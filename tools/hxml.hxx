@@ -30,7 +30,7 @@ Copyright:
  */
 
 #ifndef YAAL_TOOLS_HXML_HXX_INCLUDED
-#define YAAL_TOOLS_HXML_HXX_INCLUDED
+#define YAAL_TOOLS_HXML_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
 #include "hcore/hmap.hxx"
@@ -354,5 +354,5 @@ char const* attr_val( HXml::HConstIterator const& it, char const* const name );
 
 }
 
-#endif /* not YAAL_TOOLS_HXML_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HXML_HXX_INCLUDED */
 

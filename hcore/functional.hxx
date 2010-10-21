@@ -750,5 +750,5 @@ struct select2nd : public unary_function<typename T::second_type, T>
 
 }
 
-#endif /* not YAAL_HCORE_FUNCTIONAL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_FUNCTIONAL_HXX_INCLUDED */
 

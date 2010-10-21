@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_HFSITEM_HXX_INCLUDED
-#define YAAL_TOOLS_HFSITEM_HXX_INCLUDED
+#define YAAL_TOOLS_HFSITEM_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
 #include "hcore/hchunk.hxx"
@@ -108,5 +108,5 @@ inline void swap( yaal::tools::HFSItem::HIterator& a, yaal::tools::HFSItem::HIte
 
 }
 
-#endif /* not YAAL_TOOLS_HFSITEM_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HFSITEM_HXX_INCLUDED */
 

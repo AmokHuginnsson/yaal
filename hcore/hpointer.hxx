@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HPOINTER_HXX_INCLUDED
-#define YAAL_HCORE_HPOINTER_HXX_INCLUDED
+#define YAAL_HCORE_HPOINTER_HXX_INCLUDED 1
 
 #include "hcore/base.hxx"
 #include "hcore/trait.hxx"
@@ -654,5 +654,5 @@ inline void swap( yaal::hcore::HPointer<tType, pointer_type_t, access_type_t>& a
 
 }
 
-#endif /* not YAAL_HCORE_HPOINTER_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HPOINTER_HXX_INCLUDED */
 

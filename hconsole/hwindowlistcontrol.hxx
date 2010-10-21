@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCONSOLE_HWINDOWLISTCONTROL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HWINDOWLISTCONTROL_HXX_INCLUDED
+#define YAAL_HCONSOLE_HWINDOWLISTCONTROL_HXX_INCLUDED 1
 
 #include "hconsole/hlistcontrol.hxx"
 #include "hconsole/hwindow.hxx"
@@ -58,4 +58,5 @@ protected:
 
 }
 
-#endif /* not YAAL_HCONSOLE_HWINDOWLISTCONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HWINDOWLISTCONTROL_HXX_INCLUDED */
+

@@ -29,7 +29,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_BOUND_HXX_INCLUDED
-#define YAAL_HCORE_BOUND_HXX_INCLUDED
+#define YAAL_HCORE_BOUND_HXX_INCLUDED 1
 
 #include "hcore/hcall.hxx"
 
@@ -265,5 +265,5 @@ typename call_calculator<
 
 }
 
-#endif /* not YAAL_HCORE_BOUND_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_BOUND_HXX_INCLUDED */
 

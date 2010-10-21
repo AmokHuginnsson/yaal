@@ -32,7 +32,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_BASE_HXX_INCLUDED
-#define YAAL_HCORE_BASE_HXX_INCLUDED
+#define YAAL_HCORE_BASE_HXX_INCLUDED 1
 
 #include "hcore/compat.hxx"
 #include "hcore/macro.hxx"
@@ -148,5 +148,5 @@ char ( &YaalArrayElementCountHelper( T ( &YaalArrayElementCountHelperArray )[N] 
 
 }
 
-#endif /* not YAAL_HCORE_BASE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_BASE_HXX_INCLUDED */
 

@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef HSTREAMINTERFACE_HXX_INCLUDED
-#define HSTREAMINTERFACE_HXX_INCLUDED
+#ifndef YAAL_HCORE_HSTREAMINTERFACE_HXX_INCLUDED
+#define YAAL_HCORE_HSTREAMINTERFACE_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
 #include "hcore/hchunk.hxx"
@@ -266,5 +266,5 @@ HStreamIterator<stream_t, char const* const> stream_iterator( stream_t& stream )
 
 }
 
-#endif /* not HSTREAMINTERFACE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HSTREAMINTERFACE_HXX_INCLUDED */
 

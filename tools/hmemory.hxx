@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_HMEMORY_HXX_INCLUDED
-#define YAAL_TOOLS_HMEMORY_HXX_INCLUDED
+#define YAAL_TOOLS_HMEMORY_HXX_INCLUDED 1
 
 #include "hcore/hstreaminterface.hxx"
 
@@ -97,5 +97,5 @@ typedef yaal::hcore::HExceptionT<HMemory, yaal::hcore::HStreamInterfaceException
 
 }
 
-#endif /* not YAAL_TOOLS_HMEMORY_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HMEMORY_HXX_INCLUDED */
 

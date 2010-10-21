@@ -30,7 +30,7 @@ Copyright:
  */
 
 #ifndef YAAL_TOOLS_HBITMAP_HXX_INCLUDED
-#define YAAL_TOOLS_HBITMAP_HXX_INCLUDED
+#define YAAL_TOOLS_HBITMAP_HXX_INCLUDED 1
 
 #include "hcore/hexception.hxx"
 
@@ -218,5 +218,5 @@ private:
 
 }
 
-#endif /* not YAAL_TOOLS_HBITMAP_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HBITMAP_HXX_INCLUDED */
 

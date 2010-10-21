@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_HCHUNK_HXX_INCLUDED
-#define YAAL_HCORE_HCHUNK_HXX_INCLUDED
+#define YAAL_HCORE_HCHUNK_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
 
@@ -98,5 +98,5 @@ inline void swap( yaal::hcore::HChunk& a, yaal::hcore::HChunk& b )
 
 }
 
-#endif /* not YAAL_HCORE_HCHUNK_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HCHUNK_HXX_INCLUDED */
 

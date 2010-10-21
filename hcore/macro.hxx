@@ -80,9 +80,9 @@ Copyright:
  * \post Normal progam flow is continued only if condition is met, otherwise HFailedAssertion exception is thrown.
  */
 #	define M_ASSERT( condition ) do { if ( ! ( condition ) )yaal::hcore::HException::failed_assert( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition ); } while ( 0 )
-#else /* NDEBUG */
+#else /* #ifndef NDEBUG */
 #	define M_ASSERT( c ) /**/
-#endif /* not NDEBUG */
+#endif /* #else #ifndef NDEBUG */
 /*! \brief Run given code exactly once at the end of currnt scope.
  *
  * \param code - code to be run.
@@ -130,5 +130,5 @@ class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LIN
 #define __declspec( x ) /**/
 #endif /* #else #ifdef __MSVCXX__ */
 
-#endif /* not YAAL_HCORE_MACRO_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_MACRO_HXX_INCLUDED */
 

@@ -290,5 +290,5 @@ inline void swap( yaal::hcore::HHashContainer& a, yaal::hcore::HHashContainer& b
 
 }
 
-#endif /* not YAAL_HCORE_HHASHCONTAINER_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HHASHCONTAINER_HXX_INCLUDED */
 

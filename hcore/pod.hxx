@@ -136,5 +136,5 @@ typedef int long signed i64_t; /*!< 64 bit signed integer. */
 
 }
 
-#endif /* not YAAL_HCORE_POD_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_POD_HXX_INCLUDED */
 

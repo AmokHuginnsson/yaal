@@ -30,7 +30,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_HPATTERN_HXX_INCLUDED
-#define YAAL_HCORE_HPATTERN_HXX_INCLUDED
+#define YAAL_HCORE_HPATTERN_HXX_INCLUDED 1
 
 #include "hcore/hchunk.hxx"
 #include "hcore/hstring.hxx"
@@ -130,5 +130,5 @@ typedef HExceptionT<HPattern> HPatternException;
 
 }
 
-#endif /* not YAAL_HCORE_HPATTERN_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HPATTERN_HXX_INCLUDED */
 

@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HDATA_HDATAWINDOW_HXX_INCLUDED
-#define YAAL_HDATA_HDATAWINDOW_HXX_INCLUDED
+#define YAAL_HDATA_HDATAWINDOW_HXX_INCLUDED 1
 
 #include "dbwrapper/hdatabase.hxx"
 #include "hconsole/hwindow.hxx"
@@ -114,4 +114,5 @@ private:
 
 }
 
-#endif /* not YAAL_HDATA_HDATAWINDOW_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HDATA_HDATAWINDOW_HXX_INCLUDED */
+

@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCONSOLE_HSTATUSBARCONTROL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HSTATUSBARCONTROL_HXX_INCLUDED
+#define YAAL_HCONSOLE_HSTATUSBARCONTROL_HXX_INCLUDED 1
 
 #include "hconsole/heditcontrol.hxx"
 #include "hcore/hpointer.hxx"
@@ -115,5 +115,5 @@ protected:
 
 }
 
-#endif /* not YAAL_HCONSOLE_HSTATUSBARCONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HSTATUSBARCONTROL_HXX_INCLUDED */
 

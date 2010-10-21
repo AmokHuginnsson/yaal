@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HTIME_HXX_INCLUDED
-#define YAAL_HCORE_HTIME_HXX_INCLUDED
+#define YAAL_HCORE_HTIME_HXX_INCLUDED 1
 
 #include <ctime>
 
@@ -89,5 +89,5 @@ typedef HExceptionT<HTime> HTimeException;
 
 }
 
-#endif /* not YAAL_HCORE_HTIME_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HTIME_HXX_INCLUDED */
 

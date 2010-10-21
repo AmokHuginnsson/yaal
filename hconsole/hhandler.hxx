@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCONSOLE_HHANDLER_HXX_INCLUDED
-#define YAAL_HCONSOLE_HHANDLER_HXX_INCLUDED
+#define YAAL_HCONSOLE_HHANDLER_HXX_INCLUDED 1
 
 #include "hcore/hhashmap.hxx"
 
@@ -74,4 +74,5 @@ typedef yaal::hcore::HExceptionT<HHandler> HHandlerException;
 
 }
 
-#endif /* not YAAL_HCONSOLE_HHANDLER_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HHANDLER_HXX_INCLUDED */
+

@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCONSOLE_OMENUITEM_HXX_INCLUDED
-#define YAAL_HCONSOLE_OMENUITEM_HXX_INCLUDED
+#define YAAL_HCONSOLE_OMENUITEM_HXX_INCLUDED 1
 
 #include "hconsole/htuiprocess.hxx"
 
@@ -62,4 +62,5 @@ inline void swap( yaal::hconsole::OMenuItem& a, yaal::hconsole::OMenuItem& b )
 
 }
 
-#endif /* not YAAL_HCONSOLE_OMENUITEM_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_OMENUITEM_HXX_INCLUDED */
+

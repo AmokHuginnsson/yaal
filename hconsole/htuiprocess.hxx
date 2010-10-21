@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCONSOLE_HTUIPROCESS_HXX_INCLUDED
-#define YAAL_HCONSOLE_HTUIPROCESS_HXX_INCLUDED
+#define YAAL_HCONSOLE_HTUIPROCESS_HXX_INCLUDED 1
 
 #include "tools/hiodispatcher.hxx"
 #include "hconsole/hhandler.hxx"
@@ -88,5 +88,5 @@ typedef yaal::hcore::HExceptionT<HTUIProcess, HHandlerException> HTUIProcessExce
 
 }
 
-#endif /* not YAAL_HCONSOLE_HTUIPROCESS_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HTUIPROCESS_HXX_INCLUDED */
 

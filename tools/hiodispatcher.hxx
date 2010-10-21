@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_HPROCESS_HXX_INCLUDED
-#define YAAL_TOOLS_HPROCESS_HXX_INCLUDED
+#define YAAL_TOOLS_HPROCESS_HXX_INCLUDED 1
 
 #include "hcore/harray.hxx"
 #include "hcore/hhashmap.hxx"
@@ -109,5 +109,5 @@ typedef yaal::hcore::HExceptionT<HIODispatcher> HIODispatcherException;
 
 }
 
-#endif /* not YAAL_TOOLS_HPROCESS_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HPROCESS_HXX_INCLUDED */
 

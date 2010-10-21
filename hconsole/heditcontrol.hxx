@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCONSOLE_HEDITCONTROL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HEDITCONTROL_HXX_INCLUDED
+#define YAAL_HCONSOLE_HEDITCONTROL_HXX_INCLUDED 1
 
 #include "hcore/hlist.hxx"
 #include "hcore/hpattern.hxx"
@@ -128,4 +128,5 @@ private:
 
 }
 
-#endif /* not YAAL_HCONSOLE_HEDITCONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HEDITCONTROL_HXX_INCLUDED */
+

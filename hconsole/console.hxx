@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCONSOLE_CONSOLE_HXX_INCLUDED
-#define YAAL_HCONSOLE_CONSOLE_HXX_INCLUDED
+#define YAAL_HCONSOLE_CONSOLE_HXX_INCLUDED 1
 
 #include <cstdarg>
 
@@ -260,5 +260,5 @@ extern M_YAAL_HCONSOLE_PUBLIC_API char const* const white;
 
 }
 
-#endif /* not YAAL_HCONSOLE_CONSOLE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_CONSOLE_HXX_INCLUDED */
 

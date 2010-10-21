@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HRAWFILE_HXX_INCLUDED
-#define YAAL_HCORE_HRAWFILE_HXX_INCLUDED
+#define YAAL_HCORE_HRAWFILE_HXX_INCLUDED 1
 
 #include "hcore/hopenssl.hxx"
 #include "hcore/hstreaminterface.hxx"
@@ -115,5 +115,5 @@ extern int long _writeTimeout_;
 
 }
 
-#endif /* not YAAL_HCORE_HRAWFILE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HRAWFILE_HXX_INCLUDED */
 

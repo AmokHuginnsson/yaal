@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCONSOLE_HTREECONTROL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HTREECONTROL_HXX_INCLUDED
+#define YAAL_HCONSOLE_HTREECONTROL_HXX_INCLUDED 1
 
 #include "hcore/htree.hxx"
 #include "hconsole/hitem.hxx"
@@ -99,4 +99,5 @@ private:
 
 }
 
-#endif /* not YAAL_HCONSOLE_HTREECONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HTREECONTROL_HXX_INCLUDED */
+

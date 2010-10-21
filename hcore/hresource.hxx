@@ -30,7 +30,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_HRESOURCE_HXX_INCLUDED
-#define YAAL_HCORE_HRESOURCE_HXX_INCLUDED
+#define YAAL_HCORE_HRESOURCE_HXX_INCLUDED 1
 
 #include "hcore/base.hxx"
 #include "hcore/algorithm.hxx"
@@ -372,5 +372,5 @@ inline void swap( yaal::hcore::HResource<type_t, free_t, hold_by_t, allocated_t>
 
 }
 
-#endif /* not YAAL_HCORE_HRESOURCE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HRESOURCE_HXX_INCLUDED */
 

@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_HDES_HXX_INCLUDED
-#define YAAL_TOOLS_HDES_HXX_INCLUDED
+#define YAAL_TOOLS_HDES_HXX_INCLUDED 1
 
 #include "hcore/pod.hxx"
 #include "hcore/hstring.hxx"
@@ -80,5 +80,5 @@ private:
 
 }
 
-#endif /* not YAAL_TOOLS_HDES_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HDES_HXX_INCLUDED */
 

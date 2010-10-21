@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HDATA_HDATA_HXX_INCLUDED
-#define YAAL_HDATA_HDATA_HXX_INCLUDED
+#define YAAL_HDATA_HDATA_HXX_INCLUDED 1
 
 namespace yaal
 {
@@ -37,5 +37,5 @@ namespace hdata
 
 }
 
-#endif /* not YAAL_HDATA_HDATA_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HDATA_HDATA_HXX_INCLUDED */
 

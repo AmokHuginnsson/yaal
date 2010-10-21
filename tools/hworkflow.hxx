@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_HWORKFLOW_HXX_INCLUDED
-#define YAAL_TOOLS_HWORKFLOW_HXX_INCLUDED
+#define YAAL_TOOLS_HWORKFLOW_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
 #include "hcore/hboundcall.hxx"
@@ -99,5 +99,5 @@ private:
 
 }
 
-#endif /* not YAAL_TOOLS_HWORKFLOW_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HWORKFLOW_HXX_INCLUDED */
 

@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCONSOLE_HMAINWINDOW_HXX_INCLUDED
-#define YAAL_HCONSOLE_HMAINWINDOW_HXX_INCLUDED
+#define YAAL_HCONSOLE_HMAINWINDOW_HXX_INCLUDED 1
 
 #include "hconsole/hwindow.hxx"
 #include "hconsole/omenuitem.hxx"
@@ -66,4 +66,5 @@ private:
 
 }
 
-#endif /* not YAAL_HCONSOLE_HMAINWINDOW_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HMAINWINDOW_HXX_INCLUDED */
+

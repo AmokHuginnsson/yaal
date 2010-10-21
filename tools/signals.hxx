@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_SIGHAND_HXX_INCLUDED
-#define YAAL_TOOLS_SIGHAND_HXX_INCLUDED
+#define YAAL_TOOLS_SIGHAND_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
 #include "hcore/hchunk.hxx"
@@ -85,5 +85,5 @@ typedef yaal::hcore::HExceptionT<HSignalService> HSignalServiceException;
 
 }
 
-#endif /* not YAAL_TOOLS_SIGHAND_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_SIGHAND_HXX_INCLUDED */
 

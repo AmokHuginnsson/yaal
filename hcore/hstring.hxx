@@ -276,5 +276,5 @@ inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b )
 
 }
 
-#endif /* not YAAL_HCORE_HSTRING_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HSTRING_HXX_INCLUDED */
 

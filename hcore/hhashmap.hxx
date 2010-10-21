@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HHASHMAP_HXX_INCLUDED
-#define YAAL_HCORE_HHASHMAP_HXX_INCLUDED
+#define YAAL_HCORE_HHASHMAP_HXX_INCLUDED 1
 
 #include "hcore/hhashcontainer.hxx"
 #include "hcore/hexception.hxx"
@@ -310,5 +310,5 @@ inline void swap( yaal::hcore::HHashMap<key_type, data_type, hash_function_t>& a
 
 }
 
-#endif /* not YAAL_HCORE_HHASHMAP_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HHASHMAP_HXX_INCLUDED */
 

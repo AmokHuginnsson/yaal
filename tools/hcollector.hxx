@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_TOOLS_HCOLLECTOR_HXX_INCLUDED
-#define YAAL_TOOLS_HCOLLECTOR_HXX_INCLUDED
+#define YAAL_TOOLS_HCOLLECTOR_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
 #include "tools/hserial.hxx"
@@ -80,4 +80,5 @@ typedef yaal::hcore::HExceptionT<HCollector, HSerialException> HCollectorExcepti
 
 }
 	
-#endif /* not YAAL_TOOLS_HCOLLECTOR_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HCOLLECTOR_HXX_INCLUDED */
+

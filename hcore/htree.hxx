@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HTREE_HXX_INCLUDED
-#define YAAL_HCORE_HTREE_HXX_INCLUDED
+#define YAAL_HCORE_HTREE_HXX_INCLUDED 1
 
 #include "hcore/hexception.hxx"
 #include "hcore/hlist.hxx"
@@ -720,5 +720,5 @@ inline void swap( yaal::hcore::HTree<type_t>& a, yaal::hcore::HTree<type_t>& b )
 
 }
 
-#endif /* not YAAL_HCORE_HTREE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HTREE_HXX_INCLUDED */
 

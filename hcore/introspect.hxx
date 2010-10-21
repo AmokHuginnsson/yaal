@@ -66,5 +66,5 @@ void dump_call_stack( HStreamInterface&, int frames );
 
 }
 
-#endif /* not YAAL_HCORE_INTROSPECT_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_INTROSPECT_HXX_INCLUDED */
 

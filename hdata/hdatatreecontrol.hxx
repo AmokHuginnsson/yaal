@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HDATA_HDATATREECONTROL_HXX_INCLUDED
-#define YAAL_HDATA_HDATATREECONTROL_HXX_INCLUDED
+#define YAAL_HDATA_HDATATREECONTROL_HXX_INCLUDED 1
 
 #include "hconsole/htreecontrol.hxx"
 #include "hdata/hdatacontrol.hxx"
@@ -52,4 +52,5 @@ public:
 
 }
 
-#endif /* not YAAL_HDATA_HDATATREECONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HDATA_HDATATREECONTROL_HXX_INCLUDED */
+

@@ -30,7 +30,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_HEXCEPTION_HXX_INCLUDED
-#define YAAL_HCORE_HEXCEPTION_HXX_INCLUDED
+#define YAAL_HCORE_HEXCEPTION_HXX_INCLUDED 1
 
 #include <cerrno>
 #include <cstddef>
@@ -295,5 +295,5 @@ void throw_exception( char const* file, char const* function, int line, HString 
 
 }
 
-#endif /* not YAAL_HCORE_HEXCEPTION_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HEXCEPTION_HXX_INCLUDED */
 

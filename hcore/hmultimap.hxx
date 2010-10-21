@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HMULTIMAP_HXX_INCLUDED
-#define YAAL_HCORE_HMULTIMAP_HXX_INCLUDED
+#define YAAL_HCORE_HMULTIMAP_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
 #include "hcore/hmap.hxx"
@@ -436,5 +436,5 @@ inline void swap( yaal::hcore::HMultiMap<value_type, helper_t>& a, yaal::hcore::
 
 }
 
-#endif /* not YAAL_HCORE_HMULTIMAP_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HMULTIMAP_HXX_INCLUDED */
 

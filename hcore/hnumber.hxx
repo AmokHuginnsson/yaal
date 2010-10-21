@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HNUMBER_HXX_INCLUDED
-#define YAAL_HCORE_HNUMBER_HXX_INCLUDED
+#define YAAL_HCORE_HNUMBER_HXX_INCLUDED 1
 
 #include "hcore/hchunk.hxx"
 #include "hcore/hstring.hxx"
@@ -138,5 +138,5 @@ inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b )
 
 }
 
-#endif /* not YAAL_HCORE_HNUMBER_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HNUMBER_HXX_INCLUDED */
 

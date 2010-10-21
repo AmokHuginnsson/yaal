@@ -29,7 +29,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_STATIC_ASSERT_HXX_INCLUDED
-#define YAAL_HCORE_STATIC_ASSERT_HXX_INCLUDED
+#define YAAL_HCORE_STATIC_ASSERT_HXX_INCLUDED 1
 
 #define M_CONCAT_REAL( a, b ) a ## b
 #define M_CONCAT( a, b ) M_CONCAT_REAL( a, b )
@@ -57,5 +57,5 @@ template<> struct static_assert_failure<true> { enum { value = 1 }; };
 
 }
 
-#endif /* not YAAL_HCORE_STATIC_ASSERT_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_STATIC_ASSERT_HXX_INCLUDED */
 

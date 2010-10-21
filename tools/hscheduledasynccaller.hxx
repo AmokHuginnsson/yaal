@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_HSCHEDULEDASYNCCALLER_HXX_INCLUDED
-#define YAAL_TOOLS_HSCHEDULEDASYNCCALLER_HXX_INCLUDED
+#define YAAL_TOOLS_HSCHEDULEDASYNCCALLER_HXX_INCLUDED 1
 
 #include "tools/hasynccaller.hxx"
 
@@ -62,5 +62,5 @@ typedef yaal::hcore::HExceptionT<HScheduledAsyncCaller, HAbstractAsyncCallerExce
 
 }
 
-#endif /* not YAAL_TOOLS_HSCHEDULEDASYNCCALLER_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HSCHEDULEDASYNCCALLER_HXX_INCLUDED */
 

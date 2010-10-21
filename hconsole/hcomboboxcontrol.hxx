@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCONSOLE_HCOMBOBOXCONTROL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HCOMBOBOXCONTROL_HXX_INCLUDED
+#define YAAL_HCONSOLE_HCOMBOBOXCONTROL_HXX_INCLUDED 1
 
 #include "hconsole/heditcontrol.hxx"
 #include "hconsole/hlistcontrol.hxx"
@@ -93,5 +93,5 @@ private:
 
 }
 
-#endif /* not YAAL_HCONSOLE_HCOMBOBOXCONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HCOMBOBOXCONTROL_HXX_INCLUDED */
 

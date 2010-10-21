@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HPAIR_HXX_INCLUDED
-#define YAAL_HCORE_HPAIR_HXX_INCLUDED
+#define YAAL_HCORE_HPAIR_HXX_INCLUDED 1
 
 #include "hcore/base.hxx"
 #include "hcore/hexception.hxx"
@@ -84,5 +84,5 @@ HPair<first_type, second_type> make_pair( first_type const& first, second_type c
 
 }
 
-#endif /* not YAAL_HCORE_HPAIR_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HPAIR_HXX_INCLUDED */
 

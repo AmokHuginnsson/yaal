@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_HSOCKET_HXX_INCLUDED
-#define YAAL_HCORE_HSOCKET_HXX_INCLUDED
+#define YAAL_HCORE_HSOCKET_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
 #include "hcore/hrawfile.hxx"
@@ -110,5 +110,5 @@ typedef HExceptionT<HSocket, HRawFileException> HSocketException;
 
 }
 
-#endif /* not YAAL_HCORE_HSOCKET_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HSOCKET_HXX_INCLUDED */
 

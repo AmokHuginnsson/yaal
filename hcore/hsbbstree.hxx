@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_HSBBSTREE_HXX_INCLUDED
-#define YAAL_HCORE_HSBBSTREE_HXX_INCLUDED
+#define YAAL_HCORE_HSBBSTREE_HXX_INCLUDED 1
 
 #include "hcore/hexception.hxx"
 #include "hcore/hpair.hxx"
@@ -297,5 +297,5 @@ inline void swap( yaal::hcore::HSBBSTree& a, yaal::hcore::HSBBSTree& b )
 
 }
 
-#endif /* not YAAL_HCORE_HSBBSTREE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HSBBSTREE_HXX_INCLUDED */
 

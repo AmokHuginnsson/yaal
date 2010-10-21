@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_HARRAY_HXX_INCLUDED
-#define YAAL_HCORE_HARRAY_HXX_INCLUDED
+#define YAAL_HCORE_HARRAY_HXX_INCLUDED 1
 
 #include <new>
 
@@ -674,5 +674,5 @@ bool HArray<type_t>::operator < ( HArray const& a_ ) const
 
 }
 
-#endif /* YAAL_HCORE_HARRAY_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HARRAY_HXX_INCLUDED */
 

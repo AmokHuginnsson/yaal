@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HLOG_HXX_INCLUDED
-#define YAAL_HCORE_HLOG_HXX_INCLUDED
+#define YAAL_HCORE_HLOG_HXX_INCLUDED 1
 
 #include <cstdarg>
 
@@ -113,5 +113,5 @@ extern M_YAAL_HCORE_PUBLIC_API HLog& log;
 
 }
 
-#endif /* not YAAL_HCORE_HLOG_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HLOG_HXX_INCLUDED */
 

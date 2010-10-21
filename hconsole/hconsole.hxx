@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCONSOLE_HCONSOLE_HXX_INCLUDED
-#define YAAL_HCONSOLE_HCONSOLE_HXX_INCLUDED
+#define YAAL_HCONSOLE_HCONSOLE_HXX_INCLUDED 1
 
 namespace yaal
 {
@@ -54,5 +54,5 @@ void banner( void );
 
 }
 
-#endif /* not YAAL_HCONSOLE_HCONSOLE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HCONSOLE_HXX_INCLUDED */
 

@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCONSOLE_HCONTROLLIST_HXX_INCLUDED
-#define YAAL_HCONSOLE_HCONTROLLIST_HXX_INCLUDED
+#define YAAL_HCONSOLE_HCONTROLLIST_HXX_INCLUDED 1
 
 #include "hcore/hlist.hxx"
 #include "hconsole/hcontrol.hxx"
@@ -67,4 +67,5 @@ public:
 
 }
 
-#endif /* not YAAL_HCONSOLE_HCONTROLLIST_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HCONTROLLIST_HXX_INCLUDED */
+

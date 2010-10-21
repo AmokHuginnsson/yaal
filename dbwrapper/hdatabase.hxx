@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_DBWRAPPER_HDATABASE_HXX_INCLUDED
-#define YAAL_DBWRAPPER_HDATABASE_HXX_INCLUDED
+#define YAAL_DBWRAPPER_HDATABASE_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
 #include "dbwrapper/db_driver_loader.hxx"
@@ -78,4 +78,5 @@ typedef HDataBaseException HSQLException;
 
 }
 
-#endif /* not YAAL_DBWRAPPER_HDATABASE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_DBWRAPPER_HDATABASE_HXX_INCLUDED */
+

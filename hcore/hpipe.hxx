@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HPIPE_HXX_INCLUDED
-#define YAAL_HCORE_HPIPE_HXX_INCLUDED
+#define YAAL_HCORE_HPIPE_HXX_INCLUDED 1
 
 #include "hcore/hstreaminterface.hxx"
 #include "hcore/hpointer.hxx"
@@ -63,5 +63,5 @@ typedef HExceptionT<HPipe,HStreamInterfaceException> HPipeException;
 
 }
 
-#endif /* not YAAL_HCORE_HPIPE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HPIPE_HXX_INCLUDED */
 

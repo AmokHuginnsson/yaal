@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_HBITSOURCE_HXX_INCLUDED
-#define YAAL_TOOLS_HBITSOURCE_HXX_INCLUDED
+#define YAAL_TOOLS_HBITSOURCE_HXX_INCLUDED 1
 
 #include "hcore/base.hxx"
 #include "hcore/hchunk.hxx"
@@ -102,5 +102,5 @@ typedef yaal::hcore::HExceptionT<HStreamBlockIterator> HBitSourceException;
 
 }
 
-#endif /* not YAAL_TOOLS_HBITSOURCE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HBITSOURCE_HXX_INCLUDED */
 

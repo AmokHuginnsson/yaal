@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_TOOLS_UTIL_HXX_INCLUDED
-#define YAAL_TOOLS_UTIL_HXX_INCLUDED
+#define YAAL_TOOLS_UTIL_HXX_INCLUDED 1
 
 #include "hcore/base.hxx"
 #include "hcore/hstring.hxx"
@@ -162,4 +162,5 @@ HAlike<iter_t, item_t> alike( iter_t iter, item_t const& item, bool damerau = tr
 
 }
 
-#endif /* not YAAL_TOOLS_UTIL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_UTIL_HXX_INCLUDED */
+

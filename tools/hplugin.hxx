@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_HPLUGIN_HXX_INCLUDED
-#define YAAL_TOOLS_HPLUGIN_HXX_INCLUDED
+#define YAAL_TOOLS_HPLUGIN_HXX_INCLUDED 1
 
 #include "hcore/base.hxx"
 #include "hcore/hpointer.hxx"
@@ -73,5 +73,5 @@ typedef yaal::hcore::HExceptionT<HPlugin> HPluginException;
 
 }
 
-#endif /* not YAAL_TOOLS_HPLUGIN_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HPLUGIN_HXX_INCLUDED */
 

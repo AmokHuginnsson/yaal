@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCONSOLE_HLISTCONTROL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HLISTCONTROL_HXX_INCLUDED
+#define YAAL_HCONSOLE_HLISTCONTROL_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
 #include "hcore/hlist.hxx"
@@ -606,4 +606,5 @@ void HListControler<tType>::add_tail( void )
 
 }
 
-#endif /* not YAAL_HCONSOLE_HLISTCONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HLISTCONTROL_HXX_INCLUDED */
+

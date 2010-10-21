@@ -30,7 +30,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_HTHREAD_HXX_INCLUDED
-#define YAAL_HCORE_HTHREAD_HXX_INCLUDED
+#define YAAL_HCORE_HTHREAD_HXX_INCLUDED 1
 
 #include "hcore/hchunk.hxx"
 #include "hcore/hresource.hxx"
@@ -225,5 +225,5 @@ public:
 
 }
 
-#endif /* not YAAL_HCORE_HTHREAD_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HTHREAD_HXX_INCLUDED */
 

@@ -27,8 +27,8 @@ Copyright:
  * \brief Declaration of HClock class.
  */
 
-#ifndef HCLOCK_HXX_INCLUDED
-#define HCLOCK_HXX_INCLUDED
+#ifndef YAAL_HCORE_HCLOCK_HXX_INCLUDED
+#define YAAL_HCORE_HCLOCK_HXX_INCLUDED 1
 
 namespace yaal
 {
@@ -64,5 +64,5 @@ public:
 
 }
 
-#endif /* not HCLOCK_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HCLOCK_HXX_INCLUDED */
 

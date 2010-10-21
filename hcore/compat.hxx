@@ -29,7 +29,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_COMPAT_HXX_INCLUDED
-#define YAAL_HCORE_COMPAT_HXX_INCLUDED
+#define YAAL_HCORE_COMPAT_HXX_INCLUDED 1
 
 #include "config.hxx"
 
@@ -38,19 +38,19 @@ Copyright:
 /*! \cond */
 #if ! defined( HAVE_BASENAME_ARG_CONST )
 #define basename( x ) basename( const_cast<char*>( x ) )
-#endif /* not HAVE_BASENAME_ARG_CONST */
+#endif /* #if ! defined( HAVE_BASENAME_ARG_CONST ) */
 
 #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
 char* strcasestr( char const*, char const* );
-#endif /* not HAVE_STRCASESTR */
+#endif /* #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 ) */
 
 #if ! defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 )
 #define TEMP_FAILURE_RETRY(x) (x)
-#endif /* not HAVE_DECL_TEMP_FAILURE_RETRY */
+#endif /* #if ! defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 ) */
 
 #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
 void* memrchr( void const*, int, int long );
-#endif /* not HAVE_MEMRCHR */
+#endif /* #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 ) */
 
 #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 )
 int long strnlen( char const*, int long );
@@ -58,39 +58,39 @@ int long strnlen( char const*, int long );
 
 #if ! defined( HAVE_DECL_SUN_LEN ) || ( HAVE_DECL_SUN_LEN == 0 )
 #define SUN_LEN(x) ( ::std::strlen( x->sun_path ) + sizeof ( x->sun_family ) )
-#endif /* not HAVE_DECL_SUN_LEN */
+#endif /* #if ! defined( HAVE_DECL_SUN_LEN ) || ( HAVE_DECL_SUN_LEN == 0 ) */
 
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
 int gethostbyname_r( char const*, struct hostent*, char*, long unsigned, struct hostent**, int* );
-#endif /* not HAVE_GNU_GETHOSTBYNAME_R */
+#endif /* #if ! defined( HAVE_GNU_GETHOSTBYNAME_R ) */
 
 #if ! defined( HAVE_GNU_GETHOSTBYADDR_R )
 int gethostbyaddr_r( void const*, int, int, struct hostent*, char*, long unsigned, struct hostent**, int* );
-#endif /* not HAVE_GNU_GETHOSTBYADDR_R */
+#endif /* #if ! defined( HAVE_GNU_GETHOSTBYADDR_R ) */
 
 #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 )
 double long powl( double long, double long );
-#endif /* not HAVE_POWL */
+#endif /* #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 ) */
 
 #if ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 )
 double long floorl( double long );
-#endif /* not HAVE_DECL_FLOORL */
+#endif /* #if ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 ) */
 
 #if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 )
 double long strtold( char const*, char** );
-#endif /* not HAVE_STRTOLD */
+#endif /* #if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 ) */
 
 #if ! defined( HAVE_ASPRINTF ) || ( HAVE_ASPRINTF == 0 )
 int asprintf( char**, char const*, ... );
-#endif /* not HAVE_ASPRINTF */
+#endif /* #if ! defined( HAVE_ASPRINTF ) || ( HAVE_ASPRINTF == 0 ) */
 
 #if ! defined( LOGIN_NAME_MAX )
 static int const LOGIN_NAME_MAX = 16;
-#endif /* not LOGIN_NAME_MAX */
+#endif /* #if ! defined( LOGIN_NAME_MAX ) */
 
 #if ! defined( __DYNAMIC_LINKER__ )
 #define __DYNAMIC_LINKER__ ""
-#endif /* not __DYNAMIC_LINKER__ */
+#endif /* #if ! defined( __DYNAMIC_LINKER__ ) */
 
 #endif /* __YAAL_BUILD__ */
 
@@ -104,7 +104,7 @@ static int const LOGIN_NAME_MAX = 16;
 
 #if ! defined( HAVE_DECLTYPE )
 #define __decltype typeof
-#endif /* not HAVE_DECLTYPE */
+#endif /* #if ! defined( HAVE_DECLTYPE ) */
 
 #if ( HAVE_DECL_ERR == 1 )
 #include <cstdlib>
@@ -113,5 +113,5 @@ static int const LOGIN_NAME_MAX = 16;
 
 /*! \endcond */
 
-#endif /* not YAAL_HCORE_COMPAT_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_COMPAT_HXX_INCLUDED */
 

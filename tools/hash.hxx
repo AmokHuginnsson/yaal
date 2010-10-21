@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_HASH_HXX_INCLUDED
-#define YAAL_TOOLS_HASH_HXX_INCLUDED
+#define YAAL_TOOLS_HASH_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
 #include "hcore/hstreaminterface.hxx"
@@ -89,5 +89,5 @@ yaal::hcore::HString sha1( yaal::hcore::HString const& source );
 
 }
 
-#endif /* not YAAL_TOOLS_HASH_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HASH_HXX_INCLUDED */
 

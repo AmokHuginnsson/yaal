@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_HFILE_HXX_INCLUDED
-#define YAAL_HCORE_HFILE_HXX_INCLUDED
+#define YAAL_HCORE_HFILE_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
 #include "hcore/hsynchronizedstream.hxx"
@@ -139,4 +139,5 @@ extern M_YAAL_HCORE_PUBLIC_API HSynchronizedStream clog;
 
 }
 
-#endif /* not YAAL_HCORE_HFILE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HFILE_HXX_INCLUDED */
+

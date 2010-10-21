@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HDATA_ORESOURCE_HXX_INCLUDED
-#define YAAL_HDATA_ORESOURCE_HXX_INCLUDED
+#define YAAL_HDATA_ORESOURCE_HXX_INCLUDED 1
 
 #include "hcore/harray.hxx"
 #include "hconsole/hcontrol.hxx"
@@ -167,4 +167,5 @@ typedef yaal::hcore::HArray<OResource> resources_t;
 
 }
 
-#endif /* not YAAL_HDATA_ORESOURCE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HDATA_ORESOURCE_HXX_INCLUDED */
+

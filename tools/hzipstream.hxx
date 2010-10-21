@@ -94,5 +94,5 @@ typedef yaal::hcore::HExceptionT<HZipStream, yaal::hcore::HStreamInterfaceExcept
 
 }
 
-#endif /* not YAAL_TOOLS_HZIPSTREAM_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HZIPSTREAM_HXX_INCLUDED */
 

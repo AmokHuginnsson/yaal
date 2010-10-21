@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCONSOLE_HCONTROL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HCONTROL_HXX_INCLUDED
+#define YAAL_HCONSOLE_HCONTROL_HXX_INCLUDED 1
 
 #include "hconsole/console.hxx"
 #include "hcore/hpointer.hxx"
@@ -293,5 +293,5 @@ private:
 
 }
 
-#endif /* not YAAL_HCONSOLE_HCONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HCONTROL_HXX_INCLUDED */
 

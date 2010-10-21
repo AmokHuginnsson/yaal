@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCONSOLE_HSEARCHABLECONTROL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HSEARCHABLECONTROL_HXX_INCLUDED
+#define YAAL_HCONSOLE_HSEARCHABLECONTROL_HXX_INCLUDED 1
 
 #include "hcore/hpattern.hxx"
 #include "hconsole/hcontrol.hxx"
@@ -63,5 +63,5 @@ protected:
 
 }
 
-#endif /* not YAAL_HCONSOLE_HSEARCHABLECONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HSEARCHABLECONTROL_HXX_INCLUDED */
 

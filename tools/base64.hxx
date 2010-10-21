@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_BASE64_HXX_INCLUDED
-#define YAAL_TOOLS_BASE64_HXX_INCLUDED
+#define YAAL_TOOLS_BASE64_HXX_INCLUDED 1
 
 #include "hcore/hexception.hxx"
 #include "hcore/hstring.hxx"
@@ -54,5 +54,5 @@ typedef yaal::hcore::HExceptionT<base64> HBase64Exception;
 
 }
 
-#endif /* not YAAL_TOOLS_BASE64_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_BASE64_HXX_INCLUDED */
 

@@ -31,7 +31,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_HCORE_HXX_INCLUDED
-#define YAAL_HCORE_HCORE_HXX_INCLUDED
+#define YAAL_HCORE_HCORE_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
@@ -64,5 +64,5 @@ void set_strtold_impl( yaal_strtold_t );
 
 
 
-#endif /* not YAAL_HCORE_HCORE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HCORE_HXX_INCLUDED */
 

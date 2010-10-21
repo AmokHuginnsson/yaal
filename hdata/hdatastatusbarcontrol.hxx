@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HDATA_HDATASTATUSBARCONTROL_HXX_INCLUDED
-#define YAAL_HDATA_HDATASTATUSBARCONTROL_HXX_INCLUDED
+#define YAAL_HDATA_HDATASTATUSBARCONTROL_HXX_INCLUDED 1
 
 #include "hconsole/hstatusbarcontrol.hxx"
 #include "hdata/hdatawindow.hxx"
@@ -56,5 +56,5 @@ public:
 
 }
 
-#endif /* not YAAL_HDATA_HDATASTATUSBARCONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HDATA_HDATASTATUSBARCONTROL_HXX_INCLUDED */
 

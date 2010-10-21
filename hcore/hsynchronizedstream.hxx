@@ -130,5 +130,5 @@ HSynchronizedStream& HSynchronizedStream::operator()( call_t call_ )
 
 }
 
-#endif /* not YAAL_HCORE_HSYNCHRONIZEDSTREAM_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HSYNCHRONIZEDSTREAM_HXX_INCLUDED */
 

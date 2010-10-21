@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HLIST_HXX_INCLUDED
-#define YAAL_HCORE_HLIST_HXX_INCLUDED
+#define YAAL_HCORE_HLIST_HXX_INCLUDED 1
 
 #include "hcore/base.hxx"
 #include "hcore/algorithm.hxx"
@@ -1429,5 +1429,5 @@ inline void swap( yaal::hcore::HList<type_t>& a, yaal::hcore::HList<type_t>& b )
 
 }
 
-#endif /* not YAAL_HCORE_HLIST_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HLIST_HXX_INCLUDED */
 

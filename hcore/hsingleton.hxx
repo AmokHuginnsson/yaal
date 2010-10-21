@@ -30,7 +30,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_HSINGLETON_HXX_INCLUDED
-#define YAAL_HCORE_HSINGLETON_HXX_INCLUDED
+#define YAAL_HCORE_HSINGLETON_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
 #include "hcore/hmultimap.hxx"
@@ -171,5 +171,5 @@ tType& HSingleton<tType>::get_instance( int lifeTime_ )
 
 }
 
-#endif /* not YAAL_HCORE_HSINGLETON_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HSINGLETON_HXX_INCLUDED */
 

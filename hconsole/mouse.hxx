@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCONSOLE_MOUSE_HXX_INCLUDED
-#define YAAL_HCONSOLE_MOUSE_HXX_INCLUDED
+#define YAAL_HCONSOLE_MOUSE_HXX_INCLUDED 1
 
 namespace yaal
 {
@@ -82,5 +82,5 @@ int x_mouse_close( void );
 
 }
 
-#endif /* not YAAL_HCONSOLE_MOUSE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_MOUSE_HXX_INCLUDED */
 

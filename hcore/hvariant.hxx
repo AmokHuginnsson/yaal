@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HVARIANT_HXX_INCLUDED
-#define YAAL_HCORE_HVARIANT_HXX_INCLUDED
+#define YAAL_HCORE_HVARIANT_HXX_INCLUDED 1
 
 #include <new> /* holly shit */
 
@@ -460,5 +460,5 @@ int HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, 
 
 }
 
-#endif /* not YAAL_HCORE_HVARIANT_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HVARIANT_HXX_INCLUDED */
 

@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_PIPEDCHILD_HXX_INCLUDED
-#define YAAL_TOOLS_PIPEDCHILD_HXX_INCLUDED
+#define YAAL_TOOLS_PIPEDCHILD_HXX_INCLUDED 1
 
 #include "hcore/harray.hxx"
 #include "hcore/hstreaminterface.hxx"
@@ -109,5 +109,5 @@ typedef yaal::hcore::HExceptionT<HPipedChild,yaal::hcore::HStreamInterfaceExcept
 
 }
 
-#endif /* not YAAL_TOOLS_PIPEDCHILD_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_PIPEDCHILD_HXX_INCLUDED */
 

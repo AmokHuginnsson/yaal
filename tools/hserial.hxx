@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_TOOLS_HSERIAL_HXX_INCLUDED
-#define YAAL_TOOLS_HSERIAL_HXX_INCLUDED
+#define YAAL_TOOLS_HSERIAL_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
 #include "hcore/hchunk.hxx"
@@ -129,5 +129,5 @@ typedef yaal::hcore::HExceptionT<HSerial, yaal::hcore::HRawFileException> HSeria
 
 }
 
-#endif /* not YAAL_TOOLS_HSERIAL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HSERIAL_HXX_INCLUDED */
 

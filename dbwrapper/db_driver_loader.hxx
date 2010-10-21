@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_DBWRAPPER_DB_DRIVER_LOADER_HXX_INCLUDED
-#define YAAL_DBWRAPPER_DB_DRIVER_LOADER_HXX_INCLUDED
+#define YAAL_DBWRAPPER_DB_DRIVER_LOADER_HXX_INCLUDED 1
 
 #include "hcore/hmap.hxx"
 #include "tools/hplugin.hxx"
@@ -101,5 +101,5 @@ extern M_YAAL_DBWRAPPER_PUBLIC_API drivers_t _dBDrivers_;
 
 }
 
-#endif /* not YAAL_DBWRAPPER_DB_DRIVER_LOADER_HXX_INCLUDED */
+#endif /* #ifndef YAAL_DBWRAPPER_DB_DRIVER_LOADER_HXX_INCLUDED */
 

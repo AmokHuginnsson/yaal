@@ -28,7 +28,7 @@ Copyright:
  */
 
 #ifndef YAAL_HDATA_HDATAPROCESS_HXX_INCLUDED
-#define YAAL_HDATA_HDATAPROCESS_HXX_INCLUDED
+#define YAAL_HDATA_HDATAPROCESS_HXX_INCLUDED 1
 
 #include "hconsole/htuiprocess.hxx"
 #include "hconsole/omenuitem.hxx"
@@ -98,4 +98,5 @@ private:
 
 }
 
-#endif /* not YAAL_HDATA_HDATAPROCESS_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HDATA_HDATAPROCESS_HXX_INCLUDED */
+

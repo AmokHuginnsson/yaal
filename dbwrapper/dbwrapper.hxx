@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_DBWRAPPER_DBWRAPPER_HXX_INCLUDED
-#define YAAL_DBWRAPPER_DBWRAPPER_HXX_INCLUDED
+#define YAAL_DBWRAPPER_DBWRAPPER_HXX_INCLUDED 1
 
 #include "dbwrapper/db_driver_loader.hxx"
 
@@ -42,5 +42,5 @@ void banner( void );
 
 }
 
-#endif /* not YAAL_DBWRAPPER_DBWRAPPER_HXX_INCLUDED */
+#endif /* #ifndef YAAL_DBWRAPPER_DBWRAPPER_HXX_INCLUDED */
 

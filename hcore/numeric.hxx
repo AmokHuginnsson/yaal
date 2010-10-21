@@ -29,7 +29,7 @@ Copyright:
  */
 
 #ifndef YAAL_HCORE_NUMERIC_HXX_INCLUDED
-#define YAAL_HCORE_NUMERIC_HXX_INCLUDED
+#define YAAL_HCORE_NUMERIC_HXX_INCLUDED 1
 
 #include "hcore/static_assert.hxx"
 
@@ -304,5 +304,5 @@ struct less
 
 }
 
-#endif /* not YAAL_HCORE_NUMERIC_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_NUMERIC_HXX_INCLUDED */
 

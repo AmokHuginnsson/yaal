@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_HHASHMULTISET_HXX_INCLUDED
-#define YAAL_HCORE_HHASHMULTISET_HXX_INCLUDED
+#define YAAL_HCORE_HHASHMULTISET_HXX_INCLUDED 1
 
 #include "hcore/hhashcontainer.hxx"
 #include "hcore/hexception.hxx"
@@ -306,5 +306,5 @@ inline void swap( yaal::hcore::HHashMultiSet<key_type, hash_function_t>& a, yaal
 
 }
 
-#endif /* not YAAL_HCORE_HHASHMULTISET_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_HHASHMULTISET_HXX_INCLUDED */
 

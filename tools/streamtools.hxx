@@ -71,5 +71,5 @@ HBinaryFormatter operator << ( yaal::hcore::HStreamInterface&, HBinaryFormatterS
 
 }
 
-#endif /* not YAAL_TOOLS_STREAMTOOLS_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_STREAMTOOLS_HXX_INCLUDED */
 

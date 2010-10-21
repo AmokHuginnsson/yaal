@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_HCORE_ITERATOR_HXX_INCLUDED
-#define YAAL_HCORE_ITERATOR_HXX_INCLUDED
+#define YAAL_HCORE_ITERATOR_HXX_INCLUDED 1
 
 namespace yaal
 {
@@ -196,5 +196,5 @@ HInsertIterator<tType, HInsertionConcept<tType> > insert_iterator( tType& coll )
 
 }
 
-#endif /* not YAAL_HCORE_ITERATOR_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_ITERATOR_HXX_INCLUDED */
 

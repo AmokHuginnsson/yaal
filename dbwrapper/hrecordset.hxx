@@ -25,7 +25,7 @@ Copyright:
 */
 
 #ifndef YAAL_DBWRAPPER_HRECORDSET_HXX_INCLUDED
-#define YAAL_DBWRAPPER_HRECORDSET_HXX_INCLUDED
+#define YAAL_DBWRAPPER_HRECORDSET_HXX_INCLUDED 1
 
 #include "hcore/hlist.hxx"
 #include "hcore/harray.hxx"
@@ -166,5 +166,5 @@ typedef yaal::hcore::HExceptionT<HSQLDescriptor> HSQLDescriptorException;
 
 }
 
-#endif /* not YAAL_DBWRAPPER_HRECORDSET_HXX_INCLUDED */
+#endif /* #ifndef YAAL_DBWRAPPER_HRECORDSET_HXX_INCLUDED */
 
