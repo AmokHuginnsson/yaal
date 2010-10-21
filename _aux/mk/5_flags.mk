@@ -37,30 +37,41 @@ COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe \
 ifdef DO_RELDEB
 	DO_RELEASE = 1
 endif
+ifdef DO_RELASSERT
+	DO_RELEASE = 1
+endif
 ifdef DO_RELEASE
 	TARGET=release
-	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations -DNDEBUG -Wno-error
+	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations -Wno-error
+	COMPILER_DEBUG_FLAGS = -DNDEBUG
 	LIB_INFIX =
 endif
 ifdef DO_RELDEB
 	TARGET=reldeb
-	COMPILER_DEBUG_FLAGS        = -g
-	LIB_INFIX = -r
+	COMPILER_DEBUG_FLAGS = -g
+	LIB_INFIX = -rd
+endif
+ifdef DO_RELASSERT
+	TARGET=relassert
+	COMPILER_DEBUG_FLAGS = -D__DEBUG__
+	LIB_INFIX = -ra
 endif
 ifdef DO_DEBUG
 	TARGET=debug
-	COMPILER_DEBUG_FLAGS				= -O0 -g3 -ggdb3 -fno-inline -D__DEBUG__ $(DB)
+	COMPILER_DEBUG_FLAGS = -O0 -g3 -ggdb3 -fno-inline -D__DEBUG__ $(DB)
 	LIB_INFIX = -d
 endif
 ifdef DO_PROFILING
 	TARGET=prof
 	COMPILER_PROFILING_FLAGS = -pg
+	COMPILER_DEBUG_FLAGS = -D__DEBUG__
 	LINKER_PROFILING_FLAGS   = -pg
 	LIB_INFIX = -p
 endif
 ifdef DO_COVERAGE
 	TARGET=cov
 	COMPILER_COVERAGE_FLAGS = --coverage
+	COMPILER_DEBUG_FLAGS = -D__DEBUG__
 	LINKER_COVERAGE_FLAGS   = --coverage
 	LIB_INFIX = -c
 endif

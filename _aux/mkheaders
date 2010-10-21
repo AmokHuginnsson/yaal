@@ -29,7 +29,7 @@ if [ ! -f "${CONFIG_SRC_PATH}" ] ; then
 	CONFIG_SRC_PATH="${DIR_ROOT}/config.hxx"
 fi
 
-sed -e 's/define[ \t]*PACKAGE_/define YAAL_PACKAGE_/g' "${CONFIG_SRC_PATH}" > ${DIR_HEADERS}/config.hxx
+sed -e 's/define[ \t]*PACKAGE_/define YAAL_PACKAGE_/g' -e 's/#define[ \t]*LIB_INFIX.*/#undef LIB_INFIX/g' "${CONFIG_SRC_PATH}" > ${DIR_HEADERS}/config.hxx
 
 head -26 ${DIR_HEADERS}/hcore/hstreaminterface.hxx | sed -e s/hstreaminterface/yaal/ > ${DIR_HEADERS}/yaal.hxx
 

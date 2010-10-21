@@ -173,3 +173,4 @@ AC_DEFUN([YAAL_CHECK_GIT],
 		AC_MSG_WARN([no git in the first place])
 	fi
 ])
+
