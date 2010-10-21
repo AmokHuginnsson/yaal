@@ -48,7 +48,7 @@ ifdef DO_RELEASE
 endif
 ifdef DO_RELDEB
 	TARGET=reldeb
-	COMPILER_DEBUG_FLAGS = -g
+	COMPILER_DEBUG_FLAGS = -g -DNDEBUG
 	LIB_INFIX = -rd
 endif
 ifdef DO_RELASSERT
