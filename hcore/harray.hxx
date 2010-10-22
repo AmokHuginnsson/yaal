@@ -100,6 +100,9 @@ public:
 	bool operator ! ( void ) const;
 	iterator insert( iterator, type_t const& );
 	template<typename iterator_t>
+	void assign( iterator_t, iterator_t );
+	void assign( int long, type_t const& );
+	template<typename iterator_t>
 	void insert( iterator, iterator_t, iterator_t );
 	void insert( iterator, int long, type_t const& );
 	iterator erase( iterator );
@@ -289,6 +292,29 @@ void HArray<type_t>::initialize( int long size_, type_t const& fillWith_, trait:
 	{
 	M_PROLOG
 	resize( size_, fillWith_ );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+template<typename iterator_t>
+void HArray<type_t>::assign( iterator_t first, iterator_t last )
+	{
+	M_PROLOG
+	clear();
+	insert( end(), first, last );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+void HArray<type_t>::assign( int long size_, type_t const& fillWith_ )
+	{
+	M_PROLOG
+	int long oldSize( _size );
+	resize( size_, fillWith_ );
+	if ( oldSize > 0 )
+		fill_n( begin(), oldSize, fillWith_ );
 	return;
 	M_EPILOG
 	}

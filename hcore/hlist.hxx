@@ -159,6 +159,9 @@ public:
 	int long size( void ) const;
 	int long get_size( void ) const;
 	void swap( HList<type_t>& );
+	template<typename iterator_t>
+	void assign( iterator_t, iterator_t );
+	void assign( int long, type_t const& );
 	/*! \brief Adds new element at specified position.
 	 *
 	 * Newly created element will have default value.
@@ -578,6 +581,28 @@ template<typename type_t>
 void HList<type_t>::initialize( int long size_, type_t const& fillWith_, trait::true_type const* )
 	{
 	M_PROLOG
+	resize( size_, fillWith_ );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+template<typename iterator_t>
+void HList<type_t>::assign( iterator_t first, iterator_t last )
+	{
+	M_PROLOG
+	clear();
+	for ( ; first != last; ++ first )
+		push_back( *first );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+void HList<type_t>::assign( int long size_, type_t const& fillWith_ )
+	{
+	M_PROLOG
+	clear();
 	resize( size_, fillWith_ );
 	return;
 	M_EPILOG
