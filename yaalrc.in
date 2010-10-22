@@ -42,6 +42,13 @@ log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_VCSHEADER
 # before they fail with timeout in case operation did not succeeded in given time.
 write_timeout 4000
 
+# thread_stack_size
+# type: integer, default 0
+# thread_stack_size forces stack size value (in bytes) for newly created threads,
+# special value of 0 means to use current process stack size,
+# in another words, 0 means do not alter stack size value
+thread_stack_size 0
+
 # semaphore_type
 # type: special(alternative-flag), default: POSIX
 # semaphore_type selects preferred default semaphore implementation to be used by Yaal Threads.

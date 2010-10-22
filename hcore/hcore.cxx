@@ -221,6 +221,7 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	yaal_options()( "ssl_key", program_options_helper::option_value( HOpenSSL::_sSLKey ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL private key file.", "path" )
 		( "ssl_cert", program_options_helper::option_value( HOpenSSL::_sSLCert ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL certificate file.", "path" )
 		( "resolve_hostnames", program_options_helper::option_value( HSocket::_resolveHostnames ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Resolve IP address into host names." )
+		( "thread_stack_size", program_options_helper::option_value( HThread::_threadStackSize ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Set size of stack for newly created threads." )
 		( "semaphore_type", program_options_helper::option_value( dummy ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Default semaphore implementation type.", "type" )
 		( "write_timeout", program_options_helper::option_value( _writeTimeout_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Time-out for low level write operations." );
 	yaal_options().process_rc_file( "yaal", "core", set_hcore_variables );

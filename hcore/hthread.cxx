@@ -45,6 +45,7 @@ namespace hcore
 {
 
 HSemaphore::TYPE::type_t HSemaphore::DEFAULT = HSemaphore::TYPE::POSIX;
+int HThread::_threadStackSize = 0;
 
 void do_pthread_attr_destroy( void* attr )
 	{
@@ -63,7 +64,9 @@ HThread::HThread( void )
 	M_ENSURE( ::pthread_attr_init( attr ) == 0 );
 	size_t stackSize( 0 );
 	M_ENSURE( pthread_attr_getstacksize( attr, &stackSize ) == 0 );
-	log( LOG_TYPE::DEBUG ) << "Thread stack size: " << stackSize << "." << endl;
+	log( LOG_TYPE::DEBUG ) << "Default thread stack size: " << stackSize << " and we will use: " << ( _threadStackSize ? _threadStackSize : stackSize ) << endl;
+	if ( _threadStackSize > 0 )
+		M_ENSURE( pthread_attr_setstacksize( attr, _threadStackSize ) == 0 );
 	HResource<void> res( attr, do_pthread_attr_destroy );
 	_resGuard.swap( res );
 	M_ENSURE( ::pthread_attr_setdetachstate( attr, PTHREAD_CREATE_JOINABLE ) == 0 );

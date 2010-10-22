@@ -135,6 +135,9 @@ typedef HExceptionT<HSemaphore> HSemaphoreException;
  */
 class HThread
 	{
+public:
+	M_YAAL_HCORE_PUBLIC_API static int _threadStackSize;
+private:
 	typedef HThread this_type;
 	typedef enum
 		{

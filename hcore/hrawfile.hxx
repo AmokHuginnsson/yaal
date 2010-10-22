@@ -109,7 +109,7 @@ protected:
 typedef HExceptionT<HRawFile, HStreamInterfaceException> HRawFileException;
 
 static int const LOW_TIMEOUT_WARNING = 100; /* miliseconds */
-extern int long _writeTimeout_;
+extern M_YAAL_HCORE_PUBLIC_API int long _writeTimeout_;
 
 }
 
