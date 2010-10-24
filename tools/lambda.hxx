@@ -69,3 +69,4 @@ HLambdaStream operator << ( yaal::hcore::HStreamInterface& stream_, yaal::hcore:
 }
 
 #endif /* #ifndef YAAL_TOOLS_LAMBDA_HXX_INCLUDED */
+
