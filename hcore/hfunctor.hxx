@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HCORE_HFUNCTOR_HXX_INCLUDED 1
 
 #include "hcore/trait.hxx"
+#include "hcore/placeholder.hxx"
 
 namespace yaal
 {
@@ -42,18 +43,6 @@ namespace hcore
 
 namespace free_standing_call_args
 {
-
-struct arg_base
-	{
-	typedef trait::no_type free_standing_call_arg_type_t;
-	virtual ~arg_base( void ) {}
-	};
-
-template<int arg_no>
-struct arg : public arg_base
-	{
-	arg( void ) {}
-	};
 
 template<int, int, typename, typename, typename = trait::no_type, typename = trait::no_type,
 	typename = trait::no_type, typename = trait::no_type,
@@ -79,17 +68,17 @@ template<typename arg_t, typename fa0_t, typename fa1_t = trait::no_type,
 	typename fa10_t = trait::no_type>
 struct select
 	{
-	typedef typename trait::ternary<trait::same_type<arg<1>, arg_t>::value, fa0_t,
-					typename trait::ternary<trait::same_type<arg<2>, arg_t>::value, fa1_t,
-					typename trait::ternary<trait::same_type<arg<3>, arg_t>::value, fa2_t,
-					typename trait::ternary<trait::same_type<arg<4>, arg_t>::value, fa3_t,
-					typename trait::ternary<trait::same_type<arg<5>, arg_t>::value, fa4_t,
-					typename trait::ternary<trait::same_type<arg<6>, arg_t>::value, fa5_t,
-					typename trait::ternary<trait::same_type<arg<7>, arg_t>::value, fa6_t,
-					typename trait::ternary<trait::same_type<arg<8>, arg_t>::value, fa7_t,
-					typename trait::ternary<trait::same_type<arg<9>, arg_t>::value, fa8_t,
-					typename trait::ternary<trait::same_type<arg<10>, arg_t>::value, fa9_t,
-					typename trait::ternary<trait::same_type<arg<11>, arg_t>::value, fa10_t,
+	typedef typename trait::ternary<trait::same_type<higher_order::placeholder<1>, arg_t>::value, fa0_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<2>, arg_t>::value, fa1_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<3>, arg_t>::value, fa2_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<4>, arg_t>::value, fa3_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<5>, arg_t>::value, fa4_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<6>, arg_t>::value, fa5_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<7>, arg_t>::value, fa6_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<8>, arg_t>::value, fa7_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<9>, arg_t>::value, fa8_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<10>, arg_t>::value, fa9_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<11>, arg_t>::value, fa10_t,
 					arg_t>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type type;
 
 	};
@@ -100,7 +89,7 @@ struct resolve_arg<1, arg_t, fa0_t, trait::no_type, trait::no_type, trait::no_ty
 	typedef typename select<arg_t, fa0_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0 )
 		{
-		return ( getter<1, trait::find_type<arg_t, arg<1> >::value, arg_t, fa0_t>::get( a, fa0 ) );
+		return ( getter<1, trait::find_type<arg_t, higher_order::placeholder<1> >::value, arg_t, fa0_t>::get( a, fa0 ) );
 		}
 	};
 
@@ -110,7 +99,7 @@ struct resolve_arg<2, arg_t, fa0_t, fa1_t, trait::no_type, trait::no_type, trait
 	typedef typename select<arg_t, fa0_t, fa1_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1 )
 		{
-		return ( getter<2, trait::find_type<arg_t, arg<1>, arg<2> >::value, arg_t, fa0_t, fa1_t>::get( a, fa0, fa1 ) );
+		return ( getter<2, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2> >::value, arg_t, fa0_t, fa1_t>::get( a, fa0, fa1 ) );
 		}
 	};
 
@@ -120,7 +109,7 @@ struct resolve_arg<3, arg_t, fa0_t, fa1_t, fa2_t, trait::no_type, trait::no_type
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
 		{
-		return ( getter<3, trait::find_type<arg_t, arg<1>, arg<2>, arg<3> >::value, arg_t, fa0_t, fa1_t, fa2_t>::get( a, fa0, fa1, fa2 ) );
+		return ( getter<3, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3> >::value, arg_t, fa0_t, fa1_t, fa2_t>::get( a, fa0, fa1, fa2 ) );
 		}
 	};
 
@@ -130,7 +119,7 @@ struct resolve_arg<4, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, trait::no_type, trait::
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
 		{
-		return ( getter<4, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4> >::value,
+		return ( getter<4, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( a, fa0, fa1, fa2, fa3 ) );
 		}
 	};
@@ -141,7 +130,7 @@ struct resolve_arg<5, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, trait::no_type, 
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
 		{
-		return ( getter<5, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5> >::value,
+		return ( getter<5, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( a, fa0, fa1, fa2, fa3, fa4 ) );
 		}
 	};
@@ -152,7 +141,7 @@ struct resolve_arg<6, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, trait::no
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
 		{
-		return ( getter<6, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5>, arg<6> >::value,
+		return ( getter<6, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5 ) );
 		}
 	};
@@ -163,7 +152,7 @@ struct resolve_arg<7, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, tr
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
 		{
-		return ( getter<7, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5>, arg<6>, arg<7> >::value,
+		return ( getter<7, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6>, higher_order::placeholder<7> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) );
 		}
 	};
@@ -174,7 +163,7 @@ struct resolve_arg<8, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
 		{
-		return ( getter<8, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5>, arg<6>, arg<7>, arg<8> >::value,
+		return ( getter<8, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6>, higher_order::placeholder<7>, higher_order::placeholder<8> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) );
 		}
 	};
@@ -185,7 +174,7 @@ struct resolve_arg<9, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
 		{
-		return ( getter<9, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5>, arg<6>, arg<7>, arg<8>, arg<9> >::value,
+		return ( getter<9, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6>, higher_order::placeholder<7>, higher_order::placeholder<8>, higher_order::placeholder<9> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) );
 		}
 	};
@@ -196,7 +185,7 @@ struct resolve_arg<10, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, f
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
 		{
-		return ( getter<10, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5>, arg<6>, arg<7>, arg<8>, arg<9>, arg<10> >::value,
+		return ( getter<10, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6>, higher_order::placeholder<7>, higher_order::placeholder<8>, higher_order::placeholder<9>, higher_order::placeholder<10> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( a, fa0, fa1, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) );
 		}
 	};
@@ -207,7 +196,7 @@ struct resolve_arg<11, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, f
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 )
 		{
-		return ( getter<11, trait::find_type<arg_t, arg<1>, arg<2>, arg<3>, arg<4>, arg<5>, arg<6>, arg<7>, arg<8>, arg<9>, arg<10>, arg<11> >::value,
+		return ( getter<11, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6>, higher_order::placeholder<7>, higher_order::placeholder<8>, higher_order::placeholder<9>, higher_order::placeholder<10>, higher_order::placeholder<11> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( a, fa0, fa1, fa3, fa4, fa5, fa6, fa7, fa8, fa9, fa10 ) );
 		}
 	};
@@ -298,27 +287,6 @@ struct getter<N, -1, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7
 
 }
 
-/*! \endcond */
-
-namespace
-{
-
-static const free_standing_call_args::arg<1> _1; /*!< Place holder for first anonymous argument. */
-static const free_standing_call_args::arg<2> _2; /*!< Place holder for second anonymous argument. */
-static const free_standing_call_args::arg<3> _3; /*!< Place holder for third anonymous argument. */
-static const free_standing_call_args::arg<4> _4; /*!< Place holder for fourth anonymous argument. */
-static const free_standing_call_args::arg<5> _5; /*!< Place holder for fifth anonymous argument. */
-static const free_standing_call_args::arg<6> _6; /*!< Place holder for sixth anonymous argument. */
-static const free_standing_call_args::arg<7> _7; /*!< Place holder for seventh anonymous argument. */
-static const free_standing_call_args::arg<8> _8; /*!< Place holder for eighth anonymous argument. */
-static const free_standing_call_args::arg<9> _9; /*!< Place holder for ninth anonymous argument. */
-static const free_standing_call_args::arg<10> _10; /*!< Place holder for tenth anonymous argument. */
-static const free_standing_call_args::arg<11> _11; /*!< Place holder for eleventh anonymous argument. */
-
-}
-
-/*! \cond */
-
 struct object_resolver
 	{
 	typedef enum { REF, PTR, FREE_REF, FREE_PTR } object_type_t;
@@ -326,16 +294,16 @@ struct object_resolver
 	struct object_type
 		{
 		static object_type_t const value = static_cast<object_type_t>( meta::ternary<meta::greater<trait::find_type<CLASS_t,
-					free_standing_call_args::arg<1>,
-					free_standing_call_args::arg<2>,
-					free_standing_call_args::arg<3>,
-					free_standing_call_args::arg<4>,
-					free_standing_call_args::arg<5>,
-					free_standing_call_args::arg<6>,
-					free_standing_call_args::arg<7>,
-					free_standing_call_args::arg<8>,
-					free_standing_call_args::arg<9>,
-					free_standing_call_args::arg<10> >::value, -1>::value,
+					higher_order::placeholder<1>,
+					higher_order::placeholder<2>,
+					higher_order::placeholder<3>,
+					higher_order::placeholder<4>,
+					higher_order::placeholder<5>,
+					higher_order::placeholder<6>,
+					higher_order::placeholder<7>,
+					higher_order::placeholder<8>,
+					higher_order::placeholder<9>,
+					higher_order::placeholder<10> >::value, -1>::value,
 				meta::ternary<trait::is_pointer<arg_t>::value, FREE_PTR, FREE_REF>::value,
 				meta::ternary<trait::is_pointer<CLASS_t>::value, PTR, REF>::value>::value );
 		};

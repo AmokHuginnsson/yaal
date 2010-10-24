@@ -356,17 +356,17 @@ struct call_calculator
 	struct free_standing_args_count
 		{
 		static int const value =
-			+ meta::ternary<trait::is_kind_of<fa0_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<fa1_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<fa2_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<fa3_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<fa4_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<fa5_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<fa6_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<fa7_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<fa8_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<fa9_t, free_standing_call_args::arg_base>::value, 1, 0>::value
-			+ meta::ternary<trait::is_kind_of<fa10_t, free_standing_call_args::arg_base>::value, 1, 0>::value;
+			+ meta::ternary<trait::is_kind_of<fa0_t, higher_order::placeholder_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa1_t, higher_order::placeholder_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa2_t, higher_order::placeholder_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa3_t, higher_order::placeholder_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa4_t, higher_order::placeholder_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa5_t, higher_order::placeholder_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa6_t, higher_order::placeholder_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa7_t, higher_order::placeholder_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa8_t, higher_order::placeholder_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa9_t, higher_order::placeholder_base>::value, 1, 0>::value
+			+ meta::ternary<trait::is_kind_of<fa10_t, higher_order::placeholder_base>::value, 1, 0>::value;
 		};
 	template<typename ra0_t, typename ra1_t = trait::no_type,
 		typename ra2_t = trait::no_type, typename ra3_t = trait::no_type,
@@ -385,37 +385,37 @@ struct call_calculator
 		/* f* are types deduced from call() arguments
 		 * ra* are true argument types of function/method
 		 */
-		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<1>,
+		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<1>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a0_t;
-		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<2>,
+		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<2>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a1_t;
-		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<3>,
+		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<3>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a2_t;
-		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<4>,
+		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<4>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a3_t;
-		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<5>,
+		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<5>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a4_t;
-		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<6>,
+		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<6>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a5_t;
-		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<7>,
+		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<7>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a6_t;
-		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<8>,
+		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<8>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a7_t;
-		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<9>,
+		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<9>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a8_t;
-		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<10>,
+		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<10>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a9_t;
-		typedef typename trait::select_index<trait::find_type<free_standing_call_args::arg<11>,
+		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<11>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a10_t;
 		};
@@ -569,19 +569,19 @@ struct call_calculator
 		};
 	typedef typename trait::ternary<trait::is_member<METHOD_t>::value, /* we have method */
 					typename trait::ternary<meta::greater<trait::find_type<fa0_t, /* is 'this' a free standing arg? */
-					free_standing_call_args::arg<1>,
-					free_standing_call_args::arg<2>,
-					free_standing_call_args::arg<3>,
-					free_standing_call_args::arg<4>,
-					free_standing_call_args::arg<5>,
-					free_standing_call_args::arg<6>,
-					free_standing_call_args::arg<7>,
-					free_standing_call_args::arg<8>,
-					free_standing_call_args::arg<9>,
-					free_standing_call_args::arg<10> >::value, -1>::value,
+					higher_order::placeholder<1>,
+					higher_order::placeholder<2>,
+					higher_order::placeholder<3>,
+					higher_order::placeholder<4>,
+					higher_order::placeholder<5>,
+					higher_order::placeholder<6>,
+					higher_order::placeholder<7>,
+					higher_order::placeholder<8>,
+					higher_order::placeholder<9>,
+					higher_order::placeholder<10> >::value, -1>::value,
 						functor_this, functor>::type,
 						typename trait::ternary<trait::is_field<METHOD_t>::value,
-							typename trait::ternary<trait::same_type<fa0_t, free_standing_call_args::arg<1> >::value,
+							typename trait::ternary<trait::same_type<fa0_t, higher_order::placeholder<1> >::value,
 								field_this, field>::type, function>::type>::type type;
 	};
 

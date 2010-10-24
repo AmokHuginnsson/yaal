@@ -24,7 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-/*! \file Declaration of HResource<> class.
+/*! \file hcore/hresource.hxx
+ * \brief Declaration of HResource<> class.
  *
  * Scoped reasource guardian with definable resource free freeing function.
  */

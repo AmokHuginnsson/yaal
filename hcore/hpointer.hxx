@@ -184,6 +184,8 @@ public:
 	tType* operator->( void );
 	tType const* raw( void ) const;
 	tType* raw( void );
+	tType const* get( void ) const;
+	tType* get( void );
 	bool operator! ( void ) const;
 	void swap( HPointer& );
 	void reset( void );
@@ -547,6 +549,20 @@ tType const* HPointer<tType, pointer_type_t, access_type_t>::raw( void ) const
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 tType* HPointer<tType, pointer_type_t, access_type_t>::raw( void )
+	{
+	return ( _object );
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t>
+tType const* HPointer<tType, pointer_type_t, access_type_t>::get( void ) const
+	{
+	return ( _object );
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t>
+tType* HPointer<tType, pointer_type_t, access_type_t>::get( void )
 	{
 	return ( _object );
 	}
