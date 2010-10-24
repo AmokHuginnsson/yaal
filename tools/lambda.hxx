@@ -59,7 +59,7 @@ public:
 		}
 	};
 
-HLambdaStream operator << ( yaal::hcore::HStreamInterface& stream_, yaal::hcore::higher_order::placeholder<1> )
+inline HLambdaStream operator << ( yaal::hcore::HStreamInterface& stream_, yaal::hcore::higher_order::placeholder<1> )
 	{
 	return ( HLambdaStream( stream_ ) );
 	}
