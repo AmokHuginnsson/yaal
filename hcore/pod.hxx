@@ -77,6 +77,32 @@ struct is_integral
 	typedef trait::false_type type;
 	};
 
+/*! \brief Check if type is a floating point type.
+ *
+ * \tparam T - type to test.
+ * \retval value - true iff T is a floating point type.
+ * \retval type - true_type iff T is a floating point type.
+ */
+template<typename T>
+struct is_floating_point
+	{
+	static bool const value = false;
+	typedef trait::false_type type;
+	};
+
+/*! \brief Check if type is a numeric type.
+ *
+ * \tparam T - type to test.
+ * \retval value - true iff T is a numeric type.
+ * \retval type - true_type iff T is a numeric type.
+ */
+template<typename T>
+struct is_numeric
+	{
+	static bool const value = ( is_integral<T>::value || is_floating_point<T>::value );
+	typedef typename trait::ternary<value, trait::true_type, trait::false_type>::type type;
+	};
+
 /*! \cond */
 template<>
 struct is_integral<int>
@@ -115,6 +141,27 @@ struct is_integral<int long>
 
 template<>
 struct is_integral<int long unsigned>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+
+template<>
+struct is_floating_point<float>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+
+template<>
+struct is_floating_point<double>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+
+template<>
+struct is_floating_point<double long>
 	{
 	static bool const value = true;
 	typedef trait::true_type type;

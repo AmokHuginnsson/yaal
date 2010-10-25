@@ -40,6 +40,137 @@ namespace yaal
 namespace tools
 {
 
+template<int no>
+inline yaal::hcore::higher_order::placeholder<no> operator *( yaal::hcore::higher_order::placeholder<no> arg_ )
+	{
+	return ( arg_ );
+	}
+
+template<typename T1, typename T2>
+struct promote
+	{
+	typedef typename trait::ternary<
+			is_integral<T1>::value != is_integral<T2>::value,
+			typename trait::ternary<is_floating_point<T1>::value, T1, T2>::type,
+			typename trait::ternary<sizeof ( T1 ) >= sizeof (T2 ), T1, T2>::type
+		>::type type;
+	};
+
+template<typename T1, typename T2>
+struct return_type_binary_arithmetic
+	{
+	static bool const both_numeric = ( is_numeric<T1>::value && is_numeric<T2>::value );
+	typedef typename trait::ternary<trait::same_type<T1, T2>::value, T1, typename trait::ternary<both_numeric, typename promote<T1, T2>::type, trait::no_type>::type>::type type;
+	};
+
+class HLambdaPlus
+	{
+public:
+	template<typename T1, typename T2>
+	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ )
+		{
+		return ( val1_ + val2_ );
+		}
+	};
+
+class HLambdaMinus
+	{
+public:
+	template<typename T1, typename T2>
+	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ )
+		{
+		return ( val1_ - val2_ );
+		}
+	};
+
+class HLambdaMuliplies
+	{
+public:
+	template<typename T1, typename T2>
+	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ )
+		{
+		return ( val1_ * val2_ );
+		}
+	};
+
+class HLambdaDivides
+	{
+public:
+	template<typename T1, typename T2>
+	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ )
+		{
+		return ( val1_ / val2_ );
+		}
+	};
+
+inline HLambdaPlus operator + ( yaal::hcore::higher_order::placeholder<1>, yaal::hcore::higher_order::placeholder<2> )
+	{
+	return ( HLambdaPlus() );
+	}
+
+inline HLambdaMinus operator - ( yaal::hcore::higher_order::placeholder<1>, yaal::hcore::higher_order::placeholder<2> )
+	{
+	return ( HLambdaMinus() );
+	}
+
+inline HLambdaMuliplies operator * ( yaal::hcore::higher_order::placeholder<1>, yaal::hcore::higher_order::placeholder<2> )
+	{
+	return ( HLambdaMuliplies() );
+	}
+
+inline HLambdaDivides operator / ( yaal::hcore::higher_order::placeholder<1>, yaal::hcore::higher_order::placeholder<2> )
+	{
+	return ( HLambdaDivides() );
+	}
+
+template<typename T>
+inline HBinder<plus<T>, T, 0> operator + ( T const& constant_, yaal::hcore::higher_order::placeholder<1> )
+	{
+	return ( HBinder<plus<T>, T, 0>( plus<T>(), constant_ ) );
+	}
+
+template<typename T>
+inline HBinder<plus<T>, T, 1> operator + ( yaal::hcore::higher_order::placeholder<1>, T const& constant_ )
+	{
+	return ( HBinder<plus<T>, T, 1>( plus<T>(), constant_ ) );
+	}
+
+template<typename T>
+inline HBinder<minus<T>, T, 0> operator - ( T const& constant_, yaal::hcore::higher_order::placeholder<1> )
+	{
+	return ( HBinder<minus<T>, T, 0>( minus<T>(), constant_ ) );
+	}
+
+template<typename T>
+inline HBinder<minus<T>, T, 1> operator - ( yaal::hcore::higher_order::placeholder<1>, T const& constant_ )
+	{
+	return ( HBinder<minus<T>, T, 1>( minus<T>(), constant_ ) );
+	}
+
+template<typename T>
+inline HBinder<multiplies<T>, T, 0> operator * ( T const& constant_, yaal::hcore::higher_order::placeholder<1> )
+	{
+	return ( HBinder<multiplies<T>, T, 0>( multiplies<T>(), constant_ ) );
+	}
+
+template<typename T>
+inline HBinder<multiplies<T>, T, 1> operator * ( yaal::hcore::higher_order::placeholder<1>, T const& constant_ )
+	{
+	return ( HBinder<multiplies<T>, T, 1>( multiplies<T>(), constant_ ) );
+	}
+
+template<typename T>
+inline HBinder<divides<T>, T, 0> operator / ( T const& constant_, yaal::hcore::higher_order::placeholder<1> )
+	{
+	return ( HBinder<divides<T>, T, 0>( divides<T>(), constant_ ) );
+	}
+
+template<typename T>
+inline HBinder<divides<T>, T, 1> operator / ( yaal::hcore::higher_order::placeholder<1>, T const& constant_ )
+	{
+	return ( HBinder<divides<T>, T, 1>( divides<T>(), constant_ ) );
+	}
+
 class HLambdaStream
 	{
 	yaal::hcore::HStreamInterface& _stream;
