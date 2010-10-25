@@ -78,6 +78,12 @@ public:
 	template<typename T1, typename T2, typename T3>
 	R operator()( T1 const& arg1_, T2 const& arg2_, T3 const& arg3_ )
 		{ return ( _lambda.operator()<R>( arg1_, arg2_, arg3_ ) ); }
+	template<typename T1, typename T2, typename T3, typename T4>
+	R operator()( T1 const& arg1_, T2 const& arg2_, T3 const& arg3_, T4 const& arg4_ )
+		{ return ( _lambda.operator()<R>( arg1_, arg2_, arg3_, arg4_ ) ); }
+	template<typename T1, typename T2, typename T3, typename T4, typename T5>
+	R operator()( T1 const& arg1_, T2 const& arg2_, T3 const& arg3_, T4 const& arg4_, T5 const& arg4_ )
+		{ return ( _lambda.operator()<R>( arg1_, arg2_, arg3_, arg4_, arg5_ ) ); }
 	};
 
 template<typename T, typename L>
