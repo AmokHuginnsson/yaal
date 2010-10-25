@@ -63,44 +63,71 @@ struct return_type_binary_arithmetic
 	typedef typename trait::ternary<trait::same_type<T1, T2>::value, T1, typename trait::ternary<both_numeric, typename promote<T1, T2>::type, trait::no_type>::type>::type type;
 	};
 
+template<typename R, typename L>
+class HLambdaReturn
+	{
+	L _lambda;
+public:
+	HLambdaReturn( L lambda_ ) : _lambda( lambda_ ) {}
+	template<typename T1>
+	R operator()( T1 const& arg1_ )
+		{ return ( _lambda.operator()<R>( arg1_ ) ); }
+	template<typename T1, typename T2>
+	R operator()( T1 const& arg1_, T2 const& arg2_ )
+		{ return ( _lambda.operator()<R>( arg1_, arg2_ ) ); }
+	template<typename T1, typename T2, typename T3>
+	R operator()( T1 const& arg1_, T2 const& arg2_, T3 const& arg3_ )
+		{ return ( _lambda.operator()<R>( arg1_, arg2_, arg3_ ) ); }
+	};
+
+template<typename T, typename L>
+HLambdaReturn<T, L> ret( L lambda_ )
+	{
+	return ( HLambdaReturn<T, L>( lambda_ ) );
+	}
+
 class HLambdaPlus
 	{
 public:
+	template<typename R, typename T1, typename T2>
+	R operator()( T1 const& val1_, T2 const& val2_ )
+		{ return ( static_cast<R>( val1_ + val2_ ) ); }
 	template<typename T1, typename T2>
 	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ )
-		{
-		return ( val1_ + val2_ );
-		}
+		{ return ( val1_ + val2_ ); }
 	};
 
 class HLambdaMinus
 	{
 public:
+	template<typename R, typename T1, typename T2>
+	R operator()( T1 const& val1_, T2 const& val2_ )
+		{ return ( static_cast<R>( val1_ - val2_ ) ); }
 	template<typename T1, typename T2>
 	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ )
-		{
-		return ( val1_ - val2_ );
-		}
+		{ return ( val1_ - val2_ ); }
 	};
 
 class HLambdaMuliplies
 	{
 public:
+	template<typename R, typename T1, typename T2>
+	R operator()( T1 const& val1_, T2 const& val2_ )
+		{ return ( static_cast<R>( val1_ * val2_ ) ); }
 	template<typename T1, typename T2>
 	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ )
-		{
-		return ( val1_ * val2_ );
-		}
+		{ return ( val1_ * val2_ ); }
 	};
 
 class HLambdaDivides
 	{
 public:
+	template<typename R, typename T1, typename T2>
+	R operator()( T1 const& val1_, T2 const& val2_ )
+		{ return ( static_cast<R>( val1_ / val2_ ) ); }
 	template<typename T1, typename T2>
 	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ )
-		{
-		return ( val1_ / val2_ );
-		}
+		{ return ( val1_ / val2_ ); }
 	};
 
 inline HLambdaPlus operator + ( yaal::hcore::higher_order::placeholder<1>, yaal::hcore::higher_order::placeholder<2> )
