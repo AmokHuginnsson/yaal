@@ -239,7 +239,7 @@ void HThread::set_name( char const* name_ )
 #elif defined( HAVE_PTHREAD_SET_NAME_NP ) /* #if defined( HAVE_PTHREAD_SETNAME_NP ) */
 	::pthread_set_name_np( ::pthread_self(), name );
 #else /* #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
-	log( LOG_TYPE::WARNING ) << "Setting thread name not supported on your platform" << endl;
+	log( LOG_TYPE::WARNING ) << "Setting thread name (`" << name_ << "') not supported on your platform." << endl;
 #endif /* #else #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
 	return;
 	}
