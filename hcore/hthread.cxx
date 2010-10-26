@@ -31,6 +31,11 @@ Copyright:
 #include <unistd.h>
 #include <libintl.h>
 
+#include "config.hxx"
+#if defined( HAVE_PTHREAD_SET_NAME_NP )
+#include <pthread_np.h>
+#endif /* #if defined( HAVE_PTHREAD_SET_NAME_NP ) */
+
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
