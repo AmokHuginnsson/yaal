@@ -67,6 +67,7 @@ void* HScheduledAsyncCaller::do_work( void )
 	{
 	M_PROLOG
 	HLock l( _mutex );
+	HThread::set_name( "HScheduledAsyncCaller" );
 	while ( _loop )
 		{
 		queue_t::iterator it = _queue.begin();

@@ -106,13 +106,25 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _exceptionType_;
  */
 HString demangle( char const* );
 
+template<typename tType>
+HString type_name( tType const* object_ )
+	{
+	return ( demangle( typeid( *object_ ).name() ) );
+	}
+
+template<typename tType>
+HString type_name( void )
+	{
+	return ( demangle( typeid( tType ).name() ) );
+	}
+
 /*! \brief Template used to create type specyfic exceptions.
  */
 template<typename tType, typename base_type = HException>
 class HExceptionT : public base_type
 	{
 public:
-	HExceptionT( HString const& reason_, HString const& symbol_ = demangle( typeid( tType ).name() ) )
+	HExceptionT( HString const& reason_, HString const& symbol_ = type_name<tType>() )
 		: base_type( _exceptionType_, symbol_, 0, reason_, errno )
 		{ }
 	HExceptionT( HString const& fileName_,

@@ -148,6 +148,7 @@ void HSignalService::stop( void )
 void* HSignalService::run( void )
 	{
 	M_PROLOG
+	HThread::set_name( "HSignalService" );
 	while ( _loop && _thread.is_alive() )
 		{
 		int sigNo = 0;

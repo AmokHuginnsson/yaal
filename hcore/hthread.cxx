@@ -224,6 +224,21 @@ int long HThread::get_id( void )
 	return ( reinterpret_cast<int long>( reinterpret_cast<void*>( pthread_self() ) ) );
 	}
 
+void HThread::set_name( char const* name_ )
+	{
+	char name[16];
+	strncpy( name, name_, 16 );
+	name[15] = 0;
+#if defined( HAVE_PTHREAD_SETNAME_NP )
+	::pthread_setname_np( ::pthread_self(), name );
+#elif defined( HAVE_PTHREAD_SET_NAME_NP ) /* #if defined( HAVE_PTHREAD_SETNAME_NP ) */
+	::pthread_set_name_np( ::pthread_self(), name );
+#else /* #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
+	log( LOG_TYPE::WARNING ) << "Setting thread name not supported on your platform" << endl;
+#endif /* #else #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
+	return;
+	}
+
 void do_pthread_mutexattr_destroy( void* attr )
 	{
 	::pthread_mutexattr_destroy( static_cast<pthread_mutexattr_t*>( attr ) );

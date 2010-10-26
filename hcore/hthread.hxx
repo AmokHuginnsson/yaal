@@ -26,7 +26,7 @@ Copyright:
 /*! \file hcore/hthread.hxx
  * \brief Declaration of threading related classes.
  *
- * HThread, HThreadT<>, HMutex, HLock, HSemaphore, HCondition.
+ * HThread, HMutex, HLock, HSemaphore, HCondition, HEvent.
  */
 
 #ifndef YAAL_HCORE_HTHREAD_HXX_INCLUDED
@@ -161,6 +161,7 @@ public:
 	void schedule_finish( void );
  	bool is_alive( void ) const;
 	static int long get_id( void );
+	static void set_name( char const* );
 private:
 	void* control( void );
 	static void* SPAWN( void* );

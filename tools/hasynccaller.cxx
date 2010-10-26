@@ -125,6 +125,7 @@ void HAsyncCaller::do_signal( void )
 void* HAsyncCaller::do_work( void )
 	{
 	M_PROLOG
+	HThread::set_name( "HAsyncCaller" );
 	while ( _loop )
 		{
 		_semaphore.wait();

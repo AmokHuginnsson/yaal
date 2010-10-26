@@ -137,6 +137,7 @@ void HWorkFlow::HWorker::finish( void )
 void* HWorkFlow::HWorker::run( void )
 	{
 	M_PROLOG
+	HThread::set_name( "HWorkFlow" );
 	HWorkFlow::task_t t;
 	while ( !! ( t = _workFlow->pop_task() ) )
 		{
