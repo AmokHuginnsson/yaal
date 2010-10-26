@@ -10,6 +10,7 @@
 #cmakedefine01 HAVE_STRTOLD
 #cmakedefine HAVE_PTHREAD_SETNAME_NP
 #cmakedefine HAVE_PTHREAD_SET_NAME_NP
+#cmakedefine HAVE_PRCTL
 #cmakedefine01 HAVE_POWL
 #cmakedefine01 HAVE_DECL_TEMP_FAILURE_RETRY
 #cmakedefine01 HAVE_DECL_FLOORL

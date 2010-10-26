@@ -34,7 +34,9 @@ Copyright:
 #include "config.hxx"
 #if defined( HAVE_PTHREAD_SET_NAME_NP )
 #include <pthread_np.h>
-#endif /* #if defined( HAVE_PTHREAD_SET_NAME_NP ) */
+#elif ! defined( HAVE_PTHREAD_SETNAME_NP ) && defined( HAVE_PRCTL ) /* #if defined( HAVE_PTHREAD_SET_NAME_NP ) */
+#include <sys/prctl.h>
+#endif /* #elif ! defined( HAVE_PTHREAD_SETNAME_NP ) && defined( HAVE_PRCTL ) #if defined( HAVE_PTHREAD_SET_NAME_NP ) */
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -238,9 +240,11 @@ void HThread::set_name( char const* name_ )
 	::pthread_setname_np( ::pthread_self(), name );
 #elif defined( HAVE_PTHREAD_SET_NAME_NP ) /* #if defined( HAVE_PTHREAD_SETNAME_NP ) */
 	::pthread_set_name_np( ::pthread_self(), name );
-#else /* #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
+#elif defined( HAVE_PRCTL ) /* #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
+	::prctl( PR_SET_NAME, name, 0, 0, 0 );
+#else /* #elif defined( HAVE_PRCTL ) #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
 	log( LOG_TYPE::WARNING ) << "Setting thread name (`" << name_ << "') not supported on your platform." << endl;
-#endif /* #else #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
+#endif /* #else #elif defined( HAVE_PRCTL ) #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
 	return;
 	}
 
