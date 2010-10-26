@@ -8,8 +8,8 @@
 #cmakedefine01 HAVE_STRCASESTR
 #cmakedefine01 HAVE_ASPRINTF
 #cmakedefine01 HAVE_STRTOLD
-#cmakedefine01 HAVE_PTHREAD_SETNAME_NP
-#cmakedefine01 HAVE_PTHREAD_SET_NAME_NP
+#cmakedefine HAVE_PTHREAD_SETNAME_NP
+#cmakedefine HAVE_PTHREAD_SET_NAME_NP
 #cmakedefine01 HAVE_POWL
 #cmakedefine01 HAVE_DECL_TEMP_FAILURE_RETRY
 #cmakedefine01 HAVE_DECL_FLOORL
