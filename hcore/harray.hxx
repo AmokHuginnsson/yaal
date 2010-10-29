@@ -90,6 +90,10 @@ public:
 	type_t const& operator [] ( int long ) const;
 	void push_back( type_t const& );
 	void pop_back( void );
+	type_t& front( void );
+	type_t const& front( void ) const;
+	type_t& back( void );
+	type_t const& back( void ) const;
 	int long get_size( void ) const;
 	int long size( void ) const;
 	int long get_capacity( void ) const;
@@ -503,6 +507,42 @@ typename HArray<type_t>::iterator HArray<type_t>::erase( iterator it )
 	iterator next( it );
 	++ next;
 	return ( erase( it, next ) );
+	M_EPILOG
+	}
+
+template<typename type_t>
+type_t& HArray<type_t>::front( void )
+	{
+	M_PROLOG
+	M_ASSERT( _size > 0 );
+	return ( *_buf.get<value_type>() );
+	M_EPILOG
+	}
+
+template<typename type_t>
+type_t const& HArray<type_t>::front( void ) const
+	{
+	M_PROLOG
+	M_ASSERT( _size > 0 );
+	return ( *_buf.get<value_type const>() );
+	M_EPILOG
+	}
+
+template<typename type_t>
+type_t& HArray<type_t>::back( void )
+	{
+	M_PROLOG
+	M_ASSERT( _size > 0 );
+	return ( _buf.get<value_type>()[ _size - 1 ] );
+	M_EPILOG
+	}
+
+template<typename type_t>
+type_t const& HArray<type_t>::back( void ) const
+	{
+	M_PROLOG
+	M_ASSERT( _size > 0 );
+	return ( _buf.get<value_type const>()[ _size - 1 ] );
 	M_EPILOG
 	}
 

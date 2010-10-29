@@ -179,8 +179,14 @@ public:
 	void resize( int long, type_t const& = value_type() );
 	type_t& operator [] ( int long );
 	type_t const& operator [] ( int long ) const;
+	void push_front( type_t const& );
+	void pop_front( void );
 	void push_back( type_t const& );
 	void pop_back( void );
+	type_t& front( void );
+	type_t const& front( void ) const;
+	type_t& back( void );
+	type_t const& back( void ) const;
 	int long get_size( void ) const;
 	int long size( void ) const;
 	bool empty( void ) const;
@@ -214,8 +220,7 @@ private:
 	void initialize( iterator_t, iterator_t, trait::false_type const* );
 	void initialize( int long, type_t const&, trait::true_type const* );
 	void insert_space( int long, int long );
-	static int long chunk_size( void );
-	static int long values_per_chunk( void );
+	static int long chunk_count( int long );
 	int long capacity( void ) const;
 	};
 
@@ -279,9 +284,15 @@ HDeque<type_t>::HDeque( iterator_t first, iterator_t last )
 	}
 
 template<typename type_t>
+int long HDeque<type_t>::chunk_count( int long size_ )
+	{
+	return ( ( size_ / VALUES_PER_CHUNK ) + ( size_ % VALUES_PER_CHUNK ? 1 : 2 ) );
+	}
+
+template<typename type_t>
 int long HDeque<type_t>::capacity( void ) const
 	{
-	return ( ( _chunks.size() / sizeof ( value_type* ) ) * values_per_chunk() );
+	return ( ( _chunks.size() / sizeof ( value_type* ) ) * VALUES_PER_CHUNK );
 	}
 
 template<typename type_t>
