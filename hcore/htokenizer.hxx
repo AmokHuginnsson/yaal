@@ -62,7 +62,7 @@ public:
 public:
 	HTokenizer( HString const&, HString const&, behavoir_t const& = INCLUDE_EMPTY );
 	HTokenizer( HString const&, behavoir_t const& = INCLUDE_EMPTY );
-	void split( HString const& );
+	void assign( HString const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
 	HString const& operator[] ( int long ) const;

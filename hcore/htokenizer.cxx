@@ -45,7 +45,7 @@ HTokenizer::HTokenizer( HString const& delim_, behavoir_t const& behavoir_ )
 	{
 	}
 
-void HTokenizer::split( HString const& str_ )
+void HTokenizer::assign( HString const& str_ )
 	{
 	M_PROLOG
 	_string = str_;
