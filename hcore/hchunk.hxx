@@ -80,6 +80,9 @@ public:
 		{ return ( _size ); }
 	int long size( void ) const
 		{ return ( _size ); }
+	template<typename T>
+	int long count_of( void ) const
+		{ return ( _size / sizeof ( T ) ); }
 private:
 	HChunk( HChunk const& );
 	HChunk& operator = ( HChunk const& );

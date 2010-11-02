@@ -220,8 +220,7 @@ private:
 	void initialize( iterator_t, iterator_t, trait::false_type const* );
 	void initialize( int long, type_t const&, trait::true_type const* );
 	void insert_space( int long, int long );
-	static int long chunk_count( int long );
-	int long capacity( void ) const;
+	void center_chunks( int long );
 	};
 
 }
@@ -284,25 +283,15 @@ HDeque<type_t>::HDeque( iterator_t first, iterator_t last )
 	}
 
 template<typename type_t>
-int long HDeque<type_t>::chunk_count( int long size_ )
-	{
-	return ( ( size_ / VALUES_PER_CHUNK ) + ( size_ % VALUES_PER_CHUNK ? 1 : 2 ) );
-	}
-
-template<typename type_t>
-int long HDeque<type_t>::capacity( void ) const
-	{
-	return ( ( _chunks.size() / sizeof ( value_type* ) ) * VALUES_PER_CHUNK );
-	}
-
-template<typename type_t>
 void HDeque<type_t>::clear( void )
 	{
 	M_PROLOG
 	value_type** chunks( _chunks.get<value_type*>() );
 	for ( iterator it( _start ); it != _finish; ++ it )
 		it->~value_type();
-	for ( int long i( _start._index / CHUNK_SIZE ); chunks[ i ]; ++ i )
+	for ( int long i( _start._index / CHUNK_SIZE ),
+			CAPACITY( _chunks.count_of<value_type*>() );
+			( i < CAPACITY ) && chunks[ i ]; ++ i )
 		delete [] chunks[ i ];
 	_size = 0;
 	return;
@@ -311,14 +300,60 @@ void HDeque<type_t>::clear( void )
 
 #if 0
 template<typename type_t>
+void HDeque<type_t>::center_chunks( int long chunksCount_ )
+	{
+	M_PROLOG
+	int long firstUsedChunkIndex( _start._index / VALUES_PER_CHUNK );
+	int long chunksToMove( min( chunksCount_, _finish._index > 0 ? ( ( ( ( _finish._index - 1 ) / VALUES_PER_CHUNK ) - firstUsedChunkIndex ) + 1 ) : 0 ) );
+	int long nextFirstUsedChunkIndex( ( _chunks.count_of<value_type*>() - chunksCount_ ) / 2 );
+	if ( chunksToMove > 0 )
+		{
+		value_type** chunks( _chunks.get<value_type*>() );
+		if ( nextFirstUsedChunkIndex < firstUsedChunkIndex )
+			{
+			copy( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + chunksToMove, chunks + nextFirstUsedChunkIndex );
+			_start._index -= ( chunksToMove * VALUES_PER_CHUNK );
+			M_ASSERT( _start._index >= 0 );
+			}
+		else if ( nextFirstUsedChunkIndex > firstUsedChunkIndex )
+			{
+			copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + chunksToMove, chunks + nextFirstUsedChunkIndex );
+			_start._index += ( chunksToMove * VALUES_PER_CHUNK );
+			}
+		}
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
 void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ )
 	{
 	M_PROLOG
+	M_ASSERT( _size >= 0 );
+	M_ASSERT( size_ >= 0 );
 	if ( size_ > _size )
 		{
-		if ( size_ > capacity() )
-			{
-			}
+		int long firstUsedChunkIndex( _start._index / VALUES_PER_CHUNK );
+		M_ASSERT( _start._index + size_ > 0 );
+		/* Last chunk index after resize().
+		 */
+		int long nextLastUsedChunkIndex( ( ( _start._index + size_ ) - 1 ) / VALUES_PER_CHUNK );
+		/* Do we have to resize _chunks?
+		 * i.e.
+		 * _chunks can hold 4 chunks,
+		 * first used chunk index == 0
+		 * last used chunk index before resize == 3 (max possible last chunk index for given _chunks size)
+		 * last used chunk index after resize == 4
+		 * so test need to have following semantics:
+		 * ( ( next last used chunk index - first used chunk index ) + 1 > current _chunks size ) => resize _chunks
+		 * + 1 apeared in expression due to the fact that used chunk indexes are always inclusive
+		 */
+		/* Dafault realloc policy is geometric
+		 */
+		int long nextUsedChunksCount( ( nextLastUsedChunkIndex - firstUsedChunkIndex ) + 1 );
+		if ( nextUsedChunksCount > _chunks.count_of<value_type*>() )
+			_chunks.realloc( nextUsedChunksCount * sizeof ( value_type* ) );
+		center_chunks( nextUsedChunksCount );
 		}
 	else if ( size_ < _size )
 		{
