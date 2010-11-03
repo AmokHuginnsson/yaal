@@ -224,10 +224,16 @@ public:
 		{ return ( &_owner->_buf.template get<const_qual_t>()[ _index ] ); }
 	template<typename other_const_qual_t>
 	bool operator == ( HIterator<other_const_qual_t> const& it ) const
-		{ return ( _index == it._index ); }
+		{
+		M_ASSERT( _owner == it._owner );
+		return ( _index == it._index );
+		}
 	template<typename other_const_qual_t>
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const
-		{ return ( _index != it._index ); }
+		{
+		M_ASSERT( _owner == it._owner );
+		return ( _index != it._index );
+		}
 private:
 	friend class HArray<type_t>;
 	explicit HIterator( array_t const* owner_, int long idx )
