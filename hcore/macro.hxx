@@ -127,6 +127,7 @@ class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LIN
 #define M_YAAL_DBWRAPPER_PUBLIC_API /**/
 #define M_YAAL_HCONSOLE_PUBLIC_API /**/
 #define M_YAAL_HDATA_PUBLIC_API /**/
+#undef __declspec
 #define __declspec( x ) /**/
 #endif /* #else #ifdef __MSVCXX__ */
 
