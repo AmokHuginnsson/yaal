@@ -52,6 +52,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHDeque_[];
 template<typename type_t>
 class HDeque
 	{
+private:
 	static int long const DEFAULT_CHUNK_SIZE = 512;
 	static int long const CHUNK_SIZE = meta::max<sizeof ( type_t ), DEFAULT_CHUNK_SIZE>::value;
 	static int long const VALUES_PER_CHUNK = CHUNK_SIZE / sizeof ( type_t );
