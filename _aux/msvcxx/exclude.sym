@@ -13,6 +13,7 @@
 ?_defaultTimeFormat_@hcore@yaal@@3QBDB
 ?_digit_@hcore@yaal@@3QBDB
 ?_errMsgHArray_@hcore@yaal@@3QBQBDB
+?_errMsgHDeque_@hcore@yaal@@3QBQBDB
 ?_errMsgHList_@hcore@yaal@@3QBQBDB
 ?_errMsgHMatrix_@hcore@yaal@@3QBQBDB
 ?_errMsgHSBBSTree_@hcore@yaal@@3QBQBDB
@@ -35,8 +36,10 @@
 ?_primes_@hcore@yaal@@3QBJB
 ?_serialDevice_@tools@yaal@@3VHString@hcore@2@A
 ?_serialFlags_@tools@yaal@@3V?$HStrongEnum@UFLAG@HSerial@tools@yaal@@@hcore@2@A
+?_threadStackSize@HThread@hcore@yaal@@2HA
 ?_whiteSpace_@hcore@yaal@@3QBDB
 ?_word_@hcore@yaal@@3QBDB
+?_writeTimeout_@hcore@yaal@@3JA
 ?_zBufferSize_@tools@yaal@@3JA
 ?black@hconsole@yaal@@3QBDB
 ?blue@hconsole@yaal@@3QBDB
