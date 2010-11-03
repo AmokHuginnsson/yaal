@@ -325,7 +325,7 @@ void HDeque<type_t>::center_chunks( int long chunksCount_ )
 			}
 		else if ( nextFirstUsedChunkIndex > firstUsedChunkIndex )
 			{
-			copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + chunksToMove, chunks + nextFirstUsedChunkIndex );
+			copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + chunksToMove, chunks + nextFirstUsedChunkIndex + chunksToMove );
 			_start += ( chunksToMove * VALUES_PER_CHUNK );
 			}
 		}
