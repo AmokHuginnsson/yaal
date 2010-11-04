@@ -321,14 +321,14 @@ void HDeque<type_t>::center_chunks( int long chunksCount_ )
 			{
 			copy( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + chunksToMove, chunks + nextFirstUsedChunkIndex );
 			fill( chunks + firstUsedChunkIndex + chunksToMove, chunks + nextFirstUsedChunkIndex + chunksToMove, static_cast<value_type*>( NULL ) );
-			_start -= ( chunksToMove * VALUES_PER_CHUNK );
+			_start -= ( ( firstUsedChunkIndex - nextFirstUsedChunkIndex ) * VALUES_PER_CHUNK );
 			M_ASSERT( _start >= 0 );
 			}
 		else if ( nextFirstUsedChunkIndex > firstUsedChunkIndex )
 			{
 			copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + chunksToMove, chunks + nextFirstUsedChunkIndex + chunksToMove );
 			fill( chunks + firstUsedChunkIndex, chunks + nextFirstUsedChunkIndex, static_cast<value_type*>( NULL ) );
-			_start += ( chunksToMove * VALUES_PER_CHUNK );
+			_start += ( ( nextFirstUsedChunkIndex - firstUsedChunkIndex ) * VALUES_PER_CHUNK );
 			}
 		}
 	return;
