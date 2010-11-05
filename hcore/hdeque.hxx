@@ -308,6 +308,13 @@ void HDeque<type_t>::clear( void )
 	M_EPILOG
 	}
 
+/* Ensure that used chunks are placed in the middle of _chunks array
+ * modifies _start, if chunks are actually moved old-already-existing
+ * chunks are moved to begining of used chunks space,
+ * _start is modified to accomodate this change and is still valid
+ * after this call.
+ * No fresh chunks are created here so _size is also still valid.
+ */
 template<typename type_t>
 void HDeque<type_t>::center_chunks( int long chunksCount_ )
 	{
@@ -336,6 +343,10 @@ void HDeque<type_t>::center_chunks( int long chunksCount_ )
 	M_EPILOG
 	}
 
+/* Resize _chunks if necessary,
+ * do not change _start or _size.
+ * Do not move existing chunks, so both _start and _size remain valid.
+ */
 template<typename type_t>
 int long HDeque<type_t>::accommodate_chunks( int long size_ )
 	{
@@ -421,9 +432,25 @@ void HDeque<type_t>::insert_space( int long index_, int long size_ )
 	M_PROLOG
 	int long nextUsedChunksCount( accommodate_chunks( _size + size_ ) );
 	value_type** chunks = _chunks.get<value_type*>();
-	if ( ( index_ - _start ) < ( _size / 2 ) ) /* we push out front */
+	/* When we insert space we should ensure that we will move as little of
+	 * existing objects as possible. We have something like "used chunks" in
+	 * _chunks array, if we want to insert space before middle of used chunks range
+	 * than we shall move front part of existing HDeque<>, if we insert space
+	 * after the middle of used chunks range we shall move back part of existing HDeque<>.
+	 */
+	if ( _size > 0 )
 		{
-		if ( _size > 0 )
+		/* We cannot use center_chunks() to move front part of existing HDeque<> because
+		 * center_chunks() moves old-already-existing chunks to beginning of used chunks range.
+		 * We work like this:
+		 * If we push out front we have to move all existing chunks to the end of used chunks range,
+		 * create fresh chunks in front of it and move only smaller part of the HDeque<> elements
+		 * into the front, object by object.
+		 * If we push out back of HDeque<>, we need to move all existing chunks into the begging
+		 * of used chunks range, create fresh chunks after them move only smaller part of HDeque<>
+		 * to the end, object by object.
+		 */
+		if ( ( index_ - _start ) < ( _size / 2 ) ) /* we push out front */
 			{
 			int long firstUsedChunkIndex( _start / VALUES_PER_CHUNK );
 			int long chunksToMove( ( ( ( ( _start + _size ) - 1 ) / VALUES_PER_CHUNK ) - firstUsedChunkIndex ) + 1 );
@@ -432,13 +459,21 @@ void HDeque<type_t>::insert_space( int long index_, int long size_ )
 			fill( chunks + firstUsedChunkIndex,
 					chunks + min( chunksToMove, nextFirstUsedChunkIndex + nextUsedChunksCount - chunksToMove ),
 					static_cast<value_type*>( NULL ) );
+			_start -= ( ( nextFirstUsedChunkIndex + nextUsedChunksCount - firstUsedChunkIndex ) * VALUES_PER_CHUNK );
 			}
-		}
-	else /* we push out back */
-		{
-		if ( _size > 0 )
+		else /* we push out back */
 			center_chunks( nextUsedChunksCount );
 		}
+	else
+		_start = ( ( _chunks.count_of<value_type*>() - nextUsedChunksCount ) / 2 ) * VALUES_PER_CHUNK;
+	int long firstUsedChunkIndex( _start / VALUES_PER_CHUNK );
+	for ( int long i( firstUsedChunkIndex ); i < ( firstUsedChunkIndex + nextUsedChunksCount ); ++ i )
+		{
+		if ( ! chunks[ i ] )
+			chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
+		}
+	/* Here we perform actual move of smaller part.
+	 */
 	return;
 	M_EPILOG
 	}
