@@ -452,7 +452,7 @@ template<typename iterator_t>
 void HArray<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ )
 	{
 	M_PROLOG
-	M_ASSERT( ( pos_._owner == this ) && ( pos_._index >= 0 ) && ( pos_._index < _size ) );
+	M_ASSERT( ( pos_._owner == this ) && ( pos_._index >= 0 ) && ( pos_._index <= _size ) );
 	insert_space( pos_._index, distance( first_, last_ ) );
 	value_type* arr( _buf.get<value_type>() );
 	for ( int long i( pos_._index ); first_ != last_; ++ first_,  ++ i )
@@ -465,7 +465,7 @@ template<typename type_t>
 void HArray<type_t>::insert( iterator pos_, int long count_, type_t const& value_ )
 	{
 	M_PROLOG
-	M_ASSERT( ( pos_._owner == this ) && ( pos_._index >= 0 ) && ( pos_._index < _size ) );
+	M_ASSERT( ( pos_._owner == this ) && ( pos_._index >= 0 ) && ( pos_._index <= _size ) );
 	insert_space( pos_._index, count_ );
 	value_type* arr( _buf.get<value_type>() );
 	for ( int long i( pos_._index ), last( pos_._index + count_ ); i < last; ++ i )
@@ -478,7 +478,7 @@ template<typename type_t>
 typename HArray<type_t>::iterator HArray<type_t>::insert( iterator pos_, type_t const& value_ )
 	{
 	M_PROLOG
-	M_ASSERT( ( pos_._owner == this ) && ( pos_._index >= 0 ) && ( pos_._index < _size ) );
+	M_ASSERT( ( pos_._owner == this ) && ( pos_._index >= 0 ) && ( pos_._index <= _size ) );
 	insert_space( pos_._index, 1 );
 	value_type* arr( _buf.get<value_type>() );
 	new ( arr + pos_._index ) value_type( value_ );

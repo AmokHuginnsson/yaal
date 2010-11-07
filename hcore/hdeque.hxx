@@ -492,7 +492,7 @@ template<typename iterator_t>
 void HDeque<type_t>::insert( iterator it_, iterator_t first_, iterator_t last_ )
 	{
 	M_PROLOG
-	M_ASSERT( ( it_._owner == this ) && ( it_._index >= 0 ) && ( it_._index < _size ) );
+	M_ASSERT( ( it_._owner == this ) && ( it_._index >= 0 ) && ( it_._index <= _size ) );
 	insert_space( it_._index, distance( first_, last_ ) );
 	return;
 	M_EPILOG
