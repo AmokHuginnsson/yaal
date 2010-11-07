@@ -294,7 +294,7 @@ void HDeque<type_t>::clear( void )
 	{
 	M_PROLOG
 	value_type** chunks = _chunks.get<value_type*>();
-	for ( iterator it( this, _start ), endIt( this, _start + _size ); it != endIt; ++ it )
+	for ( iterator it( begin() ), endIt( end() ); it != endIt; ++ it )
 		it->~value_type();
 	for ( int long i( _start / CHUNK_SIZE ),
 			CAPACITY( _chunks.count_of<value_type*>() );
@@ -450,7 +450,7 @@ void HDeque<type_t>::insert_space( int long index_, int long size_ )
 		 * of used chunks range, create fresh chunks after them move only smaller part of HDeque<>
 		 * to the end, object by object.
 		 */
-		if ( ( index_ - _start ) < ( _size / 2 ) ) /* we push out front */
+		if ( index_ < ( _size / 2 ) ) /* we push out front */
 			{
 			int long firstUsedChunkIndex( _start / VALUES_PER_CHUNK );
 			int long chunksToMove( ( ( ( ( _start + _size ) - 1 ) / VALUES_PER_CHUNK ) - firstUsedChunkIndex ) + 1 );
@@ -474,6 +474,15 @@ void HDeque<type_t>::insert_space( int long index_, int long size_ )
 		}
 	/* Here we perform actual move of smaller part.
 	 */
+	if ( _size > 0 )
+		{
+		if ( index_ < ( _size / 2 ) )
+			{
+			}
+		else
+			{
+			}
+		}
 	return;
 	M_EPILOG
 	}
@@ -483,6 +492,7 @@ template<typename iterator_t>
 void HDeque<type_t>::insert( iterator it_, iterator_t first_, iterator_t last_ )
 	{
 	M_PROLOG
+	M_ASSERT( ( it_._owner == this ) && ( it_._index >= 0 ) && ( it_._index < _size ) );
 	insert_space( it_._index, distance( first_, last_ ) );
 	return;
 	M_EPILOG
@@ -554,49 +564,49 @@ type_t& HDeque<type_t>::operator[] ( int long index_ )
 template<typename type_t>
 typename HDeque<type_t>::const_iterator HDeque<type_t>::begin( void ) const
 	{
-	return ( const_iterator( this, _start ) );
+	return ( const_iterator( this, 0 ) );
 	}
 
 template<typename type_t>
 typename HDeque<type_t>::iterator HDeque<type_t>::begin( void )
 	{
-	return ( iterator( this, _start ) );
+	return ( iterator( this, 0 ) );
 	}
 
 template<typename type_t>
 typename HDeque<type_t>::const_iterator HDeque<type_t>::end( void ) const
 	{
-	return ( const_iterator( this, _start + _size ) );
+	return ( const_iterator( this, _size ) );
 	}
 
 template<typename type_t>
 typename HDeque<type_t>::iterator HDeque<type_t>::end( void )
 	{
-	return ( iterator( this, _start + _size ) );
+	return ( iterator( this, _size ) );
 	}
 
 template<typename type_t>
 typename HDeque<type_t>::const_reverse_iterator HDeque<type_t>::rbegin( void ) const
 	{
-	return ( const_iterator( this, _start + _size ) );
+	return ( const_iterator( this, _size ) );
 	}
 
 template<typename type_t>
 typename HDeque<type_t>::reverse_iterator HDeque<type_t>::rbegin( void )
 	{
-	return ( iterator( this, _start + _size ) );
+	return ( iterator( this, _size ) );
 	}
 
 template<typename type_t>
 typename HDeque<type_t>::const_reverse_iterator HDeque<type_t>::rend( void ) const
 	{
-	return ( const_iterator( this, _start ) );
+	return ( const_iterator( this, 0 ) );
 	}
 
 template<typename type_t>
 typename HDeque<type_t>::reverse_iterator HDeque<type_t>::rend( void )
 	{
-	return ( iterator( this, _start ) );
+	return ( iterator( this, 0 ) );
 	}
 
 template<typename type_t>
@@ -604,8 +614,10 @@ template<typename const_qual_t>
 const_qual_t* HDeque<type_t>::HIterator<const_qual_t>::operator->( void )
 	{
 	M_PROLOG
+	M_ASSERT( _owner && ( _index >= 0 ) && ( _index < _owner->_size ) );
 	const_qual_t* const* chunks = _owner->_chunks.template get<value_type*>();
-	return ( &chunks[ _index / HDeque<type_t>::VALUES_PER_CHUNK ][ _index % HDeque<type_t>::VALUES_PER_CHUNK ] );
+	int long physical( _owner->_start + _index );
+	return ( &chunks[ physical / HDeque<type_t>::VALUES_PER_CHUNK ][ physical % HDeque<type_t>::VALUES_PER_CHUNK ] );
 	M_EPILOG
 	}
 
@@ -614,8 +626,10 @@ template<typename const_qual_t>
 const_qual_t* HDeque<type_t>::HIterator<const_qual_t>::operator->( void ) const
 	{
 	M_PROLOG
+	M_ASSERT( _owner && ( _index >= 0 ) && ( _index < _owner->_size ) );
 	const_qual_t* const* chunks = _owner->_chunks.template get<value_type const*>();
-	return ( &chunks[ _index / HDeque<type_t>::VALUES_PER_CHUNK ][ _index % HDeque<type_t>::VALUES_PER_CHUNK ] );
+	int long physical( _owner->_start + _index );
+	return ( &chunks[ physical / HDeque<type_t>::VALUES_PER_CHUNK ][ physical % HDeque<type_t>::VALUES_PER_CHUNK ] );
 	M_EPILOG
 	}
 
@@ -624,8 +638,10 @@ template<typename const_qual_t>
 const_qual_t& HDeque<type_t>::HIterator<const_qual_t>::operator*( void )
 	{
 	M_PROLOG
+	M_ASSERT( _owner && ( _index >= 0 ) && ( _index < _owner->_size ) );
 	const_qual_t* const* chunks = _owner->_chunks.template get<const_qual_t*>();
-	return ( chunks[ _index / HDeque<type_t>::VALUES_PER_CHUNK ][ _index % HDeque<type_t>::VALUES_PER_CHUNK ] );
+	int long physical( _owner->_start + _index );
+	return ( chunks[ physical / HDeque<type_t>::VALUES_PER_CHUNK ][ physical % HDeque<type_t>::VALUES_PER_CHUNK ] );
 	M_EPILOG
 	}
 
@@ -634,8 +650,10 @@ template<typename const_qual_t>
 const_qual_t& HDeque<type_t>::HIterator<const_qual_t>::operator*( void ) const
 	{
 	M_PROLOG
+	M_ASSERT( _owner && ( _index >= 0 ) && ( _index < _owner->_size ) );
 	const_qual_t* const* chunks = _owner->_chunks.template get<const_qual_t*>();
-	return ( chunks[ _index / HDeque<type_t>::VALUES_PER_CHUNK ][ _index % HDeque<type_t>::VALUES_PER_CHUNK ] );
+	int long physical( _owner->_start + _index );
+	return ( chunks[ physical / HDeque<type_t>::VALUES_PER_CHUNK ][ physical % HDeque<type_t>::VALUES_PER_CHUNK ] );
 	M_EPILOG
 	}
 
