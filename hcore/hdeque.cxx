@@ -40,8 +40,9 @@ namespace hcore
 char const* const _errMsgHDeque_[ 4 ] =
 	{
 	_( "ok" ),
-/* HArray::ERROR::BAD_SIZE */  _( "bad size requested" ),
-/* HArray::ERROR::BAD_INDEX */ _( "index does not fit into deque" )
+/* HDeque::ERROR::BAD_SIZE */         _( "bad size requested" ),
+/* HDeque::ERROR::BAD_INDEX */        _( "index does not fit into deque" ),
+/* HDeque::ERROR::INVALID_ITERATOR */ _( "invalid iterator used for operation" )
 	};
 
 }

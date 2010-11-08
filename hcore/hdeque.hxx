@@ -68,9 +68,10 @@ public:
 		 */
 		typedef enum
 			{
-			OK = 0,    /*!< No error. */
-			BAD_SIZE,  /*!< Index of of bounds. */
-			BAD_INDEX  /*!< Index of of bounds. */
+			OK = 0,          /*!< No error. */
+			BAD_SIZE,        /*!< Index of of bounds. */
+			BAD_INDEX,       /*!< Index of of bounds. */
+			INVALID_ITERATOR /*!< iterator used for operation is not valid */
 			} error_t;
 		};
 	template<typename const_qual_t>
@@ -312,6 +313,32 @@ HDeque<type_t>::HDeque( iterator_t first, iterator_t last )
 	}
 
 template<typename type_t>
+HDeque<type_t>& HDeque<type_t>::operator = ( HDeque const& deque_ )
+	{
+	M_PROLOG
+	if ( &deque_ != this )
+		{
+		HDeque tmp( deque_ );
+		swap( tmp );
+		}
+	return ( *this );
+	M_EPILOG
+	}
+
+template<typename type_t>
+void HDeque<type_t>::swap( HDeque& deque_ )
+	{
+	if ( &deque_ != this )
+		{
+		using yaal::swap;
+		swap( _start, deque_._start );
+		swap( _size, deque_._size );
+		swap( _chunks, deque_._chunks );
+		}
+	return;
+	}
+
+template<typename type_t>
 void HDeque<type_t>::clear( void )
 	{
 	M_PROLOG
@@ -524,7 +551,9 @@ template<typename iterator_t>
 void HDeque<type_t>::insert( iterator it_, iterator_t first_, iterator_t last_ )
 	{
 	M_PROLOG
-	M_ASSERT( ( it_._owner == this ) && ( it_._index >= 0 ) && ( it_._index <= _size ) );
+	M_ASSERT( it_._owner == this );
+	if ( ( it_._index < 0 ) || ( it_._index > _size ) )
+		M_THROW( _errMsgHDeque_[ ERROR::INVALID_ITERATOR ], it_._index );
 	int long growBy( 0 );
 	insert_space( it_._index, growBy = distance( first_, last_ ) );
 	value_type** chunks = _chunks.get<value_type*>();
@@ -551,6 +580,57 @@ void HDeque<type_t>::initialize( int long size_, type_t const& fillWith_, trait:
 	M_PROLOG
 	resize( size_, fillWith_ );
 	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterator last_ )
+	{
+	M_PROLOG
+	M_ASSERT( first_._owner == this );
+	M_ASSERT( last_._owner == this );
+	if ( ( first_._index < 0 ) && ( first_._index > _size ) )
+		M_THROW( _errMsgHDeque_[ ERROR::INVALID_ITERATOR ], first_._index );
+	if ( ( last_._index < 0 ) && ( last_._index > _size ) )
+		M_THROW( _errMsgHDeque_[ ERROR::INVALID_ITERATOR ], last_._index );
+	int long toRemove( last_._index - first_._index );
+	if ( last_._index < first_._index )
+		M_THROW( _errMsgHDeque_[ ERROR::INVALID_ITERATOR ], toRemove );
+	if ( toRemove )
+		{
+		value_type** chunks = _chunks.get<value_type*>();
+		if ( first_._index < ( _size - last_._index ) ) /* Move front. */
+			{
+			for ( int long src( _start ), dst( _start + first_._index ); dst < ( _start + last_._index ); ++ src, ++ dst )
+				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ];
+			for ( int long del( _start ); del < ( _start + toRemove ); ++ del )
+				chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type();
+			for ( int long chunkIndex( _start / VALUES_PER_CHUNK ), newFirstChunk( ( _start + toRemove ) / VALUES_PER_CHUNK );
+					chunkIndex < newFirstChunk; ++ chunkIndex )
+				{
+				M_ASSERT( chunks[ chunkIndex ] );
+				delete [] static_cast<char*>( static_cast<void*>( chunks[ chunkIndex ] ) );
+				chunks[ chunkIndex ] = NULL;
+				}
+			_start += toRemove;
+			}
+		else /* Move back. */
+			{
+			for ( int long src( _start + last_._index ), dst( _start + first_._index ); src < ( _start + _size ); ++ src, ++ dst )
+				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ];
+			for ( int long del( _start + _size - toRemove ); del < ( _start + _size ); ++ del )
+				chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type();
+			for ( int long chunkIndex( ( ( _start + _start - toRemove ) - 1 ) / VALUES_PER_CHUNK );
+					chunkIndex < ( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ); ++ chunkIndex )
+				{
+				M_ASSERT( chunks[ chunkIndex ] );
+				delete [] static_cast<char*>( static_cast<void*>( chunks[ chunkIndex ] ) );
+				chunks[ chunkIndex ] = NULL;
+				}
+			}
+		_size -= toRemove;
+		center_chunks( ( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ) - ( _start / VALUES_PER_CHUNK ) );
+		}
 	M_EPILOG
 	}
 
