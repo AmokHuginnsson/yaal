@@ -476,11 +476,21 @@ void HDeque<type_t>::insert_space( int long index_, int long size_ )
 	 */
 	if ( _size > 0 )
 		{
-		if ( index_ < ( _size / 2 ) )
+		if ( index_ < ( _size / 2 ) ) /* Move from back to front. */
 			{
+			for ( int long src( _start + size_ ), dst( _start ); dst < ( index_ + _start ); ++ src, ++ dst )
+				{
+				new ( chunks[ dst / VALUES_PER_CHUNK ] + ( dst % VALUES_PER_CHUNK ) ) value_type( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
+				chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ].~value_type();
+				}
 			}
-		else
+		else /* Move from front to back. */
 			{
+			for ( int long src( _start + _size - 1 ), dst( _start + _size + size_ - 1 ); src >= ( _start + index_ ); -- src, -- dst )
+				{
+				new ( chunks[ dst / VALUES_PER_CHUNK ] + ( dst % VALUES_PER_CHUNK ) ) value_type( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
+				chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ].~value_type();
+				}
 			}
 		}
 	return;
@@ -493,7 +503,12 @@ void HDeque<type_t>::insert( iterator it_, iterator_t first_, iterator_t last_ )
 	{
 	M_PROLOG
 	M_ASSERT( ( it_._owner == this ) && ( it_._index >= 0 ) && ( it_._index <= _size ) );
-	insert_space( it_._index, distance( first_, last_ ) );
+	int long growBy( 0 );
+	insert_space( it_._index, growBy = distance( first_, last_ ) );
+	value_type** chunks = _chunks.get<value_type*>();
+	for ( int long i( it_._index + _start ); first_ != last_; ++ first_, ++ i )
+		new ( chunks[ i / VALUES_PER_CHUNK ] + ( i % VALUES_PER_CHUNK ) ) value_type( *first_ );
+	_size += growBy;
 	return;
 	M_EPILOG
 	}
