@@ -259,6 +259,28 @@ HDeque<type_t>::~HDeque( void )
 	}
 
 template<typename type_t>
+HDeque<type_t>::HDeque( HDeque const& deque )
+	: _chunks( deque._chunks.get_size() ), _start( 0 ), _size( 0 )
+	{
+	M_PROLOG
+	if ( deque._size > 0 )
+		{
+		M_ASSERT( _chunks.get_size() == deque._chunks.get_size() );
+		int long firstUsedChunkIndex( deque._start / VALUES_PER_CHUNK );
+		value_type const* const* srcChunks = deque._chunks.template get<value_type const*>();
+		value_type** chunks = _chunks.get<value_type*>();
+		for ( int long i( firstUsedChunkIndex ), chunksCount( deque._chunks.template count_of<value_type*>() ); ( i < chunksCount ) && srcChunks[ i ]; ++ i )
+			chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
+		for ( int long i( deque._start ), endIdx( deque._start + deque._size ); i < endIdx; ++ i )
+			new ( chunks[ i / VALUES_PER_CHUNK ] + ( i % VALUES_PER_CHUNK ) ) value_type( srcChunks[ i / VALUES_PER_CHUNK ][ i % VALUES_PER_CHUNK ] );
+		_start = deque._start;
+		_size = deque._size;
+		}
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
 HDeque<type_t>::HDeque( int long size_ ) 
 	: _chunks(), _start( 0 ), _size( 0 )
 	{
@@ -554,6 +576,12 @@ template<typename type_t>
 int long HDeque<type_t>::size( void ) const
 	{
 	return ( _size );
+	}
+
+template<typename type_t>
+bool HDeque<type_t>::operator!( void ) const
+	{
+	return ( is_empty() );
 	}
 
 template<typename type_t>
