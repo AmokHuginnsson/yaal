@@ -1442,7 +1442,7 @@ template<typename type_t>
 bool HList<type_t>::operator < ( HList const& l_ ) const
 	{
 	M_PROLOG
-	return ( lexicographical_compare( begin(), end(), l_.begin(), l_.end() ) );
+	return ( ( &l_ != this ) && lexicographical_compare( begin(), end(), l_.begin(), l_.end() ) );
 	M_EPILOG
 	}
 

@@ -61,9 +61,10 @@ public:
 		 */
 		typedef enum
 			{
-			OK = 0,    /*!< No error. */
-			BAD_SIZE,  /*!< Index of of bounds. */
-			BAD_INDEX  /*!< Index of of bounds. */
+			OK = 0,          /*!< No error. */
+			BAD_SIZE,        /*!< Index of of bounds. */
+			BAD_INDEX,       /*!< Index of of bounds. */
+			INVALID_ITERATOR /*!< iterator used for operation is not valid */
 			} error_t;
 		};
 private:
@@ -452,7 +453,9 @@ template<typename iterator_t>
 void HArray<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ )
 	{
 	M_PROLOG
-	M_ASSERT( ( pos_._owner == this ) && ( pos_._index >= 0 ) && ( pos_._index <= _size ) );
+	M_ASSERT( pos_._owner == this );
+	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
 	insert_space( pos_._index, distance( first_, last_ ) );
 	value_type* arr( _buf.get<value_type>() );
 	for ( int long i( pos_._index ); first_ != last_; ++ first_,  ++ i )
@@ -465,7 +468,9 @@ template<typename type_t>
 void HArray<type_t>::insert( iterator pos_, int long count_, type_t const& value_ )
 	{
 	M_PROLOG
-	M_ASSERT( ( pos_._owner == this ) && ( pos_._index >= 0 ) && ( pos_._index <= _size ) );
+	M_ASSERT( pos_._owner == this );
+	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
 	insert_space( pos_._index, count_ );
 	value_type* arr( _buf.get<value_type>() );
 	for ( int long i( pos_._index ), last( pos_._index + count_ ); i < last; ++ i )
@@ -478,7 +483,9 @@ template<typename type_t>
 typename HArray<type_t>::iterator HArray<type_t>::insert( iterator pos_, type_t const& value_ )
 	{
 	M_PROLOG
-	M_ASSERT( ( pos_._owner == this ) && ( pos_._index >= 0 ) && ( pos_._index <= _size ) );
+	M_ASSERT( pos_._owner == this );
+	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
 	insert_space( pos_._index, 1 );
 	value_type* arr( _buf.get<value_type>() );
 	new ( arr + pos_._index ) value_type( value_ );
@@ -753,7 +760,7 @@ template<typename type_t>
 bool HArray<type_t>::operator < ( HArray const& a_ ) const
 	{
 	M_PROLOG
-	return ( lexicographical_compare( begin(), end(), a_.begin(), a_.end() ) );
+	return ( ( &a_ != this ) && lexicographical_compare( begin(), end(), a_.begin(), a_.end() ) );
 	M_EPILOG
 	}
 
