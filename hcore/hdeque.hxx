@@ -541,11 +541,10 @@ void HDeque<type_t>::insert_space( int long index_, int long size_ )
 	else
 		_start = ( ( _chunks.count_of<value_type*>() - nextUsedChunksCount ) / 2 ) * VALUES_PER_CHUNK;
 	int long firstUsedChunkIndex( _start / VALUES_PER_CHUNK );
-	for ( int long i( firstUsedChunkIndex ); i < ( firstUsedChunkIndex + nextUsedChunksCount ); ++ i )
-		{
-		if ( ! chunks[ i ] )
-			chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
-		}
+	for ( int long i( firstUsedChunkIndex ); ( i < ( firstUsedChunkIndex + nextUsedChunksCount ) ) && ! chunks[ i ]; ++ i )
+		chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
+	for ( int long i( firstUsedChunkIndex + nextUsedChunksCount - 1 ); ( i >= ( firstUsedChunkIndex ) ) && ! chunks[ i ]; -- i )
+		chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
 	/* Here we perform actual move of smaller part.
 	 */
 	if ( _size > 0 )
