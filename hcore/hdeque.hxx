@@ -710,7 +710,7 @@ void HDeque<type_t>::pop_back( void )
 	{
 	M_PROLOG
 	M_ASSERT( _size > 0 );
-	erase( end() - 1 );
+	erase( end() - 1, end() );
 	return;
 	M_EPILOG
 	}
@@ -766,6 +766,39 @@ type_t& HDeque<type_t>::front( void )
 	}
 
 template<typename type_t>
+template<typename iterator_t>
+void HDeque<type_t>::assign( iterator_t first_, iterator_t last_ )
+	{
+	M_PROLOG
+	int long count( distance( first_, last_ ) );
+	if ( count <= _size )
+		{
+		iterator last( copy( first_, last_, begin() ) );
+		erase( last, end() );
+		}
+	else
+		{
+		copy_n( first_, _size, begin() );
+		insert( end(), advance( first_, _size ), last_ );
+		}
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+void HDeque<type_t>::assign( int long count_, type_t const& value_ )
+	{
+	M_PROLOG
+	fill_n( begin(), min( count_, _size ), value_ );
+	if ( count_ < _size )
+		erase( begin() + count_, end() );
+	else if ( count_ > _size )
+		resize( count_, value_ );
+	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
 typename HDeque<type_t>::iterator HDeque<type_t>::insert( iterator pos_, type_t const& value_ )
 	{
 	M_PROLOG
@@ -792,6 +825,14 @@ void HDeque<type_t>::insert( iterator pos_, int long count_, type_t const& value
 	for ( int long i( _start + pos_._index ), last( _start + pos_._index + count_ ); i < last; ++ i )
 		new ( chunks[ i / VALUES_PER_CHUNK ] + ( i % VALUES_PER_CHUNK ) ) value_type( value_ );
 	return;
+	M_EPILOG
+	}
+
+template<typename type_t>
+typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator it )
+	{
+	M_PROLOG
+	return ( erase( it, it + 1 ) );
 	M_EPILOG
 	}
 
