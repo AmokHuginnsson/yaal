@@ -44,6 +44,11 @@ extern "C" FILE* tmpfile( void );
 
 int ms_gethostname( char*, int );
 
+#if ! defined( HAVE_PTHREAD_SETNAME_NP )
+#define HAVE_PTHREAD_SETNAME_NP 1
+void pthread_setname_np( void*, char const* );
+#endif /* #if ! defined( HAVE_PTHREAD_SETNAME_NP ) */
+
 #define dup2 msvcxx::dup2
 
 inline int pipe( int* fds_ )

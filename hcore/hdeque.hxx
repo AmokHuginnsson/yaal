@@ -350,7 +350,7 @@ void HDeque<type_t>::clear( void )
 	M_PROLOG
 	value_type** chunks = _chunks.get<value_type*>();
 	for ( iterator it( begin() ), endIt( end() ); it != endIt; ++ it )
-		it->~value_type();
+		(*it).~value_type();
 	for ( int long i( _start / VALUES_PER_CHUNK ),
 			CAPACITY( _chunks.count_of<value_type*>() );
 			( i < CAPACITY ) && chunks[ i ]; ++ i )
@@ -472,7 +472,7 @@ void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ )
 			{
 			int long chunkIndex( i / VALUES_PER_CHUNK );
 			int long itemIndex( i % VALUES_PER_CHUNK );
-			( chunks[ chunkIndex ] + itemIndex )->~value_type();
+			chunks[ chunkIndex ][ itemIndex ].~value_type();
 			if ( ! itemIndex )
 				chunkStart = true;
 			if ( chunkStart && ( ( itemIndex + 1 ) == VALUES_PER_CHUNK ) )
