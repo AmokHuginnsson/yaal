@@ -137,8 +137,7 @@ private:
 	void initialize( iterator_t, iterator_t, trait::false_type const* );
 	void initialize( int long, type_t const&, trait::true_type const* );
 	void insert_space( int long, int long );
-	void center_chunks( int long );
-	int long accommodate_chunks( int long );
+	void accommodate_chunks( int long );
 	int long used_chunks( void ) const;
 	int long minimal_cover_chunks_count( int long ) const;
 	};
@@ -376,72 +375,82 @@ int long HDeque<type_t>::used_chunks( void ) const
 	}
 
 template<typename type_t>
-int long HDeque<type_t>::accommodate_chunks( int long size_ )
+void HDeque<type_t>::accommodate_chunks( int long size_ )
 	{
 	M_PROLOG
 	int long firstUsedChunkIndex( _start / VALUES_PER_CHUNK );
-	int long usedChunks( used_chunks() );
-	int long availableChunks( _chunks.count_of<value_type*>() );
-	if ( size_ < 0 ) /* We add space in front of HDeque<>. */
+	int long usedChunksCount( used_chunks() );
+	int long availableChunksCount( _chunks.count_of<value_type*>() );
+	int long newFirstChunkIndex( firstUsedChunkIndex );
+	int long newUsedChunksCount( usedChunksCount );
+	int long newAvailableChunksCount( availableChunksCount );
+	if ( size_ > 0 ) /* Add chunks at back of HDeque<>. */
+		{
+		int long newLastChunkIndex = ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK;
+		newUsedChunksCount = newLastChunkIndex + 1 - firstUsedChunkIndex;
+		if ( newLastChunkIndex >= availableChunksCount )
+			{
+			if ( newUsedChunksCount > availableChunksCount )
+				{
+				_chunks.realloc( chunk_size<value_type*>( newUsedChunksCount ) );
+				newAvailableChunksCount = _chunks.count_of<value_type*>();
+				}
+			newFirstChunkIndex = ( newAvailableChunksCount - newUsedChunksCount ) / 2;
+			}
+		}
+	else if ( size_ < 0 ) /* Add chunks in front of HDeque<>. */
 		{
 		int long newStart( _start + size_ );
 		if ( newStart < 0 )
 			{
-			int long chunkOffset( minimal_cover_chunks_count( - newStart ) );
-			if ( ( usedChunks + chunkOffset ) > availableChunks )
-				_chunks.realloc( chunk_size<value_type*>( usedChunks + chunkOffset ) );
-			value_type** chunks = _chunks.get<value_type*>();
-			copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunks, chunks + firstUsedChunkIndex + usedChunks + chunkOffset );
-			fill( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + chunkOffset, static_cast<value_type*>( NULL ) );
-			_start += chunkOffset * VALUES_PER_CHUNK;
-			usedChunks += chunkOffset;
+			int long frontExtension( minimal_cover_chunks_count( - newStart ) );
+			newUsedChunksCount = usedChunksCount + frontExtension;
+			if ( newUsedChunksCount > availableChunksCount )
+				{
+				_chunks.realloc( chunk_size<value_type*>( newUsedChunksCount ) );
+				newAvailableChunksCount = _chunks.count_of<value_type*>();
+				}
+			newFirstChunkIndex = ( ( newAvailableChunksCount - newUsedChunksCount ) / 2 ) + frontExtension;
 			}
 		}
-	else if ( size_ > 0 ) /* We add space at HDeque<>'s back. */
+	int long moveBy( firstUsedChunkIndex - newFirstChunkIndex );
+	value_type** chunks = _chunks.get<value_type*>();
+	if ( _size > 0 )
 		{
-		int long newLastUsedChunk( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK );
-		usedChunks = newLastUsedChunk + 1 - firstUsedChunkIndex;
-		if ( usedChunks > availableChunks )
-			_chunks.realloc( chunk_size<value_type*>( usedChunks ) );
+		if ( moveBy > 0 ) /* move to front */
+			{
+			copy( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstChunkIndex );
+			fill( chunks + firstUsedChunkIndex + usedChunksCount - min( moveBy, usedChunksCount ), chunks + firstUsedChunkIndex + usedChunksCount, static_cast<value_type*>( NULL ) );
+			_start -= ( moveBy * VALUES_PER_CHUNK );
+			}
+		else if ( moveBy < 0 ) /* move to back */
+			{
+			copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstChunkIndex + usedChunksCount );
+			fill( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + min( - moveBy, usedChunksCount ), static_cast<value_type*>( NULL ) );
+			_start -= ( moveBy * VALUES_PER_CHUNK );
+			M_ASSERT( ( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ) < newAvailableChunksCount );
+			}
+		M_ASSERT( ( _start >= 0 ) && ( ( _start / VALUES_PER_CHUNK ) == newFirstChunkIndex ) );
 		}
-	return ( usedChunks );
-	M_EPILOG
-	}
-
-/* Ensure that used chunks are placed in the middle of _chunks array
- * modifies _start, if chunks are actually moved old-already-existing
- * chunks are moved to begining of used chunks space,
- * _start is modified to accomodate this change and is still valid
- * after this call.
- * No fresh chunks are created here so _size is also still valid.
- */
-template<typename type_t>
-void HDeque<type_t>::center_chunks( int long chunksCount_ )
-	{
-	M_PROLOG
-	int long firstUsedChunkIndex( _start / VALUES_PER_CHUNK );
-	int long chunksToMove( min( chunksCount_, _size > 0 ? used_chunks() : 0 ) );
-	if ( chunksToMove > 0 )
+	else
+		_start = ( ( newAvailableChunksCount - newUsedChunksCount ) * VALUES_PER_CHUNK ) / 2;
+	if ( size_ > 0 )
 		{
-		int long nextFirstUsedChunkIndex( ( _chunks.count_of<value_type*>() - chunksCount_ ) / 2 );
-		value_type** chunks = _chunks.get<value_type*>();
-		if ( nextFirstUsedChunkIndex < firstUsedChunkIndex )
-			{
-			copy( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + chunksToMove, chunks + nextFirstUsedChunkIndex );
-			fill( chunks + nextFirstUsedChunkIndex + chunksToMove, chunks + firstUsedChunkIndex + chunksToMove, static_cast<value_type*>( NULL ) );
-			_start -= ( ( firstUsedChunkIndex - nextFirstUsedChunkIndex ) * VALUES_PER_CHUNK );
-			M_ASSERT( _start >= 0 );
-			}
-		else if ( nextFirstUsedChunkIndex > firstUsedChunkIndex )
-			{
-			copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + chunksToMove, chunks + nextFirstUsedChunkIndex + chunksToMove );
-			fill( chunks + firstUsedChunkIndex, chunks + nextFirstUsedChunkIndex, static_cast<value_type*>( NULL ) );
-			_start += ( ( nextFirstUsedChunkIndex - firstUsedChunkIndex ) * VALUES_PER_CHUNK );
-			}
+		for ( int long i( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ); ( i >= ( newFirstChunkIndex + usedChunksCount ) ) && ! chunks[ i ]; -- i )
+			chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
+		}
+	else if ( size_ < 0 )
+		{
+		for ( int long i( ( _start + size_ ) / VALUES_PER_CHUNK ); ( i < newFirstChunkIndex ) && ! chunks[ i ]; ++ i )
+			chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
 		}
 	return;
 	M_EPILOG
 	}
+
+#if 0
+		chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
+#endif
 
 template<typename type_t>
 void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ )
@@ -453,16 +462,10 @@ void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ )
 	if ( size_ > _size )
 		{
 		M_ASSERT( _start + size_ > 0 );
-		int long nextUsedChunksCount( accommodate_chunks( size_ - _size ) );
-		center_chunks( nextUsedChunksCount );
+		accommodate_chunks( size_ - _size );
 		value_type** chunks = _chunks.get<value_type*>();
 		for ( int long i( _start + _size ), last( _start + size_ ); i < last; ++ i )
-			{
-			int long chunkIndex( i / VALUES_PER_CHUNK );
-			if ( ! chunks[ chunkIndex ] )
-				chunks[ chunkIndex ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
-			new ( chunks[ chunkIndex ] + ( i % VALUES_PER_CHUNK ) ) value_type( fillWith_ );
-			}
+			new ( chunks[ i / VALUES_PER_CHUNK ] + ( i % VALUES_PER_CHUNK ) ) value_type( fillWith_ );
 		}
 	else if ( size_ < _size )
 		{
@@ -488,7 +491,6 @@ void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ )
 			delete [] static_cast<char*>( static_cast<void*>( chunks[ lastChunkIndex ] ) );
 			chunks[ lastChunkIndex ] = NULL;
 			}
-		center_chunks( size_ > 0 ? ( ( _start + size_ - 1 ) / VALUES_PER_CHUNK ) + 1 - ( _start / VALUES_PER_CHUNK ) : 0 );
 		}
 	_size = size_;
 	return;
@@ -499,7 +501,7 @@ template<typename type_t>
 void HDeque<type_t>::insert_space( int long index_, int long size_ )
 	{
 	M_PROLOG
-	int long nextUsedChunksCount( accommodate_chunks( ( index_ <= _size / 2 ) ? - size_ : size_ ) );
+	accommodate_chunks( ( index_ <= _size / 2 ) ? - size_ : size_ );
 	value_type** chunks = _chunks.get<value_type*>();
 	/* When we insert space we should ensure that we will move as little of
 	 * existing objects as possible. We have something like "used chunks" in
@@ -507,50 +509,13 @@ void HDeque<type_t>::insert_space( int long index_, int long size_ )
 	 * than we shall move front part of existing HDeque<>, if we insert space
 	 * after the middle of used chunks range we shall move back part of existing HDeque<>.
 	 */
-	if ( _size > 0 )
-		{
-		/* We cannot use center_chunks() to move front part of existing HDeque<> because
-		 * center_chunks() moves old-already-existing chunks to beginning of used chunks range.
-		 * We work like this:
-		 * If we push out front we have to move all existing chunks to the end of used chunks range,
-		 * create fresh chunks in front of it and move only smaller part of the HDeque<> elements
-		 * into the front, object by object.
-		 * If we push out back of HDeque<>, we need to move all existing chunks into the begging
-		 * of used chunks range, create fresh chunks after them move only smaller part of HDeque<>
-		 * to the end, object by object.
-		 */
-		if ( index_ <= ( _size / 2 ) ) /* we push out front */
-			{
-			int long newFirstUsedChunkIndex( ( _start - size_ ) / VALUES_PER_CHUNK );
-			int long newLastUsedChunkIndex( ( _start + _size - 1 ) / VALUES_PER_CHUNK );
-			int long moveBy( abs( newFirstUsedChunkIndex - ( ( _chunks.count_of<value_type*>() - newLastUsedChunkIndex ) - 1 ) ) / 2 );
-			if ( moveBy > 0 )
-				{
-				int long firstUsedChunkIndex( _start / VALUES_PER_CHUNK );
-				int long chunksToMove( used_chunks() );
-				copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + chunksToMove, chunks + firstUsedChunkIndex + chunksToMove + moveBy );
-				fill( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + min( chunksToMove, moveBy ),
-						static_cast<value_type*>( NULL ) );
-				_start += moveBy * VALUES_PER_CHUNK;
-				}
-			_start -= size_;
-			}
-		else /* we push out back */
-			center_chunks( nextUsedChunksCount );
-		}
-	else
-		_start = ( ( _chunks.count_of<value_type*>() - nextUsedChunksCount ) / 2 ) * VALUES_PER_CHUNK;
-	int long firstUsedChunkIndex( _start / VALUES_PER_CHUNK );
-	for ( int long i( firstUsedChunkIndex ); ( i < ( firstUsedChunkIndex + nextUsedChunksCount ) ) && ! chunks[ i ]; ++ i )
-		chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
-	for ( int long i( firstUsedChunkIndex + nextUsedChunksCount - 1 ); ( i >= ( firstUsedChunkIndex ) ) && ! chunks[ i ]; -- i )
-		chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
 	/* Here we perform actual move of smaller part.
 	 */
 	if ( _size > 0 )
 		{
 		if ( index_ <= ( _size / 2 ) ) /* Move from back to front. */
 			{
+			_start -= size_;
 			for ( int long src( _start + size_ ), dst( _start ); dst < ( index_ + _start ); ++ src, ++ dst )
 				{
 				new ( chunks[ dst / VALUES_PER_CHUNK ] + ( dst % VALUES_PER_CHUNK ) ) value_type( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
@@ -628,8 +593,8 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ];
 			for ( int long del( _start ); del < ( _start + toRemove ); ++ del )
 				chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type();
-			for ( int long chunkIndex( _start / VALUES_PER_CHUNK ), newFirstChunk( ( _start + toRemove ) / VALUES_PER_CHUNK );
-					chunkIndex < newFirstChunk; ++ chunkIndex )
+			for ( int long chunkIndex( _start / VALUES_PER_CHUNK ), newFirstChunkIndex( ( _start + toRemove ) / VALUES_PER_CHUNK );
+					chunkIndex < newFirstChunkIndex; ++ chunkIndex )
 				{
 				M_ASSERT( chunks[ chunkIndex ] );
 				delete [] static_cast<char*>( static_cast<void*>( chunks[ chunkIndex ] ) );
@@ -654,7 +619,6 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 				}
 			}
 		_size -= toRemove;
-		center_chunks( used_chunks() );
 		}
 	return ( last_._index < _size ? last_ : end() );
 	M_EPILOG
