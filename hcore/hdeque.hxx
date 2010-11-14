@@ -413,36 +413,39 @@ void HDeque<type_t>::accommodate_chunks( int long size_ )
 			newFirstChunkIndex = ( ( newAvailableChunksCount - newUsedChunksCount ) / 2 ) + frontExtension;
 			}
 		}
-	int long moveBy( firstUsedChunkIndex - newFirstChunkIndex );
-	value_type** chunks = _chunks.get<value_type*>();
-	if ( _size > 0 )
+	if ( size_ )
 		{
-		if ( moveBy > 0 ) /* move to front */
+		int long moveBy( firstUsedChunkIndex - newFirstChunkIndex );
+		value_type** chunks = _chunks.get<value_type*>();
+		if ( _size > 0 )
 			{
-			copy( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstChunkIndex );
-			fill( chunks + firstUsedChunkIndex + usedChunksCount - min( moveBy, usedChunksCount ), chunks + firstUsedChunkIndex + usedChunksCount, static_cast<value_type*>( NULL ) );
-			_start -= ( moveBy * VALUES_PER_CHUNK );
+			if ( moveBy > 0 ) /* move to front */
+				{
+				copy( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstChunkIndex );
+				fill( chunks + firstUsedChunkIndex + usedChunksCount - min( moveBy, usedChunksCount ), chunks + firstUsedChunkIndex + usedChunksCount, static_cast<value_type*>( NULL ) );
+				_start -= ( moveBy * VALUES_PER_CHUNK );
+				}
+			else if ( moveBy < 0 ) /* move to back */
+				{
+				copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstChunkIndex + usedChunksCount );
+				fill( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + min( - moveBy, usedChunksCount ), static_cast<value_type*>( NULL ) );
+				_start -= ( moveBy * VALUES_PER_CHUNK );
+				M_ASSERT( ( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ) < newAvailableChunksCount );
+				}
+			M_ASSERT( ( _start >= 0 ) && ( ( _start / VALUES_PER_CHUNK ) == newFirstChunkIndex ) );
 			}
-		else if ( moveBy < 0 ) /* move to back */
+		else
+			_start = ( ( newAvailableChunksCount - newUsedChunksCount ) * VALUES_PER_CHUNK ) / 2;
+		if ( size_ > 0 )
 			{
-			copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstChunkIndex + usedChunksCount );
-			fill( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + min( - moveBy, usedChunksCount ), static_cast<value_type*>( NULL ) );
-			_start -= ( moveBy * VALUES_PER_CHUNK );
-			M_ASSERT( ( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ) < newAvailableChunksCount );
+			for ( int long i( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ); ( i >= ( newFirstChunkIndex + usedChunksCount ) ) && ! chunks[ i ]; -- i )
+				chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
 			}
-		M_ASSERT( ( _start >= 0 ) && ( ( _start / VALUES_PER_CHUNK ) == newFirstChunkIndex ) );
-		}
-	else
-		_start = ( ( newAvailableChunksCount - newUsedChunksCount ) * VALUES_PER_CHUNK ) / 2;
-	if ( size_ > 0 )
-		{
-		for ( int long i( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ); ( i >= ( newFirstChunkIndex + usedChunksCount ) ) && ! chunks[ i ]; -- i )
-			chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
-		}
-	else if ( size_ < 0 )
-		{
-		for ( int long i( ( _start + size_ ) / VALUES_PER_CHUNK ); ( i < newFirstChunkIndex ) && ! chunks[ i ]; ++ i )
-			chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
+		else if ( size_ < 0 )
+			{
+			for ( int long i( ( _start + size_ ) / VALUES_PER_CHUNK ); ( i < newFirstChunkIndex ) && ! chunks[ i ]; ++ i )
+				chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
+			}
 		}
 	return;
 	M_EPILOG
@@ -652,8 +655,9 @@ template<typename type_t>
 void HDeque<type_t>::push_back( type_t const& value_ )
 	{
 	M_PROLOG
-	insert_space( _size, 1 );
-	int long idx( _start + _size - 1 );
+	accommodate_chunks( 1 );
+	int long idx( _start + _size );
+	++ _size;
 	new ( _chunks.get<value_type*>()[ idx / VALUES_PER_CHUNK ] + ( idx % VALUES_PER_CHUNK ) ) value_type( value_ );
 	return;
 	M_EPILOG
@@ -663,7 +667,10 @@ template<typename type_t>
 void HDeque<type_t>::push_front( type_t const& value_ )
 	{
 	M_PROLOG
-	insert_space( 0, 1 );
+	accommodate_chunks( -1 );
+	if ( _start > 0 )
+		-- _start;
+	++ _size;
 	new ( _chunks.get<value_type*>()[ _start / VALUES_PER_CHUNK ] + ( _start % VALUES_PER_CHUNK ) ) value_type( value_ );
 	return;
 	M_EPILOG
