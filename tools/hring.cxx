@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <libintl.h>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hring.hxx"
@@ -33,6 +35,15 @@ namespace yaal
 
 namespace tools
 {
+
+char const* const _errMsgHRing_[ 4 ] =
+	{
+	_( "ok" ),
+/* HRing::ERROR::BAD_SIZE */         _( "bad size requested" ),
+/* HRing::ERROR::BAD_INDEX */        _( "index does not fit into array" ),
+/* HRing::ERROR::INVALID_ITERATOR */ _( "invalid iterator used for operation" )
+	};
+
 }
 
 }
