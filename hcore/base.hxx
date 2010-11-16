@@ -143,6 +143,13 @@ public:
 		{ _value = _orig; }
 	};
 
+template<typename id, typename T>
+struct explicit_type
+	{
+	T _value;
+	explicit explicit_type( T const& value_ ) : _value( value_ ) {}
+	};
+
 template <typename T, int long unsigned N>
 char ( &YaalArrayElementCountHelper( T ( &YaalArrayElementCountHelperArray )[N] ) )[N];
 

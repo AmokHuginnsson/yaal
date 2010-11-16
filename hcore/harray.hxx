@@ -539,15 +539,6 @@ typename HArray<type_t>::iterator HArray<type_t>::erase( iterator it )
 	}
 
 template<typename type_t>
-type_t& HArray<type_t>::front( void )
-	{
-	M_PROLOG
-	M_ASSERT( _size > 0 );
-	return ( *_buf.get<value_type>() );
-	M_EPILOG
-	}
-
-template<typename type_t>
 type_t const& HArray<type_t>::front( void ) const
 	{
 	M_PROLOG
@@ -557,11 +548,11 @@ type_t const& HArray<type_t>::front( void ) const
 	}
 
 template<typename type_t>
-type_t& HArray<type_t>::back( void )
+type_t& HArray<type_t>::front( void )
 	{
 	M_PROLOG
 	M_ASSERT( _size > 0 );
-	return ( _buf.get<value_type>()[ _size - 1 ] );
+	return ( *_buf.get<value_type>() );
 	M_EPILOG
 	}
 
@@ -571,6 +562,15 @@ type_t const& HArray<type_t>::back( void ) const
 	M_PROLOG
 	M_ASSERT( _size > 0 );
 	return ( _buf.get<value_type const>()[ _size - 1 ] );
+	M_EPILOG
+	}
+
+template<typename type_t>
+type_t& HArray<type_t>::back( void )
+	{
+	M_PROLOG
+	M_ASSERT( _size > 0 );
+	return ( _buf.get<value_type>()[ _size - 1 ] );
 	M_EPILOG
 	}
 
@@ -645,7 +645,7 @@ int long HArray<type_t>::capacity( void ) const
 template<typename type_t>
 int long HArray<type_t>::get_capacity( void ) const
 	{
-	return ( _buf.size() / sizeof ( value_type ) );
+	return ( _buf.count_of<value_type>() );
 	}
 
 template<typename type_t>

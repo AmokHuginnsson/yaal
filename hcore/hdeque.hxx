@@ -712,7 +712,7 @@ type_t& HDeque<type_t>::back( void )
 	M_PROLOG
 	M_ASSERT( _size > 0 );
 	int long itemIndex( _start + _size - 1 );
-	return ( _chunks.get<value_type const*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
+	return ( _chunks.get<value_type*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
 	M_EPILOG
 	}
 
@@ -732,7 +732,7 @@ type_t& HDeque<type_t>::front( void )
 	M_PROLOG
 	M_ASSERT( _size > 0 );
 	int long itemIndex( _start );
-	return ( _chunks.get<value_type const*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
+	return ( _chunks.get<value_type*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
 	M_EPILOG
 	}
 
