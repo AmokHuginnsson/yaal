@@ -69,7 +69,7 @@ public:
 		typedef enum
 			{
 			OK = 0,          /*!< No error. */
-			BAD_SIZE,        /*!< Index of of bounds. */
+			BAD_SIZE,        /*!< Bad size requested. */
 			BAD_INDEX,       /*!< Index of of bounds. */
 			INVALID_ITERATOR /*!< iterator used for operation is not valid */
 			} error_t;

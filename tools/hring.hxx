@@ -75,10 +75,11 @@ public:
 		typedef enum
 			{
 			OK = 0,           /*!< No error. */
-			BAD_SIZE,         /*!< Index of of bounds. */
+			BAD_SIZE,         /*!< Bad size requested. */
 			BAD_INDEX,        /*!< Index of of bounds. */
 			INVALID_ITERATOR, /*!< iterator used for operation is not valid */
-			RING_IS_FULL      /*!< cannot expand ring any further as it is already full */
+			RING_IS_FULL,     /*!< cannot expand ring any further as it is already full */
+			RING_IS_EMPTY     /*!< cannot get data from ring as it is empty now */
 			} error_t;
 		};
 private:
@@ -94,13 +95,13 @@ public:
 	typedef yaal::hcore::HReverseIterator<const_iterator> const_reverse_iterator;
 	HRing( void );
 	explicit HRing( capacity_type );
-	HRing( int long, type_t const& );
+	HRing( capacity_type, size_type, type_t const& );
 	template<typename iterator_t>
-	HRing( iterator_t, iterator_t );
+	HRing( capacity_type, iterator_t, iterator_t );
 	virtual ~HRing( void );
 	HRing( HRing const& );
 	HRing& operator = ( HRing const& );
-	void resize( int long, type_t const& = value_type() );
+	void resize( capacity_type, size_type, type_t const& = value_type() );
 	void reserve( int long );
 	type_t& operator [] ( int long );
 	type_t const& operator [] ( int long ) const;
@@ -146,8 +147,8 @@ public:
 	bool operator < ( HRing const& ) const;
 private:
 	template<typename iterator_t>
-	void initialize( iterator_t, iterator_t, trait::false_type const* );
-	void initialize( int long, type_t const&, trait::true_type const* );
+	void initialize( capacity_type, iterator_t, iterator_t, trait::false_type const* );
+	void initialize( capacity_type, size_type, type_t const&, trait::true_type const* );
 	void insert_space( int long, int long );
 	};
 
@@ -306,22 +307,22 @@ HRing<type_t>::HRing( capacity_type capacity_ )
 	}
 
 template<typename type_t>
-HRing<type_t>::HRing( int long size_, type_t const& fillWith_ )
+HRing<type_t>::HRing( capacity_type capacity_, size_type size_, type_t const& fillWith_ )
 	: _buf(), _start( 0 ), _size( 0 )
 	{
 	M_PROLOG
-	resize( size_, fillWith_ );
+	resize( capacity_, size_, fillWith_ );
 	return;
 	M_EPILOG
 	}
 
 template<typename type_t>
 template<typename iterator_t>
-HRing<type_t>::HRing( iterator_t first, iterator_t last )
+HRing<type_t>::HRing( capacity_type capacity_, iterator_t first, iterator_t last )
 	: _buf(), _start( 0 ), _size( 0 )
 	{
 	M_PROLOG
-	initialize( first, last, typename trait::make_pointer<typename is_integral<iterator_t>::type>::type() );
+	initialize( capacity_, first, last, typename trait::make_pointer<typename is_integral<iterator_t>::type>::type() );
 	return;
 	M_EPILOG
 	}
@@ -337,19 +338,20 @@ HRing<type_t>::~HRing( void )
 
 template<typename type_t>
 template<typename iterator_t>
-void HRing<type_t>::initialize( iterator_t first, iterator_t last, trait::false_type const* )
+void HRing<type_t>::initialize( capacity_type capacity_, iterator_t first, iterator_t last, trait::false_type const* )
 	{
 	M_PROLOG
+	reserve( capacity_._value );
 	insert( end(), first, last );
 	return;
 	M_EPILOG
 	}
 
 template<typename type_t>
-void HRing<type_t>::initialize( int long size_, type_t const& fillWith_, trait::true_type const* )
+void HRing<type_t>::initialize( capacity_type capacity_, size_type size_, type_t const& fillWith_, trait::true_type const* )
 	{
 	M_PROLOG
-	resize( size_, fillWith_ );
+	resize( capacity_, size_, fillWith_ );
 	return;
 	M_EPILOG
 	}
@@ -370,7 +372,7 @@ void HRing<type_t>::assign( int long size_, type_t const& fillWith_ )
 	{
 	M_PROLOG
 	int long oldSize( _size );
-	resize( size_, fillWith_ );
+	resize( ring::capacity( get_capacity() ), ring::size( size_ ), fillWith_ );
 	if ( oldSize > 0 )
 		fill_n( begin(), oldSize, fillWith_ );
 	return;
@@ -388,17 +390,23 @@ void HRing<type_t>::clear( void )
 
 template<typename type_t>
 HRing<type_t>::HRing( HRing const& arr_ )
-	: _buf(), _size( 0 )
+	: _buf(), _start( 0 ), _size( 0 )
 	{
 	M_PROLOG
 	if ( arr_._size > 0 )
 		{ 
 		_buf.realloc( yaal::hcore::chunk_size<value_type>( arr_._size ) );
 		_size = arr_._size;
+		int long curCapacity( arr_.get_capacity() );
 		value_type* dst( _buf.get<value_type>() );
 		value_type const* src( arr_._buf.template get<value_type>() );
-		for ( int long i = 0; i < _size; ++ i )
-			new ( dst + i ) value_type( src[ i ] );
+		for ( int long i( 0 ); i < _size; ++ i )
+			{
+			int long idx( i + arr_._start );
+			if ( idx >= curCapacity )
+				idx -= curCapacity;
+			new ( dst + i ) value_type( src[ idx ] );
+			}
 		}
 	return;
 	M_EPILOG
@@ -417,20 +425,19 @@ HRing<type_t>& HRing<type_t>::operator = ( HRing const& arr_ )
 			}
 		else
 			{
+			clear();
 			value_type* dst( _buf.get<value_type>() );
 			value_type const* src( arr_._buf.template get<value_type>() );
-			copy_n( src, min( _size, arr_._size ), dst );
-			if ( arr_._size > _size )
+			int long curCapacity( arr_.get_capacity() );
+			for ( int long i( 0 ); i < arr_._size; ++ i )
 				{
-				for ( int long i = _size; i < arr_._size; ++ i )
-					new ( dst + i ) value_type( src[ i ] );
-				}
-			else if ( arr_._size < _size )
-				{
-				for ( int long i = arr_._size; i < _size; ++ i )
-					dst[ i ].~value_type();
+				int long idx( i + arr_._start );
+				if ( idx >= curCapacity )
+					idx -= curCapacity;
+				new ( dst + i ) value_type( src[ idx ] );
 				}
 			_size = arr_._size;
+			_start = 0;
 			}
 		}
 	return ( *this );
@@ -438,25 +445,39 @@ HRing<type_t>& HRing<type_t>::operator = ( HRing const& arr_ )
 	}
 
 template<typename type_t>
-void HRing<type_t>::resize( int long size_, type_t const& fillWith_ )
+void HRing<type_t>::resize( capacity_type capacity_, size_type size_, type_t const& fillWith_ )
 	{
 	M_PROLOG
-	if ( size_ < 0 )
-		M_THROW( _errMsgHRing_[ ERROR::BAD_SIZE ], size_ );
-	if ( size_ > _size )
+	if ( size_._value < 0 )
+		M_THROW( _errMsgHRing_[ ERROR::BAD_SIZE ], size_._value );
+	if ( size_._value > capacity_._value )
+		M_THROW( _errMsgHRing_[ ERROR::BAD_SIZE ], capacity_._value - size_._value );
+	if ( size_._value > _size )
 		{
-		reserve( size_ );
+		reserve( capacity_._value );
+		int long curCapacity( get_capacity() );
 		value_type* arr( _buf.get<value_type>() );
-		for ( int long i = _size; i < size_; ++ i )
-			new ( arr + i ) value_type( fillWith_ );
+		for ( int long i( _size ); i < size_._value; ++ i )
+			{
+			int long idx( i + _start );
+			if ( idx >= curCapacity )
+				idx -= curCapacity;
+			new ( arr + idx ) value_type( fillWith_ );
+			}
 		}
-	else if ( size_ < _size )
+	else if ( size_._value < _size )
 		{
+		int long curCapacity( get_capacity() );
 		value_type* arr( _buf.get<value_type>() );
-		for ( int long i = size_; i < _size; ++ i )
-			arr[ i ].~value_type();
+		for ( int long i( size_._value ); i < _size; ++ i )
+			{
+			int long idx( i + _start );
+			if ( idx >= curCapacity )
+				idx -= curCapacity;
+			arr[ idx ].~value_type();
+			}
 		}
-	_size = size_;
+	_size = size_._value;
 	return;
 	M_EPILOG
 	}
@@ -473,11 +494,22 @@ void HRing<type_t>::reserve( int long capacity_ )
 		yaal::hcore::HChunk newBuf( yaal::hcore::chunk_size<value_type>( max( capacity_, curCapacity * 2 ) ) );
 		value_type* dst( newBuf.get<value_type>() );
 		value_type* src( _buf.get<value_type>() );
-		for ( int long i = 0; i < _size; ++ i )
-			new ( dst + i ) value_type( src[ i ] );
-		for ( int long i = 0; i < _size; ++ i )
-			src[ i ].~value_type();
+		for ( int long i( 0 ); i < _size; ++ i )
+			{
+			int long idx( i + _start );
+			if ( idx >= curCapacity )
+				idx -= curCapacity;
+			new ( dst + i ) value_type( src[ idx ] );
+			}
+		for ( int long i( 0 ); i < _size; ++ i )
+			{
+			int long idx( i + _start );
+			if ( idx >= curCapacity )
+				idx -= curCapacity;
+			src[ idx ].~value_type();
+			}
 		_buf.swap( newBuf );
+		_start = 0;
 		}
 	return;
 	M_EPILOG
@@ -491,10 +523,16 @@ void HRing<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ )
 	M_ASSERT( pos_._owner == this );
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
 		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], pos_._index );
-	insert_space( pos_._index, distance( first_, last_ ) );
+	int long curCapacity( get_capacity() );
+	int long elemCount( distance( first_, last_ ) );
+	M_ENSURE_EX( ( _size + elemCount ) <= curCapacity, _errMsgHRing_[ ERROR::BAD_SIZE ] );
+	insert_space( pos_._index, elemCount );
 	value_type* arr( _buf.get<value_type>() );
-	for ( int long i( pos_._index ); first_ != last_; ++ first_,  ++ i )
-		new ( arr + i ) value_type( *first_ );
+	for ( int long i( pos_._index + _start ); first_ != last_; ++ first_,  ++ i )
+		{
+		int long idx( i >= curCapacity ? i - curCapacity : i );
+		new ( arr + idx ) value_type( *first_ );
+		}
 	return;
 	M_EPILOG
 	}
@@ -506,10 +544,15 @@ void HRing<type_t>::insert( iterator pos_, int long count_, type_t const& value_
 	M_ASSERT( pos_._owner == this );
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
 		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], pos_._index );
+	int long curCapacity( get_capacity() );
+	M_ENSURE_EX( ( _size + count_ ) <= curCapacity, _errMsgHRing_[ ERROR::BAD_SIZE ] );
 	insert_space( pos_._index, count_ );
 	value_type* arr( _buf.get<value_type>() );
-	for ( int long i( pos_._index ), last( pos_._index + count_ ); i < last; ++ i )
+	for ( int long i( pos_._index + _start ), last( pos_._index + count_ ); i < last; ++ i )
+		{
+		int long idx( i >= curCapacity ? i - curCapacity : i );
 		new ( arr + i ) value_type( value_ );
+		}
 	return;
 	M_EPILOG
 	}
@@ -521,9 +564,12 @@ typename HRing<type_t>::iterator HRing<type_t>::insert( iterator pos_, type_t co
 	M_ASSERT( pos_._owner == this );
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
 		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], pos_._index );
+	int long curCapacity( get_capacity() );
+	M_ENSURE_EX( ( _size + 1 ) <= curCapacity, _errMsgHRing_[ ERROR::BAD_SIZE ] );
 	insert_space( pos_._index, 1 );
 	value_type* arr( _buf.get<value_type>() );
-	new ( arr + pos_._index ) value_type( value_ );
+	int long idx( ( pos_._index + _start ) >= curCapacity ? pos_._index + _start - curCapacity : pos_._index + _start );
+	new ( arr + idx ) value_type( value_ );
 	return ( pos_ );
 	M_EPILOG
 	}
@@ -532,34 +578,66 @@ template<typename type_t>
 void HRing<type_t>::insert_space( int long pos_, int long size_ )
 	{
 	M_PROLOG
+	int long curCapacity( get_capacity() );
+	M_ASSERT( ( _size + size_ ) <= curCapacity );
 	int long oldSize( _size );
-	reserve( _size + size_ );
 	_size += size_;
 	value_type* arr( _buf.get<value_type>() );
-	for ( int long src( oldSize - 1 ), dst( _size - 1 ); src >= pos_; -- src, -- dst )
+	if ( pos_ <= ( _size / 2 ) )
 		{
-		new ( arr + dst ) value_type( arr[ src ] );
-		arr[ src ].~value_type();
+		_start -= size_;
+		if ( _start < 0 )
+			_start += curCapacity;
+		for ( int long src( _start + size_ ), dst( _start ); src < ( _start + size_ + pos_ ); ++ src, ++ dst )
+			{
+			int long srcIdx( src >= curCapacity ? src - curCapacity : src );
+			int long dstIdx( dst >= curCapacity ? dst - curCapacity : dst );
+			new ( arr + dstIdx ) value_type( arr[ srcIdx ] );
+			arr[ srcIdx ].~value_type();
+			}
+		}
+	else
+		{
+		for ( int long src( _start + oldSize - 1 ), dst( _start + _size - 1 ); src >= ( pos_ + _start ); -- src, -- dst )
+			{
+			int long srcIdx( src >= curCapacity ? src - curCapacity : src );
+			int long dstIdx( dst >= curCapacity ? dst - curCapacity : dst );
+			new ( arr + dstIdx ) value_type( arr[ srcIdx ] );
+			arr[ srcIdx ].~value_type();
+			}
 		}
 	return;
 	M_EPILOG
 	}
 
 template<typename type_t>
-typename HRing<type_t>::iterator HRing<type_t>::erase( iterator first, iterator last )
+typename HRing<type_t>::iterator HRing<type_t>::erase( iterator first_, iterator last_ )
 	{
 	M_PROLOG
-	for ( iterator second( last ), endIt( end() );
-			( second != endIt );
-			++ first, ++ second )
-		*first = *second;
-	int long removed( 0 );
-	for ( iterator endIt( end() );
-			( first != endIt );
-			++ first, ++ removed )
-		(*first).~value_type();
-	_size -= removed;
-	return ( last._index < _size ? last : end() );
+	M_ASSERT( first_._owner == this );
+	M_ASSERT( last_._owner == this );
+	if ( ( first_._index < 0 ) && ( first_._index > _size ) )
+		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], first_._index );
+	if ( ( last_._index < 0 ) && ( last_._index > _size ) )
+		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], last_._index );
+	if ( last_._index < first_._index )
+		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], last_._index - first_._index );
+	if ( first_ != last_ )
+		{
+		if ( first_._index < ( _size - last_._index ) )
+			{
+			for ( iterator it( begin() ), endIt( copy_backward( begin(), first_, last_ ) ); it != endIt; ++ it )
+				(*it).~value_type();
+			_start += ( last_._index - first_._index );
+			}
+		else
+			{
+			for ( iterator it( copy( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it )
+				(*it).~value_type();
+			}
+		}
+	_size -= ( last_._index - first_._index );
+	return ( last_._index < _size ? last_ : end() );
 	M_EPILOG
 	}
 
@@ -832,7 +910,7 @@ template<typename type_t>
 void HRing<type_t>::pop_back( void )
 	{
 	M_PROLOG
-	M_ASSERT( _size > 0 );
+	M_ENSURE_EX( _size > 0, _errMsgHRing_[ ERROR::RING_IS_EMPTY ] );
 	-- _size;
 	int long cap( capacity() );
 	int long idx( _start + _size );
@@ -848,7 +926,7 @@ template<typename type_t>
 void HRing<type_t>::pop_front( void )
 	{
 	M_PROLOG
-	M_ASSERT( _size > 0 );
+	M_ENSURE_EX( _size > 0, _errMsgHRing_[ ERROR::RING_IS_EMPTY ] );
 	value_type* arr( _buf.get<value_type>() );
 	arr[ _start ++ ].~value_type();
 	if ( _start == capacity() )

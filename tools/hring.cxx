@@ -36,13 +36,14 @@ namespace yaal
 namespace tools
 {
 
-char const* const _errMsgHRing_[ 5 ] =
+char const* const _errMsgHRing_[ 6 ] =
 	{
 	_( "ok" ),
 /* HRing::ERROR::BAD_SIZE */         _( "bad size requested" ),
 /* HRing::ERROR::BAD_INDEX */        _( "index does not fit into array" ),
 /* HRing::ERROR::INVALID_ITERATOR */ _( "invalid iterator used for operation" ),
-/* HRing::ERROR::RING_IS_FULL */     _( "ring is already full" )
+/* HRing::ERROR::RING_IS_FULL */     _( "ring is already full" ),
+/* HRing::ERROR::RING_IS_EMPTY */    _( "ring is now empty" )
 	};
 
 }

@@ -62,7 +62,7 @@ public:
 		typedef enum
 			{
 			OK = 0,          /*!< No error. */
-			BAD_SIZE,        /*!< Index of of bounds. */
+			BAD_SIZE,        /*!< Bad size requested. */
 			BAD_INDEX,       /*!< Index of of bounds. */
 			INVALID_ITERATOR /*!< iterator used for operation is not valid */
 			} error_t;
@@ -412,13 +412,13 @@ void HArray<type_t>::resize( int long size_, type_t const& fillWith_ )
 		{
 		reserve( size_ );
 		value_type* arr( _buf.get<value_type>() );
-		for ( int long i = _size; i < size_; ++ i )
+		for ( int long i( _size ); i < size_; ++ i )
 			new ( arr + i ) value_type( fillWith_ );
 		}
 	else if ( size_ < _size )
 		{
 		value_type* arr( _buf.get<value_type>() );
-		for ( int long i = size_; i < _size; ++ i )
+		for ( int long i( size_ ); i < _size; ++ i )
 			arr[ i ].~value_type();
 		}
 	_size = size_;
@@ -438,9 +438,9 @@ void HArray<type_t>::reserve( int long capacity_ )
 		HChunk newBuf( chunk_size<value_type>( max( capacity_, curCapacity * 2 ) ) );
 		value_type* dst( newBuf.get<value_type>() );
 		value_type* src( _buf.get<value_type>() );
-		for ( int long i = 0; i < _size; ++ i )
+		for ( int long i( 0 ); i < _size; ++ i )
 			new ( dst + i ) value_type( src[ i ] );
-		for ( int long i = 0; i < _size; ++ i )
+		for ( int long i( 0 ); i < _size; ++ i )
 			src[ i ].~value_type();
 		_buf.swap( newBuf );
 		}
@@ -511,20 +511,21 @@ void HArray<type_t>::insert_space( int long pos_, int long size_ )
 	}
 
 template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::erase( iterator first, iterator last )
+typename HArray<type_t>::iterator HArray<type_t>::erase( iterator first_, iterator last_ )
 	{
 	M_PROLOG
-	for ( iterator second( last ), endIt( end() );
-			( second != endIt );
-			++ first, ++ second )
-		*first = *second;
-	int long removed( 0 );
-	for ( iterator endIt( end() );
-			( first != endIt );
-			++ first, ++ removed )
-		(*first).~value_type();
-	_size -= removed;
-	return ( last._index < _size ? last : end() );
+	M_ASSERT( first_._owner == this );
+	M_ASSERT( last_._owner == this );
+	if ( ( first_._index < 0 ) && ( first_._index > _size ) )
+		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], first_._index );
+	if ( ( last_._index < 0 ) && ( last_._index > _size ) )
+		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index );
+	if ( last_._index < first_._index )
+		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index - first_._index );
+	for ( iterator it( copy( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it )
+		(*it).~value_type();
+	_size -= ( last_._index - first_._index );
+	return ( last_._index < _size ? last_ : end() );
 	M_EPILOG
 	}
 
