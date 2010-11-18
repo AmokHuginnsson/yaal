@@ -48,6 +48,16 @@ namespace yaal
 namespace tools
 {
 
+static void close_and_invalidate( int& fd_ )
+	{
+	M_PROLOG
+	if ( fd_ >= 0 )
+		M_ENSURE( TEMP_FAILURE_RETRY( hcore::system::close( fd_ ) ) == 0 );
+	fd_ = -1;
+	return;
+	M_EPILOG
+	}
+
 HPipedChild::HPipedChild( void )
 	: HStreamInterface(), _pid( 0 ),
 	_pipeIn( -1 ), _pipeOut( -1 ), _pipeErr( -1 ),
@@ -68,15 +78,9 @@ HPipedChild::~HPipedChild( void )
 HPipedChild::STATUS HPipedChild::finish( void )
 	{
 	M_PROLOG
-	if ( _pipeErr >= 0 )
-		TEMP_FAILURE_RETRY( hcore::system::close( _pipeErr ) );
-	_pipeErr = -1;
-	if ( _pipeOut >= 0 )
-		TEMP_FAILURE_RETRY( hcore::system::close( _pipeOut ) );
-	_pipeOut = -1;
-	if ( _pipeIn >= 0 )
-		TEMP_FAILURE_RETRY( hcore::system::close( _pipeIn ) );
-	_pipeIn = -1;
+	close_and_invalidate( _pipeErr );
+	close_and_invalidate( _pipeOut );
+	close_and_invalidate( _pipeIn );
 	STATUS s;
 	if ( _pid > 0 )
 		{
@@ -114,16 +118,6 @@ struct OPipeResGuard
 			TEMP_FAILURE_RETRY( hcore::system::close( _res[ 1 ] ) );
 		}
 	};
-
-static void close_and_invalidate( int& fd_ )
-	{
-	M_PROLOG
-	if ( fd_ >= 0 )
-		M_ENSURE( TEMP_FAILURE_RETRY( hcore::system::close( fd_ ) ) == 0 );
-	fd_ = -1;
-	return;
-	M_EPILOG
-	}
 
 void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 	{
