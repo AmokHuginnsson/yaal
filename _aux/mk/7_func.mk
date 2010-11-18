@@ -10,6 +10,7 @@ ifeq ($$(CURDIR),$$(DIR_BUILD))
 	SRCS += $$(SRC_$(1))
 	OBJS_$(1) := $$(patsubst %.$$(SS),%.$$(OS),$$(SRC_$(1)))
 	OBJS += $$(OBJS_$(1))
+	TOTAL:=$(words $(SRCS))
 endif
 endef
 
