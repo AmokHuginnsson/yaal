@@ -27,6 +27,8 @@ Copyright:
 #ifndef YAAL_HCORE_HRANDOMIZER_HXX_INCLUDED
 #define YAAL_HCORE_HRANDOMIZER_HXX_INCLUDED 1
 
+#include "hcore/numeric.hxx"
+
 namespace yaal
 {
 
@@ -40,39 +42,42 @@ namespace hcore
 class HRandomizer
 	{
 	int long unsigned _seed;
+	int _range;
 public:
 /*! \brief Construct new randomizer.
  *
  * \param seed - initialize pseudo-random numebr generator with seed.
+ * \param range - upper limit for generated numer.
  */
-	HRandomizer( int long unsigned const seed = 1 );
-
-/*! \brief Set current seed.
- *
- * \param seed - new seed for this generator.
- */
-	void set( int long unsigned const seed );
+	HRandomizer( int long unsigned const seed = 1, int range = meta::max_signed<int>::value );
 
 /*! \brief Generate next random number.
  *
- * \param cap - upper limit for generated numer.
- * \return next random number (capped or not)
+ * \param range - upper limit for generated numer.
+ * \return next random number capped to explicit value.
  */
-	int rnd( int cap = 0 );
+	int operator()( int range );
+
+/*! \brief Generate next random number.
+ *
+ * \param range - upper limit for generated numer.
+ * \return next random number capped to randomizer instance default value.
+ */
+	int operator()( void );
 	};
 
 /*! \brief Helper namespace for HRandomizer related utils.
  */
 namespace randomizer_helper
-	{
+{
 
-/*! \brief Initialize pseudo-random number generator with random seed.
+/*! \brief Make randomizer object initialized with "random" seed.
  *
- * \param[in,out] gen - pseudo-random number generator to initialize.
+ * \param range - upper limit for generated numbers.
  */
-	void init_randomizer_from_time( HRandomizer& gen );
+HRandomizer make_randomizer( int range = meta::max_signed<int>::value );
 
-	}
+}
 
 }
 

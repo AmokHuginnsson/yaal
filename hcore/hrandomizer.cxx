@@ -44,43 +44,41 @@ namespace
 	static long unsigned const INCREMENT  = 1;
 	}
 
-HRandomizer::HRandomizer( int long unsigned const seed_ )
-	: _seed( seed_ )
+HRandomizer::HRandomizer( int long unsigned const seed_, int cap_ )
+	: _seed( seed_ ), _range( cap_ )
 	{
 	M_PROLOG
+	M_ENSURE( _range > 0 );
 	return;
 	M_EPILOG
 	}
 	
-void HRandomizer::set( int long unsigned const val_ )
-	{
-	M_PROLOG
-	_seed = val_;
-	return;
-	M_EPILOG
-	}
-	
-int HRandomizer::rnd( int range_ )
+int HRandomizer::operator()( int range_ )
 	{
 	M_PROLOG
 	_seed = MULTIPLIER * _seed + INCREMENT;
-	if ( range_ )
-		return ( static_cast<int>( ( _seed >> 16 ) & 0x7fff ) % range_ );
-	else
-		return ( static_cast<int>( ( _seed >> 16 ) & 0x7fff ) );
+	M_ENSURE( range_ > 0 );
+	return ( static_cast<int>( ( _seed >> 16 ) & 0x7fff ) % range_ );
+	M_EPILOG
+	}
+
+int HRandomizer::operator()( void )
+	{
+	M_PROLOG
+	_seed = MULTIPLIER * _seed + INCREMENT;
+	return ( static_cast<int>( ( _seed >> 16 ) & 0x7fff ) % _range );
 	M_EPILOG
 	}
 
 namespace randomizer_helper
 {
 
-void init_randomizer_from_time( HRandomizer& rnd )
+HRandomizer make_randomizer( int cap_ )
 	{
 	M_PROLOG
 	struct timeval tv;
 	M_ENSURE( gettimeofday( &tv, NULL ) == 0 );
-	rnd.set( tv.tv_sec + tv.tv_usec );
-	return;
+	return ( HRandomizer( tv.tv_sec + tv.tv_usec, cap_ ) );
 	M_EPILOG
 	}
 
