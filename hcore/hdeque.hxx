@@ -750,7 +750,8 @@ void HDeque<type_t>::assign( iterator_t first_, iterator_t last_ )
 	else
 		{
 		copy_n( first_, _size, begin() );
-		insert( end(), advance( first_, _size ), last_ );
+		advance( first_, _size );
+		insert( end(), first_, last_ );
 		}
 	return;
 	M_EPILOG
