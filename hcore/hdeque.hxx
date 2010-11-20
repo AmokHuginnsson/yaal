@@ -435,7 +435,10 @@ void HDeque<type_t>::accommodate_chunks( int long size_ )
 			M_ASSERT( ( _start >= 0 ) && ( ( _start / VALUES_PER_CHUNK ) == newFirstChunkIndex ) );
 			}
 		else
+			{
 			_start = ( ( newAvailableChunksCount - newUsedChunksCount ) * VALUES_PER_CHUNK ) / 2;
+			newFirstChunkIndex = _start / VALUES_PER_CHUNK;
+			}
 		if ( size_ > 0 )
 			{
 			for ( int long i( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ); ( i >= ( newFirstChunkIndex + usedChunksCount ) ) && ! chunks[ i ]; -- i )
@@ -450,10 +453,6 @@ void HDeque<type_t>::accommodate_chunks( int long size_ )
 	return;
 	M_EPILOG
 	}
-
-#if 0
-		chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
-#endif
 
 template<typename type_t>
 void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ )
@@ -475,24 +474,12 @@ void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ )
 		value_type** chunks = _chunks.get<value_type*>();
 		bool chunkStart( false );
 		for ( int long i( _start + size_ ), last( _start + _size ); i < last; ++ i )
+			chunks[ i / VALUES_PER_CHUNK ][ i % VALUES_PER_CHUNK ].~value_type();
+		for ( int long i( ( ( ( _start + size_ - 1 ) > 0 ? ( _start + size_ - 1 ) : _start + size_ ) / VALUES_PER_CHUNK ) + ( size_ ? 1 : 0 ) ),
+				lastChunkIndex( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ); i < lastChunkIndex; ++ i )
 			{
-			int long chunkIndex( i / VALUES_PER_CHUNK );
-			int long itemIndex( i % VALUES_PER_CHUNK );
-			chunks[ chunkIndex ][ itemIndex ].~value_type();
-			if ( ! itemIndex )
-				chunkStart = true;
-			if ( chunkStart && ( ( itemIndex + 1 ) == VALUES_PER_CHUNK ) )
-				{
-				delete [] static_cast<char*>( static_cast<void*>( chunks[ chunkIndex ] ) );
-				chunks[ chunkIndex ] = NULL;
-				}
-			}
-		int long lastItem( ( _start + _size - 1 ) % VALUES_PER_CHUNK );
-		if ( chunkStart && ( ( lastItem + 1 ) != VALUES_PER_CHUNK ) )
-			{
-			int long lastChunkIndex( ( _start + _size - 1 ) / VALUES_PER_CHUNK );
-			delete [] static_cast<char*>( static_cast<void*>( chunks[ lastChunkIndex ] ) );
-			chunks[ lastChunkIndex ] = NULL;
+			delete [] static_cast<char*>( static_cast<void*>( chunks[ i ] ) );
+			chunks[ i ] = NULL;
 			}
 		}
 	_size = size_;
