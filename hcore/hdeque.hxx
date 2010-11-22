@@ -399,6 +399,7 @@ void HDeque<type_t>::accommodate_chunks( int long size_ )
 				{
 				_chunks.realloc( chunk_size<value_type*>( newUsedChunksCount ) );
 				newAvailableChunksCount = _chunks.count_of<value_type*>();
+				M_ASSERT( newAvailableChunksCount >= newUsedChunksCount );
 				}
 			newFirstChunkIndex = ( newAvailableChunksCount - newUsedChunksCount ) / 2;
 			}
@@ -408,12 +409,13 @@ void HDeque<type_t>::accommodate_chunks( int long size_ )
 		int long newStart( _start + size_ );
 		if ( newStart < 0 )
 			{
-			int long frontExtension( minimal_cover_chunks_count( - newStart ) );
+			int long frontExtension( minimal_cover_chunks_count( - newStart ) + firstUsedChunkIndex );
 			newUsedChunksCount = usedChunksCount + frontExtension;
 			if ( newUsedChunksCount > availableChunksCount )
 				{
 				_chunks.realloc( chunk_size<value_type*>( newUsedChunksCount ) );
 				newAvailableChunksCount = _chunks.count_of<value_type*>();
+				M_ASSERT( newAvailableChunksCount >= newUsedChunksCount );
 				}
 			newFirstChunkIndex = ( ( newAvailableChunksCount - newUsedChunksCount ) / 2 ) + frontExtension;
 			}
@@ -432,6 +434,7 @@ void HDeque<type_t>::accommodate_chunks( int long size_ )
 				}
 			else if ( moveBy < 0 ) /* move to back */
 				{
+				M_ASSERT( ( newFirstChunkIndex + usedChunksCount ) <= newAvailableChunksCount );
 				copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstChunkIndex + usedChunksCount );
 				fill( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + min( - moveBy, usedChunksCount ), static_cast<value_type*>( NULL ) );
 				_start -= ( moveBy * VALUES_PER_CHUNK );
@@ -440,10 +443,7 @@ void HDeque<type_t>::accommodate_chunks( int long size_ )
 			M_ASSERT( ( _start >= 0 ) && ( ( _start / VALUES_PER_CHUNK ) == newFirstChunkIndex ) );
 			}
 		else
-			{
-			_start = ( ( newAvailableChunksCount - newUsedChunksCount ) * VALUES_PER_CHUNK ) / 2;
-			newFirstChunkIndex = _start / VALUES_PER_CHUNK;
-			}
+			_start = newFirstChunkIndex * VALUES_PER_CHUNK;
 		if ( size_ > 0 )
 			{
 			for ( int long i( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ); ( i >= ( newFirstChunkIndex + usedChunksCount ) ) && ! chunks[ i ]; -- i )
@@ -451,6 +451,7 @@ void HDeque<type_t>::accommodate_chunks( int long size_ )
 			}
 		else if ( size_ < 0 )
 			{
+			M_ASSERT( ( _start + size_ ) >= 0 );
 			for ( int long i( ( _start + size_ ) / VALUES_PER_CHUNK ); ( i < newFirstChunkIndex ) && ! chunks[ i ]; ++ i )
 				chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
 			}
@@ -480,7 +481,7 @@ void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ )
 		bool chunkStart( false );
 		for ( int long i( _start + size_ ), last( _start + _size ); i < last; ++ i )
 			chunks[ i / VALUES_PER_CHUNK ][ i % VALUES_PER_CHUNK ].~value_type();
-		for ( int long i( ( ( ( _start + size_ - 1 ) > 0 ? ( _start + size_ - 1 ) : _start + size_ ) / VALUES_PER_CHUNK ) + ( size_ ? 1 : 0 ) ),
+		for ( int long i( ( ( ( _start + size_ - 1 ) >= _start ? ( _start + size_ - 1 ) : _start + size_ ) / VALUES_PER_CHUNK ) + ( size_ ? 1 : 0 ) ),
 				lastChunkIndex( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ); i < lastChunkIndex; ++ i )
 			{
 			delete [] static_cast<char*>( static_cast<void*>( chunks[ i ] ) );
@@ -506,11 +507,12 @@ void HDeque<type_t>::insert_space( int long index_, int long size_ )
 	 */
 	/* Here we perform actual move of smaller part.
 	 */
+	if ( index_ <= ( _size / 2 ) )
+		_start -= size_;
 	if ( _size > 0 )
 		{
 		if ( index_ <= ( _size / 2 ) ) /* Move from back to front. */
 			{
-			_start -= size_;
 			for ( int long src( _start + size_ ), dst( _start ); dst < ( index_ + _start ); ++ src, ++ dst )
 				{
 				new ( chunks[ dst / VALUES_PER_CHUNK ] + ( dst % VALUES_PER_CHUNK ) ) value_type( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
@@ -604,7 +606,7 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 			for ( int long del( _start + _size - toRemove ); del < ( _start + _size ); ++ del )
 				chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type();
 			int long chunksCount( _chunks.template count_of<value_type*>() );
-			for ( int long chunkIndex( ( ( ( _start + _size - toRemove ) - 1 ) / VALUES_PER_CHUNK ) + 1 );
+			for ( int long chunkIndex( ( ( ( ( ( _start + _size - toRemove ) - 1 ) >= _start ) ? ( ( _start + _size - toRemove ) - 1 ) : ( _start + _size - toRemove ) ) / VALUES_PER_CHUNK ) + ( ( _size - toRemove ) > 0 ? 1 : 0 ) );
 					( chunkIndex < ( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ) ) && ( chunkIndex < chunksCount );
 					++ chunkIndex )
 				{
