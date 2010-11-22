@@ -53,7 +53,7 @@ template<typename type_t>
 class HDeque
 	{
 private:
-	static int long const DEFAULT_CHUNK_SIZE = 512;
+	static int long const DEFAULT_CHUNK_SIZE = ( 512 / sizeof ( type_t ) ) * sizeof ( type_t ) + ( ( 512 - ( ( 512 / sizeof ( type_t ) ) * sizeof ( type_t ) ) ) > ( sizeof ( type_t ) / 2 ) ? sizeof ( type_t ) : 0 );
 	static int long const CHUNK_SIZE = meta::max<sizeof ( type_t ), DEFAULT_CHUNK_SIZE>::value;
 	static int long const VALUES_PER_CHUNK = CHUNK_SIZE / sizeof ( type_t );
 protected:
@@ -141,6 +141,11 @@ private:
 	int long used_chunks( void ) const;
 	int long minimal_cover_chunks_count( int long ) const;
 	};
+
+template<typename type_t>
+int long const HDeque<type_t>::CHUNK_SIZE;
+template<typename type_t>
+int long const HDeque<type_t>::VALUES_PER_CHUNK;
 
 }
 
