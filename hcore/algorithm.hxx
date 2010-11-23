@@ -861,6 +861,14 @@ return_t accumulate( iterator_t it, iterator_t end, return_t ret )
 	return ( ret );
 	}
 
+/*! \cond */
+template<typename type_t>
+int long distance( type_t* first_, type_t* last_ )
+	{
+	M_ASSERT( last_ > first_ );
+	return ( last_ - first_ );
+	}
+/*! \endcond */
 /*! \brief Calculate distance between two iterators.
  *
  * \param first - iterator.
@@ -876,6 +884,11 @@ int long distance( iter_t first, iter_t last )
 	return ( dist );
 	}
 
+/*! \cond */
+template<typename type_t>
+void advance( type_t*& it_, int long distance_ )
+	{ it_ += distance_; }
+/*! \endcond */
 /*! \brief Move iterator forward.
  *
  * \param it - iterator to be moved.

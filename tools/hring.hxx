@@ -158,6 +158,14 @@ template<typename type_t>
 inline void swap( yaal::tools::HRing<type_t>& a, yaal::tools::HRing<type_t>& b )
 	{ a.swap( b ); }
 
+template<typename type_t>
+int long distance( typename yaal::tools::HRing<type_t>::HIterator const& first_,  typename yaal::tools::HRing<type_t>::HIterator const& last_ )
+	{ return ( last_ - first_ ); }
+
+template<typename type_t>
+void advance( typename yaal::tools::HRing<type_t>::HIterator& it_, int long distance_ )
+	{ it_ += distance_; }
+
 namespace tools 
 {
 
@@ -524,6 +532,7 @@ void HRing<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ )
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
 		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], pos_._index );
 	int long curCapacity( get_capacity() );
+	using yaal::distance;
 	int long elemCount( distance( first_, last_ ) );
 	M_ENSURE_EX( ( _size + elemCount ) <= curCapacity, _errMsgHRing_[ ERROR::BAD_SIZE ] );
 	insert_space( pos_._index, elemCount );

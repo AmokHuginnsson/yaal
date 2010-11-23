@@ -12,6 +12,9 @@ def yaal_lookup_function( val ):
 	regex = re.compile( "^yaal::hcore::HArray<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHArrayPrinter( val )
+	regex = re.compile( "^yaal::hcore::HDeque<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHDequePrinter( val )
 	regex = re.compile( "^yaal::hcore::HList<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHListPrinter( val )
@@ -33,6 +36,9 @@ def yaal_lookup_function( val ):
 	regex = re.compile( "^yaal::hcore::HVariant<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHVariantPrinter( val )
+	regex = re.compile( "^yaal::tools::HRing<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalToolsHRingPrinter( val )
 
 	return None
 
@@ -67,7 +73,7 @@ class YaalHCoreHArrayPrinter:
 			self.count = self.count + 1
 			elt = self.item.dereference()
 			self.item = self.item + 1
-			return ('[%d]' % count, elt)
+			return ( '[%d]' % count, elt )
 
 	def __init__(self, val):
 		self.val = val
@@ -87,8 +93,43 @@ class YaalHCoreHArrayPrinter:
 	def display_hint( self ):
 		return 'array'
 
+class YaalHCoreHDequePrinter:
+	"Print a yaal::hcore::HDeque"
+
+	class _iterator:
+		def __init__( self, chunks_, VPC_, index_, size_ ):
+			self._VPC = VPC_
+			self._chunks = chunks_
+			self._index = index_
+			self._size = size_
+			self._count = 0
+
+		def __iter__(self):
+			return self
+
+		def next(self):
+			if self._count == self._size:
+				raise StopIteration
+			count = self._count
+			self._count = self._count + 1
+			elt = self._chunks[ self._index / self._VPC ][ self._index % self._VPC ]
+			self._index = self._index + 1
+			return ( '[%d]' % count, elt )
+
+	def __init__(self, val):
+		self.val = val
+	
+	def children( self ):
+		return self._iterator(self.val['_chunks']['_data'].cast( self.val.type.template_argument( 0 ).pointer().pointer() ), self.val['VALUES_PER_CHUNK'], self.val['_start'], self.val['_size'])
+
+	def to_string( self ):
+		return ( "yaal::hcore::HDeque of `%s' of length %d" % ( self.val.type.template_argument( 0 ), self.val['_size'] ) )
+
+	def display_hint( self ):
+		return 'array'
+
 class YaalHCoreHListPrinter:
-	"Print a yaal::hcore::HArray"
+	"Print a yaal::hcore::HList"
 
 	class _iterator:
 		def __init__ (self, start, size):
@@ -365,6 +406,47 @@ class YaalHCoreHVariantPrinter:
 
 	def display_hint( self ):
 		return 'string'
+
+class YaalToolsHRingPrinter:
+	"Print a yaal::tools::HRing"
+
+	class _iterator:
+		def __init__( self, data_, index_, size_, capacity_ ):
+			self._data = data_
+			self._index = index_
+			self._size = size_
+			self._capacity = capacity_ 
+			self._count = 0
+
+		def __iter__(self):
+			return self
+
+		def next(self):
+			if self._count == self._size:
+				raise StopIteration
+			count = self._count
+			self._count = self._count + 1
+			elt = self._data[ self._index % self._capacity ]
+			self._index = self._index + 1
+			return ( '[%d]' % count, elt )
+
+	def __init__(self, val):
+		self.val = val
+	
+	def sizeof_elem( self ):
+		return self.val.type.template_argument( 0 ).sizeof
+
+	def capacity( self ):
+		return self.val['_buf']['_size'] / self.sizeof_elem()
+
+	def children( self ):
+		return self._iterator( self.val['_buf']['_data'].cast( self.val.type.template_argument( 0 ).pointer() ), self.val['_start'], self.val['_size'], self.capacity() )
+
+	def to_string( self ):
+		return ( "yaal::tools::HRing of `%s' of length %d, capacity %d" % ( self.val.type.template_argument( 0 ), self.val['_size'], self.capacity() ) )
+
+	def display_hint( self ):
+		return 'array'
 
 gdb.pretty_printers.append( yaal_lookup_function )
 

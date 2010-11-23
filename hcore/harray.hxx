@@ -138,6 +138,14 @@ template<typename type_t>
 inline void swap( yaal::hcore::HArray<type_t>& a, yaal::hcore::HArray<type_t>& b )
 	{ a.swap( b ); }
 
+template<typename type_t>
+int long distance( typename yaal::hcore::HArray<type_t>::HIterator const& first_, typename yaal::hcore::HArray<type_t>::HIterator const& last_ )
+	{ return ( last_ - first_ ); }
+
+template<typename type_t>
+void advance( typename yaal::hcore::HArray<type_t>::HIterator& it_, int long distance_ )
+	{ it_ += distance_; }
+
 namespace hcore
 {
 
@@ -456,6 +464,7 @@ void HArray<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ 
 	M_ASSERT( pos_._owner == this );
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
 		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
+	using yaal::distance;
 	insert_space( pos_._index, distance( first_, last_ ) );
 	value_type* arr( _buf.get<value_type>() );
 	for ( int long i( pos_._index ); first_ != last_; ++ first_,  ++ i )

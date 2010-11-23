@@ -153,6 +153,14 @@ template<typename type_t>
 inline void swap( yaal::hcore::HDeque<type_t>& a, yaal::hcore::HDeque<type_t>& b )
 	{ a.swap( b ); }
 
+template<typename type_t>
+int long distance( typename yaal::hcore::HDeque<type_t>::HIterator const& first_,  typename yaal::hcore::HDeque<type_t>::HIterator const& last_ )
+	{ return ( last_ - first_ ); }
+
+template<typename type_t>
+void advance( typename yaal::hcore::HDeque<type_t>::HIterator& it_, int long distance_ )
+	{ it_ += distance_; }
+
 namespace hcore
 {
 
@@ -541,6 +549,7 @@ void HDeque<type_t>::insert( iterator it_, iterator_t first_, iterator_t last_ )
 	M_ASSERT( it_._owner == this );
 	if ( ( it_._index < 0 ) || ( it_._index > _size ) )
 		M_THROW( _errMsgHDeque_[ ERROR::INVALID_ITERATOR ], it_._index );
+	using yaal::distance;
 	insert_space( it_._index, distance( first_, last_ ) );
 	value_type** chunks = _chunks.get<value_type*>();
 	for ( int long i( it_._index + _start ); first_ != last_; ++ first_, ++ i )
@@ -735,6 +744,7 @@ template<typename iterator_t>
 void HDeque<type_t>::assign( iterator_t first_, iterator_t last_ )
 	{
 	M_PROLOG
+	using yaal::distance;
 	int long count( distance( first_, last_ ) );
 	if ( count <= _size )
 		{
@@ -744,6 +754,7 @@ void HDeque<type_t>::assign( iterator_t first_, iterator_t last_ )
 	else
 		{
 		copy_n( first_, _size, begin() );
+		using yaal::advance;
 		advance( first_, _size );
 		insert( end(), first_, last_ );
 		}
