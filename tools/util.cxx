@@ -554,13 +554,19 @@ void dump_configuration( void* arg )
 				case ( TYPE::HSTRING ):
 					{
 					HString const& s = o._value->get<HString>();
-					::printf( "%s%s %s\n", ! s.is_empty() ? "" : "# ", o._name, s.raw() ? s.raw() : "" );
+					if ( ! s.is_empty() )
+						::printf( "%s \"%s\"\n", o._name, s.raw() );
+					else
+						::printf( "# %s\n", o._name );
 					}
 				break;
 				case ( TYPE::CHAR_PTR ):
 					{
 					char const* ptr = o._value->get<char const*>();
-					::printf( "%s%s %s\n", ptr && ptr[ 0 ] ? "" : "# ", o._name, ptr );
+					if ( ptr && ptr[0] )
+						::printf( "%s %s\n", o._name, ptr );
+					else
+						::printf( "# %s\n", o._name );
 					}
 				break;
 				case ( TYPE::INT ):
