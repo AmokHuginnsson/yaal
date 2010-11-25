@@ -32,7 +32,7 @@ M_VCSID( "$Id: "__TID__" $" )
 namespace yaal
 {
 
-namespace hcore
+namespace tools
 {
 }
 

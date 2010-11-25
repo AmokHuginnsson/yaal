@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcore/hoptional.hxx - this file is integral part of `yaal' project.
+	tools/hoptional.hxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -23,12 +23,12 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/hoptional.hxx
+/*! \file tools/hoptional.hxx
  * \brief HOptional<> template class implementation.
  */
 
-#ifndef YAAL_HCORE_HOPTIONAL_HXX_INCLUDED
-#define YAAL_HCORE_HOPTIONAL_HXX_INCLUDED 1
+#ifndef YAAL_TOOLS_HOPTIONAL_HXX_INCLUDED
+#define YAAL_TOOLS_HOPTIONAL_HXX_INCLUDED 1
 
 #include "hcore/base.hxx"
 #include "hcore/hexception.hxx"
@@ -37,7 +37,7 @@ Copyright:
 namespace yaal
 {
 
-namespace hcore
+namespace tools
 {
 
 /*! \brief HOptional<> class template - an optional value.
@@ -47,8 +47,8 @@ template<typename type_t>
 class HOptional
 	{
 public:
-	struct SemanticContext { SemanticContext& member( SemanticContext& ); };
-	typedef SemanticContext& ( SemanticContext::* safe_bool_t )( SemanticContext& );
+	struct SemanticContext { SemanticContext const& member( SemanticContext& ) { return ( *this ); } };
+	typedef SemanticContext const& ( SemanticContext::* safe_bool_t )( SemanticContext& );
 	typedef type_t value_type;
 private:
 	char _data[ sizeof ( value_type ) ];
@@ -101,7 +101,7 @@ public:
 	value_type const& operator* ( void ) const
 		{
 		M_ASSERT( _initialized );
-		return ( *static_cast<value_type*>( static_cast<void*>( _data ) ) );
+		return ( *static_cast<value_type const*>( static_cast<void const*>( _data ) ) );
 		}
 	value_type& operator* ( void )
 		{
@@ -111,7 +111,7 @@ public:
 	value_type const* operator->( void ) const
 		{
 		M_ASSERT( _initialized );
-		return ( static_cast<value_type*>( static_cast<void*>( _data ) ) );
+		return ( static_cast<value_type const*>( static_cast<void const*>( _data ) ) );
 		}
 	value_type* operator->( void )
 		{
@@ -123,10 +123,10 @@ public:
 }
 
 template<typename type_t>
-inline void swap( yaal::hcore::HOptional<type_t>& a, yaal::hcore::HOptional<type_t>& b )
+inline void swap( yaal::tools::HOptional<type_t>& a, yaal::tools::HOptional<type_t>& b )
 	{ a.swap( b ); }
 
 }
 
-#endif /* #ifndef YAAL_HCORE_HOPTIONAL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HOPTIONAL_HXX_INCLUDED */
 
