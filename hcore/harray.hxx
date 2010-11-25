@@ -139,11 +139,11 @@ inline void swap( yaal::hcore::HArray<type_t>& a, yaal::hcore::HArray<type_t>& b
 	{ a.swap( b ); }
 
 template<typename type_t>
-int long distance( typename yaal::hcore::HArray<type_t>::HIterator const& first_, typename yaal::hcore::HArray<type_t>::HIterator const& last_ )
+inline int long distance( typename yaal::hcore::HArray<type_t>::HIterator const& first_, typename yaal::hcore::HArray<type_t>::HIterator const& last_ )
 	{ return ( last_ - first_ ); }
 
 template<typename type_t>
-void advance( typename yaal::hcore::HArray<type_t>::HIterator& it_, int long distance_ )
+inline void advance( typename yaal::hcore::HArray<type_t>::HIterator& it_, int long distance_ )
 	{ it_ += distance_; }
 
 namespace hcore
