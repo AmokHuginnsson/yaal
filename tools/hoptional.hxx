@@ -174,7 +174,7 @@ public:
 	value_type const& operator* ( void ) const
 		{
 		M_ASSERT( _initialized );
-		return ( **static_cast<value_type const**>( static_cast<void const*>( _data ) ) );
+		return ( **static_cast<value_type const* const*>( static_cast<void const*>( _data ) ) );
 		}
 	value_type& operator* ( void )
 		{
@@ -184,7 +184,7 @@ public:
 	value_type const* operator->( void ) const
 		{
 		M_ASSERT( _initialized );
-		return ( *static_cast<value_type const**>( static_cast<void const*>( _data ) ) );
+		return ( *static_cast<value_type const* const*>( static_cast<void const*>( _data ) ) );
 		}
 	value_type* operator->( void )
 		{
