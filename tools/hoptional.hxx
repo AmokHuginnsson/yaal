@@ -120,6 +120,80 @@ public:
 		}
 	};
 
+/*! \cond */
+template<typename type_t>
+class HOptional<type_t&>
+	{
+public:
+	struct SemanticContext { SemanticContext const& member( SemanticContext& ) { return ( *this ); } };
+	typedef SemanticContext const& ( SemanticContext::* safe_bool_t )( SemanticContext& );
+	typedef typename trait::strip_reference<type_t>::type value_type;
+private:
+	char _data[ sizeof ( value_type* ) ];
+	bool _initialized;
+public:
+	HOptional( void ) : _data(), _initialized( false ) {}
+	HOptional( value_type const& value_ )
+		: _data(), _initialized( true )
+		{
+		*static_cast<value_type**>( static_cast<void*>( _data ) ) = &value_;
+		}
+	HOptional( HOptional const& other_ )
+		: _data(), _initialized( other_._initialized )
+		{
+		if ( _initialized )
+			new ( _data ) value_type( *other_ );
+		}
+	HOptional& operator = ( HOptional const& other_ )
+		{
+		if ( &other_ != this )
+			{
+			HOptional tmp( other_ );
+			swap( tmp );
+			}
+		return ( *this );
+		}
+	void swap( HOptional& other_ )
+		{
+		if ( &other_ != this )
+			{
+			using yaal::swap;
+			swap( _initialized, other_._initialized );
+			swap( *static_cast<value_type**>( static_cast<void*>( _data ) ), *static_cast<value_type**>( static_cast<void*>( other_._data ) ) );
+			}
+		return;
+		}
+	operator safe_bool_t()
+		{
+		return ( _initialized ? &SemanticContext::member : NULL );
+		}
+	bool operator! ( void ) const
+		{
+		return ( ! _initialized );
+		}
+	value_type const& operator* ( void ) const
+		{
+		M_ASSERT( _initialized );
+		return ( **static_cast<value_type const**>( static_cast<void const*>( _data ) ) );
+		}
+	value_type& operator* ( void )
+		{
+		M_ASSERT( _initialized );
+		return ( **static_cast<value_type**>( static_cast<void*>( _data ) ) );
+		}
+	value_type const* operator->( void ) const
+		{
+		M_ASSERT( _initialized );
+		return ( *static_cast<value_type const**>( static_cast<void const*>( _data ) ) );
+		}
+	value_type* operator->( void )
+		{
+		M_ASSERT( _initialized );
+		return ( *static_cast<value_type**>( static_cast<void*>( _data ) ) );
+		}
+	};
+/*! \endcond */
+
 }
 
 template<typename type_t>
