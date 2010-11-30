@@ -142,7 +142,7 @@ public:
 		: _data(), _initialized( other_._initialized )
 		{
 		if ( _initialized )
-			new ( _data ) value_type( *other_ );
+			*static_cast<value_type**>( static_cast<void*>( _data ) ) = *static_cast<value_type const* const*>( static_cast<void const*>( other_._data ) );
 		}
 	HOptional& operator = ( HOptional const& other_ )
 		{
