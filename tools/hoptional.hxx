@@ -163,7 +163,7 @@ public:
 			}
 		return;
 		}
-	operator safe_bool_t()
+	operator safe_bool_t() const
 		{
 		return ( _initialized ? &SemanticContext::member : NULL );
 		}
@@ -193,6 +193,18 @@ public:
 		}
 	};
 /*! \endcond */
+
+template<typename type_t>
+inline type_t get_optional_value_or( HOptional<type_t> const& value_, type_t default_ )
+	{
+	return ( value_ ? *value_ : default_ );
+	}
+
+template<typename type_t>
+inline type_t const& get_optional_value_or( HOptional<type_t const&> const& value_, type_t const& default_ )
+	{
+	return ( value_ ? *value_ : default_ );
+	}
 
 }
 

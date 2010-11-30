@@ -330,105 +330,113 @@ resources_t& HDataProcess::build_resource( yaal::hcore::HString const& resourceN
 			{
 			M_ENSURE( (*attr).get_type() == HXml::HNode::TYPE::NODE );
 			HString const attrName = (*attr).get_name();
-			if ( attrName == "label" )
-				r[ i ]._label = xml::node_val( attr );
-			else if ( attrName == "db" )
+			try
 				{
-				M_ENSURE( r[ i ]._role == DATACONTROL_BITS::ROLE::MAIN );
-				HXml::HNode::properties_t const& db = (*attr).properties();
-				HXml::HNode::properties_t::const_iterator filterIt = db.find( "filter" );
-				HXml::HNode::properties_t::const_iterator sortIt = db.find( "sort" );
-				r[ i ]._table = xml::attr_val( attr, "table" ); 
-				r[ i ]._columns = xml::attr_val( attr, "column" );
-				r[ i ]._id = xml::attr_val( attr, "id_column" );
-				if ( filterIt != db.end() )
-					r[ i ]._filter = filterIt->second.raw();
-				if ( sortIt != db.end() )
-					r[ i ]._sort = sortIt->second.raw();
-				}
-			else if ( attrName == "position" )
-				{
-				r[ i ]._row = lexical_cast<int>( xml::attr_val( attr, "row" ) );
-				r[ i ]._column = lexical_cast<int>( xml::attr_val( attr, "column" ) );
-				r[ i ]._height = lexical_cast<int>( xml::attr_val( attr, "height" ) );
-				r[ i ]._width = lexical_cast<int>( xml::attr_val( attr, "width" ) );
-				}
-			else if ( attrName == "parent" )
-				{
-				i2s[ i ] = xml::attr_val( attr, "refid" );
-				}
-			else if ( r[ i ]._type == DATACONTROL_BITS::TYPE::LIST )
-				{
-				OListControlResource* l = static_cast<OListControlResource*>( r[ i ]._typeSpecific );
-				if ( attrName == "column" )
+				if ( attrName == "label" )
+					r[ i ]._label = xml::node_val( attr ).raw();
+				else if ( attrName == "db" )
 					{
-					if ( ! r[ i ]._columnInfo )
-						{
-						_columnCache.add_tail();
-						HChunk& c = _columnCache.tail(); 
-						c.realloc( chunk_size<OColumnInfo>( ( (*it).child_count() - attrNo ) + 1 ) );
-						r[ i ]._columnInfo = c.get<OColumnInfo>();
-						}
-					r[ i ]._columnInfo[ columnNo ]._placement = lexical_cast<int>( xml::attr_val( attr, "placement" ) );
-					r[ i ]._columnInfo[ columnNo ]._name = xml::attr_val( attr, "name" );
-					r[ i ]._columnInfo[ columnNo ]._width = lexical_cast<int>( xml::attr_val( attr, "width" ) );
-					HXml::HNode::properties_t const& col = (*attr).properties();
-					HXml::HNode::properties_t::const_iterator alignIt = col.find( "align" );
-					HXml::HNode::properties_t::const_iterator colTypeIt = col.find( "type" );
-					M_ENSURE( ( alignIt != col.end() ) && ( colTypeIt != col.end() ) );
-					if ( alignIt->second == "left" )
-						r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::LEFT;
-					else if ( alignIt->second == "center" )
-						r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::CENTER;
-					else if ( alignIt->second == "right" )
-						r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::RIGHT;
-					else
-						M_THROW( _( "unknown align type" ), i );
-					if ( colTypeIt->second == "string" )
-						r[ i ]._columnInfo[ columnNo ]._type = TYPE::HSTRING;
-					else
-						M_THROW( _( "unknown column type" ), i );
-					++ columnNo;
+					M_ENSURE( r[ i ]._role == DATACONTROL_BITS::ROLE::MAIN );
+					HXml::HNode::properties_t const& db = (*attr).properties();
+					HXml::HNode::properties_t::const_iterator filterIt = db.find( "filter" );
+					HXml::HNode::properties_t::const_iterator sortIt = db.find( "sort" );
+					r[ i ]._table = xml::attr_val( attr, "table" ).raw(); 
+					r[ i ]._columns = xml::attr_val( attr, "column" ).raw();
+					r[ i ]._id = xml::attr_val( attr, "id_column" ).raw();
+					if ( filterIt != db.end() )
+						r[ i ]._filter = filterIt->second.raw();
+					if ( sortIt != db.end() )
+						r[ i ]._sort = sortIt->second.raw();
 					}
-				else if ( attrName == "checkable" )
-					l->_checkable = lexical_cast<bool>( xml::node_val( attr ) );
-				else if ( attrName == "sortable" )
-					l->_sortable = lexical_cast<bool>( xml::node_val( attr ) );
-				else if ( attrName == "searchable" )
-					l->_searchable = lexical_cast<bool>( xml::node_val( attr ) );
-				else if ( attrName == "editable" )
-					l->_editable = lexical_cast<bool>( xml::node_val( attr ) );
-				else if ( attrName == "draw_header" )
-					l->_drawHeader = lexical_cast<bool>( xml::node_val( attr ) );
+				else if ( attrName == "position" )
+					{
+					r[ i ]._row = lexical_cast<int>( xml::attr_val( attr, "row" ) );
+					r[ i ]._column = lexical_cast<int>( xml::attr_val( attr, "column" ) );
+					r[ i ]._height = lexical_cast<int>( xml::attr_val( attr, "height" ) );
+					r[ i ]._width = lexical_cast<int>( xml::attr_val( attr, "width" ) );
+					}
+				else if ( attrName == "parent" )
+					{
+					i2s[ i ] = xml::attr_val( attr, "refid" ).raw();
+					}
+				else if ( r[ i ]._type == DATACONTROL_BITS::TYPE::LIST )
+					{
+					OListControlResource* l = static_cast<OListControlResource*>( r[ i ]._typeSpecific );
+					if ( attrName == "column" )
+						{
+						if ( ! r[ i ]._columnInfo )
+							{
+							_columnCache.add_tail();
+							HChunk& c = _columnCache.tail(); 
+							c.realloc( chunk_size<OColumnInfo>( ( (*it).child_count() - attrNo ) + 1 ) );
+							r[ i ]._columnInfo = c.get<OColumnInfo>();
+							}
+						r[ i ]._columnInfo[ columnNo ]._placement = lexical_cast<int>( xml::attr_val( attr, "placement" ) );
+						r[ i ]._columnInfo[ columnNo ]._name = xml::attr_val( attr, "name" ).raw();
+						r[ i ]._columnInfo[ columnNo ]._width = lexical_cast<int>( xml::attr_val( attr, "width" ) );
+						HXml::HNode::properties_t const& col = (*attr).properties();
+						HXml::HNode::properties_t::const_iterator alignIt = col.find( "align" );
+						HXml::HNode::properties_t::const_iterator colTypeIt = col.find( "type" );
+						M_ENSURE( ( alignIt != col.end() ) && ( colTypeIt != col.end() ) );
+						if ( alignIt->second == "left" )
+							r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::LEFT;
+						else if ( alignIt->second == "center" )
+							r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::CENTER;
+						else if ( alignIt->second == "right" )
+							r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::RIGHT;
+						else
+							M_THROW( _( "unknown align type" ), i );
+						if ( colTypeIt->second == "string" )
+							r[ i ]._columnInfo[ columnNo ]._type = TYPE::HSTRING;
+						else
+							M_THROW( _( "unknown column type" ), i );
+						++ columnNo;
+						}
+					else if ( attrName == "checkable" )
+						l->_checkable = lexical_cast<bool>( xml::node_val( attr ) );
+					else if ( attrName == "sortable" )
+						l->_sortable = lexical_cast<bool>( xml::node_val( attr ) );
+					else if ( attrName == "searchable" )
+						l->_searchable = lexical_cast<bool>( xml::node_val( attr ) );
+					else if ( attrName == "editable" )
+						l->_editable = lexical_cast<bool>( xml::node_val( attr ) );
+					else if ( attrName == "draw_header" )
+						l->_drawHeader = lexical_cast<bool>( xml::node_val( attr ) );
+					else
+						M_THROW( _( "unknown list attribute name" ), i );
+					}
+				else if ( r[ i ]._type == DATACONTROL_BITS::TYPE::EDIT )
+					{
+					OEditControlResource* e = static_cast<OEditControlResource*>( r[ i ]._typeSpecific );
+					if ( attrName == "max_string_size" )
+						e->_maxStringSize = lexical_cast<int>( xml::node_val( attr ) );
+					else if ( attrName == "value" )
+						e->_value = get_optional_value_or( xml::try_node_val( attr ), HString() ).raw();
+					else if ( attrName == "mask" )
+						e->_mask = xml::node_val( attr ).raw();
+					else if ( attrName == "replace" )
+						e->_replace = lexical_cast<bool>( xml::node_val( attr ) );
+					else if ( attrName == "multi_line" )
+						e->_multiLine = lexical_cast<bool>( xml::node_val( attr ) );
+					else if ( attrName == "read_only" )
+						e->_readOnly = lexical_cast<bool>( xml::node_val( attr ) );
+					else if ( attrName == "right_aligned" )
+						e->_rightAligned = lexical_cast<bool>( xml::node_val( attr ) );
+					else if ( attrName == "password" )
+						e->_password = lexical_cast<bool>( xml::node_val( attr ) );
+					else if ( attrName == "max_history_level" )
+						e->_maxHistoryLevel = lexical_cast<int>( xml::node_val( attr ) );
+					else
+						M_THROW( _( "unknown edit attribute name" ), i );
+					}
 				else
-					M_THROW( _( "unknown list attribute name" ), i );
+					M_THROW( _( "auto building of this type of control is not supported yet" ), i );
 				}
-			else if ( r[ i ]._type == DATACONTROL_BITS::TYPE::EDIT )
+			catch ( HException const& )
 				{
-				OEditControlResource* e = static_cast<OEditControlResource*>( r[ i ]._typeSpecific );
-				if ( attrName == "max_string_size" )
-					e->_maxStringSize = lexical_cast<int>( xml::node_val( attr ) );
-				else if ( attrName == "value" )
-					e->_value = xml::node_val( attr );
-				else if ( attrName == "mask" )
-					e->_mask = xml::node_val( attr );
-				else if ( attrName == "replace" )
-					e->_replace = lexical_cast<bool>( xml::node_val( attr ) );
-				else if ( attrName == "multi_line" )
-					e->_multiLine = lexical_cast<bool>( xml::node_val( attr ) );
-				else if ( attrName == "read_only" )
-					e->_readOnly = lexical_cast<bool>( xml::node_val( attr ) );
-				else if ( attrName == "right_aligned" )
-					e->_rightAligned = lexical_cast<bool>( xml::node_val( attr ) );
-				else if ( attrName == "password" )
-					e->_password = lexical_cast<bool>( xml::node_val( attr ) );
-				else if ( attrName == "max_history_level" )
-					e->_maxHistoryLevel = lexical_cast<int>( xml::node_val( attr ) );
-				else
-					M_THROW( _( "unknown edit attribute name" ), i );
+				log( LOG_TYPE::ERROR ) << "parsing failed on: " << attrName << endl;
+				throw;
 				}
-			else
-				M_THROW( _( "auto building of this type of control is not supported yet" ), i );
 			}
 		}
 	for ( int n = 0; n < i; ++ n )

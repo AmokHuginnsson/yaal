@@ -31,7 +31,6 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
-#include "hcore/hlog.hxx"
 #include "hlistcontrol.hxx"
 #include "hconsole.hxx"
 

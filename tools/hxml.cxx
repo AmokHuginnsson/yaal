@@ -1129,41 +1129,79 @@ char const* HXml::error_message( int code ) const
 namespace xml
 {
 
-char const* node_val( HXml::HConstNodeProxy const& node )
+value_t try_node_val( HXml::HConstNodeProxy const& node )
 	{
 	M_PROLOG
 	HXml::HConstIterator it = node.begin();
-	char const* t = "";
+	value_t value;
 	if ( it != node.end() )
 		{
 		if ( (*it).get_type() == HXml::HNode::TYPE::CONTENT )
-			t = (*it).get_value().raw();
+			value = (*it).get_value();
 		}
-	return ( t );
+	return ( value );
 	M_EPILOG
 	}
 
-char const* node_val( HXml::HConstIterator const& it )
+value_t try_node_val( HXml::HConstIterator const& it )
 	{
 	M_PROLOG
-	return ( node_val( *it ) );
+	return ( try_node_val( *it ) );
 	M_EPILOG
 	}
 
-char const* attr_val( HXml::HConstNodeProxy const& node, char const* const name )
+value_t try_attr_val( HXml::HConstNodeProxy const& node, char const* const name )
 	{
 	M_PROLOG
 	HXml::HNode::properties_t const& props = node.properties();
 	HXml::HNode::properties_t::const_iterator prop = props.find( name );
-	M_ENSURE( prop != props.end() );
-	return ( prop->second.raw() );
+	value_t value;
+	if ( prop != props.end() )
+		value = prop->second;
+	return ( value );
 	M_EPILOG
 	}
 
-char const* attr_val( HXml::HConstIterator const& it, char const* const name )
+value_t try_attr_val( HXml::HConstIterator const& it, char const* const name )
 	{
 	M_PROLOG
-	return ( attr_val( *it, name ) );
+	return ( try_attr_val( *it, name ) );
+	M_EPILOG
+	}
+
+HString const& node_val( HXml::HConstNodeProxy const& node_ )
+	{
+	M_PROLOG
+	value_t nodeValue( try_node_val( node_ ) );
+	M_ENSURE( nodeValue );
+	return ( *nodeValue );
+	M_EPILOG
+	}
+
+HString const& node_val( HXml::HConstIterator const& it_ )
+	{
+	M_PROLOG
+	value_t nodeValue( try_node_val( it_ ) );
+	M_ENSURE( nodeValue );
+	return ( *nodeValue );
+	M_EPILOG
+	}
+
+HString const& attr_val( HXml::HConstNodeProxy const& node_, char const* const name_ )
+	{
+	M_PROLOG
+	value_t attrValue( try_attr_val( node_, name_ ) );
+	M_ENSURE_EX( attrValue, name_ );
+	return ( *attrValue );
+	M_EPILOG
+	}
+
+HString const& attr_val( HXml::HConstIterator const& it_, char const* const name_ )
+	{
+	M_PROLOG
+	value_t attrValue( try_attr_val( it_, name_ ) );
+	M_ENSURE_EX( attrValue, name_ );
+	return ( *attrValue );
 	M_EPILOG
 	}
 

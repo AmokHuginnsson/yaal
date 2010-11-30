@@ -33,8 +33,6 @@ Copyright:
 #include "hconsole/hwindow.hxx"
 #include "hconsole/hsearchablecontrol.hxx"
 
-#include "hcore/hlog.hxx"
-
 namespace yaal
 {
 

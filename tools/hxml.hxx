@@ -38,6 +38,7 @@ Copyright:
 #include "hcore/htree.hxx"
 #include "hcore/hpointer.hxx"
 #include "hcore/hstreaminterface.hxx"
+#include "tools/hoptional.hxx"
 
 namespace yaal
 {
@@ -343,10 +344,17 @@ typedef yaal::hcore::HExceptionT<HXml> HXmlException;
 namespace xml
 {
 
-char const* node_val( HXml::HConstNodeProxy const& node );
-char const* node_val( HXml::HConstIterator const& it );
-char const* attr_val( HXml::HConstNodeProxy const& node, char const* const name );
-char const* attr_val( HXml::HConstIterator const& it, char const* const name );
+typedef HOptional<yaal::hcore::HString const&> value_t;
+
+value_t try_node_val( HXml::HConstNodeProxy const& node );
+value_t try_node_val( HXml::HConstIterator const& it );
+value_t try_attr_val( HXml::HConstNodeProxy const& node, char const* const name );
+value_t try_attr_val( HXml::HConstIterator const& it, char const* const name );
+
+yaal::hcore::HString const& node_val( HXml::HConstNodeProxy const& node );
+yaal::hcore::HString const& node_val( HXml::HConstIterator const& it );
+yaal::hcore::HString const& attr_val( HXml::HConstNodeProxy const& node, char const* const name );
+yaal::hcore::HString const& attr_val( HXml::HConstIterator const& it, char const* const name );
 
 }
 
