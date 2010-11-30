@@ -133,7 +133,7 @@ private:
 	bool _initialized;
 public:
 	HOptional( void ) : _data(), _initialized( false ) {}
-	HOptional( value_type const& value_ )
+	HOptional( value_type& value_ )
 		: _data(), _initialized( true )
 		{
 		*static_cast<value_type**>( static_cast<void*>( _data ) ) = &value_;
@@ -142,7 +142,7 @@ public:
 		: _data(), _initialized( other_._initialized )
 		{
 		if ( _initialized )
-			*static_cast<value_type**>( static_cast<void*>( _data ) ) = *static_cast<value_type const* const*>( static_cast<void const*>( other_._data ) );
+			*static_cast<value_type**>( static_cast<void*>( _data ) ) = *static_cast<value_type* const*>( static_cast<void const*>( other_._data ) );
 		}
 	HOptional& operator = ( HOptional const& other_ )
 		{

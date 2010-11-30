@@ -34,6 +34,9 @@ Copyright:
 #define YAAL_TOOLS_STREAMTOOLS_HXX_INCLUDED 1
 
 #include "hcore/hstreaminterface.hxx"
+#include "hcore/harray.hxx"
+#include "hcore/hdeque.hxx"
+#include "hcore/hlist.hxx"
 
 namespace yaal
 {
@@ -66,6 +69,45 @@ public:
 	} extern bin;
 
 HBinaryFormatter operator << ( yaal::hcore::HStreamInterface&, HBinaryFormatterSeed const& );
+
+}
+
+namespace hcore
+{
+
+template<typename first_t, typename second_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& os, yaal::hcore::HPair<first_t, second_t> const& p )
+	{
+	os << "pair(" << p.first << "," << p.second << ")";
+	return ( os );
+	}
+
+template<typename tType>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType> const& a )
+	{
+	out << "array(";
+	yaal::copy( a.begin(), a.end(), stream_iterator( out, " " ) );
+	out << ( ( a.begin() != a.end() ) ? "\b)" : ")" ) << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename tType>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HDeque<tType> const& a )
+	{
+	out << "deque(";
+	yaal::copy( a.begin(), a.end(), stream_iterator( out, " " ) );
+	out << ( ( a.begin() != a.end() ) ? "\b)" : ")" ) << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename tType>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HList<tType> const& l )
+	{
+	out << "list(";
+	yaal::copy( l.begin(), l.end(), stream_iterator( out, " " ) );
+	out << ( ( l.begin() != l.end() ) ? "\b)" : ")" ) << yaal::hcore::flush;
+	return ( out );
+	}
 
 }
 
