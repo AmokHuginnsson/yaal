@@ -569,13 +569,6 @@ int HFormat::HFormatImpl::next_token( HFormatImpl::conversion_t const& conv )
 	M_EPILOG
 	}
 
-HStreamFormatProxy operator << ( HStreamInterface& stream, HFormat const& format )
-	{
-	M_PROLOG
-	return ( HStreamFormatProxy( stream, format ) );
-	M_EPILOG
-	}
-
 bool HFormat::HFormatImpl::has_conversion( HString const& s, int i )
 	{
 	M_PROLOG
@@ -823,6 +816,13 @@ HFormat::HFormatImpl::flag_t HFormat::HFormatImpl::get_flag( HString const& s, i
 	}
 
 }
+
+yaal::hcore::HStreamFormatProxy operator << ( yaal::hcore::HStreamInterface& stream, yaal::hcore::HFormat const& format )
+	{
+	M_PROLOG
+	return ( yaal::hcore::HStreamFormatProxy( stream, format ) );
+	M_EPILOG
+	}
 
 }
 

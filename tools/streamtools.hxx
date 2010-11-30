@@ -72,9 +72,6 @@ HBinaryFormatter operator << ( yaal::hcore::HStreamInterface&, HBinaryFormatterS
 
 }
 
-namespace hcore
-{
-
 template<typename first_t, typename second_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& os, yaal::hcore::HPair<first_t, second_t> const& p )
 	{
@@ -108,8 +105,6 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	out << ( ( l.begin() != l.end() ) ? "\b)" : ")" ) << yaal::hcore::flush;
 	return ( out );
 	}
-
-}
 
 }
 

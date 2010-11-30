@@ -922,15 +922,15 @@ void HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char cons
 	return;
 	}
 
-HStreamInterface& operator << ( HStreamInterface& out, HNumber const& n )
+}
+
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HNumber const& n )
 	{
 	M_PROLOG
 	out << n.to_string();
 	return ( out );
 	M_EPILOG
 	}
-
-}
 
 }
 
