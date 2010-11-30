@@ -144,9 +144,27 @@ public:
 		if ( _initialized )
 			*static_cast<value_type**>( static_cast<void*>( _data ) ) = *static_cast<value_type* const*>( static_cast<void const*>( other_._data ) );
 		}
+	template<typename other_t>
+	explicit HOptional( HOptional<other_t&> const& other_ )
+		: _data(), _initialized( other_ )
+		{
+		STATIC_ASSERT(( trait::same_type<type_t, other_t>::value || trait::same_type<type_t, other_t const>::value ));
+		if ( _initialized )
+			*static_cast<value_type**>( static_cast<void*>( _data ) ) = *static_cast<value_type* const*>( static_cast<void const*>( reinterpret_cast<HOptional const&>( other_)._data ) );
+		}
 	HOptional& operator = ( HOptional const& other_ )
 		{
 		if ( &other_ != this )
+			{
+			HOptional tmp( other_ );
+			swap( tmp );
+			}
+		return ( *this );
+		}
+	template<typename other_t>
+	HOptional& operator = ( HOptional<other_t> const& other_ )
+		{
+		if ( reinterpret_cast<HOptional const*>( &other_ ) != this )
 			{
 			HOptional tmp( other_ );
 			swap( tmp );
