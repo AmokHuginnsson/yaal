@@ -171,7 +171,7 @@ int console_mouse_open( void )
 	Gpm_Connect gpm;
 	gpm.minMod = 0;
 	gpm.maxMod = 0;
-	gpm.pid = system::getpid();
+	gpm.pid = hcore::system::getpid();
 	gpm.vc = vC = hunt_tty( 0 );
 	gpm.eventMask = static_cast<int>( GPM_UP );
 	gpm.defaultMask = static_cast<int short unsigned>( ~gpm.eventMask );
