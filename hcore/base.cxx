@@ -64,7 +64,25 @@ int short unsigned lexical_cast( HString const& val )
 template<>
 int long lexical_cast( HString const& val )
 	{
-	int base = 10;
+	int base( 10 );
+	/* how to choose correct base:
+	 *
+	 * 0     -> 10
+	 * 0Ala  -> 10
+	 * 0xOla -> 10
+	 * 0xAla -> 16
+	 * 0x    -> 10
+	 * 0x10b -> 16
+	 * xOla  -> 10
+	 * xAla  -> 10
+	 * 0Ala  -> 10
+	 * 01Ala ->  8
+	 * 01    ->  8
+	 * 0110b ->  2
+	 * 0110c ->  8
+	 * 1010c -> 10
+	 * 1010b ->  2
+	 */
 	if ( ( val.get_length() > 2 ) && ( val[ 1 ] == 'x' ) )
 		base = 16;
 	return ( ::strtol( val.raw(), NULL, base ) );
