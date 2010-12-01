@@ -348,7 +348,7 @@ HSocket::ptr_t HSocket::get_client( int fileDescriptor_ ) const
 	M_EPILOG
 	}
 
-HSocket::clients_t::const_iterator HSocket::begin( void ) const
+HSocket::iterator HSocket::begin( void ) const
 	{
 	M_PROLOG
 	if ( ! _clients )
@@ -358,13 +358,23 @@ HSocket::clients_t::const_iterator HSocket::begin( void ) const
 	M_EPILOG
 	}
 
-HSocket::clients_t::const_iterator HSocket::end( void ) const
+HSocket::iterator HSocket::end( void ) const
 	{
 	M_PROLOG
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
 	clients_t const* c = _clients;
 	return ( c->end() );
+	M_EPILOG
+	}
+
+HSocket::iterator HSocket::find( int socket_ ) const
+	{
+	M_PROLOG
+	if ( ! _clients )
+		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
+	clients_t const* c = _clients;
+	return ( c->find( socket_ ) );
 	M_EPILOG
 	}
 

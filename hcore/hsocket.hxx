@@ -74,6 +74,9 @@ public:
 	typedef HStrongEnum<TYPE> socket_type_t;
 protected:
 	typedef HHashMap<int, ptr_t> clients_t;
+public:
+	typedef typename clients_t::const_iterator iterator;
+protected:
 	bool _needShutdown;
 	socket_type_t _type;
 	int _maximumNumberOfClients;
@@ -91,8 +94,9 @@ public:
 	void shutdown( void );
 	void shutdown_client( int );
 	ptr_t get_client( int ) const;
-	clients_t::const_iterator begin( void ) const;
-	clients_t::const_iterator end( void ) const;
+	iterator begin( void ) const;
+	iterator end( void ) const;
+	iterator find( int ) const;
 	int long write_until_eos( HString const& );
 	int get_client_count( void ) const;
 	HString const& get_host_name( void );
