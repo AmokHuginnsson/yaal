@@ -75,7 +75,7 @@ public:
 protected:
 	typedef HHashMap<int, ptr_t> clients_t;
 public:
-	typedef typename clients_t::const_iterator iterator;
+	typedef clients_t::const_iterator iterator;
 protected:
 	bool _needShutdown;
 	socket_type_t _type;
