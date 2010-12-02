@@ -26,6 +26,7 @@ Copyright:
 
 #include <cstdlib>
 #include <cstring>
+#include <climits>
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -41,30 +42,53 @@ namespace yaal
 {
 
 template<>
-int long unsigned lexical_cast( HString const& val )
+bool is_hexadecimal( HString const& str_ )
 	{
-	int base = 10;
-	if ( ( val.get_length() > 2 ) && ( val[ 1 ] == 'x' ) )
-		base = 16;
-	return ( ::strtoul( val.raw(), NULL, base ) );
+	int long const len( str_.get_length() );
+	char const* str( str_.raw() );
+	if ( ( len >= 4 ) && ( str[ 0 ] == '-' ) ) /* -0x0 */
+		++ str;
+	if ( ( len >= 3 ) && ( str[ 0 ] == '0' ) ) /* 0x0 */
+		++ str;
+	return ( ( len >= 2 )
+			&& ( ( str[0] == 'x' ) || ( str[0] == 'X' ) )
+			&& ( ( ( str[1] >= '0' ) && ( str[1] <= '9' ) )
+				|| ( ( str[1] >= 'a' ) && ( str[1] <= 'f' ) )
+				|| ( ( str[1] >= 'A' ) && ( str[1] <= 'F' ) ) ) );
 	}
 
 template<>
-int unsigned lexical_cast( HString const& val )
+bool is_binary( HString const& str_ )
 	{
-	return ( static_cast<int unsigned>( lexical_cast<int long unsigned>( val ) ) );
+	int long const len( str_.get_length() );
+	char const* str( str_.raw() );
+	int offset( 0 );
+	if ( ( len >= 3 ) && ( str[ 0 ] == '-' ) ) /* -0b */
+		++ offset;
+	int long binaryMark( str_.find_other_than( "01", offset ) );
+	return ( ( binaryMark > 0 ) && ( ( str[binaryMark] == 'b' ) || ( str[binaryMark] == 'B' ) ) );
 	}
 
 template<>
-int short unsigned lexical_cast( HString const& val )
+bool is_octal( HString const& str_ )
 	{
-	return ( static_cast<int short unsigned>( lexical_cast<int long unsigned>( val ) ) );
+	bool octal( false );
+	if ( ! is_binary( str_ ) )
+		{
+		int long const len( str_.get_length() );
+		char const* str( str_.raw() );
+		int offset( 0 );
+		if ( ( len >= 3 ) && ( str[ 0 ] == '-' ) ) /* -01 */
+			++ offset, ++ str;
+		octal = ( len >= 2 ) && ( str[0] == '0' ) && ( str[1] >= '0' ) && ( str[1] <= '7' );
+		}
+	return ( octal );
 	}
 
-template<>
-int long lexical_cast( HString const& val )
+static int const MAX_VALID_INTEGER_LENGTH = 32;
+
+HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ )
 	{
-	int base( 10 );
 	/* how to choose correct base:
 	 *
 	 * 0     -> 10
@@ -83,45 +107,145 @@ int long lexical_cast( HString const& val )
 	 * 1010c -> 10
 	 * 1010b ->  2
 	 */
-	if ( ( val.get_length() > 2 ) && ( val[ 1 ] == 'x' ) )
+	HPair<int, char const*> ret;
+	int base( 10 );
+	char const* str( str_.raw() );
+	int long const len( str_.get_length() );
+	if ( is_hexadecimal( str_ ) )
+		{
 		base = 16;
-	return ( ::strtol( val.raw(), NULL, base ) );
+		char* dst( alternate_ );
+		char const* src( str );
+		int offset( src[0] == '-' ? 2 : 1 );
+		if ( src[0] == '-' )
+			{
+			*dst ++ = '-';
+			++ src;
+			}
+		if ( src[0] != '0' )
+			{
+			*dst ++ = '0';
+			int long end( str_.find_other_than( "0123456789abcdefABCDEF", offset ) );
+			if ( end < 0 )
+				end = ( len + 1 - offset );
+			if ( end >= ( MAX_VALID_INTEGER_LENGTH - offset ) )
+				M_THROW( "number too long: " + str_, end );
+			strncpy( dst, src, end );
+			dst[end] = 0;
+			str = alternate_;
+			}
+		}
+	else if ( is_binary( str_ ) )
+		base = 2;
+	else if ( is_octal( str_ ) )
+		base = 8;
+	else
+		{
+		char const* src( str );
+		if ( ( len >= 2 ) && ( src[0] == '-' ) ) /* -0 */
+			++ src;
+		if ( ! len || ! src[0] || ( src[0] < '0' ) || ( src[0] > '9' ) )
+			M_THROW( "not a number: " + str_, 0 );
+		if ( src[0] == '0' )
+			{
+			str = alternate_;
+			alternate_[0] = '0';
+			alternate_[1] = 0;
+			}
+		}
+	ret.first = base;
+	ret.second = str;
+	return ( ret );
+	}
+
+template<>
+int long unsigned lexical_cast( HString const& str_ )
+	{
+	M_PROLOG
+	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
+	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
+	int long unsigned val( ::strtoul( preParsed.second, NULL, preParsed.first ) );
+	M_ENSURE_EX( ( val && ( val != ULONG_MAX ) ) || ! errno, str_ );
+	return ( val );
+	M_EPILOG
+	}
+
+template<>
+int unsigned lexical_cast( HString const& val )
+	{
+	M_PROLOG
+	return ( static_cast<int unsigned>( lexical_cast<int long unsigned>( val ) ) );
+	M_EPILOG
+	}
+
+template<>
+int short unsigned lexical_cast( HString const& val )
+	{
+	M_PROLOG
+	return ( static_cast<int short unsigned>( lexical_cast<int long unsigned>( val ) ) );
+	M_EPILOG
+	}
+
+template<>
+int long lexical_cast( HString const& str_ )
+	{
+	M_PROLOG
+	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
+	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
+	int long val( ::strtol( preParsed.second, NULL, preParsed.first ) );
+	M_ENSURE_EX( ( val && ( val != LONG_MIN ) && ( val != LONG_MAX ) ) || ! errno, str_ );
+	return ( val );
+	M_EPILOG
 	}
 
 template<>
 int long lexical_cast( char const* const& val )
 	{
+	M_PROLOG
 	return ( lexical_cast<int long, HString>( val ) );
+	M_EPILOG
 	}
 
 template<>
 int long lexical_cast( char* const& val )
 	{
+	M_PROLOG
 	return ( lexical_cast<int long, HString>( val ) );
+	M_EPILOG
 	}
 
 template<>
 int lexical_cast( HString const& val )
 	{
+	M_PROLOG
 	return ( static_cast<int>( lexical_cast<int long>( val ) ) );
+	M_EPILOG
 	}
 
 template<>
 int short lexical_cast( HString const& val )
 	{
+	M_PROLOG
 	return ( static_cast<int short>( lexical_cast<int long>( val ) ) );
+	M_EPILOG
 	}
 
 template<>
 int lexical_cast( char const* const& val )
 	{
+	M_PROLOG
 	return ( static_cast<int>( lexical_cast<int long, HString>( val ) ) );
+	M_EPILOG
 	}
 
 template<>
 int lexical_cast( char* const& val )
 	{
+	M_PROLOG
 	return ( static_cast<int>( lexical_cast<int long, HString>( val ) ) );
+	M_EPILOG
 	}
 
 template<>
@@ -255,6 +379,24 @@ HString lexical_cast( HFormat const& f )
 char const* error_message( int code_ )
 	{
 	return ( ::strerror( code_ ) );
+	}
+
+template<>
+bool is_hexadecimal( char const* const& str_ )
+	{
+	return ( is_hexadecimal<HString>( str_ ) );
+	}
+
+template<>
+bool is_binary( char const* const& str_ )
+	{
+	return ( is_binary<HString>( str_ ) );
+	}
+
+template<>
+bool is_octal( char const* const& str_ )
+	{
+	return ( is_octal<HString>( str_ ) );
 	}
 
 }

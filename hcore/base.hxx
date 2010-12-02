@@ -153,6 +153,13 @@ struct explicit_type
 template <typename T, int long unsigned N>
 char ( &YaalArrayElementCountHelper( T ( &YaalArrayElementCountHelperArray )[N] ) )[N];
 
+template<typename type_t>
+bool is_hexadecimal( type_t const& );
+template<typename type_t>
+bool is_binary( type_t const& );
+template<typename type_t>
+bool is_octal( type_t const& );
+
 }
 
 #endif /* #ifndef YAAL_HCORE_BASE_HXX_INCLUDED */
