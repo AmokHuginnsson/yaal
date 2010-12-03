@@ -582,7 +582,7 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node ) const
 	if ( rc < 0 )
 		throw HXmlException( HString( "Unable to write start element: " ) + str );
 	HNode::properties_t const& prop = node.properties();
-	for ( HNode::properties_t::const_iterator it = prop.begin(); it != prop.end(); ++ it )
+	for ( HNode::properties_t::const_iterator it( prop.begin() ), end( prop.end() ); it != end; ++ it )
 		{
 		HString const& pname = it->first;
 		HString const& pvalue = it->second;
@@ -592,7 +592,7 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node ) const
 		if ( rc < 0 )
 			throw HXmlException( HString( "Unable to write a property: " ) + str + ", with value: " + pvalue );
 		}
-	for ( HXml::HConstIterator it = node.begin(); it != node.end(); ++ it )
+	for ( HXml::HConstIterator it( node.begin() ), end( node.end() ); it != end; ++ it )
 		{
 		if ( (*it).get_type() == HXml::HNode::TYPE::NODE )
 			dump_node( writer_p, *it );

@@ -100,7 +100,7 @@ public:
 		{
 		M_PROLOG
 		int long sizeAcc( 0 );
-		for ( typename multimap_engine_t::const_iterator it = _engine.begin(); it != _engine.end(); ++ it )
+		for ( typename multimap_engine_t::const_iterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
 			sizeAcc += it->second->get_size();
 		return ( sizeAcc );
 		M_EPILOG

@@ -137,8 +137,8 @@ void HControlList::select( HControl const* control_ )
 	M_PROLOG
 	if ( (*_focused) != control_ )
 		{
-		model_t::iterator it;
-		for (  it = _list.begin(); it != _list.end(); ++ it )
+		model_t::iterator it( _list.begin() );
+		for ( model_t::iterator end( _list.end() ); it != end; ++ it )
 			{
 			if ( (*it) == control_ )
 				{

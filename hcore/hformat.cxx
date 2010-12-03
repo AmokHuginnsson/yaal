@@ -273,7 +273,7 @@ HFormat::HFormat( char const* const aFmt )
 	copy( widthIdxs.begin(), widthIdxs.end(), insert_iterator( idxs ) );
 	copy( precIdxs.begin(), precIdxs.end(), insert_iterator( idxs ) );
 	int last = -1;
-	for ( idx_t::iterator it = idxs.begin(); it != idxs.end(); ++ it, ++ last )
+	for ( idx_t::iterator it( idxs.begin() ), end( idxs.end() ); it != end; ++ it, ++ last )
 		M_ENSURE( *it == ( last + 1 ) );
 	return;
 	M_EPILOG

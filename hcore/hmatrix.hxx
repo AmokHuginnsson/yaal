@@ -386,7 +386,7 @@ template<typename value_type>
 HMatrix<value_type>& HMatrix<value_type>::operator = ( value_type const scalar_ )
 	{
 	M_PROLOG
-	for ( typename data_t::iterator it = _data.begin(); it != _data.end(); ++ it )
+	for ( typename data_t::iterator it( _data.begin() ), end( _data.end() ); it != end; ++ it )
 		yaal::fill( it->begin(), it->end(), scalar_ );
 	return ( *this );
 	M_EPILOG
@@ -505,7 +505,7 @@ template<typename value_type>
 HMatrix<value_type>& HMatrix<value_type>::operator *= ( value_type const scalar_ )
 	{
 	M_PROLOG
-	for ( typename data_t::iterator it = _data.begin(); it != _data.end(); ++ it )
+	for ( typename data_t::iterator it( _data.begin() ), end( _data.end() ); it != end; ++ it )
 		yaal::transform( it->begin(), it->end(), it->begin(), bind2nd( yaal::multiplies<value_type>(), scalar_ ) );
 	return ( *this );
 	M_EPILOG

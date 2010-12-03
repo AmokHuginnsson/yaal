@@ -209,7 +209,7 @@ public:
 		{
 		M_PROLOG
 		int long sizeAcc( 0 );
-		for ( HHashContainer::HIterator it = _engine.begin(); it != _engine.end(); ++ it )
+		for ( HHashContainer::HIterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
 			sizeAcc += it.get<elem_t>().second;
 		return ( sizeAcc );
 		M_EPILOG

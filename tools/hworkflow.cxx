@@ -61,7 +61,7 @@ HWorkFlow::~HWorkFlow( void )
 		HLock l( _mutex );
 		_workerPoolSize = 0;
 		}
-	for ( pool_t::iterator it = _pool.begin(); it != _pool.end(); ++ it )
+	for ( pool_t::iterator it( _pool.begin() ), end( _pool.end() ); it != end; ++ it )
 		{
 		_semaphore.signal();
 		(*it)->finish();

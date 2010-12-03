@@ -349,7 +349,7 @@ HBitmap& HBitmap::operator += ( HBitmap const& bmp )
 	{
 	M_PROLOG
 	/* Super slow !!! FIXME */
-	for ( HBitmap::const_iterator it = bmp.begin(); it != bmp.end(); ++ it )
+	for ( HBitmap::const_iterator it( bmp.begin() ), endIt( bmp.end() ); it != endIt; ++ it )
 		push_back( *it );
 	return ( *this );
 	M_EPILOG

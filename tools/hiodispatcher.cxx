@@ -175,7 +175,7 @@ int HIODispatcher::run( void )
 		_callbackContext = false;
 		if ( ! _droppedFd.is_empty() )
 			{
-			for ( dropped_fd_t::iterator it = _droppedFd.begin(); it != _droppedFd.end(); ++ it )
+			for ( dropped_fd_t::iterator it( _droppedFd.begin() ), end( _droppedFd.end() ); it != end; ++ it )
 				unregister_file_descriptor_handler( *it );
 			_droppedFd.clear();
 			}

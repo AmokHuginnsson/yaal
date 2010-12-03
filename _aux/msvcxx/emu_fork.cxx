@@ -62,7 +62,7 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 	char** argv = xcalloc<char*>( _argv.size() + 2 );
 	argv[ 0 ] = xstrdup( _path.raw() );
 	int i = 1;
-	for ( HPipedChild::argv_t::iterator it = _argv.begin(); it != _argv.end(); ++ it, ++ i )
+	for ( HPipedChild::argv_t::iterator it( _argv.begin() ), end( _argv.end() ); it != end; ++ it, ++ i )
 		argv[ i ] = xstrdup( it->raw() );
 	
 	int pid = spawnvp( P_NOWAIT, _path.raw(), argv );

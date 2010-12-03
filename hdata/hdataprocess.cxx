@@ -111,7 +111,7 @@ OMenuItem* HDataProcess::build_sub_menu( HXml::HConstNodeProxy const& node_,
 
 	if ( node_.get_name() == "menu" )
 		{
-		for ( HXml::HConstIterator it = node_.begin(); it != node_.end(); ++ it )
+		for ( HXml::HConstIterator it( node_.begin() ), end( node_.end() ); it != end; ++ it )
 			{
 			menuItem.reset();
 			build_menu_item( *it, menuItem, handlers_ );
@@ -125,7 +125,7 @@ OMenuItem* HDataProcess::build_sub_menu( HXml::HConstNodeProxy const& node_,
 	subMenu.push_back( menuItem );
 	menu = new OMenuItem[ subMenu.size() ];
 	int ctr = 0;
-	for ( menu_item_list_t::iterator it = subMenu.begin(); it != subMenu.end(); ++ it, ++ ctr )
+	for ( menu_item_list_t::iterator it( subMenu.begin() ), end( subMenu.end() ); it != end; ++ it, ++ ctr )
 		menu[ ctr ] = *it;
 	return ( menu );
 	M_EPILOG
@@ -142,7 +142,7 @@ void HDataProcess::build_menu_item( HXml::HConstNodeProxy const& node_,
 
 	if ( node_.get_name() == "menu_item" )
 		{
-		for ( HXml::HConstIterator it = node_.begin(); it != node_.end(); ++ it )
+		for ( HXml::HConstIterator it( node_.begin() ), end( node_.end() ); it != end; ++ it )
 			{
 			HString const& name = (*it).get_name();
 			HXml::HConstIterator handlerIt = (*it).begin();
@@ -285,7 +285,7 @@ resources_t& HDataProcess::build_resource( yaal::hcore::HString const& resourceN
 	typedef HMap<HString, int> str_to_int_t;
 	int_to_str_t i2s;
 	str_to_int_t s2i;
-	for ( HXml::HConstIterator it = window_.begin(); it != window_.end(); ++ it, ++ i )
+	for ( HXml::HConstIterator it( window_.begin() ), end( window_.end() ); it != end; ++ it, ++ i )
 		{
 		M_ENSURE( (*it).get_type() == HXml::HNode::TYPE::NODE );
 		M_ENSURE( (*it).get_name() == "control" );

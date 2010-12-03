@@ -144,7 +144,7 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 		char** argv = xcalloc<char*>( argv_.size() + 2 );
 		argv[ 0 ] = xstrdup( image_.raw() );
 		int i = 1;
-		for ( argv_t::const_iterator it = argv_.begin(); it != argv_.end(); ++ it, ++ i )
+		for ( argv_t::const_iterator it( argv_.begin() ), end( argv_.end() ); it != end; ++ it, ++ i )
 			argv[ i ] = xstrdup( it->raw() );
 		::execv( image_.raw(), argv );
 		M_ENSURE( !"execv" );
