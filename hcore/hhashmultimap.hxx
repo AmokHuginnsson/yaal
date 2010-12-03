@@ -101,7 +101,7 @@ public:
 		{
 		M_PROLOG
 		int long sizeAcc( 0 );
-		for ( typename hashmultimap_engine_t::const_iterator it( _engine.begin() ), endIt( _engine.endIt() ); it != endIt; ++ it )
+		for ( typename hashmultimap_engine_t::const_iterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
 			sizeAcc += it->second->get_size();
 		return ( sizeAcc );
 		M_EPILOG
