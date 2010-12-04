@@ -1,0 +1,164 @@
+[Visualizer]
+yaal::hcore::HString {
+	preview ( [$c._buffer,s] )
+	stringview ( [$c._buffer,sb] )
+	children ( #( [raw members]: [$c,!] ) )
+}
+yaal::hcore::HArray<*> {
+	preview ( #( "[", $c._size, "](",
+			#array (
+				expr:	(($T1*)($c._buf._data))[$i],
+				size: $c._size
+			),
+		" )"
+	) )
+	children (
+		#(
+			[raw members]: [$c,!],
+			#array (
+				expr:	(($T1*)($c._buf._data))[$i],
+				size: $c._size
+			)
+		)
+	)
+}
+yaal::hcore::HDeque<*> {
+	preview (
+		#if ( ( 512 - ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) ) > ( sizeof ( $T1 ) / 2 ) ) (
+			#if ( ( ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) + sizeof ( $T1 ) ) > sizeof ( $T1 ) ) (
+				#( "{ _size = ", $c._size, ", _start = ", $c._start, ", VALUES_PER_CHUNK = ", ( ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) + sizeof ( $T1 ) ) / sizeof ( $T1 ), " }" )
+			) #else (
+				#( "{ _size = ", $c._size, ", _start = ", $c._start, ", VALUES_PER_CHUNK = 1 }" )
+			)
+		) #else (
+			#if ( ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) > sizeof ( $T1 ) ) (
+				#( "{ _size = ", $c._size, ", _start = ", $c._start, ", VALUES_PER_CHUNK = ",  ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) / sizeof ( $T1 ), " }" )
+			) #else (
+				#( "{ _size = ", $c._size, ", _start = ", $c._start, ", VALUES_PER_CHUNK = 1 }" )
+			)
+		)
+	)
+	children (
+		#(
+			[raw members]: [$c,!],
+			#if ( ( 512 - ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) ) > ( sizeof ( $T1 ) / 2 ) ) (
+				#if ( ( ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) + sizeof ( $T1 ) ) > sizeof ( $T1 ) ) (
+					#array (
+						expr: (($T1**)($c._chunks._data))[ ( $i + $c._start ) / ( ( ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) + sizeof ( $T1 ) ) / sizeof ( $T1 ) ) ][ ( $i + $c._start ) % ( ( ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) + sizeof ( $T1 ) ) / sizeof ( $T1 ) ) ],
+						size: $c._size
+					)
+				) #else (
+					#array (
+						expr: (($T1**)($c._chunks._data))[ $i + $c._start ][ 0 ],
+						size: $c._size
+					)
+				)
+			) #else (
+				#if ( ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) > sizeof ( $T1 ) ) (
+					#array (
+						expr: (($T1**)($c._chunks._data))[ ( $i + $c._start ) / ( ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) / sizeof ( $T1 ) ) ][ ( $i + $c._start ) % ( ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) / sizeof ( $T1 ) ) ],
+						size: $c._size
+					)
+				) #else (
+					#array (
+						expr: (($T1**)($c._chunks._data))[ $i + $c._start ][ 0 ],
+						size: $c._size
+					)
+				)
+			)
+		)
+	)
+}
+yaal::hcore::HList<*> {
+	preview (
+		#(
+			"[", $c._size, "](",
+			#list (
+				head: $c._hook,
+				next: _next
+			) : $e._value, ")"
+		)
+	)
+	children (
+		#(
+			[raw members]: [$c,!],
+			#list (
+				head: $c._hook,
+				next: _next
+			) : $e._value
+		)
+	)
+}
+yaal::hcore::HSet<*,*> {
+	preview (
+		#( "[", $c._engine._size, "](",
+			#tree (
+				head: $c._engine._root,
+				left: _left,
+				right: _right,
+				size: $c._engine._size
+			) : ((yaal::hcore::HSBBSTree::HNode<$T1>*)&$e)->_key, ")"
+		)
+	)
+	children (
+		#(
+			[raw members]: [$c,!],
+			#tree (
+				head: $c._engine._root,
+				left: _left,
+				right: _right,
+				size: $c._engine._size
+			) : ((yaal::hcore::HSBBSTree::HNode<$T1>*)&$e)->_key
+		)
+	)
+}
+yaal::hcore::HHashSet<*,*> {
+	children (
+		#(
+			[raw members]: [$c,!],
+			#array (
+				expr: &((yaal::hcore::HHashContainer::HAbstractAtom**)($c._engine._buckets._data))[$i],
+				size: $c._engine._buckets._size / sizeof ( $T1* )
+			) : #(
+				#list (
+					head: $e,
+					next: _next
+				) : ((yaal::hcore::HHashContainer::HAtom<$T1>*)&$e)->_value
+			)
+		)
+	)
+}
+yaal::tools::HRing<*> {
+	preview (
+		#(
+			"[", $c._size, ",", ( $c._buf._size / sizeof ( $T1 ) ), "](",
+			#array (
+				expr:	(($T1*)($c._buf._data))[($i + $c._start) % ( $c._buf._size / sizeof ( $T1 ) )],
+				size: $c._size
+			), ")"
+		)
+	)
+	children (
+		#(
+			[raw members]: [$c,!],
+			#array (
+				expr:	(($T1*)($c._buf._data))[($i + $c._start) % ( $c._buf._size / sizeof ( $T1 ) )],
+				size: $c._size
+			)
+		)
+	)
+}
+yaal::hcore::HNumber {
+	preview (
+		#(
+			#if ( $c._negative ) (
+				"-"
+			),
+			#array (
+				expr: ((char*)($c._canonical._data))[$i],
+				size: $c._digitCount
+			) : [$e,i]
+		)
+	)
+}
+
