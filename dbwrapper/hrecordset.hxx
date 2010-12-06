@@ -55,7 +55,7 @@ public:
 private:
 	mutable database_ptr_t _dataBase; /*!< data-base that this record-set belongs to */
 	mutable ODBConnector const* _connector; /*!< low level database engine connector */
-	mutable void* _result;	/*!< very internal for this class used only in base cla */
+	mutable void* _result; /*!< very internal for this class used only in base class */
 public:
 	HRecordSet( database_ptr_t, ODBConnector const*, void* );
 	virtual ~HRecordSet( void );
