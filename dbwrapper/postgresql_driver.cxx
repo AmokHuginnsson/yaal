@@ -96,7 +96,7 @@ void rs_unquery( void* data_ )
 	return;
 	}
 
-char* rs_get( void* data_, int long row_, int column_ )
+char const* rs_get( void* data_, int long row_, int column_ )
 	{
 	return ( ::PQgetvalue( static_cast<PGresult*>( data_ ), static_cast<int>( row_ ), column_ ) );
 	}
@@ -120,7 +120,7 @@ int long dbrs_id( void*, void* dataR_ )
 	return ( ::PQoidValue( static_cast<PGresult*>( dataR_ ) ) );
 	}
 
-char* rs_column_name( void* dataR_, int field_ )
+char const* rs_column_name( void* dataR_, int field_ )
 	{
 	return ( ::PQfname( static_cast<PGresult*>( dataR_ ), field_ ) );
 	}

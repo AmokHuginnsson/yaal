@@ -189,7 +189,7 @@ M_EXPORT_SYMBOL void rs_unquery( void* data_ )
 	return;
 	}
 
-M_EXPORT_SYMBOL char* rs_get( void* data_, int long row_, int column_ )
+M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ )
 	{
 	char** data = NULL;
 	OSQLiteResult* result = static_cast<OSQLiteResult*>( data_ );
@@ -216,9 +216,9 @@ M_EXPORT_SYMBOL int long dbrs_id( void* dataB_, void* )
 	return ( static_cast<int long>( sqlite3_last_insert_rowid( static_cast<OSQLite*>( dataB_ )->_dB ) ) );
 	}
 
-M_EXPORT_SYMBOL char* rs_column_name( void* dataR_, int field_ )
+M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ )
 	{
-	return ( static_cast<OSQLiteResult*>( dataR_ )->_data [ field_ ] );
+	return ( static_cast<OSQLiteResult*>( dataR_ )->_data[ field_ ] );
 	}
 
 int yaal_sqlite3_driver_main( int, char** )

@@ -100,7 +100,7 @@ void rs_unquery ( void* data_ )
 	return;
 	}
 
-char* rs_get( void* data_, int long row_, int column_ )
+char const* rs_get( void* data_, int long row_, int column_ )
 	{
 	MYSQL_ROW row;
 	mysql_data_seek( static_cast<MYSQL_RES*>( data_ ), row_ );
@@ -126,7 +126,7 @@ int long dbrs_id( void* dataB_, void* )
 	return ( static_cast<int long>( mysql_insert_id( static_cast<MYSQL*>( dataB_ ) ) ) );
 	}
 
-char* rs_column_name( void* dataR_, int field_ )
+char const* rs_column_name( void* dataR_, int field_ )
 	{
 	MYSQL_FIELD* field = NULL;
 	field = mysql_fetch_field_direct( static_cast<MYSQL_RES*>( dataR_ ), field_ );

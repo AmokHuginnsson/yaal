@@ -67,7 +67,7 @@ void rs_unquery( void* /*data_*/ )
 	return;
 	}
 
-char* rs_get( void* /*data_*/, int long /*row_*/, int /*column_*/ )
+char const* rs_get( void* /*data_*/, int long /*row_*/, int /*column_*/ )
 	{
 	return ( NULL );
 	}
@@ -87,7 +87,7 @@ int long dbrs_id( void* /*dataB_*/, void* /*dataR_*/ )
 	return ( 0 );
 	}
 
-char* rs_column_name( void* /*dataR_*/, int /*field_*/ )
+char const* rs_column_name( void* /*dataR_*/, int /*field_*/ )
 	{
 	return ( NULL );
 	}

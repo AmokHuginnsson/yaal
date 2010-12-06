@@ -225,13 +225,13 @@ void* db_query( void* data_, char const* query_ )
 		if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
 			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << db_error( oracle ) << endl;
 		queryStr.upper();
-		if ( queryStr.find ( "INSERT" ) == 0 )
+		if ( queryStr.find( "INSERT" ) == 0 )
 			iters = 1;
-		else if ( queryStr.find ( "UPDATE" ) == 0 )
+		else if ( queryStr.find( "UPDATE" ) == 0 )
 			iters = 1;
-		else if ( queryStr.find ( "DELETE" ) == 0 )
+		else if ( queryStr.find( "DELETE" ) == 0 )
 			iters = 1;
-		oracle->_status = OCIStmtExecute ( oracle->_serviceContext,
+		oracle->_status = OCIStmtExecute( oracle->_serviceContext,
 				queryObj->_statement, oracle->_error, iters, 0,
 				NULL, NULL,
 				OCI_DEFAULT | OCI_COMMIT_ON_SUCCESS | OCI_STMT_SCROLLABLE_READONLY );
@@ -248,13 +248,13 @@ void* db_query( void* data_, char const* query_ )
 	return ( queryObj );
 	}
 
-void db_unquery ( void * data_ )
+void db_unquery( void* data_ )
 	{
 	OAllocator * allocator = NULL;
 	OQuery* query = static_cast<OQuery*>( data_ );
 	if ( ( ( * query->_status ) == OCI_SUCCESS )
 			|| ( ( * query->_status ) == OCI_SUCCESS_WITH_INFO ) )
-		( * query->_status ) = OCIStmtRelease ( query->_statement,
+		( * query->_status ) = OCIStmtRelease( query->_statement,
 				query->_error, NULL, 0, OCI_DEFAULT );
 	else
 		OCIStmtRelease ( query->_statement,
@@ -270,7 +270,7 @@ void db_unquery ( void * data_ )
 	return;
 	}
 
-char* rs_get( void* data_, int long row_, int column_ )
+char const* rs_get( void* data_, int long row_, int column_ )
 	{
 	int size = 0;
 	char* data = NULL;
@@ -372,17 +372,17 @@ int long dbrs_id( void*, void* dataR_ )
 	return ( id );
 	}
 
-char * rs_column_name ( void* dataR_, int field_ )
+char const* rs_column_name ( void* dataR_, int field_ )
 	{
 	int nameLength = 0;
 	text* name = NULL;
 	OCIParam* parameter = NULL;
 	OQuery* query = static_cast<OQuery*>( dataR_ );
-	if ( ( ( *query->_status ) = OCIParamGet ( query->_statement,
+	if ( ( ( *query->_status ) = OCIParamGet( query->_statement,
 					OCI_HTYPE_STMT, query->_error,
 					reinterpret_cast<void**>( &parameter ), field_ + 1 ) ) == OCI_SUCCESS )
 		{
-		if ( ( ( *query->_status ) = OCIAttrGet ( parameter,
+		if ( ( ( *query->_status ) = OCIAttrGet( parameter,
 						OCI_DTYPE_PARAM, &name,
 						reinterpret_cast<ub4*>( &nameLength ),
 						OCI_ATTR_NAME, query->_error ) ) == OCI_SUCCESS )
@@ -392,12 +392,12 @@ char * rs_column_name ( void* dataR_, int field_ )
 			}
 		}
 	if ( parameter )
-		OCIDescriptorFree ( parameter, OCI_DTYPE_PARAM );
+		OCIDescriptorFree( parameter, OCI_DTYPE_PARAM );
 	return ( reinterpret_cast < char * > ( name ) );
 	}
 
-void oracle_init ( void ) __attribute__((__constructor__));
-void oracle_init ( void )
+void oracle_init( void ) __attribute__((__constructor__));
+void oracle_init( void )
 	{
 	yaal_options()( "instance_name", program_options_helper::option_value( _instanceName_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "name of the Oracle database instance", "name" );
 	yaal_options().process_rc_file( "yaal", "oracle", NULL );

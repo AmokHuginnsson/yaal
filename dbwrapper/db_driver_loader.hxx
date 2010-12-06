@@ -73,11 +73,11 @@ struct ODBConnector
 	typedef char const* ( * dbrs_error_t )( void*, void* );
 	typedef void* ( * db_query_t )( void*, char const* );
 	typedef void ( * rs_unquery_t )( void* );
-	typedef char* ( * rs_get_t )( void*, int long, int );
+	typedef char const* ( * rs_get_t )( void*, int long, int );
 	typedef int ( * rs_fields_count_t )( void* );
 	typedef int long ( * dbrs_records_count_t )( void*, void* );
 	typedef int long ( * dbrs_id_t )( void*, void* );
-	typedef char* ( * rs_column_name_t )( void*, int );
+	typedef char const* ( * rs_column_name_t )( void*, int );
 	db_connect_t db_connect;
 	db_disconnect_t db_disconnect;
 	dbrs_errno_t dbrs_errno;

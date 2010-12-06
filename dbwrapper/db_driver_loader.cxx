@@ -121,7 +121,7 @@ void null_rs_unquery( void* )
 	M_EPILOG
 	}
 
-char* null_rs_get( void*, int long, int )
+char const* null_rs_get( void*, int long, int )
 	{
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "rs_get" << eend << endl;
@@ -153,7 +153,7 @@ int long null_dbrs_id( void*, void* )
 	M_EPILOG
 	}
 
-char* null_rs_column_name( void*, int )
+char const* null_rs_column_name( void*, int )
 	{
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "rs_column_name" << eend << endl;
