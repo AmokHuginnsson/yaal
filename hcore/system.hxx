@@ -30,6 +30,8 @@ Copyright:
 #ifndef YAAL_HCORE_SYSTEM_HXX_INCLUDED
 #define YAAL_HCORE_SYSTEM_HXX_INCLUDED 1
 
+#include "hcore/hstring.hxx"
+
 namespace yaal
 {
 
@@ -54,6 +56,18 @@ int kill( int, int );
  * \return number of signaled events.
  */
 int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ = true );
+
+/*! \brief Get human readable user name from system user id.
+ * \param uid_ - system id of user.
+ * \return human readable user name.
+ */
+yaal::hcore::HString get_user_name( int uid_ );
+
+/*! \brief Get human readable group name from system group id.
+ * \param gid_ - system id of group.
+ * \return human readable group name.
+ */
+yaal::hcore::HString get_group_name( int gid_ );
 
 }
 

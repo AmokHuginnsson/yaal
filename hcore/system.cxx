@@ -28,12 +28,15 @@ Copyright:
 #include <cstring>
 #include <unistd.h>
 #include <sys/time.h>
+#include <pwd.h>
+#include <grp.h>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "system.hxx"
 #include "algorithm.hxx"
 #include "hclock.hxx"
+#include "hchunk.hxx"
 
 namespace yaal
 {
@@ -104,6 +107,42 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 	if ( timeOut_ )
 		*timeOut_ -= min( *timeOut_, clock.get_time_elapsed( HClock::UNIT::MILISECOND ) );
 	return ( ret );
+	}
+
+namespace
+{
+
+static int const GETPW_R_SIZE   = 1024;
+static int const GETGR_R_SIZE   = 1024;
+
+}
+
+HString get_user_name( int uid_ )
+	{
+	M_PROLOG
+	passwd accountInfo;
+	long int bufferSize( ::sysconf( _SC_GETPW_R_SIZE_MAX ) );
+	if ( bufferSize <= 0 )
+		bufferSize = GETPW_R_SIZE;
+	HChunk buffer( bufferSize );
+	passwd* any;
+	M_ENSURE( ! getpwuid_r( uid_, &accountInfo, buffer.get<char>(), bufferSize, &any ) );
+	return ( any ? HString( accountInfo.pw_name ) : HString( uid_ ) );
+	M_EPILOG
+	}
+
+HString get_group_name( int gid_ )
+	{
+	M_PROLOG
+	group groupInfo;
+	long int bufferSize( ::sysconf( _SC_GETGR_R_SIZE_MAX ) );
+	if ( bufferSize <= 0 )
+		bufferSize = GETGR_R_SIZE;
+	HChunk buffer( bufferSize );
+	group* any;
+	M_ENSURE( ! getgrgid_r( gid_, &groupInfo, buffer.get<char>(), bufferSize, &any ) );
+	return ( any ? HString( groupInfo.gr_name ) : HString( gid_ ) );
+	M_EPILOG
 	}
 
 }

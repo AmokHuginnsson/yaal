@@ -33,8 +33,7 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hfsitem.hxx"
 #include "hcore/xalloc.hxx"
-
-#include "hcore/hlog.hxx"
+#include "hcore/system.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -57,7 +56,7 @@ HFSItem::~HFSItem( void )
 	{
 	}
 
-bool HFSItem::is_directory() const
+bool HFSItem::is_directory( void ) const
 	{
 	M_PROLOG
 	struct stat s;
@@ -66,7 +65,7 @@ bool HFSItem::is_directory() const
 	M_EPILOG
 	}
 
-bool HFSItem::is_file() const
+bool HFSItem::is_file( void ) const
 	{
 	M_PROLOG
 	struct stat s;
@@ -75,7 +74,7 @@ bool HFSItem::is_file() const
 	M_EPILOG
 	}
 
-bool HFSItem::is_executable() const
+bool HFSItem::is_executable( void ) const
 	{
 	M_PROLOG
 	struct stat s;
@@ -84,7 +83,7 @@ bool HFSItem::is_executable() const
 	M_EPILOG
 	}
 
-int long HFSItem::get_size() const
+int long HFSItem::get_size( void ) const
 	{
 	M_PROLOG
 	struct stat s;
@@ -93,14 +92,14 @@ int long HFSItem::get_size() const
 	M_EPILOG
 	}
 
-int long HFSItem::size() const
+int long HFSItem::size( void ) const
 	{
 	M_PROLOG
 	return ( get_size() );
 	M_EPILOG
 	}
 
-yaal::hcore::HTime HFSItem::modified() const
+yaal::hcore::HTime HFSItem::modified( void ) const
 	{
 	M_PROLOG
 	struct stat s;
@@ -109,7 +108,7 @@ yaal::hcore::HTime HFSItem::modified() const
 	M_EPILOG
 	}
 
-yaal::hcore::HTime HFSItem::created() const
+yaal::hcore::HTime HFSItem::created( void ) const
 	{
 	M_PROLOG
 	struct stat s;
@@ -118,7 +117,7 @@ yaal::hcore::HTime HFSItem::created() const
 	M_EPILOG
 	}
 
-yaal::hcore::HTime HFSItem::accessed() const
+yaal::hcore::HTime HFSItem::accessed( void ) const
 	{
 	M_PROLOG
 	struct stat s;
@@ -146,6 +145,24 @@ HString HFSItem::get_name( void ) const
 	{
 	M_PROLOG
 	return ( _path.right( _nameLen ) );
+	M_EPILOG
+	}
+
+yaal::hcore::HString HFSItem::get_user( void ) const
+	{
+	M_PROLOG
+	struct stat s;
+	do_stat( &s );
+	return ( system::get_user_name( s.st_uid ) );
+	M_EPILOG
+	}
+
+yaal::hcore::HString HFSItem::get_group( void ) const
+	{
+	M_PROLOG
+	struct stat s;
+	do_stat( &s );
+	return ( system::get_group_name( s.st_gid ) );
 	M_EPILOG
 	}
 

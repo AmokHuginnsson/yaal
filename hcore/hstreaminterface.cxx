@@ -56,8 +56,9 @@ HStreamInterface::~HStreamInterface( void )
 HStreamInterface& HStreamInterface::do_output( HString const& string_ )
 	{
 	M_PROLOG
-	if ( ! string_.is_empty() )
-		do_write( string_.raw(), string_.get_length() );
+	_wordCache = string_;
+	int long len( reformat() );
+	do_write( _wordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}
@@ -65,8 +66,9 @@ HStreamInterface& HStreamInterface::do_output( HString const& string_ )
 HStreamInterface& HStreamInterface::do_output( char const* string_ )
 	{
 	M_PROLOG
-	if ( string_ )
-		do_write( string_, static_cast<int long>( ::strlen( string_ ) ) );
+	_wordCache = string_;
+	int long len( reformat() );
+	do_write( _wordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}
@@ -74,8 +76,9 @@ HStreamInterface& HStreamInterface::do_output( char const* string_ )
 HStreamInterface& HStreamInterface::do_output( bool bool_ )
 	{
 	M_PROLOG
-	char buf( bool_ ? '1' : '0' );
-	do_write( &buf, sizeof ( buf ) );
+	_wordCache = ( bool_ ? '1' : '0' );
+	int long len( reformat() );
+	do_write( _wordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}
@@ -83,8 +86,9 @@ HStreamInterface& HStreamInterface::do_output( bool bool_ )
 HStreamInterface& HStreamInterface::do_output( char char_ )
 	{
 	M_PROLOG
-	char copy( char_ );
-	do_write( &copy, sizeof ( copy ) );
+	_wordCache = char_;
+	int long len( reformat() );
+	do_write( _wordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}
@@ -92,8 +96,9 @@ HStreamInterface& HStreamInterface::do_output( char char_ )
 HStreamInterface& HStreamInterface::do_output( char unsigned charUnsigned_ )
 	{
 	M_PROLOG
-	char unsigned copy( charUnsigned_ );
-	do_write( &copy, sizeof ( copy ) );
+	_wordCache = charUnsigned_;
+	int long len( reformat() );
+	do_write( _wordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}
@@ -101,7 +106,7 @@ HStreamInterface& HStreamInterface::do_output( char unsigned charUnsigned_ )
 HStreamInterface& HStreamInterface::do_output( int short shortInteger_ )
 	{
 	M_PROLOG
-	int long tmp = shortInteger_;
+	int long tmp( shortInteger_ );
 	return ( do_output( tmp ) );
 	M_EPILOG
 	}
@@ -109,7 +114,7 @@ HStreamInterface& HStreamInterface::do_output( int short shortInteger_ )
 HStreamInterface& HStreamInterface::do_output( int short unsigned unsignedShortInteger_ )
 	{
 	M_PROLOG
-	int long unsigned tmp = unsignedShortInteger_;
+	int long unsigned tmp( unsignedShortInteger_ );
 	return ( do_output( tmp ) );
 	M_EPILOG
 	}
@@ -117,7 +122,7 @@ HStreamInterface& HStreamInterface::do_output( int short unsigned unsignedShortI
 HStreamInterface& HStreamInterface::do_output( int integer_ )
 	{
 	M_PROLOG
-	int long tmp = integer_;
+	int long tmp( integer_ );
 	return ( do_output( tmp ) );
 	M_EPILOG
 	}
@@ -125,7 +130,7 @@ HStreamInterface& HStreamInterface::do_output( int integer_ )
 HStreamInterface& HStreamInterface::do_output( int unsigned unsignedInteger_ )
 	{
 	M_PROLOG
-	int long unsigned tmp = unsignedInteger_;
+	int long unsigned tmp( unsignedInteger_ );
 	return ( do_output( tmp ) );
 	M_EPILOG
 	}
@@ -201,7 +206,8 @@ HStreamInterface& HStreamInterface::do_output( void const* ptr_ )
 	{
 	M_PROLOG
 	_wordCache.format( "0x%lx", ptr_ );
-	do_write( _wordCache.raw(), _wordCache.get_length() );
+	int long len( reformat() );
+	do_write( _wordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}

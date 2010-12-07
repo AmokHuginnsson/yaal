@@ -29,7 +29,6 @@ Copyright:
 #include <cstdio>
 #include <ctime>
 #include <unistd.h>
-#include <pwd.h>
 #include <libintl.h>
 
 #include "config.hxx"
@@ -56,7 +55,6 @@ namespace
 static int const BUFFER_SIZE		= 1024;
 static int const HOSTNAME_SIZE	= 128;
 static int const TIMESTAMP_SIZE	= 16;
-static int const GETPW_R_SIZE   = 1024;
 
 }
 
@@ -111,15 +109,7 @@ void HLog::do_rehash( void* src_, char const* const processName_ )
 	FILE* src( static_cast<FILE*>( src_ ) );
 	if ( src )
 		{
-		uid_t uid( getuid() );
-		passwd accountInfo;
-		long int bsize = ::sysconf( _SC_GETPW_R_SIZE_MAX );
-		HChunk login( bsize > 0 ? bsize + 1 : GETPW_R_SIZE );
-		passwd* any;
-		if ( ! getpwuid_r( uid, &accountInfo, login.get<char>(), static_cast<int>( bsize ), &any ) )
-			_loginName = accountInfo.pw_name;
-		else
-			_loginName = uid;
+		_loginName = system::get_user_name( getuid() );
 		::fseek( src, 0, SEEK_SET );
 		char* buf = _buffer.get<char>();
 #ifdef HAVE_GETLINE

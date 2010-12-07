@@ -55,11 +55,13 @@ public:
 	bool is_executable( void ) const;
 	int long get_size( void ) const;
 	int long size( void ) const;
-	yaal::hcore::HString get_path() const;
-	yaal::hcore::HString get_name() const;
-	yaal::hcore::HTime modified() const;
-	yaal::hcore::HTime created() const;
-	yaal::hcore::HTime accessed() const;
+	yaal::hcore::HString get_path( void ) const;
+	yaal::hcore::HString get_name( void ) const;
+	yaal::hcore::HTime modified( void ) const;
+	yaal::hcore::HTime created( void ) const;
+	yaal::hcore::HTime accessed( void ) const;
+	yaal::hcore::HString get_user( void ) const;
+	yaal::hcore::HString get_group( void ) const;
 	HIterator begin( void );
 	HIterator end( void );
 	bool operator ! ( void ) const;
