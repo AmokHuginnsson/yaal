@@ -99,6 +99,15 @@ int long HFSItem::size( void ) const
 	M_EPILOG
 	}
 
+int HFSItem::get_permissions( void ) const
+	{
+	M_PROLOG
+	struct stat s;
+	do_stat( &s );
+	return ( s.st_mode );
+	M_EPILOG
+	}
+
 yaal::hcore::HTime HFSItem::modified( void ) const
 	{
 	M_PROLOG
