@@ -64,6 +64,8 @@ public:
 	typedef HConstIterator const_iterator;
 	typedef yaal::hcore::HTree<HNode> tree_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, yaal::hcore::HString> entities_t;
+	typedef entities_t::const_iterator const_entity_iterator;
+	typedef entities_t::iterator entity_iterator;
 	struct PARSER
 		{
 		typedef enum
@@ -108,6 +110,10 @@ public:
 	HConstNodeProxy const get_element_by_id( yaal::hcore::HString const& ) const;
 	HNodeProxy get_element_by_path( yaal::hcore::HString const& );
 	HConstNodeProxy const get_element_by_path( yaal::hcore::HString const& ) const;
+	const_entity_iterator entity_begin( void ) const;
+	const_entity_iterator entity_end( void ) const;
+	entity_iterator entity_begin( void );
+	entity_iterator entity_end( void );
 private:
 	static int writer_callback( void*, char const*, int );
 	static int reader_callback( void*, char*, int );

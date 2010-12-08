@@ -347,7 +347,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 	HXmlParserG::get_instance();
 	errno = 0;
 	HString streamId = get_stream_id( &stream );
-	int const LOW_LEVEL_PARSING_OPTIONS( XML_PARSE_NOENT | XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR | XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_NSCLEAN );
+	int const LOW_LEVEL_PARSING_OPTIONS( XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR | XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_NSCLEAN );
 	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, &stream, streamId.raw(), NULL, LOW_LEVEL_PARSING_OPTIONS ),
 			xmlFreeDoc );
 	if ( errno )
@@ -698,6 +698,22 @@ HXml::HConstNodeProxy const HXml::get_root( void ) const
 	M_PROLOG
 	return ( HConstNodeProxy( _dOM.get_root() ) );
 	M_EPILOG
+	}
+
+HXml::const_entity_iterator HXml::entity_begin( void ) const
+	{
+	}
+
+HXml::const_entity_iterator HXml::entity_end( void ) const
+	{
+	}
+
+HXml::entity_iterator HXml::entity_begin( void )
+	{
+	}
+
+HXml::entity_iterator HXml::entity_end( void )
+	{
 	}
 
 HXml::HNodeProxy::HNodeProxy( void )
