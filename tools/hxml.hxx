@@ -75,7 +75,7 @@ public:
 			DEFAULT = STRIP_EMPTY | STRIP_COMMENT
 			} parser_t;
 		};
-protected:
+private:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
 	typedef enum { TO_EXTERNAL, TO_INTERNAL } way_t;
@@ -124,6 +124,7 @@ private:
 	int get_node_set_by_path( yaal::hcore::HString const& );
 	const_xml_element_t get_element_by_id( const_xml_element_t const&, yaal::hcore::HString const& ) const;
 	const_xml_element_t get_element_by_path( const_xml_element_t const&, yaal::hcore::HString const&, int ) const;
+	void parse_dtd( void* );
 	char const* error_message( int ) const;
 private:
 	HXml( HXml const& );
@@ -145,6 +146,7 @@ public:
 			{
 			NODE,    /*!< XML node. */
 			CONTENT, /*!< XML node content. */
+			ENTITY,  /*!< XML entity. */
 			COMMENT  /*!< XML comment. */
 			} type_t;
 		};

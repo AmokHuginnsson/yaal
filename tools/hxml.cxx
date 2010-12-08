@@ -363,6 +363,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 		}
 	if ( xmlXIncludeProcessFlags( doc.get(), LOW_LEVEL_PARSING_OPTIONS ) < 0 )
 		throw HXmlException( "a flagged processing XInclude failed" );
+	parse_dtd( doc.get()->intSubset );
 	xmlNodePtr root = xmlDocGetRootElement( doc.get() );
 	if ( ! root )
 		M_THROW( _( "empty doc" ), errno );
@@ -372,6 +373,26 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 	(*_convert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
 			root, streamId );
 	swap( _xml->_doc, doc );
+	return;
+	M_EPILOG
+	}
+
+void HXml::parse_dtd( void* dtd_ )
+	{
+	M_PROLOG
+	if ( dtd_ )
+		{
+		xmlDtdPtr dtd( static_cast<xmlDtdPtr>( dtd_ ) );
+		xmlNodePtr node( dtd->children );
+		while ( node )
+			{
+			if ( ( node->type == XML_ENTITY_DECL ) && ( node->name && node->content ) )
+				_entities[ reinterpret_cast<char const*>( node->name ) ] = reinterpret_cast<char const*>( node->content );
+			else
+				log_trace << "failed to handle DTD child: " << static_cast<int>( node->type ) << " " << node->name << " " << node->content << endl;
+			node = node->next;
+			}
+		}
 	return;
 	M_EPILOG
 	}
@@ -442,6 +463,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, PARSER::parser_t p
 				M_ASSERT( node->name );
 				entities_t::const_iterator it( _entities.find( node->name ) );
 				M_ENSURE_EX( it != _entities.end(), HString( "entity not found:" ) + node->name );
+				log_trace << "XML_ENTITY_REF_NODE" << endl;
 				}
 			break;
 			case ( XML_TEXT_NODE ): if ( node->content )
@@ -702,18 +724,30 @@ HXml::HConstNodeProxy const HXml::get_root( void ) const
 
 HXml::const_entity_iterator HXml::entity_begin( void ) const
 	{
+	M_PROLOG
+	return ( _entities.begin() );
+	M_EPILOG
 	}
 
 HXml::const_entity_iterator HXml::entity_end( void ) const
 	{
+	M_PROLOG
+	return ( _entities.end() );
+	M_EPILOG
 	}
 
 HXml::entity_iterator HXml::entity_begin( void )
 	{
+	M_PROLOG
+	return ( _entities.begin() );
+	M_EPILOG
 	}
 
 HXml::entity_iterator HXml::entity_end( void )
 	{
+	M_PROLOG
+	return ( _entities.end() );
+	M_EPILOG
 	}
 
 HXml::HNodeProxy::HNodeProxy( void )
