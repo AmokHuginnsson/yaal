@@ -64,12 +64,15 @@ typedef HResource<xmlXPathObject, void (*)( xmlXPathObjectPtr )> xpath_object_re
 typedef HResource<xmlOutputBuffer, int (*)( xmlOutputBufferPtr )> outputbuffer_resource_t;
 typedef HPointer<encoder_resource_t> encoder_resource_ptr_t;
 
+char const* const FULL_TREE = "//*";
+
 HString get_stream_id( HStreamInterface* stream )
 	{
 	HFile* f = dynamic_cast<HFile*>( stream );
 	HSocket* s = dynamic_cast<HSocket*>( stream );
 	return ( f ? f->get_path() : ( s ? s->get_host_name() : "anonymous stream" ) );
 	}
+
 }
 
 namespace yaal
@@ -239,7 +242,8 @@ void HXmlData::clear( void ) const
 
 HXml::HXml( void )
 	: _convert( new HXml::OConvert ), _convertedString(),
-	_varTmpBuffer(), _encoding( _defaultEncoding_ ), _xml( NULL ), _dOM()
+	_varTmpBuffer(), _encoding( _defaultEncoding_ ), _xml( NULL ),
+	_entities(), _dOM()
 	{
 	M_PROLOG
 	_xml = new ( std::nothrow ) HXmlData();
@@ -343,8 +347,8 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 	HXmlParserG::get_instance();
 	errno = 0;
 	HString streamId = get_stream_id( &stream );
-	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, &stream, streamId.raw(), NULL,
-				XML_PARSE_NOENT | XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR | XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_NSCLEAN ),
+	int const LOW_LEVEL_PARSING_OPTIONS( XML_PARSE_NOENT | XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR | XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_NSCLEAN );
+	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, &stream, streamId.raw(), NULL, LOW_LEVEL_PARSING_OPTIONS ),
 			xmlFreeDoc );
 	if ( errno )
 		{
@@ -357,8 +361,8 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 		error.format( _( "cannot parse `%s'" ), streamId.raw() );
 		throw HXmlException( error );
 		}
-	if ( xmlXIncludeProcess( doc.get() ) < 0 )
-		throw HXmlException( "processing XInclude failed" );
+	if ( xmlXIncludeProcessFlags( doc.get(), LOW_LEVEL_PARSING_OPTIONS ) < 0 )
+		throw HXmlException( "a flagged processing XInclude failed" );
 	xmlNodePtr root = xmlDocGetRootElement( doc.get() );
 	if ( ! root )
 		M_THROW( _( "empty doc" ), errno );
@@ -381,7 +385,7 @@ void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream )
 	M_EPILOG
 	}
 
-void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, bool stripEmpty_ )
+void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, PARSER::parser_t parser_ )
 	{
 	M_PROLOG
 	xmlNodePtr node = static_cast<xmlNodePtr>( data_ );
@@ -397,7 +401,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, bool stripEmpty_ )
 				xmlNodePtr child = node->children;
 				while ( child )
 					{
-					parse( child, node_, stripEmpty_ );
+					parse( child, node_, parser_ );
 					child = child->next;
 					}
 				node = node->next; /* FIXME add DTD handling later (keeping track of entities) */
@@ -428,17 +432,29 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, bool stripEmpty_ )
 				xmlNodePtr child = node->children;
 				while ( child )
 					{
-					parse( child, node_, stripEmpty_ );
+					parse( child, node_, parser_ );
 					child = child->next;
 					}
 				}
 			break;
 			case ( XML_ENTITY_REF_NODE ):
+				{
+				M_ASSERT( node->name );
+				entities_t::const_iterator it( _entities.find( node->name ) );
+				M_ENSURE_EX( it != _entities.end(), HString( "entity not found:" ) + node->name );
+				}
+			break;
 			case ( XML_TEXT_NODE ): if ( node->content )
 				{
 				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
-				if ( ! stripEmpty_ || ( _varTmpBuffer.find_other_than( _whiteSpace_ ) >= 0 ) )
+				if ( ! ( parser_ & PARSER::STRIP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_ ) >= 0 ) )
 					node_->add_node( HNode( HNode::TYPE::CONTENT, _varTmpBuffer ) );
+				}
+			break;
+			case ( XML_COMMENT_NODE ): if ( ! ( parser_ & PARSER::STRIP_COMMENT ) && node->content )
+				{
+				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
+				node_->add_node( HNode( HNode::TYPE::COMMENT, _varTmpBuffer ) );
 				}
 			break;
 			default:
@@ -451,13 +467,34 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, bool stripEmpty_ )
 	M_EPILOG
 	}
 
-void HXml::parse( HString xPath_, bool stripEmpty_ )
+void HXml::parse( void )
+	{
+	M_PROLOG
+	parse( FULL_TREE, PARSER::DEFAULT );
+	return;
+	M_EPILOG
+	}
+
+void HXml::parse( HString const& xPath_ )
+	{
+	M_PROLOG
+	parse( xPath_, PARSER::DEFAULT );
+	return;
+	M_EPILOG
+	}
+
+void HXml::parse( PARSER::parser_t parser_ )
+	{
+	M_PROLOG
+	parse( FULL_TREE, parser_ );
+	return;
+	M_EPILOG
+	}
+
+void HXml::parse( HString const& xPath_, PARSER::parser_t parser_ )
 	{
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	char const* const FULL_TREE = "//*";
-	if ( ! xPath_ || ! xPath_[ 0 ] )
-		xPath_ = FULL_TREE; /* scan full tree */
 	get_node_set_by_path( xPath_ );
 	_dOM.clear();
 	int ctr = 0;
@@ -473,10 +510,10 @@ void HXml::parse( HString xPath_, bool stripEmpty_ )
 			(**root)._text = "xpath_result_set";
 			for ( ctr = 0; ctr < _xml->_nodeSet->nodeNr; ++ ctr )
 				parse( _xml->_nodeSet->nodeTab[ ctr ],
-						root, stripEmpty_ );
+						root, parser_ );
 			}
 		else
-			parse( xmlDocGetRootElement( _xml->_doc.get() ), NULL, stripEmpty_ );
+			parse( xmlDocGetRootElement( _xml->_doc.get() ), NULL, parser_ );
 		}
 	M_EPILOG
 	}
@@ -487,7 +524,7 @@ void HXml::load( yaal::hcore::HStreamInterface& stream )
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	M_ENSURE( stream.is_valid() );
 	init( stream );
-	parse( HString(), true );
+	parse();
 	return;
 	M_EPILOG
 	}
@@ -573,15 +610,15 @@ int HXml::reader_callback( void* stream, char* buf, int len )
 	return ( static_cast<int>( static_cast<HStreamInterface*>( stream )->read( buf, len ) ) );
 	}
 
-void HXml::dump_node( void* writer_p, HConstNodeProxy const& node ) const
+void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const
 	{
 	M_PROLOG
 	writer_resource_t& writer = *static_cast<writer_resource_t*>( writer_p );
-	HString const& str = node.get_name();
+	HString const& str = node_.get_name();
 	int rc = xmlTextWriterStartElement( writer.get(), reinterpret_cast<xmlChar const* const>( str.raw() ) );
 	if ( rc < 0 )
 		throw HXmlException( HString( "Unable to write start element: " ) + str );
-	HNode::properties_t const& prop = node.properties();
+	HNode::properties_t const& prop = node_.properties();
 	for ( HNode::properties_t::const_iterator it( prop.begin() ), end( prop.end() ); it != end; ++ it )
 		{
 		HString const& pname = it->first;
@@ -592,17 +629,33 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node ) const
 		if ( rc < 0 )
 			throw HXmlException( HString( "Unable to write a property: " ) + str + ", with value: " + pvalue );
 		}
-	for ( HXml::HConstIterator it( node.begin() ), end( node.end() ); it != end; ++ it )
+	for ( HXml::HConstIterator it( node_.begin() ), end( node_.end() ); it != end; ++ it )
 		{
-		if ( (*it).get_type() == HXml::HNode::TYPE::NODE )
+		HXml::HNode::TYPE::type_t type( (*it).get_type() );
+		if ( type == HXml::HNode::TYPE::NODE )
 			dump_node( writer_p, *it );
-		else
+		else if ( type == HXml::HNode::TYPE::CONTENT )
 			{
 			HString const& value = (*it).get_value();
 			rc = xmlTextWriterWriteString( writer.get(),
 					reinterpret_cast<xmlChar const*>( convert( value, TO_EXTERNAL ).raw() ) );
 			if ( rc < 0 )
 				throw HXmlException( HString( "Unable to write a node value: " ) + value );
+			}
+		else
+			{
+			M_ASSERT( type == HXml::HNode::TYPE::COMMENT );
+			rc = xmlTextWriterStartComment( writer.get() );
+			if ( rc < 0 )
+				throw HXmlException( "Unable to write start comment." );
+			HString const& value = (*it).get_value();
+			rc = xmlTextWriterWriteString( writer.get(),
+					reinterpret_cast<xmlChar const*>( convert( value, TO_EXTERNAL ).raw() ) );
+			if ( rc < 0 )
+				throw HXmlException( HString( "Unable to write a comment value: " ) + value );
+			rc = xmlTextWriterEndComment( writer.get() );
+			if ( rc < 0 )
+				throw HXmlException( "Unable to write end comment." );
 			}
 		}
 	rc = xmlTextWriterEndElement( writer.get() );
@@ -723,7 +776,7 @@ HString const& HXml::HConstNodeProxy::get_name( void ) const
 HString const& HXml::HConstNodeProxy::get_value( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::CONTENT ) );
+	M_ASSERT( _node && ( ( (**_node)._type == HXml::HNode::TYPE::CONTENT ) || ( (**_node)._type == HXml::HNode::TYPE::COMMENT ) ) );
 	return ( (**_node)._text );
 	M_EPILOG
 	}

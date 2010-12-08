@@ -37,6 +37,7 @@ Copyright:
 #include "hcore/hlist.hxx"
 #include "hcore/htree.hxx"
 #include "hcore/hpointer.hxx"
+#include "hcore/hhashmap.hxx"
 #include "hcore/hstreaminterface.hxx"
 #include "tools/hoptional.hxx"
 
@@ -62,6 +63,16 @@ public:
 	typedef HIterator iterator;
 	typedef HConstIterator const_iterator;
 	typedef yaal::hcore::HTree<HNode> tree_t;
+	typedef yaal::hcore::HHashMap<yaal::hcore::HString, yaal::hcore::HString> entities_t;
+	struct PARSER
+		{
+		typedef enum
+			{
+			STRIP_EMPTY = 1,
+			STRIP_COMMENT = 2,
+			DEFAULT = STRIP_EMPTY | STRIP_COMMENT
+			} parser_t;
+		};
 protected:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
@@ -71,6 +82,7 @@ protected:
 	yaal::hcore::HString	_varTmpBuffer;
 	yaal::hcore::HString	_encoding;
 	HXmlData*							_xml;
+	entities_t _entities;
 	tree_t _dOM;
 public:
 	typedef tree_t::node_t xml_element_t;
@@ -80,7 +92,10 @@ public:
 	void init( yaal::hcore::HStreamInterface& );
 	void init( yaal::hcore::HStreamInterface::ptr_t );
 	void apply_style( yaal::hcore::HString const& );
-	void parse( yaal::hcore::HString = yaal::hcore::HString(), bool = true );
+	void parse( void );
+	void parse( yaal::hcore::HString const& );
+	void parse( PARSER::parser_t );
+	void parse( yaal::hcore::HString const&, PARSER::parser_t );
 	HNodeProxy get_root( void );
 	HConstNodeProxy const get_root( void ) const;
 	void load( yaal::hcore::HStreamInterface& );
@@ -97,7 +112,7 @@ private:
 	static int writer_callback( void*, char const*, int );
 	static int reader_callback( void*, char*, int );
 	void do_save( void ) const;
-	void parse( xml_node_ptr_t, tree_t::node_t, bool );
+	void parse( xml_node_ptr_t, tree_t::node_t, PARSER::parser_t );
 	void dump_node( void*, HConstNodeProxy const& ) const;
 	yaal::hcore::HString const& convert( yaal::hcore::HString const&, way_t = TO_INTERNAL ) const;
 	int get_node_set_by_path( yaal::hcore::HString const& );
@@ -122,8 +137,9 @@ public:
 		 */
 		typedef enum
 			{
-			NODE,   /*!< XML node. */
-			CONTENT /*!< XML node content. */
+			NODE,    /*!< XML node. */
+			CONTENT, /*!< XML node content. */
+			COMMENT  /*!< XML comment. */
 			} type_t;
 		};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
