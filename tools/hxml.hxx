@@ -71,7 +71,7 @@ public:
 		typedef enum
 			{
 			DEFAULT = 0,
-			STRIP_EMPTY = 1,
+			KEEP_EMPTY = 1,
 			STRIP_COMMENT = 2,
 			RESOLVE_ENTITIES = 4
 			} parser_t;

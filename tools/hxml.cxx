@@ -429,7 +429,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, PARSER::parser_t p
 					parse( child, node_, parser_ );
 					child = child->next;
 					}
-				node = node->next; /* FIXME add DTD handling later (keeping track of entities) */
+				node = node->next; /* FIXME add DTD handling later */
 				}
 			continue;
 			case ( XML_ELEMENT_NODE ):
@@ -473,7 +473,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, PARSER::parser_t p
 			case ( XML_TEXT_NODE ): if ( node->content )
 				{
 				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
-				if ( ! ( parser_ & PARSER::STRIP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_ ) >= 0 ) )
+				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_ ) >= 0 ) )
 					node_->add_node( HNode( this, HNode::TYPE::CONTENT, _varTmpBuffer ) );
 				}
 			break;
@@ -536,16 +536,17 @@ void HXml::parse( HString const& xPath_, PARSER::parser_t parser_ )
 	{
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	get_node_set_by_path( xPath_ );
+	HString xPath( xPath_.is_empty() ? FULL_TREE : xPath_.raw() );
+	get_node_set_by_path( xPath );
 	_dOM.clear();
 	int ctr = 0;
-	while ( xPath_[ ctr ] )
+	while ( xPath[ ctr ] )
 		ctr ++;
 	ctr --;
 	M_ASSERT( ctr >= 0 );
 	if ( _xml->_nodeSet )
 		{
-		if ( xPath_ != FULL_TREE )
+		if ( xPath != FULL_TREE )
 			{
 			tree_t::node_t root = _dOM.create_new_root( HNode( this ) );
 			(**root)._text = "xpath_result_set";
@@ -838,7 +839,8 @@ HXml::HNode::TYPE::type_t HXml::HConstNodeProxy::get_type( void ) const
 HString const& HXml::HConstNodeProxy::get_name( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( _node && ( ( (**_node)._type == HXml::HNode::TYPE::NODE ) || ( (**_node)._type == HXml::HNode::TYPE::ENTITY ) ) );
+	HXml::HNode::TYPE::type_t type( (**_node)._type );
+	M_ASSERT( _node && ( ( type == HXml::HNode::TYPE::NODE ) || ( type == HXml::HNode::TYPE::ENTITY ) ) );
 	return ( (**_node)._text );
 	M_EPILOG
 	}
