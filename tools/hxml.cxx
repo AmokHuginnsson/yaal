@@ -112,7 +112,7 @@ class HXsltParserG : public HSingleton<HXsltParserG>
 
 HXsltParserG::HXsltParserG( void )
 	{
-//	xmlSubstituteEntitiesDefault( 1 );
+	xmlSubstituteEntitiesDefault( 0 );
 //	xmlLoadExtDtdDefaultValue = 1;
 	}
 
@@ -339,7 +339,7 @@ int HXml::get_node_set_by_path( yaal::hcore::HString const& path_ )
 	M_EPILOG
 	}
 
-void HXml::init( yaal::hcore::HStreamInterface& stream )
+void HXml::init( yaal::hcore::HStreamInterface& stream, PARSER::parser_t parser_ )
 	{
 	M_PROLOG
 	int savedErrno = errno;
@@ -347,7 +347,9 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 	HXmlParserG::get_instance();
 	errno = 0;
 	HString streamId = get_stream_id( &stream );
-	int const LOW_LEVEL_PARSING_OPTIONS( XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR | XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_NSCLEAN );
+	int LOW_LEVEL_PARSING_OPTIONS( XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR | XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_NSCLEAN );
+	if ( parser_ & PARSER::RESOLVE_ENTITIES )
+		LOW_LEVEL_PARSING_OPTIONS |= XML_PARSE_NOENT;
 	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, &stream, streamId.raw(), NULL, LOW_LEVEL_PARSING_OPTIONS ),
 			xmlFreeDoc );
 	if ( errno )
@@ -363,7 +365,6 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 		}
 	if ( xmlXIncludeProcessFlags( doc.get(), LOW_LEVEL_PARSING_OPTIONS ) < 0 )
 		throw HXmlException( "a flagged processing XInclude failed" );
-	parse_dtd( doc.get()->intSubset );
 	xmlNodePtr root = xmlDocGetRootElement( doc.get() );
 	if ( ! root )
 		M_THROW( _( "empty doc" ), errno );
@@ -373,6 +374,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream )
 	(*_convert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
 			root, streamId );
 	swap( _xml->_doc, doc );
+	parse_dtd( _xml->_doc.get()->intSubset );
 	return;
 	M_EPILOG
 	}
@@ -389,7 +391,9 @@ void HXml::parse_dtd( void* dtd_ )
 			if ( ( node->type == XML_ENTITY_DECL ) && ( node->name && node->content ) )
 				_entities[ reinterpret_cast<char const*>( node->name ) ] = reinterpret_cast<char const*>( node->content );
 			else
-				log_trace << "failed to handle DTD child: " << static_cast<int>( node->type ) << " " << node->name << " " << node->content << endl;
+				log_trace << "failed to handle DTD child: " << static_cast<int>( node->type )
+					<< " " << reinterpret_cast<char const*>( node->name )
+					<< " " << reinterpret_cast<char const*>( node->content ) << endl;
 			node = node->next;
 			}
 		}
@@ -397,11 +401,11 @@ void HXml::parse_dtd( void* dtd_ )
 	M_EPILOG
 	}
 
-void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream )
+void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream, PARSER::parser_t parser_ )
 	{
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	init( *stream );
+	init( *stream, parser_ );
 	return;
 	M_EPILOG
 	}
@@ -431,16 +435,16 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, PARSER::parser_t p
 			case ( XML_ELEMENT_NODE ):
 				{
 				if ( node_ )
-					node_ = &*node_->add_node();
+					node_ = &*node_->add_node( HNode( this ) );
 				else
-					node_ = _dOM.create_new_root();
+					node_ = _dOM.create_new_root( HNode( this ) );
 				(**node_)._text = reinterpret_cast<char const*>( node->name );
 				if ( node->properties )
 					{
 					xmlAttrPtr attribute = node->properties;
 					while ( attribute )
 						{
-						char const* name = reinterpret_cast<char const*>( attribute->name );
+						char const* name( reinterpret_cast<char const*>( attribute->name ) );
 						if ( name )
 							{
 							if ( attribute->children )
@@ -461,22 +465,22 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, PARSER::parser_t p
 			case ( XML_ENTITY_REF_NODE ):
 				{
 				M_ASSERT( node->name );
-				entities_t::const_iterator it( _entities.find( node->name ) );
-				M_ENSURE_EX( it != _entities.end(), HString( "entity not found:" ) + node->name );
-				log_trace << "XML_ENTITY_REF_NODE" << endl;
+				entities_t::const_iterator it( _entities.find( reinterpret_cast<char const*>( node->name ) ) );
+				M_ENSURE_EX( it != _entities.end(), HString( "entity not found: " ) + reinterpret_cast<char const*>( node->name ) );
+				node_->add_node( HNode( this, HNode::TYPE::ENTITY, reinterpret_cast<char const*>( node->name ) ) );
 				}
 			break;
 			case ( XML_TEXT_NODE ): if ( node->content )
 				{
 				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
 				if ( ! ( parser_ & PARSER::STRIP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_ ) >= 0 ) )
-					node_->add_node( HNode( HNode::TYPE::CONTENT, _varTmpBuffer ) );
+					node_->add_node( HNode( this, HNode::TYPE::CONTENT, _varTmpBuffer ) );
 				}
 			break;
 			case ( XML_COMMENT_NODE ): if ( ! ( parser_ & PARSER::STRIP_COMMENT ) && node->content )
 				{
 				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
-				node_->add_node( HNode( HNode::TYPE::COMMENT, _varTmpBuffer ) );
+				node_->add_node( HNode( this, HNode::TYPE::COMMENT, _varTmpBuffer ) );
 				}
 			break;
 			default:
@@ -486,6 +490,21 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, PARSER::parser_t p
 		node = NULL;
 		}
 	return;
+	M_EPILOG
+	}
+
+void HXml::apply_style( yaal::hcore::HString const& path_ )
+	{
+	M_PROLOG
+	M_ASSERT( _xml->_doc.get() );
+	HXsltParserG::get_instance();
+	style_resource_t style( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( path_.raw() ) ), xsltFreeStylesheet );
+	doc_resource_t doc( xsltApplyStylesheet( style.get(), _xml->_doc.get(), NULL ), xmlFreeDoc );
+	if ( ! doc.get() )
+		throw HXmlException( HString( "cannot apply stylesheet: " ) + path_ );
+	_xml->clear();
+	swap( _xml->_doc, doc );
+	swap( _xml->_style, style );
 	M_EPILOG
 	}
 
@@ -528,7 +547,7 @@ void HXml::parse( HString const& xPath_, PARSER::parser_t parser_ )
 		{
 		if ( xPath_ != FULL_TREE )
 			{
-			tree_t::node_t root = _dOM.create_new_root();
+			tree_t::node_t root = _dOM.create_new_root( HNode( this ) );
 			(**root)._text = "xpath_result_set";
 			for ( ctr = 0; ctr < _xml->_nodeSet->nodeNr; ++ ctr )
 				parse( _xml->_nodeSet->nodeTab[ ctr ],
@@ -540,22 +559,23 @@ void HXml::parse( HString const& xPath_, PARSER::parser_t parser_ )
 	M_EPILOG
 	}
 
-void HXml::load( yaal::hcore::HStreamInterface& stream )
+void HXml::load( yaal::hcore::HStreamInterface& stream, PARSER::parser_t parser_ )
 	{
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	M_ENSURE( stream.is_valid() );
 	init( stream );
-	parse();
+	parse( parser_ );
 	return;
 	M_EPILOG
 	}
 
-void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream )
+void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream, PARSER::parser_t parser_ )
 	{
 	M_PROLOG
 	M_ENSURE( stream->is_valid() );
-	return ( load( *stream ) );
+	load( *stream, parser_ );
+	return;
 	M_EPILOG
 	}
 
@@ -692,7 +712,7 @@ void HXml::create_root( yaal::hcore::HString const& name_, yaal::hcore::HString 
 	M_PROLOG
 	M_ASSERT( name_ );
 	_encoding = ( !! encoding_ ) ? encoding_ : _defaultEncoding_;
-	tree_t::node_t root = _dOM.create_new_root();
+	tree_t::node_t root = _dOM.create_new_root( HNode( this ) );
 	(**root)._text = name_;
 	return;
 	M_EPILOG
@@ -818,7 +838,7 @@ HXml::HNode::TYPE::type_t HXml::HConstNodeProxy::get_type( void ) const
 HString const& HXml::HConstNodeProxy::get_name( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	M_ASSERT( _node && ( ( (**_node)._type == HXml::HNode::TYPE::NODE ) || ( (**_node)._type == HXml::HNode::TYPE::ENTITY ) ) );
 	return ( (**_node)._text );
 	M_EPILOG
 	}
@@ -826,8 +846,16 @@ HString const& HXml::HConstNodeProxy::get_name( void ) const
 HString const& HXml::HConstNodeProxy::get_value( void ) const
 	{
 	M_PROLOG
-	M_ASSERT( _node && ( ( (**_node)._type == HXml::HNode::TYPE::CONTENT ) || ( (**_node)._type == HXml::HNode::TYPE::COMMENT ) ) );
-	return ( (**_node)._text );
+	HXml::HNode::TYPE::type_t type( (**_node)._type );
+	M_ASSERT( _node && ( ( type == HXml::HNode::TYPE::CONTENT ) || ( type == HXml::HNode::TYPE::COMMENT ) || ( type == HXml::HNode::TYPE::ENTITY ) ) );
+	HString const* val( NULL );
+	if ( type == HXml::HNode::TYPE::ENTITY )
+		{
+		HXml::const_entity_iterator it( (**_node)._owner->_entities.find( (**_node)._text ) );
+		M_ASSERT( it != (**_node)._owner->entity_end() );
+		val = &it->second;
+		}
+	return ( type == HXml::HNode::TYPE::ENTITY ? *val : (**_node)._text );
 	M_EPILOG
 	}
 
@@ -851,7 +879,7 @@ HXml::HIterator HXml::HNodeProxy::add_node( HXml::HNode::TYPE::type_t const& typ
 	{
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator it = _node->add_node();
+	tree_t::iterator it = _node->add_node( (**_node)._owner );
 	(**it)._text = name_;
 	(**it)._type = type_;
 	return ( HXml::HIterator( this, it ) );
@@ -862,12 +890,12 @@ HXml::HIterator HXml::HNodeProxy::add_node( yaal::hcore::HString const& name_, y
 	{
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator it = _node->add_node();
+	tree_t::iterator it = _node->add_node( (**_node)._owner );
 	(**it)._text = name_;
 	(**it)._type = HXml::HNode::TYPE::NODE;
 	if ( !! value_ )
 		{
-		tree_t::iterator value = it->add_node();
+		tree_t::iterator value = it->add_node( (**_node)._owner );
 		(**value)._text = value_;
 		(**value)._type = HXml::HNode::TYPE::CONTENT;
 		}
@@ -879,7 +907,7 @@ HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, HXml::HNode::
 	{
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = _node->insert_node( it._iterator, HNode() );
+	tree_t::iterator newIt = _node->insert_node( it._iterator, HNode( (**_node)._owner ) );
 	(**newIt)._text = name_;
 	(**newIt)._type = type_;
 	return ( HXml::HIterator( this, newIt ) );
@@ -890,12 +918,12 @@ HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, yaal::hcore::
 	{
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = _node->insert_node( it._iterator, HNode() );
+	tree_t::iterator newIt = _node->insert_node( it._iterator, HNode( (**_node)._owner ) );
 	(**newIt)._text = name_;
 	(**newIt)._type = HXml::HNode::TYPE::NODE;;
 	if ( !! value_ )
 		{
-		tree_t::iterator value = newIt->add_node();
+		tree_t::iterator value = newIt->add_node( (**_node)._owner );
 		(**value)._text = value_;
 		(**value)._type = HXml::HNode::TYPE::CONTENT;
 		}
@@ -1114,21 +1142,6 @@ HXml::HConstNodeProxy const HXml::HConstIterator::operator* ( void ) const
 	M_ASSERT( _owner );
 	M_ASSERT( _iterator != const_cast<HXml::tree_t::const_node_t>( _owner->_node )->end() );
 	return ( HXml::HConstNodeProxy( &*_iterator ) );
-	M_EPILOG
-	}
-
-void HXml::apply_style( yaal::hcore::HString const& path_ )
-	{
-	M_PROLOG
-	M_ASSERT( _xml->_doc.get() );
-	HXsltParserG::get_instance();
-	style_resource_t style( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( path_.raw() ) ), xsltFreeStylesheet );
-	doc_resource_t doc( xsltApplyStylesheet( style.get(), _xml->_doc.get(), NULL ), xmlFreeDoc );
-	if ( ! doc.get() )
-		throw HXmlException( HString( "cannot apply stylesheet: " ) + path_ );
-	_xml->clear();
-	swap( _xml->_doc, doc );
-	swap( _xml->_style, style );
 	M_EPILOG
 	}
 

@@ -67,7 +67,7 @@ public:
 	virtual ~HTree();
 	node_t get_root( void );
 	const_node_t get_root( void ) const;
-	node_t create_new_root( void );
+	node_t create_new_root( value_type const& = value_type() );
 	node_t set_new_root( HNode* );
 	void clear( void );
 	void swap( HTree<value_type>& );
@@ -121,9 +121,10 @@ public:
 	value_t const& operator* ( void ) const;
 private:
 	HNode( tree_t* ); /* to create a root node */
+	HNode( tree_t*, value_type const& ); /* to create a root node */
 	HNode( HNode* ); /* to create a child node */
 	HNode( value_t const& ); /* to clone node */
-	HNode( value_t const&, HNode* ); /* to clone a child node */
+	HNode( HNode*, value_t const& ); /* to clone a child node */
 	virtual ~HNode( void );
 	HNode( HNode const& );
 	HNode& operator = ( HNode const& );
@@ -194,6 +195,16 @@ HTree<value_t>::HNode::HNode( tree_t* tree_ ) : _data(),
 	}
 
 template<typename value_t>
+HTree<value_t>::HNode::HNode( tree_t* tree_, value_type const& value_ ) : _data( value_ ),
+	_branch(), _trunk( NULL ), _tree( tree_ )
+	{
+	M_PROLOG
+	M_ASSERT( tree_ );
+	return;
+	M_EPILOG
+	}
+
+template<typename value_t>
 HTree<value_t>::HNode::HNode( HNode* node_ ) : _data(),
 	_branch(), _trunk( node_ ), _tree( NULL )
 	{
@@ -213,7 +224,7 @@ HTree<value_t>::HNode::HNode( value_t const& data ) : _data( data ),
 	}
 
 template<typename value_t>
-HTree<value_t>::HNode::HNode( value_t const& data, HNode* node_ ) : _data( data ),
+HTree<value_t>::HNode::HNode( HNode* node_, value_t const& data ) : _data( data ),
 	_branch(), _trunk( node_ ), _tree( NULL )
 	{
 	M_PROLOG
@@ -328,9 +339,7 @@ template<typename value_t>
 typename HTree<value_t>::iterator HTree<value_t>::HNode::add_node( value_t const& value )
 	{
 	M_PROLOG
-	node_t n = NULL;
-	_branch.push_back( n = new HNode( this ) );
-	**n = value;
+	_branch.push_back( new HNode( this, value ) );
 	return ( iterator( this, _branch.rbegin().base() ) );
 	M_EPILOG
 	}
@@ -339,8 +348,7 @@ template<typename value_t>
 typename HTree<value_t>::iterator HTree<value_t>::HNode::add_node( void )
 	{
 	M_PROLOG
-	node_t n = NULL;
-	_branch.push_back( n = new HNode( this ) );
+	_branch.push_back( new HNode( this ) );
 	return ( iterator( this, _branch.rbegin().base() ) );
 	M_EPILOG
 	}
@@ -349,10 +357,8 @@ template<typename value_t>
 typename HTree<value_t>::iterator HTree<value_t>::HNode::insert_node( typename HTree<value_t>::iterator const& pos, value_t const& value )
 	{
 	M_PROLOG
-	node_t n = NULL;
 	M_ASSERT( pos._owner == this );
-	iterator it( this, _branch.insert( pos._iterator, n = new HNode( this ) ) );
-	**it = value;
+	iterator it( this, _branch.insert( pos._iterator, new HNode( this, value ) ) );
 	return ( it );
 	M_EPILOG
 	}
@@ -674,11 +680,11 @@ void HTree<value_t>::swap( HTree<value_t>& other )
 	}
 
 template<typename value_t>
-typename HTree<value_t>::node_t HTree<value_t>::create_new_root( void )
+typename HTree<value_t>::node_t HTree<value_t>::create_new_root( value_type const& value_ )
 	{
 	M_PROLOG
 	clear();
-	_root = new HNode( this );
+	_root = new HNode( this, value_ );
 	return ( _root );
 	M_EPILOG
 	}

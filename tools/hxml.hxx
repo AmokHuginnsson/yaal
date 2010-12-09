@@ -70,9 +70,10 @@ public:
 		{
 		typedef enum
 			{
+			DEFAULT = 0,
 			STRIP_EMPTY = 1,
 			STRIP_COMMENT = 2,
-			DEFAULT = STRIP_EMPTY | STRIP_COMMENT
+			RESOLVE_ENTITIES = 4
 			} parser_t;
 		};
 private:
@@ -91,8 +92,8 @@ public:
 	typedef tree_t::const_node_t const_xml_element_t;
 	HXml( void );
 	virtual ~HXml( void );
-	void init( yaal::hcore::HStreamInterface& );
-	void init( yaal::hcore::HStreamInterface::ptr_t );
+	void init( yaal::hcore::HStreamInterface&, PARSER::parser_t = PARSER::DEFAULT );
+	void init( yaal::hcore::HStreamInterface::ptr_t, PARSER::parser_t = PARSER::DEFAULT );
 	void apply_style( yaal::hcore::HString const& );
 	void parse( void );
 	void parse( yaal::hcore::HString const& );
@@ -100,8 +101,8 @@ public:
 	void parse( yaal::hcore::HString const&, PARSER::parser_t );
 	HNodeProxy get_root( void );
 	HConstNodeProxy const get_root( void ) const;
-	void load( yaal::hcore::HStreamInterface& );
-	void load( yaal::hcore::HStreamInterface::ptr_t );
+	void load( yaal::hcore::HStreamInterface&, PARSER::parser_t = PARSER::DEFAULT );
+	void load( yaal::hcore::HStreamInterface::ptr_t, PARSER::parser_t = PARSER::DEFAULT );
 	void save( yaal::hcore::HStreamInterface& ) const;
 	void save( yaal::hcore::HStreamInterface::ptr_t ) const;
 	void create_root( yaal::hcore::HString const&, yaal::hcore::HString const& = yaal::hcore::HString() );
@@ -152,13 +153,16 @@ public:
 		};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
 private:
+	HXml const* _owner;
 	TYPE::type_t _type;
 	yaal::hcore::HString _text;
 	properties_t _properties;
 public:
-	HNode( void ) : _type( TYPE::NODE ), _text(), _properties() { }
-	HNode( TYPE::type_t const& type, yaal::hcore::HString const& value ) : _type( type ), _text( value ), _properties() {}
-	HNode( HNode const& source ) : _type( source._type ), _text( source._text ), _properties( source._properties )
+	HNode( HXml const* owner_ ) : _owner( owner_ ), _type( TYPE::NODE ), _text(), _properties() { }
+	HNode( HXml const* owner_, TYPE::type_t const& type, yaal::hcore::HString const& value )
+		: _owner( owner_ ), _type( type ), _text( value ), _properties() {}
+	HNode( HNode const& source )
+		: _owner( source._owner ), _type( source._type ), _text( source._text ), _properties( source._properties )
 		{ }
 	HNode& operator = ( HNode const& source )
 		{
@@ -176,6 +180,7 @@ public:
 		if ( &node_ != this )
 			{
 			using yaal::swap;
+			swap( _owner, node_._owner );
 			swap( _type, node_._type );
 			swap( _text, node_._text );
 			swap( _properties, node_._properties );
