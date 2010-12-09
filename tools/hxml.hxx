@@ -103,8 +103,8 @@ public:
 	HConstNodeProxy const get_root( void ) const;
 	void load( yaal::hcore::HStreamInterface&, PARSER::parser_t = PARSER::DEFAULT );
 	void load( yaal::hcore::HStreamInterface::ptr_t, PARSER::parser_t = PARSER::DEFAULT );
-	void save( yaal::hcore::HStreamInterface& ) const;
-	void save( yaal::hcore::HStreamInterface::ptr_t ) const;
+	void save( yaal::hcore::HStreamInterface&, bool = false ) const;
+	void save( yaal::hcore::HStreamInterface::ptr_t, bool = false ) const;
 	void create_root( yaal::hcore::HString const&, yaal::hcore::HString const& = yaal::hcore::HString() );
 	void clear( void );
 	HNodeProxy get_element_by_id( yaal::hcore::HString const& );

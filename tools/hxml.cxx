@@ -580,7 +580,7 @@ void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream, PARSER::parser_t p
 	M_EPILOG
 	}
 
-void HXml::save( yaal::hcore::HStreamInterface& stream ) const
+void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const
 	{
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
@@ -598,13 +598,16 @@ void HXml::save( yaal::hcore::HStreamInterface& stream ) const
 		int rc = ::xmlTextWriterStartDocument( writer.get(), NULL, _encoding.raw(), "yes" );
 		if ( rc < 0 )
 			throw HXmlException( HString( "Unable to start document with encoding: " ) + _encoding );
-		rc = xmlTextWriterSetIndent( writer.get(), 1 );
-		if ( rc < 0 )
-			throw HXmlException( "Unable to enable indenting." );
-		static char const* const INDENTION_STRING = "\t";
-		rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const* const>( INDENTION_STRING ) );
-		if ( rc < 0 )
-			throw HXmlException( "Cannot set indent string." );
+		if ( indent_ )
+			{
+			rc = xmlTextWriterSetIndent( writer.get(), 1 );
+			if ( rc < 0 )
+				throw HXmlException( "Unable to enable indenting." );
+			static char const* const INDENTION_STRING = "\t";
+			rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const* const>( INDENTION_STRING ) );
+			if ( rc < 0 )
+				throw HXmlException( "Cannot set indent string." );
+			}
 		if ( ! (*_convert) )
 			(*_convert).init( _encoding );
 		if ( ! _entities.is_empty() )
@@ -651,11 +654,11 @@ void HXml::save( yaal::hcore::HStreamInterface& stream ) const
 	M_EPILOG
 	}
 
-void HXml::save( yaal::hcore::HStreamInterface::ptr_t stream ) const
+void HXml::save( yaal::hcore::HStreamInterface::ptr_t stream, bool indent_ ) const
 	{
 	M_PROLOG
 	M_ENSURE( stream->is_valid() );
-	save( *stream );
+	save( *stream, indent_ );
 	return;
 	M_EPILOG
 	}
