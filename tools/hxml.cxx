@@ -607,6 +607,23 @@ void HXml::save( yaal::hcore::HStreamInterface& stream ) const
 			throw HXmlException( "Cannot set indent string." );
 		if ( ! (*_convert) )
 			(*_convert).init( _encoding );
+		if ( ! _entities.is_empty() )
+			{
+			rc = xmlTextWriterStartDTD( writer.get(), reinterpret_cast<xmlChar const*>( "workaround" ), NULL, NULL );
+			if ( rc < 0 )
+				throw HXmlException( "Unable to start DTD section." );
+			for ( entities_t::const_iterator it( _entities.begin() ), end( _entities.end() ); it != end; ++ it )
+				{
+				rc = xmlTextWriterWriteDTDInternalEntity( writer.get(), 0,
+						reinterpret_cast<xmlChar const*>( it->first.raw() ),
+						reinterpret_cast<xmlChar const*>( convert( it->second, TO_EXTERNAL ).raw() ) );
+				if ( rc < 0 )
+					throw HXmlException( HString( "Cannot save entity declaration: " ) + it->first );
+				}
+			rc = xmlTextWriterEndDTD( writer.get() );
+			if ( rc < 0 )
+				throw HXmlException( "Unable to end DTD section." );
+			}
 		dump_node( &writer, get_root() );
 		rc = xmlTextWriterEndDocument( writer.get() );
 		if ( rc < 0 )
@@ -680,10 +697,22 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const
 		else if ( type == HXml::HNode::TYPE::CONTENT )
 			{
 			HString const& value = (*it).get_value();
-			rc = xmlTextWriterWriteString( writer.get(),
-					reinterpret_cast<xmlChar const*>( convert( value, TO_EXTERNAL ).raw() ) );
+			if ( ! value.is_empty() && ( value[0] == '&' ) && ( value[value.get_length() - 1] == ';' ) )
+				rc = xmlTextWriterWriteRaw( writer.get(),
+						reinterpret_cast<xmlChar const*>( convert( value, TO_EXTERNAL ).raw() ) );
+			else
+				rc = xmlTextWriterWriteString( writer.get(),
+						reinterpret_cast<xmlChar const*>( convert( value, TO_EXTERNAL ).raw() ) );
 			if ( rc < 0 )
 				throw HXmlException( HString( "Unable to write a node value: " ) + value );
+			}
+		else if ( type == HXml::HNode::TYPE::ENTITY )
+			{
+			HString const& name( (*it).get_name() );
+			rc = xmlTextWriterWriteFormatRaw( writer.get(),
+					"&%s;", reinterpret_cast<xmlChar const*>( name.raw() ) );
+			if ( rc < 0 )
+				throw HXmlException( HString( "Unable to write an entity referenc: " ) + name );
 			}
 		else
 			{
