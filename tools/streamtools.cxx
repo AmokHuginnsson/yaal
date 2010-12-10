@@ -28,6 +28,8 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "streamtools.hxx"
+#include "hcore/hfile.hxx"
+#include "hcore/hsocket.hxx"
 
 using namespace yaal::hcore;
 
@@ -77,6 +79,29 @@ HBinaryFormatter operator << ( HStreamInterface& stream_, HBinaryFormatterSeed c
 	}
 
 HBinaryFormatterSeed bin;
+
+HString get_stream_id( HStreamInterface* stream )
+	{
+	HFile* f = dynamic_cast<HFile*>( stream );
+	HSocket* s = dynamic_cast<HSocket*>( stream );
+	return ( f ? f->get_path() : ( s ? s->get_host_name() : "anonymous stream" ) );
+	}
+
+HStreamInterface& ensure( HStreamInterface& stream_ )
+	{
+	M_PROLOG
+	M_ENSURE_EX( stream_.is_valid(), get_stream_id( &stream_ ) );
+	return ( stream_ );
+	M_EPILOG
+	}
+
+HStreamInterface::ptr_t ensure( HStreamInterface::ptr_t stream_ )
+	{
+	M_PROLOG
+	M_ENSURE_EX( stream_->is_valid(), get_stream_id( stream_.raw() ) );
+	return ( stream_ );
+	M_EPILOG
+	}
 
 }
 

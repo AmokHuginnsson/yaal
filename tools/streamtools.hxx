@@ -70,6 +70,10 @@ public:
 
 HBinaryFormatter operator << ( yaal::hcore::HStreamInterface&, HBinaryFormatterSeed const& );
 
+yaal::hcore::HString get_stream_id( yaal::hcore::HStreamInterface* );
+yaal::hcore::HStreamInterface& ensure( yaal::hcore::HStreamInterface& );
+yaal::hcore::HStreamInterface::ptr_t ensure( yaal::hcore::HStreamInterface::ptr_t );
+
 }
 
 template<typename first_t, typename second_t>

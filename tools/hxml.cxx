@@ -44,9 +44,8 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/hsingleton.hxx"
 #include "hcore/hresource.hxx"
 #include "hcore/hlog.hxx"
-#include "hcore/hfile.hxx"
-#include "hcore/hsocket.hxx"
 #include "tools.hxx"
+#include "streamtools.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -65,13 +64,6 @@ typedef HResource<xmlOutputBuffer, int (*)( xmlOutputBufferPtr )> outputbuffer_r
 typedef HPointer<encoder_resource_t> encoder_resource_ptr_t;
 
 char const* const FULL_TREE = "//*";
-
-HString get_stream_id( HStreamInterface* stream )
-	{
-	HFile* f = dynamic_cast<HFile*>( stream );
-	HSocket* s = dynamic_cast<HSocket*>( stream );
-	return ( f ? f->get_path() : ( s ? s->get_host_name() : "anonymous stream" ) );
-	}
 
 }
 

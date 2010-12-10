@@ -105,7 +105,7 @@ int HFile::open( HString const& path_, open_t const& open_ )
 	int error( 0 );
 	if ( ! _handle )
 		{
-		error = errno;
+		saveErrno = error = errno;
 		_error = error_message( error );
 		_error += ": " + path_;
 		}
