@@ -121,11 +121,11 @@ HString get_user_name( int uid_ )
 	{
 	M_PROLOG
 	passwd accountInfo;
-	long int bufferSize( ::sysconf( _SC_GETPW_R_SIZE_MAX ) );
+	int bufferSize( static_cast<int>( ::sysconf( _SC_GETPW_R_SIZE_MAX ) ) );
 	if ( bufferSize <= 0 )
 		bufferSize = GETPW_R_SIZE;
 	HChunk buffer( bufferSize );
-	passwd* any;
+	passwd* any( NULL );
 	M_ENSURE( ! getpwuid_r( uid_, &accountInfo, buffer.get<char>(), bufferSize, &any ) );
 	return ( any ? HString( accountInfo.pw_name ) : HString( uid_ ) );
 	M_EPILOG
@@ -135,11 +135,11 @@ HString get_group_name( int gid_ )
 	{
 	M_PROLOG
 	group groupInfo;
-	long int bufferSize( ::sysconf( _SC_GETGR_R_SIZE_MAX ) );
+	int bufferSize( static_cast<int>( ::sysconf( _SC_GETGR_R_SIZE_MAX ) ) );
 	if ( bufferSize <= 0 )
 		bufferSize = GETGR_R_SIZE;
 	HChunk buffer( bufferSize );
-	group* any;
+	group* any( NULL );
 	M_ENSURE( ! getgrgid_r( gid_, &groupInfo, buffer.get<char>(), bufferSize, &any ) );
 	return ( any ? HString( groupInfo.gr_name ) : HString( gid_ ) );
 	M_EPILOG
