@@ -3,13 +3,16 @@
 #include <dbghelp.h>
 
 #define getpwuid_r getpwuid_r_off
+#define getgrgid_r getgrgid_r_off
 
 #include <unistd.h>
 #include <dirent.h>
 #include <pwd.h>
+#include <grp.h>
 #include <sys/socket.h>
 
 #undef getpwuid_r
+#undef getgrgid_r
 #undef readdir_r
 #undef dirent
 
@@ -87,6 +90,14 @@ int getpwuid_r( uid_t, struct passwd* p, char* buf, int size, struct passwd** )
 	DWORD s = size;
 	int err( ! GetUserName( buf, &s ) );
 	return ( err );
+	}
+
+extern "C"
+int getgrgid_r( gid_t, struct group* g, char* buf, int size, struct group** )
+	{
+	g->gr_name = buf;
+	strcpy( buf, "None" );
+	return ( 0 );
 	}
 
 int ms_gethostname( char* buf_, int len_ )
