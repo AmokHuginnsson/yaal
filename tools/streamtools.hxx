@@ -78,6 +78,9 @@ yaal::hcore::HStreamInterface::ptr_t ensure( yaal::hcore::HStreamInterface::ptr_
 
 }
 
+namespace hcore
+{
+
 template<typename first_t, typename second_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& os, yaal::hcore::HPair<first_t, second_t> const& p )
 	{
@@ -239,11 +242,13 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	return ( out );
 	}
 
-namespace hcore { class HNumber; }
+class HNumber;
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HNumber const& );
 
-namespace hcore { class HTime; }
+class HTime;
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HTime const& );
+
+}
 
 }
 

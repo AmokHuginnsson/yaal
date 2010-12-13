@@ -107,6 +107,9 @@ HStreamInterface::ptr_t ensure( HStreamInterface::ptr_t stream_ )
 
 }
 
+namespace hcore
+{
+
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HNumber const& n )
 	{
 	M_PROLOG
@@ -122,6 +125,8 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	return ( out );
 	M_EPILOG
 	}
+
+}
 
 }
 
