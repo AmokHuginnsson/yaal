@@ -96,37 +96,52 @@ public:
 	 *
 	 * ch - character to initialize new string with.
 	 */
-	HString( char const ch );
+	HString( char ch );
+	/*! \brief Construct new HString from single unsigned character.
+	 *
+	 * ch - an unsigned character to initialize new string with.
+	 */
+	HString( char unsigned ch );
+	/*! \brief Construct new HString from short integer.
+	 *
+	 * shortInteger - an integer to initialize new string with.
+	 */
+	HString( int short shortInteger );
+	/*! \brief Construct new HString from unsigned short integer.
+	 *
+	 * unsignedShortInteger - an integer to initialize new string with.
+	 */
+	HString( int short unsigned unsignedShortInteger );
 	/*! \brief Construct new HString from integer.
 	 *
 	 * integer - an integer to initialize new string with.
 	 */
-	HString( int const integer );
+	HString( int integer );
 	/*! \brief Construct new HString from unsigned integer.
 	 *
 	 * unsignedInteger - an unsigned integer to initialize new string with.
 	 */
-	HString( int unsigned const unsignedInteger );
+	HString( int unsigned unsignedInteger );
 	/*! \brief Construct new HString from long integer.
 	 *
 	 * longInteger - a long integer to initialize new string with.
 	 */
-	HString( int long const longInteger );
+	HString( int long longInteger );
 	/*! \brief Construct new HString from unsigned long integer.
 	 *
 	 * unsignedLongInteger - a long integer to initialize new string with.
 	 */
-	HString( int long unsigned const unsignedLongInteger );
+	HString( int long unsigned unsignedLongInteger );
 	/*! \brief Construct new HString from double.
 	 *
 	 * real - a double to initialize new string with.
 	 */
-	HString( double const real );
+	HString( double real );
 	/*! \brief Construct new HString from long double.
 	 *
 	 * longDouble - a double to initialize new string with.
 	 */
-	HString( double long const longDouble );
+	HString( double long longDouble );
 	/*! \brief Construct new HString from pointer.
 	 *
 	 * pointer - an pointer to initialize new string with.

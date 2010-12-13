@@ -155,7 +155,7 @@ HString::HString( char const* const str_ )
 	M_EPILOG
 	}
 
-HString::HString( char const char_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 1 )
+HString::HString( char char_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 1 )
 	{
 	M_PROLOG
 	hs_realloc( 2 );
@@ -165,7 +165,37 @@ HString::HString( char const char_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _s
 	M_EPILOG
 	}
 
-HString::HString( int const int_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
+HString::HString( char unsigned charUnsigned_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 1 )
+	{
+	M_PROLOG
+	hs_realloc( 2 );
+	_buffer[ 0 ] = static_cast<char>( charUnsigned_ );
+	_buffer[ 1 ] = 0;
+	return;
+	M_EPILOG
+	}
+
+HString::HString( int short shortInt_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
+	{
+	M_PROLOG
+	_size = ::snprintf( NULL, 0, "%hd", shortInt_ );
+	hs_realloc( _size + 1 );
+	M_ENSURE( ::snprintf( _buffer, _size + 1, "%hd", shortInt_ ) == _size );
+	return;
+	M_EPILOG
+	}
+
+HString::HString( int short unsigned unsignedShortInt_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
+	{
+	M_PROLOG
+	_size = ::snprintf( NULL, 0, "%hu", unsignedShortInt_ );
+	hs_realloc( _size + 1 );
+	M_ENSURE( ::snprintf( _buffer, _size + 1, "%hu", unsignedShortInt_ ) == _size );
+	return;
+	M_EPILOG
+	}
+
+HString::HString( int int_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
 	{
 	M_PROLOG
 	_size = ::snprintf( NULL, 0, "%d", int_ );
@@ -175,7 +205,7 @@ HString::HString( int const int_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _siz
 	M_EPILOG
 	}
 
-HString::HString( int long const long_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
+HString::HString( int long long_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
 	{
 	M_PROLOG
 	_size = ::snprintf( NULL, 0, "%ld", long_ );
@@ -185,7 +215,7 @@ HString::HString( int long const long_ ) : _buffer( NULL ), _allocatedBytes( 0 )
 	M_EPILOG
 	}
 
-HString::HString( int long unsigned const long_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
+HString::HString( int long unsigned long_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
 	{
 	M_PROLOG
 	_size = ::snprintf( NULL, 0, "%lu", long_ );
@@ -195,7 +225,7 @@ HString::HString( int long unsigned const long_ ) : _buffer( NULL ), _allocatedB
 	M_EPILOG
 	}
 
-HString::HString( int unsigned const long_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
+HString::HString( int unsigned long_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
 	{
 	M_PROLOG
 	_size = ::snprintf( NULL, 0, "%u", long_ );
@@ -205,7 +235,7 @@ HString::HString( int unsigned const long_ ) : _buffer( NULL ), _allocatedBytes(
 	M_EPILOG
 	}
 
-HString::HString( double const double_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
+HString::HString( double double_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
 	{
 	M_PROLOG
 	_size = ::snprintf( NULL, 0, "%f", double_ );
@@ -215,7 +245,7 @@ HString::HString( double const double_ ) : _buffer( NULL ), _allocatedBytes( 0 )
 	M_EPILOG
 	}
 
-HString::HString( double long const double_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
+HString::HString( double long double_ ) : _buffer( NULL ), _allocatedBytes( 0 ), _size( 0 )
 	{
 	M_PROLOG
 	_size = ::snprintf( NULL, 0, "%.12Lf", double_ );
