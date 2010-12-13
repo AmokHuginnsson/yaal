@@ -37,6 +37,8 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hdeque.hxx"
 #include "hcore/hlist.hxx"
+#include "hcore/hset.hxx"
+#include "hcore/htuple.hxx"
 
 namespace yaal
 {
@@ -109,6 +111,139 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	out << ( ( l.begin() != l.end() ) ? "\b)" : ")" ) << yaal::hcore::flush;
 	return ( out );
 	}
+
+template<typename tType>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HSet<tType> const& s_ )
+	{
+	out << "set(";
+	yaal::copy( s_.begin(), s_.end(), stream_iterator( out, " " ) );
+	out << ( ( s_.begin() != s_.end() ) ? "\b)" : ")" ) << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0, typename T1>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0, typename T1, typename T2>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", " << t_.template get<2>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0, typename T1, typename T2, typename T3>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+		<< t_.template get<2>() << ", " << t_.template get<3>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0, typename T1, typename T2, typename T3, typename T4>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+		<< t_.template get<4>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+		<< t_.template get<2>() << ", " << t_.template get<3>() << t_.template get<4>() << t_.template get<5>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+		<< t_.template get<6>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+		<< t_.template get<6>() << ", " << t_.template get<7>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+		<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
+		<< t_.template get<8>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+		<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
+		<< t_.template get<8>() << ", " << t_.template get<9>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0, typename T1, typename T2, typename T3,
+	typename T4, typename T5, typename T6, typename T7,
+	typename T8, typename T9, typename T10>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
+		yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+		<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
+		<< t_.template get<8>() << ", " << t_.template get<9>() << ", "
+		<< t_.template get<10>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename T0, typename T1, typename T2, typename T3,
+	typename T4, typename T5, typename T6, typename T7,
+	typename T8, typename T9, typename T10, typename T11>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
+		yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> const& t_ )
+	{
+	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
+		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
+		<< t_.template get<4>() << ", " << t_.template get<5>() << ", "
+		<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
+		<< t_.template get<8>() << ", " << t_.template get<9>() << ", "
+		<< t_.template get<10>() << ", " << t_.template get<11>() << ">" << yaal::hcore::flush;
+	return ( out );
+	}
+
+namespace hcore { class HNumber; }
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HNumber const& );
+
+namespace hcore { class HTime; }
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HTime const& );
 
 }
 

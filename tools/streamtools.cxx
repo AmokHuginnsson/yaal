@@ -30,6 +30,8 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "streamtools.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hsocket.hxx"
+#include "hcore/hnumber.hxx"
+#include "hcore/htime.hxx"
 
 using namespace yaal::hcore;
 
@@ -104,6 +106,22 @@ HStreamInterface::ptr_t ensure( HStreamInterface::ptr_t stream_ )
 	}
 
 }
+
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HNumber const& n )
+	{
+	M_PROLOG
+	out << n.to_string();
+	return ( out );
+	M_EPILOG
+	}
+
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTime const& t_ )
+	{
+	M_PROLOG
+	out << t_.string();
+	return ( out );
+	M_EPILOG
+	}
 
 }
 
