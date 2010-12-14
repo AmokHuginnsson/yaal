@@ -38,7 +38,9 @@ Copyright:
 #include "hcore/hdeque.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/hset.hxx"
+#include "hcore/hhashset.hxx"
 #include "hcore/htuple.hxx"
+#include "tools/hring.hxx"
 
 namespace yaal
 {
@@ -76,6 +78,38 @@ yaal::hcore::HString get_stream_id( yaal::hcore::HStreamInterface* );
 yaal::hcore::HStreamInterface& ensure( yaal::hcore::HStreamInterface& );
 yaal::hcore::HStreamInterface::ptr_t ensure( yaal::hcore::HStreamInterface::ptr_t );
 
+template<typename container>
+yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
+		container const& container_, char sep_, char const* const name_ )
+	{
+	out << ( name_ ? name_ : "" );
+	char sep( '(' );
+	for ( typename container::const_iterator it( container_.begin() ), end( container_.end() ); it != end; ++ it, sep = sep_ )
+		out << sep << *it;
+	out << ")" << yaal::hcore::flush;
+	return ( out );
+	}
+
+template<typename container>
+yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
+		container const& container_, char sep_ )
+	{
+	return ( container_dump( out, container_, sep_, NULL ) );
+	}
+
+template<typename container>
+yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
+		container const& container_, char const* const name_  )
+	{
+	return ( container_dump( out, container_, ' ', name_ ) );
+	}
+
+template<typename tType>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::tools::HRing<tType> const& r_ )
+	{
+	return ( container_dump( out, r_, "ring" ) );
+	}
+
 }
 
 namespace hcore
@@ -84,44 +118,38 @@ namespace hcore
 template<typename first_t, typename second_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& os, yaal::hcore::HPair<first_t, second_t> const& p )
 	{
-	os << "pair(" << p.first << "," << p.second << ")";
+	os << "pair<" << p.first << "," << p.second << ">";
 	return ( os );
 	}
 
 template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType> const& a )
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType> const& a_ )
 	{
-	out << "array(";
-	yaal::copy( a.begin(), a.end(), stream_iterator( out, " " ) );
-	out << ( ( a.begin() != a.end() ) ? "\b)" : ")" ) << yaal::hcore::flush;
-	return ( out );
+	return ( container_dump( out, a_, "array" ) );
 	}
 
 template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HDeque<tType> const& a )
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HDeque<tType> const& d_ )
 	{
-	out << "deque(";
-	yaal::copy( a.begin(), a.end(), stream_iterator( out, " " ) );
-	out << ( ( a.begin() != a.end() ) ? "\b)" : ")" ) << yaal::hcore::flush;
-	return ( out );
+	return ( container_dump( out, d_, "deque" ) );
 	}
 
 template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HList<tType> const& l )
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HList<tType> const& l_ )
 	{
-	out << "list(";
-	yaal::copy( l.begin(), l.end(), stream_iterator( out, " " ) );
-	out << ( ( l.begin() != l.end() ) ? "\b)" : ")" ) << yaal::hcore::flush;
-	return ( out );
+	return ( container_dump( out, l_, "list" ) );
 	}
 
 template<typename tType>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HSet<tType> const& s_ )
 	{
-	out << "set(";
-	yaal::copy( s_.begin(), s_.end(), stream_iterator( out, " " ) );
-	out << ( ( s_.begin() != s_.end() ) ? "\b)" : ")" ) << yaal::hcore::flush;
-	return ( out );
+	return ( container_dump( out, s_, "set" ) );
+	}
+
+template<typename tType>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashSet<tType> const& hs_ )
+	{
+	return ( container_dump( out, hs_, "hash_set" ) );
 	}
 
 template<typename T0>

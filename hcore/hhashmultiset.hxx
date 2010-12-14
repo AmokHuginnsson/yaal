@@ -48,6 +48,9 @@ public:
 	typedef type_t value_type;
 	typedef HPair<type_t, int long> elem_t;
 	typedef HIterator iterator;
+	typedef HIterator const_iterator;
+	typedef HReverseIterator<iterator> reverse_iterator;
+	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
 	struct hasher
 		{

@@ -67,7 +67,9 @@ public:
 	typedef type_t value_type;
 	typedef type_t key_type;
 	typedef HIterator iterator;
+	typedef HIterator const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
+	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
 	HSBBSTree _engine;
 public:
