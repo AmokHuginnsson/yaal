@@ -170,6 +170,7 @@ template<typename interface>
 class HTupleBase
 	{
 public:
+	virtual ~HTupleBase( void ) {}
 	template<int const N>
 	typename tuple_helper::getter<interface, N>::type& get( void )
 		{ return ( tuple_helper::getter<interface, N>::get( static_cast<interface*>( this ) ) ); }

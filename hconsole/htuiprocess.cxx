@@ -120,10 +120,11 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 	M_EPILOG
 	}
 
-int HTUIProcess::run( void )
+void HTUIProcess::run( void )
 	{
 	M_PROLOG
-	return ( _dispatcher.run() );
+	_dispatcher.run();
+	return;
 	M_EPILOG
 	}
 

@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hhashmap.hxx"
 #include "hcore/hboundcall.hxx"
+#include "hcore/htuple.hxx"
 #include "hcore/hpipe.hxx"
 #include "tools/signals.hxx"
 
@@ -58,19 +59,22 @@ private:
 	typedef yaal::hcore::HBoundCall<> delayed_call_t;
 	typedef yaal::hcore::HBoundCall<void ( int )> call_fd_t;
 	typedef yaal::hcore::HPair<int, call_fd_t> io_handler_t;
+	typedef yaal::hcore::HTuple<FD_TYPE::fd_type_t, int, call_fd_t> new_io_handler_t;
 	typedef yaal::hcore::HArray<int> dropped_fd_t;
 	typedef yaal::hcore::HArray<io_handler_t> io_handlers_t;
 	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
-	bool _initialised;					/*!<< did process has necessery initialisation */
-	bool _loop; 								/*!<< indicates if main loop continues */
-	int _idleCycles;					/*!<< full select()'s without io activity */
-	int long _latency;			/*!<< timeout between recall (miliseconds) */
+	typedef yaal::hcore::HArray<new_io_handler_t> new_io_handlers_t;
+	bool _initialised;					/*!< did process has necessery initialisation */
+	bool _loop; 								/*!< indicates if main loop continues */
+	int _idleCycles;					/*!< full select()'s without io activity */
+	int long _latency;			/*!< timeout between recall (miliseconds) */
 	yaal::hcore::HChunk _select;
 	io_handlers_t _readers;
 	io_handlers_t _writers;
 	delayed_calls_t _alert;
 	delayed_calls_t _idle;
 	dropped_fd_t _droppedFd;
+	new_io_handlers_t _newIOHandlers;
 	bool _callbackContext;
 	yaal::hcore::HPipe _event;
 	yaal::hcore::HMutex _mutex;
@@ -82,10 +86,10 @@ public:
 	 */
 	HIODispatcher( int initialFdBuckets, int long latency );
 	virtual ~HIODispatcher( void );
-	int run( void );
+	void run( void );
 	void stop( void );
 	int idle_cycles( void ) const;
-	int register_file_descriptor_handler( int, call_fd_t, FD_TYPE::fd_type_t const& = FD_TYPE::READER );
+	void register_file_descriptor_handler( int, call_fd_t, FD_TYPE::fd_type_t const& = FD_TYPE::READER );
 	void unregister_file_descriptor_handler( int );
 	void add_alert_handle( delayed_call_t );
 	void add_idle_handle( delayed_call_t );

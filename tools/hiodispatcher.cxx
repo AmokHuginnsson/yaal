@@ -36,7 +36,9 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/hprogramoptionshandler.hxx"
 #include "hcore/system.hxx"
 #include "hcore/hlog.hxx"
+#include "hcore/algorithm.hxx"
 
+using namespace yaal;
 using namespace yaal::hcore;
 
 namespace yaal
@@ -52,12 +54,14 @@ HIODispatcher::HIODispatcher( int noFileHandlers_, int long latency_ )
 	_latency( latency_ ),
 	_select( chunk_size<int>( noFileHandlers_ ) * 2 ), /* * 2 because 1 for readers and 1 for writters */
 	_readers(), _writers(),
-	_alert(), _idle(), _droppedFd( noFileHandlers_ ),
+	_alert(), _idle(), _droppedFd( noFileHandlers_ ), _newIOHandlers( noFileHandlers_ ),
 	_callbackContext( false ), _event(), _mutex()
 	{
 	M_PROLOG
 	_droppedFd.clear();
+	_newIOHandlers.clear();
 	M_ASSERT( _droppedFd.is_empty() );
+	M_ASSERT( _newIOHandlers.is_empty() );
 	HSignalService& ss = HSignalService::get_instance();
 	HSignalService::handler_t handler( call( &HIODispatcher::handler_interrupt, this, _1 ) );
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
@@ -77,19 +81,21 @@ HIODispatcher::~HIODispatcher( void )
 	M_EPILOG
 	}
 
-int HIODispatcher::register_file_descriptor_handler( int fileDescriptor_, call_fd_t HANDLER, FD_TYPE::fd_type_t const& fdType_ )
+void HIODispatcher::register_file_descriptor_handler( int fileDescriptor_, call_fd_t HANDLER, FD_TYPE::fd_type_t const& fdType_ )
 	{
 	M_PROLOG
-	io_handlers_t& fds( fdType_ == FD_TYPE::READER ? _readers : _writers );
-	io_handlers_t::iterator it( find_if( _readers.begin(), _readers.end(),
-				compose1( bind1st( equal_to<int>(), fileDescriptor_ ), select1st<io_handlers_t::value_type>() ) ) );
-	int ret( 0 );
-	if ( it == fds.end() )
-		fds.push_back( make_pair( fileDescriptor_, HANDLER ) );
+	if ( _callbackContext )
+		_newIOHandlers.push_back( new_io_handler_t( fdType_, fileDescriptor_, HANDLER ) );
 	else
-		ret = 1;
-	_select.realloc( chunk_size<int>( _readers.get_size() + _writers.get_size() ) );
-	return ( ret );
+		{
+		io_handlers_t& fds( fdType_ == FD_TYPE::READER ? _readers : _writers );
+		io_handlers_t::iterator it( find_if( fds.begin(), fds.end(),
+					compose1( bind1st( equal_to<int>(), fileDescriptor_ ), select1st<io_handlers_t::value_type>() ) ) );
+		M_ENSURE( it == fds.end() );
+		fds.push_back( make_pair( fileDescriptor_, HANDLER ) );
+		_select.realloc( chunk_size<int>( _readers.get_size() + _writers.get_size() ) );
+		}
+	return;
 	M_EPILOG
 	}
 
@@ -132,10 +138,9 @@ int HIODispatcher::reconstruct_fdset( void )
 	M_EPILOG
 	}
 
-int HIODispatcher::run( void )
+void HIODispatcher::run( void )
 	{
 	M_PROLOG
-	int error = 0;
 	if ( _readers.is_empty() && _writers.is_empty() )
 		M_THROW( _( "there is no file descriptor to check activity on" ), errno );
 	while ( _loop )
@@ -148,6 +153,7 @@ int HIODispatcher::run( void )
 		int nWriters( static_cast<int>( _writers.get_size() ) );
 		int* readers( _select.get<int>() );
 		int* writers( _select.get<int>() + nReaders );
+		int error( 0 );
 		if ( ( error = system::wait_for_io( readers, nReaders, writers, nWriters, &wait ) ) )
 			{
 			M_ENSURE( error >= 0 );
@@ -175,12 +181,18 @@ int HIODispatcher::run( void )
 		_callbackContext = false;
 		if ( ! _droppedFd.is_empty() )
 			{
-			for ( dropped_fd_t::iterator it( _droppedFd.begin() ), end( _droppedFd.end() ); it != end; ++ it )
-				unregister_file_descriptor_handler( *it );
+			for_each( _droppedFd.begin(), _droppedFd.end(), call( &HIODispatcher::unregister_file_descriptor_handler, this, _1 ) );
 			_droppedFd.clear();
 			}
+		if ( ! _newIOHandlers.is_empty() )
+			{
+			for ( new_io_handlers_t::const_iterator it( _newIOHandlers.begin() ),
+					end( _newIOHandlers.end() ); it != end; ++ it )
+				register_file_descriptor_handler( it->get<1>(), it->get<2>(), it->get<0>() );
+			_newIOHandlers.clear();
+			}
 		}
-	return ( 0 );
+	return;
 	M_EPILOG
 	}
 
