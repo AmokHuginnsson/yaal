@@ -30,9 +30,10 @@ clean: clean-dep
 mrproper: clean
 	@printf "%b" "Purging ... "; \
 	/bin/rm -f version.hxx src/.gt_* src/tags 1exec.core; \
-	/bin/rm -rf src/1exec.core $(PRJNAME) $(DIR_BUILD); \
+	/bin/rm -rf src/1exec.core $(PRJNAME); \
 	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
+	cd .. && /bin/rm -rf $(DIR_BUILD); \
 	printf "%b\n" "done."
 
 purge: mrproper
