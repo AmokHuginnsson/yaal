@@ -44,6 +44,8 @@ namespace yaal
 namespace tools
 {
 
+static int const DIRENT_SIZE = sizeof ( dirent ) - sizeof ( dirent::d_name ) + NAME_MAX + 1;
+
 HFSItem::HFSItem( HString const& root_ )
 	: _nameLen( static_cast<int>( root_.get_length() ) ), _path( root_ )
 	{
@@ -224,7 +226,7 @@ HFSItem::HIterator::HIterator( HString const& path_ ) : _path( path_ ), _dir( NU
 	if ( ! _path.is_empty() )
 		{
 		_dir = ::opendir( _path.raw() );
-		_dirEnt = HChunk::ptr_t( new HChunk( chunk_size<dirent>( 1 ) ) );
+		_dirEnt = HChunk::ptr_t( new HChunk( DIRENT_SIZE ) );
 		operator ++();
 		}
 	return;
@@ -240,8 +242,8 @@ HFSItem::HIterator::HIterator( HIterator const& it_ ) : _path( it_._path ), _dir
 		seekdir( static_cast<DIR*>( _dir ), telldir( static_cast<DIR*>( it_._dir ) ) );
 		if ( !! it_._dirEnt )
 			{
-			_dirEnt = HChunk::ptr_t( new HChunk( chunk_size<dirent>( 1 ) ) );
-			::memcpy( _dirEnt->get<void>(), it_._dirEnt->get<void>(), sizeof ( dirent ) );
+			_dirEnt = HChunk::ptr_t( new HChunk( DIRENT_SIZE ) );
+			::memcpy( _dirEnt->get<void>(), it_._dirEnt->get<void>(), DIRENT_SIZE );
 			}
 		_item.set_path( it_._item._path, it_._item._nameLen );
 		}
