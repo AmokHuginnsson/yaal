@@ -220,12 +220,16 @@ HFSItem::HIterator HFSItem::end( void )
 	M_EPILOG
 	}
 
-static int const DIRENT_SIZE_BASE = sizeof ( dirent ) - sizeof ( dirent::d_name ) + 1;
+static int const DIRENT_SIZE_BASE = sizeof ( dirent ) - sizeof ( static_cast<dirent*>( NULL )->d_name ) + 1;
 
 int dirent_size( char const* const path_ )
 	{
 	int const nameMax( static_cast<int>( pathconf( path_, _PC_NAME_MAX ) ) );
+#ifndef NAME_MAX
+#define NAME_MAX _XOPEN_NAME_MAX
 	int const DIRENT_SIZE( DIRENT_SIZE_BASE + ( nameMax > 0 ? nameMax : NAME_MAX ) );
+#undef NAME_MAX
+#endif /* #ifndef NAME_MAX */
 	return ( DIRENT_SIZE );
 	}
 
