@@ -27,6 +27,8 @@ Copyright:
 #include <cstring>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <limits.h>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -43,8 +45,6 @@ namespace yaal
 
 namespace tools
 {
-
-static int const DIRENT_SIZE = sizeof ( dirent ) - sizeof ( dirent::d_name ) + NAME_MAX + 1;
 
 HFSItem::HFSItem( HString const& root_ )
 	: _nameLen( static_cast<int>( root_.get_length() ) ), _path( root_ )
@@ -220,13 +220,22 @@ HFSItem::HIterator HFSItem::end( void )
 	M_EPILOG
 	}
 
+static int const DIRENT_SIZE_BASE = sizeof ( dirent ) - sizeof ( dirent::d_name ) + 1;
+
+int dirent_size( char const* const path_ )
+	{
+	int const nameMax( static_cast<int>( pathconf( path_, _PC_NAME_MAX ) ) );
+	int const DIRENT_SIZE( DIRENT_SIZE_BASE + ( nameMax > 0 ? nameMax : NAME_MAX ) );
+	return ( DIRENT_SIZE );
+	}
+
 HFSItem::HIterator::HIterator( HString const& path_ ) : _path( path_ ), _dir( NULL ), _dirEnt(), _item( "" )
 	{
 	M_PROLOG
 	if ( ! _path.is_empty() )
 		{
 		_dir = ::opendir( _path.raw() );
-		_dirEnt = HChunk::ptr_t( new HChunk( DIRENT_SIZE ) );
+		_dirEnt = HChunk::ptr_t( new HChunk( dirent_size( _path.raw() ) ) );
 		operator ++();
 		}
 	return;
@@ -242,6 +251,7 @@ HFSItem::HIterator::HIterator( HIterator const& it_ ) : _path( it_._path ), _dir
 		seekdir( static_cast<DIR*>( _dir ), telldir( static_cast<DIR*>( it_._dir ) ) );
 		if ( !! it_._dirEnt )
 			{
+			int const DIRENT_SIZE( dirent_size( _path.raw() ) );
 			_dirEnt = HChunk::ptr_t( new HChunk( DIRENT_SIZE ) );
 			::memcpy( _dirEnt->get<void>(), it_._dirEnt->get<void>(), DIRENT_SIZE );
 			}
