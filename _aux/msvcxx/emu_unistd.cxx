@@ -25,6 +25,7 @@
 #undef readdir_r
 #undef dirent
 
+#include "emu_pwd.hxx"
 #include "hcore/base.hxx"
 #include "hcore/xalloc.hxx"
 #include "hcore/hlog.hxx"
@@ -210,6 +211,12 @@ int stat( char const* path_, struct stat* s_ )
 			{
 			res = -1;
 			errno = ENOTDIR;
+			}
+		else
+			{
+			owner_t owner( get_path_owner( path ) );
+			s_->st_uid = owner.first;
+			s_->st_gid = owner.second;
 			}
 		}
 	return ( res );

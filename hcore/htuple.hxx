@@ -199,7 +199,7 @@ public:
 	HTuple( T0 const& e0_ = T0() )
 		: _e0( e0_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0, typename T1>
@@ -217,7 +217,7 @@ public:
 	HTuple( T0 const& e0_ = T0(), T1 const& e1_ = T1() )
 		: base_type(), _e0( e0_ ), _e1( e1_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0, typename T1, typename T2>
@@ -237,7 +237,7 @@ public:
 	HTuple( T0 const& e0_ = T0(), T1 const& e1_ = T1(), T2 const& e2_ = T2() )
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0, typename T1, typename T2, typename T3>
@@ -259,7 +259,7 @@ public:
 	HTuple( T0 const& e0_ = T0(), T1 const& e1_ = T1(), T2 const& e2_ = T2(), T3 const& e3_ = T3() )
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4>
@@ -283,7 +283,7 @@ public:
 	HTuple( T0 const& e0_ = T0(), T1 const& e1_ = T1(), T2 const& e2_ = T2(), T3 const& e3_ = T3(), T4 const& e4_ = T4() )
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ), _e4( e4_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
@@ -309,7 +309,7 @@ public:
 	HTuple( T0 const& e0_ = T0(), T1 const& e1_ = T1(), T2 const& e2_ = T2(), T3 const& e3_ = T3(), T4 const& e4_ = T4(), T5 const& e5_ = T5() )
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ), _e4( e4_ ), _e5( e5_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
@@ -339,7 +339,7 @@ public:
 			T6 const& e6_ = T6() )
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ), _e4( e4_ ), _e5( e5_ ), _e6( e6_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
@@ -371,7 +371,7 @@ public:
 			T6 const& e6_ = T6(), T7 const& e7_ = T7() )
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ), _e4( e4_ ), _e5( e5_ ), _e6( e6_ ), _e7( e7_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
@@ -406,7 +406,7 @@ public:
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ),
 		_e4( e4_ ), _e5( e5_ ), _e6( e6_ ), _e7( e7_ ), _e8( e8_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0, typename T1, typename T2, typename T3,
@@ -445,7 +445,7 @@ public:
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ),
 		_e4( e4_ ), _e5( e5_ ), _e6( e6_ ), _e7( e7_ ), _e8( e8_ ), _e9( e9_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0, typename T1, typename T2, typename T3,
@@ -486,7 +486,7 @@ public:
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ),
 		_e4( e4_ ), _e5( e5_ ), _e6( e6_ ), _e7( e7_ ), _e8( e8_ ), _e9( e9_ ), _e10( e10_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0, typename T1, typename T2, typename T3,
@@ -529,7 +529,7 @@ public:
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ),
 		_e4( e4_ ), _e5( e5_ ), _e6( e6_ ), _e7( e7_ ), _e8( e8_ ), _e9( e9_ ), _e10( e10_ ), _e11( e11_ ) {}
 	template<typename tuple, int const N>
-	friend class tuple_helper::getter;
+	friend struct tuple_helper::getter;
 	};
 
 template<typename T0>

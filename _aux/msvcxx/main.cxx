@@ -25,6 +25,7 @@
 using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace msvcxx;
 
 __declspec( thread ) int SocketErrno::_errno = 0;
 int ESCDELAY = 0;
@@ -84,7 +85,44 @@ int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** 
 	}
 
 extern "C"
-int getpwuid_r( uid_t, struct passwd* p, char* buf, int size, struct passwd** )
+uid_t getuid( void )
+	{
+	/* Open the access token associated with the calling process. */
+	HANDLE hToken( NULL );
+	if ( ! OpenProcessToken( GetCurrentProcess(), TOKEN_QUERY, &hToken ) )
+		{
+		log_windows_error( "OpenProcessToken" );
+		return ( -1 );
+		}
+
+	static int const SID_SIZE( 128 );
+	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );
+	char tokenUserBuffer[ TOKEN_USER_SIZE ];
+	memset( tokenUserBuffer, 0, TOKEN_USER_SIZE );
+	/* Retrieve the token information in a TOKEN_USER structure. */
+	DWORD dummy( 0 );
+	if ( !GetTokenInformation( hToken, TokenUser, &tokenUserBuffer, TOKEN_USER_SIZE, &dummy ) )
+		{
+		log_windows_error( "GetTokenInformation" );
+		return ( -1 );
+		}
+
+	CloseHandle( hToken );
+	PTOKEN_USER tokenUser( static_cast<PTOKEN_USER>( static_cast<void*>( tokenUserBuffer ) ) );
+	if ( !IsValidSid( tokenUser->User.Sid ) )
+		{
+		log_windows_error( "IsValidSid" );
+		return -1;
+		}
+
+	int uid( *GetSidSubAuthority( tokenUser->User.Sid,
+		*GetSidSubAuthorityCount( tokenUser->User.Sid ) - 1) );
+
+	return ( uid );
+	}
+
+extern "C"
+int getpwuid_r( uid_t uid_, struct passwd* p, char* buf, int size, struct passwd** )
 	{
 	p->pw_name = buf;
 	DWORD s = size;

@@ -9,6 +9,7 @@
 #define readdir_r unix_readdir_r
 
 static int const NAME_MAX = 255;
+#define _XOPEN_NAME_MAX NAME_MAX
 
 struct unix_dirent
 	{

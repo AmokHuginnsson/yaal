@@ -16,6 +16,7 @@
 ?_errMsgHDeque_@hcore@yaal@@3QBQBDB
 ?_errMsgHList_@hcore@yaal@@3QBQBDB
 ?_errMsgHMatrix_@hcore@yaal@@3QBQBDB
+?_errMsgHRing_@tools@yaal@@3QBQBDB
 ?_errMsgHSBBSTree_@hcore@yaal@@3QBQBDB
 ?_errMsgHVector_@hcore@yaal@@3PAPBDA
 ?_exceptionType_@hcore@yaal@@3QBDB
@@ -76,6 +77,7 @@ _coshl
 _cosl
 _expl
 _floorl
+_getgrgid_r
 _getpwuid_r
 _log10l
 _logl

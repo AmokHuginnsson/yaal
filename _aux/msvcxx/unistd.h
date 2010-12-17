@@ -19,6 +19,7 @@ extern "C" FILE* tmpfile( void );
 #define timeval timeval_off
 #define gethostname gethostname_off
 #define dup2 dup2_off
+#define getuid ms_getuid
 #include <glibc/unistd.h>
 #undef gethostname
 #include <sys/types.h>
