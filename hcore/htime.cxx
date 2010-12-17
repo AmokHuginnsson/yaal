@@ -41,8 +41,8 @@ namespace hcore
 
 char const* const _defaultTimeFormat_ = "%a, %d %b %Y %H:%M:%S %z";
 
-HTime::HTime( void ) : _format ( _defaultTimeFormat_ ),
-	_cache( 1, HChunk::STRATEGY::GEOMETRIC ), _value(), _broken()
+HTime::HTime( void )
+	: _format ( _defaultTimeFormat_ ), _cache(), _value(), _broken()
 	{
 	M_PROLOG
 	set_now();
@@ -51,8 +51,7 @@ HTime::HTime( void ) : _format ( _defaultTimeFormat_ ),
 	}
 
 HTime::HTime( char const* const strTime_ )
-	: _format ( _defaultTimeFormat_ ),
-	_cache( 1, HChunk::STRATEGY::GEOMETRIC ), _value(), _broken()
+	: _format ( _defaultTimeFormat_ ), _cache(), _value(), _broken()
 	{
 	M_PROLOG
 	char const* err( ::strptime( strTime_, _format.raw(), &_broken ) );
@@ -64,17 +63,17 @@ HTime::HTime( char const* const strTime_ )
 	M_EPILOG
 	}
 
-HTime::HTime( HTime const& time_ ) : _format( _defaultTimeFormat_ ),
-	_cache( 1, HChunk::STRATEGY::GEOMETRIC ), _value(), _broken()
+HTime::HTime( HTime const& time_ )
+	: _format( time_._format ), _cache( time_._cache.get_size() ),
+	_value( time_._value ), _broken( time_._broken )
 	{
 	M_PROLOG
-	operator = ( time_ );
 	return;
 	M_EPILOG
 	}
 
-HTime::HTime( time_t const& time_ ) : _format( _defaultTimeFormat_ ),
-	_cache( 1, HChunk::STRATEGY::GEOMETRIC ), _value( time_ ), _broken()
+HTime::HTime( time_t const& time_ )
+	: _format( _defaultTimeFormat_ ), _cache(), _value( time_ ), _broken()
 	{
 	M_PROLOG
 	M_ENSURE( localtime_r( &_value, &_broken ) );
@@ -84,8 +83,7 @@ HTime::HTime( time_t const& time_ ) : _format( _defaultTimeFormat_ ),
 
 HTime::HTime( int const year_, int const month_, int const day_,
 							 int const hour_, int const minute_, int const second_ )
-	: _format( _defaultTimeFormat_ ), _cache( 1, HChunk::STRATEGY::GEOMETRIC ), _value(),
-	_broken()
+	: _format( _defaultTimeFormat_ ), _cache(), _value(), _broken()
 	{
 	M_PROLOG
 	set_datetime( year_, month_, day_, hour_, minute_, second_ );
@@ -104,21 +102,21 @@ void HTime::set( time_t const& time_ )
 	{
 	M_PROLOG
 	_value = time_;
-	M_ENSURE( localtime_r( &_value, &_broken ) );
+	M_ENSURE( ::localtime_r( &_value, &_broken ) );
 	return;
 	M_EPILOG
 	}
 
-void HTime::set_now ( void )
+void HTime::set_now( void )
 	{
 	M_PROLOG
-	_value = time( NULL );
-	M_ENSURE( localtime_r( &_value, &_broken ) );
+	_value = ::time( NULL );
+	M_ENSURE( ::localtime_r( &_value, &_broken ) );
 	return;
 	M_EPILOG
 	}
 
-void HTime::format( char const * const format_ )
+void HTime::format( char const* const format_ )
 	{
 	M_PROLOG
 	_format = format_;
@@ -139,7 +137,7 @@ void HTime::set_time( int const hour_, int const minute_,
 	if ( ( second_ < 0 ) || ( second_ > 59 ) )
 		M_THROW( "bad second", second_ );
 	_broken.tm_sec = second_;
-	_value = mktime( &_broken );
+	_value = ::mktime( &_broken );
 	return;
 	M_EPILOG
 	}
@@ -155,7 +153,7 @@ void HTime::set_date( int const year_, int const month_,
 	if ( ( day_ < 1 ) || ( day_ > 31 ) )
 		M_THROW( "bad day of month", day_ );
 	_broken.tm_mday = day_;
-	_value = mktime( &_broken );
+	_value = ::mktime( &_broken );
 	return;
 	M_EPILOG
 	}
@@ -213,27 +211,38 @@ int HTime::get_second( void ) const
 	M_EPILOG
 	}
 
+void HTime::swap( HTime& time_ )
+	{
+	M_PROLOG
+	if ( &time_ != this )
+		{
+		using yaal::swap;
+		swap( _value, time_._value );
+		swap( _format, time_._format );
+		swap( _cache, time_._cache );
+		swap( _broken, time_._broken );
+		}
+	return;
+	M_EPILOG
+	}
+
 HTime& HTime::operator = ( HTime const& time_ )
 	{
 	M_PROLOG
-	if ( this != & time_ )
+	if ( this != &time_ )
 		{
-		_format = time_._format;
-		_value = time_._value;
-		_cache.raw()[ 0 ] = 0;
-		memcpy ( &_broken, &time_._broken, sizeof ( tm ) );
+		HTime tmp( time_ );
+		swap( tmp );
 		}
-	return ( * this );
+	return ( *this );
 	M_EPILOG
 	}
 
 HTime HTime::operator - ( HTime const& time_ ) const
 	{
 	M_PROLOG
-	HTime time;
-	time._format = _format;
-	time._value = static_cast<time_t>( difftime( _value, time_._value ) );
-	M_ENSURE( gmtime_r( &time._value, &time._broken ) );
+	HTime time( *this );
+	time -= time_;
 	return ( time );
 	M_EPILOG
 	}
@@ -241,7 +250,8 @@ HTime HTime::operator - ( HTime const& time_ ) const
 HTime & HTime::operator -= ( HTime const& time_ )
 	{
 	M_PROLOG
-	( *this ) = ( *this ) - time_;
+	_value = static_cast<time_t>( difftime( _value, time_._value ) );
+	M_ENSURE( gmtime_r( &_value, &_broken ) );
 	return ( *this );
 	M_EPILOG
 	}
@@ -291,17 +301,18 @@ bool HTime::operator > ( time_t const& time_ ) const
 HString HTime::string( void ) const
 	{
 	M_PROLOG
-	int long size = 0;
 #ifdef HAVE_SMART_STRFTIME
-	size = ::strftime( NULL, 1024, _format.raw(), &_broken ) + 1;
+	static int const MIN_TIME_STRING_LENGTH( 32 );
+	int long size( ::strftime( NULL, 1024, _format.raw(), &_broken ) + 1 );
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
-	_cache.realloc( size );
+	_cache.realloc( max<int long>( size, MIN_TIME_STRING_LENGTH ) );
 	M_ENSURE( static_cast<int>( ::strftime( _cache.raw(),
 					size, _format.raw(), &_broken ) ) < size );
 #else /* HAVE_SMART_STRFTIME */
-	_cache.realloc( 64 ); /* FIXME that is pretty dumb hack */
-	size = static_cast<int long>( ::strftime( _cache.raw(), 63, _format.raw(), &_broken ) ) + 1;
+	static int const MIN_TIME_STRING_LENGTH( 64 );
+	_cache.realloc( MIN_TIME_STRING_LENGTH ); /* FIXME that is pretty dumb hack */
+	int long size( static_cast<int long>( ::strftime( _cache.raw(), MIN_TIME_STRING_LENGTH - 1, _format.raw(), &_broken ) ) + 1 );
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 #endif /* not HAVE_SMART_STRFTIME */

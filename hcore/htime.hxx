@@ -57,6 +57,7 @@ public:
 	HTime( int const, int const, int const, int const = 0, int const = 0,
 			int const = 0 );
 	virtual ~HTime ( void );
+	void swap( HTime& );
 	void set_now( void );
 	void set( time_t const& );
 	void format( char const* const = _defaultTimeFormat_ );
@@ -86,6 +87,9 @@ public:
 typedef HExceptionT<HTime> HTimeException;
 
 }
+
+inline void swap( yaal::hcore::HTime& a, yaal::hcore::HTime& b )
+	{ a.swap( b ); }
 
 }
 
