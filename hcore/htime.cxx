@@ -64,7 +64,7 @@ HTime::HTime( char const* const strTime_ )
 	}
 
 HTime::HTime( HTime const& time_ )
-	: _format( time_._format ), _cache( time_._cache.get_size() ),
+	: _format( time_._format ), _cache(),
 	_value( time_._value ), _broken( time_._broken )
 	{
 	M_PROLOG
