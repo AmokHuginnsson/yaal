@@ -102,7 +102,8 @@ void HTime::set( time_t const& time_ )
 	{
 	M_PROLOG
 	_value = time_;
-	M_ENSURE( ::localtime_r( &_value, &_broken ) );
+	/* In Visual Studio C++ localtime_r is a macro and cannot be prefixed with ::. */
+	M_ENSURE( localtime_r( &_value, &_broken ) );
 	return;
 	M_EPILOG
 	}
@@ -111,7 +112,7 @@ void HTime::set_now( void )
 	{
 	M_PROLOG
 	_value = ::time( NULL );
-	M_ENSURE( ::localtime_r( &_value, &_broken ) );
+	M_ENSURE( localtime_r( &_value, &_broken ) );
 	return;
 	M_EPILOG
 	}

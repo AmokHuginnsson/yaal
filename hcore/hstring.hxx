@@ -47,12 +47,14 @@ extern M_YAAL_HCORE_PUBLIC_API char const _word_[];
  */
 class HString
 	{
+	static int long const MAX_STRING_LENGTH = meta::max_signed<int long>::value / 2;
 	typedef HString this_type;
 private:
 	char*	_buffer; /*!< memory buffer pointer */
 	int	long _allocatedBytes; /*!< size of memory buffer */
 	int	long _size; /*!< lenght of string */
 public:
+	static int long const npos = -1;
 	typedef char const* iterator; /*!< mutable iterator for string characters */
 	typedef char const* const_iterator; /*!< const iterator for string characters */
 	/*! \brief Trivial constructor.
@@ -155,6 +157,8 @@ public:
 	char set_at( int long, char );
 	char const* raw( void ) const;
 	char const* c_str( void ) const;
+	int long max_size( void ) const;
+	int long get_max_size( void ) const;
 /*
 	iterator begin( void ) const;
 	iterator end( void ) const;
@@ -168,18 +172,22 @@ public:
 	int long size( void ) const;
 	int long get_length( void ) const;
 	int long capacity( void ) const;
+	int long get_capacity( void ) const;
 	void swap( HString& );
 	HString& assign( char const* const, int long );
 	HString& format( char const* const, ... );
 	HString& vformat( char const* const, void* );
-	int long find( char const, int long = 0 ) const;
+	int long find( char, int long = 0 ) const;
 	int long find( HString const&, int long = 0 ) const;
 	int long nfind( HString const&, int long, int long = 0 ) const;
-	int long reverse_find( char const, int long = 0 ) const;
+	int long reverse_find( char, int long = 0 ) const;
+	int long find_last( char, int long = 0 ) const;
 	int long find_one_of( char const* const, int long = 0 ) const;
 	int long reverse_find_one_of( char const* const, int long = 0 ) const;
+	int long find_last_one_of( char const* const, int long = 0 ) const;
 	int long find_other_than( char const* const, int long = 0 ) const;
 	int long reverse_find_other_than( char const* const, int long = 0 ) const;
+	int long find_last_other_than( char const* const, int long = 0 ) const;
 	HString& replace( HString const&, HString const& );
 	HString& upper( void );
 	HString& lower( void );
@@ -191,7 +199,7 @@ public:
 	 * \param length - length of a substring.
 	 * \return Substring.
 	 */
-	HString mid( int long start, int long length = meta::max_signed<int long>::value ) const;
+	HString mid( int long start, int long length = MAX_STRING_LENGTH ) const;
 	HString right( int long ) const;
 	HString& trim_left( char const* const = _whiteSpace_ );
 	HString& trim_right( char const* const = _whiteSpace_ );
@@ -217,7 +225,7 @@ public:
 	 * \param length_ - length of part to be erased.
 	 * \return self.
 	 */
-	HString& erase( int long position_, int long length_ = meta::max_signed<int long>::value );
+	HString& erase( int long position_, int long length_ = MAX_STRING_LENGTH );
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos - position where given string has to be inserted.
