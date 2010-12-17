@@ -198,7 +198,7 @@ M_EXPORT_SYMBOL
 int stat( char const* path_, struct stat* s_ )
 	{
 	string path( path_ );
-	int lastNonSeparator( static_cast<int>( path.find_last_not_of( "/\\" ) ) );
+	string::size_type lastNonSeparator( path.find_last_not_of( "/\\" ) );
 	int len( path.length() );
 	if ( lastNonSeparator != string::npos )
 		path.erase( lastNonSeparator + 1 );

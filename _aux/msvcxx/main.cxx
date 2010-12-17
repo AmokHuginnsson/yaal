@@ -1,6 +1,7 @@
 #include <sys/cdefs.h>
 #include <sys/time.h>
 #include <dbghelp.h>
+#include <sddl.h>
 
 #define getpwuid_r getpwuid_r_off
 #define getgrgid_r getgrgid_r_off
@@ -84,58 +85,103 @@ int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** 
 	return ( error );
 	}
 
-extern "C"
-uid_t getuid( void )
+PSID get_base_sid( char* buffer_, int size_ )
 	{
 	/* Open the access token associated with the calling process. */
 	HANDLE hToken( NULL );
-	if ( ! OpenProcessToken( GetCurrentProcess(), TOKEN_QUERY, &hToken ) )
+	if ( ! ::OpenProcessToken( ::GetCurrentProcess(), TOKEN_QUERY, &hToken ) )
 		{
 		log_windows_error( "OpenProcessToken" );
-		return ( -1 );
+		return ( NULL );
 		}
 
-	static int const SID_SIZE( 128 );
-	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );
-	char tokenUserBuffer[ TOKEN_USER_SIZE ];
-	memset( tokenUserBuffer, 0, TOKEN_USER_SIZE );
+	::memset( buffer_, 0, size_ );
 	/* Retrieve the token information in a TOKEN_USER structure. */
 	DWORD dummy( 0 );
-	if ( !GetTokenInformation( hToken, TokenUser, &tokenUserBuffer, TOKEN_USER_SIZE, &dummy ) )
+	if ( ! ::GetTokenInformation( hToken, TokenUser, buffer_, size_, &dummy ) )
 		{
 		log_windows_error( "GetTokenInformation" );
-		return ( -1 );
+		return ( NULL );
 		}
 
-	CloseHandle( hToken );
-	PTOKEN_USER tokenUser( static_cast<PTOKEN_USER>( static_cast<void*>( tokenUserBuffer ) ) );
-	if ( !IsValidSid( tokenUser->User.Sid ) )
+	::CloseHandle( hToken );
+	PTOKEN_USER tokenUser( static_cast<PTOKEN_USER>( static_cast<void*>( buffer_ ) ) );
+	if ( ! ::IsValidSid( tokenUser->User.Sid ) )
 		{
 		log_windows_error( "IsValidSid" );
-		return -1;
+		return ( NULL );
 		}
-
-	int uid( *GetSidSubAuthority( tokenUser->User.Sid,
-		*GetSidSubAuthorityCount( tokenUser->User.Sid ) - 1) );
-
-	return ( uid );
+	return ( tokenUser->User.Sid );
 	}
 
 extern "C"
-int getpwuid_r( uid_t uid_, struct passwd* p, char* buf, int size, struct passwd** )
+uid_t getuid( void )
 	{
-	p->pw_name = buf;
-	DWORD s = size;
-	int err( ! GetUserName( buf, &s ) );
+	static int const SID_SIZE( 128 );
+	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );
+	char tokenUserBuffer[ TOKEN_USER_SIZE ];
+	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE ) );
+	int uid( sid ? *::GetSidSubAuthority( sid, *::GetSidSubAuthorityCount( sid ) - 1 ) : -1 );
+	return ( uid );
+	}
+
+bool get_system_account_name( int id_, char* buf_, int size_ )
+	{
+	static int const SID_SIZE( 128 );
+	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );
+	char tokenUserBuffer[ TOKEN_USER_SIZE ];
+	PSID sid( get_base_sid( tokenUserBuffer, TOKEN_USER_SIZE ) );
+	bool fail( true );
+	if ( sid )
+		{
+		LPTSTR sidStrBuffer( NULL );
+		if ( ::ConvertSidToStringSid( sid, &sidStrBuffer ) )
+			{
+			HString sidStr( sidStrBuffer );
+			::LocalFree( sidStrBuffer );
+			sidStr.erase( sidStr.find_last( '-' ) + 1 );
+			sidStr += id_;
+			PSID newSid( NULL );
+			if ( ::ConvertStringSidToSid( sidStr.raw(), &newSid ) )
+				{
+				DWORD size( size_ );
+				static int const DUMMY_BUFFER_SIZE = 128;
+				char dummy[DUMMY_BUFFER_SIZE];
+				DWORD dummyLen( DUMMY_BUFFER_SIZE );
+				SID_NAME_USE eUse = SidTypeUnknown;
+				if ( ::LookupAccountSid( NULL, newSid, buf_, &size, dummy, &dummyLen, &eUse ) )
+					fail = false;
+				::LocalFree( newSid );
+				}
+			}
+		}
+	return ( fail );
+	}
+
+extern "C"
+int getpwuid_r( uid_t uid_, struct passwd* p_, char* buf_, int size_, struct passwd** result_ )
+	{
+	p_->pw_name = buf_;
+	int err( -1 );
+	if ( ! get_system_account_name( uid_, buf_, size_ ) )
+		{
+		err = 0;
+		*result_ = p_;
+		}
 	return ( err );
 	}
 
 extern "C"
-int getgrgid_r( gid_t, struct group* g, char* buf, int size, struct group** )
+int getgrgid_r( gid_t gid_, struct group* g_, char* buf_, int size_, struct group** result_ )
 	{
-	g->gr_name = buf;
-	strcpy( buf, "None" );
-	return ( 0 );
+	g_->gr_name = buf_;
+	int err( -1 );
+	if ( ! get_system_account_name( gid_, buf_, size_ ) )
+		{
+		err = 0;
+		*result_ = g_;
+		}
+	return ( err );
 	}
 
 int ms_gethostname( char* buf_, int len_ )
