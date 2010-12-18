@@ -815,6 +815,13 @@ HFormat::HFormatImpl::flag_t HFormat::HFormatImpl::get_flag( HString const& s, i
 	M_EPILOG
 	}
 
+HString str( HFormat const& format_ )
+	{
+	M_PROLOG
+	return ( format_.string() );
+	M_EPILOG
+	}
+
 }
 
 yaal::hcore::HStreamFormatProxy operator << ( yaal::hcore::HStreamInterface& stream, yaal::hcore::HFormat const& format )

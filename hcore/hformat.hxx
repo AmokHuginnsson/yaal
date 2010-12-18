@@ -110,6 +110,8 @@ public:
 		}
 	};
 
+HString str( HFormat const& );
+
 }
 
 yaal::hcore::HStreamFormatProxy operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HFormat const& );
