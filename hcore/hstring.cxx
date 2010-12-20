@@ -119,7 +119,7 @@ HString::HString( int const preallocate_, bool const )
 void HString::hs_realloc( int long const preallocate_ )
 	{
 	M_PROLOG
-	if ( preallocate_ < 1 )
+	if ( ( preallocate_ < 1 ) || ( preallocate_ > ( MAX_STRING_LENGTH + 1 ) ) )
 		M_THROW( _( "bad new buffer size requested" ), preallocate_ );
 	if ( preallocate_ > _allocatedBytes )
 		{
@@ -455,7 +455,7 @@ int long HString::capacity( void ) const
 int long HString::get_capacity( void ) const
 	{
 	M_PROLOG
-		return ( _allocatedBytes - 1 );
+	return ( _allocatedBytes - 1 );
 	M_EPILOG
 	}
 
@@ -595,7 +595,7 @@ int long HString::reverse_find_one_of( char const* const set_,
 		return ( - 1 );
 	if ( before_ < 0 )
 		before_ = 0;
-	if ( ( ! ::std::strlen( set_ ) ) || ( _size <= before_ ) )
+	if ( ( _size <= before_ ) || ( ! ::std::strlen( set_ ) ) )
 		return ( - 1 );
 	char* str( string_helper::strrnpbrk( _buffer, set_, _size - before_ ) );
 	if ( ! str )
@@ -609,14 +609,14 @@ int long HString::find_last_one_of( char const* const set_,
 	{
 	M_PROLOG
 	if ( ! set_ )
-		return ( - 1 );
-	if ( before_ < 0 )
-		before_ = 0;
-	if ( ( ! ::std::strlen( set_ ) ) || ( _size <= before_ ) )
-		return ( - 1 );
-	char* str( string_helper::strrnpbrk( _buffer, set_, before_ ) );
+		return ( -1 );
+	if ( before_ >= _size )
+		before_ = _size - 1;
+	if ( ( before_ < 0 ) || ( ! ::std::strlen( set_ ) ) )
+		return ( -1 );
+	char* str( string_helper::strrnpbrk( _buffer, set_, before_ + 1 ) );
 	if ( ! str )
-		return ( - 1 );
+		return ( -1 );
 	return ( static_cast<int long>( str - _buffer ) );
 	M_EPILOG
 	}
@@ -663,16 +663,16 @@ int long HString::find_last_other_than( char const* const set_,
 		int long before_ ) const
 	{
 	M_PROLOG
-		if ( ! set_ )
-			return ( 0 );
-	if ( before_ < 0 )
-		before_ = 0;
+	if ( ! set_ )
+		return ( _size - 1 );
+	if ( before_ >= _size )
+		before_ = _size - 1;
 	if ( ! ::std::strlen( set_ ) )
-		return ( 0 );
-	if ( _size <= before_ )
+		return ( _size - 1 );
+	if ( before_ < 0 )
 		return ( -1 );
-	int long index( string_helper::strrnspn( _buffer, set_, before_ ) );
-	if ( index >= before_ )
+	int long index( string_helper::strrnspn( _buffer, set_, before_ + 1 ) );
+	if ( index > before_ )
 		return ( -1 );
 	return ( index );
 	M_EPILOG
@@ -695,11 +695,11 @@ int long HString::reverse_find( char char_, int long before_ ) const
 int long HString::find_last( char char_, int long before_ ) const
 	{
 	M_PROLOG
-		if ( before_ >= _size )
-			return ( -1 );
 	if ( before_ < 0 )
-		before_ = 0;
-	char const* str( static_cast<char const*>( ::memrchr( _buffer, char_, _size - before_ ) ) );
+		return ( -1 );
+	if ( before_ >= _size )
+		before_ = _size - 1;
+	char const* str( static_cast<char const*>( ::memrchr( _buffer, char_, before_ + 1 ) ) );
 	if ( ! str )
 		return ( -1 );
 	return ( static_cast<int long>( str - _buffer ) );
@@ -1100,7 +1100,7 @@ char* strrnpbrk( char const* const buffer_,
 		return ( NULL );
 	int long stopSetSize( static_cast<int long>( ::std::strlen( stopSet_ ) ) );
 	int long index( length_ - 1 );
-	while ( index )
+	while ( index >= 0 )
 		{
 		if ( ::std::memchr( stopSet_, buffer_[ index ], stopSetSize ) )
 			return ( const_cast<char*>( buffer_ + index ) );
@@ -1116,7 +1116,7 @@ int long strrnspn( char const* const buffer_, char const* const skipSet_,
 	M_PROLOG
 	int long skipSetSize( static_cast<int long>( ::std::strlen( skipSet_ ) ) );
 	int long index( length_ - 1 );
-	while ( index )
+	while ( index >= 0 )
 		{
 		if ( ! ::std::memchr( skipSet_, buffer_[ index ], skipSetSize ) )
 			return ( index );

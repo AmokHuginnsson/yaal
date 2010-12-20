@@ -47,7 +47,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const _word_[];
  */
 class HString
 	{
-	static int long const MAX_STRING_LENGTH = meta::max_signed<int long>::value / 2;
+	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 2 ) - 1;
 	typedef HString this_type;
 private:
 	char*	_buffer; /*!< memory buffer pointer */
@@ -181,13 +181,13 @@ public:
 	int long find( HString const&, int long = 0 ) const;
 	int long nfind( HString const&, int long, int long = 0 ) const;
 	int long reverse_find( char, int long = 0 ) const;
-	int long find_last( char, int long = 0 ) const;
+	int long find_last( char, int long = MAX_STRING_LENGTH ) const;
 	int long find_one_of( char const* const, int long = 0 ) const;
 	int long reverse_find_one_of( char const* const, int long = 0 ) const;
-	int long find_last_one_of( char const* const, int long = 0 ) const;
+	int long find_last_one_of( char const* const, int long = MAX_STRING_LENGTH ) const;
 	int long find_other_than( char const* const, int long = 0 ) const;
 	int long reverse_find_other_than( char const* const, int long = 0 ) const;
-	int long find_last_other_than( char const* const, int long = 0 ) const;
+	int long find_last_other_than( char const* const, int long = MAX_STRING_LENGTH ) const;
 	HString& replace( HString const&, HString const& );
 	HString& upper( void );
 	HString& lower( void );
