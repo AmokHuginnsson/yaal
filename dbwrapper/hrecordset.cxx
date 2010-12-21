@@ -259,7 +259,16 @@ void HSQLDescriptor::sync( int field_, int long& value )
 	{
 	M_PROLOG
 	if ( _mode == MODE::SELECT )
-		value = lexical_cast<int long>( _values[ field_ ] );
+		{
+		try
+			{
+			value = lexical_cast<int long>( _values[ field_ ] );
+			}
+		catch ( HException const& )
+			{
+			/* FIXME implement handling NULL values */
+			}
+		}
 	else
 		_values[ field_ ] = value;
 	M_EPILOG
