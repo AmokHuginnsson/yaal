@@ -152,6 +152,12 @@ public:
 		if ( _initialized )
 			*static_cast<value_type**>( static_cast<void*>( _data ) ) = *static_cast<value_type* const*>( static_cast<void const*>( reinterpret_cast<HOptional const&>( other_)._data ) );
 		}
+	HOptional( HOptional<type_t>& other_ )
+		: _data(), _initialized( other_ )
+		{
+		if ( _initialized )
+			*static_cast<value_type**>( static_cast<void*>( _data ) ) = &*other_;
+		}
 	HOptional& operator = ( HOptional const& other_ )
 		{
 		if ( &other_ != this )

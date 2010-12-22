@@ -189,9 +189,14 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& mode_ )
 						_SQL += ", ";
 					hasField = true;
 					_SQL += _fields[ i ];
-					_SQL += " = '";
-					_SQL += _values[ i ];
-					_SQL += "'";
+					if ( _values[ i ] )
+						{
+						_SQL += " = '";
+						_SQL += *_values[ i ];
+						_SQL += "'";
+						}
+					else
+						_SQL += " = NULL";
 					}
 				}
 			if ( ! _filter.is_empty() )
@@ -249,7 +254,12 @@ void HSQLDescriptor::sync( int field_, HString& value )
 	{
 	M_PROLOG
 	if ( _mode == MODE::SELECT )
-		value = _values[ field_ ];
+		{
+		if ( _values[ field_ ] )
+			value = *_values[ field_ ];
+		else
+			value.clear();
+		}
 	else
 		_values[ field_ ] = value;
 	M_EPILOG
@@ -260,17 +270,13 @@ void HSQLDescriptor::sync( int field_, int long& value )
 	M_PROLOG
 	if ( _mode == MODE::SELECT )
 		{
-		try
-			{
-			value = lexical_cast<int long>( _values[ field_ ] );
-			}
-		catch ( HException const& )
-			{
-			/* FIXME implement handling NULL values */
-			}
+		if ( _values[ field_ ] )
+			value = lexical_cast<int long>( *_values[ field_ ] );
+		else
+			value = 0;
 		}
 	else
-		_values[ field_ ] = value;
+		_values[ field_ ] = HRecordSet::value_t( value );
 	M_EPILOG
 	}
 
@@ -391,12 +397,15 @@ HRecordSet::HIterator HRecordSet::HIterator::operator ++ ( int )
 	M_EPILOG
 	}
 
-yaal::hcore::HString HRecordSet::HIterator::operator[] ( int field_ ) const
+HRecordSet::value_t HRecordSet::HIterator::operator[] ( int field_ ) const
 	{
 	M_PROLOG
 	M_ASSERT( _owner );
-	return ( (_owner->_connector->rs_get)( _owner->_result,
-				_cursorPosition, field_ ) );
+	char const* valRaw( (_owner->_connector->rs_get)( _owner->_result, _cursorPosition, field_ ) );
+	value_t value;
+	if ( valRaw )
+		value = value_t( valRaw );
+	return ( value );
 	M_EPILOG
 	}
 
@@ -445,7 +454,7 @@ void HSQLDescriptor::sync( HRecordSet::iterator const& it )
 	M_EPILOG
 	}
 
-HString& HSQLDescriptor::operator[]( int column_ )
+HSQLDescriptor::value_ref_t HSQLDescriptor::operator[]( int column_ )
 	{
 	M_PROLOG
 	M_ASSERT( ( column_ >= 0 ) && ( column_ <= _fieldCount ) );

@@ -31,6 +31,7 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/hpointer.hxx"
+#include "tools/hoptional.hxx"
 #include "dbwrapper/db_driver_loader.hxx"
 
 namespace yaal
@@ -49,7 +50,8 @@ class HRecordSet
 	typedef HRecordSet this_type;
 public:
 	typedef yaal::hcore::HPointer<HRecordSet> ptr_t;
-	typedef yaal::hcore::HArray<yaal::hcore::HString> values_t;
+	typedef yaal::tools::HOptional<yaal::hcore::HString> value_t;
+	typedef yaal::hcore::HArray<value_t> values_t;
 	class HIterator;
 	typedef HIterator iterator;
 private:
@@ -91,7 +93,7 @@ public:
 	HIterator operator -- ( int );
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
-	yaal::hcore::HString operator[] ( int ) const;
+	HRecordSet::value_t operator[] ( int ) const;
 private:
 	HIterator( HRecordSet*, int long );
 	friend class HRecordSet;
@@ -104,6 +106,7 @@ class HSQLDescriptor
 public:
 	typedef HSQLDescriptor this_type;
 	typedef yaal::hcore::HPointer<this_type> ptr_t;
+	typedef yaal::tools::HOptional<yaal::hcore::HString&> value_ref_t;
 	/*! \brief Query types.
 	 */
 	struct MODE
@@ -127,7 +130,7 @@ private:
 	yaal::hcore::HString _filter;		/* additional constant filter (WHERE clause) */
 	yaal::hcore::HString _sort;			/* additional constant sort (ORDER BY clause) */
 	typedef yaal::hcore::HArray<yaal::hcore::HString> fields_t;
-	typedef yaal::hcore::HArray<yaal::hcore::HString> values_t;
+	typedef HRecordSet::values_t values_t;
 	typedef yaal::hcore::HArray<bool> mutated_t;
 	fields_t _fields;
 	int _fieldCount;		/* number of columns returned by last query */
@@ -152,7 +155,7 @@ public:
 	void sync( int, int long& );
 	void sync( int, yaal::hcore::HString& );
 	void sync( HRecordSet::iterator const& );
-	yaal::hcore::HString& operator[]( int );
+	value_ref_t operator[]( int );
 	yaal::hcore::HString const& build_sql( MODE::mode_t const& );
 	HRecordSet::ptr_t execute( MODE::mode_t const& );
 	HRecordSet::ptr_t execute( char const* const );
