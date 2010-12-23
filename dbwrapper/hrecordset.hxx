@@ -106,7 +106,6 @@ class HSQLDescriptor
 public:
 	typedef HSQLDescriptor this_type;
 	typedef yaal::hcore::HPointer<this_type> ptr_t;
-	typedef yaal::tools::HOptional<yaal::hcore::HString&> value_ref_t;
 	/*! \brief Query types.
 	 */
 	struct MODE
@@ -155,7 +154,7 @@ public:
 	void sync( int, int long& );
 	void sync( int, yaal::hcore::HString& );
 	void sync( HRecordSet::iterator const& );
-	value_ref_t operator[]( int );
+	HRecordSet::value_t& operator[]( int );
 	yaal::hcore::HString const& build_sql( MODE::mode_t const& );
 	HRecordSet::ptr_t execute( MODE::mode_t const& );
 	HRecordSet::ptr_t execute( char const* const );

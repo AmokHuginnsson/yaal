@@ -454,7 +454,7 @@ void HSQLDescriptor::sync( HRecordSet::iterator const& it )
 	M_EPILOG
 	}
 
-HSQLDescriptor::value_ref_t HSQLDescriptor::operator[]( int column_ )
+HRecordSet::value_t& HSQLDescriptor::operator[]( int column_ )
 	{
 	M_PROLOG
 	M_ASSERT( ( column_ >= 0 ) && ( column_ <= _fieldCount ) );
