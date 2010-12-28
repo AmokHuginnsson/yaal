@@ -30,10 +30,12 @@ Copyright:
 #include <new>
 
 #include <iconv.h>
+#include <libexslt/exslt.h>
 #include <libxml/xmlwriter.h>
 #include <libxml/xinclude.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
+#include <libexslt/exsltconfig.h>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -104,6 +106,7 @@ class HXsltParserG : public HSingleton<HXsltParserG>
 
 HXsltParserG::HXsltParserG( void )
 	{
+	exsltRegisterAll();
 	xmlSubstituteEntitiesDefault( 0 );
 //	xmlLoadExtDtdDefaultValue = 1;
 	}
