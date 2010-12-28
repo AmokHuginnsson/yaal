@@ -587,7 +587,7 @@ void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const
 			throw HXmlException( _( "Cannot create the xml DOC writer." ) );
 		doc_resource_t dummy( pDoc, xmlFreeDoc );
 		swap( doc, dummy );
-		int rc = ::xmlTextWriterStartDocument( writer.get(), NULL, _encoding.raw(), "yes" );
+		int rc = ::xmlTextWriterStartDocument( writer.get(), NULL, _encoding.raw(), NULL );
 		if ( rc < 0 )
 			throw HXmlException( HString( "Unable to start document with encoding: " ) + _encoding );
 		if ( indent_ )
