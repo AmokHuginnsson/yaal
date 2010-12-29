@@ -34,6 +34,7 @@ Copyright:
 #include "hcore/trait.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/iterator.hxx"
+#include "hcore/functional.hxx"
 
 namespace yaal
 {
@@ -1005,6 +1006,127 @@ template<typename tType>
 inline tType abs( tType const& val )
 	{
 	return ( val >= 0 ? val : - val );
+	}
+
+/*! \cond */
+template<typename iter_t, typename compare_t>
+void max_heapify( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	return;
+	}
+/*! \endcond */
+
+/*! \brief Make heap from range of elements.
+ *
+ * \param first_ - begining of the heap.
+ * \param last_ - one past the end of the heap.
+ * \param comp_ - comparision operator.
+ */
+template<typename iter_t, typename compare_t>
+void make_heap( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	return;
+	}
+
+/*! \brief Add element to the heap.
+ *
+ * \param first_ - begining of the heap.
+ * \param last_ - one past the end of the heap and new element at the same time.
+ * \param comp_ - comparision operator.
+ */
+template<typename iter_t, typename compare_t>
+void push_heap( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	int long size( last_ - first_ );
+	while ( size && comp_( *( first_ + ( size / 2 ) ), *( first_ + size ) ) )
+		{
+		swap( *( first_ + ( size / 2 ) ), *( first_ + size ) );
+		size >>= 1;
+		}
+	return;
+	}
+
+/*! \brief Add element to the heap.
+ *
+ * \param first_ - begining of the heap.
+ * \param last_ - one past the end of the heap and new element at the same time.
+ */
+template<typename iter_t>
+void push_heap( iter_t first_, iter_t last_ )
+	{
+	push_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+	return;
+	}
+
+/*! \brief Retrieve top element from the heap.
+ *
+ * \param first_ - begining of the heap.
+ * \param last_ - one past the end of the heap.
+ * \param comp_ - comparision operator.
+ */
+template<typename iter_t, typename compare_t>
+void pop_heap( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	return;
+	}
+
+/*! \brief Test if given range of elements forms a heap.
+ *
+ * \param first_ - begining of the heap.
+ * \param last_ - one past the end of the heap.
+ * \param comp_ - comparision operator.
+ */
+template<typename iter_t, typename compare_t>
+bool is_heap( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	bool isHeap( true );
+	int long size( last_ - first_ );
+
+	int long childs( 0 );
+
+	while ( isHeap && ( childs < size ) )
+		{
+		int long roots( childs );
+		childs = ( childs * 2 ) + 1;
+		for ( int long r( roots ), c( childs ); ( r < childs ) && ( c < size ); ++ r, ++ c )
+			{
+			if ( comp_( *( first_ + r ), *( first_ + c ) ) )
+				{
+				isHeap = false;
+				break;
+				}
+			++ c;
+			if ( ( c < size ) && comp_( *( first_ + r ), *( first_ + c ) ) )
+				{
+				isHeap = false;
+				break;
+				}
+			}
+		}
+	return ( isHeap );
+	}
+
+/*! \brief Test if given range of elements forms a heap.
+ *
+ * \param first_ - begining of the heap.
+ * \param last_ - one past the end of the heap.
+ */
+template<typename iter_t>
+bool is_heap( iter_t first_, iter_t last_ )
+	{
+	return ( yaal::is_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+	}
+
+/*! \brief Turn range of elements that is a heap into a sorted range.
+ *
+ * \param first_ - begining of the heap.
+ * \param last_ - one past the end of the heap.
+ * \param comp_ - comparision operator.
+ */
+template<typename iter_t, typename compare_t>
+void sort_heap( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	return;
 	}
 
 }
