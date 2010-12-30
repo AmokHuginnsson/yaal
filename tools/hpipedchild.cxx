@@ -130,6 +130,7 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 	HFSItem image( image_ );
 	M_ENSURE_EX( !! image && image.is_executable(), image_ );
 	M_ENSURE( ( ! ::pipe( fileDesIn ) ) && ( ! ::pipe( fileDesOut ) ) && ( ! ::pipe( fileDesErr ) ) );
+	HChunk argv( chunk_size<char const*>( argv_.size() + 2 ) );
 	_pid = ::fork();
 	M_ENSURE_EX( _pid >= 0, "fork()" );
 	if ( ! _pid )
@@ -141,12 +142,11 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 				|| ( ::dup2( fileDesOut[ 1 ], fileno( stdout ) ) < 0 )
 				|| ( ::dup2( fileDesErr[ 1 ], fileno( stderr ) ) < 0 ) )
 			M_THROW( "dup2", errno );
-		char const** argv = xcalloc<char const*>( argv_.size() + 2 );
-		argv[ 0 ] = image_.raw();
+		argv.get<char const*>()[ 0 ] = image_.raw();
 		int i( 1 );
 		for ( argv_t::const_iterator it( argv_.begin() ), end( argv_.end() ); it != end; ++ it, ++ i )
-			argv[ i ] = it->raw();
-		::execv( argv[ 0 ], const_cast<char* const*>( argv ) );
+			argv.get<char const*>()[ i ] = it->raw();
+		::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
 		M_ENSURE( !"execv" );
 		}
 	else
