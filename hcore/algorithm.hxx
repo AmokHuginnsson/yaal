@@ -1008,14 +1008,6 @@ inline tType abs( tType const& val )
 	return ( val >= 0 ? val : - val );
 	}
 
-/*! \cond */
-template<typename iter_t, typename compare_t>
-void max_heapify( iter_t first_, iter_t last_, compare_t comp_ )
-	{
-	return;
-	}
-/*! \endcond */
-
 /*! \brief Make heap from range of elements.
  *
  * \param first_ - begining of the heap.
@@ -1025,6 +1017,39 @@ void max_heapify( iter_t first_, iter_t last_, compare_t comp_ )
 template<typename iter_t, typename compare_t>
 void make_heap( iter_t first_, iter_t last_, compare_t comp_ )
 	{
+	int long size( last_ - first_ );
+	for ( int long i( ( size / 2 ) - 1 ); i >= 0; -- i )
+		{
+		int long pos( i );
+		while ( pos < size )
+			{
+			int long left( ( pos * 2 ) + 1 );
+			int long right( ( pos * 2 ) + 2 );
+			if ( left < size )
+				{
+				int long child( right < size ? ( comp_( *( first_ + left ), *( first_ + right ) ) ? right : left ) : left );
+				if ( comp_( *( first_ + pos ), *( first_ + child ) ) )
+					swap( *( first_ + pos ), *( first_ + child ) );
+				else
+					break;
+				pos = child;
+				}
+			else
+				break;
+			}
+		}
+	return;
+	}
+
+/*! \brief Make heap from range of elements.
+ *
+ * \param first_ - begining of the heap.
+ * \param last_ - one past the end of the heap.
+ */
+template<typename iter_t>
+void make_heap( iter_t first_, iter_t last_ )
+	{
+	make_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 	}
 
@@ -1037,11 +1062,11 @@ void make_heap( iter_t first_, iter_t last_, compare_t comp_ )
 template<typename iter_t, typename compare_t>
 void push_heap( iter_t first_, iter_t last_, compare_t comp_ )
 	{
-	int long size( last_ - first_ );
-	while ( size && comp_( *( first_ + ( size / 2 ) ), *( first_ + size ) ) )
+	int long pos( ( last_ - first_ ) - 1 ); /* zero based position of inserted element */
+	while ( ( pos > 0 ) && comp_( *( first_ + ( ( pos -1 ) / 2 ) ), *( first_ + pos ) ) )
 		{
-		swap( *( first_ + ( size / 2 ) ), *( first_ + size ) );
-		size >>= 1;
+		swap( *( first_ + ( ( pos - 1 ) / 2 ) ), *( first_ + pos ) );
+		pos = ( pos - 1 ) / 2;
 		}
 	return;
 	}
@@ -1067,6 +1092,40 @@ void push_heap( iter_t first_, iter_t last_ )
 template<typename iter_t, typename compare_t>
 void pop_heap( iter_t first_, iter_t last_, compare_t comp_ )
 	{
+	int long size( ( last_ - first_ ) - 1 );
+	if ( size > 0 )
+		{
+		swap( *first_, *( last_ - 1 ) );
+		int long pos( 0 );
+		while ( pos < size )
+			{
+			int long left( ( pos * 2 ) + 1 );
+			int long right( ( pos * 2 ) + 2 );
+			if ( left < size )
+				{
+				int long child( right < size ? ( comp_( *( first_ + left ), *( first_ + right ) ) ? right : left ) : left );
+				if ( comp_( *( first_ + pos ), *( first_ + child ) ) )
+					swap( *( first_ + pos ), *( first_ + child ) );
+				else
+					break;
+				pos = child;
+				}
+			else
+				break;
+			}
+		}
+	return;
+	}
+
+/*! \brief Retrieve top element from the heap.
+ *
+ * \param first_ - begining of the heap.
+ * \param last_ - one past the end of the heap.
+ */
+template<typename iter_t>
+void pop_heap( iter_t first_, iter_t last_ )
+	{
+	pop_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 	}
 
@@ -1126,6 +1185,20 @@ bool is_heap( iter_t first_, iter_t last_ )
 template<typename iter_t, typename compare_t>
 void sort_heap( iter_t first_, iter_t last_, compare_t comp_ )
 	{
+	for ( int long i( last_ - first_ ); i > 1; -- i )
+		pop_heap( first_, first_ + i, comp_ );
+	return;
+	}
+
+/*! \brief Turn range of elements that is a heap into a sorted range.
+ *
+ * \param first_ - begining of the heap.
+ * \param last_ - one past the end of the heap.
+ */
+template<typename iter_t>
+void sort_heap( iter_t first_, iter_t last_ )
+	{
+	sort_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 	}
 
