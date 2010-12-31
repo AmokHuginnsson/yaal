@@ -19,11 +19,12 @@ extern "C" FILE* tmpfile( void );
 #define timeval timeval_off
 #define gethostname gethostname_off
 #define dup2 dup2_off
-#define getuid ms_getuid
+#define getuid getuid_off
 #include <glibc/unistd.h>
 #undef gethostname
 #include <sys/types.h>
 #include <libintl.h>
+#undef getuid
 #undef timeval
 #undef environ
 #undef select
@@ -38,12 +39,14 @@ extern "C" FILE* tmpfile( void );
 #include <sys/time.h>
 
 #define fork ms_fork
+#define getuid ms_getuid
 #define gethostname ms_gethostname
 
 #include "hcore/macro.hxx"
 #include "emu_unistd.hxx"
 
 int ms_gethostname( char*, int );
+M_YAAL_HCORE_PUBLIC_API uid_t ms_getuid( void );
 
 #if ! defined( HAVE_PTHREAD_SETNAME_NP )
 #define HAVE_PTHREAD_SETNAME_NP 1

@@ -114,8 +114,8 @@ PSID get_base_sid( char* buffer_, int size_ )
 	return ( tokenUser->User.Sid );
 	}
 
-extern "C"
-uid_t getuid( void )
+M_EXPORT_SYMBOL
+uid_t ms_getuid( void )
 	{
 	static int const SID_SIZE( 128 );
 	static int const TOKEN_USER_SIZE( sizeof ( TOKEN_USER ) + SID_SIZE );
