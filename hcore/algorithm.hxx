@@ -1202,6 +1202,32 @@ void sort_heap( iter_t first_, iter_t last_ )
 	return;
 	}
 
+/*! \brief Sort range of elements (sorting algorithm is unstable).
+ *
+ * \param first_ - begining of the range to be sorted.
+ * \param last_ - one past the end of the range to be sorted.
+ * \param comp_ - comparision operator used for sorting.
+ */
+template<typename iter_t, typename compare_t>
+void sort( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	make_heap( first_, last_, comp_ );
+	sort_heap( first_, last_, comp_ );
+	return;
+	}
+
+/*! \brief Sort range of elements (sorting algorithm is unstable).
+ *
+ * \param first_ - begining of the range to be sorted.
+ * \param last_ - one past the end of the range to be sorted.
+ */
+template<typename iter_t>
+void sort( iter_t first_, iter_t last_ )
+	{
+	sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+	return;
+	}
+
 }
 
 #endif /* #ifndef YAAL_HCORE_ALGORITHM_HXX_INCLUDED */
