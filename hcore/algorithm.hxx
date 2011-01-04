@@ -1228,6 +1228,68 @@ void sort( iter_t first_, iter_t last_ )
 	return;
 	}
 
+/*! \brief Remove consecutive duplicates from range.
+ *
+ * \param first_ - begining of range of elements to filter.
+ * \param last_ - one past the end of range of elements to filter.
+ * \param dest_ - begining of destination range.
+ * \param comp_ - uniqeness test predicate.
+ */
+template<typename iter_t, typename iter_out_t, typename compare_t>
+iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_, compare_t comp_ )
+	{
+	if ( first_ != last_ )
+		{
+		*dest_ = *first_;
+		++ first_;
+		for ( ; first_ != last_; ++ first_ )
+			{
+			while ( comp_( *first_, *dest_ ) && ( first_ != last_ ) )
+				++ first_;
+			++ dest_;
+			*dest_ = *first_;
+			}
+		++ dest_;
+		}
+	return ( dest_ );
+	}
+
+/*! \brief Remove consecutive duplicates from range.
+ *
+ * \param first_ - begining of range of elements to filter.
+ * \param last_ - one past the end of range of elements to filter.
+ * \param dest_ - begining of destination range.
+ * \param comp_ - uniqeness test predicate.
+ */
+template<typename iter_t, typename iter_out_t>
+iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_ )
+	{
+	return ( unique_copy( first_, last_, dest_, equal_to<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+	}
+
+/*! \brief Remove consecutive duplicates from range.
+ *
+ * \param first_ - begining of range of elements to filter.
+ * \param last_ - one past the end of range of elements to filter.
+ * \param comp_ - uniqeness test predicate.
+ */
+template<typename iter_t, typename compare_t>
+iter_t unique( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	return ( unique_copy( first_, last_, first_, comp_ ) );
+	}
+
+/*! \brief Remove consecutive duplicates from range.
+ *
+ * \param first_ - begining of range of elements to filter.
+ * \param last_ - one past the end of range of elements to filter.
+ */
+template<typename iter_t>
+iter_t unique( iter_t first_, iter_t last_ )
+	{
+	return ( unique( first_, last_, equal_to<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+	}
+
 }
 
 #endif /* #ifndef YAAL_HCORE_ALGORITHM_HXX_INCLUDED */
