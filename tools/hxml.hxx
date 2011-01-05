@@ -37,6 +37,7 @@ Copyright:
 #include "hcore/hlist.hxx"
 #include "hcore/htree.hxx"
 #include "hcore/hpointer.hxx"
+#include "hcore/hresource.hxx"
 #include "hcore/hhashmap.hxx"
 #include "hcore/hstreaminterface.hxx"
 #include "tools/hoptional.hxx"
@@ -53,8 +54,8 @@ class HXmlData;
  */
 class HXml
 	{
-	typedef HXml this_type;
 public:
+	typedef HXml this_type;
 	class HNode;
 	class HNodeProxy;
 	class HConstNodeProxy;
@@ -80,11 +81,12 @@ private:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
 	typedef enum { TO_EXTERNAL, TO_INTERNAL } way_t;
+	typedef yaal::hcore::HResource<HXmlData> xml_low_t;
 	mutable yaal::hcore::HPointer<OConvert> _convert;
-	mutable yaal::hcore::HString	_convertedString;
-	yaal::hcore::HString	_varTmpBuffer;
-	yaal::hcore::HString	_encoding;
-	HXmlData*							_xml;
+	mutable yaal::hcore::HString _convertedString;
+	yaal::hcore::HString _varTmpBuffer;
+	yaal::hcore::HString _encoding;
+	xml_low_t _xml;
 	entities_t _entities;
 	tree_t _dOM;
 public:
@@ -92,6 +94,9 @@ public:
 	typedef tree_t::const_node_t const_xml_element_t;
 	HXml( void );
 	virtual ~HXml( void );
+	HXml( HXml const& );
+	void swap( HXml& );
+	HXml& operator = ( HXml const& );
 	void init( yaal::hcore::HStreamInterface&, PARSER::parser_t = PARSER::DEFAULT );
 	void init( yaal::hcore::HStreamInterface::ptr_t, PARSER::parser_t = PARSER::DEFAULT );
 	void apply_style( yaal::hcore::HString const& );
@@ -127,9 +132,6 @@ private:
 	const_xml_element_t get_element_by_path( const_xml_element_t const&, yaal::hcore::HString const&, int ) const;
 	void parse_dtd( void* );
 	char const* error_message( int ) const;
-private:
-	HXml( HXml const& );
-	HXml& operator = ( HXml const& );
 	};
 
 /*! \brief Basic building block of XML document.
@@ -388,6 +390,9 @@ yaal::hcore::HString const& attr_val( HXml::HConstIterator const& it, char const
 }
 
 }
+
+inline void swap( yaal::tools::HXml& a, yaal::tools::HXml& b )
+	{ a.swap( b ); }
 
 }
 

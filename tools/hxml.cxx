@@ -44,7 +44,6 @@ M_VCSID( "$Id: "__TID__" $" )
 
 #include "hcore/htokenizer.hxx"
 #include "hcore/hsingleton.hxx"
-#include "hcore/hresource.hxx"
 #include "hcore/hlog.hxx"
 #include "tools.hxx"
 #include "streamtools.hxx"
@@ -58,12 +57,11 @@ namespace
 /* char schema_err[] = "bad xml schema"; */
 typedef HResource<xmlDoc, void (*)( xmlDocPtr )> doc_resource_t;
 typedef HResource<xmlTextWriter, void (*)( xmlTextWriterPtr )> writer_resource_t;
-typedef HResource<xmlCharEncodingHandler, int (*)( xmlCharEncodingHandler* )> encoder_resource_t;
-typedef HResource<xsltStylesheet, void (*)( xsltStylesheetPtr )> style_resource_t;
+typedef HPointer<xmlCharEncodingHandler, HPointerScalar, HPointerStrict, int (*)( xmlCharEncodingHandler* )> encoder_resource_t;
+typedef HPointer<xsltStylesheet, HPointerScalar, HPointerStrict, void (*)( xsltStylesheetPtr )> style_resource_t;
 typedef HResource<xmlXPathContext, void (*)( xmlXPathContextPtr )> xpath_context_resource_t;
 typedef HResource<xmlXPathObject, void (*)( xmlXPathObjectPtr )> xpath_object_resource_t;
 typedef HResource<xmlOutputBuffer, int (*)( xmlOutputBufferPtr )> outputbuffer_resource_t;
-typedef HPointer<encoder_resource_t> encoder_resource_ptr_t;
 
 char const* const FULL_TREE = "//*";
 
@@ -121,7 +119,7 @@ HXsltParserG::~HXsltParserG( void )
 
 struct HXml::OConvert
 	{
-	encoder_resource_ptr_t _encoder;
+	encoder_resource_t _encoder;
 	iconv_t _iconvToExternal;
 	iconv_t _iconvToInternal;
 	OConvert( void ) 
@@ -151,10 +149,9 @@ struct HXml::OConvert
 		xmlCharEncodingHandlerPtr encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
 		if ( ! encoder )
 			M_THROW( _( "cannot enable internal convertion" ), errno );
-		_encoder = encoder_resource_ptr_t(
-				new encoder_resource_t( encoder, xmlCharEncCloseFunc ) );
-		_iconvToExternal = (*_encoder).get()->iconv_in;
-		_iconvToInternal = (*_encoder).get()->iconv_out;
+		_encoder = encoder_resource_t( encoder, xmlCharEncCloseFunc );
+		_iconvToExternal = _encoder->iconv_in;
+		_iconvToInternal = _encoder->iconv_out;
 		M_EPILOG
 		}
 	void init( yaal::hcore::HString const& encoding_, xmlNodePtr root_, yaal::hcore::HString const& fileName_ )
@@ -177,10 +174,9 @@ struct HXml::OConvert
 			}
 		if ( ! encoder )
 			M_THROW( _( "cannot enable internal convertion" ), errno );
-		_encoder = encoder_resource_ptr_t(
-				new encoder_resource_t( encoder, xmlCharEncCloseFunc ) );
-		_iconvToExternal = (*_encoder).get()->iconv_in;
-		_iconvToInternal = (*_encoder).get()->iconv_out;
+		_encoder = encoder_resource_t( encoder, xmlCharEncCloseFunc );
+		_iconvToExternal = _encoder->iconv_in;
+		_iconvToInternal = _encoder->iconv_out;
 		M_EPILOG
 		}
 	bool operator ! ( void ) const
@@ -192,22 +188,19 @@ struct HXml::OConvert
 class HXmlData
 	{
 private:
-	/*{*/
 	friend class HXml;
 	doc_resource_t     _doc;
 	style_resource_t   _style;
 	mutable xpath_context_resource_t _xPathContext;
 	mutable xpath_object_resource_t _xPathObject;
 	xmlNodeSetPtr      _nodeSet;
-	/*}*/
-protected:
-	/*{*/
-	HXmlData( void );
+public:
 	virtual ~HXmlData( void );
-	HXmlData( HXmlData const& ) __attribute__(( __noreturn__ ));
+protected:
+	HXmlData( void );
+	HXmlData( HXmlData const& );
 	HXmlData& operator = ( HXmlData const& ) __attribute__(( __noreturn__ ));
 	void clear( void ) const;
-	/*}*/
 	};
 
 HXmlData::HXmlData( void )
@@ -215,6 +208,17 @@ HXmlData::HXmlData( void )
 	_nodeSet( NULL )
 	{
 	M_PROLOG
+	return;
+	M_EPILOG
+	}
+
+HXmlData::HXmlData( HXmlData const& xmlData_ )
+	: _doc(), _style(), _xPathContext(), _xPathObject(),
+	_nodeSet( NULL )
+	{
+	M_PROLOG
+	_doc = doc_resource_t( ::xmlCopyDoc( const_cast<xmlDoc*>( xmlData_._doc.get() ), 1 ), &::xmlFreeDoc );
+	_style = xmlData_._style;
 	return;
 	M_EPILOG
 	}
@@ -237,22 +241,57 @@ void HXmlData::clear( void ) const
 
 HXml::HXml( void )
 	: _convert( new HXml::OConvert ), _convertedString(),
-	_varTmpBuffer(), _encoding( _defaultEncoding_ ), _xml( NULL ),
+	_varTmpBuffer(), _encoding( _defaultEncoding_ ), _xml(),
 	_entities(), _dOM()
 	{
 	M_PROLOG
-	_xml = new ( std::nothrow ) HXmlData();
-	M_ENSURE( _xml );
+	_xml = xml_low_t( new ( std::nothrow ) HXmlData() );
+	M_ENSURE( _xml.get() );
 	M_EPILOG
+	return;
+	}
+
+HXml::HXml( HXml const& xml_ )
+	: _convert( xml_._convert ), _convertedString( xml_._convertedString ),
+	_varTmpBuffer( xml_._varTmpBuffer ), _encoding( xml_._encoding ), _xml(),
+	_entities( xml_._entities ), _dOM( xml_._dOM )
+	{
+	M_PROLOG
+	_xml = xml_low_t( new ( std::nothrow ) HXmlData( *xml_._xml ) );
+	M_ENSURE( _xml.get() );
+	M_EPILOG
+	return;
+	}
+
+HXml& HXml::operator = ( HXml const& xml_ )
+	{
+	if ( &xml_ != this )
+		{
+		HXml tmp( xml_ );
+		swap( tmp );
+		}
+	return ( *this );
+	}
+
+void HXml::swap( HXml& xml_ )
+	{
+	if ( &xml_ != this )
+		{
+		using yaal::swap;
+		swap( xml_._convert, _convert );
+		swap( xml_._convertedString, _convertedString );
+		swap( xml_._varTmpBuffer, _varTmpBuffer );
+		swap( xml_._encoding, _encoding );
+		swap( xml_._xml, _xml );
+		swap( xml_._entities, _entities );
+		swap( xml_._dOM, _dOM );
+		}
 	return;
 	}
 
 HXml::~HXml ( void )
 	{
 	M_PROLOG
-	if ( _xml )
-		delete _xml;
-	_xml = NULL;
 	return;
 	M_EPILOG
 	}
@@ -325,10 +364,12 @@ int HXml::get_node_set_by_path( yaal::hcore::HString const& path_ )
 			{
 			_varTmpBuffer = path_;
 			_xml->_nodeSet = obj.get()->nodesetval;
+			using yaal::swap;
 			swap( _xml->_xPathObject, obj );
 			setSize = _xml->_nodeSet ? _xml->_nodeSet->nodeNr : 0;
 			}
 		}
+	using yaal::swap;
 	swap( _xml->_xPathContext, ctx );
 	return ( setSize );
 	M_EPILOG
@@ -368,6 +409,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, PARSER::parser_t parser_
 #endif /* __DEBUGGER_BABUNI__ */
 	(*_convert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
 			root, streamId );
+	using yaal::swap;
 	swap( _xml->_doc, doc );
 	parse_dtd( _xml->_doc.get()->intSubset );
 	return;
@@ -498,6 +540,7 @@ void HXml::apply_style( yaal::hcore::HString const& path_ )
 	if ( ! doc.get() )
 		throw HXmlException( HString( "cannot apply stylesheet: " ) + path_ );
 	_xml->clear();
+	using yaal::swap;
 	swap( _xml->_doc, doc );
 	swap( _xml->_style, style );
 	M_EPILOG
@@ -589,6 +632,7 @@ void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const
 		if ( ! writer.get() )
 			throw HXmlException( _( "Cannot create the xml DOC writer." ) );
 		doc_resource_t dummy( pDoc, xmlFreeDoc );
+		using yaal::swap;
 		swap( doc, dummy );
 		int rc = ::xmlTextWriterStartDocument( writer.get(), NULL, _encoding.raw(), NULL );
 		if ( rc < 0 )
@@ -629,9 +673,12 @@ void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const
 		}
 	_xml->clear();
 	if ( _xml->_doc.get() )
-		xmlFreeNode( xmlDocSetRootElement( _xml->_doc.get(), xmlDocGetRootElement( doc.get() ) ) );
+		xmlFreeNode( xmlDocSetRootElement( const_cast<xmlDoc*>( _xml->_doc.get() ), xmlDocGetRootElement( doc.get() ) ) );
 	else
-		swap( _xml->_doc, doc );
+		{
+		using yaal::swap;
+		swap( const_cast<doc_resource_t&>( _xml->_doc ), doc );
+		}
 	M_ASSERT( _xml->_doc.get() );
 	if ( _xml->_style.get() )
 		{
@@ -639,12 +686,12 @@ void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const
 							NULL, &stream, ::xmlFindCharEncodingHandler( _encoding.raw() ) ),
 				xmlOutputBufferClose );
 		M_ENSURE( ::xsltSaveResultTo( obuf.get(),
-					_xml->_doc.get(), _xml->_style.get() ) != -1 );
+					const_cast<xmlDoc*>( _xml->_doc.get() ), const_cast<xsltStylesheet*>( _xml->_style.get() ) ) != -1 );
 		}
 	else
 		M_ENSURE( ::xmlSaveFileTo( ::xmlOutputBufferCreateIO( writer_callback,
 						NULL, &stream, ::xmlFindCharEncodingHandler( _encoding.raw() ) ),
-					_xml->_doc.get(), _encoding.raw() ) != -1 );
+					const_cast<xmlDoc*>( _xml->_doc.get() ), _encoding.raw() ) != -1 );
 	return;
 	M_EPILOG
 	}
