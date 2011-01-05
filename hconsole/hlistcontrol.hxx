@@ -343,12 +343,13 @@ protected:
 	iterator_t _firstVisibleRow;	/*!< pointer to first visible row */
 	list_control_helper::HAbstractControler::ptr_t _controler;
 public:
-	HListControl ( HWindow*,		 	/* parent */
-								 int,						/* row */
-								 int,						/* col */
-								 int,						/* height */
-								 int,						/* width */
-								 char const*, list_control_helper::HAbstractControler::ptr_t const& = list_control_helper::HListControler<>::ptr_t( new list_control_helper::HListControler<>( list_control_helper::HListControler<>::model_ptr_t( new list_control_helper::HListControler<>::model_t() ) ) ) );	/* label */
+	HListControl( HWindow* /* parent */,
+			int /* row */,
+			int /* col */,
+			int /* height */,
+			int /* width */,
+			char const*,
+			list_control_helper::HAbstractControler::ptr_t const& = list_control_helper::HListControler<>::ptr_t( new list_control_helper::HListControler<>( list_control_helper::HListControler<>::model_ptr_t( new list_control_helper::HListControler<>::model_t() ) ) ) );	/* label */
 	virtual ~HListControl ( void );
 	void add_column( int,									/* at position */
 			char const*,									/* column name */
