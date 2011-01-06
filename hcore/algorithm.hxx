@@ -570,6 +570,61 @@ yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_
 	return ( make_pair( it1, it2 ) );
 	}
 
+/*! \brief Merges in polaces two consecutive sorted ranges of elements into one sorted range of elements.
+ *
+ * \param first_ - begining of first range.
+ * \param mid_ - one past the end of first range and beginning of second range.
+ * \param last_ - end of second range.
+ * \param comp_ - comparision operator.
+ */
+template<typename iter_t, typename compare_t>
+void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ )
+	{
+	iter_t sec( mid_ );
+	for ( iter_t it( first_ ); it != mid_; ++ it )
+		{
+		while ( ( sec != last_ ) && comp_( *it, *sec ) )
+			++ it;
+		}
+	return;
+	}
+
+/*! \brief Merges in polaces two consecutive sorted ranges of elements into one sorted range of elements.
+ *
+ * \param first_ - begining of first range.
+ * \param mid_ - one past the end of first range and beginning of second range.
+ * \param last_ - end of second range.
+ */
+template<typename iter_t, typename compare_t>
+void inplace_merge( iter_t first_, iter_t mid_, iter_t last_ )
+	{
+	inplace_merge( first_, mid_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+	return;
+	}
+
+/*! \brief Joins two sorted ranges of elements into one sorted range of elements.
+ *
+ * \param it1 - begining of first range.
+ * \param end1 - one past the end of first range.
+ * \param it2 - begining of second range.
+ * \param end2 - one past the end of second range.
+ * \param out - destination container extender functor.
+ * \param comp_ - comparision operator.
+ */
+template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t, typename compare_t>
+iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out, compare_t comp_ )
+	{
+	for ( ; it1 != end1; ++ it1, ++ out )
+		{
+		for ( ; ( it2 != end2 ) && comp_( *it2, *it1 ); ++ it2, ++ out )
+			*out = *it2;
+		*out = *it1;
+		}
+	for ( ; it2 != end2; ++ it2, ++ out )
+		*out = *it2;
+	return ( out );
+	}
+
 /*! \brief Joins two sorted ranges of elements into one sorted range of elements.
  *
  * \param it1 - begining of first range.
@@ -581,15 +636,7 @@ yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
 iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out )
 	{
-	for ( ; it1 != end1; ++ it1, ++ out )
-		{
-		for ( ; ( it2 != end2 ) && ( *it2 < *it1 ); ++ it2, ++ out )
-			*out = *it2;
-		*out = *it1;
-		}
-	for ( ; it2 != end2; ++ it2, ++ out )
-		*out = *it2;
-	return ( out );
+	return ( merge( it1, end1, it2, end2, less<typename hcore::iterator_traits<iter_in1_t>::value_type>() ) );
 	}
 
 /*! \brief Create union of two sorted ranges of elements.
