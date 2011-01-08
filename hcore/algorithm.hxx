@@ -599,6 +599,21 @@ iter_t rotate( iter_t first_, iter_t mid_, iter_t last_ )
 	return ( newMid );
 	}
 
+/*! \brief Rotate range of elements, or "swap" two consecutive ranges of elements storing result in another range.
+ * \param first_ - begining of range to rotate, or begining of first range to "swap".
+ * \param mid_ - the rotation point, or one past end of first range to "swap" and begining of the second range.
+ * \param last_ - one past end of range to rotate, or one past end of the second range to "swap".
+ * \param out_ - begining of detination range.
+ * \return A rotation point that could be used to revert the operation, or new begining of new second range.
+ */
+template<typename iter_t, typename out_it_t>
+out_it_t rotate_copy( iter_t first_, iter_t mid_, iter_t last_, out_it_t out_ )
+	{
+	out_it_t it( copy( mid_, last_, out_ ) );
+  it = copy( first_, mid_, it );
+	return ( it );
+	}
+
 /*! \brief Merges in place two consecutive sorted ranges of elements into one sorted range of elements.
  *
  * \param first_ - begining of first range.
