@@ -570,7 +570,36 @@ yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_
 	return ( make_pair( it1, it2 ) );
 	}
 
-/*! \brief Merges in polaces two consecutive sorted ranges of elements into one sorted range of elements.
+/*! \brief Rotate range of elements, or "swap" two consecutive ranges of elements.
+ * \param first_ - begining of range to rotate, or begining of first range to "swap".
+ * \param mid_ - the rotation point, or one past end of first range to "swap" and begining of the second range.
+ * \param last_ - one past end of range to rotate, or one past end of the second range to "swap".
+ * \return A rotation point that could be used to revert the operation, or new begining of new second range.
+ */
+template<typename iter_t>
+iter_t rotate( iter_t first_, iter_t mid_, iter_t last_ )
+	{
+	iter_t mid( mid_ );
+	iter_t newMid;
+	iter_t it( mid_ );
+	while ( first_ != it )
+		{
+		swap( *first_, *it );
+		++ first_, ++ it, ++ mid;
+		if ( it == last_ )
+			it = mid_;
+		else if ( first_ == mid_ )
+			mid_ = it;
+		if ( mid == last_ )
+			{
+			newMid = first_;
+			mid = first_;
+			}
+		}
+	return ( newMid );
+	}
+
+/*! \brief Merges in place two consecutive sorted ranges of elements into one sorted range of elements.
  *
  * \param first_ - begining of first range.
  * \param mid_ - one past the end of first range and beginning of second range.
@@ -926,7 +955,7 @@ int long distance( type_t* first_, type_t* last_ )
 template<typename iter_t>
 int long distance( iter_t first, iter_t last )
 	{
-	int long dist = 0;
+	int long dist( 0 );
 	while ( first != last )
 		++ first, ++ dist;
 	return ( dist );
