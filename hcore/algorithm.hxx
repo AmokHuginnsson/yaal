@@ -580,7 +580,7 @@ template<typename iter_t>
 iter_t rotate( iter_t first_, iter_t mid_, iter_t last_ )
 	{
 	iter_t mid( mid_ );
-	iter_t newMid;
+	iter_t newMid( last_ );
 	iter_t it( mid_ );
 	while ( first_ != it )
 		{
@@ -624,11 +624,19 @@ out_it_t rotate_copy( iter_t first_, iter_t mid_, iter_t last_, out_it_t out_ )
 template<typename iter_t, typename compare_t>
 void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ )
 	{
-	iter_t sec( mid_ );
-	for ( iter_t it( first_ ); it != mid_; ++ it )
+	iter_t it( mid_ );
+	while ( ( first_ != it ) && ( it != last_ ) )
 		{
-		while ( ( sec != last_ ) && comp_( *it, *sec ) )
+		while ( ( first_ != it ) && ! comp_( *it, *first_ ) )
+			++ first_;
+		while ( ( it != last_ ) && comp_( *it, *first_ ) )
 			++ it;
+		first_ = rotate( first_, mid_, it );
+		mid_ = it;
+		if ( it == last_ )
+			it = mid_;
+		else if ( first_ == mid_ )
+			mid_ = it;
 		}
 	return;
 	}
@@ -639,7 +647,7 @@ void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ )
  * \param mid_ - one past the end of first range and beginning of second range.
  * \param last_ - end of second range.
  */
-template<typename iter_t, typename compare_t>
+template<typename iter_t>
 void inplace_merge( iter_t first_, iter_t mid_, iter_t last_ )
 	{
 	inplace_merge( first_, mid_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
