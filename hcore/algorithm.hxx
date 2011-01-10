@@ -688,7 +688,7 @@ iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t en
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
 iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out )
 	{
-	return ( merge( it1, end1, it2, end2, less<typename hcore::iterator_traits<iter_in1_t>::value_type>() ) );
+	return ( merge( it1, end1, it2, end2, out, less<typename hcore::iterator_traits<iter_in1_t>::value_type>() ) );
 	}
 
 /*! \brief Create union of two sorted ranges of elements.
@@ -1324,6 +1324,63 @@ template<typename iter_t>
 void sort( iter_t first_, iter_t last_ )
 	{
 	sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+	return;
+	}
+
+/*! \cond */
+template<typename iter_t, typename compare_t>
+void insert_sort( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	while ( first_ != last_ )
+		{
+		iter_t it( min_element( first_, last_, comp_ ) );
+		if ( it != first_ )
+			swap( *it, *first_ );
+		++ first_;
+		}
+	return;
+	}
+/*! \endcond */
+
+namespace
+{
+static int const YAAL_MERGE_SORT_THRESHOLD = 16;
+}
+
+/*! \brief Perform stable sort of range of elements (sorting algorithm is unstable).
+ *
+ * \param first_ - begining of the range to be sorted.
+ * \param last_ - one past the end of the range to be sorted.
+ * \param comp_ - comparision operator used for sorting.
+ */
+template<typename iter_t, typename compare_t>
+void stable_sort( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	using yaal::distance;
+	int long size( distance( first_, last_ ) );
+	if ( size < YAAL_MERGE_SORT_THRESHOLD )
+		insert_sort( first_, last_, comp_ );
+	else
+		{
+		iter_t mid( first_ );
+		using yaal::advance;
+		advance( mid, size / 2 );
+		stable_sort( first_, mid, comp_ );
+		stable_sort( mid, last_, comp_ );
+		inplace_merge( first_, mid, last_, comp_ );
+		}
+	return;
+	}
+
+/*! \brief Perform stable sort of range of elements (sorting algorithm is unstable).
+ *
+ * \param first_ - begining of the range to be sorted.
+ * \param last_ - one past the end of the range to be sorted.
+ */
+template<typename iter_t>
+void stable_sort( iter_t first_, iter_t last_ )
+	{
+	stable_sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 	}
 
