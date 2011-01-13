@@ -35,6 +35,8 @@ Copyright:
 #include "hcore/hpair.hxx"
 #include "hcore/iterator.hxx"
 #include "hcore/functional.hxx"
+#include "hcore/system.hxx"
+#include "hcore/hauxiliarybuffer.hxx"
 
 namespace yaal
 {
@@ -614,15 +616,77 @@ out_it_t rotate_copy( iter_t first_, iter_t mid_, iter_t last_, out_it_t out_ )
 	return ( it );
 	}
 
-/*! \brief Merges in place two consecutive sorted ranges of elements into one sorted range of elements.
+/*! \brief Get smaller of two values.
  *
- * \param first_ - begining of first range.
- * \param mid_ - one past the end of first range and beginning of second range.
- * \param last_ - end of second range.
- * \param comp_ - comparision operator.
+ * \param left - first value to be considered as smaller.
+ * \param right -  second value to be considered as smaller.
+ * \return Smaller of two values.
  */
+template<typename tType>
+inline tType min( tType const& left, tType const& right )
+	{
+	return ( left < right ? left : right );
+	}
+
+/*! \brief Get bigger of two values.
+ *
+ * \param left - first value to be considered as bigger.
+ * \param right -  second value to be considered as bigger.
+ * \return Bigger of two values.
+ */
+template<typename tType>
+inline tType max( tType const& left, tType const& right )
+	{
+	return ( left >= right ? left : right );
+	}
+
+/*! \cond */
+template<typename type_t>
+int long distance( type_t* first_, type_t* last_ )
+	{
+	M_ASSERT( last_ > first_ );
+	return ( last_ - first_ );
+	}
+/*! \endcond */
+/*! \brief Calculate distance between two iterators.
+ *
+ * \param first - iterator.
+ * \param last - iterator.
+ * \return last - first.
+ */
+template<typename iter_t>
+int long distance( iter_t first, iter_t last )
+	{
+	int long dist( 0 );
+	while ( first != last )
+		++ first, ++ dist;
+	return ( dist );
+	}
+
+/*! \cond */
+template<typename type_t>
+void advance( type_t*& it_, int long distance_ )
+	{ it_ += distance_; }
+/*! \endcond */
+/*! \brief Move iterator forward.
+ *
+ * \param it - iterator to be moved.
+ * \param dist - how far iterator shall be moved.
+ */
+template<typename iter_t>
+void advance( iter_t& it, int long dist )
+	{
+	for ( int long i = 0; i < dist; ++ i, ++ it )
+		;
+	}
+
+/*! \cond */
+namespace
+{
+static int const YAAL_MERGE_ALGO_THRESHOLD = 16;
+}
 template<typename iter_t, typename compare_t>
-void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ )
+void inplace_merge_inplace( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ )
 	{
 	iter_t it( mid_ );
 	while ( ( first_ != it ) && ( it != last_ ) )
@@ -640,8 +704,39 @@ void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ )
 		}
 	return;
 	}
+template<typename iter_t, typename compare_t>
+void inplace_merge_auxilary_buffer( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_, int long couldCopy_ )
+	{
+	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
+	using yaal::distance;
+	int long count( distance( first_, mid_ ) );
+	int long auxSize( min( count, couldCopy_ ) );
+	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
+	aux_t aux( first_, mid_ );
+	return;
+	}
+/*! \endcond */
 
-/*! \brief Merges in polaces two consecutive sorted ranges of elements into one sorted range of elements.
+/*! \brief Merges in place two consecutive sorted ranges of elements into one sorted range of elements.
+ *
+ * \param first_ - begining of first range.
+ * \param mid_ - one past the end of first range and beginning of second range.
+ * \param last_ - end of second range.
+ * \param comp_ - comparision operator.
+ */
+template<typename iter_t, typename compare_t>
+void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ )
+	{
+	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
+	int long couldCopy( hcore::system::get_available_memory_size() / sizeof ( value_t ) );
+	if ( couldCopy > YAAL_MERGE_ALGO_THRESHOLD )
+		inplace_merge_auxilary_buffer( first_, mid_, last_, comp_, couldCopy );
+	else
+		inplace_merge_inplace( first_, mid_, last_, comp_ );
+	return;
+	}
+
+/*! \brief Merges in place two consecutive sorted ranges of elements into one sorted range of elements.
  *
  * \param first_ - begining of first range.
  * \param mid_ - one past the end of first range and beginning of second range.
@@ -961,70 +1056,6 @@ return_t accumulate( iterator_t it, iterator_t end, return_t ret )
 	return ( ret );
 	}
 
-/*! \cond */
-template<typename type_t>
-int long distance( type_t* first_, type_t* last_ )
-	{
-	M_ASSERT( last_ > first_ );
-	return ( last_ - first_ );
-	}
-/*! \endcond */
-/*! \brief Calculate distance between two iterators.
- *
- * \param first - iterator.
- * \param last - iterator.
- * \return last - first.
- */
-template<typename iter_t>
-int long distance( iter_t first, iter_t last )
-	{
-	int long dist( 0 );
-	while ( first != last )
-		++ first, ++ dist;
-	return ( dist );
-	}
-
-/*! \cond */
-template<typename type_t>
-void advance( type_t*& it_, int long distance_ )
-	{ it_ += distance_; }
-/*! \endcond */
-/*! \brief Move iterator forward.
- *
- * \param it - iterator to be moved.
- * \param dist - how far iterator shall be moved.
- */
-template<typename iter_t>
-void advance( iter_t& it, int long dist )
-	{
-	for ( int long i = 0; i < dist; ++ i, ++ it )
-		;
-	}
-
-/*! \brief Get smaller of two values.
- *
- * \param left - first value to be considered as smaller.
- * \param right -  second value to be considered as smaller.
- * \return Smaller of two values.
- */
-template<typename tType>
-inline tType min( tType const& left, tType const& right )
-	{
-	return ( left < right ? left : right );
-	}
-
-/*! \brief Get bigger of two values.
- *
- * \param left - first value to be considered as bigger.
- * \param right -  second value to be considered as bigger.
- * \return Bigger of two values.
- */
-template<typename tType>
-inline tType max( tType const& left, tType const& right )
-	{
-	return ( left >= right ? left : right );
-	}
-
 /*! \brief Find minimum element in a range.
  *
  * \param it - begining of the range to search thru.
@@ -1342,11 +1373,6 @@ void insert_sort( iter_t first_, iter_t last_, compare_t comp_ )
 	}
 /*! \endcond */
 
-namespace
-{
-static int const YAAL_MERGE_SORT_THRESHOLD = 16;
-}
-
 /*! \brief Perform stable sort of range of elements (sorting algorithm is unstable).
  *
  * \param first_ - begining of the range to be sorted.
@@ -1358,7 +1384,7 @@ void stable_sort( iter_t first_, iter_t last_, compare_t comp_ )
 	{
 	using yaal::distance;
 	int long size( distance( first_, last_ ) );
-	if ( size < YAAL_MERGE_SORT_THRESHOLD )
+	if ( size < YAAL_MERGE_ALGO_THRESHOLD )
 		insert_sort( first_, last_, comp_ );
 	else
 		{
