@@ -203,6 +203,7 @@ public:
 	HString right( int long ) const;
 	HString& trim_left( char const* const = _whiteSpace_ );
 	HString& trim_right( char const* const = _whiteSpace_ );
+	HString& trim( char const* const = _whiteSpace_ );
 	HString& shift_left( int long );
 	HString& shift_right( int long, char const = ' ' );
 	/*! \brief Fill portion of string with constatnt value.

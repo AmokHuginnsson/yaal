@@ -59,6 +59,8 @@ private:
 	mutable HString _buffer;
 public:
 	class HIterator;
+	typedef HIterator iterator;
+	typedef HIterator const_iterator;
 public:
 	HTokenizer( HString const&, HString const&, behavoir_t const& = INCLUDE_EMPTY );
 	HTokenizer( HString const&, behavoir_t const& = INCLUDE_EMPTY );

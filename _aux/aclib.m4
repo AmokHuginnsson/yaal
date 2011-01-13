@@ -81,23 +81,28 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 		AC_SUBST([SERIAL_DEVICE],['ttyS0'])
 	fi
 	if test ["x${HOST_OS_TYPE}"] = ["xDebian"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] \) ; then
-		AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your operating system is Debian.])
+		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+		AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your specific linux version is Debian.])
 		HOST_OS_TYPE=[Debian]
 		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(*)_main\""]
 	elif test ["x${HOST_OS_TYPE}"] = ["xUbuntu"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/00-header] \) ; then
-		AC_DEFINE([__HOST_OS_TYPE_UBUNTU__], [], [Your operating system is Ubuntu.])
+		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+		AC_DEFINE([__HOST_OS_TYPE_UBUNTU__], [], [Your specific linux version is Ubuntu.])
 		HOST_OS_TYPE=[Ubuntu]
 		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(*)_main\""]
 	elif test ["x${HOST_OS_TYPE}"] = ["xCentOS"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
-		AC_DEFINE([__HOST_OS_TYPE_CENTOS__], [], [Your operating system is CentOS.])
+		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+		AC_DEFINE([__HOST_OS_TYPE_CENTOS__], [], [Your specific linux version is CentOS.])
 		HOST_OS_TYPE=[CentOS]
 		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(*)_main\""]
 	elif test ["x${HOST_OS_TYPE}"] = ["xPLD"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/poldek/poldek.conf] \) ; then
-		AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your operating system is PLD.])
+		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+		AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your specific linux version is PLD.])
 		HOST_OS_TYPE=[PLD]
 		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(*)_main\""]
 	elif test ["x${HOST_OS_TYPE}"] = ["xSlackware"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/random-seed] \) ; then
-		AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__], [], [Your operating system is Slackware.])
+		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+		AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__], [], [Your specific linux version is Slackware.])
 		HOST_OS_TYPE=[Slackware]
 		YAAL_LXXFLAGS=["-Wl,--entry=\"yaal_\$(*)_main\""]
 	elif test ["x${HOST_OS_TYPE}"] != ["x"] ; then

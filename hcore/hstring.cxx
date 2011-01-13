@@ -882,6 +882,15 @@ HString& HString::trim_right( char const* const set_ )
 	M_EPILOG
 	}
 
+HString& HString::trim( char const* const set_ )
+	{
+	M_PROLOG
+	trim_left( set_ );
+	trim_right( set_ );
+	return ( *this );
+	M_EPILOG
+	}
+
 HString& HString::shift_left( int long shift_ )
 	{
 	M_PROLOG

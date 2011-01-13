@@ -69,6 +69,11 @@ yaal::hcore::HString get_user_name( int uid_ );
  */
 yaal::hcore::HString get_group_name( int gid_ );
 
+/*! \brief Get amount of free/avaialable for allocation memory.
+ * \return Available memory size in bytes.
+ */
+int long get_available_memory_size( void );
+
 }
 
 }

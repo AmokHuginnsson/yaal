@@ -37,6 +37,8 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "algorithm.hxx"
 #include "hclock.hxx"
 #include "hchunk.hxx"
+#include "hfile.hxx"
+#include "htokenizer.hxx"
 
 namespace yaal
 {
@@ -142,6 +144,47 @@ HString get_group_name( int gid_ )
 	group* any( NULL );
 	M_ENSURE( ! getgrgid_r( gid_, &groupInfo, buffer.get<char>(), bufferSize, &any ) );
 	return ( any ? HString( groupInfo.gr_name ) : HString( gid_ ) );
+	M_EPILOG
+	}
+
+int long get_available_memory_size( void )
+	{
+	M_PROLOG
+#ifdef __HOST_OS_TYPE_LINUX__
+	int long availableMemory( 0 );
+	try
+		{
+		HFile meminfo( "/proc/meminfo", HFile::OPEN::READING );
+		HString line;
+		HTokenizer t( line, ":" );
+		HString tokens;
+		while ( meminfo.read_line( line ) > 0 )
+			{
+			t.assign( line );
+			if ( t.begin() != t.end() )
+				{
+				tokens = *t.begin();
+				if ( ! strcasecmp( tokens, "MemFree" ) )
+					{
+					HTokenizer::iterator it( t.begin() );
+					++ it;
+					if ( it != t.end() )
+						{
+						tokens = *it;
+						tokens.trim();
+						availableMemory = lexical_cast<int long>( tokens ) * 1024;
+						}
+					}
+				}
+			}
+		}
+	catch ( HException const& )
+		{
+		}
+	return ( availableMemory );
+#else /* #ifdef __HOST_OS_TYPE_LINUX__ */
+	return ( 0 );
+#endif /* #else #ifdef __HOST_OS_TYPE_LINUX__ */
 	M_EPILOG
 	}
 
