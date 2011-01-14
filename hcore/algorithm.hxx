@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	algorithm.hxx - this file is integral part of `yaal' project.
+	hcore/algorithm.hxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -35,7 +35,7 @@ Copyright:
 #include "hcore/hpair.hxx"
 #include "hcore/iterator.hxx"
 #include "hcore/functional.hxx"
-#include "hcore/system.hxx"
+#include "hcore/algorithm_impl.hxx"
 #include "hcore/hauxiliarybuffer.hxx"
 
 namespace yaal
@@ -616,139 +616,6 @@ out_it_t rotate_copy( iter_t first_, iter_t mid_, iter_t last_, out_it_t out_ )
 	return ( it );
 	}
 
-/*! \brief Get smaller of two values.
- *
- * \param left - first value to be considered as smaller.
- * \param right -  second value to be considered as smaller.
- * \return Smaller of two values.
- */
-template<typename tType>
-inline tType min( tType const& left, tType const& right )
-	{
-	return ( left < right ? left : right );
-	}
-
-/*! \brief Get bigger of two values.
- *
- * \param left - first value to be considered as bigger.
- * \param right -  second value to be considered as bigger.
- * \return Bigger of two values.
- */
-template<typename tType>
-inline tType max( tType const& left, tType const& right )
-	{
-	return ( left >= right ? left : right );
-	}
-
-/*! \cond */
-template<typename type_t>
-int long distance( type_t* first_, type_t* last_ )
-	{
-	M_ASSERT( last_ > first_ );
-	return ( last_ - first_ );
-	}
-/*! \endcond */
-/*! \brief Calculate distance between two iterators.
- *
- * \param first - iterator.
- * \param last - iterator.
- * \return last - first.
- */
-template<typename iter_t>
-int long distance( iter_t first, iter_t last )
-	{
-	int long dist( 0 );
-	while ( first != last )
-		++ first, ++ dist;
-	return ( dist );
-	}
-
-/*! \cond */
-template<typename type_t>
-void advance( type_t*& it_, int long distance_ )
-	{ it_ += distance_; }
-/*! \endcond */
-/*! \brief Move iterator forward.
- *
- * \param it - iterator to be moved.
- * \param dist - how far iterator shall be moved.
- */
-template<typename iter_t>
-void advance( iter_t& it, int long dist )
-	{
-	for ( int long i = 0; i < dist; ++ i, ++ it )
-		;
-	}
-
-/*! \cond */
-namespace
-{
-static int const YAAL_MERGE_ALGO_THRESHOLD = 16;
-}
-template<typename iter_t, typename compare_t>
-void inplace_merge_inplace( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ )
-	{
-	iter_t it( mid_ );
-	while ( ( first_ != it ) && ( it != last_ ) )
-		{
-		while ( ( first_ != it ) && ! comp_( *it, *first_ ) )
-			++ first_;
-		while ( ( it != last_ ) && comp_( *it, *first_ ) )
-			++ it;
-		first_ = rotate( first_, mid_, it );
-		mid_ = it;
-		if ( it == last_ )
-			it = mid_;
-		else if ( first_ == mid_ )
-			mid_ = it;
-		}
-	return;
-	}
-template<typename iter_t, typename compare_t>
-void inplace_merge_auxilary_buffer( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_, int long couldCopy_ )
-	{
-	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
-	using yaal::distance;
-	int long count( distance( first_, mid_ ) );
-	int long auxSize( min( count, couldCopy_ ) );
-	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
-	aux_t aux( first_, mid_ );
-	return;
-	}
-/*! \endcond */
-
-/*! \brief Merges in place two consecutive sorted ranges of elements into one sorted range of elements.
- *
- * \param first_ - begining of first range.
- * \param mid_ - one past the end of first range and beginning of second range.
- * \param last_ - end of second range.
- * \param comp_ - comparision operator.
- */
-template<typename iter_t, typename compare_t>
-void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ )
-	{
-	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
-	int long couldCopy( hcore::system::get_available_memory_size() / sizeof ( value_t ) );
-	if ( couldCopy > YAAL_MERGE_ALGO_THRESHOLD )
-		inplace_merge_auxilary_buffer( first_, mid_, last_, comp_, couldCopy );
-	else
-		inplace_merge_inplace( first_, mid_, last_, comp_ );
-	return;
-	}
-
-/*! \brief Merges in place two consecutive sorted ranges of elements into one sorted range of elements.
- *
- * \param first_ - begining of first range.
- * \param mid_ - one past the end of first range and beginning of second range.
- * \param last_ - end of second range.
- */
-template<typename iter_t>
-void inplace_merge( iter_t first_, iter_t mid_, iter_t last_ )
-	{
-	inplace_merge( first_, mid_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
-	return;
-	}
-
 /*! \brief Joins two sorted ranges of elements into one sorted range of elements.
  *
  * \param it1 - begining of first range.
@@ -767,9 +634,7 @@ iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t en
 			*out = *it2;
 		*out = *it1;
 		}
-	for ( ; it2 != end2; ++ it2, ++ out )
-		*out = *it2;
-	return ( out );
+	return ( copy( it2, end2, out ) );
 	}
 
 /*! \brief Joins two sorted ranges of elements into one sorted range of elements.
@@ -784,6 +649,107 @@ template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
 iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out )
 	{
 	return ( merge( it1, end1, it2, end2, out, less<typename hcore::iterator_traits<iter_in1_t>::value_type>() ) );
+	}
+
+/*! \cond */
+template<typename iter_t, typename compare_t>
+void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ )
+	{
+	iter_t it( mid_ );
+	while ( ( first_ != it ) && ( it != last_ ) )
+		{
+		while ( ( first_ != it ) && ! comp_( *it, *first_ ) )
+			++ first_;
+		while ( ( it != last_ ) && comp_( *it, *first_ ) )
+			++ it;
+		first_ = rotate( first_, mid_, it );
+		mid_ = it;
+		if ( it == last_ )
+			it = mid_;
+		else if ( first_ == mid_ )
+			mid_ = it;
+		}
+	return;
+	}
+template<typename iter_t, typename compare_t>
+void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_,
+		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iter_t>::value_type>& aux_ )
+	{
+	typedef hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iter_t>::value_type> aux_t;
+	if ( aux_.get_size() > 0 )
+		{
+		if ( aux_.get_size() == aux_.get_requested_size() )
+			merge( aux_.begin(), aux_.end(), mid_, last_, first_, comp_ );
+		else
+			{
+			typename aux_t::value_type* out( aux_.begin() );
+			typename aux_t::value_type* end( aux_.end() );
+			iter_t it1( first_ );
+			iter_t it2( mid_ );
+			for ( ; it1 != mid_; ++ it1, ++ out )
+				{
+				for ( ; ( it2 != last_ ) && comp_( *it2, *it1 ); ++ it2, ++ out )
+					{
+					if ( out == end )
+						{
+						it1 = copy_backward( it1, mid_, it2 );
+						mid_ = it2;
+						swap_ranges( aux_.begin(), end, first_ );
+						first_ = it1;
+						out = aux_.begin();
+						}
+					*out = *it2;
+					}
+				if ( out == end )
+					{
+					it1 = copy_backward( it1, mid_, it2 );
+					mid_ = it2;
+					swap_ranges( aux_.begin(), end, first_ );
+					first_ = it1;
+					out = aux_.begin();
+					}
+				*out = *it1;
+				}
+			swap_ranges( aux_.begin(), out, first_ );
+			}
+		}
+	else
+		inplace_merge_impl( first_, mid_, last_, comp_ );
+	return;
+	}
+/*! \endcond */
+
+/*! \brief Merges in place two consecutive sorted ranges of elements into one sorted range of elements.
+ *
+ * \param first_ - begining of first range.
+ * \param mid_ - one past the end of first range and beginning of second range.
+ * \param last_ - end of second range.
+ * \param comp_ - comparision operator.
+ */
+template<typename iter_t, typename compare_t>
+void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ )
+	{
+	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
+	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
+	aux_t aux( first_, mid_ );
+	if ( aux.get_size() > 0 )
+		inplace_merge_impl( first_, mid_, last_, comp_, aux );
+	else
+		inplace_merge_impl( first_, mid_, last_, comp_ );
+	return;
+	}
+
+/*! \brief Merges in place two consecutive sorted ranges of elements into one sorted range of elements.
+ *
+ * \param first_ - begining of first range.
+ * \param mid_ - one past the end of first range and beginning of second range.
+ * \param last_ - end of second range.
+ */
+template<typename iter_t>
+void inplace_merge( iter_t first_, iter_t mid_, iter_t last_ )
+	{
+	inplace_merge( first_, mid_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+	return;
 	}
 
 /*! \brief Create union of two sorted ranges of elements.
@@ -1372,6 +1338,11 @@ void insert_sort( iter_t first_, iter_t last_, compare_t comp_ )
 	return;
 	}
 /*! \endcond */
+
+namespace
+{
+static int const YAAL_MERGE_ALGO_THRESHOLD = 32;
+}
 
 /*! \brief Perform stable sort of range of elements (sorting algorithm is unstable).
  *

@@ -9,9 +9,15 @@ def yaal_lookup_function( val ):
 	regex = re.compile( "^yaal::hcore::HString$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHStringPrinter( val )
+	regex = re.compile( "^yaal::hcore::HArray<.*>::HIterator<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHArrayHIteratorPrinter( val )
 	regex = re.compile( "^yaal::hcore::HArray<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHArrayPrinter( val )
+	regex = re.compile( "^yaal::hcore::HDeque<.*>::HIterator<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHDequeHIteratorPrinter( val )
 	regex = re.compile( "^yaal::hcore::HDeque<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHDequePrinter( val )
@@ -54,6 +60,20 @@ class YaalHCoreHStringPrinter:
 	def display_hint( self ):
 		return 'string'
 
+class YaalHCoreHArrayHIteratorPrinter:
+	"Print a yaal::hcore::HArray::HIterator"
+
+	def __init__( self, val ):
+		self._val = val
+
+	def to_string( self ):
+		ptr = self._val['_owner']['_buf']['_data'].cast(self._val.type.template_argument( 0 ).pointer());
+		index = self._val['_index']
+		return "{0x%x,%d,%d,%s}" % ( ptr, index, self._val['_owner']['_size'], ( ptr + index ).dereference() )
+
+	def display_hint( self ):
+		return 'string'
+
 class YaalHCoreHArrayPrinter:
 	"Print a yaal::hcore::HArray"
 
@@ -92,6 +112,23 @@ class YaalHCoreHArrayPrinter:
 
 	def display_hint( self ):
 		return 'array'
+
+class YaalHCoreHDequeHIteratorPrinter:
+	"Print a yaal::hcore::HDeque::HIterator"
+
+	def __init__( self, val ):
+		self._val = val
+
+	def to_string( self ):
+		VPC = self.val['VALUES_PER_CHUNK']
+		chunks = self.val['_owner']['_chunks']['_data'].cast( self.val.type.template_argument( 0 ).pointer().pointer() )
+		index = self._val['_index']
+		start = self._val['_owner']['_start']
+		physical = index + start
+		return "{0x%x,%d,%d,%s}" % ( ptr, index, self._val['_owner']['_size'], chunks[physical / VPC][physical % VPC] )
+
+	def display_hint( self ):
+		return 'string'
 
 class YaalHCoreHDequePrinter:
 	"Print a yaal::hcore::HDeque"
