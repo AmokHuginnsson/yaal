@@ -31,6 +31,14 @@ Copyright:
 #include <pwd.h>
 #include <grp.h>
 
+#include "config.hxx"
+
+#ifdef __HOST_OS_TYPE_FREEBSD__
+#include <sys/sysctl.h>
+#include <sys/vmmeter.h>
+#include <vm/vm_param.h>
+#endif
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "system.hxx"
@@ -182,9 +190,20 @@ int long get_available_memory_size( void )
 		{
 		}
 	return ( availableMemory );
-#else /* #ifdef __HOST_OS_TYPE_LINUX__ */
+#elif defined ( __HOST_OS_TYPE_FREEBSD__ ) /* #ifdef __HOST_OS_TYPE_LINUX__ */
+	vmtotal vm;
+	int mib[] = { CTL_HW, HW_PAGESIZE };
+	int long pagesize( 0 );
+	size_t size( sizeof ( pagesize ) );
+	M_ENSURE( sysctl( mib, 2, &pagesize, &size, NULL, 0 ) == 0 );
+	mib[ 0 ] = CTL_VM;
+	mib[ 1 ] = VM_TOTAL;
+	size = sizeof ( vmtotal );
+	M_ENSURE( sysctl( mib, 2, &vm, &size, NULL, 0 ) == 0 );
+	return ( vm.t_free * pagesize );
+#else /* #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #ifdef __HOST_OS_TYPE_LINUX__ */
 	return ( 0 );
-#endif /* #else #ifdef __HOST_OS_TYPE_LINUX__ */
+#endif
 	M_EPILOG
 	}
 

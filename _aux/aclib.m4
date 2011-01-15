@@ -151,6 +151,7 @@ AC_DEFUN([YAAL_DETECT_PHYSICAL_MEMORY],
 			PHYS_MEM=`free -m | awk '/^Mem:/{print [$]2}'`
 		;;
 		xFreeBSD)
+			PHYS_MEM=`/sbin/sysctl hw.physmem | awk '{print int( [$]2 / 1024 / 1024 )}'`
 		;;
 		xSolaris)
 		;;
