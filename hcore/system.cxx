@@ -201,7 +201,9 @@ int long get_available_memory_size( void )
 	size = sizeof ( vmtotal );
 	M_ENSURE( sysctl( mib, 2, &vm, &size, NULL, 0 ) == 0 );
 	return ( vm.t_free * pagesize );
-#else /* #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #ifdef __HOST_OS_TYPE_LINUX__ */
+#elif defined ( __HOST_OS_TYPE_SOLARIS__ ) /* #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #ifdef __HOST_OS_TYPE_LINUX__ */
+	return ( sysconf( _SC_AVPHYS_PAGES ) * sysconf( _SC_PAGESIZE ) );
+#else
 	return ( 0 );
 #endif
 	M_EPILOG

@@ -154,6 +154,7 @@ AC_DEFUN([YAAL_DETECT_PHYSICAL_MEMORY],
 			PHYS_MEM=`/sbin/sysctl hw.physmem | awk '{print int( [$]2 / 1024 / 1024 )}'`
 		;;
 		xSolaris)
+			PHYS_MEM=`prtconf | awk '/Memory/{print [$]3}'`
 		;;
 		xWindows)
 		;;
