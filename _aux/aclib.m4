@@ -116,9 +116,9 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM],
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_TYPE=[Solaris]
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -d [c:/windows] ; then
-		AC_DEFINE([__HOST_OS_TYPE_WINDOWS__], [], [Your operating system is MS Windows.])
+		AC_DEFINE([__HOST_OS_TYPE_CYGWIN__], [], [Your operating system is Cygwin.])
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--out-implib=lib\$(*).\$(LIB_ARCHIVE_SUFFIX)"]
-		HOST_OS_TYPE=[Windows]
+		HOST_OS_TYPE=[Cygwin]
 		LIB_PREFIX=["cyg"]
 		LIB_EXT=['"dll"']
 		TOOLS_LIBS=["${TOOLS_LIBS} -liconv"]
@@ -147,7 +147,7 @@ AC_DEFUN([YAAL_DETECT_PHYSICAL_MEMORY],
 	fi
 	PHYS_MEM="0"
 	case "x${HOST_OS_TYPE}" in
-		xDebian|xUbuntu|xCentOS|xPLD|xSlackware|xLinux)
+		xDebian|xUbuntu|xCentOS|xPLD|xSlackware|xLinux|xCygwin)
 			PHYS_MEM=`free -m | awk '/^Mem:/{print [$]2}'`
 		;;
 		xFreeBSD)
@@ -155,8 +155,6 @@ AC_DEFUN([YAAL_DETECT_PHYSICAL_MEMORY],
 		;;
 		xSolaris)
 			PHYS_MEM=`prtconf | awk '/Memory/{print [$]3}'`
-		;;
-		xWindows)
 		;;
 	esac
 	AC_DEFINE_UNQUOTED([__PHYSICAL_MEMORY__], ${PHYS_MEM}, [Amount of physical memory on this system.])

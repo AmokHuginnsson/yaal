@@ -158,7 +158,7 @@ HString get_group_name( int gid_ )
 int long get_available_memory_size( void )
 	{
 	M_PROLOG
-#ifdef __HOST_OS_TYPE_LINUX__
+#if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ )
 	int long availableMemory( 0 );
 	try
 		{
@@ -190,7 +190,7 @@ int long get_available_memory_size( void )
 		{
 		}
 	return ( availableMemory );
-#elif defined ( __HOST_OS_TYPE_FREEBSD__ ) /* #ifdef __HOST_OS_TYPE_LINUX__ */
+#elif defined ( __HOST_OS_TYPE_FREEBSD__ ) /* #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
 	vmtotal vm;
 	int mib[] = { CTL_HW, HW_PAGESIZE };
 	int long pagesize( 0 );
@@ -201,7 +201,7 @@ int long get_available_memory_size( void )
 	size = sizeof ( vmtotal );
 	M_ENSURE( sysctl( mib, 2, &vm, &size, NULL, 0 ) == 0 );
 	return ( vm.t_free * pagesize );
-#elif defined ( __HOST_OS_TYPE_SOLARIS__ ) /* #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #ifdef __HOST_OS_TYPE_LINUX__ */
+#elif defined ( __HOST_OS_TYPE_SOLARIS__ ) /* #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
 	return ( sysconf( _SC_AVPHYS_PAGES ) * sysconf( _SC_PAGESIZE ) );
 #else
 	return ( 0 );
