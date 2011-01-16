@@ -37,7 +37,7 @@ Copyright:
 #include <sys/sysctl.h>
 #include <sys/vmmeter.h>
 #include <vm/vm_param.h>
-#endif
+#endif /* #ifdef __HOST_OS_TYPE_FREEBSD__ */
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -203,6 +203,8 @@ int long get_available_memory_size( void )
 	return ( vm.t_free * pagesize );
 #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) /* #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
 	return ( sysconf( _SC_AVPHYS_PAGES ) * sysconf( _SC_PAGESIZE ) );
+#elif defined ( __HOST_OS_TYPE_WINDOWS__ ) /* #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
+	return ( ms_get_available_memory_size() );
 #else
 	return ( 0 );
 #endif

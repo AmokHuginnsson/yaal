@@ -247,4 +247,12 @@ void log_windows_error( char const* api_ )
 	return;
 	}
 
+int long get_available_memory_size( void )
+	{
+	MEMORYSTATUS ms;
+	::GlobalMemoryStatus( &ms );
+	return ( ms.dwAvailVirtual );
+	}
+
 }
+

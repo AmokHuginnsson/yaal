@@ -133,7 +133,9 @@ extern "C" int long getline( char**, size_t*, FILE* );
 #undef SIG_IGN
 #undef SIGABRT
 #undef NSIG
+#define kill kill_off
 #include <glibc/signal.h>
+#undef kill
 #endif /* _CSIGNAL_ */
 #include "cleanup.hxx"
 #endif /* __YAAL_BUILD__ */

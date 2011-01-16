@@ -161,9 +161,12 @@ public:
 	typedef tType value_type;
 	typedef typename trait::make_reference<tType>::type reference;
 	typedef typename trait::make_reference<tType const>::type const_reference;
+	typedef pointer_type_t<tType> pointer_type;
 	HPointer( void );
 	template<typename real_t>
-	explicit HPointer( real_t* const, deleter_t = pointer_type_t<tType>::template delete_pointee<real_t> );
+	explicit HPointer( real_t* const );
+	template<typename real_t>
+	explicit HPointer( real_t* const, deleter_t );
 	virtual ~HPointer( void );
 	HPointer( HPointer const& );
 	template<typename alien_t, template<typename, typename>class alien_access_t, typename alien_deleter_t>
@@ -300,6 +303,18 @@ template<typename tType, template<typename>class pointer_type_t,
 HPointer<tType, pointer_type_t, access_type_t, deleter_t>::HPointer( void )
 	: _shared( NULL ), _object( NULL )
 	{
+	return;
+	}
+
+template<typename tType, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t, typename deleter_t>
+template<typename real_t>
+HPointer<tType, pointer_type_t, access_type_t, deleter_t>::HPointer( real_t* const pointer_ )
+	: _shared( new HShared( &pointer_type::template delete_pointee<real_t>, pointer_ ) ), _object( pointer_ )
+	{
+	_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
+	_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
+	access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this );
 	return;
 	}
 
