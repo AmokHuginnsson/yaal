@@ -267,7 +267,6 @@ else ( CMAKE_HOST_WIN32 )
 	target_link_libraries( hconsole tools hcore ncurses gpm )
 	target_link_libraries( hdata hconsole dbwrapper tools hcore )
 	add_custom_target( headers ALL COMMAND env DIR_ROOT=${CMAKE_HOME_DIRECTORY} DIR_BUILD=${TARGET_PATH} HDRS='${HEADERS}' ./_aux/mkheaders DEPENDS hdata )
-	set_target_properties( headers PROPERTIES PUBLIC_HEADER ${HEADERS} )
 endif ( CMAKE_HOST_WIN32 )
 
 if ( HAVE_SQLITE3_H )

@@ -2,6 +2,17 @@
 #define YAAL_CONFIG_HXX_INCLUDED 1
 #define PACKAGE_NAME "yaal"
 #define PACKAGE_VERSION "0.0.0"
+#cmakedefine __HOST_OS_TYPE_LINUX__
+#cmakedefine __HOST_OS_TYPE_DEBIAN__
+#cmakedefine __HOST_OS_TYPE_UBUNTU__
+#cmakedefine __HOST_OS_TYPE_CENTOS__
+#cmakedefine __HOST_OS_TYPE_PLD__
+#cmakedefine __HOST_OS_TYPE_SLACKWARE__
+#cmakedefine __HOST_OS_TYPE_FREEBSD__
+#cmakedefine __HOST_OS_TYPE_SOLARIS__
+#cmakedefine __HOST_OS_TYPE_CYGWIN__
+#cmakedefine __HOST_OS_TYPE_WINDOWS__
+#define __PHYSICAL_MEMORY__ ( @PHYS_MEM@ - 1 + 1 )
 #cmakedefine HAVE_PRETTY_FUNCTION
 #cmakedefine HAVE_FUNCTION
 #cmakedefine HAVE_FUNC
