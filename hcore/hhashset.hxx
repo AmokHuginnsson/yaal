@@ -223,13 +223,14 @@ private:
 
 
 template<typename key_type_t, typename hash_function_t>
-class HHashSet<key_type_t, hash_function_t>::HIterator
+class HHashSet<key_type_t, hash_function_t>::HIterator : public iterator_interface<key_type_t, iterator_category::forward>
 	{
 	typedef key_type_t key_type;
 	typedef HHashSet<key_type, hash_function_t> set_t;
 	HHashContainer::HIterator _engine;
 public:
-	HIterator( void ) : _engine() {}
+	typedef iterator_interface<key_type_t, iterator_category::forward> base_type;
+	HIterator( void ) : base_type(), _engine() {}
 	HIterator& operator = ( HIterator const& it_ )
 		{
 		if ( &it_ != this )
@@ -268,7 +269,7 @@ public:
 		{ return ( _engine != it._engine ); }
 private:
 	friend class HHashSet<key_type, hash_function_t>;
-	explicit HIterator( HHashContainer::HIterator const& it ) : _engine( it ) {};
+	explicit HIterator( HHashContainer::HIterator const& it ) : base_type(), _engine( it ) {};
 	};
 
 }

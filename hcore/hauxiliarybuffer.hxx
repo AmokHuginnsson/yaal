@@ -33,6 +33,7 @@ Copyright:
 #include <new>
 
 #include "hcore/algorithm_impl.hxx"
+#include "hcore/iterator.hxx"
 #include "hcore/system.hxx"
 
 namespace yaal
@@ -82,7 +83,7 @@ template<typename iter_t>
 void HAuxiliaryBuffer<type_t>::init( iter_t first_, iter_t last_ )
 	{
 	using yaal::distance;
-	_requestedSize = distance( first_, last_ );
+	_requestedSize = distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() );
 	int long couldCopy( hcore::system::get_available_memory_size() / sizeof ( value_type ) );
 	int long auxSize( min( _requestedSize, max( couldCopy, _allocated ) ) );
 	/* Only 1 element in auxiliary buffer is equivalent

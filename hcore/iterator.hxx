@@ -27,16 +27,26 @@ Copyright:
 #ifndef YAAL_HCORE_ITERATOR_HXX_INCLUDED
 #define YAAL_HCORE_ITERATOR_HXX_INCLUDED 1
 
+#include "hcore/hexception.hxx"
+#include "hcore/trait.hxx"
+
 namespace yaal
 {
 
 namespace hcore
 {
 
-template<typename T>
+struct iterator_category
+	{
+	struct forward {};
+	struct random_access {};
+	};
+
+template<typename T, typename category>
 struct iterator_interface
 	{
 	typedef T value_type;
+	typedef category category_type;
 	virtual ~iterator_interface( void ) {}
 	};
 
@@ -44,13 +54,95 @@ template<typename iterator>
 struct iterator_traits
 	{
 	typedef typename iterator::value_type value_type;
+	template<typename iterator_t>
+	static trait::true_type has_category( typename iterator_t::category_type* );
+	template<typename iterator_t>
+	static trait::false_type has_category( ... );
+	template<typename U, bool const has_type>
+	struct get_category
+		{ typedef iterator_category::forward type; };
+
+	template<typename U>
+	struct get_category<U, true>
+		{ typedef typename U::category_type type; };
+	typedef typename get_category<iterator, sizeof ( has_category<iterator>( 0 ) ) == sizeof ( trait::true_type )>::type category_type;
 	};
 
 template<typename T>
 struct iterator_traits<T*>
 	{
 	typedef T value_type;
+	typedef typename iterator_category::random_access category_type;
 	};
+
+}
+
+/*! \cond */
+template<typename tType>
+inline int long distance( tType* first_, tType* last_ )
+	{
+	M_ASSERT( ! ( last_ < first_ ) );
+	return ( last_ - first_ );
+	}
+template<typename iter_t>
+inline int long distance( iter_t first_, iter_t last_, hcore::iterator_category::random_access )
+	{
+	M_ASSERT( ! ( last_ < first_ ) );
+	return ( last_ - first_ );
+	}
+template<typename iter_t>
+inline int long distance( iter_t first_, iter_t last_, hcore::iterator_category::forward )
+	{
+	int long dist( 0 );
+	while ( first_ != last_ )
+		++ first_, ++ dist;
+	return ( dist );
+	}
+/*! \endcond */
+/*! \brief Calculate distance between two iterators.
+ *
+ * \param first - iterator.
+ * \param last - iterator.
+ * \return last - first.
+ */
+template<typename iter_t>
+inline int long distance( iter_t first, iter_t last )
+	{
+	return ( distance( first, last, typename hcore::iterator_traits<iter_t>::category_type() ) );
+	}
+
+/*! \cond */
+template<typename tType>
+inline void advance( tType*& it_, int long distance_ )
+	{
+	it_ += distance_;
+	}
+template<typename iter_t>
+inline void advance( iter_t& it_, int long distance_, hcore::iterator_category::random_access )
+	{
+	it_ += distance_;
+	}
+template<typename type_t>
+inline void advance( type_t& it_, int long distance_, hcore::iterator_category::forward )
+	{
+	for ( int long i( 0 ); i < distance_; ++ i, ++ it_ )
+		;
+	}
+/*! \endcond */
+/*! \brief Move iterator forward.
+ *
+ * \param it - iterator to be moved.
+ * \param dist - how far iterator shall be moved.
+ */
+template<typename iter_t>
+void advance( iter_t& it, int long dist )
+	{
+	advance( it, dist, typename hcore::iterator_traits<iter_t>::category_type() );
+	return;
+	}
+
+namespace hcore
+{
 
 template<typename iterator_t>
 class HReverseIterator

@@ -345,7 +345,7 @@ private:
  */
 template<typename key_type_t, typename value_type_t, typename hasher_function_t, template<typename, typename> class storage_policy_t>
 template<typename const_qual_t>
-class HHashMultiMap<key_type_t, value_type_t, hasher_function_t, storage_policy_t>::HIterator
+class HHashMultiMap<key_type_t, value_type_t, hasher_function_t, storage_policy_t>::HIterator : public iterator_interface<typename HHashMultiMap<key_type_t, value_type_t, hasher_function_t, storage_policy_t>::storage_t::template const_aware_type<const_qual_t>::accessor_t, iterator_category::forward>
 	{
 	typedef key_type_t key_type;
 	typedef value_type_t data_type;
@@ -360,9 +360,10 @@ class HHashMultiMap<key_type_t, value_type_t, hasher_function_t, storage_policy_
 	key_iterator_t _major;
 	value_iterator_t _minor;
 public:
-	HIterator( void ) : _owner( NULL ), _major(), _minor() {}
+	typedef iterator_interface<typename hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t, iterator_category::forward> base_type;
+	HIterator( void ) : base_type(), _owner( NULL ), _major(), _minor() {}
 	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& it_ ) : _owner( it_._owner ), _major( it_._major ), _minor( it_._minor )
+	HIterator( HIterator<other_const_qual_t> const& it_ ) : base_type(), _owner( it_._owner ), _major( it_._major ), _minor( it_._minor )
 		{
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
@@ -434,7 +435,7 @@ private:
 	friend class HHashMultiMap<key_type, data_type, hasher_function_t, storage_policy_t>;
 	explicit HIterator( hash_multi_map_t const* const owner_,
 			key_iterator_t const& major,
-			value_iterator_t const& minor ) : _owner( owner_ ), _major( major ), _minor( minor ) {};
+			value_iterator_t const& minor ) : base_type(), _owner( owner_ ), _major( major ), _minor( minor ) {};
 	};
 
 }

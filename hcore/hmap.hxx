@@ -206,18 +206,19 @@ public:
  */
 template<typename key_type_t, typename value_type_t, typename helper_t>
 template<typename const_qual_t>
-class HMap<key_type_t, value_type_t, helper_t>::HIterator : public iterator_interface<const_qual_t>
+class HMap<key_type_t, value_type_t, helper_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward>
 	{
 	typedef key_type_t key_type;
 	typedef value_type_t data_type;
 	typedef HMap<key_type, data_type, helper_t> map_t;
 	HSBBSTree::HIterator _engine;
 public:
+	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
 	HIterator( void )
-		: iterator_interface<const_qual_t>(), _engine() {}
+		: base_type(), _engine() {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it_ )
-		: iterator_interface<const_qual_t>(), _engine( it_._engine )
+		: base_type(), _engine( it_._engine )
 		{
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
@@ -268,7 +269,7 @@ private:
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	explicit HIterator( HSBBSTree::HIterator const& it )
-		: iterator_interface<const_qual_t>(), _engine( it ) {};
+		: base_type(), _engine( it ) {};
 	};
 
 }

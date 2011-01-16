@@ -158,14 +158,6 @@ template<typename type_t>
 inline void swap( yaal::tools::HRing<type_t>& a, yaal::tools::HRing<type_t>& b )
 	{ a.swap( b ); }
 
-template<typename type_t>
-inline int long distance( typename yaal::tools::HRing<type_t>::HIterator const& first_,  typename yaal::tools::HRing<type_t>::HIterator const& last_ )
-	{ return ( last_ - first_ ); }
-
-template<typename type_t>
-inline void advance( typename yaal::tools::HRing<type_t>::HIterator& it_, int long distance_ )
-	{ it_ += distance_; }
-
 namespace tools 
 {
 
@@ -173,21 +165,22 @@ namespace tools
  */
 template<typename type_t>
 template<typename const_qual_t>
-class HRing<type_t>::HIterator : public yaal::hcore::iterator_interface<const_qual_t>
+class HRing<type_t>::HIterator : public yaal::hcore::iterator_interface<const_qual_t, yaal::hcore::iterator_category::random_access>
 	{
 	typedef HRing<type_t> array_t;
 	array_t const* _owner;
 	int long _index;
 public:
+	typedef yaal::hcore::iterator_interface<const_qual_t, yaal::hcore::iterator_category::random_access> base_type;
 	typedef type_t value_type;
-	HIterator( void ) : yaal::hcore::iterator_interface<const_qual_t>(), _owner( NULL ), _index( 0 ) {}
-	HIterator( HIterator const& it_ ) : yaal::hcore::iterator_interface<const_qual_t>(), _owner( it_._owner ), _index( it_._index ) {}
+	HIterator( void ) : base_type(), _owner( NULL ), _index( 0 ) {}
+	HIterator( HIterator const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index ) {}
 	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& it_ ) : yaal::hcore::iterator_interface<const_qual_t>(), _owner( it_._owner ), _index( it_._index )
+	HIterator( HIterator<other_const_qual_t> const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index )
 		{
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
-	HIterator& operator= ( HIterator const& it_ )
+	HIterator& operator = ( HIterator const& it_ )
 		{
 		if ( &it_ != this )
 			{
@@ -291,10 +284,16 @@ public:
 		M_ASSERT( _owner == it._owner );
 		return ( _index != it._index );
 		}
+	template<typename other_const_qual_t>
+	bool operator < ( HIterator<other_const_qual_t> const& it ) const
+		{
+		M_ASSERT( _owner == it._owner );
+		return ( _index < it._index );
+		}
 private:
 	friend class HRing<type_t>;
 	explicit HIterator( array_t const* owner_, int long idx )
-		: yaal::hcore::iterator_interface<const_qual_t>(), _owner( owner_ ), _index( idx ) {};
+		: base_type(), _owner( owner_ ), _index( idx ) {};
 	};
 
 template<typename type_t>

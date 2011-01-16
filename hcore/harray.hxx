@@ -138,14 +138,6 @@ template<typename type_t>
 inline void swap( yaal::hcore::HArray<type_t>& a, yaal::hcore::HArray<type_t>& b )
 	{ a.swap( b ); }
 
-template<typename type_t>
-inline int long distance( typename yaal::hcore::HArray<type_t>::HIterator const& first_, typename yaal::hcore::HArray<type_t>::HIterator const& last_ )
-	{ return ( last_ - first_ ); }
-
-template<typename type_t>
-inline void advance( typename yaal::hcore::HArray<type_t>::HIterator& it_, int long distance_ )
-	{ it_ += distance_; }
-
 namespace hcore
 {
 
@@ -153,21 +145,22 @@ namespace hcore
  */
 template<typename type_t>
 template<typename const_qual_t>
-class HArray<type_t>::HIterator : public iterator_interface<const_qual_t>
+class HArray<type_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::random_access>
 	{
 	typedef HArray<type_t> array_t;
 	array_t const* _owner;
 	int long _index;
 public:
 	typedef type_t value_type;
-	HIterator( void ) : iterator_interface<const_qual_t>(), _owner( NULL ), _index( 0 ) {}
-	HIterator( HIterator const& it_ ) : iterator_interface<const_qual_t>(), _owner( it_._owner ), _index( it_._index ) {}
+	typedef iterator_interface<const_qual_t, iterator_category::random_access> base_type;
+	HIterator( void ) : base_type(), _owner( NULL ), _index( 0 ) {}
+	HIterator( HIterator const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index ) {}
 	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& it_ ) : iterator_interface<const_qual_t>(), _owner( it_._owner ), _index( it_._index )
+	HIterator( HIterator<other_const_qual_t> const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index )
 		{
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
-	HIterator& operator= ( HIterator const& it_ )
+	HIterator& operator = ( HIterator const& it_ )
 		{
 		if ( &it_ != this )
 			{
@@ -255,10 +248,16 @@ public:
 		M_ASSERT( _owner == it._owner );
 		return ( _index != it._index );
 		}
+	template<typename other_const_qual_t>
+	bool operator < ( HIterator<other_const_qual_t> const& it ) const
+		{
+		M_ASSERT( _owner == it._owner );
+		return ( _index < it._index );
+		}
 private:
 	friend class HArray<type_t>;
 	explicit HIterator( array_t const* owner_, int long idx )
-		: iterator_interface<const_qual_t>(), _owner( owner_ ), _index( idx ) {};
+		: base_type(), _owner( owner_ ), _index( idx ) {};
 	};
 
 template<typename type_t>

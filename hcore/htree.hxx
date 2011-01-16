@@ -139,9 +139,9 @@ private:
  */
 template<typename value_t>
 template<typename const_qual_t>
-class HTree<value_t>::HIterator : public iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type>
+class HTree<value_t>::HIterator : public iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type, iterator_category::forward>
 	{
-	typedef iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type> base_type;
+	typedef iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type, iterator_category::forward> base_type;
 	typedef typename trait::copy_const<const_qual_t, HNode>::type const_qual_node_t;
 	typedef typename trait::copy_const<const_qual_t, HNode*>::type const_qual_node_ptr_t;
 	typedef typename HTree<value_t>::const_node_t owner_t;

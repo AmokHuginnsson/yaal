@@ -238,17 +238,18 @@ private:
 
 template<typename key_type_t, typename data_type_t, typename hash_function_t>
 template<typename const_qual_t>
-class HHashMap<key_type_t, data_type_t, hash_function_t>::HIterator : public iterator_interface<const_qual_t>
+class HHashMap<key_type_t, data_type_t, hash_function_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward>
 	{
 	typedef key_type_t key_type;
 	typedef data_type_t data_type;
 	typedef HHashMap<key_type, data_type, hash_function_t> map_t;
 	HHashContainer::HIterator _engine;
 public:
-	HIterator( void ) : iterator_interface<const_qual_t>(), _engine() {}
+	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
+	HIterator( void ) : base_type(), _engine() {}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it_ )
-		: iterator_interface<const_qual_t>(), _engine( it_._engine )
+		: base_type(), _engine( it_._engine )
 		{
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
 		}
@@ -299,7 +300,7 @@ private:
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	explicit HIterator( HHashContainer::HIterator const& it )
-		: iterator_interface<const_qual_t>(), _engine( it ) {};
+		: base_type(), _engine( it ) {};
 	};
 
 }

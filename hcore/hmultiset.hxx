@@ -205,14 +205,15 @@ public:
 /*! \brief Iterator for HMultiSet<> data structure.
  */
 template<typename value_type, typename helper_t = multiset_helper<value_type> >
-class HMultiSet<value_type, helper_t>::HIterator
+class HMultiSet<value_type, helper_t>::HIterator : public iterator_interface<value_type, iterator_category::forward>
 	{
 	typedef HPair<value_type, int long> elem_t;
 	int long _index;
 	HSBBSTree::HIterator _engine;
 public:
-	HIterator( void ) : _index( 0 ), _engine() {}
-	HIterator( HIterator const& it_ ) : _index( it_._index ), _engine( it_._engine ) {}
+	typedef iterator_interface<value_type, iterator_category::forward> base_type;
+	HIterator( void ) : base_type(), _index( 0 ), _engine() {}
+	HIterator( HIterator const& it_ ) : base_type(), _index( it_._index ), _engine( it_._engine ) {}
 	HIterator& operator= ( HIterator const& it_ )
 		{
 		if ( &it_ != this )
@@ -260,7 +261,7 @@ public:
 		{ return ( ( _engine != it._engine ) || ( _index != it._index ) ); }
 private:
 	friend class HMultiSet<value_type, helper_t>;
-	explicit HIterator( HSBBSTree::HIterator const& it ) : _index( 0 ), _engine( it ) {};
+	explicit HIterator( HSBBSTree::HIterator const& it ) : base_type(), _index( 0 ), _engine( it ) {};
 	};
 
 }

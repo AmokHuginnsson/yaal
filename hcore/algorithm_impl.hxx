@@ -30,8 +30,6 @@ Copyright:
 #ifndef YAAL_HCORE_ALGORITHM_IMPL_HXX_INCLUDED
 #define YAAL_HCORE_ALGORITHM_IMPL_HXX_INCLUDED 1
 
-#include "hcore/hexception.hxx"
-
 namespace yaal
 {
 
@@ -57,46 +55,6 @@ template<typename tType>
 inline tType max( tType const& left, tType const& right )
 	{
 	return ( left >= right ? left : right );
-	}
-
-/*! \cond */
-template<typename type_t>
-int long distance( type_t* first_, type_t* last_ )
-	{
-	M_ASSERT( last_ > first_ );
-	return ( last_ - first_ );
-	}
-/*! \endcond */
-/*! \brief Calculate distance between two iterators.
- *
- * \param first - iterator.
- * \param last - iterator.
- * \return last - first.
- */
-template<typename iter_t>
-int long distance( iter_t first, iter_t last )
-	{
-	int long dist( 0 );
-	while ( first != last )
-		++ first, ++ dist;
-	return ( dist );
-	}
-
-/*! \cond */
-template<typename type_t>
-void advance( type_t*& it_, int long distance_ )
-	{ it_ += distance_; }
-/*! \endcond */
-/*! \brief Move iterator forward.
- *
- * \param it - iterator to be moved.
- * \param dist - how far iterator shall be moved.
- */
-template<typename iter_t>
-void advance( iter_t& it, int long dist )
-	{
-	for ( int long i = 0; i < dist; ++ i, ++ it )
-		;
 	}
 
 }

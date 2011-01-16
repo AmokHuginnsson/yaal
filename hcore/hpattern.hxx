@@ -53,8 +53,8 @@ public:
 	typedef HMatchIterator iterator;
 	typedef HPair<char, bool*> flag_desc_t;
 	typedef HArray<flag_desc_t> pluggable_flags_t;
-private:
 	typedef HPattern this_type;
+private:
 	bool		_initialized;				/*!< is pattern initialized */
 	bool		_ignoreCaseDefault;	/*!< default value for ignore case switch */
 	bool		_ignoreCase;				/*!< self explanary */
@@ -109,16 +109,19 @@ private:
 
 /*! \brief Pattern matches iterator.
  */
-class HPattern::HMatchIterator
+class HPattern::HMatchIterator : public iterator_interface<HMatch, iterator_category::forward>
 	{
 	HPattern const* _owner;
 	HPattern::HMatch _match;
 public:
+	typedef iterator_interface<HMatch, iterator_category::forward> base_type;
 	HMatch const* operator->( void ) const;
 	HMatch const& operator*( void ) const;
 	bool operator != ( HMatchIterator const& ) const;
 	bool operator == ( HMatchIterator const& ) const;
 	HMatchIterator& operator ++ ( void );
+	HMatchIterator( HMatchIterator const& );
+	HMatchIterator& operator = ( HMatchIterator const& );
 private:
 	HMatchIterator( HPattern const*, char const*, int long );
 	friend class HPattern;

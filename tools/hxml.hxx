@@ -289,11 +289,12 @@ private:
 
 /*! \brief XML node iterator.
  */
-class HXml::HIterator : public yaal::hcore::iterator_interface<HXml::HNodeProxy>
+class HXml::HIterator : public yaal::hcore::iterator_interface<HXml::HNodeProxy, yaal::hcore::iterator_category::forward>
 	{
 	HXml::HNodeProxy const* _owner;
 	HXml::tree_t::iterator _iterator;
 public:
+	typedef yaal::hcore::iterator_interface<HXml::HNodeProxy, yaal::hcore::iterator_category::forward> base_type;
 	HIterator( void );
 	HIterator( HIterator const& );
 	HIterator& operator ++ ( void )
@@ -330,11 +331,12 @@ private:
 
 /*! \brief XML immutable node iterator.
  */
-class HXml::HConstIterator : public yaal::hcore::iterator_interface<HXml::HConstNodeProxy>
+class HXml::HConstIterator : public yaal::hcore::iterator_interface<HXml::HConstNodeProxy, yaal::hcore::iterator_category::forward>
 	{
 	HXml::HConstNodeProxy const* _owner;
 	HXml::tree_t::const_iterator _iterator;
 public:
+	typedef yaal::hcore::iterator_interface<HXml::HConstNodeProxy, yaal::hcore::iterator_category::forward> base_type;
 	HConstIterator( void );
 	HConstIterator( HConstIterator const& );
 	HConstIterator& operator ++ ( void )

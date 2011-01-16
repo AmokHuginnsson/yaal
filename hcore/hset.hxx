@@ -190,12 +190,13 @@ public:
 /*! \brief Iterator for HSet<> data structure.
  */
 template<typename value_type, typename helper_t = set_helper<value_type> >
-class HSet<value_type, helper_t>::HIterator : public iterator_interface<value_type>
+class HSet<value_type, helper_t>::HIterator : public iterator_interface<value_type, iterator_category::forward>
 	{
 	HSBBSTree::HIterator _engine;
 public:
-	HIterator( void ) : iterator_interface<value_type>(), _engine() {}
-	HIterator( HIterator const& it_ ) : iterator_interface<value_type>(), _engine( it_._engine ) {}
+	typedef iterator_interface<value_type, iterator_category::forward> base_type;
+	HIterator( void ) : base_type(), _engine() {}
+	HIterator( HIterator const& it_ ) : base_type(), _engine( it_._engine ) {}
 	HIterator& operator = ( HIterator const& it_ )
 		{
 		if ( &it_ != this )
@@ -235,7 +236,7 @@ public:
 private:
 	friend class HSet<value_type, helper_t>;
 	explicit HIterator( HSBBSTree::HIterator const& it )
-		: iterator_interface<value_type>(), _engine( it ) {}
+		: base_type(), _engine( it ) {}
 	};
 
 }

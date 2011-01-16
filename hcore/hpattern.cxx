@@ -308,8 +308,23 @@ char const* HPattern::HMatch::raw( void ) const
 	}
 
 HPattern::HMatchIterator::HMatchIterator( HPattern const* owner_, char const* const start_, int long len_ )
-	: _owner( owner_ ), _match( start_, len_ )
+	: base_type(), _owner( owner_ ), _match( start_, len_ )
 	{
+	}
+
+HPattern::HMatchIterator::HMatchIterator( HMatchIterator const& it_ )
+	: base_type(), _owner( it_._owner ), _match( it_._match )
+	{
+	}
+
+HPattern::HMatchIterator& HPattern::HMatchIterator::operator = ( HPattern::HMatchIterator const& it_ )
+	{
+	if ( &it_ != this )
+		{
+		_owner = it_._owner;
+		_match = it_._match;
+		}
+	return ( *this );
 	}
 
 HPattern::HMatch const* HPattern::HMatchIterator::operator->( void ) const
