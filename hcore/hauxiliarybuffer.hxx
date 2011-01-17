@@ -84,8 +84,14 @@ void HAuxiliaryBuffer<type_t>::init( iter_t first_, iter_t last_ )
 	{
 	using yaal::distance;
 	_requestedSize = distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() );
-	int long couldCopy( hcore::system::get_available_memory_size() / sizeof ( value_type ) );
-	int long auxSize( min( _requestedSize, max( couldCopy, _allocated ) ) );
+	int long canCopy( _allocated );
+	if ( _requestedSize > _allocated )
+		{
+		int long newCanCopy( hcore::system::get_available_memory_size() / sizeof ( value_type ) );
+		if ( newCanCopy > canCopy )
+			canCopy = newCanCopy;
+		}
+	int long auxSize( min( _requestedSize, canCopy ) );
 	/* Only 1 element in auxiliary buffer is equivalent
 	 * to pure inplace implementation, so it does not make sense to go with aux. */
 	clear();

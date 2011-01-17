@@ -1341,7 +1341,7 @@ void insert_sort( iter_t first_, iter_t last_, compare_t comp_ )
 
 namespace
 {
-static int const YAAL_MERGE_ALGO_THRESHOLD = 160;
+static int const YAAL_MERGE_ALGO_THRESHOLD = 18;
 }
 
 /*! \cond */
