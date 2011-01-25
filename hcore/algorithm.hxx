@@ -1326,14 +1326,57 @@ void sort( iter_t first_, iter_t last_ )
 
 /*! \cond */
 template<typename iter_t, typename compare_t>
-void insert_sort( iter_t first_, iter_t last_, compare_t comp_ )
+void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::iterator_category::forward )
 	{
-	while ( first_ != last_ )
+	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
+	iter_t it( first_ );
+	++ it;
+	while ( it != last_ )
 		{
-		iter_t it( min_element( first_, last_, comp_ ) );
-		if ( it != first_ )
-			swap( *it, *first_ );
-		++ first_;
+		iter_t next( it );
+		++ next;
+		iter_t sorted( first_ );
+		while ( ( sorted != it ) && ! comp_( *it, *sorted ) )
+			++ sorted;
+		if ( sorted != it )
+			{
+			value_t tmp( *it );
+			copy_backward( sorted, it, next );
+			*sorted = tmp;
+			}
+		++ it;
+		}
+	return;
+	}
+template<typename iter_t, typename compare_t>
+void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::iterator_category::random_access )
+	{
+	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
+	iter_t it( first_ );
+	++ it;
+	while ( it != last_ )
+		{
+		int long dist( ( it - first_ ) / 2 );
+		iter_t sorted( first_ + dist );
+		while ( dist > 1 )
+			{
+			dist >>= 1;
+			if ( comp_( *it, *sorted ) )
+				sorted -= ( dist & 1 ? dist + 1 : dist );
+			else
+				sorted += dist;
+			}
+		if ( ( sorted != first_ ) && comp_( *it, *sorted ) )
+			-- sorted;
+		while ( ( sorted != it ) && ! comp_( *it, *sorted ) )
+			++ sorted;
+		if ( sorted != it )
+			{
+			value_t tmp( *it );
+			copy_backward( sorted, it, it + 1 );
+			*sorted = tmp;
+			}
+		++ it;
 		}
 	return;
 	}
@@ -1341,7 +1384,7 @@ void insert_sort( iter_t first_, iter_t last_, compare_t comp_ )
 
 namespace
 {
-static int const YAAL_MERGE_ALGO_THRESHOLD = 18;
+static int const YAAL_MERGE_ALGO_THRESHOLD = 16;
 }
 
 /*! \cond */
@@ -1352,7 +1395,7 @@ void stable_sort_impl( iter_t first_, iter_t last_, compare_t comp_,
 	using yaal::distance;
 	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
 	if ( size < YAAL_MERGE_ALGO_THRESHOLD )
-		insert_sort( first_, last_, comp_ );
+		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iter_t>::category_type() );
 	else
 		{
 		iter_t mid( first_ );
@@ -1379,7 +1422,7 @@ void stable_sort( iter_t first_, iter_t last_, compare_t comp_ )
 	using yaal::distance;
 	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
 	if ( size < YAAL_MERGE_ALGO_THRESHOLD )
-		insert_sort( first_, last_, comp_ );
+		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iter_t>::category_type() );
 	else
 		{
 		iter_t mid( first_ );
