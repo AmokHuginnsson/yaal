@@ -235,32 +235,121 @@ typedef HExceptionT<HStreamInterface> HStreamInterfaceException;
  * \tparam stream_t - type of stream wrapped by this iterator.
  * \tparam delim_t - type of optional delimiter separating each iteration.
  */
-template<typename stream_t, typename delim_t>
+template<typename stream_t, typename delim_t, typename out_t>
 class HStreamIterator
 	{
-	stream_t& _stream;
+	mutable stream_t* _stream;
 	delim_t _delim;
+	mutable HString _wordCache;
+	mutable int long _steps;
 public:
-	explicit HStreamIterator( stream_t& stream, delim_t const& delim = delim_t() ) : _stream( stream ), _delim( delim ) {}
+	HStreamIterator( void )
+		: _stream( NULL ), _delim(), _wordCache(), _steps( 0 ) {}
+	explicit HStreamIterator( stream_t& stream, delim_t const& delim = delim_t() )
+		: _stream( &stream ), _delim( delim ), _wordCache(), _steps( 0 ) {}
+	HStreamIterator( HStreamIterator const& it_ )
+		: _stream( it_._stream ), _delim( it_._delim ), _wordCache( it_._wordCache ), _steps( it_._steps ) {}
+	HStreamIterator& operator = ( HStreamIterator const& it_ )
+		{
+		if ( &it_ != this )
+			{
+			HStreamIterator tmp( it_ );
+			swap( tmp );
+			}
+		return ( *this );
+		}
 	HStreamIterator& operator* ( void )
+		{ return ( *this ); }
+	HStreamIterator& operator* ( void ) const
 		{ return ( *this ); }
 	template<typename item_t>
 	HStreamIterator& operator = ( item_t const& item )
 		{
-		_stream << item << _delim;
+		*_stream << item << _delim;
 		return ( *this );
 		}
-	HStreamIterator& operator ++ ( void )
-		{ return ( *this ); }
+	operator out_t ( void ) const
+		{
+		M_PROLOG
+		while ( _steps > 0 )
+			{
+			read_word();
+			-- _steps;
+			}
+		out_t ret;
+		while ( _stream )
+			{
+			try
+				{
+				ret = lexical_cast<out_t>( _wordCache );
+				break;
+				}
+			catch ( HException const& )
+				{
+				read_word();
+				}
+			}
+		return ( ret );
+		M_EPILOG
+		}
+	bool operator == ( HStreamIterator const& it_ ) const
+		{
+		return ( ! ( _stream != it_._stream ) );
+		}
+	bool operator != ( HStreamIterator const& it_ ) const
+		{
+		return ( _stream != it_._stream );
+		}
+	void swap( HStreamIterator& it_ )
+		{
+		if ( &it_ != this )
+			{
+			using yaal::swap;
+			swap( _stream, it_._stream );
+			swap( _delim, it_._delim );
+			swap( _wordCache, it_._wordCache );
+			swap( _steps, it_._steps );
+			}
+		return;
+		}
+	HStreamIterator const& operator ++ ( void ) const
+		{
+		M_PROLOG
+		++ _steps;
+		return ( *this );
+		M_EPILOG
+		}
+private:
+	void read_word( void ) const
+		{
+		M_PROLOG
+		int long len( _stream->read_until( _wordCache, _whiteSpace_ ) );
+		if ( len <= 0 )
+			_stream = NULL;
+		return;
+		M_EPILOG
+		}
 	};
 
 template<typename stream_t, typename delim_t>
-HStreamIterator<stream_t, delim_t> stream_iterator( stream_t& stream, delim_t delim )
-	{ return ( HStreamIterator<stream_t, delim_t>( stream, delim ) ); }
+HStreamIterator<stream_t, delim_t, void> stream_iterator( stream_t& stream, delim_t delim )
+	{ return ( HStreamIterator<stream_t, delim_t, void>( stream, delim ) ); }
 
 template<typename stream_t>
-HStreamIterator<stream_t, char const* const> stream_iterator( stream_t& stream )
-	{ return ( HStreamIterator<stream_t, char const* const>( stream, "" ) ); }
+HStreamIterator<stream_t, char const* const, void> stream_iterator( stream_t& stream )
+	{ return ( HStreamIterator<stream_t, char const* const, void>( stream, "" ) ); }
+
+template<typename out_t, typename stream_t, typename delim_t>
+HStreamIterator<stream_t, delim_t, out_t> stream_iterator( stream_t& stream, delim_t delim )
+	{ return ( HStreamIterator<stream_t, delim_t, out_t>( stream, delim ) ); }
+
+template<typename out_t, typename stream_t>
+HStreamIterator<stream_t, char const* const, out_t> stream_iterator( stream_t& stream )
+	{ return ( HStreamIterator<stream_t, char const* const, out_t>( stream, "" ) ); }
+
+template<typename stream_t, typename out_t>
+inline HStreamIterator<stream_t, char const* const, out_t> stream_iterator( void )
+	{ return ( HStreamIterator<stream_t, char const* const, out_t>() ); }
 
 }
 

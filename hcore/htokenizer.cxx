@@ -35,13 +35,13 @@ namespace yaal
 namespace hcore
 {
 
-HTokenizer::HTokenizer( HString const& str_, HString const& delim_, behavoir_t const& behavoir_ )
-	: _behavior( behavoir_ ), _string( str_ ), _delimiter( delim_ ), _buffer()
+HTokenizer::HTokenizer( HString const& str_, HString const& delim_, behavior_t const& behavior_ )
+	: _behavior( behavior_ ), _string( str_ ), _delimiter( delim_ ), _buffer()
 	{
 	}
 
-HTokenizer::HTokenizer( HString const& delim_, behavoir_t const& behavoir_ )
-	: _behavior( behavoir_ ), _string(), _delimiter( delim_ ), _buffer()
+HTokenizer::HTokenizer( HString const& delim_, behavior_t const& behavior_ )
+	: _behavior( behavior_ ), _string(), _delimiter( delim_ ), _buffer()
 	{
 	}
 

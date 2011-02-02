@@ -51,9 +51,9 @@ public:
 		{
 		SKIP_EMPTY,
 		INCLUDE_EMPTY
-		} behavoir_t;
+		} behavior_t;
 private:
-	behavoir_t _behavior;
+	behavior_t _behavior;
 	HString _string;
 	HString _delimiter;
 	mutable HString _buffer;
@@ -62,8 +62,8 @@ public:
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
 public:
-	HTokenizer( HString const&, HString const&, behavoir_t const& = INCLUDE_EMPTY );
-	HTokenizer( HString const&, behavoir_t const& = INCLUDE_EMPTY );
+	HTokenizer( HString const&, HString const&, behavior_t const& = INCLUDE_EMPTY );
+	HTokenizer( HString const&, behavior_t const& = INCLUDE_EMPTY );
 	void assign( HString const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
