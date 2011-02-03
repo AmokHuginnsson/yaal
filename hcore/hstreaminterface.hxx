@@ -232,20 +232,20 @@ typedef HExceptionT<HStreamInterface> HStreamInterfaceException;
  *
  * This helper may be useful in algorithms.
  *
- * \tparam stream_t - type of stream wrapped by this iterator.
+ * \tparam HStreamInterface - type of stream wrapped by this iterator.
  * \tparam delim_t - type of optional delimiter separating each iteration.
  */
-template<typename stream_t, typename delim_t, typename out_t>
+template<typename delim_t, typename out_t>
 class HStreamIterator
 	{
-	mutable stream_t* _stream;
+	mutable HStreamInterface* _stream;
 	delim_t _delim;
 	mutable HString _wordCache;
 	mutable int long _steps;
 public:
 	HStreamIterator( void )
 		: _stream( NULL ), _delim(), _wordCache(), _steps( 0 ) {}
-	explicit HStreamIterator( stream_t& stream, delim_t const& delim = delim_t() )
+	explicit HStreamIterator( HStreamInterface& stream, delim_t const& delim = delim_t() )
 		: _stream( &stream ), _delim( delim ), _wordCache(), _steps( 0 ) {}
 	HStreamIterator( HStreamIterator const& it_ )
 		: _stream( it_._stream ), _delim( it_._delim ), _wordCache( it_._wordCache ), _steps( it_._steps ) {}
@@ -331,25 +331,24 @@ private:
 		}
 	};
 
-template<typename stream_t, typename delim_t>
-HStreamIterator<stream_t, delim_t, void> stream_iterator( stream_t& stream, delim_t delim )
-	{ return ( HStreamIterator<stream_t, delim_t, void>( stream, delim ) ); }
+template<typename delim_t>
+HStreamIterator<delim_t, void> stream_iterator( HStreamInterface& stream, delim_t delim )
+	{ return ( HStreamIterator<delim_t, void>( stream, delim ) ); }
 
-template<typename stream_t>
-HStreamIterator<stream_t, char const* const, void> stream_iterator( stream_t& stream )
-	{ return ( HStreamIterator<stream_t, char const* const, void>( stream, "" ) ); }
+inline HStreamIterator<char const* const, void> stream_iterator( HStreamInterface& stream )
+	{ return ( HStreamIterator<char const* const, void>( stream, "" ) ); }
 
-template<typename out_t, typename stream_t, typename delim_t>
-HStreamIterator<stream_t, delim_t, out_t> stream_iterator( stream_t& stream, delim_t delim )
-	{ return ( HStreamIterator<stream_t, delim_t, out_t>( stream, delim ) ); }
+template<typename out_t, typename delim_t>
+HStreamIterator<delim_t, out_t> stream_iterator( HStreamInterface& stream, delim_t delim )
+	{ return ( HStreamIterator<delim_t, out_t>( stream, delim ) ); }
 
-template<typename out_t, typename stream_t>
-HStreamIterator<stream_t, char const* const, out_t> stream_iterator( stream_t& stream )
-	{ return ( HStreamIterator<stream_t, char const* const, out_t>( stream, "" ) ); }
+template<typename out_t>
+HStreamIterator<char const* const, out_t> stream_iterator( HStreamInterface& stream )
+	{ return ( HStreamIterator<char const* const, out_t>( stream, "" ) ); }
 
-template<typename stream_t, typename out_t>
-inline HStreamIterator<stream_t, char const* const, out_t> stream_iterator( void )
-	{ return ( HStreamIterator<stream_t, char const* const, out_t>() ); }
+template<typename out_t>
+inline HStreamIterator<char const* const, out_t> stream_iterator( void )
+	{ return ( HStreamIterator<char const* const, out_t>() ); }
 
 }
 
