@@ -79,7 +79,7 @@ static int const ALLOC_BIT_MASK = 128;
 #define GET_SIZE ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] : *reinterpret_cast<int long const*>( _mem + sizeof ( char* ) ) )
 #define SET_SIZE( size ) do { ( IS_INPLACE ? static_cast<int long>( _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) ) : *reinterpret_cast<int long*>( _mem + sizeof ( char* ) ) = ( size ) ); } while ( 0 )
 #define EXT_SET_SIZE( base, size ) do { ( EXT_IS_INPLACE( base ) ? static_cast<int long>( base[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) ) : *reinterpret_cast<int long*>( base + sizeof ( char* ) ) = ( size ) ); } while ( 0 )
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : ( *reinterpret_cast<int long const*>( _mem + sizeof ( char* ) + sizeof ( int long ) ) ) & ( static_cast<int long unsigned>( -1 ) >> 1 ) )
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : static_cast<int long>( ( *reinterpret_cast<int long const*>( _mem + sizeof ( char* ) + sizeof ( int long ) ) ) & ( static_cast<int long unsigned>( -1 ) >> 1 ) ) )
 #define SET_ALLOC_BYTES( capacity ) do { ( *reinterpret_cast<int long*>( _mem + sizeof ( char* ) + sizeof ( int long ) ) = ( capacity ) ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); } while ( 0 )
 
 char const* _errMsgHString_[ 3 ] =
