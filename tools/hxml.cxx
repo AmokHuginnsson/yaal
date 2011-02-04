@@ -429,8 +429,8 @@ void HXml::parse_dtd( void* dtd_ )
 				_entities[ reinterpret_cast<char const*>( node->name ) ] = reinterpret_cast<char const*>( node->content );
 			else
 				log_trace << "failed to handle DTD child: " << static_cast<int>( node->type )
-					<< " " << reinterpret_cast<char const*>( node->name )
-					<< " " << reinterpret_cast<char const*>( node->content ) << endl;
+					<< " " << ( node->name ? reinterpret_cast<char const*>( node->name ) : "(nil)" )
+					<< " " << ( node->content ? reinterpret_cast<char const*>( node->content ) : "(nil)" )<< endl;
 			node = node->next;
 			}
 		}

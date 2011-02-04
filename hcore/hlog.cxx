@@ -212,7 +212,7 @@ void HLog::timestamp( void )
 void HLog::eol_reset( char const* const buf_, int long len_ )
 	{
 	M_PROLOG
-	if ( buf_[ len_ - 1 ] != '\n' )
+	if ( ( len_ < 1 ) || ( buf_[ len_ - 1 ] != '\n' ) )
 		_newLine = false;
 	else
 		{
