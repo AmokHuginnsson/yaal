@@ -50,9 +50,10 @@ class HString
 	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 2 ) - 1;
 	typedef HString this_type;
 private:
-	char*	_buffer; /*!< memory buffer pointer */
-	int	long _allocatedBytes; /*!< size of memory buffer */
-	int	long _size; /*!< lenght of string */
+	static int const INPLACE_BUFFER_SIZE = sizeof ( char* ) + sizeof ( int long ) + sizeof ( int long );
+	static int const ALLOC_FLAG_INDEX = INPLACE_BUFFER_SIZE - 1;
+	static int const MAX_INPLACE_CAPACITY = INPLACE_BUFFER_SIZE - 2; /* -1 for terminating NIL, -1 for ALLOC_FLAG byte. */
+	char _mem[ INPLACE_BUFFER_SIZE ];
 public:
 	static int long const npos = -1;
 	typedef char const* iterator; /*!< mutable iterator for string characters */
@@ -170,6 +171,7 @@ public:
 	void clear( void );
 	int long length( void ) const;
 	int long size( void ) const;
+	int long get_size( void ) const;
 	int long get_length( void ) const;
 	int long capacity( void ) const;
 	int long get_capacity( void ) const;

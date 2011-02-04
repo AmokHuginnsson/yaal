@@ -55,7 +55,13 @@ class YaalHCoreHStringPrinter:
 		self._val = val
 
 	def to_string( self ):
-		return self._val['_buffer']
+		inplace = not ( self._val['_mem'][self._val['_mem'].type.sizeof - 1] & 128 )
+		s = ""
+		if inplace:
+			s = self._val['_mem']
+		else:
+			s = self._val['_mem'].cast( gdb.lookup_type( 'char' ).pointer().pointer() ).dereference()
+		return s
 
 	def display_hint( self ):
 		return 'string'
