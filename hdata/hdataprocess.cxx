@@ -411,7 +411,10 @@ resources_t& HDataProcess::build_resource( yaal::hcore::HString const& resourceN
 					if ( attrName == "max_string_size" )
 						e->_maxStringSize = lexical_cast<int>( xml::node_val( attr ) );
 					else if ( attrName == "value" )
-						e->_value = get_optional_value_or( xml::try_node_val( attr ), HString() ).raw();
+						{
+						xml::value_t value( xml::try_node_val( attr ) );
+						e->_value = value ? value->raw() : "";
+						}
 					else if ( attrName == "mask" )
 						e->_mask = xml::node_val( attr ).raw();
 					else if ( attrName == "replace" )
