@@ -1,7 +1,21 @@
 [Visualizer]
 yaal::hcore::HString {
-	preview ( [$c._buffer,s] )
-	stringview ( [$c._buffer,sb] )
+	preview ( 
+		#if ( $c._mem[sizeof ( yaal::hcore::HString )-1]&128 ) (
+		 #( [(*(char**)($c._mem)),s] )
+		)
+		#else (
+		 #( [$c._mem,s] )
+		)
+	)
+	stringview (
+		#if ( $c._mem[sizeof ( yaal::hcore::HString )-1]&128 ) (
+		 #( [(*(char**)($c._mem)),s] )
+		)
+		#else (
+		 #( [$c._mem,s] )
+		)
+	)
 	children ( #( [raw members]: [$c,!] ) )
 }
 yaal::hcore::HArray<*> {
