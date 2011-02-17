@@ -748,6 +748,15 @@ struct select2nd : public unary_function<typename T::second_type, T>
 		{ return ( arg_.second ); }
 	};
 
+template<typename to_t, typename from_t>
+struct bound_cast : public unary_function<to_t, from_t>
+	{
+	to_t operator()( from_t from_ ) const
+		{
+		return ( static_cast<to_t>( from_ ) );
+		}
+	};
+
 }
 
 #endif /* #ifndef YAAL_HCORE_FUNCTIONAL_HXX_INCLUDED */
