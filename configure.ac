@@ -9,6 +9,7 @@ pushdef([AC_EXTRAVERSION],esyscmd(awk '/^EXTRAVERSION[[[:space:]]]+=[[[:space:]]
 pushdef([YAAL_PACKAGE_VERSION],[AC_VERSION.AC_SUBVERSION.AC_EXTRAVERSION-esyscmd(date +%Y%m%d|tr -d '\n')])
 m4_include([_aux/aclib.m4])
 AC_INIT([[yaal]],[YAAL_PACKAGE_VERSION],[[amok@codestation.org]])
+PRIVILEGES_SANITY
 
 AC_MSG_RESULT([--- Welcome to yaal configurator ---                     [[0%]]])
 
@@ -40,21 +41,7 @@ AC_CONFIG_AUX_DIR([_aux])
 dnl yaal is not Free Software.
 AC_COPYRIGHT([[yaal (c) 2004 All rights reserved.]])
 
-AC_CHECK_PROG(HAS_GIT,[git],["true"],["false"])
-AC_MSG_CHECKING([git id sub-command])
-AC_SUBST(GITID,[true])
-if test ["$HAS_GIT"] = ["true"] ; then
-	THIS_ID=`git id ${0}.ac 2> /dev/null`
-	if test ["x${THIS_ID}"] != ["x"] ; then
-		AC_SUBST(GITID,["git id"])
-		AC_MSG_RESULT([ok])
-	else
-		AC_MSG_WARN([not present])
-	fi
-else
-	AC_MSG_WARN([no git in the first place])
-fi
-
+YAAL_CHECK_GIT
 dnl yaal is still in alpha stage.
 AC_REVISION(${THIS_ID})
 

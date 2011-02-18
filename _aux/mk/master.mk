@@ -1,3 +1,4 @@
+include _aux/mk/0_sanity.mk
 -include .my_make
 COMA=,
 include _aux/mk/2_term.mk

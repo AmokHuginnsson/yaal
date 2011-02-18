@@ -30,6 +30,7 @@ char const COPYRIGHT [ ] =
 #include <cstdlib>
 #include <libintl.h>
 #include <locale.h>
+#include <unistd.h>
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -213,6 +214,11 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	STATIC_ASSERT( sizeof( u64_t ) == 8 );
 #endif
 	errno = 0;
+	if ( ! ( getuid() && geteuid() ) )
+		{
+		::perror( "running with super-user privileges - bailing out" );
+		::exit( 1 );
+		}
 	init_locale();
 	char* env( ::getenv( "YAAL_DEBUG" ) );
 	if ( env )

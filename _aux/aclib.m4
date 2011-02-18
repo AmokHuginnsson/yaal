@@ -1,3 +1,13 @@
+dnl Bail out if running as root.
+dnl --------------------------------------------------------------------------
+AC_DEFUN([PRIVILEGES_SANITY],
+[
+	EID=`id -u`
+	if test "x${EID}" = "x0" ; then
+		AC_MSG_ERROR([running with super-user privileges - bailing out])
+	fi
+])
+
 dnl YAAL_DETECT_FLAGS(RESULT, FLAGSET)
 dnl Detect if the compiler supports a set of flags
 dnl --------------------------------------------------------------------------

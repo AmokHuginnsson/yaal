@@ -1,6 +1,7 @@
 dnl configure.ac is integral part of yaal client project.
 
 m4_include([_aux/aclib.m4])
+PRIVILEGES_SANITY
 
 DO_TARGET="RELEASE"
 AC_ARG_ENABLE([debug],[AC_HELP_STRING([--enable-debug],[Compile with debugging symbols.])],[DO_TARGET="DEBUG" LIB_INFIX="-d"])
