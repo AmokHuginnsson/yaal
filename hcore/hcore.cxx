@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "config.hxx"
 char const COPYRIGHT [ ] =
 "/*\n"
@@ -30,7 +31,6 @@ char const COPYRIGHT [ ] =
 #include <cstdlib>
 #include <libintl.h>
 #include <locale.h>
-#include <unistd.h>
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )

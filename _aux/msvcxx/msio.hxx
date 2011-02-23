@@ -11,6 +11,9 @@
 namespace msvcxx
 {
 
+int const FALSE = 0;
+int const TRUE = 1;
+
 class SystemIO;
 
 class IO

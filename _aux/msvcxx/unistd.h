@@ -41,6 +41,7 @@ extern "C" FILE* tmpfile( void );
 #define fork ms_fork
 #define getuid ms_getuid
 #define gethostname ms_gethostname
+#define geteuid getuid
 
 #include "hcore/macro.hxx"
 #include "emu_unistd.hxx"

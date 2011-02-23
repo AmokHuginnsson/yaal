@@ -8,6 +8,7 @@
 #undef STRICT
 #undef OPTIONAL
 #undef TRUE
+#undef FALSE
 #undef ALTERNATE
 #undef OK
 #undef min
