@@ -320,7 +320,15 @@ HStreamInterface& HSynchronizedStream::do_input( void const*& val_ )
 	M_EPILOG
 	}
 
-int long HSynchronizedStream::do_read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true )
+HStreamInterface& HSynchronizedStream::do_input( manipulator_t const& val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_input( val_ ) );
+	M_EPILOG
+	}
+
+int long HSynchronizedStream::do_read_until( yaal::hcore::HString& store, char const* const delim, bool strip )
 	{
 	M_PROLOG
 	HLock l( _mutex );
@@ -328,11 +336,35 @@ int long HSynchronizedStream::do_read_until( yaal::hcore::HString& store, char c
 	M_EPILOG
 	}
 
-int long HSynchronizedStream::do_read_until_n( yaal::hcore::HString& store, int long maxcount, char const* const delim = eols, bool strip = true )
+int long HSynchronizedStream::do_read_until_n( yaal::hcore::HString& store, int long maxcount, char const* const delim, bool strip )
 	{
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_read_until_n( store, maxcount, delim, strip ) );
+	M_EPILOG
+	}
+
+int long HSynchronizedStream::do_read_while( yaal::hcore::HString& store, char const* const acquire, bool strip )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_read_while( store, acquire, strip ) );
+	M_EPILOG
+	}
+
+int long HSynchronizedStream::do_read_while_n( yaal::hcore::HString& store, int long maxcount, char const* const acquire, bool strip )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_read_while_n( store, maxcount, acquire, strip ) );
+	M_EPILOG
+	}
+
+int HSynchronizedStream::do_peek( void )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_peek() );
 	M_EPILOG
 	}
 
@@ -357,6 +389,14 @@ HStreamInterface& HSynchronizedStream::do_set_base( BASES::enum_t val_ )
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_set_base( val_ ) );
+	M_EPILOG
+	}
+
+HStreamInterface& HSynchronizedStream::do_set_skipws( bool val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_set_skipws( val_ ) );
 	M_EPILOG
 	}
 

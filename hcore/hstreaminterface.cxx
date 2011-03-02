@@ -43,7 +43,7 @@ char const* const HStreamInterface::eols = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
 	: _cache( 1, HChunk::STRATEGY::GEOMETRIC ), _offset( 0 ),
-	_wordCache(), _fill( ' ' ), _width( 0 ), _base( BASES::DEC )
+	_wordCache(), _fill( ' ' ), _width( 0 ), _base( BASES::DEC ), _skipWS( true ), _valid( true )
 	{
 	return;
 	}
@@ -265,6 +265,20 @@ HStreamInterface& oct( HStreamInterface& iface_ )
 	M_EPILOG
 	}
 
+HStreamInterface& skipws( HStreamInterface& iface_ )
+	{
+	M_PROLOG
+	return ( iface_.set_skipws( true ) );
+	M_EPILOG
+	}
+
+HStreamInterface& noskipws( HStreamInterface& iface_ )
+	{
+	M_PROLOG
+	return ( iface_.set_skipws( false ) );
+	M_EPILOG
+	}
+
 HStreamInterface::HManipulator setw( int width_ )
 	{
 	M_PROLOG
@@ -291,45 +305,115 @@ int long HStreamInterface::do_read_until_n( HString& message_, int long maxCount
 		char const* const stopSet_, bool stripDelim_ )
 	{
 	M_PROLOG
-	int long nRead = 0; /* how many bytes were read in this single invocation */
-	int long iPoolSize = _cache.size();
-	char* buffer = _cache.raw(); /* read cache buffer */
+	return ( semantic_read( message_, maxCount_, stopSet_, stripDelim_, true ) );
+	M_EPILOG
+	}
+
+int long HStreamInterface::do_read_while( HString& message_,
+		char const* const acquire_, bool stripDelim_ )
+	{
+	M_PROLOG
+	return ( read_while_n( message_, meta::max_signed<int long>::value, acquire_, stripDelim_ ) );
+	M_EPILOG
+	}
+
+int long HStreamInterface::do_read_while_n( HString& message_, int long maxCount_,
+		char const* const acquire_, bool stripDelim_ )
+	{
+	M_PROLOG
+	return ( semantic_read( message_, maxCount_, acquire_, stripDelim_, false ) );
+	M_EPILOG
+	}
+
+int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int long maxCount_, char const* const set_, bool stripDelim_, bool isStopSet_ )
+	{
+	M_PROLOG
+	int long nRead( 0 ); /* how many bytes were read in this single invocation */
+	int long iPoolSize( _cache.size() );
+	char* buffer( _cache.raw() ); /* read cache buffer */
 	bool byDelim( false );
 	bool bySize( false );
-	do
+	int setLen( static_cast<int>( :: strlen( set_ ) ) );
+	if ( _offset )
 		{
-		/* Let's check if next read wont exceed size of our read buffer.
-		 * 1 byte or terminating zero and one byte for at least one new character,
-		 * hence + 2 in condition.
-		 */
-		if ( ( _offset + 2 ) > iPoolSize )
+		int cached( 0 );
+		for ( ; ( cached < _offset ) && ( cached < maxCount_ ); ++ cached )
 			{
-			_cache.realloc( _offset + 2 );
-			buffer = _cache.raw(); /* update read cache buffer ptr, reallocation could move previous buffer into another memomry position */
-			iPoolSize = _cache.size();
+			if ( ( byDelim = ( ::memchr( set_, buffer[ cached ], setLen ) ? isStopSet_ : ! isStopSet_ ) ) )
+				break;
 			}
-		/* We read only one byte at a time. */
-		nRead = read( buffer + _offset, sizeof ( char ) * 1 );
-		/* nRead can be one of the following:
-		 * nRead > 0 - a successful read, we shall check for stop char and possibly continue reading.
-		 * nRead == 0 - stream is blocking and has just been closed or has no data to read and is internally non-blocking.
-		 * nRead < 0 - an error occured, read opration could be externally interrupted.
-		 */
+		if ( ( cached == maxCount_ ) || byDelim )
+			{
+			nRead = cached - ( ( ( cached > 0 ) && ! stripDelim_ ) ? 1 : 0 );
+			message_.assign( buffer, nRead );
+			if ( nRead )
+				{
+				_offset -= static_cast<int>( nRead );
+				::memmove( buffer, buffer + nRead, _offset );
+				}
+			}
 		}
-	while ( ( nRead > 0 )
-			&& ( ! ( byDelim = ( ::strchr( stopSet_, buffer[ _offset ++ ] ) ? true : false ) ) ) /* We increment _offset only if read succeeded. */
-			&& ( ! ( bySize = ( _offset >= maxCount_ ) ) ) );
-	if ( nRead >= 0 )
+	if ( ! ( nRead || byDelim ) )
 		{
-		M_ASSERT( _offset >= 0 );
-		message_.assign( buffer, _offset - ( ( ( _offset > 0 ) && stripDelim_ && byDelim ) ? 1 : 0 ) );
-		nRead = _offset;
-		_offset = 0;
+		do
+			{
+			/* Let's check if next read wont exceed size of our read buffer.
+			 * 1 byte or terminating zero and one byte for at least one new character,
+			 * hence + 2 in condition.
+			 */
+			if ( ( _offset + 2 ) > iPoolSize )
+				{
+				_cache.realloc( _offset + 2 );
+				buffer = _cache.raw(); /* update read cache buffer ptr, reallocation could move previous buffer into another memomry position */
+				iPoolSize = _cache.size();
+				}
+			/* We read only one byte at a time. */
+			nRead = do_read( buffer + _offset, sizeof ( char ) * 1 );
+			/* nRead can be one of the following:
+			 * nRead > 0 - a successful read, we shall check for stop char and possibly continue reading.
+			 * nRead == 0 - stream is blocking and has just been closed or has no data to read and is internally non-blocking.
+			 * nRead < 0 - an error occured, read opration could be externally interrupted.
+			 */
+			}
+		while ( ( nRead > 0 ) /* We increment _offset only if read succeeded. */
+				&& ( ! ( byDelim = ( ::memchr( set_, buffer[ _offset ++ ], setLen ) ? isStopSet_ : ! isStopSet_ ) ) )
+				&& ( ! ( bySize = ( _offset >= maxCount_ ) ) ) );
+		if ( nRead >= 0 )
+			{
+			if ( ! nRead )
+				_valid = false;
+			M_ASSERT( _offset >= 0 );
+			message_.assign( buffer, _offset - ( ( ( _offset > 0 ) && byDelim ) ? 1 : 0 ) );
+			if ( byDelim && ! stripDelim_ )
+				{
+				buffer[ 0 ] = buffer[ _offset - 1 ];
+				_offset = 1;
+				}
+			else
+				{
+				nRead = _offset;
+				_offset = 0;
+				}
+			}
+		else
+			message_.clear();
 		}
-	else
-		message_.clear();
 	return ( nRead );
 	M_EPILOG
+	}
+
+int HStreamInterface::do_peek( void )
+	{
+	if ( ! _offset )
+		{
+		int long iPoolSize( _cache.size() );
+		if ( iPoolSize < 1 )
+			_cache.realloc( 1 );
+		char* buffer( _cache.raw() ); /* read cache buffer */
+		do_read( buffer, 1 );
+		_offset = 1;
+		}
+	return ( _cache.raw()[ _offset - 1 ] );
 	}
 
 HStreamInterface& HStreamInterface::do_input( HString& word )
@@ -344,7 +428,37 @@ HStreamInterface& HStreamInterface::do_input( HString& word )
 bool HStreamInterface::read_word( void )
 	{
 	M_PROLOG
-	while ( read_until( _wordCache, _whiteSpace_, true ) < 0 )
+	while ( read_while( _wordCache, _whiteSpace_, false ) < 0 )
+		;
+	while ( read_until( _wordCache, _whiteSpace_, false ) < 0 )
+		;
+	return ( _wordCache.get_length() > 0 );
+	M_EPILOG
+	}
+
+bool HStreamInterface::read_integer( void )
+	{
+	M_PROLOG
+	while ( read_while( _wordCache, _whiteSpace_, false ) < 0 )
+		;
+	bool neg( peek() == '-' );
+	char sink( 0 );
+	if ( neg )
+		read( &sink, 1 );
+	while ( read_while( _wordCache, _digit_, false ) < 0 )
+		;
+	if ( neg )
+		_wordCache.insert( 0, "-" );
+	return ( _wordCache.get_length() > 0 );
+	M_EPILOG
+	}
+
+bool HStreamInterface::read_floatint_point( void )
+	{
+	M_PROLOG
+	while ( read_while( _wordCache, _whiteSpace_, false ) < 0 )
+		;
+	while ( read_until( _wordCache, _whiteSpace_, false ) < 0 )
 		;
 	return ( _wordCache.get_length() > 0 );
 	M_EPILOG
@@ -380,7 +494,7 @@ HStreamInterface& HStreamInterface::do_input( char unsigned& cu )
 HStreamInterface& HStreamInterface::do_input( int short& is )
 	{
 	M_PROLOG
-	if ( read_word() )
+	if ( read_integer() )
 		is = lexical_cast<int short>( _wordCache );
 	return ( *this );
 	M_EPILOG
@@ -389,7 +503,7 @@ HStreamInterface& HStreamInterface::do_input( int short& is )
 HStreamInterface& HStreamInterface::do_input( int short unsigned& isu )
 	{
 	M_PROLOG
-	if ( read_word() )
+	if ( read_integer() )
 		isu = lexical_cast<int short unsigned>( _wordCache );
 	return ( *this );
 	M_EPILOG
@@ -398,7 +512,7 @@ HStreamInterface& HStreamInterface::do_input( int short unsigned& isu )
 HStreamInterface& HStreamInterface::do_input( int& i )
 	{
 	M_PROLOG
-	if ( read_word() )
+	if ( read_integer() )
 		i = lexical_cast<int>( _wordCache );
 	return ( *this );
 	M_EPILOG
@@ -407,7 +521,7 @@ HStreamInterface& HStreamInterface::do_input( int& i )
 HStreamInterface& HStreamInterface::do_input( int unsigned& iu )
 	{
 	M_PROLOG
-	if ( read_word() )
+	if ( read_integer() )
 		iu = lexical_cast<int unsigned>( _wordCache );
 	return ( *this );
 	M_EPILOG
@@ -416,7 +530,7 @@ HStreamInterface& HStreamInterface::do_input( int unsigned& iu )
 HStreamInterface& HStreamInterface::do_input( int long& il )
 	{
 	M_PROLOG
-	if ( read_word() )
+	if ( read_integer() )
 		il = lexical_cast<int long>( _wordCache );
 	return ( *this );
 	M_EPILOG
@@ -425,7 +539,7 @@ HStreamInterface& HStreamInterface::do_input( int long& il )
 HStreamInterface& HStreamInterface::do_input( int long unsigned& ilu )
 	{
 	M_PROLOG
-	if ( read_word() )
+	if ( read_integer() )
 		ilu = lexical_cast<int long unsigned>( _wordCache );
 	return ( *this );
 	M_EPILOG
@@ -465,11 +579,44 @@ HStreamInterface& HStreamInterface::do_input( void const*& )
 	M_EPILOG
 	}
 
+HStreamInterface& HStreamInterface::do_input( manipulator_t const& HFILE_INTERFACE )
+	{
+	M_PROLOG
+	return ( HFILE_INTERFACE( *this ) );
+	M_EPILOG
+	}
 
 int long HStreamInterface::read( void* const buffer_, int long size_ )
 	{
 	M_PROLOG
-	return ( do_read( buffer_, size_ ) );
+	int long nRead( 0 );
+	if ( _offset )
+		{
+		char* buffer( _cache.raw() );
+		if ( _offset > size_ )
+			{
+			::memcpy( buffer_, buffer, nRead = size_ );
+			::memmove( buffer, static_cast<char const*>( buffer ) + size_, _offset - size_ );
+			_offset -= static_cast<int>( size_ );
+			}
+		else
+			{
+			::memcpy( buffer_, buffer, nRead = _offset );
+			size_ -= _offset;
+			_offset = 0;
+			}
+		}
+	if ( size_ > 0 )
+		{
+		int physRead( do_read( static_cast<char*>( buffer_ ) + nRead, size_ ) );
+		if ( physRead >= 0 )
+			nRead += physRead;
+		else if ( ! nRead )
+			nRead = physRead;
+		if ( ! physRead )
+			_valid = false;
+		}
+	return ( nRead );
 	M_EPILOG
 	}
 
@@ -483,7 +630,7 @@ int long HStreamInterface::write( void const* const buffer_, int long size_ )
 bool HStreamInterface::is_valid( void ) const
 	{
 	M_PROLOG
-	return ( do_is_valid() );
+	return ( _valid && do_is_valid() );
 	M_EPILOG
 	}
 
@@ -515,6 +662,14 @@ HStreamInterface& HStreamInterface::do_set_base( BASES::enum_t base_ )
 	{
 	M_PROLOG
 	_base = base_;
+	return ( *this );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::do_set_skipws( bool skipWS_ )
+	{
+	M_PROLOG
+	_skipWS = skipWS_;
 	return ( *this );
 	M_EPILOG
 	}

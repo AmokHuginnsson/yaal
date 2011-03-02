@@ -98,11 +98,16 @@ protected:
 	virtual HStreamInterface& do_input( double long& );
 	virtual HStreamInterface& do_input( float& );
 	virtual HStreamInterface& do_input( void const*& );
+	virtual HStreamInterface& do_input( manipulator_t const& );
 	virtual int long do_read_until( yaal::hcore::HString&, char const* const, bool );
 	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const* const, bool );
+	virtual int long do_read_while( yaal::hcore::HString&, char const* const, bool );
+	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* const, bool );
+	virtual int do_peek( void );
 	virtual HStreamInterface& do_set_fill( int );
 	virtual HStreamInterface& do_set_width( int );
 	virtual HStreamInterface& do_set_base( BASES::enum_t );
+	virtual HStreamInterface& do_set_skipws( bool );
 	virtual int long do_write( void const* const, int long );
 	virtual int long do_read( void* const, int long );
 	virtual void do_flush( void ) const;

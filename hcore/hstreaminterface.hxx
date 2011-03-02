@@ -44,6 +44,8 @@ HStreamInterface& flush( HStreamInterface& );
 HStreamInterface& dec( HStreamInterface& );
 HStreamInterface& hex( HStreamInterface& );
 HStreamInterface& oct( HStreamInterface& );
+HStreamInterface& skipws( HStreamInterface& );
+HStreamInterface& noskipws( HStreamInterface& );
 
 /*! \brief Interface for stream based IO.
  */
@@ -80,6 +82,8 @@ protected:
 	int _fill; /*!< Fill character for output operations. */
 	int _width; /*!< Next output operation width. */
 	BASES::enum_t _base;
+	bool _skipWS;
+	bool _valid;
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
@@ -145,6 +149,8 @@ public:
 		{ return ( do_input( val_ ) ); }
 	HStreamInterface& operator >> ( void const*& val_ )
 		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( manipulator_t const& val_ )
+		{ return ( do_input( val_ ) ); }
 	/*! \brief Read data from stream until end of it or until delimiter is encountered.
 	 *
 	 * \param store - Store read date here.
@@ -164,11 +170,34 @@ public:
 	 */
 	int long read_until_n( yaal::hcore::HString& store, int long maxcount, char const* const delim = eols, bool strip = true )
 		{ return ( do_read_until_n( store, maxcount, delim, strip ) ); }
+	/*! \brief Read data from stream as long as read characters are in set and end of stream has not been reached.
+	 *
+	 * \param store - Store read date here.
+	 * \param acquire - Read only those characters.
+	 * \param strip - Remove delimiting stop char from output buffer.
+	 * \return number of bytes read.
+	 */
+	int long read_while( yaal::hcore::HString& store, char const* const acquire, bool strip = true )
+		{ return ( do_read_while( store, acquire, strip ) ); }
+	/*! \brief Read data from stream as long as read characters are in set and neither end of stream nor given limit has been reached.
+	 *
+	 * \param store - Store read date here.
+	 * \param maxcount - A maximum number of bytes to read.
+	 * \param acquire - Read only those characters.
+	 * \param strip - Remove delimiting stop char from output buffer.
+	 * \return number of bytes read.
+	 */
+	int long read_while_n( yaal::hcore::HString& store, int long maxcount, char const* const acquire, bool strip = true )
+		{ return ( do_read_while_n( store, maxcount, acquire, strip ) ); }
 	int long read( void* const, int long );
 	int long write( void const* const, int long );
 	M_YAAL_HCORE_PUBLIC_API static char const* const eols;
 	bool is_valid( void ) const;
 	void flush( void ) const;
+	int peek( void )
+		{ return ( do_peek() ); }
+	HStreamInterface& set_skipws( bool skipWS_ )
+		{ return ( do_set_skipws( skipWS_ ) ); }
 	HStreamInterface& set_fill( int val_ )
 		{ return ( do_set_fill( val_ ) ); }
 	HStreamInterface& set_width( int val_ )
@@ -207,13 +236,21 @@ protected:
 	virtual HStreamInterface& do_input( double long& );
 	virtual HStreamInterface& do_input( float& );
 	virtual HStreamInterface& do_input( void const*& );
+	virtual HStreamInterface& do_input( manipulator_t const& );
 	virtual int long do_read_until( yaal::hcore::HString&, char const* const, bool );
 	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const* const, bool );
+	virtual int long do_read_while( yaal::hcore::HString&, char const* const, bool );
+	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* const, bool );
+	virtual int do_peek( void );
 	virtual HStreamInterface& do_set_fill( int );
 	virtual HStreamInterface& do_set_width( int );
 	virtual HStreamInterface& do_set_base( BASES::enum_t );
+	virtual HStreamInterface& do_set_skipws( bool );
 private:
 	bool read_word( void );
+	bool read_integer( void );
+	bool read_floatint_point( void );
+	int long semantic_read( yaal::hcore::HString&, int long, char const* const, bool, bool );
 	int long reformat( void );
 	virtual int long do_write( void const* const, int long ) = 0;
 	virtual int long do_read( void* const, int long ) = 0;
@@ -271,11 +308,6 @@ public:
 	operator out_t ( void ) const
 		{
 		M_PROLOG
-		while ( _steps > 0 )
-			{
-			read_word();
-			-- _steps;
-			}
 		out_t ret;
 		while ( _stream )
 			{
@@ -294,10 +326,17 @@ public:
 		}
 	bool operator == ( HStreamIterator const& it_ ) const
 		{
-		return ( ! ( _stream != it_._stream ) );
+		return ( operator != (  it_ ) );
 		}
 	bool operator != ( HStreamIterator const& it_ ) const
 		{
+		if ( ! _steps )
+			read_word();
+		while ( _steps > 0 )
+			{
+			read_word();
+			-- _steps;
+			}
 		return ( _stream != it_._stream );
 		}
 	void swap( HStreamIterator& it_ )
@@ -323,9 +362,12 @@ private:
 	void read_word( void ) const
 		{
 		M_PROLOG
-		int long len( _stream->read_until( _wordCache, _whiteSpace_ ) );
-		if ( len <= 0 )
-			_stream = NULL;
+		if ( _stream )
+			{
+			int long len( _stream->read_until( _wordCache, _whiteSpace_ ) );
+			if ( ( len <= 0 ) || ! _stream->is_valid() )
+				_stream = NULL;
+			}
 		return;
 		M_EPILOG
 		}

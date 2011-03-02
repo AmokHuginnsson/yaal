@@ -593,7 +593,7 @@ void dump_configuration( void* arg )
 	M_EPILOG
 	}
 
-void failure( int exitStatus_, char const * const format_, ... )
+void failure( int exitStatus_, char const* const format_, ... )
 	{
 	M_PROLOG
 	HString msg;
