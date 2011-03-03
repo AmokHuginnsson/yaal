@@ -333,7 +333,7 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 	char* buffer( _cache.raw() ); /* read cache buffer */
 	bool byDelim( false );
 	bool bySize( false );
-	int setLen( static_cast<int>( :: strlen( set_ ) ) );
+	int setLen( static_cast<int>( ::strlen( set_ ) + 1 ) ); /* + 1 for terminating \0 byte that also could be searched for */
 	if ( _offset )
 		{
 		int cached( 0 );
@@ -351,6 +351,8 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 				_offset -= static_cast<int>( nRead );
 				::memmove( buffer, buffer + nRead, _offset );
 				}
+			if ( byDelim )
+				++ nRead;
 			}
 		}
 	if ( ! ( nRead || byDelim ) )
@@ -383,6 +385,7 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 			if ( ! nRead )
 				_valid = false;
 			M_ASSERT( _offset >= 0 );
+			nRead = _offset;
 			message_.assign( buffer, _offset - ( ( ( _offset > 0 ) && byDelim ) ? 1 : 0 ) );
 			if ( byDelim && ! stripDelim_ )
 				{
@@ -390,10 +393,7 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 				_offset = 1;
 				}
 			else
-				{
-				nRead = _offset;
 				_offset = 0;
-				}
 			}
 		else
 			message_.clear();
@@ -428,7 +428,7 @@ HStreamInterface& HStreamInterface::do_input( HString& word )
 bool HStreamInterface::read_word( void )
 	{
 	M_PROLOG
-	static int const whiteLen( static_cast<int>( ::strlen( _whiteSpace_ ) ) );
+	static int const whiteLen( static_cast<int>( ::strlen( _whiteSpace_ ) + 1 ) ); /* see comment in semantic_read in analoguous context */
 	if ( ! _skipWS && ::memchr( _whiteSpace_, HStreamInterface::do_peek(), whiteLen ) )
 		_valid = false;
 	else
@@ -502,7 +502,7 @@ HStreamInterface& HStreamInterface::do_input( bool& b )
 HStreamInterface& HStreamInterface::do_input( char& char_ )
 	{
 	M_PROLOG
-	static int const whiteLen( static_cast<int>( ::strlen( _whiteSpace_ ) ) );
+	static int const whiteLen( static_cast<int>( ::strlen( _whiteSpace_ ) + 1 ) ); /* see comment in semantic_read in analoguous context */
 	char c( 0 );
 	do read( &c, 1 );
 	while ( _valid && _skipWS && ::memchr( _whiteSpace_, c, whiteLen ) );

@@ -531,7 +531,7 @@ HString& HString::assign( char const* const data_, int long length_ )
 		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
 	if ( length_ < 0 )
 		M_THROW( _( "bad length" ), length_ );
-	int long newSize( length_ );
+	int long newSize( ::strnlen( data_, length_ ) );
 	hs_realloc( newSize + 1 );
 	::memcpy( MEM, data_, newSize );
 	MEM[ newSize ] = 0;
