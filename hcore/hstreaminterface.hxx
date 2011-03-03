@@ -277,15 +277,15 @@ class HStreamIterator
 	{
 	mutable HStreamInterface* _stream;
 	delim_t _delim;
-	mutable HString _wordCache;
+	mutable out_t _valueCache;
 	mutable int long _steps;
 public:
 	HStreamIterator( void )
-		: _stream( NULL ), _delim(), _wordCache(), _steps( 0 ) {}
+		: _stream( NULL ), _delim(), _valueCache(), _steps( 0 ) {}
 	explicit HStreamIterator( HStreamInterface& stream, delim_t const& delim = delim_t() )
-		: _stream( &stream ), _delim( delim ), _wordCache(), _steps( 0 ) {}
+		: _stream( &stream ), _delim( delim ), _valueCache(), _steps( 0 ) {}
 	HStreamIterator( HStreamIterator const& it_ )
-		: _stream( it_._stream ), _delim( it_._delim ), _wordCache( it_._wordCache ), _steps( it_._steps ) {}
+		: _stream( it_._stream ), _delim( it_._delim ), _valueCache( it_._valueCache ), _steps( it_._steps ) {}
 	HStreamIterator& operator = ( HStreamIterator const& it_ )
 		{
 		if ( &it_ != this )
@@ -308,20 +308,7 @@ public:
 	operator out_t ( void ) const
 		{
 		M_PROLOG
-		out_t ret;
-		while ( _stream )
-			{
-			try
-				{
-				ret = lexical_cast<out_t>( _wordCache );
-				break;
-				}
-			catch ( HException const& )
-				{
-				read_word();
-				}
-			}
-		return ( ret );
+		return ( _valueCache );
 		M_EPILOG
 		}
 	bool operator == ( HStreamIterator const& it_ ) const
@@ -331,10 +318,10 @@ public:
 	bool operator != ( HStreamIterator const& it_ ) const
 		{
 		if ( ! _steps )
-			read_word();
+			read_value();
 		while ( _steps > 0 )
 			{
-			read_word();
+			read_value();
 			-- _steps;
 			}
 		return ( _stream != it_._stream );
@@ -346,7 +333,7 @@ public:
 			using yaal::swap;
 			swap( _stream, it_._stream );
 			swap( _delim, it_._delim );
-			swap( _wordCache, it_._wordCache );
+			swap( _valueCache, it_._valueCache );
 			swap( _steps, it_._steps );
 			}
 		return;
@@ -359,13 +346,13 @@ public:
 		M_EPILOG
 		}
 private:
-	void read_word( void ) const
+	void read_value( void ) const
 		{
 		M_PROLOG
 		if ( _stream )
 			{
-			int long len( _stream->read_until( _wordCache, _whiteSpace_ ) );
-			if ( ( len <= 0 ) || ! _stream->is_valid() )
+			*_stream >> _valueCache;
+			if ( ! _stream->is_valid() )
 				_stream = NULL;
 			}
 		return;
@@ -374,11 +361,11 @@ private:
 	};
 
 template<typename delim_t>
-HStreamIterator<delim_t, void> stream_iterator( HStreamInterface& stream, delim_t delim )
-	{ return ( HStreamIterator<delim_t, void>( stream, delim ) ); }
+HStreamIterator<delim_t, trait::no_type> stream_iterator( HStreamInterface& stream, delim_t delim )
+	{ return ( HStreamIterator<delim_t, trait::no_type>( stream, delim ) ); }
 
-inline HStreamIterator<char const* const, void> stream_iterator( HStreamInterface& stream )
-	{ return ( HStreamIterator<char const* const, void>( stream, "" ) ); }
+inline HStreamIterator<char const* const, trait::no_type> stream_iterator( HStreamInterface& stream )
+	{ return ( HStreamIterator<char const* const, trait::no_type>( stream, "" ) ); }
 
 template<typename out_t, typename delim_t>
 HStreamIterator<delim_t, out_t> stream_iterator( HStreamInterface& stream, delim_t delim )

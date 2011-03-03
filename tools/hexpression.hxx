@@ -69,9 +69,11 @@ class HExpression
 	int _length;
 	syntax_error_t _error;
 	double long _variables[ 26 ];
-	hcore::HArray<double long> _constantsPool;
-	hcore::HArray<int> _terminalIndexes;
-	hcore::HString	_formula;
+	typedef hcore::HArray<double long> constants_t;
+	constants_t _constantsPool;
+	typedef hcore::HArray<int> terminal_indexes_t;
+	terminal_indexes_t _terminalIndexes;
+	hcore::HString _formula;
 	tree_t _equationTree;
 public:
 	/*{*/

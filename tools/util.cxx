@@ -222,14 +222,27 @@ void usun_ogonki ( char * string_ )
 double long atof_ex( HString const& string_, bool parse_ )
 	{
 	M_PROLOG
-	HExpression analyser;
+	double long value( 0 );
 	HString str = string_;
-	str.replace ( ",", "." );
-	str.replace ( " ", "" );
-	str.replace ( "\t", "" );
-	if ( parse_ && analyser.compile( str ) )
-		return ( analyser.evaluate() );
-	return ( lexical_cast<double long>( str ) );
+	str.replace ( ",", "." ).replace ( " ", "" ).replace ( "\t", "" );
+	if ( parse_ )
+		{
+		HExpression analyser;
+		try
+			{
+			if ( analyser.compile( str ) )
+				value = analyser.evaluate();
+			else
+				throw HExpressionException( HString( analyser.get_error() ) + " for: " + string_ + ", at: " + analyser.get_error_token() );
+			}
+		catch ( HExpressionException const& e )
+			{
+			throw HExpressionException( HString( e.what() ) + " - " + analyser.get_error() + " for: " + string_ + ", at: " + analyser.get_error_token() );
+			}
+		}
+	else
+		value = lexical_cast<double long>( str );
+	return ( value );
 	M_EPILOG
 	}
 

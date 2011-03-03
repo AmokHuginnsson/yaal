@@ -297,7 +297,7 @@ int long HStreamInterface::do_read_until( HString& message_,
 		char const* const stopSet_, bool stripDelim_ )
 	{
 	M_PROLOG
-	return ( read_until_n( message_, meta::max_signed<int long>::value, stopSet_, stripDelim_ ) );
+	return ( HStreamInterface::read_until_n( message_, meta::max_signed<int long>::value, stopSet_, stripDelim_ ) );
 	M_EPILOG
 	}
 
@@ -313,7 +313,7 @@ int long HStreamInterface::do_read_while( HString& message_,
 		char const* const acquire_, bool stripDelim_ )
 	{
 	M_PROLOG
-	return ( read_while_n( message_, meta::max_signed<int long>::value, acquire_, stripDelim_ ) );
+	return ( HStreamInterface::do_read_while_n( message_, meta::max_signed<int long>::value, acquire_, stripDelim_ ) );
 	M_EPILOG
 	}
 
@@ -428,24 +428,30 @@ HStreamInterface& HStreamInterface::do_input( HString& word )
 bool HStreamInterface::read_word( void )
 	{
 	M_PROLOG
-	while ( read_while( _wordCache, _whiteSpace_, false ) < 0 )
-		;
-	while ( read_until( _wordCache, _whiteSpace_, false ) < 0 )
-		;
-	return ( _wordCache.get_length() > 0 );
+	static int const whiteLen( static_cast<int>( ::strlen( _whiteSpace_ ) ) );
+	if ( ! _skipWS && ::memchr( _whiteSpace_, HStreamInterface::do_peek(), whiteLen ) )
+		_valid = false;
+	else
+		{
+		while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_, false ) < 0 )
+			;
+		while ( HStreamInterface::do_read_until( _wordCache, _whiteSpace_, false ) < 0 )
+			;
+		}
+	return ( _valid && ( _wordCache.get_length() > 0 ) );
 	M_EPILOG
 	}
 
 bool HStreamInterface::read_integer( void )
 	{
 	M_PROLOG
-	while ( read_while( _wordCache, _whiteSpace_, false ) < 0 )
+	while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_, false ) < 0 )
 		;
-	bool neg( peek() == '-' );
+	bool neg( HStreamInterface::do_peek() == '-' );
 	char sink( 0 );
 	if ( neg )
-		read( &sink, 1 );
-	while ( read_while( _wordCache, _digit_, false ) < 0 )
+		HStreamInterface::read( &sink, 1 );
+	while ( HStreamInterface::do_read_while( _wordCache, _digit_, false ) < 0 )
 		;
 	if ( neg )
 		_wordCache.insert( 0, "-" );
@@ -456,10 +462,30 @@ bool HStreamInterface::read_integer( void )
 bool HStreamInterface::read_floatint_point( void )
 	{
 	M_PROLOG
-	while ( read_while( _wordCache, _whiteSpace_, false ) < 0 )
+	while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_, false ) < 0 )
 		;
-	while ( read_until( _wordCache, _whiteSpace_, false ) < 0 )
+	bool neg( HStreamInterface::do_peek() == '-' );
+	char sink( 0 );
+	if ( neg )
+		read( &sink, 1 );
+	while ( HStreamInterface::do_read_while( _wordCache, _digit_, false ) < 0 )
 		;
+	if ( neg )
+		_wordCache.insert( 0, "-" );
+	bool dot( HStreamInterface::do_peek() == '.' );
+	if ( dot )
+		HStreamInterface::read( &sink, 1 );
+	if ( dot )
+		{
+		HString decimal;
+		while ( HStreamInterface::do_read_while( decimal, _digit_, false ) < 0 )
+			;
+		if ( ! decimal.is_empty() )
+			{
+			_wordCache += sink;
+			_wordCache += decimal;
+			}
+		}
 	return ( _wordCache.get_length() > 0 );
 	M_EPILOG
 	}
@@ -473,11 +499,14 @@ HStreamInterface& HStreamInterface::do_input( bool& b )
 	M_EPILOG
 	}
 
-HStreamInterface& HStreamInterface::do_input( char& c )
+HStreamInterface& HStreamInterface::do_input( char& char_ )
 	{
 	M_PROLOG
-	if ( read_word() )
-		c = _wordCache[ 0 ];
+	static int const whiteLen( static_cast<int>( ::strlen( _whiteSpace_ ) ) );
+	char c( 0 );
+	do read( &c, 1 );
+	while ( _valid && _skipWS && ::memchr( _whiteSpace_, c, whiteLen ) );
+	char_ = c;
 	return ( *this );
 	M_EPILOG
 	}
@@ -485,8 +514,9 @@ HStreamInterface& HStreamInterface::do_input( char& c )
 HStreamInterface& HStreamInterface::do_input( char unsigned& cu )
 	{
 	M_PROLOG
-	if ( read_word() )
-		cu = _wordCache[ 0 ];
+	char ch;
+	HStreamInterface::do_input( ch );
+	cu = ch;
 	return ( *this );
 	M_EPILOG
 	}
@@ -548,7 +578,7 @@ HStreamInterface& HStreamInterface::do_input( int long unsigned& ilu )
 HStreamInterface& HStreamInterface::do_input( double& d )
 	{
 	M_PROLOG
-	if ( read_word() )
+	if ( read_floatint_point() )
 		d = lexical_cast<double>( _wordCache );
 	return ( *this );
 	M_EPILOG
@@ -557,7 +587,7 @@ HStreamInterface& HStreamInterface::do_input( double& d )
 HStreamInterface& HStreamInterface::do_input( double long& dl )
 	{
 	M_PROLOG
-	if ( read_word() )
+	if ( read_floatint_point() )
 		dl = lexical_cast<double long>( _wordCache );
 	return ( *this );
 	M_EPILOG
@@ -566,7 +596,7 @@ HStreamInterface& HStreamInterface::do_input( double long& dl )
 HStreamInterface& HStreamInterface::do_input( float& f )
 	{
 	M_PROLOG
-	if ( read_word() )
+	if ( read_floatint_point() )
 		f = lexical_cast<float>( _wordCache );
 	return ( *this );
 	M_EPILOG
