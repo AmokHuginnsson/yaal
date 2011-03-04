@@ -67,11 +67,9 @@ public:
 		{
 		typedef enum
 			{
-			DEFAULTS = 0, /* KEEP_NEWLINES | BUFFERED_READS */
-			KEEP_NEWLINES = 1,
-			STRIP_NEWLINES = 2,
-			BUFFERED_READS = 4,
-			UNBUFFERED_READS = 8
+			DEFAULTS = 0, /* BUFFERED_READS */
+			BUFFERED_READS = 1,
+			UNBUFFERED_READS = 2
 			} enum_t;
 		};
 	typedef HStrongEnum<READ> read_t;

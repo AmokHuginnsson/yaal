@@ -514,7 +514,7 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 	M_PROLOG
 	int long index = 0, lenght = 0, end = 0;
 	option_ = value_ = "";
-	while ( file_.read_line( option_, HFile::READ::STRIP_NEWLINES ) >= 0 )
+	while ( file_.read_line( option_ ) >= 0 )
 		{
 		line_ ++;
 		index = 0;

@@ -193,10 +193,6 @@ int long HFile::read_line( HString& line_, read_t const& read_,
 	M_PROLOG
 	M_ASSERT( _handle );
 	read_t readMode = read_;
-	if ( ( !!( readMode & READ::KEEP_NEWLINES ) ) && ( !!( readMode & READ::STRIP_NEWLINES ) ) )
-		M_THROW( _( "bad newlines setting" ), readMode.value() );
-	if ( ! ( ( !!( readMode & READ::KEEP_NEWLINES ) ) || ( !!( readMode & READ::STRIP_NEWLINES ) ) ) )
-		readMode |= READ::KEEP_NEWLINES;
 	if ( ( !!( readMode & READ::BUFFERED_READS ) ) && ( !!( readMode & READ::UNBUFFERED_READS ) ) )
 		M_THROW( _( "bad buffering setting" ), readMode.value() );
 	if ( ! ( ( !!( readMode & READ::BUFFERED_READS ) ) || ( !!( readMode & READ::UNBUFFERED_READS ) ) ) )
@@ -213,31 +209,21 @@ int long HFile::read_line( HString& line_, read_t const& read_,
 			if ( maximumLength_ && ( length > maximumLength_ ) )
 				M_THROW( _( "line too long" ), length );
 			ptr = static_cast<char*>( _cache.realloc( length ) );
-			M_ENSURE( static_cast<int>( ::std::fread( ptr,
-							sizeof ( char ), length,
-							static_cast<FILE*>( _handle ) ) ) == length );
-			ptr[ length ] = 0;
+			M_ENSURE( read( ptr, length ) == length );
+			ptr[ length - 1 ] = 0;
 			line_ = ptr;
-			length = line_.get_length();
 			}
 		}
 	else /* UNBUFFERED_READS */
 		{
-		length = read_until( line_, HStreamInterface::eols, false );
+		length = read_until( line_, HStreamInterface::eols, true );
 		if ( maximumLength_ && ( length > maximumLength_ ) )
 			M_THROW( _( "line too long" ), length );
 		}
 	if ( length > 0 )
 		{
-		int long newLen = length;
-		if ( ( !!( readMode & READ::STRIP_NEWLINES ) ) && ( newLen > 0 ) )
-			{
-			-- newLen;
-			if ( ( newLen > 0 ) && ( line_[ newLen - 1 ] == '\r' ) )
-				-- newLen;
-			}
-		if ( newLen < length )
-			line_.set_at( newLen, 0 );
+		if ( ( length > 1 ) && ( line_[ length - 2 ] == '\r' ) )
+			line_.set_at( length - 2, 0 );
 		}
 	else
 		length = -1;
