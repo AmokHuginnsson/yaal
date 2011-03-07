@@ -137,6 +137,24 @@ function terminate( code ) {
 	WScript.quit( code );
 }
 
+if (!Array.prototype.filter) {
+	Array.prototype.filter = function(fun /*, thisp*/) {
+		var len = this.length;
+		if (typeof fun != "function")
+			throw new TypeError();
+		var res = new Array();
+		var thisp = arguments[1];
+		for (var i = 0; i < len; i++) {
+			if (i in this) {
+				var val = this[i]; // in case fun mutates this
+				if (fun.call(thisp, val, i, this))
+					res.push(val);
+			}
+		}
+		return res;
+	};
+}
+
 try {
 	fs = new ActiveXObject( "Scripting.FileSystemObject" );
 	dirRoot = fs.GetFolder(".").path.replace( /\\/gm, "/" );
@@ -239,7 +257,14 @@ try {
 	if ( BOOST_INSTALL_PATH != null )
 		cmdline += ( "-DBOOST_INSTALL_PATH=" + BOOST_INSTALL_PATH + " " );
 	cmdline += CMAKELISTS_PATH;
-	msg( "Executing: " + cmdline );
+	envSys = shell.environment( "System" );
+	envProc = shell.environment( "Process" );
+	envUser = shell.environment( "User" );
+	envProc( "PATH" ) = envSys( "PATH" ).split( ";", 1000 ).filter( ( function( obj ){ return ( ! String( obj ).match( "cygwin|unix" ) ); } ) ).join( ";" );
+	envProc( "CXX" ) = "";
+	envProc( "CC" ) = "";
+	envProc.remove( "CXX" );
+	envProc.remove( "CC" );
 	cmd = shell.exec( cmdline );
 	if ( FAST ) {
 		var eoo = 0;
