@@ -188,8 +188,8 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ )
 	M_ENSURE( ::setsockopt( _fileDescriptor, SOL_SOCKET, SO_REUSEADDR,
 				reinterpret_cast<char*>( &reuseAddr ), sizeof ( reuseAddr ) ) == 0 );
 	M_ENSURE_EX( ( ::bind( _fileDescriptor,
-				static_cast<sockaddr*>( _address ), _addressSize ) == 0 ), address_ );
-	M_ENSURE_EX( ( ::listen( _fileDescriptor, _maximumNumberOfClients ) == 0 ), address_ );
+				static_cast<sockaddr*>( _address ), _addressSize ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
+	M_ENSURE_EX( ( ::listen( _fileDescriptor, _maximumNumberOfClients ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	_clients = new clients_t( _maximumNumberOfClients );
 	_needShutdown = true;
 	return;
@@ -266,9 +266,9 @@ void HSocket::connect( yaal::hcore::HString const& address_, int port_ )
 			M_ENSURE( ::getsockopt( _fileDescriptor, SOL_SOCKET, SO_ERROR, &error, &optLen ) == 0 );
 			}
 		else if ( ! timeout )
-			M_ENSURE_EX( ! "connection timedout", address_ );
+			M_ENSURE_EX( ! "connection timedout", !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 		}
-	M_ENSURE_EX( error == 0, address_ );
+	M_ENSURE_EX( error == 0, !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	errno = saveErrno;
 	_needShutdown = true;
 	return;
@@ -288,7 +288,7 @@ void HSocket::make_address( yaal::hcore::HString const& address_, int port_ )
 #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 )
 		addrinfo* addrInfo( NULL );
 		error = ::getaddrinfo( address_.raw(), NULL, NULL, &addrInfo );
-		M_ENSURE( ! error && addrInfo );
+		M_ENSURE_EX( ! error && addrInfo, address_ );
 		addressNetwork->sin_addr.s_addr = reinterpret_cast<sockaddr_in*>( addrInfo->ai_addr )->sin_addr.s_addr;
 		::freeaddrinfo( addrInfo );
 #else /* #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 ) */
@@ -302,7 +302,7 @@ void HSocket::make_address( yaal::hcore::HString const& address_, int port_ )
 					&hostNameStatus, &error ) == ERANGE )
 			_cache.realloc( _addressSize <<= 1 );
 		errno = error;
-		M_ENSURE( hostNameStatus );
+		M_ENSURE_EX( hostNameStatus, address_ );
 		addressNetwork->sin_addr.s_addr = reinterpret_cast<in_addr*>(
 				hostName.h_addr_list[ 0 ] )->s_addr;
 #endif /* #else #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 ) */
