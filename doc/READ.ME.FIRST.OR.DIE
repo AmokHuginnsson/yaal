@@ -10,8 +10,9 @@
 	- Debian (latest development branch, currently `unstable' aka `Sid') (Debian stable releases are not supported!)
 	- Ubuntu (latest development branch and latest stable release, currently 11.04 and 10.10 respectively)
 	- Centos (latest stable release, currently 5.5)
-	- FreeBSD (latest stable release, currently 8.1-RELEASE)
-	- Solaris (latest stable release, currently 5.10)
+	- FreeBSD (latest stable release, currently 8.2-RELEASE)
+	- Sun Solaris (latest stable release, currently 5.10)
+	- Oracle Solaris (latest stable release, currently 11)
 	- Windows XP SP3 with Cygwin (latest available cygwin release, currently 1.7.x)
 
 [For more detailed information regarding platform support
