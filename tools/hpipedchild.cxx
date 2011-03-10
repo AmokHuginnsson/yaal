@@ -131,6 +131,9 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 	M_ENSURE_EX( !! image && image.is_executable(), image_ );
 	M_ENSURE( ( ! ::pipe( fileDesIn ) ) && ( ! ::pipe( fileDesOut ) ) && ( ! ::pipe( fileDesErr ) ) );
 	HChunk argv( chunk_size<char const*>( argv_.size() + 2 ) );
+	int const stdinFd( fileno( stdin ) );
+	int const stdoutFd( fileno( stdout ) );
+	int const stderrFd( fileno( stderr ) );
 	_pid = ::fork();
 	M_ENSURE_EX( _pid >= 0, "fork()" );
 	if ( ! _pid )
@@ -138,9 +141,9 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 		close_and_invalidate( fileDesIn[ 1 ] );
 		close_and_invalidate( fileDesOut[ 0 ] );
 		close_and_invalidate( fileDesErr[ 0 ] );
-		if ( ( ::dup2( fileDesIn[ 0 ], fileno( stdin ) ) < 0 )
-				|| ( ::dup2( fileDesOut[ 1 ], fileno( stdout ) ) < 0 )
-				|| ( ::dup2( fileDesErr[ 1 ], fileno( stderr ) ) < 0 ) )
+		if ( ( ::dup2( fileDesIn[ 0 ], stdinFd ) < 0 )
+				|| ( ::dup2( fileDesOut[ 1 ], stdoutFd ) < 0 )
+				|| ( ::dup2( fileDesErr[ 1 ], stderrFd ) < 0 ) )
 			M_THROW( "dup2", errno );
 		argv.get<char const*>()[ 0 ] = image_.raw();
 		int i( 1 );

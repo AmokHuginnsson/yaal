@@ -103,6 +103,7 @@ elseif ( __HOST_OS_TYPE_SOLARIS__ )
 	execute_process( COMMAND prtconf COMMAND awk "/Memory/{print $3}" OUTPUT_VARIABLE PHYS_MEM OUTPUT_STRIP_TRAILING_WHITESPACE )
 endif()
 
+use_cxx_compiler_flag( -pthread )
 use_cxx_compiler_flag( -fmessage-length=0 )
 use_cxx_compiler_flag( -std=gnu++98 )
 use_cxx_compiler_flag( -pipe )

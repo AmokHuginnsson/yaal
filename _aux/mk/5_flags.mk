@@ -31,8 +31,7 @@ CXXWARNING_FLAGS		=	\
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
-COMPILER_PRIME_FLAGS					= -fmessage-length=0 -std=gnu++98 -pipe \
-																-D_GNU_SOURCE
+COMPILER_PRIME_FLAGS = -pthread -fmessage-length=0 -std=gnu++98 -pipe -D_GNU_SOURCE
 
 ifdef DO_RELDEB
 	DO_RELEASE = 1
