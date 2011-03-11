@@ -638,7 +638,7 @@ int long HStreamInterface::read( void* const buffer_, int long size_ )
 		}
 	if ( size_ > 0 )
 		{
-		int physRead( do_read( static_cast<char*>( buffer_ ) + nRead, size_ ) );
+		int long physRead( do_read( static_cast<char*>( buffer_ ) + nRead, size_ ) );
 		if ( physRead >= 0 )
 			nRead += physRead;
 		else if ( ! nRead )
