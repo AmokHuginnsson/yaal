@@ -76,6 +76,7 @@ public:
 	typedef HIterator<value_type const> const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
+	typedef HPair<iterator, bool> insert_result;
 private:
 	HSBBSTree _engine;
 public:
@@ -114,7 +115,7 @@ public:
 		{ return ( is_empty() );	}
 	bool is_empty( void ) const
 		{ return ( _engine.is_empty() );	}
-	HPair<iterator, bool> insert( value_type const& e )
+	insert_result insert( value_type const& e )
 		{
 		HPair<HSBBSTree::HIterator, bool> p = _engine.insert<value_type, helper_t>( e );
 		return ( make_pair( iterator( p.first ), p.second ) );

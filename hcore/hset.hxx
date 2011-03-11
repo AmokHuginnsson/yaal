@@ -70,6 +70,7 @@ public:
 	typedef HIterator const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
+	typedef HPair<iterator, bool> insert_result;
 private:
 	HSBBSTree _engine;
 public:
@@ -108,7 +109,7 @@ public:
 		{ return ( is_empty() );	}
 	bool is_empty( void ) const
 		{ return ( _engine.is_empty() );	}
-	HPair<HIterator, bool> insert( value_type const& elem )
+	insert_result insert( value_type const& elem )
 		{
 		M_PROLOG
 		HPair<HSBBSTree::HIterator, bool> p = _engine.insert<value_type, helper_t>( elem );

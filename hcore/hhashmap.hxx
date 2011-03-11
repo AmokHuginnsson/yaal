@@ -52,6 +52,7 @@ public:
 	typedef HIterator<value_type const> const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
+	typedef HPair<iterator, bool> insert_result;
 private:
 	struct hasher
 		{
@@ -153,7 +154,7 @@ public:
 		{ M_PROLOG return ( const_iterator( _engine.find( key_, _hasher ) ) ); M_EPILOG }
 	iterator find( key_t const& key_ )
 		{ M_PROLOG return ( iterator( _engine.find( key_, _hasher ) ) ); M_EPILOG }
-	HPair<iterator, bool> insert( value_type const& val_ )
+	insert_result insert( value_type const& val_ )
 		{
 		M_PROLOG
 		HPair<HHashContainer::HIterator, bool> it( _engine.insert( val_, _hasher ) );
