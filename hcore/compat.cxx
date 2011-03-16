@@ -134,22 +134,3 @@ double long strtold( char const* str, char** tail )
 	}
 #endif /* not HAVE_STRTOLD */
 
-#if ! defined( HAVE_ASPRINTF ) || ( HAVE_ASPRINTF == 0 )
-int asprintf( char** pbuf, char const* fmt, ... )
-	{
-	::std::va_list ap;
-	va_start( ap, fmt );
-	::std::va_list apTest;
-	__va_copy( apTest, ap );
-	int size = vsnprintf( NULL, 0, fmt, apTest ) + 1;
-	if ( size > 0 )
-		{
-		*pbuf = yaal::hcore::xcalloc<char>( size );
-		size = vsnprintf( *pbuf, size, fmt, ap );
-		}
-	va_end( apTest );
-	va_end( ap );
-	return ( size );
-	}
-#endif /* not HAVE_ASPRINTF */
-

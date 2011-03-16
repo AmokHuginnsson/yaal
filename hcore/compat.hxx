@@ -80,10 +80,6 @@ double long floorl( double long );
 double long strtold( char const*, char** );
 #endif /* #if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 ) */
 
-#if ! defined( HAVE_ASPRINTF ) || ( HAVE_ASPRINTF == 0 )
-int asprintf( char**, char const*, ... );
-#endif /* #if ! defined( HAVE_ASPRINTF ) || ( HAVE_ASPRINTF == 0 ) */
-
 #if ! defined( LOGIN_NAME_MAX )
 static int const LOGIN_NAME_MAX = 16;
 #endif /* #if ! defined( LOGIN_NAME_MAX ) */
