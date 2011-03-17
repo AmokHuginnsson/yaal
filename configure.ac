@@ -115,7 +115,7 @@ fi
 CXXFLAGS=["-Wextra"]
 AC_MSG_CHECKING([does gcc support -Wextra])
 RESULT=["no"]
-AC_COMPILE_IFELSE([ ],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([ ])],
 							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -Wextra"]]
 							[RESULT=["yes"]],
 							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -W]"])
