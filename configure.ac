@@ -39,7 +39,7 @@ AC_CONFIG_SRCDIR([[yaalrc.in]])
 AC_CONFIG_AUX_DIR([_aux])
 
 dnl yaal is not Free Software.
-AC_COPYRIGHT([[yaal (c) 2004 All rights reserved.]])
+AC_COPYRIGHT([[yaal (c) 2011 All rights reserved.]])
 
 YAAL_CHECK_GIT
 dnl yaal is still in alpha stage.
@@ -94,6 +94,7 @@ _FLAGS=''
 CXXFLAGS_ORIG=$CXXFLAGS;
 CPPFLAGS_ORIG=$CPPFLAGS;
 
+YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-pthread], [C++])
 YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-m64], [C++])
 YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fPIC], [C++])
 YAAL_DETECT_FLAGS(RDYNAMIC, [-rdynamic], [C++])
@@ -120,13 +121,13 @@ AC_COMPILE_IFELSE([ ],
 							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -W]"])
 AC_MSG_RESULT([$RESULT])
 CXXFLAGS=["-Wshadow -Werror"]
-AC_COMPILE_IFELSE([#include <pthread.h>],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <pthread.h>]])],
 							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -Wshadow"]
 							_FLAGS=["-Wshadow"]],
 							[AC_MSG_WARN([[Cannot use -Wshadow!]])])
 CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["-pedantic-errors"]
-AC_COMPILE_IFELSE([#include <cstdlib>],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstdlib>]])],
 							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -pedantic-errors"]
 							_FLAGS=["$_FLAGS -pedantic-errors"]],
 							[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
@@ -206,12 +207,13 @@ CXXFLAGS=$CXXFLAGS_ORIG
 
 AC_MSG_CHECKING([whether C++ compiler supports __decltype])
 RESULT=["no"]
-AC_COMPILE_IFELSE([int main( int, char const* const* const ) { int a = 0; typedef __decltype( a ) a_t; a_t b; return ( 0 );	}], [AC_DEFINE([HAVE_DECLTYPE],[],[Is __decltype available?])] RESULT=["yes"])
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[int main( int, char const* const* const ) { int a = 0; typedef __decltype( a ) a_t; a_t b; return ( 0 ); }]])],
+	[AC_DEFINE([HAVE_DECLTYPE],[],[Is __decltype available?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether strftime() returns required buffer size])
 RESULT=["no"]
-AC_RUN_IFELSE([#include <ctime>
+AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <ctime>
 int main( int, char const* const* const )
 	{
 	time_t t( time( NULL ) );
@@ -219,12 +221,12 @@ int main( int, char const* const* const )
 	localtime_r( &t, &broken );
 	int size( strftime( NULL, 1024, "%F %T", &broken ) );
 	return ( ! size );
-	}], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
+	}]])], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether contents of input buffer for iconv() is const])
 RESULT=["no"]
-AC_COMPILE_IFELSE([#include <iconv.h>
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <iconv.h>
 int main( int, char const* const* const )
 	{
 	iconv_t conv( 0 );
@@ -233,23 +235,23 @@ int main( int, char const* const* const )
 	char* out( NULL );
 	iconv( conv, &in, &size, &out, &size );
 	return ( 0 );
-	}], [AC_DEFINE([HAVE_ICONV_INPUT_CONST],[],[Is your iconv() input args const?])] RESULT=["yes"])
+	}]])], [AC_DEFINE([HAVE_ICONV_INPUT_CONST],[],[Is your iconv() input args const?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether arg for basename is const])
 RESULT=["no"]
-AC_COMPILE_IFELSE([#include <cstring>
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstring>
 int main( int, char const* const* const )
 	{
 	char const* const p( NULL );
 	basename( p );
 	return ( 0 );
-	}], [AC_DEFINE([HAVE_BASENAME_ARG_CONST],[],[Is your argument to basename a pointer to const?])] RESULT=["yes"])
+	}]])], [AC_DEFINE([HAVE_BASENAME_ARG_CONST],[],[Is your argument to basename a pointer to const?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether gethostbyname_r is GNU variant])
 RESULT=["no"]
-AC_COMPILE_IFELSE([#include <netdb.h>
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <netdb.h>
 int main( int, char const* const* const )
 	{
 	int i( 0 );
@@ -257,12 +259,12 @@ int main( int, char const* const* const )
 	struct hostent h, * ph( 0 );
 	::gethostbyname_r( "", &h, p, 0, &ph, &i );
 	return ( 0 );
-	}], [AC_DEFINE([HAVE_GNU_GETHOSTBYNAME_R],[],[Is gethostbyname_r a GNU flavour?])] RESULT=["yes"])
+	}]])], [AC_DEFINE([HAVE_GNU_GETHOSTBYNAME_R],[],[Is gethostbyname_r a GNU flavour?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether gethostbyaddr_r is GNU variant])
 RESULT=["no"]
-AC_COMPILE_IFELSE([#include<netdb.h>
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include<netdb.h>
 int main( int, char const* const* const )
 	{
 	int i( 0 );
@@ -270,7 +272,7 @@ int main( int, char const* const* const )
 	struct hostent h, * ph( 0 );
 	::gethostbyaddr_r( 0, 0, 0, &h, p, 0, &ph, &i );
 	return ( 0 );
-	}], [AC_DEFINE([HAVE_GNU_GETHOSTBYADDR_R],[],[Is gethostbyaddr_r a GNU flavour?])] RESULT=["yes"])
+	}]])], [AC_DEFINE([HAVE_GNU_GETHOSTBYADDR_R],[],[Is gethostbyaddr_r a GNU flavour?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 DEFAULT_DRIVER=["null"]
@@ -353,8 +355,8 @@ AC_CHECK_FUNCS([getline memrchr strnlen getaddrinfo getnameinfo gethostbyname_r 
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])
 AC_MSG_CHECKING([whether basename is declared in cstring])
-AC_COMPILE_IFELSE([#include <cstring>
-	int main( int, char** ){ char* p( NULL ); basename( p ); return ( 0 ); }],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstring>
+	int main( int, char** ){ char* p( NULL ); basename( p ); return ( 0 ); }]])],
 	[AC_DEFINE([HAVE_BASENAME_IN_CSTRING],[1],[Does your basename() is included in cstring header?]) AC_MSG_RESULT([yes])],
 	[AC_MSG_RESULT([no])])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
@@ -365,8 +367,8 @@ AC_CHECK_DECLS([SUN_LEN],[],[],[#include <cstdlib>
 								#include <sys/un.h>])
 AC_CHECK_DECLS([ERR],[],[],[#include <cstdlib>])
 AC_MSG_CHECKING([whether powl is available])
-AC_COMPILE_IFELSE([#include <cmath>
-									 int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cmath>
+									 int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }]])],
 	[AC_DEFINE([HAVE_POWL],[1],[We have ::powl().]) AC_MSG_RESULT([yes])], AC_MSG_RESULT([no]))
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
@@ -376,23 +378,23 @@ AC_MSG_RESULT([--- Libraries/environment sanity check ... ---          [[93%]]])
 AC_MSG_CHECKING([if your ncurses-devel is seriously brain-damaged])
 CXXFLAGS=$CXXFLAGS_ORIG
 CXXFLAGS=["${EXTRA_CXXFLAGS} -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
-AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
-									 int main( int, char** ) { printw("x"); return ( 0 ); }],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <$_NCURSES_HEADER>
+									 int main( int, char** ) { printw("x"); return ( 0 ); }]])],
 	[AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
 		AC_MSG_ERROR([Cannot continue with seriously brain-damaged ncurses.])])
 AC_MSG_CHECKING([if your ncurses is damaged about char-subscripts in ncurses (acs_map)])
-AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
-									 int main( int, char** ) { addch(ACS_DARROW); return ( 0 ); }],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <$_NCURSES_HEADER>
+									 int main( int, char** ) { addch(ACS_DARROW); return ( 0 ); }]])],
 	[AC_DEFINE([HAVE_ASCII_GRAPHICS],[],[Does your ncurses installation support ASCII graphic chars?]) AC_MSG_RESULT([[no :)]])],
 	[AC_MSG_RESULT([[yes :(]])
 		AC_MSG_WARN([You will not have pretty ascii graphics.])])
 AC_MSG_CHECKING([type of attr_get second argument])
-AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
-									 int main( int, char** ){ attr_t* a( NULL ); int short* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <$_NCURSES_HEADER>
+									 int main( int, char** ){ attr_t* a( NULL ); int short* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }]])],
 	[AC_DEFINE_UNQUOTED([NCURSES_ATTR_GET_SECOND_ARG_TYPE],[int short],[Type of second argument of attr_get() of ncurses library..]) AC_MSG_RESULT([[int short]])],
-	[AC_COMPILE_IFELSE([#include <$_NCURSES_HEADER>
-	 int main( int, char** ){ attr_t* a( NULL ); int* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }],
+	[AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <$_NCURSES_HEADER>
+	 int main( int, char** ){ attr_t* a( NULL ); int* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }]])],
 	[AC_DEFINE_UNQUOTED([NCURSES_ATTR_GET_SECOND_ARG_TYPE],[int],[Type of second argument of attr_get() of ncurses library..]) AC_MSG_RESULT([[int]])],
 	[AC_MSG_ERROR([unknown type for second argument of attr_get in ncurses library!])])])
 

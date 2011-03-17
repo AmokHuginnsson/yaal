@@ -23,7 +23,14 @@ AC_DEFUN([YAAL_DETECT_FLAGS],
 			$1_save_FLAGS="$FLAGS"
 			FLAGS="$FLAGS $flag -Werror $4"
 			AC_MSG_CHECKING([whether COMPILER compiler understands [$]flag])
-			AC_LINK_IFELSE([int main( int, char** ) { return ( 0 ); }], [$1_works=yes], [$1_works=no])
+			touch conftest.c
+			UNRECOGNIZED=`${CC} -o conftest.o -c ${FLAGS} conftest.c 2>&1 | grep "unrecognized option"`
+			/bin/rm -f conftest.c conftest.o
+			if test "x${UNRECOGNIZED}" = "x" ; then
+				AC_LINK_IFELSE([AC_LANG_SOURCE([[int main( int, char** ) { return ( 0 ); }]])], [$1_works=yes], [$1_works=no])
+			else
+				$1_works=no
+			fi
 			AC_MSG_RESULT([$]$1_works)
 			FLAGS="[$]$1_save_FLAGS"
 			if test "x[$]$1_works" = "xyes"; then
@@ -44,8 +51,8 @@ AC_DEFUN([YAAL_DETECT_FUNCTION_MACRO],
 [
 	AC_MSG_CHECKING(whether $CC implements __PRETTY_FUNCTION__)
 	AC_CACHE_VAL(yaal_cv_have_func,
-							 [AC_COMPILE_IFELSE([#include <cstdio>
-int main( int, char** ){ printf( "%s", __PRETTY_FUNCTION__ ); return ( 0 );}],
+							 [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstdio>
+int main( int, char** ){ printf( "%s", __PRETTY_FUNCTION__ ); return ( 0 );}]])],
 							 yaal_cv_have_func=yes, yaal_cv_have_func=no)])
 	AC_MSG_RESULT($yaal_cv_have_func)
 	if test "$yaal_cv_have_func" = yes; then
@@ -53,8 +60,8 @@ int main( int, char** ){ printf( "%s", __PRETTY_FUNCTION__ ); return ( 0 );}],
 	else
 		AC_MSG_CHECKING(whether $CC implements __FUNCTION__)
 		AC_CACHE_VAL(yaal_cv_have_pretty_function,
-								 [AC_COMPILE_IFELSE([#include <cstdio>
-int main( int, char** ){ printf( "%s", __FUNCTION__ ); return ( 0 );}],
+								 [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstdio>
+int main( int, char** ){ printf( "%s", __FUNCTION__ ); return ( 0 );}]])],
 								 yaal_cv_have_pretty_function=yes, yaal_cv_have_pretty_function=no)])
 		AC_MSG_RESULT($yaal_cv_have_pretty_function)
 		if test "$yaal_cv_have_pretty_function" = yes; then
@@ -62,8 +69,8 @@ int main( int, char** ){ printf( "%s", __FUNCTION__ ); return ( 0 );}],
 		else
 			AC_MSG_CHECKING(whether $CC implements __func__)
 			AC_CACHE_VAL(yaal_cv_have_function,
-									 [AC_COMPILE_IFELSE([#include <cstdio>
-int main( int, char** ){ printf( "%s", __func__ ); return ( 0 );}],
+									 [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstdio>
+int main( int, char** ){ printf( "%s", __func__ ); return ( 0 );}]])],
 									 yaal_cv_have_function=yes, yaal_cv_have_function=no)])
 			AC_MSG_RESULT($yaal_cv_have_function)
 			if test "$yaal_cv_have_function" = yes; then
@@ -171,6 +178,9 @@ AC_DEFUN([YAAL_DETECT_PHYSICAL_MEMORY],
 	AC_MSG_RESULT([${PHYS_MEM}])
 ])
 
+
+dnl Check available git features.
+dnl --------------------------------------------------------------------------
 AC_DEFUN([YAAL_CHECK_GIT],
 [
 	AC_CHECK_PROG(HAS_GIT,[git],["true"],["false"])
@@ -188,4 +198,5 @@ AC_DEFUN([YAAL_CHECK_GIT],
 		AC_MSG_WARN([no git in the first place])
 	fi
 ])
+
 

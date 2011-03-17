@@ -92,7 +92,7 @@ AC_MSG_RESULT([$RESULT])
 CXXFLAGS=["-Wshadow -Werror"]
 AC_MSG_CHECKING([can we use -Wshadow in <pthread.h>])
 RESULT=["no"]
-AC_COMPILE_IFELSE([#include <pthread.h>],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <pthread.h>]])],
 							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -Wshadow"]]
 							[RESULT=["yes"]],
 							[AC_MSG_WARN([[Cannot use -Wshadow!]])])
@@ -100,7 +100,7 @@ AC_MSG_RESULT([$RESULT])
 CXXFLAGS=["-pedantic-errors -Werror"]
 AC_MSG_CHECKING([can we use -pedantic-errors in <cstdlib>])
 RESULT=["no"]
-AC_COMPILE_IFELSE([#include <cstdlib>],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstdlib>]])],
 							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -pedantic-errors"]]
 							[RESULT=["yes"]],
 							[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
