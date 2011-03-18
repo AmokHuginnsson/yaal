@@ -21,6 +21,7 @@ define CONFIGURE_DRIVER
 	SRCS += $$(patsubst %,$$(DIR_ROOT)/$$(DIR_dbwrapper)/%.$$(SS),$(1)_driver)
 	OBJS_$(1)_driver := ./$$(patsubst %,$$(DIR_dbwrapper)/%.$$(OS), $(1)_driver)
 	OBJS += $$(OBJS_$(1)_driver)
+	TOTAL:=$(words $(SRCS))
 endef
 
 define MAKE_DIR
