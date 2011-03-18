@@ -120,12 +120,14 @@ function makeBoostDesc( boostInfo ) {
 }
 
 function msg( str ) {
-	while ( ( str.length > 0 ) && ( ( str.charAt( str.length - 1 ) == '\n' ) || ( str.charAt( str.length - 1 ) == '\r' ) ) )
-		str = str.substr( 0, str.length - 1 );
-	if ( ! FAST ) {
-		globalMessageBuffer += ( str + "\n" );
-	} else if ( str.length > 0 ) {
-		WScript.echo( str );
+	if ( str != null ) {
+		while ( ( str.length > 0 ) && ( ( str.charAt( str.length - 1 ) == '\n' ) || ( str.charAt( str.length - 1 ) == '\r' ) ) )
+			str = str.substr( 0, str.length - 1 );
+		if ( ! FAST ) {
+			globalMessageBuffer += ( str + "\n" );
+		} else if ( str.length > 0 ) {
+			WScript.echo( str );
+		}
 	}
 }
 
@@ -137,18 +139,18 @@ function terminate( code ) {
 	WScript.quit( code );
 }
 
-if (!Array.prototype.filter) {
-	Array.prototype.filter = function(fun /*, thisp*/) {
+if ( ! Array.prototype.filter ) {
+	Array.prototype.filter = function( fun/*, thisp*/ ) {
 		var len = this.length;
-		if (typeof fun != "function")
+		if ( typeof fun != "function" )
 			throw new TypeError();
 		var res = new Array();
 		var thisp = arguments[1];
-		for (var i = 0; i < len; i++) {
-			if (i in this) {
+		for ( var i = 0; i < len; ++ i ) {
+			if ( i in this ) {
 				var val = this[i]; // in case fun mutates this
-				if (fun.call(thisp, val, i, this))
-					res.push(val);
+				if ( fun.call( thisp, val, i, this ) )
+					res.push( val );
 			}
 		}
 		return res;
@@ -177,6 +179,7 @@ try {
 	var BOOST_VERSION = null;
 	var EXTRA_INCLUDE_PATH = "";
 	var EXTRA_LIBRARY_PATH = "";
+	var PREFIX = "";
 	var SILENT = 0;
 	var VERBOSE = 0;
 	var VISUAL_STUDIO_VERSION = vcVersion();
@@ -205,6 +208,9 @@ try {
 			break;
 			case "VISUAL_STUDIO_VERSION":
 				VISUAL_STUDIO_VERSION = parts[1];
+			break;
+			case "PREFIX":
+				PREFIX = parts[1];
 			break;
 			case "FAST":
 				FAST = 1;
@@ -261,23 +267,36 @@ try {
 	envProc = shell.environment( "Process" );
 	envUser = shell.environment( "User" );
 	envProc( "PATH" ) = envSys( "PATH" ).split( ";", 1000 ).filter( ( function( obj ){ return ( ! String( obj ).match( "cygwin|unix" ) ); } ) ).join( ";" );
+	if ( PREFIX.length > 0 )
+		envProc( "PREFIX" ) = PREFIX;
 	envProc( "CXX" ) = "";
 	envProc( "CC" ) = "";
 	envProc.remove( "CXX" );
 	envProc.remove( "CC" );
 	cmd = shell.exec( cmdline );
-	if ( FAST ) {
-		var eoo = 0;
-		var eoe = 0;
-		while ( ( ! ( eoo = cmd.stdout.AtEndOfStream ) ) || ( ! ( eoe = cmd.stderr.AtEndOfStream ) ) ) {
-			if ( ! eoo )
-				msg( cmd.stdout.readLine() );
-			if ( ! eoe )
-				msg( cmd.stderr.readLine() );
+	var eoo = true;
+	var eoe = true;
+	var errBuf;
+	var outBuf;
+	while ( ( ! ( eoo = cmd.stdout.AtEndOfStream ) ) || ( ! ( eoe = cmd.stderr.AtEndOfStream ) ) ) {
+		if ( ! eoo ) {
+			var out = cmd.stdout.readLine();
+			if ( FAST )
+				msg( out );
+			else
+				outBuf += ( out + "\n" );
 		}
-	} else {
-		msg( cmd.stdout.readAll() );
-		msg( cmd.stderr.readAll() );
+		if ( ! eoe ) {
+			var err = cmd.stderr.readLine();
+			if ( FAST )
+				msg( err );
+			else
+				errBuf += ( err + "\n" );
+		}
+	}
+	if ( ! FAST ) {
+		msg( outBuf );
+		msg( errBuf );
 	}
 	if ( ! SILENT ) {
 		msg( "Done!" );
