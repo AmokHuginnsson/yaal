@@ -223,7 +223,9 @@ int setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	if ( io.type() == IO::TYPE::SOCKET )
-		ret = ::setsockopt( reinterpret_cast<SOCKET>( io.handle() ), level_, optname_, static_cast<char const*>( optval_ ), optlen_ );
+		ret = ::setsockopt( reinterpret_cast<SOCKET>( io.handle() ), level_,
+				optname_ == SO_REUSEADDR ? SO_EXCLUSIVEADDRUSE : optname_,
+				static_cast<char const*>( optval_ ), optlen_ );
 	return ( ret );
 	}
 
