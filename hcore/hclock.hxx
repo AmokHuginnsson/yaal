@@ -57,7 +57,12 @@ private:
 	mutable int long _moment[2];
 public:
 	HClock( void );
-	int long get_time_elapsed( UNIT::unit_t const& = UNIT::SECOND, bool = false ) const;
+	/*! \brief Get time that elapsed from last measurement.
+	 *
+	 * \param unit_ - get time given in specific units.
+	 * \param reset_ - reset timer with this call.
+	 */
+	int long get_time_elapsed( UNIT::unit_t unit_ = UNIT::SECOND, bool reset_ = false ) const;
 	};
 
 }

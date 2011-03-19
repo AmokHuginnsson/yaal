@@ -54,7 +54,7 @@ HClock::HClock( void ) : _moment()
 	M_EPILOG
 	}
 
-int long HClock::get_time_elapsed( UNIT::unit_t const& unit_, bool reset_ ) const
+int long HClock::get_time_elapsed( UNIT::unit_t unit_, bool reset_ ) const
 	{
 	M_PROLOG
 	static int long const NANO_IN_WHOLE = power<10, 9>::value;
