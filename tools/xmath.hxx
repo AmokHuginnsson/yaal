@@ -39,6 +39,12 @@ namespace xmath
 {
 
 template<typename number_t>
+number_t clip( number_t const& lowerBound_, number_t const& number_, number_t const& upperBound_ )
+	{
+	return ( number_ < lowerBound_ ? lowerBound_ : ( upperBound_ < number_ ? upperBound_ : number_ ) );
+	}
+
+template<typename number_t>
 number_t factorial( number_t number_ )
 	{
 	number_t n = 1;
