@@ -266,7 +266,7 @@ try {
 	envSys = shell.environment( "System" );
 	envProc = shell.environment( "Process" );
 	envUser = shell.environment( "User" );
-	envProc( "PATH" ) = envProc( "PATH" ).split( ";", 1000 ).filter( ( function( obj ){ return ( ! String( obj ).match( "cygwin|unix" ) ); } ) ).join( ";" );
+	envProc( "PATH" ) = ( envSys( "PATH" ) + ";" + envProc( "PATH" ) ).split( ";", 1000 ).filter( ( function( obj ){ return ( ! String( obj ).match( "cygwin|unix" ) ); } ) ).join( ";" );
 	if ( PREFIX.length > 0 )
 		envProc( "PREFIX" ) = PREFIX;
 	envProc( "CXX" ) = "";
