@@ -1,7 +1,9 @@
+#define WinMain WinMain_off
 #include <sys/cdefs.h>
 #include <sys/time.h>
 #include <dbghelp.h>
 #include <sddl.h>
+#undef WinMain
 
 #define getpwuid_r getpwuid_r_off
 #define getgrgid_r getgrgid_r_off
@@ -274,3 +276,29 @@ Errno& get_errno( void )
 	}
 
 }
+
+M_EXPORT_SYMBOL
+int WINAPI WinMain(
+	 __in HINSTANCE, __in HINSTANCE, __in LPSTR,
+	 __in int )
+	{
+	LPWSTR cmdLineW( ::GetCommandLineW() );
+	int nArgs( 0 );
+	LPWSTR *szArglist( ::CommandLineToArgvW( cmdLineW, &nArgs  ) );
+	char* cmdLine( ::GetCommandLine() );
+	char** argv = new char*[ nArgs ];
+	for ( int i( 1 ), offset( 0 ); i < nArgs; ++ i )
+		{
+		offset += ::lstrlenW( szArglist[ i - 1 ] );
+		cmdLine[offset] = 0;
+		++ offset;
+		argv[ i ] = cmdLine + offset;
+		}
+	::LocalFree( szArglist );
+	argv[ 0 ] = cmdLine;
+	HMODULE appHandle( ::GetModuleHandle( NULL ) );
+	typedef int ( *main_type )( int, char** );
+	main_type main = bit_cast<main_type>( ::GetProcAddress( appHandle, "main" ) );
+	return ( main( nArgs, argv ) );
+	}
+
