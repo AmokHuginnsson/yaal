@@ -36,8 +36,10 @@ Copyright:
 
 #include "hcore/hpointer.hxx"
 #include "hcore/harray.hxx"
+#include "hcore/hdeque.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/hset.hxx"
+#include "hcore/hhashset.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/reflection.hxx"
@@ -185,6 +187,15 @@ void set_option_value_from_string( HArray<tType>& object, HString const& value )
 	}
 
 template<typename tType>
+void set_option_value_from_string( HDeque<tType>& object, HString const& value )
+	{
+	M_PROLOG
+	object.push_back( lexical_cast<tType>( value ) );
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
 void set_option_value_from_string( HList<tType>& object, HString const& value )
 	{
 	M_PROLOG
@@ -195,6 +206,15 @@ void set_option_value_from_string( HList<tType>& object, HString const& value )
 
 template<typename tType>
 void set_option_value_from_string( HSet<tType>& object, HString const& value )
+	{
+	M_PROLOG
+	object.insert( lexical_cast<tType>( value ) );
+	return;
+	M_EPILOG
+	}
+
+template<typename tType>
+void set_option_value_from_string( HHashSet<tType>& object, HString const& value )
 	{
 	M_PROLOG
 	object.insert( lexical_cast<tType>( value ) );
