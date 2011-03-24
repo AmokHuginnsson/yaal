@@ -164,8 +164,9 @@ int listen( int fd_, int backlog_ )
 	else
 		{
 		SOCKET s( reinterpret_cast<SOCKET>( io.handle() ) );
-		if ( WSAEventSelect( s, io.event(), FD_ACCEPT ) )
+		if ( WSAEventSelect( s, io.event(), FD_ACCEPT | FD_OOB ) )
 			log_windows_error( "WSAEventSelect" );
+		io.fake_schedule_read();
 		ret = ::listen( s, backlog_ );
 		}
 	return ( ret );
@@ -181,7 +182,7 @@ int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 		int len = *len_;
 		ret = ::accept( reinterpret_cast<SOCKET>( io.handle() ), addr_, &len );
 		SystemIO::io_t sock( sysIo.create_io( IO::TYPE::SOCKET, reinterpret_cast<HANDLE>( ret ) ) );
-		if ( WSAEventSelect( ret, sock.second->event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
+		if ( WSAEventSelect( ret, sock.second->event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE | FD_OOB ) )
 			log_windows_error( "WSAEventSelect" );
 		ret = sock.first;
 		}
@@ -227,7 +228,7 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 		{
 		SOCKET s( reinterpret_cast<SOCKET>( io.handle() ) );
 		ret = ::connect( s, const_cast<sockaddr const*>( addr_ ), static_cast<int>( len_ ) );
-		if ( WSAEventSelect( s, io.event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE ) )
+		if ( WSAEventSelect( s, io.event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE | FD_OOB ) )
 			log_windows_error( "WSAEventSelect" );
 		}
 	return ( ret );
