@@ -53,6 +53,10 @@ public:
 	OVERLAPPED* overlapped( void );
 	std::string path( void ) const;
 	void set_path( std::string const& );
+	void swap( IO& );
+	void fake_schedule_read( void );
+	void reset( void );
+	bool ready( void ) const;
 private:
 	friend class SystemIO;
 	int close( void );

@@ -41,29 +41,47 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 		HANDLE handles[MAXIMUM_WAIT_OBJECTS];
 		OsCast osCast;
 		std::transform( readFds->_data, readFds->_data + readFds->_count, ios, osCast );
-		std::transform( ios, ios + readFds->_count, handles, osCast );
- 		int up( ::WaitForMultipleObjects( readFds->_count, handles, false, miliseconds ) );
-		if ( up == WAIT_FAILED )
+		for ( int i( 0 ); i < readFds->_count; ++ i )
 			{
-			ret = -1;
-			log_windows_error( "WaitForMultipleObjects" );
+			if ( ios[i]->ready() )
+				++ ret;
 			}
-		else if ( ( up >= static_cast<int>( WAIT_OBJECT_0 ) ) && ( up < ( static_cast<int>( WAIT_OBJECT_0 ) + count ) ) )
+		if ( ret > 0 )
 			{
-			for ( int i( 0 ); i < count; ++ i )
+			for ( int i( 0 ); i < readFds->_count; ++ i )
 				{
-				int upL( ::WaitForSingleObject( handles[ i ], 0 ) );
-				if ( ( i == ( up - WAIT_OBJECT_0 ) || ( upL == WAIT_OBJECT_0 ) ) )
-					++ ret;
-				else
+				if ( ! ios[i]->ready() )
 					readFds->_data[ i ] = -1;
-				}
+				}	
 			std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
 			readFds->_count = ret;
-			ret += ( writeFds ? writeFds->_count : 0 );
 			}
 		else
-			FD_ZERO( readFds );
+			{
+			std::transform( ios, ios + readFds->_count, handles, osCast );
+ 			int up( ::WaitForMultipleObjects( readFds->_count, handles, false, miliseconds ) );
+			if ( up == WAIT_FAILED )
+				{
+				ret = -1;
+				log_windows_error( "WaitForMultipleObjects" );
+				}
+			else if ( ( up >= static_cast<int>( WAIT_OBJECT_0 ) ) && ( up < ( static_cast<int>( WAIT_OBJECT_0 ) + count ) ) )
+				{
+				for ( int i( 0 ); i < count; ++ i )
+					{
+					int upL( ::WaitForSingleObject( handles[ i ], 0 ) );
+					if ( ( i == ( up - WAIT_OBJECT_0 ) || ( upL == WAIT_OBJECT_0 ) ) )
+						++ ret;
+					else
+						readFds->_data[ i ] = -1;
+					}
+				std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
+				readFds->_count = ret;
+				ret += ( writeFds ? writeFds->_count : 0 );
+				}
+			else
+				FD_ZERO( readFds );
+			}
 		}
 	else if ( writeFds )
 		ret = writeFds->_count;
@@ -81,6 +99,7 @@ int make_pipe_instance( IO& io_ )
 		PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
 		PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
 		PIPE_UNLIMITED_INSTANCES, 1024, 1024, 1000, NULL ) );
+	io_.fake_schedule_read();
 	return ( io_.handle() != INVALID_HANDLE_VALUE ? 0 : -1 );
 	}
 
@@ -168,9 +187,16 @@ int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ )
 		}
 	else
 		{
-		SystemIO::io_t np( sysIo.create_io( IO::TYPE::NAMED_PIPE, io.handle() ) );
-		std::swap( *io.overlapped(), *np.second->overlapped() );
-		ret = make_pipe_instance( io );
+		SystemIO::io_t np( sysIo.create_io( IO::TYPE::NAMED_PIPE,
+			reinterpret_cast<HANDLE>( -1 ), NULL, io.path() ) );
+		ret = make_pipe_instance( *(np.second) );
+		np.second->swap( io );
+		np.second->reset();
+		if ( ::ConnectNamedPipe( io.handle(), io.overlapped() ) )
+			{
+			log_windows_error( "ConnectNamedPipe" );
+			ret = -1;
+			}	
 		if ( ! ret )
 			ret = np.first;
 		}

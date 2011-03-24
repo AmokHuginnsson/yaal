@@ -237,45 +237,14 @@ int* iconv_errno( void )
 	{
 	static int* (*msvcrt_errno)( void ) = NULL;
 	__declspec( thread ) static int errorNumber( 0 );
-	errorNumber = ::GetLastError();
-	if ( ! errorNumber )
+	if ( ! msvcrt_errno )
 		{
-		if ( ! msvcrt_errno )
-			{
-			void* p( get_module_func_address( "msvcrt.dll", "_errno" ) );
-			msvcrt_errno = p ? static_cast<int* (*)( void )>( p ) : &_errno;
-			}
-		errorNumber = *msvcrt_errno();
+		void* p( get_module_func_address( "msvcrt.dll", "_errno" ) );
+		msvcrt_errno = p ? static_cast<int* (*)( void )>( p ) : &_errno;
 		}
+	errorNumber = *msvcrt_errno();
 	return ( &errorNumber );
 	}
-
-namespace msvcxx
-{
-
-Errno::operator int& ( void )
-	{
-	return ( _errno = ::GetLastError() );
-	}
-
-Errno::operator int ( void ) const
-	{
-	return ( _errno = ::GetLastError() );
-	}
-
-Errno& Errno::operator = ( int errno_ )
-	{
-	::SetLastError( _errno = errno_ );
-	return ( *this );
-	}
-
-Errno& get_errno( void )
-	{
-	static Errno smartErrno;
-	return ( smartErrno );
-	}
-
-}
 
 M_EXPORT_SYMBOL
 int WINAPI WinMain(

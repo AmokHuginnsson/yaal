@@ -30,7 +30,11 @@ void IO::schedule_read( void )
 	{
 	DWORD nRead( 0 );
 	if ( ! _scheduled )
-		::ReadFile( _handle, &_buffer, 1, &nRead, &_overlapped );
+		{
+		BOOL status( ::ReadFile( _handle, &_buffer, 1, &nRead, &_overlapped ) );
+		if ( status && ( nRead == 1 ) )
+			_ready = true;
+		}
 	_scheduled = true;
 	return;
 	}
@@ -51,12 +55,13 @@ int long IO::read( void* buf_, int long size_ )
 	DWORD iRead( 0 );
 	int off( 0 );
 	bool ok( false );
-	if ( _scheduled )
+	if ( _scheduled && ! _ready )
 		sync_read();
 	if ( _ready )
 		{
-		static_cast<char*>( buf_ )[0] = _buffer;
+		_scheduled = false;
 		_ready = false;
+		static_cast<char*>( buf_ )[0] = _buffer;
 		-- size_;
 		++ off;
 		ok = true;
@@ -148,6 +153,36 @@ void IO::set_path( std::string const& path_ )
 	{
 	_path = path_;
 	return;
+	}
+
+void IO::swap( IO& io_ )
+	{
+	using std::swap;
+	swap( _overlapped, io_._overlapped );
+	swap( _buffer, io_._buffer );
+	swap( _scheduled, io_._scheduled );
+	swap( _ready, io_._ready );
+	swap( _handle, io_._handle );
+	swap( _nonBlocking, io_._nonBlocking );
+	swap( _path, io_._path );
+	swap( _type, io_._type );
+	return;
+	}
+
+void IO::reset( void )
+	{
+	if ( ! _ready )
+		_scheduled = false;
+	}
+
+void IO::fake_schedule_read( void )
+	{
+	_scheduled = true;
+	}
+
+bool IO::ready( void ) const
+	{
+	return ( _ready );
 	}
 
 SystemIO::SystemIO( void )

@@ -23,6 +23,7 @@
 #pragma warning( disable : 4996 )
 #undef __PRETTY_FUNCTION__
 #define __PRETTY_FUNCTION__ __FUNCSIG__
+#define _SECURE_SCL 0
 #define HAVE_PRETTY_FUNCTION 1
 #include <yaal/cleanup.hxx>
 #endif /* __MSVCXX__ */
