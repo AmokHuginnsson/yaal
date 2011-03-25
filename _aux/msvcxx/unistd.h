@@ -85,5 +85,7 @@ public:
 	int operator()( void );
 	};
 
+static int const WCONTINUED = 0;
+
 #endif /* not YAAL_MSVCXX_UNISTD_H_INCLUDED */
 
