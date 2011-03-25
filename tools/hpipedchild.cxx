@@ -84,18 +84,23 @@ HPipedChild::STATUS HPipedChild::finish( void )
 	STATUS s;
 	if ( _pid > 0 )
 		{
-		hcore::system::kill( _pid, SIGKILL );
-		int status = 0;
-		::waitpid( _pid, &status, 0 );
-		if ( WIFEXITED( status ) )
+		int status( 0 );
+		int pid( 0 );
+		M_ENSURE( ( pid = ::waitpid( _pid, &status, WNOHANG | WUNTRACED | WCONTINUED ) ) != -1 );
+		if ( pid != _pid )
 			{
-			s.type = STATUS::TYPE::NORMAL;
-			s.value = WEXITSTATUS( status );
-			}
-		else if ( WIFSIGNALED( status ) )
-			{
-			s.type = STATUS::TYPE::ABORT;
-			s.value = WTERMSIG( status );
+			M_ENSURE( hcore::system::kill( _pid, SIGKILL ) == 0 );
+			M_ENSURE( ::waitpid( _pid, &status, 0 ) == _pid );
+			if ( WIFEXITED( status ) )
+				{
+				s.type = STATUS::TYPE::NORMAL;
+				s.value = WEXITSTATUS( status );
+				}
+			else if ( WIFSIGNALED( status ) )
+				{
+				s.type = STATUS::TYPE::ABORT;
+				s.value = WTERMSIG( status );
+				}
 			}
 		}
 	_pid = 0;
