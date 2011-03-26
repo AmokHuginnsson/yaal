@@ -39,6 +39,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/xalloc.hxx"
 #include "hcore/system.hxx"
 #include "util.hxx"
+#include "halarm.hxx"
 
 using namespace yaal::hcore;
 
@@ -57,6 +58,8 @@ static void close_and_invalidate( int& fd_ )
 	return;
 	M_EPILOG
 	}
+
+int HPipedChild::_killGracePeriod = 1000;
 
 HPipedChild::HPipedChild( void )
 	: HStreamInterface(), _pid( 0 ),
@@ -90,8 +93,10 @@ HPipedChild::STATUS HPipedChild::finish( void )
 		if ( pid != _pid )
 			{
 			M_ENSURE( hcore::system::kill( _pid, SIGTERM ) == 0 );
-			util::sleep::second( 1 );
-			M_ENSURE( ( pid = ::waitpid( _pid, &status, WNOHANG | WUNTRACED | WCONTINUED ) ) != -1 );
+				{
+				HAlarm alarm( _killGracePeriod );
+				M_ENSURE( ( ( pid = ::waitpid( _pid, &status, 0 ) ) != -1 ) || ( errno == EINTR ) );
+				}
 			if ( pid != _pid )
 				{
 				M_ENSURE( hcore::system::kill( _pid, SIGKILL ) == 0 );

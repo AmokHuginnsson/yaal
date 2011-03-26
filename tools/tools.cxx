@@ -40,6 +40,8 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/hstring.hxx"    /* HString class */
 #include "hcore/htokenizer.hxx" /* HTokenizer class */
 #include "util.hxx" /* atof_ex */
+#include "signals.hxx" /* HSignalService::_killGracePeriod */
+#include "hpipedchild.hxx" /* HPipedChild::_killGracePeriod */
 
 using namespace yaal::hcore;
 
@@ -165,6 +167,8 @@ HToolsInitDeinit::HToolsInitDeinit( void )
 			( "ignore_signal_SIGQUIT", program_options_helper::option_value( _ignoreSignalSIGQUIT_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore QUIT, core dump signal" )
 			( "serial_device", program_options_helper::option_value( _serialDevice_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to serial device", "path" )
 			( "default_encoding", program_options_helper::option_value( _defaultEncoding_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "dafault character encoding used in text documents", "encoding" )
+			( "kill_grace_period", program_options_helper::option_value( HSignalService::_killGracePeriod ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "wait for that many miliseconds before killing interior", "miliseconds" )
+			( "child_kill_grace_period", program_options_helper::option_value( HPipedChild::_killGracePeriod ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "wait for that many miliseconds before killing child process", "miliseconds" )
 			( "compression_level", program_options_helper::option_value( _compressionLevel_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "default compression level for zlib library", "level" )
 			( "compression_buffer_size", program_options_helper::option_value( _zBufferSize_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "size for compression buffer used in zlib library", "numBytes" )
 			( "collector_connection_timeout", program_options_helper::option_value( _collectorConnectionTimeOut_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "timeout on collector device read", "seconds" );

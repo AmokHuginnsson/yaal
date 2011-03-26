@@ -85,8 +85,21 @@ void failure( int, char const* const, ... ) __attribute__(( __noreturn__ ));
 namespace sleep
 {
 
-int milisecond( int, bool = false );
-int second( int, bool = false );
+/*! \brief Suspend execution of current thread for given number of miliseconds.
+ *
+ * \param miliseconds - sleep that many miliseconds.
+ * \param ignoreInterrupts - continue sleeping even if interrupted.
+ * \return true iff sleep had been interrupted.
+ */
+bool milisecond( int miliseconds, bool ignoreInterrupts = false );
+
+/*! \brief Suspend execution of current thread for given number of seconds.
+ *
+ * \param seconds - sleep that many miliseconds.
+ * \param ignoreInterrupts - continue sleeping even if interrupted.
+ * \return true iff sleep had been interrupted.
+ */
+bool second( int seconds, bool ignoreInterrupts = false );
 
 }
 

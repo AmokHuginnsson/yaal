@@ -80,14 +80,18 @@ public:
 
 }
 
+int HSignalService::_killGracePeriod = 1000;
 int HSignalService::_exitStatus = 0;
 
 HSignalService::HSignalService( void )
-	: _loop( true ), _locker( chunk_size<sigset_t>( 1 ) ),
+	: _loop( true ),
+	_catch( chunk_size<sigset_t>( 1 ) ),
+	_block( chunk_size<sigset_t>( 1 ) ),
 	_thread(), _mutex(), _handlers()
 	{
 	M_PROLOG
-	M_ENSURE( sigemptyset( _locker.get<sigset_t>() ) == 0 );
+	M_ENSURE( sigemptyset( _catch.get<sigset_t>() ) == 0 );
+	M_ENSURE( sigemptyset( _block.get<sigset_t>() ) == 0 );
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
 		register_handler( SIGINT, call( &HBaseSignalHandlers::signal_INT, _1 ) );
 	register_handler( SIGHUP, call( &HBaseSignalHandlers::signal_HUP, _1 ) );
@@ -107,8 +111,9 @@ HSignalService::HSignalService( void )
 #endif /* HAVE_DECL_SIGIOT */
 	register_handler( SIGTRAP, fatal );
 	register_handler( SIGSYS, fatal );
-	lock_on( SIGPIPE );
-	lock_on( SIGURG );
+	catch_signal( SIGPIPE );
+	catch_signal( SIGURG );
+	block_signal( SIGALRM );
 	_thread.spawn( call( &HSignalService::run, this ) );
 	return;
 	M_EPILOG
@@ -140,6 +145,7 @@ void HSignalService::stop( void )
 		HSet<int> signals;
 		transform( _handlers.begin(), _handlers.end(), insert_iterator( signals ), select1st<handlers_t::value_type>() );
 		for_each( signals.begin(), signals.end(), call( &HSignalService::reset_signal, this, _1 ) );
+		M_ENSURE( signal( SIGALRM, SIG_DFL ) != SIG_ERR );
 		}
 	return;
 	M_EPILOG
@@ -152,7 +158,7 @@ void* HSignalService::run( void )
 	while ( _loop && _thread.is_alive() )
 		{
 		int sigNo = 0;
-		M_ENSURE( sigwait( _locker.get<sigset_t>(), &sigNo ) == 0 );
+		M_ENSURE( sigwait( _catch.get<sigset_t>(), &sigNo ) == 0 );
 		HLock lock( _mutex );
 		handlers_t::iterator it;
 		if ( ( it = _handlers.find( sigNo ) ) != _handlers.end() )
@@ -182,17 +188,17 @@ void HSignalService::register_handler( int sigNo_, handler_t handler_ )
 	{
 	M_PROLOG
 	_handlers.push_front( sigNo_, handler_ );
-	lock_on( sigNo_ );
+	catch_signal( sigNo_ );
 	M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
 	return;
 	M_EPILOG
 	}
 
-void HSignalService::lock_on( int sigNo_ )
+void HSignalService::catch_signal( int sigNo_ )
 	{
 	M_PROLOG
-	M_ENSURE( sigaddset( _locker.get<sigset_t>(), sigNo_ ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_BLOCK, _locker.get<sigset_t>(), NULL ) == 0 );
+	M_ENSURE( sigaddset( _catch.get<sigset_t>(), sigNo_ ) == 0 );
+	M_ENSURE( pthread_sigmask( SIG_BLOCK, _catch.get<sigset_t>(), NULL ) == 0 );
 
 	/*
 	 * FreeBSD does not wake sigwait on signal with installed
@@ -201,8 +207,23 @@ void HSignalService::lock_on( int sigNo_ )
 	 * signal as blocked.
 	 */
 	struct sigaction act;
-	::memset( &act, 0, sizeof ( struct sigaction ) );
+	::memset( &act, 0, sizeof ( act ) );
 	act.sa_flags = SA_RESTART;
+	act.sa_handler = dummy_signal_handler;
+	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
+	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
+	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
+	return;
+	M_EPILOG
+	}
+
+void HSignalService::block_signal( int sigNo_ )
+	{
+	M_PROLOG
+	M_ENSURE( sigaddset( _block.get<sigset_t>(), sigNo_ ) == 0 );
+	M_ENSURE( pthread_sigmask( SIG_BLOCK, _block.get<sigset_t>(), NULL ) == 0 );
+	struct sigaction act;
+	::memset( &act, 0, sizeof ( act ) );
 	act.sa_handler = dummy_signal_handler;
 	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
 	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
@@ -216,13 +237,13 @@ void HSignalService::reset_signal( int sigNo_ )
 	M_PROLOG
 	M_ENSURE( _handlers.count( sigNo_ ) );
 	struct sigaction act;
-	::memset( &act, 0, sizeof ( struct sigaction ) );
+	::memset( &act, 0, sizeof ( act ) );
 	act.sa_handler = SIG_DFL;
 	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
 	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
 	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
 	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &act.sa_mask, NULL ) == 0 );
-	M_ENSURE( sigdelset( _locker.get<sigset_t>(), sigNo_ ) == 0 );
+	M_ENSURE( sigdelset( _catch.get<sigset_t>(), sigNo_ ) == 0 );
 	_handlers.erase( sigNo_ );
 	return;
 	M_EPILOG
@@ -231,6 +252,7 @@ void HSignalService::reset_signal( int sigNo_ )
 void HSignalService::schedule_exit( int exitStatus_ )
 	{
 	M_PROLOG
+	_isKilled_ = true;
 	_exitStatus = exitStatus_;
 	M_ENSURE( signal( SIGALRM, HSignalService::exit ) != SIG_ERR );
 	alarm( 1 );

@@ -87,6 +87,7 @@ private:
 	yaal::hcore::HChunk _secondLineCache;
 	int _secondLineOffset;
 public:
+	static int _killGracePeriod;
 	HPipedChild( void );
 	~HPipedChild( void );
 	void spawn( yaal::hcore::HString const&, argv_t const& = argv_t() );

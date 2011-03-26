@@ -57,11 +57,13 @@ private:
 	typedef handlers_t::value_list_ptr_t handler_list_ptr_t;
 	static int _exitStatus;
 	bool _loop;
-	yaal::hcore::HChunk _locker;
+	yaal::hcore::HChunk _catch;
+	yaal::hcore::HChunk _block;
 	yaal::hcore::HThread _thread;
 	yaal::hcore::HMutex _mutex;
 	handlers_t _handlers;
 public:
+	static int _killGracePeriod;
 	void register_handler( int, handler_t );
 	void reset_signal( int );
 	void stop( void	);
@@ -69,7 +71,8 @@ private:
 	HSignalService( void );
 	~HSignalService( void );
 	void* run( void );
-	void lock_on( int );
+	void catch_signal( int );
+	void block_signal( int );
 	static int life_time( int );
 	void schedule_exit( int );
 	static void exit( int ) __attribute__(( __noreturn__ ));

@@ -631,15 +631,15 @@ void failure( int exitStatus_, char const* const format_, ... )
 namespace sleep
 {
 
-int sleep_real( timeval& time_, bool ignoreInterrrupt_ )
+bool sleep_real( timeval& time_, bool ignoreInterrrupt_ )
 	{
-	int err = 0;
+	int err( 0 );
 	while ( ( ( err = ::select( 0, NULL, NULL, NULL, &time_ ) ) == -1 ) && ( errno == EINTR ) && ignoreInterrrupt_ )
 		;
-	return ( err );
+	return ( ( err != 0 ) && ! ( ( errno == EINTR ) && ignoreInterrrupt_ ) );
 	}
 
-int milisecond( int quantity_, bool ignoreInterrrupt_ )
+bool milisecond( int quantity_, bool ignoreInterrrupt_ )
 	{
 	timeval wait;
 	wait.tv_sec = quantity_ / 1000;
@@ -647,7 +647,7 @@ int milisecond( int quantity_, bool ignoreInterrrupt_ )
 	return ( sleep_real( wait, ignoreInterrrupt_ ) );
 	}
 
-int second( int quantity_, bool ignoreInterrrupt_ )
+bool second( int quantity_, bool ignoreInterrrupt_ )
 	{
 	timeval wait;
 	wait.tv_sec = quantity_;

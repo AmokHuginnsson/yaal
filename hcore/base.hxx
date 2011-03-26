@@ -56,6 +56,8 @@ Copyright:
 namespace yaal
 {
 
+extern bool _isKilled_;
+
 /*! \brief Convert between distinct datatypes.
  *
  * \tparam to_t - destination type.
