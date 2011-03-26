@@ -146,6 +146,7 @@ CPPFLAGS=$CXXFLAGS_ORIG;
 AC_SEARCH_LIBS([pthread_create],[thr pthread],,[AC_MSG_ERROR([Cannot build without threading library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
 AC_SEARCH_LIBS([clock_gettime],[rt],,[AC_MSG_ERROR([Cannot continue without rt library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
+AC_SEARCH_LIBS([timer_create],[rt],,[AC_MSG_ERROR([Cannot continue without rt library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([gethostbyname_r],[nsl]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([getaddrinfo],[socket getaddrinfo],,[AC_MSG_ERROR([Cannot continue without getaddrinfo feature.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([getnameinfo],[socket getaddrinfo],,[AC_MSG_ERROR([Cannot continue without getnameinfo feature.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
