@@ -143,7 +143,7 @@ void HIODispatcher::run( void )
 	M_PROLOG
 	if ( _readers.is_empty() && _writers.is_empty() )
 		M_THROW( _( "there is no file descriptor to check activity on" ), errno );
-	while ( _loop )
+	while ( ! _isKilled_ && _loop )
 		{
 		_callbackContext = true;
 		handle_alerts();

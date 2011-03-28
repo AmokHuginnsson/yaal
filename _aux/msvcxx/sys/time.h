@@ -57,7 +57,6 @@ inline void FD_SET_ms( int fd_, fd_set* fdset_ )
 
 using namespace asio;
 
-typedef void* timer_t;
 typedef int clockid_t;
 
 struct itimerspec
