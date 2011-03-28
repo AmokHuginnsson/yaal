@@ -139,7 +139,7 @@ void* HWorkFlow::HWorker::run( void )
 	M_PROLOG
 	HThread::set_name( "HWorkFlow" );
 	HWorkFlow::task_t t;
-	while ( !! ( t = _workFlow->pop_task() ) )
+	while ( ! _isKilled_ && ( !! ( t = _workFlow->pop_task() ) ) )
 		{
 		t();
 		t.reset();
