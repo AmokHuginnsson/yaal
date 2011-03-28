@@ -25,6 +25,9 @@
 ?_ignoreSignalSIGQUIT_@tools@yaal@@3_NA
 ?_ignoreSignalSIGTSTP_@tools@yaal@@3_NA
 ?_instance@?$HSingleton@VHSignalService@tools@yaal@@@hcore@yaal@@0PAVHSignalService@tools@3@A
+?_isKilled_@yaal@@3_NA
+?_killGracePeriod@HPipedChild@tools@yaal@@2HA
+?_killGracePeriod@HSignalService@tools@yaal@@2HA
 ?_letter_@hcore@yaal@@3QBDB
 ?_logMask@HLog@hcore@yaal@@2JA
 ?_maskAlpha_@hconsole@yaal@@3QBDB
@@ -35,6 +38,7 @@
 ?_maskLoose_@hconsole@yaal@@3QBDB
 ?_needRepaint_@hconsole@yaal@@3_NA
 ?_primes_@hcore@yaal@@3QBJB
+?_resolveHostnames@HSocket@hcore@yaal@@2_NA
 ?_serialDevice_@tools@yaal@@3VHString@hcore@2@A
 ?_serialFlags_@tools@yaal@@3V?$HStrongEnum@UFLAG@HSerial@tools@yaal@@@hcore@2@A
 ?_threadStackSize@HThread@hcore@yaal@@2HA

@@ -2,7 +2,9 @@
 #define YAAL_MSVCXX_SYS_TIME_H_INCLUDED 1
 
 #include <algorithm>
+#include <pthread.h>
 
+#undef ENOSYS
 #define _SYS_UN_H 1
 #define _NETINET_IN_H 1
 #define _NETDB_H 1
@@ -54,6 +56,22 @@ inline void FD_SET_ms( int fd_, fd_set* fdset_ )
 }
 
 using namespace asio;
+
+typedef void* timer_t;
+typedef int clockid_t;
+
+struct itimerspec
+	{
+	timespec it_value;
+	timespec it_interval;
+	};
+
+M_YAAL_HCORE_PUBLIC_API
+int timer_create( clockid_t, struct sigevent*, timer_t* );
+M_YAAL_HCORE_PUBLIC_API
+int timer_settime( timer_t, int, struct itimerspec const*, struct itimerspec* );
+M_YAAL_HCORE_PUBLIC_API
+int timer_delete( timer_t );
 
 namespace msvcxx
 {

@@ -53,7 +53,7 @@ public:
 	typedef HSocket this_type;
 	typedef HRawFile base_type;
 	typedef HPointer<HSocket> ptr_t;
-	static bool _resolveHostnames;
+	M_YAAL_HCORE_PUBLIC_API static bool _resolveHostnames;
 	/*! \brief Socket types.
 	 */
 	struct TYPE

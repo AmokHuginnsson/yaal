@@ -271,3 +271,20 @@ int WINAPI WinMain(
 	return ( main( nArgs, argv ) );
 	}
 
+M_EXPORT_SYMBOL
+int timer_create( clockid_t, struct sigevent*, timer_t* )
+	{
+	return ( 0 );
+	}
+
+M_EXPORT_SYMBOL
+int timer_settime( timer_t, int, struct itimerspec const*, struct itimerspec* )
+	{
+	return ( 0 );
+	}
+
+M_EXPORT_SYMBOL
+int timer_delete( timer_t )
+	{
+	return ( 0 );
+	}

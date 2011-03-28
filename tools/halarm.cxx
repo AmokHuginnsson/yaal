@@ -24,6 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <ctime>
 #include <cstring>
 #include <csignal>
 

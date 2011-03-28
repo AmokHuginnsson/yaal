@@ -56,7 +56,7 @@ Copyright:
 namespace yaal
 {
 
-extern bool _isKilled_;
+extern M_YAAL_HCORE_PUBLIC_API bool _isKilled_;
 
 /*! \brief Convert between distinct datatypes.
  *

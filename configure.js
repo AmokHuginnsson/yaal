@@ -14,7 +14,7 @@ var withUt = false;
 var ForReading = 1;
 var ForWriting = 2;
 var ForAppending = 8;
-var FAST = 0;
+var FAST = -1;
 
 function checkKey( key ) {
 	var has = false;
@@ -222,6 +222,13 @@ try {
 				SILENT = 1;
 			break;
 		}
+	}
+
+	if ( FAST == -1 ) {
+		if ( WScript.FullName.substr( WScript.FullName.length - 11 ).toLowerCase() == "cscript.exe" )
+			FAST = 1;
+		else
+			FAST = 0;
 	}
 
 	var boostInfo = new boostInfo( BOOST_INSTALL_PATH );
