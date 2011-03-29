@@ -74,15 +74,30 @@ void SynchronizedQueue<T>::push( T const& elem )
 SynchronizedQueue<int> _signalQueue_;
 
 M_EXPORT_SYMBOL
-int kill( int pid, int signo )
+int kill( int pid_, int sigNo_ )
 	{
 	int err( 0 );
-	if ( pid == getpid() )
-		_signalQueue_.push( signo );
-	else if ( signo )
-		TerminateProcess( reinterpret_cast<HANDLE>( pid ), signo );
+	if ( pid_ == getpid() )
+		_signalQueue_.push( sigNo_ );
+	else if ( sigNo_ )
+		{
+		HANDLE process( ::OpenProcess( PROCESS_TERMINATE, false, pid_ ) );
+		if ( ! process )
+			err = -1;
+		else
+			{
+			::TerminateProcess( process, sigNo_ );
+			::CloseHandle( process );
+			}
+		}
 	else
-		err = ( ( GetProcessId( reinterpret_cast<HANDLE>( pid ) ) != 0 ) ? 0 : -1 );
+		{
+		HANDLE process( ::OpenProcess( PROCESS_QUERY_LIMITED_INFORMATION, false, pid_ ) );
+		if ( ! process )
+			err = -1;
+		else
+			::CloseHandle( process );
+		}
 	return ( err );
 	}
 
