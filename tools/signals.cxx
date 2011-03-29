@@ -78,6 +78,20 @@ public:
 	static int signal_USR1( int );
 	};
 
+void reset_signal_low( int sigNo_ )
+	{
+	M_PROLOG
+	struct sigaction act;
+	::memset( &act, 0, sizeof ( act ) );
+	act.sa_handler = SIG_DFL;
+	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
+	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
+	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
+	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &act.sa_mask, NULL ) == 0 );
+	return;
+	M_EPILOG
+	}
+
 }
 
 int HSignalService::_killGracePeriod = 1000;
@@ -142,10 +156,10 @@ void HSignalService::stop( void )
 		 */
 		M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
 		_thread.finish();
+		reset_signal_low( SIGALRM );
 		HSet<int> signals;
 		transform( _handlers.begin(), _handlers.end(), insert_iterator( signals ), select1st<handlers_t::value_type>() );
 		for_each( signals.begin(), signals.end(), call( &HSignalService::reset_signal, this, _1 ) );
-		M_ENSURE( signal( SIGALRM, SIG_DFL ) != SIG_ERR );
 		}
 	return;
 	M_EPILOG
@@ -236,13 +250,7 @@ void HSignalService::reset_signal( int sigNo_ )
 	{
 	M_PROLOG
 	M_ENSURE( _handlers.count( sigNo_ ) );
-	struct sigaction act;
-	::memset( &act, 0, sizeof ( act ) );
-	act.sa_handler = SIG_DFL;
-	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
-	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
-	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &act.sa_mask, NULL ) == 0 );
+	reset_signal_low( sigNo_ );
 	M_ENSURE( sigdelset( _catch.get<sigset_t>(), sigNo_ ) == 0 );
 	_handlers.erase( sigNo_ );
 	return;
@@ -394,6 +402,9 @@ int HBaseSignalHandlers::signal_fatal( int signum_ )
 	log( LOG_TYPE::INFO ) << message << endl;
 	cerr << "\n" << message << endl;
 	abort();
+#ifdef __MSVCXX__
+	return ( -1 );
+#endif /* #ifdef __MSVCXX__ */
 	M_EPILOG
 	}
 

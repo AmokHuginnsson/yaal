@@ -90,7 +90,6 @@
 #define HAVE_GETHOSTBYNAME_R 1
 #define __va_copy( x, y ) ( ( x ) = ( y ) )
 extern "C" int setenv( char const*, char  const*, int );
-typedef void* timer_t;
 #ifdef PTHREAD_H
 #define pthread_self() pthread_self().p
 #endif /* PTHREAD_H */

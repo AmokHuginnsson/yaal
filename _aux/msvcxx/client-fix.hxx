@@ -4,5 +4,7 @@
 #define _restrict m_restrict0
 #define restrict_t restrict_t0
 
+typedef void* timer_t;
+
 #endif /* not YAAL_FIX_HXX_INCLUDED */
 

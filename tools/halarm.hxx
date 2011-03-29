@@ -48,7 +48,7 @@ class HAlarm
 private:
 	timer_t _timer;
 	yaal::hcore::HLock _lock;
-	static yaal::hcore::HMutex _mutex;
+	M_YAAL_TOOLS_PUBLIC_API static yaal::hcore::HMutex _mutex;
 public:
 	typedef HAlarm this_type;
 	/*! \brief Register an alarm.

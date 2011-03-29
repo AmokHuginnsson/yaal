@@ -107,6 +107,9 @@ int bio_puts( BIO*, char const* )
 	{
 	M_PROLOG
 	M_ENSURE( ! "BIO_puts call not implemented!" );
+#ifdef __MSVCXX__
+	return ( -1 );
+#endif /* #ifdef __MSVCXX__ */
 	M_EPILOG
 	}
 
@@ -115,6 +118,9 @@ int bio_gets( BIO*, char*, int )
 	{
 	M_PROLOG
 	M_ENSURE( ! "BIO_gets call not implemented!" );
+#ifdef __MSVCXX__
+	return ( -1 );
+#endif /* #ifdef __MSVCXX__ */
 	M_EPILOG
 	}
 

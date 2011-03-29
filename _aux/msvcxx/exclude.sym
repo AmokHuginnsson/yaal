@@ -36,6 +36,7 @@
 ?_maskExtended_@hconsole@yaal@@3QBDB
 ?_maskLetters_@hconsole@yaal@@3QBDB
 ?_maskLoose_@hconsole@yaal@@3QBDB
+?_mutex@HAlarm@tools@yaal@@0VHMutex@hcore@3@A
 ?_needRepaint_@hconsole@yaal@@3_NA
 ?_primes_@hcore@yaal@@3QBJB
 ?_resolveHostnames@HSocket@hcore@yaal@@2_NA

@@ -116,7 +116,7 @@ void win_signal_handler( int signo )
 
 int sigaction( int signo, struct sigaction*, void* )
 	{
-	if ( ( signo != SIGURG ) && ( signo != SIGBUS ) && ( signo != SIGTRAP ) && ( signo != SIGSYS ) ) //&& ( signo != 5 ) && ( signo != 12 ) )
+	if ( ( signo != SIGURG ) && ( signo != SIGBUS ) && ( signo != SIGTRAP ) && ( signo != SIGSYS ) && ( signo != SIGALRM ) ) /*&& ( signo != 12 ) ) */
 		signal( signo, win_signal_handler );
 	return ( 0 );
 	}
