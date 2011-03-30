@@ -60,8 +60,13 @@ Copyright:
 /*! \brief Last statement of every exception guarder function/method.
  */
 #define M_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
+#ifndef NDEBUG
 #define M_DESTRUCTOR_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); yaal::_isKilled_ = true; yaal::hcore::debug_break(); } catch ( ... ) { yaal::_isKilled_ = true; yaal::hcore::debug_break(); }
 #define M_SAFE( code ) do { try { code; } catch ( ... ) { yaal::_isKilled_ = true; yaal::hcore::debug_break(); } } while ( 0 )
+#else /* #ifndef NDEBUG */
+#define M_DESTRUCTOR_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); yaal::_isKilled_ = true; } catch ( ... ) { yaal::_isKilled_ = true; }
+#define M_SAFE( code ) do { try { code; } catch ( ... ) { yaal::_isKilled_ = true; } } while ( 0 )
+#endif /* #else #ifndef NDEBUG */
 /*! \brief Last statement in <tt>int main( int, char** )</tt>.
  */
 #define M_FINAL } catch ( yaal::hcore::HException& e ){ e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e.print_error(); } catch ( yaal::hcore::HFailedAssertion const& ) { exit( -1 ); } catch ( int retVal ) { return ( retVal ); }
