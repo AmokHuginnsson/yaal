@@ -50,6 +50,14 @@ HHashContainer::HHashContainer( void )
 	{
 	}
 
+HHashContainer::~HHashContainer( void )
+	{
+	M_PROLOG
+	clear();
+	return;
+	M_DESTRUCTOR_EPILOG
+	}
+
 int long HHashContainer::get_size( void ) const
 	{
 	M_PROLOG
@@ -76,7 +84,7 @@ void HHashContainer::clear( void )
 			{
 			HAbstractAtom* del( atom );
 			atom = atom->_next;
-			delete del;
+			M_SAFE( delete del );
 			}
 		buckets[ i ] = NULL;
 		}
@@ -100,7 +108,7 @@ void HHashContainer::erase( HIterator const& it )
 			ancestor->_next = atom->_next;
 		else
 			buckets[ it._index ] = atom->_next;
-		delete atom;
+		M_SAFE( delete atom );
 		-- _size;
 		}
 	return;

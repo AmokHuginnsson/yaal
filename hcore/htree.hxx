@@ -240,11 +240,11 @@ HTree<value_t>::HNode::~HNode( void )
 	struct tool
 		{
 		static void deleter( HNode*& node )
-			{ delete node; }
+			{ M_SAFE( delete node ); }
 		};
 	for_each( _branch.begin(), _branch.end(), cref( tool::deleter ) );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 template<typename value_t>
@@ -391,7 +391,7 @@ typename HTree<value_t>::iterator HTree<value_t>::HNode::replace_node( typename 
 		HNode* wasted = *pos._iterator;
 		*pos._iterator = node;
 		node->_trunk = this;
-		delete wasted;
+		M_SAFE( delete wasted );
 		}
 	return ( pos );
 	M_EPILOG
@@ -401,7 +401,7 @@ template<typename value_t>
 typename HTree<value_t>::iterator HTree<value_t>::HNode::remove_node( typename HTree<value_t>::iterator pos )
 	{
 	M_PROLOG
-	delete *pos._iterator;
+	M_SAFE( delete *pos._iterator );
 	return ( iterator( this, _branch.erase( pos._iterator ) ) );
 	M_EPILOG
 	}
@@ -629,7 +629,7 @@ HTree<value_t>::~HTree( void )
 	M_PROLOG
 	clear();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 template<typename value_t>
@@ -660,7 +660,7 @@ void HTree<value_t>::clear( void )
 	{
 	M_PROLOG
 	if ( _root )
-		delete _root;
+		M_SAFE( delete _root );
 	_root = NULL;
 	M_EPILOG
 	}
@@ -700,7 +700,7 @@ typename HTree<value_t>::node_t HTree<value_t>::set_new_root( typename HTree<val
 		_root = node;
 		node->_tree = this;
 		node->_trunk = NULL;
-		delete wasted;
+		M_SAFE( delete wasted );
 		}
 	return ( node );
 	M_EPILOG

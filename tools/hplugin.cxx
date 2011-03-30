@@ -48,7 +48,7 @@ HPlugin::~HPlugin( void )
 	M_PROLOG
 	if ( _handle )
 		unload();
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HPlugin::load( HString const& path_ )

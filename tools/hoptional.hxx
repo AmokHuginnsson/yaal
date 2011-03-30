@@ -62,8 +62,10 @@ public:
 		}
 	~HOptional( void )
 		{
+		M_PROLOG
 		if ( _initialized )
-			operator->()->~value_type();
+			M_SAFE( operator->()->~value_type() );
+		M_DESTRUCTOR_EPILOG
 		}
 	HOptional( HOptional const& other_ )
 		: _data(), _initialized( other_._initialized )

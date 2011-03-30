@@ -248,7 +248,7 @@ HOpenSSL::OSSLContext::~OSSLContext( void )
 		_sslLibMutexes.clear();
 		}
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void* HOpenSSL::OSSLContext::create_ssl( void )
@@ -363,7 +363,7 @@ HOpenSSL::~HOpenSSL( void )
 	M_PROLOG
 	_ctx->consume_ssl( _ssl );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HOpenSSL::accept_or_connect( void )

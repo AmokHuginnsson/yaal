@@ -108,7 +108,7 @@ HDestructor<tType>::~HDestructor( void )
 	{
 	M_PROLOG
 	destruct();
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 template<typename tType>
@@ -116,7 +116,7 @@ void HDestructor<tType>::destruct( void )
 	{
 	M_PROLOG
 	if ( _object )
-		delete _object;
+		M_SAFE( delete _object );
 	_object = NULL;
 	M_EPILOG
 	}

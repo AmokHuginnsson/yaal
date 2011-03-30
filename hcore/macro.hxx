@@ -59,18 +59,20 @@ Copyright:
 #define M_PROLOG try{
 /*! \brief Last statement of every exception guarder function/method.
  */
-#define M_EPILOG } catch ( yaal::hcore::HException& e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
+#define M_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
+#define M_DESTRUCTOR_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); yaal::_isKilled_ = true; yaal::hcore::debug_break(); } catch ( ... ) { yaal::_isKilled_ = true; yaal::hcore::debug_break(); }
+#define M_SAFE( code ) do { try { code; } catch ( ... ) { yaal::_isKilled_ = true; yaal::hcore::debug_break(); } } while ( 0 )
 /*! \brief Last statement in <tt>int main( int, char** )</tt>.
  */
-#define M_FINAL } catch ( yaal::hcore::HException& e ){ e.log ( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e.print_error(); } catch ( yaal::hcore::HFailedAssertion& ) { exit( -1 ); } catch ( int retVal ) { return ( retVal ); }
+#define M_FINAL } catch ( yaal::hcore::HException& e ){ e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e.print_error(); } catch ( yaal::hcore::HFailedAssertion const& ) { exit( -1 ); } catch ( int retVal ) { return ( retVal ); }
 /*! \brief Throw HExceptionT<> is condition is not met.
  *
  * Use this macro to test return status of low-level system function calls.
  *
  * \param condition - condition to be tested.
  */
-#define M_ENSURE( condition ) do { if ( ! ( condition ) ){ yaal::hcore::throw_exception<this_type>( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno, error_message( errno ) ); } } while ( 0 )
-#define M_ENSURE_EX( condition, comment ) do { if ( ! ( condition ) ){ yaal::hcore::throw_exception<this_type>( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno, error_message( errno ), comment ); } } while ( 0 )
+#define M_ENSURE( condition ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno, error_message( errno ) ); } } while ( 0 )
+#define M_ENSURE_EX( condition, comment ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition, errno, error_message( errno ), comment ); } } while ( 0 )
 #ifndef NDEBUG
 /*! \brief Run-time assertion tester.
  *
@@ -79,7 +81,7 @@ Copyright:
  * \param condition - condition to be tested.
  * \post Normal progam flow is continued only if condition is met, otherwise HFailedAssertion exception is thrown.
  */
-#	define M_ASSERT( condition ) do { if ( ! ( condition ) )yaal::hcore::HException::failed_assert( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition ); } while ( 0 )
+#	define M_ASSERT( condition ) do { if ( ! ( condition ) ) yaal::hcore::failed_assert( __FILE__, __PRETTY_FUNCTION__, __LINE__, #condition ); } while ( 0 )
 #else /* #ifndef NDEBUG */
 #	define M_ASSERT( c ) /**/
 #endif /* #else #ifndef NDEBUG */

@@ -76,7 +76,7 @@ HFile::~HFile( void )
 	if ( _handle && ! _external )
 		close();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 int HFile::open( HString const& path_, open_t const& open_ )

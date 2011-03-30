@@ -53,7 +53,7 @@ HPipe::~HPipe( void )
 	TEMP_FAILURE_RETRY( system::close( _pipe[ 1 ] ) );
 	TEMP_FAILURE_RETRY( system::close( _pipe[ 0 ] ) );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 int HPipe::get_reader_fd( void ) const

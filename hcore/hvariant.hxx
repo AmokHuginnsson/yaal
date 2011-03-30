@@ -184,7 +184,9 @@ template<typename t0_t, typename t1_t,
 	typename t20_t>
 HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::~HVariant( void )
 	{
+	M_PROLOG
 	destroy( _type, _mem );
+	M_DESTRUCTOR_EPILOG
 	}
 
 template<typename t0_t, typename t1_t,
@@ -262,31 +264,39 @@ template<typename t0_t, typename t1_t,
 	typename t20_t>
 void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::destroy( int type_, void* mem_ )
 	{
-	switch ( type_ )
+	try
 		{
-		case ( -1 ): break;
-		case ( 0 ): reinterpret_cast<t0_t*>( mem_ )->~t0_t(); break;
-		case ( 1 ): reinterpret_cast<t1_t*>( mem_ )->~t1_t(); break;
-		case ( 2 ): reinterpret_cast<t2_t*>( mem_ )->~t2_t(); break;
-		case ( 3 ): reinterpret_cast<t3_t*>( mem_ )->~t3_t(); break;
-		case ( 4 ): reinterpret_cast<t4_t*>( mem_ )->~t4_t(); break;
-		case ( 5 ): reinterpret_cast<t5_t*>( mem_ )->~t5_t(); break;
-		case ( 6 ): reinterpret_cast<t6_t*>( mem_ )->~t6_t(); break;
-		case ( 7 ): reinterpret_cast<t7_t*>( mem_ )->~t7_t(); break;
-		case ( 8 ): reinterpret_cast<t8_t*>( mem_ )->~t8_t(); break;
-		case ( 9 ): reinterpret_cast<t9_t*>( mem_ )->~t9_t(); break;
-		case ( 10 ): reinterpret_cast<t10_t*>( mem_ )->~t10_t(); break;
-		case ( 11 ): reinterpret_cast<t11_t*>( mem_ )->~t11_t(); break;
-		case ( 12 ): reinterpret_cast<t12_t*>( mem_ )->~t12_t(); break;
-		case ( 13 ): reinterpret_cast<t13_t*>( mem_ )->~t13_t(); break;
-		case ( 14 ): reinterpret_cast<t14_t*>( mem_ )->~t14_t(); break;
-		case ( 15 ): reinterpret_cast<t15_t*>( mem_ )->~t15_t(); break;
-		case ( 16 ): reinterpret_cast<t16_t*>( mem_ )->~t16_t(); break;
-		case ( 17 ): reinterpret_cast<t17_t*>( mem_ )->~t17_t(); break;
-		case ( 18 ): reinterpret_cast<t18_t*>( mem_ )->~t18_t(); break;
-		case ( 19 ): reinterpret_cast<t19_t*>( mem_ )->~t19_t(); break;
-		case ( 20 ): reinterpret_cast<t20_t*>( mem_ )->~t20_t(); break;
-		default: M_ASSERT( ! "Absurd type number." ); break;
+		switch ( type_ )
+			{
+			case ( -1 ): break;
+			case ( 0 ): reinterpret_cast<t0_t*>( mem_ )->~t0_t(); break;
+			case ( 1 ): reinterpret_cast<t1_t*>( mem_ )->~t1_t(); break;
+			case ( 2 ): reinterpret_cast<t2_t*>( mem_ )->~t2_t(); break;
+			case ( 3 ): reinterpret_cast<t3_t*>( mem_ )->~t3_t(); break;
+			case ( 4 ): reinterpret_cast<t4_t*>( mem_ )->~t4_t(); break;
+			case ( 5 ): reinterpret_cast<t5_t*>( mem_ )->~t5_t(); break;
+			case ( 6 ): reinterpret_cast<t6_t*>( mem_ )->~t6_t(); break;
+			case ( 7 ): reinterpret_cast<t7_t*>( mem_ )->~t7_t(); break;
+			case ( 8 ): reinterpret_cast<t8_t*>( mem_ )->~t8_t(); break;
+			case ( 9 ): reinterpret_cast<t9_t*>( mem_ )->~t9_t(); break;
+			case ( 10 ): reinterpret_cast<t10_t*>( mem_ )->~t10_t(); break;
+			case ( 11 ): reinterpret_cast<t11_t*>( mem_ )->~t11_t(); break;
+			case ( 12 ): reinterpret_cast<t12_t*>( mem_ )->~t12_t(); break;
+			case ( 13 ): reinterpret_cast<t13_t*>( mem_ )->~t13_t(); break;
+			case ( 14 ): reinterpret_cast<t14_t*>( mem_ )->~t14_t(); break;
+			case ( 15 ): reinterpret_cast<t15_t*>( mem_ )->~t15_t(); break;
+			case ( 16 ): reinterpret_cast<t16_t*>( mem_ )->~t16_t(); break;
+			case ( 17 ): reinterpret_cast<t17_t*>( mem_ )->~t17_t(); break;
+			case ( 18 ): reinterpret_cast<t18_t*>( mem_ )->~t18_t(); break;
+			case ( 19 ): reinterpret_cast<t19_t*>( mem_ )->~t19_t(); break;
+			case ( 20 ): reinterpret_cast<t20_t*>( mem_ )->~t20_t(); break;
+			default: M_ASSERT( ! "Absurd type number." ); break;
+			}
+		}
+	catch ( ... )
+		{
+		yaal::_isKilled_ = true;
+		debug_break();
 		}
 	}
 

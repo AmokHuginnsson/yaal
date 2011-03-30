@@ -139,7 +139,7 @@ HSignalService::~HSignalService( void )
 	if ( _loop )
 		stop();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HSignalService::stop( void )

@@ -56,7 +56,7 @@ HDataBase::~HDataBase( void )
 		(_connector->db_disconnect)( _coreData );
 	_coreData = NULL;
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 int HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HString const& login_,

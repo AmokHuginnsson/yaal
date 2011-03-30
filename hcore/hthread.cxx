@@ -94,7 +94,7 @@ HThread::~HThread( void )
 		}
 	M_ASSERT( _status == DEAD );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 int HThread::spawn( call_t call_ )
@@ -279,7 +279,7 @@ HMutex::~HMutex( void )
 		;
 	M_ENSURE( error == 0 );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HMutex::lock( void )
@@ -315,7 +315,7 @@ HLock::~HLock( void )
 	M_PROLOG
 	_mutex.unlock();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 class HPosixSemaphore : public HSemaphoreImplementationInterface
@@ -349,7 +349,7 @@ HPosixSemaphore::~HPosixSemaphore( void )
 	M_PROLOG
 	M_ENSURE( ::sem_destroy( &_sem ) == 0 );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HPosixSemaphore::do_wait( void )
@@ -486,7 +486,7 @@ HCondition::~HCondition( void )
 	M_ENSURE( ::pthread_cond_destroy( _buf.get<pthread_cond_t>() ) == 0 );
 	::pthread_condattr_destroy( static_cast<pthread_condattr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_cond_t ) ) ));
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 /*
@@ -547,7 +547,7 @@ HEvent::~HEvent( void )
 	M_PROLOG
 	_mutex.unlock();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HEvent::wait( void )

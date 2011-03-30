@@ -340,7 +340,7 @@ HRing<type_t>::~HRing( void )
 	M_PROLOG
 	clear();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 template<typename type_t>
@@ -481,7 +481,7 @@ void HRing<type_t>::resize( capacity_type capacity_, size_type size_, type_t con
 			int long idx( i + _start );
 			if ( idx >= curCapacity )
 				idx -= curCapacity;
-			arr[ idx ].~value_type();
+			M_SAFE( arr[ idx ].~value_type() );
 			}
 		}
 	_size = size_._value;
@@ -513,7 +513,7 @@ void HRing<type_t>::reserve( int long capacity_ )
 			int long idx( i + _start );
 			if ( idx >= curCapacity )
 				idx -= curCapacity;
-			src[ idx ].~value_type();
+			M_SAFE( src[ idx ].~value_type() );
 			}
 		_buf.swap( newBuf );
 		_start = 0;
@@ -601,7 +601,7 @@ void HRing<type_t>::insert_space( int long pos_, int long size_ )
 			int long srcIdx( src >= curCapacity ? src - curCapacity : src );
 			int long dstIdx( dst >= curCapacity ? dst - curCapacity : dst );
 			new ( arr + dstIdx ) value_type( arr[ srcIdx ] );
-			arr[ srcIdx ].~value_type();
+			M_SAFE( arr[ srcIdx ].~value_type() );
 			}
 		}
 	else
@@ -611,7 +611,7 @@ void HRing<type_t>::insert_space( int long pos_, int long size_ )
 			int long srcIdx( src >= curCapacity ? src - curCapacity : src );
 			int long dstIdx( dst >= curCapacity ? dst - curCapacity : dst );
 			new ( arr + dstIdx ) value_type( arr[ srcIdx ] );
-			arr[ srcIdx ].~value_type();
+			M_SAFE( arr[ srcIdx ].~value_type() );
 			}
 		}
 	return;
@@ -635,13 +635,13 @@ typename HRing<type_t>::iterator HRing<type_t>::erase( iterator first_, iterator
 		if ( first_._index < ( _size - last_._index ) )
 			{
 			for ( iterator it( begin() ), endIt( copy_backward( begin(), first_, last_ ) ); it != endIt; ++ it )
-				(*it).~value_type();
+				M_SAFE( (*it).~value_type() );
 			_start += ( last_._index - first_._index );
 			}
 		else
 			{
 			for ( iterator it( copy( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it )
-				(*it).~value_type();
+				M_SAFE( (*it).~value_type() );
 			}
 		}
 	_size -= ( last_._index - first_._index );
@@ -925,7 +925,7 @@ void HRing<type_t>::pop_back( void )
 	if ( idx >= cap )
 		idx -= cap;
 	value_type* arr( _buf.get<value_type>() );
-	arr[ idx ].~value_type();
+	M_SAFE( arr[ idx ].~value_type() );
 	return;
 	M_EPILOG
 	}
@@ -936,7 +936,7 @@ void HRing<type_t>::pop_front( void )
 	M_PROLOG
 	M_ENSURE_EX( _size > 0, _errMsgHRing_[ ERROR::RING_IS_EMPTY ] );
 	value_type* arr( _buf.get<value_type>() );
-	arr[ _start ++ ].~value_type();
+	M_SAFE( arr[ _start ++ ].~value_type() );
 	if ( _start == capacity() )
 		_start = 0;
 	-- _size;

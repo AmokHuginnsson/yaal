@@ -122,7 +122,7 @@ int HException::code( void ) const
 	return ( _code );
 	}
 
-void HException::failed_assert( char const* const fileName_,
+void failed_assert( char const* const fileName_,
 		char const* const functionName_, int const line_,
 		char const* const message_ )
 	{
@@ -132,8 +132,7 @@ void HException::failed_assert( char const* const fileName_,
 			message_, fileName_, line_, functionName_ );
 	if ( ! errno )
 		++ errno;
-	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT )
-		::abort();
+	debug_break();
 	static int const DUMP_DEPTH = 64;
 	dump_call_stack( clog, DUMP_DEPTH );
 	throw ( HFailedAssertion( message_ ) );
@@ -185,6 +184,13 @@ HString demangle( char const* symbolName_ )
 		xfree( p );
 		}
 	return ( symbol );
+	}
+
+void debug_break( void )
+	{
+	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT )
+		::abort();
+	return;
 	}
 
 }

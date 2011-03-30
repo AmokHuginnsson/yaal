@@ -85,6 +85,7 @@ private:
 	HChunk _buckets;
 public:
 	HHashContainer( void );
+	virtual ~HHashContainer( void );
 	int long get_size( void ) const;
 	bool is_empty( void ) const;
 	void clear( void );

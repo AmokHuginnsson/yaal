@@ -68,7 +68,7 @@ HTUIProcess::~HTUIProcess( void )
 	log_trace << "destruction success" << endl;
 #endif /* __DEBUGGER_BABUNI__ */
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ )

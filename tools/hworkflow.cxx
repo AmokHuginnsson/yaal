@@ -67,7 +67,7 @@ HWorkFlow::~HWorkFlow( void )
 		(*it)->finish();
 		}
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HWorkFlow::push_task( task_t call_ )

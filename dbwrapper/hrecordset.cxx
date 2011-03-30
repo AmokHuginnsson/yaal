@@ -63,7 +63,7 @@ HRecordSet::~HRecordSet ( void )
 	M_PROLOG
 	clear();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HRecordSet::clear( void )

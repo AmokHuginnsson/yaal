@@ -126,7 +126,7 @@ public:
 		M_PROLOG
 		clear();
 		return;
-		M_EPILOG
+		M_DESTRUCTOR_EPILOG
 		}
 	HHashMap& operator = ( HHashMap const& map_ )
 		{

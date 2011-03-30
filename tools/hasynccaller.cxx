@@ -111,7 +111,7 @@ HAsyncCaller::~HAsyncCaller( void )
 	M_PROLOG
 	stop();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HAsyncCaller::do_signal( void )

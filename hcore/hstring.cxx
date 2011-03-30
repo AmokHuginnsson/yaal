@@ -102,7 +102,7 @@ HString::~HString( void )
 	if ( ! IS_INPLACE )
 		xfree( *reinterpret_cast<char**>( _mem ) );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 HString::HString( HString const& string_ )

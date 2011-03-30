@@ -56,8 +56,10 @@ HChunk::HChunk( int long size_, STRATEGY::enum_t strategy_ )
 
 HChunk::~HChunk( void )
 	{
+	M_PROLOG
 	free();
 	return;
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HChunk::free( void )

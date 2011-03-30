@@ -272,7 +272,7 @@ HDeque<type_t>::~HDeque( void )
 	M_PROLOG
 	clear();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 template<typename type_t>
@@ -361,7 +361,7 @@ void HDeque<type_t>::clear( void )
 	M_PROLOG
 	value_type** chunks = _chunks.get<value_type*>();
 	for ( iterator it( begin() ), endIt( end() ); it != endIt; ++ it )
-		(*it).~value_type();
+		M_SAFE( (*it).~value_type() );
 	for ( int long i( _start / VALUES_PER_CHUNK ),
 			CAPACITY( _chunks.count_of<value_type*>() );
 			( i < CAPACITY ) && chunks[ i ]; ++ i )
@@ -487,7 +487,7 @@ void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ )
 		value_type** chunks = _chunks.get<value_type*>();
 		bool chunkStart( false );
 		for ( int long i( _start + size_ ), last( _start + _size ); i < last; ++ i )
-			chunks[ i / VALUES_PER_CHUNK ][ i % VALUES_PER_CHUNK ].~value_type();
+			M_SAFE( chunks[ i / VALUES_PER_CHUNK ][ i % VALUES_PER_CHUNK ].~value_type() );
 		for ( int long i( ( ( ( _start + size_ - 1 ) >= _start ? ( _start + size_ - 1 ) : _start + size_ ) / VALUES_PER_CHUNK ) + ( size_ ? 1 : 0 ) ),
 				lastChunkIndex( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ); i < lastChunkIndex; ++ i )
 			{
@@ -523,7 +523,7 @@ void HDeque<type_t>::insert_space( int long index_, int long size_ )
 			for ( int long src( _start + size_ ), dst( _start ); dst < ( index_ + _start ); ++ src, ++ dst )
 				{
 				new ( chunks[ dst / VALUES_PER_CHUNK ] + ( dst % VALUES_PER_CHUNK ) ) value_type( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
-				chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ].~value_type();
+				M_SAFE( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ].~value_type() );
 				}
 			}
 		else /* Move from front to back. */
@@ -531,7 +531,7 @@ void HDeque<type_t>::insert_space( int long index_, int long size_ )
 			for ( int long src( _start + _size - 1 ), dst( _start + _size + size_ - 1 ); src >= ( _start + index_ ); -- src, -- dst )
 				{
 				new ( chunks[ dst / VALUES_PER_CHUNK ] + ( dst % VALUES_PER_CHUNK ) ) value_type( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
-				chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ].~value_type();
+				M_SAFE( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ].~value_type() );
 				}
 			}
 		}
@@ -597,7 +597,7 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 			for ( int long src( _start ), dst( _start + first_._index ); dst < ( _start + last_._index ); ++ src, ++ dst )
 				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ];
 			for ( int long del( _start ); del < ( _start + toRemove ); ++ del )
-				chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type();
+				M_SAFE( chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type() );
 			for ( int long chunkIndex( _start / VALUES_PER_CHUNK ), newFirstChunkIndex( ( _start + toRemove ) / VALUES_PER_CHUNK );
 					chunkIndex < newFirstChunkIndex; ++ chunkIndex )
 				{
@@ -612,7 +612,7 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 			for ( int long src( _start + last_._index ), dst( _start + first_._index ); src < ( _start + _size ); ++ src, ++ dst )
 				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ];
 			for ( int long del( _start + _size - toRemove ); del < ( _start + _size ); ++ del )
-				chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type();
+				M_SAFE( chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type() );
 			int long chunksCount( _chunks.template count_of<value_type*>() );
 			for ( int long chunkIndex( ( ( ( ( ( _start + _size - toRemove ) - 1 ) >= _start ) ? ( ( _start + _size - toRemove ) - 1 ) : ( _start + _size - toRemove ) ) / VALUES_PER_CHUNK ) + ( ( _size - toRemove ) > 0 ? 1 : 0 ) );
 					( chunkIndex < ( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ) ) && ( chunkIndex < chunksCount );

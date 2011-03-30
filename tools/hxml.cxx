@@ -91,7 +91,7 @@ HXmlParserG::~HXmlParserG( void )
 	xmlCleanupParser();
 	xmlCleanupCharEncodingHandlers();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 class HXsltParserG : public HSingleton<HXsltParserG>
@@ -114,7 +114,7 @@ HXsltParserG::~HXsltParserG( void )
 	M_PROLOG
 	xsltCleanupGlobals();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 struct HXml::OConvert

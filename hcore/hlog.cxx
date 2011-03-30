@@ -92,7 +92,7 @@ HLog::~HLog( void )
 	if ( ! _realMode )
 		_file::ref().close();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HLog::do_rehash( void* src_, char const* const processName_ )

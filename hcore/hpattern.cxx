@@ -65,7 +65,7 @@ HPattern::~HPattern( void )
 	M_PROLOG
 	regfree( _compiled.get<regex_t>() );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HPattern::save_state( void* sp, pluggable_flags_t* f )

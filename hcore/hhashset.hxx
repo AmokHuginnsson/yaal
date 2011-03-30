@@ -120,7 +120,7 @@ public:
 		M_PROLOG
 		clear();
 		return;
-		M_EPILOG
+		M_DESTRUCTOR_EPILOG
 		}
 	HHashSet& operator = ( HHashSet const& set_ )
 		{

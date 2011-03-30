@@ -52,7 +52,7 @@ HScheduledAsyncCaller::~HScheduledAsyncCaller( void )
 	M_PROLOG
 	stop();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HScheduledAsyncCaller::do_signal( void )

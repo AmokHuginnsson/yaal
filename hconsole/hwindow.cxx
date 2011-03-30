@@ -67,7 +67,7 @@ HWindow::~HWindow( void )
 	log << "destroing window: " << _title << endl;
 #endif /* __DEBUGGER_BABUNI__ */
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 int HWindow::init( void )

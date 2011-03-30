@@ -165,10 +165,10 @@ HSBBSTree::HAbstractNode::HAbstractNode( void )
 HSBBSTree::HAbstractNode::~HAbstractNode( void )
 	{
 	if ( _left )
-		delete _left;
+		M_SAFE( delete _left );
 	_left = NULL;
 	if ( _right )
-		delete _right;
+		M_SAFE( delete _right );
 	_right = NULL;
 	return;
 	}
@@ -193,14 +193,14 @@ HSBBSTree::~HSBBSTree( void )
 	M_PROLOG
 	clear();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HSBBSTree::clear( void )
 	{
 	M_PROLOG
 	if ( _root )
-		delete _root;
+		M_SAFE( delete _root );
 	_root = NULL;
 	_size = 0;
 	M_EPILOG

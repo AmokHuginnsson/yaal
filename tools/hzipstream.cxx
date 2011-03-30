@@ -79,7 +79,7 @@ HZipStream::~HZipStream( void )
 	M_PROLOG
 	cleanup();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HZipStream::cleanup( void )

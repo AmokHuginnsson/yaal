@@ -142,6 +142,7 @@ HConsole::HConsole( void ) : _initialized( false ), _width( 0 ), _height( 0 ), _
 
 HConsole::~HConsole( void )
 	{
+	M_PROLOG
 	if ( _initialized )
 		{
 		if ( ! isendwin() )
@@ -151,6 +152,7 @@ HConsole::~HConsole( void )
 		delwin( newscr );
 		}
 	return;
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HConsole::init( void )

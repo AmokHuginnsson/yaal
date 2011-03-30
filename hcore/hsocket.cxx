@@ -122,7 +122,7 @@ HSocket::~HSocket( void )
 	if ( _address )
 		xfree( _address );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HSocket::shutdown( void )
@@ -139,7 +139,7 @@ int HSocket::do_close( void )
 	sockaddr_un* addressFile = NULL;
 	if ( _clients )
 		{
-		delete _clients;
+		M_SAFE( delete _clients );
 		_clients = NULL;
 		if ( ( !!( _type & TYPE::FILE ) ) && ( _address ) )
 			{

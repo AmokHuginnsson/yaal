@@ -69,7 +69,7 @@ HRawFile::~HRawFile( void )
 	M_PROLOG
 	if ( _fileDescriptor >= 0 )
 		HRawFile::close();
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 int HRawFile::close( void )

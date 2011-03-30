@@ -90,8 +90,6 @@ public:
 	void log( char const* const, char const* const, int const );
 	char const* what( void ) const;
 	int code( void ) const;
-	static void failed_assert( char const* const, char const* const, int const,
-			char const* const ) __attribute__(( __noreturn__ ));
 	static void set_error_stream( void* );
 private:
 	HException& operator = ( HException const& );
@@ -183,6 +181,9 @@ public:
 	global_t& instance( void )
 		{ return ( _object ); }
 	};
+
+void failed_assert( char const* const, char const* const, int const, char const* const ) __attribute__(( __noreturn__ ));
+void debug_break( void );
 
 /*
  * A,     AE,      AE = ET<A, E>

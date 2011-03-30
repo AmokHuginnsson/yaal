@@ -68,7 +68,7 @@ HBitmap::~HBitmap( void )
 	M_PROLOG
 	clear();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 int long HBitmap::get_size( void ) const

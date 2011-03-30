@@ -304,7 +304,7 @@ HArray<type_t>::~HArray( void )
 	M_PROLOG
 	clear();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 template<typename type_t>
@@ -400,7 +400,7 @@ HArray<type_t>& HArray<type_t>::operator = ( HArray const& arr_ )
 			else if ( arr_._size < _size )
 				{
 				for ( int long i = arr_._size; i < _size; ++ i )
-					dst[ i ].~value_type();
+					M_SAFE( dst[ i ].~value_type() );
 				}
 			_size = arr_._size;
 			}
@@ -426,7 +426,7 @@ void HArray<type_t>::resize( int long size_, type_t const& fillWith_ )
 		{
 		value_type* arr( _buf.get<value_type>() );
 		for ( int long i( size_ ); i < _size; ++ i )
-			arr[ i ].~value_type();
+			M_SAFE( arr[ i ].~value_type() );
 		}
 	_size = size_;
 	return;
@@ -448,7 +448,7 @@ void HArray<type_t>::reserve( int long capacity_ )
 		for ( int long i( 0 ); i < _size; ++ i )
 			new ( dst + i ) value_type( src[ i ] );
 		for ( int long i( 0 ); i < _size; ++ i )
-			src[ i ].~value_type();
+			M_SAFE( src[ i ].~value_type() );
 		_buf.swap( newBuf );
 		}
 	return;
@@ -512,7 +512,7 @@ void HArray<type_t>::insert_space( int long pos_, int long size_ )
 	for ( int long src( oldSize - 1 ), dst( _size - 1 ); src >= pos_; -- src, -- dst )
 		{
 		new ( arr + dst ) value_type( arr[ src ] );
-		arr[ src ].~value_type();
+		M_SAFE( arr[ src ].~value_type() );
 		}
 	return;
 	M_EPILOG
@@ -531,7 +531,7 @@ typename HArray<type_t>::iterator HArray<type_t>::erase( iterator first_, iterat
 	if ( last_._index < first_._index )
 		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index - first_._index );
 	for ( iterator it( copy( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it )
-		(*it).~value_type();
+		M_SAFE( (*it).~value_type() );
 	_size -= ( last_._index - first_._index );
 	return ( last_._index < _size ? last_ : end() );
 	M_EPILOG
@@ -752,7 +752,7 @@ void HArray<type_t>::pop_back( void )
 	M_PROLOG
 	M_ASSERT( _size > 0 );
 	value_type* arr( _buf.get<value_type>() );
-	arr[ -- _size ].~value_type();
+	M_SAFE( arr[ -- _size ].~value_type() );
 	return;
 	M_EPILOG
 	}

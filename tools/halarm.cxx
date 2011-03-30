@@ -33,6 +33,7 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "halarm.hxx"
 #include "hcore/numeric.hxx"
 
+using namespace yaal::hcore;
 using namespace yaal::meta;
 
 namespace yaal
@@ -86,7 +87,7 @@ HAlarm::~HAlarm( void )
 
 	M_ENSURE( timer_delete( _timer ) == 0 );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 }

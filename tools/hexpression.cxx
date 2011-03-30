@@ -156,7 +156,7 @@ HExpression::~HExpression( void )
 	{
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 HExpression::HExpression( HExpression const& ex )

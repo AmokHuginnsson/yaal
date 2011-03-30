@@ -269,7 +269,7 @@ HFSItem::HIterator::~HIterator( void )
 	M_PROLOG
 	cleanup();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 HFSItem::HIterator& HFSItem::HIterator::operator = ( HFSItem::HIterator const& fSItemIterator_ )

@@ -119,9 +119,11 @@ void HAuxiliaryBuffer<type_t>::init( iter_t first_, iter_t last_ )
 template<typename type_t>
 HAuxiliaryBuffer<type_t>::~HAuxiliaryBuffer( void )
 	{
+	M_PROLOG
 	clear();
 	delete _data;
 	return;
+	M_DESTRUCTOR_EPILOG
 	}
 
 template<typename type_t>

@@ -75,7 +75,7 @@ HPipedChild::~HPipedChild( void )
 	if ( _pid > 0 )
 		finish();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 HPipedChild::STATUS HPipedChild::finish( void )

@@ -539,7 +539,7 @@ HList<type_t>::~HList( void )
 	M_PROLOG
 	clear();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 template<typename type_t>
@@ -742,7 +742,7 @@ void HList<type_t>::clear( void )
 	{
 	M_PROLOG
 	while ( _size -- )
-		delete _hook->_next;
+		M_SAFE( delete _hook->_next );
 	_index = 0;
 	_indexElement = NULL;
 	_hook = NULL;
@@ -1002,7 +1002,7 @@ HList<type_t>::erase( HIterator<type_t, treatment> const& iterator_ )
 	 */
 	if ( iterator_._current == _hook )
 		_hook = _hook->_next;
-	delete iterator_._current;
+	M_SAFE( delete iterator_._current );
 	_size --;
 	if ( _size == 0 )
 		_hook = NULL;
@@ -1038,7 +1038,7 @@ void HList<type_t>::pop_front( void )
 		M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
 	if ( _indexElement )
 		_indexElement = _indexElement->_next;
-	delete element;
+	M_SAFE( delete element );
 	_size--;
 	if ( _size == 0 )
 		{
@@ -1063,7 +1063,7 @@ void HList<type_t>::pop_back( void )
 			_indexElement = element->_previous;
 			_index --;
 			}
-		delete element;
+		M_SAFE( delete element );
 		-- _size;
 		if ( _size == 0 )
 			{

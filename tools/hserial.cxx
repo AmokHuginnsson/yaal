@@ -83,7 +83,7 @@ HSerial::~HSerial( void )
 		close();
 	M_ASSERT ( _fileDescriptor < 0 );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 bool HSerial::open( void )

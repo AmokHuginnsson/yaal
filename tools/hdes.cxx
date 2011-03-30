@@ -71,7 +71,7 @@ HDes::~HDes( void )
 	M_PROLOG
 	flush_keys();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HDes::generate_keys( u8_t const* password_, int len_ )
