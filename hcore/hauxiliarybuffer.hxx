@@ -132,7 +132,7 @@ void HAuxiliaryBuffer<type_t>::clear( void )
 	if ( _initialized )
 		{
 		for ( value_type* it( begin() ), * endIt( end() ); it != endIt; ++ it )
-			it->~value_type();
+			M_SAFE( it->~value_type() );
 		_initialized = false;
 		}
 	}

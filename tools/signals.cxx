@@ -179,7 +179,7 @@ void* HSignalService::run( void )
 			{
 			for ( ; ( it != _handlers.end() ) && ( (*it).first == sigNo ); ++ it )
 				{
-				handler_t handler( (*it).second );
+				handler_t handler( (*it).second.first );
 				M_ASSERT( !! handler );
 				int status = handler( sigNo );
 				if ( status > 0 )
@@ -198,12 +198,34 @@ void* HSignalService::run( void )
 	M_EPILOG
 	}
 
-void HSignalService::register_handler( int sigNo_, handler_t handler_ )
+void HSignalService::register_handler( int sigNo_, handler_t handler_, void const* owner_ )
 	{
 	M_PROLOG
-	_handlers.push_front( sigNo_, handler_ );
+	HLock lock( _mutex );
+	_handlers.push_front( sigNo_, make_pair( handler_, owner_ ) );
 	catch_signal( sigNo_ );
 	M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
+	return;
+	M_EPILOG
+	}
+
+void HSignalService::flush_handlers( void const* owner_ )
+	{
+	M_PROLOG
+	HLock lock( _mutex );
+	for ( handlers_t::iterator it( _handlers.begin() ); it != _handlers.end(); )
+		{
+		handlers_t::iterator del( it );
+		++ it;
+		if ( del->second.second == owner_ )
+			{
+			int sigNo( del->first );
+			if ( _handlers.count( sigNo ) == 1 )
+				reset_signal( sigNo );
+			else
+				_handlers.erase( del );
+			}
+		}
 	return;
 	M_EPILOG
 	}
@@ -249,6 +271,7 @@ void HSignalService::block_signal( int sigNo_ )
 void HSignalService::reset_signal( int sigNo_ )
 	{
 	M_PROLOG
+	HLock lock( _mutex );
 	M_ENSURE( _handlers.count( sigNo_ ) );
 	reset_signal_low( sigNo_ );
 	M_ENSURE( sigdelset( _catch.get<sigset_t>(), sigNo_ ) == 0 );

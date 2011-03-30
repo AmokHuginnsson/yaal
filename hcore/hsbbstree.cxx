@@ -361,7 +361,7 @@ void HSBBSTree::remove_node( HAbstractNode* node_ )
 			&& ! ( node_->_left || node_->_right ) )
 		node_->_parent->set_child( node_, NULL );
 	node_->_left = node_->_right = NULL;
-	delete node_;
+	M_SAFE( delete node_ );
 	_size --;
 	if ( ! _size )
 		_root = NULL;

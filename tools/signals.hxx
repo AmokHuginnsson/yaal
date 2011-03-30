@@ -51,8 +51,9 @@ public:
 	typedef yaal::hcore::HSingleton<HSignalService> base_type;
 	typedef HSignalService this_type;
 	typedef yaal::hcore::HBoundCall<int ( int )> handler_t;
+	typedef yaal::hcore::HPair<handler_t, void const*> handler_info_t;
 private:
-	typedef yaal::hcore::HMultiMap<int, handler_t> handlers_t;
+	typedef yaal::hcore::HMultiMap<int, handler_info_t> handlers_t;
 	typedef handlers_t::value_list_t handler_list_t;
 	typedef handlers_t::value_list_ptr_t handler_list_ptr_t;
 	static int _exitStatus;
@@ -64,7 +65,8 @@ private:
 	handlers_t _handlers;
 public:
 	static int _killGracePeriod;
-	void register_handler( int, handler_t );
+	void register_handler( int, handler_t, void const* = NULL );
+	void flush_handlers( void const* );
 	void reset_signal( int );
 	void stop( void	);
 private:

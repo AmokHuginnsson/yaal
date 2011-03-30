@@ -31,6 +31,8 @@ Copyright:
 #include <sys/stat.h>
 #include <sqlite3.h>
 
+#include "hcore/base.hxx"
+#include "hcore/hexception.hxx"
 #include "hcore/compat.hxx"
 #include "hcore/hstring.hxx"
 
@@ -124,7 +126,7 @@ M_EXPORT_SYMBOL void db_disconnect( void* data_ )
 	OSQLite* sQLite = static_cast<OSQLite*>( data_ );
 	if ( sQLite->_dB )
 		sqlite3_close( sQLite->_dB );
-	delete sQLite;
+	M_SAFE( delete sQLite );
 	return;
 	}
 
@@ -185,7 +187,7 @@ M_EXPORT_SYMBOL void rs_unquery( void* data_ )
 	{
 	OSQLiteResult* pr = static_cast<OSQLiteResult*>( data_ );
 	sqlite3_free_table( pr->_data );
-	delete pr;
+	M_SAFE( delete pr );
 	return;
 	}
 

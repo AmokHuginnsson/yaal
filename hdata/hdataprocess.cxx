@@ -74,7 +74,7 @@ HDataProcess::~HDataProcess( void )
 	log_trace << "destruction success" << endl;
 #endif /* __DEBUGGER_BABUNI__ */
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 int HDataProcess::init_xrc( char const* processName_,
@@ -192,7 +192,7 @@ void HDataProcess::destroy_menu( OMenuItem* menu_ )
 			destroy_menu( menu_ [ ctr ]._subMenu );
 		ctr ++;
 		}
-	delete [ ] menu_;
+	M_SAFE( delete [] menu_ );
 	return;
 	M_EPILOG
 	}

@@ -57,7 +57,7 @@ HMainWindow::~HMainWindow( void )
 	log_trace << "destruction success" << endl;
 #endif /* __DEBUGGER_BABUNI__ */
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 int HMainWindow::init( void )

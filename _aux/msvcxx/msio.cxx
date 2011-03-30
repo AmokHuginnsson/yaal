@@ -22,8 +22,10 @@ IO::IO( TYPE::type_t t_, HANDLE h_, HANDLE e_, std::string const& p_ )
 
 IO::~IO( void )
 	{
+	M_PROLOG
 	if ( _overlapped.hEvent )
 		::CloseHandle( _overlapped.hEvent );
+	M_DESTRUCTOR_EPILOG
 	}
 
 void IO::schedule_read( void )

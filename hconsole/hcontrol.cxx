@@ -96,7 +96,7 @@ HControl::~HControl( void )
 #endif /* __DEBUGGER_BABUNI__ */
 	_parent = NULL;
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HControl::enable( bool enable_ )

@@ -125,9 +125,9 @@ HInfo::HInfo( HInfo const& info_ )
 HInfo::~HInfo( void )
 	{
 	M_PROLOG
-	purge( );
+	purge();
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HInfo::purge( void )

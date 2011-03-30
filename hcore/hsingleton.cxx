@@ -44,7 +44,9 @@ HLifeTimeTracker::HLifeTimeTracker( void )
 
 HLifeTimeTracker::~HLifeTimeTracker( void )
 	{
+	M_PROLOG
 	M_ASSERT( _destructors.size() == 0 );
+	M_DESTRUCTOR_EPILOG
 	}
 
 HLifeTimeTracker& HLifeTimeTracker::get_instance( void )

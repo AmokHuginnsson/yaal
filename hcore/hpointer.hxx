@@ -276,14 +276,14 @@ template<typename tType>
 template<typename real_t>
 void HPointerScalar<tType>::delete_pointee( tType* pointer_ )
 	{
-	delete static_cast<real_t*>( pointer_ );
+	M_SAFE( delete static_cast<real_t*>( pointer_ ) );
 	}
 
 template<typename tType>
 template<typename real_t>
 void HPointerArray<tType>::delete_pointee( tType* pointer_ )
 	{
-	delete [] static_cast<real_t*>( pointer_ );
+	M_SAFE( delete [] static_cast<real_t*>( pointer_ ) );
 	}
 
 template<typename tType>

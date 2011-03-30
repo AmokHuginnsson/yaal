@@ -89,7 +89,7 @@ void const* HBitmap::raw( void ) const
 void HBitmap::clear( void )
 	{
 	if ( _allocatedBytes )
-		delete static_cast<HChunk*>( _data );
+		M_SAFE( delete static_cast<HChunk*>( _data ) );
 	_data = NULL;
 	_allocatedBytes = 0;
 	_size = 0;

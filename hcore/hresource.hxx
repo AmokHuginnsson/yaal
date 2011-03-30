@@ -84,11 +84,11 @@ struct HResourceReleaseBy
 	{
 	static void delete_obj( T p )
 		{
-		delete static_cast<real_t>( p );
+		M_SAFE( delete static_cast<real_t>( p ) );
 		}
 	static void delete_array( T p )
 		{
-		delete [] static_cast<real_t>( p );
+		M_SAFE( delete [] static_cast<real_t>( p ) );
 		}
 	};
 struct HResourceReleaseWhen

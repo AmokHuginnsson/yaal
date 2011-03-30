@@ -65,8 +65,8 @@ HIODispatcher::HIODispatcher( int noFileHandlers_, int long latency_ )
 	HSignalService& ss = HSignalService::get_instance();
 	HSignalService::handler_t handler( call( &HIODispatcher::handler_interrupt, this, _1 ) );
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
-		ss.register_handler( SIGINT, handler );
-	ss.register_handler( SIGHUP, handler );
+		ss.register_handler( SIGINT, handler, this );
+	ss.register_handler( SIGHUP, handler, this );
 	register_file_descriptor_handler( _event.get_reader_fd(), call( &HIODispatcher::process_interrupt, this, _1 ) );
 	if ( _latency < LOW_LATENCY_WARNING )
 		log( LOG_TYPE::WARNING ) << "Low latency on IO Dispatcher!" << endl;
@@ -77,8 +77,10 @@ HIODispatcher::HIODispatcher( int noFileHandlers_, int long latency_ )
 HIODispatcher::~HIODispatcher( void )
 	{
 	M_PROLOG
+	HSignalService& ss = HSignalService::get_instance();
+	ss.flush_handlers( this );
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HIODispatcher::register_file_descriptor_handler( int fileDescriptor_, call_fd_t HANDLER, FD_TYPE::fd_type_t const& fdType_ )
