@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <unordered_set>
 #include <sys/cdefs.h>
 #include <process.h>
 #include <io.h>
@@ -17,9 +18,13 @@
 #define getpwuid_r getpwuid_r_off
 
 #define fill fill_off
+#include <csignal>
 #include <unistd.h>
 #undef fill
+#undef waitpid
+#include <sys/wait.h>
 
+#include "synchronizedunorderedset.hxx"
 #include "hcore/xalloc.hxx"
 #include "cleanup.hxx"
 #include "msio.hxx"
@@ -30,6 +35,10 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
 using namespace msvcxx;
+
+typedef SynchronizedUnorderedSet<int> pid_set_t;
+
+pid_set_t _children_;
 
 M_EXPORT_SYMBOL
 HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )
@@ -86,6 +95,29 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 	for ( int  k = 0, size = _argv.size(); k < size; ++ k )
 		xfree( argv[ k ] );
 	xfree( argv );
+
+	_children_.insert( pid );
 	return ( pid );
 	}
 
+namespace msvcxx
+{
+
+#undef waitpid
+int waitpid( int pid_, int* status_, int options_ )
+	{
+	int ret( ::waitpid( pid_, status_, options_ ) );
+	if ( ret == -1 )
+		{
+		if ( _children_.count( pid_ ) > 0 )
+			{
+			if ( ! kill( pid_, 0 ) )
+				ret = pid_;
+			}
+		}
+	if ( ret == pid_ )
+		_children_.erase( pid_ );
+	return ( ret );
+	}
+
+}

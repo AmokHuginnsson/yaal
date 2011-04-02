@@ -1,5 +1,4 @@
 #include <sys/cdefs.h>
-#include <list>
 #include <process.h>
 
 #define pthread_sigmask pthread_sigmask_off
@@ -23,55 +22,17 @@
 #undef pthread_sigmask
 #undef getpid
 
+#include "synchronizedqueue.hxx"
 #include "hcore/base.hxx"
-#include "cleanup.hxx"
-#include "hcore/hthread.hxx"
-
 #include "cleanup.hxx"
 
 using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 
-template<typename T>
-class SynchronizedQueue
-	{
-	list<T> _data;
-	yaal::hcore::HMutex _mutex;
-	yaal::hcore::HSemaphore _semaphore;
-public:
-	SynchronizedQueue( void )
-		: _data(), _mutex(), _semaphore()
-		{ }
-	bool pop( T& );
-	void push( T const& );
-	};
+typedef SynchronizedQueue<int> signal_queue_t;
 
-template<typename T>
-bool SynchronizedQueue<T>::pop( T& elem )
-	{
-	_semaphore.wait();
-	HLock l( _mutex );
-	bool found = false;
-	if ( ! _data.empty() )
-		{
-		found = true;
-		elem = _data.front();
-		_data.pop_front();
-		}
-	return ( ! found );
-	}
-
-template<typename T>
-void SynchronizedQueue<T>::push( T const& elem )
-	{
-	HLock l( _mutex );
-	_data.push_back( elem );
-	_semaphore.signal();
-	return;
-	}
-
-SynchronizedQueue<int> _signalQueue_;
+signal_queue_t _signalQueue_;
 
 M_EXPORT_SYMBOL
 int kill( int pid_, int sigNo_ )
@@ -92,9 +53,12 @@ int kill( int pid_, int sigNo_ )
 		}
 	else
 		{
-		HANDLE process( ::OpenProcess( PROCESS_QUERY_LIMITED_INFORMATION, false, pid_ ) );
+		HANDLE process( ::OpenProcess( PROCESS_QUERY_INFORMATION, false, pid_ ) );
 		if ( ! process )
+			{
+			int code( ::GetLastError() );
 			err = -1;
+			}
 		else
 			::CloseHandle( process );
 		}

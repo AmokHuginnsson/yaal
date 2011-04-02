@@ -32,3 +32,4 @@ inline int lstat( char const* path_, struct stat* s_ )
 	{ return ( msvcxx::stat( path_, s_ ) ); }
 
 #endif /* not YAAL_MSVCXX_SYS_STAT_H_INCLUDED */
+
