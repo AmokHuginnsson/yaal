@@ -310,8 +310,9 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t, typename deleter_t>
 template<typename real_t>
 HPointer<tType, pointer_type_t, access_type_t, deleter_t>::HPointer( real_t* const pointer_ )
-	: _shared( new HShared( &pointer_type::template delete_pointee<real_t>, pointer_ ) ), _object( pointer_ )
+	: _shared( pointer_ ? new HShared( &pointer_type::template delete_pointee<real_t>, pointer_ ) : NULL ), _object( pointer_ )
 	{
+	M_ASSERT( pointer_ );
 	_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
 	_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
 	access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this );
@@ -322,8 +323,9 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t, typename deleter_t>
 template<typename real_t>
 HPointer<tType, pointer_type_t, access_type_t, deleter_t>::HPointer( real_t* const pointer_, deleter_t deleter_ )
-	: _shared( new HShared( deleter_, pointer_ ) ), _object( pointer_ )
+	: _shared( pointer_ ? new HShared( deleter_, pointer_ ) : NULL ), _object( pointer_ )
 	{
+	M_ASSERT( pointer_ );
 	_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
 	_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
 	access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this );
