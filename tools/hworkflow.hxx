@@ -43,6 +43,7 @@ namespace tools
 class HWorkFlowInterface
 	{
 public:
+	typedef HWorkFlowInterface this_type;
 	typedef yaal::hcore::HBoundCall<> task_t;
 	virtual ~HWorkFlowInterface( void ){}
 	task_t pop_task( void );
@@ -50,12 +51,18 @@ private:
 	virtual task_t do_pop_task( void ) = 0;
 	};
 
+typedef yaal::hcore::HExceptionT<HWorkFlowInterface> HWorkFlowInterfaceException;
+
 /*! \brief Thread pool idiom implementation.
  */
 class HWorkFlow : public HWorkFlowInterface
 	{
-private:
+public:
+	typedef HWorkFlow this_type;
+	typedef HWorkFlowInterface base_type;
+	typedef yaal::hcore::HPointer<HWorkFlow> ptr_t;
 	class HWorker;
+private:
 	typedef yaal::hcore::HPointer<HWorker> worker_ptr_t;
 	typedef yaal::hcore::HList<worker_ptr_t> pool_t;
 	typedef yaal::hcore::HList<task_t> queue_t;
@@ -78,22 +85,28 @@ private:
 	virtual task_t do_pop_task( void );
 	};
 
+typedef yaal::hcore::HExceptionT<HWorkFlow, HWorkFlowInterfaceException> HWorkFlowException;
+
 /*! \brief Finest unit of working capacity.
  */
 class HWorkFlow::HWorker
 	{
+public:
+	typedef HWorker this_type;
 private:
 	HWorkFlowInterface* _workFlow;
 	yaal::hcore::HThread _thread;
-public:
+private:
 	HWorker( HWorkFlowInterface* );
 	void spawn( void );
 	void finish( void );
-private:
 	void* run( void );
 	HWorker( HWorker const& );
 	HWorker& operator = ( HWorker const& );
+	friend class HWorkFlow;
 	};
+
+typedef yaal::hcore::HExceptionT<HWorkFlow::HWorker> HWorkerException;
 
 }
 
