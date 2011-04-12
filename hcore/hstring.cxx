@@ -622,7 +622,7 @@ int long HString::find_one_of( char const* const set_,
 		return ( - 1 );
 	if ( after_ < 0 )
 		after_ = 0;
-	if ( ( ! ::std::strlen( set_ ) )
+	if ( ( ! set_[0] )
 			|| ( GET_SIZE <= after_ ) )
 		return ( - 1 );
 	char const* str( ::std::strpbrk( ROMEM + after_, set_ ) );
@@ -640,7 +640,7 @@ int long HString::reverse_find_one_of( char const* const set_,
 		return ( - 1 );
 	if ( before_ < 0 )
 		before_ = 0;
-	if ( ( GET_SIZE <= before_ ) || ( ! ::std::strlen( set_ ) ) )
+	if ( ( GET_SIZE <= before_ ) || ( ! set_[0] ) )
 		return ( - 1 );
 	char* str( string_helper::strrnpbrk( ROMEM, set_, GET_SIZE - before_ ) );
 	if ( ! str )
@@ -657,7 +657,7 @@ int long HString::find_last_one_of( char const* const set_,
 		return ( -1 );
 	if ( before_ >= GET_SIZE )
 		before_ = GET_SIZE - 1;
-	if ( ( before_ < 0 ) || ( ! ::std::strlen( set_ ) ) )
+	if ( ( before_ < 0 ) || ( ! set_[0] ) )
 		return ( -1 );
 	char* str( string_helper::strrnpbrk( ROMEM, set_, before_ + 1 ) );
 	if ( ! str )
@@ -674,10 +674,10 @@ int long HString::find_other_than( char const* const set_,
 		return ( 0 );
 	if ( after_ < 0 )
 		after_ = 0;
-	if ( ! ::std::strlen( set_ ) )
-		return ( 0 );
-	if ( GET_SIZE <= after_ )
+	if ( after_ >= GET_SIZE )
 		return ( -1 );
+	if ( ! set_[0] )
+		return ( after_ );
 	int long index = static_cast<int long>( ::std::strspn( ROMEM + after_, set_ ) );
 	if ( ( index + after_ ) >= GET_SIZE )
 		return ( - 1 );
@@ -693,10 +693,10 @@ int long HString::reverse_find_other_than( char const* const set_,
 		return ( 0 );
 	if ( before_ < 0 )
 		before_ = 0;
-	if ( ! ::std::strlen( set_ ) )
-		return ( 0 );
-	if ( GET_SIZE <= before_ )
+	if ( before_ >= GET_SIZE )
 		return ( -1 );
+	if ( ! set_[0] )
+		return ( before_ );
 	int long index( string_helper::strrnspn( ROMEM, set_, GET_SIZE - before_ ) );
 	if ( index >= ( GET_SIZE - before_ ) )
 		return ( - 1 );
@@ -712,10 +712,10 @@ int long HString::find_last_other_than( char const* const set_,
 		return ( GET_SIZE - 1 );
 	if ( before_ >= GET_SIZE )
 		before_ = GET_SIZE - 1;
-	if ( ! ::std::strlen( set_ ) )
-		return ( GET_SIZE - 1 );
 	if ( before_ < 0 )
 		return ( -1 );
+	if ( ! set_[0] )
+		return ( before_ );
 	int long index( string_helper::strrnspn( ROMEM, set_, before_ + 1 ) );
 	if ( index > before_ )
 		return ( -1 );
