@@ -49,7 +49,7 @@ void db_disconnect( void* );
 void* db_connect( char const* dataBase_,
 		char const* login_, char const * password_ )
 	{
-	MYSQL* mySQL = NULL;
+	MYSQL* mySQL( NULL );
 	if ( _brokenDB_ )
 		{
 		db_disconnect( _brokenDB_ );
@@ -94,7 +94,7 @@ void* db_query( void* data_, char const* query_ )
 	return ( mysql_store_result( static_cast<MYSQL*>( data_ ) ) );
 	}
 
-void rs_unquery ( void* data_ )
+void rs_unquery( void* data_ )
 	{
 	mysql_free_result( static_cast<MYSQL_RES*>( data_ ) );
 	return;
@@ -137,6 +137,30 @@ int yaal_mysql_driver_main( int, char** ) __attribute__(( __noreturn__ ));
 int yaal_mysql_driver_main( int, char** )
 	{
 	::exit( 0 );
+	}
+
+}
+
+namespace
+{
+
+class HMySQLInitDeinit
+	{
+public:
+	HMySQLInitDeinit( void );
+	~HMySQLInitDeinit( void );
+	} mySQLInitDeinit;
+
+HMySQLInitDeinit::HMySQLInitDeinit( void )
+	{
+	mysql_library_init( 0, NULL, NULL );
+	return;
+	}
+
+HMySQLInitDeinit::~HMySQLInitDeinit( void )
+	{
+	mysql_library_end();
+	return;
 	}
 
 }
