@@ -42,7 +42,7 @@ namespace hcore
 namespace
 {
 int const SPECIAL_CHARS = 3; /* minus, dot, nil */
-char const* const VALID_CHARACTERS = "-.0123456789";
+char const VALID_CHARACTERS[] = "-.0123456789";
 int const JUST_DIGITS = 2;
 int const HARDCODED_MINIMUM_PRECISION = 16;
 int const A_MINUS = 0;
