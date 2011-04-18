@@ -194,7 +194,7 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ )
 			driver = make_pair( HPlugin::ptr_t( new HPlugin() ), ODBConnector() );
 			log( LOG_TYPE::NOTICE ) << "Loading [" << _driver_[ driverId_ + 1 ] << "] driver ... ";
 			driver.first->load( _driver_[ driverId_ + 1 ] );
-			cerr << "(linking symbols ...) " << flush;
+			cout << "(linking symbols ...) " << flush;
 			driver.first->resolve( SYMBOL_PREFIX"db_disconnect", driver.second.db_disconnect );
 			driver.first->resolve( SYMBOL_PREFIX"dbrs_errno", driver.second.dbrs_errno );
 			driver.first->resolve( SYMBOL_PREFIX"dbrs_error", driver.second.dbrs_error );
@@ -231,7 +231,7 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ )
 	{
 	M_PROLOG
 	errno = 0;
-	cerr << "Using dynamic database driver [" << _driver_[ driverId_ + 1 ] << "] ... " << flush;
+	cout << "Using dynamic database driver [" << _driver_[ driverId_ + 1 ] << "] ... " << flush;
 	ODBConnector const* pConnector( NULL );
 	if ( driverId_ != ODBConnector::DRIVER::NONE )
 		{
@@ -247,7 +247,7 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ )
 			pConnector = try_load_driver( static_cast<ODBConnector::DRIVER::enum_t>( driverId_ ) );
 		}
 	if ( pConnector->db_connect != null_db_connect )
-		cerr << _done_ << flush;
+		cout << _done_ << flush;
 	return ( pConnector );
 	M_EPILOG
 	}
