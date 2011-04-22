@@ -133,6 +133,7 @@ extern "C" int long getline( char**, size_t*, FILE* );
 #undef SIGABRT
 #undef NSIG
 #define kill kill_off
+#define __USE_EXTERN_INLINES 1
 #include <glibc/signal.h>
 #undef kill
 #endif /* _CSIGNAL_ */

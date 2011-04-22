@@ -5,6 +5,7 @@
 #define sigdelset sigdelset_off
 #define sigwait sigwait_off
 #define sigemptyset sigemptyset_off
+#define sigismember sigismember_off
 #define kill kill_off
 #include <../include/csignal>
 #define signal signal_off
@@ -16,10 +17,12 @@
 #undef sigdelset
 #undef sigwait
 #undef sigemptyset
+#undef sigismember
 #undef kill
 
 M_YAAL_HCORE_PUBLIC_API int sigaddset( sigset_t*, int );
 M_YAAL_HCORE_PUBLIC_API int sigdelset( sigset_t*, int );
+M_YAAL_HCORE_PUBLIC_API int sigismember( sigset_t*, int );
 M_YAAL_HCORE_PUBLIC_API int sigwait( sigset_t*, int* );
 M_YAAL_HCORE_PUBLIC_API int sigaction( int, struct sigaction*, void* );
 M_YAAL_HCORE_PUBLIC_API int sigemptyset( sigset_t* );

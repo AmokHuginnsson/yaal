@@ -8,6 +8,7 @@
 #define getpwuid_r getpwuid_r_off
 #define getgrgid_r getgrgid_r_off
 
+#include <csignal>
 #include <unistd.h>
 #include <dirent.h>
 #include <pwd.h>
@@ -22,7 +23,6 @@
 #include "hcore/base.hxx"
 #include "hcore/xalloc.hxx"
 #include "cxxabi.h"
-
 #include "cleanup.hxx"
 
 using namespace std;
@@ -271,20 +271,50 @@ int WINAPI WinMain(
 	return ( main( nArgs, argv ) );
 	}
 
-M_EXPORT_SYMBOL
-int timer_create( clockid_t, struct sigevent*, timer_t* )
+void __stdcall timer_expired( PVOID lpParameter, __in BOOLEAN )
 	{
-	return ( 0 );
+	int sigNo( reinterpret_cast<int>( lpParameter ) );
+	kill( getpid(), sigNo );
 	}
 
 M_EXPORT_SYMBOL
-int timer_settime( timer_t, int, struct itimerspec const*, struct itimerspec* )
+int timer_create( clockid_t, struct sigevent*, timer_t* timer_ )
 	{
-	return ( 0 );
+	int err( 0 );
+	HANDLE h( NULL );
+	if ( ! ::CreateTimerQueueTimer( &h,
+			NULL, timer_expired, reinterpret_cast<PVOID>( SIGALRM ),
+			ULONG_MAX, 0, WT_EXECUTEONLYONCE ) )
+		{
+		log_windows_error( "CreateTimerQueueTimer" );
+		err = -1;
+		}
+	else
+		*timer_ = h;
+	return ( err );
 	}
 
 M_EXPORT_SYMBOL
-int timer_delete( timer_t )
+int timer_settime( timer_t timer_, int, struct itimerspec const* due_, struct itimerspec* )
 	{
-	return ( 0 );
+	int err( 0 );
+	int long miliseconds( due_->it_value.tv_sec * 1000 + due_->it_value.tv_nsec / 1000000 );
+	if ( ! ::ChangeTimerQueueTimer( NULL, timer_, miliseconds ? miliseconds : ULONG_MAX, 0 ) )
+		{
+		log_windows_error( "CreateTimerQueueTimer" );
+		err = -1;
+		}
+	return ( err );
+	}
+
+M_EXPORT_SYMBOL
+int timer_delete( timer_t timer_ )
+	{
+	int err( 0 );
+	if ( ! ::DeleteTimerQueueTimer( NULL, timer_, NULL ) )
+		{
+		log_windows_error( "DeleteTimerQueueTimer" );
+		err = -1;
+		}
+	return ( err );
 	}

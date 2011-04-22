@@ -1,14 +1,16 @@
 #include <sys/cdefs.h>
 #include <sys/socket.h>
+#include <csignal>
 
 #include "hcore/base.hxx"
 #include "hcore/hexception.hxx"
 #include "cleanup.hxx"
 #include "emu_unistd.hxx"
 #include "msio.hxx"
+#include "emu_signals.hxx"
 
 using namespace std;
-using namespace yaal;
+using yaal::error_message;
 
 namespace msvcxx
 {
@@ -88,7 +90,11 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 	else
 		{
 		M_ASSERT( timeout );
-		::Sleep( miliseconds );
+		if ( ::WaitForSingleObject( _tlsSignalsSetup_->interrupt(), miliseconds ) == WAIT_OBJECT_0 )
+			{
+			ret = -1;
+			errno = EINTR;
+			}
 		}
 	return ( ret );
 	}
@@ -124,7 +130,7 @@ int bind( int fd_, const struct sockaddr* addr_, socklen_t len_ )
 			{
 			::CloseHandle( h );
 			n += path;
-			replace( n.begin(), n.end(), '/', '\\' );
+			std::replace( n.begin(), n.end(), '/', '\\' );
 			io.set_path( n );
 			ret = make_pipe_instance( io );
 			}
@@ -214,7 +220,7 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 		char const* path( addr_->sa_data + 2 );
 		string n( "\\\\.\\pipe" );
 		n += path;
-		replace( n.begin(), n.end(), '/', '\\' );
+		std::replace( n.begin(), n.end(), '/', '\\' );
 		HANDLE h( ::CreateFile( n.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, 0 ) );
 		if ( h == INVALID_HANDLE_VALUE )
 			{

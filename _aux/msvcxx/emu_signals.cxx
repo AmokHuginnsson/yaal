@@ -1,4 +1,3 @@
-#include <stack>
 #include <sys/cdefs.h>
 #include <process.h>
 
@@ -16,7 +15,6 @@
 #define getpid getpid_off
 #define isatty isatty_off
 #define getpwuid_r getpwuid_r_off
-
 #include <csignal>
 
 #undef getpwuid_r
@@ -26,49 +24,116 @@
 #include <iostream>
 
 #include "synchronizedqueue.hxx"
-#include "hcore/htls.hxx"
 #include "hcore/base.hxx"
+#include "emu_signals.hxx"
 #include "cleanup.hxx"
 
 using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace msvcxx;
 
-
-typedef SynchronizedQueue<int> signal_queue_t;
-
-class SignalsSetup
-	{
-public:
-	SignalsSetup( void );
-	~SignalsSetup( void );
-	void set_mask( sigset_t const* );
-	};
+namespace msvcxx
+{
 
 SignalsSetup::SignalsSetup( void )
+	: _mask(), _interrupt( ::CreateEvent( NULL, false, false, NULL ) )
 	{
 	}
 
 SignalsSetup::~SignalsSetup( void )
 	{
+	::CloseHandle( _interrupt );
 	}
 
-void SignalsSetup::set_mask( sigset_t const* )
+void SignalsSetup::set_mask( int how_, sigset_t const* set_ )
+	{
+	switch ( how_ )
+		{
+		case ( SIG_SETMASK ):
+			_mask = *set_;
+		break;
+		case ( SIG_BLOCK ):
+			_mask |= *set_;
+		break;
+		case ( SIG_UNBLOCK ):
+			_mask &= ~*set_;
+		break;
+		default:
+			M_ASSERT( !"Bad how_ argument value." );
+		}
+	}
+
+bool SignalsSetup::is_blocked( int sigNo_ ) const
+	{
+	sigset_t copy( _mask );
+	return ( sigismember( &copy, sigNo_ ) ? true : false );
+	}
+
+HANDLE SignalsSetup::interrupt( void )
+	{
+	return ( _interrupt );
+	}
+
+void SignalsSetup::signal( void )
+	{
+	::SetEvent( _interrupt );
+	}
+
+class SignalDispatcher
+	{
+	typedef SynchronizedQueue<int> signal_queue_t;
+	signal_queue_t _queue;
+	sigset_t _mask;
+public:
+	SignalDispatcher( void );
+	void dispatch( int );
+	bool sigwait( sigset_t const*, int& );
+	};
+
+TLSSignalsSetup _tlsSignalsSetup_;
+SignalDispatcher _signalDispatcher_;
+
+SignalDispatcher::SignalDispatcher( void )
+	: _queue(), _mask()
 	{
 	}
 
-typedef HTLS<SignalsSetup> TLSSignalsSetup;
+void SignalDispatcher::dispatch( int sigNo_ )
+	{
+	if ( sigismember( &_mask, sigNo_ ) )
+		{
+		_queue.push( sigNo_ );
+		}
+	else
+		{
+		TLSSignalsSetup::external_lock l( _tlsSignalsSetup_.acquire() );
+		for ( TLSSignalsSetup::iterator it( _tlsSignalsSetup_.begin() ), end( _tlsSignalsSetup_.end() );
+			it != end; ++ it )
+			{
+			if ( ! (*it)->is_blocked( sigNo_ ) )
+				{
+				(*it)->signal();
+				break;
+				}
+			}
+		}
+	}
 
-TLSSignalsSetup _tlsSignalsSetup_;
+bool SignalDispatcher::sigwait( sigset_t const* mask_, int& sigNo_ )
+	{
+	_mask = *mask_;
+	return ( _queue.pop( sigNo_ ) );
+	}
 
-signal_queue_t _signalQueue_;
+}
 
 M_EXPORT_SYMBOL
 int kill( int pid_, int sigNo_ )
 	{
 	int err( 0 );
 	if ( pid_ == getpid() )
-		_signalQueue_.push( sigNo_ );
+		_signalDispatcher_.dispatch( sigNo_ );
 	else if ( sigNo_ )
 		{
 		HANDLE process( ::OpenProcess( PROCESS_TERMINATE, false, pid_ ) );
@@ -95,31 +160,36 @@ int kill( int pid_, int sigNo_ )
 	}
 
 M_EXPORT_SYMBOL
-int sigwait( sigset_t*, int* signo )
+int sigwait( sigset_t* mask_, int* signo )
 	{
-	if ( _signalQueue_.pop( *signo ) )
+	if ( _signalDispatcher_.sigwait( mask_, *signo ) )
 		*signo = SIGURG;
 	return ( 0 );
 	}
 
-int sigaddset( sigset_t*, int )
+int sigaddset( sigset_t* set_, int sig_ )
 	{
-	return ( 0 );
+	return ( __sigaddset( set_, sig_ ) );
 	}
 
-int sigdelset( sigset_t*, int )
+int sigdelset( sigset_t* set_, int sig_ )
 	{
-	return ( 0 );
+	return ( __sigdelset( set_, sig_ ) );
 	}
 
-int sigemptyset( sigset_t* )
+int sigismember( sigset_t* set_, int sig_ )
 	{
-	return ( 0 );
+	return ( __sigismember( set_, sig_ ) );
+	}
+
+int sigemptyset( sigset_t* set_ )
+	{
+	return ( __sigemptyset( set_ ) );
 	}
 
 void win_signal_handler( int signo )
 	{
-	_signalQueue_.push( signo );
+	_signalDispatcher_.dispatch( signo );
 	}
 
 int sigaction( int signo, struct sigaction*, void* )
@@ -131,9 +201,9 @@ int sigaction( int signo, struct sigaction*, void* )
 
 extern "C"
 M_EXPORT_SYMBOL
-int pthread_sigmask( int, sigset_t* set_, void* )
+int pthread_sigmask( int how_, sigset_t* set_, void* )
 	{
-	_tlsSignalsSetup_->set_mask( set_ );
+	_tlsSignalsSetup_->set_mask( how_, set_ );
 	return ( 0 );
 	}
 

@@ -194,11 +194,11 @@ public:
 		}
 	const_iterator end( void ) const
 		{
-		return ( _instances.begin() );
+		return ( _instances.end() );
 		}
 	iterator end( void )
 		{
-		return ( _instances.begin() );
+		return ( _instances.end() );
 		}
 	};
 template<typename tType>

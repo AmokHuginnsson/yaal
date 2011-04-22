@@ -73,6 +73,9 @@
 ?yellow@hconsole@yaal@@3QBDB
 __CTA1H
 __TI1H
+___sigaddset
+___sigdelset
+___sigismember
 _acosl
 _asinl
 _atanl
