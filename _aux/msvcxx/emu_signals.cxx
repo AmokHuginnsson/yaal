@@ -26,86 +26,14 @@
 #include <iostream>
 
 #include "synchronizedqueue.hxx"
+#include "hcore/htls.hxx"
 #include "hcore/base.hxx"
-#include "hcore/hboundcall.hxx"
 #include "cleanup.hxx"
 
 using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 
-template<typename TLS>
-class tls_ptr
-	{
-	typedef tls_ptr<TLS> this_type;
-	typedef stack<TLS*> tls_instances_t;
-	typedef HBoundCall<> tls_constructor_t;
-	static _declspec( thread ) TLS* _tls;
-	CMutex _mutex;
-	tls_instances_t _tlsInstances;
-	tls_constructor_t _tlsConstructor;
-public:
-	tls_ptr( void ) : _mutex(), _tlsInstances(), _tlsConstructor( call( static_cast<void ( this_type::* )( void )>( &this_type::construct ), this ) ) {}
-	void construct( void )
-		{
-		CLock l( _mutex );
-		M_ASSERT( ! _tls );
-		_tls = new TLS;
-		_tlsInstances.push( _tls );
-		}
-	template<typename T0>
-	tls_ptr( T0 const& a0 ) : _mutex(), _tlsInstances(), _tlsConstructor( call( static_cast<void ( this_type::* )( T0 const& )>( &this_type::construct ), this, a0 ) ) {}
-	template<typename T0>
-	void construct( T0 const& a0 )
-		{
-		CLock l( _mutex );
-		M_ASSERT( ! _tls );
-		_tls = new TLS( a0 );
-		_tlsInstances.push( _tls );
-		}
-	template<typename T0, typename T1>
-	tls_ptr( T0 const& a0, T1 const& a1 )
-		: _mutex(), _tlsInstances(),
-		_tlsConstructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const& )>( &this_type::construct ), this, a0, a1 ) ) {}
-	template<typename T0, typename T1>
-	void construct( T0 const& a0, T1 const& a1 )
-		{
-		CLock l( _mutex );
-		M_ASSERT( ! _tls );
-		_tls = new TLS( a0, a1 );
-		_tlsInstances.push( _tls );
-		}
-	template<typename T0, typename T1, typename T2>
-	tls_ptr( T0 const& a0, T1 const& a1, T2 const& a2 )
-		: _mutex(), _tlsInstances(),
-		_tlsConstructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const& )>( &this_type::construct ), this, a0, a1, a2 ) ) {}
-	template<typename T0, typename T1, typename T2>
-	void construct( T0 const& a0, T1 const& a1, T2 const& a2 )
-		{
-		CLock l( _mutex );
-		M_ASSERT( ! _tls );
-		_tls = new TLS( a0, a1, a2 );
-		_tlsInstances.push( _tls );
-		}
-	~tls_ptr( void )
-		{
-		CLock l( _mutex );
-		while ( ! _tlsInstances.empty() )
-			{
-			delete _tlsInstances.top();
-			_tlsInstances.pop();
-			}
-		_tls = NULL;
-		}
-	TLS* operator->( void )
-		{
-		if ( ! _tls )
-			_tlsConstructor();
-		return ( _tls );
-		}
-	};
-template<typename TLS>
-__declspec( thread ) TLS* tls_ptr<TLS>::_tls = NULL;
 
 typedef SynchronizedQueue<int> signal_queue_t;
 
@@ -129,7 +57,7 @@ void SignalsSetup::set_mask( sigset_t const* )
 	{
 	}
 
-typedef tls_ptr<SignalsSetup> TLSSignalsSetup;
+typedef HTLS<SignalsSetup> TLSSignalsSetup;
 
 TLSSignalsSetup _tlsSignalsSetup_;
 
@@ -208,3 +136,4 @@ int pthread_sigmask( int, sigset_t* set_, void* )
 	_tlsSignalsSetup_->set_mask( set_ );
 	return ( 0 );
 	}
+

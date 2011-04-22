@@ -90,6 +90,12 @@ static int const LOGIN_NAME_MAX = 16;
 
 #endif /* __YAAL_BUILD__ */
 
+#ifdef __GNUC__
+#define CXX_EXTENSION_TLS __thread
+#elif defined( __MSVCXX__ )
+#define CXX_EXTENSION_TLS __declspec( thread )
+#endif /* #elif defined( __MSVCXX__ ) #ifdef __GNUC__ */
+
 #if ! defined( HAVE_PRETTY_FUNCTION )
 #if ! defined( HAVE_FUNCTION )
 #if ! defined( HAVE_FUNC )
