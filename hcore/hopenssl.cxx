@@ -193,11 +193,11 @@ void HOpenSSL::OSSLContext::init( void )
 		CRYPTO_set_id_callback( &get_thread_id );
 		SSL_library_init();
 		}
-	SSL_METHOD* method = static_cast<SSL_METHOD*>( select_method() );
+	SSL_METHOD const* method = static_cast<SSL_METHOD const*>( select_method() );
 	SSL_CTX* ctx = NULL;
 	HString buffer;
 	ERR_clear_error();
-	_context = ctx = SSL_CTX_new( method );
+	_context = ctx = SSL_CTX_new( const_cast<SSL_METHOD*>( method ) );
 	if ( ! _context )
 		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
 	++ _instances;
@@ -211,7 +211,7 @@ void HOpenSSL::OSSLContext::init( void )
 	M_EPILOG
 	}
 
-void* HOpenSSL::OSSLContext::select_method( void ) const
+void const* HOpenSSL::OSSLContext::select_method( void ) const
 	{
 	return ( do_method() );
 	}
@@ -304,10 +304,10 @@ HOpenSSL::OSSLContextServer::OSSLContextServer( void )
 	M_EPILOG
 	}
 
-void* HOpenSSL::OSSLContextServer::do_method( void ) const
+void const* HOpenSSL::OSSLContextServer::do_method( void ) const
 	{
 	M_PROLOG
-	SSL_METHOD* m( SSLv23_server_method() );
+	SSL_METHOD const* m( SSLv23_server_method() );
 	M_ENSURE( m );
 	return ( m );
 	M_EPILOG
@@ -320,10 +320,10 @@ HOpenSSL::OSSLContextClient::OSSLContextClient( void )
 	M_EPILOG
 	}
 
-void* HOpenSSL::OSSLContextClient::do_method( void ) const
+void const* HOpenSSL::OSSLContextClient::do_method( void ) const
 	{
 	M_PROLOG
-	SSL_METHOD* m( SSLv23_client_method() );
+	SSL_METHOD const* m( SSLv23_client_method() );
 	M_ENSURE( m );
 	return ( m );
 	M_EPILOG

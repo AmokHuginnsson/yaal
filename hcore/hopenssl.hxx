@@ -78,12 +78,12 @@ private:
 		OSSLContext( void );
 		virtual ~OSSLContext( void );
 		void init( void );
-		virtual void* do_method( void ) const = 0;
+		virtual void const* do_method( void ) const = 0;
 		static void libssl_rule_mutex( int, int, char const*, int );
 	public:
 		void* create_ssl( void );
 		void consume_ssl( void* );
-		void* select_method( void ) const;
+		void const* select_method( void ) const;
 	private:
 		OSSLContext( OSSLContext const& );
 		OSSLContext& operator=( OSSLContext const& );
@@ -91,14 +91,14 @@ private:
 	class OSSLContextServer : public OSSLContext, public HSingleton<OSSLContextServer>
 		{
 		OSSLContextServer( void );
-		virtual void* do_method( void ) const;
+		virtual void const* do_method( void ) const;
 		friend class HSingleton<OSSLContextServer>;
 		friend class HDestructor<OSSLContextServer>;
 		};
 	class OSSLContextClient : public OSSLContext, public HSingleton<OSSLContextClient>
 		{
 		OSSLContextClient( void );
-		virtual void* do_method( void ) const;
+		virtual void const* do_method( void ) const;
 		friend class HSingleton<OSSLContextClient>;
 		friend class HDestructor<OSSLContextClient>;
 		};
