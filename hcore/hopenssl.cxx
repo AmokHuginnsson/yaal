@@ -45,8 +45,6 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "system.hxx"
 #include "hlog.hxx"
 
-#include "hcore.hxx"
-
 namespace yaal
 {
 
@@ -91,14 +89,24 @@ int long unsigned get_thread_id( void )
 int bio_read( BIO* bio_, char* buf_, int size_ )
 	{
 	M_PROLOG
-	return ( static_cast<int>( ::read( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, size_ ) ) );
+	int nRead( static_cast<int>( ::read( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, size_ ) ) );
+	if ( ( nRead < 0 ) && ( errno == EAGAIN ) )
+		BIO_set_retry_read( bio_ );
+	else
+		BIO_clear_retry_flags( bio_ );
+	return ( nRead );
 	M_EPILOG
 	}
 
 int bio_write( BIO* bio_, char const* buf_, int size_ )
 	{
 	M_PROLOG
-	return ( static_cast<int>( ::write( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, size_ ) ) );
+	int nWritten( static_cast<int>( ::write( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, size_ ) ) );
+	if ( ( nWritten < 0 ) && ( errno == EAGAIN ) )
+		BIO_set_retry_write( bio_ );
+	else
+		BIO_clear_retry_flags( bio_ );
+	return ( nWritten );
 	M_EPILOG
 	}
 
@@ -384,6 +392,7 @@ void HOpenSSL::accept_or_connect( void )
 int HOpenSSL::accept( void )
 	{
 	M_PROLOG
+	ERR_clear_error();
 	return ( SSL_accept( static_cast<SSL*>( _ssl ) ) );
 	M_EPILOG
 	}
@@ -391,6 +400,7 @@ int HOpenSSL::accept( void )
 int HOpenSSL::connect( void )
 	{
 	M_PROLOG
+	ERR_clear_error();
 	return ( SSL_connect( static_cast<SSL*>( _ssl ) ) );
 	M_EPILOG
 	}
@@ -398,11 +408,23 @@ int HOpenSSL::connect( void )
 void HOpenSSL::check_err( int code ) const
 	{
 	M_PROLOG
-	int err = SSL_get_error( static_cast<SSL*>( _ssl ), code );
+	int err( SSL_get_error( static_cast<SSL const*>( _ssl ), code ) );
 	if ( ( err != SSL_ERROR_ZERO_RETURN ) && ( err != SSL_ERROR_WANT_READ ) && ( err != SSL_ERROR_WANT_WRITE ) )
 		{
-		HString buffer;
-		throw HOpenSSLException( openssl_helper::format_error_message( buffer ) );
+		int errTop( static_cast<int>( ERR_get_error() ) );
+		HString buffer( "OpenSSL: " );
+		if ( ! errTop && ( err == SSL_ERROR_SYSCALL ) )
+			{
+			if ( code == 0 )
+				buffer += "EOF that violates protocol was observed.";
+			else if ( code == -1 )
+				buffer += strerror( errno );
+			else
+				buffer += "unknown problem occured!";
+			}
+		else 
+			openssl_helper::format_error_message( buffer, errTop );
+		throw HOpenSSLException( buffer );
 		}
 	return;
 	M_EPILOG
