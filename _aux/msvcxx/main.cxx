@@ -311,7 +311,7 @@ M_EXPORT_SYMBOL
 int timer_delete( timer_t timer_ )
 	{
 	int err( 0 );
-	if ( ! ::DeleteTimerQueueTimer( NULL, timer_, NULL ) )
+	if ( ! ::DeleteTimerQueueTimer( NULL, timer_, NULL ) && ( ::GetLastError() != ERROR_IO_PENDING ) )
 		{
 		log_windows_error( "DeleteTimerQueueTimer" );
 		err = -1;
