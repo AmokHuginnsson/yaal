@@ -11,7 +11,7 @@ all: debug
 
 debug: $(BUILD_ARTIFACT)
 
-$(BUILD_ARTIFACT): $(PROJECT_NAME).sln
+$(BUILD_ARTIFACT): $(wildcard */*.cxx) $(wildcard */*.hxx)  $(wildcard */*/*.cxx) $(wildcard */*/*.hxx) $(PROJECT_NAME).sln
 	"$(VCBUILD)" /showenv /M1 $(PROJECT_NAME).sln "Debug|Win32" ; \
 	test -f $(@)
 
