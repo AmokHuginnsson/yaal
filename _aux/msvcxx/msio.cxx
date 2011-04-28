@@ -96,13 +96,16 @@ int long IO::write( void const* buf_, int long size_ )
 int IO::close( void )
 	{
 	int ret( 0 );
-	if ( ( _type == IO::TYPE::PIPE ) || ( _type == IO::TYPE::NAMED_PIPE ) )
-		ret = ::CloseHandle( _handle ) ? 0 : -1;
-	else if ( _type == IO::TYPE::SOCKET )
-		ret = ::closesocket( reinterpret_cast<SOCKET>( _handle ) );
-	else
+	if ( reinterpret_cast<SOCKET>( _handle ) != -1 )
 		{
-		M_ASSERT( ! "invalid HANDLE" );
+		if ( ( _type == IO::TYPE::PIPE ) || ( _type == IO::TYPE::NAMED_PIPE ) )
+			ret = ::CloseHandle( _handle ) ? 0 : -1;
+		else if ( _type == IO::TYPE::SOCKET )
+			ret = ::closesocket( reinterpret_cast<SOCKET>( _handle ) );
+		else
+			{
+			M_ASSERT( ! "invalid HANDLE type" );
+			}
 		}
 	return ( ret );
 	}
