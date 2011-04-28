@@ -38,7 +38,7 @@ namespace yaal
 namespace hcore
 {
 
-/*! \brief HQueue<> - a stack container adaptor.
+/*! \brief HQueue<> - a queue container adaptor.
  */
 template<typename type_t, template <typename> class sequence_t = HDeque>
 class HQueue
@@ -90,13 +90,13 @@ public:
 	value_type const& front( void ) const
 		{
 		M_PROLOG
-		return ( _sequence.back() );
+		return ( _sequence.front() );
 		M_EPILOG
 		}
 	value_type& front( void )
 		{
 		M_PROLOG
-		return ( _sequence.back() );
+		return ( _sequence.front() );
 		M_EPILOG
 		}
 	value_type const& back( void ) const
