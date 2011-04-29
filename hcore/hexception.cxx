@@ -132,7 +132,8 @@ void failed_assert( char const* const fileName_,
 			message_, fileName_, line_, functionName_ );
 	if ( ! errno )
 		++ errno;
-	kill_inferior();
+	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT )
+		::abort();
 	static int const DUMP_DEPTH = 64;
 	dump_call_stack( clog, DUMP_DEPTH );
 	throw ( HFailedAssertion( message_ ) );
