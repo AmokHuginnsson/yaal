@@ -296,7 +296,7 @@ void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
 	catch ( ... )
 		{
 		yaal::_isKilled_ = true;
-		debug_break();
+		debug_break( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of " + type_name<this_type>() + " throws" ).raw() );
 		}
 	}
 

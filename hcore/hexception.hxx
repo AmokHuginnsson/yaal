@@ -183,7 +183,7 @@ public:
 	};
 
 void failed_assert( char const* const, char const* const, int const, char const* const ) __attribute__(( __noreturn__ ));
-void debug_break( void );
+void debug_break( char const* const = NULL );
 
 /*
  * A,     AE,      AE = ET<A, E>

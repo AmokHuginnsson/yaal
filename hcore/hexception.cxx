@@ -164,10 +164,12 @@ void HGlobalScopeExceptionHandlingPolicy::handle_exception( void )
 		}
 	catch ( HException const& e )
 		{
+		hcore::log << "Exception `" << e.what() << "' thrown from outside of main() scope." << endl;
 		cerr << "Exception `" << e.what() << "' thrown from outside of main() scope." << endl;
 		}
 	catch ( ... )
 		{
+		hcore::log << "Exception of unknown type thrown from outside of main() scope." << endl;
 		cerr << "Exception of unknown type thrown from outside of main() scope." << endl;
 		}
 	exit( 1 );
@@ -186,8 +188,13 @@ HString demangle( char const* symbolName_ )
 	return ( symbol );
 	}
 
-void debug_break( void )
+void debug_break( char const* const msg_ )
 	{
+	if ( msg_ )
+		{
+		hcore::log << "FATAL ERROR: " << msg_ << endl;
+		cerr << "FATAL ERROR: " << msg_ << endl;
+		}
 	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT )
 		::abort();
 	return;

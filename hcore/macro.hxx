@@ -36,6 +36,7 @@ Copyright:
 #define _(string) dgettext( PACKAGE_NAME, string )
 
 /*! \cond */
+#define M_STRINGIFY_REAL( x ) #x
 #define M_CONCAT_REAL( a, b ) a ## b
 /*! \endcond */
 /*! \brief Create uniqe C++ identifier from two other identifier.
@@ -45,6 +46,7 @@ Copyright:
  * \return EVAL(a)EVAL(b) - where EVAL(x) is x preprocessed by CPP.
  */
 #define M_CONCAT( a, b ) M_CONCAT_REAL( a, b )
+#define M_STRINGIFY( x ) M_STRINGIFY_REAL( x )
 /*! \brief Create object file identifier for ident(1) program.
  */
 #define M_VCSID(id) namespace { static char const* M_CONCAT(wrapper_VCSID, __LINE__)( void ) { M_CONCAT( wrapper_VCSID, __LINE__)(); return ( id ); } }
@@ -61,8 +63,8 @@ Copyright:
  */
 #define M_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
 #ifndef NDEBUG
-#define M_DESTRUCTOR_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); yaal::_isKilled_ = true; yaal::hcore::debug_break(); } catch ( ... ) { yaal::_isKilled_ = true; yaal::hcore::debug_break(); }
-#define M_SAFE( code ) do { try { code; } catch ( ... ) { yaal::_isKilled_ = true; yaal::hcore::debug_break(); } } while ( 0 )
+#define M_DESTRUCTOR_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); yaal::_isKilled_ = true; yaal::hcore::debug_break(); } catch ( ... ) { yaal::_isKilled_ = true; yaal::hcore::debug_break( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of " + type_name( this ) + " throws" ).raw() ); }
+#define M_SAFE( code ) do { try { code; } catch ( ... ) { yaal::_isKilled_ = true; yaal::hcore::debug_break( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": " #code ); } } while ( 0 )
 #else /* #ifndef NDEBUG */
 #define M_DESTRUCTOR_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); yaal::_isKilled_ = true; } catch ( ... ) { yaal::_isKilled_ = true; }
 #define M_SAFE( code ) do { try { code; } catch ( ... ) { yaal::_isKilled_ = true; } } while ( 0 )
