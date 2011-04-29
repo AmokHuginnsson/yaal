@@ -293,10 +293,14 @@ void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
 			default: M_ASSERT( ! "Absurd type number." ); break;
 			}
 		}
+	catch ( yaal::hcore::HException& e )
+		{
+		e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ );
+		kill_inferior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + type_name<this_type>() + "[" + type_ + "]' throws `" + e.what() + "' in `" + __PRETTY_FUNCTION__ + "'." ).raw() );
+		}
 	catch ( ... )
 		{
-		yaal::_isKilled_ = true;
-		debug_break( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of " + type_name<this_type>() + " throws" ).raw() );
+		kill_inferior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + type_name<this_type>() + "[" + type_ + "]' throws in `" + __PRETTY_FUNCTION__ + "'." ).raw() );
 		}
 	}
 

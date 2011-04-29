@@ -128,11 +128,11 @@ void failed_assert( char const* const fileName_,
 	{
 	M_PROLOG
 	hcore::log << "Failed assertion: " << message_ << " -> " << fileName_ << "(" << line_ << "): " << functionName_ << endl;
-	fprintf( ERROR_STREAM, "Failed assertion: `%s' at: %s: %4d: %s\n",
+	fprintf( ERROR_STREAM, "Failed assertion: `%s' at: %s: %4d : %s\n",
 			message_, fileName_, line_, functionName_ );
 	if ( ! errno )
 		++ errno;
-	debug_break();
+	kill_inferior();
 	static int const DUMP_DEPTH = 64;
 	dump_call_stack( clog, DUMP_DEPTH );
 	throw ( HFailedAssertion( message_ ) );
@@ -188,15 +188,18 @@ HString demangle( char const* symbolName_ )
 	return ( symbol );
 	}
 
-void debug_break( char const* const msg_ )
+void kill_inferior( char const* const msg_ )
 	{
+	yaal::_isKilled_ = true;
 	if ( msg_ )
 		{
 		hcore::log << "FATAL ERROR: " << msg_ << endl;
 		cerr << "FATAL ERROR: " << msg_ << endl;
 		}
+#ifndef NDEBUG
 	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT )
 		::abort();
+#endif /* #ifndef NDEBUG */
 	return;
 	}
 

@@ -62,16 +62,36 @@ Copyright:
 /*! \brief Last statement of every exception guarder function/method.
  */
 #define M_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
-#ifndef NDEBUG
-#define M_DESTRUCTOR_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); yaal::_isKilled_ = true; yaal::hcore::debug_break(); } catch ( ... ) { yaal::_isKilled_ = true; yaal::hcore::debug_break( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of " + type_name( this ) + " throws" ).raw() ); }
-#define M_SAFE( code ) do { try { code; } catch ( ... ) { yaal::_isKilled_ = true; yaal::hcore::debug_break( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": " #code ); } } while ( 0 )
-#else /* #ifndef NDEBUG */
-#define M_DESTRUCTOR_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); yaal::_isKilled_ = true; } catch ( ... ) { yaal::_isKilled_ = true; }
-#define M_SAFE( code ) do { try { code; } catch ( ... ) { yaal::_isKilled_ = true; } } while ( 0 )
-#endif /* #else #ifndef NDEBUG */
+#define M_DESTRUCTOR_EPILOG } \
+	catch ( yaal::hcore::HException& e ) \
+		{ \
+		e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); \
+		yaal::hcore::kill_inferior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + type_name( this ) + "' throws `" + e.what() + "' in `" + __PRETTY_FUNCTION__ + "'." ).raw() ); \
+		} \
+	catch ( ... ) \
+		{ \
+		yaal::hcore::kill_inferior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + type_name( this ) + "' throws in `" + __PRETTY_FUNCTION__ + "'." ).raw() ); \
+		}
+#define M_SAFE( code ) do \
+	{ \
+	try \
+		{ \
+		code; \
+		} \
+	catch ( yaal::hcore::HException& e ) \
+		{ \
+		e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); \
+		yaal::hcore::kill_inferior( ( yaal::hcore::HString( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": `" #code "' throws `" ) + e.what() + "' in `" + __PRETTY_FUNCTION__ + "'." ).raw() ); \
+		} \
+	catch ( ... ) \
+		{ \
+		yaal::hcore::kill_inferior( ( yaal::hcore::HString( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": `" #code "' throws in `" ) + __PRETTY_FUNCTION__ + "'." ).raw() ); \
+		} \
+	} \
+while ( 0 )
 /*! \brief Last statement in <tt>int main( int, char** )</tt>.
  */
-#define M_FINAL } catch ( yaal::hcore::HException& e ){ e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e.print_error(); } catch ( yaal::hcore::HFailedAssertion const& ) { exit( -1 ); } catch ( int retVal ) { return ( retVal ); }
+#define M_FINAL } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); e.print_error(); } catch ( yaal::hcore::HFailedAssertion const& ) { exit( -1 ); } catch ( int retVal ) { return ( retVal ); }
 /*! \brief Throw HExceptionT<> is condition is not met.
  *
  * Use this macro to test return status of low-level system function calls.
