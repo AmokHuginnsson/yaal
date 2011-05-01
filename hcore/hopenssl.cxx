@@ -283,7 +283,7 @@ void HOpenSSL::OSSLContext::consume_ssl( void* ssl_ )
 	M_EPILOG
 	}
 
-void HOpenSSL::OSSLContext::libssl_rule_mutex( int mode, int nth, char const* file_, int line_ )
+void HOpenSSL::OSSLContext::libssl_rule_mutex( int mode, int nth, char const* /* file_ */, int /* line_ */ )
 	{
 	M_PROLOG
 	HLock lock( _mutex );
@@ -299,8 +299,6 @@ void HOpenSSL::OSSLContext::libssl_rule_mutex( int mode, int nth, char const* fi
 		m.first->unlock();
 		-- m.second;
 		}
-	file_ = NULL;
-	line_ = 0;
 	return;
 	M_EPILOG
 	}
