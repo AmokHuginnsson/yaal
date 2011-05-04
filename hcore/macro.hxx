@@ -66,11 +66,11 @@ Copyright:
 	catch ( yaal::hcore::HException& e ) \
 		{ \
 		e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); \
-		yaal::hcore::kill_inferior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + type_name( this ) + "' throws `" + e.what() + "' in `" + __PRETTY_FUNCTION__ + "'." ).raw() ); \
+		yaal::hcore::kill_inferior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + yaal::hcore::type_name( this ) + "' throws `" + e.what() + "' in `" + __PRETTY_FUNCTION__ + "'." ).raw() ); \
 		} \
 	catch ( ... ) \
 		{ \
-		yaal::hcore::kill_inferior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + type_name( this ) + "' throws in `" + __PRETTY_FUNCTION__ + "'." ).raw() ); \
+		yaal::hcore::kill_inferior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + yaal::hcore::type_name( this ) + "' throws in `" + __PRETTY_FUNCTION__ + "'." ).raw() ); \
 		}
 #define M_SAFE( code ) do \
 	{ \
