@@ -48,15 +48,21 @@ namespace abi
 extern "C" 
 int backtrace( void** buf_, int size_ )
 	{
-	return ( CaptureStackBackTrace( 0, std::min( size_, 63 ), buf_, NULL ) );
+	int toFetch( std::min( size_, 63 ) );
+	int got( ::CaptureStackBackTrace( 0, toFetch, buf_, NULL ) );
+	::SymInitialize( ::GetCurrentProcess(), NULL, false );
+	char** strings = reinterpret_cast<char**>( buf_ );
+	return ( got );
 	}
 
 extern "C"
 char** backtrace_symbols( void* const* buf_, int size_ )
 	{
-	char** strings = xcalloc<char*>( size_ );
+	char** strings = reinterpret_cast<char**>( xcalloc<char>( size_ * ( sizeof ( char* ) + sizeof ( SYMBOL_INFO ) +  ) ) );
+	SYMBOL_INFO* syms
 	for ( int i( 0 ); i < size_; ++ i )
-		strings[i] = reinterpret_cast<char*>( buf_[i] );
+		strings[i] = SymFromAddr( process, ( DWORD64 )( buf_[ i ] ), 0, &symbol );
+reinterpret_cast<char*>( buf_[i] );
 	return ( strings );
 	}
 
