@@ -14,7 +14,7 @@
 # bool   - (true|yes|on|false|no|off)
 # char   - [a-z]
 # int    - [0-9]+
-# string - .+
+# string - [^ ].*
 #
 # example:
 # log_sql true
