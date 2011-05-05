@@ -21,14 +21,10 @@
 #undef pthread_sigmask
 #undef getpid
 
-#include <iostream>
-
 #include "synchronizedqueue.hxx"
 #include "hcore/base.hxx"
 #include "emu_signals.hxx"
 #include "cleanup.hxx"
-#include "hcore/introspect.hxx"
-#include "hcore/hfile.hxx"
 
 using namespace std;
 using namespace yaal;
@@ -41,8 +37,6 @@ namespace msvcxx
 SignalsSetup::SignalsSetup( void )
 	: _mask(), _interrupt( ::CreateEvent( NULL, false, false, NULL ) )
 	{
-	std::clog << __PRETTY_FUNCTION__ << ": interrupt handle = " << _interrupt << endl;
-	dump_call_stack( yaal::hcore::clog, 64 );
 	}
 
 SignalsSetup::~SignalsSetup( void )

@@ -1,7 +1,6 @@
 #include <sys/cdefs.h>
 #include <sys/socket.h>
 #include <csignal>
-#include <iostream>
 
 #include "hcore/base.hxx"
 #include "hcore/hexception.hxx"
@@ -94,7 +93,6 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 		HANDLE h( _tlsSignalsSetup_->interrupt() );
 		if ( ::WaitForSingleObject( h, miliseconds ) == WAIT_OBJECT_0 )
 			{
-			clog << "interrupt handle = " << h << endl;
 			ret = -1;
 			errno = EINTR;
 			}

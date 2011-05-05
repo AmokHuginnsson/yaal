@@ -106,6 +106,7 @@ HSignalService::HSignalService( void )
 	M_PROLOG
 	M_ENSURE( sigemptyset( _catch.get<sigset_t>() ) == 0 );
 	M_ENSURE( sigemptyset( _block.get<sigset_t>() ) == 0 );
+	catch_signal( SIGURG );
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
 		register_handler( SIGINT, call( &HBaseSignalHandlers::signal_INT, _1 ) );
 	register_handler( SIGHUP, call( &HBaseSignalHandlers::signal_HUP, _1 ) );
@@ -126,7 +127,6 @@ HSignalService::HSignalService( void )
 	register_handler( SIGTRAP, fatal );
 	register_handler( SIGSYS, fatal );
 	catch_signal( SIGPIPE );
-	catch_signal( SIGURG );
 	block_signal( SIGALRM );
 	_thread.spawn( call( &HSignalService::run, this ) );
 	return;
