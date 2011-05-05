@@ -14,6 +14,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <sys/socket.h>
+#include <iostream>
 
 #undef getpwuid_r
 #undef getgrgid_r
@@ -32,14 +33,15 @@ using namespace msvcxx;
 
 __declspec( thread ) int SocketErrno::_errno = 0;
 int ESCDELAY = 0;
+static int const MAX_SYMBOL_NAME_LEN( 2048 );
 
 namespace abi
 	{
 
 	char* __cxa_demangle( char const* const a, int, int, int* )
 		{
-		char* buf = xcalloc<char>( 1024 );
-		UnDecorateSymbolName( a, buf, 1023, 0 );
+		char* buf = xcalloc<char>( MAX_SYMBOL_NAME_LEN );
+		::UnDecorateSymbolName( a, buf, MAX_SYMBOL_NAME_LEN - 1, 0 );
 		return ( buf );
 		}
 
@@ -50,7 +52,17 @@ int backtrace( void** buf_, int size_ )
 	{
 	int toFetch( std::min( size_, 63 ) );
 	int got( ::CaptureStackBackTrace( 0, toFetch, buf_, NULL ) );
-	::SymInitialize( ::GetCurrentProcess(), NULL, false );
+	static bool once( false );
+	if ( ! once )
+		{
+		once = true;
+		/* ::SymSetOptions( SYMOPT_UNDNAME ); */
+		if ( ! ::SymInitialize( ::GetCurrentProcess(), NULL, true ) )
+			{
+			log_windows_error( "SymInitialize" );
+			got = 0;
+			}
+		}
 	char** strings = reinterpret_cast<char**>( buf_ );
 	return ( got );
 	}
@@ -58,11 +70,36 @@ int backtrace( void** buf_, int size_ )
 extern "C"
 char** backtrace_symbols( void* const* buf_, int size_ )
 	{
-	char** strings = reinterpret_cast<char**>( xcalloc<char>( size_ * ( sizeof ( char* ) + sizeof ( SYMBOL_INFO ) +  ) ) );
-	SYMBOL_INFO* syms
+	HANDLE process( ::GetCurrentProcess() );
+	bool fail( false );
+	char** strings = reinterpret_cast<char**>( xcalloc<char>( size_ * ( MAX_SYMBOL_NAME_LEN + 2 + sizeof ( char* ) ) ) );
 	for ( int i( 0 ); i < size_; ++ i )
-		strings[i] = SymFromAddr( process, ( DWORD64 )( buf_[ i ] ), 0, &symbol );
-reinterpret_cast<char*>( buf_[i] );
+		strings[ i ] = reinterpret_cast<char*>( strings + size_ ) + i * ( MAX_SYMBOL_NAME_LEN + 2 );
+	char buffer[ sizeof ( SYMBOL_INFO ) + MAX_SYMBOL_NAME_LEN ];
+	SYMBOL_INFO* tester( static_cast<SYMBOL_INFO*>( static_cast<void*>( buffer ) ) );
+	::memset( tester, 0, sizeof ( SYMBOL_INFO ) );
+	tester->SizeOfStruct = sizeof ( SYMBOL_INFO );
+	tester->MaxNameLen = MAX_SYMBOL_NAME_LEN;
+	for ( int i( 0 ); i < size_; ++ i )
+		{
+		if ( ! ::SymFromAddr( process, reinterpret_cast<DWORD64>( buf_[ i ] ), 0, tester ) )
+			{
+			log_windows_error( "SymFromAddr" );
+			fail = true;
+			break;
+			}
+		else
+			{
+			strings[i][0] = '(';
+			::strncpy( strings[i] + 1, tester->Name, tester->NameLen );
+			strings[i][ tester->NameLen + 1 ] = 0;
+			}
+		}
+	if ( fail )
+		{
+		xfree( strings );
+		strings = NULL;
+		}
 	return ( strings );
 	}
 
