@@ -39,7 +39,7 @@ namespace yaal
 namespace hcore
 {
 
-#define log_trace ( yaal::hcore::log << "Log: " << __FILE__ << " : " << " : " << __LINE__ << " : " << __PRETTY_FUNCTION__ << " : " )
+#define log_trace ( yaal::hcore::log << "Log: " << __FILE__ << " : " << __LINE__ << " : " << __PRETTY_FUNCTION__ << " : " )
 
 extern void* DEFAULT_LOG_STREAM;
 

@@ -26,6 +26,7 @@ Copyright:
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/mman.h>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -45,10 +46,21 @@ HMemoryMappedFile::HMemoryMappedFile( yaal::hcore::HString const& path_, int lon
 	: _fd( -1 ), _map( NULL ), _size( 0 )
 	{
 	M_PROLOG
-	M_ENSURE( ( _fd = ::open( path_.raw(), O_RDWR ) ) >= 0 );
-	if ( ! size_ )
+	M_ENSURE_EX( ( _fd = ::open( path_.raw(), O_RDWR ) ) >= 0, path_ );
+	try
 		{
-		M_ENSURE( ( _size = ::lseek( _fd, 0, SEEK_END ) ) >= 0 );
+		if ( ! size_ )
+			{
+			M_ENSURE( ( _size = ::lseek( _fd, 0, SEEK_END ) ) >= 0 );
+			}
+		M_ENSURE( ( _map = ::mmap( NULL, _size, PROT_READ | PROT_WRITE, MAP_PRIVATE, _fd, 0 ) ) != MAP_FAILED );
+		}
+	catch ( ... )
+		{
+		M_SAFE( M_ENSURE( ::close( _fd ) != 0 ) );
+		_fd = -1;
+		_map = NULL;
+		throw;
 		}
 	return;
 	M_EPILOG
@@ -59,7 +71,13 @@ HMemoryMappedFile::~HMemoryMappedFile( void )
 	M_PROLOG
 	if ( _fd >= 0 )
 		{
+		M_ASSERT( _map );
+		M_ENSURE( ::munmap( _map, _size ) == 0 );
 		M_ENSURE( ::close( _fd ) == 0 );
+		}
+	else
+		{
+		M_ASSERT( ! _map );
 		}
 	return;
 	M_DESTRUCTOR_EPILOG
