@@ -71,12 +71,14 @@ public:
 	 * \param src - original HMemory object to be copied.
 	 */
 	HMemory( HMemory const& src );
+	/*! \brief Destructor.
+	 */
+	virtual ~HMemory( void );
 	/*! \brief Assign operator.
 	 *
 	 * \param src - original HMemory object to be copied.
 	 * \return Self.
 	 */
-	virtual ~HMemory( void );
 	HMemory& operator = ( HMemory const& src );
 	/*! \brief Check if two blocks of memory have identical contents.
 	 *
