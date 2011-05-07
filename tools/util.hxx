@@ -68,8 +68,9 @@ struct OOptionInfo
 	char const* _name;
 	char const* _intro;
 	char const* _note;
-	OOptionInfo( yaal::hcore::HProgramOptionsHandler const& opt, char const* const name, char const* const intro, char const* const note )
-		: _opt( opt ), _name( name ), _intro( intro ), _note( note ) {}
+	char const* _syntax;
+	OOptionInfo( yaal::hcore::HProgramOptionsHandler const& opt, char const* const name, char const* const intro, char const* const note, char const* const syntax = NULL )
+		: _opt( opt ), _name( name ), _intro( intro ), _note( note ), _syntax( syntax ) {}
 private:
 	OOptionInfo( OOptionInfo const& );
 	OOptionInfo& operator = ( OOptionInfo const& );

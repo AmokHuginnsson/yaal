@@ -351,11 +351,11 @@ void show_help( void* arg )
 	M_PROLOG
 	OOptionInfo& info = *static_cast<OOptionInfo*>( arg );
 	::printf(
-"Usage: %s [OPTION]... [FILE]...\n"
+"Usage: %s %s\n"
 "%s - %s\n\n"
 "Mandatory arguments to long options are mandatory for short options too.\n"
 "Options:\n",
-			info._name, info._name, info._intro );
+			info._name, info._syntax ? info._syntax : "[OPTION]... [FILE]...", info._name, info._intro );
 	size_t longestLongLength( 0 );
 	size_t longestShortLength( 0 );
 	HProgramOptionsHandler::options_t const& opts( info._opt.get_options() );
