@@ -75,6 +75,8 @@ public:
 	 * \param size - capacity of newly constructed string.
 	 */
 	HString( int const size, bool const );
+	/*! \brief Destroy string object and deallocate all resources.
+	 */
 	~HString( void );
 	/*! \brief Increases string capacity.
 	 *
@@ -95,6 +97,12 @@ public:
 	 * str - old style C string to base new HString on.
 	 */
 	HString( char const* const str );
+	/*! \brief Construct string based on character array.
+	 *
+	 * array - a character array where to initialize new HString object with.
+	 * size - at most that many characters from array are used.
+	 */
+	HString( char const* const array, int long size );
 	/*! \brief Construct new HString from single character.
 	 *
 	 * ch - character to initialize new string with.

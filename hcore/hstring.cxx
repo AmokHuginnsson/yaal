@@ -183,6 +183,22 @@ HString::HString( char const* const str_ )
 	M_EPILOG
 	}
 
+HString::HString( char const* const array_, int long size_ )
+	: _mem()
+	{
+	M_PROLOG
+	if ( array_ )
+		{
+		int long newSize( min( static_cast<int long>( ::std::strlen( array_ ) ), size_ ) );
+		hs_realloc( newSize + 1 );
+		::std::strncpy( MEM, array_, newSize );
+		MEM[ newSize ] = 0;
+		SET_SIZE( newSize );
+		}
+	return;
+	M_EPILOG
+	}
+
 HString::HString( char char_ ) : _mem()
 	{
 	M_PROLOG
