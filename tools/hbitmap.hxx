@@ -217,10 +217,14 @@ public:
 	bool operator == ( bool ) const;
 	bool operator != ( bool ) const;
 	operator bool ( void ) const;
+	void swap( HBit& );
 private:
 	friend class HBitmap::HIterator<HBitmap::HBit>;
 	HBit( HBitmap*, int long );
 	};
+
+inline void swap( yaal::tools::HBitmap::HBit a, yaal::tools::HBitmap::HBit b )
+	{ a.swap( b ); }
 
 }
 

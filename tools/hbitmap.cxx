@@ -608,6 +608,16 @@ HBitmap::HBit& HBitmap::HBit::operator = ( bool bit )
 	return ( *this );
 	}
 
+void HBitmap::HBit::swap( HBitmap::HBit& other )
+	{
+	M_PROLOG
+	bool bit( _owner->get( _index ) );
+	_owner->set( _index, other._owner->get( other._index ) );
+	other._owner->set( other._index, bit );
+	return;
+	M_EPILOG
+	}
+
 }
 
 }
