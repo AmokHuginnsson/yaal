@@ -183,6 +183,28 @@ public:
 		-- _index;
 		return ( it );
 		}
+	HIterator& operator += ( int long offset_ )
+		{
+		_index += offset_;
+		return ( *this );
+		}
+	HIterator operator + ( int long offset_ )
+		{
+		HIterator it( *this );
+		it += offset_;
+		return ( it );
+		}
+	HIterator& operator -= ( int long offset_ )
+		{
+		_index -= offset_;
+		return ( *this );
+		}
+	HIterator operator - ( int long offset_ )
+		{
+		HIterator it( *this );
+		it -= offset_;
+		return ( it );
+		}
 	HIterator& operator = ( HIterator const& it )
 		{
 		if ( &it != this )
