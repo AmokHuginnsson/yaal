@@ -461,7 +461,24 @@ iter2_t remove_copy_if( iter1_t first_, iter1_t const& last_, iter2_t res_, cond
 	return ( res_ );
 	}
 
-/*! \brief Checks if two ranges are same size and have same set of values.
+/*! \brief Checks if two ranges are of same size and have same set of values.
+ * 
+ * \param it1 - begining of first range.
+ * \param end1 - one past last element of first range.
+ * \param it2 - begining of second range.
+ * \param end2 - one past last element of second range.
+ * \param equity - an element equity predicate that has to be met for all compared elements.
+ * \return true if and only if ranges have same size and same contents.
+ */
+template<typename iter1_t, typename iter2_t, typename equity_t>
+bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, equity_t equity )
+	{
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && equity( *it1, *it2 ); ++ it1, ++ it2 )
+		;
+	return ( ( it1 == end1 ) && ( it2 == end2 ) );
+	}
+
+/*! \brief Checks if two ranges are of same size and have same set of values.
  * 
  * \param it1 - begining of first range.
  * \param end1 - one past last element of first range.
@@ -475,6 +492,46 @@ bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
 		;
 	return ( ( it1 == end1 ) && ( it2 == end2 ) );
+	}
+
+/*! \cond */
+template<typename iter1_t, typename iter2_t, typename equity_t>
+bool search_try_subsequence( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, equity_t equity )
+	{
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && equity( *it1, *it2 ); ++ it1, ++ it2 )
+		;
+	return ( it1 == end1 );
+	}
+/*! \condend */
+
+/*! \brief Search for sequence of elements in another sequence.
+ * \param first1 - begining of sequence that we search thru.
+ * \param last1 - one past the end of sequence that we search thru.
+ * \param first2 - begining of sequence that we are looking for.
+ * \param last2 - one past the end of the sequence that we are looking for.
+ * \param equity - a predicate that shall be met for elements in respective ranges.
+ * \return Begining of found sequence or one past the end of sequence that we searched thru.
+ */
+template<typename iter1_t, typename iter2_t, typename equity_t>
+iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t last2, equity_t equity )
+	{
+	/* Naive - quadratic complexity implementation. */
+	while ( ( first1 != last1 ) && ! search_try_subsequence( first2, last2, first1, last1, equity ) )
+		++ first1;
+	return ( first1 );
+	}
+
+/*! \brief Search for sequence of elements in another sequence.
+ * \param first1 - begining of sequence that we search thru.
+ * \param last1 - one past the end of sequence that we search thru.
+ * \param first2 - begining of sequence that we are looking for.
+ * \param last2 - one past the end of the sequence that we are looking for.
+ * \return Begining of found sequence or one past the end of sequence that we searched thru.
+ */
+template<typename iter1_t, typename iter2_t>
+iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t last2 )
+	{
+	return ( search( first1, last1, first2, last2, equal_to<typename hcore::iterator_traits<iter1_t>::value_type>() ) );
 	}
 
 /*! \brief Checks if two ranges have same set of values.
