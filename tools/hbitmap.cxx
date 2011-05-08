@@ -531,14 +531,14 @@ HBitmap::const_iterator HBitmap::end( void ) const
 	return ( const_iterator( this, _size ) );
 	}
 
-HBitmap::const_iterator HBitmap::rbegin( void ) const
+HBitmap::const_reverse_iterator HBitmap::rbegin( void ) const
 	{
-	return ( const_iterator( this, _size - 1 ) );
+	return ( end() );
 	}
 
-HBitmap::const_iterator HBitmap::rend( void ) const
+HBitmap::const_reverse_iterator HBitmap::rend( void ) const
 	{
-	return ( const_iterator( this, -1 ) );
+	return ( begin() );
 	}
 
 HBitmap::iterator HBitmap::begin( void )
@@ -557,14 +557,14 @@ HBitmap::iterator HBitmap::end( void )
 	return ( iterator( this, _size ) );
 	}
 
-HBitmap::iterator HBitmap::rbegin( void )
+HBitmap::reverse_iterator HBitmap::rbegin( void )
 	{
-	return ( iterator( this, _size - 1 ) );
+	return ( end() );
 	}
 
-HBitmap::iterator HBitmap::rend( void )
+HBitmap::reverse_iterator HBitmap::rend( void )
 	{
-	return ( iterator( this, -1 ) );
+	return ( begin() );
 	}
 
 HBitmap::HBit::HBit( HBitmap* owner_, int long idx )

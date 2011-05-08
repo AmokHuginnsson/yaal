@@ -33,6 +33,7 @@ Copyright:
 #define YAAL_TOOLS_HBITMAP_HXX_INCLUDED 1
 
 #include "hcore/hexception.hxx"
+#include "hcore/iterator.hxx"
 
 namespace yaal
 {
@@ -51,6 +52,8 @@ public:
 	class HIterator;
 	typedef HIterator<bool> const_iterator;
 	typedef HIterator<HBit> iterator;
+	typedef yaal::hcore::HReverseIterator<iterator> reverse_iterator;
+	typedef yaal::hcore::HReverseIterator<const_iterator> const_reverse_iterator;
 private:
 	int long _allocatedBytes;
 	int long _size;
@@ -87,13 +90,13 @@ public:
 	const_iterator begin( void ) const;
 	const_iterator find( int long ) const;
 	const_iterator end( void ) const;
-	const_iterator rbegin( void ) const;
-	const_iterator rend( void ) const;
+	const_reverse_iterator rbegin( void ) const;
+	const_reverse_iterator rend( void ) const;
 	iterator begin( void );
 	iterator find( int long );
 	iterator end( void );
-	iterator rbegin( void );
-	iterator rend( void );
+	reverse_iterator rbegin( void );
+	reverse_iterator rend( void );
 	bool get( int long ) const;
 	void set( int long, bool );
 	void rotate_left( int long, int long, int long );
@@ -140,14 +143,19 @@ struct owner_const_qual_from_type<HBitmap::HBit>
 /*! \brief Bit iterator, allows access to single bits in sequence.
  */
 template<typename const_qual_t>
-class HBitmap::HIterator
+class HBitmap::HIterator : public yaal::hcore::iterator_interface<const_qual_t, yaal::hcore::iterator_category::random_access>
 	{
+public:
+	typedef yaal::hcore::iterator_interface<const_qual_t, yaal::hcore::iterator_category::random_access> base_type;
+	typedef const_qual_t value_type;
+	typedef const_qual_t reference;
+private:
 	typedef typename bitmap_type_helper::owner_const_qual_from_type<const_qual_t>::owner_t owner_t;
 	owner_t _owner;
 	int long _index;
 public:
-	HIterator( void ) : _owner( NULL ), _index( 0 ) {}
-	HIterator( HIterator const& it ) : _owner( it._owner ), _index( it._index ) {}
+	HIterator( void ) : base_type(), _owner( NULL ), _index( 0 ) {}
+	HIterator( HIterator const& it ) : base_type(), _owner( it._owner ), _index( it._index ) {}
 	HIterator& operator ++ ( void )
 		{
 		++ _index;
@@ -193,7 +201,7 @@ public:
 private:
 	friend class yaal::tools::HBitmap;
 	HIterator( owner_t owner_, int long idx )
-		: _owner( owner_ ), _index( idx ) {}
+		: base_type(), _owner( owner_ ), _index( idx ) {}
 	};
 
 /*! \brief Writtable bit reference interface.

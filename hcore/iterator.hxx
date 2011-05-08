@@ -46,6 +46,8 @@ template<typename T, typename category>
 struct iterator_interface
 	{
 	typedef T value_type;
+	typedef T& reference;
+	typedef T* pointer;
 	typedef category category_type;
 	virtual ~iterator_interface( void ) {}
 	};
@@ -54,6 +56,8 @@ template<typename iterator>
 struct iterator_traits
 	{
 	typedef typename iterator::value_type value_type;
+	typedef typename iterator::reference reference;
+	typedef typename iterator::pointer pointer;
 	template<typename iterator_t>
 	static trait::true_type has_category( typename iterator_t::category_type* );
 	template<typename iterator_t>
@@ -72,6 +76,8 @@ template<typename T>
 struct iterator_traits<T*>
 	{
 	typedef T value_type;
+	typedef T& reference;
+	typedef T* pointer;
 	typedef typename iterator_category::random_access category_type;
 	};
 
@@ -184,19 +190,19 @@ public:
 		{
 		return ( _iterator );
 		}
-	typename iterator_t::value_type const& operator*( void ) const
+	const typename iterator_t::reference operator*( void ) const
 		{
 		return ( *_iterator );
 		}
-	typename iterator_t::value_type& operator*( void )
+	typename iterator_t::reference operator*( void )
 		{
 		return ( *_iterator );
 		}
-	typename iterator_t::value_type const* operator->( void ) const
+	const typename iterator_t::pointer operator->( void ) const
 		{
 		return ( &*_iterator );
 		}
-	typename iterator_t::value_type* operator->( void )
+	typename iterator_t::pointer operator->( void )
 		{
 		return ( &*_iterator );
 		}
