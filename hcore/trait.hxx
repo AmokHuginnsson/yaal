@@ -442,10 +442,21 @@ struct strip_reference<T&>
  * \retval type - pointer to T type.
  */
 template<typename T>
+struct make_pointer;
+
+/*! \cond */
+template<typename T>
+struct make_pointer<T&>
+	{
+	typedef T* type;
+	};
+
+template<typename T>
 struct make_pointer
 	{
 	typedef T* type;
 	};
+/*! \endcond */
 
 /*! \brief Meta function used to strip one level of pointer from type.
  *

@@ -46,8 +46,8 @@ template<typename T, typename category>
 struct iterator_interface
 	{
 	typedef T value_type;
-	typedef T& reference;
-	typedef T* pointer;
+	typedef typename trait::make_reference<T>::type reference;
+	typedef typename trait::make_pointer<T>::type pointer;
 	typedef category category_type;
 	virtual ~iterator_interface( void ) {}
 	};
