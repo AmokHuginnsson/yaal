@@ -190,7 +190,7 @@ public:
 		{
 		return ( _iterator );
 		}
-	const typename iterator_t::reference operator*( void ) const
+	typename trait::make_reference<typename iterator_t::value_type const>::type operator*( void ) const
 		{
 		return ( *_iterator );
 		}
@@ -198,7 +198,7 @@ public:
 		{
 		return ( *_iterator );
 		}
-	const typename iterator_t::pointer operator->( void ) const
+	typename trait::make_pointer<typename iterator_t::value_type const>::type operator->( void ) const
 		{
 		return ( &*_iterator );
 		}
