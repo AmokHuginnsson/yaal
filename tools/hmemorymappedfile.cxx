@@ -51,7 +51,7 @@ HMemoryMappedFile::HMemoryMappedFile( yaal::hcore::HString const& path_, int lon
 		{
 		if ( ! size_ )
 			{
-			M_ENSURE( ( _size = ::lseek( _fd, 0, SEEK_END ) ) >= 0 );
+			M_ENSURE( ( _size = static_cast<int long>( ::lseek( _fd, 0, SEEK_END ) ) ) >= 0 );
 			}
 		M_ENSURE( ( _map = ::mmap( NULL, _size, PROT_READ | PROT_WRITE, MAP_PRIVATE, _fd, 0 ) ) != MAP_FAILED );
 		}
