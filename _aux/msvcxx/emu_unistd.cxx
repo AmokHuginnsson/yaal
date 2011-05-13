@@ -222,6 +222,29 @@ int stat( char const* path_, struct stat* s_ )
 	return ( res );
 	}
 
+typedef __mode_t mode_t;
+
+M_EXPORT_SYMBOL
+mode_t umask( mode_t umask_ )
+	{
+	static bool initialized( false );
+	static mode_t currentUmask( 0 );
+	mode_t oldUmask( ::umask( umask_ ) );
+	if ( initialized )
+		oldUmask = currentUmask;
+	else
+		{
+		initialized = true;
+		if ( ! oldUmask )
+			{
+			/* Windows default umask is screwed. */
+			oldUmask = 7;
+			}
+		}
+	currentUmask = umask_;
+	return ( oldUmask );
+	}
+
 M_EXPORT_SYMBOL
 char const* windows_strerror( int code_ )
 	{
