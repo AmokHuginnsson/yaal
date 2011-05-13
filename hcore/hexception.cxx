@@ -189,7 +189,7 @@ HString demangle( char const* symbolName_ )
 	return ( symbol );
 	}
 
-void kill_inferior( char const* const msg_ )
+void kill_interior( char const* const msg_ )
 	{
 	yaal::_isKilled_ = true;
 	if ( msg_ )

@@ -183,7 +183,7 @@ public:
 	};
 
 void failed_assert( char const* const, char const* const, int const, char const* const ) __attribute__(( __noreturn__ ));
-void kill_inferior( char const* const = NULL );
+void kill_interior( char const* const = NULL );
 
 /*
  * A,     AE,      AE = ET<A, E>
