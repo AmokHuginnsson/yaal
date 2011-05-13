@@ -31,6 +31,7 @@ char const COPYRIGHT [ ] =
 #include <cstdlib>
 #include <libintl.h>
 #include <locale.h>
+#include <sys/stat.h>
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -217,6 +218,18 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	if ( ! ( getuid() && geteuid() ) )
 		{
 		::perror( "running with super-user privileges - bailing out" );
+		::exit( 1 );
+		}
+	mode_t const lockOutUmask( S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH );
+	mode_t curUmask( ::umask( lockOutUmask ) );
+	if ( ::umask( curUmask ) != lockOutUmask )
+		{
+		::perror( "syscall failure - bailng out" );
+		exit( 1 );
+		}
+	if ( ( ~curUmask ) & ( S_IROTH | S_IWOTH | S_IXOTH )  )
+		{
+		::perror( "running with too permissive umask - bailing out" );
 		::exit( 1 );
 		}
 	init_locale();

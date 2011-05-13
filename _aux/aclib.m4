@@ -6,6 +6,10 @@ AC_DEFUN([PRIVILEGES_SANITY],
 	if test "x${EID}" = "x0" ; then
 		AC_MSG_ERROR([running with super-user privileges - bailing out])
 	fi
+	UMASK=`umask | sed 's/0077/77/'`
+	if test "x${UMASK}" != "x77" ; then
+		AC_MSG_ERROR([running with too permissive umask: `${UMASK}', must be: `0077' - bailing out])
+	fi
 ])
 
 dnl YAAL_DETECT_FLAGS(RESULT, FLAGSET)
