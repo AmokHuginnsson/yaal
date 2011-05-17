@@ -7,7 +7,7 @@
 extern "C" FILE* tmpfile( void );
 
 #define _SYS_SOCKET_H 1
-#define _SYS_RESOURCE_H 1
+#define _STRUCT_TIMEVAL 1
 #undef EDEADLOCK
 #define __socklen_t_defined 1
 #undef environ

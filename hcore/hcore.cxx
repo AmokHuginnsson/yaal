@@ -253,7 +253,9 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 		::perror( "running with too permissive umask - bailing out" );
 		::exit( 1 );
 		}
+#if ( HAVE_DECL_RLIMIT_AS == 1 )
 	ensure_limit( RLIMIT_AS, "unlimited VM size - bailing out" );
+#endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
 #ifndef __HOST_OS_TYPE_CYGWIN__
 	ensure_limit( RLIMIT_DATA, "unlimited data size - bailing out" );
 #endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
