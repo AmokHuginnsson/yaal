@@ -57,8 +57,8 @@ FILE* ERROR_STREAM = stderr;
 
 char const* const _exceptionType_ = _( "Exception type" );
 
-HException::HException( HString const& fileName_,
-		HString const& functionName_,
+HException::HException( char const* fileName_,
+		char const* functionName_,
 		int const line_, HString const& message_,
 		int const code_ )
 	: _code( code_ ), _frame( 0 ),
@@ -68,7 +68,13 @@ HException::HException( HString const& fileName_,
 	{
 	hcore::log << "Exception: " << _message << ", code: " << _code;
 	hcore::log << '.' << endl;
-	log( fileName_.raw(), functionName_.raw(), line_ );
+	log( fileName_, functionName_, line_ );
+	/*
+	 * Special case of exception where function name is actually pointer to temporary
+	 * and shall not be remembered.
+	 */
+	if ( _fileName == _exceptionType_ )
+		_functionName = NULL;
 	return;
 	}
 
@@ -95,20 +101,24 @@ void HException::print_error( void ) const
 void HException::log( char const* const fileName_,
 											 char const* const functionName_, int const line_ )
 	{
-	size_t length = ::strlen( fileName_ );
-	if ( _frame
-			&& ( _fileName == fileName_ )
-			&& ( _functionName == functionName_ ) )
-		return;
-	HString frame;
-	frame.format(
-				"Exception frame %2d: %16s : %4d : %s\n", _frame,
-				fileName_ + ( length > 16 ? length - 16 : 0 ),
-				line_, functionName_ );
-	if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK )
-		fprintf( static_cast<FILE*>( ERROR_STREAM ), "%s", frame.raw() );
-	hcore::log << frame;
-	++ _frame;
+	if ( ! _frame
+			|| ( ( _fileName != fileName_ ) && ::strcmp( _fileName, fileName_ ) )
+			|| ( ! _functionName && functionName_ )
+			|| ( ( _functionName != functionName_ ) && ::strcmp( _functionName, functionName_ ) ) )
+		{
+		_fileName = fileName_;
+		_functionName = functionName_;
+		HString frame;
+		size_t length( ::strlen( fileName_ ) );
+		frame.format(
+					"Exception frame %2d: %16s : %4d : %s\n", _frame,
+					fileName_ + ( length > 16 ? length - 16 : 0 ),
+					line_, functionName_ );
+		if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK )
+			fprintf( static_cast<FILE*>( ERROR_STREAM ), "%s", frame.raw() );
+		hcore::log << frame;
+		++ _frame;
+		}
 	return;
 	}
 

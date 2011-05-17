@@ -68,11 +68,11 @@ struct DEBUG_LEVEL
 class HException
 	{
 protected:
-	int  _code;
-	int  _frame;
-	HString _fileName;
-	HString _functionName;
-	HString _message;
+	int  _code; /*!< Numeric code for given exception type/cause. */
+	int  _frame; /*!< Frame counter for step-by-step unwinding with logging. */
+	char const* _fileName; /*!< Log each frame only once. */
+	char const* _functionName; /*!< Log each frame only once. */
+	HString _message; /*!< Exception messege. */
 public:
 	/*! \brief Construct exception object.
 	 *
@@ -82,7 +82,7 @@ public:
 	 * \param message_ - an exception description.
 	 * \param code_ - error code.
 	 */
-	HException( HString const& fileName_, HString const& functionName_, int const line_,
+	HException( char const* fileName_, char const* functionName_, int const line_,
 			HString const& message_, int const code_ = 0 );
 	HException( HException const& );
 	virtual ~HException( void );
@@ -123,10 +123,10 @@ class HExceptionT : public base_type
 	{
 public:
 	HExceptionT( HString const& reason_, HString const& symbol_ = type_name<tType>() )
-		: base_type( _exceptionType_, symbol_, 0, reason_, errno )
+		: base_type( _exceptionType_, symbol_.raw(), 0, reason_, errno )
 		{ }
-	HExceptionT( HString const& fileName_,
-			HString const& functionName_, int const line_,
+	HExceptionT( char const* fileName_,
+			char const* functionName_, int const line_,
 			HString const& reason_, int const code_ )
 		: base_type( fileName_, functionName_, line_, reason_, code_ )
 		{	}
