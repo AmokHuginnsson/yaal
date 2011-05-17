@@ -146,6 +146,13 @@ private:
 		ALIVE,
 		ZOMBIE
 		} status_t;
+	struct OExceptionInfo
+		{
+		bool _stacked;
+		int _code;
+		yaal::hcore::HString _message;
+		OExceptionInfo( void ) : _stacked( false ), _code( 0 ), _message() {}
+		};
 	status_t _status;
 	HChunk _buf;
 	mutable HMutex _mutex;
@@ -153,6 +160,7 @@ private:
 	HResource<void> _resGuard;
 	typedef HBoundCall<void* ()> call_t;
 	call_t _call;
+	OExceptionInfo _exceptionInfo;
 public:
 	HThread( void );
 	virtual ~HThread( void );
@@ -160,6 +168,7 @@ public:
 	void* finish( void );
 	void schedule_finish( void );
  	bool is_alive( void ) const;
+	void stack_exception( yaal::hcore::HString const&, int = 0 );
 	static int long get_id( void );
 	static void set_name( char const* );
 private:

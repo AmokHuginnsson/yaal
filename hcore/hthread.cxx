@@ -64,7 +64,7 @@ void do_pthread_attr_destroy( void* attr )
 
 HThread::HThread( void )
 	: _status( DEAD ), _buf( chunk_size<pthread_t>( 1 ) + chunk_size<pthread_attr_t>( 1 ) ),
-	_mutex( HMutex::TYPE::RECURSIVE ), _semaphore(), _resGuard(), _call()
+	_mutex( HMutex::TYPE::RECURSIVE ), _semaphore(), _resGuard(), _call(), _exceptionInfo()
 	{
 	M_PROLOG
 	pthread_attr_t* attr( static_cast<pthread_attr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_t ) ) ) );
@@ -136,6 +136,8 @@ void* HThread::finish( void )
 	void* returnValue( NULL );
 	M_ENSURE( ::pthread_join( *_buf.get<pthread_t>(), &returnValue ) == 0 );
 	_status = DEAD;
+	if ( _exceptionInfo._stacked )
+		throw HThreadException( _exceptionInfo._message, _exceptionInfo._code );
 	return ( returnValue );
 	M_EPILOG
 	}
@@ -148,6 +150,21 @@ void* HThread::SPAWN( void* thread_ )
 	 * Because of not catching an exception at the thread owner layer
 	 * is a severe coding bug, application must crash in the event
 	 * of uncaught exception.
+	 *
+	 * Other possibility would be to use kill_interior() here,
+	 * but as opposite of `exception in destructor' case where
+	 * process possibly would not be terminated, an uncaught exception
+	 * in thread would always cause process termination.
+	 *
+	 * So again:
+	 *
+	 * In case of `exception in destructor' without library intervention
+	 * thery is a chance to continue normal execution, so we finish gracefuly
+	 * via kill_interior().
+	 *
+	 * In case of `exception in thread' there is no chance to continue
+	 * normal execution without library intervention,
+	 * so we die via apropriate fatal signal.
 	 */
 	try
 		{
@@ -187,29 +204,6 @@ void* HThread::control( void )
 	pthread_cleanup_push( CLEANUP, this );
 	_status = ALIVE;
 	_semaphore.signal();
-	/*
-	 * Setting int run(); as pure virtual exposed us to undefined behavior
-	 * at the event of two subsequent spawn() calls.
-	 *
-	 * The scenario is:
-	 * There are 2 threads: T1 and T2.
-	 * T1 does:
-	 * spawn();
-	 *
-	 * T2 is created from this spawn, and invokes this function (control()).
-	 * Here, between line above and line below comes task switch.
-	 *
-	 * T1 does:
-	 * spawn();
-	 *
-	 * The second spawn fails with an exception and the thread object is destroyed.
-	 * Here comes another task switch and although finish() waits on signal
-	 * that is send after the run() call, the derived class is already destroyed
-	 * and the run below is "pure virtual" with no underneath object.
-	 *
-	 * That is why we have to deliver interface that allows users to not specify
-	 * any useful or meaningful int run();
-	 */
 	returnValue = _call();
 	pthread_cleanup_pop( 0 );
 	_status = ZOMBIE;
@@ -246,6 +240,16 @@ void HThread::set_name( char const* name_ )
 	log( LOG_TYPE::WARNING ) << "Setting thread name (`" << name_ << "') not supported on your platform." << endl;
 #endif /* #else #elif defined( HAVE_PRCTL ) #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
 	return;
+	}
+
+void HThread::stack_exception( yaal::hcore::HString const& message_, int code_ )
+	{
+	M_PROLOG
+	_exceptionInfo._stacked = true;
+	_exceptionInfo._code = code_;
+	_exceptionInfo._message = message_;
+	return;
+	M_EPILOG
 	}
 
 void do_pthread_mutexattr_destroy( void* attr )
