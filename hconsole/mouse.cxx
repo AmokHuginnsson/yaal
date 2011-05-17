@@ -258,7 +258,7 @@ int x_mouse_open( void )
 		error.format( "could not set up apropriate mask: 1 = %d, 2 = %d, 3 = %d",
 				mouseMask & BUTTON1_CLICKED, mouseMask & BUTTON2_CLICKED,
 				mouseMask & BUTTON3_CLICKED );
-		throw ( HException( __FILE__, __PRETTY_FUNCTION__, __LINE__, error, static_cast<int>( mouseMask ) ) );
+		throw ( HException( __FILE__, __LINE__, __PRETTY_FUNCTION__, error, static_cast<int>( mouseMask ) ) );
 		}
 	return ( 0 );
 	M_EPILOG

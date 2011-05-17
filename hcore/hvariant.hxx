@@ -295,7 +295,7 @@ void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
 		}
 	catch ( yaal::hcore::HException& e )
 		{
-		e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ );
+		e.log( __FILE__, __LINE__, __PRETTY_FUNCTION__ );
 		kill_interior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + yaal::hcore::type_name<this_type>() + "[" + type_ + "]' throws `" + e.what() + "' in `" + __PRETTY_FUNCTION__ + "'." ).raw() );
 		}
 	catch ( ... )

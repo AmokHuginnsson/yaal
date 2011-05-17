@@ -77,17 +77,23 @@ public:
 	/*! \brief Construct exception object.
 	 *
 	 * \param fileName_ - source code file name where exception has been generated.
-	 * \param functionName_ - name of the function that throws this exception.
 	 * \param line_ - line of code where throw occured.
+	 * \param functionName_ - name of the function that throws this exception.
 	 * \param message_ - an exception description.
 	 * \param code_ - error code.
 	 */
-	HException( char const* fileName_, char const* functionName_, int const line_,
+	HException( char const* fileName_, int line_, char const* functionName_,
 			HString const& message_, int const code_ = 0 );
 	HException( HException const& );
 	virtual ~HException( void );
 	void print_error( void ) const;
-	void log( char const* const, char const* const, int const );
+	/*! \brief Log exception frame.
+	 *
+	 * \param fileName_ - source code file name where exception has been caught.
+	 * \param line_ - line of code where where exception has been caught.
+	 * \param functionName_ - name of the function that is on unwinding path.
+	 */
+	void log( char const* const fileName_, int line_, char const* const functionName_ );
 	char const* what( void ) const;
 	int code( void ) const;
 	static void set_error_stream( void* );
@@ -122,13 +128,13 @@ template<typename tType, typename base_type = HException>
 class HExceptionT : public base_type
 	{
 public:
-	HExceptionT( HString const& reason_, HString const& symbol_ = type_name<tType>() )
-		: base_type( _exceptionType_, symbol_.raw(), 0, reason_, errno )
+	HExceptionT( HString const& reason_, int code_ = errno, HString const& symbol_ = type_name<tType>() )
+		: base_type( _exceptionType_, 0, symbol_.raw(), reason_, code_ )
 		{ }
 	HExceptionT( char const* fileName_,
-			char const* functionName_, int const line_,
+			int line_, char const* functionName_,
 			HString const& reason_, int const code_ )
-		: base_type( fileName_, functionName_, line_, reason_, code_ )
+		: base_type( fileName_, line_, functionName_, reason_, code_ )
 		{	}
 	};
 
@@ -182,7 +188,7 @@ public:
 		{ return ( _object ); }
 	};
 
-void failed_assert( char const* const, char const* const, int const, char const* const ) __attribute__(( __noreturn__ ));
+void failed_assert( char const* const, int, char const* const, char const* const ) __attribute__(( __noreturn__ ));
 void kill_interior( char const* const = NULL );
 
 /*
@@ -285,23 +291,23 @@ struct parent_exception<void>
 }
 
 template<typename tType, typename code_t>
-void throw_exception( char const*, char const*, int, HString const&, code_t const&, HString const& = HString() ) __attribute__(( __noreturn__ ));
+void throw_exception( char const*, int, char const*, HString const&, code_t const&, HString const& = HString() ) __attribute__(( __noreturn__ ));
 template<typename tType, typename code_t>
-void throw_exception( char const* file, char const* function, int line, HString const& message, code_t const& code, HString const& reason )
+void throw_exception( char const* file, int line, char const* function, HString const& message, code_t const& code, HString const& reason )
 	{
 	typedef typename exception_auto_hierarchy::parent_exception<tType>::parent_exception_t parent_exception_t;
 	typedef typename yaal::hcore::HExceptionT<tType, parent_exception_t> exception_t;
-	throw exception_t( file, function, line, ! reason.is_empty() ? message + ": " + reason : message, static_cast<int>( code ) );
+	throw exception_t( file, line, function, ! reason.is_empty() ? message + ": " + reason : message, static_cast<int>( code ) );
 	}
 
 template<typename tType, typename code_t>
-void throw_exception( char const*, char const*, int, HString const&, code_t const&, HString const&, HString const& ) __attribute__(( __noreturn__ ));
+void throw_exception( char const*, int, char const*, HString const&, code_t const&, HString const&, HString const& ) __attribute__(( __noreturn__ ));
 template<typename tType, typename code_t>
-void throw_exception( char const* file, char const* function, int line, HString const& message, code_t const& code, HString const& reason, HString const& comment )
+void throw_exception( char const* file, int line, char const* function, HString const& message, code_t const& code, HString const& reason, HString const& comment )
 	{
 	typedef typename exception_auto_hierarchy::parent_exception<tType>::parent_exception_t parent_exception_t;
 	typedef typename yaal::hcore::HExceptionT<tType, parent_exception_t> exception_t;
-	throw exception_t( file, function, line, message + ": " + reason + ": " + comment, static_cast<int>( code ) );
+	throw exception_t( file, line, function, message + ": " + reason + ": " + comment, static_cast<int>( code ) );
 	}
 
 }

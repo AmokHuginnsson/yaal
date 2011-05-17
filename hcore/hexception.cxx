@@ -58,9 +58,8 @@ FILE* ERROR_STREAM = stderr;
 char const* const _exceptionType_ = _( "Exception type" );
 
 HException::HException( char const* fileName_,
-		char const* functionName_,
-		int const line_, HString const& message_,
-		int const code_ )
+		int const line_, char const* functionName_,
+		HString const& message_, int const code_ )
 	: _code( code_ ), _frame( 0 ),
 	_fileName( fileName_ ),
 	_functionName( functionName_ ),
@@ -68,7 +67,7 @@ HException::HException( char const* fileName_,
 	{
 	hcore::log << "Exception: " << _message << ", code: " << _code;
 	hcore::log << '.' << endl;
-	log( fileName_, functionName_, line_ );
+	log( fileName_, line_, functionName_ );
 	/*
 	 * Special case of exception where function name is actually pointer to temporary
 	 * and shall not be remembered.
@@ -98,8 +97,8 @@ void HException::print_error( void ) const
 	return;
 	}
 
-void HException::log( char const* const fileName_,
-											 char const* const functionName_, int const line_ )
+void HException::log( char const* const fileName_, int const line_,
+		char const* const functionName_ )
 	{
 	if ( ! _frame
 			|| ( ( _fileName != fileName_ ) && ::strcmp( _fileName, fileName_ ) )
@@ -133,7 +132,7 @@ int HException::code( void ) const
 	}
 
 void failed_assert( char const* const fileName_,
-		char const* const functionName_, int const line_,
+		int line_, char const* const functionName_,
 		char const* const message_ )
 	{
 	M_PROLOG
