@@ -56,10 +56,10 @@ Copyright:
  * \param e_no - error code for exception.
  */
 #define M_THROW( msg, e_no ) yaal::hcore::throw_exception<this_type>( __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, e_no )
-/*! \brief First statement of every exception guarder function/method.
+/*! \brief First statement of every exception guarded function/method.
  */
 #define M_PROLOG try{
-/*! \brief Last statement of every exception guarder function/method.
+/*! \brief Last statement of every exception guarded function/method.
  */
 #define M_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __PRETTY_FUNCTION__, __LINE__ ); throw; }
 #define M_DESTRUCTOR_EPILOG } \
