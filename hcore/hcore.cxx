@@ -254,12 +254,14 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 		::exit( 1 );
 		}
 	ensure_limit( RLIMIT_AS, "unlimited VM size - bailing out" );
+#ifndef __HOST_OS_TYPE_CYGWIN__
 	ensure_limit( RLIMIT_DATA, "unlimited data size - bailing out" );
+#endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 	ensure_limit( RLIMIT_STACK, "unlimited stack size - bailing out" );
 	ensure_limit( RLIMIT_NOFILE, "unlimited open descriptors count - bailing out" );
 #if ( HAVE_DECL_RLIMIT_NPROC == 1 )
 	ensure_limit( RLIMIT_NPROC, "unlimited process count - bailing out" );
-#endif /* ( HAVE_DECL_RLIMIT_NPROC == 1 ) */
+#endif /* #if ( HAVE_DECL_RLIMIT_NPROC == 1 ) */
 	init_locale();
 	char* env( ::getenv( "YAAL_DEBUG" ) );
 	if ( env )
