@@ -32,6 +32,7 @@ char const COPYRIGHT [ ] =
 #include <libintl.h>
 #include <locale.h>
 #include <sys/stat.h>
+#include <sys/resource.h>
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -205,6 +206,26 @@ void init_locale( char const* const package_ )
 	M_EPILOG
 	}
 
+namespace
+{
+static char const SYSCALL_FAILURE[] = "syscall failure - bailng out";
+}
+
+void ensure_limit( int resource_, char const* message_ )
+	{
+	rlimit rl = { 0, 0 };
+	if ( ::getrlimit( resource_, &rl ) != 0 )
+		{
+		::perror( SYSCALL_FAILURE );
+		::exit( 1 );
+		}
+	if ( rl.rlim_cur == RLIM_INFINITY )
+		{
+		::perror( message_ );
+		::exit( 1 );
+		}
+	}
+
 HCoreInitDeinit::HCoreInitDeinit( void )
 	{
 	STATIC_ASSERT( sizeof( int ) >= 4 );
@@ -224,7 +245,7 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	mode_t curUmask( ::umask( lockOutUmask ) );
 	if ( ::umask( curUmask ) != lockOutUmask )
 		{
-		::perror( "syscall failure - bailng out" );
+		::perror( SYSCALL_FAILURE );
 		exit( 1 );
 		}
 	if ( ( ~curUmask ) & ( S_IROTH | S_IWOTH | S_IXOTH )  )
@@ -232,6 +253,11 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 		::perror( "running with too permissive umask - bailing out" );
 		::exit( 1 );
 		}
+	ensure_limit( RLIMIT_AS, "unlimited VM size - bailing out" );
+	ensure_limit( RLIMIT_DATA, "unlimited data size - bailing out" );
+	ensure_limit( RLIMIT_NPROC, "unlimited process count - bailing out" );
+	ensure_limit( RLIMIT_STACK, "unlimited stack size - bailing out" );
+	ensure_limit( RLIMIT_NOFILE, "unlimited open descriptors count - bailing out" );
 	init_locale();
 	char* env( ::getenv( "YAAL_DEBUG" ) );
 	if ( env )
