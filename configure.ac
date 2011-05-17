@@ -360,6 +360,7 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstring>
 	int main( int, char** ){ char* p( NULL ); basename( p ); return ( 0 ); }]])],
 	[AC_DEFINE([HAVE_BASENAME_IN_CSTRING],[1],[Does your basename() is included in cstring header?]) AC_MSG_RESULT([yes])],
 	[AC_MSG_RESULT([no])])
+AC_CHECK_DECLS([RLIMIT_NPROC],[],[],[#include <sys/resource.h>])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
 AC_CHECK_DECLS([floorl],[],[],[#include <cmath>])

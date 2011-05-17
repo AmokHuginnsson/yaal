@@ -255,9 +255,11 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 		}
 	ensure_limit( RLIMIT_AS, "unlimited VM size - bailing out" );
 	ensure_limit( RLIMIT_DATA, "unlimited data size - bailing out" );
-	ensure_limit( RLIMIT_NPROC, "unlimited process count - bailing out" );
 	ensure_limit( RLIMIT_STACK, "unlimited stack size - bailing out" );
 	ensure_limit( RLIMIT_NOFILE, "unlimited open descriptors count - bailing out" );
+#if ( HAVE_DECL_RLIMIT_NPROC == 1 )
+	ensure_limit( RLIMIT_NPROC, "unlimited process count - bailing out" );
+#endif /*  */
 	init_locale();
 	char* env( ::getenv( "YAAL_DEBUG" ) );
 	if ( env )
