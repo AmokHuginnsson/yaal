@@ -219,7 +219,7 @@ void ensure_limit( int resource_, char const* message_ )
 		::perror( SYSCALL_FAILURE );
 		::exit( 1 );
 		}
-	if ( rl.rlim_cur == RLIM_INFINITY )
+	if ( static_cast<int long>( rl.rlim_cur ) == static_cast<int long>( RLIM_INFINITY ) )
 		{
 		::perror( message_ );
 		::exit( 1 );
@@ -259,7 +259,7 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 	ensure_limit( RLIMIT_NOFILE, "unlimited open descriptors count - bailing out" );
 #if ( HAVE_DECL_RLIMIT_NPROC == 1 )
 	ensure_limit( RLIMIT_NPROC, "unlimited process count - bailing out" );
-#endif /*  */
+#endif /* ( HAVE_DECL_RLIMIT_NPROC == 1 ) */
 	init_locale();
 	char* env( ::getenv( "YAAL_DEBUG" ) );
 	if ( env )
