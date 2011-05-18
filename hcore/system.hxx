@@ -38,6 +38,8 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Low level system interface belongs here.
+ */
 namespace system
 {
 
@@ -58,21 +60,31 @@ int kill( int, int );
 int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ = true );
 
 /*! \brief Get human readable user name from system user id.
+ *
  * \param uid_ - system id of user.
  * \return human readable user name.
  */
 yaal::hcore::HString get_user_name( int uid_ );
 
 /*! \brief Get human readable group name from system group id.
+ *
  * \param gid_ - system id of group.
  * \return human readable group name.
  */
 yaal::hcore::HString get_group_name( int gid_ );
 
 /*! \brief Get amount of free/avaialable for allocation memory.
+ *
  * \return Available memory size in bytes.
  */
 int long get_available_memory_size( void );
+
+/*! \brief Get amount of free/avaialable disk space on given filesystem.
+ *
+ * \param path - path to filesystem to be checked for free space.
+ * \return Available disk space in bytes.
+ */
+int long get_available_disk_space( yaal::hcore::HString const& );
 
 }
 

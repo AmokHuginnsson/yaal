@@ -30,6 +30,7 @@ Copyright:
 #include <sys/time.h>
 #include <pwd.h>
 #include <grp.h>
+#include <sys/statvfs.h>
 
 #include "config.hxx"
 
@@ -208,6 +209,16 @@ int long get_available_memory_size( void )
 #else
 	return ( 0 );
 #endif
+	M_EPILOG
+	}
+
+int long get_available_disk_space( yaal::hcore::HString const& path_ )
+	{
+	M_PROLOG
+	struct statvfs svfs;
+	::memset( &svfs, 0, sizeof ( svfs ) );
+	M_ENSURE( ::statvfs( path_.raw(), &svfs ) == 0 );
+	return ( svfs.f_bavail * svfs.f_frsize );
 	M_EPILOG
 	}
 
