@@ -97,7 +97,7 @@ HThread::~HThread( void )
 	M_DESTRUCTOR_EPILOG
 	}
 
-int HThread::spawn( call_t call_ )
+void HThread::spawn( call_t call_ )
 	{
 	M_PROLOG
 	HLock lock( _mutex );
@@ -109,7 +109,7 @@ int HThread::spawn( call_t call_ )
 				static_cast<pthread_attr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_t ) ) ),
 				SPAWN, this ) == 0 );
 	_semaphore.wait();
-	return ( 0 );
+	return;
 	M_EPILOG
 	}
 
@@ -145,7 +145,7 @@ void* HThread::finish( void )
 void* HThread::SPAWN( void* thread_ )
 	{
 	M_PROLOG
-	/*
+	/*!
 	 * We cannot afford silencing uncaught exceptions here.
 	 * Because of not catching an exception at the thread owner layer
 	 * is a severe coding bug, application must crash in the event

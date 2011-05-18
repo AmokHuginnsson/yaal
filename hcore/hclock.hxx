@@ -61,6 +61,7 @@ public:
 	 *
 	 * \param unit_ - get time given in specific units.
 	 * \param reset_ - reset timer with this call.
+	 * \return Amount of time that elapsed in given unit.
 	 */
 	int long get_time_elapsed( UNIT::unit_t unit_ = UNIT::SECOND, bool reset_ = false ) const;
 	};

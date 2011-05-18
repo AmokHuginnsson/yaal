@@ -211,9 +211,24 @@ public:
 	 */
 	HString mid( int long start, int long length = MAX_STRING_LENGTH ) const;
 	HString right( int long ) const;
-	HString& trim_left( char const* const = _whiteSpace_ );
-	HString& trim_right( char const* const = _whiteSpace_ );
-	HString& trim( char const* const = _whiteSpace_ );
+	/*! \brief Trim all consecutive occurrences of given characters from beginning of the string.
+	 *
+	 * \param set - set of characters that shall be removed.
+	 * \return Self.
+	 */
+	HString& trim_left( char const* const set = _whiteSpace_ );
+	/*! \brief Trim all consecutive occurrences of given characters from end of the string.
+	 *
+	 * \param set - set of characters that shall be removed.
+	 * \return Self.
+	 */
+	HString& trim_right( char const* const set = _whiteSpace_ );
+	/*! \brief Trim all consecutive occurrences of given characters from both beginning and end of the string.
+	 *
+	 * \param set - set of characters that shall be removed.
+	 * \return Self.
+	 */
+	HString& trim( char const* const set = _whiteSpace_ );
 	HString& shift_left( int long );
 	HString& shift_right( int long, char const = ' ' );
 	/*! \brief Fill portion of string with constatnt value.
@@ -221,6 +236,7 @@ public:
 	 * \param value - use this value as a filler.
 	 * \param position - start at this position.
 	 * \param count - fill that many bytes.
+	 * \return Self.
 	 */
 	HString& fill( char value = '\0', int long position = 0, int long lenght = 0 );
 	/*! \brief Fill portion of string with constatnt value and finish with \0 (zero) byte.
@@ -228,20 +244,21 @@ public:
 	 * \param value - use this value as a filler.
 	 * \param position - start at this position.
 	 * \param count - fill that many bytes.
+	 * \return Self.
 	 */
 	HString& fillz( char value = '\0', int long position = 0, int long count = 0 );
 	/*! \brief Erase part of the string.
 	 *
 	 * \param position_ - start position for part to be erased.
 	 * \param length_ - length of part to be erased.
-	 * \return self.
+	 * \return Self.
 	 */
 	HString& erase( int long position_, int long length_ = MAX_STRING_LENGTH );
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos - position where given string has to be inserted.
 	 * \param str - string to be inserted.
-	 * \return self.
+	 * \return Self.
 	 */
 	HString& insert( int long pos, HString const& str );
 	/*! \brief Insert given string at given position.
@@ -249,7 +266,7 @@ public:
 	 * \param pos - position where given string has to be inserted.
 	 * \param len - lenght of string to be inserted.
 	 * \param str - string to be inserted.
-	 * \return self.
+	 * \return Self.
 	 *
 	 * \pre \e str real length must not be smaller than \e len.
 	 */
@@ -258,7 +275,7 @@ public:
 	 *
 	 * \param pos - position where given string has to be inserted.
 	 * \param str - string to be inserted.
-	 * \return self.
+	 * \return Self.
 	 */
 	HString& insert( int long pos, char const* str = NULL );
 	/*! \brief Insert given string at given position.
@@ -266,7 +283,7 @@ public:
 	 * \param pos - position where given string has to be inserted.
 	 * \param str - string to be inserted.
 	 * \param len - lenght of string to be inserted.
-	 * \return self.
+	 * \return Self.
 	 *
 	 * \pre \e str real length must not be smaller than \e len.
 	 */

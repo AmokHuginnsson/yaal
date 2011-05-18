@@ -46,19 +46,34 @@ private:
 	ODBConnector const* _connector;
 	void* _coreData;	/*!< very internal for this class used only in base class */
 public:
-	typedef yaal::hcore::HPointer<HDataBase> ptr_t;
+	typedef yaal::hcore::HPointer<HDataBase> ptr_t; /*!< Smart pointer type for this class. */
 	/*! \brief Connect to database.
 	 *
 	 * \param database - database to connect to.
 	 * \param login - authenticate to database with given login
 	 * \param password - password for given login
 	 */
-	int connect( yaal::hcore::HString const& database,
+	void connect( yaal::hcore::HString const& database,
 							yaal::hcore::HString const& login,
 							yaal::hcore::HString const& password );
+	/*! \brief Close database connection.
+	 */
 	void disconnect( void );
-	HRecordSet::ptr_t query( yaal::hcore::HString const& );
+	/*! \brief Run given query on database connection.
+	 *
+	 * \param query_ - query to be executed.
+	 * \return Result set for given query.
+	 */
+	HRecordSet::ptr_t query( yaal::hcore::HString const& query_ );
+	/*! \brief Get error messege for last error that occurred on this connection.
+	 *
+	 * \return Error message for last error that occurred.
+	 */
 	char const* get_error( void ) const;
+	/*! \brief Get error code of last error that occurred on this database connection.
+	 *
+	 * \return Error code for last error on this connection.
+	 */
 	int get_errno( void ) const;
 	static ptr_t get_connector( ODBConnector::DRIVER::enum_t = ODBConnector::DRIVER::DEFAULT );
 	ODBConnector const* connector( void ) const;

@@ -59,7 +59,7 @@ HDataBase::~HDataBase( void )
 	M_DESTRUCTOR_EPILOG
 	}
 
-int HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HString const& login_,
+void HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HString const& login_,
 		yaal::hcore::HString const& password_ )
 	{
 	M_PROLOG
@@ -67,7 +67,7 @@ int HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HStr
 	if ( ! _coreData )
 		M_THROW( (_connector->dbrs_error)( _coreData, NULL ),
 				(_connector->dbrs_errno)( _coreData, NULL ) );
-	return ( 0 );
+	return;
 	M_EPILOG
 	}
 

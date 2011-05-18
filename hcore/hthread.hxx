@@ -164,15 +164,48 @@ private:
 public:
 	HThread( void );
 	virtual ~HThread( void );
-	int spawn( call_t );
+	/*! \brief Spawn new working thread.
+	 *
+	 * \param call_ - a call that shall be invoked in newly spawned thread.
+	 */
+	void spawn( call_t call_ );
+	/*! \brief Finish working thread and cleanup after after it.
+	 *
+	 * \return Working thread low level exit status information.
+	 */
 	void* finish( void );
+	/*! \brief Signal working thread that it should finish.
+	 */
 	void schedule_finish( void );
+	/*! \brief Test if working thread is currently running.
+	 *
+	 * \return True if working thread is currently running.
+	 */
  	bool is_alive( void ) const;
-	void stack_exception( yaal::hcore::HString const&, int = 0 );
+	/*! \brief Store information about exception that occured.
+	 *
+	 * Using this method cause HThread::finish() to throw a HThreadException.
+	 *
+	 * \param message_ - exception message.
+	 * \param code_ - additional excepion information code.
+	 */
+	void stack_exception( yaal::hcore::HString const& message_, int code_ = 0 );
+	/*! \brief Get operationg system level working thread ID.
+	 *
+	 * \return Working thread ID.
+	 */
 	static int long get_id( void );
-	static void set_name( char const* );
+	/*! \brief Set thread name.
+	 *
+	 * \param name_ - new name for working thread.
+	 */
+	static void set_name( char const* name_ );
 private:
+	/*! \brief Pass control to user specified call in working thread.
+	 */
 	void* control( void );
+	/*! \brief Spawn working thread and execute HThead::control().
+	 */
 	static void* SPAWN( void* );
 	static void CLEANUP( void* );
 	HThread( HThread const& );
