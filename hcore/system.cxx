@@ -218,7 +218,7 @@ int long get_available_disk_space( yaal::hcore::HString const& path_ )
 	struct statvfs svfs;
 	::memset( &svfs, 0, sizeof ( svfs ) );
 	M_ENSURE( ::statvfs( path_.raw(), &svfs ) == 0 );
-	return ( svfs.f_bavail * svfs.f_frsize );
+	return ( svfs.f_bavail * svfs.f_bsize );
 	M_EPILOG
 	}
 
