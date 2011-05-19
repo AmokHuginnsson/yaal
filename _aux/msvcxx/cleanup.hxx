@@ -29,5 +29,7 @@
 
 static int const OK = 0;
 static int const ERR = -1;
+#define strtoll _strtoi64
+#define strtoull _strtoui64
 
 #endif /* not YAAL_MSVCXX_CLEANUP_HXX_INCLUDED */

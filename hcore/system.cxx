@@ -218,7 +218,7 @@ i64_t get_available_disk_space( yaal::hcore::HString const& path_ )
 	struct statvfs svfs;
 	::memset( &svfs, 0, sizeof ( svfs ) );
 	M_ENSURE( ::statvfs( path_.raw(), &svfs ) == 0 );
-	return ( svfs.f_bavail * svfs.f_frsize );
+	return ( static_cast<i64_t>( svfs.f_bavail ) * static_cast<i64_t>( svfs.f_frsize ) );
 	M_EPILOG
 	}
 
