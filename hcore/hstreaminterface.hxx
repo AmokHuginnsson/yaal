@@ -109,6 +109,10 @@ public:
 		{ return ( do_output( val_ ) ); }
 	HStreamInterface& operator << ( int long unsigned val_ )
 		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( int long long val_ )
+		{ return ( do_output( val_ ) ); }
+	HStreamInterface& operator << ( int long long unsigned val_ )
+		{ return ( do_output( val_ ) ); }
 	HStreamInterface& operator << ( double val_ )
 		{ return ( do_output( val_ ) ); }
 	HStreamInterface& operator << ( double long val_ )
@@ -140,6 +144,10 @@ public:
 	HStreamInterface& operator >> ( int long& val_ )
 		{ return ( do_input( val_ ) ); }
 	HStreamInterface& operator >> ( int long unsigned& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( int long long& val_ )
+		{ return ( do_input( val_ ) ); }
+	HStreamInterface& operator >> ( int long long unsigned& val_ )
 		{ return ( do_input( val_ ) ); }
 	HStreamInterface& operator >> ( double& val_ )
 		{ return ( do_input( val_ ) ); }
@@ -216,6 +224,8 @@ protected:
 	virtual HStreamInterface& do_output( int unsigned );
 	virtual HStreamInterface& do_output( int long );
 	virtual HStreamInterface& do_output( int long unsigned );
+	virtual HStreamInterface& do_output( int long long );
+	virtual HStreamInterface& do_output( int long long unsigned );
 	virtual HStreamInterface& do_output( double );
 	virtual HStreamInterface& do_output( double long );
 	virtual HStreamInterface& do_output( float );
@@ -232,6 +242,8 @@ protected:
 	virtual HStreamInterface& do_input( int unsigned& );
 	virtual HStreamInterface& do_input( int long& );
 	virtual HStreamInterface& do_input( int long unsigned& );
+	virtual HStreamInterface& do_input( int long long& );
+	virtual HStreamInterface& do_input( int long long unsigned& );
 	virtual HStreamInterface& do_input( double& );
 	virtual HStreamInterface& do_input( double long& );
 	virtual HStreamInterface& do_input( float& );

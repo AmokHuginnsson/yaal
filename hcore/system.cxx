@@ -212,7 +212,7 @@ int long get_available_memory_size( void )
 	M_EPILOG
 	}
 
-int long get_available_disk_space( yaal::hcore::HString const& path_ )
+i64_t get_available_disk_space( yaal::hcore::HString const& path_ )
 	{
 	M_PROLOG
 	struct statvfs svfs;

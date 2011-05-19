@@ -145,6 +145,16 @@ HStreamInterface& HStreamInterface::do_output( int long longInteger_ )
 	M_EPILOG
 	}
 
+HStreamInterface& HStreamInterface::do_output( int long long longLongInteger_ )
+	{
+	M_PROLOG
+	_wordCache.format( _base == BASES::DEC ? "%lld" : ( _base == BASES::HEX ) ? "%llx" : "%llo", longLongInteger_ );
+	int long len( reformat() );
+	do_write( _wordCache.raw(), len );
+	return ( *this );
+	M_EPILOG
+	}
+
 int long HStreamInterface::reformat( void )
 	{
 	M_PROLOG
@@ -166,6 +176,16 @@ HStreamInterface& HStreamInterface::do_output( int long unsigned unsignedLongInt
 	{
 	M_PROLOG
 	_wordCache.format( _base == BASES::DEC ? "%lu" : ( _base == BASES::HEX ) ? "%lx" : "%lo", unsignedLongInteger_ );
+	int long len( reformat() );
+	do_write( _wordCache.raw(), len );
+	return ( *this );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::do_output( int long long unsigned unsignedLongLongInteger_ )
+	{
+	M_PROLOG
+	_wordCache.format( _base == BASES::DEC ? "%llu" : ( _base == BASES::HEX ) ? "%llx" : "%llo", unsignedLongLongInteger_ );
 	int long len( reformat() );
 	do_write( _wordCache.raw(), len );
 	return ( *this );
@@ -571,6 +591,24 @@ HStreamInterface& HStreamInterface::do_input( int long unsigned& ilu )
 	M_PROLOG
 	if ( read_integer() )
 		ilu = lexical_cast<int long unsigned>( _wordCache );
+	return ( *this );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::do_input( int long long& ill )
+	{
+	M_PROLOG
+	if ( read_integer() )
+		ill = lexical_cast<int long long>( _wordCache );
+	return ( *this );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::do_input( int long long unsigned& illu )
+	{
+	M_PROLOG
+	if ( read_integer() )
+		illu = lexical_cast<int long long unsigned>( _wordCache );
 	return ( *this );
 	M_EPILOG
 	}

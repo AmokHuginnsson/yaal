@@ -12,6 +12,8 @@
 #cmakedefine __HOST_OS_TYPE_SOLARIS__
 #cmakedefine __HOST_OS_TYPE_CYGWIN__
 #cmakedefine __HOST_OS_TYPE_WINDOWS__
+#define SIZEOF_INT_LONG @SIZEOF_INT_LONG@
+#define SIZEOF_INT_LONG_LONG @SIZEOF_INT_LONG_LONG@
 #define __PHYSICAL_MEMORY__ ( @PHYS_MEM@ - 1 + 1 )
 #cmakedefine HAVE_PRETTY_FUNCTION
 #cmakedefine HAVE_FUNCTION

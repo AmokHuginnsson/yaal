@@ -7,7 +7,6 @@ CWARNING_FLAGS =	\
 						-Werror \
 						-Winline \
 						-Wlarger-than-16384 \
-						-Wlong-long \
 						-Wmissing-noreturn \
 						-Wpointer-arith \
 						-Wredundant-decls \
@@ -31,7 +30,7 @@ CXXWARNING_FLAGS		=	\
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
-COMPILER_PRIME_FLAGS = -fmessage-length=0 -std=gnu++98 -pipe -D_GNU_SOURCE -D_REENTRANT -D_THREAD_SAFE -D_POSIX_PTHREAD_SEMANTICS
+COMPILER_PRIME_FLAGS = -fmessage-length=0 -std=gnu++98 -Wno-long-long -pipe -D_GNU_SOURCE -D_REENTRANT -D_THREAD_SAFE -D_POSIX_PTHREAD_SEMANTICS
 
 ifdef DO_RELDEB
 	DO_RELEASE = 1

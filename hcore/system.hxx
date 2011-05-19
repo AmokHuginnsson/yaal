@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HCORE_SYSTEM_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
+#include "hcore/pod.hxx"
 
 namespace yaal
 {
@@ -84,7 +85,7 @@ int long get_available_memory_size( void );
  * \param path - path to filesystem to be checked for free space.
  * \return Available disk space in bytes.
  */
-int long get_available_disk_space( yaal::hcore::HString const& );
+i64_t get_available_disk_space( yaal::hcore::HString const& );
 
 }
 

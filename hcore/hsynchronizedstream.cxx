@@ -160,6 +160,22 @@ HStreamInterface& HSynchronizedStream::do_output( int long unsigned val_ )
 	M_EPILOG
 	}
 
+HStreamInterface& HSynchronizedStream::do_output( int long long val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_output( val_ ) );
+	M_EPILOG
+	}
+
+HStreamInterface& HSynchronizedStream::do_output( int long long unsigned val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_output( val_ ) );
+	M_EPILOG
+	}
+
 HStreamInterface& HSynchronizedStream::do_output( double val_ )
 	{
 	M_PROLOG
@@ -281,6 +297,22 @@ HStreamInterface& HSynchronizedStream::do_input( int long& val_ )
 	}
 
 HStreamInterface& HSynchronizedStream::do_input( int long unsigned& val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_input( val_ ) );
+	M_EPILOG
+	}
+
+HStreamInterface& HSynchronizedStream::do_input( int long long& val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_input( val_ ) );
+	M_EPILOG
+	}
+
+HStreamInterface& HSynchronizedStream::do_input( int long long unsigned& val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );

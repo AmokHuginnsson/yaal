@@ -139,6 +139,14 @@ AC_MSG_RESULT([--- Guessed fetures are: $_FLAGS])
 
 YAAL_DETECT_FUNCTION_MACRO
 
+dnl Check for POD sizes.
+dnl We shall not pollute namespace with unnecessary macros.
+dnl AC_CHECK_SIZEOF([char])
+dnl AC_CHECK_SIZEOF([int short])
+dnl AC_CHECK_SIZEOF([int])
+AC_CHECK_SIZEOF([int long])
+AC_CHECK_SIZEOF([int long long])
+
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
 CXXFLAGS=$CXXFLAGS_ORIG;

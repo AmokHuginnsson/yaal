@@ -161,15 +161,23 @@ HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ 
 	}
 
 template<>
-int long unsigned lexical_cast( HString const& str_ )
+int long long unsigned lexical_cast( HString const& str_ )
 	{
 	M_PROLOG
 	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	int long unsigned val( ::strtoul( preParsed.second, NULL, preParsed.first ) );
+	int long long unsigned val( ::strtoull( preParsed.second, NULL, preParsed.first ) );
 	M_ENSURE_EX( ( val && ( val != ULONG_MAX ) ) || ! errno, str_ );
 	return ( val );
+	M_EPILOG
+	}
+
+template<>
+int long unsigned lexical_cast( HString const& val )
+	{
+	M_PROLOG
+	return ( static_cast<int long unsigned>( lexical_cast<int long long unsigned>( val ) ) );
 	M_EPILOG
 	}
 
@@ -190,15 +198,23 @@ int short unsigned lexical_cast( HString const& val )
 	}
 
 template<>
-int long lexical_cast( HString const& str_ )
+int long long lexical_cast( HString const& str_ )
 	{
 	M_PROLOG
 	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	int long val( ::strtol( preParsed.second, NULL, preParsed.first ) );
+	int long long val( ::strtoll( preParsed.second, NULL, preParsed.first ) );
 	M_ENSURE_EX( ( val && ( val != LONG_MIN ) && ( val != LONG_MAX ) ) || ! errno, str_ );
 	return ( val );
+	M_EPILOG
+	}
+
+template<>
+int long lexical_cast( HString const& val )
+	{
+	M_PROLOG
+	return ( static_cast<int long>( lexical_cast<int long long>( val ) ) );
 	M_EPILOG
 	}
 

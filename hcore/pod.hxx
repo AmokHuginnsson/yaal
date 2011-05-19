@@ -171,15 +171,23 @@ struct is_floating_point<double long>
 typedef char unsigned u8_t; /*!< 8 bit unsigned integer. */
 typedef int short unsigned u16_t; /*!< 16 bit unsigned integer. */
 typedef int unsigned u32_t; /*!< 32 bit unsigned integer. */
-#if 0
+#if ( SIZEOF_INT_LONG == 8 )
 typedef int long unsigned u64_t; /*!< 64 bit unsigned integer. */
-#endif
+#elif ( SIZEOF_INT_LONG_LONG == 8 ) /* #if ( SIZEOF_INT_LONG == 8 ) */
+typedef int long long unsigned u64_t; /*!< 64 bit unsigned integer. */
+#else /* #elif ( SIZEOF_INT_LONG_LONG == 8 ) #if ( SIZEOF_INT_LONG == 8 ) */
+#error Required type: a 64bit integer, is not available.
+#endif /* #else #elif ( SIZEOF_INT_LONG_LONG == 8 ) #if ( SIZEOF_INT_LONG == 8 ) */
 typedef char signed i8_t; /*!< 8 bit signed integer. */
 typedef int short signed i16_t; /*!< 16 bit signed integer. */
 typedef int signed i32_t; /*!< 32 bit signed integer. */
-#if 0
+#if ( SIZEOF_INT_LONG == 8 )
 typedef int long signed i64_t; /*!< 64 bit signed integer. */
-#endif
+#elif ( SIZEOF_INT_LONG_LONG == 8 ) /* #if ( SIZEOF_INT_LONG == 8 ) */
+typedef int long long signed i64_t; /*!< 64 bit signed integer. */
+#else /* #elif ( SIZEOF_INT_LONG_LONG == 8 ) #if ( SIZEOF_INT_LONG == 8 ) */
+#error Required type: a 64bit integer, is not available.
+#endif /* #else #elif ( SIZEOF_INT_LONG_LONG == 8 ) #if ( SIZEOF_INT_LONG == 8 ) */
 
 }
 
