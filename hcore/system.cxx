@@ -156,32 +156,43 @@ HString get_group_name( int gid_ )
 	M_EPILOG
 	}
 
-int long get_available_memory_size( void )
+HResourceInfo get_memory_size_info( void )
 	{
 	M_PROLOG
+	i64_t freeMemory( 0 );
+	i64_t totalMemory( 0 );
 #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ )
-	int long availableMemory( 0 );
+	/* FIXME: sysconf() interface is also available on Linux and is way faster.
+	 * We shall make use of it.
+	 */
 	try
 		{
 		HFile meminfo( "/proc/meminfo", HFile::OPEN::READING );
 		HString line;
 		HTokenizer t( line, ":" );
 		HString tokens;
-		while ( meminfo.read_line( line ) > 0 )
+		char const TAGS[][9] = { "MemFree", "MemTotal" };
+		i64_t* vars[] = { &freeMemory, &totalMemory };
+		int hit( 0 );
+		while ( ( hit < 2 ) && ( meminfo.read_line( line ) > 0 ) )
 			{
 			t.assign( line );
 			if ( t.begin() != t.end() )
 				{
 				tokens = *t.begin();
-				if ( ! strcasecmp( tokens, "MemFree" ) )
+				for ( int f( 0 ); f < 2; ++ f )
 					{
-					HTokenizer::iterator it( t.begin() );
-					++ it;
-					if ( it != t.end() )
+					if ( ! strcasecmp( tokens, TAGS[f] ) )
 						{
-						tokens = *it;
-						tokens.trim();
-						availableMemory = lexical_cast<int long>( tokens ) * 1024;
+						HTokenizer::iterator it( t.begin() );
+						++ it;
+						if ( it != t.end() )
+							{
+							tokens = *it;
+							tokens.trim();
+							*(vars[f]) = lexical_cast<i64_t>( tokens ) * 1024;
+							++ hit;
+							}
 						}
 					}
 				}
@@ -190,7 +201,6 @@ int long get_available_memory_size( void )
 	catch ( HException const& )
 		{
 		}
-	return ( availableMemory );
 #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) /* #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
 	vmtotal vm;
 	int mib[] = { CTL_HW, HW_PAGESIZE };
@@ -201,24 +211,28 @@ int long get_available_memory_size( void )
 	mib[ 1 ] = VM_TOTAL;
 	size = sizeof ( vmtotal );
 	M_ENSURE( sysctl( mib, 2, &vm, &size, NULL, 0 ) == 0 );
-	return ( vm.t_free * pagesize );
+	freeMemory = vm.t_free * pagesize;
+	totalMemory = vm.t_total * pagesize;
 #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) /* #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
-	return ( sysconf( _SC_AVPHYS_PAGES ) * sysconf( _SC_PAGESIZE ) );
+	freeMemory = sysconf( _SC_AVPHYS_PAGES ) * sysconf( _SC_PAGESIZE );
+	totalMemory = sysconf( _SC_PHYS_PAGES ) * sysconf( _SC_PAGESIZE );
 #elif defined ( __HOST_OS_TYPE_WINDOWS__ ) /* #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
-	return ( ms_get_available_memory_size() );
-#else
-	return ( 0 );
+	HResourceInfo ri( ms_get_memory_size_info() );
+	freeMemory = ri.free();
+	totalMemory = ri.total();
 #endif
+	return ( HResourceInfo( freeMemory, totalMemory ) );
 	M_EPILOG
 	}
 
-i64_t get_available_disk_space( yaal::hcore::HString const& path_ )
+HResourceInfo get_disk_space_info( yaal::hcore::HString const& path_ )
 	{
 	M_PROLOG
 	struct statvfs svfs;
 	::memset( &svfs, 0, sizeof ( svfs ) );
 	M_ENSURE( ::statvfs( path_.raw(), &svfs ) == 0 );
-	return ( static_cast<i64_t>( svfs.f_bavail ) * static_cast<i64_t>( svfs.f_frsize ) );
+	return ( HResourceInfo( static_cast<i64_t>( svfs.f_bavail ) * static_cast<i64_t>( svfs.f_frsize ),
+				static_cast<i64_t>( svfs.f_blocks ) * static_cast<i64_t>( svfs.f_frsize ) ) );
 	M_EPILOG
 	}
 

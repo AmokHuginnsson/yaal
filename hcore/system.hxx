@@ -74,18 +74,46 @@ yaal::hcore::HString get_user_name( int uid_ );
  */
 yaal::hcore::HString get_group_name( int gid_ );
 
+/*! \brief Store information about amount of given resource.
+ */
+class HResourceInfo
+	{
+	i64_t _free;
+	i64_t _total;
+public:
+	/*! \brief Construct resource info object.
+	 *
+	 * \param free_ - amount of free resouce.
+	 * \param total_ - total amount of reource.
+	 */
+	HResourceInfo( i64_t free_ = 0, i64_t total_ = 0 )
+		: _free( free_ ), _total( total_) {}
+	/*! \brief Get information about amount of free resource.
+	 *
+	 * \return Free resouce size.
+	 */
+	i64_t free( void ) const
+		{ return ( _free ); }
+	/*! \brief Get information about total size of resource.
+	 *
+	 * \return Total size of given resource.
+	 */
+	i64_t total( void ) const
+		{ return ( _total ); }
+	};
+
 /*! \brief Get amount of free/avaialable for allocation memory.
  *
  * \return Available memory size in bytes.
  */
-int long get_available_memory_size( void );
+HResourceInfo get_memory_size_info( void );
 
 /*! \brief Get amount of free/avaialable disk space on given filesystem.
  *
  * \param path - path to filesystem to be checked for free space.
  * \return Available disk space in bytes.
  */
-i64_t get_available_disk_space( yaal::hcore::HString const& );
+HResourceInfo get_disk_space_info( yaal::hcore::HString const& );
 
 }
 

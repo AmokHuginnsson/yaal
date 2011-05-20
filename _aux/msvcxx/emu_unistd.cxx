@@ -270,11 +270,11 @@ void log_windows_error( char const* api_ )
 	return;
 	}
 
-int long get_available_memory_size( void )
+yaal::hcore::HResourceInfo get_memory_size_info( void )
 	{
 	MEMORYSTATUS ms;
 	::GlobalMemoryStatus( &ms );
-	return ( ms.dwAvailVirtual );
+	return ( HResourceInfo( ms.dwAvailVirtual, ms.dwTotalVirtual ) );
 	}
 
 }
