@@ -1,6 +1,7 @@
 #ifndef YAAL_MSVCXX_EMU_UNISTD_HXX_INCLUDED
 #define YAAL_MSVCXX_EMU_UNISTD_HXX_INCLUDED 1
 
+#include "config.hxx"
 #include "hcore/system.hxx"
 
 namespace msvcxx
