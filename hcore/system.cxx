@@ -202,17 +202,22 @@ HResourceInfo get_memory_size_info( void )
 		{
 		}
 #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) /* #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
-	vmtotal vm;
 	int mib[] = { CTL_HW, HW_PAGESIZE };
 	int long pagesize( 0 );
 	size_t size( sizeof ( pagesize ) );
 	M_ENSURE( sysctl( mib, 2, &pagesize, &size, NULL, 0 ) == 0 );
+	mib[ 1 ] = HW_PHYSMEM;
+	int long physmem( 0 );
+	size = sizeof ( physmem );
+	M_ENSURE( sysctl( mib, 2, &physmem, &size, NULL, 0 ) == 0 );
 	mib[ 0 ] = CTL_VM;
 	mib[ 1 ] = VM_TOTAL;
+	vmtotal vm;
+	::memset( &vm, 0, sizeof ( vm ) );
 	size = sizeof ( vmtotal );
 	M_ENSURE( sysctl( mib, 2, &vm, &size, NULL, 0 ) == 0 );
 	freeMemory = vm.t_free * pagesize;
-	totalMemory = vm.t_total * pagesize;
+	totalMemory = physmem;
 #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) /* #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
 	freeMemory = sysconf( _SC_AVPHYS_PAGES ) * sysconf( _SC_PAGESIZE );
 	totalMemory = sysconf( _SC_PHYS_PAGES ) * sysconf( _SC_PAGESIZE );
