@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <dbghelp.h>
 #include <sddl.h>
+#include <psapi.h>
 #undef WinMain
 
 #define getpwuid_r getpwuid_r_off
@@ -13,6 +14,7 @@
 #include <dirent.h>
 #include <pwd.h>
 #include <grp.h>
+#include <sys/resource.h>
 #include <sys/socket.h>
 #include <iostream>
 
@@ -362,3 +364,17 @@ int timer_delete( timer_t timer_ )
 	return ( err );
 	}
 
+extern "C"
+int getrusage( __rusage_who_t who_, struct rusage* usage_ ) __THROW
+	{
+	int err( 0 );
+	if ( who_ != RUSAGE_SELF )
+		err = EINVAL;
+	else
+		{
+		PROCESS_MEMORY_COUNTERS pmc;
+		::GetProcessMemoryInfo( ::GetCurrentProcess(), &pmc, sizeof ( pmc ) );
+		usage_->ru_maxrss = pmc.WorkingSetSize;
+		}
+	return ( 0 );
+	}

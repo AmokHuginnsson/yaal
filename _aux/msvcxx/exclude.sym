@@ -87,6 +87,7 @@ _expl
 _floorl
 _getgrgid_r
 _getpwuid_r
+_getrusage
 _log10l
 _logl
 _powl

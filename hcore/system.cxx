@@ -233,18 +233,20 @@ HResourceInfo get_memory_size_info( void )
 	freeMemory = sysconf( _SC_AVPHYS_PAGES ) * sysconf( _SC_PAGESIZE );
 	totalMemory = sysconf( _SC_PHYS_PAGES ) * sysconf( _SC_PAGESIZE );
 #elif defined ( __HOST_OS_TYPE_WINDOWS__ ) /* #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
-	usedMemory = ru.ru_maxrss * 1024;
+	usedMemory = ru.ru_maxrss;
 	ms_get_memory_size_info( freeMemory, totalMemory );
 #endif
+	availableMemory = freeMemory;
+#if ( HAVE_DECL_RLIMIT_AS == 1 )
 	rlimit rlVM = { 0, 0 };
 	M_ENSURE( ::getrlimit( RLIMIT_AS, &rlVM ) == 0 );
-	availableMemory = freeMemory;
-	if ( ( rlVM.rlim_cur - usedMemory ) < availableMemory )
+	if ( ( rlVM.rlim_cur > 0 ) && ( ( rlData.rlim_cur - usedMemory ) < availableMemory ) )
 		availableMemory = rlVM.rlim_cur - usedMemory;
+#endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
 #ifndef __HOST_OS_TYPE_CYGWIN__
 	rlimit rlData = { 0, 0 };
 	M_ENSURE( ::getrlimit( RLIMIT_DATA, &rlData ) == 0 );
-	if ( ( rlData.rlim_cur - usedMemory ) < availableMemory )
+	if ( ( rlData.rlim_cur > 0 ) && ( ( rlData.rlim_cur - usedMemory ) < availableMemory ) )
 		availableMemory = rlData.rlim_cur - usedMemory;
 #endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 	return ( HResourceInfo( availableMemory, freeMemory, totalMemory ) );
