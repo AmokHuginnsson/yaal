@@ -270,11 +270,13 @@ void log_windows_error( char const* api_ )
 	return;
 	}
 
-system::HResourceInfo get_memory_size_info( void )
+void get_memory_size_info( i64_t& free_, i64_t& total_ )
 	{
 	MEMORYSTATUS ms;
 	::GlobalMemoryStatus( &ms );
-	return ( system::HResourceInfo( ms.dwAvailVirtual, ms.dwTotalVirtual ) );
+	free_ = ms.dwAvailVirtual;
+	total_ = ms.dwTotalVirtual;
+	return;
 	}
 
 }

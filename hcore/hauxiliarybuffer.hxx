@@ -87,7 +87,7 @@ void HAuxiliaryBuffer<type_t>::init( iter_t first_, iter_t last_ )
 	int long canCopy( _allocated );
 	if ( _requestedSize > _allocated )
 		{
-		int long newCanCopy( hcore::system::get_memory_size_info().free() / sizeof ( value_type ) );
+		int long newCanCopy( hcore::system::get_memory_size_info().available() / sizeof ( value_type ) );
 		if ( newCanCopy > canCopy )
 			canCopy = newCanCopy;
 		}

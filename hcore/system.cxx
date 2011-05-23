@@ -31,6 +31,7 @@ Copyright:
 #include <pwd.h>
 #include <grp.h>
 #include <sys/statvfs.h>
+#include <sys/resource.h>
 
 #include "config.hxx"
 
@@ -159,9 +160,15 @@ HString get_group_name( int gid_ )
 HResourceInfo get_memory_size_info( void )
 	{
 	M_PROLOG
+	i64_t availableMemory( 0 );
 	i64_t freeMemory( 0 );
 	i64_t totalMemory( 0 );
+	i64_t usedMemory( 0 );
+	struct rusage ru;
+	::memset( &ru, 0, sizeof ( ru ) );
+	M_ENSURE( ::getrusage( RUSAGE_SELF, &ru ) == 0 );
 #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ )
+	usedMemory = ru.ru_maxrss * 1024;
 	/* FIXME: sysconf() interface is also available on Linux and is way faster.
 	 * We shall make use of it.
 	 */
@@ -171,16 +178,17 @@ HResourceInfo get_memory_size_info( void )
 		HString line;
 		HTokenizer t( line, ":" );
 		HString tokens;
-		char const TAGS[][9] = { "MemFree", "MemTotal" };
-		i64_t* vars[] = { &freeMemory, &totalMemory };
+		i64_t cachedMemory( 0 );
+		char const TAGS[][9] = { "MemFree", "MemTotal", "Cached" };
+		i64_t* vars[] = { &freeMemory, &totalMemory, &cachedMemory };
 		int hit( 0 );
-		while ( ( hit < 2 ) && ( meminfo.read_line( line ) > 0 ) )
+		while ( ( hit < countof ( TAGS ) ) && ( meminfo.read_line( line ) > 0 ) )
 			{
 			t.assign( line );
 			if ( t.begin() != t.end() )
 				{
 				tokens = *t.begin();
-				for ( int f( 0 ); f < 2; ++ f )
+				for ( int f( 0 ); f < countof ( TAGS ); ++ f )
 					{
 					if ( ! strcasecmp( tokens, TAGS[f] ) )
 						{
@@ -197,11 +205,13 @@ HResourceInfo get_memory_size_info( void )
 					}
 				}
 			}
+		freeMemory += cachedMemory;
 		}
 	catch ( HException const& )
 		{
 		}
 #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) /* #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
+	usedMemory = ru.ru_maxrss * 1024;
 	int mib[] = { CTL_HW, HW_PAGESIZE };
 	int long pagesize( 0 );
 	size_t size( sizeof ( pagesize ) );
@@ -219,14 +229,25 @@ HResourceInfo get_memory_size_info( void )
 	freeMemory = vm.t_free * pagesize;
 	totalMemory = physmem;
 #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) /* #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
+	usedMemory = ru.ru_maxrss * ::getpagesize();
 	freeMemory = sysconf( _SC_AVPHYS_PAGES ) * sysconf( _SC_PAGESIZE );
 	totalMemory = sysconf( _SC_PHYS_PAGES ) * sysconf( _SC_PAGESIZE );
 #elif defined ( __HOST_OS_TYPE_WINDOWS__ ) /* #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
-	HResourceInfo ri( ms_get_memory_size_info() );
-	freeMemory = ri.free();
-	totalMemory = ri.total();
+	usedMemory = ru.ru_maxrss * 1024;
+	ms_get_memory_size_info( freeMemory, totalMemory );
 #endif
-	return ( HResourceInfo( freeMemory, totalMemory ) );
+	rlimit rlVM = { 0, 0 };
+	M_ENSURE( ::getrlimit( RLIMIT_AS, &rlVM ) == 0 );
+	availableMemory = freeMemory;
+	if ( ( rlVM.rlim_cur - usedMemory ) < availableMemory )
+		availableMemory = rlVM.rlim_cur - usedMemory;
+#ifndef __HOST_OS_TYPE_CYGWIN__
+	rlimit rlData = { 0, 0 };
+	M_ENSURE( ::getrlimit( RLIMIT_DATA, &rlData ) == 0 );
+	if ( ( rlData.rlim_cur - usedMemory ) < availableMemory )
+		availableMemory = rlData.rlim_cur - usedMemory;
+#endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
+	return ( HResourceInfo( availableMemory, freeMemory, totalMemory ) );
 	M_EPILOG
 	}
 
@@ -237,6 +258,7 @@ HResourceInfo get_disk_space_info( yaal::hcore::HString const& path_ )
 	::memset( &svfs, 0, sizeof ( svfs ) );
 	M_ENSURE( ::statvfs( path_.raw(), &svfs ) == 0 );
 	return ( HResourceInfo( static_cast<i64_t>( svfs.f_bavail ) * static_cast<i64_t>( svfs.f_frsize ),
+				static_cast<i64_t>( svfs.f_bfree ) * static_cast<i64_t>( svfs.f_frsize ),
 				static_cast<i64_t>( svfs.f_blocks ) * static_cast<i64_t>( svfs.f_frsize ) ) );
 	M_EPILOG
 	}

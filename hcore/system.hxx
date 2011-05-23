@@ -78,16 +78,24 @@ yaal::hcore::HString get_group_name( int gid_ );
  */
 class HResourceInfo
 	{
+	i64_t _available;
 	i64_t _free;
 	i64_t _total;
 public:
 	/*! \brief Construct resource info object.
 	 *
+	 * \param available_ - amount of resouce available for allocation.
 	 * \param free_ - amount of free resouce.
 	 * \param total_ - total amount of reource.
 	 */
-	HResourceInfo( i64_t free_ = 0, i64_t total_ = 0 )
-		: _free( free_ ), _total( total_) {}
+	HResourceInfo( i64_t available_ = 0, i64_t free_ = 0, i64_t total_ = 0 )
+		: _available( available_ ), _free( free_ ), _total( total_) {}
+	/*! \brief Get information about amount of resource available for allocation.
+	 *
+	 * \return Amount of available resouce.
+	 */
+	i64_t available( void ) const
+		{ return ( _available ); }
 	/*! \brief Get information about amount of free resource.
 	 *
 	 * \return Free resouce size.
