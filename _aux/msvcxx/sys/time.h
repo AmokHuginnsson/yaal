@@ -1,7 +1,9 @@
 #ifndef YAAL_MSVCXX_SYS_TIME_H_INCLUDED
 #define YAAL_MSVCXX_SYS_TIME_H_INCLUDED 1
 
+#define log cmath_log
 #include <algorithm>
+#undef log
 #include <errno.h>
 #include <pthread.h>
 

@@ -1,5 +1,7 @@
 #include <sys/cdefs.h>
+#define log cmath_log
 #include <sstream>
+#undef log
 #include <io.h>
 #include <sys/time.h>
 #include <../include/sys/stat.h>
