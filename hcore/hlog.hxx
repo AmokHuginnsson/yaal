@@ -47,12 +47,12 @@ extern void* DEFAULT_LOG_STREAM;
  */
 namespace LOG_TYPE
 	{
-	static int const DEBUG			= 1; 
-	static int const INFO				= 2; 
-	static int const NOTICE			= 4; 
-	static int const WARNING		= 8;
-	static int const ERROR			= 16; 
-	static int const VCSHEADER	= 32;
+	static int const DEBUG     = 1; 
+	static int const INFO      = 2; 
+	static int const NOTICE    = 4; 
+	static int const WARNING   = 8;
+	static int const ERROR     = 16; 
+	static int const VCSHEADER = 32;
 	}
 
 /*! \brief Logging utility.
