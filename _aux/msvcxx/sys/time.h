@@ -2,9 +2,9 @@
 #define YAAL_MSVCXX_SYS_TIME_H_INCLUDED 1
 
 #include <algorithm>
+#include <errno.h>
 #include <pthread.h>
 
-#undef ENOSYS
 #define _SYS_UN_H 1
 #define _NETINET_IN_H 1
 #define _NETDB_H 1

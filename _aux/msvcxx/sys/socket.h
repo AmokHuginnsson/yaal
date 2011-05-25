@@ -3,9 +3,15 @@
 
 #include <sys/time.h>
 
+#ifndef ENOTCONN
 #define ENOTCONN WSAENOTCONN
+#endif /* #ifndef ENOTCONN */
+#ifndef ECONNRESET
 #define ECONNRESET WSAECONNRESET
+#endif /* #ifndef ECONNRESET */
+#ifndef EINPROGRESS
 #define EINPROGRESS WSAEINPROGRESS
+#endif /* #ifndef EINPROGRESS */
 static int const SHUT_RDWR = SD_RECEIVE | SD_SEND;
 
 #include "emu_socket.hxx"

@@ -111,10 +111,9 @@ inline int clock_gettime( __clockid_t, struct timespec* tp_ )
 static int const CLOCK_REALTIME = 0;
 #endif /* _CTIME */
 #ifdef _CSTRING_
+#include <errno.h>
 #include <pthread.h>
 #include "hcore/macro.hxx"
-#undef ENOTSUP
-#undef ENOSYS
 #undef SIG_BLOCK
 #undef SIG_UNBLOCK
 #undef SIG_SETMASK
