@@ -4,6 +4,7 @@
 #define PACKAGE_VERSION "0.0.0"
 #define PACKAGE_STRING PACKAGE_NAME" "PACKAGE_VERSION
 #define LIB_INFIX "@LIB_INFIX@"
+#cmakedefine HAVE_SGI_STL_EXTENSIONS
 #ifndef __GNUC__
 #define __attribute__( x ) /**/
 #endif /* not __GNUC__ */
@@ -27,3 +28,4 @@
 #include <yaal/cleanup.hxx>
 #endif /* __MSVCXX__ */
 #endif /* not @PROJECT_NAME_UC@_CONFIG_HXX_INCLUDED */
+
