@@ -240,13 +240,13 @@ HResourceInfo get_memory_size_info( void )
 #if ( HAVE_DECL_RLIMIT_AS == 1 )
 	rlimit rlVM = { 0, 0 };
 	M_ENSURE( ::getrlimit( RLIMIT_AS, &rlVM ) == 0 );
-	if ( ( rlVM.rlim_cur > 0 ) && ( ( rlVM.rlim_cur - usedMemory ) < availableMemory ) )
+	if ( ( rlVM.rlim_cur > 0 ) && ( ( static_cast<i64_t>( rlVM.rlim_cur ) - usedMemory ) < availableMemory ) )
 		availableMemory = rlVM.rlim_cur - usedMemory;
 #endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
 #ifndef __HOST_OS_TYPE_CYGWIN__
 	rlimit rlData = { 0, 0 };
 	M_ENSURE( ::getrlimit( RLIMIT_DATA, &rlData ) == 0 );
-	if ( ( rlData.rlim_cur > 0 ) && ( ( rlData.rlim_cur - usedMemory ) < availableMemory ) )
+	if ( ( rlData.rlim_cur > 0 ) && ( ( static_cast<i64_t>( rlData.rlim_cur ) - usedMemory ) < availableMemory ) )
 		availableMemory = rlData.rlim_cur - usedMemory;
 #endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 	return ( HResourceInfo( availableMemory, freeMemory, totalMemory ) );
