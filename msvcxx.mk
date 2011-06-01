@@ -7,6 +7,7 @@ PROJECT_NAME=$(notdir $(CURDIR))
 VCBUILD=$(wildcard /cygdrive/c/Program\ Files\ (x86)/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)$(wildcard /cygdrive/c/Program\ Files/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)
 MSBUILD=$(wildcard /cygdrive/c/Windows/Microsoft.NET/Framework/v4*/MSBuild.exe)
 BUILD_ARTIFACT=build.stamp
+CPUS=$(shell grep -c processor /proc/cpuinfo)
 
 all: debug
 
@@ -15,10 +16,10 @@ debug: $(BUILD_ARTIFACT)
 $(BUILD_ARTIFACT): $(wildcard */*.cxx) $(wildcard */*.hxx)  $(wildcard */*/*.cxx) $(wildcard */*/*.hxx) $(PROJECT_NAME).sln
 	@export VS_VER="x`awk '/# Visual Studio /{print $$4}' $(PROJECT_NAME).sln`" ; \
 	if [ "$${VS_VER}" = "x2008" ] ; then \
-		"$(VCBUILD)" /showenv /M1 $(PROJECT_NAME).sln "Debug|Win32" ; \
+		"$(VCBUILD)" /showenv /M$(CPUS) $(PROJECT_NAME).sln "Debug|Win32" ; \
 	else \
 		if [ "$${VS_VER}" = "x2010" ] ; then \
-			"$(MSBUILD)" $(PROJECT_NAME).sln /nologo /m:4 /t:Build /clp:NoItemAndPropertyList /p:Configuration=Debug /p:Platform=Win32 ; \
+			"$(MSBUILD)" $(PROJECT_NAME).sln /nologo /m:$(CPUS) /t:Build /clp:NoItemAndPropertyList /p:Configuration=Debug /p:Platform=Win32 ; \
 		else \
 			echo "Cannot guess VS version!" && false ; \
 		fi \
