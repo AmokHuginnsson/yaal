@@ -98,6 +98,8 @@ public:
 	int long count( value_type const& ) const;
 	int long erase( value_type const& );
 	void erase( const_iterator const& );
+	bool operator == ( HTwoWayMap const& ) const;
+	bool operator < ( HTwoWayMap const& ) const;
 	};
 
 template<typename left_type_t, typename right_type_t>
@@ -239,6 +241,22 @@ void HTwoWayMap<left_type_t, right_type_t>::erase( const_iterator const& it )
 	_data.erase( toErase );
 	M_ASSERT( ( _data.get_size() == _leftView.get_size() ) && ( _data.get_size() == _rightView.get_size() ) );
 	return;
+	M_EPILOG
+	}
+
+template<typename left_type_t, typename right_type_t>
+bool HTwoWayMap<left_type_t, right_type_t>::operator == ( HTwoWayMap const& twm_ ) const
+	{
+	M_PROLOG
+	return ( ( &twm_ == this ) || ( _data == twm_._data ) );
+	M_EPILOG
+	}
+
+template<typename left_type_t, typename right_type_t>
+bool HTwoWayMap<left_type_t, right_type_t>::operator < ( HTwoWayMap const& twm_ ) const
+	{
+	M_PROLOG
+	return ( ( &twm_ != this ) && ( _data < twm_._data ) );
 	M_EPILOG
 	}
 

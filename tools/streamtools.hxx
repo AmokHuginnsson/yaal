@@ -41,6 +41,7 @@ Copyright:
 #include "hcore/hhashset.hxx"
 #include "hcore/htuple.hxx"
 #include "tools/hring.hxx"
+#include "tools/htwowaymap.hxx"
 
 namespace yaal
 {
@@ -108,6 +109,12 @@ template<typename tType>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::tools::HRing<tType> const& r_ )
 	{
 	return ( container_dump( out, r_, "ring" ) );
+	}
+
+template<typename left_t, typename right_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::tools::HTwoWayMap<left_t, right_t> const& twm_ )
+	{
+	return ( container_dump( out, twm_, "twowaymap" ) );
 	}
 
 }
