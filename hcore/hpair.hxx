@@ -28,6 +28,7 @@ Copyright:
 #define YAAL_HCORE_HPAIR_HXX_INCLUDED 1
 
 #include "hcore/base.hxx"
+#include "hcore/algorithm_low.hxx"
 #include "hcore/hexception.hxx"
 
 namespace yaal
@@ -59,8 +60,8 @@ public:
 		M_PROLOG
 		if ( &pair != this )
 			{
-			first = pair.first;
-			second = pair.second;
+			HPair tmp( pair );
+			swap( tmp );
 			}
 		return ( *this );
 		M_EPILOG
@@ -74,6 +75,16 @@ public:
 		return ( ( first < pair.first )
 				|| ( ! ( pair.first < first ) && ( second < pair.second ) ) );
 		}
+	void swap( HPair& pair )
+		{
+		if ( &pair != this )
+			{
+			using yaal::swap;
+			swap( first, pair.first );
+			swap( second, pair.second );
+			}
+		return;
+		}
 	};
 
 template<typename first_type, typename second_type>
@@ -81,6 +92,10 @@ HPair<first_type, second_type> make_pair( first_type const& first, second_type c
 	{ return ( HPair<first_type, second_type>( first, second ) ); }
 
 }
+
+template<typename first_type, typename second_type>
+inline void swap( yaal::hcore::HPair<first_type, second_type>& a, yaal::hcore::HPair<first_type, second_type>& b )
+	{ a.swap( b ); }
 
 }
 

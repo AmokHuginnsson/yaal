@@ -31,34 +31,15 @@ Copyright:
 #ifndef YAAL_HCORE_ALGORITHM_HXX_INCLUDED
 #define YAAL_HCORE_ALGORITHM_HXX_INCLUDED 1
 
+#include "hcore/algorithm_low.hxx"
 #include "hcore/trait.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/iterator.hxx"
 #include "hcore/functional.hxx"
-#include "hcore/algorithm_impl.hxx"
 #include "hcore/hauxiliarybuffer.hxx"
 
 namespace yaal
 {
-
-/*! \brief Swap contents of two variables.
- *
- * \param left - first variable to be swapped.
- * \param right - second variable to be swapped.
- *
- * \post After the call left holds value of right from before call, and right holds value of left from before call.
- */
-template<typename tType>
-inline void swap( tType& left, tType& right )
-	{
-	if ( &left != &right )
-		{
-		tType tmp( left );
-		left = right;
-		right = tmp;
-		}
-	return;
-	}
 
 /*! \brief Find first occurence of given value in given range of elements.
  *

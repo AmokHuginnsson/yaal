@@ -32,7 +32,7 @@ Copyright:
 
 #include <new>
 
-#include "hcore/algorithm_impl.hxx"
+#include "hcore/algorithm_low.hxx"
 #include "hcore/iterator.hxx"
 #include "hcore/system.hxx"
 

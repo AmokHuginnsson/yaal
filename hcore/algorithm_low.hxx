@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcore/algorithm_impl.hxx - this file is integral part of `yaal' project.
+	hcore/algorithm_low.hxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -23,7 +23,7 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/hcore/algorithm_impl.hxx
+/*! \file hcore/hcore/algorithm_low.hxx
  * \brief Implementation of low level alogrithms.
  */
 
@@ -32,6 +32,25 @@ Copyright:
 
 namespace yaal
 {
+
+/*! \brief Swap contents of two variables.
+ *
+ * \param left - first variable to be swapped.
+ * \param right - second variable to be swapped.
+ *
+ * \post After the call left holds value of right from before call, and right holds value of left from before call.
+ */
+template<typename tType>
+inline void swap( tType& left, tType& right )
+	{
+	if ( &left != &right )
+		{
+		tType tmp( left );
+		left = right;
+		right = tmp;
+		}
+	return;
+	}
 
 /*! \brief Get smaller of two values.
  *
