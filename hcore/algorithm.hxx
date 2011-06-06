@@ -552,6 +552,24 @@ bool equal( iter1_t it1, iter1_t end1, iter2_t it2, pred_t predicate_ )
  * \param end1 - one past last element of first range.
  * \param it2 - begining of second range.
  * \param end2 - one past last element of second range.
+ * \param compare - comparizon function.
+ * \return true if and only if first range is lexicographicaly before second range.
+ */
+template<typename iter1_t, typename iter2_t, typename compare_t>
+bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, compare_t compare )
+	{
+	/* skip equals */
+	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( ! compare( *it1, *it2 ) ) && ( ! compare( *it2, *it1 ) ); ++ it1, ++ it2 )
+		;
+	return ( ( ( it1 != end1 ) && ( it2 != end2 ) && compare( *it1, *it2 ) ) || ( ( it1 == end1 ) && ( it2 != end2 ) ) );
+	}
+
+/*! \brief Checks if one range is lexicographicaly before another range.
+ * 
+ * \param it1 - begining of first range.
+ * \param end1 - one past last element of first range.
+ * \param it2 - begining of second range.
+ * \param end2 - one past last element of second range.
  * \return true if and only if first range is lexicographicaly before second range.
  */
 template<typename iter1_t, typename iter2_t>

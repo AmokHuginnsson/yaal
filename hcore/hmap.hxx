@@ -200,7 +200,7 @@ public:
 	bool operator == ( HMap const& map_ ) const
 		{ M_PROLOG return ( ( &map_ == this ) || safe_equal( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
 	bool operator < ( HMap const& map_ ) const
-		{ M_PROLOG return ( lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
+		{ M_PROLOG return ( ( &map_ != this ) && lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
 	};
 
 /*! \brief Iterator for HMap<> data structure.

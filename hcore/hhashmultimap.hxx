@@ -325,7 +325,7 @@ public:
 	bool operator == ( HHashMultiMap const& map_ ) const
 		{ M_PROLOG return ( ( &map_ == this ) || safe_equal( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
 	bool operator < ( HHashMultiMap const& map_ ) const
-		{ M_PROLOG return ( lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
+		{ M_PROLOG return ( ( &map_ != this ) && lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
 private:
 	typename hashmultimap_engine_t::iterator ensure_key( key_type const& key )
 		{
@@ -427,10 +427,6 @@ public:
 		{ return ( ( _major == it._major ) && ( _minor == it._minor ) ); }
 	bool operator != ( HIterator const& it ) const
 		{ return ( ! ( ( _major == it._major ) && ( _minor == it._minor ) ) ); }
-	bool operator == ( HHashMultiMap const& map_ ) const
-		{ M_PROLOG return ( equals( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
-	bool operator < ( HHashMultiMap const& map_ ) const
-		{ M_PROLOG return ( lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
 private:
 	friend class HHashMultiMap<key_type, data_type, hasher_function_t, storage_policy_t>;
 	explicit HIterator( hash_multi_map_t const* const owner_,

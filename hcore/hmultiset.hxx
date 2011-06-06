@@ -199,7 +199,7 @@ public:
 	bool operator == ( HMultiSet const& set_ ) const
 		{ M_PROLOG return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 	bool operator < ( HMultiSet const& set_ ) const
-		{ M_PROLOG return ( lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
+		{ M_PROLOG return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 	};
 
 /*! \brief Iterator for HMultiSet<> data structure.
