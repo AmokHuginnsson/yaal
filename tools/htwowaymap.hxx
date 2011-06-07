@@ -132,7 +132,7 @@ template<typename left_type_t, typename right_type_t>
 template<typename view_type_t>
 class HTwoWayMap<left_type_t, right_type_t>::HView
 	{
-	typedef HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t> this_type;
+	typedef typename HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t> this_type;
 	typedef HTwoWayMap<left_type_t, right_type_t> twowaymap_type;
 	typedef typename twowaymap_type::storage_type storage_type;
 	typedef twowaymap_helper<view_type_t const*, typename storage_type::iterator> twowaymap_view_helper;
@@ -160,11 +160,11 @@ template<typename view_type_t>
 class HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::HIterator
 	: public yaal::hcore::iterator_interface<typename HTwoWayMap<left_type_t, right_type_t>::value_type, yaal::hcore::iterator_category::forward>
 	{
-	typedef HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::HIterator this_type;
+	typedef typename HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::HIterator this_type;
 	typedef yaal::hcore::iterator_interface<typename HTwoWayMap<left_type_t, right_type_t>::value_type, yaal::hcore::iterator_category::forward> base_type;
 	typedef typename base_type::value_type value_type;
 	typedef HTwoWayMap<left_type_t, right_type_t> twowaymap_type;
-	typedef HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t> view_type;
+	typedef typename HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t> view_type;
 	typedef typename view_type::view_storage_type view_storage_type;
 	typedef typename view_storage_type::const_iterator iterator_t;
 	view_type const* _owner;
