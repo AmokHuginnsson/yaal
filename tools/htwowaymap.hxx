@@ -111,6 +111,7 @@ public:
 	void erase( iterator, iterator );
 	bool operator == ( HTwoWayMap const& ) const;
 	bool operator < ( HTwoWayMap const& ) const;
+	left_view_type const& left( void ) const;
 private:
 	struct equal_helper
 		{
@@ -224,8 +225,6 @@ public:
 private:
 	HIterator( view_type const* owner_, iterator_t engine_ ) : _owner( owner_ ), _engine( engine_ ) {}
 	friend class HTwoWayMap<left_type_t, right_type_t>;
-	template<typename>
-	friend class HTwoWayMap<left_type_t, right_type_t>::HView;
 	};
 
 template<typename left_type_t, typename right_type_t>
@@ -477,6 +476,26 @@ bool HTwoWayMap<left_type_t, right_type_t>::operator < ( HTwoWayMap const& twm_ 
 	M_PROLOG
 	return ( ( &twm_ != this ) && lexicographical_compare( _leftView._data.begin(), _leftView._data.end(), twm_._leftView._data.begin(), twm_._leftView._data.end(), less_helper() ) );
 	M_EPILOG
+	}
+
+template<typename left_type_t, typename right_type_t>
+typename HTwoWayMap<left_type_t, right_type_t>::left_view_type const& HTwoWayMap<left_type_t, right_type_t>::left( void ) const
+	{
+	return ( _leftView );
+	}
+
+template<typename left_type_t, typename right_type_t>
+template<typename view_type_t>
+typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::begin( void ) const
+	{
+	return ( const_iterator( this, _data.begin() ) );
+	}
+
+template<typename left_type_t, typename right_type_t>
+template<typename view_type_t>
+typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::end( void ) const
+	{
+	return ( const_iterator( this, _data.end() ) );
 	}
 
 }
