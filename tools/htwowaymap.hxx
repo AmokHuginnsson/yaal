@@ -112,6 +112,7 @@ public:
 	bool operator == ( HTwoWayMap const& ) const;
 	bool operator < ( HTwoWayMap const& ) const;
 	left_view_type const& left( void ) const;
+	right_view_type const& right( void ) const;
 private:
 	struct equal_helper
 		{
@@ -482,6 +483,12 @@ template<typename left_type_t, typename right_type_t>
 typename HTwoWayMap<left_type_t, right_type_t>::left_view_type const& HTwoWayMap<left_type_t, right_type_t>::left( void ) const
 	{
 	return ( _leftView );
+	}
+
+template<typename left_type_t, typename right_type_t>
+typename HTwoWayMap<left_type_t, right_type_t>::right_view_type const& HTwoWayMap<left_type_t, right_type_t>::right( void ) const
+	{
+	return ( _rightView );
 	}
 
 template<typename left_type_t, typename right_type_t>

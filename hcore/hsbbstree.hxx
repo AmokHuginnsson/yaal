@@ -115,6 +115,10 @@ public:
 	void remove( HIterator const& );
 	template<typename tType, typename ttType, typename tttType>
 	HIterator find( ttType const& ) const;
+	template<typename tType, typename ttType, typename tttType>
+	HIterator lower_bound( ttType const& ) const;
+	template<typename tType, typename ttType, typename tttType>
+	HIterator upper_bound( ttType const& ) const;
 	int long get_size( void ) const;
 	bool is_empty( void ) const;
 	void clear( void );
@@ -255,6 +259,22 @@ HSBBSTree::HIterator HSBBSTree::find( ttType const& key_ ) const
 	M_PROLOG
 	ONodePtr nodePtr = find_node<tType, ttType, tttType>( key_ );
 	return ( HIterator( this, nodePtr._exists ? nodePtr._node : NULL ) );
+	M_EPILOG
+	}
+
+template<typename tType, typename ttType, typename tttType>
+HSBBSTree::HIterator HSBBSTree::lower_bound( ttType const& key_ ) const
+	{
+	M_PROLOG
+	return ( HIterator( this, NULL ) );
+	M_EPILOG
+	}
+
+template<typename tType, typename ttType, typename tttType>
+HSBBSTree::HIterator HSBBSTree::upper_bound( ttType const& key_ ) const
+	{
+	M_PROLOG
+	return ( HIterator( this, NULL ) );
 	M_EPILOG
 	}
 

@@ -164,6 +164,10 @@ public:
 		}
 	HIterator find( value_type const& e ) const
 		{ return ( HIterator( _engine.find<value_type, value_type, helper_t>( e ) ) ); }
+	HIterator lower_bound( value_type const& e ) const
+		{ return ( HIterator( _engine.lower_bound<value_type, value_type, helper_t>( e ) ) ); }
+	HIterator upper_bound( value_type const& e ) const
+		{ return ( HIterator( _engine.upper_bound<value_type, value_type, helper_t>( e ) ) ); }
 	HIterator begin( void ) const
 		{ return ( HIterator( _engine.begin() ) ); }
 	HIterator end( void ) const
