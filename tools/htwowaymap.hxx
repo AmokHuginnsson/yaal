@@ -153,6 +153,9 @@ public:
 	const_reverse_iterator rbegin( void ) const;
 	const_reverse_iterator rend( void ) const;
 	const_iterator find( view_type_t const& ) const;
+	const_iterator lower_bound( view_type_t const& ) const;
+	const_iterator upper_bound( view_type_t const& ) const;
+	int long count( view_type_t const& ) const;
 private:
 	friend class HTwoWayMap<left_type_t, right_type_t>;
 	};
@@ -503,6 +506,34 @@ template<typename view_type_t>
 typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::end( void ) const
 	{
 	return ( const_iterator( this, _data.end() ) );
+	}
+
+template<typename left_type_t, typename right_type_t>
+template<typename view_type_t>
+typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::find( view_type_t const& key_ ) const
+	{
+	return ( const_iterator( this, _data.find( &key_ ) ) );
+	}
+
+template<typename left_type_t, typename right_type_t>
+template<typename view_type_t>
+typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::lower_bound( view_type_t const& key_ ) const
+	{
+	return ( const_iterator( this, _data.lower_bound( &key_ ) ) );
+	}
+
+template<typename left_type_t, typename right_type_t>
+template<typename view_type_t>
+typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::upper_bound( view_type_t const& key_ ) const
+	{
+	return ( const_iterator( this, _data.upper_bound( &key_ ) ) );
+	}
+
+template<typename left_type_t, typename right_type_t>
+template<typename view_type_t>
+int long HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::count( view_type_t const& key_ ) const
+	{
+	return ( _data.count( &key_ ) );
 	}
 
 }
