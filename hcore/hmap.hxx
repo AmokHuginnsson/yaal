@@ -163,6 +163,14 @@ public:
 		{ return ( iterator( _engine.find<value_type, key_type, helper_t>( e ) ) ); }
 	const_iterator find( key_type const& e ) const
 		{ return ( const_iterator( _engine.find<value_type, key_type, helper_t>( e ) ) ); }
+	iterator lower_bound( key_type const& e )
+		{ return ( iterator( _engine.lower_bound<value_type, key_type, helper_t>( e ) ) ); }
+	const_iterator lower_bound( key_type const& e ) const
+		{ return ( const_iterator( _engine.lower_bound<value_type, key_type, helper_t>( e ) ) ); }
+	iterator upper_bound( key_type const& e )
+		{ return ( iterator( _engine.upper_bound<value_type, key_type, helper_t>( e ) ) ); }
+	const_iterator upper_bound( key_type const& e ) const
+		{ return ( const_iterator( _engine.upper_bound<value_type, key_type, helper_t>( e ) ) ); }
 	iterator begin( void )
 		{ return ( iterator( _engine.begin() ) ); }
 	const_iterator begin( void ) const

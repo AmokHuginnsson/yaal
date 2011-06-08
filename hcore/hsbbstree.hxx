@@ -217,7 +217,7 @@ HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& key_ )
 	{
 	M_PROLOG
 	ONodePtr nodeHolder;
-	HNode<tType>* node = NULL;
+	HNode<tType>* node( NULL );
 	if ( _root )
 		nodeHolder = find_node<tType, tType, ttType>( key_ );
 	if ( nodeHolder._exists )
@@ -266,7 +266,15 @@ template<typename tType, typename ttType, typename tttType>
 HSBBSTree::HIterator HSBBSTree::lower_bound( ttType const& key_ ) const
 	{
 	M_PROLOG
-	return ( HIterator( this, NULL ) );
+	HIterator it( this, NULL );
+	if ( _root )
+		{
+		ONodePtr nodeHolder( find_node<tType, ttType, tttType>( key_ ) );
+		it._current = nodeHolder._node;
+		if ( nodeHolder._node && ! nodeHolder._exists && tttType::less( static_cast<HNode<tType>*>( nodeHolder._node )->_key, key_ ) )
+			++ it;
+		}
+	return ( it );
 	M_EPILOG
 	}
 
@@ -274,7 +282,15 @@ template<typename tType, typename ttType, typename tttType>
 HSBBSTree::HIterator HSBBSTree::upper_bound( ttType const& key_ ) const
 	{
 	M_PROLOG
-	return ( HIterator( this, NULL ) );
+	HIterator it( this, NULL );
+	if ( _root )
+		{
+		ONodePtr nodeHolder( find_node<tType, ttType, tttType>( key_ ) );
+		it._current = nodeHolder._node;
+		if ( nodeHolder._node && ( nodeHolder._exists || tttType::less( static_cast<HNode<tType>*>( nodeHolder._node )->_key, key_ ) ) )
+			++ it;
+		}
+	return ( it );
 	M_EPILOG
 	}
 

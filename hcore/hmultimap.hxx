@@ -209,10 +209,6 @@ public:
 		return ( const_iterator( this, major, minor ) );
 		M_EPILOG
 		}
-	const_iterator lower_bound( key_type const& key_ ) const
-		{ M_PROLOG return ( find( key_ ) ); M_EPILOG }
-	iterator lower_bound( key_type const& key_ )
-		{ M_PROLOG return ( find( key_ ) ); M_EPILOG }
 	iterator find( key_type const& key )
 		{
 		M_PROLOG
@@ -223,24 +219,39 @@ public:
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 		}
-	const_iterator upper_bound( key_type const& key ) const
+	const_iterator lower_bound( key_type const& key_ ) const
 		{
 		M_PROLOG
-		typename multimap_engine_t::const_iterator major = _engine.find( key );
+		typename multimap_engine_t::const_iterator major =  _engine.lower_bound( key_ );
+		typename value_list_t::const_iterator minor;
 		if ( major != _engine.end() )
-			++ major;
+			minor = major->second->begin();
+		return ( const_iterator( this, major, minor ) );
+		M_EPILOG }
+	iterator lower_bound( key_type const& key_ )
+		{
+		M_PROLOG
+		typename multimap_engine_t::iterator major = _engine.lower_bound( key_ );
+		typename value_list_t::iterator minor;
+		if ( major != _engine.end() )
+			minor = major->second->begin();
+		return ( iterator( this, major, minor ) );
+		M_EPILOG
+		}
+	const_iterator upper_bound( key_type const& key_ ) const
+		{
+		M_PROLOG
+		typename multimap_engine_t::const_iterator major = _engine.upper_bound( key_ );
 		typename value_list_t::const_iterator minor;
 		if ( major != _engine.end() )
 			minor = major->second->begin();
 		return ( const_iterator( this, major, minor ) );
 		M_EPILOG
 		}
-	iterator upper_bound( key_type const& key )
+	iterator upper_bound( key_type const& key_ )
 		{
 		M_PROLOG
-		typename multimap_engine_t::iterator major = _engine.find( key );
-		if ( major != _engine.end() )
-			++ major;
+		typename multimap_engine_t::iterator major = _engine.upper_bound( key_ );
 		typename value_list_t::iterator minor;
 		if ( major != _engine.end() )
 			minor = major->second->begin();

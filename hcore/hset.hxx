@@ -175,7 +175,7 @@ public:
 	reverse_iterator rbegin( void ) const
 		{ return ( end() ); }
 	reverse_iterator rend( void ) const
-		{ return ( HIterator( begin() ) ); }
+		{ return ( begin() ); }
 	void clear( void )
 		{ _engine.clear(); }
 	void swap( HSet<value_type, helper_t>& other )
@@ -200,6 +200,8 @@ class HSet<value_type, helper_t>::HIterator : public iterator_interface<value_ty
 	HSBBSTree::HIterator _engine;
 public:
 	typedef iterator_interface<value_type, iterator_category::forward> base_type;
+	typedef value_type const& reference;
+	typedef value_type const* pointer;
 	HIterator( void ) : base_type(), _engine() {}
 	HIterator( HIterator const& it_ ) : base_type(), _engine( it_._engine ) {}
 	HIterator& operator = ( HIterator const& it_ )
@@ -230,9 +232,9 @@ public:
 		-- _engine;
 		return ( it );
 		}
-	value_type const& operator * ( void )
+	value_type const& operator * ( void ) const
 		{	return ( _engine.get<value_type>() );	}
-	value_type const* operator -> ( void )
+	value_type const* operator -> ( void ) const
 		{ return ( &_engine.get<value_type>() );	}
 	bool operator == ( HIterator const& it ) const
 		{ return ( _engine == it._engine ); }

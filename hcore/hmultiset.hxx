@@ -178,6 +178,10 @@ public:
 		}
 	HIterator find( value_type const& e ) const
 		{ return ( HIterator( _engine.find<elem_t, value_type, helper_t>( e ) ) ); }
+	HIterator lower_bound( value_type const& e ) const
+		{ return ( HIterator( _engine.lower_bound<value_type, value_type, helper_t>( e ) ) ); }
+	HIterator upper_bound( value_type const& e ) const
+		{ return ( HIterator( _engine.upper_bound<value_type, value_type, helper_t>( e ) ) ); }
 	HIterator begin( void ) const
 		{ return ( HIterator( _engine.begin() ) ); }
 	HIterator end( void ) const
@@ -251,9 +255,9 @@ public:
 		-- _engine;
 		return ( it );
 		}
-	value_type const& operator * ( void )
+	value_type const& operator * ( void ) const
 		{	return ( _engine.get<elem_t>().first );	}
-	value_type const* operator -> ( void )
+	value_type const* operator -> ( void ) const
 		{ return ( &_engine.get<elem_t>().first );	}
 	bool operator == ( HIterator const& it ) const
 		{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
