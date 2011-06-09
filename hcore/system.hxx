@@ -123,6 +123,12 @@ HResourceInfo get_memory_size_info( void );
  */
 HResourceInfo get_disk_space_info( yaal::hcore::HString const& );
 
+/*! \brief Get number of avaialable CPU cores.
+ *
+ * \return Number of avaialable CPU cores.
+ */
+int get_core_count_info( void );
+
 }
 
 }

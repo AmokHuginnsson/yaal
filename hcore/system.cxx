@@ -265,6 +265,13 @@ HResourceInfo get_disk_space_info( yaal::hcore::HString const& path_ )
 	M_EPILOG
 	}
 
+int get_core_count_info( void )
+	{
+	M_PROLOG
+	return ( static_cast<int>( ::sysconf( _SC_NPROCESSORS_ONLN ) ) );
+	M_EPILOG
+	}
+
 }
 
 }
