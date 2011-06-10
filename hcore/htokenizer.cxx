@@ -132,6 +132,13 @@ HString const& HTokenizer::HIterator::operator* ( void ) const
 	M_EPILOG
 	}
 
+HString const* HTokenizer::HIterator::operator-> ( void ) const
+	{
+	M_PROLOG
+	return ( &operator*() );
+	M_EPILOG
+	}
+
 bool HTokenizer::HIterator::operator != ( HIterator const& it ) const
 	{
 	M_PROLOG

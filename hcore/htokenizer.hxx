@@ -85,6 +85,7 @@ public:
 	HIterator( HIterator const& );
 	HIterator& operator = ( HIterator const& );
 	HString const& operator*( void ) const;
+	HString const* operator->( void ) const;
 	bool operator != ( HIterator const& ) const;
 	bool operator == ( HIterator const& ) const;
 	HIterator& operator ++ ( void );
