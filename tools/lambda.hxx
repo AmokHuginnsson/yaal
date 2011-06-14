@@ -24,7 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 /*! \file tools/lambda.hxx
- * \brief Declaration of labda language extension.
+ * \brief Declaration of lambda language extension.
  */
 
 #ifndef YAAL_TOOLS_LAMBDA_HXX_INCLUDED
