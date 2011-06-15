@@ -35,9 +35,11 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/xalloc.hxx"
 #include "hcore/htree.hxx"
 #include "hcore/hcore.hxx"
+#include "hcore/math.hxx"
 #include "hexpression.hxx"
 
 using namespace yaal;
+using namespace yaal::math;
 using namespace yaal::hcore;
 
 namespace yaal
@@ -126,8 +128,6 @@ int _functionMnemonicsLength_ [ 16 ] =
 	{
 	4, 3, 4, 3, 3, 2, 4, 3, 6, 6, 5, 6, 3, 4, 2, 3
 	};
-
-static double long PI = 3.141592653589793238462643383279502884197069399375105820974944592307816406286208998628034825342117067982148086513282306647093844;
 
 HExpression::HExpression( void )
 	: _index( 0 ), _length( 0 ), _error( OK ),

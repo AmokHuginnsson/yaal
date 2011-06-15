@@ -25,12 +25,16 @@ Copyright:
 */
 
 #include <cmath>
+#include <limits>
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hcomplex.hxx"
 #include "hcore.hxx"
+#include "math.hxx"
+
+using namespace yaal::math;
 
 namespace yaal
 {
@@ -117,10 +121,27 @@ double long HComplex::modulus( void ) const
 double long HComplex::argument( void ) const
 	{
 	M_PROLOG
-	if ( ! _real )
-		M_THROW( "I cannot count complex argument, real part equals to 0.",
-				errno );
-	return ( ::std::atan( _imaginary  / _real ) );
+	bool reZero( yaal::abs( _real ) < ( 2.L * std::numeric_limits<double long>::epsilon() ) );
+	bool imZero( yaal::abs( _imaginary ) < ( 2.L * std::numeric_limits<double long>::epsilon() ) );
+	if ( reZero && imZero  )
+		M_THROW( "Argument for 0 + 0i is undefined.", errno );
+	
+	double long arg( 0.L );
+	if ( _real > 0.L )
+		arg = ::std::atan( _imaginary  / _real );
+	else if ( ( _real < 0.L ) && ( _imaginary >= 0.L ) )
+		arg = ::std::atan( _imaginary  / _real ) + PI;
+	else if ( ( _real < 0.L ) && ( _imaginary < 0.L ) )
+		arg = ::std::atan( _imaginary  / _real ) - PI;
+	else if ( reZero && ( _imaginary > 0 ) )
+		arg = PI / 2.L;
+	else if ( reZero && ( _imaginary < 0 ) )
+		arg = -PI / 2.L;
+	else
+		{
+		M_ASSERT( ! "bad code path" );
+		}
+	return ( arg );
 	M_EPILOG
 	}
 

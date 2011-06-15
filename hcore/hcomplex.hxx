@@ -30,6 +30,8 @@ Copyright:
 #ifndef YAAL_HCORE_HCOMPLEX_HXX_INCLUDED
 #define YAAL_HCORE_HCOMPLEX_HXX_INCLUDED 1
 
+#include "hcore/hexception.hxx"
+
 namespace yaal
 {
 
@@ -40,7 +42,9 @@ namespace hcore
  */
 class HComplex
 	{
+public:
 	typedef HComplex this_type;
+private:
 	double long _real;
 	double long _imaginary;
 public:
@@ -74,6 +78,8 @@ public:
 	HComplex operator / ( double long ) const;
 	friend HComplex operator * ( double long, HComplex const& );
 	};
+
+typedef yaal::hcore::HExceptionT<HComplex> HComplexException;
 
 }
 

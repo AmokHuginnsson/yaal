@@ -1,7 +1,7 @@
 /*
----           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
+---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcore.hxx - this file is integral part of `yaal' project.
+	hcore/math.hxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -23,44 +23,27 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/hcore.hxx
- * \brief Basic system level stuff.
- *
- * This file holds (except HException class declaration) main #defines,
- * macros and global variables used acros whole yaal.
+/*! \file hcore/math.hxx
+ * \brief Basic mathematical definitions in math namespace.
  */
 
-#ifndef YAAL_HCORE_HCORE_HXX_INCLUDED
-#define YAAL_HCORE_HCORE_HXX_INCLUDED 1
-
-#include "hcore/hstring.hxx"
-#include "hcore/hprogramoptionshandler.hxx"
+#ifndef YAAL_HCORE_MATH_HXX_INCLUDED
+#define YAAL_HCORE_MATH_HXX_INCLUDED 1
 
 namespace yaal
 {
 
-namespace hcore
+/*! \brief Basic mathematical declarations.
+ */
+namespace math
 {
 
-HProgramOptionsHandler& yaal_options( void );
-bool eq( double long, double long );
-void set_env( HString const&, HString const&, bool = true );
-void decode_set_env( HString );
-void init_locale( char const* const = NULL );
-void banner( void );
-double long strtold( HString const& );
-
-namespace extendable
-{
-
-typedef double long ( *yaal_strtold_t )( HString const& );
-void set_strtold_impl( yaal_strtold_t );
+extern double long PI;
+extern double long E;
 
 }
 
 }
 
-}
-
-#endif /* #ifndef YAAL_HCORE_HCORE_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_MATH_HXX_INCLUDED */
 
