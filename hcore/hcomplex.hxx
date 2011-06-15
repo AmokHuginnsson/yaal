@@ -41,38 +41,38 @@ namespace hcore
 class HComplex
 	{
 	typedef HComplex this_type;
-	double _real;
-	double _imaginary;
+	double long _real;
+	double long _imaginary;
 public:
 	HComplex( void );
-	HComplex( double const, double const = 0 );
+	HComplex( double long, double long = 0 );
 	HComplex( HComplex const& );
 	virtual ~HComplex( void );
-	double re( void ) const;
-	double im( void ) const;
-	double set_real( double const );
-	double set_imaginary( double const );
-	HComplex& set( double const, double const );
-	double modulus( void ) const;
-	double argument( void ) const;
+	double long re( void ) const;
+	double long im( void ) const;
+	double long set_real( double long );
+	double long set_imaginary( double long );
+	HComplex& set( double long, double long );
+	double long modulus( void ) const;
+	double long argument( void ) const;
 	HComplex& operator = ( HComplex const& );
 	bool operator == ( HComplex const& ) const;
 	bool operator != ( HComplex const& ) const;
-	HComplex& operator = ( double const );
+	HComplex& operator = ( double long );
 	HComplex& operator += ( HComplex const& );
 	HComplex& operator -= ( HComplex const& );
 	HComplex& operator *= ( HComplex const& );
-	HComplex& operator *= ( double const );
+	HComplex& operator *= ( double long );
 	HComplex& operator /= ( HComplex const& );
-	HComplex& operator /= ( double const );
-	HComplex operator + ( HComplex const& );
-	HComplex operator - ( HComplex const& );
+	HComplex& operator /= ( double long );
+	HComplex operator + ( HComplex const& ) const;
+	HComplex operator - ( HComplex const& ) const;
 	HComplex operator - ( void ) const;
-	HComplex operator * ( HComplex const& );
-	HComplex operator * ( double const );
-	HComplex operator / ( HComplex const& );
-	HComplex operator / ( double const );
-	friend HComplex operator * ( double const, HComplex const& );
+	HComplex operator * ( HComplex const& ) const;
+	HComplex operator * ( double long ) const;
+	HComplex operator / ( HComplex const& ) const;
+	HComplex operator / ( double long ) const;
+	friend HComplex operator * ( double long, HComplex const& );
 	};
 
 }

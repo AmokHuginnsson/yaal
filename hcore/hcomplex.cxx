@@ -45,7 +45,7 @@ HComplex::HComplex( void ) : _real ( 0 ), _imaginary ( 0 )
 	M_EPILOG
 	}
 
-HComplex::HComplex( double const real_,  double const imaginary_ )
+HComplex::HComplex( double long real_,  double long imaginary_ )
 	: _real ( real_ ), _imaginary ( imaginary_ )
 	{
 	M_PROLOG
@@ -53,10 +53,11 @@ HComplex::HComplex( double const real_,  double const imaginary_ )
 	M_EPILOG
 	}
 
-HComplex::HComplex( HComplex const& complex_ ) : _real ( 0 ), _imaginary ( 0 )
+HComplex::HComplex( HComplex const& complex_ )
+	: _real ( complex_._real ), _imaginary ( complex_._imaginary )
 	{
 	M_PROLOG
-	( * this ) = complex_;
+	return;
 	M_EPILOG
 	}
 
@@ -67,107 +68,109 @@ HComplex::~HComplex( void )
 	M_EPILOG
 	}
 
-double HComplex::re ( void ) const
+double long HComplex::re( void ) const
 	{
 	M_PROLOG
 	return ( _real );
 	M_EPILOG
 	}
 
-double HComplex::im ( void ) const
+double long HComplex::im( void ) const
 	{
 	M_PROLOG
 	return ( _imaginary );
 	M_EPILOG
 	}
 
-double HComplex::set_real ( double const real_ )
+double long HComplex::set_real( double long real_ )
 	{
 	M_PROLOG
 	return ( _real = real_ );
 	M_EPILOG
 	}
 
-double HComplex::set_imaginary ( double const imaginary_ )
+double long HComplex::set_imaginary( double long imaginary_ )
 	{
 	M_PROLOG
 	return ( _imaginary = imaginary_ );
 	M_EPILOG
 	}
 
-HComplex& HComplex::set( double const real_, double const imaginary_ )
+HComplex& HComplex::set( double long real_, double long imaginary_ )
 	{
 	M_PROLOG
 	_real = real_;
 	_imaginary = imaginary_;
-	return ( * this );
+	return ( *this );
 	M_EPILOG
 	}
 
-double HComplex::modulus( void ) const
+double long HComplex::modulus( void ) const
 	{
 	M_PROLOG
 	if ( ! _imaginary )
 		return ( _real );
-	return ( sqrt( _real * _real + _imaginary * _imaginary ) );
+	return ( ::std::sqrt( _real * _real + _imaginary * _imaginary ) );
 	M_EPILOG
 	}
 
-double HComplex::argument( void ) const
+double long HComplex::argument( void ) const
 	{
 	M_PROLOG
 	if ( ! _real )
 		M_THROW( "I cannot count complex argument, real part equals to 0.",
 				errno );
-	return ( atan ( _imaginary  / _real ) );
+	return ( ::std::atan( _imaginary  / _real ) );
 	M_EPILOG
 	}
 
 HComplex& HComplex::operator = ( HComplex const& complex_ )
 	{
 	M_PROLOG
-	if ( this != &complex_ )
-		set ( complex_._real, complex_._imaginary );
-	return ( * this );
+	if ( &complex_ != this )
+		set( complex_._real, complex_._imaginary );
+	return ( *this );
 	M_EPILOG
 	}
 
 bool HComplex::operator == ( HComplex const& complex_ ) const
 	{
 	M_PROLOG
-	return ( eq ( _real, complex_._real )
-			&& eq ( _imaginary, complex_._imaginary ) );
+	return ( eq( _real, complex_._real )
+			&& eq( _imaginary, complex_._imaginary ) );
 	M_EPILOG
 	}
 
 bool HComplex::operator != ( HComplex const& complex_ ) const
 	{
 	M_PROLOG
-	return ( ! ( eq ( _real, complex_._real )
-				&& eq ( _imaginary, complex_._imaginary ) ) );
+	return ( ! ( eq( _real, complex_._real )
+				&& eq( _imaginary, complex_._imaginary ) ) );
 	M_EPILOG
 	}
 
-HComplex& HComplex::operator = ( double const real_ )
+HComplex& HComplex::operator = ( double long real_ )
 	{
 	M_PROLOG
 	set( real_, 0. );
-	return ( * this );
+	return ( *this );
 	M_EPILOG
 	}
 
 HComplex& HComplex::operator += ( HComplex const& complex_ )
 	{
 	M_PROLOG
-	( * this ) = ( * this ) + complex_;
-	return ( * this );
+	_real += complex_._real;
+	_imaginary += complex_._imaginary;
+	return ( *this );
 	M_EPILOG
 	}
 
 HComplex& HComplex::operator -= ( HComplex const& complex_ )
 	{
 	M_PROLOG
-	( * this ) = ( * this ) - complex_;
+	_real -= complex_._real;
+	_imaginary -= complex_._imaginary;
 	return ( * this );
 	M_EPILOG
 	}
@@ -175,119 +178,112 @@ HComplex& HComplex::operator -= ( HComplex const& complex_ )
 HComplex& HComplex::operator *= ( HComplex const& complex_ )
 	{
 	M_PROLOG
-	( * this ) = ( * this ) * complex_;
-	return ( * this );
+	double long real( _real * complex_._real - _imaginary * complex_._imaginary );
+	double long imaginary( _imaginary * complex_._real + _real * complex_._imaginary );
+	set( real, imaginary );
+	return ( *this );
 	M_EPILOG
 	}
 
-HComplex& HComplex::operator *= ( double const value_ )
+HComplex& HComplex::operator *= ( double long value_ )
 	{
 	M_PROLOG
-	( * this ) = ( * this ) * value_;
-	return ( * this );
+	_real *= value_;
+	_imaginary *= value_;
+	return ( *this );
 	M_EPILOG
 	}
 
 HComplex& HComplex::operator /= ( HComplex const& complex_ )
 	{
 	M_PROLOG
-	( * this ) = ( * this ) / complex_;
-	return ( * this );
+	double long denominator( complex_._real * complex_._real + complex_._imaginary * complex_._imaginary );
+	if ( ! denominator )
+		M_THROW( "denominator equals 0", errno );
+	double long real( ( _real * complex_._real + _imaginary * complex_._imaginary ) / denominator );
+	double long imaginary( ( complex_._real * _imaginary - _real * complex_._imaginary ) / denominator );
+	set( real, imaginary );
+	return ( *this );
 	M_EPILOG
 	}
 
-HComplex& HComplex::operator /= ( double const value_ )
+HComplex& HComplex::operator /= ( double long value_ )
 	{
 	M_PROLOG
-	( * this ) = ( * this ) / value_;
-	return ( * this );
+	if ( ! value_ )
+		M_THROW( "denominator equals 0", errno );
+	_real /= value_;
+	_imaginary /= value_;
+	return ( *this );
 	M_EPILOG
 	}
 
-HComplex HComplex::operator + ( HComplex const& complex_ )
+HComplex HComplex::operator + ( HComplex const& complex_ ) const
 	{
 	M_PROLOG
-	HComplex complex( _real, _imaginary );
-	complex._real += complex_._real;
-	complex._imaginary += complex_._imaginary;
-	return ( complex );
+	HComplex c( *this );
+	c += complex_;
+	return ( c );
 	M_EPILOG
 	}
 
-HComplex HComplex::operator - ( HComplex const& complex_ )
+HComplex HComplex::operator - ( HComplex const& complex_ ) const
 	{
 	M_PROLOG
-	HComplex complex( _real, _imaginary );
-	complex._real -= complex_._real;
-	complex._imaginary -= complex_._imaginary;
-	return ( complex );
+	HComplex c( *this );
+	c -= complex_;
+	return ( c );
 	M_EPILOG
 	}
 
 HComplex HComplex::operator - ( void ) const
 	{
 	M_PROLOG
-	HComplex complex( 0., 0. );
-	complex -= ( * this );
-	return ( complex );
+	HComplex c( -_real, -_imaginary );
+	return ( c );
 	M_EPILOG
 	}
 
-HComplex HComplex::operator * ( HComplex const& complex_ )
+HComplex HComplex::operator * ( HComplex const& complex_ ) const
 	{
 	M_PROLOG
-	HComplex complex( _real, _imaginary );
-	complex._real = _real * complex_._real
-		- _imaginary * complex_._imaginary;
-	complex._imaginary = _imaginary * complex_._real
-		+ _real * complex_._imaginary;
-	return ( complex );
+	HComplex c( *this );
+	c *= complex_;
+	return ( c );
 	M_EPILOG
 	}
 
-HComplex HComplex::operator * ( double const value_ )
+HComplex HComplex::operator * ( double long value_ ) const
 	{
 	M_PROLOG
-	HComplex complex( _real, _imaginary );
-	complex._real *= value_;
-	complex._imaginary *= value_;
-	return ( complex );
+	HComplex c( *this );
+	c *= value_;
+	return ( c );
 	M_EPILOG
 	}
 
-HComplex HComplex::operator / ( HComplex const& complex_ )
+HComplex HComplex::operator / ( HComplex const& complex_ ) const
 	{
 	M_PROLOG
-	HComplex complex( _real, _imaginary );
-	double denominator = complex_._real * complex_._real
-													+ complex_._imaginary * complex_._imaginary;
-	if ( ! denominator )
-		M_THROW( "denominator equals 0", errno );
-	complex._real = ( _real * complex_._real
-			+ _imaginary * complex_._imaginary ) / denominator;
-	complex._imaginary = ( complex_._real * _imaginary
-			- _real * complex_._imaginary ) / denominator;
-	return ( complex );
+	HComplex c( *this );
+	c /= complex_;
+	return ( c );
 	M_EPILOG
 	}
 
-HComplex HComplex::operator / ( double const value_ )
+HComplex HComplex::operator / ( double long value_ ) const
 	{
 	M_PROLOG
-	HComplex complex( _real, _imaginary );
-	if ( ! value_ )
-		M_THROW( "denominator equals 0", errno );
-	complex._real /= value_;
-	complex._imaginary /= value_;
-	return ( complex );
+	HComplex c( *this );
+	c /= value_;
+	return ( c );
 	M_EPILOG
 	}
 
-HComplex operator * ( double const value_, HComplex const& complex_ )
+HComplex operator * ( double long value_, HComplex const& complex_ )
 	{
 	M_PROLOG
-	HComplex complex( complex_._real, complex_._imaginary );
-	return ( complex * value_ );
+	return ( complex_ * value_ );
 	M_EPILOG
 	}
 
