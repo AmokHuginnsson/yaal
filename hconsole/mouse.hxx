@@ -27,6 +27,8 @@ Copyright:
 #ifndef YAAL_HCONSOLE_MOUSE_HXX_INCLUDED
 #define YAAL_HCONSOLE_MOUSE_HXX_INCLUDED 1
 
+#include "hcore/hexception.hxx"
+
 namespace yaal
 {
 
@@ -60,6 +62,8 @@ typedef struct
 	int _row;     /*!< Cursor Y position. */
 	int _column;  /*!< Cursor X position. */
 	} OMouse;
+
+typedef yaal::hcore::HExceptionT<OMouse> HMouseException;
 
 typedef int ( * fun_console_mouse_open_t )( void );
 typedef int ( * fun_console_mouse_get_t )( OMouse& );

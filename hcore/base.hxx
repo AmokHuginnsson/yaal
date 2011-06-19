@@ -58,6 +58,8 @@ namespace yaal
 
 extern M_YAAL_HCORE_PUBLIC_API bool _isKilled_;
 
+struct LexicalCast {};
+
 /*! \brief Convert between distinct datatypes.
  *
  * \tparam to_t - destination type.

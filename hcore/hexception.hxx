@@ -39,6 +39,7 @@ Copyright:
 #ifdef __YAAL_BUILD__
 #	include "config.hxx"
 #endif /* __YAAL_BUILD__ */
+#include "hcore/base.hxx"
 #include "hcore/trait.hxx"
 #include "hcore/hstring.hxx"
 
@@ -73,7 +74,6 @@ protected:
 	char const* _fileName; /*!< Log each frame only once. */
 	char const* _functionName; /*!< Log each frame only once. */
 	HString _message; /*!< Exception messege. */
-public:
 	/*! \brief Construct exception object.
 	 *
 	 * \param fileName_ - source code file name where exception has been generated.
@@ -85,6 +85,7 @@ public:
 	HException( char const* fileName_, int line_, char const* functionName_,
 			HString const& message_, int const code_ = 0 );
 	HException( HException const& );
+public:
 	virtual ~HException( void );
 	void print_error( void ) const;
 	/*! \brief Log exception frame.
@@ -124,10 +125,12 @@ HString type_name( void )
 
 /*! \brief Template used to create type specyfic exceptions.
  */
-template<typename tType, typename base_type = HException>
-class HExceptionT : public base_type
+template<typename tType, typename base_type_t = HException>
+class HExceptionT : public base_type_t
 	{
 public:
+	typedef base_type_t base_type;
+	typedef HExceptionT<tType, base_type> this_type;
 	HExceptionT( HString const& reason_, int code_ = errno, HString const& symbol_ = type_name<tType>() )
 		: base_type( _exceptionType_, 0, symbol_.raw(), reason_, code_ )
 		{ }
@@ -139,6 +142,7 @@ public:
 	};
 
 typedef HExceptionT<HString> HStringException;
+typedef HExceptionT<LexicalCast> HLexicalCastException;
 
 /*! \brief Failed assertion exception.
  *

@@ -91,6 +91,7 @@ static int const MAX_VALID_INTEGER_LENGTH = 32;
 
 HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ )
 	{
+	typedef LexicalCast this_type;
 	/* how to choose correct base:
 	 *
 	 * 0     -> 10
@@ -168,6 +169,7 @@ int long long unsigned lexical_cast( HString const& str_ )
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	int long long unsigned val( ::strtoull( preParsed.second, NULL, preParsed.first ) );
+	typedef LexicalCast this_type;
 	M_ENSURE_EX( ( val && ( val != ULONG_MAX ) ) || ! errno, str_ );
 	return ( val );
 	M_EPILOG
@@ -205,6 +207,7 @@ int long long lexical_cast( HString const& str_ )
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	int long long val( ::strtoll( preParsed.second, NULL, preParsed.first ) );
+	typedef LexicalCast this_type;
 	M_ENSURE_EX( ( val && ( val != LONG_MIN ) && ( val != LONG_MAX ) ) || ! errno, str_ );
 	return ( val );
 	M_EPILOG
@@ -332,6 +335,7 @@ bool lexical_cast( char const* const& value_ )
 		{
 		message = "bad value: ";
 		message += value_;
+		typedef LexicalCast this_type;
 		M_THROW( message, bVal );
 		}
 	return ( bVal );
