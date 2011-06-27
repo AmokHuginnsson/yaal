@@ -175,8 +175,8 @@ class HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::HIterator
 	view_type const* _owner;
 	iterator_t _engine;
 public:
-	HIterator( void ) : _owner( NULL ), _engine() {}
-	HIterator( HIterator const& it_ ) : _owner( it_._owner ), _engine( it_._engine ) {}
+	HIterator( void ) : base_type(), _owner( NULL ), _engine() {}
+	HIterator( HIterator const& it_ ) : base_type(), _owner( it_._owner ), _engine( it_._engine ) {}
 	HIterator& operator = ( HIterator const& it_ )
 		{
 		if ( &it_ != this )
@@ -227,7 +227,7 @@ public:
 		return ( &*(_engine->second) );
 		}
 private:
-	HIterator( view_type const* owner_, iterator_t engine_ ) : _owner( owner_ ), _engine( engine_ ) {}
+	HIterator( view_type const* owner_, iterator_t engine_ ) : base_type(), _owner( owner_ ), _engine( engine_ ) {}
 	friend class HTwoWayMap<left_type_t, right_type_t>;
 	};
 
