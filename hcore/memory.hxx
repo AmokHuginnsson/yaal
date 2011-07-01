@@ -30,6 +30,8 @@ Copyright:
 #ifndef YAAL_HCORE_MEMORY_HXX_INCLUDED
 #define YAAL_HCORE_MEMORY_HXX_INCLUDED 1
 
+#include "hcore/hexception.hxx"
+
 namespace yaal
 {
 
@@ -37,6 +39,22 @@ namespace yaal
  */
 namespace memory
 {
+
+struct YaalNew {};
+
+static YaalNew yaal __attribute__((used));
+
+struct MemoryAllocation {};
+typedef yaal::hcore::HExceptionT<MemoryAllocation> HMemoryAllocationException;
+
+struct ON_ALLOC_FAILURE
+	{
+	typedef enum
+		{
+		ABORT,
+		THROW
+		} on_alloc_failure_t;
+	};
 
 void* alloc( int long );
 void* calloc( int long );
@@ -72,6 +90,8 @@ inline void free( tType& pointer_ ) throw()
 }
 
 }
+
+void* operator new ( int long unsigned, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException );
 
 #endif /* #ifndef YAAL_HCORE_MEMORY_HXX_INCLUDED */
 

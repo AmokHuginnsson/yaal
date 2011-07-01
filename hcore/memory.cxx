@@ -24,10 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <new>
 #include <cstdlib>
-#include <cstdio>
 #include <cstring>
-#include <libintl.h>
+#include <cstdio>
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -40,54 +40,54 @@ namespace yaal
 namespace memory
 {
 
+ON_ALLOC_FAILURE::on_alloc_failure_t _onAllocFailure_ = ON_ALLOC_FAILURE::ABORT;
+
 void* alloc( int long size_ )
 	{
-	register void* newPtr = NULL;
-	if ( size_ < 0 )
-		{
-		::perror( _( "memory::malloc: requested size lower than 0" ) );
-		::abort();
-		}
-	newPtr = ::malloc( size_ );
+	M_ASSERT( ( size_ > 0 ) && "memory::malloc: requested size lower than 0" );
+	register void* newPtr( ::malloc( size_ ) );
 	if ( newPtr == 0 )
 		{
-		::perror( _( "memory::malloc: malloc returned NULL" ) );
-		::abort();
+		char const msg[] = "memory::malloc: malloc returned NULL";
+		if ( _onAllocFailure_ == ON_ALLOC_FAILURE::ABORT )
+			{
+			::perror( msg );
+			::abort();
+			}
+		else
+			throw HMemoryAllocationException( msg );
 		}
 	return ( newPtr );
 	}
 
 void* calloc( int long size_ )
 	{
-	register void* newPtr = alloc( size_ );
+	register void* newPtr( alloc( size_ ) );
 	::memset( newPtr, 0, size_ );
 	return ( newPtr );
 	}
 
 void* realloc( void* ptr_, int long size_ )
 	{
-	register void* newPtr = NULL;
-	if ( size_ < 0 )
-		{
-		::perror( _( "memory::realloc: requested size lower than 0" ) );
-		::abort();
-		}
-	newPtr = ::realloc( ptr_, size_ );
+	M_ASSERT( ( size_ >= 0 ) && "memory::realloc: requested size lower than 0" );
+	register void* newPtr( ::realloc( ptr_, size_ ) );
 	if ( newPtr == 0 )
 		{
-		::perror( _( "memory::realloc: realloc returned NULL" ) );
-		::abort();
+		char const msg[] = "memory::realloc: realloc returned NULL";
+		if ( _onAllocFailure_ == ON_ALLOC_FAILURE::ABORT )
+			{
+			::perror( msg );
+			::abort();
+			}
+		else
+			throw HMemoryAllocationException( msg );
 		}
 	return ( newPtr );
 	}
 
 void free0( void* ptr_ ) throw()
 	{
-	if ( ptr_ == NULL )
-		{
-		::perror( "memory::free0: request to free NULL pointer" );
-		::abort();
-		}
+	M_ASSERT( ( ptr_ != NULL ) && "memory::free0: request to free NULL pointer" );
 	::free( ptr_ );
 	return;
 	}
@@ -95,4 +95,22 @@ void free0( void* ptr_ ) throw()
 }
 
 }
+
+void* operator new ( int long unsigned size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException )
+	{
+	M_ASSERT( ( size_ > 0 ) && "yaal::memory::new: requested size lower than 0" );
+	void* newPtr( ::operator new ( size_, std::nothrow ) );
+	if ( newPtr == 0 )
+		{
+		char const msg[] = "yaal::memory::new: new returned NULL";
+		if ( yaal::memory::_onAllocFailure_ == yaal::memory::ON_ALLOC_FAILURE::ABORT )
+			{
+			::perror( msg );
+			::abort();
+			}
+		else
+			throw yaal::memory::HMemoryAllocationException( msg );
+		}
+	return ( newPtr );
+	}
 

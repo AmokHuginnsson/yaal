@@ -27,6 +27,14 @@
 # with set_env configuration command one can preset any environment
 # variable, set_env can be used in all sections
 
+# on_alloc_failure
+# type: special(alternative-flag), default: ABORT
+# on_alloc_failure determinaes library behavior on memory allocation failure
+# valid memory allocation responses are: ABORT or THROW,
+# where ABORT means terminate process imediatelly with SIGABRT,
+# THROW means throw proper exception and possiby continue execution.
+on_alloc_failure THROW
+
 # log_mask
 # type: special(multi-flag), default: (empty)
 # log_mask decides what types of information will be logged

@@ -38,6 +38,7 @@ char const COPYRIGHT [ ] =
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hcore.hxx"
+#include "memory.hxx"
 #include "hlog.hxx"
 #include "hstring.hxx"
 #include "htokenizer.hxx"
@@ -49,6 +50,13 @@ M_VCSID( "$Id: "__TID__" $" )
 
 namespace yaal
 {
+
+namespace memory
+{
+
+extern ON_ALLOC_FAILURE::on_alloc_failure_t _onAllocFailure_;
+
+}
 
 namespace hcore
 {
@@ -109,6 +117,15 @@ bool set_hcore_variables( HString& option_, HString& value_ )
 			HSemaphore::DEFAULT = HSemaphore::TYPE::POSIX;
 		else if ( value_ == "YAAL" )
 			HSemaphore::DEFAULT = HSemaphore::TYPE::YAAL;
+		else
+			fail = true;
+		}
+	else if ( ! strcasecmp( option_, "on_alloc_failure" ) )
+		{
+		if ( value_ == "ABORT" )
+			memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::ABORT;
+		else if ( value_ == "THROW" )
+			memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::THROW;
 		else
 			fail = true;
 		}
@@ -272,6 +289,7 @@ HCoreInitDeinit::HCoreInitDeinit( void )
 		( "resolve_hostnames", program_options_helper::option_value( HSocket::_resolveHostnames ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Resolve IP address into host names." )
 		( "thread_stack_size", program_options_helper::option_value( HThread::_threadStackSize ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Set size of stack for newly created threads." )
 		( "semaphore_type", program_options_helper::option_value( dummy ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Default semaphore implementation type.", "type" )
+		( "on_alloc_failure", program_options_helper::option_value( dummy ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Memory allocation failure handling policy.", "policy" )
 		( "write_timeout", program_options_helper::option_value( _writeTimeout_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Time-out for low level write operations." );
 	yaal_options().process_rc_file( "yaal", "core", set_hcore_variables );
 	if ( _writeTimeout_ < LOW_TIMEOUT_WARNING )

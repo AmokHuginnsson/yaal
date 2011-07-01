@@ -33,6 +33,7 @@ Copyright:
 #include <new>
 
 #include "hcore/base.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/algorithm.hxx"
 #include "hcore/pod.hxx"
@@ -288,7 +289,7 @@ HDeque<type_t>::HDeque( HDeque const& deque )
 		value_type const* const* srcChunks = deque._chunks.template get<value_type const*>();
 		value_type** chunks = _chunks.get<value_type*>();
 		for ( int long i( firstUsedChunkIndex ), chunksCount( deque._chunks.template count_of<value_type*>() ); ( i < chunksCount ) && srcChunks[ i ]; ++ i )
-			chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
+			chunks[ i ] = static_cast<value_type*>( operator new ( CHUNK_SIZE, memory::yaal ) );
 		for ( int long i( deque._start ), endIdx( deque._start + deque._size ); i < endIdx; ++ i )
 			new ( chunks[ i / VALUES_PER_CHUNK ] + ( i % VALUES_PER_CHUNK ) ) value_type( srcChunks[ i / VALUES_PER_CHUNK ][ i % VALUES_PER_CHUNK ] );
 		_start = deque._start;
@@ -366,7 +367,7 @@ void HDeque<type_t>::clear( void )
 			CAPACITY( _chunks.count_of<value_type*>() );
 			( i < CAPACITY ) && chunks[ i ]; ++ i )
 		{
-		delete [] static_cast<char*>( static_cast<void*>( chunks[ i ] ) );
+		delete static_cast<void*>( chunks[ i ] );
 		chunks[ i ] = NULL;
 		}
 	_size = 0;
@@ -454,13 +455,13 @@ void HDeque<type_t>::accommodate_chunks( int long size_ )
 		if ( size_ > 0 )
 			{
 			for ( int long i( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ); ( i >= ( newFirstChunkIndex + usedChunksCount ) ) && ! chunks[ i ]; -- i )
-				chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
+				chunks[ i ] = static_cast<value_type*>( operator new ( CHUNK_SIZE, memory::yaal ) );
 			}
 		else if ( size_ < 0 )
 			{
 			M_ASSERT( ( _start + size_ ) >= 0 );
 			for ( int long i( ( _start + size_ ) / VALUES_PER_CHUNK ); ( i < newFirstChunkIndex ) && ! chunks[ i ]; ++ i )
-				chunks[ i ] = static_cast<value_type*>( static_cast<void*>( new char[ CHUNK_SIZE ] ) );
+				chunks[ i ] = static_cast<value_type*>( operator new (  CHUNK_SIZE, memory::yaal ) );
 			}
 		}
 	return;
@@ -491,7 +492,7 @@ void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ )
 		for ( int long i( ( ( ( _start + size_ - 1 ) >= _start ? ( _start + size_ - 1 ) : _start + size_ ) / VALUES_PER_CHUNK ) + ( size_ ? 1 : 0 ) ),
 				lastChunkIndex( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ); i < lastChunkIndex; ++ i )
 			{
-			delete [] static_cast<char*>( static_cast<void*>( chunks[ i ] ) );
+			delete static_cast<void*>( chunks[ i ] );
 			chunks[ i ] = NULL;
 			}
 		}
@@ -602,7 +603,7 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 					chunkIndex < newFirstChunkIndex; ++ chunkIndex )
 				{
 				M_ASSERT( chunks[ chunkIndex ] );
-				delete [] static_cast<char*>( static_cast<void*>( chunks[ chunkIndex ] ) );
+				delete static_cast<void*>( chunks[ chunkIndex ] );
 				chunks[ chunkIndex ] = NULL;
 				}
 			_start += toRemove;
@@ -619,7 +620,7 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 					++ chunkIndex )
 				{
 				M_ASSERT( chunks[ chunkIndex ] );
-				delete [] static_cast<char*>( static_cast<void*>( chunks[ chunkIndex ] ) );
+				delete static_cast<void*>( chunks[ chunkIndex ] );
 				chunks[ chunkIndex ] = NULL;
 				}
 			}

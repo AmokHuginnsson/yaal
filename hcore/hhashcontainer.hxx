@@ -30,8 +30,7 @@ Copyright:
 #ifndef YAAL_HCORE_HHASHCONTAINER_HXX_INCLUDED
 #define YAAL_HCORE_HHASHCONTAINER_HXX_INCLUDED 1
 
-#include <new>
-
+#include "hcore/memory.hxx"
 #include "hcore/trait.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/hpair.hxx"
@@ -228,9 +227,7 @@ HPair<HHashContainer::HIterator, bool> HHashContainer::insert( tType const& val_
 		{
 		if ( ( _size + 1 ) > _prime )
 			resize( ( _size + 1 ) * 2, hasher_ );
-		HAtom<typename hasher_t::value_type>* atom = new ( std::nothrow ) HAtom<typename hasher_t::value_type>( val_ );
-		if ( ! atom )
-			M_THROW( "memory allocation error", errno );
+		HAtom<typename hasher_t::value_type>* atom = new ( memory::yaal ) HAtom<typename hasher_t::value_type>( val_ );
 
 		/* I cannot use index calculated in find() call above because here we use different prime.
 		 */
