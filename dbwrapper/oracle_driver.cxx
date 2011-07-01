@@ -34,7 +34,7 @@ Copyright:
 #define __STRICT_ANSI__
 #include <oci.h>
 
-#include "hcore/xalloc.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/base.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
@@ -78,16 +78,16 @@ OOracle* _brokenDB_ = NULL;
 void db_disconnect( void* );
 void db_unquery( void* );
 
-void* db_connect ( char const* /* In Oracle user name is name of schema. */,
+void* db_connect( char const* /* In Oracle user name is name of schema. */,
 		char const* login_, char const* password_ )
 	{
-	OOracle* oracle = NULL;
+	OOracle* oracle( NULL );
 	if ( _brokenDB_ )
 		{
 		db_disconnect( _brokenDB_ );
 		_brokenDB_ = NULL;
 		}
-	oracle = xcalloc<OOracle>( 1 );
+	oracle = memory::calloc<OOracle>( 1 );
 	if ( ( oracle->_status = OCIInitialize( OCI_DEFAULT, NULL, NULL,
 					NULL, NULL ) ) != OCI_SUCCESS )
 		{
@@ -125,7 +125,7 @@ void* db_connect ( char const* /* In Oracle user name is name of schema. */,
 
 void db_disconnect( void* data_ )
 	{
-	OOracle* oracle = static_cast<OOracle*>( data_ );
+	OOracle* oracle( static_cast<OOracle*>( data_ ) );
 	if ( ! oracle )
 		oracle = _brokenDB_;
 	if ( oracle )
@@ -139,15 +139,15 @@ void db_disconnect( void* data_ )
 		if ( oracle->_environment )
 			OCIHandleFree ( oracle->_environment, OCI_HTYPE_ENV );
 		oracle->_environment = NULL;
-		xfree ( oracle );
+		memory::free( oracle );
 		}
 	return;
 	}
 
 int db_errno( void* data_ )
 	{
-	int error = 0;
-	OOracle const* oracle = NULL;
+	int error( 0 );
+	OOracle const* oracle( NULL );
 	if ( ! data_ )
 		data_ = _brokenDB_;
 	if ( ! data_ )
@@ -163,9 +163,9 @@ int db_errno( void* data_ )
 
 char const* db_error( void* data_ )
 	{
-	sb4 code = 0;
+	sb4 code( 0 );
 	static char textBuffer[ OCI_ERROR_MAXMSG_SIZE ];
-	OOracle const* oracle = NULL;
+	OOracle const* oracle( NULL );
 	if ( ! data_ )
 		data_ = _brokenDB_;
 	if ( ! data_ )
@@ -175,7 +175,7 @@ char const* db_error( void* data_ )
 		{
 		case ( OCI_SUCCESS_WITH_INFO ):
 		case ( OCI_ERROR ):
-			OCIErrorGet( oracle->_error, 1, NULL, & code,
+			OCIErrorGet( oracle->_error, 1, NULL, &code,
 					reinterpret_cast<OraText*>( textBuffer ),
 					OCI_ERROR_MAXMSG_SIZE - 2, OCI_HTYPE_ERROR );
 		break;
@@ -198,9 +198,9 @@ char const* db_error( void* data_ )
 
 void* db_query( void* data_, char const* query_ )
 	{
-	OOracle* oracle = static_cast<OOracle*> ( data_ );
-	OQuery* queryObj = xcalloc<OQuery>( 1 );
-	HString queryStr = query_;
+	OOracle* oracle( static_cast<OOracle*>( data_ ) );
+	OQuery* queryObj( memory::calloc<OQuery>( 1 ) );
+	HString queryStr( query_ );
 	int iters = 0;
 	int length = static_cast<int>( ::strlen( query_ ) );
 	char* end = ( const_cast<char*>( query_ ) + length ) - 1;
@@ -250,34 +250,34 @@ void* db_query( void* data_, char const* query_ )
 
 void db_unquery( void* data_ )
 	{
-	OAllocator * allocator = NULL;
-	OQuery* query = static_cast<OQuery*>( data_ );
+	OAllocator* allocator( NULL );
+	OQuery* query( static_cast<OQuery*>( data_ ) );
 	if ( ( ( * query->_status ) == OCI_SUCCESS )
 			|| ( ( * query->_status ) == OCI_SUCCESS_WITH_INFO ) )
 		( * query->_status ) = OCIStmtRelease( query->_statement,
 				query->_error, NULL, 0, OCI_DEFAULT );
 	else
-		OCIStmtRelease ( query->_statement,
+		OCIStmtRelease( query->_statement,
 				NULL, NULL, 0, OCI_DEFAULT );
 	allocator = query->_allocator;
 	while ( allocator )
 		{
 		allocator = query->_allocator->_next;
-		xfree ( query->_allocator );
+		memory::free ( query->_allocator );
 		query->_allocator = allocator;
 		}
-	xfree ( query );
+	memory::free ( query );
 	return;
 	}
 
 char const* rs_get( void* data_, int long row_, int column_ )
 	{
-	int size = 0;
-	char* data = NULL;
+	int size( 0 );
+	char* data( NULL );
 	OAllocator* allocator;
-	OCIParam* parameter = NULL;
-	OCIDefine* result = NULL;
-	OQuery* query = static_cast<OQuery*>( data_ );
+	OCIParam* parameter( NULL );
+	OCIDefine* result( NULL );
+	OQuery* query( static_cast<OQuery*>( data_ ) );
 	if ( ( ( *query->_status ) = OCIParamGet( query->_statement,
 					OCI_HTYPE_STMT, query->_error,
 					reinterpret_cast<void**>( &parameter ), column_ + 1 ) ) == OCI_SUCCESS )
@@ -286,7 +286,7 @@ char const* rs_get( void* data_, int long row_, int column_ )
 						OCI_DTYPE_PARAM, &size, 0, OCI_ATTR_DATA_SIZE,
 						query->_error ) ) == OCI_SUCCESS )
 			{
-			data = xcalloc<char>( size + 1 );
+			data = memory::calloc<char>( size + 1 );
 			if ( ( ( *query->_status ) = OCIDefineByPos( query->_statement,
 							&result, query->_error, column_ + 1, data, size + 1,
 							SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT ) ) == OCI_SUCCESS )
@@ -295,7 +295,7 @@ char const* rs_get( void* data_, int long row_, int column_ )
 								query->_error, 1, OCI_FETCH_ABSOLUTE, static_cast<ub4>( row_ ),
 								OCI_DEFAULT ) ) == OCI_SUCCESS )
 					{
-					allocator = xcalloc<OAllocator>( 1 );
+					allocator = memory::calloc<OAllocator>( 1 );
 					allocator->_buffer = data;
 					if ( query->_allocator )
 						query->_allocator->_next = allocator;
@@ -303,7 +303,7 @@ char const* rs_get( void* data_, int long row_, int column_ )
 						query->_allocator = allocator;
 					}
 				else
-					xfree ( data );
+					memory::free( data );
 				}
 			}
 		}
@@ -314,8 +314,8 @@ char const* rs_get( void* data_, int long row_, int column_ )
 
 int rs_fields_count( void* data_ )
 	{
-	int fields = - 1;
-	OQuery* query = static_cast<OQuery*>( data_ );
+	int fields( -1 );
+	OQuery* query( static_cast<OQuery*>( data_ ) );
 	if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
 					OCI_HTYPE_STMT, & fields, 0, OCI_ATTR_PARAM_COUNT,
 					query->_error ) ) != OCI_SUCCESS )
@@ -323,40 +323,40 @@ int rs_fields_count( void* data_ )
 	return ( fields );
 	}
 
-int long dbrs_records_count ( void*, void* dataR_ )
+int long dbrs_records_count( void*, void* dataR_ )
 	{
-	int rows = 0;
-	OQuery* query = static_cast<OQuery*>( dataR_ );
-	( *query->_status ) = OCIStmtFetch2 ( query->_statement,
-																								 query->_error, 1,
-																								 OCI_FETCH_LAST, 0,
-																								 OCI_DEFAULT );
+	int rows( 0 );
+	OQuery* query( static_cast<OQuery*>( dataR_ ) );
+	( *query->_status ) = OCIStmtFetch2( query->_statement,
+			 query->_error, 1,
+			 OCI_FETCH_LAST, 0,
+			 OCI_DEFAULT );
 	if ( ( ( *query->_status ) != OCI_SUCCESS )
 			&& ( ( *query->_status ) != OCI_SUCCESS_WITH_INFO ) )
 		{
 		log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to fetch last row." << endl;
-		return ( - 1 );
+		return ( -1 );
 		}
-	if ( ( ( *query->_status ) = OCIAttrGet ( query->_statement,
+	if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
 					OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_CURRENT_POSITION,
 					query->_error ) ) != OCI_SUCCESS )
 		{
-		if ( ( ( *query->_status ) = OCIAttrGet ( query->_statement,
+		if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
 						OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_ROW_COUNT,
 						query->_error ) ) != OCI_SUCCESS )
-			rows = - 1;
+			rows = -1;
 		}
 	return ( rows );
 	}
 
 int long dbrs_id( void*, void* dataR_ )
 	{
-	int nameLength = 0;
-	int long id = 0;
+	int nameLength( 0 );
+	int long id( 0 );
 	HString sQL;
-	text* name = NULL;
-	OQuery* query = static_cast<OQuery*>( dataR_ );
-	OQuery* autonumber = NULL;
+	text* name( NULL );
+	OQuery* query( static_cast<OQuery*>( dataR_ ) );
+	OQuery* autonumber( NULL );
 	if ( ( ( *query->_status ) = OCIAttrGet ( query->_statement,
 					OCI_HTYPE_STMT, &name,
 					reinterpret_cast<ub4*>( &nameLength ),
@@ -372,11 +372,11 @@ int long dbrs_id( void*, void* dataR_ )
 	return ( id );
 	}
 
-char const* rs_column_name ( void* dataR_, int field_ )
+char const* rs_column_name( void* dataR_, int field_ )
 	{
-	int nameLength = 0;
-	text* name = NULL;
-	OCIParam* parameter = NULL;
+	int nameLength( 0 );
+	text* name( NULL );
+	OCIParam* parameter( NULL );
 	OQuery* query = static_cast<OQuery*>( dataR_ );
 	if ( ( ( *query->_status ) = OCIParamGet( query->_statement,
 					OCI_HTYPE_STMT, query->_error,
