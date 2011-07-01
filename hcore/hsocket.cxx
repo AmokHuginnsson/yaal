@@ -40,7 +40,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hsocket.hxx"
-#include "xalloc.hxx"
+#include "memory.hxx"
 #include "hstring.hxx"
 #include "system.hxx"
 #include "hlog.hxx"
@@ -106,9 +106,9 @@ HSocket::HSocket( socket_type_t const& socketType_,
 			}
 		}
 	if ( !!( _type & TYPE::NETWORK ) )
-		_address = xcalloc<sockaddr_in>( 1 );
+		_address = memory::calloc<sockaddr_in>( 1 );
 	else
-		_address = xcalloc<sockaddr_un>( 1 );
+		_address = memory::calloc<sockaddr_un>( 1 );
 	return;
 	M_EPILOG
 	}
@@ -120,7 +120,7 @@ HSocket::~HSocket( void )
 	/* There will be no memory leakage if shutdown() throws,
 	 * because application has to terminate. */
 	if ( _address )
-		xfree( _address );
+		memory::free( _address );
 	return;
 	M_DESTRUCTOR_EPILOG
 	}

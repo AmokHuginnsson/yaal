@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	xalloc.hxx - this file is integral part of `yaal' project.
+	hcore/memory.hxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -23,49 +23,48 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hcore/memory.hxx
+ * \brief Declarations of basic memory functions.
+ */
 
-#ifndef YAAL_HCORE_XALLOC_HXX_INCLUDED
-#define YAAL_HCORE_XALLOC_HXX_INCLUDED 1
+#ifndef YAAL_HCORE_MEMORY_HXX_INCLUDED
+#define YAAL_HCORE_MEMORY_HXX_INCLUDED 1
 
 namespace yaal
 {
 
-/*! \brief Core functionality.
- * 
- * This namespace contains core library functionality that is
- * independent from UI or external software.
+/*! \brief Memory handling routines.
  */
-namespace hcore
+namespace memory
 {
 
-void* xmalloc_internal( int long const );
-void* xcalloc_internal( int long const );
-void* xrealloc_internal( void*, int long const );
-void xfree_internal( void* ) throw();
-char* xstrdup ( char const* const );
+void* alloc( int long );
+void* calloc( int long );
+void* realloc( void*, int long );
+void free0( void* ) throw();
 
 template<typename tType>
-inline tType* xmalloc( int long const count_ )
+inline tType* alloc( int long count_ )
 	{
-	return ( static_cast<tType*>( xmalloc_internal( count_ * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( alloc( count_ * sizeof ( tType ) ) ) );
 	}
 
 template<typename tType>
-inline tType* xcalloc( int long const count_ )
+inline tType* calloc( int long count_ )
 	{
-	return ( static_cast<tType*>( xcalloc_internal( count_ * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( calloc( count_ * sizeof ( tType ) ) ) );
 	}
 
 template<typename tType>
-inline tType* xrealloc( void* pointer_, int long const count_ )
+inline tType* realloc( void* pointer_, int long count_ )
 	{
-	return ( static_cast<tType*>( xrealloc_internal ( pointer_, count_ * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( realloc( pointer_, count_ * sizeof ( tType ) ) ) );
 	}
 
 template<typename tType>
-inline void xfree( tType& pointer_ ) throw()
+inline void free( tType& pointer_ ) throw()
 	{
-	xfree_internal( pointer_ );
+	free0( pointer_ );
 	pointer_ = NULL;
 	return;
 	}
@@ -74,5 +73,5 @@ inline void xfree( tType& pointer_ ) throw()
 
 }
 
-#endif /* #ifndef YAAL_HCORE_XALLOC_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCORE_MEMORY_HXX_INCLUDED */
 

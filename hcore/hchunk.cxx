@@ -31,7 +31,7 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hchunk.hxx"
 #include "algorithm.hxx"
-#include "xalloc.hxx"
+#include "memory.hxx"
 
 namespace yaal
 {
@@ -65,7 +65,7 @@ HChunk::~HChunk( void )
 void HChunk::free( void )
 	{
 	if ( _data )
-		xfree( _data );
+		memory::free( _data );
 	_size = 0;
 	return;
 	}
@@ -87,7 +87,7 @@ void* HChunk::realloc( int long size_, STRATEGY::enum_t strategy_ )
 			{
 			M_ASSERT( strategy_ == STRATEGY::EXACT );
 			}
-		_data = xrealloc<char>( _data, size_ );
+		_data = memory::realloc<char>( _data, size_ );
 		::memset( static_cast<char*>( _data ) + _size, 0, size_ - _size );
 		_size = size_;
 		}

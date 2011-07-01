@@ -34,7 +34,6 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "tools.hxx"
 #include "hcore/hcore.hxx"
-#include "hcore/xalloc.hxx"
 #include "hcore/hprogramoptionshandler.hxx"    /* read conf from rc */
 #include "hcore/hlog.hxx"       /* log object */
 #include "hcore/hstring.hxx"    /* HString class */
@@ -228,3 +227,4 @@ int yaal_tools_main( int, char** )
 		}
 	return ( 0 );
 	}
+

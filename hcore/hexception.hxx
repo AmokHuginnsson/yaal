@@ -49,6 +49,11 @@ typedef void base_type;
 namespace yaal
 {
 
+/*! \brief Core functionality.
+ * 
+ * This namespace contains core library functionality that is
+ * independent from UI or external software.
+ */
 namespace hcore
 {
 

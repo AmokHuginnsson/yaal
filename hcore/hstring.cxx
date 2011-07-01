@@ -35,7 +35,7 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "algorithm.hxx"
 #include "hstring.hxx"
-#include "xalloc.hxx"
+#include "memory.hxx"
 #include "hchunk.hxx"
 
 namespace yaal
@@ -100,7 +100,7 @@ HString::~HString( void )
 	{
 	M_PROLOG
 	if ( ! IS_INPLACE )
-		xfree( *reinterpret_cast<char**>( _mem ) );
+		memory::free( *reinterpret_cast<char**>( _mem ) );
 	return;
 	M_DESTRUCTOR_EPILOG
 	}
@@ -143,13 +143,13 @@ void HString::hs_realloc( int long const preallocate_ )
 			newAllocBytes <<= 1;
 		if ( ! IS_INPLACE )
 			{
-			*reinterpret_cast<char**>( _mem ) = xrealloc<char>( MEM, newAllocBytes );
+			*reinterpret_cast<char**>( _mem ) = memory::realloc<char>( MEM, newAllocBytes );
 			SET_ALLOC_BYTES( newAllocBytes );
 			::std::memset( MEM + oldAllocBytes, 0, newAllocBytes - oldAllocBytes );
 			}
 		else
 			{
-			char* newMem( xcalloc<char>( newAllocBytes ) );
+			char* newMem( memory::calloc<char>( newAllocBytes ) );
 			int long origSize( GET_SIZE );
 			::std::strncpy( newMem, _mem, origSize );
 			*reinterpret_cast<char**>( _mem ) = newMem;

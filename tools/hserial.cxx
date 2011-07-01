@@ -42,7 +42,6 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hserial.hxx"
 #include "tools.hxx"
 
-#include "hcore/xalloc.hxx"
 #include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;

@@ -34,7 +34,6 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hfsitem.hxx"
-#include "hcore/xalloc.hxx"
 #include "hcore/system.hxx"
 
 using namespace yaal;

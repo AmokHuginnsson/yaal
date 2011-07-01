@@ -32,7 +32,6 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
-#include "hcore/xalloc.hxx"
 #include "hcore/htree.hxx"
 #include "hcore/hcore.hxx"
 #include "hcore/math.hxx"

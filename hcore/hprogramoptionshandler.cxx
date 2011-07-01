@@ -35,7 +35,6 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hprogramoptionshandler.hxx"
 #include "functional.hxx"
-#include "xalloc.hxx"
 #include "hstring.hxx"
 #include "hchunk.hxx"
 #include "hpattern.hxx"
@@ -559,43 +558,6 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 		}
 	return ( 0 );
 	M_EPILOG
-	}
-
-void rc_set_variable( char const* const value_, bool& variable_ )
-	{
-	M_PROLOG
-	variable_ = lexical_cast<bool>( value_ );
-	M_EPILOG
-	return;
-	}
-
-void rc_set_variable( char const * const value_, char** variable_ )
-	{
-	if ( *variable_ )
-		xfree( *variable_ );
-	*variable_ = NULL;
-	*variable_ = xstrdup( value_ );
-	return;
-	}
-
-void rc_set_variable( char const* const value_, int& variable_ )
-	{
-	variable_ = lexical_cast<int>( value_ );
-	}
-
-void rc_set_variable( char const* const value_, double long& variable_ )
-	{
-	variable_ = lexical_cast<double long>( value_ );
-	}
-
-void rc_set_variable( char const* const value_, double& variable_ )
-	{
-	variable_ = lexical_cast<double>( value_ );
-	}
-
-void rc_set_variable( char const* const value_, char& variable_ )
-	{
-	variable_ = value_[ 0 ];
 	}
 
 void HProgramOptionsHandler::set_option( OOption& option_, HString const& value_ )

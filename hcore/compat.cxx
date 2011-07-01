@@ -50,7 +50,6 @@ Copyright:
 #endif /* not HAVE_STRCASESTR */
 
 #include "base.hxx"
-#include "xalloc.hxx"
 
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )

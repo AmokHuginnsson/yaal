@@ -29,7 +29,7 @@ Copyright:
 #include <cstring>
 #include <cstdlib>
 
-#include "hcore/xalloc.hxx"
+#include "hcore/memory.hxx"
 
 #include "config.hxx"
 

@@ -61,7 +61,6 @@ struct execution_info
  */
 void dump_call_stack( HStreamInterface&, int frames );
 
-
 }
 
 }

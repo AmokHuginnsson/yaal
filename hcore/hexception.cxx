@@ -35,7 +35,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hexception.hxx"
-#include "xalloc.hxx"
+#include "memory.hxx"
 #include "hlog.hxx"
 #include "hfile.hxx"
 #include "introspect.hxx"
@@ -193,7 +193,7 @@ HString demangle( char const* symbolName_ )
 	if ( p )
 		{
 		symbol = p;
-		xfree( p );
+		memory::free( p );
 		}
 	return ( symbol );
 	}

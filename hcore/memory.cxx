@@ -1,7 +1,7 @@
 /*
 ---          `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	xalloc.cxx - this file is integral part of `yaal' project.
+	memory.cxx - this file is integral part of `yaal' project.
 
 	i.  You may not make any changes in Copyright information.
 	ii. You must attach Copyright information to any part of every copy
@@ -32,77 +32,64 @@ Copyright:
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
-#include "xalloc.hxx"
+#include "memory.hxx"
 
 namespace yaal
 {
 
-namespace hcore
+namespace memory
 {
 
-void* xmalloc_internal( int long const size_ )
+void* alloc( int long size_ )
 	{
 	register void* newPtr = NULL;
 	if ( size_ < 0 )
 		{
-		::perror( _( "xmalloc_internal: requested size lower than 0" ) );
+		::perror( _( "memory::malloc: requested size lower than 0" ) );
 		::abort();
 		}
 	newPtr = ::malloc( size_ );
 	if ( newPtr == 0 )
 		{
-		::perror( _( "xmalloc_internal: malloc returned NULL" ) );
+		::perror( _( "memory::malloc: malloc returned NULL" ) );
 		::abort();
 		}
 	return ( newPtr );
 	}
 
-void* xcalloc_internal( int long size_ )
+void* calloc( int long size_ )
 	{
-	register void* newPtr = xmalloc_internal( size_ );
+	register void* newPtr = alloc( size_ );
 	::memset( newPtr, 0, size_ );
 	return ( newPtr );
 	}
 
-void* xrealloc_internal( void* ptr_, int long size_ )
+void* realloc( void* ptr_, int long size_ )
 	{
 	register void* newPtr = NULL;
 	if ( size_ < 0 )
 		{
-		::perror( _( "xrealloc_internal: requested size lower than 0" ) );
+		::perror( _( "memory::realloc: requested size lower than 0" ) );
 		::abort();
 		}
-	newPtr = realloc( ptr_, size_ );
+	newPtr = ::realloc( ptr_, size_ );
 	if ( newPtr == 0 )
 		{
-		::perror( _( "xrealloc_internal: realloc returned NULL" ) );
+		::perror( _( "memory::realloc: realloc returned NULL" ) );
 		::abort();
 		}
 	return ( newPtr );
 	}
 
-void xfree_internal( void* ptr_ ) throw()
+void free0( void* ptr_ ) throw()
 	{
 	if ( ptr_ == NULL )
 		{
-		::perror( "xfree_internal: request to free NULL pointer" );
+		::perror( "memory::free0: request to free NULL pointer" );
 		::abort();
 		}
 	::free( ptr_ );
 	return;
-	}
-
-char* xstrdup( char const* const str_ )
-	{
-	char* str = 0;
-	if ( ! str_ )
-		{
-		::perror( "xstrdup: request to duplicate NULL pointer string" );
-		::abort();
-		}
-	str = yaal::hcore::xcalloc<char>( static_cast<int long>( ::strlen( str_ ) ) + 1 );
-	::strcpy( str, str_ );
-	return ( str );
 	}
 
 }

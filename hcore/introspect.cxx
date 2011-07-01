@@ -29,13 +29,13 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "introspect.hxx"
+#include "memory.hxx"
 
 #if defined( HAVE_EXECINFO_H )
 #include <execinfo.h>
 #endif /* HAVE_EXECINFO_H */
 #include <cxxabi.h>
 
-#include "xalloc.hxx"
 #include "hlog.hxx"
 
 using namespace yaal;
@@ -56,7 +56,7 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int )
 	strings_ptr_t frames( new strings_t );
 #ifdef _EXECINFO_H
 	
-	void** pointer = xcalloc<void*>( level_ + 1 );
+	void** pointer = memory::calloc<void*>( level_ + 1 );
 	int size( backtrace( pointer, level_ ) );
 	char** strings = backtrace_symbols( pointer, size );
 
@@ -78,8 +78,8 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int )
 			}
 		}
 
-	xfree( strings );
-	xfree( pointer );
+	memory::free( strings );
+	memory::free( pointer );
 #endif /* _EXECINFO_H */
 	return ( frames );
 	}
