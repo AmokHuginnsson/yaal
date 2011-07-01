@@ -29,7 +29,6 @@
 
 #include "emu_pwd.hxx"
 #include "hcore/base.hxx"
-#include "hcore/xalloc.hxx"
 #include "hcore/hlog.hxx"
 #include "cleanup.hxx"
 

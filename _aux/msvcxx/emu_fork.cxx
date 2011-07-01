@@ -25,7 +25,7 @@
 #include <sys/wait.h>
 
 #include "synchronizedunorderedset.hxx"
-#include "hcore/xalloc.hxx"
+#include "hcore/memory.hxx"
 #include "cleanup.hxx"
 #include "msio.hxx"
 #include "emu_unistd.hxx"
@@ -52,6 +52,19 @@ HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOn
 	{
 	}
 
+char* xstrdup( char const* const str_ )
+	{
+	char* str = 0;
+	if ( ! str_ )
+		{
+		::perror( "xstrdup: request to duplicate NULL pointer string" );
+		::abort();
+		}
+	str = memory::calloc<char>( static_cast<int long>( ::strlen( str_ ) ) + 1 );
+	::strcpy( str, str_ );
+	return ( str );
+	}
+
 M_EXPORT_SYMBOL
 int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 	{
@@ -68,7 +81,7 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 	M_ENSURE( ::dup2( _out[1], _fileno( stdout ) ) == 0 );
 	M_ENSURE( ::dup2( _err[1], _fileno( stderr ) ) == 0 );
 
-	char** argv = xcalloc<char*>( _argv.size() + 2 );
+	char** argv = memory::calloc<char*>( _argv.size() + 2 );
 	argv[ 0 ] = xstrdup( _path.raw() );
 	int i = 1;
 	for ( HPipedChild::argv_t::iterator it( _argv.begin() ), end( _argv.end() ); it != end; ++ it, ++ i )
@@ -93,8 +106,8 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 		M_THROW( "close", errno );
 
 	for ( int  k = 0, size = _argv.size(); k < size; ++ k )
-		xfree( argv[ k ] );
-	xfree( argv );
+		memory::free( argv[ k ] );
+	memory::free( argv );
 
 	_children_.insert( pid );
 	return ( pid );

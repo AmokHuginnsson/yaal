@@ -24,7 +24,7 @@
 #undef dirent
 
 #include "hcore/base.hxx"
-#include "hcore/xalloc.hxx"
+#include "hcore/memory.hxx"
 #include "cxxabi.h"
 #include "cleanup.hxx"
 
@@ -42,7 +42,7 @@ namespace abi
 
 	char* __cxa_demangle( char const* const a, int, int, int* )
 		{
-		char* buf = xcalloc<char>( MAX_SYMBOL_NAME_LEN );
+		char* buf = memory::calloc<char>( MAX_SYMBOL_NAME_LEN );
 		::UnDecorateSymbolName( a, buf, MAX_SYMBOL_NAME_LEN - 1, 0 );
 		return ( buf );
 		}
@@ -74,7 +74,7 @@ char** backtrace_symbols( void* const* buf_, int size_ )
 	{
 	HANDLE process( ::GetCurrentProcess() );
 	bool fail( false );
-	char** strings = reinterpret_cast<char**>( xcalloc<char>( size_ * ( MAX_SYMBOL_NAME_LEN + 2 + sizeof ( char* ) ) ) );
+	char** strings = reinterpret_cast<char**>( memory::calloc<char>( size_ * ( MAX_SYMBOL_NAME_LEN + 2 + sizeof ( char* ) ) ) );
 	for ( int i( 0 ); i < size_; ++ i )
 		strings[ i ] = reinterpret_cast<char*>( strings + size_ ) + i * ( MAX_SYMBOL_NAME_LEN + 2 );
 	char buffer[ sizeof ( SYMBOL_INFO ) + MAX_SYMBOL_NAME_LEN ];
@@ -99,7 +99,7 @@ char** backtrace_symbols( void* const* buf_, int size_ )
 		}
 	if ( fail )
 		{
-		xfree( strings );
+		memory::free( strings );
 		strings = NULL;
 		}
 	return ( strings );
