@@ -76,6 +76,7 @@
 #pragma warning( disable : 4250 )
 #pragma warning( disable : 4251 )
 #pragma warning( disable : 4275 )
+#pragma warning( disable : 4290 )
 #pragma warning( disable : 4351 )
 #pragma warning( disable : 4345 )
 #pragma warning( disable : 4355 )

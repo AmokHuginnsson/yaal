@@ -30,6 +30,8 @@ Copyright:
 #ifndef YAAL_HCORE_MEMORY_HXX_INCLUDED
 #define YAAL_HCORE_MEMORY_HXX_INCLUDED 1
 
+#include <cstddef>
+
 #include "hcore/hexception.hxx"
 
 namespace yaal
@@ -91,8 +93,10 @@ inline void free( tType& pointer_ ) throw()
 
 }
 
-void* operator new ( int long unsigned, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException );
-void* operator new[] ( int long unsigned, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException );
+void* operator new ( std::size_t, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException );
+void operator delete ( void*, yaal::memory::YaalNew const& ) throw ();
+void* operator new[] ( std::size_t, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException );
+void operator delete[] ( void*, yaal::memory::YaalNew const& ) throw ();
 
 #endif /* #ifndef YAAL_HCORE_MEMORY_HXX_INCLUDED */
 

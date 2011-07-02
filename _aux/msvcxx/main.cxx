@@ -52,8 +52,19 @@ namespace abi
 extern "C" 
 int backtrace( void** buf_, int size_ )
 	{
-	int toFetch( std::min( size_, 63 ) );
+/* Warning!
+ *
+ * Maximum number of frames to capture has changed! (63 => 62)
+ *
+ * Build date: 5/12/2011
+ * Windows Server 2003 and Windows XP:
+ *   The sum of the FramesToSkip and FramesToCapture parameters must be less than 63.
+ */
+	int toFetch( std::min( size_, 62 ) );
+	::SetLastError( 0 );
 	int got( ::CaptureStackBackTrace( 0, toFetch, buf_, NULL ) );
+	if ( ( toFetch > 0 ) && ( got < 1 ) && ( ::GetLastError() != 0 ) )
+		log_windows_error( "CaptureStackBackTrace" );
 	static bool once( false );
 	if ( ! once )
 		{
@@ -86,13 +97,27 @@ char** backtrace_symbols( void* const* buf_, int size_ )
 		{
 		if ( ! ::SymFromAddr( process, reinterpret_cast<DWORD64>( buf_[ i ] ), 0, tester ) )
 			{
-			log_windows_error( "SymFromAddr" );
-			fail = true;
+			if ( ! i )
+				{
+				log_windows_error( "SymFromAddr" );
+				fail = true;
+				}
+			else
+				{
+				char const invalid[] = "(invalid address";
+				for ( ; i < size_; ++ i )
+					::strncpy( strings[i], invalid, sizeof ( invalid ) );
+				}
 			break;
 			}
 		else
 			{
 			strings[i][0] = '(';
+			if ( ! tester->NameLen && tester->Name && tester->Name[0] )
+				{
+				tester->Name[MAX_SYMBOL_NAME_LEN - 1] = 0;
+				tester->NameLen = ::strlen( tester->Name );
+				}
 			::strncpy( strings[i] + 1, tester->Name, tester->NameLen );
 			strings[i][ tester->NameLen + 1 ] = 0;
 			}

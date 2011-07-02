@@ -96,7 +96,7 @@ void free0( void* ptr_ ) throw()
 
 }
 
-void* operator new ( int long unsigned size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException )
+void* operator new ( std::size_t size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException )
 	{
 	M_ASSERT( ( size_ > 0 ) && "yaal::memory::new: requested size lower than 0" );
 	void* newPtr( ::operator new ( size_, std::nothrow ) );
@@ -114,7 +114,12 @@ void* operator new ( int long unsigned size_, yaal::memory::YaalNew const& ) thr
 	return ( newPtr );
 	}
 
-void* operator new[] ( int long unsigned size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException )
+void operator delete ( void* ptr_, yaal::memory::YaalNew const& ) throw ()
+	{
+	::operator delete ( ptr_ );
+	}
+
+void* operator new[] ( std::size_t size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException )
 	{
 	M_ASSERT( ( size_ > 0 ) && "yaal::memory::new[]: requested size lower than 0" );
 	void* newPtr( ::operator new[] ( size_, std::nothrow ) );
@@ -130,5 +135,10 @@ void* operator new[] ( int long unsigned size_, yaal::memory::YaalNew const& ) t
 			throw yaal::memory::HMemoryAllocationException( msg );
 		}
 	return ( newPtr );
+	}
+
+void operator delete[] ( void* ptr_, yaal::memory::YaalNew const& ) throw ()
+	{
+	::operator delete[] ( ptr_ );
 	}
 

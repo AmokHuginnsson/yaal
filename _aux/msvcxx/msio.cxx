@@ -11,6 +11,8 @@
 #include "msio.hxx"
 #include "emu_unistd.hxx"
 
+using namespace yaal;
+
 namespace msvcxx
 {
 
