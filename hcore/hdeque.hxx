@@ -367,7 +367,7 @@ void HDeque<type_t>::clear( void )
 			CAPACITY( _chunks.count_of<value_type*>() );
 			( i < CAPACITY ) && chunks[ i ]; ++ i )
 		{
-		delete static_cast<void*>( chunks[ i ] );
+		operator delete ( static_cast<void*>( chunks[ i ] ) );
 		chunks[ i ] = NULL;
 		}
 	_size = 0;
@@ -492,7 +492,7 @@ void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ )
 		for ( int long i( ( ( ( _start + size_ - 1 ) >= _start ? ( _start + size_ - 1 ) : _start + size_ ) / VALUES_PER_CHUNK ) + ( size_ ? 1 : 0 ) ),
 				lastChunkIndex( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ); i < lastChunkIndex; ++ i )
 			{
-			delete static_cast<void*>( chunks[ i ] );
+			operator delete ( static_cast<void*>( chunks[ i ] ) );
 			chunks[ i ] = NULL;
 			}
 		}
@@ -603,7 +603,7 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 					chunkIndex < newFirstChunkIndex; ++ chunkIndex )
 				{
 				M_ASSERT( chunks[ chunkIndex ] );
-				delete static_cast<void*>( chunks[ chunkIndex ] );
+				operator delete ( static_cast<void*>( chunks[ chunkIndex ] ) );
 				chunks[ chunkIndex ] = NULL;
 				}
 			_start += toRemove;
@@ -620,7 +620,7 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 					++ chunkIndex )
 				{
 				M_ASSERT( chunks[ chunkIndex ] );
-				delete static_cast<void*>( chunks[ chunkIndex ] );
+				operator delete ( static_cast<void*>( chunks[ chunkIndex ] ) );
 				chunks[ chunkIndex ] = NULL;
 				}
 			}
