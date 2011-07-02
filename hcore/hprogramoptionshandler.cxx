@@ -188,7 +188,7 @@ struct ORCLoader
 	};
 
 typedef HList<ORCLoader> rc_loaders_t;
-rc_loaders_t _rCLoades_;
+rc_loaders_t _rCLoaders_;
 bool _rCLoadersLocked_ = false;
 
 }
@@ -278,7 +278,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 	{
 	M_PROLOG
 	if ( ! _rCLoadersLocked_ )
-		_rCLoades_.push_back( ORCLoader( this, rcName_, section_, rc_callback ) );
+		_rCLoaders_.push_back( ORCLoader( this, rcName_, section_, rc_callback ) );
 	struct OPlacement
 		{
 		RC_PATHER::placement_t _placement;
@@ -464,7 +464,7 @@ int reload_configuration( void )
 	M_PROLOG
 	HLocker lock( _rCLoadersLocked_ );
 	log << "Reloading configuration." << endl;
-	for_each( _rCLoades_.begin(), _rCLoades_.end(), cref( process_loader ) );
+	for_each( _rCLoaders_.begin(), _rCLoaders_.end(), cref( process_loader ) );
 	return ( 0 );
 	M_EPILOG
 	}
