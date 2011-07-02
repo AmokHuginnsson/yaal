@@ -31,6 +31,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hformat.hxx"
+#include "hcore/memory.hxx"
 #include "hlist.hxx"
 #include "hmap.hxx"
 #include "hset.hxx"
@@ -138,14 +139,14 @@ class HFormat::HFormatImpl
 
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
 	: _positionIndex( 0 ), _format( fmt ), _buffer(), _string(), _tokens(),
-	_positions( new positions_t ), _args( new args_t )
+	_positions( new ( memory::yaal ) positions_t ), _args( new ( memory::yaal ) args_t )
 	{
 	}
 
 HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
 	: _positionIndex( fi._positionIndex ), _format( fi._format ), _buffer( fi._buffer ),
-	_string( fi._string ), _tokens( fi._tokens ), _positions( new positions_t ),
-	_args( new args_t )
+	_string( fi._string ), _tokens( fi._tokens ), _positions( new ( memory::yaal ) positions_t ),
+	_args( new ( memory::yaal ) args_t )
 	{
 	*_positions = *fi._positions;
 	*_args = *fi._args;
@@ -205,7 +206,7 @@ bool does_intersect( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
 }
 
 HFormat::HFormat( char const* const aFmt )
-	: _impl( new HFormatImpl( aFmt ) )
+	: _impl( new ( memory::yaal ) HFormatImpl( aFmt ) )
 	{
 	M_PROLOG
 	HString fmt( aFmt );
@@ -285,7 +286,7 @@ HFormat::HFormat( format_impl_ptr_t fi )
 	}
 
 HFormat::HFormat( HFormat const& fi )
-	: _impl( new HFormat::HFormatImpl( *(fi._impl) ) )
+	: _impl( new ( memory::yaal ) HFormat::HFormatImpl( *(fi._impl) ) )
 	{
 	}
 

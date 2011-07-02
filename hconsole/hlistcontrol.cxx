@@ -32,6 +32,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hlistcontrol.hxx"
+#include "hcore/memory.hxx"
 #include "hconsole.hxx"
 
 using namespace yaal;
@@ -1252,7 +1253,7 @@ HRow<>::HRow( iterator_t& it_ ) : _iterator( it_ ), _cells( it_->get_size() )
 	M_PROLOG
 	int long cellCount = it_->get_size();
 	for ( int i = 0; i < cellCount; ++ i )
-		_cells[ i ] = HCell<>::ptr_t( new HCell<>( _iterator, i ) );
+		_cells[ i ] = HCell<>::ptr_t( new ( memory::yaal ) HCell<>( _iterator, i ) );
 	return;
 	M_EPILOG
 	}

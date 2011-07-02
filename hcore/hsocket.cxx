@@ -190,7 +190,7 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ )
 	M_ENSURE_EX( ( ::bind( _fileDescriptor,
 				static_cast<sockaddr*>( _address ), _addressSize ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	M_ENSURE_EX( ( ::listen( _fileDescriptor, _maximumNumberOfClients ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
-	_clients = new clients_t( _maximumNumberOfClients );
+	_clients = new ( memory::yaal ) clients_t( _maximumNumberOfClients );
 	_needShutdown = true;
 	return;
 	M_EPILOG
@@ -226,7 +226,7 @@ HSocket::ptr_t HSocket::accept( void )
 	socket_type_t type = _type;
 	if ( !!( _type & ( socket_type_t( TYPE::SSL_SERVER  ) | TYPE::SSL_CLIENT ) ) )
 		type &= ~socket_type_t( TYPE::SSL_CLIENT ), type |= TYPE::SSL_SERVER;
-	ptr_t socket = ptr_t( new HSocket( type, -1 ) );
+	ptr_t socket = ptr_t( new ( memory::yaal ) HSocket( type, -1 ) );
 	M_ASSERT( ! socket->_sSL );
 	socket->_fileDescriptor = fileDescriptor;
 	if ( !!( _type & TYPE::NONBLOCKING ) )

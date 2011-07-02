@@ -31,12 +31,13 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
+#include "db_driver_loader.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/hlog.hxx"
 #include "hcore/hfile.hxx"
 #include "tools/hplugin.hxx"
 #include "tools/hstringstream.hxx"
-#include "db_driver_loader.hxx"
 #include "dbwrapper.hxx"
 
 using namespace yaal::hcore;
@@ -191,7 +192,7 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ )
 		{
 		try
 			{
-			driver = make_pair( HPlugin::ptr_t( new HPlugin() ), ODBConnector() );
+			driver = make_pair( HPlugin::ptr_t( new ( memory::yaal ) HPlugin() ), ODBConnector() );
 			log( LOG_TYPE::NOTICE ) << "Loading [" << _driver_[ driverId_ + 1 ] << "] driver ... ";
 			driver.first->load( _driver_[ driverId_ + 1 ] );
 			cout << "(linking symbols ...) " << flush;

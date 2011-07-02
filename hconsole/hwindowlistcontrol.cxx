@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hwindowlistcontrol.hxx"
+#include "hcore/memory.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole::list_control_helper;
@@ -98,7 +99,7 @@ typedef yaal::hcore::HList<HWindow::ptr_t>::iterator window_iterator_t;
 template<>
 HRow<window_iterator_t>::HRow( iterator_t& it_ ) : _iterator( it_ ), _cells( 1 )
 	{
-	_cells[ 0 ] = HCell<window_iterator_t>::ptr_t( new HCell<window_iterator_t>( _iterator, 0 ) );
+	_cells[ 0 ] = HCell<window_iterator_t>::ptr_t( new ( memory::yaal ) HCell<window_iterator_t>( _iterator, 0 ) );
 	return;
 	}
 

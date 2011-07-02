@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/hpointer.hxx"
 #include "hcore/hlist.hxx"
+#include "hcore/memory.hxx"
 #include "hconsole/hitem.hxx"
 #include "hconsole/hwindow.hxx"
 #include "hconsole/hsearchablecontrol.hxx"
@@ -349,7 +350,7 @@ public:
 			int /* height */,
 			int /* width */,
 			char const*,
-			list_control_helper::HAbstractControler::ptr_t const& = list_control_helper::HListControler<>::ptr_t( new list_control_helper::HListControler<>( list_control_helper::HListControler<>::model_ptr_t( new list_control_helper::HListControler<>::model_t() ) ) ) );	/* label */
+			list_control_helper::HAbstractControler::ptr_t const& = list_control_helper::HListControler<>::ptr_t( new ( memory::yaal ) list_control_helper::HListControler<>( list_control_helper::HListControler<>::model_ptr_t( new ( memory::yaal ) list_control_helper::HListControler<>::model_t() ) ) ) );	/* label */
 	virtual ~HListControl ( void );
 	void add_column( int,									/* at position */
 			char const*,									/* column name */
@@ -458,25 +459,25 @@ int long HListControler<tType>::size( void )
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::begin( void )
 	{
-	return ( HModelIteratorWrapper( _list->begin() != _list->end() ? iterator_ptr_t( new HModelIterator( this, _list->begin() ) ) : iterator_ptr_t() ) );
+	return ( HModelIteratorWrapper( _list->begin() != _list->end() ? iterator_ptr_t( new ( memory::yaal ) HModelIterator( this, _list->begin() ) ) : iterator_ptr_t() ) );
 	}
 
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::end( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( this, _list->end() ) ) ) );
+	return ( HModelIteratorWrapper( iterator_ptr_t( new ( memory::yaal ) HModelIterator( this, _list->end() ) ) ) );
 	}
 
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::rbegin( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( this, _list->rbegin().base() ) ) ) );
+	return ( HModelIteratorWrapper( iterator_ptr_t( new ( memory::yaal ) HModelIterator( this, _list->rbegin().base() ) ) ) );
 	}
 
 template<typename tType>
 HAbstractControler::HModelIteratorWrapper HListControler<tType>::rend( void )
 	{
-	return ( HModelIteratorWrapper( iterator_ptr_t( new HModelIterator( this, _list->rend().base() ) ) ) );
+	return ( HModelIteratorWrapper( iterator_ptr_t( new ( memory::yaal ) HModelIterator( this, _list->rend().base() ) ) ) );
 	}
 
 template<typename tType>
@@ -546,7 +547,7 @@ bool HListControler<tType>::HModelIterator::is_not_equal( typename HListControle
 template<typename tType>
 void HListControler<tType>::HModelIterator::assign_to( HAbstractControler::iterator_ptr_t& it_ ) const
 	{
-	it_ = iterator_ptr_t( new HModelIterator( _owner, _iterator ) );
+	it_ = iterator_ptr_t( new ( memory::yaal ) HModelIterator( _owner, _iterator ) );
 	return;
 	}
 

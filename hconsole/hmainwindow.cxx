@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hmainwindow.hxx"
+#include "hcore/memory.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole::list_control_helper;
@@ -68,13 +69,13 @@ int HMainWindow::init( void )
 	if ( ( _focusedChild != HControlList::model_t::cyclic_iterator() ) && ( !! (*_focusedChild) ) )
 		return ( 0 );
 	error = HWindow::init();
-	_menu = new HMenuControl( this, 1, 1, - 2,	- cons.get_width() / 2 - 1,
+	_menu = new ( memory::yaal ) HMenuControl( this, 1, 1, - 2,	- cons.get_width() / 2 - 1,
 			" &Menu \n" );
 	_menu->enable( true );
 	_menu->set_focus();
-	HWindowListControl* windowList = new HWindowListControl( this, 1,
+	HWindowListControl* windowList = new ( memory::yaal ) HWindowListControl( this, 1,
 			- cons.get_width() / 2 + 1, - 2, - 1, " &Opened window list: \n",
-			HListControler<HWindow::ptr_t>::ptr_t( new HListControler<HWindow::ptr_t>( _windowList ) ),
+			HListControler<HWindow::ptr_t>::ptr_t( new ( memory::yaal ) HListControler<HWindow::ptr_t>( _windowList ) ),
 			_foregroundWindow );
 	windowList->add_column( -1, "&Okno", 1 );
 	windowList->enable( true );

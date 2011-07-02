@@ -28,6 +28,7 @@ Copyright:
 #define YAAL_HCORE_HTREE_HXX_INCLUDED 1
 
 #include "hcore/hexception.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/functional.hxx"
 
@@ -339,7 +340,7 @@ template<typename value_t>
 typename HTree<value_t>::iterator HTree<value_t>::HNode::add_node( value_t const& value )
 	{
 	M_PROLOG
-	_branch.push_back( new HNode( this, value ) );
+	_branch.push_back( new ( memory::yaal ) HNode( this, value ) );
 	return ( iterator( this, _branch.rbegin().base() ) );
 	M_EPILOG
 	}
@@ -348,7 +349,7 @@ template<typename value_t>
 typename HTree<value_t>::iterator HTree<value_t>::HNode::add_node( void )
 	{
 	M_PROLOG
-	_branch.push_back( new HNode( this ) );
+	_branch.push_back( new ( memory::yaal ) HNode( this ) );
 	return ( iterator( this, _branch.rbegin().base() ) );
 	M_EPILOG
 	}
@@ -358,7 +359,7 @@ typename HTree<value_t>::iterator HTree<value_t>::HNode::insert_node( typename H
 	{
 	M_PROLOG
 	M_ASSERT( pos._owner == this );
-	iterator it( this, _branch.insert( pos._iterator, new HNode( this, value ) ) );
+	iterator it( this, _branch.insert( pos._iterator, new ( memory::yaal ) HNode( this, value ) ) );
 	return ( it );
 	M_EPILOG
 	}
@@ -472,7 +473,7 @@ template<typename value_t>
 typename HTree<value_t>::node_t HTree<value_t>::HNode::clone( HNode* parent ) const
 	{
 	M_PROLOG
-	node_t node = new HNode( _data );
+	node_t node = new ( memory::yaal ) HNode( _data );
 	node->_trunk = parent;
 	typename branch_t::const_iterator endIt = _branch.end();
 	for ( typename branch_t::const_iterator it = _branch.begin();
@@ -684,7 +685,7 @@ typename HTree<value_t>::node_t HTree<value_t>::create_new_root( value_type cons
 	{
 	M_PROLOG
 	clear();
-	_root = new HNode( this, value_ );
+	_root = new ( memory::yaal ) HNode( this, value_ );
 	return ( _root );
 	M_EPILOG
 	}

@@ -34,9 +34,10 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
+#include "util.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/hpointer.hxx"
 #include "hcore/htokenizer.hxx"
-#include "util.hxx"
 #include "hexpression.hxx"
 #include "hcore/hlog.hxx"
 #include "hdes.hxx"
@@ -691,8 +692,8 @@ int levenshtein_damerau( yaal::hcore::HString const& one_, yaal::hcore::HString 
 		return ( lengthTwo );
 	lengthOne ++;
 	lengthTwo ++;
-	HPointer<int*, HPointerArray> distanceMatrixHolder( new int*[ lengthOne ] );
-	HPointer<int, HPointerArray> distanceMatrixBuffer( new int[ lengthOne * lengthTwo ] );
+	HPointer<int*, HPointerArray> distanceMatrixHolder( new ( memory::yaal ) int*[ lengthOne ] );
+	HPointer<int, HPointerArray> distanceMatrixBuffer( new ( memory::yaal ) int[ lengthOne * lengthTwo ] );
 	distanceMatrix = distanceMatrixHolder.raw();
 	for ( indexOne = 0; indexOne < lengthOne; ++ indexOne )
 		distanceMatrix[ indexOne ] = distanceMatrixBuffer.raw() + indexOne * lengthTwo;

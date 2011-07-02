@@ -29,8 +29,9 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
-#include "hcore/hcore.hxx"
 #include "hdatawindow.hxx"
+#include "hcore/hcore.hxx"
+#include "hcore/memory.hxx"
 #include "hdatalistcontrol.hxx"
 #include "hdatatreecontrol.hxx"
 #include "hdataeditcontrol.hxx"
@@ -54,7 +55,7 @@ HDataWindow::HDataWindow( char const* title_, HDataProcess* owner_,
 	_modified( false ), _documentMode( DOCUMENT::VIEW ), _mainControl( NULL ),
 	_resourcesArray( dataControlInfo_ ), _syncStore( NULL ),
 	_viewModeControls(), _editModeControls(), _owner( owner_ ),
-	_dB( new HSQLDescriptor( owner_->data_base() ) ),
+	_dB( new ( memory::yaal ) HSQLDescriptor( owner_->data_base() ) ),
 	_mode( HSQLDescriptor::MODE::SELECT )
 	{
 	M_PROLOG
@@ -125,7 +126,7 @@ int HDataWindow::init( void )
 				editControlResource._maxHistoryLevel = 8;
 				if ( r._typeSpecific )
 					ecr = static_cast<OEditControlResource*>( r._typeSpecific );
-				dataControl = new HDataEditControl( this,
+				dataControl = new ( memory::yaal ) HDataEditControl( this,
 						M_SETUP_STANDARD, ecr->_maxStringSize, ecr->_value,
 						ecr->_mask, ecr->_replace,
 						ecr->_multiLine, ecr->_readOnly, 
@@ -142,7 +143,7 @@ int HDataWindow::init( void )
 				if ( r._typeSpecific )
 					lcr = static_cast<OListControlResource*>( r._typeSpecific );
 				HDataListControl* list = NULL;
-				dataControl = list = new HDataListControl( this, M_SETUP_STANDARD );
+				dataControl = list = new ( memory::yaal ) HDataListControl( this, M_SETUP_STANDARD );
 				list->set_flags( HListControl::flag_t( lcr->_checkable ? HListControl::FLAG::CHECKABLE : HListControl::FLAG::NONE )
 						| ( lcr->_sortable ? HListControl::FLAG::SORTABLE : HListControl::FLAG::NONE )
 						| ( lcr->_editable ? HListControl::FLAG::EDITABLE : HListControl::FLAG::NONE )
@@ -151,7 +152,7 @@ int HDataWindow::init( void )
 				}
 			break;
 			case ( DATACONTROL_BITS::TYPE::TREE ):
-				dataControl = new HDataTreeControl( this, M_SETUP_STANDARD );
+				dataControl = new ( memory::yaal ) HDataTreeControl( this, M_SETUP_STANDARD );
 			break;
 			case ( DATACONTROL_BITS::TYPE::COMBO ):
 			break;
@@ -210,7 +211,7 @@ int HDataWindow::init( void )
 HStatusBarControl* HDataWindow::init_bar( char const* label_ )
 	{
 	M_PROLOG
-	return ( new HDataStatusBarControl( this, label_ ) );
+	return ( new ( memory::yaal ) HDataStatusBarControl( this, label_ ) );
 	M_EPILOG
 	}
 

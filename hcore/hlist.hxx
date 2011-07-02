@@ -28,6 +28,7 @@ Copyright:
 #define YAAL_HCORE_HLIST_HXX_INCLUDED 1
 
 #include "hcore/base.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/algorithm.hxx"
 #include "hcore/functional.hxx"
 #include "hcore/pod.hxx"
@@ -799,7 +800,7 @@ template<OListBits::treatment_t const treatment>
 typename OListBits::iterator<type_t, treatment>::type HList<type_t>::insert( HIterator<type_t, treatment> const& it )
 	{
 	M_PROLOG
-	HElement* element = new HElement( it._current ? it._current : _hook );
+	HElement* element = new ( memory::yaal ) HElement( it._current ? it._current : _hook );
 	if ( ( _size == 0 ) || ( ( it._current == _hook ) && ( treatment == TREAT_AS_OPENED ) ) )
 		_hook = element;
 	_size ++;
@@ -815,7 +816,7 @@ typename OListBits::iterator<type_t, treatment>::type HList<type_t>::insert( HIt
 		type_t const& val )
 	{
 	M_PROLOG
-	HElement* element = new HElement( it._current ? it._current : _hook, val );
+	HElement* element = new ( memory::yaal ) HElement( it._current ? it._current : _hook, val );
 	if ( ( _size == 0 ) || ( ( it._current == _hook ) && ( treatment == TREAT_AS_OPENED ) ) )
 		_hook = element;
 	_size ++;
@@ -853,7 +854,7 @@ template<typename type_t>
 type_t& HList<type_t>::add_head( void )
 	{
 	M_PROLOG
-	_hook = new HElement( _hook );
+	_hook = new ( memory::yaal ) HElement( _hook );
 	++ _size;
 	if ( _indexElement )
 		_indexElement = _indexElement->_previous;
@@ -865,7 +866,7 @@ template<typename type_t>
 type_t& HList<type_t>::add_tail( void )
 	{
 	M_PROLOG
-	HElement* element = new HElement( _hook );
+	HElement* element = new ( memory::yaal ) HElement( _hook );
 	if ( _size == 0 )
 		_hook = element;
 	++ _size;
@@ -877,7 +878,7 @@ template<typename type_t>
 void HList<type_t>::push_front( type_t const& object_ )
 	{
 	M_PROLOG
-	_hook = new HElement( _hook, object_ );
+	_hook = new ( memory::yaal ) HElement( _hook, object_ );
 	++ _size;
 	if ( _indexElement )
 		_indexElement = _indexElement->_previous;
@@ -889,7 +890,7 @@ template<typename type_t>
 void HList<type_t>::push_back( type_t const& object_ )
 	{
 	M_PROLOG
-	HElement* element = new HElement( _hook, object_ );
+	HElement* element = new ( memory::yaal ) HElement( _hook, object_ );
 	if ( _size == 0 )
 		_hook = element;
 	++ _size;
@@ -922,7 +923,7 @@ type_t& HList<type_t>::add_orderly( type_t const& object_,
 	M_PROLOG
 	bool before = false;
 	int index = 0, oldIndex = -1, lower = 0, upper = _size;
-	HElement* element = new HElement( NULL, object_ );
+	HElement* element = new ( memory::yaal ) HElement( NULL, object_ );
 	if ( ( _order != UNSORTED ) && ( _order != order_ ) )
 		M_THROW( _errMsgHList_[ ERROR::BAD_ORDER ], order_ );
 	_order = order_;

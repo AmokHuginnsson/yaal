@@ -300,7 +300,7 @@ int WINAPI WinMain(
 	int nArgs( 0 );
 	LPWSTR *szArglist( ::CommandLineToArgvW( cmdLineW, &nArgs  ) );
 	char* cmdLine( ::GetCommandLine() );
-	char** argv = new char*[ nArgs ];
+	char** argv = new ( memory::yaal ) char*[ nArgs ];
 	for ( int i( 1 ), offset( 0 ); i < nArgs; ++ i )
 		{
 		offset += ::lstrlenW( szArglist[ i - 1 ] );

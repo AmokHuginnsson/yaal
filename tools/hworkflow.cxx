@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hworkflow.hxx"
+#include "hcore/memory.hxx"
 
 using namespace yaal::hcore;
 
@@ -77,7 +78,7 @@ void HWorkFlow::push_task( task_t call_ )
 	M_ASSERT( _busyWorkers <= _activeWorkers );
 	if ( ( _busyWorkers == _activeWorkers ) && ( _activeWorkers < _workerPoolSize ) )
 		{
-		worker_ptr_t w( new HWorker( this ) );
+		worker_ptr_t w( new ( memory::yaal ) HWorker( this ) );
 		_pool.push_back( w );
 		++ _activeWorkers;
 		++ _busyWorkers;

@@ -31,6 +31,7 @@ Copyright:
 #include "hcore/hmap.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/hmulticontainer.hxx"
+#include "hcore/memory.hxx"
 
 namespace yaal
 {
@@ -338,7 +339,7 @@ private:
 		typename multimap_engine_t::iterator major = _engine.find( key );
 		if ( major == _engine.end() )
 			{
-			value_list_ptr_t list = value_list_ptr_t( new value_list_t() );
+			value_list_ptr_t list = value_list_ptr_t( new ( memory::yaal ) value_list_t() );
 			major = _engine.insert( make_pair( key, list ) ).first;
 			}
 		return ( major );

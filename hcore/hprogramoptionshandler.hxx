@@ -43,6 +43,7 @@ Copyright:
 #include "hcore/hfile.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/reflection.hxx"
+#include "hcore/memory.hxx"
 
 namespace yaal
 {
@@ -279,7 +280,7 @@ namespace program_options_helper
 template<typename tType>
 HProgramOptionsHandler::HOptionValueInterface::ptr_t option_value( tType& instance )
 	{
-	HProgramOptionsHandler::HOptionValueInterface::ptr_t value( new HProgramOptionsHandler::HOptionValue<tType>( instance ) );
+	HProgramOptionsHandler::HOptionValueInterface::ptr_t value( new ( memory::yaal ) HProgramOptionsHandler::HOptionValue<tType>( instance ) );
 	return ( value );
 	}
 

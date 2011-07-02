@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/placeholder.hxx"
 #include "hcore/hstreaminterface.hxx"
 #include "tools/hstringstream.hxx"
+#include "hcore/memory.hxx"
 
 namespace yaal
 {
@@ -209,7 +210,7 @@ class HLambdaStream
 	yaal::hcore::HStreamInterface& _stream;
 	yaal::hcore::HStreamInterface::ptr_t _buffer;
 public:
-	HLambdaStream( yaal::hcore::HStreamInterface& stream_ ) : _stream( stream_ ), _buffer( new HStringStream ) {}
+	HLambdaStream( yaal::hcore::HStreamInterface& stream_ ) : _stream( stream_ ), _buffer( new ( memory::yaal ) HStringStream ) {}
 	template<typename T>
 	HLambdaStream& operator << ( T const& val_ )
 		{

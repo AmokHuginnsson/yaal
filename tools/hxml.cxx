@@ -41,7 +41,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hxml.hxx"
-
+#include "hcore/memory.hxx"
 #include "hcore/htokenizer.hxx"
 #include "hcore/hsingleton.hxx"
 #include "hcore/hlog.hxx"
@@ -227,7 +227,7 @@ HXmlData::~HXmlData ( void )
 	{
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 void HXmlData::clear( void ) const
@@ -240,15 +240,14 @@ void HXmlData::clear( void ) const
 	}
 
 HXml::HXml( void )
-	: _convert( new HXml::OConvert ), _convertedString(),
+	: _convert( new ( memory::yaal ) HXml::OConvert ), _convertedString(),
 	_varTmpBuffer(), _encoding( _defaultEncoding_ ), _xml(),
 	_entities(), _dOM()
 	{
 	M_PROLOG
-	_xml = xml_low_t( new ( std::nothrow ) HXmlData() );
-	M_ENSURE( _xml.get() );
-	M_EPILOG
+	_xml = xml_low_t( new ( memory::yaal ) HXmlData() );
 	return;
+	M_EPILOG
 	}
 
 HXml::HXml( HXml const& xml_ )
@@ -257,10 +256,9 @@ HXml::HXml( HXml const& xml_ )
 	_entities( xml_._entities ), _dOM( xml_._dOM )
 	{
 	M_PROLOG
-	_xml = xml_low_t( new ( std::nothrow ) HXmlData( *xml_._xml ) );
-	M_ENSURE( _xml.get() );
-	M_EPILOG
+	_xml = xml_low_t( new ( memory::yaal ) HXmlData( *xml_._xml ) );
 	return;
+	M_EPILOG
 	}
 
 HXml& HXml::operator = ( HXml const& xml_ )
@@ -293,7 +291,7 @@ HXml::~HXml ( void )
 	{
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 	}
 
 #ifdef HAVE_ICONV_INPUT_CONST

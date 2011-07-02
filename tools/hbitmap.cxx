@@ -31,6 +31,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hbitmap.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/pod.hxx"
 
@@ -178,7 +179,7 @@ void HBitmap::ensure_pool( int long newSize )
 	if ( _allocatedBytes )
 		static_cast<HChunk*>( _data )->realloc( newPoolSize );
 	else
-		_data = new HChunk( newPoolSize, HChunk::STRATEGY::GEOMETRIC );
+		_data = new ( memory::yaal ) HChunk( newPoolSize, HChunk::STRATEGY::GEOMETRIC );
 	_allocatedBytes = newPoolSize;
 	M_ENSURE( _data );
 	return;

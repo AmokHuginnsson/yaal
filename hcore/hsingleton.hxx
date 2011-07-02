@@ -33,6 +33,7 @@ Copyright:
 #define YAAL_HCORE_HSINGLETON_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/hmultimap.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/hthread.hxx"
@@ -146,9 +147,9 @@ tType* HSingleton<tType>::create_instance( int lifeTime_ )
 	M_PROLOG
 	M_ASSERT( ! _instance );
 	HLifeTimeTracker& lt = HLifeTimeTracker::get_instance();
-	HLifeTimeTracker::destructor_ptr_t p( new HDestructor<tType>( _instance ) );
+	HLifeTimeTracker::destructor_ptr_t p( new ( memory::yaal ) HDestructor<tType>( _instance ) );
 	lt.register_destructor( p, tType::life_time( lifeTime_ ) );
-	return ( new tType() );
+	return ( new ( memory::yaal ) tType() );
 	M_EPILOG
 	}
 

@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HCORE_HTLS_HXX_INCLUDED 1
 
 #include "hcore/compat.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/hdeque.hxx"
 #include "hcore/hresource.hxx"
 #include "hcore/hpointer.hxx"
@@ -70,7 +71,7 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new tType );
+		ptr_t p( _tls = new ( memory::yaal ) tType );
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -84,7 +85,7 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new tType( a0_ ) );
+		ptr_t p( _tls = new ( memory::yaal ) tType( a0_ ) );
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -98,7 +99,7 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new tType( a0_, a1_ ) );
+		ptr_t p( _tls = new ( memory::yaal ) tType( a0_, a1_ ) );
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -112,7 +113,7 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new tType( a0_, a1_, a2_ ) );
+		ptr_t p( _tls = new ( memory::yaal ) tType( a0_, a1_, a2_ ) );
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -127,7 +128,7 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new tType( a0_, a1_, a2_, a3_ ) );
+		ptr_t p( _tls = new ( memory::yaal ) tType( a0_, a1_, a2_, a3_ ) );
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -142,7 +143,7 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new tType( a0_, a1_, a2_, a3_, a4_ ) );
+		ptr_t p( _tls = new ( memory::yaal ) tType( a0_, a1_, a2_, a3_, a4_ ) );
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -157,7 +158,7 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new tType( a0_, a1_, a2_, a3_, a4_, a5_ ) );
+		ptr_t p( _tls = new ( memory::yaal ) tType( a0_, a1_, a2_, a3_, a4_, a5_ ) );
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -172,7 +173,7 @@ public:
 	external_lock acquire( void )
 		{
 		M_PROLOG
-		external_lock l( new yaal::hcore::HLock( _mutex ) );
+		external_lock l( new ( memory::yaal ) yaal::hcore::HLock( _mutex ) );
 		return ( l );
 		M_EPILOG
 		}

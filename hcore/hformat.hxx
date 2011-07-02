@@ -30,6 +30,7 @@ Copyright:
 #ifndef YAAL_HCORE_HFORMAT_HXX_INCLUDED
 #define YAAL_HCORE_HFORMAT_HXX_INCLUDED 1
 
+#include "hcore/memory.hxx"
 #include "hcore/hstreaminterface.hxx"
 
 namespace yaal
@@ -91,7 +92,7 @@ class HStreamFormatProxy
 	typedef HPointer<HStreamFormatProxyImpl> stream_format_proxy_impl_t;
 	stream_format_proxy_impl_t _impl;
 public:
-	HStreamFormatProxy( HStreamInterface& s, HFormat const& f ) : _impl( new HStreamFormatProxyImpl( s, f ) ) {}
+	HStreamFormatProxy( HStreamInterface& s, HFormat const& f ) : _impl( new ( memory::yaal ) HStreamFormatProxyImpl( s, f ) ) {}
 	template<typename tType>
 	HStreamFormatProxy operator % ( tType const& v )
 		{

@@ -33,9 +33,11 @@ Copyright:
 
 #include "hcore/base.hxx"
 #include "hcore/hexception.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/compat.hxx"
 #include "hcore/hstring.hxx"
 
+using namespace yaal;
 using namespace yaal::hcore;
 
 extern "C"
@@ -90,7 +92,7 @@ M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
 		db_disconnect( _brokenDB_ );
 		_brokenDB_ = NULL;
 		}
-	sQLite = new OSQLite;
+	sQLite = new ( memory::yaal ) OSQLite;
 	HString dataBase( dataBase_ );
 	if ( ::stat( dataBase.raw(), &stat ) )
 		{
@@ -171,7 +173,7 @@ M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ )
 	{
 	OSQLite* sQLite = static_cast<OSQLite*>( data_ );
 	OSQLiteResult * result = NULL;
-	result = new OSQLiteResult;
+	result = new ( memory::yaal ) OSQLiteResult;
 	result->_columns = 0;
 	result->_rows = 0;
 	result->_data = NULL;

@@ -53,7 +53,7 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int level_ )
 execution_info::strings_ptr_t execution_info::get_call_stack( int )
 #endif /* not _EXECINFO_H */
 	{
-	strings_ptr_t frames( new strings_t );
+	strings_ptr_t frames( new ( memory::yaal ) strings_t );
 #ifdef _EXECINFO_H
 	
 	void** pointer = memory::calloc<void*>( level_ + 1 );

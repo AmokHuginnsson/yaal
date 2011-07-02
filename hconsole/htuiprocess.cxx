@@ -32,6 +32,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "htuiprocess.hxx"
+#include "hcore/memory.hxx"
 #include "hconsole.hxx"
 #include "hmainwindow.hxx"
 #include "mouse.hxx"
@@ -52,7 +53,7 @@ HTUIProcess::HTUIProcess( int noFileHandlers_, size_t keyHandlers_,
 		size_t commandHandlers_ )
 	: HHandler( keyHandlers_, commandHandlers_ ),
 	_dispatcher( noFileHandlers_, _latency_ * 1000 ), _mainWindow(), _foregroundWindow(),
-	_windows( new model_t() )
+	_windows( new ( memory::yaal ) model_t() )
 	{
 	M_PROLOG
 	return;
@@ -99,7 +100,7 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 		mainWindow = mainWindow_;
 	else /* Create automatically default main window. */
 		{
-		mainWindow = HWindow::ptr_t( new HMainWindow( processName_, _windows, _foregroundWindow ) );
+		mainWindow = HWindow::ptr_t( new ( memory::yaal ) HMainWindow( processName_, _windows, _foregroundWindow ) );
 		register_postprocess_handler( KEY<'\t'>::meta, NULL,
 				&HTUIProcess::handler_jump_meta_tab );
 		register_postprocess_handler( KEY<'q'>::command, NULL,

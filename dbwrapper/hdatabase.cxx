@@ -29,8 +29,9 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
-#include "hcore/hlog.hxx"
 #include "hdatabase.hxx"
+#include "hcore/memory.hxx"
+#include "hcore/hlog.hxx"
 #include "db_driver_loader.hxx"
 
 using namespace yaal::hcore;
@@ -83,7 +84,7 @@ HRecordSet::ptr_t HDataBase::query( HString const& query_ )
 		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _coreData, result ) );
 	HRecordSet::ptr_t rs;
 	if ( result )
-		rs = HRecordSet::ptr_t( new HRecordSet( get_pointer(), _connector, result ) );
+		rs = HRecordSet::ptr_t( new ( memory::yaal ) HRecordSet( get_pointer(), _connector, result ) );
 	return ( rs );
 	M_EPILOG
 	}
@@ -105,7 +106,7 @@ int HDataBase::get_errno( void ) const
 HDataBase::ptr_t HDataBase::get_connector( ODBConnector::DRIVER::enum_t driverId_ )
 	{
 	M_PROLOG
-	ptr_t p( new HDataBase() );
+	ptr_t p( new ( memory::yaal ) HDataBase() );
 	p->_connector = load_driver( driverId_ );
 	return ( p );
 	M_EPILOG

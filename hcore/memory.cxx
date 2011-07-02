@@ -114,3 +114,21 @@ void* operator new ( int long unsigned size_, yaal::memory::YaalNew const& ) thr
 	return ( newPtr );
 	}
 
+void* operator new[] ( int long unsigned size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException )
+	{
+	M_ASSERT( ( size_ > 0 ) && "yaal::memory::new[]: requested size lower than 0" );
+	void* newPtr( ::operator new[] ( size_, std::nothrow ) );
+	if ( newPtr == 0 )
+		{
+		char const msg[] = "yaal::memory::new: new[] returned NULL";
+		if ( yaal::memory::_onAllocFailure_ == yaal::memory::ON_ALLOC_FAILURE::ABORT )
+			{
+			::perror( msg );
+			::abort();
+			}
+		else
+			throw yaal::memory::HMemoryAllocationException( msg );
+		}
+	return ( newPtr );
+	}
+

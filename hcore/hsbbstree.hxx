@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HCORE_HSBBSTREE_HXX_INCLUDED 1
 
 #include "hcore/hexception.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/hpair.hxx"
 
 namespace yaal
@@ -208,7 +209,7 @@ template<typename tType>
 HSBBSTree::HAbstractNode* HSBBSTree::HNode<tType>::clone( void ) const
 	{
 	M_PROLOG
-	return ( new HNode( _key ) );
+	return ( new ( memory::yaal ) HNode( _key ) );
 	M_EPILOG
 	}
 
@@ -224,7 +225,7 @@ HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& key_ )
 		node = static_cast<HNode<tType>*>( nodeHolder._node );
 	else
 		{
-		node = new HNode<tType>( key_ );
+		node = new ( memory::yaal ) HNode<tType>( key_ );
 		++ _size;
 		if ( _root )
 			{

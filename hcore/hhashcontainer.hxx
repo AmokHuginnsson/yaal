@@ -75,7 +75,7 @@ private:
 		value_t _value;
 		HAtom( value_t const& value_ ) : HAbstractAtom(), _value( value_ ) {}
 		virtual HAbstractAtom* clone( void ) const
-			{ return ( new HAtom( _value ) ); }
+			{ return ( new ( memory::yaal ) HAtom( _value ) ); }
 		friend class HHashContainer;
 		friend class HIterator;
 		};

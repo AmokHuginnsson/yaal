@@ -42,6 +42,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hthread.hxx"
+#include "hcore/memory.hxx"
 #include "hlog.hxx"
 
 namespace yaal
@@ -447,7 +448,7 @@ void HYaalSemaphore::do_signal( void )
 	}
 
 HSemaphore::HSemaphore( TYPE::type_t type_ )
-	: _impl( type_ == TYPE::POSIX ? semaphore_implementation_t( new HPosixSemaphore() ) : semaphore_implementation_t( new HYaalSemaphore() ) )
+	: _impl( type_ == TYPE::POSIX ? semaphore_implementation_t( new ( memory::yaal ) HPosixSemaphore() ) : semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore() ) )
 	{
 	}
 

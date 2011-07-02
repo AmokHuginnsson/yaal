@@ -32,6 +32,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hfile.hxx"
+#include "hcore/memory.hxx"
 
 namespace yaal
 {
@@ -312,7 +313,7 @@ bool HFile::do_is_valid( void ) const
 
 HFile cinInstance( stdin );
 HSynchronizedStream cin( cinInstance );
-HSynchronizedStream cout( HStreamInterface::ptr_t( new HFile( stdout ) ) );
+HSynchronizedStream cout( HStreamInterface::ptr_t( new ( memory::yaal ) HFile( stdout ) ) );
 HFile cerrInstance( stderr );
 HSynchronizedStream cerr( cerrInstance );
 HSynchronizedStream clog;

@@ -40,6 +40,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "console.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/hlog.hxx"
 #include "hcore/hcore.hxx"
 #include "hcore/system.hxx"
@@ -179,7 +180,7 @@ void HConsole::init( void )
 	signalService.register_handler( SIGTRAP, cleanup );
 	signalService.register_handler( SIGSYS, cleanup );
 	signalService.register_handler( SIGPIPE, cleanup );
-	_event = HPipe::ptr_t( new HPipe );
+	_event = HPipe::ptr_t( new ( memory::yaal ) HPipe );
 	M_EPILOG
 	}
 

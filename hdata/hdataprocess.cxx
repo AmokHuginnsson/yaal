@@ -29,12 +29,13 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
+#include "hdata/hdataprocess.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/hlog.hxx"
 #include "hcore/hfile.hxx"
 #include "tools/hplugin.hxx"
 #include "hconsole/hmainwindow.hxx"
 #include "dbwrapper/db_driver_loader.hxx"
-#include "hdata/hdataprocess.hxx"
 #include "hdatawindow.hxx"
 #include "oresource.hxx"
 
@@ -85,7 +86,7 @@ int HDataProcess::init_xrc( char const* processName_,
 	HMainWindow* mainWindow = NULL;
 	if ( dbwrapper::_dBDrivers_.is_empty() )
 		M_THROW( "no database driver loaded", errno );
-	_resource.load( HStreamInterface::ptr_t( new HFile( resource_, HFile::OPEN::READING ) ) );
+	_resource.load( HStreamInterface::ptr_t( new ( memory::yaal ) HFile( resource_, HFile::OPEN::READING ) ) );
 	HXml::HNodeProxy const node = _resource.get_element_by_path( "/resource/menu" );
 	_rootMenu = build_sub_menu( node, handlers_ );
 	M_ASSERT( ( _foregroundWindow != HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
@@ -123,7 +124,7 @@ OMenuItem* HDataProcess::build_sub_menu( HXml::HConstNodeProxy const& node_,
 				+ '=' + node_.get_value(), errno );
 	menuItem.reset();
 	subMenu.push_back( menuItem );
-	menu = new OMenuItem[ subMenu.size() ];
+	menu = new ( memory::yaal ) OMenuItem[ subMenu.size() ];
 	int ctr = 0;
 	for ( menu_item_list_t::iterator it( subMenu.begin() ), end( subMenu.end() ); it != end; ++ it, ++ ctr )
 		menu[ ctr ] = *it;

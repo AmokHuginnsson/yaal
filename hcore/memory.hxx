@@ -92,6 +92,7 @@ inline void free( tType& pointer_ ) throw()
 }
 
 void* operator new ( int long unsigned, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException );
+void* operator new[] ( int long unsigned, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException );
 
 #endif /* #ifndef YAAL_HCORE_MEMORY_HXX_INCLUDED */
 
