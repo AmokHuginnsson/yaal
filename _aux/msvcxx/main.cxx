@@ -27,12 +27,14 @@
 #include "hcore/memory.hxx"
 #include "cxxabi.h"
 #include "cleanup.hxx"
+#include "crit.hxx"
 
 using namespace std;
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace msvcxx;
 
+CMutex _backtraceMutex_;
 __declspec( thread ) int SocketErrno::_errno = 0;
 int ESCDELAY = 0;
 static int const MAX_SYMBOL_NAME_LEN( 2048 );
@@ -52,6 +54,7 @@ namespace abi
 extern "C" 
 int backtrace( void** buf_, int size_ )
 	{
+	CLock l( _backtraceMutex_ );
 /* Warning!
  *
  * Maximum number of frames to capture has changed! (63 => 62)
@@ -83,6 +86,7 @@ int backtrace( void** buf_, int size_ )
 extern "C"
 char** backtrace_symbols( void* const* buf_, int size_ )
 	{
+	CLock l( _backtraceMutex_ );
 	HANDLE process( ::GetCurrentProcess() );
 	bool fail( false );
 	char** strings = reinterpret_cast<char**>( memory::calloc<char>( size_ * ( MAX_SYMBOL_NAME_LEN + 2 + sizeof ( char* ) ) ) );
