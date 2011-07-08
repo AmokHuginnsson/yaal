@@ -47,8 +47,8 @@ template<typename type_t>
 class HOptional
 	{
 public:
-	struct SemanticContext { SemanticContext const& member( SemanticContext& ) { return ( *this ); } };
-	typedef SemanticContext const& ( SemanticContext::* safe_bool_t )( SemanticContext& );
+	struct SemanticContext { SemanticContext const& member( SemanticContext& ) const { return ( *this ); } };
+	typedef SemanticContext const& ( SemanticContext::* safe_bool_t )( SemanticContext& ) const;
 	typedef type_t value_type;
 private:
 	char _data[ sizeof ( value_type ) ];
@@ -92,7 +92,7 @@ public:
 			}
 		return;
 		}
-	operator safe_bool_t()
+	operator safe_bool_t() const
 		{
 		return ( _initialized ? &SemanticContext::member : NULL );
 		}

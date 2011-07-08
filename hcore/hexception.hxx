@@ -169,7 +169,7 @@ public:
 			}
 		return ( *this );
 		}
-	char const* what( void ) { return ( _what ); }
+	char const* what( void ) const { return ( _what ); }
 private:
 	void swap( HFailedAssertion& );
 	};

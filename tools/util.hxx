@@ -158,7 +158,7 @@ public:
 			_iter = it;
 			}
 		}
-	iter_t operator()( void )
+	iter_t operator()( void ) const
 		{ return ( _iter ); }
 	};
 
