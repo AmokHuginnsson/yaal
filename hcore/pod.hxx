@@ -166,6 +166,16 @@ struct is_floating_point<double long>
 	static bool const value = true;
 	typedef trait::true_type type;
 	};
+
+namespace hcore { class HNumber; }
+
+template<>
+struct is_floating_point<hcore::HNumber>
+	{
+	static bool const value = true;
+	typedef trait::true_type type;
+	};
+
 /*! \endcond */
 
 typedef char unsigned u8_t; /*!< 8 bit unsigned integer. */

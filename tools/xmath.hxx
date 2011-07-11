@@ -27,6 +27,10 @@ Copyright:
 #ifndef YAAL_TOOLS_XMATH_HXX_INCLUDED
 #define YAAL_TOOLS_XMATH_HXX_INCLUDED 1
 
+#include "hcore/hexception.hxx"
+#include "hcore/iterator.hxx"
+#include "hcore/pod.hxx"
+
 namespace yaal
 {
 
@@ -37,6 +41,52 @@ namespace tools
  */
 namespace xmath
 {
+
+/*! \brief Provide statistics for set of numbers.
+ */
+template<typename numeric_t>
+class HNumberSetStats
+	{
+	int long _count;
+	numeric_t _sum;
+	numeric_t _average;
+public:
+	template<typename iterator_t>
+	HNumberSetStats( iterator_t, iterator_t );
+	int long count( void ) const
+		{ return ( _count ); }
+	numeric_t sum( void )
+		{ return ( _sum ); }
+	numeric_t average( void ) const
+		{ return ( _average ); }
+	};
+
+template<typename numeric_t>
+template<typename iterator_t>
+HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_ )
+	: _count( 0 ), _sum(), _average()
+	{
+	M_PROLOG
+	for ( ; first_ != last_; ++ first_, ++ _count )
+		{
+		_sum += *first_;
+		}
+	_average = _sum / _count;
+	return;
+	M_EPILOG
+	}
+
+template<typename iterator_t>
+HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
+	typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
+	double long>::type> number_set_stats( iterator_t first_, iterator_t last_ )
+	{
+	M_PROLOG
+	return ( HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
+		typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
+		double long>::type>( first_, last_ ) );
+	M_EPILOG
+	}
 
 template<typename number_t>
 number_t clip( number_t const& lowerBound_, number_t const& number_, number_t const& upperBound_ )
