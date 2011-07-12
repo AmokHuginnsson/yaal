@@ -57,8 +57,8 @@ namespace
 /* char schema_err[] = "bad xml schema"; */
 typedef HResource<xmlDoc, void (*)( xmlDocPtr )> doc_resource_t;
 typedef HResource<xmlTextWriter, void (*)( xmlTextWriterPtr )> writer_resource_t;
-typedef HPointer<xmlCharEncodingHandler, HPointerScalar, HPointerStrict, int (*)( xmlCharEncodingHandler* )> encoder_resource_t;
-typedef HPointer<xsltStylesheet, HPointerScalar, HPointerStrict, void (*)( xsltStylesheetPtr )> style_resource_t;
+typedef HPointer<xmlCharEncodingHandler> encoder_resource_t;
+typedef HPointer<xsltStylesheet> style_resource_t;
 typedef HResource<xmlXPathContext, void (*)( xmlXPathContextPtr )> xpath_context_resource_t;
 typedef HResource<xmlXPathObject, void (*)( xmlXPathObjectPtr )> xpath_object_resource_t;
 typedef HResource<xmlOutputBuffer, int (*)( xmlOutputBufferPtr )> outputbuffer_resource_t;
