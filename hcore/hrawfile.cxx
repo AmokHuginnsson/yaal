@@ -135,7 +135,7 @@ int long HRawFile::read_ssl( void* const buffer_, int long size_ )
 int long HRawFile::read_ssl_loader( void* const buffer_, int long size_ )
 	{
 	M_PROLOG
-	_sSL = HOpenSSL::ptr_t( new ( memory::yaal ) HOpenSSL( _fileDescriptor, _type & TYPE::SSL_SERVER ? HOpenSSL::TYPE::SERVER : HOpenSSL::TYPE::CLIENT ) );
+	_sSL = HOpenSSL::ptr_t( make_pointer<HOpenSSL>( _fileDescriptor, _type & TYPE::SSL_SERVER ? HOpenSSL::TYPE::SERVER : HOpenSSL::TYPE::CLIENT ) );
 	reader = &HRawFile::read_ssl;
 	writer = &HRawFile::write_ssl;
 	closer = &HRawFile::close_ssl;
@@ -215,7 +215,7 @@ int long HRawFile::write_ssl( void const* const buffer_, int long size_ )
 int long HRawFile::write_ssl_loader( void const* const buffer_, int long size_ )
 	{
 	M_PROLOG
-	_sSL = HOpenSSL::ptr_t( new ( memory::yaal ) HOpenSSL( _fileDescriptor, _type & TYPE::SSL_SERVER ? HOpenSSL::TYPE::SERVER : HOpenSSL::TYPE::CLIENT ) );
+	_sSL = HOpenSSL::ptr_t( make_pointer<HOpenSSL>( _fileDescriptor, _type & TYPE::SSL_SERVER ? HOpenSSL::TYPE::SERVER : HOpenSSL::TYPE::CLIENT ) );
 	reader = &HRawFile::read_ssl;
 	writer = &HRawFile::write_ssl;
 	closer = &HRawFile::close_ssl;

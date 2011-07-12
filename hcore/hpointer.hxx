@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/base.hxx"
 #include "hcore/trait.hxx"
 #include "hcore/algorithm.hxx"
+#include "hcore/memory.hxx"
 
 namespace yaal
 {
@@ -706,7 +707,7 @@ struct pointer_helper
 	static tType* do_make_pointer_pre( HPointer<tType>& ptr_ )
 		{
 		typedef HPointer<tType> ptr_t;
-		ptr_._shared = new typename ptr_t::template HShared<HSpaceHolderDeleter<tType> >( HSpaceHolderDeleter<tType>(), static_cast<tType*>( NULL ) );
+		ptr_._shared = new ( memory::yaal ) typename ptr_t::template HShared<HSpaceHolderDeleter<tType> >( HSpaceHolderDeleter<tType>(), static_cast<tType*>( NULL ) );
 		return ( static_cast<typename ptr_t::template HShared<HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem() );
 		}
 

@@ -75,7 +75,7 @@ int HMainWindow::init( void )
 	_menu->set_focus();
 	HWindowListControl* windowList = new ( memory::yaal ) HWindowListControl( this, 1,
 			- cons.get_width() / 2 + 1, - 2, - 1, " &Opened window list: \n",
-			HListControler<HWindow::ptr_t>::ptr_t( new ( memory::yaal ) HListControler<HWindow::ptr_t>( _windowList ) ),
+			make_pointer<HListControler<HWindow::ptr_t> >( _windowList ),
 			_foregroundWindow );
 	windowList->add_column( -1, "&Okno", 1 );
 	windowList->enable( true );

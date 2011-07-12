@@ -147,7 +147,7 @@ tType* HSingleton<tType>::create_instance( int lifeTime_ )
 	M_PROLOG
 	M_ASSERT( ! _instance );
 	HLifeTimeTracker& lt = HLifeTimeTracker::get_instance();
-	HLifeTimeTracker::destructor_ptr_t p( new ( memory::yaal ) HDestructor<tType>( _instance ) );
+	HLifeTimeTracker::destructor_ptr_t p( make_pointer<HDestructor<tType> >( _instance ) );
 	lt.register_destructor( p, tType::life_time( lifeTime_ ) );
 	return ( new ( memory::yaal ) tType() );
 	M_EPILOG

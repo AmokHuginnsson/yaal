@@ -206,7 +206,7 @@ SystemIO& SystemIO::get_instance( void )
 SystemIO::io_t& SystemIO::create_io( IO::TYPE::type_t type_, HANDLE h_, HANDLE e_, std::string const& p_ )
 	{
 	CLock l( _mutex );
-	return ( *( _ioTable.insert( std::make_pair( _idPool ++, io_ptr_t( new ( memory::yaal ) IO( type_, h_, e_, p_ ) ) ) ).first ) );
+	return ( *( _ioTable.insert( std::make_pair( _idPool ++, make_shared<IO>( type_, h_, e_, p_ ) ) ) ).first );
 	}
 
 SystemIO::io_t& SystemIO::get_io( int id_ )
@@ -217,7 +217,7 @@ SystemIO::io_t& SystemIO::get_io( int id_ )
 		return ( *i );
 	M_ASSERT( id_ < MANAGED_IO );
 	HANDLE h( reinterpret_cast<HANDLE>( _get_osfhandle( id_ ) ) );
-	return ( *( _ioTable.insert( std::make_pair( id_, io_ptr_t( new ( memory::yaal ) IO( IO::TYPE::TERMINAL, h, h ) ) ) ).first ) );
+	return ( *( _ioTable.insert( std::make_pair( id_, make_shared<IO>( IO::TYPE::TERMINAL, h, h ) ) ) ).first );
 	}
 
 int SystemIO::close_io( int id_ )
@@ -242,7 +242,7 @@ int SystemIO::dup2_io( int id1_, int id2_ )
 	int fd1( id1_ < MANAGED_IO ? id1_ : _open_osfhandle( reinterpret_cast<intptr_t>( get_io( id1_ ).second->_handle ), 0 ) );
 	int fd2( id2_ < MANAGED_IO ? id2_ : _open_osfhandle( reinterpret_cast<intptr_t>( get_io( id2_ ).second->_handle ), 0 ) );	int fd( _dup2( fd1, fd2 ) );
 /*	HANDLE h( reinterpret_cast<HANDLE>( _get_osfhandle( fd ) ) );
-	 _ioTable.insert( std::make_pair( fd, io_ptr_t( new ( memory::yaal ) IO( IO::TYPE::TERMINAL, h, h ) ) ) */
+	 _ioTable.insert( std::make_pair( fd, make_shared<IO>( IO::TYPE::TERMINAL, h, h ) ) ) */
 	return ( fd );
 	}
 

@@ -238,7 +238,7 @@ HFSItem::HIterator::HIterator( HString const& path_ ) : _path( path_ ), _dir( NU
 	if ( ! _path.is_empty() )
 		{
 		_dir = ::opendir( _path.raw() );
-		_dirEnt = HChunk::ptr_t( new ( memory::yaal ) HChunk( dirent_size( _path.raw() ) ) );
+		_dirEnt = make_pointer<HChunk>( dirent_size( _path.raw() ) );
 		operator ++();
 		}
 	return;
@@ -255,7 +255,7 @@ HFSItem::HIterator::HIterator( HIterator const& it_ ) : _path( it_._path ), _dir
 		if ( !! it_._dirEnt )
 			{
 			int const DIRENT_SIZE( dirent_size( _path.raw() ) );
-			_dirEnt = HChunk::ptr_t( new ( memory::yaal ) HChunk( DIRENT_SIZE ) );
+			_dirEnt = make_pointer<HChunk>( DIRENT_SIZE );
 			::memcpy( _dirEnt->get<void>(), it_._dirEnt->get<void>(), DIRENT_SIZE );
 			}
 		_item.set_path( it_._item._path, it_._item._nameLen );

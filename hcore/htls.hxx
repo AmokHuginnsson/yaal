@@ -71,7 +71,8 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new ( memory::yaal ) tType );
+		ptr_t p( make_pointer<tType>() );
+		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -85,7 +86,8 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new ( memory::yaal ) tType( a0_ ) );
+		ptr_t p( make_pointer<tType>( a0_ ) );
+		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -99,7 +101,8 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new ( memory::yaal ) tType( a0_, a1_ ) );
+		ptr_t p( make_pointer<tType>( a0_, a1_ ) );
+		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -113,7 +116,8 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new ( memory::yaal ) tType( a0_, a1_, a2_ ) );
+		ptr_t p( make_pointer<tType>( a0_, a1_, a2_ ) );
+		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -128,7 +132,8 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new ( memory::yaal ) tType( a0_, a1_, a2_, a3_ ) );
+		ptr_t p( make_pointer<tType>( a0_, a1_, a2_, a3_ ) );
+		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -143,7 +148,8 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new ( memory::yaal ) tType( a0_, a1_, a2_, a3_, a4_ ) );
+		ptr_t p( make_pointer<tType>( a0_, a1_, a2_, a3_, a4_ ) );
+		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
 		}
@@ -151,14 +157,95 @@ public:
 	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const& )>( &this_type::construct ),
-					this, a0_, a1_, a2_, a3_, a4_ ) ) {}
+					this, a0_, a1_, a2_, a3_, a4_, a5_ ) ) {}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
 	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_ )
 		{
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
-		ptr_t p( _tls = new ( memory::yaal ) tType( a0_, a1_, a2_, a3_, a4_, a5_ ) );
+		ptr_t p( make_pointer<tType>( a0_, a1_, a2_, a3_, a4_, a5_ ) );
+		_tls = p.raw();
+		_instances.push_back( p );
+		M_EPILOG
+		}
+	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_ )
+		: _mutex(), _instances(),
+		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const&, T6 const& )>( &this_type::construct ),
+					this, a0_, a1_, a2_, a3_, a4_, a5_, a6_ ) ) {}
+	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_ )
+		{
+		M_PROLOG
+		yaal::hcore::HLock l( _mutex );
+		M_ASSERT( ! _tls );
+		ptr_t p( make_pointer<tType>( a0_, a1_, a2_, a3_, a4_, a5_, a6_ ) );
+		_tls = p.raw();
+		_instances.push_back( p );
+		M_EPILOG
+		}
+	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
+	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_ )
+		: _mutex(), _instances(),
+		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const&, T6 const&, T7 const& )>( &this_type::construct ),
+					this, a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_ ) ) {}
+	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_ )
+		{
+		M_PROLOG
+		yaal::hcore::HLock l( _mutex );
+		M_ASSERT( ! _tls );
+		ptr_t p( make_pointer<tType>( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_ ) );
+		_tls = p.raw();
+		_instances.push_back( p );
+		M_EPILOG
+		}
+	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
+	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_ )
+		: _mutex(), _instances(),
+		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const&, T6 const&, T7 const&, T8 const& )>( &this_type::construct ),
+					this, a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_ ) ) {}
+	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_ )
+		{
+		M_PROLOG
+		yaal::hcore::HLock l( _mutex );
+		M_ASSERT( ! _tls );
+		ptr_t p( make_pointer<tType>( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_ ) );
+		_tls = p.raw();
+		_instances.push_back( p );
+		M_EPILOG
+		}
+	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
+	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_, T9 const& a9_ )
+		: _mutex(), _instances(),
+		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const&, T6 const&, T7 const&, T8 const&, T9 const& )>( &this_type::construct ),
+					this, a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_ ) ) {}
+	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_, T9 const& a9_ )
+		{
+		M_PROLOG
+		yaal::hcore::HLock l( _mutex );
+		M_ASSERT( ! _tls );
+		ptr_t p( make_pointer<tType>( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_ ) );
+		_tls = p.raw();
+		_instances.push_back( p );
+		M_EPILOG
+		}
+	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
+	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_, T9 const& a9_, T10 const& a10_ )
+		: _mutex(), _instances(),
+		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const&, T6 const&, T7 const&, T8 const&, T9 const&, T10 const& )>( &this_type::construct ),
+					this, a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_, a10_ ) ) {}
+	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_, T9 const& a9_, T10 const& a10_ )
+		{
+		M_PROLOG
+		yaal::hcore::HLock l( _mutex );
+		M_ASSERT( ! _tls );
+		ptr_t p( make_pointer<tType>( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_, a10_ ) );
+		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
 		}

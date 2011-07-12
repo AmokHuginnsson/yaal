@@ -192,7 +192,7 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ )
 		{
 		try
 			{
-			driver = make_pair( HPlugin::ptr_t( new ( memory::yaal ) HPlugin() ), ODBConnector() );
+			driver = make_pair( HPlugin::ptr_t( make_pointer<HPlugin>() ), ODBConnector() );
 			log( LOG_TYPE::NOTICE ) << "Loading [" << _driver_[ driverId_ + 1 ] << "] driver ... ";
 			driver.first->load( _driver_[ driverId_ + 1 ] );
 			cout << "(linking symbols ...) " << flush;

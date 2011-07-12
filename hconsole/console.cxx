@@ -180,7 +180,7 @@ void HConsole::init( void )
 	signalService.register_handler( SIGTRAP, cleanup );
 	signalService.register_handler( SIGSYS, cleanup );
 	signalService.register_handler( SIGPIPE, cleanup );
-	_event = HPipe::ptr_t( new ( memory::yaal ) HPipe );
+	_event = make_pointer<HPipe>();
 	M_EPILOG
 	}
 

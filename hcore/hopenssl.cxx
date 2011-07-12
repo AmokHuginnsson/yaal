@@ -195,7 +195,7 @@ void HOpenSSL::OSSLContext::init( void )
 		_sslLibMutexes.resize( numLocks );
 		for ( mutexes_t::iterator it( _sslLibMutexes.begin() ), endIt( _sslLibMutexes.end() ); it != endIt; ++ it )
 			{
-			it->first = mutex_ptr_t( new ( memory::yaal ) HMutex( HMutex::TYPE::RECURSIVE ) );
+			it->first = mutex_ptr_t( make_pointer<HMutex>( HMutex::TYPE::RECURSIVE ) );
 			it->second = 0;
 			}
 		CRYPTO_set_locking_callback( &HOpenSSL::OSSLContext::libssl_rule_mutex );

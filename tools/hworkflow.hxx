@@ -104,6 +104,7 @@ private:
 	HWorker( HWorker const& );
 	HWorker& operator = ( HWorker const& );
 	friend class HWorkFlow;
+	friend HWorkFlow::worker_ptr_t yaal::hcore::make_pointer<HWorker>( HWorkFlow* );
 	};
 
 typedef yaal::hcore::HExceptionT<HWorkFlow::HWorker> HWorkerException;
