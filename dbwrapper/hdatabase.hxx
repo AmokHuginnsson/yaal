@@ -82,7 +82,7 @@ private:
 	virtual ~HDataBase( void );
 	HDataBase( HDataBase const& );
 	HDataBase& operator = ( HDataBase const& );
-	friend struct yaal::hcore::pointer_helper::HSpaceHolderDeleter<HDataBase>;
+	friend class yaal::hcore::pointer_helper::HSpaceHolderDeleter<HDataBase>;
 	friend class HRecordSet;
 	friend ptr_t yaal::hcore::make_pointer<HDataBase>( void );
 	};

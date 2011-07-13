@@ -241,8 +241,13 @@ private:
 		iterator_t& raw( void );
 		friend class HModelIteratorWrapper;
 		friend class HListControler<tType>;
+#ifndef _MSC_VER
 		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HListControler<tType>* const&, typename model_t::iterator const& );
 		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HListControler<tType> const* const&, typename model_t::iterator const& );
+#else /* #ifndef _MSC_VER */
+		template<typename T1, typename T2, typename T3>
+		friend yaal::hcore::HPointer<T1> yaal::hcore::make_pointer<T1>( T2 const&, T3 const& );
+#endif /* #else #ifndef _MSC_VER */
 	public:
 		~HModelIterator( void );
 		};
@@ -353,7 +358,11 @@ public:
 			int /* height */,
 			int /* width */,
 			char const*,
+#ifndef _MSC_VER
 			list_control_helper::HAbstractControler::ptr_t const& = hcore::make_pointer<list_control_helper::HListControler<> >( hcore::make_pointer<list_control_helper::HListControler<>::model_t>() ) );	/* label */
+#else /* #ifndef _MSC_VER */
+			list_control_helper::HAbstractControler::ptr_t const& =  list_control_helper::HListControler<>::ptr_t( new ( memory::yaal ) list_control_helper::HListControler<>( list_control_helper::HListControler<>::model_ptr_t( new ( memory::yaal ) list_control_helper::HListControler<>::model_t() ) ) ) );	/* label */
+#endif /* #else #ifndef _MSC_VER */
 	virtual ~HListControl ( void );
 	void add_column( int,									/* at position */
 			char const*,									/* column name */

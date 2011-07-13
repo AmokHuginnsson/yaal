@@ -206,7 +206,7 @@ SystemIO& SystemIO::get_instance( void )
 SystemIO::io_t& SystemIO::create_io( IO::TYPE::type_t type_, HANDLE h_, HANDLE e_, std::string const& p_ )
 	{
 	CLock l( _mutex );
-	return ( *( _ioTable.insert( std::make_pair( _idPool ++, make_shared<IO>( type_, h_, e_, p_ ) ) ) ).first );
+	return ( *( _ioTable.insert( std::make_pair( _idPool ++, io_ptr_t( new IO( type_, h_, e_, p_ ) ) ) ) ).first );
 	}
 
 SystemIO::io_t& SystemIO::get_io( int id_ )
@@ -217,7 +217,7 @@ SystemIO::io_t& SystemIO::get_io( int id_ )
 		return ( *i );
 	M_ASSERT( id_ < MANAGED_IO );
 	HANDLE h( reinterpret_cast<HANDLE>( _get_osfhandle( id_ ) ) );
-	return ( *( _ioTable.insert( std::make_pair( id_, make_shared<IO>( IO::TYPE::TERMINAL, h, h ) ) ) ).first );
+	return ( *( _ioTable.insert( std::make_pair( id_, io_ptr_t( new IO( IO::TYPE::TERMINAL, h, h ) ) ) ) ).first );
 	}
 
 int SystemIO::close_io( int id_ )
