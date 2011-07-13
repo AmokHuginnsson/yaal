@@ -112,9 +112,13 @@ HComplex& HComplex::set( double long real_, double long imaginary_ )
 double long HComplex::modulus( void ) const
 	{
 	M_PROLOG
+	double long mod( 0 );
 	if ( ! _imaginary )
-		return ( _real );
-	return ( ::std::sqrt( _real * _real + _imaginary * _imaginary ) );
+		mod = _real;
+	else if ( ! _real )
+		mod = _imaginary;
+	else mod = ::std::sqrt( _real * _real + _imaginary * _imaginary );
+	return ( mod );
 	M_EPILOG
 	}
 
