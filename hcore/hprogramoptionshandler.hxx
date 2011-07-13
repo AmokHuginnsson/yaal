@@ -280,7 +280,7 @@ namespace program_options_helper
 template<typename tType>
 HProgramOptionsHandler::HOptionValueInterface::ptr_t option_value( tType& instance )
 	{
-	HProgramOptionsHandler::HOptionValueInterface::ptr_t value( make_pointer<HProgramOptionsHandler::HOptionValue<tType> >( instance ) );
+	HProgramOptionsHandler::HOptionValueInterface::ptr_t value( make_pointer<HProgramOptionsHandler::HOptionValue<tType> >( ref( instance ) ) );
 	return ( value );
 	}
 

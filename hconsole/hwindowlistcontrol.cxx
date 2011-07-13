@@ -99,7 +99,7 @@ typedef yaal::hcore::HList<HWindow::ptr_t>::iterator window_iterator_t;
 template<>
 HRow<window_iterator_t>::HRow( iterator_t& it_ ) : _iterator( it_ ), _cells( 1 )
 	{
-	_cells[ 0 ] = make_pointer<HCell<window_iterator_t> >( _iterator, 0 );
+	_cells[ 0 ] = make_pointer<HCell<window_iterator_t> >( ref( _iterator ), 0 );
 	return;
 	}
 

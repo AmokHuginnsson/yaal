@@ -241,8 +241,8 @@ private:
 		iterator_t& raw( void );
 		friend class HModelIteratorWrapper;
 		friend class HListControler<tType>;
-		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HListControler<tType>*, typename model_t::iterator );
-		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HListControler<tType> const*, typename model_t::iterator );
+		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HListControler<tType>* const&, typename model_t::iterator const& );
+		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HListControler<tType> const* const&, typename model_t::iterator const& );
 	public:
 		~HModelIterator( void );
 		};

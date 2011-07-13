@@ -749,7 +749,7 @@ HPointer<tType> make_pointer( void )
 	}
 
 template<typename tType, typename a0_t>
-HPointer<tType> make_pointer( a0_t a0_ )
+HPointer<tType> make_pointer( a0_t const& a0_ )
 	{
 	HPointer<tType> ptr;
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
@@ -759,7 +759,7 @@ HPointer<tType> make_pointer( a0_t a0_ )
 	}
 
 template<typename tType, typename a0_t, typename a1_t>
-HPointer<tType> make_pointer( a0_t a0_, a1_t a1_ )
+HPointer<tType> make_pointer( a0_t const& a0_, a1_t const& a1_ )
 	{
 	HPointer<tType> ptr;
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
@@ -769,7 +769,7 @@ HPointer<tType> make_pointer( a0_t a0_, a1_t a1_ )
 	}
 
 template<typename tType, typename a0_t, typename a1_t, typename a2_t>
-HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_ )
+HPointer<tType> make_pointer( a0_t const& a0_, a1_t const& a1_, a2_t const& a2_ )
 	{
 	HPointer<tType> ptr;
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
@@ -780,7 +780,7 @@ HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_ )
 
 template<typename tType, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t>
-HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_ )
+HPointer<tType> make_pointer( a0_t const& a0_, a1_t const& a1_, a2_t const& a2_, a3_t const& a3_ )
 	{
 	HPointer<tType> ptr;
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
@@ -791,7 +791,8 @@ HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_ )
 
 template<typename tType, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t>
-HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_ )
+HPointer<tType> make_pointer( a0_t const& a0_, a1_t const& a1_,
+		a2_t const& a2_, a3_t const& a3_, a4_t const& a4_ )
 	{
 	HPointer<tType> ptr;
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
@@ -802,7 +803,8 @@ HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_ )
 
 template<typename tType, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t>
-HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_ )
+HPointer<tType> make_pointer( a0_t const& a0_, a1_t const& a1_,
+		a2_t const& a2_, a3_t const& a3_, a4_t const& a4_, a5_t const& a5_ )
 	{
 	HPointer<tType> ptr;
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
@@ -813,7 +815,8 @@ HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, 
 
 template<typename tType, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_ )
+HPointer<tType> make_pointer( a0_t const& a0_, a1_t const& a1_,
+		a2_t const& a2_, a3_t const& a3_, a4_t const& a4_, a5_t const& a5_, a6_t const& a6_ )
 	{
 	HPointer<tType> ptr;
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
@@ -825,8 +828,9 @@ HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, 
 template<typename tType, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t, typename a6_t,
 	typename a7_t>
-HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_,
-		a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_ )
+HPointer<tType> make_pointer( a0_t const& a0_, a1_t const& a1_,
+		a2_t const& a2_, a3_t const& a3_, a4_t const& a4_, a5_t const& a5_,
+		a6_t const& a6_, a7_t const& a7_ )
 	{
 	HPointer<tType> ptr;
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
@@ -838,8 +842,9 @@ HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_,
 template<typename tType, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t, typename a6_t,
 	typename a7_t, typename a8_t>
-HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_,
-		a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, a8_t a8_ )
+HPointer<tType> make_pointer( a0_t const& a0_, a1_t const& a1_,
+		a2_t const& a2_, a3_t const& a3_, a4_t const& a4_, a5_t const& a5_,
+		a6_t const& a6_, a7_t const& a7_, a8_t const& a8_ )
 	{
 	HPointer<tType> ptr;
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
@@ -851,8 +856,9 @@ HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_,
 template<typename tType, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t, typename a6_t,
 	typename a7_t, typename a8_t, typename a9_t>
-HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_,
-		a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, a8_t a8_, a9_t a9_ )
+HPointer<tType> make_pointer( a0_t const& a0_, a1_t const& a1_,
+		a2_t const& a2_, a3_t const& a3_, a4_t const& a4_, a5_t const& a5_,
+		a6_t const& a6_, a7_t const& a7_, a8_t const& a8_, a9_t const& a9_ )
 	{
 	HPointer<tType> ptr;
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
@@ -864,8 +870,10 @@ HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_,
 template<typename tType, typename a0_t, typename a1_t, typename a2_t,
 	typename a3_t, typename a4_t, typename a5_t, typename a6_t,
 	typename a7_t, typename a8_t, typename a9_t, typename a10_t>
-HPointer<tType> make_pointer( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_,
-		a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, a8_t a8_, a9_t a9_, a10_t a10_ )
+HPointer<tType> make_pointer( a0_t const& a0_, a1_t const& a1_,
+		a2_t const& a2_, a3_t const& a3_, a4_t const& a4_, a5_t const& a5_,
+		a6_t const& a6_, a7_t const& a7_, a8_t const& a8_, a9_t const& a9_,
+		a10_t const& a10_ )
 	{
 	HPointer<tType> ptr;
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
