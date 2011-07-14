@@ -111,6 +111,7 @@ bool set_tools_variables( HString& option_, HString& value_ )
 				case (   2400 ): _baudRate_ = HSerial::SPEED::B_2400;   break;
 				default:
 					M_THROW( _( "unknown baud rate" ), baudRate );
+				break;
 				}
 			}
 		}

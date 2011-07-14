@@ -278,6 +278,7 @@ int HTreeControl::do_process_input( int code_ )
 		/* no break on purpouse, see hlistcontrol.c */
 		default :
 			errorCode = code_;
+		break;
 		}
 	code_ = errorCode;
 	if ( ! errorCode )

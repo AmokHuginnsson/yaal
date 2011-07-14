@@ -59,6 +59,7 @@ void SignalsSetup::set_mask( int how_, sigset_t const* set_ )
 		break;
 		default:
 			M_ASSERT( !"Bad how_ argument value." );
+		break;
 		}
 	}
 

@@ -542,6 +542,7 @@ int HEditControl::do_process_input ( int code_ )
 		break;
 		default:
 			errorCode = insert_char( code_, length );
+		break;
 		}
 	if ( errorCode == HISTORY_OPERATION )
 		errorCode = update_from_history();

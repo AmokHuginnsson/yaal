@@ -605,6 +605,7 @@ void dump_configuration( void* arg )
 				break;
 				default:
 					;
+				break;
 				}
 			}
 		::printf( "\n" );

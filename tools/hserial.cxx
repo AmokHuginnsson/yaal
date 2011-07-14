@@ -320,15 +320,19 @@ void HSerial::flush( int type_ )
 			{
 			case ( TCIFLUSH ):
 				M_THROW( "tcflush ( TCIFLUSH )", errno );
+			break;
 			case ( TCOFLUSH ):
 				M_THROW( "tcflush ( TCOFLUSH )", errno );
+			break;
 			case ( TCIOFLUSH ):
 				M_THROW( "tcflush ( TCIOFLUSH )", errno );
+			break;
 			default :
 				{
 				errMsg.format( "tcflush ( %d )", type_ );
 				M_THROW( errMsg, errno );
 				}
+			break;
 			}
 		}
 	return;

@@ -320,6 +320,7 @@ double long HExpression::functions( tree_t::const_node_t node_ )
 		break;
 		default:
 			M_THROW( _( "unknown function type" ), function );
+		break;
 		}
 	return ( retVal );
 	M_EPILOG
@@ -347,6 +348,7 @@ double long HExpression::addition( tree_t::const_node_t node_ )
 			break;
 			default:
 				M_THROW( _( "unknown addition operator" ), op );
+			break;
 			}
 		}
 	return ( leftValue );
@@ -382,6 +384,7 @@ double long HExpression::multiplication( tree_t::const_node_t node_ )
 			break;
 			default:
 				M_THROW( _( "unknown multiplication operator" ), op );
+			break;
 			}
 		}
 	return ( leftValue );
@@ -800,6 +803,7 @@ char const* HExpression::get_error( void ) const
 			return ( _( "premature termination" ) );
 		default :
 			M_THROW ( _( "enknown error code" ), _error );
+		break;
 		}
 	return ( NULL );
 	M_EPILOG

@@ -244,6 +244,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& mode_ )
 		break;
 		default :
 			M_THROW( _eMode_, mode_ );
+		break;
 		}
 	_mode = mode_;
 	return ( _SQL );

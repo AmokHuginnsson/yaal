@@ -227,6 +227,7 @@ int HLogPad::do_process_input ( int code_ )
 		break;
 		default :
 			code = code_;
+		break;
 		}
 	if ( ! code )
 		schedule_refresh();

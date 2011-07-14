@@ -192,6 +192,7 @@ char const* db_error( void* data_ )
 		default:
 			snprintf( textBuffer, OCI_ERROR_MAXMSG_SIZE - 2,
 					"Error - %d", oracle->_status );
+		break;
 		}
 	return ( textBuffer );
 	}

@@ -377,10 +377,11 @@ int HStatusBarControl::process_input_normal( int code_ )
 			}
 		break;
 		case ( '\t' ):
-		HConsole::get_instance().bell();
+			HConsole::get_instance().bell();
 		break;
 		default :
 			code_ = code;
+		break;
 		}
 	return ( code_ );
 	M_EPILOG

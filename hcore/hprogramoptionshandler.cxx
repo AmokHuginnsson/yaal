@@ -631,6 +631,7 @@ option* make_option_array( HProgramOptionsHandler::options_t const& options_, HC
 			case ( HProgramOptionsHandler::OOption::TYPE::NONE ):
 			default :
 				options[ ctr ].has_arg = no_argument;
+			break;
 			}
 		options[ ctr ].val = it->_shortForm;
 		}

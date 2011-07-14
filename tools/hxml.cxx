@@ -310,9 +310,8 @@ HString const& HXml::convert( HString const& data_, way_t way_ ) const
 		case ( TO_EXTERNAL ): { cD = ( *_convert )._iconvToExternal; break; }
 		case ( TO_INTERNAL ): { cD = ( *_convert )._iconvToInternal; break; }
 		default:
-			{
 			M_ASSERT( ! _( "unknown conversion way" ) );
-			}
+		break;
 		}
 	size_t sizeOut = 0, sizeIn = ::strlen( source );
 	/* The longest single character in any encoding is 6 bytes long. */

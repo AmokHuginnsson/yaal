@@ -195,6 +195,7 @@ int HDataWindow::init( void )
 			break;
 			default :
 				M_THROW( ( HFormat( "unknown resource purpouse at %d" ) % i ).string(), r._role );
+			break;
 			}
 		}
 	_mainControl->set_focus();
@@ -269,6 +270,7 @@ void HDataWindow::set_mode( DOCUMENT::mode_t mode_ )
 		break;
 		default :
 			M_THROW ( "unknown window mode", mode_ );
+		break;
 		}
 	return;
 	M_EPILOG

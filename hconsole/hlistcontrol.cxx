@@ -317,6 +317,7 @@ void HListControl::draw_cell( iterator_t& it_, int row_, int column_, int column
 		break;
 		default :
 			M_THROW( "unknown align", columnInfo_->_align );
+		break;
 		}
 	if ( row_ == _cursorPosition )
 		{
@@ -589,6 +590,7 @@ int HListControl::do_process_input( int code_ )
 			else
 				errorCode = code_;
 			}
+		break;
 		}
 	code_ = errorCode;
 	if ( ! errorCode )
@@ -971,6 +973,7 @@ bool HListControl::get_text_for_cell( iterator_t& it_, int column_, type_t type_
 		break;
 		default :
 			M_THROW( "unknown type", type_.value() );
+		break;
 		}
 	return ( item.get_checked() );
 	M_EPILOG

@@ -80,7 +80,7 @@ int long HClock::get_time_elapsed( UNIT::unit_t unit_, bool reset_ ) const
 		case ( UNIT::NANOSECOND ): elapsed = time.tv_sec * NANO_IN_WHOLE + time.tv_nsec; break;
 		case ( UNIT::MICROSECOND ): elapsed = time.tv_sec * MICRO_IN_WHOLE + time.tv_nsec / NANO_IN_MICRO; break;
 		case ( UNIT::MILISECOND ): elapsed = time.tv_sec * MILI_IN_WHOLE + time.tv_nsec / NANO_IN_MILI; break;
-		default: M_ASSERT( ! "bad HClock::UNIT!" );
+		default: M_ASSERT( ! "bad HClock::UNIT!" ); break;
 		}
 	if ( reset_ )
 		{
