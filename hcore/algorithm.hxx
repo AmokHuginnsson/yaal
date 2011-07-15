@@ -1180,8 +1180,10 @@ void make_heap( iter_t first_, iter_t last_, compare_t comp_ )
 			if ( left < size )
 				{
 				int long child( right < size ? ( comp_( *( first_ + left ), *( first_ + right ) ) ? right : left ) : left );
-				if ( comp_( *( first_ + pos ), *( first_ + child ) ) )
-					swap( *( first_ + pos ), *( first_ + child ) );
+				iter_t fp( first_ + pos );
+				iter_t fc( first_ + child );
+				if ( comp_( *fp, *fc ) )
+					swap( *fp, *fc );
 				else
 					break;
 				pos = child;
@@ -1256,8 +1258,10 @@ void pop_heap( iter_t first_, iter_t last_, compare_t comp_ )
 			if ( left < size )
 				{
 				int long child( right < size ? ( comp_( *( first_ + left ), *( first_ + right ) ) ? right : left ) : left );
-				if ( comp_( *( first_ + pos ), *( first_ + child ) ) )
-					swap( *( first_ + pos ), *( first_ + child ) );
+				iter_t fp( first_ + pos );
+				iter_t fc( first_ + child );
+				if ( comp_( *fp, *fc ) )
+					swap( *fp, *fc );
 				else
 					break;
 				pos = child;
@@ -1354,29 +1358,29 @@ void sort_heap( iter_t first_, iter_t last_ )
 	return;
 	}
 
-/*! \brief Sort range of elements (sorting algorithm is unstable).
+/*! \brief Sort range of elements (sorting algorithm is unstable with worst case complexity guarantee O(n*ln(n)) ).
  *
  * \param first_ - begining of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
  * \param comp_ - comparision operator used for sorting.
  */
 template<typename iter_t, typename compare_t>
-void sort( iter_t first_, iter_t last_, compare_t comp_ )
+void heap_sort( iter_t first_, iter_t last_, compare_t comp_ )
 	{
 	make_heap( first_, last_, comp_ );
 	sort_heap( first_, last_, comp_ );
 	return;
 	}
 
-/*! \brief Sort range of elements (sorting algorithm is unstable).
+/*! \brief Sort range of elements (sorting algorithm is unstable with worst case complexity guarantee O(n*ln(n)) ).
  *
  * \param first_ - begining of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
  */
 template<typename iter_t>
-void sort( iter_t first_, iter_t last_ )
+void heap_sort( iter_t first_, iter_t last_ )
 	{
-	sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+	heap_sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 	}
 
@@ -1504,6 +1508,88 @@ template<typename iter_t>
 void stable_sort( iter_t first_, iter_t last_ )
 	{
 	stable_sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+	return;
+	}
+
+/*! \cond */
+/* naive */
+template<typename iter_t, typename compare_t>
+typename hcore::iterator_traits<iter_t>::value_type choose_pivot( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	iter_t mid( first_ + ( last_ - first_ ) / 2 );
+	if ( comp_( *first_, *last_ ) )
+		{
+		if ( comp_( *first_, *mid ) )
+			{
+			if ( comp_( *last_, *mid ) )
+				mid = last_;
+			}
+		else
+			mid = first_;
+		}
+	else
+		{
+		if ( comp_( *last_, *mid ) )
+			{
+			if ( comp_( *first_, *mid ) )
+				mid = first_;
+			}
+		else
+			mid = last_;
+		}
+	return ( *mid );
+	}
+/*! \endcond */
+
+/*! \brief Sort range of elements (sorting algorithm is unstable with worst case complexity O(n^2) ).
+ *
+ * \param first_ - begining of the range to be sorted.
+ * \param last_ - one past the end of the range to be sorted.
+ * \param comp_ - comparision operator used for sorting.
+ */
+template<typename iter_t, typename compare_t>
+void sort( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	using yaal::distance;
+	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
+	if ( size < YAAL_MERGE_ALGO_THRESHOLD )
+		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iter_t>::category_type() );
+	else
+		{
+		iter_t l( first_ );
+		iter_t r( last_ - 1 );
+		typename hcore::iterator_traits<iter_t>::value_type pivot( choose_pivot( l, r, comp_ ) );
+		using yaal::swap;
+		while ( l != r )
+			{
+			for ( ; ( l != r ) && comp_( *l, pivot ); ++ l )
+				;
+			for ( ; ( r != l ) && comp_( pivot, *r ); -- r )
+				;
+			if ( l != r )
+				{
+				swap( *l, *r );
+				++ l;
+				if ( ! ( l != r ) )
+					break;
+				-- r;
+				}
+			}
+		sort( first_, l, comp_ );
+		sort( l, last_, comp_ );
+		}
+	return;
+	}
+
+/*! \brief Sort range of elements (sorting algorithm is unstable with worst case complexity O(n^2) ).
+ *
+ * \param first_ - begining of the range to be sorted.
+ * \param last_ - one past the end of the range to be sorted.
+ */
+template<typename iter_t>
+void sort( iter_t first_, iter_t last_ )
+	{
+	sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 	}
 
