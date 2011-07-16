@@ -1442,9 +1442,23 @@ void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::iterator_
 	}
 /*! \endcond */
 
+/*! \cond */
+template<typename iter_t, typename compare_t>
+void selection_sort( iter_t first_, iter_t last_, compare_t comp_ )
+	{
+	for ( ; first_ != last_; ++ first_ )
+		{
+		iter_t min( min_element( first_, last_, comp_ ) );
+		if ( min != first_ )
+			swap( *min, *first_ );
+		}
+	}
+/*! \endcond */
+
 namespace
 {
-static int const YAAL_MERGE_ALGO_THRESHOLD = 16;
+static int const YAAL_MERGE_SORT_ALGO_THRESHOLD = 16;
+static int const YAAL_QUICK_SORT_ALGO_THRESHOLD = 8;
 }
 
 /*! \cond */
@@ -1454,7 +1468,7 @@ void stable_sort_impl( iter_t first_, iter_t last_, compare_t comp_,
 	{
 	using yaal::distance;
 	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
-	if ( size < YAAL_MERGE_ALGO_THRESHOLD )
+	if ( size < YAAL_MERGE_SORT_ALGO_THRESHOLD )
 		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iter_t>::category_type() );
 	else
 		{
@@ -1481,7 +1495,7 @@ void stable_sort( iter_t first_, iter_t last_, compare_t comp_ )
 	{
 	using yaal::distance;
 	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
-	if ( size < YAAL_MERGE_ALGO_THRESHOLD )
+	if ( size < YAAL_MERGE_SORT_ALGO_THRESHOLD )
 		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iter_t>::category_type() );
 	else
 		{
@@ -1552,7 +1566,7 @@ void sort( iter_t first_, iter_t last_, compare_t comp_ )
 	{
 	using yaal::distance;
 	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
-	if ( size < YAAL_MERGE_ALGO_THRESHOLD )
+	if ( size < YAAL_QUICK_SORT_ALGO_THRESHOLD )
 		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iter_t>::category_type() );
 	else
 		{
@@ -1564,19 +1578,43 @@ void sort( iter_t first_, iter_t last_, compare_t comp_ )
 			{
 			for ( ; ( l != r ) && comp_( *l, pivot ); ++ l )
 				;
-			for ( ; ( r != l ) && comp_( pivot, *r ); -- r )
+			for ( ; ( r != l ) && ! comp_( *r, pivot ); -- r )
 				;
 			if ( l != r )
 				{
 				swap( *l, *r );
 				++ l;
-				if ( ! ( l != r ) )
+				if ( l != r )
+					-- r;
+				else
 					break;
-				-- r;
+				}
+			else
+				break;
+			}
+		for ( ; ( l != last_ ) && comp_( *l, pivot ); ++ l )
+			;
+		bool leftConstant( false );
+		if ( ! ( l != first_ ) )
+			{
+			/* if l == first_ it means that pivot is minimum of a set
+			 */
+			leftConstant = true;
+			for ( r = l; r != last_; ++ r )
+				{
+				if ( ( ! comp_( pivot, *r ) ) && ( r != l ) )
+					{
+					swap( *r, *l );
+					++ l;
+					}
 				}
 			}
-		sort( first_, l, comp_ );
-		sort( l, last_, comp_ );
+		if ( l != last_ )
+			{
+			if ( ! leftConstant )
+				sort( first_, l, comp_ );
+			sort( l, last_, comp_ );
+			}
 		}
 	return;
 	}
