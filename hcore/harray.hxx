@@ -603,7 +603,7 @@ template<typename type_t>
 bool HArray<type_t>::operator ! ( void ) const
 	{
 	M_PROLOG
-	return ( ! is_empty() );
+	return ( is_empty() );
 	M_EPILOG
 	}
 
