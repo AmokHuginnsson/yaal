@@ -1341,8 +1341,8 @@ bool is_heap( iter_t first_, iter_t last_ )
 template<typename iter_t, typename compare_t>
 void sort_heap( iter_t first_, iter_t last_, compare_t comp_ )
 	{
-	for ( int long i( last_ - first_ ); i > 1; -- i )
-		pop_heap( first_, first_ + i, comp_ );
+	for ( iter_t first( first_ + 1 ); last_ != first; -- last_ )
+		pop_heap( first_, last_, comp_ );
 	return;
 	}
 
