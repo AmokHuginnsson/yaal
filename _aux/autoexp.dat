@@ -21,7 +21,7 @@ yaal::hcore::HString {
 yaal::hcore::HArray<*> {
 	preview ( #( "[", $c._size, "](",
 			#array (
-				expr:	(($T1*)($c._buf._data))[$i],
+				expr:	$c._buf[$i],
 				size: $c._size
 			),
 		" )"
@@ -30,7 +30,7 @@ yaal::hcore::HArray<*> {
 		#(
 			[raw members]: [$c,!],
 			#array (
-				expr:	(($T1*)($c._buf._data))[$i],
+				expr:	$c._buf[$i],
 				size: $c._size
 			)
 		)
