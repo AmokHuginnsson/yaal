@@ -370,6 +370,7 @@ void HDeque<type_t>::clear( void )
 		operator delete ( static_cast<void*>( chunks[ i ] ) );
 		chunks[ i ] = NULL;
 		}
+	_start = 0;
 	_size = 0;
 	return;
 	M_EPILOG
@@ -626,6 +627,8 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 			}
 		_size -= toRemove;
 		}
+	if ( ! _size )
+		_start = 0;
 	return ( last_._index < _size ? last_ : end() );
 	M_EPILOG
 	}
@@ -684,7 +687,19 @@ void HDeque<type_t>::pop_back( void )
 	{
 	M_PROLOG
 	M_ASSERT( _size > 0 );
-	erase( end() - 1, end() );
+	int long idx( _start + _size - 1 );
+	int long chunk( idx / VALUES_PER_CHUNK );
+	int long offset( idx % VALUES_PER_CHUNK );
+	value_type** chunks = _chunks.get<value_type*>();
+	M_SAFE( ( chunks[ chunk ] + offset )->~value_type() );
+	-- _size;
+	if ( ! ( offset && _size ) )
+		{
+		::operator delete ( static_cast<void*>( chunks[ chunk ] ), memory::yaal );
+		chunks[ chunk ] = NULL;
+		}
+	if ( ! _size )
+		_start = 0;
 	return;
 	M_EPILOG
 	}
@@ -694,7 +709,19 @@ void HDeque<type_t>::pop_front( void )
 	{
 	M_PROLOG
 	M_ASSERT( _size > 0 );
-	erase( begin() );
+	int long chunk( _start / VALUES_PER_CHUNK );
+	int long offset( _start % VALUES_PER_CHUNK );
+	value_type** chunks = _chunks.get<value_type*>();
+	M_SAFE( ( chunks[ chunk ] + offset )->~value_type() );
+	-- _size;
+	++ _start;
+	if ( ! ( ( _start % VALUES_PER_CHUNK ) && _size ) )
+		{
+		::operator delete ( static_cast<void*>( chunks[ chunk ] ), memory::yaal );
+		chunks[ chunk ] = NULL;
+		}
+	if ( ! _size )
+		_start = 0;
 	return;
 	M_EPILOG
 	}
