@@ -73,7 +73,7 @@ class YaalHCoreHArrayHIteratorPrinter:
 		self._val = val
 
 	def to_string( self ):
-		ptr = self._val['_owner']['_buf']['_data'].cast(self._val.type.template_argument( 0 ).pointer());
+		ptr = self._val['_owner']['_buf'];
 		index = self._val['_index']
 		return "{0x%x,%d,%d,%s}" % ( ptr, index, self._val['_owner']['_size'], ( ptr + index ).dereference() )
 
@@ -107,14 +107,11 @@ class YaalHCoreHArrayPrinter:
 	def sizeof_elem( self ):
 		return self.val.type.template_argument( 0 ).sizeof
 
-	def capacity( self ):
-		return self.val['_buf']['_size'] / self.sizeof_elem()
-
 	def children( self ):
-		return self._iterator(self.val['_buf']['_data'].cast(self.val.type.template_argument( 0 ).pointer()), self.val['_size'])
+		return self._iterator(self.val['_buf'], self.val['_size'])
 
 	def to_string( self ):
-		return ( "yaal::hcore::HArray of `%s' of length %d, capacity %d" % ( self.val.type.template_argument( 0 ), self.val['_size'], self.capacity() ) )
+		return ( "yaal::hcore::HArray of `%s' of length %d, capacity %d" % ( self.val.type.template_argument( 0 ), self.val['_size'], self.val['_capacity'] ) )
 
 	def display_hint( self ):
 		return 'array'
