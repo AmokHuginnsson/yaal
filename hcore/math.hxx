@@ -38,8 +38,8 @@ namespace yaal
 namespace math
 {
 
-extern double long PI;
-extern double long E;
+M_YAAL_HCORE_PUBLIC_API extern double long PI;
+M_YAAL_HCORE_PUBLIC_API extern double long E;
 
 }
 
