@@ -1,7 +1,7 @@
 [Visualizer]
 yaal::hcore::HString {
 	preview ( 
-		#if ( $c._mem[sizeof ( yaal::hcore::HString )-1]&128 ) (
+		#if ( ($c._mem[((sizeof(int*))*3)-1]&128) ) (
 		 #( [(*(char**)($c._mem)),s] )
 		)
 		#else (
@@ -9,7 +9,7 @@ yaal::hcore::HString {
 		)
 	)
 	stringview (
-		#if ( $c._mem[sizeof ( yaal::hcore::HString )-1]&128 ) (
+		#if ( ($c._mem[((sizeof(int*))*3)-1]&128) ) (
 		 #( [(*(char**)($c._mem)),s] )
 		)
 		#else (
