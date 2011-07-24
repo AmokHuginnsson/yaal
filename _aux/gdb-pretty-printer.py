@@ -69,8 +69,8 @@ class YaalHCoreHStringPrinter:
 class YaalHCoreHArrayHIteratorPrinter:
 	"Print a yaal::hcore::HArray::HIterator"
 
-	def __init__( self, val ):
-		self._val = val
+	def __init__( self, val_ ):
+		self._val = val_
 
 	def to_string( self ):
 		ptr = self._val['_owner']['_buf'];
@@ -123,12 +123,16 @@ class YaalHCoreHDequeHIteratorPrinter:
 		self._val = val
 
 	def to_string( self ):
-		VPC = self.val['VALUES_PER_CHUNK']
-		chunks = self.val['_owner']['_chunks']['_data'].cast( self.val.type.template_argument( 0 ).pointer().pointer() )
+		VPC = self._val['_owner']['VALUES_PER_CHUNK']
+		ptr = self._val['_owner']
+		chunks = ptr['_chunks']['_data'].cast( self._val.type.template_argument( 0 ).pointer().pointer() )
 		index = self._val['_index']
-		start = self._val['_owner']['_start']
+		start = ptr['_start']
 		physical = index + start
-		return "{0x%x,%d,%d,%s}" % ( ptr, index, self._val['_owner']['_size'], chunks[physical / VPC][physical % VPC] )
+		chunk = chunks[physical / VPC]
+		if chunk != 0:
+			return "{0x%x,%d,%d,%s}" % ( ptr, index, self._val['_owner']['_size'], chunk[physical % VPC] )
+		return "{0x%x,%d,%d,(NIL)}" % ( ptr, index, self._val['_owner']['_size'] )
 
 	def display_hint( self ):
 		return 'string'
@@ -152,7 +156,9 @@ class YaalHCoreHDequePrinter:
 				raise StopIteration
 			count = self._count
 			self._count = self._count + 1
-			elt = self._chunks[ self._index / self._VPC ][ self._index % self._VPC ]
+			chunkIdx = self._index / self._VPC
+			chunk = self._chunks[ chunkIdx ]
+			elt = chunk[ self._index % self._VPC ] if chunk != 0 else "{(NIL) %d chunk}" % chunkIdx
 			self._index = self._index + 1
 			return ( '[%d]' % count, elt )
 
