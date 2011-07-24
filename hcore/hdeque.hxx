@@ -57,6 +57,7 @@ private:
 	static int long const DEFAULT_CHUNK_SIZE = ( 512 / sizeof ( type_t ) ) * sizeof ( type_t ) + ( ( 512 - ( ( 512 / sizeof ( type_t ) ) * sizeof ( type_t ) ) ) > ( sizeof ( type_t ) / 2 ) ? sizeof ( type_t ) : 0 );
 	static int long const CHUNK_SIZE = meta::max<sizeof ( type_t ), DEFAULT_CHUNK_SIZE>::value;
 	static int long const VALUES_PER_CHUNK = CHUNK_SIZE / sizeof ( type_t );
+	static int long const MIN_CHUNKS_COUNT = 8;
 protected:
 	typedef HDeque<type_t> this_type;
 public:
@@ -147,6 +148,8 @@ template<typename type_t>
 int long const HDeque<type_t>::CHUNK_SIZE;
 template<typename type_t>
 int long const HDeque<type_t>::VALUES_PER_CHUNK;
+template<typename type_t>
+int long const HDeque<type_t>::MIN_CHUNKS_COUNT;
 
 }
 
@@ -283,7 +286,7 @@ HDeque<type_t>::HDeque( HDeque const& deque )
 	M_PROLOG
 	if ( deque._size > 0 )
 		{
-		_chunks.realloc( deque._chunks.get_size(), HChunk::STRATEGY::EXACT );
+		_chunks.realloc( max( chunk_size<value_type*>( MIN_CHUNKS_COUNT ), deque._chunks.get_size() ), HChunk::STRATEGY::EXACT );
 		M_ASSERT( _chunks.get_size() == deque._chunks.get_size() );
 		int long firstUsedChunkIndex( deque._start / VALUES_PER_CHUNK );
 		value_type const* const* srcChunks = deque._chunks.template get<value_type const*>();
@@ -406,7 +409,7 @@ void HDeque<type_t>::accommodate_chunks( int long size_ )
 			{
 			if ( newUsedChunksCount > availableChunksCount )
 				{
-				_chunks.realloc( chunk_size<value_type*>( newUsedChunksCount ) );
+				_chunks.realloc( chunk_size<value_type*>( max( newUsedChunksCount, MIN_CHUNKS_COUNT ) ) );
 				newAvailableChunksCount = _chunks.count_of<value_type*>();
 				M_ASSERT( newAvailableChunksCount >= newUsedChunksCount );
 				}
@@ -422,7 +425,7 @@ void HDeque<type_t>::accommodate_chunks( int long size_ )
 			newUsedChunksCount = usedChunksCount + frontExtension;
 			if ( newUsedChunksCount > availableChunksCount )
 				{
-				_chunks.realloc( chunk_size<value_type*>( newUsedChunksCount ) );
+				_chunks.realloc( chunk_size<value_type*>( max( newUsedChunksCount, MIN_CHUNKS_COUNT ) ) );
 				newAvailableChunksCount = _chunks.count_of<value_type*>();
 				M_ASSERT( newAvailableChunksCount >= newUsedChunksCount );
 				}
@@ -674,7 +677,7 @@ void HDeque<type_t>::push_back( type_t const& value_ )
 			int long newUsedChunksCount( usedChunksCount + 1 );
 			if ( newUsedChunksCount > availableChunksCount ) /* We need allocate more space for chunks. */
 				{
-				_chunks.realloc( chunk_size<value_type*>( newUsedChunksCount ) );
+				_chunks.realloc( chunk_size<value_type*>( max( newUsedChunksCount, MIN_CHUNKS_COUNT ) ) );
 				availableChunksCount = _chunks.count_of<value_type*>();
 				}
 			/* We have enough space for chunks, but we need to move existing chunks. */
@@ -720,11 +723,63 @@ template<typename type_t>
 void HDeque<type_t>::push_front( type_t const& value_ )
 	{
 	M_PROLOG
-	accommodate_chunks( -1 );
-	if ( _start > 0 )
+	int long chunk( 0 );
+	int long offset( 0 );
+	value_type** chunks( NULL );
+	if ( ! ( _start % VALUES_PER_CHUNK ) ) /* New chunk in front required. */
+		{
+		if ( ! _start ) /* We need at least to move chunks. */
+			{
+			int long availableChunksCount( _chunks.count_of<value_type*>() );
+			int long usedChunksCount( used_chunks() );
+			int long newUsedChunksCount( usedChunksCount + 1 );
+			if ( newUsedChunksCount > availableChunksCount ) /* We need allocate more space for chunks. */
+				{
+				_chunks.realloc( chunk_size<value_type*>( max( newUsedChunksCount, MIN_CHUNKS_COUNT ) ) );
+				availableChunksCount = _chunks.count_of<value_type*>();
+				}
+			/* We have enough space for chunks, but we need to move existing chunks. */
+			chunks = _chunks.get<value_type*>();
+			int long newFirstUsedChunk( ( availableChunksCount - newUsedChunksCount ) / 2 );
+			if ( _size > 0 )
+				{
+				int long firstUsedChunkIndex( ( _start / VALUES_PER_CHUNK ) - 1 );
+				int long moveBy( firstUsedChunkIndex - newFirstUsedChunk );
+				if ( moveBy > 0 ) /* move to front */
+					{
+					copy( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstUsedChunk );
+					fill( chunks + firstUsedChunkIndex + usedChunksCount - min( moveBy, usedChunksCount ), chunks + firstUsedChunkIndex + usedChunksCount, static_cast<value_type*>( NULL ) );
+					_start -= ( moveBy * VALUES_PER_CHUNK );
+					}
+				else if ( moveBy < 0 ) /* move to back */
+					{
+					M_ASSERT( ( newFirstUsedChunk + usedChunksCount ) <= availableChunksCount );
+					copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstUsedChunk + usedChunksCount );
+					fill( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + min( - moveBy, usedChunksCount ), static_cast<value_type*>( NULL ) );
+					_start -= ( moveBy * VALUES_PER_CHUNK );
+					M_ASSERT( ( ( _start + _size ) / VALUES_PER_CHUNK ) < availableChunksCount );
+					}
+				M_ASSERT( ( _start >= 0 ) && ( ( _start / VALUES_PER_CHUNK ) == newFirstUsedChunk ) );
+				}
+			else
+				_start = newFirstUsedChunk * VALUES_PER_CHUNK;
+			}
+		else /* We have enough space and we do not need to move chunks. */
+			chunks = _chunks.get<value_type*>();
 		-- _start;
+		chunk = _start / VALUES_PER_CHUNK;
+		offset = VALUES_PER_CHUNK - 1;
+		chunks[ chunk ] = static_cast<value_type*>( operator new ( CHUNK_SIZE, memory::yaal ) );
+		}
+	else /* We use old chunk. */
+		{
+		chunks = _chunks.get<value_type*>();
+		-- _start;
+		chunk = _start / VALUES_PER_CHUNK;
+		offset = _start % VALUES_PER_CHUNK;
+		}
+	new ( _chunks.get<value_type*>()[ chunk ] + offset ) value_type( value_ );
 	++ _size;
-	new ( _chunks.get<value_type*>()[ _start / VALUES_PER_CHUNK ] + ( _start % VALUES_PER_CHUNK ) ) value_type( value_ );
 	return;
 	M_EPILOG
 	}
