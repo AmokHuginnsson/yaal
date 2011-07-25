@@ -187,20 +187,73 @@ struct ORCLoader
 		}
 	};
 
-typedef HList<ORCLoader> rc_loaders_t;
-rc_loaders_t _rCLoaders_;
-bool _rCLoadersLocked_ = false;
+class HSetup : public HSingleton<HSetup>
+	{
+public:
+	typedef HSingleton<HSetup> base_type;
+	typedef HSetup this_type;
+	typedef HMap<HString, ORCLoader> rc_loaders_t;
+	typedef typename rc_loaders_t::iterator iterator;
+private:
+	rc_loaders_t _rCLoaders;
+	bool _locked;
+	HSetup( void )
+		: _rCLoaders(), _locked( false ) {}
+	virtual ~HSetup( void ) {}
+public:
+	void add_section( HString const& section_, ORCLoader const& orcLoader_ )
+		{
+		M_PROLOG
+		_rCLoaders.insert( make_pair( section_, orcLoader_ ) );
+		M_EPILOG
+		}
+	ORCLoader& operator()( HString const& section_ )
+		{
+		M_PROLOG
+		rc_loaders_t::iterator it( _rCLoaders.find( section_ ) );
+		M_ENSURE( it != _rCLoaders.end() );
+		return ( it->second );
+		M_EPILOG
+		}
+	iterator begin()
+		{
+		M_PROLOG
+		return ( _rCLoaders.begin() );
+		M_EPILOG
+		}
+	iterator end()
+		{
+		M_PROLOG
+		return ( _rCLoaders.end() );
+		M_EPILOG
+		}
+	void lock( void )
+		{
+		_locked = true;
+		}
+	void unlock( void )
+		{
+		_locked = false;
+		}
+	bool is_locked( void ) const
+		{
+		return ( _locked );
+		}
+private:
+	friend class HSingleton<HSetup>;
+	friend class HDestructor<HSetup>;
+	};
 
 }
 
 class HLocker
 	{
-	bool& _lock;
+	HSetup& _setup;
 public:
-	HLocker( bool& lock_ ) : _lock( lock_ )
-		{ _lock = true; }
+	HLocker( HSetup& setup_ ) : _setup( setup_ )
+		{ _setup.lock(); }
 	~HLocker( void )
-		{ _lock = false; }
+		{ _setup.unlock(); }
 	};
 
 HProgramOptionsHandler::OOption::OOption( void )
@@ -277,8 +330,9 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 		HString const& section_, RC_CALLBACK_t rc_callback )
 	{
 	M_PROLOG
-	if ( ! _rCLoadersLocked_ )
-		_rCLoaders_.push_back( ORCLoader( this, rcName_, section_, rc_callback ) );
+	HSetup& setup( HSetup::get_instance() );
+	if ( ! setup.is_locked() )
+		setup.add_section( section_, ORCLoader( this, rcName_, section_, rc_callback ) );
 	struct OPlacement
 		{
 		RC_PATHER::placement_t _placement;
@@ -462,9 +516,11 @@ namespace program_options_helper
 int reload_configuration( void )
 	{
 	M_PROLOG
-	HLocker lock( _rCLoadersLocked_ );
+	HSetup& setup( HSetup::get_instance() );
+	HLocker lock( setup );
 	log << "Reloading configuration." << endl;
-	for_each( _rCLoaders_.begin(), _rCLoaders_.end(), cref( process_loader ) );
+	for ( HSetup::iterator it( setup.begin() ), end( setup.end() ); it != end; ++ it )
+		process_loader( it->second );
 	return ( 0 );
 	M_EPILOG
 	}
