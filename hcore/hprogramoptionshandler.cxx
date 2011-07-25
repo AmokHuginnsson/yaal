@@ -154,7 +154,7 @@ bool substitute_environment( HString& string_ )
 	M_EPILOG
 	}
 
-namespace
+namespace program_options_helper
 {
 
 struct ORCLoader
@@ -193,7 +193,7 @@ public:
 	typedef HSingleton<HSetup> base_type;
 	typedef HSetup this_type;
 	typedef HMap<HString, ORCLoader> rc_loaders_t;
-	typedef typename rc_loaders_t::iterator iterator;
+	typedef rc_loaders_t::iterator iterator;
 private:
 	rc_loaders_t _rCLoaders;
 	bool _locked;
@@ -244,8 +244,6 @@ private:
 	friend class HDestructor<HSetup>;
 	};
 
-}
-
 class HLocker
 	{
 	HSetup& _setup;
@@ -255,6 +253,8 @@ public:
 	~HLocker( void )
 		{ _setup.unlock(); }
 	};
+
+}
 
 HProgramOptionsHandler::OOption::OOption( void )
 	: _name( NULL ), _value(),
@@ -330,9 +330,9 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 		HString const& section_, RC_CALLBACK_t rc_callback )
 	{
 	M_PROLOG
-	HSetup& setup( HSetup::get_instance() );
+	program_options_helper::HSetup& setup( program_options_helper::HSetup::get_instance() );
 	if ( ! setup.is_locked() )
-		setup.add_section( section_, ORCLoader( *this, rcName_, section_, rc_callback ) );
+		setup.add_section( section_, program_options_helper::ORCLoader( *this, rcName_, section_, rc_callback ) );
 	struct OPlacement
 		{
 		RC_PATHER::placement_t _placement;
@@ -502,6 +502,9 @@ void const* HProgramOptionsHandler::HOptionValueInterface::id( void ) const
 	M_EPILOG
 	}
 
+namespace program_options_helper
+{
+
 void process_loader( ORCLoader& loader )
 	{
 	M_PROLOG
@@ -509,9 +512,6 @@ void process_loader( ORCLoader& loader )
 	return;
 	M_EPILOG
 	}
-
-namespace program_options_helper
-{
 
 int reload_configuration( void )
 	{
