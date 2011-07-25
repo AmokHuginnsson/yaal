@@ -740,29 +740,18 @@ void HDeque<type_t>::push_front( type_t const& value_ )
 				}
 			/* We have enough space for chunks, but we need to move existing chunks. */
 			chunks = _chunks.get<value_type*>();
-			int long newFirstUsedChunk( ( availableChunksCount - newUsedChunksCount ) / 2 );
+			int long oldFirstUsedChunk( ( ( availableChunksCount - newUsedChunksCount ) / 2 ) + 1 );
 			if ( _size > 0 )
 				{
-				int long firstUsedChunkIndex( ( _start / VALUES_PER_CHUNK ) - 1 );
-				int long moveBy( firstUsedChunkIndex - newFirstUsedChunk );
-				if ( moveBy > 0 ) /* move to front */
-					{
-					copy( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstUsedChunk );
-					fill( chunks + firstUsedChunkIndex + usedChunksCount - min( moveBy, usedChunksCount ), chunks + firstUsedChunkIndex + usedChunksCount, static_cast<value_type*>( NULL ) );
-					_start -= ( moveBy * VALUES_PER_CHUNK );
-					}
-				else if ( moveBy < 0 ) /* move to back */
-					{
-					M_ASSERT( ( newFirstUsedChunk + usedChunksCount ) <= availableChunksCount );
-					copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstUsedChunk + usedChunksCount );
-					fill( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + min( - moveBy, usedChunksCount ), static_cast<value_type*>( NULL ) );
-					_start -= ( moveBy * VALUES_PER_CHUNK );
-					M_ASSERT( ( ( _start + _size ) / VALUES_PER_CHUNK ) < availableChunksCount );
-					}
-				M_ASSERT( ( _start >= 0 ) && ( ( _start / VALUES_PER_CHUNK ) == newFirstUsedChunk ) );
+				M_ASSERT( ( oldFirstUsedChunk + usedChunksCount ) <= availableChunksCount );
+				copy_backward( chunks, chunks + usedChunksCount, chunks + usedChunksCount + oldFirstUsedChunk );
+				fill( chunks, chunks + min( oldFirstUsedChunk, usedChunksCount ), static_cast<value_type*>( NULL ) );
+				_start += ( oldFirstUsedChunk * VALUES_PER_CHUNK );
+				M_ASSERT( ( ( ( _start - 1 ) + _size ) / VALUES_PER_CHUNK ) < availableChunksCount );
+				M_ASSERT( ( _start > 0 ) && ( ( _start / VALUES_PER_CHUNK ) == oldFirstUsedChunk ) );
 				}
 			else
-				_start = newFirstUsedChunk * VALUES_PER_CHUNK;
+				_start = oldFirstUsedChunk * VALUES_PER_CHUNK;
 			}
 		else /* We have enough space and we do not need to move chunks. */
 			chunks = _chunks.get<value_type*>();
