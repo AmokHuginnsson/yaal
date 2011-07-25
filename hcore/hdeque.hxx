@@ -667,7 +667,7 @@ void HDeque<type_t>::push_back( type_t const& value_ )
 	int long idx( _start + _size );
 	int long chunk( idx / VALUES_PER_CHUNK );
 	int long offset( idx % VALUES_PER_CHUNK );
-	value_type** chunks( NULL );
+	value_type** chunks = NULL;
 	if ( ! offset ) /* We start new chunk. */
 		{
 		int long availableChunksCount( _chunks.count_of<value_type*>() );
@@ -725,7 +725,7 @@ void HDeque<type_t>::push_front( type_t const& value_ )
 	M_PROLOG
 	int long chunk( 0 );
 	int long offset( 0 );
-	value_type** chunks( NULL );
+	value_type** chunks = NULL;
 	if ( ! ( _start % VALUES_PER_CHUNK ) ) /* New chunk in front required. */
 		{
 		if ( ! _start ) /* We need at least to move chunks. */

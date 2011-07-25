@@ -5,7 +5,5 @@ _aux/ltmain.sh
 _aux/missing
 doc/html
 yaalrc
-yaal.*
 Debug
-VisualStudio
 static
