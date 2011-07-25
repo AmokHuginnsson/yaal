@@ -159,13 +159,13 @@ namespace
 
 struct ORCLoader
 	{
-	HProgramOptionsHandler* _optionHandler;
+	HProgramOptionsHandler _optionHandler;
 	HString _path;
 	HString _section;
 	HProgramOptionsHandler::RC_CALLBACK_t rc_callback;
  	ORCLoader( void ) :
-		_optionHandler( NULL ), _path(), _section(), rc_callback( NULL ) { }
- 	ORCLoader( HProgramOptionsHandler* optionHandler_, HString const& rcName_,
+		_optionHandler(), _path(), _section(), rc_callback( NULL ) { }
+ 	ORCLoader( HProgramOptionsHandler const& optionHandler_, HString const& rcName_,
 		HString const& section_, HProgramOptionsHandler::RC_CALLBACK_t callback )
 		: _optionHandler( optionHandler_ ),
 		_path( rcName_ ), _section( section_ ),
@@ -332,7 +332,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 	M_PROLOG
 	HSetup& setup( HSetup::get_instance() );
 	if ( ! setup.is_locked() )
-		setup.add_section( section_, ORCLoader( this, rcName_, section_, rc_callback ) );
+		setup.add_section( section_, ORCLoader( *this, rcName_, section_, rc_callback ) );
 	struct OPlacement
 		{
 		RC_PATHER::placement_t _placement;
@@ -505,7 +505,7 @@ void const* HProgramOptionsHandler::HOptionValueInterface::id( void ) const
 void process_loader( ORCLoader& loader )
 	{
 	M_PROLOG
-	loader._optionHandler->process_rc_file( loader._path, loader._section, loader.rc_callback );
+	loader._optionHandler.process_rc_file( loader._path, loader._section, loader.rc_callback );
 	return;
 	M_EPILOG
 	}
