@@ -132,6 +132,9 @@ struct HResourceReleaseWhen
 		};
 	};
 
+/*! \brief Provide reference semantics for HResource<>.
+ *
+ */
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 struct HResourceRef
 	{
@@ -179,6 +182,7 @@ public:
 	const_hold_t get( void ) const;
 	hold_t get( void );
 	void reset( void );
+	hold_t release( void );
 	void swap( HResource& other );
 private:
 	template<typename alien_t>
@@ -273,8 +277,7 @@ template<typename type_t, typename free_t, template<typename>class hold_by_t, ty
 template<typename real_t>
 HResource<type_t, free_t, hold_by_t, allocated_t>::operator HResourceRef<real_t, free_t, hold_by_t, allocated_t>( void )
 	{
-	HResourceRef<real_t, free_t, hold_by_t, allocated_t> ref( _resource, _free );
-	_resource = typename hold_by_t<value_type>::hold_t();
+	HResourceRef<real_t, free_t, hold_by_t, allocated_t> ref( release(), _free );
 	_free = free_t();
 	return ( ref );
 	}
@@ -283,8 +286,7 @@ template<typename type_t, typename free_t, template<typename>class hold_by_t, ty
 template<typename real_t>
 HResource<type_t, free_t, hold_by_t, allocated_t>::operator HResource<real_t, free_t, hold_by_t, allocated_t>( void )
 	{
-	HResource<real_t, free_t, hold_by_t, allocated_t> ref( _resource, _free );
-	_resource = typename hold_by_t<value_type>::hold_t();
+	HResource<real_t, free_t, hold_by_t, allocated_t> ref( release(), _free );
 	_free = free_t();
 	return ( ref );
 	}
@@ -338,6 +340,14 @@ void HResource<type_t, free_t, hold_by_t, allocated_t>::reset( void )
 		allocated_t::reset( _resource );
 		}
 	return;
+	}
+
+template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
+typename HResource<type_t, free_t, hold_by_t, allocated_t>::hold_t HResource<type_t, free_t, hold_by_t, allocated_t>::release( void )
+	{
+	typename HResource<type_t, free_t, hold_by_t, allocated_t>::hold_t val( _resource );
+	allocated_t::reset( _resource );
+	return ( val );
 	}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
