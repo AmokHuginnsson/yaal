@@ -133,7 +133,6 @@ struct HResourceReleaseWhen
 	};
 
 /*! \brief Provide reference semantics for HResource<>.
- *
  */
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 struct HResourceRef

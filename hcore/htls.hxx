@@ -33,7 +33,6 @@ Copyright:
 #include "hcore/compat.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/hdeque.hxx"
-#include "hcore/hresource.hxx"
 #include "hcore/hpointer.hxx"
 #include "hcore/hboundcall.hxx"
 #include "hcore/hthread.hxx"
@@ -54,7 +53,6 @@ public:
 	typedef yaal::hcore::HPointer<tType> ptr_t;
 	typedef yaal::hcore::HDeque<ptr_t> instances_t;
 	typedef yaal::hcore::HBoundCall<> constructor_t;
-	typedef yaal::hcore::HResource<yaal::hcore::HLock> external_lock;
 	typedef typename instances_t::iterator iterator;
 	typedef typename instances_t::const_iterator const_iterator;
 private:
@@ -257,11 +255,10 @@ public:
 		_tls = NULL;
 		M_DESTRUCTOR_EPILOG
 		}
-	external_lock acquire( void )
+	external_lock_t acquire( void )
 		{
 		M_PROLOG
-		external_lock l( new ( memory::yaal ) yaal::hcore::HLock( _mutex ) );
-		return ( l );
+		return ( external_lock_t( ref( _mutex ) ) );
 		M_EPILOG
 		}
 	tType* operator->( void )

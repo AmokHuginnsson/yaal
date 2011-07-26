@@ -35,6 +35,7 @@ Copyright:
 #include "hcore/hchunk.hxx"
 #include "hcore/hresource.hxx"
 #include "hcore/hboundcall.hxx"
+#include "hcore/huniquemovable.hxx"
 
 namespace yaal
 {
@@ -228,6 +229,7 @@ private:
 	HLock( HLock const& );
 	HLock& operator = ( HLock const& );
 	};
+typedef HUniqueMovable<HLock> external_lock_t;
 
 /*! \brief Multi-threaded synchronizing prymitive - Conditional Variable.
  */
