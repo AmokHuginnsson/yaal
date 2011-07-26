@@ -40,6 +40,21 @@ namespace yaal
 namespace hcore
 {
 
+/*! \brief Provide reference semantics for HUniqueMovable<>.
+ */
+template<typename tType>
+struct HUniqueMovableRef
+	{
+	char _mem[sizeof ( tType )];
+	bool _owner;
+	explicit HUniqueMovableRef( tType* obj_, bool owner_ )
+		: _mem(), _owner( owner_ )
+		{
+		if ( owner_ )
+			::memcpy( _mem, obj_, sizeof ( tType ) );
+		}
+	};
+
 /*! \brief Keep memory movable object on stack and ensure its uniqeness.
  */
 template<typename tType>
@@ -162,6 +177,12 @@ public:
 		::memcpy( _mem, um_._mem, sizeof ( value_type ) );
 		um_._owner = false;
 		}
+	HUniqueMovable( HUniqueMovableRef<tType> const& um_ )
+		: _mem(), _owner( um_._owner )
+		{
+		if ( um_._owner )
+			::memcpy( _mem, um_._mem, sizeof ( value_type ) );
+		}
 	~HUniqueMovable( void )
 		{
 		reset();
@@ -178,6 +199,18 @@ public:
 				um_._owner = false;
 				_owner = true;
 				}
+			}
+		return ( *this );
+		M_EPILOG
+		}
+	HUniqueMovable& operator = ( HUniqueMovableRef<tType> const& um_ )
+		{
+		M_PROLOG
+		reset();
+		if ( um_._owner )
+			{
+			::memcpy( _mem, um_._mem, sizeof ( value_type ) );
+			_owner = true;
 			}
 		return ( *this );
 		M_EPILOG
@@ -209,6 +242,12 @@ public:
 		{
 		M_ASSERT( _owner );
 		return ( static_cast<value_type*>( static_cast<void*>( _mem ) ) );
+		}
+	operator HUniqueMovableRef<value_type>( void )
+		{
+		HUniqueMovableRef<value_type> ref( static_cast<value_type*>( static_cast<void*>( _mem ) ), _owner );
+		_owner = false;
+		return ( ref );
 		}
 	};
 
