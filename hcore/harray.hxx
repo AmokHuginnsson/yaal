@@ -720,6 +720,7 @@ void HArray<type_t>::swap( HArray& other )
 		using yaal::swap;
 		swap( _buf, other._buf );
 		swap( _size, other._size );
+		swap( _capacity, other._capacity );
 		}
 	return;
 	M_EPILOG
