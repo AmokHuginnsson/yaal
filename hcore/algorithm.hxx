@@ -71,6 +71,90 @@ iterator_t find_if( iterator_t it, iterator_t end, condition_t cond )
 	return ( it );
 	}
 
+/*! \brief Find first occurence of value from given set in given range of elements.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \param first2_ - beginning of range of elements to look in.
+ * \param last2_ - one past the end of range of elements to look in.
+ * \return iterator pointing to found value or end of range.
+ */
+template<typename iterator_t, typename iter2_t>
+iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_ )
+	{
+	for ( ; ( it != end ); ++ it )
+		{
+		if ( find( first2_, last2_, *it ) != last2_ )
+			break;
+		}
+	return ( it );
+	}
+
+/*! \brief Find first occurence of value from given set in given range of elements, using condition to match elements.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \param first2_ - beginning of range of elements to look in.
+ * \param last2_ - one past the end of range of elements to look in.
+ * \param cond_ - use condition for matching elements.
+ * \return iterator pointing to found value or end of range.
+ */
+template<typename iterator_t, typename iter2_t, typename cond_t>
+iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_, cond_t cond_ )
+	{
+	for ( ; ( it != end ); ++ it )
+		{
+		iter2_t v( first2_ );
+		for ( ; ( v != last2_ ) && ( ! cond_( *it, *v ) ); ++ v )
+			;
+		if ( v != last2_ )
+			break;
+		}
+	return ( it );
+	}
+
+/*! \brief Find first occurence of value that is not in given set of values in given range of elements.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \param first2_ - beginning of range of elements to look in.
+ * \param last2_ - one past the end of range of elements to look in.
+ * \return iterator pointing to found value or end of range.
+ */
+template<typename iterator_t, typename iter2_t>
+iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_ )
+	{
+	for ( ; ( it != end ); ++ it )
+		{
+		if ( ! ( find( first2_, last2_, *it ) != last2_ ) )
+			break;
+		}
+	return ( it );
+	}
+
+/*! \brief Find first occurence of value that is not in given set of values in given range of elements, using condition to match elements.
+ *
+ * \param it - begining of the range to search thru.
+ * \param end - one past the end of the range to search thru.
+ * \param first2_ - beginning of range of elements to look in.
+ * \param last2_ - one past the end of range of elements to look in.
+ * \param cond_ - use condition for matching elements.
+ * \return iterator pointing to found value or end of range.
+ */
+template<typename iterator_t, typename iter2_t, typename cond_t>
+iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_, cond_t cond_ )
+	{
+	for ( ; ( it != end ); ++ it )
+		{
+		iter2_t v( first2_ );
+		for ( ; ( v != last2_ ) && ( ! cond_( *it, *v ) ); ++ v )
+			;
+		if ( ! ( v != last2_ ) )
+			break;
+		}
+	return ( it );
+	}
+
 /*! \brief Count number of occurences of element in range.
  *
  * \param it - begining of the range to search thru.
