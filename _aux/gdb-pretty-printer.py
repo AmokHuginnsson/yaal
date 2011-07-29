@@ -2,57 +2,57 @@
 
 import re
 
-def yaal_lookup_function( val ):
-	lookup_tag = val.type.strip_typedefs().tag
+def yaal_lookup_function( val_ ):
+	lookup_tag = val_.type.strip_typedefs().tag
 	if lookup_tag == None:
 		return None
 	regex = re.compile( "^yaal::hcore::HString$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHStringPrinter( val )
+		return YaalHCoreHStringPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HArray<.*>::HIterator<.*>$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHArrayHIteratorPrinter( val )
+		return YaalHCoreHArrayHIteratorPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HArray<.*>$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHArrayPrinter( val )
+		return YaalHCoreHArrayPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HDeque<.*>::HIterator<.*>$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHDequeHIteratorPrinter( val )
+		return YaalHCoreHDequeHIteratorPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HDeque<.*>$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHDequePrinter( val )
+		return YaalHCoreHDequePrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HList<.*>$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHListPrinter( val )
+		return YaalHCoreHListPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HMap<.*>$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHMapPrinter( val )
+		return YaalHCoreHMapPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HSet<.*>$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHSetPrinter( val )
+		return YaalHCoreHSetPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HHashMap<.*>$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHHashMapPrinter( val )
+		return YaalHCoreHHashMapPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HHashSet<.*>$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHHashSetPrinter( val )
+		return YaalHCoreHHashSetPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HNumber$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHNumberPrinter( val )
+		return YaalHCoreHNumberPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HVariant<.*>$" )
 	if regex.match( lookup_tag ):
-		return YaalHCoreHVariantPrinter( val )
+		return YaalHCoreHVariantPrinter( val_ )
 	regex = re.compile( "^yaal::tools::HRing<.*>$" )
 	if regex.match( lookup_tag ):
-		return YaalToolsHRingPrinter( val )
+		return YaalToolsHRingPrinter( val_ )
 
 	return None
 
 class YaalHCoreHStringPrinter:
 	"Print a yaal::hcore::HString"
 
-	def __init__( self, val ):
-		self._val = val
+	def __init__( self, val_ ):
+		self._val = val_
 
 	def to_string( self ):
 		inplace = not ( self._val['_mem'][self._val['_mem'].type.sizeof - 1] & 128 )
@@ -83,35 +83,35 @@ class YaalHCoreHArrayHIteratorPrinter:
 class YaalHCoreHArrayPrinter:
 	"Print a yaal::hcore::HArray"
 
-	class _iterator:
+	class Iterator:
 		def __init__ (self, start, size):
-			self.item = start
-			self.size = size
-			self.count = 0
+			self._item = start
+			self._size = size
+			self._count = 0
 
 		def __iter__(self):
 			return self
 
 		def next(self):
-			if self.count == self.size:
+			if self._count == self._size:
 				raise StopIteration
-			count = self.count
-			self.count = self.count + 1
-			elt = self.item.dereference()
-			self.item = self.item + 1
+			count = self._count
+			self._count = self._count + 1
+			elt = self._item.dereference()
+			self._item = self._item + 1
 			return ( '[%d]' % count, elt )
 
-	def __init__(self, val):
-		self.val = val
+	def __init__(self, val_):
+		self._val = val_
 	
 	def sizeof_elem( self ):
-		return self.val.type.template_argument( 0 ).sizeof
+		return self._val.type.template_argument( 0 ).sizeof
 
 	def children( self ):
-		return self._iterator(self.val['_buf'], self.val['_size'])
+		return self.Iterator(self._val['_buf'], self._val['_size'])
 
 	def to_string( self ):
-		return ( "yaal::hcore::HArray of `%s' of length %d, capacity %d" % ( self.val.type.template_argument( 0 ), self.val['_size'], self.val['_capacity'] ) )
+		return ( "yaal::hcore::HArray of `%s' of length %d, capacity %d" % ( self._val.type.template_argument( 0 ), self._val['_size'], self._val['_capacity'] ) )
 
 	def display_hint( self ):
 		return 'array'
@@ -119,8 +119,8 @@ class YaalHCoreHArrayPrinter:
 class YaalHCoreHDequeHIteratorPrinter:
 	"Print a yaal::hcore::HDeque::HIterator"
 
-	def __init__( self, val ):
-		self._val = val
+	def __init__( self, val_ ):
+		self._val = val_
 
 	def to_string( self ):
 		VPC = self._val['_owner']['VALUES_PER_CHUNK']
@@ -140,7 +140,7 @@ class YaalHCoreHDequeHIteratorPrinter:
 class YaalHCoreHDequePrinter:
 	"Print a yaal::hcore::HDeque"
 
-	class _iterator:
+	class Iterator:
 		def __init__( self, chunks_, VPC_, index_, size_ ):
 			self._VPC = VPC_
 			self._chunks = chunks_
@@ -148,10 +148,10 @@ class YaalHCoreHDequePrinter:
 			self._size = size_
 			self._count = 0
 
-		def __iter__(self):
+		def __iter__( self ):
 			return self
 
-		def next(self):
+		def next( self ):
 			if self._count == self._size:
 				raise StopIteration
 			count = self._count
@@ -162,14 +162,14 @@ class YaalHCoreHDequePrinter:
 			self._index = self._index + 1
 			return ( '[%d]' % count, elt )
 
-	def __init__(self, val):
-		self.val = val
+	def __init__( self, val_ ):
+		self._val = val_
 	
 	def children( self ):
-		return self._iterator(self.val['_chunks']['_data'].cast( self.val.type.template_argument( 0 ).pointer().pointer() ), self.val['VALUES_PER_CHUNK'], self.val['_start'], self.val['_size'])
+		return self.Iterator( self._val['_chunks']['_data'].cast( self._val.type.template_argument( 0 ).pointer().pointer() ), self._val['VALUES_PER_CHUNK'], self._val['_start'], self._val['_size'] )
 
 	def to_string( self ):
-		return ( "yaal::hcore::HDeque of `%s' of length %d" % ( self.val.type.template_argument( 0 ), self.val['_size'] ) )
+		return ( "yaal::hcore::HDeque of `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val['_size'] ) )
 
 	def display_hint( self ):
 		return 'array'
@@ -177,93 +177,94 @@ class YaalHCoreHDequePrinter:
 class YaalHCoreHListPrinter:
 	"Print a yaal::hcore::HList"
 
-	class _iterator:
-		def __init__ (self, start, size):
-			self.item = start
-			self.size = size
-			self.count = 0
+	class Iterator:
+		def __init__( self, start_, size_ ):
+			self._item = start_
+			self._size = size_
+			self._count = 0
 
-		def __iter__(self):
+		def __iter__( self ):
 			return self
 
-		def next(self):
-			if self.count == self.size:
+		def next( self ):
+			if self._count == self._size:
 				raise StopIteration
-			count = self.count
-			self.count = self.count + 1
-			elt = self.item['_value']
-			self.item = self.item['_next']
+			count = self._count
+			self._count = self._count + 1
+			elt = self._item['_value']
+			self._item = self._item['_next']
 			return ('[%d]' % count, elt)
 
-	def __init__(self, val):
-		self.val = val
+	def __init__( self, val_ ):
+		self._val = val_
 	
 	def children( self ):
-		return self._iterator(self.val['_hook'], self.val['_size'])
+		return self.Iterator(self._val['_hook'], self._val['_size'])
 
 	def to_string( self ):
-		return ( "yaal::hcore::HList of `%s' of length %d" % ( self.val.type.template_argument( 0 ), self.val['_size'] ) )
+		return ( "yaal::hcore::HList of `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val['_size'] ) )
 
 	def display_hint( self ):
 		return 'array'
 
 class BinaryTreeIterator( object ):
-	def __init__( self, owner, start, size ):
-		self._owner = owner
-		self.item = start
-		self.size = size
-		self.count = 0
-	def do_next( self, it ):
-		lastNode = it;
-		while it != 0:
-			if ( it['_right'] != 0 ) and ( it['_right'] != lastNode ):
-				it = it['_right']
-				while ( it['_left'] ):
-					it = it['_left']
+	def __init__( self, owner_, start_, size_ ):
+		self._owner = owner_
+		self._item = start_
+		self._size = size_
+		self._count = 0
+	def do_next( self, it_ ):
+		lastNode = it_;
+		while it_ != 0:
+			if ( it_['_right'] != 0 ) and ( it_['_right'] != lastNode ):
+				it_ = it_['_right']
+				while ( it_['_left'] ):
+					it_ = it_['_left']
 				break
 			else:
-				lastNode = it
-				it = it['_parent']
-				if ( it != 0 ) and ( lastNode == it['_left'] ):
+				lastNode = it_
+				it_ = it_['_parent']
+				if ( it_ != 0 ) and ( lastNode == it_['_left'] ):
 					break
-		return it
+		return it_
 
 class YaalHCoreHMapPrinter:
 	"Print a yaal::hcore::HMap"
 
-	class _iterator( BinaryTreeIterator ):
+	class Iterator( BinaryTreeIterator ):
 
-		def __iter__(self):
+		def __iter__( self ):
 			return self
 
-		def next(self):
-			if self.count == ( self.size * 2 ):
+		def next( self ):
+			if self._count == ( self._size * 2 ):
 				raise StopIteration
-			count = self.count
+			count = self._count
 			valuetype = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self._owner.type.template_argument( 0 ).const(), self._owner.type.template_argument( 1 ) ) )
 			nodetype = gdb.lookup_type( "yaal::hcore::HSBBSTree::HNode<%s>" % ( valuetype ) ).pointer()
 			if ( count % 2 ) == 0:
-				elt = self.item.cast( nodetype )['_key']['first']
+				elt = self._item.cast( nodetype )['_key']['first']
 			else:
-				elt = self.item.cast( nodetype )['_key']['second']
-				self.item = self.do_next( self.item )
-			self.count = self.count + 1
+				elt = self._item.cast( nodetype )['_key']['second']
+				self._item = self.do_next( self._item )
+			self._count = self._count + 1
 			return ('[%d]' % count, elt)
 
-	def __init__( self, val ):
-		self.val = val
+	def __init__( self, val_ ):
+		self._val = val_
 
 	def begin( self ):
-		node = self.val['_engine']['_root']
-		while node['_left'] != 0:
-			node = node['_left']
+		node = self._val['_engine']['_root']
+		if self._val['_engine']['_size'] > 0:
+			while node['_left'] != 0:
+				node = node['_left']
 		return node
 
 	def children( self ):
-		return self._iterator( self.val, self.begin(), self.val['_engine']['_size'] )
+		return self.Iterator( self._val, self.begin(), self._val['_engine']['_size'] )
 
 	def to_string( self ):
-		return ( "yaal::hcore::HMap of `%s' to `%s' of length %d" % ( self.val.type.template_argument( 0 ), self.val.type.template_argument( 1 ), self.val['_engine']['_size'] ) )
+		return ( "yaal::hcore::HMap of `%s' to `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_size'] ) )
 
 	def display_hint( self ):
 		return 'map'
@@ -271,46 +272,47 @@ class YaalHCoreHMapPrinter:
 class YaalHCoreHSetPrinter:
 	"Print a yaal::hcore::HSet"
 
-	class _iterator( BinaryTreeIterator ):
+	class Iterator( BinaryTreeIterator ):
 
-		def __iter__(self):
+		def __iter__( self ):
 			return self
 
-		def next(self):
-			if self.count == self.size:
+		def next( self ):
+			if self._count == self._size:
 				raise StopIteration
-			count = self.count
+			count = self._count
 			nodetype = gdb.lookup_type( "yaal::hcore::HSBBSTree::HNode<%s>" % ( self._owner.type.template_argument( 0 ) ) ).pointer()
-			elt = self.item.cast( nodetype )['_key']
-			self.item = self.do_next( self.item )
-			self.count = self.count + 1
+			elt = self._item.cast( nodetype )['_key']
+			self._item = self.do_next( self._item )
+			self._count = self._count + 1
 			return ('[%d]' % count, elt)
 
-	def __init__( self, val ):
-		self.val = val
+	def __init__( self, val_ ):
+		self._val = val_
 
 	def begin( self ):
-		node = self.val['_engine']['_root']
-		while node['_left'] != 0:
-			node = node['_left']
+		node = self._val['_engine']['_root']
+		if self._val['_engine']['_size'] > 0:
+			while node['_left'] != 0:
+				node = node['_left']
 		return node
 
 	def children( self ):
-		return self._iterator( self.val, self.begin(), self.val['_engine']['_size'] )
+		return self.Iterator( self._val, self.begin(), self._val['_engine']['_size'] )
 
 	def to_string( self ):
-		return ( "yaal::hcore::HSet of `%s' of length %d" % ( self.val.type.template_argument( 0 ), self.val['_engine']['_size'] ) )
+		return ( "yaal::hcore::HSet of `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val['_engine']['_size'] ) )
 
 	def display_hint( self ):
 		return 'array'
 
 class HashContainterIterator( object ):
-	def __init__( self, owner, atom, index, size ):
-		self._owner = owner
-		self._atom = atom
-		self._index = index
-		self.size = size
-		self.count = 0
+	def __init__( self, owner_, atom_, index_, size_ ):
+		self._owner = owner_
+		self._atom = atom_
+		self._index = index_
+		self._size = size_
+		self._count = 0
 
 	def do_next( self ):
 		if self._atom != 0:
@@ -319,53 +321,53 @@ class HashContainterIterator( object ):
 				self._index = self._index + 1;
 		if self._atom == 0:
 			buckets = self._owner.buckets()
-			while ( self._index < self._owner.val['_engine']['_prime'] ) and ( buckets[ self._index ] == 0 ):
+			while ( self._index < self._owner._val['_engine']['_prime'] ) and ( buckets[ self._index ] == 0 ):
 				self._index = self._index + 1
-			if self._index < self._owner.val['_engine']['_prime']:
+			if self._index < self._owner._val['_engine']['_prime']:
 				self._atom = buckets[ self._index ];
 		if self._atom == 0:
-			self._index = self._owner.val['_engine']['_prime'];
+			self._index = self._owner._val['_engine']['_prime'];
 
 
 class YaalHCoreHHashMapPrinter:
 	"Print a yaal::hcore::HHashMap"
 
-	class _iterator( HashContainterIterator ):
-		def __iter__(self):
+	class Iterator( HashContainterIterator ):
+		def __iter__( self ):
 			return self
 
-		def next(self):
-			if self.count == ( self.size * 2 ):
+		def next( self ):
+			if self._count == ( self._size * 2 ):
 				raise StopIteration
-			count = self.count
+			count = self._count
 			nodetype = self._owner.nodetype()
 			if ( count % 2 ) == 0:
 				elt = self._atom.cast( nodetype )['_value']['first']
 			else:
 				elt = self._atom.cast( nodetype )['_value']['second']
 				self.do_next()
-			self.count = self.count + 1
+			self._count = self._count + 1
 			return ('[%d]' % count, elt)
 
-	def __init__( self, val ):
-		self.val = val
+	def __init__( self, val_ ):
+		self._val = val_
 
 	def nodetype( self ):
-		valuetype = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self.val.type.template_argument( 0 ).const(), self.val.type.template_argument( 1 ) ) )
+		valuetype = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self._val.type.template_argument( 0 ).const(), self._val.type.template_argument( 1 ) ) )
 		nodetype = gdb.lookup_type( "yaal::hcore::HHashContainer::HAtom<%s>" % ( valuetype ) ).pointer()
 		return nodetype
 
 	def buckets( self ):
-		buckets = self.val['_engine']['_buckets']['_data']
+		buckets = self._val['_engine']['_buckets']['_data']
 		return buckets.cast( self.nodetype().pointer() )
 
 	def children( self ):
-		it = self._iterator( self, 0, 0, self.val['_engine']['_size'] )
+		it = self.Iterator( self, 0, 0, self._val['_engine']['_size'] )
 		it.do_next()
 		return it
 
 	def to_string( self ):
-		return ( "yaal::hcore::HHashMap of `%s' to `%s' of length %d" % ( self.val.type.template_argument( 0 ), self.val.type.template_argument( 1 ), self.val['_engine']['_size'] ) )
+		return ( "yaal::hcore::HHashMap of `%s' to `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_engine']['_size'] ) )
 
 	def display_hint( self ):
 		return 'map'
@@ -373,38 +375,38 @@ class YaalHCoreHHashMapPrinter:
 class YaalHCoreHHashSetPrinter:
 	"Print a yaal::hcore::HHashSet"
 
-	class _iterator( HashContainterIterator ):
-		def __iter__(self):
+	class Iterator( HashContainterIterator ):
+		def __iter__( self ):
 			return self
 
-		def next(self):
-			if self.count == self.size:
+		def next( self ):
+			if self._count == self._size:
 				raise StopIteration
-			count = self.count
+			count = self._count
 			nodetype = self._owner.nodetype()
 			elt = self._atom.cast( nodetype )['_value']
 			self.do_next()
-			self.count = self.count + 1
+			self._count = self._count + 1
 			return ('[%d]' % count, elt)
 
-	def __init__( self, val ):
-		self.val = val
+	def __init__( self, val_ ):
+		self._val = val_
 
 	def nodetype( self ):
-		nodetype = gdb.lookup_type( "yaal::hcore::HHashContainer::HAtom<%s>" % ( self.val.type.template_argument( 0 ) ) ).pointer()
+		nodetype = gdb.lookup_type( "yaal::hcore::HHashContainer::HAtom<%s>" % ( self._val.type.template_argument( 0 ) ) ).pointer()
 		return nodetype
 
 	def buckets( self ):
-		buckets = self.val['_engine']['_buckets']['_data']
+		buckets = self._val['_engine']['_buckets']['_data']
 		return buckets.cast( self.nodetype().pointer() )
 
 	def children( self ):
-		it = self._iterator( self, 0, 0, self.val['_engine']['_size'] )
+		it = self.Iterator( self, 0, 0, self._val['_engine']['_size'] )
 		it.do_next()
 		return it
 
 	def to_string( self ):
-		return ( "yaal::hcore::HHashSet of `%s' of length %d" % ( self.val.type.template_argument( 0 ), self.val['_engine']['_size'] ) )
+		return ( "yaal::hcore::HHashSet of `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val['_engine']['_size'] ) )
 
 	def display_hint( self ):
 		return 'array'
@@ -412,8 +414,8 @@ class YaalHCoreHHashSetPrinter:
 class YaalHCoreHNumberPrinter:
 	"Print a yaal::hcore::HNumber"
 
-	def __init__( self, val ):
-		self._val = val
+	def __init__( self, val_ ):
+		self._val = val_
 
 	def to_string( self ):
 		s = ""
@@ -440,8 +442,8 @@ class YaalHCoreHNumberPrinter:
 class YaalHCoreHVariantPrinter:
 	"Print a yaal::hcore::HVariant"
 
-	def __init__( self, val ):
-		self._val = val
+	def __init__( self, val_ ):
+		self._val = val_
 
 	def to_string( self ):
 		val = "<uninitialized variant>"
@@ -456,7 +458,7 @@ class YaalHCoreHVariantPrinter:
 class YaalToolsHRingPrinter:
 	"Print a yaal::tools::HRing"
 
-	class _iterator:
+	class Iterator:
 		def __init__( self, data_, index_, size_, capacity_ ):
 			self._data = data_
 			self._index = index_
@@ -464,10 +466,10 @@ class YaalToolsHRingPrinter:
 			self._capacity = capacity_ 
 			self._count = 0
 
-		def __iter__(self):
+		def __iter__( self ):
 			return self
 
-		def next(self):
+		def next( self ):
 			if self._count == self._size:
 				raise StopIteration
 			count = self._count
@@ -476,20 +478,20 @@ class YaalToolsHRingPrinter:
 			self._index = self._index + 1
 			return ( '[%d]' % count, elt )
 
-	def __init__(self, val):
-		self.val = val
+	def __init__( self, val_ ):
+		self._val = val_
 	
 	def sizeof_elem( self ):
-		return self.val.type.template_argument( 0 ).sizeof
+		return self._val.type.template_argument( 0 ).sizeof
 
 	def capacity( self ):
-		return self.val['_buf']['_size'] / self.sizeof_elem()
+		return self._val['_buf']['_size'] / self.sizeof_elem()
 
 	def children( self ):
-		return self._iterator( self.val['_buf']['_data'].cast( self.val.type.template_argument( 0 ).pointer() ), self.val['_start'], self.val['_size'], self.capacity() )
+		return self.Iterator( self._val['_buf']['_data'].cast( self._val.type.template_argument( 0 ).pointer() ), self._val['_start'], self._val['_size'], self.capacity() )
 
 	def to_string( self ):
-		return ( "yaal::tools::HRing of `%s' of length %d, capacity %d" % ( self.val.type.template_argument( 0 ), self.val['_size'], self.capacity() ) )
+		return ( "yaal::tools::HRing of `%s' of length %d, capacity %d" % ( self._val.type.template_argument( 0 ), self._val['_size'], self.capacity() ) )
 
 	def display_hint( self ):
 		return 'array'
