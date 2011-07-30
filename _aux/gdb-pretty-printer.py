@@ -164,12 +164,13 @@ class YaalHCoreHDequePrinter:
 
 	def __init__( self, val_ ):
 		self._val = val_
+		self._VPC = abs( self._val['VALUES_PER_CHUNK'] )
 	
 	def children( self ):
-		return self.Iterator( self._val['_chunks']['_data'].cast( self._val.type.template_argument( 0 ).pointer().pointer() ), self._val['VALUES_PER_CHUNK'], self._val['_start'], self._val['_size'] )
+		return self.Iterator( self._val['_chunks']['_data'].cast( self._val.type.template_argument( 0 ).pointer().pointer() ), self._VPC, self._val['_start'], self._val['_size'] )
 
 	def to_string( self ):
-		return ( "yaal::hcore::HDeque of `%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val['_size'] ) )
+		return ( "yaal::hcore::HDeque of `%s' of length %d of VPC %d" % ( self._val.type.template_argument( 0 ), self._val['_size'], self._VPC ) )
 
 	def display_hint( self ):
 		return 'array'
