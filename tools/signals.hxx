@@ -66,6 +66,7 @@ private:
 public:
 	static int _killGracePeriod;
 	void register_handler( int, handler_t, void const* = NULL );
+	void call_handler( int );
 	void flush_handlers( void const* );
 	void reset_signal( int );
 	void stop( void	);

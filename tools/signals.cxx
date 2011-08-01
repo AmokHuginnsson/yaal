@@ -74,6 +74,7 @@ public:
 	static int signal_TSTP( int );
 	static int signal_CONT( int );
 	static int signal_fatal( int ) __attribute__(( __noreturn__ ));
+	static void signal_fatal_sync( int );
 	static int signal_USR1( int );
 	};
 
@@ -173,25 +174,7 @@ void* HSignalService::run( void )
 		int sigNo = 0;
 		M_ENSURE( sigwait( _catch.get<sigset_t>(), &sigNo ) == 0 );
 		HLock lock( _mutex );
-		handlers_t::iterator it;
-		if ( ( it = _handlers.find( sigNo ) ) != _handlers.end() )
-			{
-			for ( ; ( it != _handlers.end() ) && ( (*it).first == sigNo ); ++ it )
-				{
-				handler_t handler( (*it).second.first );
-				M_ASSERT( !! handler );
-				int status = handler( sigNo );
-				if ( status > 0 )
-					break; /* signal was entirely consumed */
-				else if ( status < 0 )
-					{
-					_loop = false;
-					schedule_exit( -1 - status );
-					}
-				}
-			}
-		else
-			M_ENSURE( ( sigNo == SIGURG ) || ( sigNo == SIGPIPE ) );
+		call_handler( sigNo );
 		}
 	return ( 0 );
 	M_EPILOG
@@ -202,8 +185,22 @@ void HSignalService::register_handler( int sigNo_, handler_t handler_, void cons
 	M_PROLOG
 	HLock lock( _mutex );
 	_handlers.push_front( sigNo_, make_pair( handler_, owner_ ) );
-	catch_signal( sigNo_ );
-	M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
+	int SYNCHRONOUS_SIGNALS[] = { SIGSEGV, SIGBUS, SIGFPE, SIGILL };
+	if ( find( SYNCHRONOUS_SIGNALS, SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ), sigNo_ ) == ( SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ) ) )
+		{
+		catch_signal( sigNo_ );
+		M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
+		}
+	else
+		{
+		struct sigaction act;
+		::memset( &act, 0, sizeof ( act ) );
+		act.sa_flags = SA_RESTART;
+		act.sa_handler = &HBaseSignalHandlers::signal_fatal_sync;
+		M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
+		M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
+		M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
+		}
 	return;
 	M_EPILOG
 	}
@@ -297,6 +294,32 @@ void HSignalService::exit( int )
 int HSignalService::life_time( int )
 	{
 	return ( 100 );
+	}
+
+void HSignalService::call_handler( int sigNo_ )
+	{
+	M_PROLOG
+	handlers_t::iterator it;
+	if ( ( it = _handlers.find( sigNo_ ) ) != _handlers.end() )
+		{
+		for ( ; ( it != _handlers.end() ) && ( (*it).first == sigNo_ ); ++ it )
+			{
+			handler_t handler( (*it).second.first );
+			M_ASSERT( !! handler );
+			int status = handler( sigNo_ );
+			if ( status > 0 )
+				break; /* signal was entirely consumed */
+			else if ( status < 0 )
+				{
+				_loop = false;
+				schedule_exit( status );
+				}
+			}
+		}
+	else
+		M_ENSURE( ( sigNo_ == SIGURG ) || ( sigNo_ == SIGPIPE ) );
+	return;
+	M_EPILOG
 	}
 
 namespace
@@ -427,6 +450,13 @@ int HBaseSignalHandlers::signal_fatal( int signum_ )
 #ifdef __MSVCXX__
 	return ( -1 );
 #endif /* #ifdef __MSVCXX__ */
+	M_EPILOG
+	}
+
+void HBaseSignalHandlers::signal_fatal_sync( int signum_ )
+	{
+	M_PROLOG
+	HSignalService::get_instance().call_handler( signum_ );
 	M_EPILOG
 	}
 
