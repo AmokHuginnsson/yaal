@@ -31,8 +31,11 @@ Copyright:
 #ifndef YAAL_HCORE_STATIC_ASSERT_HXX_INCLUDED
 #define YAAL_HCORE_STATIC_ASSERT_HXX_INCLUDED 1
 
-#define M_CONCAT_REAL( a, b ) a ## b
-#define M_CONCAT( a, b ) M_CONCAT_REAL( a, b )
+#include "hcore/macro.hxx"
+
+#ifdef STATIS_ASSERT
+#	error Yaal redefines STATIS_ASSERT macro.
+#endif /* #ifdef STATIS_ASSERT */
 
 /*! \brief Perform static (compile time) code check.
  *

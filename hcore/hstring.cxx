@@ -62,7 +62,9 @@ int long kmpsearch( char const* const, int long, char const* const, int long );
 }
 
 char const _whiteSpace_[] = "\a\b \t\v\f\r\n";
+#undef D_LETTER
 #define D_LETTER "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#undef D_DIGIT
 #define D_DIGIT "0123456789"
 char const _digit_[] = D_DIGIT;
 char const _letter_[] = D_LETTER;
@@ -71,15 +73,25 @@ char const _word_[] = D_LETTER D_DIGIT "_";
 #undef D_LETTER
 
 static int const ALLOC_BIT_MASK = 128;
+#undef IS_INPLACE
 #define IS_INPLACE ( ! ( _mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
+#undef EXT_IS_INPLACE
 #define EXT_IS_INPLACE( base ) ( ! ( base[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
+#undef MEM
 #define MEM ( IS_INPLACE ? _mem : *reinterpret_cast<char**>( _mem ) )
+#undef EXT_MEM
 #define EXT_MEM( base ) ( EXT_IS_INPLACE( base ) ? base : *reinterpret_cast<char**>( base ) )
+#undef ROMEM
 #define ROMEM ( IS_INPLACE ? _mem : *reinterpret_cast<char const* const*>( _mem ) )
+#undef GET_SIZE
 #define GET_SIZE ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] : *reinterpret_cast<int long const*>( _mem + sizeof ( char* ) ) )
+#undef SET_SIZE
 #define SET_SIZE( size ) do { ( IS_INPLACE ? static_cast<int long>( _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) ) : *reinterpret_cast<int long*>( _mem + sizeof ( char* ) ) = ( size ) ); } while ( 0 )
+#undef EXT_SET_SIZE
 #define EXT_SET_SIZE( base, size ) do { ( EXT_IS_INPLACE( base ) ? static_cast<int long>( base[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) ) : *reinterpret_cast<int long*>( base + sizeof ( char* ) ) = ( size ) ); } while ( 0 )
+#undef GET_ALLOC_BYTES
 #define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : static_cast<int long>( ( *reinterpret_cast<int long const*>( _mem + sizeof ( char* ) + sizeof ( int long ) ) ) & ( static_cast<int long unsigned>( -1 ) >> 1 ) ) )
+#undef SET_ALLOC_BYTES
 #define SET_ALLOC_BYTES( capacity ) do { ( *reinterpret_cast<int long*>( _mem + sizeof ( char* ) + sizeof ( int long ) ) = ( capacity ) ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); } while ( 0 )
 
 char const* _errMsgHString_[ 3 ] =

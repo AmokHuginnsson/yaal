@@ -31,6 +31,76 @@ Copyright:
 #ifndef YAAL_HCORE_MACRO_HXX_INCLUDED
 #define YAAL_HCORE_MACRO_HXX_INCLUDED 1
 
+#ifdef _
+#	error Yaal redefines _ macro.
+#endif /* #ifdef _ */
+#ifdef M_STRINGIFY_REAL
+#	error Yaal redefines M_STRINGIFY_REAL macro.
+#endif /* #ifdef M_STRINGIFY_REAL */
+#ifdef M_CONCAT_REAL
+#	error Yaal redefines M_CONCAT_REAL macro.
+#endif /* #ifdef M_CONCAT_REAL */
+#ifdef M_CONCAT
+#	error Yaal redefines M_CONCAT macro.
+#endif /* #ifdef M_CONCAT */
+#ifdef M_STRINGIFY
+#	error Yaal redefines M_STRINGIFY macro.
+#endif /* #ifdef M_STRINGIFY */
+#ifdef M_VCSID
+#	error Yaal redefines M_VCSID macro.
+#endif /* #ifdef M_VCSID */
+#ifdef M_THROW
+#	error Yaal redefines M_THROW macro.
+#endif /* #ifdef M_THROW */
+#ifdef M_PROLOG
+#	error Yaal redefines M_PROLOG macro.
+#endif /* #ifdef M_PROLOG */
+#ifdef M_EPILOG
+#	error Yaal redefines M_EPILOG macro.
+#endif /* #ifdef M_EPILOG */
+#ifdef M_DESTRUCTOR_EPILOG
+#	error Yaal redefines M_DESTRUCTOR_EPILOG macro.
+#endif /* #ifdef M_DESTRUCTOR_EPILOG */
+#ifdef M_SAFE
+#	error Yaal redefines M_SAFE macro.
+#endif /* #ifdef M_SAFE */
+#ifdef M_FINAL
+#	error Yaal redefines M_FINAL macro.
+#endif /* #ifdef M_FINAL */
+#ifdef M_ENSURE
+#	error Yaal redefines M_ENSURE macro.
+#endif /* #ifdef M_ENSURE */
+#ifdef M_ENSURE_EX
+#	error Yaal redefines M_ENSURE_EX macro.
+#endif /* #ifdef M_ENSURE_EX */
+#ifdef M_ASSERT
+#	error Yaal redefines M_ASSERT macro.
+#endif /* #ifdef M_ASSERT */
+#ifdef M_AT_END_OF_SCOPE
+#	error Yaal redefines M_AT_END_OF_SCOPE macro.
+#endif /* #ifdef M_AT_END_OF_SCOPE */
+#ifdef countof
+#	error Yaal redefines countof macro.
+#endif /* #ifdef countof */
+#ifdef M_EXPORT_SYMBOL
+#	error Yaal redefines M_EXPORT_SYMBOL macro.
+#endif /* #ifdef M_EXPORT_SYMBOL */
+#ifdef M_YAAL_HCORE_PUBLIC_API
+#	error Yaal redefines M_YAAL_HCORE_PUBLIC_API macro.
+#endif /* #ifdef M_YAAL_HCORE_PUBLIC_API */
+#ifdef M_YAAL_TOOLS_PUBLIC_API
+#	error Yaal redefines M_YAAL_TOOLS_PUBLIC_API macro.
+#endif /* #ifdef M_YAAL_TOOLS_PUBLIC_API */
+#ifdef M_YAAL_DBWRAPPER_PUBLIC_API
+#	error Yaal redefines M_YAAL_DBWRAPPER_PUBLIC_API macro.
+#endif /* #ifdef M_YAAL_DBWRAPPER_PUBLIC_API */
+#ifdef M_YAAL_HCONSOLE_PUBLIC_API
+#	error Yaal redefines M_YAAL_HCONSOLE_PUBLIC_API macro.
+#endif /* #ifdef M_YAAL_HCONSOLE_PUBLIC_API */
+#ifdef M_YAAL_HDATA_PUBLIC_API
+#	error Yaal redefines M_YAAL_HDATA_PUBLIC_API macro.
+#endif /* #ifdef M_YAAL_HDATA_PUBLIC_API */
+
 /*! \brief gettext library API convenience macro.
  */
 #define _(string) dgettext( PACKAGE_NAME, string )
