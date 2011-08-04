@@ -329,7 +329,7 @@ HRing<type_t>::HRing( capacity_type capacity_, iterator_t first, iterator_t last
 	: _buf(), _start( 0 ), _size( 0 )
 	{
 	M_PROLOG
-	initialize( capacity_, first, last, typename trait::make_pointer<typename is_integral<iterator_t>::type>::type() );
+	initialize( capacity_, first, last, typename trait::add_pointer<typename is_integral<iterator_t>::type>::type() );
 	return;
 	M_EPILOG
 	}

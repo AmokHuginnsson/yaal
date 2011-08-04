@@ -328,7 +328,7 @@ HDeque<type_t>::HDeque( iterator_t first, iterator_t last )
 	: _chunks(), _start( 0 ), _size( 0 )
 	{
 	M_PROLOG
-	initialize( first, last, typename trait::make_pointer<typename is_integral<iterator_t>::type>::type() );
+	initialize( first, last, typename trait::add_pointer<typename is_integral<iterator_t>::type>::type() );
 	return;
 	M_EPILOG
 	}

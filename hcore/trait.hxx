@@ -442,17 +442,17 @@ struct strip_reference<T&>
  * \retval type - pointer to T type.
  */
 template<typename T>
-struct make_pointer;
+struct add_pointer;
 
 /*! \cond */
 template<typename T>
-struct make_pointer<T&>
+struct add_pointer<T&>
 	{
 	typedef T* type;
 	};
 
 template<typename T>
-struct make_pointer
+struct add_pointer
 	{
 	typedef T* type;
 	};
@@ -541,12 +541,12 @@ struct make_const_ref_ptr
 	typedef typename ternary<is_reference<T>::value,
 						typename make_reference<
 							typename ternary<is_pointer<typename strip_reference<T>::type>::value,
-								typename make_pointer<typename strip_pointer<typename strip_reference<T>::type>::type const>::type,
+								typename add_pointer<typename strip_pointer<typename strip_reference<T>::type>::type const>::type,
 								typename strip_reference<T>::type const
 							>::type
 						>::type,
 						typename ternary<is_pointer<typename strip_reference<T>::type>::value,
-							typename make_pointer<typename strip_pointer<typename strip_reference<T>::type>::type const>::type,
+							typename add_pointer<typename strip_pointer<typename strip_reference<T>::type>::type const>::type,
 							T const>::type>::type type;
 	};
 

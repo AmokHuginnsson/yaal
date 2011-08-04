@@ -563,7 +563,7 @@ HList<type_t>::HList( iter_t first, iter_t last )
 	_index( 0 ), _indexElement( NULL )
 	{
 	M_PROLOG
-	initialize( first, last, typename trait::make_pointer<typename is_integral<iter_t>::type>::type() );
+	initialize( first, last, typename trait::add_pointer<typename is_integral<iter_t>::type>::type() );
 	return;
 	M_EPILOG
 	}

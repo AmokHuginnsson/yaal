@@ -47,7 +47,7 @@ struct iterator_interface
 	{
 	typedef T value_type;
 	typedef typename trait::make_reference<T>::type reference;
-	typedef typename trait::make_pointer<T>::type pointer;
+	typedef typename trait::add_pointer<T>::type pointer;
 	typedef category category_type;
 	virtual ~iterator_interface( void ) {}
 	};
@@ -198,7 +198,7 @@ public:
 		{
 		return ( *_iterator );
 		}
-	typename trait::make_pointer<typename iterator_t::value_type const>::type operator->( void ) const
+	typename trait::add_pointer<typename iterator_t::value_type const>::type operator->( void ) const
 		{
 		return ( &*_iterator );
 		}

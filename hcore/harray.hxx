@@ -294,7 +294,7 @@ HArray<type_t>::HArray( iterator_t first, iterator_t last )
 	: _buf( NULL ), _size( 0 ), _capacity( 0 )
 	{
 	M_PROLOG
-	initialize( first, last, typename trait::make_pointer<typename is_integral<iterator_t>::type>::type() );
+	initialize( first, last, typename trait::add_pointer<typename is_integral<iterator_t>::type>::type() );
 	return;
 	M_EPILOG
 	}
