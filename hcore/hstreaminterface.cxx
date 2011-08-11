@@ -58,7 +58,8 @@ HStreamInterface& HStreamInterface::do_output( HString const& string_ )
 	M_PROLOG
 	_wordCache = string_;
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	if ( len > 0 )
+		do_write( _wordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}
@@ -68,7 +69,8 @@ HStreamInterface& HStreamInterface::do_output( char const* string_ )
 	M_PROLOG
 	_wordCache = string_;
 	int long len( reformat() );
-	do_write( _wordCache.raw(), len );
+	if ( len > 0 )
+		do_write( _wordCache.raw(), len );
 	return ( *this );
 	M_EPILOG
 	}
