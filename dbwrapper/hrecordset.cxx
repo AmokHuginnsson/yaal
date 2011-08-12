@@ -98,8 +98,6 @@ char const* HRecordSet::get_column_name( int column_ ) const
 int long HRecordSet::get_insert_id( void ) const
 	{
 	M_PROLOG
-	if ( ! _result )
-		M_THROW( "no result", errno );
 	return ( (_connector->dbrs_id)( _dataBase->_coreData, _result ) );
 	M_EPILOG
 	}

@@ -62,7 +62,7 @@ void* db_connect( char const* dataBase_,
 		if ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) )
 			_brokenDB_ = mySQL, mySQL = NULL;
 		else if ( ! mysql_real_connect( mySQL, NULL, login_, password_,
-				dataBase_, 0, NULL, CLIENT_IGNORE_SPACE ) )
+				dataBase_, 0, NULL, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) )
 			_brokenDB_ = mySQL, mySQL = NULL;
 		}
 	return ( mySQL );
@@ -110,7 +110,7 @@ char const* rs_get( void* data_, int long row_, int column_ )
 
 int rs_fields_count( void* data_ )
 	{
-	return ( ::mysql_num_fields( static_cast<MYSQL_RES*>( data_ ) ) );
+	return ( data_ ? ::mysql_num_fields( static_cast<MYSQL_RES*>( data_ ) ) : 0 );
 	}
 
 int long dbrs_records_count( void* dataB_, void* dataR_ )

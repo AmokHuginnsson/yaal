@@ -115,9 +115,16 @@ int long dbrs_records_count( void*, void* dataR_ )
 		return ( ::PQntuples( static_cast<PGresult*>( dataR_ ) ) );
 	}
 
-int long dbrs_id( void*, void* dataR_ )
+int long dbrs_id( void* db_, void* )
 	{
-	return ( ::PQoidValue( static_cast<PGresult*>( dataR_ ) ) );
+	void* result( db_query( db_, "SELECT lastval();" ) );
+	int long id( -1 );
+	if ( result )
+		{
+		id = ::strtol( rs_get( result, 0, 0 ), NULL, 10 );
+		rs_unquery( result );
+		}
+	return ( id );
 	}
 
 char const* rs_column_name( void* dataR_, int field_ )

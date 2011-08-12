@@ -358,7 +358,7 @@ int long dbrs_id( void*, void* dataR_ )
 	text* name( NULL );
 	OQuery* query( static_cast<OQuery*>( dataR_ ) );
 	OQuery* autonumber( NULL );
-	if ( ( ( *query->_status ) = OCIAttrGet ( query->_statement,
+	if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
 					OCI_HTYPE_STMT, &name,
 					reinterpret_cast<ub4*>( &nameLength ),
 					OCI_ATTR_NAME, query->_error ) ) == OCI_SUCCESS )

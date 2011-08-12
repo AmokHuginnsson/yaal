@@ -82,10 +82,7 @@ HRecordSet::ptr_t HDataBase::query( HString const& query_ )
 	void* result = (_connector->db_query)( _coreData, query_.raw() );
 	if ( (_connector->dbrs_errno)( _coreData, result ) )
 		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _coreData, result ) );
-	HRecordSet::ptr_t rs;
-	if ( result )
-		rs = make_pointer<HRecordSet>( get_pointer(), _connector, result );
-	return ( rs );
+	return ( make_pointer<HRecordSet>( get_pointer(), _connector, result ) );
 	M_EPILOG
 	}
 
