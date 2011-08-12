@@ -75,16 +75,16 @@ typedef struct
 
 OOracle* _brokenDB_ = NULL;
 
-void db_disconnect( void* );
-void db_unquery( void* );
+void yaal_oracle_db_disconnect( void* );
+void yaal_oracle_rs_unquery( void* );
 
-void* db_connect( char const* /* In Oracle user name is name of schema. */,
+M_EXPORT_SYMBOL void* db_connect( char const* /* In Oracle user name is name of schema. */,
 		char const* login_, char const* password_ )
 	{
 	OOracle* oracle( NULL );
 	if ( _brokenDB_ )
 		{
-		db_disconnect( _brokenDB_ );
+		yaal_oracle_db_disconnect( _brokenDB_ );
 		_brokenDB_ = NULL;
 		}
 	oracle = memory::calloc<OOracle>( 1 );
@@ -123,7 +123,7 @@ void* db_connect( char const* /* In Oracle user name is name of schema. */,
 	return ( oracle );
 	}
 
-void db_disconnect( void* data_ )
+void yaal_oracle_db_disconnect( void* data_ )
 	{
 	OOracle* oracle( static_cast<OOracle*>( data_ ) );
 	if ( ! oracle )
@@ -143,8 +143,12 @@ void db_disconnect( void* data_ )
 		}
 	return;
 	}
+M_EXPORT_SYMBOL void db_disconnect( void* data_ )
+	{
+	yaal_oracle_db_disconnect( data_ );
+	}
 
-int db_errno( void* data_ )
+M_EXPORT_SYMBOL int db_errno( void* data_ )
 	{
 	int error( 0 );
 	OOracle const* oracle( NULL );
@@ -161,7 +165,7 @@ int db_errno( void* data_ )
 	return ( error );
 	}
 
-char const* db_error( void* data_ )
+M_EXPORT_SYMBOL char const* db_error( void* data_ )
 	{
 	sb4 code( 0 );
 	static char textBuffer[ OCI_ERROR_MAXMSG_SIZE ];
@@ -197,7 +201,7 @@ char const* db_error( void* data_ )
 	return ( textBuffer );
 	}
 
-void* db_query( void* data_, char const* query_ )
+void* yaal_oracle_db_query( void* data_, char const* query_ )
 	{
 	OOracle* oracle( static_cast<OOracle*>( data_ ) );
 	OQuery* queryObj( memory::calloc<OQuery>( 1 ) );
@@ -218,7 +222,7 @@ void* db_query( void* data_, char const* query_ )
 			&& ( oracle->_status != OCI_SUCCESS_WITH_INFO ) )
 		{
 		log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to prepare statement." << endl;
-		db_unquery( queryObj );
+		yaal_oracle_rs_unquery( queryObj );
 		queryObj = NULL;
 		}
 	else
@@ -240,7 +244,7 @@ void* db_query( void* data_, char const* query_ )
 				&& ( oracle->_status != OCI_SUCCESS_WITH_INFO ) )
 			{
 			log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to execute statement." << endl;
-			db_unquery( queryObj );
+			yaal_oracle_rs_unquery( queryObj );
 			queryObj = NULL;
 			}
 		else if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
@@ -248,8 +252,12 @@ void* db_query( void* data_, char const* query_ )
 		}
 	return ( queryObj );
 	}
+M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ )
+	{
+	return ( yaal_oracle_db_query( data_, query_ ) );
+	}
 
-void db_unquery( void* data_ )
+void yaal_oracle_rs_unquery( void* data_ )
 	{
 	OAllocator* allocator( NULL );
 	OQuery* query( static_cast<OQuery*>( data_ ) );
@@ -270,8 +278,12 @@ void db_unquery( void* data_ )
 	memory::free ( query );
 	return;
 	}
+M_EXPORT_SYMBOL void rs_unquery( void* data_ )
+	{
+	yaal_oracle_rs_unquery( data_ );
+	}
 
-char const* rs_get( void* data_, int long row_, int column_ )
+M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ )
 	{
 	int size( 0 );
 	char* data( NULL );
@@ -313,7 +325,7 @@ char const* rs_get( void* data_, int long row_, int column_ )
 	return ( NULL );
 	}
 
-int rs_fields_count( void* data_ )
+M_EXPORT_SYMBOL int rs_fields_count( void* data_ )
 	{
 	int fields( -1 );
 	OQuery* query( static_cast<OQuery*>( data_ ) );
@@ -324,7 +336,7 @@ int rs_fields_count( void* data_ )
 	return ( fields );
 	}
 
-int long dbrs_records_count( void*, void* dataR_ )
+M_EXPORT_SYMBOL int long dbrs_records_count( void*, void* dataR_ )
 	{
 	int rows( 0 );
 	OQuery* query( static_cast<OQuery*>( dataR_ ) );
@@ -350,7 +362,7 @@ int long dbrs_records_count( void*, void* dataR_ )
 	return ( rows );
 	}
 
-int long dbrs_id( void*, void* dataR_ )
+M_EXPORT_SYMBOL int long dbrs_id( void*, void* dataR_ )
 	{
 	int nameLength( 0 );
 	int long id( 0 );
@@ -366,14 +378,14 @@ int long dbrs_id( void*, void* dataR_ )
 		name[ nameLength ] = 0;
 		sQL.format ( "SELECT %s_sequence.currval FROM dual;",
 				reinterpret_cast<char*>( name ) );
-		autonumber = static_cast<OQuery*>( db_query( autonumber, sQL.raw() ) );
+		autonumber = static_cast<OQuery*>( yaal_oracle_db_query( autonumber, sQL.raw() ) );
 		id = strtol( rs_get( autonumber, 0, 0 ), NULL, 10 );
-		db_unquery( autonumber );
+		yaal_oracle_rs_unquery( autonumber );
 		}
 	return ( id );
 	}
 
-char const* rs_column_name( void* dataR_, int field_ )
+M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ )
 	{
 	int nameLength( 0 );
 	text* name( NULL );

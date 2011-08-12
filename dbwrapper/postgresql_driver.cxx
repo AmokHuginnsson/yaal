@@ -45,15 +45,13 @@ extern "C"
 
 PGconn* _brokenDB_ = NULL;
 
-void db_disconnect( void* );
-
-void* db_connect( char const* dataBase_,
+M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
 		char const* login_, char const* password_ )
 	{
 	PGconn * connection = NULL;
 	if ( _brokenDB_ )
 		{
-		db_disconnect ( _brokenDB_ );
+		PQfinish( _brokenDB_ );
 		_brokenDB_ = NULL;
 		}
 	connection = PQsetdbLogin( NULL /* host */,
@@ -65,48 +63,48 @@ void* db_connect( char const* dataBase_,
 	return ( connection );
 	}
 
-void db_disconnect( void* data_ )
+M_EXPORT_SYMBOL void db_disconnect( void* data_ )
 	{
 	if ( data_ )
 		PQfinish( static_cast<PGconn*>( data_ ) );
 	return;
 	}
 
-int dbrs_errno( void*, void* result_ )
+M_EXPORT_SYMBOL int dbrs_errno( void*, void* result_ )
 	{
 	ExecStatusType status = PQresultStatus( static_cast<PGresult*>( result_ ) );
 	return ( ! ( ( status == PGRES_COMMAND_OK ) || ( status == PGRES_TUPLES_OK ) ) );
 	}
 
-char const* dbrs_error( void* db_, void* result_ )
+M_EXPORT_SYMBOL char const* dbrs_error( void* db_, void* result_ )
 	{
 	if ( ! db_ )
 		db_ = _brokenDB_;
 	return ( result_ ? ::PQresultErrorMessage( static_cast<PGresult*>( result_ ) ) : ::PQerrorMessage( static_cast<PGconn*>( db_ ) ) );
 	}
 
-void* db_query( void* data_, char const* query_ )
+M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ )
 	{
 	return ( PQexec( static_cast<PGconn*>( data_ ), query_ ) );
 	}
 
-void rs_unquery( void* data_ )
+M_EXPORT_SYMBOL void rs_unquery( void* data_ )
 	{
 	PQclear( static_cast<PGresult*>( data_ ) );
 	return;
 	}
 
-char const* rs_get( void* data_, int long row_, int column_ )
+M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ )
 	{
 	return ( ::PQgetvalue( static_cast<PGresult*>( data_ ), static_cast<int>( row_ ), column_ ) );
 	}
 
-int rs_fields_count( void* data_ )
+M_EXPORT_SYMBOL int rs_fields_count( void* data_ )
 	{
 	return ( ::PQnfields( static_cast<PGresult*>( data_ ) ) );
 	}
 
-int long dbrs_records_count( void*, void* dataR_ )
+M_EXPORT_SYMBOL int long dbrs_records_count( void*, void* dataR_ )
 	{
 	char* tmp = ::PQcmdTuples( static_cast<PGresult*>( dataR_ ) );
 	if ( tmp && tmp [ 0 ] )
@@ -115,19 +113,21 @@ int long dbrs_records_count( void*, void* dataR_ )
 		return ( ::PQntuples( static_cast<PGresult*>( dataR_ ) ) );
 	}
 
-int long dbrs_id( void* db_, void* )
+M_EXPORT_SYMBOL int long dbrs_id( void* db_, void* )
 	{
-	void* result( db_query( db_, "SELECT lastval();" ) );
+	PGresult* result( PQexec( static_cast<PGconn*>( db_ ), "SELECT lastval();" ) );
 	int long id( -1 );
 	if ( result )
 		{
-		id = ::strtol( rs_get( result, 0, 0 ), NULL, 10 );
-		rs_unquery( result );
+		char const* value( PQgetvalue( result, 0, 0 ) );
+		if ( value )
+			id = ::strtol( value, NULL, 10 );
+		PQclear( result );
 		}
 	return ( id );
 	}
 
-char const* rs_column_name( void* dataR_, int field_ )
+M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ )
 	{
 	return ( ::PQfname( static_cast<PGresult*>( dataR_ ), field_ ) );
 	}

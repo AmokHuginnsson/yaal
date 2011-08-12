@@ -72,9 +72,9 @@ private:
 
 OSQLite* _brokenDB_ = NULL;
 
-M_EXPORT_SYMBOL void* db_query( void*, char const* );
-M_EXPORT_SYMBOL void rs_unquery( void* );
-M_EXPORT_SYMBOL void db_disconnect( void* );
+void* yaal_sqlite3_db_query( void*, char const* );
+void yaal_sqlite3_rs_unquery( void* );
+void yaal_sqlite3_db_disconnect( void* );
 
 /* sqlite driver uses convention that database file name should have
  * .sqlite extension or no extension at all, and this default extension is added
@@ -89,7 +89,7 @@ M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
 	OSQLite* sQLite = NULL;
 	if ( _brokenDB_ )
 		{
-		db_disconnect( _brokenDB_ );
+		yaal_sqlite3_db_disconnect( _brokenDB_ );
 		_brokenDB_ = NULL;
 		}
 	sQLite = new ( memory::yaal ) OSQLite;
@@ -114,22 +114,26 @@ M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
 		}
 	else
 		{
-		ptr = db_query( sQLite, "PRAGMA empty_result_callbacks = ON;" );
+		ptr = yaal_sqlite3_db_query( sQLite, "PRAGMA empty_result_callbacks = ON;" );
 		if ( ptr )
-			rs_unquery( ptr );
+			yaal_sqlite3_rs_unquery( ptr );
 		else
 			_brokenDB_ = sQLite, sQLite = NULL;
 		}
 	return ( sQLite );
 	}
 
-M_EXPORT_SYMBOL void db_disconnect( void* data_ )
+void yaal_sqlite3_db_disconnect( void* data_ )
 	{
 	OSQLite* sQLite = static_cast<OSQLite*>( data_ );
 	if ( sQLite->_dB )
 		sqlite3_close( sQLite->_dB );
 	M_SAFE( delete sQLite );
 	return;
+	}
+M_EXPORT_SYMBOL void db_disconnect( void* data_ )
+	{
+	yaal_sqlite3_db_disconnect( data_ );
 	}
 
 M_EXPORT_SYMBOL int dbrs_errno( void* db_, void* result_ )
@@ -169,7 +173,7 @@ M_EXPORT_SYMBOL char const* dbrs_error( void* db_, void* result_ )
 	return ( msg );
 	}
 
-M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ )
+void* yaal_sqlite3_db_query( void* data_, char const* query_ )
 	{
 	OSQLite* sQLite( static_cast<OSQLite*>( data_ ) );
 	OSQLiteResult* result( new ( memory::yaal ) OSQLiteResult );
@@ -183,13 +187,21 @@ M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ )
 	result->_errorMessage = errmsg;
 	return ( result );
 	}
+M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ )
+	{
+	return ( yaal_sqlite3_db_query( data_, query_ ) );
+	}
 
-M_EXPORT_SYMBOL void rs_unquery( void* data_ )
+void yaal_sqlite3_rs_unquery( void* data_ )
 	{
 	OSQLiteResult* pr = static_cast<OSQLiteResult*>( data_ );
 	sqlite3_free_table( pr->_data );
 	M_SAFE( delete pr );
 	return;
+	}
+M_EXPORT_SYMBOL void rs_unquery( void* data_ )
+	{
+	yaal_sqlite3_rs_unquery( data_ );
 	}
 
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ )
@@ -208,7 +220,7 @@ M_EXPORT_SYMBOL int rs_fields_count( void* data_ )
 M_EXPORT_SYMBOL int long dbrs_records_count( void* dataB_, void* dataR_ )
 	{
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( dataR_ ) );
-	if ( result && result->_data )
+	if ( result && ( result->_columns > 0 ) )
 		return ( result->_rows );
 	else
 		return ( ::sqlite3_changes( static_cast<OSQLite*>( dataB_ )->_dB ) );

@@ -44,15 +44,13 @@ extern "C"
 
 MYSQL* _brokenDB_ = NULL;
 
-void db_disconnect( void* );
-
-void* db_connect( char const* dataBase_,
+M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
 		char const* login_, char const * password_ )
 	{
 	MYSQL* mySQL( NULL );
 	if ( _brokenDB_ )
 		{
-		db_disconnect( _brokenDB_ );
+		mysql_close( _brokenDB_ );
 		_brokenDB_ = NULL;
 		}
 	mySQL = mysql_init( NULL );
@@ -68,39 +66,39 @@ void* db_connect( char const* dataBase_,
 	return ( mySQL );
 	}
 
-void db_disconnect( void* data_ )
+M_EXPORT_SYMBOL void db_disconnect( void* data_ )
 	{
 	mysql_close( static_cast<MYSQL*>( data_ ) );
 	return;
 	}
 
-int dbrs_errno( void* data_, void* )
+M_EXPORT_SYMBOL int dbrs_errno( void* data_, void* )
 	{
 	if ( ! data_ )
 		data_ = _brokenDB_;
 	return ( ::mysql_errno( static_cast<MYSQL*>( data_ ) ) );
 	}
 
-char const* dbrs_error( void* data_, void* )
+M_EXPORT_SYMBOL char const* dbrs_error( void* data_, void* )
 	{
 	if ( ! data_ )
 		data_ = _brokenDB_;
 	return ( ::mysql_error( static_cast<MYSQL*>( data_ ) ) );
 	}
 
-void* db_query( void* data_, char const* query_ )
+M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ )
 	{
 	mysql_query( static_cast<MYSQL*>( data_ ), query_ );
 	return ( mysql_store_result( static_cast<MYSQL*>( data_ ) ) );
 	}
 
-void rs_unquery( void* data_ )
+M_EXPORT_SYMBOL void rs_unquery( void* data_ )
 	{
 	mysql_free_result( static_cast<MYSQL_RES*>( data_ ) );
 	return;
 	}
 
-char const* rs_get( void* data_, int long row_, int column_ )
+M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ )
 	{
 	MYSQL_ROW row;
 	mysql_data_seek( static_cast<MYSQL_RES*>( data_ ), row_ );
@@ -108,12 +106,12 @@ char const* rs_get( void* data_, int long row_, int column_ )
 	return ( row [ column_ ] );
 	}
 
-int rs_fields_count( void* data_ )
+M_EXPORT_SYMBOL int rs_fields_count( void* data_ )
 	{
 	return ( data_ ? ::mysql_num_fields( static_cast<MYSQL_RES*>( data_ ) ) : 0 );
 	}
 
-int long dbrs_records_count( void* dataB_, void* dataR_ )
+M_EXPORT_SYMBOL int long dbrs_records_count( void* dataB_, void* dataR_ )
 	{
 	if ( dataR_ )
 		return ( static_cast<int long>( mysql_num_rows( static_cast<MYSQL_RES*>( dataR_ ) ) ) );
@@ -121,12 +119,12 @@ int long dbrs_records_count( void* dataB_, void* dataR_ )
 		return ( static_cast<int long>( mysql_affected_rows( static_cast<MYSQL*>( dataB_ ) ) ) );
 	}
 
-int long dbrs_id( void* dataB_, void* )
+M_EXPORT_SYMBOL int long dbrs_id( void* dataB_, void* )
 	{
 	return ( static_cast<int long>( mysql_insert_id( static_cast<MYSQL*>( dataB_ ) ) ) );
 	}
 
-char const* rs_column_name( void* dataR_, int field_ )
+M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ )
 	{
 	MYSQL_FIELD* field = NULL;
 	field = mysql_fetch_field_direct( static_cast<MYSQL_RES*>( dataR_ ), field_ );
