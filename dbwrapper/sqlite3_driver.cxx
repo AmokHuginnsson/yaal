@@ -171,9 +171,8 @@ M_EXPORT_SYMBOL char const* dbrs_error( void* db_, void* result_ )
 
 M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ )
 	{
-	OSQLite* sQLite = static_cast<OSQLite*>( data_ );
-	OSQLiteResult * result = NULL;
-	result = new ( memory::yaal ) OSQLiteResult;
+	OSQLite* sQLite( static_cast<OSQLite*>( data_ ) );
+	OSQLiteResult* result( new ( memory::yaal ) OSQLiteResult );
 	result->_columns = 0;
 	result->_rows = 0;
 	result->_data = NULL;
@@ -208,8 +207,9 @@ M_EXPORT_SYMBOL int rs_fields_count( void* data_ )
 
 M_EXPORT_SYMBOL int long dbrs_records_count( void* dataB_, void* dataR_ )
 	{
-	if ( dataR_ )
-		return ( static_cast<OSQLiteResult*>( dataR_ )->_rows );
+	OSQLiteResult* result( static_cast<OSQLiteResult*>( dataR_ ) );
+	if ( result && result->_data )
+		return ( result->_rows );
 	else
 		return ( ::sqlite3_changes( static_cast<OSQLite*>( dataB_ )->_dB ) );
 	}
