@@ -64,9 +64,9 @@ HString const& HTokenizer::operator[] ( int long nth_ ) const
 	{
 	M_PROLOG
 	M_ENSURE( nth_ >= 0 );
-	int long i = nth_;
 	_buffer.clear();
-	for ( HIterator it = begin(), endIt = end(); it != endIt; ++ it, -- i )
+	int long i( nth_ );
+	for ( HIterator it( begin() ), endIt( end() ); it != endIt; ++ it, -- i )
 		{
 		if ( ! i )
 			{
@@ -82,7 +82,7 @@ HString const& HTokenizer::operator[] ( int long nth_ ) const
 HTokenizer::HIterator HTokenizer::begin( void ) const
 	{
 	M_PROLOG
-	int long idx = _string.find_other_than( _delimiter.raw(), 0 );
+	int long idx( _string.find_other_than( _delimiter.raw(), 0 ) );
 	return ( HIterator( this, _behavior == INCLUDE_EMPTY ? 0 : ( idx >= 0 ? idx : -1 ) ) );
 	M_EPILOG
 	}
