@@ -57,11 +57,11 @@ class HLogPad : public HControl
 		int _attribute;
 		hcore::HString _text;
 	public:
-		HLogLine ( void );
-		virtual ~HLogLine ( void );
+		HLogLine( void );
+		virtual ~HLogLine( void );
 		friend class HLogPad;
 		};
-	typedef hcore::HList < HLogLine > contents_t;
+	typedef hcore::HList<HLogLine> contents_t;
 	int _lines;
 	int _offsetRow;
 	int _offsetColumn;
@@ -74,8 +74,8 @@ public:
 	void add( yaal::hcore::HString const& );
 	void add( int );
 protected:
-	virtual int do_process_input ( int );
-	virtual void do_refresh ( void );
+	virtual int do_process_input( int );
+	virtual void do_refresh( void );
 	};
 
 }

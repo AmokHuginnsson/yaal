@@ -52,25 +52,25 @@ HLogPad::HLogLine::~HLogLine ( void )
 	M_EPILOG
 	}
 
-HLogPad::HLogPad ( HWindow * parent_, int row_, int column_,
-		int height_, int width_, char const * const label_ )
+HLogPad::HLogPad ( HWindow* parent_, int row_, int column_,
+		int height_, int width_, char const* const label_ )
 	: HControl ( parent_, row_, column_, height_, width_, label_ ),
-	_lines ( 0 ), _offsetRow ( 0 ), _offsetColumn ( 0 ),
-	_attribute ( 0 ), _contents()
+	_lines( 0 ), _offsetRow( 0 ), _offsetColumn( 0 ),
+	_attribute( 0 ), _contents()
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-HLogPad::~HLogPad ( void )
+HLogPad::~HLogPad( void )
 	{
 	M_PROLOG
 	return;
 	M_EPILOG
 	}
 
-void HLogPad::do_refresh ( void )
+void HLogPad::do_refresh( void )
 	{
 	M_PROLOG
 	int ctr = 0, row = 0, cursor = 0, column = 0;
@@ -83,10 +83,10 @@ void HLogPad::do_refresh ( void )
 	for ( ctr = 0; ctr < _heightRaw; ctr ++ )
 		cons.c_cmvprintf( _rowRaw + ctr,
 				_columnRaw, _attribute, _varTmpBuffer.raw() );
-	if ( _contents.size() )
+	if ( ! _contents.is_empty() )
 		{
 		ctr = 0;
-		for ( contents_t::iterator it = _contents.begin(); ( it != _contents.end() ) && ( row < _heightRaw ); ++ it )
+		for ( contents_t::iterator it( _contents.begin() ), end( _contents.end() ); ( it != end ) && ( row < _heightRaw ); ++ it )
 			{
 			if ( it->_type == HLogLine::ATTRIBUTE )
 				_attribute = it->_attribute | bG;
@@ -95,7 +95,7 @@ void HLogPad::do_refresh ( void )
 				if ( ( ctr >= _offsetRow ) && ( cursor < _widthRaw ) )
 					{
 					if ( _offsetColumn > column )
-						_varTmpBuffer = it->_text.mid ( _offsetColumn - column );
+						_varTmpBuffer = it->_text.mid( _offsetColumn - column );
 					else
 						_varTmpBuffer = it->_text;
 					if ( ( cursor + _varTmpBuffer.get_length() ) >= _widthRaw )
@@ -126,24 +126,24 @@ void HLogPad::do_refresh ( void )
 	M_EPILOG
 	}
 
-void HLogPad::add ( int attribute_ )
+void HLogPad::add( int attribute_ )
 	{
 	M_PROLOG
 	HLogLine logLine;
 	logLine._type = HLogLine::ATTRIBUTE;
 	logLine._attribute = attribute_;
-	_contents.push_back ( logLine );
+	_contents.push_back( logLine );
 	return;
 	M_EPILOG
 	}
 
-void HLogPad::add ( yaal::hcore::HString const& text_ )
+void HLogPad::add( yaal::hcore::HString const& text_ )
 	{
 	M_PROLOG
-	int indexNL = 0, indexChar = 0;
+	int indexNL( 0 ), indexChar( 0 );
 	HLogLine logLine;
-	HLogLine* it = NULL;
-	if ( _contents.size() )
+	HLogLine* it( NULL );
+	if ( ! _contents.is_empty() )
 		it = &_contents.tail();
 	if ( ! it || ( it->_type != HLogLine::TEXT ) )
 		{
@@ -159,7 +159,7 @@ void HLogPad::add ( yaal::hcore::HString const& text_ )
 			{
 			it->_text += _varTmpBuffer.left( indexNL );
 			it->_type = HLogLine::TEXT_EOL;
-			_lines ++;
+			++ _lines;
 			indexChar = static_cast<int>( _varTmpBuffer.find_other_than( "\r\n", indexNL + 1 ) );
 			if ( indexChar >= 0 )
 				_varTmpBuffer = _varTmpBuffer.mid( indexChar );
@@ -184,16 +184,16 @@ void HLogPad::add ( yaal::hcore::HString const& text_ )
 	M_EPILOG
 	}
 
-void HLogPad::add ( int attribute_, yaal::hcore::HString const& text_ )
+void HLogPad::add( int attribute_, yaal::hcore::HString const& text_ )
 	{
 	M_PROLOG
-	add ( attribute_ );
-	add ( text_ );
+	add( attribute_ );
+	add( text_ );
 	return;
 	M_EPILOG
 	}
 
-int HLogPad::do_process_input ( int code_ )
+int HLogPad::do_process_input( int code_ )
 	{
 	M_PROLOG
 	int code = 0;
