@@ -70,6 +70,8 @@ namespace yaal
 namespace hconsole
 {
 
+STATIC_ASSERT( KEY_CODES::SPECIAL_KEY > KEY_MAX );
+
 int GLYPHS::DOWN_ARROW, GLYPHS::UP_ARROW, GLYPHS::VERTICAL_LINE;
 
 /* Bbbbffff
@@ -247,14 +249,12 @@ void HConsole::enter_curses( void )
 		{
 		if ( ::getenv( "DISPLAY" ) )
 			{
-			log( LOG_TYPE::INFO ) << _( "using ncurses mouse support" ) << endl;
 			mouse::mouse_open = mouse::x_mouse_open;
 			mouse::mouse_get = mouse::x_mouse_get;
 			mouse::mouse_close = mouse::x_mouse_close;
 			}
 		else
 			{
-			log( LOG_TYPE::INFO ) << _( "using console mouse support" ) << endl;
 			mouse::mouse_open = mouse::console_mouse_open;
 			mouse::mouse_get = mouse::console_mouse_get;
 			mouse::mouse_close = mouse::console_mouse_close;
@@ -262,6 +262,9 @@ void HConsole::enter_curses( void )
 		if ( ( _mouseDes = mouse::mouse_open() ) < 0 )
 			M_THROW( _( "mouse is console type"
 						" and we did not recived file descriptor" ), errno );
+		log( LOG_TYPE::INFO )
+			<< ( ( mouse::mouse_open == mouse::x_mouse_open ) ? _( "using ncurses mouse support, at fd(" ) : _( "using console mouse support, at fd(" ) )
+			<< _mouseDes << ')' << endl;
 		}
 #ifdef HAVE_ASCII_GRAPHICS
 	GLYPHS::DOWN_ARROW		= static_cast<int>( ACS_DARROW );
@@ -500,58 +503,59 @@ int HConsole::ungetch( int code_ ) const
 int HConsole::get_key( void ) const
 	{
 	M_PROLOG
-	int key = 0;
-	int character = 0;
 	CURSOR::cursor_t origCursState = CURSOR::INVISIBLE;
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
 	M_ENSURE( noecho() != ERR );
-	M_ENSURE( fflush( NULL ) == 0 );
-	key = getch();
+	M_ENSURE( ::fflush( NULL ) == 0 );
+	int key( getch() );
+	M_ASSERT( key < KEY_CODES::SPECIAL_KEY );
 	if ( key == KEY_CODES::ESC )
 		{
-		M_ENSURE( nodelay ( stdscr, true ) != ERR );
+		M_ENSURE( nodelay( stdscr, true ) != ERR );
 		key = getch();
-		M_ENSURE( nodelay ( stdscr, false ) != ERR );
+		M_ENSURE( nodelay( stdscr, false ) != ERR );
 		if ( key == ERR )
 			key = KEY_CODES::ESC;
 		else
-			key = KEY<>::meta_r ( key );
+			key = KEY<>::meta_r( key );
 		}
-	if ( key == KEY<>::ctrl_r ( _commandComposeCharacter_ ) )
+	if ( key == KEY<>::ctrl_r( _commandComposeCharacter_ ) )
 		{
-		origCursState = curs_set ( CURSOR::INVISIBLE );
-		c_cmvprintf ( _height - 1, -1, COLORS::FG_WHITE, "ctrl-%c",
+		origCursState = curs_set( CURSOR::INVISIBLE );
+		c_cmvprintf( _height - 1, -1, COLORS::FG_WHITE, "ctrl-%c",
 					_commandComposeCharacter_ );
-		timeout ( _commandComposeDelay_ * 100 );
+		timeout( _commandComposeDelay_ * 100 );
 		key = getch();
-		timeout ( -1 );
+		timeout( -1 );
 		if ( key == ERR )
 			{
-			key = KEY<>::ctrl_r ( _commandComposeCharacter_ );
-			c_cmvprintf ( _height - 1, 0, COLORS::FG_LIGHTGRAY, "      " );
+			key = KEY<>::ctrl_r( _commandComposeCharacter_ );
+			c_cmvprintf( _height - 1, 0, COLORS::FG_LIGHTGRAY, "      " );
 			}
 		else
 			{
+			int character = 0;
 			if ( key < KEY_CODES::ESC )
-				key = KEY<>::command_r ( character = key + 96 );
+				key = KEY<>::command_r( character = key + 96 );
 			else if ( key == KEY_CODES::ESC )
 				{
-				M_ENSURE( nodelay ( stdscr, true ) != ERR );
+				M_ENSURE( nodelay( stdscr, true ) != ERR );
 				key = getch();
-				M_ENSURE( nodelay ( stdscr, false ) != ERR );
+				M_ENSURE( nodelay( stdscr, false ) != ERR );
 				if ( key == ERR )
-					key = KEY<>::command_r (character = KEY_CODES::ESC);
+					key = KEY<>::command_r( character = KEY_CODES::ESC );
 				else
-					key = KEY<>::command_r (KEY<>::meta_r ( character = key ) );
+					key = KEY<>::command_r( KEY<>::meta_r( character = key ) );
 				}
 			else
-				key = KEY<>::command_r ( character = key );
-			c_cmvprintf ( _height - 1, 6, COLORS::FG_WHITE, " %c", character );
+				key = KEY<>::command_r( character = key );
+			c_cmvprintf( _height - 1, 6, COLORS::FG_WHITE, " %c", character );
 			}
-		curs_set ( origCursState );
+		curs_set( origCursState );
 		}
 	M_ENSURE( echo() != ERR );
+	M_ASSERT( key < KEY_CODES::SPECIAL_KEY );
 	switch ( key )
 		{
 		case ( KEY_NPAGE ):     key = KEY_CODES::PAGE_DOWN; break;
@@ -579,11 +583,10 @@ int HConsole::get_key( void ) const
 int HConsole::kbhit( void ) const
 	{
 	M_PROLOG
-	int key;
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
 	M_ENSURE( nodelay( stdscr, true ) != ERR );
-	key = get_key();
+	int key( get_key() );
 	M_ENSURE( nodelay( stdscr, false ) != ERR );
 	if ( key == ERR )
 		return ( 0 );

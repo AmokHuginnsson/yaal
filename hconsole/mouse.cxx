@@ -71,7 +71,7 @@ fun_console_mouse_open_t mouse_open = NULL;
 fun_console_mouse_get_t mouse_get = NULL;
 fun_console_mouse_close_t mouse_close = NULL;
 
-int hunt_tty ( int offset_ )
+int hunt_tty( int offset_ )
 	{
 	M_PROLOG
 	/* this hack allows to guess current controling virtual terminal screen */
@@ -92,7 +92,7 @@ int hunt_tty ( int offset_ )
 				vC = lexical_cast<int>( ptr + 4 + offset_ );
 			}
 		else
-			M_THROW( "cannot find controling virtual console", errno );
+			throw HConsoleException( "cannot find controling virtual console", errno );
 		}
 	return ( vC );
 	M_EPILOG
@@ -118,13 +118,13 @@ int console_mouse_open( void )
 	if ( _mouse_ < 0 )
 		{
 		error.format( _( "cannot open mouse, %s" ), error_message( errno ) );
-		M_THROW( error, vC );
+		throw HMouseException( error, vC );
 		}
 	if ( ::ioctl( _mouse_, CONS_MOUSECTL, &mouse ) < 0 )
 		{
 		error.format( _( "cannot setup mouse mode, %s" ), error_message( errno ) );
 		TEMP_FAILURE_RETRY( hcore::system::close( _mouse_ ) );
-		M_THROW( error, errno );
+		throw HMouseException( error, errno );
 		}
 
 	log( LOG_TYPE::INFO ) << "i have opened device: `" << tty << '\'' << endl;
@@ -139,7 +139,7 @@ int console_mouse_get( OMouse& mouse_ )
 	mouse_info mouse;
 	mouse.operation = MOUSE_GETINFO;
 	if ( ::ioctl( _mouse_, CONS_MOUSECTL, &mouse ) < 0 )
-		M_THROW( "cannot get mouse data", errno );
+		throw HMouseException( "cannot get mouse data", errno );
 	else
 		{
 		mouse_._buttons = mouse.u.data.buttons;
@@ -154,7 +154,7 @@ int console_mouse_close( void )
 	{
 	M_PROLOG
 	if ( ! _mouse_ )
-		M_THROW( "mouse not opened", errno );
+		throw HMouseException( "mouse not opened", errno );
 	TEMP_FAILURE_RETRY( hcore::system::close( _mouse_ ) );
 	_mouse_ = 0;
 	return ( 0 );
@@ -179,7 +179,7 @@ int console_mouse_open( void )
 	if ( Gpm_Open( &gpm, vC ) == -1 )
 		{
 		error.format( "Can't open mouse connection: %s", error_message( errno ) );
-		M_THROW( error, vC );
+		throw HMouseException( error, vC );
 		}
 	log( LOG_TYPE::INFO ) << "i have opened device: `" << vC << '\'' << endl;
 	return ( gpm_fd );
@@ -191,7 +191,7 @@ int console_mouse_get( OMouse& mouse_ )
 	M_PROLOG
 	Gpm_Event event;
 	if ( Gpm_GetEvent( &event ) != 1 )
-		M_THROW( _( "cannot retrieve event") , errno );
+		throw HMouseException( _( "cannot retrieve event") , errno );
 	mouse_._buttons = event.buttons;
 	mouse_._row = event.y;
 	mouse_._column = event.x;
@@ -215,7 +215,7 @@ int console_mouse_open( void )
 	M_PROLOG
 	int a( 1 );
 	if ( a )
-		M_THROW( _( "console mouse support not compiled" ), errno );
+		throw HMouseException( _( "console mouse support not compiled" ) );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -225,7 +225,7 @@ int console_mouse_get( OMouse& )
 	M_PROLOG
 	int a( 1 );
 	if ( a )
-		M_THROW( _( "console mouse support not compiled" ), errno );
+		throw HMouseException( _( "console mouse support not compiled" ) );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -251,7 +251,7 @@ int x_mouse_open( void )
 	desiredMouseMask = BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED;
 	mouseMask = mousemask( desiredMouseMask, NULL );
 	if ( ! mouseMask )
-		M_THROW( "mousemask() returned 0", errno );
+		throw HMouseException( "mousemask() returned 0", errno );
 	else if ( ( mouseMask & desiredMouseMask ) < desiredMouseMask )
 		{
 		HString error;
@@ -260,6 +260,8 @@ int x_mouse_open( void )
 				mouseMask & BUTTON3_CLICKED );
 		throw ( HMouseException( error ) );
 		}
+	if ( ! has_mouse() )
+		throw HMouseException( "Mouse driver failed to initialize properly." );
 	return ( 0 );
 	M_EPILOG
 	}
@@ -269,7 +271,7 @@ int x_mouse_get( OMouse& mouse_ )
 	M_PROLOG
 	MEVENT mouse;
 	if ( getmouse( &mouse ) != OK )
-		M_THROW( "cannot get mouse data", errno );
+		throw HMouseException( "cannot get mouse data", errno );
 	else
 		{
 		mouse_._buttons = static_cast<int>( mouse.bstate );
