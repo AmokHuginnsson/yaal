@@ -563,6 +563,8 @@ void strip_comment( HString& line_ )
 	M_EPILOG
 	}
 
+char const _keyValueSep_[] = " \t=";
+
 int read_rc_line( HString& option_, HString& value_, HFile& file_,
 		int& line_ )
 	{
@@ -588,15 +590,17 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 			option_.shift_left( index );
 			lenght -= index;
 			}
-		/* now we look for first whitespace after option */
-		if ( ( index = option_.find_one_of( _whiteSpace_ ) ) > 0 )
+		/* now we look for first key-value separator after option */
+		if ( ( index = option_.find_one_of( _keyValueSep_ ) ) > 0 )
 			{
 			/* we have found a whitespace, so there is probability that */
 			/* have a value :-o */
 			int long endOfOption = index;
-			index = option_.find_other_than( _whiteSpace_, index );
+			index = option_.find_other_than( _keyValueSep_, index );
 			if ( ( index > 0 ) && option_[ index ] )
 				{
+				if ( count( option_.raw() + endOfOption, option_.raw() + index, '=' ) > 1 )
+					throw HProgramOptionsHandlerException( "Syntax error: redundant `=' sign.", line_ );
 				/* we have found a non-whitespace, so there certainly is a value */
 				end = ( lenght - 1 ) - option_.reverse_find_other_than( _whiteSpace_ );
 				/* now we strip apostrophe or quotation marks */
