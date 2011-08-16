@@ -73,23 +73,24 @@ HLogPad::~HLogPad( void )
 void HLogPad::do_refresh( void )
 	{
 	M_PROLOG
-	int ctr = 0, row = 0, cursor = 0, column = 0;
-	int bG = _focused ? COLORS::BG_GRAY : COLORS::BG_BLACK;
 	HConsole& cons = HConsole::get_instance();
 	draw_label();
 	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
 	_varTmpBuffer.fillz( ' ', 0, _widthRaw );
-	_attribute = COLORS::ATTR_NORMAL | bG;
-	for ( ctr = 0; ctr < _heightRaw; ctr ++ )
-		cons.c_cmvprintf( _rowRaw + ctr,
-				_columnRaw, _attribute, _varTmpBuffer.raw() );
+	int bg( _focused ? COLORS::BG_GRAY : COLORS::BG_BLACK );
+	_attribute = COLORS::ATTR_NORMAL | bg;
+	for ( int i( 0 ); i < _heightRaw; ++ i )
+		cons.c_cmvprintf( _rowRaw + i, _columnRaw, _attribute, _varTmpBuffer.raw() );
 	if ( ! _contents.is_empty() )
 		{
-		ctr = 0;
+		int ctr( 0 ); /* number of text lines in _contents iterated so far */
+		int row( 0 ); /* number of lines printed so far */
+		int cursor( 0 ); /* end of portion of currently printed line */
+		int column( 0 ); /* total length of currently printed line */
 		for ( contents_t::iterator it( _contents.begin() ), end( _contents.end() ); ( it != end ) && ( row < _heightRaw ); ++ it )
 			{
 			if ( it->_type == HLogLine::ATTRIBUTE )
-				_attribute = it->_attribute | bG;
+				_attribute = it->_attribute | bg;
 			else
 				{
 				if ( ( ctr >= _offsetRow ) && ( cursor < _widthRaw ) )
@@ -98,7 +99,7 @@ void HLogPad::do_refresh( void )
 						_varTmpBuffer = it->_text.mid( _offsetColumn - column );
 					else
 						_varTmpBuffer = it->_text;
-					if ( ( cursor + _varTmpBuffer.get_length() ) >= _widthRaw )
+					if ( ( cursor + _varTmpBuffer.get_length() ) > _widthRaw )
 						_varTmpBuffer.set_at( _widthRaw - cursor, 0 );
 					if ( _varTmpBuffer[ 0 ] )
 						cons.c_cmvprintf( _rowRaw + row,
@@ -111,8 +112,8 @@ void HLogPad::do_refresh( void )
 					cursor = 0;
 					column = 0;
 					if ( ctr >= _offsetRow )
-						row ++;
-					ctr ++;
+						++ row;
+					++ ctr;
 					}
 				else
 					{
