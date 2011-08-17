@@ -43,6 +43,7 @@ namespace hconsole
 class HTimeControl : public hcore::HTime, public HControl
 	{
 public:
+	typedef HTimeControl this_type;
 	HTimeControl( HWindow*, int, int, int, int, char const* );
 	virtual ~HTimeControl( void );
 	};

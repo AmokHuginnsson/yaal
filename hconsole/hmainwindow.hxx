@@ -47,6 +47,10 @@ namespace hconsole
  */
 class HMainWindow : public HWindow
 	{
+public:
+	typedef HMainWindow this_type;
+	typedef HWindow base_type;
+private:
 	HMenuControl* _menu;
 	HTUIProcess::model_ptr_t _windowList;
 	HTUIProcess::model_t::cyclic_iterator& _foregroundWindow;
@@ -61,6 +65,8 @@ private:
 	HMainWindow( HMainWindow const& );
 	HMainWindow& operator = ( HMainWindow const& );
 	};
+
+typedef yaal::hcore::HExceptionT<HMainWindow, HWindowException> HMainWindowException;
 
 }
 

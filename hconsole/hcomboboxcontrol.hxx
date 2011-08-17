@@ -48,10 +48,9 @@ namespace hconsole
 class HComboboxControl : public virtual HEditControl,
 	public virtual HListControl
 	{
-protected:
+public:
 	typedef HComboboxControl this_type;
 	typedef HListControl base_type;
-public:
 	/*! \brief Current combobox state.
 	 */
 	struct MODE
@@ -88,6 +87,8 @@ protected:
 private:
 	void close_combo ( void );
 	};
+
+typedef yaal::hcore::HExceptionT<HComboboxControl, HListControlException> HComboboxControlException;
 
 }
 

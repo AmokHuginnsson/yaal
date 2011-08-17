@@ -42,8 +42,8 @@ class HControl;
  */
 class HControlList
 	{
-	typedef HControlList this_type;
 public:
+	typedef HControlList this_type;
 	typedef hcore::HList<HControl::ptr_t> model_t;
 private:
 	model_t _list;
@@ -62,6 +62,8 @@ public:
 	HControl* get_control_by_no( int );
 	void exchange( int, int );
 	};
+
+typedef yaal::hcore::HExceptionT<HControlList> HControlListException;
 
 }
 

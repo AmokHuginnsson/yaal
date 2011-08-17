@@ -42,6 +42,10 @@ namespace hconsole
  */
 class HLogPad : public HControl
 	{
+public:
+	typedef HLogPad this_type;
+	typedef HControl base_type;
+private:
 	/*! \brief Basic unit of data for HLogPad display.
 	 */
 	class HLogLine
@@ -77,6 +81,8 @@ protected:
 	virtual int do_process_input( int );
 	virtual void do_refresh( void );
 	};
+
+typedef yaal::hcore::HExceptionT<HLogPad, HControlException> HLogPadException;
 
 }
 

@@ -43,10 +43,9 @@ namespace hconsole
  */
 class HMenuControl : public HTreeControl
 	{
-protected:
+public:
 	typedef HMenuControl this_type;
 	typedef HTreeControl base_type;
-public:
 	typedef yaal::hcore::HPointer<HMenuControl> ptr_t;
 protected:
 	HTUIProcess* _process;
@@ -66,6 +65,8 @@ private:
 	HMenuControl( HMenuControl const& );
 	HMenuControl& operator = ( HMenuControl const& );
 	};
+
+typedef yaal::hcore::HExceptionT<HMenuControl, HTreeControlException> HMenuControlException;
 
 }
 

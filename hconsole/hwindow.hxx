@@ -45,10 +45,9 @@ class HControlList;
  */
 class HWindow : public HHandler
 	{
-protected:
+public:
 	typedef HWindow this_type;
 	typedef HHandler base_type;
-public:
 	typedef yaal::hcore::HPointer<HWindow> ptr_t;
 protected:
 	bool								_initialised;		/*!< was window properly initialised? */
@@ -91,6 +90,8 @@ private:
 	HWindow( HWindow const& );
 	HWindow& operator = ( HWindow const& );
 	};
+
+typedef yaal::hcore::HExceptionT<HWindow, HHandlerException> HWindowException;
 
 }
 

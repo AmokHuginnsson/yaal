@@ -44,6 +44,9 @@ namespace hconsole
  */
 class HTreeControl : public virtual HControl
 	{
+public:
+	typedef HTreeControl this_type;
+	typedef HControl base_type;
 protected:
 	class HNodeControl;
 	friend class HNodeControl;
@@ -94,6 +97,8 @@ private:
 	HTreeControl( HTreeControl const& );
 	HTreeControl& operator = ( HTreeControl const& );
 	};
+
+typedef yaal::hcore::HExceptionT<HTreeControl, HControlException> HTreeControlException;
 
 }
 
