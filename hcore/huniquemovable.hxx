@@ -177,7 +177,7 @@ public:
 		::memcpy( _mem, um_._mem, sizeof ( value_type ) );
 		um_._owner = false;
 		}
-	HUniqueMovable( HUniqueMovableRef<tType> const& um_ )
+	HUniqueMovable( HUniqueMovableRef<tType> um_ )
 		: _mem(), _owner( um_._owner )
 		{
 		if ( um_._owner )
@@ -203,7 +203,7 @@ public:
 		return ( *this );
 		M_EPILOG
 		}
-	HUniqueMovable& operator = ( HUniqueMovableRef<tType> const& um_ )
+	HUniqueMovable& operator = ( HUniqueMovableRef<tType> um_ )
 		{
 		M_PROLOG
 		reset();
@@ -248,6 +248,10 @@ public:
 		HUniqueMovableRef<value_type> ref( static_cast<value_type*>( static_cast<void*>( _mem ) ), _owner );
 		_owner = false;
 		return ( ref );
+		}
+	bool has_ownership( void ) const
+		{
+		return ( _owner );
 		}
 	};
 
