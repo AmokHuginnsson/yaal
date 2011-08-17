@@ -108,11 +108,11 @@ class HList : public OListBits
 	typedef HList<type_t> this_type;
 private:
 	class HElement;
-	int _size;           /*!< how many elements this list contains */
+	int long _size;           /*!< how many elements this list contains */
 	HElement* _hook;    /*!< "begining" of the list ( "first" element ) */
 /* for internal use only */
 	sort_order_t _order; /*!< last-to-current sort order */
-	int _index;          /*!< this two fiels will allow boost operator[], int holds last */
+	int long _index;          /*!< this two fiels will allow boost operator[], int holds last */
 	HElement* _indexElement;   /*!< index and HElement * holds pointer to this last element */
 public:
 	typedef type_t value_type;
@@ -199,9 +199,8 @@ public:
 	typename OListBits::iterator<type_t, treatment>::type erase( HIterator<type_t, treatment>, HIterator<type_t, treatment> const& );
 	/*! \brief Sets cursor at specified index or number
 	 */
-	iterator n_th( int );
-	type_t& operator[] ( int );
-	type_t const& operator[] ( int ) const;
+	iterator n_th( int long );
+	type_t& operator[] ( int long );
 	type_t& front( void );
 	type_t const& front( void ) const;
 	type_t& back( void );
@@ -227,7 +226,7 @@ private:
 	template<typename T>
 	void insert_sort( HElement*&, HElement*&, T const& );
 	void insert( HElement*, HElement* );
-	HElement* element_by_index ( int );
+	HElement* element_by_index( int long );
 	void exchange( HElement*, HElement* );
 	void sub_swap( HElement*, HElement*, HElement* );
 	friend class HIterator<type_t, OListBits::TREAT_AS_OPENED>;
@@ -693,23 +692,21 @@ template<typename type_t>
 HList<type_t>& HList<type_t>::operator = ( HList<type_t> const& list_ )
 	{
 	M_PROLOG
-	int ctr = 0;
-	int count = 0;
 	if ( this != & list_ )
 		{
-		count = _size < list_._size ? _size : list_._size;
 		iterator thisIt = begin();
 		const_iterator otherIt = list_.begin();
-		if ( count )
+		int long ctr( 0 );
+		int long count( _size < list_._size ? _size : list_._size );
+		if ( count > 0 )
 			{
-			for ( ctr = 0; ctr < count; ctr ++ )	
+			for ( ; ctr < count; ++ ctr, ++ thisIt, ++ otherIt )
 				{
 				*thisIt = *otherIt;
 				if ( otherIt._current == list_._hook )
 					_hook = thisIt._current;
 				if ( otherIt._current == list_._indexElement )
 					_indexElement = thisIt._current;
-				++ thisIt; ++ otherIt;
 				}
 			}
 		if ( _size > list_._size )
@@ -720,14 +717,11 @@ HList<type_t>& HList<type_t>::operator = ( HList<type_t> const& list_ )
 			}
 		else if ( _size < list_._size )
 			{
-			for ( ; ctr < list_._size; ctr ++ )	
+			for ( ; ctr < list_._size; ++ ctr, ++ otherIt )
 				{
 				push_back( *otherIt );
-				if ( otherIt._current == list_._hook )
-					_hook = _hook->_previous;
 				if ( otherIt._current == list_._indexElement )
 					_indexElement = _hook->_previous;
-				++ otherIt;
 				}
 			}
 		_index = list_._index;
@@ -1080,7 +1074,7 @@ void HList<type_t>::pop_back( void )
 	}
 
 template<typename type_t>
-type_t& HList<type_t>::operator[] ( int index_ )
+type_t& HList<type_t>::operator[] ( int long index_ )
 	{
 	M_PROLOG
 	return ( element_by_index( index_ )->_value );
@@ -1088,7 +1082,7 @@ type_t& HList<type_t>::operator[] ( int index_ )
 	}
 
 template<typename type_t>
-typename HList<type_t>::HElement* HList<type_t>::element_by_index( int index_ )
+typename HList<type_t>::HElement* HList<type_t>::element_by_index( int long index_ )
 	{
 	M_PROLOG
 	if ( _size == 0 )
@@ -1113,7 +1107,7 @@ we have to check if index_ is lowwer or geater than _index/2
 	if ( index_ < _index )
 		{
 		if ( index_ < ( _index / 2 ) )
-			for ( _index = 0, _indexElement = _hook; _index < index_; _index ++ )
+			for ( _index = 0, _indexElement = _hook; _index < index_; ++ _index )
 				_indexElement = _indexElement->_next;
 		else
 			for ( ; _index > index_; _index -- )
@@ -1122,7 +1116,7 @@ we have to check if index_ is lowwer or geater than _index/2
 	else
 		{
 		if ( index_ < ( ( _size + _index ) / 2 ) )
-			for ( ; _index < index_; _index ++ )
+			for ( ; _index < index_; ++ _index )
 				_indexElement = _indexElement->_next;
 		else
 			for ( _index = _size - 1, _indexElement = _hook->_previous;
@@ -1134,7 +1128,7 @@ we have to check if index_ is lowwer or geater than _index/2
 	}
 
 template<typename type_t>
-typename HList<type_t>::iterator HList<type_t>::n_th( int index_ )
+typename HList<type_t>::iterator HList<type_t>::n_th( int long index_ )
 	{
 	M_PROLOG
 	return ( iterator( this, element_by_index( index_ ) ) );
