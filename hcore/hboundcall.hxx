@@ -76,7 +76,7 @@ public:
 		typename b8_t, typename b9_t,
 		typename b10_t>
 	HBoundCall( HCall<free_args_count, return_type, CALL_type, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& call_ )
-	 : _call( new ( memory::yaal ) HCall<free_args_count, return_type, CALL_type, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>( call_ ) )
+	 : _call( make_pointer<HCall<free_args_count, return_type, CALL_type, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >( call_ ) )
 		{	}
 	return_t operator()( void ) const
 		{ return ( (*_call)() ); }
