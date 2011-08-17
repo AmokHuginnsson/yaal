@@ -248,16 +248,16 @@ int x_mouse_open( void )
 	{
 	M_PROLOG
 	mmask_t mouseMask, desiredMouseMask;
-	desiredMouseMask = BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED;
+	desiredMouseMask = BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED | BUTTON1_DOUBLE_CLICKED;
 	mouseMask = mousemask( desiredMouseMask, NULL );
 	if ( ! mouseMask )
 		throw HMouseException( "mousemask() returned 0", errno );
 	else if ( ( mouseMask & desiredMouseMask ) < desiredMouseMask )
 		{
 		HString error;
-		error.format( "could not set up apropriate mask: 1 = %d, 2 = %d, 3 = %d",
+		error.format( "could not set up apropriate mask: B1C = %d, B2C = %d, B3C = %d, B1DC = %d",
 				mouseMask & BUTTON1_CLICKED, mouseMask & BUTTON2_CLICKED,
-				mouseMask & BUTTON3_CLICKED );
+				mouseMask & BUTTON3_CLICKED, mouseMask & BUTTON1_DOUBLE_CLICKED );
 		throw ( HMouseException( error ) );
 		}
 	if ( ! has_mouse() )
