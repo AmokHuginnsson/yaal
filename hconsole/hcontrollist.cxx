@@ -105,12 +105,12 @@ void HControlList::update_all( void )
 int HControlList::hit_test_all( mouse::OMouse& mouse_ )
 	{
 	M_PROLOG
-	if ( (*_focused)->hit_test ( mouse_._row, mouse_._column ) )
-		return ( (*_focused)->click ( mouse_ ) );
+	if ( (*_focused)->hit_test( mouse_._row, mouse_._column ) )
+		return ( (*_focused)->click( mouse_ ) );
 	for ( model_t::iterator it = _list.begin();
 			it != _list.end(); ++ it )
-		if ( (*it)->hit_test ( mouse_._row, mouse_._column ) )
-			return ( (*it)->click ( mouse_ ) );
+		if ( (*it)->hit_test( mouse_._row, mouse_._column ) )
+			return ( (*it)->click( mouse_ ) );
 	return( 0 );
 	M_EPILOG
 	}
