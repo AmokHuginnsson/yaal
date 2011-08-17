@@ -104,7 +104,7 @@ private:
 	HPipedChild& operator = ( HPipedChild const& );
 	};
 
-typedef yaal::hcore::HExceptionT<HPipedChild,yaal::hcore::HStreamInterfaceException> HPipedChildException;
+typedef yaal::hcore::HExceptionT<HPipedChild, yaal::hcore::HStreamInterfaceException> HPipedChildException;
 
 }
 

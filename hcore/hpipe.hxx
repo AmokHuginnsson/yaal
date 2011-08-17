@@ -57,7 +57,7 @@ protected:
 	virtual bool do_is_valid( void ) const;
 	};
 
-typedef HExceptionT<HPipe,HStreamInterfaceException> HPipeException;
+typedef HExceptionT<HPipe, HStreamInterfaceException> HPipeException;
 
 }
 

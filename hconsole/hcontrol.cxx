@@ -300,6 +300,13 @@ void HControl::do_update( void )
 bool HControl::hit_test( int row_, int column_ ) const
 	{
 	M_PROLOG
+	return ( do_hit_test( row_, column_ ) );
+	M_EPILOG
+	}
+
+bool HControl::do_hit_test( int row_, int column_ ) const
+	{
+	M_PROLOG
 	if ( ( row_ < _rowRaw ) || ( row_ > ( _rowRaw + _heightRaw ) ) )
 		return ( false );
 	if ( ( column_ < _columnRaw )

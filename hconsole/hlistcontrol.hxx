@@ -284,10 +284,9 @@ public:
  */
 class HListControl : virtual public HSearchableControl
 	{
-protected:
+public:
 	typedef HListControl this_type;
 	typedef HSearchableControl base_type;
-public:
 	typedef list_control_helper::HAbstractControler::HModelIteratorWrapper iterator_t;
 	/*! \brief HListControl settings flags.
 	 */
@@ -613,6 +612,8 @@ void HListControler<tType>::add_tail( void )
 	}
 
 }
+
+typedef yaal::hcore::HExceptionT<HListControl, HSearchableControlException> HListControlException;
 
 }
 

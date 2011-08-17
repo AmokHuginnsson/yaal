@@ -43,6 +43,9 @@ namespace hconsole
  */
 class HSearchableControl : public virtual HControl
 	{
+public:
+	typedef HSearchableControl this_type;
+	typedef HControl base_type;
 protected:
 	bool _searchable;		/*!< are items searchable */
 	bool _searchActived;	/*!< should we highlight last search */
@@ -58,6 +61,8 @@ protected:
 	virtual void go_to_match( void ) = 0;
 	virtual void go_to_match_previous( void ) = 0;
 	};
+
+typedef yaal::hcore::HExceptionT<HSearchableControl, HControlException> HSearchableControlException;
 
 }
 

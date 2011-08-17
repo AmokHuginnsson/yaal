@@ -51,9 +51,10 @@ extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskDefault_;
  */
 class HEditControl : public virtual HControl
 	{
-protected:
+public:
 	typedef HEditControl this_type;
 	typedef HControl base_type;
+protected:
 	bool _replace;         /*!< current edit mode */
 	bool _multiLine;       /*!< is control multiline */
 	bool _readOnly;        /*!< shall editing be disabled */
@@ -123,6 +124,8 @@ private:
 	int insert_char( int, int );
 	int update_from_history( void );
 	};
+
+typedef yaal::hcore::HExceptionT<HEditControl, HControlException> HEditControlException;
 
 }
 

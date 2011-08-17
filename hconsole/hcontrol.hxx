@@ -46,8 +46,8 @@ class HWindow;
  */
 class HControl
 	{
-	typedef HControl this_type;
 public:
+	typedef HControl this_type;
 /*! \brief Various configuration bits for HControl hierarchy.
  */
 	struct BITS
@@ -281,6 +281,7 @@ protected:
 	virtual int do_process_input( int );
 	virtual void do_refresh( void ) = 0;
 	virtual void do_update( void );
+	virtual bool do_hit_test( int, int ) const;
 	virtual int do_click( mouse::OMouse& );
 	virtual void do_draw_label( void );
 	void draw_label( void );
@@ -288,6 +289,8 @@ private:
 	HControl ( HControl const& );
 	HControl& operator = ( HControl const& );
 	};
+
+typedef yaal::hcore::HExceptionT<HControl> HControlException;
 
 }
 

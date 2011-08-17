@@ -47,6 +47,8 @@ namespace hconsole
 class HStatusBarControl : public HEditControl
 	{
 public:
+	typedef HStatusBarControl this_type;
+	typedef HEditControl base_type;
 	typedef yaal::hcore::HPointer<HStatusBarControl> ptr_t;
 	/*! \brief HStatusBarControl prompt configuration.
 	 */
@@ -107,9 +109,12 @@ public:
 protected:
 	virtual void do_refresh( void );
 	virtual void do_draw_label( void );
+	virtual bool do_hit_test( int, int ) const;
 	virtual int verify( void );
 	virtual int do_process_input( int );
 	};
+
+typedef yaal::hcore::HExceptionT<HStatusBarControl, HEditControlException> HStatusBarControlException; 
 
 }
 
