@@ -21,6 +21,9 @@ def yaal_lookup_function( val_ ):
 	regex = re.compile( "^yaal::hcore::HDeque<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHDequePrinter( val_ )
+	regex = re.compile( "^yaal::hcore::HList<.*>::HIterator<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHListHIteratorPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HList<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHListPrinter( val_ )
@@ -73,7 +76,7 @@ class YaalHCoreHArrayHIteratorPrinter:
 		self._val = val_
 
 	def to_string( self ):
-		ptr = self._val['_owner']['_buf'];
+		ptr = self._val['_owner']['_buf']
 		index = self._val['_index']
 		return "{0x%x,%d,%d,%s}" % ( ptr, index, self._val['_owner']['_size'], ( ptr + index ).dereference() )
 
@@ -175,6 +178,22 @@ class YaalHCoreHDequePrinter:
 	def display_hint( self ):
 		return 'array'
 
+class YaalHCoreHListHIteratorPrinter:
+	"Print a yaal::hcore::HList::HIterator"
+
+	def __init__( self, val_ ):
+		self._val = val_
+
+	def to_string( self ):
+		ptr = self._val['_owner']
+		current = self._val['_current']
+		if ptr != 0:
+			return "{0x%x,%s,%s}" % ( ptr, self._val['_owner']['_size'], current['_value'] )
+		return "{0x0,0,(NIL)}"
+
+	def display_hint( self ):
+		return 'string'
+
 class YaalHCoreHListPrinter:
 	"Print a yaal::hcore::HList"
 
@@ -215,7 +234,7 @@ class BinaryTreeIterator( object ):
 		self._size = size_
 		self._count = 0
 	def do_next( self, it_ ):
-		lastNode = it_;
+		lastNode = it_
 		while it_ != 0:
 			if ( it_['_right'] != 0 ) and ( it_['_right'] != lastNode ):
 				it_ = it_['_right']
@@ -317,17 +336,17 @@ class HashContainterIterator( object ):
 
 	def do_next( self ):
 		if self._atom != 0:
-			self._atom = self._atom['_next'];
+			self._atom = self._atom['_next']
 			if self._atom == 0:
-				self._index = self._index + 1;
+				self._index = self._index + 1
 		if self._atom == 0:
 			buckets = self._owner.buckets()
 			while ( self._index < self._owner._val['_engine']['_prime'] ) and ( buckets[ self._index ] == 0 ):
 				self._index = self._index + 1
 			if self._index < self._owner._val['_engine']['_prime']:
-				self._atom = buckets[ self._index ];
+				self._atom = buckets[ self._index ]
 		if self._atom == 0:
-			self._index = self._owner._val['_engine']['_prime'];
+			self._index = self._owner._val['_engine']['_prime']
 
 
 class YaalHCoreHHashMapPrinter:
