@@ -497,6 +497,23 @@ int HConsole::c_cmvprintf( int row_, int column_, int attribute_,
 
 int HConsole::ungetch( int code_ ) const
 	{
+	switch ( code_ )
+		{
+		case ( KEY_CODES::PAGE_DOWN ): code_ = KEY_NPAGE;     break;
+		case ( KEY_CODES::PAGE_UP ):   code_ = KEY_PPAGE;     break;
+		case ( KEY_CODES::HOME ):      code_ = KEY_HOME;      break;
+		case ( KEY_CODES::END ):       code_ = KEY_END;       break;
+		case ( KEY_CODES::BACKSPACE ): code_ = KEY_BACKSPACE; break;
+		case ( KEY_CODES::UP ):        code_ = KEY_UP;        break;
+		case ( KEY_CODES::DOWN ):      code_ = KEY_DOWN;      break;
+		case ( KEY_CODES::LEFT ):      code_ = KEY_LEFT;      break;
+		case ( KEY_CODES::RIGHT ):     code_ = KEY_RIGHT;     break;
+		case ( KEY_CODES::DELETE ):    code_ = KEY_DC;        break;
+		case ( KEY_CODES::INSERT ):    code_ = KEY_IC;        break;
+		case ( KEY_CODES::MOUSE ):     code_ = KEY_MOUSE;     break;
+		default:
+		break;
+		}
 	return ( ::ungetch( code_ ) );
 	}
 
@@ -555,7 +572,7 @@ int HConsole::get_key( void ) const
 		curs_set( origCursState );
 		}
 	M_ENSURE( echo() != ERR );
-	M_ASSERT( key < KEY_CODES::SPECIAL_KEY );
+	M_ASSERT( ( key < KEY_CODES::SPECIAL_KEY ) || ( key > KEY_CODES::META_BASE ) );
 	switch ( key )
 		{
 		case ( KEY_NPAGE ):     key = KEY_CODES::PAGE_DOWN; break;
