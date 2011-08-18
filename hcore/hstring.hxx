@@ -74,7 +74,7 @@ public:
 	 *
 	 * \param size - capacity of newly constructed string.
 	 */
-	HString( int const size, bool const );
+	HString( int long size, bool );
 	/*! \brief Destroy string object and deallocate all resources.
 	 */
 	~HString( void );
@@ -86,7 +86,7 @@ public:
 	 *
 	 * \post String capacity has value of smallest 2^n greater or equal to \e size.
 	 */
-	void hs_realloc( int long const size );
+	void hs_realloc( int long size );
 	/*! \brief Materialize string.
 	 *
 	 * Used in copy-on-write implementation.

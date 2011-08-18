@@ -132,7 +132,7 @@ HString::HString( HString const& string_ )
 	M_EPILOG
 	}
 
-HString::HString( int const preallocate_, bool const )
+HString::HString( int long preallocate_, bool )
 	: _mem()
 	{
 	M_PROLOG
@@ -142,7 +142,7 @@ HString::HString( int const preallocate_, bool const )
 	M_EPILOG
 	}
 
-void HString::hs_realloc( int long const preallocate_ )
+void HString::hs_realloc( int long preallocate_ )
 	{
 	M_PROLOG
 	if ( ( preallocate_ < 1 ) || ( preallocate_ > ( MAX_STRING_LENGTH + 1 ) ) )
