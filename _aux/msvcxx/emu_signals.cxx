@@ -106,7 +106,7 @@ void SignalDispatcher::dispatch( int sigNo_ )
 		}
 	else
 		{
-		TLSSignalsSetup::external_lock l( _tlsSignalsSetup_.acquire() );
+		external_lock_t l( _tlsSignalsSetup_.acquire() );
 		for ( TLSSignalsSetup::iterator it( _tlsSignalsSetup_.begin() ), end( _tlsSignalsSetup_.end() );
 			it != end; ++ it )
 			{

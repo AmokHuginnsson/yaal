@@ -122,6 +122,9 @@ int long HTee::do_read( void* const, int long )
 	{
 	M_PROLOG
 	M_ASSERT( ! "oparation makes no sense for tee stream" );
+#ifdef __MSVCXX__
+	return ( -1 );
+#endif /* #ifdef __MSVCXX__ */
 	M_EPILOG
 	}
 
