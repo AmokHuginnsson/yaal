@@ -49,7 +49,7 @@ CONF_cov=--enable-coverage
 DS=d
 FIND=find
 
-.PHONY: all bin clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov debug dep doc install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prof purge static stats tags uninstall
+.PHONY: all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov debug dep doc install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prof purge static stats tags uninstall
 .NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc configure config.hxx.in
 
 default: $(.DEFAULT_GOAL)
@@ -59,7 +59,7 @@ all: $(MAIN_TARGETS)
 install-all: $(foreach T, $(MAIN_TARGETS), install-$(T))
 uninstall-all: $(foreach T, $(MAIN_TARGETS), uninstall-$(T))
 
-bin clean dep doc environment install mrproper static stats tags uninstall .DEFAULT: .my_make  build/$(.DEFAULT_GOAL)/Makefile.mk
+bin check clean dep doc environment install mrproper static stats tags uninstall .DEFAULT: .my_make  build/$(.DEFAULT_GOAL)/Makefile.mk
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
 	$(call invoke,$(MAKE) -C $(dir $(firstword $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk)) ./)) -f $(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(wildcard ./build/$(T)/Makefile.mk))) ./_aux/empty) $(@))
 

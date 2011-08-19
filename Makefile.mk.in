@@ -183,7 +183,7 @@ mrproper: clean
 | xargs /bin/rm -f; \
 	printf "%b\n" "done."
 
-include $(DIR_ROOT)/_aux/mk/d_target-tags.mk
+include $(DIR_ROOT)/_aux/mk/d_target-tools.mk
 
 doc: $(SRCS) $(HDRS)
 	@cd $(DIR_ROOT) && doxygen _aux/doxygenrc 2>&1 | grep 'is not documented'; \

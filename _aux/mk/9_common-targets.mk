@@ -1,5 +1,5 @@
 #phony targets
-.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper relassert reldeb release prof purge static stats tags uninstall
+.PHONY: all bin check clean clean-dep cov debug dep doc install install-environment mrproper relassert reldeb release prof purge static stats tags uninstall
 
 all: debug
 
