@@ -193,14 +193,14 @@ public:
 	common& operator = ( int ) { return ( *this ); }
 	common& operator* ( void ) { return ( *this ); }
 	common& operator ++ ( void ) { ++ _count; return ( *this ); }
-	int long operator()( void ) { return ( _count ); }
+	int long operator() ( void ) const { return ( _count ); }
 	void operator() ( int long count ) { _count = count; }
-	} c;
+	};
 
 template<typename iter1_t, typename iter2_t>
 bool does_intersect( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 )
 	{
-	return ( set_intersection( it1, end1, it2, end2, c )() > 0 );
+	return ( set_intersection( it1, end1, it2, end2, common() )() > 0 );
 	}
 
 }

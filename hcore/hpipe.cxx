@@ -40,6 +40,7 @@ namespace hcore
 {
 
 HPipe::HPipe( void )
+	: _pipe()
 	{
 	M_PROLOG
 	M_ENSURE( ::pipe( _pipe ) == 0 );

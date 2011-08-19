@@ -77,7 +77,7 @@ public:
 		{}
 	/*! \brief Lower bound of size of map's table */
 	HHashMap( int long size_ )
-		: _hasher(  &hash ), _engine()
+		: _hasher( &hash ), _engine()
 		{
 		M_PROLOG
 		_engine.resize( size_, _hasher );
@@ -94,7 +94,7 @@ public:
 		}
 	template<typename iterator_t>
 	HHashMap( iterator_t first, iterator_t last )
-		: _hasher(  &hash ), _engine()
+		: _hasher( &hash ), _engine()
 		{
 		M_PROLOG
 		for ( ; first != last; ++ first )
@@ -104,7 +104,7 @@ public:
 		}
 	template<typename iterator_t>
 	HHashMap( iterator_t first, iterator_t last, int long size_ )
-		: _hasher(  &hash ), _engine()
+		: _hasher( &hash ), _engine()
 		{
 		M_PROLOG
 		resize( size_, _hasher );

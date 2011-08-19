@@ -60,10 +60,11 @@ int HHandler::register_preprocess_handler_internal( int codeCount_, int const * 
 		HANDLER_t HANDLER )
 	{
 	M_PROLOG
-	int ctr = 0;
 	if ( codes_ )
-		for ( ctr = 0; ctr < codeCount_; ctr ++ )
+		{
+		for ( int ctr( 0 ); ctr < codeCount_; ctr ++ )
 			_preprocessHandlers[ codes_ [ ctr ] ] = HANDLER;
+		}
 	else
 		_preprocessHandlers[ codeCount_ ] = HANDLER;
 	return ( 0 );
@@ -74,10 +75,11 @@ int HHandler::register_postprocess_handler_internal( int codeCount_, int const *
 		HANDLER_t HANDLER )
 	{
 	M_PROLOG
-	int ctr = 0;
 	if ( codes_ )
-		for ( ctr = 0; ctr < codeCount_; ctr ++ )
+		{
+		for ( int ctr( 0 ); ctr < codeCount_; ctr ++ )
 			_postprocessHandlers[ codes_ [ ctr ] ] = HANDLER;
+		}
 	else
 		_postprocessHandlers[ codeCount_ ] = HANDLER;
 	return ( 0 );

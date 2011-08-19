@@ -204,13 +204,12 @@ void HExpression::swap( HExpression& ex )
 double long HExpression::count_branch( tree_t::const_node_t node_ )
 	{
 	M_PROLOG
-	int index = 0;
-	double long value = 0;
+	double long value( 0 );
 	if ( node_->has_childs() )
 		value = ( this->*( (*node_)->METHOD ) )( node_ );
 	else
 		{
-		index = (*node_)->_variables.head();
+		int index( (*node_)->_variables.head() );
 		if ( index >= 0 )
 			value = _variables[ index ];
 		else

@@ -88,9 +88,8 @@ int HComboboxControl::kill_focus ( void )
 void HComboboxControl::do_refresh ( void )
 	{
 	M_PROLOG
-	int width = 0;
-	int height = 0;
-	HConsole& cons = HConsole::get_instance();
+	int width( 0 );
+	HConsole& cons( HConsole::get_instance() );
 	if ( _mode == MODE::EDITCONTROL )
 		{
 /* ripped from HControl::draw_label() */
@@ -106,7 +105,7 @@ void HComboboxControl::do_refresh ( void )
 		}
 	else
 		{
-		height = _height;
+		int height( _height );
 		width = _width;
 		_width = _droppedWidth;
 		int size = static_cast<int>( _controler->size() );

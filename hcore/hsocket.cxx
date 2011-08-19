@@ -400,18 +400,17 @@ int HSocket::get_client_count( void ) const
 
 HString const& HSocket::get_host_name( void )
 	{
-	static int const GETHOST_BY_NAME_R_WORK_BUFFER_SIZE = 1024;
+	static int const GETHOST_BY_NAME_R_WORK_BUFFER_SIZE( 1024 );
 	M_PROLOG
-	int error = 0;
-	int size = GETHOST_BY_NAME_R_WORK_BUFFER_SIZE;
-	sockaddr_in* addressNetwork = NULL;
-	sockaddr_un* addressFile = NULL;
+	int size( GETHOST_BY_NAME_R_WORK_BUFFER_SIZE );
+	sockaddr_in* addressNetwork( NULL );
+	sockaddr_un* addressFile( NULL );
 #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 )
 	size = NI_MAXHOST;
 #else /* #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
-	int code = 0;
+	int code( 0 );
 	hostent hostName;
-	hostent* hostNameStatus = NULL;
+	hostent* hostNameStatus( NULL );
 #endif /* #else #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
 	if ( _fileDescriptor < 0 )
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
@@ -424,6 +423,7 @@ HString const& HSocket::get_host_name( void )
 			addressNetwork = reinterpret_cast<sockaddr_in*>( _address );
 			if ( _resolveHostnames )
 				{
+				int error( 0 );
 #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 )
 				error = getnameinfo(
 								reinterpret_cast<sockaddr*>( addressNetwork ), _addressSize,

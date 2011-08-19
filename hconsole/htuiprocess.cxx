@@ -77,7 +77,6 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 	M_PROLOG
 	static int const CTRLS_COUNT( 2 );
 	static int const ALTS_COUNT( 10 );
-	int ctr( 0 );
 	int alts[ ALTS_COUNT ];
 	int ctrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
 	HWindow::ptr_t mainWindow;
@@ -105,7 +104,7 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 				&HTUIProcess::handler_jump_meta_tab );
 		register_postprocess_handler( KEY<'q'>::command, NULL,
 				&HTUIProcess::handler_close_window );
-		for ( ctr = 0; ctr < ALTS_COUNT; ctr ++ )
+		for ( int ctr( 0 ); ctr < ALTS_COUNT; ++ ctr )
 			alts[ ctr ] = KEY<>::meta_r( '0' + ctr );
 		register_postprocess_handler( ALTS_COUNT, alts,
 			&HTUIProcess::handler_jump_meta_direct );

@@ -319,7 +319,7 @@ void HProgramOptionsHandler::HOptionValueInterface::set( HString const& val )
 	M_EPILOG
 	}
 
-type_t HProgramOptionsHandler::HOptionValueInterface::get_type( void ) const
+type_id_t HProgramOptionsHandler::HOptionValueInterface::get_type( void ) const
 	{
 	M_PROLOG
 	return ( do_get_type() );

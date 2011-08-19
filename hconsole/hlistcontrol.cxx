@@ -119,9 +119,6 @@ HListControl::~HListControl( void )
 void HListControl::do_refresh( void )
 	{
 	M_PROLOG
-	bool checked = false;
-	int ctr = 0;
-	int ctrLoc = 0;
 	int columnOffset = 0;
 	int tmp = 0;
 	int columns = static_cast<int>( _header.size() );
@@ -143,6 +140,7 @@ void HListControl::do_refresh( void )
 	if ( _drawHeader )
 		_heightRaw --;
 	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
+	int ctr( 0 );
 	if ( size > 0 )
 		{
 		iterator_t it = _firstVisibleRow;
@@ -151,12 +149,12 @@ void HListControl::do_refresh( void )
 					++ ctr, ++ it )
 			{
 			columnOffset = 0;
-			for ( ctrLoc = 0; ctrLoc < columns; ctrLoc ++ )
+			for ( int ctrLoc( 0 ); ctrLoc < columns; ctrLoc ++ )
 				{
 				columnInfo = & _header[ ctrLoc ];
 				if ( columnInfo->_widthRaw )
 					{
-					checked = get_text_for_cell( it, ctrLoc, columnInfo->_type );
+					bool checked( get_text_for_cell( it, ctrLoc, columnInfo->_type ) );
 					draw_cell( it, ctr, ctrLoc, columnOffset, columnInfo, checked );
 					columnOffset += columnInfo->_widthRaw;
 					}
@@ -603,7 +601,7 @@ int HListControl::do_process_input( int code_ )
 	}
 
 void HListControl::add_column( int column_, char const* name_,
-		int width_, BITS::ALIGN::align_t const& align_, const type_t& type_, 
+		int width_, BITS::ALIGN::align_t const& align_, type_id_t type_, 
 		HControl* control_ )
 	{
 	M_PROLOG
@@ -700,8 +698,8 @@ void HListControl::sort_by_column( int column_, OListBits::sort_order_t order_ )
 int HListControl::do_click( mouse::OMouse& mouse_ )
 	{
 	M_PROLOG
-	int row = 0, column = 0, ctr = 0;
-	int width = 0, columns = static_cast<int>( _header.size() );
+	int row = 0;
+	int columns( static_cast<int>( _header.size() ) );
 	HColumnInfo* columnInfo = NULL;
 	if ( ! HControl::do_click( mouse_ ) )
 		return ( 1 );
@@ -710,8 +708,9 @@ int HListControl::do_click( mouse::OMouse& mouse_ )
 		return ( 1 );
 	if ( row < 0 ) /* header clicked */
 		{
-		column = mouse_._column + _columnRaw - 1;
-		for ( ctr = 0; ctr < columns; ctr ++ )
+		int column( mouse_._column + _columnRaw - 1 );
+		int width( 0 );
+		for ( int ctr( 0 ); ctr < columns; ++ ctr )
 			{
 			columnInfo = &_header [ ctr ];
 			width += columnInfo->_widthRaw;
@@ -952,7 +951,7 @@ void HListControl::set_flags( flag_t flags_, flag_t mask_ )
 	M_EPILOG
 	}
 
-bool HListControl::get_text_for_cell( iterator_t& it_, int column_, type_t type_ )
+bool HListControl::get_text_for_cell( iterator_t& it_, int column_, type_id_t type_ )
 	{
 	M_PROLOG
 	M_ASSERT( it_.is_valid() );
@@ -1028,7 +1027,7 @@ void HListControl::do_update( void )
 	M_EPILOG
 	}
 
-type_t HListControl::get_column_type( int column_ )
+type_id_t HListControl::get_column_type( int column_ )
 	{
 	M_PROLOG
 	return ( _header[ column_ ]._type );

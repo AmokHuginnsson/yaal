@@ -58,7 +58,7 @@ struct OSortHelper
 	{
 	int _sortColumn;
 	yaal::hcore::OListBits::sort_order_t _order;
-	type_t _type;
+	type_id_t _type;
 	int long _comparedItems;
 	int long _size;
 	HWindow * _window;
@@ -313,7 +313,7 @@ public:
 		BITS::ALIGN::align_t _align;
 		int _shortcutIndex;
 		char _shortcut;
-		type_t _type;
+		type_id_t _type;
 		hcore::HString _name;
 		HControl * _control;
 	public:
@@ -367,7 +367,7 @@ public:
 			char const*,									/* column name */
 			int,									/* width */
 			BITS::ALIGN::align_t const& = BITS::ALIGN::LEFT,		/* align */
-			const type_t& = TYPE::HSTRING,	/* type */
+			type_id_t = TYPE::HSTRING,	/* type */
 			HControl * = NULL );					/* control associated */
 	virtual int set_focus( char = 0 );
 	void set_flags( flag_t, flag_t );
@@ -375,9 +375,9 @@ public:
 	list_control_helper::HAbstractControler::ptr_t& get_controler ( void );
 	void remove_current_row();
 	int long get_row_count( void );
-	type_t get_column_type( int );
+	type_id_t get_column_type( int );
 protected:
-	virtual bool get_text_for_cell( iterator_t&, int, type_t );
+	virtual bool get_text_for_cell( iterator_t&, int, type_id_t );
 	virtual void do_refresh( void );
 	void draw_cell( iterator_t&, int, int, int, HColumnInfo const* const, bool );
 	virtual int do_process_input( int );

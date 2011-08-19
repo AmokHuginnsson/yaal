@@ -206,7 +206,6 @@ void* yaal_oracle_db_query( void* data_, char const* query_ )
 	OOracle* oracle( static_cast<OOracle*>( data_ ) );
 	OQuery* queryObj( memory::calloc<OQuery>( 1 ) );
 	HString queryStr( query_ );
-	int iters = 0;
 	int length = static_cast<int>( ::strlen( query_ ) );
 	char* end = ( const_cast<char*>( query_ ) + length ) - 1;
 	
@@ -230,6 +229,7 @@ void* yaal_oracle_db_query( void* data_, char const* query_ )
 		if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
 			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << db_error( oracle ) << endl;
 		queryStr.upper();
+		int iters( 0 );
 		if ( queryStr.find( "INSERT" ) == 0 )
 			iters = 1;
 		else if ( queryStr.find( "UPDATE" ) == 0 )

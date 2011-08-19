@@ -94,11 +94,11 @@ struct OAttributes
  */
 struct OColumnInfo
 	{
-	int _placement; 			/*!< what place should this new column take */
-	char const* _name;	/*!< column name */
-	int _width;						/*!< column width */
+	int _placement;    /*!< what place should this new column take */
+	char const* _name; /*!< column name */
+	int _width;        /*!< column width */
 	yaal::hconsole::HControl::BITS::ALIGN::align_t _align;	/*!< column alignment */
-	type_t _type;					/*!< data type stored in that column */
+	type_id_t _type;   /*!< data type stored in that column */
 	OColumnInfo( void )
 		: _placement( 0 ), _name( NULL ), _width( 0 ),
 		_align( yaal::hconsole::HControl::BITS::ALIGN::LEFT ),

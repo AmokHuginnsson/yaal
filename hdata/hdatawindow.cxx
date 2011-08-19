@@ -142,8 +142,7 @@ int HDataWindow::init( void )
 				listControlResource._drawHeader = true;
 				if ( r._typeSpecific )
 					lcr = static_cast<OListControlResource*>( r._typeSpecific );
-				HDataListControl* list = NULL;
-				dataControl = list = new ( memory::yaal ) HDataListControl( this, M_SETUP_STANDARD );
+				HDataListControl* list( static_cast<HDataListControl*>( dataControl = new ( memory::yaal ) HDataListControl( this, M_SETUP_STANDARD ) ) );
 				list->set_flags( HListControl::flag_t( lcr->_checkable ? HListControl::FLAG::CHECKABLE : HListControl::FLAG::NONE )
 						| ( lcr->_sortable ? HListControl::FLAG::SORTABLE : HListControl::FLAG::NONE )
 						| ( lcr->_editable ? HListControl::FLAG::EDITABLE : HListControl::FLAG::NONE )
@@ -365,8 +364,8 @@ int HDataWindow::handler_delete( int, void const* )
 		filter.format( "id = %ld", _mainControl->get_current_id() );
 		_dB->set_filter( filter );
 		_dB->execute( HSQLDescriptor::MODE::DELETE );
+		_mainControl->load();
 		}
-	_mainControl->load();
 	return ( 0 );
 	M_EPILOG
 	}

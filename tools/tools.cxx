@@ -80,14 +80,13 @@ extern char _transTableStripPL_ [ 256 ];
 bool set_tools_variables( HString& option_, HString& value_ )
 	{
 	M_PROLOG
-	int baudRate = 0;
 	if ( ! strcasecmp( option_, "set_env" ) )
 		decode_set_env( value_ );
 	else if ( ! strcasecmp( option_, "serial_baudrate" ) )
 		{
 		if ( ( value_.get_length() > 1 ) && ( value_ [ 0 ] == 'B' ) )
 			{
-			baudRate = lexical_cast<int>( value_.raw() + 1 );
+			int baudRate( lexical_cast<int>( value_.raw() + 1 ) );
 			switch ( baudRate )
 				{
 				case ( 115200 ): _baudRate_ = HSerial::SPEED::B_115200; break;

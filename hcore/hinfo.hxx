@@ -43,7 +43,7 @@ namespace hcore
  */
 class HInfo
 	{
-	type_t		_type;
+	type_id_t		_type;
 	int				_int;
 	int long	_intLong;
 	double		_double;

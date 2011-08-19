@@ -1,2 +1,4 @@
 variableHidingTypedef:hcore/hexception.hxx:46
 variableHidingTypedef:hcore/hexception.hxx:47
+variableHidingTypedef:hcore/hhashset.hxx:57
+variableHidingTypedef:hcore/hhashmap.hxx:59

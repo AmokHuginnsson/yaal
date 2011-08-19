@@ -63,7 +63,7 @@ struct TYPE
 	template<typename tType>
 	struct symbolic;
 	};
-typedef yaal::hcore::HStrongEnum<TYPE> type_t; /*!< Strong enumeration of PODs. */
+typedef yaal::hcore::HStrongEnum<TYPE> type_id_t; /*!< Strong enumeration of PODs. */
 
 /*! \cond */
 template<> struct TYPE::symbolic<void> { static enum_t const value = VOID; };
