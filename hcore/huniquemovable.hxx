@@ -187,6 +187,7 @@ public:
 		{
 		reset();
 		}
+/* cppcheck-suppress operatorEqVarError */
 	HUniqueMovable& operator = ( HUniqueMovable& um_ )
 		{
 		M_PROLOG

@@ -95,7 +95,9 @@ public:
 	iterator begin( void );
 	iterator find( int long );
 	iterator end( void );
+/* cppcheck-suppress functionConst */
 	reverse_iterator rbegin( void );
+/* cppcheck-suppress functionConst */
 	reverse_iterator rend( void );
 	bool get( int long ) const;
 	void set( int long, bool );

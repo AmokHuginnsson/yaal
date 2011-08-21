@@ -273,6 +273,7 @@ public:
 		{
 		return ( _instances.begin() );
 		}
+/* cppcheck-suppress functionConst */
 	iterator begin( void )
 		{
 		return ( _instances.begin() );
@@ -281,6 +282,7 @@ public:
 		{
 		return ( _instances.end() );
 		}
+/* cppcheck-suppress functionConst */
 	iterator end( void )
 		{
 		return ( _instances.end() );

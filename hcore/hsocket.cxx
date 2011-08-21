@@ -164,6 +164,7 @@ void HSocket::shutdown_client( int fileDescriptor_ )
 	ptr_t client;
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
+/* cppcheck-suppress nullPointer */
 	clients_t::iterator it( _clients->find( fileDescriptor_ ) );
 	if ( it == _clients->end() )
 		M_THROW( _( "no such client" ), fileDescriptor_ );
@@ -341,6 +342,7 @@ HSocket::ptr_t HSocket::get_client( int fileDescriptor_ ) const
 	ptr_t client;
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
+/* cppcheck-suppress nullPointer */
 	clients_t::iterator it( _clients->find( fileDescriptor_ ) );
 	if ( it == _clients->end() )
 		M_THROW( _( "no such client" ), fileDescriptor_ );

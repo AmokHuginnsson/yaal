@@ -234,6 +234,7 @@ HString::HString( char unsigned charUnsigned_ ) : _mem()
 HString::HString( int short shortInt_ ) : _mem()
 	{
 	M_PROLOG
+/* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%hd", shortInt_ ) );
 	hs_realloc( newSize + 1 );
 	M_ENSURE( ::snprintf( MEM, newSize + 1, "%hd", shortInt_ ) == newSize );
@@ -245,6 +246,7 @@ HString::HString( int short shortInt_ ) : _mem()
 HString::HString( int short unsigned unsignedShortInt_ ) : _mem()
 	{
 	M_PROLOG
+/* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%hu", unsignedShortInt_ ) );
 	hs_realloc( newSize + 1 );
 	M_ENSURE( ::snprintf( MEM, newSize + 1, "%hu", unsignedShortInt_ ) == newSize );
@@ -256,6 +258,7 @@ HString::HString( int short unsigned unsignedShortInt_ ) : _mem()
 HString::HString( int int_ ) : _mem()
 	{
 	M_PROLOG
+/* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%d", int_ ) );
 	hs_realloc( newSize + 1 );
 	M_ENSURE( ::snprintf( MEM, newSize + 1, "%d", int_ ) == newSize );
@@ -267,6 +270,7 @@ HString::HString( int int_ ) : _mem()
 HString::HString( int long long_ ) : _mem()
 	{
 	M_PROLOG
+/* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%ld", long_ ) );
 	hs_realloc( newSize + 1 );
 	M_ENSURE( ::snprintf( MEM, newSize + 1, "%ld", long_ ) == newSize );
@@ -278,6 +282,7 @@ HString::HString( int long long_ ) : _mem()
 HString::HString( int long unsigned long_ ) : _mem()
 	{
 	M_PROLOG
+/* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%lu", long_ ) );
 	hs_realloc( newSize + 1 );
 	M_ENSURE( ::snprintf( MEM, newSize + 1, "%lu", long_ ) == newSize );
@@ -289,6 +294,7 @@ HString::HString( int long unsigned long_ ) : _mem()
 HString::HString( int unsigned long_ ) : _mem()
 	{
 	M_PROLOG
+/* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%u", long_ ) );
 	hs_realloc( newSize + 1 );
 	M_ENSURE( ::snprintf( MEM, newSize + 1, "%u", long_ ) == newSize );
@@ -300,6 +306,7 @@ HString::HString( int unsigned long_ ) : _mem()
 HString::HString( double double_ ) : _mem()
 	{
 	M_PROLOG
+/* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%f", double_ ) );
 	hs_realloc( newSize + 1 );
 	M_ENSURE( ::snprintf( MEM, newSize + 1, "%f", double_ ) == newSize );
@@ -311,6 +318,7 @@ HString::HString( double double_ ) : _mem()
 HString::HString( double long double_ ) : _mem()
 	{
 	M_PROLOG
+/* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%.12Lf", double_ ) );
 	hs_realloc( newSize + 1 );
 	M_ENSURE( ::snprintf( MEM, newSize + 1, "%.12Lf", double_ ) == newSize );
@@ -327,6 +335,7 @@ HString::HString( void const* const ptrVoid_ )
 	 * Solaris libc omits 0x in %p conversion.
 	 * Well, that sucks.
 	 */
+/* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) );
 	hs_realloc( newSize + 1 );
 	M_ENSURE( ::snprintf( MEM, newSize + 1, "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) == newSize );

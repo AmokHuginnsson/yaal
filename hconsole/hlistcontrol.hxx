@@ -174,10 +174,10 @@ public:
 		HAbstractRow* operator-> ( void );
 		HModelIteratorWrapper& operator++ ( void );
 		HModelIteratorWrapper& operator-- ( void );
-		HModelIteratorWrapper& operator= ( HModelIteratorWrapper const& );
+		HModelIteratorWrapper& operator = ( HModelIteratorWrapper const& );
 		iterator_ptr_t& raw( void );
-		bool operator== ( HModelIteratorWrapper const& );
-		bool operator!= ( HModelIteratorWrapper const& );
+		bool operator == ( HModelIteratorWrapper const& );
+		bool operator != ( HModelIteratorWrapper const& );
 		bool is_valid( void ) const;
 		};
 	HAbstractControler( void );
@@ -194,7 +194,7 @@ public:
 	void set_control( HListControl* );
 private:
 	HAbstractControler( HAbstractControler const& );
-	HAbstractControler& operator=( HAbstractControler const& );
+	HAbstractControler& operator = ( HAbstractControler const& );
 	};
 
 /*! \brief Controler of HListControl in MVC idiom.
