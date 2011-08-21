@@ -194,6 +194,7 @@ public:
 		{
 		return ( *_iterator );
 		}
+/* cppcheck-suppress functionConst */
 	typename iterator_t::reference operator*( void )
 		{
 		return ( *_iterator );
@@ -202,6 +203,7 @@ public:
 		{
 		return ( &*_iterator );
 		}
+/* cppcheck-suppress functionConst */
 	typename iterator_t::pointer operator->( void )
 		{
 		return ( &*_iterator );

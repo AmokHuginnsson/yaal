@@ -45,6 +45,7 @@ class HHashSet
 public:
 	class HIterator;
 	typedef type_t key_type;
+/* cppcheck-suppress variableHidingTypedef */
 	typedef type_t value_type;
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;

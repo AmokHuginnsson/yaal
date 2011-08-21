@@ -629,7 +629,21 @@ class pointer_to_nullary_member_function
 	member_t _member;
 public:
 	pointer_to_nullary_member_function( member_t member_ ) : _member( member_ ) {}
+/* cppcheck-suppress functionConst */
 	R operator()( C* object_ )
+		{
+		return ( (object_->*_member)() );
+		}
+	};
+
+template<typename R, typename C>
+class pointer_to_nullary_const_member_function
+	{
+	typedef R (C::*member_t)( void ) const;
+	member_t _member;
+public:
+	pointer_to_nullary_const_member_function( member_t member_ ) : _member( member_ ) {}
+	R operator()( C const* object_ ) const
 		{
 		return ( (object_->*_member)() );
 		}
@@ -642,7 +656,21 @@ class pointer_to_nullary_member_function_ref
 	member_t _member;
 public:
 	pointer_to_nullary_member_function_ref( member_t member_ ) : _member( member_ ) {}
+/* cppcheck-suppress functionConst */
 	R operator()( C& object_ )
+		{
+		return ( (object_.*_member)() );
+		}
+	};
+
+template<typename R, typename C>
+class pointer_to_nullary_const_member_function_ref
+	{
+	typedef R (C::*member_t)( void ) const;
+	member_t _member;
+public:
+	pointer_to_nullary_const_member_function_ref( member_t member_ ) : _member( member_ ) {}
+	R operator()( C const& object_ ) const
 		{
 		return ( (object_.*_member)() );
 		}
@@ -655,9 +683,21 @@ pointer_to_nullary_member_function<R, C> mem_fun( R (C::*member_)( void ) )
 	}
 
 template<typename R, typename C>
+pointer_to_nullary_const_member_function<R, C> mem_fun( R (C::*member_)( void ) const )
+	{
+	return ( pointer_to_nullary_const_member_function<R, C>( member_ ) );
+	}
+
+template<typename R, typename C>
 pointer_to_nullary_member_function_ref<R, C> mem_fun_ref( R (C::*member_)( void ) )
 	{
 	return ( pointer_to_nullary_member_function_ref<R, C>( member_ ) );
+	}
+
+template<typename R, typename C>
+pointer_to_nullary_const_member_function_ref<R, C> mem_fun_ref( R (C::*member_)( void ) const )
+	{
+	return ( pointer_to_nullary_const_member_function_ref<R, C>( member_ ) );
 	}
 
 template<typename R, typename C, typename T>
@@ -667,7 +707,21 @@ class pointer_to_unary_member_function
 	member_t _member;
 public:
 	pointer_to_unary_member_function( member_t member_ ) : _member( member_ ) {}
+/* cppcheck-suppress functionConst */
 	R operator()( C* object_, T arg_ )
+		{
+		return ( (object_->*_member)( arg_ ) );
+		}
+	};
+
+template<typename R, typename C, typename T>
+class pointer_to_unary_const_member_function
+	{
+	typedef R (C::*member_t)( T ) const;
+	member_t _member;
+public:
+	pointer_to_unary_const_member_function( member_t member_ ) : _member( member_ ) {}
+	R operator()( C const* object_, T arg_ ) const
 		{
 		return ( (object_->*_member)( arg_ ) );
 		}
@@ -680,7 +734,21 @@ class pointer_to_unary_member_function_ref
 	member_t _member;
 public:
 	pointer_to_unary_member_function_ref( member_t member_ ) : _member( member_ ) {}
+/* cppcheck-suppress functionConst */
 	R operator()( C& object_, T arg_ )
+		{
+		return ( (object_.*_member)( arg_ ) );
+		}
+	};
+
+template<typename R, typename C, typename T>
+class pointer_to_unary_const_member_function_ref
+	{
+	typedef R (C::*member_t)( T ) const;
+	member_t _member;
+public:
+	pointer_to_unary_const_member_function_ref( member_t member_ ) : _member( member_ ) {}
+	R operator()( C const& object_, T arg_ ) const
 		{
 		return ( (object_.*_member)( arg_ ) );
 		}
@@ -693,9 +761,21 @@ pointer_to_unary_member_function<R, C, T> mem_fun1( R (C::*member_)( T ) )
 	}
 
 template<typename R, typename C, typename T>
+pointer_to_unary_const_member_function<R, C, T> mem_fun1( R (C::*member_)( T ) const )
+	{
+	return ( pointer_to_unary_const_member_function<R, C, T>( member_ ) );
+	}
+
+template<typename R, typename C, typename T>
 pointer_to_unary_member_function_ref<R, C, T> mem_fun1_ref( R (C::*member_)( T ) )
 	{
 	return ( pointer_to_unary_member_function_ref<R, C, T>( member_ ) );
+	}
+
+template<typename R, typename C, typename T>
+pointer_to_unary_const_member_function_ref<R, C, T> mem_fun1_ref( R (C::*member_)( T ) const )
+	{
+	return ( pointer_to_unary_const_member_function_ref<R, C, T>( member_ ) );
 	}
 
 template<typename F, typename G1, typename G2>

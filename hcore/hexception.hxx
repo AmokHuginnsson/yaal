@@ -43,7 +43,9 @@ Copyright:
 #include "hcore/trait.hxx"
 #include "hcore/hstring.hxx"
 
+/* cppcheck-suppress variableHidingTypedef */
 typedef void this_type;
+/* cppcheck-suppress variableHidingTypedef */
 typedef void base_type;
 
 namespace yaal

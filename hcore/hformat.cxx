@@ -194,7 +194,6 @@ public:
 	common& operator* ( void ) { return ( *this ); }
 	common& operator ++ ( void ) { ++ _count; return ( *this ); }
 	int long operator() ( void ) const { return ( _count ); }
-	void operator() ( int long count ) { _count = count; }
 	};
 
 template<typename iter1_t, typename iter2_t>

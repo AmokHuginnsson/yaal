@@ -119,7 +119,7 @@ Copyright:
 #define M_STRINGIFY( x ) M_STRINGIFY_REAL( x )
 /*! \brief Create object file identifier for ident(1) program.
  */
-#define M_VCSID(id) namespace { static char const M_CONCAT(wrapper_VCSID, __LINE__)[] = id; }
+#define M_VCSID( id ) namespace { static char const M_CONCAT( wrapper_VCSID, __LINE__ )[] = id; }
 /*! \brief Throw auto generated exception.
  *
  * \param msg - message for exception.

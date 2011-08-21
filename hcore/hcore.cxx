@@ -185,7 +185,6 @@ double long std_strtold( HString const& str_ )
 namespace extendable
 {
 
-typedef double long ( *yaal_strtold_t )( HString const& );
 yaal_strtold_t acting_strtold = &std_strtold;
 
 void set_strtold_impl( yaal_strtold_t newStrtold_ )
@@ -245,9 +244,13 @@ void ensure_limit( int resource_, char const* message_ )
 
 HCoreInitDeinit::HCoreInitDeinit( void )
 	{
+/* cppcheck-suppress variableHidingTypedef */
 	STATIC_ASSERT( sizeof( int ) >= 4 );
+/* cppcheck-suppress variableHidingTypedef */
 	STATIC_ASSERT( sizeof( u8_t ) == 1 );
+/* cppcheck-suppress variableHidingTypedef */
 	STATIC_ASSERT( sizeof( u16_t ) == 2 );
+/* cppcheck-suppress variableHidingTypedef */
 	STATIC_ASSERT( sizeof( u32_t ) == 4 );
 	STATIC_ASSERT( sizeof( u64_t ) == 8 );
 	errno = 0;

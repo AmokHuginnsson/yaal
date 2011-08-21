@@ -45,6 +45,7 @@ class HHashMap
 public:
 	typedef key_t key_type;
 	typedef data_t data_type;
+/* cppcheck-suppress variableHidingTypedef */
 	typedef HPair<key_t const, data_t> value_type;
 	template<typename const_qual_t>
 	class HIterator;

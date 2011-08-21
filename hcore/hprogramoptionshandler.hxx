@@ -55,6 +55,7 @@ namespace hcore
  */
 class HProgramOptionsHandler
 	{
+/* cppcheck-suppress variableHidingTypedef */
 	typedef HProgramOptionsHandler this_type;
 public:
 	typedef bool ( *RC_CALLBACK_t )( HString&, HString& );
