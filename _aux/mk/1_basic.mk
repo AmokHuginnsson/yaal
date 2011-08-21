@@ -16,6 +16,7 @@ define NEW_TARGET
 	LIBS_TARGET_$(1) := $(5)
 	EXTRA_DEPS_TARGET_$(1) := $(6)
 	TARGETS := $$(TARGETS) TARGET_$(1)
+	SRC_TARGETS := $$(SRC_TARGETS) $(2)
 endef
 
 COMA=,
