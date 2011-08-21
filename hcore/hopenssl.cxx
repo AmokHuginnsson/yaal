@@ -35,6 +35,7 @@ Copyright:
 #include <openssl/engine.h>
 
 #if ! defined(OPENSSL_THREADS)
+/* cppcheck-suppress preprocessorErrorDirective */
 #error Thread support in OpenSSL library is missing.
 #endif /* not OPENSSL_THREADS */
 

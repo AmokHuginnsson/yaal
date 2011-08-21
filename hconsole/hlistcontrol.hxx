@@ -174,6 +174,7 @@ public:
 		HAbstractRow* operator-> ( void );
 		HModelIteratorWrapper& operator++ ( void );
 		HModelIteratorWrapper& operator-- ( void );
+/* cppcheck-suppress operatorEq */
 		HModelIteratorWrapper& operator = ( HModelIteratorWrapper const& );
 		iterator_ptr_t& raw( void );
 		bool operator == ( HModelIteratorWrapper const& );

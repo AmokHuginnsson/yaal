@@ -76,6 +76,7 @@ public:
 	HDataProcess( void );
 	virtual ~HDataProcess( void );
 	int init_xrc( char const*, char const*, menu_handlers_map_t const& );
+/* cppcheck-suppress functionConst */
 	dbwrapper::database_ptr_t data_base( void );
 protected:
 	virtual int handler_quit( int, void const* = NULL );
