@@ -96,6 +96,10 @@ public:
 		{ return ( do_invoke( a0 ) ); }
 	return_t operator()( a0_t a0 ) const
 		{ return ( do_invoke( a0 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0 )
+		{ return ( do_invoke( *a0 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0 ) const
+		{ return ( do_invoke( *a0 ) ); }
 	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0 )
 		{ return ( do_invoke( *a0 ) ); }
 	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0 ) const
@@ -129,6 +133,18 @@ public:
 		{ return ( do_invoke( a0, a1 ) ); }
 	return_t operator()( a0_t a0, a1_t a1 ) const
 		{ return ( do_invoke( a0, a1 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1 )
+		{ return ( do_invoke( *a0, a1 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1 ) const
+		{ return ( do_invoke( *a0, a1 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 )
+		{ return ( do_invoke( *a0, a1 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 ) const
+		{ return ( do_invoke( *a0, a1 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 )
+		{ return ( do_invoke( *a0, a1 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 ) const
+		{ return ( do_invoke( *a0, a1 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
@@ -437,8 +453,9 @@ struct call_calculator
 			typename trait::argument_type<METHOD_t, 9>::type,
 			typename trait::argument_type<METHOD_t, 10>::type,
 			fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> sorted_real_args;
+		typedef typename sorted_real_args::a0_t arg0_t;
 		typedef HCallInterface<free_standing_args_count::value, typename trait::return_type<METHOD_t>::type,
-						typename sorted_real_args::a0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
+						arg0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 )
@@ -482,8 +499,11 @@ struct call_calculator
 			typename trait::argument_type<METHOD_t, 8>::type,
 			typename trait::argument_type<METHOD_t, 9>::type,
 			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> sorted_real_args;
+		typedef typename trait::ternary<trait::is_member_const<METHOD_t>::value, typename trait::make_const<typename sorted_real_args::a0_t>::type,
+							typename sorted_real_args::a0_t>::type arg0_t;
 		typedef HCallInterface<free_standing_args_count::value, typename trait::return_type<METHOD_t>::type,
-						typename sorted_real_args::a0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
+						arg0_t,
+						typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 )
@@ -526,8 +546,9 @@ struct call_calculator
 			typename trait::argument_type<METHOD_t, 9>::type,
 			typename trait::argument_type<METHOD_t, 10>::type,
 			fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> sorted_real_args;
+		typedef typename sorted_real_args::a0_t arg0_t;
 		typedef HCallInterface<free_standing_args_count::value, typename trait::return_type<METHOD_t>::type,
-						typename sorted_real_args::a0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
+						arg0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
@@ -957,7 +978,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	a0_t _a0;
 public:
 	HCall( CALL_t call_, a0_t a0 )
@@ -979,7 +1000,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t,
 	a1_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 public:
@@ -1007,7 +1028,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1038,7 +1059,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1073,7 +1094,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1110,7 +1131,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1150,7 +1171,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1194,7 +1215,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1242,7 +1263,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1291,7 +1312,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1343,7 +1364,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	a0_t _a0;
 	a1_t _a1;
 	a2_t _a2;
@@ -1397,7 +1418,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t,
 	a1_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
@@ -1426,7 +1447,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
@@ -1458,7 +1479,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
@@ -1494,7 +1515,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
@@ -1532,7 +1553,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
@@ -1573,7 +1594,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
@@ -1618,7 +1639,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
@@ -1667,7 +1688,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
@@ -1717,7 +1738,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
@@ -1770,7 +1791,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	a0_t _a0;
 	a1_t _a1;
@@ -1826,7 +1847,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
@@ -1859,7 +1880,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
@@ -1896,7 +1917,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
@@ -1935,7 +1956,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
@@ -1977,7 +1998,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
@@ -2023,7 +2044,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
@@ -2073,7 +2094,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
@@ -2124,7 +2145,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
@@ -2178,7 +2199,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	a0_t _a0;
@@ -2235,7 +2256,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2273,7 +2294,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2313,7 +2334,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2356,7 +2377,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2403,7 +2424,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2454,7 +2475,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2506,7 +2527,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2561,7 +2582,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2620,7 +2641,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2661,7 +2682,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2705,7 +2726,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2753,7 +2774,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2805,7 +2826,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2858,7 +2879,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2914,7 +2935,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -2973,7 +2994,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3018,7 +3039,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3067,7 +3088,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3120,7 +3141,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3174,7 +3195,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3231,7 +3252,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3291,7 +3312,7 @@ class HCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3341,7 +3362,7 @@ class HCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3395,7 +3416,7 @@ class HCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3450,7 +3471,7 @@ class HCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3508,7 +3529,7 @@ class HCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3569,7 +3590,7 @@ class HCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3624,7 +3645,7 @@ class HCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3680,7 +3701,7 @@ class HCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3739,7 +3760,7 @@ class HCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3802,7 +3823,7 @@ class HCall<9, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	trait::no_type, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3859,7 +3880,7 @@ class HCall<9, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3919,7 +3940,7 @@ class HCall<9, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -3982,7 +4003,7 @@ class HCall<10, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, trait::no_type> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -4043,7 +4064,7 @@ class HCall<10, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
@@ -4107,7 +4128,7 @@ class HCall<11, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
 	a9_t, a10_t> base_t;
-	typedef typename descriptor::type::sorted_real_args::a0_t fa0_t;
+	typedef typename descriptor::type::arg0_t fa0_t;
 	typedef typename descriptor::type::sorted_real_args::a1_t fa1_t;
 	typedef typename descriptor::type::sorted_real_args::a2_t fa2_t;
 	typedef typename descriptor::type::sorted_real_args::a3_t fa3_t;
