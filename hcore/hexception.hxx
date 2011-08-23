@@ -190,6 +190,7 @@ class HExceptionSafeGlobal
 	{
 	global_t _object;
 public:
+/* cppcheck-suppress functionConst */
 	HExceptionSafeGlobal( void ) try : _object() {} catch ( ... ) { exception_handling_policy_t::handle_exception(); }
 	template<typename a0_t>
 	HExceptionSafeGlobal( a0_t const& a0_ ) try : _object( a0_ ) {} catch ( ... ) { exception_handling_policy_t::handle_exception(); }
