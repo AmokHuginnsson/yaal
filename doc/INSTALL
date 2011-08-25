@@ -56,6 +56,10 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 ( 8 ) $ mkdir -p "${HOME}/etc/conf"
 ( 9 ) $ cd "${HOME}/etc/conf"
 (10 ) $ ln -s "${HOME}/src/yaal/build/${DEFAULT_TARGET}/yaalrc" yaalrc # required only once
+(11 ) $ mkdir -p "${HOME}/var/db/keys"                                 # required only once
+(12 ) $ cd "${HOME}/var/db/keys"                                       # required only once
+(13 ) $ openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 -out yaal.key # required only once
+(14 ) $ openssl req -x509 -new -key yaal.key -out yaal.pem -days 3652  # required only once
 
 Next spawn new shell and you are done!
 
@@ -102,6 +106,14 @@ configuration files.
 In step 9 we enter directory created in step 8.
 
 In step 10 we create link to `yaal' configuration file.
+
+In step 11 we create directory for OpenSSL keys used by yaal ssl related routines.
+
+Next, in step 12 we enter directory for yaal SSL keys.
+
+In step 13 we create private key for yaal SSL related routines.
+
+In step 14 we create SSL root certificate.
 
 Please observe that in steps 4 and 10 we assumed you downloaded `yaal' sources
 into "${HOME}/src/yaal' directory, if not please modify paths in those steps
