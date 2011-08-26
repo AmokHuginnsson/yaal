@@ -47,6 +47,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const _word_[];
  */
 class HString
 	{
+public:
 	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 2 ) - 1;
 	typedef HString this_type;
 private:
@@ -184,7 +185,21 @@ public:
 	int long capacity( void ) const;
 	int long get_capacity( void ) const;
 	void swap( HString& );
-	HString& assign( char const* const, int long );
+	/*! \brief Erase old content and assign new data from buffer.
+	 *
+	 * \param data - data to be assigned to this string.
+	 * \param size - size of the date to be assigned.
+	 * \return Self.
+	 */
+	HString& assign( char const* const data, int long length );
+	/*! \brief Erase old content and assign a substring of given string.
+	 *
+	 * \param str - assign substring of this string.
+	 * \param offset - an offset of a substing to get.
+	 * \param length - a length of substring to get.
+	 * \return Self.
+	 */
+	HString& assign( HString const& str, int long offset, int long length );
 	HString& format( char const* const, ... );
 	HString& vformat( char const* const, void* );
 	int long find( char, int long = 0 ) const;
@@ -253,7 +268,7 @@ public:
 	 * \param length_ - length of part to be erased.
 	 * \return Self.
 	 */
-	HString& erase( int long position_, int long length_ = MAX_STRING_LENGTH );
+	HString& erase( int long position_ = 0, int long length_ = MAX_STRING_LENGTH );
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos - position where given string has to be inserted.
@@ -296,8 +311,21 @@ public:
 	 */
 	HString& insert( int long postition, int long n, char value );
 	HString& append( HString const& );
+	/*! \brief Append a substring of given string to this string.
+	 *
+	 * \param str - append substring of this string.
+	 * \param offset - an offset of a substing to get.
+	 * \param length - a length of substring to get.
+	 * \return Self.
+	 */
 	HString& append( HString const&, int long idx_, int long len_ );
 	HString& append( int long count_, char val_ );
+	/*! \brief Append new data from buffer to already existing data in this string.
+	 *
+	 * \param data - data to be appended to this string.
+	 * \param size - size of the date to be appended.
+	 * \return Self.
+	 */
 	HString& append( char const* const, int long len_ );
 	};
 
