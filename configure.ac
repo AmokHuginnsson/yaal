@@ -372,6 +372,7 @@ AC_CHECK_DECLS([RLIMIT_AS, RLIMIT_NPROC],[],[],[#include <sys/resource.h>])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
 AC_CHECK_DECLS([floorl],[],[],[#include <cmath>])
+AC_CHECK_DECLS([has_mouse],[],[],[#include <${_NCURSES_HEADER}>])
 AC_CHECK_DECLS([SIGIOT],[],[],[#include <csignal>])
 AC_CHECK_DECLS([SUN_LEN],[],[],[#include <cstdlib>
 								#include <sys/un.h>])
