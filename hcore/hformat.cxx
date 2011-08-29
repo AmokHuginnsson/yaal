@@ -148,8 +148,10 @@ HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
 	_string( fi._string ), _tokens( fi._tokens ), _positions( new ( memory::yaal ) positions_t ),
 	_args( new ( memory::yaal ) args_t )
 	{
+	M_PROLOG
 	*_positions = *fi._positions;
 	*_args = *fi._args;
+	M_EPILOG
 	}
 
 HFormat::HFormatImpl& HFormat::HFormatImpl::operator = ( HFormat::HFormatImpl const& fi )
@@ -315,6 +317,7 @@ void HFormat::swap( HFormat& fi )
 
 HString HFormat::string( void ) const
 	{
+	M_PROLOG
 	HString fmt;
 	M_ENSURE( _impl->_positions->size() == _impl->_args->size() );
 	for ( HFormatImpl::tokens_t::const_iterator it = _impl->_tokens.begin(), end = _impl->_tokens.end(); it != end; ++ it )
@@ -404,6 +407,7 @@ HString HFormat::string( void ) const
 			}
 		}
 	return ( _impl->_string );
+	M_EPILOG
 	}
 
 HString HFormat::format( void ) const
