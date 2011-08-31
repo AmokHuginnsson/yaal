@@ -532,7 +532,9 @@ void HXml::apply_style( yaal::hcore::HString const& path_ )
 	M_PROLOG
 	M_ASSERT( _xml->_doc.get() );
 	HXsltParserG::get_instance();
-	style_resource_t style( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( path_.raw() ) ), xsltFreeStylesheet );
+	xsltStylesheet* pstyle( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( path_.raw() ) ) );
+	M_ENSURE_EX( pstyle, HString( "failure parsing XSLT file: " ) + path_ );
+	style_resource_t style( pstyle, xsltFreeStylesheet );
 	doc_resource_t doc( xsltApplyStylesheet( style.get(), _xml->_doc.get(), NULL ), xmlFreeDoc );
 	if ( ! doc.get() )
 		throw HXmlException( HString( "cannot apply stylesheet: " ) + path_ );
