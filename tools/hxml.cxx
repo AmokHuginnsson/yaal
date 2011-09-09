@@ -507,7 +507,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, PARSER::parser_t p
 			case ( XML_TEXT_NODE ): if ( node->content )
 				{
 				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
-				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_ ) >= 0 ) )
+				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_.data() ) >= 0 ) )
 					node_->add_node( HNode( this, HNode::TYPE::CONTENT, _varTmpBuffer ) );
 				}
 			break;

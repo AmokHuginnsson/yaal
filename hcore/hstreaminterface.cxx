@@ -450,14 +450,14 @@ HStreamInterface& HStreamInterface::do_input( HString& word )
 bool HStreamInterface::read_word( void )
 	{
 	M_PROLOG
-	static int const whiteLen( static_cast<int>( ::strlen( _whiteSpace_ ) + 1 ) ); /* see comment in semantic_read in analoguous context */
-	if ( ! _skipWS && ::memchr( _whiteSpace_, HStreamInterface::do_peek(), whiteLen ) )
+	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analoguous context */
+	if ( ! _skipWS && ::memchr( _whiteSpace_.data(), HStreamInterface::do_peek(), _whiteSpace_.size() + 1 ) )
 		_valid = false;
 	else
 		{
-		while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_, false ) < 0 )
+		while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_.data(), false ) < 0 )
 			;
-		while ( HStreamInterface::do_read_until( _wordCache, _whiteSpace_, false ) < 0 )
+		while ( HStreamInterface::do_read_until( _wordCache, _whiteSpace_.data(), false ) < 0 )
 			;
 		}
 	return ( _valid && ( _wordCache.get_length() > 0 ) );
@@ -467,13 +467,13 @@ bool HStreamInterface::read_word( void )
 bool HStreamInterface::read_integer( void )
 	{
 	M_PROLOG
-	while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_, false ) < 0 )
+	while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_.data(), false ) < 0 )
 		;
 	bool neg( HStreamInterface::do_peek() == '-' );
 	char sink( 0 );
 	if ( neg )
 		HStreamInterface::read( &sink, 1 );
-	while ( HStreamInterface::do_read_while( _wordCache, _digit_, false ) < 0 )
+	while ( HStreamInterface::do_read_while( _wordCache, _digit_.data(), false ) < 0 )
 		;
 	if ( neg )
 		_wordCache.insert( 0, "-" );
@@ -484,13 +484,13 @@ bool HStreamInterface::read_integer( void )
 bool HStreamInterface::read_floatint_point( void )
 	{
 	M_PROLOG
-	while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_, false ) < 0 )
+	while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_.data(), false ) < 0 )
 		;
 	bool neg( HStreamInterface::do_peek() == '-' );
 	char sink( 0 );
 	if ( neg )
 		read( &sink, 1 );
-	while ( HStreamInterface::do_read_while( _wordCache, _digit_, false ) < 0 )
+	while ( HStreamInterface::do_read_while( _wordCache, _digit_.data(), false ) < 0 )
 		;
 	if ( neg )
 		_wordCache.insert( 0, "-" );
@@ -500,7 +500,7 @@ bool HStreamInterface::read_floatint_point( void )
 	if ( dot )
 		{
 		HString decimal;
-		while ( HStreamInterface::do_read_while( decimal, _digit_, false ) < 0 )
+		while ( HStreamInterface::do_read_while( decimal, _digit_.data(), false ) < 0 )
 			;
 		if ( ! decimal.is_empty() )
 			{
@@ -524,10 +524,10 @@ HStreamInterface& HStreamInterface::do_input( bool& b )
 HStreamInterface& HStreamInterface::do_input( char& char_ )
 	{
 	M_PROLOG
-	static int const whiteLen( static_cast<int>( ::strlen( _whiteSpace_ ) + 1 ) ); /* see comment in semantic_read in analoguous context */
+	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analoguous context */
 	char c( 0 );
 	do read( &c, 1 );
-	while ( _valid && _skipWS && ::memchr( _whiteSpace_, c, whiteLen ) );
+	while ( _valid && _skipWS && ::memchr( _whiteSpace_.data(), c, _whiteSpace_.size() + 1 ) );
 	char_ = c;
 	return ( *this );
 	M_EPILOG

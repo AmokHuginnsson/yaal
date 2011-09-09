@@ -64,16 +64,21 @@ int long strrnspn( char const* const, char const* const, int long const );
 int long kmpsearch( char const* const, int long, char const* const, int long );
 }
 
-char const _whiteSpace_[] = "\a\b \t\v\f\r\n";
+#undef D_WHITE_SPACE
+#define D_WHITE_SPACE "\a\b \t\v\f\r\n"
+HCharacterClass const _whiteSpace_ = HCharacterClass( D_WHITE_SPACE, sizeof ( D_WHITE_SPACE ) - 1 );
+#undef D_WHITE_SPACE
 #undef D_LETTER
 #define D_LETTER "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 #undef D_DIGIT
 #define D_DIGIT "0123456789"
-char const _digit_[] = D_DIGIT;
-char const _letter_[] = D_LETTER;
-char const _word_[] = D_LETTER D_DIGIT "_";
+HCharacterClass const _digit_ = HCharacterClass( D_DIGIT, sizeof ( D_DIGIT ) - 1 );
+HCharacterClass const _letter_ = HCharacterClass( D_LETTER, sizeof ( D_LETTER ) - 1 );
+HCharacterClass const _word_ = HCharacterClass( D_LETTER D_DIGIT "_", sizeof ( D_LETTER D_DIGIT "_" ) - 1 );
 #undef D_DIGIT
 #undef D_LETTER
+
+HCharacterClass const* _characterClass_[] = { &_whiteSpace_, &_digit_, &_letter_, &_word_ };
 
 static int const ALLOC_BIT_MASK = 128;
 #undef IS_INPLACE

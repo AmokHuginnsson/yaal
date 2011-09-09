@@ -38,10 +38,34 @@ namespace yaal
 namespace hcore
 {
 
-extern M_YAAL_HCORE_PUBLIC_API char const _whiteSpace_[];
-extern M_YAAL_HCORE_PUBLIC_API char const _digit_[];
-extern M_YAAL_HCORE_PUBLIC_API char const _letter_[];
-extern M_YAAL_HCORE_PUBLIC_API char const _word_[];
+class HCharacterClass
+	{
+	char const* _data;
+	int _size;
+public:
+	HCharacterClass( char const* data_, int size_ )
+		: _data( data_ ), _size( size_ ) {}
+	char const* data( void ) const
+		{ return ( _data ); }
+	int size( void ) const
+		{ return ( _size ); }
+	};
+
+extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _whiteSpace_;
+extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _digit_;
+extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _letter_;
+extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _word_;
+struct CHARACTER_CLASS
+	{
+	typedef enum
+		{
+		WHITE_SPACE = 0,
+		DIGIT = 1,
+		LETTER = 2,
+		WORD = 3
+		} character_class_t;
+	};
+extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const* _characterClass_[];
 
 /*! \brief Implementation of high level string operations.
  */
@@ -231,19 +255,19 @@ public:
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim_left( char const* const set = _whiteSpace_ );
+	HString& trim_left( char const* const set = _whiteSpace_.data() );
 	/*! \brief Trim all consecutive occurrences of given characters from end of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim_right( char const* const set = _whiteSpace_ );
+	HString& trim_right( char const* const set = _whiteSpace_.data() );
 	/*! \brief Trim all consecutive occurrences of given characters from both beginning and end of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
 	 * \return Self.
 	 */
-	HString& trim( char const* const set = _whiteSpace_ );
+	HString& trim( char const* const set = _whiteSpace_.data() );
 	HString& shift_left( int long );
 	HString& shift_right( int long, char const = ' ' );
 	/*! \brief Fill portion of string with constatnt value.

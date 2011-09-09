@@ -437,11 +437,11 @@ void show_help( void* arg )
 			while ( ( ws < cols ) && ( ws >= 0 ) )
 				{
 				eol = ws;
-				ws = static_cast<int>( desc.find_one_of( _whiteSpace_, ws ) );
+				ws = static_cast<int>( desc.find_one_of( _whiteSpace_.data(), ws ) );
 				if ( ( ws < 0 ) || ( ws > cols ) )
 					break;
 				eol = ws;
-				ws = static_cast<int>( desc.find_other_than( _whiteSpace_, ws ) );
+				ws = static_cast<int>( desc.find_other_than( _whiteSpace_.data(), ws ) );
 				}
 			if ( ( ws >= cols ) || ( desc.get_length() > cols ) )
 				{
@@ -546,10 +546,10 @@ void dump_configuration( void* arg )
 			int eol = 0;
 			while ( ( eol < MAXIMUM_LINE_LENGTH ) && ( eol >= 0 ) )
 				{
-				eol = static_cast<int>( desc.find_one_of( _whiteSpace_, eol ) );
+				eol = static_cast<int>( desc.find_one_of( _whiteSpace_.data(), eol ) );
 				if ( ( eol < 0 ) || ( eol > MAXIMUM_LINE_LENGTH ) )
 					break;
-				eol = static_cast<int>( desc.find_other_than( _whiteSpace_, eol ) );
+				eol = static_cast<int>( desc.find_other_than( _whiteSpace_.data(), eol ) );
 				}
 			if ( eol >= MAXIMUM_LINE_LENGTH )
 				{
