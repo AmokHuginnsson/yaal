@@ -416,6 +416,14 @@ HStreamInterface& HSynchronizedStream::do_set_width( int val_ )
 	M_EPILOG
 	}
 
+HStreamInterface& HSynchronizedStream::do_set_precision( int val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_set_precision( val_ ) );
+	M_EPILOG
+	}
+
 HStreamInterface& HSynchronizedStream::do_set_base( BASES::enum_t val_ )
 	{
 	M_PROLOG

@@ -43,7 +43,9 @@ char const* const HStreamInterface::eols = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
 	: _cache( 1, HChunk::STRATEGY::GEOMETRIC ), _offset( 0 ),
-	_wordCache(), _fill( ' ' ), _width( 0 ), _base( BASES::DEC ), _skipWS( true ), _valid( true )
+	_wordCache(), _fill( ' ' ), _width( 0 ), _precision( 6 ),
+	_base( BASES::DEC ), _floatFormat( FLOAT_FORMAT::NATURAL ),
+	_skipWS( true ), _valid( true )
 	{
 	return;
 	}
@@ -194,10 +196,30 @@ HStreamInterface& HStreamInterface::do_output( int long long unsigned unsignedLo
 	M_EPILOG
 	}
 
+void HStreamInterface::apply_precision( void )
+	{
+	M_PROLOG
+	int dot( static_cast<int>( _wordCache.find( '.' ) ) );
+	if ( dot != HString::npos )
+		{
+		int nonZero( static_cast<int>( _wordCache.find_last_other_than( "0" ) ) );
+		if ( ( nonZero != HString::npos ) && ( nonZero >= dot  ) )
+			{
+			int len( static_cast<int>( _wordCache.get_length() ) );
+			int cap( max( _floatFormat == FLOAT_FORMAT::FIXED ? _precision + 1 : 0, nonZero + ( nonZero == dot ? 0 : 1 ) ) ); /* + 1 for a dot */
+			if ( cap < len )
+				_wordCache.set_at( cap, 0 );
+			}
+		}
+	return;
+	M_EPILOG
+	}
+
 HStreamInterface& HStreamInterface::do_output( double double_ )
 	{
 	M_PROLOG
 	_wordCache.format( "%f", double_ );
+	apply_precision();
 	int long len( reformat() );
 	do_write( _wordCache.raw(), len );
 	return ( *this );
@@ -208,6 +230,7 @@ HStreamInterface& HStreamInterface::do_output( double long longDouble_ )
 	{
 	M_PROLOG
 	_wordCache.format( "%.12Lf", longDouble_ );
+	apply_precision();
 	int long len( reformat() );
 	do_write( _wordCache.raw(), len );
 	return ( *this );
@@ -218,6 +241,7 @@ HStreamInterface& HStreamInterface::do_output( float float_ )
 	{
 	M_PROLOG
 	_wordCache.format( "%f", float_ );
+	apply_precision();
 	int long len( reformat() );
 	do_write( _wordCache.raw(), len );
 	return ( *this );
@@ -305,6 +329,13 @@ HStreamInterface::HManipulator setw( int width_ )
 	{
 	M_PROLOG
 	return ( HStreamInterface::HManipulator( width_, &HStreamInterface::HManipulator::set_width ) );
+	M_EPILOG
+	}
+
+HStreamInterface::HManipulator setprecision( int width_ )
+	{
+	M_PROLOG
+	return ( HStreamInterface::HManipulator( width_, &HStreamInterface::HManipulator::set_precision ) );
 	M_EPILOG
 	}
 
@@ -728,6 +759,14 @@ HStreamInterface& HStreamInterface::do_set_width( int width_ )
 	M_EPILOG
 	}
 
+HStreamInterface& HStreamInterface::do_set_precision( int precision_ )
+	{
+	M_PROLOG
+	_precision = precision_;
+	return ( *this );
+	M_EPILOG
+	}
+
 HStreamInterface& HStreamInterface::do_set_base( BASES::enum_t base_ )
 	{
 	M_PROLOG
@@ -769,6 +808,14 @@ void HStreamInterface::HManipulator::set_width( HStreamInterface& iface_ ) const
 	{
 	M_PROLOG
 	iface_.set_width( _value );
+	return;
+	M_EPILOG
+	}
+
+void HStreamInterface::HManipulator::set_precision( HStreamInterface& iface_ ) const
+	{
+	M_PROLOG
+	iface_.set_precision( _value );
 	return;
 	M_EPILOG
 	}

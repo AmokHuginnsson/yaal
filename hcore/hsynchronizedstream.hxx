@@ -110,6 +110,7 @@ protected:
 	virtual int do_peek( void );
 	virtual HStreamInterface& do_set_fill( int );
 	virtual HStreamInterface& do_set_width( int );
+	virtual HStreamInterface& do_set_precision( int );
 	virtual HStreamInterface& do_set_base( BASES::enum_t );
 	virtual HStreamInterface& do_set_skipws( bool );
 	virtual int long do_write( void const* const, int long );

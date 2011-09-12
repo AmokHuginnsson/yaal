@@ -63,6 +63,7 @@ public:
 		void operator()( HStreamInterface& ) const;
 		void set_fill( HStreamInterface& ) const;
 		void set_width( HStreamInterface& ) const;
+		void set_precision( HStreamInterface& ) const;
 		};
 	typedef HPointer<HStreamInterface> ptr_t;
 	struct BASES
@@ -74,6 +75,15 @@ public:
 			OCT
 			} enum_t;
 		};
+	struct FLOAT_FORMAT
+		{
+		typedef enum
+			{
+			NATURAL,
+			FIXED,
+			SCIENTIFIC
+			} enum_t;
+		};
 	typedef HStreamInterface& ( *manipulator_t )( HStreamInterface& );
 protected:
 	HChunk _cache; /*!< Read buffer. */
@@ -81,7 +91,9 @@ protected:
 	HString _wordCache; /*!< Cache for operator >> () and operator << (). */
 	int _fill; /*!< Fill character for output operations. */
 	int _width; /*!< Next output operation width. */
+	int _precision; /*!< Set number of siginificant digits to display for all subsequent outputs of floating point type values. */
 	BASES::enum_t _base;
+	FLOAT_FORMAT::enum_t _floatFormat;
 	bool _skipWS;
 	bool _valid;
 public:
@@ -210,6 +222,8 @@ public:
 		{ return ( do_set_fill( val_ ) ); }
 	HStreamInterface& set_width( int val_ )
 		{ return ( do_set_width( val_ ) ); }
+	HStreamInterface& set_precision( int precision_ )
+		{ return ( do_set_precision( precision_ ) ); }
 	HStreamInterface& set_base( BASES::enum_t val_ )
 		{ return ( do_set_base( val_ ) ); }
 protected:
@@ -256,6 +270,7 @@ protected:
 	virtual int do_peek( void );
 	virtual HStreamInterface& do_set_fill( int );
 	virtual HStreamInterface& do_set_width( int );
+	virtual HStreamInterface& do_set_precision( int );
 	virtual HStreamInterface& do_set_base( BASES::enum_t );
 	virtual HStreamInterface& do_set_skipws( bool );
 private:
@@ -264,6 +279,7 @@ private:
 	bool read_floatint_point( void );
 	int long semantic_read( yaal::hcore::HString&, int long, char const* const, bool, bool );
 	int long reformat( void );
+	void apply_precision( void );
 	virtual int long do_write( void const* const, int long ) = 0;
 	virtual int long do_read( void* const, int long ) = 0;
 	virtual void do_flush( void ) const = 0;
@@ -274,6 +290,7 @@ private:
 
 HStreamInterface::HManipulator setfill( int );
 HStreamInterface::HManipulator setw( int );
+HStreamInterface::HManipulator setprecision( int );
 
 typedef HExceptionT<HStreamInterface> HStreamInterfaceException;
 
