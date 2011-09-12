@@ -54,6 +54,8 @@ public:
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _whiteSpace_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _digit_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _letter_;
+extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _lowerCaseLetter_;
+extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _upperCaseLetter_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _word_;
 struct CHARACTER_CLASS
 	{
@@ -62,7 +64,9 @@ struct CHARACTER_CLASS
 		WHITE_SPACE = 0,
 		DIGIT = 1,
 		LETTER = 2,
-		WORD = 3
+		LOWER_CASE_LETTER = 3,
+		UPPER_CASE_LETTER = 4,
+		WORD = 5
 		} character_class_t;
 	};
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const* _characterClass_[];

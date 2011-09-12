@@ -68,17 +68,25 @@ int long kmpsearch( char const* const, int long, char const* const, int long );
 #define D_WHITE_SPACE "\a\b \t\v\f\r\n"
 HCharacterClass const _whiteSpace_ = HCharacterClass( D_WHITE_SPACE, sizeof ( D_WHITE_SPACE ) - 1 );
 #undef D_WHITE_SPACE
+#undef D_LOWER_CASE_LETTER
+#undef D_UPPER_CASE_LETTER
 #undef D_LETTER
-#define D_LETTER "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define D_LOWER_CASE_LETTER "abcdefghijklmnopqrstuvwxyz"
+#define D_UPPER_CASE_LETTER "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define D_LETTER D_LOWER_CASE_LETTER D_UPPER_CASE_LETTER
 #undef D_DIGIT
 #define D_DIGIT "0123456789"
 HCharacterClass const _digit_ = HCharacterClass( D_DIGIT, sizeof ( D_DIGIT ) - 1 );
 HCharacterClass const _letter_ = HCharacterClass( D_LETTER, sizeof ( D_LETTER ) - 1 );
+HCharacterClass const _lowerCaseLetter_ = HCharacterClass( D_LOWER_CASE_LETTER, sizeof ( D_LOWER_CASE_LETTER ) - 1 );
+HCharacterClass const _upperCaseLetter_ = HCharacterClass( D_UPPER_CASE_LETTER, sizeof ( D_UPPER_CASE_LETTER ) - 1 );
 HCharacterClass const _word_ = HCharacterClass( D_LETTER D_DIGIT "_", sizeof ( D_LETTER D_DIGIT "_" ) - 1 );
 #undef D_DIGIT
 #undef D_LETTER
+#undef D_LOWER_CASE_LETTER
+#undef D_UPPER_CASE_LETTER
 
-HCharacterClass const* _characterClass_[] = { &_whiteSpace_, &_digit_, &_letter_, &_word_ };
+HCharacterClass const* _characterClass_[] = { &_whiteSpace_, &_digit_, &_letter_, &_lowerCaseLetter_, &_upperCaseLetter_, &_word_ };
 
 static int const ALLOC_BIT_MASK = 128;
 #undef IS_INPLACE
