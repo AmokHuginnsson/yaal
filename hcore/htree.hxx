@@ -72,6 +72,8 @@ public:
 	node_t set_new_root( HNode* );
 	void clear( void );
 	void swap( HTree<value_type>& );
+	bool is_empty( void ) const;
+	bool empty( void ) const;
 private:
 	friend class HTree<value_type>::HNode;
 	};
@@ -663,6 +665,20 @@ void HTree<value_t>::clear( void )
 	if ( _root )
 		M_SAFE( delete _root );
 	_root = NULL;
+	M_EPILOG
+	}
+
+template<typename value_t>
+bool HTree<value_t>::is_empty( void ) const
+	{
+	return ( _root ? false : true );
+	}
+
+template<typename value_t>
+bool HTree<value_t>::empty( void ) const
+	{
+	M_PROLOG
+	return ( is_empty() );
 	M_EPILOG
 	}
 
