@@ -44,6 +44,11 @@ HStreamInterface& flush( HStreamInterface& );
 HStreamInterface& dec( HStreamInterface& );
 HStreamInterface& hex( HStreamInterface& );
 HStreamInterface& oct( HStreamInterface& );
+HStreamInterface& natural( HStreamInterface& );
+HStreamInterface& fixed( HStreamInterface& );
+HStreamInterface& scientific( HStreamInterface& );
+HStreamInterface& boolalpha( HStreamInterface& );
+HStreamInterface& noboolalpha( HStreamInterface& );
 HStreamInterface& skipws( HStreamInterface& );
 HStreamInterface& noskipws( HStreamInterface& );
 
@@ -95,6 +100,7 @@ protected:
 	BASES::enum_t _base;
 	FLOAT_FORMAT::enum_t _floatFormat;
 	bool _skipWS;
+	bool _boolAlpha;
 	bool _valid;
 public:
 	HStreamInterface( void );
@@ -218,6 +224,8 @@ public:
 		{ return ( do_peek() ); }
 	HStreamInterface& set_skipws( bool skipWS_ )
 		{ return ( do_set_skipws( skipWS_ ) ); }
+	HStreamInterface& set_boolalpha( bool boolalpha_ )
+		{ return ( do_set_boolalpha( boolalpha_ ) ); }
 	HStreamInterface& set_fill( int val_ )
 		{ return ( do_set_fill( val_ ) ); }
 	HStreamInterface& set_width( int val_ )
@@ -226,6 +234,8 @@ public:
 		{ return ( do_set_precision( precision_ ) ); }
 	HStreamInterface& set_base( BASES::enum_t val_ )
 		{ return ( do_set_base( val_ ) ); }
+	HStreamInterface& set_float_format( FLOAT_FORMAT::enum_t val_ )
+		{ return ( do_set_float_format( val_ ) ); }
 protected:
 	virtual HStreamInterface& do_output( HString const& );
 	virtual HStreamInterface& do_output( char const* );
@@ -272,7 +282,9 @@ protected:
 	virtual HStreamInterface& do_set_width( int );
 	virtual HStreamInterface& do_set_precision( int );
 	virtual HStreamInterface& do_set_base( BASES::enum_t );
+	virtual HStreamInterface& do_set_float_format( FLOAT_FORMAT::enum_t );
 	virtual HStreamInterface& do_set_skipws( bool );
+	virtual HStreamInterface& do_set_boolalpha( bool );
 private:
 	bool read_word( void );
 	bool read_integer( void );

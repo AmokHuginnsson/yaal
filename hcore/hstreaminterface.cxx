@@ -45,7 +45,7 @@ HStreamInterface::HStreamInterface( void )
 	: _cache( 1, HChunk::STRATEGY::GEOMETRIC ), _offset( 0 ),
 	_wordCache(), _fill( ' ' ), _width( 0 ), _precision( 6 ),
 	_base( BASES::DEC ), _floatFormat( FLOAT_FORMAT::NATURAL ),
-	_skipWS( true ), _valid( true )
+	_skipWS( true ), _boolAlpha( false ), _valid( true )
 	{
 	return;
 	}
@@ -80,7 +80,7 @@ HStreamInterface& HStreamInterface::do_output( char const* string_ )
 HStreamInterface& HStreamInterface::do_output( bool bool_ )
 	{
 	M_PROLOG
-	_wordCache = ( bool_ ? '1' : '0' );
+	_wordCache = _boolAlpha ? ( bool_ ? "true" : "false" ) : ( bool_ ? "1" : "0" );
 	int long len( reformat() );
 	do_write( _wordCache.raw(), len );
 	return ( *this );
@@ -322,6 +322,41 @@ HStreamInterface& noskipws( HStreamInterface& iface_ )
 	{
 	M_PROLOG
 	return ( iface_.set_skipws( false ) );
+	M_EPILOG
+	}
+
+HStreamInterface& boolalpha( HStreamInterface& iface_ )
+	{
+	M_PROLOG
+	return ( iface_.set_boolalpha( true ) );
+	M_EPILOG
+	}
+
+HStreamInterface& noboolalpha( HStreamInterface& iface_ )
+	{
+	M_PROLOG
+	return ( iface_.set_boolalpha( false ) );
+	M_EPILOG
+	}
+
+HStreamInterface& natural( HStreamInterface& iface_ )
+	{
+	M_PROLOG
+	return ( iface_.set_float_format( HStreamInterface::FLOAT_FORMAT::NATURAL ) );
+	M_EPILOG
+	}
+
+HStreamInterface& fixed( HStreamInterface& iface_ )
+	{
+	M_PROLOG
+	return ( iface_.set_float_format( HStreamInterface::FLOAT_FORMAT::FIXED ) );
+	M_EPILOG
+	}
+
+HStreamInterface& scientific( HStreamInterface& iface_ )
+	{
+	M_PROLOG
+	return ( iface_.set_float_format( HStreamInterface::FLOAT_FORMAT::SCIENTIFIC ) );
 	M_EPILOG
 	}
 
@@ -775,10 +810,26 @@ HStreamInterface& HStreamInterface::do_set_base( BASES::enum_t base_ )
 	M_EPILOG
 	}
 
+HStreamInterface& HStreamInterface::do_set_float_format( FLOAT_FORMAT::enum_t floatFormat_ )
+	{
+	M_PROLOG
+	_floatFormat = floatFormat_;
+	return ( *this );
+	M_EPILOG
+	}
+
 HStreamInterface& HStreamInterface::do_set_skipws( bool skipWS_ )
 	{
 	M_PROLOG
 	_skipWS = skipWS_;
+	return ( *this );
+	M_EPILOG
+	}
+
+HStreamInterface& HStreamInterface::do_set_boolalpha( bool boolalpha_ )
+	{
+	M_PROLOG
+	_boolAlpha = boolalpha_;
 	return ( *this );
 	M_EPILOG
 	}

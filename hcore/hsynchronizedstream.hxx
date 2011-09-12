@@ -112,7 +112,9 @@ protected:
 	virtual HStreamInterface& do_set_width( int );
 	virtual HStreamInterface& do_set_precision( int );
 	virtual HStreamInterface& do_set_base( BASES::enum_t );
+	virtual HStreamInterface& do_set_float_format( FLOAT_FORMAT::enum_t );
 	virtual HStreamInterface& do_set_skipws( bool );
+	virtual HStreamInterface& do_set_boolalpha( bool );
 	virtual int long do_write( void const* const, int long );
 	virtual int long do_read( void* const, int long );
 	virtual void do_flush( void ) const;

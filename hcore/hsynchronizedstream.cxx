@@ -432,11 +432,27 @@ HStreamInterface& HSynchronizedStream::do_set_base( BASES::enum_t val_ )
 	M_EPILOG
 	}
 
+HStreamInterface& HSynchronizedStream::do_set_float_format( FLOAT_FORMAT::enum_t val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_set_float_format( val_ ) );
+	M_EPILOG
+	}
+
 HStreamInterface& HSynchronizedStream::do_set_skipws( bool val_ )
 	{
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_set_skipws( val_ ) );
+	M_EPILOG
+	}
+
+HStreamInterface& HSynchronizedStream::do_set_boolalpha( bool val_ )
+	{
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_set_boolalpha( val_ ) );
 	M_EPILOG
 	}
 
