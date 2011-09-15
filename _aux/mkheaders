@@ -1,15 +1,17 @@
 #! /bin/sh
 
-if [ -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" ] ; then
+if [ -z "${LIB_NAME}" -o -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" ] ; then
 	printf "%b\n" "Core settings not found!"
 	exit 1
 fi
 
 umask 022
 
+LIB_NAME_UC=`echo ${LIB_NAME} | tr [a-z] [A-Z]`
+
 cd ${DIR_ROOT}
 
-DIR_HEADERS="${DIR_BUILD}/yaal"
+DIR_HEADERS="${DIR_BUILD}/include/${LIB_NAME}"
 
 for FILE in ${HDRS}; do
 	mkdir -p ${DIR_HEADERS}/`dirname ${FILE}`
@@ -18,7 +20,7 @@ for FILE in ${HDRS}; do
 	match(\$0, "#\\t*include");
 	printf "%s", substr( \$0, RSTART, RLENGTH );
 	match(\$0, "\"[a-z_./-]+");
-	printf " <yaal/%s>\\n", substr(\$0, RSTART + 1, RLENGTH - 1) }
+	printf " <${LIB_NAME}/%s>\\n", substr(\$0, RSTART + 1, RLENGTH - 1) }
 !/^#\\t*include "/
 EOF
 done
@@ -29,21 +31,24 @@ if [ ! -f "${CONFIG_SRC_PATH}" ] ; then
 	CONFIG_SRC_PATH="${DIR_ROOT}/config.hxx"
 fi
 
-sed -e 's/define[ \t]*PACKAGE_/define YAAL_PACKAGE_/g' -e 's/#define[ \t]*LIB_INFIX.*/#undef LIB_INFIX/g' "${CONFIG_SRC_PATH}" > ${DIR_HEADERS}/config.hxx
+sed -e "s/define[ \t]*PACKAGE_/define ${LIB_NAME_UC}_PACKAGE_/g" -e 's/#define[ \t]*LIB_INFIX.*/#undef LIB_INFIX/g' "${CONFIG_SRC_PATH}" > ${DIR_HEADERS}/config.hxx
 
-head -26 ${DIR_HEADERS}/hcore/hstreaminterface.hxx | sed -e s/hstreaminterface/yaal/ > ${DIR_HEADERS}/yaal.hxx
+PROTO=`find ${DIR_HEADERS} ! -path "${DIR_HEADERS}/${LIB_NAME}.hxx" ! -name 'config.hxx' -type f | head -1 | sed -e "s@${DIR_HEADERS}/@@"`
+PROTO_TAG=`echo ${PROTO} | sed -e 's@.*/\([^\.]*\).*@\1@'`
 
-cat << EOF >> ${DIR_HEADERS}/yaal.hxx
-#ifndef YAAL_YAAL_HXX_INCLUDED
-#define YAAL_YAAL_HXX_INCLUDED 1
+head -26 ${DIR_HEADERS}/${PROTO} | sed -e s/${PROTO_TAG}/${LIB_NAME}/ > ${DIR_HEADERS}/${LIB_NAME}.hxx
+
+cat << EOF >> ${DIR_HEADERS}/${LIB_NAME}.hxx
+#ifndef ${LIB_NAME_UC}_${LIB_NAME_UC}_HXX_INCLUDED
+#define ${LIB_NAME_UC}_${LIB_NAME_UC}_HXX_INCLUDED 1
 
 EOF
 
-find ${DIR_HEADERS} ! -name 'yaal.hxx' -type f | awk '{ printf "#include <%s>\n", substr( $1, match( $1, "yaal(/[^/]*)?/[^/]*.hxx" ), 255 ) }' | sort >> ${DIR_HEADERS}/yaal.hxx
+find ${DIR_HEADERS} ! -path "${DIR_HEADERS}/${LIB_NAME}.hxx" -type f | awk -v LIB_NAME=${LIB_NAME} '/.*\.hxx\>/{ printf "#include <%s>\n", substr( $1, match( $1, LIB_NAME"(/[^/]*)?/[^/]*.hxx" ), 255 ) }' | sort >> ${DIR_HEADERS}/${LIB_NAME}.hxx
 
-cat << EOF >> ${DIR_HEADERS}/yaal.hxx
+cat << EOF >> ${DIR_HEADERS}/${LIB_NAME}.hxx
 
-#endif /* not YAAL_YAAL_HXX_INCLUDED */
+#endif /* not ${LIB_NAME_UC}_${LIB_NAME_UC}_HXX_INCLUDED */
 
 EOF
 

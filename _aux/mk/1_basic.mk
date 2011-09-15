@@ -5,6 +5,13 @@ FIND      = find
 ARFLAGS   = cr
 VPATH     = $(DIR_ROOT)
 
+define IDENT_HELPER
+	DIR_PREFIX=$$(subst . /,./,$$(foreach IT,$$(subst /, ,$$(subst $$(DIR_ROOT),,$$(DIR_BUILD))),/..))
+	HEADER=$$(addsuffix .hxx,$$(basename $(1)))
+	ID="\"$(1) $$(shell $$(GITID) ./$$(DIR_PREFIX)/$$(subst $$(DIR_ROOT)/,,$(1)))\""
+	TID="\"$$(HEADER) $$(if $$(wildcard $$(HEADER)),$$(shell $$(GITID) ./$$(DIR_PREFIX)/$$(subst $$(DIR_ROOT)/,,$$(HEADER))),)\""
+endef
+
 # this neat trick does not really blong here
 # but we want client makefiles look really simple
 

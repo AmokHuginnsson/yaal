@@ -283,7 +283,7 @@ struct existing_hier<sizeof ( trait::false_type ), subclass>
 
 /*! \brief Meta-function to retrieve parent exception of given exception.
  *
- * \tparam tType - childe exception type.
+ * \tparam tType - child exception type.
  */
 template<typename tType>
 struct parent_exception
