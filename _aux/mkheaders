@@ -1,6 +1,6 @@
 #! /bin/sh
 
-if [ -z "${LIB_NAME}" -o -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" ] ; then
+if [ -z "${LIB_NAME}" -o -z "${LIB_VERSION}" -o -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" ] ; then
 	printf "%b\n" "Core settings not found!"
 	exit 1
 fi
@@ -36,7 +36,7 @@ sed -e "s/define[ \t]*PACKAGE_/define ${LIB_NAME_UC}_PACKAGE_/g" -e 's/#define[ 
 PROTO=`find ${DIR_HEADERS} ! -path "${DIR_HEADERS}/${LIB_NAME}.hxx" ! -name 'config.hxx' -type f | head -1 | sed -e "s@${DIR_HEADERS}/@@"`
 PROTO_TAG=`echo ${PROTO} | sed -e 's@.*/\([^\.]*\).*@\1@'`
 
-head -26 ${DIR_HEADERS}/${PROTO} | sed -e s/${PROTO_TAG}/${LIB_NAME}/ > ${DIR_HEADERS}/${LIB_NAME}.hxx
+head -26 ${DIR_HEADERS}/${PROTO} | sed -e "s/${LIB_NAME}' (/${LIB_NAME}' ${LIB_VERSION} (/" -e "s/${PROTO_TAG}/${LIB_NAME}/" > ${DIR_HEADERS}/${LIB_NAME}.hxx
 
 cat << EOF >> ${DIR_HEADERS}/${LIB_NAME}.hxx
 #ifndef ${LIB_NAME_UC}_${LIB_NAME_UC}_HXX_INCLUDED

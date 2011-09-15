@@ -29,6 +29,7 @@ LIB_NAME     = yaal
 VERSION      = 0
 SUBVERSION   = 0
 EXTRAVERSION = 27
+LIB_VERSION  = $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 COMPONENTS   = hcore tools dbwrapper hconsole hdata
 DRIVERS      = @DO_ORACLE_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
 PREFIX       = @prefix@
@@ -167,7 +168,7 @@ install-environment:
 
 $(HAPI_HEADER): $(HDRS)
 	@printf "%b" "Making headers ... "; \
-	env LIB_NAME=$(LIB_NAME) DIR_ROOT="$(DIR_ROOT)" DIR_BUILD="$(DIR_BUILD)" HDRS="$(HDRS)" $(DIR_ROOT)/_aux/mkheaders; \
+	env LIB_NAME=$(LIB_NAME) LIB_VERSION=$(LIB_VERSION) DIR_ROOT="$(DIR_ROOT)" DIR_BUILD="$(DIR_BUILD)" HDRS="$(HDRS)" $(DIR_ROOT)/_aux/mkheaders; \
 	printf "%b$(NL)" "done.$(CL)$(BOLD)"; \
 	printf "%b\n" "All OK!$(RS)";
 
