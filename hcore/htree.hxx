@@ -581,7 +581,7 @@ HTree<value_t>::HIterator<const_qual_t>::HIterator( HIterator const& it )
 template<typename value_t>
 template<typename const_qual_t>
 template<typename other_const_qual_t>
-HTree<value_t>::HIterator<const_qual_t>::HIterator( typename HTree<value_t>::template HIterator<other_const_qual_t> const& it )
+HTree<value_t>::HIterator<const_qual_t>::HIterator( HIterator<other_const_qual_t> const& it )
 	: base_type(), _owner( it._owner ), _iterator( it._iterator )
 	{
 	STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
@@ -590,7 +590,7 @@ HTree<value_t>::HIterator<const_qual_t>::HIterator( typename HTree<value_t>::tem
 
 template<typename value_t>
 template<typename const_qual_t>
-typename HTree<value_t>::template HIterator<const_qual_t>& HTree<value_t>::HIterator<const_qual_t>::operator = ( typename HTree<value_t>::template HIterator<const_qual_t> const& it )
+typename HTree<value_t>::template HIterator<const_qual_t>& HTree<value_t>::HIterator<const_qual_t>::operator = ( HIterator const& it )
 	{
 	M_PROLOG
 	if ( &it != this )
@@ -632,7 +632,7 @@ typename HTree<value_t>::template HIterator<const_qual_t>::const_qual_node_t* HT
 
 template<typename value_t>
 template<typename const_qual_t>
-bool HTree<value_t>::HIterator<const_qual_t>::operator == ( typename HTree<value_t>::template HIterator<const_qual_t> const& it ) const
+bool HTree<value_t>::HIterator<const_qual_t>::operator == ( HIterator const& it ) const
 	{
 	M_PROLOG
 	M_ASSERT( _owner == it._owner );
@@ -642,7 +642,7 @@ bool HTree<value_t>::HIterator<const_qual_t>::operator == ( typename HTree<value
 
 template<typename value_t>
 template<typename const_qual_t>
-bool HTree<value_t>::HIterator<const_qual_t>::operator != ( typename HTree<value_t>::template HIterator<const_qual_t> const& it ) const
+bool HTree<value_t>::HIterator<const_qual_t>::operator != ( HIterator const& it ) const
 	{
 	M_PROLOG
 	M_ASSERT( _owner == it._owner );

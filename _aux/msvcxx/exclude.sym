@@ -6,6 +6,7 @@
 ?MANAGED_IO@SystemIO@msvcxx@@2HB
 ?PI@math@yaal@@3OA
 ?_baudRate_@tools@yaal@@3V?$HStrongEnum@USPEED@HSerial@tools@yaal@@@hcore@2@A
+?_characterClass_@hcore@yaal@@3PAPBVHCharacterClass@12@A
 ?_collectorConnectionTimeOut_@tools@yaal@@3HA
 ?_compressionLevel_@tools@yaal@@3HA
 ?_dBDrivers_@dbwrapper@yaal@@3V?$HMap@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@V?$HPair@V?$HPointer@VHPlugin@tools@yaal@@UHPointerScalar@hcore@3@UHPointerStrict@53@@hcore@yaal@@UODBConnector@dbwrapper@3@@hcore@5@U?$map_helper@$$CBW4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@V?$HPair@V?$HPointer@VHPlugin@tools@yaal@@UHPointerScalar@hcore@3@UHPointerStrict@53@@hcore@yaal@@UODBConnector@dbwrapper@3@@hcore@5@@75@@hcore@2@A
@@ -14,6 +15,7 @@
 ?_defaultEncoding_@tools@yaal@@3VHString@hcore@2@A
 ?_defaultTimeFormat_@hcore@yaal@@3QBDB
 ?_digit_@hcore@yaal@@3QBDB
+?_digit_@hcore@yaal@@3VHCharacterClass@12@B
 ?_errMsgHArray_@hcore@yaal@@3QBQBDB
 ?_errMsgHDeque_@hcore@yaal@@3QBQBDB
 ?_errMsgHList_@hcore@yaal@@3QBQBDB
@@ -31,7 +33,9 @@
 ?_killGracePeriod@HPipedChild@tools@yaal@@2HA
 ?_killGracePeriod@HSignalService@tools@yaal@@2HA
 ?_letter_@hcore@yaal@@3QBDB
+?_letter_@hcore@yaal@@3VHCharacterClass@12@B
 ?_logMask@HLog@hcore@yaal@@2JA
+?_lowerCaseLetter_@hcore@yaal@@3VHCharacterClass@12@B
 ?_maskAlpha_@hconsole@yaal@@3QBDB
 ?_maskDefault_@hconsole@yaal@@3QBDB
 ?_maskDigits_@hconsole@yaal@@3QBDB
@@ -45,8 +49,11 @@
 ?_serialDevice_@tools@yaal@@3VHString@hcore@2@A
 ?_serialFlags_@tools@yaal@@3V?$HStrongEnum@UFLAG@HSerial@tools@yaal@@@hcore@2@A
 ?_threadStackSize@HThread@hcore@yaal@@2HA
+?_upperCaseLetter_@hcore@yaal@@3VHCharacterClass@12@B
 ?_whiteSpace_@hcore@yaal@@3QBDB
+?_whiteSpace_@hcore@yaal@@3VHCharacterClass@12@B
 ?_word_@hcore@yaal@@3QBDB
+?_word_@hcore@yaal@@3VHCharacterClass@12@B
 ?_writeTimeout_@hcore@yaal@@3JA
 ?_zBufferSize_@tools@yaal@@3JA
 ?black@hconsole@yaal@@3QBDB
