@@ -49,7 +49,7 @@ find ${DIR_HEADERS} ! -path "${DIR_HEADERS}/${LIB_NAME}.hxx" -type f | awk -v LI
 
 cat << EOF >> ${DIR_HEADERS}/${LIB_NAME}.hxx
 
-#endif /* not ${LIB_NAME_UC}_${LIB_NAME_UC}_HXX_INCLUDED */
+#endif /* #ifndef ${LIB_NAME_UC}_${LIB_NAME_UC}_HXX_INCLUDED */
 
 EOF
 
