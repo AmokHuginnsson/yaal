@@ -46,31 +46,25 @@ using namespace yaal::hcore;
 using namespace yaal::hconsole;
 using namespace yaal::tools;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace dbwrapper
-{
+namespace dbwrapper {
 
 void dbwrapper_error( void );
 void dbwrapper_exit( void ) __attribute__(( __noreturn__ ));
 
 ODBConnector::DRIVER::enum_t _dataBaseDriver_ = ODBConnector::DRIVER::NONE;
 
-bool set_dbwrapper_variables( HString& option_, HString& value_ )
-	{
+bool set_dbwrapper_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
 	if ( ! strcasecmp( option_, "set_env" ) )
 		decode_set_env( value_ );
-	else if ( ! strcasecmp( option_, "log_mask" ) )
-		{
+	else if ( ! strcasecmp( option_, "log_mask" ) ) {
 		if ( ! strcasecmp( value_, "LOG_SQL" ) )
 			HLog::_logMask |= LOG_TYPE::SQL;
 		else
 			return ( true );
-		}
-	else if ( ! strcasecmp( option_, "data_base_driver" ) )
-		{
+	} else if ( ! strcasecmp( option_, "data_base_driver" ) ) {
 		if ( ! ( strcasecmp( value_, "none" )
 					&& strcasecmp( value_, "null" )
 					&& strcasecmp( value_, "dummy" ) ) )
@@ -83,57 +77,50 @@ bool set_dbwrapper_variables( HString& option_, HString& value_ )
 			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::MYSQL;
 		else if ( value_ == "Oracle" )
 			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::ORACLE;
-		else
-			{
+		else {
 			log( LOG_TYPE::ERROR ) << "Error: `" << value_;
 			log << "' is unknown driver." << endl;
 			exit( 1 );
-			}
 		}
-	else
+	} else
 		return ( true );
 	return ( false );
 	M_EPILOG
-	}
+}
 
-class HDBWrapperInitDeinit
-	{
+class HDBWrapperInitDeinit {
 public:
 	HDBWrapperInitDeinit( void );
-	} initDeinit;
+} initDeinit;
 
-HDBWrapperInitDeinit::HDBWrapperInitDeinit( void )
-	{
+HDBWrapperInitDeinit::HDBWrapperInitDeinit( void ) {
 	M_PROLOG
 	yaal_options().process_rc_file( "yaal", "dbwrapper", set_dbwrapper_variables );
 	return;
 	M_EPILOG
-	}
+}
 
 extern char const* _done_;
 
-void banner( void )
-	{
+void banner( void ) {
 	::printf( "\tdbwrapper\n" );
 	return;
-	}
+}
 
 }
 
 }
 
 extern "C"
-int yaal_dbwrapper_main( int, char** )
-	{
+int yaal_dbwrapper_main( int, char** ) {
 	static char const dynamicLinkerPath[]
 		__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
-	if ( dynamicLinkerPath[ 0 ] )
-		{
+	if ( dynamicLinkerPath[ 0 ] ) {
 		yaal::hcore::banner();
 		yaal::tools::banner();
 		yaal::dbwrapper::banner();
 		::exit( 0 );
-		}
-	return ( 0 );
 	}
+	return ( 0 );
+}
 

@@ -30,31 +30,26 @@ Copyright:
 #include "hcore/hexception.hxx"
 #include "hcore/trait.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-struct iterator_category
-	{
+struct iterator_category {
 	struct forward {};
 	struct random_access {};
-	};
+};
 
 template<typename T, typename category>
-struct iterator_interface
-	{
+struct iterator_interface {
 	typedef T value_type;
 	typedef typename trait::make_reference<T>::type reference;
 	typedef typename trait::add_pointer<T>::type pointer;
 	typedef category category_type;
 	virtual ~iterator_interface( void ) {}
-	};
+};
 
 template<typename iterator>
-struct iterator_traits
-	{
+struct iterator_traits {
 	typedef typename iterator::value_type value_type;
 	typedef typename iterator::reference reference;
 	typedef typename iterator::pointer pointer;
@@ -70,40 +65,36 @@ struct iterator_traits
 	struct get_category<U, true>
 		{ typedef typename U::category_type type; };
 	typedef typename get_category<iterator, sizeof ( has_category<iterator>( 0 ) ) == sizeof ( trait::true_type )>::type category_type;
-	};
+};
 
 template<typename T>
-struct iterator_traits<T*>
-	{
+struct iterator_traits<T*> {
 	typedef T value_type;
 	typedef T& reference;
 	typedef T* pointer;
 	typedef typename iterator_category::random_access category_type;
-	};
+};
 
 }
 
 /*! \cond */
 template<typename tType>
-inline int long distance( tType* first_, tType* last_ )
-	{
+inline int long distance( tType* first_, tType* last_ ) {
 	M_ASSERT( ! ( last_ < first_ ) );
 	return ( last_ - first_ );
-	}
+}
 template<typename iter_t>
-inline int long distance( iter_t first_, iter_t last_, hcore::iterator_category::random_access )
-	{
+inline int long distance( iter_t first_, iter_t last_, hcore::iterator_category::random_access ) {
 	M_ASSERT( ! ( last_ < first_ ) );
 	return ( last_ - first_ );
-	}
+}
 template<typename iter_t>
-inline int long distance( iter_t first_, iter_t last_, hcore::iterator_category::forward )
-	{
+inline int long distance( iter_t first_, iter_t last_, hcore::iterator_category::forward ) {
 	int long dist( 0 );
 	while ( first_ != last_ )
 		++ first_, ++ dist;
 	return ( dist );
-	}
+}
 /*! \endcond */
 /*! \brief Calculate distance between two iterators.
  *
@@ -112,28 +103,24 @@ inline int long distance( iter_t first_, iter_t last_, hcore::iterator_category:
  * \return last - first.
  */
 template<typename iter_t>
-inline int long distance( iter_t first, iter_t last )
-	{
+inline int long distance( iter_t first, iter_t last ) {
 	return ( distance( first, last, typename hcore::iterator_traits<iter_t>::category_type() ) );
-	}
+}
 
 /*! \cond */
 template<typename tType>
-inline void advance( tType*& it_, int long distance_ )
-	{
+inline void advance( tType*& it_, int long distance_ ) {
 	it_ += distance_;
-	}
+}
 template<typename iter_t>
-inline void advance( iter_t& it_, int long distance_, hcore::iterator_category::random_access )
-	{
+inline void advance( iter_t& it_, int long distance_, hcore::iterator_category::random_access ) {
 	it_ += distance_;
-	}
+}
 template<typename type_t>
-inline void advance( type_t& it_, int long distance_, hcore::iterator_category::forward )
-	{
+inline void advance( type_t& it_, int long distance_, hcore::iterator_category::forward ) {
 	for ( int long i( 0 ); i < distance_; ++ i, ++ it_ )
 		;
-	}
+}
 /*! \endcond */
 /*! \brief Move iterator forward.
  *
@@ -141,121 +128,103 @@ inline void advance( type_t& it_, int long distance_, hcore::iterator_category::
  * \param dist - how far iterator shall be moved.
  */
 template<typename iter_t>
-void advance( iter_t& it, int long dist )
-	{
+void advance( iter_t& it, int long dist ) {
 	advance( it, dist, typename hcore::iterator_traits<iter_t>::category_type() );
 	return;
-	}
+}
 
-namespace hcore
-{
+namespace hcore {
 
 template<typename iterator_t>
-class HReverseIterator
-	{
+class HReverseIterator {
 	iterator_t _iterator;
 public:
 	HReverseIterator( void ) : _iterator() {}
 	HReverseIterator( HReverseIterator const& iterator_ ) : _iterator( iterator_._iterator ) {}
 	HReverseIterator( iterator_t const& iterator_ ) : _iterator( iterator_ ) { -- _iterator; }
-	HReverseIterator& operator = ( HReverseIterator const& iterator_ )
-		{
+	HReverseIterator& operator = ( HReverseIterator const& iterator_ ) {
 		if ( &iterator_ != this )
 			_iterator = iterator_._iterator;
 		return ( *this );
-		}
-	HReverseIterator& operator ++ ( void )
-		{
+	}
+	HReverseIterator& operator ++ ( void ) {
 		-- _iterator;
 		return ( *this );
-		}
-	HReverseIterator operator ++ ( int )
-		{
+	}
+	HReverseIterator operator ++ ( int ) {
 		HReverseIterator it( *this );
 		-- _iterator;
 		return ( it );
-		}
-	HReverseIterator& operator -- ( void )
-		{
+	}
+	HReverseIterator& operator -- ( void ) {
 		++ _iterator;
 		return ( *this );
-		}
-	HReverseIterator operator -- ( int )
-		{
+	}
+	HReverseIterator operator -- ( int ) {
 		HReverseIterator it( *this );
 		++ _iterator;
 		return ( it );
-		}
-	iterator_t base( void ) const
-		{
+	}
+	iterator_t base( void ) const {
 		return ( _iterator );
-		}
-	typename trait::make_reference<typename iterator_t::value_type const>::type operator*( void ) const
-		{
+	}
+	typename trait::make_reference<typename iterator_t::value_type const>::type operator*( void ) const {
 		return ( *_iterator );
-		}
+	}
 /* cppcheck-suppress functionConst */
-	typename iterator_t::reference operator*( void )
-		{
+	typename iterator_t::reference operator*( void ) {
 		return ( *_iterator );
-		}
-	typename trait::add_pointer<typename iterator_t::value_type const>::type operator->( void ) const
-		{
+	}
+	typename trait::add_pointer<typename iterator_t::value_type const>::type operator->( void ) const {
 		return ( &*_iterator );
-		}
+	}
 /* cppcheck-suppress functionConst */
-	typename iterator_t::pointer operator->( void )
-		{
+	typename iterator_t::pointer operator->( void ) {
 		return ( &*_iterator );
-		}
-	bool operator == ( HReverseIterator const& iterator_ ) const
-		{
+	}
+	bool operator == ( HReverseIterator const& iterator_ ) const {
 		return ( _iterator == iterator_._iterator );
-		}
-	bool operator != ( HReverseIterator const& iterator_ ) const
-		{
+	}
+	bool operator != ( HReverseIterator const& iterator_ ) const {
 		return ( _iterator != iterator_._iterator );
-		}
-	};
+	}
+};
 
 /*! \brief (Back)Insertion concept for HInsertIterator.
  *
  * May be used for collections that support back insertion.
  */
 template<typename tType>
-class HBackInsertionConcept
-	{
+class HBackInsertionConcept {
 public:
 	template<typename elem_t>
 	static void insert( tType& coll, elem_t const& elem )
 		{ coll.push_back( elem ); }
-	};
+};
 
 /*! \brief (Front)Insertion concept for HInsertIterator.
  *
  * May be used for collections that support front insertion.
  */
 template<typename tType>
-class HFrontInsertionConcept
-	{
+class HFrontInsertionConcept {
 public:
 	template<typename elem_t>
 	static void insert( tType& coll, elem_t const& elem )
 		{ coll.push_front( elem ); }
-	};
+};
 
 /*! \brief Insertion concept for HInsertIterator.
  *
  * Shall be used when insertion to sets/maps is required.
  */
 template<typename tType>
-class HInsertionConcept
-	{
+class HInsertionConcept {
 public:
 	template<typename elem_t>
 	static void insert( tType& coll, elem_t const& elem )
 		{ coll.insert( elem ); }
-	};
+};
 
 /*! \brief Iterator class that allows extending existing collections.
  *
@@ -263,8 +232,7 @@ public:
  * \tparam inserter - insertion concept, tell how collection shall be extended.
  */
 template<typename tType, typename inserter>
-class HInsertIterator
-	{
+class HInsertIterator {
 	tType& _coll;
 public:
 	HInsertIterator( tType& coll ) : _coll( coll ) {}
@@ -273,12 +241,11 @@ public:
 	HInsertIterator& operator* ( void )
 		{ return ( *this ); }
 	template<typename arg_t>
-	HInsertIterator& operator = ( arg_t const& elem )
-		{
+	HInsertIterator& operator = ( arg_t const& elem ) {
 		inserter::insert( _coll, elem );
 		return ( *this );
-		}
-	};
+	}
+};
 
 template<typename tType>
 HInsertIterator<tType, HBackInsertionConcept<tType> > back_insert_iterator( tType& coll )

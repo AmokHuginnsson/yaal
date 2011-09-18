@@ -3,11 +3,9 @@
 
 #include "emu_pwd.hxx"
 
-namespace msvcxx
-{
+namespace msvcxx {
 
-owner_t get_path_owner( std::string const& path_ )
-	{
+owner_t get_path_owner( std::string const& path_ ) {
 	owner_t owner;
 
 	HANDLE hFile( ::CreateFile(
@@ -18,8 +16,7 @@ owner_t get_path_owner( std::string const& path_ )
 		OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
 		NULL ) );
-	if ( hFile != INVALID_HANDLE_VALUE )
-		{
+	if ( hFile != INVALID_HANDLE_VALUE ) {
 		PSID pSidOwner( NULL );
 		PSID pSidGroup( NULL );
 		PSECURITY_DESCRIPTOR pSD( NULL );
@@ -31,15 +28,14 @@ owner_t get_path_owner( std::string const& path_ )
 			&pSidGroup,
 			NULL,
 			NULL,
-			&pSD ) == ERROR_SUCCESS )
-			{
+			&pSD ) == ERROR_SUCCESS ) {
 			owner.first = ( *GetSidSubAuthority( pSidOwner, *GetSidSubAuthorityCount( pSidOwner ) - 1 ) );
 			owner.second = ( *GetSidSubAuthority( pSidGroup, *GetSidSubAuthorityCount( pSidGroup ) - 1 ) );
-			}
+		}
 		::LocalFree( pSD );
 		::CloseHandle( hFile );
-		}
-	return ( owner );
 	}
+	return ( owner );
+}
 
 }

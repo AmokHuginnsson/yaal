@@ -36,40 +36,34 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "harray.hxx"
 #include "hchunk.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-struct OPatternState
-	{
+struct OPatternState {
 	bool _ignoreCase;
 	bool _extended;
 	HPattern::pluggable_flags_t _flags;
 	OPatternState( void ) : _ignoreCase( false ), _extended( false ), _flags() {}
-	};
+};
 
 HPattern::HPattern( bool const ignoreCase_ ) : _initialized( false ),
 	_ignoreCaseDefault( ignoreCase_ ), _ignoreCase( false ),
 	_extended( false ), _simpleMatchLength( 0 ), _compiled( sizeof ( regex_t ) ),
-	_patternInput(), _patternReal(), _lastError( 0 ), _varTmpBuffer()
-	{
+	_patternInput(), _patternReal(), _lastError( 0 ), _varTmpBuffer() {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HPattern::~HPattern( void )
-	{
+HPattern::~HPattern( void ) {
 	M_PROLOG
 	regfree( _compiled.get<regex_t>() );
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HPattern::save_state( void* sp, pluggable_flags_t* f )
-	{
+void HPattern::save_state( void* sp, pluggable_flags_t* f ) {
 	M_PROLOG
 	OPatternState& s = *static_cast<OPatternState*>( sp );
 	s._ignoreCase = _ignoreCase;
@@ -78,10 +72,9 @@ void HPattern::save_state( void* sp, pluggable_flags_t* f )
 		s._flags = *f;
 	return;
 	M_EPILOG
-	}
+}
 
-void HPattern::restore_state( void* sp, pluggable_flags_t* f )
-	{
+void HPattern::restore_state( void* sp, pluggable_flags_t* f ) {
 	M_PROLOG
 	OPatternState& s = *static_cast<OPatternState*>( sp );
 	_ignoreCase = s._ignoreCase;
@@ -90,10 +83,9 @@ void HPattern::restore_state( void* sp, pluggable_flags_t* f )
 		*f = s._flags;
 	return;
 	M_EPILOG
-	}
+}
 
-int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags ) 
-	{
+int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags ) {
 	M_PROLOG
 	char const* const pattern = pattern_.raw();
 	_patternInput = pattern_;
@@ -105,27 +97,24 @@ int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags )
 /* clear all flags */
 	_ignoreCase = _ignoreCaseDefault;
 	_extended = false;
-	if ( externalFlags )
-		{
+	if ( externalFlags ) {
 		for ( pluggable_flags_t::iterator it = externalFlags->begin(), endIt = externalFlags->end(); it != endIt; ++ it )
 			*it->second = false;
-		}
+	}
 /* FIXME g++ 4.3 bug *///		flags_[ i ] &= FLAG_MASK;
 /* end of clearing */
 /* look for switches at the beginnig of pattern */
 	int long ctr( 0 );
 	int err( 0 );
-	while ( pattern[ ctr ] == '\\' )
-		{
-		if ( set_switch( pattern[ ++ ctr ], externalFlags ) )
-			{
+	while ( pattern[ ctr ] == '\\' ) {
+		if ( set_switch( pattern[ ++ ctr ], externalFlags ) ) {
 			restore_state( &savePoint, externalFlags );
 			err = 1;
 			_varTmpBuffer.format( "bad search option '%c'", pattern[ ctr ] );
 			return ( err );
-			}
-		ctr ++;
 		}
+		ctr ++;
+	}
 	if ( pattern[ ctr ] == '/' )
 		ctr ++;
 	int long begin = ctr;
@@ -137,225 +126,189 @@ int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags )
 	int long endMatch( ctr = _patternInput.get_length() - 1 );
 	if ( endMatch < 0 )
 		return ( true );
-	while ( ( ctr > 0 ) && ( pattern[ ctr ] != '/' ) )
-		{
-		if ( set_switch( pattern[ ctr ], externalFlags ) )
-			{
+	while ( ( ctr > 0 ) && ( pattern[ ctr ] != '/' ) ) {
+		if ( set_switch( pattern[ ctr ], externalFlags ) ) {
 			restore_state( &savePoint, externalFlags );
 			ctr = 1;
-			}
-		ctr --;
 		}
+		ctr --;
+	}
 	if ( ctr )
 		endMatch = ctr - 1;
 /* end of looking at end */
 	_varTmpBuffer = _patternReal = _patternInput.mid( begin,
 			( endMatch - begin ) + 1 );
 	_simpleMatchLength = static_cast<int>( _patternReal.get_length() );
-	if ( ! _simpleMatchLength )
-		{
+	if ( ! _simpleMatchLength ) {
 		err = -1;
 		_varTmpBuffer = _( "empty pattern" );
-		}
+	}
 	_initialized = ! err;
 	if ( _initialized && _extended )
 		err = parse_re( _patternReal.raw() );
 	return ( err );
 	M_EPILOG
-	}
+}
 
-int HPattern::parse_re( char const* const pattern_ )
-	{
+int HPattern::parse_re( char const* const pattern_ ) {
 	M_PROLOG
 	::regfree( _compiled.get<regex_t>() );
 	if ( ( _lastError = ::regcomp( _compiled.get<regex_t>(), pattern_,
-					_ignoreCase ? REG_ICASE : 0 ) ) )
-		{
+					_ignoreCase ? REG_ICASE : 0 ) ) ) {
 		prepare_error_message( pattern_ );
 		_initialized = false;
-		}
-	else
-		{
+	} else {
 		_initialized = true;
 		_extended = true;
 		_simpleMatchLength = 1; /* it is not really a simple pattern */
-		}
+	}
 	return ( _lastError );
 	M_EPILOG
-	}
+}
 
-HString const& HPattern::error( void ) const
-	{
+HString const& HPattern::error( void ) const {
 	return ( _varTmpBuffer );
-	}
+}
 
-int HPattern::error_code( void ) const
-	{
+int HPattern::error_code( void ) const {
 	return ( _lastError );
-	}
+}
 
-bool HPattern::set_switch( char const switch_, pluggable_flags_t* externalFlags ) 
-	{
+bool HPattern::set_switch( char const switch_, pluggable_flags_t* externalFlags ) {
 	M_PROLOG
 	bool ok( true );
-	switch ( switch_ )
-		{
+	switch ( switch_ ) {
 		case ( 'i' ):{_ignoreCase = ! _ignoreCase;break;}
 		case ( 'e' ):{_extended = true;break;}
 		case ( 'c' ):{_ignoreCase = true;break;}
 		case ( 'C' ):{_ignoreCase = false;break;}
-		default :
-			{
-			if ( externalFlags )
-				{
+		default : {
+			if ( externalFlags ) {
 				ok = false;
-				for ( pluggable_flags_t::iterator it = externalFlags->begin(), endIt = externalFlags->end(); it != endIt; ++ it )
-					{
+				for ( pluggable_flags_t::iterator it = externalFlags->begin(), endIt = externalFlags->end(); it != endIt; ++ it ) {
 					if ( switch_ == it->first )
 						*it->second = ok = true;
 					break;
-					}
 				}
-			break;
 			}
+			break;
 		}
+	}
 	return ( ! ok );
 	M_EPILOG
-	}
+}
 
 char const* HPattern::matches( char const* const string_,
-		int long* const matchLength_ ) const
-	{
+		int long* const matchLength_ ) const {
 	M_PROLOG
 	M_ASSERT( string_ );
 	char const* ptr = NULL;
 	int long matchLength = 0;
 	regmatch_t match;
-	if ( _simpleMatchLength )
-		{
-		if ( _extended )
-			{
-			if ( ! ( _lastError = ::regexec( _compiled.get<regex_t>(), string_, 1, &match, 0 ) ) )
-				{
+	if ( _simpleMatchLength ) {
+		if ( _extended ) {
+			if ( ! ( _lastError = ::regexec( _compiled.get<regex_t>(), string_, 1, &match, 0 ) ) ) {
 				matchLength = match.rm_eo - match.rm_so;
 				if ( matchLength > 0 )
 					ptr = string_ + match.rm_so;
-				}
-			else
+			} else
 				prepare_error_message( _patternReal );
-			}
-		else
-			{
+		} else {
 			if ( _ignoreCase )
 				ptr = ::strcasestr( string_, _patternReal.raw() );
 			else
 				ptr = ::strstr( string_, _patternReal.raw() );
 			if ( ptr )
 				matchLength = _simpleMatchLength;
-			}
 		}
+	}
 	if ( matchLength_ )
 		( *matchLength_ ) = matchLength;
 	return ( ptr );
 	M_EPILOG
-	}
+}
 
-void HPattern::prepare_error_message( HString const& string_ ) const
-	{
+void HPattern::prepare_error_message( HString const& string_ ) const {
 	M_PROLOG
 	int long size( static_cast<int long>( ::regerror( _lastError, _compiled.get<regex_t>(), NULL, 0 ) ) + 1 );
 	HChunk buffer( size + 1 );
 	M_ENSURE( static_cast<int>( ::regerror( _lastError, _compiled.get<regex_t>(),
 					buffer.raw(), size ) ) < size );
 	_varTmpBuffer = buffer.raw();
-	if ( ! string_.empty() )
-		{
+	if ( ! string_.empty() ) {
 		_varTmpBuffer += ": `";
 		_varTmpBuffer += string_;
 		_varTmpBuffer += "'";
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-HPattern::HMatchIterator HPattern::find( char const* str_ ) const
-	{
+HPattern::HMatchIterator HPattern::find( char const* str_ ) const {
 	M_ASSERT( str_ );
 	int long len = 0;
 	char const* start = matches( str_, &len );
 	HMatchIterator it( this, start, len );
 	return ( it );
-	}
+}
 
-HPattern::HMatchIterator HPattern::end( void ) const
-	{
+HPattern::HMatchIterator HPattern::end( void ) const {
 	return ( HMatchIterator( this, NULL, 0 ) );
-	}
+}
 
 HPattern::HMatch::HMatch( char const* start_, int long size_ )
-	: _size( size_ ), _start( start_ )
-	{
-	}
+	: _size( size_ ), _start( start_ ) {
+}
 
-int long HPattern::HMatch::size( void ) const
-	{
+int long HPattern::HMatch::size( void ) const {
 	return ( _size );
-	}
+}
 
-char const* HPattern::HMatch::raw( void ) const
-	{
+char const* HPattern::HMatch::raw( void ) const {
 	return ( _start );
-	}
+}
 
 HPattern::HMatchIterator::HMatchIterator( HPattern const* owner_, char const* const start_, int long len_ )
-	: base_type(), _owner( owner_ ), _match( start_, len_ )
-	{
-	}
+	: base_type(), _owner( owner_ ), _match( start_, len_ ) {
+}
 
 HPattern::HMatchIterator::HMatchIterator( HMatchIterator const& it_ )
-	: base_type(), _owner( it_._owner ), _match( it_._match )
-	{
-	}
+	: base_type(), _owner( it_._owner ), _match( it_._match ) {
+}
 
-HPattern::HMatchIterator& HPattern::HMatchIterator::operator = ( HPattern::HMatchIterator const& it_ )
-	{
-	if ( &it_ != this )
-		{
+HPattern::HMatchIterator& HPattern::HMatchIterator::operator = ( HPattern::HMatchIterator const& it_ ) {
+	if ( &it_ != this ) {
 		_owner = it_._owner;
 		_match = it_._match;
-		}
+	}
 	return ( *this );
-	}
+}
 
-HPattern::HMatch const* HPattern::HMatchIterator::operator->( void ) const
-	{
+HPattern::HMatch const* HPattern::HMatchIterator::operator->( void ) const {
 	return ( &_match );
-	}
+}
 
-bool HPattern::HMatchIterator::operator != ( HMatchIterator const& mi_ ) const
-	{
+bool HPattern::HMatchIterator::operator != ( HMatchIterator const& mi_ ) const {
 	M_PROLOG
 	M_ASSERT( mi_._owner == _owner );
 	return ( mi_._match._start != _match._start );
 	M_EPILOG
-	}
+}
 
-bool HPattern::HMatchIterator::operator == ( HMatchIterator const& mi_ ) const
-	{
+bool HPattern::HMatchIterator::operator == ( HMatchIterator const& mi_ ) const {
 	M_PROLOG
 	M_ASSERT( mi_._owner == _owner );
 	return ( mi_._match._start == _match._start );
 	M_EPILOG
-	}
+}
 
-HPattern::HMatchIterator& HPattern::HMatchIterator::operator ++ ( void )
-	{
+HPattern::HMatchIterator& HPattern::HMatchIterator::operator ++ ( void ) {
 	M_PROLOG
 	M_ASSERT( _match._start );
 	_match._start = _owner->matches( _match._start + 1, &_match._size );
 	return ( *this );
 	M_EPILOG
-	}
+}
 
 }
 

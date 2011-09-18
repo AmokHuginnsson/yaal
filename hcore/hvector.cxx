@@ -31,17 +31,14 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hvector.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-char const * _errMsgHVector_ [ 2 ] =
-	{
+char const * _errMsgHVector_ [ 2 ] = {
 	_ ( "ok" ),
 /* HVector::ERROR::DIMNOTMATCH */	_ ( "dimensions do not match" )
-	};
+};
 
 }
 

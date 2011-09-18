@@ -30,29 +30,24 @@ Copyright:
 #ifndef YAAL_HCORE_HCLOCK_HXX_INCLUDED
 #define YAAL_HCORE_HCLOCK_HXX_INCLUDED 1
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief High resolution time mesurement tool.
  */
-class HClock
-	{
+class HClock {
 public:
 	/*! \brief Resolution units for time mesurement.
 	 */
-	struct UNIT
-		{
-		typedef enum
-			{
+	struct UNIT {
+		typedef enum {
 			SECOND = 0,
 			NANOSECOND = 1,
 			MICROSECOND = 2,
 			MILISECOND = 3
-			} unit_t;
-		};
+		} unit_t;
+	};
 private:
 	mutable int long _moment[2];
 public:
@@ -64,7 +59,7 @@ public:
 	 * \return Amount of time that elapsed in given unit.
 	 */
 	int long get_time_elapsed( UNIT::unit_t unit_ = UNIT::SECOND, bool reset_ = false ) const;
-	};
+};
 
 }
 

@@ -29,11 +29,9 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hqueue.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 }
 
 }

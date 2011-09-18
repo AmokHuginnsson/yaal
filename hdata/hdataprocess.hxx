@@ -36,11 +36,9 @@ Copyright:
 #include "dbwrapper/hdatabase.hxx"
 #include "hdata/oresource.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 #define M_REGISTER_MENU_HANDLER( handler ) do {	handlers[ #handler ] = static_cast<OMenuItem::HANDLER_t>( &this_type::handler ); } while ( 0 )
 
@@ -52,8 +50,7 @@ typedef yaal::hcore::HHashMap<yaal::hcore::HString,
  * HDataProcess enables rapid building of database connected TUI
  * applications with simple XML resource files.
  */
-class HDataProcess : public hconsole::HTUIProcess
-	{
+class HDataProcess : public hconsole::HTUIProcess {
 protected:
 	typedef HDataProcess this_type;
 	typedef HTUIProcess base_type;
@@ -93,7 +90,7 @@ private:
 private:
 	HDataProcess( HDataProcess const& );
 	HDataProcess& operator = ( HDataProcess const& );
-	};
+};
 
 }
 

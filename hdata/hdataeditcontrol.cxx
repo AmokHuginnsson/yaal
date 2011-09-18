@@ -34,11 +34,9 @@ using namespace yaal::hcore;
 using namespace yaal::hconsole;
 using namespace yaal::dbwrapper;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 HDataEditControl::HDataEditControl( HDataWindow * parent_,
 		int row_, int column_, int height_, int width_,
@@ -54,20 +52,17 @@ HDataEditControl::HDataEditControl( HDataWindow * parent_,
 										mask_, replace_, multiLine_,
 										readOnly_, rightAligned_,
 										password_, maxHistoryLevel_ ),
-									HDataControl()
-	{
+									HDataControl() {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-int HDataEditControl::do_process_input ( int code_ )
-	{
+int HDataEditControl::do_process_input ( int code_ ) {
 	M_PROLOG
 	bool noChange = false;
 	HDataWindow * window = NULL;
-	switch ( code_ )
-		{
+	switch ( code_ ) {
 		case ( '\t' ):
 		case ( '\r' ):
 		case ( KEY_CODES::LEFT ):
@@ -98,17 +93,16 @@ int HDataEditControl::do_process_input ( int code_ )
 		break;
 		default:
 		break;
-		}
+	}
 	code_ = HEditControl::do_process_input ( code_ );
-	if ( ! ( code_ || noChange ) )
-		{
+	if ( ! ( code_ || noChange ) ) {
 		window = dynamic_cast<HDataWindow*>( _parent );
 		M_ASSERT ( window );
 		window->set_modified();
-		}
+	}
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
 }
 

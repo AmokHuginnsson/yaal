@@ -39,11 +39,9 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 HControl::HControl( HWindow* parent_, int row_, int column_,
 										 int height_, int width_, char const* label_ )
@@ -54,42 +52,35 @@ HControl::HControl( HWindow* parent_, int row_, int column_,
 	_height( height_ ), _width( width_ ), _rowRaw( 0 ),
 	_columnRaw( 0 ), _heightRaw( 0 ), _widthRaw( 0 ),
 	_label( label_ ), _varTmpBuffer(), _parent( parent_ ),
-	_labelLength( 0 ), _shortcutIndex( 0 ), _valid( false ), _needRepaint( false )
-	{
+	_labelLength( 0 ), _shortcutIndex( 0 ), _valid( false ), _needRepaint( false ) {
 	M_PROLOG
 	if ( ! HConsole::get_instance().is_enabled() )
 		M_THROW ( "not in curses mode.", errno );
 	if ( ! parent_ )
 		M_THROW ( "no parent window.", reinterpret_cast<int long>( parent_ ) );
 	_shortcutIndex = static_cast<int>( _label.find( '&' ) );
-	if ( _shortcutIndex > -1 )
-		{
+	if ( _shortcutIndex > -1 ) {
 		_label.set_at( _shortcutIndex, 0 );
 		_label += label_ + _shortcutIndex + 1;
-		}
-	else
+	} else
 		_shortcutIndex = 0;
 	_labelLength = label_ ? static_cast<int>( _label.get_length() ) : 0;
-	if ( _labelLength )
-		{
+	if ( _labelLength ) {
 		if ( _label[ _labelLength - 1 ] != '\n' )
 			_singleLine = true;
-		else
-			{
+		else {
 			_singleLine = false;
 			_label.set_at( -- _labelLength, 0 );
-			}
 		}
-	else
+	} else
 		_singleLine = true;
 	_parent->add_control( HControl::ptr_t ( this ),
 				KEY<>::meta_r ( _label [ _shortcutIndex ] ) );
 	return;
 	M_EPILOG
-	}
+}
 
-HControl::~HControl( void )
-	{
+HControl::~HControl( void ) {
 	M_PROLOG
 #ifdef __DEBUGGER_BABUNI__
 	log << "destroing control: " << _label << endl;
@@ -97,10 +88,9 @@ HControl::~HControl( void )
 	_parent = NULL;
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HControl::enable( bool enable_ )
-	{
+void HControl::enable( bool enable_ ) {
 	M_PROLOG
 	_enabled = enable_;
 	if ( ! _enabled )
@@ -108,28 +98,25 @@ void HControl::enable( bool enable_ )
 	schedule_refresh();
 	return;
 	M_EPILOG
-	}
+}
 
-int HControl::process_input( int code_ )
-	{
+int HControl::process_input( int code_ ) {
 	M_PROLOG
 	if ( ! _valid )
 		update();
 	return ( do_process_input( code_ ) );
 	M_EPILOG
-	}
+}
 
-int HControl::do_process_input ( int code_ )
-	{
+int HControl::do_process_input ( int code_ ) {
 	M_PROLOG
 	if ( ! _focused )
 		M_THROW( "input in control without focus", code_ );
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
-int HControl::set_focus( char shortCut_ )
-	{
+int HControl::set_focus( char shortCut_ ) {
 	M_PROLOG
 	if ( ! _enabled )
 		return ( 1 );
@@ -142,10 +129,9 @@ int HControl::set_focus( char shortCut_ )
 		schedule_refresh();
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HControl::kill_focus ( void )
-	{
+int HControl::kill_focus ( void ) {
 	M_PROLOG
 	if ( ! _focused )
 		return ( 1 );
@@ -153,62 +139,55 @@ int HControl::kill_focus ( void )
 	schedule_refresh();
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-void HControl::refresh( void )
-	{
+void HControl::refresh( void ) {
 	M_PROLOG
 	if ( ! _valid )
 		update();
 	do_refresh();
 	return;
 	M_EPILOG
-	}
+}
 
-void HControl::update( void )
-	{
+void HControl::update( void ) {
 	M_PROLOG
 	do_update();
 	_valid = true;
 	return;
 	M_EPILOG
-	}
+}
 
-void HControl::set( HInfo const & )
-	{
+void HControl::set( HInfo const & ) {
 	M_PROLOG
 	if ( errno || ! errno )
 		M_THROW ( "Abstract method called!", errno );
 	return;
 	M_EPILOG
-	}
+}
 
-HInfo HControl::get( void )
-	{
+HInfo HControl::get( void ) {
 	M_PROLOG
 	HInfo info;
 	return ( info );
 	M_EPILOG
-	}
+}
 
-bool HControl::is_searchable( void )
-	{
+bool HControl::is_searchable( void ) {
 	M_PROLOG
 	return ( false );
 	M_EPILOG
-	}
+}
 
-void HControl::draw_label( void )
-	{
+void HControl::draw_label( void ) {
 	M_PROLOG
 	do_draw_label();
 	_needRepaint = false;
 	return;
 	M_EPILOG
-	}
+}
 
-void HControl::do_draw_label( void )
-	{
+void HControl::do_draw_label( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	schedule_refresh();
@@ -221,11 +200,10 @@ void HControl::do_draw_label( void )
 	_widthRaw = ( _width > 0 ) ? _width
 		: cons.get_width() + _width - _columnRaw;
 /* done */
-	if ( ! _drawLabel )
-		{
+	if ( ! _drawLabel ) {
 		set_attr_data();
 		return;
-		}
+	}
 	set_attr_label();
 	M_ENSURE( cons.c_mvprintf( _rowRaw, _columnRaw, _label.raw() ) != C_ERR );
 	set_attr_shortcut();
@@ -238,11 +216,10 @@ void HControl::do_draw_label( void )
 		_rowRaw ++, _heightRaw --;
 	return;
 	M_EPILOG
-	}
+}
 
 void HControl::set_attributes( int attributeDisabled_,
-		int attributeEnabled_, int attributeFocused_ )
-	{
+		int attributeEnabled_, int attributeFocused_ ) {
 	M_PROLOG
 	if ( attributeDisabled_ == DEFAULT_ATTRS )
 		_attributeDisabled = _attributeDisabled_;
@@ -259,10 +236,9 @@ void HControl::set_attributes( int attributeDisabled_,
 	schedule_refresh();
 	return;
 	M_EPILOG
-	}
+}
 
-void HControl::move( int row_, int column_, int height_, int width_ )
-	{
+void HControl::move( int row_, int column_, int height_, int width_ ) {
 	M_PROLOG
 	_row = row_;
 	_column = column_;
@@ -271,41 +247,36 @@ void HControl::move( int row_, int column_, int height_, int width_ )
 	schedule_refresh();
 	return;
 	M_EPILOG
-	}
+}
 
-int HControl::click( mouse::OMouse& mouse_ )
-	{
+int HControl::click( mouse::OMouse& mouse_ ) {
 	M_PROLOG
 	if ( ! _valid )
 		update();
 	return ( do_click( mouse_ ) );
 	M_EPILOG
-	}
+}
 
-int HControl::do_click( mouse::OMouse& )
-	{
+int HControl::do_click( mouse::OMouse& ) {
 	M_PROLOG
 	if ( _focused )
 		return ( 1 );
 	set_focus();
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-void HControl::do_update( void )
-	{
+void HControl::do_update( void ) {
 	return;
-	}
+}
 
-bool HControl::hit_test( int row_, int column_ ) const
-	{
+bool HControl::hit_test( int row_, int column_ ) const {
 	M_PROLOG
 	return ( do_hit_test( row_, column_ ) );
 	M_EPILOG
-	}
+}
 
-bool HControl::do_hit_test( int row_, int column_ ) const
-	{
+bool HControl::do_hit_test( int row_, int column_ ) const {
 	M_PROLOG
 	if ( ( row_ < _rowRaw ) || ( row_ > ( _rowRaw + _heightRaw ) ) )
 		return ( false );
@@ -314,76 +285,66 @@ bool HControl::do_hit_test( int row_, int column_ ) const
 		return ( false );
 	return ( true );
 	M_EPILOG
-	}
+}
 
-int HControl::attr_label( void ) const
-	{
+int HControl::attr_label( void ) const {
 	M_PROLOG
 	return ( _enabled ? ( _focused ? _attributeFocused >> 8 : _attributeEnabled >> 8 ) : _attributeDisabled >> 8 );
 	M_EPILOG
-	}
+}
 
-int HControl::attr_shortcut( void ) const
-	{
+int HControl::attr_shortcut( void ) const {
 	M_PROLOG
 	return ( ! _enabled ? ( ! _focused ? _attributeFocused >> 8 : _attributeEnabled >> 8 ) : _attributeDisabled >> 8 );
 	M_EPILOG
-	}
+}
 
-int HControl::attr_data( void ) const
-	{
+int HControl::attr_data( void ) const {
 	M_PROLOG
 	return ( _enabled ? ( _focused ? _attributeFocused : _attributeEnabled ) : _attributeDisabled );
 	M_EPILOG
-	}
+}
 
-void HControl::set_attr_label( void ) const
-	{
+void HControl::set_attr_label( void ) const {
 	M_PROLOG
 	HConsole::get_instance().set_attr( attr_label() );
 	return;
 	M_EPILOG
-	}
+}
 
-void HControl::set_attr_shortcut( void ) const
-	{
+void HControl::set_attr_shortcut( void ) const {
 	M_PROLOG
 	HConsole::get_instance().set_attr( attr_shortcut() );
 	return;
 	M_EPILOG
-	}
+}
 
-void HControl::set_attr_data( void ) const
-	{
+void HControl::set_attr_data( void ) const {
 	M_PROLOG
 	HConsole::get_instance().set_attr( attr_data() );
 	return;
 	M_EPILOG
-	}
+}
 
-void HControl::set_draw_label( bool drawLabel_ )
-	{
+void HControl::set_draw_label( bool drawLabel_ ) {
 	_drawLabel = drawLabel_;
 	return;
-	}
+}
 
-void HControl::schedule_refresh( void )
-	{
+void HControl::schedule_refresh( void ) {
 	_needRepaint = true;
 	_needRepaint_ = true;
 	return;
-	}
+}
 
-void HControl::invalidate( void )
-	{
+void HControl::invalidate( void ) {
 	_valid = false;
 	return;
-	}
+}
 
-bool HControl::need_repaint( void ) const
-	{
+bool HControl::need_repaint( void ) const {
 	return ( _needRepaint );
-	}
+}
 
 }
 

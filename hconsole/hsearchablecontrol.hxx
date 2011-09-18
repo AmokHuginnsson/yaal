@@ -33,16 +33,13 @@ Copyright:
 #include "hcore/hpattern.hxx"
 #include "hconsole/hcontrol.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief Provision H*Control classes with search capabilities.
  */
-class HSearchableControl : public virtual HControl
-	{
+class HSearchableControl : public virtual HControl {
 public:
 	typedef HSearchableControl this_type;
 	typedef HControl base_type;
@@ -60,7 +57,7 @@ protected:
 	void highlight( int, int, int, bool );
 	virtual void go_to_match( void ) = 0;
 	virtual void go_to_match_previous( void ) = 0;
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HSearchableControl, HControlException> HSearchableControlException;
 

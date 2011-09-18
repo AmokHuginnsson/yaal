@@ -34,11 +34,9 @@ Copyright:
 #include "hcore/memory.hxx"
 #include "hcore/hpair.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 extern M_YAAL_HCORE_PUBLIC_API char const * const _errMsgHSBBSTree_ [ ];
 
@@ -48,49 +46,41 @@ extern M_YAAL_HCORE_PUBLIC_API char const * const _errMsgHSBBSTree_ [ ];
  * Implementation of core engine for HMap<> and HSet<> classes.
  * HSBBSTree is not ment to be used directly.
  */
-class HSBBSTree
-	{
+class HSBBSTree {
 	typedef HSBBSTree this_type;
 public:
 	/*! \brief HSBBSTree operation error types.
 	 */
-	struct ERROR
-		{
-		typedef enum
-			{
+	struct ERROR {
+		typedef enum {
 			OK = 0,
 			NON_EXISTING_KEY,
 			NIL_ITERATOR
-			} error_t;
-		};
+		} error_t;
+	};
 	class HIterator;
 private:
 	class HAbstractNode;
-	struct ONodePtr
-		{
+	struct ONodePtr {
 		HAbstractNode* _node;
 		bool _exists;
 		ONodePtr( void ) : _node( NULL ), _exists( false ) { }
 		ONodePtr( ONodePtr const& np ) : _node( np._node ), _exists( np._exists ) {}
-		ONodePtr& operator = ( ONodePtr const& np )
-			{
-			if ( &np != this )
-				{
+		ONodePtr& operator = ( ONodePtr const& np ) {
+			if ( &np != this ) {
 				_node = np._node;
 				_exists = np._exists;
-				}
-			return ( *this );
 			}
-		};
+			return ( *this );
+		}
+	};
 	template<typename tType>
 	class HNode;
-	class HAbstractNode
-		{
-		typedef enum
-			{
+	class HAbstractNode {
+		typedef enum {
 			RED,
 			BLACK
-			} color_t;
+		} color_t;
 		color_t _color;
 		HAbstractNode* _parent;
 		HAbstractNode* _left;
@@ -105,7 +95,7 @@ private:
 		friend class HSBBSTree::HIterator;
 		template<typename any_t>
 		friend class HNode;
-		};
+	};
 	HAbstractNode* _root;
 	int long _size;
 public:
@@ -140,12 +130,11 @@ private:
 	void rotate_right( HAbstractNode* );
 	HSBBSTree( HSBBSTree const& );
 	HSBBSTree& operator = ( HSBBSTree const& );
-	};
+};
 
 /*! \brief Iterator for HSBBSTree data structure.
  */
-class HSBBSTree::HIterator
-	{
+class HSBBSTree::HIterator {
 	HSBBSTree const* _owner;
 	HAbstractNode* _current;
 public:
@@ -163,13 +152,12 @@ public:
 private:
 	friend class HSBBSTree;
 	explicit HIterator( HSBBSTree const*, HAbstractNode* const );
-	};
+};
 
 /*! \brief True HSBBSTree contents.
  */
 template<typename tType>
-class	HSBBSTree::HNode : public HSBBSTree::HAbstractNode
-	{
+class	HSBBSTree::HNode : public HSBBSTree::HAbstractNode {
 	tType _key;
 	HNode( tType const& );
 	HNode( HNode const& );
@@ -178,44 +166,39 @@ class	HSBBSTree::HNode : public HSBBSTree::HAbstractNode
 	friend class HSBBSTree;
 	friend tType& HSBBSTree::HIterator::get<tType>( void );
 	friend tType const& HSBBSTree::HIterator::get<tType>( void ) const;
-	};
+};
 
 template<typename tType>
-tType& HSBBSTree::HIterator::get( void )
-	{
+tType& HSBBSTree::HIterator::get( void ) {
 	M_PROLOG
 	M_ASSERT( _current );
 	return ( static_cast<HNode<tType>*>( _current )->_key );
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-tType const& HSBBSTree::HIterator::get( void ) const
-	{
+tType const& HSBBSTree::HIterator::get( void ) const {
 	M_PROLOG
 	M_ASSERT( _current );
 	return ( static_cast<HNode<tType>*>( _current )->_key );
 	M_EPILOG
-	}
+}
 
 template<typename tType>
 HSBBSTree::HNode<tType>::HNode( tType const& key_ )
-	: HAbstractNode(), _key( key_ )
-	{
+	: HAbstractNode(), _key( key_ ) {
 	return;
-	}
+}
 
 template<typename tType>
-HSBBSTree::HAbstractNode* HSBBSTree::HNode<tType>::clone( void ) const
-	{
+HSBBSTree::HAbstractNode* HSBBSTree::HNode<tType>::clone( void ) const {
 	M_PROLOG
 	return ( new ( memory::yaal ) HNode( _key ) );
 	M_EPILOG
-	}
+}
 
 template<typename tType, typename ttType>
-HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& key_ )
-	{
+HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& key_ ) {
 	M_PROLOG
 	ONodePtr nodeHolder;
 	HNode<tType>* node( NULL );
@@ -223,109 +206,90 @@ HPair<HSBBSTree::HIterator, bool> HSBBSTree::insert( tType const& key_ )
 		nodeHolder = find_node<tType, tType, ttType>( key_ );
 	if ( nodeHolder._exists )
 		node = static_cast<HNode<tType>*>( nodeHolder._node );
-	else
-		{
+	else {
 		node = new ( memory::yaal ) HNode<tType>( key_ );
 		++ _size;
-		if ( _root )
-			{
+		if ( _root ) {
 			node->_parent = nodeHolder._node;
-			if ( ttType::less( key_, static_cast<HNode<tType>*>( nodeHolder._node )->_key ) )
-				{
+			if ( ttType::less( key_, static_cast<HNode<tType>*>( nodeHolder._node )->_key ) ) {
 				M_ASSERT( ! nodeHolder._node->_left );
 				nodeHolder._node->_left = node;
-				}
-			else
-				{
+			} else {
 				M_ASSERT( ! nodeHolder._node->_right );
 				nodeHolder._node->_right = node;
-				}
-			insert_rebalance( node );
 			}
-		else
-			{
+			insert_rebalance( node );
+		} else {
 			_root = node;
 			_root->_color = HAbstractNode::BLACK;
-			}
 		}
+	}
 	M_ASSERT( ( ! _root ) || ( _root->_parent == NULL ) );
 	M_ASSERT( ( ! _root ) || ( _root->_color == HAbstractNode::BLACK ) );
 	return ( make_pair( HIterator( this, node ), ! nodeHolder._exists ) );
 	M_EPILOG
-	}
+}
 
 template<typename tType, typename ttType, typename tttType>
-HSBBSTree::HIterator HSBBSTree::find( ttType const& key_ ) const
-	{
+HSBBSTree::HIterator HSBBSTree::find( ttType const& key_ ) const {
 	M_PROLOG
 	ONodePtr nodePtr = find_node<tType, ttType, tttType>( key_ );
 	return ( HIterator( this, nodePtr._exists ? nodePtr._node : NULL ) );
 	M_EPILOG
-	}
+}
 
 template<typename tType, typename ttType, typename tttType>
-HSBBSTree::HIterator HSBBSTree::lower_bound( ttType const& key_ ) const
-	{
+HSBBSTree::HIterator HSBBSTree::lower_bound( ttType const& key_ ) const {
 	M_PROLOG
 	HIterator it( this, NULL );
-	if ( _root )
-		{
+	if ( _root ) {
 		ONodePtr nodeHolder( find_node<tType, ttType, tttType>( key_ ) );
 		it._current = nodeHolder._node;
 		if ( nodeHolder._node && ! nodeHolder._exists && tttType::less( static_cast<HNode<tType>*>( nodeHolder._node )->_key, key_ ) )
 			++ it;
-		}
+	}
 	return ( it );
 	M_EPILOG
-	}
+}
 
 template<typename tType, typename ttType, typename tttType>
-HSBBSTree::HIterator HSBBSTree::upper_bound( ttType const& key_ ) const
-	{
+HSBBSTree::HIterator HSBBSTree::upper_bound( ttType const& key_ ) const {
 	M_PROLOG
 	HIterator it( this, NULL );
-	if ( _root )
-		{
+	if ( _root ) {
 		ONodePtr nodeHolder( find_node<tType, ttType, tttType>( key_ ) );
 		it._current = nodeHolder._node;
 		if ( nodeHolder._node && ( nodeHolder._exists || tttType::less( static_cast<HNode<tType>*>( nodeHolder._node )->_key, key_ ) ) )
 			++ it;
-		}
+	}
 	return ( it );
 	M_EPILOG
-	}
+}
 
 template<typename tType, typename ttType, typename tttType>
-typename HSBBSTree::ONodePtr HSBBSTree::find_node( ttType const& key_ ) const
-	{
+typename HSBBSTree::ONodePtr HSBBSTree::find_node( ttType const& key_ ) const {
 	M_PROLOG
 	ONodePtr nodePtr;
-	if ( _root )
-		{
+	if ( _root ) {
 		nodePtr._node = _root;
-		while ( ! nodePtr._exists )
-			{
-			if ( tttType::less( key_, static_cast<HNode<tType>*>( nodePtr._node )->_key ) )
-				{
+		while ( ! nodePtr._exists ) {
+			if ( tttType::less( key_, static_cast<HNode<tType>*>( nodePtr._node )->_key ) ) {
 				if ( nodePtr._node->_left )
 					nodePtr._node = nodePtr._node->_left;
 				else
 					break;
-				}
-			else if ( tttType::less( static_cast<HNode<tType>*>( nodePtr._node )->_key, key_ ) )
-				{
+			} else if ( tttType::less( static_cast<HNode<tType>*>( nodePtr._node )->_key, key_ ) ) {
 				if ( nodePtr._node->_right )
 					nodePtr._node = nodePtr._node->_right;
 				else
 					break;
-				}
-			else
+			} else
 				nodePtr._exists = true;
-			}
 		}
+	}
 	return ( nodePtr );
 	M_EPILOG
-	}
+}
 
 }
 

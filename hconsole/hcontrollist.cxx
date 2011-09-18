@@ -32,55 +32,46 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
-HControlList::HControlList( model_t::cyclic_iterator& focused_ ) : _list(), _focused( focused_ )
-	{
+HControlList::HControlList( model_t::cyclic_iterator& focused_ ) : _list(), _focused( focused_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HControlList::next_enabled( char shorcut_ )
-	{
+void HControlList::next_enabled( char shorcut_ ) {
 	M_PROLOG
 	bool loop = true;
 	HControlList::model_t::cyclic_iterator it = _focused;
-	do
-		{
+	do {
 		++ _focused;
 		if ( dynamic_cast<HStatusBarControl*>( &(*(*_focused))) )
 			continue;
 		loop = (*_focused)->set_focus( shorcut_ ) ? true : false;
 		if ( _focused == it )
 			loop = false;
-		}
-	while ( loop );
-	if ( _focused != it )
-		{
+	} while ( loop );
+	if ( _focused != it ) {
 		(*it)->kill_focus();
 		(*_focused)->set_focus( -1 );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HControlList::add_control( HControl::ptr_t control_ )
-	{
+void HControlList::add_control( HControl::ptr_t control_ ) {
 	M_PROLOG
 	_list.push_back( control_ );
 	if ( _focused == _list.end() )
 		_focused = _list.rbegin().base();
 	return;
 	M_EPILOG
-	}
+}
 
-void HControlList::refresh_all( bool force_ )
-	{
+void HControlList::refresh_all( bool force_ ) {
 	M_PROLOG
 	for ( model_t::iterator it = _list.begin();
 			it != _list.end(); ++ it )
@@ -90,20 +81,18 @@ void HControlList::refresh_all( bool force_ )
 		(*_focused)->refresh();
 	return;
 	M_EPILOG
-	}
+}
 
-void HControlList::update_all( void )
-	{
+void HControlList::update_all( void ) {
 	M_PROLOG
 	for ( model_t::iterator it = _list.begin();
 			it != _list.end(); ++ it )
 			(*it)->update();
 	return;
 	M_EPILOG
-	}
+}
 
-int HControlList::hit_test_all( mouse::OMouse& mouse_ )
-	{
+int HControlList::hit_test_all( mouse::OMouse& mouse_ ) {
 	M_PROLOG
 	if ( (*_focused)->hit_test( mouse_._row, mouse_._column ) )
 		return ( (*_focused)->click( mouse_ ) );
@@ -113,61 +102,53 @@ int HControlList::hit_test_all( mouse::OMouse& mouse_ )
 			return ( (*it)->click( mouse_ ) );
 	return( 0 );
 	M_EPILOG
-	}
+}
 
-HControl* HControlList::get_control_by_no( int offset_ )
-	{
+HControl* HControlList::get_control_by_no( int offset_ ) {
 	M_PROLOG
 	model_t::iterator it = _list.begin();
 	while ( offset_ -- > 0 )
 		++ it;
 	return ( &**it );
 	M_EPILOG
-	}
+}
 
-void HControlList::pop_front( void )
-	{
+void HControlList::pop_front( void ) {
 	M_PROLOG
 	_list.pop_front();
 	M_EPILOG
-	}
+}
 
-void HControlList::select( HControl const* control_ )
-	{
+void HControlList::select( HControl const* control_ ) {
 	M_PROLOG
-	if ( (*_focused) != control_ )
-		{
+	if ( (*_focused) != control_ ) {
 		model_t::iterator it( _list.begin() );
-		for ( model_t::iterator end( _list.end() ); it != end; ++ it )
-			{
-			if ( (*it) == control_ )
-				{
+		for ( model_t::iterator end( _list.end() ); it != end; ++ it ) {
+			if ( (*it) == control_ ) {
 				_focused = it;
 				break;
-				}
 			}
+		}
 		if ( it == _list.end() )
 			M_THROW( "bogus object", reinterpret_cast<int long>( control_ ) );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HControlList::select( HControl::ptr_t const& control_ )
-	{
+void HControlList::select( HControl::ptr_t const& control_ ) {
 	M_PROLOG
 	select( control_.raw() );
 	return;
 	M_EPILOG
-	}
+}
 
-void HControlList::exchange( int former_, int latter_ )
-	{
+void HControlList::exchange( int former_, int latter_ ) {
 	M_PROLOG
 	_list.exchange( _list.n_th( former_ + 1 ), _list.n_th( latter_ + 1 ) );
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

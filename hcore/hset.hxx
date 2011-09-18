@@ -33,17 +33,14 @@ Copyright:
 #include "hcore/hsbbstree.hxx"
 #include "hcore/iterator.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief HSBBSTree util, a helper for HSet<> instatiations.
  */
 template<typename type_t>
-struct set_helper
-{
+struct set_helper {
 
 template<typename key_t>
 inline static bool less( key_t const& left, key_t const& right )
@@ -60,8 +57,7 @@ inline static bool less( key_t const& left, key_t const& right )
  * \tparam helper_t - HSBBSTree plugable code.
  */
 template<typename type_t, typename helper_t = set_helper<type_t> >
-class HSet
-	{
+class HSet {
 public:
 	class HIterator;
 	typedef type_t value_type;
@@ -76,31 +72,27 @@ private:
 public:
 	HSet( void ) : _engine() {}
 	template<typename iterator_t>
-	HSet( iterator_t first, iterator_t last ) : _engine()
-		{
+	HSet( iterator_t first, iterator_t last ) : _engine() {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
-		}
-	HSet( HSet const& source )
-		{
+	}
+	HSet( HSet const& source ) {
 		M_PROLOG
 		_engine.copy_from( source._engine );
 		return;
 		M_EPILOG
-		}
-	HSet& operator = ( HSet const& set_ )
-		{
+	}
+	HSet& operator = ( HSet const& set_ ) {
 		M_PROLOG
-		if ( &set_ != this )
-			{
+		if ( &set_ != this ) {
 			HSet tmp( set_ );
 			swap( tmp );
-			}
+		}
 		return ( *this );
 		M_EPILOG
-		}
+	}
 	int long size( void ) const
 		{ return ( get_size() ); }
 	int long get_size( void ) const
@@ -109,59 +101,52 @@ public:
 		{ return ( is_empty() );	}
 	bool is_empty( void ) const
 		{ return ( _engine.is_empty() );	}
-	insert_result insert( value_type const& elem )
-		{
+	insert_result insert( value_type const& elem ) {
 		M_PROLOG
 		HPair<HSBBSTree::HIterator, bool> p = _engine.insert<value_type, helper_t>( elem );
 		return ( make_pair( HIterator( p.first ), p.second ) );
 		M_EPILOG
-		}
+	}
 	template<typename iter_t>
-	void insert( iter_t i, iter_t endIt )
-		{
+	void insert( iter_t i, iter_t endIt ) {
 		M_PROLOG
 		for ( ; i != endIt; ++ i )
 			insert( *i );
 		return;
 		M_EPILOG
-		}
-	int long count( value_type const& elem ) const
-		{
+	}
+	int long count( value_type const& elem ) const {
 		M_PROLOG
 		HIterator it( find( elem ) );
 		return ( it != end() ? 1 : 0 );
 		M_EPILOG
-		}
-	int long erase( value_type const& elem )
-		{
+	}
+	int long erase( value_type const& elem ) {
 		M_PROLOG
 		HIterator it( find( elem ) );
 		int long erased( 0 );
-		if ( it != end() )
-			{
+		if ( it != end() ) {
 			_engine.remove( it._engine );
 			erased = 1;
-			}
+		}
 		return ( erased );
 		M_EPILOG
-		}
-	HIterator erase( HIterator const& it )
-		{
+	}
+	HIterator erase( HIterator const& it ) {
 		M_PROLOG
 		HIterator newIt( it );
 		++ newIt;
 		_engine.remove( it._engine );
 		return ( newIt );
 		M_EPILOG
-		}
-	void erase( HIterator first_, HIterator const& last_ )
-		{
+	}
+	void erase( HIterator first_, HIterator const& last_ ) {
 		M_PROLOG
 		while ( first_ != last_ )
 			first_ = erase( first_ );
 		return;
 		M_EPILOG
-		}
+	}
 	HIterator find( value_type const& e ) const
 		{ return ( HIterator( _engine.find<value_type, value_type, helper_t>( e ) ) ); }
 	HIterator lower_bound( value_type const& e ) const
@@ -178,25 +163,22 @@ public:
 		{ return ( begin() ); }
 	void clear( void )
 		{ _engine.clear(); }
-	void swap( HSet<value_type, helper_t>& other )
-		{
-		if ( &other != this )
-			{
+	void swap( HSet<value_type, helper_t>& other ) {
+		if ( &other != this ) {
 			using yaal::swap;
 			_engine.swap( other._engine );
-			}
 		}
+	}
 	bool operator == ( HSet const& set_ ) const
 		{ M_PROLOG return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 	bool operator < ( HSet const& set_ ) const
 		{ M_PROLOG return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
-	};
+};
 
 /*! \brief Iterator for HSet<> data structure.
  */
 template<typename value_type, typename helper_t = set_helper<value_type> >
-class HSet<value_type, helper_t>::HIterator : public iterator_interface<value_type, iterator_category::forward>
-	{
+class HSet<value_type, helper_t>::HIterator : public iterator_interface<value_type, iterator_category::forward> {
 	HSBBSTree::HIterator _engine;
 public:
 	typedef iterator_interface<value_type, iterator_category::forward> base_type;
@@ -204,34 +186,29 @@ public:
 	typedef value_type const* pointer;
 	HIterator( void ) : base_type(), _engine() {}
 	HIterator( HIterator const& it_ ) : base_type(), _engine( it_._engine ) {}
-	HIterator& operator = ( HIterator const& it_ )
-		{
+	HIterator& operator = ( HIterator const& it_ ) {
 		if ( &it_ != this )
 			_engine = it_._engine;
 		return ( *this );
-		}
-	HIterator& operator ++ ( void )
-		{
+	}
+	HIterator& operator ++ ( void ) {
 		++ _engine;
 		return ( *this );
-		}
-	HIterator const operator ++ ( int )
-		{
+	}
+	HIterator const operator ++ ( int ) {
 		HIterator it( _engine );
 		++ _engine;
 		return ( it );
-		}
-	HIterator& operator -- ( void )
-		{
+	}
+	HIterator& operator -- ( void ) {
 		-- _engine;
 		return ( *this );
-		}
-	HIterator const operator -- ( int )
-		{
+	}
+	HIterator const operator -- ( int ) {
 		HIterator it( _engine );
 		-- _engine;
 		return ( it );
-		}
+	}
 	value_type const& operator * ( void ) const
 		{	return ( _engine.get<value_type>() );	}
 	value_type const* operator -> ( void ) const
@@ -244,7 +221,7 @@ private:
 	friend class HSet<value_type, helper_t>;
 	explicit HIterator( HSBBSTree::HIterator const& it )
 		: base_type(), _engine( it ) {}
-	};
+};
 
 }
 

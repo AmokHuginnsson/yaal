@@ -35,16 +35,13 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hstreaminterface.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Low-level run-time information regarding program execution.
  */
-struct execution_info
-	{
+struct execution_info {
 	typedef HList<HString> strings_t;
 	typedef HPointer<strings_t> strings_ptr_t;
 	/*! \brief Get current call stack information.
@@ -53,7 +50,7 @@ struct execution_info
 	 * \return Current call stack as list of strings.
 	 */
 	static strings_ptr_t get_call_stack( int frames );
-	};
+};
 
 /*! \brief Print current call stack on the console.
  *

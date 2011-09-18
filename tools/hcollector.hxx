@@ -33,24 +33,20 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "tools/hserial.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Collector device interface.
  */
-class HCollector : public HSerial
-	{
+class HCollector : public HSerial {
 protected:
 	typedef HCollector this_type;
 	typedef HSerial base_type;
 public:
 	/*! \brief Protocol description for Collector device.
 	 */
-	struct PROTOCOL
-		{
+	struct PROTOCOL {
 		static char const* const SYN;
 		static char const* const ACK;
 		static char const* const DTA; /* warrning! no endline */
@@ -58,7 +54,7 @@ public:
 																							 so sizeof() retruns 4 */
 		static char const* const ERR;
 		static int const RECV_BUF_SIZE = 8; /* 5 should be enought but you never know */
-		};
+	};
 private:
 	int			_lines;
 	char		_readBuf [ PROTOCOL::RECV_BUF_SIZE + 1 /* for \0 - the terminator */ ];
@@ -72,7 +68,7 @@ public:
 	int read_collector( void ( * )( char const* const, int ) );
 private:
 	bool test_char( char const*, int ) const;
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HCollector, HSerialException> HCollectorException;
 

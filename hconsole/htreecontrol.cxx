@@ -34,47 +34,40 @@ M_VCSID( "$Id: "__TID__" $" )
 using namespace yaal::hcore;
 using namespace yaal::hconsole::mouse;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 HTreeControl::HNodeControl::HNodeControl( int cols )
 						: _unfolded( false ),
-						_rowRaw( 0 ), _columnRaw( 0 ), _widthRaw( 0 ), _data( cols )
-	{
+						_rowRaw( 0 ), _columnRaw( 0 ), _widthRaw( 0 ), _data( cols ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HTreeControl::HNodeControl::~HNodeControl( void )
-	{
+HTreeControl::HNodeControl::~HNodeControl( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HInfo& HTreeControl::HNodeControl::operator[]( int idx )
-	{
+HInfo& HTreeControl::HNodeControl::operator[]( int idx ) {
 	M_PROLOG
 	return ( _data[ idx ] );
 	M_EPILOG
-	}
+}
 
-void HTreeControl::expand( tree_t::node_t node )
-	{
+void HTreeControl::expand( tree_t::node_t node ) {
 	M_PROLOG
 	(**node)._unfolded = true;
 	if ( node->get_parent() )
 		expand( node->get_parent() );
 	return;
 	M_EPILOG
-	}
+}
 
-void HTreeControl::collapse( tree_t::node_t node )
-	{
+void HTreeControl::collapse( tree_t::node_t node ) {
 	M_PROLOG
 	(**node)._unfolded = false;
   if ( ! node->has_childs() )
@@ -83,51 +76,44 @@ void HTreeControl::collapse( tree_t::node_t node )
 		collapse( &*it );
 	return;
 	M_EPILOG
-	}
+}
 
-bool HTreeControl::HNodeControl::hit_test( int row_, int column_ ) const
-	{
+bool HTreeControl::HNodeControl::hit_test( int row_, int column_ ) const {
 	M_PROLOG
-	if ( _rowRaw == row_ )
-		{
-		if ( column_ >= _columnRaw )
-			{
+	if ( _rowRaw == row_ ) {
+		if ( column_ >= _columnRaw ) {
 			if ( column_ < ( _columnRaw + _widthRaw - 1 ) )
 				return ( true );
-			}
 		}
+	}
 	return ( false );
 	M_EPILOG
-	}
+}
 
-void HTreeControl::HNodeControl::click( int column_ )
-	{
+void HTreeControl::HNodeControl::click( int column_ ) {
 	M_PROLOG
 	if ( column_ == _columnRaw )
 		_unfolded = ! _unfolded;
 	return;
 	M_EPILOG
-	}
+}
 
 HTreeControl::HTreeControl( HWindow* parent_, int row_, int column_,
 		int height_, int width_, char const* label_ )
 	: HControl( parent_, row_, column_, height_, width_, label_ ),
-	_tree(), _selected( NULL )
-	{
+	_tree(), _selected( NULL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HTreeControl::~HTreeControl( void )
-	{
+HTreeControl::~HTreeControl( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HTreeControl::do_refresh( void )
-	{
+void HTreeControl::do_refresh( void ) {
 	M_PROLOG
 	int ctr = 0;
 	HConsole& cons = HConsole::get_instance();
@@ -142,16 +128,14 @@ void HTreeControl::do_refresh( void )
 		draw_node( _tree.get_root(), _rowRaw );
 	return;
 	M_EPILOG
-	}
+}
 
-int HTreeControl::draw_node( tree_t::node_t node_, int row_ )
-	{
+int HTreeControl::draw_node( tree_t::node_t node_, int row_ ) {
 	M_PROLOG
 	int row = row_;
 	HConsole& cons = HConsole::get_instance();
 	M_ASSERT( node_ );
-	if ( (**node_)._data.get_size() )
-		{
+	if ( (**node_)._data.get_size() ) {
 		row ++;
 		HInfo const& info = (**node_)._data[ 0 ];
 		HString const& str = info.get<HString const&>();
@@ -167,25 +151,22 @@ int HTreeControl::draw_node( tree_t::node_t node_, int row_ )
 			cons.set_attr( _enabled ? ( _focused ? ~_attributeFocused
 						: ~ _attributeEnabled ) : ~ _attributeDisabled );
 		cons.c_mvprintf( row, (**node_)._columnRaw + 1, str.raw() );
-		}
-	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) )
-		{
+	}
+	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
 		for ( tree_t::iterator it = node_->begin(); it != node_->end(); ++ it )
 			row = draw_node( &*it, row );
-		}
+	}
 	return ( row );
 	M_EPILOG
-	}
+}
 
-int HTreeControl::do_process_input( int code_ )
-	{
+int HTreeControl::do_process_input( int code_ ) {
 	M_PROLOG
 	bool wasFolded = false;
 	int errorCode = 0;
 	code_ = HControl::do_process_input( code_ );
 	tree_t::node_t node = _selected;
-	switch ( code_ )
-		{
+	switch ( code_ ) {
 		case ( KEY_CODES::HOME ):
 			node = _tree.get_root();
 			if ( node->has_childs() )
@@ -200,64 +181,51 @@ int HTreeControl::do_process_input( int code_ )
 			break;
 		case ( KEY_CODES::PAGE_DOWN ):
 			break;
-		case ( KEY_CODES::UP ):
-			{
+		case ( KEY_CODES::UP ): {
 			_selected = previous( node );
-			if ( _selected == node )
-				{
+			if ( _selected == node ) {
 				if ( node->get_level() > 1 ) 
 					_selected = node->get_parent();
-				}
-			else
-				{
+			} else {
 				node = _selected;
-				while ( (**node)._unfolded )
-					{
-					if ( node->has_childs() )
-						{
+				while ( (**node)._unfolded ) {
+					if ( node->has_childs() ) {
 						_selected = &*node->begin();
 						node = _selected;
 						_selected = previous( node, true );
 						node = _selected;
-						}
 					}
 				}
 			}
+		}
 		break;
-		case ( KEY_CODES::RIGHT ):
-			{
+		case ( KEY_CODES::RIGHT ): {
 			wasFolded = ! (**node)._unfolded;
-			if ( node->has_childs() )
-				{
+			if ( node->has_childs() ) {
 				(**node)._unfolded = true;
 				if ( wasFolded )
 					break;
-				}
 			}
+		}
 		/* when node is unfolded, right key works as down key */
-		case ( KEY_CODES::DOWN ):
-			{
-			if ( (**node)._unfolded )
-				{
+		case ( KEY_CODES::DOWN ): {
+			if ( (**node)._unfolded ) {
 				if ( node->has_childs() )
 					_selected = &*node->begin();
-				}
-			else
-				{
+			} else {
 				node = _selected;
 				node = next( node );
-				while ( ! node )
-					{
+				while ( ! node ) {
 					node = _selected->get_parent();
 					if ( ! node || ( node->get_level() < 1 ) )
 						break;
 					_selected = node;
 					node = next( node );
-					}
+				}
 				if ( node && ( node->get_level() > 0 ) )
 					_selected = node;
-				}
 			}
+		}
 		break;
 		case ( KEY_CODES::LEFT ):
 			if ( (**node)._unfolded && node->get_level() )
@@ -279,26 +247,23 @@ int HTreeControl::do_process_input( int code_ )
 		default :
 			errorCode = code_;
 		break;
-		}
+	}
 	code_ = errorCode;
-	if ( ! errorCode )
-		{
+	if ( ! errorCode ) {
 		schedule_refresh();
 		_parent->status_bar()->message( COLORS::FG_LIGHTGRAY, "" );
-		}
+	}
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
-int HTreeControl::set_focus( char shorcut_ )
-	{
+int HTreeControl::set_focus( char shorcut_ ) {
 	M_PROLOG
 	return ( HControl::set_focus ( shorcut_ ) );
 	M_EPILOG
-	}
+}
 
-int HTreeControl::do_click( OMouse& mouse_ )
-	{
+int HTreeControl::do_click( OMouse& mouse_ ) {
 	M_PROLOG
 	if ( ! HControl::do_click( mouse_ ) )
 		return ( 1 );
@@ -306,61 +271,51 @@ int HTreeControl::do_click( OMouse& mouse_ )
 		schedule_refresh();
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-bool HTreeControl::do_click( tree_t::node_t node_, OMouse& mouse_ )
-	{
+bool HTreeControl::do_click( tree_t::node_t node_, OMouse& mouse_ ) {
 	M_PROLOG
-	if ( (**node_).hit_test( mouse_._row, mouse_._column ) )
-		{
+	if ( (**node_).hit_test( mouse_._row, mouse_._column ) ) {
 		(**node_).click( mouse_._column );
 		_selected = node_;
 		return ( true );
-		}
-	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) )
-		{
+	}
+	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
 		for ( tree_t::iterator it = node_->begin(); it != node_->end(); ++ it )
 			if ( do_click( &*it, mouse_ ) )
 				return ( true );
-		}
+	}
 	return ( false );
 	M_EPILOG
-	}
+}
 
-HTreeControl::tree_t::node_t HTreeControl::previous( tree_t::node_t node, bool wrap )
-	{
+HTreeControl::tree_t::node_t HTreeControl::previous( tree_t::node_t node, bool wrap ) {
 	M_PROLOG
 	tree_t::node_t p = NULL;
 	tree_t::node_t parent = node->get_parent();
-	if ( parent )
-		{
+	if ( parent ) {
 		tree_t::iterator it;
 		for ( it = parent->begin(); ( it != parent->end() ) && ( &*it != node ); ++ it )
 			;
-		if ( it != parent->end() )
-			{
-			if ( it == parent->begin() )
-				{
+		if ( it != parent->end() ) {
+			if ( it == parent->begin() ) {
 				if ( wrap )
 					it = parent->rbegin().base();
-				}
-			else
+			} else
 				-- it;
-			}
+		}
 		if ( it != parent->end() )
 			p = &*it;
-		}
+	}
 	return ( p );
 	M_EPILOG
-	}
+}
 
-HTreeControl::tree_t::node_t HTreeControl::next( tree_t::node_t node )
-	{
+HTreeControl::tree_t::node_t HTreeControl::next( tree_t::node_t node ) {
 	M_PROLOG
 	tree_t::node_t parent = node->get_parent();
 	tree_t::node_t n = NULL;
-	if ( parent )
-		{
+	if ( parent ) {
 		tree_t::iterator it;
 		for ( it = parent->begin(); ( it != parent->end() ) && ( &*it != node ); ++ it )
 			;
@@ -368,10 +323,10 @@ HTreeControl::tree_t::node_t HTreeControl::next( tree_t::node_t node )
 			++ it;
 		if ( it != parent->end() )
 			n = &*it;
-		}
+	}
 	return ( n );
 	M_EPILOG
-	}
+}
 
 }
 

@@ -38,14 +38,12 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
 bool _isKilled_ = false;
 
 template<>
-bool is_hexadecimal( HString const& str_ )
-	{
+bool is_hexadecimal( HString const& str_ ) {
 	int long const len( str_.get_length() );
 	char const* str( str_.raw() );
 	if ( ( len >= 4 ) && ( str[ 0 ] == '-' ) ) /* -0x0 */
@@ -57,11 +55,10 @@ bool is_hexadecimal( HString const& str_ )
 			&& ( ( ( str[1] >= '0' ) && ( str[1] <= '9' ) )
 				|| ( ( str[1] >= 'a' ) && ( str[1] <= 'f' ) )
 				|| ( ( str[1] >= 'A' ) && ( str[1] <= 'F' ) ) ) );
-	}
+}
 
 template<>
-bool is_binary( HString const& str_ )
-	{
+bool is_binary( HString const& str_ ) {
 	int long const len( str_.get_length() );
 	char const* str( str_.raw() );
 	int offset( 0 );
@@ -69,28 +66,25 @@ bool is_binary( HString const& str_ )
 		++ offset;
 	int long binaryMark( str_.find_other_than( "01", offset ) );
 	return ( ( binaryMark > 0 ) && ( ( str[binaryMark] == 'b' ) || ( str[binaryMark] == 'B' ) ) );
-	}
+}
 
 template<>
-bool is_octal( HString const& str_ )
-	{
+bool is_octal( HString const& str_ ) {
 	bool octal( false );
-	if ( ! is_binary( str_ ) )
-		{
+	if ( ! is_binary( str_ ) ) {
 		int long const len( str_.get_length() );
 		char const* str( str_.raw() );
 		int offset( 0 );
 		if ( ( len >= 3 ) && ( str[ 0 ] == '-' ) ) /* -01 */
 			++ offset, ++ str;
 		octal = ( len >= 2 ) && ( str[0] == '0' ) && ( str[1] >= '0' ) && ( str[1] <= '7' );
-		}
-	return ( octal );
 	}
+	return ( octal );
+}
 
 static int const MAX_VALID_INTEGER_LENGTH = 32;
 
-HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ )
-	{
+HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ ) {
 	typedef LexicalCast this_type;
 	/* how to choose correct base:
 	 *
@@ -114,19 +108,16 @@ HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ 
 	int base( 10 );
 	char const* str( str_.raw() );
 	int long const len( str_.get_length() );
-	if ( is_hexadecimal( str_ ) )
-		{
+	if ( is_hexadecimal( str_ ) ) {
 		base = 16;
 		char* dst( alternate_ );
 		char const* src( str );
 		int offset( src[0] == '-' ? 2 : 1 );
-		if ( src[0] == '-' )
-			{
+		if ( src[0] == '-' ) {
 			*dst ++ = '-';
 			++ src;
-			}
-		if ( src[0] != '0' )
-			{
+		}
+		if ( src[0] != '0' ) {
 			*dst ++ = '0';
 			int long end( str_.find_other_than( "0123456789abcdefABCDEF", offset ) );
 			if ( end < 0 )
@@ -136,34 +127,30 @@ HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ 
 			strncpy( dst, src, end );
 			dst[end] = 0;
 			str = alternate_;
-			}
 		}
-	else if ( is_binary( str_ ) )
+	} else if ( is_binary( str_ ) )
 		base = 2;
 	else if ( is_octal( str_ ) )
 		base = 8;
-	else
-		{
+	else {
 		char const* src( str );
 		if ( ( len >= 2 ) && ( src[0] == '-' ) ) /* -0 */
 			++ src;
 		if ( ! len || ! src[0] || ( src[0] < '0' ) || ( src[0] > '9' ) )
 			M_THROW( "not a number: " + str_, 0 );
-		if ( src[0] == '0' )
-			{
+		if ( src[0] == '0' ) {
 			str = alternate_;
 			alternate_[0] = '0';
 			alternate_[1] = 0;
-			}
 		}
+	}
 	ret.first = base;
 	ret.second = str;
 	return ( ret );
-	}
+}
 
 template<>
-int long long unsigned lexical_cast( HString const& str_ )
-	{
+int long long unsigned lexical_cast( HString const& str_ ) {
 	M_PROLOG
 	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
@@ -173,35 +160,31 @@ int long long unsigned lexical_cast( HString const& str_ )
 	M_ENSURE_EX( ( val && ( val != ULONG_MAX ) ) || ! errno, str_ );
 	return ( val );
 	M_EPILOG
-	}
+}
 
 template<>
-int long unsigned lexical_cast( HString const& val )
-	{
+int long unsigned lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( static_cast<int long unsigned>( lexical_cast<int long long unsigned>( val ) ) );
 	M_EPILOG
-	}
+}
 
 template<>
-int unsigned lexical_cast( HString const& val )
-	{
+int unsigned lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( static_cast<int unsigned>( lexical_cast<int long unsigned>( val ) ) );
 	M_EPILOG
-	}
+}
 
 template<>
-int short unsigned lexical_cast( HString const& val )
-	{
+int short unsigned lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( static_cast<int short unsigned>( lexical_cast<int long unsigned>( val ) ) );
 	M_EPILOG
-	}
+}
 
 template<>
-int long long lexical_cast( HString const& str_ )
-	{
+int long long lexical_cast( HString const& str_ ) {
 	M_PROLOG
 	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
@@ -211,107 +194,94 @@ int long long lexical_cast( HString const& str_ )
 	M_ENSURE_EX( ( val && ( val != LONG_MIN ) && ( val != LONG_MAX ) ) || ! errno, str_ );
 	return ( val );
 	M_EPILOG
-	}
+}
 
 template<>
-int long lexical_cast( HString const& val )
-	{
+int long lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( static_cast<int long>( lexical_cast<int long long>( val ) ) );
 	M_EPILOG
-	}
+}
 
 template<>
-int long lexical_cast( char const* const& val )
-	{
+int long lexical_cast( char const* const& val ) {
 	M_PROLOG
 	return ( lexical_cast<int long, HString>( val ) );
 	M_EPILOG
-	}
+}
 
 template<>
-int long lexical_cast( char* const& val )
-	{
+int long lexical_cast( char* const& val ) {
 	M_PROLOG
 	return ( lexical_cast<int long, HString>( val ) );
 	M_EPILOG
-	}
+}
 
 template<>
-int lexical_cast( HString const& val )
-	{
+int lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( static_cast<int>( lexical_cast<int long>( val ) ) );
 	M_EPILOG
-	}
+}
 
 template<>
-int short lexical_cast( HString const& val )
-	{
+int short lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( static_cast<int short>( lexical_cast<int long>( val ) ) );
 	M_EPILOG
-	}
+}
 
 template<>
-int lexical_cast( char const* const& val )
-	{
+int lexical_cast( char const* const& val ) {
 	M_PROLOG
 	return ( static_cast<int>( lexical_cast<int long, HString>( val ) ) );
 	M_EPILOG
-	}
+}
 
 template<>
-int lexical_cast( char* const& val )
-	{
+int lexical_cast( char* const& val ) {
 	M_PROLOG
 	return ( static_cast<int>( lexical_cast<int long, HString>( val ) ) );
 	M_EPILOG
-	}
+}
 
 template<>
-double long lexical_cast( HString const& val )
-	{
+double long lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( hcore::strtold( val ) );
 	M_EPILOG
-	}
+}
 
 template<>
-float lexical_cast( HString const& val )
-	{
+float lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( static_cast<float>( lexical_cast<double long>( val ) ) );
 	M_EPILOG
-	}
+}
 
 template<>
-double long lexical_cast( char const* const& val )
-	{
+double long lexical_cast( char const* const& val ) {
 	M_PROLOG
 	return ( lexical_cast<double long, HString>( val ) );
 	M_EPILOG
-	}
+}
 
 template<>
-double lexical_cast( HString const& val )
-	{
+double lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( static_cast<double>( lexical_cast<double long>( val ) ) );
 	M_EPILOG
-	}
+}
 
 template<>
-double lexical_cast( char const* const& val )
-	{
+double lexical_cast( char const* const& val ) {
 	M_PROLOG
 	return ( lexical_cast<double, HString>( val ) );
 	M_EPILOG
-	}
+}
 
 template<>
-bool lexical_cast( char const* const& value_ )
-	{
+bool lexical_cast( char const* const& value_ ) {
 	M_PROLOG
 	static HString message;
 	bool bVal = false;
@@ -331,95 +301,83 @@ bool lexical_cast( char const* const& value_ )
 		bVal = true;
 	else if ( ! ::strcasecmp( value_, "0" ) )
 		bVal = false;
-	else
-		{
+	else {
 		message = "bad value: ";
 		message += value_;
 		typedef LexicalCast this_type;
 		M_THROW( message, bVal );
-		}
+	}
 	return ( bVal );
 	M_EPILOG
-	}
+}
 
 template<>
-bool lexical_cast( char* const& value_ )
-	{
+bool lexical_cast( char* const& value_ ) {
 	M_PROLOG
 	return ( lexical_cast<bool,char const*>( value_ ) );
 	M_EPILOG
-	}
+}
 
 template<>
-bool lexical_cast( HString const& value_ )
-	{
+bool lexical_cast( HString const& value_ ) {
 	M_PROLOG
 	return ( lexical_cast<bool>( value_.raw() ) );
 	M_EPILOG
-	}
+}
 
 template<>
-char lexical_cast( HString const& val )
-	{
+char lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( val.is_empty() ? static_cast<char>( 0 ) : val[ 0 ] );
 	M_EPILOG
-	}
+}
 
 template<>
-char const* lexical_cast( HString const& val )
-	{
+char const* lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( val.raw() );
 	M_EPILOG
-	}
+}
 
 template<>
-HString lexical_cast( HString const& val )
-	{
+HString lexical_cast( HString const& val ) {
 	M_PROLOG
 	return ( val );
 	M_EPILOG
-	}
+}
 
 template<>
-HString lexical_cast( int const& val_ )
-	{
+HString lexical_cast( int const& val_ ) {
 	M_PROLOG
 	return ( val_ );
 	M_EPILOG
-	}
+}
 
 template<>
-HString lexical_cast( HFormat const& f )
-	{
+HString lexical_cast( HFormat const& f ) {
 	M_PROLOG
 	return ( f.string() );
 	M_EPILOG
-	}
+}
 
-char const* error_message( int code_ )
-	{
+char const* error_message( int code_ ) {
 	return ( ::strerror( code_ ) );
-	}
+}
 
 template<>
-bool is_hexadecimal( char const* const& str_ )
-	{
+bool is_hexadecimal( char const* const& str_ ) {
 	return ( is_hexadecimal<HString>( str_ ) );
-	}
+}
 
 template<>
-bool is_binary( char const* const& str_ )
-	{
+bool is_binary( char const* const& str_ ) {
 	return ( is_binary<HString>( str_ ) );
-	}
+}
 
 template<>
-bool is_octal( char const* const& str_ )
-	{
+bool is_octal( char const* const& str_ ) {
 	return ( is_octal<HString>( str_ ) );
-	}
+}
 
 }
 

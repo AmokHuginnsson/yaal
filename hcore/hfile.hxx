@@ -34,56 +34,47 @@ Copyright:
 #include "hcore/hsynchronizedstream.hxx"
 #include "hcore/hstrongenum.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief File manipulation class.
  */
-class HFile : public HStreamInterface
-	{
+class HFile : public HStreamInterface {
 protected:
 	typedef HFile this_type;
 	typedef HStreamInterface base_type;
 public:
 	/*! \brief Bits user for specyfying the way files are opened.
 	 */
-	struct OPEN
-		{
-		typedef enum
-			{
+	struct OPEN {
+		typedef enum {
 			READING = 1,
 			WRITING = 2,
 			APPEND = 4,
 			TRUNCATE = 8
-			} enum_t;
-		};
+		} enum_t;
+	};
 	typedef HStrongEnum<OPEN> open_t;
 	/*! \brief Read operation modifiers.
 	 */
-	struct READ
-		{
-		typedef enum
-			{
+	struct READ {
+		typedef enum {
 			DEFAULTS = 0, /* BUFFERED_READS */
 			BUFFERED_READS = 1,
 			UNBUFFERED_READS = 2
-			} enum_t;
-		};
+		} enum_t;
+	};
 	typedef HStrongEnum<READ> read_t;
 	/*! \brief Kinds of seek operation.
 	 */
-	struct SEEK
-		{
-		typedef enum
-			{
+	struct SEEK {
+		typedef enum {
 			SET,
 			CUR,
 			END
-			} enum_t;
-		};
+		} enum_t;
+	};
 	typedef HStrongEnum<SEEK> seek_t;
 private:
 	void* _handle;
@@ -124,7 +115,7 @@ private:
 	int long get_line_length( void );
 	HFile( HFile const& );
 	HFile& operator = ( HFile const& );
-	};
+};
 
 typedef HExceptionT<HFile, HStreamInterfaceException> HFileException;
 

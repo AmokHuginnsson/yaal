@@ -32,26 +32,21 @@ Copyright:
 #include "hcore/hrawfile.hxx"
 #include "hcore/hstrongenum.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Serial port handling class.
  */
-class HSerial : public hcore::HRawFile
-	{
+class HSerial : public hcore::HRawFile {
 protected:
 	typedef HSerial this_type;
 	typedef HRawFile base_type;
 public:
 	/*! \brief Serial port configuration flags.
 	 */
-	struct FLAG
-		{
-		typedef enum
-			{
+	struct FLAG {
+		typedef enum {
 			DEFAULT								= 0x0001,
 			FLOW_CONTROL_HARDWARE = 0x0002,
 			FLOW_CONTROL_SOFTWARE = 0x0004,
@@ -66,15 +61,13 @@ public:
 			CANONICAL							= 0x0800,
 			ECHO									= 0x1000,
 			CR2NL									= 0x2000
-			} enum_t;
-		};
+		} enum_t;
+	};
 	typedef yaal::hcore::HStrongEnum<FLAG> flag_t;
 	/*! \brief Serial port data trnsmission speeds.
 	 */
-	struct SPEED
-		{
-		typedef enum
-			{
+	struct SPEED {
+		typedef enum {
 			DEFAULT,
 			B_230400,
 			B_115200,
@@ -96,8 +89,8 @@ public:
 #endif /* HAVE_DECL_B7200 */
 			B_4800,
 			B_2400
-			} enum_t;
-		};
+		} enum_t;
+	};
 	typedef yaal::hcore::HStrongEnum<SPEED> speed_t;
 protected:
 	speed_t _speed;
@@ -121,7 +114,7 @@ private:
 	void compile( void );
 	void compile_speed( void );
 	void compile_flags( void );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HSerial, yaal::hcore::HRawFileException> HSerialException;
 

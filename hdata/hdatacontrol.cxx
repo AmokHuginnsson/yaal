@@ -33,68 +33,58 @@ using namespace yaal::hcore;
 using namespace yaal::hconsole;
 using namespace yaal::dbwrapper;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 HDataControl::HDataControl( void )
-						: HControl( NULL, 0, 0, 0, 0, NULL ), _resource( NULL ), _SQL()
-	{
+						: HControl( NULL, 0, 0, 0, 0, NULL ), _resource( NULL ), _SQL() {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HDataControl::~HDataControl( void )
-	{
+HDataControl::~HDataControl( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HDataControl::set_resource( OResource const* resource_ )
-	{
+void HDataControl::set_resource( OResource const* resource_ ) {
 	M_PROLOG
 	_resource = resource_;
 	M_EPILOG
-	}
+}
 
-void HDataControl::set_dbd( HSQLDescriptor::ptr_t dbd )
-	{
+void HDataControl::set_dbd( HSQLDescriptor::ptr_t dbd ) {
 	M_PROLOG
 	_SQL = dbd;
 	M_EPILOG
-	}
+}
 
-void HDataControl::load( int long )
-	{
+void HDataControl::load( int long ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-int long HDataControl::get_current_id( void )
-	{
+int long HDataControl::get_current_id( void ) {
 	M_PROLOG
 	return ( -1 );
 	M_EPILOG
-	}
+}
 
-void HDataControl::add_new( void )
-	{
+void HDataControl::add_new( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HDataControl::cancel_new( void )
-	{
+void HDataControl::cancel_new( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

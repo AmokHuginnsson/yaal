@@ -32,27 +32,22 @@ Copyright:
 
 #include "hcore/hpointer.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Simplest raw memory provisioner.
  */
-class HChunk
-	{
+class HChunk {
 	int long _size;
 	void* _data;
 public:
-	struct STRATEGY
-		{
-		typedef enum
-			{
+	struct STRATEGY {
+		typedef enum {
 			GEOMETRIC,
 			EXACT
-			} enum_t;
-		};
+		} enum_t;
+	};
 	typedef yaal::hcore::HPointer<HChunk> ptr_t;
 	/*! \brief Create empty memory holder.
 	 */
@@ -86,13 +81,12 @@ public:
 private:
 	HChunk( HChunk const& );
 	HChunk& operator = ( HChunk const& );
-	};
+};
 
 template<typename T>
-int long chunk_size( int long count_ )
-	{
+int long chunk_size( int long count_ ) {
 	return ( sizeof ( T ) * count_ );
-	}
+}
 
 }
 

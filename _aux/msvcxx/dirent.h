@@ -11,12 +11,11 @@
 static int const NAME_MAX = 255;
 #define _XOPEN_NAME_MAX NAME_MAX
 
-struct unix_dirent
-	{
+struct unix_dirent {
 	int d_fileno;
 	int d_type;
 	char d_name[NAME_MAX + 1];
-	};
+};
 
 M_YAAL_HCORE_PUBLIC_API int unix_readdir_r( DIR*, struct unix_dirent*, struct unix_dirent** );
 

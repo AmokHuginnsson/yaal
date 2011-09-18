@@ -31,11 +31,9 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 }
 

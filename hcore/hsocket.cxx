@@ -45,27 +45,23 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "system.hxx"
 #include "hlog.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-enum
-	{
+enum {
 	OK = 0,
 	NOT_INITIALIZED,
 	NOT_A_SERVER,
 	ALREADY_LISTENING
-	};
+};
 
-char const* const _errMsgHSocket_[ 4 ] =
-	{
+char const* const _errMsgHSocket_[ 4 ] = {
 	_( "ok" ),
 	_( "socket not initialized" ),
 	_( "socket is not a server" ),
 	_( "already listening" )
-	};
+};
 
 bool HSocket::_resolveHostnames = true;
 
@@ -78,8 +74,7 @@ HSocket::HSocket( socket_type_t const& socketType_,
 	_needShutdown( false ), _type( socketType_ ),
 	_maximumNumberOfClients( maximumNumberOfClients_ ),
 	_addressSize( 0 ), _address( NULL ), _clients( NULL ),
-	_hostName()
-	{
+	_hostName() {
 	M_PROLOG
 	if ( _type == TYPE::DEFAULT )
 		_type |= TYPE::SSL_CLIENT;
@@ -91,30 +86,27 @@ HSocket::HSocket( socket_type_t const& socketType_,
 		M_THROW( _( "bad socket option" ), socketType_.value() );
 	if ( ! ( socketType_ & ( socket_type_t( TYPE::BLOCKING ) | TYPE::NONBLOCKING ) ) )
 		_type |= TYPE::BLOCKING;
-	if ( _maximumNumberOfClients >= 0 )
-		{
+	if ( _maximumNumberOfClients >= 0 ) {
 		M_ENSURE( ( _fileDescriptor = ::socket(
 						!!( _type & TYPE::NETWORK ) ? PF_INET : PF_UNIX,
 						static_cast<int>( SOCK_STREAM ),
 						0 /* info libc "Creating a Socket"
 								 says that "zero is usually right for PROTOCOL" */ ) ) >= 0 );
-		if ( !!( _type & TYPE::NONBLOCKING ) )
-			{
+		if ( !!( _type & TYPE::NONBLOCKING ) ) {
 			int flags( ::fcntl( _fileDescriptor, F_GETFL, 0 ) );
 			M_ENSURE( flags >= 0 );
 			M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, flags | O_NONBLOCK ) == 0 );
-			}
 		}
+	}
 	if ( !!( _type & TYPE::NETWORK ) )
 		_address = memory::calloc<sockaddr_in>( 1 );
 	else
 		_address = memory::calloc<sockaddr_un>( 1 );
 	return;
 	M_EPILOG
-	}
+}
 
-HSocket::~HSocket( void )
-	{
+HSocket::~HSocket( void ) {
 	M_PROLOG
 	shutdown();
 	/* There will be no memory leakage if shutdown() throws,
@@ -123,43 +115,37 @@ HSocket::~HSocket( void )
 		memory::free( _address );
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HSocket::shutdown( void )
-	{
+void HSocket::shutdown( void ) {
 	M_PROLOG
 	close();
 	M_EPILOG
-	}
+}
 
-int HSocket::do_close( void )
-	{
+int HSocket::do_close( void ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	sockaddr_un* addressFile = NULL;
-	if ( _clients )
-		{
+	if ( _clients ) {
 		M_SAFE( delete _clients );
 		_clients = NULL;
-		if ( ( !!( _type & TYPE::FILE ) ) && ( _address ) )
-			{
+		if ( ( !!( _type & TYPE::FILE ) ) && ( _address ) ) {
 			addressFile = static_cast<sockaddr_un*>( _address );
 			if ( addressFile->sun_path [ 0 ] )
 				M_ENSURE_EX( ( ::unlink( addressFile->sun_path ) == 0 ), addressFile->sun_path );
-			}
 		}
-	if ( _needShutdown && ( _fileDescriptor >= 0 ) )
-		{
+	}
+	if ( _needShutdown && ( _fileDescriptor >= 0 ) ) {
 		M_ENSURE( ( ::shutdown( _fileDescriptor, SHUT_RDWR ) == 0 ) || ( errno == ENOTCONN ) || ( errno == ECONNRESET ) );
 		HRawFile::do_close();
 		_needShutdown = false;
-		}
+	}
 	return( 0 );
 	M_EPILOG
-	}
+}
 
-void HSocket::shutdown_client( int fileDescriptor_ )
-	{
+void HSocket::shutdown_client( int fileDescriptor_ ) {
 	M_PROLOG
 	ptr_t client;
 	if ( ! _clients )
@@ -172,10 +158,9 @@ void HSocket::shutdown_client( int fileDescriptor_ )
 	_clients->erase( fileDescriptor_ );
 	return;
 	M_EPILOG
-	}
+}
 
-void HSocket::listen( yaal::hcore::HString const& address_, int port_ )
-	{
+void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	int reuseAddr = 1;
@@ -195,10 +180,9 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ )
 	_needShutdown = true;
 	return;
 	M_EPILOG
-	}
+}
 
-HSocket::ptr_t HSocket::accept( void )
-	{
+HSocket::ptr_t HSocket::accept( void ) {
 	M_PROLOG
 	int fileDescriptor = -1;
 	socklen_t addressSize = 0;
@@ -209,18 +193,15 @@ HSocket::ptr_t HSocket::accept( void )
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
-	if ( !!( _type & TYPE::NETWORK ) )
-		{
+	if ( !!( _type & TYPE::NETWORK ) ) {
 		address = static_cast<sockaddr*>(
 				static_cast<void*>( &addressNetwork ) );
 		addressSize = sizeof ( addressNetwork );
-		}
-	else
-		{
+	} else {
 		address = static_cast<sockaddr*>(
 				static_cast<void*>( &addressFile ) );
 		addressSize = sizeof ( addressFile );
-		}
+	}
 	M_ENSURE( ( fileDescriptor = ::accept( _fileDescriptor,
 					address, &addressSize ) ) >= 0 );
 	/* - 1 means that constructor shall not create socket */
@@ -230,12 +211,11 @@ HSocket::ptr_t HSocket::accept( void )
 	ptr_t socket( make_pointer<HSocket>( type, -1 ) );
 	M_ASSERT( ! socket->_sSL );
 	socket->_fileDescriptor = fileDescriptor;
-	if ( !!( _type & TYPE::NONBLOCKING ) )
-		{
+	if ( !!( _type & TYPE::NONBLOCKING ) ) {
 		int flags( ::fcntl( socket->_fileDescriptor, F_GETFL, 0 ) );
 		M_ENSURE( flags >= 0 );
 		M_ENSURE( ::fcntl( socket->_fileDescriptor, F_SETFL, flags | O_NONBLOCK ) == 0 );
-		}
+	}
 	socket->_addressSize = addressSize;
 	socket->_needShutdown = true;
 	socket->set_timeout( _timeout );
@@ -245,42 +225,36 @@ HSocket::ptr_t HSocket::accept( void )
 	_clients->insert( make_pair( fileDescriptor, socket ) );
 	return ( socket );
 	M_EPILOG
-	}
+}
 
-void HSocket::connect( yaal::hcore::HString const& address_, int port_ )
-	{
+void HSocket::connect( yaal::hcore::HString const& address_, int port_ ) {
 	M_PROLOG
 	if ( _fileDescriptor < 0 )
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
 	int saveErrno( errno );
 	make_address( address_, port_ );
 	int error( ::connect( _fileDescriptor, static_cast<sockaddr*>( _address ), _addressSize ) );
-	if ( ( !!( _type & TYPE::NONBLOCKING ) ) && error && ( errno == EINPROGRESS ) )
-		{
+	if ( ( !!( _type & TYPE::NONBLOCKING ) ) && error && ( errno == EINPROGRESS ) ) {
 		int fd( _fileDescriptor );
 		int long timeout( _timeout );
 		int up( hcore::system::wait_for_io( NULL, 0, &fd, 1, &timeout ) );
-		if ( up == 1 )
-			{
+		if ( up == 1 ) {
 			M_ASSERT( fd == _fileDescriptor );
 			socklen_t optLen( sizeof ( error ) );
 			M_ENSURE( ::getsockopt( _fileDescriptor, SOL_SOCKET, SO_ERROR, &error, &optLen ) == 0 );
-			}
-		else if ( ! timeout )
+		} else if ( ! timeout )
 			M_ENSURE_EX( ! "connection timedout", !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
-		}
+	}
 	M_ENSURE_EX( error == 0, !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	errno = saveErrno;
 	_needShutdown = true;
 	return;
 	M_EPILOG
-	}
+}
 
-void HSocket::make_address( yaal::hcore::HString const& address_, int port_ )
-	{
+void HSocket::make_address( yaal::hcore::HString const& address_, int port_ ) {
 	M_PROLOG
-	if ( !!( _type & TYPE::NETWORK ) )
-		{
+	if ( !!( _type & TYPE::NETWORK ) ) {
 		int error( 0 );
 		sockaddr_in* addressNetwork( static_cast<sockaddr_in*>( _address ) );
 		addressNetwork->sin_family = AF_INET;
@@ -308,23 +282,20 @@ void HSocket::make_address( yaal::hcore::HString const& address_, int port_ )
 				hostName.h_addr_list[ 0 ] )->s_addr;
 #endif /* #else #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 ) */
 		_addressSize = sizeof ( sockaddr_in );
-		}
-	else /* _type & TYPE::FILE */
-		{
+	} else /* _type & TYPE::FILE */ {
 		sockaddr_un* addressFile( static_cast<sockaddr_un*>( _address ) );
 		addressFile->sun_family = AF_UNIX;
 		::strncpy( addressFile->sun_path, address_.raw(),
 				sizeof ( addressFile->sun_path ) );
 		addressFile->sun_path[ sizeof ( addressFile->sun_path ) - 1 ] = 0;
 		_addressSize = static_cast<int>( SUN_LEN( addressFile ) );
-		}
+	}
 	_hostName = address_;
 	return;
 	M_EPILOG
-	}
+}
 
-int HSocket::get_port( void ) const
-	{
+int HSocket::get_port( void ) const {
 	M_PROLOG
 	if ( _fileDescriptor < 0 )
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
@@ -334,10 +305,9 @@ int HSocket::get_port( void ) const
 	addressNetwork = static_cast<sockaddr_in*>( _address );
 	return ( ntohs( addressNetwork->sin_port ) );
 	M_EPILOG
-	}
+}
 
-HSocket::ptr_t HSocket::get_client( int fileDescriptor_ ) const
-	{
+HSocket::ptr_t HSocket::get_client( int fileDescriptor_ ) const {
 	M_PROLOG
 	ptr_t client;
 	if ( ! _clients )
@@ -348,40 +318,36 @@ HSocket::ptr_t HSocket::get_client( int fileDescriptor_ ) const
 		M_THROW( _( "no such client" ), fileDescriptor_ );
 	return ( it->second );
 	M_EPILOG
-	}
+}
 
-HSocket::iterator HSocket::begin( void ) const
-	{
+HSocket::iterator HSocket::begin( void ) const {
 	M_PROLOG
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
 	clients_t const* c = _clients;
 	return ( c->begin() );
 	M_EPILOG
-	}
+}
 
-HSocket::iterator HSocket::end( void ) const
-	{
+HSocket::iterator HSocket::end( void ) const {
 	M_PROLOG
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
 	clients_t const* c = _clients;
 	return ( c->end() );
 	M_EPILOG
-	}
+}
 
-HSocket::iterator HSocket::find( int socket_ ) const
-	{
+HSocket::iterator HSocket::find( int socket_ ) const {
 	M_PROLOG
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
 	clients_t const* c = _clients;
 	return ( c->find( socket_ ) );
 	M_EPILOG
-	}
+}
 
-int long HSocket::write_until_eos( HString const& message_ )
-	{
+int long HSocket::write_until_eos( HString const& message_ ) {
 	M_PROLOG
 	int long nSize = 0;
 	nSize = message_.get_length();
@@ -389,19 +355,17 @@ int long HSocket::write_until_eos( HString const& message_ )
 		nSize = write( message_.raw(), nSize );
 	return ( nSize );
 	M_EPILOG
-	}
+}
 
-int HSocket::get_client_count( void ) const
-	{
+int HSocket::get_client_count( void ) const {
 	M_PROLOG
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
 	return ( static_cast<int>( _clients->size() ) );
 	M_EPILOG
-	}
+}
 
-HString const& HSocket::get_host_name( void )
-	{
+HString const& HSocket::get_host_name( void ) {
 	static int const GETHOST_BY_NAME_R_WORK_BUFFER_SIZE( 1024 );
 	M_PROLOG
 	int size( GETHOST_BY_NAME_R_WORK_BUFFER_SIZE );
@@ -416,15 +380,12 @@ HString const& HSocket::get_host_name( void )
 #endif /* #else #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
 	if ( _fileDescriptor < 0 )
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
-	if ( _hostName.is_empty() )
-		{
-		if ( !!( _type & TYPE::NETWORK ) )
-			{
+	if ( _hostName.is_empty() ) {
+		if ( !!( _type & TYPE::NETWORK ) ) {
 			char const* name = NULL;
 			_cache.realloc( size );
 			addressNetwork = reinterpret_cast<sockaddr_in*>( _address );
-			if ( _resolveHostnames )
-				{
+			if ( _resolveHostnames ) {
 				int error( 0 );
 #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 )
 				error = getnameinfo(
@@ -446,22 +407,20 @@ HString const& HSocket::get_host_name( void )
 				if ( hostNameStatus )
 					name = hostName.h_name;
 #endif /* #else #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
-				}
+			}
 			if ( ! name )
 				name = inet_ntop( AF_INET, &addressNetwork->sin_addr,
 						_cache.raw(), size );
 			_hostName = name;
-			}
-		else
-			{
+		} else {
 			addressFile = static_cast<sockaddr_un*>( _address );
 			if ( addressFile->sun_path[ 0 ] )
 				_hostName = addressFile->sun_path[ 0 ];
-			}
 		}
+	}
 	return ( _hostName );
 	M_EPILOG
-	}
+}
 
 }
 

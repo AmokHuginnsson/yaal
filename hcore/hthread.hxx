@@ -37,32 +37,27 @@ Copyright:
 #include "hcore/hboundcall.hxx"
 #include "hcore/huniquemovable.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 class HCondition;
 /*! \brief Implementation of multi-threaded synchronizing prymitive - Mutex.
  */
-class HMutex
-	{
+class HMutex {
 	typedef HMutex this_type;
 public:
 	/*! \brief Mutex types.
 	 */
-	struct TYPE
-		{
+	struct TYPE {
 		/*! \brief Mutex types.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			DEFAULT = 0,      /*!< Default mutex type (non-recursive). */
 			RECURSIVE = 1,    /*!< Recursive mutex type. */
 			NON_RECURSIVE = 2 /*!< Implicit non-recursive mutex type. */
-			} mutex_type_t;
-		};
+		} mutex_type_t;
+	};
 private:
 	/*{*/
 	TYPE::mutex_type_t _type;
@@ -83,10 +78,9 @@ private:
 	HMutex& operator = ( HMutex const& );
 	friend class HCondition;
 	/*}*/
-	};
+};
 
-class HSemaphoreImplementationInterface
-	{
+class HSemaphoreImplementationInterface {
 	typedef HSemaphoreImplementationInterface this_type;
 public:
 	HSemaphoreImplementationInterface( void ) {}
@@ -98,25 +92,22 @@ private:
 	virtual void do_signal( void ) = 0;
 	HSemaphoreImplementationInterface( HSemaphoreImplementationInterface const& );
 	HSemaphoreImplementationInterface& operator = ( HSemaphoreImplementationInterface const& );
-	};
+};
 
 typedef HExceptionT<HMutex> HMutexException;
 
 /*! \brief Multi-threaded synchronizing prymitive - Semaphore.
  */
-class HSemaphore
-	{
+class HSemaphore {
 public:
 	typedef HSemaphore this_type;
 	typedef HResource<HSemaphoreImplementationInterface> semaphore_implementation_t;
-	struct TYPE
-		{
-		typedef enum
-			{
+	struct TYPE {
+		typedef enum {
 			POSIX,
 			YAAL
-			} type_t;
-		};
+		} type_t;
+	};
 	M_YAAL_HCORE_PUBLIC_API static TYPE::type_t DEFAULT;
 private:
 	semaphore_implementation_t _impl;
@@ -128,32 +119,29 @@ public:
 private:
 	HSemaphore( HSemaphore const& );
 	HSemaphore& operator = ( HSemaphore const& );
-	};
+};
 
 typedef HExceptionT<HSemaphore> HSemaphoreException;
 
 /*! \brief Core multi-threading primitive - Thread.
  */
-class HThread
-	{
+class HThread {
 public:
 	M_YAAL_HCORE_PUBLIC_API static int _threadStackSize;
 private:
 	typedef HThread this_type;
-	typedef enum
-		{
+	typedef enum {
 		DEAD,
 		SPAWNING,
 		ALIVE,
 		ZOMBIE
-		} status_t;
-	struct OExceptionInfo
-		{
+	} status_t;
+	struct OExceptionInfo {
 		bool _stacked;
 		int _code;
 		yaal::hcore::HString _message;
 		OExceptionInfo( void ) : _stacked( false ), _code( 0 ), _message() {}
-		};
+	};
 	status_t _status;
 	HChunk _buf;
 	mutable HMutex _mutex;
@@ -211,7 +199,7 @@ private:
 	static void CLEANUP( void* );
 	HThread( HThread const& );
 	HThread& operator = ( HThread const& );
-	};
+};
 
 typedef HExceptionT<HThread> HThreadException;
 
@@ -219,8 +207,7 @@ typedef HExceptionT<HThread> HThreadException;
  *
  * Scope based automation of locking and unlocking of Mutexes.
  */
-class HLock
-	{
+class HLock {
 	HMutex& _mutex;
 public:
 	explicit HLock( HMutex& );
@@ -228,23 +215,21 @@ public:
 private:
 	HLock( HLock const& );
 	HLock& operator = ( HLock const& );
-	};
+};
 typedef HUniqueMovable<HLock> external_lock_t;
 
 /*! \brief Multi-threaded synchronizing prymitive - Conditional Variable.
  */
-class HCondition
-	{
+class HCondition {
 	typedef HCondition this_type;
 	HChunk _buf;
 	HMutex& _mutex;
 public:
-	typedef enum
-		{
+	typedef enum {
 		OK,
 		TIMEOUT,
 		INTERRUPT
-		} status_t;
+	} status_t;
 	HCondition( HMutex& );
 	virtual ~HCondition( void );
 	status_t wait( int long unsigned, int long unsigned );
@@ -252,14 +237,13 @@ public:
 private:
 	HCondition( HCondition const& );
 	HCondition& operator = ( HCondition const& );
-	};
+};
 
 typedef HExceptionT<HCondition> HConditionException;
 
 /*! \brief Asynchronous notification mechanizm.
  */
-class HEvent
-	{
+class HEvent {
 	HMutex _mutex;
 	HCondition _condition;
 public:
@@ -267,7 +251,7 @@ public:
 	~HEvent( void );
 	void wait( void );
 	void signal( void );
-	};
+};
 
 }
 

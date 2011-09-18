@@ -1,8 +1,7 @@
 #ifndef YAAL_MSVCXX_EMU_SOCKET_HXX_INCLUDED
 #define YAAL_MSVCXX_EMU_SOCKET_HXX_INCLUDED 1
 
-namespace msvcxx
-{
+namespace msvcxx {
 
 int socket( int, int, int );
 int listen( int, int );

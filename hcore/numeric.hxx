@@ -33,13 +33,11 @@ Copyright:
 
 #include "hcore/static_assert.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
 /*! \brief Compile time numerical calculus functions belong here.
  */
-namespace meta
-{
+namespace meta {
 
 /*! \brief Perform a logical negation.
  *
@@ -47,10 +45,9 @@ namespace meta
  * \retval value - conditional value.
  */
 template<bool const value_in>
-struct boolean_not
-	{
+struct boolean_not {
 	static bool const value = ! value_in;
-	};
+};
 
 /*! \brief Perform a exclusive or logical operation.
  *
@@ -59,10 +56,9 @@ struct boolean_not
  * \retval value - an exclusive or of p and q.
  */
 template<bool const p, bool const q>
-struct boolean_xor
-	{
+struct boolean_xor {
 	static bool const value = ( p && !q ) || ( !p && q );
-	};
+};
 
 /*! \brief Perform a logical biconditional operation.
  *
@@ -71,10 +67,9 @@ struct boolean_xor
  * \retval value - p <=> q.
  */
 template<bool const p, bool const q>
-struct boolean_xnor
-	{
+struct boolean_xnor {
 	static bool const value = ( p && q ) || ( ! ( p || q ) );
-	};
+};
 
 /*! \brief Test if givent type is a signed type.
  *
@@ -85,10 +80,9 @@ struct boolean_xnor
  * is already required there.
  */
 template<typename T>
-struct is_signed
-	{
+struct is_signed {
 	static bool const value = static_cast<T>( 0 ) > static_cast<T>( ~0 );
-	};
+};
 
 /*! \brief Get maximum positive number for a given type.
  *
@@ -96,11 +90,10 @@ struct is_signed
  * \retval value - a maximum positive number that can be fit into variable of type T.
  */
 template<typename T>
-struct max_signed
-	{
+struct max_signed {
 	STATIC_ASSERT( is_signed<T>::value );
 	static T const value = static_cast<T>( ~( static_cast<T>( 1 ) << ( ( sizeof ( T ) << 3 ) - 1 ) ) );
-	};
+};
 template<typename T>
 T const max_signed<T>::value;
 
@@ -110,11 +103,10 @@ T const max_signed<T>::value;
  * \retval value - a maximum positive number that can be fit into variable of unsigned type T.
  */
 template<typename T>
-struct max_unsigned
-	{
+struct max_unsigned {
 	STATIC_ASSERT( boolean_not<is_signed<T>::value>::value );
 	static T const value = static_cast<T>( ~0 );
-	};
+};
 template<typename T>
 T const max_unsigned<T>::value;
 
@@ -124,11 +116,10 @@ T const max_unsigned<T>::value;
  * \retval value - a minimum negative number that can be fit into variable of type T.
  */
 template<typename T>
-struct min_signed
-	{
+struct min_signed {
 	STATIC_ASSERT( is_signed<T>::value );
 	static T const value = static_cast<T>( static_cast<T>( 1 ) << ( ( sizeof ( T ) << 3 ) - 1 ) );
-	};
+};
 template<typename T>
 T const min_signed<T>::value;
 
@@ -138,10 +129,9 @@ T const min_signed<T>::value;
  * \retval value - integer value: 1 for true, 0 for false.
  */
 template<bool boolean>
-struct to_int
-	{
+struct to_int {
 	static int const value = boolean ? 1 : 0;
-	};
+};
 
 /*! \brief Convert given integer value to boolean.
  *
@@ -149,10 +139,9 @@ struct to_int
  * \retval value - a converted value, false for 0, true otherwise.
  */
 template<int long integer>
-struct to_bool
-	{
+struct to_bool {
 	static bool const value = integer ? true : false;
-	};
+};
 
 /*! \brief Staticaly calculate maximul of a set.
  *
@@ -170,8 +159,7 @@ template<int long a0, int long a1,
 	int long a16 = min_signed<int long>::value, int long a17 = min_signed<int long>::value,
 	int long a18 = min_signed<int long>::value, int long a19 = min_signed<int long>::value,
 	int long a20 = min_signed<int long>::value>
-struct max
-	{
+struct max {
 	static int long const b0 = a0 > a1 ? a0 : a1;
 	static int long const b1 = b0 > a2 ? b0 : a2;
 	static int long const b2 = b1 > a3 ? b1 : a3;
@@ -192,7 +180,7 @@ struct max
 	static int long const b17 = b16 > a18 ? b16 : a18;
 	static int long const b18 = b17 > a19 ? b17 : a19;
 	static int long const value = b18 > a20 ? b18 : a20;
-	};
+};
 
 /*! \brief Simulate binary literal.
  *
@@ -200,17 +188,15 @@ struct max
  * \retval value - a number of value of binary interpretation of input.
  */
 template<int long unsigned const input>
-struct binary
-	{
+struct binary {
 	static int long unsigned const value = ( binary<input / 10>::value << 1 ) + ( input % 10 );
-	};
+};
 
 /*! \cond */
 template<>
-struct binary<0>
-	{
+struct binary<0> {
 	static int long unsigned const value = 0;
-	};
+};
 /*! \endcond */
 
 /*! \brief Simulate binary literal.
@@ -219,17 +205,15 @@ struct binary<0>
  * \retval value - a number of value of binary interpretation of input.
  */
 template<int long unsigned const input>
-struct obinary
-	{
+struct obinary {
 	static int long unsigned const value = ( obinary<(input >> 3)>::value << 1 ) + ( input & 7 );
-	};
+};
 
 /*! \cond */
 template<>
-struct obinary<0>
-	{
+struct obinary<0> {
 	static int long unsigned const value = 0;
-	};
+};
 /*! \endcond */
 
 /*! \brief Compile time power finction calculator.
@@ -239,17 +223,15 @@ struct obinary<0>
  * \retval value - base**exponent.
  */
 template<int long unsigned const base, int long unsigned const exponent, int long unsigned const helper = 1>
-struct power
-	{
+struct power {
 	static int long unsigned const value = power<base, exponent - 1, helper * base>::value;
-	};
+};
 
 /*! \cond */
 template<int long unsigned const base, int long unsigned const helper>
-struct power<base,0,helper>
-	{
+struct power<base,0,helper> {
 	static int long unsigned const value = helper;
-	};
+};
 /*! \endcond */
 
 /*! \brief Perform compile time ternary operator on integers.
@@ -264,16 +246,14 @@ struct ternary;
 
 /* \cond */
 template<int long value_for_true, int long value_for_false>
-struct ternary<true, value_for_true, value_for_false>
-	{
+struct ternary<true, value_for_true, value_for_false> {
 	static int long const value = value_for_true;
-	};
+};
 
 template<int long value_for_true, int long value_for_false>
-struct ternary<false, value_for_true, value_for_false>
-	{
+struct ternary<false, value_for_true, value_for_false> {
 	static int long const value = value_for_false;
-	};
+};
 /* \endcond */
 
 /*! \brief Check if one value is greater than another.
@@ -283,10 +263,9 @@ struct ternary<false, value_for_true, value_for_false>
  * \retval value - true iff val1 > val2.
  */
 template<int long const val1, int long const val2>
-struct greater
-	{
+struct greater {
 	static bool const value = val1 > val2;
-	};
+};
 
 /*! \brief Check if one value is less than another.
  *
@@ -295,10 +274,9 @@ struct greater
  * \retval value - true iff val1 < val2.
  */
 template<int long const val1, int long const val2>
-struct less
-	{
+struct less {
 	static bool const value = val1 < val2;
-	};
+};
 
 }
 

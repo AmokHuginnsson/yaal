@@ -34,19 +34,16 @@ Copyright:
 #include "tools/hoptional.hxx"
 #include "dbwrapper/db_driver_loader.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace dbwrapper
-{
+namespace dbwrapper {
 
 class HDataBase;
 typedef yaal::hcore::HPointer<HDataBase> database_ptr_t;
 
 /*! \brief Relational database query result representation.
  */
-class HRecordSet
-	{
+class HRecordSet {
 	typedef HRecordSet this_type;
 public:
 	typedef yaal::hcore::HPointer<HRecordSet> ptr_t;
@@ -76,12 +73,11 @@ public:
 private:
 	HRecordSet( HRecordSet const& );
 	HRecordSet& operator = ( HRecordSet const& );
-	};
+};
 
 /*! \brief Query result iterator.
  */
-class HRecordSet::HIterator
-	{
+class HRecordSet::HIterator {
 	HRecordSet* _owner;
 	int long _cursorPosition; /* cursor position in record-set */
 public:
@@ -97,29 +93,26 @@ public:
 private:
 	HIterator( HRecordSet*, int long );
 	friend class HRecordSet;
-	};
+};
 
 /*! \brief Build a SQL query based on user supplied meta-data.
  */
-class HSQLDescriptor
-	{
+class HSQLDescriptor {
 public:
 	typedef HSQLDescriptor this_type;
 	typedef yaal::hcore::HPointer<this_type> ptr_t;
 	/*! \brief Query types.
 	 */
-	struct MODE
-		{
+	struct MODE {
 		/*! \brief Query types.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			SELECT, /*!< SELECT query. */
 			UPDATE, /*!< Data update query. */
 			INSERT, /*!< INSERT new data query. */
 			DELETE  /*!< DELETER data query. */
-			} mode_t;
-		};
+		} mode_t;
+	};
 private:
 	MODE::mode_t _mode;
 	yaal::hcore::HString _varTmpBuffer;
@@ -159,7 +152,7 @@ public:
 	HRecordSet::ptr_t execute( MODE::mode_t const& );
 	HRecordSet::ptr_t execute( char const* const );
 	HRecordSet::ptr_t execute( void );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HRecordSet> HRecordSetException;
 typedef yaal::hcore::HExceptionT<HSQLDescriptor> HSQLDescriptorException;

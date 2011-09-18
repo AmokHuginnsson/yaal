@@ -3,8 +3,7 @@
 
 #include <glibc/sys/wait.h>
 
-namespace msvcxx
-{
+namespace msvcxx {
 int waitpid( int, int*, int );
 }
 

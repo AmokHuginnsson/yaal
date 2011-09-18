@@ -30,16 +30,13 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hstreaminterface.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Perform stream operations on character string.
  */
-class HStringStream : public yaal::hcore::HStreamInterface
-	{
+class HStringStream : public yaal::hcore::HStreamInterface {
 	mutable bool _used; /* FIXME Confirm mutable is necesarry here. */
 	mutable int long _offset;
 	mutable yaal::hcore::HString _buffer;
@@ -58,7 +55,7 @@ private:
 	virtual void do_flush( void ) const;
 	virtual int long do_read( void* const, int long );
 	virtual bool do_is_valid( void ) const;
-	};
+};
 
 char const* operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& );
 

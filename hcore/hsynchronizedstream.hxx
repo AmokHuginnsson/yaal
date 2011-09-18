@@ -38,16 +38,13 @@ Copyright:
 #include "hcore/hthread.hxx"
 #include "hcore/trait.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief HSynchronizedStream makes use of HStreamInterface derivates thread safe.
  */
-class HSynchronizedStream : public HStreamInterface
-	{
+class HSynchronizedStream : public HStreamInterface {
 public:
 	typedef HSynchronizedStream this_type;
 	typedef HStreamInterface base_type;
@@ -122,21 +119,20 @@ protected:
 private:
 	HSynchronizedStream( HSynchronizedStream const& );
 	HSynchronizedStream& operator = ( HSynchronizedStream const& );
-	};
+};
 
 typedef HExceptionT<HSynchronizedStream, HStreamInterfaceException> HSynchronizedStreamException;
 
 
 template<typename call_t>
-HSynchronizedStream& HSynchronizedStream::operator()( call_t call_ )
-	{
+HSynchronizedStream& HSynchronizedStream::operator()( call_t call_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	if ( _streamRef )
 		call_( _streamRef );
 	return ( *this );
 	M_EPILOG
-	}
+}
 
 }
 

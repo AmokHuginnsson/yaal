@@ -4,8 +4,7 @@
 #include "config.hxx"
 #include "hcore/pod.hxx"
 
-namespace msvcxx
-{
+namespace msvcxx {
 
 int close( int const& );
 M_YAAL_HCORE_PUBLIC_API int long read( int const&, void*, int long );

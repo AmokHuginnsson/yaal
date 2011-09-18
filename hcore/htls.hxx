@@ -37,17 +37,14 @@ Copyright:
 #include "hcore/hboundcall.hxx"
 #include "hcore/hthread.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief HTLS<> adds automation around handling Thread Local Storage objects.
  */
 template<typename tType>
-class HTLS
-	{
+class HTLS {
 public:
 	typedef HTLS<tType> this_type;
 	typedef yaal::hcore::HPointer<tType> ptr_t;
@@ -64,8 +61,7 @@ public:
 	HTLS( void )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( void )>( &this_type::construct ), this ) ) {}
-	void construct( void )
-		{
+	void construct( void ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -73,14 +69,13 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
+	}
 	template<typename T0>
 	HTLS( T0 const& a0_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const& )>( &this_type::construct ), this, a0_ ) ) {}
 	template<typename T0>
-	void construct( T0 const& a0_ )
-		{
+	void construct( T0 const& a0_ ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -88,14 +83,13 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
+	}
 	template<typename T0, typename T1>
 	HTLS( T0 const& a0_, T1 const& a1_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const& )>( &this_type::construct ), this, a0_, a1_ ) ) {}
 	template<typename T0, typename T1>
-	void construct( T0 const& a0_, T1 const& a1_ )
-		{
+	void construct( T0 const& a0_, T1 const& a1_ ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -103,14 +97,13 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
+	}
 	template<typename T0, typename T1, typename T2>
 	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const& )>( &this_type::construct ), this, a0_, a1_, a2_ ) ) {}
 	template<typename T0, typename T1, typename T2>
-	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_ )
-		{
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_ ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -118,15 +111,14 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
+	}
 	template<typename T0, typename T1, typename T2, typename T3>
 	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const& )>( &this_type::construct ),
 					this, a0_, a1_, a2_, a3_ ) ) {}
 	template<typename T0, typename T1, typename T2, typename T3>
-	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_ )
-		{
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_ ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -134,15 +126,14 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
+	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4>
 	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const& )>( &this_type::construct ),
 					this, a0_, a1_, a2_, a3_, a4_ ) ) {}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4>
-	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_ )
-		{
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_ ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -150,15 +141,14 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
+	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
 	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const& )>( &this_type::construct ),
 					this, a0_, a1_, a2_, a3_, a4_, a5_ ) ) {}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
-	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_ )
-		{
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_ ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -166,15 +156,14 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
+	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
 	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const&, T6 const& )>( &this_type::construct ),
 					this, a0_, a1_, a2_, a3_, a4_, a5_, a6_ ) ) {}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_ )
-		{
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_ ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -182,15 +171,14 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
+	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
 	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const&, T6 const&, T7 const& )>( &this_type::construct ),
 					this, a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_ ) ) {}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_ )
-		{
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_ ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -198,15 +186,14 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
+	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
 	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const&, T6 const&, T7 const&, T8 const& )>( &this_type::construct ),
 					this, a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_ ) ) {}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_ )
-		{
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_ ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -214,15 +201,14 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
+	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
 	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_, T9 const& a9_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const&, T6 const&, T7 const&, T8 const&, T9 const& )>( &this_type::construct ),
 					this, a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_ ) ) {}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_, T9 const& a9_ )
-		{
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_, T9 const& a9_ ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -230,15 +216,14 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
+	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
 	HTLS( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_, T9 const& a9_, T10 const& a10_ )
 		: _mutex(), _instances(),
 		_constructor( call( static_cast<void ( this_type::* )( T0 const&, T1 const&, T2 const&, T3 const&, T4 const&, T5 const&, T6 const&, T7 const&, T8 const&, T9 const&, T10 const& )>( &this_type::construct ),
 					this, a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_, a10_ ) ) {}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
-	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_, T9 const& a9_, T10 const& a10_ )
-		{
+	void construct( T0 const& a0_, T1 const& a1_, T2 const& a2_, T3 const& a3_, T4 const& a4_, T5 const& a5_, T6 const& a6_, T7 const& a7_, T8 const& a8_, T9 const& a9_, T10 const& a10_ ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! _tls );
@@ -246,48 +231,41 @@ public:
 		_tls = p.raw();
 		_instances.push_back( p );
 		M_EPILOG
-		}
-	~HTLS( void )
-		{
+	}
+	~HTLS( void ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		_instances.clear();
 		_tls = NULL;
 		M_DESTRUCTOR_EPILOG
-		}
-	external_lock_t acquire( void )
-		{
+	}
+	external_lock_t acquire( void ) {
 		M_PROLOG
 		return ( external_lock_t( ref( _mutex ) ) );
 		M_EPILOG
-		}
-	tType* operator->( void )
-		{
+	}
+	tType* operator->( void ) {
 		M_PROLOG
 		if ( ! _tls )
 			_constructor();
 		return ( _tls );
 		M_EPILOG
-		}
-	const_iterator begin( void ) const
-		{
+	}
+	const_iterator begin( void ) const {
 		return ( _instances.begin() );
-		}
+	}
 /* cppcheck-suppress functionConst */
-	iterator begin( void )
-		{
+	iterator begin( void ) {
 		return ( _instances.begin() );
-		}
-	const_iterator end( void ) const
-		{
+	}
+	const_iterator end( void ) const {
 		return ( _instances.end() );
-		}
+	}
 /* cppcheck-suppress functionConst */
-	iterator end( void )
-		{
+	iterator end( void ) {
 		return ( _instances.end() );
-		}
-	};
+	}
+};
 template<typename tType>
 CXX_EXTENSION_TLS tType* HTLS<tType>::_tls = NULL;
 

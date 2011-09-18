@@ -34,38 +34,32 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/harray.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Secure Socket Layer utility class.
  *
  * One can create both SSL server and SSL client
  * IO wrappers.
  */
-class HOpenSSL
-	{
+class HOpenSSL {
 public:
 	typedef HOpenSSL this_type;
 	static yaal::hcore::HString _sSLKey;
 	static yaal::hcore::HString _sSLCert;
 	/*! \brief SSL object types.
 	 */
-	struct TYPE
-		{
+	struct TYPE {
 		/*! \brief Types.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			SERVER, /*!< Server side of SSL connection. */
 			CLIENT  /*!< Client side of SSL connection. */
-			} ssl_context_type_t;
-		};
+		} ssl_context_type_t;
+	};
 private:
-	class OSSLContext
-		{
+	class OSSLContext {
 		typedef HPointer<HMutex> mutex_ptr_t;
 		typedef HPair<mutex_ptr_t, int> mutex_info_t;
 		typedef HArray<mutex_info_t> mutexes_t;
@@ -87,21 +81,19 @@ private:
 	private:
 		OSSLContext( OSSLContext const& );
 		OSSLContext& operator=( OSSLContext const& );
-		};
-	class OSSLContextServer : public OSSLContext, public HSingleton<OSSLContextServer>
-		{
+	};
+	class OSSLContextServer : public OSSLContext, public HSingleton<OSSLContextServer> {
 		OSSLContextServer( void );
 		virtual void const* do_method( void ) const;
 		friend class HSingleton<OSSLContextServer>;
 		friend class HDestructor<OSSLContextServer>;
-		};
-	class OSSLContextClient : public OSSLContext, public HSingleton<OSSLContextClient>
-		{
+	};
+	class OSSLContextClient : public OSSLContext, public HSingleton<OSSLContextClient> {
 		OSSLContextClient( void );
 		virtual void const* do_method( void ) const;
 		friend class HSingleton<OSSLContextClient>;
 		friend class HDestructor<OSSLContextClient>;
-		};
+	};
 	bool _pendingOperation;
 	void* _ssl;
 	OSSLContext* _ctx;
@@ -121,7 +113,7 @@ private:
 	operation_t do_accept_or_connect;
 	HOpenSSL( HOpenSSL const& );
 	HOpenSSL& operator=( HOpenSSL const& );
-	};
+};
 
 typedef HExceptionT<HOpenSSL> HOpenSSLException;
 typedef HExceptionT<HOpenSSL, HOpenSSLException> HOpenSSLFatalException;

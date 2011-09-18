@@ -33,18 +33,15 @@ Copyright:
 #include "hconsole/hhandler.hxx"
 #include "hconsole/hstatusbarcontrol.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 class HControlList;
 
 /*! \brief TUI Window implementation.
  */
-class HWindow : public HHandler
-	{
+class HWindow : public HHandler {
 public:
 	typedef HWindow this_type;
 	typedef HHandler base_type;
@@ -89,7 +86,7 @@ private:
 	void acquire_focus( HControl const* const );
 	HWindow( HWindow const& );
 	HWindow& operator = ( HWindow const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HWindow, HHandlerException> HWindowException;
 

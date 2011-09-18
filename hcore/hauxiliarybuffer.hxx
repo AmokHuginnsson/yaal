@@ -36,17 +36,14 @@ Copyright:
 #include "hcore/iterator.hxx"
 #include "hcore/system.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Helper class for adaptive algorithms.
  */
 template<typename type_t>
-class HAuxiliaryBuffer
-	{
+class HAuxiliaryBuffer {
 public:
 	typedef HAuxiliaryBuffer<type_t> this_type;
 	typedef type_t value_type;
@@ -67,99 +64,86 @@ public:
 	template<typename iter_t>
 	void init( iter_t, iter_t );
 	void clear( void );
-	};
+};
 
 template<typename type_t>
 template<typename iter_t>
 HAuxiliaryBuffer<type_t>::HAuxiliaryBuffer( iter_t first_, iter_t last_ )
-	: _data( NULL ), _size( 0 ), _requestedSize( 0 ), _allocated( 0 ), _initialized( false )
-	{
+	: _data( NULL ), _size( 0 ), _requestedSize( 0 ), _allocated( 0 ), _initialized( false ) {
 	init( first_, last_ );
 	return;
-	}
+}
 
 template<typename type_t>
 template<typename iter_t>
-void HAuxiliaryBuffer<type_t>::init( iter_t first_, iter_t last_ )
-	{
+void HAuxiliaryBuffer<type_t>::init( iter_t first_, iter_t last_ ) {
 	using yaal::distance;
 	_requestedSize = distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() );
 	int long canCopy( _allocated );
-	if ( _requestedSize > _allocated )
-		{
+	if ( _requestedSize > _allocated ) {
 		int long newCanCopy( static_cast<int long>( hcore::system::get_memory_size_info().available() ) / sizeof ( value_type ) );
 		if ( newCanCopy > canCopy )
 			canCopy = newCanCopy;
-		}
+	}
 	int long auxSize( min( _requestedSize, canCopy ) );
 	/* Only 1 element in auxiliary buffer is equivalent
 	 * to pure inplace implementation, so it does not make sense to go with aux. */
 	clear();
-	if ( auxSize > 1 )
-		{
-		if ( auxSize > _allocated )
-			{
-			if ( _allocated > 0 )
-				{
+	if ( auxSize > 1 ) {
+		if ( auxSize > _allocated ) {
+			if ( _allocated > 0 ) {
 				delete _data;
 				_data = NULL;
 				_allocated = 0;
-				}
+			}
 			_data = static_cast<value_type*>( operator new ( auxSize * sizeof ( value_type ) ) );
 			_allocated = auxSize;
-			}
+		}
 		_size = auxSize;
 		for ( value_type* it( _data ), * endIt( _data + _size ); it != endIt; ++ it, ++ first_ )
 			new ( it ) value_type( *first_ );
 		_initialized = true;
-		}
-	return;
 	}
+	return;
+}
 
 template<typename type_t>
-HAuxiliaryBuffer<type_t>::~HAuxiliaryBuffer( void )
-	{
+HAuxiliaryBuffer<type_t>::~HAuxiliaryBuffer( void ) {
 	M_PROLOG
 	clear();
 	delete _data;
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
 template<typename type_t>
-void HAuxiliaryBuffer<type_t>::clear( void )
-	{
-	if ( _initialized )
-		{
+void HAuxiliaryBuffer<type_t>::clear( void ) {
+	if ( _initialized ) {
 		for ( value_type* it( begin() ), * endIt( end() ); it != endIt; ++ it )
 			M_SAFE( it->~value_type() );
 		_initialized = false;
-		}
 	}
+}
 
 template<typename type_t>
-typename HAuxiliaryBuffer<type_t>::value_type* HAuxiliaryBuffer<type_t>::begin( void )
-	{
+typename HAuxiliaryBuffer<type_t>::value_type* HAuxiliaryBuffer<type_t>::begin( void ) {
 	return ( _initialized ? _data : NULL );
-	}
+}
 
 template<typename type_t>
-typename HAuxiliaryBuffer<type_t>::value_type* HAuxiliaryBuffer<type_t>::end( void )
-	{
+typename HAuxiliaryBuffer<type_t>::value_type* HAuxiliaryBuffer<type_t>::end( void ) {
 	return ( _initialized ? _data + _size : NULL );
-	}
+}
 
 template<typename type_t>
-int long HAuxiliaryBuffer<type_t>::get_size( void ) const
-	{
+int long HAuxiliaryBuffer<type_t>::get_size( void ) const {
 	return ( _initialized ? _size : 0 );
-	}
+}
 
 template<typename type_t>
-int long HAuxiliaryBuffer<type_t>::get_requested_size( void ) const
-	{
+int long HAuxiliaryBuffer<type_t>::get_requested_size( void ) const {
 	return ( _initialized ? _requestedSize : 0 );
-	}
+}
 
 }
 

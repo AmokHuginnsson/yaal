@@ -36,17 +36,14 @@ M_VCSID( "$Id: "__ID__" $" )
 using namespace yaal::hcore;
 using namespace yaal::meta;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 yaal::hcore::HMutex HAlarm::_mutex;
 
 HAlarm::HAlarm( int long miliseconds_ )
-	: _timer(), _lock( _mutex )
-	{
+	: _timer(), _lock( _mutex ) {
 	M_PROLOG
 	static int long const MILI_IN_WHOLE = power<10, 3>::value;
 	static int long const NANO_IN_MILI = power<10, 6>::value;
@@ -70,10 +67,9 @@ HAlarm::HAlarm( int long miliseconds_ )
 	M_ENSURE( timer_settime( _timer, 0, &timeout, NULL ) == 0 );
 	return;
 	M_EPILOG
-	}
+}
 
-HAlarm::~HAlarm( void )
-	{
+HAlarm::~HAlarm( void ) {
 	M_PROLOG
 
 	itimerspec timeout;
@@ -88,7 +84,7 @@ HAlarm::~HAlarm( void )
 	M_ENSURE( timer_delete( _timer ) == 0 );
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
 }
 

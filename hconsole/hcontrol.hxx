@@ -32,11 +32,9 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hinfo.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 class HWindow;
 
@@ -44,28 +42,24 @@ class HWindow;
  *
  * This class is a common interface for all TUI control classes.
  */
-class HControl
-	{
+class HControl {
 public:
 	typedef HControl this_type;
 /*! \brief Various configuration bits for HControl hierarchy.
  */
-	struct BITS
-		{
+	struct BITS {
 		/*! \brief Possible alignment types of text in HControl.
 		 */
-		struct ALIGN
-			{
+		struct ALIGN {
 			/*! \brief Align type.
 			 */
-			typedef enum
-				{
+			typedef enum {
 				LEFT, /*!< text ought to be left aligned */
 				CENTER, /*!< text ought to be centered */
 				RIGHT /*!< text ought to be right aligned */
-				} align_t;
-			};
+			} align_t;
 		};
+	};
 	static int const DEFAULT_ATTRS = -1; /*!< Default HControl attribites (colors of label and data fore/back-ground) */
 	typedef yaal::hcore::HPointer<HControl> ptr_t;
 protected:
@@ -288,7 +282,7 @@ protected:
 private:
 	HControl ( HControl const& );
 	HControl& operator = ( HControl const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HControl> HControlException;
 

@@ -55,46 +55,41 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 
 #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
-void* memrchr( void const* ptr, int what, int long from )
-	{
+void* memrchr( void const* ptr, int what, int long from ) {
 	char const* str = static_cast<char const*>( ptr );
-	while ( -- from >= 0 )
-		{
+	while ( -- from >= 0 ) {
 		if ( str[ from ] == what )
 			break;
-		}
-	return ( from >= 0 ? const_cast<char*>( str + from ) : 0 );
 	}
+	return ( from >= 0 ? const_cast<char*>( str + from ) : 0 );
+}
 #endif /* not HAVE_MEMRCHR */
 
 #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 )
-int long strnlen( char const* str_, int long maxLen_ )
-	{
+int long strnlen( char const* str_, int long maxLen_ ) {
 	char const* end( static_cast<char const*>( ::memchr( str_, 0, maxLen_ ) ) );
 	return ( end ? end - str_ : maxLen_ );
-	}
+}
 #endif /* #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 ) */
 
 #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
 #include <cstring>
-char* strcasestr( char const* haystack, char const* needle )
-	{
+char* strcasestr( char const* haystack, char const* needle ) {
 	int long idx = ::yaal::hcore::string_helper::kmpcasesearch( ( haystack ), static_cast<int long>( ::std::strlen( haystack ) ), ( needle ), static_cast<int long>( ::std::strlen( needle ) ) );
 	return ( idx >= 0 ? const_cast<char*>( haystack ) + idx : 0 );
-	}
+}
 #endif /* not HAVE_STRCASESTR */
 
 #if defined( HAVE_GETHOSTBYNAME_R )
 #if ! defined( HAVE_GNU_GETHOSTBYNAME_R )
 #include <cstdlib>
 #include <netdb.h>
-int gethostbyname_r( char const* a0, struct hostent* a1, char* a2, long unsigned a3, struct hostent** a4, int* a5 )
-	{
+int gethostbyname_r( char const* a0, struct hostent* a1, char* a2, long unsigned a3, struct hostent** a4, int* a5 ) {
 	hostent* h = ::gethostbyname_r( a0, a1, a2, static_cast<int>( a3 ), a5 );
 	if ( a4 )
 		*a4 = h;
 	return ( h ? 0 : errno );
-	}
+}
 #endif /* not HAVE_GNU_GETHOSTBYNAME_R */
 #endif /* HAVE_GETHOSTBYNAME_R */
 
@@ -102,34 +97,30 @@ int gethostbyname_r( char const* a0, struct hostent* a1, char* a2, long unsigned
 #if ! defined( HAVE_GNU_GETHOSTBYADDR_R )
 #include <cstdlib>
 #include <netdb.h>
-int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a4, long unsigned a5, struct hostent** a6, int* a7 )
-	{
+int gethostbyaddr_r( void const* a0, int a1, int a2, struct hostent* a3, char* a4, long unsigned a5, struct hostent** a6, int* a7 ) {
 	hostent* h = ::gethostbyaddr_r( static_cast<char const*>( a0 ), a1, a2, a3, a4, static_cast<int>( a5 ), a7 );
 	if ( a6 )
 		*a6 = h;
 	return ( h ? 0 : errno );
-	}
+}
 #endif /* not HAVE_GNU_GETHOSTBYADDR_R */
 #endif /* HAVE_GETHOSTBYADDR_R */
 
 #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 )
-double long powl( double long a, double long b )
-	{
+double long powl( double long a, double long b ) {
 	return ( ::std::pow( a, b ) );
-	}
+}
 #endif /* not HAVE_POWL */
 
 #if ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 )
-double long floorl( double long x )
-	{
+double long floorl( double long x ) {
 	return ( ::std::floor( x ) );
-	}
+}
 #endif /* not HAVE_DECL_FLOORL */
 
 #if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 )
-double long strtold( char const* str, char** tail )
-	{
+double long strtold( char const* str, char** tail ) {
 	return ( strtod( str, tail ) );
-	}
+}
 #endif /* not HAVE_STRTOLD */
 

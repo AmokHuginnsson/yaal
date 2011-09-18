@@ -24,64 +24,52 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-extern "C"
-{
+extern "C" {
 
 M_EXPORT_SYMBOL void* db_connect( char const* /*dataBase_*/,
-		char const* /*login_*/, char const* /*password_*/ )
-	{
+		char const* /*login_*/, char const* /*password_*/ ) {
 	return ( NULL );
-	}
+}
 
-M_EXPORT_SYMBOL void db_disconnect( void* /*data_*/ )
-	{
+M_EXPORT_SYMBOL void db_disconnect( void* /*data_*/ ) {
 	return;
-	}
+}
 
-M_EXPORT_SYMBOL int dbrs_errno( void* /*dataB_*/, void* /*dataR_*/ )
-	{
+M_EXPORT_SYMBOL int dbrs_errno( void* /*dataB_*/, void* /*dataR_*/ ) {
 	return ( errno );
-	}
+}
 
-M_EXPORT_SYMBOL char const* dbrs_error( void* /*dataB_*/, void* /*dataR_*/ )
-	{
+M_EXPORT_SYMBOL char const* dbrs_error( void* /*dataB_*/, void* /*dataR_*/ ) {
 	return ( "" );
-	}
+}
 
-M_EXPORT_SYMBOL void* db_query( void* /*data_*/, char const* /*query_*/ )
-	{
+M_EXPORT_SYMBOL void* db_query( void* /*data_*/, char const* /*query_*/ ) {
 	return ( NULL );
-	}
+}
 
-M_EXPORT_SYMBOL void rs_unquery( void* /*data_*/ )
-	{
+M_EXPORT_SYMBOL void rs_unquery( void* /*data_*/ ) {
 	return;
-	}
+}
 
-M_EXPORT_SYMBOL char const* rs_get( void* /*data_*/, int long /*row_*/, int /*column_*/ )
-	{
+M_EXPORT_SYMBOL char const* rs_get( void* /*data_*/, int long /*row_*/, int /*column_*/ ) {
 	return ( NULL );
-	}
+}
 
-M_EXPORT_SYMBOL int rs_fields_count( void* /*data_*/ )
-	{
+M_EXPORT_SYMBOL int rs_fields_count( void* /*data_*/ ) {
 	return ( 0 );
-	}
+}
 
-M_EXPORT_SYMBOL int long dbrs_records_count( void* /*dataB_*/, void* /*dataR_*/ )
-	{
+M_EXPORT_SYMBOL int long dbrs_records_count( void* /*dataB_*/, void* /*dataR_*/ ) {
 	return ( 0 );
-	}
+}
 
-M_EXPORT_SYMBOL int long dbrs_id( void* /*dataB_*/, void* /*dataR_*/ )
-	{
+M_EXPORT_SYMBOL int long dbrs_id( void* /*dataB_*/, void* /*dataR_*/ ) {
 	return ( 0 );
-	}
+}
 
-M_EXPORT_SYMBOL char const* rs_column_name( void* /*dataR_*/, int /*field_*/ )
-	{
+M_EXPORT_SYMBOL char const* rs_column_name( void* /*dataR_*/, int /*field_*/ ) {
 	return ( NULL );
-	}
+}
 
 }
 

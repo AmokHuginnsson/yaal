@@ -30,16 +30,13 @@ Copyright:
 #include "hcore/hstreaminterface.hxx"
 #include "hcore/hpointer.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Unnamed pipe C++ wrapper.
  */
-class HPipe : public yaal::hcore::HStreamInterface
-	{
+class HPipe : public yaal::hcore::HStreamInterface {
 protected:
 	typedef HPipe this_type;
 	typedef HStreamInterface base_type;
@@ -55,7 +52,7 @@ protected:
 	virtual int long do_read( void* const, int long );
 	virtual void do_flush( void ) const;
 	virtual bool do_is_valid( void ) const;
-	};
+};
 
 typedef HExceptionT<HPipe, HStreamInterfaceException> HPipeException;
 

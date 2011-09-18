@@ -34,13 +34,11 @@ Copyright:
 
 #include "hcore/hexception.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
 /*! \brief Memory handling routines.
  */
-namespace memory
-{
+namespace memory {
 
 struct YaalNew {};
 
@@ -49,14 +47,12 @@ static YaalNew yaal __attribute__((used));
 struct MemoryAllocation {};
 typedef yaal::hcore::HExceptionT<MemoryAllocation> HMemoryAllocationException;
 
-struct ON_ALLOC_FAILURE
-	{
-	typedef enum
-		{
+struct ON_ALLOC_FAILURE {
+	typedef enum {
 		ABORT,
 		THROW
-		} on_alloc_failure_t;
-	};
+	} on_alloc_failure_t;
+};
 
 void* alloc( int long );
 void* calloc( int long );
@@ -64,30 +60,26 @@ void* realloc( void*, int long );
 void free0( void* ) throw();
 
 template<typename tType>
-inline tType* alloc( int long count_ )
-	{
+inline tType* alloc( int long count_ ) {
 	return ( static_cast<tType*>( alloc( count_ * sizeof ( tType ) ) ) );
-	}
+}
 
 template<typename tType>
-inline tType* calloc( int long count_ )
-	{
+inline tType* calloc( int long count_ ) {
 	return ( static_cast<tType*>( calloc( count_ * sizeof ( tType ) ) ) );
-	}
+}
 
 template<typename tType>
-inline tType* realloc( void* pointer_, int long count_ )
-	{
+inline tType* realloc( void* pointer_, int long count_ ) {
 	return ( static_cast<tType*>( realloc( pointer_, count_ * sizeof ( tType ) ) ) );
-	}
+}
 
 template<typename tType>
-inline void free( tType& pointer_ ) throw()
-	{
+inline void free( tType& pointer_ ) throw() {
 	free0( pointer_ );
 	pointer_ = NULL;
 	return;
-	}
+}
 
 }
 

@@ -5,8 +5,7 @@
 #include <glibc/fcntl.h>
 #undef fcntl
 
-namespace msvcxx
-{
+namespace msvcxx {
 
 int fcntl( int, int, int );
 

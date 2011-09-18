@@ -38,33 +38,28 @@ Copyright:
 #include "hcore/hlist.hxx"
 #include "hcore/hthread.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Interface for all client to singleton pattern.
  */
-class HSingletonInterface : private trait::HNonCopyable
-	{
+class HSingletonInterface : private trait::HNonCopyable {
 public:
 	static int life_time( int );
-	};
+};
 
 /*! \brief Interface for automatic destruction used by HLifeTimeTracker.
  */
-class HAbstractDestructor
-	{
+class HAbstractDestructor {
 public:
 	virtual ~HAbstractDestructor( void ) {}
 	virtual void destruct( void ) = 0;
-	};
+};
 
 /*! \brief Singleton deleter engine.
  */
-class HLifeTimeTracker
-	{
+class HLifeTimeTracker {
 	typedef HLifeTimeTracker this_type;
 public:
 	typedef yaal::hcore::HPointer<HAbstractDestructor> destructor_ptr_t;
@@ -85,48 +80,43 @@ public:
 #else /* not __HOST_OS_TYPE_FREEBSD__ */
 	static void destruct( void* );
 #endif /* __HOST_OS_TYPE_FREEBSD__ */
-	};
+};
 
 /*! \brief HLifeTimeTracker utility used to destroy guarded objects.
  */
 template<typename tType>
-class HDestructor : public HAbstractDestructor
-	{
+class HDestructor : public HAbstractDestructor {
 	tType*& _object;
 public:
 	explicit HDestructor( tType*& );
 	~HDestructor( void );
 	virtual void destruct( void );
-	};
+};
 
 template<typename tType>
-HDestructor<tType>::HDestructor( tType*& object_ ) : HAbstractDestructor(), _object( object_ )
-	{
-	}
+HDestructor<tType>::HDestructor( tType*& object_ ) : HAbstractDestructor(), _object( object_ ) {
+}
 
 template<typename tType>
-HDestructor<tType>::~HDestructor( void )
-	{
+HDestructor<tType>::~HDestructor( void ) {
 	M_PROLOG
 	destruct();
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
 template<typename tType>
-void HDestructor<tType>::destruct( void )
-	{
+void HDestructor<tType>::destruct( void ) {
 	M_PROLOG
 	if ( _object )
 		M_SAFE( delete _object );
 	_object = NULL;
 	M_EPILOG
-	}
+}
 
 /*! \brief Singleton pattern implementation.
  */
 template<typename tType>
-class HSingleton : private HSingletonInterface
-	{
+class HSingleton : private HSingletonInterface {
 public:
 	typedef HSingleton<tType> this_type;
 private:
@@ -134,7 +124,7 @@ private:
 	static tType* create_instance( int );
 public:
 	static tType& get_instance( int = 0 );
-	};
+};
 
 typedef HExceptionT<HSingletonInterface> HSingletonException;
 
@@ -142,8 +132,7 @@ template<typename tType>
 tType* HSingleton<tType>::_instance = NULL;
 
 template<typename tType>
-tType* HSingleton<tType>::create_instance( int lifeTime_ )
-	{
+tType* HSingleton<tType>::create_instance( int lifeTime_ ) {
 	M_PROLOG
 	M_ASSERT( ! _instance );
 	HLifeTimeTracker& lt = HLifeTimeTracker::get_instance();
@@ -151,22 +140,20 @@ tType* HSingleton<tType>::create_instance( int lifeTime_ )
 	lt.register_destructor( p, tType::life_time( lifeTime_ ) );
 	return ( new ( memory::yaal ) tType() );
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-tType& HSingleton<tType>::get_instance( int lifeTime_ )
-	{
+tType& HSingleton<tType>::get_instance( int lifeTime_ ) {
 	M_PROLOG
-	if ( ! _instance )
-		{
+	if ( ! _instance ) {
 		static HMutex mutex;
 		HLock l( mutex );
 		if ( ! _instance )
 			_instance = create_instance( lifeTime_ );
-		}
+	}
 	return ( *_instance );
 	M_EPILOG
-	}
+}
 
 }
 

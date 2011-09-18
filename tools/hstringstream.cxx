@@ -34,62 +34,51 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 HStringStream::HStringStream( void )
-	: _used( false ), _offset( 0 ), _buffer( "" )
-	{
-	}
+	: _used( false ), _offset( 0 ), _buffer( "" ) {
+}
 
 HStringStream::HStringStream( HString const& init_ )
-	: _used( false ), _offset( 0 ), _buffer( init_ )
-	{
-	}
+	: _used( false ), _offset( 0 ), _buffer( init_ ) {
+}
 
-HStringStream& HStringStream::operator = ( HString const& s )
-	{
+HStringStream& HStringStream::operator = ( HString const& s ) {
 	_buffer = s;
 	_offset = 0;
 	_used = false;
 	return ( *this );
-	}
+}
 
-char const* HStringStream::raw( void ) const
-	{
+char const* HStringStream::raw( void ) const {
 	return ( _buffer.raw() );
-	}
+}
 
-yaal::hcore::HString const& HStringStream::string( void ) const
-	{
+yaal::hcore::HString const& HStringStream::string( void ) const {
 	return ( _buffer );
-	}
+}
 
-int long HStringStream::do_write( void const* const buffer_, int long size_ )
-	{
+int long HStringStream::do_write( void const* const buffer_, int long size_ ) {
 	M_PROLOG
-	if ( _used )
-		{
+	if ( _used ) {
 		_buffer.clear();
 		_used = false;
-		}
+	}
 	_buffer.insert( _buffer.get_length(), size_, static_cast<char const* const>( buffer_ ) );
 	return ( size_ );
 	M_EPILOG
-	}
+}
 
-void HStringStream::do_flush( void ) const
-	{
+void HStringStream::do_flush( void ) const {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-int long HStringStream::do_read( void* const buffer_, int long size_ )
-	{
+int long HStringStream::do_read( void* const buffer_, int long size_ ) {
 	M_PROLOG
 	int long length = yaal::min( _buffer.get_length() - _offset, size_ );
 	if ( length > 0 )
@@ -97,51 +86,45 @@ int long HStringStream::do_read( void* const buffer_, int long size_ )
 	_offset += length;
 	return ( length );
 	M_EPILOG
-	}
+}
 
-void HStringStream::use( void ) const
-	{
+void HStringStream::use( void ) const {
 	_used = true;
 	return;
-	}
+}
 
-void HStringStream::clear( void )
-	{
+void HStringStream::clear( void ) {
 	M_PROLOG
 	_buffer.clear();
 	return;
 	M_EPILOG
-	}
+}
 
-char const* HStringStream::consume( void ) const
-	{
+char const* HStringStream::consume( void ) const {
 	M_PROLOG
 	use();
 	return ( _buffer.raw() );
 	M_EPILOG
-	}
+}
 
-char const* operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& stream )
-	{
+char const* operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& stream ) {
 	M_PROLOG
 	stream.use();
 	return ( stream.raw() );
 	M_EPILOG
-	}
+}
 
-bool HStringStream::is_empty( void ) const
-	{
+bool HStringStream::is_empty( void ) const {
 	M_PROLOG
 	return ( _used || _buffer.is_empty() );
 	M_EPILOG
-	}
+}
 
-bool HStringStream::do_is_valid( void ) const
-	{
+bool HStringStream::do_is_valid( void ) const {
 	M_PROLOG
 	return ( true );
 	M_EPILOG
-	}
+}
 
 }
 

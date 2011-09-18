@@ -44,23 +44,19 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace
-{
+namespace {
 
-double long yaal_strtold( HString const& str_ )
-	{
+double long yaal_strtold( HString const& str_ ) {
 	M_PROLOG
 	return ( tools::util::atof_ex( str_, true ) );
 	M_EPILOG
-	}
+}
 
 }
 
-namespace tools
-{
+namespace tools {
 
 HString _serialDevice_;
 HString _defaultEncoding_ = "ISO-8859-2";
@@ -71,24 +67,19 @@ bool _ignoreSignalSIGINT_ = false;
 bool _ignoreSignalSIGTSTP_ = false;
 bool _ignoreSignalSIGQUIT_ = false;
 
-namespace util
-	{
+namespace util {
 extern char _transTableStripPL_ [ 256 ];
-	}
+}
 
 /* return true means error occured, false - every thing ok */
-bool set_tools_variables( HString& option_, HString& value_ )
-	{
+bool set_tools_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
 	if ( ! strcasecmp( option_, "set_env" ) )
 		decode_set_env( value_ );
-	else if ( ! strcasecmp( option_, "serial_baudrate" ) )
-		{
-		if ( ( value_.get_length() > 1 ) && ( value_ [ 0 ] == 'B' ) )
-			{
+	else if ( ! strcasecmp( option_, "serial_baudrate" ) ) {
+		if ( ( value_.get_length() > 1 ) && ( value_ [ 0 ] == 'B' ) ) {
 			int baudRate( lexical_cast<int>( value_.raw() + 1 ) );
-			switch ( baudRate )
-				{
+			switch ( baudRate ) {
 				case ( 115200 ): _baudRate_ = HSerial::SPEED::B_115200; break;
 #if ( HAVE_DECL_B76800 )
 				case (  76800 ): _baudRate_ = HSerial::SPEED::B_76800;  break;
@@ -111,14 +102,11 @@ bool set_tools_variables( HString& option_, HString& value_ )
 				default:
 					M_THROW( _( "unknown baud rate" ), baudRate );
 				break;
-				}
 			}
 		}
-	else if ( ! strcasecmp( option_, "serial_flags" ) )
-		{
+	} else if ( ! strcasecmp( option_, "serial_flags" ) ) {
 		HTokenizer t( value_, " \t" );
-		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it )
-			{
+		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it ) {
 			if ( ! strcasecmp( *it, "FLOW_CONTROL_HARDWARE" ) )
 				_serialFlags_ = HSerial::FLAG::FLOW_CONTROL_HARDWARE;
 			else if ( ! strcasecmp( *it, "SOFTWARE_CONTROL_SOFTWARE" ) )
@@ -145,21 +133,19 @@ bool set_tools_variables( HString& option_, HString& value_ )
 				_serialFlags_ = HSerial::FLAG::PARITY_ODD;
 			else
 				return ( true );
-			}
 		}
+	}
 	return ( false );
 	M_EPILOG
-	}
+}
 
-class HToolsInitDeinit
-	{
+class HToolsInitDeinit {
 public:
 	HToolsInitDeinit( void );
 	~HToolsInitDeinit( void );
-	} initDeinit;
+} initDeinit;
 
-HToolsInitDeinit::HToolsInitDeinit( void )
-	{
+HToolsInitDeinit::HToolsInitDeinit( void ) {
 	M_PROLOG
 	yaal_options()( "ignore_signal_SIGINT", program_options_helper::option_value( _ignoreSignalSIGINT_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore INT (interrupt) signal" )
 			( "ignore_signal_SIGTSTP", program_options_helper::option_value( _ignoreSignalSIGTSTP_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore TSTP (terminal stop, suspend) signal" )
@@ -197,34 +183,30 @@ HToolsInitDeinit::HToolsInitDeinit( void )
 	util::_transTableStripPL_[ static_cast<char unsigned>( '¯' ) ] = 'Z';
 	return;
 	M_EPILOG
-	}
+}
 
-HToolsInitDeinit::~HToolsInitDeinit( void )
-	{
+HToolsInitDeinit::~HToolsInitDeinit( void ) {
 	return;
-	}
+}
 
-void banner( void )
-	{
+void banner( void ) {
 	::printf( "\ttools\n" );
 	return;
-	}
+}
 
 }
 
 }
 
 extern "C"
-int yaal_tools_main( int, char** )
-	{
+int yaal_tools_main( int, char** ) {
 	static char const dynamicLinkerPath[]
 		__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
-	if ( dynamicLinkerPath[ 0 ] )
-		{
+	if ( dynamicLinkerPath[ 0 ] ) {
 		yaal::hcore::banner();
 		yaal::tools::banner();
 		::exit( 0 );
-		}
-	return ( 0 );
 	}
+	return ( 0 );
+}
 

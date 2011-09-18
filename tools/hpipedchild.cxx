@@ -42,100 +42,83 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
-static void close_and_invalidate( int& fd_ )
-	{
+static void close_and_invalidate( int& fd_ ) {
 	M_PROLOG
 	if ( fd_ >= 0 )
 		M_ENSURE( TEMP_FAILURE_RETRY( hcore::system::close( fd_ ) ) == 0 );
 	fd_ = -1;
 	return;
 	M_EPILOG
-	}
+}
 
 int HPipedChild::_killGracePeriod = 1000;
 
 HPipedChild::HPipedChild( void )
 	: HStreamInterface(), _pid( 0 ),
 	_pipeIn( -1 ), _pipeOut( -1 ), _pipeErr( -1 ),
-	_cSOI( STREAM::OUT ), _secondLineCache( _cache.size() ), _secondLineOffset( _offset )
-	{
+	_cSOI( STREAM::OUT ), _secondLineCache( _cache.size() ), _secondLineOffset( _offset ) {
 	return;
-	}
+}
 
-HPipedChild::~HPipedChild( void )
-	{
+HPipedChild::~HPipedChild( void ) {
 	M_PROLOG
 	if ( _pid > 0 )
 		finish();
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-HPipedChild::STATUS HPipedChild::finish( void )
-	{
+HPipedChild::STATUS HPipedChild::finish( void ) {
 	M_PROLOG
 	close_and_invalidate( _pipeErr );
 	close_and_invalidate( _pipeOut );
 	close_and_invalidate( _pipeIn );
 	STATUS s;
-	if ( _pid > 0 )
-		{
+	if ( _pid > 0 ) {
 		int status( 0 );
 		int pid( 0 );
 		M_ENSURE( ( pid = ::waitpid( _pid, &status, WNOHANG | WUNTRACED | WCONTINUED ) ) != -1 );
-		if ( pid != _pid )
-			{
-			M_ENSURE( hcore::system::kill( _pid, SIGTERM ) == 0 );
-				{
+		if ( pid != _pid ) {
+			M_ENSURE( hcore::system::kill( _pid, SIGTERM ) == 0 ); {
 				HAlarm alarm( _killGracePeriod );
 				M_ENSURE( ( ( pid = ::waitpid( _pid, &status, 0 ) ) != -1 ) || ( errno == EINTR ) );
-				}
-			if ( pid != _pid )
-				{
+			}
+			if ( pid != _pid ) {
 				M_ENSURE( hcore::system::kill( _pid, SIGKILL ) == 0 );
 				M_ENSURE( ::waitpid( _pid, &status, 0 ) == _pid );
-				}
-			}
-		if ( WIFEXITED( status ) )
-			{
-			s.type = STATUS::TYPE::NORMAL;
-			s.value = WEXITSTATUS( status );
-			}
-		else if ( WIFSIGNALED( status ) )
-			{
-			s.type = STATUS::TYPE::ABORT;
-			s.value = WTERMSIG( status );
 			}
 		}
+		if ( WIFEXITED( status ) ) {
+			s.type = STATUS::TYPE::NORMAL;
+			s.value = WEXITSTATUS( status );
+		} else if ( WIFSIGNALED( status ) ) {
+			s.type = STATUS::TYPE::ABORT;
+			s.value = WTERMSIG( status );
+		}
+	}
 	_pid = 0;
 	return ( s );
 	M_EPILOG
-	}
+}
 
-struct OPipeResGuard
-	{
+struct OPipeResGuard {
 	int _res[2];
-	OPipeResGuard( void ) : _res()
-		{
+	OPipeResGuard( void ) : _res() {
 		_res[ 0 ] = _res[ 1 ] = -1;
-		}
-	~OPipeResGuard( void )
-		{
+	}
+	~OPipeResGuard( void ) {
 		if ( _res[ 0 ] >= 0 )
 			TEMP_FAILURE_RETRY( hcore::system::close( _res[ 0 ] ) );
 		if ( _res[ 1 ] >= 0 )
 			TEMP_FAILURE_RETRY( hcore::system::close( _res[ 1 ] ) );
-		}
-	};
+	}
+};
 
-void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
-	{
+void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	OPipeResGuard pipeIn, pipeOut, pipeErr;
@@ -151,8 +134,7 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 	int const stderrFd( fileno( stderr ) );
 	_pid = ::fork();
 	M_ENSURE_EX( _pid >= 0, "fork()" );
-	if ( ! _pid )
-		{
+	if ( ! _pid ) {
 		close_and_invalidate( fileDesIn[ 1 ] );
 		close_and_invalidate( fileDesOut[ 0 ] );
 		close_and_invalidate( fileDesErr[ 0 ] );
@@ -166,88 +148,76 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ )
 			argv.get<char const*>()[ i ] = it->raw();
 		::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
 		M_ENSURE( !"execv" );
-		}
-	else
-		{
+	} else {
 		close_and_invalidate( fileDesIn[ 0 ] );
 		close_and_invalidate( fileDesOut[ 1 ] );
 		close_and_invalidate( fileDesErr[ 1 ] );
 		swap( _pipeIn, fileDesIn[ 1 ] );
 		swap( _pipeOut, fileDesOut[ 0 ] );
 		swap( _pipeErr, fileDesErr[ 0 ] );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-int long HPipedChild::do_read( void* const buffer_, int long size_ )
-	{
+int long HPipedChild::do_read( void* const buffer_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( ( _pipeOut >= 0 ) && ( _pipeErr >= 0 ) );
 	int fd = ( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
 	return ( ::read( fd, buffer_, size_ ) );
 	M_EPILOG
-	}
+}
 
-int long HPipedChild::do_write( void const* const string_, int long size_ )
-	{
+int long HPipedChild::do_write( void const* const string_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( _pipeIn >= 0 );
 	int long nWritten( 0 );
 	int long nWriteChunk( 0 );
-	do
-		{
+	do {
 		nWriteChunk = TEMP_FAILURE_RETRY( ::write( _pipeIn,
 					static_cast<char const* const>( string_ ) + nWritten,
 					size_ - nWritten ) );
 		nWritten += nWriteChunk;
-		}
-	while ( ( nWriteChunk > 0 ) && ( nWritten < size_ ) );
+	} while ( ( nWriteChunk > 0 ) && ( nWritten < size_ ) );
 	return ( nWritten );
 	M_EPILOG
-	}
+}
 
-void HPipedChild::do_flush( void ) const
-	{
-	}
+void HPipedChild::do_flush( void ) const {
+}
 
-bool HPipedChild::read_poll( int long* time_ )
-	{
+bool HPipedChild::read_poll( int long* time_ ) {
 	M_PROLOG
 	int fd( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
 	return ( hcore::system::wait_for_io( &fd, 1, NULL, 0, time_ ) <= 0 );
 	M_EPILOG
-	}
+}
 
-bool HPipedChild::is_running( void ) const
-	{
+bool HPipedChild::is_running( void ) const {
 	int err( 0 );
 	if ( _pid > 0 )
 		err = hcore::system::kill( _pid, 0 );
 	return ( ( _pid > 0 ) && ! err );
-	}
+}
 
-void HPipedChild::set_csoi( STREAM::stream_t const& cSOI_ )
-	{
+void HPipedChild::set_csoi( STREAM::stream_t const& cSOI_ ) {
 	M_PROLOG
 	M_ASSERT( ( cSOI_ == STREAM::OUT ) || ( cSOI_ == STREAM::ERR ) );
-	if ( cSOI_ != _cSOI )
-		{
+	if ( cSOI_ != _cSOI ) {
 		using yaal::swap;
 		swap( _offset, _secondLineOffset );
 		swap( _cache, _secondLineCache );
-		}
+	}
 	_cSOI = cSOI_;
 	return;
 	M_EPILOG
-	}
+}
 
-bool HPipedChild::do_is_valid( void ) const
-	{
+bool HPipedChild::do_is_valid( void ) const {
 	M_PROLOG
 	return ( is_running() && ( _pipeIn >= 0 ) && ( _pipeOut >= 0 ) && ( _pipeErr >= 0 ) );
 	M_EPILOG
-	}
+}
 
 }
 

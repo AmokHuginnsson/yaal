@@ -31,16 +31,13 @@ Copyright:
 #include "hconsole/hcontrol.hxx"
 #include "hdata/oresource.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 /*! \brief Base class for database connected TUI controls.
  */
-class HDataControl : public virtual hconsole::HControl
-	{
+class HDataControl : public virtual hconsole::HControl {
 protected:
 	OResource const* _resource;
 	dbwrapper::HSQLDescriptor::ptr_t _SQL;
@@ -56,7 +53,7 @@ public:
 private:
 	HDataControl ( HDataControl const & );
 	HDataControl & operator = ( HDataControl const & );
-	};
+};
 
 }
 

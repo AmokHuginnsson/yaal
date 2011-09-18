@@ -33,16 +33,13 @@ Copyright:
 #include "hcore/trait.hxx"
 #include "hcore/placeholder.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \cond */
 
-namespace free_standing_call_args
-{
+namespace free_standing_call_args {
 
 template<int, int, typename, typename, typename = trait::no_type, typename = trait::no_type,
 	typename = trait::no_type, typename = trait::no_type,
@@ -66,8 +63,7 @@ template<typename arg_t, typename fa0_t, typename fa1_t = trait::no_type,
 	typename fa6_t = trait::no_type, typename fa7_t = trait::no_type,
 	typename fa8_t = trait::no_type, typename fa9_t = trait::no_type,
 	typename fa10_t = trait::no_type>
-struct select
-	{
+struct select {
 	typedef typename trait::ternary<trait::same_type<higher_order::placeholder<1>, arg_t>::value, fa0_t,
 					typename trait::ternary<trait::same_type<higher_order::placeholder<2>, arg_t>::value, fa1_t,
 					typename trait::ternary<trait::same_type<higher_order::placeholder<3>, arg_t>::value, fa2_t,
@@ -81,218 +77,182 @@ struct select
 					typename trait::ternary<trait::same_type<higher_order::placeholder<11>, arg_t>::value, fa10_t,
 					arg_t>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type type;
 
-	};
+};
 
 template<typename arg_t, typename fa0_t>
-struct resolve_arg<1, arg_t, fa0_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-	{
+struct resolve_arg<1, arg_t, fa0_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
 	typedef typename select<arg_t, fa0_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0 )
-		{
+	inline static return_t get( arg_t a, fa0_t fa0 ) {
 		return ( getter<1, trait::find_type<arg_t, higher_order::placeholder<1> >::value, arg_t, fa0_t>::get( a, fa0 ) );
-		}
-	};
+	}
+};
 
 template<typename arg_t, typename fa0_t, typename fa1_t>
-struct resolve_arg<2, arg_t, fa0_t, fa1_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-	{
+struct resolve_arg<2, arg_t, fa0_t, fa1_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
 	typedef typename select<arg_t, fa0_t, fa1_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1 )
-		{
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1 ) {
 		return ( getter<2, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2> >::value, arg_t, fa0_t, fa1_t>::get( a, fa0, fa1 ) );
-		}
-	};
+	}
+};
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t>
-struct resolve_arg<3, arg_t, fa0_t, fa1_t, fa2_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-	{
+struct resolve_arg<3, arg_t, fa0_t, fa1_t, fa2_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
-		{
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2 ) {
 		return ( getter<3, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3> >::value, arg_t, fa0_t, fa1_t, fa2_t>::get( a, fa0, fa1, fa2 ) );
-		}
-	};
+	}
+};
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-struct resolve_arg<4, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-	{
+struct resolve_arg<4, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
-		{
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 ) {
 		return ( getter<4, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( a, fa0, fa1, fa2, fa3 ) );
-		}
-	};
+	}
+};
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-struct resolve_arg<5, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-	{
+struct resolve_arg<5, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
-		{
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 ) {
 		return ( getter<5, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( a, fa0, fa1, fa2, fa3, fa4 ) );
-		}
-	};
+	}
+};
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-struct resolve_arg<6, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-	{
+struct resolve_arg<6, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
-		{
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 ) {
 		return ( getter<6, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5 ) );
-		}
-	};
+	}
+};
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-struct resolve_arg<7, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, trait::no_type, trait::no_type, trait::no_type>
-	{
+struct resolve_arg<7, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, trait::no_type, trait::no_type, trait::no_type> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
-		{
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 ) {
 		return ( getter<7, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6>, higher_order::placeholder<7> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) );
-		}
-	};
+	}
+};
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-struct resolve_arg<8, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, trait::no_type, trait::no_type>
-	{
+struct resolve_arg<8, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, trait::no_type, trait::no_type> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
-		{
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 ) {
 		return ( getter<8, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6>, higher_order::placeholder<7>, higher_order::placeholder<8> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) );
-		}
-	};
+	}
+};
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t>
-struct resolve_arg<9, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, trait::no_type>
-	{
+struct resolve_arg<9, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, trait::no_type> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
-		{
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 ) {
 		return ( getter<9, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6>, higher_order::placeholder<7>, higher_order::placeholder<8>, higher_order::placeholder<9> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( a, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) );
-		}
-	};
+	}
+};
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t>
-struct resolve_arg<10, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>
-	{
+struct resolve_arg<10, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
-		{
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 ) {
 		return ( getter<10, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6>, higher_order::placeholder<7>, higher_order::placeholder<8>, higher_order::placeholder<9>, higher_order::placeholder<10> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( a, fa0, fa1, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) );
-		}
-	};
+	}
+};
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct resolve_arg<11, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct resolve_arg<11, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::type return_t;
-	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 )
-		{
+	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 ) {
 		return ( getter<11, trait::find_type<arg_t, higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3>, higher_order::placeholder<4>, higher_order::placeholder<5>, higher_order::placeholder<6>, higher_order::placeholder<7>, higher_order::placeholder<8>, higher_order::placeholder<9>, higher_order::placeholder<10>, higher_order::placeholder<11> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( a, fa0, fa1, fa3, fa4, fa5, fa6, fa7, fa8, fa9, fa10 ) );
-		}
-	};
+	}
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, 0, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, 0, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t, fa0_t fa0, fa1_t = fa1_t(), fa2_t = fa2_t(), fa3_t = fa3_t(), fa4_t = fa4_t(), fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
 		{ return ( fa0 ); }
-	};
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, 1, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, 1, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t, fa0_t, fa1_t fa1, fa2_t = fa2_t(), fa3_t = fa3_t(), fa4_t = fa4_t(), fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
 		{ return ( fa1 ); }
-	};
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, 2, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, 2, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t, fa0_t, fa1_t, fa2_t fa2, fa3_t = fa3_t(), fa4_t = fa4_t(), fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
 		{ return ( fa2 ); }
-	};
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, 3, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, 3, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t fa3, fa4_t = fa4_t(), fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
 		{ return ( fa3 ); }
-	};
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, 4, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, 4, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t fa4, fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
 		{ return ( fa4 ); }
-	};
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, 5, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, 5, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t fa5, fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
 		{ return ( fa5 ); }
-	};
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, 6, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, 6, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t fa6, fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
 		{ return ( fa6 ); }
-	};
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, 7, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, 7, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t fa7, fa8_t = fa8_t(), fa9_t = fa9_t(), fa10_t = fa10_t() )
 		{ return ( fa7 ); }
-	};
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, 8, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, 8, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t fa8, fa9_t = fa9_t(), fa10_t = fa10_t() )
 		{ return ( fa8 ); }
-	};
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, 9, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, 9, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t fa9, fa10_t = fa10_t() )
 		{ return ( fa9 ); }
-	};
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, 10, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, 10, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t fa10 )
 		{ return ( fa10 ); }
-	};
+};
 
 template<int N, typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t, typename fa9_t, typename fa10_t>
-struct getter<N, -1, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>
-	{
+struct getter<N, -1, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> {
 	inline static typename resolve_arg<N, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::return_t get( arg_t a, fa0_t, fa1_t = fa1_t(), fa2_t = fa2_t(), fa3_t = fa3_t(), fa4_t = fa4_t(), fa5_t = fa5_t(), fa6_t = fa6_t(), fa7_t = fa7_t(), fa8_t = fa8_t(), fa9_t = fa9_t() )
 		{ return ( a ); }
-	};
+};
 
 }
 
-struct object_resolver
-	{
+struct object_resolver {
 	typedef enum { REF, PTR, FREE_REF, FREE_PTR } object_type_t;
 	template<typename CLASS_t, typename arg_t = int>
-	struct object_type
-		{
+	struct object_type {
 		static object_type_t const value = static_cast<object_type_t>( meta::ternary<meta::greater<trait::find_type<CLASS_t,
 					higher_order::placeholder<1>,
 					higher_order::placeholder<2>,
@@ -306,13 +266,12 @@ struct object_resolver
 					higher_order::placeholder<10> >::value, -1>::value,
 				meta::ternary<trait::is_pointer<arg_t>::value, FREE_PTR, FREE_REF>::value,
 				meta::ternary<trait::is_pointer<CLASS_t>::value, PTR, REF>::value>::value );
-		};
+	};
 	template<typename return_t, object_type_t>
 	struct invoke;
 
 	template<typename return_t>
-	struct invoke<return_t, REF>
-		{
+	struct invoke<return_t, REF> {
 		template<typename METHOD_t, typename CLASS_t,
 			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
@@ -382,10 +341,9 @@ struct object_resolver
 		template<typename CLASS_t, typename dummy_t>
 		static CLASS_t* id( CLASS_t& object_, dummy_t )
 			{ return ( &object_ ); }
-		};
+	};
 	template<typename return_t>
-	struct invoke<return_t, PTR>
-		{
+	struct invoke<return_t, PTR> {
 		template<typename METHOD_t, typename CLASS_t,
 			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
@@ -455,10 +413,9 @@ struct object_resolver
 		template<typename CLASS_t, typename dummy_t>
 		static CLASS_t id( CLASS_t object_, dummy_t )
 			{ return ( object_ ); }
-		};
+	};
 	template<typename return_t>
-	struct invoke<return_t, FREE_REF>
-		{
+	struct invoke<return_t, FREE_REF> {
 		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
 			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
@@ -528,10 +485,9 @@ struct object_resolver
 		template<typename dummy_t, typename CLASS_t>
 		static CLASS_t* id( dummy_t, CLASS_t& object_ )
 			{ return ( &object_ ); }
-		};
+	};
 	template<typename return_t>
-	struct invoke<return_t, FREE_PTR>
-		{
+	struct invoke<return_t, FREE_PTR> {
 		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
 			typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 			typename a4_t, typename a5_t, typename a6_t, typename a7_t,
@@ -601,16 +557,15 @@ struct object_resolver
 		template<typename dummy_t, typename CLASS_t>
 		static CLASS_t id( dummy_t, CLASS_t object_ )
 			{ return ( object_ ); }
-		};
 	};
+};
 
 /*! \endcond */
 
 /*! \brief Make a functor from any (class, method) pair.
  */
 template<typename CLASS_t, typename METHOD_t>
-class HFunctor
-	{
+class HFunctor {
 	CLASS_t _object;
 	METHOD_t _method;
 	typedef typename trait::return_type<METHOD_t>::type return_t;
@@ -829,7 +784,7 @@ public:
 		{ return ( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::go( _method, _object ) ); }
 	void const* id( void ) const
 		{ return ( bit_cast<void const*>( object_resolver::invoke<return_t, object_resolver::object_type<CLASS_t>::value>::id( _object, _method ) ) ); }
-	};
+};
 
 }
 

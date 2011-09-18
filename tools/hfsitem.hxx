@@ -32,16 +32,13 @@ Copyright:
 #include "hcore/hpointer.hxx"
 #include "hcore/htime.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief File system object representation.
  */
-class HFSItem
-	{
+class HFSItem {
 	typedef HFSItem this_type;
 	int _nameLen;
 	yaal::hcore::HString _path;
@@ -72,14 +69,13 @@ private:
 	void do_stat( void* ) const;
 	void set_path( yaal::hcore::HString const&, int );
 	friend class HIterator;
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HFSItem> HFSItemException;
 
 /*! \brief File system iterator.
  */
-class HFSItem::HIterator
-	{
+class HFSItem::HIterator {
 	yaal::hcore::HString _path;
 	void* _dir;
 	yaal::hcore::HChunk::ptr_t _dirEnt;
@@ -100,7 +96,7 @@ private:
 	void cleanup( void );
 	friend class HFSItem;
 	explicit HIterator( yaal::hcore::HString const& it );
-	};
+};
 
 }
 

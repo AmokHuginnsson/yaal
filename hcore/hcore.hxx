@@ -36,11 +36,9 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 HProgramOptionsHandler& yaal_options( void );
 bool eq( double long, double long );
@@ -50,8 +48,7 @@ void init_locale( char const* const = NULL );
 void banner( void );
 double long strtold( HString const& );
 
-namespace extendable
-{
+namespace extendable {
 
 typedef double long ( *yaal_strtold_t )( HString const& );
 void set_strtold_impl( yaal_strtold_t );

@@ -33,15 +33,12 @@ Copyright:
 
 #include "hcore/hstrongenum.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
 /*! \brief POD type symbols. (Some non-POD yaal types included too).
  */
-struct TYPE
-	{
-	typedef enum
-		{
+struct TYPE {
+	typedef enum {
 		UNKNOWN     = 0x0000,
 		BOOL        = 0x0001,
 		CHAR        = 0x0002,
@@ -59,10 +56,10 @@ struct TYPE
 		HTIME       = 0x2000,
 		CONTAINER   = 0x4000,
 		VOID        = 0x8000
-		} enum_t;
+	} enum_t;
 	template<typename tType>
 	struct symbolic;
-	};
+};
 typedef yaal::hcore::HStrongEnum<TYPE> type_id_t; /*!< Strong enumeration of PODs. */
 
 /*! \cond */

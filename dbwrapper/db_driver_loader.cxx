@@ -43,14 +43,11 @@ M_VCSID( "$Id: "__TID__" $" )
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace dbwrapper
-{
+namespace dbwrapper {
 
-namespace
-{
+namespace {
 
 char const* const etag = "Error: Data base request (";
 char const* const eend = ") while no driver loaded.";
@@ -59,8 +56,7 @@ char const* const eend = ") while no driver loaded.";
 
 char const* const _done_ = "done.\r\n";
 
-static char const* _driver_[ 7 ] =
-	{
+static char const* _driver_[ 7 ] = {
 	"default",
 	"null",
 	LIB_PREFIX"sqlite3_driver"LIB_INFIX"."LIB_EXT,
@@ -68,104 +64,92 @@ static char const* _driver_[ 7 ] =
 	LIB_PREFIX"mysql_driver"LIB_INFIX"."LIB_EXT,
 	LIB_PREFIX"oracle_driver"LIB_INFIX"."LIB_EXT,
 	NULL
-	};
+};
 
 drivers_t _dBDrivers_;
 
 /* Null driver */
 
-void* null_db_connect( char const*, char const*, char const* )
-	{
+void* null_db_connect( char const*, char const*, char const* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_connect" << eend << endl;
 	return ( NULL );
 	M_EPILOG
-	}
+}
 
-void null_db_disconnect( void* )
-	{
+void null_db_disconnect( void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "(db_disconnect)" << eend << endl;
 	return;
 	M_EPILOG
-	}
+}
 
-int null_dbrs_errno( void*, void* )
-	{
+int null_dbrs_errno( void*, void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_errno" << eend << endl;
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-char const* null_dbrs_error( void*, void* )
-	{
+char const* null_dbrs_error( void*, void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_error" << eend << endl;
 	return ( _( "null database driver loaded" ) );
 	M_EPILOG
-	}
+}
 
-void* null_db_query( void*, char const* )
-	{
+void* null_db_query( void*, char const* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_query" << eend << endl;
 	return ( NULL );
 	M_EPILOG
-	}
+}
 
-void null_rs_unquery( void* )
-	{
+void null_rs_unquery( void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_unquery" << eend << endl;
 	return;
 	M_EPILOG
-	}
+}
 
-char const* null_rs_get( void*, int long, int )
-	{
+char const* null_rs_get( void*, int long, int ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "rs_get" << eend << endl;
 	return ( NULL );
 	M_EPILOG
-	}
+}
 
-int null_rs_fields_count( void* )
-	{
+int null_rs_fields_count( void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "rs_fields_count" << eend << endl;
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int long null_dbrs_records_count( void*, void* )
-	{
+int long null_dbrs_records_count( void*, void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "dbrs_records_count" << eend << endl;
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int long null_dbrs_id( void*, void* )
-	{
+int long null_dbrs_id( void*, void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "dbrs_id" << eend << endl;
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-char const* null_rs_column_name( void*, int )
-	{
+char const* null_rs_column_name( void*, int ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "rs_column_name" << eend << endl;
 	return ( NULL );
 	M_EPILOG
-	}
+}
 
 /* end of null-dummy driver */
 
-void dbwrapper_error( void )
-	{
+void dbwrapper_error( void ) {
 	M_PROLOG
 	HString message;
 	message = HPlugin().error_message( 0 );
@@ -173,25 +157,21 @@ void dbwrapper_error( void )
 	::fprintf( stderr, "(%s), ", message.raw() );
 	return;
 	M_EPILOG
-	}
+}
 
 void dbwrapper_exit( void ) __attribute__ ((noreturn));
-void dbwrapper_exit( void )
-	{
+void dbwrapper_exit( void ) {
 	cerr << "failed." << endl;
 	exit( 1 );
-	}
+}
 
-ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ )
-	{
+ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 	M_PROLOG
 	M_ENSURE( ( driverId_ >= ODBConnector::DRIVER::SQLITE3 ) && ( driverId_ < ODBConnector::DRIVER::TERMINATOR ) );
 	drivers_t::const_iterator it = _dBDrivers_.find( driverId_ );
 	driver_t driver;
-	if ( it == _dBDrivers_.end() ) /* given driver has not been loaded yet */
-		{
-		try
-			{
+	if ( it == _dBDrivers_.end() ) /* given driver has not been loaded yet */ {
+		try {
 			driver = make_pair( HPlugin::ptr_t( make_pointer<HPlugin>() ), ODBConnector() );
 			log( LOG_TYPE::NOTICE ) << "Loading [" << _driver_[ driverId_ + 1 ] << "] driver ... ";
 			driver.first->load( _driver_[ driverId_ + 1 ] );
@@ -208,50 +188,42 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ )
 			driver.first->resolve( SYMBOL_PREFIX"rs_column_name", driver.second.rs_column_name );
 			driver.first->resolve( SYMBOL_PREFIX"db_connect", driver.second.db_connect );
 			it = _dBDrivers_.insert( make_pair( driverId_, driver ) ).first;
-			}
-		catch ( HPluginException& e )
-			{
+		} catch ( HPluginException& e ) {
 			log( LOG_TYPE::NOTICE ) << "fail." << endl;
 			HStringStream reason;
 			reason << _( "cannot load database driver: " ) << e.what();
 			M_THROW( reason.string(), _dataBaseDriver_ );
-			}
+		}
 		if ( driver.first->is_loaded() )
 			log( LOG_TYPE::NOTICE ) << "success." << endl;
-		else
-			{
+		else {
 			dbwrapper_error();
 			dbwrapper_exit();
-			}
 		}
+	}
 	return ( &it->second.second );
 	M_EPILOG
-	}
+}
 
-ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ )
-	{
+ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 	M_PROLOG
 	errno = 0;
 	cout << "Using dynamic database driver [" << _driver_[ driverId_ + 1 ] << "] ... " << flush;
 	ODBConnector const* pConnector( NULL );
-	if ( driverId_ != ODBConnector::DRIVER::NONE )
-		{
-		if ( driverId_ == ODBConnector::DRIVER::DEFAULT )
-			{
-			for ( int i = 1; i < ODBConnector::DRIVER::TERMINATOR; ++ i )
-				{
+	if ( driverId_ != ODBConnector::DRIVER::NONE ) {
+		if ( driverId_ == ODBConnector::DRIVER::DEFAULT ) {
+			for ( int i = 1; i < ODBConnector::DRIVER::TERMINATOR; ++ i ) {
 				if ( ( pConnector = try_load_driver( static_cast<ODBConnector::DRIVER::enum_t>( i ) ) ) )
 					break;
-				}
 			}
-		else
+		} else
 			pConnector = try_load_driver( static_cast<ODBConnector::DRIVER::enum_t>( driverId_ ) );
-		}
+	}
 	if ( pConnector->db_connect != null_db_connect )
 		cout << _done_ << flush;
 	return ( pConnector );
 	M_EPILOG
-	}
+}
 
 ODBConnector::ODBConnector( void )
 	: db_connect( null_db_connect ),
@@ -264,9 +236,8 @@ ODBConnector::ODBConnector( void )
 	rs_fields_count( null_rs_fields_count ),
 	dbrs_records_count( null_dbrs_records_count ),
 	dbrs_id( null_dbrs_id ),
-	rs_column_name( null_rs_column_name )
-	{
-	}
+	rs_column_name( null_rs_column_name ) {
+}
 
 /* end of driver null section */
 

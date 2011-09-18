@@ -37,16 +37,13 @@ Copyright:
 #include "hcore/hpair.hxx"
 #include "hcore/harray.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Regular expression string searcher.
  */
-class HPattern
-	{
+class HPattern {
 public:
 	class HMatch;
 	class HMatchIterator;
@@ -91,12 +88,11 @@ private:
 	bool set_switch( char const, pluggable_flags_t* );
 	void save_state( void*, pluggable_flags_t* );
 	void restore_state( void*, pluggable_flags_t* );
-	};
+};
 
 /*! \brief Instance of single match for given pattern.
  */
-class HPattern::HMatch
-	{
+class HPattern::HMatch {
 	int long _size;
 	char const* _start;
 public:
@@ -105,12 +101,11 @@ public:
 private:
 	HMatch( char const*, int long );
 	friend class HPattern::HMatchIterator;
-	};
+};
 
 /*! \brief Pattern matches iterator.
  */
-class HPattern::HMatchIterator : public iterator_interface<HMatch, iterator_category::forward>
-	{
+class HPattern::HMatchIterator : public iterator_interface<HMatch, iterator_category::forward> {
 	HPattern const* _owner;
 	HPattern::HMatch _match;
 public:
@@ -125,7 +120,7 @@ public:
 private:
 	HMatchIterator( HPattern const*, char const*, int long );
 	friend class HPattern;
-	};
+};
 
 typedef HExceptionT<HPattern> HPatternException;
 

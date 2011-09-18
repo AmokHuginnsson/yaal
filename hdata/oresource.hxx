@@ -30,8 +30,7 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hconsole/hcontrol.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
 /*! \brief Api for rapid database based aplication development.
  * 
@@ -39,21 +38,17 @@ namespace yaal
  * and in dbwrapper. Its user may rapidly create fulfeatured applications
  * that use console interface, mouse capabilities and database access.
  */
-namespace hdata
-{
+namespace hdata {
 
 /*! \brief Database connected TUI controls flags and configuration bits.
  */
-struct DATACONTROL_BITS
-	{
+struct DATACONTROL_BITS {
 /*! \brief control role flags
  */
-	struct ROLE
-		{
+	struct ROLE {
 		/*! \brief the flags
 		 */
-		typedef enum
-			{
+		typedef enum {
 			INVALID,
 			MAIN,		/*!< main control of a window, contents of this control holds
 										 data of main record-set of a window */
@@ -61,14 +56,12 @@ struct DATACONTROL_BITS
 			FILTER,	/*!< this kind of control is meant to setup filter for main
 										control for `view mode' */
 			DATA		/*!< this kind of control is used to store record-set data in `edit mode' */
-			} role_t;
-		};
+		} role_t;
+	};
 /*! \brief control types
  */
-	struct TYPE
-		{
-		typedef enum
-			{
+	struct TYPE {
+		typedef enum {
 			INVALID,
 			EDIT,
 			LIST,
@@ -76,24 +69,22 @@ struct DATACONTROL_BITS
 			COMBO,
 			DATE,
 			CHECK
-			} type_t; 
-		};
+		} type_t; 
 	};
+};
 
 /*! \brief TUI control attributes description.
  */
-struct OAttributes
-	{
+struct OAttributes {
 	bool	_drawLabel;					/*!< should be label driven */
 	int		_disabledAttribute;	/*!< attribute of control in disabled state */
 	int		_enabledAttribute;	/*!< attribute of control in enabled state */
 	int		_focusedAttribute;	/*!< attribute of control in focused state */
-	};
+};
 
 /*! \brief Description of HListControl column.
  */
-struct OColumnInfo
-	{
+struct OColumnInfo {
 	int _placement;    /*!< what place should this new column take */
 	char const* _name; /*!< column name */
 	int _width;        /*!< column width */
@@ -103,14 +94,13 @@ struct OColumnInfo
 		: _placement( 0 ), _name( NULL ), _width( 0 ),
 		_align( yaal::hconsole::HControl::BITS::ALIGN::LEFT ),
 		_type( TYPE::HSTRING ) {}
-	};
+};
 
 class HDataControl;
 
 /*! \brief Text mode user interface binary description.
  */
-struct OResource
-	{
+struct OResource {
 /* data part */
 	char const*	_table;   /*!< name of table in database asociated with control */
 	char const*	_columns; /*!< what columns from record-set we are looking for */
@@ -133,12 +123,11 @@ struct OResource
 																	 holds initialization information about
 																	 parent's record's field-column */
 	int			_parent;						/*!< index of parent control (tree data structure) */
-	};
+};
 
 /*! \brief edit control type specific data
  */
-struct OEditControlResource
-	{
+struct OEditControlResource {
 	int			_maxStringSize;		/*!< maximum length of contained string */
 	char const*	_value;			/*!< initial value for control */
 	char const*	_mask;				/*!< tell what can be inserted into control */
@@ -148,18 +137,17 @@ struct OEditControlResource
 	bool		_rightAligned;		/*!< is control content right aligned */
 	bool		_password;				/*!< is control in password mode? (no echo) */
 	int			_maxHistoryLevel;	/*!< history buffer size */
-	};
+};
 
 /*! \brief list control type specific data
  */
-struct OListControlResource
-	{
+struct OListControlResource {
 	bool	_checkable;					/*!< can control items be checked/unchecked */
 	bool	_sortable;					/*!< is control content sortable */
 	bool	_searchable;				/*!< can be item searched */
 	bool	_editable;
 	bool	_drawHeader;				/*!< should be header droven */
-	};
+};
 
 typedef yaal::hcore::HArray<OResource> resources_t;
 

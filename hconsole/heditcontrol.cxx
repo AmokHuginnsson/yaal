@@ -39,11 +39,9 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 char const* const _maskLetters_  = "^[a-zA-Z±°Ê∆Í ≥£Ò—Û”∂¶º¨øØ]*$";
 char const* const _maskDigits_   = "^[0-9]*$";
@@ -66,20 +64,18 @@ HEditControl::HEditControl( HWindow* parent_,
 					_password( password_ ),
 					_maxStringSize( bufferSize_ ), _cursorPosition ( 0 ),
 					_controlOffset( 0 ), _maxHistoryLevel( maxHistoryLevel_ ),
-					_pattern(), _string( bufferSize_, true ), _history(), _historyIt()
-	{
+					_pattern(), _string( bufferSize_, true ), _history(), _historyIt() {
 	M_PROLOG
 	int errorCode = 0;
 	int length = 0;
 	HString errorMessage;
 	if ( bufferSize_ < 1 )
 		M_THROW( _( "buffer size is ridiculously low" ), bufferSize_ );
-	if ( value_ )
-		{
+	if ( value_ ) {
 		length = static_cast<int>( ::strlen( value_ ) );
 		if ( length > bufferSize_ )
 			M_THROW( _( "initial value too big" ), length - bufferSize_ );
-		}
+	}
 	_varTmpBuffer.hs_realloc ( bufferSize_ + 1 );
 	if ( _rightAligned && _multiLine )
 		M_THROW( _( "edit-control right aligned and multiline at the same time" ), 0 );
@@ -99,28 +95,24 @@ HEditControl::HEditControl( HWindow* parent_,
 		: HConsole::get_instance().get_width() + _width - _columnRaw;
 /* _widthRaw must be set up properly before setting up _cursorPosition and
  * _controlOffset whose are used in refresh() */
-	if ( length >= _widthRaw )
-		{
+	if ( length >= _widthRaw ) {
 		_cursorPosition = _widthRaw - 1;
 		_controlOffset = ( length - _widthRaw ) + 1;
-		}
-	else
+	} else
 		_cursorPosition = length;
 #ifdef __DEBUG__
 #endif /* __DEBUG__ */
 	return;
 	M_EPILOG
-	}
+}
 	
-HEditControl::~HEditControl( void )
-	{
+HEditControl::~HEditControl( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HEditControl::do_refresh( void )
-	{
+void HEditControl::do_refresh( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	draw_label();
@@ -133,318 +125,261 @@ void HEditControl::do_refresh( void )
 	if ( len < _widthRaw )
 		_varTmpBuffer.fill( ' ', len, _widthRaw - len );
 	M_ENSURE( cons.c_mvprintf( _rowRaw, _columnRaw, _varTmpBuffer.raw() ) != C_ERR );
-	if ( _focused )
-		{
+	if ( _focused ) {
 		M_ENSURE( cons.c_move( _rowRaw,
 					_columnRaw + ( _password ? 0 : _cursorPosition ) ) != C_ERR );
 		cons.curs_set( _replace ? CURSOR::VERY_VISIBLE : CURSOR::VISIBLE );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-HInfo HEditControl::get( void )
-	{
+HInfo HEditControl::get( void ) {
 	M_PROLOG
 	return ( HInfo( _string ) );
 	M_EPILOG
-	}
+}
 
-void HEditControl::set_flags( bool replace_, bool password_ )
-	{
+void HEditControl::set_flags( bool replace_, bool password_ ) {
 	M_PROLOG
 	_replace = replace_;
 	_password = password_;
 	return;
 	M_EPILOG
-	}
+}
 
 char const _wordSeparator_ [ ] = " \t\n`-=[]\\;',./~!@#$%^&*()+{}|:\"<>?";
 
-int HEditControl::find_eow( int length_ )
-	{
+int HEditControl::find_eow( int length_ ) {
 	M_PROLOG
 	int index = static_cast<int>( _string.find_other_than( _wordSeparator_, _controlOffset + _cursorPosition ) );
-	if ( index >= 0 )
-		{
+	if ( index >= 0 ) {
 		index = static_cast<int>( _string.find_one_of( _wordSeparator_, index ) );
 		if ( index < 0 )
 			index = length_;
-		}
+	}
 	return ( index );
 	M_EPILOG
-	}
+}
 
-int HEditControl::go_to_eow( int length_ )
-	{
+int HEditControl::go_to_eow( int length_ ) {
 	M_PROLOG
 	int err = ( ( _controlOffset + _cursorPosition ) < length_ ) ? 0 : 1;
-	if ( ! err )
-		{
+	if ( ! err ) {
 		int index = find_eow( length_ );
 		err = ( index >= 0 ? 0 : 1 );
-		if ( ! err )
-			{
+		if ( ! err ) {
 			_cursorPosition =	( index - _controlOffset );
-			if ( _cursorPosition >= _widthRaw )
-				{
+			if ( _cursorPosition >= _widthRaw ) {
 				_controlOffset += ( ( _cursorPosition - _widthRaw  ) + 1 );
 				_cursorPosition = _widthRaw - 1;
-				}
 			}
 		}
+	}
 	return ( err );
 	M_EPILOG
-	}
+}
 
-int HEditControl::kill_line( void )
-	{
+int HEditControl::kill_line( void ) {
 	M_PROLOG
-	if ( ! _readOnly )
-		{
+	if ( ! _readOnly ) {
 		_varTmpBuffer.set_at( 0, 0 );
 		_controlOffset = 0;
 		_cursorPosition = 0;
-		}
+	}
 	return ( ! _readOnly ? 0 : 1 );
 	M_EPILOG
-	}
+}
 
-int HEditControl::move_right( int length_ )
-	{
+int HEditControl::move_right( int length_ ) {
 	M_PROLOG
 	int err = ( ( _cursorPosition + _controlOffset ) < length_ ) ? 0 : 1;
-	if ( ! err )
-		{
+	if ( ! err ) {
 		_cursorPosition ++;
-		if ( _cursorPosition >= _widthRaw )
-			{
+		if ( _cursorPosition >= _widthRaw ) {
 			_cursorPosition = _widthRaw - 1;
 			_controlOffset ++;
-			}
 		}
+	}
 	return ( err );
 	M_EPILOG
-	}
+}
 
-int HEditControl::move_left( void )
-	{
+int HEditControl::move_left( void ) {
 	M_PROLOG
 	int err = ( ( _controlOffset + _cursorPosition ) > 0 ) ? 0 : 1;
-	if ( ! err )
-		{
+	if ( ! err ) {
 		if ( _cursorPosition > 0 )
 			_cursorPosition --;
 		else if ( _controlOffset > 0 )
 			_controlOffset --;
-		}
+	}
 	return ( err );
 	M_EPILOG
-	}
+}
 
-int HEditControl::go_to_end( int length_ )
-	{
+int HEditControl::go_to_end( int length_ ) {
 	M_PROLOG
-	if ( length_ >= _widthRaw )
-		{
+	if ( length_ >= _widthRaw ) {
 		_cursorPosition = _widthRaw - 1;
 		_controlOffset = ( length_ - _widthRaw ) + 1;
-		}
-	else
+	} else
 		_cursorPosition = length_;
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HEditControl::delete_char( int length_ )
-	{
+int HEditControl::delete_char( int length_ ) {
 	M_PROLOG
 	int err = ! ( _readOnly || _replace ) ? 0 : 1;
-	if ( ! err )
-		{
-		if ( ( _controlOffset + _cursorPosition ) >= length_ )
-			{
+	if ( ! err ) {
+		if ( ( _controlOffset + _cursorPosition ) >= length_ ) {
 			_varTmpBuffer.set_at( 0, 0 );
 			_controlOffset = 0;
 			_cursorPosition = 0;
-			}
-		else
-			{
+		} else {
 			_varTmpBuffer.erase( _controlOffset + _cursorPosition, 1 );
-			if ( ( _controlOffset > 0 ) && ( ( _controlOffset + _widthRaw ) >= length_ ) )
-				{
+			if ( ( _controlOffset > 0 ) && ( ( _controlOffset + _widthRaw ) >= length_ ) ) {
 				_controlOffset --;
 				++ _cursorPosition;
-				}
 			}
 		}
+	}
 	return ( err );
 	M_EPILOG
-	}
+}
 
-int HEditControl::kill_char( void )
-	{
+int HEditControl::kill_char( void ) {
 	M_PROLOG
 	int err = ( ! _readOnly && ( ( _controlOffset + _cursorPosition ) > 0 ) ) ? 0 : 1;
-	if ( ! err ) 
-		{
+	if ( ! err ) {
 		if ( _controlOffset > 0 )
 			_controlOffset --;
 		else if ( _cursorPosition > 0 )
 			_cursorPosition --;
 		if ( ! _replace )
 			_varTmpBuffer.erase( _controlOffset+ _cursorPosition, 1 );
-		}
+	}
 	return ( err );
 	M_EPILOG
-	}
+}
 
-int HEditControl::find_bow( int length_ )
-	{
+int HEditControl::find_bow( int length_ ) {
 	M_PROLOG
 	int index = static_cast<int>( _string.reverse_find_other_than( _wordSeparator_, length_ - ( _controlOffset + _cursorPosition ) ) );
-	if ( index >= 0 )
-		{
+	if ( index >= 0 ) {
 		index = static_cast<int>( _string.reverse_find_one_of( _wordSeparator_, index ) );
 		if ( index < 0 )
 			index = 0;
 		else
 			index = length_ - index;
-		}
+	}
 	return ( index );
 	M_EPILOG
-	}
+}
 
-int HEditControl::go_to_bow( int length_ )
-	{
+int HEditControl::go_to_bow( int length_ ) {
 	M_PROLOG
 	int err = ( _controlOffset + _cursorPosition ) ? 0 : 1;
-	if ( ! err )
-		{
+	if ( ! err ) {
 		int index = find_bow( length_ );
-		if ( index >= 0 )
-			{
+		if ( index >= 0 ) {
 			_cursorPosition = ( index - _controlOffset );
-			if ( _cursorPosition < 0 )
-				{
+			if ( _cursorPosition < 0 ) {
 				_controlOffset += _cursorPosition;
 				_cursorPosition = 0;
-				}
 			}
-		else
-			{
+		} else {
 			err = 1;
 			_controlOffset = 0;
 			_cursorPosition = 0;
-			}
 		}
+	}
 	return ( err );
 	M_EPILOG
-	}
+}
 
-int HEditControl::delete_word( int length_ )
-	{
+int HEditControl::delete_word( int length_ ) {
 	M_PROLOG
 	int err = ( ! ( _readOnly || _replace ) ) ? 0 : 1;
-	if ( ! err )
-		{
+	if ( ! err ) {
 		int oldIndex = ( _controlOffset + _cursorPosition );
-		if ( oldIndex >= length_ )
-			{
+		if ( oldIndex >= length_ ) {
 			_varTmpBuffer.set_at( 0, 0 );
 			_controlOffset = 0;
 			_cursorPosition = 0;
-			}
-		else
-			{
+		} else {
 			int index = find_eow( length_ );
 			_varTmpBuffer.erase( oldIndex, index - oldIndex );
-			}
 		}
+	}
 	return ( err );
 	M_EPILOG
-	}
+}
 
-int HEditControl::kill_word( int length_ )
-	{
+int HEditControl::kill_word( int length_ ) {
 	M_PROLOG
 	int err = ( ! ( _readOnly || _replace ) ) ? 0 : 1;
-	if ( ! err )
-		{
+	if ( ! err ) {
 		int oldIndex = ( _controlOffset + _cursorPosition );
-		if ( oldIndex )
-			{
+		if ( oldIndex ) {
 			int index = find_bow( length_ );
-			if ( index >= 0 )
-				{
+			if ( index >= 0 ) {
 				_cursorPosition = ( index - _controlOffset );
-				if ( _cursorPosition < 0 )
-					{
+				if ( _cursorPosition < 0 ) {
 					_controlOffset += _cursorPosition;
 					_cursorPosition = 0;
-					}
-				_varTmpBuffer.erase( index, oldIndex - index );
 				}
-			else
-				{
+				_varTmpBuffer.erase( index, oldIndex - index );
+			} else {
 				err = 1;
 				_controlOffset = 0;
 				_cursorPosition = 0;
-				}
 			}
-		else
+		} else
 			err = 1;
-		}
+	}
 	return ( err );
 	M_EPILOG
-	}
+}
 
-int HEditControl::insert_char( int code_, int length_ )
-	{
+int HEditControl::insert_char( int code_, int length_ ) {
 	M_PROLOG
 	int err = 0;
 	if ( ( ! _readOnly && ( code_ > 31 ) && ( code_ < 256 ) )
 			&& ( ( ! _replace && ( length_ < _maxStringSize ) ) 
-				|| ( _replace && ( ( _controlOffset + _cursorPosition ) < length_ ) )	) )
-		{
+				|| ( _replace && ( ( _controlOffset + _cursorPosition ) < length_ ) )	) ) {
 		if ( ! _replace )
 			_varTmpBuffer.insert( _controlOffset+ _cursorPosition, 1 );
 		_varTmpBuffer.set_at( _cursorPosition + _controlOffset, static_cast<char>( code_ ) );
 		_cursorPosition ++;
-		if ( _cursorPosition >= _widthRaw )
-			{
+		if ( _cursorPosition >= _widthRaw ) {
 			_cursorPosition = _widthRaw - 1;
 			_controlOffset ++;
-			}
 		}
-	else
+	} else
 		err = code_;
 	return ( err );
 	M_EPILOG
-	}
+}
 
-int HEditControl::update_from_history( void )
-	{
+int HEditControl::update_from_history( void ) {
 	M_PROLOG
 	if ( ! _history.is_empty() && ( _historyIt != _history.end() ) )
 		_varTmpBuffer = *_historyIt;
 	int length = static_cast<int>( _varTmpBuffer.get_length() );
-	if ( length >= _widthRaw )
-		{
+	if ( length >= _widthRaw ) {
 		_cursorPosition = _widthRaw - 1;
 		_controlOffset = ( length - _widthRaw ) + 1;
-		}
-	else
-		{
+	} else {
 		_controlOffset = 0;
 		_cursorPosition = length;
-		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HEditControl::do_process_input ( int code_ )
-	{
+int HEditControl::do_process_input ( int code_ ) {
 	M_PROLOG
 	static int const HISTORY_OPERATION = -1;
 	static int const DATA_ENTER = -2;
@@ -458,8 +393,7 @@ int HEditControl::do_process_input ( int code_ )
 	oldControlOffset = _controlOffset;
 	oldCursorPosition = _cursorPosition;
 	length = static_cast<int>( _varTmpBuffer.get_length() );
-	switch ( code_ )
-		{
+	switch ( code_ ) {
 		case ( KEY_CODES::PAGE_UP ):
 			_historyIt = _history.hook();
 			errorCode = HISTORY_OPERATION;
@@ -480,26 +414,23 @@ int HEditControl::do_process_input ( int code_ )
 		case ( '\t' ):
 			_focused = false;
 		/* enter works like tab without focus movement */
-		case ( '\r' ):
-			{
+		case ( '\r' ): {
 			errorCode = static_cast<int>( _history.size() );
 			errorCode ++;
 			while ( -- errorCode )
 				if ( ( *( ++ _historyIt ) ) == _string )
 					break;
-			if ( _string.get_length() && ( ! errorCode ) )
-				{
+			if ( _string.get_length() && ( ! errorCode ) ) {
 				_history.push_front( _string );
 				errorCode = static_cast<int>( _history.size() );
 				while ( errorCode -- > _maxHistoryLevel )
 					_history.pop_back(); /* FIXME investigate if it actually work */
 				_historyIt = _history.hook();
 				-- _historyIt;
-				}
-			else
+			} else
 				-- _historyIt;
 			errorCode = DATA_ENTER;
-			}
+		}
 		break;
 		case ( KEY_CODES::LEFT ):
 			errorCode = move_left();
@@ -543,35 +474,31 @@ int HEditControl::do_process_input ( int code_ )
 		default:
 			errorCode = insert_char( code_, length );
 		break;
-		}
+	}
 	if ( errorCode == HISTORY_OPERATION )
 		errorCode = update_from_history();
-	if ( ! errorCode )
-		{
+	if ( ! errorCode ) {
 		_pattern.find( _varTmpBuffer.raw() );
 		errorCode = _pattern.error_code();
 		if ( errorCode )
 			_parent->status_bar()->message( COLORS::BG_BROWN, _pattern.error().raw() );
-		else
-			{
+		else {
 			code_ = errorCode;
 			_string = _varTmpBuffer;
 			_parent->status_bar()->message ( COLORS::FG_LIGHTGRAY, "" );
 			schedule_refresh();
-			}
 		}
-	if ( errorCode && ( errorCode != DATA_ENTER ) )
-		{
+	}
+	if ( errorCode && ( errorCode != DATA_ENTER ) ) {
 		_controlOffset = oldControlOffset;
 		_cursorPosition = oldCursorPosition;
 		cons.bell();
-		}
+	}
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
-void HEditControl::set( HInfo const& info_ )
-	{
+void HEditControl::set( HInfo const& info_ ) {
 	M_PROLOG
 	int length = 0;
 	char const* string = info_.get<char const *>();
@@ -583,40 +510,35 @@ void HEditControl::set( HInfo const& info_ )
 	_string = string;
 	length = static_cast<int>( _string.get_length() );
 	_controlOffset = 0;
-	if ( length >= _widthRaw )
-		{
+	if ( length >= _widthRaw ) {
 		_cursorPosition = _widthRaw - 1;
 		_controlOffset = ( length - _widthRaw ) + 1;
-		}
-	else
+	} else
 		_cursorPosition = length;
 	schedule_refresh();
 	return;
 	M_EPILOG
-	}
+}
 
-int HEditControl::set_focus ( char shorcut_ )
-	{
+int HEditControl::set_focus ( char shorcut_ ) {
 	M_PROLOG
 	return ( HControl::set_focus ( shorcut_ ) );
 	M_EPILOG
-	}
+}
 
-int HEditControl::do_click ( mouse::OMouse & mouse_ )
-	{
+int HEditControl::do_click ( mouse::OMouse & mouse_ ) {
 	M_PROLOG
 	int position = 0;
 	if ( ! HControl::do_click ( mouse_ ) )
 		return ( 1 );
 	position = mouse_._column - _columnRaw;
-	if ( position < _string.get_length() )
-		{
+	if ( position < _string.get_length() ) {
 		_cursorPosition = position;
 		schedule_refresh();
-		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
 }
 

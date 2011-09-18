@@ -43,14 +43,11 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hlog.hxx"
 #include "system.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-namespace
-{
+namespace {
 
 static int const BUFFER_SIZE		= 1024;
 static int const HOSTNAME_SIZE	= 128;
@@ -66,8 +63,7 @@ HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedStream( _file::ref
 	_type( 0 ), _bufferSize( BUFFER_SIZE ),
 	_processName( NULL ),
 	_loginName(), _hostName( HOSTNAME_SIZE ),
-	_buffer( _bufferSize )
-	{
+	_buffer( _bufferSize ) {
 	M_PROLOG
 	if ( ! _file::ref() )
 		M_THROW( "tmpfile() failed", errno );
@@ -78,25 +74,22 @@ HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedStream( _file::ref
 	M_ENSURE( ::gethostname( _hostName.get<char>(), HOSTNAME_SIZE - 1 ) == 0 );
 	return;
 	M_EPILOG
-	}
+}
 
-HLog::~HLog( void )
-	{
+HLog::~HLog( void ) {
 	M_PROLOG
-	if ( _logMask & LOG_TYPE::NOTICE )
-		{
+	if ( _logMask & LOG_TYPE::NOTICE ) {
 		if ( _newLine )
 			timestamp();
 		_file::ref() << "Process exited normally.\n";
-		}
+	}
 	if ( ! _realMode )
 		_file::ref().close();
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HLog::do_rehash( void* src_, char const* const processName_ )
-	{
+void HLog::do_rehash( void* src_, char const* const processName_ ) {
 	M_PROLOG
 	M_ASSERT( ! _realMode );
 #ifndef HAVE_GETLINE
@@ -107,8 +100,7 @@ void HLog::do_rehash( void* src_, char const* const processName_ )
 	if ( processName_ )
 		_processName = ::basename( processName_ );
 	FILE* src( static_cast<FILE*>( src_ ) );
-	if ( src )
-		{
+	if ( src ) {
 		_loginName = system::get_user_name( getuid() );
 		::fseek( src, 0, SEEK_SET );
 		char* buf = _buffer.get<char>();
@@ -117,36 +109,34 @@ void HLog::do_rehash( void* src_, char const* const processName_ )
 #else /* HAVE_GETLINE */
     while ( ( len = static_cast<int>( ::fread( buf, sizeof ( char ), _bufferSize, src ) ) ) )
 #endif /* not HAVE_GETLINE */
-      {
+     {
 #ifndef HAVE_GETLINE
       ptr = static_cast<char*>( ::memchr( buf, '\n', len ) );
       if ( ! ptr )
-        {
+       {
        	_file::ref() << buf;
         continue;
-        }
+       }
       * ++ ptr = 0;
       ::fseek( src, static_cast<int long>( ptr - buf ) - len, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
 			_type = ::strtol( buf, NULL, 0x10 );
-			if ( ! _type || ( _type & _logMask ) )
-				{
+			if ( ! _type || ( _type & _logMask ) ) {
 				timestamp();
 				_file::ref() << buf + 10; /* 10 for timestamp */
-				}
 			}
+		}
 		if ( buf[ ::strlen( buf ) - 1 ] == '\n' )
 			_type = 0;
 		::fclose( src );
-		}
+	}
 	do_flush();
 	return;
 	M_EPILOG
-	}
+}
 
 void HLog::rehash_stream( void* stream_,
-		char const* const processName_ )
-	{
+		char const* const processName_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	if ( ! stream_ )
@@ -156,11 +146,10 @@ void HLog::rehash_stream( void* stream_,
 	do_rehash( src, processName_ );
 	return;
 	M_EPILOG
-	}
+}
 
 void HLog::rehash( HString const& logFileName_,
-		char const* const processName_ )
-	{
+		char const* const processName_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	if ( logFileName_.is_empty() )
@@ -170,21 +159,18 @@ void HLog::rehash( HString const& logFileName_,
 	do_rehash( src, processName_ );
 	return;
 	M_EPILOG
-	}
+}
 
-void HLog::timestamp( void )
-	{
+void HLog::timestamp( void ) {
 	M_PROLOG
 	char buffer[ TIMESTAMP_SIZE ];
-	if ( ! _realMode )
-		{
-		if ( !! _file::ref() )
-			{
+	if ( ! _realMode ) {
+		if ( !! _file::ref() ) {
 			::snprintf( buffer, TIMESTAMP_SIZE - 1, "%-10lx", _type );
 			_file::ref() << buffer;
-			}
-		return;
 		}
+		return;
+	}
 	time_t currentTime = ::time( NULL );
 	tm* brokenTime = ::localtime( &currentTime );
 	::memset( buffer, 0, TIMESTAMP_SIZE );
@@ -207,25 +193,22 @@ void HLog::timestamp( void )
 		_file::ref() << "(ERROR) ";
 	return;
 	M_EPILOG
-	}
+}
 
-void HLog::eol_reset( char const* const buf_, int long len_ )
-	{
+void HLog::eol_reset( char const* const buf_, int long len_ ) {
 	M_PROLOG
 	if ( ( len_ < 1 ) || ( buf_[ len_ - 1 ] != '\n' ) )
 		_newLine = false;
-	else
-		{
+	else {
 		_type = 0;
 		_newLine = true;
 		_file::ref().flush();
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-int HLog::vformat( char const* const format_, va_list ap_ )
-	{
+int HLog::vformat( char const* const format_, va_list ap_ ) {
 	M_PROLOG
 	int err = 0;
 	if ( _newLine )
@@ -238,10 +221,9 @@ int HLog::vformat( char const* const format_, va_list ap_ )
 	eol_reset( buf, ::strlen( buf ) );
 	return ( err );
 	M_EPILOG
-	}
+}
 
-int HLog::operator() ( char const * const format_, ... )
-	{
+int HLog::operator() ( char const * const format_, ... ) {
 	M_PROLOG
 	int err = 0;
 	va_list ap;
@@ -250,11 +232,10 @@ int HLog::operator() ( char const * const format_, ... )
 	va_end( ap );
 	return ( err );
 	M_EPILOG
-	}
+}
 
 int HLog::operator() ( int long const type_,
-		char const* const format_, ... )
-	{
+		char const* const format_, ... ) {
 	M_PROLOG
 	int err = 0;
 	va_list ap;
@@ -264,61 +245,54 @@ int HLog::operator() ( int long const type_,
 	va_end( ap );
 	return ( err );
 	M_EPILOG
-	}
+}
 
-HLog& HLog::operator() ( int long type_ )
-	{
+HLog& HLog::operator() ( int long type_ ) {
 	M_PROLOG
 	_type = type_;
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-HLog& HLog::filter( int long type_ )
-	{
+HLog& HLog::filter( int long type_ ) {
 	M_PROLOG
 	_type = type_;
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-int long HLog::do_write( void const* const string_, int long size_ )
-	{
+int long HLog::do_write( void const* const string_, int long size_ ) {
 	M_PROLOG
 	if ( ! string_ )
 		return ( 0 );
 	int len = 0;
 	char const* const str = static_cast<char const* const>( string_ );
-	if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
-		{
+	if ( ! ( _type && _realMode ) || ( _type & _logMask ) ) {
 		if ( _newLine )
 			timestamp();
 		len = static_cast<int>( _file::ref().write( str, size_ ) );
-		}
+	}
 	eol_reset( str, size_ );
 	return ( len );
 	M_EPILOG
-	}
+}
 
-void HLog::do_flush( void ) const
-	{
+void HLog::do_flush( void ) const {
 	M_PROLOG
 	_file::ref().flush();
 	return;
 	M_EPILOG
-	}
+}
 
-int long HLog::do_read( void* const, int long )
-	{
+int long HLog::do_read( void* const, int long ) {
 	return ( 0 );
-	}
+}
 
-bool HLog::do_is_valid( void ) const
-	{
+bool HLog::do_is_valid( void ) const {
 	M_PROLOG
 	return ( ! _file::ref() );
 	M_EPILOG
-	}
+}
 
 }
 

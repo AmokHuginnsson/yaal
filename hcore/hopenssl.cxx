@@ -46,16 +46,13 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "system.hxx"
 #include "hlog.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief OpenSSL libraary wrapper helpers.
  */
-namespace openssl_helper
-{
+namespace openssl_helper {
 
 /*! \brief Format OpenSSL related error.
  *
@@ -63,14 +60,13 @@ namespace openssl_helper
  * \param err - error code to translate to message.
  * \return Error message.
  */
-HString& format_error_message( HString& buffer_, int err = 0 )
-	{
+HString& format_error_message( HString& buffer_, int err = 0 ) {
 	int long code = 0;
 	buffer_ = err ? ERR_error_string( err, NULL ) : "";
 	while ( ( code = ERR_get_error() ) )
 		buffer_.append( ( buffer_.is_empty() ? "" : "\n" ) ).append( ERR_error_string( code, NULL ) );
 	return ( buffer_ );
-	}
+}
 
 }
 
@@ -78,17 +74,14 @@ int HOpenSSL::OSSLContext::_instances = 0;
 HMutex HOpenSSL::OSSLContext::_mutex( HMutex::TYPE::RECURSIVE );
 HOpenSSL::OSSLContext::mutexes_t HOpenSSL::OSSLContext::_sslLibMutexes;
 
-HOpenSSL::OSSLContext::OSSLContext( void ) : _context( NULL ), _users( 0 )
-	{
-	}
+HOpenSSL::OSSLContext::OSSLContext( void ) : _context( NULL ), _users( 0 ) {
+}
 
-int long unsigned get_thread_id( void )
-	{
+int long unsigned get_thread_id( void ) {
 	return ( HThread::get_id() );
-	}
+}
 
-int bio_read( BIO* bio_, char* buf_, int size_ )
-	{
+int bio_read( BIO* bio_, char* buf_, int size_ ) {
 	M_PROLOG
 	int nRead( static_cast<int>( ::read( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, size_ ) ) );
 	if ( ( nRead < 0 ) && ( errno == EAGAIN ) )
@@ -97,10 +90,9 @@ int bio_read( BIO* bio_, char* buf_, int size_ )
 		BIO_clear_retry_flags( bio_ );
 	return ( nRead );
 	M_EPILOG
-	}
+}
 
-int bio_write( BIO* bio_, char const* buf_, int size_ )
-	{
+int bio_write( BIO* bio_, char const* buf_, int size_ ) {
 	M_PROLOG
 	int nWritten( static_cast<int>( ::write( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, size_ ) ) );
 	if ( ( nWritten < 0 ) && ( errno == EAGAIN ) )
@@ -109,36 +101,32 @@ int bio_write( BIO* bio_, char const* buf_, int size_ )
 		BIO_clear_retry_flags( bio_ );
 	return ( nWritten );
 	M_EPILOG
-	}
+}
 
 int bio_puts( BIO*, char const* ) __attribute__(( __noreturn__ ));
-int bio_puts( BIO*, char const* )
-	{
+int bio_puts( BIO*, char const* ) {
 	M_PROLOG
 	M_ENSURE( ! "BIO_puts call not implemented!" );
 #ifdef __MSVCXX__
 	return ( -1 );
 #endif /* #ifdef __MSVCXX__ */
 	M_EPILOG
-	}
+}
 
 int bio_gets( BIO*, char*, int ) __attribute__(( __noreturn__ ));
-int bio_gets( BIO*, char*, int )
-	{
+int bio_gets( BIO*, char*, int ) {
 	M_PROLOG
 	M_ENSURE( ! "BIO_gets call not implemented!" );
 #ifdef __MSVCXX__
 	return ( -1 );
 #endif /* #ifdef __MSVCXX__ */
 	M_EPILOG
-	}
+}
 
-int long bio_ctrl( BIO*, int cmd_, int long, void* )
-	{
+int long bio_ctrl( BIO*, int cmd_, int long, void* ) {
 	M_PROLOG
 	int code( 0 );
-	switch ( cmd_ )
-		{
+	switch ( cmd_ ) {
 		case ( BIO_CTRL_EOF ): break;
 		case ( BIO_CTRL_RESET ): break;
 		case ( BIO_C_FILE_SEEK ): break;
@@ -149,28 +137,25 @@ int long bio_ctrl( BIO*, int cmd_, int long, void* )
 		case ( BIO_CTRL_DUP ): break;
 		case ( BIO_CTRL_FLUSH ): code = 1; break;
 		default: break;
-		}
+	}
 	return ( code );
 	M_EPILOG
-	}
+}
 
-int bio_create( BIO* bio_ )
-	{
+int bio_create( BIO* bio_ ) {
 	M_PROLOG
 	bio_->init = 1;
 	return ( 1 );
 	M_EPILOG
-	}
+}
 
-int bio_destroy( BIO* )
-	{
+int bio_destroy( BIO* ) {
 	M_PROLOG
 	return ( 1 );
 	M_EPILOG
-	}
+}
 
-BIO_METHOD fd_method =
-	{
+BIO_METHOD fd_method = {
 	BIO_TYPE_SOURCE_SINK,
 	"yaal-stream",
 	bio_write,
@@ -181,27 +166,24 @@ BIO_METHOD fd_method =
 	bio_create,
 	bio_destroy,
 	NULL
-	};
+};
 
-void HOpenSSL::OSSLContext::init( void )
-	{
+void HOpenSSL::OSSLContext::init( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
-	if ( _instances == 0 )
-		{
+	if ( _instances == 0 ) {
 		SSL_load_error_strings();
 		int numLocks( CRYPTO_num_locks() );
 		M_ENSURE( numLocks > 0 );
 		_sslLibMutexes.resize( numLocks );
-		for ( mutexes_t::iterator it( _sslLibMutexes.begin() ), endIt( _sslLibMutexes.end() ); it != endIt; ++ it )
-			{
+		for ( mutexes_t::iterator it( _sslLibMutexes.begin() ), endIt( _sslLibMutexes.end() ); it != endIt; ++ it ) {
 			it->first = mutex_ptr_t( make_pointer<HMutex>( HMutex::TYPE::RECURSIVE ) );
 			it->second = 0;
-			}
+		}
 		CRYPTO_set_locking_callback( &HOpenSSL::OSSLContext::libssl_rule_mutex );
 		CRYPTO_set_id_callback( &get_thread_id );
 		SSL_library_init();
-		}
+	}
 	SSL_METHOD const* method = static_cast<SSL_METHOD const*>( select_method() );
 	SSL_CTX* ctx = NULL;
 	HString buffer;
@@ -218,15 +200,13 @@ void HOpenSSL::OSSLContext::init( void )
 		throw HOpenSSLFatalException( openssl_helper::format_error_message( buffer ) );
 	return;
 	M_EPILOG
-	}
+}
 
-void const* HOpenSSL::OSSLContext::select_method( void ) const
-	{
+void const* HOpenSSL::OSSLContext::select_method( void ) const {
 	return ( do_method() );
-	}
+}
 
-HOpenSSL::OSSLContext::~OSSLContext( void )
-	{
+HOpenSSL::OSSLContext::~OSSLContext( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	M_ENSURE( ! _users );
@@ -234,8 +214,7 @@ HOpenSSL::OSSLContext::~OSSLContext( void )
 		SSL_CTX_free( static_cast<SSL_CTX*>( _context ) );
 	_context = NULL;
 	-- _instances;
-	if ( _instances == 0 )
-		{
+	if ( _instances == 0 ) {
 		ERR_remove_state( system::getpid() );
 		ERR_remove_state( 0 );
 		ENGINE_cleanup();
@@ -244,24 +223,21 @@ HOpenSSL::OSSLContext::~OSSLContext( void )
 		EVP_cleanup();
 		CRYPTO_cleanup_all_ex_data();
 		CRYPTO_set_locking_callback( NULL );
-		for ( int i( 0 ), SIZE( static_cast<int>( _sslLibMutexes.size() ) ); i < SIZE; ++ i )
-			{
+		for ( int i( 0 ), SIZE( static_cast<int>( _sslLibMutexes.size() ) ); i < SIZE; ++ i ) {
 			mutex_info_t& m( _sslLibMutexes[ i ] );
-			if ( m.second > 0 )
-				{
+			if ( m.second > 0 ) {
 				log_trace << "A ssl lock " << CRYPTO_get_lock_name( i ) << " still holds " << m.second << "locks." <<endl;
 				while ( m.second -- )
 					m.first->unlock();
-				}
 			}
-		_sslLibMutexes.clear();
 		}
+		_sslLibMutexes.clear();
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void* HOpenSSL::OSSLContext::create_ssl( void )
-	{
+void* HOpenSSL::OSSLContext::create_ssl( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	M_ASSERT( _context );
@@ -272,80 +248,69 @@ void* HOpenSSL::OSSLContext::create_ssl( void )
 	++ _users;
 	return ( ssl );
 	M_EPILOG
-	}
+}
 
-void HOpenSSL::OSSLContext::consume_ssl( void* ssl_ )
-	{
+void HOpenSSL::OSSLContext::consume_ssl( void* ssl_ ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	M_ASSERT( ssl_ );
 	SSL_free( static_cast<SSL*>( ssl_ ) );
 	-- _users;
 	M_EPILOG
-	}
+}
 
-void HOpenSSL::OSSLContext::libssl_rule_mutex( int mode, int nth, char const* /* file_ */, int /* line_ */ )
-	{
+void HOpenSSL::OSSLContext::libssl_rule_mutex( int mode, int nth, char const* /* file_ */, int /* line_ */ ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	mutex_info_t& m( _sslLibMutexes[ nth ] );
-	if ( mode & CRYPTO_LOCK )
-		{
+	if ( mode & CRYPTO_LOCK ) {
 		m.first->lock();
 		++ m.second;
-		}
-	else
-		{
+	} else {
 		M_ASSERT( m.second > 0 );
 		m.first->unlock();
 		-- m.second;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-HOpenSSL::OSSLContextServer::OSSLContextServer( void )
-	{
+HOpenSSL::OSSLContextServer::OSSLContextServer( void ) {
 	M_PROLOG
 	init();
 	M_EPILOG
-	}
+}
 
-void const* HOpenSSL::OSSLContextServer::do_method( void ) const
-	{
+void const* HOpenSSL::OSSLContextServer::do_method( void ) const {
 	M_PROLOG
 	SSL_METHOD const* m( SSLv23_server_method() );
 	M_ENSURE( m );
 	return ( m );
 	M_EPILOG
-	}
+}
 
-HOpenSSL::OSSLContextClient::OSSLContextClient( void )
-	{
+HOpenSSL::OSSLContextClient::OSSLContextClient( void ) {
 	M_PROLOG
 	init();
 	M_EPILOG
-	}
+}
 
-void const* HOpenSSL::OSSLContextClient::do_method( void ) const
-	{
+void const* HOpenSSL::OSSLContextClient::do_method( void ) const {
 	M_PROLOG
 	SSL_METHOD const* m( SSLv23_client_method() );
 	M_ENSURE( m );
 	return ( m );
 	M_EPILOG
-	}
+}
 
 HOpenSSL::HOpenSSL( int fileDescriptor_, TYPE::ssl_context_type_t type_ )
 	: _pendingOperation( false ), _ssl( NULL ),
 	_ctx( ( type_ == TYPE::SERVER )
 			? static_cast<OSSLContext*>( &OSSLContextServer::get_instance() )
 			: static_cast<OSSLContext*>( &OSSLContextClient::get_instance() ) ),
-	do_accept_or_connect( ( type_ == TYPE::SERVER ) ? &HOpenSSL::accept : &HOpenSSL::connect )
-	{
+	do_accept_or_connect( ( type_ == TYPE::SERVER ) ? &HOpenSSL::accept : &HOpenSSL::connect ) {
 	M_PROLOG
-	try
-		{
+	try {
 		SSL* ssl( static_cast<SSL*>( _ctx->create_ssl() ) );
 		_ssl = ssl;
 		BIO* bio( BIO_new( &fd_method ) );
@@ -353,123 +318,106 @@ HOpenSSL::HOpenSSL( int fileDescriptor_, TYPE::ssl_context_type_t type_ )
 		bio->ptr = reinterpret_cast<void*>( fileDescriptor_ );
 		SSL_set_bio( ssl, bio, bio );
 		accept_or_connect();
-		}
-	catch ( HOpenSSLException const& )
-		{
+	} catch ( HOpenSSLException const& ) {
 		if ( _ssl )
 			_ctx->consume_ssl( _ssl );
 		_ssl = NULL;
 		throw;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-HOpenSSL::~HOpenSSL( void )
-	{
+HOpenSSL::~HOpenSSL( void ) {
 	M_PROLOG
 	_ctx->consume_ssl( _ssl );
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HOpenSSL::accept_or_connect( void )
-	{
+void HOpenSSL::accept_or_connect( void ) {
 	M_PROLOG
 	int ret = (this->*do_accept_or_connect)();
-	if ( ret == -1 )
-		{
+	if ( ret == -1 ) {
 		check_err( ret );
 		_pendingOperation = true;
-		}
-	else
+	} else
 		_pendingOperation = false;
 	return;
 	M_EPILOG
-	}
+}
 
-int HOpenSSL::accept( void )
-	{
+int HOpenSSL::accept( void ) {
 	M_PROLOG
 	ERR_clear_error();
 	return ( SSL_accept( static_cast<SSL*>( _ssl ) ) );
 	M_EPILOG
-	}
+}
 
-int HOpenSSL::connect( void )
-	{
+int HOpenSSL::connect( void ) {
 	M_PROLOG
 	ERR_clear_error();
 	return ( SSL_connect( static_cast<SSL*>( _ssl ) ) );
 	M_EPILOG
-	}
+}
 
-void HOpenSSL::check_err( int code ) const
-	{
+void HOpenSSL::check_err( int code ) const {
 	M_PROLOG
 	int err( SSL_get_error( static_cast<SSL const*>( _ssl ), code ) );
-	if ( ( err != SSL_ERROR_ZERO_RETURN ) && ( err != SSL_ERROR_WANT_READ ) && ( err != SSL_ERROR_WANT_WRITE ) )
-		{
+	if ( ( err != SSL_ERROR_ZERO_RETURN ) && ( err != SSL_ERROR_WANT_READ ) && ( err != SSL_ERROR_WANT_WRITE ) ) {
 		int errTop( static_cast<int>( ERR_get_error() ) );
 		HString buffer( "OpenSSL: " );
-		if ( ! errTop && ( err == SSL_ERROR_SYSCALL ) )
-			{
+		if ( ! errTop && ( err == SSL_ERROR_SYSCALL ) ) {
 			if ( code == 0 )
 				buffer += "EOF that violates protocol was observed.";
 			else if ( code == -1 )
 				buffer += strerror( errno );
 			else
 				buffer += "unknown problem occured!";
-			}
-		else 
+		} else 
 			openssl_helper::format_error_message( buffer, errTop );
 		throw HOpenSSLException( buffer );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-int long HOpenSSL::read( void* const buffer_, int long size_ )
-	{
+int long HOpenSSL::read( void* const buffer_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( _ssl );
 	if ( _pendingOperation )
 		accept_or_connect();
 	int nRead = -1;
-	if ( ! _pendingOperation )
-		{
+	if ( ! _pendingOperation ) {
 		nRead = SSL_read( static_cast<SSL*>( _ssl ), buffer_, static_cast<int>( size_ ) );
 		if ( nRead <= 0 )
 			check_err( nRead );
-		}
+	}
 	return ( nRead );
 	M_EPILOG
-	}
+}
 
-int long HOpenSSL::write( void const* const buffer_, int long size_ )
-	{
+int long HOpenSSL::write( void const* const buffer_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( _ssl );
 	if ( _pendingOperation )
 		accept_or_connect();
 	int nWritten = 0;
-	if ( ! _pendingOperation )
-		{
+	if ( ! _pendingOperation ) {
 		nWritten = SSL_write( static_cast<SSL*>( _ssl ), buffer_, static_cast<int>( size_ ) );
 		if ( nWritten <= 0 )
 			check_err( nWritten );
-		}
+	}
 	return ( nWritten );
 	M_EPILOG
-	}
+}
 
-void HOpenSSL::shutdown( void )
-	{
+void HOpenSSL::shutdown( void ) {
 	M_PROLOG
 	M_ASSERT( _ssl );
 	SSL_shutdown( static_cast<SSL*>( _ssl ) );
 	M_EPILOG
-	}
+}
 
 }
 

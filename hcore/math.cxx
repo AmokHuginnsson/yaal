@@ -28,11 +28,9 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "math.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace math
-{
+namespace math {
 
 /* Number of digits here is limited by Visual Studio C++ compiler internal identifier buffer size. */
 double long PI( 3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384L ); 

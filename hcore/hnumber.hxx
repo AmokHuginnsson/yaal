@@ -30,16 +30,13 @@ Copyright:
 #include "hcore/hchunk.hxx"
 #include "hcore/hstring.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Finite precision calculation units (numbers).
  */
-class HNumber
-	{
+class HNumber {
 	typedef HNumber this_type;
 private:
 	int long _precision;
@@ -124,7 +121,7 @@ private:
 	void from_string( HString const& );
 	void from_double( double long );
 	void normalize( void );
-	};
+};
 
 typedef HExceptionT<HNumber> HNumberException;
 

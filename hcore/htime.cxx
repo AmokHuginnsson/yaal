@@ -33,26 +33,22 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "htime.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 char const* const _defaultTimeFormat_ = "%a, %d %b %Y %H:%M:%S %z";
 
 HTime::HTime( void )
-	: _format ( _defaultTimeFormat_ ), _cache(), _value(), _broken()
-	{
+	: _format ( _defaultTimeFormat_ ), _cache(), _value(), _broken() {
 	M_PROLOG
 	set_now();
 	return;
 	M_EPILOG
-	}
+}
 
 HTime::HTime( char const* const strTime_ )
-	: _format ( _defaultTimeFormat_ ), _cache(), _value(), _broken()
-	{
+	: _format ( _defaultTimeFormat_ ), _cache(), _value(), _broken() {
 	M_PROLOG
 	char const* err( ::strptime( strTime_, _format.raw(), &_broken ) );
 	if ( ! err )
@@ -61,73 +57,65 @@ HTime::HTime( char const* const strTime_ )
 	_value = ::mktime( &_broken );
 	return;
 	M_EPILOG
-	}
+}
 
 HTime::HTime( HTime const& time_ )
 	: _format( time_._format ), _cache(),
-	_value( time_._value ), _broken( time_._broken )
-	{
+	_value( time_._value ), _broken( time_._broken ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
 HTime::HTime( time_t const& time_ )
-	: _format( _defaultTimeFormat_ ), _cache(), _value( time_ ), _broken()
-	{
+	: _format( _defaultTimeFormat_ ), _cache(), _value( time_ ), _broken() {
 	M_PROLOG
 	M_ENSURE( localtime_r( &_value, &_broken ) );
 	return;
 	M_EPILOG
-	}
+}
 
 HTime::HTime( int const year_, int const month_, int const day_,
 							 int const hour_, int const minute_, int const second_ )
-	: _format( _defaultTimeFormat_ ), _cache(), _value(), _broken()
-	{
+	: _format( _defaultTimeFormat_ ), _cache(), _value(), _broken() {
 	M_PROLOG
 	set_datetime( year_, month_, day_, hour_, minute_, second_ );
 	return;
 	M_EPILOG
-	}
+}
 
-HTime::~HTime( void )
-	{
+HTime::~HTime( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HTime::set( time_t const& time_ )
-	{
+void HTime::set( time_t const& time_ ) {
 	M_PROLOG
 	_value = time_;
 	/* In Visual Studio C++ localtime_r is a macro and cannot be prefixed with ::. */
 	M_ENSURE( localtime_r( &_value, &_broken ) );
 	return;
 	M_EPILOG
-	}
+}
 
-void HTime::set_now( void )
-	{
+void HTime::set_now( void ) {
 	M_PROLOG
 	_value = ::time( NULL );
 	M_ENSURE( localtime_r( &_value, &_broken ) );
 	return;
 	M_EPILOG
-	}
+}
 
-void HTime::format( char const* const format_ )
-	{
+void HTime::format( char const* const format_ ) {
 	M_PROLOG
 	_format = format_;
 	return;
 	M_EPILOG
-	}
+}
 
 void HTime::set_time( int const hour_, int const minute_,
-											 int const second_ )
-	{
+											 int const second_ ) {
 	M_PROLOG
 	if ( ( hour_ < 0 ) || ( hour_ > 23 ) )
 		M_THROW( "bad hour", hour_ );
@@ -141,11 +129,10 @@ void HTime::set_time( int const hour_, int const minute_,
 	_value = ::mktime( &_broken );
 	return;
 	M_EPILOG
-	}
+}
 
 void HTime::set_date( int const year_, int const month_,
-											 int const day_ )
-	{
+											 int const day_ ) {
 	M_PROLOG
 	_broken.tm_year = year_ - 1900;
 	if ( ( month_ < 1 ) || ( month_ > 12 ) )
@@ -157,150 +144,130 @@ void HTime::set_date( int const year_, int const month_,
 	_value = ::mktime( &_broken );
 	return;
 	M_EPILOG
-	}
+}
 
 void HTime::set_datetime( int const year_, int const month_,
 											 int const day_, int const hour_,
-											 int const minute_, int const second_ )
-	{
+											 int const minute_, int const second_ ) {
 	M_PROLOG
 	set_date( year_, month_, day_ );
 	set_time( hour_, minute_, second_ );
 	return;
 	M_EPILOG
-	}
+}
 
-int HTime::get_year( void ) const
-	{
+int HTime::get_year( void ) const {
 	M_PROLOG
 	return ( _broken.tm_year + 1900 );
 	M_EPILOG
-	}
+}
 
-int HTime::get_month( void ) const
-	{
+int HTime::get_month( void ) const {
 	M_PROLOG
 	return ( _broken.tm_mon + 1 );
 	M_EPILOG
-	}
+}
 
-int HTime::get_day( void ) const
-	{
+int HTime::get_day( void ) const {
 	M_PROLOG
 	return ( _broken.tm_mday );
 	M_EPILOG
-	}
+}
 
-int HTime::get_hour( void ) const
-	{
+int HTime::get_hour( void ) const {
 	M_PROLOG
 	return ( _broken.tm_hour );
 	M_EPILOG
-	}
+}
 
-int HTime::get_minute( void ) const
-	{
+int HTime::get_minute( void ) const {
 	M_PROLOG
 	return ( _broken.tm_min );
 	M_EPILOG
-	}
+}
 
-int HTime::get_second( void ) const
-	{
+int HTime::get_second( void ) const {
 	M_PROLOG
 	return ( _broken.tm_sec );
 	M_EPILOG
-	}
+}
 
-void HTime::swap( HTime& time_ )
-	{
+void HTime::swap( HTime& time_ ) {
 	M_PROLOG
-	if ( &time_ != this )
-		{
+	if ( &time_ != this ) {
 		using yaal::swap;
 		swap( _value, time_._value );
 		swap( _format, time_._format );
 		swap( _cache, time_._cache );
 		swap( _broken, time_._broken );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-HTime& HTime::operator = ( HTime const& time_ )
-	{
+HTime& HTime::operator = ( HTime const& time_ ) {
 	M_PROLOG
-	if ( this != &time_ )
-		{
+	if ( this != &time_ ) {
 		HTime tmp( time_ );
 		swap( tmp );
-		}
+	}
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-HTime HTime::operator - ( HTime const& time_ ) const
-	{
+HTime HTime::operator - ( HTime const& time_ ) const {
 	M_PROLOG
 	HTime time( *this );
 	time -= time_;
 	return ( time );
 	M_EPILOG
-	}
+}
 
-HTime & HTime::operator -= ( HTime const& time_ )
-	{
+HTime & HTime::operator -= ( HTime const& time_ ) {
 	M_PROLOG
 	_value = static_cast<time_t>( difftime( _value, time_._value ) );
 	M_ENSURE( gmtime_r( &_value, &_broken ) );
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-bool HTime::operator == ( time_t const& time_ ) const
-	{
+bool HTime::operator == ( time_t const& time_ ) const {
 	M_PROLOG
 	return ( _value == time_ );
 	M_EPILOG
-	}
+}
 
-bool HTime::operator != ( time_t const& time_ ) const
-	{
+bool HTime::operator != ( time_t const& time_ ) const {
 	M_PROLOG
 	return ( _value != time_ );
 	M_EPILOG
-	}
+}
 
-bool HTime::operator <= ( time_t const& time_ ) const
-	{
+bool HTime::operator <= ( time_t const& time_ ) const {
 	M_PROLOG
 	return ( _value <= time_ );
 	M_EPILOG
-	}
+}
 
-bool HTime::operator >= ( time_t const& time_ ) const
-	{
+bool HTime::operator >= ( time_t const& time_ ) const {
 	M_PROLOG
 	return ( _value >= time_ );
 	M_EPILOG
-	}
+}
 
-bool HTime::operator < ( time_t const& time_ ) const
-	{
+bool HTime::operator < ( time_t const& time_ ) const {
 	M_PROLOG
 	return ( _value < time_ );
 	M_EPILOG
-	}
+}
 
-bool HTime::operator > ( time_t const& time_ ) const
-	{
+bool HTime::operator > ( time_t const& time_ ) const {
 	M_PROLOG
 	return ( _value > time_ );
 	M_EPILOG
-	}
+}
 
-HString HTime::string( void ) const
-	{
+HString HTime::string( void ) const {
 	M_PROLOG
 #ifdef HAVE_SMART_STRFTIME
 	static int const MIN_TIME_STRING_LENGTH( 32 );
@@ -319,12 +286,11 @@ HString HTime::string( void ) const
 #endif /* not HAVE_SMART_STRFTIME */
 	return ( HString( _cache.raw() ) );
 	M_EPILOG
-	}
+}
 
-time_t HTime::raw( void ) const
-	{
+time_t HTime::raw( void ) const {
 	return ( _value );
-	}
+}
 
 }
 

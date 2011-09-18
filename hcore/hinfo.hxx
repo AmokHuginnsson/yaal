@@ -33,16 +33,13 @@ Copyright:
 #include "hcore/hstrongenum.hxx"
 #include "hcore/reflection.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Type agnostic data container.
  */
-class HInfo
-	{
+class HInfo {
 	type_id_t		_type;
 	int				_int;
 	int long	_intLong;
@@ -69,7 +66,7 @@ public:
 	bool operator ! ( void ) const;
 private:
 	void purge( void );
-	};
+};
 
 }
 

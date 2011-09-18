@@ -29,11 +29,9 @@ Copyright:
 
 #include "dbwrapper/db_driver_loader.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace dbwrapper
-{
+namespace dbwrapper {
 
 extern M_YAAL_DBWRAPPER_PUBLIC_API ODBConnector::DRIVER::enum_t _dataBaseDriver_;
 void banner( void );

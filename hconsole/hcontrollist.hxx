@@ -30,18 +30,15 @@ Copyright:
 #include "hcore/hlist.hxx"
 #include "hconsole/hcontrol.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 class HControl;
 
 /*! \brief Keep list of TUI controls for a given window.
  */
-class HControlList
-	{
+class HControlList {
 public:
 	typedef HControlList this_type;
 	typedef hcore::HList<HControl::ptr_t> model_t;
@@ -61,7 +58,7 @@ public:
 	int hit_test_all( mouse::OMouse& );
 	HControl* get_control_by_no( int );
 	void exchange( int, int );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HControlList> HControlListException;
 

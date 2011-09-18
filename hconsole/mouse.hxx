@@ -29,39 +29,33 @@ Copyright:
 
 #include "hcore/hexception.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief Console (TUI) and X mouse handling.
  */
-namespace mouse
-{
+namespace mouse {
 
 /*! \brief Meta-data for mouse interface.
  */
-struct MOUSE_BITS
-	{
+struct MOUSE_BITS {
 	/*! \brief Mouse button identifiers.
 	 */
-	struct BUTTONS
-		{
+	struct BUTTONS {
 		static int const ONE 		= 1; /*!< Button 1. */
 		static int const TWO		= 2; /*!< Button 2. */
 		static int const THREE	= 4; /*!< Button 3. */
-		};
 	};
+};
 
 /*! \brief Mouse input event data.
  */
-typedef struct
-	{
+typedef struct {
 	int _buttons; /*!< Button state mask. */
 	int _row;     /*!< Cursor Y position. */
 	int _column;  /*!< Cursor X position. */
-	} OMouse;
+} OMouse;
 
 typedef yaal::hcore::HExceptionT<OMouse> HMouseException;
 

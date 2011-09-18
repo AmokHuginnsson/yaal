@@ -36,33 +36,28 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace dbwrapper
-{
+namespace dbwrapper {
 
 HDataBase::HDataBase( void ) : HPointerFromThisInterface<HDataBase>(),
-	_connector( NULL ), _coreData( NULL )
-	{
+	_connector( NULL ), _coreData( NULL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HDataBase::~HDataBase( void )
-	{
+HDataBase::~HDataBase( void ) {
 	M_PROLOG
 	if ( _coreData )
 		(_connector->db_disconnect)( _coreData );
 	_coreData = NULL;
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
 void HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HString const& login_,
-		yaal::hcore::HString const& password_ )
-	{
+		yaal::hcore::HString const& password_ ) {
 	M_PROLOG
 	_coreData = (_connector->db_connect)( dataBase_.raw(), login_.raw(), password_.raw() );
 	if ( ! _coreData )
@@ -70,10 +65,9 @@ void HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HSt
 				(_connector->dbrs_errno)( _coreData, NULL ) );
 	return;
 	M_EPILOG
-	}
+}
 
-HRecordSet::ptr_t HDataBase::query( HString const& query_ )
-	{
+HRecordSet::ptr_t HDataBase::query( HString const& query_ ) {
 	M_PROLOG
 	if ( ! _coreData )
 		M_THROW( "not connected to database", errno );
@@ -84,35 +78,31 @@ HRecordSet::ptr_t HDataBase::query( HString const& query_ )
 		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _coreData, result ) );
 	return ( make_pointer<HRecordSet>( get_pointer(), _connector, result ) );
 	M_EPILOG
-	}
+}
 
-char const* HDataBase::get_error( void ) const
-	{
+char const* HDataBase::get_error( void ) const {
 	M_PROLOG
 	return ( (_connector->dbrs_error)( _coreData, NULL ) );
 	M_EPILOG
-	}
+}
 
-int HDataBase::get_errno( void ) const
-	{
+int HDataBase::get_errno( void ) const {
 	M_PROLOG
 	return ( (_connector->dbrs_errno)( _coreData, NULL ) );
 	M_EPILOG
-	}
+}
 
-HDataBase::ptr_t HDataBase::get_connector( ODBConnector::DRIVER::enum_t driverId_ )
-	{
+HDataBase::ptr_t HDataBase::get_connector( ODBConnector::DRIVER::enum_t driverId_ ) {
 	M_PROLOG
 	ptr_t p( make_pointer<HDataBase>() );
 	p->_connector = load_driver( driverId_ );
 	return ( p );
 	M_EPILOG
-	}
+}
 
-ODBConnector const* HDataBase::connector( void ) const
-	{
+ODBConnector const* HDataBase::connector( void ) const {
 	return ( _connector );
-	}
+}
 
 }
 

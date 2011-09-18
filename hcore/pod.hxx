@@ -33,8 +33,7 @@ Copyright:
 
 #include "hcore/trait.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
 /*! \brief Check if type is a POD type.
  *
@@ -43,11 +42,10 @@ namespace yaal
  * \retval type - true_type iff T is a POD type.
  */
 template<typename T>
-struct is_pod
-	{
+struct is_pod {
 	static bool const value = trait::is_pointer<T>::value;
 	typedef typename trait::ternary<trait::is_pointer<T>::value, trait::true_type, trait::false_type>::type type;
-	};
+};
 
 /*! \cond */
 template<> struct is_pod<bool> { static bool const value = true; typedef trait::true_type type; };
@@ -71,11 +69,10 @@ template<> struct is_pod<float> { static bool const value = true; typedef trait:
  * \retval type - true_type iff T is an integral type.
  */
 template<typename T>
-struct is_integral
-	{
+struct is_integral {
 	static bool const value = false;
 	typedef trait::false_type type;
-	};
+};
 
 /*! \brief Check if type is a floating point type.
  *
@@ -84,11 +81,10 @@ struct is_integral
  * \retval type - true_type iff T is a floating point type.
  */
 template<typename T>
-struct is_floating_point
-	{
+struct is_floating_point {
 	static bool const value = false;
 	typedef trait::false_type type;
-	};
+};
 
 /*! \brief Check if type is a numeric type.
  *
@@ -97,84 +93,73 @@ struct is_floating_point
  * \retval type - true_type iff T is a numeric type.
  */
 template<typename T>
-struct is_numeric
-	{
+struct is_numeric {
 	static bool const value = ( is_integral<T>::value || is_floating_point<T>::value );
 	typedef typename trait::ternary<value, trait::true_type, trait::false_type>::type type;
-	};
+};
 
 /*! \cond */
 template<>
-struct is_integral<int>
-	{
+struct is_integral<int> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 
 template<>
-struct is_integral<int unsigned>
-	{
+struct is_integral<int unsigned> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 
 template<>
-struct is_integral<int short>
-	{
+struct is_integral<int short> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 
 template<>
-struct is_integral<int short unsigned>
-	{
+struct is_integral<int short unsigned> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 
 template<>
-struct is_integral<int long>
-	{
+struct is_integral<int long> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 
 template<>
-struct is_integral<int long unsigned>
-	{
+struct is_integral<int long unsigned> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 
 template<>
-struct is_floating_point<float>
-	{
+struct is_floating_point<float> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 
 template<>
-struct is_floating_point<double>
-	{
+struct is_floating_point<double> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 
 template<>
-struct is_floating_point<double long>
-	{
+struct is_floating_point<double long> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 
 namespace hcore { class HNumber; }
 
 template<>
-struct is_floating_point<hcore::HNumber>
-	{
+struct is_floating_point<hcore::HNumber> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 
 /*! \endcond */
 

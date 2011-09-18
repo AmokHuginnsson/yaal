@@ -31,11 +31,9 @@ Copyright:
 #include "hcore/hpattern.hxx"
 #include "hconsole/hcontrol.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskLetters_;
 extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskDigits_;
@@ -49,8 +47,7 @@ extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskDefault_;
  * Edit control allows convenient text editing with handful
  * of advanced automatic text operations.
  */
-class HEditControl : public virtual HControl
-	{
+class HEditControl : public virtual HControl {
 public:
 	typedef HEditControl this_type;
 	typedef HControl base_type;
@@ -123,7 +120,7 @@ private:
 	int kill_word( int );
 	int insert_char( int, int );
 	int update_from_history( void );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HEditControl, HControlException> HEditControlException;
 

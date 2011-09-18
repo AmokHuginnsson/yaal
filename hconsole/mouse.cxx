@@ -58,21 +58,17 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
-namespace mouse
-{
+namespace mouse {
 
 fun_console_mouse_open_t mouse_open = NULL;
 fun_console_mouse_get_t mouse_get = NULL;
 fun_console_mouse_close_t mouse_close = NULL;
 
-int hunt_tty( int offset_ )
-	{
+int hunt_tty( int offset_ ) {
 	M_PROLOG
 	/* this hack allows to guess current controling virtual terminal screen */
 	int vC = 0;
@@ -81,29 +77,25 @@ int hunt_tty( int offset_ )
 	ttyName = ttyname( STDIN_FILENO );
 	if ( ttyName && ! ::strncmp( ttyName, "/dev/ttyv", 8 + offset_ ) )
 		vC = lexical_cast<int>( ttyName + 8 + offset_ );
-	else
-		{
+	else {
 		ttyName = ::getenv( "STY" );
-		if ( ttyName )
-			{
+		if ( ttyName ) {
 			if ( ( ptr = ::strstr( ttyName, ".tty" ) ) )
 				vC = lexical_cast<int>( ptr + 4 + offset_ );
 			else if ( ( ptr = ::strstr( ttyName, ".pts" ) ) )
 				vC = lexical_cast<int>( ptr + 4 + offset_ );
-			}
-		else
+		} else
 			throw HConsoleException( "cannot find controling virtual console", errno );
-		}
+	}
 	return ( vC );
 	M_EPILOG
-	}
+}
 
 #ifdef HAVE_SYS_CONSIO_H
 
 int _mouse_ = 0;
 
-int console_mouse_open( void )
-	{
+int console_mouse_open( void ) {
 	M_PROLOG
 	int vC = 0;
 	char tty[] = "/dev/ttyv0";
@@ -115,43 +107,38 @@ int console_mouse_open( void )
 	vC = hunt_tty( 1 );
 	tty[ 9 ] = '0' + vC;
 	_mouse_ = ::open( tty, O_RDWR );
-	if ( _mouse_ < 0 )
-		{
+	if ( _mouse_ < 0 ) {
 		error.format( _( "cannot open mouse, %s" ), error_message( errno ) );
 		throw HMouseException( error, vC );
-		}
-	if ( ::ioctl( _mouse_, CONS_MOUSECTL, &mouse ) < 0 )
-		{
+	}
+	if ( ::ioctl( _mouse_, CONS_MOUSECTL, &mouse ) < 0 ) {
 		error.format( _( "cannot setup mouse mode, %s" ), error_message( errno ) );
 		TEMP_FAILURE_RETRY( hcore::system::close( _mouse_ ) );
 		throw HMouseException( error, errno );
-		}
+	}
 
 	log( LOG_TYPE::INFO ) << "i have opened device: `" << tty << '\'' << endl;
 
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int console_mouse_get( OMouse& mouse_ )
-	{
+int console_mouse_get( OMouse& mouse_ ) {
 	M_PROLOG
 	mouse_info mouse;
 	mouse.operation = MOUSE_GETINFO;
 	if ( ::ioctl( _mouse_, CONS_MOUSECTL, &mouse ) < 0 )
 		throw HMouseException( "cannot get mouse data", errno );
-	else
-		{
+	else {
 		mouse_._buttons = mouse.u.data.buttons;
 		mouse_._row = mouse.u.data.y / 16;
 		mouse_._column = mouse.u.data.x / 8;
-		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int console_mouse_close( void )
-	{
+int console_mouse_close( void ) {
 	M_PROLOG
 	if ( ! _mouse_ )
 		throw HMouseException( "mouse not opened", errno );
@@ -159,12 +146,11 @@ int console_mouse_close( void )
 	_mouse_ = 0;
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
 #elif defined ( HAVE_GPM_H )
 
-int console_mouse_open( void )
-	{
+int console_mouse_open( void ) {
 	M_PROLOG
 	int vC = 0;
 	HString error;
@@ -176,18 +162,16 @@ int console_mouse_open( void )
 	gpm.eventMask = static_cast<int>( GPM_UP );
 	gpm.defaultMask = static_cast<int short unsigned>( ~gpm.eventMask );
 	gpm_zerobased = true;
-	if ( Gpm_Open( &gpm, vC ) == -1 )
-		{
+	if ( Gpm_Open( &gpm, vC ) == -1 ) {
 		error.format( "Can't open mouse connection: %s", error_message( errno ) );
 		throw HMouseException( error, vC );
-		}
+	}
 	log( LOG_TYPE::INFO ) << "i have opened device: `" << vC << '\'' << endl;
 	return ( gpm_fd );
 	M_EPILOG
-	}
+}
 
-int console_mouse_get( OMouse& mouse_ )
-	{
+int console_mouse_get( OMouse& mouse_ ) {
 	M_PROLOG
 	Gpm_Event event;
 	if ( Gpm_GetEvent( &event ) != 1 )
@@ -197,41 +181,37 @@ int console_mouse_get( OMouse& mouse_ )
 	mouse_._column = event.x;
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int console_mouse_close( void )
-	{
+int console_mouse_close( void ) {
 	M_PROLOG
 	while ( Gpm_Close() )
 		;
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
 #else /* HAVE_GPM_H */
 
-int console_mouse_open( void )
-	{
+int console_mouse_open( void ) {
 	M_PROLOG
 	int a( 1 );
 	if ( a )
 		throw HMouseException( _( "console mouse support not compiled" ) );
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int console_mouse_get( OMouse& )
-	{
+int console_mouse_get( OMouse& ) {
 	M_PROLOG
 	int a( 1 );
 	if ( a )
 		throw HMouseException( _( "console mouse support not compiled" ) );
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int console_mouse_close( void )
-	{
+int console_mouse_close( void ) {
 	M_PROLOG
 /*	I cannot throw exception here bacause exception was probably
  *	thrown by console_mouse_open in enter_curses and now this
@@ -240,54 +220,49 @@ int console_mouse_close( void )
  *	overload the stack because of infinite number of exceptions */
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
 #endif /* ! HAVE_GPM_H */
 
-int x_mouse_open( void )
-	{
+int x_mouse_open( void ) {
 	M_PROLOG
 	mmask_t mouseMask, desiredMouseMask;
 	desiredMouseMask = BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED | BUTTON1_DOUBLE_CLICKED;
 	mouseMask = mousemask( desiredMouseMask, NULL );
 	if ( ! mouseMask )
 		throw HMouseException( "mousemask() returned 0", errno );
-	else if ( ( mouseMask & desiredMouseMask ) < desiredMouseMask )
-		{
+	else if ( ( mouseMask & desiredMouseMask ) < desiredMouseMask ) {
 		HString error;
 		error.format( "could not set up apropriate mask: B1C = %d, B2C = %d, B3C = %d, B1DC = %d",
 				mouseMask & BUTTON1_CLICKED, mouseMask & BUTTON2_CLICKED,
 				mouseMask & BUTTON3_CLICKED, mouseMask & BUTTON1_DOUBLE_CLICKED );
 		throw ( HMouseException( error ) );
-		}
+	}
 #if defined( HAVE_DECL_HAS_MOUSE ) && ( HAVE_DECL_HAS_MOUSE == 1 )
 	if ( ! has_mouse() )
 		throw HMouseException( "Mouse driver failed to initialize properly." );
 #endif /* #if defined( HAVE_DECL_HAS_MOUSE ) && ( HAVE_DECL_HAS_MOUSE == 1 ) */
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int x_mouse_get( OMouse& mouse_ )
-	{
+int x_mouse_get( OMouse& mouse_ ) {
 	M_PROLOG
 	MEVENT mouse;
 	if ( getmouse( &mouse ) != OK )
 		throw HMouseException( "cannot get mouse data", errno );
-	else
-		{
+	else {
 		mouse_._buttons = static_cast<int>( mouse.bstate );
 		mouse_._row = mouse.y;
 		mouse_._column = mouse.x;
-		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int x_mouse_close( void )
-	{
+int x_mouse_close( void ) {
 	return ( 0 );
-	}
+}
 
 }
 

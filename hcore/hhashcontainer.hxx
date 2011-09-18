@@ -36,26 +36,21 @@ Copyright:
 #include "hcore/hpair.hxx"
 #include "hcore/algorithm.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 template<typename key_t>
-inline int long hash( key_t const& key_ )
-	{
+inline int long hash( key_t const& key_ ) {
 	return ( static_cast<int long>( key_ ) );
-	}
+}
 
 extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
 
-class HHashContainer : private trait::HNonCopyable
-	{
+class HHashContainer : private trait::HNonCopyable {
 public:
 	class HIterator;
-	class HAbstractAtom
-		{
+	class HAbstractAtom {
 	private: /* for UT */
 		HAbstractAtom* _next;
 		HAbstractAtom( void ) : _next( NULL ) {}
@@ -66,11 +61,10 @@ public:
 		friend class HIterator;
 	public:
 		virtual ~HAbstractAtom( void ) {}
-		};
+	};
 private:
 	template<typename value_t>
-	class HAtom : public HAbstractAtom
-		{
+	class HAtom : public HAbstractAtom {
 	private: /* for UT */
 		value_t _value;
 		HAtom( value_t const& value_ ) : HAbstractAtom(), _value( value_ ) {}
@@ -78,7 +72,7 @@ private:
 			{ return ( new ( memory::yaal ) HAtom( _value ) ); }
 		friend class HHashContainer;
 		friend class HIterator;
-		};
+	};
 	int long _prime;
 	int _size;
 	HChunk _buckets;
@@ -99,12 +93,11 @@ public:
 	void resize( int long, hasher_t const& );
 	void copy_from( HHashContainer const& );
 	void swap( HHashContainer& );
-	};
+};
 
 /*! \brief Iterator for HHashContainer data structure.
  */
-class HHashContainer::HIterator
-	{
+class HHashContainer::HIterator {
 	HHashContainer const* _owner;
 	int long _index;
 	HHashContainer::HAbstractAtom* _atom;
@@ -112,31 +105,25 @@ public:
 	HIterator( void ) : _owner( NULL ), _index( 0 ), _atom( NULL ) {}
 	HIterator( HIterator const& it_ )
 		: _owner( it_._owner ), _index( it_._index ),
-		_atom( it_._atom )
-		{
-		}
-	HIterator& operator = ( HIterator const& it_ )
-		{
-		if ( &it_ != this )
-			{
+		_atom( it_._atom ) {
+	}
+	HIterator& operator = ( HIterator const& it_ ) {
+		if ( &it_ != this ) {
 			_owner = it_._owner;
 			_index = it_._index;
 			_atom = it_._atom;
-			}
-		return ( *this );
 		}
-	HIterator& operator ++ ( void )
-		{
+		return ( *this );
+	}
+	HIterator& operator ++ ( void ) {
 		M_ASSERT( _owner );
 		int long oldIndex( _index );
-		if ( _atom )
-			{
+		if ( _atom ) {
 			_atom = _atom->_next;
 			if ( ! _atom )
 				++ _index;
-			}
-		if ( ! _atom )
-			{
+		}
+		if ( ! _atom ) {
 			HHashContainer::HAbstractAtom* const* buckets = _owner->_buckets.get<HHashContainer::HAbstractAtom*>();
 			if ( oldIndex == _owner->_prime )
 				_index = 0;
@@ -144,17 +131,15 @@ public:
 				++ _index;
 			if ( _index < _owner->_prime )
 				_atom = buckets[ _index ];
-			}
+		}
 		if ( ! _atom )
 			_index = _owner->_prime;
 		return ( *this );
-		}
-	HIterator& operator -- ( void )
-		{
+	}
+	HIterator& operator -- ( void ) {
 		M_ASSERT( _owner );
 		HHashContainer::HAbstractAtom* const* buckets = _owner->_buckets.get<HHashContainer::HAbstractAtom*>();
-		if ( _atom )
-			{
+		if ( _atom ) {
 			HHashContainer::HAbstractAtom* atom( buckets[ _index ] );
 			while ( ( atom != _atom ) && ( atom->_next != _atom ) )
 				atom = atom->_next;
@@ -162,9 +147,8 @@ public:
 				_atom = NULL;
 			else
 				_atom = atom;
-			}
-		if ( ! _atom )
-			{
+		}
+		if ( ! _atom ) {
 			if ( _index == 0 )
 				_index = _owner->_prime - 1;
 			while ( ( _index > 0 ) && ! buckets[ _index ] )
@@ -172,59 +156,52 @@ public:
 			_atom = buckets[ _index ];
 			while ( _atom && _atom->_next )
 				_atom = _atom->_next;
-			}
-		return ( *this );
 		}
+		return ( *this );
+	}
 	template<typename tType>
-	tType& get( void )
-		{
+	tType& get( void ) {
 		M_ASSERT( _atom );
 		return ( static_cast<HHashContainer::HAtom<tType>*>( _atom )->_value );
-		}
+	}
 	template<typename tType>
-	tType const& get( void ) const
-		{
+	tType const& get( void ) const {
 		M_ASSERT( _atom );
 		return ( static_cast<HHashContainer::HAtom<tType> const*>( _atom )->_value );
-		}
-	bool operator == ( HIterator const& it ) const
-		{
+	}
+	bool operator == ( HIterator const& it ) const {
 		M_ASSERT( _owner == it._owner );
 		return ( ( _index == it._index ) && ( _atom == it._atom ) );
-		}
+	}
 	bool operator != ( HIterator const& it ) const
 		{ return ( ! operator == ( it ) ); }
 private:
 	friend class HHashContainer;
 	explicit HIterator( HHashContainer const* owner_, int long index_, HHashContainer::HAbstractAtom* atom_ )
 		: _owner( owner_ ), _index( index_ ), _atom( atom_ ) {};
-	};
+};
 
 template<typename key_t, typename hasher_t>
-HHashContainer::HIterator HHashContainer::find( key_t const& key_, hasher_t const& hasher_ ) const
-	{
+HHashContainer::HIterator HHashContainer::find( key_t const& key_, hasher_t const& hasher_ ) const {
 	M_PROLOG
 	int long idx( 0 );
 	HAtom<typename hasher_t::value_type>* atom( NULL );
-	if ( _prime )
-		{
+	if ( _prime ) {
 		idx = yaal::abs( hasher_( key_ ) ) % _prime;
 		atom = _buckets.get<HAtom<typename hasher_t::value_type>*>()[ idx ];
 		while ( atom && ! hasher_( atom->_value, key_ ) )
 			atom = static_cast<HAtom<typename hasher_t::value_type>*>( atom->_next );
-		}
+	}
 	return ( atom ? HIterator( this, idx, atom ) : end() );
 	M_EPILOG
-	}
+}
 
 template<typename tType, typename hasher_t>
-HPair<HHashContainer::HIterator, bool> HHashContainer::insert( tType const& val_, hasher_t const& hasher_ )
-	{
+HPair<HHashContainer::HIterator, bool> HHashContainer::insert( tType const& val_, hasher_t const& hasher_ ) {
 	M_PROLOG
 	HIterator it( _prime ? find( val_, hasher_ ) : end() );
 	bool inserted( false );
-	if ( it == end() )
-		{
+	if ( it == end() ) {
 		if ( ( _size + 1 ) > _prime )
 			resize( ( _size + 1 ) * 2, hasher_ );
 		HAtom<typename hasher_t::value_type>* atom = new ( memory::yaal ) HAtom<typename hasher_t::value_type>( val_ );
@@ -238,48 +215,43 @@ HPair<HHashContainer::HIterator, bool> HHashContainer::insert( tType const& val_
 		++ _size;
 		it = HIterator( this, newHash, atom );
 		inserted = true;
-		}
+	}
 	return ( make_pair( it, inserted ) );
 	M_EPILOG
-	}
+}
 
 template<typename hasher_t>
-void HHashContainer::resize( int long size_, hasher_t const& hasher_ )
-	{
+void HHashContainer::resize( int long size_, hasher_t const& hasher_ ) {
 	M_PROLOG
 	if ( size_ < 1 )
 		M_THROW( "bad new container size", size_ );
-	if ( size_ > _size )
-		{
+	if ( size_ > _size ) {
 		int n = 0;
-		while ( size_ )
-			{
+		while ( size_ ) {
 			size_ >>= 1;
 			n ++;
-			}
+		}
 		int long prime( _primes_[ n - 1 ] );
 		HChunk buckets( chunk_size<HAtom<typename hasher_t::value_type>*>( prime ), HChunk::STRATEGY::GEOMETRIC );
 		M_ASSERT( ( buckets.size() / static_cast<int long>( sizeof ( HAtom<typename hasher_t::value_type>* ) ) ) >= prime );
 		HAtom<typename hasher_t::value_type>** oldBuckets = _buckets.get<HAtom<typename hasher_t::value_type>*>();
 		HAtom<typename hasher_t::value_type>** newBuckets = buckets.get<HAtom<typename hasher_t::value_type>*>();
-		for ( int long i( 0 ); i < _prime; ++ i )
-			{
+		for ( int long i( 0 ); i < _prime; ++ i ) {
 			HAtom<typename hasher_t::value_type>* a( oldBuckets[ i ] );
-			while ( a )
-				{
+			while ( a ) {
 				HAtom<typename hasher_t::value_type>* atom( a );
 				a = static_cast<HAtom<typename hasher_t::value_type>*>( a->_next );
 				int long newHash( yaal::abs( hasher_( atom->_value ) ) % prime );
 				atom->_next = newBuckets[ newHash ];
 				newBuckets[ newHash ] = atom;
-				}
 			}
+		}
 		_buckets.swap( buckets );
 		_prime = prime;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

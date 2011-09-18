@@ -33,11 +33,9 @@ Copyright:
 #include "hconsole/hstatusbarcontrol.hxx"
 #include "hdata/hdatawindow.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 /*! \brief Implementation of database enabled TUI Statusbar control class.
  *
@@ -45,12 +43,11 @@ namespace hdata
  * invocation of commands and specyfing search patterns.
  * Additionally it provides document status presentation.
  */
-class HDataStatusBarControl : public hconsole::HStatusBarControl
-	{
+class HDataStatusBarControl : public hconsole::HStatusBarControl {
 public:
 	HDataStatusBarControl ( HDataWindow *, char const *, int = -1 );
 	virtual void do_draw_label ( void );
-	};
+};
 
 }
 

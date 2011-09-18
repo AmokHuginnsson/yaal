@@ -27,11 +27,9 @@ Copyright:
 #ifndef YAAL_HCONSOLE_HCONSOLE_HXX_INCLUDED
 #define YAAL_HCONSOLE_HCONSOLE_HXX_INCLUDED 1
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 extern M_YAAL_HCONSOLE_PUBLIC_API int _latency_;
 extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeDisabled_;

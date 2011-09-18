@@ -30,33 +30,28 @@ Copyright:
 #include "hcore/hlist.hxx"
 #include "hconsole/hcontrol.hxx"
 
-namespace yaal
-{
+namespace yaal {
 	
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief Implementation of TUI LogPad control class.
  *
  * LogPad is read only TUI control that is able to display formatted text.
  */
-class HLogPad : public HControl
-	{
+class HLogPad : public HControl {
 public:
 	typedef HLogPad this_type;
 	typedef HControl base_type;
 private:
 	/*! \brief Basic unit of data for HLogPad display.
 	 */
-	class HLogLine
-		{
-		typedef enum
-			{
+	class HLogLine {
+		typedef enum {
 			NONE,
 			ATTRIBUTE,
 			TEXT,
 			TEXT_EOL
-			} type_t;
+		} type_t;
 		type_t _type;
 		int _attribute;
 		hcore::HString _text;
@@ -64,7 +59,7 @@ private:
 		HLogLine( void );
 		virtual ~HLogLine( void );
 		friend class HLogPad;
-		};
+	};
 	typedef hcore::HList<HLogLine> contents_t;
 	int _lines;
 	int _offsetRow;
@@ -80,7 +75,7 @@ public:
 protected:
 	virtual int do_process_input( int );
 	virtual void do_refresh( void );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HLogPad, HControlException> HLogPadException;
 

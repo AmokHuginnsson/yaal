@@ -22,8 +22,7 @@
 #undef umask
 #undef _INC_STAT_INL
 
-namespace msvcxx
-{
+namespace msvcxx {
 int stat( char const*, struct stat* );
 mode_t umask( mode_t );
 }

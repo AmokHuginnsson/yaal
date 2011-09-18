@@ -36,81 +36,69 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::math;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-HComplex::HComplex( void ) : _real ( 0 ), _imaginary ( 0 )
-	{
+HComplex::HComplex( void ) : _real ( 0 ), _imaginary ( 0 ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
 HComplex::HComplex( double long real_,  double long imaginary_ )
-	: _real ( real_ ), _imaginary ( imaginary_ )
-	{
+	: _real ( real_ ), _imaginary ( imaginary_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
 HComplex::HComplex( HComplex const& complex_ )
-	: _real ( complex_._real ), _imaginary ( complex_._imaginary )
-	{
+	: _real ( complex_._real ), _imaginary ( complex_._imaginary ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HComplex::~HComplex( void )
-	{
+HComplex::~HComplex( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-double long HComplex::re( void ) const
-	{
+double long HComplex::re( void ) const {
 	M_PROLOG
 	return ( _real );
 	M_EPILOG
-	}
+}
 
-double long HComplex::im( void ) const
-	{
+double long HComplex::im( void ) const {
 	M_PROLOG
 	return ( _imaginary );
 	M_EPILOG
-	}
+}
 
-double long HComplex::set_real( double long real_ )
-	{
+double long HComplex::set_real( double long real_ ) {
 	M_PROLOG
 	return ( _real = real_ );
 	M_EPILOG
-	}
+}
 
-double long HComplex::set_imaginary( double long imaginary_ )
-	{
+double long HComplex::set_imaginary( double long imaginary_ ) {
 	M_PROLOG
 	return ( _imaginary = imaginary_ );
 	M_EPILOG
-	}
+}
 
-HComplex& HComplex::set( double long real_, double long imaginary_ )
-	{
+HComplex& HComplex::set( double long real_, double long imaginary_ ) {
 	M_PROLOG
 	_real = real_;
 	_imaginary = imaginary_;
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-double long HComplex::modulus( void ) const
-	{
+double long HComplex::modulus( void ) const {
 	M_PROLOG
 	double long mod( 0 );
 	if ( ! _imaginary )
@@ -120,10 +108,9 @@ double long HComplex::modulus( void ) const
 	else mod = ::std::sqrt( _real * _real + _imaginary * _imaginary );
 	return ( mod );
 	M_EPILOG
-	}
+}
 
-double long HComplex::argument( void ) const
-	{
+double long HComplex::argument( void ) const {
 	M_PROLOG
 	bool reZero( yaal::abs( _real ) < ( 2.L * std::numeric_limits<double long>::epsilon() ) );
 	bool imZero( yaal::abs( _imaginary ) < ( 2.L * std::numeric_limits<double long>::epsilon() ) );
@@ -141,86 +128,76 @@ double long HComplex::argument( void ) const
 		arg = PI / 2.L;
 	else if ( reZero && ( _imaginary < 0 ) )
 		arg = -PI / 2.L;
-	else
-		{
+	else {
 		M_ASSERT( ! "bad code path" );
-		}
+	}
 	return ( arg );
 	M_EPILOG
-	}
+}
 
-HComplex& HComplex::operator = ( HComplex const& complex_ )
-	{
+HComplex& HComplex::operator = ( HComplex const& complex_ ) {
 	M_PROLOG
 	if ( &complex_ != this )
 		set( complex_._real, complex_._imaginary );
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-bool HComplex::operator == ( HComplex const& complex_ ) const
-	{
+bool HComplex::operator == ( HComplex const& complex_ ) const {
 	M_PROLOG
 	return ( eq( _real, complex_._real )
 			&& eq( _imaginary, complex_._imaginary ) );
 	M_EPILOG
-	}
+}
 
-bool HComplex::operator != ( HComplex const& complex_ ) const
-	{
+bool HComplex::operator != ( HComplex const& complex_ ) const {
 	M_PROLOG
 	return ( ! ( eq( _real, complex_._real )
 				&& eq( _imaginary, complex_._imaginary ) ) );
 	M_EPILOG
-	}
+}
 
-HComplex& HComplex::operator = ( double long real_ )
-	{
+HComplex& HComplex::operator = ( double long real_ ) {
 	M_PROLOG
 	set( real_, 0. );
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-HComplex& HComplex::operator += ( HComplex const& complex_ )
-	{
+HComplex& HComplex::operator += ( HComplex const& complex_ ) {
 	M_PROLOG
 	_real += complex_._real;
 	_imaginary += complex_._imaginary;
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-HComplex& HComplex::operator -= ( HComplex const& complex_ )
-	{
+HComplex& HComplex::operator -= ( HComplex const& complex_ ) {
 	M_PROLOG
 	_real -= complex_._real;
 	_imaginary -= complex_._imaginary;
 	return ( * this );
 	M_EPILOG
-	}
+}
 
-HComplex& HComplex::operator *= ( HComplex const& complex_ )
-	{
+HComplex& HComplex::operator *= ( HComplex const& complex_ ) {
 	M_PROLOG
 	double long real( _real * complex_._real - _imaginary * complex_._imaginary );
 	double long imaginary( _imaginary * complex_._real + _real * complex_._imaginary );
 	set( real, imaginary );
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-HComplex& HComplex::operator *= ( double long value_ )
-	{
+HComplex& HComplex::operator *= ( double long value_ ) {
 	M_PROLOG
 	_real *= value_;
 	_imaginary *= value_;
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-HComplex& HComplex::operator /= ( HComplex const& complex_ )
-	{
+HComplex& HComplex::operator /= ( HComplex const& complex_ ) {
 	M_PROLOG
 	double long denominator( complex_._real * complex_._real + complex_._imaginary * complex_._imaginary );
 	if ( ! denominator )
@@ -230,10 +207,9 @@ HComplex& HComplex::operator /= ( HComplex const& complex_ )
 	set( real, imaginary );
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-HComplex& HComplex::operator /= ( double long value_ )
-	{
+HComplex& HComplex::operator /= ( double long value_ ) {
 	M_PROLOG
 	if ( ! value_ )
 		M_THROW( "denominator equals 0", errno );
@@ -241,76 +217,68 @@ HComplex& HComplex::operator /= ( double long value_ )
 	_imaginary /= value_;
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-HComplex HComplex::operator + ( HComplex const& complex_ ) const
-	{
+HComplex HComplex::operator + ( HComplex const& complex_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c += complex_;
 	return ( c );
 	M_EPILOG
-	}
+}
 
-HComplex HComplex::operator - ( HComplex const& complex_ ) const
-	{
+HComplex HComplex::operator - ( HComplex const& complex_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c -= complex_;
 	return ( c );
 	M_EPILOG
-	}
+}
 
-HComplex HComplex::operator - ( void ) const
-	{
+HComplex HComplex::operator - ( void ) const {
 	M_PROLOG
 	HComplex c( -_real, -_imaginary );
 	return ( c );
 	M_EPILOG
-	}
+}
 
-HComplex HComplex::operator * ( HComplex const& complex_ ) const
-	{
+HComplex HComplex::operator * ( HComplex const& complex_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c *= complex_;
 	return ( c );
 	M_EPILOG
-	}
+}
 
-HComplex HComplex::operator * ( double long value_ ) const
-	{
+HComplex HComplex::operator * ( double long value_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c *= value_;
 	return ( c );
 	M_EPILOG
-	}
+}
 
-HComplex HComplex::operator / ( HComplex const& complex_ ) const
-	{
+HComplex HComplex::operator / ( HComplex const& complex_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c /= complex_;
 	return ( c );
 	M_EPILOG
-	}
+}
 
-HComplex HComplex::operator / ( double long value_ ) const
-	{
+HComplex HComplex::operator / ( double long value_ ) const {
 	M_PROLOG
 	HComplex c( *this );
 	c /= value_;
 	return ( c );
 	M_EPILOG
-	}
+}
 
-HComplex operator * ( double long value_, HComplex const& complex_ )
-	{
+HComplex operator * ( double long value_, HComplex const& complex_ ) {
 	M_PROLOG
 	return ( complex_ * value_ );
 	M_EPILOG
-	}
+}
 
 }
 

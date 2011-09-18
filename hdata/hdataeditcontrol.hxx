@@ -33,18 +33,15 @@ Copyright:
 #include "hconsole/heditcontrol.hxx"
 #include "hdata/hdatawindow.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 /*! \brief Database enabled TUI Edit control.
  *
  * This TUI control support automatic synchronization with document query column.
  */
-class HDataEditControl : public HDataControl, public virtual hconsole::HEditControl
-	{
+class HDataEditControl : public HDataControl, public virtual hconsole::HEditControl {
 public:
 	HDataEditControl( HDataWindow *,					/* parent */
 								int,								/* top ( parent relative ) */
@@ -62,7 +59,7 @@ public:
 								bool = false,				/* password */
 								int = 8 );						/* max history level */
 	virtual int do_process_input( int );
-	};
+};
 
 }
 

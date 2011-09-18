@@ -36,19 +36,15 @@ Copyright:
 #include "hcore/base.hxx"
 #include "hcore/algorithm.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Resource lifetime tracking helper.
  */
-struct HResourceAllocatedBy
-	{
+struct HResourceAllocatedBy {
 	template<typename T>
-	struct by_pointer
-		{
+	struct by_pointer {
 		typedef typename trait::strip_const<T>::type* hold_t;
 		typedef T const* const_hold_t;
 		typedef typename trait::make_reference<typename trait::strip_const<T>::type>::type ref_t;
@@ -61,10 +57,9 @@ struct HResourceAllocatedBy
 			{ return ( val ); }
 		static T const* raw( const_hold_t val )
 			{ return ( val ); }
-		};
+	};
 	template<typename T>
-	struct by_value
-		{
+	struct by_value {
 		typedef T hold_t;
 		typedef T const& const_hold_t;
 		typedef T& ref_t;
@@ -77,77 +72,64 @@ struct HResourceAllocatedBy
 			{ return ( val ); }
 		static T raw( T const& val )
 			{ return ( val ); }
-		};
 	};
+};
 template<typename T, typename real_t>
-struct HResourceReleaseBy
-	{
-	static void delete_obj( T p )
-		{
+struct HResourceReleaseBy {
+	static void delete_obj( T p ) {
 		M_SAFE( delete static_cast<real_t>( p ) );
-		}
-	static void delete_array( T p )
-		{
+	}
+	static void delete_array( T p ) {
 		M_SAFE( delete [] static_cast<real_t>( p ) );
-		}
-	};
-struct HResourceReleaseWhen
-	{
-	struct always
-		{
+	}
+};
+struct HResourceReleaseWhen {
+	struct always {
 		static bool is_allocated( void* )
 			{ return ( true ); }
-		};
-	struct non_null
-		{
+	};
+	struct non_null {
 		static bool is_allocated( void* value )
 			{ return ( value != NULL ); }
 		template<typename T>
-		static void reset( T*& p )
-			{
+		static void reset( T*& p ) {
 			p = NULL;
-			}
-		};
+		}
+	};
 	template<int than>
-	struct greater
-		{
+	struct greater {
 		static bool is_allocated( int long value )
 			{ return ( value > than ); }
 		template<typename T>
-		static void reset( T& p )
-			{
+		static void reset( T& p ) {
 			p = than;
-			}
-		};
+		}
+	};
 	template<int than>
-	struct greater_or_eq
-		{
+	struct greater_or_eq {
 		static bool is_allocated( int long value )
 			{ return ( value >= than ); }
 		template<typename T>
-		static void reset( T& p )
-			{
+		static void reset( T& p ) {
 			p = than - 1;
-			}
-		};
+		}
 	};
+};
 
 /*! \brief Provide reference semantics for HResource<>.
  */
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-struct HResourceRef
-	{
+struct HResourceRef {
 	typedef typename hold_by_t<type_t>::hold_t hold_t;
 	hold_t _hold;
 	free_t _free;
 	explicit HResourceRef( hold_t hold_, free_t free_ ) : _hold( hold_ ), _free( free_ ) {}
-	};
+};
 
 /*! \brief Raw resource life time tracker.
  */
 template<typename type_t, typename free_t = void (*)( type_t* ), template<typename>class hold_by_t = HResourceAllocatedBy::by_pointer, typename allocated_t = HResourceReleaseWhen::non_null>
-class HResource
-	{
+class HResource {
 	typedef typename hold_by_t<type_t>::hold_t hold_t;
 	typedef typename hold_by_t<type_t>::const_hold_t const_hold_t;
 	typedef typename hold_by_t<type_t>::ref_t ref_t;
@@ -186,192 +168,167 @@ public:
 private:
 	template<typename alien_t>
 	void pass( alien_t& );
-	};
+};
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 HResource<type_t, free_t, hold_by_t, allocated_t>::HResource( void )
-	: _resource(), _free()
-	{
+	: _resource(), _free() {
 	return;
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-HResource<type_t, free_t, hold_by_t, allocated_t>::~HResource( void )
-	{
+HResource<type_t, free_t, hold_by_t, allocated_t>::~HResource( void ) {
 	reset();
 	return;
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 template<typename real_t>
 HResource<type_t, free_t, hold_by_t, allocated_t>::HResource( real_t resource_ )
-		: _resource( resource_ ), _free( &HResourceReleaseBy<hold_t, real_t>::delete_obj )
-	{
+		: _resource( resource_ ), _free( &HResourceReleaseBy<hold_t, real_t>::delete_obj ) {
 	return;
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 template<typename real_t, typename deleter_t>
 HResource<type_t, free_t, hold_by_t, allocated_t>::HResource( real_t resource_, deleter_t free_ )
-		: _resource( resource_ ), _free( free_ )
-	{
+		: _resource( resource_ ), _free( free_ ) {
 	return;
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 HResource<type_t, free_t, hold_by_t, allocated_t>::HResource( HResource& src_ )
-	: _resource(), _free()
-	{
+	: _resource(), _free() {
 	pass( src_ );
 	return;
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 template<typename real_t>
 HResource<type_t, free_t, hold_by_t, allocated_t>::HResource( HResource<real_t, free_t, hold_by_t, allocated_t>& src_ )
-	: _resource(), _free()
-	{
+	: _resource(), _free() {
 	pass( src_ );
 	return;
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 HResource<type_t, free_t, hold_by_t, allocated_t>::HResource( HResourceRef<type_t, free_t, hold_by_t, allocated_t> src_ )
-	: _resource( src_._hold ), _free( src_._free )
-	{
+	: _resource( src_._hold ), _free( src_._free ) {
 	return;
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-HResource<type_t, free_t, hold_by_t, allocated_t>& HResource<type_t, free_t, hold_by_t, allocated_t>::operator = ( HResource& src_ )
-	{
+HResource<type_t, free_t, hold_by_t, allocated_t>& HResource<type_t, free_t, hold_by_t, allocated_t>::operator = ( HResource& src_ ) {
 	if ( &src_ != this )
 		pass( src_ );
 	return ( *this );
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 template<typename real_t, typename real_free_t>
-HResource<type_t, free_t, hold_by_t, allocated_t>& HResource<type_t, free_t, hold_by_t, allocated_t>::operator = ( HResource<real_t, real_free_t, hold_by_t, allocated_t>& src_ )
-	{
+HResource<type_t, free_t, hold_by_t, allocated_t>& HResource<type_t, free_t, hold_by_t, allocated_t>::operator = ( HResource<real_t, real_free_t, hold_by_t, allocated_t>& src_ ) {
 	if ( &reinterpret_cast<HResource&>( src_ ) != this )
 		pass( src_ );
 	return ( *this );
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-HResource<type_t, free_t, hold_by_t, allocated_t>& HResource<type_t, free_t, hold_by_t, allocated_t>::operator = ( HResourceRef<type_t, free_t, hold_by_t, allocated_t> src_ )
-	{
-	if ( src_._hold != _resource )
-		{
+HResource<type_t, free_t, hold_by_t, allocated_t>& HResource<type_t, free_t, hold_by_t, allocated_t>::operator = ( HResourceRef<type_t, free_t, hold_by_t, allocated_t> src_ ) {
+	if ( src_._hold != _resource ) {
 		HResource drop( *this );
 		using yaal::swap;
 		swap( _resource, src_._hold );
 		swap( _free, src_._free );
-		}
-	return ( *this );
 	}
+	return ( *this );
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 template<typename real_t>
-HResource<type_t, free_t, hold_by_t, allocated_t>::operator HResourceRef<real_t, free_t, hold_by_t, allocated_t>( void )
-	{
+HResource<type_t, free_t, hold_by_t, allocated_t>::operator HResourceRef<real_t, free_t, hold_by_t, allocated_t>( void ) {
 	HResourceRef<real_t, free_t, hold_by_t, allocated_t> ref( release(), _free );
 	_free = free_t();
 	return ( ref );
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 template<typename real_t>
-HResource<type_t, free_t, hold_by_t, allocated_t>::operator HResource<real_t, free_t, hold_by_t, allocated_t>( void )
-	{
+HResource<type_t, free_t, hold_by_t, allocated_t>::operator HResource<real_t, free_t, hold_by_t, allocated_t>( void ) {
 	HResource<real_t, free_t, hold_by_t, allocated_t> ref( release(), _free );
 	_free = free_t();
 	return ( ref );
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-typename HResource<type_t, free_t, hold_by_t, allocated_t>::const_ref_t HResource<type_t, free_t, hold_by_t, allocated_t>::operator*( void ) const
-	{
+typename HResource<type_t, free_t, hold_by_t, allocated_t>::const_ref_t HResource<type_t, free_t, hold_by_t, allocated_t>::operator*( void ) const {
 	M_ASSERT( allocated_t::is_allocated( _resource ) );
 	return ( hold_by_t<value_type>::ref( _resource ) );
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-typename HResource<type_t, free_t, hold_by_t, allocated_t>::ref_t HResource<type_t, free_t, hold_by_t, allocated_t>::operator*( void )
-	{
+typename HResource<type_t, free_t, hold_by_t, allocated_t>::ref_t HResource<type_t, free_t, hold_by_t, allocated_t>::operator*( void ) {
 	M_ASSERT( allocated_t::is_allocated( _resource ) );
 	return ( hold_by_t<value_type>::ref( _resource ) );
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-typename HResource<type_t, free_t, hold_by_t, allocated_t>::const_hold_t HResource<type_t, free_t, hold_by_t, allocated_t>::operator->( void ) const
-	{
+typename HResource<type_t, free_t, hold_by_t, allocated_t>::const_hold_t HResource<type_t, free_t, hold_by_t, allocated_t>::operator->( void ) const {
 	M_ASSERT( allocated_t::is_allocated( _resource ) );
 	return ( hold_by_t<value_type>::raw( _resource ) );
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-typename HResource<type_t, free_t, hold_by_t, allocated_t>::hold_t HResource<type_t, free_t, hold_by_t, allocated_t>::operator->( void )	
-	{
+typename HResource<type_t, free_t, hold_by_t, allocated_t>::hold_t HResource<type_t, free_t, hold_by_t, allocated_t>::operator->( void )	 {
 	M_ASSERT( allocated_t::is_allocated( _resource ) );
 	return ( hold_by_t<value_type>::raw( _resource ) );
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-typename HResource<type_t, free_t, hold_by_t, allocated_t>::const_hold_t HResource<type_t, free_t, hold_by_t, allocated_t>::get( void ) const
-	{
+typename HResource<type_t, free_t, hold_by_t, allocated_t>::const_hold_t HResource<type_t, free_t, hold_by_t, allocated_t>::get( void ) const {
 	return ( hold_by_t<value_type>::raw( _resource ) );
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-typename HResource<type_t, free_t, hold_by_t, allocated_t>::hold_t HResource<type_t, free_t, hold_by_t, allocated_t>::get( void )
-	{
+typename HResource<type_t, free_t, hold_by_t, allocated_t>::hold_t HResource<type_t, free_t, hold_by_t, allocated_t>::get( void ) {
 	return ( hold_by_t<value_type>::raw( _resource ) );
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-void HResource<type_t, free_t, hold_by_t, allocated_t>::reset( void )
-	{
-	if ( allocated_t::is_allocated( _resource ) )
-		{
+void HResource<type_t, free_t, hold_by_t, allocated_t>::reset( void ) {
+	if ( allocated_t::is_allocated( _resource ) ) {
 		_free( _resource );
 		allocated_t::reset( _resource );
-		}
-	return;
 	}
+	return;
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-typename HResource<type_t, free_t, hold_by_t, allocated_t>::hold_t HResource<type_t, free_t, hold_by_t, allocated_t>::release( void )
-	{
+typename HResource<type_t, free_t, hold_by_t, allocated_t>::hold_t HResource<type_t, free_t, hold_by_t, allocated_t>::release( void ) {
 	typename HResource<type_t, free_t, hold_by_t, allocated_t>::hold_t val( _resource );
 	allocated_t::reset( _resource );
 	return ( val );
-	}
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
-void HResource<type_t, free_t, hold_by_t, allocated_t>::swap( HResource& other )
-	{
-	if ( &other != this )
-		{
+void HResource<type_t, free_t, hold_by_t, allocated_t>::swap( HResource& other ) {
+	if ( &other != this ) {
 		using yaal::swap;
 		swap( _resource, other._resource );
 		swap( _free, other._free );
-		}
-	return;
 	}
+	return;
+}
 
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 template<typename alien_t>
-void HResource<type_t, free_t, hold_by_t, allocated_t>::pass( alien_t& src_ )
-	{
+void HResource<type_t, free_t, hold_by_t, allocated_t>::pass( alien_t& src_ ) {
 	HResource& src = reinterpret_cast<HResource&>( src_ );
 	using yaal::swap;
 	swap( _resource, src._resource );
 	swap( _free, src._free );
 	src_.reset();
 	return;
-	}
+}
 
 }
 

@@ -43,11 +43,9 @@ using namespace yaal::hcore;
 using namespace yaal::hconsole;
 using namespace yaal::dbwrapper;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 HDataWindow::HDataWindow( char const* title_, HDataProcess* owner_,
 		resources_t* dataControlInfo_ )
@@ -56,8 +54,7 @@ HDataWindow::HDataWindow( char const* title_, HDataProcess* owner_,
 	_resourcesArray( dataControlInfo_ ), _syncStore( NULL ),
 	_viewModeControls(), _editModeControls(), _owner( owner_ ),
 	_dB( new ( memory::yaal ) HSQLDescriptor( owner_->data_base() ) ),
-	_mode( HSQLDescriptor::MODE::SELECT )
-	{
+	_mode( HSQLDescriptor::MODE::SELECT ) {
 	M_PROLOG
 	register_postprocess_handler( KEY<'n'>::command, NULL,
 			&HDataWindow::handler_add_new );
@@ -73,22 +70,20 @@ HDataWindow::HDataWindow( char const* title_, HDataProcess* owner_,
 			&HDataWindow::handler_cancel );
 	return;
 	M_EPILOG
-	}
+}
 
-HDataWindow::~HDataWindow( void )
-	{
+HDataWindow::~HDataWindow( void ) {
 	M_PROLOG
 	_mainControl = NULL;
 	_resourcesArray = NULL;
 	_syncStore = NULL;
 	return;
 	M_EPILOG
-	}
+}
 
 #define M_SETUP_STANDARD r._row, r._column, r._height, r._width, r._label
 
-int HDataWindow::init( void )
-	{
+int HDataWindow::init( void ) {
 	M_PROLOG
 	char value[] = "";
 	char const* mask = _maskDefault_;
@@ -106,15 +101,12 @@ int HDataWindow::init( void )
 	attributes._enabledAttribute = -1;
 	attributes._focusedAttribute = -1;
 	HWindow::init();
-	for ( int i( 0 ), SIZE( static_cast<int>( _resourcesArray->size() ) ); i < SIZE; ++ i )
-		{
+	for ( int i( 0 ), SIZE( static_cast<int>( _resourcesArray->size() ) ); i < SIZE; ++ i ) {
 		OResource& r( (*_resourcesArray)[ i ] );
 		if ( r._attributes )
 			attr = r._attributes;
-		switch ( r._type )
-			{
-			case ( DATACONTROL_BITS::TYPE::EDIT ):
-				{
+		switch ( r._type ) {
+			case ( DATACONTROL_BITS::TYPE::EDIT ): {
 				editControlResource._maxStringSize = 127;
 				editControlResource._value = value;
 				editControlResource._mask = mask;
@@ -132,10 +124,9 @@ int HDataWindow::init( void )
 						ecr->_multiLine, ecr->_readOnly, 
 						ecr->_rightAligned, ecr->_password,
 						ecr->_maxHistoryLevel );
-				}
+			}
 			break;
-			case ( DATACONTROL_BITS::TYPE::LIST ):
-				{
+			case ( DATACONTROL_BITS::TYPE::LIST ): {
 				listControlResource._checkable = false;
 				listControlResource._sortable = true;
 				listControlResource._searchable = true;
@@ -148,7 +139,7 @@ int HDataWindow::init( void )
 						| ( lcr->_editable ? HListControl::FLAG::EDITABLE : HListControl::FLAG::NONE )
 						| ( lcr->_drawHeader ? HListControl::FLAG::DRAW_HEADER : HListControl::FLAG::NONE ),
 						HListControl::FLAG::ALL );
-				}
+			}
 			break;
 			case ( DATACONTROL_BITS::TYPE::TREE ):
 				dataControl = new ( memory::yaal ) HDataTreeControl( this, M_SETUP_STANDARD );
@@ -161,19 +152,16 @@ int HDataWindow::init( void )
 			break;
 			default :
 			break;
-			}
-		if ( dataControl )
-			{
+		}
+		if ( dataControl ) {
 			dataControl->set_draw_label( attr->_drawLabel );
 			dataControl->set_attributes( attr->_disabledAttribute,
 					attr->_enabledAttribute,
 					attr->_focusedAttribute );
 			dataControl->set_resource( &r );
-			}
-		switch ( r._role )
-			{
-			case ( DATACONTROL_BITS::ROLE::MAIN ):
-				{
+		}
+		switch ( r._role ) {
+			case ( DATACONTROL_BITS::ROLE::MAIN ): {
 				_dB->set_table( r._table );
 				_dB->set_columns( r._columns );
 				_dB->set_filter( r._filter );
@@ -182,7 +170,7 @@ int HDataWindow::init( void )
 				_mainControl = dataControl;
 				_viewModeControls.push_back( dataControl );
 				dataControl->enable( true );
-				}
+			}
 			break;
 			case ( DATACONTROL_BITS::ROLE::DATA ):
 				link( i, dataControl );
@@ -195,28 +183,25 @@ int HDataWindow::init( void )
 			default :
 				M_THROW( ( HFormat( "unknown resource purpouse at %d" ) % i ).string(), r._role );
 			break;
-			}
 		}
+	}
 	_mainControl->set_focus();
-	if ( _mainControl )
-		{
+	if ( _mainControl ) {
 		_mainControl->load();
 		_mainControl->process_input( KEY_CODES::HOME );
-		}
+	}
 	refresh();
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-HStatusBarControl* HDataWindow::init_bar( char const* label_ )
-	{
+HStatusBarControl* HDataWindow::init_bar( char const* label_ ) {
 	M_PROLOG
 	return ( new ( memory::yaal ) HDataStatusBarControl( this, label_ ) );
 	M_EPILOG
-	}
+}
 
-void HDataWindow::link( int child_, HDataControl* dataControl_ )
-	{
+void HDataWindow::link( int child_, HDataControl* dataControl_ ) {
 	M_PROLOG
 	int parent = 0;
 	char name [] = "";
@@ -229,8 +214,7 @@ void HDataWindow::link( int child_, HDataControl* dataControl_ )
 	cI->_align = HControl::BITS::ALIGN::LEFT;
 	cI->_type = TYPE::HSTRING;
 	parent = (*_resourcesArray)[ child_ ]._parent;
-	if ( (*_resourcesArray)[ parent ]._type == DATACONTROL_BITS::TYPE::LIST )
-		{
+	if ( (*_resourcesArray)[ parent ]._type == DATACONTROL_BITS::TYPE::LIST ) {
 		pDC = dynamic_cast<HDataListControl*>( _controls.get_control_by_no( parent + 1 /* 1 stands for offset caused by 'status bar' */ ) );
 		if ( ! pDC )
 			M_THROW( "wrong control resource order",
@@ -239,21 +223,17 @@ void HDataWindow::link( int child_, HDataControl* dataControl_ )
 			cI = (*_resourcesArray)[ child_ ]._columnInfo;
 		pDC->add_column( cI->_placement, cI->_name,
 				cI->_width, cI->_align, cI->_type, dataControl_ );
-		}
-	else
+	} else
 		M_THROW( "unknown parent type", (*_resourcesArray)[ parent ]._type );
 	return;
 	M_EPILOG
-	}
+}
 
-void HDataWindow::set_mode( DOCUMENT::mode_t mode_ )
-	{
+void HDataWindow::set_mode( DOCUMENT::mode_t mode_ ) {
 	M_PROLOG
-	switch ( mode_ )
-		{
+	switch ( mode_ ) {
 		case ( DOCUMENT::VIEW ):
-		case ( DOCUMENT::EDIT ):
-			{
+		case ( DOCUMENT::EDIT ): {
 			_documentMode = mode_;
 			controls_t::iterator end = _editModeControls.end();
 			for ( controls_t::iterator it = _editModeControls.begin(); it != end; ++ it )
@@ -265,18 +245,17 @@ void HDataWindow::set_mode( DOCUMENT::mode_t mode_ )
 			end = mode_ == DOCUMENT::EDIT ? _editModeControls.end() : _viewModeControls.end();
 			if ( begin != end )
 				(*begin)->set_focus();
-			}
+		}
 		break;
 		default :
 			M_THROW ( "unknown window mode", mode_ );
 		break;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HDataWindow::sync( HRecordSet::iterator it )
-	{
+void HDataWindow::sync( HRecordSet::iterator it ) {
 	M_PROLOG
 	M_ASSERT( _syncStore );
 	M_ASSERT( _documentMode == DOCUMENT::VIEW );
@@ -286,10 +265,9 @@ void HDataWindow::sync( HRecordSet::iterator it )
 	if ( _syncStore->_idColNo >= 0 )
 		_syncStore->_item.m_lId = lexical_cast<int>( *it[ _syncStore->_idColNo ] );
 	M_EPILOG
-	}
+}
 
-void HDataWindow::sync( void )
-	{
+void HDataWindow::sync( void ) {
 	M_PROLOG
 	M_ASSERT( _documentMode == DOCUMENT::EDIT );
 	int count = static_cast<int>( _editModeControls.size() );
@@ -297,125 +275,108 @@ void HDataWindow::sync( void )
 		*(*_dB)[ i ] = _editModeControls[ i ]->get().get<HString const&>();
 	return;
 	M_EPILOG
-	}
+}
 
-void HDataWindow::set_sync_store( ORowBuffer* rB_ )
-	{
+void HDataWindow::set_sync_store( ORowBuffer* rB_ ) {
 	_syncStore = rB_;
 	return;
-	}
+}
 
-int HDataWindow::handler_add_new( int, void const* )
-	{
+int HDataWindow::handler_add_new( int, void const* ) {
 	M_PROLOG
-	if ( _documentMode != DOCUMENT::VIEW )
-		{
+	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_ ( "You cannot add new rocord now." ) );
 		return ( 0 );
-		}
+	}
 	_mode = HSQLDescriptor::MODE::INSERT;
 	if ( _mainControl )
 		_mainControl->add_new();
 	set_mode( DOCUMENT::EDIT );
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HDataWindow::handler_edit( int, void const* )
-	{
+int HDataWindow::handler_edit( int, void const* ) {
 	M_PROLOG
-	if ( _documentMode != DOCUMENT::VIEW )
-		{
+	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_ ( "You cannot start editing of this record." ) );
 		return ( 0 );
-		}
-	if ( ! _dB->get_size() )
-		{
+	}
+	if ( ! _dB->get_size() ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_ ( "There is nothing to edit." ) );
 		return ( 0 );
-		}
+	}
 	_mode = HSQLDescriptor::MODE::UPDATE;
 	set_mode( DOCUMENT::EDIT );
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HDataWindow::handler_delete( int, void const* )
-	{
+int HDataWindow::handler_delete( int, void const* ) {
 	M_PROLOG
-	if ( _documentMode != DOCUMENT::VIEW )
-		{
+	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_( "You cannot delete this record." ) );
 		return ( 0 );
-		}
-	if ( ! _dB->get_size() )
-		{
+	}
+	if ( ! _dB->get_size() ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_( "There is nothing to remove." ) );
 		return ( 0 );
-		}
-	if ( _mainControl )
-		{
+	}
+	if ( _mainControl ) {
 		HString filter;
 		filter.format( "id = %ld", _mainControl->get_current_id() );
 		_dB->set_filter( filter );
 		_dB->execute( HSQLDescriptor::MODE::DELETE );
 		_mainControl->load();
-		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HDataWindow::handler_save( int, void const* )
-	{
+int HDataWindow::handler_save( int, void const* ) {
 	M_PROLOG
-	if ( _documentMode != DOCUMENT::EDIT )
-		{
+	if ( _documentMode != DOCUMENT::EDIT ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED, _( "There is nothing to save." ) );
 		return ( 0 );
-		}
-	if ( _mode == HSQLDescriptor::MODE::UPDATE )
-		{
+	}
+	if ( _mode == HSQLDescriptor::MODE::UPDATE ) {
 		HString filter;
 		filter.format( "id = %ld", _mainControl->get_current_id() );
 		_dB->set_filter( filter );
-		}
+	}
 	sync();
 	HRecordSet::ptr_t rs = _dB->execute( _mode );
 	if ( rs->get_errno() )
 		_statusBar->message( COLORS::FG_BRIGHTRED, rs->get_error() );
-	else
-		{
+	else {
 		_modified = false;
 		set_mode( DOCUMENT::VIEW );
 		_mainControl->load();
-		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HDataWindow::handler_requery( int, void const* )
-	{
+int HDataWindow::handler_requery( int, void const* ) {
 	M_PROLOG
-	if ( _documentMode != DOCUMENT::VIEW )
-		{
+	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_( "Finish your current operation first." ) );
 		return ( 0 );
-		}
+	}
 	set_mode( DOCUMENT::VIEW );
 	_mainControl->load();
 	refresh();
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HDataWindow::handler_cancel( int, void const* )
-	{
+int HDataWindow::handler_cancel( int, void const* ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::EDIT )
 		return ( 0 );
@@ -427,15 +388,13 @@ int HDataWindow::handler_cancel( int, void const* )
 	_statusBar->message( COLORS::FG_BRIGHTRED, _( "Dropping all changes." ) );
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-bool HDataWindow::is_modified( void ) const
-	{
+bool HDataWindow::is_modified( void ) const {
 	return ( _modified );
-	}
+}
 
-void HDataWindow::set_modified( bool modified_ )
-	{
+void HDataWindow::set_modified( bool modified_ ) {
 	M_PROLOG
 	bool modified = _modified;
 	_modified = modified_;
@@ -443,7 +402,7 @@ void HDataWindow::set_modified( bool modified_ )
 		_statusBar->refresh();
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

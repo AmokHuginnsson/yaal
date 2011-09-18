@@ -36,72 +36,57 @@ M_VCSID( "$Id: "__ID__" $" )
 using namespace yaal;
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 HMemoryMappedFile::HMemoryMappedFile( yaal::hcore::HString const& path_, int long size_ )
-	: _fd( -1 ), _map( NULL ), _size( 0 )
-	{
+	: _fd( -1 ), _map( NULL ), _size( 0 ) {
 	M_PROLOG
 	M_ENSURE_EX( ( _fd = ::open( path_.raw(), O_RDWR ) ) >= 0, path_ );
-	try
-		{
-		if ( ! size_ )
-			{
+	try {
+		if ( ! size_ ) {
 			M_ENSURE( ( _size = static_cast<int long>( ::lseek( _fd, 0, SEEK_END ) ) ) >= 0 );
-			}
-		M_ENSURE( ( _map = ::mmap( NULL, _size, PROT_READ | PROT_WRITE, MAP_PRIVATE, _fd, 0 ) ) != MAP_FAILED );
 		}
-	catch ( ... )
-		{
+		M_ENSURE( ( _map = ::mmap( NULL, _size, PROT_READ | PROT_WRITE, MAP_PRIVATE, _fd, 0 ) ) != MAP_FAILED );
+	} catch ( ... ) {
 		M_SAFE( M_ENSURE( ::close( _fd ) != 0 ) );
 		_fd = -1;
 		_map = NULL;
 		throw;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-HMemoryMappedFile::~HMemoryMappedFile( void )
-	{
+HMemoryMappedFile::~HMemoryMappedFile( void ) {
 	M_PROLOG
-	if ( _fd >= 0 )
-		{
+	if ( _fd >= 0 ) {
 		M_ASSERT( _map );
 		M_ENSURE( ::munmap( _map, _size ) == 0 );
 		M_ENSURE( ::close( _fd ) == 0 );
-		}
-	else
-		{
+	} else {
 		M_ASSERT( ! _map );
-		}
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void* HMemoryMappedFile::map( void )
-	{
+void* HMemoryMappedFile::map( void ) {
 	return ( _map );
-	}
+}
 
-void const* HMemoryMappedFile::map( void ) const
-	{
+void const* HMemoryMappedFile::map( void ) const {
 	return ( _map );
-	}
+}
 
-int long HMemoryMappedFile::get_size( void ) const
-	{
+int long HMemoryMappedFile::get_size( void ) const {
 	return ( _size );
-	}
+}
 
-int long HMemoryMappedFile::size( void ) const
-	{
+int long HMemoryMappedFile::size( void ) const {
 	return ( get_size() );
-	}
+}
 
 }
 

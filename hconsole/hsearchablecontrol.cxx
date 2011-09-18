@@ -33,59 +33,51 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 HSearchableControl::HSearchableControl( bool searchable_ )
 									: HControl( NULL, 0, 0, 0, 0, NULL ),
 	_searchable( searchable_ ), _searchActived( false ),
-	_filtered( false ), _backwards( false ), _pattern()
-	{
+	_filtered( false ), _backwards( false ), _pattern() {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HSearchableControl::~HSearchableControl ( void )
-	{
+HSearchableControl::~HSearchableControl ( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HSearchableControl::search( HString const& pattern_, bool backwards_ )
-	{
+void HSearchableControl::search( HString const& pattern_, bool backwards_ ) {
 	M_PROLOG
 	HPattern::pluggable_flags_t pf;
 	pf.push_back( make_pair( 'f', &_filtered ) );
 	_searchActived = ! _pattern.parse( pattern_, &pf );
 	if ( ! _searchActived )
 		_parent->status_bar()->message( _pattern.error().raw() );
-	else
-		{
+	else {
 		_backwards = backwards_;
 		if ( _backwards )
 			go_to_match_previous();
 		else
 			go_to_match();
-		}
+	}
 	schedule_refresh();
 	return;
 	M_EPILOG
-	}
+}
 
 void HSearchableControl::highlight( int row_, int column_,
-		int currentIndex_, bool current_ )
-	{
+		int currentIndex_, bool current_ ) {
 	M_PROLOG
 	int long ctr( 0 );
 	HConsole& cons = HConsole::get_instance();
 	for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.raw() ),
-			end = _pattern.end(); it != end; ++ it )
-		{
+			end = _pattern.end(); it != end; ++ it ) {
 		if ( ( _focused && ( ( currentIndex_ != ctr ) || ! current_ ) )
 				|| ( ! _focused && ( currentIndex_ == ctr ) && current_ ) )
 			cons.set_attr( _attributeSearchHighlight_ >> 8 );
@@ -95,10 +87,10 @@ void HSearchableControl::highlight( int row_, int column_,
 				static_cast<int>( column_ + ( it->raw() - _varTmpBuffer.raw() ) ),
 				"%.*s", it->size(), it->raw() );
 		ctr ++;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

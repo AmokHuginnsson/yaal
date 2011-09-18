@@ -53,8 +53,7 @@ Copyright:
  *  - Abstraction
  *  - Layer
  */
-namespace yaal
-{
+namespace yaal {
 
 extern M_YAAL_HCORE_PUBLIC_API bool _isKilled_;
 
@@ -86,24 +85,21 @@ char const* error_message( int code );
  * \return val equvalent in to_t representation.
  */
 template<typename to_t, typename from_t>
-to_t bit_cast( from_t val_ )
-	{
-	union caster
-		{
+to_t bit_cast( from_t val_ ) {
+	union caster {
 		from_t _from;
 		to_t _to;
 		char _buf;
-		} cast;
+	} cast;
 	/* We shall not use hcore/algorithm.hxx here or we suffer compilation slowdown. */
 	for ( int i( 0 ), SIZE( sizeof ( from_t ) > sizeof ( to_t ) ? sizeof ( from_t ) : sizeof ( to_t ) ); i < SIZE; ++ i )
 		(&cast._buf)[ i ] = 0;
 	cast._from = val_;
 	return ( cast._to );
-	}
+}
 
 template<typename field_t, int const id = 0>
-class HField
-	{
+class HField {
 protected:
 	field_t _field;
 public:
@@ -133,11 +129,10 @@ public:
 		{ return ( _field ); }
 	field_t const& ref( void ) const
 		{ return ( _field ); }
-	};
+};
 
 template<typename tType>
-class HScopedValueReplacement
-	{
+class HScopedValueReplacement {
 	tType _orig;
 	tType& _value;
 public:
@@ -145,14 +140,13 @@ public:
 	HScopedValueReplacement( tType& value_, tType const& tmp_ ) : _orig( value_), _value( value_ ) { _value = tmp_; }
 	~HScopedValueReplacement( void )
 		{ _value = _orig; }
-	};
+};
 
 template<typename id, typename T>
-struct explicit_type
-	{
+struct explicit_type {
 	T _value;
 	explicit explicit_type( T const& value_ ) : _value( value_ ) {}
-	};
+};
 
 template <typename T, int long unsigned N>
 char ( &YaalArrayElementCountHelper( T ( &YaalArrayElementCountHelperArray )[N] ) )[N];

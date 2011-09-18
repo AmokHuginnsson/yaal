@@ -42,14 +42,11 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-namespace
-{
+namespace {
 
 FILE* ERROR_STREAM = stderr;
 
@@ -63,8 +60,7 @@ HException::HException( char const* fileName_,
 	: _code( code_ ), _frame( 0 ),
 	_fileName( fileName_ ),
 	_functionName( functionName_ ),
-	_message( message_ )
-	{
+	_message( message_ ) {
 	hcore::log << "Exception: " << _message << ", code: " << _code;
 	hcore::log << '.' << endl;
 	log( fileName_, line_, functionName_ );
@@ -75,36 +71,31 @@ HException::HException( char const* fileName_,
 	if ( _fileName == _exceptionType_ )
 		_functionName = NULL;
 	return;
-	}
+}
 
 HException::HException( HException const& exception_ )
 	: _code( exception_._code ), _frame( exception_._frame ),
 	_fileName( exception_._fileName ),
 	_functionName( exception_._functionName ),
-	_message( exception_._message )
-	{
+	_message( exception_._message ) {
 	return;
-	}
+}
 
-HException::~HException( void )
-	{
+HException::~HException( void ) {
 	return;
-	}
+}
 
-void HException::print_error( void ) const
-	{
+void HException::print_error( void ) const {
 	fprintf( static_cast<FILE*>( ERROR_STREAM ), "\nException: %s, %d.\n", _message.raw(), _code );
 	return;
-	}
+}
 
 void HException::log( char const* const fileName_, int const line_,
-		char const* const functionName_ )
-	{
+		char const* const functionName_ ) {
 	if ( ! _frame
 			|| ( ( _fileName != fileName_ ) && ::strcmp( _fileName, fileName_ ) )
 			|| ( ! _functionName && functionName_ )
-			|| ( ( _functionName != functionName_ ) && ::strcmp( _functionName, functionName_ ) ) )
-		{
+			|| ( ( _functionName != functionName_ ) && ::strcmp( _functionName, functionName_ ) ) ) {
 		_fileName = fileName_;
 		_functionName = functionName_;
 		HString frame;
@@ -117,24 +108,21 @@ void HException::log( char const* const fileName_, int const line_,
 			fprintf( static_cast<FILE*>( ERROR_STREAM ), "%s", frame.raw() );
 		hcore::log << frame;
 		++ _frame;
-		}
+	}
 	return;
-	}
+}
 
-char const* HException::what( void ) const
-	{
+char const* HException::what( void ) const {
 	return ( _message.raw() );
-	}
+}
 
-int HException::code( void ) const
-	{
+int HException::code( void ) const {
 	return ( _code );
-	}
+}
 
 void failed_assert( char const* const fileName_,
 		int line_, char const* const functionName_,
-		char const* const message_ )
-	{
+		char const* const message_ ) {
 	M_PROLOG
 	hcore::log << "Failed assertion: " << message_ << " -> " << fileName_ << "(" << line_ << "): " << functionName_ << endl;
 	fprintf( ERROR_STREAM, "Failed assertion: `%s' at: %s: %4d : %s\n",
@@ -147,71 +135,59 @@ void failed_assert( char const* const fileName_,
 	dump_call_stack( clog, DUMP_DEPTH );
 	throw ( HFailedAssertion( message_ ) );
 	M_EPILOG
-	}
+}
 
-void HException::set_error_stream( void* errorStream_ )
-	{
+void HException::set_error_stream( void* errorStream_ ) {
 	M_PROLOG
 	M_ASSERT( errorStream_ );
 	ERROR_STREAM = static_cast<FILE*>( errorStream_ );
 	return;
 	M_EPILOG
-	}
+}
 
-void HFailedAssertion::swap( HFailedAssertion& other )
-	{
+void HFailedAssertion::swap( HFailedAssertion& other ) {
 	using yaal::swap;
 	if ( &other != this )
 		swap( _what, other._what );
 	return;
-	}
+}
 
-void HGlobalScopeExceptionHandlingPolicy::handle_exception( void )
-	{
-	try
-		{
+void HGlobalScopeExceptionHandlingPolicy::handle_exception( void ) {
+	try {
 		throw;
-		}
-	catch ( HException const& e )
-		{
+	} catch ( HException const& e ) {
 		hcore::log << "Exception `" << e.what() << "' thrown from outside of main() scope." << endl;
 		cerr << "Exception `" << e.what() << "' thrown from outside of main() scope." << endl;
-		}
-	catch ( ... )
-		{
+	} catch ( ... ) {
 		hcore::log << "Exception of unknown type thrown from outside of main() scope." << endl;
 		cerr << "Exception of unknown type thrown from outside of main() scope." << endl;
-		}
-	exit( 1 );
 	}
+	exit( 1 );
+}
 
-HString demangle( char const* symbolName_ )
-	{
+HString demangle( char const* symbolName_ ) {
 	int status = 0;
 	HString symbol;
 	char* p( abi::__cxa_demangle( symbolName_, 0, 0, &status ) );
-	if ( p )
-		{
+	if ( p ) {
 		symbol = p;
 		memory::free( p );
-		}
-	return ( symbol );
 	}
+	return ( symbol );
+}
 
-void kill_interior( char const* const msg_ )
-	{
+void kill_interior( char const* const msg_ ) {
 	yaal::_isKilled_ = true;
-	if ( msg_ )
-		{
+	if ( msg_ ) {
 		hcore::log << "FATAL ERROR: " << msg_ << endl;
 		cerr << "FATAL ERROR: " << msg_ << endl;
-		}
+	}
 #ifndef NDEBUG
 	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT )
 		::abort();
 #endif /* #ifndef NDEBUG */
 	return;
-	}
+}
 
 }
 

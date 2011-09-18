@@ -29,30 +29,25 @@ Copyright:
 
 #include "hcore/hstreaminterface.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Stream based access to raw memory block.
  *
  * This stream based memory accessor wrapper does not own the memory block.
  */
-class HMemory : public yaal::hcore::HStreamInterface
-	{
+class HMemory : public yaal::hcore::HStreamInterface {
 public:
 	typedef HMemory this_type;
 	typedef yaal::hcore::HStreamInterface base_type;
-	struct INITIAL_STATE
-		{
-		typedef enum
-			{
+	struct INITIAL_STATE {
+		typedef enum {
 			AUTO,
 			VALID,
 			INVALID
-			} enum_t;
-		};
+		} enum_t;
+	};
 private:
 	void* _block;
 	int long _size;
@@ -91,7 +86,7 @@ private:
 	virtual void do_flush( void ) const;
 	virtual int long do_read( void* const, int long );
 	virtual bool do_is_valid( void ) const;
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HMemory, yaal::hcore::HStreamInterfaceException> HMemoryException;
 

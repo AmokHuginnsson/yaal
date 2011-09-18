@@ -31,18 +31,15 @@ Copyright:
 #include "hconsole/omenuitem.hxx"
 #include "hcore/hpointer.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief Implementation of TUI Menu control class.
  *
  * Menu control displays menu and automatically spawns apropriate actions.
  */
-class HMenuControl : public HTreeControl
-	{
+class HMenuControl : public HTreeControl {
 public:
 	typedef HMenuControl this_type;
 	typedef HTreeControl base_type;
@@ -64,7 +61,7 @@ protected:
 private:
 	HMenuControl( HMenuControl const& );
 	HMenuControl& operator = ( HMenuControl const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HMenuControl, HTreeControlException> HMenuControlException;
 

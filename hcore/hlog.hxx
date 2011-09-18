@@ -33,11 +33,9 @@ Copyright:
 #include "hcore/hchunk.hxx"
 #include "hcore/hfile.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 #ifdef log_trace
 #	error Yaal redefines log_trace macro.
@@ -49,20 +47,18 @@ extern void* DEFAULT_LOG_STREAM;
 
 /*! \brief Enumeration of available log levels.
  */
-namespace LOG_TYPE
-	{
+namespace LOG_TYPE {
 	static int const DEBUG     = 1; 
 	static int const INFO      = 2; 
 	static int const NOTICE    = 4; 
 	static int const WARNING   = 8;
 	static int const ERROR     = 16; 
 	static int const VCSHEADER = 32;
-	}
+}
 
 /*! \brief Logging utility.
  */
-class HLog : public HField<HFile>, public HSynchronizedStream, public HSingleton<HLog>
-	{
+class HLog : public HField<HFile>, public HSynchronizedStream, public HSingleton<HLog> {
 protected:
 	typedef HLog this_type;
 	typedef HSynchronizedStream base_type;
@@ -108,7 +104,7 @@ private:
 	HLog& operator= ( HLog const& );
 	friend class yaal::hcore::HSingleton<HLog>;
 	friend class yaal::hcore::HDestructor<HLog>;
-	};
+};
 
 typedef HExceptionT<HLog, HSynchronizedStreamException> HLogException;
 extern M_YAAL_HCORE_PUBLIC_API HLog& log;

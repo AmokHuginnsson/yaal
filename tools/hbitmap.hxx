@@ -35,16 +35,13 @@ Copyright:
 #include "hcore/hexception.hxx"
 #include "hcore/iterator.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Abstract for bit pool bit operations.
  */
-class HBitmap
-	{
+class HBitmap {
 	typedef HBitmap this_type;
 public:
 	class HBit;
@@ -108,14 +105,13 @@ private:
 	int long octets_for_bits( int long ) const;
 	void* block( void );
 	void const* block( void ) const;
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HBitmap> HBitmapException;
 
 /*! \brief HBitmap class helpers, utility functions.
  */
-namespace bitmap_type_helper
-{
+namespace bitmap_type_helper {
 
 /*! \brief Get owner constness based on child type.
  *
@@ -123,21 +119,18 @@ namespace bitmap_type_helper
  * \retval owner_t - const qualified owner type.
  */
 template<typename input>
-struct owner_const_qual_from_type
-	{
-	};
+struct owner_const_qual_from_type {
+};
 
 /*! \cond */
 template<>
-struct owner_const_qual_from_type<bool>
-	{
+struct owner_const_qual_from_type<bool> {
 	typedef HBitmap const* owner_t;
-	};
+};
 template<>
-struct owner_const_qual_from_type<HBitmap::HBit>
-	{
+struct owner_const_qual_from_type<HBitmap::HBit> {
 	typedef HBitmap* owner_t;
-	};
+};
 /*! \endcond */
 
 }
@@ -145,8 +138,7 @@ struct owner_const_qual_from_type<HBitmap::HBit>
 /*! \brief Bit iterator, allows access to single bits in sequence.
  */
 template<typename const_qual_t>
-class HBitmap::HIterator : public yaal::hcore::iterator_interface<const_qual_t, yaal::hcore::iterator_category::random_access>
-	{
+class HBitmap::HIterator : public yaal::hcore::iterator_interface<const_qual_t, yaal::hcore::iterator_category::random_access> {
 public:
 	typedef yaal::hcore::iterator_interface<const_qual_t, yaal::hcore::iterator_category::random_access> base_type;
 	typedef const_qual_t value_type;
@@ -159,84 +151,70 @@ public:
 	HIterator( void ) : base_type(), _owner( NULL ), _index( 0 ) {}
 	HIterator( HIterator const& it ) : base_type(), _owner( it._owner ), _index( it._index ) {}
 	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& it ) : base_type(), _owner( it._owner ), _index( it._index )
-		{
+	HIterator( HIterator<other_const_qual_t> const& it ) : base_type(), _owner( it._owner ), _index( it._index ) {
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, bool>::value ));
-		}
-	HIterator& operator ++ ( void )
-		{
+	}
+	HIterator& operator ++ ( void ) {
 		++ _index;
 		return ( *this );
-		}
-	HIterator operator ++ ( int )
-		{
+	}
+	HIterator operator ++ ( int ) {
 		HIterator it( *this );
 		++ _index;
 		return ( it );
-		}
-	HIterator& operator -- ( void )
-		{
+	}
+	HIterator& operator -- ( void ) {
 		-- _index;
 		return ( *this );
-		}
-	HIterator operator -- ( int )
-		{
+	}
+	HIterator operator -- ( int ) {
 		HIterator it( *this );
 		-- _index;
 		return ( it );
-		}
-	HIterator& operator += ( int long offset_ )
-		{
+	}
+	HIterator& operator += ( int long offset_ ) {
 		_index += offset_;
 		return ( *this );
-		}
-	HIterator operator + ( int long offset_ )
-		{
+	}
+	HIterator operator + ( int long offset_ ) {
 		HIterator it( *this );
 		it += offset_;
 		return ( it );
-		}
-	HIterator& operator -= ( int long offset_ )
-		{
+	}
+	HIterator& operator -= ( int long offset_ ) {
 		_index -= offset_;
 		return ( *this );
-		}
-	HIterator operator - ( int long offset_ )
-		{
+	}
+	HIterator operator - ( int long offset_ ) {
 		HIterator it( *this );
 		it -= offset_;
 		return ( it );
-		}
-	HIterator& operator = ( HIterator const& it )
-		{
-		if ( &it != this )
-			{
+	}
+	HIterator& operator = ( HIterator const& it ) {
+		if ( &it != this ) {
 			_owner = it._owner;
 			_index = it._index;
-			}
-		return ( *this );
 		}
-	bool operator == ( HIterator const& it ) const
-		{
+		return ( *this );
+	}
+	bool operator == ( HIterator const& it ) const {
 		M_ASSERT( _owner == it._owner );
 		return ( _index == it._index );
-		}
-	bool operator != ( HIterator const& it ) const
-		{
+	}
+	bool operator != ( HIterator const& it ) const {
 		M_ASSERT( _owner == it._owner );
 		return ( _index != it._index );
-		}
+	}
 	const_qual_t operator* ( void );
 private:
 	friend class yaal::tools::HBitmap;
 	HIterator( owner_t owner_, int long idx )
 		: base_type(), _owner( owner_ ), _index( idx ) {}
-	};
+};
 
 /*! \brief Writtable bit reference interface.
  */
-class HBitmap::HBit
-	{
+class HBitmap::HBit {
 	HBitmap* _owner;
 	int long _index;
 public:
@@ -250,7 +228,7 @@ public:
 private:
 	friend class HBitmap::HIterator<HBitmap::HBit>;
 	HBit( HBitmap*, int long );
-	};
+};
 
 inline void swap( yaal::tools::HBitmap::HBit a, yaal::tools::HBitmap::HBit b )
 	{ a.swap( b ); }

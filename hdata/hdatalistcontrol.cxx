@@ -37,11 +37,9 @@ using namespace yaal::hconsole;
 using namespace yaal::hconsole::list_control_helper;
 using namespace yaal::dbwrapper;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 HDataListControl::HDataListControl( 
 		HDataWindow* window_, int row_, int column_, int height_,
@@ -50,22 +48,19 @@ HDataListControl::HDataListControl(
 										width_, title_ ),
 								HSearchableControl( true ),
 								HListControl( NULL, 0, 0, 0, 0, NULL ),
-								HDataControl(), _dataControler( _controler )
-	{
+								HDataControl(), _dataControler( _controler ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HDataListControl::~HDataListControl ( void )
-	{
+HDataListControl::~HDataListControl ( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HDataListControl::load( int long /*id_*/ )
-	{
+void HDataListControl::load( int long /*id_*/ ) {
 	M_PROLOG
 	_SQL->set_filter( "" );
 	int count = 0, ctr = 0, size = static_cast<int>( _dataControler->size() );
@@ -82,56 +77,49 @@ void HDataListControl::load( int long /*id_*/ )
 	parent->status_bar()->init_progress( static_cast<double>( count ), "Collecting ..." );
 	HListControler<>::model_ptr_t model = _dataControler->get_model();
 	HListControler<>::model_t::iterator it = model->begin();
-	for ( HRecordSet::iterator row( rs->begin() ), end( rs->end() ); row != end; ++ row )
-		{
+	for ( HRecordSet::iterator row( rs->begin() ), end( rs->end() ); row != end; ++ row ) {
 		parent->sync( row );
 		parent->status_bar()->update_progress();
 		if ( it != model->end() )
 			{	
 			(*it) = rb._item;
 			++ it;
-			}
-		else
+		} else
 			model->push_back( rb._item );
 		++ ctr;
-		}
-	while ( ctr ++ < size )
+	} while ( ctr ++ < size )
 		_dataControler->remove_tail();
 	reset();
 	parent->set_sync_store();
 	return;
 	M_EPILOG
-	}
+}
 
-int long HDataListControl::get_current_id( void )
-	{
+int long HDataListControl::get_current_id( void ) {
 	M_PROLOG
 	return ( _cursor->get_id() );
 	M_EPILOG
-	}
+}
 
-void HDataListControl::add_new( void )
-	{
+void HDataListControl::add_new( void ) {
 	M_PROLOG
 	_dataControler->add_tail( HItem( static_cast<int>( _header.size() ) ) );
 	process_input( KEY_CODES::HOME );
 	process_input( KEY_CODES::END );
 	return;
 	M_EPILOG
-	}
+}
 
-void HDataListControl::cancel_new( void )
-	{
+void HDataListControl::cancel_new( void ) {
 	M_PROLOG
 	_dataControler->remove_tail();
-	if ( _dataControler->size() )
-		{
+	if ( _dataControler->size() ) {
 		process_input( KEY_CODES::HOME );
 		process_input( KEY_CODES::END );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

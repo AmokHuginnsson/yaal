@@ -17,10 +17,8 @@ using namespace string_helper;
 
 typedef map<string, string> dictionary_t;
 
-void handle_options( int argc_, char** argv_, dictionary_t& opts_ )
-	{
-	for ( int i( 1 ); i < argc_; ++ i )
-		{
+void handle_options( int argc_, char** argv_, dictionary_t& opts_ ) {
+	for ( int i( 1 ); i < argc_; ++ i ) {
 		ASSERT( i % 2 ); /* option name */
 		string name( argv_[ i ] );
 		if ( name.substr( 0, 2 ) != "--" )
@@ -30,34 +28,31 @@ void handle_options( int argc_, char** argv_, dictionary_t& opts_ )
 			throw runtime_error( "Option: `" + name + "' is not supported." );
 		ENSURE( ++ i < argc_ );
 		it->second = argv_[i];
-		}
-	return;
 	}
+	return;
+}
 
-int main( int argc_, char** argv_ )
-	{
+int main( int argc_, char** argv_ ) {
 	int ret( 0 );
 	dictionary_t options;
 	options.insert( make_pair<string, string>( "--source", "" ) );
 	options.insert( make_pair<string, string>( "--destination", "" ) );
 	options.insert( make_pair<string, string>( "--append", "" ) );
 	options.insert( make_pair<string, string>( "--exclude", "" ) );
-	try
-		{
+	try {
 		typedef set<string> word_list_t;
 		word_list_t exclude;
 		handle_options( argc_, argv_, options );
 		dictionary_t::const_iterator excludeOption( options.find( "--exclude" ) );
 		ASSERT( excludeOption != options.end() );
 
-		if ( ! excludeOption->second.empty() )
-			{
+		if ( ! excludeOption->second.empty() ) {
 			ifstream excludeFile( excludeOption->second.c_str() );
 			ENSURE( !! excludeFile );
 			string line;
 			while ( ! getline( excludeFile, line ).fail() )
 				exclude.insert( line );
-			}
+		}
 		dictionary_t::const_iterator sourceOption( options.find( "--source" ) );
 		ASSERT( sourceOption != options.end() );
 		ENSURE( ! sourceOption->second.empty() );
@@ -74,33 +69,28 @@ int main( int argc_, char** argv_ )
 		string line;
 		word_list_t s;
 		bool inSymbols( false );
-		while ( ! getline( sourceFile, line ).fail() )
-			{
-			if ( line.find( "public symbols" ) != string::npos )
-				{
+		while ( ! getline( sourceFile, line ).fail() ) {
+			if ( line.find( "public symbols" ) != string::npos ) {
 				inSymbols = true;
 				continue;
-				}
+			}
 			if ( line.find( "  Summary" ) != string::npos )
 				break;
-			if ( inSymbols )
-				{
+			if ( inSymbols ) {
 				vector<string> t;
 				tokenize( line, t );
 				if ( t.size() > 1 )
 					s.insert( t[1] );
-				}
 			}
+		}
 		if ( appendOption->second != "true" )
 			destinationFile << "EXPORTS" << endl;
 		set_difference( s.begin(), s.end(),
 			exclude.begin(), exclude.end(),
 			ostream_iterator<string>( destinationFile, "\n" ) );
-		}
-	catch ( exception const& e )
-		{
+	} catch ( exception const& e ) {
 		ret = 1;
 		cerr << "Exception caught: " << e.what() << endl;
-		}
-	return ( ret );
 	}
+	return ( ret );
+}

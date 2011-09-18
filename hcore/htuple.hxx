@@ -32,143 +32,127 @@ Copyright:
 
 #include "hcore/trait.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-namespace tuple_helper
-{
+namespace tuple_helper {
 
 template<typename tuple, int const N>
 struct getter;
 
 template<typename tuple>
-struct getter<tuple, 0>
-	{
+struct getter<tuple, 0> {
 	typedef typename tuple::T0_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e0 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e0 ); }
-	};
+};
 
 template<typename tuple>
-struct getter<tuple, 1>
-	{
+struct getter<tuple, 1> {
 	typedef typename tuple::T1_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e1 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e1 ); }
-	};
+};
 
 template<typename tuple>
-struct getter<tuple, 2>
-	{
+struct getter<tuple, 2> {
 	typedef typename tuple::T2_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e2 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e2 ); }
-	};
+};
 
 template<typename tuple>
-struct getter<tuple, 3>
-	{
+struct getter<tuple, 3> {
 	typedef typename tuple::T3_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e3 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e3 ); }
-	};
+};
 
 template<typename tuple>
-struct getter<tuple, 4>
-	{
+struct getter<tuple, 4> {
 	typedef typename tuple::T4_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e4 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e4 ); }
-	};
+};
 
 template<typename tuple>
-struct getter<tuple, 5>
-	{
+struct getter<tuple, 5> {
 	typedef typename tuple::T5_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e5 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e5 ); }
-	};
+};
 
 template<typename tuple>
-struct getter<tuple, 6>
-	{
+struct getter<tuple, 6> {
 	typedef typename tuple::T6_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e6 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e6 ); }
-	};
+};
 
 template<typename tuple>
-struct getter<tuple, 7>
-	{
+struct getter<tuple, 7> {
 	typedef typename tuple::T7_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e7 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e7 ); }
-	};
+};
 
 template<typename tuple>
-struct getter<tuple, 8>
-	{
+struct getter<tuple, 8> {
 	typedef typename tuple::T8_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e8 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e8 ); }
-	};
+};
 
 template<typename tuple>
-struct getter<tuple, 9>
-	{
+struct getter<tuple, 9> {
 	typedef typename tuple::T9_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e9 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e9 ); }
-	};
+};
 
 template<typename tuple>
-struct getter<tuple, 10>
-	{
+struct getter<tuple, 10> {
 	typedef typename tuple::T10_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e10 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e10 ); }
-	};
+};
 
 template<typename tuple>
-struct getter<tuple, 11>
-	{
+struct getter<tuple, 11> {
 	typedef typename tuple::T11_type type;
 	static type& get( tuple* tuple_ )
 		{ return ( tuple_->_e11 ); }
 	static type const& get( tuple const* tuple_ )
 		{ return ( tuple_->_e11 ); }
-	};
+};
 
 }
 
 template<typename interface>
-class HTupleBase
-	{
+class HTupleBase {
 public:
 	virtual ~HTupleBase( void ) {}
 	template<int const N>
@@ -177,7 +161,7 @@ public:
 	template<int const N>
 	typename tuple_helper::getter<interface, N>::type const& get( void ) const
 		{ return ( tuple_helper::getter<interface, N>::get( static_cast<interface const*>( this ) ) ); }
-	};
+};
 
 template<typename T0, typename T1 = trait::no_type, typename T2 = trait::no_type, typename T3 = trait::no_type,
 	typename T4 = trait::no_type, typename T5 = trait::no_type, typename T6 = trait::no_type, typename T7 = trait::no_type,
@@ -187,8 +171,7 @@ class HTuple;
 /*! \brief HTuple<> - a tuple_helper concept implementation.
  */
 template<typename T0>
-class HTuple<T0> : public HTupleBase<HTuple<T0> >
-	{
+class HTuple<T0> : public HTupleBase<HTuple<T0> > {
 public:
 	typedef HTuple<T0> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -200,11 +183,10 @@ public:
 		: _e0( e0_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0, typename T1>
-class HTuple<T0, T1> : public HTupleBase<HTuple<T0, T1> >
-	{
+class HTuple<T0, T1> : public HTupleBase<HTuple<T0, T1> > {
 public:
 	typedef HTuple<T0, T1> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -218,11 +200,10 @@ public:
 		: base_type(), _e0( e0_ ), _e1( e1_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0, typename T1, typename T2>
-class HTuple<T0, T1, T2> : public HTupleBase<HTuple<T0, T1, T2> >
-	{
+class HTuple<T0, T1, T2> : public HTupleBase<HTuple<T0, T1, T2> > {
 public:
 	typedef HTuple<T0, T1, T2> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -238,11 +219,10 @@ public:
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0, typename T1, typename T2, typename T3>
-class HTuple<T0, T1, T2, T3> : public HTupleBase<HTuple<T0, T1, T2, T3> >
-	{
+class HTuple<T0, T1, T2, T3> : public HTupleBase<HTuple<T0, T1, T2, T3> > {
 public:
 	typedef HTuple<T0, T1, T2, T3> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -260,11 +240,10 @@ public:
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4>
-class HTuple<T0, T1, T2, T3, T4> : public HTupleBase<HTuple<T0, T1, T2, T3, T4> >
-	{
+class HTuple<T0, T1, T2, T3, T4> : public HTupleBase<HTuple<T0, T1, T2, T3, T4> > {
 public:
 	typedef HTuple<T0, T1, T2, T3, T4> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -284,11 +263,10 @@ public:
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ), _e4( e4_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
-class HTuple<T0, T1, T2, T3, T4, T5> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5> >
-	{
+class HTuple<T0, T1, T2, T3, T4, T5> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5> > {
 public:
 	typedef HTuple<T0, T1, T2, T3, T4, T5> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -310,11 +288,10 @@ public:
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ), _e4( e4_ ), _e5( e5_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-class HTuple<T0, T1, T2, T3, T4, T5, T6> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6> >
-	{
+class HTuple<T0, T1, T2, T3, T4, T5, T6> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6> > {
 public:
 	typedef HTuple<T0, T1, T2, T3, T4, T5, T6> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -340,11 +317,10 @@ public:
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ), _e4( e4_ ), _e5( e5_ ), _e6( e6_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-class HTuple<T0, T1, T2, T3, T4, T5, T6, T7> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6, T7> >
-	{
+class HTuple<T0, T1, T2, T3, T4, T5, T6, T7> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6, T7> > {
 public:
 	typedef HTuple<T0, T1, T2, T3, T4, T5, T6, T7> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -372,11 +348,10 @@ public:
 		: base_type(), _e0( e0_ ), _e1( e1_ ), _e2( e2_ ), _e3( e3_ ), _e4( e4_ ), _e5( e5_ ), _e6( e6_ ), _e7( e7_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-class HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8> >
-	{
+class HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8> > {
 public:
 	typedef HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -407,12 +382,11 @@ public:
 		_e4( e4_ ), _e5( e5_ ), _e6( e6_ ), _e7( e7_ ), _e8( e8_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0, typename T1, typename T2, typename T3,
 	typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-class HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> >
-	{
+class HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> > {
 public:
 	typedef HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -446,12 +420,11 @@ public:
 		_e4( e4_ ), _e5( e5_ ), _e6( e6_ ), _e7( e7_ ), _e8( e8_ ), _e9( e9_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0, typename T1, typename T2, typename T3,
 	typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
-class HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> >
-	{
+class HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> > {
 public:
 	typedef HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -487,12 +460,11 @@ public:
 		_e4( e4_ ), _e5( e5_ ), _e6( e6_ ), _e7( e7_ ), _e8( e8_ ), _e9( e9_ ), _e10( e10_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0, typename T1, typename T2, typename T3,
 	typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11>
-class HTuple : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> >
-	{
+class HTuple : public HTupleBase<HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> > {
 public:
 	typedef HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> this_type;
 	typedef HTupleBase<this_type> base_type;
@@ -530,7 +502,7 @@ public:
 		_e4( e4_ ), _e5( e5_ ), _e6( e6_ ), _e7( e7_ ), _e8( e8_ ), _e9( e9_ ), _e10( e10_ ), _e11( e11_ ) {}
 	template<typename tuple, int const N>
 	friend struct tuple_helper::getter;
-	};
+};
 
 template<typename T0>
 HTuple<T0> make_tuple( T0 const& e0_ )

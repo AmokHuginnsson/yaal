@@ -41,11 +41,9 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 char const* const HCollector::PROTOCOL::SYN = "SYN\n";
 char const* const HCollector::PROTOCOL::ACK = "ACK\n";
@@ -60,8 +58,7 @@ char const* const _error_ = _( "collector device not opened" );
 
 HCollector::HCollector( char const* devicePath_ )
 					: HSerial( devicePath_ ), _lines( 0 ),
-						_line()
-	{
+						_line() {
 	M_PROLOG
 	memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
 	/*
@@ -72,10 +69,9 @@ HCollector::HCollector( char const* devicePath_ )
 	set_flags( HSerial::FLAG_TEXT );
 	return;
 	M_EPILOG
-	}
+}
 
-bool HCollector::test_char( char const* buffer_, int index_ ) const
-	{
+bool HCollector::test_char( char const* buffer_, int index_ ) const {
 	return (
 			buffer_ [ index_ ]
 							&& ( ( ( buffer_ [ index_ ] >= '0' )
@@ -87,10 +83,9 @@ bool HCollector::test_char( char const* buffer_, int index_ ) const
 										|| ( buffer_ [ index_ ] == '?' ) )
 									&& index_ ) )
 							);
-	}
+}
 
-int HCollector::send_line( char const* line_ )
-	{
+int HCollector::send_line( char const* line_ ) {
 	M_PROLOG
 	int long ctr = 0;
 	int cRC = 0;
@@ -100,11 +95,10 @@ int HCollector::send_line( char const* line_ )
 	if ( length < 1 )
 		return ( 0 );
 	localCopy = line_;
-	if ( line_[ length - 1 ] == '\n' )
-		{
+	if ( line_[ length - 1 ] == '\n' ) {
 		length --;
 		localCopy.set_at( length, 0 );
-		}
+	}
 	for ( ctr = 0; ctr < length; ctr ++ )
 		cRC += localCopy[ ctr ];
 	line.format ( "%s%02x%02x%s\n", PROTOCOL::DTA,
@@ -112,8 +106,7 @@ int HCollector::send_line( char const* line_ )
 	::memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
 	length += static_cast<int>( ::strlen( PROTOCOL::DTA ) );
 	length += ( 2 /* for lenght */ + 2 /* for crc */ + 1 /* for newline */ );
-	while ( ::strncmp( _readBuf, PROTOCOL::ACK, ::strlen( PROTOCOL::ACK ) ) )
-		{
+	while ( ::strncmp( _readBuf, PROTOCOL::ACK, ::strlen( PROTOCOL::ACK ) ) ) {
 		flush( TCOFLUSH );
 		ctr = HRawFile::write( line.raw(), length );
 		wait_for_eot();
@@ -121,13 +114,12 @@ int HCollector::send_line( char const* line_ )
 		HRawFile::read( _readBuf, PROTOCOL::RECV_BUF_SIZE );
 		flush( TCIFLUSH );
 		error ++;
-		}
+	}
 	return ( static_cast<int>( error + length - ctr ) );
 	M_EPILOG
-	}
+}
 
-int HCollector::receive_line( HString& line_ )
-	{
+int HCollector::receive_line( HString& line_ ) {
 	M_PROLOG
 	int long error = -1;
 	int ctr = 0;
@@ -136,16 +128,14 @@ int HCollector::receive_line( HString& line_ )
 	int ackLenght = static_cast<int>( ::strlen( PROTOCOL::ACK ) );
 	int errLenght = static_cast<int>( ::strlen( PROTOCOL::ERR ) );
 	/* P prefix means sender transmission side data */
-	while ( ( pCRC != cRC ) || ( pLength != length ) )
-		{
+	while ( ( pCRC != cRC ) || ( pLength != length ) ) {
 		_line = "";
 		_readBuf[ 0 ] = 0;
-		while ( strlen( _readBuf ) < static_cast<size_t>( PROTOCOL::RECV_BUF_SIZE ) )
-			{
+		while ( strlen( _readBuf ) < static_cast<size_t>( PROTOCOL::RECV_BUF_SIZE ) ) {
 			::memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
 			HRawFile::read( _readBuf, PROTOCOL::RECV_BUF_SIZE );
 			_line += _readBuf;
-			}
+		}
 		flush( TCIFLUSH );
 		line_ = _line;
 		line_.shift_left(	static_cast<int long>( ::strlen( PROTOCOL::DTA ) ) + 2 /* for lenght */ + 2 /* for crc */ );
@@ -164,17 +154,16 @@ int HCollector::receive_line( HString& line_ )
 		if ( ( pCRC != cRC ) || ( pLength != length ) )
 			error += ( errLenght - HRawFile::write( PROTOCOL::ERR, errLenght ) );
 		error ++;
-		}
+	}
 	flush( TCOFLUSH );
 	error += ( ackLenght - HRawFile::write( PROTOCOL::ACK, ackLenght ) );
 	wait_for_eot();
 	_lines ++;
 	return ( static_cast<int>( error ) );
 	M_EPILOG
-	}
+}
 
-int HCollector::establish_connection ( int timeOut_ )
-	{
+int HCollector::establish_connection ( int timeOut_ ) {
 	M_PROLOG
 /*
 	 We have small problem here.
@@ -186,8 +175,7 @@ int HCollector::establish_connection ( int timeOut_ )
 	if ( _fileDescriptor < 0 )
 		M_THROW( _error_, _fileDescriptor );
 	::memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
-	while ( ::strncmp( _readBuf, PROTOCOL::ACK, ::strlen( PROTOCOL::ACK ) ) )
-		{
+	while ( ::strncmp( _readBuf, PROTOCOL::ACK, ::strlen( PROTOCOL::ACK ) ) ) {
 		flush( TCOFLUSH );
 		if ( HRawFile::write( PROTOCOL::SYN, lenght ) != lenght )
 			M_THROW( "write", lenght );
@@ -200,51 +188,47 @@ int HCollector::establish_connection ( int timeOut_ )
 		error ++;
 		if ( error > timeOut_ )
 			return ( -1 );
-		}
+	}
 	log( LOG_TYPE::DEBUG ) << "Collector: Connected ! (estab)" << endl;
 	return ( error );
 	M_EPILOG
-	}
+}
 
-int HCollector::wait_for_connection ( int timeOut_ )
-	{
+int HCollector::wait_for_connection ( int timeOut_ ) {
 	M_PROLOG
 	int error = - 1;
 	int lenght = static_cast<int>( ::strlen( PROTOCOL::ACK ) );
 	if ( _fileDescriptor < 0 )
 		M_THROW ( _error_, _fileDescriptor );
 	::memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
-	while ( ::strncmp( _readBuf, PROTOCOL::SYN, strlen ( PROTOCOL::SYN ) ) )
-		{
+	while ( ::strncmp( _readBuf, PROTOCOL::SYN, strlen ( PROTOCOL::SYN ) ) ) {
 		if ( timed_read( _readBuf, PROTOCOL::RECV_BUF_SIZE, timeOut_ ) >= 0 )
 			error ++;
 		else
 			return ( -1 );
-		}
+	}
 	error += static_cast<int>( lenght - HRawFile::write( PROTOCOL::ACK, lenght ) );
 	log( LOG_TYPE::DEBUG ) << "Collector: Connected ! (wait)" << endl;
 	return ( error );
 	M_EPILOG
-	}
+}
 
-int HCollector::read_collector ( void ( *process_line )( char const* const, int ) ) 
-	{
+int HCollector::read_collector ( void ( *process_line )( char const* const, int ) ) {
 	M_PROLOG
 	int error = 0;
 	_lines = 0;
 	error = wait_for_connection( tools::_collectorConnectionTimeOut_ );
 	HString line;
-	while ( error >= 0 )
-		{
+	while ( error >= 0 ) {
 		error += receive_line( line );
 		/* '\n' is stripped from each line so we need to FIN treat special */
 		if ( ! ::strncmp( line.raw(), PROTOCOL::FIN, sizeof ( PROTOCOL::FIN ) ) )
 			break;
 		process_line( line.raw(), _lines );
-		}
+	}
 	return ( error );
 	M_EPILOG
-	}
+}
 
 }
 

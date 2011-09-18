@@ -34,25 +34,20 @@ Copyright:
 #include "hcore/hpipe.hxx"
 #include "tools/signals.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Input/output (fd) event listner and notification dispatcher.
  */
-class HIODispatcher
-	{
+class HIODispatcher {
 public:
-	struct FD_TYPE
-		{
-		typedef enum
-			{
+	struct FD_TYPE {
+		typedef enum {
 			READER,
 			WRITER
-			} fd_type_t;
-		};
+		} fd_type_t;
+	};
 protected:
 	typedef HIODispatcher this_type;
 private:
@@ -105,7 +100,7 @@ private:
 	void handle_idle( void );
 	HIODispatcher( HIODispatcher const& );
 	HIODispatcher& operator = ( HIODispatcher const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HIODispatcher> HIODispatcherException;
 

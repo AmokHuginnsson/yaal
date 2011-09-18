@@ -34,11 +34,9 @@ using namespace yaal::hcore;
 using namespace yaal::hconsole;
 using namespace yaal::dbwrapper;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 HDataTreeControl::HDataTreeControl(
 		HDataWindow* window_, int row_, int column_, int height_,
@@ -46,26 +44,23 @@ HDataTreeControl::HDataTreeControl(
 								: HControl( window_, row_, column_, height_,
 										width_, title_ ),
 								HTreeControl( NULL, 0, 0, 0, 0, NULL ),
-								HDataControl()
-	{
+								HDataControl() {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HDataTreeControl::~HDataTreeControl ( void )
-	{
+HDataTreeControl::~HDataTreeControl ( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HDataTreeControl::load ( int long /*id_*/ )
-	{
+void HDataTreeControl::load ( int long /*id_*/ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

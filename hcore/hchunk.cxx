@@ -33,77 +33,64 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "algorithm.hxx"
 #include "memory.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 HChunk::HChunk( void )
-	: _size( 0 ), _data( NULL )
-	{
+	: _size( 0 ), _data( NULL ) {
 	return;
-	}
+}
 
 HChunk::HChunk( int long size_, STRATEGY::enum_t strategy_ )
-	: _size( 0 ), _data( NULL )
-	{
+	: _size( 0 ), _data( NULL ) {
 	M_PROLOG
 	realloc( size_, strategy_ );
 	return;
 	M_EPILOG
-	}
+}
 
-HChunk::~HChunk( void )
-	{
+HChunk::~HChunk( void ) {
 	M_PROLOG
 	free();
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HChunk::free( void )
-	{
+void HChunk::free( void ) {
 	if ( _data )
 		memory::free( _data );
 	_size = 0;
 	return;
-	}
+}
 
-void* HChunk::realloc( int long size_, STRATEGY::enum_t strategy_ )
-	{
+void* HChunk::realloc( int long size_, STRATEGY::enum_t strategy_ ) {
 	if ( size_ < 1 )
 		M_THROW( "bad size", size_ );
-	if ( size_ > _size )
-		{
-		if ( strategy_ == STRATEGY::GEOMETRIC )
-			{
+	if ( size_ > _size ) {
+		if ( strategy_ == STRATEGY::GEOMETRIC ) {
 			int long newSize = 1;
 			while ( newSize < size_ )
 				newSize <<= 1;
 			size_ = newSize;
-			}
-		else
-			{
+		} else {
 			M_ASSERT( strategy_ == STRATEGY::EXACT );
-			}
+		}
 		_data = memory::realloc<char>( _data, size_ );
 		::memset( static_cast<char*>( _data ) + _size, 0, size_ - _size );
 		_size = size_;
-		}
-	return ( _data );
 	}
+	return ( _data );
+}
 
-void HChunk::swap( HChunk& chunk_ )
-	{
-	if ( &chunk_ != this )
-		{
+void HChunk::swap( HChunk& chunk_ ) {
+	if ( &chunk_ != this ) {
 		using yaal::swap;
 		swap( _data, chunk_._data );
 		swap( _size, chunk_._size );
-		}
-	return;
 	}
+	return;
+}
 
 }
 

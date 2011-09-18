@@ -4,8 +4,7 @@
 #include <utility>
 #include <string>
 
-namespace msvcxx
-{
+namespace msvcxx {
 
 typedef std::pair<int, int> owner_t;
 owner_t get_path_owner( std::string const& );

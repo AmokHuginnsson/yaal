@@ -31,14 +31,11 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hmatrix.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-char const * const _errMsgHMatrix_ [ 12 ] =
-	{
+char const * const _errMsgHMatrix_ [ 12 ] = {
 	_( "ok" ),
 /* HMatrix::ERROR::BAD_ROWS */                           _( "rows < 1" ),
 /* HMatrix::ERROR::BAD_COLUMNS */                        _( "columns < 1" ),
@@ -50,7 +47,7 @@ char const * const _errMsgHMatrix_ [ 12 ] =
 /* HMatrix::ERROR::DIM_NOT_MATCH_COLUMNS_ROWS_COLUMNS */ _( "columns does not match rows and columns" ),
 /* HMatrix::ERROR::ROW_OUT_OF_RANGE */                   _( "row too big for minor" ),
 /* HMatrix::ERROR::COLUMN_OUT_OF_RANGE */                _( "column too big for minor" )
-	};
+};
 
 }
 

@@ -30,13 +30,10 @@ Copyright:
 #include "hcore/hmap.hxx"
 #include "tools/hplugin.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
-namespace LOG_TYPE
-{
+namespace hcore {
+namespace LOG_TYPE {
 
 static int const SQL = 1073741824;
 
@@ -48,15 +45,11 @@ static int const SQL = 1073741824;
  * The dbwrapper allows its user to transparently access
  * any kind of relational database that are available for Unix.
  */
-namespace dbwrapper
-{
+namespace dbwrapper {
 
-struct ODBConnector
-	{
-	struct DRIVER
-		{
-		typedef enum
-			{
+struct ODBConnector {
+	struct DRIVER {
+		typedef enum {
 			DEFAULT = -1,
 			NONE = 0,
 			DUMMY = 0,
@@ -65,8 +58,8 @@ struct ODBConnector
 			MYSQL, 
 			ORACLE,
 			TERMINATOR
-			} enum_t;
-		};
+		} enum_t;
+	};
 	typedef void* ( * db_connect_t )( char const*, char const*, char const* );
 	typedef void ( * db_disconnect_t )( void* );
 	typedef int ( * dbrs_errno_t )( void*, void* );
@@ -90,7 +83,7 @@ struct ODBConnector
 	dbrs_id_t dbrs_id;
 	rs_column_name_t rs_column_name;
 	ODBConnector( void );
-	};
+};
 
 ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t );
 typedef yaal::hcore::HPair<yaal::tools::HPlugin::ptr_t, ODBConnector> driver_t;

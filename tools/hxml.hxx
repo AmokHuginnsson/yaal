@@ -42,18 +42,15 @@ Copyright:
 #include "hcore/hstreaminterface.hxx"
 #include "tools/hoptional.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 class HXmlData;
 
 /*! \brief XML document operation wrapper.
  */
-class HXml
-	{
+class HXml {
 public:
 	typedef HXml this_type;
 	class HNode;
@@ -67,16 +64,14 @@ public:
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, yaal::hcore::HString> entities_t;
 	typedef entities_t::const_iterator const_entity_iterator;
 	typedef entities_t::iterator entity_iterator;
-	struct PARSER
-		{
-		typedef enum
-			{
+	struct PARSER {
+		typedef enum {
 			DEFAULT = 0,
 			KEEP_EMPTY = 1,
 			STRIP_COMMENT = 2,
 			RESOLVE_ENTITIES = 4
-			} parser_t;
-		};
+		} parser_t;
+	};
 private:
 	struct OConvert;
 	typedef void* xml_node_ptr_t;
@@ -132,27 +127,24 @@ private:
 	const_xml_element_t get_element_by_path( const_xml_element_t const&, yaal::hcore::HString const&, int ) const;
 	void parse_dtd( void* );
 	char const* error_message( int ) const;
-	};
+};
 
 /*! \brief Basic building block of XML document.
  */
-class HXml::HNode
-	{
+class HXml::HNode {
 public:
 	/*! \brief XML node types.
 	 */
-	struct TYPE
-		{
+	struct TYPE {
 		/*! \brief XML node types.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			NODE,    /*!< XML node. */
 			CONTENT, /*!< XML node content. */
 			ENTITY,  /*!< XML entity. */
 			COMMENT  /*!< XML comment. */
-			} type_t;
-		};
+		} type_t;
+	};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
 private:
 	HXml const* _owner;
@@ -166,47 +158,41 @@ public:
 	HNode( HNode const& source )
 		: _owner( source._owner ), _type( source._type ), _text( source._text ), _properties( source._properties )
 		{ }
-	HNode& operator = ( HNode const& source )
-		{
+	HNode& operator = ( HNode const& source ) {
 		M_PROLOG
-		if ( &source != this )
-			{
+		if ( &source != this ) {
 			HNode tmp( source );
 			swap( tmp );
-			}
+		}
 		return ( *this );
 		M_EPILOG
-		}
-	void swap( HNode& node_ )
-		{
-		if ( &node_ != this )
-			{
+	}
+	void swap( HNode& node_ ) {
+		if ( &node_ != this ) {
 			using yaal::swap;
 			swap( _owner, node_._owner );
 			swap( _type, node_._type );
 			swap( _text, node_._text );
 			swap( _properties, node_._properties );
-			}
-		return;
 		}
+		return;
+	}
 private:
-	void clear( void )
-		{
+	void clear( void ) {
 		M_PROLOG
 		_text.clear();
 		_properties.clear();
 		return;
 		M_EPILOG
-		}
+	}
 	friend class HXml;
 	friend class HXml::HNodeProxy;
 	friend class HXml::HConstNodeProxy;
-	};
+};
 
 /*! \brief Immutable XML document node.
  */
-class HXml::HConstNodeProxy
-	{
+class HXml::HConstNodeProxy {
 public:
 	typedef HXml::HConstIterator const_iterator;
 	typedef HXml::HIterator iterator;
@@ -238,12 +224,11 @@ private:
 	friend class HXml;
 	friend class HXml::HConstIterator;
 	HConstNodeProxy( HXml::tree_t::const_node_t );
-	};
+};
 
 /*! \brief XML document node.
  */
-class HXml::HNodeProxy : public HXml::HConstNodeProxy
-	{
+class HXml::HNodeProxy : public HXml::HConstNodeProxy {
 public:
 	typedef HXml::HConstIterator const_iterator;
 	typedef HXml::HIterator iterator;
@@ -285,40 +270,35 @@ private:
 	friend class HXml::HIterator;
 	friend class HXml::HConstNodeProxy;
 	HNodeProxy( HXml::tree_t::node_t );
-	};
+};
 
 /*! \brief XML node iterator.
  */
-class HXml::HIterator : public yaal::hcore::iterator_interface<HXml::HNodeProxy, yaal::hcore::iterator_category::forward>
-	{
+class HXml::HIterator : public yaal::hcore::iterator_interface<HXml::HNodeProxy, yaal::hcore::iterator_category::forward> {
 	HXml::HNodeProxy const* _owner;
 	HXml::tree_t::iterator _iterator;
 public:
 	typedef yaal::hcore::iterator_interface<HXml::HNodeProxy, yaal::hcore::iterator_category::forward> base_type;
 	HIterator( void );
 	HIterator( HIterator const& );
-	HIterator& operator ++ ( void )
-		{
+	HIterator& operator ++ ( void ) {
 		++ _iterator;
 		return ( *this );
-		}
-	HIterator operator ++ ( int )
-		{
+	}
+	HIterator operator ++ ( int ) {
 		HIterator it( *this );
 		++ _iterator;
 		return ( it );
-		}
-	HIterator& operator -- ( void )
-		{
+	}
+	HIterator& operator -- ( void ) {
 		-- _iterator;
 		return ( *this );
-		}
-	HIterator operator -- ( int )
-		{
+	}
+	HIterator operator -- ( int ) {
 		HIterator it( *this );
 		-- _iterator;
 		return ( it );
-		}
+	}
 	HIterator& operator = ( HIterator const& );
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
@@ -327,40 +307,35 @@ public:
 private:
 	friend class HXml::HNodeProxy;
 	HIterator( HXml::HNodeProxy const*, HXml::tree_t::iterator const& );
-	};
+};
 
 /*! \brief XML immutable node iterator.
  */
-class HXml::HConstIterator : public yaal::hcore::iterator_interface<HXml::HConstNodeProxy, yaal::hcore::iterator_category::forward>
-	{
+class HXml::HConstIterator : public yaal::hcore::iterator_interface<HXml::HConstNodeProxy, yaal::hcore::iterator_category::forward> {
 	HXml::HConstNodeProxy const* _owner;
 	HXml::tree_t::const_iterator _iterator;
 public:
 	typedef yaal::hcore::iterator_interface<HXml::HConstNodeProxy, yaal::hcore::iterator_category::forward> base_type;
 	HConstIterator( void );
 	HConstIterator( HConstIterator const& );
-	HConstIterator& operator ++ ( void )
-		{
+	HConstIterator& operator ++ ( void ) {
 		++ _iterator;
 		return ( *this );
-		}
-	HConstIterator operator ++ ( int )
-		{
+	}
+	HConstIterator operator ++ ( int ) {
 		HConstIterator it( *this );
 		++ _iterator;
 		return ( it );
-		}
-	HConstIterator& operator -- ( void )
-		{
+	}
+	HConstIterator& operator -- ( void ) {
 		-- _iterator;
 		return ( *this );
-		}
-	HConstIterator operator -- ( int )
-		{
+	}
+	HConstIterator operator -- ( int ) {
 		HConstIterator it( *this );
 		-- _iterator;
 		return ( it );
-		}
+	}
 	HConstIterator& operator = ( HConstIterator const& );
 	bool operator == ( HConstIterator const& ) const;
 	bool operator != ( HConstIterator const& ) const;
@@ -368,14 +343,13 @@ public:
 private:
 	friend class HXml::HConstNodeProxy;
 	HConstIterator( HXml::HConstNodeProxy const*, HXml::tree_t::const_iterator const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HXml> HXmlException;
 
 /*! \brief HXml related convenience and helper functions.
  */
-namespace xml
-{
+namespace xml {
 
 typedef HOptional<yaal::hcore::HString const&> value_t;
 

@@ -33,66 +33,55 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
-HScheduledAsyncCaller::HScheduledAsyncCaller( void ) : _condition( _mutex )
-	{
+HScheduledAsyncCaller::HScheduledAsyncCaller( void ) : _condition( _mutex ) {
 	M_PROLOG
 	start();
 	return;
 	M_EPILOG
-	}
+}
 
-HScheduledAsyncCaller::~HScheduledAsyncCaller( void )
-	{
+HScheduledAsyncCaller::~HScheduledAsyncCaller( void ) {
 	M_PROLOG
 	stop();
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HScheduledAsyncCaller::do_signal( void )
-	{
+void HScheduledAsyncCaller::do_signal( void ) {
 	M_PROLOG
 	_condition.signal();
 	return;
 	M_EPILOG
-	}
+}
 
-void* HScheduledAsyncCaller::do_work( void )
-	{
+void* HScheduledAsyncCaller::do_work( void ) {
 	M_PROLOG
 	HLock l( _mutex );
 	HThread::set_name( "HScheduledAsyncCaller" );
-	while ( _loop )
-		{
+	while ( _loop ) {
 		queue_t::iterator it = _queue.begin();
-		while ( ( it != _queue.end() ) && ( (*it).first <= time( NULL ) ) )
-			{
+		while ( ( it != _queue.end() ) && ( (*it).first <= time( NULL ) ) ) {
 			(*it).second();
 			it = _queue.erase( it );
-			}
-		if ( it != _queue.end() )
-			{
+		}
+		if ( it != _queue.end() ) {
 			time_t delay = 0;
 			if ( ( delay = ( (*it).first - time( NULL ) ) ) > 0 )
 				_condition.wait( static_cast<int long unsigned>( delay ), 0 );
-			}
-		else
+		} else
 			_condition.wait( 10000, 0 );
-		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HScheduledAsyncCaller::life_time( int )
-	{
+int HScheduledAsyncCaller::life_time( int ) {
 	return ( 50 );
-	}
+}
 
 }
 

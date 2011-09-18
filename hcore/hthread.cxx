@@ -45,27 +45,23 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/memory.hxx"
 #include "hlog.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 HSemaphore::TYPE::type_t HSemaphore::DEFAULT = HSemaphore::TYPE::POSIX;
 int HThread::_threadStackSize = 0;
 
-void do_pthread_attr_destroy( void* attr )
-	{
+void do_pthread_attr_destroy( void* attr ) {
 	M_PROLOG
 	M_ENSURE( ::pthread_attr_destroy( static_cast<pthread_attr_t*>( attr ) ) == 0 );
 	return;
 	M_EPILOG
-	}
+}
 
 HThread::HThread( void )
 	: _status( DEAD ), _buf( chunk_size<pthread_t>( 1 ) + chunk_size<pthread_attr_t>( 1 ) ),
-	_mutex( HMutex::TYPE::RECURSIVE ), _semaphore(), _resGuard(), _call(), _exceptionInfo()
-	{
+	_mutex( HMutex::TYPE::RECURSIVE ), _semaphore(), _resGuard(), _call(), _exceptionInfo() {
 	M_PROLOG
 	pthread_attr_t* attr( static_cast<pthread_attr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_t ) ) ) );
 	M_ENSURE( ::pthread_attr_init( attr ) == 0 );
@@ -80,25 +76,22 @@ HThread::HThread( void )
 	M_ENSURE( ::pthread_attr_setinheritsched( attr, PTHREAD_INHERIT_SCHED ) == 0 );
 	return;
 	M_EPILOG
-	}
+}
 
-HThread::~HThread( void )
-	{
+HThread::~HThread( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
-	if ( _status != DEAD )
-		{
+	if ( _status != DEAD ) {
 		_mutex.unlock();
 		finish();
 		_mutex.lock();
-		}
+	}
 	M_ASSERT( _status == DEAD );
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HThread::spawn( call_t call_ )
-	{
+void HThread::spawn( call_t call_ ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	if ( _status != DEAD )
@@ -111,20 +104,18 @@ void HThread::spawn( call_t call_ )
 	_semaphore.wait();
 	return;
 	M_EPILOG
-	}
+}
 
-void HThread::schedule_finish( void )
-	{
+void HThread::schedule_finish( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	if ( _status != DEAD )
 		_status = ZOMBIE;
 	return;
 	M_EPILOG
-	}
+}
 
-void* HThread::finish( void )
-	{
+void* HThread::finish( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	if ( ( _status != ALIVE ) && ( _status != ZOMBIE ) && ( _status != SPAWNING ) )
@@ -140,10 +131,9 @@ void* HThread::finish( void )
 		throw HThreadException( _exceptionInfo._message, _exceptionInfo._code );
 	return ( returnValue );
 	M_EPILOG
-	}
+}
 
-void* HThread::SPAWN( void* thread_ )
-	{
+void* HThread::SPAWN( void* thread_ ) {
 	M_PROLOG
 	/*!
 	 * We cannot afford silencing uncaught exceptions here.
@@ -166,32 +156,25 @@ void* HThread::SPAWN( void* thread_ )
 	 * normal execution without library intervention,
 	 * so we die via apropriate fatal signal.
 	 */
-	try
-		{
+	try {
 		return ( reinterpret_cast<HThread*>( thread_ )->control() );
-		}
-	catch ( HException const& e )
-		{
+	} catch ( HException const& e ) {
 		log( LOG_TYPE::ERROR ) << "Uncaught exception: `" << e.what() << "' in thread!" << endl;
 		throw;
-		}
-	catch ( ... )
-		{
+	} catch ( ... ) {
 		log( LOG_TYPE::ERROR ) << "Unknown uncaught exception in thread!" << endl;
 		throw;
-		}
-	M_EPILOG
 	}
+	M_EPILOG
+}
 
-void HThread::CLEANUP( void* )
-	{
+void HThread::CLEANUP( void* ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void* HThread::control( void )
-	{
+void* HThread::control( void ) {
 	M_PROLOG
 	M_ENSURE( ::pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );
 	M_ENSURE( ::pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
@@ -210,23 +193,20 @@ void* HThread::control( void )
 	_semaphore.signal();
 	return ( returnValue );
 	M_EPILOG
-	}
+}
 
-bool HThread::is_alive( void ) const
-	{
+bool HThread::is_alive( void ) const {
 	M_PROLOG
 	HLock lock( _mutex );
 	return ( _status == ALIVE );
 	M_EPILOG
-	}
+}
 
-int long HThread::get_id( void )
-	{
+int long HThread::get_id( void ) {
 	return ( reinterpret_cast<int long>( reinterpret_cast<void*>( pthread_self() ) ) );
-	}
+}
 
-void HThread::set_name( char const* name_ )
-	{
+void HThread::set_name( char const* name_ ) {
 	char name[16];
 	strncpy( name, name_, 16 );
 	name[15] = 0;
@@ -240,27 +220,24 @@ void HThread::set_name( char const* name_ )
 	log( LOG_TYPE::WARNING ) << "Setting thread name (`" << name_ << "') not supported on your platform." << endl;
 #endif /* #else #elif defined( HAVE_PRCTL ) #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
 	return;
-	}
+}
 
-void HThread::stack_exception( yaal::hcore::HString const& message_, int code_ )
-	{
+void HThread::stack_exception( yaal::hcore::HString const& message_, int code_ ) {
 	M_PROLOG
 	_exceptionInfo._stacked = true;
 	_exceptionInfo._code = code_;
 	_exceptionInfo._message = message_;
 	return;
 	M_EPILOG
-	}
+}
 
-void do_pthread_mutexattr_destroy( void* attr )
-	{
+void do_pthread_mutexattr_destroy( void* attr ) {
 	::pthread_mutexattr_destroy( static_cast<pthread_mutexattr_t*>( attr ) );
-	}
+}
 
 HMutex::HMutex( TYPE::mutex_type_t const type_ ) : _type( type_ ),
 	_buf( chunk_size<pthread_mutex_t>( 1 ) + chunk_size<pthread_mutexattr_t>( 1 ) ),
-	_resGuard()
-	{
+	_resGuard() {
 	M_PROLOG
 	if ( _type == TYPE::DEFAULT )
 		_type = TYPE::NON_RECURSIVE;
@@ -273,10 +250,9 @@ HMutex::HMutex( TYPE::mutex_type_t const type_ ) : _type( type_ ),
 	::pthread_mutex_init( _buf.get<pthread_mutex_t>(), attr );
 	return;
 	M_EPILOG
-	}
+}
 
-HMutex::~HMutex( void )
-	{
+HMutex::~HMutex( void ) {
 	M_PROLOG
 	int error = 0;
 	while ( ( error = ::pthread_mutex_destroy( _buf.get<pthread_mutex_t>() ) ) == EBUSY )
@@ -284,46 +260,41 @@ HMutex::~HMutex( void )
 	M_ENSURE( error == 0 );
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HMutex::lock( void )
-	{
+void HMutex::lock( void ) {
 	M_PROLOG
 	int error = ::pthread_mutex_lock( _buf.get<pthread_mutex_t>() );
 	if ( ! ( _type & TYPE::RECURSIVE ) )
 		M_ENSURE( error != EDEADLK );
 	return;
 	M_EPILOG
-	}
+}
 
-void HMutex::unlock( void )
-	{
+void HMutex::unlock( void ) {
 	M_PROLOG
 	int error = ::pthread_mutex_unlock( _buf.get<pthread_mutex_t>() );
 	if ( ! ( _type & TYPE::RECURSIVE ) )
 		M_ENSURE( error != EPERM );
 	return;
 	M_EPILOG
-	}
+}
 
-HLock::HLock( HMutex& mutex_ ) : _mutex( mutex_ )
-	{
+HLock::HLock( HMutex& mutex_ ) : _mutex( mutex_ ) {
 	M_PROLOG
 	_mutex.lock();
 	return;
 	M_EPILOG
-	}
+}
 
-HLock::~HLock( void )
-	{
+HLock::~HLock( void ) {
 	M_PROLOG
 	_mutex.unlock();
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-class HPosixSemaphore : public HSemaphoreImplementationInterface
-	{
+class HPosixSemaphore : public HSemaphoreImplementationInterface {
 public:
 	typedef HPosixSemaphore this_type;
 	typedef HSemaphoreImplementationInterface base_type;
@@ -337,59 +308,52 @@ private:
 	virtual void do_signal( void );
 	HPosixSemaphore( HPosixSemaphore const& );
 	HPosixSemaphore& operator = ( HPosixSemaphore const& );
-	};
+};
 
 HPosixSemaphore::HPosixSemaphore( void )
-	: _sem()
-	{
+	: _sem() {
 	M_PROLOG
 	M_ENSURE( ::sem_init( &_sem, 0, 0 ) == 0 );
 	return;
 	M_EPILOG
-	}
+}
 
-HPosixSemaphore::~HPosixSemaphore( void )
-	{
+HPosixSemaphore::~HPosixSemaphore( void ) {
 	M_PROLOG
 	M_ENSURE( ::sem_destroy( &_sem ) == 0 );
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HPosixSemaphore::do_wait( void )
-	{
+void HPosixSemaphore::do_wait( void ) {
 	M_PROLOG
 	::sem_wait( &_sem ); /* Always returns 0. */
 	return;
 	M_EPILOG
-	}
+}
 
-void HPosixSemaphore::do_signal( void )
-	{
+void HPosixSemaphore::do_signal( void ) {
 	M_PROLOG
 	M_ENSURE( ::sem_post( &_sem ) == 0 );
 	return;
 	M_EPILOG
-	}
+}
 
-void HSemaphoreImplementationInterface::wait( void )
-	{
+void HSemaphoreImplementationInterface::wait( void ) {
 	M_PROLOG
 	do_wait();
 	return;
 	M_EPILOG
-	}
+}
 
-void HSemaphoreImplementationInterface::signal( void )
-	{
+void HSemaphoreImplementationInterface::signal( void ) {
 	M_PROLOG
 	do_signal();
 	return;
 	M_EPILOG
-	}
+}
 
-class HYaalSemaphore : public HSemaphoreImplementationInterface
-	{
+class HYaalSemaphore : public HSemaphoreImplementationInterface {
 public:
 	typedef HYaalSemaphore this_type;
 	typedef HSemaphoreImplementationInterface base_type;
@@ -405,93 +369,80 @@ private:
 	virtual void do_signal( void );
 	HYaalSemaphore( HYaalSemaphore const& );
 	HYaalSemaphore& operator = ( HYaalSemaphore const& );
-	};
+};
 
 HYaalSemaphore::HYaalSemaphore( void )
-	: _mutex(), _cond( _mutex ), _count( 0 )
-	{
+	: _mutex(), _cond( _mutex ), _count( 0 ) {
 	return;
-	}
+}
 
-HYaalSemaphore::~HYaalSemaphore( void )
-	{
+HYaalSemaphore::~HYaalSemaphore( void ) {
 	return;
-	}
+}
 
-void HYaalSemaphore::do_wait( void )
-	{
+void HYaalSemaphore::do_wait( void ) {
 	M_PROLOG
 	HLock l( _mutex );
 	if ( _count > 0 )
 		-- _count;
-	else
-		{
-		do
-			{
+	else {
+		do {
 			_cond.wait( 0x1fffffff, 0 );
-			}
-		while ( ! _count );
+		} while ( ! _count );
 		-- _count;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HYaalSemaphore::do_signal( void )
-	{
+void HYaalSemaphore::do_signal( void ) {
 	M_PROLOG
 	HLock l( _mutex );
 	++ _count;
 	_cond.signal();
 	return;
 	M_EPILOG
-	}
+}
 
 HSemaphore::HSemaphore( TYPE::type_t type_ )
-	: _impl( type_ == TYPE::POSIX ? semaphore_implementation_t( new ( memory::yaal ) HPosixSemaphore() ) : semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore() ) )
-	{
-	}
+	: _impl( type_ == TYPE::POSIX ? semaphore_implementation_t( new ( memory::yaal ) HPosixSemaphore() ) : semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore() ) ) {
+}
 
-HSemaphore::~HSemaphore( void )
-	{
+HSemaphore::~HSemaphore( void ) {
 	return;
-	}
+}
 
-void HSemaphore::wait( void )
-	{
+void HSemaphore::wait( void ) {
 	M_PROLOG
 	_impl->wait();
 	return;
 	M_EPILOG
-	}
+}
 
-void HSemaphore::signal( void )
-	{
+void HSemaphore::signal( void ) {
 	M_PROLOG
 	_impl->signal();
 	return;
 	M_EPILOG
-	}
+}
 
 HCondition::HCondition( HMutex& mutex_ )
-	: _buf( chunk_size<pthread_cond_t>( 1 ) + chunk_size<pthread_condattr_t>( 1 ) ), _mutex( mutex_ )
-	{
+	: _buf( chunk_size<pthread_cond_t>( 1 ) + chunk_size<pthread_condattr_t>( 1 ) ), _mutex( mutex_ ) {
 	M_PROLOG
 	pthread_condattr_t* attr( static_cast<pthread_condattr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_cond_t ) ) ) );
 	::pthread_condattr_init( attr );
 	::pthread_cond_init( _buf.get<pthread_cond_t>(), attr );
 	return;
 	M_EPILOG
-	}
+}
 
-HCondition::~HCondition( void )
-	{
+HCondition::~HCondition( void ) {
 	M_PROLOG
 	M_ENSURE( ::pthread_cond_destroy( _buf.get<pthread_cond_t>() ) == 0 );
 	::pthread_condattr_destroy( static_cast<pthread_condattr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_cond_t ) ) ));
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
 /*
  * Read it or die!
@@ -507,8 +458,7 @@ HCondition::~HCondition( void )
  */
 
 HCondition::status_t HCondition::wait( int long unsigned timeOutSeconds_,
-		int long unsigned timeOutNanoSeconds_ )
-	{
+		int long unsigned timeOutNanoSeconds_ ) {
 	M_PROLOG
 	int error = 0;
 	timespec timeOut;
@@ -517,59 +467,53 @@ HCondition::status_t HCondition::wait( int long unsigned timeOutSeconds_,
 	static int long const NANO_IN_WHOLE = meta::power<10, 9>::value;
 	timeOut.tv_sec += timeOutSeconds_;
 	timeOut.tv_nsec += timeOutNanoSeconds_;
-	if ( timeOut.tv_nsec >= NANO_IN_WHOLE )
-		{
+	if ( timeOut.tv_nsec >= NANO_IN_WHOLE ) {
 		++ timeOut.tv_sec;
 		timeOut.tv_nsec -= NANO_IN_WHOLE;
-		}
+	}
 	error = ::pthread_cond_timedwait( _buf.get<pthread_cond_t>(),
 				_mutex._buf.get<pthread_mutex_t>(), &timeOut );
 	M_ENSURE( ( error == 0 ) || ( error == EINTR ) || ( error == ETIMEDOUT ) );
 	return ( ( error == 0 ) ? OK : ( ( errno == EINTR ) ? INTERRUPT : TIMEOUT ) );
 	M_EPILOG
-	}
+}
 
-void HCondition::signal( void )
-	{
+void HCondition::signal( void ) {
 	M_PROLOG
 	::pthread_cond_signal( _buf.get<pthread_cond_t>() );
 	return;
 	M_EPILOG
-	}
+}
 
 HEvent::HEvent( void )
-	: _mutex(), _condition( _mutex )
-	{
+	: _mutex(), _condition( _mutex ) {
 	M_PROLOG
 	_mutex.lock();
 	return;
 	M_EPILOG
-	}
+}
 
-HEvent::~HEvent( void )
-	{
+HEvent::~HEvent( void ) {
 	M_PROLOG
 	_mutex.unlock();
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HEvent::wait( void )
-	{
+void HEvent::wait( void ) {
 	M_PROLOG
 	_condition.wait( 0x1fffffff, 0 ); /* FreeBSD strange limit. */
 	return;
 	M_EPILOG
-	}
+}
 
-void HEvent::signal( void )
-	{
+void HEvent::signal( void ) {
 	M_PROLOG
 	HLock l( _mutex );
 	_condition.signal();
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

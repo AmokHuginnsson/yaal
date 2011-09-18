@@ -35,11 +35,9 @@ Copyright:
 #include "hcore/hpointer.hxx"
 #include "hcore/hresource.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Implementation of abstration of any-method of any-class invocation.
  *
@@ -65,8 +63,7 @@ template<typename return_t>
 class HCallInterface<0, return_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type, trait::no_type> {
 public:
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( void )
@@ -79,14 +76,13 @@ protected:
 	virtual return_t do_invoke( void ) = 0;
 	virtual return_t do_invoke( void ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename return_t, typename a0_t>
 class HCallInterface<1, return_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type> : public unary_function<return_t, a0_t>
-	{
+	trait::no_type, trait::no_type> : public unary_function<return_t, a0_t> {
 public:
 	typedef unary_function<return_t, a0_t> base_type;
 	typedef typename base_type::result_type result_type;
@@ -114,15 +110,14 @@ protected:
 	virtual return_t do_invoke( a0_t ) = 0;
 	virtual return_t do_invoke( a0_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename return_t, typename a0_t, typename a1_t>
 class HCallInterface<2, return_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type>
-		: public binary_function<return_t, a0_t, a1_t>
-	{
+		: public binary_function<return_t, a0_t, a1_t> {
 public:
 	typedef binary_function<return_t, a0_t, a1_t> base_type;
 	typedef typename base_type::result_type result_type;
@@ -151,14 +146,13 @@ protected:
 	virtual return_t do_invoke( a0_t, a1_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t>
 class HCallInterface<3, return_t, a0_t, a1_t,
 	a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 public:
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2 )
@@ -171,14 +165,13 @@ protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t>
 class HCallInterface<4, return_t, a0_t, a1_t,
 	a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 public:
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
@@ -191,14 +184,13 @@ protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
 class HCallInterface<5, return_t, a0_t, a1_t,
 	a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 public:
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
@@ -211,14 +203,13 @@ protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t>
 class HCallInterface<6, return_t, a0_t, a1_t,
 	a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 public:
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
@@ -231,14 +222,13 @@ protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
 class HCallInterface<7, return_t, a0_t, a1_t,
 	a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 public:
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
@@ -251,14 +241,13 @@ protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t>
 class HCallInterface<8, return_t, a0_t, a1_t,
 	a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 public:
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
@@ -271,14 +260,13 @@ protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t>
 class HCallInterface<9, return_t, a0_t, a1_t,
 	a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 public:
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
@@ -291,15 +279,14 @@ protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t, typename a9_t>
 class HCallInterface<10, return_t, a0_t, a1_t,
 	a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, trait::no_type>
-	{
+	a9_t, trait::no_type> {
 public:
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
@@ -312,15 +299,14 @@ protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t, typename a9_t, typename a10_t>
 class HCallInterface<11, return_t, a0_t, a1_t,
 	a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 public:
 	virtual ~HCallInterface( void ) {}
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
@@ -333,7 +319,7 @@ protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) const = 0;
 	virtual void const* do_id( void ) const = 0;
-	};
+};
 
 template<typename CLASS_t, typename METHOD_t>
 void const* caller_id( HFunctor<CLASS_t, METHOD_t> const& functor_ )
@@ -366,11 +352,9 @@ template<typename METHOD_t,
 	typename fa4_t = trait::no_type, typename fa5_t = trait::no_type,
 	typename fa6_t = trait::no_type, typename fa7_t = trait::no_type,
 	typename fa8_t = trait::no_type, typename fa9_t = trait::no_type, typename fa10_t = trait::no_type>
-struct call_calculator
-	{
+struct call_calculator {
 	typedef call_calculator<METHOD_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> descriptor;
-	struct free_standing_args_count
-		{
+	struct free_standing_args_count {
 		static int const value =
 			+ meta::ternary<trait::is_kind_of<fa0_t, higher_order::placeholder_base>::value, 1, 0>::value
 			+ meta::ternary<trait::is_kind_of<fa1_t, higher_order::placeholder_base>::value, 1, 0>::value
@@ -383,7 +367,7 @@ struct call_calculator
 			+ meta::ternary<trait::is_kind_of<fa8_t, higher_order::placeholder_base>::value, 1, 0>::value
 			+ meta::ternary<trait::is_kind_of<fa9_t, higher_order::placeholder_base>::value, 1, 0>::value
 			+ meta::ternary<trait::is_kind_of<fa10_t, higher_order::placeholder_base>::value, 1, 0>::value;
-		};
+	};
 	template<typename ra0_t, typename ra1_t = trait::no_type,
 		typename ra2_t = trait::no_type, typename ra3_t = trait::no_type,
 		typename ra4_t = trait::no_type, typename ra5_t = trait::no_type,
@@ -396,8 +380,7 @@ struct call_calculator
 		typename f6_t = trait::no_type, typename f7_t = trait::no_type,
 		typename f8_t = trait::no_type, typename f9_t = trait::no_type,
 		typename f10_t = trait::no_type>
-	struct free_standing_args
-		{
+	struct free_standing_args {
 		/* f* are types deduced from call() arguments
 		 * ra* are true argument types of function/method
 		 */
@@ -434,9 +417,8 @@ struct call_calculator
 		typedef typename trait::select_index<trait::find_type<higher_order::placeholder<11>,
 			f0_t, f1_t, f2_t, f3_t, f4_t, f5_t, f6_t, f7_t, f8_t, f9_t, f10_t>::value,
 			ra0_t, ra1_t, ra2_t, ra3_t, ra4_t, ra5_t, ra6_t, ra7_t, ra8_t, ra9_t, ra10_t>::type a10_t;
-		};
-	struct functor
-		{
+	};
+	struct functor {
 		typedef HFunctor<fa0_t, METHOD_t> functor_t;
 		typedef HCall<free_standing_args_count::value, descriptor, typename trait::return_type<METHOD_t>::type,
 						functor_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> type;
@@ -480,9 +462,8 @@ struct call_calculator
 			{ return type( functor_t( fa0, m ), fa1 ); }
 		inline static type make( METHOD_t m, fa0_t fa0 )
 			{ return type( functor_t( fa0, m ) ); }
-		};
-	struct functor_this
-		{
+	};
+	struct functor_this {
 		typedef HFunctor<fa0_t, METHOD_t> functor_t;
 		typedef HCall<free_standing_args_count::value, descriptor, typename trait::return_type<METHOD_t>::type,
 						functor_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> type;
@@ -528,9 +509,8 @@ struct call_calculator
 			{ return type( functor_t( fa0, m ), fa0, fa1 ); }
 		inline static type make( METHOD_t m, fa0_t fa0 )
 			{ return type( functor_t( fa0, m ), fa0 ); }
-		};
-	struct function
-		{
+	};
+	struct function {
 		typedef HCall<free_standing_args_count::value, descriptor, typename trait::return_type<METHOD_t>::type,
 						METHOD_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
 		typedef free_standing_args<
@@ -573,21 +553,19 @@ struct call_calculator
 			{ return type( m, fa0 ); }
 		inline static type make( METHOD_t m )
 			{ return type( m ); }
-		};
-	struct field
-		{
+	};
+	struct field {
 		typedef HCall<-2, descriptor, typename trait::field_type<METHOD_t>::type,
 						fa0_t, METHOD_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
 		inline static type make( METHOD_t m, fa0_t a0 )
 			{ return ( type( m, a0 ) ); }
-		};
-	struct field_this
-		{
+	};
+	struct field_this {
 		typedef HCall<-1, descriptor, typename trait::field_type<METHOD_t>::type,
 						fa0_t, METHOD_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
 		inline static type make( METHOD_t m, fa0_t )
 			{ return ( type( m ) ); }
-		};
+	};
 	typedef typename trait::ternary<trait::is_member<METHOD_t>::value, /* we have method */
 					typename trait::ternary<meta::greater<trait::find_type<fa0_t, /* is 'this' a free standing arg? */
 					higher_order::placeholder<1>,
@@ -604,7 +582,7 @@ struct call_calculator
 						typename trait::ternary<trait::is_field<METHOD_t>::value,
 							typename trait::ternary<trait::same_type<fa0_t, higher_order::placeholder<1> >::value,
 								field_this, field>::type, function>::type>::type type;
-	};
+};
 
 /*! \brief Base class for HCall<1..10>.
  */
@@ -612,8 +590,7 @@ template<int free_args, typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
 	typename a4_t, typename a5_t, typename a6_t, typename a7_t,
 	typename a8_t, typename a9_t, typename a10_t>
-class HCallBase : public descriptor::type::interface_type
-	{
+class HCallBase : public descriptor::type::interface_type {
 protected:
 	CALL_t _call;
 public:
@@ -621,30 +598,27 @@ public:
 protected:
 	virtual void const* do_id( void ) const
 		{ return ( caller_id( _call ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename class_t, typename field_t>
 class HCall<-2, descriptor, return_t, class_t, field_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	field_t _field;
 	class_t _object;
 public:
 	HCall(  field_t field_, class_t object_ ) : _field( field_ ), _object( object_ ) {}
-	return_t const& operator()( void ) const
-		{
+	return_t const& operator()( void ) const {
 		return ( _object->*_field );
-		}
-	};
+	}
+};
 
 template<typename descriptor, typename return_t, typename class_t, typename field_t>
 class HCall<-1, descriptor, return_t, class_t, field_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type> : public unary_function<return_t, typename trait::class_type<field_t>::type>
-	{
+	trait::no_type, trait::no_type> : public unary_function<return_t, typename trait::class_type<field_t>::type> {
 public:
 	typedef unary_function<return_t, typename trait::class_type<field_t>::type> base_type;
 	typedef typename base_type::result_type result_type;
@@ -653,15 +627,13 @@ private:
 	field_t _field;
 public:
 	HCall( field_t field_ ) : _field( field_ ) {}
-	return_t const& operator()( argument_type const& obj_ ) const
-		{
+	return_t const& operator()( argument_type const& obj_ ) const {
 		return ( obj_.*_field );
-		}
-	return_t& operator()( argument_type& obj_ )
-		{
+	}
+	return_t& operator()( argument_type& obj_ ) {
 		return ( obj_.*_field );
-		}
-	};
+	}
+};
 
 /*! \cond */
 
@@ -673,8 +645,7 @@ class HCall<0, descriptor, return_t, CALL_t,
 		: public HCallBase<0, descriptor, return_t, CALL_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type, trait::no_type> {
 	typedef HCallBase<0, descriptor, return_t, CALL_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -686,7 +657,7 @@ public:
 		{ return ( (base_t::_call)() ); }
 	virtual return_t do_invoke( void ) const
 		{ return ( (base_t::_call)() ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t, typename a0_t>
 class HCall<0, descriptor, return_t, CALL_t, a0_t,
@@ -696,8 +667,7 @@ class HCall<0, descriptor, return_t, CALL_t, a0_t,
 		: public HCallBase<0, descriptor, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<0, descriptor, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -710,7 +680,7 @@ public:
 		{ return ( (base_t::_call)( _a0 ) ); }
 	virtual return_t do_invoke( void ) const
 		{ return ( (base_t::_call)( _a0 ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
 class HCall<0, descriptor, return_t, CALL_t, a0_t, a1_t,
@@ -718,8 +688,7 @@ class HCall<0, descriptor, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 		: public HCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
 	typedef HCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> base_t;
@@ -732,7 +701,7 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1 ) ); }
 	virtual return_t do_invoke( void ) const
 		{ return ( (base_t::_call)( _a0, _a1 ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
@@ -741,8 +710,7 @@ class HCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 		: public HCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
 	typedef HCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type> base_t;
@@ -756,7 +724,7 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2 ) ); }
 	virtual return_t do_invoke( void ) const
 		{ return ( (base_t::_call)( _a0, _a1, _a2 ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
@@ -765,8 +733,7 @@ class HCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type>
 		: public HCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type, trait::no_type> {
 	typedef HCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type> base_t;
@@ -781,7 +748,7 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3 ) ); }
 	virtual return_t do_invoke( void ) const
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3 ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -791,8 +758,7 @@ class HCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type>
 		: public HCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type> base_t;
@@ -808,7 +774,7 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4 ) ); }
 	virtual return_t do_invoke( void ) const
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4 ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -816,8 +782,7 @@ template<typename descriptor, typename return_t, typename CALL_t,
 class HCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
 		: public HCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
-	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
 	typedef HCallBase<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> base_t;
 	a0_t _a0;
@@ -833,7 +798,7 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
 	virtual return_t do_invoke( void ) const
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -843,8 +808,7 @@ class HCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, trait::no_type,
-	trait::no_type, trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type, trait::no_type> {
 	typedef HCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, trait::no_type,
@@ -864,7 +828,7 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
 	virtual return_t do_invoke( void ) const
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -874,8 +838,7 @@ class HCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
-	trait::no_type, trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type, trait::no_type> {
 	typedef HCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
@@ -896,7 +859,7 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
 	virtual return_t do_invoke( void ) const
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -907,8 +870,7 @@ class HCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
-	a8_t, trait::no_type, trait::no_type>
-	{
+	a8_t, trait::no_type, trait::no_type> {
 	typedef HCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
@@ -929,7 +891,7 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
 	virtual return_t do_invoke( void ) const
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -939,8 +901,7 @@ class HCall<0, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
-	a8_t, a9_t, trait::no_type>
-	{
+	a8_t, a9_t, trait::no_type> {
 	typedef HCallBase<0, descriptor, return_t, CALL_t,
 	a0_t, a1_t, a2_t, a3_t,
 	a4_t, a5_t, a6_t, a7_t,
@@ -962,7 +923,7 @@ public:
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
 	virtual return_t do_invoke( void ) const
 		{ return ( (base_t::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t, typename a0_t>
 class HCall<1, descriptor, return_t, CALL_t, a0_t,
@@ -972,8 +933,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t,
 		: public HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -985,7 +945,7 @@ public:
 		: base_t( call_ ), _a0( a0 ) {}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_t::_call)( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_t::_call)( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
 class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t,
@@ -994,8 +954,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t,
 		: public HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -1012,7 +971,7 @@ public:
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_t::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
@@ -1022,8 +981,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 		: public HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -1043,7 +1001,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
@@ -1053,8 +1011,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 		: public HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -1077,7 +1034,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
 				free_standing_call_args::resolve_arg<1, a3_t, fa0_t>::get( _a3, a0 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1088,8 +1045,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 		: public HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -1115,7 +1071,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
 				free_standing_call_args::resolve_arg<1, a3_t, fa0_t>::get( _a3, a0 ),
 				free_standing_call_args::resolve_arg<1, a4_t, fa0_t>::get( _a4, a0 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1125,8 +1081,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
@@ -1155,7 +1110,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a3_t, fa0_t>::get( _a3, a0 ),
 				free_standing_call_args::resolve_arg<1, a4_t, fa0_t>::get( _a4, a0 ),
 				free_standing_call_args::resolve_arg<1, a5_t, fa0_t>::get( _a5, a0 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1165,8 +1120,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
@@ -1199,7 +1153,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a4_t, fa0_t>::get( _a4, a0 ),
 				free_standing_call_args::resolve_arg<1, a5_t, fa0_t>::get( _a5, a0 ),
 				free_standing_call_args::resolve_arg<1, a6_t, fa0_t>::get( _a6, a0 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1209,8 +1163,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
@@ -1246,7 +1199,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a5_t, fa0_t>::get( _a5, a0 ),
 				free_standing_call_args::resolve_arg<1, a6_t, fa0_t>::get( _a6, a0 ),
 				free_standing_call_args::resolve_arg<1, a7_t, fa0_t>::get( _a7, a0 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1257,8 +1210,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -1296,7 +1248,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a6_t, fa0_t>::get( _a6, a0 ),
 				free_standing_call_args::resolve_arg<1, a7_t, fa0_t>::get( _a7, a0 ),
 				free_standing_call_args::resolve_arg<1, a8_t, fa0_t>::get( _a8, a0 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1306,8 +1258,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, trait::no_type>
-	{
+	a9_t, trait::no_type> {
 	typedef HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -1348,7 +1299,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a7_t, fa0_t>::get( _a7, a0 ),
 				free_standing_call_args::resolve_arg<1, a8_t, fa0_t>::get( _a8, a0 ),
 				free_standing_call_args::resolve_arg<1, a9_t, fa0_t>::get( _a9, a0 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1358,8 +1309,7 @@ class HCall<1, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 	typedef HCallBase<1, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -1403,7 +1353,7 @@ public:
 				free_standing_call_args::resolve_arg<1, a8_t, fa0_t>::get( _a8, a0 ),
 				free_standing_call_args::resolve_arg<1, a9_t, fa0_t>::get( _a9, a0 ),
 				free_standing_call_args::resolve_arg<1, a10_t, fa0_t>::get( _a10, a0 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
 class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t,
@@ -1412,8 +1362,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t,
 		: public HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, trait::no_type, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -1431,7 +1380,7 @@ public:
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_t::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
@@ -1441,8 +1390,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 		: public HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -1463,7 +1411,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
@@ -1473,8 +1421,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 		: public HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -1498,7 +1445,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1509,8 +1456,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 		: public HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -1537,7 +1483,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1547,8 +1493,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
@@ -1578,7 +1523,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1588,8 +1533,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
@@ -1623,7 +1567,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1633,8 +1577,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
@@ -1671,7 +1614,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1682,8 +1625,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -1722,7 +1664,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1732,8 +1674,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, trait::no_type>
-	{
+	a9_t, trait::no_type> {
 	typedef HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -1775,7 +1716,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a9_t, fa0_t, fa1_t>::get( _a9, a0, a1 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1785,8 +1726,7 @@ class HCall<2, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 	typedef HCallBase<2, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -1831,7 +1771,7 @@ public:
 				free_standing_call_args::resolve_arg<2, a8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a9_t, fa0_t, fa1_t>::get( _a9, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a10_t, fa0_t, fa1_t>::get( _a10, a0, a1 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t>
@@ -1841,8 +1781,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t,
 		: public HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, trait::no_type, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -1864,7 +1803,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
@@ -1874,8 +1813,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 		: public HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -1900,7 +1838,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1911,8 +1849,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 		: public HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -1940,7 +1877,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1950,8 +1887,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
@@ -1982,7 +1918,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -1992,8 +1928,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
@@ -2028,7 +1963,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2038,8 +1973,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
@@ -2077,7 +2011,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2088,8 +2022,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -2129,7 +2062,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2139,8 +2072,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, trait::no_type>
-	{
+	a9_t, trait::no_type> {
 	typedef HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -2183,7 +2115,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a9_t, fa0_t, fa1_t, fa2_t>::get( _a9, a0, a1, a2 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2193,8 +2125,7 @@ class HCall<3, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 	typedef HCallBase<3, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -2240,7 +2171,7 @@ public:
 				free_standing_call_args::resolve_arg<3, a8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a9_t, fa0_t, fa1_t, fa2_t>::get( _a9, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a10_t, fa0_t, fa1_t, fa2_t>::get( _a10, a0, a1, a2 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t>
@@ -2250,8 +2181,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t,
 		: public HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, trait::no_type,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -2277,7 +2207,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2288,8 +2218,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 		: public HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -2318,7 +2247,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2328,8 +2257,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
@@ -2361,7 +2289,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2371,8 +2299,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
@@ -2408,7 +2335,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2418,8 +2345,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
@@ -2458,7 +2384,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2469,8 +2395,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -2511,7 +2436,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2521,8 +2446,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, trait::no_type>
-	{
+	a9_t, trait::no_type> {
 	typedef HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -2566,7 +2490,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a9_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a9, a0, a1, a2, a3 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2576,8 +2500,7 @@ class HCall<4, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 	typedef HCallBase<4, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -2624,7 +2547,7 @@ public:
 				free_standing_call_args::resolve_arg<4, a8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a9_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a9, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a10_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a10, a0, a1, a2, a3 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2635,8 +2558,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t,
 		: public HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	trait::no_type, trait::no_type, trait::no_type, trait::no_type,
@@ -2666,7 +2588,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2676,8 +2598,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
@@ -2710,7 +2631,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2720,8 +2641,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
@@ -2758,7 +2678,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2768,8 +2688,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
@@ -2809,7 +2728,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2820,8 +2739,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -2863,7 +2781,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2873,8 +2791,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, trait::no_type>
-	{
+	a9_t, trait::no_type> {
 	typedef HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -2919,7 +2836,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a9, a0, a1, a2, a3, a4 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2929,8 +2846,7 @@ class HCall<5, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 	typedef HCallBase<5, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -2978,7 +2894,7 @@ public:
 				free_standing_call_args::resolve_arg<5, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a9, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a10, a0, a1, a2, a3, a4 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -2988,8 +2904,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, trait::no_type, trait::no_type, trait::no_type,
@@ -3023,7 +2938,7 @@ public:
 				free_standing_call_args::resolve_arg<6, a3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3033,8 +2948,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
@@ -3072,7 +2986,7 @@ public:
 				free_standing_call_args::resolve_arg<6, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3082,8 +2996,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
@@ -3124,7 +3037,7 @@ public:
 				free_standing_call_args::resolve_arg<6, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3135,8 +3048,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3179,7 +3091,7 @@ public:
 				free_standing_call_args::resolve_arg<6, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3189,8 +3101,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, trait::no_type>
-	{
+	a9_t, trait::no_type> {
 	typedef HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3236,7 +3147,7 @@ public:
 				free_standing_call_args::resolve_arg<6, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a9, a0, a1, a2, a3, a4, a5 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3246,8 +3157,7 @@ class HCall<6, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 	typedef HCallBase<6, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3296,7 +3206,7 @@ public:
 				free_standing_call_args::resolve_arg<6, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a9, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a10, a0, a1, a2, a3, a4, a5 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3306,8 +3216,7 @@ class HCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, trait::no_type, trait::no_type,
@@ -3346,7 +3255,7 @@ public:
 				free_standing_call_args::resolve_arg<7, a4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3356,8 +3265,7 @@ class HCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
@@ -3399,7 +3307,7 @@ public:
 				free_standing_call_args::resolve_arg<7, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3410,8 +3318,7 @@ class HCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3455,7 +3362,7 @@ public:
 				free_standing_call_args::resolve_arg<7, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3465,8 +3372,7 @@ class HCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, trait::no_type>
-	{
+	a9_t, trait::no_type> {
 	typedef HCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3513,7 +3419,7 @@ public:
 				free_standing_call_args::resolve_arg<7, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3523,8 +3429,7 @@ class HCall<7, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 	typedef HCallBase<7, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3574,7 +3479,7 @@ public:
 				free_standing_call_args::resolve_arg<7, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3584,8 +3489,7 @@ class HCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, trait::no_type,
@@ -3628,7 +3532,7 @@ public:
 				free_standing_call_args::resolve_arg<8, a5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3639,8 +3543,7 @@ class HCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3685,7 +3588,7 @@ public:
 				free_standing_call_args::resolve_arg<8, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3695,8 +3598,7 @@ class HCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, trait::no_type>
-	{
+	a9_t, trait::no_type> {
 	typedef HCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3744,7 +3646,7 @@ public:
 				free_standing_call_args::resolve_arg<8, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3754,8 +3656,7 @@ class HCall<8, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 	typedef HCallBase<8, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3806,7 +3707,7 @@ public:
 				free_standing_call_args::resolve_arg<8, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3817,8 +3718,7 @@ class HCall<9, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	trait::no_type, trait::no_type>
-	{
+	trait::no_type, trait::no_type> {
 	typedef HCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3864,7 +3764,7 @@ public:
 				free_standing_call_args::resolve_arg<9, a6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3874,8 +3774,7 @@ class HCall<9, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, trait::no_type>
-	{
+	a9_t, trait::no_type> {
 	typedef HCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3924,7 +3823,7 @@ public:
 				free_standing_call_args::resolve_arg<9, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3934,8 +3833,7 @@ class HCall<9, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t,
 		: public HCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 	typedef HCallBase<9, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -3987,7 +3885,7 @@ public:
 				free_standing_call_args::resolve_arg<9, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -3997,8 +3895,7 @@ class HCall<10, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t
 		: public HCallBase<10, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, trait::no_type>
-	{
+	a9_t, trait::no_type> {
 	typedef HCallBase<10, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -4048,7 +3945,7 @@ public:
 				free_standing_call_args::resolve_arg<10, a7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -4058,8 +3955,7 @@ class HCall<10, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t
 		: public HCallBase<10, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 	typedef HCallBase<10, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -4112,7 +4008,7 @@ public:
 				free_standing_call_args::resolve_arg<10, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
-	};
+};
 
 template<typename descriptor, typename return_t, typename CALL_t,
 	typename a0_t, typename a1_t, typename a2_t, typename a3_t,
@@ -4122,8 +4018,7 @@ class HCall<11, descriptor, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t
 		: public HCallBase<11, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
-	a9_t, a10_t>
-	{
+	a9_t, a10_t> {
 	typedef HCallBase<11, descriptor, return_t, CALL_t, a0_t,
 	a1_t, a2_t, a3_t, a4_t,
 	a5_t, a6_t, a7_t, a8_t,
@@ -4177,7 +4072,7 @@ public:
 				free_standing_call_args::resolve_arg<11, a8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
 				free_standing_call_args::resolve_arg<11, a9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
 				free_standing_call_args::resolve_arg<11, a10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ) ); }
-	};
+};
 
 /*! \endcond */
 

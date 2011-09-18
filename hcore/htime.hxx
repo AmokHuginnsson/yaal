@@ -32,18 +32,15 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hchunk.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 extern M_YAAL_HCORE_PUBLIC_API char const* const _defaultTimeFormat_;
 
 /*! \brief Date and time handling class.
  */
-class HTime
-	{
+class HTime {
 	typedef HTime this_type;
 	HString	_format;
 	mutable HChunk _cache;
@@ -82,7 +79,7 @@ public:
 	bool operator > ( time_t const& ) const;
 	HString string( void ) const;
 	time_t raw( void ) const;
-	};
+};
 
 typedef HExceptionT<HTime> HTimeException;
 

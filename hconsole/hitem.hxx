@@ -30,17 +30,14 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hinfo.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief Basic data unit stored in HListControl and HTreeControl.
  */
 template <typename tType = yaal::hcore::HInfo>
-class HItem_t : public hcore::HArray<tType>
-	{
+class HItem_t : public hcore::HArray<tType> {
 public:
 	int long	m_lId;
 	bool	m_bChecked;
@@ -48,41 +45,36 @@ public:
 	virtual ~HItem_t ( void );
 	HItem_t ( HItem_t const &, int );
 	HItem_t & operator = ( HItem_t const & );
-	};
+};
 
 template <typename tType>
 HItem_t<tType>::HItem_t ( int size_ ) : hcore::HArray<tType> ( size_ ),
-															 m_lId ( 0 ), m_bChecked ( false )
-	{
+															 m_lId ( 0 ), m_bChecked ( false ) {
 	return;
-	}
+}
 
 template <typename tType>
-HItem_t<tType>::~HItem_t ( void )
-	{
+HItem_t<tType>::~HItem_t ( void ) {
 	return;
-	}
+}
 
 template <typename tType>
 HItem_t<tType>::HItem_t ( HItem_t const & item_, int ) : hcore::HArray<tType> ( item_ ),
-	m_lId ( item_.m_lId ), m_bChecked ( item_.m_bChecked )
-	{
+	m_lId ( item_.m_lId ), m_bChecked ( item_.m_bChecked ) {
 	return;
-	}
+}
 
 template <typename tType>
-HItem_t<tType> & HItem_t<tType>::operator = ( HItem_t<tType> const & item_ )
-	{
+HItem_t<tType> & HItem_t<tType>::operator = ( HItem_t<tType> const & item_ ) {
 	M_PROLOG
-	if ( this != & item_ )
-		{
+	if ( this != & item_ ) {
 		(*this).hcore::HArray<tType>::operator = ( item_ );
 		m_lId = item_.m_lId;
 		m_bChecked = item_.m_bChecked;
-		}
+	}
 	return ( *this );
 	M_EPILOG
-	}
+}
 
 typedef HItem_t<> HItem;
 

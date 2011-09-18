@@ -45,24 +45,20 @@ Copyright:
 #include "hcore/reflection.hxx"
 #include "hcore/memory.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Handle program options from command-line and configuration (resource) file.
  */
-class HProgramOptionsHandler
-	{
+class HProgramOptionsHandler {
 /* cppcheck-suppress variableHidingTypedef */
 	typedef HProgramOptionsHandler this_type;
 public:
 	typedef bool ( *RC_CALLBACK_t )( HString&, HString& );
 	typedef void ( *param_callback_t )( void* );
 	typedef yaal::hcore::HPair<param_callback_t, void*> simple_callback_t; 
-	class HOptionValueInterface
-		{
+	class HOptionValueInterface {
 		typedef HOptionValueInterface this_type;
 	public:
 		typedef HPointer<HOptionValueInterface> ptr_t;
@@ -76,20 +72,17 @@ public:
 		virtual void do_set( HString const& ) = 0;
 		virtual type_id_t do_get_type( void ) const = 0;
 		virtual void const* do_get( void ) const = 0;
-		};
+	};
 	/*! \brief Basic program configuration item.
 	 */
-	struct OOption
-		{
-		struct TYPE
-			{
-			typedef enum
-				{
+	struct OOption {
+		struct TYPE {
+			typedef enum {
 				NONE,
 				OPTIONAL,
 				REQUIRED
-				} enum_t;
-			};
+			} enum_t;
+		};
 		char const* _name;
 		HOptionValueInterface::ptr_t _value;
 		int _shortForm;
@@ -106,7 +99,7 @@ public:
 		OOption( OOption const& );
 		OOption& operator = ( OOption const& );
 		void swap( OOption& );
-		};
+	};
 	template<typename tType>
 	class HOptionValue;
 	typedef HArray<OOption> options_t;
@@ -170,76 +163,68 @@ public:
 		{ return ( _options ); }
 private:
 	void set_option( OOption&, HString const& );
-	};
+};
 
 typedef HExceptionT<HProgramOptionsHandler> HProgramOptionsHandlerException;
 
 /*! \brief Helper functions for program options handling infrastructure.
  */
-namespace program_options_helper
-{
+namespace program_options_helper {
 
 template<typename tType>
-void set_option_value_from_string( HArray<tType>& object, HString const& value )
-	{
+void set_option_value_from_string( HArray<tType>& object, HString const& value ) {
 	M_PROLOG
 	object.push_back( lexical_cast<tType>( value ) );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-void set_option_value_from_string( HDeque<tType>& object, HString const& value )
-	{
+void set_option_value_from_string( HDeque<tType>& object, HString const& value ) {
 	M_PROLOG
 	object.push_back( lexical_cast<tType>( value ) );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-void set_option_value_from_string( HList<tType>& object, HString const& value )
-	{
+void set_option_value_from_string( HList<tType>& object, HString const& value ) {
 	M_PROLOG
 	object.push_back( lexical_cast<tType>( value ) );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-void set_option_value_from_string( HSet<tType>& object, HString const& value )
-	{
+void set_option_value_from_string( HSet<tType>& object, HString const& value ) {
 	M_PROLOG
 	object.insert( lexical_cast<tType>( value ) );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-void set_option_value_from_string( HHashSet<tType>& object, HString const& value )
-	{
+void set_option_value_from_string( HHashSet<tType>& object, HString const& value ) {
 	M_PROLOG
 	object.insert( lexical_cast<tType>( value ) );
 	return;
 	M_EPILOG
-	}
+}
 
 /*! \brief Set variable value based on string.
  */
 template<typename tType>
-void set_option_value_from_string( tType& object, HString const& value )
-	{
+void set_option_value_from_string( tType& object, HString const& value ) {
 	M_PROLOG
 	object = lexical_cast<tType>( value );
 	return;
 	M_EPILOG
-	}
+}
 
 }
 
 template<typename tType>
-class HProgramOptionsHandler::HOptionValue : public HProgramOptionsHandler::HOptionValueInterface, private trait::HNonCopyable
-	{
+class HProgramOptionsHandler::HOptionValue : public HProgramOptionsHandler::HOptionValueInterface, private trait::HNonCopyable {
 	tType& _instance;
 	typedef HProgramOptionsHandler::HOptionValue<tType> this_type;
 protected:
@@ -247,50 +232,43 @@ protected:
 public:
 	HOptionValue( tType& instance ) : _instance( instance ) {}
 protected:
-	virtual void do_set( HString const& value )
-		{
+	virtual void do_set( HString const& value ) {
 		M_PROLOG
 		using yaal::hcore::program_options_helper::set_option_value_from_string;
 		set_option_value_from_string( _instance, value );
 		return;
 		M_EPILOG
-		}
-	virtual type_id_t do_get_type( void ) const
-		{
+	}
+	virtual type_id_t do_get_type( void ) const {
 		return ( TYPE::symbolic<tType>::value );
-		}
-	virtual void const* do_get( void ) const
-		{
+	}
+	virtual void const* do_get( void ) const {
 		return ( &_instance );
-		}
-	};
+	}
+};
 
 template<typename tType>
-tType const& HProgramOptionsHandler::HOptionValueInterface::get( void ) const
-	{
+tType const& HProgramOptionsHandler::HOptionValueInterface::get( void ) const {
 	M_PROLOG
 	return ( *static_cast<tType const*>( do_get() ) );
 	M_EPILOG
-	}
+}
 
-namespace program_options_helper
-{
+namespace program_options_helper {
 
 /*! \brief Type safe option container.
  */
 template<typename tType>
-HProgramOptionsHandler::HOptionValueInterface::ptr_t option_value( tType& instance )
-	{
+HProgramOptionsHandler::HOptionValueInterface::ptr_t option_value( tType& instance ) {
 	HProgramOptionsHandler::HOptionValueInterface::ptr_t value( make_pointer<HProgramOptionsHandler::HOptionValue<tType> >( ref( instance ) ) );
 	return ( value );
-	}
+}
 
 static HProgramOptionsHandler::HOptionValueInterface::ptr_t no_value;
 
-inline yaal::hcore::HProgramOptionsHandler::simple_callback_t callback( yaal::hcore::HProgramOptionsHandler::param_callback_t func, void* param )
-	{
+inline yaal::hcore::HProgramOptionsHandler::simple_callback_t callback( yaal::hcore::HProgramOptionsHandler::param_callback_t func, void* param ) {
 	return ( HProgramOptionsHandler::simple_callback_t( func, param ) );
-	}
+}
 
 int reload_configuration( void );
 

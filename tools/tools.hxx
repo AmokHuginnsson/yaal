@@ -29,16 +29,14 @@ Copyright:
 
 #include "tools/hserial.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
 /*! \brief Addtional useful functions.
  * 
  * This namespace contains some very cool functions that
  * easies performing complex tasks.
  */
-namespace tools
-{
+namespace tools {
 	
 extern M_YAAL_TOOLS_PUBLIC_API yaal::hcore::HString _serialDevice_;
 extern M_YAAL_TOOLS_PUBLIC_API yaal::hcore::HString _defaultEncoding_;

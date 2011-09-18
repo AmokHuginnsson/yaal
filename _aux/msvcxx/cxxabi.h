@@ -1,8 +1,7 @@
 #ifndef YAAL_MSVCXX_CXXABI_H_INCLUDED
 #define YAAL_MSVCXX_CXXABI_H_INCLUDED
 
-namespace abi
-{
+namespace abi {
 
 char* __cxa_demangle( char const* const, int, int, int* );
 

@@ -35,16 +35,13 @@ Copyright:
 #include "hconsole/hwindow.hxx"
 #include "hconsole/hwindowlistcontrol.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief A backbone of TUI based application.
  */
-class HTUIProcess : public HHandler
-	{
+class HTUIProcess : public HHandler {
 protected:
 	typedef HTUIProcess this_type;
 	typedef HHandler base_type;
@@ -80,7 +77,7 @@ protected:
 private:
 	HTUIProcess( HTUIProcess const& );
 	HTUIProcess& operator = ( HTUIProcess const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HTUIProcess, HHandlerException> HTUIProcessException;
 

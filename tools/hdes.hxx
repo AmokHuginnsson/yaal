@@ -30,16 +30,13 @@ Copyright:
 #include "hcore/pod.hxx"
 #include "hcore/hstring.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief DES algorithm constants.
  */
-struct DES
-	{
+struct DES {
 	static int const BITS_IN_BYTE  = yaal::meta::power<2,3>::value;
 	static int const SIDES_COUNT   = 2;
 	static int const IKEY_SIZE     = 6;
@@ -47,21 +44,19 @@ struct DES
 	static int const IKEYS_COUNT   = 16;
 	static int const PASSWORD_SIZE = 16;
 	static int const HALF_KEY_SIZE = 28;
-	};
+};
 
 /*! \brief Cryptography interface.
  * 
  * Small class incorporates simple cryptography functionality.
  */
-class HDes
-	{
+class HDes {
 public:
 	typedef HDes this_type;
-	typedef enum
-		{
+	typedef enum {
 		CRYPT = 0,
 		DECRYPT = 1
-		} action_t;
+	} action_t;
 private:
 	u8_t _IKeys[ DES::SIDES_COUNT ][ DES::IKEYS_COUNT ][ DES::IKEY_SIZE ];
 public:
@@ -74,7 +69,7 @@ private:
 	void _des( u8_t* /* block */, int /* action */, int /* part */ );
 	void _3des( u8_t* /* block */, int /* action */ );
 	void permutate( u8_t* /* buffer */, const u8_t* /* tab */, int /* len */ ) const;
-	};
+};
 
 }
 

@@ -33,45 +33,39 @@ Copyright:
 #include "hconsole/heditcontrol.hxx"
 #include "hcore/hpointer.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief Implementation of TUI Statusbar control class.
  *
  * Statusbar control provides display of progress bars, allows
  * invocation of commands and specyfing search patterns.
  */
-class HStatusBarControl : public HEditControl
-	{
+class HStatusBarControl : public HEditControl {
 public:
 	typedef HStatusBarControl this_type;
 	typedef HEditControl base_type;
 	typedef yaal::hcore::HPointer<HStatusBarControl> ptr_t;
 	/*! \brief HStatusBarControl prompt configuration.
 	 */
-	struct PROMPT
-		{
+	struct PROMPT {
 		/*! \brief HStatusBarControl prompt context.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			NORMAL,
 			COMMAND,
 			SEARCH,
 			MENU
-			} mode_t;
+		} mode_t;
 		/*! \brief HStatusBarControl prompt type.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			RELAXED,
 			ONLY_ENTER_CAN_QUIT,
 			MUST_CANCEL
-			} restrict_t;
-		};
+		} restrict_t;
+	};
 protected:
 	int			_statusBarAttribute;
 	int			_promptLength;
@@ -112,7 +106,7 @@ protected:
 	virtual bool do_hit_test( int, int ) const;
 	virtual int verify( void );
 	virtual int do_process_input( int );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HStatusBarControl, HEditControlException> HStatusBarControlException; 
 

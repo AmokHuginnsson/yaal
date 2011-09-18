@@ -30,23 +30,20 @@ Copyright:
 #include "hcore/htime.hxx"
 #include "hconsole/hwindow.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief Implementation of TUI Time control class.
  *
  * Time control allows setting and/or getting dates and time.
  */
-class HTimeControl : public hcore::HTime, public HControl
-	{
+class HTimeControl : public hcore::HTime, public HControl {
 public:
 	typedef HTimeControl this_type;
 	HTimeControl( HWindow*, int, int, int, int, char const* );
 	virtual ~HTimeControl( void );
-	};
+};
 
 }
 

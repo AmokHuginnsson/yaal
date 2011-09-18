@@ -29,109 +29,96 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hinfo.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 HInfo::HInfo( void )
-	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
-	{
+	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
 HInfo::HInfo( int int_ )
-	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
-	{
+	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( ) {
 	M_PROLOG
 	_type = TYPE::INT;
 	_int = int_;
 	return;
 	M_EPILOG
-	}
+}
 
 HInfo::HInfo( int long longInt_ )
-	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
-	{
+	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( ) {
 	M_PROLOG
 	_type = TYPE::INT_LONG;
 	_intLong = longInt_;
 	return;
 	M_EPILOG
-	}
+}
 
 HInfo::HInfo ( double double_ )
-	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
-	{
+	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( ) {
 	M_PROLOG
 	_type = TYPE::DOUBLE;
 	_double = double_;
 	return;
 	M_EPILOG
-	}
+}
 
 HInfo::HInfo( void* const pointer_ )
-	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
-	{
+	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( ) {
 	M_PROLOG
 	_type = TYPE::VOID_PTR;
 	_pointer = pointer_;
 	return;
 	M_EPILOG
-	}
+}
 
 HInfo::HInfo( char const* const buffer_ )
-	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
-	{
+	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( ) {
 	M_PROLOG
 	_type = TYPE::HSTRING;
 	_string = buffer_;
 	return;
 	M_EPILOG
-	}
+}
 
 HInfo::HInfo( HString const& string_ )
-	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
-	{
+	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( ) {
 	M_PROLOG
 	_type = TYPE::HSTRING;
 	_string = string_;
 	return;
 	M_EPILOG
-	}
+}
 
 HInfo::HInfo( HTime const& time_ )
-	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
-	{
+	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( ) {
 	M_PROLOG
 	_type = TYPE::HTIME;
 	_time = time_;
 	return;
 	M_EPILOG
-	}
+}
 
 HInfo::HInfo( HInfo const& info_ )
-	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( )
-	{
+	: _type( TYPE::VOID ), _int( 0 ), _intLong( 0 ), _double( 0 ), _pointer( NULL ), _string( "" ), _time( ) {
 	M_PROLOG
 	( * this ) = info_;
 	return;
 	M_EPILOG
-	}
+}
 
-HInfo::~HInfo( void )
-	{
+HInfo::~HInfo( void ) {
 	M_PROLOG
 	purge();
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HInfo::purge( void )
-	{
+void HInfo::purge( void ) {
 	M_PROLOG
 	_type = TYPE::VOID;
 	_int = 0;
@@ -142,20 +129,17 @@ void HInfo::purge( void )
 	_pointer = NULL;
 	return;
 	M_EPILOG
-	}
+}
 
-char HInfo::operator [] ( int const index_ )
-	{
+char HInfo::operator [] ( int const index_ ) {
 	M_PROLOG
 	return ( _string[ index_ ] );
 	M_EPILOG
-	}
+}
 
-HInfo& HInfo::operator = ( HInfo const& info_ )
-	{
+HInfo& HInfo::operator = ( HInfo const& info_ ) {
 	M_PROLOG
-	if ( this != & info_ )
-		{
+	if ( this != & info_ ) {
 		_type = info_._type;
 		_int = info_._int;
 		_intLong = info_._intLong;
@@ -163,13 +147,12 @@ HInfo& HInfo::operator = ( HInfo const& info_ )
 		_string = info_._string;
 		_time = info_._time;
 		_pointer = info_._pointer;
-		}
+	}
 	return ( * this );
 	M_EPILOG
-	}
+}
 
-HInfo& HInfo::operator () ( HInfo const& info_ )
-	{
+HInfo& HInfo::operator () ( HInfo const& info_ ) {
 	M_PROLOG
 	if ( !!( info_._type & TYPE::INT ) )
 		_int = info_._int;
@@ -186,71 +169,63 @@ HInfo& HInfo::operator () ( HInfo const& info_ )
 	_type |= info_._type;
 	return ( * this );
 	M_EPILOG
-	}
+}
 
 template<>
-int HInfo::get<int>( void ) const
-	{
+int HInfo::get<int>( void ) const {
 	M_PROLOG
 	return ( _int );
 	M_EPILOG
-	}
+}
 
 template<>
-int long HInfo::get<int long>( void ) const
-	{
+int long HInfo::get<int long>( void ) const {
 	M_PROLOG
 	return ( _intLong );
 	M_EPILOG
-	}
+}
 
 template<>
-double HInfo::get<double>( void ) const
-	{
+double HInfo::get<double>( void ) const {
 	M_PROLOG
 	return ( _double );
 	M_EPILOG
-	}
+}
 
 template<>
-char const* HInfo::get<char const*>( void ) const
-	{
+char const* HInfo::get<char const*>( void ) const {
 	M_PROLOG
 	return ( _string.raw() );
 	M_EPILOG
-	}
+}
 
 template<>
-HString const& HInfo::get<HString const&>( void ) const
-	{
+HString const& HInfo::get<HString const&>( void ) const {
 	M_PROLOG
 	return ( _string );
 	M_EPILOG
-	}
+}
 
 template<>
-HTime const& HInfo::get<HTime const&>( void ) const
-	{
+HTime const& HInfo::get<HTime const&>( void ) const {
 	M_PROLOG
 	return ( _time );
 	M_EPILOG
-	}
+}
 
 template<>
-void* HInfo::get<void*>( void ) const
-	{
+void* HInfo::get<void*>( void ) const {
 	M_PROLOG
 	void* tmp = _pointer;
 	return ( tmp );
 	M_EPILOG
-	}
+}
 
-bool HInfo::operator ! ( void ) const
-	{
+bool HInfo::operator ! ( void ) const {
 	M_PROLOG
 	return ( ! ( _intLong || _double || ! _string.empty() ) );
 	M_EPILOG
-	}
+}
 
 }
 

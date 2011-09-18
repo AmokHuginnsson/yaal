@@ -39,20 +39,16 @@ M_VCSID( "$Id: "__TID__" $" )
 using namespace std;
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
-namespace hash
-{
+namespace hash {
 
 void change_endianess( u32_t*, int long );
 void update_md5_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
-yaal::hcore::HString md5( HStreamInterface& stream )
-	{
+yaal::hcore::HString md5( HStreamInterface& stream ) {
 	M_PROLOG
 	static int const BLOCK_SIZE = 512;
 	static int const MESSAGE_LENGTH_SIZE = 64;
@@ -67,60 +63,52 @@ yaal::hcore::HString md5( HStreamInterface& stream )
 	u32_t total = 0;
 	u32_t totalH = 0;
 	u32_t state[ STATE_SIZE ] = { STATE0, STATE1, STATE2, STATE3 };
-	do
-		{
+	do {
 		HStreamBlockIterator::HBlock block = *source;
 		++ source;
 		last = static_cast<int>( block.octets() << 3 );
 		if ( ( total + last ) < total )
 			++ totalH;
 		total += last;
-		if ( last < BLOCK_SIZE )
-			{
+		if ( last < BLOCK_SIZE ) {
 			u32_t* x = static_cast<u32_t*>( block.data() );
 			HBitmap bmp;
 			bmp.use( block.data(), BLOCK_SIZE );
 			bmp.fill( last, BLOCK_SIZE - last, false );
 			bmp.set( last, true );
-			if ( last >= ( ( BLOCK_SIZE - MESSAGE_LENGTH_SIZE ) - SUPPLEMENT_SIZE ) )
-				{
+			if ( last >= ( ( BLOCK_SIZE - MESSAGE_LENGTH_SIZE ) - SUPPLEMENT_SIZE ) ) {
 				update_md5_state( state, block );
 				yaal::fill( x, x + ( BLOCK_SIZE >> 5 ), 0 );
-				}
+			}
 			x[ 14 ] = total;
 			x[ 15 ] = totalH;
 			update_md5_state( state, block );
-			}
-		else
+		} else
 			update_md5_state( state, block );
-		}
-	while ( last == BLOCK_SIZE );
+	} while ( last == BLOCK_SIZE );
 	HString result;
 	change_endianess( state, STATE_SIZE );
 	result.format( "%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ] );
 	return ( result );
 	M_EPILOG
-	}
+}
 
-yaal::hcore::HString md5( HStreamInterface::ptr_t stream )
-	{
+yaal::hcore::HString md5( HStreamInterface::ptr_t stream ) {
 	M_PROLOG
 	return ( md5( *stream ) );
 	M_EPILOG
-	}
+}
 
-yaal::hcore::HString md5( HString const& string )
-	{
+yaal::hcore::HString md5( HString const& string ) {
 	M_PROLOG
 	HStringStream ss( string );
 	return ( md5( ss ) );
 	M_EPILOG
-	}
+}
 
 void update_sha1_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
-yaal::hcore::HString sha1( HStreamInterface& stream )
-	{
+yaal::hcore::HString sha1( HStreamInterface& stream ) {
 	M_PROLOG
 	static int const BLOCK_SIZE = 512;
 	static int const MESSAGE_LENGTH_SIZE = 64;
@@ -136,58 +124,50 @@ yaal::hcore::HString sha1( HStreamInterface& stream )
 	u32_t total = 0;
 	u32_t totalH = 0;
 	u32_t state[ STATE_SIZE ] = { STATE0, STATE1, STATE2, STATE3, STATE4 };
-	do
-		{
+	do {
 		HStreamBlockIterator::HBlock block = *source;
 		++ source;
 		last = static_cast<int>( block.octets() << 3 );
 		if ( ( total + last ) < total )
 			++ totalH;
 		total += last;
-		if ( last < BLOCK_SIZE )
-			{
+		if ( last < BLOCK_SIZE ) {
 			u32_t* x = static_cast<u32_t*>( block.data() );
 			HBitmap bmp;
 			bmp.use( block.data(),BLOCK_SIZE );
 			bmp.fill( last, BLOCK_SIZE - last, false );
 			bmp.set( last, true );
-			if ( last >= ( ( BLOCK_SIZE - MESSAGE_LENGTH_SIZE ) - SUPPLEMENT_SIZE ) )
-				{
+			if ( last >= ( ( BLOCK_SIZE - MESSAGE_LENGTH_SIZE ) - SUPPLEMENT_SIZE ) ) {
 				update_sha1_state( state, block );
 				yaal::fill( x, x + ( BLOCK_SIZE >> 5 ), 0 );
-				}
+			}
 			x[ 14 ] = totalH;
 			x[ 15 ] = total;
 			change_endianess( x + 14, 2 );
 			update_sha1_state( state, block );
-			}
-		else
+		} else
 			update_sha1_state( state, block );
-		}
-	while ( last == BLOCK_SIZE );
+	} while ( last == BLOCK_SIZE );
 	HString result;
 	result.format( "%08x%08x%08x%08x%08x", state[ 0 ], state[ 1 ], state[ 2 ], state[ 3 ], state[ 4 ] );
 	return ( result );
 	M_EPILOG
-	}
+}
 
-yaal::hcore::HString sha1( HStreamInterface::ptr_t stream )
-	{
+yaal::hcore::HString sha1( HStreamInterface::ptr_t stream ) {
 	M_PROLOG
 	return ( sha1( *stream ) );
 	M_EPILOG
-	}
+}
 
-yaal::hcore::HString sha1( HString const& string )
-	{
+yaal::hcore::HString sha1( HString const& string ) {
 	M_PROLOG
 	HStringStream ss( string );
 	return ( sha1( ss ) );
 	M_EPILOG
-	}
+}
 
-void update_md5_state( u32_t* state, HStreamBlockIterator::HBlock const& block )
-	{
+void update_md5_state( u32_t* state, HStreamBlockIterator::HBlock const& block ) {
 #define M_F(x, y, z) (((x)&(y)) | (~(x)&(z)))
 #define M_G(x, y, z) (((x)&(z)) | ((y)&~(z)))
 #define M_H(x, y, z) ((x)^(y)^(z))
@@ -321,10 +301,9 @@ void update_md5_state( u32_t* state, HStreamBlockIterator::HBlock const& block )
 #undef M_HH
 #undef M_II
 #undef M_ROTATE_LEFT
-	}
+}
 
-void update_sha1_state( u32_t* state, HStreamBlockIterator::HBlock const& block )
-	{
+void update_sha1_state( u32_t* state, HStreamBlockIterator::HBlock const& block ) {
 #define M_ROTATE_LEFT( x, s ) ( ( ( x ) << ( s ) ) | ( ( x ) >> ( 32 - ( s ) ) ) )
 	static int const WORK_BUFFER_SIZE = 80;
 	static int const INPUT_CHUNK_SIZE = 16;
@@ -339,30 +318,22 @@ void update_sha1_state( u32_t* state, HStreamBlockIterator::HBlock const& block 
 	change_endianess( x, INPUT_CHUNK_SIZE );
 	for ( int i = INPUT_CHUNK_SIZE; i < WORK_BUFFER_SIZE; ++ i )
 		tmp = x[ i - 3 ] ^ x[ i - 8 ] ^ x[ i - 14 ] ^ x[ i - 16 ], x[ i ] = M_ROTATE_LEFT( tmp, 1 );
-  for ( int i = 0; i < WORK_BUFFER_SIZE; ++ i )
-		{
+  for ( int i = 0; i < WORK_BUFFER_SIZE; ++ i ) {
 		u32_t f;
 		u32_t k;
-		if ( ( 0 <= i ) && ( i <= 19 ) )
-			{
+		if ( ( 0 <= i ) && ( i <= 19 ) ) {
 			f = ( b & c ) | ( ( ~ b ) & d );
 			k = 0x5a827999;
-			}
-		else if ( ( 20 <= i ) && ( i <= 39 ) )
-			{
+		} else if ( ( 20 <= i ) && ( i <= 39 ) ) {
 			f = b ^ c ^ d;
 			k = 0x6ed9eba1;
-			}
-		else if ( ( 40 <= i ) && ( i <= 59 ) )
-			{
+		} else if ( ( 40 <= i ) && ( i <= 59 ) ) {
 			f = ( b & c ) | ( b & d ) | ( c & d );
 			k = 0x8f1bbcdc;
-			}
-		else
-			{
+		} else {
 			f = b ^ c ^ d;
 			k = 0xca62c1d6;
-			}
+		}
 		
 		tmp = M_ROTATE_LEFT( a, 5 ) + f + e + k + x[ i ];
 		e = d;
@@ -370,7 +341,7 @@ void update_sha1_state( u32_t* state, HStreamBlockIterator::HBlock const& block 
 		c = M_ROTATE_LEFT( b, 30 );
 		b = a;
 		a = tmp;
-		}
+	}
 	state[ 0 ] += a;
 	state[ 1 ] += b;
 	state[ 2 ] += c;
@@ -378,17 +349,16 @@ void update_sha1_state( u32_t* state, HStreamBlockIterator::HBlock const& block 
 	state[ 4 ] += e;
 	return;
 #undef M_ROTATE_LEFT
-	}
+}
 
-void change_endianess( u32_t* mem, int long size )
-	{
+void change_endianess( u32_t* mem, int long size ) {
 	while ( size -- )
 		mem[ size ] =
 			  ( ( mem[ size ] & 0xff000000 ) >> 24 )
 			| ( ( mem[ size ] & 0x00ff0000 ) >> 8 )
 			| ( ( mem[ size ] & 0x0000ff00 ) << 8 )
 			| ( ( mem[ size ] & 0x000000ff ) << 24 );
-	}
+}
 
 }
 

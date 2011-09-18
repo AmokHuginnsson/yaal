@@ -30,13 +30,11 @@ Copyright:
 #ifndef YAAL_HCORE_MATH_HXX_INCLUDED
 #define YAAL_HCORE_MATH_HXX_INCLUDED 1
 
-namespace yaal
-{
+namespace yaal {
 
 /*! \brief Basic mathematical declarations.
  */
-namespace math
-{
+namespace math {
 
 M_YAAL_HCORE_PUBLIC_API extern double long PI;
 M_YAAL_HCORE_PUBLIC_API extern double long E;

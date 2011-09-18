@@ -4,8 +4,7 @@
 #include "crit.hxx"
 
 template<typename type_t>
-class SynchronizedUnorderedSet
-	{
+class SynchronizedUnorderedSet {
 	public:
 		typedef std::tr1::unordered_set<type_t> data_t;
 		typedef typename data_t::value_type value_type;
@@ -19,26 +18,22 @@ class SynchronizedUnorderedSet
 	public:
 		SynchronizedUnorderedSet( void ) : _data(), _mutex() {}
 		~SynchronizedUnorderedSet( void ) {}
-		insert_result insert( value_type const& value_ )
-			{
+		insert_result insert( value_type const& value_ ) {
 			CLock l( _mutex );
 			return ( _data.insert( value_ ) );
-			}
-		void erase( iterator it_ )
-			{
+		}
+		void erase( iterator it_ ) {
 			CLock l( _mutex );
 			_data.erase( it_ );
-			}
-		int long erase( value_type const& value_ )
-			{
+		}
+		int long erase( value_type const& value_ ) {
 			CLock l( _mutex );
 			return ( _data.erase( value_ ) );
-			}
-		int long count( value_type const& value_ ) const
-			{
+		}
+		int long count( value_type const& value_ ) const {
 			CLock l( _mutex );
 			return ( _data.count( value_ ) );
-			}
-	};
+		}
+};
 
 #endif /* #ifndef YAAL_MSVCXX_SYNCHRONIZEDUNORDEREDSET_HXX_INCLUDED */

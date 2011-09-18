@@ -35,13 +35,11 @@ Copyright:
 
 #include "hcore/numeric.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
 /*! \brief Type trait alteration utilities.
  */
-namespace trait
-{
+namespace trait {
 
 /*! \brief Type that represents \e true in type calculus context.
  */
@@ -65,19 +63,17 @@ class no_type {};
  * \retval type - true_type iff types are same.
  */
 template<typename T1, typename T2>
-struct same_type
-	{
+struct same_type {
 	static bool const value = false;
 	typedef trait::false_type type;
-	};
+};
 
 /* \cond */
 template<typename T1>
-struct same_type<T1, T1>
-	{
+struct same_type<T1, T1> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 /* \endcond */
 
 /*! \brief Perform compile time ternary operator on types.
@@ -92,16 +88,14 @@ struct ternary;
 
 /* \cond */
 template<typename type_for_true, typename type_for_false>
-struct ternary<true, type_for_true, type_for_false>
-	{
+struct ternary<true, type_for_true, type_for_false> {
 	typedef type_for_true type;
-	};
+};
 
 template<typename type_for_true, typename type_for_false>
-struct ternary<false, type_for_true, type_for_false>
-	{
+struct ternary<false, type_for_true, type_for_false> {
 	typedef type_for_false type;
-	};
+};
 /* \endcond */
 
 /*! \brief Convert value domain boolean into type domain boolean.
@@ -114,16 +108,14 @@ struct boolean_type;
 
 /* \cond */
 template<>
-struct boolean_type<true>
-	{
+struct boolean_type<true> {
 	typedef true_type type;
-	};
+};
 
 template<>
-struct boolean_type<false>
-	{
+struct boolean_type<false> {
 	typedef false_type type;
-	};
+};
 /* \endcond */
 
 /*! \brief Convert type domain boolean into value domain boolean.
@@ -136,16 +128,14 @@ struct boolean_value;
 
 /* \cond */
 template<>
-struct boolean_value<true_type>
-	{
+struct boolean_value<true_type> {
 	static bool const value = true;
-	};
+};
 
 template<>
-struct boolean_value<false_type>
-	{
+struct boolean_value<false_type> {
 	static bool const value = false;
-	};
+};
 /* \endcond */
 
 /*! \brief Search for given type in a type list.
@@ -165,8 +155,7 @@ template<typename tType, typename t0_t, typename t1_t = no_type,
 	typename t16_t = no_type, typename t17_t = no_type,
 	typename t18_t = no_type, typename t19_t = no_type,
 	typename t20_t = no_type>
-struct find_type
-	{
+struct find_type {
 	static int const value = -1
 		+ meta::ternary<same_type<tType, no_type>::value, 0, 1 * meta::to_int<same_type<t0_t, tType>::value>::value
 		+ 2 * meta::to_int<same_type<t1_t, tType>::value>::value
@@ -189,7 +178,7 @@ struct find_type
 		+ 19 * meta::to_int<same_type<t18_t, tType>::value>::value
 		+ 20 * meta::to_int<same_type<t19_t, tType>::value>::value
 		+ 21 * meta::to_int<same_type<t20_t, tType>::value>::value>::value;
-	};
+};
 
 /*! \brief Get type from given list by index.
  *
@@ -208,8 +197,7 @@ template<int const index, typename t0_t, typename t1_t = no_type,
 	typename t16_t = no_type, typename t17_t = no_type,
 	typename t18_t = no_type, typename t19_t = no_type,
 	typename t20_t = no_type>
-struct select_index
-	{
+struct select_index {
 	typedef typename ternary<index == 0, t0_t,
 					typename ternary<index == 1, t1_t,
 					typename ternary<index == 2, t2_t,
@@ -231,7 +219,7 @@ struct select_index
 					typename ternary<index == 18, t18_t,
 					typename ternary<index == 19, t19_t,
 					typename ternary<index == 20, t20_t, no_type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type type;
-	};
+};
 
 /*! \brief Count occurences of a type.
  *
@@ -250,8 +238,7 @@ template<typename tType, typename t0_t, typename t1_t = no_type,
 	typename t16_t = no_type, typename t17_t = no_type,
 	typename t18_t = no_type, typename t19_t = no_type,
 	typename t20_t = no_type>
-struct count_type
-	{
+struct count_type {
 	static int const value =
 		+ meta::to_int<same_type<t0_t, tType>::value>::value
 		+ meta::to_int<same_type<t1_t, tType>::value>::value
@@ -274,7 +261,7 @@ struct count_type
 		+ meta::to_int<same_type<t18_t, tType>::value>::value
 		+ meta::to_int<same_type<t19_t, tType>::value>::value
 		+ meta::to_int<same_type<t20_t, tType>::value>::value;
-	};
+};
 template<typename tType, typename t0_t, typename t1_t,
 	typename t2_t, typename t3_t, typename t4_t, typename t5_t,
 	typename t6_t, typename t7_t, typename t8_t, typename t9_t,
@@ -290,25 +277,22 @@ int const count_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t
  * \retval type - true_type iff T is a pointer type.
  */
 template<typename T>
-struct is_pointer
-	{
+struct is_pointer {
 	static bool const value = false;
 	typedef trait::false_type type;
-	};
+};
 
 /*! \cond */
 template<typename T>
-struct is_pointer<T*>
-	{
+struct is_pointer<T*> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 template<typename T>
-struct is_pointer<T const*>
-	{
+struct is_pointer<T const*> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 /*! \endcond */
 
 /*! \brief Test if type is a const type.
@@ -318,19 +302,17 @@ struct is_pointer<T const*>
  * \retval type - true_type iff T is a const type.
  */
 template<typename T>
-struct is_const
-	{
+struct is_const {
 	static bool const value = false;
 	typedef trait::false_type type;
-	};
+};
 
 /*! \cond */
 template<typename T>
-struct is_const<T const>
-	{
+struct is_const<T const> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 /*! \endcond */
 
 /*! \brief Test if type is a volatile type.
@@ -340,19 +322,17 @@ struct is_const<T const>
  * \retval type - true_type iff T is a volatile type.
  */
 template<typename T>
-struct is_volatile
-	{
+struct is_volatile {
 	static bool const value = false;
 	typedef trait::false_type type;
-	};
+};
 
 /*! \cond */
 template<typename T>
-struct is_volatile<T volatile>
-	{
+struct is_volatile<T volatile> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 /*! \endcond */
 
 /*! \brief Test if type is a reference type.
@@ -362,25 +342,22 @@ struct is_volatile<T volatile>
  * \retval type - true_type iff T is a reference type.
  */
 template<typename T>
-struct is_reference
-	{
+struct is_reference {
 	static bool const value = false;
 	typedef trait::false_type type;
-	};
+};
 
 /*! \cond */
 template<typename T>
-struct is_reference<T&>
-	{
+struct is_reference<T&> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 template<typename T>
-struct is_reference<T const&>
-	{
+struct is_reference<T const&> {
 	static bool const value = true;
 	typedef trait::true_type type;
-	};
+};
 /*! \endcond */
 
 /*! \brief Meta function used to make reference from type.
@@ -393,28 +370,24 @@ struct make_reference;
 
 /* \cond */
 template<>
-struct make_reference<void>
-	{
+struct make_reference<void> {
 	typedef void type;
-	};
+};
 
 template<>
-struct make_reference<void const>
-	{
+struct make_reference<void const> {
 	typedef void type;
-	};
+};
 
 template<typename T>
-struct make_reference<T&>
-	{
+struct make_reference<T&> {
 	typedef T& type;
-	};
+};
 
 template<typename T>
-struct make_reference
-	{
+struct make_reference {
 	typedef T& type;
-	};
+};
 /* \endcond */
 
 /*! \brief Meta function used to strip reference from type.
@@ -423,17 +396,15 @@ struct make_reference
  * \retval type - a type T without reference trait.
  */
 template<typename T>
-struct strip_reference
-	{
+struct strip_reference {
 	typedef T type;
-	};
+};
 
 /*! \cond */
 template<typename T>
-struct strip_reference<T&>
-	{
+struct strip_reference<T&> {
 	typedef T type;
-	};
+};
 /*! \endcond */
 
 /*! \brief Meta function used to add one level of pointer to a type.
@@ -446,16 +417,14 @@ struct add_pointer;
 
 /*! \cond */
 template<typename T>
-struct add_pointer<T&>
-	{
+struct add_pointer<T&> {
 	typedef T* type;
-	};
+};
 
 template<typename T>
-struct add_pointer
-	{
+struct add_pointer {
 	typedef T* type;
-	};
+};
 /*! \endcond */
 
 /*! \brief Meta function used to strip one level of pointer from type.
@@ -464,17 +433,15 @@ struct add_pointer
  * \retval type - stripped new type.
  */
 template<typename T>
-struct strip_pointer
-	{
+struct strip_pointer {
 	typedef T type;
-	};
+};
 
 /*! \cond */
 template<typename T>
-struct strip_pointer<T*>
-	{
+struct strip_pointer<T*> {
 	typedef T type;
-	};
+};
 /*! \endcond */
 
 /*! \brief Meta function used to add const to type.
@@ -483,23 +450,20 @@ struct strip_pointer<T*>
  * \retval type - a type with constness trait.
  */
 template<typename T>
-struct make_const
-	{
+struct make_const {
 	typedef T const type;
-	};
+};
 
 /*! \cond */
 template<typename T>
-struct make_const<T const>
-	{
+struct make_const<T const> {
 	typedef T const type;
-	};
+};
 
 template<typename T>
-struct make_const<T&>
-	{
+struct make_const<T&> {
 	typedef T const& type;
-	};
+};
 /*! \endcond */
 
 /*! \brief Meta function used to strip const from type.
@@ -508,17 +472,15 @@ struct make_const<T&>
  * \retval type - a type without constness trait.
  */
 template<typename T>
-struct strip_const
-	{
+struct strip_const {
 	typedef T type;
-	};
+};
 
 /*! \cond */
 template<typename T>
-struct strip_const<T const>
-	{
+struct strip_const<T const> {
 	typedef T type;
-	};
+};
 /*! \endcond */
 
 /*! \brief Copy constness (or lack of it) from on type to another.
@@ -528,22 +490,19 @@ struct strip_const<T const>
  * \retval type - a destination type with constness of source type.
  */
 template<typename source, typename destination>
-struct copy_const
-	{
+struct copy_const {
 	typedef destination type;
-	};
+};
 
 /*! \cond */
 template<typename source, typename destination>
-struct copy_const<source const, destination>
-	{
+struct copy_const<source const, destination> {
 	typedef destination const type;
-	};
+};
 /*! \endcond */
 
 template<typename T>
-struct make_const_ref_ptr
-	{
+struct make_const_ref_ptr {
 	typedef typename ternary<is_reference<T>::value,
 						typename make_reference<
 							typename ternary<is_pointer<typename strip_reference<T>::type>::value,
@@ -554,7 +513,7 @@ struct make_const_ref_ptr
 						typename ternary<is_pointer<typename strip_reference<T>::type>::value,
 							typename add_pointer<typename strip_pointer<typename strip_reference<T>::type>::type const>::type,
 							T const>::type>::type type;
-	};
+};
 
 /*! \brief A reference type wrapper.
  * 
@@ -563,8 +522,7 @@ struct make_const_ref_ptr
  * \tparam basic_t - type to be wrapper as reference.
  */
 template<typename basic_t>
-class reference
-	{
+class reference {
 	basic_t* _ref;
 public:
 	explicit reference( basic_t& obj ) : _ref( &obj ) {}
@@ -573,12 +531,11 @@ public:
 	basic_t& operator->( void )
 		{ return ( *_ref ); }
 	template<typename basic_assgnable_t>
-	basic_t& operator = ( basic_assgnable_t const& v )
-		{
+	basic_t& operator = ( basic_assgnable_t const& v ) {
 		*_ref = v;
 		return ( *_ref );
-		}
-	};
+	}
+};
 
 /*! \brief Check if given class has been derived from another given class.
  *
@@ -587,24 +544,22 @@ public:
  * \retval value - true iff derived_t is derived from base_t.
  */
 template<typename derived_t, typename base_t>
-struct is_kind_of
-	{
+struct is_kind_of {
 	static true_type calc( base_t const* );
 	static false_type calc( ... );
 	static bool const value = sizeof ( calc( static_cast<derived_t const*>( NULL ) ) ) == sizeof ( true_type );
-	};
+};
 
 /*! \brief Interface preventing copying of objects.
  */
-class HNonCopyable
-	{
+class HNonCopyable {
 public:
 	HNonCopyable( void ) {}
 	virtual ~HNonCopyable( void ) {}
 private:
 	HNonCopyable( HNonCopyable const& );
 	HNonCopyable& operator = ( HNonCopyable const& );
-	};
+};
 
 /*! \brief Check if given type is a field type (actually a pointer to a field).
  *
@@ -926,8 +881,7 @@ template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 struct is_member_const<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const>
 	{ static bool const value = true; };
 
-namespace generic_helper
-{
+namespace generic_helper {
 
 template<typename T>
 struct return_type
@@ -1473,8 +1427,7 @@ struct argument_type<return_t ( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, 
 }
 
 template<typename T>
-struct functional_return_type
-	{
+struct functional_return_type {
 	template<typename real_class>
 	static true_type has_result_type( typename strip_reference<typename real_class::result_type>::type* );
 	template<typename real_class>
@@ -1490,11 +1443,10 @@ struct functional_return_type
 		{ typedef typename U::result_type type; };
 	
 	typedef typename get<T, has_result_type_value>::type type;
-	};
+};
 
 template<typename T>
-struct functional_argument_type
-	{
+struct functional_argument_type {
 	template<typename real_class>
 	static true_type has_argument_type( typename strip_reference<typename real_class::argument_type>::type* );
 	template<typename real_class>
@@ -1526,14 +1478,13 @@ struct functional_argument_type
 	struct get<U, 2>
 		{ typedef typename U::second_argument_type type; };
 
-	template<int const no> struct index
-		{
+	template<int const no> struct index {
 		static int const idx = meta::ternary<( no == 0 ), meta::ternary<a0, 0, meta::ternary<a1, 1, -1>::value>::value,
 														meta::ternary<( no == 1 ) && a2, 2,
 														-1>::value>::value;
 		typedef typename get<T, idx>::type type;
-		};
 	};
+};
 /*! \endcond */
 
 /*! \brief Get return type of member or function.
@@ -1542,27 +1493,24 @@ struct functional_argument_type
  * \retval type - return type of given member or function.
  */
 template<typename T>
-struct return_type
-	{
+struct return_type {
 	template<bool const force, typename U>
 	struct resolve;
 
 	template<typename U>
-	struct resolve<false, U>
-		{
+	struct resolve<false, U> {
 		typedef U type;
-		};
+	};
 
 	template<typename U>
-	struct resolve<true, U>
-		{
+	struct resolve<true, U> {
 		typedef typename generic_helper::return_type<T>::type type;
-		};
+	};
 
 	typedef typename functional_return_type<T>::type functional_return_type_t;
 
 	typedef typename resolve<same_type<functional_return_type_t, no_type>::value, functional_return_type_t>::type type;
-	};
+};
 
 /*! \brief Get type of an indexed argument of member or function.
  *
@@ -1571,27 +1519,24 @@ struct return_type
  * \retval type - type of given argument of given member or function.
  */
 template<typename T, int const no>
-struct argument_type
-	{
+struct argument_type {
 	template<bool const force, typename U>
 	struct resolve;
 
 	template<typename U>
-	struct resolve<false, U>
-		{
+	struct resolve<false, U> {
 		typedef U type;
-		};
+	};
 
 	template<typename U>
-	struct resolve<true, U>
-		{
+	struct resolve<true, U> {
 		typedef typename generic_helper::argument_type<T>::template index<no>::type type;
-		};
+	};
 
 	typedef typename functional_argument_type<T>::template index<no>::type functional_argument_type_t;
 
 	typedef typename resolve<same_type<functional_argument_type_t, no_type>::value, functional_argument_type_t>::type type;
-	};
+};
 
 /*! \brief Get class type of given member.
  *
@@ -1803,8 +1748,7 @@ struct class_type_from_field<field_t class_t::*>
 	{ typedef class_t type; };
 
 template<typename class_t>
-struct class_type
-	{
+struct class_type {
 	template<typename real_class>
 	static true_type has_this_type( typename strip_reference<typename real_class::this_type>::type* );
 	template<typename real_class>
@@ -1836,7 +1780,7 @@ struct class_type
 							is_functional ? 1 : 0
 						>::value
 					>::value>::type type;
-	};
+};
 
 /*! \endcond */
 
@@ -1845,13 +1789,11 @@ struct field_type;
 
 /*! \cond */
 template<typename class_t, typename field_t>
-struct field_type<field_t class_t::*>
-	{
+struct field_type<field_t class_t::*> {
 	typedef field_t type;
-	};
+};
 
-namespace generic_helper
-{
+namespace generic_helper {
 
 template<typename field_t>
 struct argument_count
@@ -2142,8 +2084,7 @@ struct argument_count<return_t ( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t,
 }
 
 template<typename T>
-struct functional_argument_count
-	{
+struct functional_argument_count {
 	template<typename real_class>
 	static true_type has_argument_type( typename strip_reference<typename real_class::argument_type>::type* );
 	template<typename real_class>
@@ -2169,30 +2110,27 @@ struct functional_argument_count
 				-1>::value
 			>::value,
 		-1>::value;
-	};
+};
 
 template<typename T>
-struct argument_count
-	{
+struct argument_count {
 	template<bool const force, int const count>
 	struct resolve;
 
 	template<int const count>
-	struct resolve<false, count>
-		{
+	struct resolve<false, count> {
 		static int const value = count;
-		};
+	};
 
 	template<int const count>
-	struct resolve<true, count>
-		{
+	struct resolve<true, count> {
 		static int const value = generic_helper::argument_count<T>::value;
-		};
+	};
 
 	static int const functional_argument_count = functional_argument_count<T>::value;
 
 	static int const value = resolve<functional_argument_count == -1, functional_argument_count>::value;
-	};
+};
 
 }
 

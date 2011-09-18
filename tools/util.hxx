@@ -34,24 +34,20 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Small but useful utils.
  */
-namespace util
-{
+namespace util {
 
 template<typename iter_t, typename pred_t>
-iter_t find_local( iter_t it, iter_t end, pred_t pred )
-	{
+iter_t find_local( iter_t it, iter_t end, pred_t pred ) {
 	for ( ; it != end; ++ it )
 		pred( it );
 	return ( pred() );
-	}
+}
 
 yaal::hcore::HString kwota_slownie( double );
 void usun_ogonki( char* );
@@ -62,8 +58,7 @@ yaal::hcore::HString get_token( yaal::hcore::HString const&, yaal::hcore::HStrin
 
 /*! \brief Helper structure for displaing program help and current configuration.
  */
-struct OOptionInfo
-	{
+struct OOptionInfo {
 	yaal::hcore::HProgramOptionsHandler const& _opt;
 	char const* _name;
 	char const* _intro;
@@ -74,7 +69,7 @@ struct OOptionInfo
 private:
 	OOptionInfo( OOptionInfo const& );
 	OOptionInfo& operator = ( OOptionInfo const& );
-	};
+};
 
 void show_help( void* );
 void dump_configuration( void* );
@@ -83,8 +78,7 @@ void failure( int, char const* const, ... ) __attribute__(( __noreturn__ ));
 
 /*! \brief Various convinient sleep functions.
  */
-namespace sleep
-{
+namespace sleep {
 
 /*! \brief Suspend execution of current thread for given number of miliseconds.
  *
@@ -106,8 +100,7 @@ bool second( int seconds, bool ignoreInterrupts = false );
 
 /*! \brief 3DES cropto algorithm functions.
  */
-namespace crypto
-{
+namespace crypto {
 
 void crypt_3des( yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HString const& );
 void crypt_3des( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface&, yaal::hcore::HString const& );
@@ -118,8 +111,7 @@ void decrypt_3des( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface
 
 /*! \brief The Levenshtein and Levenshtein-Damerau string distance functions.
  */
-namespace distance
-{
+namespace distance {
 
 /*! \brief Calculate distance between two strings.
  *
@@ -138,8 +130,7 @@ int levenshtein_damerau( yaal::hcore::HString const& first, yaal::hcore::HString
  * \tparam item_t - type of item to look for.
  */
 template<typename iter_t, typename item_t>
-class HAlike 
-	{
+class HAlike {
 	item_t const& _item;
 	iter_t _iter;
 	int long _best;
@@ -149,24 +140,21 @@ public:
 		: _item( item ), _iter( it ),
 		_best( meta::max_signed<int long>::value ),
 		_damerau( damerau ) {}
-	void operator()( iter_t it )
-		{
+	void operator()( iter_t it ) {
 		int long dist = levenshtein_damerau( _item, *it, _damerau );
-		if ( dist < _best )
-			{
+		if ( dist < _best ) {
 			_best = dist;
 			_iter = it;
-			}
 		}
+	}
 	iter_t operator()( void ) const
 		{ return ( _iter ); }
-	};
+};
 
 template<typename iter_t, typename item_t>
-HAlike<iter_t, item_t> alike( iter_t iter, item_t const& item, bool damerau = true )
-	{
+HAlike<iter_t, item_t> alike( iter_t iter, item_t const& item, bool damerau = true ) {
 	return ( HAlike<iter_t, item_t>( iter, item, damerau ) );
-	}
+}
 
 }
 

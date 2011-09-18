@@ -30,53 +30,45 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hstreaminterface.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Run process and access its std(in/out/err).
  */
-class HPipedChild : public yaal::hcore::HStreamInterface
-	{
+class HPipedChild : public yaal::hcore::HStreamInterface {
 protected:
 	typedef HPipedChild this_type;
 	typedef HStreamInterface base_type;
 public:
 	/*! \brief Child process output stream types.
 	 */
-	struct STREAM
-		{
+	struct STREAM {
 		/*! \brief Output type flags.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			OUT, /*!< Output stream is of interest. */
 			ERR /*!< Error stream is of interest. */
-			} stream_t;
-		};
+		} stream_t;
+	};
 	/*! \brief Status of this child process.
 	 */
-	struct STATUS
-		{
+	struct STATUS {
 		/*! \brief Status flags.
 		 */
-		struct TYPE
-			{
+		struct TYPE {
 			/*! \brief Status flags.
 			 */
-			typedef enum
-				{
+			typedef enum {
 				NORMAL, /*!< process is running. */
 				ABORT, /*!< process has been stopped. */
 				NOT_SPAWNED /*!< process has not been spawned yet. */
-				} type_t;
-			};
+			} type_t;
+		};
 		TYPE::type_t type; /*!< child process current status. */
 		int value; /*!< exit value of finished child process. */
 		STATUS( void ) : type( TYPE::NOT_SPAWNED ), value( 0 ) {}
-		};
+	};
 	typedef yaal::hcore::HArray<yaal::hcore::HString> argv_t;
 private:
 	int _pid;
@@ -102,7 +94,7 @@ private:
 	virtual bool do_is_valid( void ) const;
 	HPipedChild( HPipedChild const& );
 	HPipedChild& operator = ( HPipedChild const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HPipedChild, yaal::hcore::HStreamInterfaceException> HPipedChildException;
 

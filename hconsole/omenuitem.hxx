@@ -29,16 +29,13 @@ Copyright:
 
 #include "hconsole/htuiprocess.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief TUI menu node.
  */
-struct OMenuItem
-	{
+struct OMenuItem {
 public: /* All is public for simpler usage. */
 	typedef int ( HTUIProcess::* HANDLER_t )( void* );
 	OMenuItem* _subMenu;
@@ -53,7 +50,7 @@ public: /* All is public for simpler usage. */
 	void reset( void );
 	void call( HTUIProcess* );
 	void swap( OMenuItem& );
-	};
+};
 
 }
 

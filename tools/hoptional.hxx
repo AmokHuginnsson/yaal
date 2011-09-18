@@ -34,18 +34,15 @@ Copyright:
 #include "hcore/hexception.hxx"
 #include "hcore/algorithm.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief HOptional<> class template - an optional value.
  * Provide interface for values that can be unitialized.
  */
 template<typename type_t>
-class HOptional
-	{
+class HOptional {
 public:
 	struct SemanticContext { SemanticContext const& member( SemanticContext& ) const { return ( *this ); } };
 	typedef SemanticContext const& ( SemanticContext::* safe_bool_t )( SemanticContext& ) const;
@@ -56,76 +53,62 @@ private:
 public:
 	HOptional( void ) : _data(), _initialized( false ) {}
 	HOptional( value_type const& value_ )
-		: _data(), _initialized( true )
-		{
+		: _data(), _initialized( true ) {
 		new ( _data ) value_type( value_ );
-		}
-	~HOptional( void )
-		{
+	}
+	~HOptional( void ) {
 		M_PROLOG
 		if ( _initialized )
 			M_SAFE( operator->()->~value_type() );
 		M_DESTRUCTOR_EPILOG
-		}
+	}
 	HOptional( HOptional const& other_ )
-		: _data(), _initialized( other_._initialized )
-		{
+		: _data(), _initialized( other_._initialized ) {
 		if ( _initialized )
 			new ( _data ) value_type( *other_ );
-		}
-	HOptional& operator = ( HOptional const& other_ )
-		{
-		if ( &other_ != this )
-			{
+	}
+	HOptional& operator = ( HOptional const& other_ ) {
+		if ( &other_ != this ) {
 			HOptional tmp( other_ );
 			swap( tmp );
-			}
-		return ( *this );
 		}
-	void swap( HOptional& other_ )
-		{
-		if ( &other_ != this )
-			{
+		return ( *this );
+	}
+	void swap( HOptional& other_ ) {
+		if ( &other_ != this ) {
 			using yaal::swap;
 			swap( _initialized, other_._initialized );
 			swap_ranges( _data, _data + sizeof ( value_type ), other_._data );
-			}
+		}
 		return;
-		}
-	operator safe_bool_t() const
-		{
+	}
+	operator safe_bool_t() const {
 		return ( _initialized ? &SemanticContext::member : NULL );
-		}
-	bool operator! ( void ) const
-		{
+	}
+	bool operator! ( void ) const {
 		return ( ! _initialized );
-		}
-	value_type const& operator* ( void ) const
-		{
+	}
+	value_type const& operator* ( void ) const {
 		M_ASSERT( _initialized );
 		return ( *static_cast<value_type const*>( static_cast<void const*>( _data ) ) );
-		}
-	value_type& operator* ( void )
-		{
+	}
+	value_type& operator* ( void ) {
 		M_ASSERT( _initialized );
 		return ( *static_cast<value_type*>( static_cast<void*>( _data ) ) );
-		}
-	value_type const* operator->( void ) const
-		{
+	}
+	value_type const* operator->( void ) const {
 		M_ASSERT( _initialized );
 		return ( static_cast<value_type const*>( static_cast<void const*>( _data ) ) );
-		}
-	value_type* operator->( void )
-		{
+	}
+	value_type* operator->( void ) {
 		M_ASSERT( _initialized );
 		return ( static_cast<value_type*>( static_cast<void*>( _data ) ) );
-		}
-	};
+	}
+};
 
 /*! \cond */
 template<typename type_t>
-class HOptional<type_t&>
-	{
+class HOptional<type_t&> {
 public:
 	struct SemanticContext { SemanticContext const& member( SemanticContext& ) { return ( *this ); } };
 	typedef SemanticContext const& ( SemanticContext::* safe_bool_t )( SemanticContext& );
@@ -136,101 +119,83 @@ private:
 public:
 	HOptional( void ) : _data(), _initialized( false ) {}
 	HOptional( value_type& value_ )
-		: _data(), _initialized( true )
-		{
+		: _data(), _initialized( true ) {
 		*static_cast<value_type**>( static_cast<void*>( _data ) ) = &value_;
-		}
+	}
 	HOptional( HOptional const& other_ )
-		: _data(), _initialized( other_._initialized )
-		{
+		: _data(), _initialized( other_._initialized ) {
 		if ( _initialized )
 			*static_cast<value_type**>( static_cast<void*>( _data ) ) = *static_cast<value_type* const*>( static_cast<void const*>( other_._data ) );
-		}
+	}
 	template<typename other_t>
 	explicit HOptional( HOptional<other_t&> const& other_ )
-		: _data(), _initialized( other_ )
-		{
+		: _data(), _initialized( other_ ) {
 		STATIC_ASSERT(( trait::same_type<type_t, other_t>::value || trait::same_type<type_t, other_t const>::value ));
 		if ( _initialized )
 			*static_cast<value_type**>( static_cast<void*>( _data ) ) = *static_cast<value_type* const*>( static_cast<void const*>( reinterpret_cast<HOptional const&>( other_)._data ) );
-		}
+	}
 	HOptional( HOptional<type_t>& other_ )
-		: _data(), _initialized( other_ )
-		{
+		: _data(), _initialized( other_ ) {
 		if ( _initialized )
 			*static_cast<value_type**>( static_cast<void*>( _data ) ) = &*other_;
-		}
-	HOptional& operator = ( HOptional const& other_ )
-		{
-		if ( &other_ != this )
-			{
+	}
+	HOptional& operator = ( HOptional const& other_ ) {
+		if ( &other_ != this ) {
 			HOptional tmp( other_ );
 			swap( tmp );
-			}
-		return ( *this );
 		}
+		return ( *this );
+	}
 	template<typename other_t>
-	HOptional& operator = ( HOptional<other_t> const& other_ )
-		{
-		if ( reinterpret_cast<HOptional const*>( &other_ ) != this )
-			{
+	HOptional& operator = ( HOptional<other_t> const& other_ ) {
+		if ( reinterpret_cast<HOptional const*>( &other_ ) != this ) {
 			HOptional tmp( other_ );
 			swap( tmp );
-			}
-		return ( *this );
 		}
-	void swap( HOptional& other_ )
-		{
-		if ( &other_ != this )
-			{
+		return ( *this );
+	}
+	void swap( HOptional& other_ ) {
+		if ( &other_ != this ) {
 			using yaal::swap;
 			swap( _initialized, other_._initialized );
 			swap( *static_cast<value_type**>( static_cast<void*>( _data ) ), *static_cast<value_type**>( static_cast<void*>( other_._data ) ) );
-			}
+		}
 		return;
-		}
-	operator safe_bool_t() const
-		{
+	}
+	operator safe_bool_t() const {
 		return ( _initialized ? &SemanticContext::member : NULL );
-		}
-	bool operator! ( void ) const
-		{
+	}
+	bool operator! ( void ) const {
 		return ( ! _initialized );
-		}
-	value_type const& operator* ( void ) const
-		{
+	}
+	value_type const& operator* ( void ) const {
 		M_ASSERT( _initialized );
 		return ( **static_cast<value_type const* const*>( static_cast<void const*>( _data ) ) );
-		}
-	value_type& operator* ( void )
-		{
+	}
+	value_type& operator* ( void ) {
 		M_ASSERT( _initialized );
 		return ( **static_cast<value_type**>( static_cast<void*>( _data ) ) );
-		}
-	value_type const* operator->( void ) const
-		{
+	}
+	value_type const* operator->( void ) const {
 		M_ASSERT( _initialized );
 		return ( *static_cast<value_type const* const*>( static_cast<void const*>( _data ) ) );
-		}
-	value_type* operator->( void )
-		{
+	}
+	value_type* operator->( void ) {
 		M_ASSERT( _initialized );
 		return ( *static_cast<value_type**>( static_cast<void*>( _data ) ) );
-		}
-	};
+	}
+};
 /*! \endcond */
 
 template<typename type_t>
-inline type_t get_optional_value_or( HOptional<type_t> const& value_, type_t default_ )
-	{
+inline type_t get_optional_value_or( HOptional<type_t> const& value_, type_t default_ ) {
 	return ( value_ ? *value_ : default_ );
-	}
+}
 
 template<typename type_t>
-inline type_t const& get_optional_value_or( HOptional<type_t const&> const& value_, type_t const& default_ )
-	{
+inline type_t const& get_optional_value_or( HOptional<type_t const&> const& value_, type_t const& default_ ) {
 	return ( value_ ? *value_ : default_ );
-	}
+}
 
 }
 

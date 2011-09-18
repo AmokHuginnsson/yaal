@@ -35,16 +35,13 @@ Copyright:
 #include "hcore/hexception.hxx"
 #include "hcore/hthread.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief HAlarm class provides automatic registration and deregistration of system alerts.
  */
-class HAlarm
-	{
+class HAlarm {
 private:
 	timer_t _timer;
 	yaal::hcore::HLock _lock;
@@ -63,7 +60,7 @@ public:
 private:
 	HAlarm( HAlarm const& );
 	HAlarm& operator = ( HAlarm const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HAlarm> HAlarmException;
 

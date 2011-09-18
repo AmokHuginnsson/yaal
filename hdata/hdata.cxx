@@ -41,36 +41,31 @@ using namespace yaal::hconsole;
 using namespace yaal::tools;
 using namespace yaal::dbwrapper;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
-void banner( void )
-	{
+void banner( void ) {
 	::printf( "\thdata\n" );
 	return;
-	}
+}
 
 }
 
 }
 
 extern "C"
-int yaal_hdata_main( int, char** )
-	{
+int yaal_hdata_main( int, char** ) {
 	static char const dynamicLinkerPath[]
 		__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
-	if ( dynamicLinkerPath[ 0 ] )
-		{
+	if ( dynamicLinkerPath[ 0 ] ) {
 		yaal::hcore::banner();
 		yaal::tools::banner();
 		yaal::dbwrapper::banner();
 		yaal::hconsole::banner();
 		yaal::hdata::banner();
 		::exit( 0 );
-		}
-	return ( 0 );
 	}
+	return ( 0 );
+}
 

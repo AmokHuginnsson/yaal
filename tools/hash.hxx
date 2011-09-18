@@ -30,16 +30,13 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hstreaminterface.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Hashing functions.
  */
-namespace hash
-{
+namespace hash {
 
 /*! \brief Calculate md5 hash of data.
  *

@@ -32,17 +32,14 @@ Copyright:
 
 #include "hcore/harray.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief HHeap<> - a heap concept implementation.
  */
 template<typename type_t, template <typename> class sequence_t = HArray>
-class HHeap
-	{
+class HHeap {
 	typedef sequence_t<type_t> sequence_type;
 public:
 	typedef typename sequence_type::value_type value_type;
@@ -52,64 +49,55 @@ public:
 	HHeap( void ) : _sequence() {}
 	HHeap( HHeap const& heap_ ) : _sequence( heap_._sequence ) {}
 	template<typename iter_t>
-	HHeap( iter_t first_, iter_t last_ ) : _sequence( first_, last_ )
-		{
+	HHeap( iter_t first_, iter_t last_ ) : _sequence( first_, last_ ) {
 		M_PROLOG
 		make_heap( _sequence.begin(), _sequence.end() );
 		M_EPILOG
-		}
-	bool is_empty( void ) const
-		{
+	}
+	bool is_empty( void ) const {
 		M_PROLOG
 		return ( _sequence.is_empty() );
 		M_EPILOG
-		}
-	bool empty( void ) const
-		{
+	}
+	bool empty( void ) const {
 		M_PROLOG
 		return ( _sequence.is_empty() );
 		M_EPILOG
-		}
-	bool get_size( void ) const
-		{
+	}
+	bool get_size( void ) const {
 		M_PROLOG
 		return ( _sequence.get_size() );
 		M_EPILOG
-		}
-	bool size( void ) const
-		{
+	}
+	bool size( void ) const {
 		M_PROLOG
 		return ( _sequence.get_size() );
 		M_EPILOG
-		}
-	bool clear( void )
-		{
+	}
+	bool clear( void ) {
 		M_PROLOG
 		return ( _sequence.clear() );
 		M_EPILOG
-		}
-	void push( value_type const& value_ )
-		{
+	}
+	void push( value_type const& value_ ) {
 		M_PROLOG
 		_sequence.push_back( value_ );
 		push_heap( _sequence.begin(), _sequence.end() );
 		M_EPILOG
-		}
-	void pop( void )
-		{
+	}
+	void pop( void ) {
 		M_PROLOG
 		pop_heap( _sequence.begin(), _sequence.end() );
 		_sequence.pop_back();
 		M_EPILOG
-		}
-	value_type const& top( void ) const
-		{
+	}
+	value_type const& top( void ) const {
 		M_PROLOG
 		M_ASSERT( ! is_empty() );
 		return ( *_sequence.begin() );
 		M_EPILOG
-		}
-	};
+	}
+};
 
 }
 

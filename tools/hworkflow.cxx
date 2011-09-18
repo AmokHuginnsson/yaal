@@ -32,122 +32,105 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
-HWorkFlowInterface::task_t HWorkFlowInterface::pop_task( void )
-	{
+HWorkFlowInterface::task_t HWorkFlowInterface::pop_task( void ) {
 	M_PROLOG
 	return ( do_pop_task() );
 	M_EPILOG
-	}
+}
 
 HWorkFlow::HWorkFlow( int workerPoolSize_ )
 	: _workerPoolSize( workerPoolSize_ ), _activeWorkers( 0 ),
-	_busyWorkers( 0 ), _pool(), _queue(), _semaphore(), _mutex()
-	{
+	_busyWorkers( 0 ), _pool(), _queue(), _semaphore(), _mutex() {
 	M_PROLOG
 	M_ASSERT( _workerPoolSize > 0 );
 	return;
 	M_EPILOG
-	}
+}
 
-HWorkFlow::~HWorkFlow( void )
-	{
-	M_PROLOG
-		{
+HWorkFlow::~HWorkFlow( void ) {
+	M_PROLOG {
 		HLock l( _mutex );
 		_workerPoolSize = 0;
-		}
-	for ( pool_t::iterator it( _pool.begin() ), end( _pool.end() ); it != end; ++ it )
-		{
+	}
+	for ( pool_t::iterator it( _pool.begin() ), end( _pool.end() ); it != end; ++ it ) {
 		_semaphore.signal();
 		(*it)->finish();
-		}
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HWorkFlow::push_task( task_t call_ )
-	{
+void HWorkFlow::push_task( task_t call_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	M_ASSERT( _busyWorkers <= _activeWorkers );
-	if ( ( _busyWorkers == _activeWorkers ) && ( _activeWorkers < _workerPoolSize ) )
-		{
+	if ( ( _busyWorkers == _activeWorkers ) && ( _activeWorkers < _workerPoolSize ) ) {
 		worker_ptr_t w( make_pointer<HWorker>( this ) );
 		_pool.push_back( w );
 		++ _activeWorkers;
 		++ _busyWorkers;
 		w->spawn();
-		}
+	}
 	_queue.push_back( call_ );
 	_semaphore.signal();
 	return;
 	M_EPILOG
-	}
+}
 
-HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void )
-	{
+HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void ) {
 	M_PROLOG
-	bool running = true;
-		{
+	bool running = true; {
 		HLock l( _mutex );
 		-- _busyWorkers;
 		running = _workerPoolSize ? true : false;
-		}
+	}
 	if ( running )
 		_semaphore.wait();
 	HLock l( _mutex );
 	HWorkFlow::task_t t;
-	if ( ! _queue.is_empty() )
-		{
+	if ( ! _queue.is_empty() ) {
 		t = _queue.front();
 		_queue.pop_front();
 		++ _busyWorkers;
-		}
+	}
 	return ( t );
 	M_EPILOG
-	}
+}
 
 HWorkFlow::HWorker::HWorker( HWorkFlowInterface* workFlow_ )
-	: _workFlow( workFlow_ ), _thread()
-	{
+	: _workFlow( workFlow_ ), _thread() {
 	return;
-	}
+}
 
-void HWorkFlow::HWorker::spawn( void )
-	{
+void HWorkFlow::HWorker::spawn( void ) {
 	M_PROLOG
 	_thread.spawn( call( &HWorkFlow::HWorker::run, this ) );
 	return;
 	M_EPILOG
-	}
+}
 
-void HWorkFlow::HWorker::finish( void )
-	{
+void HWorkFlow::HWorker::finish( void ) {
 	M_PROLOG
 	_thread.finish();
 	return;
 	M_EPILOG
-	}
+}
 
-void* HWorkFlow::HWorker::run( void )
-	{
+void* HWorkFlow::HWorker::run( void ) {
 	M_PROLOG
 	HThread::set_name( "HWorkFlow" );
 	HWorkFlow::task_t t;
-	while ( ! _isKilled_ && ( !! ( t = _workFlow->pop_task() ) ) )
-		{
+	while ( ! _isKilled_ && ( !! ( t = _workFlow->pop_task() ) ) ) {
 		t();
 		t.reset();
-		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
 }
 

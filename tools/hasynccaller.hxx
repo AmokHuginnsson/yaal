@@ -32,16 +32,13 @@ Copyright:
 #include "hcore/hmultimap.hxx"
 #include "hcore/hsingleton.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Interface for asynchronous call providers.
  */
-class HAbstractAsyncCaller
-	{
+class HAbstractAsyncCaller {
 public:
 	typedef HAbstractAsyncCaller this_type;
 protected:
@@ -64,14 +61,13 @@ protected:
 	virtual void* do_work( void ) = 0;
 private:
 	void* run( void );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HAbstractAsyncCaller> HAbstractAsyncCallerException;
 
 /*! \brief Invoke function or method asynchronously.
  */
-class HAsyncCaller : public HAbstractAsyncCaller, public yaal::hcore::HSingleton<HAsyncCaller>
-	{
+class HAsyncCaller : public HAbstractAsyncCaller, public yaal::hcore::HSingleton<HAsyncCaller> {
 public:
 	typedef HAbstractAsyncCaller base_type;
 	typedef HAsyncCaller this_type;
@@ -84,7 +80,7 @@ private:
 	static int life_time( int );
 	friend class yaal::hcore::HSingleton<HAsyncCaller>;
 	friend class yaal::hcore::HDestructor<HAsyncCaller>;
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HAsyncCaller, HAbstractAsyncCallerException> HAsyncCallerException;
 

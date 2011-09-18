@@ -32,16 +32,13 @@ Copyright:
 #include "hcore/hthread.hxx"
 #include "hcore/hlist.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Interface for HWorkFlow class to be used by HWorker class.
  */
-class HWorkFlowInterface
-	{
+class HWorkFlowInterface {
 public:
 	typedef HWorkFlowInterface this_type;
 	typedef yaal::hcore::HBoundCall<> task_t;
@@ -49,14 +46,13 @@ public:
 	task_t pop_task( void );
 private:
 	virtual task_t do_pop_task( void ) = 0;
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HWorkFlowInterface> HWorkFlowInterfaceException;
 
 /*! \brief Thread pool idiom implementation.
  */
-class HWorkFlow : public HWorkFlowInterface
-	{
+class HWorkFlow : public HWorkFlowInterface {
 public:
 	typedef HWorkFlow this_type;
 	typedef HWorkFlowInterface base_type;
@@ -83,14 +79,13 @@ public:
 	void push_task( task_t );
 private:
 	virtual task_t do_pop_task( void );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HWorkFlow, HWorkFlowInterfaceException> HWorkFlowException;
 
 /*! \brief Finest unit of working capacity.
  */
-class HWorkFlow::HWorker
-	{
+class HWorkFlow::HWorker {
 public:
 	typedef HWorker this_type;
 private:
@@ -105,7 +100,7 @@ private:
 	HWorker& operator = ( HWorker const& );
 	friend class HWorkFlow;
 	friend HWorkFlow::worker_ptr_t yaal::hcore::make_pointer<HWorker>( HWorkFlow* const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HWorkFlow::HWorker> HWorkerException;
 

@@ -33,40 +33,35 @@ M_VCSID( "$Id: "__TID__" $" )
 using namespace yaal::hcore;
 using namespace yaal::hconsole;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 HDataStatusBarControl::HDataStatusBarControl ( HDataWindow * parent_,
 		char const * label_, int statusBarAttribute_ )
 								 : HControl ( parent_, - 2, 0, 2, - 1, label_ ),
-									HStatusBarControl ( NULL, NULL, statusBarAttribute_ )
-	{
+									HStatusBarControl ( NULL, NULL, statusBarAttribute_ ) {
 	M_PROLOG
 	_labelLength += 3; /* for "[+]" */
 	return;
 	M_EPILOG
-	}
+}
 
-void HDataStatusBarControl::do_draw_label ( void )
-	{
+void HDataStatusBarControl::do_draw_label ( void ) {
 	M_PROLOG
 	HDataWindow * window = NULL;
 	HStatusBarControl::draw_label();
 	window = dynamic_cast < HDataWindow * > ( _parent );
 	M_ASSERT ( window );
-	if ( window->is_modified() )
-		{
+	if ( window->is_modified() ) {
 		set_attr_shortcut();
 		HConsole& cons = HConsole::get_instance();
 		cons.c_mvprintf ( cons.get_height() - 2, _labelLength - 4, "[+]" );
 		set_attr_data();
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

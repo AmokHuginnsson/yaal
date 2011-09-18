@@ -30,11 +30,9 @@ Copyright:
 #include "hconsole/hlistcontrol.hxx"
 #include "hconsole/hwindow.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 class HWindow;
 
@@ -43,8 +41,7 @@ class HWindow;
  * Window List control displays list of currently opened windows,
  * and allows visual navigation for them.
  */
-class HWindowListControl : public HListControl
-	{
+class HWindowListControl : public HListControl {
 public:
 	typedef HWindowListControl this_type;
 	typedef HListControl base_type;
@@ -55,7 +52,7 @@ public:
 	HWindowListControl ( HWindow *, int, int, int, int, char const *,
 			list_control_helper::HAbstractControler::ptr_t const&, model_t::cyclic_iterator& );
 	virtual int do_process_input ( int );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HWindowListControl, HListControlException> HWindowListControlException;
 

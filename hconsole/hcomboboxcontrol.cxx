@@ -33,11 +33,9 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 HComboboxControl::HComboboxControl ( HWindow * parent_,
 		int row_, int column_, int height_, int width_,
@@ -49,49 +47,42 @@ HComboboxControl::HComboboxControl ( HWindow * parent_,
 											mask_ ),
 									HSearchableControl ( searchable_ ),
 									HListControl ( NULL, 0, 0, 0, 0, NULL ),
-									_mode ( MODE::EDITCONTROL ), _droppedWidth ( droppedWidth_ )
-	{
+									_mode ( MODE::EDITCONTROL ), _droppedWidth ( droppedWidth_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HComboboxControl::~HComboboxControl ( void )
-	{
+HComboboxControl::~HComboboxControl ( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-int HComboboxControl::set_focus ( char code_ )
-	{
+int HComboboxControl::set_focus ( char code_ ) {
 	M_PROLOG
 	if ( _mode == MODE::EDITCONTROL )
 		return ( HEditControl::set_focus ( code_ ) );
 	return ( HListControl::set_focus ( code_ ) );
 	M_EPILOG
-	}
+}
 
-int HComboboxControl::kill_focus ( void )
-	{
+int HComboboxControl::kill_focus ( void ) {
 	M_PROLOG
-	if ( _mode == MODE::LISTCONTROL )
-		{
+	if ( _mode == MODE::LISTCONTROL ) {
 		_mode = MODE::EDITCONTROL;
 		HConsole::get_instance().clrscr();
 		_parent->schedule_refresh();
-		}
+	}
 	return ( HControl::kill_focus() );
 	M_EPILOG
-	}
+}
 
-void HComboboxControl::do_refresh ( void )
-	{
+void HComboboxControl::do_refresh ( void ) {
 	M_PROLOG
 	int width( 0 );
 	HConsole& cons( HConsole::get_instance() );
-	if ( _mode == MODE::EDITCONTROL )
-		{
+	if ( _mode == MODE::EDITCONTROL ) {
 /* ripped from HControl::draw_label() */
 		width = ( _width > 0 ) ? _width
 			: cons.get_width() + _width - _columnRaw;
@@ -102,9 +93,7 @@ void HComboboxControl::do_refresh ( void )
 		M_ENSURE( cons.c_addch( GLYPHS::DOWN_ARROW ) != C_ERR );
 		M_ENSURE( cons.c_move( _rowRaw, _columnRaw + HEditControl::_cursorPosition ) != C_ERR );
 		_heightRaw = 0;
-		}
-	else
-		{
+	} else {
 		int height( _height );
 		width = _width;
 		_width = _droppedWidth;
@@ -115,18 +104,15 @@ void HComboboxControl::do_refresh ( void )
 		HListControl::do_refresh();
 		_height = height;
 		_width = width;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-int HComboboxControl::do_process_input( int code_ )
-	{
+int HComboboxControl::do_process_input( int code_ ) {
 	M_PROLOG
-	if ( _mode == MODE::EDITCONTROL )
-		{
-		switch ( code_ )
-			{
+	if ( _mode == MODE::EDITCONTROL ) {
+		switch ( code_ ) {
 			case ( KEY_CODES::UP ):
 				_mode = MODE::LISTCONTROL;
 			break;
@@ -135,41 +121,34 @@ int HComboboxControl::do_process_input( int code_ )
 			break;
 			default :
 				return ( HEditControl::do_process_input ( code_ ) );
-			}
-		schedule_refresh();
 		}
-	else
-		{
+		schedule_refresh();
+	} else {
 		if ( code_ != '\r' )
 			return ( HListControl::do_process_input ( code_ ) );
 		close_combo();
-		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HComboboxControl::do_click( mouse::OMouse& mouse_ )
-	{
+int HComboboxControl::do_click( mouse::OMouse& mouse_ ) {
 	M_PROLOG
-	if ( _mode == MODE::EDITCONTROL )
-		{
+	if ( _mode == MODE::EDITCONTROL ) {
 		HEditControl::do_click( mouse_ );
 		_widthRaw = ( _width > 0 ) ? _width
 			: HConsole::get_instance().get_width() + _width - _columnRaw;
-		if ( mouse_._column == ( _columnRaw + _widthRaw - 1 ) )
-			{
+		if ( mouse_._column == ( _columnRaw + _widthRaw - 1 ) ) {
 			_mode = MODE::LISTCONTROL;
 			schedule_refresh();
-			}
 		}
-	else if ( HListControl::do_click( mouse_ ) )
+	} else if ( HListControl::do_click( mouse_ ) )
 		close_combo();
 	return ( 0 );
 	M_EPILOG
-	}
+}
 			
-void HComboboxControl::close_combo( void )
-	{
+void HComboboxControl::close_combo( void ) {
 	M_PROLOG
 	_mode = MODE::EDITCONTROL;
 	if ( _controler->empty() )
@@ -177,7 +156,7 @@ void HComboboxControl::close_combo( void )
 	_parent->schedule_refresh();
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

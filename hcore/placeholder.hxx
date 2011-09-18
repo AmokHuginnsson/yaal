@@ -30,30 +30,24 @@ Copyright:
 #ifndef YAAL_HCORE_PLACEHOLDER_HXX_INCLUDED
 #define YAAL_HCORE_PLACEHOLDER_HXX_INCLUDED 1
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-namespace higher_order
-{
+namespace higher_order {
 
-struct placeholder_base
-	{
+struct placeholder_base {
 	virtual ~placeholder_base( void ) {}
-	};
+};
 
 template<int arg_no>
-struct placeholder : public placeholder_base
-	{
+struct placeholder : public placeholder_base {
 	placeholder( void ) {}
-	};
+};
 
 }
 
-namespace
-{
+namespace {
 
 static const higher_order::placeholder<1> _1; /*!< Place holder for first anonymous argument. */
 static const higher_order::placeholder<2> _2; /*!< Place holder for second anonymous argument. */

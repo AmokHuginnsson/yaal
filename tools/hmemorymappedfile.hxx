@@ -33,16 +33,13 @@ Copyright:
 #include "hcore/trait.hxx"
 #include "hcore/hstring.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Implements Memory Mapped Files (MMF) resource wrapper.
  */
-class HMemoryMappedFile : private yaal::trait::HNonCopyable
-	{
+class HMemoryMappedFile : private yaal::trait::HNonCopyable {
 private:
 	int _fd;
 	void* _map;
@@ -75,7 +72,7 @@ public:
 private:
 	HMemoryMappedFile( HMemoryMappedFile const& );
 	HMemoryMappedFile& operator = ( HMemoryMappedFile const& );
-	};
+};
 
 }
 

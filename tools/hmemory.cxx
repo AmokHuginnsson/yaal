@@ -32,94 +32,79 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hmemory.hxx"
 #include "hcore/algorithm.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 HMemory::HMemory( void* ptr, int long size_, INITIAL_STATE::enum_t initialState_ )
 	: _block( ptr ), _size( size_ ),
 	_valid( initialState_ == INITIAL_STATE::AUTO ? -1 : ( initialState_ == INITIAL_STATE::VALID ? size_ : 0 ) ),
-	_cursorRead( 0 ), _cursorWrite( 0 )
-	{
+	_cursorRead( 0 ), _cursorWrite( 0 ) {
 	M_ASSERT( size_ > 0 );
 	M_ASSERT( ptr );
 	return;
-	}
+}
 
-HMemory::~HMemory( void )
-	{
+HMemory::~HMemory( void ) {
 	return;
-	}
+}
 
-bool HMemory::operator == ( HMemory const& other ) const
-	{
+bool HMemory::operator == ( HMemory const& other ) const {
 	M_PROLOG
 	return ( ( other._size == _size ) && ( ! memcmp( other._block, _block, _size ) ) );
 	M_EPILOG
-	}
+}
 
-int long HMemory::do_write( void const* const src_, int long size_ )
-	{
+int long HMemory::do_write( void const* const src_, int long size_ ) {
 	M_PROLOG
 	if ( _valid == -1 ) /* First data access. */
 		_valid = 0;
 	int long maxWrite( _size - _valid );
 	int long size( min( size_, maxWrite ) );
-	if ( ( _cursorWrite + size ) > _size )
-		{
+	if ( ( _cursorWrite + size ) > _size ) {
 		int long part1( _size - _cursorWrite );
 		int long part2( size - part1 );
 		::memcpy( static_cast<char*>( _block ) + _cursorWrite, src_, part1 );
 		::memcpy( static_cast<char*>( _block ), static_cast<char const* const>( src_ ) + part1, part2 );
 		_cursorWrite = part2;
-		}
-	else
-		{
+	} else {
 		::memcpy( static_cast<char*>( _block ) + _cursorWrite, src_, size );
 		_cursorWrite += size;
-		}
+	}
 	_valid += size;
 	return ( size );
 	M_EPILOG
-	}
+}
 
-void HMemory::do_flush( void ) const
-	{
+void HMemory::do_flush( void ) const {
 	return;
-	}
+}
 
-int long HMemory::do_read( void* const dest_, int long size_ )
-	{
+int long HMemory::do_read( void* const dest_, int long size_ ) {
 	M_PROLOG
 	if ( _valid == -1 ) /* First data access. */
 		_valid = _size;
 	int long size( min( size_, _valid ) );
-	if ( ( _cursorRead + size ) > _size )
-		{
+	if ( ( _cursorRead + size ) > _size ) {
 		int long part1( _size - _cursorRead );
 		int long part2( size - part1 );
 		::memcpy( dest_, static_cast<char*>( _block ) + _cursorRead, part1 );
 		::memcpy( static_cast<char*>( dest_ ) + part1, static_cast<char*>( _block ), part2 );
 		_cursorWrite = part2;
-		}
-	else
-		{
+	} else {
 		::memcpy( dest_, static_cast<char const* const>( _block ) + _cursorRead, size );
 		_cursorRead += size;
-		}
+	}
 	_valid -= size;
 	return ( size );
 	M_EPILOG
-	}
+}
 
-bool HMemory::do_is_valid( void ) const
-	{
+bool HMemory::do_is_valid( void ) const {
 	M_PROLOG
 	return ( ( _cursorRead < _size ) && ( _cursorWrite < _size ) );
 	M_EPILOG
-	}
+}
 
 }
 

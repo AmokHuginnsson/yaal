@@ -41,11 +41,9 @@ M_VCSID( "$Id: "__ID__" $" )
 using namespace yaal;
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 #ifdef _EXECINFO_H
 execution_info::strings_ptr_t execution_info::get_call_stack( int level_ )
@@ -62,11 +60,9 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int )
 
 	if ( level_ < size )
 		size = level_;
-	for ( int ctr( 0 ); ctr < size; ++ ctr )
-		{
+	for ( int ctr( 0 ); ctr < size; ++ ctr ) {
 		char* ptr( strchr( strings[ ctr ], '(' ) );
-		if ( ptr )
-			{
+		if ( ptr ) {
 			char* end( strchr( ptr, '+' ) );
 			if ( end )
 				(*end) = 0;
@@ -75,21 +71,20 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int )
 				frames->push_back( symbol );
 			else if ( strings[ ctr ] )
 				frames->push_back( strings[ ctr ] );
-			}
 		}
+	}
 
 	memory::free( strings );
 	memory::free( pointer );
 #endif /* _EXECINFO_H */
 	return ( frames );
-	}
+}
 
-void dump_call_stack( HStreamInterface& stream, int no )
-	{
+void dump_call_stack( HStreamInterface& stream, int no ) {
 	execution_info::strings_ptr_t frames = execution_info::get_call_stack( no );
 	stream << "Obtained " << frames->get_size() << " stack frames." << endl;
 	yaal::copy( frames->begin(), frames->end(), stream_iterator( stream, hcore::endl ) );
-	}
+}
 
 }
 

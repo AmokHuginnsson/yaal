@@ -31,19 +31,16 @@ Copyright:
 #include "hconsole/hitem.hxx"
 #include "hconsole/hwindow.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief Implementation of TUI Tree control class.
  *
  * Tree control allows fancy representation of tree based data with handful
  * of display alteration methods.
  */
-class HTreeControl : public virtual HControl
-	{
+class HTreeControl : public virtual HControl {
 public:
 	typedef HTreeControl this_type;
 	typedef HControl base_type;
@@ -52,8 +49,7 @@ protected:
 	friend class HNodeControl;
 	/*! \brief Basic operatable element of TUI Tree control representing single tree node.
 	 */
-	class HNodeControl
-		{
+	class HNodeControl {
 	protected:
 		bool _unfolded;	/* is this branch folded? */
 		int _rowRaw;
@@ -70,7 +66,7 @@ protected:
 		bool hit_test( int, int ) const;
 		void click( int );
 		friend class HTreeControl;
-		};
+	};
 	typedef yaal::hcore::HTree<HNodeControl> tree_t;
 	tree_t _tree;
 	tree_t::node_t _selected;
@@ -96,7 +92,7 @@ private:
 	tree_t::node_t previous( tree_t::node_t, bool = false );
 	HTreeControl( HTreeControl const& );
 	HTreeControl& operator = ( HTreeControl const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HTreeControl, HControlException> HTreeControlException;
 

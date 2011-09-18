@@ -32,14 +32,11 @@ Copyright:
 #include "hcore/macro.hxx"
 #include "hcore/numeric.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-class HCharacterClass
-	{
+class HCharacterClass {
 	char const* _data;
 	int _size;
 public:
@@ -49,7 +46,7 @@ public:
 		{ return ( _data ); }
 	int size( void ) const
 		{ return ( _size ); }
-	};
+};
 
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _whiteSpace_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _digit_;
@@ -57,24 +54,21 @@ extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _letter_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _lowerCaseLetter_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _upperCaseLetter_;
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _word_;
-struct CHARACTER_CLASS
-	{
-	typedef enum
-		{
+struct CHARACTER_CLASS {
+	typedef enum {
 		WHITE_SPACE = 0,
 		DIGIT = 1,
 		LETTER = 2,
 		LOWER_CASE_LETTER = 3,
 		UPPER_CASE_LETTER = 4,
 		WORD = 5
-		} character_class_t;
-	};
+	} character_class_t;
+};
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const* _characterClass_[];
 
 /*! \brief Implementation of high level string operations.
  */
-class HString
-	{
+class HString {
 public:
 	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 2 ) - 1;
 	typedef HString this_type;
@@ -355,7 +349,7 @@ public:
 	 * \return Self.
 	 */
 	HString& append( char const* const, int long len_ );
-	};
+};
 
 HString operator + ( HString const&, HString const& );
 int strcasecmp( HString const&, HString const& );
@@ -369,8 +363,7 @@ int long hash( HString const& );
 
 /*! \brief HString class helpers, utility functions.
  */
-namespace string_helper
-{
+namespace string_helper {
 
 int long kmpcasesearch( char const* const, int long, char const* const, int long );
 

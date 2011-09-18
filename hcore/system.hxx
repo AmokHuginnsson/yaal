@@ -33,16 +33,13 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/pod.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Low level system interface belongs here.
  */
-namespace system
-{
+namespace system {
 
 int close( int );
 int getpid( void );
@@ -76,8 +73,7 @@ yaal::hcore::HString get_group_name( int gid_ );
 
 /*! \brief Store information about amount of given resource.
  */
-class HResourceInfo
-	{
+class HResourceInfo {
 	i64_t _available;
 	i64_t _free;
 	i64_t _total;
@@ -108,7 +104,7 @@ public:
 	 */
 	i64_t total( void ) const
 		{ return ( _total ); }
-	};
+};
 
 /*! \brief Get amount of free/avaialable for allocation memory.
  *

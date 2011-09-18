@@ -31,11 +31,9 @@ Copyright:
 #include "hcore/algorithm_low.hxx"
 #include "hcore/hexception.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Implementation of ordered pair concept.
  *
@@ -43,8 +41,7 @@ namespace hcore
  * \tparam second_t - type of second pair element.
  */
 template<typename first_t, typename second_t>
-class HPair
-	{
+class HPair {
 public:
 	typedef first_t first_type;
 	typedef second_t second_type;
@@ -55,37 +52,32 @@ public:
 	HPair( HPair const& pair ) : first( pair.first ), second( pair.second ) {}
 	template<typename alt_first_t, typename alt_second_t>
 	HPair( HPair<alt_first_t, alt_second_t> const& p ) : first( p.first ), second( p.second ) {}
-	HPair& operator = ( HPair const& pair )
-		{
+	HPair& operator = ( HPair const& pair ) {
 		M_PROLOG
-		if ( &pair != this )
-			{
+		if ( &pair != this ) {
 			HPair tmp( pair );
 			swap( tmp );
-			}
+		}
 		return ( *this );
 		M_EPILOG
-		}
+	}
 	bool operator == ( HPair const& pair ) const
 		{	return ( ( first == pair.first ) && ( second == pair.second ) );	}
 	bool operator != ( HPair const& pair ) const
 		{	return ( ! operator == ( pair ) );	}
-	bool operator < ( HPair const& pair ) const
-		{
+	bool operator < ( HPair const& pair ) const {
 		return ( ( first < pair.first )
 				|| ( ! ( pair.first < first ) && ( second < pair.second ) ) );
-		}
-	void swap( HPair& pair )
-		{
-		if ( &pair != this )
-			{
+	}
+	void swap( HPair& pair ) {
+		if ( &pair != this ) {
 			using yaal::swap;
 			swap( first, pair.first );
 			swap( second, pair.second );
-			}
-		return;
 		}
-	};
+		return;
+	}
+};
 
 template<typename first_type, typename second_type>
 HPair<first_type, second_type> make_pair( first_type const& first, second_type const& second )

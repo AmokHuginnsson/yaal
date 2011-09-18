@@ -33,26 +33,21 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
-HPlugin::HPlugin( void ) : _handle( NULL )
-	{
-	}
+HPlugin::HPlugin( void ) : _handle( NULL ) {
+}
 
-HPlugin::~HPlugin( void )
-	{
+HPlugin::~HPlugin( void ) {
 	M_PROLOG
 	if ( _handle )
 		unload();
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HPlugin::load( HString const& path_ )
-	{
+void HPlugin::load( HString const& path_ ) {
 	M_PROLOG
 	_handle = dlopen( ! path_.is_empty() ? path_.raw() : NULL, RTLD_NOW | RTLD_GLOBAL );
 	if ( _handle == reinterpret_cast<void const*>( -1 ) )
@@ -60,10 +55,9 @@ void HPlugin::load( HString const& path_ )
 	M_ENSURE_EX( _handle != NULL, path_ );
 	return;
 	M_EPILOG
-	}
+}
 
-void HPlugin::unload( void )
-	{
+void HPlugin::unload( void ) {
 	M_PROLOG
 #if ! defined( __HOST_OS_TYPE_FREEBSD__ )
 	M_ENSURE( dlclose( _handle ) == 0 );
@@ -73,29 +67,26 @@ void HPlugin::unload( void )
 	_handle = NULL;
 	return;
 	M_EPILOG
-	}
+}
 
-char const* HPlugin::error_message( int )
-	{
+char const* HPlugin::error_message( int ) {
 	M_PROLOG
 	return ( dlerror() );
 	M_EPILOG
-	}
+}
 
-void* HPlugin::resolve( HString const& symbolName_ )
-	{
+void* HPlugin::resolve( HString const& symbolName_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
 	void* sym = NULL;
 	M_ENSURE_EX( ( sym = dlsym( _handle, symbolName_.raw() ) ) != NULL, symbolName_ );
 	return ( sym );
 	M_EPILOG
-	}
+}
 
-bool HPlugin::is_loaded( void ) const
-	{
+bool HPlugin::is_loaded( void ) const {
 	return ( _handle ? true : false );
-	}
+}
 
 }
 

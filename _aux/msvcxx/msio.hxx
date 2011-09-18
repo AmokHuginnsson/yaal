@@ -8,27 +8,23 @@
 #include "crit.hxx"
 #include "hcore/macro.hxx"
 
-namespace msvcxx
-{
+namespace msvcxx {
 
 int const FALSE = 0;
 int const TRUE = 1;
 
 class SystemIO;
 
-class IO
-	{
+class IO {
 public:
-	struct TYPE
-		{
-		typedef enum
-			{
+	struct TYPE {
+		typedef enum {
 			TERMINAL,
 			PIPE,
 			NAMED_PIPE,
 			SOCKET
-			} type_t;
-		};
+		} type_t;
+	};
 private:
 	TYPE::type_t _type;
 	HANDLE _handle;
@@ -62,12 +58,11 @@ private:
 	int close( void );
 	IO( IO const& );
 	IO& operator = ( IO const& );
-	};
+};
 
 typedef std::tr1::shared_ptr<IO> io_ptr_t;
 
-class M_YAAL_HCORE_PUBLIC_API SystemIO
-	{
+class M_YAAL_HCORE_PUBLIC_API SystemIO {
 public:
 	static int const MANAGED_IO = 0x10000;
 private:
@@ -84,7 +79,7 @@ public:
 	static SystemIO& get_instance( void );
 private:
 	SystemIO( void );
-	};
+};
 
 } /* namespace msvcxx */
 

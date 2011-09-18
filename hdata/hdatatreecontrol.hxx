@@ -30,23 +30,20 @@ Copyright:
 #include "hconsole/htreecontrol.hxx"
 #include "hdata/hdatacontrol.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 class HDataWindow;
 
 /*! \brief Database connected tree based TUI control.
  */
-class HDataTreeControl : public HDataControl, public virtual hconsole::HTreeControl
-	{
+class HDataTreeControl : public HDataControl, public virtual hconsole::HTreeControl {
 public:
 	HDataTreeControl( HDataWindow*, int, int, int, int, char const* );
 	virtual ~HDataTreeControl( void );
 	virtual void load( int long );
-	};
+};
 
 }
 

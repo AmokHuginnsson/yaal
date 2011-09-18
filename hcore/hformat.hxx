@@ -33,16 +33,13 @@ Copyright:
 #include "hcore/memory.hxx"
 #include "hcore/hstreaminterface.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief printf() like but type safe string formating.
  */
-class HFormat
-	{
+class HFormat {
 	typedef HFormat this_type;
 	class HFormatImpl;
 	typedef HPointer<HFormatImpl> format_impl_ptr_t;
@@ -69,7 +66,7 @@ public:
 	HFormat operator % ( void const* );
 	HString string( void ) const;
 	HString format( void ) const;
-	};
+};
 
 typedef HExceptionT<HFormat> HFormatException;
 
@@ -80,36 +77,32 @@ typedef HExceptionT<HFormat> HFormatException;
  * cout << HFormat( "%.15Lf" ) % 3.141592653589793 << endl;
  * \endcode
  */
-class HStreamFormatProxy
-	{
-	class HStreamFormatProxyImpl
-		{
+class HStreamFormatProxy {
+	class HStreamFormatProxyImpl {
 		HFormat _format;
 		HStreamInterface& _stream;
 		HStreamFormatProxyImpl( HStreamInterface& s, HFormat const& f ) : _format( f ), _stream( s ) {}
 		friend class HStreamFormatProxy;
-		};
+	};
 	typedef HPointer<HStreamFormatProxyImpl> stream_format_proxy_impl_t;
 	stream_format_proxy_impl_t _impl;
 public:
 	HStreamFormatProxy( HStreamInterface& s, HFormat const& f ) : _impl( new ( memory::yaal ) HStreamFormatProxyImpl( s, f ) ) {}
 	template<typename tType>
-	HStreamFormatProxy operator % ( tType const& v )
-		{
+	HStreamFormatProxy operator % ( tType const& v ) {
 		M_PROLOG
 		_impl->_format % v;
 		return ( *this );
 		M_EPILOG
-		}
+	}
 	template<typename tType>
-	HStreamInterface& operator << ( tType const& v )
-		{
+	HStreamInterface& operator << ( tType const& v ) {
 		M_PROLOG
 		_impl->_stream << _impl->_format.string() << v;
 		return ( _impl->_stream );
 		M_EPILOG
-		}
-	};
+	}
+};
 
 HString str( HFormat const& );
 

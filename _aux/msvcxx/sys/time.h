@@ -25,29 +25,25 @@
 
 #include "hcore/macro.hxx"
 
-struct fd_set
-	{
+struct fd_set {
 	static int const MAXIMUM_FD_WAIT_OBJECTS = FD_SETSIZE;
 	int _data[MAXIMUM_FD_WAIT_OBJECTS];
 	int _count;
-	};
+};
 
-namespace asio
-{
+namespace asio {
 
-inline bool FD_ISSET( int fd_, fd_set const* fdset_ )
-	{
+inline bool FD_ISSET( int fd_, fd_set const* fdset_ ) {
 	bool isSet( false );
 	if ( fdset_->_count > 0 )
 		isSet = ( std::find( fdset_->_data, fdset_->_data + fdset_->_count, fd_ ) != ( fdset_->_data + fdset_->_count ) );
 	return ( isSet );
-	}
+}
 
-inline void FD_ZERO( fd_set* fdset_ )
-	{
+inline void FD_ZERO( fd_set* fdset_ ) {
 	std::fill_n( fdset_->_data, fd_set::MAXIMUM_FD_WAIT_OBJECTS, -1 );
 	fdset_->_count = 0;
-	}
+}
 
 inline void FD_SET( int fd_, fd_set* fdset_ )
 	{ fdset_->_data[ fdset_->_count ++ ] = fd_; }
@@ -62,11 +58,10 @@ using namespace asio;
 typedef int clockid_t;
 typedef void* timer_t;
 
-struct itimerspec
-	{
+struct itimerspec {
 	timespec it_value;
 	timespec it_interval;
-	};
+};
 
 M_YAAL_HCORE_PUBLIC_API
 int timer_create( clockid_t, struct sigevent*, timer_t* );
@@ -75,8 +70,7 @@ int timer_settime( timer_t, int, struct itimerspec const*, struct itimerspec* );
 M_YAAL_HCORE_PUBLIC_API
 int timer_delete( timer_t );
 
-namespace msvcxx
-{
+namespace msvcxx {
 
 M_YAAL_HCORE_PUBLIC_API
 int select( int, fd_set*, fd_set*, fd_set*, struct timeval* );

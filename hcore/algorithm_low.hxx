@@ -30,8 +30,7 @@ Copyright:
 #ifndef YAAL_HCORE_ALGORITHM_IMPL_HXX_INCLUDED
 #define YAAL_HCORE_ALGORITHM_IMPL_HXX_INCLUDED 1
 
-namespace yaal
-{
+namespace yaal {
 
 /*! \brief Swap contents of two variables.
  *
@@ -41,16 +40,14 @@ namespace yaal
  * \post After the call left holds value of right from before call, and right holds value of left from before call.
  */
 template<typename tType>
-inline void swap( tType& left, tType& right )
-	{
-	if ( &left != &right )
-		{
+inline void swap( tType& left, tType& right ) {
+	if ( &left != &right ) {
 		tType tmp( left );
 		left = right;
 		right = tmp;
-		}
-	return;
 	}
+	return;
+}
 
 /*! \brief Get smaller of two values.
  *
@@ -59,10 +56,9 @@ inline void swap( tType& left, tType& right )
  * \return Smaller of two values.
  */
 template<typename tType>
-inline tType min( tType const& left, tType const& right )
-	{
+inline tType min( tType const& left, tType const& right ) {
 	return ( left < right ? left : right );
-	}
+}
 
 /*! \brief Get bigger of two values.
  *
@@ -71,10 +67,9 @@ inline tType min( tType const& left, tType const& right )
  * \return Bigger of two values.
  */
 template<typename tType>
-inline tType max( tType const& left, tType const& right )
-	{
+inline tType max( tType const& left, tType const& right ) {
 	return ( left >= right ? left : right );
-	}
+}
 
 }
 

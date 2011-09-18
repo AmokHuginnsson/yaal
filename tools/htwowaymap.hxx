@@ -33,17 +33,14 @@ Copyright:
 #include "hcore/hlist.hxx"
 #include "hcore/hmap.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief HSBBSTree util, a helper for HSet<> instatiations for left view.
  */
 template<typename key_type, typename data_type>
-struct twowaymap_helper
-{
+struct twowaymap_helper {
 
 inline static bool less( yaal::hcore::HPair<key_type, data_type> const& left, yaal::hcore::HPair<key_type, data_type> const& right )
 	{	return ( *(left.first) < *(right.first) );	}
@@ -65,8 +62,7 @@ inline static bool less( yaal::hcore::HPair<key_type, data_type> const& left, ke
  * \tparam right_type_t - type of elements in "right" set in map.
  */
 template<typename left_type_t, typename right_type_t>
-class HTwoWayMap
-	{
+class HTwoWayMap {
 public:
 	typedef HTwoWayMap<left_type_t, right_type_t> this_type;
 	typedef left_type_t left_type;
@@ -114,26 +110,21 @@ public:
 	left_view_type const& left( void ) const;
 	right_view_type const& right( void ) const;
 private:
-	struct equal_helper
-		{
-		bool operator()( typename left_view_type::view_storage_type::value_type const& left_, typename left_view_type::view_storage_type::value_type const& right_ ) const
-			{
+	struct equal_helper {
+		bool operator()( typename left_view_type::view_storage_type::value_type const& left_, typename left_view_type::view_storage_type::value_type const& right_ ) const {
 			return ( *(left_.second) == *(right_.second) );
-			}
-		};
-	struct less_helper
-		{
-		bool operator()( typename left_view_type::view_storage_type::value_type const& left_, typename left_view_type::view_storage_type::value_type const& right_ ) const
-			{
-			return ( *(left_.second) < *(right_.second) );
-			}
-		};
+		}
 	};
+	struct less_helper {
+		bool operator()( typename left_view_type::view_storage_type::value_type const& left_, typename left_view_type::view_storage_type::value_type const& right_ ) const {
+			return ( *(left_.second) < *(right_.second) );
+		}
+	};
+};
 
 template<typename left_type_t, typename right_type_t>
 template<typename view_type_t>
-class HTwoWayMap<left_type_t, right_type_t>::HView
-	{
+class HTwoWayMap<left_type_t, right_type_t>::HView {
 	typedef typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t> this_type;
 	typedef HTwoWayMap<left_type_t, right_type_t> twowaymap_type;
 	typedef typename twowaymap_type::storage_type storage_type;
@@ -158,13 +149,12 @@ public:
 	int long count( view_type_t const& ) const;
 private:
 	friend class HTwoWayMap<left_type_t, right_type_t>;
-	};
+};
 
 template<typename left_type_t, typename right_type_t>
 template<typename view_type_t>
 class HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::HIterator
-	: public yaal::hcore::iterator_interface<typename HTwoWayMap<left_type_t, right_type_t>::value_type, yaal::hcore::iterator_category::forward>
-	{
+	: public yaal::hcore::iterator_interface<typename HTwoWayMap<left_type_t, right_type_t>::value_type, yaal::hcore::iterator_category::forward> {
 	typedef typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::HIterator this_type;
 	typedef yaal::hcore::iterator_interface<typename HTwoWayMap<left_type_t, right_type_t>::value_type, yaal::hcore::iterator_category::forward> base_type;
 	typedef typename base_type::value_type value_type;
@@ -177,268 +167,232 @@ class HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::HIterator
 public:
 	HIterator( void ) : base_type(), _owner( NULL ), _engine() {}
 	HIterator( HIterator const& it_ ) : base_type(), _owner( it_._owner ), _engine( it_._engine ) {}
-	HIterator& operator = ( HIterator const& it_ )
-		{
-		if ( &it_ != this )
-			{
+	HIterator& operator = ( HIterator const& it_ ) {
+		if ( &it_ != this ) {
 			_owner = it_._owner;
 			_engine = it_._engine;
-			}
-		return ( *this );
 		}
-	HIterator& operator ++ ( void )
-		{
+		return ( *this );
+	}
+	HIterator& operator ++ ( void ) {
 		++ _engine;
 		return ( *this );
-		}
-	HIterator& operator -- ( void )
-		{
+	}
+	HIterator& operator -- ( void ) {
 		-- _engine;
 		return ( *this );
-		}
-	HIterator operator ++ ( int )
-		{
+	}
+	HIterator operator ++ ( int ) {
 		HIterator it( *this );
 		++ _engine;
 		return ( it );
-		}
-	HIterator operator -- ( int )
-		{
+	}
+	HIterator operator -- ( int ) {
 		HIterator it( *this );
 		++ _engine;
 		return ( it );
-		}
-	bool operator != ( HIterator const& it_ )
-		{
+	}
+	bool operator != ( HIterator const& it_ ) {
 		M_ASSERT( _owner == it_._owner );
 		return ( _engine != it_._engine );
-		}
-	bool operator == ( HIterator const& it_ )
-		{
+	}
+	bool operator == ( HIterator const& it_ ) {
 		M_ASSERT( _owner == it_._owner );
 		return ( _engine == it_._engine );
-		}
-	value_type const& operator*( void ) const
-		{
+	}
+	value_type const& operator*( void ) const {
 		return ( *(_engine->second) );
-		}
-	value_type const* operator->( void ) const
-		{
+	}
+	value_type const* operator->( void ) const {
 		return ( &*(_engine->second) );
-		}
+	}
 private:
 	HIterator( view_type const* owner_, iterator_t engine_ ) : base_type(), _owner( owner_ ), _engine( engine_ ) {}
 	friend class HTwoWayMap<left_type_t, right_type_t>;
-	};
+};
 
 template<typename left_type_t, typename right_type_t>
 HTwoWayMap<left_type_t, right_type_t>::HTwoWayMap( void )
-	: _data(), _leftView(), _rightView()
-	{
-	}
+	: _data(), _leftView(), _rightView() {
+}
 
 template<typename left_type_t, typename right_type_t>
 template<typename iter_t>
 HTwoWayMap<left_type_t, right_type_t>::HTwoWayMap( iter_t first, iter_t last )
-	: _data(), _leftView(), _rightView()
-	{
+	: _data(), _leftView(), _rightView() {
 	M_PROLOG
 	assign( first, last );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 HTwoWayMap<left_type_t, right_type_t>::HTwoWayMap( HTwoWayMap const& twm_ )
-	: _data(), _leftView(), _rightView()
-	{
+	: _data(), _leftView(), _rightView() {
 	M_PROLOG
 	assign( twm_._data.begin(), twm_._data.end() );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-HTwoWayMap<left_type_t, right_type_t>& HTwoWayMap<left_type_t, right_type_t>::operator = ( HTwoWayMap const& twm_ )
-	{
+HTwoWayMap<left_type_t, right_type_t>& HTwoWayMap<left_type_t, right_type_t>::operator = ( HTwoWayMap const& twm_ ) {
 	M_PROLOG
-	if ( &twm_ != this )
-		{
+	if ( &twm_ != this ) {
 		HTwoWayMap tmp( twm_ );
 		swap( tmp );
-		}
+	}
 	return ( *this );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-void HTwoWayMap<left_type_t, right_type_t>::swap( HTwoWayMap& twm_ )
-	{
+void HTwoWayMap<left_type_t, right_type_t>::swap( HTwoWayMap& twm_ ) {
 	M_PROLOG
-	if ( &twm_ != this )
-		{
+	if ( &twm_ != this ) {
 		using yaal::swap;
 		swap( _data, twm_._data );
 		swap( _leftView._data, twm_._leftView._data );
 		swap( _rightView._data, twm_._rightView._data );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 template<typename iter_t>
-void HTwoWayMap<left_type_t, right_type_t>::assign( iter_t first, iter_t last )
-	{
+void HTwoWayMap<left_type_t, right_type_t>::assign( iter_t first, iter_t last ) {
 	M_PROLOG
 	clear();
 	for ( ; first != last; ++ first )
 		insert( *first );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-bool HTwoWayMap<left_type_t, right_type_t>::is_empty( void ) const
-	{
+bool HTwoWayMap<left_type_t, right_type_t>::is_empty( void ) const {
 	M_PROLOG
 	bool isEmpty( _data.is_empty() );
 	return ( isEmpty );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-bool HTwoWayMap<left_type_t, right_type_t>::empty( void ) const
-	{
+bool HTwoWayMap<left_type_t, right_type_t>::empty( void ) const {
 	M_PROLOG
 	return ( is_empty() );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-int long HTwoWayMap<left_type_t, right_type_t>::get_size( void ) const
-	{
+int long HTwoWayMap<left_type_t, right_type_t>::get_size( void ) const {
 	M_PROLOG
 	return ( _data.get_size() );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-int long HTwoWayMap<left_type_t, right_type_t>::size( void ) const
-	{
+int long HTwoWayMap<left_type_t, right_type_t>::size( void ) const {
 	M_PROLOG
 	return ( get_size() );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-void HTwoWayMap<left_type_t, right_type_t>::clear( void )
-	{
+void HTwoWayMap<left_type_t, right_type_t>::clear( void ) {
 	M_PROLOG
 	_rightView._data.clear();
 	_leftView._data.clear();
 	_data.clear();
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 typename HTwoWayMap<left_type_t, right_type_t>::const_iterator
-HTwoWayMap<left_type_t, right_type_t>::begin( void ) const
-	{
+HTwoWayMap<left_type_t, right_type_t>::begin( void ) const {
 	M_PROLOG
 	return ( _data.begin() );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 typename HTwoWayMap<left_type_t, right_type_t>::const_iterator
-HTwoWayMap<left_type_t, right_type_t>::end( void ) const
-	{
+HTwoWayMap<left_type_t, right_type_t>::end( void ) const {
 	M_PROLOG
 	return ( _data.end() );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 typename HTwoWayMap<left_type_t, right_type_t>::const_reverse_iterator
-HTwoWayMap<left_type_t, right_type_t>::rbegin( void ) const
-	{
+HTwoWayMap<left_type_t, right_type_t>::rbegin( void ) const {
 	M_PROLOG
 	return ( _data.rbegin() );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 typename HTwoWayMap<left_type_t, right_type_t>::const_reverse_iterator
-HTwoWayMap<left_type_t, right_type_t>::rend( void ) const
-	{
+HTwoWayMap<left_type_t, right_type_t>::rend( void ) const {
 	M_PROLOG
 	return ( _data.rend() );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 typename HTwoWayMap<left_type_t, right_type_t>::insert_result
-HTwoWayMap<left_type_t, right_type_t>::insert( value_type const& value_ )
-	{
+HTwoWayMap<left_type_t, right_type_t>::insert( value_type const& value_ ) {
 	M_PROLOG
 	typename left_view_type::view_storage_type::const_iterator lvit( _leftView._data.find( &(value_.first) ) );
 	bool inserted( false );
 	typename storage_type::iterator it;
-	if ( ! ( lvit != _leftView._data.end() ) )
-		{
+	if ( ! ( lvit != _leftView._data.end() ) ) {
 		typename right_view_type::view_storage_type::const_iterator rvit( _rightView._data.find( &(value_.second) ) );
-		if ( ! ( rvit != _rightView._data.end() ) )
-			{
+		if ( ! ( rvit != _rightView._data.end() ) ) {
 			_data.push_back( value_ );
 			it = _data.rbegin().base();
 			_leftView._data.insert( make_pair( &it->first, it ) );
 			_rightView._data.insert( make_pair( &it->second, it ) );
 			inserted = true;
-			}
-		else
+		} else
 			it = rvit->second;
-		}
-	else
+	} else
 		it = lvit->second;
 	M_ASSERT( ( _data.get_size() == _leftView._data.get_size() ) && ( _data.get_size() == _rightView._data.get_size() ) );
 	return ( make_pair( it, inserted ) );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-int long HTwoWayMap<left_type_t, right_type_t>::count( value_type const& value_ ) const
-	{
+int long HTwoWayMap<left_type_t, right_type_t>::count( value_type const& value_ ) const {
 	M_PROLOG
 	typename left_view_type::view_storage_type::const_iterator it( _leftView._data.find( &(value_.first) ) );
 	return ( ( ( it != _leftView._data.end() ) && ( it->second->second == value_.second ) ) ? 1 : 0 );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-int long HTwoWayMap<left_type_t, right_type_t>::erase( value_type const& value_ )
-	{
+int long HTwoWayMap<left_type_t, right_type_t>::erase( value_type const& value_ ) {
 	M_PROLOG
 	typename left_view_type::view_storage_type::iterator lvit( _leftView._data.find( &(value_.first) ) );
 	bool erased = false;
-	if ( ( lvit != _leftView._data.end() ) && ( lvit->second->second == value_.second ) )
-		{
+	if ( ( lvit != _leftView._data.end() ) && ( lvit->second->second == value_.second ) ) {
 		typename storage_type::iterator it( lvit->second );
 		int long const erasedInRight( _rightView._data.erase( &(value_.second) ) );
 		M_ASSERT( erasedInRight == 1 );
 		_leftView._data.erase( lvit );
 		_data.erase( it );
 		erased = true;
-		}
+	}
 	M_ASSERT( ( _data.get_size() == _leftView._data.get_size() ) && ( _data.get_size() == _rightView._data.get_size() ) );
 	return ( erased ? 1 : 0 );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-void HTwoWayMap<left_type_t, right_type_t>::erase( const_iterator const& it )
-	{
+void HTwoWayMap<left_type_t, right_type_t>::erase( const_iterator const& it ) {
 	M_PROLOG
 	typename left_view_type::view_storage_type::iterator lvit( _leftView._data.find( &(it->first) ) );
 	M_ASSERT( lvit != _leftView._data.end() );
@@ -450,91 +404,79 @@ void HTwoWayMap<left_type_t, right_type_t>::erase( const_iterator const& it )
 	M_ASSERT( ( _data.get_size() == _leftView._data.get_size() ) && ( _data.get_size() == _rightView._data.get_size() ) );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-void HTwoWayMap<left_type_t, right_type_t>::erase( iterator first, iterator last )
-	{
+void HTwoWayMap<left_type_t, right_type_t>::erase( iterator first, iterator last ) {
 	M_PROLOG
-	for ( ; first != last; )
-		{
+	for ( ; first != last; ) {
 		iterator del( first );
 		++ first;
 		erase( del );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-bool HTwoWayMap<left_type_t, right_type_t>::operator == ( HTwoWayMap const& twm_ ) const
-	{
+bool HTwoWayMap<left_type_t, right_type_t>::operator == ( HTwoWayMap const& twm_ ) const {
 	M_PROLOG
 	return ( ( &twm_ == this ) || safe_equal( _leftView._data.begin(), _leftView._data.end(), twm_._leftView._data.begin(), twm_._leftView._data.end(), equal_helper() ) );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-bool HTwoWayMap<left_type_t, right_type_t>::operator < ( HTwoWayMap const& twm_ ) const
-	{
+bool HTwoWayMap<left_type_t, right_type_t>::operator < ( HTwoWayMap const& twm_ ) const {
 	M_PROLOG
 	return ( ( &twm_ != this ) && lexicographical_compare( _leftView._data.begin(), _leftView._data.end(), twm_._leftView._data.begin(), twm_._leftView._data.end(), less_helper() ) );
 	M_EPILOG
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-typename HTwoWayMap<left_type_t, right_type_t>::left_view_type const& HTwoWayMap<left_type_t, right_type_t>::left( void ) const
-	{
+typename HTwoWayMap<left_type_t, right_type_t>::left_view_type const& HTwoWayMap<left_type_t, right_type_t>::left( void ) const {
 	return ( _leftView );
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
-typename HTwoWayMap<left_type_t, right_type_t>::right_view_type const& HTwoWayMap<left_type_t, right_type_t>::right( void ) const
-	{
+typename HTwoWayMap<left_type_t, right_type_t>::right_view_type const& HTwoWayMap<left_type_t, right_type_t>::right( void ) const {
 	return ( _rightView );
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 template<typename view_type_t>
-typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::begin( void ) const
-	{
+typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::begin( void ) const {
 	return ( const_iterator( this, _data.begin() ) );
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 template<typename view_type_t>
-typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::end( void ) const
-	{
+typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::end( void ) const {
 	return ( const_iterator( this, _data.end() ) );
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 template<typename view_type_t>
-typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::find( view_type_t const& key_ ) const
-	{
+typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::find( view_type_t const& key_ ) const {
 	return ( const_iterator( this, _data.find( &key_ ) ) );
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 template<typename view_type_t>
-typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::lower_bound( view_type_t const& key_ ) const
-	{
+typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::lower_bound( view_type_t const& key_ ) const {
 	return ( const_iterator( this, _data.lower_bound( &key_ ) ) );
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 template<typename view_type_t>
-typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::upper_bound( view_type_t const& key_ ) const
-	{
+typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t>::const_iterator HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::upper_bound( view_type_t const& key_ ) const {
 	return ( const_iterator( this, _data.upper_bound( &key_ ) ) );
-	}
+}
 
 template<typename left_type_t, typename right_type_t>
 template<typename view_type_t>
-int long HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::count( view_type_t const& key_ ) const
-	{
+int long HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::count( view_type_t const& key_ ) const {
 	return ( _data.count( &key_ ) );
-	}
+}
 
 }
 

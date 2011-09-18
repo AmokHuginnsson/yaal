@@ -34,24 +34,21 @@ Copyright:
 #include "tools/signals.hxx"
 #include "hconsole/mouse.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
 /*! \brief User inteface.
  * 
  * This namespace contains library API required to build
  * terminal based user interface (TUI).
  */
-namespace hconsole
-{
+namespace hconsole {
 
 extern int const C_OK;
 extern int const C_ERR;
 
 /*! \brief Special key codes.
  */
-struct KEY_CODES
-	{
+struct KEY_CODES {
 	static int const ESC					= 27;
 	/* Coincidentaly KEY_MAX from ncurses is 0777 which is 511. */
 	static int const SPECIAL_KEY  = 0x400;
@@ -69,35 +66,30 @@ struct KEY_CODES
 	static int const MOUSE				=	BACKSPACE	+ 1;
 	static int const META_BASE		= 0x04000;
 	static int const COMMAND_BASE	= 0x08000;
-	};
+};
 
 /*! \brief Quasi graphic glyphs.
  */
-struct GLYPHS
-	{
+struct GLYPHS {
 	static int DOWN_ARROW;
 	static int UP_ARROW;
 	static int VERTICAL_LINE;
-	};
+};
 
 /*! \brief Cursor visibility types.
  */
-struct CURSOR
-	{
-	typedef enum
-		{
+struct CURSOR {
+	typedef enum {
 		INVISIBLE, 
 		VISIBLE, 
 		VERY_VISIBLE
-		} cursor_t;
-	};
+	} cursor_t;
+};
 
 /*! \brief TUI colors definitions.
  */
-struct COLORS
-	{
-	enum
-		{
+struct COLORS {
+	enum {
 		FG_BLACK         = 0,
 		FG_RED           = 1,
 		FG_GREEN         = 2,
@@ -134,8 +126,8 @@ struct COLORS
 		BG_WHITE         = 112 | BG_BLINK,
 		ATTR_NORMAL      = ( FG_LIGHTGRAY | BG_BLACK ),
 		ATTR_DEFAULT     = -1
-		};
 	};
+};
 
 /*! \brief Get special key code values.
  *
@@ -145,43 +137,36 @@ struct COLORS
  * \retval commercial - CONTROL-x modified code (command).
  */
 template<int code = 0>
-struct KEY
-	{
+struct KEY {
 	static int const meta = code + KEY_CODES::META_BASE;
-	static int meta_r( int code_ )
-		{
+	static int meta_r( int code_ ) {
 		return ( code_ + KEY_CODES::META_BASE );
-		}
+	}
 	static int const ctrl = code - 96;
-	static int ctrl_r( int code_ )
-		{
+	static int ctrl_r( int code_ ) {
 		return ( code_ - 96 );
-		}
+	}
 	static int const command = code + KEY_CODES::COMMAND_BASE;
-	static int command_r( int code_ )
-		{
+	static int command_r( int code_ ) {
 		return ( code_ + KEY_CODES::COMMAND_BASE );
-		}
-	};
+	}
+};
 
 /*! \brief TUI input events types.
  */
-struct EVENT
-	{
-	enum
-		{
+struct EVENT {
+	enum {
 		ERROR,
 		KEYBOARD,
 		MOUSE
-		};
 	};
+};
 
 extern M_YAAL_HCONSOLE_PUBLIC_API bool _needRepaint_;
 
 /*! \brief Low level TUI description and modifier.
  */
-class HConsole : public yaal::hcore::HSingleton<HConsole>
-	{
+class HConsole : public yaal::hcore::HSingleton<HConsole> {
 protected:
 	typedef HConsole this_type;
 	typedef yaal::hcore::HSingleton<HConsole> base_type;
@@ -235,7 +220,7 @@ private:
 	~HConsole( void );
 	friend class yaal::hcore::HSingleton<HConsole>;
 	friend class yaal::hcore::HDestructor<HConsole>;
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HConsole, yaal::hcore::HSingletonException> HConsoleException;
 

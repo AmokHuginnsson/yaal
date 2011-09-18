@@ -50,32 +50,25 @@ M_VCSID( "$Id: "__ID__" $" )
 #include "hfile.hxx"
 #include "htokenizer.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-namespace system
-{
+namespace system {
 
-int close( int fd_ )
-	{
+int close( int fd_ ) {
 	return ( ::close( fd_ ) );
-	}
+}
 
-int getpid( void )
-	{
+int getpid( void ) {
 	return ( ::getpid() );
-	}
+}
 
-int kill( int pid_, int signal_ )
-	{
+int kill( int pid_, int signal_ ) {
 	return ( ::kill( pid_, signal_ ) );
-	}
+}
 
-int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ )
-	{
+int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ ) {
 	M_ASSERT( ( inputCount_ >= 0 ) && ( outputCount_ >= 0 ) && ( ( inputCount_ + outputCount_ ) > 0 ) );
 	M_ASSERT( ! inputCount_ || input_ );
 	M_ASSERT( ! outputCount_ || output_ );
@@ -92,45 +85,38 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 	for ( int i( 0 ); i < outputCount_; ++ i )
 		FD_SET( output_[ i ], &writers );
 	timeval timeOut, * timeOutP = timeOut_ ? &timeOut : NULL;
-	if ( timeOut_ )
-		{
+	if ( timeOut_ ) {
 		timeOut.tv_usec = ( *timeOut_ % 1000 ) * 1000;
 		timeOut.tv_sec = *timeOut_ / 1000;
-		}
+	}
 	int ret( 0 );
-	do
-		{
+	do {
 		ret = ::select( FD_SETSIZE, inputCount_ ? &readers : NULL, outputCount_ ? &writers : NULL, NULL, timeOutP );
-		}
-	while ( restartable_
+	} while ( restartable_
 			&& ( ret == -1 )
 			&& ( errno == EINTR )
 			&& ( ! timeOut_ || ( clock.get_time_elapsed( HClock::UNIT::MILISECOND ) < *timeOut_ ) ) );
-	for ( int i( 0 ); i < inputCount_; ++ i )
-		{
+	for ( int i( 0 ); i < inputCount_; ++ i ) {
 		if ( ! FD_ISSET( input_[ i ], &readers ) )
 			input_[ i ] = -1;
-		}
-	for ( int i( 0 ); i < outputCount_; ++ i )
-		{
+	}
+	for ( int i( 0 ); i < outputCount_; ++ i ) {
 		if ( ! FD_ISSET( output_[ i ], &writers ) )
 			output_[ i ] = -1;
-		}
+	}
 	if ( timeOut_ )
 		*timeOut_ -= min( *timeOut_, clock.get_time_elapsed( HClock::UNIT::MILISECOND ) );
 	return ( ret );
-	}
+}
 
-namespace
-{
+namespace {
 
 static int const GETPW_R_SIZE   = 1024;
 static int const GETGR_R_SIZE   = 1024;
 
 }
 
-HString get_user_name( int uid_ )
-	{
+HString get_user_name( int uid_ ) {
 	M_PROLOG
 	passwd accountInfo;
 	int bufferSize( static_cast<int>( ::sysconf( _SC_GETPW_R_SIZE_MAX ) ) );
@@ -141,10 +127,9 @@ HString get_user_name( int uid_ )
 	M_ENSURE( ! getpwuid_r( uid_, &accountInfo, buffer.get<char>(), bufferSize, &any ) );
 	return ( any ? HString( accountInfo.pw_name ) : HString( uid_ ) );
 	M_EPILOG
-	}
+}
 
-HString get_group_name( int gid_ )
-	{
+HString get_group_name( int gid_ ) {
 	M_PROLOG
 	group groupInfo;
 	int bufferSize( static_cast<int>( ::sysconf( _SC_GETGR_R_SIZE_MAX ) ) );
@@ -155,10 +140,9 @@ HString get_group_name( int gid_ )
 	M_ENSURE( ! getgrgid_r( gid_, &groupInfo, buffer.get<char>(), bufferSize, &any ) );
 	return ( any ? HString( groupInfo.gr_name ) : HString( gid_ ) );
 	M_EPILOG
-	}
+}
 
-HResourceInfo get_memory_size_info( void )
-	{
+HResourceInfo get_memory_size_info( void ) {
 	M_PROLOG
 	i64_t availableMemory( 0 );
 	i64_t freeMemory( 0 );
@@ -172,8 +156,7 @@ HResourceInfo get_memory_size_info( void )
 	/* FIXME: sysconf() interface is also available on Linux and is way faster.
 	 * We shall make use of it.
 	 */
-	try
-		{
+	try {
 		HFile meminfo( "/proc/meminfo", HFile::OPEN::READING );
 		HString line;
 		HTokenizer t( line, ":" );
@@ -182,34 +165,27 @@ HResourceInfo get_memory_size_info( void )
 		char const TAGS[][9] = { "MemFree", "MemTotal", "Cached" };
 		i64_t* vars[] = { &freeMemory, &totalMemory, &cachedMemory };
 		int hit( 0 );
-		while ( ( hit < countof ( TAGS ) ) && ( meminfo.read_line( line ) > 0 ) )
-			{
+		while ( ( hit < countof ( TAGS ) ) && ( meminfo.read_line( line ) > 0 ) ) {
 			t.assign( line );
-			if ( t.begin() != t.end() )
-				{
+			if ( t.begin() != t.end() ) {
 				tokens = *t.begin();
-				for ( int f( 0 ); f < countof ( TAGS ); ++ f )
-					{
-					if ( ! strcasecmp( tokens, TAGS[f] ) )
-						{
+				for ( int f( 0 ); f < countof ( TAGS ); ++ f ) {
+					if ( ! strcasecmp( tokens, TAGS[f] ) ) {
 						HTokenizer::iterator it( t.begin() );
 						++ it;
-						if ( it != t.end() )
-							{
+						if ( it != t.end() ) {
 							tokens = *it;
 							tokens.trim();
 							*(vars[f]) = lexical_cast<i64_t>( tokens ) * 1024;
 							++ hit;
-							}
 						}
 					}
 				}
 			}
+		}
 		freeMemory += cachedMemory;
-		}
-	catch ( HException const& )
-		{
-		}
+	} catch ( HException const& ) {
+	}
 #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) /* #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
 	usedMemory = ru.ru_maxrss * 1024;
 	int mib[] = { CTL_HW, HW_PAGESIZE };
@@ -251,10 +227,9 @@ HResourceInfo get_memory_size_info( void )
 #endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 	return ( HResourceInfo( availableMemory, freeMemory, totalMemory ) );
 	M_EPILOG
-	}
+}
 
-HResourceInfo get_disk_space_info( yaal::hcore::HString const& path_ )
-	{
+HResourceInfo get_disk_space_info( yaal::hcore::HString const& path_ ) {
 	M_PROLOG
 	struct statvfs svfs;
 	::memset( &svfs, 0, sizeof ( svfs ) );
@@ -263,14 +238,13 @@ HResourceInfo get_disk_space_info( yaal::hcore::HString const& path_ )
 				static_cast<i64_t>( svfs.f_bfree ) * static_cast<i64_t>( svfs.f_frsize ),
 				static_cast<i64_t>( svfs.f_blocks ) * static_cast<i64_t>( svfs.f_frsize ) ) );
 	M_EPILOG
-	}
+}
 
-int get_core_count_info( void )
-	{
+int get_core_count_info( void ) {
 	M_PROLOG
 	return ( static_cast<int>( ::sysconf( _SC_NPROCESSORS_ONLN ) ) );
 	M_EPILOG
-	}
+}
 
 }
 

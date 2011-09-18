@@ -30,18 +30,15 @@ Copyright:
 #include "hcore/hopenssl.hxx"
 #include "hcore/hstreaminterface.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 typedef int file_descriptor_t;
 
 /*! \brief Raw low level IO operations abstraction.
  */
-class HRawFile : public HStreamInterface
-	{
+class HRawFile : public HStreamInterface {
 protected:
 	typedef HRawFile this_type;
 	typedef HStreamInterface base_type;
@@ -50,28 +47,24 @@ protected:
 	typedef int ( HRawFile::* CLOSER_t )( void );
 	/*! \brief Type of underneath file descriptor.
 	 */
-	struct TYPE
-		{
+	struct TYPE {
 		/*! \brief Fd type flags.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			DEFAULT			= 0, /*!< means plain */
 			PLAIN				= 1, /*!< fd represents plain raw IO */
 			SSL_SERVER	= 2, /*!< fd represents SSL server part of IO */
 			SSL_CLIENT	= 4  /*!< fd represents SSL client part of IO */
-			} raw_file_type_t;
-		};
+		} raw_file_type_t;
+	};
 	/*! \brief HRawFile event type that HRawFile user can wait for.
 	 */
-	struct ACTION
-		{
-		typedef enum
-			{
+	struct ACTION {
+		typedef enum {
 			READ,
 			WRITE
-			} action_t;
-		};
+		} action_t;
+	};
 	TYPE::raw_file_type_t _type;
 	file_descriptor_t _fileDescriptor; /* raw file descriptor of the file */
 	int long _timeout;
@@ -104,7 +97,7 @@ protected:
 	virtual void do_flush( void ) const;
 	virtual bool do_is_valid( void ) const;
 	bool wait_for( ACTION::action_t const&, int long* );
-	};
+};
 
 typedef HExceptionT<HRawFile, HStreamInterfaceException> HRawFileException;
 

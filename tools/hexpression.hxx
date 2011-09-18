@@ -31,19 +31,15 @@ Copyright:
 #include "hcore/htree.hxx"
 #include "hcore/harray.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Mathematical expression analyser and evaluator.
  */
-class HExpression
-	{
+class HExpression {
 	typedef HExpression this_type;
-	typedef enum
-		{
+	typedef enum {
 		OK = 0,
 		UNKNOWN_MNEMONIC = 1,
 		UNEXPECTED_TERMINATION = 2,
@@ -54,17 +50,16 @@ class HExpression
 		DIGIT_EXPECTED = 7,
 		UNEXPECTED_TOKEN = 8,
 		PREMATURE_TERMINATION = 9
-		} syntax_error_t;
+	} syntax_error_t;
 	typedef hcore::HList<int> int_list_t;
 	struct OEquationElement;
 	typedef hcore::HTree<OEquationElement> tree_t;
-	struct OEquationElement
-		{
+	struct OEquationElement {
 		typedef double long ( HExpression::* METHOD_t ) ( tree_t::const_node_t );
 		METHOD_t METHOD;
 		int_list_t _variables;
 		OEquationElement() : METHOD(), _variables() {}
-		};
+	};
 	int _index;
 	int _length;
 	syntax_error_t _error;
@@ -104,7 +99,7 @@ private:
 	double long bracket( tree_t::const_node_t );
 	double long functions( tree_t::const_node_t );
 	void shorten_the_branch( tree_t::node_t );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HExpression> HExpressionException;
 

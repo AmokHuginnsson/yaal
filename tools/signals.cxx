@@ -45,14 +45,11 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
-namespace
-{
+namespace {
 
 /*
  * dummy_signal_handler is called even if signal is masked in sigwait,
@@ -61,8 +58,7 @@ namespace
 static void dummy_signal_handler( int )
 	{ }
 
-class HBaseSignalHandlers
-	{
+class HBaseSignalHandlers {
 	typedef HBaseSignalHandlers this_type;
 public:
 	static void unlock( int );
@@ -76,10 +72,9 @@ public:
 	static int signal_fatal( int ) __attribute__(( __noreturn__ ));
 	static void signal_fatal_sync( int );
 	static int signal_USR1( int );
-	};
+};
 
-void reset_signal_low( int sigNo_ )
-	{
+void reset_signal_low( int sigNo_ ) {
 	M_PROLOG
 	struct sigaction act;
 	::memset( &act, 0, sizeof ( act ) );
@@ -90,7 +85,7 @@ void reset_signal_low( int sigNo_ )
 	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &act.sa_mask, NULL ) == 0 );
 	return;
 	M_EPILOG
-	}
+}
 
 }
 
@@ -101,8 +96,7 @@ HSignalService::HSignalService( void )
 	: _loop( true ),
 	_catch( chunk_size<sigset_t>( 1 ) ),
 	_block( chunk_size<sigset_t>( 1 ) ),
-	_thread(), _mutex(), _handlers()
-	{
+	_thread(), _mutex(), _handlers() {
 	M_PROLOG
 	M_ENSURE( sigemptyset( _catch.get<sigset_t>() ) == 0 );
 	M_ENSURE( sigemptyset( _block.get<sigset_t>() ) == 0 );
@@ -131,22 +125,19 @@ HSignalService::HSignalService( void )
 	_thread.spawn( call( &HSignalService::run, this ) );
 	return;
 	M_EPILOG
-	}
+}
 
-HSignalService::~HSignalService( void )
-	{
+HSignalService::~HSignalService( void ) {
 	M_PROLOG
 	if ( _loop )
 		stop();
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-void HSignalService::stop( void )
-	{
+void HSignalService::stop( void ) {
 	M_PROLOG
-	if ( _loop )
-		{
+	if ( _loop ) {
 		_loop = false;
 		/*
 		 * man for raise() is full of shit
@@ -160,39 +151,33 @@ void HSignalService::stop( void )
 		HSet<int> signals;
 		transform( _handlers.begin(), _handlers.end(), insert_iterator( signals ), select1st<handlers_t::value_type>() );
 		for_each( signals.begin(), signals.end(), call( &HSignalService::reset_signal, this, _1 ) );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void* HSignalService::run( void )
-	{
+void* HSignalService::run( void ) {
 	M_PROLOG
 	HThread::set_name( "HSignalService" );
-	while ( _loop && _thread.is_alive() )
-		{
+	while ( _loop && _thread.is_alive() ) {
 		int sigNo = 0;
 		M_ENSURE( sigwait( _catch.get<sigset_t>(), &sigNo ) == 0 );
 		HLock lock( _mutex );
 		call_handler( sigNo );
-		}
+	}
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-void HSignalService::register_handler( int sigNo_, handler_t handler_, void const* owner_ )
-	{
+void HSignalService::register_handler( int sigNo_, handler_t handler_, void const* owner_ ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	_handlers.push_front( sigNo_, make_pair( handler_, owner_ ) );
 	int SYNCHRONOUS_SIGNALS[] = { SIGSEGV, SIGBUS, SIGFPE, SIGILL };
-	if ( find( SYNCHRONOUS_SIGNALS, SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ), sigNo_ ) == ( SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ) ) )
-		{
+	if ( find( SYNCHRONOUS_SIGNALS, SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ), sigNo_ ) == ( SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ) ) ) {
 		catch_signal( sigNo_ );
 		M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
-		}
-	else
-		{
+	} else {
 		struct sigaction act;
 		::memset( &act, 0, sizeof ( act ) );
 		act.sa_flags = SA_RESTART;
@@ -200,34 +185,30 @@ void HSignalService::register_handler( int sigNo_, handler_t handler_, void cons
 		M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
 		M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
 		M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HSignalService::flush_handlers( void const* owner_ )
-	{
+void HSignalService::flush_handlers( void const* owner_ ) {
 	M_PROLOG
 	HLock lock( _mutex );
-	for ( handlers_t::iterator it( _handlers.begin() ); it != _handlers.end(); )
-		{
+	for ( handlers_t::iterator it( _handlers.begin() ); it != _handlers.end(); ) {
 		handlers_t::iterator del( it );
 		++ it;
-		if ( del->second.second == owner_ )
-			{
+		if ( del->second.second == owner_ ) {
 			int sigNo( del->first );
 			if ( _handlers.count( sigNo ) == 1 )
 				reset_signal( sigNo );
 			else
 				_handlers.erase( del );
-			}
 		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HSignalService::catch_signal( int sigNo_ )
-	{
+void HSignalService::catch_signal( int sigNo_ ) {
 	M_PROLOG
 	M_ENSURE( sigaddset( _catch.get<sigset_t>(), sigNo_ ) == 0 );
 	M_ENSURE( pthread_sigmask( SIG_BLOCK, _catch.get<sigset_t>(), NULL ) == 0 );
@@ -247,10 +228,9 @@ void HSignalService::catch_signal( int sigNo_ )
 	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
 	return;
 	M_EPILOG
-	}
+}
 
-void HSignalService::block_signal( int sigNo_ )
-	{
+void HSignalService::block_signal( int sigNo_ ) {
 	M_PROLOG
 	M_ENSURE( sigaddset( _block.get<sigset_t>(), sigNo_ ) == 0 );
 	M_ENSURE( pthread_sigmask( SIG_BLOCK, _block.get<sigset_t>(), NULL ) == 0 );
@@ -262,10 +242,9 @@ void HSignalService::block_signal( int sigNo_ )
 	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
 	return;
 	M_EPILOG
-	}
+}
 
-void HSignalService::reset_signal( int sigNo_ )
-	{
+void HSignalService::reset_signal( int sigNo_ ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	M_ENSURE( _handlers.count( sigNo_ ) );
@@ -274,61 +253,51 @@ void HSignalService::reset_signal( int sigNo_ )
 	_handlers.erase( sigNo_ );
 	return;
 	M_EPILOG
-	}
+}
 
-void HSignalService::schedule_exit( int exitStatus_ )
-	{
+void HSignalService::schedule_exit( int exitStatus_ ) {
 	M_PROLOG
 	_isKilled_ = true;
 	_exitStatus = exitStatus_;
 	M_ENSURE( signal( SIGALRM, HSignalService::exit ) != SIG_ERR );
 	alarm( 1 );
 	M_EPILOG
-	}
+}
 
-void HSignalService::exit( int )
-	{
+void HSignalService::exit( int ) {
 	::exit( _exitStatus );
-	}
+}
 
-int HSignalService::life_time( int )
-	{
+int HSignalService::life_time( int ) {
 	return ( 100 );
-	}
+}
 
-void HSignalService::call_handler( int sigNo_ )
-	{
+void HSignalService::call_handler( int sigNo_ ) {
 	M_PROLOG
 	handlers_t::iterator it;
-	if ( ( it = _handlers.find( sigNo_ ) ) != _handlers.end() )
-		{
-		for ( ; ( it != _handlers.end() ) && ( (*it).first == sigNo_ ); ++ it )
-			{
+	if ( ( it = _handlers.find( sigNo_ ) ) != _handlers.end() ) {
+		for ( ; ( it != _handlers.end() ) && ( (*it).first == sigNo_ ); ++ it ) {
 			handler_t handler( (*it).second.first );
 			M_ASSERT( !! handler );
 			int status = handler( sigNo_ );
 			if ( status > 0 )
 				break; /* signal was entirely consumed */
-			else if ( status < 0 )
-				{
+			else if ( status < 0 ) {
 				_loop = false;
 				schedule_exit( status );
-				}
 			}
 		}
-	else
+	} else
 		M_ENSURE( ( sigNo_ == SIGURG ) || ( sigNo_ == SIGPIPE ) );
 	return;
 	M_EPILOG
-	}
+}
 
-namespace
-{
+namespace {
 
 /* singnal handler definitions */
 
-void HBaseSignalHandlers::unlock( int sigNo_ )
-	{
+void HBaseSignalHandlers::unlock( int sigNo_ ) {
 	M_PROLOG
 	sigset_t set;
 	M_ENSURE( sigemptyset( &set ) == 0 );
@@ -336,10 +305,9 @@ void HBaseSignalHandlers::unlock( int sigNo_ )
 	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &set, NULL ) == 0 );
 	return;
 	M_EPILOG
-	}
+}
 
-void HBaseSignalHandlers::lock( int sigNo_ )
-	{
+void HBaseSignalHandlers::lock( int sigNo_ ) {
 	M_PROLOG
 	sigset_t set;
 	M_ENSURE( sigemptyset( &set ) == 0 );
@@ -347,10 +315,9 @@ void HBaseSignalHandlers::lock( int sigNo_ )
 	M_ENSURE( pthread_sigmask( SIG_BLOCK, &set, NULL ) == 0 );
 	return;
 	M_EPILOG
-	}
+}
 
-int HBaseSignalHandlers::signal_INT ( int signum_ )
-	{
+int HBaseSignalHandlers::signal_INT ( int signum_ ) {
 	M_PROLOG
 	if ( tools::_ignoreSignalSIGINT_ )
 		return ( 0 );
@@ -362,10 +329,9 @@ int HBaseSignalHandlers::signal_INT ( int signum_ )
 	cerr << "\n" << message << endl;
 	return ( -1 );
 	M_EPILOG
-	}
+}
 
-int HBaseSignalHandlers::signal_HUP( int signum_ )
-	{
+int HBaseSignalHandlers::signal_HUP( int signum_ ) {
 	M_PROLOG
 	HString message;
 	message = "Unhandled HUP received: ";
@@ -375,10 +341,9 @@ int HBaseSignalHandlers::signal_HUP( int signum_ )
 	cerr << "\n" << message << endl;
 	return ( -1 );
 	M_EPILOG
-	}
+}
 	
-int HBaseSignalHandlers::signal_TERM( int signum_ )
-	{
+int HBaseSignalHandlers::signal_TERM( int signum_ ) {
 	M_PROLOG
 	HString message;
 	message = "Process was explictly killed: ";
@@ -388,10 +353,9 @@ int HBaseSignalHandlers::signal_TERM( int signum_ )
 	cerr << "\n" << message << endl;
 	return ( -2 );
 	M_EPILOG
-	}
+}
 	
-int HBaseSignalHandlers::signal_QUIT ( int signum_ )
-	{
+int HBaseSignalHandlers::signal_QUIT ( int signum_ ) {
 	M_PROLOG
 	if ( tools::_ignoreSignalSIGQUIT_ )
 		return ( 0 );
@@ -404,10 +368,9 @@ int HBaseSignalHandlers::signal_QUIT ( int signum_ )
 	abort();
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HBaseSignalHandlers::signal_TSTP( int signum_ )
-	{
+int HBaseSignalHandlers::signal_TSTP( int signum_ ) {
 	M_PROLOG
 	if ( tools::_ignoreSignalSIGTSTP_ )
 		return ( 0 );
@@ -421,10 +384,9 @@ int HBaseSignalHandlers::signal_TSTP( int signum_ )
 	raise( SIGTSTP );
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HBaseSignalHandlers::signal_CONT( int signum_ )
-	{
+int HBaseSignalHandlers::signal_CONT( int signum_ ) {
 	M_PROLOG
 	lock( SIGTSTP );
 	HString message;
@@ -435,10 +397,9 @@ int HBaseSignalHandlers::signal_CONT( int signum_ )
 	cerr << "\n" << message << endl;
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HBaseSignalHandlers::signal_fatal( int signum_ )
-	{
+int HBaseSignalHandlers::signal_fatal( int signum_ ) {
 	M_PROLOG
 	HString message;
 	message = "Process caused FATAL ERROR: ";
@@ -451,17 +412,15 @@ int HBaseSignalHandlers::signal_fatal( int signum_ )
 	return ( -1 );
 #endif /* #ifdef __MSVCXX__ */
 	M_EPILOG
-	}
+}
 
-void HBaseSignalHandlers::signal_fatal_sync( int signum_ )
-	{
+void HBaseSignalHandlers::signal_fatal_sync( int signum_ ) {
 	M_PROLOG
 	HSignalService::get_instance().call_handler( signum_ );
 	M_EPILOG
-	}
+}
 
-int HBaseSignalHandlers::signal_USR1( int signum_ )
-	{
+int HBaseSignalHandlers::signal_USR1( int signum_ ) {
 	M_PROLOG
 	HString message;
 	message = "\nDo you play with the mouse under FreeBSD ? ";
@@ -471,7 +430,7 @@ int HBaseSignalHandlers::signal_USR1( int signum_ )
 	cerr << "\n" << message << endl;
 	return ( -3 );
 	M_EPILOG
-	}
+}
 
 /* end of signal handler definitions */
 

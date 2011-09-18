@@ -41,11 +41,9 @@ M_VCSID( "$Id: "__TID__" $" )
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 int _latency_ = 1;
 int _attributeDisabled_ = ( COLORS::FG_GREEN | COLORS::BG_BLACK | COLORS::BG_BLINK ) << 8
@@ -68,22 +66,19 @@ bool	_leaveCtrlBackSlash_ = false;
 char	_commandComposeCharacter_ = 'x';
 int		_commandComposeDelay_ = 16;
 
-void set_color_bits( int & word_, int bits_, int what_ )
-	{
+void set_color_bits( int & word_, int bits_, int what_ ) {
 	int unsigned mask = 0x000f;
-	if ( what_ )
-		{
+	if ( what_ ) {
 		what_ <<= 2;
 		bits_ <<= what_;
 		mask <<= what_;
-		}
+	}
 	word_ &= ~ mask;
 	word_ |= bits_;
 	return;
-	}
+}
 
-int get_color_bits( HString& value_, int what_ )
-	{
+int get_color_bits( HString& value_, int what_ ) {
 	M_PROLOG
 	HTokenizer t( value_, " \t" );
 	HString str = t[ what_ ];
@@ -123,10 +118,9 @@ int get_color_bits( HString& value_, int what_ )
 		return ( COLORS::FG_WHITE );
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-void set_color( HString& value_, int& attribute_ )
-	{
+void set_color( HString& value_, int& attribute_ ) {
 	M_PROLOG
 	int ctr = 0;
 	int tab[ 4 ] = { 2, 3, 0, 1 };
@@ -135,10 +129,9 @@ void set_color( HString& value_, int& attribute_ )
 				get_color_bits( value_, ctr ), tab [ ctr ] );
 	return;
 	M_EPILOG
-	}
+}
 
-bool set_hconsole_variables( HString& option_, HString& value_ )
-	{
+bool set_hconsole_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
 	if ( ! strcasecmp( option_, "set_env" ) )
 		decode_set_env( value_ );
@@ -156,17 +149,15 @@ bool set_hconsole_variables( HString& option_, HString& value_ )
 		return ( true );
 	return ( false );
 	M_EPILOG
-	}
+}
 
-class HConsoleInitDeinit
-	{
+class HConsoleInitDeinit {
 public:
 	HConsoleInitDeinit( void );
-	} initDeinit;
+} initDeinit;
 
 
-HConsoleInitDeinit::HConsoleInitDeinit( void )
-	{
+HConsoleInitDeinit::HConsoleInitDeinit( void ) {
 	M_PROLOG
 	errno = 0;
 	int escdelay( 0 );
@@ -186,30 +177,27 @@ HConsoleInitDeinit::HConsoleInitDeinit( void )
 	HConsole::set_escdelay( escdelay );
 	return;
 	M_EPILOG
-	}
+}
 
-void banner( void )
-	{
+void banner( void ) {
 	::printf( "\thconsole\n" );
 	return;
-	}
+}
 
 }
 
 }
 
 extern "C"
-int yaal_hconsole_main( int, char** )
-	{
+int yaal_hconsole_main( int, char** ) {
 	static char const dynamicLinkerPath[]
 		__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
-	if ( dynamicLinkerPath[ 0 ] )
-		{
+	if ( dynamicLinkerPath[ 0 ] ) {
 		yaal::hcore::banner();
 		yaal::tools::banner();
 		yaal::hconsole::banner();
 		::exit( 0 );
-		}
-	return ( 0 );
 	}
+	return ( 0 );
+}
 

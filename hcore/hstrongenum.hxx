@@ -27,73 +27,60 @@ Copyright:
 #ifndef YAAL_HCORE_HSTRONGENUM_HXX_INCLUDED
 #define YAAL_HCORE_HSTRONGENUM_HXX_INCLUDED 1
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief C++ enum interface with strong typing.
  */
 template<typename EnumID>
-class HStrongEnum
-	{
+class HStrongEnum {
 	typename EnumID::enum_t _value;
 public:
 	HStrongEnum( typename EnumID::enum_t value_ ) : _value( value_ ) {}
 	HStrongEnum( HStrongEnum const& e ) : _value( e._value ) {}
-	HStrongEnum operator | ( HStrongEnum const& other ) const
-		{
+	HStrongEnum operator | ( HStrongEnum const& other ) const {
 		return ( static_cast<typename EnumID::enum_t>( static_cast<int long unsigned>( _value )
 					| static_cast<int long unsigned>( other._value ) ) );
-		}
-	HStrongEnum& operator |= ( HStrongEnum const& other )
-		{
+	}
+	HStrongEnum& operator |= ( HStrongEnum const& other ) {
 		_value = static_cast<typename EnumID::enum_t>( static_cast<int long unsigned>( _value )
 				| static_cast<int long unsigned>( other._value ) );
 		return ( *this );
-		}
-	HStrongEnum operator & ( HStrongEnum const& other ) const
-		{
+	}
+	HStrongEnum operator & ( HStrongEnum const& other ) const {
 		return ( static_cast<typename EnumID::enum_t>( static_cast<int long unsigned>( _value )
 					& static_cast<int long unsigned>( other._value ) ) );
-		}
-	HStrongEnum& operator &= ( HStrongEnum const& other )
-		{
+	}
+	HStrongEnum& operator &= ( HStrongEnum const& other ) {
 		_value = static_cast<typename EnumID::enum_t>( static_cast<int long unsigned>( _value )
 				& static_cast<int long unsigned>( other._value ) );
 		return ( *this );
-		}
-	HStrongEnum operator ^ ( HStrongEnum const& other ) const
-		{
+	}
+	HStrongEnum operator ^ ( HStrongEnum const& other ) const {
 		return ( static_cast<typename EnumID::enum_t>( static_cast<int long unsigned>( _value )
 					^ static_cast<int long unsigned>( other._value ) ) );
-		}
-	HStrongEnum& operator ^= ( HStrongEnum const& other )
-		{
+	}
+	HStrongEnum& operator ^= ( HStrongEnum const& other ) {
 		_value = static_cast<typename EnumID::enum_t>( static_cast<int long unsigned>( _value )
 				^ static_cast<int long unsigned>( other._value ) );
 		return ( *this );
-		}
-	HStrongEnum operator ~ ( void ) const
-		{
+	}
+	HStrongEnum operator ~ ( void ) const {
 		return ( static_cast<typename EnumID::enum_t>( ~ static_cast<int long unsigned>( _value ) ) );
-		}
-	bool operator == ( HStrongEnum const& other ) const
-		{
+	}
+	bool operator == ( HStrongEnum const& other ) const {
 		return ( other._value == _value );
-		}
-	bool operator != ( HStrongEnum const& other ) const
-		{
+	}
+	bool operator != ( HStrongEnum const& other ) const {
 		return ( other._value != _value );
-		}
+	}
 	typename EnumID::enum_t value( void ) const
 		{ return ( _value ); }
-	bool operator ! ( void ) const
-		{
+	bool operator ! ( void ) const {
 		return ( static_cast<int long unsigned>( _value ) ? false : true );
-		}
-	};
+	}
+};
 
 }
 

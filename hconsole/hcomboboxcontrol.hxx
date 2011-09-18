@@ -33,11 +33,9 @@ Copyright:
 #include "hconsole/heditcontrol.hxx"
 #include "hconsole/hlistcontrol.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief Implementation of TUI Combobox control class.
  *
@@ -46,23 +44,20 @@ namespace hconsole
  * advanced automatic text operations.
  */
 class HComboboxControl : public virtual HEditControl,
-	public virtual HListControl
-	{
+	public virtual HListControl {
 public:
 	typedef HComboboxControl this_type;
 	typedef HListControl base_type;
 	/*! \brief Current combobox state.
 	 */
-	struct MODE
-		{
+	struct MODE {
 		/*! \brief Current combobox state.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			EDITCONTROL, /*!< Combobox retracted. */
 			LISTCONTROL  /*!< Combobox expanded. */
-			} mode_t;
-		};
+		} mode_t;
+	};
 protected:
 	MODE::mode_t _mode; /* operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
 	int _droppedWidth;	/* width of dropped list */
@@ -86,7 +81,7 @@ protected:
 	virtual int do_click ( mouse::OMouse & );
 private:
 	void close_combo ( void );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HComboboxControl, HListControlException> HComboboxControlException;
 

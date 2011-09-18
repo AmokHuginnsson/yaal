@@ -43,35 +43,30 @@ Copyright:
 #include "tools/hring.hxx"
 #include "tools/htwowaymap.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief New manipulator for yaal::hcore::HStreamInterface, `bin'.
  *
  * Output PODs as in binary number format.
  */
-class HBinaryFormatter
-	{
+class HBinaryFormatter {
 	yaal::hcore::HStreamInterface* _stream;
 public:
 	HBinaryFormatter( yaal::hcore::HStreamInterface* );
 	template<typename T>
-	HBinaryFormatter& operator << ( T const& v )
-		{
+	HBinaryFormatter& operator << ( T const& v ) {
 		return ( binary( &v, sizeof ( T ) ) );
-		}
+	}
 	yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface::manipulator_t const& );
 	HBinaryFormatter& binary( void const*, int );
-	};
+};
 
-class HBinaryFormatterSeed
-	{
+class HBinaryFormatterSeed {
 public:
 	HBinaryFormatter create( yaal::hcore::HStreamInterface* ) const;
-	} extern bin;
+} extern bin;
 
 HBinaryFormatter operator << ( yaal::hcore::HStreamInterface&, HBinaryFormatterSeed const& );
 
@@ -81,8 +76,7 @@ yaal::hcore::HStreamInterface::ptr_t ensure( yaal::hcore::HStreamInterface::ptr_
 
 template<typename container>
 yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
-		container const& container_, char sep_, char const* const name_ )
-	{
+		container const& container_, char sep_, char const* const name_ ) {
 	M_PROLOG
 	out << ( name_ ? name_ : "" );
 	char sep( '(' );
@@ -91,44 +85,39 @@ yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& ou
 	out << ")" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename container>
 yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
-		container const& container_, char sep_ )
-	{
+		container const& container_, char sep_ ) {
 	M_PROLOG
 	return ( container_dump( out, container_, sep_, NULL ) );
 	M_EPILOG
-	}
+}
 
 template<typename container>
 yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& out,
-		container const& container_, char const* const name_  )
-	{
+		container const& container_, char const* const name_  ) {
 	M_PROLOG
 	return ( container_dump( out, container_, ' ', name_ ) );
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::tools::HRing<tType> const& r_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::tools::HRing<tType> const& r_ ) {
 	M_PROLOG
 	return ( container_dump( out, r_, "ring" ) );
 	M_EPILOG
-	}
+}
 
 template<typename left_t, typename right_t>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::tools::HTwoWayMap<left_t, right_t> const& twm_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::tools::HTwoWayMap<left_t, right_t> const& twm_ ) {
 	M_PROLOG
 	return ( container_dump( out, twm_, "twowaymap" ) );
 	M_EPILOG
-	}
+}
 
-class HTee : public yaal::hcore::HStreamInterface
-	{
+class HTee : public yaal::hcore::HStreamInterface {
 	yaal::hcore::HStreamInterface& _stream1;
 	yaal::hcore::HStreamInterface& _stream2;
 public:
@@ -140,7 +129,7 @@ protected:
 	virtual int long do_read( void* const, int long ) __attribute__((noreturn));
 	virtual void do_flush( void ) const;
 	virtual bool do_is_valid( void ) const;
-	};
+};
 
 HTee tee( yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HStreamInterface::ptr_t  );
 HTee tee( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface::ptr_t  );
@@ -149,119 +138,105 @@ HTee tee( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface& );
 
 }
 
-namespace hcore
-{
+namespace hcore {
 
 template<typename first_t, typename second_t>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& os, yaal::hcore::HPair<first_t, second_t> const& p )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& os, yaal::hcore::HPair<first_t, second_t> const& p ) {
 	M_PROLOG
 	os << "pair<" << p.first << "," << p.second << ">";
 	return ( os );
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType> const& a_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType> const& a_ ) {
 	M_PROLOG
 	return ( container_dump( out, a_, "array" ) );
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HDeque<tType> const& d_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HDeque<tType> const& d_ ) {
 	M_PROLOG
 	return ( container_dump( out, d_, "deque" ) );
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HList<tType> const& l_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HList<tType> const& l_ ) {
 	M_PROLOG
 	return ( container_dump( out, l_, "list" ) );
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HSet<tType> const& s_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HSet<tType> const& s_ ) {
 	M_PROLOG
 	return ( container_dump( out, s_, "set" ) );
 	M_EPILOG
-	}
+}
 
 template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashSet<tType> const& hs_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashSet<tType> const& hs_ ) {
 	M_PROLOG
 	return ( container_dump( out, hs_, "hash_set" ) );
 	M_EPILOG
-	}
+}
 
 template<typename T0>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0> const& t_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename T0, typename T1>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1> const& t_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename T0, typename T1, typename T2>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2> const& t_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", " << t_.template get<2>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename T0, typename T1, typename T2, typename T3>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3> const& t_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
 		<< t_.template get<2>() << ", " << t_.template get<3>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4> const& t_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
 		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
 		<< t_.template get<4>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5> const& t_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
 		<< t_.template get<2>() << ", " << t_.template get<3>() << t_.template get<4>() << t_.template get<5>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6> const& t_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
 		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
@@ -269,11 +244,10 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 		<< t_.template get<6>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7> const& t_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
 		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
@@ -281,11 +255,10 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 		<< t_.template get<6>() << ", " << t_.template get<7>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8> const& t_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
 		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
@@ -294,11 +267,10 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 		<< t_.template get<8>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> const& t_ )
-	{
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
 		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
@@ -307,14 +279,13 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 		<< t_.template get<8>() << ", " << t_.template get<9>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename T0, typename T1, typename T2, typename T3,
 	typename T4, typename T5, typename T6, typename T7,
 	typename T8, typename T9, typename T10>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
-		yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> const& t_ )
-	{
+		yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
 		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
@@ -324,14 +295,13 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 		<< t_.template get<10>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 template<typename T0, typename T1, typename T2, typename T3,
 	typename T4, typename T5, typename T6, typename T7,
 	typename T8, typename T9, typename T10, typename T11>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
-		yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> const& t_ )
-	{
+		yaal::hcore::HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> const& t_ ) {
 	M_PROLOG
 	out << "tuple<" << t_.template get<0>() << ", " << t_.template get<1>() << ", "
 		<< t_.template get<2>() << ", " << t_.template get<3>() << ", "
@@ -341,7 +311,7 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 		<< t_.template get<10>() << ", " << t_.template get<11>() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
-	}
+}
 
 class HNumber;
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HNumber const& );

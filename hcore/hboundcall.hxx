@@ -34,22 +34,18 @@ Copyright:
 #include "hcore/hpointer.hxx"
 #include "hcore/memory.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-namespace defaults
-{
+namespace defaults {
 
 typedef void simple_call( void );
 
 }
 
 template<typename signature_t = defaults::simple_call>
-class HBoundCall
-	{
+class HBoundCall {
 	typedef typename trait::return_type<signature_t>::type return_t;
 	typedef HCallInterface<trait::argument_count<signature_t>::value,
 					return_t,
@@ -148,13 +144,12 @@ public:
 		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
 	void const* id( void ) const
 		{ return ( _call->id() ); }
-	void reset( void )
-		{
+	void reset( void ) {
 		_call.reset();
-		}
+	}
 	bool operator ! ( void ) const
 		{ return ( ! _call ); }
-	};
+};
 
 }
 

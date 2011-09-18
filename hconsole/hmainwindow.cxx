@@ -33,36 +33,31 @@ M_VCSID( "$Id: "__TID__" $" )
 using namespace yaal::hcore;
 using namespace yaal::hconsole::list_control_helper;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 HMainWindow::HMainWindow( char const* title_, HTUIProcess::model_ptr_t windows_,
 		HTUIProcess::model_t::cyclic_iterator& foregroundWindow_ )
 		: HWindow( title_ ), _menu( NULL ), _windowList( windows_ ),
-		_foregroundWindow( foregroundWindow_ )
-	{
+		_foregroundWindow( foregroundWindow_ ) {
 	M_PROLOG
 	register_postprocess_handler ( KEY<'q'>::command, NULL,
 				& HMainWindow::handler_close );
 	return;
 	M_EPILOG
-	}
+}
 
-HMainWindow::~HMainWindow( void )
-	{
+HMainWindow::~HMainWindow( void ) {
 	M_PROLOG
 #ifdef __DEBUGGER_BABUNI__
 	log_trace << "destruction success" << endl;
 #endif /* __DEBUGGER_BABUNI__ */
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-int HMainWindow::init( void )
-	{
+int HMainWindow::init( void ) {
 	M_PROLOG
 	int error = 0;
 	HConsole& cons = HConsole::get_instance();
@@ -82,23 +77,21 @@ int HMainWindow::init( void )
 	_controls.select( _menu );
 	return ( error );
 	M_EPILOG
-	}
+}
 
-void HMainWindow::init_menu( HTUIProcess* process_, OMenuItem* menu_ )
-	{
+void HMainWindow::init_menu( HTUIProcess* process_, OMenuItem* menu_ ) {
 	M_PROLOG
 	_menu->init( process_,	menu_ );
 	return;
 	M_EPILOG
-	}
+}
 
-int HMainWindow::handler_close( int code_, void const* )
-	{
+int HMainWindow::handler_close( int code_, void const* ) {
 	M_PROLOG
 	code_ = KEY<'x'>::command;
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
 }
 

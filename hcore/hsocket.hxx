@@ -36,19 +36,16 @@ Copyright:
 #include "hcore/hexception.hxx"
 #include "hcore/hstrongenum.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Network socket primitive.
  *
  * HSocket implements both server (listening) and client (connecting)
  * network connectivity and data tranfer operations.
  */
-class HSocket : public HRawFile
-	{
+class HSocket : public HRawFile {
 public:
 	typedef HSocket this_type;
 	typedef HRawFile base_type;
@@ -56,12 +53,10 @@ public:
 	M_YAAL_HCORE_PUBLIC_API static bool _resolveHostnames;
 	/*! \brief Socket types.
 	 */
-	struct TYPE
-		{
+	struct TYPE {
 		/*! \brief Socket types.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			DEFAULT			= 0x00,
 			FILE				= 0x01,
 			NETWORK			= 0x02,
@@ -69,8 +64,8 @@ public:
 			NONBLOCKING	= 0x08,
 			SSL_SERVER	= 0x10,
 			SSL_CLIENT	= 0x20
-			} enum_t;
-		};
+		} enum_t;
+	};
 	typedef HStrongEnum<TYPE> socket_type_t;
 protected:
 	typedef HHashMap<int, ptr_t> clients_t;
@@ -106,7 +101,7 @@ protected:
 private:
 	HSocket( HSocket const& );
 	HSocket& operator = ( HSocket const& );
-	};
+};
 
 typedef HExceptionT<HSocket, HRawFileException> HSocketException;
 

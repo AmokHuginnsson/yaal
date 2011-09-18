@@ -46,25 +46,21 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
-namespace
-	{
+namespace {
 	char const* const _eAlreadyOpened_ = _( "serial port already openend" );
 	char const* const _eNotOpened_ = _( "serial port not opened" );
-	}
+}
 
 HSerial::flag_t HSerial::FLAG_TEXT = HSerial::flag_t( HSerial::FLAG::DEFAULT ) | HSerial::FLAG::CANONICAL | HSerial::FLAG::CR2NL;
 
 HSerial::HSerial( HString const& devicePath_ )
 				: HRawFile(), _speed( SPEED::DEFAULT ),
 	_flags( FLAG::DEFAULT ), _devicePath(),
-	_tIO( chunk_size<termios>( 1 ) ), _backUpTIO( chunk_size<termios>( 1 ) )
-	{
+	_tIO( chunk_size<termios>( 1 ) ), _backUpTIO( chunk_size<termios>( 1 ) ) {
 	M_PROLOG
 	if ( !! devicePath_ )
 		_devicePath = devicePath_;
@@ -73,20 +69,18 @@ HSerial::HSerial( HString const& devicePath_ )
 	compile();
 	return;
 	M_EPILOG
-	}
+}
 
-HSerial::~HSerial( void )
-	{
+HSerial::~HSerial( void ) {
 	M_PROLOG
 	if ( _fileDescriptor >= 0 )
 		close();
 	M_ASSERT ( _fileDescriptor < 0 );
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-bool HSerial::open( void )
-	{
+bool HSerial::open( void ) {
 	M_PROLOG
 	if ( _fileDescriptor >= 0 )
 		M_THROW( _eAlreadyOpened_, errno );
@@ -104,20 +98,18 @@ bool HSerial::open( void )
 			_tIO.get<termios const>() );
 	return ( false );
 	M_EPILOG
-	}
+}
 
-int HSerial::do_close( void )
-	{
+int HSerial::do_close( void ) {
 	M_PROLOG
 	if ( _fileDescriptor >= 0 )
 		::tcsetattr( _fileDescriptor, TCSANOW,
 				_backUpTIO.get<termios const>() );
 	return ( HRawFile::do_close() );
 	M_EPILOG
-	}
+}
 
-void HSerial::compile( void )
-	{
+void HSerial::compile( void ) {
 	M_PROLOG
 	termios& tIO = *_tIO.get<termios>();
 	::memset( &tIO, 0, sizeof ( termios ) );
@@ -150,18 +142,16 @@ void HSerial::compile( void )
 	compile_speed();
 	return;
 	M_EPILOG
-	}
+}
 
-void HSerial::set_speed( speed_t speed_ )
-	{
+void HSerial::set_speed( speed_t speed_ ) {
 	M_PROLOG
 	_speed = speed_;
 	return;
 	M_EPILOG
-	}
+}
 
-void HSerial::compile_speed( void )
-	{
+void HSerial::compile_speed( void ) {
 	M_PROLOG
 	if ( _fileDescriptor >= 0 )
 		M_THROW( _eAlreadyOpened_, errno );
@@ -169,8 +159,7 @@ void HSerial::compile_speed( void )
 	int baudRate = 0;
 	if ( _speed == SPEED::DEFAULT )
 		_speed = tools::_baudRate_;
-	switch ( _speed.value() )
-		{
+	switch ( _speed.value() ) {
 		case ( SPEED::B_230400 ): baudRate = B230400; break;
 		case ( SPEED::B_115200 ): baudRate = B115200; break;
 #if defined( HAVE_DECL_B76800 ) && ( HAVE_DECL_B76800 == 1 )
@@ -192,28 +181,25 @@ void HSerial::compile_speed( void )
 		case ( SPEED::B_4800 ): baudRate = B4800; break;
 		case ( SPEED::B_2400 ): baudRate = B2400; break;
 		case ( SPEED::DEFAULT ): break;
-		default :
-			{
+		default : {
 			M_THROW( _( "unknown speed" ), _speed.value() );
 			break;
-			}
 		}
+	}
 	cfsetispeed( &tIO, baudRate );
 	cfsetospeed( &tIO, baudRate );
 	return;
 	M_EPILOG
-	}
+}
 
-void HSerial::set_flags( flag_t flags_ )
-	{
+void HSerial::set_flags( flag_t flags_ ) {
 	M_PROLOG
 	_flags = flags_;
 	return;
 	M_EPILOG
-	}
+}
 
-void HSerial::compile_flags( void )
-	{
+void HSerial::compile_flags( void ) {
 	M_PROLOG
 	if ( _fileDescriptor >= 0 )
 		M_THROW( _eAlreadyOpened_, errno );
@@ -306,18 +292,15 @@ void HSerial::compile_flags( void )
 		tIO.c_lflag |= ECHO_VAL;
 	return;
 	M_EPILOG
-	}
+}
 
-void HSerial::flush( int type_ )
-	{
+void HSerial::flush( int type_ ) {
 	M_PROLOG
 	HString errMsg;
 	if ( _fileDescriptor < 0 )
 		M_THROW( _eNotOpened_, errno );
-	if ( tcflush( _fileDescriptor, type_ ) )
-		{
-		switch ( type_ )
-			{
+	if ( tcflush( _fileDescriptor, type_ ) ) {
+		switch ( type_ ) {
 			case ( TCIFLUSH ):
 				M_THROW( "tcflush ( TCIFLUSH )", errno );
 			break;
@@ -327,20 +310,18 @@ void HSerial::flush( int type_ )
 			case ( TCIOFLUSH ):
 				M_THROW( "tcflush ( TCIOFLUSH )", errno );
 			break;
-			default :
-				{
+			default : {
 				errMsg.format( "tcflush ( %d )", type_ );
 				M_THROW( errMsg, errno );
-				}
-			break;
 			}
+			break;
 		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HSerial::wait_for_eot( void )
-	{
+void HSerial::wait_for_eot( void ) {
 	M_PROLOG
 	if ( _fileDescriptor < 0 )
 		M_THROW( _eNotOpened_, errno );
@@ -348,11 +329,10 @@ void HSerial::wait_for_eot( void )
 		M_THROW( "tcdrain", errno );
 	return;
 	M_EPILOG
-	}
+}
 
 int HSerial::timed_read( void* const buffer_, int const size_,
-		int timeOut_ )
-	{
+		int timeOut_ ) {
 	M_PROLOG
 	if ( _fileDescriptor < 0 )
 		M_THROW( _eNotOpened_, errno );
@@ -362,7 +342,7 @@ int HSerial::timed_read( void* const buffer_, int const size_,
 		nRead = static_cast<int>( HRawFile::read( buffer_, size_ ) );
 	return ( nRead );
 	M_EPILOG
-	}
+}
 
 }
 

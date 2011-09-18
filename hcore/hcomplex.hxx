@@ -32,16 +32,13 @@ Copyright:
 
 #include "hcore/hexception.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Complex number representation.
  */
-class HComplex
-	{
+class HComplex {
 public:
 	typedef HComplex this_type;
 private:
@@ -77,7 +74,7 @@ public:
 	HComplex operator / ( HComplex const& ) const;
 	HComplex operator / ( double long ) const;
 	friend HComplex operator * ( double long, HComplex const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HComplex> HComplexException;
 

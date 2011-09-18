@@ -41,33 +41,28 @@ typedef SynchronizedUnorderedSet<int> pid_set_t;
 pid_set_t _children_;
 
 M_EXPORT_SYMBOL
-HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )
-	{
+HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::create_spawner( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ ) {
 	return ( HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( path_, argv_, in_, out_, err_ ) );
-	}
+}
 
 M_EXPORT_SYMBOL
 HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn( yaal::hcore::HString const& path_, yaal::tools::HPipedChild::argv_t const& argv_, int* in_, int* out_, int* err_ )
-	: _path( path_ ), _argv( argv_ ), _in( in_ ), _out( out_ ), _err( err_ )
-	{
-	}
+	: _path( path_ ), _argv( argv_ ), _in( in_ ), _out( out_ ), _err( err_ ) {
+}
 
-char* xstrdup( char const* const str_ )
-	{
+char* xstrdup( char const* const str_ ) {
 	char* str = 0;
-	if ( ! str_ )
-		{
+	if ( ! str_ ) {
 		::perror( "xstrdup: request to duplicate NULL pointer string" );
 		::abort();
-		}
+	}
 	str = memory::calloc<char>( static_cast<int long>( ::strlen( str_ ) ) + 1 );
 	::strcpy( str, str_ );
 	return ( str );
-	}
+}
 
 M_EXPORT_SYMBOL
-int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
-	{
+int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	/* Make a backup of original descriptors. */
 	int hStdIn = _dup( _fileno( stdin ) );
 	int hStdOut = _dup( _fileno( stdout ) );
@@ -111,26 +106,22 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void )
 
 	_children_.insert( pid );
 	return ( pid );
-	}
+}
 
-namespace msvcxx
-{
+namespace msvcxx {
 
 #undef waitpid
-int waitpid( int pid_, int* status_, int options_ )
-	{
+int waitpid( int pid_, int* status_, int options_ ) {
 	int ret( ::waitpid( pid_, status_, options_ ) );
-	if ( ret == -1 )
-		{
-		if ( _children_.count( pid_ ) > 0 )
-			{
+	if ( ret == -1 ) {
+		if ( _children_.count( pid_ ) > 0 ) {
 			if ( ! kill( pid_, 0 ) )
 				ret = pid_;
-			}
 		}
+	}
 	if ( ret == pid_ )
 		_children_.erase( pid_ );
 	return ( ret );
-	}
+}
 
 }

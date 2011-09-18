@@ -40,11 +40,9 @@ Copyright:
 using namespace yaal;
 using namespace yaal::hcore;
 
-extern "C"
-{
+extern "C" {
 
-struct OSQLite
-	{
+struct OSQLite {
 	int _errorCode;
 	HString _errorMessage;
 	sqlite3* _dB;
@@ -53,10 +51,9 @@ struct OSQLite
 private:
 	OSQLite( OSQLite const& );
 	OSQLite& operator = ( OSQLite const& );
-	};
+};
 	
-struct OSQLiteResult
-	{
+struct OSQLiteResult {
 	int _rows;
 	int _columns;
 	char** _data;
@@ -68,7 +65,7 @@ struct OSQLiteResult
 private:
 	OSQLiteResult( OSQLiteResult const& );
 	OSQLiteResult& operator = ( OSQLiteResult const& );
-	};
+};
 
 OSQLite* _brokenDB_ = NULL;
 
@@ -81,63 +78,53 @@ void yaal_sqlite3_db_disconnect( void* );
  * to user supplied database name by driver during db_connect. */
 
 M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
-		char const*, char const* )
-	{
+		char const*, char const* ) {
 	void* ptr = NULL;
 	char const fileNameExt[] = ".sqlite";
 	struct stat stat;
 	OSQLite* sQLite = NULL;
-	if ( _brokenDB_ )
-		{
+	if ( _brokenDB_ ) {
 		yaal_sqlite3_db_disconnect( _brokenDB_ );
 		_brokenDB_ = NULL;
-		}
+	}
 	sQLite = new ( memory::yaal ) OSQLite;
 	HString dataBase( dataBase_ );
-	if ( ::stat( dataBase.raw(), &stat ) )
-		{
+	if ( ::stat( dataBase.raw(), &stat ) ) {
 		dataBase += fileNameExt; 
-		if ( ::stat( dataBase.raw(), &stat ) )
-			{
+		if ( ::stat( dataBase.raw(), &stat ) ) {
 			sQLite->_errorMessage.format( "Database file `%s' does not exists.", dataBase.raw() );
 			_brokenDB_ = sQLite;
 			return ( NULL );
-			}
 		}
+	}
 	sQLite->_errorCode = ::sqlite3_open( dataBase.raw(),
 			&sQLite->_dB );
-	if ( sQLite->_errorCode )
-		{
+	if ( sQLite->_errorCode ) {
 		sQLite->_errorMessage = ::sqlite3_errmsg( sQLite->_dB );
 		_brokenDB_ = sQLite;
 		sQLite = NULL;
-		}
-	else
-		{
+	} else {
 		ptr = yaal_sqlite3_db_query( sQLite, "PRAGMA empty_result_callbacks = ON;" );
 		if ( ptr )
 			yaal_sqlite3_rs_unquery( ptr );
 		else
 			_brokenDB_ = sQLite, sQLite = NULL;
-		}
-	return ( sQLite );
 	}
+	return ( sQLite );
+}
 
-void yaal_sqlite3_db_disconnect( void* data_ )
-	{
+void yaal_sqlite3_db_disconnect( void* data_ ) {
 	OSQLite* sQLite = static_cast<OSQLite*>( data_ );
 	if ( sQLite->_dB )
 		sqlite3_close( sQLite->_dB );
 	M_SAFE( delete sQLite );
 	return;
-	}
-M_EXPORT_SYMBOL void db_disconnect( void* data_ )
-	{
+}
+M_EXPORT_SYMBOL void db_disconnect( void* data_ ) {
 	yaal_sqlite3_db_disconnect( data_ );
-	}
+}
 
-M_EXPORT_SYMBOL int dbrs_errno( void* db_, void* result_ )
-	{
+M_EXPORT_SYMBOL int dbrs_errno( void* db_, void* result_ ) {
 	OSQLite* sQLite = static_cast<OSQLite*>( db_ );
 	OSQLiteResult* r = static_cast<OSQLiteResult*>( result_ );
 	if ( ! sQLite )
@@ -145,18 +132,16 @@ M_EXPORT_SYMBOL int dbrs_errno( void* db_, void* result_ )
 	int code( errno );
 	if ( r && r->_errorCode )
 		code = r->_errorCode;
-	else if ( sQLite )
-		{
+	else if ( sQLite ) {
 		if ( sQLite->_errorCode )
 			code = sQLite->_errorCode;
 		else
 			code = sqlite3_errcode( sQLite->_dB );
-		}
-	return ( code );
 	}
+	return ( code );
+}
 
-M_EXPORT_SYMBOL char const* dbrs_error( void* db_, void* result_ )
-	{
+M_EXPORT_SYMBOL char const* dbrs_error( void* db_, void* result_ ) {
 	OSQLite* sQLite = static_cast<OSQLite*>( db_ );
 	OSQLiteResult* r = static_cast<OSQLiteResult*>( result_ );
 	if ( ! sQLite )
@@ -164,17 +149,15 @@ M_EXPORT_SYMBOL char const* dbrs_error( void* db_, void* result_ )
 	char const* msg( "" );
 	if ( r && ! r->_errorMessage.is_empty() )
 		msg = r->_errorMessage.raw();
-	else if ( sQLite )
-		{
+	else if ( sQLite ) {
 		if ( ! sQLite->_errorMessage.is_empty() )
 			return ( sQLite->_errorMessage.raw() );
 		return ( sqlite3_errmsg( sQLite->_dB ) );
-		}
-	return ( msg );
 	}
+	return ( msg );
+}
 
-void* yaal_sqlite3_db_query( void* data_, char const* query_ )
-	{
+void* yaal_sqlite3_db_query( void* data_, char const* query_ ) {
 	OSQLite* sQLite( static_cast<OSQLite*>( data_ ) );
 	OSQLiteResult* result( new ( memory::yaal ) OSQLiteResult );
 	result->_columns = 0;
@@ -186,61 +169,52 @@ void* yaal_sqlite3_db_query( void* data_, char const* query_ )
 			&result->_columns, &errmsg );
 	result->_errorMessage = errmsg;
 	return ( result );
-	}
-M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ )
-	{
+}
+M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ ) {
 	return ( yaal_sqlite3_db_query( data_, query_ ) );
-	}
+}
 
-void yaal_sqlite3_rs_unquery( void* data_ )
-	{
+void yaal_sqlite3_rs_unquery( void* data_ ) {
 	OSQLiteResult* pr = static_cast<OSQLiteResult*>( data_ );
 	sqlite3_free_table( pr->_data );
 	M_SAFE( delete pr );
 	return;
-	}
-M_EXPORT_SYMBOL void rs_unquery( void* data_ )
-	{
+}
+M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
 	yaal_sqlite3_rs_unquery( data_ );
-	}
+}
 
-M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ )
-	{
+M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	char** data = NULL;
 	OSQLiteResult* result = static_cast<OSQLiteResult*>( data_ );
 	data = result->_data;
 	return ( data[ ( row_ + 1 ) * result->_columns + column_ ] );
-	}
+}
 
-M_EXPORT_SYMBOL int rs_fields_count( void* data_ )
-	{
+M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	return ( static_cast<OSQLiteResult*>( data_ )->_columns );
-	}
+}
 
-M_EXPORT_SYMBOL int long dbrs_records_count( void* dataB_, void* dataR_ )
-	{
+M_EXPORT_SYMBOL int long dbrs_records_count( void* dataB_, void* dataR_ ) {
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( dataR_ ) );
 	if ( result && ( result->_columns > 0 ) )
 		return ( result->_rows );
 	else
 		return ( ::sqlite3_changes( static_cast<OSQLite*>( dataB_ )->_dB ) );
-	}
+}
 
-M_EXPORT_SYMBOL int long dbrs_id( void* dataB_, void* )
-	{
+M_EXPORT_SYMBOL int long dbrs_id( void* dataB_, void* ) {
 	/* FIXME change driver interface to allow 64bit insert row id (from autoincrement) */
 	return ( static_cast<int long>( sqlite3_last_insert_rowid( static_cast<OSQLite*>( dataB_ )->_dB ) ) );
-	}
+}
 
-M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ )
-	{
+M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	return ( static_cast<OSQLiteResult*>( dataR_ )->_data[ field_ ] );
-	}
+}
 
-int yaal_sqlite3_driver_main( int, char** )
-	{
+int yaal_sqlite3_driver_main( int, char** ) {
 	return ( 0 );
-	}
+}
 
 }
 

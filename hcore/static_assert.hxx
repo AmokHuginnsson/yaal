@@ -45,8 +45,7 @@ Copyright:
  */
 #define STATIC_ASSERT( condition ) typedef char M_CONCAT( SAF, __LINE__ )[ static_assert_failure<( condition )>::value ]
 
-namespace yaal
-{
+namespace yaal {
 
 /*! \cond */
 template<bool> struct static_assert_failure;

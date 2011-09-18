@@ -34,111 +34,89 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "memory.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace memory
-{
+namespace memory {
 
 ON_ALLOC_FAILURE::on_alloc_failure_t _onAllocFailure_ = ON_ALLOC_FAILURE::ABORT;
 
-void* alloc( int long size_ )
-	{
+void* alloc( int long size_ ) {
 	M_ASSERT( ( size_ > 0 ) && "memory::malloc: requested size lower than 0" );
 	register void* newPtr( ::malloc( size_ ) );
-	if ( newPtr == 0 )
-		{
+	if ( newPtr == 0 ) {
 		char const msg[] = "memory::malloc: malloc returned NULL";
-		if ( _onAllocFailure_ == ON_ALLOC_FAILURE::ABORT )
-			{
+		if ( _onAllocFailure_ == ON_ALLOC_FAILURE::ABORT ) {
 			::perror( msg );
 			::abort();
-			}
-		else
+		} else
 			throw HMemoryAllocationException( msg );
-		}
-	return ( newPtr );
 	}
+	return ( newPtr );
+}
 
-void* calloc( int long size_ )
-	{
+void* calloc( int long size_ ) {
 	register void* newPtr( alloc( size_ ) );
 	::memset( newPtr, 0, size_ );
 	return ( newPtr );
-	}
+}
 
-void* realloc( void* ptr_, int long size_ )
-	{
+void* realloc( void* ptr_, int long size_ ) {
 	M_ASSERT( ( size_ >= 0 ) && "memory::realloc: requested size lower than 0" );
 	register void* newPtr( ::realloc( ptr_, size_ ) );
-	if ( newPtr == 0 )
-		{
+	if ( newPtr == 0 ) {
 		char const msg[] = "memory::realloc: realloc returned NULL";
-		if ( _onAllocFailure_ == ON_ALLOC_FAILURE::ABORT )
-			{
+		if ( _onAllocFailure_ == ON_ALLOC_FAILURE::ABORT ) {
 			::perror( msg );
 			::abort();
-			}
-		else
+		} else
 			throw HMemoryAllocationException( msg );
-		}
-	return ( newPtr );
 	}
+	return ( newPtr );
+}
 
-void free0( void* ptr_ ) throw()
-	{
+void free0( void* ptr_ ) throw() {
 	M_ASSERT( ( ptr_ != NULL ) && "memory::free0: request to free NULL pointer" );
 	::free( ptr_ );
 	return;
-	}
-
 }
 
 }
 
-void* operator new ( std::size_t size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException )
-	{
+}
+
+void* operator new ( std::size_t size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException ) {
 	M_ASSERT( ( size_ > 0 ) && "yaal::memory::new: requested size lower than 0" );
 	void* newPtr( ::operator new ( size_, std::nothrow ) );
-	if ( newPtr == 0 )
-		{
+	if ( newPtr == 0 ) {
 		char const msg[] = "yaal::memory::new: new returned NULL";
-		if ( yaal::memory::_onAllocFailure_ == yaal::memory::ON_ALLOC_FAILURE::ABORT )
-			{
+		if ( yaal::memory::_onAllocFailure_ == yaal::memory::ON_ALLOC_FAILURE::ABORT ) {
 			::perror( msg );
 			::abort();
-			}
-		else
+		} else
 			throw yaal::memory::HMemoryAllocationException( msg );
-		}
+	}
 	return ( newPtr );
-	}
+}
 
-void operator delete ( void* ptr_, yaal::memory::YaalNew const& ) throw ()
-	{
+void operator delete ( void* ptr_, yaal::memory::YaalNew const& ) throw () {
 	::operator delete ( ptr_ );
-	}
+}
 
-void* operator new[] ( std::size_t size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException )
-	{
+void* operator new[] ( std::size_t size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException ) {
 	M_ASSERT( ( size_ > 0 ) && "yaal::memory::new[]: requested size lower than 0" );
 	void* newPtr( ::operator new[] ( size_, std::nothrow ) );
-	if ( newPtr == 0 )
-		{
+	if ( newPtr == 0 ) {
 		char const msg[] = "yaal::memory::new: new[] returned NULL";
-		if ( yaal::memory::_onAllocFailure_ == yaal::memory::ON_ALLOC_FAILURE::ABORT )
-			{
+		if ( yaal::memory::_onAllocFailure_ == yaal::memory::ON_ALLOC_FAILURE::ABORT ) {
 			::perror( msg );
 			::abort();
-			}
-		else
+		} else
 			throw yaal::memory::HMemoryAllocationException( msg );
-		}
+	}
 	return ( newPtr );
-	}
+}
 
-void operator delete[] ( void* ptr_, yaal::memory::YaalNew const& ) throw ()
-	{
+void operator delete[] ( void* ptr_, yaal::memory::YaalNew const& ) throw () {
 	::operator delete[] ( ptr_ );
-	}
+}
 

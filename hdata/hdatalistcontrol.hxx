@@ -33,11 +33,9 @@ Copyright:
 #include "hconsole/hlistcontrol.hxx"
 #include "hdata/hdatacontrol.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 class HDataWindow;
 
@@ -45,8 +43,7 @@ class HDataWindow;
  *
  * This TUI control support automatic display of database content.
  */
-class HDataListControl : public HDataControl, public virtual yaal::hconsole::HListControl
-	{
+class HDataListControl : public HDataControl, public virtual yaal::hconsole::HListControl {
 public:
 	yaal::hconsole::list_control_helper::HListControler<>::ptr_t _dataControler;
 	HDataListControl( HDataWindow*, int, int, int, int, char const* );
@@ -55,7 +52,7 @@ public:
 	virtual int long get_current_id( void );
 	virtual void add_new( void );
 	virtual void cancel_new( void );
-	};
+};
 
 }
 

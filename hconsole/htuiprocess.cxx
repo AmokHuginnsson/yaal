@@ -43,25 +43,21 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 HTUIProcess::HTUIProcess( int noFileHandlers_, size_t keyHandlers_,
 		size_t commandHandlers_ )
 	: HHandler( keyHandlers_, commandHandlers_ ),
 	_dispatcher( noFileHandlers_, _latency_ * 1000 ), _mainWindow(), _foregroundWindow(),
-	_windows( new ( memory::yaal ) model_t() )
-	{
+	_windows( new ( memory::yaal ) model_t() ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HTUIProcess::~HTUIProcess( void )
-	{
+HTUIProcess::~HTUIProcess( void ) {
 	M_PROLOG
 	if ( _windows->size() > 0 )
 		_windows->pop_front();
@@ -70,10 +66,9 @@ HTUIProcess::~HTUIProcess( void )
 #endif /* __DEBUGGER_BABUNI__ */
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
-int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ )
-	{
+int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ ) {
 	M_PROLOG
 	static int const CTRLS_COUNT( 2 );
 	static int const ALTS_COUNT( 10 );
@@ -97,8 +92,7 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 				& HTUIProcess::handler_mouse );
 	if ( !! mainWindow_ )
 		mainWindow = mainWindow_;
-	else /* Create automatically default main window. */
-		{
+	else /* Create automatically default main window. */ {
 		mainWindow = make_pointer<HMainWindow>( processName_, _windows, ref( _foregroundWindow ) );
 		register_postprocess_handler( KEY<'\t'>::meta, NULL,
 				&HTUIProcess::handler_jump_meta_tab );
@@ -108,7 +102,7 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 			alts[ ctr ] = KEY<>::meta_r( '0' + ctr );
 		register_postprocess_handler( ALTS_COUNT, alts,
 			&HTUIProcess::handler_jump_meta_direct );
-		}
+	}
 	_mainWindow = mainWindow;
 	add_window( mainWindow );
 	if ( ! mainWindow->is_initialised() )
@@ -118,18 +112,16 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 	refresh();
 	return ( 1 );
 	M_EPILOG
-	}
+}
 
-void HTUIProcess::run( void )
-	{
+void HTUIProcess::run( void ) {
 	M_PROLOG
 	_dispatcher.run();
 	return;
 	M_EPILOG
-	}
+}
 
-int HTUIProcess::add_window( HWindow::ptr_t window_ )
-	{
+int HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	M_PROLOG
 	window_->init();
 	_windows->push_back( window_ );
@@ -141,10 +133,9 @@ int HTUIProcess::add_window( HWindow::ptr_t window_ )
 	refresh( true );
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-void HTUIProcess::process_stdin( int code_ )
-	{
+void HTUIProcess::process_stdin( int code_ ) {
 	M_PROLOG
 	HString command;
 	HConsole& cons = HConsole::get_instance();
@@ -156,8 +147,7 @@ void HTUIProcess::process_stdin( int code_ )
 			code_ = (*_foregroundWindow)->process_input( code_ );
 	if ( code_ )
 		code_ = process_input_with_handlers( code_, _postprocessHandlers );
-	if ( ! code_ )
-		{
+	if ( ! code_ ) {
 		if ( !! (*_foregroundWindow) )
 			_command = (*_foregroundWindow)->get_command();
 		if ( ! _command.is_empty() )
@@ -166,13 +156,12 @@ void HTUIProcess::process_stdin( int code_ )
 				&& !! (*_foregroundWindow) )
 			(*_foregroundWindow)->status_bar()->message( COLORS::FG_RED,
 					"unknown command: `%s'", command.raw() );
-		}
+	}
 	if ( _needRepaint_ )
 		refresh();
 #ifdef __DEBUGGER_BABUNI__
 	_needRepaint_ = true;
-	if ( code_ )
-		{
+	if ( code_ ) {
 		if ( code_ > KEY<KEY<0>::meta>::command )
 			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"COMMAND-META-%c: %5d       ",
@@ -193,8 +182,7 @@ void HTUIProcess::process_stdin( int code_ )
 			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"             %c: %5d       ",
 					code_, code_ );
-		}
-	else
+	} else
 		cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( code_ && !! (*_foregroundWindow) )
@@ -202,22 +190,19 @@ void HTUIProcess::process_stdin( int code_ )
 				"unknown function, err code(%d)", code_ );
 	return;
 	M_EPILOG
-	}
+}
 
-void HTUIProcess::handler_alert( void )
-	{
+void HTUIProcess::handler_alert( void ) {
 	M_PROLOG
-	if ( _needRepaint_ )
-		{
+	if ( _needRepaint_ ) {
 		_needRepaint_ = false;
 		HConsole::get_instance().c_refresh();
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HTUIProcess::handler_idle( void )
-	{
+void HTUIProcess::handler_idle( void ) {
 	M_PROLOG
 #ifdef __DEBUG__
 	HConsole& cons = HConsole::get_instance();
@@ -226,26 +211,23 @@ void HTUIProcess::handler_idle( void )
 			COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, clock.raw() );
 	_needRepaint_ = true;
 #endif /* __DEBUG__ */
-	if ( !! (*_foregroundWindow) )
-		{
+	if ( !! (*_foregroundWindow) ) {
 		HStatusBarControl::ptr_t& statusBar = (*_foregroundWindow)->status_bar();
 		if ( !! statusBar )
 			statusBar->refresh();
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HTUIProcess::process_mouse( int )
-	{
+void HTUIProcess::process_mouse( int ) {
 	M_PROLOG
 	handler_mouse( 0 );
 	return;
 	M_EPILOG
-	}
+}
 
-int HTUIProcess::handler_mouse( int code_, void const* )
-	{
+int HTUIProcess::handler_mouse( int code_, void const* ) {
 	M_PROLOG
 	code_ = 0;
 	mouse::OMouse mouse;
@@ -261,28 +243,25 @@ int HTUIProcess::handler_mouse( int code_, void const* )
 #endif /* __DEBUGGER_BABUNI__ */
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
-void HTUIProcess::process_terminal_event( int event_ )
-	{
+void HTUIProcess::process_terminal_event( int event_ ) {
 	M_PROLOG
 	char type;
 	::read( event_, &type, 1 );
-	switch( type )
-		{
+	switch( type ) {
 		case 'r':
 			handler_refresh( 0 );
 		break;
 		case 'm':
 			process_mouse( 0 );
 		break;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-int HTUIProcess::handler_refresh( int, void const* )
-	{
+int HTUIProcess::handler_refresh( int, void const* ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	cons.endwin();
@@ -292,20 +271,18 @@ int HTUIProcess::handler_refresh( int, void const* )
 	refresh( true ); /* there is c_clrscr(); and c_refresh() call inside */
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HTUIProcess::handler_quit( int, void const* )
-	{
+int HTUIProcess::handler_quit( int, void const* ) {
 	M_PROLOG
 	_dispatcher.stop();
 	_needRepaint_ = false;
 	HConsole::get_instance().clrscr();
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-int HTUIProcess::handler_jump_meta_tab( int code_, void const* )
-	{
+int HTUIProcess::handler_jump_meta_tab( int code_, void const* ) {
 	M_PROLOG
 	if ( _dispatcher.idle_cycles() < 5 )
 		++ _foregroundWindow;
@@ -315,10 +292,9 @@ int HTUIProcess::handler_jump_meta_tab( int code_, void const* )
 	code_ = 0;
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
-int HTUIProcess::handler_jump_meta_direct( int code_, void const* )
-	{
+int HTUIProcess::handler_jump_meta_direct( int code_, void const* ) {
 	M_PROLOG
 	code_ = ( code_ & 0xff ) - '0';
 	if ( code_ >= _windows->size() )
@@ -330,10 +306,9 @@ int HTUIProcess::handler_jump_meta_direct( int code_, void const* )
 	code_ = 0;
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
-int HTUIProcess::handler_close_window( int code_, void const* )
-	{
+int HTUIProcess::handler_close_window( int code_, void const* ) {
 	M_PROLOG
 	model_t::cyclic_iterator it = _foregroundWindow;
 	-- _foregroundWindow;
@@ -342,37 +317,32 @@ int HTUIProcess::handler_close_window( int code_, void const* )
 	code_ = 0;
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
-void HTUIProcess::select( HWindow const* const window_ )
-	{
+void HTUIProcess::select( HWindow const* const window_ ) {
 	M_PROLOG
-	for ( model_t::iterator it = _windows->begin(); it != _windows->end(); ++ it )
-		{
-		if ( (*it) == window_ )
-			{
+	for ( model_t::iterator it = _windows->begin(); it != _windows->end(); ++ it ) {
+		if ( (*it) == window_ ) {
 			_foregroundWindow = it;
 			break;
-			}
 		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HTUIProcess::refresh( bool force_ )
-	{
+void HTUIProcess::refresh( bool force_ ) {
 	M_PROLOG
-	if ( ( _foregroundWindow != HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) )
-		{
+	if ( ( _foregroundWindow != HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) ) {
 		if ( force_ )
 			(*_foregroundWindow)->schedule_refresh();
 		(*_foregroundWindow)->refresh();
-		}
+	}
 	HConsole::get_instance().c_refresh();
 	_needRepaint_ = false;
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

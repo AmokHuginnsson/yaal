@@ -32,17 +32,14 @@ Copyright:
 
 #include "hcore/hdeque.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief HQueue<> - a queue container adaptor.
  */
 template<typename type_t, template <typename> class sequence_t = HDeque>
-class HQueue
-	{
+class HQueue {
 	typedef sequence_t<type_t> sequence_type;
 public:
 	typedef typename sequence_type::value_type value_type;
@@ -51,93 +48,77 @@ private:
 public:
 	HQueue( void ) : _sequence() {}
 	HQueue( HQueue const& stack_ ) : _sequence( stack_._sequence ) {}
-	HQueue& operator = ( HQueue const& stack_ )
-		{
+	HQueue& operator = ( HQueue const& stack_ ) {
 		M_PROLOG
-		if ( &stack_ != this )
-			{
+		if ( &stack_ != this ) {
 			HQueue tmp( stack_ );
 			swap( tmp );
-			}
+		}
 		return ( *this );
 		M_EPILOG
-		}
-	void swap( HQueue& stack_ )
-		{
-		if ( &stack_ != this )
-			{
+	}
+	void swap( HQueue& stack_ ) {
+		if ( &stack_ != this ) {
 			using yaal::swap;
 			swap( _sequence, stack_._sequence );
-			}
+		}
 		return;
-		}
-	bool is_empty( void ) const
-		{
+	}
+	bool is_empty( void ) const {
 		return ( _sequence.is_empty() );
-		}
-	bool empty( void ) const
-		{
+	}
+	bool empty( void ) const {
 		return ( _sequence.is_empty() );
-		}
-	int long get_size( void ) const
-		{
+	}
+	int long get_size( void ) const {
 		return ( _sequence.get_size() );
-		}
-	int long size( void ) const
-		{
+	}
+	int long size( void ) const {
 		return ( _sequence.get_size() );
-		}
-	value_type const& front( void ) const
-		{
+	}
+	value_type const& front( void ) const {
 		M_PROLOG
 		return ( _sequence.front() );
 		M_EPILOG
-		}
-	value_type& front( void )
-		{
+	}
+	value_type& front( void ) {
 		M_PROLOG
 		return ( _sequence.front() );
 		M_EPILOG
-		}
-	value_type const& back( void ) const
-		{
+	}
+	value_type const& back( void ) const {
 		M_PROLOG
 		return ( _sequence.back() );
 		M_EPILOG
-		}
-	value_type& back( void )
-		{
+	}
+	value_type& back( void ) {
 		M_PROLOG
 		return ( _sequence.back() );
 		M_EPILOG
-		}
-	void push( value_type const& value_ )
-		{
+	}
+	void push( value_type const& value_ ) {
 		M_PROLOG
 		_sequence.push_front( value_ );
 		return;
 		M_EPILOG
-		}
-	void pop( void )
-		{
+	}
+	void pop( void ) {
 		M_PROLOG
 		_sequence.pop_back();
 		return;
 		M_EPILOG
-		}
-	bool operator == ( HQueue const& s_ ) const
-		{
+	}
+	bool operator == ( HQueue const& s_ ) const {
 		M_PROLOG
 		return ( ( &s_ == this ) || safe_equal( _sequence.begin(), _sequence.end(), s_._sequence.begin(), s_._sequence.end() ) );
 		M_EPILOG
-		}
-	bool operator < ( HQueue const& s_ ) const
-		{
+	}
+	bool operator < ( HQueue const& s_ ) const {
 		M_PROLOG
 		return ( ( &s_ != this ) && lexicographical_compare( _sequence.begin(), _sequence.end(), s_._sequence.begin(), s_._sequence.end() ) );
 		M_EPILOG
-		}
-	};
+	}
+};
 
 }
 

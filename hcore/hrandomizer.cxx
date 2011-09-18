@@ -32,55 +32,47 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hrandomizer.hxx"
 #include "hexception.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-namespace
-	{
+namespace {
 	static long unsigned const MULTIPLIER = 0x015a4e35L;
 	static long unsigned const INCREMENT  = 1;
-	}
+}
 
 HRandomizer::HRandomizer( int long unsigned const seed_, int cap_ )
-	: _seed( seed_ ), _range( cap_ )
-	{
+	: _seed( seed_ ), _range( cap_ ) {
 	M_PROLOG
 	M_ENSURE( _range > 0 );
 	return;
 	M_EPILOG
-	}
+}
 	
-int HRandomizer::operator()( int range_ )
-	{
+int HRandomizer::operator()( int range_ ) {
 	M_PROLOG
 	_seed = MULTIPLIER * _seed + INCREMENT;
 	M_ENSURE( range_ > 0 );
 	return ( static_cast<int>( ( _seed >> 16 ) & 0x7fff ) % range_ );
 	M_EPILOG
-	}
+}
 
-int HRandomizer::operator()( void )
-	{
+int HRandomizer::operator()( void ) {
 	M_PROLOG
 	_seed = MULTIPLIER * _seed + INCREMENT;
 	return ( static_cast<int>( ( _seed >> 16 ) & 0x7fff ) % _range );
 	M_EPILOG
-	}
+}
 
-namespace randomizer_helper
-{
+namespace randomizer_helper {
 
-HRandomizer make_randomizer( int cap_ )
-	{
+HRandomizer make_randomizer( int cap_ ) {
 	M_PROLOG
 	struct timeval tv;
 	M_ENSURE( gettimeofday( &tv, NULL ) == 0 );
 	return ( HRandomizer( tv.tv_sec + tv.tv_usec, cap_ ) );
 	M_EPILOG
-	}
+}
 
 }
 

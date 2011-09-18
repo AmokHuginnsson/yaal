@@ -29,18 +29,15 @@ Copyright:
 
 #include "hcore/numeric.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Pseudo=random number generator.
  *
  * Congurent pseudo random number generator class.
  */
-class HRandomizer
-	{
+class HRandomizer {
 	int long unsigned _seed;
 	int _range;
 public:
@@ -64,12 +61,11 @@ public:
  * \return next random number capped to randomizer instance default value.
  */
 	int operator()( void );
-	};
+};
 
 /*! \brief Helper namespace for HRandomizer related utils.
  */
-namespace randomizer_helper
-{
+namespace randomizer_helper {
 
 /*! \brief Make randomizer object initialized with "random" seed.
  *

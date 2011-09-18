@@ -42,23 +42,19 @@ string strip_prefix( string, string );
 string dirname_basename( string const& );
 void copy_file( string const&, string const& );
 
-int main( int argc_, char** argv_ )
-	{
+int main( int argc_, char** argv_ ) {
 	int errorCode = 0;
-	try
-		{
+	try {
 /*
-		if ( argc_ == 2 )
-			{
+		if ( argc_ == 2 ) {
 			cout << "`" << argv_[1] << "' is considered" << ( is_directory( argv_[1] ) ? "" : " not" ) << " to be a directory" << endl;
 			cout << "dirname of `" << argv_[1] << "' is: " << dirname( argv_[1] ) << endl;
 			return ( 1 );
-			}
-		if ( argc_ == 2 )
-			{
+		}
+		if ( argc_ == 2 ) {
 			remove_all( argv_[1] );
 			return ( 1 );
-			}
+		}
 */
 		if ( argc_ != 4 )
 			throw invalid_argument( "mkheaders: exactly 3 arguments required" );
@@ -98,16 +94,14 @@ int main( int argc_, char** argv_ )
 		ifstream i( ( dirHeaders + "/hcore/" + ( string( D_UNIQ ) + ".hxx" ) ).c_str() );
 		string line;
 		int lines = 0;
-		while ( ! getline( i, line ).fail() && ( lines ++ < 26 ) )
-			{
+		while ( ! getline( i, line ).fail() && ( lines ++ < 26 ) ) {
 			int pos = 0;
-			if ( ( pos = line.find( D_UNIQ ) ) != string::npos )
-				{
+			if ( ( pos = line.find( D_UNIQ ) ) != string::npos ) {
 				line.erase( pos, sizeof ( D_UNIQ ) - 1 );
 				line.insert( pos, "yaal" );
-				}
-			o << line << endl;
 			}
+			o << line << endl;
+		}
 		o << "#ifndef YAAL_YAAL_HXX_INCLUDED" << endl
 			<< "#define YAAL_YAAL_HXX_INCLUDED 1" << endl << endl
 			<< "#include <yaal/config.hxx>" << endl;
@@ -118,142 +112,115 @@ int main( int argc_, char** argv_ )
 		ofstream co( ( dirHeaders + "/config.hxx" ).c_str() );
 		static char const PACKAGE_S[] = "define PACKAGE_";
 		static char const LIB_INFIX[] = "define LIB_INFIX";
-		while ( ! getline( ci, line ).fail() )
-			{
+		while ( ! getline( ci, line ).fail() ) {
 			int pos = 0;
-			if ( ( pos = line.find( PACKAGE_S ) ) != string::npos )
-				{
+			if ( ( pos = line.find( PACKAGE_S ) ) != string::npos ) {
 				line.erase( pos, sizeof ( PACKAGE_S ) - 1 );
 				line.insert( pos, "define YAAL_PACKAGE_" );
-				}
-			else if ( line.find( LIB_INFIX ) != string::npos )
+			} else if ( line.find( LIB_INFIX ) != string::npos )
 				line = "#undef LIB_INFIX";
 			co << line << endl;
-			}
+		}
 #ifndef __GNUC__
 		copy_file( dirRoot + "/_aux/msvcxx/cleanup.hxx", dirHeaders + "/cleanup.hxx" );
 		copy_file( dirRoot + "/_aux/msvcxx/client-fix.hxx", dirHeaders + "/fix.hxx" );
 #endif /* not __GNUC__ */
-		}
-	catch ( exception const& e )
-		{
+	} catch ( exception const& e ) {
 		errorCode = 1;
 		cerr << e.what() << endl;
-		}
-	catch ( int const& )
-		{
-		}
-	return ( errorCode );
+	} catch ( int const& ) {
 	}
+	return ( errorCode );
+}
 
-void copy_file( string const& src_, string const& dst_ )
-	{
+void copy_file( string const& src_, string const& dst_ ) {
 	ifstream i( src_.c_str() );
 	ofstream o( dst_.c_str() );
 	string line;
 	while ( ! getline( i, line ).fail() )
 		o << line << endl;
 	return;
-	}
+}
 
-void process_file( string const& from, string const& to )
-	{
+void process_file( string const& from, string const& to ) {
 	/* cout << from << " --> " << to << endl; */
 	ifstream i( from.c_str() );
 	ofstream o( to.c_str() );
 	string line;
-	while ( ! getline( i, line ).fail() )
-		{
+	while ( ! getline( i, line ).fail() ) {
 		process_line( line );
 		o << line << endl;
-		}
 	}
+}
 
-void process_line( string& line )
-	{
-	if ( line.find( "#include" ) == 0 )
-		{
+void process_line( string& line ) {
+	if ( line.find( "#include" ) == 0 ) {
 		int posOpen = line.find( "\"" );
 		int posClose = ( posOpen != string::npos ) ? line.find( "\"", posOpen + 1 ) : string::npos;
-		if ( ( posOpen != string::npos ) && ( posClose != string::npos ) )
-			{
+		if ( ( posOpen != string::npos ) && ( posClose != string::npos ) ) {
 			line[ posOpen ] = '<';
 			line[ posClose ] = '>';
 			line.erase( posClose + 1 );
 			line.insert( posOpen + 1, "yaal/" );
-			}
 		}
 	}
+}
 
-void delete_fucking_old_files_no_matter_fucking_what( string const& p )
-	{
+void delete_fucking_old_files_no_matter_fucking_what( string const& p ) {
 	bool fail( false );
-	while ( is_directory( p ) )
-		{
-		if ( fail )
-			{
+	while ( is_directory( p ) ) {
+		if ( fail ) {
 			sleep( 1 );
 			cout << "+" << endl;
-			}
+		}
 		remove_all( p );
 		fail = true;
-		}
 	}
+}
 
-void create_fucking_new_directory_no_matter_fucking_what( string const& p )
-	{
+void create_fucking_new_directory_no_matter_fucking_what( string const& p ) {
 	bool fail( false );
-	while ( ! is_directory( p ) )
-		{
-		if ( fail )
-			{
+	while ( ! is_directory( p ) ) {
+		if ( fail ) {
 			sleep( 1 );
 			cout << "+" << endl;
-			}
+		}
 		mkdir( p.c_str(), 0 );
 		fail = true;
-		}
 	}
+}
 
-bool is_directory( string const& p )
-	{
+bool is_directory( string const& p ) {
 	struct stat s;
 	bool dir( false );
 	if ( ! stat( p.c_str(), &s ) )
 		dir = ( s.st_mode & S_IFDIR ) ? true : false;
 	return ( dir );
-	}
+}
 
-string dirname( string const& p )
-	{
+string dirname( string const& p ) {
 	string dir;
 /*	clog << "testing path: `" << p << "'" << endl; */
-	if ( ! p.empty() )
-		{
-		if ( ! is_directory( p ) )
-			{
+	if ( ! p.empty() ) {
+		if ( ! is_directory( p ) ) {
 			int long delimIdx( p.find_last_of( "/\\" ) );
 			if ( delimIdx != string::npos )
 				dir = dirname( string( p, 0, delimIdx ) );
-			}
-		else
+		} else
 			dir = p;
-		}
-	return ( dir );
 	}
+	return ( dir );
+}
 
-string basename( string const& p )
-	{
+string basename( string const& p ) {
 	int long idx( 0 );
 	string name( ( ( idx = p.find_last_of( "/\\" ) ) != string::npos ) ? string( p, idx + 1 ) : p );
 	return ( name );
-	}
+}
 
-void remove_all( string const& p )
-	{
+void remove_all( string const& p ) {
 	string toRemove( ( p.find_last_of( "/\\" ) == p.size() - 1 ) ? dirname( p ) : p );
-	if ( is_directory( toRemove ) )
-		{
+	if ( is_directory( toRemove ) ) {
 #ifdef __GNUC__
 		DIR* d( opendir( toRemove.c_str() ) );
 		if ( ! d )
@@ -264,54 +231,45 @@ void remove_all( string const& p )
 		if ( ff < 0 )
 			throw runtime_error( "cannot open directory: " + toRemove );
 #endif /* not __GNUC__ */
-		try
-			{
+		try {
 #ifdef __GNUC__
 			dirent* ent( NULL );
-			while ( ( ent = readdir( d ) ) )
-				{
-				if ( ent && ent->d_name )
-					{
+			while ( ( ent = readdir( d ) ) ) {
+				if ( ent && ent->d_name ) {
 					string name( ent->d_name );
 					if ( ( name != "." ) && ( name != ".." ) )
 						remove_all( toRemove + "/" + name );
-					}
 				}
+			}
 #else /* __GNUC__ */
-			do
-				{
+			do {
 				string name( findBuf.name );
 				if ( ( name != "." ) && ( name != ".." ) )
 					remove_all( toRemove + "/" + name );
-				}
-			while ( ! _findnext( ff, &findBuf ) );
+			} while ( ! _findnext( ff, &findBuf ) );
 #endif /* not __GNUC__ */
-			}
-		catch ( ... )
-			{
+		} catch ( ... ) {
 #ifdef __GNUC__
 			closedir( d );
 #else /* __GNUC__ */
 			_findclose( ff );
 #endif /* not __GNUC__ */
 			throw;
-			}
+		}
 #ifdef __GNUC__
 		closedir( d );
 #else /* __GNUC__ */
 		_findclose( ff );
 #endif /* not __GNUC__ */
 		rmdir( toRemove.c_str() );
-		}
-	else
+	} else
 		unlink( toRemove.c_str() );
-	}
+}
 
 string dirname_basename( string const& p )
 	{ return basename( dirname( p ) ); }
 
-string strip_prefix( string item_, string prefix_ )
-	{
+string strip_prefix( string item_, string prefix_ ) {
 	return ( item_.find( prefix_ ) == 0 ? string( item_, prefix_.size() ) : item_ );
-	}
+}
 

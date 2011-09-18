@@ -36,27 +36,22 @@ Copyright:
 #include "hcore/hpointer.hxx"
 #include "hcore/hstreaminterface.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
-class HZipStream : public yaal::hcore::HStreamInterface
-	{
+class HZipStream : public yaal::hcore::HStreamInterface {
 public:
 	typedef HZipStream this_type;
 	typedef yaal::hcore::HStreamInterface base_type;
 	typedef yaal::hcore::HStreamInterface::ptr_t owned_stream_t;
 	typedef yaal::hcore::HStreamInterface& ref_stream_t;
-	struct MODE
-		{
-		typedef enum
-			{
+	struct MODE {
+		typedef enum {
 			DEFLATE,
 			INFLATE
-			} mode_t;
-		};
+		} mode_t;
+	};
 private:
 	MODE::mode_t _mode;
 	int _error;
@@ -86,7 +81,7 @@ private:
 	virtual bool do_is_valid( void ) const;
 	HZipStream( HZipStream const& );
 	HZipStream& operator = ( HZipStream const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HZipStream, yaal::hcore::HStreamInterfaceException> HZipStreamException;
 

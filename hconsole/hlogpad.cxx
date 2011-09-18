@@ -31,47 +31,40 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 HLogPad::HLogLine::HLogLine ( void )
-	: _type ( NONE ), _attribute ( COLORS::ATTR_NORMAL ), _text()
-	{
+	: _type ( NONE ), _attribute ( COLORS::ATTR_NORMAL ), _text() {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HLogPad::HLogLine::~HLogLine ( void )
-	{
+HLogPad::HLogLine::~HLogLine ( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
 HLogPad::HLogPad ( HWindow* parent_, int row_, int column_,
 		int height_, int width_, char const* const label_ )
 	: HControl ( parent_, row_, column_, height_, width_, label_ ),
 	_lines( 0 ), _offsetRow( 0 ), _offsetColumn( 0 ),
-	_attribute( 0 ), _contents()
-	{
+	_attribute( 0 ), _contents() {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-HLogPad::~HLogPad( void )
-	{
+HLogPad::~HLogPad( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HLogPad::do_refresh( void )
-	{
+void HLogPad::do_refresh( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	draw_label();
@@ -81,20 +74,16 @@ void HLogPad::do_refresh( void )
 	_attribute = COLORS::ATTR_NORMAL | bg;
 	for ( int i( 0 ); i < _heightRaw; ++ i )
 		cons.c_cmvprintf( _rowRaw + i, _columnRaw, _attribute, _varTmpBuffer.raw() );
-	if ( ! _contents.is_empty() )
-		{
+	if ( ! _contents.is_empty() ) {
 		int ctr( 0 ); /* number of text lines in _contents iterated so far */
 		int row( 0 ); /* number of lines printed so far */
 		int cursor( 0 ); /* end of portion of currently printed line */
 		int column( 0 ); /* total length of currently printed line */
-		for ( contents_t::iterator it( _contents.begin() ), end( _contents.end() ); ( it != end ) && ( row < _heightRaw ); ++ it )
-			{
+		for ( contents_t::iterator it( _contents.begin() ), end( _contents.end() ); ( it != end ) && ( row < _heightRaw ); ++ it ) {
 			if ( it->_type == HLogLine::ATTRIBUTE )
 				_attribute = it->_attribute | bg;
-			else
-				{
-				if ( ( ctr >= _offsetRow ) && ( cursor < _widthRaw ) )
-					{
+			else {
+				if ( ( ctr >= _offsetRow ) && ( cursor < _widthRaw ) ) {
 					if ( _offsetColumn > column )
 						_varTmpBuffer = it->_text.mid( _offsetColumn - column );
 					else
@@ -104,31 +93,26 @@ void HLogPad::do_refresh( void )
 					if ( _varTmpBuffer[ 0 ] )
 						cons.c_cmvprintf( _rowRaw + row,
 								_columnRaw + cursor, _attribute, _varTmpBuffer.raw() );
-					}
-				else
+				} else
 					_varTmpBuffer = "";
-				if ( it->_type == HLogLine::TEXT_EOL )
-					{
+				if ( it->_type == HLogLine::TEXT_EOL ) {
 					cursor = 0;
 					column = 0;
 					if ( ctr >= _offsetRow )
 						++ row;
 					++ ctr;
-					}
-				else
-					{
+				} else {
 					cursor += static_cast<int>( _varTmpBuffer.get_length() );
 					column += static_cast<int>( it->_text.get_length() );
-					}
 				}
 			}
 		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HLogPad::add( int attribute_ )
-	{
+void HLogPad::add( int attribute_ ) {
 	M_PROLOG
 	HLogLine logLine;
 	logLine._type = HLogLine::ATTRIBUTE;
@@ -136,28 +120,24 @@ void HLogPad::add( int attribute_ )
 	_contents.push_back( logLine );
 	return;
 	M_EPILOG
-	}
+}
 
-void HLogPad::add( yaal::hcore::HString const& text_ )
-	{
+void HLogPad::add( yaal::hcore::HString const& text_ ) {
 	M_PROLOG
 	int indexNL( 0 ), indexChar( 0 );
 	HLogLine logLine;
 	HLogLine* it( NULL );
 	if ( ! _contents.is_empty() )
 		it = &_contents.tail();
-	if ( ! it || ( it->_type != HLogLine::TEXT ) )
-		{
+	if ( ! it || ( it->_type != HLogLine::TEXT ) ) {
 		it = &logLine;
 		it->_type = HLogLine::TEXT;
 		it->_text = "";
-		}
+	}
 	_varTmpBuffer = text_;
-	while ( ! _varTmpBuffer.is_empty() )
-		{
+	while ( ! _varTmpBuffer.is_empty() ) {
 		indexNL = static_cast<int>( _varTmpBuffer.find_one_of( "\r\n" ) );
-		if ( indexNL >= 0 )
-			{
+		if ( indexNL >= 0 ) {
 			it->_text += _varTmpBuffer.left( indexNL );
 			it->_type = HLogLine::TEXT_EOL;
 			++ _lines;
@@ -166,40 +146,35 @@ void HLogPad::add( yaal::hcore::HString const& text_ )
 				_varTmpBuffer = _varTmpBuffer.mid( indexChar );
 			else
 				_varTmpBuffer = "";
-			}
-		else
-			{
+		} else {
 			it->_text += _varTmpBuffer;
 			_varTmpBuffer = "";
-			}
+		}
 		if ( it == &logLine )
 			_contents.push_back( *it );
 		it = &logLine;
 		it->_type = HLogLine::TEXT;
 		it->_text = "";
-		}
+	}
 	if ( _lines > _heightRaw )
 		_offsetRow = _lines - _heightRaw;
 	schedule_refresh();
 	return;
 	M_EPILOG
-	}
+}
 
-void HLogPad::add( int attribute_, yaal::hcore::HString const& text_ )
-	{
+void HLogPad::add( int attribute_, yaal::hcore::HString const& text_ ) {
 	M_PROLOG
 	add( attribute_ );
 	add( text_ );
 	return;
 	M_EPILOG
-	}
+}
 
-int HLogPad::do_process_input( int code_ )
-	{
+int HLogPad::do_process_input( int code_ ) {
 	M_PROLOG
 	int code = 0;
-	switch ( code_ )
-		{
+	switch ( code_ ) {
 		case ( KEY_CODES::DOWN ):
 			if ( _lines > ( _heightRaw + _offsetRow ) )
 				_offsetRow ++;
@@ -229,12 +204,12 @@ int HLogPad::do_process_input( int code_ )
 		default :
 			code = code_;
 		break;
-		}
+	}
 	if ( ! code )
 		schedule_refresh();
 	return ( code );
 	M_EPILOG
-	}
+}
 
 }
 

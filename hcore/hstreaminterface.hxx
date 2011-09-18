@@ -32,11 +32,9 @@ Copyright:
 #include "hcore/hexception.hxx"
 #include "hcore/hpointer.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 class HStreamInterface;
 HStreamInterface& endl( HStreamInterface& );
@@ -54,12 +52,10 @@ HStreamInterface& noskipws( HStreamInterface& );
 
 /*! \brief Interface for stream based IO.
  */
-class HStreamInterface
-	{
+class HStreamInterface {
 public:
 	typedef HStreamInterface this_type;
-	class HManipulator
-		{
+	class HManipulator {
 		int _value;
 		typedef void ( HManipulator::* ACTION_t )( HStreamInterface& ) const;
 		ACTION_t _action;
@@ -69,26 +65,22 @@ public:
 		void set_fill( HStreamInterface& ) const;
 		void set_width( HStreamInterface& ) const;
 		void set_precision( HStreamInterface& ) const;
-		};
+	};
 	typedef HPointer<HStreamInterface> ptr_t;
-	struct BASES
-		{
-		typedef enum
-			{
+	struct BASES {
+		typedef enum {
 			DEC,
 			HEX,
 			OCT
-			} enum_t;
-		};
-	struct FLOAT_FORMAT
-		{
-		typedef enum
-			{
+		} enum_t;
+	};
+	struct FLOAT_FORMAT {
+		typedef enum {
 			NATURAL,
 			FIXED,
 			SCIENTIFIC
-			} enum_t;
-		};
+		} enum_t;
+	};
 	typedef HStreamInterface& ( *manipulator_t )( HStreamInterface& );
 protected:
 	HChunk _cache; /*!< Read buffer. */
@@ -298,7 +290,7 @@ private:
 	virtual bool do_is_valid( void ) const = 0;
 	friend HStreamInterface& endl( HStreamInterface& );
 	friend HStreamInterface& flush( HStreamInterface& );
-	};
+};
 
 HStreamInterface::HManipulator setfill( int );
 HStreamInterface::HManipulator setw( int );
@@ -314,8 +306,7 @@ typedef HExceptionT<HStreamInterface> HStreamInterfaceException;
  * \tparam delim_t - type of optional delimiter separating each iteration.
  */
 template<typename delim_t, typename out_t>
-class HStreamIterator
-	{
+class HStreamIterator {
 	mutable HStreamInterface* _stream;
 	delim_t _delim;
 	mutable out_t _valueCache;
@@ -327,79 +318,67 @@ public:
 		: _stream( &stream ), _delim( delim ), _valueCache(), _steps( 0 ) {}
 	HStreamIterator( HStreamIterator const& it_ )
 		: _stream( it_._stream ), _delim( it_._delim ), _valueCache( it_._valueCache ), _steps( it_._steps ) {}
-	HStreamIterator& operator = ( HStreamIterator const& it_ )
-		{
-		if ( &it_ != this )
-			{
+	HStreamIterator& operator = ( HStreamIterator const& it_ ) {
+		if ( &it_ != this ) {
 			HStreamIterator tmp( it_ );
 			swap( tmp );
-			}
-		return ( *this );
 		}
+		return ( *this );
+	}
 	HStreamIterator& operator* ( void )
 		{ return ( *this ); }
 	HStreamIterator& operator* ( void ) const
 		{ return ( *this ); }
 	template<typename item_t>
-	HStreamIterator& operator = ( item_t const& item )
-		{
+	HStreamIterator& operator = ( item_t const& item ) {
 		*_stream << item << _delim;
 		return ( *this );
-		}
-	operator out_t ( void ) const
-		{
+	}
+	operator out_t ( void ) const {
 		M_PROLOG
 		return ( _valueCache );
 		M_EPILOG
-		}
-	bool operator == ( HStreamIterator const& it_ ) const
-		{
+	}
+	bool operator == ( HStreamIterator const& it_ ) const {
 		return ( operator != (  it_ ) );
-		}
-	bool operator != ( HStreamIterator const& it_ ) const
-		{
+	}
+	bool operator != ( HStreamIterator const& it_ ) const {
 		if ( ! _steps )
 			read_value();
-		while ( _steps > 0 )
-			{
+		while ( _steps > 0 ) {
 			read_value();
 			-- _steps;
-			}
-		return ( _stream != it_._stream );
 		}
-	void swap( HStreamIterator& it_ )
-		{
-		if ( &it_ != this )
-			{
+		return ( _stream != it_._stream );
+	}
+	void swap( HStreamIterator& it_ ) {
+		if ( &it_ != this ) {
 			using yaal::swap;
 			swap( _stream, it_._stream );
 			swap( _delim, it_._delim );
 			swap( _valueCache, it_._valueCache );
 			swap( _steps, it_._steps );
-			}
-		return;
 		}
-	HStreamIterator const& operator ++ ( void ) const
-		{
+		return;
+	}
+	HStreamIterator const& operator ++ ( void ) const {
 		M_PROLOG
 		++ _steps;
 		return ( *this );
 		M_EPILOG
-		}
+	}
 private:
-	void read_value( void ) const
-		{
+	void read_value( void ) const {
 		M_PROLOG
-		if ( _stream )
-			{
+		if ( _stream ) {
 			*_stream >> _valueCache;
 			if ( ! _stream->is_valid() )
 				_stream = NULL;
-			}
+		}
 		return;
 		M_EPILOG
-		}
-	};
+	}
+};
 
 template<typename delim_t>
 HStreamIterator<delim_t, trait::no_type> stream_iterator( HStreamInterface& stream, delim_t delim )

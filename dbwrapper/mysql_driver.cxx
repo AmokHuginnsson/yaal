@@ -39,127 +39,108 @@ Copyright:
 
 #include <mysql/mysql.h>
 
-extern "C"
-{
+extern "C" {
 
 MYSQL* _brokenDB_ = NULL;
 
 M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
-		char const* login_, char const * password_ )
-	{
+		char const* login_, char const * password_ ) {
 	MYSQL* mySQL( NULL );
-	if ( _brokenDB_ )
-		{
+	if ( _brokenDB_ ) {
 		mysql_close( _brokenDB_ );
 		_brokenDB_ = NULL;
-		}
+	}
 	mySQL = mysql_init( NULL );
-	if ( mySQL )
-		{
+	if ( mySQL ) {
 		int unsigned protocol( MYSQL_PROTOCOL_SOCKET );
 		if ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) )
 			_brokenDB_ = mySQL, mySQL = NULL;
 		else if ( ! mysql_real_connect( mySQL, NULL, login_, password_,
 				dataBase_, 0, NULL, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) )
 			_brokenDB_ = mySQL, mySQL = NULL;
-		}
-	return ( mySQL );
 	}
+	return ( mySQL );
+}
 
-M_EXPORT_SYMBOL void db_disconnect( void* data_ )
-	{
+M_EXPORT_SYMBOL void db_disconnect( void* data_ ) {
 	mysql_close( static_cast<MYSQL*>( data_ ) );
 	return;
-	}
+}
 
-M_EXPORT_SYMBOL int dbrs_errno( void* data_, void* )
-	{
+M_EXPORT_SYMBOL int dbrs_errno( void* data_, void* ) {
 	if ( ! data_ )
 		data_ = _brokenDB_;
 	return ( ::mysql_errno( static_cast<MYSQL*>( data_ ) ) );
-	}
+}
 
-M_EXPORT_SYMBOL char const* dbrs_error( void* data_, void* )
-	{
+M_EXPORT_SYMBOL char const* dbrs_error( void* data_, void* ) {
 	if ( ! data_ )
 		data_ = _brokenDB_;
 	return ( ::mysql_error( static_cast<MYSQL*>( data_ ) ) );
-	}
+}
 
-M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ )
-	{
+M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ ) {
 	mysql_query( static_cast<MYSQL*>( data_ ), query_ );
 	return ( mysql_store_result( static_cast<MYSQL*>( data_ ) ) );
-	}
+}
 
-M_EXPORT_SYMBOL void rs_unquery( void* data_ )
-	{
+M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
 	mysql_free_result( static_cast<MYSQL_RES*>( data_ ) );
 	return;
-	}
+}
 
-M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ )
-	{
+M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	MYSQL_ROW row;
 	mysql_data_seek( static_cast<MYSQL_RES*>( data_ ), row_ );
 	row = mysql_fetch_row( static_cast<MYSQL_RES*>( data_ ) );
 	return ( row [ column_ ] );
-	}
+}
 
-M_EXPORT_SYMBOL int rs_fields_count( void* data_ )
-	{
+M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	return ( data_ ? ::mysql_num_fields( static_cast<MYSQL_RES*>( data_ ) ) : 0 );
-	}
+}
 
-M_EXPORT_SYMBOL int long dbrs_records_count( void* dataB_, void* dataR_ )
-	{
+M_EXPORT_SYMBOL int long dbrs_records_count( void* dataB_, void* dataR_ ) {
 	if ( dataR_ )
 		return ( static_cast<int long>( mysql_num_rows( static_cast<MYSQL_RES*>( dataR_ ) ) ) );
 	else
 		return ( static_cast<int long>( mysql_affected_rows( static_cast<MYSQL*>( dataB_ ) ) ) );
-	}
+}
 
-M_EXPORT_SYMBOL int long dbrs_id( void* dataB_, void* )
-	{
+M_EXPORT_SYMBOL int long dbrs_id( void* dataB_, void* ) {
 	return ( static_cast<int long>( mysql_insert_id( static_cast<MYSQL*>( dataB_ ) ) ) );
-	}
+}
 
-M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ )
-	{
+M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	MYSQL_FIELD* field = NULL;
 	field = mysql_fetch_field_direct( static_cast<MYSQL_RES*>( dataR_ ), field_ );
 	return ( field->name );
-	}
+}
 
 int yaal_mysql_driver_main( int, char** ) __attribute__(( __noreturn__ ));
-int yaal_mysql_driver_main( int, char** )
-	{
+int yaal_mysql_driver_main( int, char** ) {
 	::exit( 0 );
-	}
+}
 
 }
 
-namespace
-{
+namespace {
 
-class HMySQLInitDeinit
-	{
+class HMySQLInitDeinit {
 public:
 	HMySQLInitDeinit( void );
 	~HMySQLInitDeinit( void );
-	} mySQLInitDeinit;
+} mySQLInitDeinit;
 
-HMySQLInitDeinit::HMySQLInitDeinit( void )
-	{
+HMySQLInitDeinit::HMySQLInitDeinit( void ) {
 	mysql_library_init( 0, NULL, NULL );
 	return;
-	}
+}
 
-HMySQLInitDeinit::~HMySQLInitDeinit( void )
-	{
+HMySQLInitDeinit::~HMySQLInitDeinit( void ) {
 	mysql_library_end();
 	return;
-	}
+}
 
 }
 

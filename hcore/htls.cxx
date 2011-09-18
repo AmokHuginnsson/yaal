@@ -28,11 +28,9 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "htls.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 }
 

@@ -32,53 +32,45 @@ M_VCSID( "$Id: "__TID__" $" )
 using namespace yaal;
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 OMenuItem::OMenuItem( void )
-	: _subMenu( NULL ), HANDLER( NULL ), _param( NULL ), _label()
-	{
+	: _subMenu( NULL ), HANDLER( NULL ), _param( NULL ), _label() {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
 OMenuItem::OMenuItem( OMenuItem* const menuItem_, HANDLER_t const handler,
 		void* param_, HString const& label_ )
 	: _subMenu( menuItem_ ), HANDLER( handler ),
-	_param( param_ ), _label ( label_ )
-	{
+	_param( param_ ), _label ( label_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
 OMenuItem::OMenuItem( OMenuItem const& menuItem_ )
 	: _subMenu( menuItem_._subMenu ), HANDLER( menuItem_.HANDLER ),
-	_param( menuItem_._param ), _label( menuItem_._label )
-	{
+	_param( menuItem_._param ), _label( menuItem_._label ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-OMenuItem& OMenuItem::operator = ( OMenuItem const& menuItem_ )
-	{
+OMenuItem& OMenuItem::operator = ( OMenuItem const& menuItem_ ) {
 	M_PROLOG
-	if ( &menuItem_ != this )
-		{
+	if ( &menuItem_ != this ) {
 		OMenuItem item( menuItem_ );
 		swap( item );
-		}
+	}
 	return ( *this );
 	M_EPILOG
-	}
+}
 
-void OMenuItem::reset( void )
-	{
+void OMenuItem::reset( void ) {
 	M_PROLOG
 	_subMenu = NULL;
 	HANDLER = NULL;
@@ -86,30 +78,27 @@ void OMenuItem::reset( void )
 	_label = "";
 	return;
 	M_EPILOG
-	}
+}
 
-void OMenuItem::call( HTUIProcess* proc )
-	{
+void OMenuItem::call( HTUIProcess* proc ) {
 	M_PROLOG
 	static_cast<void>( ( proc->*( HANDLER ) )( _param ) );
 	return;
 	M_EPILOG
-	}
+}
 
-void OMenuItem::swap( OMenuItem& other )
-	{
+void OMenuItem::swap( OMenuItem& other ) {
 	M_PROLOG
-	if ( &other != this )
-		{
+	if ( &other != this ) {
 		using yaal::swap;
 		swap( _subMenu, other._subMenu );
 		swap( HANDLER, other.HANDLER );
 		swap( _param, other._param );
 		swap( _label, other._label );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 }
 

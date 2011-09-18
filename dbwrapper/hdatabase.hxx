@@ -31,16 +31,13 @@ Copyright:
 #include "dbwrapper/db_driver_loader.hxx"
 #include "dbwrapper/hrecordset.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace dbwrapper
-{
+namespace dbwrapper {
 
 /*! \brief Data base access abstraction layer.
  */
-class HDataBase : public yaal::hcore::HPointerFromThisInterface<HDataBase>
-	{
+class HDataBase : public yaal::hcore::HPointerFromThisInterface<HDataBase> {
 	typedef HDataBase this_type;
 private:
 	ODBConnector const* _connector;
@@ -85,7 +82,7 @@ private:
 	friend class yaal::hcore::pointer_helper::HSpaceHolderDeleter<HDataBase>;
 	friend class HRecordSet;
 	friend ptr_t yaal::hcore::make_pointer<HDataBase>( void );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HDataBase> HDataBaseException;
 typedef HDataBaseException HSQLException;

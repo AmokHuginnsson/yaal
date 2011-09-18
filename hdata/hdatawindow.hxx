@@ -34,11 +34,9 @@ Copyright:
 #include "hdata/hdatalistcontrol.hxx"
 #include "hdata/oresource.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hdata
-{
+namespace hdata {
 
 class HDataProcess;
 
@@ -46,32 +44,28 @@ class HDataProcess;
  *
  * This class automates DML operations.
  */
-class HDataWindow : public hconsole::HWindow
-	{
+class HDataWindow : public hconsole::HWindow {
 protected:
 	typedef HDataWindow this_type;
 	typedef HWindow base_type;
 public:
 	/*! \brief Data window operation mode.
 	 */
-	struct DOCUMENT
-		{
+	struct DOCUMENT {
 		/*! \brief Data window operation mode.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			VIEW, /*!< Browse data. */
 			EDIT  /*!< Edit current record. */
-			} mode_t;
-		};
+		} mode_t;
+	};
 	/*! \brief DML helper, buffer for currently edited row.
 	 */
-	struct ORowBuffer
-		{
+	struct ORowBuffer {
 		int _idColNo;
 		yaal::hconsole::HItem _item;
 		ORowBuffer( int idColNo_, int size_ ) : _idColNo( idColNo_ ), _item( size_ ) {}
-		};
+	};
 protected:
 	bool _modified;
 	DOCUMENT::mode_t _documentMode;
@@ -108,7 +102,7 @@ protected:
 private:
 	HDataWindow( HDataWindow const& );
 	HDataWindow& operator = ( HDataWindow const& );
-	};
+};
 
 }
 

@@ -29,19 +29,16 @@ Copyright:
 
 #include "tools/hasynccaller.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Task scheduler.
  *
  * HScheduledAsyncCaller is capable of invocation of any method of any class
  * at precisely specified moment in time.
  */
-class HScheduledAsyncCaller : public HAbstractAsyncCaller, public yaal::hcore::HSingleton<HScheduledAsyncCaller>
-	{
+class HScheduledAsyncCaller : public HAbstractAsyncCaller, public yaal::hcore::HSingleton<HScheduledAsyncCaller> {
 public:
 	typedef HAbstractAsyncCaller base_type;
 	typedef HScheduledAsyncCaller this_type;
@@ -54,7 +51,7 @@ private:
 	static int life_time( int );
 	friend class yaal::hcore::HSingleton<HScheduledAsyncCaller>;
 	friend class yaal::hcore::HDestructor<HScheduledAsyncCaller>;
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HScheduledAsyncCaller, HAbstractAsyncCallerException> HScheduledAsyncCallerException;
 

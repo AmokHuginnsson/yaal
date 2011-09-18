@@ -32,28 +32,24 @@ Copyright:
 
 #include "hcore/hthread.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Implementation of automatic exclusive access concept.
  */
 template<typename T>
-struct HExclusiveAccessorRef
-	{
+struct HExclusiveAccessorRef {
 	T _object;
 	yaal::hcore::external_lock_t _lock;
 	HExclusiveAccessorRef( yaal::hcore::external_lock_t lock_, T object_ )
 		: _object( object_ ), _lock( lock_ ) { }
 private:
 	HExclusiveAccessorRef( HExclusiveAccessorRef const& );
-	};
+};
 
 template<typename T>
-class HExclusiveAccessor
-	{
+class HExclusiveAccessor {
 	T _object;
 	yaal::hcore::external_lock_t _lock;
 public:
@@ -66,54 +62,45 @@ public:
 		: _object( ea_._object ), _lock( ea_._lock ) { }
 	HExclusiveAccessor( HExclusiveAccessorRef<T> ear_ )
 		: _object( ear_._object ), _lock( ear_._lock ) { }
-	HExclusiveAccessor& operator = ( HExclusiveAccessor& ea_ )
-		{
-		if ( &ea_ != this )
-			{
+	HExclusiveAccessor& operator = ( HExclusiveAccessor& ea_ ) {
+		if ( &ea_ != this ) {
 			_object = ea_._object;
 			_lock = ea_._lock;
-			}
-		return ( *this );
 		}
-	HExclusiveAccessor& operator = ( HExclusiveAccessorRef<T> ea_ )
-		{
+		return ( *this );
+	}
+	HExclusiveAccessor& operator = ( HExclusiveAccessorRef<T> ea_ ) {
 		_object = ea_._object;
 		_lock = ea_._lock;
 		return ( *this );
-		}
-	T& operator->( void )
-		{
+	}
+	T& operator->( void ) {
 		M_ASSERT( _lock.has_ownership() );
 		return ( _object );
-		}
-	T const& operator->( void ) const
-		{
+	}
+	T const& operator->( void ) const {
 		M_ASSERT( _lock.has_ownership() );
 		return ( _object );
-		}
-	T& operator*( void )
-		{
+	}
+	T& operator*( void ) {
 		M_ASSERT( _lock.has_ownership() );
 		return ( *_object );
-		}
-	T const& operator*( void ) const
-		{
+	}
+	T const& operator*( void ) const {
 		M_ASSERT( _lock.has_ownership() );
 		return ( *_object );
-		}
+	}
 	template<typename real_t>
-	operator HExclusiveAccessor<real_t>( void )
-		{
+	operator HExclusiveAccessor<real_t>( void ) {
 		HExclusiveAccessor<real_t> ea( _lock, _object );
 		return ( ea );
-		}
+	}
 	template<typename real_t>
-	operator HExclusiveAccessorRef<real_t>( void )
-		{
+	operator HExclusiveAccessorRef<real_t>( void ) {
 		HExclusiveAccessorRef<real_t> ref( _lock, _object );
 		return ( ref );
-		}
-	};
+	}
+};
 
 }
 

@@ -38,24 +38,20 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::meta;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
-HClock::HClock( void ) : _moment()
-	{
+HClock::HClock( void ) : _moment() {
 	M_PROLOG
 	timespec time;
 	M_ENSURE( clock_gettime( CLOCK_REALTIME, &time ) == 0 );
 	_moment[ UNIT::SECOND ] = time.tv_sec;
 	_moment[ UNIT::NANOSECOND ] = time.tv_nsec;
 	M_EPILOG
-	}
+}
 
-int long HClock::get_time_elapsed( UNIT::unit_t unit_, bool reset_ ) const
-	{
+int long HClock::get_time_elapsed( UNIT::unit_t unit_, bool reset_ ) const {
 	M_PROLOG
 	static int long const NANO_IN_WHOLE = power<10, 9>::value;
 	static int long const MICRO_IN_WHOLE = power<10, 6>::value;
@@ -66,30 +62,26 @@ int long HClock::get_time_elapsed( UNIT::unit_t unit_, bool reset_ ) const
 	timespec reset;
 	M_ENSURE( clock_gettime( CLOCK_REALTIME, &reset ) == 0 );
 	time.tv_sec = reset.tv_sec - _moment[ UNIT::SECOND ];
-	if ( reset.tv_nsec < _moment[ UNIT::NANOSECOND ] )
-		{
+	if ( reset.tv_nsec < _moment[ UNIT::NANOSECOND ] ) {
 		-- time.tv_sec;
 		time.tv_nsec = NANO_IN_WHOLE - ( _moment[ UNIT::NANOSECOND ] - reset.tv_nsec );
-		}
-	else
+	} else
 		time.tv_nsec = reset.tv_nsec - _moment[ UNIT::NANOSECOND ];
 	int long elapsed = 0;
-	switch ( unit_ )
-		{
+	switch ( unit_ ) {
 		case ( UNIT::SECOND ): elapsed = time.tv_sec; break;
 		case ( UNIT::NANOSECOND ): elapsed = time.tv_sec * NANO_IN_WHOLE + time.tv_nsec; break;
 		case ( UNIT::MICROSECOND ): elapsed = time.tv_sec * MICRO_IN_WHOLE + time.tv_nsec / NANO_IN_MICRO; break;
 		case ( UNIT::MILISECOND ): elapsed = time.tv_sec * MILI_IN_WHOLE + time.tv_nsec / NANO_IN_MILI; break;
 		default: M_ASSERT( ! "bad HClock::UNIT!" ); break;
-		}
-	if ( reset_ )
-		{
+	}
+	if ( reset_ ) {
 		_moment[ UNIT::SECOND ] = reset.tv_sec;
 		_moment[ UNIT::NANOSECOND ] = reset.tv_nsec;
-		}
+	}
 	return ( elapsed );
 	M_EPILOG
-	}
+}
 
 }
 

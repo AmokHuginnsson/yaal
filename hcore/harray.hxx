@@ -37,36 +37,31 @@ Copyright:
 #include "hcore/algorithm.hxx"
 #include "hcore/pod.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHArray_[];
 
 /*! \brief Simplest compund data structure.
  */
 template<typename type_t>
-class HArray
-	{
+class HArray {
 	typedef HArray<type_t> this_type;
 public:
 	typedef type_t value_type;
 	/*! \brief Error codes for HArray<> operations.
 	 */
-	struct ERROR
-		{
+	struct ERROR {
 		/*! \brief Error codes for HArray<> operations.
 		 */
-		typedef enum
-			{
+		typedef enum {
 			OK = 0,          /*!< No error. */
 			BAD_SIZE,        /*!< Bad size requested. */
 			BAD_INDEX,       /*!< Index of of bounds. */
 			INVALID_ITERATOR /*!< iterator used for operation is not valid */
-			} error_t;
-		};
+		} error_t;
+	};
 private:
 	value_type* _buf;
 	int long _size;
@@ -131,7 +126,7 @@ private:
 	void initialize( iterator_t, iterator_t, trait::false_type const* );
 	void initialize( int long, type_t const&, trait::true_type const* );
 	void insert_space( int long, int long );
-	};
+};
 
 }
 
@@ -139,15 +134,13 @@ template<typename type_t>
 inline void swap( yaal::hcore::HArray<type_t>& a, yaal::hcore::HArray<type_t>& b )
 	{ a.swap( b ); }
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Iterator for HArray<> data structure.
  */
 template<typename type_t>
 template<typename const_qual_t>
-class HArray<type_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::random_access>
-	{
+class HArray<type_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::random_access> {
 	typedef HArray<type_t> array_t;
 	array_t const* _owner;
 	int long _index;
@@ -157,152 +150,128 @@ public:
 	HIterator( void ) : base_type(), _owner( NULL ), _index( 0 ) {}
 	HIterator( HIterator const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index ) {}
 	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index )
-		{
+	HIterator( HIterator<other_const_qual_t> const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index ) {
 		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
-		}
-	HIterator& operator = ( HIterator const& it_ )
-		{
-		if ( &it_ != this )
-			{
+	}
+	HIterator& operator = ( HIterator const& it_ ) {
+		if ( &it_ != this ) {
 			_owner = it_._owner;
 			_index = it_._index;
-			}
-		return ( *this );
 		}
-	HIterator& operator ++ ( void )
-		{
+		return ( *this );
+	}
+	HIterator& operator ++ ( void ) {
 		++ _index;
 		return ( *this );
-		}
-	HIterator const operator ++ ( int )
-		{
+	}
+	HIterator const operator ++ ( int ) {
 		HIterator it( _owner, _index );
 		++ _index;
 		return ( it );
-		}
-	HIterator& operator -- ( void )
-		{
+	}
+	HIterator& operator -- ( void ) {
 		-- _index;
 		return ( *this );
-		}
-	HIterator const operator -- ( int )
-		{
+	}
+	HIterator const operator -- ( int ) {
 		HIterator it( _owner, _index );
 		-- _index;
 		return ( it );
-		}
-	HIterator operator + ( int long off_ ) const
-		{
+	}
+	HIterator operator + ( int long off_ ) const {
 		HIterator it( _owner, _index + off_ );
 		return ( it );
-		}
-	HIterator& operator += ( int long off_ )
-		{
+	}
+	HIterator& operator += ( int long off_ ) {
 		_index += off_;
 		return ( *this );
-		}
-	HIterator operator - ( int long off_ ) const
-		{
+	}
+	HIterator operator - ( int long off_ ) const {
 		HIterator it( _owner, _index - off_ );
 		return ( it );
-		}
-	HIterator& operator -= ( int long off_ )
-		{
+	}
+	HIterator& operator -= ( int long off_ ) {
 		_index -= off_;
 		return ( *this );
-		}
-	int long operator - ( HIterator const& it ) const
-		{
+	}
+	int long operator - ( HIterator const& it ) const {
 		M_ASSERT( _owner == it._owner );
 		return ( _index - it._index );
-		}
-	const_qual_t& operator* ( void )
-		{
+	}
+	const_qual_t& operator* ( void ) {
 		M_ASSERT( _owner && ( _index >= 0 ) && ( _index < _owner->_size ) );
 		return ( const_cast<const_qual_t&>( _owner->_buf[ _index ] ) );
-		}
-	const_qual_t& operator* ( void ) const
-		{
+	}
+	const_qual_t& operator* ( void ) const {
 		M_ASSERT( _owner && ( _index >= 0 ) && ( _index < _owner->_size ) );
 		return ( _owner->_buf[ _index ] );
-		}
-	const_qual_t* operator-> ( void )
-		{
+	}
+	const_qual_t* operator-> ( void ) {
 		M_ASSERT( _owner && ( _index >= 0 ) && ( _index < _owner->_size ) );
 		return ( const_cast<const_qual_t*>( &_owner->_buf[ _index ] ) );
-		}
-	const_qual_t* operator-> ( void ) const
-		{
+	}
+	const_qual_t* operator-> ( void ) const {
 		M_ASSERT( _owner && ( _index >= 0 ) && ( _index < _owner->_size ) );
 		return ( &_owner->_buf[ _index ] );
-		}
+	}
 	template<typename other_const_qual_t>
-	bool operator == ( HIterator<other_const_qual_t> const& it ) const
-		{
+	bool operator == ( HIterator<other_const_qual_t> const& it ) const {
 		M_ASSERT( _owner == it._owner );
 		return ( _index == it._index );
-		}
+	}
 	template<typename other_const_qual_t>
-	bool operator != ( HIterator<other_const_qual_t> const& it ) const
-		{
+	bool operator != ( HIterator<other_const_qual_t> const& it ) const {
 		M_ASSERT( _owner == it._owner );
 		return ( _index != it._index );
-		}
+	}
 	template<typename other_const_qual_t>
-	bool operator < ( HIterator<other_const_qual_t> const& it ) const
-		{
+	bool operator < ( HIterator<other_const_qual_t> const& it ) const {
 		M_ASSERT( _owner == it._owner );
 		return ( _index < it._index );
-		}
+	}
 private:
 	friend class HArray<type_t>;
 	explicit HIterator( array_t const* owner_, int long idx )
 		: base_type(), _owner( owner_ ), _index( idx ) {};
-	};
+};
 
 template<typename type_t>
 HArray<type_t>::HArray( void )
-	: _buf( NULL ), _size( 0 ), _capacity( 0 )
-	{
+	: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 	return;
-	}
+}
 
 template<typename type_t>
 HArray<type_t>::HArray( int long size_ )
-	: _buf( NULL ), _size( 0 ), _capacity( 0 )
-	{
+	: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 	M_PROLOG
 	resize( size_ );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
 HArray<type_t>::HArray( int long size_, type_t const& fillWith_ )
-	: _buf( NULL ), _size( 0 ), _capacity( 0 )
-	{
+	: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 	M_PROLOG
 	resize( size_, fillWith_ );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
 template<typename iterator_t>
 HArray<type_t>::HArray( iterator_t first, iterator_t last )
-	: _buf( NULL ), _size( 0 ), _capacity( 0 )
-	{
+	: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 	M_PROLOG
 	initialize( first, last, typename trait::add_pointer<typename is_integral<iterator_t>::type>::type() );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
 HArray<type_t>::HArray( HArray const& arr_ )
-	: _buf( NULL ), _size( 0 ), _capacity( 0 )
-	{
+	: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 	M_PROLOG
 	if ( arr_._size > 0 )
 		{ 
@@ -310,55 +279,50 @@ HArray<type_t>::HArray( HArray const& arr_ )
 		_size = arr_._size;
 		for ( int long i = 0; i < _size; ++ i )
 			new ( _buf + i ) value_type( arr_._buf[ i ] );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-HArray<type_t>::~HArray( void )
-	{
+HArray<type_t>::~HArray( void ) {
 	M_PROLOG
 	clear();
 	:: operator delete ( _buf, memory::yaal );
 	_capacity = 0;
 	return;
 	M_DESTRUCTOR_EPILOG
-	}
+}
 
 template<typename type_t>
 template<typename iterator_t>
-void HArray<type_t>::initialize( iterator_t first, iterator_t last, trait::false_type const* )
-	{
+void HArray<type_t>::initialize( iterator_t first, iterator_t last, trait::false_type const* ) {
 	M_PROLOG
 	insert( end(), first, last );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-void HArray<type_t>::initialize( int long size_, type_t const& fillWith_, trait::true_type const* )
-	{
+void HArray<type_t>::initialize( int long size_, type_t const& fillWith_, trait::true_type const* ) {
 	M_PROLOG
 	resize( size_, fillWith_ );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
 template<typename iterator_t>
-void HArray<type_t>::assign( iterator_t first, iterator_t last )
-	{
+void HArray<type_t>::assign( iterator_t first, iterator_t last ) {
 	M_PROLOG
 	clear();
 	insert( end(), first, last );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-void HArray<type_t>::assign( int long size_, type_t const& fillWith_ )
-	{
+void HArray<type_t>::assign( int long size_, type_t const& fillWith_ ) {
 	M_PROLOG
 	int long oldSize( _size );
 	resize( size_, fillWith_ );
@@ -366,78 +330,63 @@ void HArray<type_t>::assign( int long size_, type_t const& fillWith_ )
 		fill_n( begin(), oldSize, fillWith_ );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-void HArray<type_t>::clear( void )
-	{
+void HArray<type_t>::clear( void ) {
 	M_PROLOG
 	erase( begin(), end() );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-HArray<type_t>& HArray<type_t>::operator = ( HArray const& arr_ )
-	{
+HArray<type_t>& HArray<type_t>::operator = ( HArray const& arr_ ) {
 	M_PROLOG
-	if ( &arr_ != this )
-		{
-		if ( arr_._size > _capacity )
-			{
+	if ( &arr_ != this ) {
+		if ( arr_._size > _capacity ) {
 			HArray<value_type> tmp( arr_ );
 			swap( tmp );
-			}
-		else
-			{
+		} else {
 			copy_n( arr_._buf, min( _size, arr_._size ), _buf );
-			if ( arr_._size > _size )
-				{
+			if ( arr_._size > _size ) {
 				for ( int long i = _size; i < arr_._size; ++ i )
 					new ( _buf + i ) value_type( arr_._buf[ i ] );
-				}
-			else if ( arr_._size < _size )
-				{
+			} else if ( arr_._size < _size ) {
 				for ( int long i = arr_._size; i < _size; ++ i )
 					M_SAFE( _buf[ i ].~value_type() );
-				}
-			_size = arr_._size;
 			}
+			_size = arr_._size;
 		}
+	}
 	return ( *this );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-void HArray<type_t>::resize( int long size_, type_t const& fillWith_ )
-	{
+void HArray<type_t>::resize( int long size_, type_t const& fillWith_ ) {
 	M_PROLOG
 	if ( size_ < 0 )
 		M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], size_ );
-	if ( size_ > _size )
-		{
+	if ( size_ > _size ) {
 		reserve( size_ );
 		for ( int long i( _size ); i < size_; ++ i )
 			new ( _buf + i ) value_type( fillWith_ );
-		}
-	else if ( size_ < _size )
-		{
+	} else if ( size_ < _size ) {
 		for ( int long i( size_ ); i < _size; ++ i )
 			M_SAFE( _buf[ i ].~value_type() );
-		}
+	}
 	_size = size_;
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-void HArray<type_t>::reserve( int long capacity_ )
-	{
+void HArray<type_t>::reserve( int long capacity_ ) {
 	M_PROLOG
 	if ( capacity_ < 0 )
 		M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], capacity_ );
-	if ( capacity_ > _capacity )
-		{
+	if ( capacity_ > _capacity ) {
 		int long newCapacity( _capacity ? max( capacity_, _capacity * 2 ) : capacity_ );
 		value_type* newBuf( static_cast<value_type*>( ::operator new ( newCapacity * sizeof ( value_type ), memory::yaal ) ) );
 		for ( int long i( 0 ); i < _size; ++ i )
@@ -448,15 +397,14 @@ void HArray<type_t>::reserve( int long capacity_ )
 		swap( newBuf, _buf );
 		_capacity = newCapacity;
 		:: operator delete ( newBuf, memory::yaal );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
 template<typename iterator_t>
-void HArray<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ )
-	{
+void HArray<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ ) {
 	M_PROLOG
 	M_ASSERT( pos_._owner == this );
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
@@ -467,11 +415,10 @@ void HArray<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ 
 		new ( _buf + i ) value_type( *first_ );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-void HArray<type_t>::insert( iterator pos_, int long count_, type_t const& value_ )
-	{
+void HArray<type_t>::insert( iterator pos_, int long count_, type_t const& value_ ) {
 	M_PROLOG
 	M_ASSERT( pos_._owner == this );
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
@@ -481,11 +428,10 @@ void HArray<type_t>::insert( iterator pos_, int long count_, type_t const& value
 		new ( _buf + i ) value_type( value_ );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::insert( iterator pos_, type_t const& value_ )
-	{
+typename HArray<type_t>::iterator HArray<type_t>::insert( iterator pos_, type_t const& value_ ) {
 	M_PROLOG
 	M_ASSERT( pos_._owner == this );
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
@@ -494,27 +440,24 @@ typename HArray<type_t>::iterator HArray<type_t>::insert( iterator pos_, type_t 
 	new ( _buf + pos_._index ) value_type( value_ );
 	return ( pos_ );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-void HArray<type_t>::insert_space( int long pos_, int long size_ )
-	{
+void HArray<type_t>::insert_space( int long pos_, int long size_ ) {
 	M_PROLOG
 	int long oldSize( _size );
 	reserve( _size + size_ );
 	_size += size_;
-	for ( int long src( oldSize - 1 ), dst( _size - 1 ); src >= pos_; -- src, -- dst )
-		{
+	for ( int long src( oldSize - 1 ), dst( _size - 1 ); src >= pos_; -- src, -- dst ) {
 		new ( _buf + dst ) value_type( _buf[ src ] );
 		M_SAFE( _buf[ src ].~value_type() );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::erase( iterator first_, iterator last_ )
-	{
+typename HArray<type_t>::iterator HArray<type_t>::erase( iterator first_, iterator last_ ) {
 	M_PROLOG
 	M_ASSERT( first_._owner == this );
 	M_ASSERT( last_._owner == this );
@@ -529,206 +472,179 @@ typename HArray<type_t>::iterator HArray<type_t>::erase( iterator first_, iterat
 	_size -= ( last_._index - first_._index );
 	return ( last_._index < _size ? last_ : end() );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::erase( iterator it )
-	{
+typename HArray<type_t>::iterator HArray<type_t>::erase( iterator it ) {
 	M_PROLOG
 	iterator next( it );
 	++ next;
 	return ( erase( it, next ) );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-type_t const& HArray<type_t>::front( void ) const
-	{
+type_t const& HArray<type_t>::front( void ) const {
 	M_PROLOG
 	M_ASSERT( _size > 0 );
 	return ( *_buf );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-type_t& HArray<type_t>::front( void )
-	{
+type_t& HArray<type_t>::front( void ) {
 	M_PROLOG
 	M_ASSERT( _size > 0 );
 	return ( *_buf );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-type_t const& HArray<type_t>::back( void ) const
-	{
+type_t const& HArray<type_t>::back( void ) const {
 	M_PROLOG
 	M_ASSERT( _size > 0 );
 	return ( _buf[ _size - 1 ] );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-type_t& HArray<type_t>::back( void )
-	{
+type_t& HArray<type_t>::back( void ) {
 	M_PROLOG
 	M_ASSERT( _size > 0 );
 	return ( _buf[ _size - 1 ] );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-type_t& HArray<type_t>::operator[] ( int long index_ )
-	{
+type_t& HArray<type_t>::operator[] ( int long index_ ) {
 	M_PROLOG
 	int long idx = ( index_ < 0 ) ? index_ + _size : index_;
 	if ( ( idx >= _size ) || ( idx < 0 ) )
 		M_THROW( _errMsgHArray_[ ERROR::BAD_INDEX ], idx );
 	return ( _buf[ idx ] );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-type_t const& HArray<type_t>::operator[] ( int long index_ ) const
-	{
+type_t const& HArray<type_t>::operator[] ( int long index_ ) const {
 	M_PROLOG
 	int long idx( ( index_ < 0 ) ? index_ + _size : index_ );
 	if ( ( idx >= _size ) || ( idx < 0 ) )
 		M_THROW( _errMsgHArray_[ ERROR::BAD_INDEX ], idx );
 	return ( _buf[ idx ] );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-bool HArray<type_t>::operator ! ( void ) const
-	{
+bool HArray<type_t>::operator ! ( void ) const {
 	M_PROLOG
 	return ( is_empty() );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-int long HArray<type_t>::get_size( void ) const
-	{
+int long HArray<type_t>::get_size( void ) const {
 	M_PROLOG
 	return ( _size );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-int long HArray<type_t>::size( void ) const
-	{
+int long HArray<type_t>::size( void ) const {
 	M_PROLOG
 	return ( _size );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-bool HArray<type_t>::is_empty( void ) const
-	{
+bool HArray<type_t>::is_empty( void ) const {
 	M_PROLOG
 	return ( _size ? false : true );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-bool HArray<type_t>::empty( void ) const
-	{
+bool HArray<type_t>::empty( void ) const {
 	M_PROLOG
 	return ( _size ? false : true );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-int long HArray<type_t>::capacity( void ) const
-	{
+int long HArray<type_t>::capacity( void ) const {
 	return ( get_capacity() );
-	}
+}
 
 template<typename type_t>
-int long HArray<type_t>::get_capacity( void ) const
-	{
+int long HArray<type_t>::get_capacity( void ) const {
 	return ( _capacity );
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::begin( void )
-	{
+typename HArray<type_t>::iterator HArray<type_t>::begin( void ) {
 	return ( iterator( this, 0 ) );
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::find( int long idx )
-	{
+typename HArray<type_t>::iterator HArray<type_t>::find( int long idx ) {
 	return ( iterator( this, min( idx, _size ) ) );
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::end( void )
-	{
+typename HArray<type_t>::iterator HArray<type_t>::end( void ) {
 	return ( iterator( this, _size ) );
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::const_iterator HArray<type_t>::begin( void ) const
-	{
+typename HArray<type_t>::const_iterator HArray<type_t>::begin( void ) const {
 	return ( const_iterator( this, 0 ) );
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::const_iterator HArray<type_t>::find( int long idx ) const
-	{
+typename HArray<type_t>::const_iterator HArray<type_t>::find( int long idx ) const {
 	return ( const_iterator( this, min( idx, _size ) ) );
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::const_iterator HArray<type_t>::end( void ) const
-	{
+typename HArray<type_t>::const_iterator HArray<type_t>::end( void ) const {
 	return ( const_iterator( this, _size ) );
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::reverse_iterator HArray<type_t>::rbegin( void )
-	{
+typename HArray<type_t>::reverse_iterator HArray<type_t>::rbegin( void ) {
 	return ( end() );
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::reverse_iterator HArray<type_t>::rend( void )
-	{
+typename HArray<type_t>::reverse_iterator HArray<type_t>::rend( void ) {
 	return ( begin() );
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::const_reverse_iterator HArray<type_t>::rbegin( void ) const
-	{
+typename HArray<type_t>::const_reverse_iterator HArray<type_t>::rbegin( void ) const {
 	return ( end() );
-	}
+}
 
 template<typename type_t>
-typename HArray<type_t>::const_reverse_iterator HArray<type_t>::rend( void ) const
-	{
+typename HArray<type_t>::const_reverse_iterator HArray<type_t>::rend( void ) const {
 	return ( begin() );
-	}
+}
 
 template<typename type_t>
-void HArray<type_t>::swap( HArray& other )
-	{
+void HArray<type_t>::swap( HArray& other ) {
 	M_PROLOG
-	if ( &other != this )
-		{
+	if ( &other != this ) {
 		using yaal::swap;
 		swap( _buf, other._buf );
 		swap( _size, other._size );
 		swap( _capacity, other._capacity );
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-void HArray<type_t>::push_back( type_t const& val_ )
-	{
+void HArray<type_t>::push_back( type_t const& val_ ) {
 	M_PROLOG
 	M_ASSERT( _size <= _capacity );
 	if ( _size == _capacity )
@@ -737,33 +653,30 @@ void HArray<type_t>::push_back( type_t const& val_ )
 	++ _size;
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-void HArray<type_t>::pop_back( void )
-	{
+void HArray<type_t>::pop_back( void ) {
 	M_PROLOG
 	M_ASSERT( _size > 0 );
 	M_SAFE( _buf[ -- _size ].~value_type() );
 	return;
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-bool HArray<type_t>::operator == ( HArray const& a_ ) const
-	{
+bool HArray<type_t>::operator == ( HArray const& a_ ) const {
 	M_PROLOG
 	return ( ( &a_ == this ) || safe_equal( begin(), end(), a_.begin(), a_.end() ) );
 	M_EPILOG
-	}
+}
 
 template<typename type_t>
-bool HArray<type_t>::operator < ( HArray const& a_ ) const
-	{
+bool HArray<type_t>::operator < ( HArray const& a_ ) const {
 	M_PROLOG
 	return ( ( &a_ != this ) && lexicographical_compare( begin(), end(), a_.begin(), a_.end() ) );
 	M_EPILOG
-	}
+}
 
 }
 

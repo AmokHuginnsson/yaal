@@ -42,11 +42,9 @@ M_VCSID( "$Id: "__TID__" $" )
 
 using namespace yaal::hcore;
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 HStatusBarControl::HStatusBarControl( HWindow* parent_,
 		char const* label_, int statusBarAttribute_ )
@@ -59,8 +57,7 @@ HStatusBarControl::HStatusBarControl( HWindow* parent_,
 	_lastProgress( -1 ), _lastPercent( - 1 ), _lastMinute( 0 ),
 	_lastSecond( 0 ), _lastStep( 0 ),
 	_message( "" ), /* initialization of this field is required by bar() meth */
-	_start()
-	{
+	_start() {
 	M_PROLOG
 	int attribte = 0;
 	if ( statusBarAttribute_ > 0 )
@@ -74,17 +71,15 @@ HStatusBarControl::HStatusBarControl( HWindow* parent_,
 	_statusBarAttribute &= 0xff00;
 	return;
 	M_EPILOG
-	}
+}
 
-HStatusBarControl::~HStatusBarControl( void )
-	{
+HStatusBarControl::~HStatusBarControl( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
-	}
+}
 
-void HStatusBarControl::do_draw_label( void )
-	{
+void HStatusBarControl::do_draw_label( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	cons.c_move( cons.get_height() - 2, 0 );
@@ -96,49 +91,43 @@ void HStatusBarControl::do_draw_label( void )
 	cons.c_move( _rowRaw, _promptLength );
 	return;
 	M_EPILOG
-	}
+}
 
-void HStatusBarControl::do_refresh( void )
-	{
+void HStatusBarControl::do_refresh( void ) {
 	M_PROLOG
 	int origRow = 0;
 	int origColumn = 0;
 	HConsole& cons = HConsole::get_instance();
 	if ( ! _focused )
 		cons.c_getyx( origRow, origColumn );
-	if ( _promptLength )
-		{
+	if ( _promptLength ) {
 		cons.set_attr( _statusBarAttribute >> 8 );
 		cons.c_mvprintf( _rowRaw, 0, _prompt.raw() );
-		}
+	}
 	HEditControl::do_refresh();
 	if ( ! _focused )
 		cons.c_move ( origRow, origColumn );
-	if ( _statusBarAttribute & 0xff )
-		{
+	if ( _statusBarAttribute & 0xff ) {
 		_attributeEnabled &= 0xff00;
 		_attributeEnabled |= ( _statusBarAttribute & 0x00ff );
 		_statusBarAttribute &= 0xff00;
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-int HStatusBarControl::do_process_input( int code_ )
-	{
+int HStatusBarControl::do_process_input( int code_ ) {
 	M_PROLOG
 	if ( ( code_ == KEY_CODES::BACKSPACE )
 			&& ( _restrict == PROMPT::RELAXED )
 			&& ( _mode != PROMPT::MENU )
-			&& ! _string.get_length() )
-		{
+			&& ! _string.get_length() ) {
 		end_prompt();
 		return ( 0 );
-		}
+	}
 	if ( code_ != '\t' )
 		code_ = HEditControl::do_process_input( code_ );
-	switch ( _mode )
-		{
+	switch ( _mode ) {
 		case ( PROMPT::NORMAL ):
 		case ( PROMPT::COMMAND ):
 		case ( PROMPT::SEARCH ):
@@ -149,14 +138,13 @@ int HStatusBarControl::do_process_input( int code_ )
 		break;
 		default :
 			break;
-		}
+	}
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
 void HStatusBarControl::set_prompt( char const* prompt_, PROMPT::mode_t mode_,
-		PROMPT::restrict_t restrict_ )
-	{
+		PROMPT::restrict_t restrict_ ) {
 	M_PROLOG
 	_mode = mode_;
 	_restrict = restrict_;
@@ -164,18 +152,16 @@ void HStatusBarControl::set_prompt( char const* prompt_, PROMPT::mode_t mode_,
 	_parent->_controls.select( _parent->_statusBar );
 	(*_parent->_previousFocusedChild)->kill_focus();
 	set_focus( -1 );
-	if ( prompt_ )
-		{
+	if ( prompt_ ) {
 		_prompt = prompt_;
 		_promptLength = static_cast<int>( _prompt.get_length() );
-		}
+	}
 	HEditControl::set ( "" ); /* refresh call inside */
 	return;
 	M_EPILOG
-	}
+}
 
-int HStatusBarControl::verify( void )
-	{
+int HStatusBarControl::verify( void ) {
 	M_PROLOG
 	int length = 0;
 	bool ok = false;
@@ -183,11 +169,10 @@ int HStatusBarControl::verify( void )
 		ok = true;
 	return ( ok );
 	M_EPILOG
-	}
+}
 
 void HStatusBarControl::init_progress( double max_, char const* title_,
-		bool estimate_ )
-	{
+		bool estimate_ ) {
 	M_PROLOG
 	_done = false;
 	_estimate = estimate_;
@@ -200,11 +185,10 @@ void HStatusBarControl::init_progress( double max_, char const* title_,
 	refresh();
 	return;
 	M_EPILOG
-	}
+}
 
 void HStatusBarControl::update_progress( double step_,
-		char const * title_ )
-	{
+		char const * title_ ) {
 	M_PROLOG
 	HTime now, left;
 	HConsole& cons( HConsole::get_instance() );
@@ -214,12 +198,11 @@ void HStatusBarControl::update_progress( double step_,
 	if ( step_ < 0 )
 		step_ = ++ _lastStep;
 	HTime stoper( now - _start );
-	if ( _estimate )
-		{
+	if ( _estimate ) {
 		if ( step_ )
 			now.set( static_cast<time_t>( ( _progressSize / step_ ) * static_cast<double>( stoper.raw() ) ) );
 		left = now - stoper;
-		}
+	}
 	/* 6 for "[100%]", 10 for elapse, 10 for estimate, 2 for || */
 	int maxBar( _widthRaw - ( 6 + 10 + 2 + ( _estimate ? 10 : 0 ) ) );
 	int nextPercent( static_cast<int>( ( 100. * step_ / _progressSize ) ) );
@@ -233,32 +216,27 @@ void HStatusBarControl::update_progress( double step_,
 	if ( title_ || ( _lastProgress != nextStep )
 			|| ( _lastPercent != nextPercent )
 			|| ( _lastMinute != nextMinute )
-			|| ( _lastSecond != nextSecond ))
-		{
+			|| ( _lastSecond != nextSecond )) {
 		schedule_refresh();
 		bar( title_ );
-		if ( _estimate )
-			{
+		if ( _estimate ) {
 			_varTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", maxBar );
 			_string.format( _varTmpBuffer.raw(), "-",
 					( step_ ? ( left.string().raw() ) : "(?\?:?\?:?\?)" ),
 					stoper.string().raw(),	nextPercent, "%%" );
-			}
-		else
-			{
+		} else {
 			_varTmpBuffer.format ( "|%%-%ds|%%s[%%3d%%s]", maxBar );
 			_string.format( _varTmpBuffer.raw(), "-",
 					stoper.string().raw(), nextPercent, "%%" );
-			}
+		}
 		_string.fill( '-', 1, maxBar );
 		if ( nextStep > 0 )
 			_string.fill( '=', 1, nextStep );
-		if ( _done )
-			{
+		if ( _done ) {
 			int length = static_cast<int>( _string.get_length() );
 			_string.erase( length - 6, 5 );
 			_string.insert( length - 6, 4, "done" );
-			}
+		}
 		cons.c_mvprintf( _rowRaw, _columnRaw, _string.raw() );
 		_string = "";
 		_lastProgress = nextStep;
@@ -266,17 +244,15 @@ void HStatusBarControl::update_progress( double step_,
 		_lastMinute = nextMinute;
 		_lastSecond = nextSecond;
 		cons.c_refresh();
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
 void HStatusBarControl::message( int attribute_,
-		char const* format_, ... )
-	{
+		char const* format_, ... ) {
 	M_PROLOG
-	if ( ! _focused )
-		{
+	if ( ! _focused ) {
 		va_list ap;
 		va_start( ap, format_ );
 		if ( format_ && format_ [ 0 ] )
@@ -289,16 +265,14 @@ void HStatusBarControl::message( int attribute_,
 		_attributeEnabled &= 0xff00;
 		_attributeEnabled |= ( attribute_ & 0x00ff );
 		schedule_refresh();
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HStatusBarControl::message( char const* format_, ... )
-	{
+void HStatusBarControl::message( char const* format_, ... ) {
 	M_PROLOG
-	if ( ! _focused )
-		{
+	if ( ! _focused ) {
 		va_list ap;
 		va_start( ap, format_ );
 		if ( format_ && format_ [ 0 ] )
@@ -307,67 +281,59 @@ void HStatusBarControl::message( char const* format_, ... )
 		set( _varTmpBuffer );
 		va_end( ap );
 		schedule_refresh();
-		}
+	}
 	return;
 	M_EPILOG
-	}
+}
 
-void HStatusBarControl::bar( char const* bar_ )
-	{
+void HStatusBarControl::bar( char const* bar_ ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	set_attr_data();
-	if ( bar_ )
-		{
+	if ( bar_ ) {
 		_varTmpBuffer.format( " %%-%ds ",
 				( cons.get_width() - _labelLength ) - ( _singleLine ? 2 : 1 ) );
 		_message.format( _varTmpBuffer.raw(), bar_ );
-		}
+	}
 	cons.c_mvprintf( cons.get_height() - 2,
 			_labelLength - ( _singleLine ? 0 : 1 ), _message.raw() );
 	return;
 	M_EPILOG
-	}
+}
 
 int HStatusBarControl::ask( char const* question_,
-		char const* prompt_ )
-	{
+		char const* prompt_ ) {
 	M_PROLOG
 	bar( question_ );
 	set_prompt( prompt_ );
 	return ( 0 );
 	M_EPILOG
-	}
+}
 
-bool HStatusBarControl::confirm( char const* question_ )
-	{
+bool HStatusBarControl::confirm( char const* question_ ) {
 	M_PROLOG
 	ask( question_, "[yes/no]: " );
 	return ( false );
 	M_EPILOG
-	}
+}
 
-int HStatusBarControl::process_input_normal( int code_ )
-	{
+int HStatusBarControl::process_input_normal( int code_ ) {
 	M_PROLOG
 	int code = code_;
 	PROMPT::mode_t mode = _mode;
 	code_ = 0;
-	switch ( code )
-		{
-		case ( '\r' ):
-			{
+	switch ( code ) {
+		case ( '\r' ): {
 			bool backwards( _prompt[ 0 ] == '?' );
 			end_prompt();
 			if ( mode == PROMPT::COMMAND )
 				_parent->_command = _string;
-			else if ( mode == PROMPT::SEARCH )
-				{
+			else if ( mode == PROMPT::SEARCH ) {
 				HSearchableControl* searchableControl( dynamic_cast<HSearchableControl*>( &(*(*_parent->_previousFocusedChild)) ) );
 				if ( searchableControl )
 					searchableControl->search( _string, backwards );
-				}
 			}
+		}
 		break;
 		case ( '\t' ):
 			HConsole::get_instance().bell();
@@ -375,20 +341,18 @@ int HStatusBarControl::process_input_normal( int code_ )
 		default :
 			code_ = code;
 		break;
-		}
+	}
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
-int HStatusBarControl::process_input_menu( int code_ )
-	{
+int HStatusBarControl::process_input_menu( int code_ ) {
 	M_PROLOG
 	return ( code_ );
 	M_EPILOG
-	}
+}
 
-void HStatusBarControl::end_prompt( void )
-	{
+void HStatusBarControl::end_prompt( void ) {
 	M_PROLOG
 	_mode = PROMPT::NORMAL;
 	_prompt = "";
@@ -398,14 +362,13 @@ void HStatusBarControl::end_prompt( void )
 	(*_parent->_focusedChild)->set_focus ( -1 );
 	return;
 	M_EPILOG
-	}
+}
 
-bool HStatusBarControl::do_hit_test( int row_, int col_ ) const
-	{
+bool HStatusBarControl::do_hit_test( int row_, int col_ ) const {
 	M_PROLOG
 	return ( _focused ? base_type::do_hit_test( row_, col_ ) : false );
 	M_EPILOG
-	}
+}
 
 }
 

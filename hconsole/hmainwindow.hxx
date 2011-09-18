@@ -35,18 +35,15 @@ Copyright:
 #include "hconsole/hmenucontrol.hxx"
 #include "hconsole/hwindowlistcontrol.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hconsole
-{
+namespace hconsole {
 
 /*! \brief Main window of TUI application.
  *
  * Main window of TUI application consists of menu and active window list.
  */
-class HMainWindow : public HWindow
-	{
+class HMainWindow : public HWindow {
 public:
 	typedef HMainWindow this_type;
 	typedef HWindow base_type;
@@ -64,7 +61,7 @@ protected:
 private:
 	HMainWindow( HMainWindow const& );
 	HMainWindow& operator = ( HMainWindow const& );
-	};
+};
 
 typedef yaal::hcore::HExceptionT<HMainWindow, HWindowException> HMainWindowException;
 

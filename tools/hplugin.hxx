@@ -30,16 +30,13 @@ Copyright:
 #include "hcore/base.hxx"
 #include "hcore/hpointer.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Dynamically load and use shared libraries.
  */
-class HPlugin
-	{
+class HPlugin {
 	typedef HPlugin this_type;
 	void* _handle;
 public:
@@ -56,16 +53,15 @@ public:
 private:
 	HPlugin( HPlugin const& );
 	HPlugin const& operator = ( HPlugin const& );
-	};
+};
 
 template<typename name_t>
-void HPlugin::resolve( yaal::hcore::HString const& name_, name_t& handle )
-	{
+void HPlugin::resolve( yaal::hcore::HString const& name_, name_t& handle ) {
 	M_PROLOG
 	handle = bit_cast<name_t>( resolve( name_ ) );
 	return;
 	M_EPILOG
-	}
+}
 
 typedef yaal::hcore::HExceptionT<HPlugin> HPluginException;
 

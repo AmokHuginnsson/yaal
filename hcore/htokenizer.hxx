@@ -35,23 +35,19 @@ Copyright:
 #include "hcore/hexception.hxx"
 #include "hcore/hstring.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace hcore
-{
+namespace hcore {
 
 /*! \brief Convenient interface for splitting strings into tokens.
  */
-class HTokenizer
-	{
+class HTokenizer {
 	typedef HTokenizer this_type;
 public:
-	typedef enum
-		{
+	typedef enum {
 		SKIP_EMPTY,
 		INCLUDE_EMPTY
-		} behavior_t;
+	} behavior_t;
 private:
 	behavior_t _behavior;
 	HString _string;
@@ -71,12 +67,11 @@ public:
 	HString tail( HIterator ) const;
 private:
 	friend class HIterator;
-	};
+};
 
 /*! \brief Interface for itertion thru tokens from given string.
  */
-class HTokenizer::HIterator
-	{
+class HTokenizer::HIterator {
 	typedef HTokenizer::HIterator this_type;
 	HTokenizer const* _owner;
 	int long _start;
@@ -92,7 +87,7 @@ public:
 private:
 	HIterator( HTokenizer const*, int long );
 	friend class HTokenizer;
-	};
+};
 
 typedef HExceptionT<HTokenizer> HTokenizerException;
 

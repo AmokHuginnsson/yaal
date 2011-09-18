@@ -28,11 +28,9 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "hexclusiveaccessor.hxx"
 
-namespace yaal
-{
+namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 }
 
