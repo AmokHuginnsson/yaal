@@ -458,12 +458,20 @@ typename HTree<value_t>::const_node_t HTree<value_t>::HNode::get_parent( void ) 
 
 template<typename value_t>
 HTree<value_t>& HTree<value_t>::HNode::get_tree( void ) {
-	return ( *_tree );
+	HNode* node( this );
+	while ( node->_trunk )
+		node = node->_trunk;
+	M_ASSERT( node->_tree );
+	return ( *node->_tree );
 }
 
 template<typename value_t>
 HTree<value_t> const& HTree<value_t>::HNode::get_tree( void ) const {
-	return ( *_tree );
+	HNode* node( this );
+	while ( node->_trunk )
+		node = node->_trunk;
+	M_ASSERT( node->_tree );
+	return ( *node->_tree );
 }
 
 template<typename value_t>
