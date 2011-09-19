@@ -218,6 +218,8 @@ HOpenSSL::OSSLContext::~OSSLContext( void ) {
 		ERR_remove_state( system::getpid() );
 		ERR_remove_state( 0 );
 		ENGINE_cleanup();
+		CONF_modules_finish();
+		CONF_modules_free();
 		CONF_modules_unload( 1 );
 		ERR_free_strings();
 		EVP_cleanup();
