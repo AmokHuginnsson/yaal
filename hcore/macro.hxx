@@ -128,37 +128,27 @@ Copyright:
 #define M_THROW( msg, e_no ) yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, msg, e_no )
 /*! \brief First statement of every exception guarded function/method.
  */
-#define M_PROLOG try{
+#define M_PROLOG try {
 /*! \brief Last statement of every exception guarded function/method.
  */
 #define M_EPILOG } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __LINE__, __PRETTY_FUNCTION__ ); throw; }
 #define M_DESTRUCTOR_EPILOG } \
-	catch ( yaal::hcore::HException& e ) \
-		{ \
+	catch ( yaal::hcore::HException& e ) { \
 		e.log( __FILE__, __LINE__, __PRETTY_FUNCTION__ ); \
 		yaal::hcore::kill_interior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + yaal::hcore::type_name( this ) + "' throws `" + e.what() + "' in `" + __PRETTY_FUNCTION__ + "'." ).raw() ); \
-	} \
-	catch ( ... ) \
-		{ \
+	} catch ( ... ) { \
 		yaal::hcore::kill_interior( ( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": destructor of `" + yaal::hcore::type_name( this ) + "' throws in `" + __PRETTY_FUNCTION__ + "'." ).raw() ); \
 	}
-#define M_SAFE( code ) do \
-	{ \
-	try \
-		{ \
+#define M_SAFE( code ) do { \
+	try { \
 		code; \
-	} \
-	catch ( yaal::hcore::HException& e ) \
-		{ \
+	} catch ( yaal::hcore::HException& e ) { \
 		e.log( __FILE__, __LINE__, __PRETTY_FUNCTION__ ); \
 		yaal::hcore::kill_interior( ( yaal::hcore::HString( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": `" #code "' throws `" ) + e.what() + "' in `" + __PRETTY_FUNCTION__ + "'." ).raw() ); \
-	} \
-	catch ( ... ) \
-		{ \
+	} catch ( ... ) { \
 		yaal::hcore::kill_interior( ( yaal::hcore::HString( __FILE__ ":" M_STRINGIFY( __LINE__ ) ": `" #code "' throws in `" ) + __PRETTY_FUNCTION__ + "'." ).raw() ); \
 	} \
-} \
-while ( 0 )
+} while ( 0 )
 /*! \brief Last statement in <tt>int main( int, char** )</tt>.
  */
 #define M_FINAL } catch ( yaal::hcore::HException& e ) { e.log( __FILE__, __LINE__, __PRETTY_FUNCTION__ ); e.print_error(); } catch ( yaal::hcore::HFailedAssertion const& ) { exit( -1 ); } catch ( int retVal ) { return ( retVal ); }
