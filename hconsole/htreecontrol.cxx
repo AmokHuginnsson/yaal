@@ -72,7 +72,7 @@ void HTreeControl::collapse( tree_t::node_t node ) {
 	(**node)._unfolded = false;
   if ( ! node->has_childs() )
 		return;
-	for ( tree_t::iterator it = node->begin(); it != node->end(); ++ it )
+	for ( tree_t::HNode::iterator it = node->begin(); it != node->end(); ++ it )
 		collapse( &*it );
 	return;
 	M_EPILOG
@@ -153,7 +153,7 @@ int HTreeControl::draw_node( tree_t::node_t node_, int row_ ) {
 		cons.c_mvprintf( row, (**node_)._columnRaw + 1, str.raw() );
 	}
 	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
-		for ( tree_t::iterator it = node_->begin(); it != node_->end(); ++ it )
+		for ( tree_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it )
 			row = draw_node( &*it, row );
 	}
 	return ( row );
@@ -281,7 +281,7 @@ bool HTreeControl::do_click( tree_t::node_t node_, OMouse& mouse_ ) {
 		return ( true );
 	}
 	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
-		for ( tree_t::iterator it = node_->begin(); it != node_->end(); ++ it )
+		for ( tree_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it )
 			if ( do_click( &*it, mouse_ ) )
 				return ( true );
 	}
@@ -294,7 +294,7 @@ HTreeControl::tree_t::node_t HTreeControl::previous( tree_t::node_t node, bool w
 	tree_t::node_t p = NULL;
 	tree_t::node_t parent = node->get_parent();
 	if ( parent ) {
-		tree_t::iterator it;
+		tree_t::HNode::iterator it;
 		for ( it = parent->begin(); ( it != parent->end() ) && ( &*it != node ); ++ it )
 			;
 		if ( it != parent->end() ) {
@@ -316,7 +316,7 @@ HTreeControl::tree_t::node_t HTreeControl::next( tree_t::node_t node ) {
 	tree_t::node_t parent = node->get_parent();
 	tree_t::node_t n = NULL;
 	if ( parent ) {
-		tree_t::iterator it;
+		tree_t::HNode::iterator it;
 		for ( it = parent->begin(); ( it != parent->end() ) && ( &*it != node ); ++ it )
 			;
 		if ( it != parent->end() )

@@ -843,7 +843,7 @@ HXml::HNode::properties_t const& HXml::HConstNodeProxy::properties( void ) const
 HXml::HIterator HXml::HNodeProxy::add_node( HXml::HNode::TYPE::type_t const& type_, yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator it = _node->add_node( (**_node)._owner );
+	tree_t::HNode::iterator it = _node->add_node( (**_node)._owner );
 	(**it)._text = name_;
 	(**it)._type = type_;
 	return ( HXml::HIterator( this, it ) );
@@ -853,11 +853,11 @@ HXml::HIterator HXml::HNodeProxy::add_node( HXml::HNode::TYPE::type_t const& typ
 HXml::HIterator HXml::HNodeProxy::add_node( yaal::hcore::HString const& name_, yaal::hcore::HString const& value_ ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator it = _node->add_node( (**_node)._owner );
+	tree_t::HNode::iterator it = _node->add_node( (**_node)._owner );
 	(**it)._text = name_;
 	(**it)._type = HXml::HNode::TYPE::NODE;
 	if ( !! value_ ) {
-		tree_t::iterator value = it->add_node( (**_node)._owner );
+		tree_t::HNode::iterator value = it->add_node( (**_node)._owner );
 		(**value)._text = value_;
 		(**value)._type = HXml::HNode::TYPE::CONTENT;
 	}
@@ -868,7 +868,7 @@ HXml::HIterator HXml::HNodeProxy::add_node( yaal::hcore::HString const& name_, y
 HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, HXml::HNode::TYPE::type_t const& type_, yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = _node->insert_node( it._iterator, HNode( (**_node)._owner ) );
+	tree_t::HNode::iterator newIt = _node->insert_node( it._iterator, HNode( (**_node)._owner ) );
 	(**newIt)._text = name_;
 	(**newIt)._type = type_;
 	return ( HXml::HIterator( this, newIt ) );
@@ -878,11 +878,11 @@ HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, HXml::HNode::
 HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, yaal::hcore::HString const& name_, yaal::hcore::HString const& value_ ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = _node->insert_node( it._iterator, HNode( (**_node)._owner ) );
+	tree_t::HNode::iterator newIt = _node->insert_node( it._iterator, HNode( (**_node)._owner ) );
 	(**newIt)._text = name_;
 	(**newIt)._type = HXml::HNode::TYPE::NODE;;
 	if ( !! value_ ) {
-		tree_t::iterator value = newIt->add_node( (**_node)._owner );
+		tree_t::HNode::iterator value = newIt->add_node( (**_node)._owner );
 		(**value)._text = value_;
 		(**value)._type = HXml::HNode::TYPE::CONTENT;
 	}
@@ -893,7 +893,7 @@ HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, yaal::hcore::
 HXml::HIterator HXml::HNodeProxy::move_node( HXml::HIterator it, HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = _node->move_node( it._iterator, node._node );
+	tree_t::HNode::iterator newIt = _node->move_node( it._iterator, node._node );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 }
@@ -901,7 +901,7 @@ HXml::HIterator HXml::HNodeProxy::move_node( HXml::HIterator it, HXml::HNodeProx
 HXml::HIterator HXml::HNodeProxy::move_node( HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = _node->move_node( node._node );
+	tree_t::HNode::iterator newIt = _node->move_node( node._node );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 }
@@ -909,7 +909,7 @@ HXml::HIterator HXml::HNodeProxy::move_node( HXml::HNodeProxy node ) {
 HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HIterator it, HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = _node->copy_node( it._iterator, node._node );
+	tree_t::HNode::iterator newIt = _node->copy_node( it._iterator, node._node );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 }
@@ -917,7 +917,7 @@ HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HIterator it, HXml::HNodeProx
 HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = _node->copy_node( node._node );
+	tree_t::HNode::iterator newIt = _node->copy_node( node._node );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 }
@@ -1008,11 +1008,11 @@ HXml::HConstIterator::HConstIterator( void )
 	: base_type(), _owner( NULL ), _iterator() {
 }
 
-HXml::HIterator::HIterator( HXml::HNodeProxy const* owner_, HXml::tree_t::iterator const& it )
+HXml::HIterator::HIterator( HXml::HNodeProxy const* owner_, HXml::tree_t::HNode::iterator const& it )
 	: base_type(), _owner( owner_ ), _iterator( it ) {
 }
 
-HXml::HConstIterator::HConstIterator( HXml::HConstNodeProxy const* owner_, HXml::tree_t::const_iterator const& it )
+HXml::HConstIterator::HConstIterator( HXml::HConstNodeProxy const* owner_, HXml::tree_t::HNode::const_iterator const& it )
 	: base_type(), _owner( owner_ ), _iterator( it ) {
 }
 
@@ -1078,7 +1078,7 @@ HXml::const_xml_element_t HXml::get_element_by_id( const_xml_element_t const& no
 	HXml::HNode::properties_t::const_iterator idIt = (*node)->_properties.find( "id" );
 	if ( ( idIt != (*node)->_properties.end() ) && ( idIt->second == id ) )
 		result = node;
-	for ( tree_t::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
+	for ( tree_t::HNode::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
 		result = get_element_by_id( &*it, id );
 	return ( result );
 	M_EPILOG
@@ -1099,7 +1099,7 @@ HXml::HConstNodeProxy const HXml::get_element_by_id( yaal::hcore::HString const&
 HXml::HIterator HXml::HNodeProxy::remove_node( HXml::HIterator it ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
-	tree_t::iterator newIt = _node->remove_node( it._iterator );
+	tree_t::HNode::iterator newIt = _node->remove_node( it._iterator );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 }
@@ -1112,7 +1112,7 @@ HXml::const_xml_element_t HXml::get_element_by_path( const_xml_element_t const& 
 	HString name = t[ part ];
 	if ( ! name.is_empty() ) {
 		if ( (**node)._text == name ) {
-			for ( tree_t::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
+			for ( tree_t::HNode::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
 				if ( (**it)._type == HXml::HNode::TYPE::NODE )
 					result = get_element_by_path( &*it, path, part + 1 );
 		}

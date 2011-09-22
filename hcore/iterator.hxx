@@ -139,9 +139,16 @@ template<typename iterator_t>
 class HReverseIterator {
 	iterator_t _iterator;
 public:
-	HReverseIterator( void ) : _iterator() {}
-	HReverseIterator( HReverseIterator const& iterator_ ) : _iterator( iterator_._iterator ) {}
-	HReverseIterator( iterator_t const& iterator_ ) : _iterator( iterator_ ) { -- _iterator; }
+	HReverseIterator( void )
+		: _iterator() {}
+	HReverseIterator( HReverseIterator const& iterator_ )
+		: _iterator( iterator_._iterator ) {}
+	template<typename other_iterator_t>
+	HReverseIterator( HReverseIterator<other_iterator_t> const& iterator_ )
+		: _iterator( iterator_._iterator ) {}
+	HReverseIterator( iterator_t const& iterator_ )
+		: _iterator( iterator_ )
+		{ -- _iterator; }
 	HReverseIterator& operator = ( HReverseIterator const& iterator_ ) {
 		if ( &iterator_ != this )
 			_iterator = iterator_._iterator;
@@ -188,6 +195,9 @@ public:
 	bool operator != ( HReverseIterator const& iterator_ ) const {
 		return ( _iterator != iterator_._iterator );
 	}
+private:
+	template<typename other_iterator_t>
+	friend class HReverseIterator;
 };
 
 /*! \brief (Back)Insertion concept for HInsertIterator.

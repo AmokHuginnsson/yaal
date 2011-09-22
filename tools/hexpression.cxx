@@ -302,7 +302,7 @@ double long HExpression::functions( tree_t::const_node_t node_ ) {
 double long HExpression::addition( tree_t::const_node_t node_ ) {
 	M_PROLOG
 	double long leftValue = 0, rightValue = 0;
-	tree_t::const_iterator it = node_->begin();
+	tree_t::HNode::const_iterator it = node_->begin();
 	int_list_t::const_iterator var = (*node_)->_variables.begin();
 	leftValue = count_branch( &*it );
 	while ( ( ++ it ) != node_->end() ) {
@@ -328,7 +328,7 @@ double long HExpression::addition( tree_t::const_node_t node_ ) {
 double long HExpression::multiplication( tree_t::const_node_t node_ ) {
 	M_PROLOG
 	double long leftValue = 0, rightValue = 0;
-	tree_t::const_iterator it = node_->begin();
+	tree_t::HNode::const_iterator it = node_->begin();
 	int_list_t::const_iterator var = (*node_)->_variables.begin();
 	leftValue = count_branch( &*it );
 	while ( ( ++ it ) != node_->end() ) {
@@ -361,7 +361,7 @@ double long HExpression::multiplication( tree_t::const_node_t node_ ) {
 double long HExpression::power( tree_t::const_node_t node_ ) {
 	M_PROLOG
 	double long leftValue, rightValue;
-	tree_t::const_iterator it = node_->begin();
+	tree_t::HNode::const_iterator it = node_->begin();
 	leftValue = count_branch ( &*it );
 	rightValue = count_branch ( &*( ++ it ) );
 	if ( ( leftValue < 0 )
@@ -479,7 +479,7 @@ void HExpression::shorten_the_branch( tree_t::node_t node_ ) {
 	tree_t::node_t parent = node_->get_parent();
 	if ( parent ) {
 		M_ASSERT( node_->child_count() == 1 );
-		tree_t::iterator it;
+		tree_t::HNode::iterator it;
 		for ( it = parent->begin(); it != parent->end(); ++ it ) {
 			if ( &*it == node_ )
 				break;

@@ -46,7 +46,7 @@ int HMenuControl::load_sub_menu( tree_t::node_t node, OMenuItem* subMenu_ ) {
 		HNodeControl info( 1 );
 		info[ 0 ]( subMenu_ [ ctr ]._label );
 		info[ 0 ]( static_cast<void*>( &subMenu_[ ctr ] ) );
-		tree_t::iterator it = node->add_node( info );
+		tree_t::HNode::iterator it = node->add_node( info );
 		if ( subMenu_ [ ctr ]._subMenu )
 			load_sub_menu( &*it, subMenu_[ ctr ]._subMenu );
 		ctr ++;
