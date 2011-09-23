@@ -447,7 +447,7 @@ HString::const_iterator HString::end( void ) const {
 }
 
 HString::iterator HString::begin( void ) {
-	return ( iterator( this, 9 ) );
+	return ( iterator( this, 0 ) );
 }
 
 HString::iterator HString::end( void ) {
