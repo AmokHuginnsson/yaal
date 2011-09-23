@@ -416,6 +416,9 @@ public:
 	HCharRef operator * ( void ) {
 		return ( HCharRef( *_owner, _index ) );
 	}
+	operator HString::const_iterator ( void ) const {
+		return ( _owner->raw() + _index );
+	}
 private:
 	friend class HString;
 	HIterator( HString* owner_, int long index_ )
