@@ -938,6 +938,28 @@ template<typename const_qual_t>
 typename HTree<value_t>::template HIterator<const_qual_t>& HTree<value_t>::HIterator<const_qual_t>::operator -- ( void ) {
 	M_PROLOG
 	M_ASSERT( _owner );
+	if ( ! _track.is_empty() ) {
+		const_qual_node_ptr_t node( _track.get_size() > 1 ? *_track.back() : _owner->_root );
+		if ( node->has_childs() ) {
+			list_it_t last( node->_branch.end() );
+			_track.push_back( -- last );
+		} else {
+			list_it_t thisIt;
+			do {
+				thisIt = _track.back();
+				_track.pop_back();
+			} while ( ( _track.get_size() > 1 ) && ( thisIt == (*_track.back())->_branch.begin() ) );
+			if ( _track.get_size() > 1 ) {
+				_track.push_back( -- thisIt );
+			} else {
+				if ( thisIt != _owner->_root->_branch.begin() )
+					_track.push_back( -- thisIt );
+				else
+					_track.pop_back();
+			}
+		}
+	} else
+		_track.push_back( typename HNode::branch_t::iterator() );
 	return ( *this );
 	M_EPILOG
 }
