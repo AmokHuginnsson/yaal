@@ -38,7 +38,6 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "memory.hxx"
 #include "hlog.hxx"
 #include "hfile.hxx"
-#include "introspect.hxx"
 
 using namespace yaal;
 
@@ -46,11 +45,7 @@ namespace yaal {
 
 namespace hcore {
 
-namespace {
-
 FILE* ERROR_STREAM = stderr;
-
-}
 
 char const* const _exceptionType_ = _( "Exception type" );
 
@@ -120,36 +115,12 @@ int HException::code( void ) const {
 	return ( _code );
 }
 
-void failed_assert( char const* const fileName_,
-		int line_, char const* const functionName_,
-		char const* const message_ ) {
-	M_PROLOG
-	hcore::log << "Failed assertion: " << message_ << " -> " << fileName_ << "(" << line_ << "): " << functionName_ << endl;
-	fprintf( ERROR_STREAM, "Failed assertion: `%s' at: %s: %4d : %s\n",
-			message_, fileName_, line_, functionName_ );
-	if ( ! errno )
-		++ errno;
-	if ( _debugLevel_ >= DEBUG_LEVEL::ABORT_ON_ASSERT )
-		::abort();
-	static int const DUMP_DEPTH = 64;
-	dump_call_stack( clog, DUMP_DEPTH );
-	throw ( HFailedAssertion( message_ ) );
-	M_EPILOG
-}
-
 void HException::set_error_stream( void* errorStream_ ) {
 	M_PROLOG
 	M_ASSERT( errorStream_ );
 	ERROR_STREAM = static_cast<FILE*>( errorStream_ );
 	return;
 	M_EPILOG
-}
-
-void HFailedAssertion::swap( HFailedAssertion& other ) {
-	using yaal::swap;
-	if ( &other != this )
-		swap( _what, other._what );
-	return;
 }
 
 void HGlobalScopeExceptionHandlingPolicy::handle_exception( void ) {

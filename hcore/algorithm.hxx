@@ -942,13 +942,17 @@ void generate_n( iterator_t it, int long count, generator_t generator ) {
  */
 template<typename iterator_t>
 void reverse( iterator_t it, iterator_t end ) {
-	int long count = 0;
-	iterator_t itLast;
-	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count )
-		itLast = itEnd;
-	count >>= 1;
-	for ( int long i = 0; i < count; ++ i, ++ it, -- itLast )
-		swap( *it, *itLast );
+	if ( it != end ) {
+		-- end;
+		while ( it != end ) {
+			swap( *it, *end );
+			++ it;
+			if ( it != end )
+				-- end;
+			else
+				break;
+		}
+	}
 	return;
 }
 

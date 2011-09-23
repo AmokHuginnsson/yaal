@@ -31,6 +31,7 @@ Copyright:
 
 #include "hcore/macro.hxx"
 #include "hcore/numeric.hxx"
+#include "hcore/assert.hxx"
 
 namespace yaal {
 
@@ -72,6 +73,8 @@ class HString {
 public:
 	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 2 ) - 1;
 	typedef HString this_type;
+	class HIterator;
+	class HCharRef;
 private:
 	static int const INPLACE_BUFFER_SIZE = sizeof ( char* ) + sizeof ( int long ) + sizeof ( int long );
 	static int const ALLOC_FLAG_INDEX = INPLACE_BUFFER_SIZE - 1;
@@ -79,7 +82,7 @@ private:
 	char _mem[ INPLACE_BUFFER_SIZE ];
 public:
 	static int long const npos = -1;
-	typedef char const* iterator; /*!< mutable iterator for string characters */
+	typedef HIterator iterator; /*!< mutable iterator for string characters */
 	typedef char const* const_iterator; /*!< const iterator for string characters */
 	/*! \brief Trivial constructor.
 	 *
@@ -191,10 +194,8 @@ public:
 	char const* c_str( void ) const;
 	int long max_size( void ) const;
 	int long get_max_size( void ) const;
-/*
-	iterator begin( void ) const;
-	iterator end( void ) const;
-*/
+	iterator begin( void );
+	iterator end( void );
 	const_iterator begin( void ) const;
 	const_iterator end( void ) const;
 	bool is_empty( void ) const;
@@ -351,6 +352,77 @@ public:
 	HString& append( char const* const, int long len_ );
 };
 
+class HString::HCharRef {
+	HString& _string;
+	int long _index;
+public:
+	operator char ( void ) {
+		return ( _string[ _index ] );
+	}
+	HCharRef& operator = ( char ch_ );
+	void swap( HCharRef& );
+private:
+	friend class HString;
+	HCharRef( HString& string_, int long index_ )
+		: _string( string_ ), _index( index_ )
+		{}
+};
+
+class HString::HIterator {
+	HString* _owner;
+	int long _index;
+public:
+	HIterator( void )
+		: _owner( NULL ), _index( 0 )
+		{}
+	HIterator( HIterator const& it_ )
+		: _owner( it_._owner ), _index( it_._index )
+		{}
+	HIterator& operator = ( HIterator const& it_ ) {
+		if ( &it_ != this ) {
+			_owner = it_._owner;
+			_index = it_._index;
+		}
+		return ( *this );
+	}
+	bool operator == ( HIterator const& it_ ) const {
+		M_ASSERT( _owner == it_._owner );
+		return ( _index == it_._index );
+	}
+	bool operator != ( HIterator const& it_ ) const {
+		M_ASSERT( _owner == it_._owner );
+		return ( _index != it_._index );
+	}
+	HIterator& operator ++ ( void ) {
+		M_ASSERT( _owner );
+		++ _index;
+		return ( *this );
+	}
+	HIterator& operator -- ( void ) {
+		M_ASSERT( _owner );
+		-- _index;
+		return ( *this );
+	}
+	HIterator operator ++ ( int ) {
+		HIterator it( *this );
+		++ _index;
+		return ( it );
+	}
+	HIterator operator -- ( int ) {
+		HIterator it( *this );
+		-- _index;
+		return ( it );
+	}
+	HCharRef operator * ( void ) {
+		return ( HCharRef( *_owner, _index ) );
+	}
+private:
+	friend class HString;
+	HIterator( HString* owner_, int long index_ )
+		: _owner( owner_ ), _index( index_ )
+		{}
+};
+
 HString operator + ( HString const&, HString const& );
 int strcasecmp( HString const&, HString const& );
 bool operator == ( HString const&, HString const& );
@@ -372,6 +444,9 @@ int long kmpcasesearch( char const* const, int long, char const* const, int long
 }
 
 inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b )
+	{ a.swap( b ); }
+
+inline void swap( yaal::hcore::HString::HCharRef a, yaal::hcore::HString::HCharRef b )
 	{ a.swap( b ); }
 
 }

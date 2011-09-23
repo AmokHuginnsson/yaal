@@ -446,6 +446,14 @@ HString::const_iterator HString::end( void ) const {
 	return ( ROMEM + get_length() );
 }
 
+HString::iterator HString::begin( void ) {
+	return ( iterator( this, 9 ) );
+}
+
+HString::iterator HString::end( void ) {
+	return ( iterator( this, get_length() ) );
+}
+
 bool HString::empty( void ) const {
 	return ( is_empty() );
 }
@@ -1083,6 +1091,25 @@ HString& HString::append( char const* const buf_, int long len_ ) {
 		SET_SIZE( newSize );
 	}
 	return ( *this );
+	M_EPILOG
+}
+
+HString::HCharRef& HString::HCharRef::operator = ( char ch_ ) {
+	M_PROLOG
+	_string.set_at( _index, ch_ );
+	return ( *this );
+	M_EPILOG
+}
+
+void HString::HCharRef::swap( HCharRef& charRef_ ) {
+	M_PROLOG
+	if ( &charRef_ != this ) {
+		char l( _string[_index] );
+		char r( charRef_._string[charRef_._index] );
+		_string.set_at( _index, r );
+		charRef_._string.set_at( charRef_._index, l );
+	}
+	return;
 	M_EPILOG
 }
 

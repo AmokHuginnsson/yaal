@@ -40,6 +40,7 @@ Copyright:
 #	include "config.hxx"
 #endif /* __YAAL_BUILD__ */
 #include "hcore/base.hxx"
+#include "hcore/assert.hxx"
 #include "hcore/trait.hxx"
 #include "hcore/hstring.hxx"
 
@@ -144,28 +145,6 @@ public:
 typedef HExceptionT<HString> HStringException;
 typedef HExceptionT<LexicalCast> HLexicalCastException;
 
-/*! \brief Failed assertion exception.
- *
- * In \e DEBUG build failuers in assertions does not abort the
- * process, insead the throw instance of HFailedAssertion.
- */
-class HFailedAssertion {
-	char const* _what;
-public:
-	HFailedAssertion( char const* const what_ ) : _what( what_ ) {}
-	HFailedAssertion( HFailedAssertion const& fa ) : _what( fa._what ) {}
-	HFailedAssertion& operator = ( HFailedAssertion const& fa ) {
-		if ( &fa != this ) {
-			HFailedAssertion n( fa );
-			swap( n );
-		}
-		return ( *this );
-	}
-	char const* what( void ) const { return ( _what ); }
-private:
-	void swap( HFailedAssertion& );
-};
-
 /*! \brief Yaal's default exception handling policy.
  */
 struct HGlobalScopeExceptionHandlingPolicy {
@@ -188,7 +167,6 @@ public:
 		{ return ( _object ); }
 };
 
-void failed_assert( char const* const, int, char const* const, char const* const ) __attribute__(( __noreturn__ ));
 void kill_interior( char const* const = NULL );
 
 /*
