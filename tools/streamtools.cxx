@@ -43,12 +43,6 @@ HBinaryFormatter::HBinaryFormatter( HStreamInterface* stream_ )
 	: _stream( stream_ ) {
 }
 
-HStreamInterface& HBinaryFormatter::operator << ( HStreamInterface::manipulator_t const& M ) {
-	M_PROLOG
-	return ( M( *_stream) );
-	M_EPILOG
-}
-
 HStreamInterface& HBinaryFormatter::operator << ( HStreamInterface::manipulator_t M ) {
 	M_PROLOG
 	return ( M( *_stream) );
