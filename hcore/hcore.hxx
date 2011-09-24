@@ -45,7 +45,7 @@ bool eq( double long, double long );
 void set_env( HString const&, HString const&, bool = true );
 void decode_set_env( HString );
 void init_locale( char const* const = NULL );
-void banner( void );
+void banner( char const* = NULL, char const* = NULL );
 double long strtold( HString const& );
 
 namespace extendable {

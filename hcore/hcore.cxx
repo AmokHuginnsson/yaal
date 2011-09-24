@@ -2,7 +2,7 @@
 #include "config.hxx"
 char const COPYRIGHT [ ] =
 "/*\n"
-"---           `yaal' "PACKAGE_VERSION" (c) 1978 by Marcin 'Amok' Konarski            ---\n"
+"---           `%s' %s (c) 1978 by Marcin 'Amok' Konarski            ---\n"
 "\n"
 /* hcore.cxx - this file is integral part of `yaal' project.
  */
@@ -266,11 +266,11 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 	return;
 }
 
-void banner( void ) {
+void banner( char const* packageName_, char const* packageVersion_ ) {
+	::printf( COPYRIGHT, packageName_ ? packageName_ : PACKAGE_NAME, packageVersion_ ? packageVersion_ : PACKAGE_VERSION );
 	::printf(
-		"%s\n"
 		"Available libraries:\n"
-		"\thcore\n", COPYRIGHT );
+		"\thcore\n" );
 	return;
 }
 

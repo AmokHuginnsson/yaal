@@ -100,8 +100,6 @@ HDBWrapperInitDeinit::HDBWrapperInitDeinit( void ) {
 	M_EPILOG
 }
 
-extern char const* _done_;
-
 void banner( void ) {
 	::printf( "\tdbwrapper\n" );
 	return;

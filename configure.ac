@@ -7,8 +7,8 @@ pushdef([AC_VERSION],esyscmd(awk '/^VERSION[[[:space:]]]+=[[[:space:]]]+/{printf
 pushdef([AC_SUBVERSION],esyscmd(awk '/^SUBVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.mk.in))
 pushdef([AC_EXTRAVERSION],esyscmd(awk '/^EXTRAVERSION[[[:space:]]]+=[[[:space:]]]+/{printf $3}' Makefile.mk.in))
 pushdef([YAAL_PACKAGE_VERSION],[AC_VERSION.AC_SUBVERSION.AC_EXTRAVERSION-esyscmd(date +%Y%m%d|tr -d '\n')])
-m4_include([_aux/aclib.m4])
 AC_INIT([[yaal]],[YAAL_PACKAGE_VERSION],[[amok@codestation.org]])
+m4_include([_aux/aclib.m4])
 PRIVILEGES_SANITY
 
 AC_MSG_RESULT([--- Welcome to yaal configurator ---                     [[0%]]])
