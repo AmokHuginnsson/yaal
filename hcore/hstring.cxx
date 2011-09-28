@@ -839,6 +839,31 @@ HString& HString::reverse( void ) {
 	M_EPILOG
 }
 
+void HString::substr( HString& dest_, int long from_, int long length_ ) const {
+	M_PROLOG
+	if ( from_ < 0 )
+		length_ += from_, from_ = 0;
+	if ( ( length_ > 0 ) && ( from_ < GET_SIZE ) ) {
+		int long newSize( min( length_, GET_SIZE ) );
+		if ( ( newSize + from_ ) > GET_SIZE )
+			newSize = GET_SIZE - from_;
+		dest_.hs_realloc( newSize + 1 );
+		::std::strncpy( EXT_MEM( dest_._mem ), ROMEM + from_, newSize );
+		EXT_MEM( dest_._mem )[ newSize ] = 0;
+		EXT_SET_SIZE( dest_._mem, newSize );
+	}
+	return;
+	M_EPILOG
+}
+
+HString HString::substr( int long from_, int long length_ ) const {
+	M_PROLOG
+	HString str;
+	substr( str, from_, length_ );
+	return ( str );
+	M_EPILOG
+}
+
 HString HString::left( int long to_ ) const {
 	M_PROLOG
 	HString str;
@@ -856,17 +881,7 @@ HString HString::left( int long to_ ) const {
 HString HString::mid( int long from_, int long length_ ) const {
 	M_PROLOG
 	HString str;
-	if ( from_ < 0 )
-		length_ += from_, from_ = 0;
-	if ( ( length_ <= 0 ) || ( from_ >= GET_SIZE ) )
-		return ( str );
-	int long newSize( min( length_, GET_SIZE ) );
-	if ( ( newSize + from_ ) > GET_SIZE )
-		newSize = GET_SIZE - from_;
-	str.hs_realloc( newSize + 1 );
-	::std::strncpy( EXT_MEM( str._mem ), ROMEM + from_, newSize );
-	EXT_MEM( str._mem )[ newSize ] = 0;
-	EXT_SET_SIZE( str._mem, newSize );
+	substr( str, from_, length_ );
 	return ( str );
 	M_EPILOG
 }

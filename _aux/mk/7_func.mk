@@ -28,6 +28,7 @@ $$(DIR_$(1))/%.$$(OS): $$(DIR_SRC_$(1))/%.$$(SS)
 	$$(call invoke,$$(CXX) $$(CXXFLAGS) -D__ID__=$$(ID) -D__TID__=$$(TID) $$(<) -c -o $$(@) 2>&1 | tee -a make.log) && \
 	test -f $$(@) \
 	$$(call msg,&& printf "%b$$(NL)" "done.$$(CL)")
+
 endef
 
 define CONFIGURE_DRIVER

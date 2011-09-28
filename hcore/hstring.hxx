@@ -198,15 +198,61 @@ public:
 	iterator end( void );
 	const_iterator begin( void ) const;
 	const_iterator end( void ) const;
+	/*! \brief Check if string is empty (has zero length).
+	 *
+	 * \return Tue iff this string is empty.
+	 */
 	bool is_empty( void ) const;
+	/*! \brief Check if string is empty (has zero length).
+	 * 
+	 * empty() is really an alias for is_empty().
+	 *
+	 * \return Tue iff this string is empty.
+	 */
 	bool empty( void ) const;
+	/*! \brief Clear this string contents.
+	 *
+	 * \post String is empty.
+	 */
 	void clear( void );
-	int long length( void ) const;
-	int long size( void ) const;
-	int long get_size( void ) const;
+	/*! \brief Get string length.
+	 *
+	 * \return String length in characters.
+	 */
 	int long get_length( void ) const;
-	int long capacity( void ) const;
+	/*! \brief Get string length.
+	 *
+	 * length() is really an alias for get_length().
+	 *
+	 * \return String length in characters.
+	 */
+	int long length( void ) const;
+	/*! \brief Get string length.
+	 *
+	 * get_size() is really an alias for get_length().
+	 *
+	 * \return String length in characters.
+	 */
+	int long get_size( void ) const;
+	/*! \brief Get string length.
+	 *
+	 * size() is really an alias for get_length().
+	 *
+	 * \return String length in characters.
+	 */
+	int long size( void ) const;
+	/*! \brief Tell how many characters can this string store without memory reallocation.
+	 *
+	 * \return Number of characters that can be stored in this string without reallocation.
+	 */
 	int long get_capacity( void ) const;
+	/*! \brief Tell how many characters can this string store without memory reallocation.
+	 *
+	 * capacity() is really an alias for get_capacity().
+	 *
+	 * \return Number of characters that can be stored in this string without reallocation.
+	 */
+	int long capacity( void ) const;
 	void swap( HString& );
 	/*! \brief Erase old content and assign new data from buffer.
 	 *
@@ -240,8 +286,17 @@ public:
 	HString& upper( void );
 	HString& lower( void );
 	HString& reverse( void );
+	/*! \brief Get substring of this string by start position and length.
+	 *
+	 * \param start - position for begining of a substring.
+	 * \param length - length of a substring.
+	 * \return Substring.
+	 */
+	HString substr( int long start, int long length = MAX_STRING_LENGTH ) const;
 	HString left( int long ) const;
 	/*! \brief Get substring of this string by start position and length.
+	 *
+	 * mid() is really an alias for substr().
 	 *
 	 * \param start - position for begining of a substring.
 	 * \param length - length of a substring.
@@ -350,6 +405,8 @@ public:
 	 * \return Self.
 	 */
 	HString& append( char const* const, int long len_ );
+private:
+	void substr( HString&, int long, int long ) const;
 };
 
 class HString::HCharRef {
