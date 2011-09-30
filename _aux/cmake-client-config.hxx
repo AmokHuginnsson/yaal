@@ -20,6 +20,7 @@
 #pragma warning( disable : 4351 )
 #pragma warning( disable : 4345 )
 #pragma warning( disable : 4355 )
+#pragma warning( disable : 4503 )
 #pragma warning( disable : 4646 )
 #pragma warning( disable : 4996 )
 #undef __PRETTY_FUNCTION__
