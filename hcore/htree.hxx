@@ -216,13 +216,57 @@ public:
 	HIterator( HIterator const& );
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& );
-	HIterator& operator ++ ( void );
+	HIterator& operator ++ ( void ) {
+		M_PROLOG
+		M_ASSERT( _owner );
+		if ( ! _track.is_empty() ) {
+			list_it_t thisIt( _track.back() );
+			_track.pop_back();
+			if ( ! _track.is_empty() ) {
+				const_qual_node_ptr_t parent( ( _track.get_size() > 1 ) ? *_track.back() : _owner->_root );
+				++ thisIt;
+				if ( thisIt != parent->_branch.end() )
+					descent( *thisIt, thisIt );
+			}
+		} else if ( _owner->_root )
+			descent( _owner->_root, typename HNode::branch_t::iterator() );
+		return ( *this );
+		M_EPILOG
+	}
 	HIterator operator ++ ( int ) {
 		HIterator it( *this );
 		operator ++ ();
 		return ( it );
 	}
-	HIterator& operator -- ( void );
+	HIterator& operator -- ( void ) {
+		M_PROLOG
+		M_ASSERT( _owner );
+		if ( ! _track.is_empty() ) {
+			const_qual_node_ptr_t node( _track.get_size() > 1 ? *_track.back() : _owner->_root );
+			if ( node->has_childs() ) {
+				list_it_t last( node->_branch.end() );
+				_track.push_back( -- last );
+			} else {
+				list_it_t thisIt;
+				do {
+					thisIt = _track.back();
+					_track.pop_back();
+				} while ( ( _track.get_size() > 1 ) && ( thisIt == (*_track.back())->_branch.begin() ) );
+				if ( _track.get_size() > 1 ) {
+					_track.push_back( -- thisIt );
+				} else {
+					if ( thisIt != _owner->_root->_branch.begin() )
+						_track.push_back( -- thisIt );
+					else
+						_track.pop_back();
+				}
+			}
+		} else
+			_track.push_back( typename HNode::branch_t::iterator() );
+		return ( *this );
+		M_EPILOG
+	}
+
 	HIterator operator -- ( int ) {
 		HIterator it( *this );
 		operator -- ();
@@ -902,26 +946,6 @@ bool HTree<value_t>::HIterator<const_qual_t>::operator != ( HIterator const& it 
 
 template<typename value_t>
 template<typename const_qual_t>
-typename HTree<value_t>::template HIterator<const_qual_t>& HTree<value_t>::HIterator<const_qual_t>::operator ++ ( void ) {
-	M_PROLOG
-	M_ASSERT( _owner );
-	if ( ! _track.is_empty() ) {
-		list_it_t thisIt( _track.back() );
-		_track.pop_back();
-		if ( ! _track.is_empty() ) {
-			const_qual_node_ptr_t parent( ( _track.get_size() > 1 ) ? *_track.back() : _owner->_root );
-			++ thisIt;
-			if ( thisIt != parent->_branch.end() )
-				descent( *thisIt, thisIt );
-		}
-	} else if ( _owner->_root )
-		descent( _owner->_root, typename HNode::branch_t::iterator() );
-	return ( *this );
-	M_EPILOG
-}
-
-template<typename value_t>
-template<typename const_qual_t>
 void HTree<value_t>::HIterator<const_qual_t>::descent( const_qual_node_t* n_, list_it_t const& start_ ) {
 	M_PROLOG
 	_track.push_back( start_ );
@@ -932,38 +956,6 @@ void HTree<value_t>::HIterator<const_qual_t>::descent( const_qual_node_t* n_, li
 	return;
 	M_EPILOG
 }
-
-template<typename value_t>
-template<typename const_qual_t>
-typename HTree<value_t>::template HIterator<const_qual_t>& HTree<value_t>::HIterator<const_qual_t>::operator -- ( void ) {
-	M_PROLOG
-	M_ASSERT( _owner );
-	if ( ! _track.is_empty() ) {
-		const_qual_node_ptr_t node( _track.get_size() > 1 ? *_track.back() : _owner->_root );
-		if ( node->has_childs() ) {
-			list_it_t last( node->_branch.end() );
-			_track.push_back( -- last );
-		} else {
-			list_it_t thisIt;
-			do {
-				thisIt = _track.back();
-				_track.pop_back();
-			} while ( ( _track.get_size() > 1 ) && ( thisIt == (*_track.back())->_branch.begin() ) );
-			if ( _track.get_size() > 1 ) {
-				_track.push_back( -- thisIt );
-			} else {
-				if ( thisIt != _owner->_root->_branch.begin() )
-					_track.push_back( -- thisIt );
-				else
-					_track.pop_back();
-			}
-		}
-	} else
-		_track.push_back( typename HNode::branch_t::iterator() );
-	return ( *this );
-	M_EPILOG
-}
-
 
 }
 
