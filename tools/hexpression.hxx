@@ -38,6 +38,8 @@ namespace tools {
 /*! \brief Mathematical expression analyser and evaluator.
  */
 class HExpression {
+public:
+	static int const MAX_VARIABLE_COUNT = 26;
 	typedef HExpression this_type;
 	typedef enum {
 		OK = 0,
@@ -51,6 +53,7 @@ class HExpression {
 		UNEXPECTED_TOKEN = 8,
 		PREMATURE_TERMINATION = 9
 	} syntax_error_t;
+private:
 	typedef hcore::HList<int> int_list_t;
 	struct OEquationElement;
 	typedef hcore::HTree<OEquationElement> tree_t;
@@ -63,7 +66,7 @@ class HExpression {
 	int _index;
 	int _length;
 	syntax_error_t _error;
-	double long _variables[ 26 ];
+	double long _variables[ MAX_VARIABLE_COUNT ];
 	typedef hcore::HArray<double long> constants_t;
 	constants_t _constantsPool;
 	typedef hcore::HArray<int> terminal_indexes_t;
@@ -90,12 +93,14 @@ private:
 	bool multiplication_production( tree_t::node_t );
 	bool power_production( tree_t::node_t );
 	bool signum_production( tree_t::node_t );
+	bool factorial_production( tree_t::node_t );
 	bool terminal_production( tree_t::node_t );
 	double long count_branch( tree_t::const_node_t );
 	double long addition( tree_t::const_node_t );
 	double long multiplication( tree_t::const_node_t );
 	double long power( tree_t::const_node_t );
 	double long signum( tree_t::const_node_t );
+	double long factorial( tree_t::const_node_t );
 	double long bracket( tree_t::const_node_t );
 	double long functions( tree_t::const_node_t );
 	void shorten_the_branch( tree_t::node_t );

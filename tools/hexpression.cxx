@@ -36,6 +36,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/hcore.hxx"
 #include "hcore/math.hxx"
 #include "hexpression.hxx"
+#include "xmath.hxx"
 
 using namespace yaal;
 using namespace yaal::math;
@@ -51,6 +52,7 @@ struct OPERATOR {
 	static int const MULTIPLY;
 	static int const DIVIDE;
 	static int const MODULO;
+	static int const FACTORIAL;
 };
 
 int const OPERATOR::ADD = '+';
@@ -58,6 +60,7 @@ int const OPERATOR::SUBSTRACT = '-';
 int const OPERATOR::MULTIPLY = '*';
 int const OPERATOR::DIVIDE = '/';
 int const OPERATOR::MODULO = '%';
+int const OPERATOR::FACTORIAL = '!';
 
 struct FUNCTION {
 	static int const FUNCTIONS;
@@ -123,21 +126,19 @@ int _functionMnemonicsLength_ [ 16 ] = {
 };
 
 HExpression::HExpression( void )
-	: _index( 0 ), _length( 0 ), _error( OK ),
+	: _index( 0 ), _length( 0 ), _error( OK ), _variables(),
 	_constantsPool(), _terminalIndexes(), _formula(),
 	_equationTree() {
 	M_PROLOG
-	yaal::fill( _variables, _variables + 26, 0 );
 	return;
 	M_EPILOG
 }
 
 HExpression::HExpression( HString const& formula )
-	: _index( 0 ), _length( 0 ), _error( OK ),
+	: _index( 0 ), _length( 0 ), _error( OK ), _variables(),
 	_constantsPool(), _terminalIndexes(), _formula(),
 	_equationTree() {
 	M_PROLOG
-	yaal::fill( _variables, _variables + 26, 0 );
 	compile( formula );
 	return;
 	M_EPILOG
@@ -150,12 +151,12 @@ HExpression::~HExpression( void ) {
 }
 
 HExpression::HExpression( HExpression const& ex )
-	: _index( ex._index ), _length( ex._length ), _error( ex._error ),
+	: _index( ex._index ), _length( ex._length ), _error( ex._error ), _variables(),
 	_constantsPool( ex._constantsPool ),
 	_terminalIndexes( ex._terminalIndexes ), _formula( ex._formula ),
 	_equationTree( ex._equationTree ) {
 	M_PROLOG
-	yaal::copy( ex._variables, ex._variables + 26, _variables );
+	yaal::copy( ex._variables, ex._variables + MAX_VARIABLE_COUNT, _variables );
 	return;
 	M_EPILOG
 }
@@ -181,7 +182,7 @@ void HExpression::swap( HExpression& ex ) {
 		_terminalIndexes.swap( ex._terminalIndexes );
 		_formula.swap( ex._formula );
 		_equationTree.swap( ex._equationTree );
-		yaal::swap_ranges( _variables, _variables + 26, ex._variables );
+		yaal::swap_ranges( _variables, _variables + MAX_VARIABLE_COUNT, ex._variables );
 	}
 	return;
 	M_EPILOG
@@ -379,6 +380,14 @@ double long HExpression::signum( tree_t::const_node_t node_ ) {
 	M_EPILOG
 }
 
+double long HExpression::factorial( tree_t::const_node_t node_ ) {
+	M_PROLOG
+	double long leftValue;
+	leftValue = count_branch( &*node_->begin() );
+	return ( xmath::factorial( static_cast<int long long unsigned>( leftValue ) ) );
+	M_EPILOG
+}
+
 double long HExpression::bracket( tree_t::const_node_t node_ ) {
 	M_PROLOG
 	double long leftValue;
@@ -519,12 +528,29 @@ bool HExpression::signum_production( tree_t::node_t node_ ) {
 	}
 	if ( _formula[ _index ] == '-' ) {
 		_index ++;
-		if ( terminal_production( &*node_->add_node() ) )
+		if ( factorial_production( &*node_->add_node() ) )
 			return ( true );
 		(**node_).METHOD = &HExpression::signum;
 	} else
-		if ( terminal_production( node_ ) )
+		if ( factorial_production( node_ ) )
 			return ( true );
+	return ( false );
+	M_EPILOG
+}
+
+bool HExpression::factorial_production( tree_t::node_t node_ ) {
+	M_PROLOG
+	if ( terminal_production( &*node_->add_node() ) )
+		return ( true );
+	if ( _index > _length ) {
+		_error = UNEXPECTED_TERMINATION;
+		return ( true );
+	} else if ( ( _index < _length ) && ( _formula[ _index ] == OPERATOR::FACTORIAL ) ) {
+		++ _index;
+		(**node_).METHOD = &HExpression::factorial;
+	} else {
+		shorten_the_branch( node_ );
+	}
 	return ( false );
 	M_EPILOG
 }
@@ -538,7 +564,7 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 	switch ( _formula [ _index ] ) {
 		case '(' : {
 			_index ++;
-			if ( addition_production ( node_ ) )
+			if ( addition_production( node_ ) )
 				return ( true );
 			if ( _formula [ _index ] != ')' ) {
 				_error = CLOSING_BRACKET_EXPECTED;
@@ -549,7 +575,7 @@ bool HExpression::terminal_production( tree_t::node_t node_ ) {
 		}
 		case '|' : {
 			_index ++;
-			if ( addition_production ( &*node_->add_node() ) )
+			if ( addition_production( &*node_->add_node() ) )
 				return ( true );
 			(**node_).METHOD = &HExpression::functions;
 			(**node_)._variables.push_back( FUNCTION::ABS );
@@ -663,7 +689,7 @@ double long& HExpression::operator[]( int index_ ) {
 	if ( ( index_ >= 'a' ) && ( index_ <= 'a' ) )
 		index_ = ( index_ - 'a' ) + 'A';
 	double long* val = NULL;
-	if ( ( index_ >= 0 ) && ( index_ < 26 ) )
+	if ( ( index_ >= 0 ) && ( index_ < MAX_VARIABLE_COUNT ) )
 		val = &_variables[ index_ ];
 	else if ( ( index_ >= 'A' ) && ( index_ <= 'Z' ) )
 		val = &_variables[ index_ - 'A' ];
