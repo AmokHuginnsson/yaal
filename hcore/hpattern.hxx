@@ -64,19 +64,24 @@ private:
 	mutable int _lastError;
 	mutable HString _varTmpBuffer;	/*!< error message of last operation */
 public:
-	/*! \brief Construct pattern.
+	/*! \brief Construct pattern with regex rule.
 	 *
-	 * caseSentitive - shall defualt match policy be: case matters, default ignore case state
+	 * \param pattern - regex rule to construct pattern object.
+	 * \param caseSentitive - shall defualt match policy be: case matters, default ignore case state
 	 */
-	HPattern( bool caseSentitive = false );
+	HPattern( HString const& pattern = HString(), bool caseSentitive = false );
 	virtual ~HPattern( void );
-	/*! \brief Parse regular expression patten and prepare for matches retrieval.
+	/*! \brief Parse regular expression pattern with configuration and prepare for matches retrieval.
 	 *
 	 * pattern - regular expression pattern to match against.
 	 * externalFlags - set of external flags that may by set by pattern extra arguments.
 	 */
 	int parse( HString const& pattern, pluggable_flags_t* externalFlags = NULL );
-	int parse_re( char const* const );
+	/*! \brief Parse naked regular expression pattern and prepare for matches retrieval.
+	 *
+	 * pattern - regular expression pattern to match against.
+	 */
+	int parse_re( HString const& pattern );
 	HString const& error( void ) const;
 	int error_code( void ) const;
 	HMatchIterator find( char const* const ) const;

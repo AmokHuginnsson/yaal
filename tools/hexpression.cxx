@@ -686,7 +686,7 @@ double long* HExpression::variables( void ) {
 
 double long& HExpression::operator[]( int index_ ) {
 	M_PROLOG
-	if ( ( index_ >= 'a' ) && ( index_ <= 'a' ) )
+	if ( ( index_ >= 'a' ) && ( index_ <= 'z' ) )
 		index_ = ( index_ - 'a' ) + 'A';
 	double long* val = NULL;
 	if ( ( index_ >= 0 ) && ( index_ < MAX_VARIABLE_COUNT ) )

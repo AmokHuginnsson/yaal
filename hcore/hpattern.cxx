@@ -47,18 +47,23 @@ struct OPatternState {
 	OPatternState( void ) : _ignoreCase( false ), _extended( false ), _flags() {}
 };
 
-HPattern::HPattern( bool const ignoreCase_ ) : _initialized( false ),
+HPattern::HPattern( HString const& pattern_, bool ignoreCase_ ) : _initialized( false ),
 	_ignoreCaseDefault( ignoreCase_ ), _ignoreCase( false ),
 	_extended( false ), _simpleMatchLength( 0 ), _compiled( sizeof ( regex_t ) ),
 	_patternInput(), _patternReal(), _lastError( 0 ), _varTmpBuffer() {
 	M_PROLOG
+	if ( ! pattern_.is_empty() ) {
+		if ( parse_re( pattern_ ) )
+			throw HPatternException( _varTmpBuffer );
+	}
 	return;
 	M_EPILOG
 }
 
 HPattern::~HPattern( void ) {
 	M_PROLOG
-	regfree( _compiled.get<regex_t>() );
+	if ( _initialized )
+		::regfree( _compiled.get<regex_t>() );
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -113,7 +118,7 @@ int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags )
 			_varTmpBuffer.format( "bad search option '%c'", pattern[ ctr ] );
 			return ( err );
 		}
-		ctr ++;
+		++ ctr;
 	}
 	if ( pattern[ ctr ] == '/' )
 		ctr ++;
@@ -143,17 +148,17 @@ int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags )
 		err = -1;
 		_varTmpBuffer = _( "empty pattern" );
 	}
-	_initialized = ! err;
-	if ( _initialized && _extended )
+	if ( ( ! err ) && _extended )
 		err = parse_re( _patternReal.raw() );
 	return ( err );
 	M_EPILOG
 }
 
-int HPattern::parse_re( char const* const pattern_ ) {
+int HPattern::parse_re( HString const& pattern_ ) {
 	M_PROLOG
-	::regfree( _compiled.get<regex_t>() );
-	if ( ( _lastError = ::regcomp( _compiled.get<regex_t>(), pattern_,
+	if ( _initialized )
+		::regfree( _compiled.get<regex_t>() );
+	if ( ( _lastError = ::regcomp( _compiled.get<regex_t>(), pattern_.raw(),
 					_ignoreCase ? REG_ICASE : 0 ) ) ) {
 		prepare_error_message( pattern_ );
 		_initialized = false;
@@ -244,7 +249,7 @@ void HPattern::prepare_error_message( HString const& string_ ) const {
 	M_EPILOG
 }
 
-HPattern::HMatchIterator HPattern::find( char const* str_ ) const {
+HPattern::HMatchIterator HPattern::find( char const* const str_ ) const {
 	M_ASSERT( str_ );
 	int long len = 0;
 	char const* start = matches( str_, &len );
