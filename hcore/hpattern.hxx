@@ -52,17 +52,19 @@ public:
 	typedef HArray<flag_desc_t> pluggable_flags_t;
 	typedef HPattern this_type;
 private:
-	bool		_initialized;				/*!< is pattern initialized */
-	bool		_ignoreCaseDefault;	/*!< default value for ignore case switch */
-	bool		_ignoreCase;				/*!< self explanary */
-	bool		_extended;					/*!< simple strstr or extended RE */
-	int			_simpleMatchLength;	/*!< length of simple strstr pattern */
-	HChunk	_compiled;					/*!< compiled regular expression for
-																	 search patterns */
-	HString	_patternInput;			/*!< current search pattern */
-	HString	_patternReal;				/*!< pattern with stripped switches */
+	bool		_initialized;          /*!< is pattern initialized */
+	bool		_ignoreCaseDefault;    /*!< default value for ignore case switch */
+	bool		_ignoreCase;           /*!< self explanary */
+	bool		_extended;             /*!< simple strstr or extended RE */
+	int			_simpleMatchLength;    /*!< length of simple strstr pattern */
+	HChunk	_compiled;             /*!< compiled regular expression for
+																      search patterns */
+	HString	_patternInput;         /*!< current search pattern */
+	HString	_patternReal;          /*!< pattern with stripped switches */
 	mutable int _lastError;
-	mutable HString _varTmpBuffer;	/*!< error message of last operation */
+	mutable HChunk _errorBuffer;   /*!< buffer for error message */
+	mutable HString _errorCause;   /*!< cause of last error */
+	mutable HString _errorMessage; /*!< error message of last operation */
 public:
 	/*! \brief Construct pattern with regex rule.
 	 *
@@ -87,9 +89,10 @@ public:
 	HMatchIterator find( char const* const ) const;
 	HMatchIterator end( void ) const;
 private:
+	char const* error_message( int = 0 ) const;
+	void error_clear( void ) const;
 	char const* matches( char const* const,
 			int long* const = NULL /* match length */ ) const;
-	void prepare_error_message( HString const& ) const;
 	bool set_switch( char const, pluggable_flags_t* );
 	void save_state( void*, pluggable_flags_t* );
 	void restore_state( void*, pluggable_flags_t* );
