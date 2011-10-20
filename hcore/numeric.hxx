@@ -83,6 +83,8 @@ template<typename T>
 struct is_signed {
 	static bool const value = static_cast<T>( 0 ) > static_cast<T>( ~0 );
 };
+template<typename T>
+bool const is_signed<T>::value;
 
 /*! \brief Get maximum positive number for a given type.
  *
