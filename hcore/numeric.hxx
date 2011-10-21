@@ -145,7 +145,7 @@ struct to_bool {
 	static bool const value = integer ? true : false;
 };
 
-/*! \brief Staticaly calculate maximul of a set.
+/*! \brief Staticaly determine maximum of a set.
  *
  * \tparam a0, a1, ..., a9 - list of integers to find maximum.
  * \retval value - maximum integer from given set.
@@ -183,6 +183,59 @@ struct max {
 	static int long const b18 = b17 > a19 ? b17 : a19;
 	static int long const value = b18 > a20 ? b18 : a20;
 };
+template<int long a0, int long a1, int long a2, int long a3,
+	int long a4, int long a5, int long a6, int long a7,
+	int long a8, int long a9, int long a10, int long a11,
+	int long a12, int long a13, int long a14, int long a15,
+	int long a16, int long a17, int long a18, int long a19,
+	int long a20>
+int long const max<a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20>::value;
+
+/*! \brief Staticaly determine mimimum of a set.
+ *
+ * \tparam a0, a1, ..., a9 - list of integers to find minimum.
+ * \retval value - minimum integer from given set.
+ */
+template<int long a0, int long a1,
+	int long a2 = max_signed<int long>::value, int long a3 = max_signed<int long>::value,
+	int long a4 = max_signed<int long>::value, int long a5 = max_signed<int long>::value,
+	int long a6 = max_signed<int long>::value, int long a7 = max_signed<int long>::value,
+	int long a8 = max_signed<int long>::value, int long a9 = max_signed<int long>::value,
+	int long a10 = max_signed<int long>::value, int long a11 = max_signed<int long>::value,
+	int long a12 = max_signed<int long>::value, int long a13 = max_signed<int long>::value,
+	int long a14 = max_signed<int long>::value, int long a15 = max_signed<int long>::value,
+	int long a16 = max_signed<int long>::value, int long a17 = max_signed<int long>::value,
+	int long a18 = max_signed<int long>::value, int long a19 = max_signed<int long>::value,
+	int long a20 = max_signed<int long>::value>
+struct min {
+	static int long const b0 = a0 < a1 ? a0 : a1;
+	static int long const b1 = b0 < a2 ? b0 : a2;
+	static int long const b2 = b1 < a3 ? b1 : a3;
+	static int long const b3 = b2 < a4 ? b2 : a4;
+	static int long const b4 = b3 < a5 ? b3 : a5;
+	static int long const b5 = b4 < a6 ? b4 : a6;
+	static int long const b6 = b5 < a7 ? b5 : a7;
+	static int long const b7 = b6 < a8 ? b6 : a8;
+	static int long const b8 = b7 < a9 ? b7 : a9;
+	static int long const b9 = b8 < a10 ? b8 : a10;
+	static int long const b10 = b9 < a11 ? b9 : a11;
+	static int long const b11 = b10 < a12 ? b10 : a12;
+	static int long const b12 = b11 < a13 ? b11 : a13;
+	static int long const b13 = b12 < a14 ? b12 : a14;
+	static int long const b14 = b13 < a15 ? b13 : a15;
+	static int long const b15 = b14 < a16 ? b14 : a16;
+	static int long const b16 = b15 < a17 ? b15 : a17;
+	static int long const b17 = b16 < a18 ? b16 : a18;
+	static int long const b18 = b17 < a19 ? b17 : a19;
+	static int long const value = b18 < a20 ? b18 : a20;
+};
+template<int long a0, int long a1, int long a2, int long a3,
+	int long a4, int long a5, int long a6, int long a7,
+	int long a8, int long a9, int long a10, int long a11,
+	int long a12, int long a13, int long a14, int long a15,
+	int long a16, int long a17, int long a18, int long a19,
+	int long a20>
+int long const min<a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20>::value;
 
 /*! \brief Simulate binary literal.
  *
