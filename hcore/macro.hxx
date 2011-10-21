@@ -180,7 +180,7 @@ Copyright:
 class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LINE__ )( void ) {} ~M_CONCAT( AtEndOfScope, __LINE__ )( void ) { do { code } while ( 0 ); } } M_CONCAT( atEndOfScope, __LINE__ )
 /*! \brief Convinience macro to obtain number of elements of declared array.
  */
-#define countof( array ) static_cast<int>( sizeof ( yaal::YaalArrayElementCountHelper( ( array ) ) ) )
+#define countof( array ) ( meta::integer_cast<int, sizeof ( yaal::YaalArrayElementCountHelper( ( array ) ) )>::value )
 
 #ifdef __MSVCXX__
 #define M_EXPORT_SYMBOL __declspec( dllexport )

@@ -299,7 +299,7 @@ struct power<base,0,helper> {
 template<bool const condition, int long value_for_true, int long value_for_false>
 struct ternary;
 
-/* \cond */
+/*! \cond */
 template<int long value_for_true, int long value_for_false>
 struct ternary<true, value_for_true, value_for_false> {
 	static int long const value = value_for_true;
@@ -309,7 +309,7 @@ template<int long value_for_true, int long value_for_false>
 struct ternary<false, value_for_true, value_for_false> {
 	static int long const value = value_for_false;
 };
-/* \endcond */
+/*! \endcond */
 
 /*! \brief Check if one value is greater than another.
  *
@@ -331,6 +331,38 @@ struct greater {
 template<int long const val1, int long const val2>
 struct less {
 	static bool const value = val1 < val2;
+};
+
+/*! \brief Helper for reporting range errors in (unsigned_)integer_cast<>.
+ */
+template<typename T, T val, bool vaild>
+struct out_of_range;
+
+/*! \cond */
+template<typename T, T val>
+struct out_of_range<T, val, true> {
+	static T const value = val;
+};
+
+template<typename T, T val>
+struct out_of_range<T, val, false> {
+};
+/*! \endcond */
+
+/*! \brief Safely cast compile time constant integers.
+ */
+template<typename T, int long val>
+struct integer_cast {
+	STATIC_ASSERT( meta::is_signed<T>::value );
+	static T const value = out_of_range<T, static_cast<T>( val ), static_cast<T>( val ) == val>::value;
+};
+
+/*! \brief Safely cast compile time constant unsigned integers.
+ */
+template<typename T, int long unsigned val>
+struct unsigned_integer_cast {
+	STATIC_ASSERT( meta::boolean_not<meta::is_signed< T >::value>::value );
+	static T const value = out_of_range<T, static_cast<T>( val ), static_cast<T>( val ) == val>::value;
 };
 
 }
