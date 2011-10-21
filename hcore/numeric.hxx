@@ -343,6 +343,8 @@ template<typename T, T val>
 struct out_of_range<T, val, true> {
 	static T const value = val;
 };
+template<typename T, T val>
+T const out_of_range<T, val, true>::value;
 
 template<typename T, T val>
 struct out_of_range<T, val, false> {
@@ -356,6 +358,8 @@ struct integer_cast {
 	STATIC_ASSERT( meta::is_signed<T>::value );
 	static T const value = out_of_range<T, static_cast<T>( val ), static_cast<T>( val ) == val>::value;
 };
+template<typename T, int long val>
+T const integer_cast<T, val>::value;
 
 /*! \brief Safely cast compile time constant unsigned integers.
  */
@@ -364,6 +368,8 @@ struct unsigned_integer_cast {
 	STATIC_ASSERT( meta::boolean_not<meta::is_signed< T >::value>::value );
 	static T const value = out_of_range<T, static_cast<T>( val ), static_cast<T>( val ) == val>::value;
 };
+template<typename T, int long unsigned val>
+T const unsigned_integer_cast<T, val>::value;
 
 }
 
