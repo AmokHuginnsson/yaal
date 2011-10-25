@@ -405,6 +405,11 @@ public:
 	 * \return Self.
 	 */
 	HString& append( char const* const, int long len_ );
+	/*! \brief Append single character at end of this string.
+	 *
+	 * \param character_ - character to be appended.
+	 */
+	void push_back( char character_ );
 private:
 	void substr( HString&, int long, int long ) const;
 };

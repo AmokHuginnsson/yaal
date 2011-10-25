@@ -1109,6 +1109,13 @@ HString& HString::append( char const* const buf_, int long len_ ) {
 	M_EPILOG
 }
 
+void HString::push_back( char character_ ) {
+	M_PROLOG
+	append( 1, character_ );
+	return;
+	M_EPILOG
+}
+
 HString::HCharRef& HString::HCharRef::operator = ( char ch_ ) {
 	M_PROLOG
 	_string.set_at( _index, ch_ );
