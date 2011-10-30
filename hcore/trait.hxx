@@ -1459,10 +1459,94 @@ struct functional_argument_type {
 	static true_type has_second_argument_type( typename strip_reference<typename real_class::second_argument_type>::type* );
 	template<typename real_class>
 	static false_type has_second_argument_type( ... );
+	template<typename real_class>
+	static true_type has_third_argument_type( typename strip_reference<typename real_class::third_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_third_argument_type( ... );
+	template<typename real_class>
+	static true_type has_fourth_argument_type( typename strip_reference<typename real_class::fourth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_fourth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_fifth_argument_type( typename strip_reference<typename real_class::fifth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_fifth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_sixth_argument_type( typename strip_reference<typename real_class::sixth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_sixth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_seventh_argument_type( typename strip_reference<typename real_class::seventh_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_seventh_argument_type( ... );
+	template<typename real_class>
+	static true_type has_eighth_argument_type( typename strip_reference<typename real_class::eighth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_eighth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_ninth_argument_type( typename strip_reference<typename real_class::ninth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_ninth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_tenth_argument_type( typename strip_reference<typename real_class::tenth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_tenth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_eleventh_argument_type( typename strip_reference<typename real_class::eleventh_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_eleventh_argument_type( ... );
 
-	static bool const a0 = ( sizeof ( has_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
-	static bool const a1 = ( sizeof ( has_first_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
-	static bool const a2 = ( sizeof ( has_second_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
+	template<typename U, int const no>
+	struct idx;
+
+	template<typename U>
+	struct idx<U, 0> {
+		static bool const value = ( sizeof ( has_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
+	template<typename U>
+	struct idx<U, 1> {
+		static bool const value = ( sizeof ( has_first_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
+	template<typename U>
+	struct idx<U, 2> {
+		static bool const value = ( sizeof ( has_second_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
+	template<typename U>
+	struct idx<U, 3> {
+		static bool const value = ( sizeof ( has_third_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
+	template<typename U>
+	struct idx<U, 4> {
+		static bool const value = ( sizeof ( has_fourth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
+	template<typename U>
+	struct idx<U, 5> {
+		static bool const value = ( sizeof ( has_fifth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
+	template<typename U>
+	struct idx<U, 6> {
+		static bool const value = ( sizeof ( has_sixth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
+	template<typename U>
+	struct idx<U, 7> {
+		static bool const value = ( sizeof ( has_seventh_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
+	template<typename U>
+	struct idx<U, 8> {
+		static bool const value = ( sizeof ( has_eighth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
+	template<typename U>
+	struct idx<U, 9> {
+		static bool const value = ( sizeof ( has_ninth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
+	template<typename U>
+	struct idx<U, 10> {
+		static bool const value = ( sizeof ( has_tenth_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
+	template<typename U>
+	struct idx<U, 11> {
+		static bool const value = ( sizeof ( has_eleventh_argument_type<U>( 0 ) ) == sizeof ( true_type ) );
+	};
 
 	template<typename U, int const no>
 	struct get
@@ -1477,11 +1561,37 @@ struct functional_argument_type {
 	template<typename U>
 	struct get<U, 2>
 		{ typedef typename U::second_argument_type type; };
+	template<typename U>
+	struct get<U, 3>
+		{ typedef typename U::third_argument_type type; };
+	template<typename U>
+	struct get<U, 4>
+		{ typedef typename U::fourth_argument_type type; };
+	template<typename U>
+	struct get<U, 5>
+		{ typedef typename U::fifth_argument_type type; };
+	template<typename U>
+	struct get<U, 6>
+		{ typedef typename U::sixth_argument_type type; };
+	template<typename U>
+	struct get<U, 7>
+		{ typedef typename U::seventh_argument_type type; };
+	template<typename U>
+	struct get<U, 8>
+		{ typedef typename U::eighth_argument_type type; };
+	template<typename U>
+	struct get<U, 9>
+		{ typedef typename U::ninth_argument_type type; };
+	template<typename U>
+	struct get<U, 10>
+		{ typedef typename U::tenth_argument_type type; };
+	template<typename U>
+	struct get<U, 11>
+		{ typedef typename U::eleventh_argument_type type; };
 
 	template<int const no> struct index {
-		static int const idx = meta::ternary<( no == 0 ), meta::ternary<a0, 0, meta::ternary<a1, 1, -1>::value>::value,
-														meta::ternary<( no == 1 ) && a2, 2,
-														-1>::value>::value;
+		static int const idx = meta::ternary<( no == 0 ), meta::ternary<idx<T, 0>::value, 0, meta::ternary<idx<T, 1>::value, 1, -1>::value>::value,
+														meta::ternary<idx<T, no + 1>::value, no + 1, -1>::value>::value;
 		typedef typename get<T, idx>::type type;
 	};
 };
@@ -2097,19 +2207,58 @@ struct functional_argument_count {
 	static true_type has_second_argument_type( typename strip_reference<typename real_class::second_argument_type>::type* );
 	template<typename real_class>
 	static false_type has_second_argument_type( ... );
+	template<typename real_class>
+	static true_type has_third_argument_type( typename strip_reference<typename real_class::third_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_third_argument_type( ... );
+	template<typename real_class>
+	static true_type has_fourth_argument_type( typename strip_reference<typename real_class::fourth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_fourth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_fifth_argument_type( typename strip_reference<typename real_class::fifth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_fifth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_sixth_argument_type( typename strip_reference<typename real_class::sixth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_sixth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_seventh_argument_type( typename strip_reference<typename real_class::seventh_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_seventh_argument_type( ... );
+	template<typename real_class>
+	static true_type has_eighth_argument_type( typename strip_reference<typename real_class::eighth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_eighth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_ninth_argument_type( typename strip_reference<typename real_class::ninth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_ninth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_tenth_argument_type( typename strip_reference<typename real_class::tenth_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_tenth_argument_type( ... );
+	template<typename real_class>
+	static true_type has_eleventh_argument_type( typename strip_reference<typename real_class::eleventh_argument_type>::type* );
+	template<typename real_class>
+	static false_type has_eleventh_argument_type( ... );
 
-	static bool const a0 = ( sizeof ( has_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
-	static bool const a1 = ( sizeof ( has_first_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
-	static bool const a2 = ( sizeof ( has_second_argument_type<T>( 0 ) ) == sizeof ( true_type ) );
+	static int const a0 = ( sizeof ( has_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static int const a1 = ( sizeof ( has_first_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static int const a2 = ( sizeof ( has_second_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static int const a3 = ( sizeof ( has_third_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static int const a4 = ( sizeof ( has_fourth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static int const a5 = ( sizeof ( has_fifth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static int const a6 = ( sizeof ( has_sixth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static int const a7 = ( sizeof ( has_seventh_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static int const a8 = ( sizeof ( has_eighth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static int const a9 = ( sizeof ( has_ninth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static int const a10 = ( sizeof ( has_tenth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static int const a11 = ( sizeof ( has_eleventh_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
 
-	static int const value = meta::ternary<a0 || a1 || a2,
-		meta::ternary<a0,
-			1,
-			meta::ternary<a1 || a2,
-				2,
-				-1>::value
-			>::value,
-		-1>::value;
+	static int const arg_count = a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + meta::ternary<a1 != 0, 0, a0>::value;
+	static int const value = meta::ternary<arg_count != 0, arg_count, -1>::value;
 };
 
 template<typename T>
