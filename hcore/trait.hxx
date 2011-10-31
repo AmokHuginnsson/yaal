@@ -2244,18 +2244,72 @@ struct functional_argument_count {
 	template<typename real_class>
 	static false_type has_eleventh_argument_type( ... );
 
-	static int const a0 = ( sizeof ( has_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
-	static int const a1 = ( sizeof ( has_first_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
-	static int const a2 = ( sizeof ( has_second_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
-	static int const a3 = ( sizeof ( has_third_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
-	static int const a4 = ( sizeof ( has_fourth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
-	static int const a5 = ( sizeof ( has_fifth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
-	static int const a6 = ( sizeof ( has_sixth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
-	static int const a7 = ( sizeof ( has_seventh_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
-	static int const a8 = ( sizeof ( has_eighth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
-	static int const a9 = ( sizeof ( has_ninth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
-	static int const a10 = ( sizeof ( has_tenth_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
-	static int const a11 = ( sizeof ( has_eleventh_argument_type<T>( 0 ) ) == sizeof ( true_type ) ) ? 1 : 0;
+	static bool const ta0 = sizeof ( has_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta1 = sizeof ( has_first_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta2 = sizeof ( has_second_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta3 = sizeof ( has_third_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta4 = sizeof ( has_fourth_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta5 = sizeof ( has_fifth_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta6 = sizeof ( has_sixth_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta7 = sizeof ( has_seventh_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta8 = sizeof ( has_eighth_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta9 = sizeof ( has_ninth_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta10 = sizeof ( has_tenth_argument_type<T>( 0 ) ) == sizeof ( true_type );
+	static bool const ta11 = sizeof ( has_eleventh_argument_type<T>( 0 ) ) == sizeof ( true_type );
+
+	template<typename U, int const no, bool const exists>
+	struct get
+		{ typedef no_type type; };
+
+	template<typename U>
+	struct get<U, 0, true>
+		{ typedef typename U::argument_type type; };
+	template<typename U>
+	struct get<U, 1, true>
+		{ typedef typename U::first_argument_type type; };
+	template<typename U>
+	struct get<U, 2, true>
+		{ typedef typename U::second_argument_type type; };
+	template<typename U>
+	struct get<U, 3, true>
+		{ typedef typename U::third_argument_type type; };
+	template<typename U>
+	struct get<U, 4, true>
+		{ typedef typename U::fourth_argument_type type; };
+	template<typename U>
+	struct get<U, 5, true>
+		{ typedef typename U::fifth_argument_type type; };
+	template<typename U>
+	struct get<U, 6, true>
+		{ typedef typename U::sixth_argument_type type; };
+	template<typename U>
+	struct get<U, 7, true>
+		{ typedef typename U::seventh_argument_type type; };
+	template<typename U>
+	struct get<U, 8, true>
+		{ typedef typename U::eighth_argument_type type; };
+	template<typename U>
+	struct get<U, 9, true>
+		{ typedef typename U::ninth_argument_type type; };
+	template<typename U>
+	struct get<U, 10, true>
+		{ typedef typename U::tenth_argument_type type; };
+	template<typename U>
+	struct get<U, 11, true>
+		{ typedef typename U::eleventh_argument_type type; };
+
+	static int const a0 = meta::ternary<meta::boolean_not<same_type<typename get<T, 0, ta0>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a1 = meta::ternary<meta::boolean_not<same_type<typename get<T, 1, ta1>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a2 = meta::ternary<meta::boolean_not<same_type<typename get<T, 2, ta2>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a3 = meta::ternary<meta::boolean_not<same_type<typename get<T, 3, ta3>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a4 = meta::ternary<meta::boolean_not<same_type<typename get<T, 4, ta4>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a5 = meta::ternary<meta::boolean_not<same_type<typename get<T, 5, ta5>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a6 = meta::ternary<meta::boolean_not<same_type<typename get<T, 6, ta6>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a7 = meta::ternary<meta::boolean_not<same_type<typename get<T, 7, ta7>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a8 = meta::ternary<meta::boolean_not<same_type<typename get<T, 8, ta8>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a9 = meta::ternary<meta::boolean_not<same_type<typename get<T, 9, ta9>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a10 =  meta::ternary<meta::boolean_not<same_type<typename get<T, 10, ta10>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a11 =  meta::ternary<meta::boolean_not<same_type<typename get<T, 11, ta11>::type, no_type>::value>::value, 1, 0>::value;
 
 	static int const arg_count = a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + meta::ternary<a1 != 0, 0, a0>::value;
 	static int const value = meta::ternary<arg_count != 0, arg_count, -1>::value;
