@@ -48,9 +48,9 @@ HRecordSet::HRecordSet( database_ptr_t dataBase_,
 	_result( reuslt_ ) {
 	M_PROLOG
 	if ( get_size() < 0 )
-		log( LOG_TYPE::ERROR ) << "SQL error (query): " << (_connector->dbrs_error)( _dataBase->_coreData, _result ) << endl;
+		log( LOG_TYPE::ERROR ) << "SQL error (query): " << (_connector->dbrs_error)( _dataBase->_dbLink, _result ) << endl;
 	if ( get_field_count() < 0 )
-		log( LOG_TYPE::ERROR ) << "SQL error (fiels count): " << (_connector->dbrs_error)( _dataBase->_coreData, _result ) << endl;
+		log( LOG_TYPE::ERROR ) << "SQL error (fiels count): " << (_connector->dbrs_error)( _dataBase->_dbLink, _result ) << endl;
 	return;
 	M_EPILOG
 }
@@ -79,7 +79,7 @@ int HRecordSet::get_field_count( void ) const {
 }
 
 int long HRecordSet::get_size( void ) const {
-	return ( (_connector->dbrs_records_count)( _dataBase->_coreData, _result ) );
+	return ( (_connector->dbrs_records_count)( _dataBase->_dbLink, _result ) );
 }
 
 char const* HRecordSet::get_column_name( int column_ ) const {
@@ -88,19 +88,19 @@ char const* HRecordSet::get_column_name( int column_ ) const {
 
 int long HRecordSet::get_insert_id( void ) const {
 	M_PROLOG
-	return ( (_connector->dbrs_id)( _dataBase->_coreData, _result ) );
+	return ( (_connector->dbrs_id)( _dataBase->_dbLink, _result ) );
 	M_EPILOG
 }
 
 char const* HRecordSet::get_error( void ) const {
 	M_PROLOG
-	return ( (_connector->dbrs_error)( _dataBase->_coreData, _result ) );
+	return ( (_connector->dbrs_error)( _dataBase->_dbLink, _result ) );
 	M_EPILOG
 }
 
 int HRecordSet::get_errno( void ) const {
 	M_PROLOG
-	return ( (_connector->dbrs_errno)( _dataBase->_coreData, _result ) );
+	return ( (_connector->dbrs_errno)( _dataBase->_dbLink, _result ) );
 	M_EPILOG
 }
 

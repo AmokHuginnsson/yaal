@@ -39,50 +39,55 @@ Copyright:
 #endif /* not HAVE_LIBPQ_FE_H */
 
 #include "hcore/memory.hxx"
+#include "dbwrapper/db_driver.hxx"
+
+using namespace yaal;
+using namespace yaal::hcore;
+using namespace yaal::dbwrapper;
 
 extern "C" {
 
-namespace {
-
-PGconn* _brokenDB_ = NULL;
-
-}
-
-M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
+M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* dataBase_,
 		char const* login_, char const* password_ ) {
-	PGconn * connection = NULL;
-	if ( _brokenDB_ ) {
-		PQfinish( _brokenDB_ );
-		_brokenDB_ = NULL;
-	}
-	connection = PQsetdbLogin( NULL /* host */,
+	PGconn* connection( NULL );
+	dbLink_._conn = connection = PQsetdbLogin( NULL /* host */,
 			NULL /* port */, NULL /* options */,
 			NULL /* debugging tty */,
 			dataBase_, login_, password_ );
-	if ( PQstatus( connection ) != CONNECTION_OK )
-		_brokenDB_ = connection, connection = NULL;
-	return ( connection );
+	if ( PQstatus( connection ) == CONNECTION_OK )
+		dbLink_._valid = true;
+	return ( ! dbLink_._valid );
 }
 
-M_EXPORT_SYMBOL void db_disconnect( void* data_ ) {
-	if ( data_ )
-		PQfinish( static_cast<PGconn*>( data_ ) );
+M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
+	if ( dbLink_._conn ) {
+		PQfinish( static_cast<PGconn*>( dbLink_._conn ) );
+		dbLink_.clear();
+	}
 	return;
 }
 
-M_EXPORT_SYMBOL int dbrs_errno( void*, void* result_ ) {
-	ExecStatusType status = PQresultStatus( static_cast<PGresult*>( result_ ) );
-	return ( ! ( ( status == PGRES_COMMAND_OK ) || ( status == PGRES_TUPLES_OK ) ) );
+M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
+	M_ASSERT( dbLink_._conn );
+	int err( 0 );
+	if ( result_ ) {
+		ExecStatusType status = PQresultStatus( static_cast<PGresult*>( result_ ) );
+		err = ( ( status == PGRES_COMMAND_OK ) || ( status == PGRES_TUPLES_OK ) ) ? 0 : status;
+	} else {
+		ConnStatusType connStatus( PQstatus( static_cast<PGconn*>( dbLink_._conn ) ) );
+		err = ( connStatus == CONNECTION_OK ) ? 0 : connStatus;
+	}
+	return ( err );
 }
 
-M_EXPORT_SYMBOL char const* dbrs_error( void* db_, void* result_ ) {
-	if ( ! db_ )
-		db_ = _brokenDB_;
-	return ( result_ ? ::PQresultErrorMessage( static_cast<PGresult*>( result_ ) ) : ::PQerrorMessage( static_cast<PGconn*>( db_ ) ) );
+M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) {
+	M_ASSERT( dbLink_._conn );
+	return ( result_ ? ::PQresultErrorMessage( static_cast<PGresult*>( result_ ) ) : ::PQerrorMessage( static_cast<PGconn*>( dbLink_._conn ) ) );
 }
 
-M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ ) {
-	return ( PQexec( static_cast<PGconn*>( data_ ), query_ ) );
+M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
+	return ( PQexec( static_cast<PGconn*>( dbLink_._conn ), query_ ) );
 }
 
 M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
@@ -98,7 +103,7 @@ M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	return ( ::PQnfields( static_cast<PGresult*>( data_ ) ) );
 }
 
-M_EXPORT_SYMBOL int long dbrs_records_count( void*, void* dataR_ ) {
+M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 	char* tmp = ::PQcmdTuples( static_cast<PGresult*>( dataR_ ) );
 	if ( tmp && tmp [ 0 ] )
 		return ( ::strtol( tmp, NULL, 10 ) );
@@ -106,8 +111,9 @@ M_EXPORT_SYMBOL int long dbrs_records_count( void*, void* dataR_ ) {
 		return ( ::PQntuples( static_cast<PGresult*>( dataR_ ) ) );
 }
 
-M_EXPORT_SYMBOL int long dbrs_id( void* db_, void* ) {
-	PGresult* result( PQexec( static_cast<PGconn*>( db_ ), "SELECT lastval();" ) );
+M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
+	PGresult* result( PQexec( static_cast<PGconn*>( dbLink_._conn ), "SELECT lastval();" ) );
 	int long id( -1 );
 	if ( result ) {
 		char const* value( PQgetvalue( result, 0, 0 ) );

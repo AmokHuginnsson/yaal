@@ -70,35 +70,35 @@ drivers_t _dBDrivers_;
 
 /* Null driver */
 
-void* null_db_connect( char const*, char const*, char const* ) {
+bool null_db_connect( ODBLink&, char const*, char const*, char const* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_connect" << eend << endl;
-	return ( NULL );
+	return ( true );
 	M_EPILOG
 }
 
-void null_db_disconnect( void* ) {
+void null_db_disconnect( ODBLink& ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "(db_disconnect)" << eend << endl;
 	return;
 	M_EPILOG
 }
 
-int null_dbrs_errno( void*, void* ) {
+int null_dbrs_errno( ODBLink const&, void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_errno" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 }
 
-char const* null_dbrs_error( void*, void* ) {
+char const* null_dbrs_error( ODBLink const&, void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_error" << eend << endl;
 	return ( _( "null database driver loaded" ) );
 	M_EPILOG
 }
 
-void* null_db_query( void*, char const* ) {
+void* null_db_query( ODBLink&, char const* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_query" << eend << endl;
 	return ( NULL );
@@ -126,14 +126,14 @@ int null_rs_fields_count( void* ) {
 	M_EPILOG
 }
 
-int long null_dbrs_records_count( void*, void* ) {
+int long null_dbrs_records_count( ODBLink&, void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "dbrs_records_count" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 }
 
-int long null_dbrs_id( void*, void* ) {
+int long null_dbrs_id( ODBLink&, void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "dbrs_id" << eend << endl;
 	return ( 0 );

@@ -41,7 +41,7 @@ namespace yaal {
 namespace dbwrapper {
 
 HDataBase::HDataBase( void ) : HPointerFromThisInterface<HDataBase>(),
-	_connector( NULL ), _coreData( NULL ) {
+	_connector( NULL ), _dbLink() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -49,9 +49,9 @@ HDataBase::HDataBase( void ) : HPointerFromThisInterface<HDataBase>(),
 
 HDataBase::~HDataBase( void ) {
 	M_PROLOG
-	if ( _coreData )
-		(_connector->db_disconnect)( _coreData );
-	_coreData = NULL;
+	if ( _dbLink._conn )
+		(_connector->db_disconnect)( _dbLink );
+	_dbLink.clear();
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -59,36 +59,35 @@ HDataBase::~HDataBase( void ) {
 void HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HString const& login_,
 		yaal::hcore::HString const& password_ ) {
 	M_PROLOG
-	_coreData = (_connector->db_connect)( dataBase_.raw(), login_.raw(), password_.raw() );
-	if ( ! _coreData )
-		M_THROW( (_connector->dbrs_error)( _coreData, NULL ),
-				(_connector->dbrs_errno)( _coreData, NULL ) );
+	if ( (_connector->db_connect)( _dbLink, dataBase_.raw(), login_.raw(), password_.raw() ) )
+		M_THROW( (_connector->dbrs_error)( _dbLink, NULL ),
+				(_connector->dbrs_errno)( _dbLink, NULL ) );
 	return;
 	M_EPILOG
 }
 
 HRecordSet::ptr_t HDataBase::query( HString const& query_ ) {
 	M_PROLOG
-	if ( ! _coreData )
+	if ( ! _dbLink._valid )
 		M_THROW( "not connected to database", errno );
 	if ( HLog::_logMask & LOG_TYPE::SQL )
 		log << "SQL: " << query_ << endl;
-	void* result = (_connector->db_query)( _coreData, query_.raw() );
-	if ( (_connector->dbrs_errno)( _coreData, result ) )
-		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _coreData, result ) );
+	void* result = (_connector->db_query)( _dbLink, query_.raw() );
+	if ( (_connector->dbrs_errno)( _dbLink, result ) )
+		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dbLink, result ) );
 	return ( make_pointer<HRecordSet>( get_pointer(), _connector, result ) );
 	M_EPILOG
 }
 
 char const* HDataBase::get_error( void ) const {
 	M_PROLOG
-	return ( (_connector->dbrs_error)( _coreData, NULL ) );
+	return ( (_connector->dbrs_error)( _dbLink, NULL ) );
 	M_EPILOG
 }
 
 int HDataBase::get_errno( void ) const {
 	M_PROLOG
-	return ( (_connector->dbrs_errno)( _coreData, NULL ) );
+	return ( (_connector->dbrs_errno)( _dbLink, NULL ) );
 	M_EPILOG
 }
 
@@ -98,10 +97,6 @@ HDataBase::ptr_t HDataBase::get_connector( ODBConnector::DRIVER::enum_t driverId
 	p->_connector = load_driver( driverId_ );
 	return ( p );
 	M_EPILOG
-}
-
-ODBConnector const* HDataBase::connector( void ) const {
-	return ( _connector );
 }
 
 }

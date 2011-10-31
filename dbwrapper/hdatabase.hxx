@@ -28,7 +28,7 @@ Copyright:
 #define YAAL_DBWRAPPER_HDATABASE_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
-#include "dbwrapper/db_driver_loader.hxx"
+#include "dbwrapper/db_driver.hxx"
 #include "dbwrapper/hrecordset.hxx"
 
 namespace yaal {
@@ -41,7 +41,7 @@ class HDataBase : public yaal::hcore::HPointerFromThisInterface<HDataBase> {
 	typedef HDataBase this_type;
 private:
 	ODBConnector const* _connector;
-	void* _coreData;	/*!< very internal for this class used only in base class */
+	ODBLink _dbLink;	/*!< very internal for this class used only in base class */
 public:
 	typedef yaal::hcore::HPointer<HDataBase> ptr_t; /*!< Smart pointer type for this class. */
 	/*! \brief Connect to database.
@@ -73,7 +73,6 @@ public:
 	 */
 	int get_errno( void ) const;
 	static ptr_t get_connector( ODBConnector::DRIVER::enum_t = ODBConnector::DRIVER::DEFAULT );
-	ODBConnector const* connector( void ) const;
 private:
 	HDataBase( void );
 	virtual ~HDataBase( void );

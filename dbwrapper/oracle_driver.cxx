@@ -40,9 +40,11 @@ Copyright:
 #include "hcore/hprogramoptionshandler.hxx"
 #include "hcore/hcore.hxx"
 #include "hcore/hlog.hxx"
+#include "dbwrapper/db_driver.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::dbwrapper;
 
 extern "C" {
 
@@ -69,84 +71,61 @@ typedef struct {
 	OAllocator* _allocator;
 } OQuery;
 
-namespace {
-
-OOracle* _brokenDB_ = NULL;
-
-}
-
-void yaal_oracle_db_disconnect( void* );
+void yaal_oracle_db_disconnect( ODBLink& );
 void yaal_oracle_rs_unquery( void* );
 
-M_EXPORT_SYMBOL void* db_connect( char const* /* In Oracle user name is name of schema. */,
+M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* /* In Oracle user name is name of schema. */,
 		char const* login_, char const* password_ ) {
 	OOracle* oracle( NULL );
-	if ( _brokenDB_ ) {
-		yaal_oracle_db_disconnect( _brokenDB_ );
-		_brokenDB_ = NULL;
-	}
-	oracle = memory::calloc<OOracle>( 1 );
-	if ( ( oracle->_status = OCIInitialize( OCI_DEFAULT, NULL, NULL,
-					NULL, NULL ) ) != OCI_SUCCESS ) {
-		_brokenDB_ = oracle;
-		return ( NULL );
-	}
-	if ( ( oracle->_status = OCIEnvCreate( &oracle->_environment,
-				OCI_DEFAULT | OCI_THREADED, NULL, NULL, NULL, NULL, 0,
-				NULL ) ) != OCI_SUCCESS ) {
-		_brokenDB_ = oracle;
-		return ( NULL );
-	}
-	if ( ( oracle->_status = OCIHandleAlloc( oracle->_environment,
-				reinterpret_cast<void**>( &oracle->_error ),
-				OCI_HTYPE_ERROR, 0, NULL ) ) != OCI_SUCCESS ) {
-		_brokenDB_ = oracle;
-		return ( NULL );
-	}
-	if ( ( oracle->_status = OCILogon ( oracle->_environment,
-				oracle->_error, &oracle->_serviceContext,
-				reinterpret_cast<OraText const*>( login_ ),
-				static_cast<ub4>( ::strlen( login_ ) ),
-				reinterpret_cast<OraText const*>( password_ ),
-				static_cast<ub4>( ::strlen( password_ ) ),
-				reinterpret_cast<OraText const*>( _instanceName_.raw() ),
-				static_cast<ub4>( _instanceName_.get_length() ) ) ) != OCI_SUCCESS ) {
-		_brokenDB_ = oracle;
-		return ( NULL );
-	}
-	return ( oracle );
+	dbLink_._conn = oracle = memory::calloc<OOracle>( 1 );
+	do {
+		if ( ( oracle->_status = OCIInitialize( OCI_DEFAULT, NULL, NULL,
+						NULL, NULL ) ) != OCI_SUCCESS )
+			break;
+		if ( ( oracle->_status = OCIEnvCreate( &oracle->_environment,
+					OCI_DEFAULT | OCI_THREADED, NULL, NULL, NULL, NULL, 0,
+					NULL ) ) != OCI_SUCCESS )
+			break;
+		if ( ( oracle->_status = OCIHandleAlloc( oracle->_environment,
+					reinterpret_cast<void**>( &oracle->_error ),
+					OCI_HTYPE_ERROR, 0, NULL ) ) != OCI_SUCCESS )
+			break;
+		if ( ( oracle->_status = OCILogon ( oracle->_environment,
+					oracle->_error, &oracle->_serviceContext,
+					reinterpret_cast<OraText const*>( login_ ),
+					static_cast<ub4>( ::strlen( login_ ) ),
+					reinterpret_cast<OraText const*>( password_ ),
+					static_cast<ub4>( ::strlen( password_ ) ),
+					reinterpret_cast<OraText const*>( _instanceName_.raw() ),
+					static_cast<ub4>( _instanceName_.get_length() ) ) ) == OCI_SUCCESS )
+			dbLink_._valid = true;
+	} while ( false );
+	return ( ! dbLink_._valid );
 }
 
-void yaal_oracle_db_disconnect( void* data_ ) {
-	OOracle* oracle( static_cast<OOracle*>( data_ ) );
-	if ( ! oracle )
-		oracle = _brokenDB_;
-	if ( oracle ) {
-		if ( oracle->_serviceContext )
-			OCILogoff ( oracle->_serviceContext, oracle->_error );
-		oracle->_serviceContext = NULL;
-		if ( oracle->_error )
-			OCIHandleFree ( oracle->_error, OCI_HTYPE_ERROR );
-		oracle->_error = NULL;
-		if ( oracle->_environment )
-			OCIHandleFree ( oracle->_environment, OCI_HTYPE_ENV );
-		oracle->_environment = NULL;
-		memory::free( oracle );
-	}
+void yaal_oracle_db_disconnect( ODBLink& dbLink_ ) {
+	M_ASSERT( dbLink_._conn );
+	OOracle* oracle( static_cast<OOracle*>( dbLink_._conn ) );
+	if ( oracle->_serviceContext )
+		OCILogoff( oracle->_serviceContext, oracle->_error );
+	oracle->_serviceContext = NULL;
+	if ( oracle->_error )
+		OCIHandleFree( oracle->_error, OCI_HTYPE_ERROR );
+	oracle->_error = NULL;
+	if ( oracle->_environment )
+		OCIHandleFree( oracle->_environment, OCI_HTYPE_ENV );
+	oracle->_environment = NULL;
+	memory::free( oracle );
 	return;
 }
-M_EXPORT_SYMBOL void db_disconnect( void* data_ ) {
-	yaal_oracle_db_disconnect( data_ );
+M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
+	yaal_oracle_db_disconnect( dbLink_ );
 }
 
-M_EXPORT_SYMBOL int db_errno( void* data_ ) {
+M_EXPORT_SYMBOL int db_errno( ODBLink const& dbLink_ ) {
+	M_ASSERT( dbLink_._conn );
 	int error( 0 );
-	OOracle const* oracle( NULL );
-	if ( ! data_ )
-		data_ = _brokenDB_;
-	if ( ! data_ )
-		return ( 0 );
-	oracle = static_cast<OOracle const*>( data_ );
+	OOracle const* oracle( static_cast<OOracle const*>( dbLink_._conn ) );
 	if ( ( oracle->_status != OCI_SUCCESS_WITH_INFO )
 			&& ( oracle->_status != OCI_ERROR ) )
 		return ( oracle->_status );
@@ -155,15 +134,11 @@ M_EXPORT_SYMBOL int db_errno( void* data_ ) {
 	return ( error );
 }
 
-M_EXPORT_SYMBOL char const* db_error( void* data_ ) {
+M_EXPORT_SYMBOL char const* db_error( ODBLink const& dbLink_ ) {
+	M_ASSERT( dbLink_._conn );
 	sb4 code( 0 );
 	static char textBuffer[ OCI_ERROR_MAXMSG_SIZE ];
-	OOracle const* oracle( NULL );
-	if ( ! data_ )
-		data_ = _brokenDB_;
-	if ( ! data_ )
-		return ( "fatal" );
-	oracle = static_cast<OOracle const*>( data_ );
+	OOracle const* oracle( static_cast<OOracle const*>( dbLink_._conn ) );
 	switch ( oracle->_status ) {
 		case ( OCI_SUCCESS_WITH_INFO ):
 		case ( OCI_ERROR ):
@@ -189,8 +164,9 @@ M_EXPORT_SYMBOL char const* db_error( void* data_ ) {
 	return ( textBuffer );
 }
 
-void* yaal_oracle_db_query( void* data_, char const* query_ ) {
-	OOracle* oracle( static_cast<OOracle*>( data_ ) );
+void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
+	OOracle* oracle( static_cast<OOracle*>( dbLink_._conn ) );
 	OQuery* queryObj( memory::calloc<OQuery>( 1 ) );
 	HString queryStr( query_ );
 	int length = static_cast<int>( ::strlen( query_ ) );
@@ -234,8 +210,8 @@ void* yaal_oracle_db_query( void* data_, char const* query_ ) {
 	}
 	return ( queryObj );
 }
-M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ ) {
-	return ( yaal_oracle_db_query( data_, query_ ) );
+M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+	return ( yaal_oracle_db_query( dbLink_, query_ ) );
 }
 
 void yaal_oracle_rs_unquery( void* data_ ) {
@@ -307,7 +283,7 @@ M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	return ( fields );
 }
 
-M_EXPORT_SYMBOL int long dbrs_records_count( void*, void* dataR_ ) {
+M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 	int rows( 0 );
 	OQuery* query( static_cast<OQuery*>( dataR_ ) );
 	( *query->_status ) = OCIStmtFetch2( query->_statement,
@@ -330,7 +306,8 @@ M_EXPORT_SYMBOL int long dbrs_records_count( void*, void* dataR_ ) {
 	return ( rows );
 }
 
-M_EXPORT_SYMBOL int long dbrs_id( void*, void* dataR_ ) {
+M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* dataR_ ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	int nameLength( 0 );
 	int long id( 0 );
 	HString sQL;
@@ -344,7 +321,7 @@ M_EXPORT_SYMBOL int long dbrs_id( void*, void* dataR_ ) {
 		name[ nameLength ] = 0;
 		sQL.format ( "SELECT %s_sequence.currval FROM dual;",
 				reinterpret_cast<char*>( name ) );
-		autonumber = static_cast<OQuery*>( yaal_oracle_db_query( autonumber, sQL.raw() ) );
+		autonumber = static_cast<OQuery*>( yaal_oracle_db_query( dbLink_, sQL.raw() ) );
 		id = strtol( rs_get( autonumber, 0, 0 ), NULL, 10 );
 		yaal_oracle_rs_unquery( autonumber );
 	}

@@ -24,26 +24,30 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "dbwrapper/db_driver.hxx"
+
+using namespace yaal::dbwrapper;
+
 extern "C" {
 
-M_EXPORT_SYMBOL void* db_connect( char const* /*dataBase_*/,
+M_EXPORT_SYMBOL bool db_connect( ODBLink&, char const* /*dataBase_*/,
 		char const* /*login_*/, char const* /*password_*/ ) {
-	return ( NULL );
+	return ( true );
 }
 
-M_EXPORT_SYMBOL void db_disconnect( void* /*data_*/ ) {
+M_EXPORT_SYMBOL void db_disconnect( ODBLink& /*data_*/ ) {
 	return;
 }
 
-M_EXPORT_SYMBOL int dbrs_errno( void* /*dataB_*/, void* /*dataR_*/ ) {
+M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& /*dataB_*/, void* /*dataR_*/ ) {
 	return ( errno );
 }
 
-M_EXPORT_SYMBOL char const* dbrs_error( void* /*dataB_*/, void* /*dataR_*/ ) {
+M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& /*dataB_*/, void* /*dataR_*/ ) {
 	return ( "" );
 }
 
-M_EXPORT_SYMBOL void* db_query( void* /*data_*/, char const* /*query_*/ ) {
+M_EXPORT_SYMBOL void* db_query( ODBLink& /*data_*/, char const* /*query_*/ ) {
 	return ( NULL );
 }
 
@@ -59,11 +63,11 @@ M_EXPORT_SYMBOL int rs_fields_count( void* /*data_*/ ) {
 	return ( 0 );
 }
 
-M_EXPORT_SYMBOL int long dbrs_records_count( void* /*dataB_*/, void* /*dataR_*/ ) {
+M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dataB_*/, void* /*dataR_*/ ) {
 	return ( 0 );
 }
 
-M_EXPORT_SYMBOL int long dbrs_id( void* /*dataB_*/, void* /*dataR_*/ ) {
+M_EXPORT_SYMBOL int long dbrs_id( ODBLink& /*dataB_*/, void* /*dataR_*/ ) {
 	return ( 0 );
 }
 

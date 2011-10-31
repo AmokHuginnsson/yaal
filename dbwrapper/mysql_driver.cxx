@@ -29,8 +29,6 @@ Copyright:
 #include <cstring>
 #include <cstdlib>
 
-#include "hcore/memory.hxx"
-
 #include "config.hxx"
 
 #ifdef __HOST_OS_TYPE_FREEBSD__
@@ -39,53 +37,51 @@ Copyright:
 
 #include <mysql/mysql.h>
 
+#include "hcore/memory.hxx"
+#include "dbwrapper/db_driver.hxx"
+
+using namespace yaal;
+using namespace yaal::hcore;
+using namespace yaal::dbwrapper;
+
 extern "C" {
 
-namespace {
-
-MYSQL* _brokenDB_ = NULL;
-
-}
-
-M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
+M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* dataBase_,
 		char const* login_, char const * password_ ) {
 	MYSQL* mySQL( NULL );
-	if ( _brokenDB_ ) {
-		mysql_close( _brokenDB_ );
-		_brokenDB_ = NULL;
-	}
-	mySQL = mysql_init( NULL );
+	dbLink_._conn = mySQL = mysql_init( NULL );
 	if ( mySQL ) {
 		int unsigned protocol( MYSQL_PROTOCOL_SOCKET );
-		if ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) )
-			_brokenDB_ = mySQL, mySQL = NULL;
-		else if ( ! mysql_real_connect( mySQL, NULL, login_, password_,
-				dataBase_, 0, NULL, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) )
-			_brokenDB_ = mySQL, mySQL = NULL;
+		if ( ! mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) ) {
+			if ( mysql_real_connect( mySQL, NULL,
+						login_, password_, dataBase_,
+						0, NULL, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) )
+				dbLink_._valid = true;
+		}
 	}
-	return ( mySQL );
+	return ( ! dbLink_._valid );
 }
 
-M_EXPORT_SYMBOL void db_disconnect( void* data_ ) {
-	mysql_close( static_cast<MYSQL*>( data_ ) );
+M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
+	if ( dbLink_._conn ) {
+		mysql_close( static_cast<MYSQL*>( dbLink_._conn ) );
+		dbLink_.clear();
+	}
 	return;
 }
 
-M_EXPORT_SYMBOL int dbrs_errno( void* data_, void* ) {
-	if ( ! data_ )
-		data_ = _brokenDB_;
-	return ( ::mysql_errno( static_cast<MYSQL*>( data_ ) ) );
+M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* ) {
+	return ( ::mysql_errno( static_cast<MYSQL*>( dbLink_._conn ) ) );
 }
 
-M_EXPORT_SYMBOL char const* dbrs_error( void* data_, void* ) {
-	if ( ! data_ )
-		data_ = _brokenDB_;
-	return ( ::mysql_error( static_cast<MYSQL*>( data_ ) ) );
+M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* ) {
+	return ( ::mysql_error( static_cast<MYSQL*>( dbLink_._conn ) ) );
 }
 
-M_EXPORT_SYMBOL void* db_query( void* data_, char const* query_ ) {
-	mysql_query( static_cast<MYSQL*>( data_ ), query_ );
-	return ( mysql_store_result( static_cast<MYSQL*>( data_ ) ) );
+M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
+	mysql_query( static_cast<MYSQL*>( dbLink_._conn ), query_ );
+	return ( mysql_store_result( static_cast<MYSQL*>( dbLink_._conn ) ) );
 }
 
 M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
@@ -104,15 +100,17 @@ M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	return ( data_ ? ::mysql_num_fields( static_cast<MYSQL_RES*>( data_ ) ) : 0 );
 }
 
-M_EXPORT_SYMBOL int long dbrs_records_count( void* dataB_, void* dataR_ ) {
+M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& dbLink_, void* dataR_ ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	if ( dataR_ )
 		return ( static_cast<int long>( mysql_num_rows( static_cast<MYSQL_RES*>( dataR_ ) ) ) );
 	else
-		return ( static_cast<int long>( mysql_affected_rows( static_cast<MYSQL*>( dataB_ ) ) ) );
+		return ( static_cast<int long>( mysql_affected_rows( static_cast<MYSQL*>( dbLink_._conn ) ) ) );
 }
 
-M_EXPORT_SYMBOL int long dbrs_id( void* dataB_, void* ) {
-	return ( static_cast<int long>( mysql_insert_id( static_cast<MYSQL*>( dataB_ ) ) ) );
+M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
+	return ( static_cast<int long>( mysql_insert_id( static_cast<MYSQL*>( dbLink_._conn ) ) ) );
 }
 
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
