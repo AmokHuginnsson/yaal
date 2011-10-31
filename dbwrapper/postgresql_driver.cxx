@@ -42,7 +42,11 @@ Copyright:
 
 extern "C" {
 
+namespace {
+
 PGconn* _brokenDB_ = NULL;
+
+}
 
 M_EXPORT_SYMBOL void* db_connect( char const* dataBase_,
 		char const* login_, char const* password_ ) {

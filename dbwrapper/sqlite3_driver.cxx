@@ -67,7 +67,11 @@ private:
 	OSQLiteResult& operator = ( OSQLiteResult const& );
 };
 
+namespace {
+
 OSQLite* _brokenDB_ = NULL;
+
+}
 
 void* yaal_sqlite3_db_query( void*, char const* );
 void yaal_sqlite3_rs_unquery( void* );

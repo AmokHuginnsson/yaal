@@ -69,7 +69,11 @@ typedef struct {
 	OAllocator* _allocator;
 } OQuery;
 
+namespace {
+
 OOracle* _brokenDB_ = NULL;
+
+}
 
 void yaal_oracle_db_disconnect( void* );
 void yaal_oracle_rs_unquery( void* );
