@@ -81,7 +81,7 @@ struct boolean_xnor {
  */
 template<typename T>
 struct is_signed {
-	static bool const value = static_cast<T>( 0 ) > static_cast<T>( ~0 );
+	static bool const value = ! ( static_cast<T>( -1 ) > 0 );
 };
 template<typename T>
 bool const is_signed<T>::value;

@@ -31,8 +31,6 @@ Copyright:
 #ifndef YAAL_HCORE_MACRO_HXX_INCLUDED
 #define YAAL_HCORE_MACRO_HXX_INCLUDED 1
 
-#include "config.hxx"
-
 #ifdef _
 #	error Yaal redefines _ macro.
 #endif /* #ifdef _ */
