@@ -384,7 +384,7 @@ double long HExpression::factorial( tree_t::const_node_t node_ ) {
 	M_PROLOG
 	double long leftValue;
 	leftValue = count_branch( &*node_->begin() );
-	return ( xmath::factorial( static_cast<int long long unsigned>( leftValue ) ) );
+	return ( static_cast<double long>( xmath::factorial( static_cast<int long long unsigned>( leftValue ) ) ) );
 	M_EPILOG
 }
 
