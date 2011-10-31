@@ -187,7 +187,7 @@ void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 		queryObj = NULL;
 	} else {
 		if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
-			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << db_error( oracle ) << endl;
+			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << db_error( dbLink_ ) << endl;
 		queryStr.upper();
 		int iters( 0 );
 		if ( queryStr.find( "INSERT" ) == 0 )
@@ -206,7 +206,7 @@ void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 			yaal_oracle_rs_unquery( queryObj );
 			queryObj = NULL;
 		} else if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
-			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << db_error( oracle ) << endl;
+			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << db_error( dbLink_ ) << endl;
 	}
 	return ( queryObj );
 }
