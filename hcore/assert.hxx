@@ -30,6 +30,8 @@ Copyright:
 #ifndef YAAL_HCORE_ASSERT_HXX_INCLUDED
 #define YAAL_HCORE_ASSERT_HXX_INCLUDED 1
 
+#include "config.hxx"
+
 namespace yaal {
 
 namespace hcore {
