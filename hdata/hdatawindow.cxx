@@ -181,7 +181,7 @@ int HDataWindow::init( void ) {
 				_viewModeControls.push_back( dataControl );
 			break;
 			default :
-				M_THROW( ( HFormat( "unknown resource purpouse at %d" ) % i ).string(), r._role );
+				M_THROW( ( HFormat( "unknown resource purpose at %d" ) % i ).string(), r._role );
 			break;
 		}
 	}
@@ -248,7 +248,7 @@ void HDataWindow::set_mode( DOCUMENT::mode_t mode_ ) {
 		}
 		break;
 		default :
-			M_THROW ( "unknown window mode", mode_ );
+			M_THROW( "unknown window mode", mode_ );
 		break;
 	}
 	return;
