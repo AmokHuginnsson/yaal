@@ -3,22 +3,22 @@
 
 	hmatrix.hxx - this file is integral part of `yaal' project.
 
-	i.  You may not make any changes in Copyright information.
-	ii. You must attach Copyright information to any part of every copy
-	    of this software.
+  i.  You may not make any changes in Copyright information.
+  ii. You must attach Copyright information to any part of every copy
+      of this software.
 
 Copyright:
 
- You are free to use this program as is, you can redistribute binary
+ You can use this software free of charge and you can redistribute its binary
  package freely but:
-  1. You cannot use any part of sources of this software.
-  2. You cannot redistribute any part of sources of this software.
-  3. No reverse engineering is allowed.
-  4. If you want redistribute binary package you cannot demand any fees
-     for this software.
-     You cannot even demand cost of the carrier (CD for example).
-  5. You cannot include it to any commercial enterprise (for example 
-     as a free add-on to payed software or payed newspaper).
+  1. You are not allowed to use any part of sources of this software.
+  2. You are not allowed to redistribute any part of sources of this software.
+  3. You are not allowed to reverse engineer this software.
+  4. If you want to distribute a binary package of this software you cannot
+     demand any fees for it. You cannot even demand
+     a return of cost of the media or distribution (CD for example).
+  5. You cannot involve this software in any commercial activity (for example
+     as a free add-on to paid software or newspaper).
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
@@ -286,7 +286,7 @@ HMatrix<value_type> HMatrix<value_type>::T( void ) {
 	int ctrRow = 0, ctrColumn = 0;
 	HMatrix matrix ( _columns, _rows );
 	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ )
-		for ( ctrColumn = 0; ctrColumn < _columns; ctrColumn ++ ) 
+		for ( ctrColumn = 0; ctrColumn < _columns; ctrColumn ++ )
 			matrix._data[ ctrColumn ][ ctrRow ] = _data[ ctrRow ][ ctrColumn ];
 	return ( matrix );
 	M_EPILOG
@@ -395,9 +395,9 @@ HMatrix<value_type> HMatrix<value_type>::operator * ( HMatrix const& matrix_ ) c
 	value_type scalar = 0;
 	int ctrRow = 0, ctrColumn = 0, ctrRowColumn = 0;
 	HMatrix matrix( _rows, matrix_._columns );
-	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ ) 
+	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ )
 		for ( ctrColumn = 0; ctrColumn < matrix_._columns; ctrColumn ++, scalar = 0 ) {
-			for ( ctrRowColumn = 0; ctrRowColumn < _columns; ctrRowColumn ++ ) 
+			for ( ctrRowColumn = 0; ctrRowColumn < _columns; ctrRowColumn ++ )
 				scalar += ( _data[ ctrRow ][ ctrRowColumn ] * matrix_._data[ ctrRowColumn ][ ctrColumn ] );
 			matrix._data[ ctrRow ][ ctrColumn ] = scalar;
 		}
@@ -500,7 +500,7 @@ bool HMatrix<value_type>::operator == ( HMatrix const & matrix_ ) const {
 	M_PROLOG
 	check_dimensions_rows_columns ( matrix_._rows, matrix_._columns );
 	int ctr = 0;
-	for ( ctr = 0; ctr < _rows; ctr++ ) 
+	for ( ctr = 0; ctr < _rows; ctr++ )
 		if ( this->_array [ ctr ] != matrix_ [ ctr ] )
 			return ( false );
 	return ( true );
@@ -524,7 +524,7 @@ HVector<value_type> operator * ( HVector<value_type> const & vector_,
 		HVector<value_type> vector ( matrix_._columns );
 		for ( j = 0; j < matrix_._columns; j++ ) {
 			scalar = 0;
-			for ( k = 0; k < matrix_._columns; k++ ) 
+			for ( k = 0; k < matrix_._columns; k++ )
 				scalar += vector_ [ k ] * matrix_ [ k ] [ j ];
 			vector [ j ] = scalar;
 		}
@@ -567,7 +567,7 @@ HVector<value_type> T ( HMatrix<value_type> const& matrix_,
 
 }
 
-template<typename value_type> 
+template<typename value_type>
 inline void swap( yaal::hcore::HMatrix<value_type>& a, yaal::hcore::HMatrix<value_type>& b )
 	{ a.swap( b ); }
 

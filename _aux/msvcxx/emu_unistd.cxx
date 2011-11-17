@@ -158,7 +158,7 @@ M_EXPORT_SYMBOL
 int long read( int const& fd_, void* buf_, int long size_ ) {
 	int long nRead( -1 );
 	if ( fd_ < SystemIO::MANAGED_IO )
-		nRead = ::read( fd_, buf_, size_ ); 
+		nRead = ::read( fd_, buf_, size_ );
 	else {
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );

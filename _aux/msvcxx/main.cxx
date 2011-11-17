@@ -49,7 +49,7 @@ namespace abi {
 
 }
 
-extern "C" 
+extern "C"
 int backtrace( void** buf_, int size_ ) {
 	CLock l( _backtraceMutex_ );
 /* Warning!
