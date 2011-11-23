@@ -30,6 +30,7 @@ Copyright:
 #ifndef YAAL_HCORE_HFUNCTOR_HXX_INCLUDED
 #define YAAL_HCORE_HFUNCTOR_HXX_INCLUDED 1
 
+#include "hcore/base.hxx"
 #include "hcore/trait.hxx"
 #include "hcore/placeholder.hxx"
 
