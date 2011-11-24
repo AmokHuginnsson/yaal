@@ -86,6 +86,38 @@ HLambdaReturn<T, L> ret( L lambda_ ) {
 	return ( HLambdaReturn<T, L>( lambda_ ) );
 }
 
+class HLambdaPreIncrement {
+public:
+	template<typename T>
+	T& operator()( T& val_ ) const {
+		return ( ++ val_ );
+	}
+};
+
+class HLambdaPostIncrement {
+public:
+	template<typename T>
+	T operator()( T& val_ ) const {
+		return ( val_ ++ );
+	}
+};
+
+class HLambdaPreDecrement {
+public:
+	template<typename T>
+	T& operator()( T& val_ ) const {
+		return ( -- val_ );
+	}
+};
+
+class HLambdaPostDecrement {
+public:
+	template<typename T>
+	T operator()( T& val_ ) const {
+		return ( val_ -- );
+	}
+};
+
 class HLambdaPlus {
 public:
 	template<typename R, typename T1, typename T2>
@@ -125,6 +157,26 @@ public:
 	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ )
 		{ return ( val1_ / val2_ ); }
 };
+
+template<int const N>
+inline HLambdaPreIncrement operator ++ ( yaal::hcore::higher_order::placeholder<N> ) {
+	return ( HLambdaPreIncrement() );
+}
+
+template<int const N>
+inline HLambdaPostIncrement operator ++ ( yaal::hcore::higher_order::placeholder<N>, int ) {
+	return ( HLambdaPostIncrement() );
+}
+
+template<int const N>
+inline HLambdaPreDecrement operator -- ( yaal::hcore::higher_order::placeholder<N> ) {
+	return ( HLambdaPreDecrement() );
+}
+
+template<int const N>
+inline HLambdaPostDecrement operator -- ( yaal::hcore::higher_order::placeholder<N>, int ) {
+	return ( HLambdaPostDecrement() );
+}
 
 inline HLambdaPlus operator + ( yaal::hcore::higher_order::placeholder<1>, yaal::hcore::higher_order::placeholder<2> ) {
 	return ( HLambdaPlus() );
