@@ -32,12 +32,20 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "resolver.hxx"
-#include "hexception.hxx"
 #include "hlog.hxx"
 
 namespace yaal {
 
 namespace hcore {
+
+HIP::HIP( u8_t oct0_, u8_t oct1_, u8_t oct2_, u8_t oct3_ )
+	: _data( 0 ) {
+	u8_t* ip( reinterpret_cast<u8_t*>( &_data ) );
+	ip[0] = oct0_;
+	ip[1] = oct1_;
+	ip[2] = oct2_;
+	ip[3] = oct3_;
+}
 
 namespace {
 static int const RESOLVER_INITIAL_CACHE_SIZE( 256 );
@@ -75,6 +83,7 @@ ip_t resolver::get_ip( HString const& hostName_ ) {
 HString resolver::ip_to_string( ip_t ip_ ) {
 	M_PROLOG
 	sockaddr_in addr;
+	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = ip_.raw();
 	char const* name( NULL );
 	while ( ! name ) {
@@ -93,6 +102,7 @@ HString resolver::get_name( ip_t ip_ ) {
 	HString name;
 	int error( 0 );
 	sockaddr_in addr;
+	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = ip_.raw();
 #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 )
 	int size( NI_MAXHOST );
@@ -100,6 +110,7 @@ HString resolver::get_name( ip_t ip_ ) {
 	error = getnameinfo(
 					reinterpret_cast<sockaddr*>( &addr ), sizeof ( addr ),
 					_cache->raw(), size, NULL, 0, NI_NOFQDN );
+	HScopedValueReplacement<int> saveErrno( errno, error );
 	M_ENSURE( error == 0 );
 	name = _cache->raw();
 #else /* #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
@@ -115,7 +126,7 @@ HString resolver::get_name( ip_t ip_ ) {
 		_cache->realloc( size <<= 1 );
 	if ( code )
 		log_trace << error_message( code ) << endl;
-	errno = error;
+	HScopedValueReplacement<int> saveErrno( errno, error );
 	M_ENSURE( error == 0 );
 	if ( hostNameStatus )
 		name = hostName.h_name;
@@ -124,6 +135,14 @@ HString resolver::get_name( ip_t ip_ ) {
 		name = ip_to_string( ip_ );
 	return ( name );
 	M_EPILOG
+}
+
+char const* resolver::error_message( int code_ ) {
+#if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 )
+	return ( gai_strerror( code_ ) );
+#else /* #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
+	return ( hstrerror( code_ ) );
+#endif /* #else #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
 }
 
 }
