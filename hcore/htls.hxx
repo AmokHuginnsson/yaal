@@ -251,6 +251,13 @@ public:
 		return ( _tls );
 		M_EPILOG
 	}
+	tType& operator*( void ) {
+		M_PROLOG
+		if ( ! _tls )
+			_constructor();
+		return ( *_tls );
+		M_EPILOG
+	}
 	const_iterator begin( void ) const {
 		return ( _instances.begin() );
 	}

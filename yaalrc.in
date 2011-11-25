@@ -66,7 +66,7 @@ semaphore_type POSIX
 # resolve_hostnames
 # type: bool, default true
 # resolve_hostnames switch enables/disables resolving IP address into host names.
-resolve_hostnames false
+resolve_hostnames true
 
 # ssl_key
 # type: string, default: (empty)
