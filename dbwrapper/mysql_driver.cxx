@@ -135,12 +135,14 @@ public:
 } mySQLInitDeinit;
 
 HMySQLInitDeinit::HMySQLInitDeinit( void ) {
-	mysql_library_init( 0, NULL, NULL );
+	if ( ! ::getenv( "BUGGY_MYSQL_CLIENT" ) )
+		mysql_library_init( 0, NULL, NULL );
 	return;
 }
 
 HMySQLInitDeinit::~HMySQLInitDeinit( void ) {
-	mysql_library_end();
+	if ( ! ::getenv( "BUGGY_MYSQL_CLIENT" ) )
+		mysql_library_end();
 	return;
 }
 
