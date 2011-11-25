@@ -71,6 +71,12 @@ yaal::hcore::HString get_user_name( int uid_ );
  */
 yaal::hcore::HString get_group_name( int gid_ );
 
+/*! \brief Get host name of local computer.
+ *
+ * \return Host name of local computer.
+ */
+yaal::hcore::HString get_host_name( void );
+
 /*! \brief Store information about amount of given resource.
  */
 class HResourceInfo {

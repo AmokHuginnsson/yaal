@@ -142,6 +142,13 @@ HString get_group_name( int gid_ ) {
 	M_EPILOG
 }
 
+yaal::hcore::HString get_host_name( void ) {
+	static int const HOSTNAME_SIZE = 128;
+	static HChunk hostname( HOSTNAME_SIZE );
+	M_ENSURE( ::gethostname( hostname.get<char>(), HOSTNAME_SIZE - 1 ) == 0 );
+	return ( hostname.raw() );
+}
+
 HResourceInfo get_memory_size_info( void ) {
 	M_PROLOG
 	i64_t availableMemory( 0 );

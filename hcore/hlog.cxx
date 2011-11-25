@@ -50,7 +50,6 @@ namespace hcore {
 namespace {
 
 static int const BUFFER_SIZE		= 1024;
-static int const HOSTNAME_SIZE	= 128;
 static int const TIMESTAMP_SIZE	= 16;
 
 }
@@ -62,7 +61,7 @@ void* DEFAULT_LOG_STREAM( stderr );
 HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedStream( _file::ref() ), _realMode( false ), _newLine( true ),
 	_type( 0 ), _bufferSize( BUFFER_SIZE ),
 	_processName( NULL ),
-	_loginName(), _hostName( HOSTNAME_SIZE ),
+	_loginName(), _hostName( system::get_host_name() ),
 	_buffer( _bufferSize ) {
 	M_PROLOG
 	if ( ! _file::ref() )
@@ -71,7 +70,6 @@ HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedStream( _file::ref
 	intro.format( "%-10xProcess started (%ld).\n",
 			LOG_TYPE::NOTICE, static_cast<int long>( system::getpid() ) );
 	_file::ref() << intro;
-	M_ENSURE( ::gethostname( _hostName.get<char>(), HOSTNAME_SIZE - 1 ) == 0 );
 	return;
 	M_EPILOG
 }
@@ -184,9 +182,9 @@ void HLog::timestamp( void ) {
 	if ( size > TIMESTAMP_SIZE )
 		M_THROW( _( "strftime returned more than TIMESTAMP_SIZE" ), size );
 	if ( _processName )
-		_file::ref() << buffer << " " << _loginName << "@" << _hostName.get<char>() << "->" << _processName << ": ";
+		_file::ref() << buffer << " " << _loginName << "@" << _hostName << "->" << _processName << ": ";
 	else
-		_file::ref() << buffer << " " << _loginName << "@" << _hostName.get<char>() << ": ";
+		_file::ref() << buffer << " " << _loginName << "@" << _hostName << ": ";
 	if ( _type & LOG_TYPE::WARNING )
 		_file::ref() << "(WARNING) ";
 	else if ( _type & LOG_TYPE::ERROR )

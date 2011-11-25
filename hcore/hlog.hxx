@@ -70,7 +70,7 @@ private:
 	size_t   _bufferSize;
 	char const* _processName;
 	HString  _loginName;
-	HChunk   _hostName;
+	HString  _hostName;
 	HChunk   _buffer;
 public:
 	M_YAAL_HCORE_PUBLIC_API static int long _logMask;
