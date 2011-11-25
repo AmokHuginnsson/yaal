@@ -169,6 +169,12 @@ public:
 	}
 };
 
+#ifdef __GNUC__
+#if ( 100 * __GNUC__ + __GNUC_MINOR__ ) <= 402
+#pragma GCC diagnostic warning "-Weffc++"
+#endif /* #if ( 100 * __GNUC__ + __GNUC_MINOR__ ) <= 402 */
+#endif /* #ifdef __GNUC__ */
+
 template<LAMBDA_TYPE::type_t const first_lambda_type,
 	typename first_lambda_first_type, typename first_lambda_second_type,
 	LAMBDA_TYPE::type_t const second_lambda_type,
@@ -185,6 +191,11 @@ operator , ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_se
 template<>
 class HLambda<LAMBDA_TYPE::PRE_INCREMENT> {
 public:
+	HLambda()
+		{}
+	template<int const N>
+	HLambda( yaal::hcore::higher_order::placeholder<N> const& )
+		{}
 	template<typename T>
 	T& operator()( T& val_ ) const {
 		return ( ++ val_ );
@@ -194,6 +205,11 @@ public:
 template<>
 class HLambda<LAMBDA_TYPE::POST_INCREMENT> {
 public:
+	HLambda()
+		{}
+	template<int const N>
+	HLambda( yaal::hcore::higher_order::placeholder<N> const& )
+		{}
 	template<typename T>
 	T operator()( T& val_ ) const {
 		return ( val_ ++ );
@@ -203,6 +219,11 @@ public:
 template<>
 class HLambda<LAMBDA_TYPE::PRE_DECREMENT> {
 public:
+	HLambda()
+		{}
+	template<int const N>
+	HLambda( yaal::hcore::higher_order::placeholder<N> const& )
+		{}
 	template<typename T>
 	T& operator()( T& val_ ) const {
 		return ( -- val_ );
@@ -212,6 +233,11 @@ public:
 template<>
 class HLambda<LAMBDA_TYPE::POST_DECREMENT> {
 public:
+	HLambda()
+		{}
+	template<int const N>
+	HLambda( yaal::hcore::higher_order::placeholder<N> const& )
+		{}
 	template<typename T>
 	T operator()( T& val_ ) const {
 		return ( val_ -- );
@@ -298,23 +324,19 @@ public:
 		{ return ( val1_ / val2_ ); }
 };
 
-template<int const N>
-inline HLambda<LAMBDA_TYPE::PRE_INCREMENT> operator ++ ( yaal::hcore::higher_order::placeholder<N> ) {
+inline HLambda<LAMBDA_TYPE::PRE_INCREMENT> operator ++ ( HLambda<LAMBDA_TYPE::PRE_INCREMENT> ) {
 	return ( HLambda<LAMBDA_TYPE::PRE_INCREMENT>() );
 }
 
-template<int const N>
-inline HLambda<LAMBDA_TYPE::POST_INCREMENT> operator ++ ( yaal::hcore::higher_order::placeholder<N>, int ) {
+inline HLambda<LAMBDA_TYPE::POST_INCREMENT> operator ++ ( HLambda<LAMBDA_TYPE::POST_INCREMENT>, int ) {
 	return ( HLambda<LAMBDA_TYPE::POST_INCREMENT>() );
 }
 
-template<int const N>
-inline HLambda<LAMBDA_TYPE::PRE_DECREMENT> operator -- ( yaal::hcore::higher_order::placeholder<N> ) {
+inline HLambda<LAMBDA_TYPE::PRE_DECREMENT> operator -- ( HLambda<LAMBDA_TYPE::PRE_DECREMENT> ) {
 	return ( HLambda<LAMBDA_TYPE::PRE_DECREMENT>() );
 }
 
-template<int const N>
-inline HLambda<LAMBDA_TYPE::POST_DECREMENT> operator -- ( yaal::hcore::higher_order::placeholder<N>, int ) {
+inline HLambda<LAMBDA_TYPE::POST_DECREMENT> operator -- ( HLambda<LAMBDA_TYPE::POST_DECREMENT>, int ) {
 	return ( HLambda<LAMBDA_TYPE::POST_DECREMENT>() );
 }
 
