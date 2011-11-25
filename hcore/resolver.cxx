@@ -24,12 +24,11 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifdef _MSC_VER
 #include <unistd.h>
 #include <sys/socket.h>
-#endif /* #ifdef _MSC_VER */
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
 
 #include "config.hxx"
 
