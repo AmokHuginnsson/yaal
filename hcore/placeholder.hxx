@@ -60,10 +60,10 @@ template<>
 struct placeholder<2> : public placeholder_base {
 	placeholder( void ) {}
 	template <typename a0_t, typename a1_t>
-	a1_t const& operator()( a0_t const& a0_, a1_t const& a1_ ) const
+	a1_t const& operator()( a0_t const&, a1_t const& a1_ ) const
 		{ return ( a1_ ); }
 	template <typename a0_t, typename a1_t>
-	a1_t& operator()( a0_t& a0_, a1_t& a1_ )
+	a1_t& operator()( a0_t&, a1_t& a1_ )
 		{ return ( a1_ ); }
 };
 
@@ -71,10 +71,10 @@ template<>
 struct placeholder<3> : public placeholder_base {
 	placeholder( void ) {}
 	template <typename a0_t, typename a1_t, typename a2_t>
-	a2_t const& operator()( a0_t const& a0_, a1_t const& a1_, a2_t const& a2_ ) const
+	a2_t const& operator()( a0_t const&, a1_t const&, a2_t const& a2_ ) const
 		{ return ( a2_ ); }
 	template <typename a0_t, typename a1_t, typename a2_t>
-	a2_t& operator()( a0_t& a0_, a1_t& a1_, a2_t& a2_ )
+	a2_t& operator()( a0_t&, a1_t&, a2_t& a2_ )
 		{ return ( a2_ ); }
 };
 
