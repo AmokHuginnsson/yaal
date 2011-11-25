@@ -42,6 +42,8 @@ extern "C" FILE* tmpfile( void );
 #define getuid ms_getuid
 #define gethostname ms_gethostname
 #define geteuid getuid
+#undef gai_strerror
+#define gai_strerror msvcxx::windows_strerror
 
 #include "hcore/macro.hxx"
 #include "emu_unistd.hxx"

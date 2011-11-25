@@ -225,8 +225,8 @@ mode_t umask( mode_t umask_ ) {
 
 M_EXPORT_SYMBOL
 char const* windows_strerror( int code_ ) {
-	static int const MAX_MSG_LEN( 512 );
-	static char msg[512];
+	static int const MAX_MSG_LEN( 1024 );
+	static char msg[MAX_MSG_LEN];
 	char* p( msg );
 
 	FormatMessage(
