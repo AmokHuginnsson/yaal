@@ -90,6 +90,7 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 		timeOut.tv_sec = *timeOut_ / 1000;
 	}
 	int ret( 0 );
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	do {
 		ret = ::select( FD_SETSIZE, inputCount_ ? &readers : NULL, outputCount_ ? &writers : NULL, NULL, timeOutP );
 	} while ( restartable_
