@@ -108,7 +108,7 @@ private:
 	void accept_or_connect( void );
 	int accept( void );
 	int connect( void );
-	void check_err( int ) const;
+	int check_err( int ) const;
 	typedef int ( HOpenSSL::* operation_t )( void );
 	operation_t do_accept_or_connect;
 	HOpenSSL( HOpenSSL const& );

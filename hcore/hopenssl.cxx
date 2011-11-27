@@ -61,7 +61,7 @@ namespace openssl_helper {
  * \return Error message.
  */
 HString& format_error_message( HString& buffer_, int err = 0 ) {
-	int long code = 0;
+	int long code( 0 );
 	buffer_ = err ? ERR_error_string( err, NULL ) : "";
 	while ( ( code = ERR_get_error() ) )
 		buffer_.append( ( buffer_.is_empty() ? "" : "\n" ) ).append( ERR_error_string( code, NULL ) );
@@ -184,8 +184,8 @@ void HOpenSSL::OSSLContext::init( void ) {
 		CRYPTO_set_id_callback( &get_thread_id );
 		SSL_library_init();
 	}
-	SSL_METHOD const* method = static_cast<SSL_METHOD const*>( select_method() );
-	SSL_CTX* ctx = NULL;
+	SSL_METHOD const* method( static_cast<SSL_METHOD const*>( select_method() ) );
+	SSL_CTX* ctx( NULL );
 	HString buffer;
 	ERR_clear_error();
 	_context = ctx = SSL_CTX_new( const_cast<SSL_METHOD*>( method ) );
@@ -263,15 +263,14 @@ void HOpenSSL::OSSLContext::consume_ssl( void* ssl_ ) {
 
 void HOpenSSL::OSSLContext::libssl_rule_mutex( int mode, int nth, char const* /* file_ */, int /* line_ */ ) {
 	M_PROLOG
-	HLock lock( _mutex );
 	mutex_info_t& m( _sslLibMutexes[ nth ] );
 	if ( mode & CRYPTO_LOCK ) {
 		m.first->lock();
 		++ m.second;
 	} else {
 		M_ASSERT( m.second > 0 );
-		m.first->unlock();
 		-- m.second;
+		m.first->unlock();
 	}
 	return;
 	M_EPILOG
@@ -339,7 +338,7 @@ HOpenSSL::~HOpenSSL( void ) {
 
 void HOpenSSL::accept_or_connect( void ) {
 	M_PROLOG
-	int ret = (this->*do_accept_or_connect)();
+	int ret( (this->*do_accept_or_connect)() );
 	if ( ret == -1 ) {
 		check_err( ret );
 		_pendingOperation = true;
@@ -363,7 +362,7 @@ int HOpenSSL::connect( void ) {
 	M_EPILOG
 }
 
-void HOpenSSL::check_err( int code ) const {
+int HOpenSSL::check_err( int code ) const {
 	M_PROLOG
 	int err( SSL_get_error( static_cast<SSL const*>( _ssl ), code ) );
 	if ( ( err != SSL_ERROR_ZERO_RETURN ) && ( err != SSL_ERROR_WANT_READ ) && ( err != SSL_ERROR_WANT_WRITE ) ) {
@@ -380,7 +379,7 @@ void HOpenSSL::check_err( int code ) const {
 			openssl_helper::format_error_message( buffer, errTop );
 		throw HOpenSSLException( buffer );
 	}
-	return;
+	return ( ( err == SSL_ERROR_WANT_READ ) || ( err == SSL_ERROR_WANT_WRITE ) ? -1 : 0 );
 	M_EPILOG
 }
 
@@ -389,11 +388,11 @@ int long HOpenSSL::read( void* const buffer_, int long size_ ) {
 	M_ASSERT( _ssl );
 	if ( _pendingOperation )
 		accept_or_connect();
-	int nRead = -1;
+	int nRead( -1 );
 	if ( ! _pendingOperation ) {
 		nRead = SSL_read( static_cast<SSL*>( _ssl ), buffer_, static_cast<int>( size_ ) );
 		if ( nRead <= 0 )
-			check_err( nRead );
+			nRead = check_err( nRead );
 	}
 	return ( nRead );
 	M_EPILOG
@@ -404,7 +403,7 @@ int long HOpenSSL::write( void const* const buffer_, int long size_ ) {
 	M_ASSERT( _ssl );
 	if ( _pendingOperation )
 		accept_or_connect();
-	int nWritten = 0;
+	int nWritten( -1 );
 	if ( ! _pendingOperation ) {
 		nWritten = SSL_write( static_cast<SSL*>( _ssl ), buffer_, static_cast<int>( size_ ) );
 		if ( nWritten <= 0 )

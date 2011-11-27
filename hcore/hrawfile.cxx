@@ -138,12 +138,13 @@ int long HRawFile::do_write( void const* const buffer_, int long size_ ) {
 }
 
 bool HRawFile::wait_for( ACTION::action_t const& action_, int long* time_ ) {
-	int fd( _fileDescriptor );
-	int error( system::wait_for_io( action_ == ACTION::READ ? &fd : NULL,
-				action_ == ACTION::READ ? 1 : 0,
-				action_ == ACTION::WRITE ? &fd : NULL,
-				action_ == ACTION::WRITE ? 1 : 0, time_ ) );
-	return ( ( error <= 0 ) || ( fd == -1 ) );
+	int fdR( action_ & ACTION::READ ? _fileDescriptor : -1 );
+	int fdW( action_ & ACTION::WRITE ? _fileDescriptor : -1 );
+	int error( system::wait_for_io( action_ & ACTION::READ ? &fdR : NULL,
+				action_ & ACTION::READ ? 1 : 0,
+				action_ & ACTION::WRITE ? &fdW : NULL,
+				action_ & ACTION::WRITE ? 1 : 0, time_ ) );
+	return ( ( error <= 0 ) || ( ( fdR == -1 ) && ( fdW == -1 ) ) );
 }
 
 int long HRawFile::write_plain( void const* const buffer_, int long size_ ) {
@@ -174,8 +175,9 @@ int long HRawFile::write_ssl( void const* const buffer_, int long size_ ) {
 		M_THROW( _error_, errno );
 	HClock clk;
 	int long nWritten = 0;
+	int long timeOut( _timeout );
 	do {
-		if ( _timeout  && ( clk.get_time_elapsed() > _timeout ) )
+		if ( ( _timeout > 0 ) && wait_for( ACTION::BOTH, &timeOut ) )
 			throw HStreamInterfaceException( _( "timeout on write" ) );
 		int long ret = _sSL->write( static_cast<char const* const>( buffer_ ) + nWritten, size_ );
 		if ( ! ret ) {

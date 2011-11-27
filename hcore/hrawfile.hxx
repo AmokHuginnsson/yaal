@@ -61,8 +61,9 @@ protected:
 	 */
 	struct ACTION {
 		typedef enum {
-			READ,
-			WRITE
+			READ = 1,
+			WRITE = 2,
+			BOTH = READ | WRITE
 		} action_t;
 	};
 	TYPE::raw_file_type_t _type;
