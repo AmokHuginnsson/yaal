@@ -16,6 +16,8 @@ extern "C" FILE* tmpfile( void );
 #define close close_off
 #define read read_off
 #define write write_off
+#define sendto sendto_off
+#define recvfrom recvfrom_off
 #define timeval timeval_off
 #define gethostname gethostname_off
 #define dup2 dup2_off
@@ -32,6 +34,8 @@ extern "C" FILE* tmpfile( void );
 #undef close
 #undef read
 #undef write
+#undef sendto
+#undef recvfrom
 #undef pipe
 #undef unlink
 #undef dup2
@@ -61,11 +65,17 @@ void pthread_setname_np( void*, char const* );
 inline int pipe( int* fds_ )
 	{ return ( msvcxx::pipe( fds_ ) ); }
 
-inline int long read( int const& fd_, void* buf_, int long size_ )
+inline int long read( int fd_, void* buf_, int long size_ )
 	{ return ( msvcxx::read( fd_, buf_, size_ ) ); }
 
-inline int long write( int const& fd_, void const* buf_, int long size_ )
+inline int long write( int fd_, void const* buf_, int long size_ )
 	{ return ( msvcxx::write( fd_, buf_, size_ ) ); }
+
+inline int long sendto( int fd_, void const* buf_, int long size_, int flags_, sockaddr const* to_, int toLen_ )
+	{ return ( msvcxx::sendto( fd_, buf_, size_, flags_, to_, toLen_ ) ); }
+
+inline int long recvfrom( int fd_, void* buf_, int long size_, int flags_, sockaddr* from_, int* fromLen_ )
+	{ return ( msvcxx::recvfrom( fd_, buf_, size_, flags_, from_, fromLen_ ) ); }
 
 template<typename T>
 inline int close( T const& fd_ )

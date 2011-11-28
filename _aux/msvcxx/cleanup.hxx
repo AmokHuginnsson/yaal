@@ -22,6 +22,8 @@
 #undef move
 #undef write
 #undef read
+#undef sendto
+#undef recvfrom
 #undef interface
 
 #ifndef YAAL_MSVCXX_CLEANUP_HXX_INCLUDED

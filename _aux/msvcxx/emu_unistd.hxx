@@ -7,8 +7,10 @@
 namespace msvcxx {
 
 int close( int const& );
-M_YAAL_HCORE_PUBLIC_API int long read( int const&, void*, int long );
-M_YAAL_HCORE_PUBLIC_API int long write( int const&, void const*, int long );
+M_YAAL_HCORE_PUBLIC_API int long read( int, void*, int long );
+M_YAAL_HCORE_PUBLIC_API int long write( int, void const*, int long );
+M_YAAL_HCORE_PUBLIC_API int long sendto( int, void const*, int long, int, sockaddr const*, int );
+M_YAAL_HCORE_PUBLIC_API int long recvfrom( int, void*, int long, int, sockaddr*, int* );
 M_YAAL_HCORE_PUBLIC_API int pipe( int* );
 M_YAAL_HCORE_PUBLIC_API int dup2( int, int );
 M_YAAL_HCORE_PUBLIC_API void log_windows_error( char const* );

@@ -155,7 +155,7 @@ int close( int const& fd_ ) {
 }
 
 M_EXPORT_SYMBOL
-int long read( int const& fd_, void* buf_, int long size_ ) {
+int long read( int fd_, void* buf_, int long size_ ) {
 	int long nRead( -1 );
 	if ( fd_ < SystemIO::MANAGED_IO )
 		nRead = ::read( fd_, buf_, size_ );
@@ -168,7 +168,7 @@ int long read( int const& fd_, void* buf_, int long size_ ) {
 }
 
 M_EXPORT_SYMBOL
-int long write( int const& fd_, void const* buf_, int long size_ ) {
+int long write( int fd_, void const* buf_, int long size_ ) {
 	int long nWritten( -1 );
 	if ( fd_ < SystemIO::MANAGED_IO )
 		nWritten = ::write( fd_, buf_, size_ );
@@ -178,6 +178,16 @@ int long write( int const& fd_, void const* buf_, int long size_ ) {
 		nWritten = io.write( buf_, size_ );
 	}
 	return ( nWritten );
+}
+
+M_EXPORT_SYMBOL
+int long sendto( int fd_, void const* buf_, int long size_, int flags_, sockaddr const* to_, int toLen_ ) {
+	return ( 0 );
+}
+
+M_EXPORT_SYMBOL
+int long recvfrom( int fd_, void* buf_, int long size_, int flags_, sockaddr* from_, int* fromLen_ ) {
+	return ( 0 );
 }
 
 M_EXPORT_SYMBOL
