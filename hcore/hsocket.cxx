@@ -158,7 +158,6 @@ void HSocket::shutdown_client( int fileDescriptor_ ) {
 void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	int reuseAddr = 1;
 	if ( _fileDescriptor < 0 )
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
 	if ( _clients )
@@ -166,6 +165,7 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 	if ( _maximumNumberOfClients < 1 )
 		M_THROW( _( "bad maximum number of clients" ), _maximumNumberOfClients );
 	make_address( address_, port_ );
+	int reuseAddr( 1 );
 	M_ENSURE( ::setsockopt( _fileDescriptor, SOL_SOCKET, SO_REUSEADDR,
 				reinterpret_cast<char*>( &reuseAddr ), sizeof ( reuseAddr ) ) == 0 );
 	M_ENSURE_EX( ( ::bind( _fileDescriptor,
