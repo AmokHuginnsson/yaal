@@ -15,13 +15,15 @@ AC_MSG_RESULT([--- Welcome to yaal configurator ---                     [[0%]]])
 
 AC_ARG_WITH([console-mouse],[AC_HELP_STRING([--with-console-mouse],[Compile with console mouse support, default is `yes' if apriopriate library can be found.])],[CONSOLE_MOUSE=$withval],[CONSOLE_MOUSE="auto"])
 dnl ` <- this one fixes syntax highlighting in vim.
-AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, default is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])
+AC_ARG_WITH([sqlite3],[AC_HELP_STRING([--with-sqlite3],[Compile with SQLite3 driver, default is `yes' if SQLite3 can be found.])],[SQLITE3=$withval],[SQLITE3="auto"])
 dnl `
 AC_ARG_WITH([postgres],[AC_HELP_STRING([--with-postgres],[Compile with PostgreSQL driver, default is `yes' if PostgreSQL can be found.])],[POSTGRES=$withval],[POSTGRES="auto"])
 dnl `
-AC_ARG_WITH([sqlite3],[AC_HELP_STRING([--with-sqlite3],[Compile with SQLite3 driver, default is `yes' if SQLite3 can be found.])],[SQLITE3=$withval],[SQLITE3="auto"])
+AC_ARG_WITH([mysql],[AC_HELP_STRING([--with-mysql],[Compile with MySQL driver, default is `yes' if MySQL can be found.])],[MYSQL=$withval],[MYSQL="auto"])
 dnl `
-AC_ARG_WITH([oracle],[AC_HELP_STRING([--with-oracle],[Compile with Oralce driver, default is `yes' if Oracle can be found.])],[ORACLE=$withval],[ORACLE="auto"])
+AC_ARG_WITH([firebird],[AC_HELP_STRING([--with-firebird],[Compile with Firebird driver, default is `yes' if Firebird can be found.])],[FIREBIRD=$withval],[FIREBIRD="auto"])
+dnl `
+AC_ARG_WITH([oracle],[AC_HELP_STRING([--with-oracle],[Compile with Oracle driver, default is `yes' if Oracle can be found.])],[ORACLE=$withval],[ORACLE="auto"])
 dnl `
 DO_TARGET="RELEASE"
 AC_ARG_ENABLE([debug],[AC_HELP_STRING([--enable-debug],[Compile with debugging symbols.])],[DO_TARGET="DEBUG" LIB_INFIX="-d"])
@@ -168,13 +170,6 @@ AC_SEARCH_LIBS([dlopen],[dl],,[AC_MSG_ERROR([Cannot continue without dynamic dyn
 AC_CHECK_LIB([ncurses],[initscr],,[AC_MSG_ERROR([Cannot continue without ncurses library.])]) LIBS=""
 AC_CHECK_LIB([gpm],[Gpm_Open]) HCONSOLE_LIBS="${HCONSOLE_LIBS} ${LIBS}" LIBS=""
 
-if test ["$POSTGRES"] != ["no"] ; then
-	AC_CHECK_LIB([pq],[PQsetdbLogin],
-								[],[if test ["$POSTGRES"] = ["yes"] ; then
-											AC_MSG_ERROR([Cannot continue without PostgreSQL.])
-										fi;POSTGRES=["no"]])
-	LIBS=""
-fi
 if test ["$SQLITE3"] != ["no"] ; then
 	AC_CHECK_LIB([sqlite3],[sqlite3_open],
 								[],[if test ["$SQLITE3"] = ["yes"] ; then
@@ -182,14 +177,11 @@ if test ["$SQLITE3"] != ["no"] ; then
 										fi;SQLITE3=["no"]])
 	LIBS=""
 fi
-if test ["$ORACLE"] != ["no"] ; then
-	CXXFLAGS=["$CXXFLAGS -L$ORACLE_HOME/lib"]
-	AC_CHECK_LIB([clntsh],[OCIEnvCreate],
-								[EXTRA_LIB_PATHS="$EXTRA_LIB_PATHS -L$ORACLE_HOME/lib"],
-								[if test ["$ORACLE"] = ["yes"] ; then
-											AC_MSG_ERROR([Cannot continue without Oracle.])
-										fi;ORACLE=["no"]])
-	CXXFLAGS=$CXXFLAGS_ORIG
+if test ["$POSTGRES"] != ["no"] ; then
+	AC_CHECK_LIB([pq],[PQsetdbLogin],
+								[],[if test ["$POSTGRES"] = ["yes"] ; then
+											AC_MSG_ERROR([Cannot continue without PostgreSQL.])
+										fi;POSTGRES=["no"]])
 	LIBS=""
 fi
 if test ["$MYSQL"] != ["no"] ; then
@@ -201,6 +193,23 @@ if test ["$MYSQL"] != ["no"] ; then
 				[if test ["$MYSQL"] = ["yes"] ; then
 					AC_MSG_ERROR([Cannot continue without MySQL.])
 				fi;MYSQL=["no"]])])
+	CXXFLAGS=$CXXFLAGS_ORIG
+	LIBS=""
+fi
+if test ["$FIREBIRD"] != ["no"] ; then
+	AC_CHECK_LIB([fbclient],[isc_attach_database],
+								[],[if test ["$FIREBIRD"] = ["yes"] ; then
+											AC_MSG_ERROR([Cannot continue without Firebird.])
+										fi;FIREBIRD=["no"]])
+	LIBS=""
+fi
+if test ["$ORACLE"] != ["no"] ; then
+	CXXFLAGS=["$CXXFLAGS -L$ORACLE_HOME/lib"]
+	AC_CHECK_LIB([clntsh],[OCIEnvCreate],
+								[EXTRA_LIB_PATHS="$EXTRA_LIB_PATHS -L$ORACLE_HOME/lib"],
+								[if test ["$ORACLE"] = ["yes"] ; then
+											AC_MSG_ERROR([Cannot continue without Oracle.])
+										fi;ORACLE=["no"]])
 	CXXFLAGS=$CXXFLAGS_ORIG
 	LIBS=""
 fi
@@ -314,6 +323,9 @@ CPPFLAGS=$CPPFLAGS_ORIG
 AC_CHECK_HEADERS([ncurses/curses.h],_NCURSES_HEADER=['ncurses/curses.h'],
 	[AC_CHECK_HEADERS([curses.h],_NCURSES_HEADER=['curses.h'],
 			[AC_MSG_ERROR([Cannot continue without ncurses devel!])])])
+
+dnl Reversed order of database API check is due to setting default db driver properly.
+
 if test ["$ORACLE"] != ["no"] ; then
 	CXXFLAGS=["$CXXFLAGS -I$ORACLE_HOME/rdbms/public"]
 	CPPFLAGS=["$CXXFLAGS"]
@@ -328,6 +340,22 @@ if test ["$ORACLE"] != ["no"] ; then
 	CXXFLAGS=$CXXFLAGS_ORIG
 	CPPFLAGS=$CPPFLAGS_ORIG
 fi
+if test ["$FIREBIRD"] != ["no"] ; then
+	AC_CHECK_HEADERS([ibase.h],
+	  [AC_SUBST([DO_FIREBIRD_DRIVER],["firebird"])
+			DEFAULT_DRIVER=["Firebird"]],
+				[if test ["$FIREBIRD"] = ["yes"] ; then
+					AC_MSG_ERROR([[Cannot continue without Firebird devel(client)!]])
+				fi;FIREBIRD=["no"]])
+fi
+if test ["$MYSQL"] != ["no"] ; then
+	AC_CHECK_HEADERS([mysql/mysql.h],
+		[AC_SUBST([DO_MYSQL_DRIVER],["mysql"])
+			DEFAULT_DRIVER=["MySQL"]],
+				[if test ["$MYSQL"] = ["yes"] ; then
+					AC_MSG_ERROR([[Cannot continue without MySQL devel(client)!]])
+				fi;MYSQL=["no"]])
+fi
 if test ["$POSTGRES"] != ["no"] ; then
 	AC_CHECK_HEADERS([postgresql/libpq-fe.h],
 		[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
@@ -338,14 +366,6 @@ if test ["$POSTGRES"] != ["no"] ; then
 				[if test ["$POSTGRES"] = ["yes"] ; then
 					AC_MSG_ERROR([[Cannot continue without PostgreSQL devel(client)!]])
 				fi;POSTGRES=["no"]])])
-fi
-if test ["$MYSQL"] != ["no"] ; then
-	AC_CHECK_HEADERS([mysql/mysql.h],
-		[AC_SUBST([DO_MYSQL_DRIVER],["mysql"])
-			DEFAULT_DRIVER=["MySQL"]],
-				[if test ["$MYSQL"] = ["yes"] ; then
-					AC_MSG_ERROR([[Cannot continue without MySQL devel(client)!]])
-				fi;MYSQL=["no"]])
 fi
 if test ["$SQLITE3"] != ["no"] ; then
 	AC_CHECK_HEADERS([sqlite3.h],

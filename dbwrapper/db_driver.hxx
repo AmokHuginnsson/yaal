@@ -62,6 +62,7 @@ struct ODBConnector {
 			SQLITE3,
 			POSTGRESQL,
 			MYSQL,
+			FIREBIRD,
 			ORACLE,
 			TERMINATOR
 		} enum_t;

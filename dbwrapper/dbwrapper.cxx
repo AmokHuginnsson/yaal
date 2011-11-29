@@ -75,6 +75,8 @@ bool set_dbwrapper_variables( HString& option_, HString& value_ ) {
 			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::POSTGRESQL;
 		else if ( value_ == "MySQL" )
 			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::MYSQL;
+		else if ( value_ == "Firebird" )
+			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::FIREBIRD;
 		else if ( value_ == "Oracle" )
 			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::ORACLE;
 		else {

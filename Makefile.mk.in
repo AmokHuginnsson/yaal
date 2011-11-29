@@ -31,7 +31,7 @@ SUBVERSION   = 0
 EXTRAVERSION = 29
 LIB_VERSION  = $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 COMPONENTS   = hcore tools dbwrapper hconsole hdata
-DRIVERS      = @DO_ORACLE_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
+DRIVERS      = @DO_ORACLE_DRIVER@ @DO_FIREBIRD_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
 PREFIX       = @prefix@
 DIR_LIB      = $(PREFIX)/lib
 DIR_HEADERS  = $(PREFIX)/include
@@ -85,6 +85,8 @@ DEPS_postgresql_driver = $(TARGET_hcore)
 LIBS_postgresql_driver = -lc -lpq -lhcore$(LIB_INFIX)
 DEPS_mysql_driver      = $(TARGET_hcore)
 LIBS_mysql_driver      = -lc -lmysqlclient -lhcore$(LIB_INFIX)
+DEPS_firebird_driver     = $(TARGET_hcore)
+LIBS_firebird_driver     = -lc -lfbclient -lhcore$(LIB_INFIX)
 DEPS_oracle_driver     = $(TARGET_hcore)
 LIBS_oracle_driver     = -lc -lclntsh -lhcore$(LIB_INFIX)
 
