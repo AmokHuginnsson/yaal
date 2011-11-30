@@ -30,24 +30,24 @@ using namespace yaal::dbwrapper;
 
 extern "C" {
 
-M_EXPORT_SYMBOL bool db_connect( ODBLink&, char const* /*dataBase_*/,
+M_EXPORT_SYMBOL bool db_connect( ODBLink& /*dbLink_*/, char const* /*dataBase_*/,
 		char const* /*login_*/, char const* /*password_*/ ) {
 	return ( true );
 }
 
-M_EXPORT_SYMBOL void db_disconnect( ODBLink& /*data_*/ ) {
+M_EXPORT_SYMBOL void db_disconnect( ODBLink& /*dbLink_*/ ) {
 	return;
 }
 
-M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& /*dataB_*/, void* /*dataR_*/ ) {
+M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& /*dbLink_*/, void* /*dataR_*/ ) {
 	return ( errno );
 }
 
-M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& /*dataB_*/, void* /*dataR_*/ ) {
+M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& /*dbLink_*/, void* /*dataR_*/ ) {
 	return ( "" );
 }
 
-M_EXPORT_SYMBOL void* db_query( ODBLink& /*data_*/, char const* /*query_*/ ) {
+M_EXPORT_SYMBOL void* db_query( ODBLink& /*dbLink_*/, char const* /*query_*/ ) {
 	return ( NULL );
 }
 
@@ -63,11 +63,11 @@ M_EXPORT_SYMBOL int rs_fields_count( void* /*data_*/ ) {
 	return ( 0 );
 }
 
-M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dataB_*/, void* /*dataR_*/ ) {
+M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* /*dataR_*/ ) {
 	return ( 0 );
 }
 
-M_EXPORT_SYMBOL int long dbrs_id( ODBLink& /*dataB_*/, void* /*dataR_*/ ) {
+M_EXPORT_SYMBOL int long dbrs_id( ODBLink& /*dbLink_*/, void* /*dataR_*/ ) {
 	return ( 0 );
 }
 

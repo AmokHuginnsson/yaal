@@ -29,10 +29,10 @@
 
 # on_alloc_failure
 # type: special(alternative-flag), default: ABORT
-# on_alloc_failure determinaes library behavior on memory allocation failure
+# on_alloc_failure determines library behavior on memory allocation failure
 # valid memory allocation responses are: ABORT or THROW,
-# where ABORT means terminate process imediatelly with SIGABRT,
-# THROW means throw proper exception and possiby continue execution.
+# where ABORT means terminate process immediately with SIGABRT,
+# THROW means throw proper exception and possibly continue execution.
 on_alloc_failure THROW
 
 # log_mask
@@ -45,7 +45,7 @@ on_alloc_failure THROW
 log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_VCSHEADER
 
 # write_timeout
-# type: integer, dafault 4000
+# type: integer, default 4000
 # write_timeout specifies how long non-blocking write operations should wait
 # before they fail with timeout in case operation did not succeeded in given time.
 write_timeout 4000
@@ -85,19 +85,19 @@ ssl_cert "${HOME}/var/db/keys/yaal.pem"
 
 # ignore_signal_(SIGINT|SIGTSTP|SIGQUIT)
 # type: bool, default: false
-# this option tells if process should ignore recievied signal
+# this option tells if process should ignore received signal
 ignore_signal_SIGINT false
 ignore_signal_SIGTSTP false
 ignore_signal_SIGQUIT false
 
 # kill_grace_period
 # type: integer, default 1000
-# wait for that many miliseconds before killing interior
+# wait for that many milliseconds before killing interior
 kill_grace_period 1000
 
 # child_kill_grace_period
 # type: integer, default 1000
-# wait for that many miliseconds before killing child process 
+# wait for that many milliseconds before killing child process 
 child_kill_grace_period 1000
 
 # default_encoding
@@ -108,12 +108,12 @@ default_encoding "ISO-8859-2"
 # compression_level
 # type: integer, default: -1
 # valid levels [-1..9]
-# sets default compression level for zlib libraary
+# sets default compression level for zlib library
 compression_level -1
 
 # compression_buffer_size
 # type: integer, default 262144
-# set size (in bytes) for memory buffer used for (de)compression in zlib libraary
+# set size (in bytes) for memory buffer used for (de)compression in zlib library
 compression_buffer_size 262144
 
 # serial port configuration
@@ -133,7 +133,7 @@ serial_baudrate B115200
 # serial_flags
 # type: special(multi flag value),
 # default: FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
-# this option set various flags controling serial connection behaviour
+# this option set various flags controlling serial connection behaviour
 # flag names: FLOW_CONTROL_HARDWARE SOFTWARE_CONTROL_SOFTWARE BITS_PER_BYTE_8
 #             BITS_PER_BYTE_7 BITS_PER_BYTE_6 BITS_PER_BYTE_5 PARITY_CHECK
 #             PARITY_ODD CR2NL ECHO CANONICAL STOP_BITS_1 STOP_BITS_2
@@ -141,7 +141,7 @@ serial_flags FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
 
 # collector_connection_timeout
 # type: integer, default: 9999
-# time in seconds, after this time elapses process gives up an atempt
+# time in seconds, after this time elapses process gives up an attempt
 # to connect to collector port
 collector_connection_timeout 8
 
@@ -155,7 +155,7 @@ collector_connection_timeout 8
 # ESC key code is used to compose escape sequences
 # terminal must distinguish if following codes make sequence
 # or are separate key presses, to do that ncurses uses esc_delay
-# environment variable which holds delay (miliseconds),
+# environment variable which holds delay (milliseconds),
 # after this time elapses next code is treated as separate character
 
 esc_delay 0
@@ -187,7 +187,7 @@ use_mouse true
 
 # latency
 # type: integer, default: 1
-# how long should aplication wait for user input before running
+# how long should application wait for user input before running
 # idle-state operation, this value is specified in seconds
 latency 1
 
@@ -248,10 +248,10 @@ log_mask LOG_SQL
 
 # select data base driver
 # accepted drivers are:
-# SQLite3, PostgreSQL, MySQL, Oracle, null, none
-# last two drivers disables database interface completly,
+# SQLite3, PostgreSQL, MySQL, Firebird, Oracle, null, none
+# last two drivers disables database interface completely,
 # it can by useful for programs that does not use databases
-# or for debuging purpouses
+# or for debugging purposes
 
 # data_base_driver
 # type: string, default: (installation dependent)
