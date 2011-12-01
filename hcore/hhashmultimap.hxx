@@ -66,15 +66,19 @@ private:
 	typedef HHashMap<key_type, value_list_ptr_t, hasher_function_t> hashmultimap_engine_t;
 	hashmultimap_engine_t _engine;
 public:
-	HHashMultiMap( void ) : _engine() {}
+	HHashMultiMap( void )
+		: _engine()
+		{}
 	template<typename iterator_t>
-	HHashMultiMap( iterator_t first, iterator_t last ) : _engine() {
+	HHashMultiMap( iterator_t first, iterator_t last )
+		: _engine() {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
-	HHashMultiMap( HHashMultiMap const& multimap_ ) : _engine() {
+	HHashMultiMap( HHashMultiMap const& multimap_ )
+		: _engine() {
 		M_PROLOG
 		_engine.copy_from( multimap_._engine );
 		return;

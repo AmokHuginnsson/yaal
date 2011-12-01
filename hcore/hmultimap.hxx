@@ -65,15 +65,19 @@ private:
 	typedef HMap<key_type, value_list_ptr_t, helper_t> multimap_engine_t;
 	multimap_engine_t _engine;
 public:
-	HMultiMap( void ) : _engine() {}
+	HMultiMap( void )
+		: _engine()
+		{}
 	template<typename iterator_t>
-	HMultiMap( iterator_t first, iterator_t last ) : _engine() {
+	HMultiMap( iterator_t first, iterator_t last )
+		: _engine() {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
-	HMultiMap( HMultiMap const& multimap_ ) : _engine() {
+	HMultiMap( HMultiMap const& multimap_ )
+		: _engine() {
 		M_PROLOG
 		_engine.copy_from( multimap_._engine );
 		return;

@@ -76,15 +76,19 @@ public:
 private:
 	HSBBSTree _engine;
 public:
-	HMap( void ) : _engine() {}
+	HMap( void )
+		: _engine()
+		{}
 	template<typename iterator_t>
-	HMap( iterator_t first, iterator_t last ) : _engine() {
+	HMap( iterator_t first, iterator_t last )
+		: _engine() {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
-	HMap( HMap const& source ) : _engine() {
+	HMap( HMap const& source )
+		: _engine() {
 		M_PROLOG
 		_engine.copy_from( source._engine );
 		return;

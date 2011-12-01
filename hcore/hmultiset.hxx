@@ -75,15 +75,19 @@ public:
 private:
 	HSBBSTree _engine;
 public:
-	HMultiSet( void ) : _engine() {}
+	HMultiSet( void )
+		: _engine()
+		{}
 	template<typename iterator_t>
-	HMultiSet( iterator_t first, iterator_t last ) : _engine() {
+	HMultiSet( iterator_t first, iterator_t last )
+		: _engine() {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
-	HMultiSet( HMultiSet const& source ) : _engine() {
+	HMultiSet( HMultiSet const& source )
+		: _engine() {
 		M_PROLOG
 		_engine.copy_from( source._engine );
 		return;

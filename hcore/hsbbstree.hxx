@@ -64,8 +64,12 @@ private:
 	struct ONodePtr {
 		HAbstractNode* _node;
 		bool _exists;
-		ONodePtr( void ) : _node( NULL ), _exists( false ) { }
-		ONodePtr( ONodePtr const& np ) : _node( np._node ), _exists( np._exists ) {}
+		ONodePtr( void )
+			: _node( NULL ), _exists( false )
+			{ }
+		ONodePtr( ONodePtr const& np )
+			: _node( np._node ), _exists( np._exists )
+			{}
 		ONodePtr& operator = ( ONodePtr const& np ) {
 			if ( &np != this ) {
 				_node = np._node;

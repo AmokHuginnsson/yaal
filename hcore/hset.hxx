@@ -70,15 +70,19 @@ public:
 private:
 	HSBBSTree _engine;
 public:
-	HSet( void ) : _engine() {}
+	HSet( void )
+		: _engine()
+		{}
 	template<typename iterator_t>
-	HSet( iterator_t first, iterator_t last ) : _engine() {
+	HSet( iterator_t first, iterator_t last )
+		: _engine() {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
-	HSet( HSet const& source ) {
+	HSet( HSet const& source )
+		: _engine() {
 		M_PROLOG
 		_engine.copy_from( source._engine );
 		return;
