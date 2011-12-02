@@ -65,11 +65,14 @@ else
 
 	printf "	dynamic_cast:      %8d\n" ${DYNAMIC_CAST}
 
-	TYPEDEFS=`grep -c 'typedef' ${TMP_FILE}`
+	TYPEDEFS=`grep -c '\<typedef\>' ${TMP_FILE}`
 
 	printf "	typedefs:          %8d\n" ${TYPEDEFS}
 
-	FUNCTIONS=`grep -c "^	}$" ${TMP_FILE}`
+	FUNCTIONS=`grep -c ") {" ${TMP_FILE}`
+	NON_FUNCTIONS=`grep -c "\(\<if\>\|\<while\>\|\<for\>\|\<switch\>\|\<case\>\).*)[[:space:]][{]" ${TMP_FILE}`
+
+	FUNCTIONS=`expr ${FUNCTIONS} - ${NON_FUNCTIONS}`
 
 	printf "	functions:         %8d\n" ${FUNCTIONS}
 
