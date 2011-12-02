@@ -206,7 +206,8 @@ int SystemIO::dup2_io( int id1_, int id2_ ) {
 	M_ASSERT( ( id1_ >= MANAGED_IO ) || ( id2_ >= MANAGED_IO ) );
 	CLock l( _mutex );
 	int fd1( id1_ < MANAGED_IO ? id1_ : _open_osfhandle( reinterpret_cast<intptr_t>( get_io( id1_ ).second->_handle ), 0 ) );
-	int fd2( id2_ < MANAGED_IO ? id2_ : _open_osfhandle( reinterpret_cast<intptr_t>( get_io( id2_ ).second->_handle ), 0 ) );	int fd( _dup2( fd1, fd2 ) );
+	int fd2( id2_ < MANAGED_IO ? id2_ : _open_osfhandle( reinterpret_cast<intptr_t>( get_io( id2_ ).second->_handle ), 0 ) );
+	int fd( _dup2( fd1, fd2 ) );
 /*	HANDLE h( reinterpret_cast<HANDLE>( _get_osfhandle( fd ) ) );
 	 _ioTable.insert( std::make_pair( fd, make_shared<IO>( IO::TYPE::TERMINAL, h, h ) ) ) */
 	return ( fd );

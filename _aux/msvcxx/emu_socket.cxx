@@ -86,6 +86,7 @@ int make_pipe_instance( IO& io_ ) {
 		PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
 		PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
 		PIPE_UNLIMITED_INSTANCES, 1024, 1024, 1000, NULL ) );
+	/* Connection it self fires event so we only fake read here. */
 	io_.fake_schedule_read();
 	return ( io_.handle() != INVALID_HANDLE_VALUE ? 0 : -1 );
 }
@@ -102,7 +103,7 @@ int bind( int fd_, const struct sockaddr* addr_, socklen_t len_ ) {
                        0,                      // do not share
                        NULL,                   // default security
                        CREATE_NEW,          // overwrite existing
-                       FILE_ATTRIBUTE_NORMAL,  // normal file
+											 FILE_ATTRIBUTE_NORMAL | FILE_FLAG_NO_BUFFERING, // normal file
                        NULL);                  // no attr. template
 		string n( "\\\\.\\pipe" );
 		if ( h != INVALID_HANDLE_VALUE ) {
@@ -137,11 +138,12 @@ int listen( int fd_, int backlog_ ) {
 		if ( ::ConnectNamedPipe( io.handle(), io.overlapped() ) ) {
 			log_windows_error( "ConnectNamedPipe" );
 			ret = -1;
-		}		
+		}
 	} else {
 		SOCKET s( reinterpret_cast<SOCKET>( io.handle() ) );
 		if ( WSAEventSelect( s, io.event(), FD_ACCEPT | FD_OOB ) )
 			log_windows_error( "WSAEventSelect" );
+		/* Connection it self fires eventc so we only fake read here. */
 		io.fake_schedule_read();
 		ret = ::listen( s, backlog_ );
 	}
@@ -184,7 +186,8 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ ) {
 		string n( "\\\\.\\pipe" );
 		n += path;
 		std::replace( n.begin(), n.end(), '/', '\\' );
-		HANDLE h( ::CreateFile( n.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, 0 ) );
+		HANDLE h( ::CreateFile( n.c_str(), ( GENERIC_READ | GENERIC_WRITE ) & ( ~SYNCHRONIZE ), 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING
+, 0 ) );
 		if ( h == INVALID_HANDLE_VALUE ) {
 			log_windows_error( "CreateNamedPipe" );
 			ret = -1;
