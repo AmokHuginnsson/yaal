@@ -35,10 +35,9 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::dbwrapper;
 
-extern "C" {
-
 struct OFirebird {
 	static int const MAX_ERROR_COUNT = 20;
+	static char const _tpb[];
 	isc_db_handle _db;
 	HChunk _connectionString;
 	ISC_STATUS _status[ MAX_ERROR_COUNT ];
@@ -47,6 +46,25 @@ struct OFirebird {
 		: _db( 0 ), _connectionString(), _status(), _errorMessageBufer()
 		{}
 };
+
+char const OFirebird::_tpb[] = {
+	isc_tpb_version3,
+	isc_tpb_consistency,
+	isc_tpb_write
+};
+
+struct OFirebirdResult {
+	ODBLink& _dbLink;
+	isc_tr_handle _tr;
+	isc_stmt_handle _stmt;
+	ISC_STATUS _status[ OFirebird::MAX_ERROR_COUNT ];
+	HChunk _errorMessageBufer;
+	OFirebirdResult( ODBLink& dbLink_ )
+		: _dbLink( dbLink_ ), _tr( 0 ), _stmt( 0 ), _status(), _errorMessageBufer()
+		{}
+};
+
+extern "C" {
 
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* dataBase_,
 		char const* login_, char const* password_ ) {
@@ -83,6 +101,8 @@ M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 	M_ASSERT( db );
 	isc_detach_database( db->_status, &db->_db );
 	M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
+	M_SAFE( delete db );
+	dbLink_.clear();
 	return;
 }
 
@@ -92,27 +112,60 @@ M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* ) {
 	return ( isc_sqlcode( db->_status ) );
 }
 
-M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* ) {
+M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) {
 	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
-	M_ASSERT( db );
+	OFirebirdResult* res( static_cast<OFirebirdResult*>( result_ ) );
+	M_ASSERT( db || res );
 	static int const MIN_ERROR_BUFFER_SIZE( 512 ); /* no documentation is available why 512 is correct here :( */
-	ISC_STATUS const* status( db->_status );
-	db->_errorMessageBufer.realloc( MIN_ERROR_BUFFER_SIZE );
-	char* msg( db->_errorMessageBufer.get<char>() );
+	ISC_STATUS const* status( res ? res->_status : db->_status );
+	HChunk& errBuf( res ? res->_errorMessageBufer : db->_errorMessageBufer );
+	errBuf.realloc( MIN_ERROR_BUFFER_SIZE );
+	char* msg( errBuf.get<char>() );
 	int msgLen( 0 );
 	while ( fb_interpret( msg + msgLen, MIN_ERROR_BUFFER_SIZE, &status ) ) {
 		msgLen = static_cast<int>( ::strlen( msg ) );
-		db->_errorMessageBufer.realloc( MIN_ERROR_BUFFER_SIZE + msgLen );
-		msg = db->_errorMessageBufer.get<char>();
+		errBuf.realloc( MIN_ERROR_BUFFER_SIZE + msgLen );
+		msg = errBuf.get<char>();
 	}
 	return ( msg );
 }
 
-M_EXPORT_SYMBOL void* db_query( ODBLink& /*dbLink_*/, char const* /*query_*/ ) {
-	return ( NULL );
+M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
+	M_ASSERT( db );
+	typedef HResource<OFirebirdResult> firebird_result_resource_guard_t;
+	firebird_result_resource_guard_t res( new OFirebirdResult( dbLink_ ) );
+	bool ok( false );
+	do {
+		isc_start_transaction( db->_status, &res->_tr, 1, &db->_db, sizeof ( OFirebird::_tpb ), OFirebird::_tpb );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+			break;
+		XSQLDA desc;
+		desc.version = SQLDA_VERSION1;
+		desc.sqln = 1;
+		desc.sqld = 1;
+		isc_dsql_allocate_statement( db->_status, &db->_db, &res->_stmt );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+			isc_rollback_transaction( res->_status, &res->_tr );
+			break;
+		}
+		isc_dsql_prepare( db->_status, &res->_tr, &res->_stmt, 0, query_, 1, &desc );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+			isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
+			isc_rollback_transaction( res->_status, &res->_tr );
+			break;
+		}
+		ok = true;
+	} while ( false );
+	return ( ok ? res.release() : NULL );
 }
 
-M_EXPORT_SYMBOL void rs_unquery( void* /*data_*/ ) {
+M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
+	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
+	M_ASSERT( res );
+	isc_commit_transaction( res->_status, &res->_tr );
+	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+	M_SAFE( delete res );
 	return;
 }
 
