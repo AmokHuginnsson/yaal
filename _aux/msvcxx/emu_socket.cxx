@@ -30,7 +30,11 @@ M_EXPORT_SYMBOL
 int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout ) {
 	int ret( 0 );
 	int long miliseconds( timeout ? ( ( timeout->tv_sec * 1000 ) + ( timeout->tv_usec / 1000 ) ) : 0 );
-	if ( readFds ) {
+	if ( writeFds ) {
+		ret = writeFds->_count;
+		if ( readFds )
+			readFds->_count = 0;
+	} else if ( readFds ) {
 		int count( ( readFds ? readFds->_count : 0 ) + ( writeFds ? writeFds->_count : 0 ) );
 		M_ENSURE( count <= MAXIMUM_WAIT_OBJECTS );
 		IO* ios[MAXIMUM_WAIT_OBJECTS];
@@ -68,9 +72,7 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 			} else
 				FD_ZERO( readFds );
 		}
-	} else if ( writeFds )
-		ret = writeFds->_count;
-	else {
+	} else {
 		M_ASSERT( timeout );
 		HANDLE h( _tlsSignalsSetup_->interrupt() );
 		if ( ::WaitForSingleObject( h, miliseconds ) == WAIT_OBJECT_0 ) {
@@ -186,8 +188,7 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ ) {
 		string n( "\\\\.\\pipe" );
 		n += path;
 		std::replace( n.begin(), n.end(), '/', '\\' );
-		HANDLE h( ::CreateFile( n.c_str(), ( GENERIC_READ | GENERIC_WRITE ) & ( ~SYNCHRONIZE ), 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING
-, 0 ) );
+		HANDLE h( ::CreateFile( n.c_str(), ( GENERIC_READ | GENERIC_WRITE ) & ( ~SYNCHRONIZE ), 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, 0 ) );
 		if ( h == INVALID_HANDLE_VALUE ) {
 			log_windows_error( "CreateNamedPipe" );
 			ret = -1;

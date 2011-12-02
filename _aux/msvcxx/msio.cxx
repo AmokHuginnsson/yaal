@@ -41,9 +41,11 @@ void IO::schedule_read( void ) {
 
 void IO::sync_read( void ) {
 	DWORD iRead( 0 );
-	if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iRead, true ) || ( iRead != 1 ) )
-		log_windows_error( "GetOverlappedResult" );
-	else
+	if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iRead, true ) ) {
+		log_windows_error( "GetOverlappedResult(sync_read)" );
+	} if ( iRead != 1 ) {
+		log_windows_error( "GetOverlappedResult(bad read)" );
+	} else
 		_ready = true;
 	_scheduled = false;
 	return;
@@ -69,7 +71,7 @@ int long IO::read( void* buf_, int long size_ ) {
 			log_windows_error( "ReadFile" );
 		ok = ::GetOverlappedResult( _handle, &_overlapped, &iRead, ! _nonBlocking ) ? true : false;
 		if ( ! ok )
-			log_windows_error( "GetOverlappedResult" );
+			log_windows_error( "GetOverlappedResult(read)" );
 	}
 	return ( ok ? iRead + off : -1 );
 }
@@ -80,7 +82,7 @@ int long IO::write( void const* buf_, int long size_ ) {
 	if ( ::GetLastError() == ERROR_IO_PENDING ) {
 		ok = ::GetOverlappedResult( _handle, &_overlapped, &iWritten, true ) ? true : false;
 		if ( ! ok )
-			log_windows_error( "GetOverlappedResult" );
+			log_windows_error( "GetOverlappedResult(write)" );
 	}
 	return ( ok ? iWritten : -1 );
 }
