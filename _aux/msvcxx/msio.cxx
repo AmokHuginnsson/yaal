@@ -17,6 +17,7 @@ namespace msvcxx {
 
 IO::IO( TYPE::type_t t_, HANDLE h_, HANDLE e_, std::string const& p_ )
 : _type( t_ ), _handle( h_ ), _overlapped(), _buffer( 0 ),
+	_connected( ( t_ == TYPE::TERMINAL ) || ( t_ == TYPE::PIPE ) ),
 	_scheduled( false ), _ready( false ), _nonBlocking( false ), _path( p_ ) {
 	_overlapped.hEvent = e_ ? e_ : ::CreateEvent( NULL, false, false, NULL );
 }
@@ -39,14 +40,17 @@ void IO::schedule_read( void ) {
 	return;
 }
 
-void IO::sync_read( void ) {
-	DWORD iRead( 0 );
-	if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iRead, true ) ) {
+void IO::sync( void ) {
+	DWORD iTransfered( 0 );
+	if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransfered, true ) ) {
 		log_windows_error( "GetOverlappedResult(sync_read)" );
-	} if ( iRead != 1 ) {
-		log_windows_error( "GetOverlappedResult(bad read)" );
+	} if ( _connected ) {
+		if ( iTransfered != 1 )
+			log_windows_error( "GetOverlappedResult(bad read)" );
+		else
+			_ready = true;
 	} else
-		_ready = true;
+		_connected = true;
 	_scheduled = false;
 	return;
 }
@@ -56,7 +60,7 @@ int long IO::read( void* buf_, int long size_ ) {
 	int off( 0 );
 	bool ok( false );
 	if ( _scheduled && ! _ready )
-		sync_read();
+		sync();
 	if ( _ready ) {
 		_scheduled = false;
 		_ready = false;
@@ -89,6 +93,7 @@ int long IO::write( void const* buf_, int long size_ ) {
 
 int IO::close( void ) {
 	int ret( 0 );
+	_connected = false;
 	if ( reinterpret_cast<SOCKET>( _handle ) != -1 ) {
 		if ( ( _type == IO::TYPE::PIPE ) || ( _type == IO::TYPE::NAMED_PIPE ) )
 			ret = ::CloseHandle( _handle ) ? 0 : -1;
@@ -165,6 +170,10 @@ void IO::fake_schedule_read( void ) {
 
 bool IO::ready( void ) const {
 	return ( _ready );
+}
+
+bool IO::is_connected( void ) const {
+	return ( _connected );
 }
 
 SystemIO::SystemIO( void )

@@ -30,6 +30,7 @@ private:
 	HANDLE _handle;
 	OVERLAPPED _overlapped;
 	char _buffer;
+	bool _connected;
 	bool _scheduled; /* io has been scheduled */
 	bool _ready; /* data is ready */
 	bool _nonBlocking;
@@ -39,7 +40,7 @@ public:
 	~IO( void );
 	HANDLE event( void ) const;
 	void schedule_read( void );
-	void sync_read( void );
+	void sync( void );
 	int long read( void*, int long );
 	int long write( void const*, int long );
 	int fcntl( int, int );
@@ -53,6 +54,7 @@ public:
 	void fake_schedule_read( void );
 	void reset( void );
 	bool ready( void ) const;
+	bool is_connected( void ) const;
 private:
 	friend class SystemIO;
 	int close( void );
