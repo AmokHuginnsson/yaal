@@ -28,8 +28,10 @@ Copyright:
 #include <ibase.h>
 
 #include "hcore/hchunk.hxx"
+#include "hcore/harray.hxx"
 #include "hcore/hresource.hxx"
 #include "dbwrapper/db_driver.hxx"
+#include "hcore/hfile.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -54,13 +56,20 @@ char const OFirebird::_tpb[] = {
 };
 
 struct OFirebirdResult {
+	typedef HPointer<HChunk> chunk_t;
+	typedef HArray<chunk_t> values_t;
 	ODBLink& _dbLink;
 	isc_tr_handle _tr;
 	isc_stmt_handle _stmt;
+	HChunk _metaData;
+	HChunk _cache;
+	values_t _values;
 	ISC_STATUS _status[ OFirebird::MAX_ERROR_COUNT ];
 	HChunk _errorMessageBufer;
 	OFirebirdResult( ODBLink& dbLink_ )
-		: _dbLink( dbLink_ ), _tr( 0 ), _stmt( 0 ), _status(), _errorMessageBufer()
+		: _dbLink( dbLink_ ), _tr( 0 ), _stmt( 0 ),
+		_metaData(), _cache(), _values(),
+		_status(), _errorMessageBufer()
 		{}
 };
 
@@ -145,48 +154,164 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 		desc.sqln = 1;
 		desc.sqld = 1;
 		isc_dsql_allocate_statement( db->_status, &db->_db, &res->_stmt );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
-			isc_rollback_transaction( res->_status, &res->_tr );
-			break;
-		}
+		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
 		isc_dsql_prepare( db->_status, &res->_tr, &res->_stmt, 0, query_, 1, &desc );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
-			isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
-			isc_rollback_transaction( res->_status, &res->_tr );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
 			break;
+		isc_dsql_describe( db->_status, &res->_stmt, 1, &desc );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+			break;
+		XSQLDA* out( NULL );
+		if ( desc.sqld > 0 ) {
+			res->_metaData.realloc( XSQLDA_LENGTH( desc.sqld ) );
+			out = res->_metaData.get<XSQLDA>();
+			out->version = SQLDA_VERSION1;
+			out->sqld = out->sqln = desc.sqld;
+			isc_dsql_describe( db->_status, &res->_stmt, 1, out );
+			if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+				break;
+			int i( 0 );
+			XSQLVAR* var( NULL );
+			int valuesMaxBufferSize( 0 );
+			for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var )
+				valuesMaxBufferSize += var->sqllen;
+			valuesMaxBufferSize += out->sqld;
+			valuesMaxBufferSize += ( out->sqld * static_cast<int>( sizeof ( short ) ) );
+			res->_cache.realloc( valuesMaxBufferSize );
+			char* valBuf( res->_cache.raw() );
+			for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var ) {
+				var->sqldata = valBuf;
+				valBuf += var->sqllen; /* vlaue buffer */
+				++ valBuf; /* \0 terminator */
+				var->sqlind = reinterpret_cast<short*>( valBuf ); /* NULL indicator */
+				valBuf += sizeof ( short );
+				var->sqltype = SQL_VARYING + 1; /* get everything as null terminated text */
+			}
+		}
+		isc_dsql_execute( db->_status, &res->_tr, &res->_stmt, 1, NULL );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+			break;
+		if ( desc.sqld > 0 ) {
+			int retcode( 0 );
+			while ( ( retcode = static_cast<int>( isc_dsql_fetch( db->_status, &res->_stmt, 1, out ) ) ) == 0 ) {
+				int valuesBufferSize( 0 );
+				int i( 0 );
+				XSQLVAR* var( NULL );
+				for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var )
+					valuesBufferSize += ( var->sqllen - static_cast<int>( sizeof ( short ) ) );
+				valuesBufferSize += out->sqld * static_cast<int>( sizeof ( int ) ); /* for offsets */
+				valuesBufferSize += out->sqld; /* for \0 terminators */
+				OFirebirdResult::chunk_t c( make_pointer<HChunk>() );
+				c->realloc( valuesBufferSize );
+				int offset( 0 );
+				int* offsets( c->get<int>() );
+				char* buf( reinterpret_cast<char*>( offsets + out->sqld ) );
+				for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var ) {
+					if ( ( *var->sqlind ) != -1 ) {
+						offsets[i] = offset;
+						int len( var->sqllen - static_cast<int>( sizeof ( short ) ) );
+						::memcpy( buf + offset, var->sqldata + sizeof ( short ), len );
+						offset += len;
+						buf[offset] = 0;
+						++ offset;
+					} else
+						offsets[i] = -1;
+				}
+				res->_values.push_back( c );
+			}
+			if ( retcode != 100 )
+				break;
 		}
 		ok = true;
 	} while ( false );
+	if ( ! ok ) {
+		isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
+		isc_rollback_transaction( res->_status, &res->_tr );
+	}
 	return ( ok ? res.release() : NULL );
 }
 
 M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	M_ASSERT( res );
+	isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
+	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 	isc_commit_transaction( res->_status, &res->_tr );
 	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 	M_SAFE( delete res );
 	return;
 }
 
-M_EXPORT_SYMBOL char const* rs_get( void* /*data_*/, int long /*row_*/, int /*column_*/ ) {
-	return ( NULL );
+M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
+	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
+	M_ASSERT( res );
+	OFirebirdResult::chunk_t c( res->_values[row_] );
+	XSQLDA* out( res->_metaData.get<XSQLDA>() );
+	int* offsets( c->get<int>() );
+	char* buf( reinterpret_cast<char*>( offsets + out->sqld ) );
+	return ( offsets[column_] >= 0 ? buf + offsets[column_] : NULL );
 }
 
-M_EXPORT_SYMBOL int rs_fields_count( void* /*data_*/ ) {
-	return ( 0 );
+M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
+	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
+	M_ASSERT( res );
+	XSQLDA* out( res->_metaData.get<XSQLDA>() );
+	return ( out->sqld );
 }
 
-M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* /*dataR_*/ ) {
-	return ( 0 );
+M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ ) {
+	OFirebirdResult* res( static_cast<OFirebirdResult*>( dataR_ ) );
+	M_ASSERT( res );
+	char items[] = { isc_info_sql_stmt_type, isc_info_sql_records, isc_info_end };
+	static int const COUNT_BUF_SIZE( 48 ); /* Value taken from firebird sources. */
+	char countBuffer[COUNT_BUF_SIZE];
+	::memset( countBuffer, isc_info_end, COUNT_BUF_SIZE );
+	isc_dsql_sql_info( res->_status, &res->_stmt, sizeof ( items ), items, sizeof ( countBuffer ), countBuffer );
+	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+	char statementType( 0 );
+	char const* p( countBuffer );
+	if ( *p == isc_info_sql_stmt_type ) {
+		++ p;
+		int len( isc_vax_integer( p, sizeof ( short ) ) ); /* Stored on two bytes. */
+		p += sizeof ( short );
+		statementType = static_cast<char>( isc_vax_integer( p, static_cast<int short>( len ) ) );
+		p += len;
+	}
+	int long count( 0 );
+	if ( statementType == isc_info_sql_stmt_select )
+		count = res->_values.size();
+	else {
+		int totalLen( static_cast<int>( p - countBuffer ) );
+		if ( *p == isc_info_sql_records ) {
+			++ p;
+			++ totalLen;
+			totalLen += static_cast<int>( sizeof ( short ) );
+			totalLen += isc_vax_integer( p, sizeof ( short ) );
+			p += sizeof ( short );
+			while ( *p != isc_info_end ) {
+				char const countType( *p++ );
+				int len( isc_vax_integer( p, sizeof ( short ) ) ); /* Stored on two bytes. */
+				p += sizeof ( short );
+				count = isc_vax_integer( p, static_cast<int short>( len ) );
+				p += len;
+				if ( countType == statementType )
+					break;
+			}
+			M_ENSURE( countBuffer[totalLen] == isc_info_end );
+		}
+	}
+	return ( count );
 }
 
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink& /*dbLink_*/, void* /*dataR_*/ ) {
 	return ( 0 );
 }
 
-M_EXPORT_SYMBOL char const* rs_column_name( void* /*dataR_*/, int /*field_*/ ) {
-	return ( NULL );
+M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
+	OFirebirdResult* res( static_cast<OFirebirdResult*>( dataR_ ) );
+	M_ASSERT( res );
+	XSQLDA* out( res->_metaData.get<XSQLDA>() );
+	return ( out->sqlvar[field_].aliasname );
 }
 
 int yaal_firebird_driver_main( int, char** ) {
