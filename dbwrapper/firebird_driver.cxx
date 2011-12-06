@@ -31,11 +31,14 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hresource.hxx"
 #include "dbwrapper/db_driver.hxx"
-#include "hcore/hfile.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::dbwrapper;
+
+namespace {
+static char const LAST_INSERT_ID[] = "SELECT CAST( RDB$GET_CONTEXT('USER_SESSION', 'LAST_INSERT_ID') AS BIGINT ) FROM RDB$DATABASE;";
+}
 
 struct OFirebird {
 	static int const MAX_ERROR_COUNT = 20;
@@ -155,7 +158,7 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 		desc.sqld = 1;
 		isc_dsql_allocate_statement( db->_status, &db->_db, &res->_stmt );
 		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
-		isc_dsql_prepare( db->_status, &tr, &res->_stmt, 0, query_, 1, &desc );
+		isc_dsql_prepare( db->_status, &tr, &res->_stmt, 0, query_, 3, &desc ); /* Dialect version 3. */
 		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
 			break;
 		isc_dsql_describe( db->_status, &res->_stmt, 1, &desc );
@@ -282,6 +285,13 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ 
 	if ( statementType == isc_info_sql_stmt_select )
 		count = res->_values.size();
 	else {
+		int reqCountType( 0 );
+		switch ( statementType )  {
+			case isc_info_sql_stmt_update: reqCountType = isc_info_req_update_count; break;
+			case isc_info_sql_stmt_delete: reqCountType = isc_info_req_delete_count; break;
+			case isc_info_sql_stmt_insert: reqCountType = isc_info_req_insert_count; break;
+			default: break;
+		}
 		int totalLen( static_cast<int>( p - countBuffer ) );
 		if ( *p == isc_info_sql_records ) {
 			++ p;
@@ -295,7 +305,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ 
 				p += sizeof ( short );
 				count = isc_vax_integer( p, static_cast<int short>( len ) );
 				p += len;
-				if ( countType == statementType )
+				if ( countType == reqCountType )
 					break;
 			}
 			M_ENSURE( countBuffer[totalLen] == isc_info_end );
@@ -304,8 +314,52 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ 
 	return ( count );
 }
 
-M_EXPORT_SYMBOL int long dbrs_id( ODBLink& /*dbLink_*/, void* /*dataR_*/ ) {
-	return ( 0 );
+M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
+	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
+	M_ASSERT( db );
+	bool ok( false );
+	isc_tr_handle tr( 0 );
+	isc_stmt_handle stmt( 0 );
+	int long lastInsertId( -1 );
+	short nullInd( 0 );
+	do {
+		isc_start_transaction( db->_status, &tr, 1, &db->_db, sizeof ( OFirebird::_tpb ), OFirebird::_tpb );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+			break;
+		XSQLDA desc;
+		XSQLVAR& var( desc.sqlvar[0] );
+		desc.version = SQLDA_VERSION1;
+		desc.sqln = 1;
+		desc.sqld = 1;
+		isc_dsql_allocate_statement( db->_status, &db->_db, &stmt );
+		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
+		isc_dsql_prepare( db->_status, &tr, &stmt, 0, LAST_INSERT_ID, 3, &desc ); /* Dialect version 3. */
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+			break;
+		isc_dsql_describe( db->_status, &stmt, 1, &desc );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+			break;
+		var.sqlind = &nullInd;
+		var.sqldata = reinterpret_cast<char*>( &lastInsertId );
+		isc_dsql_execute( db->_status, &tr, &stmt, 1, NULL );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+			break;
+		if ( isc_dsql_fetch( db->_status, &stmt, 1, &desc ) != 0 )
+			break;
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+			break;
+		ok = true;
+	} while ( false );
+	isc_dsql_free_statement( db->_status, &stmt, DSQL_drop );
+	M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, NULL ) );
+	if ( ! ok ) {
+		isc_rollback_transaction( db->_status, &tr );
+		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, NULL ) );
+	} else {
+		isc_commit_transaction( db->_status, &tr );
+		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, NULL ) );
+	}
+	return ( nullInd != -1 ? lastInsertId : -1 );
 }
 
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
