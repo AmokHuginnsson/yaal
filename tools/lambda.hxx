@@ -71,6 +71,14 @@ struct LAMBDA_TYPE {
 		MINUS,
 		MULTIPLIES,
 		DIVIDES,
+		NEGATE,
+		BOOLEAN_NOT,
+		BOOLEAN_AND,
+		BOOLEAN_OR,
+		BIT_NOT,
+		BIT_AND,
+		BIT_OR,
+		BIR_XOR,
 		COMA,
 		STREAM
 	} type_t;
@@ -273,15 +281,33 @@ public:
 	}
 };
 
-template<>
-class HLambda<LAMBDA_TYPE::MINUS> {
+template<typename first_lambda, typename second_lambda>
+class HLambda<LAMBDA_TYPE::MINUS, first_lambda, second_lambda> {
 public:
 	template<typename R, typename T1, typename T2>
-	R operator()( T1 const& val1_, T2 const& val2_ )
-		{ return ( static_cast<R>( val1_ - val2_ ) ); }
+	R operator()( T1 const& val1_, T2 const& val2_ ) {
+		first_lambda fl;
+		second_lambda sl;
+		return ( static_cast<R>( fl( val1_, val2_ ) - sl( val1_, val2_ ) ) );
+	}
+	template<typename R, typename T1, typename T2, typename T3>
+	R operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
+		first_lambda fl;
+		second_lambda sl;
+		return ( static_cast<R>( fl( val1_, val2_, val3_ ) - sl( val1_, val2_, val3_ ) ) );
+	}
 	template<typename T1, typename T2>
-	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ )
-		{ return ( val1_ - val2_ ); }
+	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ ) {
+		first_lambda fl;
+		second_lambda sl;
+		return ( fl( val1_, val2_ ) - sl( val1_, val2_ ) );
+	}
+	template<typename T1, typename T2, typename T3>
+	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
+		first_lambda fl;
+		second_lambda sl;
+		return ( fl( val1_, val2_, val3_ ) - sl( val1_, val2_, val3_ ) );
+	}
 };
 
 template<typename first_lambda, typename second_lambda>
@@ -313,15 +339,33 @@ public:
 	}
 };
 
-template<>
-class HLambda<LAMBDA_TYPE::DIVIDES> {
+template<typename first_lambda, typename second_lambda>
+class HLambda<LAMBDA_TYPE::DIVIDES, first_lambda, second_lambda> {
 public:
 	template<typename R, typename T1, typename T2>
-	R operator()( T1 const& val1_, T2 const& val2_ )
-		{ return ( static_cast<R>( val1_ / val2_ ) ); }
+	R operator()( T1 const& val1_, T2 const& val2_ ) {
+		first_lambda fl;
+		second_lambda sl;
+		return ( static_cast<R>( fl( val1_, val2_ ) / sl( val1_, val2_ ) ) );
+	}
+	template<typename R, typename T1, typename T2, typename T3>
+	R operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
+		first_lambda fl;
+		second_lambda sl;
+		return ( static_cast<R>( fl( val1_, val2_, val3_ ) / sl( val1_, val2_, val3_ ) ) );
+	}
 	template<typename T1, typename T2>
-	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ )
-		{ return ( val1_ / val2_ ); }
+	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ ) {
+		first_lambda fl;
+		second_lambda sl;
+		return ( fl( val1_, val2_ ) / sl( val1_, val2_ ) );
+	}
+	template<typename T1, typename T2, typename T3>
+	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
+		first_lambda fl;
+		second_lambda sl;
+		return ( fl( val1_, val2_, val3_ ) / sl( val1_, val2_, val3_ ) );
+	}
 };
 
 inline HLambda<LAMBDA_TYPE::PRE_INCREMENT> operator ++ ( HLambda<LAMBDA_TYPE::PRE_INCREMENT> ) {
@@ -391,9 +435,59 @@ operator + ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_se
 
 /***********************************************************************/
 
-inline HLambda<LAMBDA_TYPE::MINUS> operator - ( yaal::hcore::higher_order::placeholder<1>, yaal::hcore::higher_order::placeholder<2> ) {
-	return ( HLambda<LAMBDA_TYPE::MINUS>() );
+/***********************************************************************/
+/* Lambda Minus */
+
+template<int const first, int const second>
+inline HLambda<LAMBDA_TYPE::MINUS,
+			 HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >,
+			 HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >
+			 operator - ( yaal::hcore::higher_order::placeholder<first>, yaal::hcore::higher_order::placeholder<second> ) {
+	return ( HLambda<LAMBDA_TYPE::MINUS,
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >,
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >() );
 }
+
+template<LAMBDA_TYPE::type_t const first_lambda_type,
+	typename first_lambda_first_type, typename first_lambda_second_type, int second>
+HLambda<LAMBDA_TYPE::MINUS,
+	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+	HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >
+operator - ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
+		yaal::hcore::higher_order::placeholder<second> )
+	{ return ( HLambda<LAMBDA_TYPE::MINUS,
+			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >() ); }
+
+template<int const first,
+	LAMBDA_TYPE::type_t const second_lambda_type,
+	typename second_lambda_first_type, typename second_lambda_second_type>
+HLambda<LAMBDA_TYPE::MINUS,
+	HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >,
+	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
+operator - ( yaal::hcore::higher_order::placeholder<first> const&,
+		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& )
+	{ return ( HLambda<LAMBDA_TYPE::MINUS,
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >,
+			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >() ); }
+
+template<LAMBDA_TYPE::type_t const first_lambda_type,
+	typename first_lambda_first_type, typename first_lambda_second_type,
+	LAMBDA_TYPE::type_t const second_lambda_type,
+	typename second_lambda_first_type, typename second_lambda_second_type>
+HLambda<LAMBDA_TYPE::MINUS,
+	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
+operator - ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
+		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& )
+	{ return ( HLambda<LAMBDA_TYPE::MINUS,
+			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >() ); }
+
+/***********************************************************************/
+
+/***********************************************************************/
+/* Lambda Multiplies */
 
 template<int const first, int const second>
 inline HLambda<LAMBDA_TYPE::MULTIPLIES,
@@ -405,9 +499,94 @@ inline HLambda<LAMBDA_TYPE::MULTIPLIES,
 			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >() );
 }
 
-inline HLambda<LAMBDA_TYPE::DIVIDES> operator / ( yaal::hcore::higher_order::placeholder<1>, yaal::hcore::higher_order::placeholder<2> ) {
-	return ( HLambda<LAMBDA_TYPE::DIVIDES>() );
+template<LAMBDA_TYPE::type_t const first_lambda_type,
+	typename first_lambda_first_type, typename first_lambda_second_type, int second>
+HLambda<LAMBDA_TYPE::MULTIPLIES,
+	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+	HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >
+operator * ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
+		yaal::hcore::higher_order::placeholder<second> )
+	{ return ( HLambda<LAMBDA_TYPE::MULTIPLIES,
+			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >() ); }
+
+template<int const first,
+	LAMBDA_TYPE::type_t const second_lambda_type,
+	typename second_lambda_first_type, typename second_lambda_second_type>
+HLambda<LAMBDA_TYPE::MULTIPLIES,
+	HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >,
+	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
+operator * ( yaal::hcore::higher_order::placeholder<first> const&,
+		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& )
+	{ return ( HLambda<LAMBDA_TYPE::MULTIPLIES,
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >,
+			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >() ); }
+
+template<LAMBDA_TYPE::type_t const first_lambda_type,
+	typename first_lambda_first_type, typename first_lambda_second_type,
+	LAMBDA_TYPE::type_t const second_lambda_type,
+	typename second_lambda_first_type, typename second_lambda_second_type>
+HLambda<LAMBDA_TYPE::MULTIPLIES,
+	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
+operator * ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
+		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& )
+	{ return ( HLambda<LAMBDA_TYPE::MULTIPLIES,
+			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >() ); }
+
+/***********************************************************************/
+
+/***********************************************************************/
+/* Lambda Divides */
+
+template<int const first, int const second>
+inline HLambda<LAMBDA_TYPE::DIVIDES,
+			 HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >,
+			 HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >
+			 operator / ( yaal::hcore::higher_order::placeholder<first>, yaal::hcore::higher_order::placeholder<second> ) {
+	return ( HLambda<LAMBDA_TYPE::DIVIDES,
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >,
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >() );
 }
+
+template<LAMBDA_TYPE::type_t const first_lambda_type,
+	typename first_lambda_first_type, typename first_lambda_second_type, int second>
+HLambda<LAMBDA_TYPE::DIVIDES,
+	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+	HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >
+operator / ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
+		yaal::hcore::higher_order::placeholder<second> )
+	{ return ( HLambda<LAMBDA_TYPE::DIVIDES,
+			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >() ); }
+
+template<int const first,
+	LAMBDA_TYPE::type_t const second_lambda_type,
+	typename second_lambda_first_type, typename second_lambda_second_type>
+HLambda<LAMBDA_TYPE::DIVIDES,
+	HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >,
+	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
+operator / ( yaal::hcore::higher_order::placeholder<first> const&,
+		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& )
+	{ return ( HLambda<LAMBDA_TYPE::DIVIDES,
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >,
+			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >() ); }
+
+template<LAMBDA_TYPE::type_t const first_lambda_type,
+	typename first_lambda_first_type, typename first_lambda_second_type,
+	LAMBDA_TYPE::type_t const second_lambda_type,
+	typename second_lambda_first_type, typename second_lambda_second_type>
+HLambda<LAMBDA_TYPE::DIVIDES,
+	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
+operator / ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
+		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& )
+	{ return ( HLambda<LAMBDA_TYPE::DIVIDES,
+			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
+			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >() ); }
+
+/***********************************************************************/
 
 template<typename T>
 inline HBinder<plus<T>, T, 0> operator + ( T const& constant_, yaal::hcore::higher_order::placeholder<1> ) {
@@ -424,8 +603,8 @@ inline HBinder<minus<T>, T, 0> operator - ( T const& constant_, yaal::hcore::hig
 	return ( HBinder<minus<T>, T, 0>( minus<T>(), constant_ ) );
 }
 
-template<typename T>
-inline HBinder<minus<T>, T, 1> operator - ( yaal::hcore::higher_order::placeholder<1>, T const& constant_ ) {
+template<int const first, typename T>
+inline HBinder<minus<T>, T, 1> operator - ( yaal::hcore::higher_order::placeholder<first>, T const& constant_ ) {
 	return ( HBinder<minus<T>, T, 1>( minus<T>(), constant_ ) );
 }
 
@@ -434,8 +613,8 @@ inline HBinder<multiplies<T>, T, 0> operator * ( T const& constant_, yaal::hcore
 	return ( HBinder<multiplies<T>, T, 0>( multiplies<T>(), constant_ ) );
 }
 
-template<typename T>
-inline HBinder<multiplies<T>, T, 1> operator * ( yaal::hcore::higher_order::placeholder<1>, T const& constant_ ) {
+template<int const first, typename T>
+inline HBinder<multiplies<T>, T, 1> operator * ( yaal::hcore::higher_order::placeholder<first>, T const& constant_ ) {
 	return ( HBinder<multiplies<T>, T, 1>( multiplies<T>(), constant_ ) );
 }
 
@@ -444,8 +623,8 @@ inline HBinder<divides<T>, T, 0> operator / ( T const& constant_, yaal::hcore::h
 	return ( HBinder<divides<T>, T, 0>( divides<T>(), constant_ ) );
 }
 
-template<typename T>
-inline HBinder<divides<T>, T, 1> operator / ( yaal::hcore::higher_order::placeholder<1>, T const& constant_ ) {
+template<int const first, typename T>
+inline HBinder<divides<T>, T, 1> operator / ( yaal::hcore::higher_order::placeholder<first>, T const& constant_ ) {
 	return ( HBinder<divides<T>, T, 1>( divides<T>(), constant_ ) );
 }
 
