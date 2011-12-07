@@ -63,6 +63,7 @@ struct LAMBDA_TYPE {
 	typedef enum {
 		RETURN,
 		VALUE,
+		CONST,
 		PRE_INCREMENT,
 		POST_INCREMENT,
 		PRE_DECREMENT,
@@ -114,9 +115,40 @@ HLambdaReturn<T, L> ret( L lambda_ ) {
 template<LAMBDA_TYPE::type_t const lambda_type, typename first_lambda = trait::no_type, typename second_lambda = trait::no_type>
 class HLambda;
 
+template<typename type_t>
+class HLambda<LAMBDA_TYPE::CONST, type_t> {
+	type_t _const;
+public:
+	HLambda( type_t const& const_ )
+		: _const( const_ )
+		{}
+	type_t const& operator()( void ) const
+		{ return ( _const ); }
+	template<typename a0_t>
+	type_t const& operator()( a0_t const& ) const
+		{ return ( _const ); }
+	template<typename a0_t>
+	type_t const& operator()( a0_t& ) const
+		{ return ( _const ); }
+	template<typename a0_t, typename a1_t>
+	type_t const& operator()( a0_t const&, a1_t const& ) const
+		{ return ( _const ); }
+	template<typename a0_t, typename a1_t>
+	type_t const& operator()( a0_t&, a1_t const& ) const
+		{ return ( _const ); }
+	template<typename a0_t, typename a1_t, typename a2_t>
+	type_t const& operator()( a0_t const&, a1_t const&, a2_t const& ) const
+		{ return ( _const ); }
+	template<typename a0_t, typename a1_t, typename a2_t>
+	type_t const& operator()( a0_t&, a1_t const&, a2_t const& ) const
+		{ return ( _const ); }
+};
+
 template<>
 class HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<1> > {
 public:
+	HLambda( void ) {}
+	HLambda( yaal::trait::no_type const& ) {}
 	template<typename a0_t>
 	a0_t const& operator()( a0_t const& a0_ ) const
 		{ return ( a0_ ); }
@@ -140,6 +172,8 @@ public:
 template<>
 class HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<2> > {
 public:
+	HLambda( void ) {}
+	HLambda( yaal::trait::no_type const& ) {}
 	template<typename a0_t, typename a1_t>
 	a1_t const& operator()( a0_t const&, a1_t const& a1_ ) const
 		{ return ( a1_ ); }
@@ -157,6 +191,8 @@ public:
 template<>
 class HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<3> > {
 public:
+	HLambda( void ) {}
+	HLambda( yaal::trait::no_type const& ) {}
 	template<typename a0_t, typename a1_t, typename a2_t>
 	a2_t const& operator()( a0_t const&, a1_t const&, a2_t const& a2_ ) const
 		{ return ( a2_ ); }
@@ -167,13 +203,22 @@ public:
 
 template<typename first_lambda, typename second_lambda>
 class HLambda<LAMBDA_TYPE::COMA, first_lambda, second_lambda> {
+	first_lambda _firstLambda;
+	second_lambda _secondLambda;
 public:
+	HLambda( void )
+		: _firstLambda(), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_, second_lambda const& secondLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda( secondLambda_ )
+		{}
 	template<typename T>
 	T& operator()( T& val_ ) const {
-		first_lambda fl;
-		second_lambda sl;
-		fl( val_ );
-		return ( sl( val_ ) );
+		_firstLambda( val_ );
+		return ( _secondLambda( val_ ) );
 	}
 };
 
@@ -190,11 +235,11 @@ template<LAMBDA_TYPE::type_t const first_lambda_type,
 HLambda<LAMBDA_TYPE::COMA,
 	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
 	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
-operator , ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
-		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& )
+operator , ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const& firstLambda_,
+		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& secondLambda_ )
 	{ return ( HLambda<LAMBDA_TYPE::COMA,
 			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
-			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >() ); }
+			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) ); }
 
 template<>
 class HLambda<LAMBDA_TYPE::PRE_INCREMENT> {
@@ -254,117 +299,161 @@ public:
 
 template<typename first_lambda, typename second_lambda>
 class HLambda<LAMBDA_TYPE::PLUS, first_lambda, second_lambda> {
+	first_lambda _firstLambda;
+	second_lambda _secondLambda;
 public:
+	HLambda( void )
+		: _firstLambda(), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_, second_lambda const& secondLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda( secondLambda_ )
+		{}
+	template<typename R, typename T1>
+	R operator()( T1 const& val1_ ) {
+		return ( static_cast<R>( _firstLambda( val1_ ) + _secondLambda( val1_ ) ) );
+	}
 	template<typename R, typename T1, typename T2>
 	R operator()( T1 const& val1_, T2 const& val2_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( static_cast<R>( fl( val1_, val2_ ) + sl( val1_, val2_ ) ) );
+		return ( static_cast<R>( _firstLambda( val1_, val2_ ) + _secondLambda( val1_, val2_ ) ) );
 	}
 	template<typename R, typename T1, typename T2, typename T3>
 	R operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( static_cast<R>( fl( val1_, val2_, val3_ ) + sl( val1_, val2_, val3_ ) ) );
+		return ( static_cast<R>( _firstLambda( val1_, val2_, val3_ ) + _secondLambda( val1_, val2_, val3_ ) ) );
+	}
+	template<typename T1>
+	T1 operator()( T1 const& val1_ ) {
+		return ( _firstLambda( val1_ ) + _secondLambda( val1_ ) );
 	}
 	template<typename T1, typename T2>
 	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( fl( val1_, val2_ ) + sl( val1_, val2_ ) );
+		return ( _firstLambda( val1_, val2_ ) + _secondLambda( val1_, val2_ ) );
 	}
 	template<typename T1, typename T2, typename T3>
 	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( fl( val1_, val2_, val3_ ) + sl( val1_, val2_, val3_ ) );
+		return ( _firstLambda( val1_, val2_, val3_ ) + _secondLambda( val1_, val2_, val3_ ) );
 	}
 };
 
 template<typename first_lambda, typename second_lambda>
 class HLambda<LAMBDA_TYPE::MINUS, first_lambda, second_lambda> {
+	first_lambda _firstLambda;
+	second_lambda _secondLambda;
 public:
+	HLambda( void )
+		: _firstLambda(), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_, second_lambda const& secondLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda( secondLambda_ )
+		{}
+	template<typename R, typename T1>
+	R operator()( T1 const& val1_ ) {
+		return ( static_cast<R>( _firstLambda( val1_ ) - _secondLambda( val1_ ) ) );
+	}
 	template<typename R, typename T1, typename T2>
 	R operator()( T1 const& val1_, T2 const& val2_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( static_cast<R>( fl( val1_, val2_ ) - sl( val1_, val2_ ) ) );
+		return ( static_cast<R>( _firstLambda( val1_, val2_ ) - _secondLambda( val1_, val2_ ) ) );
 	}
 	template<typename R, typename T1, typename T2, typename T3>
 	R operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( static_cast<R>( fl( val1_, val2_, val3_ ) - sl( val1_, val2_, val3_ ) ) );
+		return ( static_cast<R>( _firstLambda( val1_, val2_, val3_ ) - _secondLambda( val1_, val2_, val3_ ) ) );
+	}
+	template<typename T1>
+	T1 operator()( T1 const& val1_ ) {
+		return ( _firstLambda( val1_ ) - _secondLambda( val1_ ) );
 	}
 	template<typename T1, typename T2>
 	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( fl( val1_, val2_ ) - sl( val1_, val2_ ) );
+		return ( _firstLambda( val1_, val2_ ) - _secondLambda( val1_, val2_ ) );
 	}
 	template<typename T1, typename T2, typename T3>
 	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( fl( val1_, val2_, val3_ ) - sl( val1_, val2_, val3_ ) );
+		return ( _firstLambda( val1_, val2_, val3_ ) - _secondLambda( val1_, val2_, val3_ ) );
 	}
 };
 
 template<typename first_lambda, typename second_lambda>
 class HLambda<LAMBDA_TYPE::MULTIPLIES, first_lambda, second_lambda> {
+	first_lambda _firstLambda;
+	second_lambda _secondLambda;
 public:
+	HLambda( void )
+		: _firstLambda(), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_, second_lambda const& secondLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda( secondLambda_ )
+		{}
+	template<typename R, typename T1>
+	R operator()( T1 const& val1_ ) {
+		return ( static_cast<R>( _firstLambda( val1_ ) * _secondLambda( val1_ ) ) );
+	}
 	template<typename R, typename T1, typename T2>
 	R operator()( T1 const& val1_, T2 const& val2_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( static_cast<R>( fl( val1_, val2_ ) * sl( val1_, val2_ ) ) );
+		return ( static_cast<R>( _firstLambda( val1_, val2_ ) * _secondLambda( val1_, val2_ ) ) );
 	}
 	template<typename R, typename T1, typename T2, typename T3>
 	R operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( static_cast<R>( fl( val1_, val2_, val3_ ) * sl( val1_, val2_, val3_ ) ) );
+		return ( static_cast<R>( _firstLambda( val1_, val2_, val3_ ) * _secondLambda( val1_, val2_, val3_ ) ) );
+	}
+	template<typename T1>
+	T1 operator()( T1 const& val1_ ) {
+		return ( _firstLambda( val1_ ) * _secondLambda( val1_ ) );
 	}
 	template<typename T1, typename T2>
 	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( fl( val1_, val2_ ) * sl( val1_, val2_ ) );
+		return ( _firstLambda( val1_, val2_ ) * _secondLambda( val1_, val2_ ) );
 	}
 	template<typename T1, typename T2, typename T3>
 	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( fl( val1_, val2_, val3_ ) * sl( val1_, val2_, val3_ ) );
+		return ( _firstLambda( val1_, val2_, val3_ ) * _secondLambda( val1_, val2_, val3_ ) );
 	}
 };
 
 template<typename first_lambda, typename second_lambda>
 class HLambda<LAMBDA_TYPE::DIVIDES, first_lambda, second_lambda> {
+	first_lambda _firstLambda;
+	second_lambda _secondLambda;
 public:
+	HLambda( void )
+		: _firstLambda(), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_, second_lambda const& secondLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda( secondLambda_ )
+		{}
+	template<typename R, typename T1>
+	R operator()( T1 const& val1_ ) {
+		return ( static_cast<R>( _firstLambda( val1_ ) / _secondLambda( val1_ ) ) );
+	}
 	template<typename R, typename T1, typename T2>
 	R operator()( T1 const& val1_, T2 const& val2_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( static_cast<R>( fl( val1_, val2_ ) / sl( val1_, val2_ ) ) );
+		return ( static_cast<R>( _firstLambda( val1_, val2_ ) / _secondLambda( val1_, val2_ ) ) );
 	}
 	template<typename R, typename T1, typename T2, typename T3>
 	R operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( static_cast<R>( fl( val1_, val2_, val3_ ) / sl( val1_, val2_, val3_ ) ) );
+		return ( static_cast<R>( _firstLambda( val1_, val2_, val3_ ) / _secondLambda( val1_, val2_, val3_ ) ) );
+	}
+	template<typename T1>
+	T1 operator()( T1 const& val1_ ) {
+		return ( _firstLambda( val1_ ) / _secondLambda( val1_ ) );
 	}
 	template<typename T1, typename T2>
 	typename return_type_binary_arithmetic<T1, T2>::type operator()( T1 const& val1_, T2 const& val2_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( fl( val1_, val2_ ) / sl( val1_, val2_ ) );
+		return ( _firstLambda( val1_, val2_ ) / _secondLambda( val1_, val2_ ) );
 	}
 	template<typename T1, typename T2, typename T3>
 	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) {
-		first_lambda fl;
-		second_lambda sl;
-		return ( fl( val1_, val2_, val3_ ) / sl( val1_, val2_, val3_ ) );
+		return ( _firstLambda( val1_, val2_, val3_ ) / _secondLambda( val1_, val2_, val3_ ) );
 	}
 };
 
@@ -402,11 +491,11 @@ template<LAMBDA_TYPE::type_t const first_lambda_type,
 HLambda<LAMBDA_TYPE::PLUS,
 	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
 	HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >
-operator + ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
+operator + ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const& firstLambda_,
 		yaal::hcore::higher_order::placeholder<second> )
 	{ return ( HLambda<LAMBDA_TYPE::PLUS,
 			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
-			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >() ); }
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >( firstLambda_ ) ); }
 
 template<int const first,
 	LAMBDA_TYPE::type_t const second_lambda_type,
@@ -427,11 +516,11 @@ template<LAMBDA_TYPE::type_t const first_lambda_type,
 HLambda<LAMBDA_TYPE::PLUS,
 	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
 	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
-operator + ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
-		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& )
+operator + ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const& firstLambda_,
+		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& secondLambda_ )
 	{ return ( HLambda<LAMBDA_TYPE::PLUS,
 			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
-			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >() ); }
+			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) ); }
 
 /***********************************************************************/
 
@@ -453,11 +542,11 @@ template<LAMBDA_TYPE::type_t const first_lambda_type,
 HLambda<LAMBDA_TYPE::MINUS,
 	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
 	HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >
-operator - ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
+operator - ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const& firstLambda_,
 		yaal::hcore::higher_order::placeholder<second> )
 	{ return ( HLambda<LAMBDA_TYPE::MINUS,
 			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
-			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >() ); }
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >( firstLambda_ ) ); }
 
 template<int const first,
 	LAMBDA_TYPE::type_t const second_lambda_type,
@@ -478,11 +567,11 @@ template<LAMBDA_TYPE::type_t const first_lambda_type,
 HLambda<LAMBDA_TYPE::MINUS,
 	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
 	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
-operator - ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
-		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& )
+operator - ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const& firstLambda_,
+		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& secondLambda_ )
 	{ return ( HLambda<LAMBDA_TYPE::MINUS,
 			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
-			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >() ); }
+			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) ); }
 
 /***********************************************************************/
 
@@ -504,11 +593,11 @@ template<LAMBDA_TYPE::type_t const first_lambda_type,
 HLambda<LAMBDA_TYPE::MULTIPLIES,
 	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
 	HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >
-operator * ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
+operator * ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const& firstLambda_,
 		yaal::hcore::higher_order::placeholder<second> )
 	{ return ( HLambda<LAMBDA_TYPE::MULTIPLIES,
 			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
-			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >() ); }
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >( firstLambda_ ) ); }
 
 template<int const first,
 	LAMBDA_TYPE::type_t const second_lambda_type,
@@ -529,11 +618,11 @@ template<LAMBDA_TYPE::type_t const first_lambda_type,
 HLambda<LAMBDA_TYPE::MULTIPLIES,
 	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
 	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
-operator * ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
-		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& )
+operator * ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const& firstLambda_,
+		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& secondLambda_ )
 	{ return ( HLambda<LAMBDA_TYPE::MULTIPLIES,
 			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
-			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >() ); }
+			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) ); }
 
 /***********************************************************************/
 
@@ -555,11 +644,11 @@ template<LAMBDA_TYPE::type_t const first_lambda_type,
 HLambda<LAMBDA_TYPE::DIVIDES,
 	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
 	HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >
-operator / ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
+operator / ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const& firstLambda_,
 		yaal::hcore::higher_order::placeholder<second> )
 	{ return ( HLambda<LAMBDA_TYPE::DIVIDES,
 			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
-			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >() ); }
+			HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >( firstLambda_ ) ); }
 
 template<int const first,
 	LAMBDA_TYPE::type_t const second_lambda_type,
@@ -580,22 +669,31 @@ template<LAMBDA_TYPE::type_t const first_lambda_type,
 HLambda<LAMBDA_TYPE::DIVIDES,
 	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
 	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
-operator / ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&,
-		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& )
+operator / ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const& firstLambda_,
+		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& secondLambda_ )
 	{ return ( HLambda<LAMBDA_TYPE::DIVIDES,
 			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
-			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >() ); }
+			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) ); }
 
 /***********************************************************************/
 
-template<typename T>
-inline HBinder<plus<T>, T, 0> operator + ( T const& constant_, yaal::hcore::higher_order::placeholder<1> ) {
-	return ( HBinder<plus<T>, T, 0>( plus<T>(), constant_ ) );
+template<typename T, int const second>
+inline HLambda<LAMBDA_TYPE::PLUS, HLambda<LAMBDA_TYPE::CONST, T>, HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >
+operator + ( T const& constant_, yaal::hcore::higher_order::placeholder<second> ) {
+	return ( HLambda<LAMBDA_TYPE::PLUS, HLambda<LAMBDA_TYPE::CONST, T>, HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<second> > >( HLambda<LAMBDA_TYPE::CONST, T>( constant_ ) ) );
 }
 
 template<int const first, typename T>
-inline HBinder<plus<T>, T, 1> operator + ( yaal::hcore::higher_order::placeholder<first>, T const& constant_ ) {
-	return ( HBinder<plus<T>, T, 1>( plus<T>(), constant_ ) );
+inline HLambda<LAMBDA_TYPE::PLUS, HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >, HLambda<LAMBDA_TYPE::CONST, T> >
+operator + ( yaal::hcore::higher_order::placeholder<first> const&, T const& constant_ ) {
+	return ( HLambda<LAMBDA_TYPE::PLUS, HLambda<LAMBDA_TYPE::VALUE, yaal::hcore::higher_order::placeholder<first> >, HLambda<LAMBDA_TYPE::CONST, T> >( yaal::trait::no_type(), HLambda<LAMBDA_TYPE::CONST, T>( constant_ ) ) );
+}
+
+template<LAMBDA_TYPE::type_t const first_lambda_type,
+	typename first_lambda_first_type, typename first_lambda_second_type, typename T>
+inline HLambda<LAMBDA_TYPE::PLUS, HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>, HLambda<LAMBDA_TYPE::CONST, T> >
+operator + ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const&, T const& constant_ ) {
+	return ( HLambda<LAMBDA_TYPE::PLUS, HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>, HLambda<LAMBDA_TYPE::CONST, T> >( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>(), HLambda<LAMBDA_TYPE::CONST, T>( constant_ ) ) );
 }
 
 template<typename T>
