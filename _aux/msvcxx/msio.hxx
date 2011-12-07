@@ -54,6 +54,7 @@ public:
 	void fake_schedule_read( void );
 	void reset( void );
 	void connect( void );
+	void accept( void );
 	bool ready( void ) const;
 	bool is_connected( void ) const;
 private:

@@ -191,6 +191,13 @@ void IO::connect( void ) {
 	return;
 }
 
+void IO::accept( void ) {
+	M_ASSERT( ! _connected );
+	_connected = true;
+	_ready = false;
+	_scheduled = false;
+}
+
 SystemIO::SystemIO( void )
 	: _ioTable(), _mutex(), _idPool( MANAGED_IO )
 	{}

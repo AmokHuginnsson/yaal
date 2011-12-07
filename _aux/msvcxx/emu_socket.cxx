@@ -163,6 +163,7 @@ int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ ) {
 		if ( WSAEventSelect( ret, sock.second->event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE | FD_OOB ) )
 			log_windows_error( "WSAEventSelect" );
 		ret = sock.first;
+		sock.second->accept();
 	} else {
 		SystemIO::io_t np( sysIo.create_io( IO::TYPE::NAMED_PIPE,
 			reinterpret_cast<HANDLE>( -1 ), NULL, io.path() ) );
@@ -175,6 +176,7 @@ int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ ) {
 		}	
 		if ( ! ret )
 			ret = np.first;
+		np.second->accept();
 	}
 	return ( ret );
 }
