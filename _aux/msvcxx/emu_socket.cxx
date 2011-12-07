@@ -200,6 +200,7 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ ) {
 		if ( WSAEventSelect( s, io.event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE | FD_OOB ) )
 			log_windows_error( "WSAEventSelect" );
 	}
+	io.connect();
 	return ( ret );
 }
 

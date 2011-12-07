@@ -44,7 +44,8 @@ void IO::sync( void ) {
 	DWORD iTransfered( 0 );
 	if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransfered, true ) ) {
 		log_windows_error( "GetOverlappedResult(sync_read)" );
-	} if ( _connected ) {
+	}
+	if ( _connected ) {
 		if ( iTransfered != 1 )
 			log_windows_error( "GetOverlappedResult(bad read)" );
 		else
@@ -174,6 +175,20 @@ bool IO::ready( void ) const {
 
 bool IO::is_connected( void ) const {
 	return ( _connected );
+}
+
+void IO::connect( void ) {
+	M_ASSERT( ! _connected );
+	if ( ! _nonBlocking ) {
+		DWORD iTransfered( 0 );
+		if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransfered, true ) ) {
+			log_windows_error( "GetOverlappedResult(connect)" );
+		}
+	}
+	_connected = true;
+	_scheduled = false;
+	_ready = false;
+	return;
 }
 
 SystemIO::SystemIO( void )
