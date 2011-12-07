@@ -39,9 +39,10 @@ typedef int file_descriptor_t;
 /*! \brief Raw low level IO operations abstraction.
  */
 class HRawFile : public HStreamInterface {
-protected:
+public:
 	typedef HRawFile this_type;
 	typedef HStreamInterface base_type;
+protected:
 	typedef int long ( HRawFile::* READER_t )( void* const, int long );
 	typedef int long ( HRawFile::* WRITER_t )( void const* const, int long );
 	typedef int ( HRawFile::* CLOSER_t )( void );

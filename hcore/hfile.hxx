@@ -41,10 +41,9 @@ namespace hcore {
 /*! \brief File manipulation class.
  */
 class HFile : public HStreamInterface {
-protected:
+public:
 	typedef HFile this_type;
 	typedef HStreamInterface base_type;
-public:
 	/*! \brief Bits user for specyfying the way files are opened.
 	 */
 	struct OPEN {
