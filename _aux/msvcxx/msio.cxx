@@ -31,7 +31,7 @@ IO::~IO( void ) {
 
 void IO::schedule_read( void ) {
 	DWORD nRead( 0 );
-	if ( ! _scheduled ) {
+	if ( _connected && ! _scheduled ) {
 		BOOL status( ::ReadFile( _handle, &_buffer, 1, &nRead, &_overlapped ) );
 		if ( status && ( nRead == 1 ) )
 			_ready = true;
@@ -44,15 +44,16 @@ void IO::sync( void ) {
 	DWORD iTransfered( 0 );
 	if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransfered, true ) ) {
 		log_windows_error( "GetOverlappedResult(sync_read)" );
+	} else {
+		if ( _connected ) {
+			if ( iTransfered != 1 )
+				log_windows_error( "GetOverlappedResult(bad read)" );
+			else
+				_ready = true;
+		} else
+			_connected = _ready = true;
+		_scheduled = false;
 	}
-	if ( _connected ) {
-		if ( iTransfered != 1 )
-			log_windows_error( "GetOverlappedResult(bad read)" );
-		else
-			_ready = true;
-	} else
-		_connected = true;
-	_scheduled = false;
 	return;
 }
 
@@ -163,10 +164,6 @@ void IO::swap( IO& io_ ) {
 void IO::reset( void ) {
 	if ( ! _ready )
 		_scheduled = false;
-}
-
-void IO::fake_schedule_read( void ) {
-	_scheduled = true;
 }
 
 bool IO::ready( void ) const {

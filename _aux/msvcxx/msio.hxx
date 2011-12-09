@@ -51,7 +51,6 @@ public:
 	std::string path( void ) const;
 	void set_path( std::string const& );
 	void swap( IO& );
-	void fake_schedule_read( void );
 	void reset( void );
 	void connect( void );
 	void accept( void );

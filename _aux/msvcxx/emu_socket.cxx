@@ -88,8 +88,6 @@ int make_pipe_instance( IO& io_ ) {
 		PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
 		PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
 		PIPE_UNLIMITED_INSTANCES, 1024, 1024, 1000, NULL ) );
-	/* Connection it self fires event so we only fake read here. */
-	io_.fake_schedule_read();
 	return ( io_.handle() != INVALID_HANDLE_VALUE ? 0 : -1 );
 }
 
@@ -145,8 +143,6 @@ int listen( int fd_, int backlog_ ) {
 		SOCKET s( reinterpret_cast<SOCKET>( io.handle() ) );
 		if ( WSAEventSelect( s, io.event(), FD_ACCEPT | FD_OOB ) )
 			log_windows_error( "WSAEventSelect" );
-		/* Connection it self fires eventc so we only fake read here. */
-		io.fake_schedule_read();
 		ret = ::listen( s, backlog_ );
 	}
 	return ( ret );
