@@ -641,7 +641,11 @@ public:
 		return ( static_cast<R>( _firstLambda( val1_ ) = _secondLambda( val1_ ) ) );
 	}
 	template<typename R, typename T1, typename T2>
-	R operator()( T1 const& val1_, T2 const& val2_ ) const {
+	R operator()( T1& val1_, T2 const& val2_ ) const {
+		return ( static_cast<R>( _firstLambda( val1_, val2_ ) = _secondLambda( val1_, val2_ ) ) );
+	}
+	template<typename R, typename T1, typename T2>
+	R operator()( T1 const& val1_, T2& val2_ ) const {
 		return ( static_cast<R>( _firstLambda( val1_, val2_ ) = _secondLambda( val1_, val2_ ) ) );
 	}
 	template<typename R, typename T1, typename T2>
@@ -649,7 +653,27 @@ public:
 		return ( static_cast<R>( _firstLambda( val1_, val2_ ) = _secondLambda( val1_, val2_ ) ) );
 	}
 	template<typename R, typename T1, typename T2, typename T3>
-	R operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) const {
+	R operator()( T1& val1_, T2 const& val2_, T3 const& val3_ ) const {
+		return ( static_cast<R>( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) ) );
+	}
+	template<typename R, typename T1, typename T2, typename T3>
+	R operator()( T1& val1_, T2& val2_, T3 const& val3_ ) const {
+		return ( static_cast<R>( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) ) );
+	}
+	template<typename R, typename T1, typename T2, typename T3>
+	R operator()( T1 const& val1_, T2& val2_, T3 const& val3_ ) const {
+		return ( static_cast<R>( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) ) );
+	}
+	template<typename R, typename T1, typename T2, typename T3>
+	R operator()( T1 const& val1_, T2& val2_, T3& val3_ ) const {
+		return ( static_cast<R>( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) ) );
+	}
+	template<typename R, typename T1, typename T2, typename T3>
+	R operator()( T1& val1_, T2 const& val2_, T3& val3_ ) const {
+		return ( static_cast<R>( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) ) );
+	}
+	template<typename R, typename T1, typename T2, typename T3>
+	R operator()( T1 const& val1_, T2 const& val2_, T3& val3_ ) const {
 		return ( static_cast<R>( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) ) );
 	}
 	template<typename R, typename T1, typename T2, typename T3>
@@ -677,7 +701,27 @@ public:
 		return ( _firstLambda( val1_, val2_ ) = _secondLambda( val1_, val2_ ) );
 	}
 	template<typename T1, typename T2, typename T3>
-	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1 const& val1_, T2 const& val2_, T3 const& val3_ ) const {
+	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1& val1_, T2 const& val2_, T3 const& val3_ ) const {
+		return ( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) );
+	}
+	template<typename T1, typename T2, typename T3>
+	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1& val1_, T2& val2_, T3 const& val3_ ) const {
+		return ( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) );
+	}
+	template<typename T1, typename T2, typename T3>
+	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1 const& val1_, T2& val2_, T3 const& val3_ ) const {
+		return ( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) );
+	}
+	template<typename T1, typename T2, typename T3>
+	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1 const& val1_, T2& val2_, T3& val3_ ) const {
+		return ( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) );
+	}
+	template<typename T1, typename T2, typename T3>
+	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1 const& val1_, T2 const& val2_, T3& val3_ ) const {
+		return ( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) );
+	}
+	template<typename T1, typename T2, typename T3>
+	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<T1, T2>::type, T3>::type operator()( T1& val1_, T2 const& val2_, T3& val3_ ) const {
 		return ( _firstLambda( val1_, val2_, val3_ ) = _secondLambda( val1_, val2_, val3_ ) );
 	}
 	template<typename T1, typename T2, typename T3>
