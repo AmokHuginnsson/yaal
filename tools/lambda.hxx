@@ -275,10 +275,65 @@ public:
 	HLambda( first_lambda const& firstLambda_, second_lambda const& secondLambda_ )
 		: _firstLambda( firstLambda_ ), _secondLambda( secondLambda_ )
 		{}
-	template<typename T>
-	T& operator()( T& val_ ) const {
-		_firstLambda( val_ );
-		return ( _secondLambda( val_ ) );
+	template<typename a0_t>
+	void operator()( a0_t& a0_ ) const {
+		_firstLambda( a0_ );
+		_secondLambda( a0_ );
+	}
+	template<typename a0_t>
+	void operator()( a0_t const& a0_ ) const {
+		_firstLambda( a0_ );
+		_secondLambda( a0_ );
+	}
+	template<typename a0_t, typename a1_t>
+	void operator()( a0_t& a0_, a1_t& a1_ ) const {
+		_firstLambda( a0_, a1_ );
+		_secondLambda( a0_, a1_ );
+	}
+	template<typename a0_t, typename a1_t>
+	void operator()( a0_t const& a0_, a1_t const& a1_ ) const {
+		_firstLambda( a0_, a1_ );
+		_secondLambda( a0_, a1_ );
+	}
+	template<typename a0_t, typename a1_t, typename a2_t>
+	void operator()( a0_t& a0_, a1_t& a1_, a2_t& a2_ ) const {
+		_firstLambda( a0_, a1_, a2_ );
+		_secondLambda( a0_, a1_, a2_ );
+	}
+	template<typename a0_t, typename a1_t, typename a2_t>
+	void operator()( a0_t const& a0_, a1_t const& a1_, a2_t const& a2_ ) const {
+		_firstLambda( a0_, a1_, a2_ );
+		_secondLambda( a0_, a1_, a2_ );
+	}
+	template<typename R, typename a0_t>
+	R operator()( a0_t& a0_ ) const {
+		_firstLambda( a0_ );
+		return ( static_cast<R>( _secondLambda( a0_ ) ) );
+	}
+	template<typename R, typename a0_t>
+	R operator()( a0_t const& a0_ ) const {
+		_firstLambda( a0_ );
+		return ( static_cast<R>( _secondLambda( a0_ ) ) );
+	}
+	template<typename R, typename a0_t, typename a1_t>
+	R operator()( a0_t& a0_, a1_t& a1_ ) const {
+		_firstLambda( a0_, a1_ );
+		return ( static_cast<R>( _secondLambda( a0_, a1_ ) ) );
+	}
+	template<typename R, typename a0_t, typename a1_t>
+	R operator()( a0_t const& a0_, a1_t const& a1_ ) const {
+		_firstLambda( a0_, a1_ );
+		return ( static_cast<R>( _secondLambda( a0_, a1_ ) ) );
+	}
+	template<typename R, typename a0_t, typename a1_t, typename a2_t>
+	R operator()( a0_t& a0_, a1_t& a1_, a2_t& a2_ ) const {
+		_firstLambda( a0_, a1_, a2_ );
+		return ( static_cast<R>( _secondLambda( a0_, a1_, a2_ ) ) );
+	}
+	template<typename R, typename a0_t, typename a1_t, typename a2_t>
+	R operator()( a0_t const& a0_, a1_t const& a1_, a2_t const& a2_ ) const {
+		_firstLambda( a0_, a1_, a2_ );
+		return ( static_cast<R>( _secondLambda( a0_, a1_, a2_ ) ) );
 	}
 };
 
@@ -983,24 +1038,113 @@ operator % ( T const& constant_, HLambda<first_lambda_type, first_lambda_first_t
 
 /***********************************************************************/
 
-class HLambdaStream {
+template<typename lambda_type>
+class HLambda<LAMBDA_TYPE::STREAM, lambda_type> {
 	yaal::hcore::HStreamInterface& _stream;
-	yaal::hcore::HStreamInterface::ptr_t _buffer;
+	lambda_type _lambda;
 public:
-	HLambdaStream( yaal::hcore::HStreamInterface& stream_ ) : _stream( stream_ ), _buffer( new ( memory::yaal ) HStringStream ) {}
-	template<typename T>
-	HLambdaStream& operator << ( T const& val_ ) {
-		*_buffer << val_;
-		return ( *this );
+	HLambda( yaal::hcore::HStreamInterface& stream_, lambda_type const& lambda_ )
+		: _stream( stream_ ), _lambda( lambda_ )
+		{}
+	template<typename a0_t>
+	void operator()( a0_t& a0_ ) const {
+		_stream << _lambda( a0_ );
 	}
-	template<typename T>
-	void operator()( T const& val_ ) {
-		_stream << val_ << static_cast<HStringStream*>( _buffer.raw() )->string();
+	template<typename a0_t>
+	void operator()( a0_t const& a0_ ) const {
+		_stream << _lambda( a0_ );
+	}
+	template<typename a0_t, typename a1_t>
+	void operator()( a0_t& a0_, a1_t& a1_ ) const {
+		_stream << _lambda( a0_, a1_ );
+	}
+	template<typename a0_t, typename a1_t>
+	void operator()( a0_t const& a0_, a1_t const& a1_ ) const {
+		_stream << _lambda( a0_, a1_ );
+	}
+	template<typename a0_t, typename a1_t, typename a2_t>
+	void operator()( a0_t& a0_, a1_t& a1_, a2_t& a2_ ) const {
+		_stream << _lambda( a0_, a1_, a2_ );
+	}
+	template<typename a0_t, typename a1_t, typename a2_t>
+	void operator()( a0_t const& a0_, a1_t const& a1_, a2_t const& a2_ ) const {
+		_stream << _lambda( a0_, a1_, a2_ );
+	}
+	yaal::hcore::HStreamInterface& stream( void ) const {
+		return ( _stream );
 	}
 };
 
-inline HLambdaStream operator << ( yaal::hcore::HStreamInterface& stream_, yaal::hcore::higher_order::placeholder<1> ) {
-	return ( HLambdaStream( stream_ ) );
+template<typename first_lambda, typename second_lambda>
+class HLambda<LAMBDA_TYPE::STREAM, first_lambda, second_lambda> {
+	yaal::hcore::HStreamInterface& _stream;
+	first_lambda _firstLambda;
+	second_lambda _secondLambda;
+public:
+	HLambda( yaal::hcore::HStreamInterface& stream_, first_lambda const& firstLambda_, second_lambda const& secondLambda_ )
+		: _stream( stream_ ), _firstLambda( firstLambda_ ), _secondLambda( secondLambda_ )
+		{}
+	template<typename a0_t>
+	void operator()( a0_t& a0_ ) const {
+		_firstLambda( a0_ );
+		_stream << _secondLambda( a0_ );
+	}
+	template<typename a0_t>
+	void operator()( a0_t const& a0_ ) const {
+		_firstLambda( a0_ );
+		_stream << _secondLambda( a0_ );
+	}
+	template<typename a0_t, typename a1_t>
+	void operator()( a0_t& a0_, a1_t& a1_ ) const {
+		_firstLambda( a0_, a1_ );
+		_stream << _secondLambda( a0_, a1_ );
+	}
+	template<typename a0_t, typename a1_t>
+	void operator()( a0_t const& a0_, a1_t const& a1_ ) const {
+		_firstLambda( a0_, a1_ );
+		_stream << _secondLambda( a0_, a1_ );
+	}
+	template<typename a0_t, typename a1_t, typename a2_t>
+	void operator()( a0_t& a0_, a1_t& a1_, a2_t& a2_ ) const {
+		_firstLambda( a0_, a1_, a2_ );
+		_stream << _secondLambda( a0_, a1_, a2_ );
+	}
+	template<typename a0_t, typename a1_t, typename a2_t>
+	void operator()( a0_t const& a0_, a1_t const& a1_, a2_t const& a2_ ) const {
+		_firstLambda( a0_, a1_, a2_ );
+		_stream << _secondLambda( a0_, a1_, a2_ );
+	}
+};
+
+template<int const no>
+HLambda<LAMBDA_TYPE::STREAM, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > >
+operator << ( yaal::hcore::HStreamInterface& stream_, yaal::hcore::higher_order::placeholder<no> ) {
+	return ( HLambda<LAMBDA_TYPE::STREAM, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > >( stream_, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >() )  );
+}
+
+template<LAMBDA_TYPE::type_t const lambda_type, typename lambda_type_first_type, typename lambda_type_second_type>
+HLambda<LAMBDA_TYPE::STREAM, HLambda<lambda_type, lambda_type_first_type, lambda_type_second_type> >
+operator << ( yaal::hcore::HStreamInterface& stream_, HLambda<lambda_type, lambda_type_first_type, lambda_type_second_type> const& lambda_ ) {
+	return ( HLambda<LAMBDA_TYPE::STREAM, HLambda<lambda_type, lambda_type_first_type, lambda_type_second_type> >( stream_, lambda_ )  );
+}
+
+template<typename stream_lambda_first_type, typename stream_lambda_second_type,
+	LAMBDA_TYPE::type_t const lambda_type, typename lambda_type_first_type, typename lambda_type_second_type>
+HLambda<LAMBDA_TYPE::STREAM, HLambda<LAMBDA_TYPE::STREAM, stream_lambda_first_type, stream_lambda_second_type>, HLambda<lambda_type, lambda_type_first_type, lambda_type_second_type> >
+operator << ( HLambda<LAMBDA_TYPE::STREAM, stream_lambda_first_type, stream_lambda_second_type> const& streamLambda_, HLambda<lambda_type, lambda_type_first_type, lambda_type_second_type> const& lambda_ ) {
+	return ( HLambda<LAMBDA_TYPE::STREAM, HLambda<LAMBDA_TYPE::STREAM, stream_lambda_first_type, stream_lambda_second_type>, HLambda<lambda_type, lambda_type_first_type, lambda_type_second_type> >( streamLambda_.stream(), streamLambda_, lambda_ )  );
+}
+
+template<typename stream_lambda_first_type, typename stream_lambda_second_type>
+HLambda<LAMBDA_TYPE::STREAM, HLambda<LAMBDA_TYPE::STREAM, stream_lambda_first_type, stream_lambda_second_type>, HLambda<LAMBDA_TYPE::CONST, char const* const> >
+operator << ( HLambda<LAMBDA_TYPE::STREAM, stream_lambda_first_type, stream_lambda_second_type> const& streamLambda_, char const* str_ ) {
+	return ( HLambda<LAMBDA_TYPE::STREAM, HLambda<LAMBDA_TYPE::STREAM, stream_lambda_first_type, stream_lambda_second_type>, HLambda<LAMBDA_TYPE::CONST, char const* const> >( streamLambda_.stream(), streamLambda_, HLambda<LAMBDA_TYPE::CONST, char const* const>( str_ ) )  );
+}
+
+template<typename stream_lambda_first_type, typename stream_lambda_second_type, typename T>
+HLambda<LAMBDA_TYPE::STREAM, HLambda<LAMBDA_TYPE::STREAM, stream_lambda_first_type, stream_lambda_second_type>, HLambda<LAMBDA_TYPE::CONST, T> >
+operator << ( HLambda<LAMBDA_TYPE::STREAM, stream_lambda_first_type, stream_lambda_second_type> const& streamLambda_, T const& const_ ) {
+	return ( HLambda<LAMBDA_TYPE::STREAM, HLambda<LAMBDA_TYPE::STREAM, stream_lambda_first_type, stream_lambda_second_type>, HLambda<LAMBDA_TYPE::CONST, T> >( streamLambda_.stream(), streamLambda_, HLambda<LAMBDA_TYPE::CONST, T>( const_ ) )  );
 }
 
 }
