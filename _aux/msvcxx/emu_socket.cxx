@@ -29,57 +29,104 @@ struct OsCast {
 M_EXPORT_SYMBOL
 int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout ) {
 	int ret( 0 );
-	int long miliseconds( timeout ? ( ( timeout->tv_sec * 1000 ) + ( timeout->tv_usec / 1000 ) ) : 0 );
-	if ( writeFds ) {
-		ret = writeFds->_count;
-		if ( readFds )
-			readFds->_count = 0;
-	} else if ( readFds ) {
+	do {
 		int count( ( readFds ? readFds->_count : 0 ) + ( writeFds ? writeFds->_count : 0 ) );
-		M_ENSURE( count <= MAXIMUM_WAIT_OBJECTS );
+		M_ENSURE( ( count + 1 ) <= MAXIMUM_WAIT_OBJECTS ); /* +1 for interrupt handler */
+		int long miliseconds( timeout ? ( ( timeout->tv_sec * 1000 ) + ( timeout->tv_usec / 1000 ) ) : 0 );
 		IO* ios[MAXIMUM_WAIT_OBJECTS];
 		HANDLE handles[MAXIMUM_WAIT_OBJECTS];
+		int offset( readFds ? readFds->_count : 0 );
 		OsCast osCast;
-		std::transform( readFds->_data, readFds->_data + readFds->_count, ios, osCast );
-		for ( int i( 0 ); i < readFds->_count; ++ i ) {
-			if ( ios[i]->ready() )
-				++ ret;
+		if ( readFds && writeFds ) {
+			std::sort( readFds->_data, readFds->_data + readFds->_count );
+			std::sort( writeFds->_data, writeFds->_data + writeFds->_count );
+			int* end( std::set_difference( readFds->_data, readFds->_data + readFds->_count,
+				writeFds->_data, writeFds->_data + writeFds->_count,
+				readFds->_data ) );
+			readFds->_count = end - readFds->_data;
 		}
-		if ( ret > 0 ) {
+		if ( readFds ) {
+			std::transform( readFds->_data, readFds->_data + readFds->_count, ios, osCast );
 			for ( int i( 0 ); i < readFds->_count; ++ i ) {
-				if ( ! ios[i]->ready() )
-					readFds->_data[ i ] = -1;
-			}	
-			std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
-			readFds->_count = ret;
-		} else {
+				if ( ios[i]->ready() )
+					++ ret;
+			}
+			if ( ret > 0 ) {
+				for ( int i( 0 ); i < readFds->_count; ++ i ) {
+					if ( ! ios[i]->ready() )
+						readFds->_data[ i ] = -1;
+				}
+				std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
+				readFds->_count = ret;
+				if ( writeFds )
+					FD_ZERO( writeFds );
+				break; /* !!! Early exit. !!! */
+			}
 			std::transform( ios, ios + readFds->_count, handles, osCast );
- 			int up( ::WaitForMultipleObjects( readFds->_count, handles, false, miliseconds ) );
-			if ( up == WAIT_FAILED ) {
-				ret = -1;
-				log_windows_error( "WaitForMultipleObjects" );
-			} else if ( ( up >= static_cast<int>( WAIT_OBJECT_0 ) ) && ( up < ( static_cast<int>( WAIT_OBJECT_0 ) + count ) ) ) {
-				for ( int i( 0 ); i < count; ++ i ) {
+		}
+		if ( writeFds ) {
+			std::transform( writeFds->_data, writeFds->_data + writeFds->_count, ios + offset, osCast );
+			for ( int i( 0 ); i < writeFds->_count; ++ i ) {
+				if ( ios[i + offset]->is_connected() )
+					++ ret;
+			}
+			if ( ret > 0 ) {
+				for ( int i( 0 ); i < writeFds->_count; ++ i ) {
+					if ( ! ios[i + offset]->is_connected() )
+						writeFds->_data[ i ] = -1;
+				}
+				std::remove( writeFds->_data, writeFds->_data + writeFds->_count, -1 );
+				writeFds->_count = ret;
+				if ( readFds )
+					FD_ZERO( readFds );
+				break; /* !!! Early exit. !!! */
+			}
+			std::transform( ios + offset, ios + count, handles, osCast );
+		}
+		HANDLE interrupt( _tlsSignalsSetup_->interrupt() );
+		handles[count] = interrupt;
+		int up( ::WaitForMultipleObjects( count + 1, handles, false, miliseconds ) );
+		if ( up == WAIT_FAILED ) {
+			ret = -1;
+			log_windows_error( "WaitForMultipleObjects" );
+		} else if ( ( up >= static_cast<int>( WAIT_OBJECT_0 ) ) && ( up < ( static_cast<int>( WAIT_OBJECT_0 ) + count ) ) ) {
+			if ( readFds ) {
+				for ( int i( 0 ); i < readFds->_count; ++ i ) {
 					int upL( ::WaitForSingleObject( handles[ i ], 0 ) );
-					if ( ( i == ( up - WAIT_OBJECT_0 ) || ( upL == WAIT_OBJECT_0 ) ) )
+					if ( ( i == ( up - WAIT_OBJECT_0 ) ) || ( upL == WAIT_OBJECT_0 ) )
 						++ ret;
 					else
 						readFds->_data[ i ] = -1;
 				}
 				std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
 				readFds->_count = ret;
-				ret += ( writeFds ? writeFds->_count : 0 );
-			} else
+			}
+			if ( writeFds ) {
+				for ( int i( 0 ); i < writeFds->_count; ++ i ) {
+					int upL( ::WaitForSingleObject( handles[ i + offset ], 0 ) );
+					if ( ( ( i + offset ) == ( up - WAIT_OBJECT_0 ) ) || ( upL == WAIT_OBJECT_0 ) ) {
+						if ( ! ios[i + offset]->is_connected() )
+							ios[i + offset]->sync();
+						++ ret;
+					} else
+						writeFds->_data[ i ] = -1;
+				}
+				std::remove( writeFds->_data, writeFds->_data + writeFds->_count, -1 );
+				writeFds->_count = ( ret - ( readFds ? readFds->_count : 0 ) );
+			}
+		} else {
+			if ( readFds )
 				FD_ZERO( readFds );
+			if ( writeFds )
+				FD_ZERO( writeFds );
 		}
-	} else {
-		M_ASSERT( timeout );
-		HANDLE h( _tlsSignalsSetup_->interrupt() );
-		if ( ::WaitForSingleObject( h, miliseconds ) == WAIT_OBJECT_0 ) {
-			ret = -1;
-			errno = EINTR;
+		if ( ! ret ) {
+			if ( ::WaitForSingleObject( interrupt, miliseconds ) == WAIT_OBJECT_0 ) {
+				ret = -1;
+				errno = EINTR;
+			}
 		}
-	}
+	} while ( false );
 	return ( ret );
 }
 
@@ -198,7 +245,8 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ ) {
 		if ( WSAEventSelect( s, io.event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE | FD_OOB ) )
 			log_windows_error( "WSAEventSelect" );
 	}
-	io.connect();
+	if ( ! ret )
+	 ret = io.connect();
 	return ( ret );
 }
 
@@ -228,6 +276,12 @@ int getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* opt
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	if ( io.type() == IO::TYPE::SOCKET )
 		ret = ::getsockopt( reinterpret_cast<SOCKET>( io.handle() ), level_, optname_, static_cast<char*>( optval_ ), optlen_ );
+	else {
+		if ( optname_ == SO_ERROR ) {
+			int* opt( reinterpret_cast<int*>( optval_ ) );
+			*opt = 0;
+		}
+	}
 	return ( ret );
 }
 
@@ -238,5 +292,5 @@ int get_socket_error( void ) {
 }
 
 void set_socket_error( int errno_ ) {
-	WSASetLastError( errno_ );
+	WSASetLastError( *_errno() = errno_ );
 }

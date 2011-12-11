@@ -7,6 +7,7 @@
 
 #include "crit.hxx"
 #include "hcore/macro.hxx"
+#include "hcore/hchunk.hxx"
 
 namespace msvcxx {
 
@@ -29,7 +30,8 @@ private:
 	TYPE::type_t _type;
 	HANDLE _handle;
 	OVERLAPPED _overlapped;
-	char _buffer;
+	int _readRequest;
+	yaal::hcore::HChunk _buffer;
 	bool _connected;
 	bool _scheduled; /* io has been scheduled */
 	bool _ready; /* data is ready */
@@ -52,7 +54,7 @@ public:
 	void set_path( std::string const& );
 	void swap( IO& );
 	void reset( void );
-	void connect( void );
+	int connect( void );
 	void accept( void );
 	bool ready( void ) const;
 	bool is_connected( void ) const;

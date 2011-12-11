@@ -3,7 +3,9 @@
 #include <io.h>
 #define _FCNTL_H 1
 #include <bits/fcntl.h>
+#include <sstream>
 
+#include "sys/socket.h"
 #include "hcore/base.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/hexception.hxx"
@@ -11,12 +13,15 @@
 #include "msio.hxx"
 #include "emu_unistd.hxx"
 
-using namespace yaal;
+using namespace std;
 
 namespace msvcxx {
 
+static int const IO_BUFFER_SIZE( 256 );
+
 IO::IO( TYPE::type_t t_, HANDLE h_, HANDLE e_, std::string const& p_ )
-: _type( t_ ), _handle( h_ ), _overlapped(), _buffer( 0 ),
+: _type( t_ ), _handle( h_ ), _overlapped(),
+	_readRequest( 0 ), _buffer( IO_BUFFER_SIZE ),
 	_connected( ( t_ == TYPE::TERMINAL ) || ( t_ == TYPE::PIPE ) ),
 	_scheduled( false ), _ready( false ), _nonBlocking( false ), _path( p_ ) {
 	_overlapped.hEvent = e_ ? e_ : ::CreateEvent( NULL, false, false, NULL );
@@ -32,7 +37,7 @@ IO::~IO( void ) {
 void IO::schedule_read( void ) {
 	DWORD nRead( 0 );
 	if ( _connected && ! _scheduled ) {
-		BOOL status( ::ReadFile( _handle, &_buffer, 1, &nRead, &_overlapped ) );
+		BOOL status( ::ReadFile( _handle, _buffer.raw(), _readRequest = 1, &nRead, &_overlapped ) );
 		if ( status && ( nRead == 1 ) )
 			_ready = true;
 	}
@@ -43,13 +48,16 @@ void IO::schedule_read( void ) {
 void IO::sync( void ) {
 	DWORD iTransfered( 0 );
 	if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransfered, true ) ) {
-		log_windows_error( "GetOverlappedResult(sync_read)" );
+		log_windows_error( "GetOverlappedResult(sync)" );
 	} else {
 		if ( _connected ) {
-			if ( iTransfered != 1 )
-				log_windows_error( "GetOverlappedResult(bad read)" );
-			else
+			if ( ( iTransfered < _readRequest ) && ( ::GetLastError() != ERROR_HANDLE_EOF ) ) {
+				stringstream ss;
+				ss << "iTransfered: " << iTransfered << ", _readRequest: " << _readRequest;
+				log_windows_error( ( ss.str() + "GetOverlappedResult(bad read)" ).c_str() );
+			} else {
 				_ready = true;
+			}
 		} else
 			_connected = _ready = true;
 		_scheduled = false;
@@ -58,6 +66,7 @@ void IO::sync( void ) {
 }
 
 int long IO::read( void* buf_, int long size_ ) {
+	M_ASSERT( _connected );
 	DWORD iRead( 0 );
 	int off( 0 );
 	bool ok( false );
@@ -66,23 +75,51 @@ int long IO::read( void* buf_, int long size_ ) {
 	if ( _ready ) {
 		_scheduled = false;
 		_ready = false;
-		static_cast<char*>( buf_ )[0] = _buffer;
-		-- size_;
-		++ off;
+		off = std::min<int>( size_, _readRequest );
+		::memcpy( buf_, _buffer.raw(), off );
+		size_ -= off;
 		ok = true;
 	}
+	bool eof( false );
 	if ( size_ > 0 ) {
-		ok = ::ReadFile( _handle, static_cast<char*>( buf_ ) + off, size_, &iRead, &_overlapped ) ? true : false;
-		if ( ! ok && ( ::GetLastError() != ERROR_IO_PENDING ) )
-			log_windows_error( "ReadFile" );
-		ok = ::GetOverlappedResult( _handle, &_overlapped, &iRead, ! _nonBlocking ) ? true : false;
-		if ( ! ok )
-			log_windows_error( "GetOverlappedResult(read)" );
+		if ( ! _scheduled ) {
+			if ( ! _nonBlocking ) {
+				ok = ::ReadFile( _handle, static_cast<char*>( buf_ ) + off, size_, &iRead, &_overlapped ) ? true : false;
+			} else {
+				if ( ( off + size_ ) > _buffer.get_size() )
+					_buffer.realloc( off + size_ );
+				ok = ::ReadFile( _handle, _buffer.get<char>() + off, _readRequest = size_, &iRead, &_overlapped ) ? true : false;
+			}
+			if ( ! ok && ( ::GetLastError() != ERROR_IO_PENDING ) ) {
+				if ( ::GetLastError() == ERROR_HANDLE_EOF ) {
+					iRead = 0;
+					ok = true;
+					eof = true;
+				} else
+					log_windows_error( "ReadFile" );
+			}
+		}
+		if ( ! eof )
+			ok = ::GetOverlappedResult( _handle, &_overlapped, &iRead, ! _nonBlocking ) ? true : false;
+		if ( ! ok ) {
+			if ( ! _nonBlocking || ( ::GetLastError() != ERROR_IO_INCOMPLETE ) )
+				log_windows_error( "GetOverlappedResult(read)" );
+			else {
+				errno = EAGAIN;
+				_scheduled = true;
+			}
+		} else {
+			if ( _nonBlocking && ( iRead == size_ ) )
+				::memcpy( static_cast<char*>( buf_ ) + off, _buffer.get<char>() + off, size_ );
+			_readRequest = 0;
+			_scheduled = false;
+		}
 	}
 	return ( ok ? iRead + off : -1 );
 }
 
 int long IO::write( void const* buf_, int long size_ ) {
+	M_ASSERT( _connected );
 	DWORD iWritten( 0 );
 	bool ok( ::WriteFile( _handle, buf_, size_, &iWritten, &_overlapped ) ? true : false );
 	if ( ::GetLastError() == ERROR_IO_PENDING ) {
@@ -151,7 +188,7 @@ void IO::set_path( std::string const& path_ ) {
 void IO::swap( IO& io_ ) {
 	using std::swap;
 	swap( _overlapped, io_._overlapped );
-	swap( _buffer, io_._buffer );
+	yaal::swap( _buffer, io_._buffer );
 	swap( _scheduled, io_._scheduled );
 	swap( _ready, io_._ready );
 	swap( _handle, io_._handle );
@@ -174,18 +211,21 @@ bool IO::is_connected( void ) const {
 	return ( _connected );
 }
 
-void IO::connect( void ) {
+int IO::connect( void ) {
 	M_ASSERT( ! _connected );
 	if ( ! _nonBlocking ) {
 		DWORD iTransfered( 0 );
 		if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransfered, true ) ) {
 			log_windows_error( "GetOverlappedResult(connect)" );
 		}
-	}
-	_connected = true;
+		_connected = true;
+	} else if ( _type == TYPE::SOCKET )
+		get_socket_errno() = WSAEINPROGRESS;
+	else
+		_connected = true;
 	_scheduled = false;
 	_ready = false;
-	return;
+	return ( _connected ? 0 : -1 );
 }
 
 void IO::accept( void ) {
