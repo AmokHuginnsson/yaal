@@ -691,6 +691,174 @@ operator > ( HLambda<first_lambda_type, lambda_first_type, lambda_second_type> c
 	return ( HLambda<LAMBDA_TYPE::GREATER, HLambda<first_lambda_type, lambda_first_type, lambda_second_type>, HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) );
 }
 
+template<typename first_lambda, typename second_lambda>
+class HLambda<LAMBDA_TYPE::LESS_EQUAL, first_lambda, second_lambda> {
+	first_lambda _firstLambda;
+	second_lambda _secondLambda;
+public:
+	HLambda( void )
+		: _firstLambda(), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_, second_lambda const& secondLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda( secondLambda_ )
+		{}
+	template<typename a0_t>
+	bool operator()( a0_t const& a0_ ) const {
+		return ( _firstLambda( a0_ ) <= _secondLambda( a0_ ) );
+	}
+	template<typename a0_t, typename a1_t>
+	bool operator()( a0_t const& a0_, a1_t const& a1_ ) const {
+		return ( _firstLambda( a0_, a1_ ) <= _secondLambda( a0_, a1_ ) );
+	}
+	template<typename a0_t, typename a1_t, typename a2_t>
+	bool operator()( a0_t const& a0_, a1_t const& a1_, a2_t const& a2_ ) const {
+		return ( _firstLambda( a0_, a1_, a2_ ) <= _secondLambda( a0_, a1_, a2_ ) );
+	}
+};
+
+/* _1 <= 0 */
+template<int const no, typename T>
+HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >, HLambda<LAMBDA_TYPE::CONST, T> >
+operator <= ( yaal::hcore::higher_order::placeholder<no> const&, T const& const_ ) {
+	return ( HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >, HLambda<LAMBDA_TYPE::CONST, T> >( HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >(), HLambda<LAMBDA_TYPE::CONST, T>( const_ ) ) );
+}
+
+/* _1 <= _2 */
+template<int const first, int const second>
+HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<first> >, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<second> > >
+operator <= ( yaal::hcore::higher_order::placeholder<first> const&, yaal::hcore::higher_order::placeholder<second> const& ) {
+	return ( HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<first> >, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<second> > >( HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<first> >(), HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<second> >() ) );
+}
+
+/* 0 <= _1 */
+template<typename T, int const no>
+HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<LAMBDA_TYPE::CONST, T>, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > >
+operator <= ( T const& const_, yaal::hcore::higher_order::placeholder<no> const& ) {
+	return ( HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<LAMBDA_TYPE::CONST, T>, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > >( HLambda<LAMBDA_TYPE::CONST, T>( const_ ), HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >() ) );
+}
+
+/* _1 <= ( _2 * 2 ) */
+template<int const no, LAMBDA_TYPE::type_t const lambda_type, typename lambda_first_type, typename lambda_second_type>
+HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >, HLambda<lambda_type, lambda_first_type, lambda_second_type> >
+operator <= ( yaal::hcore::higher_order::placeholder<no> const&, HLambda<lambda_type, lambda_first_type, lambda_second_type> const& lambda_ ) {
+	return ( HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >, HLambda<lambda_type, lambda_first_type, lambda_second_type> >( HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >(), lambda_ ) );
+}
+
+/* ( _2 * 2 ) <= _1 */
+template<LAMBDA_TYPE::type_t const lambda_type, typename lambda_first_type, typename lambda_second_type, int const no>
+HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<lambda_type, lambda_first_type, lambda_second_type>, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > >
+operator <= ( HLambda<lambda_type, lambda_first_type, lambda_second_type> const& lambda_, yaal::hcore::higher_order::placeholder<no> const& ) {
+	return ( HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<lambda_type, lambda_first_type, lambda_second_type>, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > >( lambda_, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >() ) );
+}
+
+/* 0 <= ( _2 * 2 ) */
+template<typename T, LAMBDA_TYPE::type_t const lambda_type, typename lambda_first_type, typename lambda_second_type>
+HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<LAMBDA_TYPE::CONST, T>, HLambda<lambda_type, lambda_first_type, lambda_second_type> >
+operator <= ( T const& const_, HLambda<lambda_type, lambda_first_type, lambda_second_type> const& lambda_ ) {
+	return ( HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<LAMBDA_TYPE::CONST, T>, HLambda<lambda_type, lambda_first_type, lambda_second_type> >( HLambda<LAMBDA_TYPE::CONST, T>( const_ ), lambda_ ) );
+}
+
+/* ( _2 * 2 ) <= 0 */
+template<LAMBDA_TYPE::type_t const lambda_type, typename lambda_first_type, typename lambda_second_type, typename T>
+HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<lambda_type, lambda_first_type, lambda_second_type>, HLambda<LAMBDA_TYPE::CONST, T> >
+operator <= ( HLambda<lambda_type, lambda_first_type, lambda_second_type> const& lambda_, T const& const_ ) {
+	return ( HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<lambda_type, lambda_first_type, lambda_second_type>, HLambda<LAMBDA_TYPE::CONST, T> >( lambda_, HLambda<LAMBDA_TYPE::CONST, T >( const_ ) ) );
+}
+
+/* ( _1 + 1 ) <= ( _2 * 2 ) */
+template<LAMBDA_TYPE::type_t const first_lambda_type, typename lambda_first_type, typename lambda_second_type, LAMBDA_TYPE::type_t const second_lambda_type, typename second_lambda_first_type, typename second_lambda_second_type>
+HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<first_lambda_type, lambda_first_type, lambda_second_type>, HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
+operator <= ( HLambda<first_lambda_type, lambda_first_type, lambda_second_type> const& firstLambda_, HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& secondLambda_ ) {
+	return ( HLambda<LAMBDA_TYPE::LESS_EQUAL, HLambda<first_lambda_type, lambda_first_type, lambda_second_type>, HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) );
+}
+
+template<typename first_lambda, typename second_lambda>
+class HLambda<LAMBDA_TYPE::GREATER_EQUAL, first_lambda, second_lambda> {
+	first_lambda _firstLambda;
+	second_lambda _secondLambda;
+public:
+	HLambda( void )
+		: _firstLambda(), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda()
+		{}
+	HLambda( first_lambda const& firstLambda_, second_lambda const& secondLambda_ )
+		: _firstLambda( firstLambda_ ), _secondLambda( secondLambda_ )
+		{}
+	template<typename a0_t>
+	bool operator()( a0_t const& a0_ ) const {
+		return ( _firstLambda( a0_ ) >= _secondLambda( a0_ ) );
+	}
+	template<typename a0_t, typename a1_t>
+	bool operator()( a0_t const& a0_, a1_t const& a1_ ) const {
+		return ( _firstLambda( a0_, a1_ ) >= _secondLambda( a0_, a1_ ) );
+	}
+	template<typename a0_t, typename a1_t, typename a2_t>
+	bool operator()( a0_t const& a0_, a1_t const& a1_, a2_t const& a2_ ) const {
+		return ( _firstLambda( a0_, a1_, a2_ ) >= _secondLambda( a0_, a1_, a2_ ) );
+	}
+};
+
+/* _1 >= 0 */
+template<int const no, typename T>
+HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >, HLambda<LAMBDA_TYPE::CONST, T> >
+operator >= ( yaal::hcore::higher_order::placeholder<no> const&, T const& const_ ) {
+	return ( HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >, HLambda<LAMBDA_TYPE::CONST, T> >( HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >(), HLambda<LAMBDA_TYPE::CONST, T>( const_ ) ) );
+}
+
+/* _1 >= _2 */
+template<int const first, int const second>
+HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<first> >, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<second> > >
+operator >= ( yaal::hcore::higher_order::placeholder<first> const&, yaal::hcore::higher_order::placeholder<second> const& ) {
+	return ( HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<first> >, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<second> > >( HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<first> >(), HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<second> >() ) );
+}
+
+/* 0 >= _1 */
+template<typename T, int const no>
+HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<LAMBDA_TYPE::CONST, T>, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > >
+operator >= ( T const& const_, yaal::hcore::higher_order::placeholder<no> const& ) {
+	return ( HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<LAMBDA_TYPE::CONST, T>, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > >( HLambda<LAMBDA_TYPE::CONST, T>( const_ ), HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >() ) );
+}
+
+/* _1 >= ( _2 * 2 ) */
+template<int const no, LAMBDA_TYPE::type_t const lambda_type, typename lambda_first_type, typename lambda_second_type>
+HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >, HLambda<lambda_type, lambda_first_type, lambda_second_type> >
+operator >= ( yaal::hcore::higher_order::placeholder<no> const&, HLambda<lambda_type, lambda_first_type, lambda_second_type> const& lambda_ ) {
+	return ( HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >, HLambda<lambda_type, lambda_first_type, lambda_second_type> >( HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >(), lambda_ ) );
+}
+
+/* ( _2 * 2 ) >= _1 */
+template<LAMBDA_TYPE::type_t const lambda_type, typename lambda_first_type, typename lambda_second_type, int const no>
+HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<lambda_type, lambda_first_type, lambda_second_type>, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > >
+operator >= ( HLambda<lambda_type, lambda_first_type, lambda_second_type> const& lambda_, yaal::hcore::higher_order::placeholder<no> const& ) {
+	return ( HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<lambda_type, lambda_first_type, lambda_second_type>, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > >( lambda_, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >() ) );
+}
+
+/* 0 >= ( _2 * 2 ) */
+template<typename T, LAMBDA_TYPE::type_t const lambda_type, typename lambda_first_type, typename lambda_second_type>
+HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<LAMBDA_TYPE::CONST, T>, HLambda<lambda_type, lambda_first_type, lambda_second_type> >
+operator >= ( T const& const_, HLambda<lambda_type, lambda_first_type, lambda_second_type> const& lambda_ ) {
+	return ( HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<LAMBDA_TYPE::CONST, T>, HLambda<lambda_type, lambda_first_type, lambda_second_type> >( HLambda<LAMBDA_TYPE::CONST, T>( const_ ), lambda_ ) );
+}
+
+/* ( _2 * 2 ) >= 0 */
+template<LAMBDA_TYPE::type_t const lambda_type, typename lambda_first_type, typename lambda_second_type, typename T>
+HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<lambda_type, lambda_first_type, lambda_second_type>, HLambda<LAMBDA_TYPE::CONST, T> >
+operator >= ( HLambda<lambda_type, lambda_first_type, lambda_second_type> const& lambda_, T const& const_ ) {
+	return ( HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<lambda_type, lambda_first_type, lambda_second_type>, HLambda<LAMBDA_TYPE::CONST, T> >( lambda_, HLambda<LAMBDA_TYPE::CONST, T >( const_ ) ) );
+}
+
+/* ( _1 + 1 ) >= ( _2 * 2 ) */
+template<LAMBDA_TYPE::type_t const first_lambda_type, typename lambda_first_type, typename lambda_second_type, LAMBDA_TYPE::type_t const second_lambda_type, typename second_lambda_first_type, typename second_lambda_second_type>
+HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<first_lambda_type, lambda_first_type, lambda_second_type>, HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
+operator >= ( HLambda<first_lambda_type, lambda_first_type, lambda_second_type> const& firstLambda_, HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& secondLambda_ ) {
+	return ( HLambda<LAMBDA_TYPE::GREATER_EQUAL, HLambda<first_lambda_type, lambda_first_type, lambda_second_type>, HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) );
+}
+
 template<LAMBDA_TYPE::type_t const first_lambda_type,
 	typename first_lambda_first_type, typename first_lambda_second_type,
 	LAMBDA_TYPE::type_t const second_lambda_type,
