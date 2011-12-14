@@ -2298,18 +2298,18 @@ struct functional_argument_count {
 	struct get<U, 11, true>
 		{ typedef typename U::eleventh_argument_type type; };
 
-	static int const a0 = meta::ternary<meta::boolean_not<same_type<typename get<T, 0, ta0>::type, no_type>::value>::value, 1, 0>::value;
-	static int const a1 = meta::ternary<meta::boolean_not<same_type<typename get<T, 1, ta1>::type, no_type>::value>::value, 1, 0>::value;
-	static int const a2 = meta::ternary<meta::boolean_not<same_type<typename get<T, 2, ta2>::type, no_type>::value>::value, 1, 0>::value;
-	static int const a3 = meta::ternary<meta::boolean_not<same_type<typename get<T, 3, ta3>::type, no_type>::value>::value, 1, 0>::value;
-	static int const a4 = meta::ternary<meta::boolean_not<same_type<typename get<T, 4, ta4>::type, no_type>::value>::value, 1, 0>::value;
-	static int const a5 = meta::ternary<meta::boolean_not<same_type<typename get<T, 5, ta5>::type, no_type>::value>::value, 1, 0>::value;
-	static int const a6 = meta::ternary<meta::boolean_not<same_type<typename get<T, 6, ta6>::type, no_type>::value>::value, 1, 0>::value;
-	static int const a7 = meta::ternary<meta::boolean_not<same_type<typename get<T, 7, ta7>::type, no_type>::value>::value, 1, 0>::value;
-	static int const a8 = meta::ternary<meta::boolean_not<same_type<typename get<T, 8, ta8>::type, no_type>::value>::value, 1, 0>::value;
-	static int const a9 = meta::ternary<meta::boolean_not<same_type<typename get<T, 9, ta9>::type, no_type>::value>::value, 1, 0>::value;
-	static int const a10 =  meta::ternary<meta::boolean_not<same_type<typename get<T, 10, ta10>::type, no_type>::value>::value, 1, 0>::value;
-	static int const a11 =  meta::ternary<meta::boolean_not<same_type<typename get<T, 11, ta11>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a0 = meta::ternary<meta::logical_not<same_type<typename get<T, 0, ta0>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a1 = meta::ternary<meta::logical_not<same_type<typename get<T, 1, ta1>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a2 = meta::ternary<meta::logical_not<same_type<typename get<T, 2, ta2>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a3 = meta::ternary<meta::logical_not<same_type<typename get<T, 3, ta3>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a4 = meta::ternary<meta::logical_not<same_type<typename get<T, 4, ta4>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a5 = meta::ternary<meta::logical_not<same_type<typename get<T, 5, ta5>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a6 = meta::ternary<meta::logical_not<same_type<typename get<T, 6, ta6>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a7 = meta::ternary<meta::logical_not<same_type<typename get<T, 7, ta7>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a8 = meta::ternary<meta::logical_not<same_type<typename get<T, 8, ta8>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a9 = meta::ternary<meta::logical_not<same_type<typename get<T, 9, ta9>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a10 =  meta::ternary<meta::logical_not<same_type<typename get<T, 10, ta10>::type, no_type>::value>::value, 1, 0>::value;
+	static int const a11 =  meta::ternary<meta::logical_not<same_type<typename get<T, 11, ta11>::type, no_type>::value>::value, 1, 0>::value;
 
 	static int const arg_count = a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9 + a10 + a11 + meta::ternary<a1 != 0, 0, a0>::value;
 	static int const value = meta::ternary<arg_count != 0, arg_count, -1>::value;

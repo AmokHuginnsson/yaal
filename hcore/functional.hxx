@@ -370,7 +370,7 @@ struct logical_or : public binary_function<bool, bool, bool> {
 	}
 };
 
-/*! \brief Callculate exclusive or boolean value.
+/*! \brief Callculate `exclusive or' logical value.
  *
  * \param p - first predicate.
  * \param q - second predicate.

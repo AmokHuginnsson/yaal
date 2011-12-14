@@ -45,7 +45,7 @@ namespace meta {
  * \retval value - conditional value.
  */
 template<bool const value_in>
-struct boolean_not {
+struct logical_not {
 	static bool const value = ! value_in;
 };
 
@@ -56,7 +56,7 @@ struct boolean_not {
  * \retval value - an exclusive or of p and q.
  */
 template<bool const p, bool const q>
-struct boolean_xor {
+struct logical_xor {
 	static bool const value = ( p && !q ) || ( !p && q );
 };
 
@@ -67,7 +67,7 @@ struct boolean_xor {
  * \retval value - p <=> q.
  */
 template<bool const p, bool const q>
-struct boolean_xnor {
+struct logical_xnor {
 	static bool const value = ( p && q ) || ( ! ( p || q ) );
 };
 
@@ -106,7 +106,7 @@ T const max_signed<T>::value;
  */
 template<typename T>
 struct max_unsigned {
-	STATIC_ASSERT( boolean_not<is_signed<T>::value>::value );
+	STATIC_ASSERT( logical_not<is_signed<T>::value>::value );
 	static T const value = static_cast<T>( ~0 );
 };
 template<typename T>
@@ -365,7 +365,7 @@ T const integer_cast<T, val>::value;
  */
 template<typename T, int long unsigned val>
 struct unsigned_integer_cast {
-	STATIC_ASSERT( meta::boolean_not<meta::is_signed< T >::value>::value );
+	STATIC_ASSERT( meta::logical_not<meta::is_signed< T >::value>::value );
 	static T const value = out_of_range<T, static_cast<T>( val ), static_cast<T>( val ) == val>::value;
 };
 template<typename T, int long unsigned val>
