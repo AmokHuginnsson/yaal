@@ -478,6 +478,58 @@ operator ! ( HLambda<lambda_type, lambda_first_type, lambda_second_type > const&
 	return ( HLambda<LAMBDA_TYPE::LOGICAL_NOT, HLambda<lambda_type, lambda_first_type, lambda_second_type > >( lambda_ ) );
 }
 
+/* -_1 */
+#define DEFINE_LAMBDA( OP, NAME ) \
+template<typename lambda> \
+class HLambda<LAMBDA_TYPE::NAME, lambda> { \
+	lambda _lambda; \
+public: \
+	HLambda( lambda const& lambda_ ) \
+		: _lambda( lambda_ ) \
+		{} \
+	template<typename R, typename a0_t> \
+	R operator()( a0_t const& a0_ ) const { \
+		return ( OP _lambda( a0_ ) ); \
+	} \
+	template<typename R, typename a0_t, typename a1_t> \
+	R operator()( a0_t const& a0_, a1_t const& a1_ ) const { \
+		return ( OP _lambda( a0_, a1_ ) ); \
+	} \
+	template<typename R, typename a0_t, typename a1_t, typename a2_t> \
+	R  operator()( a0_t const& a0_, a1_t const& a1_, a2_t const& a2_ ) const { \
+		return ( OP _lambda( a0_, a1_, a2_ ) ); \
+	} \
+	template<typename a0_t> \
+	a0_t operator()( a0_t const& a0_ ) const { \
+		return ( OP _lambda( a0_ ) ); \
+	} \
+	template<typename a0_t, typename a1_t> \
+	typename return_type_binary_arithmetic<a0_t, a1_t>::type operator()( a0_t const& a0_, a1_t const& a1_ ) const { \
+		return ( OP _lambda( a0_, a1_ ) ); \
+	} \
+	template<typename a0_t, typename a1_t, typename a2_t> \
+	typename return_type_binary_arithmetic<typename return_type_binary_arithmetic<a0_t, a1_t>::type, a2_t>::type operator()( a0_t const& a0_, a1_t const& a1_, a2_t const& a2_ ) const { \
+		return ( OP _lambda( a0_, a1_, a2_ ) ); \
+	} \
+}; \
+ \
+template<int const no> \
+HLambda<LAMBDA_TYPE::NAME, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > > \
+operator OP ( yaal::hcore::higher_order::placeholder<no> const& ) { \
+	return ( HLambda<LAMBDA_TYPE::NAME, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> > >( HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >() ) ); \
+} \
+ \
+template<LAMBDA_TYPE::type_t const lambda_type, typename lambda_first_type, typename lambda_second_type> \
+HLambda<LAMBDA_TYPE::NAME, HLambda<lambda_type, lambda_first_type, lambda_second_type > > \
+operator OP ( HLambda<lambda_type, lambda_first_type, lambda_second_type > const& lambda_ ) { \
+	return ( HLambda<LAMBDA_TYPE::NAME, HLambda<lambda_type, lambda_first_type, lambda_second_type > >( lambda_ ) ); \
+}
+
+DEFINE_LAMBDA( -, NEGATE );
+DEFINE_LAMBDA( ~, BIT_NOT );
+
+#undef DEFINE_LAMBDA
+
 #define DEFINE_LAMBDA( OP, NAME ) \
 template<typename first_lambda, typename second_lambda> \
 class HLambda<LAMBDA_TYPE::NAME, first_lambda, second_lambda> { \
