@@ -352,11 +352,11 @@ public:
 #endif /* #ifdef __GNUC__ */
 
 
-#if defined ( DEFINE_LAMBDA )
-#	error Yaal redefines DEFINE_LAMBDA macro.
-#endif /* #if defined ( DEFINE_LAMBDA ) */
+#if defined ( YAAL_DEFINE_LAMBDA )
+#	error Yaal redefines YAAL_DEFINE_LAMBDA macro.
+#endif /* #if defined ( YAAL_DEFINE_LAMBDA ) */
 
-#define DEFINE_LAMBDA( OP, NAME ) \
+#define YAAL_DEFINE_LAMBDA( OP, NAME ) \
 template<typename first_lambda, typename second_lambda> \
 class HLambda<LAMBDA_TYPE::NAME, first_lambda, second_lambda> { \
 	first_lambda _firstLambda; \
@@ -435,14 +435,14 @@ operator OP ( HLambda<first_lambda_type, lambda_first_type, lambda_second_type> 
 	return ( HLambda<LAMBDA_TYPE::NAME, HLambda<first_lambda_type, lambda_first_type, lambda_second_type>, HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) ); \
 }
 
-DEFINE_LAMBDA( ==, EQUAL );
-DEFINE_LAMBDA( !=, NOT_EQUAL );
-DEFINE_LAMBDA( <, LESS );
-DEFINE_LAMBDA( >, GREATER );
-DEFINE_LAMBDA( <=, LESS_EQUAL );
-DEFINE_LAMBDA( >=, GREATER_EQUAL );
+YAAL_DEFINE_LAMBDA( ==, EQUAL );
+YAAL_DEFINE_LAMBDA( !=, NOT_EQUAL );
+YAAL_DEFINE_LAMBDA( <, LESS );
+YAAL_DEFINE_LAMBDA( >, GREATER );
+YAAL_DEFINE_LAMBDA( <=, LESS_EQUAL );
+YAAL_DEFINE_LAMBDA( >=, GREATER_EQUAL );
 
-#undef DEFINE_LAMBDA
+#undef YAAL_DEFINE_LAMBDA
 
 /* !_1 */
 template<typename lambda>
@@ -479,7 +479,7 @@ operator ! ( HLambda<lambda_type, lambda_first_type, lambda_second_type > const&
 }
 
 /* -_1 */
-#define DEFINE_LAMBDA( OP, NAME ) \
+#define YAAL_DEFINE_LAMBDA( OP, NAME ) \
 template<typename lambda> \
 class HLambda<LAMBDA_TYPE::NAME, lambda> { \
 	lambda _lambda; \
@@ -525,12 +525,12 @@ operator OP ( HLambda<lambda_type, lambda_first_type, lambda_second_type > const
 	return ( HLambda<LAMBDA_TYPE::NAME, HLambda<lambda_type, lambda_first_type, lambda_second_type > >( lambda_ ) ); \
 }
 
-DEFINE_LAMBDA( -, NEGATE );
-DEFINE_LAMBDA( ~, BIT_NOT );
+YAAL_DEFINE_LAMBDA( -, NEGATE );
+YAAL_DEFINE_LAMBDA( ~, BIT_NOT );
 
-#undef DEFINE_LAMBDA
+#undef YAAL_DEFINE_LAMBDA
 
-#define DEFINE_LAMBDA( OP, NAME ) \
+#define YAAL_DEFINE_LAMBDA( OP, NAME ) \
 template<typename first_lambda, typename second_lambda> \
 class HLambda<LAMBDA_TYPE::NAME, first_lambda, second_lambda> { \
 	first_lambda _firstLambda; \
@@ -604,10 +604,10 @@ operator OP ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_s
 	return ( HLambda<LAMBDA_TYPE::NAME, HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>, HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) ); \
 }
 
-DEFINE_LAMBDA( &&, LOGICAL_AND );
-DEFINE_LAMBDA( ||, LOGICAL_OR );
+YAAL_DEFINE_LAMBDA( &&, LOGICAL_AND );
+YAAL_DEFINE_LAMBDA( ||, LOGICAL_OR );
 
-#undef DEFINE_LAMBDA
+#undef YAAL_DEFINE_LAMBDA
 
 template<LAMBDA_TYPE::type_t const first_lambda_type,
 	typename first_lambda_first_type, typename first_lambda_second_type,
@@ -694,7 +694,7 @@ inline HLambda<LAMBDA_TYPE::POST_DECREMENT> operator -- ( HLambda<LAMBDA_TYPE::P
 	return ( HLambda<LAMBDA_TYPE::POST_DECREMENT>() );
 }
 
-#define DEFINE_LAMBDA( OP, NAME ) \
+#define YAAL_DEFINE_LAMBDA( OP, NAME ) \
 template<typename first_lambda, typename second_lambda> \
 class HLambda<LAMBDA_TYPE::NAME, first_lambda, second_lambda> { \
 	first_lambda _firstLambda; \
@@ -801,16 +801,16 @@ operator OP ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_s
 			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>, \
 			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) ); }
 
-DEFINE_LAMBDA( +, PLUS );
-DEFINE_LAMBDA( -, MINUS );
-DEFINE_LAMBDA( *, MULTIPLIES );
-DEFINE_LAMBDA( /, DIVIDES );
-DEFINE_LAMBDA( %, MODULO );
-DEFINE_LAMBDA( &, BIT_AND );
-DEFINE_LAMBDA( |, BIT_OR );
-DEFINE_LAMBDA( ^, BIT_XOR );
+YAAL_DEFINE_LAMBDA( +, PLUS );
+YAAL_DEFINE_LAMBDA( -, MINUS );
+YAAL_DEFINE_LAMBDA( *, MULTIPLIES );
+YAAL_DEFINE_LAMBDA( /, DIVIDES );
+YAAL_DEFINE_LAMBDA( %, MODULO );
+YAAL_DEFINE_LAMBDA( &, BIT_AND );
+YAAL_DEFINE_LAMBDA( |, BIT_OR );
+YAAL_DEFINE_LAMBDA( ^, BIT_XOR );
 
-#undef DEFINE_LAMBDA
+#undef YAAL_DEFINE_LAMBDA
 
 template<typename first_lambda, typename second_lambda>
 class HLambda<LAMBDA_TYPE::ASSIGN, first_lambda, second_lambda> {
@@ -951,7 +951,7 @@ static const lambda_placeholder<3> _3; /*!< Place holder for third formal lambda
 
 }
 
-#define DEFINE_LAMBDA( OP, NAME ) \
+#define YAAL_DEFINE_LAMBDA( OP, NAME ) \
 template<typename first_lambda, typename second_lambda> \
 class HLambda<LAMBDA_TYPE::NAME, first_lambda, second_lambda> { \
 	first_lambda _firstLambda; \
@@ -1078,15 +1078,15 @@ HLambda<LAMBDA_TYPE::NAME, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_or
 	return ( HLambda<LAMBDA_TYPE::NAME, HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >, HLambda<lambda_type, lambda_first_type, lambda_second_type> >( HLambda<LAMBDA_TYPE::VARIABLE, yaal::hcore::higher_order::placeholder<no> >(), lambda_ ) ); \
 }
 
-DEFINE_LAMBDA( +=, PLUS_ASSIGN );
-DEFINE_LAMBDA( -=, MINUS_ASSIGN );
-DEFINE_LAMBDA( *=, MULTIPLIES_ASSIGN );
-DEFINE_LAMBDA( /=, DIVIDES_ASSIGN );
-DEFINE_LAMBDA( %=, MODULO_ASSIGN );
-DEFINE_LAMBDA( &=, BIT_AND_ASSIGN );
-DEFINE_LAMBDA( |=, BIT_OR_ASSIGN );
+YAAL_DEFINE_LAMBDA( +=, PLUS_ASSIGN );
+YAAL_DEFINE_LAMBDA( -=, MINUS_ASSIGN );
+YAAL_DEFINE_LAMBDA( *=, MULTIPLIES_ASSIGN );
+YAAL_DEFINE_LAMBDA( /=, DIVIDES_ASSIGN );
+YAAL_DEFINE_LAMBDA( %=, MODULO_ASSIGN );
+YAAL_DEFINE_LAMBDA( &=, BIT_AND_ASSIGN );
+YAAL_DEFINE_LAMBDA( |=, BIT_OR_ASSIGN );
 
-#undef DEFINE_LAMBDA
+#undef YAAL_DEFINE_LAMBDA
 
 template<typename lambda_type>
 class HLambda<LAMBDA_TYPE::STREAM, lambda_type> {
