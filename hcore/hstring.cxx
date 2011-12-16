@@ -1193,15 +1193,15 @@ int long strrnspn( char const* const buffer_, char const* const skipSet_,
 
 int long kmpsearch( char const* const str, int long lenstr, char const* const pat, int long lenpat ) {
 	HChunk KMPnext( chunk_size<int>( lenpat + 1 ) );
-	int* next = KMPnext.get<int>();
-	int b = next[ 0 ] = -1;
+	int* next( KMPnext.get<int>() );
+	int b( next[ 0 ] = -1 );
 	for ( int i = 1; i <= lenpat; ++ i ) {
 		while ( ( b > -1 ) && ( pat[ b ] != pat[ i - 1 ] ) )
 			b = next[ b ];
 		++ b;
 		next[ i ] = ( pat[ i ] == pat[ b ] ) ? next[ b ] : b;
 	}
-	int start = -1;
+	int start( -1 );
 	b = 0;
 	for ( int i = 0; i < lenstr; ++ i ) {
 		while ( ( b > -1 ) && ( pat[ b ] != str[ i ] ) )
@@ -1216,15 +1216,15 @@ int long kmpsearch( char const* const str, int long lenstr, char const* const pa
 
 int long kmpcasesearch( char const* const str, int long lenstr, char const* const pat, int long lenpat ) {
 	HChunk KMPnext( chunk_size<int>( lenpat + 1 ) );
-	int* next = KMPnext.get<int>();
-	int b = next[ 0 ] = -1;
+	int* next( KMPnext.get<int>() );
+	int b( next[ 0 ] = -1 );
 	for ( int i = 1; i <= lenpat; ++ i ) {
 		while ( ( b > -1 ) && ( tolower( pat[ b ] ) != tolower( pat[ i - 1 ] ) ) )
 			b = next[ b ];
 		++ b;
 		next[ i ] = ( tolower( pat[ i ] ) == tolower( pat[ b ] ) ) ? next[ b ] : b;
 	}
-	int start = -1;
+	int start( -1 );
 	b = 0;
 	for ( int i = 0; i < lenstr; ++ i ) {
 		while ( ( b > -1 ) && ( tolower( pat[ b ] ) != tolower( str[ i ] ) ) )
