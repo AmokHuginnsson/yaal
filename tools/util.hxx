@@ -49,6 +49,17 @@ iter_t find_local( iter_t it, iter_t end, pred_t pred ) {
 	return ( pred() );
 }
 
+struct EscapeTable {
+	static int const ESCAPE_TABLE_SIZE = 256;
+	char _rawToSafe[ESCAPE_TABLE_SIZE];
+	char _safeToRaw[ESCAPE_TABLE_SIZE];
+	EscapeTable( char const*, int, char const*, int );
+};
+
+void escape( yaal::hcore::HString&, EscapeTable const&, char = '\\' );
+void unescape( yaal::hcore::HString&, EscapeTable const&, char = '\\' );
+yaal::hcore::HString escape_copy( yaal::hcore::HString, EscapeTable const&, char = '\\' );
+yaal::hcore::HString unescape_copy( yaal::hcore::HString, EscapeTable const&, char = '\\' );
 yaal::hcore::HString kwota_slownie( double );
 void usun_ogonki( char* );
 double long atof_ex( yaal::hcore::HString const&, bool = false );

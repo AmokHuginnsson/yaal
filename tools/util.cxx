@@ -43,6 +43,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hdes.hxx"
 #include "xmath.hxx"
 #include "hcore/hrandomizer.hxx"
+#include "hcore/htls.hxx"
 
 using namespace yaal::hcore;
 
@@ -57,9 +58,9 @@ namespace {
 	static int const STEP_LENGTH = 4;
 }
 
-char _transTableStripPL_ [ 256 ];
+char _transTableStripPL_[ 256 ];
 
-char _jednNastki_ [ ] [ 16 ] = {
+char _jednNastki_[][ 16 ] = {
 	"zero ",
 	"jeden ",
 	"dwa ",
@@ -83,7 +84,7 @@ char _jednNastki_ [ ] [ 16 ] = {
 	"dwadzie¶cia "
 };
 
-char _dzies_ [ ] [ 24 ] = {
+char _dzies_[][ 24 ] = {
 	"dziesiêæ-zero ",
 	"dziesiêæ ",
 	"dwadzie¶cia ",
@@ -97,7 +98,7 @@ char _dzies_ [ ] [ 24 ] = {
 	"sto "
 };
 
-char _setki_ [ ] [ 16 ] = {
+char _setki_[][ 16 ] = {
 	"sto-zero ",
 	"sto ",
 	"dwie¶cie ",
@@ -111,7 +112,7 @@ char _setki_ [ ] [ 16 ] = {
 	"tysi±c "
 };
 
-char _temat_ [ ] [ 12 ] = {
+char _temat_[][ 12 ] = {
 	"grosz",
 	"z³ot",
 	"tysi",
@@ -123,19 +124,101 @@ char _temat_ [ ] [ 12 ] = {
 	"tryliard"
 };
 
-char _koncowka_ [ ] [ 3 ] [ 6 ] = {
-		{ "", "e", "y" },
-		{ "y ", "e ", "ych " },
-		{ "±c ", "±ce ", "êcy " },
-		{ " ", "y ", "ów " },
-		{ " ", "y ", "ów " },
-		{ " ", "y ", "ów " },
-		{ " ", "y ", "ów " },
-		{ " ", "y ", "ów " },
-		{ " ", "y ", "ów " }
+char _koncowka_[][ 3 ][ 6 ] = {
+	{ "", "e", "y" },
+	{ "y ", "e ", "ych " },
+	{ "±c ", "±ce ", "êcy " },
+	{ " ", "y ", "ów " },
+	{ " ", "y ", "ów " },
+	{ " ", "y ", "ów " },
+	{ " ", "y ", "ów " },
+	{ " ", "y ", "ów " },
+	{ " ", "y ", "ów " }
 };
 
 HString _lastErrorMessage_;
+
+EscapeTable::EscapeTable( char const* raw_, int rawLen_, char const* safe_, int safeLen_ )
+	: _rawToSafe(), _safeToRaw() {
+	M_PROLOG
+	M_ASSERT( ( rawLen_ > 0 ) && ( safeLen_ == rawLen_ ) && raw_ && safe_ );
+	for ( int i( 0 ); i < EscapeTable::ESCAPE_TABLE_SIZE; ++ i ) {
+		_rawToSafe[i] = _safeToRaw[i] = static_cast<char>( i );
+	}
+	for ( int i( 0 ); i < rawLen_; ++ i ) {
+		_rawToSafe[static_cast<char unsigned>( raw_[i] )] = safe_[i];
+		_safeToRaw[static_cast<char unsigned>( safe_[i] )] = raw_[i];
+	}
+	return;
+	M_EPILOG
+}
+
+void escape( yaal::hcore::HString& string_, EscapeTable const& et_, char escape_ ) {
+	M_PROLOG
+	typedef HTLS<HChunk> cache_t;
+	static cache_t _cache_;
+	HChunk& cache( *_cache_ );
+	int cacheSize( static_cast<int>( cache.get_size() ) );
+	if ( string_.get_length() >= cacheSize ) {
+		cache.realloc( string_.get_length() );
+		cacheSize = static_cast<int>( cache.get_size() );
+	}
+	int pos( 0 );
+	char* ptr( cache.get<char>() );
+	for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
+		char ch( et_._rawToSafe[static_cast<char unsigned>( *it )] );
+		if ( ( pos + 1 ) >= cacheSize ) {
+			cache.realloc( cacheSize * 2 );
+			cacheSize = static_cast<int>( cache.get_size() );
+			ptr = cache.get<char>();
+		}
+		if ( ch != *it )
+			ptr[pos ++] = escape_;
+		ptr[ pos ] = ch;
+	}
+	string_.assign( ptr, pos );
+	return;
+	M_EPILOG
+}
+
+void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, char escape_ ) {
+	M_PROLOG
+	typedef HTLS<HChunk> cache_t;
+	static cache_t _cache_;
+	HChunk& cache( *_cache_ );
+	int cacheSize( static_cast<int>( cache.get_size() ) );
+	if ( string_.get_length() >= cacheSize ) {
+		cache.realloc( string_.get_length() );
+		cacheSize = static_cast<int>( cache.get_size() );
+	}
+	int pos( 0 );
+	char* ptr( cache.get<char>() );
+	for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
+		if ( *it == escape_ ) {
+			++ it;
+			if ( ! ( it != end ) )
+				break;
+		}
+		ptr[pos] = et_._safeToRaw[static_cast<char unsigned>( *it )];
+	}
+	string_.assign( ptr, pos );
+	return;
+	M_EPILOG
+}
+
+HString escape_copy( yaal::hcore::HString string_, EscapeTable const& et_, char escape_ ) {
+	M_PROLOG
+	escape( string_, et_, escape_ );
+	return ( string_ );
+	M_EPILOG
+}
+
+HString unescape_copy( yaal::hcore::HString string_, EscapeTable const& et_, char escape_ ) {
+	M_PROLOG
+	unescape( string_, et_, escape_ );
+	return ( string_ );
+	M_EPILOG
+}
 
 HString kwota_slownie( double kwota_ ) {
 	M_PROLOG
@@ -242,7 +325,7 @@ int modulo_ASCII( HString const& aSCIINumber_, int modulo_ ) {
 		number = lexical_cast<int>( tmpString );
 		number %= modulo_;
 		tmpString.format ( "%d", number );
-		tmpNumber.shift_left ( tmpLength - tmpString.get_length() );
+		tmpNumber.shift_left( tmpLength - tmpString.get_length() );
 		tmpLength = tmpString.get_length();
 		for ( ctr = 0; ctr < tmpLength; ctr ++ )
 			tmpNumber.set_at( ctr, tmpString[ ctr ] );
