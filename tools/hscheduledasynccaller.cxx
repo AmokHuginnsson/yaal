@@ -53,6 +53,7 @@ HScheduledAsyncCaller::~HScheduledAsyncCaller( void ) {
 
 void HScheduledAsyncCaller::do_signal( void ) {
 	M_PROLOG
+	HLock l( _mutex );
 	_condition.signal();
 	return;
 	M_EPILOG

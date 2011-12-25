@@ -237,7 +237,7 @@ void do_pthread_mutexattr_destroy( void* attr ) {
 
 HMutex::HMutex( TYPE::mutex_type_t const type_ ) : _type( type_ ),
 	_buf( chunk_size<pthread_mutex_t>( 1 ) + chunk_size<pthread_mutexattr_t>( 1 ) ),
-	_resGuard() {
+	_resGuard(), _owner( HThread::INVALID ) {
 	M_PROLOG
 	if ( _type == TYPE::DEFAULT )
 		_type = TYPE::NON_RECURSIVE;
@@ -267,15 +267,30 @@ void HMutex::lock( void ) {
 	int error = ::pthread_mutex_lock( _buf.get<pthread_mutex_t>() );
 	if ( ! ( _type & TYPE::RECURSIVE ) )
 		M_ENSURE( error != EDEADLK );
+	_owner = HThread::get_id();
 	return;
 	M_EPILOG
 }
 
 void HMutex::unlock( void ) {
 	M_PROLOG
+	_owner = HThread::INVALID;
 	int error = ::pthread_mutex_unlock( _buf.get<pthread_mutex_t>() );
 	if ( ! ( _type & TYPE::RECURSIVE ) )
 		M_ENSURE( error != EPERM );
+	return;
+	M_EPILOG
+}
+
+bool HMutex::is_owned( void ) const {
+	M_PROLOG
+	return ( _owner == HThread::get_id() );
+	M_EPILOG
+}
+
+void HMutex::reown( void ) {
+	M_PROLOG
+	_owner = HThread::get_id();
 	return;
 	M_EPILOG
 }
@@ -431,7 +446,7 @@ HCondition::HCondition( HMutex& mutex_ )
 	M_PROLOG
 	pthread_condattr_t* attr( static_cast<pthread_condattr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_cond_t ) ) ) );
 	::pthread_condattr_init( attr );
-	::pthread_cond_init( _buf.get<pthread_cond_t>(), attr );
+	M_ENSURE( ::pthread_cond_init( _buf.get<pthread_cond_t>(), attr ) == 0 );
 	return;
 	M_EPILOG
 }
@@ -460,6 +475,7 @@ HCondition::~HCondition( void ) {
 HCondition::status_t HCondition::wait( int long unsigned timeOutSeconds_,
 		int long unsigned timeOutNanoSeconds_ ) {
 	M_PROLOG
+	M_ASSERT( _mutex.is_owned() );
 	int error = 0;
 	timespec timeOut;
 	::memset( &timeOut, 0, sizeof ( timespec ) );
@@ -473,14 +489,27 @@ HCondition::status_t HCondition::wait( int long unsigned timeOutSeconds_,
 	}
 	error = ::pthread_cond_timedwait( _buf.get<pthread_cond_t>(),
 				_mutex._buf.get<pthread_mutex_t>(), &timeOut );
+	/* We need to make sure that mutex owner is reset to proper value, as HCondition::signal() invoker undoubtfuly modified it. */
+	_mutex.reown();
+	/* Error code is not stored in errno but is explicitly returned. */
+	HScopedValueReplacement<int> saveErrno( errno, error );
 	M_ENSURE( ( error == 0 ) || ( error == EINTR ) || ( error == ETIMEDOUT ) );
-	return ( ( error == 0 ) ? OK : ( ( errno == EINTR ) ? INTERRUPT : TIMEOUT ) );
+	return ( ( error == 0 ) ? OK : ( ( error == EINTR ) ? INTERRUPT : TIMEOUT ) );
 	M_EPILOG
 }
 
 void HCondition::signal( void ) {
 	M_PROLOG
-	::pthread_cond_signal( _buf.get<pthread_cond_t>() );
+	M_ASSERT( _mutex.is_owned() );
+	M_ENSURE( ::pthread_cond_signal( _buf.get<pthread_cond_t>() ) == 0 );
+	return;
+	M_EPILOG
+}
+
+void HCondition::broadcast( void ) {
+	M_PROLOG
+	M_ASSERT( _mutex.is_owned() );
+	M_ENSURE( ::pthread_cond_broadcast( _buf.get<pthread_cond_t>() ) == 0 );
 	return;
 	M_EPILOG
 }
@@ -502,6 +531,7 @@ HEvent::~HEvent( void ) {
 
 void HEvent::wait( void ) {
 	M_PROLOG
+	M_ASSERT( _mutex.is_owned() );
 	_condition.wait( 0x1fffffff, 0 ); /* FreeBSD strange limit. */
 	return;
 	M_EPILOG

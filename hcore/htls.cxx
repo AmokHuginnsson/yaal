@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <pthread.h>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "htls.hxx"
@@ -31,6 +33,38 @@ M_VCSID( "$Id: "__ID__" $" )
 namespace yaal {
 
 namespace hcore {
+
+namespace tls {
+
+int create( destruct_t destruct_ ) {
+	M_PROLOG
+	pthread_key_t key( 0 );
+	M_ENSURE( pthread_key_create( &key, destruct_ ) == 0 );
+	return ( key );
+	M_EPILOG
+}
+
+void set( int key_, void const* value_ ) {
+	M_PROLOG
+	M_ENSURE( ::pthread_setspecific( key_, value_ ) == 0 );
+	return;
+	M_EPILOG
+}
+
+void* get( int key_ ) {
+	M_PROLOG
+	return ( ::pthread_getspecific( key_ ) );
+	M_EPILOG
+}
+
+void free( int key_ ) {
+	M_PROLOG
+	M_ENSURE( ::pthread_key_delete( key_ ) == 0 );
+	return;
+	M_EPILOG
+}
+
+}
 
 }
 

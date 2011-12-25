@@ -63,6 +63,7 @@ private:
 	TYPE::mutex_type_t _type;
 	HChunk _buf;
 	HResource<void> _resGuard;
+	int long _owner;
 	/*}*/
 public:
 	/*{*/
@@ -71,9 +72,11 @@ public:
 	void lock( void );
 	bool try_lock( void );
 	void unlock( void );
+	bool is_owned( void ) const;
 	/*}*/
 private:
 	/*{*/
+	void reown( void );
 	HMutex( HMutex const& );
 	HMutex& operator = ( HMutex const& );
 	friend class HCondition;
@@ -128,6 +131,7 @@ typedef HExceptionT<HSemaphore> HSemaphoreException;
 class HThread {
 public:
 	M_YAAL_HCORE_PUBLIC_API static int _threadStackSize;
+	static int long const INVALID = -1;
 private:
 	typedef HThread this_type;
 	typedef enum {
@@ -234,6 +238,7 @@ public:
 	virtual ~HCondition( void );
 	status_t wait( int long unsigned, int long unsigned );
 	void signal( void );
+	void broadcast( void );
 private:
 	HCondition( HCondition const& );
 	HCondition& operator = ( HCondition const& );
