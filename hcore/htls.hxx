@@ -60,8 +60,69 @@ template<typename tType>
 class HTLS : private trait::HNonCopyable {
 public:
 	typedef HTLS<tType> this_type;
-	typedef yaal::hcore::HPair<tType*, this_type*> instance_holder_t;
-	typedef yaal::hcore::HSet<instance_holder_t> instances_t;
+	class HTLSHolder : private trait::HNonCopyable {
+	public:
+		typedef HTLSHolder this_type;
+	protected:
+		typedef HTLS<tType> owner_t;
+		tType _object;
+		owner_t* _owner;
+	public:
+		explicit HTLSHolder( owner_t* owner_ )
+			: _object(), _owner( owner_ ) {}
+		template<typename a0_t>
+		explicit HTLSHolder( a0_t a0_, owner_t* owner_ )
+			: _object( a0_ ), _owner( owner_ ) {}
+		template<typename a0_t, typename a1_t>
+		explicit HTLSHolder( a0_t a0_, a1_t a1_, owner_t* owner_ )
+			: _object( a0_, a1_ ), _owner( owner_ ) {}
+		template<typename a0_t, typename a1_t, typename a2_t>
+		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, owner_t* owner_ )
+			: _object( a0_, a1_, a2_ ), _owner( owner_ ) {}
+		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t>
+		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, owner_t* owner_ )
+			: _object( a0_, a1_, a2_, a3_ ), _owner( owner_ ) {}
+		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
+		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, owner_t* owner_ )
+			: _object( a0_, a1_, a2_, a3_, a4_ ), _owner( owner_ ) {}
+		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t>
+		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, owner_t* owner_ )
+			: _object( a0_, a1_, a2_, a3_, a4_, a5_ ), _owner( owner_ ) {}
+		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
+		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, owner_t* owner_ )
+			: _object( a0_, a1_, a2_, a3_, a4_, a5_, a6_ ), _owner( owner_ ) {}
+		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t>
+		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, owner_t* owner_ )
+			: _object( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_ ), _owner( owner_ ) {}
+		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t>
+		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, a8_t a8_, owner_t* owner_ )
+			: _object( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_ ), _owner( owner_ ) {}
+		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t, typename a9_t>
+		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, a8_t a8_, a9_t a9_, owner_t* owner_ )
+			: _object( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_ ), _owner( owner_ ) {}
+		virtual ~HTLSHolder( void ) {}
+		operator tType const& ( void ) const
+			{ return ( _object ); }
+		operator tType& ( void )
+			{ return ( _object ); }
+		tType const* operator->( void ) const
+			{ return ( &_object ); }
+		tType* operator->( void )
+			{ return ( &_object ); }
+		template<typename assgnee_t>
+		tType& operator = ( assgnee_t const& v_ ) {
+			_object = v_;
+			return ( _object );
+		}
+		owner_t* get_owner( void ) {
+			return ( _owner );
+		}
+	private:
+		HTLSHolder( HTLSHolder const& );
+		HTLSHolder& operator = ( HTLSHolder const& );
+	};
+	typedef yaal::hcore::HResource<HTLSHolder> tls_holder_res_t;
+	typedef yaal::hcore::HSet<HTLSHolder*> instances_t;
 	typedef yaal::hcore::HBoundCall<> constructor_t;
 	typedef typename instances_t::iterator iterator;
 	typedef typename instances_t::const_iterator const_iterator;
@@ -78,9 +139,12 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType(), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	template<typename T0>
@@ -92,9 +156,12 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType( a0_ ), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( a0_, this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	template<typename T0, typename T1>
@@ -106,9 +173,12 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType( a0_, a1_ ), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( a0_, a1_, this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	template<typename T0, typename T1, typename T2>
@@ -120,9 +190,12 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType( a0_, a1_, a2_ ), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( a0_, a1_, a2_, this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	template<typename T0, typename T1, typename T2, typename T3>
@@ -135,9 +208,12 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType( a0_, a1_, a2_, a3_ ), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( a0_, a1_, a2_, a3_, this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4>
@@ -150,9 +226,12 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType( a0_, a1_, a2_, a3_, a4_ ), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( a0_, a1_, a2_, a3_, a4_, this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
@@ -165,9 +244,12 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType( a0_, a1_, a2_, a3_, a4_, a5_ ), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( a0_, a1_, a2_, a3_, a4_, a5_, this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
@@ -180,9 +262,12 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType( a0_, a1_, a2_, a3_, a4_, a5_, a6_ ), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( a0_, a1_, a2_, a3_, a4_, a5_, a6_, this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
@@ -195,9 +280,12 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_ ), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
@@ -210,9 +298,12 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_ ), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
@@ -225,9 +316,12 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_ ), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_, this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
@@ -240,29 +334,31 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		typename instances_t::insert_result ir( _instances.insert( make_pair( new tType( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_, a10_ ), this ) ) );
-		M_ASSERT( ir.second );
-		tls::set( _key, &*ir.first );
+		tls_holder_res_t res( new HTLSHolder( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_, a10_, this ) );
+		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
+		tls::set( _key, res.get() );
+		M_ASSERT( res->get_owner() );
+		res.release();
+		return;
 		M_EPILOG
 	}
 	static void destruct( void* tls_ ) {
 		M_PROLOG
-		instance_holder_t* ih( static_cast<instance_holder_t*>( tls_ ) );
-		yaal::hcore::HLock l( ih->second->_mutex );
-		tType* obj( ih->first );
-		ih->second->_instances.erase( *ih );
-		M_SAFE( delete obj );
+		HTLSHolder* th( static_cast<HTLSHolder*>( tls_ ) );
+		this_type* tls( th->get_owner() );
+		yaal::hcore::HLock l( tls->_mutex );
+		tls->_instances.erase( th );
+		M_SAFE( delete th );
 		M_EPILOG
 	}
 	virtual ~HTLS( void ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		for ( typename instances_t::iterator it( _instances.begin() ), endIt( _instances.end() ); it != endIt; ++ it ) {
-			M_SAFE( delete it->first );
+			M_SAFE( delete *it );
 		}
 		_instances.clear();
 		tls::free( _key );
-		_key = tls::create( &HTLS::destruct );
 		M_DESTRUCTOR_EPILOG
 	}
 	external_lock_t acquire( void ) {
@@ -274,14 +370,14 @@ public:
 		M_PROLOG
 		if ( ! tls::get( _key ) )
 			_constructor();
-		return ( static_cast<instance_holder_t*>( tls::get( _key ) )->first );
+		return ( &static_cast<tType&>( *static_cast<HTLSHolder*>( tls::get( _key ) ) ) );
 		M_EPILOG
 	}
 	tType& operator*( void ) {
 		M_PROLOG
 		if ( ! tls::get( _key ) )
 			_constructor();
-		return ( *static_cast<instance_holder_t*>( tls::get( _key ) )->first );
+		return ( *static_cast<HTLSHolder*>( tls::get( _key ) ) );
 		M_EPILOG
 	}
 	const_iterator begin( void ) const {
