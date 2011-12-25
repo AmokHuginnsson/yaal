@@ -45,12 +45,13 @@ class HTLS;
 
 namespace tls {
 
+typedef int key_t;
 typedef void ( *destruct_t )( void* );
 
-int create( destruct_t );
-void set( int, void const* );
-void* get( int );
-void free( int );
+key_t create( destruct_t );
+void set( key_t, void const* );
+void* get( key_t );
+void free( key_t );
 
 }
 
@@ -127,7 +128,7 @@ public:
 	typedef typename instances_t::iterator iterator;
 	typedef typename instances_t::const_iterator const_iterator;
 private:
-	int _key;
+	tls::key_t _key;
 	yaal::hcore::HMutex _mutex;
 	instances_t _instances;
 	constructor_t _constructor;

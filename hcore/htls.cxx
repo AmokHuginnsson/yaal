@@ -36,30 +36,32 @@ namespace hcore {
 
 namespace tls {
 
-int create( destruct_t destruct_ ) {
+STATIC_ASSERT( sizeof ( pthread_key_t ) == sizeof ( key_t ) );
+
+key_t create( destruct_t destruct_ ) {
 	M_PROLOG
 	pthread_key_t key( 0 );
 	M_ENSURE( pthread_key_create( &key, destruct_ ) == 0 );
-	return ( key );
+	return ( reinterpret_cast<key_t>( key ) );
 	M_EPILOG
 }
 
-void set( int key_, void const* value_ ) {
+void set( key_t key_, void const* value_ ) {
 	M_PROLOG
-	M_ENSURE( ::pthread_setspecific( key_, value_ ) == 0 );
+	M_ENSURE( ::pthread_setspecific( reinterpret_cast<pthread_key_t>( key_ ), value_ ) == 0 );
 	return;
 	M_EPILOG
 }
 
-void* get( int key_ ) {
+void* get( key_t key_ ) {
 	M_PROLOG
-	return ( ::pthread_getspecific( key_ ) );
+	return ( ::pthread_getspecific( reinterpret_cast<pthread_key_t>( key_ ) ) );
 	M_EPILOG
 }
 
-void free( int key_ ) {
+void free( key_t key_ ) {
 	M_PROLOG
-	M_ENSURE( ::pthread_key_delete( key_ ) == 0 );
+	M_ENSURE( ::pthread_key_delete( reinterpret_cast<pthread_key_t>( key_ ) ) == 0 );
 	return;
 	M_EPILOG
 }
