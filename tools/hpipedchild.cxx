@@ -49,7 +49,9 @@ namespace tools {
 static void close_and_invalidate( int& fd_ ) {
 	M_PROLOG
 	if ( fd_ >= 0 )
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 		M_ENSURE( TEMP_FAILURE_RETRY( hcore::system::close( fd_ ) ) == 0 );
+#pragma GCC diagnostic error "-Wold-style-cast"
 	fd_ = -1;
 	return;
 	M_EPILOG
@@ -92,12 +94,18 @@ HPipedChild::STATUS HPipedChild::finish( void ) {
 				M_ENSURE( ::waitpid( _pid, &status, 0 ) == _pid );
 			}
 		}
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 		if ( WIFEXITED( status ) ) {
+#pragma GCC diagnostic error "-Wold-style-cast"
 			s.type = STATUS::TYPE::NORMAL;
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 			s.value = WEXITSTATUS( status );
 		} else if ( WIFSIGNALED( status ) ) {
+#pragma GCC diagnostic error "-Wold-style-cast"
 			s.type = STATUS::TYPE::ABORT;
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 			s.value = WTERMSIG( status );
+#pragma GCC diagnostic error "-Wold-style-cast"
 		}
 	}
 	_pid = 0;
@@ -112,9 +120,13 @@ struct OPipeResGuard {
 	}
 	~OPipeResGuard( void ) {
 		if ( _res[ 0 ] >= 0 )
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 			TEMP_FAILURE_RETRY( hcore::system::close( _res[ 0 ] ) );
+#pragma GCC diagnostic error "-Wold-style-cast"
 		if ( _res[ 1 ] >= 0 )
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 			TEMP_FAILURE_RETRY( hcore::system::close( _res[ 1 ] ) );
+#pragma GCC diagnostic error "-Wold-style-cast"
 	}
 };
 
@@ -174,9 +186,11 @@ int long HPipedChild::do_write( void const* const string_, int long size_ ) {
 	int long nWritten( 0 );
 	int long nWriteChunk( 0 );
 	do {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 		nWriteChunk = TEMP_FAILURE_RETRY( ::write( _pipeIn,
 					static_cast<char const* const>( string_ ) + nWritten,
 					size_ - nWritten ) );
+#pragma GCC diagnostic error "-Wold-style-cast"
 		nWritten += nWriteChunk;
 	} while ( ( nWriteChunk > 0 ) && ( nWritten < size_ ) );
 	return ( nWritten );

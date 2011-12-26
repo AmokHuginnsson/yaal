@@ -174,11 +174,11 @@ void update_md5_state( u32_t* state, HStreamBlockIterator::HBlock const& block )
 #define M_I(x, y, z) ((y)^((x)|~(z)))
 
 #define M_FF(v, w, x, y, z, s, ac) { \
- v += M_F(w, x, y) + z + (u32_t)(ac); \
+ v += M_F(w, x, y) + z + static_cast<u32_t>(ac); \
  v = M_ROTATE_LEFT(v, s) + w; \
  }
 #define M_GG(v, w, x, y, z, s, ac) { \
- v += M_G(w, x, y) + z + (u32_t)(ac); \
+ v += M_G(w, x, y) + z + static_cast<u32_t>(ac); \
  v = M_ROTATE_LEFT(v, s) + w; \
  }
 #define M_HH(v, w, x, y, z, s, ac) { \

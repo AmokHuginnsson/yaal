@@ -42,26 +42,26 @@ key_t create( destruct_t destruct_ ) {
 	M_PROLOG
 	pthread_key_t key( 0 );
 	M_ENSURE( pthread_key_create( &key, destruct_ ) == 0 );
-	return ( reinterpret_cast<key_t>( key ) );
+	return ( key );
 	M_EPILOG
 }
 
 void set( key_t key_, void const* value_ ) {
 	M_PROLOG
-	M_ENSURE( ::pthread_setspecific( reinterpret_cast<pthread_key_t>( key_ ), value_ ) == 0 );
+	M_ENSURE( ::pthread_setspecific( key_, value_ ) == 0 );
 	return;
 	M_EPILOG
 }
 
 void* get( key_t key_ ) {
 	M_PROLOG
-	return ( ::pthread_getspecific( reinterpret_cast<pthread_key_t>( key_ ) ) );
+	return ( ::pthread_getspecific( key_ ) );
 	M_EPILOG
 }
 
 void free( key_t key_ ) {
 	M_PROLOG
-	M_ENSURE( ::pthread_key_delete( reinterpret_cast<pthread_key_t>( key_ ) ) == 0 );
+	M_ENSURE( ::pthread_key_delete( key_ ) == 0 );
 	return;
 	M_EPILOG
 }

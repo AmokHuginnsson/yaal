@@ -24,8 +24,8 @@ CWARNING_FLAGS =	\
 #						-Waggregate-return \ # useless for C++
 CXXWARNING_FLAGS		=	\
 						-Weffc++ \
-						-Wsign-promo
-#						-Wold-style-cast \ # lots of warrnings from libc headers
+						-Wsign-promo \
+						-Wold-style-cast
 #						-Woverloaded-virtual \ # too many unecessary warnings
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__

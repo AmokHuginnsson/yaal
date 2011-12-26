@@ -572,7 +572,9 @@ char unsigned HConsole::get_attr( void ) const {
 	 * &attr and &color never being NULL. */
 	attr_t* pa( &attr );
 	NCURSES_ATTR_GET_SECOND_ARG_TYPE* pc( &color );
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 	static_cast<void>( attr_get( pa, pc, NULL ) ); /* Ugly macro */
+#pragma GCC diagnostic error "-Wold-style-cast"
 	int unsigned attribute = ( color << 1 ) & 56;
 	attribute |= ( color & 7 );
 	if ( attr & A_BOLD )

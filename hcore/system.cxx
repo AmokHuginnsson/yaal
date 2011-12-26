@@ -81,9 +81,13 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 		FD_ZERO( &writers );
 /* FD_SET is a macro and first argument is evaluated twice ! */
 	for ( int i( 0 ); i < inputCount_; ++ i )
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 		FD_SET( input_[ i ], &readers );
+#pragma GCC diagnostic error "-Wold-style-cast"
 	for ( int i( 0 ); i < outputCount_; ++ i )
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 		FD_SET( output_[ i ], &writers );
+#pragma GCC diagnostic error "-Wold-style-cast"
 	timeval timeOut, * timeOutP = timeOut_ ? &timeOut : NULL;
 	if ( timeOut_ ) {
 		timeOut.tv_usec = ( *timeOut_ % 1000 ) * 1000;
@@ -98,11 +102,15 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 			&& ( errno == EINTR )
 			&& ( ! timeOut_ || ( clock.get_time_elapsed( HClock::UNIT::MILISECOND ) < *timeOut_ ) ) );
 	for ( int i( 0 ); i < inputCount_; ++ i ) {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 		if ( ! FD_ISSET( input_[ i ], &readers ) )
+#pragma GCC diagnostic error "-Wold-style-cast"
 			input_[ i ] = -1;
 	}
 	for ( int i( 0 ); i < outputCount_; ++ i ) {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 		if ( ! FD_ISSET( output_[ i ], &writers ) )
+#pragma GCC diagnostic error "-Wold-style-cast"
 			output_[ i ] = -1;
 	}
 	if ( timeOut_ )

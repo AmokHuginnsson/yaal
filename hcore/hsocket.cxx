@@ -262,7 +262,9 @@ void HSocket::make_address( yaal::hcore::HString const& address_, int port_ ) {
 		::strncpy( addressFile->sun_path, address_.raw(),
 				sizeof ( addressFile->sun_path ) );
 		addressFile->sun_path[ sizeof ( addressFile->sun_path ) - 1 ] = 0;
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 		_addressSize = static_cast<int>( SUN_LEN( addressFile ) );
+#pragma GCC diagnostic error "-Wold-style-cast"
 	}
 	_hostName = address_;
 	return;

@@ -206,7 +206,9 @@ void ensure_limit( int resource_, char const* message_ ) {
 		::perror( SYSCALL_FAILURE );
 		::exit( 1 );
 	}
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 	if ( static_cast<int long>( rl.rlim_cur ) == static_cast<int long>( RLIM_INFINITY ) ) {
+#pragma GCC diagnostic error "-Wold-style-cast"
 		::perror( message_ );
 		::exit( 1 );
 	}
