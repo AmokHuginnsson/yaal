@@ -52,11 +52,11 @@ protected:
 public:
 	void register_call( priority_t, call_t );
 	void flush( void* );
+	void stop( void );
 protected:
 	HAbstractAsyncCaller( void );
 	virtual ~HAbstractAsyncCaller( void ) {}
 	void start( void );
-	void stop( void );
 	virtual void do_signal( void ) = 0;
 	virtual void* do_work( void ) = 0;
 private:

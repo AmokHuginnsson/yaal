@@ -95,8 +95,8 @@ void SignalDispatcher::dispatch( int sigNo_ ) {
 		external_lock_t l( _tlsSignalsSetup_.acquire() );
 		for ( TLSSignalsSetup::iterator it( _tlsSignalsSetup_.begin() ), end( _tlsSignalsSetup_.end() );
 			it != end; ++ it ) {
-			if ( ! (*it)->is_blocked( sigNo_ ) ) {
-				(*it)->signal();
+			if ( ! (**it)->is_blocked( sigNo_ ) ) {
+				(**it)->signal();
 				break;
 			}
 		}

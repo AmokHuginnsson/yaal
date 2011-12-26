@@ -46,7 +46,8 @@ HScheduledAsyncCaller::HScheduledAsyncCaller( void ) : _condition( _mutex ) {
 
 HScheduledAsyncCaller::~HScheduledAsyncCaller( void ) {
 	M_PROLOG
-	stop();
+	if ( _loop )
+		stop();
 	return;
 	M_DESTRUCTOR_EPILOG
 }
