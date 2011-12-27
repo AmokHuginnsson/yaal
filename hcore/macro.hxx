@@ -79,6 +79,9 @@ Copyright:
 #ifdef M_AT_END_OF_SCOPE
 #	error Yaal redefines M_AT_END_OF_SCOPE macro.
 #endif /* #ifdef M_AT_END_OF_SCOPE */
+#ifdef M_TEMP_FAILURE_RETRY
+#	error Yaal redefines M_TEMP_FAILURE_RETRY macro.
+#endif /* #ifdef M_TEMP_FAILURE_RETRY */
 #ifdef countof
 #	error Yaal redefines countof macro.
 #endif /* #ifdef countof */
@@ -178,6 +181,19 @@ Copyright:
  */
 #define M_AT_END_OF_SCOPE( code ) \
 class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LINE__ )( void ) {} ~M_CONCAT( AtEndOfScope, __LINE__ )( void ) { do { code } while ( 0 ); } } M_CONCAT( atEndOfScope, __LINE__ )
+#if defined( HAVE_DECL_TEMP_FAILURE_RETRY ) && ( HAVE_DECL_TEMP_FAILURE_RETRY == 1 )
+/*! \brief Reinmplement TEMP_FAILURE_RETRY macro.
+ * Some of the original implementations use C-style-casts which messes our build.
+ */
+#	define M_TEMP_FAILURE_RETRY( expr ) ( __extension__( { \
+	int long __result( 0 ); \
+	do __result = static_cast<int long>( expr ); \
+	while ( ( __result == -1 ) && ( errno == EINTR ) ); \
+	__result; \
+} ) )
+#else /* #if defined( HAVE_DECL_TEMP_FAILURE_RETRY ) && ( HAVE_DECL_TEMP_FAILURE_RETRY == 1 ) */
+#	define M_TEMP_FAILURE_RETRY( expr ) ( expr )
+#endif /* #else #if defined( HAVE_DECL_TEMP_FAILURE_RETRY ) && ( HAVE_DECL_TEMP_FAILURE_RETRY == 1 ) */
 /*! \brief Convinience macro to obtain number of elements of declared array.
  */
 #define countof( array ) ( yaal::meta::integer_cast<int, sizeof ( yaal::YaalArrayElementCountHelper( ( array ) ) )>::value )

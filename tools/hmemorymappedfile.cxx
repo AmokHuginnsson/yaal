@@ -40,6 +40,12 @@ namespace yaal {
 
 namespace tools {
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+static void const* const FWD_MAP_FAILED = MAP_FAILED;
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 HMemoryMappedFile::HMemoryMappedFile( yaal::hcore::HString const& path_, int long size_ )
 	: _fd( -1 ), _map( NULL ), _size( 0 ) {
 	M_PROLOG
@@ -48,9 +54,7 @@ HMemoryMappedFile::HMemoryMappedFile( yaal::hcore::HString const& path_, int lon
 		if ( ! size_ ) {
 			M_ENSURE( ( _size = static_cast<int long>( ::lseek( _fd, 0, SEEK_END ) ) ) >= 0 );
 		}
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-		M_ENSURE( ( _map = ::mmap( NULL, _size, PROT_READ | PROT_WRITE, MAP_PRIVATE, _fd, 0 ) ) != MAP_FAILED );
-#pragma GCC diagnostic error "-Wold-style-cast"
+		M_ENSURE( ( _map = ::mmap( NULL, _size, PROT_READ | PROT_WRITE, MAP_PRIVATE, _fd, 0 ) ) != FWD_MAP_FAILED );
 	} catch ( ... ) {
 		M_SAFE( M_ENSURE( ::close( _fd ) != 0 ) );
 		_fd = -1;

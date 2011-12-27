@@ -93,9 +93,7 @@ int HRawFile::do_close ( void ) {
 	int error = 0;
 	if ( _fileDescriptor < 0 )
 		M_THROW( "file is not opened", errno );
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-	error = static_cast<int>( TEMP_FAILURE_RETRY( system::close( _fileDescriptor ) ) );
-#pragma GCC diagnostic error "-Wold-style-cast"
+	error = static_cast<int>( M_TEMP_FAILURE_RETRY( system::close( _fileDescriptor ) ) );
 	_fileDescriptor = -1;
 	return ( error );
 	M_EPILOG
@@ -158,11 +156,9 @@ int long HRawFile::write_plain( void const* const buffer_, int long size_ ) {
 	do {
 		if ( ( _timeout > 0 ) && wait_for( ACTION::WRITE, &timeOut ) )
 			throw HStreamInterfaceException( _( "timeout on write" ) );
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-		int long ret = TEMP_FAILURE_RETRY( ::write( _fileDescriptor,
+		int long ret = M_TEMP_FAILURE_RETRY( ::write( _fileDescriptor,
 					static_cast<char const* const>( buffer_ ) + iWritten,
 					size_ - iWritten ) );
-#pragma GCC diagnostic error "-Wold-style-cast"
 		if ( ret < 0 ) {
 			iWritten = ret;
 			break;

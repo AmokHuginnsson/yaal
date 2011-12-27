@@ -68,6 +68,23 @@ int kill( int pid_, int signal_ ) {
 	return ( ::kill( pid_, signal_ ) );
 }
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+template<typename T1>
+inline void FWD_FD_ZERO( T1 val1_ ) {
+	FD_ZERO( val1_ );
+}
+template<typename T1, typename T2>
+inline void FWD_FD_SET( T1 val1_, T2 val2_ ) {
+	FD_SET( val1_, val2_ );
+}
+template<typename T1, typename T2>
+inline bool FWD_FD_ISSET( T1 val1_, T2 val2_ ) {
+	return ( FD_ISSET( val1_, val2_ ) );
+}
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, int long* timeOut_, bool restartable_ ) {
 	M_ASSERT( ( inputCount_ >= 0 ) && ( outputCount_ >= 0 ) && ( ( inputCount_ + outputCount_ ) > 0 ) );
 	M_ASSERT( ! inputCount_ || input_ );
@@ -76,18 +93,13 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 	fd_set readers;
 	fd_set writers;
 	if ( inputCount_ )
-		FD_ZERO( &readers );
+		FWD_FD_ZERO( &readers );
 	if ( outputCount_ )
-		FD_ZERO( &writers );
-/* FD_SET is a macro and first argument is evaluated twice ! */
+		FWD_FD_ZERO( &writers );
 	for ( int i( 0 ); i < inputCount_; ++ i )
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-		FD_SET( input_[ i ], &readers );
-#pragma GCC diagnostic error "-Wold-style-cast"
+		FWD_FD_SET( input_[ i ], &readers );
 	for ( int i( 0 ); i < outputCount_; ++ i )
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-		FD_SET( output_[ i ], &writers );
-#pragma GCC diagnostic error "-Wold-style-cast"
+		FWD_FD_SET( output_[ i ], &writers );
 	timeval timeOut, * timeOutP = timeOut_ ? &timeOut : NULL;
 	if ( timeOut_ ) {
 		timeOut.tv_usec = ( *timeOut_ % 1000 ) * 1000;
@@ -102,15 +114,11 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 			&& ( errno == EINTR )
 			&& ( ! timeOut_ || ( clock.get_time_elapsed( HClock::UNIT::MILISECOND ) < *timeOut_ ) ) );
 	for ( int i( 0 ); i < inputCount_; ++ i ) {
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-		if ( ! FD_ISSET( input_[ i ], &readers ) )
-#pragma GCC diagnostic error "-Wold-style-cast"
+		if ( ! FWD_FD_ISSET( input_[ i ], &readers ) )
 			input_[ i ] = -1;
 	}
 	for ( int i( 0 ); i < outputCount_; ++ i ) {
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-		if ( ! FD_ISSET( output_[ i ], &writers ) )
-#pragma GCC diagnostic error "-Wold-style-cast"
+		if ( ! FWD_FD_ISSET( output_[ i ], &writers ) )
 			output_[ i ] = -1;
 	}
 	if ( timeOut_ )

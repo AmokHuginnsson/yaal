@@ -42,10 +42,16 @@ namespace yaal {
 
 namespace hcore {
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 HClock::HClock( void ) : _moment() {
 	M_PROLOG
 	timespec time;
-	M_ENSURE( clock_gettime( CLOCK_REALTIME, &time ) == 0 );
+	M_ENSURE( clock_gettime( FWD_CLOCK_REALTIME, &time ) == 0 );
 	_moment[ UNIT::SECOND ] = time.tv_sec;
 	_moment[ UNIT::NANOSECOND ] = time.tv_nsec;
 	M_EPILOG
@@ -60,7 +66,7 @@ int long HClock::get_time_elapsed( UNIT::unit_t unit_, bool reset_ ) const {
 	static int long const NANO_IN_MICRO = power<10, 3>::value;
 	timespec time;
 	timespec reset;
-	M_ENSURE( clock_gettime( CLOCK_REALTIME, &reset ) == 0 );
+	M_ENSURE( clock_gettime( FWD_CLOCK_REALTIME, &reset ) == 0 );
 	time.tv_sec = reset.tv_sec - _moment[ UNIT::SECOND ];
 	if ( reset.tv_nsec < _moment[ UNIT::NANOSECOND ] ) {
 		-- time.tv_sec;

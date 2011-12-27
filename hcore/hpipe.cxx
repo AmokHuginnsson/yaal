@@ -47,10 +47,8 @@ HPipe::HPipe( void )
 
 HPipe::~HPipe( void ) {
 	M_PROLOG
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-	TEMP_FAILURE_RETRY( system::close( _pipe[ 1 ] ) );
-	TEMP_FAILURE_RETRY( system::close( _pipe[ 0 ] ) );
-#pragma GCC diagnostic error "-Wold-style-cast"
+	M_TEMP_FAILURE_RETRY( system::close( _pipe[ 1 ] ) );
+	M_TEMP_FAILURE_RETRY( system::close( _pipe[ 0 ] ) );
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -71,11 +69,9 @@ int long HPipe::do_write( void const* const buffer_, int long size_ ) {
 	int long nWritten( 0 );
 	int long nWriteChunk( 0 );
 	do {
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-		nWriteChunk = TEMP_FAILURE_RETRY( ::write( _pipe[ 1 ],
+		nWriteChunk = M_TEMP_FAILURE_RETRY( ::write( _pipe[ 1 ],
 					static_cast<char const* const>( buffer_ ) + nWritten,
 					size_ - nWritten ) );
-#pragma GCC diagnostic error "-Wold-style-cast"
 		nWritten += nWriteChunk;
 	} while ( ( nWriteChunk > 0 ) && ( nWritten < size_ ) );
 	return ( nWritten );

@@ -74,13 +74,18 @@ public:
 	static int signal_USR1( int );
 };
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+static sighandler_t const FWD_SIG_DFL = SIG_DFL;
+static sighandler_t const FWD_SIG_ERR = SIG_ERR;
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 void reset_signal_low( int sigNo_ ) {
 	M_PROLOG
 	struct sigaction act;
 	::memset( &act, 0, sizeof ( act ) );
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-	act.sa_handler = SIG_DFL;
-#pragma GCC diagnostic error "-Wold-style-cast"
+	act.sa_handler = FWD_SIG_DFL;
 	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
 	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
 	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
@@ -261,9 +266,7 @@ void HSignalService::schedule_exit( int exitStatus_ ) {
 	M_PROLOG
 	_isKilled_ = true;
 	_exitStatus = exitStatus_;
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-	M_ENSURE( signal( SIGALRM, HSignalService::exit ) != SIG_ERR );
-#pragma GCC diagnostic error "-Wold-style-cast"
+	M_ENSURE( signal( SIGALRM, HSignalService::exit ) != FWD_SIG_ERR );
 	alarm( 1 );
 	M_EPILOG
 }

@@ -247,6 +247,15 @@ void HSocket::connect( yaal::hcore::HString const& address_, int port_ ) {
 	M_EPILOG
 }
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+template<typename T>
+inline int FWD_SUN_LEN( T arg ) {
+	return ( static_cast<int>( SUN_LEN( arg ) ) );
+}
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 void HSocket::make_address( yaal::hcore::HString const& address_, int port_ ) {
 	M_PROLOG
 	if ( !!( _type & TYPE::NETWORK ) ) {
@@ -262,9 +271,7 @@ void HSocket::make_address( yaal::hcore::HString const& address_, int port_ ) {
 		::strncpy( addressFile->sun_path, address_.raw(),
 				sizeof ( addressFile->sun_path ) );
 		addressFile->sun_path[ sizeof ( addressFile->sun_path ) - 1 ] = 0;
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-		_addressSize = static_cast<int>( SUN_LEN( addressFile ) );
-#pragma GCC diagnostic error "-Wold-style-cast"
+		_addressSize = static_cast<int>( FWD_SUN_LEN( addressFile ) );
 	}
 	_hostName = address_;
 	return;

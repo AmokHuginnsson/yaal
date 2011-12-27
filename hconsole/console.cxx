@@ -561,6 +561,15 @@ int HConsole::kbhit( void ) const {
 	return ( key );
 	M_EPILOG
 }
+
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+template <typename T1, typename T2>
+inline void fwd_attr_get( T1& val1_, T2& val2_, void* val3_ ) {
+	attr_get( val1_, val2_, val3_ ); /* Ugly macro */
+}
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
 	
 char unsigned HConsole::get_attr( void ) const {
 	M_PROLOG
@@ -572,9 +581,7 @@ char unsigned HConsole::get_attr( void ) const {
 	 * &attr and &color never being NULL. */
 	attr_t* pa( &attr );
 	NCURSES_ATTR_GET_SECOND_ARG_TYPE* pc( &color );
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-	static_cast<void>( attr_get( pa, pc, NULL ) ); /* Ugly macro */
-#pragma GCC diagnostic error "-Wold-style-cast"
+	fwd_attr_get( pa, pc, NULL );
 	int unsigned attribute = ( color << 1 ) & 56;
 	attribute |= ( color & 7 );
 	if ( attr & A_BOLD )

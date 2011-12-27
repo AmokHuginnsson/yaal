@@ -40,6 +40,12 @@ namespace yaal {
 
 namespace tools {
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 yaal::hcore::HMutex HAlarm::_mutex;
 
 HAlarm::HAlarm( int long miliseconds_ )
@@ -53,7 +59,7 @@ HAlarm::HAlarm( int long miliseconds_ )
 	event.sigev_notify = SIGEV_SIGNAL;
 	event.sigev_signo = SIGALRM;
 	event.sigev_value.sival_ptr = &_timer;
-	M_ENSURE( timer_create( CLOCK_REALTIME, &event, &_timer ) == 0 );
+	M_ENSURE( timer_create( FWD_CLOCK_REALTIME, &event, &_timer ) == 0 );
 	
 	sigset_t mask;
 	M_ENSURE( sigemptyset( &mask ) == 0 );

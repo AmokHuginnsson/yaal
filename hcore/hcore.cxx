@@ -200,15 +200,19 @@ namespace {
 static char const SYSCALL_FAILURE[] = "syscall failure - bailng out";
 }
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+static int const FWD_RLIM_INFINITY = RLIM_INFINITY;
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 void ensure_limit( int resource_, char const* message_ ) {
 	rlimit rl = { 0, 0 };
 	if ( ::getrlimit( resource_, &rl ) != 0 ) {
 		::perror( SYSCALL_FAILURE );
 		::exit( 1 );
 	}
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-	if ( static_cast<int long>( rl.rlim_cur ) == static_cast<int long>( RLIM_INFINITY ) ) {
-#pragma GCC diagnostic error "-Wold-style-cast"
+	if ( static_cast<int long>( rl.rlim_cur ) == static_cast<int long>( FWD_RLIM_INFINITY ) ) {
 		::perror( message_ );
 		::exit( 1 );
 	}

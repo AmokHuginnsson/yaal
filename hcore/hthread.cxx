@@ -459,6 +459,12 @@ HCondition::~HCondition( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 /*
  * Read it or die!
  *
@@ -479,7 +485,7 @@ HCondition::status_t HCondition::wait( int long unsigned timeOutSeconds_,
 	int error = 0;
 	timespec timeOut;
 	::memset( &timeOut, 0, sizeof ( timespec ) );
-	M_ENSURE( clock_gettime( CLOCK_REALTIME, &timeOut ) == 0 );
+	M_ENSURE( clock_gettime( FWD_CLOCK_REALTIME, &timeOut ) == 0 );
 	static int long const NANO_IN_WHOLE = meta::power<10, 9>::value;
 	timeOut.tv_sec += timeOutSeconds_;
 	timeOut.tv_nsec += timeOutNanoSeconds_;
