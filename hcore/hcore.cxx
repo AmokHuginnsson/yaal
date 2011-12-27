@@ -202,7 +202,7 @@ static char const SYSCALL_FAILURE[] = "syscall failure - bailng out";
 
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
-static int const FWD_RLIM_INFINITY = RLIM_INFINITY;
+static int long const FWD_RLIM_INFINITY = RLIM_INFINITY;
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 

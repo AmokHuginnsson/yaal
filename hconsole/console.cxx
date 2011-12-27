@@ -565,8 +565,8 @@ int HConsole::kbhit( void ) const {
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 template <typename T1, typename T2>
-inline void fwd_attr_get( T1& val1_, T2& val2_, void* val3_ ) {
-	attr_get( val1_, val2_, val3_ ); /* Ugly macro */
+inline void fwd_attr_get( T1& val1_, T2& val2_, void* ) {
+	static_cast<void>( attr_get( val1_, val2_, NULL ) ); /* Ugly macro */
 }
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
