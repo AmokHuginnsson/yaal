@@ -47,7 +47,9 @@ using namespace yaal::dbwrapper;
 
 extern "C" {
 
-char* TABLE_LIST_QUERY = const_ast<char*>( "SELECT tablename FROM pg_tables WHERE tablename !~* 'pg_*;" );
+char* TABLE_LIST_QUERY = const_cast<char*>( "SELECT table_name, table_schema"
+		" FROM information_schema.tables"
+		" WHERE table_schema NOT IN ('pg_catalog', 'information_schema');" );
 char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT a.attnum, a.attname AS field, t.typname AS type,"
 		" a.attlen AS length, a.atttypmod AS length_var,"
 		" a.attnotnull AS not_null, a.atthasdef as has_default"
