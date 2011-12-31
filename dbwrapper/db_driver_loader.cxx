@@ -188,6 +188,15 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 			driver.first->resolve( SYMBOL_PREFIX"dbrs_id", driver.second.dbrs_id );
 			driver.first->resolve( SYMBOL_PREFIX"rs_column_name", driver.second.rs_column_name );
 			driver.first->resolve( SYMBOL_PREFIX"db_connect", driver.second.db_connect );
+			char const** tlq( NULL );
+			driver.first->resolve( SYMBOL_PREFIX"TABLE_LIST_QUERY", tlq );
+			driver.second._tableListQuery = *tlq;
+			char const** clq( NULL );
+			driver.first->resolve( SYMBOL_PREFIX"COLUMN_LIST_QUERY", clq );
+			driver.second._columnListQuery = *clq;
+			int* cni( NULL );
+			driver.first->resolve( SYMBOL_PREFIX"COLUMN_NAME_INDEX", cni );
+			driver.second._columnNameIndex = *cni;
 			it = _dBDrivers_.insert( make_pair( driverId_, driver ) ).first;
 		} catch ( HPluginException& e ) {
 			log( LOG_TYPE::NOTICE ) << "fail." << endl;
@@ -237,7 +246,10 @@ ODBConnector::ODBConnector( void )
 	rs_fields_count( null_rs_fields_count ),
 	dbrs_records_count( null_dbrs_records_count ),
 	dbrs_id( null_dbrs_id ),
-	rs_column_name( null_rs_column_name ) {
+	rs_column_name( null_rs_column_name ),
+	_tableListQuery( NULL ),
+	_columnListQuery( NULL ),
+	_columnNameIndex( 0 ) {
 }
 
 /* end of driver null section */

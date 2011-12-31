@@ -44,6 +44,14 @@ using namespace yaal::dbwrapper;
 
 extern "C" {
 
+char* TABLE_LIST_QUERY = const_cast<char*>( "SELECT name FROM"
+		  " (SELECT * FROM sqlite_master UNION ALL"
+			"  SELECT * FROM sqlite_temp_master)"
+			" WHERE type='table'"
+			" ORDER BY name;" );
+char* COLUMN_LIST_QUERY = const_cast<char*>( "PRAGMA TABLE_INFO( %s );" );
+int COLUMN_NAME_INDEX = 1;
+
 struct OSQLite {
 	int _errorCode;
 	HString _errorMessage;

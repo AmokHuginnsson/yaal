@@ -89,6 +89,9 @@ struct ODBConnector {
 	dbrs_records_count_t dbrs_records_count;
 	dbrs_id_t dbrs_id;
 	rs_column_name_t rs_column_name;
+	char const* _tableListQuery;
+	char const* _columnListQuery;
+	int _columnNameIndex;
 	ODBConnector( void );
 };
 

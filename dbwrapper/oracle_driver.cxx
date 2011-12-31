@@ -48,6 +48,10 @@ using namespace yaal::dbwrapper;
 
 extern "C" {
 
+char* TABLE_LIST_QUERY = const_cast<char*>( ";" );
+char* COLUMN_LIST_QUERY = const_cast<char*>( "%s;" );
+int COLUMN_NAME_INDEX = 0;
+
 static char const* const _logTag_ = "Oracle: ";
 
 HString _instanceName_;

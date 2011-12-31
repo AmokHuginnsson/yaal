@@ -47,6 +47,18 @@ using namespace yaal::dbwrapper;
 
 extern "C" {
 
+char* TABLE_LIST_QUERY = const_ast<char*>( "SELECT tablename FROM pg_tables WHERE tablename !~* 'pg_*;" );
+char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT a.attnum, a.attname AS field, t.typname AS type,"
+		" a.attlen AS length, a.atttypmod AS length_var,"
+		" a.attnotnull AS not_null, a.atthasdef as has_default"
+		" FROM pg_class c, pg_attribute a, pg_type t"
+		" WHERE c.relname = '%s'"
+		" AND a.attnum > 0"
+		" AND a.attrelid = c.oid"
+		" AND a.atttypid = t.oid"
+		" ORDER BY a.attnum;" );
+int COLUMN_NAME_INDEX = 1;
+
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* dataBase_,
 		char const* login_, char const* password_ ) {
 	PGconn* connection( NULL );

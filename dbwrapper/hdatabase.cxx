@@ -99,6 +99,30 @@ HDataBase::ptr_t HDataBase::get_connector( ODBConnector::DRIVER::enum_t driverId
 	M_EPILOG
 }
 
+HDataBase::table_list_t HDataBase::get_tables( void ) const {
+	M_PROLOG
+	M_ASSERT( _connector->_tableListQuery );
+	table_list_t tl;
+	HRecordSet::ptr_t rs( const_cast<HDataBase*>( this )->query( _connector->_tableListQuery ) );
+	for ( HRecordSet::iterator it( rs->begin() ), end( rs->end() ); it != end; ++ it )
+		tl.push_back( *it[0] );
+	return ( tl );
+	M_EPILOG
+}
+
+HDataBase::column_list_t HDataBase::get_columns( yaal::hcore::HString const& tableName_ ) const {
+	M_PROLOG
+	M_ASSERT( _connector->_columnListQuery );
+	column_list_t cl;
+	HString q;
+	q.format( _connector->_columnListQuery, tableName_.raw() );
+	HRecordSet::ptr_t rs( const_cast<HDataBase*>( this )->query( q ) );
+	for ( HRecordSet::iterator it( rs->begin() ), end( rs->end() ); it != end; ++ it )
+		cl.push_back( *it[_connector->_columnNameIndex] );
+	return ( cl );
+	M_EPILOG
+}
+
 }
 
 }

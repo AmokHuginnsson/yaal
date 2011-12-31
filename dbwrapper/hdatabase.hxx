@@ -38,7 +38,10 @@ namespace dbwrapper {
 /*! \brief Data base access abstraction layer.
  */
 class HDataBase : public yaal::hcore::HPointerFromThisInterface<HDataBase> {
+public:
 	typedef HDataBase this_type;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> table_list_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> column_list_t;
 private:
 	ODBConnector const* _connector;
 	ODBLink _dbLink;	/*!< very internal for this class used only in base class */
@@ -73,6 +76,8 @@ public:
 	 */
 	int get_errno( void ) const;
 	static ptr_t get_connector( ODBConnector::DRIVER::enum_t = ODBConnector::DRIVER::DEFAULT );
+	table_list_t get_tables( void ) const;
+	column_list_t get_columns( yaal::hcore::HString const& ) const;
 private:
 	HDataBase( void );
 	virtual ~HDataBase( void );
