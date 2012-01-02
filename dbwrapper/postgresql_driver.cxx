@@ -47,10 +47,10 @@ using namespace yaal::dbwrapper;
 
 extern "C" {
 
-char* TABLE_LIST_QUERY = const_cast<char*>( "SELECT table_name, table_schema"
+M_EXPORT_SYMBOL char* TABLE_LIST_QUERY = const_cast<char*>( "SELECT table_name, table_schema"
 		" FROM information_schema.tables"
 		" WHERE table_schema NOT IN ('pg_catalog', 'information_schema');" );
-char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT a.attnum, a.attname AS field, t.typname AS type,"
+M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT a.attnum, a.attname AS field, t.typname AS type,"
 		" a.attlen AS length, a.atttypmod AS length_var,"
 		" a.attnotnull AS not_null, a.atthasdef as has_default"
 		" FROM pg_class c, pg_attribute a, pg_type t"
@@ -59,7 +59,7 @@ char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT a.attnum, a.attname AS fiel
 		" AND a.attrelid = c.oid"
 		" AND a.atttypid = t.oid"
 		" ORDER BY a.attnum;" );
-int COLUMN_NAME_INDEX = 1;
+M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 1;
 
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* dataBase_,
 		char const* login_, char const* password_ ) {

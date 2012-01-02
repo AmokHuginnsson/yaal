@@ -77,18 +77,18 @@ struct OFirebirdResult {
 
 extern "C" {
 
-char* TABLE_LIST_QUERY = const_cast<char*>( "SELECT LOWER( TRIM( rdb$relation_name ) )"
+M_EXPORT_SYMBOL char* TABLE_LIST_QUERY = const_cast<char*>( "SELECT LOWER( TRIM( rdb$relation_name ) )"
 		" FROM rdb$relations"
 		" WHERE rdb$view_blr IS NULL"
 		" AND (rdb$system_flag IS NULL OR rdb$system_flag = 0);" );
-char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT LOWER( TRIM( f.rdb$field_name ) )"
+M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT LOWER( TRIM( f.rdb$field_name ) )"
 		" FROM rdb$relation_fields f"
 		" JOIN rdb$relations r ON f.rdb$relation_name = r.rdb$relation_name"
 		" AND r.rdb$view_blr IS NULL"
 		" AND ( r.rdb$system_flag IS NULL OR r.rdb$system_flag = 0 )"
 		" WHERE LOWER( TRIM( r.rdb$relation_name ) ) = '%s'"
 		" ORDER BY f.rdb$field_position;" );
-int COLUMN_NAME_INDEX = 0;
+M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 0;
 
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* dataBase_,
 		char const* login_, char const* password_ ) {

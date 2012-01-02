@@ -188,10 +188,10 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 			driver.first->resolve( SYMBOL_PREFIX"dbrs_id", driver.second.dbrs_id );
 			driver.first->resolve( SYMBOL_PREFIX"rs_column_name", driver.second.rs_column_name );
 			driver.first->resolve( SYMBOL_PREFIX"db_connect", driver.second.db_connect );
-			char const** tlq( NULL );
+			char const** tlq = NULL; /* msvcxx bug */
 			driver.first->resolve( SYMBOL_PREFIX"TABLE_LIST_QUERY", tlq );
 			driver.second._tableListQuery = *tlq;
-			char const** clq( NULL );
+			char const** clq = NULL; /* msvcxx bug */
 			driver.first->resolve( SYMBOL_PREFIX"COLUMN_LIST_QUERY", clq );
 			driver.second._columnListQuery = *clq;
 			int* cni( NULL );
