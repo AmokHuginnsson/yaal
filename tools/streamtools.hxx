@@ -176,6 +176,13 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 	M_EPILOG
 }
 
+template<typename key_t, typename value_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HMap<key_t, value_t> const& m_ ) {
+	M_PROLOG
+	return ( container_dump( out, m_, "map" ) );
+	M_EPILOG
+}
+
 template<typename tType>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashSet<tType> const& hs_ ) {
 	M_PROLOG

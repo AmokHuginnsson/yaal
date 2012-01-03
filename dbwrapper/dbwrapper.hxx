@@ -28,10 +28,24 @@ Copyright:
 #define YAAL_DBWRAPPER_DBWRAPPER_HXX_INCLUDED 1
 
 #include "dbwrapper/db_driver_loader.hxx"
+#include "dbwrapper/hdatabase.hxx"
 
 namespace yaal {
 
 namespace dbwrapper {
+
+/*! \brief Helper functions for database access.
+ */
+namespace util {
+
+/*! \brief Connect to database based on provided URI.
+ *
+ * \param uri_ - URI containing all necessary information to obtain database connection.
+ * \return Database handle.
+ */
+HDataBase::ptr_t connect( yaal::hcore::HString const& uri_ );
+
+}
 
 extern M_YAAL_DBWRAPPER_PUBLIC_API ODBConnector::DRIVER::enum_t _dataBaseDriver_;
 void banner( void );

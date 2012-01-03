@@ -50,6 +50,16 @@ namespace yaal {
 
 namespace dbwrapper {
 
+namespace util {
+
+HDataBase::ptr_t connect( yaal::hcore::HString const& ) {
+	M_PROLOG
+	return ( HDataBase::get_connector() );
+	M_EPILOG
+}
+
+}
+
 void dbwrapper_error( void );
 void dbwrapper_exit( void ) __attribute__(( __noreturn__ ));
 
