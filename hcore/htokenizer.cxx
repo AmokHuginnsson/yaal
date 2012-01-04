@@ -35,6 +35,17 @@ namespace hcore {
 
 HTokenizer::HTokenizer( HString const& str_, HString const& delim_, behavior_t const& behavior_ )
 	: _behavior( behavior_ ), _string( str_ ), _delimiter( delim_ ), _buffer() {
+	M_PROLOG
+	if ( ( _behavior & INCLUDE_EMPTY ) && ( _behavior & SKIP_EMPTY ) )
+		throw HTokenizerException( "bad empty item handling specified" );
+	if ( ! ( _behavior & HANDLE_EMPTY_MASK ) )
+		_behavior = static_cast<behavior_t>( _behavior | INCLUDE_EMPTY );
+	if ( ( _behavior & DELIMITED_BY_ANY_OF ) && ( _behavior & DELIMITED_BY_WHOLE_STRING ) )
+		throw HTokenizerException( "bad delimited by specified" );
+	if ( ! ( _behavior & DELIMITED_BY_MASK ) )
+		_behavior = static_cast<behavior_t>( _behavior | DELIMITED_BY_WHOLE_STRING );
+	return;
+	M_EPILOG
 }
 
 HTokenizer::HTokenizer( HString const& delim_, behavior_t const& behavior_ )
@@ -65,7 +76,7 @@ HString const& HTokenizer::operator[] ( int long nth_ ) const {
 			break;
 		}
 	}
-	M_ENSURE( ( _behavior == HTokenizer::INCLUDE_EMPTY ) || ! _buffer.is_empty() );
+	M_ENSURE( ( _behavior & HTokenizer::INCLUDE_EMPTY ) || ! _buffer.is_empty() );
 	return ( _buffer );
 	M_EPILOG
 }
@@ -73,7 +84,7 @@ HString const& HTokenizer::operator[] ( int long nth_ ) const {
 HTokenizer::HIterator HTokenizer::begin( void ) const {
 	M_PROLOG
 	int long idx( _string.find_other_than( _delimiter.raw(), 0 ) );
-	return ( HIterator( this, _behavior == INCLUDE_EMPTY ? 0 : ( idx >= 0 ? idx : -1 ) ) );
+	return ( HIterator( this, _behavior & INCLUDE_EMPTY ? 0 : ( idx != HString::npos ? idx : -1 ) ) );
 	M_EPILOG
 }
 
@@ -95,8 +106,8 @@ HTokenizer::HIterator& HTokenizer::HIterator::operator ++ ( void ) {
 	M_PROLOG
 	M_ENSURE( _start >= 0 );
 	_start = _owner->_string.find_one_of( _owner->_delimiter.raw(), _start );
-	if ( _start >= 0 ) {
-		if ( ( _owner->_behavior == HTokenizer::INCLUDE_EMPTY ) )
+	if ( _start != HString::npos ) {
+		if ( ( _owner->_behavior & HTokenizer::INCLUDE_EMPTY ) )
 			++ _start;
 		else
 			_start = _owner->_string.find_other_than( _owner->_delimiter.raw(), _start + 1 );
@@ -110,8 +121,8 @@ HString const& HTokenizer::HIterator::operator* ( void ) const {
 	M_ENSURE( _start >= 0 );
 	_buffer.clear();
 	int long end = _owner->_string.find_one_of( _owner->_delimiter.raw(), _start );
-	_buffer = _owner->_string.mid( _start, end >= 0 ? ( end - _start ) : meta::max_signed<int long>::value );
-	M_ASSERT( ( _owner->_behavior == HTokenizer::INCLUDE_EMPTY ) || ! _buffer.is_empty()  );
+	_buffer = _owner->_string.mid( _start, end != HString::npos ? ( end - _start ) : meta::max_signed<int long>::value );
+	M_ASSERT( ( _owner->_behavior & HTokenizer::INCLUDE_EMPTY ) || ! _buffer.is_empty()  );
 	return ( _buffer );
 	M_EPILOG
 }

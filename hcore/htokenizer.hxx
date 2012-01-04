@@ -45,8 +45,13 @@ class HTokenizer {
 	typedef HTokenizer this_type;
 public:
 	typedef enum {
-		SKIP_EMPTY,
-		INCLUDE_EMPTY
+		DEFAULT = 0,
+		SKIP_EMPTY = 1,
+		INCLUDE_EMPTY = 2,
+		HANDLE_EMPTY_MASK = SKIP_EMPTY | INCLUDE_EMPTY,
+		DELIMITED_BY_ANY_OF = 4,
+		DELIMITED_BY_WHOLE_STRING = 8,
+		DELIMITED_BY_MASK = DELIMITED_BY_ANY_OF | DELIMITED_BY_WHOLE_STRING
 	} behavior_t;
 private:
 	behavior_t _behavior;
@@ -58,8 +63,8 @@ public:
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
 public:
-	HTokenizer( HString const&, HString const&, behavior_t const& = INCLUDE_EMPTY );
-	HTokenizer( HString const&, behavior_t const& = INCLUDE_EMPTY );
+	HTokenizer( HString const&, HString const&, behavior_t const& = DEFAULT );
+	HTokenizer( HString const&, behavior_t const& = DEFAULT );
 	void assign( HString const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
