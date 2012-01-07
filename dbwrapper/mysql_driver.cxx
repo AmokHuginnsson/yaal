@@ -50,15 +50,15 @@ M_EXPORT_SYMBOL char* TABLE_LIST_QUERY = const_cast<char*>( "SHOW TABLES;" );
 M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SHOW COLUMNS FROM %s;" );
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 0;
 
-M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* dataBase_,
-		char const* login_, char const * password_ ) {
+M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& dataBase_,
+		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
 	MYSQL* mySQL( NULL );
 	dbLink_._conn = mySQL = mysql_init( NULL );
 	if ( mySQL ) {
 		int unsigned protocol( MYSQL_PROTOCOL_SOCKET );
 		if ( ! mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) ) {
 			if ( mysql_real_connect( mySQL, NULL,
-						login_, password_, dataBase_,
+						login_.raw(), password_.raw(), dataBase_.raw(),
 						0, NULL, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) )
 				dbLink_._valid = true;
 		}

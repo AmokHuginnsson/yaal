@@ -38,12 +38,12 @@ namespace dbwrapper {
  */
 namespace util {
 
-/*! \brief Connect to database based on provided URI.
+/*! \brief Connect to database based on provided DSN URI.
  *
- * \param uri_ - URI containing all necessary information to obtain database connection.
+ * \param dsn_ - Data Source Name URI containing all necessary information to obtain database connection.
  * \return Database handle.
  */
-HDataBase::ptr_t connect( yaal::hcore::HString const& uri_ );
+HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ );
 
 }
 

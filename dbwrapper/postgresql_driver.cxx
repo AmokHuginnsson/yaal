@@ -61,13 +61,13 @@ M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT a.attnum, a
 		" ORDER BY a.attnum;" );
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 1;
 
-M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* dataBase_,
-		char const* login_, char const* password_ ) {
+M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& dataBase_,
+		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
 	PGconn* connection( NULL );
 	dbLink_._conn = connection = PQsetdbLogin( NULL /* host */,
 			NULL /* port */, NULL /* options */,
 			NULL /* debugging tty */,
-			dataBase_, login_, password_ );
+			dataBase_.raw(), login_.raw(), password_.raw() );
 	if ( PQstatus( connection ) == CONNECTION_OK )
 		dbLink_._valid = true;
 	return ( ! dbLink_._valid );

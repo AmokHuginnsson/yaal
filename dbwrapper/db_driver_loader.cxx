@@ -71,7 +71,7 @@ drivers_t _dBDrivers_;
 
 /* Null driver */
 
-bool null_db_connect( ODBLink&, char const*, char const*, char const* ) {
+bool null_db_connect( ODBLink&, yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_connect" << eend << endl;
 	return ( true );

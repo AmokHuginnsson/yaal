@@ -57,9 +57,9 @@ HDataBase::~HDataBase( void ) {
 }
 
 void HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HString const& login_,
-		yaal::hcore::HString const& password_ ) {
+		yaal::hcore::HString const& password_, yaal::hcore::HString const& server_ ) {
 	M_PROLOG
-	if ( (_connector->db_connect)( _dbLink, dataBase_.raw(), login_.raw(), password_.raw() ) )
+	if ( (_connector->db_connect)( _dbLink, dataBase_, login_, password_, server_ ) )
 		M_THROW( (_connector->dbrs_error)( _dbLink, NULL ),
 				(_connector->dbrs_errno)( _dbLink, NULL ) );
 	return;

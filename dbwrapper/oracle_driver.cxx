@@ -78,8 +78,8 @@ typedef struct {
 void yaal_oracle_db_disconnect( ODBLink& );
 void yaal_oracle_rs_unquery( void* );
 
-M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* /* In Oracle user name is name of schema. */,
-		char const* login_, char const* password_ ) {
+M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& /* In Oracle user name is name of schema. */,
+		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
 	OOracle* oracle( NULL );
 	dbLink_._conn = oracle = memory::calloc<OOracle>( 1 );
 	do {
@@ -96,10 +96,10 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* /* In Oracle user
 			break;
 		if ( ( oracle->_status = OCILogon ( oracle->_environment,
 					oracle->_error, &oracle->_serviceContext,
-					reinterpret_cast<OraText const*>( login_ ),
-					static_cast<ub4>( ::strlen( login_ ) ),
-					reinterpret_cast<OraText const*>( password_ ),
-					static_cast<ub4>( ::strlen( password_ ) ),
+					reinterpret_cast<OraText const*>( login_.raw() ),
+					static_cast<ub4>( login_.get_length() ),
+					reinterpret_cast<OraText const*>( password_.raw() ),
+					static_cast<ub4>( password_.get_length() ),
 					reinterpret_cast<OraText const*>( _instanceName_.raw() ),
 					static_cast<ub4>( _instanceName_.get_length() ) ) ) == OCI_SUCCESS )
 			dbLink_._valid = true;

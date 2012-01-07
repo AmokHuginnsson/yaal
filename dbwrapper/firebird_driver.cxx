@@ -90,14 +90,13 @@ M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT LOWER( TRIM
 		" ORDER BY f.rdb$field_position;" );
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 0;
 
-M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* dataBase_,
-		char const* login_, char const* password_ ) {
-	M_ASSERT( dataBase_ && login_ && password_ );
+M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& dataBase_,
+		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
 	typedef HResource<OFirebird> firebird_resource_guard_t;
 	firebird_resource_guard_t db( new OFirebird );
-	int short dbLen( static_cast<int short>( ::strlen( dataBase_ ) ) );
-	int short loginLen( static_cast<int short>( ::strlen( login_ ) ) );
-	int short passLen( static_cast<int short>( ::strlen( password_ ) ) );
+	int short dbLen( static_cast<int short>( dataBase_.get_length() ) );
+	int short loginLen( static_cast<int short>( login_.get_length() ) );
+	int short passLen( static_cast<int short>( password_.get_length() ) );
 	static int short const DPB_VER_LEN( 1 );
 	static int short const DPB_CLUSTER_HEADER_LEN( 2 );
 	static int short const CLUSTER_COUNT( 2 ); /* login and password as clusters */
@@ -108,12 +107,12 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* dataBase_,
 	*pdpb ++ = isc_dpb_version1;
 	*pdpb ++ = isc_dpb_user_name;
 	*pdpb ++ = static_cast<char>( loginLen );
-	::strncpy( pdpb, login_, loginLen );
+	::strncpy( pdpb, login_.raw(), loginLen );
 	pdpb += loginLen;
 	*pdpb ++ = isc_dpb_password;
 	*pdpb ++ = static_cast<char>( passLen );
-	::strncpy( pdpb, password_, passLen );
-	isc_attach_database( db->_status, dbLen, dataBase_, &db->_db, dpbLen, dpb );
+	::strncpy( pdpb, password_.raw(), passLen );
+	isc_attach_database( db->_status, dbLen, dataBase_.raw(), &db->_db, dpbLen, dpb );
 	if ( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) )
 		dbLink_._valid = true;
 	dbLink_._conn = db.release();

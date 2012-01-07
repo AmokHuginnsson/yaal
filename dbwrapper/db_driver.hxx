@@ -67,7 +67,7 @@ struct ODBConnector {
 			TERMINATOR
 		} enum_t;
 	};
-	typedef bool ( * db_connect_t )( ODBLink&, char const*, char const*, char const* );
+	typedef bool ( * db_connect_t )( ODBLink&, yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
 	typedef void ( * db_disconnect_t )( ODBLink& );
 	typedef int ( * dbrs_errno_t )( ODBLink const&, void* );
 	typedef char const* ( * dbrs_error_t )( ODBLink const&, void* );

@@ -85,8 +85,8 @@ void yaal_sqlite3_db_disconnect( ODBLink& );
  * .sqlite extension or no extension at all, and this default extension is added
  * to user supplied database name by driver during db_connect. */
 
-M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, char const* dataBase_,
-		char const*, char const* ) {
+M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
+		HString const&, HString const&, HString const& ) {
 	do {
 		char const fileNameExt[] = ".sqlite";
 		struct stat stat;

@@ -52,10 +52,12 @@ public:
 	 * \param database - database to connect to.
 	 * \param login - authenticate to database with given login
 	 * \param password - password for given login
+	 * \param server - server connection specification.
 	 */
 	void connect( yaal::hcore::HString const& database,
 							yaal::hcore::HString const& login,
-							yaal::hcore::HString const& password );
+							yaal::hcore::HString const& password,
+							yaal::hcore::HString const& server = yaal::hcore::HString() );
 	/*! \brief Close database connection.
 	 */
 	void disconnect( void );

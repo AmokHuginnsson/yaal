@@ -50,11 +50,69 @@ namespace yaal {
 
 namespace dbwrapper {
 
+namespace {
+
+ODBConnector::DRIVER::enum_t db_driver_from_string( HString const& dbType_ ) {
+	M_PROLOG
+	ODBConnector::DRIVER::enum_t driver( ODBConnector::DRIVER::NONE );
+	if ( ! ( strcasecmp( dbType_, "none" )
+				&& strcasecmp( dbType_, "null" )
+				&& strcasecmp( dbType_, "dummy" ) ) )
+		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::NONE;
+	else if ( ! strcasecmp( dbType_, "SQLite3" ) )
+		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::SQLITE3;
+	else if ( ! strcasecmp( dbType_, "PostgreSQL" ) )
+		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::POSTGRESQL;
+	else if ( ! strcasecmp( dbType_, "MySQL" ) )
+		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::MYSQL;
+	else if ( ! strcasecmp( dbType_, "Firebird" ) )
+		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::FIREBIRD;
+	else if ( ! strcasecmp( dbType_, "Oracle" ) )
+		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::ORACLE;
+	else
+		throw HDataBaseException( "unsupported database type: " + dbType_ );
+	return ( driver );
+	M_EPILOG
+}
+
+}
+
 namespace util {
 
-HDataBase::ptr_t connect( yaal::hcore::HString const& ) {
+HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 	M_PROLOG
-	return ( HDataBase::get_connector() );
+	char const SCHEMA_SEPARATOR[] = "://";
+	int dbTypeEnd( static_cast<int>( dsn_.find( SCHEMA_SEPARATOR ) ) );
+	if ( dbTypeEnd == HString::npos )
+		throw HDataBaseException( "bad database uri: " + dsn_ );
+	HString dbType( dsn_.raw(), dbTypeEnd );
+	dbType.lower();
+	ODBConnector::DRIVER::enum_t driver( db_driver_from_string( dbType ) );
+	HString connectionString = dsn_.substr( dbTypeEnd + sizeof ( SCHEMA_SEPARATOR ) - 1 );
+	int userPassEnd( static_cast<int>( connectionString.find( '@' ) ) );
+	HString userName;
+	HString password;
+	HString dbHostSpec;
+	if ( userPassEnd != HString::npos ) {
+		HString userPass( connectionString.raw(), userPassEnd );
+		int userEnd( static_cast<int>( userPass.find( ':' ) ) );
+		userName = userPass.left( userEnd );
+		if ( userEnd != HString::npos )
+			password = userPass.substr( userEnd + 1 );
+		dbHostSpec = connectionString.substr( userPassEnd + 1 );
+	} else
+		dbHostSpec = connectionString;
+	int hostSpecEnd( static_cast<int>( dbHostSpec.find( '/' ) ) );
+	HString hostSpec;
+	HString database;
+	if ( hostSpecEnd != HString::npos ) {
+		hostSpec = dbHostSpec.left( hostSpecEnd );
+		database = dbHostSpec.substr( hostSpecEnd + 1 );
+	} else
+		throw HDataBaseException( "bad database uri: " + dsn_ );
+	HDataBase::ptr_t db( HDataBase::get_connector( driver ) );
+	db->connect( userName, password, database, hostSpec );
+	return ( db );
 	M_EPILOG
 }
 
@@ -75,21 +133,9 @@ bool set_dbwrapper_variables( HString& option_, HString& value_ ) {
 		else
 			return ( true );
 	} else if ( ! strcasecmp( option_, "data_base_driver" ) ) {
-		if ( ! ( strcasecmp( value_, "none" )
-					&& strcasecmp( value_, "null" )
-					&& strcasecmp( value_, "dummy" ) ) )
-			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::NONE;
-		else if ( value_ == "SQLite3" )
-			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::SQLITE3;
-		else if ( value_ == "PostgreSQL" )
-			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::POSTGRESQL;
-		else if ( value_ == "MySQL" )
-			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::MYSQL;
-		else if ( value_ == "Firebird" )
-			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::FIREBIRD;
-		else if ( value_ == "Oracle" )
-			dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::ORACLE;
-		else {
+		try {
+			dbwrapper::_dataBaseDriver_ = db_driver_from_string( value_ );
+		} catch ( HDataBaseException const& ) {
 			log( LOG_TYPE::ERROR ) << "Error: `" << value_;
 			log << "' is unknown driver." << endl;
 			exit( 1 );
