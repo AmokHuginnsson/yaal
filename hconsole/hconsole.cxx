@@ -80,7 +80,7 @@ void set_color_bits( int & word_, int bits_, int what_ ) {
 
 int get_color_bits( HString& value_, int what_ ) {
 	M_PROLOG
-	HTokenizer t( value_, " \t" );
+	HTokenizer t( value_, " \t", HTokenizer::DELIMITED_BY_ANY_OF );
 	HString str = t[ what_ ];
 	if ( str.is_empty() )
 		return ( 0 );

@@ -85,7 +85,7 @@ bool set_hcore_variables( HString& option_, HString& value_ ) {
 	if ( ! strcasecmp( option_, "set_env" ) )
 		decode_set_env( value_ );
 	else if ( ! strcasecmp( option_, "log_mask" ) ) {
-		HTokenizer t( value_, " \t" );
+		HTokenizer t( value_, " \t", HTokenizer::DELIMITED_BY_ANY_OF );
 		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it ) {
 			if ( ! strcasecmp( *it, "LOG_DEBUG" ) )
 				HLog::_logMask |= LOG_TYPE::DEBUG;

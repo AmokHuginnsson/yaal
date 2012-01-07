@@ -34,6 +34,7 @@ Copyright:
 
 #include "hcore/hexception.hxx"
 #include "hcore/hstring.hxx"
+#include "hcore/hstrongenum.hxx"
 
 namespace yaal {
 
@@ -52,7 +53,8 @@ public:
 		DELIMITED_BY_ANY_OF = 4,
 		DELIMITED_BY_WHOLE_STRING = 8,
 		DELIMITED_BY_MASK = DELIMITED_BY_ANY_OF | DELIMITED_BY_WHOLE_STRING
-	} behavior_t;
+	} enum_t;
+	typedef HStrongEnum<HTokenizer> behavior_t;
 private:
 	behavior_t _behavior;
 	HString _string;
@@ -63,14 +65,15 @@ public:
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
 public:
-	HTokenizer( HString const&, HString const&, behavior_t const& = DEFAULT );
-	HTokenizer( HString const&, behavior_t const& = DEFAULT );
+	HTokenizer( HString const&, HString const&, enum_t const& = DEFAULT );
+	HTokenizer( HString const&, enum_t const& = DEFAULT );
 	void assign( HString const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
 	HString const& operator[] ( int long ) const;
 	HString tail( HIterator ) const;
 private:
+	int long skip_empty( int long ) const;
 	friend class HIterator;
 };
 

@@ -89,7 +89,7 @@ HString HHandler::process_command( void ) {
 	M_PROLOG
 	HString command;
 	if ( ! _command.is_empty() ) {
-		command = HTokenizer( _command, " \t" )[ 0 ];
+		command = HTokenizer( _command, " \t", HTokenizer::DELIMITED_BY_ANY_OF )[ 0 ];
 		process_handler_command_map_t::iterator it( _commandHandlers.find( command ) );
 		if ( it != _commandHandlers.end() ) {
 			static_cast<void>( ( this->*( it->second ) )( 0, _command.raw() ) );

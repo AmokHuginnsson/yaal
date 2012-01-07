@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstring>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
@@ -33,7 +35,7 @@ namespace yaal {
 
 namespace hcore {
 
-HTokenizer::HTokenizer( HString const& str_, HString const& delim_, behavior_t const& behavior_ )
+HTokenizer::HTokenizer( HString const& str_, HString const& delim_, enum_t const& behavior_ )
 	: _behavior( behavior_ ), _string( str_ ), _delimiter( delim_ ), _buffer() {
 	M_PROLOG
 	if ( ( _behavior & INCLUDE_EMPTY ) && ( _behavior & SKIP_EMPTY ) )
@@ -48,7 +50,7 @@ HTokenizer::HTokenizer( HString const& str_, HString const& delim_, behavior_t c
 	M_EPILOG
 }
 
-HTokenizer::HTokenizer( HString const& delim_, behavior_t const& behavior_ )
+HTokenizer::HTokenizer( HString const& delim_, enum_t const& behavior_ )
 	: _behavior( behavior_ ), _string(), _delimiter( delim_ ), _buffer() {
 }
 
@@ -76,21 +78,41 @@ HString const& HTokenizer::operator[] ( int long nth_ ) const {
 			break;
 		}
 	}
-	M_ENSURE( ( _behavior & HTokenizer::INCLUDE_EMPTY ) || ! _buffer.is_empty() );
+	M_ENSURE( ( _behavior & INCLUDE_EMPTY ) || ! _buffer.is_empty() );
 	return ( _buffer );
 	M_EPILOG
 }
 
 HTokenizer::HIterator HTokenizer::begin( void ) const {
 	M_PROLOG
-	int long idx( _string.find_other_than( _delimiter.raw(), 0 ) );
-	return ( HIterator( this, _behavior & INCLUDE_EMPTY ? 0 : ( idx != HString::npos ? idx : -1 ) ) );
+	return ( HIterator( this, _behavior & SKIP_EMPTY ? skip_empty( 0 ) : 0 ) );
 	M_EPILOG
 }
 
 HTokenizer::HIterator HTokenizer::end( void ) const {
 	M_PROLOG
-	return ( HIterator( this, -1 ) );
+	return ( HIterator( this, HString::npos ) );
+	M_EPILOG
+}
+
+int long HTokenizer::skip_empty( int long start_ ) const {
+	M_PROLOG
+	M_ASSERT( _behavior & SKIP_EMPTY );
+	if ( _behavior & DELIMITED_BY_WHOLE_STRING ) {
+		if ( start_ != HString::npos ) {
+			int long delimLen( _delimiter.get_length() );
+			char const* delimRaw( _delimiter.raw() );
+			char const* ptr( _string.raw() );
+			while ( ! ::strncmp( delimRaw, ptr + start_, delimLen ) )
+				start_ += delimLen;
+		}
+	} else {
+		if ( start_ != HString::npos )
+			start_ = _string.find_other_than( _delimiter.raw(), start_ );
+	}
+	if ( start_ >= _string.get_length() )
+		start_ = HString::npos;
+	return ( start_ );
 	M_EPILOG
 }
 
@@ -104,23 +126,29 @@ HTokenizer::HIterator::HIterator( HTokenizer::HIterator const& it_ )
 
 HTokenizer::HIterator& HTokenizer::HIterator::operator ++ ( void ) {
 	M_PROLOG
-	M_ENSURE( _start >= 0 );
-	_start = _owner->_string.find_one_of( _owner->_delimiter.raw(), _start );
-	if ( _start != HString::npos ) {
-		if ( ( _owner->_behavior & HTokenizer::INCLUDE_EMPTY ) )
+	M_ENSURE( _start != HString::npos );
+	M_ASSERT( _start >= 0 );
+	if ( _owner->_behavior & HTokenizer::DELIMITED_BY_WHOLE_STRING ) {
+		_start = _owner->_string.find( _owner->_delimiter, _start );
+		if ( _start != HString::npos )
+			_start += _owner->_delimiter.get_length();
+	} else {
+		_start = _owner->_string.find_one_of( _owner->_delimiter.raw(), _start );
+		if ( _start != HString::npos )
 			++ _start;
-		else
-			_start = _owner->_string.find_other_than( _owner->_delimiter.raw(), _start + 1 );
 	}
+	if ( _owner->_behavior & HTokenizer::SKIP_EMPTY )
+		_start = _owner->skip_empty( _start );
 	return ( *this );
 	M_EPILOG
 }
 
 HString const& HTokenizer::HIterator::operator* ( void ) const {
 	M_PROLOG
-	M_ENSURE( _start >= 0 );
+	M_ENSURE( _start != HString::npos );
+	M_ASSERT( _start >= 0 );
 	_buffer.clear();
-	int long end = _owner->_string.find_one_of( _owner->_delimiter.raw(), _start );
+	int long end( ( _owner->_behavior & HTokenizer::DELIMITED_BY_WHOLE_STRING ) ? _owner->_string.find( _owner->_delimiter, _start ) : _owner->_string.find_one_of( _owner->_delimiter.raw(), _start ) );
 	_buffer = _owner->_string.mid( _start, end != HString::npos ? ( end - _start ) : meta::max_signed<int long>::value );
 	M_ASSERT( ( _owner->_behavior & HTokenizer::INCLUDE_EMPTY ) || ! _buffer.is_empty()  );
 	return ( _buffer );

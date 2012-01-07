@@ -105,7 +105,7 @@ bool set_tools_variables( HString& option_, HString& value_ ) {
 			}
 		}
 	} else if ( ! strcasecmp( option_, "serial_flags" ) ) {
-		HTokenizer t( value_, " \t" );
+		HTokenizer t( value_, " \t", HTokenizer::DELIMITED_BY_ANY_OF );
 		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it ) {
 			if ( ! strcasecmp( *it, "FLOW_CONTROL_HARDWARE" ) )
 				_serialFlags_ = HSerial::FLAG::FLOW_CONTROL_HARDWARE;
