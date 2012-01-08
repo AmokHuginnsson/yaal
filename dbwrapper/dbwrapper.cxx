@@ -58,17 +58,17 @@ ODBConnector::DRIVER::enum_t db_driver_from_string( HString const& dbType_ ) {
 	if ( ! ( strcasecmp( dbType_, "none" )
 				&& strcasecmp( dbType_, "null" )
 				&& strcasecmp( dbType_, "dummy" ) ) )
-		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::NONE;
+		driver = ODBConnector::DRIVER::NONE;
 	else if ( ! strcasecmp( dbType_, "SQLite3" ) )
-		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::SQLITE3;
+		driver = ODBConnector::DRIVER::SQLITE3;
 	else if ( ! strcasecmp( dbType_, "PostgreSQL" ) )
-		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::POSTGRESQL;
+		driver = ODBConnector::DRIVER::POSTGRESQL;
 	else if ( ! strcasecmp( dbType_, "MySQL" ) )
-		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::MYSQL;
+		driver = ODBConnector::DRIVER::MYSQL;
 	else if ( ! strcasecmp( dbType_, "Firebird" ) )
-		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::FIREBIRD;
+		driver = ODBConnector::DRIVER::FIREBIRD;
 	else if ( ! strcasecmp( dbType_, "Oracle" ) )
-		dbwrapper::_dataBaseDriver_ = ODBConnector::DRIVER::ORACLE;
+		driver = ODBConnector::DRIVER::ORACLE;
 	else
 		throw HDataBaseException( "unsupported database type: " + dbType_ );
 	return ( driver );
@@ -111,7 +111,7 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 	} else
 		throw HDataBaseException( "bad database uri: " + dsn_ );
 	HDataBase::ptr_t db( HDataBase::get_connector( driver ) );
-	db->connect( userName, password, database, hostSpec );
+	db->connect( database, userName, password, hostSpec );
 	return ( db );
 	M_EPILOG
 }

@@ -59,6 +59,7 @@ HDataBase::~HDataBase( void ) {
 void HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HString const& login_,
 		yaal::hcore::HString const& password_, yaal::hcore::HString const& server_ ) {
 	M_PROLOG
+	M_ASSERT( _connector && _connector->db_connect );
 	if ( (_connector->db_connect)( _dbLink, dataBase_, login_, password_, server_ ) )
 		M_THROW( (_connector->dbrs_error)( _dbLink, NULL ),
 				(_connector->dbrs_errno)( _dbLink, NULL ) );
@@ -94,7 +95,7 @@ int HDataBase::get_errno( void ) const {
 HDataBase::ptr_t HDataBase::get_connector( ODBConnector::DRIVER::enum_t driverId_ ) {
 	M_PROLOG
 	ptr_t p( make_pointer<HDataBase>() );
-	p->_connector = load_driver( driverId_ );
+	M_ENSURE( p->_connector = load_driver( driverId_ ) );
 	return ( p );
 	M_EPILOG
 }

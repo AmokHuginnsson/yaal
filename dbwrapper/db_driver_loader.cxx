@@ -229,7 +229,7 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 		} else
 			pConnector = try_load_driver( static_cast<ODBConnector::DRIVER::enum_t>( driverId_ ) );
 	}
-	if ( pConnector->db_connect != null_db_connect )
+	if ( ! pConnector || ( pConnector->db_connect != null_db_connect ) )
 		cout << _done_ << flush;
 	return ( pConnector );
 	M_EPILOG
