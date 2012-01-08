@@ -56,7 +56,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	dbLink_._conn = mySQL = mysql_init( NULL );
 	if ( mySQL ) {
 		int unsigned protocol( MYSQL_PROTOCOL_SOCKET );
-		if ( ! mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) ) {
+		if ( ! ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) || mysql_options( mySQL, MYSQL_SET_CHARSET_NAME, MYSQL_AUTODETECT_CHARSET_NAME ) ) ) {
 			if ( mysql_real_connect( mySQL, NULL,
 						login_.raw(), password_.raw(), dataBase_.raw(),
 						0, NULL, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) )
