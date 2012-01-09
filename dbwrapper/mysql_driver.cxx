@@ -157,7 +157,7 @@ HMySQLInitDeinit::HMySQLInitDeinit( void ) {
 	if ( _clientCharacterSet_ == AUTODETECT_CHARSET )
 		_clientCharacterSet_ = MYSQL_AUTODETECT_CHARSET_NAME;
 #endif /* #ifdef defined( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME ) && ( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME == 1 ) */
-	char const* characterSetOverride( ::getenv( "MYSQL_CLIENT_CHARACTER_SET" ) );
+	char const* characterSetOverride( ::getenv( "YAAL_MYSQL_CLIENT_CHARACTER_SET" ) );
 	if ( characterSetOverride )
 		_clientCharacterSet_ = characterSetOverride;
 	if ( ! ::getenv( "BUGGY_MYSQL_CLIENT" ) )
