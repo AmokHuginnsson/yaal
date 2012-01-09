@@ -46,15 +46,19 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::dbwrapper;
 
+namespace {
+
+static char const* const _logTag_ = "Oracle: ";
+
+HString _instanceName_;
+
+}
+
 extern "C" {
 
 M_EXPORT_SYMBOL char* TABLE_LIST_QUERY = const_cast<char*>( ";" );
 M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "%s;" );
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 0;
-
-static char const* const _logTag_ = "Oracle: ";
-
-HString _instanceName_;
 
 struct OAllocator {
 	OAllocator* _next;

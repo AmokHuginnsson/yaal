@@ -39,10 +39,19 @@ Copyright:
 
 #include "hcore/memory.hxx"
 #include "dbwrapper/db_driver.hxx"
+#include "hcore/hprogramoptionshandler.hxx"
+#include "hcore/hcore.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::dbwrapper;
+
+namespace {
+
+char const AUTODETECT_CHARSET[] = "autodetect";
+HString _clientCharacterSet_ = AUTODETECT_CHARSET;
+
+}
 
 extern "C" {
 
@@ -56,7 +65,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	dbLink_._conn = mySQL = mysql_init( NULL );
 	if ( mySQL ) {
 		int unsigned protocol( MYSQL_PROTOCOL_SOCKET );
-		if ( ! ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) || mysql_options( mySQL, MYSQL_SET_CHARSET_NAME, MYSQL_AUTODETECT_CHARSET_NAME ) ) ) {
+		if ( ! ( mysql_options( mySQL, MYSQL_OPT_PROTOCOL, &protocol ) || mysql_options( mySQL, MYSQL_SET_CHARSET_NAME, _clientCharacterSet_.raw() ) ) ) {
 			if ( mysql_real_connect( mySQL, NULL,
 						login_.raw(), password_.raw(), dataBase_.raw(),
 						0, NULL, CLIENT_IGNORE_SPACE | CLIENT_IGNORE_SIGPIPE ) )
@@ -139,6 +148,18 @@ public:
 } mySQLInitDeinit;
 
 HMySQLInitDeinit::HMySQLInitDeinit( void ) {
+	yaal_options()( "client_character_set",
+			program_options_helper::option_value( _clientCharacterSet_ ),
+			HProgramOptionsHandler::OOption::TYPE::REQUIRED,
+			"character set used by mysql client", "name" );
+	yaal_options().process_rc_file( "yaal", "mysql", NULL );
+#if defined( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME ) && ( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME == 1 )
+	if ( _clientCharacterSet_ == AUTODETECT_CHARSET )
+		_clientCharacterSet_ = MYSQL_AUTODETECT_CHARSET_NAME;
+#endif /* #ifdef defined( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME ) && ( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME == 1 ) */
+	char const* characterSetOverride( ::getenv( "MYSQL_CLIENT_CHARACTER_SET" ) );
+	if ( characterSetOverride )
+		_clientCharacterSet_ = characterSetOverride;
 	if ( ! ::getenv( "BUGGY_MYSQL_CLIENT" ) )
 		mysql_library_init( 0, NULL, NULL );
 	return;

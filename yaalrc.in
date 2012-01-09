@@ -259,6 +259,16 @@ data_base_driver '@DEFAULT_DRIVER@'
 
 ### dbwrapper END
 
+### mysql driver BEGIN
+[mysql]
+
+# set default character set for mysql driver
+# client_character_set
+# type: string, default: autodetect
+client_character_set 'autodetect'
+
+### mysql driver END
+
 ### oracle driver BEGIN
 [oracle]
 

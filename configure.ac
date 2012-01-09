@@ -397,6 +397,9 @@ AC_CHECK_DECLS([SIGIOT],[],[],[#include <csignal>])
 AC_CHECK_DECLS([SUN_LEN],[],[],[#include <cstdlib>
 								#include <sys/un.h>])
 AC_CHECK_DECLS([ERR],[],[],[#include <cstdlib>])
+if test ["$MYSQL"] != ["no"] ; then
+	AC_CHECK_DECLS([MYSQL_AUTODETECT_CHARSET_NAME],[],[],[#include <mysql/mysql.h>])
+fi
 AC_MSG_CHECKING([whether powl is available])
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cmath>
 									 int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }]])],
