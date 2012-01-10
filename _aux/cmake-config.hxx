@@ -1,7 +1,7 @@
 #ifndef YAAL_CONFIG_HXX_INCLUDED
 #define YAAL_CONFIG_HXX_INCLUDED 1
 #define PACKAGE_NAME "yaal"
-#define PACKAGE_VERSION "0.0.0"
+#define PACKAGE_VERSION @PACKAGE_VERSION@
 #cmakedefine __HOST_OS_TYPE_LINUX__
 #cmakedefine __HOST_OS_TYPE_DEBIAN__
 #cmakedefine __HOST_OS_TYPE_UBUNTU__
@@ -18,6 +18,8 @@
 #cmakedefine HAVE_PRETTY_FUNCTION
 #cmakedefine HAVE_FUNCTION
 #cmakedefine HAVE_FUNC
+#cmakedefine HAVE_SIGHANDLER_T
+#cmakedefine HAVE___SIGHANDLER_T
 #cmakedefine01 HAVE_STRCASESTR
 #cmakedefine01 HAVE_ASPRINTF
 #cmakedefine01 HAVE_STRTOLD
@@ -63,6 +65,7 @@
 #cmakedefine HAVE_GPM_H
 #cmakedefine01 HAVE_NCURSES_CURSES_H
 #cmakedefine01 HAVE_CURSES_H
+#cmakedefine01 HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME
 #define NCURSES_ATTR_GET_SECOND_ARG_TYPE @NCURSES_ATTR_GET_SECOND_ARG_TYPE@
 #ifndef __GNUC__
 #define __attribute__( x ) /**/
