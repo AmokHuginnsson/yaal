@@ -95,6 +95,12 @@ int hunt_tty( int offset_ ) {
 
 int _mouse_ = 0;
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+static int long unsigned const FWD_CONS_MOUSECTL = CONS_MOUSECTL;
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 int console_mouse_open( void ) {
 	M_PROLOG
 	int vC = 0;
@@ -111,7 +117,7 @@ int console_mouse_open( void ) {
 		error.format( _( "cannot open mouse, %s" ), error_message( errno ) );
 		throw HMouseException( error, vC );
 	}
-	if ( ::ioctl( _mouse_, CONS_MOUSECTL, &mouse ) < 0 ) {
+	if ( ::ioctl( _mouse_, FWD_CONS_MOUSECTL, &mouse ) < 0 ) {
 		error.format( _( "cannot setup mouse mode, %s" ), error_message( errno ) );
 		TEMP_FAILURE_RETRY( hcore::system::close( _mouse_ ) );
 		throw HMouseException( error, errno );
@@ -127,7 +133,7 @@ int console_mouse_get( OMouse& mouse_ ) {
 	M_PROLOG
 	mouse_info mouse;
 	mouse.operation = MOUSE_GETINFO;
-	if ( ::ioctl( _mouse_, CONS_MOUSECTL, &mouse ) < 0 )
+	if ( ::ioctl( _mouse_, FWD_CONS_MOUSECTL, &mouse ) < 0 )
 		throw HMouseException( "cannot get mouse data", errno );
 	else {
 		mouse_._buttons = mouse.u.data.buttons;

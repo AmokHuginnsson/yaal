@@ -76,7 +76,7 @@ public:
 
 #ifndef HAVE_SIGHANDLER_T
 #ifdef HAVE___SIGHANDLER_T
-typedef __sighandler_t sighandler_t;
+typedef __sighandler_t* sighandler_t;
 #else /* #ifdef HAVE___SIGHANDLER_T */
 #error No signal handler type definition available.
 #endif /* #else #ifdef HAVE___SIGHANDLER_T */
