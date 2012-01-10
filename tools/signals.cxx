@@ -74,6 +74,14 @@ public:
 	static int signal_USR1( int );
 };
 
+#ifndef HAVE_SIGHANDLER_T
+#ifdef HAVE___SIGHANDLER_T
+typedef __sighandler_t sighandler_t;
+#else /* #ifdef HAVE___SIGHANDLER_T */
+#error No signal handler type definition available.
+#endif /* #else #ifdef HAVE___SIGHANDLER_T */
+#endif /* #ifndef HAVE_SIGHANDLER_T */
+
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static sighandler_t const FWD_SIG_DFL = SIG_DFL;
