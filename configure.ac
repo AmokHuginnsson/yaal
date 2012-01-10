@@ -381,7 +381,10 @@ AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
 AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 LIBS="${HCORE_LIBS}"
 AC_LANG([C])
+CFLAGS_ORIG=["${CFLAGS}"]
+CFLAGS="-D_GNU_SOURCE=1"
 AC_CHECK_TYPES([sighandler_t],[],[AC_CHECK_TYPES([__sighandler_t],[],[],[#include <signal.h>])],[#include <signal.h>])
+CFLAGS=${CFLAGS_ORIG}
 AC_LANG([C++])
 if test ["${ac_cv_type_sighandler_t}"] = ["no"] -a ["${ac_cv_type___sighandler_t}"] = ["no"] ; then
 	AC_CHECK_TYPES([SIG_PF],[],[AC_MSG_ERROR([Cannot continue without signal handler type definition.])],[#include <signal.h>])
