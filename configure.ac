@@ -381,8 +381,11 @@ AC_MSG_RESULT([--- Done looking for needed header, all found. ---      [[82%]]])
 AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 LIBS="${HCORE_LIBS}"
 AC_LANG([C])
-AC_CHECK_TYPES([sighandler_t],[],[AC_CHECK_TYPES([__sighandler_t],[],[AC_MSG_ERROR([Cannot continue without signal handler type definition.])],[#include <signal.h>])],[#include <signal.h>])
+AC_CHECK_TYPES([sighandler_t],[],[AC_CHECK_TYPES([__sighandler_t],[],[],[#include <signal.h>])],[#include <signal.h>])
 AC_LANG([C++])
+if test ["${ac_cv_type_sighandler_t}"] = ["no"] -a ["${ac_cv_type___sighandler_t}"] = ["no"] ; then
+	AC_CHECK_TYPES([SIG_PF],[],[AC_MSG_ERROR([Cannot continue without signal handler type definition.])],[#include <signal.h>])
+fi
 AC_CHECK_FUNCS([getline memrchr strnlen getaddrinfo getnameinfo gethostbyname_r gethostbyaddr_r strcasestr strtold pthread_setname_np pthread_set_name_np prctl])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])

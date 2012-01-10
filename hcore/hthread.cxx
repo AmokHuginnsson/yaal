@@ -174,6 +174,13 @@ void HThread::CLEANUP( void* ) {
 	M_EPILOG
 }
 
+/*
+ * pthread_cleanup_push is a macro on Solaris,
+ * and this macro uses old-style-casts.
+ */
+#ifdef __HOST_OS_TYPE_SOLARIS__
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif /* #ifdef __HOST_OS_TYPE_SOLARIS__ */
 void* HThread::control( void ) {
 	M_PROLOG
 	M_ENSURE( ::pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );
@@ -194,6 +201,9 @@ void* HThread::control( void ) {
 	return ( returnValue );
 	M_EPILOG
 }
+#ifdef __HOST_OS_TYPE_SOLARIS__
+#pragma GCC diagnostic error "-Wold-style-cast"
+#endif /* #ifdef __HOST_OS_TYPE_SOLARIS__ */
 
 bool HThread::is_alive( void ) const {
 	M_PROLOG

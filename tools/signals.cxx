@@ -77,9 +77,11 @@ public:
 #ifndef HAVE_SIGHANDLER_T
 #ifdef HAVE___SIGHANDLER_T
 typedef __sighandler_t* sighandler_t;
-#else /* #ifdef HAVE___SIGHANDLER_T */
+#elif defined ( HAVE_SIG_PF )
+typedef SIG_PF sighandler_t;
+#else /* #elif defined ( HAVE_SIG_PF ) */
 #error No signal handler type definition available.
-#endif /* #else #ifdef HAVE___SIGHANDLER_T */
+#endif /* #else #elif defined ( HAVE_SIG_PF ) */
 #endif /* #ifndef HAVE_SIGHANDLER_T */
 
 namespace {

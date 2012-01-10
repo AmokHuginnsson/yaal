@@ -20,6 +20,7 @@
 #cmakedefine HAVE_FUNC
 #cmakedefine HAVE_SIGHANDLER_T
 #cmakedefine HAVE___SIGHANDLER_T
+#cmakedefine HAVE_SIG_PF
 #cmakedefine01 HAVE_STRCASESTR
 #cmakedefine01 HAVE_ASPRINTF
 #cmakedefine01 HAVE_STRTOLD
