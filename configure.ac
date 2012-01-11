@@ -168,6 +168,7 @@ AC_CHECK_LIB([xslt],[xsltParseStylesheetFile],,[AC_MSG_ERROR([Cannot continue wi
 AC_CHECK_LIB([exslt],[exsltRegisterAll],,[AC_MSG_ERROR([Cannot continue without EXSLT library.])]) LIBS=""
 AC_SEARCH_LIBS([dlopen],[dl],,[AC_MSG_ERROR([Cannot continue without dynamic dynamic linker library.])]) TOOLS_LIBS="${TOOLS_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([ncurses],[initscr],,[AC_MSG_ERROR([Cannot continue without ncurses library.])]) LIBS=""
+AC_CHECK_LIB([tinfo],[curs_set]) HCONSOLE_LIBS="${HCONSOLE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([gpm],[Gpm_Open]) HCONSOLE_LIBS="${HCONSOLE_LIBS} ${LIBS}" LIBS=""
 
 if test ["$SQLITE3"] != ["no"] ; then
