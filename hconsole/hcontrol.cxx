@@ -108,7 +108,7 @@ int HControl::process_input( int code_ ) {
 	M_EPILOG
 }
 
-int HControl::do_process_input ( int code_ ) {
+int HControl::do_process_input( int code_ ) {
 	M_PROLOG
 	if ( ! _focused )
 		M_THROW( "input in control without focus", code_ );
@@ -131,7 +131,7 @@ int HControl::set_focus( char shortCut_ ) {
 	M_EPILOG
 }
 
-int HControl::kill_focus ( void ) {
+int HControl::kill_focus( void ) {
 	M_PROLOG
 	if ( ! _focused )
 		return ( 1 );

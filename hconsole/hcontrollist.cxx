@@ -44,8 +44,8 @@ HControlList::HControlList( model_t::cyclic_iterator& focused_ ) : _list(), _foc
 
 void HControlList::next_enabled( char shorcut_ ) {
 	M_PROLOG
-	bool loop = true;
-	HControlList::model_t::cyclic_iterator it = _focused;
+	bool loop( true );
+	HControlList::model_t::cyclic_iterator it( _focused );
 	do {
 		++ _focused;
 		if ( dynamic_cast<HStatusBarControl*>( &(*(*_focused))) )
@@ -85,9 +85,8 @@ void HControlList::refresh_all( bool force_ ) {
 
 void HControlList::update_all( void ) {
 	M_PROLOG
-	for ( model_t::iterator it = _list.begin();
-			it != _list.end(); ++ it )
-			(*it)->update();
+	for ( model_t::iterator it( _list.begin() ), end( _list.end() ); it != end; ++ it )
+		(*it)->update();
 	return;
 	M_EPILOG
 }

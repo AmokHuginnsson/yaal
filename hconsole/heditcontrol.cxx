@@ -412,7 +412,6 @@ int HEditControl::do_process_input ( int code_ ) {
 			errorCode = HISTORY_OPERATION;
 		break;
 		case ( '\t' ):
-			_focused = false;
 		/* enter works like tab without focus movement */
 		case ( '\r' ): {
 			errorCode = static_cast<int>( _history.size() );

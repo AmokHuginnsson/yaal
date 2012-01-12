@@ -57,7 +57,7 @@ struct OSortHelper {
 	type_id_t _type;
 	int long _comparedItems;
 	int long _size;
-	HWindow * _window;
+	HWindow* _window;
 	void progress ( void );
 };
 template<typename tType>
@@ -355,7 +355,7 @@ public:
 	virtual int set_focus( char = 0 );
 	void set_flags( flag_t, flag_t );
 	void reset( void );
-	list_control_helper::HAbstractControler::ptr_t& get_controler ( void );
+	list_control_helper::HAbstractControler::ptr_t& get_controler( void );
 	void remove_current_row();
 	int long get_row_count( void );
 	type_id_t get_column_type( int );
