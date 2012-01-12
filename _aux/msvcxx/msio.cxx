@@ -24,7 +24,7 @@ IO::IO( TYPE::type_t t_, HANDLE h_, HANDLE e_, std::string const& p_ )
 	_readRequest( 0 ), _buffer( IO_BUFFER_SIZE ),
 	_connected( ( t_ == TYPE::TERMINAL ) || ( t_ == TYPE::PIPE ) ),
 	_scheduled( false ), _ready( false ), _nonBlocking( false ), _path( p_ ) {
-	_overlapped.hEvent = e_ ? e_ : ::CreateEvent( NULL, false, false, NULL );
+	_overlapped.hEvent = e_ ? e_ : ::CreateEvent( NULL, true, false, NULL );
 }
 
 IO::~IO( void ) {
@@ -51,7 +51,7 @@ void IO::sync( void ) {
 		log_windows_error( "GetOverlappedResult(sync)" );
 	} else {
 		if ( _connected ) {
-			if ( ( iTransfered < _readRequest ) && ( ::GetLastError() != ERROR_HANDLE_EOF ) ) {
+			if ( ( static_cast<int>( iTransfered ) < _readRequest ) && ( ::GetLastError() != ERROR_HANDLE_EOF ) ) {
 				stringstream ss;
 				ss << "iTransfered: " << iTransfered << ", _readRequest: " << _readRequest;
 				log_windows_error( ( ss.str() + "GetOverlappedResult(bad read)" ).c_str() );

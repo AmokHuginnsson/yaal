@@ -69,29 +69,32 @@ int main( int argc_, char** argv_ ) {
 			throw invalid_argument( "mkheaders: DIR_ROOT not a directory" );
 		if ( ! is_directory( dirBuild ) )
 			throw invalid_argument( "mkheaders: DIR_BUILD not a directory" );
-		string dirHeaders( dirBuild + "/yaal" );
+		string dirInclude( dirBuild + "/include" );
+		string dirLibHeaders( dirBuild + "/include/yaal" );
 		set<string> components;
 		transform( paths.begin(), paths.end(), inserter( components, components.begin() ), dirname_basename );
 		cout << "Making headers ... " << endl
 			<< "dir root: " << dirRoot << endl
 			<< "dir build: " << dirBuild << endl
-			<< "dir headers: " << dirHeaders << endl
-			<< "yaal configuration header path: " << dirHeaders << "/config.hxx" << endl
+			<< "dir headers: " << dirLibHeaders << endl
+			<< "yaal configuration header path: " << dirLibHeaders << "/config.hxx" << endl
 			<< "Components: \n\t";
 		copy( components.begin(), components.end(), ostream_iterator<string>( cout, "\n\t" ) );
 		cout << endl;
-		delete_fucking_old_files_no_matter_fucking_what( dirHeaders );
-		create_fucking_new_directory_no_matter_fucking_what( dirHeaders );
+		delete_fucking_old_files_no_matter_fucking_what( dirLibHeaders );
+		delete_fucking_old_files_no_matter_fucking_what( dirInclude );
+		create_fucking_new_directory_no_matter_fucking_what( dirInclude );
+		create_fucking_new_directory_no_matter_fucking_what( dirLibHeaders );
 		for ( paths_t::const_iterator it = components.begin(), end = components.end(); it != end; ++ it )
-			create_fucking_new_directory_no_matter_fucking_what( dirHeaders + "/" + *it );
+			create_fucking_new_directory_no_matter_fucking_what( dirLibHeaders + "/" + *it );
 		int toProcess( headers.size() );
 		cout << "Files to process: " << toProcess << endl;
 		for ( paths_t::const_iterator it = headers.begin(), end = headers.end(); it != end; ++ it )
-			process_file( dirRoot + "/" + *it, dirHeaders + "/" + *it );
+			process_file( dirRoot + "/" + *it, dirLibHeaders + "/" + *it );
 //		copy_file( s._configPath, s._destinationPath / s._configPath.leaf() );
-		ofstream o( ( dirHeaders + "/yaal.hxx" ).c_str() );
+		ofstream o( ( dirLibHeaders + "/yaal.hxx" ).c_str() );
 		static char const D_UNIQ[] = "hstreaminterface";
-		ifstream i( ( dirHeaders + "/hcore/" + ( string( D_UNIQ ) + ".hxx" ) ).c_str() );
+		ifstream i( ( dirLibHeaders + "/hcore/" + ( string( D_UNIQ ) + ".hxx" ) ).c_str() );
 		string line;
 		int lines = 0;
 		while ( ! getline( i, line ).fail() && ( lines ++ < 26 ) ) {
@@ -109,7 +112,7 @@ int main( int argc_, char** argv_ ) {
 			o << "#include <yaal/" << *it << ">" << endl;
 		o << endl << "#endif /* not YAAL_YAAL_HXX_INCLUDED */" << endl << endl;
 		ifstream ci( ( dirBuild + "/config.hxx" ).c_str() );
-		ofstream co( ( dirHeaders + "/config.hxx" ).c_str() );
+		ofstream co( ( dirLibHeaders + "/config.hxx" ).c_str() );
 		static char const PACKAGE_S[] = "define PACKAGE_";
 		static char const LIB_INFIX[] = "define LIB_INFIX";
 		while ( ! getline( ci, line ).fail() ) {
@@ -122,8 +125,8 @@ int main( int argc_, char** argv_ ) {
 			co << line << endl;
 		}
 #ifndef __GNUC__
-		copy_file( dirRoot + "/_aux/msvcxx/cleanup.hxx", dirHeaders + "/cleanup.hxx" );
-		copy_file( dirRoot + "/_aux/msvcxx/client-fix.hxx", dirHeaders + "/fix.hxx" );
+		copy_file( dirRoot + "/_aux/msvcxx/cleanup.hxx", dirLibHeaders + "/cleanup.hxx" );
+		copy_file( dirRoot + "/_aux/msvcxx/client-fix.hxx", dirLibHeaders + "/fix.hxx" );
 #endif /* not __GNUC__ */
 	} catch ( exception const& e ) {
 		errorCode = 1;
