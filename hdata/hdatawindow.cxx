@@ -272,7 +272,7 @@ void HDataWindow::sync( void ) {
 	M_ASSERT( _documentMode == DOCUMENT::EDIT );
 	int count = static_cast<int>( _editModeControls.size() );
 	for ( int i = 0; i < count; i ++ )
-		*(*_dB)[ i ] = _editModeControls[ i ]->get().get<HString const&>();
+		(*_dB)[ i ] = _editModeControls[ i ]->get().get<HString const&>();
 	return;
 	M_EPILOG
 }
