@@ -346,7 +346,7 @@ bool verify_IBAN( HString const& iBAN_ ) {
 	char pattern [ 2 ] = "\0";
 	HString iBAN, tmpString;
 	if ( length < MIN_IBAN_LENGTH ) {
-		_lastErrorMessage_.format ( "IBAN: Number too short (%d).", length );
+		_lastErrorMessage_.format ( "IBAN: Number too short (%d).", static_cast<int>( length ) );
 		return ( true );
 	}
 	iBAN.hs_realloc( length );
@@ -355,7 +355,7 @@ bool verify_IBAN( HString const& iBAN_ ) {
 			iBAN += iBAN_[ ctr ];
 	length = iBAN.get_length();
 	if ( length < MIN_IBAN_LENGTH ) {
-		_lastErrorMessage_.format ( "IBAN: Number too short (%d).", length );
+		_lastErrorMessage_.format ( "IBAN: Number too short (%d).", static_cast<int>( length ) );
 		return ( true );
 	}
 	if ( ! ( isalpha ( iBAN [ 0 ] ) && isalpha ( iBAN [ 1 ] ) ) ) {

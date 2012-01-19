@@ -93,8 +93,8 @@ public:
 	void end_prompt( void );
 	void init_progress( double, char const*, bool = true );
 	void update_progress( double = -1, char const * = NULL );
-	void message( int, char const*, ... );
-	void message( char const*, ... );
+	void message( int, char const*, ... ) __attribute__(( format( printf, 3, 4 ) ));
+	void message( char const*, ... ) __attribute__(( format( printf, 2, 3 ) ));
 	void bar( char const* = NULL );
 	int ask( char const*, char const* );
 	bool confirm( char const* );

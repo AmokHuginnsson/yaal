@@ -58,7 +58,7 @@ void HSearchableControl::search( HString const& pattern_, bool backwards_ ) {
 	pf.push_back( make_pair( 'f', &_filtered ) );
 	_searchActived = ! _pattern.parse( pattern_, &pf );
 	if ( ! _searchActived )
-		_parent->status_bar()->message( _pattern.error().raw() );
+		_parent->status_bar()->message( "%s", _pattern.error().raw() );
 	else {
 		_backwards = backwards_;
 		if ( _backwards )

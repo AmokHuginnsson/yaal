@@ -269,8 +269,8 @@ public:
 	 * \return Self.
 	 */
 	HString& assign( HString const& str, int long offset, int long length );
-	HString& format( char const* const, ... );
-	HString& vformat( char const* const, void* );
+	HString& format( char const* const, ... ) __attribute__(( format( printf, 2, 3 ) ));
+	HString& vformat( char const* const, void* ) __attribute__(( format( printf, 2, 0 ) ));
 	int long find( char, int long = 0 ) const;
 	int long find( HString const&, int long = 0 ) const;
 	int long nfind( HString const&, int long, int long = 0 ) const;

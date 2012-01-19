@@ -85,7 +85,7 @@ private:
 void show_help( void* );
 void dump_configuration( void* );
 
-void failure( int, char const* const, ... ) __attribute__(( __noreturn__ ));
+void failure( int, char const* const, ... ) __attribute__(( __noreturn__, format( printf, 2, 3 ) ));
 
 /*! \brief Various convinient sleep functions.
  */

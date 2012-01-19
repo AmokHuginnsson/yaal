@@ -81,10 +81,10 @@ public:
 	void rehash( HString const&, char const* const = NULL );
 	/*! \brief log ( "data %d", x ); will look nice
 	 */
-	int operator()( char const* const, ... );
+	int operator()( char const* const, ... ) __attribute__(( format( printf, 2, 3 ) ));
 	/*! \brief log ( "data %d", x ); will look nice
 	 */
-	int operator()( int long const, char const*, ... );
+	int operator()( int long const, char const*, ... ) __attribute__(( format( printf, 3, 4 ) ));
 	/*! \brief sets log type
 	 */
 	HLog& operator()( int long );
@@ -94,7 +94,7 @@ private:
 	virtual ~HLog( void );
 	void do_rehash( void*, char const* const );
 	void timestamp( void );
-	int vformat( char const* const, va_list );
+	int vformat( char const* const, va_list ) __attribute__(( format( printf, 2, 0 ) ));
 	void eol_reset( char const* const, int long );
 	virtual int long do_write( void const* const, int long );
 	virtual void do_flush( void ) const;

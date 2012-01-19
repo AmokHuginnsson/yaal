@@ -480,11 +480,11 @@ int HEditControl::do_process_input ( int code_ ) {
 		_pattern.find( _varTmpBuffer.raw() );
 		errorCode = _pattern.error_code();
 		if ( errorCode )
-			_parent->status_bar()->message( COLORS::BG_BROWN, _pattern.error().raw() );
+			_parent->status_bar()->message( COLORS::BG_BROWN, "%s", _pattern.error().raw() );
 		else {
 			code_ = errorCode;
 			_string = _varTmpBuffer;
-			_parent->status_bar()->message ( COLORS::FG_LIGHTGRAY, "" );
+			_parent->status_bar()->message( COLORS::FG_LIGHTGRAY, NULL );
 			schedule_refresh();
 		}
 	}

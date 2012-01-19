@@ -251,7 +251,7 @@ int HTreeControl::do_process_input( int code_ ) {
 	code_ = errorCode;
 	if ( ! errorCode ) {
 		schedule_refresh();
-		_parent->status_bar()->message( COLORS::FG_LIGHTGRAY, "" );
+		_parent->status_bar()->message( COLORS::FG_LIGHTGRAY, NULL );
 	}
 	return ( code_ );
 	M_EPILOG

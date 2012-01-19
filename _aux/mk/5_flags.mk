@@ -1,4 +1,4 @@
-CWARNING_FLAGS =	\
+CWARNING_FLAGS = \
 						-Wall \
 						-Wcast-align \
 						-Wcast-qual \
@@ -13,20 +13,21 @@ CWARNING_FLAGS =	\
 						-Wsign-compare \
 						-Wundef \
 						-Wwrite-strings \
-						-Wmissing-declarations
-#						-Wmissing-prototypes \
-						-Wnested-externs \
-						-Wstrict-prototypes \
-						-Wtraditional \ #C only
-#						-Wmissing-format-attribute \
-						-Wunreachable-code \ # too many warrnings
+						-Wmissing-declarations \
+						-Wmissing-format-attribute
+#						-Wunreachable-code \ # too many warrnings
 #						-Waggregate-return \ # useless for C++
 CXXWARNING_FLAGS		=	\
 						-Weffc++ \
 						-Wsign-promo \
 						-Wold-style-cast
 #						-Woverloaded-virtual \ # too many unecessary warnings
-PURE_C_WARINIG_FLAGS= -Wbad-function-cast
+PURE_C_WARINIG_FLAGS= \
+						-Wbad-function-cast \
+						-Wmissing-prototypes \
+						-Wnested-externs \
+						-Wstrict-prototypes \
+						-Wtraditional
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif

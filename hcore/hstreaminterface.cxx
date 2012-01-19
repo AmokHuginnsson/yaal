@@ -224,7 +224,7 @@ HStreamInterface& HStreamInterface::do_output( float float_ ) {
 
 HStreamInterface& HStreamInterface::do_output( void const* ptr_ ) {
 	M_PROLOG
-	_wordCache.format( "0x%lx", ptr_ );
+	_wordCache.format( "0x%lx", reinterpret_cast<int long unsigned>( ptr_ ) );
 	int long len( reformat() );
 	do_write( _wordCache.raw(), len );
 	return ( *this );

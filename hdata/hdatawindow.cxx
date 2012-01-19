@@ -352,7 +352,7 @@ int HDataWindow::handler_save( int, void const* ) {
 	sync();
 	HRecordSet::ptr_t rs = _dB->execute( _mode );
 	if ( rs->get_errno() )
-		_statusBar->message( COLORS::FG_BRIGHTRED, rs->get_error() );
+		_statusBar->message( COLORS::FG_BRIGHTRED, "%s", rs->get_error() );
 	else {
 		_modified = false;
 		set_mode( DOCUMENT::VIEW );

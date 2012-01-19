@@ -253,13 +253,16 @@ void HStatusBarControl::message( int attribute_,
 		char const* format_, ... ) {
 	M_PROLOG
 	if ( ! _focused ) {
-		va_list ap;
-		va_start( ap, format_ );
-		if ( format_ && format_ [ 0 ] )
-			HConsole::get_instance().bell();
-		_varTmpBuffer.vformat( format_, &ap );
+		if ( format_ ) {
+			va_list ap;
+			va_start( ap, format_ );
+			_varTmpBuffer.vformat( format_, &ap );
+			va_end( ap );
+			if ( ! _varTmpBuffer.is_empty() )
+				HConsole::get_instance().bell();
+		} else
+			_varTmpBuffer.clear();
 		set( _varTmpBuffer );
-		va_end( ap );
 		if ( ! ( _statusBarAttribute & 0x00ff ) )
 			_statusBarAttribute |= ( _attributeEnabled & 0x00ff );
 		_attributeEnabled &= 0xff00;
@@ -273,13 +276,16 @@ void HStatusBarControl::message( int attribute_,
 void HStatusBarControl::message( char const* format_, ... ) {
 	M_PROLOG
 	if ( ! _focused ) {
-		va_list ap;
-		va_start( ap, format_ );
-		if ( format_ && format_ [ 0 ] )
-			HConsole::get_instance().bell();
-		_varTmpBuffer.vformat( format_, &ap );
+		if ( format_ ) {
+			va_list ap;
+			va_start( ap, format_ );
+			_varTmpBuffer.vformat( format_, &ap );
+			va_end( ap );
+			if ( ! _varTmpBuffer.is_empty() )
+				HConsole::get_instance().bell();
+		} else
+			_varTmpBuffer.clear();
 		set( _varTmpBuffer );
-		va_end( ap );
 		schedule_refresh();
 	}
 	return;
