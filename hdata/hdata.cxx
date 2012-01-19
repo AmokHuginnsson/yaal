@@ -55,6 +55,8 @@ void banner( void ) {
 }
 
 extern "C"
+int yaal_hdata_main( int, char** );
+extern "C"
 int yaal_hdata_main( int, char** ) {
 	static char const dynamicLinkerPath[]
 		__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;

@@ -55,6 +55,8 @@ public:
 	}
 } base64DecodeTableInit;
 
+namespace {
+
 void do_buf_3_to_4( HString& out, u32_t const& in, int mode, int long pad = 0 ) {
 	char buf[ 5 ] = { 0, 0, 0, 0, 0 };
 	buf[ 0 ] = _base64EncodeTable_[mode][ ( in >> 18 ) & 63 ];
@@ -96,13 +98,15 @@ yaal::hcore::HString base64_raw_encode( char const* ptr, int long length, bool s
 	M_EPILOG
 }
 
+}
+
 yaal::hcore::HString base64::encode( yaal::hcore::HString const& message, bool standardCompliantMode ) {
 	M_PROLOG
 	return ( base64_raw_encode( message.raw(), message.get_length(), standardCompliantMode ) );
 	M_EPILOG
 }
 
-bool is_base64_character( char ch_, bool standardCompliantMode_ ) {
+inline bool is_base64_character( char ch_, bool standardCompliantMode_ ) {
 	return ( ( ( ch_ >= 'A' ) && ( ch_ <= 'Z' ) )
 				|| ( ( ch_ >= 'a' ) && ( ch_ <= 'z' ) )
 				|| ( ( ch_ >= '0' ) && ( ch_ <= '9' ) )
@@ -110,6 +114,8 @@ bool is_base64_character( char ch_, bool standardCompliantMode_ ) {
 				|| ( ! standardCompliantMode_ && ( ch_ == '_' ) ) || ( standardCompliantMode_ && ( ch_ == '/' ) )
 				|| ( ch_ == '=' ) );
 }
+
+namespace {
 
 int long base64_raw_decode( yaal::hcore::HString const& message, char* output, int long bufSize, bool standardCompliantMode ) {
 	M_PROLOG
@@ -137,6 +143,8 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 	}
 	return ( size );
 	M_EPILOG
+}
+
 }
 
 yaal::hcore::HString base64::decode( yaal::hcore::HString const& message, bool standardCompliantMode ) {

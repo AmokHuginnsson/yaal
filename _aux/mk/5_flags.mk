@@ -12,10 +12,9 @@ CWARNING_FLAGS =	\
 						-Wredundant-decls \
 						-Wsign-compare \
 						-Wundef \
-						-Wwrite-strings
-#						-Wbad-function-cast \
-						-Wmissing-declarations \
-						-Wmissing-prototypes \
+						-Wwrite-strings \
+						-Wmissing-declarations
+#						-Wmissing-prototypes \
 						-Wnested-externs \
 						-Wstrict-prototypes \
 						-Wtraditional \ #C only
@@ -27,6 +26,7 @@ CXXWARNING_FLAGS		=	\
 						-Wsign-promo \
 						-Wold-style-cast
 #						-Woverloaded-virtual \ # too many unecessary warnings
+PURE_C_WARINIG_FLAGS= -Wbad-function-cast
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif

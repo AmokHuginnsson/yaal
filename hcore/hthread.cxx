@@ -52,12 +52,17 @@ namespace hcore {
 HSemaphore::TYPE::type_t HSemaphore::DEFAULT = HSemaphore::TYPE::POSIX;
 int HThread::_threadStackSize = 0;
 
+namespace {
+
 void do_pthread_attr_destroy( void* attr ) {
 	M_PROLOG
 	M_ENSURE( ::pthread_attr_destroy( static_cast<pthread_attr_t*>( attr ) ) == 0 );
 	return;
 	M_EPILOG
 }
+
+}
+
 
 HThread::HThread( void )
 	: _status( DEAD ), _buf( chunk_size<pthread_t>( 1 ) + chunk_size<pthread_attr_t>( 1 ) ),
@@ -241,8 +246,12 @@ void HThread::stack_exception( yaal::hcore::HString const& message_, int code_ )
 	M_EPILOG
 }
 
+namespace {
+
 void do_pthread_mutexattr_destroy( void* attr ) {
 	::pthread_mutexattr_destroy( static_cast<pthread_mutexattr_t*>( attr ) );
+}
+
 }
 
 HMutex::HMutex( TYPE::mutex_type_t const type_ ) : _type( type_ ),

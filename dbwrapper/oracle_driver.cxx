@@ -82,6 +82,8 @@ typedef struct {
 void yaal_oracle_db_disconnect( ODBLink& );
 void yaal_oracle_rs_unquery( void* );
 
+M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
+		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& /* In Oracle user name is name of schema. */,
 		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
 	OOracle* oracle( NULL );
@@ -126,11 +128,13 @@ void yaal_oracle_db_disconnect( ODBLink& dbLink_ ) {
 	memory::free( oracle );
 	return;
 }
+M_EXPORT_SYMBOL void db_disconnect( ODBLink& );
 M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 	yaal_oracle_db_disconnect( dbLink_ );
 }
 
-M_EXPORT_SYMBOL int db_errno( ODBLink const& dbLink_ ) {
+M_EXPORT_SYMBOL int dbrs_errno( ODBLink const&, void* );
+M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* ) {
 	M_ASSERT( dbLink_._conn );
 	int error( 0 );
 	OOracle const* oracle( static_cast<OOracle const*>( dbLink_._conn ) );
@@ -142,7 +146,8 @@ M_EXPORT_SYMBOL int db_errno( ODBLink const& dbLink_ ) {
 	return ( error );
 }
 
-M_EXPORT_SYMBOL char const* db_error( ODBLink const& dbLink_ ) {
+M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const&, void* );
+M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* ) {
 	M_ASSERT( dbLink_._conn );
 	sb4 code( 0 );
 	static char textBuffer[ OCI_ERROR_MAXMSG_SIZE ];
@@ -218,6 +223,7 @@ void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 	}
 	return ( queryObj );
 }
+M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( yaal_oracle_db_query( dbLink_, query_ ) );
 }
@@ -241,10 +247,12 @@ void yaal_oracle_rs_unquery( void* data_ ) {
 	memory::free ( query );
 	return;
 }
+M_EXPORT_SYMBOL void rs_unquery( void* );
 M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
 	yaal_oracle_rs_unquery( data_ );
 }
 
+M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	int size( 0 );
 	char* data( NULL );
@@ -281,6 +289,7 @@ M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	return ( NULL );
 }
 
+M_EXPORT_SYMBOL int rs_fields_count( void* );
 M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	int fields( -1 );
 	OQuery* query( static_cast<OQuery*>( data_ ) );
@@ -291,6 +300,7 @@ M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	return ( fields );
 }
 
+M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 	int rows( 0 );
 	OQuery* query( static_cast<OQuery*>( dataR_ ) );
@@ -314,6 +324,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 	return ( rows );
 }
 
+M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* dataR_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	int nameLength( 0 );
@@ -336,6 +347,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* dataR_ ) {
 	return ( id );
 }
 
+M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	int nameLength( 0 );
 	text* name( NULL );
@@ -364,9 +376,9 @@ void oracle_init( void ) {
 	return;
 }
 
-int yaal_oracle_driver_main( int, char** ) __attribute__(( __noreturn__ ));
+int yaal_oracle_driver_main( int, char** );
 int yaal_oracle_driver_main( int, char** ) {
-	::exit( 0 );
+	return ( 0 );
 }
 
 }

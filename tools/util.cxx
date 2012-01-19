@@ -309,6 +309,8 @@ double long atof_ex( HString const& string_, bool parse_ ) {
 	M_EPILOG
 }
 
+namespace {
+
 int modulo_ASCII( HString const& aSCIINumber_, int modulo_ ) {
 	M_PROLOG
 	int ctr = 0, number = 0, step = 0;
@@ -333,6 +335,8 @@ int modulo_ASCII( HString const& aSCIINumber_, int modulo_ ) {
 	}
 	return ( lexical_cast<int>( tmpNumber ) % modulo_ );
 	M_EPILOG
+}
+
 }
 
 bool verify_IBAN( HString const& iBAN_ ) {
@@ -393,7 +397,7 @@ HString get_token( yaal::hcore::HString const& s, yaal::hcore::HString const& d,
 	M_EPILOG
 }
 
-bool is_byte( int value ) {
+inline bool is_byte( int value ) {
 	return ( value <= static_cast<int>( meta::max_unsigned<char unsigned>::value ) );
 }
 
@@ -648,7 +652,7 @@ void failure( int exitStatus_, char const* const format_, ... ) {
 
 namespace sleep {
 
-bool sleep_real( timeval& time_, bool ignoreInterrrupt_ ) {
+inline bool sleep_real( timeval& time_, bool ignoreInterrrupt_ ) {
 	int err( 0 );
 	while ( ( ( err = ::select( 0, NULL, NULL, NULL, &time_ ) ) == -1 ) && ( errno == EINTR ) && ignoreInterrrupt_ )
 		;

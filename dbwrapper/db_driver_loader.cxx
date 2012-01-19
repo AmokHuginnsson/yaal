@@ -71,6 +71,8 @@ drivers_t _dBDrivers_;
 
 /* Null driver */
 
+namespace {
+
 bool null_db_connect( ODBLink&, yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_connect" << eend << endl;
@@ -213,6 +215,8 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 	}
 	return ( &it->second.second );
 	M_EPILOG
+}
+
 }
 
 ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {

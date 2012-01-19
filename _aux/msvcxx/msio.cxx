@@ -284,3 +284,4 @@ int SystemIO::dup2_io( int id1_, int id2_ ) {
 }
 
 } /* namespace msvcxx */
+

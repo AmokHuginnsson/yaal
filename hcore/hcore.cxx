@@ -79,6 +79,8 @@ bool eq( double long left_, double long right_ ) {
 					: ( ( right_ ) - ( left_ ) ) ) < EPSILON ) );
 }
 
+namespace {
+
 bool set_hcore_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
 	bool fail( false );
@@ -120,6 +122,8 @@ bool set_hcore_variables( HString& option_, HString& value_ ) {
 		fail = true;
 	return ( fail );
 	M_EPILOG
+}
+
 }
 
 void set_env( HString const& name_, HString const& value_, bool overwrite_ ) {
@@ -197,14 +201,14 @@ void init_locale( char const* const package_ ) {
 }
 
 namespace {
-static char const SYSCALL_FAILURE[] = "syscall failure - bailng out";
-}
-
-namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static int long const FWD_RLIM_INFINITY = RLIM_INFINITY;
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
+
+namespace {
+
+static char const SYSCALL_FAILURE[] = "syscall failure - bailng out";
 
 void ensure_limit( int resource_, char const* message_ ) {
 	rlimit rl = { 0, 0 };
@@ -216,6 +220,8 @@ void ensure_limit( int resource_, char const* message_ ) {
 		::perror( message_ );
 		::exit( 1 );
 	}
+}
+
 }
 
 HCoreInitDeinit::HCoreInitDeinit( void ) {
@@ -284,6 +290,8 @@ void banner( char const* packageName_, char const* packageVersion_ ) {
 
 }
 
+extern "C"
+int yaal_hcore_main( int, char** );
 extern "C"
 int yaal_hcore_main( int, char** ) {
 	static char const dynamicLinkerPath[]

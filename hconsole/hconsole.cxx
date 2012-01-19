@@ -31,6 +31,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
+#include "hconsole.hxx"
 #include "hcore/hcore.hxx"
 #include "hcore/hlog.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
@@ -66,7 +67,7 @@ bool	_leaveCtrlBackSlash_ = false;
 char	_commandComposeCharacter_ = 'x';
 int		_commandComposeDelay_ = 16;
 
-void set_color_bits( int & word_, int bits_, int what_ ) {
+inline void set_color_bits( int & word_, int bits_, int what_ ) {
 	int unsigned mask = 0x000f;
 	if ( what_ ) {
 		what_ <<= 2;
@@ -77,6 +78,8 @@ void set_color_bits( int & word_, int bits_, int what_ ) {
 	word_ |= bits_;
 	return;
 }
+
+namespace {
 
 int get_color_bits( HString& value_, int what_ ) {
 	M_PROLOG
@@ -151,6 +154,8 @@ bool set_hconsole_variables( HString& option_, HString& value_ ) {
 	M_EPILOG
 }
 
+}
+
 class HConsoleInitDeinit {
 public:
 	HConsoleInitDeinit( void );
@@ -188,6 +193,8 @@ void banner( void ) {
 
 }
 
+extern "C"
+int yaal_hconsole_main( int, char** );
 extern "C"
 int yaal_hconsole_main( int, char** ) {
 	static char const dynamicLinkerPath[]

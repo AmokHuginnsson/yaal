@@ -66,6 +66,8 @@ typedef HStrongEnum<RC_PATHER> placement_bit_t;
 
 int read_rc_line( HString&, HString&, HFile&, int& );
 
+namespace {
+
 HString make_path( HString const& rcName_,
 		RC_PATHER::placement_t placement_ ) {
 	M_PROLOG
@@ -137,6 +139,8 @@ bool substitute_environment( HString& string_ ) {
 	}
 	return ( envVarRefFound );
 	M_EPILOG
+}
+
 }
 
 namespace program_options_helper {
@@ -449,11 +453,15 @@ void const* HProgramOptionsHandler::HOptionValueInterface::id( void ) const {
 
 namespace program_options_helper {
 
+namespace {
+
 void process_loader( ORCLoader& loader ) {
 	M_PROLOG
 	loader._optionHandler.process_rc_file( loader._path, loader._section, loader.rc_callback );
 	return;
 	M_EPILOG
+}
+
 }
 
 int reload_configuration( void ) {
@@ -468,6 +476,8 @@ int reload_configuration( void ) {
 }
 
 }
+
+namespace {
 
 /* Reads one line from file_, stores beginning of line in option_,
  * stores rest of line in value_, returns 1 if there are more lines
@@ -501,6 +511,8 @@ void strip_comment( HString& line_ ) {
 }
 
 char const _keyValueSep_[] = " \t=";
+
+}
 
 int read_rc_line( HString& option_, HString& value_, HFile& file_,
 		int& line_ ) {
@@ -567,6 +579,8 @@ void HProgramOptionsHandler::set_option( OOption& option_, HString const& value_
 	M_EPILOG
 }
 
+namespace {
+
 char const* make_short_opts( HProgramOptionsHandler::options_t const& options_, HString& buffer_ ) {
 	M_PROLOG
 	buffer_ = "";
@@ -619,6 +633,8 @@ option* make_option_array( HProgramOptionsHandler::options_t const& options_, HC
 	}
 	return ( options );
 	M_EPILOG
+}
+
 }
 
 int HProgramOptionsHandler::process_command_line( int argc_,

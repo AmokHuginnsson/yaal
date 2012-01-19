@@ -60,7 +60,7 @@ namespace openssl_helper {
  * \param err - error code to translate to message.
  * \return Error message.
  */
-HString& format_error_message( HString& buffer_, int err = 0 ) {
+inline HString& format_error_message( HString& buffer_, int err = 0 ) {
 	int long code( 0 );
 	buffer_ = err ? ERR_error_string( err, NULL ) : "";
 	while ( ( code = ERR_get_error() ) )
@@ -77,9 +77,12 @@ HOpenSSL::OSSLContext::mutexes_t HOpenSSL::OSSLContext::_sslLibMutexes;
 HOpenSSL::OSSLContext::OSSLContext( void ) : _context( NULL ), _users( 0 ) {
 }
 
-int long unsigned get_thread_id( void ) {
+
+inline int long unsigned get_thread_id( void ) {
 	return ( HThread::get_id() );
 }
+
+namespace {
 
 int bio_read( BIO* bio_, char* buf_, int size_ ) {
 	M_PROLOG
@@ -153,6 +156,8 @@ int bio_destroy( BIO* ) {
 	M_PROLOG
 	return ( 1 );
 	M_EPILOG
+}
+
 }
 
 BIO_METHOD fd_method = {

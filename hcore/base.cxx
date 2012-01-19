@@ -84,6 +84,8 @@ bool is_octal( HString const& str_ ) {
 
 static int const MAX_VALID_INTEGER_LENGTH = 32;
 
+namespace {
+
 HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ ) {
 	typedef LexicalCast this_type;
 	/* how to choose correct base:
@@ -147,6 +149,8 @@ HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ 
 	ret.first = base;
 	ret.second = str;
 	return ( ret );
+}
+
 }
 
 template<>

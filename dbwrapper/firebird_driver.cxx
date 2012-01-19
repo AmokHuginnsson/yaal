@@ -90,6 +90,8 @@ M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT LOWER( TRIM
 		" ORDER BY f.rdb$field_position;" );
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 0;
 
+M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
+		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& dataBase_,
 		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
 	typedef HResource<OFirebird> firebird_resource_guard_t;
@@ -119,6 +121,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	return ( ! dbLink_._valid );
 }
 
+M_EXPORT_SYMBOL void db_disconnect( ODBLink& );
 M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
 	M_ASSERT( db );
@@ -129,12 +132,14 @@ M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 	return;
 }
 
+M_EXPORT_SYMBOL int dbrs_errno( ODBLink const&, void* );
 M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* ) {
 	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
 	M_ASSERT( db );
 	return ( isc_sqlcode( db->_status ) );
 }
 
+M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const&, void* );
 M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) {
 	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( result_ ) );
@@ -153,6 +158,7 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 	return ( msg );
 }
 
+M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
 	M_ASSERT( db );
@@ -249,6 +255,7 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( ok ? res.release() : NULL );
 }
 
+M_EXPORT_SYMBOL void rs_unquery( void* );
 M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	M_ASSERT( res );
@@ -258,6 +265,7 @@ M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
 	return;
 }
 
+M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	M_ASSERT( res );
@@ -268,6 +276,7 @@ M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	return ( offsets[column_] >= 0 ? buf + offsets[column_] : NULL );
 }
 
+M_EXPORT_SYMBOL int rs_fields_count( void* );
 M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	M_ASSERT( res );
@@ -275,6 +284,7 @@ M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	return ( out ? out->sqld : 0 );
 }
 
+M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( dataR_ ) );
 	M_ASSERT( res );
@@ -326,6 +336,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ 
 	return ( count );
 }
 
+M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
 	M_ASSERT( db );
@@ -374,6 +385,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	return ( nullInd != -1 ? lastInsertId : -1 );
 }
 
+M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( dataR_ ) );
 	M_ASSERT( res );
@@ -381,6 +393,7 @@ M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	return ( out->sqlvar[field_].aliasname );
 }
 
+int yaal_firebird_driver_main( int, char** );
 int yaal_firebird_driver_main( int, char** ) {
 	return ( 0 );
 }

@@ -123,6 +123,8 @@ void dbwrapper_exit( void ) __attribute__(( __noreturn__ ));
 
 ODBConnector::DRIVER::enum_t _dataBaseDriver_ = ODBConnector::DRIVER::NONE;
 
+namespace {
+
 bool set_dbwrapper_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
 	if ( ! strcasecmp( option_, "set_env" ) )
@@ -146,6 +148,8 @@ bool set_dbwrapper_variables( HString& option_, HString& value_ ) {
 	M_EPILOG
 }
 
+}
+
 class HDBWrapperInitDeinit {
 public:
 	HDBWrapperInitDeinit( void );
@@ -167,6 +171,8 @@ void banner( void ) {
 
 }
 
+extern "C"
+int yaal_dbwrapper_main( int, char** );
 extern "C"
 int yaal_dbwrapper_main( int, char** ) {
 	static char const dynamicLinkerPath[]

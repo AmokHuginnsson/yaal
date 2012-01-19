@@ -31,6 +31,8 @@ namespace yaal {
 
 namespace hdata {
 
+void banner( void );
+
 }
 
 }

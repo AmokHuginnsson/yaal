@@ -298,3 +298,4 @@ int get_socket_error( void ) {
 void set_socket_error( int errno_ ) {
 	WSASetLastError( *_errno() = errno_ );
 }
+

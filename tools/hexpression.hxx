@@ -110,6 +110,8 @@ typedef yaal::hcore::HExceptionT<HExpression> HExpressionException;
 
 }
 
+void swap( yaal::tools::HExpression&, yaal::tools::HExpression& );
+
 }
 
 #endif /* #ifndef YAAL_TOOLS_HEXPRESSION_HXX_INCLUDED */

@@ -85,6 +85,8 @@ void yaal_sqlite3_db_disconnect( ODBLink& );
  * .sqlite extension or no extension at all, and this default extension is added
  * to user supplied database name by driver during db_connect. */
 
+M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
+		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 		HString const&, HString const&, HString const& ) {
 	do {
@@ -123,10 +125,12 @@ void yaal_sqlite3_db_disconnect( ODBLink& dbLink_ ) {
 	dbLink_.clear();
 	return;
 }
+M_EXPORT_SYMBOL void db_disconnect( ODBLink& );
 M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 	yaal_sqlite3_db_disconnect( dbLink_ );
 }
 
+M_EXPORT_SYMBOL int dbrs_errno( ODBLink const&, void* );
 M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 	OSQLite* sQLite( static_cast<OSQLite*>( dbLink_._conn ) );
 	OSQLiteResult* r( static_cast<OSQLiteResult*>( result_ ) );
@@ -143,6 +147,7 @@ M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 	return ( code );
 }
 
+M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const&, void* );
 M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) {
 	OSQLite* sQLite = static_cast<OSQLite*>( dbLink_._conn );
 	OSQLiteResult* r = static_cast<OSQLiteResult*>( result_ );
@@ -171,6 +176,7 @@ void* yaal_sqlite3_db_query( ODBLink& dbLink_, char const* query_ ) {
 	result->_errorMessage = errmsg;
 	return ( result );
 }
+M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	return ( yaal_sqlite3_db_query( dbLink_, query_ ) );
@@ -182,10 +188,12 @@ void yaal_sqlite3_rs_unquery( void* data_ ) {
 	M_SAFE( delete pr );
 	return;
 }
+M_EXPORT_SYMBOL void rs_unquery( void* );
 M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
 	yaal_sqlite3_rs_unquery( data_ );
 }
 
+M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	char** data = NULL;
 	OSQLiteResult* result = static_cast<OSQLiteResult*>( data_ );
@@ -193,10 +201,12 @@ M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	return ( data[ ( row_ + 1 ) * result->_columns + column_ ] );
 }
 
+M_EXPORT_SYMBOL int rs_fields_count( void* );
 M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	return ( static_cast<OSQLiteResult*>( data_ )->_columns );
 }
 
+M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& dbLink_, void* dataR_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( dataR_ ) );
@@ -206,16 +216,19 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& dbLink_, void* dataR_ ) {
 		return ( ::sqlite3_changes( static_cast<OSQLite*>( dbLink_._conn )->_dB ) );
 }
 
+M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	/* FIXME change driver interface to allow 64bit insert row id (from autoincrement) */
 	return ( static_cast<int long>( sqlite3_last_insert_rowid( static_cast<OSQLite*>( dbLink_._conn )->_dB ) ) );
 }
 
+M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	return ( static_cast<OSQLiteResult*>( dataR_ )->_data[ field_ ] );
 }
 
+int yaal_sqlite3_driver_main( int, char** );
 int yaal_sqlite3_driver_main( int, char** ) {
 	return ( 0 );
 }

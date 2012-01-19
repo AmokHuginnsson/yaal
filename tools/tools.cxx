@@ -71,6 +71,8 @@ namespace util {
 extern char _transTableStripPL_ [ 256 ];
 }
 
+namespace {
+
 /* return true means error occured, false - every thing ok */
 bool set_tools_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
@@ -139,6 +141,8 @@ bool set_tools_variables( HString& option_, HString& value_ ) {
 	M_EPILOG
 }
 
+}
+
 class HToolsInitDeinit {
 public:
 	HToolsInitDeinit( void );
@@ -198,6 +202,8 @@ void banner( void ) {
 
 }
 
+extern "C"
+int yaal_tools_main( int, char** );
 extern "C"
 int yaal_tools_main( int, char** ) {
 	static char const dynamicLinkerPath[]

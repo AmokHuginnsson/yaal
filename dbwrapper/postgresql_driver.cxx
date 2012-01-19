@@ -61,6 +61,8 @@ M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT a.attnum, a
 		" ORDER BY a.attnum;" );
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 1;
 
+M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
+		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& dataBase_,
 		yaal::hcore::HString const& login_, yaal::hcore::HString const& password_, yaal::hcore::HString const& ) {
 	PGconn* connection( NULL );
@@ -73,6 +75,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	return ( ! dbLink_._valid );
 }
 
+M_EXPORT_SYMBOL void db_disconnect( ODBLink& );
 M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 	if ( dbLink_._conn ) {
 		PQfinish( static_cast<PGconn*>( dbLink_._conn ) );
@@ -81,6 +84,7 @@ M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 	return;
 }
 
+M_EXPORT_SYMBOL int dbrs_errno( ODBLink const&, void* );
 M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 	M_ASSERT( dbLink_._conn );
 	int err( 0 );
@@ -94,29 +98,35 @@ M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 	return ( err );
 }
 
+M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const&, void* );
 M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) {
 	M_ASSERT( dbLink_._conn );
 	return ( result_ ? ::PQresultErrorMessage( static_cast<PGresult*>( result_ ) ) : ::PQerrorMessage( static_cast<PGconn*>( dbLink_._conn ) ) );
 }
 
+M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	return ( PQexec( static_cast<PGconn*>( dbLink_._conn ), query_ ) );
 }
 
+M_EXPORT_SYMBOL void rs_unquery( void* );
 M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
 	PQclear( static_cast<PGresult*>( data_ ) );
 	return;
 }
 
+M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	return ( ::PQgetvalue( static_cast<PGresult*>( data_ ), static_cast<int>( row_ ), column_ ) );
 }
 
+M_EXPORT_SYMBOL int rs_fields_count( void* );
 M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	return ( ::PQnfields( static_cast<PGresult*>( data_ ) ) );
 }
 
+M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 	char* tmp = ::PQcmdTuples( static_cast<PGresult*>( dataR_ ) );
 	if ( tmp && tmp [ 0 ] )
@@ -125,6 +135,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 		return ( ::PQntuples( static_cast<PGresult*>( dataR_ ) ) );
 }
 
+M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	PGresult* result( PQexec( static_cast<PGconn*>( dbLink_._conn ), "SELECT lastval();" ) );
@@ -138,13 +149,15 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	return ( id );
 }
 
+M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	return ( ::PQfname( static_cast<PGresult*>( dataR_ ), field_ ) );
 }
 
-int yaal_postgresql_driver_main( int, char** ) __attribute__(( __noreturn__ ));
+int yaal_postgresql_driver_main( int, char** );
 int yaal_postgresql_driver_main( int, char** ) {
-	::exit( 0 );
+	return ( 0 );
 }
 
 }
+

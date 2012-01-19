@@ -68,6 +68,8 @@ fun_console_mouse_open_t mouse_open = NULL;
 fun_console_mouse_get_t mouse_get = NULL;
 fun_console_mouse_close_t mouse_close = NULL;
 
+namespace {
+
 int hunt_tty( int offset_ ) {
 	M_PROLOG
 	/* this hack allows to guess current controling virtual terminal screen */
@@ -89,6 +91,8 @@ int hunt_tty( int offset_ ) {
 	}
 	return ( vC );
 	M_EPILOG
+}
+
 }
 
 #ifdef HAVE_SYS_CONSIO_H

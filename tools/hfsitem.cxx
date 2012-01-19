@@ -198,7 +198,7 @@ HFSItem::HIterator HFSItem::end( void ) {
 
 static int const DIRENT_SIZE_BASE = sizeof ( dirent ) - sizeof ( static_cast<dirent*>( NULL )->d_name ) + 1;
 
-int dirent_size( char const* const path_ ) {
+inline int dirent_size( char const* const path_ ) {
 	int const nameMax( static_cast<int>( pathconf( path_, _PC_NAME_MAX ) ) );
 #ifndef NAME_MAX
 #define NAME_MAX _XOPEN_NAME_MAX
