@@ -177,6 +177,8 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* ) {
 	return ( textBuffer );
 }
 
+namespace {
+
 void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	OOracle* oracle( static_cast<OOracle*>( dbLink_._conn ) );
@@ -200,7 +202,7 @@ void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 		queryObj = NULL;
 	} else {
 		if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
-			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << db_error( dbLink_ ) << endl;
+			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, NULL ) << endl;
 		queryStr.upper();
 		int iters( 0 );
 		if ( queryStr.find( "INSERT" ) == 0 )
@@ -219,9 +221,11 @@ void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 			yaal_oracle_rs_unquery( queryObj );
 			queryObj = NULL;
 		} else if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
-			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << db_error( dbLink_ ) << endl;
+			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, NULL ) << endl;
 	}
 	return ( queryObj );
+}
+
 }
 M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
