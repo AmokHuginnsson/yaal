@@ -292,6 +292,21 @@ void HStatusBarControl::message( char const* format_, ... ) {
 	M_EPILOG
 }
 
+void HStatusBarControl::clear( int attribute_ ) {
+	M_PROLOG
+	if ( ! _focused ) {
+		_varTmpBuffer.clear();
+		set( _varTmpBuffer );
+		if ( ! ( _statusBarAttribute & 0x00ff ) )
+			_statusBarAttribute |= ( _attributeEnabled & 0x00ff );
+		_attributeEnabled &= 0xff00;
+		_attributeEnabled |= ( attribute_ & 0x00ff );
+		schedule_refresh();
+	}
+	return;
+	M_EPILOG
+}
+
 void HStatusBarControl::bar( char const* bar_ ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();

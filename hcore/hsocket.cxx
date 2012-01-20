@@ -253,6 +253,14 @@ template<typename T>
 inline int FWD_SUN_LEN( T arg ) {
 	return ( static_cast<int>( SUN_LEN( arg ) ) );
 }
+template<typename T>
+inline T fwd_htons( T arg_ ) {
+	return ( htons( arg_ ) );
+}
+template<typename T>
+inline T fwd_ntohs( T arg_ ) {
+	return ( ntohs( arg_ ) );
+}
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 
@@ -261,7 +269,7 @@ void HSocket::make_address( yaal::hcore::HString const& address_, int port_ ) {
 	if ( !!( _type & TYPE::NETWORK ) ) {
 		sockaddr_in* addressNetwork( static_cast<sockaddr_in*>( _address ) );
 		addressNetwork->sin_family = AF_INET;
-		addressNetwork->sin_port = htons(
+		addressNetwork->sin_port = fwd_htons(
 				static_cast<int short unsigned>( port_ ) );
 		addressNetwork->sin_addr.s_addr = resolver::get_ip( address_ ).raw();
 		_addressSize = sizeof ( sockaddr_in );
@@ -286,7 +294,7 @@ int HSocket::get_port( void ) const {
 	if ( ! ( _type & TYPE::NETWORK ) )
 		M_THROW( _( "unix socket has not a port attribute" ), _type.value() );
 	addressNetwork = static_cast<sockaddr_in*>( _address );
-	return ( ntohs( addressNetwork->sin_port ) );
+	return ( fwd_ntohs( addressNetwork->sin_port ) );
 	M_EPILOG
 }
 

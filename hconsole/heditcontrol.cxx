@@ -484,7 +484,7 @@ int HEditControl::do_process_input ( int code_ ) {
 		else {
 			code_ = errorCode;
 			_string = _varTmpBuffer;
-			_parent->status_bar()->message( COLORS::FG_LIGHTGRAY, NULL );
+			_parent->status_bar()->clear( COLORS::FG_LIGHTGRAY );
 			schedule_refresh();
 		}
 	}

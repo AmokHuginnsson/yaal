@@ -89,11 +89,24 @@ void HUDPSocket::init( socket_type_t type_ ) {
 	M_EPILOG
 }
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+template<typename T>
+inline T fwd_htons( T arg_ ) {
+	return ( htons( arg_ ) );
+}
+template<typename T>
+inline T fwd_ntohs( T arg_ ) {
+	return ( ntohs( arg_ ) );
+}
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 void HUDPSocket::bind( int port_, ip_t ip_ ) {
 	M_PROLOG
 	sockaddr_in address;
 	address.sin_family = AF_INET;
-	address.sin_port = htons( static_cast<int short unsigned>( port_ ) );
+	address.sin_port = fwd_htons( static_cast<int short unsigned>( port_ ) );
 	address.sin_addr.s_addr = ip_.raw();
 
 	M_ENSURE_EX( ( ::bind( _fileDescriptor, reinterpret_cast<sockaddr*>( &address ), sizeof ( address ) ) == 0 ), resolver::ip_to_string( ip_ ) + ":" + port_ );
@@ -105,7 +118,7 @@ void HUDPSocket::send_to( ip_t dest_, int port_, void const* data_, int long siz
 	M_PROLOG
 	sockaddr_in address;
 	address.sin_family = AF_INET;
-	address.sin_port = htons( static_cast<int short unsigned>( port_ ) );
+	address.sin_port = fwd_htons( static_cast<int short unsigned>( port_ ) );
 	address.sin_addr.s_addr = dest_.raw();
 	M_ENSURE( ::sendto( _fileDescriptor, data_, size_, 0, reinterpret_cast<sockaddr*>( &address ), sizeof ( address ) ) == size_ );
 	return;
@@ -118,7 +131,7 @@ int long HUDPSocket::receive( ODatagram& datagram_ ) {
 	socklen_t len( sizeof ( address ) );
 	int long nRead( ::recvfrom( _fileDescriptor, datagram_._data.raw(), datagram_._size, 0, reinterpret_cast<sockaddr*>( &address ), &len ) );
 	datagram_._ip = ip_t( address.sin_addr.s_addr );
-	datagram_._port = ntohs( address.sin_port );
+	datagram_._port = fwd_ntohs( address.sin_port );
 	return ( nRead );
 	M_EPILOG
 }

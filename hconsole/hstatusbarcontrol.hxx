@@ -95,6 +95,7 @@ public:
 	void update_progress( double = -1, char const * = NULL );
 	void message( int, char const*, ... ) __attribute__(( format( printf, 3, 4 ) ));
 	void message( char const*, ... ) __attribute__(( format( printf, 2, 3 ) ));
+	void clear( int );
 	void bar( char const* = NULL );
 	int ask( char const*, char const* );
 	bool confirm( char const* );
