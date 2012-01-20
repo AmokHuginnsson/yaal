@@ -7,22 +7,23 @@ CWARNING_FLAGS = \
 						-Werror \
 						-Winline \
 						-Wlarger-than-16384 \
+						-Wmissing-declarations \
+						-Wmissing-format-attribute \
 						-Wmissing-noreturn \
 						-Wpointer-arith \
 						-Wredundant-decls \
 						-Wsign-compare \
 						-Wundef \
-						-Wwrite-strings \
-						-Wmissing-declarations \
-						-Wmissing-format-attribute
-#						-Wunreachable-code \ # too many warrnings
-#						-Waggregate-return \ # useless for C++
-CXXWARNING_FLAGS		=	\
+						-Wunreachable-code \
+						-Wwrite-strings
+CXXWARNING_FLAGS =	\
 						-Weffc++ \
-						-Wsign-promo \
-						-Wold-style-cast
-#						-Woverloaded-virtual \ # too many unecessary warnings
-PURE_C_WARINIG_FLAGS= \
+						-Wold-style-cast \
+						-Woverloaded-virtual \
+						-Wsign-promo
+# -Waggregate-return makes no sense for C++ as it effectively banishes return by value.
+PURE_C_WARINIG_FLAGS = \
+						-Waggregate-return \
 						-Wbad-function-cast \
 						-Wmissing-prototypes \
 						-Wnested-externs \
