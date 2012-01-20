@@ -25,7 +25,7 @@ AC_DEFUN([YAAL_DETECT_FLAGS],
 	for flag in $2; do
 		if test -z "[$]$1"; then
 			$1_save_FLAGS="$FLAGS"
-			FLAGS="$FLAGS $flag -Werror $4"
+			FLAGS="-Werror $FLAGS $flag -pedantic-errors $4"
 			AC_MSG_CHECKING([whether COMPILER compiler understands [$]flag])
 			touch conftest.c
 			UNRECOGNIZED=`${CC} -o conftest.o -c ${FLAGS} conftest.c 2>&1 | grep "unrecognized option"`

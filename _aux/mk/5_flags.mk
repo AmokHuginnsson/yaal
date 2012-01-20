@@ -7,7 +7,6 @@ CWARNING_FLAGS = \
 						-Werror \
 						-Winline \
 						-Wlarger-than-16384 \
-						-Wmissing-declarations \
 						-Wmissing-format-attribute \
 						-Wmissing-noreturn \
 						-Wpointer-arith \
