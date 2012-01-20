@@ -22,7 +22,7 @@ CXXWARNING_FLAGS =	\
 						-Woverloaded-virtual \
 						-Wsign-promo
 # -Waggregate-return makes no sense for C++ as it effectively banishes return by value.
-PURE_C_WARINIG_FLAGS = \
+PURE_C_WARNING_FLAGS = \
 						-Waggregate-return \
 						-Wbad-function-cast \
 						-Wmissing-prototypes \
