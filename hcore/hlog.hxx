@@ -59,7 +59,7 @@ namespace LOG_TYPE {
 /*! \brief Logging utility.
  */
 class HLog : public HField<HFile>, public HSynchronizedStream, public HSingleton<HLog> {
-protected:
+public:
 	typedef HLog this_type;
 	typedef HSynchronizedStream base_type;
 private:

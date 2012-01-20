@@ -40,11 +40,60 @@ namespace hcore {
 template<typename type_t, typename hash_function_t = int long(*)( type_t const& )>
 class HHashMultiSet {
 public:
-	class HIterator;
 	typedef type_t key_type;
 /* cppcheck-suppress variableHidingTypedef */
 	typedef type_t value_type;
 	typedef HPair<type_t, int long> elem_t;
+	class HIterator {
+		typedef type_t key_type;
+		typedef HHashMultiSet<key_type, hash_function_t> set_t;
+		int long _index;
+		HHashContainer::HIterator _engine;
+	public:
+		HIterator( void ) : _index( 0 ), _engine() {}
+		HIterator( HIterator const& it_ ) : _index( it_._index ), _engine( it_._engine ) {}
+		HIterator& operator = ( HIterator const& it_ ) {
+			if ( &it_ != this ) {
+				_index = it_._index;
+				_engine = it_._engine;
+			}
+			return ( *this );
+		}
+		HIterator& operator ++ ( void ) {
+			if ( _index < ( _engine.get<typename set_t::elem_t>().second - 1 ) )
+				++ _index;
+			else {
+				_index = 0;
+				++ _engine;
+			}
+			return ( *this );
+		}
+		HIterator const operator ++ ( int ) {
+			HIterator it( _engine );
+			++ _engine;
+			return ( it );
+		}
+		HIterator& operator -- ( void ) {
+			-- _engine;
+			return ( *this );
+		}
+		HIterator const operator -- ( int ) {
+			HIterator it( _engine );
+			-- _engine;
+			return ( it );
+		}
+		key_type const& operator* ( void ) const
+			{ return ( _engine.get<typename set_t::elem_t>().first ); }
+		key_type const* operator-> ( void ) const
+			{ return ( &_engine.get<typename set_t::elem_t>().first ); }
+		bool operator == ( HIterator const& it ) const
+			{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
+		bool operator != ( HIterator const& it ) const
+			{ return ( ( _engine != it._engine ) || ( _index != it._index ) ); }
+	private:
+		friend class HHashMultiSet<key_type, hash_function_t>;
+		explicit HIterator( HHashContainer::HIterator const& it ) : _index( 0 ), _engine( it ) {};
+	};
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
@@ -217,59 +266,6 @@ public:
 	bool operator < ( HHashMultiSet const& set_ ) const
 		{ M_PROLOG return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 private:
-};
-
-
-template<typename key_type_t, typename hash_function_t>
-class HHashMultiSet<key_type_t, hash_function_t>::HIterator {
-	typedef key_type_t key_type;
-	typedef HHashMultiSet<key_type, hash_function_t> set_t;
-	int long _index;
-	HHashContainer::HIterator _engine;
-public:
-	HIterator( void ) : _index( 0 ), _engine() {}
-	HIterator( HIterator const& it_ ) : _index( it_._index ), _engine( it_._engine ) {}
-	HIterator& operator = ( HIterator const& it_ ) {
-		if ( &it_ != this ) {
-			_index = it_._index;
-			_engine = it_._engine;
-		}
-		return ( *this );
-	}
-	HIterator& operator ++ ( void ) {
-		if ( _index < ( _engine.get<typename set_t::elem_t>().second - 1 ) )
-			++ _index;
-		else {
-			_index = 0;
-			++ _engine;
-		}
-		return ( *this );
-	}
-	HIterator const operator ++ ( int ) {
-		HIterator it( _engine );
-		++ _engine;
-		return ( it );
-	}
-	HIterator& operator -- ( void ) {
-		-- _engine;
-		return ( *this );
-	}
-	HIterator const operator -- ( int ) {
-		HIterator it( _engine );
-		-- _engine;
-		return ( it );
-	}
-	key_type const& operator* ( void ) const
-		{ return ( _engine.get<typename set_t::elem_t>().first ); }
-	key_type const* operator-> ( void ) const
-		{ return ( &_engine.get<typename set_t::elem_t>().first ); }
-	bool operator == ( HIterator const& it ) const
-		{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
-	bool operator != ( HIterator const& it ) const
-		{ return ( ( _engine != it._engine ) || ( _index != it._index ) ); }
-private:
-	friend class HHashMultiSet<key_type, hash_function_t>;
-	explicit HIterator( HHashContainer::HIterator const& it ) : _index( 0 ), _engine( it ) {};
 };
 
 }

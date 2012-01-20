@@ -40,10 +40,9 @@ namespace tools {
 /*! \brief Collector device interface.
  */
 class HCollector : public HSerial {
-protected:
+public:
 	typedef HCollector this_type;
 	typedef HSerial base_type;
-public:
 	/*! \brief Protocol description for Collector device.
 	 */
 	struct PROTOCOL {

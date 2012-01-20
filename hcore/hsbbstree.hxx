@@ -38,7 +38,7 @@ namespace yaal {
 
 namespace hcore {
 
-extern M_YAAL_HCORE_PUBLIC_API char const * const _errMsgHSBBSTree_ [ ];
+extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHSBBSTree_[];
 
 /*! \brief HSBBSTree stands for: Self-balancing binary search tree.
  *
@@ -162,14 +162,14 @@ private:
  */
 template<typename tType>
 class	HSBBSTree::HNode : public HSBBSTree::HAbstractNode {
+	typedef tType value_type;
 	tType _key;
 	HNode( tType const& );
 	HNode( HNode const& );
 	HNode& operator = ( HNode const& );
 	virtual HAbstractNode* clone( void ) const;
 	friend class HSBBSTree;
-	friend tType& HSBBSTree::HIterator::get<tType>( void );
-	friend tType const& HSBBSTree::HIterator::get<tType>( void ) const;
+	friend class HSBBSTree::HIterator;
 };
 
 template<typename tType>

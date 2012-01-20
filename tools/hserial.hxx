@@ -39,10 +39,9 @@ namespace tools {
 /*! \brief Serial port handling class.
  */
 class HSerial : public hcore::HRawFile {
-protected:
+public:
 	typedef HSerial this_type;
 	typedef HRawFile base_type;
-public:
 	/*! \brief Serial port configuration flags.
 	 */
 	struct FLAG {

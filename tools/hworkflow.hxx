@@ -58,8 +58,8 @@ public:
 	typedef HWorkFlowInterface base_type;
 	typedef yaal::hcore::HPointer<HWorkFlow> ptr_t;
 	class HWorker;
-private:
 	typedef yaal::hcore::HPointer<HWorker> worker_ptr_t;
+private:
 	typedef yaal::hcore::HList<worker_ptr_t> pool_t;
 	typedef yaal::hcore::HList<task_t> queue_t;
 	int _workerPoolSize;

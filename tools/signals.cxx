@@ -126,7 +126,7 @@ HSignalService::HSignalService( void )
 	register_handler( SIGTSTP, call( &HBaseSignalHandlers::signal_TSTP, _1 ) );
 	register_handler( SIGCONT, call( &HBaseSignalHandlers::signal_CONT, _1 ) );
 	register_handler( SIGUSR1, call( &HBaseSignalHandlers::signal_USR1, _1 ) );
-	handler_t fatal( call( &HBaseSignalHandlers::signal_fatal, _1 ) );
+	handler_t fatal( call( static_cast<raw_handler_t>( &HBaseSignalHandlers::signal_fatal ), _1 ) );
 	register_handler( SIGSEGV, fatal );
 	register_handler( SIGBUS, fatal );
 	register_handler( SIGABRT, fatal );

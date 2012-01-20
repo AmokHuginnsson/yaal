@@ -133,9 +133,9 @@ struct OPipeResGuard {
 	}
 	~OPipeResGuard( void ) {
 		if ( _res[ 0 ] >= 0 )
-			M_TEMP_FAILURE_RETRY( hcore::system::close( _res[ 0 ] ) );
+			M_ENSURE( M_TEMP_FAILURE_RETRY( hcore::system::close( _res[ 0 ] ) ) == 0 );
 		if ( _res[ 1 ] >= 0 )
-			M_TEMP_FAILURE_RETRY( hcore::system::close( _res[ 1 ] ) );
+			M_ENSURE( M_TEMP_FAILURE_RETRY( hcore::system::close( _res[ 1 ] ) ) == 0 );
 	}
 };
 

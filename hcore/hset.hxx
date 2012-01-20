@@ -59,9 +59,54 @@ inline static bool less( key_t const& left, key_t const& right )
 template<typename type_t, typename helper_t = set_helper<type_t> >
 class HSet {
 public:
-	class HIterator;
 	typedef type_t value_type;
 	typedef type_t key_type;
+	/*! \brief Iterator for HSet<> data structure.
+	 */
+	class HIterator : public iterator_interface<value_type, iterator_category::forward> {
+		HSBBSTree::HIterator _engine;
+	public:
+		typedef iterator_interface<value_type, iterator_category::forward> base_type;
+		typedef value_type const& reference;
+		typedef value_type const* pointer;
+		HIterator( void ) : base_type(), _engine() {}
+		HIterator( HIterator const& it_ ) : base_type(), _engine( it_._engine ) {}
+		HIterator& operator = ( HIterator const& it_ ) {
+			if ( &it_ != this )
+				_engine = it_._engine;
+			return ( *this );
+		}
+		HIterator& operator ++ ( void ) {
+			++ _engine;
+			return ( *this );
+		}
+		HIterator const operator ++ ( int ) {
+			HIterator it( _engine );
+			++ _engine;
+			return ( it );
+		}
+		HIterator& operator -- ( void ) {
+			-- _engine;
+			return ( *this );
+		}
+		HIterator const operator -- ( int ) {
+			HIterator it( _engine );
+			-- _engine;
+			return ( it );
+		}
+		value_type const& operator * ( void ) const
+			{	return ( _engine.get<value_type>() );	}
+		value_type const* operator -> ( void ) const
+			{ return ( &_engine.get<value_type>() );	}
+		bool operator == ( HIterator const& it ) const
+			{ return ( _engine == it._engine ); }
+		bool operator != ( HIterator const& it ) const
+			{ return ( _engine != it._engine ); }
+	private:
+		friend class HSet<value_type, helper_t>;
+		explicit HIterator( HSBBSTree::HIterator const& it )
+			: base_type(), _engine( it ) {}
+	};
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
@@ -177,54 +222,6 @@ public:
 		{ M_PROLOG return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 	bool operator < ( HSet const& set_ ) const
 		{ M_PROLOG return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
-};
-
-/*! \brief Iterator for HSet<> data structure.
- */
-template<typename value_type, typename helper_t = set_helper<value_type> >
-class HSet<value_type, helper_t>::HIterator : public iterator_interface<value_type, iterator_category::forward> {
-	HSBBSTree::HIterator _engine;
-public:
-	typedef iterator_interface<value_type, iterator_category::forward> base_type;
-	typedef value_type const& reference;
-	typedef value_type const* pointer;
-	HIterator( void ) : base_type(), _engine() {}
-	HIterator( HIterator const& it_ ) : base_type(), _engine( it_._engine ) {}
-	HIterator& operator = ( HIterator const& it_ ) {
-		if ( &it_ != this )
-			_engine = it_._engine;
-		return ( *this );
-	}
-	HIterator& operator ++ ( void ) {
-		++ _engine;
-		return ( *this );
-	}
-	HIterator const operator ++ ( int ) {
-		HIterator it( _engine );
-		++ _engine;
-		return ( it );
-	}
-	HIterator& operator -- ( void ) {
-		-- _engine;
-		return ( *this );
-	}
-	HIterator const operator -- ( int ) {
-		HIterator it( _engine );
-		-- _engine;
-		return ( it );
-	}
-	value_type const& operator * ( void ) const
-		{	return ( _engine.get<value_type>() );	}
-	value_type const* operator -> ( void ) const
-		{ return ( &_engine.get<value_type>() );	}
-	bool operator == ( HIterator const& it ) const
-		{ return ( _engine == it._engine ); }
-	bool operator != ( HIterator const& it ) const
-		{ return ( _engine != it._engine ); }
-private:
-	friend class HSet<value_type, helper_t>;
-	explicit HIterator( HSBBSTree::HIterator const& it )
-		: base_type(), _engine( it ) {}
 };
 
 }

@@ -48,6 +48,7 @@ class M_YAAL_TOOLS_PUBLIC_API HSignalService : public yaal::hcore::HSingleton<HS
 public:
 	typedef yaal::hcore::HSingleton<HSignalService> base_type;
 	typedef HSignalService this_type;
+	typedef int (*raw_handler_t)( int );
 	typedef yaal::hcore::HBoundCall<int ( int )> handler_t;
 	typedef yaal::hcore::HPair<handler_t, void const*> handler_info_t;
 private:

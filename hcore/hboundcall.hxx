@@ -89,7 +89,7 @@ public:
 		typename b10_t>
 	HBoundCall( HCall<free_args_count, return_t, CALL_type, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& call_ )
 	 : _call( make_pointer<HCall<free_args_count, return_t, CALL_type, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >( call_ ) )
-		{	}
+		{ }
 	result_type operator()( void ) const
 		{ return ( (*_call)() ); }
 	result_type operator()( void )

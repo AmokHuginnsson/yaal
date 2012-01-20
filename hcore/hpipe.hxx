@@ -37,7 +37,7 @@ namespace hcore {
 /*! \brief Unnamed pipe C++ wrapper.
  */
 class HPipe : public yaal::hcore::HStreamInterface {
-protected:
+public:
 	typedef HPipe this_type;
 	typedef HStreamInterface base_type;
 private:

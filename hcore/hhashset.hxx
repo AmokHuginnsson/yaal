@@ -40,10 +40,51 @@ namespace hcore {
 template<typename type_t, typename hash_function_t = int long(*)( type_t const& )>
 class HHashSet {
 public:
-	class HIterator;
 	typedef type_t key_type;
 /* cppcheck-suppress variableHidingTypedef */
 	typedef type_t value_type;
+	class HIterator : public iterator_interface<type_t, iterator_category::forward> {
+		typedef type_t key_type;
+		typedef HHashSet<key_type, hash_function_t> set_t;
+		HHashContainer::HIterator _engine;
+	public:
+		typedef iterator_interface<type_t, iterator_category::forward> base_type;
+		HIterator( void ) : base_type(), _engine() {}
+		HIterator& operator = ( HIterator const& it_ ) {
+			if ( &it_ != this )
+				_engine = it_._engine;
+			return ( *this );
+		}
+		HIterator& operator ++ ( void ) {
+			++ _engine;
+			return ( *this );
+		}
+		HIterator const operator ++ ( int ) {
+			HIterator it( _engine );
+			++ _engine;
+			return ( it );
+		}
+		HIterator& operator -- ( void ) {
+			-- _engine;
+			return ( *this );
+		}
+		HIterator const operator -- ( int ) {
+			HIterator it( _engine );
+			-- _engine;
+			return ( it );
+		}
+		key_type const& operator* ( void ) const
+			{ return ( _engine.get<typename set_t::value_type>() ); }
+		key_type const* operator-> ( void ) const
+			{ return ( &_engine.get<typename set_t::value_type>() ); }
+		bool operator == ( HIterator const& it ) const
+			{ return ( _engine == it._engine ); }
+		bool operator != ( HIterator const& it ) const
+			{ return ( _engine != it._engine ); }
+	private:
+		friend class HHashSet<key_type, hash_function_t>;
+		explicit HIterator( HHashContainer::HIterator const& it ) : base_type(), _engine( it ) {};
+	};
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
@@ -201,51 +242,6 @@ public:
 	bool operator < ( HHashSet const& set_ ) const
 		{ M_PROLOG return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 private:
-};
-
-
-template<typename key_type_t, typename hash_function_t>
-class HHashSet<key_type_t, hash_function_t>::HIterator : public iterator_interface<key_type_t, iterator_category::forward> {
-	typedef key_type_t key_type;
-	typedef HHashSet<key_type, hash_function_t> set_t;
-	HHashContainer::HIterator _engine;
-public:
-	typedef iterator_interface<key_type_t, iterator_category::forward> base_type;
-	HIterator( void ) : base_type(), _engine() {}
-	HIterator& operator = ( HIterator const& it_ ) {
-		if ( &it_ != this )
-			_engine = it_._engine;
-		return ( *this );
-	}
-	HIterator& operator ++ ( void ) {
-		++ _engine;
-		return ( *this );
-	}
-	HIterator const operator ++ ( int ) {
-		HIterator it( _engine );
-		++ _engine;
-		return ( it );
-	}
-	HIterator& operator -- ( void ) {
-		-- _engine;
-		return ( *this );
-	}
-	HIterator const operator -- ( int ) {
-		HIterator it( _engine );
-		-- _engine;
-		return ( it );
-	}
-	key_type const& operator* ( void ) const
-		{ return ( _engine.get<typename set_t::value_type>() ); }
-	key_type const* operator-> ( void ) const
-		{ return ( &_engine.get<typename set_t::value_type>() ); }
-	bool operator == ( HIterator const& it ) const
-		{ return ( _engine == it._engine ); }
-	bool operator != ( HIterator const& it ) const
-		{ return ( _engine != it._engine ); }
-private:
-	friend class HHashSet<key_type, hash_function_t>;
-	explicit HIterator( HHashContainer::HIterator const& it ) : base_type(), _engine( it ) {};
 };
 
 }

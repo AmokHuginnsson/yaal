@@ -64,9 +64,60 @@ inline static bool less( HPair<type_t, int long> const& left, type_t const& righ
 template<typename type_t, typename helper_t = multiset_helper<type_t> >
 class HMultiSet {
 public:
-	class HIterator;
 	typedef type_t value_type;
 	typedef type_t key_type;
+	/*! \brief Iterator for HMultiSet<> data structure.
+	 */
+	class HIterator : public iterator_interface<value_type, iterator_category::forward> {
+		typedef HPair<value_type, int long> elem_t;
+		int long _index;
+		HSBBSTree::HIterator _engine;
+	public:
+		typedef iterator_interface<value_type, iterator_category::forward> base_type;
+		HIterator( void ) : base_type(), _index( 0 ), _engine() {}
+		HIterator( HIterator const& it_ ) : base_type(), _index( it_._index ), _engine( it_._engine ) {}
+		HIterator& operator= ( HIterator const& it_ ) {
+			if ( &it_ != this ) {
+				_index = it_._index;
+				_engine = it_._engine;
+			}
+			return ( *this );
+		}
+		HIterator& operator ++ ( void ) {
+			if ( _index < ( _engine.get<elem_t>().second - 1 ) )
+				++ _index;
+			else {
+				_index = 0;
+				++ _engine;
+			}
+			return ( *this );
+		}
+		HIterator const operator ++ ( int ) {
+			HIterator it( _engine );
+			++ _engine;
+			return ( it );
+		}
+		HIterator& operator -- ( void ) {
+			-- _engine;
+			return ( *this );
+		}
+		HIterator const operator -- ( int ) {
+			HIterator it( _engine );
+			-- _engine;
+			return ( it );
+		}
+		value_type const& operator * ( void ) const
+			{	return ( _engine.get<elem_t>().first );	}
+		value_type const* operator -> ( void ) const
+			{ return ( &_engine.get<elem_t>().first );	}
+		bool operator == ( HIterator const& it ) const
+			{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
+		bool operator != ( HIterator const& it ) const
+			{ return ( ( _engine != it._engine ) || ( _index != it._index ) ); }
+	private:
+		friend class HMultiSet<value_type, helper_t>;
+		explicit HIterator( HSBBSTree::HIterator const& it ) : base_type(), _index( 0 ), _engine( it ) {};
+	};
 	typedef HPair<type_t, int long> elem_t;
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
@@ -190,60 +241,6 @@ public:
 		{ M_PROLOG return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 	bool operator < ( HMultiSet const& set_ ) const
 		{ M_PROLOG return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
-};
-
-/*! \brief Iterator for HMultiSet<> data structure.
- */
-template<typename value_type, typename helper_t = multiset_helper<value_type> >
-class HMultiSet<value_type, helper_t>::HIterator : public iterator_interface<value_type, iterator_category::forward> {
-	typedef HPair<value_type, int long> elem_t;
-	int long _index;
-	HSBBSTree::HIterator _engine;
-public:
-	typedef iterator_interface<value_type, iterator_category::forward> base_type;
-	HIterator( void ) : base_type(), _index( 0 ), _engine() {}
-	HIterator( HIterator const& it_ ) : base_type(), _index( it_._index ), _engine( it_._engine ) {}
-	HIterator& operator= ( HIterator const& it_ ) {
-		if ( &it_ != this ) {
-			_index = it_._index;
-			_engine = it_._engine;
-		}
-		return ( *this );
-	}
-	HIterator& operator ++ ( void ) {
-		if ( _index < ( _engine.get<elem_t>().second - 1 ) )
-			++ _index;
-		else {
-			_index = 0;
-			++ _engine;
-		}
-		return ( *this );
-	}
-	HIterator const operator ++ ( int ) {
-		HIterator it( _engine );
-		++ _engine;
-		return ( it );
-	}
-	HIterator& operator -- ( void ) {
-		-- _engine;
-		return ( *this );
-	}
-	HIterator const operator -- ( int ) {
-		HIterator it( _engine );
-		-- _engine;
-		return ( it );
-	}
-	value_type const& operator * ( void ) const
-		{	return ( _engine.get<elem_t>().first );	}
-	value_type const* operator -> ( void ) const
-		{ return ( &_engine.get<elem_t>().first );	}
-	bool operator == ( HIterator const& it ) const
-		{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
-	bool operator != ( HIterator const& it ) const
-		{ return ( ( _engine != it._engine ) || ( _index != it._index ) ); }
-private:
-	friend class HMultiSet<value_type, helper_t>;
-	explicit HIterator( HSBBSTree::HIterator const& it ) : base_type(), _index( 0 ), _engine( it ) {};
 };
 
 }

@@ -37,10 +37,9 @@ namespace tools {
 /*! \brief Run process and access its std(in/out/err).
  */
 class HPipedChild : public yaal::hcore::HStreamInterface {
-protected:
+public:
 	typedef HPipedChild this_type;
 	typedef HStreamInterface base_type;
-public:
 	/*! \brief Child process output stream types.
 	 */
 	struct STREAM {

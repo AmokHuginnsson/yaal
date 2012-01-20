@@ -68,7 +68,7 @@ template <typename tType>
 HItem_t<tType> & HItem_t<tType>::operator = ( HItem_t<tType> const & item_ ) {
 	M_PROLOG
 	if ( this != & item_ ) {
-		(*this).hcore::HArray<tType>::operator = ( item_ );
+		hcore::HArray<tType>::operator = ( item_ );
 		m_lId = item_.m_lId;
 		m_bChecked = item_.m_bChecked;
 	}

@@ -1590,9 +1590,9 @@ struct functional_argument_type {
 		{ typedef typename U::eleventh_argument_type type; };
 
 	template<int const no> struct index {
-		static int const idx = meta::ternary<( no == 0 ), meta::ternary<idx<T, 0>::value, 0, meta::ternary<idx<T, 1>::value, 1, -1>::value>::value,
+		static int const argNo = meta::ternary<( no == 0 ), meta::ternary<idx<T, 0>::value, 0, meta::ternary<idx<T, 1>::value, 1, -1>::value>::value,
 														meta::ternary<idx<T, no + 1>::value, no + 1, -1>::value>::value;
-		typedef typename get<T, idx>::type type;
+		typedef typename get<T, argNo>::type type;
 	};
 };
 /*! \endcond */
@@ -2330,9 +2330,9 @@ struct argument_count {
 		static int const value = generic_helper::argument_count<T>::value;
 	};
 
-	static int const functional_argument_count = functional_argument_count<T>::value;
+	static int const functionalArgumentCount = functional_argument_count<T>::value;
 
-	static int const value = resolve<functional_argument_count == -1, functional_argument_count>::value;
+	static int const value = resolve<functionalArgumentCount == -1, functionalArgumentCount>::value;
 };
 
 }

@@ -167,7 +167,7 @@ extern M_YAAL_HCONSOLE_PUBLIC_API bool _needRepaint_;
 /*! \brief Low level TUI description and modifier.
  */
 class HConsole : public yaal::hcore::HSingleton<HConsole> {
-protected:
+public:
 	typedef HConsole this_type;
 	typedef yaal::hcore::HSingleton<HConsole> base_type;
 private:

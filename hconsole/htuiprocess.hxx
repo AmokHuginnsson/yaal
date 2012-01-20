@@ -42,10 +42,9 @@ namespace hconsole {
 /*! \brief A backbone of TUI based application.
  */
 class HTUIProcess : public HHandler {
-protected:
+public:
 	typedef HTUIProcess this_type;
 	typedef HHandler base_type;
-public:
 	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
 	typedef yaal::hcore::HPointer<model_t> model_ptr_t;
 protected:

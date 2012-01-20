@@ -47,8 +47,8 @@ HPipe::HPipe( void )
 
 HPipe::~HPipe( void ) {
 	M_PROLOG
-	M_TEMP_FAILURE_RETRY( system::close( _pipe[ 1 ] ) );
-	M_TEMP_FAILURE_RETRY( system::close( _pipe[ 0 ] ) );
+	M_ENSURE( M_TEMP_FAILURE_RETRY( system::close( _pipe[ 1 ] ) == 0 ) );
+	M_ENSURE( M_TEMP_FAILURE_RETRY( system::close( _pipe[ 0 ] ) == 0 ) );
 	return;
 	M_DESTRUCTOR_EPILOG
 }

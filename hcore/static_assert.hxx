@@ -25,7 +25,7 @@ Copyright:
 */
 
 /*! \file hcore/static_assert.hxx
- * \brief STATIS_ASSERT functionality implemented here.
+ * \brief STATIC_ASSERT functionality implemented here.
  */
 
 #ifndef YAAL_HCORE_STATIC_ASSERT_HXX_INCLUDED
@@ -33,9 +33,9 @@ Copyright:
 
 #include "hcore/macro.hxx"
 
-#ifdef STATIS_ASSERT
-#	error Yaal redefines STATIS_ASSERT macro.
-#endif /* #ifdef STATIS_ASSERT */
+#ifdef STATIC_ASSERT
+#	error Yaal redefines STATIC_ASSERT macro.
+#endif /* #ifdef STATIC_ASSERT */
 
 /*! \brief Perform static (compile time) code check.
  *
