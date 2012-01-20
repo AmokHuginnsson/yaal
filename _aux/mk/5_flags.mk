@@ -13,7 +13,6 @@ CWARNING_FLAGS = \
 						-Wredundant-decls \
 						-Wsign-compare \
 						-Wundef \
-						-Wunreachable-code \
 						-Wwrite-strings
 CXXWARNING_FLAGS =	\
 						-Weffc++ \
