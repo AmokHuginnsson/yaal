@@ -230,6 +230,13 @@ RESULT=["no"]
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[int main( int, char const* const* const ) { int a = 0; typedef __decltype( a ) a_t; a_t b; return ( 0 ); }]])],
 	[AC_DEFINE([HAVE_DECLTYPE],[],[Is __decltype available?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
+AC_MSG_CHECKING([whether `.interp' user section is allowed])
+dnl `
+RESULT=["no"]
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[void f( void ) { static char const dynamicLinkerPath[]	__attribute__(( __section__(".interp") )) = "/dummy"; }]])],
+	[AC_DEFINE([HAVE_INTERP_ALLOWED],[],[Is `.interp' user secion allowed?])] RESULT=["yes"])
+dnl `
+AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether strftime() returns required buffer size])
 RESULT=["no"]

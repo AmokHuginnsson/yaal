@@ -59,7 +59,10 @@ int yaal_hdata_main( int, char** );
 extern "C"
 int yaal_hdata_main( int, char** ) {
 	static char const dynamicLinkerPath[]
-		__attribute__(( __section__(".interp") )) = __DYNAMIC_LINKER__;
+#ifdef HAVE_INTERP_ALLOWED
+		__attribute__(( __section__(".interp") ))
+#endif /* #ifdef HAVE_INTERP_ALLOWED */
+		= __DYNAMIC_LINKER__;
 	if ( dynamicLinkerPath[ 0 ] ) {
 		yaal::hcore::banner();
 		yaal::tools::banner();
