@@ -18,10 +18,10 @@
 		<td>Ubuntu 12.04 (Precise Pangolin)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Centos 5.7 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Centos 6.0 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>FreeBSD 8.2</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>FreeBSD 9.0</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Sun Solaris 5.10</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
