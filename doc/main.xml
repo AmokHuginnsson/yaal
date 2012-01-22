@@ -18,7 +18,7 @@
 		<td>Ubuntu 12.04 (Precise Pangolin)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Centos 6.0 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Centos 6.2 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>FreeBSD 9.0</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
