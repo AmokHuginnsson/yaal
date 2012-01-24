@@ -38,6 +38,86 @@ namespace yaal {
 
 namespace hconsole {
 
+class HListControlModelInterface {
+public:
+	typedef HListControlModelInterface this_type;
+	typedef yaal::hcore::HPointer<HListControlModelInterface> ptr_t;
+	class HListControlModelIteratorInterface {
+	public:
+		typedef HListControlModelIteratorInterface this_type;
+		typedef yaal::hcore::HPointer<HListControlModelIteratorInterface> ptr_t;
+		virtual ~HListControlModelIteratorInterface( void ) {}
+		bool operator == ( HListControlModelIteratorInterface const& it_ ) const {
+			return ( do_equal_to( it_ ) );
+		}
+		bool operator != ( HListControlModelIteratorInterface const& it_ ) const {
+			return ( ! do_equal_to( it_ ) );
+		}
+		HListControlModelIteratorInterface& operator ++ ( void );
+	protected:
+		virtual bool do_equal_to( HListControlModelIteratorInterface const& ) const = 0;
+		virtual void do_next( void ) = 0;
+	};
+	typedef HListControlModelIteratorInterface& iterator_t;
+	virtual ~HListControlModelInterface( void ) {}
+	HListControlModelIteratorInterface::ptr_t begin( void ) const {
+		return ( do_begin() );
+	}
+	HListControlModelIteratorInterface::ptr_t end( void ) const {
+		return ( do_end() );
+	}
+	yaal::hcore::HString get_value( iterator_t it_, int col_ ) const {
+		return ( do_get_value( it_, col_ ) );
+	}
+protected:
+	virtual HListControlModelIteratorInterface::ptr_t do_begin( void ) const = 0;
+	virtual HListControlModelIteratorInterface::ptr_t do_end( void ) const = 0;
+	virtual yaal::hcore::HString do_get_value( iterator_t, int ) const = 0;
+};
+
+template<typename sequence_t>
+class HListControlModel : public HListControlModelInterface {
+public:
+	typedef HListControlModel this_type;
+	typedef HListControlModelInterface base_type;
+	typedef yaal::hcore::HPointer<sequence_t> sequence_ptr_t;
+	class HListControlModelIterator : public HListControlModelInterface::HListControlModelIteratorInterface {
+	public:
+		typedef HListControlModelIterator this_type;
+		typedef HListControlModelIteratorInterface base_type;
+		yaal::hcore::HString get_value( int col_ ) {
+			return ( (*_iter)[ col_ ] );
+		}
+	private:
+		typename sequence_t::iterator_t _iter;
+		HListControlModelIterator( typename sequence_t::iterator_t iter_ )
+			: _iter( iter_ )
+				{}
+	protected:
+		virtual bool do_equal_to( HListControlModelIteratorInterface const& it_ ) const {
+			M_ASSERT( dynamic_cast<HListControlModelIterator*>( &it_ ) );
+			return ( _iter == static_cast<HListControlModelIterator&>( it_ )._iter );
+		}
+		virtual void do_next( void ) {
+			++ _iter;
+		}
+		friend class HListControlModel;
+	};
+private:
+	sequence_ptr_t _sequence;
+protected:
+	virtual HListControlModelIteratorInterface::ptr_t do_begin( void ) const {
+		return ( yaal::hcore::make_pointer<HListControlModelIterator>( _sequence.begin() ) );
+	}
+	virtual HListControlModelIteratorInterface::ptr_t do_end( void ) const {
+		return ( yaal::hcore::make_pointer<HListControlModelIterator>( _sequence.end() ) );
+	}
+	virtual yaal::hcore::HString do_get_value( iterator_t it_, int col_ ) const {
+		M_ASSERT( dynamic_cast<HListControlModelIterator*>( &it_ ) );
+		return ( static_cast<HListControlModelIterator&>( it_ ).get_value( col_ ) );
+	}
+};
+
 class HListControl;
 
 /*! \brief Pack of helpers for "list control" concept.

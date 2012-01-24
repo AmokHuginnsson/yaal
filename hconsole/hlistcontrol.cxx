@@ -827,16 +827,16 @@ bool HListControl::get_text_for_cell( iterator_t& it_, int column_, type_id_t ty
 	HAbstractRow& item = *it_;
 	switch ( type_.value() ) {
 		case ( TYPE::INT_LONG ):
-			_varTmpBuffer = item [ column_ ].get_long();
+			_varTmpBuffer = item[ column_ ].get_long();
 		break;
 		case ( TYPE::DOUBLE ):
-			_varTmpBuffer = item [ column_ ].get_double();
+			_varTmpBuffer = item[ column_ ].get_double();
 		break;
 		case ( TYPE::HSTRING ):
-			_varTmpBuffer = item [ column_ ].get_string();
+			_varTmpBuffer = item[ column_ ].get_string();
 		break;
 		case ( TYPE::HTIME ):
-			_varTmpBuffer = item [ column_ ].get_time();
+			_varTmpBuffer = item[ column_ ].get_time();
 		break;
 		default :
 			M_THROW( "unknown type", type_.value() );
