@@ -63,7 +63,7 @@ public:
 	 */
 	struct ORowBuffer {
 		int _idColNo;
-		yaal::hconsole::HItem _item;
+		yaal::hconsole::HInfoItem _item;
 		ORowBuffer( int idColNo_, int size_ ) : _idColNo( idColNo_ ), _item( size_ ) {}
 	};
 protected:

@@ -103,7 +103,7 @@ int long HDataListControl::get_current_id( void ) {
 
 void HDataListControl::add_new( void ) {
 	M_PROLOG
-	_dataControler->add_tail( HItem( static_cast<int>( _header.size() ) ) );
+	_dataControler->add_tail( HInfoItem( static_cast<int>( _header.size() ) ) );
 	process_input( KEY_CODES::HOME );
 	process_input( KEY_CODES::END );
 	return;

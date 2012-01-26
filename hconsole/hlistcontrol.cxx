@@ -1062,24 +1062,24 @@ HAbstractRow::~HAbstractRow( void ) {
 
 template<>
 void HRow<>::switch_state( void ) {
-	_iterator->m_bChecked = ! _iterator->m_bChecked;
+	_iterator->_checked = ! _iterator->_checked;
 	return;
 }
 
 template<>
 bool HRow<>::get_checked( void ) {
-	return ( _iterator->m_bChecked );
+	return ( _iterator->_checked );
 }
 
 template<>
 int long HRow<>::get_id( void ) {
-	return ( _iterator->m_lId );
+	return ( _iterator->_id );
 }
 
 template<>
-HRow<>::HRow( iterator_t& it_ ) : _iterator( it_ ), _cells( it_->get_size() ) {
+HRow<>::HRow( iterator_t& it_ ) : _iterator( it_ ), _cells( it_->get_value_count() ) {
 	M_PROLOG
-	int long cellCount = it_->get_size();
+	int long cellCount = it_->get_value_count();
 	for ( int i = 0; i < cellCount; ++ i )
 		_cells[ i ] = make_pointer<HCell<> >( ref( _iterator ), i );
 	return;
@@ -1100,11 +1100,11 @@ void HCell<>::set_child_control_data( HControl* control_ ) {
 }
 
 template<>
-bool CompareListControlItems<>::operator() ( HItem const& left_,
-		HItem const& right_ ) const {
+bool CompareListControlItems<>::operator() ( HInfoItem const& left_,
+		HInfoItem const& right_ ) const {
 	M_PROLOG
-	HItem const& left = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? left_ : right_;
-	HItem const& right = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? right_ : left_;
+	HInfoItem const& left = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? left_ : right_;
+	HInfoItem const& right = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? right_ : left_;
 	return ( list_control_helper::compare_cells( left[ _sortHelper._sortColumn ],
 				right[ _sortHelper._sortColumn ], _sortHelper ) );
 	M_EPILOG

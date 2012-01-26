@@ -160,7 +160,7 @@ public:
  *
  * \tparam tType - basic unit of data held in list model.
  */
-template<typename tType = yaal::hcore::HList<HItem>::iterator>
+template<typename tType = yaal::hcore::HList<HInfoItem>::iterator>
 class HCell : public HAbstractCell {
 	int _column;
 	tType& _data;
@@ -189,7 +189,7 @@ public:
  *
  * \tparam tType - iterator to basic unit of data held in list model.
  */
-template<typename tType = yaal::hcore::HList<HItem>::iterator>
+template<typename tType = yaal::hcore::HList<HInfoItem>::iterator>
 class HRow : public HAbstractRow {
 	typedef tType iterator_t;
 	typedef yaal::hcore::HArray<HAbstractCell::ptr_t> cells_t;
@@ -282,7 +282,7 @@ private:
  *
  * \tparam tType - basic unit of data held in list model.
  */
-template<typename tType = HItem>
+template<typename tType = HInfoItem>
 class HListControler : public HAbstractControler {
 public:
 	typedef yaal::hcore::HList<tType> model_t;
@@ -475,7 +475,7 @@ namespace list_control_helper {
 
 /*! \brief HListControl sort helper functor.
  */
-template<typename tType = HItem>
+template<typename tType = HInfoItem>
 class CompareListControlItems {
 	list_control_helper::OSortHelper& _sortHelper;
 public:

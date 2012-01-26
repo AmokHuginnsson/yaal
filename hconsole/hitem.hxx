@@ -37,47 +37,87 @@ namespace hconsole {
 /*! \brief Basic data unit stored in HListControl and HTreeControl.
  */
 template <typename tType = yaal::hcore::HInfo>
-class HItem_t : public hcore::HArray<tType> {
+class HItem {
 public:
-	int long	m_lId;
-	bool	m_bChecked;
-	HItem_t ( int = 0 );
-	virtual ~HItem_t ( void );
-	HItem_t ( HItem_t const &, int );
-	HItem_t & operator = ( HItem_t const & );
+	typedef tType value_type;
+	typedef HItem<tType> this_type;
+	typedef hcore::HArray<value_type> data_t;
+private:
+	data_t _data;
+public:
+	int long	_id;
+	bool	_checked;
+	HItem( int = 0 );
+	virtual ~HItem ( void );
+	HItem( HItem const& );
+	HItem& operator = ( HItem const& );
+	void swap( HItem& );
+	value_type& operator[]( int );
+	value_type const& operator[]( int ) const;
+	int get_value_count( void ) const;
 };
 
 template <typename tType>
-HItem_t<tType>::HItem_t ( int size_ ) : hcore::HArray<tType> ( size_ ),
-															 m_lId ( 0 ), m_bChecked ( false ) {
+HItem<tType>::HItem( int size_ )
+	: _data( size_ ), _id( 0 ), _checked( false ) {
 	return;
 }
 
 template <typename tType>
-HItem_t<tType>::~HItem_t ( void ) {
+HItem<tType>::~HItem ( void ) {
 	return;
 }
 
 template <typename tType>
-HItem_t<tType>::HItem_t ( HItem_t const & item_, int ) : hcore::HArray<tType> ( item_ ),
-	m_lId ( item_.m_lId ), m_bChecked ( item_.m_bChecked ) {
+HItem<tType>::HItem( HItem const& item_ )
+	: _data( item_._data ), _id ( item_._id ), _checked ( item_._checked ) {
 	return;
 }
 
 template <typename tType>
-HItem_t<tType> & HItem_t<tType>::operator = ( HItem_t<tType> const & item_ ) {
+HItem<tType>& HItem<tType>::operator = ( HItem const& item_ ) {
 	M_PROLOG
-	if ( this != & item_ ) {
-		hcore::HArray<tType>::operator = ( item_ );
-		m_lId = item_.m_lId;
-		m_bChecked = item_.m_bChecked;
+	if ( this != &item_ ) {
+		HItem tmp( item_ );
+		swap( tmp );
 	}
 	return ( *this );
 	M_EPILOG
 }
 
-typedef HItem_t<> HItem;
+template <typename tType>
+void HItem<tType>::swap( HItem& item_ ) {
+	if ( &item_ != this ) {
+		using yaal::swap;
+		swap( _data, item_._data );
+		swap( _id, item_._id );
+		swap( _checked, item_._checked );
+	}
+	return;
+}
 
+template <typename tType>
+tType& HItem<tType>::operator[]( int idx_ ) {
+	return ( _data[ idx_ ] );
+}
+
+template <typename tType>
+tType const& HItem<tType>::operator[]( int idx_ ) const {
+	return ( _data[ idx_ ] );
+}
+
+template <typename tType>
+int HItem<tType>::get_value_count( void ) const {
+	return ( static_cast<int>( _data.get_size() ) );
+}
+
+typedef HItem<> HInfoItem;
+
+}
+
+template <typename tType>
+inline void swap( yaal::hconsole::HItem<tType>& a, yaal::hconsole::HItem<tType>& b ) {
+	a.swap( b );
 }
 
 }

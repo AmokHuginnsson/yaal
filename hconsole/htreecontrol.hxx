@@ -55,7 +55,7 @@ protected:
 		int _rowRaw;
 		int	_columnRaw;
 		int _widthRaw;
-		HItem _data;
+		HInfoItem _data;
 	public:
 		HNodeControl( int = 0 );
 		virtual ~HNodeControl ( void );

@@ -135,7 +135,7 @@ int HTreeControl::draw_node( tree_t::node_t node_, int row_ ) {
 	int row = row_;
 	HConsole& cons = HConsole::get_instance();
 	M_ASSERT( node_ );
-	if ( (**node_)._data.get_size() ) {
+	if ( (**node_)._data.get_value_count() ) {
 		row ++;
 		HInfo const& info = (**node_)._data[ 0 ];
 		HString const& str = info.get<HString const&>();
