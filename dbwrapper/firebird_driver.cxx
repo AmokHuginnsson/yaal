@@ -125,8 +125,10 @@ M_EXPORT_SYMBOL void db_disconnect( ODBLink& );
 M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
 	M_ASSERT( db );
-	isc_detach_database( db->_status, &db->_db );
-	M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
+	if ( db->_db ) {
+		isc_detach_database( db->_status, &db->_db );
+		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
+	}
 	M_SAFE( delete db );
 	dbLink_.clear();
 	return;
