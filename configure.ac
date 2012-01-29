@@ -188,13 +188,16 @@ if test ["$POSTGRES"] != ["no"] ; then
 fi
 if test ["$MYSQL"] != ["no"] ; then
 	AC_CHECK_LIB([mysqlclient],[mysql_init],[],[
-			CXXFLAGS=["$CXXFLAGS -L/usr/local/lib/mysql"]
+			CXXFLAGS_ORIG="${CXXFLAGS}"
+			CXXFLAGS=["$CXXFLAGS_ORIG -L/usr/local/lib/mysql"]
 			unset ac_cv_lib_mysqlclient_mysql_init
-			AC_CHECK_LIB([mysqlclient],[mysql_init],[
-				EXTRA_LIB_PATHS="-L/usr/local/lib/mysql"],
-				[if test ["$MYSQL"] = ["yes"] ; then
-					AC_MSG_ERROR([Cannot continue without MySQL.])
-				fi;MYSQL=["no"]])])
+			AC_CHECK_LIB([mysqlclient],[mysql_init],[EXTRA_LIB_PATHS="-L/usr/local/lib/mysql"],[
+				CXXFLAGS=["$CXXFLAGS_ORIG -L/usr/lib64/mysql/"]
+				unset ac_cv_lib_mysqlclient_mysql_init
+				AC_CHECK_LIB([mysqlclient],[mysql_init],[EXTRA_LIB_PATHS="-L/usr/lib64/mysql/"],[
+					if test ["$MYSQL"] = ["yes"] ; then
+						AC_MSG_ERROR([Cannot continue without MySQL.])
+					fi;MYSQL=["no"]])])])
 	CXXFLAGS=$CXXFLAGS_ORIG
 	LIBS=""
 fi
