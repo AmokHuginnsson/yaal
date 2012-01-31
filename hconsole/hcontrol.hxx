@@ -30,7 +30,7 @@ Copyright:
 #include "hconsole/console.hxx"
 #include "hcore/hpointer.hxx"
 #include "hcore/hstring.hxx"
-#include "hcore/hinfo.hxx"
+#include "hconsole/hinfo.hxx"
 
 namespace yaal {
 
@@ -157,7 +157,7 @@ public:
  *
  * \param data - Data that shall be stored inside of this control.
  */
-	virtual void set( hcore::HInfo const& data );
+	virtual void set( HInfo const& data );
 
 /*! \brief Interface for getting control data.
  *
@@ -166,7 +166,7 @@ public:
  *
  * \return Data that has been stored inside of this control.
  */
-	virtual hcore::HInfo get( void );
+	virtual HInfo const& get( void ) const;
 
 /*! \brief Interface for checking is particular control instance support searching.
  *

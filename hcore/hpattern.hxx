@@ -86,7 +86,15 @@ public:
 	int parse_re( HString const& pattern );
 	HString const& error( void ) const;
 	int error_code( void ) const;
-	HMatchIterator find( char const* const ) const;
+	/*! \brief Find substring matching this patter in given string.
+	 *
+	 * \param string_ - string to search through.
+	 * \return HMatchIterator pointing to first match or end of matches HMatchIterator.
+	 *
+	 * Parameter must be raw memory pointer for HMatchIterator returns
+	 * raw memory pointers to input string while dereferenced.
+	 */
+	HMatchIterator find( char const* const string_ ) const;
 	HMatchIterator end( void ) const;
 private:
 	char const* error_message( int = 0 ) const;

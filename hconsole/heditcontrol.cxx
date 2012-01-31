@@ -134,9 +134,15 @@ void HEditControl::do_refresh( void ) {
 	M_EPILOG
 }
 
-HInfo HEditControl::get( void ) {
+HString const& HEditControl::get_text( void ) const {
 	M_PROLOG
-	return ( HInfo( _string ) );
+	return ( _string );
+	M_EPILOG
+}
+
+HInfo const& HEditControl::get( void ) const {
+	M_PROLOG
+	return ( HInfoString( _string ) );
 	M_EPILOG
 }
 
@@ -497,16 +503,15 @@ int HEditControl::do_process_input ( int code_ ) {
 	M_EPILOG
 }
 
-void HEditControl::set( HInfo const& info_ ) {
+void HEditControl::set_text( HString const& string_ ) {
 	M_PROLOG
-	int length = 0;
-	char const* string = info_.get<char const *>();
+	int length( 0 );
 	HString errorMessage;
-	_pattern.find( string );
+	_pattern.find( string_.raw() );
 	int errorCode = _pattern.error_code();
 	if ( errorCode )
 		M_THROW( _pattern.error(), errorCode );
-	_string = string;
+	_string = string_;
 	length = static_cast<int>( _string.get_length() );
 	_controlOffset = 0;
 	if ( length >= _widthRaw ) {
@@ -515,6 +520,13 @@ void HEditControl::set( HInfo const& info_ ) {
 	} else
 		_cursorPosition = length;
 	schedule_refresh();
+	return;
+	M_EPILOG
+}
+
+void HEditControl::set( HInfo const& info_ ) {
+	M_PROLOG
+	set_text( info_.get_string() );
 	return;
 	M_EPILOG
 }

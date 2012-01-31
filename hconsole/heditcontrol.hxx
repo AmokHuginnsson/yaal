@@ -98,9 +98,11 @@ public:
 								bool password = false, int maxhist = 8 );
 	virtual ~HEditControl( void );
 	void set_flags( bool = false, bool = false );
-	virtual hcore::HInfo get( void );
+	virtual HInfo const& get( void ) const;
 	virtual int set_focus( char = 0 );
-	virtual void set( hcore::HInfo const& );
+	virtual void set( HInfo const& );
+	void set_text( yaal::hcore::HString const& );
+	yaal::hcore::HString const& get_text( void ) const;
 protected:
 	virtual void do_refresh( void );
 	virtual int do_process_input( int );

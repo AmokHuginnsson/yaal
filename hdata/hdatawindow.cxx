@@ -261,7 +261,7 @@ void HDataWindow::sync( HRecordSet::iterator it ) {
 	M_ASSERT( _documentMode == DOCUMENT::VIEW );
 	int long count = _syncStore->_item.get_value_count();
 	for ( int i = 0; i < count; i ++ )
-		_syncStore->_item[ i ]( it[ i ]->raw() );
+		_syncStore->_item[ i ].set_string( *it[ i ] );
 	if ( _syncStore->_idColNo >= 0 )
 		_syncStore->_item._id = lexical_cast<int>( *it[ _syncStore->_idColNo ] );
 	M_EPILOG
@@ -272,7 +272,7 @@ void HDataWindow::sync( void ) {
 	M_ASSERT( _documentMode == DOCUMENT::EDIT );
 	int count = static_cast<int>( _editModeControls.size() );
 	for ( int i = 0; i < count; i ++ )
-		(*_dB)[ i ] = _editModeControls[ i ]->get().get<HString const&>();
+		(*_dB)[ i ] = _editModeControls[ i ]->get().get_string();
 	return;
 	M_EPILOG
 }

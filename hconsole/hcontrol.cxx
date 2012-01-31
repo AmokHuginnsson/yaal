@@ -166,9 +166,9 @@ void HControl::set( HInfo const & ) {
 	M_EPILOG
 }
 
-HInfo HControl::get( void ) {
+HInfo const& HControl::get( void ) const {
 	M_PROLOG
-	HInfo info;
+	static HInfoMultiVal info;
 	return ( info );
 	M_EPILOG
 }

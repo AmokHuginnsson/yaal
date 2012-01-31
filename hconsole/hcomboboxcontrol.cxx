@@ -152,7 +152,7 @@ void HComboboxControl::close_combo( void ) {
 	M_PROLOG
 	_mode = MODE::EDITCONTROL;
 	if ( _controler->empty() )
-		HEditControl::set( (*_cursor)[ 0 ].get_string() );
+		set_text( (*_cursor)[ 0 ].get_string() );
 	_parent->schedule_refresh();
 	return;
 	M_EPILOG

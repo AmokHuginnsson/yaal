@@ -59,7 +59,8 @@ protected:
 	public:
 		HNodeControl( int = 0 );
 		virtual ~HNodeControl ( void );
-		yaal::hcore::HInfo& operator[]( int );
+		HInfo const& operator[]( int ) const;
+		HInfo& operator[]( int );
 	protected:
 		void expand( void );
 		void collapse( void );

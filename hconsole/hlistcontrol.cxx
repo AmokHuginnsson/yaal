@@ -913,17 +913,16 @@ bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHe
 	bool lower = false;
 	switch ( sortHelper_._type.value() ) {
 		case ( TYPE::INT_LONG ):
-			lower = left_.get<long>() < right_.get<long>();
+			lower = left_.get_int_long() < right_.get_int_long();
 		break;
 		case ( TYPE::DOUBLE ):
-			lower = left_.get<double>() < right_.get<double>();
+			lower = left_.get_double() < right_.get_double();
 		break;
 		case ( TYPE::HSTRING ):
-			lower = strcasecmp( left_.get<HString const &>(),
-					 right_.get<HString const&>() ) < 0;
+			lower = strcasecmp( left_.get_string(), right_.get_string() ) < 0;
 		break;
 		case ( TYPE::HTIME ):
-			lower = left_.get<HTime const&>().raw() < right_.get<HTime const&>().raw();
+			lower = left_.get_time().raw() < right_.get_time().raw();
 		break;
 		default:
 			break;
@@ -961,28 +960,28 @@ void HAbstractControler::add_tail( void ) {
 template<>
 yaal::hcore::HString const HCell<>::get_long( void ) {
 	M_PROLOG
-	return ( HString ( (*_data)[ _column ].get<int long>() ) );
+	return ( HString ( (*_data)[ _column ].get_int_long() ) );
 	M_EPILOG
 }
 
 template<>
 yaal::hcore::HString const HCell<>::get_double( void ) {
 	M_PROLOG
-	return ( HString ( (*_data)[ _column ].get<double>() ) );
+	return ( HString ( (*_data)[ _column ].get_double() ) );
 	M_EPILOG
 }
 
 template<>
 yaal::hcore::HString const HCell<>::get_string( void ) {
 	M_PROLOG
-	return ( (*_data)[ _column ].get<yaal::hcore::HString const &>() );
+	return ( (*_data)[ _column ].get_string() );
 	M_EPILOG
 }
 
 template<>
 yaal::hcore::HString HCell<>::get_time( void ) {
 	M_PROLOG
-	return ( ( (*_data)[ _column ].get<yaal::hcore::HTime const &>() ).string() );
+	return ( ( (*_data)[ _column ].get_time() ).string() );
 	M_EPILOG
 }
 

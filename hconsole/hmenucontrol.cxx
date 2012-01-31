@@ -44,8 +44,8 @@ int HMenuControl::load_sub_menu( tree_t::node_t node, OMenuItem* subMenu_ ) {
 	HString str;
 	while ( ! subMenu_[ ctr ]._label.is_empty() ) {
 		HNodeControl info( 1 );
-		info[ 0 ]( subMenu_ [ ctr ]._label );
-		info[ 0 ]( static_cast<void*>( &subMenu_[ ctr ] ) );
+		info[ 0 ].set_string( subMenu_ [ ctr ]._label );
+		info[ 0 ].set_pointer( static_cast<void*>( &subMenu_[ ctr ] ) );
 		tree_t::HNode::iterator it = node->add_node( info );
 		if ( subMenu_ [ ctr ]._subMenu )
 			load_sub_menu( &*it, subMenu_[ ctr ]._subMenu );
@@ -100,7 +100,7 @@ int HMenuControl::do_process_input( int code_ ) {
 		M_THROW ( _ ( "menu not initialized" ), errno );
 	code_ = HTreeControl::do_process_input ( code_ );
 	if ( ( code_ == '\r' ) || ( code_ == ' ' ) ) {
-		menu = static_cast<OMenuItem*>( (**_selected)[ 0 ].get<void*>() );
+		menu = static_cast<OMenuItem*>( (**_selected)[ 0 ].get_pointer() );
 		if ( menu->HANDLER )
 			menu->call( _process );
 		code_ = 0;

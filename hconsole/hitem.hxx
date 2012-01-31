@@ -28,15 +28,17 @@ Copyright:
 #define YAAL_HCONSOLE_HITEM_HXX_INCLUDED 1
 
 #include "hcore/harray.hxx"
-#include "hcore/hinfo.hxx"
+#include "hconsole/hinfo.hxx"
 
 namespace yaal {
 
 namespace hconsole {
 
 /*! \brief Basic data unit stored in HListControl and HTreeControl.
+ *
+ * tType myst be subclass of HInfo.
  */
-template <typename tType = yaal::hcore::HInfo>
+template <typename tType = HInfoMultiVal>
 class HItem {
 public:
 	typedef tType value_type;
@@ -52,8 +54,8 @@ public:
 	HItem( HItem const& );
 	HItem& operator = ( HItem const& );
 	void swap( HItem& );
-	value_type& operator[]( int );
-	value_type const& operator[]( int ) const;
+	HInfo& operator[]( int );
+	HInfo const& operator[]( int ) const;
 	int get_value_count( void ) const;
 };
 
@@ -97,12 +99,12 @@ void HItem<tType>::swap( HItem& item_ ) {
 }
 
 template <typename tType>
-tType& HItem<tType>::operator[]( int idx_ ) {
+HInfo& HItem<tType>::operator[]( int idx_ ) {
 	return ( _data[ idx_ ] );
 }
 
 template <typename tType>
-tType const& HItem<tType>::operator[]( int idx_ ) const {
+HInfo const& HItem<tType>::operator[]( int idx_ ) const {
 	return ( _data[ idx_ ] );
 }
 

@@ -52,6 +52,12 @@ HTreeControl::HNodeControl::~HNodeControl( void ) {
 	M_EPILOG
 }
 
+HInfo const& HTreeControl::HNodeControl::operator[]( int idx ) const {
+	M_PROLOG
+	return ( _data[ idx ] );
+	M_EPILOG
+}
+
 HInfo& HTreeControl::HNodeControl::operator[]( int idx ) {
 	M_PROLOG
 	return ( _data[ idx ] );
@@ -138,7 +144,7 @@ int HTreeControl::draw_node( tree_t::node_t node_, int row_ ) {
 	if ( (**node_)._data.get_value_count() ) {
 		row ++;
 		HInfo const& info = (**node_)._data[ 0 ];
-		HString const& str = info.get<HString const&>();
+		HString const& str = info.get_string();
 		(**node_)._rowRaw = row;
 		(**node_)._columnRaw = _columnRaw + node_->get_level() * 2 - 1;
 		(**node_)._widthRaw = static_cast<int>( str.get_length() ) + 2;

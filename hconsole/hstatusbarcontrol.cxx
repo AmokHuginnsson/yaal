@@ -156,7 +156,7 @@ void HStatusBarControl::set_prompt( char const* prompt_, PROMPT::mode_t mode_,
 		_prompt = prompt_;
 		_promptLength = static_cast<int>( _prompt.get_length() );
 	}
-	HEditControl::set ( "" ); /* refresh call inside */
+	set_text( "" ); /* refresh call inside */
 	return;
 	M_EPILOG
 }
@@ -262,7 +262,7 @@ void HStatusBarControl::message( int attribute_,
 				HConsole::get_instance().bell();
 		} else
 			_varTmpBuffer.clear();
-		set( _varTmpBuffer );
+		set_text( _varTmpBuffer );
 		if ( ! ( _statusBarAttribute & 0x00ff ) )
 			_statusBarAttribute |= ( _attributeEnabled & 0x00ff );
 		_attributeEnabled &= 0xff00;
@@ -285,7 +285,7 @@ void HStatusBarControl::message( char const* format_, ... ) {
 				HConsole::get_instance().bell();
 		} else
 			_varTmpBuffer.clear();
-		set( _varTmpBuffer );
+		set_text( _varTmpBuffer );
 		schedule_refresh();
 	}
 	return;
@@ -296,7 +296,7 @@ void HStatusBarControl::clear( int attribute_ ) {
 	M_PROLOG
 	if ( ! _focused ) {
 		_varTmpBuffer.clear();
-		set( _varTmpBuffer );
+		set_text( _varTmpBuffer );
 		if ( ! ( _statusBarAttribute & 0x00ff ) )
 			_statusBarAttribute |= ( _attributeEnabled & 0x00ff );
 		_attributeEnabled &= 0xff00;
