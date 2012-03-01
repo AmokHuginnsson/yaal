@@ -56,8 +56,13 @@ HString _instanceName_;
 
 extern "C" {
 
-M_EXPORT_SYMBOL char* TABLE_LIST_QUERY = const_cast<char*>( "SELECT LOWER( table_name ) FROM user_tables;" );
-M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT LOWER(column_name) FROM user_tab_columns WHERE table_name = UPPER('%s') ORDER BY column_id;" );
+M_EXPORT_SYMBOL char* TABLE_LIST_QUERY = const_cast<char*>(
+		"SELECT LOWER( table_name ) FROM user_tables;" );
+M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>(
+		"SELECT LOWER( column_name )"
+		" FROM user_tab_columns"
+		" WHERE table_name = UPPER( '%s' )"
+		" ORDER BY column_id;" );
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 0;
 
 typedef struct {
@@ -106,6 +111,7 @@ private:
 
 void yaal_oracle_db_disconnect( ODBLink& );
 void yaal_oracle_rs_unquery( void* );
+char const* yaal_oracle_rs_get( void*, int long, int );
 
 M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
 		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
@@ -245,7 +251,7 @@ void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 		oracle->_status = OCIStmtExecute( oracle->_serviceContext,
 				queryObj->_statement, oracle->_error, iters, 0,
 				NULL, NULL,
-				OCI_DEFAULT | OCI_COMMIT_ON_SUCCESS | OCI_STMT_SCROLLABLE_READONLY );
+				OCI_DEFAULT | OCI_COMMIT_ON_SUCCESS | ( iters == 0 ? OCI_STMT_SCROLLABLE_READONLY : 0 ) );
 		bool fail( false );
 		typedef HArray<OCIParam*> params_t;
 		params_t params;
@@ -322,7 +328,7 @@ void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 					}
 					if ( fail )
 						break;
-				} else {
+				} else if ( iters == 0 ) {
 					fail = true;
 					break;
 				}
@@ -364,8 +370,7 @@ M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
 	yaal_oracle_rs_unquery( data_ );
 }
 
-M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
-M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
+char const* yaal_oracle_rs_get( void* data_, int long row_, int column_ ) {
 	OQuery* query( static_cast<OQuery*>( data_ ) );
 	OQuery::OFieldInfo& fi( query->_fieldInfos[column_] );
 	char const* ptr( NULL );
@@ -375,62 +380,60 @@ M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 		ptr = fi._buffer;
 	return ( fi._isNull ? NULL : ptr );
 }
+M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
+M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
+	return ( yaal_oracle_rs_get( data_, row_, column_ ) );
+}
 
 M_EXPORT_SYMBOL int rs_fields_count( void* );
 M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
-	int fields( -1 );
 	OQuery* query( static_cast<OQuery*>( data_ ) );
-	if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
-					OCI_HTYPE_STMT, &fields, 0, OCI_ATTR_PARAM_COUNT,
-					query->_error ) ) != OCI_SUCCESS )
-		fields = -1;
-	return ( fields );
+	return ( static_cast<int>( query->_fieldInfos.get_size() ) );
 }
 
 M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 	int rows( 0 );
 	OQuery* query( static_cast<OQuery*>( dataR_ ) );
-	( *query->_status ) = OCIStmtFetch2( query->_statement,
-			 query->_error, 1,
-			 OCI_FETCH_LAST, 0,
-			 OCI_DEFAULT );
-	if ( ( ( *query->_status ) != OCI_SUCCESS )
-			&& ( ( *query->_status ) != OCI_SUCCESS_WITH_INFO ) ) {
-		log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to fetch last row." << endl;
-		return ( -1 );
+	if ( ! query->_fieldInfos.is_empty() ) {
+		( *query->_status ) = OCIStmtFetch2( query->_statement,
+				 query->_error, 1,
+				 OCI_FETCH_LAST, 0,
+				 OCI_DEFAULT );
+		if ( ( *query->_status ) != OCI_NO_DATA ) {
+			if ( ( ( *query->_status ) != OCI_SUCCESS )
+					&& ( ( *query->_status ) != OCI_SUCCESS_WITH_INFO ) ) {
+				log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to fetch last row." << endl;
+				rows = -1;
+			}
+		}
 	}
-	if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
-					OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_CURRENT_POSITION,
-					query->_error ) ) != OCI_SUCCESS ) {
-		if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
-						OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_ROW_COUNT,
-						query->_error ) ) != OCI_SUCCESS )
-			rows = -1;
+	if ( rows != -1 ) {
+		if ( ! query->_fieldInfos.is_empty() ) {
+			if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
+							OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_CURRENT_POSITION,
+							query->_error ) ) != OCI_SUCCESS ) {
+				if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
+								OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_ROW_COUNT,
+								query->_error ) ) != OCI_SUCCESS )
+					rows = -1;
+			}
+		} else {
+			if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
+							OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_ROW_COUNT,
+							query->_error ) ) != OCI_SUCCESS )
+				rows = -1;
+		}
 	}
 	return ( rows );
 }
 
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
-M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* dataR_ ) {
+M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
-	int nameLength( 0 );
-	int long id( 0 );
-	HString sQL;
-	text* name( NULL );
-	OQuery* query( static_cast<OQuery*>( dataR_ ) );
-	OQuery* autonumber( NULL );
-	if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
-					OCI_HTYPE_STMT, &name,
-					reinterpret_cast<ub4*>( &nameLength ),
-					OCI_ATTR_NAME, query->_error ) ) == OCI_SUCCESS ) {
-		name[ nameLength ] = 0;
-		sQL.format ( "SELECT %s_sequence.currval FROM dual;",
-				reinterpret_cast<char*>( name ) );
-		autonumber = static_cast<OQuery*>( yaal_oracle_db_query( dbLink_, sQL.raw() ) );
-		id = strtol( rs_get( autonumber, 0, 0 ), NULL, 10 );
-		yaal_oracle_rs_unquery( autonumber );
-	}
+	OQuery* autonumber( static_cast<OQuery*>( yaal_oracle_db_query( dbLink_, "SELECT SYS_CONTEXT( 'CLIENTCONTEXT', 'LAST_INSERT_ID' ) FROM dual" ) ) );
+	int long id( strtol( yaal_oracle_rs_get( autonumber, 0, 0 ), NULL, 10 ) );
+	yaal_oracle_rs_unquery( autonumber );
 	return ( id );
 }
 
