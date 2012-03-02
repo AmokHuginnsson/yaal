@@ -57,6 +57,8 @@ template<> struct is_pod<int> { static bool const value = true; typedef trait::t
 template<> struct is_pod<int unsigned> { static bool const value = true; typedef trait::true_type type; };
 template<> struct is_pod<int long> { static bool const value = true; typedef trait::true_type type; };
 template<> struct is_pod<int long unsigned> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<int long long> { static bool const value = true; typedef trait::true_type type; };
+template<> struct is_pod<int long long unsigned> { static bool const value = true; typedef trait::true_type type; };
 template<> struct is_pod<double> { static bool const value = true; typedef trait::true_type type; };
 template<> struct is_pod<double long> { static bool const value = true; typedef trait::true_type type; };
 template<> struct is_pod<float> { static bool const value = true; typedef trait::true_type type; };
@@ -131,6 +133,18 @@ struct is_integral<int long> {
 
 template<>
 struct is_integral<int long unsigned> {
+	static bool const value = true;
+	typedef trait::true_type type;
+};
+
+template<>
+struct is_integral<int long long> {
+	static bool const value = true;
+	typedef trait::true_type type;
+};
+
+template<>
+struct is_integral<int long long unsigned> {
 	static bool const value = true;
 	typedef trait::true_type type;
 };

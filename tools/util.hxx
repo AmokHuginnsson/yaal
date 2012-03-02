@@ -42,6 +42,13 @@ namespace tools {
  */
 namespace util {
 
+template<typename T>
+T hton( T v_ ) {
+	STATIC_ASSERT( is_numeric<T>::value ); 
+	reverse( static_cast<char*>( static_cast<void*>( &v_ ) ), static_cast<char*>( static_cast<void*>( &v_ ) ) + sizeof ( v_ ) );
+	return ( v_ );
+}
+
 template<typename iter_t, typename pred_t>
 iter_t find_local( iter_t it, iter_t end, pred_t pred ) {
 	for ( ; it != end; ++ it )

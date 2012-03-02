@@ -55,6 +55,17 @@ class HBinaryFormatter {
 	yaal::hcore::HStreamInterface* _stream;
 public:
 	HBinaryFormatter( yaal::hcore::HStreamInterface* );
+	HBinaryFormatter& operator << ( int short );
+	HBinaryFormatter& operator << ( int short unsigned );
+	HBinaryFormatter& operator << ( int );
+	HBinaryFormatter& operator << ( int unsigned );
+	HBinaryFormatter& operator << ( int long );
+	HBinaryFormatter& operator << ( int long unsigned );
+	HBinaryFormatter& operator << ( int long long );
+	HBinaryFormatter& operator << ( int long long unsigned );
+	HBinaryFormatter& operator << ( float );
+	HBinaryFormatter& operator << ( double );
+	HBinaryFormatter& operator << ( double long );
 	template<typename T>
 	HBinaryFormatter& operator << ( T const& v ) {
 		return ( binary( &v, sizeof ( T ) ) );

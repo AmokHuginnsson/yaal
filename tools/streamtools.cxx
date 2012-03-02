@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <arpa/inet.h>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
@@ -32,8 +34,10 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/hsocket.hxx"
 #include "hcore/hnumber.hxx"
 #include "hcore/htime.hxx"
+#include "util.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::tools::util;
 
 namespace yaal {
 
@@ -46,6 +50,83 @@ HBinaryFormatter::HBinaryFormatter( HStreamInterface* stream_ )
 HStreamInterface& HBinaryFormatter::operator << ( HStreamInterface::manipulator_t M ) {
 	M_PROLOG
 	return ( M( *_stream) );
+	M_EPILOG
+}
+
+HBinaryFormatter& HBinaryFormatter::operator << ( int short v_ ) {
+	M_PROLOG
+	int short v( htons( v_ ) );
+	return ( binary( &v, sizeof ( v ) ) );
+	M_EPILOG
+}
+
+HBinaryFormatter& HBinaryFormatter::operator << ( int short unsigned v_ ) {
+	M_PROLOG
+	int short v( htons( v_ ) );
+	return ( binary( &v, sizeof ( v ) ) );
+	M_EPILOG
+}
+
+HBinaryFormatter& HBinaryFormatter::operator << ( int v_ ) {
+	M_PROLOG
+	int v( htonl( v_ ) );
+	return ( binary( &v, sizeof ( v ) ) );
+	M_EPILOG
+}
+
+HBinaryFormatter& HBinaryFormatter::operator << ( int unsigned v_ ) {
+	M_PROLOG
+	int unsigned v( htonl( v_ ) );
+	return ( binary( &v, sizeof ( v ) ) );
+	M_EPILOG
+}
+
+HBinaryFormatter& HBinaryFormatter::operator << ( int long v_ ) {
+	M_PROLOG
+	int long v( hton( v_ ) );
+	return ( binary( &v, sizeof ( v ) ) );
+	M_EPILOG
+}
+
+HBinaryFormatter& HBinaryFormatter::operator << ( int long unsigned v_ ) {
+	M_PROLOG
+	int long unsigned v( hton( v_ ) );
+	return ( binary( &v, sizeof ( v ) ) );
+	M_EPILOG
+}
+
+HBinaryFormatter& HBinaryFormatter::operator << ( int long long v_ ) {
+	M_PROLOG
+	int long long v( hton( v_ ) );
+	return ( binary( &v, sizeof ( v ) ) );
+	M_EPILOG
+}
+
+HBinaryFormatter& HBinaryFormatter::operator << ( int long long unsigned v_ ) {
+	M_PROLOG
+	int long long unsigned v( hton( v_ ) );
+	return ( binary( &v, sizeof ( v ) ) );
+	M_EPILOG
+}
+
+HBinaryFormatter& HBinaryFormatter::operator << ( float v_ ) {
+	M_PROLOG
+	float v( hton( v_ ) );
+	return ( binary( &v, sizeof ( v ) ) );
+	M_EPILOG
+}
+
+HBinaryFormatter& HBinaryFormatter::operator << ( double v_ ) {
+	M_PROLOG
+	double v( hton( v_ ) );
+	return ( binary( &v, sizeof ( v ) ) );
+	M_EPILOG
+}
+
+HBinaryFormatter& HBinaryFormatter::operator << ( double long v_ ) {
+	M_PROLOG
+	double long v( hton( v_ ) );
+	return ( binary( &v, sizeof ( v ) ) );
 	M_EPILOG
 }
 
