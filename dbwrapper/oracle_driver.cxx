@@ -220,17 +220,12 @@ void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 	OOracle* oracle( static_cast<OOracle*>( dbLink_._conn ) );
 	OQuery* queryObj( new OQuery( &oracle->_status ) );
 	HString queryStr( query_ );
-	int length( static_cast<int>( ::strlen( query_ ) ) );
-	char* end( ( const_cast<char*>( query_ ) + length ) - 1 );
-	
-	if ( ( *end ) == ';' ) {
-		( *end ) = 0;
-		-- length;
-	}
+	queryStr.trim();
+	queryStr.trim_right( ";" );
 	oracle->_status = OCIStmtPrepare2( oracle->_serviceContext,
 			&queryObj->_statement, oracle->_error,
-			reinterpret_cast<OraText const*>( query_ ),
-			length, NULL, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
+			reinterpret_cast<OraText const*>( queryStr.raw() ),
+			static_cast<ub4>( queryStr.get_length() ), NULL, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
 	queryObj->_error = oracle->_error;
 	if ( ( oracle->_status != OCI_SUCCESS )
 			&& ( oracle->_status != OCI_SUCCESS_WITH_INFO ) ) {
@@ -355,9 +350,9 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 
 void yaal_oracle_rs_unquery( void* data_ ) {
 	OQuery* query( static_cast<OQuery*>( data_ ) );
-	if ( ( ( * query->_status ) == OCI_SUCCESS )
-			|| ( ( * query->_status ) == OCI_SUCCESS_WITH_INFO ) )
-		( * query->_status ) = OCIStmtRelease( query->_statement,
+	if ( ( ( *query->_status ) == OCI_SUCCESS )
+			|| ( ( *query->_status ) == OCI_SUCCESS_WITH_INFO ) )
+		( *query->_status ) = OCIStmtRelease( query->_statement,
 				query->_error, NULL, 0, OCI_DEFAULT );
 	else
 		OCIStmtRelease( query->_statement,
@@ -396,6 +391,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 	int rows( 0 );
 	OQuery* query( static_cast<OQuery*>( dataR_ ) );
 	if ( ! query->_fieldInfos.is_empty() ) {
+		/* We have SELECT statement. */
 		( *query->_status ) = OCIStmtFetch2( query->_statement,
 				 query->_error, 1,
 				 OCI_FETCH_LAST, 0,
@@ -408,23 +404,10 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 			}
 		}
 	}
-	if ( rows != -1 ) {
-		if ( ! query->_fieldInfos.is_empty() ) {
-			if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
-							OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_CURRENT_POSITION,
-							query->_error ) ) != OCI_SUCCESS ) {
-				if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
-								OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_ROW_COUNT,
-								query->_error ) ) != OCI_SUCCESS )
-					rows = -1;
-			}
-		} else {
-			if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
-							OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_ROW_COUNT,
-							query->_error ) ) != OCI_SUCCESS )
-				rows = -1;
-		}
-	}
+	if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
+					OCI_HTYPE_STMT, &rows, 0, OCI_ATTR_ROW_COUNT,
+					query->_error ) ) != OCI_SUCCESS )
+		rows = -1;
 	return ( rows );
 }
 
