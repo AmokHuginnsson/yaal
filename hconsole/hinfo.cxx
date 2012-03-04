@@ -308,8 +308,13 @@ double HInfoString::do_get_double( void ) const
 double long HInfoString::do_get_double_long( void ) const
 	{ return ( lexical_cast<double long>( _data ) ); }
 
-HTime const& HInfoString::do_get_time( void ) const
-	{ M_ASSERT( !"impossible inplace conversion requested" ); }
+HTime const& HInfoString::do_get_time( void ) const {
+	M_ASSERT( !"impossible inplace conversion requested" );
+#ifdef __MSVCXX__
+	static HTime const dummy;
+	return ( dummy );
+#endif /* #ifdef __MSVCXX__ */
+}
 
 void* HInfoString::do_get_pointer( void ) const
 	{

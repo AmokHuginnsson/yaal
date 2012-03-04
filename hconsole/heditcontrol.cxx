@@ -64,7 +64,8 @@ HEditControl::HEditControl( HWindow* parent_,
 					_password( password_ ),
 					_maxStringSize( bufferSize_ ), _cursorPosition ( 0 ),
 					_controlOffset( 0 ), _maxHistoryLevel( maxHistoryLevel_ ),
-					_pattern(), _string( bufferSize_, true ), _history(), _historyIt() {
+					_pattern(), _string( bufferSize_, true ),
+					_infoString( _string ), _history(), _historyIt() {
 	M_PROLOG
 	int errorCode = 0;
 	int length = 0;
@@ -142,7 +143,7 @@ HString const& HEditControl::get_text( void ) const {
 
 HInfo const& HEditControl::get( void ) const {
 	M_PROLOG
-	return ( HInfoString( _string ) );
+	return ( _infoString );
 	M_EPILOG
 }
 

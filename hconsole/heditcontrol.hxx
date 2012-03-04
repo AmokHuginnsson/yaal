@@ -68,6 +68,7 @@ protected:
 	hcore::HPattern _pattern; /*!< regular expression describing what
 																characters and in what way can be entered */
 	hcore::HString _string;   /*!< control content */
+	HInfoString _infoString;
 	typedef hcore::HList<yaal::hcore::HString> history_t;
 	history_t	_history;    /*!< history of insertions */
 	history_t::cyclic_iterator _historyIt;

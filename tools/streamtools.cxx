@@ -24,6 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#ifdef __MSVCXX__
+#include <unistd.h>
+#endif /* #ifdef __MSVCXX__ */
+
 #include <arpa/inet.h>
 
 #include "hcore/base.hxx"
