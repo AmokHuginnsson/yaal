@@ -53,30 +53,43 @@ HStreamInterface& HBinaryFormatter::operator << ( HStreamInterface::manipulator_
 	M_EPILOG
 }
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+template<typename T>
+inline T fwd_htons( T arg_ ) {
+	return ( htons( arg_ ) );
+}
+template<typename T>
+inline T fwd_htonl( T arg_ ) {
+	return ( htonl( arg_ ) );
+}
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 HBinaryFormatter& HBinaryFormatter::operator << ( int short v_ ) {
 	M_PROLOG
-	int short v( htons( v_ ) );
+	int short v( fwd_htons( v_ ) );
 	return ( binary( &v, sizeof ( v ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( int short unsigned v_ ) {
 	M_PROLOG
-	int short v( htons( v_ ) );
+	int short v( fwd_htons( v_ ) );
 	return ( binary( &v, sizeof ( v ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( int v_ ) {
 	M_PROLOG
-	int v( htonl( v_ ) );
+	int v( fwd_htonl( v_ ) );
 	return ( binary( &v, sizeof ( v ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( int unsigned v_ ) {
 	M_PROLOG
-	int unsigned v( htonl( v_ ) );
+	int unsigned v( fwd_htonl( v_ ) );
 	return ( binary( &v, sizeof ( v ) ) );
 	M_EPILOG
 }

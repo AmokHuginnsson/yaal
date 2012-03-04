@@ -132,7 +132,7 @@ HInfoMultiVal::HInfoMultiVal( HTime const& time_ )
 }
 
 HInfoMultiVal::HInfoMultiVal( HInfoMultiVal const& info_ )
-	: _type( TYPE::VOID ), _char( 0 ),
+	: HInfo(), _type( TYPE::VOID ), _char( 0 ),
 	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
 	_double( 0 ), _doubleLong( 0 ),
 	_pointer( NULL ), _string( "" ), _time() {
@@ -278,7 +278,7 @@ HInfoString::HInfoString( HString const& string_ )
 	{ }
 
 HInfoString::HInfoString( HInfoString const& info_ )
-	: _data( info_._data )
+	: HInfo(), _data( info_._data )
 	{ }
 
 HInfoString::~HInfoString( void )

@@ -45,10 +45,9 @@ class HDataProcess;
  * This class automates DML operations.
  */
 class HDataWindow : public hconsole::HWindow {
-protected:
+public:
 	typedef HDataWindow this_type;
 	typedef HWindow base_type;
-public:
 	/*! \brief Data window operation mode.
 	 */
 	struct DOCUMENT {

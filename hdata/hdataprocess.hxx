@@ -51,9 +51,10 @@ typedef yaal::hcore::HHashMap<yaal::hcore::HString,
  * applications with simple XML resource files.
  */
 class HDataProcess : public hconsole::HTUIProcess {
-protected:
+public:
 	typedef HDataProcess this_type;
 	typedef HTUIProcess base_type;
+protected:
 	typedef yaal::hcore::HList<yaal::hcore::HString> param_cache_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, resources_t> resource_cache_t;
 	typedef yaal::hcore::HList<OEditControlResource> edit_cache_t;
