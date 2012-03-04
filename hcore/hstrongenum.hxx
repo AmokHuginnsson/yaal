@@ -37,8 +37,6 @@ template<typename EnumID>
 class HStrongEnum {
 	typename EnumID::enum_t _value;
 public:
-	struct SemanticContext { SemanticContext const& member( SemanticContext& ) const { return ( *this ); } };
-	typedef SemanticContext const& ( SemanticContext::* safe_bool_t )( SemanticContext& ) const;
 	HStrongEnum( typename EnumID::enum_t value_ ) : _value( value_ ) {}
 	HStrongEnum( HStrongEnum const& e ) : _value( e._value ) {}
 	HStrongEnum operator | ( HStrongEnum const& other ) const {
@@ -95,9 +93,6 @@ public:
 		{ return ( _value ); }
 	bool operator ! ( void ) const {
 		return ( static_cast<int long unsigned>( _value ) ? false : true );
-	}
-	operator safe_bool_t() const {
-		return ( static_cast<int long unsigned>( _value ) ? &SemanticContext::member : 0 );
 	}
 	operator typename EnumID::enum_t() const {
 		return ( _value );
