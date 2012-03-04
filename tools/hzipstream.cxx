@@ -90,6 +90,19 @@ void HZipStream::cleanup( void ) {
 	M_EPILOG
 }
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+template<typename T>
+inline int fwd_inflateInit( T arg_ ) {
+	return ( inflateInit( arg_ ) );
+}
+template<typename T1, typename T2>
+inline int fwd_deflateInit( T1 arg1_, T2 arg2_ ) {
+	return ( deflateInit( arg1_, arg2_ ) );
+}
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 void HZipStream::init( void ) {
 	M_PROLOG
 	z_stream* zstream( _zStream.get<z_stream>() );
@@ -100,7 +113,7 @@ void HZipStream::init( void ) {
 	zstream->next_in = Z_NULL;
 	zstream->avail_out = static_cast<uInt>( _zBufferOut.get_size() );
 	zstream->next_out = Z_NULL;
-	M_ENSURE( ( _error = ( ( _mode == MODE::DEFLATE ) ? deflateInit( zstream, _compressionLevel_ ) : inflateInit( zstream ) ) ) == Z_OK );
+	M_ENSURE( ( _error = ( ( _mode == MODE::DEFLATE ) ? fwd_deflateInit( zstream, _compressionLevel_ ) : fwd_inflateInit( zstream ) ) ) == Z_OK );
 	return;
 	M_EPILOG
 }
