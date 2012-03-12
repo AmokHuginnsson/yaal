@@ -42,37 +42,21 @@ class HListControlModelInterface {
 public:
 	typedef HListControlModelInterface this_type;
 	typedef yaal::hcore::HPointer<HListControlModelInterface> ptr_t;
-	class HListControlModelIteratorInterface {
-	public:
-		typedef HListControlModelIteratorInterface this_type;
-		typedef yaal::hcore::HPointer<HListControlModelIteratorInterface> ptr_t;
-		virtual ~HListControlModelIteratorInterface( void ) {}
-		bool operator == ( HListControlModelIteratorInterface const& it_ ) const {
-			return ( do_equal_to( it_ ) );
-		}
-		bool operator != ( HListControlModelIteratorInterface const& it_ ) const {
-			return ( ! do_equal_to( it_ ) );
-		}
-		HListControlModelIteratorInterface& operator ++ ( void );
-	protected:
-		virtual bool do_equal_to( HListControlModelIteratorInterface const& ) const = 0;
-		virtual void do_next( void ) = 0;
-	};
-	typedef HListControlModelIteratorInterface& iterator_t;
 	virtual ~HListControlModelInterface( void ) {}
-	HListControlModelIteratorInterface::ptr_t begin( void ) const {
-		return ( do_begin() );
-	}
-	HListControlModelIteratorInterface::ptr_t end( void ) const {
-		return ( do_end() );
-	}
-	yaal::hcore::HString get_value( iterator_t it_, int col_ ) const {
-		return ( do_get_value( it_, col_ ) );
-	}
+	int get_column_count( void ) const
+		{ return ( do_get_column_count() ); }
+	int long get_row_count( void ) const
+		{ return ( do_get_row_count() ); }
+	yaal::hcore::HString get_value( int long row_, int col_ ) const
+		{ return ( do_get_value( row_, col_ ) ); }
+	bool sort( int column_, bool descending_ )
+		{ return ( do_sort( column_, descending_ ) ); }
 protected:
-	virtual HListControlModelIteratorInterface::ptr_t do_begin( void ) const = 0;
-	virtual HListControlModelIteratorInterface::ptr_t do_end( void ) const = 0;
-	virtual yaal::hcore::HString do_get_value( iterator_t, int ) const = 0;
+	virtual int do_get_column_count( void ) const = 0;
+	virtual int long do_get_row_count( void ) const = 0;
+	virtual yaal::hcore::HString do_get_value( int long, int ) const = 0;
+	virtual bool do_sort( int, bool )
+		{ return ( true ); }
 };
 
 template<typename sequence_t>
@@ -81,40 +65,20 @@ public:
 	typedef HListControlModel this_type;
 	typedef HListControlModelInterface base_type;
 	typedef yaal::hcore::HPointer<sequence_t> sequence_ptr_t;
-	class HListControlModelIterator : public HListControlModelInterface::HListControlModelIteratorInterface {
-	public:
-		typedef HListControlModelIterator this_type;
-		typedef HListControlModelIteratorInterface base_type;
-		yaal::hcore::HString get_value( int col_ ) {
-			return ( (*_iter)[ col_ ] );
-		}
-	private:
-		typename sequence_t::iterator_t _iter;
-		HListControlModelIterator( typename sequence_t::iterator_t iter_ )
-			: _iter( iter_ )
-				{}
-	protected:
-		virtual bool do_equal_to( HListControlModelIteratorInterface const& it_ ) const {
-			M_ASSERT( dynamic_cast<HListControlModelIterator*>( &it_ ) );
-			return ( _iter == static_cast<HListControlModelIterator&>( it_ )._iter );
-		}
-		virtual void do_next( void ) {
-			++ _iter;
-		}
-		friend class HListControlModel;
-	};
 private:
+	int _columnCount;
 	sequence_ptr_t _sequence;
+public:
+	HListControlModel( sequence_ptr_t sequence_, int columnCount_ )
+		: _columnCount( columnCount_ ), _sequence( sequence_ )
+		{}
 protected:
-	virtual HListControlModelIteratorInterface::ptr_t do_begin( void ) const {
-		return ( yaal::hcore::make_pointer<HListControlModelIterator>( _sequence.begin() ) );
-	}
-	virtual HListControlModelIteratorInterface::ptr_t do_end( void ) const {
-		return ( yaal::hcore::make_pointer<HListControlModelIterator>( _sequence.end() ) );
-	}
-	virtual yaal::hcore::HString do_get_value( iterator_t it_, int col_ ) const {
-		M_ASSERT( dynamic_cast<HListControlModelIterator*>( &it_ ) );
-		return ( static_cast<HListControlModelIterator&>( it_ ).get_value( col_ ) );
+	int get_column_count( void ) const
+		{ return ( _columnCount ); }
+	int long do_get_row_count( void ) const
+		{ return ( _sequence->get_size() ); }
+	virtual yaal::hcore::HString do_get_value( int long row_, int col_ ) const {
+		return ( (*_sequence)[row_][ col_ ] );
 	}
 };
 
@@ -138,7 +102,7 @@ struct OSortHelper {
 	int long _comparedItems;
 	int long _size;
 	HWindow* _window;
-	void progress ( void );
+	void progress( void );
 };
 template<typename tType>
 bool compare_cells( tType const&, tType const&, OSortHelper& );
@@ -399,7 +363,8 @@ protected:
 	int  _cursorPosition; /*!< cursor position relative to control
 														begining */
 	int  _sumForOne;      /*!< sum of percentage columns width */
-	yaal::hcore::HList<HColumnInfo> _header; /*!< list header info */
+	typedef yaal::hcore::HArray<HColumnInfo> header_t;
+	header_t _header; /*!< list header info */
 /* for internal use only */
 	int  _sortColumn;     /*!< column used for current sort operation */
 	/*! \brief HListControl search match description.

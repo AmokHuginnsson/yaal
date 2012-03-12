@@ -540,7 +540,7 @@ void HListControl::add_column( int column_, char const* name_,
 	columnInfo._name = _varTmpBuffer;
 	columnInfo._control = control_;
 	if ( ! _header.is_empty() && ( column_ >= 0 ) )
-		_header.insert( _header.n_th( column_ ), columnInfo );
+		_header.insert( _header.begin() + column_, columnInfo );
 	else
 		_header.push_back( columnInfo );
 	recalculate_column_widths();
@@ -556,27 +556,24 @@ int HListControl::set_focus( char shorcut_ ) {
 
 void HListControl::recalculate_column_widths( void ) {
 	M_PROLOG
-	int ctr = 0;
-	int ctrLoc = 0;
-	int columns = 0;
-	int columnOffset = 0;
-	int newWidth = 0;
-	columns = static_cast<int>( _header.size() );
-	for ( ctr = 0; ctr < columns; ctr ++ ) {
-		newWidth = _header [ ctr ]._width;
+	int ctrLoc( 0 );
+	int columnOffset( 0 );
+	int columns( static_cast<int>( _header.size() ) );
+	for ( int ctr( 0 ); ctr < columns; ctr ++ ) {
+		int newWidth( _header[ ctr ]._width );
 		if ( newWidth ) {
 			if ( ! _sumForOne )
 				M_THROW( "width of all columns equals 0", _sumForOne );
 			newWidth *= _widthRaw;
 			newWidth /= _sumForOne;
 			ctrLoc = ctr; /* last one with non zero width */
-			_header [ ctr ]._widthRaw = newWidth;
+			_header[ ctr ]._widthRaw = newWidth;
 			columnOffset += newWidth;
 		}
 	}
 	/* last column with non zero width should fill space */
-	columnOffset -= _header [ ctrLoc ]._widthRaw;
-	_header [ ctrLoc ]._widthRaw = ( _widthRaw - columnOffset );
+	columnOffset -= _header[ ctrLoc ]._widthRaw;
+	_header[ ctrLoc ]._widthRaw = ( _widthRaw - columnOffset );
 	return;
 	M_EPILOG
 }
