@@ -24,7 +24,7 @@ $$(DIR_$(1))/%.$$(DS): $$(DIR_SRC_$(1))/%.$$(SS)
 
 $$(DIR_$(1))/%.$$(OS): $$(DIR_SRC_$(1))/%.$$(SS)
 	@$$(eval $$(call IDENT_HELPER,$$(<))) $$(call msg,printf "[%3d%%] %b" "$$(shell expr $$(words $$(CUR_COUNT)) \* 100 / $$(TOTAL))" "$$($$(CURR_PROGRESS_INDICATOR))$$(eval $$(call PROGRESS_INDICATOR))Compiling \`$$(subst $$(DIR_ROOT)/,,$$(<))' ... " && ) \
-	/bin/rm -f "$(@)" && \
+	/bin/rm -f "$$(@)" && \
 	$$(call invoke,$$(CXX) $$(CXXFLAGS) -D__ID__=$$(ID) -D__TID__=$$(TID) $$(<) -c -o $$(@) 2>&1 | tee -a make.log) && \
 	test -f $$(@) \
 	$$(call msg,&& printf "%b$$(NL)" "done.$$(CL)")
