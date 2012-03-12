@@ -38,10 +38,24 @@ namespace yaal {
 
 namespace hconsole {
 
+class HListControlModelListenerInterface {
+public:
+	void refresh( void )
+		{ do_refresh(); }
+	virtual ~HListControlModelListenerInterface( void )
+		{}
+protected:
+	virtual void do_refresh( void ) = 0;
+};
+
 class HListControlModelInterface {
+	HListControlModelListenerInterface* _listener;
 public:
 	typedef HListControlModelInterface this_type;
 	typedef yaal::hcore::HPointer<HListControlModelInterface> ptr_t;
+	HListControlModelInterface( void )
+		: _listener( NULL )
+		{}
 	virtual ~HListControlModelInterface( void ) {}
 	int get_column_count( void ) const
 		{ return ( do_get_column_count() ); }
@@ -51,12 +65,26 @@ public:
 		{ return ( do_get_value( row_, col_ ) ); }
 	bool sort( int column_, bool descending_ )
 		{ return ( do_sort( column_, descending_ ) ); }
+	void register_listener( HListControlModelListenerInterface* listener_ )
+		{ _listener = listener_; }
+	void refresh( void ) {
+		M_PROLOG
+		do_refresh();
+		if ( _listener )
+			_listener->refresh();
+		return;
+		M_EPILOG
+	}
 protected:
 	virtual int do_get_column_count( void ) const = 0;
 	virtual int long do_get_row_count( void ) const = 0;
 	virtual yaal::hcore::HString do_get_value( int long, int ) const = 0;
 	virtual bool do_sort( int, bool )
 		{ return ( true ); }
+	virtual void do_refresh( void ) {}
+private:
+	HListControlModelInterface( HListControlModelInterface const& );
+	HListControlModelInterface& operator = ( HListControlModelInterface const& );
 };
 
 template<typename sequence_t>
@@ -70,7 +98,7 @@ private:
 	sequence_ptr_t _sequence;
 public:
 	HListControlModel( sequence_ptr_t sequence_, int columnCount_ )
-		: _columnCount( columnCount_ ), _sequence( sequence_ )
+		: HListControlModelInterface(), _columnCount( columnCount_ ), _sequence( sequence_ )
 		{}
 protected:
 	int get_column_count( void ) const
@@ -78,7 +106,44 @@ protected:
 	int long do_get_row_count( void ) const
 		{ return ( _sequence->get_size() ); }
 	virtual yaal::hcore::HString do_get_value( int long row_, int col_ ) const {
-		return ( (*_sequence)[row_][ col_ ] );
+		return ( (*_sequence)[ row_ ][ col_ ] );
+	}
+};
+
+template<typename list_t>
+class HListControlModelListAdaptor : public HListControlModelInterface {
+public:
+	typedef HListControlModelListAdaptor this_type;
+	typedef HListControlModelInterface base_type;
+	typedef yaal::hcore::HPointer<list_t> list_ptr_t;
+	typedef typename list_ptr_t::value_type value_type;
+	typedef yaal::hcore::HArray<value_type*> view_t;
+private:
+	int _columnCount;
+	list_ptr_t _list;
+	view_t _view;
+public:
+	HListControlModelListAdaptor( list_ptr_t list_, int columnCount_ )
+		: HListControlModelInterface(), _columnCount( columnCount_ ), _list( list_ ), _view()
+		{}
+protected:
+	int get_column_count( void ) const
+		{ return ( _columnCount ); }
+	int long do_get_row_count( void ) const {
+		M_ASSERT( _list->get_size() >= _view.get_size() );
+		return ( _view.get_size() );
+	}
+	virtual yaal::hcore::HString do_get_value( int long row_, int col_ ) const {
+		M_ASSERT( _list->get_size() >= _view.get_size() );
+		return ( *(_view[ row_ ][ col_ ]) );
+	}
+	virtual void do_refresh( void ) {
+		M_PROLOG
+		_view.clear();
+		for ( typename list_t::iterator it( _list->begin() ), end( _list->end() ); it != end; ++ it )
+			_view.push_back( &*it );
+		return;
+		M_EPILOG
 	}
 };
 
@@ -314,7 +379,7 @@ public:
  * List control allows fancy representation of row based data with handful
  * of display alteration methods.
  */
-class HListControl : virtual public HSearchableControl {
+class HListControl : virtual public HSearchableControl, public HListControlModelListenerInterface {
 public:
 	typedef HListControl this_type;
 	typedef HSearchableControl base_type;
