@@ -251,6 +251,14 @@ HTee tee( HStreamInterface& stream1_, HStreamInterface& stream2_ ) {
 	M_EPILOG
 }
 
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream_, yaal::tools::HBitmap const& bitmap_ ) {
+	M_PROLOG
+	for ( HBitmap::const_iterator it( bitmap_.begin() ), end( bitmap_.end() ); it != end; ++ it )
+		stream_ << ( *it ? 1 : 0 );
+	return ( stream_ );
+	M_EPILOG
+}
+
 }
 
 namespace hcore {

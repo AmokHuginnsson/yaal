@@ -42,6 +42,7 @@ Copyright:
 #include "hcore/htuple.hxx"
 #include "tools/hring.hxx"
 #include "tools/htwowaymap.hxx"
+#include "tools/hbitmap.hxx"
 
 namespace yaal {
 
@@ -80,6 +81,8 @@ public:
 } extern bin;
 
 HBinaryFormatter operator << ( yaal::hcore::HStreamInterface&, HBinaryFormatterSeed const& );
+
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::tools::HBitmap const& );
 
 yaal::hcore::HString get_stream_id( yaal::hcore::HStreamInterface* );
 yaal::hcore::HStreamInterface& ensure( yaal::hcore::HStreamInterface& );

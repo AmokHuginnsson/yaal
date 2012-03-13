@@ -252,6 +252,20 @@ bool HBitmap::operator != ( HBitmap const& b ) const {
 	M_EPILOG
 }
 
+bool HBitmap::operator[] ( int long index_ ) const {
+	M_PROLOG
+	M_ENSURE( index_ < _size );
+	return ( get( index_ ) );
+	M_EPILOG
+}
+
+HBitmap::HBit HBitmap::operator[] ( int long index_ ) {
+	M_PROLOG
+	M_ENSURE( index_ < _size );
+	return ( HBit( this, index_ ) );
+	M_EPILOG
+}
+
 HBitmap& HBitmap::operator |= ( HBitmap const& b ) {
 	M_PROLOG
 	M_ASSERT( _size == b._size );
@@ -522,8 +536,7 @@ HBitmap::HBit::HBit( HBit const& bit )
 
 HBitmap::HBit& HBitmap::HBit::operator = ( HBitmap::HBit const& bit ) {
 	if ( &bit != this ) {
-		_owner = bit._owner;
-		_index = bit._index;
+		_owner->set( _index, bit._owner->get( bit._index ) );
 	}
 	return ( *this );
 }

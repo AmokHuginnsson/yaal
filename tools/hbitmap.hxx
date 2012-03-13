@@ -63,6 +63,8 @@ public:
 	HBitmap& operator = ( HBitmap const& );
 	bool operator == ( HBitmap const& ) const;
 	bool operator != ( HBitmap const& ) const;
+	bool operator[] ( int long ) const;
+	HBit operator[] ( int long );
 	HBitmap& operator |= ( HBitmap const& );
 	HBitmap& operator &= ( HBitmap const& );
 	HBitmap& operator ^= ( HBitmap const& );
@@ -227,6 +229,7 @@ public:
 	void swap( HBit& );
 private:
 	friend class HBitmap::HIterator<HBitmap::HBit>;
+	friend class HBitmap;
 	HBit( HBitmap*, int long );
 };
 
