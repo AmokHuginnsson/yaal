@@ -955,28 +955,28 @@ void HAbstractControler::add_tail( void ) {
 }
 
 template<>
-yaal::hcore::HString const HCell<>::get_long( void ) {
+yaal::hcore::HString const HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_long( void ) {
 	M_PROLOG
 	return ( HString ( (*_data)[ _column ].get_int_long() ) );
 	M_EPILOG
 }
 
 template<>
-yaal::hcore::HString const HCell<>::get_double( void ) {
+yaal::hcore::HString const HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_double( void ) {
 	M_PROLOG
 	return ( HString ( (*_data)[ _column ].get_double() ) );
 	M_EPILOG
 }
 
 template<>
-yaal::hcore::HString const HCell<>::get_string( void ) {
+yaal::hcore::HString const HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_string( void ) {
 	M_PROLOG
 	return ( (*_data)[ _column ].get_string() );
 	M_EPILOG
 }
 
 template<>
-yaal::hcore::HString HCell<>::get_time( void ) {
+yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_time( void ) {
 	M_PROLOG
 	return ( ( (*_data)[ _column ].get_time() ).string() );
 	M_EPILOG
@@ -1057,27 +1057,27 @@ HAbstractRow::~HAbstractRow( void ) {
 }
 
 template<>
-void HRow<>::switch_state( void ) {
+void HRow<yaal::hcore::HList<HInfoItem>::iterator>::switch_state( void ) {
 	_iterator->_checked = ! _iterator->_checked;
 	return;
 }
 
 template<>
-bool HRow<>::get_checked( void ) {
+bool HRow<yaal::hcore::HList<HInfoItem>::iterator>::get_checked( void ) {
 	return ( _iterator->_checked );
 }
 
 template<>
-int long HRow<>::get_id( void ) {
+int long HRow<yaal::hcore::HList<HInfoItem>::iterator>::get_id( void ) {
 	return ( _iterator->_id );
 }
 
 template<>
-HRow<>::HRow( iterator_t& it_ ) : _iterator( it_ ), _cells( it_->get_value_count() ) {
+HRow<yaal::hcore::HList<HInfoItem>::iterator>::HRow( iterator_t& it_ ) : _iterator( it_ ), _cells( it_->get_value_count() ) {
 	M_PROLOG
 	int long cellCount = it_->get_value_count();
 	for ( int i = 0; i < cellCount; ++ i )
-		_cells[ i ] = make_pointer<HCell<> >( ref( _iterator ), i );
+		_cells[ i ] = make_pointer<HCell<yaal::hcore::HList<HInfoItem>::iterator> >( ref( _iterator ), i );
 	return;
 	M_EPILOG
 }
@@ -1087,7 +1087,7 @@ HAbstractCell::~HAbstractCell( void ) {
 }
 
 template<>
-void HCell<>::set_child_control_data( HControl* control_ ) {
+void HCell<yaal::hcore::HList<HInfoItem>::iterator>::set_child_control_data( HControl* control_ ) {
 	M_PROLOG
 	control_->set( (*_data)[ _column ] );
 	control_->refresh();
@@ -1096,7 +1096,7 @@ void HCell<>::set_child_control_data( HControl* control_ ) {
 }
 
 template<>
-bool CompareListControlItems<>::operator() ( HInfoItem const& left_,
+bool CompareListControlItems<HInfoItem>::operator() ( HInfoItem const& left_,
 		HInfoItem const& right_ ) const {
 	M_PROLOG
 	HInfoItem const& left = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? left_ : right_;

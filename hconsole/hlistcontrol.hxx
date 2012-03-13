@@ -211,7 +211,7 @@ public:
  *
  * \tparam tType - basic unit of data held in list model.
  */
-template<typename tType = yaal::hcore::HList<HInfoItem>::iterator>
+template<typename tType>
 class HCell : public HAbstractCell {
 	int _column;
 	tType& _data;
@@ -240,7 +240,7 @@ public:
  *
  * \tparam tType - iterator to basic unit of data held in list model.
  */
-template<typename tType = yaal::hcore::HList<HInfoItem>::iterator>
+template<typename tType>
 class HRow : public HAbstractRow {
 	typedef tType iterator_t;
 	typedef yaal::hcore::HArray<HAbstractCell::ptr_t> cells_t;
@@ -327,7 +327,7 @@ private:
  * Former approach is more flexible while the latter is easier to implement.
  * Unfortunatelly latter approach badly limits model type traits
  * (i.e. one would have to use list of arrays of window pointers instead
- * of plain list of window pointers, wide HWindowListControl).
+ * of plain list of window pointers, vide HWindowListControl).
  *
  * We will go for the former.
  *
@@ -527,7 +527,7 @@ namespace list_control_helper {
 
 /*! \brief HListControl sort helper functor.
  */
-template<typename tType = HInfoItem>
+template<typename tType>
 class CompareListControlItems {
 	list_control_helper::OSortHelper& _sortHelper;
 public:
