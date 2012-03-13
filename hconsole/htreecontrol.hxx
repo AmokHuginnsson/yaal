@@ -35,6 +35,37 @@ namespace yaal {
 
 namespace hconsole {
 
+class HTreeControlModelInterface {
+public:
+	typedef HTreeControlModelInterface this_type;
+	class HTreeControlModelNodeInterface {
+	};
+	virtual ~HTreeControlModelInterface( void );
+	HTreeControlModelNodeInterface& get_root( void );
+	int get_child_count( HTreeControlModelNodeInterface& );
+	HTreeControlModelNodeInterface& get_child( HTreeControlModelNodeInterface&, int );
+	HTreeControlModelNodeInterface& get_parent( HTreeControlModelNodeInterface& );
+protected:
+	virtual HTreeControlModelNodeInterface& do_get_root( void ) = 0;
+};
+
+template<typename T>
+class HTreeControlModel : public HTreeControlModelInterface {
+public:
+	typedef HTreeControlModel this_type;
+	typedef HTreeControlModelInterface base_type;
+private:
+	typedef yaal::hcore::HTree<T> data_t;
+	typedef yaal::hcore::HPointer<data_t> data_ptr_t;
+	data_ptr_t _data;
+public:
+	HTreeControlModel( data_ptr_t data_ )
+		: _data( data_ )
+		{}
+protected:
+	virtual HTreeControlModelNodeInterface& do_get_root( void );
+};
+
 /*! \brief Implementation of TUI Tree control class.
  *
  * Tree control allows fancy representation of tree based data with handful

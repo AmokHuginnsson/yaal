@@ -38,8 +38,18 @@ namespace yaal {
 
 namespace hconsole {
 
+class HListControl;
+
+/*! \brief Pack of helpers for "list control" concept.
+ *
+ * List control helpers are provided as a means of customization
+ * of HListControler class.
+ */
+namespace list_control_helper {
+
 class HListControlModelListenerInterface {
 public:
+	typedef HListControlModelListenerInterface this_type;
 	void refresh( void )
 		{ do_refresh(); }
 	virtual ~HListControlModelListenerInterface( void )
@@ -57,14 +67,26 @@ public:
 		: _listener( NULL )
 		{}
 	virtual ~HListControlModelInterface( void ) {}
-	int get_column_count( void ) const
-		{ return ( do_get_column_count() ); }
-	int long get_row_count( void ) const
-		{ return ( do_get_row_count() ); }
-	yaal::hcore::HString get_value( int long row_, int col_ ) const
-		{ return ( do_get_value( row_, col_ ) ); }
-	bool sort( int column_, bool descending_ )
-		{ return ( do_sort( column_, descending_ ) ); }
+	int get_column_count( void ) const {
+		M_PROLOG
+		return ( do_get_column_count() );
+		M_EPILOG
+	}
+	int long get_row_count( void ) const {
+		M_PROLOG
+		return ( do_get_row_count() );
+		M_EPILOG
+	}
+	yaal::hcore::HString get_value( int long row_, int col_ ) const {
+		M_PROLOG
+		return ( do_get_value( row_, col_ ) );
+		M_EPILOG
+	}
+	bool sort( int column_, bool descending_ ) {
+		M_PROLOG
+		return ( do_sort( column_, descending_ ) );
+		M_EPILOG
+	}
 	void register_listener( HListControlModelListenerInterface* listener_ )
 		{ _listener = listener_; }
 	void refresh( void ) {
@@ -103,10 +125,15 @@ public:
 protected:
 	int get_column_count( void ) const
 		{ return ( _columnCount ); }
-	int long do_get_row_count( void ) const
-		{ return ( _sequence->get_size() ); }
+	int long do_get_row_count( void ) const {
+		M_PROLOG
+		return ( _sequence->get_size() );
+		M_EPILOG
+	}
 	virtual yaal::hcore::HString do_get_value( int long row_, int col_ ) const {
+		M_PROLOG
 		return ( (*_sequence)[ row_ ][ col_ ] );
+		M_EPILOG
 	}
 };
 
@@ -130,12 +157,16 @@ protected:
 	int get_column_count( void ) const
 		{ return ( _columnCount ); }
 	int long do_get_row_count( void ) const {
+		M_PROLOG
 		M_ASSERT( _list->get_size() >= _view.get_size() );
 		return ( _view.get_size() );
+		M_EPILOG
 	}
 	virtual yaal::hcore::HString do_get_value( int long row_, int col_ ) const {
+		M_PROLOG
 		M_ASSERT( _list->get_size() >= _view.get_size() );
 		return ( *(_view[ row_ ][ col_ ]) );
+		M_EPILOG
 	}
 	virtual void do_refresh( void ) {
 		M_PROLOG
@@ -146,15 +177,6 @@ protected:
 		M_EPILOG
 	}
 };
-
-class HListControl;
-
-/*! \brief Pack of helpers for "list control" concept.
- *
- * List control helpers are provided as a means of customization
- * of HListControler class.
- */
-namespace list_control_helper {
 
 /*! \brief HListControler sort helper.
  *
@@ -379,7 +401,7 @@ public:
  * List control allows fancy representation of row based data with handful
  * of display alteration methods.
  */
-class HListControl : virtual public HSearchableControl, public HListControlModelListenerInterface {
+class HListControl : virtual public HSearchableControl, public list_control_helper::HListControlModelListenerInterface {
 public:
 	typedef HListControl this_type;
 	typedef HSearchableControl base_type;
