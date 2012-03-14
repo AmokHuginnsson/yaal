@@ -39,14 +39,28 @@ class HTreeControlModelInterface {
 public:
 	typedef HTreeControlModelInterface this_type;
 	class HTreeControlModelNodeInterface {
+	public:
+		typedef HTreeControlModelNodeInterface this_type;
+		typedef yaal::hcore::HPointer<HTreeControlModelNodeInterface> ptr_t;
 	};
 	virtual ~HTreeControlModelInterface( void );
-	HTreeControlModelNodeInterface& get_root( void );
-	int get_child_count( HTreeControlModelNodeInterface& );
-	HTreeControlModelNodeInterface& get_child( HTreeControlModelNodeInterface&, int );
-	HTreeControlModelNodeInterface& get_parent( HTreeControlModelNodeInterface& );
+	HTreeControlModelNodeInterface::ptr_t create_node_proxy( void ) {
+		M_PROLOG
+		return ( do_create_node_proxy() );
+		M_EPILOG
+	}
+	void get_root( HTreeControlModelNodeInterface::ptr_t node_ ) {
+		M_PROLOG
+		do_get_root( node_ );
+		return;
+		M_EPILOG
+	}
+	int get_child_count( HTreeControlModelNodeInterface::ptr_t );
+	void get_child( HTreeControlModelNodeInterface::ptr_t, int, HTreeControlModelNodeInterface::ptr_t );
+	void get_parent( HTreeControlModelNodeInterface::ptr_t, HTreeControlModelNodeInterface::ptr_t );
 protected:
-	virtual HTreeControlModelNodeInterface& do_get_root( void ) = 0;
+	virtual HTreeControlModelNodeInterface::ptr_t do_create_node_proxy( void ) = 0;
+	virtual void do_get_root( HTreeControlModelNodeInterface::ptr_t ) = 0;
 };
 
 template<typename T>
@@ -63,7 +77,8 @@ public:
 		: _data( data_ )
 		{}
 protected:
-	virtual HTreeControlModelNodeInterface& do_get_root( void );
+	virtual HTreeControlModelNodeInterface::ptr_t do_create_node_proxy( void );
+	virtual void do_get_root( HTreeControlModelNodeInterface::ptr_t );
 };
 
 /*! \brief Implementation of TUI Tree control class.

@@ -47,9 +47,9 @@ int HMenuControl::load_sub_menu( tree_t::node_t node, OMenuItem* subMenu_ ) {
 		info[ 0 ].set_string( subMenu_ [ ctr ]._label );
 		info[ 0 ].set_pointer( static_cast<void*>( &subMenu_[ ctr ] ) );
 		tree_t::HNode::iterator it = node->add_node( info );
-		if ( subMenu_ [ ctr ]._subMenu )
+		if ( subMenu_[ ctr ]._subMenu )
 			load_sub_menu( &*it, subMenu_[ ctr ]._subMenu );
-		ctr ++;
+		++ ctr;
 	}
 	return ( ctr );
 	M_EPILOG
@@ -76,12 +76,12 @@ HMenuControl::~HMenuControl ( void ) {
 void HMenuControl::init( HTUIProcess* process_, OMenuItem* menu_ ) {
 	M_PROLOG
 	if ( _tree.get_root() && menu_ )
-		M_THROW ( "menu already initialised", errno );
+		M_THROW( "menu already initialised", errno );
 	if ( ! process_ || ! ( _tree.get_root() || menu_ ) )
-		M_THROW ( "process cannot run without core data ( process, menu )",
+		M_THROW( "process cannot run without core data ( process, menu )",
 				errno );
 	_process = process_;
-	tree_t::node_t node = NULL;
+	tree_t::node_t node( NULL );
 	if ( ! _tree.get_root() ) {
 		node = _tree.create_new_root();
 		load_sub_menu( node, menu_ );
@@ -95,12 +95,11 @@ void HMenuControl::init( HTUIProcess* process_, OMenuItem* menu_ ) {
 
 int HMenuControl::do_process_input( int code_ ) {
 	M_PROLOG
-	OMenuItem* menu = NULL;
 	if ( ! _tree.get_root() )
-		M_THROW ( _ ( "menu not initialized" ), errno );
+		M_THROW( _( "menu not initialized" ), errno );
 	code_ = HTreeControl::do_process_input ( code_ );
 	if ( ( code_ == '\r' ) || ( code_ == ' ' ) ) {
-		menu = static_cast<OMenuItem*>( (**_selected)[ 0 ].get_pointer() );
+		OMenuItem* menu( static_cast<OMenuItem*>( (**_selected)[ 0 ].get_pointer() ) );
 		if ( menu->HANDLER )
 			menu->call( _process );
 		code_ = 0;
