@@ -119,8 +119,9 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 				FD_ZERO( readFds );
 			if ( writeFds )
 				FD_ZERO( writeFds );
+			miliseconds = 0;
 		}
-		if ( ! ret ) {
+		if ( ! ret && miliseconds ) {
 			if ( ::WaitForSingleObject( interrupt, miliseconds ) == WAIT_OBJECT_0 ) {
 				ret = -1;
 				errno = EINTR;

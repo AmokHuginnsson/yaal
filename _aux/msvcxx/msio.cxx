@@ -21,7 +21,7 @@ static int const IO_BUFFER_SIZE( 256 );
 
 IO::IO( TYPE::type_t t_, HANDLE h_, HANDLE e_, std::string const& p_ )
 : _type( t_ ), _handle( h_ ), _overlapped(),
-	_readRequest( 0 ), _buffer( IO_BUFFER_SIZE ),
+	_readRequest( 0 ), _inBuffer( 0 ), _buffer( IO_BUFFER_SIZE ),
 	_connected( ( t_ == TYPE::TERMINAL ) || ( t_ == TYPE::PIPE ) ),
 	_scheduled( false ), _ready( false ), _nonBlocking( false ), _path( p_ ) {
 	_overlapped.hEvent = e_ ? e_ : ::CreateEvent( NULL, true, false, NULL );
@@ -36,12 +36,12 @@ IO::~IO( void ) {
 
 void IO::schedule_read( void ) {
 	DWORD nRead( 0 );
-	if ( _connected && ! _scheduled ) {
+	if ( _connected && ! _scheduled && ( _readRequest == 0 ) ) {
 		BOOL status( ::ReadFile( _handle, _buffer.raw(), _readRequest = 1, &nRead, &_overlapped ) );
 		if ( status && ( nRead == 1 ) )
 			_ready = true;
 	}
-	_scheduled = true;
+	_scheduled = ! _ready;
 	return;
 }
 
@@ -67,65 +67,82 @@ void IO::sync( void ) {
 
 int long IO::read( void* buf_, int long size_ ) {
 	M_ASSERT( _connected );
-	DWORD iRead( 0 );
-	int off( 0 );
-	bool ok( false );
-	if ( _scheduled && ! _ready )
-		sync();
-	if ( _ready ) {
-		_scheduled = false;
-		_ready = false;
-		off = std::min<int>( size_, _readRequest );
-		::memcpy( buf_, _buffer.raw(), off );
-		size_ -= off;
-		ok = true;
-	}
-	bool eof( false );
+	M_ASSERT( size_ >= 0 );
+	int long nRead( 0 );
 	if ( size_ > 0 ) {
-		if ( ! _scheduled ) {
-			if ( ! _nonBlocking ) {
-				ok = ::ReadFile( _handle, static_cast<char*>( buf_ ) + off, size_, &iRead, &_overlapped ) ? true : false;
-			} else {
-				if ( ( off + size_ ) > _buffer.get_size() )
-					_buffer.realloc( off + size_ );
-				ok = ::ReadFile( _handle, _buffer.get<char>() + off, _readRequest = size_, &iRead, &_overlapped ) ? true : false;
-			}
-			if ( ! ok && ( ::GetLastError() != ERROR_IO_PENDING ) ) {
-				if ( ::GetLastError() == ERROR_HANDLE_EOF ) {
-					iRead = 0;
-					ok = true;
-					eof = true;
-				} else
-					log_windows_error( "ReadFile" );
-			}
-		}
-		if ( ! eof )
-			ok = ::GetOverlappedResult( _handle, &_overlapped, &iRead, ! _nonBlocking ) ? true : false;
-		if ( ! ok ) {
-			if ( ! _nonBlocking || ( ::GetLastError() != ERROR_IO_INCOMPLETE ) )
-				log_windows_error( "GetOverlappedResult(read)" );
-			else {
-				errno = EAGAIN;
-				_scheduled = true;
-			}
+		if ( _inBuffer > 0 ) {
+			nRead = std::min<int>( _inBuffer, static_cast<int>( size_ ) );
+			::memcpy( buf_, _buffer.raw(), nRead );
+			_inBuffer -= nRead;
+			if ( _inBuffer > 0 )
+				::memmove( _buffer.raw(), _buffer.get<char>() + nRead, _inBuffer );
 		} else {
-			if ( _nonBlocking && ( iRead == size_ ) )
-				::memcpy( static_cast<char*>( buf_ ) + off, _buffer.get<char>() + off, size_ );
-			_readRequest = 0;
-			_scheduled = false;
+			int off( 0 );
+			if ( _scheduled && ! _ready )
+				sync();
+			bool ok( false );
+			if ( _ready ) {
+				_ready = false;
+				off = std::min<int>( size_, _readRequest );
+				::memcpy( buf_, _buffer.raw(), off );
+				size_ -= off;
+				_readRequest -= off;
+				ok = true;
+			}
+			if ( size_ > 0 ) {
+				DWORD iRead( 0 );
+				if ( _readRequest == 0 ) { /* No pending read operation. */
+					if ( _buffer.get_size() < ( size_ + off ) )
+						_buffer.realloc( size_ + off );
+					ok = ::ReadFile( _handle, _buffer.get<char>() + off, _readRequest = size_, &iRead, &_overlapped ) ? 
+true : false;
+				}
+				if ( ! ok || ( _readRequest > 0 ) || ( ! _nonBlocking ) ) { /* Previous read operation still pending. */
+					ok = ::GetOverlappedResult( _handle, &_overlapped, &iRead, ! _nonBlocking ) ? true : false;
+				}
+				if ( ok ) { /* We got all data from requested read. */
+					iRead = std::min( _readRequest, std::min<int>( iRead, static_cast<int>( size_ ) ) );
+					::memcpy( static_cast<char*>( buf_ ) + off, _buffer.get<char>() + off, iRead );
+					_inBuffer = _readRequest - iRead;
+					if ( _inBuffer > 0 ) {
+						::memmove( _buffer.raw(), _buffer.get<char>() + iRead, _inBuffer );
+						_readRequest = 0;
+					} else
+						_readRequest -= iRead;
+				} else {
+					/* Read still pending, handle errors. */
+					DWORD errCode( ::GetLastError() );
+					if ( ( errCode == ERROR_IO_PENDING ) || ( errCode == ERROR_IO_INCOMPLETE ) ) {
+						if ( off > 0 )
+							ok = true;
+						else
+							get_socket_errno() = EAGAIN;
+					} else if ( errCode == ERROR_HANDLE_EOF ) {
+						ok = true;
+						iRead = 0;
+					} else {
+						log_windows_error( "GetOverlappedResult(ReadFile)" );
+					}
+				}
+				nRead = ok ? iRead + off : -1;
+			} else
+				nRead = ok ? off : -1;
 		}
 	}
-	return ( ok ? iRead + off : -1 );
+	return ( nRead );
 }
 
 int long IO::write( void const* buf_, int long size_ ) {
 	M_ASSERT( _connected );
 	DWORD iWritten( 0 );
 	bool ok( ::WriteFile( _handle, buf_, size_, &iWritten, &_overlapped ) ? true : false );
-	if ( ::GetLastError() == ERROR_IO_PENDING ) {
-		ok = ::GetOverlappedResult( _handle, &_overlapped, &iWritten, true ) ? true : false;
-		if ( ! ok )
-			log_windows_error( "GetOverlappedResult(write)" );
+	if ( ! ok ) {
+		if ( ::GetLastError() == ERROR_IO_PENDING ) {
+			ok = ::GetOverlappedResult( _handle, &_overlapped, &iWritten, true ) ? true : false;
+			if ( ! ok )
+				log_windows_error( "GetOverlappedResult(write)" );
+		} else
+			log_windows_error( "GetOverlappedResult(WriteFile)" );
 	}
 	return ( ok ? iWritten : -1 );
 }
@@ -189,6 +206,9 @@ void IO::swap( IO& io_ ) {
 	using std::swap;
 	swap( _overlapped, io_._overlapped );
 	yaal::swap( _buffer, io_._buffer );
+	swap( _readRequest, io_._readRequest );
+	swap( _inBuffer, io_._inBuffer );
+	swap( _connected, io_._connected );
 	swap( _scheduled, io_._scheduled );
 	swap( _ready, io_._ready );
 	swap( _handle, io_._handle );
@@ -204,7 +224,7 @@ void IO::reset( void ) {
 }
 
 bool IO::ready( void ) const {
-	return ( _ready );
+	return ( _ready || ( _inBuffer > 0 ) );
 }
 
 bool IO::is_connected( void ) const {

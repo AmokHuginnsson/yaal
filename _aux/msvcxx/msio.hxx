@@ -30,7 +30,8 @@ private:
 	TYPE::type_t _type;
 	HANDLE _handle;
 	OVERLAPPED _overlapped;
-	int _readRequest;
+	int _readRequest; /* size of pending read request */
+	int _inBuffer; /* amount of data already in buffer ready for immediate access */
 	yaal::hcore::HChunk _buffer;
 	bool _connected;
 	bool _scheduled; /* io has been scheduled */
