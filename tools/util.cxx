@@ -762,7 +762,7 @@ void crypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInterf
 		gap = static_cast<char>( nRead % 8 );
 		if ( gap ) {
 			gap = static_cast<char>( 8 - gap );
-			generate_n( buf.raw() + nRead, gap, randomizer_helper::make_randomizer( 255 ) );
+			generate_n( buf.get<char>() + nRead, gap, randomizer_helper::make_randomizer( 255 ) );
 		}
 		int long toWrite( nRead + gap );
 		M_ASSERT( toWrite <= toRead );
@@ -793,8 +793,8 @@ void decrypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInte
 	char gap( 0 );
 	int long nRead( 0 );
 	int long toWrite( 0 );
-	char* readBuf( bufA.raw() );
-	char* writeBuf( bufB.raw() );
+	char* readBuf( bufA.get<char>() );
+	char* writeBuf( bufB.get<char>() );
 	while ( ( ( nRead = src_.read( readBuf, toRead ) ) > 0 ) || ( toWrite > 0 ) ) {
 		/* There are 3 cases for non-malformed encrypted data:
 		 * 1 - we read only full blocks

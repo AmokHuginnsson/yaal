@@ -90,7 +90,7 @@ HString resolver::ip_to_string( ip_t ip_ ) {
 	addr.sin_addr.s_addr = ip_.raw();
 	char const* name( NULL );
 	while ( ! name ) {
-		name = inet_ntop( AF_INET, &addr.sin_addr, _cache->raw(), static_cast<socklen_t>( _cache->get_size() ) );
+		name = inet_ntop( AF_INET, &addr.sin_addr, _cache->get<char>(), static_cast<socklen_t>( _cache->get_size() ) );
 		if ( ! name ) {
 			M_ENSURE( errno == ENOSPC );
 			_cache->realloc( _cache->size() * 2 );
@@ -112,7 +112,7 @@ HString resolver::get_name( ip_t ip_ ) {
 	_cache->realloc( size );
 	error = getnameinfo(
 					reinterpret_cast<sockaddr*>( &addr ), sizeof ( addr ),
-					_cache->raw(), size, NULL, 0, NI_NOFQDN );
+					_cache->get<char>(), size, NULL, 0, NI_NOFQDN );
 	HScopedValueReplacement<int> saveErrno( errno, error );
 	M_ENSURE( error == 0 );
 	name = _cache->raw();

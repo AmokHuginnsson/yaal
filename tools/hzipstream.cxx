@@ -188,7 +188,7 @@ int long HZipStream::do_read( void* const buf_, int long size_ ) {
 	M_ASSERT( _streamRef );
 	z_stream* zstream( _zStream.get<z_stream>() );
 	int long const CHUNK( _zBufferOut.get_size() );
-	char* buf( _zBufferOut.raw() );
+	char* buf( _zBufferOut.get<char>() );
 	int long copied( 0 );
 	while ( copied < size_ ) {
 		int long have( min<int long>( ( CHUNK - zstream->avail_out ) - _offset, size_ - copied ) );

@@ -280,7 +280,7 @@ HString HTime::string( void ) const {
 #else /* HAVE_SMART_STRFTIME */
 	static int const MIN_TIME_STRING_LENGTH( 64 );
 	_cache.realloc( MIN_TIME_STRING_LENGTH ); /* FIXME that is pretty dumb hack */
-	int long size( static_cast<int long>( ::strftime( _cache.raw(), MIN_TIME_STRING_LENGTH - 1, _format.raw(), &_broken ) ) + 1 );
+	int long size( static_cast<int long>( ::strftime( _cache.get<char>(), MIN_TIME_STRING_LENGTH - 1, _format.raw(), &_broken ) ) + 1 );
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 #endif /* not HAVE_SMART_STRFTIME */

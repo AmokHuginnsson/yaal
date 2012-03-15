@@ -162,8 +162,13 @@ int bind( int fd_, const struct sockaddr* addr_, socklen_t len_ ) {
 			ret = make_pipe_instance( io );
 		}
 	} else {
-		M_ASSERT( io.type() == IO::TYPE::SOCKET );
-		ret = ::bind( reinterpret_cast<SOCKET>( io.handle() ), addr_, len_ );
+		M_ASSERT( ( io.type() == IO::TYPE::SOCKET ) || ( io.type() == IO::TYPE::SOCKET_DGRAM ) );
+		SOCKET s( reinterpret_cast<SOCKET>( io.handle() ) );
+		if ( io.type() == IO::TYPE::SOCKET_DGRAM ) {
+			if ( ::WSAEventSelect( s, io.event(), FD_READ | FD_OOB ) )
+				log_windows_error( "WSAEventSelect" );
+		}
+		ret = ::bind( s, addr_, len_ );
 	}
 	return ( ret );
 }
@@ -174,7 +179,9 @@ int socket( int af, int type, int protocol ) {
 	if ( af != PF_UNIX )
 		s = ::socket( af, type, protocol );
 	SystemIO& sysIo( SystemIO::get_instance() );
-	SystemIO::io_t sock( sysIo.create_io( af == PF_UNIX ? IO::TYPE::NAMED_PIPE : IO::TYPE::SOCKET, reinterpret_cast<HANDLE>( s ) ) );
+	SystemIO::io_t sock( sysIo.create_io(
+		af == PF_UNIX ? IO::TYPE::NAMED_PIPE : ( type == SOCK_DGRAM ? IO::TYPE::SOCKET_DGRAM : IO::TYPE::SOCKET ),
+		reinterpret_cast<HANDLE>( s ) ) );
 	return ( sock.first );
 }
 
@@ -213,6 +220,7 @@ int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ ) {
 			sock.second->accept();
 		}
 	} else {
+		M_ASSERT( io.type() == IO::TYPE::NAMED_PIPE );
 		SystemIO::io_t np( sysIo.create_io( IO::TYPE::NAMED_PIPE,
 			reinterpret_cast<HANDLE>( -1 ), NULL, io.path() ) );
 		ret = make_pipe_instance( *(np.second) );
@@ -245,6 +253,7 @@ int connect( int fd_, struct sockaddr* addr_, socklen_t len_ ) {
 		} else
 			io.set_handle( h );
 	} else {
+		M_ASSERT( io.type() == IO::TYPE::SOCKET );
 		SOCKET s( reinterpret_cast<SOCKET>( io.handle() ) );
 		ret = ::connect( s, const_cast<sockaddr const*>( addr_ ), static_cast<int>( len_ ) );
 		if ( WSAEventSelect( s, io.event(), FD_ACCEPT | FD_CONNECT | FD_READ | FD_WRITE | FD_CLOSE | FD_OOB ) )
@@ -268,7 +277,8 @@ int setsockopt( int fd_, int level_, int optname_, void const* optval_, socklen_
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	if ( io.type() == IO::TYPE::SOCKET )
+	IO::TYPE::type_t t( io.type() );
+	if ( ( t == IO::TYPE::SOCKET ) || ( t == IO::TYPE::SOCKET_DGRAM ) )
 		ret = ::setsockopt( reinterpret_cast<SOCKET>( io.handle() ), level_,
 				optname_ == SO_REUSEADDR ? SO_EXCLUSIVEADDRUSE : optname_,
 				static_cast<char const*>( optval_ ), optlen_ );
@@ -279,7 +289,8 @@ int getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* opt
 	int ret( 0 );
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
-	if ( io.type() == IO::TYPE::SOCKET )
+	IO::TYPE::type_t t( io.type() );
+	if ( ( t == IO::TYPE::SOCKET ) || ( t == IO::TYPE::SOCKET_DGRAM ) )
 		ret = ::getsockopt( reinterpret_cast<SOCKET>( io.handle() ), level_, optname_, static_cast<char*>( optval_ ), optlen_ );
 	else {
 		if ( optname_ == SO_ERROR ) {
@@ -293,10 +304,10 @@ int getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* opt
 }
 
 int get_socket_error( void ) {
-	return ( WSAGetLastError() );
+	return ( ::WSAGetLastError() );
 }
 
 void set_socket_error( int errno_ ) {
-	WSASetLastError( *_errno() = errno_ );
+	::WSASetLastError( *_errno() = errno_ );
 }
 

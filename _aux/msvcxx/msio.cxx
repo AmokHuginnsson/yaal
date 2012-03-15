@@ -35,32 +35,36 @@ IO::~IO( void ) {
 }
 
 void IO::schedule_read( void ) {
-	DWORD nRead( 0 );
-	if ( _connected && ! _scheduled && ( _readRequest == 0 ) ) {
-		BOOL status( ::ReadFile( _handle, _buffer.raw(), _readRequest = 1, &nRead, &_overlapped ) );
-		if ( status && ( nRead == 1 ) )
-			_ready = true;
+	if ( _type != TYPE::SOCKET_DGRAM ) {
+		DWORD nRead( 0 );
+		if ( _connected && ! _scheduled && ( _readRequest == 0 ) ) {
+			BOOL status( ::ReadFile( _handle, _buffer.raw(), _readRequest = 1, &nRead, &_overlapped ) );
+			if ( status && ( nRead == 1 ) )
+				_ready = true;
+		}
+		_scheduled = ! _ready;
 	}
-	_scheduled = ! _ready;
 	return;
 }
 
 void IO::sync( void ) {
-	DWORD iTransfered( 0 );
-	if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransfered, true ) ) {
-		log_windows_error( "GetOverlappedResult(sync)" );
-	} else {
-		if ( _connected ) {
-			if ( ( static_cast<int>( iTransfered ) < _readRequest ) && ( ::GetLastError() != ERROR_HANDLE_EOF ) ) {
-				stringstream ss;
-				ss << "iTransfered: " << iTransfered << ", _readRequest: " << _readRequest;
-				log_windows_error( ( ss.str() + "GetOverlappedResult(bad read)" ).c_str() );
-			} else {
-				_ready = true;
-			}
-		} else
-			_connected = _ready = true;
-		_scheduled = false;
+	if ( _type != TYPE::SOCKET_DGRAM ) {
+		DWORD iTransfered( 0 );
+		if ( ! ::GetOverlappedResult( _handle, &_overlapped, &iTransfered, true ) ) {
+			log_windows_error( "GetOverlappedResult(sync)" );
+		} else {
+			if ( _connected ) {
+				if ( ( static_cast<int>( iTransfered ) < _readRequest ) && ( ::GetLastError() != ERROR_HANDLE_EOF ) ) {
+					stringstream ss;
+					ss << "iTransfered: " << iTransfered << ", _readRequest: " << _readRequest;
+					log_windows_error( ( ss.str() + "GetOverlappedResult(bad read)" ).c_str() );
+				} else {
+					_ready = true;
+				}
+			} else
+				_connected = _ready = true;
+			_scheduled = false;
+		}
 	}
 	return;
 }
@@ -153,7 +157,7 @@ int IO::close( void ) {
 	if ( reinterpret_cast<SOCKET>( _handle ) != -1 ) {
 		if ( ( _type == IO::TYPE::PIPE ) || ( _type == IO::TYPE::NAMED_PIPE ) )
 			ret = ::CloseHandle( _handle ) ? 0 : -1;
-		else if ( _type == IO::TYPE::SOCKET )
+		else if ( ( _type == IO::TYPE::SOCKET ) || ( _type == IO::TYPE::SOCKET_DGRAM ) )
 			ret = ::closesocket( reinterpret_cast<SOCKET>( _handle ) );
 		else {
 			M_ASSERT( ! "invalid HANDLE type" );
@@ -174,7 +178,7 @@ int IO::fcntl( int cmd_, int arg_ ) {
 }
 
 HANDLE IO::event( void ) const {
-	return ( _overlapped.hEvent );
+	return ( _overlapped.hEvent ? _overlapped.hEvent : _handle );
 }
 
 HANDLE IO::handle( void ) const {
@@ -253,6 +257,14 @@ void IO::accept( void ) {
 	_connected = true;
 	_ready = false;
 	_scheduled = false;
+}
+
+int IO::sendto( char const* buf_, int size_, int flags_, struct sockaddr const* to_, int toLen_ ) {
+	return ( ::sendto( reinterpret_cast<SOCKET>( _handle ), buf_, size_, flags_, to_, toLen_ ) );
+}
+
+int IO::recvfrom( char* buf_, int size_, int flags_, struct sockaddr* from_, int* fromLen_ ) {
+	return ( ::recvfrom( reinterpret_cast<SOCKET>( _handle ), buf_, size_, flags_, from_, fromLen_ )  );
 }
 
 SystemIO::SystemIO( void )

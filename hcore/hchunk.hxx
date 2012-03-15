@@ -64,9 +64,9 @@ public:
 	template<typename tType>
 	tType* get()
 		{ return ( static_cast<tType*>( _data ) ); }
-	char const* raw( void ) const
+	void const* raw( void ) const
 		{ return ( static_cast<char const*>( _data ) ); }
-	char* raw( void )
+	void* raw( void )
 		{ return ( static_cast<char*>( _data ) ); }
 	void free( void );
 	void* realloc( int long, STRATEGY::enum_t = STRATEGY::GEOMETRIC );

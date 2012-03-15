@@ -68,7 +68,7 @@ HStreamBlockIterator::HBlock HStreamBlockIterator::operator* ( void ) {
 		_bufferOffset = firstOctet;
 		_bufferSize = _stream.read( _buffer.raw(), BUFFER_SIZE );
 	}
-	return ( HBlock( ( _buffer.raw() + firstOctet ) - _bufferOffset, min( _bufferSize - ( firstOctet - _bufferOffset ), _size ) ) );
+	return ( HBlock( ( _buffer.get<char>() + firstOctet ) - _bufferOffset, min( _bufferSize - ( firstOctet - _bufferOffset ), _size ) ) );
 	M_EPILOG
 }
 

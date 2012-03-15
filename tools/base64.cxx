@@ -153,7 +153,7 @@ yaal::hcore::HString base64::decode( yaal::hcore::HString const& message, bool s
 	HChunk buf;
 	if ( len > 0 ) {
 		buf.realloc( len, HChunk::STRATEGY::EXACT );
-		base64_raw_decode( message, buf.raw(), buf.get_size(), standardCompliantMode );
+		base64_raw_decode( message, buf.get<char>(), buf.get_size(), standardCompliantMode );
 	}
 	return ( buf.raw() );
 	M_EPILOG

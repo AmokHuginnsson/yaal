@@ -109,6 +109,10 @@ void HUDPSocket::bind( int port_, ip_t ip_ ) {
 	address.sin_port = fwd_htons( static_cast<int short unsigned>( port_ ) );
 	address.sin_addr.s_addr = ip_.raw();
 
+	int reuseAddr( 1 );
+	M_ENSURE( ::setsockopt( _fileDescriptor, SOL_SOCKET, SO_REUSEADDR,
+		reinterpret_cast<char*>( &reuseAddr ), sizeof ( reuseAddr ) ) == 0 );
+
 	M_ENSURE_EX( ( ::bind( _fileDescriptor, reinterpret_cast<sockaddr*>( &address ), sizeof ( address ) ) == 0 ), resolver::ip_to_string( ip_ ) + ":" + port_ );
 	return;
 	M_EPILOG

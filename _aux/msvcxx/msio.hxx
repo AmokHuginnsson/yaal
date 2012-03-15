@@ -23,7 +23,8 @@ public:
 			TERMINAL,
 			PIPE,
 			NAMED_PIPE,
-			SOCKET
+			SOCKET,
+			SOCKET_DGRAM
 		} type_t;
 	};
 private:
@@ -46,6 +47,8 @@ public:
 	void sync( void );
 	int long read( void*, int long );
 	int long write( void const*, int long );
+	int sendto( char const*, int, int, struct sockaddr const*, int );
+	int recvfrom( char*, int, int, struct sockaddr*, int* );
 	int fcntl( int, int );
 	void set_handle( HANDLE );
 	HANDLE handle( void ) const;

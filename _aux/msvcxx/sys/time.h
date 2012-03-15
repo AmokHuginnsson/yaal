@@ -14,11 +14,7 @@
 #define select select_off
 #define fd_set fd_set_off
 #define inet_ntop inet_ntop_off
-#define sendto sendto_off
-#define recvfrom recvfrom_off
 #include <ws2tcpip.h>
-#undef recvfrom
-#undef sendto
 #undef inet_ntop
 #undef inet_ntop
 #undef select

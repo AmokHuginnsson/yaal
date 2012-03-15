@@ -369,7 +369,7 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 	M_PROLOG
 	int long nRead( 0 ); /* how many bytes were read in this single invocation */
 	int long iPoolSize( _cache.size() );
-	char* buffer( _cache.raw() ); /* read cache buffer */
+	char* buffer( _cache.get<char>() ); /* read cache buffer */
 	bool byDelim( false );
 	bool bySize( false );
 	int setLen( static_cast<int>( ::strlen( set_ ) + 1 ) ); /* + 1 for terminating \0 byte that also could be searched for */
@@ -398,7 +398,7 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 			 */
 			if ( ( _offset + 2 ) > iPoolSize ) {
 				_cache.realloc( _offset + 2 );
-				buffer = _cache.raw(); /* update read cache buffer ptr, reallocation could move previous buffer into another memomry position */
+				buffer = _cache.get<char>(); /* update read cache buffer ptr, reallocation could move previous buffer into another memory position */
 				iPoolSize = _cache.size();
 			}
 			/* We read only one byte at a time. */
@@ -434,11 +434,10 @@ int HStreamInterface::do_peek( void ) {
 		int long iPoolSize( _cache.size() );
 		if ( iPoolSize < 1 )
 			_cache.realloc( 1 );
-		char* buffer( _cache.raw() ); /* read cache buffer */
-		do_read( buffer, 1 );
+		do_read( _cache.raw(), 1 );
 		_offset = 1;
 	}
-	return ( _cache.raw()[ _offset - 1 ] );
+	return ( _cache.get<char>()[ _offset - 1 ] );
 }
 
 HStreamInterface& HStreamInterface::do_input( HString& word ) {
@@ -640,7 +639,7 @@ int long HStreamInterface::read( void* const buffer_, int long size_ ) {
 	M_PROLOG
 	int long nRead( 0 );
 	if ( _offset ) {
-		char* buffer( _cache.raw() );
+		void* buffer( _cache.raw() );
 		if ( _offset > size_ ) {
 			::memcpy( buffer_, buffer, nRead = size_ );
 			::memmove( buffer, static_cast<char const*>( buffer ) + size_, _offset - size_ );

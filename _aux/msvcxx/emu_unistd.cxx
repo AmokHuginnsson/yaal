@@ -182,12 +182,18 @@ int long write( int fd_, void const* buf_, int long size_ ) {
 
 M_EXPORT_SYMBOL
 int long sendto( int fd_, void const* buf_, int long size_, int flags_, sockaddr const* to_, int toLen_ ) {
-	return ( 0 );
+	SystemIO& sysIo( SystemIO::get_instance() );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	return ( io.sendto( static_cast<char const*>( buf_ ),
+		static_cast<int>( size_ ), flags_, to_, toLen_ ) );
 }
 
 M_EXPORT_SYMBOL
 int long recvfrom( int fd_, void* buf_, int long size_, int flags_, sockaddr* from_, int* fromLen_ ) {
-	return ( 0 );
+	SystemIO& sysIo( SystemIO::get_instance() );
+	IO& io( *( sysIo.get_io( fd_ ).second ) );
+	return ( io.recvfrom( static_cast<char*>( buf_ ),
+		static_cast<int>( size_ ), flags_, from_, fromLen_ ) );
 }
 
 M_EXPORT_SYMBOL

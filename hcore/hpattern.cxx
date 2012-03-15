@@ -250,7 +250,7 @@ char const* HPattern::error_message( int ) const {
 		int long size( static_cast<int long>( ::regerror( _lastError, _compiled.get<regex_t>(), NULL, 0 ) ) + 1 );
 		_errorBuffer.realloc( size + 1 );
 		M_ENSURE( static_cast<int>( ::regerror( _lastError, _compiled.get<regex_t>(),
-						_errorBuffer.raw(), size ) ) < size );
+						_errorBuffer.get<char>(), size ) ) < size );
 		_errorMessage = _errorBuffer.raw();
 		if ( ! _errorCause.is_empty() ) {
 			_errorMessage += ": `";

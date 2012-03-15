@@ -68,7 +68,7 @@ HThread::HThread( void )
 	: _status( DEAD ), _buf( chunk_size<pthread_t>( 1 ) + chunk_size<pthread_attr_t>( 1 ) ),
 	_mutex( HMutex::TYPE::RECURSIVE ), _semaphore(), _resGuard(), _call(), _exceptionInfo() {
 	M_PROLOG
-	pthread_attr_t* attr( static_cast<pthread_attr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_t ) ) ) );
+	pthread_attr_t* attr( static_cast<pthread_attr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_t ) ) ) );
 	M_ENSURE( ::pthread_attr_init( attr ) == 0 );
 	size_t stackSize( 0 );
 	M_ENSURE( pthread_attr_getstacksize( attr, &stackSize ) == 0 );
@@ -104,7 +104,7 @@ void HThread::spawn( call_t call_ ) {
 	_status = SPAWNING;
 	_call = call_;
 	M_ENSURE( ::pthread_create( _buf.get<pthread_t>(),
-				static_cast<pthread_attr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_t ) ) ),
+				static_cast<pthread_attr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_t ) ) ),
 				SPAWN, this ) == 0 );
 	_semaphore.wait();
 	return;
@@ -260,7 +260,7 @@ HMutex::HMutex( TYPE::mutex_type_t const type_ ) : _type( type_ ),
 	M_PROLOG
 	if ( _type == TYPE::DEFAULT )
 		_type = TYPE::NON_RECURSIVE;
-	pthread_mutexattr_t* attr( static_cast<pthread_mutexattr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_mutex_t ) ) ) );
+	pthread_mutexattr_t* attr( static_cast<pthread_mutexattr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_mutex_t ) ) ) );
 	::pthread_mutexattr_init( attr );
 	HResource<void> res( attr, do_pthread_mutexattr_destroy );
 	_resGuard.swap( res );
@@ -463,7 +463,7 @@ void HSemaphore::signal( void ) {
 HCondition::HCondition( HMutex& mutex_ )
 	: _buf( chunk_size<pthread_cond_t>( 1 ) + chunk_size<pthread_condattr_t>( 1 ) ), _mutex( mutex_ ) {
 	M_PROLOG
-	pthread_condattr_t* attr( static_cast<pthread_condattr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_cond_t ) ) ) );
+	pthread_condattr_t* attr( static_cast<pthread_condattr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_cond_t ) ) ) );
 	::pthread_condattr_init( attr );
 	M_ENSURE( ::pthread_cond_init( _buf.get<pthread_cond_t>(), attr ) == 0 );
 	return;
@@ -473,7 +473,7 @@ HCondition::HCondition( HMutex& mutex_ )
 HCondition::~HCondition( void ) {
 	M_PROLOG
 	M_ENSURE( ::pthread_cond_destroy( _buf.get<pthread_cond_t>() ) == 0 );
-	::pthread_condattr_destroy( static_cast<pthread_condattr_t*>( static_cast<void*>( _buf.raw() + sizeof ( pthread_cond_t ) ) ));
+	::pthread_condattr_destroy( static_cast<pthread_condattr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_cond_t ) ) ));
 	return;
 	M_DESTRUCTOR_EPILOG
 }
