@@ -275,7 +275,7 @@ HString HTime::string( void ) const {
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 	_cache.realloc( max<int long>( size, MIN_TIME_STRING_LENGTH ) );
-	M_ENSURE( static_cast<int>( ::strftime( _cache.raw(),
+	M_ENSURE( static_cast<int>( ::strftime( _cache.get<char>(),
 					size, _format.raw(), &_broken ) ) < size );
 #else /* HAVE_SMART_STRFTIME */
 	static int const MIN_TIME_STRING_LENGTH( 64 );

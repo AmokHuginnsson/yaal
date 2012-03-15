@@ -201,7 +201,7 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 			valuesMaxBufferSize += out->sqld;
 			valuesMaxBufferSize += ( out->sqld * static_cast<int>( sizeof ( short ) ) );
 			res->_cache.realloc( valuesMaxBufferSize );
-			char* valBuf( res->_cache.raw() );
+			char* valBuf( res->_cache.get<char>() );
 			for ( i = 0, var = out->sqlvar; i < out->sqld; ++ i, ++ var ) {
 				var->sqldata = valBuf;
 				valBuf += var->sqllen; /* vlaue buffer */
