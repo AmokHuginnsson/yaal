@@ -115,7 +115,7 @@ HString resolver::get_name( ip_t ip_ ) {
 					_cache->get<char>(), size, NULL, 0, NI_NOFQDN );
 	HScopedValueReplacement<int> saveErrno( errno, error );
 	M_ENSURE( error == 0 );
-	name = _cache->raw();
+	name = _cache->get<char>();
 #else /* #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
 	int size( RESOLVER_INITIAL_CACHE_SIZE );
 	int code( 0 );
