@@ -478,13 +478,19 @@ void show_help( void* arg ) {
 		do {
 			int eol( 0 );
 			int ws( 0 );
+			int words( 0 );
 			while ( ( ws < cols ) && ( ws >= 0 ) ) {
 				eol = ws;
 				ws = static_cast<int>( desc.find_one_of( _whiteSpace_.data(), ws ) );
+				if ( ( ws < 0 ) && ( words < 2 ) ) {
+					eol = static_cast<int>( desc.get_length() );
+				}
 				if ( ( ws < 0 ) || ( ws > cols ) )
 					break;
 				eol = ws;
 				ws = static_cast<int>( desc.find_other_than( _whiteSpace_.data(), ws ) );
+				if ( ws > 0 )
+					++ words;
 			}
 			if ( ( ws >= cols ) || ( desc.get_length() > cols ) ) {
 				printf( "%.*s\n", eol, desc.raw() );
