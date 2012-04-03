@@ -49,18 +49,35 @@ public:
 		return ( do_create_node_proxy() );
 		M_EPILOG
 	}
-	void get_root( HTreeControlModelNodeInterface::ptr_t node_ ) {
+	void get_root( HTreeControlModelNodeInterface::ptr_t node_ ) const {
 		M_PROLOG
 		do_get_root( node_ );
 		return;
 		M_EPILOG
 	}
-	int get_child_count( HTreeControlModelNodeInterface::ptr_t );
-	void get_child( HTreeControlModelNodeInterface::ptr_t, int, HTreeControlModelNodeInterface::ptr_t );
-	void get_parent( HTreeControlModelNodeInterface::ptr_t, HTreeControlModelNodeInterface::ptr_t );
+	int get_child_count( HTreeControlModelNodeInterface::ptr_t node_ ) const {
+		M_PROLOG
+		return ( do_get_child_count( node_ ) );
+		M_EPILOG
+	}
+	void get_child( HTreeControlModelNodeInterface::ptr_t node_, int childNo_, HTreeControlModelNodeInterface::ptr_t child_ ) const {
+		M_PROLOG
+		do_get_child( node_, childNo_, child_ );
+		return;
+		M_EPILOG
+	}
+	void get_parent( HTreeControlModelNodeInterface::ptr_t node_, HTreeControlModelNodeInterface::ptr_t parent_ ) const {
+		M_PROLOG
+		do_get_parent( node_, parent_ );
+		return;
+		M_EPILOG
+	}
 protected:
 	virtual HTreeControlModelNodeInterface::ptr_t do_create_node_proxy( void ) = 0;
-	virtual void do_get_root( HTreeControlModelNodeInterface::ptr_t ) = 0;
+	virtual void do_get_root( HTreeControlModelNodeInterface::ptr_t ) const = 0;
+	virtual int do_get_child_count( HTreeControlModelNodeInterface::ptr_t node_ ) const = 0;
+	virtual void do_get_child( HTreeControlModelNodeInterface::ptr_t, int, HTreeControlModelNodeInterface::ptr_t ) const = 0;
+	virtual void do_get_parent( HTreeControlModelNodeInterface::ptr_t, HTreeControlModelNodeInterface::ptr_t ) const = 0;
 };
 
 template<typename T>
@@ -78,7 +95,10 @@ public:
 		{}
 protected:
 	virtual HTreeControlModelNodeInterface::ptr_t do_create_node_proxy( void );
-	virtual void do_get_root( HTreeControlModelNodeInterface::ptr_t );
+	virtual void do_get_root( HTreeControlModelNodeInterface::ptr_t ) const;
+	virtual int do_get_child_count( HTreeControlModelNodeInterface::ptr_t node_ ) const;
+	virtual void do_get_child( HTreeControlModelNodeInterface::ptr_t, int, HTreeControlModelNodeInterface::ptr_t ) const;
+	virtual void do_get_parent( HTreeControlModelNodeInterface::ptr_t, HTreeControlModelNodeInterface::ptr_t ) const;
 };
 
 /*! \brief Implementation of TUI Tree control class.
