@@ -38,6 +38,7 @@ namespace hconsole {
 class HTreeControlModelInterface {
 public:
 	typedef HTreeControlModelInterface this_type;
+	typedef yaal::hcore::HPointer<HTreeControlModelInterface> ptr_t;
 	class HTreeControlModelNodeInterface {
 	public:
 		typedef HTreeControlModelNodeInterface this_type;
@@ -88,17 +89,53 @@ public:
 private:
 	typedef yaal::hcore::HTree<T> data_t;
 	typedef yaal::hcore::HPointer<data_t> data_ptr_t;
+	class HTreeControlModelNode : public HTreeControlModelNodeInterface {
+		typedef typename data_t::node_t node_t;
+		node_t _node;
+		HTreeControlModelNode( void )
+			: HTreeControlModelNodeInterface(), _node( NULL )
+			{}
+		void set( node_t node_ ) {
+			_node = node_;
+		}
+		node_t get( void ) const {
+			return ( _node );
+		}
+	};
 	data_ptr_t _data;
 public:
 	HTreeControlModel( data_ptr_t data_ )
 		: _data( data_ )
 		{}
 protected:
-	virtual HTreeControlModelNodeInterface::ptr_t do_create_node_proxy( void );
-	virtual void do_get_root( HTreeControlModelNodeInterface::ptr_t ) const;
-	virtual int do_get_child_count( HTreeControlModelNodeInterface::ptr_t node_ ) const;
-	virtual void do_get_child( HTreeControlModelNodeInterface::ptr_t, int, HTreeControlModelNodeInterface::ptr_t ) const;
-	virtual void do_get_parent( HTreeControlModelNodeInterface::ptr_t, HTreeControlModelNodeInterface::ptr_t ) const;
+	virtual HTreeControlModelNodeInterface::ptr_t do_create_node_proxy( void ) {
+		M_PROLOG
+		return ( hcore::make_pointer<HTreeControlModelNode>() );
+		M_EPILOG
+	}
+	virtual void do_get_root( HTreeControlModelNodeInterface::ptr_t node_ ) const {
+		M_PROLOG
+		static_cast<HTreeControlModelNode*>( node_.get() )->set( _data->get_root() );
+		return;
+		M_EPILOG
+	}
+	virtual int do_get_child_count( HTreeControlModelNodeInterface::ptr_t node_ ) const {
+		M_PROLOG
+		return ( static_cast<HTreeControlModelNode*>( node_.get() )->get()->child_count() );
+		M_EPILOG
+	}
+	virtual void do_get_child( HTreeControlModelNodeInterface::ptr_t node_, int childNo_, HTreeControlModelNodeInterface::ptr_t child_ ) const {
+		M_PROLOG
+		typename data_t::const_iterator it( static_cast<HTreeControlModelNode*>( node_.get() )->get()->begin() );
+		advance( it, childNo_ );
+		static_cast<HTreeControlModelNode*>( child_.get() )->set( &*it );
+		M_EPILOG
+	}
+	virtual void do_get_parent( HTreeControlModelNodeInterface::ptr_t node_, HTreeControlModelNodeInterface::ptr_t parent_ ) const {
+		M_PROLOG
+		return ( static_cast<HTreeControlModelNode*>( parent_.get() )->set( static_cast<HTreeControlModelNode*>( node_.get() )->get()->get_parent() ) );
+		M_EPILOG
+	}
 };
 
 /*! \brief Implementation of TUI Tree control class.
@@ -135,6 +172,7 @@ protected:
 		friend class HTreeControl;
 	};
 	typedef yaal::hcore::HTree<HNodeControl> tree_t;
+	HTreeControlModelInterface::ptr_t _model;
 	tree_t _tree;
 	tree_t::node_t _selected;
 public:
@@ -147,6 +185,8 @@ public:
 	virtual ~HTreeControl( void );
 	int draw_node( tree_t::node_t, int );
 	virtual int set_focus( char = 0 );
+	void set_model( HTreeControlModelInterface::ptr_t );
+	HTreeControlModelInterface::ptr_t get_model( void ) const;
 protected:
 	virtual int do_process_input( int );
 	virtual int do_click( mouse::OMouse& );

@@ -107,7 +107,7 @@ void HTreeControl::HNodeControl::click( int column_ ) {
 HTreeControl::HTreeControl( HWindow* parent_, int row_, int column_,
 		int height_, int width_, char const* label_ )
 	: HControl( parent_, row_, column_, height_, width_, label_ ),
-	_tree(), _selected( NULL ) {
+	_model(), _tree(), _selected( NULL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -331,6 +331,19 @@ HTreeControl::tree_t::node_t HTreeControl::next( tree_t::node_t node ) {
 			n = &*it;
 	}
 	return ( n );
+	M_EPILOG
+}
+
+void HTreeControl::set_model( HTreeControlModelInterface::ptr_t model_ ) {
+	M_PROLOG
+	_model = model_;
+	return;
+	M_EPILOG
+}
+
+HTreeControlModelInterface::ptr_t HTreeControl::get_model( void ) const {
+	M_PROLOG
+	return ( _model );
 	M_EPILOG
 }
 
