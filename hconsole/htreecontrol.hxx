@@ -56,6 +56,11 @@ public:
 		return;
 		M_EPILOG
 	}
+	int long get_id( HTreeControlModelNodeInterface::ptr_t node_ ) const {
+		M_PROLOG
+		return ( do_get_id( node_ ) );
+		M_EPILOG
+	}
 	int get_child_count( HTreeControlModelNodeInterface::ptr_t node_ ) const {
 		M_PROLOG
 		return ( do_get_child_count( node_ ) );
@@ -76,7 +81,8 @@ public:
 protected:
 	virtual HTreeControlModelNodeInterface::ptr_t do_create_node_proxy( void ) = 0;
 	virtual void do_get_root( HTreeControlModelNodeInterface::ptr_t ) const = 0;
-	virtual int do_get_child_count( HTreeControlModelNodeInterface::ptr_t node_ ) const = 0;
+	virtual int long do_get_id( HTreeControlModelNodeInterface::ptr_t ) const;
+	virtual int do_get_child_count( HTreeControlModelNodeInterface::ptr_t ) const = 0;
 	virtual void do_get_child( HTreeControlModelNodeInterface::ptr_t, int, HTreeControlModelNodeInterface::ptr_t ) const = 0;
 	virtual void do_get_parent( HTreeControlModelNodeInterface::ptr_t, HTreeControlModelNodeInterface::ptr_t ) const = 0;
 };
@@ -117,6 +123,11 @@ protected:
 		M_PROLOG
 		static_cast<HTreeControlModelNode*>( node_.get() )->set( _data->get_root() );
 		return;
+		M_EPILOG
+	}
+	virtual int long do_get_id( HTreeControlModelNodeInterface::ptr_t node_ ) const {
+		M_PROLOG
+		return ( reinterpret_cast<int long>( static_cast<HTreeControlModelNode*>( node_.get() )->get() ) );
 		M_EPILOG
 	}
 	virtual int do_get_child_count( HTreeControlModelNodeInterface::ptr_t node_ ) const {
