@@ -151,8 +151,8 @@ private:
  */
 template<typename value_t, template <typename> class sequence_t>
 template<typename const_qual_t>
-class HTree<value_t, sequence_t>::HNode::HIterator : public iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type, iterator_category::forward> {
-	typedef iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type, iterator_category::forward> base_type;
+class HTree<value_t, sequence_t>::HNode::HIterator : public iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type, typename sequence_t<HNode*>::iterator::category_type> {
+	typedef iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type, typename sequence_t<HNode*>::iterator::category_type> base_type;
 	typedef HTree<value_t, sequence_t> tree_t;
 	typedef typename tree_t::const_node_t owner_t;
 	typedef typename trait::copy_const<const_qual_t, HNode>::type const_qual_node_t;
@@ -182,6 +182,26 @@ public:
 		HIterator it( *this );
 		-- _iterator;
 		return ( it );
+	}
+	HIterator operator + ( int long off_ ) const {
+		HIterator it( _owner, _iterator + off_ );
+		return ( it );
+	}
+	HIterator& operator += ( int long off_ ) {
+		_iterator += off_;
+		return ( *this );
+	}
+	HIterator operator - ( int long off_ ) const {
+		HIterator it( _owner, _iterator - off_ );
+		return ( it );
+	}
+	HIterator& operator -= ( int long off_ ) {
+		_iterator -= off_;
+		return ( *this );
+	}
+	int long operator - ( HIterator const& it ) const {
+		M_ASSERT( _owner == it._owner );
+		return ( _iterator - it._iterator );
 	}
 	typename HTree<value_t, sequence_t>::HNode::template HIterator<const_qual_t>& operator = ( HIterator const& );
 	bool operator == ( HIterator const& ) const;

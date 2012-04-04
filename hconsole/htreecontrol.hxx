@@ -97,15 +97,27 @@ private:
 	typedef yaal::hcore::HPointer<data_t> data_ptr_t;
 	class HTreeControlModelNode : public HTreeControlModelNodeInterface {
 		typedef typename data_t::node_t node_t;
+		typedef typename data_t::HNode::const_iterator iterator;
 		node_t _node;
+		iterator _iter;
+		int _lastAccessedChild;
 		HTreeControlModelNode( void )
-			: HTreeControlModelNodeInterface(), _node( NULL )
+			: HTreeControlModelNodeInterface(),
+			_node( NULL ), _iter(), _lastAccessedChild( -1 )
 			{}
 		void set( node_t node_ ) {
 			_node = node_;
 		}
 		node_t get( void ) const {
 			return ( _node );
+		}
+		node_t nth_child( int childNo_ ) {
+			M_PROLOG
+			if ( childNo_ != _lastAccessedChild ) {
+				_lastAccessedChild = childNo_;
+			}
+			return ( &*_iter );
+			M_EPILOG
 		}
 	};
 	data_ptr_t _data;
