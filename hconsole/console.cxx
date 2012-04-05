@@ -100,32 +100,19 @@ struct ATTR {
 	}
 };
 
-char const* const bold = "\033[1m";
-char const* const reset = "\033[0m";
-char const* const black = "\033[0;30m";
-char const* const red = "\033[0;31m";
-char const* const green = "\033[0;32m";
-char const* const brown = "\033[0;33m";
-char const* const blue = "\033[0;34m";
-char const* const magenta = "\033[0;35m";
-char const* const cyan = "\033[0;36m";
-char const* const lightgray = "\033[0;37m";
-char const* const gray = "\033[1;30m";
-char const* const brightred = "\033[1;31m";
-char const* const brightgreen = "\033[1;32m";
-char const* const yellow = "\033[1;33m";
-char const* const brightblue = "\033[1;34m";
-char const* const brightmagenta = "\033[1;35m";
-char const* const brightcyan = "\033[1;36m";
-char const* const white = "\033[1;37m";
-
-/* public: */
-
-/* private: */
-WINDOW* _window = NULL;
-bool	_enabled = false;
-bool	_brokenBrightBackground = false;
-termios	_termios;
+struct OTerminal {
+	WINDOW* _window;
+	bool _enabled;
+	bool _brokenBrightBackground;
+	termios _termios;
+	bool _exists;
+	OTerminal( void )
+		: _window( NULL ), _enabled( false ),
+		_brokenBrightBackground( false ),
+		_termios(),
+		_exists( ::getenv( "TERM" ) != NULL )
+		{}
+} _terminal_;
 
 int const C_OK = OK;
 int const C_ERR = ERR;
@@ -190,7 +177,7 @@ void HConsole::enter_curses( void ) {
 	if ( ! _initialized )
 		init();
 	if ( _disableXON_ ) {
-		M_ENSURE( tcgetattr( STDIN_FILENO, &_termios ) == 0 );
+		M_ENSURE( tcgetattr( STDIN_FILENO, &_terminal_._termios ) == 0 );
 		M_ENSURE( tcgetattr( STDIN_FILENO, &termios ) == 0 );
 		termios.c_iflag &= ~IXON;
 		if ( _leaveCtrlC_ )
@@ -206,8 +193,8 @@ void HConsole::enter_curses( void ) {
 		M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &termios ) == 0 );
 	}
 	use_env( true );
-	if ( ! _window )
-		_window = initscr();
+	if ( ! _terminal_._window )
+		_terminal_._window = initscr();
 	M_ENSURE( cbreak() != ERR );
 	M_ENSURE( start_color() != ERR );
 	standout(); /* Macro, returned value without meaning */
@@ -229,8 +216,8 @@ void HConsole::enter_curses( void ) {
 					colors[ fg ], colors[ bg ] );
 	attrset( COLOR_PAIR( 7 ) );
 	bkgd( ' ' | ATTR::value( COLORS::FG_BLACK | COLORS::BG_BLACK ) | A_INVIS ); /* meaningless value from macro */
-	_brokenBrightBackground = ( ::getenv( "MRXVT_TABTITLE" ) != NULL );
-	_enabled = true;
+	_terminal_._brokenBrightBackground = ( ::getenv( "MRXVT_TABTITLE" ) != NULL );
+	_terminal_._enabled = true;
 	getmaxyx( stdscr, _height, _width );
 	if ( getenv( "YAAL_NO_MOUSE" ) )
 		_useMouse_ = false;
@@ -266,7 +253,7 @@ void HConsole::enter_curses( void ) {
 	
 void HConsole::leave_curses( void ) {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
 	if ( _useMouse_ )
 		static_cast<void>( mouse::mouse_close() );
@@ -293,8 +280,8 @@ void HConsole::leave_curses( void ) {
 */
 	M_ENSURE( endwin() == OK );
 	if ( _disableXON_ )
-		M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &_termios ) == 0 );
-	_enabled = false;
+		M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &_terminal_._termios ) == 0 );
+	_terminal_._enabled = false;
 	return;
 	M_EPILOG
 }
@@ -302,10 +289,10 @@ void HConsole::leave_curses( void ) {
 void HConsole::set_attr( int attr_ ) const {
 	M_PROLOG
 	char unsigned byte = 0;
-	if ( ! _enabled )
+	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
 	byte = static_cast<char unsigned>( attr_ );
-	if ( _brokenBrightBackground )
+	if ( _terminal_._brokenBrightBackground )
 		static_cast<void>( attrset( ATTR::value_fix( byte ) ) );
 	else
 		static_cast<void>( attrset( ATTR::value( byte ) ) );
@@ -379,7 +366,7 @@ int HConsole::c_vmvprintf( int row_, int column_,
 	int origColumn = 0;
 	int error = 0;
 	va_list& ap = *static_cast<va_list*>( ap_ );
-	if ( ! _enabled )
+	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
 	if ( column_ >= _width )
 		M_THROW( "bad column.", column_ );
@@ -402,7 +389,7 @@ int HConsole::c_vcmvprintf( int row_, int column_, int attribute_,
 	M_PROLOG
 	int error = 0;
 	int origAttribute = 0;
-	if ( ! _enabled )
+	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
 	origAttribute = get_attr();
 	set_attr( attribute_ );
@@ -416,7 +403,7 @@ int HConsole::c_vprintf ( char const* const format_, void* ap_ ) const {
 	M_PROLOG
 	int error = 0;
 	va_list& ap = *static_cast<va_list*>( ap_ );
-	if ( ! _enabled )
+	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
 	error = vw_printw( stdscr, format_, ap );
 	return ( error );
@@ -481,7 +468,7 @@ int HConsole::ungetch( int code_ ) const {
 int HConsole::get_key( void ) const {
 	M_PROLOG
 	CURSOR::cursor_t origCursState = CURSOR::INVISIBLE;
-	if ( ! _enabled )
+	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
 	M_ENSURE( noecho() != ERR );
 	M_ENSURE( ::fflush( NULL ) == 0 );
@@ -551,7 +538,7 @@ int HConsole::get_key( void ) const {
 	
 int HConsole::kbhit( void ) const {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
 	M_ENSURE( nodelay( stdscr, true ) != ERR );
 	int key( get_key() );
@@ -573,7 +560,7 @@ inline void fwd_attr_get( T1& val1_, T2& val2_, void* ) {
 	
 char unsigned HConsole::get_attr( void ) const {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
 	attr_t attr;
 	NCURSES_ATTR_GET_SECOND_ARG_TYPE color = 0;
@@ -594,7 +581,7 @@ char unsigned HConsole::get_attr( void ) const {
 	
 void HConsole::clrscr( void ) const {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
 	clear(); /* Always returns OK */
 	M_ENSURE( refresh() != ERR );
@@ -604,7 +591,7 @@ void HConsole::clrscr( void ) const {
 
 bool HConsole::is_enabled( void ) const {
 	M_PROLOG
-	return ( _enabled );
+	return ( _terminal_._enabled );
 	M_EPILOG
 }
 
@@ -716,6 +703,28 @@ void HConsole::set_escdelay( int escdelay_ ) {
 	return;
 	M_EPILOG
 }
+
+namespace {
+char const EMPTY_STRING[] = "";
+}
+char const* const bold = _terminal_._exists ? "\033[1m" : EMPTY_STRING;
+char const* const reset = _terminal_._exists ? "\033[0m" : EMPTY_STRING;
+char const* const black = _terminal_._exists ? "\033[0;30m" : EMPTY_STRING;
+char const* const red = _terminal_._exists ? "\033[0;31m" : EMPTY_STRING;
+char const* const green = _terminal_._exists ? "\033[0;32m" : EMPTY_STRING;
+char const* const brown = _terminal_._exists ? "\033[0;33m" : EMPTY_STRING;
+char const* const blue = _terminal_._exists ? "\033[0;34m" : EMPTY_STRING;
+char const* const magenta = _terminal_._exists ? "\033[0;35m" : EMPTY_STRING;
+char const* const cyan = _terminal_._exists ? "\033[0;36m" : EMPTY_STRING;
+char const* const lightgray = _terminal_._exists ? "\033[0;37m" : EMPTY_STRING;
+char const* const gray = _terminal_._exists ? "\033[1;30m" : EMPTY_STRING;
+char const* const brightred = _terminal_._exists ? "\033[1;31m" : EMPTY_STRING;
+char const* const brightgreen = _terminal_._exists ? "\033[1;32m" : EMPTY_STRING;
+char const* const yellow = _terminal_._exists ? "\033[1;33m" : EMPTY_STRING;
+char const* const brightblue = _terminal_._exists ? "\033[1;34m" : EMPTY_STRING;
+char const* const brightmagenta = _terminal_._exists ? "\033[1;35m" : EMPTY_STRING;
+char const* const brightcyan = _terminal_._exists ? "\033[1;36m" : EMPTY_STRING;
+char const* const white = _terminal_._exists ? "\033[1;37m" : EMPTY_STRING;
 
 }
 
