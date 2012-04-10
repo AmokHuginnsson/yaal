@@ -579,7 +579,7 @@ bool equal( iter1_t it1, iter1_t end1, iter2_t it2, pred_t predicate_ ) {
  * \param end1 - one past last element of first range.
  * \param it2 - begining of second range.
  * \param end2 - one past last element of second range.
- * \param compare - comparizon function.
+ * \param compare - comparision function.
  * \return true if and only if first range is lexicographicaly before second range.
  */
 template<typename iter1_t, typename iter2_t, typename compare_t>
@@ -688,6 +688,62 @@ out_it_t rotate_copy( iter_t first_, iter_t mid_, iter_t last_, out_it_t out_ ) 
 	out_it_t it( copy( mid_, last_, out_ ) );
   it = copy( first_, mid_, it );
 	return ( it );
+}
+
+/*! \brief Find first position in ordered range where given value could be inserted without violating ordering.
+ *
+ * \pre Range first_ - last_ must be ordered.
+ *
+ * \param first_ - begining of ordered range to search through.
+ * \param last_ - one past the end of ordered range to search through.
+ * \param value_ - lower bound value.
+ * \return First position in range where value could be inserted without violating ordering.
+ */
+template<typename iter_t, typename value_t>
+iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_ ) {
+}
+
+/*! \brief Find first position in ordered (where order is given) range where given value could be inserted without violating ordering.
+ *
+ * \pre Range first_ - last_ must be ordered in given order.
+ *
+ * \param first_ - begining of ordered range to search through.
+ * \param last_ - one past the end of ordered range to search through.
+ * \param value_ - lower bound value.
+ * \param comp_ - comparision operator that defines order.
+ * \return First position in range where value could be inserted without violating ordering.
+ */
+template<typename iter_t, typename value_t, typename compare_t>
+iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_ ) {
+	return ( lower_bound( first_, last_, value_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+}
+
+/*! \brief Find last position in ordered range where given value could be inserted without violating ordering.
+ *
+ * \pre Range first_ - last_ must be ordered.
+ *
+ * \param first_ - begining of ordered range to search through.
+ * \param last_ - one past the end of ordered range to search through.
+ * \param value_ - upper bound value.
+ * \return Last position in range where value could be inserted without violating ordering.
+ */
+template<typename iter_t, typename value_t>
+iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_ ) {
+}
+
+/*! \brief Find last position in ordered (where order is given) range where given value could be inserted without violating ordering.
+ *
+ * \pre Range first_ - last_ must be ordered in given order.
+ *
+ * \param first_ - begining of ordered range to search through.
+ * \param last_ - one past the end of ordered range to search through.
+ * \param value_ - upper bound value.
+ * \param comp_ - comparision operator that defines order.
+ * \return Last position in range where value could be inserted without violating ordering.
+ */
+template<typename iter_t, typename value_t, typename compare_t>
+iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_ ) {
+	return ( upper_bound( first_, last_, value_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
 }
 
 /*! \brief Joins two sorted ranges of elements into one sorted range of elements.
