@@ -284,7 +284,7 @@ HString HTime::string( void ) const {
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 #endif /* not HAVE_SMART_STRFTIME */
-	return ( HString( _cache.raw() ) );
+	return ( _cache.get<char>() );
 	M_EPILOG
 }
 
