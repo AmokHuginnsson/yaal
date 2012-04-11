@@ -48,7 +48,7 @@ namespace yaal {
  * \return iterator pointing to found value or end of range.
  */
 template<typename iterator_t, typename value_t>
-iterator_t find( iterator_t it, iterator_t end, value_t const& v ) {
+inline iterator_t find( iterator_t it, iterator_t end, value_t const& v ) {
 	for ( ; ( it != end ) && ( *it != v ); ++ it )
 		;
 	return ( it );
@@ -62,7 +62,7 @@ iterator_t find( iterator_t it, iterator_t end, value_t const& v ) {
  * \return iterator pointing to found element or end of range.
  */
 template<typename iterator_t, typename condition_t>
-iterator_t find_if( iterator_t it, iterator_t end, condition_t cond ) {
+inline iterator_t find_if( iterator_t it, iterator_t end, condition_t cond ) {
 	for ( ; ( it != end ) && ( ! cond( *it ) ); ++ it )
 		;
 	return ( it );
@@ -77,7 +77,7 @@ iterator_t find_if( iterator_t it, iterator_t end, condition_t cond ) {
  * \return iterator pointing to found value or end of range.
  */
 template<typename iterator_t, typename iter2_t>
-iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_ ) {
+inline iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_ ) {
 	for ( ; ( it != end ); ++ it ) {
 		if ( find( first2_, last2_, *it ) != last2_ )
 			break;
@@ -95,7 +95,7 @@ iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_
  * \return iterator pointing to found value or end of range.
  */
 template<typename iterator_t, typename iter2_t, typename cond_t>
-iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_, cond_t cond_ ) {
+inline iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_, cond_t cond_ ) {
 	for ( ; ( it != end ); ++ it ) {
 		iter2_t v( first2_ );
 		for ( ; ( v != last2_ ) && ( ! cond_( *it, *v ) ); ++ v )
@@ -115,7 +115,7 @@ iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_
  * \return iterator pointing to found value or end of range.
  */
 template<typename iterator_t, typename iter2_t>
-iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_ ) {
+inline iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_ ) {
 	for ( ; ( it != end ); ++ it ) {
 		if ( ! ( find( first2_, last2_, *it ) != last2_ ) )
 			break;
@@ -133,7 +133,7 @@ iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t first2_, it
  * \return iterator pointing to found value or end of range.
  */
 template<typename iterator_t, typename iter2_t, typename cond_t>
-iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_, cond_t cond_ ) {
+inline iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t first2_, iter2_t last2_, cond_t cond_ ) {
 	for ( ; ( it != end ); ++ it ) {
 		iter2_t v( first2_ );
 		for ( ; ( v != last2_ ) && ( ! cond_( *it, *v ) ); ++ v )
@@ -152,7 +152,7 @@ iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t first2_, it
  * \return Number of occurences of v in range.
  */
 template<typename iterator_t, typename value_t>
-int long count( iterator_t it, iterator_t end, value_t const& v ) {
+inline int long count( iterator_t it, iterator_t end, value_t const& v ) {
 	int long counter( 0 );
 	for ( ; it != end; ++ it ) {
 		if ( *it == v )
@@ -169,7 +169,7 @@ int long count( iterator_t it, iterator_t end, value_t const& v ) {
  * \return Number of elements in range that satify a given condition.
  */
 template<typename iterator_t, typename condition_t>
-int long count_if( iterator_t it, iterator_t end, condition_t cond ) {
+inline int long count_if( iterator_t it, iterator_t end, condition_t cond ) {
 	int long counter( 0 );
 	for ( ; it != end; ++ it ) {
 		if ( cond( *it ) )
@@ -185,7 +185,7 @@ int long count_if( iterator_t it, iterator_t end, condition_t cond ) {
  * \param CALL - invoke this function and pass values from range to it.
  */
 template<typename iterator_t, typename call_t>
-void for_each( iterator_t it, iterator_t const& end, call_t CALL ) {
+inline void for_each( iterator_t it, iterator_t const& end, call_t CALL ) {
 	for ( ; it != end; ++ it )
 		CALL( *it );
 }
@@ -199,7 +199,7 @@ void for_each( iterator_t it, iterator_t const& end, call_t CALL ) {
  * \return one past end of output range.
  */
 template<typename src_iter_t, typename dst_iter_t, typename operation_t>
-dst_iter_t transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op ) {
+inline dst_iter_t transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op ) {
 	for ( ; it != end; ++ it, ++ dst )
 		*dst = op( *it );
 	return ( dst );
@@ -215,7 +215,7 @@ dst_iter_t transform( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t
  * \return one past end of output range.
  */
 template<typename src_iter_t, typename dst_iter_t, typename skip_t, typename operation_t>
-dst_iter_t remove_transform( src_iter_t it, src_iter_t end, dst_iter_t dst, skip_t skip_, operation_t op ) {
+inline dst_iter_t remove_transform( src_iter_t it, src_iter_t end, dst_iter_t dst, skip_t skip_, operation_t op ) {
 	for ( ; it != end; ++ it ) {
 		if ( *it != skip_ ) {
 			*dst = op( *it );
@@ -235,7 +235,7 @@ dst_iter_t remove_transform( src_iter_t it, src_iter_t end, dst_iter_t dst, skip
  * \return one past end of output range.
  */
 template<typename src_iter_t, typename dst_iter_t, typename pred_t, typename operation_t>
-dst_iter_t remove_transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, pred_t predicate_, operation_t op ) {
+inline dst_iter_t remove_transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, pred_t predicate_, operation_t op ) {
 	for ( ; it != end; ++ it ) {
 		if ( ! predicate_( *it ) ) {
 			*dst = op( *it );
@@ -255,7 +255,7 @@ dst_iter_t remove_transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, p
  * \return one past end of output range.
  */
 template<typename src_iter_t, typename dst_iter_t, typename operation_t, typename condition_t>
-dst_iter_t transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op, condition_t cond ) {
+inline dst_iter_t transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, operation_t op, condition_t cond ) {
 	for ( ; it != end; ++ it, ++ dst ) {
 		if ( cond( *it ) )
 			*dst = op( *it );
@@ -275,7 +275,7 @@ dst_iter_t transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, operatio
  * \return end of output range.
  */
 template<typename src_iter_t, typename arg_iter_t, typename dst_iter_t, typename operation_t>
-dst_iter_t transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t dst, operation_t op ) {
+inline dst_iter_t transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t dst, operation_t op ) {
 	for ( ; it != end; ++ it, ++ arg, ++ dst )
 		*dst = op( *it, *arg );
 	return ( dst );
@@ -288,7 +288,7 @@ dst_iter_t transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_iter_t 
  * \param newVal_ - a value that shall replace old values.
  */
 template<typename iterator_t, typename value_t>
-void replace( iterator_t it, iterator_t end, value_t const& oldVal_, value_t const& newVal_ ) {
+inline void replace( iterator_t it, iterator_t end, value_t const& oldVal_, value_t const& newVal_ ) {
 	for ( ; it != end; ++ it ) {
 		if ( *it == oldVal_ )
 			*it = newVal_;
@@ -303,7 +303,7 @@ void replace( iterator_t it, iterator_t end, value_t const& oldVal_, value_t con
  * \param newVal_ - a value that shall replace old values.
  */
 template<typename iterator_t, typename value_t, typename pred_t>
-void replace_if( iterator_t it, iterator_t end, pred_t predicate_, value_t const& newVal_ ) {
+inline void replace_if( iterator_t it, iterator_t end, pred_t predicate_, value_t const& newVal_ ) {
 	for ( ; it != end; ++ it ) {
 		if ( predicate_( *it ) )
 			*it = newVal_;
@@ -319,7 +319,7 @@ void replace_if( iterator_t it, iterator_t end, pred_t predicate_, value_t const
  * \param newVal_ - a value that shall replace old values.
  */
 template<typename iterator_t, typename output_iterator_t, typename value_t>
-void replace_copy( iterator_t it, iterator_t end, output_iterator_t out, value_t const& oldVal_, value_t const& newVal_ ) {
+inline void replace_copy( iterator_t it, iterator_t end, output_iterator_t out, value_t const& oldVal_, value_t const& newVal_ ) {
 	for ( ; it != end; ++ it, ++ out ) {
 		if ( *it == oldVal_ )
 			*out = newVal_;
@@ -337,7 +337,7 @@ void replace_copy( iterator_t it, iterator_t end, output_iterator_t out, value_t
  * \param newVal_ - a value that shall replace old values.
  */
 template<typename iterator_t, typename output_iterator_t, typename pred_t, typename value_t>
-void replace_copy_if( iterator_t it, iterator_t end, output_iterator_t out, pred_t predicate_, value_t const& newVal_ ) {
+inline void replace_copy_if( iterator_t it, iterator_t end, output_iterator_t out, pred_t predicate_, value_t const& newVal_ ) {
 	for ( ; it != end; ++ it, ++ out ) {
 		if ( predicate_( *it ) )
 			*out = newVal_;
@@ -355,7 +355,7 @@ void replace_copy_if( iterator_t it, iterator_t end, output_iterator_t out, pred
  * \return one past end of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
-dst_it_t copy( src_it_t src, src_it_t const& end, dst_it_t dst ) {
+inline dst_it_t copy( src_it_t src, src_it_t const& end, dst_it_t dst ) {
 	for ( ; src != end; ++ src, ++ dst )
 		*dst = *src;
 	return ( dst );
@@ -369,7 +369,7 @@ dst_it_t copy( src_it_t src, src_it_t const& end, dst_it_t dst ) {
  * \return begining of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
-dst_it_t copy_backward( src_it_t const& first, src_it_t last, dst_it_t dst ) {
+inline dst_it_t copy_backward( src_it_t const& first, src_it_t last, dst_it_t dst ) {
 	if ( first != last ) {
 		-- last;
 		-- dst;
@@ -388,7 +388,7 @@ dst_it_t copy_backward( src_it_t const& first, src_it_t last, dst_it_t dst ) {
  * \return one past end of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
-dst_it_t copy_n( src_it_t src, int long count, dst_it_t dst ) {
+inline dst_it_t copy_n( src_it_t src, int long count, dst_it_t dst ) {
 	for ( int long i = 0; i < count; ++ i, ++ src, ++ dst )
 		*dst = *src;
 	return ( dst );
@@ -402,7 +402,7 @@ dst_it_t copy_n( src_it_t src, int long count, dst_it_t dst ) {
  * \return new end of range - none of elements in resulting range meet a condition.
  */
 template<typename iterator_t, typename value_t>
-iterator_t remove( iterator_t first_, iterator_t const& last_, value_t value_ ) {
+inline iterator_t remove( iterator_t first_, iterator_t const& last_, value_t value_ ) {
 	bool move( false );
 	for ( iterator_t it( first_ ); it != last_; ++ it ) {
 		if ( *it == value_ ) {
@@ -424,7 +424,7 @@ iterator_t remove( iterator_t first_, iterator_t const& last_, value_t value_ ) 
  * \return new end of range - none of elements in resulting range meet a condition.
  */
 template<typename iterator_t, typename condition_t>
-iterator_t remove_if( iterator_t first_, iterator_t const& last_, condition_t condition_ ) {
+inline iterator_t remove_if( iterator_t first_, iterator_t const& last_, condition_t condition_ ) {
 	bool move( false );
 	for ( iterator_t it( first_ ); it != last_; ++ it ) {
 		if ( condition_( *it ) ) {
@@ -447,7 +447,7 @@ iterator_t remove_if( iterator_t first_, iterator_t const& last_, condition_t co
  * \return end of output range - none of elements in resulting range are equal to given value.
  */
 template<typename iter1_t, typename iter2_t, typename value_t>
-iter2_t remove_copy( iter1_t first_, iter1_t const& last_, iter2_t res_, value_t value_ ) {
+inline iter2_t remove_copy( iter1_t first_, iter1_t const& last_, iter2_t res_, value_t value_ ) {
 	for ( ; first_ != last_; ++ first_ ) {
 		if ( *first_ != value_ ) {
 			*res_ = *first_;
@@ -466,7 +466,7 @@ iter2_t remove_copy( iter1_t first_, iter1_t const& last_, iter2_t res_, value_t
  * \return end of output range - none of elements in resulting range meet a condition.
  */
 template<typename iter1_t, typename iter2_t, typename condition_t>
-iter2_t remove_copy_if( iter1_t first_, iter1_t const& last_, iter2_t res_, condition_t condition_ ) {
+inline iter2_t remove_copy_if( iter1_t first_, iter1_t const& last_, iter2_t res_, condition_t condition_ ) {
 	for ( ; first_ != last_; ++ first_ ) {
 		if ( ! condition_( *first_ ) ) {
 			*res_ = *first_;
@@ -486,7 +486,7 @@ iter2_t remove_copy_if( iter1_t first_, iter1_t const& last_, iter2_t res_, cond
  * \return true if and only if ranges have same size and same contents.
  */
 template<typename iter1_t, typename iter2_t, typename equity_t>
-bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, equity_t equity ) {
+inline bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, equity_t equity ) {
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && equity( *it1, *it2 ); ++ it1, ++ it2 )
 		;
 	return ( ( it1 == end1 ) && ( it2 == end2 ) );
@@ -501,7 +501,7 @@ bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, equity_t 
  * \return true if and only if ranges have same size and same contents.
  */
 template<typename iter1_t, typename iter2_t>
-bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
+inline bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
 		;
 	return ( ( it1 == end1 ) && ( it2 == end2 ) );
@@ -509,7 +509,7 @@ bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
 
 /*! \cond */
 template<typename iter1_t, typename iter2_t, typename equity_t>
-bool search_try_subsequence( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, equity_t equity ) {
+inline bool search_try_subsequence( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, equity_t equity ) {
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && equity( *it1, *it2 ); ++ it1, ++ it2 )
 		;
 	return ( it1 == end1 );
@@ -525,7 +525,7 @@ bool search_try_subsequence( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end
  * \return Begining of found sequence or one past the end of sequence that we searched thru.
  */
 template<typename iter1_t, typename iter2_t, typename equity_t>
-iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t last2, equity_t equity ) {
+inline iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t last2, equity_t equity ) {
 	/* Naive - quadratic complexity implementation. */
 	while ( ( first1 != last1 ) && ! search_try_subsequence( first2, last2, first1, last1, equity ) )
 		++ first1;
@@ -540,7 +540,7 @@ iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t last2, eq
  * \return Begining of found sequence or one past the end of sequence that we searched thru.
  */
 template<typename iter1_t, typename iter2_t>
-iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t last2 ) {
+inline iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t last2 ) {
 	return ( search( first1, last1, first2, last2, equal_to<typename hcore::iterator_traits<iter1_t>::value_type>() ) );
 }
 
@@ -552,7 +552,7 @@ iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t last2 ) {
  * \return true if and only if ranges have same size and same contents.
  */
 template<typename iter1_t, typename iter2_t>
-bool equal( iter1_t it1, iter1_t end1, iter2_t it2 ) {
+inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2 ) {
 	for ( ; ( it1 != end1 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
 		;
 	return ( it1 == end1 );
@@ -567,7 +567,7 @@ bool equal( iter1_t it1, iter1_t end1, iter2_t it2 ) {
  * \return true if and only if ranges have same size and same contents.
  */
 template<typename iter1_t, typename iter2_t, typename pred_t>
-bool equal( iter1_t it1, iter1_t end1, iter2_t it2, pred_t predicate_ ) {
+inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2, pred_t predicate_ ) {
 	for ( ; ( it1 != end1 ) && predicate_( *it1 == *it2 ); ++ it1, ++ it2 )
 		;
 	return ( it1 == end1 );
@@ -583,7 +583,7 @@ bool equal( iter1_t it1, iter1_t end1, iter2_t it2, pred_t predicate_ ) {
  * \return true if and only if first range is lexicographicaly before second range.
  */
 template<typename iter1_t, typename iter2_t, typename compare_t>
-bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, compare_t compare ) {
+inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, compare_t compare ) {
 	/* skip equals */
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( ! compare( *it1, *it2 ) ) && ( ! compare( *it2, *it1 ) ); ++ it1, ++ it2 )
 		;
@@ -599,7 +599,7 @@ bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t en
  * \return true if and only if first range is lexicographicaly before second range.
  */
 template<typename iter1_t, typename iter2_t>
-bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
+inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
 	/* skip equals */
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
 		;
@@ -615,7 +615,7 @@ bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t en
  * \return A pair of iteators which point to first differentiating element.
  */
 template<typename iter1_t, typename iter2_t>
-yaal::hcore::HPair<iter1_t, iter2_t> safe_mismatch( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
+inline yaal::hcore::HPair<iter1_t, iter2_t> safe_mismatch( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
 		;
 	return ( make_pair( it1, it2 ) );
@@ -629,7 +629,7 @@ yaal::hcore::HPair<iter1_t, iter2_t> safe_mismatch( iter1_t it1, iter1_t end1, i
  * \return A pair of iteators which point to first differentiating element.
  */
 template<typename iter1_t, typename iter2_t>
-yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2 ) {
+inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2 ) {
 	for ( ; ( it1 != end1 ) && ( *it1 == *it2 ); ++ it1, ++ it2 )
 		;
 	return ( make_pair( it1, it2 ) );
@@ -644,7 +644,7 @@ yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_
  * \return A pair of iteators which point to first differentiating element.
  */
 template<typename iter1_t, typename iter2_t, typename pred_t>
-yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2, pred_t predicate_ ) {
+inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2, pred_t predicate_ ) {
 	for ( ; ( it1 != end1 ) && predicate_( *it1, *it2 ); ++ it1, ++ it2 )
 		;
 	return ( make_pair( it1, it2 ) );
@@ -657,7 +657,7 @@ yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_
  * \return A rotation point that could be used to revert the operation, or new begining of new second range.
  */
 template<typename iter_t>
-iter_t rotate( iter_t first_, iter_t mid_, iter_t last_ ) {
+inline iter_t rotate( iter_t first_, iter_t mid_, iter_t last_ ) {
 	iter_t mid( mid_ );
 	iter_t newMid( last_ );
 	iter_t it( mid_ );
@@ -684,24 +684,22 @@ iter_t rotate( iter_t first_, iter_t mid_, iter_t last_ ) {
  * \return A rotation point that could be used to revert the operation, or new begining of new second range.
  */
 template<typename iter_t, typename out_it_t>
-out_it_t rotate_copy( iter_t first_, iter_t mid_, iter_t last_, out_it_t out_ ) {
+inline out_it_t rotate_copy( iter_t first_, iter_t mid_, iter_t last_, out_it_t out_ ) {
 	out_it_t it( copy( mid_, last_, out_ ) );
   it = copy( first_, mid_, it );
 	return ( it );
 }
 
-/*! \brief Find first position in ordered range where given value could be inserted without violating ordering.
- *
- * \pre Range first_ - last_ must be ordered.
- *
- * \param first_ - begining of ordered range to search through.
- * \param last_ - one past the end of ordered range to search through.
- * \param value_ - lower bound value.
- * \return First position in range where value could be inserted without violating ordering.
- */
-template<typename iter_t, typename value_t>
-iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_ ) {
+/*! \cond */
+template<typename iter_t, typename value_t, typename compare_t>
+inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
+	return ( first_ );
 }
+template<typename iter_t, typename value_t, typename compare_t>
+inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
+	return ( first_ );
+}
+/*! \endcond */
 
 /*! \brief Find first position in ordered (where order is given) range where given value could be inserted without violating ordering.
  *
@@ -714,22 +712,34 @@ iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_ ) {
  * \return First position in range where value could be inserted without violating ordering.
  */
 template<typename iter_t, typename value_t, typename compare_t>
-iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_ ) {
-	return ( lower_bound( first_, last_, value_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_ ) {
+	return ( lower_bound( first_, last_, value_, comp_, typename hcore::iterator_traits<iter_t>::category_type() ) );
 }
 
-/*! \brief Find last position in ordered range where given value could be inserted without violating ordering.
+/*! \brief Find first position in ordered range where given value could be inserted without violating ordering.
  *
  * \pre Range first_ - last_ must be ordered.
  *
  * \param first_ - begining of ordered range to search through.
  * \param last_ - one past the end of ordered range to search through.
- * \param value_ - upper bound value.
- * \return Last position in range where value could be inserted without violating ordering.
+ * \param value_ - lower bound value.
+ * \return First position in range where value could be inserted without violating ordering.
  */
 template<typename iter_t, typename value_t>
-iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_ ) {
+inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_ ) {
+	return ( lower_bound( first_, last_, value_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
 }
+
+/*! \cond */
+template<typename iter_t, typename value_t, typename compare_t>
+inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
+	return ( first_ );
+}
+template<typename iter_t, typename value_t, typename compare_t>
+inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
+	return ( first_ );
+}
+/*! \endcond */
 
 /*! \brief Find last position in ordered (where order is given) range where given value could be inserted without violating ordering.
  *
@@ -742,8 +752,58 @@ iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_ ) {
  * \return Last position in range where value could be inserted without violating ordering.
  */
 template<typename iter_t, typename value_t, typename compare_t>
-iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_ ) {
+inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_ ) {
+	return ( upper_bound( first_, last_, value_, comp_, typename hcore::iterator_traits<iter_t>::category_type() ) );
+}
+
+/*! \brief Find last position in ordered range where given value could be inserted without violating ordering.
+ *
+ * \pre Range first_ - last_ must be ordered.
+ *
+ * \param first_ - begining of ordered range to search through.
+ * \param last_ - one past the end of ordered range to search through.
+ * \param value_ - upper bound value.
+ * \return Last position in range where value could be inserted without violating ordering.
+ */
+template<typename iter_t, typename value_t>
+inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_ ) {
 	return ( upper_bound( first_, last_, value_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+}
+
+/*! \cond */
+template<typename iter_t, typename value_t, typename compare_t>
+inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
+	return ( false );
+}
+template<typename iter_t, typename value_t, typename compare_t>
+inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
+	return ( false );
+}
+/*! \endcond */
+
+/*! \brief Verify if Given value exists in ordered (where order is given) range.
+ *
+ * \param first_ - begining of ordered range to search through.
+ * \param last_ - one past the end of ordered range to search through.
+ * \param value_ - value to look for in ordered range.
+ * \param comp_ - comparator operator that defines order.
+ * \return True iff given value is present in given ordered range.
+ */
+template<typename iter_t, typename value_t, typename compare_t>
+inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_ ) {
+	return ( binary_search( first_, last_, value_, comp_, typename hcore::iterator_traits<iter_t>::category_type() ) );
+}
+
+/*! \brief Verify if Given value exists in ordered range.
+ *
+ * \param first_ - begining of ordered range to search through.
+ * \param last_ - one past the end of ordered range to search through.
+ * \param value_ - value to look for in ordered range.
+ * \return True iff given value is present in given ordered range.
+ */
+template<typename iter_t, typename value_t>
+inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_ ) {
+	return ( binary_search( first_, last_, value_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
 }
 
 /*! \brief Joins two sorted ranges of elements into one sorted range of elements.
@@ -756,7 +816,7 @@ iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_
  * \param comp_ - comparision operator.
  */
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t, typename compare_t>
-iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out, compare_t comp_ ) {
+inline iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out, compare_t comp_ ) {
 	for ( ; it1 != end1; ++ it1, ++ out ) {
 		for ( ; ( it2 != end2 ) && comp_( *it2, *it1 ); ++ it2, ++ out )
 			*out = *it2;
@@ -774,13 +834,13 @@ iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t en
  * \param out - destination container extender functor.
  */
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
-iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out ) {
+inline iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out ) {
 	return ( merge( it1, end1, it2, end2, out, less<typename hcore::iterator_traits<iter_in1_t>::value_type>() ) );
 }
 
 /*! \cond */
 template<typename iter_t, typename compare_t>
-void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ ) {
+inline void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ ) {
 	iter_t it( mid_ );
 	while ( ( first_ != it ) && ( it != last_ ) ) {
 		while ( ( first_ != it ) && ! comp_( *it, *first_ ) )
@@ -797,7 +857,7 @@ void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compare_t com
 	return;
 }
 template<typename iter_t, typename compare_t>
-void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_,
+inline void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_,
 		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iter_t>::value_type>& aux_ ) {
 	typedef hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iter_t>::value_type> aux_t;
 	if ( aux_.get_size() > 0 ) {
@@ -844,7 +904,7 @@ void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compare_t com
  * \param comp_ - comparision operator.
  */
 template<typename iter_t, typename compare_t>
-void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ ) {
+inline void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ ) {
 	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
 	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
 	aux_t aux( first_, mid_ );
@@ -862,7 +922,7 @@ void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ ) 
  * \param last_ - end of second range.
  */
 template<typename iter_t>
-void inplace_merge( iter_t first_, iter_t mid_, iter_t last_ ) {
+inline void inplace_merge( iter_t first_, iter_t mid_, iter_t last_ ) {
 	inplace_merge( first_, mid_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 }
@@ -876,7 +936,7 @@ void inplace_merge( iter_t first_, iter_t mid_, iter_t last_ ) {
  * \param out - destination container extender functor.
  */
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
-iter_out_t set_union( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out ) {
+inline iter_out_t set_union( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out ) {
 	while ( ( it1 != end1 ) || ( it2 != end2 ) ) {
 		if ( it1 != end1 ) {
 			if ( it2 != end2 ) {
@@ -913,7 +973,7 @@ iter_out_t set_union( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_
  * \param out - destination container extender functor.
  */
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
-iter_out_t set_intersection( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out ) {
+inline iter_out_t set_intersection( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out ) {
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ); ++ it1 ) {
 		for ( ; ( it2 != end2 ) && ( *it2 < *it1 ); ++ it2 )
 			;
@@ -933,7 +993,7 @@ iter_out_t set_intersection( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, it
  * \param second - begining of second range.
  */
 template<typename first_it_t, typename second_it_t>
-void swap_ranges( first_it_t first, first_it_t const& end, second_it_t second ) {
+inline void swap_ranges( first_it_t first, first_it_t const& end, second_it_t second ) {
 	for ( ; first != end; ++ first, ++ second )
 		swap( *first, *second ) ;
 	return;
@@ -946,7 +1006,7 @@ void swap_ranges( first_it_t first, first_it_t const& end, second_it_t second ) 
  * \param filler - value to be set for all elements in range.
  */
 template<typename dst_it_t, typename filler_t>
-void fill( dst_it_t it, dst_it_t end, filler_t const& filler ) {
+inline void fill( dst_it_t it, dst_it_t end, filler_t const& filler ) {
 	for ( ; it != end; ++ it )
 		*it = filler;
 	return;
@@ -959,7 +1019,7 @@ void fill( dst_it_t it, dst_it_t end, filler_t const& filler ) {
  * \param filler - value to be set for all elements in range.
  */
 template<typename dst_it_t, typename filler_t>
-void fill_n( dst_it_t it, int long count, filler_t const& filler ) {
+inline void fill_n( dst_it_t it, int long count, filler_t const& filler ) {
 	for ( int long i = 0; i < count; ++ i, ++ it )
 		*it = filler;
 	return;
@@ -972,7 +1032,7 @@ void fill_n( dst_it_t it, int long count, filler_t const& filler ) {
  * \param generator - function object that creates new values for range.
  */
 template<typename iterator_t, typename generator_t>
-void generate( iterator_t it, iterator_t const& end, generator_t generator ) {
+inline void generate( iterator_t it, iterator_t const& end, generator_t generator ) {
 	for ( ; it != end; ++ it )
 		*it = generator();
 	return;
@@ -985,7 +1045,7 @@ void generate( iterator_t it, iterator_t const& end, generator_t generator ) {
  * \param generator - function object that creates new values for range.
  */
 template<typename iterator_t, typename generator_t>
-void generate_n( iterator_t it, int long count, generator_t generator ) {
+inline void generate_n( iterator_t it, int long count, generator_t generator ) {
 	for ( int long i = 0; i < count; ++ i, ++ it )
 		*it = static_cast<typename hcore::iterator_traits<iterator_t>::value_type>( generator() );
 	return;
@@ -997,7 +1057,7 @@ void generate_n( iterator_t it, int long count, generator_t generator ) {
  * \param end - one past last element of range to be reverted.
  */
 template<typename iterator_t>
-void reverse( iterator_t it, iterator_t end ) {
+inline void reverse( iterator_t it, iterator_t end ) {
 	if ( it != end ) {
 		-- end;
 		while ( it != end ) {
@@ -1019,7 +1079,7 @@ void reverse( iterator_t it, iterator_t end ) {
  * \return true iff last, in lexographical order, permutation has been generated.
  */
 template<typename iterator_t>
-bool next_permutation( iterator_t it, iterator_t end ) {
+inline bool next_permutation( iterator_t it, iterator_t end ) {
 	int long count = 0;
 	iterator_t itLast;
 	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count )
@@ -1060,7 +1120,7 @@ bool next_permutation( iterator_t it, iterator_t end ) {
  * \return true iff first, in lexographical order, permutation has been generated.
  */
 template<typename iterator_t>
-bool prev_permutation( iterator_t it, iterator_t end ) {
+inline bool prev_permutation( iterator_t it, iterator_t end ) {
 	int long count = 0;
 	iterator_t itLast;
 	for ( iterator_t itEnd = it; itEnd != end; ++ itEnd, ++ count )
@@ -1102,7 +1162,7 @@ bool prev_permutation( iterator_t it, iterator_t end ) {
  * \return sum of all elements in [it, end) + ret.
  */
 template<typename iterator_t, typename return_t>
-return_t accumulate( iterator_t it, iterator_t end, return_t ret ) {
+inline return_t accumulate( iterator_t it, iterator_t end, return_t ret ) {
 	for ( ; it != end; ++ it )
 		ret += *it;
 	return ( ret );
@@ -1115,7 +1175,7 @@ return_t accumulate( iterator_t it, iterator_t end, return_t ret ) {
  * \return iterator pointing to found position or end of range.
  */
 template<typename iterator_t>
-iterator_t min_element( iterator_t it, iterator_t end ) {
+inline iterator_t min_element( iterator_t it, iterator_t end ) {
 	iterator_t min( it );
 	++ it;
 	for ( ; ( it != end ); ++ it ) {
@@ -1133,7 +1193,7 @@ iterator_t min_element( iterator_t it, iterator_t end ) {
  * \return iterator pointing to found position or end of range.
  */
 template<typename iterator_t, typename predicate_t>
-iterator_t min_element( iterator_t it, iterator_t end, predicate_t predicate_ ) {
+inline iterator_t min_element( iterator_t it, iterator_t end, predicate_t predicate_ ) {
 	iterator_t min( it );
 	++ it;
 	for ( ; ( it != end ); ++ it ) {
@@ -1150,7 +1210,7 @@ iterator_t min_element( iterator_t it, iterator_t end, predicate_t predicate_ ) 
  * \return iterator pointing to found position or end of range.
  */
 template<typename iterator_t>
-iterator_t max_element( iterator_t it, iterator_t end ) {
+inline iterator_t max_element( iterator_t it, iterator_t end ) {
 	iterator_t max( it );
 	++ it;
 	for ( ; ( it != end ); ++ it ) {
@@ -1168,7 +1228,7 @@ iterator_t max_element( iterator_t it, iterator_t end ) {
  * \return iterator pointing to found position or end of range.
  */
 template<typename iterator_t, typename predicate_t>
-iterator_t max_element( iterator_t it, iterator_t end, predicate_t predicate_ ) {
+inline iterator_t max_element( iterator_t it, iterator_t end, predicate_t predicate_ ) {
 	return ( min_element( it, end, predicate_ ) );
 }
 
@@ -1189,7 +1249,7 @@ inline tType abs( tType const& val ) {
  * \param comp_ - comparision operator.
  */
 template<typename iter_t, typename compare_t>
-void make_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
+inline void make_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
 	int long size( last_ - first_ );
 	for ( int long i( ( size / 2 ) - 1 ); i >= 0; -- i ) {
 		int long pos( i );
@@ -1218,7 +1278,7 @@ void make_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param last_ - one past the end of the heap.
  */
 template<typename iter_t>
-void make_heap( iter_t first_, iter_t last_ ) {
+inline void make_heap( iter_t first_, iter_t last_ ) {
 	make_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 }
@@ -1230,7 +1290,7 @@ void make_heap( iter_t first_, iter_t last_ ) {
  * \param comp_ - comparision operator.
  */
 template<typename iter_t, typename compare_t>
-void push_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
+inline void push_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
 	int long pos( ( last_ - first_ ) - 1 ); /* zero based position of inserted element */
 	while ( ( pos > 0 ) && comp_( *( first_ + ( ( pos -1 ) / 2 ) ), *( first_ + pos ) ) ) {
 		swap( *( first_ + ( ( pos - 1 ) / 2 ) ), *( first_ + pos ) );
@@ -1245,7 +1305,7 @@ void push_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param last_ - one past the end of the heap and new element at the same time.
  */
 template<typename iter_t>
-void push_heap( iter_t first_, iter_t last_ ) {
+inline void push_heap( iter_t first_, iter_t last_ ) {
 	push_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 }
@@ -1257,7 +1317,7 @@ void push_heap( iter_t first_, iter_t last_ ) {
  * \param comp_ - comparision operator.
  */
 template<typename iter_t, typename compare_t>
-void pop_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
+inline void pop_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
 	int long size( ( last_ - first_ ) - 1 );
 	if ( size > 0 ) {
 		swap( *first_, *( last_ - 1 ) );
@@ -1287,7 +1347,7 @@ void pop_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param last_ - one past the end of the heap.
  */
 template<typename iter_t>
-void pop_heap( iter_t first_, iter_t last_ ) {
+inline void pop_heap( iter_t first_, iter_t last_ ) {
 	pop_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 }
@@ -1299,7 +1359,7 @@ void pop_heap( iter_t first_, iter_t last_ ) {
  * \param comp_ - comparision operator.
  */
 template<typename iter_t, typename compare_t>
-bool is_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
+inline bool is_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
 	bool isHeap( true );
 	int long size( last_ - first_ );
 
@@ -1329,7 +1389,7 @@ bool is_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param last_ - one past the end of the heap.
  */
 template<typename iter_t>
-bool is_heap( iter_t first_, iter_t last_ ) {
+inline bool is_heap( iter_t first_, iter_t last_ ) {
 	return ( yaal::is_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
 }
 
@@ -1340,7 +1400,7 @@ bool is_heap( iter_t first_, iter_t last_ ) {
  * \param comp_ - comparision operator.
  */
 template<typename iter_t, typename compare_t>
-void sort_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
+inline void sort_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
 	for ( iter_t first( first_ + 1 ); last_ != first; -- last_ )
 		pop_heap( first_, last_, comp_ );
 	return;
@@ -1352,7 +1412,7 @@ void sort_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param last_ - one past the end of the heap.
  */
 template<typename iter_t>
-void sort_heap( iter_t first_, iter_t last_ ) {
+inline void sort_heap( iter_t first_, iter_t last_ ) {
 	sort_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 }
@@ -1364,7 +1424,7 @@ void sort_heap( iter_t first_, iter_t last_ ) {
  * \param comp_ - comparision operator used for sorting.
  */
 template<typename iter_t, typename compare_t>
-void heap_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
+inline void heap_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
 	make_heap( first_, last_, comp_ );
 	sort_heap( first_, last_, comp_ );
 	return;
@@ -1376,14 +1436,14 @@ void heap_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param last_ - one past the end of the range to be sorted.
  */
 template<typename iter_t>
-void heap_sort( iter_t first_, iter_t last_ ) {
+inline void heap_sort( iter_t first_, iter_t last_ ) {
 	heap_sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 }
 
 /*! \cond */
 template<typename iter_t, typename compare_t>
-void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::iterator_category::forward ) {
+inline void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::iterator_category::forward ) {
 	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
 	iter_t it( first_ );
 	++ it;
@@ -1403,7 +1463,7 @@ void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::iterator_
 	return;
 }
 template<typename iter_t, typename compare_t>
-void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::iterator_category::random_access ) {
+inline void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::iterator_category::random_access ) {
 	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
 	iter_t it( first_ );
 	++ it;
@@ -1434,7 +1494,7 @@ void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::iterator_
 
 /*! \cond */
 template<typename iter_t, typename compare_t>
-void selection_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
+inline void selection_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
 	for ( ; first_ != last_; ++ first_ ) {
 		iter_t min( min_element( first_, last_, comp_ ) );
 		if ( min != first_ )
@@ -1450,7 +1510,7 @@ static int const YAAL_QUICK_SORT_ALGO_THRESHOLD = 8;
 
 /*! \cond */
 template<typename iter_t, typename compare_t>
-void stable_sort_impl( iter_t first_, iter_t last_, compare_t comp_,
+inline void stable_sort_impl( iter_t first_, iter_t last_, compare_t comp_,
 		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iter_t>::value_type>& aux_ ) {
 	using yaal::distance;
 	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
@@ -1476,7 +1536,7 @@ void stable_sort_impl( iter_t first_, iter_t last_, compare_t comp_,
  * \param comp_ - comparision operator used for sorting.
  */
 template<typename iter_t, typename compare_t>
-void stable_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
+inline void stable_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
 	using yaal::distance;
 	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
 	if ( size < YAAL_MERGE_SORT_ALGO_THRESHOLD )
@@ -1502,7 +1562,7 @@ void stable_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param last_ - one past the end of the range to be sorted.
  */
 template<typename iter_t>
-void stable_sort( iter_t first_, iter_t last_ ) {
+inline void stable_sort( iter_t first_, iter_t last_ ) {
 	stable_sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 }
@@ -1510,7 +1570,7 @@ void stable_sort( iter_t first_, iter_t last_ ) {
 /*! \cond */
 /* naive */
 template<typename iter_t, typename compare_t>
-typename hcore::iterator_traits<iter_t>::value_type choose_pivot( iter_t first_, iter_t last_, compare_t comp_ ) {
+inline typename hcore::iterator_traits<iter_t>::value_type choose_pivot( iter_t first_, iter_t last_, compare_t comp_ ) {
 	iter_t mid( first_ + ( last_ - first_ ) / 2 );
 	if ( comp_( *first_, *last_ ) ) {
 		if ( comp_( *first_, *mid ) ) {
@@ -1536,7 +1596,7 @@ typename hcore::iterator_traits<iter_t>::value_type choose_pivot( iter_t first_,
  * \param comp_ - comparision operator used for sorting.
  */
 template<typename iter_t, typename compare_t>
-void sort( iter_t first_, iter_t last_, compare_t comp_ ) {
+inline void sort( iter_t first_, iter_t last_, compare_t comp_ ) {
 	using yaal::distance;
 	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
 	if ( size < YAAL_QUICK_SORT_ALGO_THRESHOLD )
@@ -1590,7 +1650,7 @@ void sort( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param last_ - one past the end of the range to be sorted.
  */
 template<typename iter_t>
-void sort( iter_t first_, iter_t last_ ) {
+inline void sort( iter_t first_, iter_t last_ ) {
 	sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
 	return;
 }
@@ -1603,7 +1663,7 @@ void sort( iter_t first_, iter_t last_ ) {
  * \param comp_ - uniqeness test predicate.
  */
 template<typename iter_t, typename iter_out_t, typename compare_t>
-iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_, compare_t comp_ ) {
+inline iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_, compare_t comp_ ) {
 	if ( first_ != last_ ) {
 		*dest_ = *first_;
 		++ first_;
@@ -1626,7 +1686,7 @@ iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_, compare_t com
  * \param comp_ - uniqeness test predicate.
  */
 template<typename iter_t, typename iter_out_t>
-iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_ ) {
+inline iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_ ) {
 	return ( unique_copy( first_, last_, dest_, equal_to<typename hcore::iterator_traits<iter_t>::value_type>() ) );
 }
 
@@ -1637,7 +1697,7 @@ iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_ ) {
  * \param comp_ - uniqeness test predicate.
  */
 template<typename iter_t, typename compare_t>
-iter_t unique( iter_t first_, iter_t last_, compare_t comp_ ) {
+inline iter_t unique( iter_t first_, iter_t last_, compare_t comp_ ) {
 	return ( unique_copy( first_, last_, first_, comp_ ) );
 }
 
@@ -1647,7 +1707,7 @@ iter_t unique( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param last_ - one past the end of range of elements to filter.
  */
 template<typename iter_t>
-iter_t unique( iter_t first_, iter_t last_ ) {
+inline iter_t unique( iter_t first_, iter_t last_ ) {
 	return ( unique( first_, last_, equal_to<typename hcore::iterator_traits<iter_t>::value_type>() ) );
 }
 
