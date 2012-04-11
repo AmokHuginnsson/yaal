@@ -693,7 +693,25 @@ inline out_it_t rotate_copy( iter_t first_, iter_t mid_, iter_t last_, out_it_t 
 /*! \cond */
 template<typename iter_t, typename value_t, typename compare_t>
 inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
-	return ( first_ );
+	iter_t it( first_ );
+	iter_t mid( first_ );
+	while ( it != last_ ) {
+		++ it;
+		if ( ! ( it != last_ ) )
+			break;
+		++ mid;
+		++ it;
+	}
+	if ( mid != first_ ) {
+		if ( comp_( *mid, value_ ) )
+			mid = lower_bound( mid, last_, value_, comp_, hcore::iterator_category::forward() );
+		else
+			mid = lower_bound( first_, mid, value_, comp_, hcore::iterator_category::forward() );
+	} else {
+		if ( comp_( *mid, value_ ) )
+			++ mid;
+	}
+	return ( mid );
 }
 template<typename iter_t, typename value_t, typename compare_t>
 inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
@@ -733,7 +751,25 @@ inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_ ) 
 /*! \cond */
 template<typename iter_t, typename value_t, typename compare_t>
 inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
-	return ( first_ );
+	iter_t it( first_ );
+	iter_t mid( first_ );
+	while ( it != last_ ) {
+		++ it;
+		if ( ! ( it != last_ ) )
+			break;
+		++ mid;
+		++ it;
+	}
+	if ( mid != first_ ) {
+		if ( ! comp_( value_, *mid ) )
+			mid = upper_bound( mid, last_, value_, comp_, hcore::iterator_category::forward() );
+		else
+			mid = upper_bound( first_, mid, value_, comp_, hcore::iterator_category::forward() );
+	} else {
+		if ( ! comp_( value_, *mid ) )
+			++ mid;
+	}
+	return ( mid );
 }
 template<typename iter_t, typename value_t, typename compare_t>
 inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
