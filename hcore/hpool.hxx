@@ -58,13 +58,36 @@ class HPool {
 		}
 		void free( T* ) {
 		}
+		bool is_full( void ) const {
+			return ( _free == -1 );
+		}
 	};
+	HPoolBlock* _poolBlocks;
+	int _poolBlockCount;
+	int _poolBlockCapacity;
+	int _free;
 public:
+	HPool( void )
+		: _poolBlocks( NULL ), _poolBlockCount( 0 ), _poolBlockCapacity( 0 ), _free( -1 )
+		{}
+	~HPool( void ) {
+		for ( int i( 0 ); i < _poolBlockCount; ++ i )
+			delete _poolBlocks[i];
+		delete [] _poolBlocks;
+	}
 	T* alloc( void ) {
-		return ( NULL );
+		if ( _free == -1 )
+			add_pool_block();
+		T* p( _poolBlocks[_free]->alloc() );
+		if ( _poolBlocks[_free]->is_full() )
+			_free = -1;
+		return ( p );
 	}
 	void free( T* ) {
 		/* Find HPoolBlock<> that holds this object memory. */
+	}
+private:
+	void add_pool_block( void ) {
 	}
 };
 
