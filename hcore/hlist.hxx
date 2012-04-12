@@ -73,11 +73,6 @@ struct OListBits {
 		FINAL_REACHED = 2,
 		NOT_FOUND = 4
 	} status_t;
-	typedef enum {
-		UNSORTED,
-		ASCENDING,
-		DESCENDING
-	} sort_order_t;
 	virtual ~OListBits( void ) { }
 	/*! \brief HList<>::iterator type constructor.
 	 *
@@ -101,7 +96,6 @@ private:
 	int long _size;           /*!< how many elements this list contains */
 	HElement* _hook;    /*!< "begining" of the list ( "first" element ) */
 /* for internal use only */
-	sort_order_t _order; /*!< last-to-current sort order */
 	int long _index;          /*!< this two fiels will allow boost operator[], int holds last */
 	HElement* _indexElement;   /*!< index and HElement * holds pointer to this last element */
 public:
@@ -182,7 +176,7 @@ public:
 	/*! \brief Add element in the way that keeps order.
 	 */
 	template<typename T>
-	type_t& add_orderly( type_t const&, T const&, sort_order_t = ASCENDING );
+	type_t& add_orderly( type_t const&, T const& );
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<type_t, treatment>::type erase( HIterator<type_t, treatment> const& );
 	template<OListBits::treatment_t const treatment>
@@ -200,9 +194,9 @@ public:
 	type_t& tail( void );
 	type_t const& tail( void ) const;
 	void exchange( iterator const&, iterator const& );
-	void sort( sort_order_t = ASCENDING );
+	void sort( void );
 	template<typename T>
-	void sort( T const&, sort_order_t = ASCENDING );
+	void sort( T const& );
 	bool empty( void ) const;
 	bool is_empty( void ) const;
 	bool operator == ( HList const& ) const;
@@ -461,8 +455,8 @@ const_qual_t* HList<type_t>::HIterator<const_qual_t, treatment>::operator->( voi
 template<typename type_t>
 HList<type_t>::HList( void )
 	: OListBits(), _size( 0 ),
-	_hook( NULL ), _order( UNSORTED ),
-	_index( 0 ), _indexElement( NULL ) {
+	_hook( NULL ), _index( 0 ),
+	_indexElement( NULL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -471,8 +465,8 @@ HList<type_t>::HList( void )
 template<typename type_t>
 HList<type_t>::HList( int long count_ )
 	: OListBits(), _size( 0 ),
-	_hook( NULL ), _order( UNSORTED ),
-	_index( 0 ), _indexElement( NULL ) {
+	_hook( NULL ), _index( 0 ),
+	_indexElement( NULL ) {
 	M_PROLOG
 	while ( count_ -- )
 		add_tail();
@@ -483,8 +477,8 @@ HList<type_t>::HList( int long count_ )
 template<typename type_t>
 HList<type_t>::HList( int long count_, type_t const& value_ )
 	: OListBits(), _size( 0 ),
-	_hook( NULL ), _order( UNSORTED ),
-	_index( 0 ), _indexElement( NULL ) {
+	_hook( NULL ), _index( 0 ),
+	_indexElement( NULL ) {
 	M_PROLOG
 	resize( count_, value_ );
 	return;
@@ -502,8 +496,8 @@ HList<type_t>::~HList( void ) {
 template<typename type_t>
 HList<type_t>::HList( HList<type_t> const& list_ )
 	: OListBits(), _size( 0 ),
-	_hook( NULL ), _order( UNSORTED ),
-	_index( 0 ), _indexElement( NULL ) {
+	_hook( NULL ), _index( 0 ),
+	_indexElement( NULL ) {
 	M_PROLOG
 	( *this ) = list_;
 	return;
@@ -514,8 +508,8 @@ template<typename type_t>
 template<typename iter_t>
 HList<type_t>::HList( iter_t first, iter_t last )
 	: OListBits(), _size( 0 ),
-	_hook( NULL ), _order( UNSORTED ),
-	_index( 0 ), _indexElement( NULL ) {
+	_hook( NULL ), _index( 0 ),
+	_indexElement( NULL ) {
 	M_PROLOG
 	initialize( first, last, typename trait::add_pointer<typename is_integral<iter_t>::type>::type() );
 	return;
@@ -654,7 +648,6 @@ HList<type_t>& HList<type_t>::operator = ( HList<type_t> const& list_ ) {
 			}
 		}
 		_index = list_._index;
-		_order = list_._order;
 		_size = list_._size;
 	}
 	return ( *this );
@@ -704,7 +697,6 @@ void HList<type_t>::swap( HList<type_t>& other ) {
 		using yaal::swap;
 		swap( _size, other._size );
 		swap( _index, other._index );
-		swap( _order, other._order );
 		swap( _hook, other._hook );
 		swap( _indexElement, other._indexElement );
 	}
@@ -806,48 +798,25 @@ void HList<type_t>::push_back( type_t const& object_ ) {
 	M_EPILOG
 }
 
-namespace {
-
-template<typename type_t, typename T>
-bool asc_less( type_t const& a, type_t const& b, T const& comp ) {
-	return ( comp( a, b ) );
-}
-
-template<typename type_t, typename T>
-bool desc_less( type_t const& a, type_t const& b, T const& comp ) {
-	return ( comp( b, a ) );
-}
-
-}
-
 template<typename type_t>
 template<typename T>
 type_t& HList<type_t>::add_orderly( type_t const& object_,
-		T const& less, sort_order_t order_ ) {
+		T const& comp_ ) {
 	M_PROLOG
 	bool before = false;
 	int index = 0, oldIndex = -1, lower = 0, upper = _size;
 	HElement* element = new ( memory::yaal ) HElement( NULL, object_ );
-	if ( ( _order != UNSORTED ) && ( _order != order_ ) )
-		M_THROW( _errMsgHList_[ ERROR::BAD_ORDER ], order_ );
-	_order = order_;
-	typedef bool ( *comp_t )( type_t const&, type_t const&, T const& );
-	comp_t my_comp;
-	if ( _order == ASCENDING )
-		my_comp = asc_less<type_t, T>;
-	else
-		my_comp = desc_less<type_t, T>;
 	while ( _size && ( oldIndex != index ) ) {
 		oldIndex = index;
 		index = ( lower + upper ) / 2;
 		element_by_index( index );
-		if ( my_comp( _indexElement->_value, element->_value, less ) )
+		if ( comp_( _indexElement->_value, element->_value ) )
 			lower = index;
 		else
 			upper = index;
 	}
 	if ( _indexElement ) {
-		if ( my_comp( _indexElement->_value, element->_value, less ) )
+		if ( comp_( _indexElement->_value, element->_value ) )
 			_indexElement = _indexElement->_next;
 		else
 			before = true;
@@ -1137,7 +1106,7 @@ type_t const& HList<type_t>::tail( void ) const {
 
 template<typename type_t>
 template<typename T>
-void HList<type_t>::merge_sort( HElement*& left, HElement*& right, T const& less ) {
+void HList<type_t>::merge_sort( HElement*& left, HElement*& right, T const& comp_ ) {
 	M_PROLOG
 	HElement* leftIt = left;
 	HElement* rightIt = right;
@@ -1155,30 +1124,24 @@ void HList<type_t>::merge_sort( HElement*& left, HElement*& right, T const& less
 	}
 	int const ARBITRARILY_CHOSEN_THRESHOLD = 7;
 	if ( ( stepsLeft + stepsRight + 2 ) < ARBITRARILY_CHOSEN_THRESHOLD )
-		insert_sort( left, right, less );
+		insert_sort( left, right, comp_ );
 	else {
 		if ( stepsLeft < ARBITRARILY_CHOSEN_THRESHOLD )
-			insert_sort( left, leftIt, less );
+			insert_sort( left, leftIt, comp_ );
 		else
-			merge_sort( left, leftIt, less );
+			merge_sort( left, leftIt, comp_ );
 		if ( stepsRight < ARBITRARILY_CHOSEN_THRESHOLD )
-			insert_sort( rightIt, right, less );
+			insert_sort( rightIt, right, comp_ );
 		else
-			merge_sort( rightIt, right, less );
+			merge_sort( rightIt, right, comp_ );
 		HElement* first = NULL;
 		++ stepsLeft;
-		typedef bool ( *comp_t )( type_t const&, type_t const&, T const& );
-		comp_t my_comp;
-		if ( _order == ASCENDING )
-			my_comp = asc_less<type_t, T>;
-		else
-			my_comp = desc_less<type_t, T>;
 		while ( stepsLeft -- ) {
-			if ( my_comp( rightIt->_value, left->_value, less ) ) {
+			if ( comp_( rightIt->_value, left->_value ) ) {
 				HElement* ptr = rightIt;
 				if ( ! first )
 					first = ptr;
-				while ( ( rightIt != right ) && my_comp( rightIt->_next->_value, left->_value, less ) )
+				while ( ( rightIt != right ) && comp_( rightIt->_next->_value, left->_value ) )
 					rightIt = rightIt->_next;
 				HElement* nextRight = rightIt->_next;
 				bool to_break = false;
@@ -1210,20 +1173,14 @@ template<typename type_t>
 template<typename T>
 void HList<type_t>::insert_sort(
 		HElement*& baseLower_, HElement*& baseUpper_,
-		T const& less ) {
+		T const& comp_ ) {
 	M_PROLOG
 	if ( baseLower_ != baseUpper_ ) {
 		HElement* top = baseLower_;
-		typedef bool ( *comp_t )( type_t const&, type_t const&, T const& );
-		comp_t my_comp;
-		if ( _order == ASCENDING )
-			my_comp = asc_less<type_t, T>;
-		else
-			my_comp = desc_less<type_t, T>;
 		while ( top != baseUpper_ ) {
 			top = top->_next;
 			HElement* ptr = top;
-			while ( ( ptr != baseLower_ ) && my_comp( top->_value, ptr->_previous->_value, less ) )
+			while ( ( ptr != baseLower_ ) && comp_( top->_value, ptr->_previous->_value ) )
 				ptr = ptr->_previous;
 			if ( ptr != top ) {
 				HElement* oldtop = top->_previous;
@@ -1264,24 +1221,21 @@ void HList<type_t>::insert( HElement* pos, HElement* elem ) {
 }
 
 template<typename type_t>
-void HList<type_t>::sort( sort_order_t order_ ) {
+void HList<type_t>::sort( void ) {
 	M_PROLOG
-	sort( yaal::less<type_t>(), order_ );
+	sort( yaal::less<type_t>() );
 	return;
 	M_EPILOG
 }
 
 template<typename type_t>
 template<typename T>
-void HList<type_t>::sort( T const& less, sort_order_t order_ ) {
+void HList<type_t>::sort( T const& comp_ ) {
 	M_PROLOG
-	_order = order_;
-	if ( ( _order != ASCENDING ) && ( _order != DESCENDING ) )
-		M_THROW( _errMsgHList_ [ ERROR::BAD_ORDER ], _order );
 	if ( _size > 1 ) {
 		HElement* first = _hook;
 		HElement* last = _hook->_previous;
-		merge_sort( first, last, less );
+		merge_sort( first, last, comp_ );
 		_hook = first;
 		_indexElement = NULL;
 		_index = 0;

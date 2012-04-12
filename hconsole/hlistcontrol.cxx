@@ -500,7 +500,7 @@ int HListControl::do_process_input( int code_ ) {
 			if ( ctr < errorCode ) {
 				errorCode = 0;
 				sort_by_column( ctr,
-						code_ == tolower( code_ ) ? OListBits::ASCENDING : OListBits::DESCENDING );
+						code_ == tolower( code_ ) ? OSortHelper::ASCENDING : OSortHelper::DESCENDING );
 			} else
 				errorCode = code_;
 		}
@@ -578,12 +578,12 @@ void HListControl::recalculate_column_widths( void ) {
 	M_EPILOG
 }
 
-void HListControl::sort_by_column( int column_, OListBits::sort_order_t order_ ) {
+void HListControl::sort_by_column( int column_, OSortHelper::sort_order_t order_ ) {
 	M_PROLOG
 	if ( ! _sortable )
 		return;
 	_sortColumn = column_;
-	_header[ column_ ]._descending = order_ == OListBits::DESCENDING;
+	_header[ column_ ]._descending = order_ == OSortHelper::DESCENDING;
 	long int size = _controler->size();
 	if ( size > 128 )
 		_parent->status_bar()->init_progress(
@@ -617,7 +617,7 @@ int HListControl::do_click( mouse::OMouse& mouse_ ) {
 			width += columnInfo->_widthRaw;
 			if ( column <= width ) {
 				sort_by_column( ctr,
-						columnInfo->_descending ? OListBits::ASCENDING : OListBits::DESCENDING );
+						columnInfo->_descending ? OSortHelper::ASCENDING : OSortHelper::DESCENDING );
 				schedule_refresh();
 				break;
 			}
@@ -1099,8 +1099,8 @@ template<>
 bool CompareListControlItems<HInfoItem>::operator() ( HInfoItem const& left_,
 		HInfoItem const& right_ ) const {
 	M_PROLOG
-	HInfoItem const& left = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? left_ : right_;
-	HInfoItem const& right = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? right_ : left_;
+	HInfoItem const& left = _sortHelper._order == OSortHelper::ASCENDING ? left_ : right_;
+	HInfoItem const& right = _sortHelper._order == OSortHelper::ASCENDING ? right_ : left_;
 	return ( list_control_helper::compare_cells( left[ _sortHelper._sortColumn ],
 				right[ _sortHelper._sortColumn ], _sortHelper ) );
 	M_EPILOG

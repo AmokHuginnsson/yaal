@@ -139,8 +139,8 @@ template<>
 bool CompareListControlItems<HWindow::ptr_t>::operator() ( HWindow::ptr_t const& left_,
 		HWindow::ptr_t const& right_ ) const {
 	M_PROLOG
-	HWindow::ptr_t const& left = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? left_ : right_;
-	HWindow::ptr_t const& right = _sortHelper._order == yaal::hcore::OListBits::ASCENDING ? right_ : left_;
+	HWindow::ptr_t const& left = _sortHelper._order == OSortHelper::ASCENDING ? left_ : right_;
+	HWindow::ptr_t const& right = _sortHelper._order == OSortHelper::ASCENDING ? right_ : left_;
 	return ( strcasecmp( left->get_title(), right->get_title() ) > 0 );
 	M_EPILOG
 }

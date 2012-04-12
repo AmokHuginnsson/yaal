@@ -183,8 +183,12 @@ protected:
  * OSortHelper abstracts compare operation.
  */
 struct OSortHelper {
+	typedef enum {
+		ASCENDING,
+		DESCENDING
+	} sort_order_t;
 	int _sortColumn;
-	yaal::hcore::OListBits::sort_order_t _order;
+	sort_order_t _order;
 	type_id_t _type;
 	int long _comparedItems;
 	int long _size;
@@ -379,7 +383,7 @@ private:
 public:
 	HListControler( model_ptr_t = model_ptr_t() );
 	void add_tail( tType const& );
-	void add_orderly( tType const&, int, yaal::hcore::OListBits::sort_order_t = yaal::hcore::OListBits::ASCENDING );
+	void add_orderly( tType const&, int, OSortHelper::sort_order_t = OSortHelper::ASCENDING );
 	void remove_tail( void );
 	model_ptr_t get_model( void );
 	virtual void sort( list_control_helper::OSortHelper& );
@@ -512,7 +516,7 @@ protected:
 	void handle_key_space( void );
 	void handle_key_tab( void );
 private:
-	void sort_by_column( int, hcore::OListBits::sort_order_t = hcore::OListBits::ASCENDING );
+	void sort_by_column( int, list_control_helper::OSortHelper::sort_order_t = list_control_helper::OSortHelper::ASCENDING );
 	void recalculate_column_widths( void );
 	void draw_background( int );
 	void draw_header( int );
@@ -550,7 +554,7 @@ void HListControler<tType>::add_tail( tType const& row_ ) {
 }
 
 template<typename tType>
-void HListControler<tType>::add_orderly ( tType const& row_, int column_, yaal::hcore::OListBits::sort_order_t order_ ) {
+void HListControler<tType>::add_orderly ( tType const& row_, int column_, list_control_helper::OSortHelper::sort_order_t order_ ) {
 	M_PROLOG
 	list_control_helper::OSortHelper helper =
 		{ column_, order_, _control->get_column_type( column_ ),
