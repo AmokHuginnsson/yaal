@@ -46,26 +46,43 @@ class HPool {
 		static int const PADDING_ELEMENTS_PER_BLOCK = sizeof ( T ) * ( OBJECTS_PER_BLOCK / sizeof ( padding_t ) );
 		int long long _mem[ PADDING_ELEMENTS_PER_BLOCK ];
 		int _free; /*!< index of first free object */
+		int _used; /*!< number of allocated object in this block pool*/
 	public:
 		HPoolBlock( void )
-			: _mem(), _free( 0 ) {
+			: _mem(), _free( 0 ), _used( 0 ) {
 			/* Create linked list of free object memory places. */
 			for ( int i( 0 ); i < ( OBJECTS_PER_BLOCK - 1 ); ++ i ) {
+				*reinterpret_cast<char*>( reinterpret_cast<T*>( _mem ) + i ) = i + 1;
 			}
+			*reinterpret_cast<char*>( reinterpret_cast<T*>( _mem ) + OBJECTS_PER_BLOCK - 1 ) = OBJECTS_PER_BLOCK - 1;
 		}
 		T* alloc( void ) {
-			return ( NULL );
+			T* p( reinterpret_cast<T*>( _mem ) + _free );
+			_free = *reinterpret_cast<char*>( p );
+			++ _used;
+			return ( p );
 		}
-		void free( T* ) {
+		void free( T* ptr_ ) {
+			int freed( ptr_ - reinterpret_cast<T*>( _mem ) );
+			if ( _free == -1 )
+				*reinterpret_cast<char*>( ptr_ ) = freed;
+			else
+				*reinterpret_cast<char*>( ptr_ ) = _free;
+			_free = freed;
+			-- _used;
+			return;
 		}
 		bool is_full( void ) const {
 			return ( _free == -1 );
+		}
+		bool is_empty( void ) const {
+			return ( _used == 0 );
 		}
 	};
 	HPoolBlock* _poolBlocks;
 	int _poolBlockCount;
 	int _poolBlockCapacity;
-	int _free;
+	int _free; /*!< index of first HPoolBlock with free space */
 public:
 	HPool( void )
 		: _poolBlocks( NULL ), _poolBlockCount( 0 ), _poolBlockCapacity( 0 ), _free( -1 )
@@ -77,7 +94,7 @@ public:
 	}
 	T* alloc( void ) {
 		if ( _free == -1 )
-			add_pool_block();
+			get_free_block();
 		T* p( _poolBlocks[_free]->alloc() );
 		if ( _poolBlocks[_free]->is_full() )
 			_free = -1;
@@ -87,7 +104,7 @@ public:
 		/* Find HPoolBlock<> that holds this object memory. */
 	}
 private:
-	void add_pool_block( void ) {
+	void get_free_block( void ) {
 	}
 };
 
