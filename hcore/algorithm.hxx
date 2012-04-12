@@ -715,7 +715,17 @@ inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, c
 }
 template<typename iter_t, typename value_t, typename compare_t>
 inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
-	return ( first_ );
+	iter_t mid( first_ + ( last_ - first_ ) / 2 );
+	while ( mid != first_ ) {
+		if ( comp_( *mid, value_ ) )
+			first_ = mid;
+		else
+			last_ = mid;
+		mid = ( first_ + ( last_ - first_ ) / 2 );
+	}
+	if ( comp_( *mid, value_ ) )
+		++ mid;
+	return ( mid );
 }
 /*! \endcond */
 
@@ -773,7 +783,17 @@ inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, c
 }
 template<typename iter_t, typename value_t, typename compare_t>
 inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
-	return ( first_ );
+	iter_t mid( first_ + ( last_ - first_ ) / 2 );
+	while ( mid != first_ ) {
+		if ( ! comp_( value_, *mid ) )
+			first_ = mid;
+		else
+			last_ = mid;
+		mid = ( first_ + ( last_ - first_ ) / 2 );
+	}
+	if ( ! comp_( value_, *mid ) )
+		++ mid;
+	return ( mid );
 }
 /*! \endcond */
 
@@ -809,11 +829,47 @@ inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_ ) 
 /*! \cond */
 template<typename iter_t, typename value_t, typename compare_t>
 inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
-	return ( false );
+	bool found( false );
+	iter_t it( first_ );
+	iter_t mid( first_ );
+	while ( it != last_ ) {
+		++ it;
+		if ( ! ( it != last_ ) )
+			break;
+		++ mid;
+		++ it;
+	}
+	if ( mid != first_ ) {
+		if ( ! comp_( value_, *mid ) ) {
+			if ( ! comp_( *mid, value_ ) )
+				found = true;
+			else
+				found = binary_search( mid, last_, value_, comp_, hcore::iterator_category::forward() );
+		} else
+			found = binary_search( first_, mid, value_, comp_, hcore::iterator_category::forward() );
+	} else {
+		found = ( ! comp_( value_, *mid ) ) && ( ! comp_( *mid, value_ ) );
+	}
+	return ( found );
 }
 template<typename iter_t, typename value_t, typename compare_t>
 inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
-	return ( false );
+	bool found( false );
+	iter_t mid( first_ + ( last_ - first_ ) / 2 );
+	while ( ! found && ( mid != first_ ) ) {
+		if ( ! comp_( value_, *mid ) ) {
+			if ( ! comp_( *mid, value_ ) ) {
+				found = true;
+				break;
+			}
+			first_ = mid;
+		} else
+			last_ = mid;
+		mid = ( first_ + ( last_ - first_ ) / 2 );
+	}
+	if ( ! found )
+		found = ( ! comp_( value_, *mid ) ) && ( ! comp_( *mid, value_ ) );
+	return ( found );
 }
 /*! \endcond */
 
