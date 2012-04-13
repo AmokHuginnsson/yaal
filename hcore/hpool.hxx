@@ -103,6 +103,8 @@ public:
 	void free( T* p ) {
 		/* Find HPoolBlock that holds this object memory. */
 		HPoolBlock** pb( lower_bound( _poolBlocks, _poolBlocks + _poolBlockCount, p ) );
+		if ( pb != p )
+			-- pb;
 		int freeing( pb - _poolBlocks );
 		bool wasFull( (*pb)->is_full() );
 		if ( (*pb)->free( p ) ) {
