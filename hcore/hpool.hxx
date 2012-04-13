@@ -97,13 +97,15 @@ public:
 		if ( _free == -1 )
 			get_free_block();
 		T* p( _poolBlocks[_free]->alloc() );
-		if ( _poolBlocks[_free]->is_full() )
+		if ( _poolBlocks[_free]->is_full() ) {
 			_free = -1;
+			-- _freeCount;
+		}
 		return ( p );
 	}
 	void free( T* p ) {
 		/* Find HPoolBlock that holds this object memory. */
-		HPoolBlock* pb( lower_bound( _poolBlocks, _poolBlocks + _poolBlockCount, p ) );
+		HPoolBlock** pb( lower_bound( _poolBlocks, _poolBlocks + _poolBlockCount, p ) );
 		int freeing( pb - _poolBlocks );
 		bool wasFull( (*pb)->is_full() );
 		if ( (*pb)->free( p ) ) {
@@ -123,6 +125,33 @@ public:
 	}
 private:
 	void get_free_block( void ) {
+		if ( _freeCount > 0 ) {
+			for ( int i( 0 ); i < _poolBlockCount; ++ i ) {
+				if ( ! _poolBlocks[i]->is_full() ) {
+					_free = i;
+					break;
+				}
+			}
+		} else {
+			if ( _poolBlockCount == _poolBlockCapacity ) {
+				int newCapacity( ( _poolBlockCapacity > 0 ? _poolBlockCapacity * 2 : 8 ) );
+				HPoolBlock** poolBlocks( new HPoolBlock*[ newCapacity ] );
+				if ( _poolBlockCapacity )
+					copy( _poolBlocks, _poolBlocks + _poolBlockCount, poolBlocks );
+				using yaal::swap;
+				swap( _poolBlocks, poolBlocks );
+				delete [] poolBlocks;
+				_poolBlockCapacity = newCapacity;
+			}
+			HPoolBlock* pb( new HPoolBlock );
+			HPoolBlock** spot( lower_bound( _poolBlocks, _poolBlocks + _poolBlockCount, pb ) );
+			copy_backward( spot, _poolBlocks + _poolBlockCount, _poolBlocks + _poolBlockCount + 1 );
+			*spot = pb;
+			++ _poolBlockCount;
+			++ _freeCount;
+			_free = spot - _poolBlocks;
+		}
+		return;
 	}
 };
 
