@@ -41,6 +41,7 @@ namespace hcore {
 template<typename T>
 class HPool {
 	class HPoolBlock {
+	private:
 		typedef int long long padding_t;
 		static int const OBJECTS_PER_BLOCK = 256;
 		static int const PADDING_ELEMENTS_PER_BLOCK = sizeof ( T ) * ( OBJECTS_PER_BLOCK / sizeof ( padding_t ) );
@@ -62,7 +63,7 @@ class HPool {
 			++ _used;
 			return ( p );
 		}
-		void free( T* ptr_ ) {
+		bool free( T* ptr_ ) {
 			int freed( ptr_ - reinterpret_cast<T*>( _mem ) );
 			if ( _free == -1 )
 				*reinterpret_cast<char*>( ptr_ ) = freed;
@@ -70,22 +71,22 @@ class HPool {
 				*reinterpret_cast<char*>( ptr_ ) = _free;
 			_free = freed;
 			-- _used;
-			return;
+			return ( _used == 0 );
 		}
 		bool is_full( void ) const {
 			return ( _free == -1 );
 		}
-		bool is_empty( void ) const {
-			return ( _used == 0 );
-		}
 	};
-	HPoolBlock* _poolBlocks;
+	HPoolBlock** _poolBlocks;
 	int _poolBlockCount;
 	int _poolBlockCapacity;
 	int _free; /*!< index of first HPoolBlock with free space */
+	int _freeCount; /*!< Number of HPoolBlock(s) that still have some free space. */
 public:
 	HPool( void )
-		: _poolBlocks( NULL ), _poolBlockCount( 0 ), _poolBlockCapacity( 0 ), _free( -1 )
+		: _poolBlocks( NULL ), _poolBlockCount( 0 ),
+		_poolBlockCapacity( 0 ), _free( -1 ),
+		_freeCount( 0 )
 		{}
 	~HPool( void ) {
 		for ( int i( 0 ); i < _poolBlockCount; ++ i )
@@ -100,8 +101,25 @@ public:
 			_free = -1;
 		return ( p );
 	}
-	void free( T* ) {
-		/* Find HPoolBlock<> that holds this object memory. */
+	void free( T* p ) {
+		/* Find HPoolBlock that holds this object memory. */
+		HPoolBlock* pb( lower_bound( _poolBlocks, _poolBlocks + _poolBlockCount, p ) );
+		int freeing( pb - _poolBlocks );
+		bool wasFull( (*pb)->is_full() );
+		if ( (*pb)->free( p ) ) {
+			/* HPoolBlock is no longer used and we can remove it. */
+			delete *pb;
+			copy( pb + 1, _poolBlocks + _poolBlockCount, pb );
+			-- _poolBlockCount;
+			-- _freeCount;
+			if ( freeing == _free )
+				_free = -1;
+		} else { 
+			if ( wasFull )
+				++ _freeCount;
+			if ( _free == -1 )
+				_free = freeing;
+		}
 	}
 private:
 	void get_free_block( void ) {
