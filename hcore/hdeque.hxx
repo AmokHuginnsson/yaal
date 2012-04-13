@@ -266,7 +266,7 @@ HDeque<type_t>::HDeque( HDeque const& deque )
 		value_type const* const* srcChunks = deque._chunks.template get<value_type const*>();
 		value_type** chunks = _chunks.get<value_type*>();
 		for ( int long i( firstUsedChunkIndex ), chunksCount( deque._chunks.template count_of<value_type*>() ); ( i < chunksCount ) && srcChunks[ i ]; ++ i )
-			chunks[ i ] = static_cast<value_type*>( operator new ( CHUNK_SIZE, memory::yaal ) );
+			chunks[ i ] = static_cast<value_type*>( ::operator new ( CHUNK_SIZE, memory::yaal ) );
 		for ( int long i( deque._start ), endIdx( deque._start + deque._size ); i < endIdx; ++ i )
 			new ( chunks[ i / VALUES_PER_CHUNK ] + ( i % VALUES_PER_CHUNK ) ) value_type( srcChunks[ i / VALUES_PER_CHUNK ][ i % VALUES_PER_CHUNK ] );
 		_start = deque._start;
@@ -407,11 +407,11 @@ void HDeque<type_t>::accommodate_chunks( int long size_ ) {
 			_start = newFirstChunkIndex * VALUES_PER_CHUNK;
 		if ( size_ > 0 ) {
 			for ( int long i( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ); ( i >= ( newFirstChunkIndex + usedChunksCount ) ) && ! chunks[ i ]; -- i )
-				chunks[ i ] = static_cast<value_type*>( operator new ( CHUNK_SIZE, memory::yaal ) );
+				chunks[ i ] = static_cast<value_type*>( ::operator new ( CHUNK_SIZE, memory::yaal ) );
 		} else if ( size_ < 0 ) {
 			M_ASSERT( ( _start + size_ ) >= 0 );
 			for ( int long i( ( _start + size_ ) / VALUES_PER_CHUNK ); ( i < newFirstChunkIndex ) && ! chunks[ i ]; ++ i )
-				chunks[ i ] = static_cast<value_type*>( operator new (  CHUNK_SIZE, memory::yaal ) );
+				chunks[ i ] = static_cast<value_type*>( ::operator new (  CHUNK_SIZE, memory::yaal ) );
 		}
 	}
 	return;
@@ -437,7 +437,7 @@ void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ ) {
 			M_SAFE( chunks[ i / VALUES_PER_CHUNK ][ i % VALUES_PER_CHUNK ].~value_type() );
 		for ( int long i( ( ( ( _start + size_ - 1 ) >= _start ? ( _start + size_ - 1 ) : _start + size_ ) / VALUES_PER_CHUNK ) + ( size_ ? 1 : 0 ) ),
 				lastChunkIndex( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ); i < lastChunkIndex; ++ i ) {
-			operator delete ( static_cast<void*>( chunks[ i ] ) );
+			::operator delete ( static_cast<void*>( chunks[ i ] ), memory::yaal );
 			chunks[ i ] = NULL;
 		}
 	}
@@ -534,7 +534,7 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 			for ( int long chunkIndex( _start / VALUES_PER_CHUNK ), newFirstChunkIndex( ( _start + toRemove ) / VALUES_PER_CHUNK );
 					chunkIndex < newFirstChunkIndex; ++ chunkIndex ) {
 				M_ASSERT( chunks[ chunkIndex ] );
-				operator delete ( static_cast<void*>( chunks[ chunkIndex ] ) );
+				::operator delete ( static_cast<void*>( chunks[ chunkIndex ] ), memory::yaal );
 				chunks[ chunkIndex ] = NULL;
 			}
 			_start += toRemove;
@@ -548,7 +548,7 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 					( chunkIndex < ( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ) ) && ( chunkIndex < chunksCount );
 					++ chunkIndex ) {
 				M_ASSERT( chunks[ chunkIndex ] );
-				operator delete ( static_cast<void*>( chunks[ chunkIndex ] ) );
+				::operator delete ( static_cast<void*>( chunks[ chunkIndex ] ), memory::yaal );
 				chunks[ chunkIndex ] = NULL;
 			}
 		}
@@ -619,7 +619,7 @@ void HDeque<type_t>::push_back( type_t const& value_ ) {
 			chunk = ( _start + _size ) / VALUES_PER_CHUNK;
 		} else /* We have enough space and we do not need to move chunks. */
 			chunks = _chunks.get<value_type*>();
-		chunks[ chunk ] = static_cast<value_type*>( operator new ( CHUNK_SIZE, memory::yaal ) );
+		chunks[ chunk ] = static_cast<value_type*>( ::operator new ( CHUNK_SIZE, memory::yaal ) );
 	} else /* We use old chunk. */
 		chunks = _chunks.get<value_type*>();
 	new ( _chunks.get<value_type*>()[ chunk ] + offset ) value_type( value_ );
@@ -660,7 +660,7 @@ void HDeque<type_t>::push_front( type_t const& value_ ) {
 		-- _start;
 		chunk = _start / VALUES_PER_CHUNK;
 		offset = VALUES_PER_CHUNK - 1;
-		chunks[ chunk ] = static_cast<value_type*>( operator new ( CHUNK_SIZE, memory::yaal ) );
+		chunks[ chunk ] = static_cast<value_type*>( ::operator new ( CHUNK_SIZE, memory::yaal ) );
 	} else /* We use old chunk. */ {
 		chunks = _chunks.get<value_type*>();
 		-- _start;
