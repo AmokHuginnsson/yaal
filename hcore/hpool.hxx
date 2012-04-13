@@ -55,7 +55,7 @@ class HPool {
 			for ( int i( 0 ); i < ( OBJECTS_PER_BLOCK - 1 ); ++ i ) {
 				*reinterpret_cast<char*>( reinterpret_cast<T*>( _mem ) + i ) = i + 1;
 			}
-			*reinterpret_cast<char*>( reinterpret_cast<T*>( _mem ) + OBJECTS_PER_BLOCK - 1 ) = OBJECTS_PER_BLOCK - 1;
+			*reinterpret_cast<char*>( reinterpret_cast<T*>( _mem ) + OBJECTS_PER_BLOCK - 1 ) = -1;
 		}
 		T* alloc( void ) {
 			T* p( reinterpret_cast<T*>( _mem ) + _free );
@@ -65,10 +65,7 @@ class HPool {
 		}
 		bool free( T* ptr_ ) {
 			int freed( ptr_ - reinterpret_cast<T*>( _mem ) );
-			if ( _free == -1 )
-				*reinterpret_cast<char*>( ptr_ ) = freed;
-			else
-				*reinterpret_cast<char*>( ptr_ ) = _free;
+			*reinterpret_cast<char*>( ptr_ ) = _free;
 			_free = freed;
 			-- _used;
 			return ( _used == 0 );
