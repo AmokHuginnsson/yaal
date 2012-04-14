@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hpointer.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/memory.hxx"
+#include "tools/collections.hxx"
 #include "hconsole/hitem.hxx"
 #include "hconsole/hwindow.hxx"
 #include "hconsole/hsearchablecontrol.hxx"
@@ -554,12 +555,12 @@ void HListControler<tType>::add_tail( tType const& row_ ) {
 }
 
 template<typename tType>
-void HListControler<tType>::add_orderly ( tType const& row_, int column_, list_control_helper::OSortHelper::sort_order_t order_ ) {
+void HListControler<tType>::add_orderly( tType const& row_, int column_, list_control_helper::OSortHelper::sort_order_t order_ ) {
 	M_PROLOG
 	list_control_helper::OSortHelper helper =
 		{ column_, order_, _control->get_column_type( column_ ),
 		0, size(), NULL };
-	_list->add_orderly( row_, CompareListControlItems<tType> ( helper ), order_ );
+	tools::collections::add_orderly( *_list, row_, CompareListControlItems<tType>( helper ) );
 	_control->invalidate();
 	return;
 	M_EPILOG
