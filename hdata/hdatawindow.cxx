@@ -270,9 +270,9 @@ void HDataWindow::sync( HRecordSet::iterator it ) {
 void HDataWindow::sync( void ) {
 	M_PROLOG
 	M_ASSERT( _documentMode == DOCUMENT::EDIT );
-	int count = static_cast<int>( _editModeControls.size() );
-	for ( int i = 0; i < count; i ++ )
-		(*_dB)[ i ] = _editModeControls[ i ]->get().get_string();
+	int i( 0 );
+	for ( controls_t::iterator it( _editModeControls.begin() ), end( _editModeControls.end() ); it != end; ++ it, ++ i )
+		(*_dB)[ i ] = (*it)->get().get_string();
 	return;
 	M_EPILOG
 }

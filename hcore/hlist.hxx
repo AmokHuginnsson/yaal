@@ -95,9 +95,6 @@ private:
 	class HElement;
 	int long _size;           /*!< how many elements this list contains */
 	HElement* _hook;    /*!< "begining" of the list ( "first" element ) */
-/* for internal use only */
-	int long _index;          /*!< this two fiels will allow boost operator[], int holds last */
-	HElement* _indexElement;   /*!< index and HElement * holds pointer to this last element */
 public:
 	typedef type_t value_type;
 	template<typename const_qual_t, OListBits::treatment_t const treatment>
@@ -110,7 +107,9 @@ public:
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 	/*! \brief Create an empty list.
 	 */
-	HList( void );
+	HList( void )
+		: OListBits(), _size( 0 ), _hook( NULL )
+		{}
 	/*! \brief Creates list, with specified size.
 	 *
 	 * \param count - number of element for newly created list.
@@ -173,18 +172,12 @@ public:
 	void pop_back( void );
 	void push_front( type_t const& );
 	void pop_front( void );
-	/*! \brief Add element in the way that keeps order.
-	 */
-	template<typename T>
-	type_t& add_orderly( type_t const&, T const& );
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<type_t, treatment>::type erase( HIterator<type_t, treatment> const& );
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<type_t, treatment>::type erase( HIterator<type_t, treatment>, HIterator<type_t, treatment> const& );
 	/*! \brief Sets cursor at specified index or number
 	 */
-	iterator n_th( int long );
-	type_t& operator[] ( int long );
 	type_t& front( void );
 	type_t const& front( void ) const;
 	type_t& back( void );
@@ -205,12 +198,14 @@ private:
 	template<typename iterator_t>
 	void initialize( iterator_t, iterator_t, trait::false_type const* );
 	void initialize( int long, type_t const&, trait::true_type const* );
+	template<typename iterator_t>
+	void assign( iterator_t, iterator_t, trait::false_type const* );
+	void assign( int long, type_t const&, trait::true_type const* );
 	template<typename T>
 	void merge_sort( HElement*&, HElement*&, T const& );
 	template<typename T>
 	void insert_sort( HElement*&, HElement*&, T const& );
 	void insert( HElement*, HElement* );
-	HElement* element_by_index( int long );
 	void exchange( HElement*, HElement* );
 	void sub_swap( HElement*, HElement*, HElement* );
 	friend class HIterator<type_t, OListBits::TREAT_AS_OPENED>;
@@ -227,10 +222,31 @@ private:
 	HElement* _previous;
 	HElement* _next;
 	type_t _value; /*!< The Object itself. */
-	explicit HElement( HElement* );
-	explicit HElement( HElement*, type_t const& );
-	virtual ~HElement ();
-	void connect( HElement* );
+	explicit HElement( HElement* element_ )
+		: _previous ( NULL ), _next ( NULL ), _value() {
+		connect( element_ );
+	}
+	explicit HElement( HElement* element_, type_t const& value_ )
+		: _previous ( NULL ), _next ( NULL ), _value( value_ ) {
+		connect( element_ );
+	}
+	~HElement( void ) {
+		_previous->_next = _next;
+		_next->_previous = _previous;
+		return;
+	}
+	void connect( HElement* element_ ) {
+		if ( element_ == 0 ) {
+			_previous = this;
+			_next = this;
+		} else {
+			_previous = element_->_previous;
+			_next = element_;
+			element_->_previous = this;
+			_previous->_next = this;
+		}
+	}
+private:
 	HElement( HElement const & );
 	HElement& operator = ( HElement const& );
 	friend class HList<type_t>;
@@ -250,10 +266,24 @@ private:
 	HElement* _current;
 public:
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
-	HIterator( void );
-	HIterator( HIterator const& );
+	HIterator( void )
+		: base_type(), _owner( NULL ), _current( NULL ) {
+		return;
+	}
+	HIterator( HIterator const& iterator_ )
+		: base_type(), _owner( iterator_._owner ), _current( iterator_._current ) {
+		M_PROLOG
+		return;
+		M_EPILOG
+	}
 	template<typename other_const_qual_t, OListBits::treatment_t family>
-	HIterator( HIterator<other_const_qual_t, family> const& );
+	HIterator( HIterator<other_const_qual_t, family> const& iterator_ )
+		: base_type(), _owner( iterator_._owner ), _current( iterator_._current ) {
+		M_PROLOG
+		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
+		return;
+		M_EPILOG
+	}
 	HIterator& operator ++ ( void ) {
 		M_PROLOG
 		M_ASSERT( _owner );
@@ -292,18 +322,48 @@ public:
 		return ( iterator );
 		M_EPILOG
 	}
-	typename HList<type_t>::template HIterator<const_qual_t, treatment>& operator = ( HIterator const& );
-	bool operator == ( HIterator const & ) const;
-	bool operator != ( HIterator const & ) const;
-	const_qual_t& operator* ( void );
-	const_qual_t& operator* ( void ) const;
-	const_qual_t* operator->( void );
-	const_qual_t* operator->( void ) const;
+	typename HList<type_t>::template HIterator<const_qual_t, treatment>& operator = ( HIterator const& iterator_ ) {
+		M_PROLOG
+		if ( reinterpret_cast<HIterator<const_qual_t, treatment> const*>( &iterator_ ) != this ) {
+			_owner = iterator_._owner;
+			_current = iterator_._current;
+		}
+		return ( *this );
+		M_EPILOG
+	}
+	bool operator == ( HIterator const& iterator_ ) const {
+		M_PROLOG
+		M_ASSERT( ( ! ( _owner && iterator_._owner ) ) || ( _owner == iterator_._owner ) );
+		return ( _current == iterator_._current );
+		M_EPILOG
+	}
+	bool operator != ( HIterator const& iterator_ ) const {
+		M_PROLOG
+		M_ASSERT( ( ! ( _owner && iterator_._owner ) ) || ( _owner == iterator_._owner ) );
+		return ( _current != iterator_._current );
+		M_EPILOG
+	}
+	const_qual_t& operator* ( void ) {
+		return ( _current->_value );
+	}
+	const_qual_t& operator* ( void ) const {
+		return ( _current->_value );
+	}
+	const_qual_t* operator->( void ) {
+		return ( &_current->_value );
+	}
+	const_qual_t* operator->( void ) const {
+		return ( &_current->_value );
+	}
 protected:
 	friend class HList<type_t>;
 	template<typename same_const_qual_t, OListBits::treatment_t const family>
 	friend class HIterator;
-	HIterator( HList<type_t> const* const, HElement* const );
+	HIterator( HList<type_t> const* const owner_,
+			HElement* const element_ )
+		: base_type(), _owner( owner_ ), _current( element_ ) {
+		return;
+	}
 };
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -313,160 +373,9 @@ protected:
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 template<typename type_t>
-HList<type_t>::HElement::HElement( HElement* element_ )
-	: _previous ( NULL ), _next ( NULL ), _value() {
-	connect( element_ );
-}
-
-template<typename type_t>
-HList<type_t>::HElement::HElement( HElement* element_, type_t const& value_ )
-	: _previous ( NULL ), _next ( NULL ), _value( value_ ) {
-	connect( element_ );
-}
-
-template<typename type_t>
-HList<type_t>::HElement::~HElement( void ) {
-	_previous->_next = _next;
-	_next->_previous = _previous;
-	return;
-}
-
-template<typename type_t>
-void HList<type_t>::HElement::connect( HElement* element_ ) {
-	if ( element_ == 0 ) {
-		_previous = this;
-		_next = this;
-	} else {
-		_previous = element_->_previous;
-		_next = element_;
-		element_->_previous = this;
-		_previous->_next = this;
-	}
-}
-
-//========================== Iterator ========================================
-
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( void )
-	: base_type(), _owner( NULL ), _current( NULL ) {
-	return;
-}
-
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( HIterator const& iterator_ )
-	: base_type(), _owner( iterator_._owner ), _current( iterator_._current ) {
-	M_PROLOG
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-template<typename other_const_qual_t, OListBits::treatment_t family>
-HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( HIterator<other_const_qual_t, family> const& iterator_ )
-	: base_type(), _owner( iterator_._owner ), _current( iterator_._current ) {
-	M_PROLOG
-	STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-HList<type_t>::HIterator<const_qual_t, treatment>::HIterator( HList<type_t> const* const owner_,
-		HElement* const element_ )
-	: base_type(), _owner( owner_ ), _current( element_ ) {
-	return;
-}
-
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-typename HList<type_t>::template HIterator<const_qual_t, treatment>&
-HList<type_t>::HIterator<const_qual_t, treatment>::operator = ( HIterator const& iterator_ ) {
-	M_PROLOG
-	if ( reinterpret_cast<HIterator<const_qual_t, treatment> const*>( &iterator_ ) != this ) {
-		_owner = iterator_._owner;
-		_current = iterator_._current;
-	}
-	return ( *this );
-	M_EPILOG
-}
-
-/*
-template<typename type_t>
-typename HList<type_t>::HIterator & HList< type_t >::HIterator::operator ++ ( void )
-
-template<typename type_t>
-typename HList<type_t>::HIterator const HList< type_t >::HIterator::operator ++ ( int )
-
-template<typename type_t>
-typename HList<type_t>::HIterator & HList< type_t >::HIterator::operator -- ( void )
-
-template<typename type_t>
-typename HList<type_t>::HIterator const HList< type_t >::HIterator::operator -- ( int )
-*/
-
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-bool HList<type_t>::HIterator<const_qual_t, treatment>::operator == ( HIterator const& iterator_ ) const {
-	M_PROLOG
-	M_ASSERT( ( ! ( _owner && iterator_._owner ) ) || ( _owner == iterator_._owner ) );
-	return ( _current == iterator_._current );
-	M_EPILOG
-}
-
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-bool HList<type_t>::HIterator<const_qual_t, treatment>::operator!= ( HIterator const& iterator_ ) const {
-	M_PROLOG
-	M_ASSERT( ( ! ( _owner && iterator_._owner ) ) || ( _owner == iterator_._owner ) );
-	return ( _current != iterator_._current );
-	M_EPILOG
-}
-
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-const_qual_t& HList<type_t>::HIterator<const_qual_t, treatment>::operator* ( void ) {
-	return ( _current->_value );
-}
-
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-const_qual_t& HList<type_t>::HIterator<const_qual_t, treatment>::operator* ( void ) const {
-	return ( _current->_value );
-}
-
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-const_qual_t* HList<type_t>::HIterator<const_qual_t, treatment>::operator->( void ) {
-	return ( &_current->_value );
-}
-
-template<typename type_t>
-template<typename const_qual_t, OListBits::treatment_t const treatment>
-const_qual_t* HList<type_t>::HIterator<const_qual_t, treatment>::operator->( void ) const {
-	return ( &_current->_value );
-}
-
-//============================================================================
-
-template<typename type_t>
-HList<type_t>::HList( void )
-	: OListBits(), _size( 0 ),
-	_hook( NULL ), _index( 0 ),
-	_indexElement( NULL ) {
-	M_PROLOG
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
 HList<type_t>::HList( int long count_ )
 	: OListBits(), _size( 0 ),
-	_hook( NULL ), _index( 0 ),
-	_indexElement( NULL ) {
+	_hook( NULL ) {
 	M_PROLOG
 	while ( count_ -- )
 		add_tail();
@@ -477,8 +386,7 @@ HList<type_t>::HList( int long count_ )
 template<typename type_t>
 HList<type_t>::HList( int long count_, type_t const& value_ )
 	: OListBits(), _size( 0 ),
-	_hook( NULL ), _index( 0 ),
-	_indexElement( NULL ) {
+	_hook( NULL ) {
 	M_PROLOG
 	resize( count_, value_ );
 	return;
@@ -496,8 +404,7 @@ HList<type_t>::~HList( void ) {
 template<typename type_t>
 HList<type_t>::HList( HList<type_t> const& list_ )
 	: OListBits(), _size( 0 ),
-	_hook( NULL ), _index( 0 ),
-	_indexElement( NULL ) {
+	_hook( NULL ) {
 	M_PROLOG
 	( *this ) = list_;
 	return;
@@ -508,8 +415,7 @@ template<typename type_t>
 template<typename iter_t>
 HList<type_t>::HList( iter_t first, iter_t last )
 	: OListBits(), _size( 0 ),
-	_hook( NULL ), _index( 0 ),
-	_indexElement( NULL ) {
+	_hook( NULL ) {
 	M_PROLOG
 	initialize( first, last, typename trait::add_pointer<typename is_integral<iter_t>::type>::type() );
 	return;
@@ -538,9 +444,7 @@ template<typename type_t>
 template<typename iterator_t>
 void HList<type_t>::assign( iterator_t first, iterator_t last ) {
 	M_PROLOG
-	clear();
-	for ( ; first != last; ++ first )
-		push_back( *first );
+	assign( first, last, typename trait::add_pointer<typename is_integral<iterator_t>::type>::type() );
 	return;
 	M_EPILOG
 }
@@ -548,7 +452,31 @@ void HList<type_t>::assign( iterator_t first, iterator_t last ) {
 template<typename type_t>
 void HList<type_t>::assign( int long size_, type_t const& fillWith_ ) {
 	M_PROLOG
-	clear();
+	assign( size_, fillWith_, static_cast<trait::true_type const*>( NULL ) );
+	return;
+	M_EPILOG
+}
+
+template<typename type_t>
+template<typename iterator_t>
+void HList<type_t>::assign( iterator_t first, iterator_t last, trait::false_type const* ) {
+	M_PROLOG
+	int long count( 0 );
+	for ( iterator it( begin() ), endIt( end() ); ( it != endIt ) && ( first != last ); ++ it, ++ first, ++ count )
+		*it = *first;
+	if ( first != last ) {
+		for ( ; first != last; ++ first )
+			push_back( *first );
+	} else
+		resize( count );
+	return;
+	M_EPILOG
+}
+
+template<typename type_t>
+void HList<type_t>::assign( int long size_, type_t const& fillWith_, trait::true_type const* ) {
+	M_PROLOG
+	fill_n( begin(), min( size_, _size ), fillWith_ );
 	resize( size_, fillWith_ );
 	return;
 	M_EPILOG
@@ -562,7 +490,7 @@ void HList<type_t>::resize( int long size_, type_t const& value_ ) {
 		while ( diff -- )
 			pop_back();
 	} else if ( _size < size_ ) {
-		while ( size_ -- )
+		while ( diff -- )
 			push_back( value_ );
 	}
 	return;
@@ -632,8 +560,6 @@ HList<type_t>& HList<type_t>::operator = ( HList<type_t> const& list_ ) {
 				*thisIt = *otherIt;
 				if ( otherIt._current == list_._hook )
 					_hook = thisIt._current;
-				if ( otherIt._current == list_._indexElement )
-					_indexElement = thisIt._current;
 			}
 		}
 		if ( _size > list_._size ) {
@@ -643,11 +569,8 @@ HList<type_t>& HList<type_t>::operator = ( HList<type_t> const& list_ ) {
 		} else if ( _size < list_._size ) {
 			for ( ; ctr < list_._size; ++ ctr, ++ otherIt ) {
 				push_back( *otherIt );
-				if ( otherIt._current == list_._indexElement )
-					_indexElement = _hook->_previous;
 			}
 		}
-		_index = list_._index;
 		_size = list_._size;
 	}
 	return ( *this );
@@ -659,8 +582,6 @@ void HList<type_t>::clear( void ) {
 	M_PROLOG
 	while ( _size -- )
 		M_SAFE( delete _hook->_next );
-	_index = 0;
-	_indexElement = NULL;
 	_hook = NULL;
 	_size = 0;
 	return ;
@@ -696,9 +617,7 @@ void HList<type_t>::swap( HList<type_t>& other ) {
 	if ( &other != this ) {
 		using yaal::swap;
 		swap( _size, other._size );
-		swap( _index, other._index );
 		swap( _hook, other._hook );
-		swap( _indexElement, other._indexElement );
 	}
 	return;
 }
@@ -711,8 +630,6 @@ typename OListBits::iterator<type_t, treatment>::type HList<type_t>::insert( HIt
 	if ( ( _size == 0 ) || ( ( it._current == _hook ) && ( treatment == TREAT_AS_OPENED ) ) )
 		_hook = element;
 	_size ++;
-	_index = 0;
-	_indexElement = NULL;
 	return ( iterator( this, element ) );
 	M_EPILOG
 }
@@ -726,8 +643,6 @@ typename OListBits::iterator<type_t, treatment>::type HList<type_t>::insert( HIt
 	if ( ( _size == 0 ) || ( ( it._current == _hook ) && ( treatment == TREAT_AS_OPENED ) ) )
 		_hook = element;
 	_size ++;
-	_index = 0;
-	_indexElement = NULL;
 	return ( iterator( this, element ) );
 	M_EPILOG
 }
@@ -759,8 +674,6 @@ type_t& HList<type_t>::add_head( void ) {
 	M_PROLOG
 	_hook = new ( memory::yaal ) HElement( _hook );
 	++ _size;
-	if ( _indexElement )
-		_indexElement = _indexElement->_previous;
 	return ( _hook->_value );
 	M_EPILOG
 }
@@ -781,8 +694,6 @@ void HList<type_t>::push_front( type_t const& object_ ) {
 	M_PROLOG
 	_hook = new ( memory::yaal ) HElement( _hook, object_ );
 	++ _size;
-	if ( _indexElement )
-		_indexElement = _indexElement->_previous;
 	return;
 	M_EPILOG
 }
@@ -795,46 +706,6 @@ void HList<type_t>::push_back( type_t const& object_ ) {
 		_hook = element;
 	++ _size;
 	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-template<typename T>
-type_t& HList<type_t>::add_orderly( type_t const& object_,
-		T const& comp_ ) {
-	M_PROLOG
-	bool before = false;
-	int index = 0, oldIndex = -1, lower = 0, upper = _size;
-	HElement* element = new ( memory::yaal ) HElement( NULL, object_ );
-	while ( _size && ( oldIndex != index ) ) {
-		oldIndex = index;
-		index = ( lower + upper ) / 2;
-		element_by_index( index );
-		if ( comp_( _indexElement->_value, element->_value ) )
-			lower = index;
-		else
-			upper = index;
-	}
-	if ( _indexElement ) {
-		if ( comp_( _indexElement->_value, element->_value ) )
-			_indexElement = _indexElement->_next;
-		else
-			before = true;
-	}
-	if ( ! _size )
-		_hook = _indexElement = element;
-	else {
-		element->_next = _indexElement;
-		element->_previous = _indexElement->_previous;
-		_indexElement->_previous->_next = element;
-		_indexElement->_previous = element;
-	}
-	_size ++;
-	_indexElement = NULL;
-	_index = 0;
-	if ( before && ! index )
-		_hook = _hook->_previous;
-	return ( element->_value );
 	M_EPILOG
 }
 
@@ -876,8 +747,6 @@ HList<type_t>::erase( HIterator<type_t, treatment> const& iterator_ ) {
 	_size --;
 	if ( _size == 0 )
 		_hook = NULL;
-	_index = 0;
-	_indexElement = NULL;
 	return ( it );
 	M_EPILOG
 }
@@ -902,15 +771,10 @@ void HList<type_t>::pop_front( void ) {
 		_hook = _hook->_next;
 	} else
 		M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
-	if ( _indexElement )
-		_indexElement = _indexElement->_next;
 	M_SAFE( delete element );
 	_size--;
-	if ( _size == 0 ) {
+	if ( _size == 0 )
 		_hook = NULL;
-		_indexElement = NULL;
-		_index = 0;
-	}
 	return;
 	M_EPILOG
 }
@@ -921,76 +785,13 @@ void HList<type_t>::pop_back( void ) {
 	HElement* element = NULL;
 	if ( _size > 0 ) {
 		element = _hook->_previous;
-		if ( element == _indexElement ) {
-			_indexElement = element->_previous;
-			_index --;
-		}
 		M_SAFE( delete element );
 		-- _size;
-		if ( _size == 0 ) {
+		if ( _size == 0 )
 			_hook = NULL;
-			_indexElement = NULL;
-			_index = 0;
-		}
 	} else
 		M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
 	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-type_t& HList<type_t>::operator[] ( int long index_ ) {
-	M_PROLOG
-	return ( element_by_index( index_ )->_value );
-	M_EPILOG
-}
-
-template<typename type_t>
-typename HList<type_t>::HElement* HList<type_t>::element_by_index( int long index_ ) {
-	M_PROLOG
-	if ( _size == 0 )
-		M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
-	if ( index_ < 0 )
-		index_ += _size;
-	if ( ( index_ >= _size ) || ( index_ < 0 ) )
-		M_THROW( _errMsgHList_[ ERROR::BAD_INDEX ], index_ );
-	if ( ! _indexElement )
-		_indexElement = _hook;
-/*
-we are looking for the smallest distance between index_ and 0, _index, _size.
-we have two cases, index_ is between 0 and _index:
-	0 ..... index_ ..... _index ..... _size
-meaning index_ < _index
-and index_ is between _index and _size
-	0 ..... _index ..... index_ ..... _size
-meaning index_ > _index
-lets take closer look at first case  ( index_ < _index )
-we have to check if index_ is lowwer or geater than _index/2
-*/
-	if ( index_ < _index ) {
-		if ( index_ < ( _index / 2 ) )
-			for ( _index = 0, _indexElement = _hook; _index < index_; ++ _index )
-				_indexElement = _indexElement->_next;
-		else
-			for ( ; _index > index_; _index -- )
-				_indexElement = _indexElement->_previous;
-	} else {
-		if ( index_ < ( ( _size + _index ) / 2 ) )
-			for ( ; _index < index_; ++ _index )
-				_indexElement = _indexElement->_next;
-		else
-			for ( _index = _size - 1, _indexElement = _hook->_previous;
-					_index > index_; _index -- )
-				_indexElement = _indexElement->_previous;
-	}
-	return ( _indexElement );
-	M_EPILOG
-}
-
-template<typename type_t>
-typename HList<type_t>::iterator HList<type_t>::n_th( int long index_ ) {
-	M_PROLOG
-	return ( iterator( this, element_by_index( index_ ) ) );
 	M_EPILOG
 }
 
@@ -1005,10 +806,6 @@ void HList<type_t>::exchange( HElement* left_, HElement* right_ ) {
 		_hook = right_;
 	else if ( right_ == _hook )
 		_hook = left_;
-	if ( left_ == _indexElement )
-		_indexElement = right_;
-	else if ( right_ == _indexElement )
-		_indexElement = left_;
 /*
  *                         ( p L n )
  *          ( p R n ) <------+   +------> ( p R n )
@@ -1206,8 +1003,6 @@ void HList<type_t>::insert( HElement* pos, HElement* elem ) {
 	else {
 		if ( pos == _hook )
 			_hook = elem;
-		if ( pos == _indexElement )
-			_indexElement = elem;
 		if ( pos->_previous != elem ) {
 			elem->_next->_previous = elem->_previous;
 			elem->_previous->_next = elem->_next;
@@ -1237,8 +1032,6 @@ void HList<type_t>::sort( T const& comp_ ) {
 		HElement* last = _hook->_previous;
 		merge_sort( first, last, comp_ );
 		_hook = first;
-		_indexElement = NULL;
-		_index = 0;
 	}
 	return;
 	M_EPILOG;

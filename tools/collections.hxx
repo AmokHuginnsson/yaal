@@ -86,6 +86,26 @@ inline void add_orderly( collection& coll_, T const& value_ ) {
 	M_EPILOG
 }
 
+template<typename collection>
+inline typename collection::iterator n_th( collection& coll_, int long nth_ ) {
+	M_PROLOG
+	M_ENSURE( ( nth_ >= 0 ) && ( nth_ < coll_.size() ) );
+	typename collection::iterator it( coll_.begin() );
+	yaal::advance( it, nth_ );
+	return ( it );
+	M_EPILOG
+}
+
+template<typename collection>
+inline typename collection::const_iterator n_th( collection const& coll_, int long nth_ ) {
+	M_PROLOG
+	M_ENSURE( ( nth_ >= 0 ) && ( nth_ < coll_.size() ) );
+	typename collection::iterator it( coll_.begin() );
+	yaal::advance( it, nth_ );
+	return ( it );
+	M_EPILOG
+}
+
 }
 
 }

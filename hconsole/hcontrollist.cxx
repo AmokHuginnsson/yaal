@@ -29,8 +29,11 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hcontrollist.hxx"
 #include "hstatusbarcontrol.hxx"
+#include "tools/collections.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
+using namespace yaal::tools::collections;
 
 namespace yaal {
 
@@ -144,7 +147,14 @@ void HControlList::select( HControl::ptr_t const& control_ ) {
 
 void HControlList::exchange( int former_, int latter_ ) {
 	M_PROLOG
-	_list.exchange( _list.n_th( former_ + 1 ), _list.n_th( latter_ + 1 ) );
+	if ( former_ != latter_ ) {
+		int first( min( former_, latter_ ) + 1 ); /* *FIXME* Original code had +1, I do not why at this moment. */
+		int last( max( former_, latter_ ) + 1 );
+		model_t::iterator itFirst( n_th( _list, first ) );
+		model_t::iterator itLast( itFirst );
+		advance( itLast, last - first );
+		_list.exchange( itFirst, itLast );
+	}
 	return;
 	M_EPILOG
 }
