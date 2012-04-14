@@ -188,7 +188,10 @@ class YaalHCoreHListHIteratorPrinter:
 		ptr = self._val['_owner']
 		current = self._val['_current']
 		if ptr != 0:
-			return "{0x%x,%s,%s}" % ( ptr, self._val['_owner']['_size'], current['_value'] )
+			if current != 0:
+				return "{0x%x,%d,%s}" % ( ptr, ptr['_size'], current['_value'] )
+			else:
+				return "{0x%x,%d,(NIL)}" % ( ptr, ptr['_size'] )
 		return "{0x0,0,(NIL)}"
 
 	def display_hint( self ):
