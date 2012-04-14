@@ -708,7 +708,7 @@ inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, c
 		else
 			mid = lower_bound( first_, mid, value_, comp_, hcore::iterator_category::forward() );
 	} else {
-		if ( comp_( *mid, value_ ) )
+		if ( ( mid != last_ ) && comp_( *mid, value_ ) )
 			++ mid;
 	}
 	return ( mid );
@@ -723,7 +723,7 @@ inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, c
 			last_ = mid;
 		mid = ( first_ + ( last_ - first_ ) / 2 );
 	}
-	if ( comp_( *mid, value_ ) )
+	if ( ( mid != last_ ) && comp_( *mid, value_ ) )
 		++ mid;
 	return ( mid );
 }
@@ -776,7 +776,7 @@ inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, c
 		else
 			mid = upper_bound( first_, mid, value_, comp_, hcore::iterator_category::forward() );
 	} else {
-		if ( ! comp_( value_, *mid ) )
+		if ( ( mid != last_ ) && ! comp_( value_, *mid ) )
 			++ mid;
 	}
 	return ( mid );
@@ -791,7 +791,7 @@ inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, c
 			last_ = mid;
 		mid = ( first_ + ( last_ - first_ ) / 2 );
 	}
-	if ( ! comp_( value_, *mid ) )
+	if ( ( mid != last_ ) && ! comp_( value_, *mid ) )
 		++ mid;
 	return ( mid );
 }
