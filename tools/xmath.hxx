@@ -44,6 +44,8 @@ namespace xmath {
 template<typename numeric_t>
 class HNumberSetStats {
 	int long _count;
+	numeric_t _minimum;
+	numeric_t _maximum;
 	numeric_t _sum;
 	numeric_t _average;
 public:
@@ -51,6 +53,10 @@ public:
 	HNumberSetStats( iterator_t, iterator_t );
 	int long count( void ) const
 		{ return ( _count ); }
+	numeric_t minimum( void ) const
+		{ return ( _minimum ); }
+	numeric_t maximum( void ) const
+		{ return ( _maximum ); }
 	numeric_t sum( void )
 		{ return ( _sum ); }
 	numeric_t average( void ) const
@@ -60,9 +66,18 @@ public:
 template<typename numeric_t>
 template<typename iterator_t>
 HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_ )
-	: _count( 0 ), _sum(), _average() {
+	: _count( 0 ), _minimum(), _maximum(), _sum(), _average() {
 	M_PROLOG
 	for ( ; first_ != last_; ++ first_, ++ _count ) {
+		if ( _count ) {
+			if ( *first_ < _minimum )
+				_minimum = *first_;
+			if ( *first_ > _maximum )
+				_maximum = *first_;
+		} else {
+			_minimum = *first_;
+			_maximum = *first_;
+		}
 		_sum += *first_;
 	}
 	_average = _sum / _count;
