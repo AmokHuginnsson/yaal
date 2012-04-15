@@ -47,11 +47,12 @@ struct system {
 	struct rebind {
 		typedef system<U> other;
 	};
-	pointer address( reference r ) const {
-		return ( &r );
+	system( void ) {
 	}
-	const_pointer address( const_reference s ) const {
-		return ( &s );
+	template<typename U>
+	system( system<U> const& ) {
+	}
+	void swap( system& ) {
 	}
 	pointer allocate( size_type n ) {
 		return ( reinterpret_cast<pointer>( ::operator new ( sizeof ( T ) * n, memory::yaal ) ) );
@@ -61,6 +62,12 @@ struct system {
 	}
 	void deallocate( pointer p, size_type n ) {
 		::operator delete ( p, memory::yaal );
+	}
+	pointer address( reference r ) const {
+		return ( &r );
+	}
+	const_pointer address( const_reference s ) const {
+		return ( &s );
 	}
 	size_type max_size( void ) const {
 		return ( 0x1fffffff );
@@ -74,11 +81,6 @@ struct system {
 	template<typename U>
 	bool operator != ( system<U> const& ) const {
 		return ( false );
-	}
-	system( void ) {
-	}
-	template<typename U>
-	system( system<U> const& ) {
 	}
 	void construct( pointer p, const_reference t ) {
 		new ( p ) T( t );
@@ -103,11 +105,16 @@ struct pool {
 	struct rebind {
 		typedef pool<U> other;
 	};
-	pointer address( reference r ) const {
-		return ( &r );
-	}
-	const_pointer address( const_reference s ) const {
-		return ( &s );
+	pool( void )
+		: _pool()
+		{}
+	template<typename U>
+	pool( pool<U> const& )
+		: _pool()
+		{}
+	void swap( pool& pool_ ) {
+		using yaal::swap;
+		swap( _pool, pool_._pool );
 	}
 	pointer allocate( size_type ) {
 		return ( _pool.alloc() );
@@ -117,6 +124,12 @@ struct pool {
 	}
 	void deallocate( pointer p, size_type ) {
 		_pool.free( p );
+	}
+	pointer address( reference r ) const {
+		return ( &r );
+	}
+	const_pointer address( const_reference s ) const {
+		return ( &s );
 	}
 	size_type max_size( void ) const {
 		return ( 0x1fffffff );
@@ -131,13 +144,6 @@ struct pool {
 	bool operator != ( pool<U> const& pool_ ) const {
 		return ( this != &pool_ );
 	}
-	pool( void )
-		: _pool()
-		{}
-	template<typename U>
-	pool( pool<U> const& )
-		: _pool()
-		{}
 	void construct( pointer p, const_reference t ) {
 		new ( p ) T( t );
 	}

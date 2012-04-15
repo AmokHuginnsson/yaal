@@ -33,7 +33,7 @@ Copyright:
 #include <new>
 
 #include "hcore/base.hxx"
-#include "hcore/memory.hxx"
+#include "hcore/allocator.hxx"
 #include "hcore/algorithm.hxx"
 #include "hcore/pod.hxx"
 
@@ -45,9 +45,9 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHArray_[];
 
 /*! \brief Simplest compund data structure.
  */
-template<typename type_t>
+template<typename type_t, template <typename> class allocator_t = allocator::system>
 class HArray {
-	typedef HArray<type_t> this_type;
+	typedef HArray<type_t, allocator_t> this_type;
 public:
 	typedef type_t value_type;
 	/*! \brief Error codes for HArray<> operations.
@@ -73,75 +73,362 @@ public:
 	typedef HIterator<type_t const> const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
-	HArray( void );
-	explicit HArray( int long );
-	HArray( int long, type_t const& );
+	HArray( void )
+		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		return;
+	}
+	explicit HArray( int long size_ )
+		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		M_PROLOG
+		resize( size_ );
+		return;
+		M_EPILOG
+	}
+	HArray( int long size_, type_t const& fillWith_ )
+		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		M_PROLOG
+		resize( size_, fillWith_ );
+		return;
+		M_EPILOG
+	}
 	template<typename iterator_t>
-	HArray( iterator_t, iterator_t );
-	virtual ~HArray( void );
-	HArray( HArray const& );
-	HArray& operator = ( HArray const& );
-	void resize( int long, type_t const& = value_type() );
-	void reserve( int long );
-	type_t& operator [] ( int long );
-	type_t const& operator [] ( int long ) const;
-	void push_back( type_t const& );
-	void pop_back( void );
-	type_t& front( void );
-	type_t const& front( void ) const;
-	type_t& back( void );
-	type_t const& back( void ) const;
-	int long get_size( void ) const;
-	int long size( void ) const;
-	int long get_capacity( void ) const;
-	int long capacity( void ) const;
-	bool empty( void ) const;
-	bool is_empty( void ) const;
-	void clear( void );
-	bool operator ! ( void ) const;
-	iterator insert( iterator, type_t const& );
+	HArray( iterator_t first, iterator_t last )
+		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		M_PROLOG
+		initialize( first, last, typename trait::add_pointer<typename is_integral<iterator_t>::type>::type() );
+		return;
+		M_EPILOG
+	}
+	HArray( HArray const& arr_ )
+		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		M_PROLOG
+		if ( arr_._size > 0 )
+			{
+			reserve( arr_._size );
+			_size = arr_._size;
+			for ( int long i = 0; i < _size; ++ i )
+				new ( _buf + i ) value_type( arr_._buf[ i ] );
+		}
+		return;
+		M_EPILOG
+	}
+	virtual ~HArray( void ) {
+		M_PROLOG
+		clear();
+		:: operator delete ( _buf, memory::yaal );
+		_capacity = 0;
+		return;
+		M_DESTRUCTOR_EPILOG
+	}
+	void clear( void ) {
+		M_PROLOG
+		erase( begin(), end() );
+		return;
+		M_EPILOG
+	}
+	HArray& operator = ( HArray const& arr_ ) {
+		M_PROLOG
+		if ( &arr_ != this ) {
+			if ( arr_._size > _capacity ) {
+				HArray<value_type> tmp( arr_ );
+				swap( tmp );
+			} else {
+				copy_n( arr_._buf, min( _size, arr_._size ), _buf );
+				if ( arr_._size > _size ) {
+					for ( int long i = _size; i < arr_._size; ++ i )
+						new ( _buf + i ) value_type( arr_._buf[ i ] );
+				} else if ( arr_._size < _size ) {
+					for ( int long i = arr_._size; i < _size; ++ i )
+						M_SAFE( _buf[ i ].~value_type() );
+				}
+				_size = arr_._size;
+			}
+		}
+		return ( *this );
+		M_EPILOG
+	}
+	void swap( HArray& other ) {
+		M_PROLOG
+		if ( &other != this ) {
+			using yaal::swap;
+			swap( _buf, other._buf );
+			swap( _size, other._size );
+			swap( _capacity, other._capacity );
+		}
+		return;
+		M_EPILOG
+	}
+	void resize( int long size_, type_t const& fillWith_ = value_type() ) {
+		M_PROLOG
+		if ( size_ < 0 )
+			M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], size_ );
+		if ( size_ > _size ) {
+			reserve( size_ );
+			for ( int long i( _size ); i < size_; ++ i )
+				new ( _buf + i ) value_type( fillWith_ );
+		} else if ( size_ < _size ) {
+			for ( int long i( size_ ); i < _size; ++ i )
+				M_SAFE( _buf[ i ].~value_type() );
+		}
+		_size = size_;
+		return;
+		M_EPILOG
+	}
+	void reserve( int long capacity_ ) {
+		M_PROLOG
+		if ( capacity_ < 0 )
+			M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], capacity_ );
+		if ( capacity_ > _capacity ) {
+			int long newCapacity( _capacity ? max( capacity_, _capacity * 2 ) : capacity_ );
+			value_type* newBuf( static_cast<value_type*>( ::operator new ( newCapacity * sizeof ( value_type ), memory::yaal ) ) );
+			for ( int long i( 0 ); i < _size; ++ i )
+				new ( newBuf + i ) value_type( _buf[ i ] );
+			for ( int long i( 0 ); i < _size; ++ i )
+				M_SAFE( _buf[ i ].~value_type() );
+			using yaal::swap;
+			swap( newBuf, _buf );
+			_capacity = newCapacity;
+			:: operator delete ( newBuf, memory::yaal );
+		}
+		return;
+		M_EPILOG
+	}
+	type_t& operator[] ( int long index_ ) {
+		M_PROLOG
+		int long idx = ( index_ < 0 ) ? index_ + _size : index_;
+		if ( ( idx >= _size ) || ( idx < 0 ) )
+			M_THROW( _errMsgHArray_[ ERROR::BAD_INDEX ], idx );
+		return ( _buf[ idx ] );
+		M_EPILOG
+	}
+	type_t const& operator[] ( int long index_ ) const {
+		M_PROLOG
+		int long idx( ( index_ < 0 ) ? index_ + _size : index_ );
+		if ( ( idx >= _size ) || ( idx < 0 ) )
+			M_THROW( _errMsgHArray_[ ERROR::BAD_INDEX ], idx );
+		return ( _buf[ idx ] );
+		M_EPILOG
+	}
+	void push_back( type_t const& val_ ) {
+		M_PROLOG
+		M_ASSERT( _size <= _capacity );
+		if ( _size == _capacity )
+			reserve( _capacity + 1 );
+		new ( _buf + _size ) value_type( val_ );
+		++ _size;
+		return;
+		M_EPILOG
+	}
+	void pop_back( void ) {
+		M_PROLOG
+		M_ASSERT( _size > 0 );
+		M_SAFE( _buf[ -- _size ].~value_type() );
+		return;
+		M_EPILOG
+	}
+	type_t const& front( void ) const {
+		M_PROLOG
+		M_ASSERT( _size > 0 );
+		return ( *_buf );
+		M_EPILOG
+	}
+	type_t& front( void ) {
+		M_PROLOG
+		M_ASSERT( _size > 0 );
+		return ( *_buf );
+		M_EPILOG
+	}
+	type_t const& back( void ) const {
+		M_PROLOG
+		M_ASSERT( _size > 0 );
+		return ( _buf[ _size - 1 ] );
+		M_EPILOG
+	}
+	type_t& back( void ) {
+		M_PROLOG
+		M_ASSERT( _size > 0 );
+		return ( _buf[ _size - 1 ] );
+		M_EPILOG
+	}
+	int long capacity( void ) const {
+		return ( get_capacity() );
+	}
+	int long get_capacity( void ) const {
+		return ( _capacity );
+	}
+	bool operator ! ( void ) const {
+		M_PROLOG
+		return ( is_empty() );
+		M_EPILOG
+	}
+	int long get_size( void ) const {
+		return ( _size );
+	}
+	int long size( void ) const {
+		return ( _size );
+	}
+	bool is_empty( void ) const {
+		return ( _size ? false : true );
+	}
+	bool empty( void ) const {
+		return ( _size ? false : true );
+	}
 	template<typename iterator_t>
-	void assign( iterator_t, iterator_t );
-	void assign( int long, type_t const& );
+	void assign( iterator_t first, iterator_t last ) {
+		M_PROLOG
+		clear();
+		insert( end(), first, last );
+		return;
+		M_EPILOG
+	}
+	void assign( int long size_, type_t const& fillWith_ ) {
+		M_PROLOG
+		int long oldSize( _size );
+		resize( size_, fillWith_ );
+		if ( oldSize > 0 )
+			fill_n( begin(), oldSize, fillWith_ );
+		return;
+		M_EPILOG
+	}
 	template<typename iterator_t>
-	void insert( iterator, iterator_t, iterator_t );
-	void insert( iterator, int long, type_t const& );
-	iterator erase( iterator );
-	iterator erase( iterator, iterator );
-	iterator begin( void );
-	iterator find( int long );
-	iterator end( void );
-	const_iterator begin( void ) const;
-	const_iterator find( int long ) const;
-	const_iterator end( void ) const;
-	reverse_iterator rbegin( void );
-	reverse_iterator rend( void );
-	const_reverse_iterator rbegin( void ) const;
-	const_reverse_iterator rend( void ) const;
-	void swap( HArray& );
-	bool operator == ( HArray const& ) const;
-	bool operator < ( HArray const& ) const;
+	void insert( iterator pos_, iterator_t first_, iterator_t last_ ) {
+		M_PROLOG
+		M_ASSERT( pos_._owner == this );
+		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
+		using yaal::distance;
+		insert_space( pos_._index, distance( first_, last_ ) );
+		for ( int long i( pos_._index ); first_ != last_; ++ first_,  ++ i )
+			new ( _buf + i ) value_type( *first_ );
+		return;
+		M_EPILOG
+	}
+	void insert( iterator pos_, int long count_, type_t const& value_ ) {
+		M_PROLOG
+		M_ASSERT( pos_._owner == this );
+		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
+		insert_space( pos_._index, count_ );
+		for ( int long i( pos_._index ), last( pos_._index + count_ ); i < last; ++ i )
+			new ( _buf + i ) value_type( value_ );
+		return;
+		M_EPILOG
+	}
+	iterator insert( iterator pos_, type_t const& value_ ) {
+		M_PROLOG
+		M_ASSERT( pos_._owner == this );
+		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
+		insert_space( pos_._index, 1 );
+		new ( _buf + pos_._index ) value_type( value_ );
+		return ( pos_ );
+		M_EPILOG
+	}
+	iterator erase( iterator first_, iterator last_ ) {
+		M_PROLOG
+		M_ASSERT( first_._owner == this );
+		M_ASSERT( last_._owner == this );
+		if ( ( first_._index < 0 ) && ( first_._index > _size ) )
+			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], first_._index );
+		if ( ( last_._index < 0 ) && ( last_._index > _size ) )
+			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index );
+		if ( last_._index < first_._index )
+			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index - first_._index );
+		for ( iterator it( copy( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it )
+			M_SAFE( (*it).~value_type() );
+		_size -= ( last_._index - first_._index );
+		return ( last_._index < _size ? last_ : end() );
+		M_EPILOG
+	}
+	iterator erase( iterator it ) {
+		M_PROLOG
+		iterator next( it );
+		++ next;
+		return ( erase( it, next ) );
+		M_EPILOG
+	}
+	iterator begin( void ) {
+		return ( iterator( this, 0 ) );
+	}
+	iterator find( int long idx ) {
+		return ( iterator( this, min( idx, _size ) ) );
+	}
+	iterator end( void ) {
+		return ( iterator( this, _size ) );
+	}
+	const_iterator begin( void ) const {
+		return ( const_iterator( this, 0 ) );
+	}
+	const_iterator find( int long idx ) const {
+		return ( const_iterator( this, min( idx, _size ) ) );
+	}
+	const_iterator end( void ) const {
+		return ( const_iterator( this, _size ) );
+	}
+	reverse_iterator rbegin( void ) {
+		return ( end() );
+	}
+	reverse_iterator rend( void ) {
+		return ( begin() );
+	}
+	const_reverse_iterator rbegin( void ) const {
+		return ( end() );
+	}
+	const_reverse_iterator rend( void ) const {
+		return ( begin() );
+	}
+	bool operator == ( HArray const& a_ ) const {
+		M_PROLOG
+		return ( ( &a_ == this ) || safe_equal( begin(), end(), a_.begin(), a_.end() ) );
+		M_EPILOG
+	}
+	bool operator < ( HArray const& a_ ) const {
+		M_PROLOG
+		return ( ( &a_ != this ) && lexicographical_compare( begin(), end(), a_.begin(), a_.end() ) );
+		M_EPILOG
+	}
 private:
 	template<typename iterator_t>
-	void initialize( iterator_t, iterator_t, trait::false_type const* );
-	void initialize( int long, type_t const&, trait::true_type const* );
-	void insert_space( int long, int long );
+	void initialize( iterator_t first, iterator_t last, trait::false_type const* ) {
+		M_PROLOG
+		insert( end(), first, last );
+		return;
+		M_EPILOG
+	}
+	void initialize( int long size_, type_t const& fillWith_, trait::true_type const* ) {
+		M_PROLOG
+		resize( size_, fillWith_ );
+		return;
+		M_EPILOG
+	}
+	void insert_space( int long pos_, int long size_ ) {
+		M_PROLOG
+		int long oldSize( _size );
+		reserve( _size + size_ );
+		_size += size_;
+		for ( int long src( oldSize - 1 ), dst( _size - 1 ); src >= pos_; -- src, -- dst ) {
+			new ( _buf + dst ) value_type( _buf[ src ] );
+			M_SAFE( _buf[ src ].~value_type() );
+		}
+		return;
+		M_EPILOG
+	}
 };
 
 }
 
-template<typename type_t>
-inline void swap( yaal::hcore::HArray<type_t>& a, yaal::hcore::HArray<type_t>& b )
+template<typename type_t, template <typename> class allocator_t>
+inline void swap( yaal::hcore::HArray<type_t, allocator_t>& a, yaal::hcore::HArray<type_t, allocator_t>& b )
 	{ a.swap( b ); }
 
 namespace hcore {
 
 /*! \brief Iterator for HArray<> data structure.
  */
-template<typename type_t>
+template<typename type_t, template <typename> class allocator_t>
 template<typename const_qual_t>
-class HArray<type_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::random_access> {
-	typedef HArray<type_t> array_t;
+class HArray<type_t, allocator_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::random_access> {
+	typedef HArray<type_t, allocator_t> array_t;
 	array_t const* _owner;
 	int long _index;
 public:
@@ -230,453 +517,10 @@ public:
 		return ( _index < it._index );
 	}
 private:
-	friend class HArray<type_t>;
+	friend class HArray<type_t, allocator_t>;
 	explicit HIterator( array_t const* owner_, int long idx )
 		: base_type(), _owner( owner_ ), _index( idx ) {};
 };
-
-template<typename type_t>
-HArray<type_t>::HArray( void )
-	: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
-	return;
-}
-
-template<typename type_t>
-HArray<type_t>::HArray( int long size_ )
-	: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
-	M_PROLOG
-	resize( size_ );
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-HArray<type_t>::HArray( int long size_, type_t const& fillWith_ )
-	: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
-	M_PROLOG
-	resize( size_, fillWith_ );
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-template<typename iterator_t>
-HArray<type_t>::HArray( iterator_t first, iterator_t last )
-	: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
-	M_PROLOG
-	initialize( first, last, typename trait::add_pointer<typename is_integral<iterator_t>::type>::type() );
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-HArray<type_t>::HArray( HArray const& arr_ )
-	: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
-	M_PROLOG
-	if ( arr_._size > 0 )
-		{
-		reserve( arr_._size );
-		_size = arr_._size;
-		for ( int long i = 0; i < _size; ++ i )
-			new ( _buf + i ) value_type( arr_._buf[ i ] );
-	}
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-HArray<type_t>::~HArray( void ) {
-	M_PROLOG
-	clear();
-	:: operator delete ( _buf, memory::yaal );
-	_capacity = 0;
-	return;
-	M_DESTRUCTOR_EPILOG
-}
-
-template<typename type_t>
-template<typename iterator_t>
-void HArray<type_t>::initialize( iterator_t first, iterator_t last, trait::false_type const* ) {
-	M_PROLOG
-	insert( end(), first, last );
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-void HArray<type_t>::initialize( int long size_, type_t const& fillWith_, trait::true_type const* ) {
-	M_PROLOG
-	resize( size_, fillWith_ );
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-template<typename iterator_t>
-void HArray<type_t>::assign( iterator_t first, iterator_t last ) {
-	M_PROLOG
-	clear();
-	insert( end(), first, last );
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-void HArray<type_t>::assign( int long size_, type_t const& fillWith_ ) {
-	M_PROLOG
-	int long oldSize( _size );
-	resize( size_, fillWith_ );
-	if ( oldSize > 0 )
-		fill_n( begin(), oldSize, fillWith_ );
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-void HArray<type_t>::clear( void ) {
-	M_PROLOG
-	erase( begin(), end() );
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-HArray<type_t>& HArray<type_t>::operator = ( HArray const& arr_ ) {
-	M_PROLOG
-	if ( &arr_ != this ) {
-		if ( arr_._size > _capacity ) {
-			HArray<value_type> tmp( arr_ );
-			swap( tmp );
-		} else {
-			copy_n( arr_._buf, min( _size, arr_._size ), _buf );
-			if ( arr_._size > _size ) {
-				for ( int long i = _size; i < arr_._size; ++ i )
-					new ( _buf + i ) value_type( arr_._buf[ i ] );
-			} else if ( arr_._size < _size ) {
-				for ( int long i = arr_._size; i < _size; ++ i )
-					M_SAFE( _buf[ i ].~value_type() );
-			}
-			_size = arr_._size;
-		}
-	}
-	return ( *this );
-	M_EPILOG
-}
-
-template<typename type_t>
-void HArray<type_t>::resize( int long size_, type_t const& fillWith_ ) {
-	M_PROLOG
-	if ( size_ < 0 )
-		M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], size_ );
-	if ( size_ > _size ) {
-		reserve( size_ );
-		for ( int long i( _size ); i < size_; ++ i )
-			new ( _buf + i ) value_type( fillWith_ );
-	} else if ( size_ < _size ) {
-		for ( int long i( size_ ); i < _size; ++ i )
-			M_SAFE( _buf[ i ].~value_type() );
-	}
-	_size = size_;
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-void HArray<type_t>::reserve( int long capacity_ ) {
-	M_PROLOG
-	if ( capacity_ < 0 )
-		M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], capacity_ );
-	if ( capacity_ > _capacity ) {
-		int long newCapacity( _capacity ? max( capacity_, _capacity * 2 ) : capacity_ );
-		value_type* newBuf( static_cast<value_type*>( ::operator new ( newCapacity * sizeof ( value_type ), memory::yaal ) ) );
-		for ( int long i( 0 ); i < _size; ++ i )
-			new ( newBuf + i ) value_type( _buf[ i ] );
-		for ( int long i( 0 ); i < _size; ++ i )
-			M_SAFE( _buf[ i ].~value_type() );
-		using yaal::swap;
-		swap( newBuf, _buf );
-		_capacity = newCapacity;
-		:: operator delete ( newBuf, memory::yaal );
-	}
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-template<typename iterator_t>
-void HArray<type_t>::insert( iterator pos_, iterator_t first_, iterator_t last_ ) {
-	M_PROLOG
-	M_ASSERT( pos_._owner == this );
-	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
-		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
-	using yaal::distance;
-	insert_space( pos_._index, distance( first_, last_ ) );
-	for ( int long i( pos_._index ); first_ != last_; ++ first_,  ++ i )
-		new ( _buf + i ) value_type( *first_ );
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-void HArray<type_t>::insert( iterator pos_, int long count_, type_t const& value_ ) {
-	M_PROLOG
-	M_ASSERT( pos_._owner == this );
-	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
-		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
-	insert_space( pos_._index, count_ );
-	for ( int long i( pos_._index ), last( pos_._index + count_ ); i < last; ++ i )
-		new ( _buf + i ) value_type( value_ );
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::insert( iterator pos_, type_t const& value_ ) {
-	M_PROLOG
-	M_ASSERT( pos_._owner == this );
-	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
-		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
-	insert_space( pos_._index, 1 );
-	new ( _buf + pos_._index ) value_type( value_ );
-	return ( pos_ );
-	M_EPILOG
-}
-
-template<typename type_t>
-void HArray<type_t>::insert_space( int long pos_, int long size_ ) {
-	M_PROLOG
-	int long oldSize( _size );
-	reserve( _size + size_ );
-	_size += size_;
-	for ( int long src( oldSize - 1 ), dst( _size - 1 ); src >= pos_; -- src, -- dst ) {
-		new ( _buf + dst ) value_type( _buf[ src ] );
-		M_SAFE( _buf[ src ].~value_type() );
-	}
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::erase( iterator first_, iterator last_ ) {
-	M_PROLOG
-	M_ASSERT( first_._owner == this );
-	M_ASSERT( last_._owner == this );
-	if ( ( first_._index < 0 ) && ( first_._index > _size ) )
-		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], first_._index );
-	if ( ( last_._index < 0 ) && ( last_._index > _size ) )
-		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index );
-	if ( last_._index < first_._index )
-		M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index - first_._index );
-	for ( iterator it( copy( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it )
-		M_SAFE( (*it).~value_type() );
-	_size -= ( last_._index - first_._index );
-	return ( last_._index < _size ? last_ : end() );
-	M_EPILOG
-}
-
-template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::erase( iterator it ) {
-	M_PROLOG
-	iterator next( it );
-	++ next;
-	return ( erase( it, next ) );
-	M_EPILOG
-}
-
-template<typename type_t>
-type_t const& HArray<type_t>::front( void ) const {
-	M_PROLOG
-	M_ASSERT( _size > 0 );
-	return ( *_buf );
-	M_EPILOG
-}
-
-template<typename type_t>
-type_t& HArray<type_t>::front( void ) {
-	M_PROLOG
-	M_ASSERT( _size > 0 );
-	return ( *_buf );
-	M_EPILOG
-}
-
-template<typename type_t>
-type_t const& HArray<type_t>::back( void ) const {
-	M_PROLOG
-	M_ASSERT( _size > 0 );
-	return ( _buf[ _size - 1 ] );
-	M_EPILOG
-}
-
-template<typename type_t>
-type_t& HArray<type_t>::back( void ) {
-	M_PROLOG
-	M_ASSERT( _size > 0 );
-	return ( _buf[ _size - 1 ] );
-	M_EPILOG
-}
-
-template<typename type_t>
-type_t& HArray<type_t>::operator[] ( int long index_ ) {
-	M_PROLOG
-	int long idx = ( index_ < 0 ) ? index_ + _size : index_;
-	if ( ( idx >= _size ) || ( idx < 0 ) )
-		M_THROW( _errMsgHArray_[ ERROR::BAD_INDEX ], idx );
-	return ( _buf[ idx ] );
-	M_EPILOG
-}
-
-template<typename type_t>
-type_t const& HArray<type_t>::operator[] ( int long index_ ) const {
-	M_PROLOG
-	int long idx( ( index_ < 0 ) ? index_ + _size : index_ );
-	if ( ( idx >= _size ) || ( idx < 0 ) )
-		M_THROW( _errMsgHArray_[ ERROR::BAD_INDEX ], idx );
-	return ( _buf[ idx ] );
-	M_EPILOG
-}
-
-template<typename type_t>
-bool HArray<type_t>::operator ! ( void ) const {
-	M_PROLOG
-	return ( is_empty() );
-	M_EPILOG
-}
-
-template<typename type_t>
-int long HArray<type_t>::get_size( void ) const {
-	M_PROLOG
-	return ( _size );
-	M_EPILOG
-}
-
-template<typename type_t>
-int long HArray<type_t>::size( void ) const {
-	M_PROLOG
-	return ( _size );
-	M_EPILOG
-}
-
-template<typename type_t>
-bool HArray<type_t>::is_empty( void ) const {
-	M_PROLOG
-	return ( _size ? false : true );
-	M_EPILOG
-}
-
-template<typename type_t>
-bool HArray<type_t>::empty( void ) const {
-	M_PROLOG
-	return ( _size ? false : true );
-	M_EPILOG
-}
-
-template<typename type_t>
-int long HArray<type_t>::capacity( void ) const {
-	return ( get_capacity() );
-}
-
-template<typename type_t>
-int long HArray<type_t>::get_capacity( void ) const {
-	return ( _capacity );
-}
-
-template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::begin( void ) {
-	return ( iterator( this, 0 ) );
-}
-
-template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::find( int long idx ) {
-	return ( iterator( this, min( idx, _size ) ) );
-}
-
-template<typename type_t>
-typename HArray<type_t>::iterator HArray<type_t>::end( void ) {
-	return ( iterator( this, _size ) );
-}
-
-template<typename type_t>
-typename HArray<type_t>::const_iterator HArray<type_t>::begin( void ) const {
-	return ( const_iterator( this, 0 ) );
-}
-
-template<typename type_t>
-typename HArray<type_t>::const_iterator HArray<type_t>::find( int long idx ) const {
-	return ( const_iterator( this, min( idx, _size ) ) );
-}
-
-template<typename type_t>
-typename HArray<type_t>::const_iterator HArray<type_t>::end( void ) const {
-	return ( const_iterator( this, _size ) );
-}
-
-template<typename type_t>
-typename HArray<type_t>::reverse_iterator HArray<type_t>::rbegin( void ) {
-	return ( end() );
-}
-
-template<typename type_t>
-typename HArray<type_t>::reverse_iterator HArray<type_t>::rend( void ) {
-	return ( begin() );
-}
-
-template<typename type_t>
-typename HArray<type_t>::const_reverse_iterator HArray<type_t>::rbegin( void ) const {
-	return ( end() );
-}
-
-template<typename type_t>
-typename HArray<type_t>::const_reverse_iterator HArray<type_t>::rend( void ) const {
-	return ( begin() );
-}
-
-template<typename type_t>
-void HArray<type_t>::swap( HArray& other ) {
-	M_PROLOG
-	if ( &other != this ) {
-		using yaal::swap;
-		swap( _buf, other._buf );
-		swap( _size, other._size );
-		swap( _capacity, other._capacity );
-	}
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-void HArray<type_t>::push_back( type_t const& val_ ) {
-	M_PROLOG
-	M_ASSERT( _size <= _capacity );
-	if ( _size == _capacity )
-		reserve( _capacity + 1 );
-	new ( _buf + _size ) value_type( val_ );
-	++ _size;
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-void HArray<type_t>::pop_back( void ) {
-	M_PROLOG
-	M_ASSERT( _size > 0 );
-	M_SAFE( _buf[ -- _size ].~value_type() );
-	return;
-	M_EPILOG
-}
-
-template<typename type_t>
-bool HArray<type_t>::operator == ( HArray const& a_ ) const {
-	M_PROLOG
-	return ( ( &a_ == this ) || safe_equal( begin(), end(), a_.begin(), a_.end() ) );
-	M_EPILOG
-}
-
-template<typename type_t>
-bool HArray<type_t>::operator < ( HArray const& a_ ) const {
-	M_PROLOG
-	return ( ( &a_ != this ) && lexicographical_compare( begin(), end(), a_.begin(), a_.end() ) );
-	M_EPILOG
-}
 
 }
 

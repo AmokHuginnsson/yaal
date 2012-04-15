@@ -37,9 +37,7 @@ namespace hcore {
 
 char const* const _errMsgHList_[ 8 ] = {
 	_( "ok" ),
-/* HList::ERROR::BAD_INDEX */ _( "index excides list size" ),
-/* HList::ERROR::EMPTY */     _( "list was empty" ),
-/* HList::ERROR::BAD_ORDER */ _( "inconsistient sort order" )
+/* HList::ERROR::EMPTY */     _( "list was empty" )
 };
 
 }

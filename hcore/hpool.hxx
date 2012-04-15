@@ -152,8 +152,16 @@ private:
 		}
 		return;
 	}
+private:
+	HPool( HPool const& );
+	HPool& operator = ( HPool const& );
 };
 
+}
+
+template<typename T>
+inline void swap( yaal::hcore::HPool<T>& a, yaal::hcore::HPool<T>& b ) {
+	a.swap( b );
 }
 
 }
