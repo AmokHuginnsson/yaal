@@ -1747,6 +1747,40 @@ inline void sort( iter_t first_, iter_t last_ ) {
 	return;
 }
 
+/*! \brief Check is given range is sorted according to given ordering.
+ *
+ * \param first_ - begining of the range to test.
+ * \param last_ - one past the end of the range to test.
+ * \param comp_ - definition of the ordering.
+ * \return True iff given range is sorted according to given ordering.
+ */
+template<typename iter_t, typename compare_t>
+inline bool is_sorted( iter_t first_, iter_t last_, compare_t comp_ ) {
+	iter_t it( first_ );
+	bool sorted( true );
+	if ( it != last_ ) {
+		++ it;
+		for ( ; it != last_; ++ it, ++ first_ ) {
+			if ( comp_( *it, *first_ ) ) {
+				sorted = false;
+				break;
+			}
+		}
+	}
+	return ( sorted );
+}
+
+/*! \brief Check is given range is sorted according to given ordering.
+ *
+ * \param first_ - begining of the range to test.
+ * \param last_ - one past the end of the range to test.
+ * \return True iff given range is sorted according to "<" ordering.
+ */
+template<typename iter_t>
+inline bool is_sorted( iter_t first_, iter_t last_ ) {
+	return ( is_sorted( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+}
+
 /*! \brief Remove consecutive duplicates from range.
  *
  * \param first_ - begining of range of elements to filter.
