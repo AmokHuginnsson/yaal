@@ -24,7 +24,6 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <new>
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
@@ -98,10 +97,6 @@ void* operator new ( std::size_t size_, yaal::memory::YaalNew const& ) throw ( y
 	return ( newPtr );
 }
 
-void operator delete ( void* ptr_, yaal::memory::YaalNew const& ) throw () {
-	::operator delete ( ptr_ );
-}
-
 void* operator new[] ( std::size_t size_, yaal::memory::YaalNew const& ) throw ( yaal::memory::HMemoryAllocationException ) {
 	M_ASSERT( ( size_ > 0 ) && "yaal::memory::new[]: requested size lower than 0" );
 	void* newPtr( ::operator new[] ( size_, std::nothrow ) );
@@ -114,9 +109,5 @@ void* operator new[] ( std::size_t size_, yaal::memory::YaalNew const& ) throw (
 			throw yaal::memory::HMemoryAllocationException( msg );
 	}
 	return ( newPtr );
-}
-
-void operator delete[] ( void* ptr_, yaal::memory::YaalNew const& ) throw () {
-	::operator delete[] ( ptr_ );
 }
 

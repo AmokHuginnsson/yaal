@@ -281,8 +281,11 @@ public:
 	}
 	void clear( void ) {
 		M_PROLOG
-		while ( _size -- )
-			M_SAFE( delete _hook->_next );
+		while ( _size -- ) {
+			HElement* element( _hook->_next );
+			M_SAFE( element->~HElement() );
+			_allocator.deallocate( element, 1 );
+		}
 		_hook = NULL;
 		_size = 0;
 		return ;
@@ -338,7 +341,8 @@ public:
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<type_t, allocator_t, treatment>::type insert( HIterator<type_t, treatment> const& it ) {
 		M_PROLOG
-		HElement* element = new ( memory::yaal ) HElement( it._current ? it._current : _hook );
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( it._current ? it._current : _hook );
 		if ( ( _size == 0 ) || ( ( it._current == _hook ) && ( treatment == TREAT_AS_OPENED ) ) )
 			_hook = element;
 		_size ++;
@@ -348,7 +352,8 @@ public:
 	template<OListBits::treatment_t const treatment>
 	typename OListBits::iterator<type_t, allocator_t, treatment>::type insert( HIterator<type_t, treatment> const& it, type_t const& val ) {
 		M_PROLOG
-		HElement* element = new ( memory::yaal ) HElement( it._current ? it._current : _hook, val );
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( it._current ? it._current : _hook, val );
 		if ( ( _size == 0 ) || ( ( it._current == _hook ) && ( treatment == TREAT_AS_OPENED ) ) )
 			_hook = element;
 		_size ++;
@@ -378,7 +383,9 @@ public:
 	 */
 	type_t& add_head( void ) {
 		M_PROLOG
-		_hook = new ( memory::yaal ) HElement( _hook );
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( _hook );
+		_hook = element;
 		++ _size;
 		return ( _hook->_value );
 		M_EPILOG
@@ -390,7 +397,8 @@ public:
 	 */
 	type_t& add_tail( void ) {
 		M_PROLOG
-		HElement* element = new ( memory::yaal ) HElement( _hook );
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( _hook );
 		if ( _size == 0 )
 			_hook = element;
 		++ _size;
@@ -399,7 +407,8 @@ public:
 	}
 	void push_back( type_t const& object_ ) {
 		M_PROLOG
-		HElement* element = new ( memory::yaal ) HElement( _hook, object_ );
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( _hook, object_ );
 		if ( _size == 0 )
 			_hook = element;
 		++ _size;
@@ -411,7 +420,8 @@ public:
 		HElement* element = NULL;
 		if ( _size > 0 ) {
 			element = _hook->_previous;
-			M_SAFE( delete element );
+			M_SAFE( element->~HElement() );
+			_allocator.deallocate( element, 1 );
 			-- _size;
 			if ( _size == 0 )
 				_hook = NULL;
@@ -422,7 +432,9 @@ public:
 	}
 	void push_front( type_t const& object_ ) {
 		M_PROLOG
-		_hook = new ( memory::yaal ) HElement( _hook, object_ );
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( _hook, object_ );
+		_hook = element;
 		++ _size;
 		return;
 		M_EPILOG
@@ -435,7 +447,8 @@ public:
 			_hook = _hook->_next;
 		} else
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
-		M_SAFE( delete element );
+		M_SAFE( element->~HElement() );
+		_allocator.deallocate( element, 1 );
 		_size--;
 		if ( _size == 0 )
 			_hook = NULL;
@@ -474,7 +487,9 @@ public:
 		 */
 		if ( iterator_._current == _hook )
 			_hook = _hook->_next;
-		M_SAFE( delete iterator_._current );
+		HElement* element( iterator_._current );
+		M_SAFE( element->~HElement() );
+		_allocator.deallocate( element, 1 );
 		_size --;
 		if ( _size == 0 )
 			_hook = NULL;

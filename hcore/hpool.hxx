@@ -45,7 +45,7 @@ class HPool {
 		typedef int long long padding_t;
 		static int const OBJECTS_PER_BLOCK = 256;
 		static int const PADDING_ELEMENTS_PER_BLOCK = sizeof ( T ) * ( OBJECTS_PER_BLOCK / sizeof ( padding_t ) );
-		int long long _mem[ PADDING_ELEMENTS_PER_BLOCK ];
+		padding_t _mem[ PADDING_ELEMENTS_PER_BLOCK ];
 		int _free; /*!< index of first free object */
 		int _used; /*!< number of allocated object in this block pool*/
 	public:
@@ -53,26 +53,31 @@ class HPool {
 			: _mem(), _free( 0 ), _used( 0 ) {
 			/* Create linked list of free object memory places. */
 			for ( int i( 0 ); i < ( OBJECTS_PER_BLOCK - 1 ); ++ i ) {
-				*reinterpret_cast<char*>( reinterpret_cast<T*>( _mem ) + i ) = i + 1;
+				*reinterpret_cast<char unsigned*>( reinterpret_cast<T*>( _mem ) + i ) = i + 1;
 			}
-			*reinterpret_cast<char*>( reinterpret_cast<T*>( _mem ) + OBJECTS_PER_BLOCK - 1 ) = -1;
+			*reinterpret_cast<char unsigned*>( reinterpret_cast<T*>( _mem ) + OBJECTS_PER_BLOCK - 1 ) = OBJECTS_PER_BLOCK - 1;
 		}
 		T* alloc( void ) {
+			M_ASSERT( ( _free >= 0 ) && ( _free < OBJECTS_PER_BLOCK ) && ( _used < OBJECTS_PER_BLOCK ) );
 			T* p( reinterpret_cast<T*>( _mem ) + _free );
-			_free = *reinterpret_cast<char*>( p );
+			_free = *reinterpret_cast<char unsigned*>( p );
 			++ _used;
 			return ( p );
 		}
 		bool free( T* ptr_ ) {
 			int freed( ptr_ - reinterpret_cast<T*>( _mem ) );
-			*reinterpret_cast<char*>( ptr_ ) = _free;
+			M_ASSERT( ( freed >= 0 ) && ( freed < OBJECTS_PER_BLOCK ) );
+			*reinterpret_cast<char unsigned*>( ptr_ ) = ( _used != OBJECTS_PER_BLOCK ) ?  _free : freed;
 			_free = freed;
 			-- _used;
 			return ( _used == 0 );
 		}
 		bool is_full( void ) const {
-			return ( _free == -1 );
+			return ( _used == OBJECTS_PER_BLOCK );
 		}
+	private:
+		HPoolBlock( HPoolBlock const& );
+		HPoolBlock& operator = ( HPoolBlock const& );
 	};
 	HPoolBlock** _poolBlocks;
 	int _poolBlockCount;
@@ -102,16 +107,17 @@ public:
 	}
 	void free( T* p ) {
 		/* Find HPoolBlock that holds this object memory. */
-		HPoolBlock** pb( lower_bound( _poolBlocks, _poolBlocks + _poolBlockCount, p ) );
-		if ( pb != p )
+		HPoolBlock** pb( lower_bound( _poolBlocks, _poolBlocks + _poolBlockCount, reinterpret_cast<HPoolBlock*>( p ) ) );
+		if ( reinterpret_cast<void*>( *pb ) != reinterpret_cast<void*>( p ) )
 			-- pb;
 		int freeing( pb - _poolBlocks );
 		bool wasFull( (*pb)->is_full() );
 		if ( (*pb)->free( p ) ) {
 			/* HPoolBlock is no longer used and we can remove it. */
 			delete *pb;
-			copy( pb + 1, _poolBlocks + _poolBlockCount, pb );
 			-- _poolBlockCount;
+			if ( pb != ( _poolBlocks + _poolBlockCount ) )
+				copy( pb + 1, _poolBlocks + _poolBlockCount, pb );
 			-- _freeCount;
 			if ( freeing == _free )
 				_free = -1;
@@ -120,6 +126,16 @@ public:
 				++ _freeCount;
 			if ( _free == -1 )
 				_free = freeing;
+		}
+	}
+	void swap( HPool& pool_ ) {
+		if ( &pool_ != this ) {
+			using yaal::swap;
+			swap( _poolBlocks, pool_._poolBlocks );
+			swap( _poolBlockCount, pool_._poolBlockCount );
+			swap( _poolBlockCapacity, pool_._poolBlockCapacity );
+			swap( _free, pool_._free );
+			swap( _freeCount, pool_._freeCount );
 		}
 	}
 private:
@@ -134,7 +150,7 @@ private:
 		} else {
 			if ( _poolBlockCount == _poolBlockCapacity ) {
 				int newCapacity( ( _poolBlockCapacity > 0 ? _poolBlockCapacity * 2 : 8 ) );
-				HPoolBlock** poolBlocks( new HPoolBlock*[ newCapacity ] );
+				HPoolBlock** poolBlocks( new ( memory::yaal ) HPoolBlock*[ newCapacity ] );
 				if ( _poolBlockCapacity )
 					copy( _poolBlocks, _poolBlocks + _poolBlockCount, poolBlocks );
 				using yaal::swap;
@@ -142,7 +158,7 @@ private:
 				delete [] poolBlocks;
 				_poolBlockCapacity = newCapacity;
 			}
-			HPoolBlock* pb( new HPoolBlock );
+			HPoolBlock* pb( new ( memory::yaal ) HPoolBlock );
 			HPoolBlock** spot( lower_bound( _poolBlocks, _poolBlocks + _poolBlockCount, pb ) );
 			copy_backward( spot, _poolBlocks + _poolBlockCount, _poolBlocks + _poolBlockCount + 1 );
 			*spot = pb;

@@ -60,7 +60,7 @@ struct system {
 	pointer allocate( size_type n, const_pointer ) {
 		return ( reinterpret_cast<pointer>( ::operator new ( sizeof ( T ) * n, memory::yaal ) ) );
 	}
-	void deallocate( pointer p, size_type n ) {
+	void deallocate( pointer p, size_type ) {
 		::operator delete ( p, memory::yaal );
 	}
 	pointer address( reference r ) const {
@@ -88,6 +88,8 @@ struct system {
 	void destroy( pointer p ) {
 		p->~T();
 	}
+private:
+	system& operator = ( system const& );
 };
 
 template<typename T>
@@ -113,8 +115,10 @@ struct pool {
 		: _pool()
 		{}
 	void swap( pool& pool_ ) {
-		using yaal::swap;
-		swap( _pool, pool_._pool );
+		if ( &pool_ != this ) {
+			using yaal::swap;
+			swap( _pool, pool_._pool );
+		}
 	}
 	pointer allocate( size_type ) {
 		return ( _pool.alloc() );
@@ -150,9 +154,19 @@ struct pool {
 	void destroy( pointer p ) {
 		p->~T();
 	}
+private:
+	pool& operator = ( pool const& );
 };
 
 }
+
+template<typename T>
+inline void swap( yaal::allocator::system<T>& a, yaal::allocator::system<T>& b )
+	{ a.swap( b ); }
+
+template<typename T>
+inline void swap( yaal::allocator::pool<T>& a, yaal::allocator::pool<T>& b )
+	{ a.swap( b ); }
 
 }
 
