@@ -30,6 +30,7 @@ Copyright:
 #ifndef YAAL_HCORE_HPOOL_HXX_INCLUDED
 #define YAAL_HCORE_HPOOL_HXX_INCLUDED 1
 
+#include "config.hxx"
 #include "hcore/memory.hxx"
 
 namespace yaal {
@@ -40,12 +41,27 @@ namespace hcore {
  */
 template<typename T>
 class HPool {
+public:
+	typedef int long long aligner_t;
+	static int const OBJECTS_PER_BLOCK = 256;
+	static int const OBJECT_SIZE = sizeof ( T );
+#if TARGET_CPU_BITS == 64
+	static int const OBJECT_SPACE = meta::ternary<OBJECT_SIZE < 2, 2,
+	                                meta::ternary<OBJECT_SIZE < 4, 4,
+	                                meta::ternary<OBJECT_SIZE < 8, 8,
+	                                (OBJECT_SIZE + 8) & ~7u>::value>::value>::value;
+#elif TARGET_CPU_BITS == 32 /* #if TARGET_CPU_BITS == 64 */
+	static int const OBJECT_SPACE = meta::ternary<OBJECT_SIZE < 2, 2,
+	                                meta::ternary<OBJECT_SIZE < 4, 4,
+	                                (OBJECT_SIZE + 4) & ~3u>::value>::value>::value;
+#else /* #elif TARGET_CPU_BITS == 32 #if TARGET_CPU_BITS == 64 */
+#error Unsupported CPU bitness.
+#endif /* #else #elif TARGET_CPU_BITS == 32 #if TARGET_CPU_BITS == 64 */
+	static int const ALIGNER_ELEMENTS_PER_BLOCK = OBJECT_SPACE * ( OBJECTS_PER_BLOCK / sizeof ( aligner_t ) );
+private:
 	class HPoolBlock {
 	private:
-		typedef int long long padding_t;
-		static int const OBJECTS_PER_BLOCK = 256;
-		static int const PADDING_ELEMENTS_PER_BLOCK = sizeof ( T ) * ( OBJECTS_PER_BLOCK / sizeof ( padding_t ) );
-		padding_t _mem[ PADDING_ELEMENTS_PER_BLOCK ];
+		aligner_t _mem[ HPool<T>::ALIGNER_ELEMENTS_PER_BLOCK ];
 		int _free; /*!< index of first free object */
 		int _used; /*!< number of allocated object in this block pool*/
 	public:
@@ -172,6 +188,9 @@ private:
 	HPool( HPool const& );
 	HPool& operator = ( HPool const& );
 };
+
+template<typename T>
+int const HPool<T>::OBJECT_SPACE;
 
 }
 

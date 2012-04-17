@@ -13,6 +13,12 @@ if ( HAVE_INT_LONG_LONG )
 	set( SIZEOF_INT_LONG_LONG ${INT_LONG_LONG} )
 endif()
 
+if ( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+	set( TARGET_CPU_BITS 64 )
+else()
+	set( TARGET_CPU_BITS 32 )
+endif()
+
 add_definitions( -D__YAAL_BUILD__ )
 if ( CMAKE_HOST_WIN32 )
 	add_definitions( -D__MSVCXX__ -D__value=value_ /FIfix.hxx )
