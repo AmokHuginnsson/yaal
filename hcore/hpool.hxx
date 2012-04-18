@@ -68,20 +68,23 @@ private:
 		HPoolBlock( void )
 			: _mem(), _free( 0 ), _used( 0 ) {
 			/* Create linked list of free object memory places. */
-			for ( int i( 0 ); i < ( OBJECTS_PER_BLOCK - 1 ); ++ i ) {
-				*reinterpret_cast<char unsigned*>( reinterpret_cast<T*>( _mem ) + i ) = i + 1;
+			char unsigned* p( reinterpret_cast<char unsigned*>( _mem ) );
+			for ( int i( 0 ); i < ( OBJECTS_PER_BLOCK - 1 ); ++ i, p += OBJECT_SPACE ) {
+				*p = i + 1;
+				*( p + OBJECT_SPACE - 1 ) = i;
 			}
-			*reinterpret_cast<char unsigned*>( reinterpret_cast<T*>( _mem ) + OBJECTS_PER_BLOCK - 1 ) = OBJECTS_PER_BLOCK - 1;
+			*p = OBJECTS_PER_BLOCK - 1;
+			*( p + OBJECT_SPACE - 1 ) = OBJECTS_PER_BLOCK - 1;
 		}
 		T* alloc( void ) {
 			M_ASSERT( ( _free >= 0 ) && ( _free < OBJECTS_PER_BLOCK ) && ( _used < OBJECTS_PER_BLOCK ) );
-			T* p( reinterpret_cast<T*>( _mem ) + _free );
+			T* p( reinterpret_cast<T*>( reinterpret_cast<char*>( _mem ) + OBJECT_SPACE * _free ) );
 			_free = *reinterpret_cast<char unsigned*>( p );
 			++ _used;
 			return ( p );
 		}
 		bool free( T* ptr_ ) {
-			int freed( ptr_ - reinterpret_cast<T*>( _mem ) );
+			int freed( *( reinterpret_cast<char unsigned*>( ptr_ ) + OBJECT_SPACE - 1 ) );
 			M_ASSERT( ( freed >= 0 ) && ( freed < OBJECTS_PER_BLOCK ) );
 			*reinterpret_cast<char unsigned*>( ptr_ ) = ( _used != OBJECTS_PER_BLOCK ) ?  _free : freed;
 			_free = freed;
@@ -92,6 +95,7 @@ private:
 			return ( _used == OBJECTS_PER_BLOCK );
 		}
 	private:
+		friend class HPool<T>;
 		HPoolBlock( HPoolBlock const& );
 		HPoolBlock& operator = ( HPoolBlock const& );
 	};
