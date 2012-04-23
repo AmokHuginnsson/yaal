@@ -194,6 +194,8 @@ private:
 };
 
 template<typename T>
+int const HPool<T>::OBJECTS_PER_BLOCK;
+template<typename T>
 int const HPool<T>::OBJECT_SPACE;
 
 }
