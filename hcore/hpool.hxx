@@ -53,7 +53,7 @@ public:
 #elif TARGET_CPU_BITS == 32 /* #if TARGET_CPU_BITS == 64 */
 	static int const OBJECT_SPACE = meta::ternary<OBJECT_SIZE < 2, 2,
 	                                meta::ternary<OBJECT_SIZE < 4, 4,
-	                                (OBJECT_SIZE + 4) & ~3u>::value>::value>::value;
+	                                (OBJECT_SIZE + 4) & ~3u>::value>::value;
 #else /* #elif TARGET_CPU_BITS == 32 #if TARGET_CPU_BITS == 64 */
 #error Unsupported CPU bitness.
 #endif /* #else #elif TARGET_CPU_BITS == 32 #if TARGET_CPU_BITS == 64 */
