@@ -70,12 +70,10 @@ private:
 			: _mem(), _free( 0 ), _used( 0 ), _index( index_ ) {
 			/* Create linked list of free object memory places. */
 			char unsigned* p( reinterpret_cast<char unsigned*>( _mem ) );
-			for ( int i( 0 ); i < ( OBJECTS_PER_BLOCK - 1 ); ++ i, p += OBJECT_SPACE ) {
+			for ( int i( 0 ); i < OBJECTS_PER_BLOCK; ++ i, p += OBJECT_SPACE ) {
 				*p = i + 1;
 				*( p + OBJECT_SPACE - 1 ) = i;
 			}
-			*p = OBJECTS_PER_BLOCK - 1;
-			*( p + OBJECT_SPACE - 1 ) = OBJECTS_PER_BLOCK - 1;
 		}
 		T* alloc( void ) {
 			T* p( reinterpret_cast<T*>( reinterpret_cast<char*>( _mem ) + OBJECT_SPACE * _free ) );
@@ -85,7 +83,7 @@ private:
 		}
 		bool free( T* ptr_ ) {
 			int freed( *( reinterpret_cast<char unsigned*>( ptr_ ) + OBJECT_SPACE - 1 ) );
-			*reinterpret_cast<char unsigned*>( ptr_ ) = ( _used != OBJECTS_PER_BLOCK ) ?  _free : freed;
+			*reinterpret_cast<char unsigned*>( ptr_ ) = _free;
 			_free = freed;
 			-- _used;
 			return ( _used == 0 );
@@ -133,11 +131,11 @@ public:
 			/* HPoolBlock is no longer used so we can possibly remove it. */
 			if ( ( _poolBlockCount - _free ) > 1 ) {
 				/* We have at least one more block with free space so we can really remove this block. */
-				if ( pb != _poolBlocks[_poolBlockCount - 1] ) {
-					_poolBlocks[pb->_index] = _poolBlocks[_poolBlockCount - 1];
+				-- _poolBlockCount;
+				if ( pb != _poolBlocks[_poolBlockCount] ) {
+					_poolBlocks[pb->_index] = _poolBlocks[_poolBlockCount];
 					_poolBlocks[pb->_index]->_index = pb->_index;
 				}
-				-- _poolBlockCount;
 				if ( _free == _poolBlockCount )
 					-- _free;
 				delete pb;
