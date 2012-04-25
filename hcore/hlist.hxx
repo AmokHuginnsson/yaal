@@ -84,6 +84,12 @@ public:
 	class HIterator;
 private:
 
+#ifndef __sun__
+#pragma pack( push, 1 )
+#else /* #ifndef __sun__ */
+#pragma pack( 1 )
+#endif /* #else #ifndef __sun__ */
+
 	/*! \brief HList<> element class provisions basic building block for doubly-linked list.
 	 */
 	class HElement {
@@ -124,6 +130,13 @@ private:
 		friend class HIterator<type_t, OListBits::TREAT_AS_CLOSED>;
 		friend class HIterator<type_t const, OListBits::TREAT_AS_CLOSED>;
 	};
+
+#ifndef __sun__
+#pragma pack( pop )
+#else /* #ifndef __sun__ */
+#pragma pack()
+#endif /* #else #ifndef __sun__ */
+
 	typedef allocator_t<HElement> allocator_type;
 
 	int long _size;  /*!< how many elements this list contains */
