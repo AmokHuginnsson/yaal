@@ -42,26 +42,313 @@ class HTree;
 
 /*! \brief Tree based data structure and operations.
  */
-template<typename type_t, template <typename> class allocator_t = allocator::system, template <typename, template <typename> class> class sequence_t = HList>
+template<typename value_t, template <typename> class allocator_t = allocator::system, template <typename, template <typename> class> class sequence_t = HList>
 class HTree {
 private:
-	typedef HTree<type_t, allocator_t, sequence_t> tree_t;
+	typedef HTree<value_t, allocator_t, sequence_t> tree_t;
 public:
-	typedef type_t value_type;
+	typedef value_t value_type;
 	class HNode;
 	typedef HNode* node_t;
 	typedef HNode const* const_node_t;
+	/*! \brief Basic building block of HTree<>.
+	 */
+	class HNode {
+	public:
+		template<typename const_qual_t>
+		class HIterator;
+		typedef value_t value_type;
+		typedef sequence_t<HNode*, allocator_t> branch_t;
+		typedef HIterator<HNode> iterator;
+		typedef HIterator<HNode const> const_iterator;
+		typedef HReverseIterator<iterator> reverse_iterator;
+		typedef HReverseIterator<const_iterator> const_reverse_iterator;
+	private:
+		value_t _data;    /* object itself */
+		branch_t _branch; /* list of next level nodes */
+		HNode* _trunk;    /* self explanary */
+		HTree<value_t, allocator_t, sequence_t>* _tree;
+	public:
+		int long child_count( void ) const {
+			M_PROLOG
+			return ( _branch.size() );
+			M_EPILOG
+		}
+
+		bool has_childs( void ) const {
+			M_PROLOG
+			return ( ! _branch.is_empty() );
+			M_EPILOG
+		}
+		int get_level( void ) const {
+			M_PROLOG
+			int level = 0;
+			HNode const* p = this;
+			while ( ( p = p->_trunk ) )
+				++ level;
+			return ( level );
+			M_EPILOG
+		}
+		iterator replace_node( iterator pos, typename tree_t::node_t node ) {
+			M_PROLOG
+#if defined( __DEBUG__ )
+			disjointed( pos, node );
+#endif /* defined( __DEBUG__ ) */
+			if ( *pos._iterator != node ) {
+				node->detach();
+				HNode* wasted = *pos._iterator;
+				*pos._iterator = node;
+				node->_trunk = this;
+				M_SAFE( delete wasted );
+			}
+			return ( pos );
+			M_EPILOG
+		}
+		iterator remove_node( iterator pos ) {
+			M_PROLOG
+			M_SAFE( delete *pos._iterator );
+			return ( iterator( this, _branch.erase( pos._iterator ) ) );
+			M_EPILOG
+		}
+		iterator move_node( iterator const& pos, typename tree_t::node_t node ) {
+			M_PROLOG
+#if defined( __DEBUG__ )
+			disjointed( pos, node );
+#endif /* defined( __DEBUG__ ) */
+			iterator it = pos;
+			if ( *pos._iterator != node ) {
+				node->detach();
+				it = iterator( this, _branch.insert( pos._iterator, node ) );
+				node->_trunk = this;
+			}
+			return ( it );
+			M_EPILOG
+		}
+		iterator move_node( typename tree_t::node_t node ) {
+			M_PROLOG
+#if defined( __DEBUG__ )
+			disjointed( begin(), node );
+#endif /* defined( __DEBUG__ ) */
+			iterator it = rbegin().base();
+			if ( ( it == rend().base() ) || ( *it._iterator != node ) ) {
+				node->detach();
+				_branch.push_back( node );
+				it = iterator( this, _branch.rbegin().base() );
+				node->_trunk = this;
+			}
+			return ( it );
+			M_EPILOG
+		}
+		iterator copy_node( iterator const& pos, typename tree_t::node_t node ) {
+			M_PROLOG
+#if defined( __DEBUG__ )
+			disjointed( pos, node );
+#endif /* defined( __DEBUG__ ) */
+			iterator it( this, _branch.insert( pos._iterator, node->clone( this ) ) );
+			return ( it );
+			M_EPILOG
+		}
+		iterator copy_node( typename tree_t::node_t node ) {
+			M_PROLOG
+#if defined( __DEBUG__ )
+			disjointed( rbegin().base(), node );
+#endif /* defined( __DEBUG__ ) */
+			_branch.push_back( node->clone( this ) );
+			iterator it( this, _branch.rbegin().base() );
+			return ( it );
+			M_EPILOG
+		}
+		iterator add_node( value_t const& value ) {
+			M_PROLOG
+			_branch.push_back( new ( memory::yaal ) HNode( this, value ) );
+			return ( iterator( this, _branch.rbegin().base() ) );
+			M_EPILOG
+		}
+		iterator add_node( void ) {
+			M_PROLOG
+			_branch.push_back( new ( memory::yaal ) HNode( this ) );
+			return ( iterator( this, _branch.rbegin().base() ) );
+			M_EPILOG
+		}
+		iterator insert_node( iterator const& pos, value_t const& value ) {
+			M_PROLOG
+			M_ASSERT( pos._owner == this );
+			iterator it( this, _branch.insert( pos._iterator, new ( memory::yaal ) HNode( this, value ) ) );
+			return ( it );
+			M_EPILOG
+		}
+		iterator begin( void ) {
+			return ( iterator( this, _branch.begin() ) );
+		}
+		const_iterator begin( void ) const {
+			return ( const_iterator( this, _branch.begin() ) );
+		}
+		iterator end( void ) {
+			return ( iterator( this, _branch.end() ) );
+		}
+		const_iterator end( void ) const {
+			return ( const_iterator( this, _branch.end() ) );
+		}
+		reverse_iterator rbegin( void ) {
+			return ( end() );
+		}
+		const_reverse_iterator rbegin( void ) const {
+			return ( end() );
+		}
+		reverse_iterator rend( void ) {
+			return ( begin() );
+		}
+		const_reverse_iterator rend( void ) const {
+			return ( begin() );
+		}
+		node_t get_parent( void ) {
+			return ( _trunk );
+		}
+		const_node_t get_parent( void ) const {
+			return ( _trunk );
+		}
+		tree_t& get_tree( void ) {
+			HNode* node( this );
+			while ( node->_trunk )
+				node = node->_trunk;
+			M_ASSERT( node->_tree );
+			return ( *node->_tree );
+		}
+		tree_t const& get_tree( void ) const {
+			HNode* node( this );
+			while ( node->_trunk )
+				node = node->_trunk;
+			M_ASSERT( node->_tree );
+			return ( *node->_tree );
+		}
+		value_t& operator* ( void ) {
+			return ( _data );
+		}
+		value_t const& operator* ( void ) const {
+			return ( _data );
+		}
+		value_t* operator->( void ) {
+			return ( &_data );
+		}
+		value_t const* operator->( void ) const {
+			return ( &_data );
+		}
+	private:
+		/*! \brief Create a root node.
+		 */
+		HNode( tree_t* tree_ )
+			: _data(), _branch(), _trunk( NULL ), _tree( tree_ ) {
+			M_PROLOG
+			M_ASSERT( tree_ );
+			return;
+			M_EPILOG
+		}
+		/*! \brief Create a root node.
+		 */
+		HNode( tree_t* tree_, value_type const& value_ )
+			: _data( value_ ), _branch(), _trunk( NULL ), _tree( tree_ ) {
+			M_PROLOG
+			M_ASSERT( tree_ );
+			return;
+			M_EPILOG
+		}
+		/*! \brief  Create a child node.
+		 */
+		HNode( HNode* node_ )
+			: _data(), _branch(), _trunk( node_ ), _tree( NULL ) {
+			M_PROLOG
+			M_ASSERT( node_ );
+			return;
+			M_EPILOG
+		}
+		/*! \brief Clone node.
+		 */
+		HNode( value_t const& data )
+			: _data( data ), _branch(), _trunk( NULL ), _tree( NULL ) {
+			M_PROLOG
+			return;
+			M_EPILOG
+		}
+		/*! \brief  Clone a child node.
+		 */
+		HNode( node_t node_, value_t const& data )
+			: _data( data ), _branch(), _trunk( node_ ), _tree( NULL ) {
+			M_PROLOG
+			M_ASSERT( node_ );
+			return;
+			M_EPILOG
+		}
+		virtual ~HNode( void ) {
+			M_PROLOG
+			struct tool {
+				static void deleter( node_t& node )
+					{ M_SAFE( delete node ); }
+			};
+			for_each( _branch.begin(), _branch.end(), cref( tool::deleter ) );
+			return;
+			M_DESTRUCTOR_EPILOG
+		}
+		HNode( HNode const& );
+		HNode& operator = ( HNode const& );
+		void detach( void ) {
+			M_PROLOG
+			if ( _tree ) {
+				_tree->_root = NULL;
+				_tree = NULL;
+			} else {
+				typename branch_t::iterator endIt = _trunk->_branch.end();
+				for ( typename branch_t::iterator it = _trunk->_branch.begin();
+						it != endIt; ++ it ) {
+					if ( *it == this ) {
+						*it = NULL;
+						_trunk->_branch.erase( it );
+						break;
+					}
+				}
+			}
+			return;
+			M_EPILOG
+		}
+		node_t clone( HNode* parent ) const {
+			M_PROLOG
+			node_t node = new ( memory::yaal ) HNode( _data );
+			node->_trunk = parent;
+			typename branch_t::const_iterator endIt = _branch.end();
+			for ( typename branch_t::const_iterator it = _branch.begin();
+					it != endIt; ++ it )
+				node->_branch.push_back( (*it)->clone( node ) );
+			return ( node );
+			M_EPILOG
+		}
+		void disjointed( iterator const& pos, typename tree_t::node_t node ) const {
+			M_PROLOG
+			HNode* p = _trunk;
+			while ( p ) {
+				M_ASSERT( p != node );
+				p = p->_trunk;
+			}
+			M_ASSERT( pos._owner == this );
+			return;
+			M_EPILOG
+		}
+		friend class HTree<value_t, allocator_t, sequence_t>;
+		friend class HList<HNode*>;
+	};
+
+	typedef allocator_t<HNode> allocator_type;
+
 	template<typename const_qual_t>
 	class HIterator;
-	typedef HIterator<type_t> iterator;
-	typedef HIterator<type_t const> const_iterator;
+	typedef HIterator<value_t> iterator;
+	typedef HIterator<value_t const> const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
 	HNode* _root;			/* self explanary */
+	allocator_type _allocator;
 public:
-	HTree( void )
-		: _root( NULL ) {
+	explicit HTree( allocator_type const& allocator_ = allocator_type() )
+		: _root( NULL ), _allocator( allocator_ ) {
 		M_PROLOG
 		return;
 		M_EPILOG
@@ -73,7 +360,14 @@ public:
 		M_DESTRUCTOR_EPILOG
 	}
 	HTree( HTree const& t )
-		: _root( t._root ? t._root->clone( NULL ) : NULL ) {
+		: _root( t._root ? t._root->clone( NULL ) : NULL ), _allocator() {
+		M_PROLOG
+		_root && ( _root->_tree = this );
+		return;
+		M_EPILOG
+	}
+	HTree( HTree const& t, allocator_type const& allocator_ )
+		: _root( t._root ? t._root->clone( NULL ) : NULL ), _allocator( allocator_ ) {
 		M_PROLOG
 		_root && ( _root->_tree = this );
 		return;
@@ -185,291 +479,6 @@ public:
 	}
 private:
 	friend class HTree<value_type, allocator_t, sequence_t>::HNode;
-};
-
-/*! \brief Basic building block of HTree<>.
- */
-template<typename value_t, template <typename> class allocator_t, template <typename, template<typename> class> class sequence_t>
-class HTree<value_t, allocator_t, sequence_t>::HNode {
-public:
-	template<typename const_qual_t>
-	class HIterator;
-	typedef value_t value_type;
-	typedef sequence_t<node_t, allocator_t> branch_t;
-	typedef HIterator<HNode> iterator;
-	typedef HIterator<HNode const> const_iterator;
-	typedef HReverseIterator<iterator> reverse_iterator;
-	typedef HReverseIterator<const_iterator> const_reverse_iterator;
-private:
-	value_t _data;    /* object itself */
-	branch_t _branch; /* list of next level nodes */
-	node_t _trunk;    /* self explanary */
-	HTree<value_t, allocator_t, sequence_t>* _tree;
-public:
-	int long child_count( void ) const {
-		M_PROLOG
-		return ( _branch.size() );
-		M_EPILOG
-	}
-
-	bool has_childs( void ) const {
-		M_PROLOG
-		return ( ! _branch.is_empty() );
-		M_EPILOG
-	}
-	int get_level( void ) const {
-		M_PROLOG
-		int level = 0;
-		HNode const* p = this;
-		while ( ( p = p->_trunk ) )
-			++ level;
-		return ( level );
-		M_EPILOG
-	}
-	iterator replace_node( iterator pos, typename tree_t::node_t node ) {
-		M_PROLOG
-#if defined( __DEBUG__ )
-		disjointed( pos, node );
-#endif /* defined( __DEBUG__ ) */
-		if ( *pos._iterator != node ) {
-			node->detach();
-			HNode* wasted = *pos._iterator;
-			*pos._iterator = node;
-			node->_trunk = this;
-			M_SAFE( delete wasted );
-		}
-		return ( pos );
-		M_EPILOG
-	}
-	iterator remove_node( iterator pos ) {
-		M_PROLOG
-		M_SAFE( delete *pos._iterator );
-		return ( iterator( this, _branch.erase( pos._iterator ) ) );
-		M_EPILOG
-	}
-	iterator move_node( iterator const& pos, typename tree_t::node_t node ) {
-		M_PROLOG
-#if defined( __DEBUG__ )
-		disjointed( pos, node );
-#endif /* defined( __DEBUG__ ) */
-		iterator it = pos;
-		if ( *pos._iterator != node ) {
-			node->detach();
-			it = iterator( this, _branch.insert( pos._iterator, node ) );
-			node->_trunk = this;
-		}
-		return ( it );
-		M_EPILOG
-	}
-	iterator move_node( typename tree_t::node_t node ) {
-		M_PROLOG
-#if defined( __DEBUG__ )
-		disjointed( begin(), node );
-#endif /* defined( __DEBUG__ ) */
-		iterator it = rbegin().base();
-		if ( ( it == rend().base() ) || ( *it._iterator != node ) ) {
-			node->detach();
-			_branch.push_back( node );
-			it = iterator( this, _branch.rbegin().base() );
-			node->_trunk = this;
-		}
-		return ( it );
-		M_EPILOG
-	}
-	iterator copy_node( iterator const& pos, typename tree_t::node_t node ) {
-		M_PROLOG
-#if defined( __DEBUG__ )
-		disjointed( pos, node );
-#endif /* defined( __DEBUG__ ) */
-		iterator it( this, _branch.insert( pos._iterator, node->clone( this ) ) );
-		return ( it );
-		M_EPILOG
-	}
-	iterator copy_node( typename tree_t::node_t node ) {
-		M_PROLOG
-#if defined( __DEBUG__ )
-		disjointed( rbegin().base(), node );
-#endif /* defined( __DEBUG__ ) */
-		_branch.push_back( node->clone( this ) );
-		iterator it( this, _branch.rbegin().base() );
-		return ( it );
-		M_EPILOG
-	}
-	iterator add_node( value_t const& value ) {
-		M_PROLOG
-		_branch.push_back( new ( memory::yaal ) HNode( this, value ) );
-		return ( iterator( this, _branch.rbegin().base() ) );
-		M_EPILOG
-	}
-	iterator add_node( void ) {
-		M_PROLOG
-		_branch.push_back( new ( memory::yaal ) HNode( this ) );
-		return ( iterator( this, _branch.rbegin().base() ) );
-		M_EPILOG
-	}
-	iterator insert_node( iterator const& pos, value_t const& value ) {
-		M_PROLOG
-		M_ASSERT( pos._owner == this );
-		iterator it( this, _branch.insert( pos._iterator, new ( memory::yaal ) HNode( this, value ) ) );
-		return ( it );
-		M_EPILOG
-	}
-	iterator begin( void ) {
-		return ( iterator( this, _branch.begin() ) );
-	}
-	const_iterator begin( void ) const {
-		return ( const_iterator( this, _branch.begin() ) );
-	}
-	iterator end( void ) {
-		return ( iterator( this, _branch.end() ) );
-	}
-	const_iterator end( void ) const {
-		return ( const_iterator( this, _branch.end() ) );
-	}
-	reverse_iterator rbegin( void ) {
-		return ( end() );
-	}
-	const_reverse_iterator rbegin( void ) const {
-		return ( end() );
-	}
-	reverse_iterator rend( void ) {
-		return ( begin() );
-	}
-	const_reverse_iterator rend( void ) const {
-		return ( begin() );
-	}
-	node_t get_parent( void ) {
-		return ( _trunk );
-	}
-	const_node_t get_parent( void ) const {
-		return ( _trunk );
-	}
-	tree_t& get_tree( void ) {
-		HNode* node( this );
-		while ( node->_trunk )
-			node = node->_trunk;
-		M_ASSERT( node->_tree );
-		return ( *node->_tree );
-	}
-	tree_t const& get_tree( void ) const {
-		HNode* node( this );
-		while ( node->_trunk )
-			node = node->_trunk;
-		M_ASSERT( node->_tree );
-		return ( *node->_tree );
-	}
-	value_t& operator* ( void ) {
-		return ( _data );
-	}
-	value_t const& operator* ( void ) const {
-		return ( _data );
-	}
-	value_t* operator->( void ) {
-		return ( &_data );
-	}
-	value_t const* operator->( void ) const {
-		return ( &_data );
-	}
-private:
-	/*! \brief Create a root node.
-	 */
-	HNode( tree_t* tree_ )
-		: _data(), _branch(), _trunk( NULL ), _tree( tree_ ) {
-		M_PROLOG
-		M_ASSERT( tree_ );
-		return;
-		M_EPILOG
-	}
-	/*! \brief Create a root node.
-	 */
-	HNode( tree_t* tree_, value_type const& value_ )
-		: _data( value_ ), _branch(), _trunk( NULL ), _tree( tree_ ) {
-		M_PROLOG
-		M_ASSERT( tree_ );
-		return;
-		M_EPILOG
-	}
-	/*! \brief  Create a child node.
-	 */
-	HNode( HNode* node_ )
-		: _data(), _branch(), _trunk( node_ ), _tree( NULL ) {
-		M_PROLOG
-		M_ASSERT( node_ );
-		return;
-		M_EPILOG
-	}
-	/*! \brief Clone node.
-	 */
-	HNode( value_t const& data )
-		: _data( data ), _branch(), _trunk( NULL ), _tree( NULL ) {
-		M_PROLOG
-		return;
-		M_EPILOG
-	}
-	/*! \brief  Clone a child node.
-	 */
-	HNode( node_t node_, value_t const& data )
-		: _data( data ), _branch(), _trunk( node_ ), _tree( NULL ) {
-		M_PROLOG
-		M_ASSERT( node_ );
-		return;
-		M_EPILOG
-	}
-	virtual ~HNode( void ) {
-		M_PROLOG
-		struct tool {
-			static void deleter( node_t& node )
-				{ M_SAFE( delete node ); }
-		};
-		for_each( _branch.begin(), _branch.end(), cref( tool::deleter ) );
-		return;
-		M_DESTRUCTOR_EPILOG
-	}
-	HNode( HNode const& );
-	HNode& operator = ( HNode const& );
-	void detach( void ) {
-		M_PROLOG
-		if ( _tree ) {
-			_tree->_root = NULL;
-			_tree = NULL;
-		} else {
-			typename branch_t::iterator endIt = _trunk->_branch.end();
-			for ( typename branch_t::iterator it = _trunk->_branch.begin();
-					it != endIt; ++ it ) {
-				if ( *it == this ) {
-					*it = NULL;
-					_trunk->_branch.erase( it );
-					break;
-				}
-			}
-		}
-		return;
-		M_EPILOG
-	}
-	node_t clone( HNode* parent ) const {
-		M_PROLOG
-		node_t node = new ( memory::yaal ) HNode( _data );
-		node->_trunk = parent;
-		typename branch_t::const_iterator endIt = _branch.end();
-		for ( typename branch_t::const_iterator it = _branch.begin();
-				it != endIt; ++ it )
-			node->_branch.push_back( (*it)->clone( node ) );
-		return ( node );
-		M_EPILOG
-	}
-	void disjointed( iterator const& pos, typename tree_t::node_t node ) const {
-		M_PROLOG
-		HNode* p = _trunk;
-		while ( p ) {
-			M_ASSERT( p != node );
-			p = p->_trunk;
-		}
-		M_ASSERT( pos._owner == this );
-		return;
-		M_EPILOG
-	}
-	friend class HTree<value_t, allocator_t, sequence_t>;
-	friend class HList<HNode*>;
 };
 
 /*! \brief Iterator for HTree<>::HNode data structure.
@@ -726,8 +735,8 @@ private:
 
 }
 
-template<typename type_t, template <typename> class allocator_t, template <typename, template <typename> class> class sequence_t>
-inline void swap( yaal::hcore::HTree<type_t, allocator_t, sequence_t>& a, yaal::hcore::HTree<type_t, allocator_t, sequence_t>& b )
+template<typename value_t, template <typename> class allocator_t, template <typename, template <typename> class> class sequence_t>
+inline void swap( yaal::hcore::HTree<value_t, allocator_t, sequence_t>& a, yaal::hcore::HTree<value_t, allocator_t, sequence_t>& b )
 	{ a.swap( b ); }
 
 }

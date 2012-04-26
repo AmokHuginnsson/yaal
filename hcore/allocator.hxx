@@ -110,6 +110,9 @@ struct pool {
 	pool( void )
 		: _pool()
 		{}
+	pool( pool const& )
+		: _pool()
+		{}
 	template<typename U>
 	pool( pool<U> const& )
 		: _pool()

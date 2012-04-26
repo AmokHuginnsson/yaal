@@ -152,17 +152,17 @@ public:
 
 	/*! \brief Create an empty list.
 	 */
-	HList( void )
-		: OListBits(), _size( 0 ), _hook( NULL ), _allocator()
+	explicit HList( allocator_type const& allocator_ = allocator_type() )
+		: OListBits(), _size( 0 ), _hook( NULL ), _allocator( allocator_ )
 		{}
 
 	/*! \brief Creates list, with specified size.
 	 *
 	 * \param count_ - number of element for newly created list.
 	 */
-	explicit HList( int long count_ )
+	HList( int long count_, allocator_type const& allocator_ = allocator_type() )
 		: OListBits(), _size( 0 ),
-		_hook( NULL ), _allocator() {
+		_hook( NULL ), _allocator( allocator_ ) {
 		M_PROLOG
 		while ( count_ -- )
 			add_tail();
@@ -176,9 +176,18 @@ public:
 	 *
 	 * \param list_ - an existing list to copy.
 	 */
-	HList( HList<type_t> const& list_ )
+	HList( HList const& list_ )
 		: OListBits(), _size( 0 ),
 		_hook( NULL ), _allocator() {
+		M_PROLOG
+		( *this ) = list_;
+		return;
+		M_EPILOG
+	}
+
+	HList( HList const& list_, allocator_type const& allocator_ )
+		: OListBits(), _size( 0 ),
+		_hook( NULL ), _allocator( allocator_ ) {
 		M_PROLOG
 		( *this ) = list_;
 		return;
@@ -190,9 +199,9 @@ public:
 	 * \param count_ - size of new list.
 	 * \param value_ - list initializer value.
 	 */
-	HList( int long count_, type_t const& value_ )
+	HList( int long count_, type_t const& value_, allocator_type const& allocator_ = allocator_type() )
 		: OListBits(), _size( 0 ),
-		_hook( NULL ), _allocator() {
+		_hook( NULL ), _allocator( allocator_ ) {
 		M_PROLOG
 		resize( count_, value_ );
 		return;
@@ -205,9 +214,9 @@ public:
 	 * \param last_ - one past the end of range to copy into newly created list.
 	 */
 	template<typename iter_t>
-	HList( iter_t first_, iter_t last_ )
+	HList( iter_t first_, iter_t last_, allocator_type const& allocator_ = allocator_type() )
 		: OListBits(), _size( 0 ),
-		_hook( NULL ), _allocator() {
+		_hook( NULL ), _allocator( allocator_ ) {
 		M_PROLOG
 		initialize( first_, last_, typename trait::add_pointer<typename is_integral<iter_t>::type>::type() );
 		return;
