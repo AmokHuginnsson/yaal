@@ -45,7 +45,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHArray_[];
 
 /*! \brief Simplest compund data structure.
  */
-template<typename type_t, template <typename> class allocator_t = allocator::system>
+template<typename type_t, typename allocator_t = allocator::system<type_t> >
 class HArray {
 	typedef HArray<type_t, allocator_t> this_type;
 public:
@@ -417,7 +417,7 @@ private:
 
 }
 
-template<typename type_t, template <typename> class allocator_t>
+template<typename type_t, typename allocator_t>
 inline void swap( yaal::hcore::HArray<type_t, allocator_t>& a, yaal::hcore::HArray<type_t, allocator_t>& b )
 	{ a.swap( b ); }
 
@@ -425,7 +425,7 @@ namespace hcore {
 
 /*! \brief Iterator for HArray<> data structure.
  */
-template<typename type_t, template <typename> class allocator_t>
+template<typename type_t, typename allocator_t>
 template<typename const_qual_t>
 class HArray<type_t, allocator_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::random_access> {
 	typedef HArray<type_t, allocator_t> array_t;

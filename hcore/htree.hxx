@@ -37,12 +37,12 @@ namespace yaal {
 
 namespace hcore {
 
-template<typename value_t, template <typename> class, template <typename, template <typename> class> class>
+template<typename value_t, typename, template <typename, typename> class>
 class HTree;
 
 /*! \brief Tree based data structure and operations.
  */
-template<typename value_t, template <typename> class allocator_t = allocator::system, template <typename, template <typename> class> class sequence_t = HList>
+template<typename value_t, typename allocator_t = allocator::system<value_t>, template <typename, typename> class sequence_t = HList>
 class HTree {
 private:
 	typedef HTree<value_t, allocator_t, sequence_t> tree_t;
@@ -332,10 +332,10 @@ public:
 			M_EPILOG
 		}
 		friend class HTree<value_t, allocator_t, sequence_t>;
-		friend class HList<HNode*>;
+		friend class HList<HNode*, allocator_t>;
 	};
 
-	typedef allocator_t<HNode> allocator_type;
+	typedef typename allocator_t::template rebind<HNode>::other allocator_type;
 
 	template<typename const_qual_t>
 	class HIterator;
@@ -483,7 +483,7 @@ private:
 
 /*! \brief Iterator for HTree<>::HNode data structure.
  */
-template<typename value_t, template <typename> class allocator_t, template <typename, template <typename> class> class sequence_t>
+template<typename value_t, typename allocator_t, template <typename, typename> class sequence_t>
 template<typename const_qual_t>
 class HTree<value_t, allocator_t, sequence_t>::HNode::HIterator
 	: public iterator_interface<typename trait::copy_const<const_qual_t, HNode>::type, typename sequence_t<HNode*, allocator_t>::iterator::category_type> {
@@ -593,7 +593,7 @@ private:
 
 /*! \brief Iterator for HTree<> data structure.
  */
-template<typename value_t, template <typename> class allocator_t, template <typename, template <typename> class> class sequence_t>
+template<typename value_t, typename allocator_t, template <typename, typename> class sequence_t>
 template<typename const_qual_t>
 class HTree<value_t, allocator_t, sequence_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward> {
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
@@ -735,7 +735,7 @@ private:
 
 }
 
-template<typename value_t, template <typename> class allocator_t, template <typename, template <typename> class> class sequence_t>
+template<typename value_t, typename allocator_t, template <typename, typename> class sequence_t>
 inline void swap( yaal::hcore::HTree<value_t, allocator_t, sequence_t>& a, yaal::hcore::HTree<value_t, allocator_t, sequence_t>& b )
 	{ a.swap( b ); }
 

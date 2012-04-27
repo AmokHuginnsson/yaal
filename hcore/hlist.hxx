@@ -39,7 +39,7 @@ namespace hcore {
 
 extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHList_[];
 
-template<typename type_t, template <typename> class allocator_t>
+template<typename type_t, typename allocator_t>
 class HList;
 
 /*! \brief Meta-data definition for HList<> class.
@@ -66,7 +66,7 @@ struct OListBits {
 	 * \tparam Q - iterator bahavior.
 	 * \retval type - new iterator type.
 	 */
-	template<typename T, template<typename> class A, OListBits::treatment_t Q>
+	template<typename T, typename A, OListBits::treatment_t Q>
 	struct iterator {
 		typedef typename HList<T, A>::template HIterator<T,Q> type;
 	};
@@ -74,7 +74,7 @@ struct OListBits {
 
 /*! \brief Doubly-linked list data structure and its operations.
  */
-template<typename type_t, template <typename> class allocator_t = allocator::system>
+template<typename type_t, typename allocator_t = allocator::system<type_t> >
 class HList : public OListBits {
 public:
 	typedef HList<type_t, allocator_t> this_type;
@@ -124,7 +124,7 @@ private:
 	private:
 		HElement( HElement const & );
 		HElement& operator = ( HElement const& );
-		friend class HList<type_t>;
+		friend class HList<type_t, allocator_t>;
 		friend class HIterator<type_t, OListBits::TREAT_AS_OPENED>;
 		friend class HIterator<type_t const, OListBits::TREAT_AS_OPENED>;
 		friend class HIterator<type_t, OListBits::TREAT_AS_CLOSED>;
@@ -137,11 +137,14 @@ private:
 #pragma pack()
 #endif /* #else #ifndef __sun__ */
 
-	typedef allocator_t<HElement> allocator_type;
+public:
+	typedef typename allocator_t::template rebind<HElement>::other allocator_type;
 
+private:
 	int long _size;  /*!< how many elements this list contains */
 	HElement* _hook; /*!< "begining" of the list ( "first" element ) */
 	allocator_type _allocator;
+
 public:
 	typedef class HIterator<type_t, OListBits::TREAT_AS_OPENED> iterator;
 	typedef class HIterator<type_t const, OListBits::TREAT_AS_OPENED> const_iterator;
@@ -799,7 +802,7 @@ private:
 
 /*! \brief Iterator for HList<> data structure.
  */
-template<typename type_t, template <typename> class allocator_t>
+template<typename type_t, typename allocator_t>
 template<typename const_qual_t, OListBits::treatment_t const treatment>
 class HList<type_t, allocator_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward> {
 private:
@@ -910,7 +913,7 @@ protected:
 
 }
 
-template<typename type_t, template <typename> class allocator_t>
+template<typename type_t, typename allocator_t>
 inline void swap( yaal::hcore::HList<type_t, allocator_t>& a, yaal::hcore::HList<type_t, allocator_t>& b )
 	{ a.swap( b ); }
 

@@ -161,6 +161,75 @@ private:
 	pool& operator = ( pool const& );
 };
 
+template<typename T, typename allocator_t>
+struct ref {
+	typedef T* pointer;
+	typedef T const* const_pointer;
+	typedef T& reference;
+	typedef T const& const_reference;
+	typedef T value_type;
+	typedef size_t size_type;
+	typedef ptrdiff_t difference_type;
+	typedef allocator_t allocator_type;
+	allocator_type* _allocator;
+	template<typename U>
+	struct rebind {
+		typedef ref<U, allocator_type> other;
+	};
+	explicit ref( allocator_type* allocator_ )
+		: _allocator( allocator_ )
+		{}
+	ref( ref const& ref_ )
+		: _allocator( ref_._allocator )
+		{}
+	template<typename U>
+	ref( ref<U, allocator_type> const& ref_ )
+		: _allocator( ref_._allocator )
+		{}
+	void swap( ref& ref_ ) {
+		if ( &ref_ != this ) {
+			using yaal::swap;
+			swap( _allocator, ref_._allocator );
+		}
+	}
+	pointer allocate( size_type n ) {
+		return ( reinterpret_cast<pointer>( _allocator->allocate( n ) ) );
+	}
+	pointer allocate( size_type n, const_pointer p ) {
+		return ( _allocator->allocate( n, p ) );
+	}
+	void deallocate( pointer p, size_type n ) {
+		_allocator->deallocate( reinterpret_cast<typename allocator_type::pointer>( p ), n );
+	}
+	pointer address( reference r ) const {
+		return ( &r );
+	}
+	const_pointer address( const_reference s ) const {
+		return ( &s );
+	}
+	size_type max_size( void ) const {
+		return ( 0x1fffffff );
+	}
+/*! \brief true iff you can deallocate with ref<Y> something allocated with ref<X>.
+ */
+	template<typename U>
+	bool operator == ( ref<U, allocator_type> const& ref_ ) const {
+		return ( _allocator == ref_._allocator );
+	}
+	template<typename U>
+	bool operator != ( ref<U, allocator_type> const& ref_ ) const {
+		return ( _allocator != ref_._allocator );
+	}
+	void construct( pointer p, const_reference t ) {
+		new ( p ) T( t );
+	}
+	void destroy( pointer p ) {
+		p->~T();
+	}
+private:
+	ref& operator = ( ref const& );
+};
+
 }
 
 template<typename T>
@@ -169,6 +238,10 @@ inline void swap( yaal::allocator::system<T>& a, yaal::allocator::system<T>& b )
 
 template<typename T>
 inline void swap( yaal::allocator::pool<T>& a, yaal::allocator::pool<T>& b )
+	{ a.swap( b ); }
+
+template<typename T, typename allocator_t>
+inline void swap( yaal::allocator::ref<T, allocator_t>& a, yaal::allocator::ref<T, allocator_t>& b )
 	{ a.swap( b ); }
 
 }
