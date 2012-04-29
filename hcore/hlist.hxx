@@ -141,9 +141,9 @@ public:
 	typedef typename allocator_t::template rebind<HElement>::other allocator_type;
 
 private:
+	allocator_type _allocator;
 	int long _size;  /*!< how many elements this list contains */
 	HElement* _hook; /*!< "begining" of the list ( "first" element ) */
-	allocator_type _allocator;
 
 public:
 	typedef class HIterator<type_t, OListBits::TREAT_AS_OPENED> iterator;
@@ -156,7 +156,7 @@ public:
 	/*! \brief Create an empty list.
 	 */
 	explicit HList( allocator_type const& allocator_ = allocator_type() )
-		: OListBits(), _size( 0 ), _hook( NULL ), _allocator( allocator_ )
+		: OListBits(), _allocator( allocator_ ), _size( 0 ), _hook( NULL )
 		{}
 
 	/*! \brief Creates list, with specified size.
@@ -164,8 +164,8 @@ public:
 	 * \param count_ - number of element for newly created list.
 	 */
 	HList( int long count_, allocator_type const& allocator_ = allocator_type() )
-		: OListBits(), _size( 0 ),
-		_hook( NULL ), _allocator( allocator_ ) {
+		: OListBits(), _allocator( allocator_ ),
+		_size( 0 ), _hook( NULL ) {
 		M_PROLOG
 		while ( count_ -- )
 			add_tail();
@@ -180,8 +180,8 @@ public:
 	 * \param list_ - an existing list to copy.
 	 */
 	HList( HList const& list_ )
-		: OListBits(), _size( 0 ),
-		_hook( NULL ), _allocator() {
+		: OListBits(), _allocator( list_._allocator ),
+		_size( 0 ), _hook( NULL ) {
 		M_PROLOG
 		( *this ) = list_;
 		return;
@@ -189,8 +189,8 @@ public:
 	}
 
 	HList( HList const& list_, allocator_type const& allocator_ )
-		: OListBits(), _size( 0 ),
-		_hook( NULL ), _allocator( allocator_ ) {
+		: OListBits(), _allocator( allocator_ ),
+		_size( 0 ), _hook( NULL ) {
 		M_PROLOG
 		( *this ) = list_;
 		return;
@@ -203,8 +203,8 @@ public:
 	 * \param value_ - list initializer value.
 	 */
 	HList( int long count_, type_t const& value_, allocator_type const& allocator_ = allocator_type() )
-		: OListBits(), _size( 0 ),
-		_hook( NULL ), _allocator( allocator_ ) {
+		: OListBits(), _allocator( allocator_ ),
+		_size( 0 ), _hook( NULL ) {
 		M_PROLOG
 		resize( count_, value_ );
 		return;
@@ -218,8 +218,8 @@ public:
 	 */
 	template<typename iter_t>
 	HList( iter_t first_, iter_t last_, allocator_type const& allocator_ = allocator_type() )
-		: OListBits(), _size( 0 ),
-		_hook( NULL ), _allocator( allocator_ ) {
+		: OListBits(), _allocator( allocator_ ),
+		_size( 0 ), _hook( NULL ) {
 		M_PROLOG
 		initialize( first_, last_, typename trait::add_pointer<typename is_integral<iter_t>::type>::type() );
 		return;
@@ -273,7 +273,9 @@ public:
 		}
 		return;
 	}
-
+	allocator_type const& get_allocator( void ) const {
+		return ( _allocator );
+	}
 	const_iterator begin( void ) const {
 		return ( const_iterator( this, _hook ) );
 	}

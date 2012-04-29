@@ -62,7 +62,9 @@ public:
 			INVALID_ITERATOR /*!< iterator used for operation is not valid */
 		} error_t;
 	};
+	typedef allocator_t allocator_type;
 private:
+	allocator_type _allocator;
 	value_type* _buf;
 	int long _size;
 	int long _capacity;
@@ -73,34 +75,47 @@ public:
 	typedef HIterator<type_t const> const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
-	HArray( void )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+	explicit HArray( allocator_type const& allocator_ = allocator_type() )
+		: _allocator( allocator_ ), _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		return;
 	}
-	explicit HArray( int long size_ )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+	HArray( int long size_, allocator_type const& allocator_ = allocator_type() )
+		: _allocator( allocator_ ), _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
 		resize( size_ );
 		return;
 		M_EPILOG
 	}
-	HArray( int long size_, type_t const& fillWith_ )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+	HArray( int long size_, type_t const& fillWith_, allocator_type const& allocator_ = allocator_type() )
+		: _allocator( allocator_ ), _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
 		resize( size_, fillWith_ );
 		return;
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HArray( iterator_t first, iterator_t last )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+	HArray( iterator_t first, iterator_t last, allocator_type const& allocator_ = allocator_type() )
+		: _allocator( allocator_ ), _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
 		initialize( first, last, typename trait::add_pointer<typename is_integral<iterator_t>::type>::type() );
 		return;
 		M_EPILOG
 	}
 	HArray( HArray const& arr_ )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		: _allocator( arr_._allocator ), _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		M_PROLOG
+		if ( arr_._size > 0 )
+			{
+			reserve( arr_._size );
+			_size = arr_._size;
+			for ( int long i = 0; i < _size; ++ i )
+				new ( _buf + i ) value_type( arr_._buf[ i ] );
+		}
+		return;
+		M_EPILOG
+	}
+	HArray( HArray const& arr_, allocator_type const& allocator_ )
+		: _allocator( allocator_ ), _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
 		if ( arr_._size > 0 )
 			{
@@ -157,6 +172,9 @@ public:
 		}
 		return;
 		M_EPILOG
+	}
+	allocator_type const& get_allocator( void ) const {
+		return ( _allocator );
 	}
 	void resize( int long size_, type_t const& fillWith_ = value_type() ) {
 		M_PROLOG
