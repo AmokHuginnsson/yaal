@@ -33,7 +33,7 @@ Copyright:
 #include <new>
 
 #include "hcore/base.hxx"
-#include "hcore/memory.hxx"
+#include "hcore/allocator.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/algorithm.hxx"
 #include "hcore/pod.hxx"
@@ -48,7 +48,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHDeque_[];
  *
  * Implemented as array of arrays.
  */
-template<typename type_t>
+template<typename type_t, typename allocator_t = allocator::system<type_t> >
 class HDeque {
 private:
 	static int long const DEFAULT_CHUNK_SIZE = ( 512 / sizeof ( type_t ) ) * sizeof ( type_t ) + ( ( 512 - ( ( 512 / sizeof ( type_t ) ) * sizeof ( type_t ) ) ) > ( sizeof ( type_t ) / 2 ) ? sizeof ( type_t ) : 0 );
@@ -71,6 +71,7 @@ public:
 			INVALID_ITERATOR /*!< iterator used for operation is not valid */
 		} error_t;
 	};
+	typedef allocator::system<type_t> allocator_type;
 	template<typename const_qual_t>
 	class HIterator;
 	typedef HIterator<type_t> iterator;
@@ -78,16 +79,17 @@ public:
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
+	static allocator_type _allocator;
 	HChunk _chunks;
 	int long _start;
 	int long _size;
 public:
-	HDeque( void )
+	explicit HDeque( allocator_t const& = allocator_t() )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		return;
 	}
 
-	explicit HDeque( int long size_ )
+	HDeque( int long size_, allocator_t const& = allocator_t() )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		M_PROLOG
 		resize( size_ );
@@ -95,7 +97,7 @@ public:
 		M_EPILOG
 	}
 
-	HDeque( int long size_, type_t const& fillWith_ )
+	HDeque( int long size_, type_t const& fillWith_, allocator_t const& = allocator_t() )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		M_PROLOG
 		resize( size_, fillWith_ );
@@ -104,7 +106,7 @@ public:
 	}
 
 	template<typename iterator_t>
-	HDeque( iterator_t first, iterator_t last )
+	HDeque( iterator_t first, iterator_t last, allocator_t const& = allocator_t() )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		M_PROLOG
 		initialize( first, last, typename trait::add_pointer<typename is_integral<iterator_t>::type>::type() );
@@ -119,6 +121,7 @@ public:
 		M_DESTRUCTOR_EPILOG
 	}
 	HDeque( HDeque const& );
+	HDeque( HDeque const&, allocator_t const& );
 
 	HDeque& operator = ( HDeque const& deque_ ) {
 		M_PROLOG
@@ -138,6 +141,10 @@ public:
 			swap( _chunks, deque_._chunks );
 		}
 		return;
+	}
+
+	allocator_type const& get_allocator( void ) const {
+		return ( _allocator );
 	}
 	void resize( int long, type_t const& = value_type() );
 	type_t const& operator[] ( int long index_ ) const {
@@ -277,16 +284,18 @@ private:
 	}
 };
 
-template<typename type_t>
-int long const HDeque<type_t>::CHUNK_SIZE;
-template<typename type_t>
-int long const HDeque<type_t>::VALUES_PER_CHUNK;
-template<typename type_t>
-int long const HDeque<type_t>::MIN_CHUNKS_COUNT;
+template<typename type_t, typename allocator_t>
+int long const HDeque<type_t, allocator_t>::CHUNK_SIZE;
+template<typename type_t, typename allocator_t>
+int long const HDeque<type_t, allocator_t>::VALUES_PER_CHUNK;
+template<typename type_t, typename allocator_t>
+int long const HDeque<type_t, allocator_t>::MIN_CHUNKS_COUNT;
+template<typename type_t, typename allocator_t>
+typename HDeque<type_t, allocator_t>::allocator_type HDeque<type_t, allocator_t>::_allocator;
 
 }
 
-template<typename type_t>
+template<typename type_t, typename allocator_t>
 inline void swap( yaal::hcore::HDeque<type_t>& a, yaal::hcore::HDeque<type_t>& b )
 	{ a.swap( b ); }
 
@@ -294,10 +303,10 @@ namespace hcore {
 
 /*! \brief Iterator for HDeque<> data structure.
  */
-template<typename type_t>
+template<typename type_t, typename allocator_t>
 template<typename const_qual_t>
-class HDeque<type_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::random_access> {
-	typedef HDeque<type_t> deque_t;
+class HDeque<type_t, allocator_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::random_access> {
+	typedef HDeque<type_t, allocator_t> deque_t;
 	deque_t const* _owner;
 	int long _index;
 public:
@@ -402,13 +411,13 @@ public:
 		return ( _index < it._index );
 	}
 private:
-	friend class HDeque<type_t>;
+	friend class HDeque<type_t, allocator_t>;
 	explicit HIterator( deque_t const* owner_, int long idx )
 		: base_type(), _owner( owner_ ), _index( idx ) {};
 };
 
-template<typename type_t>
-HDeque<type_t>::HDeque( HDeque const& deque )
+template<typename type_t, typename allocator_t>
+HDeque<type_t, allocator_t>::HDeque( HDeque const& deque )
 	: _chunks(), _start( 0 ), _size( 0 ) {
 	M_PROLOG
 	if ( deque._size > 0 ) {
@@ -428,8 +437,29 @@ HDeque<type_t>::HDeque( HDeque const& deque )
 	M_EPILOG
 }
 
-template<typename type_t>
-void HDeque<type_t>::clear( void ) {
+template<typename type_t, typename allocator_t>
+HDeque<type_t, allocator_t>::HDeque( HDeque const& deque, allocator_t const& )
+	: _chunks(), _start( 0 ), _size( 0 ) {
+	M_PROLOG
+	if ( deque._size > 0 ) {
+		_chunks.realloc( max( chunk_size<value_type*>( MIN_CHUNKS_COUNT ), deque._chunks.get_size() ), HChunk::STRATEGY::EXACT );
+		M_ASSERT( _chunks.get_size() == deque._chunks.get_size() );
+		int long firstUsedChunkIndex( deque._start / VALUES_PER_CHUNK );
+		value_type const* const* srcChunks = deque._chunks.template get<value_type const*>();
+		value_type** chunks = _chunks.get<value_type*>();
+		for ( int long i( firstUsedChunkIndex ), chunksCount( deque._chunks.template count_of<value_type*>() ); ( i < chunksCount ) && srcChunks[ i ]; ++ i )
+			chunks[ i ] = static_cast<value_type*>( ::operator new ( CHUNK_SIZE, memory::yaal ) );
+		for ( int long i( deque._start ), endIdx( deque._start + deque._size ); i < endIdx; ++ i )
+			new ( chunks[ i / VALUES_PER_CHUNK ] + ( i % VALUES_PER_CHUNK ) ) value_type( srcChunks[ i / VALUES_PER_CHUNK ][ i % VALUES_PER_CHUNK ] );
+		_start = deque._start;
+		_size = deque._size;
+	}
+	return;
+	M_EPILOG
+}
+
+template<typename type_t, typename allocator_t>
+void HDeque<type_t, allocator_t>::clear( void ) {
 	M_PROLOG
 	value_type** chunks = _chunks.get<value_type*>();
 	for ( iterator it( begin() ), endIt( end() ); it != endIt; ++ it )
@@ -446,8 +476,8 @@ void HDeque<type_t>::clear( void ) {
 	M_EPILOG
 }
 
-template<typename type_t>
-void HDeque<type_t>::accommodate_chunks( int long size_ ) {
+template<typename type_t, typename allocator_t>
+void HDeque<type_t, allocator_t>::accommodate_chunks( int long size_ ) {
 	M_PROLOG
 	int long firstUsedChunkIndex( _start / VALUES_PER_CHUNK );
 	int long usedChunksCount( used_chunks() );
@@ -510,8 +540,8 @@ void HDeque<type_t>::accommodate_chunks( int long size_ ) {
 	M_EPILOG
 }
 
-template<typename type_t>
-void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ ) {
+template<typename type_t, typename allocator_t>
+void HDeque<type_t, allocator_t>::resize( int long size_, type_t const& fillWith_ ) {
 	M_PROLOG
 	M_ASSERT( _size >= 0 );
 	if ( size_ < 0 )
@@ -538,8 +568,8 @@ void HDeque<type_t>::resize( int long size_, type_t const& fillWith_ ) {
 	M_EPILOG
 }
 
-template<typename type_t>
-void HDeque<type_t>::insert_space( int long index_, int long size_ ) {
+template<typename type_t, typename allocator_t>
+void HDeque<type_t, allocator_t>::insert_space( int long index_, int long size_ ) {
 	M_PROLOG
 	accommodate_chunks( ( index_ <= _size / 2 ) ? - size_ : size_ );
 	value_type** chunks = _chunks.get<value_type*>();
@@ -571,9 +601,9 @@ void HDeque<type_t>::insert_space( int long index_, int long size_ ) {
 	M_EPILOG
 }
 
-template<typename type_t>
+template<typename type_t, typename allocator_t>
 template<typename iterator_t>
-void HDeque<type_t>::insert( iterator it_, iterator_t first_, iterator_t last_ ) {
+void HDeque<type_t, allocator_t>::insert( iterator it_, iterator_t first_, iterator_t last_ ) {
 	M_PROLOG
 	M_ASSERT( it_._owner == this );
 	if ( ( it_._index < 0 ) || ( it_._index > _size ) )
@@ -587,8 +617,8 @@ void HDeque<type_t>::insert( iterator it_, iterator_t first_, iterator_t last_ )
 	M_EPILOG
 }
 
-template<typename type_t>
-typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterator last_ ) {
+template<typename type_t, typename allocator_t>
+typename HDeque<type_t, allocator_t>::iterator HDeque<type_t, allocator_t>::erase( iterator first_, iterator last_ ) {
 	M_PROLOG
 	M_ASSERT( first_._owner == this );
 	M_ASSERT( last_._owner == this );
@@ -635,8 +665,8 @@ typename HDeque<type_t>::iterator HDeque<type_t>::erase( iterator first_, iterat
 	M_EPILOG
 }
 
-template<typename type_t>
-void HDeque<type_t>::push_back( type_t const& value_ ) {
+template<typename type_t, typename allocator_t>
+void HDeque<type_t, allocator_t>::push_back( type_t const& value_ ) {
 	M_PROLOG
 	int long idx( _start + _size );
 	int long chunk( idx / VALUES_PER_CHUNK );
@@ -683,8 +713,8 @@ void HDeque<type_t>::push_back( type_t const& value_ ) {
 	M_EPILOG
 }
 
-template<typename type_t>
-void HDeque<type_t>::push_front( type_t const& value_ ) {
+template<typename type_t, typename allocator_t>
+void HDeque<type_t, allocator_t>::push_front( type_t const& value_ ) {
 	M_PROLOG
 	int long chunk( 0 );
 	int long offset( 0 );
@@ -728,8 +758,8 @@ void HDeque<type_t>::push_front( type_t const& value_ ) {
 	M_EPILOG
 }
 
-template<typename type_t>
-void HDeque<type_t>::pop_back( void ) {
+template<typename type_t, typename allocator_t>
+void HDeque<type_t, allocator_t>::pop_back( void ) {
 	M_PROLOG
 	M_ASSERT( _size > 0 );
 	int long idx( _start + _size - 1 );
@@ -748,8 +778,8 @@ void HDeque<type_t>::pop_back( void ) {
 	M_EPILOG
 }
 
-template<typename type_t>
-void HDeque<type_t>::pop_front( void ) {
+template<typename type_t, typename allocator_t>
+void HDeque<type_t, allocator_t>::pop_front( void ) {
 	M_PROLOG
 	M_ASSERT( _size > 0 );
 	int long chunk( _start / VALUES_PER_CHUNK );
@@ -768,9 +798,9 @@ void HDeque<type_t>::pop_front( void ) {
 	M_EPILOG
 }
 
-template<typename type_t>
+template<typename type_t, typename allocator_t>
 template<typename iterator_t>
-void HDeque<type_t>::assign( iterator_t first_, iterator_t last_ ) {
+void HDeque<type_t, allocator_t>::assign( iterator_t first_, iterator_t last_ ) {
 	M_PROLOG
 	using yaal::distance;
 	int long count( distance( first_, last_ ) );
@@ -787,8 +817,8 @@ void HDeque<type_t>::assign( iterator_t first_, iterator_t last_ ) {
 	M_EPILOG
 }
 
-template<typename type_t>
-void HDeque<type_t>::assign( int long count_, type_t const& value_ ) {
+template<typename type_t, typename allocator_t>
+void HDeque<type_t, allocator_t>::assign( int long count_, type_t const& value_ ) {
 	M_PROLOG
 	fill_n( begin(), min( count_, _size ), value_ );
 	if ( count_ < _size )
@@ -799,8 +829,8 @@ void HDeque<type_t>::assign( int long count_, type_t const& value_ ) {
 	M_EPILOG
 }
 
-template<typename type_t>
-typename HDeque<type_t>::iterator HDeque<type_t>::insert( iterator pos_, type_t const& value_ ) {
+template<typename type_t, typename allocator_t>
+typename HDeque<type_t, allocator_t>::iterator HDeque<type_t, allocator_t>::insert( iterator pos_, type_t const& value_ ) {
 	M_PROLOG
 	M_ASSERT( pos_._owner == this );
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
@@ -813,8 +843,8 @@ typename HDeque<type_t>::iterator HDeque<type_t>::insert( iterator pos_, type_t 
 	M_EPILOG
 }
 
-template<typename type_t>
-void HDeque<type_t>::insert( iterator pos_, int long count_, type_t const& value_ ) {
+template<typename type_t, typename allocator_t>
+void HDeque<type_t, allocator_t>::insert( iterator pos_, int long count_, type_t const& value_ ) {
 	M_PROLOG
 	M_ASSERT( pos_._owner == this );
 	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
