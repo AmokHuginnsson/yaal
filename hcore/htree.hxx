@@ -97,11 +97,19 @@ public:
 #if defined( __DEBUG__ )
 			disjointed( pos, node );
 #endif /* defined( __DEBUG__ ) */
-			if ( *pos._iterator != node ) {
+			HNode* wasted( *pos._iterator );
+			if ( wasted != node ) {
 				node->detach();
-				HNode* wasted = *pos._iterator;
-				*pos._iterator = node;
-				node->_trunk = this;
+				if ( ( _allocator == node->_allocator ) && ( _branch.get_allocator() == node->_branch.get_allocator() ) ) {
+					*pos._iterator = node;
+					node->_trunk = this;
+				} else {
+					*pos._iterator = node->clone_self_to( _allocator, _branch.get_allocator(), this );
+					allocator_type allocator( node->_allocator );
+					M_SAFE( node->~HNode() );
+					allocator.deallocate( node, 1 );
+				}
+				/* Node removal must be last in case we down-graft. */
 				M_SAFE( wasted->~HNode() );
 				_allocator.deallocate( wasted, 1 );
 			}
@@ -123,9 +131,17 @@ public:
 #endif /* defined( __DEBUG__ ) */
 			iterator it = pos;
 			if ( *pos._iterator != node ) {
-				node->detach();
-				it = iterator( this, _branch.insert( pos._iterator, node ) );
-				node->_trunk = this;
+				if ( ( _allocator == node->_allocator ) && ( _branch.get_allocator() == node->_branch.get_allocator() ) ) {
+					node->detach();
+					it = iterator( this, _branch.insert( pos._iterator, node ) );
+					node->_trunk = this;
+				} else {
+					it = iterator( this, _branch.insert( pos._iterator, node->clone_self_to( _allocator, _branch.get_allocator(), this ) ) );
+					node->detach();
+					allocator_type allocator( node->_allocator );
+					M_SAFE( node->~HNode() );
+					allocator.deallocate( node, 1 );
+				}
 			}
 			return ( it );
 			M_EPILOG
@@ -137,10 +153,18 @@ public:
 #endif /* defined( __DEBUG__ ) */
 			iterator it = rbegin().base();
 			if ( ( it == rend().base() ) || ( *it._iterator != node ) ) {
-				node->detach();
-				_branch.push_back( node );
+				if ( ( _allocator == node->_allocator ) && ( _branch.get_allocator() == node->_branch.get_allocator() ) ) {
+					node->detach();
+					_branch.push_back( node );
+					node->_trunk = this;
+				} else {
+					_branch.push_back( node->clone_self_to( _allocator, _branch.get_allocator(), this ) );
+					node->detach();
+					allocator_type allocator( node->_allocator );
+					M_SAFE( node->~HNode() );
+					allocator.deallocate( node, 1 );
+				}
 				it = iterator( this, _branch.rbegin().base() );
-				node->_trunk = this;
 			}
 			return ( it );
 			M_EPILOG
@@ -150,7 +174,7 @@ public:
 #if defined( __DEBUG__ )
 			disjointed( pos, node );
 #endif /* defined( __DEBUG__ ) */
-			iterator it( this, _branch.insert( pos._iterator, node->clone_self_to( _allocator, this ) ) );
+			iterator it( this, _branch.insert( pos._iterator, node->clone_self_to( _allocator, _branch.get_allocator(), this ) ) );
 			return ( it );
 			M_EPILOG
 		}
@@ -159,7 +183,7 @@ public:
 #if defined( __DEBUG__ )
 			disjointed( rbegin().base(), node );
 #endif /* defined( __DEBUG__ ) */
-			_branch.push_back( node->clone_self_to( _allocator, this ) );
+			_branch.push_back( node->clone_self_to( _allocator, _branch.get_allocator(), this ) );
 			iterator it( this, _branch.rbegin().base() );
 			return ( it );
 			M_EPILOG
@@ -359,11 +383,11 @@ public:
 			return;
 			M_EPILOG
 		}
-		node_t clone_self_to( allocator_type& allocator_, HNode* parent ) const {
+		node_t clone_self_to( allocator_type& allocator_, branch_allocator_type const& branchAllocator_, HNode* parent ) const {
 			M_PROLOG
 			node_t node( allocator_.allocate( 1 ) );
 			try {
-				new ( node ) HNode( _data, _branch.get_allocator(), _allocator );
+				new ( node ) HNode( _data, branchAllocator_, allocator_ );
 			} catch ( ... ) {
 				allocator_.deallocate( node, 1 );
 				throw;
@@ -372,7 +396,7 @@ public:
 			typename branch_t::const_iterator endIt = _branch.end();
 			for ( typename branch_t::const_iterator it = _branch.begin();
 					it != endIt; ++ it )
-				node->_branch.push_back( (*it)->clone_self_to( allocator_, node ) );
+				node->_branch.push_back( (*it)->clone_self_to( allocator_, branchAllocator_, node ) );
 			return ( node );
 			M_EPILOG
 		}
@@ -434,7 +458,8 @@ public:
 		M_PROLOG
 		if ( t._root ) {
 			typename HNode::allocator_type allocator( &_allocator );
-			_root = t._root->clone_self_to( allocator, NULL );
+			typename HNode::branch_allocator_type branchAllocator( &_branchAllocator );
+			_root = t._root->clone_self_to( allocator, branchAllocator, NULL );
 		}
 		_root && ( _root->_tree = this );
 		return;
@@ -445,7 +470,8 @@ public:
 		M_PROLOG
 		if ( t._root ) {
 			typename HNode::allocator_type allocator( &_allocator );
-			_root = t._root->clone_self_to( allocator, NULL );
+			typename HNode::branch_allocator_type branchAllocator( &_branchAllocator );
+			_root = t._root->clone_self_to( allocator, branchAllocator, NULL );
 		}
 		_root && ( _root->_tree = this );
 		return;
@@ -469,6 +495,12 @@ public:
 			other._root && ( other._root->_tree = &other );
 		}
 		return;
+	}
+	allocator_type const& get_allocator( void ) const {
+		return ( _allocator );
+	}
+	branch_allocator_type const& get_branch_allocator( void ) const {
+		return ( _branchAllocator );
 	}
 	node_t get_root( void ) {
 		return ( _root );

@@ -214,11 +214,11 @@ struct ref {
  */
 	template<typename U>
 	bool operator == ( ref<U, allocator_type> const& ref_ ) const {
-		return ( _allocator == ref_._allocator );
+		return ( *_allocator == *ref_._allocator );
 	}
 	template<typename U>
 	bool operator != ( ref<U, allocator_type> const& ref_ ) const {
-		return ( _allocator != ref_._allocator );
+		return ( *_allocator != *ref_._allocator );
 	}
 	void construct( pointer p, const_reference t ) {
 		new ( p ) T( t );
