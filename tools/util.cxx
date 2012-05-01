@@ -198,8 +198,9 @@ void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, char escap
 			++ it;
 			if ( ! ( it != end ) )
 				break;
-		}
-		ptr[pos] = et_._safeToRaw[static_cast<char unsigned>( *it )];
+			ptr[pos] = et_._safeToRaw[static_cast<char unsigned>( *it )];
+		} else
+			ptr[pos] = *it;
 	}
 	string_.assign( ptr, pos );
 	return;
