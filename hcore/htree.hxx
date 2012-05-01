@@ -64,11 +64,12 @@ public:
 		typedef HIterator<HNode const> const_iterator;
 		typedef HReverseIterator<iterator> reverse_iterator;
 		typedef HReverseIterator<const_iterator> const_reverse_iterator;
+		typedef HTree<value_t, allocator_t, sequence_t> tree_t;
 	private:
 		value_t _data;    /* object itself */
 		branch_t _branch; /* list of next level nodes */
 		HNode* _trunk;    /* self explanary */
-		HTree<value_t, allocator_t, sequence_t>* _tree;
+		tree_t* _tree;
 		typedef allocator::ref<HNode, typename allocator_t::template rebind<HNode>::other> allocator_type;
 		allocator_type _allocator;
 	public:
@@ -101,14 +102,17 @@ public:
 				HNode* wasted = *pos._iterator;
 				*pos._iterator = node;
 				node->_trunk = this;
-				M_SAFE( delete wasted );
+				M_SAFE( wasted->~HNode() );
+				_allocator.deallocate( wasted, 1 );
 			}
 			return ( pos );
 			M_EPILOG
 		}
 		iterator remove_node( iterator pos ) {
 			M_PROLOG
-			M_SAFE( delete *pos._iterator );
+			HNode* node( *pos._iterator );
+			M_SAFE( node->~HNode() );
+			_allocator.deallocate( node, 1 );
 			return ( iterator( this, _branch.erase( pos._iterator ) ) );
 			M_EPILOG
 		}
@@ -146,7 +150,7 @@ public:
 #if defined( __DEBUG__ )
 			disjointed( pos, node );
 #endif /* defined( __DEBUG__ ) */
-			iterator it( this, _branch.insert( pos._iterator, node->clone( this ) ) );
+			iterator it( this, _branch.insert( pos._iterator, node->clone_self_to( _allocator, this ) ) );
 			return ( it );
 			M_EPILOG
 		}
@@ -155,28 +159,68 @@ public:
 #if defined( __DEBUG__ )
 			disjointed( rbegin().base(), node );
 #endif /* defined( __DEBUG__ ) */
-			_branch.push_back( node->clone( this ) );
+			_branch.push_back( node->clone_self_to( _allocator, this ) );
 			iterator it( this, _branch.rbegin().base() );
 			return ( it );
 			M_EPILOG
 		}
 		iterator add_node( value_t const& value ) {
 			M_PROLOG
-			_branch.push_back( new ( memory::yaal ) HNode( this, value ) );
+			HNode* node( _allocator.allocate( 1 ) );
+			try {
+				new ( node ) HNode( this, value );
+			} catch ( ... ) {
+				_allocator.deallocate( node, 1 );
+				throw;
+			}
+			try {
+				_branch.push_back( node );
+			} catch ( ... ) {
+				node->~HNode();
+				_allocator.deallocate( node, 1 );
+				throw;
+			}
 			return ( iterator( this, _branch.rbegin().base() ) );
 			M_EPILOG
 		}
 		iterator add_node( void ) {
 			M_PROLOG
-			_branch.push_back( new ( memory::yaal ) HNode( this ) );
+			HNode* node( _allocator.allocate( 1 ) );
+			try {
+				new ( node ) HNode( this );
+			} catch ( ... ) {
+				_allocator.deallocate( node, 1 );
+				throw;
+			}
+			try {
+				_branch.push_back( node );
+			} catch ( ... ) {
+				node->~HNode();
+				_allocator.deallocate( node, 1 );
+				throw;
+			}
 			return ( iterator( this, _branch.rbegin().base() ) );
 			M_EPILOG
 		}
 		iterator insert_node( iterator const& pos, value_t const& value ) {
 			M_PROLOG
 			M_ASSERT( pos._owner == this );
-			iterator it( this, _branch.insert( pos._iterator, new ( memory::yaal ) HNode( this, value ) ) );
-			return ( it );
+			HNode* node( _allocator.allocate( 1 ) );
+			try {
+				new ( node ) HNode( this, value );
+			} catch ( ... ) {
+				_allocator.deallocate( node, 1 );
+				throw;
+			}
+			typename branch_t::iterator bIt;
+			try {
+				bIt = _branch.insert( pos._iterator, node );
+			} catch ( ... ) {
+				node->~HNode();
+				_allocator.deallocate( node, 1 );
+				throw;
+			}
+			return ( iterator( this, bIt ) );
 			M_EPILOG
 		}
 		iterator begin( void ) {
@@ -286,11 +330,11 @@ public:
 		}
 		virtual ~HNode( void ) {
 			M_PROLOG
-			struct tool {
-				static void deleter( node_t& node )
-					{ M_SAFE( delete node ); }
-			};
-			for_each( _branch.begin(), _branch.end(), cref( tool::deleter ) );
+			for ( typename branch_t::iterator it( _branch.begin() ), endIt( _branch.end() ); it != endIt; ++ it ) {
+				HNode* node( *it );
+				M_SAFE( node->~HNode() );
+				_allocator.deallocate( node, 1 );
+			}
 			return;
 			M_DESTRUCTOR_EPILOG
 		}
@@ -315,14 +359,20 @@ public:
 			return;
 			M_EPILOG
 		}
-		node_t clone( HNode* parent ) const {
+		node_t clone_self_to( allocator_type& allocator_, HNode* parent ) const {
 			M_PROLOG
-			node_t node = new ( memory::yaal ) HNode( _data, _branch.get_allocator(), _allocator );
+			node_t node( allocator_.allocate( 1 ) );
+			try {
+				new ( node ) HNode( _data, _branch.get_allocator(), _allocator );
+			} catch ( ... ) {
+				allocator_.deallocate( node, 1 );
+				throw;
+			}
 			node->_trunk = parent;
 			typename branch_t::const_iterator endIt = _branch.end();
 			for ( typename branch_t::const_iterator it = _branch.begin();
 					it != endIt; ++ it )
-				node->_branch.push_back( (*it)->clone( node ) );
+				node->_branch.push_back( (*it)->clone_self_to( allocator_, node ) );
 			return ( node );
 			M_EPILOG
 		}
@@ -380,17 +430,23 @@ public:
 		M_DESTRUCTOR_EPILOG
 	}
 	HTree( HTree const& t )
-		: _allocator( t._allocator ), _branchAllocator( t._branchAllocator ),
-		_root( t._root ? t._root->clone( NULL ) : NULL ) {
+		: _allocator( t._allocator ), _branchAllocator( t._branchAllocator ), _root( NULL ) {
 		M_PROLOG
+		if ( t._root ) {
+			typename HNode::allocator_type allocator( &_allocator );
+			_root = t._root->clone_self_to( allocator, NULL );
+		}
 		_root && ( _root->_tree = this );
 		return;
 		M_EPILOG
 	}
 	HTree( HTree const& t, allocator_type const& allocator_ )
-		: _allocator( allocator_ ), _branchAllocator( t._branchAllocator ),
-		_root( t._root ? t._root->clone( NULL ) : NULL ) {
+		: _allocator( allocator_ ), _branchAllocator( t._branchAllocator ), _root( NULL ) {
 		M_PROLOG
+		if ( t._root ) {
+			typename HNode::allocator_type allocator( &_allocator );
+			_root = t._root->clone_self_to( allocator, NULL );
+		}
 		_root && ( _root->_tree = this );
 		return;
 		M_EPILOG
@@ -423,7 +479,14 @@ public:
 	node_t create_new_root( value_type const& value_ = value_type() ) {
 		M_PROLOG
 		clear();
-		_root = new ( memory::yaal ) HNode( this, value_ );
+		HNode* node( _allocator.allocate( 1 ) );
+		try {
+			new ( node ) HNode( this, value_ );
+		} catch ( ... ) {
+			_allocator.deallocate( node, 1 );
+			throw;
+		}
+		_root = node;
 		return ( _root );
 		M_EPILOG
 	}
@@ -435,15 +498,19 @@ public:
 			_root = node;
 			node->_tree = this;
 			node->_trunk = NULL;
-			M_SAFE( delete wasted );
+			M_SAFE( wasted->~HNode() );
+			_allocator.deallocate( wasted, 1 );
 		}
 		return ( node );
 		M_EPILOG
 	}
 	void clear( void ) {
 		M_PROLOG
-		if ( _root )
-			M_SAFE( delete _root );
+		if ( _root ) {
+			HNode* node( _root );
+			M_SAFE( node->~HNode() );
+			_allocator.deallocate( node, 1 );
+		}
 		_root = NULL;
 		M_EPILOG
 	}
