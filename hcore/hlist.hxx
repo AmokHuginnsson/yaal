@@ -890,14 +890,8 @@ public:
 		return ( _current != iterator_._current );
 		M_EPILOG
 	}
-	const_qual_t& operator* ( void ) {
-		return ( _current->_value );
-	}
 	const_qual_t& operator* ( void ) const {
 		return ( _current->_value );
-	}
-	const_qual_t* operator->( void ) {
-		return ( &_current->_value );
 	}
 	const_qual_t* operator->( void ) const {
 		return ( &_current->_value );

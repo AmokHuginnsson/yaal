@@ -32,6 +32,7 @@ Copyright:
 
 #include "hcore/hsbbstree.hxx"
 #include "hcore/iterator.hxx"
+#include "hcore/functional.hxx"
 
 namespace yaal {
 
@@ -65,12 +66,10 @@ private:
 public:
 	/*! \brief Iterator for HSet<> data structure.
 	 */
-	class HIterator : public iterator_interface<value_type, iterator_category::forward> {
+	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
 		typename engine_t::HIterator _engine;
 	public:
-		typedef iterator_interface<value_type, iterator_category::forward> base_type;
-		typedef value_type const& reference;
-		typedef value_type const* pointer;
+		typedef iterator_interface<value_type const, iterator_category::forward> base_type;
 		HIterator( void ) : base_type(), _engine() {}
 		HIterator( HIterator const& it_ ) : base_type(), _engine( it_._engine ) {}
 		HIterator& operator = ( HIterator const& it_ ) {
@@ -120,7 +119,7 @@ public:
 	HSet( void )
 		: _engine( compare_type() )
 		{}
-	HSet( compare_type const& compare_ )
+	explicit HSet( compare_type const& compare_ )
 		: _engine( compare_ )
 		{}
 	template<typename iterator_t>

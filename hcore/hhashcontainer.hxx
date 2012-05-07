@@ -160,14 +160,9 @@ public:
 		return ( *this );
 	}
 	template<typename tType>
-	tType& get( void ) {
+	tType& get( void ) const {
 		M_ASSERT( _atom );
 		return ( static_cast<HHashContainer::HAtom<tType>*>( _atom )->_value );
-	}
-	template<typename tType>
-	tType const& get( void ) const {
-		M_ASSERT( _atom );
-		return ( static_cast<HHashContainer::HAtom<tType> const*>( _atom )->_value );
 	}
 	bool operator == ( HIterator const& it ) const {
 		M_ASSERT( _owner == it._owner );

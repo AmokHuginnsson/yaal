@@ -75,7 +75,7 @@ public:
 	HMap( void )
 		: _engine( compare_type() )
 		{}
-	HMap( compare_type const& compare_ )
+	explicit HMap( compare_type const& compare_ )
 		: _engine( compare_ )
 		{}
 	template<typename iterator_t>
@@ -239,12 +239,8 @@ public:
 		-- _engine;
 		return ( it );
 	}
-	const_qual_t& operator* ( void )
-		{ return ( _engine.get() ); }
 	const_qual_t& operator* ( void ) const
 		{ return ( _engine.get() ); }
-	const_qual_t* operator-> ( void )
-		{ return ( &_engine.get() ); }
 	const_qual_t* operator-> ( void ) const
 		{ return ( &_engine.get() ); }
 	template<typename other_const_qual_t>

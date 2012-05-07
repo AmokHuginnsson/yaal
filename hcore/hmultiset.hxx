@@ -32,7 +32,7 @@ Copyright:
 
 #include "hcore/hsbbstree.hxx"
 #include "hcore/iterator.hxx"
-#include "hcore/function.hxx"
+#include "hcore/functional.hxx"
 
 namespace yaal {
 
@@ -42,7 +42,7 @@ namespace hcore {
  */
 template<typename type_t>
 struct multiset_helper {
-	typedef type_t key_type;
+	typedef typename type_t::first_type key_type;
 	inline static key_type const& key( type_t const& key_ )
 		{	return ( key_.first );	}
 };
@@ -63,26 +63,28 @@ public:
 	typedef compare_t compare_type;
 private:
 	typedef HPair<type_t, int long> elem_t;
-	typedef HSBBSTree<elem_t, compare_type, multiset_helper<value_type> > engine_t;
+	typedef HSBBSTree<elem_t, compare_type, multiset_helper<elem_t> > engine_t;
 	/*! \brief Iterator for HMultiSet<> data structure.
 	 */
-	class HIterator : public iterator_interface<value_type, iterator_category::forward> {
+	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
 		typedef HPair<value_type, int long> elem_t;
 		int long _index;
-		HSBBSTree::HIterator _engine;
+		engine_t const* _owner;
+		typename engine_t::HIterator _engine;
 	public:
-		typedef iterator_interface<value_type, iterator_category::forward> base_type;
-		HIterator( void ) : base_type(), _index( 0 ), _engine() {}
-		HIterator( HIterator const& it_ ) : base_type(), _index( it_._index ), _engine( it_._engine ) {}
-		HIterator& operator= ( HIterator const& it_ ) {
+		typedef iterator_interface<value_type const, iterator_category::forward> base_type;
+		HIterator( void ) : base_type(), _index( 0 ), _owner( NULL ), _engine() {}
+		HIterator( HIterator const& it_ ) : base_type(), _index( it_._index ), _owner( it_._owner ), _engine( it_._engine ) {}
+		HIterator& operator = ( HIterator const& it_ ) {
 			if ( &it_ != this ) {
 				_index = it_._index;
+				_owner = it_._owner;
 				_engine = it_._engine;
 			}
 			return ( *this );
 		}
 		HIterator& operator ++ ( void ) {
-			if ( _index < ( _engine.get<elem_t>().second - 1 ) )
+			if ( _index < ( _engine.get().second - 1 ) )
 				++ _index;
 			else {
 				_index = 0;
@@ -91,51 +93,69 @@ private:
 			return ( *this );
 		}
 		HIterator const operator ++ ( int ) {
-			HIterator it( _engine );
-			++ _engine;
+			HIterator it( _engine, _index );
+			operator ++ ();
 			return ( it );
 		}
 		HIterator& operator -- ( void ) {
-			-- _engine;
+			if ( _index > 0 ) {
+				-- _index;
+			} else {
+				-- _engine;
+				if ( _engine != _owner->end() )
+					_index = _engine.get().second - 1;
+			}
 			return ( *this );
 		}
 		HIterator const operator -- ( int ) {
-			HIterator it( _engine );
-			-- _engine;
+			HIterator it( _engine, _index );
+			operator -- ();
 			return ( it );
 		}
-		value_type const& operator * ( void ) const
-			{	return ( _engine.get<elem_t>().first );	}
-		value_type const* operator -> ( void ) const
-			{ return ( &_engine.get<elem_t>().first );	}
-		bool operator == ( HIterator const& it ) const
-			{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
-		bool operator != ( HIterator const& it ) const
-			{ return ( ( _engine != it._engine ) || ( _index != it._index ) ); }
+		value_type const& operator * ( void ) const {
+			M_ASSERT( _owner );
+			return ( _engine.get().first );
+		}
+		value_type const* operator -> ( void ) const {
+			M_ASSERT( _owner );
+			return ( &_engine.get().first );
+		}
+		bool operator == ( HIterator const& it ) const {
+			M_ASSERT( it._owner == _owner );
+			return ( ( _engine == it._engine ) && ( _index == it._index )  );
+		}
+		bool operator != ( HIterator const& it ) const {
+			M_ASSERT( it._owner == _owner );
+			return ( ( _engine != it._engine ) || ( _index != it._index ) );
+		}
 	private:
-		friend class HMultiSet<value_type, helper_t>;
-		explicit HIterator( HSBBSTree::HIterator const& it ) : base_type(), _index( 0 ), _engine( it ) {};
+		friend class HMultiSet<value_type, compare_type>;
+		explicit HIterator( engine_t const* owner_, typename engine_t::HIterator const& it, int long index_ )
+			: base_type(), _index( index_ ), _owner( owner_ ), _engine( it ) {};
 	};
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
-	HSBBSTree _engine;
+	engine_t _engine;
 public:
 	HMultiSet( void )
-		: _engine()
+		: _engine( compare_type() )
+		{}
+	HMultiSet( compare_type const& compare_ )
+		: _engine( compare_ )
 		{}
 	template<typename iterator_t>
-	HMultiSet( iterator_t first, iterator_t last )
-		: _engine() {
+	HMultiSet( iterator_t first, iterator_t last, compare_type const& compare_ = compare_type() )
+		: _engine( compare_ ) {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
 	HMultiSet( HMultiSet const& source )
-		: _engine() {
+		: _engine( source._engine.compare() ) {
 		M_PROLOG
 		_engine.copy_from( source._engine );
 		return;
@@ -155,8 +175,8 @@ public:
 	int long get_size( void ) const {
 		M_PROLOG
 		int long sizeAcc( 0 );
-		for ( HSBBSTree::HIterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
-			sizeAcc += it.get<elem_t>().second;
+		for ( typename engine_t::HIterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
+			sizeAcc += it.get().second;
 		return ( sizeAcc );
 		M_EPILOG
 	}
@@ -166,10 +186,10 @@ public:
 		{ return ( _engine.is_empty() );	}
 	HIterator insert( value_type const& elem ) {
 		M_PROLOG
-		HPair<HSBBSTree::HIterator, bool> p( _engine.insert<elem_t, helper_t>( make_pair( elem, 1 ) ) );
+		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair( elem, 1 ) ) );
 		if ( ! p.second )
-			++ p.first.get<elem_t>().second;
-		return ( HIterator( p.first ) );
+			++ p.first.get().second;
+		return ( HIterator( &_engine, p.first, p.first.get().second - 1 ) );
 		M_EPILOG
 	}
 	template<typename iter_t>
@@ -183,7 +203,7 @@ public:
 	int long count( value_type const& elem ) const {
 		M_PROLOG
 		HIterator it( find( elem ) );
-		return ( it != end() ? it._engine.template get<elem_t>().second : 0 );
+		return ( it != end() ? it._engine.get().second : 0 );
 		M_EPILOG
 	}
 	int long erase( value_type const& elem ) {
@@ -191,7 +211,7 @@ public:
 		HIterator it( find( elem ) );
 		int long erased( 0 );
 		if ( it != end() ) {
-			erased = it._engine.template get<elem_t>().second;
+			erased = it._engine.get().second;
 			_engine.remove( it._engine );
 		}
 		return ( erased );
@@ -213,22 +233,22 @@ public:
 		M_EPILOG
 	}
 	HIterator find( value_type const& e ) const
-		{ return ( HIterator( _engine.find<elem_t, value_type, helper_t>( e ) ) ); }
+		{ return ( HIterator( &_engine, _engine.find( e ), 0 ) ); }
 	HIterator lower_bound( value_type const& e ) const
-		{ return ( HIterator( _engine.lower_bound<value_type, value_type, helper_t>( e ) ) ); }
+		{ return ( HIterator( &_engine, _engine.lower_bound( e ), 0 ) ); }
 	HIterator upper_bound( value_type const& e ) const
-		{ return ( HIterator( _engine.upper_bound<value_type, value_type, helper_t>( e ) ) ); }
+		{ return ( HIterator( &_engine, _engine.upper_bound( e ), 0 ) ); }
 	HIterator begin( void ) const
-		{ return ( HIterator( _engine.begin() ) ); }
+		{ return ( HIterator( &_engine, _engine.begin(), 0 ) ); }
 	HIterator end( void ) const
-		{ return ( HIterator( _engine.end() ) ); }
+		{ return ( HIterator( &_engine, _engine.end(), 0 ) ); }
 	reverse_iterator rbegin( void ) const
 		{ return ( HIterator( end() ) ); }
 	reverse_iterator rend( void ) const
 		{ return ( HIterator( begin() ) ); }
 	void clear( void )
 		{ _engine.clear(); }
-	void swap( HMultiSet<value_type, helper_t>& other ) {
+	void swap( HMultiSet& other ) {
 		if ( &other != this ) {
 			using yaal::swap;
 			_engine.swap( other._engine );
@@ -242,8 +262,8 @@ public:
 
 }
 
-template<typename value_type, typename helper_t>
-inline void swap( yaal::hcore::HMultiSet<value_type, helper_t>& a, yaal::hcore::HMultiSet<value_type, helper_t>& b )
+template<typename value_type, typename compare_t>
+inline void swap( yaal::hcore::HMultiSet<value_type, compare_t>& a, yaal::hcore::HMultiSet<value_type, compare_t>& b )
 	{ a.swap( b ); }
 
 }

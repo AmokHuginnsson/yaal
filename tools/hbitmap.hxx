@@ -207,7 +207,7 @@ public:
 		M_ASSERT( _owner == it._owner );
 		return ( _index != it._index );
 	}
-	const_qual_t operator* ( void );
+	const_qual_t operator* ( void ) const;
 private:
 	friend class yaal::tools::HBitmap;
 	HIterator( owner_t owner_, int long idx )

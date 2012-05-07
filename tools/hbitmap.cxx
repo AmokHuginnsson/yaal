@@ -43,13 +43,13 @@ namespace yaal {
 namespace tools {
 
 template<>
-bool HBitmap::HIterator<bool>::operator* ( void ) {
+bool HBitmap::HIterator<bool>::operator* ( void ) const {
 	M_ASSERT( _owner );
 	return ( _owner->get( _index ) );
 }
 
 template<>
-HBitmap::HBit HBitmap::HIterator<HBitmap::HBit>::operator* ( void ) {
+HBitmap::HBit HBitmap::HIterator<HBitmap::HBit>::operator* ( void ) const {
 	M_ASSERT( _owner );
 	return ( HBitmap::HBit( _owner, _index ) );
 }

@@ -175,18 +175,10 @@ public:
 	iterator_t base( void ) const {
 		return ( _iterator );
 	}
-	typename trait::make_reference<typename iterator_t::value_type const>::type operator*( void ) const {
+	typename iterator_t::reference operator*( void ) const {
 		return ( *_iterator );
 	}
-/* cppcheck-suppress functionConst */
-	typename iterator_t::reference operator*( void ) {
-		return ( *_iterator );
-	}
-	typename trait::add_pointer<typename iterator_t::value_type const>::type operator->( void ) const {
-		return ( &*_iterator );
-	}
-/* cppcheck-suppress functionConst */
-	typename iterator_t::pointer operator->( void ) {
+	typename iterator_t::pointer operator->( void ) const {
 		return ( &*_iterator );
 	}
 	bool operator == ( HReverseIterator const& iterator_ ) const {

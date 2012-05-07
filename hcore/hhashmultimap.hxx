@@ -62,6 +62,8 @@ public:
 	class HIterator;
 	typedef HIterator<value_type> iterator;
 	typedef HIterator<value_type const> const_iterator;
+	typedef HReverseIterator<iterator> reverse_iterator;
+	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
 	typedef HHashMap<key_type, value_list_ptr_t, hasher_function_t> hashmultimap_engine_t;
 	hashmultimap_engine_t _engine;
@@ -257,28 +259,26 @@ public:
 		{ return ( const_iterator( this, _engine.end(), typename value_list_t::const_iterator() ) ); }
 	iterator end( void )
 		{ return ( iterator( this, _engine.end(), typename value_list_t::iterator() ) ); }
-	const_iterator rbegin( void ) const {
+	const_reverse_iterator rbegin( void ) const {
 		M_PROLOG
-		typename hashmultimap_engine_t::const_iterator major = _engine.rbegin();
-		typename value_list_t::const_iterator minor;
-		if ( major != _engine.end() )
-			minor = major->second->rbegin();
-		return ( const_iterator( this, major, minor ) );
+		return ( end() );
 		M_EPILOG
 	}
-	iterator rbegin( void ) {
+	reverse_iterator rbegin( void ) {
 		M_PROLOG
-		typename hashmultimap_engine_t::iterator major = _engine.rbegin();
-		typename value_list_t::iterator minor;
-		if ( major != _engine.end() )
-			minor = major->second->rbegin();
-		return ( iterator( this, major, minor ) );
+		return ( end() );
 		M_EPILOG
 	}
-	const_iterator rend( void ) const
-		{ return ( const_iterator( this, _engine.rend(), typename value_list_t::const_iterator() ) ); }
-	iterator rend( void )
-		{ return ( iterator( this, _engine.rend(), typename value_list_t::iterator() ) ); }
+	const_reverse_iterator rend( void ) const {
+		M_PROLOG
+		return ( begin() );
+		M_EPILOG
+	}
+	reverse_iterator rend( void ) {
+		M_PROLOG
+		return ( begin() );
+		M_EPILOG
+	}
 	void clear( void )
 		{ _engine.clear(); }
 	int long count( key_type const& key ) const {
@@ -378,12 +378,8 @@ public:
 		operator--();
 		return ( it );
 	}
-	typename hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t operator* ( void )
-		{	return ( hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );	}
 	typename hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t operator* ( void ) const
 		{	return ( hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );	}
-	typename hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_ptr_t operator->( void )
-		{	return ( &hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );	}
 	typename hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_ptr_t operator->( void ) const
 		{	return ( &hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );	}
 	bool operator == ( HIterator const& it ) const

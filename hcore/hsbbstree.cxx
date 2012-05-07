@@ -90,7 +90,7 @@ HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::previous( HAbstractNode* node_ ) co
 		while ( node_ && node_->_right )
 			node_ = node_->_right;
 	}
-	return ( *this );
+	return ( node_ );
 	M_EPILOG
 }
 

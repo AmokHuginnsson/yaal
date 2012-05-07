@@ -256,12 +256,8 @@ public:
 		-- _engine;
 		return ( it );
 	}
-	const_qual_t& operator* ( void )
-		{ return ( _engine.get<typename map_t::value_type>() ); }
 	const_qual_t& operator* ( void ) const
 		{ return ( _engine.get<typename map_t::value_type>() ); }
-	const_qual_t* operator-> ( void )
-		{ return ( &_engine.get<typename map_t::value_type>() ); }
 	const_qual_t* operator-> ( void ) const
 		{ return ( &_engine.get<typename map_t::value_type>() ); }
 	template<typename other_const_qual_t>

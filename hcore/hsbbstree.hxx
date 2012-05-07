@@ -99,7 +99,7 @@ protected:
 	int long _size;
 public:
 	HSBBSTreeBase( void );
-	virtual ~HSBBSTreeBase( void );
+	virtual ~HSBBSTreeBase( void ) {}
 	int long get_size( void ) const;
 	bool is_empty( void ) const;
 	HAbstractNode* leftmost( void ) const;
@@ -173,7 +173,7 @@ public:
 			M_THROW( _errMsgHSBBSTree_[ ERROR::NIL_ITERATOR ],
 					static_cast<int>( ERROR::NIL_ITERATOR ) );
 		remove_node( it_._current );
-		M_SAFE( delete it_._current );
+		M_SAFE( delete static_cast<HNode*>( it_._current ) );
 		return;
 		M_EPILOG
 	}
@@ -211,6 +211,7 @@ public:
 		M_PROLOG
 		if ( &source != this ) {
 			clear();
+			_compare = source._compare;
 			if ( source._root )
 				_root = copy_node( static_cast<HNode*>( source._root ) );
 			_size = source._size;
@@ -281,20 +282,14 @@ public:
 		M_ASSERT( _owner == iterator_._owner );
 		return ( _current != iterator_._current );
 	}
-	key_value_t& get( void ) {
-		M_PROLOG
-		M_ASSERT( _current );
-		return ( static_cast<typename owner_t::HNode*>( _current )->_key );
-		M_EPILOG
-	}
-	key_value_t const& get( void ) const {
+	key_value_t& get( void ) const {
 		M_PROLOG
 		M_ASSERT( _current );
 		return ( static_cast<typename owner_t::HNode*>( _current )->_key );
 		M_EPILOG
 	}
 private:
-	friend class HSBBSTree;
+	friend class HSBBSTree<key_value_t, compare_t, key_get_t>;
 	explicit HIterator( owner_t const* owner_, HSBBSTreeBase::HAbstractNode* const node_ )
 		: _owner( owner_ ), _current( node_ ) {
 		return;

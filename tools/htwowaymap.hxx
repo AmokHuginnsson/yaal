@@ -37,20 +37,13 @@ namespace yaal {
 
 namespace tools {
 
-/*! \brief HSBBSTree util, a helper for HSet<> instatiations for left view.
+
+/*! \brief less for HTwoWayMap.
  */
-template<typename key_type, typename data_type>
-struct twowaymap_helper {
-
-inline static bool less( yaal::hcore::HPair<key_type, data_type> const& left, yaal::hcore::HPair<key_type, data_type> const& right )
-	{	return ( *(left.first) < *(right.first) );	}
-
-inline static bool less( key_type const& left, yaal::hcore::HPair<key_type, data_type> const& right )
-	{	return ( *left < *(right.first) );	}
-
-inline static bool less( yaal::hcore::HPair<key_type, data_type> const& left, key_type const& right )
-	{	return ( *(left.first) < *right );	}
-
+template<typename key_type>
+struct twowaymap_less {
+inline bool operator()( key_type const& left, key_type const& right ) const
+	{  return ( *left < *right );  }
 };
 
 /*! \brief Bijective relation of elemnets.
@@ -128,8 +121,7 @@ class HTwoWayMap<left_type_t, right_type_t>::HView {
 	typedef typename HTwoWayMap<left_type_t, right_type_t>::template HView<view_type_t> this_type;
 	typedef HTwoWayMap<left_type_t, right_type_t> twowaymap_type;
 	typedef typename twowaymap_type::storage_type storage_type;
-	typedef twowaymap_helper<view_type_t const*, typename storage_type::iterator> twowaymap_view_helper;
-	typedef yaal::hcore::HMap<view_type_t const*, typename storage_type::iterator, twowaymap_view_helper> view_storage_type;
+	typedef yaal::hcore::HMap<view_type_t const*, typename storage_type::iterator, twowaymap_less<view_type_t const*> > view_storage_type;
 public:
 	class HIterator;
 	typedef HIterator iterator;
