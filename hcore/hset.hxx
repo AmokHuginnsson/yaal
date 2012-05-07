@@ -41,11 +41,9 @@ namespace hcore {
  */
 template<typename type_t>
 struct set_helper {
-
-template<typename key_t>
-inline static bool less( key_t const& left, key_t const& right )
-	{	return ( left < right );	}
-
+	typedef type_t key_type;
+	inline static key_type const& key( type_t const& key_ )
+		{	return ( key_ );	}
 };
 
 /*! \brief Binary tree based set.
@@ -56,15 +54,19 @@ inline static bool less( key_t const& left, key_t const& right )
  * \tparam type_t - type of values held in set.
  * \tparam helper_t - HSBBSTree plugable code.
  */
-template<typename type_t, typename helper_t = set_helper<type_t> >
+template<typename type_t, typename compare_t = less<type_t> >
 class HSet {
 public:
 	typedef type_t value_type;
 	typedef type_t key_type;
+	typedef compare_t compare_type;
+private:
+	typedef HSBBSTree<value_type, compare_type, set_helper<value_type> > engine_t;
+public:
 	/*! \brief Iterator for HSet<> data structure.
 	 */
 	class HIterator : public iterator_interface<value_type, iterator_category::forward> {
-		HSBBSTree::HIterator _engine;
+		typename engine_t::HIterator _engine;
 	public:
 		typedef iterator_interface<value_type, iterator_category::forward> base_type;
 		typedef value_type const& reference;
@@ -95,16 +97,16 @@ public:
 			return ( it );
 		}
 		value_type const& operator * ( void ) const
-			{	return ( _engine.get<value_type>() );	}
+			{	return ( _engine.get() );	}
 		value_type const* operator -> ( void ) const
-			{ return ( &_engine.get<value_type>() );	}
+			{ return ( &_engine.get() );	}
 		bool operator == ( HIterator const& it ) const
 			{ return ( _engine == it._engine ); }
 		bool operator != ( HIterator const& it ) const
 			{ return ( _engine != it._engine ); }
 	private:
-		friend class HSet<value_type, helper_t>;
-		explicit HIterator( HSBBSTree::HIterator const& it )
+		friend class HSet<value_type, compare_type>;
+		explicit HIterator( typename engine_t::HIterator const& it )
 			: base_type(), _engine( it ) {}
 	};
 	typedef HIterator iterator;
@@ -113,21 +115,24 @@ public:
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 	typedef HPair<iterator, bool> insert_result;
 private:
-	HSBBSTree _engine;
+	engine_t _engine;
 public:
 	HSet( void )
-		: _engine()
+		: _engine( compare_type() )
+		{}
+	HSet( compare_type const& compare_ )
+		: _engine( compare_ )
 		{}
 	template<typename iterator_t>
-	HSet( iterator_t first, iterator_t last )
-		: _engine() {
+	HSet( iterator_t first, iterator_t last, compare_type const& compare_ = compare_type() )
+		: _engine( compare_ ) {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
 	HSet( HSet const& source )
-		: _engine() {
+		: _engine( source._engine.compare() ) {
 		M_PROLOG
 		_engine.copy_from( source._engine );
 		return;
@@ -152,7 +157,7 @@ public:
 		{ return ( _engine.is_empty() );	}
 	insert_result insert( value_type const& elem ) {
 		M_PROLOG
-		HPair<HSBBSTree::HIterator, bool> p = _engine.insert<value_type, helper_t>( elem );
+		HPair<typename engine_t::HIterator, bool> p = _engine.insert( elem );
 		return ( make_pair( HIterator( p.first ), p.second ) );
 		M_EPILOG
 	}
@@ -197,11 +202,11 @@ public:
 		M_EPILOG
 	}
 	HIterator find( value_type const& e ) const
-		{ return ( HIterator( _engine.find<value_type, value_type, helper_t>( e ) ) ); }
+		{ return ( HIterator( _engine.find( e ) ) ); }
 	HIterator lower_bound( value_type const& e ) const
-		{ return ( HIterator( _engine.lower_bound<value_type, value_type, helper_t>( e ) ) ); }
+		{ return ( HIterator( _engine.lower_bound( e ) ) ); }
 	HIterator upper_bound( value_type const& e ) const
-		{ return ( HIterator( _engine.upper_bound<value_type, value_type, helper_t>( e ) ) ); }
+		{ return ( HIterator( _engine.upper_bound( e ) ) ); }
 	HIterator begin( void ) const
 		{ return ( HIterator( _engine.begin() ) ); }
 	HIterator end( void ) const
@@ -212,7 +217,7 @@ public:
 		{ return ( begin() ); }
 	void clear( void )
 		{ _engine.clear(); }
-	void swap( HSet<value_type, helper_t>& other ) {
+	void swap( HSet& other ) {
 		if ( &other != this ) {
 			using yaal::swap;
 			_engine.swap( other._engine );
@@ -226,8 +231,8 @@ public:
 
 }
 
-template<typename value_type, typename helper_t>
-inline void swap( yaal::hcore::HSet<value_type, helper_t>& a, yaal::hcore::HSet<value_type, helper_t>& b )
+template<typename value_type, typename compare_t>
+inline void swap( yaal::hcore::HSet<value_type, compare_t>& a, yaal::hcore::HSet<value_type, compare_t>& b )
 	{ a.swap( b ); }
 
 }

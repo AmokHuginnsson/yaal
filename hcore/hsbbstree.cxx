@@ -38,114 +38,69 @@ namespace hcore {
 
 char const* const _errMsgHSBBSTree_[ 4 ] = {
 	_( "ok" ),
-/* HSBBSTree::NON_EXISTING_KEY */			_( "key does not exists" ),
-/* HSBBSTree::NIL_ITERATOR */					_( "dereferencing nil iterator" )
+/* HSBBSTreeBase::NON_EXISTING_KEY */			_( "key does not exists" ),
+/* HSBBSTreeBase::NIL_ITERATOR */					_( "dereferencing nil iterator" )
 };
 
-HSBBSTree::HIterator::HIterator( void )
-	: _owner( NULL ), _current( NULL ) {
-	return;
-}
-
-HSBBSTree::HIterator::HIterator( HSBBSTree const* owner_, HSBBSTree::HAbstractNode* const node_ )
-	: _owner( owner_ ), _current( node_ ) {
-	return;
-}
-
-bool HSBBSTree::HIterator::operator == ( HSBBSTree::HIterator const& iterator_ ) const {
-	M_ASSERT( _owner == iterator_._owner );
-	return ( _current == iterator_._current );
-}
-
-bool HSBBSTree::HIterator::operator != ( HSBBSTree::HIterator const& iterator_ ) const {
-	M_ASSERT( _owner == iterator_._owner );
-	return ( _current != iterator_._current );
-}
-
-HSBBSTree::HIterator& HSBBSTree::HIterator::operator ++ ( void ) {
+HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::next( HAbstractNode* node_ ) const {
 	M_PROLOG
-	M_ASSERT( _owner );
-	if ( _current ) {
-		HAbstractNode* lastNode( _current );
-		while ( _current ) {
-			if ( _current->_right && ( _current->_right != lastNode ) ) {
-				_current = _current->_right;
-				while ( _current->_left )
-					_current = _current->_left;
+	if ( node_ ) {
+		HAbstractNode* lastNode( node_ );
+		while ( node_ ) {
+			if ( node_->_right && ( node_->_right != lastNode ) ) {
+				node_ = node_->_right;
+				while ( node_->_left )
+					node_ = node_->_left;
 				break;
 			} else {
-				lastNode = _current;
-				_current = _current->_parent;
-				if ( _current && ( lastNode == _current->_left ) )
+				lastNode = node_;
+				node_ = node_->_parent;
+				if ( node_ && ( lastNode == node_->_left ) )
 					break;
 			}
 		}
 	} else {
-		_current = _owner->_root;
-		while ( _current && _current->_left )
-			_current = _current->_left;
+		node_ = _root;
+		while ( node_ && node_->_left )
+			node_ = node_->_left;
+	}
+	return ( node_ );
+	M_EPILOG
+}
+
+HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::previous( HAbstractNode* node_ ) const {
+	M_PROLOG
+	if ( node_ ) {
+		HAbstractNode* lastNode( node_ );
+		while ( node_ ) {
+			if ( node_->_left && ( node_->_left != lastNode ) ) {
+				node_ = node_->_left;
+				while ( node_->_right )
+					node_ = node_->_right;
+				break;
+			} else {
+				lastNode = node_;
+				node_ = node_->_parent;
+				if ( node_ && ( lastNode == node_->_right ) )
+					break;
+			}
+		}
+	} else {
+		node_ = _root;
+		while ( node_ && node_->_right )
+			node_ = node_->_right;
 	}
 	return ( *this );
 	M_EPILOG
 }
 
-HSBBSTree::HIterator& HSBBSTree::HIterator::operator -- ( void ) {
-	M_PROLOG
-	M_ASSERT( _owner );
-	if ( _current ) {
-		HAbstractNode* lastNode( _current );
-		while ( _current ) {
-			if ( _current->_left && ( _current->_left != lastNode ) ) {
-				_current = _current->_left;
-				while ( _current->_right )
-					_current = _current->_right;
-				break;
-			} else {
-				lastNode = _current;
-				_current = _current->_parent;
-				if ( _current && ( lastNode == _current->_right ) )
-					break;
-			}
-		}
-	} else {
-		_current = _owner->_root;
-		while ( _current && _current->_right )
-			_current = _current->_right;
-	}
-	return ( *this );
-	M_EPILOG
-}
-
-HSBBSTree::HIterator::HIterator( HSBBSTree::HIterator const & iterator_ )
-	: _owner( iterator_._owner ), _current ( iterator_._current ) {
-	return;
-}
-
-HSBBSTree::HIterator& HSBBSTree::HIterator::operator = ( HSBBSTree::HIterator const& iterator_ ) {
-	if ( &iterator_ != this ) {
-		_owner = iterator_._owner;
-		_current = iterator_._current;
-	}
-	return ( *this );
-}
-
-HSBBSTree::HAbstractNode::HAbstractNode( void )
+HSBBSTreeBase::HAbstractNode::HAbstractNode( void )
 	: _color( RED ), _parent( NULL ),
 	_left( NULL ), _right( NULL ) {
 	return;
 }
 
-HSBBSTree::HAbstractNode::~HAbstractNode( void ) {
-	if ( _left )
-		M_SAFE( delete _left );
-	_left = NULL;
-	if ( _right )
-		M_SAFE( delete _right );
-	_right = NULL;
-	return;
-}
-
-void HSBBSTree::HAbstractNode::set_child( HAbstractNode* which_, HAbstractNode* new_ ) {
+void HSBBSTreeBase::HAbstractNode::set_child( HAbstractNode* which_, HAbstractNode* new_ ) {
 	M_ASSERT( ( which_ == _left ) || ( which_ == _right ) );
 	if ( which_ == _left )
 		_left = new_;
@@ -154,27 +109,12 @@ void HSBBSTree::HAbstractNode::set_child( HAbstractNode* which_, HAbstractNode* 
 	return;
 }
 
-HSBBSTree::HSBBSTree( void ) : _root( NULL ), _size( 0 ) {
+HSBBSTreeBase::HSBBSTreeBase( void )
+	: _root( NULL ), _size( 0 ) {
 	return;
 }
 
-HSBBSTree::~HSBBSTree( void ) {
-	M_PROLOG
-	clear();
-	return;
-	M_DESTRUCTOR_EPILOG
-}
-
-void HSBBSTree::clear( void ) {
-	M_PROLOG
-	if ( _root )
-		M_SAFE( delete _root );
-	_root = NULL;
-	_size = 0;
-	M_EPILOG
-}
-
-void HSBBSTree::insert_rebalance( HAbstractNode* node_ ) {
+void HSBBSTreeBase::insert_rebalance( HAbstractNode* node_ ) {
 	M_PROLOG
 	for ( ; ; ) {
 		if ( node_->_parent ) {
@@ -215,7 +155,7 @@ void HSBBSTree::insert_rebalance( HAbstractNode* node_ ) {
 	M_EPILOG
 }
 
-void HSBBSTree::rotate_left( HAbstractNode* node_ ) {
+void HSBBSTreeBase::rotate_left( HAbstractNode* node_ ) {
 	/*
 	 * At the beggining of left rotation:
 	 * node_ is parent node (center of the rotation)
@@ -245,7 +185,7 @@ void HSBBSTree::rotate_left( HAbstractNode* node_ ) {
 	return;
 }
 
-void HSBBSTree::rotate_right( HAbstractNode* node_ ) {
+void HSBBSTreeBase::rotate_right( HAbstractNode* node_ ) {
 	HAbstractNode* parent = node_->_parent;
 	HAbstractNode* node = node_->_left;
 	if ( parent ) {
@@ -266,15 +206,7 @@ void HSBBSTree::rotate_right( HAbstractNode* node_ ) {
 	return;
 }
 
-void HSBBSTree::remove( HIterator const& it_ ) {
-	if ( ! it_._current )
-		M_THROW( _errMsgHSBBSTree_[ ERROR::NIL_ITERATOR ],
-				static_cast<int>( ERROR::NIL_ITERATOR ) );
-	remove_node( it_._current );
-	return;
-}
-
-void HSBBSTree::remove_node( HAbstractNode* node_ ) {
+void HSBBSTreeBase::remove_node( HAbstractNode* node_ ) {
 	if ( node_->_left && node_->_right ) /* both children exists */ {
 		HAbstractNode* node = node_->_left;
 		while ( node->_right )
@@ -304,14 +236,13 @@ void HSBBSTree::remove_node( HAbstractNode* node_ ) {
 			&& ! ( node_->_left || node_->_right ) )
 		node_->_parent->set_child( node_, NULL );
 	node_->_left = node_->_right = NULL;
-	M_SAFE( delete node_ );
 	_size --;
 	if ( ! _size )
 		_root = NULL;
 	M_ASSERT( ! ( _root && _root->_parent ) ); /* very tricky :^) */
 }
 
-void HSBBSTree::remove_rebalance( HAbstractNode* node_ ) {
+void HSBBSTreeBase::remove_rebalance( HAbstractNode* node_ ) {
 	M_ASSERT( node_ );
 	HAbstractNode* child = node_->_left ? node_->_left : node_->_right;
 	M_ASSERT( ! child || ( node_->_parent == child->_parent ) );
@@ -389,35 +320,22 @@ void HSBBSTree::remove_rebalance( HAbstractNode* node_ ) {
 	return;
 }
 
-int long HSBBSTree::get_size( void ) const {
+int long HSBBSTreeBase::get_size( void ) const {
 	return ( _size );
 }
 
-bool HSBBSTree::is_empty( void ) const {
+bool HSBBSTreeBase::is_empty( void ) const {
 	return ( ! _root );
 }
 
-void HSBBSTree::swap( HSBBSTree& other ) {
-	if ( &other != this ) {
-		using yaal::swap;
-		swap( _size, other._size );
-		swap( _root, other._root );
-	}
-	return;
-}
-
-HSBBSTree::HIterator HSBBSTree::begin( void ) const {
+HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::leftmost( void ) const {
 	HAbstractNode* node = _root;
 	while ( node && node->_left )
 		node = node->_left;
-	return ( HIterator( this, node ) );
+	return ( node );
 }
 
-HSBBSTree::HIterator HSBBSTree::end( void ) const {
-	return ( HIterator( this, NULL ) );
-}
-
-void HSBBSTree::swap( HAbstractNode* first_, HAbstractNode* second_ ) {
+void HSBBSTreeBase::swap( HAbstractNode* first_, HAbstractNode* second_ ) {
 	M_ASSERT( first_ && second_ );
 	M_ASSERT( first_ != second_ );
 	if ( first_ == _root )
@@ -496,35 +414,7 @@ void HSBBSTree::swap( HAbstractNode* first_, HAbstractNode* second_ ) {
 	return;
 }
 
-void HSBBSTree::copy_from( HSBBSTree const& source ) {
-	M_PROLOG
-	if ( &source != this ) {
-		clear();
-		if ( source._root )
-			_root = copy_node( source._root );
-		_size = source._size;
-	}
-	return;
-	M_EPILOG
-}
-
-HSBBSTree::HAbstractNode* HSBBSTree::copy_node( HAbstractNode const* source ) {
-	M_PROLOG
-	HAbstractNode* node( source->clone() );
-	node->_color = source->_color;
-	if ( source->_left ) {
-		node->_left = copy_node( source->_left );
-		node->_left->_parent = node;
-	}
-	if ( source->_right ) {
-		node->_right = copy_node( source->_right );
-		node->_right->_parent = node;
-	}
-	return ( node );
-	M_EPILOG
-}
-
-HSBBSTree::HAbstractNode* HSBBSTree::get_sibling( HAbstractNode* node_ ) const {
+HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::get_sibling( HAbstractNode* node_ ) const {
 	if ( node_->_parent->_left == node_ )
 		return ( node_->_parent->_right );
 	M_ASSERT( node_->_parent->_right == node_ );

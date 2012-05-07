@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hsbbstree.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/iterator.hxx"
+#include "hcore/functional.hxx"
 
 namespace yaal {
 
@@ -37,18 +38,11 @@ namespace hcore {
 
 /*! \brief HSBBSTree util, a helper for HMap<> instatiations.
  */
-template<typename key_type, typename data_type>
+template<typename key_t, typename value_t>
 struct map_helper {
-
-inline static bool less( HPair<key_type, data_type> const& left, HPair<key_type, data_type> const& right )
-	{	return ( left.first < right.first );	}
-
-inline static bool less( key_type const& left, HPair<key_type, data_type> const& right )
-	{	return ( left < right.first );	}
-
-inline static bool less( HPair<key_type, data_type> const& left, key_type const& right )
-	{	return ( left.first < right );	}
-
+	typedef key_t key_type;
+	inline static key_type const& key( HPair<key_t, value_t> const& key_ )
+		{	return ( key_.first ); }
 };
 
 /*! \brief Binary tree based map.
@@ -58,13 +52,14 @@ inline static bool less( HPair<key_type, data_type> const& left, key_type const&
  *
  * \tparam key_type_t - type of key held in map.
  * \tparam value_type_t - type of value held in map.
- * \tparam helper_t - HSBBSTree plugable code.
+ * \tparam compare_t - key ordering definition.
  */
-template<typename key_type_t, typename value_type_t, typename helper_t = map_helper<key_type_t const, value_type_t> >
+template<typename key_type_t, typename value_type_t, typename compare_t = less<key_type_t> >
 class HMap {
 public:
 	typedef key_type_t key_type;
 	typedef value_type_t data_type;
+	typedef compare_t compare_type;
 	typedef HPair<key_type const, data_type> value_type;
 	template<typename const_qual_t>
 	class HIterator;
@@ -74,21 +69,25 @@ public:
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 	typedef HPair<iterator, bool> insert_result;
 private:
-	HSBBSTree _engine;
+	typedef HSBBSTree<value_type, compare_type, map_helper<key_type, data_type> > engine_t;
+	engine_t _engine;
 public:
 	HMap( void )
-		: _engine()
+		: _engine( compare_type() )
+		{}
+	HMap( compare_type const& compare_ )
+		: _engine( compare_ )
 		{}
 	template<typename iterator_t>
-	HMap( iterator_t first, iterator_t last )
-		: _engine() {
+	HMap( iterator_t first, iterator_t last, compare_type const& compare_ = compare_type() )
+		: _engine( compare_ ) {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
 	HMap( HMap const& source )
-		: _engine() {
+		: _engine( source._engine.compare() ) {
 		M_PROLOG
 		_engine.copy_from( source._engine );
 		return;
@@ -112,7 +111,7 @@ public:
 	bool is_empty( void ) const
 		{ return ( _engine.is_empty() );	}
 	insert_result insert( value_type const& e ) {
-		HPair<HSBBSTree::HIterator, bool> p = _engine.insert<value_type, helper_t>( e );
+		HPair<typename engine_t::HIterator, bool> p = _engine.insert( e );
 		return ( make_pair( iterator( p.first ), p.second ) );
 	}
 	template<typename iter_t>
@@ -150,17 +149,17 @@ public:
 		M_EPILOG
 	}
 	iterator find( key_type const& e )
-		{ return ( iterator( _engine.find<value_type, key_type, helper_t>( e ) ) ); }
+		{ return ( iterator( _engine.find( e ) ) ); }
 	const_iterator find( key_type const& e ) const
-		{ return ( const_iterator( _engine.find<value_type, key_type, helper_t>( e ) ) ); }
+		{ return ( const_iterator( _engine.find( e ) ) ); }
 	iterator lower_bound( key_type const& e )
-		{ return ( iterator( _engine.lower_bound<value_type, key_type, helper_t>( e ) ) ); }
+		{ return ( iterator( _engine.lower_bound( e ) ) ); }
 	const_iterator lower_bound( key_type const& e ) const
-		{ return ( const_iterator( _engine.lower_bound<value_type, key_type, helper_t>( e ) ) ); }
+		{ return ( const_iterator( _engine.lower_bound( e ) ) ); }
 	iterator upper_bound( key_type const& e )
-		{ return ( iterator( _engine.upper_bound<value_type, key_type, helper_t>( e ) ) ); }
+		{ return ( iterator( _engine.upper_bound( e ) ) ); }
 	const_iterator upper_bound( key_type const& e ) const
-		{ return ( const_iterator( _engine.upper_bound<value_type, key_type, helper_t>( e ) ) ); }
+		{ return ( const_iterator( _engine.upper_bound( e ) ) ); }
 	iterator begin( void )
 		{ return ( iterator( _engine.begin() ) ); }
 	const_iterator begin( void ) const
@@ -186,7 +185,7 @@ public:
 		{ M_PROLOG return ( find( key_ ) != end() ? 1 : 0 ); M_EPILOG }
 	void clear( void )
 		{ _engine.clear(); }
-	void swap( HMap<key_type, data_type, helper_t>& other ) {
+	void swap( HMap& other ) {
 		if ( &other != this ) {
 			using yaal::swap;
 			_engine.swap( other._engine );
@@ -200,13 +199,14 @@ public:
 
 /*! \brief Iterator for HMap<> data structure.
  */
-template<typename key_type_t, typename value_type_t, typename helper_t>
+template<typename key_type_t, typename value_type_t, typename compare_t>
 template<typename const_qual_t>
-class HMap<key_type_t, value_type_t, helper_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward> {
+class HMap<key_type_t, value_type_t, compare_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward> {
 	typedef key_type_t key_type;
 	typedef value_type_t data_type;
-	typedef HMap<key_type, data_type, helper_t> map_t;
-	HSBBSTree::HIterator _engine;
+	typedef HMap<key_type, data_type, compare_t> map_t;
+	typedef typename map_t::engine_t engine_t;
+	typename engine_t::HIterator _engine;
 public:
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
 	HIterator( void )
@@ -240,13 +240,13 @@ public:
 		return ( it );
 	}
 	const_qual_t& operator* ( void )
-		{ return ( _engine.get<typename map_t::value_type>() ); }
+		{ return ( _engine.get() ); }
 	const_qual_t& operator* ( void ) const
-		{ return ( _engine.get<typename map_t::value_type>() ); }
+		{ return ( _engine.get() ); }
 	const_qual_t* operator-> ( void )
-		{ return ( &_engine.get<typename map_t::value_type>() ); }
+		{ return ( &_engine.get() ); }
 	const_qual_t* operator-> ( void ) const
-		{ return ( &_engine.get<typename map_t::value_type>() ); }
+		{ return ( &_engine.get() ); }
 	template<typename other_const_qual_t>
 	bool operator == ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( _engine == it._engine ); }
@@ -254,10 +254,10 @@ public:
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( _engine != it._engine ); }
 private:
-	friend class HMap<key_type, data_type, helper_t>;
+	friend class HMap<key_type, data_type, compare_t>;
 	template<typename other_const_qual_t>
 	friend class HIterator;
-	explicit HIterator( HSBBSTree::HIterator const& it )
+	explicit HIterator( typename engine_t::HIterator const& it )
 		: base_type(), _engine( it ) {};
 };
 

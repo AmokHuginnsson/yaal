@@ -32,6 +32,7 @@ Copyright:
 
 #include "hcore/hsbbstree.hxx"
 #include "hcore/iterator.hxx"
+#include "hcore/function.hxx"
 
 namespace yaal {
 
@@ -41,16 +42,9 @@ namespace hcore {
  */
 template<typename type_t>
 struct multiset_helper {
-
-inline static bool less( HPair<type_t, int long> const& left, HPair<type_t, int long> const& right )
-	{	return ( left.first < right.first );	}
-
-inline static bool less( type_t const& left, HPair<type_t, int long> const& right )
-	{	return ( left < right.first );	}
-
-inline static bool less( HPair<type_t, int long> const& left, type_t const& right )
-	{	return ( left.first < right );	}
-
+	typedef type_t key_type;
+	inline static key_type const& key( type_t const& key_ )
+		{	return ( key_.first );	}
 };
 
 /*! \brief Binary tree based set.
@@ -61,11 +55,15 @@ inline static bool less( HPair<type_t, int long> const& left, type_t const& righ
  * \tparam type_t - type of values held in set.
  * \tparam helper_t - HSBBSTree plugable code.
  */
-template<typename type_t, typename helper_t = multiset_helper<type_t> >
+template<typename type_t, typename compare_t = less<type_t> >
 class HMultiSet {
 public:
 	typedef type_t value_type;
 	typedef type_t key_type;
+	typedef compare_t compare_type;
+private:
+	typedef HPair<type_t, int long> elem_t;
+	typedef HSBBSTree<elem_t, compare_type, multiset_helper<value_type> > engine_t;
 	/*! \brief Iterator for HMultiSet<> data structure.
 	 */
 	class HIterator : public iterator_interface<value_type, iterator_category::forward> {
@@ -118,7 +116,6 @@ public:
 		friend class HMultiSet<value_type, helper_t>;
 		explicit HIterator( HSBBSTree::HIterator const& it ) : base_type(), _index( 0 ), _engine( it ) {};
 	};
-	typedef HPair<type_t, int long> elem_t;
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
