@@ -898,6 +898,19 @@ inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_ ) 
 	return ( binary_search( first_, last_, value_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
 }
 
+/*! \brief Swap contents (values) of two ranges of elements.
+ *
+ * \param first - begining of first range.
+ * \param end - one past the end of first range.
+ * \param second - begining of second range.
+ */
+template<typename first_it_t, typename second_it_t>
+inline void swap_ranges( first_it_t first, first_it_t const& end, second_it_t second ) {
+	for ( ; first != end; ++ first, ++ second )
+		swap( *first, *second ) ;
+	return;
+}
+
 /*! \brief Joins two sorted ranges of elements into one sorted range of elements.
  *
  * \param it1 - begining of first range.
@@ -1076,19 +1089,6 @@ inline iter_out_t set_intersection( iter_in1_t it1, iter_in1_t end1, iter_in2_t 
 		}
 	}
 	return ( out );
-}
-
-/*! \brief Swap contents (values) of two ranges of elements.
- *
- * \param first - begining of first range.
- * \param end - one past the end of first range.
- * \param second - begining of second range.
- */
-template<typename first_it_t, typename second_it_t>
-inline void swap_ranges( first_it_t first, first_it_t const& end, second_it_t second ) {
-	for ( ; first != end; ++ first, ++ second )
-		swap( *first, *second ) ;
-	return;
 }
 
 /*! \brief Fill range of elements with given value.
