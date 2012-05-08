@@ -44,6 +44,9 @@ namespace yaal {
 namespace hcore {
 
 class HFormat::HFormatImpl {
+public:
+	typedef HFormatImpl this_type;
+private:
 	struct CONVERSION {
 		typedef enum {
 			EMPTY =       0x0000,
@@ -98,6 +101,7 @@ class HFormat::HFormatImpl {
 	tokens_t _tokens;
 	positions_ptr_t _positions;
 	args_ptr_t _args;
+	mutable HString _errorMessage;
 	HFormatImpl( char const* const );
 	HFormatImpl( HFormatImpl const& );
 	HFormatImpl& operator = ( HFormatImpl const& );
@@ -105,18 +109,18 @@ class HFormat::HFormatImpl {
 	int next_token( conversion_t const& );
 	friend class HFormat;
 	static bool has_conversion( HString const&, int );
-	static OToken next_conversion( HString const&, int& );
+	OToken next_conversion( HString const&, int& );
 	static bool has_constant( HString const&, int );
-	static OToken next_constant( HString const&, int& );
+	OToken next_constant( HString const&, int& );
 	static bool has_position( HString const&, int );
-	static int get_position( HString const&, int& );
+	int get_position( HString const&, int& );
 	static bool has_flag( HString const&, int );
 	static flag_t get_flag( HString const&, int& );
 	static bool has_width( HString const&, int );
-	static int get_width( HString const&, int& );
+	int get_width( HString const&, int& );
 	static bool has_precision( HString const&, int );
-	static int get_precision( HString const&, int& );
-	static conversion_t get_conversion( HString const&, int& );
+	int get_precision( HString const&, int& );
+	conversion_t get_conversion( HString const&, int& );
 	template<typename T>
 	struct variant_shell {
 		static T get( HFormat::HFormatImpl::args_t const& args, int idx ) {
@@ -125,17 +129,19 @@ class HFormat::HFormatImpl {
 			return ( it->second.get<T>() );
 		}
 	};
+public:
+	char const* error_message( int = 0 ) const;
 };
 
 HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
 	: _positionIndex( 0 ), _format( fmt ), _buffer(), _string(), _tokens(),
-	_positions( new ( memory::yaal ) positions_t ), _args( new ( memory::yaal ) args_t ) {
-}
+	_positions( new ( memory::yaal ) positions_t ), _args( new ( memory::yaal ) args_t ),
+	_errorMessage() {}
 
 HFormat::HFormatImpl::HFormatImpl( HFormatImpl const& fi )
 	: _positionIndex( fi._positionIndex ), _format( fi._format ), _buffer( fi._buffer ),
 	_string( fi._string ), _tokens( fi._tokens ), _positions( new ( memory::yaal ) positions_t ),
-	_args( new ( memory::yaal ) args_t ) {
+	_args( new ( memory::yaal ) args_t ), _errorMessage( fi._errorMessage ) {
 	M_PROLOG
 	*_positions = *fi._positions;
 	*_args = *fi._args;
@@ -163,6 +169,7 @@ void HFormat::HFormatImpl::swap( HFormat::HFormatImpl& fi ) {
 		swap( _tokens, fi._tokens );
 		swap( _positions, fi._positions );
 		swap( _args, fi._args );
+		swap( _errorMessage, fi._errorMessage );
 	}
 	return;
 	M_EPILOG
@@ -193,12 +200,13 @@ HFormat::HFormat( char const* const aFmt )
 	HString fmt( aFmt );
 	HFormatImpl::OToken t;
 	int idx = 0;
+	HFormatImpl& impl( *_impl );
 	while ( true ) {
 		t = HFormatImpl::OToken();
-		if ( HFormatImpl::has_conversion( fmt, idx ) )
-			t = HFormatImpl::next_conversion( fmt, idx );
-		else if ( HFormatImpl::has_constant( fmt, idx ) )
-			t = HFormatImpl::next_constant( fmt, idx );
+		if ( impl.has_conversion( fmt, idx ) )
+			t = impl.next_conversion( fmt, idx );
+		else if ( impl.has_constant( fmt, idx ) )
+			t = impl.next_constant( fmt, idx );
 		if ( t._conversion != HFormatImpl::CONVERSION::EMPTY )
 			_impl->_tokens.push_back( t );
 		else
@@ -738,6 +746,13 @@ HFormat::HFormatImpl::flag_t HFormat::HFormatImpl::get_flag( HString const& s, i
 HString str( HFormat const& format_ ) {
 	M_PROLOG
 	return ( format_.string() );
+	M_EPILOG
+}
+
+char const* HFormat::HFormatImpl::error_message( int ) const {
+	M_PROLOG
+	_errorMessage.format( _( "format: %s, at: %d" ), _format.raw(), _positionIndex );
+	return ( _errorMessage.raw() );
 	M_EPILOG
 }
 
