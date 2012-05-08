@@ -297,16 +297,15 @@ private:
 };
 
 template<typename key_value_t, typename compare_t, typename key_get_t>
-HPair<typename HSBBSTree<key_value_t, compare_t, key_get_t>::HIterator, bool> HSBBSTree<key_value_t, compare_t, key_get_t>::insert( key_value_type const& key_ ) {
+HPair<typename HSBBSTree<key_value_t, compare_t, key_get_t>::HIterator, bool>
+HSBBSTree<key_value_t, compare_t, key_get_t>::insert( key_value_type const& key_ ) {
 	M_PROLOG
 	ONodePtr nodeHolder;
 	HNode* node( NULL );
 	key_type const& key( key_get_type::key( key_ ) );
 	if ( _root )
 		nodeHolder = find_node( key );
-	if ( nodeHolder._exists )
-		node = static_cast<HNode*>( nodeHolder._node );
-	else {
+	if ( ! nodeHolder._exists ) {
 		node = new ( memory::yaal ) HNode( key_ );
 		++ _size;
 		if ( _root ) {
@@ -323,7 +322,8 @@ HPair<typename HSBBSTree<key_value_t, compare_t, key_get_t>::HIterator, bool> HS
 			_root = node;
 			static_cast<HNode*>( _root )->_color = HAbstractNode::BLACK;
 		}
-	}
+	} else
+		node = static_cast<HNode*>( nodeHolder._node );
 	M_ASSERT( ( ! _root ) || ( static_cast<HNode*>( _root )->_parent == NULL ) );
 	M_ASSERT( ( ! _root ) || ( static_cast<HNode*>( _root )->_color == HAbstractNode::BLACK ) );
 	return ( make_pair( HIterator( this, node ), ! nodeHolder._exists ) );
@@ -365,12 +365,13 @@ typename HSBBSTree<key_value_t, compare_t, key_get_t>::ONodePtr HSBBSTree<key_va
 	if ( _root ) {
 		nodePtr._node = _root;
 		while ( ! nodePtr._exists ) {
-			if ( _compare( key_, key_get_type::key( static_cast<HNode*>( nodePtr._node )->_key ) ) ) {
+			key_type const& key( key_get_type::key( static_cast<HNode*>( nodePtr._node )->_key ) );
+			if ( _compare( key_, key ) ) {
 				if ( static_cast<HNode*>( nodePtr._node )->_left )
 					nodePtr._node = static_cast<HNode*>( nodePtr._node )->_left;
 				else
 					break;
-			} else if ( _compare( key_get_type::key( static_cast<HNode*>( nodePtr._node )->_key ), key_ ) ) {
+			} else if ( _compare( key, key_ ) ) {
 				if ( static_cast<HNode*>( nodePtr._node )->_right )
 					nodePtr._node = static_cast<HNode*>( nodePtr._node )->_right;
 				else
