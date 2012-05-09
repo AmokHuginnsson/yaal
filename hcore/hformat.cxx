@@ -44,8 +44,6 @@ namespace yaal {
 namespace hcore {
 
 class HFormat::HFormatImpl {
-public:
-	typedef HFormatImpl this_type;
 private:
 	struct CONVERSION {
 		typedef enum {

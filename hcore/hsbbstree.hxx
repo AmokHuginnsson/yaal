@@ -302,15 +302,14 @@ HSBBSTree<key_value_t, compare_t, key_get_t>::insert( key_value_type const& key_
 	M_PROLOG
 	ONodePtr nodeHolder;
 	HNode* node( NULL );
-	key_type const& key( key_get_type::key( key_ ) );
 	if ( _root )
-		nodeHolder = find_node( key );
+		nodeHolder = find_node( key_get_type::key( key_ ) );
 	if ( ! nodeHolder._exists ) {
 		node = new ( memory::yaal ) HNode( key_ );
 		++ _size;
 		if ( _root ) {
 			node->_parent = nodeHolder._node;
-			if ( _compare( key, key_get_type::key( static_cast<HNode*>( nodeHolder._node )->_key ) ) ) {
+			if ( _compare( key_get_type::key( key_ ), key_get_type::key( static_cast<HNode*>( nodeHolder._node )->_key ) ) ) {
 				M_ASSERT( ! static_cast<HNode*>( nodeHolder._node )->_left );
 				static_cast<HNode*>( nodeHolder._node )->_left = node;
 			} else {
@@ -365,13 +364,12 @@ typename HSBBSTree<key_value_t, compare_t, key_get_t>::ONodePtr HSBBSTree<key_va
 	if ( _root ) {
 		nodePtr._node = _root;
 		while ( ! nodePtr._exists ) {
-			key_type const& key( key_get_type::key( static_cast<HNode*>( nodePtr._node )->_key ) );
-			if ( _compare( key_, key ) ) {
+			if ( _compare( key_, key_get_type::key( static_cast<HNode*>( nodePtr._node )->_key ) ) ) {
 				if ( static_cast<HNode*>( nodePtr._node )->_left )
 					nodePtr._node = static_cast<HNode*>( nodePtr._node )->_left;
 				else
 					break;
-			} else if ( _compare( key, key_ ) ) {
+			} else if ( _compare( key_get_type::key( static_cast<HNode*>( nodePtr._node )->_key ), key_ ) ) {
 				if ( static_cast<HNode*>( nodePtr._node )->_right )
 					nodePtr._node = static_cast<HNode*>( nodePtr._node )->_right;
 				else
