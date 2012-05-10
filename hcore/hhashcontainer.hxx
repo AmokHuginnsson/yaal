@@ -48,8 +48,6 @@ inline int long hash( key_t const& key_ ) {
 extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
 
 class HHashContainer : private trait::HNonCopyable {
-public:
-	class HIterator;
 	class HAbstractAtom {
 	private: /* for UT */
 		HAbstractAtom* _next;
@@ -61,6 +59,87 @@ public:
 		friend class HIterator;
 	public:
 		virtual ~HAbstractAtom( void ) {}
+	};
+public:
+	/*! \brief Iterator for HHashContainer data structure.
+	 */
+	class HIterator {
+		HHashContainer const* _owner;
+		int long _index;
+		HHashContainer::HAbstractAtom* _atom;
+	public:
+		HIterator( void ) : _owner( NULL ), _index( 0 ), _atom( NULL ) {}
+		HIterator( HIterator const& it_ )
+			: _owner( it_._owner ), _index( it_._index ),
+			_atom( it_._atom ) {
+		}
+		HIterator& operator = ( HIterator const& it_ ) {
+			if ( &it_ != this ) {
+				_owner = it_._owner;
+				_index = it_._index;
+				_atom = it_._atom;
+			}
+			return ( *this );
+		}
+		HIterator& operator ++ ( void ) {
+			M_ASSERT( _owner );
+			int long oldIndex( _index );
+			if ( _atom ) {
+				_atom = _atom->_next;
+				if ( ! _atom )
+					++ _index;
+			}
+			if ( ! _atom ) {
+				HHashContainer::HAbstractAtom* const* buckets = _owner->_buckets.get<HHashContainer::HAbstractAtom*>();
+				if ( oldIndex == _owner->_prime )
+					_index = 0;
+				while ( ( _index < _owner->_prime ) && ! buckets[ _index ] )
+					++ _index;
+				if ( _index < _owner->_prime )
+					_atom = buckets[ _index ];
+			}
+			if ( ! _atom )
+				_index = _owner->_prime;
+			return ( *this );
+		}
+		HIterator& operator -- ( void ) {
+			M_ASSERT( _owner );
+			HHashContainer::HAbstractAtom* const* buckets = _owner->_buckets.get<HHashContainer::HAbstractAtom*>();
+			if ( _atom ) {
+				HHashContainer::HAbstractAtom* atom( buckets[ _index ] );
+				while ( ( atom != _atom ) && ( atom->_next != _atom ) )
+					atom = atom->_next;
+				if ( atom == _atom )
+					_atom = NULL;
+				else
+					_atom = atom;
+			}
+			if ( ! _atom ) {
+				if ( _index == 0 )
+					_index = _owner->_prime - 1;
+				while ( ( _index > 0 ) && ! buckets[ _index ] )
+					-- _index;
+				_atom = buckets[ _index ];
+				while ( _atom && _atom->_next )
+					_atom = _atom->_next;
+			}
+			return ( *this );
+		}
+		template<typename tType>
+		tType& get( void ) const {
+			M_ASSERT( _atom );
+			return ( static_cast<HHashContainer::HAtom<tType>*>( _atom )->_value );
+		}
+		bool operator == ( HIterator const& it ) const {
+			M_ASSERT( _owner == it._owner );
+			return ( ( _index == it._index ) && ( _atom == it._atom ) );
+		}
+		bool operator != ( HIterator const& it ) const
+			{ return ( ! operator == ( it ) ); }
+	private:
+		friend class HHashContainer;
+		explicit HIterator( HHashContainer const* owner_, int long index_, HHashContainer::HAbstractAtom* atom_ )
+			: _owner( owner_ ), _index( index_ ), _atom( atom_ ) {};
 	};
 private:
 	template<typename value_t>
@@ -77,103 +156,107 @@ private:
 	int _size;
 	HChunk _buckets;
 public:
-	HHashContainer( void );
-	virtual ~HHashContainer( void );
-	int long get_size( void ) const;
-	bool is_empty( void ) const;
-	void clear( void );
+	HHashContainer( void )
+		: _prime( 0 ), _size( 0 ), _buckets() {
+	}
+	virtual ~HHashContainer( void ) {
+		M_PROLOG
+		clear();
+		return;
+		M_DESTRUCTOR_EPILOG
+	}
+	int long get_size( void ) const {
+		M_PROLOG
+		return ( _size );
+		M_EPILOG
+	}
+	bool is_empty( void ) const {
+		M_PROLOG
+		return ( ! _size );
+		M_EPILOG
+	}
+	void clear( void ) {
+		M_PROLOG
+		HAbstractAtom** buckets = _buckets.get<HAbstractAtom*>();
+		for ( int long i = 0; i < _prime; i ++ ) {
+			HAbstractAtom* atom( buckets[ i ] );
+			while ( atom ) {
+				HAbstractAtom* del( atom );
+				atom = atom->_next;
+				M_SAFE( delete del );
+			}
+			buckets[ i ] = NULL;
+		}
+		_size = 0;
+		return;
+		M_EPILOG
+	}
 	template<typename key_t, typename hasher_t>
 	HIterator find( key_t const&, hasher_t const& ) const;
 	template<typename value_t, typename hasher_t>
 	HPair<HIterator, bool> insert( value_t const&, hasher_t const& );
-	void erase( HIterator const& );
-	HIterator begin( void ) const;
-	HIterator end( void ) const;
+	HIterator begin( void ) const {
+		M_PROLOG
+		HIterator it( this, 0, NULL );
+		return ( ++ it );
+		M_EPILOG
+	}
+	HIterator end( void ) const {
+		M_PROLOG
+		return ( HIterator( this, _prime, NULL ) );
+		M_EPILOG
+	}
 	template<typename hasher_t>
 	void resize( int long, hasher_t const& );
-	void copy_from( HHashContainer const& );
-	void swap( HHashContainer& );
-};
-
-/*! \brief Iterator for HHashContainer data structure.
- */
-class HHashContainer::HIterator {
-	HHashContainer const* _owner;
-	int long _index;
-	HHashContainer::HAbstractAtom* _atom;
-public:
-	HIterator( void ) : _owner( NULL ), _index( 0 ), _atom( NULL ) {}
-	HIterator( HIterator const& it_ )
-		: _owner( it_._owner ), _index( it_._index ),
-		_atom( it_._atom ) {
-	}
-	HIterator& operator = ( HIterator const& it_ ) {
-		if ( &it_ != this ) {
-			_owner = it_._owner;
-			_index = it_._index;
-			_atom = it_._atom;
-		}
-		return ( *this );
-	}
-	HIterator& operator ++ ( void ) {
-		M_ASSERT( _owner );
-		int long oldIndex( _index );
-		if ( _atom ) {
-			_atom = _atom->_next;
-			if ( ! _atom )
-				++ _index;
-		}
-		if ( ! _atom ) {
-			HHashContainer::HAbstractAtom* const* buckets = _owner->_buckets.get<HHashContainer::HAbstractAtom*>();
-			if ( oldIndex == _owner->_prime )
-				_index = 0;
-			while ( ( _index < _owner->_prime ) && ! buckets[ _index ] )
-				++ _index;
-			if ( _index < _owner->_prime )
-				_atom = buckets[ _index ];
-		}
-		if ( ! _atom )
-			_index = _owner->_prime;
-		return ( *this );
-	}
-	HIterator& operator -- ( void ) {
-		M_ASSERT( _owner );
-		HHashContainer::HAbstractAtom* const* buckets = _owner->_buckets.get<HHashContainer::HAbstractAtom*>();
-		if ( _atom ) {
-			HHashContainer::HAbstractAtom* atom( buckets[ _index ] );
-			while ( ( atom != _atom ) && ( atom->_next != _atom ) )
-				atom = atom->_next;
-			if ( atom == _atom )
-				_atom = NULL;
+	void erase( HIterator const& it ) {
+		M_PROLOG
+		HAbstractAtom** buckets = _buckets.get<HAbstractAtom*>();
+		HAbstractAtom* atom( buckets[ it._index ] );
+		HAbstractAtom* ancestor( NULL );
+		M_ASSERT( atom );
+		while ( atom != it._atom )
+			ancestor = atom, atom = atom->_next;
+		if ( atom ) {
+			if ( ancestor )
+				ancestor->_next = atom->_next;
 			else
-				_atom = atom;
+				buckets[ it._index ] = atom->_next;
+			M_SAFE( delete atom );
+			-- _size;
 		}
-		if ( ! _atom ) {
-			if ( _index == 0 )
-				_index = _owner->_prime - 1;
-			while ( ( _index > 0 ) && ! buckets[ _index ] )
-				-- _index;
-			_atom = buckets[ _index ];
-			while ( _atom && _atom->_next )
-				_atom = _atom->_next;
+		return;
+		M_EPILOG
+	}
+	void copy_from( HHashContainer const& src_ ) {
+		M_PROLOG
+		HChunk newBuckets( src_._buckets.get_size(), HChunk::STRATEGY::EXACT );
+		HAbstractAtom const* const* otherBuckets = src_._buckets.get<HAbstractAtom const*>();
+		HAbstractAtom** buckets = newBuckets.get<HAbstractAtom*>();
+		for ( int long i( 0 ); i < src_._prime; ++ i ) {
+			HAbstractAtom const* origAtom( otherBuckets[ i ] );
+			while ( origAtom ) {
+				HAbstractAtom* atom( origAtom->clone() );
+				origAtom = origAtom->_next;
+				atom->_next = buckets[ i ];
+				buckets[ i ] = atom;
+			}
 		}
-		return ( *this );
+		clear();
+		_prime = src_._prime;
+		_size = src_._size;
+		_buckets.swap( newBuckets );
+		return;
+		M_EPILOG
 	}
-	template<typename tType>
-	tType& get( void ) const {
-		M_ASSERT( _atom );
-		return ( static_cast<HHashContainer::HAtom<tType>*>( _atom )->_value );
+	void swap( HHashContainer& hc_ ) {
+		if ( &hc_ != this ) {
+			using yaal::swap;
+			swap( _prime, hc_._prime );
+			swap( _size, hc_._size );
+			swap( _buckets, hc_._buckets );
+		}
+		return;
 	}
-	bool operator == ( HIterator const& it ) const {
-		M_ASSERT( _owner == it._owner );
-		return ( ( _index == it._index ) && ( _atom == it._atom ) );
-	}
-	bool operator != ( HIterator const& it ) const
-		{ return ( ! operator == ( it ) ); }
-private:
-	friend class HHashContainer;
-	explicit HIterator( HHashContainer const* owner_, int long index_, HHashContainer::HAbstractAtom* atom_ )
-		: _owner( owner_ ), _index( index_ ), _atom( atom_ ) {};
 };
 
 template<typename key_t, typename hasher_t>
