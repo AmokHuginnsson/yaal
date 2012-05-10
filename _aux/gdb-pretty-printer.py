@@ -263,12 +263,14 @@ class YaalHCoreHMapPrinter:
 			if self._count == ( self._size * 2 ):
 				raise StopIteration
 			count = self._count
-			valuetype = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self._owner.type.template_argument( 0 ).const(), self._owner.type.template_argument( 1 ) ) )
-			nodetype = gdb.lookup_type( "yaal::hcore::HSBBSTree::HNode<%s>" % ( valuetype ) ).pointer()
+			valueType = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self._owner.type.template_argument( 0 ).const(), self._owner.type.template_argument( 1 ) ) )
+			compareType = self._owner.type.template_argument( 2 )
+			helperType = "yaal::hcore::map_helper<%s,%s>" % ( self._owner.type.template_argument( 0 ), self._owner.type.template_argument( 1 ) )
+			nodeType = gdb.lookup_type( "yaal::hcore::HSBBSTree<%s,%s,%s>::HNode" % ( valueType, compareType, helperType ) ).pointer()
 			if ( count % 2 ) == 0:
-				elt = self._item.cast( nodetype )['_key']['first']
+				elt = self._item.cast( nodeType )['_key']['first']
 			else:
-				elt = self._item.cast( nodetype )['_key']['second']
+				elt = self._item.cast( nodeType )['_key']['second']
 				self._item = self.do_next( self._item )
 			self._count = self._count + 1
 			return ('[%d]' % count, elt)
@@ -304,8 +306,10 @@ class YaalHCoreHSetPrinter:
 			if self._count == self._size:
 				raise StopIteration
 			count = self._count
-			nodetype = gdb.lookup_type( "yaal::hcore::HSBBSTree::HNode<%s>" % ( self._owner.type.template_argument( 0 ) ) ).pointer()
-			elt = self._item.cast( nodetype )['_key']
+			valueType = self._owner.type.template_argument( 0 )
+			compareType = self._owner.type.template_argument( 1 )
+			nodeType = gdb.lookup_type( "yaal::hcore::HSBBSTree<%s,%s,yaal::hcore::set_helper<%s>>::HNode" % ( valueType, compareType, valueType ) ).pointer()
+			elt = self._item.cast( nodeType )['_key']
 			self._item = self.do_next( self._item )
 			self._count = self._count + 1
 			return ('[%d]' % count, elt)
@@ -363,11 +367,11 @@ class YaalHCoreHHashMapPrinter:
 			if self._count == ( self._size * 2 ):
 				raise StopIteration
 			count = self._count
-			nodetype = self._owner.nodetype()
+			nodeType = self._owner.nodeType()
 			if ( count % 2 ) == 0:
-				elt = self._atom.cast( nodetype )['_value']['first']
+				elt = self._atom.cast( nodeType )['_value']['first']
 			else:
-				elt = self._atom.cast( nodetype )['_value']['second']
+				elt = self._atom.cast( nodeType )['_value']['second']
 				self.do_next()
 			self._count = self._count + 1
 			return ('[%d]' % count, elt)
@@ -375,14 +379,14 @@ class YaalHCoreHHashMapPrinter:
 	def __init__( self, val_ ):
 		self._val = val_
 
-	def nodetype( self ):
-		valuetype = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self._val.type.template_argument( 0 ).const(), self._val.type.template_argument( 1 ) ) )
-		nodetype = gdb.lookup_type( "yaal::hcore::HHashContainer::HAtom<%s>" % ( valuetype ) ).pointer()
-		return nodetype
+	def nodeType( self ):
+		valueType = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self._val.type.template_argument( 0 ).const(), self._val.type.template_argument( 1 ) ) )
+		nodeType = gdb.lookup_type( "yaal::hcore::HHashContainer::HAtom<%s>" % ( valueType ) ).pointer()
+		return nodeType
 
 	def buckets( self ):
 		buckets = self._val['_engine']['_buckets']['_data']
-		return buckets.cast( self.nodetype().pointer() )
+		return buckets.cast( self.nodeType().pointer() )
 
 	def children( self ):
 		it = self.Iterator( self, 0, 0, self._val['_engine']['_size'] )
@@ -406,8 +410,8 @@ class YaalHCoreHHashSetPrinter:
 			if self._count == self._size:
 				raise StopIteration
 			count = self._count
-			nodetype = self._owner.nodetype()
-			elt = self._atom.cast( nodetype )['_value']
+			nodeType = self._owner.nodeType()
+			elt = self._atom.cast( nodeType )['_value']
 			self.do_next()
 			self._count = self._count + 1
 			return ('[%d]' % count, elt)
@@ -415,13 +419,13 @@ class YaalHCoreHHashSetPrinter:
 	def __init__( self, val_ ):
 		self._val = val_
 
-	def nodetype( self ):
-		nodetype = gdb.lookup_type( "yaal::hcore::HHashContainer::HAtom<%s>" % ( self._val.type.template_argument( 0 ) ) ).pointer()
-		return nodetype
+	def nodeType( self ):
+		nodeType = gdb.lookup_type( "yaal::hcore::HHashContainer::HAtom<%s>" % ( self._val.type.template_argument( 0 ) ) ).pointer()
+		return nodeType
 
 	def buckets( self ):
 		buckets = self._val['_engine']['_buckets']['_data']
-		return buckets.cast( self.nodetype().pointer() )
+		return buckets.cast( self.nodeType().pointer() )
 
 	def children( self ):
 		it = self.Iterator( self, 0, 0, self._val['_engine']['_size'] )

@@ -18,7 +18,7 @@ yaal::hcore::HString {
 	)
 	children ( #( [raw members]: [$c,!] ) )
 }
-yaal::hcore::HArray<*> {
+yaal::hcore::HArray<*,*> {
 	preview ( #( "[", $c._size, "](",
 			#array (
 				expr:	$c._buf[$i],
@@ -36,7 +36,7 @@ yaal::hcore::HArray<*> {
 		)
 	)
 }
-yaal::hcore::HDeque<*> {
+yaal::hcore::HDeque<*,*> {
 	preview (
 		#if ( ( 512 - ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) ) > ( sizeof ( $T1 ) / 2 ) ) (
 			#if ( ( ( ( 512 / sizeof ( $T1 ) ) * sizeof ( $T1 ) ) + sizeof ( $T1 ) ) > sizeof ( $T1 ) ) (
@@ -83,7 +83,7 @@ yaal::hcore::HDeque<*> {
 		)
 	)
 }
-yaal::hcore::HList<*> {
+yaal::hcore::HList<*,*> {
 	preview (
 		#(
 			"[", $c._size, "](",
@@ -111,7 +111,7 @@ yaal::hcore::HSet<*,*> {
 				left: _left,
 				right: _right,
 				size: $c._engine._size
-			) : ((yaal::hcore::HSBBSTree::HNode<$T1>*)&$e)->_key, ")"
+			) : ((yaal::hcore::HSBBSTree<$T1,$T2,yaal::hcore::set_helper<$T1>>::HNode*)&$e)->_key, ")"
 		)
 	)
 	children (
@@ -122,7 +122,7 @@ yaal::hcore::HSet<*,*> {
 				left: _left,
 				right: _right,
 				size: $c._engine._size
-			) : ((yaal::hcore::HSBBSTree::HNode<$T1>*)&$e)->_key
+			) : ((yaal::hcore::HSBBSTree<$T1,$T2,yaal::hcore::set_helper<$T1>::HNode*)&$e)->_key
 		)
 	)
 }
