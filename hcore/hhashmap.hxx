@@ -35,15 +35,25 @@ namespace yaal {
 
 namespace hcore {
 
+/*! \brief HHashContainer util, a helper for HHashMap<> instatiations.
+ */
+template<typename key_t, typename value_t>
+struct hashmap_helper {
+	typedef key_t key_type;
+	inline static key_type const& key( HPair<key_t, value_t> const& key_ )
+		{	return ( key_.first ); }
+};
+
 /*! \brief Hash map container implementation.
  */
-template<typename key_t, typename data_t, typename hash_function_t = int long(*)( key_t const& )>
+template<typename key_t, typename data_t, typename hasher_t = hash<key_t> >
 class HHashMap {
 public:
 	typedef key_t key_type;
 	typedef data_t data_type;
 /* cppcheck-suppress variableHidingTypedef */
 	typedef HPair<key_t const, data_t> value_type;
+	typedef hasher_t hasher_type;
 	template<typename const_qual_t>
 	class HIterator;
 	typedef HIterator<value_type> iterator;
@@ -52,44 +62,34 @@ public:
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 	typedef HPair<iterator, bool> insert_result;
 private:
-	struct hasher {
-		typedef typename HHashMap<key_t, data_t, hash_function_t>::value_type value_type;
-		hash_function_t _hasher;
-		hasher( hash_function_t hashFunction_ ) : _hasher( hashFunction_ ) {}
-		int long operator()( value_type const& val_ ) const
-			{ return ( _hasher( val_.first ) ); }
-		int long operator()( key_t const& key_ ) const
-			{ return ( _hasher( key_ ) ); }
-		bool operator()( value_type const& a_, value_type const& b_ ) const
-			{ return ( a_.first == b_.first ); }
-		bool operator()( value_type const& a_, key_t const& b_ ) const
-			{ return ( a_.first == b_ ); }
-	};
-	typedef HHashMap<key_t, data_t, hash_function_t> this_type;
-	hasher _hasher;
-	HHashContainer _engine;
+	typedef HHashMap<key_t, data_t, hasher_t> this_type;
+	typedef HHashContainer<value_type, hasher_type, hashmap_helper<key_type, data_type> > engine_t;
+	engine_t _engine;
 public:
 	HHashMap( void )
-		: _hasher( &hash ), _engine()
+		: _engine( hasher_type() )
+		{}
+	explicit HHashMap( hasher_type const& hasher_ )
+		: _engine( hasher_ )
 		{}
 	/*! \brief Lower bound of size of map's table */
-	HHashMap( int long size_ )
-		: _hasher( &hash ), _engine() {
+	explicit HHashMap( int long size_ )
+		: _engine( hasher_type() ) {
 		M_PROLOG
-		_engine.resize( size_, _hasher );
+		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
-	HHashMap( int long size_, hash_function_t hasher_ )
-		: _hasher(  hasher_ ), _engine() {
+	HHashMap( int long size_, hasher_type const& hasher_ )
+		: _engine( hasher_ ) {
 		M_PROLOG
-		_engine.resize( size_, _hasher );
+		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HHashMap( iterator_t first, iterator_t last )
-		: _hasher( &hash ), _engine() {
+	HHashMap( iterator_t first, iterator_t last, hasher_type const& hasher_ = hasher_type() )
+		: _engine( hasher_ ) {
 		M_PROLOG
 		for ( ; first != last; ++ first )
 			insert( *first );
@@ -97,17 +97,17 @@ public:
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HHashMap( iterator_t first, iterator_t last, int long size_ )
-		: _hasher( &hash ), _engine() {
+	HHashMap( iterator_t first, iterator_t last, int long size_, hasher_type const& hasher_ = hasher_type() )
+		: _engine( hasher_ ) {
 		M_PROLOG
-		resize( size_, _hasher );
+		resize( size_ );
 		for ( ; first != last; ++ first )
 			insert( *first );
 		return;
 		M_EPILOG
 	}
 	HHashMap( HHashMap const& map_ )
-		: _hasher( map_._hasher ), _engine() {
+		: _engine( map_._engine.hasher() ) {
 		M_PROLOG
 		_engine.copy_from( map_._engine );
 		return;
@@ -140,18 +140,18 @@ public:
 	iterator end( void )
 		{ M_PROLOG return ( iterator( _engine.end() ) ); M_EPILOG }
 	const_iterator find( key_t const& key_ ) const
-		{ M_PROLOG return ( const_iterator( _engine.find( key_, _hasher ) ) ); M_EPILOG }
+		{ M_PROLOG return ( const_iterator( _engine.find( key_ ) ) ); M_EPILOG }
 	iterator find( key_t const& key_ )
-		{ M_PROLOG return ( iterator( _engine.find( key_, _hasher ) ) ); M_EPILOG }
+		{ M_PROLOG return ( iterator( _engine.find( key_ ) ) ); M_EPILOG }
 	insert_result insert( value_type const& val_ ) {
 		M_PROLOG
-		HPair<HHashContainer::HIterator, bool> it( _engine.insert( val_, _hasher ) );
+		HPair<typename engine_t::HIterator, bool> it( _engine.insert( val_ ) );
 		return ( make_pair( iterator( it.first ), it.second ) );
 		M_EPILOG
 	}
 	void resize( int long size_ ) {
 		M_PROLOG
-		_engine.resize( size_, _hasher );
+		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
@@ -206,7 +206,6 @@ public:
 		if ( &map_ != this ) {
 			using yaal::swap;
 			swap( _engine, map_._engine );
-			swap( _hasher, map_._hasher );
 		}
 		return;
 	}
@@ -218,13 +217,13 @@ private:
 };
 
 
-template<typename key_type_t, typename data_type_t, typename hash_function_t>
+template<typename key_type_t, typename data_type_t, typename hasher_t>
 template<typename const_qual_t>
-class HHashMap<key_type_t, data_type_t, hash_function_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward> {
+class HHashMap<key_type_t, data_type_t, hasher_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward> {
 	typedef key_type_t key_type;
 	typedef data_type_t data_type;
-	typedef HHashMap<key_type, data_type, hash_function_t> map_t;
-	HHashContainer::HIterator _engine;
+	typedef HHashMap<key_type, data_type, hasher_t> hashmap_t;
+	typename hashmap_t::engine_t::HIterator _engine;
 public:
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
 	HIterator( void ) : base_type(), _engine() {}
@@ -257,9 +256,9 @@ public:
 		return ( it );
 	}
 	const_qual_t& operator* ( void ) const
-		{ return ( _engine.get<typename map_t::value_type>() ); }
+		{ return ( _engine.get() ); }
 	const_qual_t* operator-> ( void ) const
-		{ return ( &_engine.get<typename map_t::value_type>() ); }
+		{ return ( &_engine.get() ); }
 	template<typename other_const_qual_t>
 	bool operator == ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( _engine == it._engine ); }
@@ -267,17 +266,17 @@ public:
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( _engine != it._engine ); }
 private:
-	friend class HHashMap<key_type, data_type, hash_function_t>;
+	friend class HHashMap<key_type, data_type, hasher_t>;
 	template<typename other_const_qual_t>
 	friend class HIterator;
-	explicit HIterator( HHashContainer::HIterator const& it )
+	explicit HIterator( typename hashmap_t::engine_t::HIterator const& it )
 		: base_type(), _engine( it ) {};
 };
 
 }
 
-template<typename key_type, typename data_type, typename hash_function_t>
-inline void swap( yaal::hcore::HHashMap<key_type, data_type, hash_function_t>& a, yaal::hcore::HHashMap<key_type, data_type, hash_function_t>& b )
+template<typename key_type, typename data_type, typename hasher_t>
+inline void swap( yaal::hcore::HHashMap<key_type, data_type, hasher_t>& a, yaal::hcore::HHashMap<key_type, data_type, hasher_t>& b )
 	{ a.swap( b ); }
 
 }

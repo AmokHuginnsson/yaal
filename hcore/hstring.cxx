@@ -1146,17 +1146,6 @@ void HString::HCharRef::swap( HCharRef& charRef_ ) {
 #undef EXT_IS_INPLACE
 #undef IS_INPLACE
 
-int long hash( HString const& string_ ) {
-	char const* const buffer = string_.raw();
-	int long size = string_.get_length();
-	int long hash = 0;
-	while ( size -- ) {
-		hash += buffer[ size ];
-		hash <<= 3;
-	}
-	return ( hash );
-}
-
 namespace string_helper {
 
 /* all str* and mem* functions takes const pointer as argument and returns

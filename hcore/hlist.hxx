@@ -846,7 +846,7 @@ public:
 	HIterator const operator ++ ( int ) {
 		M_PROLOG
 		HIterator iterator ( *this );
-		++ ( *this );
+		operator ++ ();
 		return ( iterator );
 		M_EPILOG
 	}
@@ -864,8 +864,8 @@ public:
 	}
 	HIterator const operator -- ( int ) {
 		M_PROLOG
-		HIterator iterator( * this );
-		-- ( *this );
+		HIterator iterator( *this );
+		operator -- ();
 		return ( iterator );
 		M_EPILOG
 	}

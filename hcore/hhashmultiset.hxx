@@ -35,23 +35,39 @@ namespace yaal {
 
 namespace hcore {
 
+/*! \brief HHashContainer util, a helper for HHashSet<> instatiations.
+ */
+template<typename type_t>
+struct hashmultiset_helper {
+	typedef typename type_t::first_type key_type;
+	inline static key_type const& key( type_t const& key_ )
+		{	return ( key_.first );	}
+};
+
 /*! \brief Hash set container implementation.
  */
-template<typename type_t, typename hash_function_t = int long(*)( type_t const& )>
+template<typename type_t, typename hasher_t = hash<type_t> >
 class HHashMultiSet {
 public:
 	typedef type_t key_type;
 /* cppcheck-suppress variableHidingTypedef */
 	typedef type_t value_type;
+	typedef hasher_t hasher_type;
 	typedef HPair<type_t, int long> elem_t;
-	class HIterator {
-		typedef type_t key_type;
-		typedef HHashMultiSet<key_type, hash_function_t> set_t;
+	typedef HHashMultiSet<type_t, hasher_t> this_type;
+	typedef HHashContainer<elem_t, hasher_type, hashmultiset_helper<elem_t> > engine_t;
+	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
 		int long _index;
-		HHashContainer::HIterator _engine;
+		engine_t const* _owner;
+		typename engine_t::HIterator _engine;
 	public:
-		HIterator( void ) : _index( 0 ), _engine() {}
-		HIterator( HIterator const& it_ ) : _index( it_._index ), _engine( it_._engine ) {}
+		typedef iterator_interface<value_type const, iterator_category::forward> base_type;
+		HIterator( void )
+			: base_type(), _index( 0 ), _owner( NULL ), _engine()
+			{}
+		HIterator( HIterator const& it_ )
+			: base_type(), _index( it_._index ), _owner( it_._owner ), _engine( it_._engine )
+			{}
 		HIterator& operator = ( HIterator const& it_ ) {
 			if ( &it_ != this ) {
 				_index = it_._index;
@@ -60,7 +76,7 @@ public:
 			return ( *this );
 		}
 		HIterator& operator ++ ( void ) {
-			if ( _index < ( _engine.get<typename set_t::elem_t>().second - 1 ) )
+			if ( _index < ( _engine.get().second - 1 ) )
 				++ _index;
 			else {
 				_index = 0;
@@ -69,74 +85,70 @@ public:
 			return ( *this );
 		}
 		HIterator const operator ++ ( int ) {
-			HIterator it( _engine );
-			++ _engine;
+			HIterator it( *this );
+			operator ++ ();
 			return ( it );
 		}
 		HIterator& operator -- ( void ) {
-			-- _engine;
+			if ( _index > 0 ) {
+				-- _index;
+			} else {
+				-- _engine;
+				if ( _engine != _owner->end() )
+					_index = _engine.get().second - 1;
+			}
 			return ( *this );
 		}
 		HIterator const operator -- ( int ) {
-			HIterator it( _engine );
-			-- _engine;
+			HIterator it( *this );
+			operator -- ();
 			return ( it );
 		}
 		key_type const& operator* ( void ) const
-			{ return ( _engine.get<typename set_t::elem_t>().first ); }
+			{ return ( _engine.get().first ); }
 		key_type const* operator-> ( void ) const
-			{ return ( &_engine.get<typename set_t::elem_t>().first ); }
+			{ return ( &_engine.get().first ); }
 		bool operator == ( HIterator const& it ) const
 			{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
 		bool operator != ( HIterator const& it ) const
 			{ return ( ( _engine != it._engine ) || ( _index != it._index ) ); }
 	private:
-		friend class HHashMultiSet<key_type, hash_function_t>;
-		explicit HIterator( HHashContainer::HIterator const& it ) : _index( 0 ), _engine( it ) {};
+		friend class HHashMultiSet<key_type, hasher_t>;
+		explicit HIterator( engine_t const* owner_, typename engine_t::HIterator const& it, int long index_ )
+			: base_type(), _index( index_ ), _owner( owner_ ), _engine( it )
+			{}
 	};
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
-	struct hasher {
-		typedef typename HHashMultiSet<type_t, hash_function_t>::elem_t value_type;
-		hash_function_t _hasher;
-		hasher( hash_function_t hashFunction_ ) : _hasher( hashFunction_ ) {}
-		int long operator()( value_type const& val_ ) const
-			{ return ( _hasher( val_.first ) ); }
-		int long operator()( type_t const& key_ ) const
-			{ return ( _hasher( key_ ) ); }
-		bool operator()( value_type const& a_, value_type const& b_ ) const
-			{ return ( a_.first == b_.first ); }
-		bool operator()( value_type const& a_, type_t const& b_ ) const
-			{ return ( a_.first == b_ ); }
-	};
-	typedef HHashMultiSet<type_t, hash_function_t> this_type;
-	hasher _hasher;
-	HHashContainer _engine;
+	engine_t _engine;
 public:
 	HHashMultiSet( void )
-		: _hasher( &hash ), _engine()
+		: _engine( hasher_type() )
+		{}
+	explicit HHashMultiSet( hasher_type const& hasher_ )
+		: _engine( hasher_ )
 		{}
 	/*! \brief Lower bound of size of map's table */
-	HHashMultiSet( int long size_ )
-		: _hasher(  &hash ), _engine() {
+	explicit HHashMultiSet( int long size_ )
+		: _engine( hasher_type() ) {
 		M_PROLOG
-		_engine.resize( size_, _hasher );
+		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
-	HHashMultiSet( int long size_, hash_function_t hasher_ )
-		: _hasher(  hasher_ ), _engine() {
+	HHashMultiSet( int long size_, hasher_type const& hasher_ )
+		: _engine() {
 		M_PROLOG
-		_engine.resize( size_, _hasher );
+		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HHashMultiSet( iterator_t first, iterator_t last )
-		: _hasher(  &hash ), _engine() {
+	HHashMultiSet( iterator_t first, iterator_t last, hasher_type const& hasher_ = hasher_type() )
+		: _engine( hasher_ ) {
 		M_PROLOG
 		for ( ; first != last; ++ first )
 			insert( *first );
@@ -144,17 +156,17 @@ public:
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HHashMultiSet( iterator_t first, iterator_t last, int long size_ )
-		: _hasher(  &hash ), _engine() {
+	HHashMultiSet( iterator_t first, iterator_t last, int long size_, hasher_type const& hasher_ = hasher_type() )
+		: _engine( hasher_ ) {
 		M_PROLOG
-		resize( size_, _hasher );
+		resize( size_ );
 		for ( ; first != last; ++ first )
 			insert( *first );
 		return;
 		M_EPILOG
 	}
 	HHashMultiSet( HHashMultiSet const& set_ )
-		: _hasher( set_._hasher ), _engine() {
+		: _engine( set_._engine.hasher() ) {
 		M_PROLOG
 		_engine.copy_from( set_._engine );
 		return;
@@ -176,23 +188,32 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
-	iterator begin( void ) const
-		{ M_PROLOG return ( iterator( _engine.begin() ) ); M_EPILOG }
-	iterator end( void ) const
-		{ M_PROLOG return ( iterator( _engine.end() ) ); M_EPILOG }
-	iterator find( type_t const& key_ ) const
-		{ M_PROLOG return ( iterator( _engine.find( key_, _hasher ) ) ); M_EPILOG }
+	iterator begin( void ) const {
+		M_PROLOG
+		return ( iterator( &_engine, _engine.begin(), 0 ) );
+		M_EPILOG
+	}
+	iterator end( void ) const {
+		M_PROLOG
+		return ( iterator( &_engine, _engine.end(), 0 ) );
+		M_EPILOG
+	}
+	iterator find( type_t const& key_ ) const {
+		M_PROLOG
+		return ( iterator( &_engine, _engine.find( key_ ), 0 ) );
+		M_EPILOG
+	}
 	iterator insert( value_type const& val_ ) {
 		M_PROLOG
-		HPair<HHashContainer::HIterator, bool> p( _engine.insert( make_pair( val_, 1L ), _hasher ) );
+		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair( val_, 1L ) ) );
 		if ( ! p.second )
-			++ p.first.get<elem_t>().second;
-		return ( iterator( p.first ) );
+			++ p.first.get().second;
+		return ( iterator( &_engine, p.first, p.first.get().second - 1 ) );
 		M_EPILOG
 	}
 	void resize( int long size_ ) {
 		M_PROLOG
-		_engine.resize( size_, _hasher );
+		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
@@ -234,7 +255,7 @@ public:
 	int long count( value_type const& elem ) const {
 		M_PROLOG
 		HIterator it( find( elem ) );
-		return ( it != end() ? it._engine.template get<elem_t>().second : 0 );
+		return ( it != end() ? it._engine.get().second : 0 );
 		M_EPILOG
 	}
 	void clear( void )
@@ -242,8 +263,8 @@ public:
 	int long get_size( void ) const {
 		M_PROLOG
 		int long sizeAcc( 0 );
-		for ( HHashContainer::HIterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
-			sizeAcc += it.get<elem_t>().second;
+		for ( typename engine_t::HIterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
+			sizeAcc += it.get().second;
 		return ( sizeAcc );
 		M_EPILOG
 	}
@@ -257,7 +278,6 @@ public:
 		if ( &set_ != this ) {
 			using yaal::swap;
 			swap( _engine, set_._engine );
-			swap( _hasher, set_._hasher );
 		}
 		return;
 	}
@@ -270,8 +290,8 @@ private:
 
 }
 
-template<typename key_type, typename hash_function_t>
-inline void swap( yaal::hcore::HHashMultiSet<key_type, hash_function_t>& a, yaal::hcore::HHashMultiSet<key_type, hash_function_t>& b )
+template<typename key_type, typename hasher_t>
+inline void swap( yaal::hcore::HHashMultiSet<key_type, hasher_t>& a, yaal::hcore::HHashMultiSet<key_type, hasher_t>& b )
 	{ a.swap( b ); }
 
 }

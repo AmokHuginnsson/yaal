@@ -42,6 +42,35 @@ int long const x_tag_g_pulPrimes[ 32 ] = {
 	2147483647,	0
 }, * const _primes_ = x_tag_g_pulPrimes;
 
+template<>
+int long hash<HString>::operator () ( HString const& string_ ) const {
+	char const* const buffer( string_.raw() );
+	int long size( string_.get_length() );
+	int long h( 0 );
+	while ( size -- ) {
+		h += buffer[ size ];
+		h <<= 3;
+	}
+	return ( h );
+}
+
+template<typename T>
+int long hash<T>::operator () ( T const& key_ ) const {
+	return ( key_ );
+}
+
+template struct hash<char>;
+template struct hash<char signed>;
+template struct hash<char unsigned>;
+template struct hash<int short>;
+template struct hash<int short unsigned>;
+template struct hash<int>;
+template struct hash<int unsigned>;
+template struct hash<int long>;
+template struct hash<int long unsigned>;
+template struct hash<int long long>;
+template struct hash<int long long unsigned>;
+
 }
 
 }

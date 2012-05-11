@@ -496,7 +496,6 @@ bool operator >= ( HString const&, HString const& );
 bool operator <= ( HString const&, HString const& );
 bool operator > ( HString const&, HString const& );
 bool operator < ( HString const&, HString const& );
-int long hash( HString const& );
 
 /*! \brief HString class helpers, utility functions.
  */

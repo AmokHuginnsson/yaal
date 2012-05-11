@@ -182,8 +182,8 @@ public:
 		++ _index;
 		return ( *this );
 	}
-	HIterator const operator ++ ( int ) {
-		HIterator it( _owner, _index );
+	HIterator operator ++ ( int ) {
+		HIterator it( *this );
 		++ _index;
 		return ( it );
 	}
@@ -191,8 +191,8 @@ public:
 		-- _index;
 		return ( *this );
 	}
-	HIterator const operator -- ( int ) {
-		HIterator it( _owner, _index );
+	HIterator operator -- ( int ) {
+		HIterator it( *this );
 		-- _index;
 		return ( it );
 	}

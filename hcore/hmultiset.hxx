@@ -64,10 +64,11 @@ public:
 private:
 	typedef HPair<type_t, int long> elem_t;
 	typedef HSBBSTree<elem_t, compare_type, multiset_helper<elem_t> > engine_t;
+public:
+	typedef HMultiSet<type_t, compare_t> this_type;
 	/*! \brief Iterator for HMultiSet<> data structure.
 	 */
 	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
-		typedef HPair<value_type, int long> elem_t;
 		int long _index;
 		engine_t const* _owner;
 		typename engine_t::HIterator _engine;
@@ -93,7 +94,7 @@ private:
 			return ( *this );
 		}
 		HIterator const operator ++ ( int ) {
-			HIterator it( _engine, _index );
+			HIterator it( *this );
 			operator ++ ();
 			return ( it );
 		}
@@ -108,7 +109,7 @@ private:
 			return ( *this );
 		}
 		HIterator const operator -- ( int ) {
-			HIterator it( _engine, _index );
+			HIterator it( *this );
 			operator -- ();
 			return ( it );
 		}

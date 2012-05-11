@@ -357,7 +357,7 @@ public:
 		M_EPILOG
 	}
 	HIterator const operator ++ ( int ) {
-		HIterator it( _owner, _major, _minor );
+		HIterator it( *this );
 		operator++();
 		return ( it );
 	}
@@ -384,7 +384,7 @@ public:
 		M_EPILOG
 	}
 	HIterator const operator -- ( int ) {
-		HIterator it( _owner, _major, _minor );
+		HIterator it( *this );
 		operator--();
 		return ( it );
 	}

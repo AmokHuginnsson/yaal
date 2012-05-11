@@ -82,7 +82,7 @@ public:
 			return ( *this );
 		}
 		HIterator const operator ++ ( int ) {
-			HIterator it( _engine );
+			HIterator it( *this );
 			++ _engine;
 			return ( it );
 		}
@@ -91,7 +91,7 @@ public:
 			return ( *this );
 		}
 		HIterator const operator -- ( int ) {
-			HIterator it( _engine );
+			HIterator it( *this );
 			-- _engine;
 			return ( it );
 		}

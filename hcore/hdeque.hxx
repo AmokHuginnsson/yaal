@@ -330,8 +330,8 @@ public:
 		return ( *this );
 	}
 	HIterator const operator ++ ( int ) {
-		HIterator it( _owner, _index );
-		++ _index;
+		HIterator it( *this );
+		operator ++ ();
 		return ( it );
 	}
 	HIterator& operator -- ( void ) {
@@ -339,8 +339,8 @@ public:
 		return ( *this );
 	}
 	HIterator const operator -- ( int ) {
-		HIterator it( _owner, _index );
-		-- _index;
+		HIterator it( *this );
+		operator -- ();
 		return ( it );
 	}
 	HIterator operator + ( int long off_ ) const {
