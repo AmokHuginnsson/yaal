@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hhashcontainer.hxx"
 #include "hcore/hexception.hxx"
 #include "hcore/algorithm.hxx"
+#include "hcore/allocator.hxx"
 
 namespace yaal {
 
@@ -46,14 +47,15 @@ struct hashset_helper {
 
 /*! \brief Hash set container implementation.
  */
-template<typename type_t, typename hasher_t = hash<type_t> >
+template<typename type_t, typename hasher_t = hash<type_t>, typename allocator_t = allocator::system<type_t> >
 class HHashSet {
 public:
 	typedef type_t key_type;
 /* cppcheck-suppress variableHidingTypedef */
 	typedef type_t value_type;
 	typedef hasher_t hasher_type;
-	typedef HHashSet<value_type, hasher_type> this_type;
+	typedef allocator_t allocator_type;
+	typedef HHashSet<value_type, hasher_type, allocator_type> this_type;
 	typedef HHashContainer<value_type, hasher_type, hashset_helper<value_type> > engine_t;
 	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
 		typename engine_t::HIterator _engine;
@@ -92,7 +94,7 @@ public:
 		bool operator != ( HIterator const& it ) const
 			{ return ( _engine != it._engine ); }
 	private:
-		friend class HHashSet<key_type, hasher_type>;
+		friend class HHashSet<key_type, hasher_type, allocator_type>;
 		explicit HIterator( typename engine_t::HIterator const& it ) : base_type(), _engine( it ) {};
 	};
 	typedef HIterator iterator;
@@ -247,8 +249,8 @@ private:
 
 }
 
-template<typename key_type, typename hasher_t>
-inline void swap( yaal::hcore::HHashSet<key_type, hasher_t>& a, yaal::hcore::HHashSet<key_type, hasher_t>& b )
+template<typename key_type, typename hasher_t, typename allocator_t>
+inline void swap( yaal::hcore::HHashSet<key_type, hasher_t, allocator_t>& a, yaal::hcore::HHashSet<key_type, hasher_t, allocator_t>& b )
 	{ a.swap( b ); }
 
 }

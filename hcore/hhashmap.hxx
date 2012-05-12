@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hhashcontainer.hxx"
 #include "hcore/hexception.hxx"
 #include "hcore/algorithm.hxx"
+#include "hcore/allocator.hxx"
 
 namespace yaal {
 
@@ -46,7 +47,7 @@ struct hashmap_helper {
 
 /*! \brief Hash map container implementation.
  */
-template<typename key_t, typename data_t, typename hasher_t = hash<key_t> >
+template<typename key_t, typename data_t, typename hasher_t = hash<key_t>, typename allocator_t = allocator::system<HPair<key_t, data_t> > >
 class HHashMap {
 public:
 	typedef key_t key_type;
@@ -54,6 +55,7 @@ public:
 /* cppcheck-suppress variableHidingTypedef */
 	typedef HPair<key_t const, data_t> value_type;
 	typedef hasher_t hasher_type;
+	typedef allocator_t allocator_type;
 	template<typename const_qual_t>
 	class HIterator;
 	typedef HIterator<value_type> iterator;
@@ -62,7 +64,7 @@ public:
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 	typedef HPair<iterator, bool> insert_result;
 private:
-	typedef HHashMap<key_t, data_t, hasher_t> this_type;
+	typedef HHashMap<key_type, data_type, hasher_type, allocator_type> this_type;
 	typedef HHashContainer<value_type, hasher_type, hashmap_helper<key_type, data_type> > engine_t;
 	engine_t _engine;
 public:
@@ -217,12 +219,12 @@ private:
 };
 
 
-template<typename key_type_t, typename data_type_t, typename hasher_t>
+template<typename key_type_t, typename data_type_t, typename hasher_t, typename allocator_t>
 template<typename const_qual_t>
-class HHashMap<key_type_t, data_type_t, hasher_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward> {
+class HHashMap<key_type_t, data_type_t, hasher_t, allocator_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward> {
 	typedef key_type_t key_type;
 	typedef data_type_t data_type;
-	typedef HHashMap<key_type, data_type, hasher_t> hashmap_t;
+	typedef HHashMap<key_type, data_type, hasher_t, allocator_t> hashmap_t;
 	typename hashmap_t::engine_t::HIterator _engine;
 public:
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
@@ -266,7 +268,7 @@ public:
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( _engine != it._engine ); }
 private:
-	friend class HHashMap<key_type, data_type, hasher_t>;
+	friend class HHashMap<key_type, data_type, hasher_t, allocator_t>;
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	explicit HIterator( typename hashmap_t::engine_t::HIterator const& it )
@@ -275,8 +277,8 @@ private:
 
 }
 
-template<typename key_type, typename data_type, typename hasher_t>
-inline void swap( yaal::hcore::HHashMap<key_type, data_type, hasher_t>& a, yaal::hcore::HHashMap<key_type, data_type, hasher_t>& b )
+template<typename key_type, typename data_type, typename hasher_t, typename allocator_t>
+inline void swap( yaal::hcore::HHashMap<key_type, data_type, hasher_t, allocator_t>& a, yaal::hcore::HHashMap<key_type, data_type, hasher_t, allocator_t>& b )
 	{ a.swap( b ); }
 
 }
