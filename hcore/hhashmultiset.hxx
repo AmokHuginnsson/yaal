@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hhashcontainer.hxx"
 #include "hcore/hexception.hxx"
 #include "hcore/algorithm.hxx"
+#include "hcore/allocator.hxx"
 
 namespace yaal {
 
@@ -46,7 +47,7 @@ struct hashmultiset_helper {
 
 /*! \brief Hash set container implementation.
  */
-template<typename type_t, typename hasher_t = hash<type_t> >
+template<typename type_t, typename hasher_t = hash<type_t>, typename allocator_t = allocator::system<HPair<type_t, int long> > >
 class HHashMultiSet {
 public:
 	typedef type_t key_type;
@@ -54,7 +55,8 @@ public:
 	typedef type_t value_type;
 	typedef hasher_t hasher_type;
 	typedef HPair<type_t, int long> elem_t;
-	typedef HHashMultiSet<type_t, hasher_t> this_type;
+	typedef allocator_t allocator_type;
+	typedef HHashMultiSet<value_type, hasher_type, allocator_type> this_type;
 	typedef HHashContainer<elem_t, hasher_type, hashmultiset_helper<elem_t> > engine_t;
 	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
 		int long _index;
@@ -113,7 +115,7 @@ public:
 		bool operator != ( HIterator const& it ) const
 			{ return ( ( _engine != it._engine ) || ( _index != it._index ) ); }
 	private:
-		friend class HHashMultiSet<key_type, hasher_t>;
+		friend class HHashMultiSet<key_type, hasher_type, allocator_type>;
 		explicit HIterator( engine_t const* owner_, typename engine_t::HIterator const& it, int long index_ )
 			: base_type(), _index( index_ ), _owner( owner_ ), _engine( it )
 			{}
@@ -290,8 +292,8 @@ private:
 
 }
 
-template<typename key_type, typename hasher_t>
-inline void swap( yaal::hcore::HHashMultiSet<key_type, hasher_t>& a, yaal::hcore::HHashMultiSet<key_type, hasher_t>& b )
+template<typename key_type, typename hasher_t, typename allocator_t>
+inline void swap( yaal::hcore::HHashMultiSet<key_type, hasher_t, allocator_t>& a, yaal::hcore::HHashMultiSet<key_type, hasher_t, allocator_t>& b )
 	{ a.swap( b ); }
 
 }

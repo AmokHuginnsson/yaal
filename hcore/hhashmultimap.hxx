@@ -57,6 +57,7 @@ struct hashmultimap_helper {
  */
 template<typename key_type_t, typename value_type_t,
 	typename hasher_t = hash<key_type_t>,
+	typename allocator_t = allocator::system<HPair<key_type_t, value_type_t> >,
 	template<typename, typename>class storage_policy_t = HMultiContainerStorage::HTransparent>
 class HHashMultiMap {
 public:
@@ -65,6 +66,7 @@ public:
 	typedef HPair<key_type const, data_type> value_type;
 	typedef storage_policy_t<key_type const, data_type> storage_t;
 	typedef hasher_t hasher_type;
+	typedef allocator_t allocator_type;
 	typedef HList<typename storage_t::stored_type> value_list_t;
 	typedef HPointer<value_list_t> value_list_ptr_t;
 	template<typename const_qual_t>
@@ -74,7 +76,7 @@ public:
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
-	typedef HHashMap<key_type, value_list_ptr_t, hasher_t> hashmultimap_engine_t;
+	typedef HHashMap<key_type, value_list_ptr_t, hasher_type, allocator_type> hashmultimap_engine_t;
 	hashmultimap_engine_t _engine;
 public:
 	HHashMultiMap( void )
@@ -325,12 +327,13 @@ private:
 
 /*! \brief Forward iterator for HHashMultiMap<>.
  */
-template<typename key_type_t, typename value_type_t, typename hasher_t, template<typename, typename> class storage_policy_t>
+template<typename key_type_t, typename value_type_t, typename hasher_t, typename allocator_t, template<typename, typename> class storage_policy_t>
 template<typename const_qual_t>
-class HHashMultiMap<key_type_t, value_type_t, hasher_t, storage_policy_t>::HIterator : public iterator_interface<typename HHashMultiMap<key_type_t, value_type_t, hasher_t, storage_policy_t>::storage_t::template const_aware_type<const_qual_t>::accessor_t, iterator_category::forward> {
+class HHashMultiMap<key_type_t, value_type_t, hasher_t, allocator_t, storage_policy_t>::HIterator
+	: public iterator_interface<typename HHashMultiMap<key_type_t, value_type_t, hasher_t, allocator_t, storage_policy_t>::storage_t::template const_aware_type<const_qual_t>::accessor_t, iterator_category::forward> {
 	typedef key_type_t key_type;
 	typedef value_type_t data_type;
-	typedef HHashMultiMap<key_type, data_type, hasher_t, storage_policy_t> hash_multi_map_t;
+	typedef HHashMultiMap<key_type, data_type, hasher_t, allocator_t, storage_policy_t> hash_multi_map_t;
 	typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
 					typename hash_multi_map_t::hashmultimap_engine_t::const_iterator,
 					typename hash_multi_map_t::hashmultimap_engine_t::iterator>::type key_iterator_t;
@@ -396,7 +399,7 @@ public:
 	bool operator != ( HIterator const& it ) const
 		{ return ( ! ( ( _major == it._major ) && ( _minor == it._minor ) ) ); }
 private:
-	friend class HHashMultiMap<key_type, data_type, hasher_t, storage_policy_t>;
+	friend class HHashMultiMap<key_type, data_type, hasher_type, allocator_type, storage_policy_t>;
 	explicit HIterator( hash_multi_map_t const* const owner_,
 			key_iterator_t const& major,
 			value_iterator_t const& minor ) : base_type(), _owner( owner_ ), _major( major ), _minor( minor ) {};
@@ -404,10 +407,10 @@ private:
 
 }
 
-template<typename key_type, typename data_type, typename hasher_t, template<typename, typename>class storage_policy_t>
+template<typename key_type, typename data_type, typename hasher_t, typename allocator_t, template<typename, typename>class storage_policy_t>
 inline void swap(
-		yaal::hcore::HHashMultiMap<key_type, data_type, hasher_t, storage_policy_t>& a,
-		yaal::hcore::HHashMultiMap<key_type, data_type, hasher_t, storage_policy_t>& b
+		yaal::hcore::HHashMultiMap<key_type, data_type, hasher_t, allocator_t, storage_policy_t>& a,
+		yaal::hcore::HHashMultiMap<key_type, data_type, hasher_t, allocator_t, storage_policy_t>& b
 		)
 	{ a.swap( b ); }
 
