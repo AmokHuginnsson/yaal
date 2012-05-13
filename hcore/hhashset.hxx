@@ -54,9 +54,9 @@ public:
 /* cppcheck-suppress variableHidingTypedef */
 	typedef type_t value_type;
 	typedef hasher_t hasher_type;
-	typedef allocator_t allocator_type;
-	typedef HHashSet<value_type, hasher_type, allocator_type> this_type;
-	typedef HHashContainer<value_type, hasher_type, hashset_helper<value_type> > engine_t;
+	typedef HHashContainer<value_type, hasher_type, hashset_helper<value_type>, allocator_t> engine_t;
+	typedef typename engine_t::allocator_type allocator_type;
+	typedef HHashSet<value_type, hasher_type, allocator_t> this_type;
 	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
 		typename engine_t::HIterator _engine;
 	public:
@@ -94,7 +94,7 @@ public:
 		bool operator != ( HIterator const& it ) const
 			{ return ( _engine != it._engine ); }
 	private:
-		friend class HHashSet<key_type, hasher_type, allocator_type>;
+		friend class HHashSet<key_type, hasher_type, allocator_t>;
 		explicit HIterator( typename engine_t::HIterator const& it ) : base_type(), _engine( it ) {};
 	};
 	typedef HIterator iterator;
@@ -106,29 +106,32 @@ private:
 	engine_t _engine;
 public:
 	HHashSet( void )
-		: _engine( hasher_type() )
+		: _engine( hasher_type(), allocator_type() )
 		{}
 	explicit HHashSet( hasher_type const& hasher_ )
-		: _engine( hasher_ )
+		: _engine( hasher_, allocator_type() )
+		{}
+	explicit HHashSet( allocator_type const& allocator_ )
+		: _engine( hasher_type(), allocator_ )
 		{}
 	/*! \brief Lower bound of size of map's table */
 	HHashSet( int long size_ )
-		: _engine( hasher_type() ) {
+		: _engine( hasher_type(), allocator_type() ) {
 		M_PROLOG
 		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
-	HHashSet( int long size_, hasher_type const& hasher_ )
-		: _engine( hasher_ ) {
+	HHashSet( int long size_, hasher_type const& hasher_, allocator_type const& allocator_ = allocator_type() )
+		: _engine( hasher_, allocator_ ) {
 		M_PROLOG
 		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HHashSet( iterator_t first, iterator_t last, hasher_type const& hasher_ = hasher_type() )
-		: _engine( hasher_ ) {
+	HHashSet( iterator_t first, iterator_t last, hasher_type const& hasher_ = hasher_type(), allocator_type const& allocator_ = allocator_type() )
+		: _engine( hasher_, allocator_ ) {
 		M_PROLOG
 		for ( ; first != last; ++ first )
 			insert( *first );
@@ -136,17 +139,17 @@ public:
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HHashSet( iterator_t first, iterator_t last, int long size_, hasher_type const& hasher_ = hasher_type() )
+	HHashSet( iterator_t first, iterator_t last, int long size_, hasher_type const& hasher_ = hasher_type(), allocator_type const& allocator_ = allocator_type() )
 		: _engine( hasher_ ) {
 		M_PROLOG
-		resize( size_ );
+		resize( size_, allocator_ );
 		for ( ; first != last; ++ first )
 			insert( *first );
 		return;
 		M_EPILOG
 	}
 	HHashSet( HHashSet const& set_ )
-		: _engine( set_._engine.hasher() ) {
+		: _engine( set_._engine.hasher(), set_._engine.get_allocator() ) {
 		M_PROLOG
 		_engine.copy_from( set_._engine );
 		return;
@@ -167,6 +170,9 @@ public:
 		}
 		return ( *this );
 		M_EPILOG
+	}
+	allocator_type const& get_allocator( void ) const {
+		return ( _engine.get_allocator() );
 	}
 	iterator begin( void ) const
 		{ M_PROLOG return ( iterator( _engine.begin() ) ); M_EPILOG }

@@ -66,7 +66,6 @@ public:
 	typedef HPair<key_type const, data_type> value_type;
 	typedef storage_policy_t<key_type const, data_type> storage_t;
 	typedef hasher_t hasher_type;
-	typedef allocator_t allocator_type;
 	typedef HList<typename storage_t::stored_type> value_list_t;
 	typedef HPointer<value_list_t> value_list_ptr_t;
 	template<typename const_qual_t>
@@ -76,22 +75,32 @@ public:
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
-	typedef HHashMap<key_type, value_list_ptr_t, hasher_type, allocator_type> hashmultimap_engine_t;
+	typedef HHashMap<key_type, value_list_ptr_t, hasher_type, allocator_t> hashmultimap_engine_t;
 	hashmultimap_engine_t _engine;
 public:
+	typedef typename hashmultimap_engine_t::allocator_type allocator_type;
 	HHashMultiMap( void )
 		: _engine()
 		{}
+	explicit HHashMultiMap( hasher_type const& hasher_ )
+		: _engine( hasher_ )
+		{}
+	explicit HHashMultiMap( allocator_type const& allocator_ )
+		: _engine( allocator_ )
+		{}
+	explicit HHashMultiMap( int long size_ )
+		: _engine( size_ )
+		{}
 	template<typename iterator_t>
-	HHashMultiMap( iterator_t first, iterator_t last )
-		: _engine() {
+	HHashMultiMap( iterator_t first, iterator_t last, hasher_type const& hasher_ = hasher_type(), allocator_type const& allocator_ = allocator_type() )
+		: _engine( hasher_, allocator_ ) {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
 	HHashMultiMap( HHashMultiMap const& multimap_ )
-		: _engine() {
+		: _engine( multimap_.hasher(), multimap_.get_allocator() ) {
 		M_PROLOG
 		_engine.copy_from( multimap_._engine );
 		return;
@@ -115,6 +124,9 @@ public:
 			sizeAcc += it->second->get_size();
 		return ( sizeAcc );
 		M_EPILOG
+	}
+	allocator_type const& get_allocator( void ) const {
+		return ( _engine.get_allocator() );
 	}
 	bool empty( void ) const
 		{ return ( is_empty() );	}
@@ -399,7 +411,7 @@ public:
 	bool operator != ( HIterator const& it ) const
 		{ return ( ! ( ( _major == it._major ) && ( _minor == it._minor ) ) ); }
 private:
-	friend class HHashMultiMap<key_type, data_type, hasher_type, allocator_type, storage_policy_t>;
+	friend class HHashMultiMap<key_type, data_type, hasher_type, allocator_t, storage_policy_t>;
 	explicit HIterator( hash_multi_map_t const* const owner_,
 			key_iterator_t const& major,
 			value_iterator_t const& minor ) : base_type(), _owner( owner_ ), _major( major ), _minor( minor ) {};

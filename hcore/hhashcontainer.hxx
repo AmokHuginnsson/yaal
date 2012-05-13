@@ -47,7 +47,7 @@ struct hash {
 
 extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
 
-template<typename value_t, typename hasher_t, typename get_key_t>
+template<typename value_t, typename hasher_t, typename get_key_t, typename allocator_t>
 class HHashContainer : private trait::HNonCopyable {
 public:
 	typedef value_t value_type;
@@ -68,10 +68,11 @@ private:
 		friend class HIterator;
 	};
 public:
+	typedef typename allocator_t::template rebind<HAtom>::other allocator_type;
 	/*! \brief Iterator for HHashContainer data structure.
 	 */
 	class HIterator {
-		typedef HHashContainer<value_type, hasher_type, get_key_type> owner_t;
+		typedef HHashContainer<value_type, hasher_type, get_key_type, allocator_t> owner_t;
 		owner_t const* _owner;
 		int long _index;
 		typename owner_t::HAtom* _atom;
@@ -144,7 +145,7 @@ public:
 		bool operator != ( HIterator const& it ) const
 			{ return ( ! operator == ( it ) ); }
 	private:
-		friend class HHashContainer<value_type, hasher_type, get_key_type>;
+		friend class HHashContainer<value_type, hasher_type, get_key_type, allocator_t>;
 		explicit HIterator( owner_t const* owner_, int long index_, typename owner_t::HAtom* atom_ )
 			: _owner( owner_ ), _index( index_ ), _atom( atom_ ) {};
 	};
@@ -153,15 +154,19 @@ private:
 	int _size;
 	HChunk _buckets;
 	hasher_type _hasher;
+	allocator_type _allocator;
 public:
-	HHashContainer( hasher_type const& hasher_ )
-		: _prime( 0 ), _size( 0 ), _buckets(), _hasher( hasher_ ) {
+	HHashContainer( hasher_type const& hasher_, allocator_type const& allocator_ )
+		: _prime( 0 ), _size( 0 ), _buckets(), _hasher( hasher_ ), _allocator( allocator_ ) {
 	}
 	virtual ~HHashContainer( void ) {
 		M_PROLOG
 		clear();
 		return;
 		M_DESTRUCTOR_EPILOG
+	}
+	allocator_type const& get_allocator( void ) const {
+		return ( _allocator );
 	}
 	int long get_size( void ) const {
 		M_PROLOG
@@ -257,9 +262,9 @@ public:
 	}
 };
 
-template<typename value_t, typename hasher_t, typename get_key_t>
-typename HHashContainer<value_t, hasher_t, get_key_t>::HIterator
-HHashContainer<value_t, hasher_t, get_key_t>::find( key_type const& key_ ) const {
+template<typename value_t, typename hasher_t, typename get_key_t, typename allocator_t>
+typename HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::HIterator
+HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::find( key_type const& key_ ) const {
 	M_PROLOG
 	int long idx( 0 );
 	HAtom* atom( NULL );
@@ -273,9 +278,9 @@ HHashContainer<value_t, hasher_t, get_key_t>::find( key_type const& key_ ) const
 	M_EPILOG
 }
 
-template<typename value_t, typename hasher_t, typename get_key_t>
-HPair<typename HHashContainer<value_t, hasher_t, get_key_t>::HIterator, bool>
-HHashContainer<value_t, hasher_t, get_key_t>::insert( value_type const& val_ ) {
+template<typename value_t, typename hasher_t, typename get_key_t, typename allocator_t>
+HPair<typename HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::HIterator, bool>
+HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::insert( value_type const& val_ ) {
 	M_PROLOG
 	HIterator it( _prime ? find( get_key_type::key( val_ ) ) : end() );
 	bool inserted( false );
@@ -298,8 +303,8 @@ HHashContainer<value_t, hasher_t, get_key_t>::insert( value_type const& val_ ) {
 	M_EPILOG
 }
 
-template<typename value_t, typename hasher_t, typename get_key_t>
-void HHashContainer<value_t, hasher_t, get_key_t>::resize( int long size_ ) {
+template<typename value_t, typename hasher_t, typename get_key_t, typename allocator_t>
+void HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::resize( int long size_ ) {
 	M_PROLOG
 	if ( size_ < 1 )
 		M_THROW( "bad new container size", size_ );
@@ -333,8 +338,8 @@ void HHashContainer<value_t, hasher_t, get_key_t>::resize( int long size_ ) {
 
 }
 
-template<typename value_t, typename hasher_t, typename get_key_t>
-inline void swap( yaal::hcore::HHashContainer<value_t, hasher_t, get_key_t>& a, yaal::hcore::HHashContainer<value_t, hasher_t, get_key_t>& b )
+template<typename value_t, typename hasher_t, typename get_key_t, typename allocator_t>
+inline void swap( yaal::hcore::HHashContainer<value_t, hasher_t, get_key_t, allocator_t>& a, yaal::hcore::HHashContainer<value_t, hasher_t, get_key_t, allocator_t>& b )
 	{ a.swap( b );	}
 
 }
