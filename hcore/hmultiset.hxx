@@ -251,9 +251,9 @@ public:
 	HIterator end( void ) const
 		{ return ( HIterator( &_engine, _engine.end(), 0 ) ); }
 	reverse_iterator rbegin( void ) const
-		{ return ( HIterator( end() ) ); }
+		{ return ( end() ); }
 	reverse_iterator rend( void ) const
-		{ return ( HIterator( begin() ) ); }
+		{ return ( begin() ); }
 	void clear( void )
 		{ _engine.clear(); }
 	void swap( HMultiSet& other ) {
