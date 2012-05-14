@@ -266,7 +266,8 @@ class YaalHCoreHMapPrinter:
 			valueType = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self._owner.type.template_argument( 0 ).const(), self._owner.type.template_argument( 1 ) ) )
 			compareType = self._owner.type.template_argument( 2 )
 			helperType = "yaal::hcore::map_helper<%s,%s>" % ( self._owner.type.template_argument( 0 ), self._owner.type.template_argument( 1 ) )
-			nodeType = gdb.lookup_type( "yaal::hcore::HSBBSTree<%s,%s,%s>::HNode" % ( valueType, compareType, helperType ) ).pointer()
+			allocatorType = self._owner.type.template_argument( 3 )
+			nodeType = gdb.lookup_type( "yaal::hcore::HSBBSTree<%s,%s,%s,%s>::HNode" % ( valueType, compareType, helperType, allocatorType ) ).pointer()
 			if ( count % 2 ) == 0:
 				elt = self._item.cast( nodeType )['_key']['first']
 			else:
@@ -308,7 +309,8 @@ class YaalHCoreHSetPrinter:
 			count = self._count
 			valueType = self._owner.type.template_argument( 0 )
 			compareType = self._owner.type.template_argument( 1 )
-			nodeType = gdb.lookup_type( "yaal::hcore::HSBBSTree<%s,%s,yaal::hcore::set_helper<%s>>::HNode" % ( valueType, compareType, valueType ) ).pointer()
+			allocatorType = self._owner.type.template_argument( 2 )
+			nodeType = gdb.lookup_type( "yaal::hcore::HSBBSTree<%s,%s,yaal::hcore::set_helper<%s>,%s>::HNode" % ( valueType, compareType, valueType, allocatorType ) ).pointer()
 			elt = self._item.cast( nodeType )['_key']
 			self._item = self.do_next( self._item )
 			self._count = self._count + 1
@@ -380,8 +382,12 @@ class YaalHCoreHHashMapPrinter:
 		self._val = val_
 
 	def nodeType( self ):
-		valueType = gdb.lookup_type( "yaal::hcore::HPair<%s, %s>" % ( self._val.type.template_argument( 0 ).const(), self._val.type.template_argument( 1 ) ) )
-		nodeType = gdb.lookup_type( "yaal::hcore::HHashContainer::HAtom<%s>" % ( valueType ) ).pointer()
+		keyType = self._val.type.template_argument( 0 )
+		dataType = self._val.type.template_argument( 1 )
+		valueType = gdb.lookup_type( "yaal::hcore::HPair<%s,%s>" % ( keyType.const(), dataType ) )
+		hasherType = self._val.type.template_argument( 2 );
+		allocatorType = self._val.type.template_argument( 3 );
+		nodeType = gdb.lookup_type( "yaal::hcore::HHashContainer<%s,%s,yaal::hcore::hashmap_helper<%s,%s>,%s>::HAtom" % ( valueType, hasherType, keyType, dataType, allocatorType ) ).pointer()
 		return nodeType
 
 	def buckets( self ):
@@ -420,7 +426,10 @@ class YaalHCoreHHashSetPrinter:
 		self._val = val_
 
 	def nodeType( self ):
-		nodeType = gdb.lookup_type( "yaal::hcore::HHashContainer::HAtom<%s>" % ( self._val.type.template_argument( 0 ) ) ).pointer()
+		valueType = self._val.type.template_argument( 0 );
+		hasherType = self._val.type.template_argument( 1 );
+		allocatorType = self._val.type.template_argument( 2 );
+		nodeType = gdb.lookup_type( "yaal::hcore::HHashContainer<%s,%s,yaal::hcore::hashset_helper<%s>,%s>::HAtom" % ( valueType, hasherType, valueType, allocatorType ) ).pointer()
 		return nodeType
 
 	def buckets( self ):

@@ -103,7 +103,7 @@ yaal::hcore::HList<*,*> {
 		)
 	)
 }
-yaal::hcore::HSet<*,*> {
+yaal::hcore::HSet<*,*,*> {
 	preview (
 		#( "[", $c._engine._size, "](",
 			#tree (
@@ -111,7 +111,7 @@ yaal::hcore::HSet<*,*> {
 				left: _left,
 				right: _right,
 				size: $c._engine._size
-			) : ((yaal::hcore::HSBBSTree<$T1,$T2,yaal::hcore::set_helper<$T1>>::HNode*)&$e)->_key, ")"
+			) : ((yaal::hcore::HSBBSTree<$T1,$T2,yaal::hcore::set_helper<$T1>,$T3>::HNode*)&$e)->_key, ")"
 		)
 	)
 	children (
@@ -122,22 +122,22 @@ yaal::hcore::HSet<*,*> {
 				left: _left,
 				right: _right,
 				size: $c._engine._size
-			) : ((yaal::hcore::HSBBSTree<$T1,$T2,yaal::hcore::set_helper<$T1>::HNode*)&$e)->_key
+			) : ((yaal::hcore::HSBBSTree<$T1,$T2,yaal::hcore::set_helper<$T1>,$T3>::HNode*)&$e)->_key
 		)
 	)
 }
-yaal::hcore::HHashSet<*,*> {
+yaal::hcore::HHashSet<*,*,*> {
 	children (
 		#(
 			[raw members]: [$c,!],
 			#array (
-				expr: &((yaal::hcore::HHashContainer::HAbstractAtom**)($c._engine._buckets._data))[$i],
+				expr: &((yaal::hcore::HHashContainer<$T1,$T2,yaal::hcore::hashset_helper<$T1>,$T3>::HAtom**)($c._engine._buckets._data))[$i],
 				size: $c._engine._buckets._size / sizeof ( $T1* )
 			) : #(
 				#list (
 					head: $e,
 					next: _next
-				) : ((yaal::hcore::HHashContainer::HAtom<$T1>*)&$e)->_value
+				) : ((yaal::hcore::HHashContainer<$T1,$T2,yaal::hcore::hashset_helper<$T1>,$T3>::HAtom*)&$e)->_value
 			)
 		)
 	)
