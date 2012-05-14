@@ -39,6 +39,7 @@ Copyright:
 #include "hcore/hlist.hxx"
 #include "hcore/hset.hxx"
 #include "hcore/hhashset.hxx"
+#include "hcore/hhashmap.hxx"
 #include "hcore/htuple.hxx"
 #include "tools/hring.hxx"
 #include "tools/htwowaymap.hxx"
@@ -96,6 +97,8 @@ yaal::hcore::HStreamInterface& container_dump( yaal::hcore::HStreamInterface& ou
 	char sep( '(' );
 	for ( typename container::const_iterator it( container_.begin() ), end( container_.end() ); it != end; ++ it, sep = sep_ )
 		out << sep << *it;
+	if ( container_.empty() )
+		out << sep;
 	out << ")" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
@@ -162,45 +165,52 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& os, 
 	M_EPILOG
 }
 
-template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType> const& a_ ) {
+template<typename tType, typename allocator_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType, allocator_t> const& a_ ) {
 	M_PROLOG
 	return ( tools::container_dump( out, a_, "array" ) );
 	M_EPILOG
 }
 
-template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HDeque<tType> const& d_ ) {
+template<typename tType, typename allocator_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HDeque<tType, allocator_t> const& d_ ) {
 	M_PROLOG
 	return ( tools::container_dump( out, d_, "deque" ) );
 	M_EPILOG
 }
 
-template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HList<tType> const& l_ ) {
+template<typename tType, typename allocator_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HList<tType, allocator_t> const& l_ ) {
 	M_PROLOG
 	return ( tools::container_dump( out, l_, "list" ) );
 	M_EPILOG
 }
 
-template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HSet<tType> const& s_ ) {
+template<typename tType, typename compare_t, typename allocator_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HSet<tType, compare_t, allocator_t> const& s_ ) {
 	M_PROLOG
 	return ( tools::container_dump( out, s_, "set" ) );
 	M_EPILOG
 }
 
-template<typename key_t, typename value_t>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HMap<key_t, value_t> const& m_ ) {
+template<typename key_t, typename value_t, typename compare_t, typename allocator_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HMap<key_t, value_t, compare_t, allocator_t> const& m_ ) {
 	M_PROLOG
 	return ( tools::container_dump( out, m_, "map" ) );
 	M_EPILOG
 }
 
-template<typename tType>
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashSet<tType> const& hs_ ) {
+template<typename value_t, typename hasher_t, typename allocator_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashSet<value_t, hasher_t, allocator_t> const& hs_ ) {
 	M_PROLOG
 	return ( tools::container_dump( out, hs_, "hash_set" ) );
+	M_EPILOG
+}
+
+template<typename key_t, typename value_t, typename hasher_t, typename allocator_t>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HHashMap<key_t, value_t, hasher_t, allocator_t> const& hs_ ) {
+	M_PROLOG
+	return ( tools::container_dump( out, hs_, "hash_map" ) );
 	M_EPILOG
 }
 
