@@ -139,6 +139,10 @@ template<typename iterator_t>
 class HReverseIterator {
 	iterator_t _iterator;
 public:
+	typedef typename iterator_t::value_type value_type;
+	typedef typename iterator_t::pointer pointer;
+	typedef typename iterator_t::reference reference;
+	typedef typename iterator_t::category_type category_type;
 	HReverseIterator( void )
 		: _iterator() {}
 	HReverseIterator( HReverseIterator const& iterator_ )
