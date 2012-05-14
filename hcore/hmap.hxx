@@ -54,7 +54,9 @@ struct map_helper {
  * \tparam value_type_t - type of value held in map.
  * \tparam compare_t - key ordering definition.
  */
-template<typename key_type_t, typename value_type_t, typename compare_t = less<key_type_t> >
+template<typename key_type_t, typename value_type_t,
+	typename compare_t = less<key_type_t>,
+	typename allocator_t = allocator::system<HPair<key_type_t, value_type_t> > >
 class HMap {
 public:
 	typedef key_type_t key_type;
@@ -68,26 +70,31 @@ public:
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 	typedef HPair<iterator, bool> insert_result;
+	typedef HSBBSTree<value_type, compare_type, map_helper<key_type, data_type>, allocator_t> engine_t;
+	typedef typename engine_t::allocator_type allocator_type;
+	typedef HMap<key_type_t, value_type_t, compare_t, allocator_t> this_type;
 private:
-	typedef HSBBSTree<value_type, compare_type, map_helper<key_type, data_type> > engine_t;
 	engine_t _engine;
 public:
 	HMap( void )
-		: _engine( compare_type() )
+		: _engine( compare_type(), allocator_type() )
 		{}
 	explicit HMap( compare_type const& compare_ )
-		: _engine( compare_ )
+		: _engine( compare_, allocator_type() )
+		{}
+	explicit HMap( allocator_type const& allocator_ )
+		: _engine( compare_type(), allocator_ )
 		{}
 	template<typename iterator_t>
-	HMap( iterator_t first, iterator_t last, compare_type const& compare_ = compare_type() )
-		: _engine( compare_ ) {
+	HMap( iterator_t first, iterator_t last, compare_type const& compare_ = compare_type(), allocator_type const& allocator_ = allocator_type() )
+		: _engine( compare_, allocator_ ) {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
 	HMap( HMap const& source )
-		: _engine( source._engine.compare() ) {
+		: _engine( source._engine.compare(), source._engine.get_allocator() ) {
 		M_PROLOG
 		_engine.copy_from( source._engine );
 		return;
@@ -101,6 +108,9 @@ public:
 		}
 		return ( *this );
 		M_EPILOG
+	}
+	allocator_type const& get_allocator( void ) const {
+		return ( _engine.get_allocator() );
 	}
 	int long size( void ) const
 		{ return ( get_size() ); }
@@ -199,12 +209,12 @@ public:
 
 /*! \brief Iterator for HMap<> data structure.
  */
-template<typename key_type_t, typename value_type_t, typename compare_t>
+template<typename key_type_t, typename value_type_t, typename compare_t, typename allocator_t>
 template<typename const_qual_t>
-class HMap<key_type_t, value_type_t, compare_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward> {
+class HMap<key_type_t, value_type_t, compare_t, allocator_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward> {
 	typedef key_type_t key_type;
 	typedef value_type_t data_type;
-	typedef HMap<key_type, data_type, compare_t> map_t;
+	typedef HMap<key_type, data_type, compare_t, allocator_t> map_t;
 	typedef typename map_t::engine_t engine_t;
 	typename engine_t::HIterator _engine;
 public:
@@ -250,7 +260,7 @@ public:
 	bool operator != ( HIterator<other_const_qual_t> const& it ) const
 		{ return ( _engine != it._engine ); }
 private:
-	friend class HMap<key_type, data_type, compare_t>;
+	friend class HMap<key_type, data_type, compare_t, allocator_t>;
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	explicit HIterator( typename engine_t::HIterator const& it )
@@ -259,8 +269,8 @@ private:
 
 }
 
-template<typename key_type, typename data_type, typename helper_t>
-inline void swap( yaal::hcore::HMap<key_type, data_type, helper_t>& a, yaal::hcore::HMap<key_type, data_type, helper_t>& b )
+template<typename key_type, typename data_type, typename compare_t, typename allocator_t>
+inline void swap( yaal::hcore::HMap<key_type, data_type, compare_t, allocator_t>& a, yaal::hcore::HMap<key_type, data_type, compare_t, allocator_t>& b )
 	{ a.swap( b ); }
 
 }

@@ -31,7 +31,6 @@ Copyright:
 #include "hcore/hhashmap.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/hmulticontainer.hxx"
-#include "hcore/memory.hxx"
 
 namespace yaal {
 

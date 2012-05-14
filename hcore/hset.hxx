@@ -55,15 +55,17 @@ struct set_helper {
  * \tparam type_t - type of values held in set.
  * \tparam helper_t - HSBBSTree plugable code.
  */
-template<typename type_t, typename compare_t = less<type_t> >
+template<typename type_t, typename compare_t = less<type_t>, typename allocator_t = allocator::system<type_t> >
 class HSet {
 public:
 	typedef type_t value_type;
 	typedef type_t key_type;
 	typedef compare_t compare_type;
 private:
-	typedef HSBBSTree<value_type, compare_type, set_helper<value_type> > engine_t;
+	typedef HSBBSTree<value_type, compare_type, set_helper<value_type>, allocator_t> engine_t;
 public:
+	typedef typename engine_t::allocator_type allocator_type;
+	typedef HSet<type_t, compare_t, allocator_t> this_type;
 	/*! \brief Iterator for HSet<> data structure.
 	 */
 	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
@@ -104,7 +106,7 @@ public:
 		bool operator != ( HIterator const& it ) const
 			{ return ( _engine != it._engine ); }
 	private:
-		friend class HSet<value_type, compare_type>;
+		friend class HSet<value_type, compare_type, allocator_t>;
 		explicit HIterator( typename engine_t::HIterator const& it )
 			: base_type(), _engine( it ) {}
 	};
@@ -117,21 +119,24 @@ private:
 	engine_t _engine;
 public:
 	HSet( void )
-		: _engine( compare_type() )
+		: _engine( compare_type(), allocator_type() )
 		{}
 	explicit HSet( compare_type const& compare_ )
-		: _engine( compare_ )
+		: _engine( compare_, allocator_type() )
+		{}
+	explicit HSet( allocator_type const& allocator_ )
+		: _engine( compare_type(), allocator_ )
 		{}
 	template<typename iterator_t>
-	HSet( iterator_t first, iterator_t last, compare_type const& compare_ = compare_type() )
-		: _engine( compare_ ) {
+	HSet( iterator_t first, iterator_t last, compare_type const& compare_ = compare_type(), allocator_type const& allocator_ = allocator_type() )
+		: _engine( compare_, allocator_ ) {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
 	HSet( HSet const& source )
-		: _engine( source._engine.compare() ) {
+		: _engine( source._engine.compare(), source._engine.get_allocator() ) {
 		M_PROLOG
 		_engine.copy_from( source._engine );
 		return;
@@ -145,6 +150,9 @@ public:
 		}
 		return ( *this );
 		M_EPILOG
+	}
+	allocator_type const& get_allocator( void ) const {
+		return ( _engine.get_allocator() );
 	}
 	int long size( void ) const
 		{ return ( get_size() ); }
@@ -230,8 +238,8 @@ public:
 
 }
 
-template<typename value_type, typename compare_t>
-inline void swap( yaal::hcore::HSet<value_type, compare_t>& a, yaal::hcore::HSet<value_type, compare_t>& b )
+template<typename value_type, typename compare_t, typename allocator_t>
+inline void swap( yaal::hcore::HSet<value_type, compare_t, allocator_t>& a, yaal::hcore::HSet<value_type, compare_t, allocator_t>& b )
 	{ a.swap( b ); }
 
 }

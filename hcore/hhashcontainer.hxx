@@ -35,6 +35,7 @@ Copyright:
 #include "hcore/hchunk.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/algorithm.hxx"
+#include "hcore/allocator.hxx"
 
 namespace yaal {
 

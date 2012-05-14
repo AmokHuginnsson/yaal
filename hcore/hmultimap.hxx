@@ -46,14 +46,16 @@ namespace hcore {
  * \tparam value_type_t - type of value held in map.
  * \tparam compare_t - key ordering definition.
  */
-template<typename key_type_t, typename value_type_t, typename compare_t = less<key_type_t>,
+template<typename key_type_t, typename value_type_t,
+	typename compare_t = less<key_type_t>,
+	typename allocator_t = allocator::system<HPair<key_type_t, value_type_t> >,
 	template<typename, typename>class storage_policy_t = HMultiContainerStorage::HTransparent>
 class HMultiMap {
+public:
 	typedef key_type_t key_type;
 	typedef value_type_t data_type;
 	typedef compare_t compare_type;
 	typedef storage_policy_t<key_type const, data_type> storage_t;
-public:
 	typedef HList<typename storage_t::stored_type> value_list_t;
 	typedef HPointer<value_list_t> value_list_ptr_t;
 	typedef HPair<key_type const, data_type> value_type;
@@ -64,22 +66,30 @@ public:
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 private:
-	typedef HMap<key_type, value_list_ptr_t, compare_type> multimap_engine_t;
+	typedef HMap<key_type, value_list_ptr_t, compare_type, allocator_t> multimap_engine_t;
 	multimap_engine_t _engine;
 public:
+	typedef typename multimap_engine_t::allocator_type allocator_type;
+	typedef HMultiMap<key_type_t, value_type_t, compare_t, allocator_t, storage_policy_t> this_type;
 	HMultiMap( void )
 		: _engine()
 		{}
+	explicit HMultiMap( compare_type const& compare_ )
+		: _engine( compare_ )
+		{}
+	explicit HMultiMap( allocator_type const& allocator_ )
+		: _engine( allocator_ )
+		{}
 	template<typename iterator_t>
-	HMultiMap( iterator_t first, iterator_t last )
-		: _engine() {
+	HMultiMap( iterator_t first, iterator_t last, compare_type const& compare_ = compare_type(), allocator_type const& allocator_ = allocator_type() )
+		: _engine( compare_, allocator_ ) {
 		M_PROLOG
 		insert( first, last );
 		return;
 		M_EPILOG
 	}
 	HMultiMap( HMultiMap const& multimap_ )
-		: _engine() {
+		: _engine( multimap_._engine.compare(), multimap_._engine.get_allocator() ) {
 		M_PROLOG
 		_engine.copy_from( multimap_._engine );
 		return;
@@ -93,6 +103,9 @@ public:
 		}
 		return ( *this );
 		M_EPILOG
+	}
+	allocator_type const& get_allocator( void ) const {
+		return ( _engine.get_allocator() );
 	}
 	int long size( void ) const
 		{ return ( get_size() ); }
@@ -314,12 +327,12 @@ private:
 
 /*! \brief Forward iterator for HMultiMap<>.
  */
-template<typename key_type_t, typename value_type_t, typename compare_t, template<typename, typename>class storage_policy_t>
+template<typename key_type_t, typename value_type_t, typename compare_t, typename allocator_t, template<typename, typename>class storage_policy_t>
 template<typename const_qual_t>
-class HMultiMap<key_type_t, value_type_t, compare_t, storage_policy_t>::HIterator : public iterator_interface<typename HMultiMap<key_type, data_type, compare_type, storage_policy_t>::storage_t::template const_aware_type<const_qual_t>::accessor_t, iterator_category::forward> {
+class HMultiMap<key_type_t, value_type_t, compare_t, allocator_t, storage_policy_t>::HIterator : public iterator_interface<typename HMultiMap<key_type, data_type, compare_type, allocator_t, storage_policy_t>::storage_t::template const_aware_type<const_qual_t>::accessor_t, iterator_category::forward> {
 	typedef key_type_t key_type;
 	typedef value_type_t data_type;
-	typedef HMultiMap<key_type, data_type, compare_type, storage_policy_t> multi_map_t;
+	typedef HMultiMap<key_type, data_type, compare_type, allocator_t, storage_policy_t> multi_map_t;
 	typedef typename trait::ternary<trait::same_type<const_qual_t, const_qual_t const>::value,
 					typename multi_map_t::multimap_engine_t::const_iterator,
 					typename multi_map_t::multimap_engine_t::iterator>::type key_iterator_t;
@@ -397,7 +410,7 @@ public:
 	bool operator != ( HIterator const& it ) const
 		{ return ( ! ( ( _major == it._major ) && ( _minor == it._minor ) ) ); }
 private:
-	friend class HMultiMap<key_type, data_type, compare_type, storage_policy_t>;
+	friend class HMultiMap<key_type, data_type, compare_type, allocator_t, storage_policy_t>;
 	explicit HIterator( multi_map_t const* const owner_,
 			key_iterator_t const& major,
 			value_iterator_t const& minor ) : base_type(), _owner( owner_ ), _major( major ), _minor( minor ) {};
@@ -405,9 +418,9 @@ private:
 
 }
 
-template<typename key_type_t, typename value_type_t, typename compare_t, template<typename, typename>class storage_policy_t>
-inline void swap( yaal::hcore::HMultiMap<key_type_t, value_type_t, compare_t, storage_policy_t>& a,
-		yaal::hcore::HMultiMap<key_type_t, value_type_t, compare_t, storage_policy_t>& b )
+template<typename key_type_t, typename value_type_t, typename compare_t, typename allocator_t, template<typename, typename>class storage_policy_t>
+inline void swap( yaal::hcore::HMultiMap<key_type_t, value_type_t, compare_t, allocator_t, storage_policy_t>& a,
+		yaal::hcore::HMultiMap<key_type_t, value_type_t, compare_t, allocator_t, storage_policy_t>& b )
 	{ a.swap( b ); }
 
 }

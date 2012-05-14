@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/hexception.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/hpair.hxx"
+#include "hcore/allocator.hxx"
 
 namespace yaal {
 
@@ -117,7 +118,7 @@ protected:
 	HSBBSTreeBase& operator = ( HSBBSTreeBase const& );
 };
 
-template<typename key_value_t, typename compare_t, typename key_get_t>
+template<typename key_value_t, typename compare_t, typename key_get_t, typename allocator_t>
 class HSBBSTree : public HSBBSTreeBase {
 public:
 	typedef key_value_t key_value_type;
@@ -153,12 +154,16 @@ private:
 		friend class HSBBSTree;
 		friend class HSBBSTree::HIterator;
 	};
+public:
+	typedef typename allocator_t::template rebind<HNode>::other allocator_type;
+private:
 	using HSBBSTreeBase::_root;
 	using HSBBSTreeBase::_size;
 	compare_type _compare;
+	allocator_type _allocator;
 public:
-	HSBBSTree( compare_type const& compare_ )
-		: HSBBSTreeBase(), _compare( compare_ )
+	HSBBSTree( compare_type const& compare_, allocator_type const& allocator_ )
+		: HSBBSTreeBase(), _compare( compare_ ), _allocator( allocator_ )
 		{}
 	~HSBBSTree( void ) {
 		M_PROLOG
@@ -222,6 +227,9 @@ public:
 	compare_type const& compare( void ) const {
 		return ( _compare );
 	}
+	allocator_type const& get_allocator( void ) const {
+		return ( _allocator );
+	}
 private:
 	ONodePtr find_node( key_type const& ) const;
 	HNode* copy_node( HNode const* source ) {
@@ -243,9 +251,9 @@ private:
 
 /*! \brief Iterator for HSBBSTree data structure.
  */
-template<typename key_value_t, typename compare_t, typename key_get_t>
-class HSBBSTree<key_value_t, compare_t, key_get_t>::HIterator {
-	typedef HSBBSTree<key_value_t, compare_t, key_get_t> owner_t;
+template<typename key_value_t, typename compare_t, typename key_get_t, typename allocator_t>
+class HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::HIterator {
+	typedef HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t> owner_t;
 	owner_t const* _owner;
 	HAbstractNode* _current;
 public:
@@ -289,16 +297,16 @@ public:
 		M_EPILOG
 	}
 private:
-	friend class HSBBSTree<key_value_t, compare_t, key_get_t>;
+	friend class HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>;
 	explicit HIterator( owner_t const* owner_, HSBBSTreeBase::HAbstractNode* const node_ )
 		: _owner( owner_ ), _current( node_ ) {
 		return;
 	}
 };
 
-template<typename key_value_t, typename compare_t, typename key_get_t>
-HPair<typename HSBBSTree<key_value_t, compare_t, key_get_t>::HIterator, bool>
-HSBBSTree<key_value_t, compare_t, key_get_t>::insert( key_value_type const& key_ ) {
+template<typename key_value_t, typename compare_t, typename key_get_t, typename allocator_t>
+HPair<typename HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::HIterator, bool>
+HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::insert( key_value_type const& key_ ) {
 	M_PROLOG
 	ONodePtr nodeHolder;
 	HNode* node( NULL );
@@ -329,8 +337,9 @@ HSBBSTree<key_value_t, compare_t, key_get_t>::insert( key_value_type const& key_
 	M_EPILOG
 }
 
-template<typename key_value_t, typename compare_t, typename key_get_t>
-typename HSBBSTree<key_value_t, compare_t, key_get_t>::HIterator HSBBSTree<key_value_t, compare_t, key_get_t>::lower_bound( key_type const& key_ ) const {
+template<typename key_value_t, typename compare_t, typename key_get_t, typename allocator_t>
+typename HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::HIterator
+HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::lower_bound( key_type const& key_ ) const {
 	M_PROLOG
 	HIterator it( this, NULL );
 	if ( _root ) {
@@ -343,8 +352,9 @@ typename HSBBSTree<key_value_t, compare_t, key_get_t>::HIterator HSBBSTree<key_v
 	M_EPILOG
 }
 
-template<typename key_value_t, typename compare_t, typename key_get_t>
-typename HSBBSTree<key_value_t, compare_t, key_get_t>::HIterator HSBBSTree<key_value_t, compare_t, key_get_t>::upper_bound( key_type const& key_ ) const {
+template<typename key_value_t, typename compare_t, typename key_get_t, typename allocator_t>
+typename HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::HIterator
+HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::upper_bound( key_type const& key_ ) const {
 	M_PROLOG
 	HIterator it( this, NULL );
 	if ( _root ) {
@@ -357,8 +367,9 @@ typename HSBBSTree<key_value_t, compare_t, key_get_t>::HIterator HSBBSTree<key_v
 	M_EPILOG
 }
 
-template<typename key_value_t, typename compare_t, typename key_get_t>
-typename HSBBSTree<key_value_t, compare_t, key_get_t>::ONodePtr HSBBSTree<key_value_t, compare_t, key_get_t>::find_node( key_type const& key_ ) const {
+template<typename key_value_t, typename compare_t, typename key_get_t, typename allocator_t>
+typename HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::ONodePtr
+HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::find_node( key_type const& key_ ) const {
 	M_PROLOG
 	ONodePtr nodePtr;
 	if ( _root ) {
@@ -384,8 +395,9 @@ typename HSBBSTree<key_value_t, compare_t, key_get_t>::ONodePtr HSBBSTree<key_va
 
 }
 
-template<typename key_value_t, typename compare_t, typename key_get_t>
-inline void swap( yaal::hcore::HSBBSTree<key_value_t, compare_t, key_get_t>& a, yaal::hcore::HSBBSTree<key_value_t, compare_t, key_get_t>& b )
+template<typename key_value_t, typename compare_t, typename key_get_t, typename allocator_t>
+inline void swap( yaal::hcore::HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>& a,
+		yaal::hcore::HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>& b )
 	{ a.swap( b );	}
 
 }
