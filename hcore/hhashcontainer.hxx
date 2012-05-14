@@ -125,13 +125,16 @@ public:
 					_atom = atom;
 			}
 			if ( ! _atom ) {
-				if ( _index == 0 )
-					_index = _owner->_prime - 1;
-				while ( ( _index > 0 ) && ! buckets[ _index ] )
-					-- _index;
-				_atom = buckets[ _index ];
-				while ( _atom && _atom->_next )
-					_atom = _atom->_next;
+				if ( _index != 0 ) {
+					if ( _index == _owner->_prime )
+						_index = _owner->_prime - 1;
+					while ( ( _index > 0 ) && ! buckets[ _index ] )
+						-- _index;
+					_atom = buckets[ _index ];
+					while ( _atom && _atom->_next )
+						_atom = _atom->_next;
+				} else
+					_index = _owner->_prime;
 			}
 			return ( *this );
 		}
@@ -143,8 +146,10 @@ public:
 			M_ASSERT( _owner == it._owner );
 			return ( ( _index == it._index ) && ( _atom == it._atom ) );
 		}
-		bool operator != ( HIterator const& it ) const
-			{ return ( ! operator == ( it ) ); }
+		bool operator != ( HIterator const& it ) const {
+			M_ASSERT( _owner == it._owner );
+			return ( ( _atom != it._atom ) || ( _index != it._index ) );
+		}
 	private:
 		friend class HHashContainer<value_type, hasher_type, get_key_type, allocator_t>;
 		explicit HIterator( owner_t const* owner_, int long index_, typename owner_t::HAtom* atom_ )

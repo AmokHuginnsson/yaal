@@ -176,6 +176,16 @@ public:
 		{ M_PROLOG return ( iterator( _engine.begin() ) ); M_EPILOG }
 	iterator end( void ) const
 		{ M_PROLOG return ( iterator( _engine.end() ) ); M_EPILOG }
+	reverse_iterator rbegin( void ) const {
+		M_PROLOG
+		return ( end() );
+		M_EPILOG
+	}
+	reverse_iterator rend( void ) const {
+		M_PROLOG
+		return ( begin() );
+		M_EPILOG
+	}
 	iterator find( type_t const& key_ ) const
 		{ M_PROLOG return ( iterator( _engine.find( key_ ) ) ); M_EPILOG }
 	insert_result insert( value_type const& val_ ) {

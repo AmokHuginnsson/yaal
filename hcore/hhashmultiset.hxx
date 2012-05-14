@@ -204,6 +204,16 @@ public:
 		return ( iterator( &_engine, _engine.end(), 0 ) );
 		M_EPILOG
 	}
+	reverse_iterator rbegin( void ) const {
+		M_PROLOG
+		return ( end() );
+		M_EPILOG
+	}
+	reverse_iterator rend( void ) const {
+		M_PROLOG
+		return ( begin() );
+		M_EPILOG
+	}
 	iterator find( type_t const& key_ ) const {
 		M_PROLOG
 		return ( iterator( &_engine, _engine.find( key_ ), 0 ) );

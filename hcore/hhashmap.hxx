@@ -145,6 +145,26 @@ public:
 		{ M_PROLOG return ( const_iterator( _engine.end() ) ); M_EPILOG }
 	iterator end( void )
 		{ M_PROLOG return ( iterator( _engine.end() ) ); M_EPILOG }
+	const_reverse_iterator rbegin( void ) const {
+		M_PROLOG
+		return ( end() );
+		M_EPILOG
+	}
+	const_reverse_iterator rend( void ) const {
+		M_PROLOG
+		return ( begin() );
+		M_EPILOG
+	}
+	reverse_iterator rbegin( void ) {
+		M_PROLOG
+		return ( end() );
+		M_EPILOG
+	}
+	reverse_iterator rend( void ) {
+		M_PROLOG
+		return ( begin() );
+		M_EPILOG
+	}
 	const_iterator find( key_t const& key_ ) const
 		{ M_PROLOG return ( const_iterator( _engine.find( key_ ) ) ); M_EPILOG }
 	iterator find( key_t const& key_ )
