@@ -380,23 +380,34 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
-	HIterator const operator ++ ( int ) {
+	HIterator operator ++ ( int ) {
 		HIterator it( _owner, _major, _minor );
 		operator++();
 		return ( it );
 	}
 	HIterator& operator -- ( void ) {
 		M_PROLOG
-		-- _minor;
-		if ( _minor == _major->second.rend().base() ) {
+		if ( _minor != value_iterator_t() )
+			-- _minor;
+		else {
+			if ( _major != _owner->_engine.rend().base() )
+				_minor = _major->second->rbegin().base();
+		}
+		if ( _major == _owner->_engine.end() ) {
 			-- _major;
-			if ( _major != _owner->_engine.rend() )
-				_minor = _major->second->rbegin();
+			_minor = _major->second->rbegin().base();
+		}
+		if ( _minor == _major->second->rend().base() ) {
+			-- _major;
+			if ( _major != _owner->_engine.rend().base() )
+				_minor = _major->second->rbegin().base();
+			else
+				_minor = value_iterator_t();
 		}
 		return ( *this );
 		M_EPILOG
 	}
-	HIterator const operator -- ( int ) {
+	HIterator operator -- ( int ) {
 		HIterator it( _owner, _major, _minor );
 		operator--();
 		return ( it );
