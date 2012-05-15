@@ -193,12 +193,14 @@ struct ref {
 		}
 	}
 	pointer allocate( size_type n ) {
+		STATIC_ASSERT( sizeof ( value_type ) == sizeof ( typename allocator_type::value_type ) );
 		return ( reinterpret_cast<pointer>( _allocator->allocate( n ) ) );
 	}
 	pointer allocate( size_type n, const_pointer p ) {
 		return ( _allocator->allocate( n, p ) );
 	}
 	void deallocate( pointer p, size_type n ) {
+		STATIC_ASSERT( sizeof ( value_type ) == sizeof ( typename allocator_type::value_type ) );
 		_allocator->deallocate( reinterpret_cast<typename allocator_type::pointer>( p ), n );
 	}
 	pointer address( reference r ) const {
