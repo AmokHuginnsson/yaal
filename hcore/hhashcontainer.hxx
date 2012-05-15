@@ -125,15 +125,15 @@ public:
 					_atom = atom;
 			}
 			if ( ! _atom ) {
-				if ( _index != 0 ) {
-					if ( _index == _owner->_prime )
-						_index = _owner->_prime - 1;
+				if ( _index > 0 ) {
+					-- _index;
 					while ( ( _index > 0 ) && ! buckets[ _index ] )
 						-- _index;
 					_atom = buckets[ _index ];
 					while ( _atom && _atom->_next )
 						_atom = _atom->_next;
-				} else
+				}
+				else
 					_index = _owner->_prime;
 			}
 			return ( *this );
@@ -207,7 +207,7 @@ public:
 	HPair<HIterator, bool> insert( value_type const& );
 	HIterator begin( void ) const {
 		M_PROLOG
-		HIterator it( this, 0, NULL );
+		HIterator it( this, _prime, NULL );
 		return ( ++ it );
 		M_EPILOG
 	}
