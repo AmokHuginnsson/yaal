@@ -49,6 +49,7 @@ private:
 public:
 	typedef value_t value_type;
 	class HNode;
+	typedef typename sequence_t<HNode*, allocator::ref<HNode*, allocator_t> >::allocator_type ref_branch_allocator_type;
 	typedef HNode* node_t;
 	typedef HNode const* const_node_t;
 	/*! \brief Basic building block of HTree<>.
@@ -58,8 +59,7 @@ public:
 		template<typename const_qual_t>
 		class HIterator;
 		typedef value_t value_type;
-		typedef allocator::ref<typename sequence_t<HNode*, allocator_t>::allocator_type::value_type, typename sequence_t<HNode*, allocator_t>::allocator_type> branch_allocator_type;
-		typedef sequence_t<HNode*, branch_allocator_type> branch_t;
+		typedef sequence_t<HNode*, allocator::ref<HNode*, allocator_t> > branch_t;
 		typedef HIterator<HNode> iterator;
 		typedef HIterator<HNode const> const_iterator;
 		typedef HReverseIterator<iterator> reverse_iterator;
@@ -307,7 +307,7 @@ public:
 		/*! \brief Create a root node.
 		 */
 		HNode( tree_t* tree_ )
-			: _data(), _branch( branch_allocator_type( &tree_->_branchAllocator ) ),
+			: _data(), _branch( ref_branch_allocator_type( &tree_->_branchAllocator ) ),
 			_trunk( NULL ), _tree( tree_ ), _allocator( allocator_type( &tree_->_allocator ) ) {
 			M_PROLOG
 			M_ASSERT( tree_ );
@@ -317,7 +317,7 @@ public:
 		/*! \brief Create a root node.
 		 */
 		HNode( tree_t* tree_, value_type const& value_ )
-			: _data( value_ ), _branch( branch_allocator_type( &tree_->_branchAllocator ) ),
+			: _data( value_ ), _branch( ref_branch_allocator_type( &tree_->_branchAllocator ) ),
 			_trunk( NULL ), _tree( tree_ ), _allocator( allocator_type( &tree_->_allocator ) ) {
 			M_PROLOG
 			M_ASSERT( tree_ );
@@ -336,7 +336,7 @@ public:
 		}
 		/*! \brief Clone node.
 		 */
-		HNode( value_t const& data, branch_allocator_type const& branchAllocator_, allocator_type const& allocator_ )
+		HNode( value_t const& data, ref_branch_allocator_type const& branchAllocator_, allocator_type const& allocator_ )
 			: _data( data ), _branch( branchAllocator_ ), _trunk( NULL ), _tree( NULL ), _allocator( allocator_ ) {
 			M_PROLOG
 			return;
@@ -383,7 +383,7 @@ public:
 			return;
 			M_EPILOG
 		}
-		node_t clone_self_to( allocator_type& allocator_, branch_allocator_type const& branchAllocator_, HNode* parent ) const {
+		node_t clone_self_to( allocator_type& allocator_, ref_branch_allocator_type const& branchAllocator_, HNode* parent ) const {
 			M_PROLOG
 			node_t node( allocator_.allocate( 1 ) );
 			try {
@@ -416,7 +416,7 @@ public:
 	};
 
 	typedef typename allocator_t::template rebind<HNode>::other allocator_type;
-	typedef typename sequence_t<HNode*, allocator_t>::allocator_type branch_allocator_type;
+	typedef typename ref_branch_allocator_type::allocator_type branch_allocator_type;
 
 	template<typename const_qual_t>
 	class HIterator;
@@ -458,8 +458,7 @@ public:
 		M_PROLOG
 		if ( t._root ) {
 			typename HNode::allocator_type allocator( &_allocator );
-			typename HNode::branch_allocator_type branchAllocator( &_branchAllocator );
-			_root = t._root->clone_self_to( allocator, branchAllocator, NULL );
+			_root = t._root->clone_self_to( allocator, ref_branch_allocator_type( &_branchAllocator ), NULL );
 		}
 		_root && ( _root->_tree = this );
 		return;
@@ -470,8 +469,7 @@ public:
 		M_PROLOG
 		if ( t._root ) {
 			typename HNode::allocator_type allocator( &_allocator );
-			typename HNode::branch_allocator_type branchAllocator( &_branchAllocator );
-			_root = t._root->clone_self_to( allocator, branchAllocator, NULL );
+			_root = t._root->clone_self_to( allocator, ref_branch_allocator_type( &_branchAllocator ), NULL );
 		}
 		_root && ( _root->_tree = this );
 		return;

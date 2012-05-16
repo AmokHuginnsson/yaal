@@ -174,7 +174,7 @@ struct ref {
 	allocator_type* _allocator;
 	template<typename U>
 	struct rebind {
-		typedef ref<U, allocator_type> other;
+		typedef ref<U, typename allocator_type::template rebind<U>::other> other;
 	};
 	explicit ref( allocator_type* allocator_ )
 		: _allocator( allocator_ )
