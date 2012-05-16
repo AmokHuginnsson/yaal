@@ -192,7 +192,8 @@ public:
 			while ( atom ) {
 				HAtom* del( atom );
 				atom = atom->_next;
-				M_SAFE( delete del );
+				M_SAFE( del->~HAtom() );
+				_allocator.deallocate( del, 1 );
 			}
 			buckets[ i ] = NULL;
 		}
@@ -230,7 +231,8 @@ public:
 				ancestor->_next = atom->_next;
 			else
 				buckets[ it._index ] = atom->_next;
-			M_SAFE( delete atom );
+			M_SAFE( atom->~HAtom() );
+			_allocator.deallocate( atom, 1 );
 			-- _size;
 		}
 		return;
@@ -244,7 +246,8 @@ public:
 		for ( int long i( 0 ); i < src_._prime; ++ i ) {
 			HAtom const* origAtom( otherBuckets[ i ] );
 			while ( origAtom ) {
-				HAtom* atom( new HAtom( origAtom->_value ) );
+				HAtom* atom( _allocator.allocate( 1 ) );
+				new ( atom ) HAtom( origAtom->_value );
 				origAtom = origAtom->_next;
 				atom->_next = buckets[ i ];
 				buckets[ i ] = atom;
@@ -293,7 +296,8 @@ HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::insert( value_type co
 	if ( it == end() ) {
 		if ( ( _size + 1 ) > _prime )
 			resize( ( _size + 1 ) * 2 );
-		HAtom* atom = new ( memory::yaal ) HAtom( val_ );
+		HAtom* atom( _allocator.allocate( 1 ) );
+		new ( atom ) HAtom( val_ );
 
 		/* I cannot use index calculated in find() call above because here we use different prime.
 		 */

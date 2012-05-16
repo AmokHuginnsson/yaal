@@ -137,18 +137,8 @@ private:
 		using HAbstractNode::_right;
 		key_value_type _key;
 		HNode( key_value_type const& key_ )
-			: HAbstractNode(), _key( key_ ) {
-			return;
-		}
-		~HNode( void ) {
-			if ( _left )
-				M_SAFE( delete static_cast<HNode*>( _left ) );
-			_left = NULL;
-			if ( _right )
-				M_SAFE( delete static_cast<HNode*>( _right ) );
-			_right = NULL;
-			return;
-		}
+			: HAbstractNode(), _key( key_ )
+			{}
 		HNode( HNode const& );
 		HNode& operator = ( HNode const& );
 		friend class HSBBSTree;
@@ -178,7 +168,9 @@ public:
 			M_THROW( _errMsgHSBBSTree_[ ERROR::NIL_ITERATOR ],
 					static_cast<int>( ERROR::NIL_ITERATOR ) );
 		remove_node( it_._current );
-		M_SAFE( delete static_cast<HNode*>( it_._current ) );
+		HNode* node( static_cast<HNode*>( it_._current ) );
+		M_SAFE( node->~HNode() );
+		_allocator.deallocate( node, 1 );
 		return;
 		M_EPILOG
 	}
@@ -199,7 +191,7 @@ public:
 	void clear( void ) {
 		M_PROLOG
 		if ( _root )
-			M_SAFE( delete static_cast<HNode*>( _root ) );
+			delete_node( static_cast<HNode*>( _root ) );
 		_root = NULL;
 		_size = 0;
 		M_EPILOG
@@ -234,7 +226,8 @@ private:
 	ONodePtr find_node( key_type const& ) const;
 	HNode* copy_node( HNode const* source ) {
 		M_PROLOG
-		HNode* node( new HNode( source->_key ) );
+		HNode* node( _allocator.allocate( 1 ) );
+		new ( node ) HNode( source->_key );
 		node->_color = source->_color;
 		if ( source->_left ) {
 			node->_left = copy_node( static_cast<HNode*>( source->_left ) );
@@ -245,6 +238,18 @@ private:
 			static_cast<HNode*>( node->_right )->_parent = node;
 		}
 		return ( node );
+		M_EPILOG
+	}
+	void delete_node( HNode* node_ ) {
+		M_PROLOG
+		if ( node_->_left )
+			delete_node( static_cast<HNode*>( node_->_left ) );
+		node_->_left = NULL;
+		if ( node_->_right )
+			delete_node( static_cast<HNode*>( node_->_right ) );
+		node_->_right = NULL;
+		M_SAFE( node_->~HNode() );
+		_allocator.deallocate( node_, 1 );
 		M_EPILOG
 	}
 };
@@ -313,7 +318,8 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::insert( key_value_typ
 	if ( _root )
 		nodeHolder = find_node( key_get_type::key( key_ ) );
 	if ( ! nodeHolder._exists ) {
-		node = new ( memory::yaal ) HNode( key_ );
+		node = _allocator.allocate( 1 );
+		new ( node ) HNode( key_ );
 		++ _size;
 		if ( _root ) {
 			node->_parent = nodeHolder._node;
