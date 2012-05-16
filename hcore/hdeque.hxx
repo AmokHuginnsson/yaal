@@ -226,10 +226,16 @@ public:
 	const_iterator begin( void ) const {
 		return ( const_iterator( this, 0 ) );
 	}
+	const_iterator cbegin( void ) const {
+		return ( const_iterator( this, 0 ) );
+	}
 	iterator begin( void ) {
 		return ( iterator( this, 0 ) );
 	}
 	const_iterator end( void ) const {
+		return ( const_iterator( this, _size ) );
+	}
+	const_iterator cend( void ) const {
 		return ( const_iterator( this, _size ) );
 	}
 	iterator end( void ) {
@@ -238,10 +244,16 @@ public:
 	const_reverse_iterator rbegin( void ) const {
 		return ( const_iterator( this, _size ) );
 	}
+	const_reverse_iterator crbegin( void ) const {
+		return ( const_iterator( this, _size ) );
+	}
 	reverse_iterator rbegin( void ) {
 		return ( iterator( this, _size ) );
 	}
 	const_reverse_iterator rend( void ) const {
+		return ( const_iterator( this, 0 ) );
+	}
+	const_reverse_iterator crend( void ) const {
 		return ( const_iterator( this, 0 ) );
 	}
 	reverse_iterator rend( void ) {

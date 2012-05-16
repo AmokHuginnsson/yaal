@@ -263,6 +263,9 @@ public:
 		return ( const_iterator( this, major, minor ) );
 		M_EPILOG
 	}
+	const_iterator cbegin( void ) const {
+		return ( begin() );
+	}
 	iterator begin( void ) {
 		M_PROLOG
 		typename multimap_engine_t::iterator major = _engine.begin();
@@ -274,9 +277,16 @@ public:
 	}
 	const_iterator end( void ) const
 		{ return ( const_iterator( this, _engine.end(), typename value_list_t::const_iterator() ) ); }
+	const_iterator cend( void ) const
+		{ return ( end() ); }
 	iterator end( void )
 		{ return ( iterator( this, _engine.end(), typename value_list_t::iterator() ) ); }
 	const_reverse_iterator rbegin( void ) const {
+		M_PROLOG
+		return ( end() );
+		M_EPILOG
+	}
+	const_reverse_iterator crbegin( void ) const {
 		M_PROLOG
 		return ( end() );
 		M_EPILOG
@@ -287,6 +297,8 @@ public:
 		M_EPILOG
 	}
 	const_reverse_iterator rend( void ) const
+		{ return ( begin() ); }
+	const_reverse_iterator crend( void ) const
 		{ return ( begin() ); }
 	reverse_iterator rend( void )
 		{ return ( begin() ); }

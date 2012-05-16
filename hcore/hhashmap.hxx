@@ -139,9 +139,13 @@ public:
 		{ M_PROLOG return ( insert( make_pair( key_, data_t() ) ).first->second ); M_EPILOG }
 	const_iterator begin( void ) const
 		{ M_PROLOG return ( const_iterator( _engine.begin() ) ); M_EPILOG }
+	const_iterator cbegin( void ) const
+		{ M_PROLOG return ( const_iterator( _engine.begin() ) ); M_EPILOG }
 	iterator begin( void )
 		{ M_PROLOG return ( iterator( _engine.begin() ) ); M_EPILOG }
 	const_iterator end( void ) const
+		{ M_PROLOG return ( const_iterator( _engine.end() ) ); M_EPILOG }
+	const_iterator cend( void ) const
 		{ M_PROLOG return ( const_iterator( _engine.end() ) ); M_EPILOG }
 	iterator end( void )
 		{ M_PROLOG return ( iterator( _engine.end() ) ); M_EPILOG }
@@ -151,6 +155,16 @@ public:
 		M_EPILOG
 	}
 	const_reverse_iterator rend( void ) const {
+		M_PROLOG
+		return ( begin() );
+		M_EPILOG
+	}
+	const_reverse_iterator crbegin( void ) const {
+		M_PROLOG
+		return ( end() );
+		M_EPILOG
+	}
+	const_reverse_iterator crend( void ) const {
 		M_PROLOG
 		return ( begin() );
 		M_EPILOG

@@ -126,16 +126,48 @@ public:
 	void insert( iterator, int long, type_t const& );
 	iterator erase( iterator );
 	iterator erase( iterator, iterator );
-	iterator begin( void );
-	iterator find( int long );
-	iterator end( void );
-	const_iterator begin( void ) const;
-	const_iterator find( int long ) const;
-	const_iterator end( void ) const;
-	reverse_iterator rbegin( void );
-	reverse_iterator rend( void );
-	const_reverse_iterator rbegin( void ) const;
-	const_reverse_iterator rend( void ) const;
+	iterator begin( void ) {
+		return ( iterator( this, 0 ) );
+	}
+	iterator find( int long idx ) {
+		return ( iterator( this, min( idx, _size ) ) );
+	}
+	iterator end( void ) {
+		return ( iterator( this, _size ) );
+	}
+	const_iterator begin( void ) const {
+		return ( const_iterator( this, 0 ) );
+	}
+	const_iterator cbegin( void ) const {
+		return ( const_iterator( this, 0 ) );
+	}
+	const_iterator find( int long idx ) const {
+		return ( const_iterator( this, min( idx, _size ) ) );
+	}
+	const_iterator end( void ) const {
+		return ( const_iterator( this, _size ) );
+	}
+	const_iterator cend( void ) const {
+		return ( const_iterator( this, _size ) );
+	}
+	reverse_iterator rbegin( void ) {
+		return ( end() );
+	}
+	reverse_iterator rend( void ) {
+		return ( begin() );
+	}
+	const_reverse_iterator rbegin( void ) const {
+		return ( end() );
+	}
+	const_reverse_iterator rend( void ) const {
+		return ( begin() );
+	}
+	const_reverse_iterator crbegin( void ) const {
+		return ( end() );
+	}
+	const_reverse_iterator crend( void ) const {
+		return ( begin() );
+	}
 	void swap( HRing& );
 	bool operator == ( HRing const& ) const;
 	bool operator < ( HRing const& ) const;
@@ -716,56 +748,6 @@ int long HRing<type_t>::capacity( void ) const {
 template<typename type_t>
 int long HRing<type_t>::get_capacity( void ) const {
 	return ( _buf.count_of<value_type>() );
-}
-
-template<typename type_t>
-typename HRing<type_t>::iterator HRing<type_t>::begin( void ) {
-	return ( iterator( this, 0 ) );
-}
-
-template<typename type_t>
-typename HRing<type_t>::iterator HRing<type_t>::find( int long idx ) {
-	return ( iterator( this, min( idx, _size ) ) );
-}
-
-template<typename type_t>
-typename HRing<type_t>::iterator HRing<type_t>::end( void ) {
-	return ( iterator( this, _size ) );
-}
-
-template<typename type_t>
-typename HRing<type_t>::const_iterator HRing<type_t>::begin( void ) const {
-	return ( const_iterator( this, 0 ) );
-}
-
-template<typename type_t>
-typename HRing<type_t>::const_iterator HRing<type_t>::find( int long idx ) const {
-	return ( const_iterator( this, min( idx, _size ) ) );
-}
-
-template<typename type_t>
-typename HRing<type_t>::const_iterator HRing<type_t>::end( void ) const {
-	return ( const_iterator( this, _size ) );
-}
-
-template<typename type_t>
-typename HRing<type_t>::reverse_iterator HRing<type_t>::rbegin( void ) {
-	return ( end() );
-}
-
-template<typename type_t>
-typename HRing<type_t>::reverse_iterator HRing<type_t>::rend( void ) {
-	return ( begin() );
-}
-
-template<typename type_t>
-typename HRing<type_t>::const_reverse_iterator HRing<type_t>::rbegin( void ) const {
-	return ( end() );
-}
-
-template<typename type_t>
-typename HRing<type_t>::const_reverse_iterator HRing<type_t>::rend( void ) const {
-	return ( begin() );
 }
 
 template<typename type_t>

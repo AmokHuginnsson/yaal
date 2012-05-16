@@ -174,17 +174,25 @@ public:
 		{ return ( iterator( _engine.begin() ) ); }
 	const_iterator begin( void ) const
 		{ return ( const_iterator( _engine.begin() ) ); }
+	const_iterator cbegin( void ) const
+		{ return ( const_iterator( _engine.begin() ) ); }
 	iterator end( void )
 		{ return ( iterator( _engine.end() ) ); }
 	const_iterator end( void ) const
+		{ return ( const_iterator( _engine.end() ) ); }
+	const_iterator cend( void ) const
 		{ return ( const_iterator( _engine.end() ) ); }
 	reverse_iterator rbegin( void )
 		{ return ( end() ); }
 	const_reverse_iterator rbegin( void ) const
 		{ return ( end() ); }
+	const_reverse_iterator crbegin( void ) const
+		{ return ( end() ); }
 	reverse_iterator rend( void )
 		{ return ( begin() ); }
 	const_reverse_iterator rend( void ) const
+		{ return ( begin() ); }
+	const_reverse_iterator crend( void ) const
 		{ return ( begin() ); }
 	data_type& operator[] ( key_type const& key ) {
 		M_PROLOG

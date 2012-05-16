@@ -377,10 +377,16 @@ public:
 	const_iterator begin( void ) const {
 		return ( const_iterator( this, 0 ) );
 	}
+	const_iterator cbegin( void ) const {
+		return ( const_iterator( this, 0 ) );
+	}
 	const_iterator find( int long idx ) const {
 		return ( const_iterator( this, min( idx, _size ) ) );
 	}
 	const_iterator end( void ) const {
+		return ( const_iterator( this, _size ) );
+	}
+	const_iterator cend( void ) const {
 		return ( const_iterator( this, _size ) );
 	}
 	reverse_iterator rbegin( void ) {
@@ -393,6 +399,12 @@ public:
 		return ( end() );
 	}
 	const_reverse_iterator rend( void ) const {
+		return ( begin() );
+	}
+	const_reverse_iterator crbegin( void ) const {
+		return ( end() );
+	}
+	const_reverse_iterator crend( void ) const {
 		return ( begin() );
 	}
 	bool operator == ( HArray const& a_ ) const {

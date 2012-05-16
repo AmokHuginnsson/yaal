@@ -279,10 +279,16 @@ public:
 	const_iterator begin( void ) const {
 		return ( const_iterator( this, _hook ) );
 	}
+	const_iterator cbegin( void ) const {
+		return ( const_iterator( this, _hook ) );
+	}
 	iterator begin( void ) {
 		return ( iterator( this, _hook ) );
 	}
 	const_iterator end( void ) const {
+		return ( const_iterator( this, NULL ) );
+	}
+	const_iterator cend( void ) const {
 		return ( const_iterator( this, NULL ) );
 	}
 	iterator end( void ) {
@@ -291,10 +297,16 @@ public:
 	const_reverse_iterator rbegin( void ) const {
 		return ( end() );
 	}
+	const_reverse_iterator crbegin( void ) const {
+		return ( end() );
+	}
 	reverse_iterator rbegin( void ) {
 		return ( end() );
 	}
 	const_reverse_iterator  rend( void ) const {
+		return ( begin() );
+	}
+	const_reverse_iterator  crend( void ) const {
 		return ( begin() );
 	}
 	reverse_iterator rend( void ) {
