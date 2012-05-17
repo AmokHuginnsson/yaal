@@ -33,6 +33,66 @@ namespace yaal {
 
 namespace tools {
 
+class HMemoryHandlingStrategyInterface {
+public:
+	int long get_size( void ) const
+		{ return ( do_get_size() ); }
+	void* get_memory( void ) const
+		{ return ( do_get_memory() ); }
+	void commit( int long size_ )
+		{ do_commit( size_ ); }
+	virtual ~HMemoryHandlingStrategyInterface( void )
+		{}
+protected:
+	virtual int long do_get_size( void ) const = 0;
+	virtual void* do_get_memory( void ) const = 0;
+	virtual void do_commit( int long ) = 0;
+};
+
+class HMemoryObserver : public HMemoryHandlingStrategyInterface {
+	void* _block;
+	int long _size;
+public:
+	/*! \brief Create new memory accessor.
+	 *
+	 * \param ptr - pointer to memory block to be wrapped.
+	 * \param size - size of memory block in octets.
+	 */
+	HMemoryObserver( void* ptr, int long size )
+		: _block( ptr ), _size( size ) {
+		M_ASSERT( size > 0 );
+		M_ASSERT( ptr );
+	}
+protected:
+	virtual int long do_get_size( void ) const
+		{ return ( _size ); }
+	virtual void* do_get_memory( void ) const
+		{ return ( _block ); }
+	virtual void do_commit( int long )
+		{}
+private:
+	HMemoryObserver( HMemoryObserver const& );
+	HMemoryObserver& operator = ( HMemoryObserver const& );
+};
+
+class HMemoryProvider : public HMemoryHandlingStrategyInterface {
+	yaal::hcore::HChunk& _chunk;
+public:
+	HMemoryProvider( yaal::hcore::HChunk& chunk_ )
+		: _chunk( chunk_ ) 
+		{}
+protected:
+	virtual int long do_get_size( void ) const
+		{ return ( _chunk.get_size() ); }
+	virtual void* do_get_memory( void ) const
+		{ return ( _chunk.raw() ); }
+	virtual void do_commit( int long size_ )
+		{ _chunk.realloc( size_ ); }
+private:
+	HMemoryProvider( HMemoryProvider const& );
+	HMemoryProvider& operator = ( HMemoryProvider const& );
+};
+
 /*! \brief Stream based access to raw memory block.
  *
  * This stream based memory accessor wrapper does not own the memory block.
@@ -49,32 +109,15 @@ public:
 		} enum_t;
 	};
 private:
-	void* _block;
-	int long _size;
+	HMemoryHandlingStrategyInterface& _memory;
 	int long _valid;
 	int long _cursorRead;
 	int long _cursorWrite;
 public:
-	/*! \brief Create new memory accessor.
-	 *
-	 * \param ptr - pointer to memory block to be wrapped.
-	 * \param size - size of memory block in octets.
-	 */
-	HMemory( void* ptr, int long size, INITIAL_STATE::enum_t = INITIAL_STATE::AUTO );
-	/*! \brief Copy constructor.
-	 *
-	 * \param src - original HMemory object to be copied.
-	 */
-	HMemory( HMemory const& src );
+	HMemory( HMemoryHandlingStrategyInterface& memory_, INITIAL_STATE::enum_t = INITIAL_STATE::AUTO );
 	/*! \brief Destructor.
 	 */
 	virtual ~HMemory( void );
-	/*! \brief Assign operator.
-	 *
-	 * \param src - original HMemory object to be copied.
-	 * \return Self.
-	 */
-	HMemory& operator = ( HMemory const& src );
 	/*! \brief Check if two blocks of memory have identical contents.
 	 *
 	 * \param other - check for equality with this block.
@@ -86,6 +129,8 @@ private:
 	virtual void do_flush( void ) const;
 	virtual int long do_read( void* const, int long );
 	virtual bool do_is_valid( void ) const;
+	HMemory( HMemory const& src );
+	HMemory& operator = ( HMemory const& src );
 };
 
 typedef yaal::hcore::HExceptionT<HMemory, yaal::hcore::HStreamInterfaceException> HMemoryException;
