@@ -66,12 +66,15 @@ private:
 	mutable HString _errorCause;   /*!< cause of last error */
 	mutable HString _errorMessage; /*!< error message of last operation */
 public:
+	HPattern( void );
+	HPattern( char const* const );
+	HPattern( HString const& );
 	/*! \brief Construct pattern with regex rule.
 	 *
 	 * \param pattern - regex rule to construct pattern object.
-	 * \param caseSentitive - shall defualt match policy be: case matters, default ignore case state
+	 * \param ignoreCase - shall defualt match policy be: case matters, default ignore case state
 	 */
-	HPattern( HString const& pattern = HString(), bool caseSentitive = false );
+	HPattern( HString const& pattern, bool ignoreCase );
 	virtual ~HPattern( void );
 	/*! \brief Parse regular expression pattern with configuration and prepare for matches retrieval.
 	 *
@@ -95,7 +98,14 @@ public:
 	 * raw memory pointers to input string while dereferenced.
 	 */
 	HMatchIterator find( char const* const string_ ) const;
+	HMatchIterator find( HString const& string_ ) const;
 	HMatchIterator end( void ) const;
+	/*! \brief Tell if given string matches pattern.
+	 *
+	 * \param string_ - string to check against the pattern.
+	 * \return True iff given string matches this pattern.
+	 */
+	bool matches( HString const& string_ ) const;
 private:
 	char const* error_message( int = 0 ) const;
 	void error_clear( void ) const;

@@ -32,6 +32,7 @@ Copyright:
 
 #include "hcore/base.hxx"
 #include "hcore/hstring.hxx"
+#include "hcore/hpattern.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
 
 namespace yaal {
@@ -173,6 +174,23 @@ template<typename iter_t, typename item_t>
 HAlike<iter_t, item_t> alike( iter_t iter, item_t const& item, bool damerau = true ) {
 	return ( HAlike<iter_t, item_t>( iter, item, damerau ) );
 }
+
+}
+
+namespace filesystem {
+
+struct FILE_TYPE {
+	typedef enum {
+		REGULAR_FILE = 1,
+		DIRECTORY = 2,
+		ALL = REGULAR_FILE | DIRECTORY
+	} enum_t;
+};
+
+typedef yaal::hcore::HArray<yaal::hcore::HString> find_result;
+
+find_result find( yaal::hcore::HString const&, yaal::hcore::HPattern const&,
+		int = 0, int = meta::max_signed<int>::value, FILE_TYPE::enum_t = FILE_TYPE::ALL );
 
 }
 

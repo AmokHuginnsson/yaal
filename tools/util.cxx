@@ -44,6 +44,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "xmath.hxx"
 #include "hcore/hrandomizer.hxx"
 #include "hcore/htls.hxx"
+#include "hfsitem.hxx"
 
 using namespace yaal::hcore;
 
@@ -340,47 +341,47 @@ int modulo_ASCII( HString const& aSCIINumber_, int modulo_ ) {
 
 }
 
-bool verify_IBAN( HString const& iBAN_ ) {
+bool verify_IBAN( HString const& IBAN_ ) {
 	M_PROLOG
 	int ctr = 0;
-	int long length = iBAN_.get_length();
-	char pattern [ 2 ] = "\0";
-	HString iBAN, tmpString;
+	int long length = IBAN_.get_length();
+	char pattern[ 2 ] = "\0";
+	HString IBAN, tmpString;
 	if ( length < MIN_IBAN_LENGTH ) {
-		_lastErrorMessage_.format ( "IBAN: Number too short (%d).", static_cast<int>( length ) );
+		_lastErrorMessage_.format( "IBAN: Number too short (%d).", static_cast<int>( length ) );
 		return ( true );
 	}
-	iBAN.hs_realloc( length );
+	IBAN.hs_realloc( length );
 	for ( ctr = 0; ctr < length; ctr ++ )
-		if ( isalnum( iBAN_[ ctr ] ) )
-			iBAN += iBAN_[ ctr ];
-	length = iBAN.get_length();
+		if ( isalnum( IBAN_[ ctr ] ) )
+			IBAN += IBAN_[ ctr ];
+	length = IBAN.get_length();
 	if ( length < MIN_IBAN_LENGTH ) {
-		_lastErrorMessage_.format ( "IBAN: Number too short (%d).", static_cast<int>( length ) );
+		_lastErrorMessage_.format( "IBAN: Number too short (%d).", static_cast<int>( length ) );
 		return ( true );
 	}
-	if ( ! ( isalpha ( iBAN [ 0 ] ) && isalpha ( iBAN [ 1 ] ) ) ) {
+	if ( ! ( isalpha( IBAN[ 0 ] ) && isalpha( IBAN[ 1 ] ) ) ) {
 		_lastErrorMessage_ = "IBAN: No country code present.";
 		return ( true );
 	}
-	tmpString = iBAN.left ( 4 );
-	iBAN.shift_left ( 4 );
-	iBAN += tmpString;
-/*	M_LOG ( iBAN ); */
-	iBAN.lower();
+	tmpString = IBAN.left( 4 );
+	IBAN.shift_left ( 4 );
+	IBAN += tmpString;
+/*	M_LOG ( IBAN ); */
+	IBAN.lower();
 	for ( ctr = 0; ctr < length; ctr ++ ) {
-		if ( isalpha ( iBAN [ ctr ] ) ) {
-			tmpString.format ( "%02d", ( iBAN [ ctr ] - 'a' ) + 10 );
-			pattern [ 0 ] = iBAN [ ctr ];
-			iBAN.replace ( pattern, tmpString );
-			length = iBAN.get_length();
+		if ( isalpha ( IBAN[ ctr ] ) ) {
+			tmpString.format( "%02d", ( IBAN[ ctr ] - 'a' ) + 10 );
+			pattern[ 0 ] = IBAN[ ctr ];
+			IBAN.replace( pattern, tmpString );
+			length = IBAN.get_length();
 		}
 	}
-/*	M_LOG ( iBAN ); */
-	ctr = modulo_ASCII( iBAN, 97 );
+/*	M_LOG ( IBAN ); */
+	ctr = modulo_ASCII( IBAN, 97 );
 	if ( ctr == 1 )
 		return ( false );
-	_lastErrorMessage_.format ( "IBAN: bad checksum: %d", ctr );
+	_lastErrorMessage_.format( "IBAN: bad checksum: %d", ctr );
 	return ( true );
 	M_EPILOG
 }
@@ -832,6 +833,41 @@ void decrypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInte
 	}
 	return;
 	M_EPILOG
+}
+
+}
+
+namespace filesystem {
+
+find_result find( yaal::hcore::HString const& in, yaal::hcore::HPattern const& pattern_,
+		int minDepth_, int maxDepth_, FILE_TYPE::enum_t fileType_ ) {
+	find_result result;
+	HFSItem p( in );
+	if ( !! p ) {
+		if ( p.is_file() ) {
+			if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::REGULAR_FILE ) && pattern_.matches( in ) ) {
+				result.push_back( in );
+			}
+		} else if ( p.is_directory() ) {
+			for ( HFSItem::HIterator it( p.begin() ), end( p.end() ); it != end; ++ it ) {
+				if ( it->is_file() ) {
+					if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::REGULAR_FILE ) && pattern_.matches( it->get_path() ) )
+						result.push_back( it->get_path() );
+				} else if ( it->is_directory() ) {
+					HString name( it->get_name() );
+					if ( ( name == "." ) || ( name == ".." ) )
+						continue;
+					if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::DIRECTORY ) && pattern_.matches( it->get_path() ) )
+						result.push_back( it->get_path() );
+					if ( maxDepth_ > 0 ) {
+						find_result sub( find( it->get_path(), pattern_, minDepth_ > 0 ? minDepth_ - 1 : 0, maxDepth_ - 1 ) );
+						result.insert( result.end(), sub.begin(), sub.end() );
+					}
+				}
+			}
+		}
+	}
+	return ( result );
 }
 
 }
