@@ -155,7 +155,13 @@ public:
 
 	/*! \brief Create an empty list.
 	 */
-	explicit HList( allocator_type const& allocator_ = allocator_type() )
+	HList( void )
+		: OListBits(), _allocator( allocator_type() ), _size( 0 ), _hook( NULL )
+		{}
+
+	/*! \brief Create an empty list.
+	 */
+	explicit HList( allocator_type const& allocator_ )
 		: OListBits(), _allocator( allocator_ ), _size( 0 ), _hook( NULL )
 		{}
 
@@ -163,7 +169,21 @@ public:
 	 *
 	 * \param count_ - number of element for newly created list.
 	 */
-	HList( int long count_, allocator_type const& allocator_ = allocator_type() )
+	explicit HList( int long count_ )
+		: OListBits(), _allocator( allocator_type() ),
+		_size( 0 ), _hook( NULL ) {
+		M_PROLOG
+		while ( count_ -- )
+			add_tail();
+		return;
+		M_EPILOG
+	}
+
+	/*! \brief Creates list, with specified size.
+	 *
+	 * \param count_ - number of element for newly created list.
+	 */
+	HList( int long count_, allocator_type const& allocator_ )
 		: OListBits(), _allocator( allocator_ ),
 		_size( 0 ), _hook( NULL ) {
 		M_PROLOG

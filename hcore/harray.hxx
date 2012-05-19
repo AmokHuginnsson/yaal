@@ -75,11 +75,22 @@ public:
 	typedef HIterator<type_t const> const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
-	explicit HArray( allocator_t const& = allocator_t() )
+	HArray( void )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		return;
 	}
-	HArray( int long size_, allocator_t const& = allocator_t() )
+	explicit HArray( allocator_t const& )
+		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		return;
+	}
+	explicit HArray( int long size_ )
+		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		M_PROLOG
+		resize( size_ );
+		return;
+		M_EPILOG
+	}
+	HArray( int long size_, allocator_t const& )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
 		resize( size_ );

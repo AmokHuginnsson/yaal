@@ -84,12 +84,23 @@ private:
 	int long _start;
 	int long _size;
 public:
-	explicit HDeque( allocator_t const& = allocator_t() )
+	HDeque( void )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		return;
 	}
+	explicit HDeque( allocator_t const& )
+		: _chunks(), _start( 0 ), _size( 0 ) {
+		return;
+	}
+	explicit HDeque( int long size_ )
+		: _chunks(), _start( 0 ), _size( 0 ) {
+		M_PROLOG
+		resize( size_ );
+		return;
+		M_EPILOG
+	}
 
-	HDeque( int long size_, allocator_t const& = allocator_t() )
+	HDeque( int long size_, allocator_t const& )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		M_PROLOG
 		resize( size_ );
