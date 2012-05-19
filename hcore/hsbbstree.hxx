@@ -60,24 +60,6 @@ public:
 		} error_t;
 	};
 private:
-	class HAbstractNode;
-	struct ONodePtr {
-		HAbstractNode* _node;
-		bool _exists;
-		ONodePtr( void )
-			: _node( NULL ), _exists( false )
-			{ }
-		ONodePtr( ONodePtr const& np )
-			: _node( np._node ), _exists( np._exists )
-			{}
-		ONodePtr& operator = ( ONodePtr const& np ) {
-			if ( &np != this ) {
-				_node = np._node;
-				_exists = np._exists;
-			}
-			return ( *this );
-		}
-	};
 	class HAbstractNode {
 	protected:
 		typedef enum {
@@ -154,6 +136,23 @@ private:
 #else /* #ifndef __sun__ */
 #pragma pack()
 #endif /* #else #ifndef __sun__ */
+	struct ONodePtr {
+		HNode* _node;
+		bool _exists;
+		ONodePtr( void )
+			: _node( NULL ), _exists( false )
+			{ }
+		ONodePtr( ONodePtr const& np )
+			: _node( np._node ), _exists( np._exists )
+			{}
+		ONodePtr& operator = ( ONodePtr const& np ) {
+			if ( &np != this ) {
+				_node = np._node;
+				_exists = np._exists;
+			}
+			return ( *this );
+		}
+	};
 public:
 	typedef typename allocator_t::template rebind<HNode>::other allocator_type;
 private:
@@ -333,12 +332,12 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::insert( key_value_typ
 		++ _size;
 		if ( _root ) {
 			node->_parent = nodeHolder._node;
-			if ( _compare( key_get_type::key( key_ ), key_get_type::key( static_cast<HNode*>( nodeHolder._node )->_key ) ) ) {
-				M_ASSERT( ! static_cast<HNode*>( nodeHolder._node )->_left );
-				static_cast<HNode*>( nodeHolder._node )->_left = node;
+			if ( _compare( key_get_type::key( key_ ), key_get_type::key( nodeHolder._node->_key ) ) ) {
+				M_ASSERT( ! nodeHolder._node->_left );
+				nodeHolder._node->_left = node;
 			} else {
-				M_ASSERT( ! static_cast<HNode*>( nodeHolder._node )->_right );
-				static_cast<HNode*>( nodeHolder._node )->_right = node;
+				M_ASSERT( ! nodeHolder._node->_right );
+				nodeHolder._node->_right = node;
 			}
 			insert_rebalance( node );
 		} else {
@@ -346,7 +345,7 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::insert( key_value_typ
 			static_cast<HNode*>( _root )->_color = HAbstractNode::BLACK;
 		}
 	} else
-		node = static_cast<HNode*>( nodeHolder._node );
+		node = nodeHolder._node;
 	M_ASSERT( ( ! _root ) || ( static_cast<HNode*>( _root )->_parent == NULL ) );
 	M_ASSERT( ( ! _root ) || ( static_cast<HNode*>( _root )->_color == HAbstractNode::BLACK ) );
 	return ( make_pair( HIterator( this, node ), ! nodeHolder._exists ) );
@@ -361,7 +360,7 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::lower_bound( key_type
 	if ( _root ) {
 		ONodePtr nodeHolder( find_node( key_ ) );
 		it._current = nodeHolder._node;
-		if ( nodeHolder._node && ! nodeHolder._exists && _compare( key_get_type::key( static_cast<HNode*>( nodeHolder._node )->_key ), key_ ) )
+		if ( nodeHolder._node && ! nodeHolder._exists && _compare( key_get_type::key( nodeHolder._node->_key ), key_ ) )
 			++ it;
 	}
 	return ( it );
@@ -376,7 +375,7 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::upper_bound( key_type
 	if ( _root ) {
 		ONodePtr nodeHolder( find_node( key_ ) );
 		it._current = nodeHolder._node;
-		if ( nodeHolder._node && ( nodeHolder._exists || _compare( key_get_type::key( static_cast<HNode*>( nodeHolder._node )->_key ), key_ ) ) )
+		if ( nodeHolder._node && ( nodeHolder._exists || _compare( key_get_type::key( nodeHolder._node->_key ), key_ ) ) )
 			++ it;
 	}
 	return ( it );
@@ -389,16 +388,16 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::find_node( key_type c
 	M_PROLOG
 	ONodePtr nodePtr;
 	if ( _root ) {
-		nodePtr._node = _root;
+		nodePtr._node = static_cast<HNode*>( _root );
 		while ( ! nodePtr._exists ) {
-			if ( _compare( key_, key_get_type::key( static_cast<HNode*>( nodePtr._node )->_key ) ) ) {
-				if ( static_cast<HNode*>( nodePtr._node )->_left )
-					nodePtr._node = static_cast<HNode*>( nodePtr._node )->_left;
+			if ( _compare( key_, key_get_type::key( nodePtr._node->_key ) ) ) {
+				if ( nodePtr._node->_left )
+					nodePtr._node = static_cast<HNode*>( nodePtr._node->_left );
 				else
 					break;
-			} else if ( _compare( key_get_type::key( static_cast<HNode*>( nodePtr._node )->_key ), key_ ) ) {
-				if ( static_cast<HNode*>( nodePtr._node )->_right )
-					nodePtr._node = static_cast<HNode*>( nodePtr._node )->_right;
+			} else if ( _compare( key_get_type::key( nodePtr._node->_key ), key_ ) ) {
+				if ( nodePtr._node->_right )
+					nodePtr._node = static_cast<HNode*>( nodePtr._node->_right );
 				else
 					break;
 			} else
