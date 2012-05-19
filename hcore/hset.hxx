@@ -61,9 +61,7 @@ public:
 	typedef type_t value_type;
 	typedef type_t key_type;
 	typedef compare_t compare_type;
-private:
 	typedef HSBBSTree<value_type, compare_type, set_helper<value_type>, allocator_t> engine_t;
-public:
 	typedef typename engine_t::allocator_type allocator_type;
 	typedef HSet<type_t, compare_t, allocator_t> this_type;
 	/*! \brief Iterator for HSet<> data structure.
