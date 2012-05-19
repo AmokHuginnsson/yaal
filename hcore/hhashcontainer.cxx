@@ -56,7 +56,7 @@ int long hash<HString>::operator () ( HString const& string_ ) const {
 
 template<typename T>
 int long hash<T>::operator () ( T const& key_ ) const {
-	return ( key_ );
+	return ( static_cast<int long>( key_ ) );
 }
 
 template struct hash<char>;
