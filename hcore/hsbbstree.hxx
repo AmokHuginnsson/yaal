@@ -127,6 +127,11 @@ public:
 	typedef typename key_get_type::key_type key_type;
 	class HIterator;
 private:
+#ifndef __sun__
+#pragma pack( push, 1 )
+#else /* #ifndef __sun__ */
+#pragma pack( 1 )
+#endif /* #else #ifndef __sun__ */
 	/*! \brief True HSBBSTree contents.
 	 */
 	class	HNode : public HSBBSTreeBase::HAbstractNode {
@@ -144,6 +149,11 @@ private:
 		friend class HSBBSTree;
 		friend class HSBBSTree::HIterator;
 	};
+#ifndef __sun__
+#pragma pack( pop )
+#else /* #ifndef __sun__ */
+#pragma pack()
+#endif /* #else #ifndef __sun__ */
 public:
 	typedef typename allocator_t::template rebind<HNode>::other allocator_type;
 private:

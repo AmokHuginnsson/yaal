@@ -56,6 +56,11 @@ public:
 	typedef get_key_t get_key_type;
 	typedef typename get_key_type::key_type key_type;
 private:
+#ifndef __sun__
+#pragma pack( push, 1 )
+#else /* #ifndef __sun__ */
+#pragma pack( 1 )
+#endif /* #else #ifndef __sun__ */
 	class HAtom {
 	private: /* for UT */
 		HAtom* _next;
@@ -68,6 +73,11 @@ private:
 		friend class HHashContainer;
 		friend class HIterator;
 	};
+#ifndef __sun__
+#pragma pack( pop )
+#else /* #ifndef __sun__ */
+#pragma pack()
+#endif /* #else #ifndef __sun__ */
 public:
 	typedef typename allocator_t::template rebind<HAtom>::other allocator_type;
 	/*! \brief Iterator for HHashContainer data structure.
