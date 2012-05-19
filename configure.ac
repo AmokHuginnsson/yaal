@@ -101,53 +101,10 @@ YAAL_DETECT_PHYSICAL_MEMORY
 
 dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[53%]]])
-_FLAGS=''
-CXXFLAGS_ORIG=$CXXFLAGS;
-CPPFLAGS_ORIG=$CPPFLAGS;
 
-YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-pthread], [C++])
-YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-m64], [C++])
-YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fPIC], [C++])
-YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-Wmissing-declarations], [C++])
-YAAL_DETECT_FLAGS(RDYNAMIC, [-rdynamic], [C++])
-YAAL_DETECT_FLAGS(FATAL_WARNINGS, [-Wl,--fatal-warnings], [C++])
-EXTRA_LXXFLAGS="${EXTRA_LXXFLAGS} ${FATAL_WARNINGS}"
-YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-m64], [C++])
-YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--export-dynamic], [C++], [${FATAL_WARNINGS}])
-YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--no-undefined], [C++])
-YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--enable-auto-import], [C++])
-YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])
-YAAL_DETECT_FLAGS(SONAME_FLAG, [-Wl,-soname,foo], [C++])
-if test ["x${START_GROUP}"] != ["x"] ; then
-	END_GROUP="-Wl,--end-group"
-fi
-if test ["x${SONAME_FLAG}"] != ["x"] ; then
-	SONAME_FLAG="-Wl,-soname,\$(SONAME_\$(*))"
-fi
-CXXFLAGS=["-Wextra"]
-AC_MSG_CHECKING([does gcc support -Wextra])
-RESULT=["no"]
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([ ])],
-							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -Wextra"]]
-							[RESULT=["yes"]],
-							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -W]"])
-AC_MSG_RESULT([$RESULT])
-CXXFLAGS=["-Wshadow -Werror"]
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <pthread.h>]])],
-							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -Wshadow"]
-							_FLAGS=["-Wshadow"]],
-							[AC_MSG_WARN([[Cannot use -Wshadow!]])])
-CXXFLAGS=$CXXFLAGS_ORIG
-CXXFLAGS=["-pedantic-errors"]
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstdlib>]])],
-							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -pedantic-errors"]
-							_FLAGS=["$_FLAGS -pedantic-errors"]],
-							[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
-CXXFLAGS=$CXXFLAGS_ORIG
-if test ["$_FLAGS"] = [""] ; then
-	_FLAGS='none. ---                      [[76%]]'
-fi
-AC_MSG_RESULT([--- Guessed fetures are: $_FLAGS])
+YAAL_CHECK_COMPILER_VERSION
+
+YAAL_DETECT_COMMON_FLAGS
 
 YAAL_DETECT_FUNCTION_MACRO
 
@@ -155,14 +112,16 @@ dnl Check for POD sizes.
 dnl We shall not pollute namespace with unnecessary macros.
 dnl AC_CHECK_SIZEOF([char])
 dnl AC_CHECK_SIZEOF([int short])
-dnl AC_CHECK_SIZEOF([int])
+AC_CHECK_SIZEOF([int short])
+AC_CHECK_SIZEOF([int])
 AC_CHECK_SIZEOF([int long])
 AC_CHECK_SIZEOF([int long long])
+AC_CHECK_SIZEOF([float])
+AC_CHECK_SIZEOF([double])
+AC_CHECK_SIZEOF([double long])
 
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
-CXXFLAGS=$CXXFLAGS_ORIG;
-CPPFLAGS=$CXXFLAGS_ORIG;
 AC_SEARCH_LIBS([pthread_create],[thr pthread],,[AC_MSG_ERROR([Cannot build without threading library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
 AC_SEARCH_LIBS([clock_gettime],[rt],,[AC_MSG_ERROR([Cannot continue without rt library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""

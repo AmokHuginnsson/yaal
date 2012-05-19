@@ -74,7 +74,11 @@ ifdef DO_COVERAGE
 	LINKER_COVERAGE_FLAGS   = --coverage
 	LIB_INFIX = -c
 endif
-LINKER_PRIME_FLAGS  = -Wl,--demangle
+
+# Solaris ld no longer supports --demangle option,
+# we need to use ./configure to check this option is supported
+# on host platform.
+# LINKER_PRIME_FLAGS  = -Wl,--demangle
 
 COMPILER_PATH_FLAGS = -I$(DIR_BUILD) -I$(DIR_ROOT) -I$(VPATH) -I/usr/local/include
 LINKER_PATH_FLAGS   = -L/usr/local/lib

@@ -58,54 +58,9 @@ AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
 
-dnl Check compiler version.
-AC_MSG_CHECKING([compiler version])
-GCC_MAJOR=`echo | cpp -dM | grep __GNUC__ | awk '{print [$]3}'`
-GCC_MINOR=`echo | cpp -dM | grep __GNUC_MINOR__ | awk '{print [$]3}'`
-AC_MSG_RESULT([major $GCC_MAJOR, minor $GCC_MINOR. ])
+YAAL_CHECK_COMPILER_VERSION
 
-dnl What special compiler flags we can set?
-
-YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-m64], [C++])
-YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fPIC], [C++])
-YAAL_DETECT_FLAGS(RDYNAMIC, [-rdynamic], [C++])
-YAAL_DETECT_FLAGS(FATAL_WARNINGS, [-Wl,--fatal-warnings], [C++])
-EXTRA_LXXFLAGS="${EXTRA_LXXFLAGS} ${FATAL_WARNINGS}"
-YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-m64], [C++])
-YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--export-dynamic], [C++], [${FATAL_WARNINGS}])
-YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--no-undefined], [C++])
-YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--enable-auto-import], [C++])
-YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])
-if test ["x${START_GROUP}"] != ["x"] ; then
-	END_GROUP="-Wl,--end-group"
-fi
-
-CXXFLAGS_ORIG=$CXXFLAGS;
-CXXFLAGS=["-Wextra"]
-AC_MSG_CHECKING([does gcc support -Wextra])
-RESULT=["no"]
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([ ])],
-							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -Wextra"]]
-							[RESULT=["yes"]],
-							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -W]"])
-AC_MSG_RESULT([$RESULT])
-CXXFLAGS=["-Wshadow -Werror"]
-AC_MSG_CHECKING([can we use -Wshadow in <pthread.h>])
-RESULT=["no"]
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <pthread.h>]])],
-							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -Wshadow"]]
-							[RESULT=["yes"]],
-							[AC_MSG_WARN([[Cannot use -Wshadow!]])])
-AC_MSG_RESULT([$RESULT])
-CXXFLAGS=["-pedantic-errors -Werror"]
-AC_MSG_CHECKING([can we use -pedantic-errors in <cstdlib>])
-RESULT=["no"]
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstdlib>]])],
-							[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -pedantic-errors"]]
-							[RESULT=["yes"]],
-							[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
-AC_MSG_RESULT([$RESULT])
-CXXFLAGS=${CXXFLAGS_ORIG}
+YAAL_DETECT_COMMON_FLAGS
 
 dnl Now we can look for all needed libraries.
 
