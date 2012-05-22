@@ -97,12 +97,12 @@ HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_
 }
 
 template<typename number_t>
-number_t clip( number_t const& lowerBound_, number_t const& number_, number_t const& upperBound_ ) {
+inline number_t clip( number_t const& lowerBound_, number_t const& number_, number_t const& upperBound_ ) {
 	return ( number_ < lowerBound_ ? lowerBound_ : ( upperBound_ < number_ ? upperBound_ : number_ ) );
 }
 
 template<typename number_t>
-number_t factorial( number_t number_ ) {
+inline number_t factorial( number_t number_ ) {
 	number_t n = 1;
 	for ( number_t i = 2; i <= number_; ++ i )
 		n *= i;
@@ -110,10 +110,15 @@ number_t factorial( number_t number_ ) {
 }
 
 template<typename number_t>
-number_t binomial_coefficient( number_t cardinal_, number_t subCardinal_ ) {
+inline number_t binomial_coefficient( number_t cardinal_, number_t subCardinal_ ) {
 	if ( subCardinal_ > ( cardinal_ / 2 ) )
 		subCardinal_ = cardinal_ - subCardinal_;
 	return ( factorial( cardinal_ ) / ( factorial( subCardinal_ ) * factorial( cardinal_ - subCardinal_ ) ) );
+}
+
+template<int long const M, typename number_t>
+inline number_t round_up( number_t const& n ) {
+	return ( ( ( ( n - 1 ) / M ) + 1 ) * M );
 }
 
 }
