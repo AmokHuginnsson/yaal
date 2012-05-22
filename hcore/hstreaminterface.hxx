@@ -211,7 +211,7 @@ public:
 	int long write( void const* const, int long );
 	M_YAAL_HCORE_PUBLIC_API static char const* const eols;
 	bool is_valid( void ) const;
-	void flush( void ) const;
+	void flush( void );
 	int peek( void )
 		{ return ( do_peek() ); }
 	HStreamInterface& set_skipws( bool skipWS_ )
@@ -286,7 +286,7 @@ private:
 	void apply_precision( void );
 	virtual int long do_write( void const* const, int long ) = 0;
 	virtual int long do_read( void* const, int long ) = 0;
-	virtual void do_flush( void ) const = 0;
+	virtual void do_flush( void ) = 0;
 	virtual bool do_is_valid( void ) const = 0;
 	friend HStreamInterface& endl( HStreamInterface& );
 	friend HStreamInterface& flush( HStreamInterface& );

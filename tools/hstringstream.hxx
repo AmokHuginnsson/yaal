@@ -52,7 +52,7 @@ public:
 	bool is_empty( void ) const;
 private:
 	virtual int long do_write( void const* const, int long );
-	virtual void do_flush( void ) const;
+	virtual void do_flush( void );
 	virtual int long do_read( void* const, int long );
 	virtual bool do_is_valid( void ) const;
 };

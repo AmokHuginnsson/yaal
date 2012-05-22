@@ -244,7 +244,7 @@ HString const& HFile::get_error( void ) const {
 	M_EPILOG
 }
 
-void HFile::do_flush( void ) const {
+void HFile::do_flush( void ) {
 	M_PROLOG
 	M_ASSERT( _handle );
 	M_ENSURE( ::std::fflush( static_cast<FILE*>( _handle ) ) == 0 );

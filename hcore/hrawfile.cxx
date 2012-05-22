@@ -206,7 +206,7 @@ int long HRawFile::do_read( void* const buffer_, int long size_ ) {
 	M_EPILOG
 }
 
-void HRawFile::do_flush( void ) const {
+void HRawFile::do_flush( void ) {
 }
 
 void HRawFile::set_timeout( int long timeout_ ) {

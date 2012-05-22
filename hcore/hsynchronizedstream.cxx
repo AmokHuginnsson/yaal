@@ -413,7 +413,7 @@ int long HSynchronizedStream::do_read( void* const buf_, int long size_ ) {
 	M_EPILOG
 }
 
-void HSynchronizedStream::do_flush( void ) const {
+void HSynchronizedStream::do_flush( void ) {
 	M_PROLOG
 	if ( _streamRef )
 		_streamRef->flush();

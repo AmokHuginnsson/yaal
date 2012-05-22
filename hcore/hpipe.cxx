@@ -78,7 +78,7 @@ int long HPipe::do_write( void const* const buffer_, int long size_ ) {
 	M_EPILOG
 }
 
-void HPipe::do_flush( void ) const {
+void HPipe::do_flush( void ) {
 }
 
 bool HPipe::do_is_valid( void ) const {

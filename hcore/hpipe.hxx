@@ -50,7 +50,7 @@ public:
 protected:
 	virtual int long do_write( void const* const, int long );
 	virtual int long do_read( void* const, int long );
-	virtual void do_flush( void ) const;
+	virtual void do_flush( void );
 	virtual bool do_is_valid( void ) const;
 };
 

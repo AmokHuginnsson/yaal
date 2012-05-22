@@ -72,7 +72,7 @@ int long HStringStream::do_write( void const* const buffer_, int long size_ ) {
 	M_EPILOG
 }
 
-void HStringStream::do_flush( void ) const {
+void HStringStream::do_flush( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG

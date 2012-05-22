@@ -275,7 +275,7 @@ int long HLog::do_write( void const* const string_, int long size_ ) {
 	M_EPILOG
 }
 
-void HLog::do_flush( void ) const {
+void HLog::do_flush( void ) {
 	M_PROLOG
 	_file::ref().flush();
 	return;

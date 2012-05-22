@@ -96,7 +96,7 @@ protected:
 	int long write_ssl( void const* const, int long );
 	virtual int long do_write( void const* const, int long );
 	virtual int long do_read( void* const, int long );
-	virtual void do_flush( void ) const;
+	virtual void do_flush( void );
 	virtual bool do_is_valid( void ) const;
 	bool wait_for( ACTION::action_t const&, int long* );
 };

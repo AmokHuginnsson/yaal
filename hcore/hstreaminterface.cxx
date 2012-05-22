@@ -675,7 +675,7 @@ bool HStreamInterface::is_valid( void ) const {
 	M_EPILOG
 }
 
-void HStreamInterface::flush( void ) const {
+void HStreamInterface::flush( void ) {
 	M_PROLOG
 	do_flush();
 	return;

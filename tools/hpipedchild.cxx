@@ -204,7 +204,7 @@ int long HPipedChild::do_write( void const* const string_, int long size_ ) {
 	M_EPILOG
 }
 
-void HPipedChild::do_flush( void ) const {
+void HPipedChild::do_flush( void ) {
 }
 
 bool HPipedChild::read_poll( int long* time_ ) {

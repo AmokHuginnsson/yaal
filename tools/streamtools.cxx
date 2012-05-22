@@ -213,7 +213,7 @@ int long HTee::do_read( void* const, int long ) {
 	M_EPILOG
 }
 
-void HTee::do_flush( void ) const {
+void HTee::do_flush( void ) {
 	M_PROLOG
 	_stream1.flush();
 	_stream2.flush();
