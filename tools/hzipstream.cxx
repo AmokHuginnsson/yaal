@@ -42,7 +42,7 @@ int long _zBufferSize_ = 256 * 1024; /* As advised in the documentation. */
 HZipStream::HZipStream( MODE::mode_t mode_ )
 	: _mode( mode_ ), _error( Z_OK ), _streamOwned(), _streamRef( NULL ),
 	_zStream( sizeof ( z_stream ) ), _zBufferIn( _zBufferSize_ ), _zBufferOut( _zBufferSize_ ),
-	_offset( 0 ) {
+	_offset( 0 ), _flushed( false ) {
 	M_PROLOG
 	init();
 	return;
@@ -52,7 +52,7 @@ HZipStream::HZipStream( MODE::mode_t mode_ )
 HZipStream::HZipStream( owned_stream_t stream_, MODE::mode_t mode_ )
 	: _mode( mode_ ), _error( Z_OK ), _streamOwned( stream_ ), _streamRef( _streamOwned.raw() ),
 	_zStream( sizeof ( z_stream ) ), _zBufferIn( _zBufferSize_ ), _zBufferOut( _zBufferSize_ ),
-	_offset( 0 ) {
+	_offset( 0 ), _flushed( false ) {
 	M_PROLOG
 	init();
 	return;
@@ -62,7 +62,7 @@ HZipStream::HZipStream( owned_stream_t stream_, MODE::mode_t mode_ )
 HZipStream::HZipStream( ref_stream_t stream_, MODE::mode_t mode_ )
 	: _mode( mode_ ), _error( Z_OK ), _streamOwned(), _streamRef( &stream_ ),
 	_zStream( sizeof ( z_stream ) ), _zBufferIn( _zBufferSize_ ), _zBufferOut( _zBufferSize_ ),
-	_offset( 0 ) {
+	_offset( 0 ), _flushed( false ) {
 	M_PROLOG
 	init();
 	return;
@@ -80,7 +80,8 @@ void HZipStream::cleanup( void ) {
 	M_PROLOG
 	z_stream* zstream( _zStream.get<z_stream>() );
 	if ( _mode == MODE::DEFLATE ) {
-		do_write( NULL, 0 );
+		if ( ! _flushed )
+			flush();
 		deflateEnd( zstream );
 	} else
 		inflateEnd( zstream );
@@ -139,12 +140,13 @@ void HZipStream::reset( ref_stream_t stream_ ) {
 int long HZipStream::do_write( void const* const buf_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( _streamRef );
+	M_ASSERT( _mode == MODE::DEFLATE );
 	z_stream* zstream( _zStream.get<z_stream>() );
 	zstream->avail_in = static_cast<uInt>( size_ );
 	/* Hello, idiotic interface :(
 	 */
 	zstream->next_in = const_cast<Bytef*>( static_cast<Bytef const*>( buf_ ) );
-	int long nWrite( 0 );
+	int long nWritten( 0 );
 	void* buf( _zBufferOut.raw() );
 	int long const CHUNK( _zBufferOut.get_size() );
 	do {
@@ -153,10 +155,11 @@ int long HZipStream::do_write( void const* const buf_, int long size_ ) {
 		int err( deflate( zstream, size_ > 0 ? Z_NO_FLUSH : Z_FINISH ) );
 		M_ASSERT( err != Z_STREAM_ERROR ); /* lets debug zlib library, why the f*ck not */
 		err = 0; /* in release, unused variable warning */
-		nWrite += _streamRef->write( buf, CHUNK - zstream->avail_out );
+		nWritten += _streamRef->write( buf, CHUNK - zstream->avail_out );
+		size_ -= CHUNK;
 	} while ( zstream->avail_out == 0 );
-	M_ASSERT( zstream->avail_in == 0 ); /* yeach, why the f*ck not */
-	return ( nWrite );
+	M_ASSERT( zstream->avail_in == 0 ); /* yeah, why the f*ck not */
+	return ( nWritten );
 	M_EPILOG
 }
 
@@ -186,6 +189,7 @@ int long HZipStream::prepare_data( void ) {
 int long HZipStream::do_read( void* const buf_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( _streamRef );
+	M_ASSERT( _mode == MODE::INFLATE );
 	z_stream* zstream( _zStream.get<z_stream>() );
 	int long const CHUNK( _zBufferOut.get_size() );
 	char* buf( _zBufferOut.get<char>() );
@@ -205,9 +209,12 @@ int long HZipStream::do_read( void* const buf_, int long size_ ) {
 	M_EPILOG
 }
 
-void HZipStream::do_flush( void ) const {
+void HZipStream::do_flush( void ) {
 	M_PROLOG
 	M_ASSERT( _streamRef );
+	if ( ( _mode == MODE::DEFLATE ) && ! _flushed )
+		do_write( NULL, 0 );
+	_flushed = true;
 	_streamRef->flush();
 	return;
 	M_EPILOG

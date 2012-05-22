@@ -61,6 +61,7 @@ private:
 	yaal::hcore::HChunk _zBufferIn;
 	yaal::hcore::HChunk _zBufferOut;
 	int long _offset;
+	bool _flushed;
 public:
 	HZipStream( MODE::mode_t );
 	virtual ~HZipStream( void );
@@ -77,7 +78,7 @@ private:
 	int long prepare_data( void );
 	virtual int long do_write( void const* const, int long );
 	virtual int long do_read( void* const, int long );
-	virtual void do_flush( void ) const;
+	virtual void do_flush( void );
 	virtual bool do_is_valid( void ) const;
 	HZipStream( HZipStream const& );
 	HZipStream& operator = ( HZipStream const& );
