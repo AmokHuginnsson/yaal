@@ -124,9 +124,11 @@ public:
 	 * \return true iff other has same contents as this.
 	 */
 	bool operator == ( HMemory const& other ) const;
+	int long valid_octets( void ) const
+		{ return ( _valid ); }
 private:
 	virtual int long do_write( void const* const, int long );
-	virtual void do_flush( void ) const;
+	virtual void do_flush( void );
 	virtual int long do_read( void* const, int long );
 	virtual bool do_is_valid( void ) const;
 	HMemory( HMemory const& src );

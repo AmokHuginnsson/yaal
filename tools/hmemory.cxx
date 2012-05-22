@@ -75,7 +75,7 @@ int long HMemory::do_write( void const* const src_, int long size_ ) {
 	M_EPILOG
 }
 
-void HMemory::do_flush( void ) const {
+void HMemory::do_flush( void ) {
 	return;
 }
 
