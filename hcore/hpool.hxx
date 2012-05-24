@@ -51,8 +51,8 @@ public:
 	                                meta::ternary<OBJECT_SIZE < 8, 8,
 	                                (OBJECT_SIZE + 8) & ~7u>::value>::value>::value;
 #elif TARGET_CPU_BITS == 32 /* #if TARGET_CPU_BITS == 64 */
-	static int const OBJECT_SPACE = meta::ternary<OBJECT_SIZE < 2, 2,
-	                                meta::ternary<OBJECT_SIZE < 4, 4,
+	static int const OBJECT_SPACE = meta::ternary<(OBJECT_SIZE < 2), 2,
+	                                meta::ternary<(OBJECT_SIZE < 4), 4,
 	                                (OBJECT_SIZE + 4) & ~3u>::value>::value;
 #else /* #elif TARGET_CPU_BITS == 32 #if TARGET_CPU_BITS == 64 */
 #error Unsupported CPU bitness.
@@ -166,7 +166,8 @@ private:
 	void get_free_block( void ) {
 		if ( _poolBlockCount == _poolBlockCapacity ) {
 			int newCapacity( ( _poolBlockCapacity > 0 ? _poolBlockCapacity * 2 : 8 ) );
-			HPoolBlock** poolBlocks( new ( memory::yaal ) HPoolBlock*[ newCapacity ] );
+			/* msvcxx does not allow `T v( i );', it must be `T v = i;'. */
+			HPoolBlock** poolBlocks = new ( memory::yaal ) HPoolBlock*[ newCapacity ];
 			if ( _poolBlockCapacity )
 				copy( _poolBlocks, _poolBlocks + _poolBlockCount, poolBlocks );
 			using yaal::swap;

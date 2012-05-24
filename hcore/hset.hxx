@@ -104,7 +104,7 @@ public:
 		bool operator != ( HIterator const& it ) const
 			{ return ( _engine != it._engine ); }
 	private:
-		friend class HSet<value_type, compare_type, allocator_t>;
+		friend class HSet<type_t, compare_type, allocator_t>;
 		explicit HIterator( typename engine_t::HIterator const& it )
 			: base_type(), _engine( it ) {}
 	};

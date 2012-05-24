@@ -131,7 +131,7 @@ public:
 			return ( ( _engine != it._engine ) || ( _index != it._index ) );
 		}
 	private:
-		friend class HMultiSet<value_type, compare_type, allocator_t>;
+		friend class HMultiSet<type_t, compare_type, allocator_t>;
 		explicit HIterator( engine_t const* owner_, typename engine_t::HIterator const& it, int long index_ )
 			: base_type(), _index( index_ ), _owner( owner_ ), _engine( it ) {};
 	};

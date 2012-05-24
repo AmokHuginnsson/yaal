@@ -38,9 +38,9 @@ namespace hcore {
 
 /*! \brief HHeap<> - a heap concept implementation.
  */
-template<typename type_t, template <typename> class sequence_t = HArray>
+template<typename type_t, typename sequence_t = HArray<type_t> >
 class HHeap {
-	typedef sequence_t<type_t> sequence_type;
+	typedef sequence_t sequence_type;
 public:
 	typedef typename sequence_type::value_type value_type;
 private:

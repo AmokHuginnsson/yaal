@@ -48,8 +48,8 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHSBBSTree_[];
  * HSBBSTree is not ment to be used directly.
  */
 class HSBBSTreeBase {
-	typedef HSBBSTreeBase this_type;
 public:
+	typedef HSBBSTreeBase this_type;
 	/*! \brief HSBBSTreeBase operation error types.
 	 */
 	struct ERROR {
@@ -59,13 +59,14 @@ public:
 			NIL_ITERATOR
 		} error_t;
 	};
-private:
+protected:
 	class HAbstractNode {
-	protected:
+	public:
 		typedef enum {
 			RED,
 			BLACK
 		} color_t;
+	protected:
 		color_t _color;
 		HAbstractNode* _parent;
 		HAbstractNode* _left;

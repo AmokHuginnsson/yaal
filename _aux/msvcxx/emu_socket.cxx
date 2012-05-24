@@ -167,9 +167,9 @@ int bind( int fd_, const struct sockaddr* addr_, socklen_t len_ ) {
 		if ( io.type() == IO::TYPE::SOCKET_DGRAM ) {
 			if ( ::WSAEventSelect( s, io.event(), FD_READ | FD_OOB ) )
 				log_windows_error( "WSAEventSelect" );
-			int reuseAddr( 1 );
+			int const reuseAddr( 1 );
 			ret = ::setsockopt( s, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
-					static_cast<char const*>( &reuseAddr ), sizeof ( reuseAddr ) );
+					reinterpret_cast<char const*>( &reuseAddr ), sizeof ( reuseAddr ) );
 		}
 		ret = ::bind( s, addr_, len_ );
 	}

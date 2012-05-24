@@ -38,9 +38,9 @@ namespace hcore {
 
 /*! \brief HQueue<> - a queue container adaptor.
  */
-template<typename type_t, template <typename> class sequence_t = HDeque>
+template<typename type_t, typename sequence_t = HDeque<type_t> >
 class HQueue {
-	typedef sequence_t<type_t> sequence_type;
+	typedef sequence_t sequence_type;
 public:
 	typedef typename sequence_type::value_type value_type;
 private:
