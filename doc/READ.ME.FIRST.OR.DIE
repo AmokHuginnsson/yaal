@@ -8,12 +8,12 @@
 
 ** Software:
 	- Debian (latest development branch, currently `unstable' aka `Sid') (Debian stable releases are not supported!)
-	- Ubuntu (latest development branch and latest stable release, currently 12.04 and 11.10 respectively)
+	- Ubuntu (latest development branch and latest stable release, currently 12.10 and 12.04 respectively)
 	- Centos (latest stable release, currently 6.2)
 	- FreeBSD (latest stable release, currently 9.0-RELEASE)
 	- Sun Solaris (latest stable release, currently 5.10)
 	- Oracle Solaris (latest stable release, currently 11)
-	- Windows XP SP3 with Cygwin (latest available cygwin release, currently 1.7.x)
+	- Windows XP SP3 with Cygwin (latest available cygwin release, currently 1.7.15)
 
 [For more detailed information regarding platform support
 please look into HTML documentation.]

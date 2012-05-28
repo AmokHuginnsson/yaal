@@ -15,7 +15,7 @@
 		<td>Debian Stable</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Ubuntu 12.04 (Precise Pangolin)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Ubuntu 12.10 (Quantal Quetzal)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Centos 6.2 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
@@ -33,7 +33,7 @@
 		<td>Windows XP SP3 with Cygwin</td><td class="good">100%</td><td class="fine">99%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
-		<td>Windows XP SP3 with Visual Studio C++ 2008<a class="note" href="#note_fork">4)</a></td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Windows XP SP3 with Visual Studio C++ 2008<a class="note" href="#note_fork">4)</a></td><td class="good">100%</td><td class="fine">99%</td><td class="fail">Fail</td>
 	</tr>
 </table>
 <ul>
