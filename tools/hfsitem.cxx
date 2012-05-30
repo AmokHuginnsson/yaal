@@ -282,8 +282,10 @@ bool HFSItem::HIterator::operator != ( HIterator const& it ) const {
 
 HFSItem::HIterator& HFSItem::HIterator::operator++( void ) {
 	M_ASSERT( _dir );
-	dirent* result = NULL;
-	readdir_r( static_cast<DIR*>( _dir ), _dirEnt->get<dirent>(), &result );
+	dirent* result( NULL );
+	do {
+		readdir_r( static_cast<DIR*>( _dir ), _dirEnt->get<dirent>(), &result );
+	} while ( result && ( ! ( ::memcmp( result->d_name, ".\0", 2 ) && ::memcmp( result->d_name, "..\0", 3 ) ) ) );
 	if ( ! result )
 		cleanup();
 	return ( *this );
@@ -291,7 +293,7 @@ HFSItem::HIterator& HFSItem::HIterator::operator++( void ) {
 
 void HFSItem::HIterator::update( void ) {
 	M_PROLOG
-	dirent* ent = _dirEnt->get<dirent>();
+	dirent* ent( _dirEnt->get<dirent>() );
 	_item.set_path( _path + "/" + ent->d_name, static_cast<int>( ::strlen( ent->d_name ) ) );
 	return;
 	M_EPILOG
