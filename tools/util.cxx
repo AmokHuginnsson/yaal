@@ -854,9 +854,6 @@ find_result find( yaal::hcore::HString const& in, yaal::hcore::HPattern const& p
 					if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::REGULAR_FILE ) && pattern_.matches( it->get_path() ) )
 						result.push_back( it->get_path() );
 				} else if ( it->is_directory() ) {
-					HString name( it->get_name() );
-					if ( ( name == "." ) || ( name == ".." ) )
-						continue;
 					if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::DIRECTORY ) && pattern_.matches( it->get_path() ) )
 						result.push_back( it->get_path() );
 					if ( maxDepth_ > 0 ) {
