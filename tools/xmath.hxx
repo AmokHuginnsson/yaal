@@ -39,6 +39,9 @@ namespace tools {
  */
 namespace xmath {
 
+template<typename number_t>
+number_t square_root( number_t );
+
 /*! \brief Provide statistics for set of numbers.
  */
 template<typename numeric_t>
@@ -48,26 +51,65 @@ class HNumberSetStats {
 	numeric_t _maximum;
 	numeric_t _sum;
 	numeric_t _average;
+	numeric_t _variance;
+	numeric_t _populationVariance;
 public:
 	template<typename iterator_t>
 	HNumberSetStats( iterator_t, iterator_t );
 	int long count( void ) const
 		{ return ( _count ); }
-	numeric_t minimum( void ) const
-		{ return ( _minimum ); }
-	numeric_t maximum( void ) const
-		{ return ( _maximum ); }
+	numeric_t minimum( void ) const {
+		M_PROLOG
+		M_ENSURE( _count > 0 );
+		return ( _minimum );
+		M_EPILOG
+	}
+	numeric_t maximum( void ) const {
+		M_PROLOG
+		M_ENSURE( _count > 0 );
+		return ( _maximum );
+		M_EPILOG
+	}
 	numeric_t sum( void )
 		{ return ( _sum ); }
-	numeric_t average( void ) const
-		{ return ( _average ); }
+	numeric_t average( void ) const {
+		M_PROLOG
+		M_ENSURE( _count > 0 );
+		return ( _average );
+		M_EPILOG
+	}
+	numeric_t variance( void ) const {
+		M_PROLOG
+		M_ENSURE( _count > 1 );
+		return ( _variance );
+		M_EPILOG
+	}
+	numeric_t population_variance( void ) const {
+		M_PROLOG
+		M_ENSURE( _count > 0 );
+		return ( _populationVariance );
+		M_EPILOG
+	}
+	numeric_t standard_deviation( void ) const {
+		M_PROLOG
+		M_ENSURE( _count > 1 );
+		return ( square_root( _variance ) );
+		M_EPILOG
+	}
+	numeric_t population_standard_deviation( void ) const {
+		M_PROLOG
+		M_ENSURE( _count > 0 );
+		return ( square_root( _populationVariance ) );
+		M_EPILOG
+	}
 };
 
 template<typename numeric_t>
 template<typename iterator_t>
 HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_ )
-	: _count( 0 ), _minimum(), _maximum(), _sum(), _average() {
+	: _count( 0 ), _minimum(), _maximum(), _sum(), _average(), _variance(), _populationVariance() {
 	M_PROLOG
+	numeric_t acc( 0 );
 	for ( ; first_ != last_; ++ first_, ++ _count ) {
 		if ( _count ) {
 			if ( *first_ < _minimum )
@@ -79,8 +121,12 @@ HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_
 			_maximum = *first_;
 		}
 		_sum += *first_;
+		acc += ( *first_ * *first_ );
 	}
-	_average = _sum / _count;
+	_average = _sum / static_cast<numeric_t>( _count );
+	if ( _count > 1 )
+		_variance = acc / static_cast<numeric_t>( _count - 1 ) - ( ( _average * _average * static_cast<numeric_t>( _count ) ) / static_cast<numeric_t>( _count - 1 ) );
+	_populationVariance = acc / static_cast<numeric_t>( _count ) - _average * _average;
 	return;
 	M_EPILOG
 }
