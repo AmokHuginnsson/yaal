@@ -51,6 +51,7 @@ class HNumberSetStats {
 	numeric_t _maximum;
 	numeric_t _sum;
 	numeric_t _average;
+	numeric_t _median;
 	numeric_t _variance;
 	numeric_t _populationVariance;
 public:
@@ -76,6 +77,12 @@ public:
 		M_PROLOG
 		M_ENSURE( _count > 0 );
 		return ( _average );
+		M_EPILOG
+	}
+	numeric_t median( void ) const {
+		M_PROLOG
+		M_ENSURE( _count > 0 );
+		return ( _median );
 		M_EPILOG
 	}
 	numeric_t variance( void ) const {
@@ -107,7 +114,7 @@ public:
 template<typename numeric_t>
 template<typename iterator_t>
 HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_ )
-	: _count( 0 ), _minimum(), _maximum(), _sum(), _average(), _variance(), _populationVariance() {
+	: _count( 0 ), _minimum(), _maximum(), _sum(), _average(), _median(), _variance(), _populationVariance() {
 	M_PROLOG
 	numeric_t acc( 0 );
 	for ( ; first_ != last_; ++ first_, ++ _count ) {

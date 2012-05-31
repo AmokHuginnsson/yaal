@@ -30,9 +30,8 @@ Copyright:
 #ifndef YAAL_HCORE_HAUXILIARYBUFFER_HXX_INCLUDED
 #define YAAL_HCORE_HAUXILIARYBUFFER_HXX_INCLUDED 1
 
-#include <new>
-
 #include "hcore/algorithm_low.hxx"
+#include "hcore/memory.hxx"
 #include "hcore/iterator.hxx"
 #include "hcore/system.hxx"
 
@@ -92,11 +91,11 @@ void HAuxiliaryBuffer<type_t>::init( iter_t first_, iter_t last_ ) {
 	if ( auxSize > 1 ) {
 		if ( auxSize > _allocated ) {
 			if ( _allocated > 0 ) {
-				delete _data;
+				::operator delete ( _data, memory::yaal );
 				_data = NULL;
 				_allocated = 0;
 			}
-			_data = static_cast<value_type*>( operator new ( auxSize * sizeof ( value_type ) ) );
+			_data = static_cast<value_type*>( ::operator new ( auxSize * sizeof ( value_type ), memory::yaal ) );
 			_allocated = auxSize;
 		}
 		_size = auxSize;
@@ -111,7 +110,7 @@ template<typename type_t>
 HAuxiliaryBuffer<type_t>::~HAuxiliaryBuffer( void ) {
 	M_PROLOG
 	clear();
-	delete _data;
+	::operator delete ( _data, memory::yaal );
 	return;
 	M_DESTRUCTOR_EPILOG
 }

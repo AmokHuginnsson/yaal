@@ -234,8 +234,8 @@ inline dst_iter_t remove_transform( src_iter_t it, src_iter_t end, dst_iter_t ds
  * \param op - transforming operation, an unary function.
  * \return one past end of output range.
  */
-template<typename src_iter_t, typename dst_iter_t, typename pred_t, typename operation_t>
-inline dst_iter_t remove_transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, pred_t predicate_, operation_t op ) {
+template<typename src_iter_t, typename dst_iter_t, typename predicate_t, typename operation_t>
+inline dst_iter_t remove_transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, predicate_t predicate_, operation_t op ) {
 	for ( ; it != end; ++ it ) {
 		if ( ! predicate_( *it ) ) {
 			*dst = op( *it );
@@ -302,8 +302,8 @@ inline void replace( iterator_t it, iterator_t end, value_t const& oldVal_, valu
  * \param predicate_ - a predicate to fulfill so a value could be replaced.
  * \param newVal_ - a value that shall replace old values.
  */
-template<typename iterator_t, typename value_t, typename pred_t>
-inline void replace_if( iterator_t it, iterator_t end, pred_t predicate_, value_t const& newVal_ ) {
+template<typename iterator_t, typename value_t, typename predicate_t>
+inline void replace_if( iterator_t it, iterator_t end, predicate_t predicate_, value_t const& newVal_ ) {
 	for ( ; it != end; ++ it ) {
 		if ( predicate_( *it ) )
 			*it = newVal_;
@@ -336,8 +336,8 @@ inline void replace_copy( iterator_t it, iterator_t end, output_iterator_t out, 
  * \param predicate_ - replace all elements that satify this predicate.
  * \param newVal_ - a value that shall replace old values.
  */
-template<typename iterator_t, typename output_iterator_t, typename pred_t, typename value_t>
-inline void replace_copy_if( iterator_t it, iterator_t end, output_iterator_t out, pred_t predicate_, value_t const& newVal_ ) {
+template<typename iterator_t, typename output_iterator_t, typename predicate_t, typename value_t>
+inline void replace_copy_if( iterator_t it, iterator_t end, output_iterator_t out, predicate_t predicate_, value_t const& newVal_ ) {
 	for ( ; it != end; ++ it, ++ out ) {
 		if ( predicate_( *it ) )
 			*out = newVal_;
@@ -566,8 +566,8 @@ inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2 ) {
  * \param predicate_ - a predicate to test, an equity equivalence.
  * \return true if and only if ranges have same size and same contents.
  */
-template<typename iter1_t, typename iter2_t, typename pred_t>
-inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2, pred_t predicate_ ) {
+template<typename iter1_t, typename iter2_t, typename predicate_t>
+inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2, predicate_t predicate_ ) {
 	for ( ; ( it1 != end1 ) && predicate_( *it1 == *it2 ); ++ it1, ++ it2 )
 		;
 	return ( it1 == end1 );
@@ -643,8 +643,8 @@ inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1,
  * \param predicate_ - a predicate to test a differences with.
  * \return A pair of iteators which point to first differentiating element.
  */
-template<typename iter1_t, typename iter2_t, typename pred_t>
-inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2, pred_t predicate_ ) {
+template<typename iter1_t, typename iter2_t, typename predicate_t>
+inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1, iter2_t it2, predicate_t predicate_ ) {
 	for ( ; ( it1 != end1 ) && predicate_( *it1, *it2 ); ++ it1, ++ it2 )
 		;
 	return ( make_pair( it1, it2 ) );
@@ -656,11 +656,11 @@ inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1,
  * \param last_ - one past end of range to rotate, or one past end of the second range to "swap".
  * \return A rotation point that could be used to revert the operation, or new begining of new second range.
  */
-template<typename iter_t>
-inline iter_t rotate( iter_t first_, iter_t mid_, iter_t last_ ) {
-	iter_t mid( mid_ );
-	iter_t newMid( last_ );
-	iter_t it( mid_ );
+template<typename iterator_t>
+inline iterator_t rotate( iterator_t first_, iterator_t mid_, iterator_t last_ ) {
+	iterator_t mid( mid_ );
+	iterator_t newMid( last_ );
+	iterator_t it( mid_ );
 	while ( first_ != it ) {
 		swap( *first_, *it );
 		++ first_, ++ it, ++ mid;
@@ -683,18 +683,18 @@ inline iter_t rotate( iter_t first_, iter_t mid_, iter_t last_ ) {
  * \param out_ - begining of detination range.
  * \return A rotation point that could be used to revert the operation, or new begining of new second range.
  */
-template<typename iter_t, typename out_it_t>
-inline out_it_t rotate_copy( iter_t first_, iter_t mid_, iter_t last_, out_it_t out_ ) {
+template<typename iterator_t, typename out_it_t>
+inline out_it_t rotate_copy( iterator_t first_, iterator_t mid_, iterator_t last_, out_it_t out_ ) {
 	out_it_t it( copy( mid_, last_, out_ ) );
   it = copy( first_, mid_, it );
 	return ( it );
 }
 
 /*! \cond */
-template<typename iter_t, typename value_t, typename compare_t>
-inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
-	iter_t it( first_ );
-	iter_t mid( first_ );
+template<typename iterator_t, typename value_t, typename compare_t>
+inline iterator_t lower_bound( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
+	iterator_t it( first_ );
+	iterator_t mid( first_ );
 	while ( it != last_ ) {
 		++ it;
 		if ( ! ( it != last_ ) )
@@ -713,9 +713,9 @@ inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, c
 	}
 	return ( mid );
 }
-template<typename iter_t, typename value_t, typename compare_t>
-inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
-	iter_t mid( first_ + ( last_ - first_ ) / 2 );
+template<typename iterator_t, typename value_t, typename compare_t>
+inline iterator_t lower_bound( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
+	iterator_t mid( first_ + ( last_ - first_ ) / 2 );
 	while ( mid != first_ ) {
 		if ( comp_( *mid, value_ ) )
 			first_ = mid;
@@ -739,9 +739,9 @@ inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, c
  * \param comp_ - comparision operator that defines order.
  * \return First position in range where value could be inserted without violating ordering.
  */
-template<typename iter_t, typename value_t, typename compare_t>
-inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_ ) {
-	return ( lower_bound( first_, last_, value_, comp_, typename hcore::iterator_traits<iter_t>::category_type() ) );
+template<typename iterator_t, typename value_t, typename compare_t>
+inline iterator_t lower_bound( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_ ) {
+	return ( lower_bound( first_, last_, value_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
 }
 
 /*! \brief Find first position in ordered range where given value could be inserted without violating ordering.
@@ -753,16 +753,16 @@ inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_, c
  * \param value_ - lower bound value.
  * \return First position in range where value could be inserted without violating ordering.
  */
-template<typename iter_t, typename value_t>
-inline iter_t lower_bound( iter_t first_, iter_t last_, value_t const& value_ ) {
-	return ( lower_bound( first_, last_, value_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+template<typename iterator_t, typename value_t>
+inline iterator_t lower_bound( iterator_t first_, iterator_t last_, value_t const& value_ ) {
+	return ( lower_bound( first_, last_, value_, less<typename hcore::iterator_traits<iterator_t>::value_type>() ) );
 }
 
 /*! \cond */
-template<typename iter_t, typename value_t, typename compare_t>
-inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
-	iter_t it( first_ );
-	iter_t mid( first_ );
+template<typename iterator_t, typename value_t, typename compare_t>
+inline iterator_t upper_bound( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
+	iterator_t it( first_ );
+	iterator_t mid( first_ );
 	while ( it != last_ ) {
 		++ it;
 		if ( ! ( it != last_ ) )
@@ -781,9 +781,9 @@ inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, c
 	}
 	return ( mid );
 }
-template<typename iter_t, typename value_t, typename compare_t>
-inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
-	iter_t mid( first_ + ( last_ - first_ ) / 2 );
+template<typename iterator_t, typename value_t, typename compare_t>
+inline iterator_t upper_bound( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
+	iterator_t mid( first_ + ( last_ - first_ ) / 2 );
 	while ( mid != first_ ) {
 		if ( ! comp_( value_, *mid ) )
 			first_ = mid;
@@ -807,9 +807,9 @@ inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, c
  * \param comp_ - comparision operator that defines order.
  * \return Last position in range where value could be inserted without violating ordering.
  */
-template<typename iter_t, typename value_t, typename compare_t>
-inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_ ) {
-	return ( upper_bound( first_, last_, value_, comp_, typename hcore::iterator_traits<iter_t>::category_type() ) );
+template<typename iterator_t, typename value_t, typename compare_t>
+inline iterator_t upper_bound( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_ ) {
+	return ( upper_bound( first_, last_, value_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
 }
 
 /*! \brief Find last position in ordered range where given value could be inserted without violating ordering.
@@ -821,17 +821,17 @@ inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_, c
  * \param value_ - upper bound value.
  * \return Last position in range where value could be inserted without violating ordering.
  */
-template<typename iter_t, typename value_t>
-inline iter_t upper_bound( iter_t first_, iter_t last_, value_t const& value_ ) {
-	return ( upper_bound( first_, last_, value_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+template<typename iterator_t, typename value_t>
+inline iterator_t upper_bound( iterator_t first_, iterator_t last_, value_t const& value_ ) {
+	return ( upper_bound( first_, last_, value_, less<typename hcore::iterator_traits<iterator_t>::value_type>() ) );
 }
 
 /*! \cond */
-template<typename iter_t, typename value_t, typename compare_t>
-inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
+template<typename iterator_t, typename value_t, typename compare_t>
+inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::forward ) {
 	bool found( false );
-	iter_t it( first_ );
-	iter_t mid( first_ );
+	iterator_t it( first_ );
+	iterator_t mid( first_ );
 	while ( it != last_ ) {
 		++ it;
 		if ( ! ( it != last_ ) )
@@ -852,10 +852,10 @@ inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_, c
 	}
 	return ( found );
 }
-template<typename iter_t, typename value_t, typename compare_t>
-inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
+template<typename iterator_t, typename value_t, typename compare_t>
+inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_, hcore::iterator_category::random_access ) {
 	bool found( false );
-	iter_t mid( first_ + ( last_ - first_ ) / 2 );
+	iterator_t mid( first_ + ( last_ - first_ ) / 2 );
 	while ( ! found && ( mid != first_ ) ) {
 		if ( ! comp_( value_, *mid ) ) {
 			if ( ! comp_( *mid, value_ ) ) {
@@ -881,9 +881,9 @@ inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_, c
  * \param comp_ - comparator operator that defines order.
  * \return True iff given value is present in given ordered range.
  */
-template<typename iter_t, typename value_t, typename compare_t>
-inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_, compare_t comp_ ) {
-	return ( binary_search( first_, last_, value_, comp_, typename hcore::iterator_traits<iter_t>::category_type() ) );
+template<typename iterator_t, typename value_t, typename compare_t>
+inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& value_, compare_t comp_ ) {
+	return ( binary_search( first_, last_, value_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
 }
 
 /*! \brief Verify if Given value exists in ordered range.
@@ -893,9 +893,9 @@ inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_, c
  * \param value_ - value to look for in ordered range.
  * \return True iff given value is present in given ordered range.
  */
-template<typename iter_t, typename value_t>
-inline bool binary_search( iter_t first_, iter_t last_, value_t const& value_ ) {
-	return ( binary_search( first_, last_, value_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+template<typename iterator_t, typename value_t>
+inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& value_ ) {
+	return ( binary_search( first_, last_, value_, less<typename hcore::iterator_traits<iterator_t>::value_type>() ) );
 }
 
 /*! \brief Swap contents (values) of two ranges of elements.
@@ -944,9 +944,9 @@ inline iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_i
 }
 
 /*! \cond */
-template<typename iter_t, typename compare_t>
-inline void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ ) {
-	iter_t it( mid_ );
+template<typename iterator_t, typename compare_t>
+inline void inplace_merge_impl( iterator_t first_, iterator_t mid_, iterator_t last_, compare_t comp_ ) {
+	iterator_t it( mid_ );
 	while ( ( first_ != it ) && ( it != last_ ) ) {
 		while ( ( first_ != it ) && ! comp_( *it, *first_ ) )
 			++ first_;
@@ -961,18 +961,18 @@ inline void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compar
 	}
 	return;
 }
-template<typename iter_t, typename compare_t>
-inline void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_,
-		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iter_t>::value_type>& aux_ ) {
-	typedef hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iter_t>::value_type> aux_t;
+template<typename iterator_t, typename compare_t>
+inline void inplace_merge_impl( iterator_t first_, iterator_t mid_, iterator_t last_, compare_t comp_,
+		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
+	typedef hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type> aux_t;
 	if ( aux_.get_size() > 0 ) {
 		if ( aux_.get_size() == aux_.get_requested_size() )
 			merge( aux_.begin(), aux_.end(), mid_, last_, first_, comp_ );
 		else {
 			typename aux_t::value_type* out( aux_.begin() );
 			typename aux_t::value_type* end( aux_.end() );
-			iter_t it1( first_ );
-			iter_t it2( mid_ );
+			iterator_t it1( first_ );
+			iterator_t it2( mid_ );
 			for ( ; it1 != mid_; ++ it1, ++ out ) {
 				for ( ; ( it2 != last_ ) && comp_( *it2, *it1 ); ++ it2, ++ out ) {
 					if ( out == end ) {
@@ -1008,9 +1008,9 @@ inline void inplace_merge_impl( iter_t first_, iter_t mid_, iter_t last_, compar
  * \param last_ - end of second range.
  * \param comp_ - comparision operator.
  */
-template<typename iter_t, typename compare_t>
-inline void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t comp_ ) {
-	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
+template<typename iterator_t, typename compare_t>
+inline void inplace_merge( iterator_t first_, iterator_t mid_, iterator_t last_, compare_t comp_ ) {
+	typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
 	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
 	aux_t aux( first_, mid_ );
 	if ( aux.get_size() > 0 )
@@ -1026,9 +1026,9 @@ inline void inplace_merge( iter_t first_, iter_t mid_, iter_t last_, compare_t c
  * \param mid_ - one past the end of first range and beginning of second range.
  * \param last_ - end of second range.
  */
-template<typename iter_t>
-inline void inplace_merge( iter_t first_, iter_t mid_, iter_t last_ ) {
-	inplace_merge( first_, mid_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+template<typename iterator_t>
+inline void inplace_merge( iterator_t first_, iterator_t mid_, iterator_t last_ ) {
+	inplace_merge( first_, mid_, last_, less<typename hcore::iterator_traits<iterator_t>::value_type>() );
 	return;
 }
 
@@ -1340,8 +1340,8 @@ inline tType abs( tType const& val ) {
  * \param last_ - one past the end of the heap.
  * \param comp_ - comparision operator.
  */
-template<typename iter_t, typename compare_t>
-inline void make_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
+template<typename iterator_t, typename compare_t>
+inline void make_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	int long size( last_ - first_ );
 	for ( int long i( ( size / 2 ) - 1 ); i >= 0; -- i ) {
 		int long pos( i );
@@ -1350,8 +1350,8 @@ inline void make_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
 			int long right( ( pos * 2 ) + 2 );
 			if ( left < size ) {
 				int long child( right < size ? ( comp_( *( first_ + left ), *( first_ + right ) ) ? right : left ) : left );
-				iter_t fp( first_ + pos );
-				iter_t fc( first_ + child );
+				iterator_t fp( first_ + pos );
+				iterator_t fc( first_ + child );
 				if ( comp_( *fp, *fc ) )
 					swap( *fp, *fc );
 				else
@@ -1369,9 +1369,9 @@ inline void make_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param first_ - begining of the heap.
  * \param last_ - one past the end of the heap.
  */
-template<typename iter_t>
-inline void make_heap( iter_t first_, iter_t last_ ) {
-	make_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+template<typename iterator_t>
+inline void make_heap( iterator_t first_, iterator_t last_ ) {
+	make_heap( first_, last_, less<typename hcore::iterator_traits<iterator_t>::value_type>() );
 	return;
 }
 
@@ -1381,8 +1381,8 @@ inline void make_heap( iter_t first_, iter_t last_ ) {
  * \param last_ - one past the end of the heap and new element at the same time.
  * \param comp_ - comparision operator.
  */
-template<typename iter_t, typename compare_t>
-inline void push_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
+template<typename iterator_t, typename compare_t>
+inline void push_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	int long pos( ( last_ - first_ ) - 1 ); /* zero based position of inserted element */
 	while ( ( pos > 0 ) && comp_( *( first_ + ( ( pos -1 ) / 2 ) ), *( first_ + pos ) ) ) {
 		swap( *( first_ + ( ( pos - 1 ) / 2 ) ), *( first_ + pos ) );
@@ -1396,9 +1396,9 @@ inline void push_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param first_ - begining of the heap.
  * \param last_ - one past the end of the heap and new element at the same time.
  */
-template<typename iter_t>
-inline void push_heap( iter_t first_, iter_t last_ ) {
-	push_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+template<typename iterator_t>
+inline void push_heap( iterator_t first_, iterator_t last_ ) {
+	push_heap( first_, last_, less<typename hcore::iterator_traits<iterator_t>::value_type>() );
 	return;
 }
 
@@ -1408,8 +1408,8 @@ inline void push_heap( iter_t first_, iter_t last_ ) {
  * \param last_ - one past the end of the heap.
  * \param comp_ - comparision operator.
  */
-template<typename iter_t, typename compare_t>
-inline void pop_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
+template<typename iterator_t, typename compare_t>
+inline void pop_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	int long size( ( last_ - first_ ) - 1 );
 	if ( size > 0 ) {
 		swap( *first_, *( last_ - 1 ) );
@@ -1419,8 +1419,8 @@ inline void pop_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
 			int long right( ( pos * 2 ) + 2 );
 			if ( left < size ) {
 				int long child( right < size ? ( comp_( *( first_ + left ), *( first_ + right ) ) ? right : left ) : left );
-				iter_t fp( first_ + pos );
-				iter_t fc( first_ + child );
+				iterator_t fp( first_ + pos );
+				iterator_t fc( first_ + child );
 				if ( comp_( *fp, *fc ) )
 					swap( *fp, *fc );
 				else
@@ -1438,9 +1438,9 @@ inline void pop_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param first_ - begining of the heap.
  * \param last_ - one past the end of the heap.
  */
-template<typename iter_t>
-inline void pop_heap( iter_t first_, iter_t last_ ) {
-	pop_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+template<typename iterator_t>
+inline void pop_heap( iterator_t first_, iterator_t last_ ) {
+	pop_heap( first_, last_, less<typename hcore::iterator_traits<iterator_t>::value_type>() );
 	return;
 }
 
@@ -1450,8 +1450,8 @@ inline void pop_heap( iter_t first_, iter_t last_ ) {
  * \param last_ - one past the end of the heap.
  * \param comp_ - comparision operator.
  */
-template<typename iter_t, typename compare_t>
-inline bool is_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
+template<typename iterator_t, typename compare_t>
+inline bool is_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	bool isHeap( true );
 	int long size( last_ - first_ );
 
@@ -1480,9 +1480,9 @@ inline bool is_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param first_ - begining of the heap.
  * \param last_ - one past the end of the heap.
  */
-template<typename iter_t>
-inline bool is_heap( iter_t first_, iter_t last_ ) {
-	return ( yaal::is_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+template<typename iterator_t>
+inline bool is_heap( iterator_t first_, iterator_t last_ ) {
+	return ( yaal::is_heap( first_, last_, less<typename hcore::iterator_traits<iterator_t>::value_type>() ) );
 }
 
 /*! \brief Turn range of elements that is a heap into a sorted range.
@@ -1491,9 +1491,9 @@ inline bool is_heap( iter_t first_, iter_t last_ ) {
  * \param last_ - one past the end of the heap.
  * \param comp_ - comparision operator.
  */
-template<typename iter_t, typename compare_t>
-inline void sort_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
-	for ( iter_t first( first_ + 1 ); last_ != first; -- last_ )
+template<typename iterator_t, typename compare_t>
+inline void sort_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
+	for ( iterator_t first( first_ + 1 ); last_ != first; -- last_ )
 		pop_heap( first_, last_, comp_ );
 	return;
 }
@@ -1503,9 +1503,9 @@ inline void sort_heap( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param first_ - begining of the heap.
  * \param last_ - one past the end of the heap.
  */
-template<typename iter_t>
-inline void sort_heap( iter_t first_, iter_t last_ ) {
-	sort_heap( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+template<typename iterator_t>
+inline void sort_heap( iterator_t first_, iterator_t last_ ) {
+	sort_heap( first_, last_, less<typename hcore::iterator_traits<iterator_t>::value_type>() );
 	return;
 }
 
@@ -1515,8 +1515,8 @@ inline void sort_heap( iter_t first_, iter_t last_ ) {
  * \param last_ - one past the end of the range to be sorted.
  * \param comp_ - comparision operator used for sorting.
  */
-template<typename iter_t, typename compare_t>
-inline void heap_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
+template<typename iterator_t, typename compare_t>
+inline void heap_sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	make_heap( first_, last_, comp_ );
 	sort_heap( first_, last_, comp_ );
 	return;
@@ -1527,22 +1527,22 @@ inline void heap_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param first_ - begining of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
  */
-template<typename iter_t>
-inline void heap_sort( iter_t first_, iter_t last_ ) {
-	heap_sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+template<typename iterator_t>
+inline void heap_sort( iterator_t first_, iterator_t last_ ) {
+	heap_sort( first_, last_, less<typename hcore::iterator_traits<iterator_t>::value_type>() );
 	return;
 }
 
 /*! \cond */
-template<typename iter_t, typename compare_t>
-inline void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::iterator_category::forward ) {
-	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
-	iter_t it( first_ );
+template<typename iterator_t, typename compare_t>
+inline void insert_sort( iterator_t first_, iterator_t last_, compare_t comp_, hcore::iterator_category::forward ) {
+	typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
+	iterator_t it( first_ );
 	++ it;
 	while ( it != last_ ) {
-		iter_t next( it );
+		iterator_t next( it );
 		++ next;
-		iter_t sorted( first_ );
+		iterator_t sorted( first_ );
 		while ( ( sorted != it ) && ! comp_( *it, *sorted ) )
 			++ sorted;
 		if ( sorted != it ) {
@@ -1554,14 +1554,14 @@ inline void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::it
 	}
 	return;
 }
-template<typename iter_t, typename compare_t>
-inline void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::iterator_category::random_access ) {
-	typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
-	iter_t it( first_ );
+template<typename iterator_t, typename compare_t>
+inline void insert_sort( iterator_t first_, iterator_t last_, compare_t comp_, hcore::iterator_category::random_access ) {
+	typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
+	iterator_t it( first_ );
 	++ it;
 	while ( it != last_ ) {
 		int long dist( ( it - first_ ) / 2 );
-		iter_t sorted( first_ + dist );
+		iterator_t sorted( first_ + dist );
 		while ( dist > 1 ) {
 			dist >>= 1;
 			if ( comp_( *it, *sorted ) )
@@ -1585,10 +1585,10 @@ inline void insert_sort( iter_t first_, iter_t last_, compare_t comp_, hcore::it
 /*! \endcond */
 
 /*! \cond */
-template<typename iter_t, typename compare_t>
-inline void selection_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
+template<typename iterator_t, typename compare_t>
+inline void selection_sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	for ( ; first_ != last_; ++ first_ ) {
-		iter_t min( min_element( first_, last_, comp_ ) );
+		iterator_t min( min_element( first_, last_, comp_ ) );
 		if ( min != first_ )
 			swap( *min, *first_ );
 	}
@@ -1601,17 +1601,17 @@ static int const YAAL_QUICK_SORT_ALGO_THRESHOLD = 8;
 }
 
 /*! \cond */
-template<typename iter_t, typename compare_t>
-inline void stable_sort_impl( iter_t first_, iter_t last_, compare_t comp_,
-		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iter_t>::value_type>& aux_ ) {
+template<typename iterator_t, typename compare_t>
+inline void stable_sort_impl( iterator_t first_, iterator_t last_, compare_t comp_,
+		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
 	using yaal::distance;
-	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
+	int long size( distance( first_, last_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
 	if ( size < YAAL_MERGE_SORT_ALGO_THRESHOLD )
-		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iter_t>::category_type() );
+		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() );
 	else {
-		iter_t mid( first_ );
+		iterator_t mid( first_ );
 		using yaal::advance;
-		advance( mid, size / 2, typename hcore::iterator_traits<iter_t>::category_type() );
+		advance( mid, size / 2, typename hcore::iterator_traits<iterator_t>::category_type() );
 		stable_sort_impl( first_, mid, comp_, aux_ );
 		stable_sort_impl( mid, last_, comp_, aux_ );
 		aux_.init( first_, mid );
@@ -1627,17 +1627,17 @@ inline void stable_sort_impl( iter_t first_, iter_t last_, compare_t comp_,
  * \param last_ - one past the end of the range to be sorted.
  * \param comp_ - comparision operator used for sorting.
  */
-template<typename iter_t, typename compare_t>
-inline void stable_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
+template<typename iterator_t, typename compare_t>
+inline void stable_sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	using yaal::distance;
-	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
+	int long size( distance( first_, last_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
 	if ( size < YAAL_MERGE_SORT_ALGO_THRESHOLD )
-		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iter_t>::category_type() );
+		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() );
 	else {
-		iter_t mid( first_ );
+		iterator_t mid( first_ );
 		using yaal::advance;
-		advance( mid, size / 2, typename hcore::iterator_traits<iter_t>::category_type() );
-		typedef typename hcore::iterator_traits<iter_t>::value_type value_t;
+		advance( mid, size / 2, typename hcore::iterator_traits<iterator_t>::category_type() );
+		typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
 		typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
 		aux_t aux( first_, mid );
 		stable_sort_impl( first_, mid, comp_, aux );
@@ -1653,17 +1653,17 @@ inline void stable_sort( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param first_ - begining of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
  */
-template<typename iter_t>
-inline void stable_sort( iter_t first_, iter_t last_ ) {
-	stable_sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+template<typename iterator_t>
+inline void stable_sort( iterator_t first_, iterator_t last_ ) {
+	stable_sort( first_, last_, less<typename hcore::iterator_traits<iterator_t>::value_type>() );
 	return;
 }
 
 /*! \cond */
 /* naive */
-template<typename iter_t, typename compare_t>
-inline typename hcore::iterator_traits<iter_t>::value_type choose_pivot( iter_t first_, iter_t last_, compare_t comp_ ) {
-	iter_t mid( first_ + ( last_ - first_ ) / 2 );
+template<typename iterator_t, typename compare_t>
+inline typename hcore::iterator_traits<iterator_t>::value_type choose_pivot( iterator_t first_, iterator_t last_, compare_t comp_ ) {
+	iterator_t mid( first_ + ( last_ - first_ ) / 2 );
 	if ( comp_( *first_, *last_ ) ) {
 		if ( comp_( *first_, *mid ) ) {
 			if ( comp_( *last_, *mid ) )
@@ -1681,22 +1681,125 @@ inline typename hcore::iterator_traits<iter_t>::value_type choose_pivot( iter_t 
 }
 /*! \endcond */
 
+/*! \brief Partition range of elements according to specified predicate.
+ *
+ * \param first_ - begining of the range to partition.
+ * \param last_ - one past the end of the range to partition.
+ * \param predicate_ - a predicate according to which partitioning shall be performed.
+ * \return Iterator m for which all i in [first_, m) predicate_( *i ) is true and for all i in [m, last_) predicate_( *i ) is false.
+ */
+template<typename iterator_t, typename predicate_t>
+iterator_t partition( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
+	iterator_t l( first_ );
+	if ( first_ != last_ ) {
+		iterator_t r( last_ );
+		-- r;
+		while ( l != r ) {
+			for ( ; ( l != r ) && predicate_( *l ); ++ l )
+				;
+			for ( ; ( r != l ) && ! predicate_( *r ); -- r )
+				;
+			if ( l != r ) {
+				swap( *l, *r );
+				++ l;
+				if ( l != r )
+					-- r;
+				else
+					break;
+			} else
+				break;
+		}
+		if ( predicate_( *l ) )
+			++ l;
+	}
+	return ( l );
+}
+
+#if 0
+
+aBcDeFgHiJ []
+aBcDeFgHiJ [B]
+acBDeFgHiJ [BD]
+aceDBFgHiJ [BDF]
+acefBFDHiJ [BDF]
+
+    v
+acegHiJ [BDF]
+
+#endif
+
+/*! \cond */
+template<typename iterator_t, typename predicate_t>
+iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
+	iterator_t unfit;
+	iterator_t fit( first_ );
+	using yaal::swap;
+	for ( ; first_ != last_; ++ first_ ) {
+		if ( predicate_( *first_ ) ) {
+			swap( *first_, *fit );
+			++ fit;
+		} else {
+			unfit = first_;
+			for ( ; ( unfit != last_ ) && ! predicate_( *unfit ); ++ unfit )
+				;
+			if ( unfit != last_ ) {
+				iterator_t nextFit( unfit );
+				++ nextFit;
+				rotate( first_, unfit, nextFit );
+				first_ = unfit;
+				swap( *first_, *fit );
+				++ fit;
+			}
+		}
+	}
+	if ( predicate_( *fit ) )
+		++ fit;
+	return ( fit );
+}
+template<typename iterator_t, typename predicate_t>
+inline void inplace_merge_impl( iterator_t first_, iterator_t last_, predicate_t predicate_,
+		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
+	typedef hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type> aux_t;
+	return ( first_ );
+}
+/*! \endcond */
+
+/*! \brief Partition range of elements according to specified predicate preserving relative order of elements.
+ *
+ * \param first_ - begining of the range to partition.
+ * \param last_ - one past the end of the range to partition.
+ * \param predicate_ - a predicate according to which partitioning shall be performed.
+ * \return Iterator m for which all i in [first_, m) predicate_( *i ) is true and for all i in [m, last_) predicate_( *i ) is false.
+ */
+template<typename iterator_t, typename predicate_t>
+iterator_t stable_partition( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
+	typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
+	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
+	aux_t aux( first_, last_ );
+	iterator_t it;
+//	if ( aux.get_size() > 0 )
+//		it = stable_partition_impl( first_, last_, predicate_, aux );
+//	else
+		it = stable_partition_impl( first_, last_, predicate_ );
+	return ( it );
+}
+
 /*! \brief Sort range of elements (sorting algorithm is unstable with worst case complexity O(n^2) ).
  *
  * \param first_ - begining of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
  * \param comp_ - comparision operator used for sorting.
  */
-template<typename iter_t, typename compare_t>
-inline void sort( iter_t first_, iter_t last_, compare_t comp_ ) {
+template<typename iterator_t, typename compare_t>
+inline void sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	using yaal::distance;
-	int long size( distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() ) );
+	int long size( distance( first_, last_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
 	if ( size < YAAL_QUICK_SORT_ALGO_THRESHOLD )
-		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iter_t>::category_type() );
+		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() );
 	else {
-		iter_t l( first_ );
-		iter_t r( last_ - 1 );
-		typename hcore::iterator_traits<iter_t>::value_type pivot( choose_pivot( l, r, comp_ ) );
+		iterator_t l( first_ );
+		iterator_t r( last_ - 1 );
+		typename hcore::iterator_traits<iterator_t>::value_type pivot( choose_pivot( l, r, comp_ ) );
 		using yaal::swap;
 		while ( l != r ) {
 			for ( ; ( l != r ) && comp_( *l, pivot ); ++ l )
@@ -1741,9 +1844,9 @@ inline void sort( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param first_ - begining of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
  */
-template<typename iter_t>
-inline void sort( iter_t first_, iter_t last_ ) {
-	sort( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() );
+template<typename iterator_t>
+inline void sort( iterator_t first_, iterator_t last_ ) {
+	sort( first_, last_, less<typename hcore::iterator_traits<iterator_t>::value_type>() );
 	return;
 }
 
@@ -1754,9 +1857,9 @@ inline void sort( iter_t first_, iter_t last_ ) {
  * \param comp_ - definition of the ordering.
  * \return True iff given range is sorted according to given ordering.
  */
-template<typename iter_t, typename compare_t>
-inline bool is_sorted( iter_t first_, iter_t last_, compare_t comp_ ) {
-	iter_t it( first_ );
+template<typename iterator_t, typename compare_t>
+inline bool is_sorted( iterator_t first_, iterator_t last_, compare_t comp_ ) {
+	iterator_t it( first_ );
 	bool sorted( true );
 	if ( it != last_ ) {
 		++ it;
@@ -1776,9 +1879,9 @@ inline bool is_sorted( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param last_ - one past the end of the range to test.
  * \return True iff given range is sorted according to "<" ordering.
  */
-template<typename iter_t>
-inline bool is_sorted( iter_t first_, iter_t last_ ) {
-	return ( is_sorted( first_, last_, less<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+template<typename iterator_t>
+inline bool is_sorted( iterator_t first_, iterator_t last_ ) {
+	return ( is_sorted( first_, last_, less<typename hcore::iterator_traits<iterator_t>::value_type>() ) );
 }
 
 /*! \brief Remove consecutive duplicates from range.
@@ -1788,8 +1891,8 @@ inline bool is_sorted( iter_t first_, iter_t last_ ) {
  * \param dest_ - begining of destination range.
  * \param comp_ - uniqeness test predicate.
  */
-template<typename iter_t, typename iter_out_t, typename compare_t>
-inline iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_, compare_t comp_ ) {
+template<typename iterator_t, typename iter_out_t, typename compare_t>
+inline iterator_t unique_copy( iterator_t first_, iterator_t last_, iter_out_t dest_, compare_t comp_ ) {
 	if ( first_ != last_ ) {
 		*dest_ = *first_;
 		++ first_;
@@ -1811,9 +1914,9 @@ inline iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_, compar
  * \param dest_ - begining of destination range.
  * \param comp_ - uniqeness test predicate.
  */
-template<typename iter_t, typename iter_out_t>
-inline iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_ ) {
-	return ( unique_copy( first_, last_, dest_, equal_to<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+template<typename iterator_t, typename iter_out_t>
+inline iterator_t unique_copy( iterator_t first_, iterator_t last_, iter_out_t dest_ ) {
+	return ( unique_copy( first_, last_, dest_, equal_to<typename hcore::iterator_traits<iterator_t>::value_type>() ) );
 }
 
 /*! \brief Remove consecutive duplicates from range.
@@ -1822,8 +1925,8 @@ inline iter_t unique_copy( iter_t first_, iter_t last_, iter_out_t dest_ ) {
  * \param last_ - one past the end of range of elements to filter.
  * \param comp_ - uniqeness test predicate.
  */
-template<typename iter_t, typename compare_t>
-inline iter_t unique( iter_t first_, iter_t last_, compare_t comp_ ) {
+template<typename iterator_t, typename compare_t>
+inline iterator_t unique( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	return ( unique_copy( first_, last_, first_, comp_ ) );
 }
 
@@ -1832,9 +1935,9 @@ inline iter_t unique( iter_t first_, iter_t last_, compare_t comp_ ) {
  * \param first_ - begining of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
  */
-template<typename iter_t>
-inline iter_t unique( iter_t first_, iter_t last_ ) {
-	return ( unique( first_, last_, equal_to<typename hcore::iterator_traits<iter_t>::value_type>() ) );
+template<typename iterator_t>
+inline iterator_t unique( iterator_t first_, iterator_t last_ ) {
+	return ( unique( first_, last_, equal_to<typename hcore::iterator_traits<iterator_t>::value_type>() ) );
 }
 
 }
