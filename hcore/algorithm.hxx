@@ -1690,29 +1690,17 @@ inline typename hcore::iterator_traits<iterator_t>::value_type choose_pivot( ite
  */
 template<typename iterator_t, typename predicate_t>
 iterator_t partition( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
-	iterator_t l( first_ );
-	if ( first_ != last_ ) {
-		iterator_t r( last_ );
-		-- r;
-		while ( l != r ) {
-			for ( ; ( l != r ) && predicate_( *l ); ++ l )
-				;
-			for ( ; ( r != l ) && ! predicate_( *r ); -- r )
-				;
-			if ( l != r ) {
-				swap( *l, *r );
-				++ l;
-				if ( l != r )
-					-- r;
-				else
-					break;
-			} else
-				break;
+	iterator_t fit( first_ );
+	using yaal::swap;
+	for ( ; first_ != last_; ++ first_ ) {
+		if ( predicate_( *first_ ) ) {
+			swap( *first_, *fit );
+			++ fit;
 		}
-		if ( predicate_( *l ) )
-			++ l;
 	}
-	return ( l );
+	if ( predicate_( *fit ) )
+		++ fit;
+	return ( fit );
 }
 
 #if 0
@@ -1731,30 +1719,20 @@ acegHiJ [BDF]
 /*! \cond */
 template<typename iterator_t, typename predicate_t>
 iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
-	iterator_t unfit;
-	iterator_t fit( first_ );
 	using yaal::swap;
-	for ( ; first_ != last_; ++ first_ ) {
-		if ( predicate_( *first_ ) ) {
-			swap( *first_, *fit );
-			++ fit;
-		} else {
-			unfit = first_;
-			for ( ; ( unfit != last_ ) && ! predicate_( *unfit ); ++ unfit )
-				;
-			if ( unfit != last_ ) {
-				iterator_t nextFit( unfit );
-				++ nextFit;
-				rotate( first_, unfit, nextFit );
-				first_ = unfit;
-				swap( *first_, *fit );
-				++ fit;
-			}
-		}
+	for ( ; ( first_ != last_ ) && predicate_( *first_ ); ++ first_ )
+		;
+	iterator_t unfit( first_ );
+	while ( first_ != last_ ) {
+		for ( ; ( first_ != last_ ) && ! predicate_( *first_ ); ++ first_ )
+			;
+		iterator_t fit( first_ );
+		for ( ; ( first_ != last_ ) && predicate_( *first_ ); ++ first_ )
+			;
+		if ( fit != last_ )
+			unfit = rotate( unfit, fit, first_ );
 	}
-	if ( predicate_( *fit ) )
-		++ fit;
-	return ( fit );
+	return ( unfit );
 }
 template<typename iterator_t, typename predicate_t>
 inline void inplace_merge_impl( iterator_t first_, iterator_t last_, predicate_t predicate_,
