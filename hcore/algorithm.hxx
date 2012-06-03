@@ -1689,7 +1689,7 @@ inline typename hcore::iterator_traits<iterator_t>::value_type choose_pivot( ite
  * \return Iterator m for which all i in [first_, m) predicate_( *i ) is true and for all i in [m, last_) predicate_( *i ) is false.
  */
 template<typename iterator_t, typename predicate_t>
-iterator_t partition( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
+inline iterator_t partition( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
 	iterator_t fit( first_ );
 	using yaal::swap;
 	for ( ; first_ != last_; ++ first_ ) {
@@ -1703,22 +1703,9 @@ iterator_t partition( iterator_t first_, iterator_t last_, predicate_t predicate
 	return ( fit );
 }
 
-#if 0
-
-aBcDeFgHiJ []
-aBcDeFgHiJ [B]
-acBDeFgHiJ [BD]
-aceDBFgHiJ [BDF]
-acefBFDHiJ [BDF]
-
-    v
-acegHiJ [BDF]
-
-#endif
-
 /*! \cond */
 template<typename iterator_t, typename predicate_t>
-iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
+inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
 	using yaal::swap;
 	for ( ; ( first_ != last_ ) && predicate_( *first_ ); ++ first_ )
 		;
@@ -1734,10 +1721,52 @@ iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, predicate
 	}
 	return ( unfit );
 }
+/*
+ * Adaptive algorithm:
+ * 1. Perform partition on sub-range as if auxiliary buffer were sufficient
+ * for full partitioning.
+ * 2. Remember boundary iterators (also partition boundary).
+ * 3. Perform partition on next sub-range as if auxiliary buffer were sufficient.
+ * 4. Merge two consecutive partitioned sub-ranges by rotation.
+ * 5. Repeat steps 2, 3, 4 until whole range has been processed.
+ */
 template<typename iterator_t, typename predicate_t>
-inline void inplace_merge_impl( iterator_t first_, iterator_t last_, predicate_t predicate_,
+inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, predicate_t predicate_,
 		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
-	typedef hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type> aux_t;
+	typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
+	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
+	int long auzSize( aux_.get_size() );
+	value_t* aux( aux_.begin() );
+	value_t const* auxEnd( aux_.end() );
+	iterator_t unfit( last_ );
+	for ( iterator_t fit( first_ ); first_ != last_; ) {
+		if ( predicate_( *first_ ) ) {
+			*fit = *first_;
+			++ fit;
+			++ first_;
+		} else {
+			if ( aux != auxEnd ) {
+				*aux = *first_;
+				++ aux; 
+				++ first_;
+			} else {
+				aux = aux_.begin();
+				copy( aux, auxEnd, fit );
+				if ( unfit != last_ ) {
+					rotate( unfit, fit, first_ );
+				}
+
+				while ( ( first_ != last_ ) && ! predicate_( *first_ ) )
+					++ first_;
+				fit = first_;
+				if ( first_ != last_ ) {
+					*fit = *first_;
+					++ fit;
+					++ first_;
+				}
+			}
+		}
+	}
 	return ( first_ );
 }
 /*! \endcond */
@@ -1750,14 +1779,14 @@ inline void inplace_merge_impl( iterator_t first_, iterator_t last_, predicate_t
  * \return Iterator m for which all i in [first_, m) predicate_( *i ) is true and for all i in [m, last_) predicate_( *i ) is false.
  */
 template<typename iterator_t, typename predicate_t>
-iterator_t stable_partition( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
+inline iterator_t stable_partition( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
 	typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
 	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
 	aux_t aux( first_, last_ );
 	iterator_t it;
-//	if ( aux.get_size() > 0 )
-//		it = stable_partition_impl( first_, last_, predicate_, aux );
-//	else
+	if ( aux.get_size() > 0 )
+		it = stable_partition_impl( first_, last_, predicate_, aux );
+	else
 		it = stable_partition_impl( first_, last_, predicate_ );
 	return ( it );
 }
