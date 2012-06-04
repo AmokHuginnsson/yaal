@@ -1737,12 +1737,14 @@ inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, pr
 	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
 	int long auzSize( aux_.get_size() );
 	value_t* aux( aux_.begin() );
-	value_t const* auxEnd( aux_.end() );
+	value_t* auxEnd( aux_.end() );
+	iterator_t it( first_ );
+	iterator_t fit( first_ );
 	iterator_t unfit( last_ );
-	for ( iterator_t fit( first_ ); first_ != last_; ) {
+	while ( first_ != last_ ) {
 		if ( predicate_( *first_ ) ) {
-			*fit = *first_;
-			++ fit;
+			*it = *first_;
+			++ it;
 			++ first_;
 		} else {
 			if ( aux != auxEnd ) {
@@ -1751,23 +1753,28 @@ inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, pr
 				++ first_;
 			} else {
 				aux = aux_.begin();
-				copy( aux, auxEnd, fit );
+				copy( aux, auxEnd, it );
 				if ( unfit != last_ ) {
-					rotate( unfit, fit, first_ );
-				}
-
+					unfit = rotate( unfit, fit, it );
+				} else
+					unfit = it;
 				while ( ( first_ != last_ ) && ! predicate_( *first_ ) )
 					++ first_;
-				fit = first_;
+				fit = it = first_;
 				if ( first_ != last_ ) {
-					*fit = *first_;
-					++ fit;
+					*it = *first_;
+					++ it;
 					++ first_;
 				}
 			}
 		}
 	}
-	return ( first_ );
+	copy( aux_.begin(), aux, it );
+	if ( unfit != last_ )
+		unfit = rotate( unfit, fit, it );
+	else
+		unfit = it;
+	return ( unfit );
 }
 /*! \endcond */
 
