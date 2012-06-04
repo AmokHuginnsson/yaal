@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hexception.hxx"
 #include "hcore/iterator.hxx"
 #include "hcore/pod.hxx"
+#include "hcore/algorithm.hxx"
 
 namespace yaal {
 
@@ -42,10 +43,30 @@ namespace xmath {
 template<typename number_t>
 number_t square_root( number_t );
 
+template<typename iterator_t>
+typename hcore::iterator_traits<iterator_t>::value_type
+select( iterator_t, iterator_t, int long );
+
+struct AGGREGATE_TYPE {
+	typedef enum {
+		COUNT = 1,
+		MINIMUM = 1,
+		MAXIMUM = 1,
+		SUM = 1,
+		AVERAGE = 1,
+		VARIANCE = 1,
+		POPULATION_VARIANCE = 1,
+		STANDARD_DEVIATION = 1,
+		POPULATION_STANDARD_DEVIATION = 1,
+		MEDIAN = 2
+	} type_t;
+};
+
 /*! \brief Provide statistics for set of numbers.
  */
 template<typename numeric_t>
 class HNumberSetStats {
+private:
 	int long _count;
 	numeric_t _minimum;
 	numeric_t _maximum;
@@ -54,9 +75,19 @@ class HNumberSetStats {
 	numeric_t _median;
 	numeric_t _variance;
 	numeric_t _populationVariance;
+	AGGREGATE_TYPE::type_t _aggregateType;
 public:
+	/*! \brief Construct statictics for given range of numbers.
+	 *
+	 * Following aggregate types are implicit:
+	 * `count', `minimum', `maximum', `sum', `average'
+	 * and `variance' (`population variance',
+	 * `standard deviation', `population standard deviation').
+	 *
+	 * One can explicitly request `median' aggregation type.
+	 */
 	template<typename iterator_t>
-	HNumberSetStats( iterator_t, iterator_t );
+	HNumberSetStats( iterator_t, iterator_t, AGGREGATE_TYPE::type_t = AGGREGATE_TYPE::COUNT );
 	int long count( void ) const
 		{ return ( _count ); }
 	numeric_t minimum( void ) const {
@@ -81,7 +112,7 @@ public:
 	}
 	numeric_t median( void ) const {
 		M_PROLOG
-		M_ENSURE( _count > 0 );
+		M_ENSURE( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) );
 		return ( _median );
 		M_EPILOG
 	}
@@ -113,8 +144,10 @@ public:
 
 template<typename numeric_t>
 template<typename iterator_t>
-HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_ )
-	: _count( 0 ), _minimum(), _maximum(), _sum(), _average(), _median(), _variance(), _populationVariance() {
+HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_, AGGREGATE_TYPE::type_t aggregateType_ )
+	: _count( 0 ), _minimum(), _maximum(), _sum(), _average(),
+	_median(), _variance(), _populationVariance(),
+	_aggregateType( static_cast<AGGREGATE_TYPE::type_t>( aggregateType_ | AGGREGATE_TYPE::COUNT ) ) {
 	M_PROLOG
 	numeric_t acc( 0 );
 	for ( ; first_ != last_; ++ first_, ++ _count ) {
@@ -134,6 +167,8 @@ HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_
 	if ( _count > 1 )
 		_variance = acc / static_cast<numeric_t>( _count - 1 ) - ( ( _average * _average * static_cast<numeric_t>( _count ) ) / static_cast<numeric_t>( _count - 1 ) );
 	_populationVariance = acc / static_cast<numeric_t>( _count ) - _average * _average;
+	if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) )
+		_median = select( first_, last_, _count / 2 );
 	return;
 	M_EPILOG
 }
@@ -141,11 +176,11 @@ HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_
 template<typename iterator_t>
 HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
 	typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
-	double long>::type> number_set_stats( iterator_t first_, iterator_t last_ ) {
+	double long>::type> number_set_stats( iterator_t first_, iterator_t last_, AGGREGATE_TYPE::type_t aggregateType_ = AGGREGATE_TYPE::COUNT ) {
 	M_PROLOG
 	return ( HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
 		typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
-		double long>::type>( first_, last_ ) );
+		double long>::type>( first_, last_, aggregateType_ ) );
 	M_EPILOG
 }
 
@@ -172,6 +207,17 @@ inline number_t binomial_coefficient( number_t cardinal_, number_t subCardinal_ 
 template<int long const M, typename number_t>
 inline number_t round_up( number_t const& n ) {
 	return ( ( ( ( n - 1 ) / M ) + 1 ) * M );
+}
+
+template<typename iterator_t>
+typename hcore::iterator_traits<iterator_t>::value_type
+select( iterator_t first_, iterator_t last_, int long ) {
+	typedef typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type value_t;
+	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
+	aux_t aux( first_, last_ );
+	M_ENSURE( aux.get_size() == aux.get_requested_size() );
+	value_t v;
+	return ( v );
 }
 
 }
