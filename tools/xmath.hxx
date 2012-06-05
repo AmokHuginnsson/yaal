@@ -221,6 +221,7 @@ inline number_t round_up( number_t const& n ) {
 template<typename iterator_t>
 typename hcore::iterator_traits<iterator_t>::value_type
 select( iterator_t first_, iterator_t last_, int long kth_ ) {
+	M_PROLOG
 	typedef typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type value_t;
 	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
 	M_ENSURE( first_ != last_ );
@@ -244,6 +245,7 @@ select( iterator_t first_, iterator_t last_, int long kth_ ) {
 		}
 	}
 	return ( *kth );
+	M_EPILOG
 }
 
 }
