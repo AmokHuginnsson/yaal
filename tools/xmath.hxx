@@ -49,16 +49,17 @@ select( iterator_t, iterator_t, int long );
 
 struct AGGREGATE_TYPE {
 	typedef enum {
-		COUNT = 1,
-		MINIMUM = 1,
-		MAXIMUM = 1,
-		SUM = 1,
-		AVERAGE = 1,
-		VARIANCE = 1,
-		POPULATION_VARIANCE = 1,
-		STANDARD_DEVIATION = 1,
-		POPULATION_STANDARD_DEVIATION = 1,
-		MEDIAN = 2
+		COUNT                         = 1,
+		MINIMUM                       = 2,
+		MAXIMUM                       = 4,
+		SUM                           = 8,
+		AVERAGE                       = 16,
+		VARIANCE                      = 32,
+		POPULATION_VARIANCE           = 64,
+		STANDARD_DEVIATION            = 128,
+		POPULATION_STANDARD_DEVIATION = 256,
+		BASIC = COUNT | MINIMUM | MAXIMUM | SUM | AVERAGE | VARIANCE | POPULATION_VARIANCE | STANDARD_DEVIATION | POPULATION_STANDARD_DEVIATION,
+		MEDIAN                        = 512
 	} type_t;
 };
 
@@ -87,56 +88,64 @@ public:
 	 * One can explicitly request `median' aggregation type.
 	 */
 	template<typename iterator_t>
-	HNumberSetStats( iterator_t, iterator_t, AGGREGATE_TYPE::type_t = AGGREGATE_TYPE::COUNT );
-	int long count( void ) const
-		{ return ( _count ); }
+	HNumberSetStats( iterator_t, iterator_t, AGGREGATE_TYPE::type_t = AGGREGATE_TYPE::BASIC );
+	int long count( void ) const {
+		M_PROLOG
+		M_ENSURE( _aggregateType & AGGREGATE_TYPE::COUNT );
+		return ( _count );
+		M_EPILOG
+	}
 	numeric_t minimum( void ) const {
 		M_PROLOG
-		M_ENSURE( _count > 0 );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::MINIMUM ) && ( _count > 0 ) );
 		return ( _minimum );
 		M_EPILOG
 	}
 	numeric_t maximum( void ) const {
 		M_PROLOG
-		M_ENSURE( _count > 0 );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::MAXIMUM ) && ( _count > 0 ) );
 		return ( _maximum );
 		M_EPILOG
 	}
-	numeric_t sum( void )
-		{ return ( _sum ); }
+	numeric_t sum( void ) {
+		M_PROLOG
+		M_ENSURE( _aggregateType & AGGREGATE_TYPE::SUM );
+		return ( _sum );
+		M_EPILOG
+	}
 	numeric_t average( void ) const {
 		M_PROLOG
-		M_ENSURE( _count > 0 );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::AVERAGE ) && ( _count > 0 ) );
 		return ( _average );
 		M_EPILOG
 	}
 	numeric_t median( void ) const {
 		M_PROLOG
-		M_ENSURE( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) && ( _count > 0 ) );
 		return ( _median );
 		M_EPILOG
 	}
 	numeric_t variance( void ) const {
 		M_PROLOG
-		M_ENSURE( _count > 1 );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::VARIANCE ) && ( _count > 1 ) );
 		return ( _variance );
 		M_EPILOG
 	}
 	numeric_t population_variance( void ) const {
 		M_PROLOG
-		M_ENSURE( _count > 0 );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::POPULATION_VARIANCE ) && ( _count > 0 ) );
 		return ( _populationVariance );
 		M_EPILOG
 	}
 	numeric_t standard_deviation( void ) const {
 		M_PROLOG
-		M_ENSURE( _count > 1 );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::STANDARD_DEVIATION ) && ( _count > 1 ) );
 		return ( square_root( _variance ) );
 		M_EPILOG
 	}
 	numeric_t population_standard_deviation( void ) const {
 		M_PROLOG
-		M_ENSURE( _count > 0 );
+		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION ) && ( _count > 0 ) );
 		return ( square_root( _populationVariance ) );
 		M_EPILOG
 	}
@@ -147,21 +156,21 @@ template<typename iterator_t>
 HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_, AGGREGATE_TYPE::type_t aggregateType_ )
 	: _count( 0 ), _minimum(), _maximum(), _sum(), _average(),
 	_median(), _variance(), _populationVariance(),
-	_aggregateType( static_cast<AGGREGATE_TYPE::type_t>( aggregateType_ | AGGREGATE_TYPE::COUNT ) ) {
+	_aggregateType( static_cast<AGGREGATE_TYPE::type_t>( aggregateType_ ) ) {
 	M_PROLOG
 	numeric_t acc( 0 );
-	for ( ; first_ != last_; ++ first_, ++ _count ) {
+	for ( iterator_t it( first_ ); it != last_; ++ it, ++ _count ) {
 		if ( _count ) {
-			if ( *first_ < _minimum )
-				_minimum = *first_;
-			if ( *first_ > _maximum )
-				_maximum = *first_;
+			if ( *it < _minimum )
+				_minimum = *it;
+			if ( *it > _maximum )
+				_maximum = *it;
 		} else {
-			_minimum = *first_;
-			_maximum = *first_;
+			_minimum = *it;
+			_maximum = *it;
 		}
-		_sum += *first_;
-		acc += ( *first_ * *first_ );
+		_sum += *it;
+		acc += ( *it * *it );
 	}
 	_average = _sum / static_cast<numeric_t>( _count );
 	if ( _count > 1 )
@@ -176,7 +185,7 @@ HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_
 template<typename iterator_t>
 HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
 	typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
-	double long>::type> number_set_stats( iterator_t first_, iterator_t last_, AGGREGATE_TYPE::type_t aggregateType_ = AGGREGATE_TYPE::COUNT ) {
+	double long>::type> number_set_stats( iterator_t first_, iterator_t last_, AGGREGATE_TYPE::type_t aggregateType_ = AGGREGATE_TYPE::BASIC ) {
 	M_PROLOG
 	return ( HNumberSetStats<typename trait::ternary<is_floating_point<typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type>::value,
 		typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type,
@@ -211,13 +220,30 @@ inline number_t round_up( number_t const& n ) {
 
 template<typename iterator_t>
 typename hcore::iterator_traits<iterator_t>::value_type
-select( iterator_t first_, iterator_t last_, int long ) {
+select( iterator_t first_, iterator_t last_, int long kth_ ) {
 	typedef typename trait::strip_const<typename hcore::iterator_traits<iterator_t>::value_type>::type value_t;
 	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
+	M_ENSURE( first_ != last_ );
 	aux_t aux( first_, last_ );
 	M_ENSURE( aux.get_size() == aux.get_requested_size() );
-	value_t v;
-	return ( v );
+	M_ENSURE( ( kth_ >= 0 ) && ( kth_ < aux.get_requested_size() ) );
+	value_t* left( aux.begin() );
+	value_t* right( aux.end() );
+	value_t* start( aux.begin() );
+	value_t* kth( NULL );
+	while ( left != right ) {
+		kth = partition( left, right, bind2nd( less<value_t>(), choose_pivot( left, right, less<value_t>() ) ) );
+		int long idx( kth - start );
+		if ( idx == kth_ )
+			break;
+		if ( kth_ < idx ) {
+			right = kth - 1;
+		} else {
+			kth_ -= idx;
+			left = kth + 1;
+		}
+	}
+	return ( *kth );
 }
 
 }
