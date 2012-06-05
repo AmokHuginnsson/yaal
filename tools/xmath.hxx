@@ -177,7 +177,7 @@ HNumberSetStats<numeric_t>::HNumberSetStats( iterator_t first_, iterator_t last_
 		_variance = acc / static_cast<numeric_t>( _count - 1 ) - ( ( _average * _average * static_cast<numeric_t>( _count ) ) / static_cast<numeric_t>( _count - 1 ) );
 	_populationVariance = acc / static_cast<numeric_t>( _count ) - _average * _average;
 	if ( ( _count > 0 ) && ( _aggregateType & AGGREGATE_TYPE::MEDIAN ) )
-		_median = select( first_, last_, _count / 2 );
+		_median = select( first_, last_, ( _count - 1 ) / 2 );
 	return;
 	M_EPILOG
 }
@@ -233,13 +233,13 @@ select( iterator_t first_, iterator_t last_, int long kth_ ) {
 	value_t* kth( NULL );
 	while ( left != right ) {
 		kth = partition( left, right, bind2nd( less<value_t>(), choose_pivot( left, right, less<value_t>() ) ) );
-		int long idx( kth - start );
+		int long idx( kth - left );
 		if ( idx == kth_ )
 			break;
 		if ( kth_ < idx ) {
 			right = kth - 1;
 		} else {
-			kth_ -= idx;
+			kth_ -= ( idx + 1 );
 			left = kth + 1;
 		}
 	}
