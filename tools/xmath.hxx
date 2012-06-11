@@ -229,9 +229,9 @@ select( iterator_t first_, iterator_t last_, int long kth_ ) {
 	M_ENSURE( aux.get_size() == aux.get_requested_size() );
 	M_ENSURE( ( kth_ >= 0 ) && ( kth_ < aux.get_requested_size() ) );
 	value_t* left( aux.begin() );
-	value_t* right( aux.end() );
-	value_t* start( aux.begin() );
-	value_t* kth( NULL );
+	value_t* right( aux.end() - 1 );
+	value_t* start( left );
+	value_t* kth( left );
 	while ( left != right ) {
 		kth = partition( left, right, bind2nd( less<value_t>(), choose_pivot( left, right, less<value_t>() ) ) );
 		int long idx( kth - left );
