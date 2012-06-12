@@ -41,7 +41,7 @@ namespace hcore {
 template<typename key_t, typename value_t>
 struct map_helper {
 	typedef key_t key_type;
-	inline static key_type const& key( HPair<key_t, value_t> const& key_ )
+	inline static key_type const& key( HPair<key_t const, value_t> const& key_ )
 		{	return ( key_.first ); }
 };
 
