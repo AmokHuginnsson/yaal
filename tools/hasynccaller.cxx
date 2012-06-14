@@ -44,9 +44,11 @@ HAbstractAsyncCaller::HAbstractAsyncCaller( void )
 
 void HAbstractAsyncCaller::stop( void ) {
 	M_PROLOG
-	_loop = false;
-	do_signal();
-	_thread.finish();
+	if ( _loop ) {
+		_loop = false;
+		do_signal();
+		_thread.finish();
+	}
 	return;
 	M_EPILOG
 }
