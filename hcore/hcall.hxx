@@ -39,7 +39,7 @@ namespace yaal {
 
 namespace hcore {
 
-/*! \brief Implementation of abstration of any-method of any-class invocation.
+/*! \brief Implementation of abstraction of any-method of any-class invocation.
  *
  * \tparam free_args - how many free standing args this call have.
  * \tparam return_t - call result type.
@@ -57,7 +57,7 @@ template<int free_args = 0, typename return_t = void,
 	typename a10_t = trait::no_type>
 class HCallInterface;
 
-/*! \brief Interface to abstration of any-method of any-class invocation.
+/*! \brief Interface to abstraction of any-method of any-class invocation.
  */
 template<typename return_t>
 class HCallInterface<0, return_t,
@@ -401,7 +401,7 @@ template<typename CLASS_t>
 void const* caller_id( CLASS_t const& object_ )
 	{ return ( &object_ ); }
 
-/*! \brief Implementation of abstration of any-method of any-class invocation.
+/*! \brief Implementation of abstraction of any-method of any-class invocation.
  *
  * \tparam CALL_t - class on which this invocation will operate.
  * \tparam METHOD_t - method of given class CALL_t that shall be invoked.

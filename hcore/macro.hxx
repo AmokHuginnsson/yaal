@@ -25,7 +25,7 @@ Copyright:
 */
 
 /*! \file hcore/macro.hxx
- * \brief Globaly visible preprocessor macros are stored here.
+ * \brief Globally visible preprocessor macros are stored here.
  */
 
 #ifndef YAAL_HCORE_MACRO_HXX_INCLUDED
