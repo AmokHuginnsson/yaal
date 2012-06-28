@@ -139,7 +139,7 @@ include $(DIR_ROOT)/_aux/mk/b_implicit-compile.mk
 include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 
 #phony targets
-.PHONY: all bin clean clean-dep cov debug dep doc install install-environment mrproper relassert reldeb release prof purge static stats tags uninstall
+.PHONY: all bin clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge static stats tags uninstall
 .NOTPARALLEL: $(HAPI_HEADER) $(LD_SO_CONF)
 
 $(TARGET): $(DIRS) $(TARGETS) $(HAPI_HEADER)

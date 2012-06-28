@@ -49,7 +49,7 @@ CONF_cov=--enable-coverage
 DS=d
 FIND=find
 
-.PHONY: all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov debug dep doc install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prof purge static stats tags uninstall
+.PHONY: all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov debug dep distclean doc install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prof purge static stats tags uninstall
 .NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc configure config.hxx.in
 
 default: $(.DEFAULT_GOAL)
@@ -73,7 +73,7 @@ mrproper-all: $(foreach T, $(MAIN_TARGETS), mrproper-$(T))
 
 clean-all: $(foreach T, $(MAIN_TARGETS), clean-$(T))
 
-purge: mrproper-all
+distclean purge: mrproper-all
 	@sh -c '. ./_aux/clean-lib.sh && clean .' && \
 	if [ -d _aux -a ! -h _aux ] ; then /bin/rm -f _aux/config.guess _aux/config.sub _aux/install-sh _aux/ltmain.sh _aux/missing ; fi && \
 	/bin/rm -rf aclocal.m4 autom4te.cache build config.cache config.status \

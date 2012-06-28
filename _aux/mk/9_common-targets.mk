@@ -1,5 +1,5 @@
 #phony targets
-.PHONY: all bin check clean clean-dep cov debug dep doc install install-environment mrproper relassert reldeb release prof purge static stats tags uninstall
+.PHONY: all bin check clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge static stats tags uninstall
 
 all: debug
 
@@ -36,7 +36,7 @@ mrproper: clean
 	cd .. && /bin/rm -rf $(DIR_BUILD); \
 	printf "%b\n" "done."
 
-purge: mrproper
+distclean purge: mrproper
 	if [ -d _aux -a ! -h _aux ] ; then /bin/rm -f _aux/config.guess _aux/config.sub _aux/install-sh _aux/ltmain.sh _aux/missing ; fi && \
 	/bin/rm -rf aclocal.m4 autom4te.cache build config.cache config.status \
 		configure.lineno configure.scan configure Makefile.mk config.hxx config.hxx.in \
