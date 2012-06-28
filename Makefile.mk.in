@@ -139,7 +139,7 @@ include $(DIR_ROOT)/_aux/mk/b_implicit-compile.mk
 include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 
 #phony targets
-.PHONY: all bin clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge static stats tags uninstall
+.PHONY: all bin clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge static stats tags test uninstall
 .NOTPARALLEL: $(HAPI_HEADER) $(LD_SO_CONF)
 
 $(TARGET): $(DIRS) $(TARGETS) $(HAPI_HEADER)
@@ -203,6 +203,11 @@ flint:
 						dbwrapper/hdatabase.$(SS) dbwrapper/hrecordset.$(SS) \
 						hdata/*.$(SS) \
 | awk '{gsub(" \\(compare with line [^)]+\\)","");print}'|head -20
+
+test: all install
+	@if [ -d $(DIR_ROOT)/../tress ] ; then \
+		cd $(DIR_ROOT)/../tress && env -u DIR_ROOT $(MAKE) purge $(TARGET) test ; \
+	fi
 
 include $(DIR_ROOT)/_aux/mk/e_deps.mk
 
