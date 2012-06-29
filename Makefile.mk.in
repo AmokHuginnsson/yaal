@@ -33,9 +33,9 @@ LIB_VERSION  = $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 COMPONENTS   = hcore tools dbwrapper hconsole hdata
 DRIVERS      = @DO_ORACLE_DRIVER@ @DO_FIREBIRD_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
 PREFIX       = @prefix@
-DIR_LIB      = $(PREFIX)/lib
-DIR_HEADERS  = $(PREFIX)/include
-DIR_DOC      = $(PREFIX)/share/doc/$(LIB_NAME)
+DIR_LIB      = $(DESTDIR)$(PREFIX)/lib
+DIR_HEADERS  = $(DESTDIR)$(PREFIX)/include
+DIR_DOC      = $(DESTDIR)$(PREFIX)/share/doc/$(LIB_NAME)
 DIRS         = $(DIR_LIB) $(DIR_BUILD)
 HAPI_HEADER  = include/$(LIB_NAME)/$(LIB_NAME).hxx
 LD_SO_CONF   = $(DIR_LIB)/ld.so.conf
@@ -166,7 +166,7 @@ uninstall:
 	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
 
 install-environment:
-	@cd $(DIR_ROOT) && ./_aux/msh $(PREFIX)
+	@cd $(DIR_ROOT) && ./_aux/msh $(DESTDIR)$(PREFIX)
 
 $(HAPI_HEADER): $(HDRS)
 	@printf "%b" "Making headers ... "; \
@@ -204,9 +204,9 @@ flint:
 						hdata/*.$(SS) \
 | awk '{gsub(" \\(compare with line [^)]+\\)","");print}'|head -20
 
-test: all install
+test: all
 	@if [ -d $(DIR_ROOT)/../tress ] ; then \
-		cd $(DIR_ROOT)/../tress && env -u DIR_ROOT $(MAKE) purge $(TARGET) test ; \
+		cd $(DIR_ROOT)/../tress && env -u DIR_ROOT C_INCLUDE_PATH="$(DIR_BUILD)/include:${C_INCLUDE_PATH}" CPLUS_INCLUDE_PATH="$(DIR_BUILD)/include:${CPLUS_INCLUDE_PATH}" LIBRARY_PATH="$(DIR_BUILD):${LIBRARY_PATH}" LD_LIBRARY_PATH="$(DIR_BUILD):${LD_LIBRARY_PATH}" $(MAKE) purge $(TARGET) test ; \
 	fi
 
 include $(DIR_ROOT)/_aux/mk/e_deps.mk
