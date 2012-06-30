@@ -34,9 +34,10 @@ COMPONENTS   = hcore tools dbwrapper hconsole hdata
 DRIVERS      = @DO_ORACLE_DRIVER@ @DO_FIREBIRD_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
 PREFIX       = @prefix@
 DIR_LIB      = $(DESTDIR)$(PREFIX)/lib
+DIR_PKGCONFIG= $(DESTDIR)$(PREFIX)/share/pkgconfig
 DIR_HEADERS  = $(DESTDIR)$(PREFIX)/include
 DIR_DOC      = $(DESTDIR)$(PREFIX)/share/doc/$(LIB_NAME)
-DIRS         = $(DIR_LIB) $(DIR_BUILD)
+DIRS         = $(DIR_LIB) $(DIR_PKGCONFIG) $(DIR_BUILD)
 HAPI_HEADER  = include/$(LIB_NAME)/$(LIB_NAME).hxx
 LD_SO_CONF   = $(DIR_LIB)/ld.so.conf
 DO_@DO_TARGET@=1
@@ -152,7 +153,7 @@ environment: $(DIRS)
 
 install: all
 	@$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call INSTALL_TARGET,$(IT))) \
-	$(call invoke,$(INSTALL) -D -m644 yaal.pc $(DIR_LIB)/pkgconfig/yaal.pc ) ; \
+	$(call invoke,$(INSTALL) -m644 yaal.pc $(DIR_PKGCONFIG)/ ) ; \
 	/bin/mkdir -p $(DIR_HEADERS) && /bin/cp -fRp $(DIR_BUILD)/include/$(LIB_NAME) $(DIR_HEADERS)/ && \
 	$(call msg,printf "%b" "making cache ... " && ) \
 	printf "%b\n" $(DIR_LIB) > $(DIR_LIB)/ld.so.conf && \
@@ -163,6 +164,7 @@ install: all
 uninstall:
 	@$(call msg,printf "%b" "Uninstalling the library ... " && ) \
 	$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call UNINSTALL_TARGET,$(IT))) \
+	$(call invoke,/bin/rm -f $(DIR_PKGCONFIG)/yaal.pc && )\
 	$(call invoke,/bin/rm -fr $(DIR_HEADERS)/$(LIB_NAME)) \
 	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
 
