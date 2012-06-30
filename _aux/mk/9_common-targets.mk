@@ -40,7 +40,7 @@ distclean purge: mrproper
 	if [ -d _aux -a ! -h _aux ] ; then /bin/rm -f _aux/config.guess _aux/config.sub _aux/install-sh _aux/ltmain.sh _aux/missing ; fi && \
 	/bin/rm -rf aclocal.m4 autom4te.cache build config.cache config.status \
 		configure.lineno configure.scan configure Makefile.mk config.hxx config.hxx.in \
-		config.h config.h.in yaalrc config.log dirs.d doc/html \
+		config.h config.h.in yaalrc yaal.pc config.log dirs.d doc/html \
 		CMakeFiles CMakeCache.txt cmake_install.cmake install_manifest.txt \
 		tags GPATH GRTAGS GSYMS GTAGS make.log *.vcproj.* *.vcproj *.vcxproj.* *.vcxproj \
 		*.sln *.suo *.ncb *.sdf *.dir _UpgradeReport_Files UpgradeLog.XML debug release *.so \

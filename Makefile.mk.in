@@ -152,6 +152,7 @@ environment: $(DIRS)
 
 install: all
 	@$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call INSTALL_TARGET,$(IT))) \
+	$(call invoke,$(INSTALL) -D -m644 yaal.pc $(DIR_LIB)/pkgconfig/yaal.pc ) ; \
 	/bin/mkdir -p $(DIR_HEADERS) && /bin/cp -fRp $(DIR_BUILD)/include/$(LIB_NAME) $(DIR_HEADERS)/ && \
 	$(call msg,printf "%b" "making cache ... " && ) \
 	printf "%b\n" $(DIR_LIB) > $(DIR_LIB)/ld.so.conf && \

@@ -449,6 +449,7 @@ AC_SUBST([HCORE_LIBS],[${HCORE_LIBS}])
 AC_SUBST([TOOLS_LIBS],[${TOOLS_LIBS}])
 AC_SUBST([HCONSOLE_LIBS],[${HCONSOLE_LIBS}])
 AC_SUBST([DO_TARGET],[${DO_TARGET}])
+AC_SUBST([VERSION],[YAAL_PACKAGE_VERSION])
 AH_TOP([/* $Id$ */
 
 #ifndef YAAL_CONFIG_HXX_INCLUDED
@@ -461,7 +462,7 @@ AH_BOTTOM([
 
 dnl We have to set up proper compiler/linker flags.
 AC_CONFIG_HEADERS(config.hxx)
-AC_CONFIG_FILES([Makefile.mk yaalrc])
+AC_CONFIG_FILES([Makefile.mk yaalrc yaal.pc])
 AC_OUTPUT
 AC_MSG_RESULT([--- All ok, good luck! ---                     	       [[100%]]])
 AC_MSG_RESULT([[Now you can type \`make'.]])

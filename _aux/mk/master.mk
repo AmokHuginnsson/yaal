@@ -4,7 +4,7 @@ COMA=,
 include _aux/mk/2_term.mk
 
 define PREPARE_MAIN_TARGET
-$(1): build/$(1)/Makefile.mk build/$(1)/config.hxx $$(if $$(wildcard yaalrc.in),build/$(1)/yaalrc)
+$(1): build/$(1)/Makefile.mk build/$(1)/config.hxx $$(if $$(wildcard yaalrc.in),build/$(1)/yaalrc build/$(1)/yaal.pc)
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
 	$$(call invoke,$$(strip $(2) $$(MAKE) -C $$(dir $$(<)) --no-print-directory -f Makefile.mk -e $$(@)))
 
@@ -33,12 +33,12 @@ build/%/$(1): configure $(1).in
 			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(CONFIGURE) | tee -a make.log | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
 		else \
 			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(CONFIGURE) | tee -a make.log ; \
-		fi ; test -f $$(notdir $$(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc)
+		fi ; test -f $$(notdir $$(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc yaal.pc)
 endef
 
 MAIN_TARGETS=debug release reldeb relassert prof cov
 .DEFAULT_GOAL:=$(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(if $(wildcard ./build/$(T)/Makefile.mk),$(T))) $(DEFAULT_TARGET) release))
-CONFIG_ITEMS=Makefile.mk config.hxx yaalrc
+CONFIG_ITEMS=Makefile.mk config.hxx yaalrc yaal.pc
 CONF_release=
 CONF_reldeb=--enable-reldeb
 CONF_relassert=--enable-relassert
@@ -50,7 +50,7 @@ DS=d
 FIND=find
 
 .PHONY: all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov debug dep distclean doc install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prof purge static stats tags uninstall
-.NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc configure config.hxx.in
+.NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc build/%/yaal.pc configure config.hxx.in
 
 default: $(.DEFAULT_GOAL)
 
@@ -78,7 +78,7 @@ distclean purge: mrproper-all
 	if [ -d _aux -a ! -h _aux ] ; then /bin/rm -f _aux/config.guess _aux/config.sub _aux/install-sh _aux/ltmain.sh _aux/missing ; fi && \
 	/bin/rm -rf aclocal.m4 autom4te.cache build config.cache config.status \
 		configure.lineno configure.scan configure Makefile.mk config.hxx config.hxx.in \
-		config.h config.h.in yaalrc config.log dirs.d doc/html \
+		config.h config.h.in yaalrc yaal.pc config.log dirs.d doc/html \
 		CMakeFiles CMakeCache.txt cmake_install.cmake install_manifest.txt \
 		tags GPATH GRTAGS GSYMS GTAGS make.log *.vcproj.* *.vcproj *.vcxproj.* *.vcxproj \
 		*.sln *.suo *.ncb *.sdf *.dir _UpgradeReport_Files UpgradeLog.XML debug release *.so \
@@ -94,3 +94,4 @@ clean-dep:
 local.mk:
 
 -include local.mk
+
