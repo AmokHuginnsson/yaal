@@ -56,6 +56,7 @@ AC_PROG_CXXCPP
 dnl AC_PROG_MKDIR_P dnl Centos 5.4 has obsolete version of autoconf package.
 AC_PROG_INSTALL
 AC_PROG_RANLIB
+AC_PROG_MKDIR_P
 AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
 
 YAAL_CHECK_COMPILER_VERSION
