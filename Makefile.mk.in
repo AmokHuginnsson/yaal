@@ -33,11 +33,14 @@ LIB_VERSION  = $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
 COMPONENTS   = hcore tools dbwrapper hconsole hdata
 DRIVERS      = @DO_ORACLE_DRIVER@ @DO_FIREBIRD_DRIVER@ @DO_MYSQL_DRIVER@ @DO_POSTGRESQL_DRIVER@ @DO_SQLITE3_DRIVER@
 PREFIX       = @prefix@
+prefix       = @prefix@
+SYSCONFDIR   = @sysconfdir@
+DIR_SYSCONF  = $(DESTDIR)$(SYSCONFDIR)
 DIR_LIB      = $(DESTDIR)$(PREFIX)/lib
 DIR_PKGCONFIG= $(DESTDIR)$(PREFIX)/share/pkgconfig
 DIR_HEADERS  = $(DESTDIR)$(PREFIX)/include
 DIR_DOC      = $(DESTDIR)$(PREFIX)/share/doc/$(LIB_NAME)
-DIRS         = $(DIR_LIB) $(DIR_PKGCONFIG) $(DIR_BUILD)
+DIRS         = $(DIR_BUILD)
 HAPI_HEADER  = include/$(LIB_NAME)/$(LIB_NAME).hxx
 LD_SO_CONF   = $(DIR_LIB)/ld.so.conf
 DO_@DO_TARGET@=1
@@ -53,6 +56,7 @@ CTAGS   = @CTAGS@
 GITID   = @GITID@
 RANLIB  = @RANLIB@
 INSTALL = @INSTALL@
+MKDIR_P = @MKDIR_P@
 include $(DIR_ROOT)/_aux/mk/1_basic.mk
 include $(DIR_ROOT)/_aux/mk/2_term.mk
 include $(DIR_ROOT)/_aux/mk/3_suffix.mk
@@ -152,9 +156,11 @@ $(foreach IT,$(DIRS),$(eval $(call MAKE_DIR,$(IT))))
 environment: $(DIRS)
 
 install: all
-	@$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call INSTALL_TARGET,$(IT))) \
-	$(call invoke,$(INSTALL) -m644 yaal.pc $(DIR_PKGCONFIG)/ ) ; \
-	/bin/mkdir -p $(DIR_HEADERS) && /bin/cp -fRp $(DIR_BUILD)/include/$(LIB_NAME) $(DIR_HEADERS)/ && \
+	@$(call invoke,$(MKDIR_P) $(DIR_LIB) $(DIR_SYSCONF) && ) \
+	$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call INSTALL_TARGET,$(IT))) \
+	$(call invoke,$(INSTALL) -m644 yaal.pc $(DIR_PKGCONFIG)/ && ) \
+	$(call invoke,$(INSTALL) -m644 yaalrc $(DIR_SYSCONF)/ && ) \
+	$(call invoke,$(MKDIR_P) $(DIR_HEADERS) && /bin/cp -fRp $(DIR_BUILD)/include/$(LIB_NAME) $(DIR_HEADERS)/ && ) \
 	$(call msg,printf "%b" "making cache ... " && ) \
 	printf "%b\n" $(DIR_LIB) > $(DIR_LIB)/ld.so.conf && \
 	/bin/cp -f $(DIR_ROOT)/_aux/mkcache $(DIR_LIB) && \
@@ -164,7 +170,8 @@ install: all
 uninstall:
 	@$(call msg,printf "%b" "Uninstalling the library ... " && ) \
 	$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call UNINSTALL_TARGET,$(IT))) \
-	$(call invoke,/bin/rm -f $(DIR_PKGCONFIG)/yaal.pc && )\
+	$(call invoke,/bin/rm -f $(DIR_PKGCONFIG)/yaal.pc && ) \
+	$(call invoke,/bin/rm -f $(DIR_SYSCONF)/yaalrc && ) \
 	$(call invoke,/bin/rm -fr $(DIR_HEADERS)/$(LIB_NAME)) \
 	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
 

@@ -90,6 +90,7 @@ AC_MSG_RESULT([--- Looking standrad development software ... ---       [[33%]]])
 dnl AC_PROG_MKDIR_P dnl Centos 5.4 has obsolete version of autoconf package.
 AC_PROG_INSTALL
 AC_PROG_RANLIB
+AC_PROG_MKDIR_P
 AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
 
 dnl Looking for main libc headers
