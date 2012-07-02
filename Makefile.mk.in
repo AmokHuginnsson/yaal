@@ -200,9 +200,17 @@ mrproper: clean
 
 include $(DIR_ROOT)/_aux/mk/d_target-tools.mk
 
-doc: $(SRCS) $(HDRS)
+doc: $(DIR_ROOT)/doc/html/doxygen.css
+
+$(DIR_ROOT)/doc/html/doxygen.css: $(SRCS) $(HDRS)
 	@cd $(DIR_ROOT) && doxygen _aux/doxygenrc 2>&1 | grep 'is not documented'; \
 	cat doc/doxygen.css >> doc/html/doxygen.css
+
+install-doc: doc/html/doxygen.css
+	@$(call invoke,$(MKDIR_P) $(DIR_DOC) && /bin/cp -fRp $(DIR_ROOT)/doc/html $(DIR_DOC) )
+
+uninstall-doc:
+	@$(call invoke,/bin/rm -rf $(DIR_DOC))
 
 stats:
 	@cd $(DIR_ROOT) && ./_aux/stats $(DIR_ROOT)
@@ -216,7 +224,7 @@ flint:
 
 test: all
 	@if [ -d $(DIR_ROOT)/../tress ] ; then \
-		cd $(DIR_ROOT)/../tress && env -u DIR_ROOT C_INCLUDE_PATH="$(DIR_BUILD)/include:${C_INCLUDE_PATH}" CPLUS_INCLUDE_PATH="$(DIR_BUILD)/include:${CPLUS_INCLUDE_PATH}" LIBRARY_PATH="$(DIR_BUILD):${LIBRARY_PATH}" LD_LIBRARY_PATH="$(DIR_BUILD):${LD_LIBRARY_PATH}" $(MAKE) purge $(TARGET) test ; \
+		cd $(DIR_ROOT)/../tress && env -u DIR_ROOT C_INCLUDE_PATH="$(DIR_BUILD)/include:${C_INCLUDE_PATH}" CPLUS_INCLUDE_PATH="$(DIR_BUILD)/include:${CPLUS_INCLUDE_PATH}" LIBRARY_PATH="$(DIR_BUILD):${LIBRARY_PATH}" LD_LIBRARY_PATH="$(DIR_BUILD):${LD_LIBRARY_PATH}" $(MAKE) purge debug test ; \
 	fi
 
 include $(DIR_ROOT)/_aux/mk/e_deps.mk

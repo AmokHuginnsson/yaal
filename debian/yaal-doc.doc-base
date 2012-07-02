@@ -1,0 +1,11 @@
+Document: yaal
+Title: Debian yaal Manual
+Author: Marcin Konarski
+Abstract: This manual describes what yaal is
+ and how it can be used to
+ manage online manuals on Debian systems.
+Section: unknown
+
+Format: HTML
+Index: /usr/share/doc/yaal/html/index.html
+Files: /usr/share/doc/yaal/html/*.html

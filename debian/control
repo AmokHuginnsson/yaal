@@ -1,0 +1,30 @@
+Source: yaal
+Priority: extra
+Maintainer: Marcin Konarski <amok@codestation.org>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.2
+Section: libs
+Homepage: http://codestation.org/
+Vcs-Git: https://codestation.org/repo/yaal.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/yaal.git;a=summary
+
+Package: yaal-doc
+Section: doc
+Architecture: any
+Depends: yaal-dev (= ${binary:Version})
+Description: Yet Another Abstraction Layer - general purpose C++ library - documentation for developers.
+ <insert long description, indented with spaces>
+
+Package: yaal-dev
+Section: libdevel
+Architecture: any
+Depends: yaal (= ${binary:Version})
+Description: Yet Another Abstraction Layer - general purpose C++ library - development package.
+ <insert long description, indented with spaces>
+
+Package: yaal
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Yet Another Abstraction Layer - general purpose C++ library - runtime package.
+ <insert long description, indented with spaces>

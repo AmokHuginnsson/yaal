@@ -1,0 +1,26 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# debian/rules for yaal project package that uses debhelper.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export PREFIX=/usr
+export SYSCONFDIR=/etc
+
+dropprivs: ./debian/dropprivs.c
+	$(CC) $(<) -o $(@)
+
+override_dh_auto_clean: dropprivs
+	./dropprivs dh_auto_clean && /bin/rm -fr ./dropprivs ./debian/tmp
+
+override_dh_auto_build: dropprivs
+	./dropprivs dh_auto_build -- debug release doc
+
+override_dh_auto_install: dropprivs
+	./dropprivs dh_auto_install -- install-debug install-release install-doc
+
+
+%: dropprivs
+	./dropprivs dh $(@)
+
