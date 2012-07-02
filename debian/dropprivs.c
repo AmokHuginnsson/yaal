@@ -10,10 +10,13 @@ int main( int argc, char** argv ) {
 	uid_t euid = -1;
 	uid_t suid = -1;
 	int error = 0;
+	char const* errmsg = "unknown error";
 	do {
 
-		if ( argc < 2 )
+		if ( argc < 2 ) {
+			errmsg = "invalid usage - program requires at least one parameter";
 			break;
+		}
 
 		if ( getresuid( &ruid, &euid, &suid ) != 0 ) {
 			error = errno;
@@ -21,8 +24,11 @@ int main( int argc, char** argv ) {
 		}
 		
 		char const* username = getenv( "USERNAME" );
+		if ( username == NULL )
+			username = getenv( "LOGNAME" );
 		if ( username == NULL ) {
 			error = errno;
+			errmsg = "unable to guess unprivileged user name";
 			break;
 		}
 
@@ -32,7 +38,7 @@ int main( int argc, char** argv ) {
 			static int const PWDBUF_SIZE = 1024;
 			char pwdbuf[PWDBUF_SIZE];
 			struct passwd* result = NULL;
-			if ( getpwnam_r( username, &pwd, pwdbuf, PWDBUF_SIZE, &result ) ) {
+			if ( getpwnam_r( username, &pwd, pwdbuf, PWDBUF_SIZE, &result ) != 0 ) {
 				error = errno;
 				break;
 			}
@@ -59,13 +65,14 @@ int main( int argc, char** argv ) {
 		}
 
 		execvp( argv[1], argv + 1 );
+		errmsg = "failed to execute program";
 		error = errno;
 
 	} while ( 0 );
 	if ( error != 0 ) {
 		printf( "%s\n", strerror( error ) );
 	} else {
-		printf( "invalid usage\n" );
+		printf( "%s\n", errmsg );
 	}
 	return ( error );
 }
