@@ -156,7 +156,7 @@ $(foreach IT,$(DIRS),$(eval $(call MAKE_DIR,$(IT))))
 environment: $(DIRS)
 
 install: all
-	@$(call invoke,$(MKDIR_P) $(DIR_LIB) $(DIR_SYSCONF) && ) \
+	@$(call invoke,$(MKDIR_P) $(DIR_LIB) $(DIR_PKGCONFIG) $(DIR_SYSCONF) && ) \
 	$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call INSTALL_TARGET,$(IT))) \
 	$(call invoke,$(INSTALL) -m644 yaal.pc $(DIR_PKGCONFIG)/ && ) \
 	$(call invoke,$(INSTALL) -m644 yaalrc $(DIR_SYSCONF)/ && ) \
