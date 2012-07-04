@@ -13,15 +13,15 @@ COMMENT=       Yet Another Abstraction Layer
 BUILD_DEPENDS= autoconf:${PORTSDIR}/devel/autoconf \
 	libtool:${PORTSDIR}/devel/libtool \
 	gmake:${PORTSDIR}/devel/gmake \
-	doxygen:${PORTSDIR}/devel/doxygen \
-	libxml2:${PORTSDIR}/textproc/libxml2 \
-	libxslt:${PORTSDIR}/textproc/libxslt
+	doxygen:${PORTSDIR}/devel/doxygen
+LIB_DEPENDS= xml2:${PORTSDIR}/textproc/libxml2 \
+	xslt:${PORTSDIR}/textproc/libxslt
 
 do-fetch:
-	cd ../../ && git pull
+	cd ../../../ && git pull
 
 do-extract:
-	mkdir -p $(WRKDIR) && ln -s ../../../ $(WRKDIR)/$(PORTNAME)-$(PORTVERSION)
+	mkdir -p $(WRKDIR) && ln -s ../../../../ $(WRKDIR)/$(PORTNAME)-$(PORTVERSION)
 
 do-build:
 	cd $(WRKSRC) && $(MAKE) PREFIX=/usr/local debug && $(MAKE) PREFIX=/usr/local release && $(MAKE) doc
