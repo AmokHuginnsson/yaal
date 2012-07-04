@@ -31,14 +31,14 @@ make purge
 %build
 cd -
 umask 0077
-make %{?_smp_mflags} debug release doc PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir}
+make %{?_smp_mflags} debug release doc PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir} LIBDIR=%{_libdir}
 
 
 %install
 rm -rf ${RPM_BUILD_ROOT}
 cd -
 umask 0077
-make install-debug install-release install-doc DESTDIR=${RPM_BUILD_ROOT} PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir}
+make install-debug install-release install-doc DESTDIR=${RPM_BUILD_ROOT}
 rm -f ${RPM_BUILD_ROOT}/%_libdir/ld.so.conf ${RPM_BUILD_ROOT}/%{_prefix}/lib/ld.so.conf ${RPM_BUILD_ROOT}/%{_prefix}/lib/lib*[a-z]?.a ${RPM_BUILD_ROOT}/%{_prefix}/lib/mkcache
 
 %clean

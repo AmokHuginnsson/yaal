@@ -33,6 +33,7 @@ Copyright:
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
+#include "config.hxx"
 #include "hprogramoptionshandler.hxx"
 #include "functional.hxx"
 #include "hstring.hxx"
@@ -74,7 +75,8 @@ HString make_path( HString const& rcName_,
 	HString rcPath;
 	switch ( placement_ ) {
 		case ( RC_PATHER::ETC ): {
-			rcPath = "/etc/";
+			rcPath = SYSCONFDIR;
+			rcPath += "/";
 			rcPath += rcName_;
 			rcPath += "rc";
 		}
@@ -102,22 +104,20 @@ HString make_path( HString const& rcName_,
 	M_EPILOG
 }
 
-int rc_open( HString const& rcName_,
-		RC_PATHER::placement_t const placament_,
-		HFile& file_ ) {
+int rc_open( HString const& rcPath_, HFile& file_ ) {
 	M_PROLOG
 	int error = 0;
-	HString rcPath = make_path( rcName_, placament_ );
 	if ( !! file_ )
 		file_.close();
-	error = file_.open( rcPath, HFile::OPEN::READING );
+	error = file_.open( rcPath_, HFile::OPEN::READING );
+	HString message( rcPath_ );
 	if ( error )
-		rcPath +=	" not found, ";
+		message += " not found, ";
 	else {
-		rcPath = "config read from: " + rcPath;
-		rcPath += ", ";
+		message = "config read from: " + rcPath_;
+		message += ", ";
 	}
-	log << rcPath;
+	log << message;
 	return ( error );
 	M_EPILOG
 }
@@ -309,7 +309,8 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 				{ RC_PATHER::ETC, RC_PATHER::GLOBAL },
 				{ RC_PATHER::HOME_ETC, RC_PATHER::LOCAL },
 				{ RC_PATHER::HOME, RC_PATHER::LOCAL } };
-	bool section = false, optionOK;
+	bool section( false );
+	bool optionOK( false );
 	placement_bit_t successStory( RC_PATHER::NONE );
 	size_t ctrOut = 0;
 	HFile rc;
@@ -317,13 +318,16 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 	log( LOG_TYPE::INFO ) << "process_rc_file(): ";
 	if ( _options.is_empty() )
 		M_THROW( _( "bad variable count" ), _options.size() );
+	typedef HSet<HString> paths_t;
+	paths_t paths;
 	for ( ctrOut = 0; ctrOut < ( sizeof ( placementTab ) / sizeof ( OPlacement ) ); ctrOut ++ ) {
 		if ( ( !!( successStory & RC_PATHER::GLOBAL ) )
 				&& ( placementTab[ ctrOut ]._placementBit == RC_PATHER::GLOBAL ) )
 			continue;
 		if ( !! ( successStory & RC_PATHER::LOCAL ) )
 			break;
-		if ( ! rc_open( rcName_, placementTab [ ctrOut ]._placement, rc ) ) {
+		HString rcPath( make_path( rcName_, placementTab[ ctrOut ]._placement ) );
+		if ( paths.insert( rcPath ).second && ! rc_open( rcPath, rc ) ) {
 			successStory |= placementTab [ ctrOut ]._placementBit;
 			int line = 0;
 			while ( read_rc_line( option, value, rc, line ) ) {

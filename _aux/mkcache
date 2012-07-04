@@ -2,19 +2,30 @@
 
 HOST_OS_TYPE=`uname`
 
-if [ ! -z "${PREFIX}" ] ; then
+DIR_LIB=""
 
-	/bin/rm -f ${PREFIX}/lib/ld.so.cache
+for arg in "${@}" ; do
+	case ${arg} in
+		--lib-dir=*) DIR_LIB=`echo ${arg} | sed 's;--lib-dir=;;'` ;;
+		*)
+			echo "unknown option: ${arg}"
+		;;
+	esac
+done
+
+if [ ! -z "${DIR_LIB}" ] ; then
+
+	/bin/rm -f ${DIR_LIB}/ld.so.cache
 
 	case "${HOST_OS_TYPE}" in
 		FreeBSD)
-			/sbin/ldconfig -i -f ${PREFIX}/lib/ld.so.cache ${PREFIX}/lib
+			/sbin/ldconfig -i -f ${DIR_LIB}/ld.so.cache ${DIR_LIB}
 		;;
 		Linux)
-			/sbin/ldconfig -f ${PREFIX}/lib/ld.so.conf -C ${PREFIX}/lib/ld.so.cache ${PREFIX}/lib > /dev/null 2> /dev/null
+			/sbin/ldconfig -f ${DIR_LIB}/ld.so.conf -C ${DIR_LIB}/ld.so.cache ${DIR_LIB} > /dev/null 2> /dev/null
 		;;
 		SunOS)
-			/bin/crle -64 -c ${PREFIX}/lib/ls.so.conf -l ${PREFIX}/lib
+			/bin/crle -64 -c ${DIR_LIB}/ls.so.conf -l ${DIR_LIB}
 		;;
 		CYGWIN*)
 			echo "This platform does not use link caching."
@@ -24,7 +35,9 @@ if [ ! -z "${PREFIX}" ] ; then
 			exit 1
 		;;
 	esac
-
+else
+	echo "Core settings not set!"
+	exit 1
 fi
 
 exit 0

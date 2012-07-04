@@ -1,5 +1,25 @@
 #! /bin/sh
 
+LIB_NAME=""
+LIB_VERSION=""
+DIR_ROOT=""
+DIR_BUILD=""
+HDRS=""
+
+for arg in "${@}" ; do
+	case ${arg} in
+		--lib-name=*)    LIB_NAME=`echo ${arg} | sed 's;--lib-name=;;'` ;;
+		--lib-version=*) LIB_VERSION=`echo ${arg} | sed 's;--lib-version=;;'` ;;
+		--dir-root=*)    DIR_ROOT=`echo ${arg} | sed 's;--dir-root=;;'` ;;
+		--dir-build=*)   DIR_BUILD=`echo ${arg} | sed 's;--dir-build=;;'` ;;
+		--headers=*)     HDRS=`echo ${arg} | sed 's;--headers=;;'` ;;
+		*)
+			echo "unknown option: ${arg}"
+			exit 1
+		;;
+	esac
+done
+
 if [ -z "${LIB_NAME}" -o -z "${LIB_VERSION}" -o -z "${DIR_ROOT}" -o -z "${DIR_BUILD}" -o -z "${HDRS}" ] ; then
 	printf "%b\n" "Core settings not found!"
 	exit 1

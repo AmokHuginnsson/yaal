@@ -282,3 +282,5 @@ AC_DEFUN([YAAL_DETECT_COMMON_FLAGS], [
 	CPPFLAGS=$CXXFLAGS_ORIG;
 ])
 
+AC_DEFINE_UNQUOTED([SYSCONFDIR], "$sysconfdir", [Path to global system configuration directory.])
+
