@@ -8,3 +8,6 @@ yaalrc
 Debug
 static
 dropprivs
+_aux/freebsd/pkg-plist
+_aux/freebsd/work
+_aux/freebsd/*.tbz

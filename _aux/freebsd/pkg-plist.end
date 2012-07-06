@@ -1,0 +1,7 @@
+@dirrm include/yaal/hdata
+@dirrm include/yaal/hconsole
+@dirrm include/yaal/dbwrapper
+@dirrm include/yaal/tools
+@dirrm include/yaal/hcore
+@dirrm include/yaal
+@dirrm share/doc/yaal

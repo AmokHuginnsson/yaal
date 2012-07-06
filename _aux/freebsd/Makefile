@@ -36,15 +36,26 @@ pre-clean:
 	${RM} -rf $(MY_DESTDIR)
 
 do-fetch:
-	cd ../../../ && git pull
+	cd ../../ && git pull
 
 do-extract:
-	${MKDIR} $(WRKDIR) && ${LN} -s ../../../../ $(WRKSRC)
+	${MKDIR} $(WRKDIR) && ${LN} -s ../../../ $(WRKSRC)
 
 do-build:
 	cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) debug && $(MAKE) $(BUILD_ENV) release && $(MAKE) doc
 
 do-install:
 	${MKDIR} $(MY_DESTDIR) && cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) install-debug install-release install-doc
+
+post-install:
+	${RM} $(MY_DESTDIR)/$(MY_PREFIX)/lib/mkcache
+
+do-package:
+	echo "@name $(PORTNAME)-$(PORTVERSION)" > pkg-plist && \
+	cat pkg-plist.begin >> pkg-plist && \
+	find $(MY_DESTDIR)/$(MY_PREFIX) -type f -o -type l | sed -e 's;$(MY_DESTDIR)/$(MY_PREFIX)/;;' >> pkg-plist && \
+	find -d $(MY_DESTDIR)/$(MY_PREFIX)/share/doc/yaal -type d | sed -e 's;$(MY_DESTDIR)/$(MY_PREFIX)/;@dirrm ;' >> pkg-plist && \
+	cat pkg-plist.end >> pkg-plist && \
+	/usr/sbin/pkg_create -S $(MY_DESTDIR) -p $(MY_PREFIX) -f pkg-plist -c -"$(COMMENT)" -d pkg-descr $(PORTNAME)-$(PORTVERSION).tbz
 
 .include <bsd.port.mk>
