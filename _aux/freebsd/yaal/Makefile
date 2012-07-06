@@ -9,18 +9,31 @@ MASTER_SITES=  http://codestation.org/ https://codestation.org/
 
 MAINTAINER=    amok@codestation.org
 COMMENT=       Yet Another Abstraction Layer
+RESTRICTED=1
 
 BUILD_DEPENDS= autoconf:${PORTSDIR}/devel/autoconf \
 	libtool:${PORTSDIR}/devel/libtool \
 	gmake:${PORTSDIR}/devel/gmake \
+	fakeroot:${PORTSDIR}/security/fakeroot \
 	doxygen:${PORTSDIR}/devel/doxygen
 LIB_DEPENDS= xml2:${PORTSDIR}/textproc/libxml2 \
 	xslt:${PORTSDIR}/textproc/libxslt
 
-INSTALL_AS_USER=1
+INSTALL_AS_USER=yo
+
+WRKDIR=$(.CURDIR)/work
+PKG_DBDIR=$(WRKDIR)/pkg
+PORT_DBDIR=$(WRKDIR)/port
+MY_DESTDIR=$(WRKDIR)/tmp-root
+MY_PREFIX=/usr/local
+LOCALBASE=$(MY_DESTDIR)/$(MY_PREFIX)
+PREFIX=$(LOCALBASE)
+BUILD_ENV=PREFIX=$(MY_PREFIX) DESTDIR=$(MY_DESTDIR) SYSCONFDIR=$(MY_PREFIX)/etc
+BINOWN=root
+SHAREOWN=root
 
 pre-clean:
-	${RM} -rf $(WRKDIR)/tmp-root
+	${RM} -rf $(MY_DESTDIR)
 
 do-fetch:
 	cd ../../../ && git pull
@@ -29,9 +42,9 @@ do-extract:
 	${MKDIR} $(WRKDIR) && ${LN} -s ../../../../ $(WRKSRC)
 
 do-build:
-	cd $(WRKSRC) && $(MAKE) PREFIX=/usr/local SYSCONFDIR=/usr/local/etc debug && $(MAKE) PREFIX=/usr/local SYSCONFDIR=/usr/local/etc release && $(MAKE) doc
+	cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) debug && $(MAKE) $(BUILD_ENV) release && $(MAKE) doc
 
 do-install:
-	${MKDIR} $(WRKDIR)/tmp-root && cd $(WRKSRC) && $(MAKE) DESTDIR=$(WRKDIR)/tmp-root install-debug install-release install-doc
+	${MKDIR} $(MY_DESTDIR) && cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) install-debug install-release install-doc
 
 .include <bsd.port.mk>
