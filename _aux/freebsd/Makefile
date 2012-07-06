@@ -33,7 +33,8 @@ BINOWN=root
 SHAREOWN=root
 
 pre-clean:
-	${RM} -rf $(MY_DESTDIR)
+	${RM} -rf $(MY_DESTDIR) pkg-plist $(PORTNAME)-$(PORTVERSION).tbz && \
+	cd ../../ && $(MAKE) purge
 
 do-fetch:
 	cd ../../ && git pull
