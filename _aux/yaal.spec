@@ -39,7 +39,7 @@ rm -rf ${RPM_BUILD_ROOT}
 cd -
 umask 0077
 make install-debug install-release install-doc DESTDIR=${RPM_BUILD_ROOT}
-rm -f ${RPM_BUILD_ROOT}/%_libdir/ld.so.conf ${RPM_BUILD_ROOT}/%{_prefix}/lib/ld.so.conf ${RPM_BUILD_ROOT}/%{_prefix}/lib/lib*[a-z]?.a ${RPM_BUILD_ROOT}/%{_prefix}/lib/mkcache
+rm -f ${RPM_BUILD_ROOT}/%{_libdir}/ld.so.conf ${RPM_BUILD_ROOT}/%{_libdir}/ld.so.cache ${RPM_BUILD_ROOT}/%{_libdir}/mkcache
 
 %clean
 rm -rf ${RPM_BUILD_ROOT}
@@ -49,12 +49,13 @@ make purge
 
 %files
 %defattr(-,root,root,-)
-%{_prefix}//lib/lib*[a-z]?.so*
+%{_libdir}/lib*[a-z]?.so*
 %{_sysconfdir}/*
 
 %files -n yaal-devel
 %defattr(-,root,root,-)
-%{_prefix}/lib/lib*-d.*
+%{_libdir}/lib*-d.so*
+%{_libdir}/lib*.a
 %{_includedir}/*
 %{_datadir}/pkgconfig
 
