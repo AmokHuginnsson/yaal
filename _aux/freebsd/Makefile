@@ -1,5 +1,6 @@
 # $FreeBSD$
 # yaal (R) 2012 Copyright codestation.org all rights reserved.
+# NATIVE_MAKE
 
 PORTNAME=      yaal
 PORTVERSION=   0.0.30
@@ -14,7 +15,6 @@ RESTRICTED=1
 BUILD_DEPENDS= autoconf:${PORTSDIR}/devel/autoconf \
 	libtool:${PORTSDIR}/devel/libtool \
 	gmake:${PORTSDIR}/devel/gmake \
-	fakeroot:${PORTSDIR}/security/fakeroot \
 	doxygen:${PORTSDIR}/devel/doxygen
 LIB_DEPENDS= xml2:${PORTSDIR}/textproc/libxml2 \
 	xslt:${PORTSDIR}/textproc/libxslt
@@ -31,6 +31,8 @@ PREFIX=$(LOCALBASE)
 BUILD_ENV=PREFIX=$(MY_PREFIX) DESTDIR=$(MY_DESTDIR) SYSCONFDIR=$(MY_PREFIX)/etc
 BINOWN=root
 SHAREOWN=root
+
+.PHONY: clean all package
 
 pre-clean:
 	${RM} -rf $(MY_DESTDIR) pkg-plist $(PORTNAME)-$(PORTVERSION).tbz && \
