@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 2.8.5 )
 string( TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC )
 
 # setting CMAKE_CONFIGURATION_TYPES breaks default CMAKE_INSTALL_CONFIG_NAME.
@@ -49,6 +49,16 @@ include( CheckIncludeFileCXX )
 include( CheckFunctionExists )
 include( CheckSymbolExists )
 include( CheckTypeSize )
+include( GNUInstallDirs )
+
+if ( NOT ( "$ENV{SYSCONFDIR}" STREQUAL "" ) )
+	set( CMAKE_INSTALL_FULL_SYSCONFDIR  $ENV{SYSCONFDIR} CACHE PATH "Configuration install directory." FORCE )
+endif ( NOT ( "$ENV{SYSCONFDIR}" STREQUAL "" ) )
+
+set( prefix ${CMAKE_INSTALL_PREFIX} )
+set( exec_prefix "\${prefix}" )
+set( libdir "\${prefix}/${CMAKE_INSTALL_LIBDIR}" )
+set( includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}" )
 
 macro( use_cxx_compiler_flag flag )
 	string( REGEX REPLACE "^-" "" name "${flag}" )
@@ -176,6 +186,18 @@ elseif ( "${CMAKE_BUILD_TYPE}" STREQUAL "cov" )
 	add_definitions( -D__DEBUG__ )
 endif()
 
+macro (today RESULT)
+	if (WIN32)
+		execute_process( COMMAND "cmd" " /C date /T" OUTPUT_VARIABLE ${RESULT} )
+		string(REGEX REPLACE "(..)/(..)/..(..).*" "\\1/\\2/\\3" ${RESULT} ${${RESULT}})
+	elseif(UNIX)
+		execute_process( COMMAND "date" "+%Y%m%d" OUTPUT_VARIABLE ${RESULT} )
+	else (WIN32)
+		message(SEND_ERROR "date not implemented")
+		set(${RESULT} 000000)
+	endif (WIN32)
+endmacro (today)
+
 add_definitions( -D__ID__="" -D__TID__="" )
 set( TARGET_PATH "${CMAKE_HOME_DIRECTORY}/build/${CMAKE_BUILD_TYPE}" )
 include_directories( ${TARGET_PATH} ${CMAKE_HOME_DIRECTORY} ${CMAKE_INCLUDE_PATH} )
@@ -187,6 +209,9 @@ file( STRINGS ${CMAKE_HOME_DIRECTORY}/Makefile.mk.in PROJECT_SUBVERSION LIMIT_CO
 string( REGEX REPLACE "^SUBVERSION[\\t ]*=[\\t ]*" "" PROJECT_SUBVERSION ${PROJECT_SUBVERSION} )
 file( STRINGS ${CMAKE_HOME_DIRECTORY}/Makefile.mk.in PROJECT_EXTRAVERSION LIMIT_COUNT 1 REGEX "^EXTRAVERSION[\\t ]*=[\\t ]*" )
 string( REGEX REPLACE "^EXTRAVERSION[\\t ]*=[\\t ]*" "" PROJECT_EXTRAVERSION ${PROJECT_EXTRAVERSION} )
+
+today(TODAY)
+set( VERSION "${PROJECT_VERSION}.${PROJECT_SUBVERSION}.${PROJECT_EXTRAVERSION}-${TODAY}" )
 
 link_directories( ${CMAKE_LIBRARY_PATH} )
 

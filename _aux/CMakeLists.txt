@@ -257,6 +257,7 @@ set( CMAKE_REQUIRED_DEFINITIONS )
 
 configure_file( ${CMAKE_HOME_DIRECTORY}/_aux/cmake-config.hxx ${TARGET_PATH}/config.hxx )
 configure_file( ${CMAKE_HOME_DIRECTORY}/yaalrc.in ${TARGET_PATH}/yaalrc @ONLY )
+configure_file( ${CMAKE_HOME_DIRECTORY}/yaal.pc.in ${TARGET_PATH}/yaal.pc @ONLY )
 
 macro( yaal_make_component name )
 	msg( "Processing component: ${name}" )
@@ -328,7 +329,7 @@ else ( CMAKE_HOST_WIN32 )
 	target_link_libraries( dbwrapper tools hcore )
 	target_link_libraries( hconsole tools hcore ncurses gpm )
 	target_link_libraries( hdata hconsole dbwrapper tools hcore )
-	add_custom_target( headers ALL COMMAND env LIB_NAME=${CMAKE_PROJECT_NAME} LIB_VERSION=${PROJECT_VERSION} DIR_ROOT=${CMAKE_HOME_DIRECTORY} DIR_BUILD=${TARGET_PATH} HDRS='${HEADERS}' ./_aux/mkheaders DEPENDS hdata )
+	add_custom_target( headers ALL COMMAND ./_aux/mkheaders --lib-name=${CMAKE_PROJECT_NAME} --lib-version=${PROJECT_VERSION} --dir-root=${CMAKE_HOME_DIRECTORY} --dir-build=${TARGET_PATH} --headers='${HEADERS}' DEPENDS hdata )
 endif ( CMAKE_HOST_WIN32 )
 
 if ( HAVE_SQLITE3_H )
@@ -368,4 +369,6 @@ else()
 endif()
 
 install( DIRECTORY ${TARGET_PATH}/include/yaal DESTINATION include )
+install( FILES ${TARGET_PATH}/yaalrc DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR} )
+install( FILES ${TARGET_PATH}/yaal.pc DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/pkgconfig )
 
