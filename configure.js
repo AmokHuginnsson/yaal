@@ -180,6 +180,7 @@ try {
 	var EXTRA_INCLUDE_PATH = "";
 	var EXTRA_LIBRARY_PATH = "";
 	var PREFIX = "";
+	var SYSCONFDIR = "";
 	var SILENT = 0;
 	var VERBOSE = 0;
 	var VISUAL_STUDIO_VERSION = vcVersion();
@@ -212,6 +213,9 @@ try {
 			case "PREFIX":
 				PREFIX = parts[1];
 			break;
+			case "SYSCONFDIR":
+				SYSCONFDIR = parts[1];
+			break;
 			case "FAST":
 				FAST = 1;
 			break;
@@ -223,6 +227,9 @@ try {
 			break;
 		}
 	}
+
+	if ( SYSCONFDIR.length == 0 )
+		SYSCONFDIR = PREFIX + "/etc";
 
 	if ( FAST == -1 ) {
 		if ( WScript.FullName.substr( WScript.FullName.length - 11 ).toLowerCase() == "cscript.exe" )
@@ -276,6 +283,7 @@ try {
 	envProc( "PATH" ) = ( envSys( "PATH" ) + ";" + envProc( "PATH" ) ).split( ";", 1000 ).filter( ( function( obj ){ return ( ! String( obj ).match( "cygwin|unix" ) ); } ) ).join( ";" );
 	if ( PREFIX.length > 0 )
 		envProc( "PREFIX" ) = PREFIX;
+	envProc( "SYSCONFDIR" ) = SYSCONFDIR;
 	envProc( "CXX" ) = "";
 	envProc( "CC" ) = "";
 	envProc.remove( "CXX" );

@@ -119,6 +119,7 @@ _pthread_sigmask
 _select
 _sinhl
 _sinl
+_sqrtf
 _sqrtl
 _tanhl
 _tanl
