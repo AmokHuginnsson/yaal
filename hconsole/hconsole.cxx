@@ -206,6 +206,7 @@ int yaal_hconsole_main( int, char** ) {
 		yaal::hcore::banner();
 		yaal::tools::banner();
 		yaal::hconsole::banner();
+		::printf( "\n" );
 		::exit( 0 );
 	}
 	return ( 0 );

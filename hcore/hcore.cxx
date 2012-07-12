@@ -58,7 +58,8 @@ extern ON_ALLOC_FAILURE::on_alloc_failure_t _onAllocFailure_;
 
 namespace hcore {
 
-int _debugLevel_ = 0;
+bool _libraryEntryPoint_( false );
+int _debugLevel_( 0 );
 HLog& log( HLog::get_instance( 1000 ) );
 
 yaal::hcore::HString HOpenSSL::_sSLKey;
@@ -279,7 +280,9 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 }
 
 void banner( char const* packageName_, char const* packageVersion_ ) {
+	_libraryEntryPoint_ = true;
 	::printf( COPYRIGHT, packageName_ ? packageName_ : PACKAGE_NAME, packageVersion_ ? packageVersion_ : PACKAGE_VERSION );
+	::printf( "\nVCS id: %s\n\n", PACKAGE_VCS );
 	::printf(
 		"Available libraries:\n"
 		"\thcore\n" );
@@ -301,6 +304,7 @@ int yaal_hcore_main( int, char** ) {
 		= __DYNAMIC_LINKER__;
 	if ( dynamicLinkerPath[ 0 ] ) {
 		yaal::hcore::banner();
+		::printf( "\n" );
 		::exit( 0 );
 	}
 	return ( 0 );

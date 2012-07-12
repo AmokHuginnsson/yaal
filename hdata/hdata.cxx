@@ -69,6 +69,7 @@ int yaal_hdata_main( int, char** ) {
 		yaal::dbwrapper::banner();
 		yaal::hconsole::banner();
 		yaal::hdata::banner();
+		::printf( "\n" );
 		::exit( 0 );
 	}
 	return ( 0 );

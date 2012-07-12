@@ -214,6 +214,7 @@ int yaal_tools_main( int, char** ) {
 	if ( dynamicLinkerPath[ 0 ] ) {
 		yaal::hcore::banner();
 		yaal::tools::banner();
+		::printf( "\n" );
 		::exit( 0 );
 	}
 	return ( 0 );

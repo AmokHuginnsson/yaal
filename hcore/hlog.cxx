@@ -42,6 +42,7 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hlog.hxx"
 #include "system.hxx"
+#include "hcore.hxx"
 
 namespace yaal {
 
@@ -81,8 +82,12 @@ HLog::~HLog( void ) {
 			timestamp();
 		_file::ref() << "Process exited normally.\n";
 	}
-	if ( ! _realMode )
-		_file::ref().close();
+	if ( ! _realMode ) {
+		if ( ! _libraryEntryPoint_ )
+			rehash_stream( stderr, PACKAGE_NAME );
+		else
+			_file::ref().close();
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }

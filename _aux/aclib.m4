@@ -181,6 +181,7 @@ AC_DEFUN([YAAL_DETECT_PHYSICAL_MEMORY], [
 dnl Check available git features.
 dnl --------------------------------------------------------------------------
 AC_DEFUN([YAAL_CHECK_GIT], [
+	PACKAGE_VCS=""
 	AC_CHECK_PROG(HAS_GIT,[git],["yes"],["no"])
 	AC_MSG_CHECKING([git id sub-command])
 	AC_SUBST(GITID,[true])
@@ -191,14 +192,17 @@ AC_DEFUN([YAAL_CHECK_GIT], [
 				AC_SUBST(GITID,["git id"])
 				AC_MSG_RESULT([yes])
 			else
+				AC_SUBST(GITID,["git log --no-color -n 1 --pretty=format:\"%H %ad %an\""])
 				AC_MSG_RESULT([no])
 			fi
+			PACKAGE_VCS=`git rev-parse HEAD`
 		else
 			AC_MSG_WARN([not a git hosted project])
 		fi
 	else
 		AC_MSG_WARN([no git in the first place])
 	fi
+	AC_DEFINE_UNQUOTED([PACKAGE_VCS], "${PACKAGE_VCS}", [Version Control System current commit id.])
 ])
 
 

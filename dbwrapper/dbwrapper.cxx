@@ -184,6 +184,7 @@ int yaal_dbwrapper_main( int, char** ) {
 		yaal::hcore::banner();
 		yaal::tools::banner();
 		yaal::dbwrapper::banner();
+		::printf( "\n" );
 		::exit( 0 );
 	}
 	return ( 0 );
