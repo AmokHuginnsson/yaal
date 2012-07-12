@@ -131,11 +131,11 @@ void* dlopen_fix( char const* name_, int flag_ ) {
 }
 
 int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ ) {
-	dirent* result;
+	dirent* result( NULL );
 	dirent broken;
 	int error( readdir_r( dir_, &broken, &result ) );
+	*result_ = reinterpret_cast<unix_dirent*>( result );
 	if ( ( ! error ) && result ) {
-		*result_ = reinterpret_cast<unix_dirent*>( result );
 		entry_->d_fileno = (*result_)->d_fileno;
 		entry_->d_type = (*result_)->d_type;
 		strncpy( entry_->d_name, (*result_)->d_name, NAME_MAX );
