@@ -197,6 +197,13 @@ macro (today RESULT)
 	endif (WIN32)
 endmacro (today)
 
+find_package(Git)
+if ( GIT_FOUND )
+	execute_process( COMMAND git rev-parse HEAD OUTPUT_VARIABLE PACKAGE_VCS OUTPUT_STRIP_TRAILING_WHITESPACE )
+else()
+	set( PACKAGE_VCS "" )
+endif()
+
 add_definitions( -D__ID__="" -D__TID__="" )
 set( TARGET_PATH "${CMAKE_HOME_DIRECTORY}/build/${CMAKE_BUILD_TYPE}" )
 include_directories( ${TARGET_PATH} ${CMAKE_HOME_DIRECTORY} ${CMAKE_INCLUDE_PATH} )
