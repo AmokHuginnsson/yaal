@@ -288,6 +288,7 @@ try {
 	envProc( "CC" ) = "";
 	envProc.remove( "CXX" );
 	envProc.remove( "CC" );
+	msg( cmdline );
 	cmd = shell.exec( cmdline );
 	var eoo = true;
 	var eoe = true;
