@@ -83,7 +83,12 @@ HString make_path( HString const& rcName_,
 		break;
 		case ( RC_PATHER::HOME_ETC ):
 		case ( RC_PATHER::HOME ): {
-			char * homePath = getenv( "HOME" );
+#if ! defined( __MSVCXX__ )
+			char const USER_HOME_ENV[] = "HOME";
+#else /* #if ! defined( __MSVCXX__ ) */
+			char const USER_HOME_ENV[] = "USERPROFILE";
+#endif /* #else #if ! defined( __MSVCXX__ ) */
+			char const* homePath( ::getenv( USER_HOME_ENV ) );
 			if ( ! homePath ) {
 				perror( "rc_open: getenv()" );
 				abort();
