@@ -47,7 +47,6 @@ void decode_set_env( HString );
 void init_locale( char const* const = NULL );
 void banner( char const* = NULL, char const* = NULL );
 double long strtold( HString const& );
-extern M_YAAL_HCORE_PUBLIC_API bool _libraryEntryPoint_;
 
 namespace extendable {
 

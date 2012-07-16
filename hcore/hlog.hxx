@@ -72,6 +72,7 @@ private:
 	HString  _loginName;
 	HString  _hostName;
 	HChunk   _buffer;
+	M_YAAL_HCORE_PUBLIC_API static bool _autoRehash;
 public:
 	M_YAAL_HCORE_PUBLIC_API static int long _logMask;
 public:
@@ -89,6 +90,7 @@ public:
 	 */
 	HLog& operator()( int long );
 	HLog& filter( int long );
+	static void disable_auto_rehash( void );
 private:
 	HLog( void );
 	virtual ~HLog( void );

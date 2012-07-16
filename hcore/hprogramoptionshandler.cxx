@@ -650,18 +650,16 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 		char* const* const argv_,
 		int* const unknown_ ) {
 	M_PROLOG
-	bool validSwitch = false;
-	int val = 0;
-	char const* shortOpts = NULL;
-	option* optionArray = NULL;
+	int val( 0 );
+	HLog::disable_auto_rehash();
 	HString shortOptBuffer;
 	HChunk longOptBuffer( chunk_size<option>( _options.size() + 1 ) ); /* + 1 for array terminator */
 	hcore::log( LOG_TYPE::INFO ) << "Decoding switches ... ";
-	shortOpts = make_short_opts( _options, shortOptBuffer );
-	optionArray = make_option_array( _options, longOptBuffer );
+	char const* shortOpts( make_short_opts( _options, shortOptBuffer ) );
+	option* optionArray( make_option_array( _options, longOptBuffer ) );
 	while ( ( val = ::getopt_long( argc_, argv_, shortOpts,
 					optionArray, NULL ) ) != EOF ) {
-		validSwitch = false;
+		bool validSwitch( false );
 		for ( options_t::iterator it = _options.begin(), end = _options.end(); it != end; ++ it ) {
 			if ( it->_shortForm == val )
 				validSwitch = true, set_option( *it, optarg );

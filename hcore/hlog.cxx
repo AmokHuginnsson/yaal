@@ -55,6 +55,7 @@ static int const TIMESTAMP_SIZE	= 16;
 
 }
 
+bool HLog::_autoRehash = true;
 int long HLog::_logMask = 0;
 
 void* DEFAULT_LOG_STREAM( stderr );
@@ -83,13 +84,18 @@ HLog::~HLog( void ) {
 		_file::ref() << "Process exited normally.\n";
 	}
 	if ( ! _realMode ) {
-		if ( ! _libraryEntryPoint_ )
+		if ( _autoRehash )
 			rehash_stream( stderr, PACKAGE_NAME );
 		else
 			_file::ref().close();
 	}
 	return;
 	M_DESTRUCTOR_EPILOG
+}
+
+void HLog::disable_auto_rehash( void ) {
+	_autoRehash = false;
+	return;
 }
 
 void HLog::do_rehash( void* src_, char const* const processName_ ) {
