@@ -5,6 +5,7 @@
 ?_attributeFocused_@hconsole@yaal@@3HA
 ?_attributeSearchHighlight_@hconsole@yaal@@3HA
 ?_attributeStatusBar_@hconsole@yaal@@3HA
+?_autoRehash@HLog@hcore@yaal@@0_NA
 ?_baudRate_@tools@yaal@@3V?$HStrongEnum@USPEED@HSerial@tools@yaal@@@hcore@2@A
 ?_characterClass_@hcore@yaal@@3PAPBVHCharacterClass@12@A
 ?_collectorConnectionTimeOut_@tools@yaal@@3HA
@@ -43,7 +44,6 @@
 ?_leaveCtrlZ_@hconsole@yaal@@3_NA
 ?_letter_@hcore@yaal@@3QBDB
 ?_letter_@hcore@yaal@@3VHCharacterClass@12@B
-?_libraryEntryPoint_@hcore@yaal@@3_NA
 ?_logMask@HLog@hcore@yaal@@2JA
 ?_lowerCaseLetter_@hcore@yaal@@3VHCharacterClass@12@B
 ?_maskAlpha_@hconsole@yaal@@3QBDB
