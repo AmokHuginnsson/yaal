@@ -41,13 +41,23 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _defaultTimeFormat_;
 /*! \brief Date and time handling class.
  */
 class HTime {
+public:
 	typedef HTime this_type;
+	typedef enum {
+		UTC,
+		LOCAL
+	} now_in_t;
+private:
 	HString	_format;
 	mutable HChunk _cache;
 	time_t	_value;
 	tm			_broken;
 public:
-	HTime( void );
+	/*! \brief Construct HTime object based on current moment in time.
+	 *
+	 * \param nowIn_ - get time as UTC or local time (time considering current time zone).
+	 */
+	HTime( now_in_t nowIn_ );
 	HTime( HTime const& );
 	HTime( char const* const );
 	HTime( time_t const& );
@@ -55,7 +65,7 @@ public:
 			int const = 0 );
 	virtual ~HTime ( void );
 	void swap( HTime& );
-	void set_now( void );
+	void set_now( now_in_t );
 	void set( time_t const& );
 	void format( char const* const = _defaultTimeFormat_ );
 	void set_time( int const = 0, int const = 0, int const = 0 );
@@ -82,6 +92,14 @@ public:
 };
 
 typedef HExceptionT<HTime> HTimeException;
+
+inline HTime now_utc( void ) {
+	return ( HTime( HTime::UTC ) );
+}
+
+inline HTime now_local( void ) {
+	return ( HTime( HTime::LOCAL ) );
+}
 
 }
 

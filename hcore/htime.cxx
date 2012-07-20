@@ -39,10 +39,10 @@ namespace hcore {
 
 char const* const _defaultTimeFormat_ = "%a, %d %b %Y %H:%M:%S %z";
 
-HTime::HTime( void )
+HTime::HTime( now_in_t nowIn_ )
 	: _format ( _defaultTimeFormat_ ), _cache(), _value(), _broken() {
 	M_PROLOG
-	set_now();
+	set_now( nowIn_ );
 	return;
 	M_EPILOG
 }
@@ -99,10 +99,10 @@ void HTime::set( time_t const& time_ ) {
 	M_EPILOG
 }
 
-void HTime::set_now( void ) {
+void HTime::set_now( now_in_t nowIn_ ) {
 	M_PROLOG
 	_value = ::time( NULL );
-	M_ENSURE( localtime_r( &_value, &_broken ) );
+	M_ENSURE( ( nowIn_ == UTC ? gmtime_r( &_value, &_broken) : localtime_r( &_value, &_broken ) ) != NULL );
 	return;
 	M_EPILOG
 }

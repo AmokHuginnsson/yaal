@@ -41,7 +41,7 @@ HInfoMultiVal::HInfoMultiVal( void )
 	: _type( TYPE::VOID ), _char( 0 ),
 	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
 	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time() {
+	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -51,7 +51,7 @@ HInfoMultiVal::HInfoMultiVal( int int_ )
 	: _type( TYPE::VOID ), _char( 0 ),
 	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
 	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time() {
+	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
 	M_PROLOG
 	_type = TYPE::INT;
 	_int = int_;
@@ -63,7 +63,7 @@ HInfoMultiVal::HInfoMultiVal( int long longInt_ )
 	: _type( TYPE::VOID ), _char( 0 ),
 	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
 	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time() {
+	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
 	M_PROLOG
 	_type = TYPE::INT_LONG;
 	_intLong = longInt_;
@@ -75,7 +75,7 @@ HInfoMultiVal::HInfoMultiVal ( double double_ )
 	: _type( TYPE::VOID ), _char( 0 ),
 	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
 	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time() {
+	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
 	M_PROLOG
 	_type = TYPE::DOUBLE;
 	_double = double_;
@@ -87,7 +87,7 @@ HInfoMultiVal::HInfoMultiVal( void* const pointer_ )
 	: _type( TYPE::VOID ), _char( 0 ),
 	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
 	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time() {
+	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
 	M_PROLOG
 	_type = TYPE::VOID_PTR;
 	_pointer = pointer_;
@@ -99,7 +99,7 @@ HInfoMultiVal::HInfoMultiVal( char const* const buffer_ )
 	: _type( TYPE::VOID ), _char( 0 ),
 	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
 	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time() {
+	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
 	M_PROLOG
 	_type = TYPE::HSTRING;
 	_string = buffer_;
@@ -111,7 +111,7 @@ HInfoMultiVal::HInfoMultiVal( HString const& string_ )
 	: _type( TYPE::VOID ), _char( 0 ),
 	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
 	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time() {
+	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
 	M_PROLOG
 	_type = TYPE::HSTRING;
 	_string = string_;
@@ -123,7 +123,7 @@ HInfoMultiVal::HInfoMultiVal( HTime const& time_ )
 	: _type( TYPE::VOID ), _char( 0 ),
 	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
 	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time() {
+	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
 	M_PROLOG
 	_type = TYPE::HTIME;
 	_time = time_;
@@ -135,7 +135,7 @@ HInfoMultiVal::HInfoMultiVal( HInfoMultiVal const& info_ )
 	: HInfo(), _type( TYPE::VOID ), _char( 0 ),
 	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
 	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time() {
+	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
 	M_PROLOG
 	( * this ) = info_;
 	return;
@@ -156,7 +156,7 @@ void HInfoMultiVal::purge( void ) {
 	_intLong = 0;
 	_double = 0;
 	_string = "";
-	_time = HTime( );
+	_time = HTime( HTime::LOCAL );
 	_pointer = NULL;
 	return;
 	M_EPILOG
@@ -311,7 +311,7 @@ double long HInfoString::do_get_double_long( void ) const
 HTime const& HInfoString::do_get_time( void ) const {
 	M_ASSERT( !"impossible inplace conversion requested" );
 #ifdef __MSVCXX__
-	static HTime const dummy;
+	static HTime const dummy( HTime::LOCAL );
 	return ( dummy );
 #endif /* #ifdef __MSVCXX__ */
 }

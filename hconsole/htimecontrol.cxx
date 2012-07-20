@@ -35,10 +35,9 @@ namespace yaal {
 
 namespace hconsole {
 
-HTimeControl::HTimeControl ( HWindow * parent_, int row_, int column_,
-										 int height_, int width_, char const * label_ )
-					: HControl ( parent_, row_, column_, height_,
-							width_, label_ ) {
+HTimeControl::HTimeControl( HWindow* parent_, int row_, int column_,
+		int height_, int width_, char const* label_ )
+	: HTime( HTime::LOCAL ), HControl( parent_, row_, column_, height_, width_, label_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
