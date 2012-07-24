@@ -3,7 +3,7 @@
 # NATIVE_MAKE
 
 PORTNAME=      yaal
-PORTVERSION=   0.0.30
+PORTVERSION!=  awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in
 #PORTREVISION=  0
 CATEGORIES=    devel
 MASTER_SITES=  http://codestation.org/ https://codestation.org/
