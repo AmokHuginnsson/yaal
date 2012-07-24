@@ -1,0 +1,12 @@
+PKG="yaal"
+NAME="yaal - Yet Another Abstraction Layer"
+VERSION="@VERSION@"
+ARCH="@ARCH@"
+CLASSES="none"
+CATEGORY="application"
+BASEDIR="/opt"
+VENDOR="codestation.org"
+EMAIL="amok@codestation.org"
+HOTLINE="https://codestation.org/repo/yaal.git"
+DESC="yaal (Yet Another Abstraction Layer) is general purpose C++ library."
+
