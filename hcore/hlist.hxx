@@ -611,6 +611,28 @@ public:
 		return ( back() );
 		M_EPILOG
 	}
+	void splice( iterator it_, HList& list_ ) {
+		M_PROLOG
+		M_ASSERT( it_._owner == this );
+		M_ENSURE( &list_ != this );
+		if ( list_._hook ) {
+			HElement* e( _hook ? ( it_._current ? it_._current : _hook ) : NULL );
+			if ( e ) {
+				HElement* p( e->_previous );
+				p->_next = list_._hook;
+				e->_previous = list_._hook->_previous;
+				list_._hook->_previous->_next = e;
+				list_._hook->_previous = p;
+			}
+			if ( ( it_._current == _hook ) || ! _hook )
+				_hook = list_._hook;
+			_size += list_._size;
+			list_._hook = NULL;
+			list_._size = 0;
+		}
+		return;
+		M_EPILOG
+	}
 	void exchange( iterator const& left, iterator const& right ) {
 		M_PROLOG
 		if ( left != right )
