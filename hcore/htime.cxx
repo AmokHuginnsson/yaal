@@ -102,7 +102,7 @@ void HTime::set( time_t const& time_ ) {
 void HTime::set_now( now_in_t nowIn_ ) {
 	M_PROLOG
 	_value = ::time( NULL );
-	M_ENSURE( ( nowIn_ == UTC ? gmtime_r( &_value, &_broken) : localtime_r( &_value, &_broken ) ) != NULL );
+	M_ENSURE( ( nowIn_ == UTC ? gmtime_r( &_value, &_broken ) : localtime_r( &_value, &_broken ) ) != NULL );
 	return;
 	M_EPILOG
 }
