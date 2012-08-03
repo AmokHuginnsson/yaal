@@ -633,6 +633,71 @@ public:
 		return;
 		M_EPILOG
 	}
+	void splice( iterator /* it_ */, HList& /* list_ */, iterator ) {
+		M_PROLOG
+		return;
+		M_EPILOG
+	}
+	void splice( iterator /* it_ */, HList& /* list_ */, iterator, iterator ) {
+		M_PROLOG
+		return;
+		M_EPILOG
+	}
+	void remove( type_t const& value_ ) {
+		M_PROLOG
+		for ( iterator it( begin() ), endIt( end() ); it != endIt; ) {
+			if ( *it == value_ ) {
+				it = erase( it );
+			} else
+				++ it;
+		}
+		return;
+		M_EPILOG
+	}
+	template<typename cond_t>
+	void remove_if( cond_t condition_ ) {
+		M_PROLOG
+		for ( iterator it( begin() ), endIt( end() ); it != endIt; ) {
+			if ( condition_( *it ) ) {
+				it = erase( it );
+			} else
+				++ it;
+		}
+		return;
+		M_EPILOG
+	}
+	void unique( void ) {
+		M_PROLOG
+		iterator it( begin() );
+		iterator follow( begin() );
+		iterator endIt( end() );
+		++ it;
+		while ( it != endIt ) {
+			if ( *it == *follow ) {
+				it = erase( it );
+			} else {
+				++ it;
+				++ follow;
+			}
+		}
+		return;
+		M_EPILOG
+	}
+	void reverse( void ) {
+		M_PROLOG
+		if ( _hook ) {
+			_hook = _hook->_previous;
+			HElement* e( _hook->_previous );
+			using yaal::swap;
+			while ( e != _hook ) {
+				swap( e->_previous, e->_next );
+				e = e->_next;
+			}
+			swap( _hook->_previous, _hook->_next );
+		}
+		return;
+		M_EPILOG
+	}
 	void exchange( iterator const& left, iterator const& right ) {
 		M_PROLOG
 		if ( left != right )
