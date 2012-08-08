@@ -624,7 +624,7 @@ public:
 				list_._hook->_previous->_next = e;
 				list_._hook->_previous = p;
 			}
-			if ( ( it_._current == _hook ) || ! _hook )
+			if ( it_._current == _hook )
 				_hook = list_._hook;
 			_size += list_._size;
 			list_._hook = NULL;
@@ -633,8 +633,31 @@ public:
 		return;
 		M_EPILOG
 	}
-	void splice( iterator /* it_ */, HList& /* list_ */, iterator ) {
+	void splice( iterator to_, HList& list_, iterator from_ ) {
 		M_PROLOG
+		M_ASSERT( to_._owner == this );
+		M_ASSERT( from_._owner == &list_ );
+		M_ASSERT( from_._current && ( list_._size > 0 ) );
+		HElement* e( _hook ? ( to_._current ? to_._current : _hook ) : NULL );
+		if ( ( from_._current != to_._current ) && ( from_._current->_next != to_._current ) ) {
+			if ( from_._current == list_._hook )
+				list_._hook = ( list_._size > 1 ) ? list_._hook->_next : NULL;
+			if ( to_._current == _hook )
+				_hook = from_._current;
+			from_._current->_previous->_next = from_._current->_next;
+			from_._current->_next->_previous = from_._current->_previous;
+			if ( e ) {
+				from_._current->_next = e;
+				from_._current->_previous = e->_previous;
+				e->_previous->_next = from_._current;
+				e->_previous = from_._current;
+			} else {
+				_hook->_next = _hook;
+				_hook->_previous = _hook;
+			}
+			-- list_._size;
+			++ _size;
+		}
 		return;
 		M_EPILOG
 	}
