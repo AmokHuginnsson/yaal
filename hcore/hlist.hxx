@@ -641,7 +641,7 @@ public:
 		HElement* e( _hook ? ( to_._current ? to_._current : _hook ) : NULL );
 		if ( ( from_._current != to_._current ) && ( from_._current->_next != to_._current ) ) {
 			if ( from_._current == list_._hook )
-				list_._hook = ( list_._size > 1 ) ? list_._hook->_next : NULL;
+				list_._hook = ( list_._hook->_next != list_._hook ) ? list_._hook->_next : NULL;
 			if ( to_._current == _hook )
 				_hook = from_._current;
 			from_._current->_previous->_next = from_._current->_next;
@@ -661,8 +661,37 @@ public:
 		return;
 		M_EPILOG
 	}
-	void splice( iterator /* it_ */, HList& /* list_ */, iterator, iterator ) {
+	void splice( iterator it_, HList& list_, iterator first_, iterator last_ ) {
 		M_PROLOG
+		M_ASSERT( it_._owner == this );
+		M_ASSERT( first_._owner == &list_ );
+		M_ASSERT( last_._owner == &list_ );
+		M_ASSERT( first_._current || ( first_._current == last_._current ) );
+		if ( first_._current != last_._current ) {
+			HElement* to( _hook ? ( it_._current ? it_._current : _hook ) : NULL );
+			HElement* last( last_._current ? last_._current : list_._hook );
+			if ( ( ( last_._current != to ) || ( &list_ != this ) ) && ( last->_previous != to ) ) {
+				int long count( ( &list_ != this ) ? distance( first_, last_ ) : 0 );
+				if ( first_._current == list_._hook )
+					list_._hook = last_._current;
+				HElement* lastPrev( last->_previous );
+				first_._current->_previous->_next = last;
+				last->_previous = first_._current->_previous;
+				if ( to ) {
+					first_._current->_previous = to->_previous;
+					to->_previous->_next = first_._current;
+					lastPrev->_next = to;
+					to->_previous = lastPrev;
+				} else {
+					first_._current->_previous = lastPrev;
+					lastPrev->_next = first_._current;
+				}
+				if ( ! to || ( it_._current == _hook ) )
+					_hook = first_._current;
+				list_._size -= count;
+				_size += count;
+			}
+		}
 		return;
 		M_EPILOG
 	}
