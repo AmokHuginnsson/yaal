@@ -74,9 +74,28 @@ private:
 	yaal::hcore::HSemaphore _semaphore;
 	yaal::hcore::HMutex _mutex;
 public:
-	HWorkFlow( int = 1 );
+	/*! \brief Construct HWorkFlow object.
+	 *
+	 * \param workerPoolSize - maximum number of workers in this worker pool.
+	 */
+	HWorkFlow( int workerPoolSize = 1 );
+	/*! \brief Destroy HWorkFlow object.
+	 *
+	 * All scheduled tasks that are running are bound to finish naturally.
+	 * All scheduled tasks that not yet started are bound to start and than finish naturally.
+	 */
 	virtual ~HWorkFlow( void );
-	void push_task( task_t );
+	/*! \brief Schedule execution of task in this worker pool.
+	 *
+	 * \param task - task to execute by this worker pool.
+	 */
+	void push_task( task_t task );
+	/*! \brief Cancel all scheduled tasks.
+	 *
+	 * Cancel execution of all scheduled tasks that were not started yet.
+	 * Tasks that already started are bound to finish normally.
+	 */
+	void cancel_all( void );
 private:
 	virtual task_t do_pop_task( void );
 };

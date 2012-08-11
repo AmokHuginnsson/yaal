@@ -52,14 +52,11 @@ HWorkFlow::HWorkFlow( int workerPoolSize_ )
 }
 
 HWorkFlow::~HWorkFlow( void ) {
-	M_PROLOG {
-		HLock l( _mutex );
-		_workerPoolSize = 0;
-	}
-	for ( pool_t::iterator it( _pool.begin() ), end( _pool.end() ); it != end; ++ it ) {
+	M_PROLOG
+	for ( pool_t::iterator it( _pool.begin() ), end( _pool.end() ); it != end; ++ it )
 		_semaphore.signal();
+	for ( pool_t::iterator it( _pool.begin() ), end( _pool.end() ); it != end; ++ it )
 		(*it)->finish();
-	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -81,17 +78,22 @@ void HWorkFlow::push_task( task_t call_ ) {
 	M_EPILOG
 }
 
+void HWorkFlow::cancel_all( void ) {
+	M_PROLOG
+	HLock l( _mutex );
+	_queue.clear();
+	M_EPILOG
+}
+
 HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void ) {
 	M_PROLOG
-	bool running = true; {
+	/* make worker as idle (not busy) */ {
 		HLock l( _mutex );
 		-- _busyWorkers;
-		running = _workerPoolSize ? true : false;
 	}
-	if ( running )
-		_semaphore.wait();
-	HLock l( _mutex );
 	HWorkFlow::task_t t;
+	_semaphore.wait();
+	HLock l( _mutex );
 	if ( ! _queue.is_empty() ) {
 		t = _queue.front();
 		_queue.pop_front();
