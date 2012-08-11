@@ -82,7 +82,7 @@ public:
 	/*! \brief Destroy HWorkFlow object.
 	 *
 	 * All scheduled tasks that are running are bound to finish naturally.
-	 * All scheduled tasks that not yet started are bound to start and than finish naturally.
+	 * All scheduled tasks that not yet started are bound to start and then finish naturally.
 	 */
 	virtual ~HWorkFlow( void );
 	/*! \brief Schedule execution of task in this worker pool.
