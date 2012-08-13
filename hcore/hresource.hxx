@@ -251,6 +251,9 @@ public:
 		}
 		return;
 	}
+	bool operator ! ( void ) const {
+		return ( ! allocated_t::is_allocated( _resource ) );
+	}
 private:
 	template<typename alien_t>
 	void pass( alien_t& src_ ) {
