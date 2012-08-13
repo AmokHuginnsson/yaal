@@ -81,7 +81,7 @@ HException::~HException( void ) {
 }
 
 void HException::print_error( void ) const {
-	fprintf( static_cast<FILE*>( ERROR_STREAM ), "\nException: %s, %d.\n", _message.raw(), _code );
+	fprintf( ERROR_STREAM, "\nException: %s, %d.\n", _message.raw(), _code );
 	return;
 }
 
@@ -100,7 +100,7 @@ void HException::log( char const* const fileName_, int const line_,
 					fileName_ + ( length > 16 ? length - 16 : 0 ),
 					line_, functionName_ );
 		if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK )
-			fprintf( static_cast<FILE*>( ERROR_STREAM ), "%s", frame.raw() );
+			fprintf( ERROR_STREAM, "%s", frame.raw() );
 		hcore::log << frame;
 		++ _frame;
 	}
