@@ -76,6 +76,10 @@ double long powl( double long, double long );
 double long floorl( double long );
 #endif /* #if ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 ) */
 
+#if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 )
+double long sqrtl( double long );
+#endif /* #if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 ) */
+
 #if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 )
 double long strtold( char const*, char** );
 #endif /* #if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 ) */

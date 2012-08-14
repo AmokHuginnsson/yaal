@@ -118,6 +118,12 @@ double long floorl( double long x ) {
 }
 #endif /* not HAVE_DECL_FLOORL */
 
+#if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 )
+double long sqrtl( double long x ) {
+	return ( ::std::sqrt( x ) );
+}
+#endif /* not HAVE_DECL_SQRTL */
+
 #if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 )
 double long strtold( char const* str, char** tail ) {
 	return ( strtod( str, tail ) );

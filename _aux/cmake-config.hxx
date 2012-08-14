@@ -36,6 +36,7 @@
 #cmakedefine HAVE_PTHREAD_SET_NAME_NP
 #cmakedefine HAVE_PRCTL
 #cmakedefine01 HAVE_POWL
+#cmakedefine01 HAVE_DECL_SQRTL
 #cmakedefine01 HAVE_DECL_TEMP_FAILURE_RETRY
 #cmakedefine01 HAVE_DECL_FLOORL
 #cmakedefine01 HAVE_GETHOSTBYNAME_R

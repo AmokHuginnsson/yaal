@@ -176,6 +176,8 @@ if ( NOT HAVE_PRETTY_FUNCTION )
 	endif()
 endif()
 check_cxx_source_compiles("#include <cmath>
+	int main( int, char** ) { ::sqrtl( 0. ); return ( 0 ); }" HAVE_DECL_SQRTL )
+check_cxx_source_compiles("#include <cmath>
 	int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }" HAVE_POWL )
 check_cxx_source_compiles("#include <cmath>
 	int main( int, char** ) { ::floorl( 0. ); return ( 0 ); }" HAVE_DECL_FLOORL )
