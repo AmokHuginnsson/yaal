@@ -239,6 +239,11 @@ public:
  */
 template<typename tType, typename inserter>
 class HInsertIterator {
+public:
+	typedef typename tType::iterator::value_type value_type;
+	typedef typename tType::iterator::reference reference;
+	typedef typename tType::iterator::pointer pointer;
+private:
 	tType& _coll;
 public:
 	HInsertIterator( tType& coll ) : _coll( coll ) {}

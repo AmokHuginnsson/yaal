@@ -513,27 +513,27 @@ struct call_calculator {
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 )
-			{ return type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9, fa10 ); }
+			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9, fa10 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
-			{ return type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ); }
+			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
-			{ return type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ); }
+			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
-			{ return type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7 ); }
+			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
-			{ return type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6 ); }
+			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
-			{ return type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5 ); }
+			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
-			{ return type( functor_t( fa0, m ), fa1, fa2, fa3, fa4 ); }
+			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
-			{ return type( functor_t( fa0, m ), fa1, fa2, fa3 ); }
+			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
-			{ return type( functor_t( fa0, m ), fa1, fa2 ); }
+			{ return ( type( functor_t( fa0, m ), fa1, fa2 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 )
-			{ return type( functor_t( fa0, m ), fa1 ); }
+			{ return ( type( functor_t( fa0, m ), fa1 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0 )
-			{ return type( functor_t( fa0, m ) ); }
+			{ return ( type( functor_t( fa0, m ) ) ); }
 	};
 	struct functor_this {
 		typedef HFunctor<fa0_t, METHOD_t> functor_t;
@@ -560,27 +560,27 @@ struct call_calculator {
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 )
-			{ return type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9, fa10 ); }
+			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9, fa10 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
-			{ return type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ); }
+			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
-			{ return type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ); }
+			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
-			{ return type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ); }
+			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
-			{ return type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6 ); }
+			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
-			{ return type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5 ); }
+			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
-			{ return type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4 ); }
+			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
-			{ return type( functor_t( fa0, m ), fa0, fa1, fa2, fa3 ); }
+			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
-			{ return type( functor_t( fa0, m ), fa0, fa1, fa2 ); }
+			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 )
-			{ return type( functor_t( fa0, m ), fa0, fa1 ); }
+			{ return ( type( functor_t( fa0, m ), fa0, fa1 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0 )
-			{ return type( functor_t( fa0, m ), fa0 ); }
+			{ return ( type( functor_t( fa0, m ), fa0 ) ); }
 	};
 	struct function {
 		typedef HCall<free_standing_args_count::value, descriptor, typename trait::return_type<METHOD_t>::type,
@@ -604,27 +604,27 @@ struct call_calculator {
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
-			{ return type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ); }
+			{ return ( type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
-			{ return type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ); }
+			{ return ( type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
-			{ return type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ); }
+			{ return ( type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
-			{ return type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6 ); }
+			{ return ( type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
-			{ return type( m, fa0, fa1, fa2, fa3, fa4, fa5 ); }
+			{ return ( type( m, fa0, fa1, fa2, fa3, fa4, fa5 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
-			{ return type( m, fa0, fa1, fa2, fa3, fa4 ); }
+			{ return ( type( m, fa0, fa1, fa2, fa3, fa4 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
-			{ return type( m, fa0, fa1, fa2, fa3 ); }
+			{ return ( type( m, fa0, fa1, fa2, fa3 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
-			{ return type( m, fa0, fa1, fa2 ); }
+			{ return ( type( m, fa0, fa1, fa2 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 )
-			{ return type( m, fa0, fa1 ); }
+			{ return ( type( m, fa0, fa1 ) ); }
 		inline static type make( METHOD_t m, fa0_t fa0 )
-			{ return type( m, fa0 ); }
+			{ return ( type( m, fa0 ) ); }
 		inline static type make( METHOD_t m )
-			{ return type( m ); }
+			{ return ( type( m ) ); }
 	};
 	struct field {
 		typedef HCall<-2, descriptor, typename trait::field_type<METHOD_t>::type,

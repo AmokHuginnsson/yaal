@@ -27,7 +27,7 @@ Copyright:
 /*! \file hcore/hresource.hxx
  * \brief Declaration of HResource<> class.
  *
- * Scoped reasource guardian with definable resource free freeing function.
+ * Scoped resource guardian with definable resource free freeing function.
  */
 
 #ifndef YAAL_HCORE_HRESOURCE_HXX_INCLUDED
