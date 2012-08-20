@@ -112,7 +112,8 @@ ifeq ($(LIB_PREFIX),lib)
 	@$(call invoke,$(AR) $(ARFLAGS) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX) $(OBJS_$(*)) | tee -a make.log ) ; \
 	$(call invoke,$(RANLIB) lib$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX))
 endif # just to allow shared linking during the build
-	@$(call invoke,ln -sf lib$(*)$(LIB_INFIX).so.$(RELEASE) lib$(*)$(LIB_INFIX).so) \
+	@$(call invoke,ln -sf lib$(*)$(LIB_INFIX).so.$(RELEASE) lib$(*)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION)) && \
+	$(call invoke,ln -sf lib$(*)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) lib$(*)$(LIB_INFIX).so) \
 	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
 
 define INSTALL_TARGET
@@ -224,7 +225,7 @@ flint:
 
 test: all
 	@if [ -d $(DIR_ROOT)/../tress ] ; then \
-		cd $(DIR_ROOT)/../tress && env -u DIR_ROOT EXTRA_CXXFLAGS="-I$(DIR_BUILD)/include" EXTRA_LXXFLAGS="-L$(DIR_BUILD)" LD_LIBRARY_PATH="$(DIR_BUILD)" SYSCONFDIR=$(DIR_SYSCONF) $(MAKE) purge debug test ; \
+		cd $(DIR_ROOT)/../tress && env -u DIR_ROOT EXTRA_CXXFLAGS="-isystem $(DIR_BUILD)/include -I$(DIR_BUILD)/include" EXTRA_LXXFLAGS="-L$(DIR_BUILD)" LD_LIBRARY_PATH="$(DIR_BUILD)" SYSCONFDIR=$(DIR_SYSCONF) $(MAKE) purge debug test ; \
 	fi
 
 include $(DIR_ROOT)/_aux/mk/e_deps.mk
