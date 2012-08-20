@@ -224,7 +224,7 @@ flint:
 
 test: all
 	@if [ -d $(DIR_ROOT)/../tress ] ; then \
-		cd $(DIR_ROOT)/../tress && env -u DIR_ROOT C_INCLUDE_PATH="$(DIR_BUILD)/include:${C_INCLUDE_PATH}" CPLUS_INCLUDE_PATH="$(DIR_BUILD)/include:${CPLUS_INCLUDE_PATH}" LIBRARY_PATH="$(DIR_BUILD):${LIBRARY_PATH}" LD_LIBRARY_PATH="$(DIR_BUILD):${LD_LIBRARY_PATH}" $(MAKE) purge debug test ; \
+		cd $(DIR_ROOT)/../tress && env -u DIR_ROOT EXTRA_CXXFLAGS="-I$(DIR_BUILD)/include" EXTRA_LXXFLAGS="-L$(DIR_BUILD)" LD_LIBRARY_PATH="$(DIR_BUILD)" SYSCONFDIR=$(DIR_SYSCONF) $(MAKE) purge debug test ; \
 	fi
 
 include $(DIR_ROOT)/_aux/mk/e_deps.mk

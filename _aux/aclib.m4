@@ -268,11 +268,11 @@ AC_DEFUN([YAAL_DETECT_COMMON_FLAGS], [
 								[AC_MSG_WARN([[Cannot use -Wshadow!]])])
 	AC_MSG_RESULT([$RESULT])
 	CXXFLAGS=$CXXFLAGS_ORIG
-	CXXFLAGS=["-pedantic-errors -Werror"]
+	CXXFLAGS=["-pedantic-errors -Wno-long-long -Werror"]
 	AC_MSG_CHECKING([can we use -pedantic-errors in <cstdlib>])
 	RESULT=["no"]
 	AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstdlib>]])],
-								[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -pedantic-errors"]]
+								[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -pedantic-errors -Wno-long-long"]]
 								[_FLAGS=["$_FLAGS -pedantic-errors"]]
 								[RESULT=["yes"]],
 								[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
