@@ -3,7 +3,12 @@
 VERIFY_DIR=../../yaalrc.in
 VERSION=$(shell awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in)
 ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
-ARTIFACT=../../yaal_$(VERSION)_$(ARCH).deb
+ARTIFACTS=yaal_$(VERSION)_$(ARCH).deb \
+					yaal-dev_$(VERSION)_$(ARCH).deb \
+					yaal-doc_$(VERSION)_$(ARCH).deb \
+					yaal_$(VERSION).dsc \
+					yaal_$(VERSION).tar.gz \
+					yaal_$(VERSION)_$(ARCH).changes
 DEBIAN_LINK=../../debian
 DEBEMAIL=amok@codestation.org
 export DEBEMAIL
@@ -24,14 +29,16 @@ changelog: $(VERIFY_DIR) $(DEBIAN_LINK)
 	dch --create --newversion 0.0.30 --package yaal "Vendor Release." && \
 	dch --release release
 
-$(ARTIFACT): $(VERIFY_DIR) changelog
+$(ARTIFACTS): $(VERIFY_DIR) changelog
 	cd ../../ && \
-	dpkg-buildpackage -us -uc
+	dpkg-buildpackage -us -uc && \
+	mv $(addprefix ../,$(ARTIFACTS)) _aux/debian
 
-package: $(VERIFY_DIR) $(ARTIFACT)
+package: $(VERIFY_DIR) $(ARTIFACTS)
 
 clean: $(VERIFY_DIR) changelog
-	@cd ../../ && \
+	@/bin/rm -f $(ARTIFACTS) && \
+	cd ../../ && \
 	dpkg-buildpackage -Tclean && \
 	/bin/rm debian _aux/debian/changelog
 
