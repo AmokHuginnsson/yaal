@@ -47,8 +47,8 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHArray_[];
  */
 template<typename type_t, typename allocator_t = allocator::system<type_t> >
 class HArray {
-	typedef HArray<type_t, allocator_t> this_type;
 public:
+	typedef HArray<type_t, allocator_t> this_type;
 	typedef type_t value_type;
 	/*! \brief Error codes for HArray<> operations.
 	 */

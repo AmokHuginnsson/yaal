@@ -35,6 +35,7 @@ Copyright:
 
 #include "hcore/hstreaminterface.hxx"
 #include "hcore/harray.hxx"
+#include "hcore/hstaticarray.hxx"
 #include "hcore/hdeque.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/hset.hxx"
@@ -169,6 +170,13 @@ template<typename tType, typename allocator_t>
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HArray<tType, allocator_t> const& a_ ) {
 	M_PROLOG
 	return ( tools::container_dump( out, a_, "array" ) );
+	M_EPILOG
+}
+
+template<typename tType, int const N>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HStaticArray<tType, N> const& sa_ ) {
+	M_PROLOG
+	return ( tools::container_dump( out, sa_, "staticarray" ) );
 	M_EPILOG
 }
 
