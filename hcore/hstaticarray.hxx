@@ -153,22 +153,22 @@ public:
 		return ( _data + N );
 	}
 	const_reverse_iterator rbegin( void ) const {
-		return ( const_reverse_iterator( _data + N - 1 ) );
+		return ( const_reverse_iterator( end() ) );
 	}
 	const_reverse_iterator crbegin( void ) const {
-		return ( const_reverse_iterator( _data + N - 1 ) );
+		return ( const_reverse_iterator( cend() ) );
 	}
 	reverse_iterator rbegin( void ) {
-		return ( reverse_iterator( _data + N - 1 ) );
+		return ( reverse_iterator( end() ) );
 	}
 	const_reverse_iterator rend( void ) const {
-		return ( const_reverse_iterator( _data - 1 ) );
+		return ( const_reverse_iterator( begin() ) );
 	}
 	const_reverse_iterator crend( void ) const {
-		return ( const_reverse_iterator( _data - 1 ) );
+		return ( const_reverse_iterator( cbegin() ) );
 	}
 	reverse_iterator rend( void ) {
-		return ( reverse_iterator( _data - 1 ) );
+		return ( reverse_iterator( begin() ) );
 	}
 	value_type const& front( void ) const {
 		return ( _data[0] );
