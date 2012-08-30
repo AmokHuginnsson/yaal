@@ -278,3 +278,6 @@ client_character_set 'autodetect'
 instance_name '@ORACLE_SID@'
 
 ### oracle driver END
+### Local variables:
+### eval:(conf-mode)
+### End:
