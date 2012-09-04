@@ -135,6 +135,13 @@ void set_env( HString const& name_, HString const& value_, bool overwrite_ ) {
 	M_EPILOG
 }
 
+void unset_env( HString const& name_ ) {
+	M_PROLOG
+	M_ENSURE( ::unsetenv( name_.raw() ) == 0 );
+	return;
+	M_EPILOG
+}
+
 void decode_set_env( HString line ) {
 	M_PROLOG
 	int long eon = 0;

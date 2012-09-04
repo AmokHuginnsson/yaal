@@ -1,7 +1,7 @@
 /*
----           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
+---           yaal 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcore.hxx - this file is integral part of `yaal' project.
+	hmonitor.cxx - this file is integral part of yaal project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -23,42 +23,42 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/hcore.hxx
- * \brief Basic system level stuff.
- *
- * This file holds (except HException class declaration) main #defines,
- * macros and global variables used acros whole yaal.
- */
 
-#ifndef YAAL_HCORE_HCORE_HXX_INCLUDED
-#define YAAL_HCORE_HCORE_HXX_INCLUDED 1
+#include "hcore/base.hxx"
+M_VCSID( "$Id: "__ID__" $" )
+#include "hmonitor.hxx"
 
-#include "hcore/hstring.hxx"
-#include "hcore/hprogramoptionshandler.hxx"
+using namespace yaal;
+using namespace yaal::hcore;
 
 namespace yaal {
 
-namespace hcore {
+namespace tools {
 
-HProgramOptionsHandler& yaal_options( void );
-bool eq( double long, double long );
-void set_env( HString const&, HString const&, bool = true );
-void unset_env( HString const& );
-void decode_set_env( HString );
-void init_locale( char const* const = NULL );
-void banner( char const* = NULL, char const* = NULL );
-double long strtold( HString const& );
+HMonitor::HMonitor( void )
+	: _mutexes(), _mutex() {
+	return;
+}
 
-namespace extendable {
+HMonitor::~HMonitor( void ) {
+}
 
-typedef double long ( *yaal_strtold_t )( HString const& );
-void set_strtold_impl( yaal_strtold_t );
+HMutex& HMonitor::acquire( HString const& name_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	mutexes_t::iterator it( _mutexes.find( name_ ) );
+	if ( it == _mutexes.end() ) {
+		it = _mutexes.insert( make_pair( name_, make_pointer<HMutex>() ) ).first;
+	}
+	return ( *it->second );
+	M_EPILOG
+}
 
+int HMonitor::life_time( int ) {
+	return ( 95 );
 }
 
 }
 
 }
-
-#endif /* #ifndef YAAL_HCORE_HCORE_HXX_INCLUDED */
 
