@@ -28,6 +28,7 @@
 #include "cxxabi.h"
 #include "cleanup.hxx"
 #include "crit.hxx"
+#include "msio.hxx"
 
 using namespace std;
 using namespace yaal;
@@ -230,9 +231,14 @@ int getgrgid_r( gid_t gid_, struct group* g_, char* buf_, int size_, struct grou
 }
 
 int ms_gethostname( char* buf_, int len_ ) {
-	WSADATA wsaData;
-	WORD wVersionRequested( MAKEWORD( 2, 2 ) );
-	int err( WSAStartup( wVersionRequested, &wsaData ) );
+	static bool once( false );
+	if ( ! once ) {
+		once = true;
+		WSADATA wsaData;
+		WORD wVersionRequested( MAKEWORD( 2, 2 ) );
+		int err( WSAStartup( wVersionRequested, &wsaData ) );
+		SystemIO::get_instance();
+	}
 #undef gethostname
 	return ( gethostname( buf_, len_ ) );
 }

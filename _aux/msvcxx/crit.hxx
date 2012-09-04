@@ -8,6 +8,9 @@ public:
 	~CMutex( void ) { ::CloseHandle( _handle ); }
 	void Lock( void ) { ::WaitForSingleObject( _handle, INFINITE ); }
 	void Unlock( void ) { ::ReleaseMutex( _handle ); }
+private:
+	CMutex( CMutex const& );
+	CMutex& operator = ( CMutex const& );
 };
 
 class CLock {
@@ -19,6 +22,9 @@ public:
 	~CLock( void ) {
 		_mutex.Unlock();
 	}
+private:
+	CLock( CLock const& );
+	CLock operator = ( CLock const& );
 };
 
 #endif /* #ifndef YAAL_MSVCXX_CRIT_HXX_INCLUDED */

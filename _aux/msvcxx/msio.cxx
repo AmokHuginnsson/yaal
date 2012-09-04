@@ -295,12 +295,12 @@ int SystemIO::close_io( int id_ ) {
 	CLock l( _mutex );
 	io_table_t::iterator i( _ioTable.find( id_ ) );
 	int ret( 0 );
-	if ( i != _ioTable.end() )
+	if ( i != _ioTable.end() ) {
 		ret = i->second->close();
-	else {
+		_ioTable.erase( i );
+	} else {
 		M_ASSERT( id_ < MANAGED_IO );
 	}
-	_ioTable.erase( i );
 	return ( ret );
 }
 

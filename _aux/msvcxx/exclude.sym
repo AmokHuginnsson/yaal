@@ -26,6 +26,7 @@
 ?_errMsgHMatrix_@hcore@yaal@@3QBQBDB
 ?_errMsgHRing_@tools@yaal@@3QBQBDB
 ?_errMsgHSBBSTree_@hcore@yaal@@3QBQBDB
+?_errMsgHStaticArray_@hcore@yaal@@3QBQBDB
 ?_errMsgHVector_@hcore@yaal@@3PAPBDA
 ?_exceptionType_@hcore@yaal@@3QBDB
 ?_exitStatus@HSignalService@tools@yaal@@0HA
