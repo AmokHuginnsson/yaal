@@ -45,6 +45,7 @@ extern "C" FILE* tmpfile( void );
 #define fork ms_fork
 #define getuid ms_getuid
 #define gethostname ms_gethostname
+#define unsetenv unsetenv_fix
 #define geteuid getuid
 #undef gai_strerror
 #define gai_strerror msvcxx::windows_strerror
@@ -54,6 +55,7 @@ extern "C" FILE* tmpfile( void );
 
 int ms_gethostname( char*, int );
 M_YAAL_HCORE_PUBLIC_API uid_t ms_getuid( void );
+int unsetenv_fix( char const* );
 
 #if ! defined( HAVE_PTHREAD_SETNAME_NP )
 #define HAVE_PTHREAD_SETNAME_NP 1

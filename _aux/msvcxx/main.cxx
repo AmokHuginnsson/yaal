@@ -131,6 +131,15 @@ void* dlopen_fix( char const* name_, int flag_ ) {
 	return ( handle );
 }
 
+#undef unsetenv
+extern "C" int unsetenv( char const* name_ );
+int unsetenv_fix( char const* name_ ) {
+	string n( name_ );
+	n += "=";
+	int ret( unsetenv( n.c_str() ) );
+	return ( ret );
+}
+
 int unix_readdir_r( DIR* dir_, struct unix_dirent* entry_, struct unix_dirent** result_ ) {
 	dirent* result( NULL );
 	dirent broken;
