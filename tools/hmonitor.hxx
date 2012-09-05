@@ -49,7 +49,7 @@ private:
 	mutexes_t _mutexes;
 	yaal::hcore::HMutex _mutex;
 public:
-	yaal::hcore::HMutex& acquire( yaal::hcore::HString const& );
+	yaal::hcore::external_lock_t acquire( yaal::hcore::HString const& );
 private:
 	HMonitor( void );
 	virtual ~HMonitor( void );

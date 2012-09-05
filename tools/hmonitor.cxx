@@ -43,14 +43,18 @@ HMonitor::HMonitor( void )
 HMonitor::~HMonitor( void ) {
 }
 
-HMutex& HMonitor::acquire( HString const& name_ ) {
+external_lock_t HMonitor::acquire( HString const& name_ ) {
 	M_PROLOG
-	HLock l( _mutex );
-	mutexes_t::iterator it( _mutexes.find( name_ ) );
-	if ( it == _mutexes.end() ) {
-		it = _mutexes.insert( make_pair( name_, make_pointer<HMutex>() ) ).first;
+	HMutex* m( NULL );
+	/* scope for mutexes' containter mutex */ {
+		HLock l( _mutex );
+		mutexes_t::iterator it( _mutexes.find( name_ ) );
+		if ( it == _mutexes.end() ) {
+			it = _mutexes.insert( make_pair( name_, make_pointer<HMutex>() ) ).first;
+		}
+		m = it->second.raw();
 	}
-	return ( *it->second );
+	return ( external_lock_t( ref( *m ) ) );
 	M_EPILOG
 }
 
