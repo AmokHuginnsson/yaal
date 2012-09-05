@@ -125,6 +125,7 @@ _sqrtf
 _sqrtl
 _tanhl
 _tanl
+_unsetenv_fix
 _yaal_dbwrapper_main
 _yaal_hconsole_main
 _yaal_hcore_main
