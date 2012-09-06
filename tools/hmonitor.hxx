@@ -42,7 +42,7 @@ namespace tools {
 class HMonitor : public yaal::hcore::HSingleton<HMonitor> {
 public:
 	typedef HMonitor this_type;
-	typedef HSingleton<HMonitor> base_type;
+	typedef yaal::hcore::HSingleton<HMonitor> base_type;
 private:
 	typedef yaal::hcore::HPointer<yaal::hcore::HMutex> mutex_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, mutex_t> mutexes_t;
