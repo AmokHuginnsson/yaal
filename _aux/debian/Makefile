@@ -26,7 +26,7 @@ $(DEBIAN_LINK): $(VERIFY_DIR)
 changelog: $(VERIFY_DIR) $(DEBIAN_LINK)
 	/bin/rm -f changelog && \
 	cd ../../ && \
-	dch --create --newversion 0.0.30 --package yaal "Vendor Release." && \
+	dch --create --newversion $(VERSION) --package yaal "Vendor Release." && \
 	dch --release release
 
 $(ARTIFACTS): $(VERIFY_DIR) changelog
