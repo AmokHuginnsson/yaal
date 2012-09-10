@@ -39,7 +39,11 @@ pre-clean:
 	cd ../../ && $(MAKE) purge
 
 do-fetch:
-	cd ../../ && git pull
+	cd ../../ && if [ -f .git/config ] ; then \
+		if grep -q "\<url\>" .git/config ; then \
+			git pull ; \
+		fi \
+	fi
 
 do-extract:
 	${MKDIR} $(WRKDIR) && ${LN} -s ../../../ $(WRKSRC)
