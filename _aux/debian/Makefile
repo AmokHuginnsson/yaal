@@ -13,6 +13,12 @@ DEBIAN_LINK=../../debian
 DEBEMAIL=amok@codestation.org
 export DEBEMAIL
 
+ifneq ($(word 2,$(MAKECMDGOALS)),)
+$(error Only one targed allowed at a time.)
+endif
+
+.PHONY: all package clean
+
 all: $(VERIFY_DIR)
 	@echo "Explicit target required!" && echo && echo "supported targets: clean package"
 
