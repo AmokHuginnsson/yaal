@@ -61,16 +61,30 @@ HAlarm::HAlarm( int long miliseconds_ )
 	event.sigev_value.sival_ptr = &_timer;
 	M_ENSURE( timer_create( FWD_CLOCK_REALTIME, &event, &_timer ) == 0 );
 	
-	sigset_t mask;
-	M_ENSURE( sigemptyset( &mask ) == 0 );
-	M_ENSURE( sigaddset( &mask, SIGALRM ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &mask, NULL ) == 0 );
+	int step( 0 );
+	try {
+		sigset_t mask;
+		M_ENSURE( sigemptyset( &mask ) == 0 );
+		M_ENSURE( sigaddset( &mask, SIGALRM ) == 0 );
+		M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &mask, NULL ) == 0 );
+		++ step;
 
-	itimerspec timeout;
-	::memset( &timeout, 0, sizeof ( timeout ) );
-	timeout.it_value.tv_sec = miliseconds_ / MILI_IN_WHOLE;
-	timeout.it_value.tv_nsec = ( miliseconds_ % MILI_IN_WHOLE ) * NANO_IN_MILI;
-	M_ENSURE( timer_settime( _timer, 0, &timeout, NULL ) == 0 );
+		itimerspec timeout;
+		::memset( &timeout, 0, sizeof ( timeout ) );
+		timeout.it_value.tv_sec = miliseconds_ / MILI_IN_WHOLE;
+		timeout.it_value.tv_nsec = ( miliseconds_ % MILI_IN_WHOLE ) * NANO_IN_MILI;
+		M_ENSURE( timer_settime( _timer, 0, &timeout, NULL ) == 0 );
+		++ step;
+	} catch ( ... ) {
+		if ( step > 0 ) {
+			sigset_t mask;
+			M_ENSURE( sigemptyset( &mask ) == 0 );
+			M_ENSURE( sigaddset( &mask, SIGALRM ) == 0 );
+			M_ENSURE( pthread_sigmask( SIG_BLOCK, &mask, NULL ) == 0 );
+		}
+		M_ENSURE( timer_delete( _timer ) == 0 );
+		throw;
+	}
 	return;
 	M_EPILOG
 }
