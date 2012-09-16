@@ -120,6 +120,10 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 			if ( writeFds )
 				FD_ZERO( writeFds );
 			miliseconds = 0;
+			if ( up != WAIT_TIMEOUT ) {
+				ret = -1;
+				errno = EINTR;
+			}
 		}
 		if ( ! ret && miliseconds ) {
 			if ( ::WaitForSingleObject( interrupt, miliseconds ) == WAIT_OBJECT_0 ) {

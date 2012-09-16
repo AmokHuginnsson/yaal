@@ -36,7 +36,7 @@ namespace hcore {
 
 char const* const _errMsgHStaticArray_[ 4 ] = {
 	_( "ok" ),
-/* HStaticArray::ERROR::BAD_INDEX */ _( "index does not fit into array" ),
+/* HStaticArray::ERROR::BAD_INDEX */ _( "index does not fit into static array" ),
 /* HStaticArray::ERROR::BAD_SEQUENCE_SIZE */ _( "Paired sequence size is invalid." ),
 /* HStaticArray::ERROR::COUNT_NOT_MATCH */ _( "Specifed count does not match with container size." )
 };
