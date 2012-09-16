@@ -1,139 +1,16 @@
 #include <sys/cdefs.h>
 #include <sys/socket.h>
-#include <csignal>
 
 #include "hcore/base.hxx"
 #include "hcore/hexception.hxx"
 #include "cleanup.hxx"
 #include "emu_unistd.hxx"
 #include "msio.hxx"
-#include "emu_signals.hxx"
 
 using namespace std;
 using yaal::error_message;
 
 namespace msvcxx {
-
-struct OsCast {
-	SystemIO& _sysIO;
-	OsCast() : _sysIO( SystemIO::get_instance() ) {}
-	IO* operator()( int id_ ) {
-		return ( _sysIO.get_io( id_ ).second.get() );
-	}
-	HANDLE operator()( IO* io_ ) {
-		io_->schedule_read();
-		return ( io_->event() );
-	}
-};
-
-M_EXPORT_SYMBOL
-int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, struct timeval* timeout ) {
-	int ret( 0 );
-	do {
-		int count( ( readFds ? readFds->_count : 0 ) + ( writeFds ? writeFds->_count : 0 ) );
-		M_ENSURE( ( count + 1 ) <= MAXIMUM_WAIT_OBJECTS ); /* +1 for interrupt handler */
-		int long miliseconds( timeout ? ( ( timeout->tv_sec * 1000 ) + ( timeout->tv_usec / 1000 ) ) : 0 );
-		IO* ios[MAXIMUM_WAIT_OBJECTS];
-		HANDLE handles[MAXIMUM_WAIT_OBJECTS];
-		int offset( readFds ? readFds->_count : 0 );
-		OsCast osCast;
-		if ( readFds && writeFds ) {
-			std::sort( readFds->_data, readFds->_data + readFds->_count );
-			std::sort( writeFds->_data, writeFds->_data + writeFds->_count );
-			int* end( std::set_difference( readFds->_data, readFds->_data + readFds->_count,
-				writeFds->_data, writeFds->_data + writeFds->_count,
-				readFds->_data ) );
-			readFds->_count = end - readFds->_data;
-		}
-		if ( readFds ) {
-			std::transform( readFds->_data, readFds->_data + readFds->_count, ios, osCast );
-			for ( int i( 0 ); i < readFds->_count; ++ i ) {
-				if ( ios[i]->ready() )
-					++ ret;
-			}
-			if ( ret > 0 ) {
-				for ( int i( 0 ); i < readFds->_count; ++ i ) {
-					if ( ! ios[i]->ready() )
-						readFds->_data[ i ] = -1;
-				}
-				std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
-				readFds->_count = ret;
-				if ( writeFds )
-					FD_ZERO( writeFds );
-				break; /* !!! Early exit. !!! */
-			}
-			std::transform( ios, ios + readFds->_count, handles, osCast );
-		}
-		if ( writeFds ) {
-			std::transform( writeFds->_data, writeFds->_data + writeFds->_count, ios + offset, osCast );
-			for ( int i( 0 ); i < writeFds->_count; ++ i ) {
-				if ( ios[i + offset]->is_connected() )
-					++ ret;
-			}
-			if ( ret > 0 ) {
-				for ( int i( 0 ); i < writeFds->_count; ++ i ) {
-					if ( ! ios[i + offset]->is_connected() )
-						writeFds->_data[ i ] = -1;
-				}
-				std::remove( writeFds->_data, writeFds->_data + writeFds->_count, -1 );
-				writeFds->_count = ret;
-				if ( readFds )
-					FD_ZERO( readFds );
-				break; /* !!! Early exit. !!! */
-			}
-			std::transform( ios + offset, ios + count, handles, osCast );
-		}
-		HANDLE interrupt( _tlsSignalsSetup_->interrupt() );
-		handles[count] = interrupt;
-		int up( ::WaitForMultipleObjects( count + 1, handles, false, miliseconds ) );
-		if ( up == WAIT_FAILED ) {
-			ret = -1;
-			log_windows_error( "WaitForMultipleObjects" );
-		} else if ( ( up >= static_cast<int>( WAIT_OBJECT_0 ) ) && ( up < ( static_cast<int>( WAIT_OBJECT_0 ) + count ) ) ) {
-			if ( readFds ) {
-				for ( int i( 0 ); i < readFds->_count; ++ i ) {
-					int upL( ::WaitForSingleObject( handles[ i ], 0 ) );
-					if ( ( i == ( up - WAIT_OBJECT_0 ) ) || ( upL == WAIT_OBJECT_0 ) )
-						++ ret;
-					else
-						readFds->_data[ i ] = -1;
-				}
-				std::remove( readFds->_data, readFds->_data + readFds->_count, -1 );
-				readFds->_count = ret;
-			}
-			if ( writeFds ) {
-				for ( int i( 0 ); i < writeFds->_count; ++ i ) {
-					int upL( ::WaitForSingleObject( handles[ i + offset ], 0 ) );
-					if ( ( ( i + offset ) == ( up - WAIT_OBJECT_0 ) ) || ( upL == WAIT_OBJECT_0 ) ) {
-						if ( ! ios[i + offset]->is_connected() )
-							ios[i + offset]->sync();
-						++ ret;
-					} else
-						writeFds->_data[ i ] = -1;
-				}
-				std::remove( writeFds->_data, writeFds->_data + writeFds->_count, -1 );
-				writeFds->_count = ( ret - ( readFds ? readFds->_count : 0 ) );
-			}
-		} else {
-			if ( readFds )
-				FD_ZERO( readFds );
-			if ( writeFds )
-				FD_ZERO( writeFds );
-			miliseconds = 0;
-			if ( up != WAIT_TIMEOUT ) {
-				ret = -1;
-				errno = EINTR;
-			}
-		}
-		if ( ! ret && miliseconds ) {
-			if ( ::WaitForSingleObject( interrupt, miliseconds ) == WAIT_OBJECT_0 ) {
-				ret = -1;
-				errno = EINTR;
-			}
-		}
-	} while ( false );
-	return ( ret );
-}
 
 int make_pipe_instance( IO& io_ ) {
 	io_.set_handle( CreateNamedPipe( io_.path().c_str(),

@@ -64,17 +64,22 @@ char* xstrdup( char const* const str_ ) {
 M_EXPORT_SYMBOL
 int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	/* Make a backup of original descriptors. */
-	int hStdIn = _dup( _fileno( stdin ) );
-	int hStdOut = _dup( _fileno( stdout ) );
-	int hStdErr = _dup( _fileno( stderr ) );
+	int stdinFd( _fileno( stdin ) );
+	int stdoutFd( _fileno( stdout ) );
+	int stderrFd( _fileno( stderr ) );
+	int hStdIn = _dup( stdinFd );
+	::fflush( stdout );
+	int hStdOut = _dup( stdoutFd );
+	::fflush( stderr );
+	int hStdErr = _dup( stderrFd );
 
 	/* ensure backup went ok */
 	M_ENSURE( ( hStdIn >= 0 ) && ( hStdOut >= 0 ) && ( hStdErr >= 0 ) );
 
 	/* Overwrite *standard* descrptors with our communication pipe descriptors. */
-	M_ENSURE( ::dup2( _in[0], _fileno( stdin ) ) == 0 );
-	M_ENSURE( ::dup2( _out[1], _fileno( stdout ) ) == 0 );
-	M_ENSURE( ::dup2( _err[1], _fileno( stderr ) ) == 0 );
+	M_ENSURE( ::dup2( _in[0], stdinFd ) == 0 );
+	M_ENSURE( ::dup2( _out[1], stdoutFd ) == 0 );
+	M_ENSURE( ::dup2( _err[1], stderrFd ) == 0 );
 
 	char** argv = memory::calloc<char*>( _argv.size() + 2 );
 	argv[ 0 ] = xstrdup( _path.raw() );
@@ -90,9 +95,9 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 		log_windows_error( "GetProcessId" );
 
 	/* Restore backed up standard descriptors. */
-	M_ENSURE( ::dup2( hStdIn, _fileno( stdin ) ) == 0 );
-	M_ENSURE( ::dup2( hStdOut, _fileno( stdout ) ) == 0 );
-	M_ENSURE( ::dup2( hStdErr, _fileno( stderr ) ) == 0 );
+	M_ENSURE( ::dup2( hStdIn, stdinFd ) == 0 );
+	M_ENSURE( ::dup2( hStdOut, stdoutFd ) == 0 );
+	M_ENSURE( ::dup2( hStdErr, stderrFd ) == 0 );
 
 	/* Close backups. */
 	if ( TEMP_FAILURE_RETRY( ::close( hStdIn ) )
