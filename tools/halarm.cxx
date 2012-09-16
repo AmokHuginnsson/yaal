@@ -76,12 +76,8 @@ HAlarm::HAlarm( int long miliseconds_ )
 		M_ENSURE( timer_settime( _timer, 0, &timeout, NULL ) == 0 );
 		++ step;
 	} catch ( ... ) {
-		if ( step > 0 ) {
-			sigset_t mask;
-			M_ENSURE( sigemptyset( &mask ) == 0 );
-			M_ENSURE( sigaddset( &mask, SIGALRM ) == 0 );
-			M_ENSURE( pthread_sigmask( SIG_BLOCK, &mask, NULL ) == 0 );
-		}
+		if ( step > 0 )
+			cleanup_sigmask();
 		M_ENSURE( timer_delete( _timer ) == 0 );
 		throw;
 	}
@@ -96,14 +92,21 @@ HAlarm::~HAlarm( void ) {
 	::memset( &timeout, 0, sizeof ( timeout ) );
 	M_ENSURE( timer_settime( _timer, 0, &timeout, NULL ) == 0 );
 
-	sigset_t mask;
-	M_ENSURE( sigemptyset( &mask ) == 0 );
-	M_ENSURE( sigaddset( &mask, SIGALRM ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_BLOCK, &mask, NULL ) == 0 );
+	cleanup_sigmask();
 
 	M_ENSURE( timer_delete( _timer ) == 0 );
 	return;
 	M_DESTRUCTOR_EPILOG
+}
+
+void HAlarm::cleanup_sigmask( void ) {
+	M_PROLOG
+	sigset_t mask;
+	M_ENSURE( sigemptyset( &mask ) == 0 );
+	M_ENSURE( sigaddset( &mask, SIGALRM ) == 0 );
+	M_ENSURE( pthread_sigmask( SIG_BLOCK, &mask, NULL ) == 0 );
+	return;
+	M_EPILOG
 }
 
 }

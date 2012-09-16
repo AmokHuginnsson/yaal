@@ -60,6 +60,7 @@ public:
 private:
 	HAlarm( HAlarm const& );
 	HAlarm& operator = ( HAlarm const& );
+	void cleanup_sigmask( void );
 };
 
 typedef yaal::hcore::HExceptionT<HAlarm> HAlarmException;
