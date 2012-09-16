@@ -37,6 +37,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hpipedchild.hxx"
 #include "hfsitem.hxx"
 #include "hcore/system.hxx"
+#include "hcore/hfile.hxx"
 #include "util.hxx"
 #include "halarm.hxx"
 
@@ -150,9 +151,14 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 	M_ENSURE_EX( !! image && image.is_executable(), image_ );
 	M_ENSURE( ( ! ::pipe( fileDesIn ) ) && ( ! ::pipe( fileDesOut ) ) && ( ! ::pipe( fileDesErr ) ) );
 	HChunk argv( chunk_size<char const*>( argv_.size() + 2 ) );
+	external_lock_t stdinLock( cin.acquire() );
+	external_lock_t sdtoutLock( cout.acquire() );
+	external_lock_t stderrLock( cerr.acquire() );
 	int const stdinFd( fileno( stdin ) );
 	int const stdoutFd( fileno( stdout ) );
 	int const stderrFd( fileno( stderr ) );
+	::fflush( stderr );
+	::fflush( stdout );
 	_pid = ::fork();
 	M_ENSURE_EX( _pid >= 0, "fork()" );
 	if ( ! _pid ) {

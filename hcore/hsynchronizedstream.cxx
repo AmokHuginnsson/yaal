@@ -55,6 +55,7 @@ void HSynchronizedStream::reset( owned_stream_t stream_ ) {
 	M_PROLOG
 	_streamOwned = stream_;
 	_streamRef = _streamOwned.raw();
+	return;
 	M_EPILOG
 }
 
@@ -62,6 +63,13 @@ void HSynchronizedStream::reset( ref_stream_t stream_ ) {
 	M_PROLOG
 	_streamOwned.reset();
 	_streamRef = &stream_;
+	return;
+	M_EPILOG
+}
+
+external_lock_t HSynchronizedStream::acquire( void ) {
+	M_PROLOG
+	return ( external_lock_t( ref( _mutex ) ) );
 	M_EPILOG
 }
 
@@ -331,17 +339,17 @@ int long HSynchronizedStream::do_read_until_n( yaal::hcore::HString& store, int 
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_read_while( yaal::hcore::HString& store, char const* const acquire, bool strip ) {
+int long HSynchronizedStream::do_read_while( yaal::hcore::HString& store, char const* const acquire_, bool strip ) {
 	M_PROLOG
 	HLock l( _mutex );
-	return ( HStreamInterface::do_read_while( store, acquire, strip ) );
+	return ( HStreamInterface::do_read_while( store, acquire_, strip ) );
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_read_while_n( yaal::hcore::HString& store, int long maxcount, char const* const acquire, bool strip ) {
+int long HSynchronizedStream::do_read_while_n( yaal::hcore::HString& store, int long maxcount, char const* const acquire_, bool strip ) {
 	M_PROLOG
 	HLock l( _mutex );
-	return ( HStreamInterface::do_read_while_n( store, maxcount, acquire, strip ) );
+	return ( HStreamInterface::do_read_while_n( store, maxcount, acquire_, strip ) );
 	M_EPILOG
 }
 
