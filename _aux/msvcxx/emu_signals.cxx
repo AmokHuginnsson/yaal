@@ -1,7 +1,6 @@
 #include <sys/cdefs.h>
 #include <process.h>
 
-#define pthread_sigmask pthread_sigmask_off
 #define execl execl_off
 #define execle execle_off
 #define execv execv_off
@@ -18,7 +17,6 @@
 #include <csignal>
 
 #undef getpwuid_r
-#undef pthread_sigmask
 #undef getpid
 
 #include "synchronizedqueue.hxx"
@@ -33,8 +31,19 @@ using namespace msvcxx;
 
 namespace msvcxx {
 
+class SignalDispatcher {
+	typedef SynchronizedQueue<int> signal_queue_t;
+	signal_queue_t _queue;
+	sigset_t _mask;
+public:
+	SignalDispatcher( void );
+	void dispatch( int );
+	bool sigwait( sigset_t const*, int& );
+	sigset_t get_mask( void ) const;
+} _signalDispatcher_;
+
 SignalsSetup::SignalsSetup( void )
-	: _mask(), _interrupt( ::CreateEvent( NULL, false, false, NULL ) ) {
+	: _mask( _signalDispatcher_.get_mask() ), _interrupt( ::CreateEvent( NULL, false, false, NULL ) ) {
 }
 
 SignalsSetup::~SignalsSetup( void ) {
@@ -71,18 +80,7 @@ void SignalsSetup::signal( void ) {
 	::SetEvent( _interrupt );
 }
 
-class SignalDispatcher {
-	typedef SynchronizedQueue<int> signal_queue_t;
-	signal_queue_t _queue;
-	sigset_t _mask;
-public:
-	SignalDispatcher( void );
-	void dispatch( int );
-	bool sigwait( sigset_t const*, int& );
-};
-
 TLSSignalsSetup _tlsSignalsSetup_;
-SignalDispatcher _signalDispatcher_;
 
 SignalDispatcher::SignalDispatcher( void )
 	: _queue(), _mask() {
@@ -108,10 +106,16 @@ bool SignalDispatcher::sigwait( sigset_t const* mask_, int& sigNo_ ) {
 	return ( _queue.pop( sigNo_ ) );
 }
 
+sigset_t SignalDispatcher::get_mask( void ) const {
+	return ( _mask );
+}
+
 }
 
 M_EXPORT_SYMBOL
 int kill( int pid_, int sigNo_ ) {
+	if ( sigNo_ == SIGABRT_COMPAT )
+		sigNo_ = SIGABRT;
 	int err( 0 );
 	if ( pid_ == getpid() )
 		_signalDispatcher_.dispatch( sigNo_ );
@@ -141,34 +145,54 @@ int sigwait( sigset_t* mask_, int* signo ) {
 	return ( 0 );
 }
 
+inline sigset_t sigmask( int sig_ ) {
+	sigset_t mask( 1 );
+	return ( mask << ( sig_ - 1 ) );
+}
+
 int sigaddset( sigset_t* set_, int sig_ ) {
-	return ( __sigaddset( set_, sig_ ) );
-}
-
-int sigdelset( sigset_t* set_, int sig_ ) {
-	return ( __sigdelset( set_, sig_ ) );
-}
-
-int sigismember( sigset_t* set_, int sig_ ) {
-	return ( __sigismember( set_, sig_ ) );
-}
-
-int sigemptyset( sigset_t* set_ ) {
-	return ( __sigemptyset( set_ ) );
-}
-
-void win_signal_handler( int signo ) {
-	_signalDispatcher_.dispatch( signo );
-}
-
-int sigaction( int signo, struct sigaction*, void* ) {
-	if ( ( signo != SIGURG ) && ( signo != SIGBUS ) && ( signo != SIGTRAP ) && ( signo != SIGSYS ) && ( signo != SIGALRM ) ) /*&& ( signo != 12 ) ) */
-		signal( signo, win_signal_handler );
+	*set_ |= sigmask( sig_ );
 	return ( 0 );
 }
 
-extern "C"
-M_EXPORT_SYMBOL
+int sigdelset( sigset_t* set_, int sig_ ) {
+	*set_ &= ~sigmask( sig_ );
+	return ( 0 );
+}
+
+int sigismember( sigset_t* set_, int sig_ ) {
+	return ( *set_ & sigmask( sig_ ) ? 1 : 0 );
+}
+
+int sigemptyset( sigset_t* set_ ) {
+	return ( *set_ = 0 );
+}
+
+void win_signal_handler( int signo ) {
+	if ( signo == SIGABRT_COMPAT )
+		signo = SIGABRT;
+	_signalDispatcher_.dispatch( signo );
+}
+
+int sigaction( int signo, struct sigaction* sa_, void* ) {
+	if ( ( signo != SIGURG )
+			&& ( signo != SIGBUS )
+			&& ( signo != SIGTRAP )
+			&& ( signo != SIGSYS )
+			&& ( signo != SIGALRM ) ) /*&& ( signo != 12 ) ) */ {
+		if ( sa_->sa_handler != SIG_DFL ) {
+			signal( signo, win_signal_handler );
+			if ( signo == SIGABRT )
+				signal( SIGABRT_COMPAT, win_signal_handler );
+		} else {
+			signal( signo, sa_->sa_handler );
+			if ( signo == SIGABRT )
+				signal( SIGABRT_COMPAT, sa_->sa_handler );
+		}
+	}
+	return ( 0 );
+}
+
 int pthread_sigmask( int how_, sigset_t* set_, void* ) {
 	_tlsSignalsSetup_->set_mask( how_, set_ );
 	return ( 0 );

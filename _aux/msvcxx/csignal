@@ -1,24 +1,23 @@
 #ifndef YAAL_MSVCXX_CSIGNAL_INCLUDED
 #define YAAL_MSVCXX_CSIGNAL_INCLUDED 1
 
-#define sigaddset sigaddset_off
-#define sigdelset sigdelset_off
-#define sigwait sigwait_off
-#define sigemptyset sigemptyset_off
-#define sigismember sigismember_off
-#define kill kill_off
-#include <../include/csignal>
-#define signal signal_off
-#define raise raise_off
 #include <unistd.h>
-#undef signal
-#undef raise
-#undef sigaddset
-#undef sigdelset
-#undef sigwait
-#undef sigemptyset
-#undef sigismember
-#undef kill
+
+typedef yaal::u64_t sigset_t;
+typedef yaal::u64_t __sigset_t;
+
+#define _SIGNAL_H 1
+typedef void (*__sighandler_t) (int);
+typedef __sighandler_t sighandler_t;
+#include <bits/signum.h>
+#include <bits/siginfo.h>
+#include <bits/sigaction.h>
+#undef SIG_DFL
+#undef SIG_IGN
+#undef SIG_ERR
+#undef _SIGNAL_H
+#undef SIGABRT
+#include <../include/csignal>
 
 M_YAAL_HCORE_PUBLIC_API int sigaddset( sigset_t*, int );
 M_YAAL_HCORE_PUBLIC_API int sigdelset( sigset_t*, int );
@@ -27,6 +26,7 @@ M_YAAL_HCORE_PUBLIC_API int sigwait( sigset_t*, int* );
 M_YAAL_HCORE_PUBLIC_API int sigaction( int, struct sigaction*, void* );
 M_YAAL_HCORE_PUBLIC_API int sigemptyset( sigset_t* );
 M_YAAL_HCORE_PUBLIC_API int kill( int, int );
+M_YAAL_HCORE_PUBLIC_API int pthread_sigmask( int, sigset_t*, void* );
 
 #endif /* not YAAL_MSVCXX_CSIGNAL_INCLUDED */
 // vim: ft=cpp

@@ -145,17 +145,6 @@ namespace msvcxx { M_YAAL_HCORE_PUBLIC_API char const* windows_strerror( int ); 
 #ifdef _CSTDIO_
 extern "C" int long getline( char**, size_t*, FILE* );
 #endif /* _CSTDIO_ */
-#ifdef _CSIGNAL_
-#undef SIG_ERR
-#undef SIG_DFL
-#undef SIG_IGN
-#undef SIGABRT
-#undef NSIG
-#define kill kill_off
-#define __USE_EXTERN_INLINES 1
-#include <glibc/signal.h>
-#undef kill
-#endif /* _CSIGNAL_ */
 #include "cleanup.hxx"
 #endif /* __YAAL_BUILD__ */
 #endif /* __MSVCXX__ */
