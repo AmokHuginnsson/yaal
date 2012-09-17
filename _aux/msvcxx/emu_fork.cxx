@@ -26,6 +26,7 @@
 
 #include "synchronizedunorderedset.hxx"
 #include "hcore/memory.hxx"
+#include "hcore/hfile.hxx"
 #include "cleanup.hxx"
 #include "msio.hxx"
 #include "emu_unistd.hxx"
@@ -64,6 +65,9 @@ char* xstrdup( char const* const str_ ) {
 M_EXPORT_SYMBOL
 int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	/* Make a backup of original descriptors. */
+	external_lock_t stdinLock( cin.acquire() );
+	external_lock_t sdtoutLock( cout.acquire() );
+	external_lock_t stderrLock( cerr.acquire() );
 	int stdinFd( _fileno( stdin ) );
 	int stdoutFd( _fileno( stdout ) );
 	int stderrFd( _fileno( stderr ) );
