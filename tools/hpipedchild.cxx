@@ -158,7 +158,9 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 	int const stdoutFd( fileno( stdout ) );
 	int const stderrFd( fileno( stderr ) );
 	::fflush( stderr );
+	cout << hcore::flush;
 	::fflush( stdout );
+	cerr << hcore::flush;
 	_pid = ::fork();
 	M_ENSURE_EX( _pid >= 0, "fork()" );
 	if ( ! _pid ) {

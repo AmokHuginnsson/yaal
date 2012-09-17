@@ -1,3 +1,4 @@
+#include <iostream>
 #include <algorithm>
 #include <unordered_set>
 #include <sys/cdefs.h>
@@ -65,16 +66,20 @@ char* xstrdup( char const* const str_ ) {
 M_EXPORT_SYMBOL
 int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	/* Make a backup of original descriptors. */
-	external_lock_t stdinLock( cin.acquire() );
-	external_lock_t sdtoutLock( cout.acquire() );
-	external_lock_t stderrLock( cerr.acquire() );
+	external_lock_t stdinLock( hcore::cin.acquire() );
+	external_lock_t sdtoutLock( hcore::cout.acquire() );
+	external_lock_t stderrLock( hcore::cerr.acquire() );
 	int stdinFd( _fileno( stdin ) );
 	int stdoutFd( _fileno( stdout ) );
 	int stderrFd( _fileno( stderr ) );
 	int hStdIn = _dup( stdinFd );
 	::fflush( stdout );
+	hcore::cout << hcore::flush;
+	std::cout << std::flush;
 	int hStdOut = _dup( stdoutFd );
 	::fflush( stderr );
+	hcore::cerr << hcore::flush;
+	std::cerr << std::flush;
 	int hStdErr = _dup( stderrFd );
 
 	/* ensure backup went ok */
