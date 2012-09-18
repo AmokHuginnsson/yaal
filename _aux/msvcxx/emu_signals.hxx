@@ -12,6 +12,7 @@ public:
 	SignalsSetup( void );
 	~SignalsSetup( void );
 	void set_mask( int, sigset_t const* );
+	sigset_t get_mask( void ) const;
 	bool is_blocked( int ) const;
 	HANDLE interrupt( void );
 	void signal( void );

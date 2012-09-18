@@ -33,13 +33,17 @@ namespace msvcxx {
 
 class SignalDispatcher {
 	typedef SynchronizedQueue<int> signal_queue_t;
+	bool _started;
 	signal_queue_t _queue;
-	sigset_t _mask;
+	sigset_t _block;
+	sigset_t _accept;
 public:
 	SignalDispatcher( void );
 	void dispatch( int );
 	bool sigwait( sigset_t const*, int& );
 	sigset_t get_mask( void ) const;
+	void set_mask( int, sigset_t const* );
+	bool is_started( void ) const;
 } _signalDispatcher_;
 
 SignalsSetup::SignalsSetup( void )
@@ -67,6 +71,10 @@ void SignalsSetup::set_mask( int how_, sigset_t const* set_ ) {
 	}
 }
 
+sigset_t SignalsSetup::get_mask( void ) const {
+	return ( _mask );
+}
+
 bool SignalsSetup::is_blocked( int sigNo_ ) const {
 	sigset_t copy( _mask );
 	return ( sigismember( &copy, sigNo_ ) ? true : false );
@@ -83,11 +91,11 @@ void SignalsSetup::signal( void ) {
 TLSSignalsSetup _tlsSignalsSetup_;
 
 SignalDispatcher::SignalDispatcher( void )
-	: _queue(), _mask() {
+	: _started( false ), _queue(), _block(), _accept() {
 }
 
 void SignalDispatcher::dispatch( int sigNo_ ) {
-	if ( sigismember( &_mask, sigNo_ ) ) {
+	if ( sigismember( &_accept, sigNo_ ) ) {
 		_queue.push( sigNo_ );
 	} else {
 		external_lock_t l( _tlsSignalsSetup_.acquire() );
@@ -101,13 +109,35 @@ void SignalDispatcher::dispatch( int sigNo_ ) {
 	}
 }
 
-bool SignalDispatcher::sigwait( sigset_t const* mask_, int& sigNo_ ) {
-	_mask = *mask_;
+bool SignalDispatcher::sigwait( sigset_t const* set_, int& sigNo_ ) {
+	_started = true;
+	_accept = *set_;
 	return ( _queue.pop( sigNo_ ) );
 }
 
 sigset_t SignalDispatcher::get_mask( void ) const {
-	return ( _mask );
+	return ( _block );
+}
+
+void SignalDispatcher::set_mask( int how_, sigset_t const* set_ ) {
+	switch ( how_ ) {
+		case ( SIG_SETMASK ):
+			_block = *set_;
+		break;
+		case ( SIG_BLOCK ):
+			_block |= *set_;
+		break;
+		case ( SIG_UNBLOCK ):
+			_block &= ~*set_;
+		break;
+		default:
+			M_ASSERT( !"Bad how_ argument value." );
+		break;
+	}
+}
+
+bool SignalDispatcher::is_started( void ) const {
+	return ( _started );
 }
 
 }
@@ -139,8 +169,8 @@ int kill( int pid_, int sigNo_ ) {
 }
 
 M_EXPORT_SYMBOL
-int sigwait( sigset_t* mask_, int* signo ) {
-	if ( _signalDispatcher_.sigwait( mask_, *signo ) )
+int sigwait( sigset_t* set_, int* signo ) {
+	if ( _signalDispatcher_.sigwait( set_, *signo ) )
 		*signo = SIGURG;
 	return ( 0 );
 }
@@ -194,7 +224,11 @@ int sigaction( int signo, struct sigaction* sa_, void* ) {
 }
 
 int pthread_sigmask( int how_, sigset_t* set_, void* ) {
-	_tlsSignalsSetup_->set_mask( how_, set_ );
+	if ( sigismember( set_, SIGALRM ) )
+	if ( _signalDispatcher_.is_started() )
+		_tlsSignalsSetup_->set_mask( how_, set_ );
+	else
+		_signalDispatcher_.set_mask( how_, set_ );
 	return ( 0 );
 }
 
