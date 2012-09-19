@@ -42,10 +42,15 @@ namespace mouse {
 struct MOUSE_BITS {
 	/*! \brief Mouse button identifiers.
 	 */
-	struct BUTTONS {
-		static int const ONE 		= 1; /*!< Button 1. */
-		static int const TWO		= 2; /*!< Button 2. */
-		static int const THREE	= 4; /*!< Button 3. */
+	struct BUTTON {
+		static int const ONE        = 1;       /*!< Button 1, single click. */
+		static int const ONE_2      = 1 | 64;  /*!< Button 1, double clicked. */
+		static int const TWO        = 2;       /*!< Button 2, single click. */
+		static int const TWO_2      = 2 | 64;  /*!< Button 2, double clicked. */
+		static int const THREE      = 4;       /*!< Button 3, single click. */
+		static int const THREE_2    = 4 | 64;  /*!< Button 3, double clicked. */
+		static int const WHEEL_UP   = 8;       /*!< Wheel rotated up. */
+		static int const WHEEL_DOWN = 16;      /*!< Wheel rotated down. */
 	};
 };
 

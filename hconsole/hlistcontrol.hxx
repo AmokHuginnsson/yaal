@@ -516,6 +516,8 @@ protected:
 	void handle_key_ctrl_p( void );
 	void handle_key_space( void );
 	void handle_key_tab( void );
+	void scroll_up( void );
+	void scroll_down( void );
 private:
 	void sort_by_column( int, list_control_helper::OSortHelper::sort_order_t = list_control_helper::OSortHelper::ASCENDING );
 	void recalculate_column_widths( void );

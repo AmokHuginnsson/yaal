@@ -186,7 +186,12 @@ int console_mouse_get( OMouse& mouse_ ) {
 	Gpm_Event event;
 	if ( Gpm_GetEvent( &event ) != 1 )
 		throw HMouseException( _( "cannot retrieve event") , errno );
-	mouse_._buttons = event.buttons;
+	mouse_._buttons = 0;
+	mouse_._buttons |= ( ( event.buttons & GPM_B_LEFT ) ? MOUSE_BITS::BUTTON::ONE : 0 );
+	mouse_._buttons |= ( ( event.buttons & GPM_B_MIDDLE ) ? MOUSE_BITS::BUTTON::TWO : 0 );
+	mouse_._buttons |= ( ( event.buttons & GPM_B_RIGHT ) ? MOUSE_BITS::BUTTON::THREE : 0 );
+	mouse_._buttons |= ( ( event.buttons & GPM_B_UP ) ? MOUSE_BITS::BUTTON::WHEEL_UP : 0 );
+	mouse_._buttons |= ( ( event.buttons & GPM_B_DOWN ) ? MOUSE_BITS::BUTTON::WHEEL_DOWN : 0 );
 	mouse_._row = event.y;
 	mouse_._column = event.x;
 	return ( 0 );
@@ -237,15 +242,19 @@ int console_mouse_close( void ) {
 int x_mouse_open( void ) {
 	M_PROLOG
 	mmask_t mouseMask, desiredMouseMask;
-	desiredMouseMask = BUTTON1_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED | BUTTON1_DOUBLE_CLICKED;
+	desiredMouseMask = BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED
+		| BUTTON2_CLICKED | BUTTON2_DOUBLE_CLICKED
+		| BUTTON3_CLICKED | BUTTON3_DOUBLE_CLICKED
+		| BUTTON4_PRESSED;
 	mouseMask = mousemask( desiredMouseMask, NULL );
 	if ( ! mouseMask )
 		throw HMouseException( "mousemask() returned 0", errno );
 	else if ( ( mouseMask & desiredMouseMask ) < desiredMouseMask ) {
 		HString error;
-		error.format( "could not set up apropriate mask: B1C = %lu, B2C = %lu, B3C = %lu, B1DC = %lu",
+		error.format( "could not set up apropriate mask: B1C = %lu, B2C = %lu, B3C = %lu, B4C = %lu, B1DC = %lu",
 				mouseMask & BUTTON1_CLICKED, mouseMask & BUTTON2_CLICKED,
-				mouseMask & BUTTON3_CLICKED, mouseMask & BUTTON1_DOUBLE_CLICKED );
+				mouseMask & BUTTON3_CLICKED, mouseMask & BUTTON4_CLICKED,
+				mouseMask & BUTTON1_DOUBLE_CLICKED );
 		throw ( HMouseException( error ) );
 	}
 #if defined( HAVE_DECL_HAS_MOUSE ) && ( HAVE_DECL_HAS_MOUSE == 1 )
@@ -262,7 +271,15 @@ int x_mouse_get( OMouse& mouse_ ) {
 	if ( getmouse( &mouse ) != OK )
 		throw HMouseException( "cannot get mouse data", errno );
 	else {
-		mouse_._buttons = static_cast<int>( mouse.bstate );
+		mouse_._buttons = 0;
+		mouse_._buttons |= ( ( mouse.bstate & BUTTON1_CLICKED ) ? MOUSE_BITS::BUTTON::ONE : 0 );
+		mouse_._buttons |= ( ( mouse.bstate & BUTTON1_DOUBLE_CLICKED ) ? MOUSE_BITS::BUTTON::ONE_2 : 0 );
+		mouse_._buttons |= ( ( mouse.bstate & BUTTON2_CLICKED ) ? MOUSE_BITS::BUTTON::TWO : 0 );
+		mouse_._buttons |= ( ( mouse.bstate & BUTTON2_DOUBLE_CLICKED ) ? MOUSE_BITS::BUTTON::TWO_2 : 0 );
+		mouse_._buttons |= ( ( mouse.bstate & BUTTON3_CLICKED ) ? MOUSE_BITS::BUTTON::THREE : 0 );
+		mouse_._buttons |= ( ( mouse.bstate & BUTTON3_DOUBLE_CLICKED ) ? MOUSE_BITS::BUTTON::THREE_2 : 0 );
+		mouse_._buttons |= ( ( mouse.bstate & BUTTON4_PRESSED ) ? MOUSE_BITS::BUTTON::WHEEL_UP : 0 );
+		mouse_._buttons |= ( ( mouse.bstate >= ( BUTTON4_RESERVED_EVENT << 1 ) ) ? MOUSE_BITS::BUTTON::WHEEL_DOWN : 0 );
 		mouse_._row = mouse.y;
 		mouse_._column = mouse.x;
 	}

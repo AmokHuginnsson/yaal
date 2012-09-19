@@ -38,6 +38,7 @@ M_VCSID( "$Id: "__TID__" $" )
 using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::hconsole::list_control_helper;
+using namespace yaal::hconsole::mouse;
 
 namespace yaal {
 
@@ -398,12 +399,12 @@ void HListControl::handle_key_page_down( void ) {
 void HListControl::handle_key_up( void ) {
 	if ( ( _controlOffset + _cursorPosition ) > 0 ) {
 		if ( _cursorPosition > 0 ) {
-			_cursorPosition --;
+			-- _cursorPosition;
 			-- _cursor;
 		} else if ( _controlOffset > 0 ) {
 			-- _firstVisibleRow;
 			-- _cursor;
-			_controlOffset --;
+			-- _controlOffset;
 		}
 	} else
 		HConsole::get_instance().bell();
@@ -430,11 +431,11 @@ void HListControl::handle_key_end( void ) {
 
 void HListControl::handle_key_down( void ) {
 	if ( ( _cursorPosition + _controlOffset ) < ( _controler->size() - 1 ) ) {
-		_cursorPosition ++;
+		++ _cursorPosition;
 		++ _cursor;
 		if ( _cursorPosition >= _heightRaw ) {
 			_cursorPosition = _heightRaw - 1;
-			_controlOffset ++;
+			++ _controlOffset;
 			++ _firstVisibleRow;
 		}
 	} else
@@ -607,8 +608,6 @@ int HListControl::do_click( mouse::OMouse& mouse_ ) {
 	if ( ! HControl::do_click( mouse_ ) )
 		return ( 1 );
 	row = ( mouse_._row - _rowRaw ) - ( _drawHeader ? 1 : 0 );
-	if ( row == _cursorPosition )
-		return ( 1 );
 	if ( row < 0 ) /* header clicked */ {
 		int column( mouse_._column + _columnRaw - 1 );
 		int width( 0 );
@@ -623,10 +622,53 @@ int HListControl::do_click( mouse::OMouse& mouse_ ) {
 			}
 		}
 	} else if ( row < _controler->size() ) {
-		_cursorPosition = row;
+		if ( mouse_._buttons & MOUSE_BITS::BUTTON::WHEEL_UP )
+			scroll_up();
+		else if ( mouse_._buttons & MOUSE_BITS::BUTTON::WHEEL_DOWN )
+			scroll_down();
+		else if ( row == _cursorPosition )
+			return ( 1 );
+		else {
+			if ( row > _cursorPosition ) {
+				for ( int i( _cursorPosition ); i < row; ++ i )
+					++ _cursor;
+			} else {
+				for ( int i( _cursorPosition ); i > row; -- i )
+					-- _cursor;
+			}
+			_cursorPosition = row;
+		}
 		schedule_refresh();
 	}
 	return ( 0 );
+	M_EPILOG
+}
+
+void HListControl::scroll_up( void ) {
+	M_PROLOG
+	if ( _controlOffset > 0 ) {
+		-- _controlOffset;
+		-- _firstVisibleRow;
+		if ( _cursorPosition < ( _heightRaw - 1 ) )
+			++ _cursorPosition;
+		else
+			-- _cursor;
+	}
+	return;
+	M_EPILOG
+}
+
+void HListControl::scroll_down( void ) {
+	M_PROLOG
+	if ( ( _controlOffset + _heightRaw ) < _controler->size() ) {
+		++ _controlOffset;
+		++ _firstVisibleRow;
+		if ( _cursorPosition > 0 )
+			-- _cursorPosition;
+		else
+			++ _cursor;
+	}
+	return;
 	M_EPILOG
 }
 
