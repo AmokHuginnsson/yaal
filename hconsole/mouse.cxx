@@ -241,22 +241,19 @@ int console_mouse_close( void ) {
 
 int x_mouse_open( void ) {
 	M_PROLOG
-	mmask_t mouseMask, desiredMouseMask;
-	desiredMouseMask = BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED
-		| BUTTON2_CLICKED | BUTTON2_DOUBLE_CLICKED
-		| BUTTON3_CLICKED | BUTTON3_DOUBLE_CLICKED
-		| BUTTON4_PRESSED;
-	mouseMask = mousemask( desiredMouseMask, NULL );
+	mmask_t desiredMouseMask( ALL_MOUSE_EVENTS );
+	mmask_t strictlyRequiredMask( BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED );
+	mmask_t mouseMask( mousemask( desiredMouseMask, NULL ) );
 	if ( ! mouseMask )
 		throw HMouseException( "mousemask() returned 0", errno );
-	else if ( ( mouseMask & desiredMouseMask ) < desiredMouseMask ) {
+	else if ( ( mouseMask & strictlyRequiredMask ) < strictlyRequiredMask ) {
 		HString error;
-		error.format( "could not set up apropriate mask: B1C = %lu, B2C = %lu, B3C = %lu, B4C = %lu, B1DC = %lu",
+		error.format( "could not set up apropriate mask: B1C = %lu, B2C = %lu, B3C = %lu, B1DC = %lu",
 				mouseMask & BUTTON1_CLICKED, mouseMask & BUTTON2_CLICKED,
-				mouseMask & BUTTON3_CLICKED, mouseMask & BUTTON4_CLICKED,
-				mouseMask & BUTTON1_DOUBLE_CLICKED );
+				mouseMask & BUTTON3_CLICKED, mouseMask & BUTTON1_DOUBLE_CLICKED );
 		throw ( HMouseException( error ) );
 	}
+	mouseinterval( 500 );
 #if defined( HAVE_DECL_HAS_MOUSE ) && ( HAVE_DECL_HAS_MOUSE == 1 )
 	if ( ! has_mouse() )
 		throw HMouseException( "Mouse driver failed to initialize properly." );
@@ -279,7 +276,7 @@ int x_mouse_get( OMouse& mouse_ ) {
 		mouse_._buttons |= ( ( mouse.bstate & BUTTON3_CLICKED ) ? MOUSE_BITS::BUTTON::THREE : 0 );
 		mouse_._buttons |= ( ( mouse.bstate & BUTTON3_DOUBLE_CLICKED ) ? MOUSE_BITS::BUTTON::THREE_2 : 0 );
 		mouse_._buttons |= ( ( mouse.bstate & BUTTON4_PRESSED ) ? MOUSE_BITS::BUTTON::WHEEL_UP : 0 );
-		mouse_._buttons |= ( ( mouse.bstate >= ( BUTTON4_RESERVED_EVENT << 1 ) ) ? MOUSE_BITS::BUTTON::WHEEL_DOWN : 0 );
+		mouse_._buttons |= ( ( mouse.bstate >= ( BUTTON4_TRIPLE_CLICKED << 1 ) ) ? MOUSE_BITS::BUTTON::WHEEL_DOWN : 0 );
 		mouse_._row = mouse.y;
 		mouse_._column = mouse.x;
 	}

@@ -906,7 +906,6 @@ void HListControl::remove_current_row ( void ) {
 		flag = false;
 	if ( _cursor == _firstVisibleRow )
 		++ _firstVisibleRow;
-	_needRepaint_ = true;
 	iterator_t it = _cursor;
 	if ( flag )
 		++ _cursor;
