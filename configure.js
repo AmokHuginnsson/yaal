@@ -28,6 +28,24 @@ function checkKey( key ) {
 	return ( { exists : has, value : value } );
 }
 
+function isBoostUsed( buildDefinitionPath ) {
+	var used = false;
+	try {
+		var fs = new ActiveXObject( "Scripting.FileSystemObject" );
+		var bd = fs.openTextFile( "./" + buildDefinitionPath + "/CMakeLists.txt", ForReading );
+		while ( ! bd.AtEndOfStream ) {
+			var line = bd.readLine();
+			if ( line.toLowerCase().indexOf( "boost" ) != -1 ) {
+				used = true;
+				break;
+			}
+		}
+	} catch ( e ) {
+		msg( "Reading build definition: " + e.description );
+	}
+	return ( used );
+}
+
 function boostInfo( install_path ) {
 	var keyPrefix = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\boostpro.com\\", "HKEY_LOCAL_MACHINE\\SOFTWARE\\Boost-Consulting.com\\", "HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\boostpro.com\\", "HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Boost-Consulting.com\\" ];
 	this.installPath = "";
@@ -238,33 +256,38 @@ try {
 			FAST = 0;
 	}
 
-	var boostInfo = new boostInfo( BOOST_INSTALL_PATH );
-
-	if ( ! boostInfo.exists ) {
-		msg( "Cannot locate boost installation (havent you used BoostPro?)!" );
-		terminate( 1 );
-	}
 	if ( ( VISUAL_STUDIO_VERSION == null ) || ( VISUAL_STUDIO_VERSION == "" ) ) {
 		msg( "Cannot determine your VisualStudio installation information." );
 		terminate( 1 );
 	}
-	BOOST_VERSION = boostInfo.version.vc
-		+ "-" + boostInfo.version.thread
-		+ "-" + boostInfo.version.target
-		+ "-" + boostInfo.version.lib;
 	var eol = dirRoot.charAt( dirRoot.length - 1 );
 	if ( ( eol != "\\" ) && ( eol != "/" ) )
 		dirRoot += "/";
 
-	eol = boostInfo.installPath.charAt( boostInfo.installPath.length - 1 );
-	if ( ( eol != "\\" ) && ( eol != "/" ) )
-		boostInfo.installPath += "/";
-	boostInfo.installPath = boostInfo.installPath.replace( /\\/gm, "/" );
-
 	msg( "Project root: " + dirRoot );
 	msg( "CMake generator: " + VISUAL_STUDIO_VERSION );
 	msg( "CMakeLists.txt path: " + CMAKELISTS_PATH );
-	msg( makeBoostDesc( boostInfo ) );
+
+	if ( isBoostUsed( CMAKELISTS_PATH ) ) {
+		var boostInfo = new boostInfo( BOOST_INSTALL_PATH );
+
+		if ( ! boostInfo.exists ) {
+			msg( "Cannot locate boost installation (havent you used BoostPro?)!" );
+			terminate( 1 );
+		}
+
+		BOOST_VERSION = boostInfo.version.vc
+			+ "-" + boostInfo.version.thread
+			+ "-" + boostInfo.version.target
+			+ "-" + boostInfo.version.lib;
+
+		eol = boostInfo.installPath.charAt( boostInfo.installPath.length - 1 );
+		if ( ( eol != "\\" ) && ( eol != "/" ) )
+			boostInfo.installPath += "/";
+		boostInfo.installPath = boostInfo.installPath.replace( /\\/gm, "/" );
+
+		msg( makeBoostDesc( boostInfo ) );
+	}
 
 	var shell = WScript.createObject( "WScript.Shell" );
 	var cmdline = "cmake -G \"" + VISUAL_STUDIO_VERSION + "\" ";
