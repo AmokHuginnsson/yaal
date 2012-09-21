@@ -45,6 +45,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "mouse.hxx"
 #include "console.hxx"
 #include "hcore/hstring.hxx"
+#include "hcore/hcore.hxx"
 #include "hcore/hlog.hxx"
 #include "hcore/system.hxx"
 
@@ -243,6 +244,8 @@ int x_mouse_open( void ) {
 	M_PROLOG
 	mmask_t desiredMouseMask( ALL_MOUSE_EVENTS );
 	mmask_t strictlyRequiredMask( BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED | BUTTON2_CLICKED | BUTTON3_CLICKED );
+
+	set_env( "NCURSES_GPM_TERMS", "" );
 	mmask_t mouseMask( mousemask( desiredMouseMask, NULL ) );
 	if ( ! mouseMask )
 		throw HMouseException( "mousemask() returned 0", errno );
