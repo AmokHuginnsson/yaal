@@ -416,10 +416,10 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <$_NCURSES_HEADER>
 		AC_MSG_WARN([You will not have pretty ascii graphics.])])
 AC_MSG_CHECKING([type of attr_get second argument])
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <$_NCURSES_HEADER>
-									 int main( int, char** ){ attr_t* a( NULL ); int short* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }]])],
+									 int main( int, char** ){ attr_t* a( NULL ); int short* p( NULL ); return ( attr_get( a, p, NULL ) ); }]])],
 	[AC_DEFINE_UNQUOTED([NCURSES_ATTR_GET_SECOND_ARG_TYPE],[int short],[Type of second argument of attr_get() of ncurses library.]) AC_MSG_RESULT([[int short]])],
 	[AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <$_NCURSES_HEADER>
-	 int main( int, char** ){ attr_t* a( NULL ); int* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }]])],
+	 int main( int, char** ){ attr_t* a( NULL ); int* p( NULL ); return ( attr_get( a, p, NULL ) ); }]])],
 	[AC_DEFINE_UNQUOTED([NCURSES_ATTR_GET_SECOND_ARG_TYPE],[int],[Type of second argument of attr_get() of ncurses library.]) AC_MSG_RESULT([[int]])],
 	[AC_MSG_ERROR([unknown type for second argument of attr_get in ncurses library!])])])
 
