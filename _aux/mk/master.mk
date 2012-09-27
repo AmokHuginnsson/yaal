@@ -33,7 +33,7 @@ build/%/$(1): configure $(1).in
 			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) $$(if $$(LIBDIR),--libdir=$$(LIBDIR)) $$(CONFIGURE) | tee -a make.log | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
 		else \
 			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) $$(if $$(LIBDIR),--libdir=$$(LIBDIR)) $$(CONFIGURE) | tee -a make.log ; \
-		fi ; test -f $$(notdir $$(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc yaal.pc)
+		fi ; test -f $$(notdir $$(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc yaal.pc ; true)
 endef
 
 MAIN_TARGETS=debug release reldeb relassert prof cov
