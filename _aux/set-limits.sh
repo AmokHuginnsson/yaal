@@ -1,7 +1,7 @@
 ### ! /bin/sh
 
 PHYS_MEM=0
-OSTYPE=`uname -o`
+OSTYPE=`uname`
 
 case "${OSTYPE}" in
 	*Linux)
