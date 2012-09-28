@@ -10,7 +10,7 @@ case "${OSTYPE}" in
 	FreeBSD)
 		PHYS_MEM=`/sbin/sysctl hw.physmem | awk '{print int( $2 / 1024 / 1024 )}'`
 	;;
-	Solaris)
+	Solaris|SunOS)
 		PHYS_MEM=`prtconf | awk '/Memory/{print $3}'`
 	;;
 esac
