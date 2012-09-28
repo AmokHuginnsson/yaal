@@ -92,7 +92,7 @@ struct LAMBDA_TYPE {
 		GREATER,
 		LESS_EQUAL,
 		GREATER_EQUAL,
-		COMA,
+		COMMA,
 		STREAM
 	} type_t;
 };
@@ -276,7 +276,7 @@ inline HLambda<LAMBDA_TYPE::DEREFERENCE, yaal::hcore::higher_order::placeholder<
 }
 
 template<typename first_lambda, typename second_lambda>
-class HLambda<LAMBDA_TYPE::COMA, first_lambda, second_lambda> {
+class HLambda<LAMBDA_TYPE::COMMA, first_lambda, second_lambda> {
 	first_lambda _firstLambda;
 	second_lambda _secondLambda;
 public:
@@ -613,12 +613,12 @@ template<LAMBDA_TYPE::type_t const first_lambda_type,
 	typename first_lambda_first_type, typename first_lambda_second_type,
 	LAMBDA_TYPE::type_t const second_lambda_type,
 	typename second_lambda_first_type, typename second_lambda_second_type>
-HLambda<LAMBDA_TYPE::COMA,
+HLambda<LAMBDA_TYPE::COMMA,
 	HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
 	HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >
 operator , ( HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type> const& firstLambda_,
 		HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> const& secondLambda_ )
-	{ return ( HLambda<LAMBDA_TYPE::COMA,
+	{ return ( HLambda<LAMBDA_TYPE::COMMA,
 			HLambda<first_lambda_type, first_lambda_first_type, first_lambda_second_type>,
 			HLambda<second_lambda_type, second_lambda_first_type, second_lambda_second_type> >( firstLambda_, secondLambda_ ) ); }
 

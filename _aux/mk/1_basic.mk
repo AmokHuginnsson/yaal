@@ -26,6 +26,6 @@ define NEW_TARGET
 	SRC_TARGETS := $$(SRC_TARGETS) $(2)
 endef
 
-COMA=,
-quotecoma=$(subst $(COMA),$$(COMA),$(subst -EOC,,$(subst $(COMA)-EOC,,$(subst $(COMA)$(COMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC))))
+COMMA=,
+quotecomma=$(subst $(COMMA),$$(COMMA),$(subst -EOC,,$(subst $(COMMA)-EOC,,$(subst $(COMMA)$(COMMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC))))
 

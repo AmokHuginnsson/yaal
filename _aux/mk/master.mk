@@ -1,6 +1,6 @@
 include _aux/mk/0_sanity.mk
 -include .my_make
-COMA=,
+COMMA=,
 include _aux/mk/2_term.mk
 
 define PREPARE_MAIN_TARGET

@@ -426,7 +426,7 @@ void show_help( void* arg ) {
 			longestShortLength = 2;
 	}
 	HString desc;
-	char const* description = NULL;
+	char const* description( NULL );
 	char const* envColumns( ::getenv( "COLUMNS" ) );
 	int const columns( envColumns ? xmath::clip( 80, lexical_cast<int>( envColumns ), 128 ): 80 );
 	int cols( static_cast<int>( columns - ( longestLongLength + longestShortLength + 2 + 2 + 2 ) ) );
@@ -442,7 +442,7 @@ void show_help( void* arg ) {
 			sf = "-";
 			sf += static_cast<char>( o._shortForm );
 		}
-		char const* coma = is_byte( o._shortForm ) && o._name ? "," : " ";
+		char const* comma( is_byte( o._shortForm ) && o._name ? "," : " " );
 		if ( ! description )
 			description = o._description;
 		/* if long form word exist, build full form of long form */
@@ -461,20 +461,20 @@ void show_help( void* arg ) {
 		if ( i > 0 ) /* subsequent options */ {
 			HProgramOptionsHandler::OOption const& p = opts[ i - 1 ];
 			if ( o._name && p._name && ( ! ::strcmp( o._name, p._name ) ) ) {
-				lf = "", coma = " ";
+				lf = "", comma = " ";
 				if ( description == o._description )
 					description = "";
 			}
 			if ( is_byte( o._shortForm ) && is_byte( p._shortForm ) && (  o._shortForm == p._shortForm ) ) {
-				sf = "", coma = " ";
+				sf = "", comma = " ";
 				if ( description == o._description )
 					description = "";
 			}
 		}
 		printf( "  %*s%s %-*s  ",
-				static_cast<int>( longestShortLength ), sf.raw() ? sf.raw() : "", coma,
+				static_cast<int>( longestShortLength ), sf.raw() ? sf.raw() : "", comma,
 				static_cast<int>( longestLongLength ), lf.raw() ? lf.raw() : "" );
-		/* + 2 for two prefixing spaces, + 2 for 2 spaces separating options from descriptions, + 2 for coma and space */
+		/* + 2 for two prefixing spaces, + 2 for 2 spaces separating options from descriptions, + 2 for comma and space */
 		desc = description;
 		bool loop( true );
 		do {
