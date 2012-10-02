@@ -114,8 +114,6 @@ struct OTerminal {
 		{}
 } _terminal_;
 
-int const C_OK = OK;
-int const C_ERR = ERR;
 bool _needRepaint_( false );
 
 /* public: */
@@ -166,6 +164,8 @@ void HConsole::init( void ) {
 
 void HConsole::enter_curses( void ) {
 	M_PROLOG
+	if ( ! _terminal_._exists )
+		throw HConsoleException( "Not connected to any terminal." );
 	short colors[] = { COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
 		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
 	int fg = 0, bg = 0;
@@ -207,7 +207,6 @@ void HConsole::enter_curses( void ) {
 	M_ENSURE( fflush( NULL ) == 0 );
 	flushinp(); /* Always returns OK */
 	curs_set( CURSOR::INVISIBLE );
-	refresh();
 	/* init color pairs */
 	M_ENSURE( assume_default_colors( COLOR_BLACK, COLOR_BLACK ) == OK );
 	for ( bg = 0; bg < 8; bg ++ )
@@ -218,7 +217,6 @@ void HConsole::enter_curses( void ) {
 	bkgd( ' ' | ATTR::value( COLORS::FG_BLACK | COLORS::BG_BLACK ) | A_INVIS ); /* meaningless value from macro */
 	_terminal_._brokenBrightBackground = ( ::getenv( "MRXVT_TABTITLE" ) != NULL );
 	_terminal_._enabled = true;
-	getmaxyx( stdscr, _height, _width );
 	if ( getenv( "YAAL_NO_MOUSE" ) )
 		_useMouse_ = false;
 	if ( _useMouse_ ) {
@@ -247,6 +245,7 @@ void HConsole::enter_curses( void ) {
 	GLYPHS::UP_ARROW			= '^';
 	GLYPHS::VERTICAL_LINE	= '|';
 #endif /* not HAVE_ASCII_GRAPHICS */
+	refresh();
 	return;
 	M_EPILOG
 }
@@ -265,12 +264,12 @@ void HConsole::leave_curses( void ) {
 	M_ENSURE( intrflush ( stdscr, true ) != ERR );
 	leaveok( stdscr, false ); /* Always OK */
 	immedok( stdscr, true ); /* Always OK */
-	refresh();
 	nl(); /* Always OK */
 	standend();
 	M_ENSURE( keypad ( stdscr, false ) != ERR );
 	M_ENSURE( nocbreak() != ERR );
 	curs_set( CURSOR::VISIBLE );
+	refresh();
 /*	reset_shell_mode(); */
 /* see comment near def_shell_mode(), ( automagicly by endwin() ) */
 /*
@@ -329,26 +328,13 @@ void HConsole::addch( int char_ ) {
 void HConsole::refresh( void ) {
 	M_PROLOG
 	M_ENSURE( ::refresh() != ERR );
+	getmaxyx( stdscr, _height, _width );
 	return;
 	M_EPILOG
 }
 
 int HConsole::endwin ( void ) {
 	return ( ::endwin() );
-}
-
-inline void getmaxyx_fwd( WINDOW* win_, int& height_, int& width_ ) {
-	getmaxyx( win_, height_, width_ );
-	return;
-}
-#undef getmaxyx
-
-void HConsole::getmaxyx( void ) {
-	M_PROLOG
-	getmaxyx_fwd( stdscr, _height, _width );
-	log( LOG_TYPE::INFO ) << "New terminal dimenstions: " << _height << "x" << _width << "." << endl;
-	return;
-	M_EPILOG
 }
 
 inline void getyx_fwd( WINDOW* win_, int& height_, int& width_ ) {

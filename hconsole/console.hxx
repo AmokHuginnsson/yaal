@@ -43,9 +43,6 @@ namespace yaal {
  */
 namespace hconsole {
 
-extern int const C_OK;
-extern int const C_ERR;
-
 /*! \brief Special key codes.
  */
 struct KEY_CODES {
@@ -187,7 +184,6 @@ public:
 	void addch( int );
 	void refresh( void );
 	int endwin( void );
-	void getmaxyx( void );
 	void getyx( int&, int& ) const;
 	void clrtoeol( void ) const;
 	void printf( char const* const, ... ) const;

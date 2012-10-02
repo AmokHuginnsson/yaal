@@ -267,7 +267,6 @@ int HTUIProcess::handler_refresh( int, void const* ) {
 	cons.endwin();
 	cons.kbhit(); /* cleans all trash from stdio buffer */
 	cons.refresh();
-	cons.getmaxyx();
 	refresh( true ); /* there is c_clrscr(); and refresh() call inside */
 	return ( 0 );
 	M_EPILOG

@@ -58,7 +58,6 @@ private:
 	static int _exitStatus;
 	bool _loop;
 	yaal::hcore::HChunk _catch;
-	yaal::hcore::HChunk _block;
 	yaal::hcore::HThread _thread;
 	yaal::hcore::HMutex _mutex;
 	handlers_t _handlers;

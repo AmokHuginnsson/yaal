@@ -61,8 +61,6 @@ static void dummy_signal_handler( int )
 class HBaseSignalHandlers {
 	typedef HBaseSignalHandlers this_type;
 public:
-	static void unlock( int );
-	static void lock( int );
 	static int signal_INT( int );
 	static int signal_HUP( int );
 	static int signal_TERM( int );
@@ -104,6 +102,21 @@ void reset_signal_low( int sigNo_ ) {
 	M_EPILOG
 }
 
+void catch_signal_low( int sigNo_ ) {
+	M_PROLOG
+	struct sigaction act;
+	::memset( &act, 0, sizeof ( act ) );
+	act.sa_flags = SA_RESTART;
+	act.sa_handler = dummy_signal_handler;
+	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
+	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
+	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
+	M_ENSURE( pthread_sigmask( SIG_BLOCK, &act.sa_mask, NULL ) == 0 );
+
+	return;
+	M_EPILOG
+}
+
 }
 
 int HSignalService::_killGracePeriod = 1000;
@@ -112,11 +125,9 @@ int HSignalService::_exitStatus = 0;
 HSignalService::HSignalService( void )
 	: _loop( true ),
 	_catch( chunk_size<sigset_t>( 1 ) ),
-	_block( chunk_size<sigset_t>( 1 ) ),
 	_thread(), _mutex(), _handlers() {
 	M_PROLOG
 	M_ENSURE( sigemptyset( _catch.get<sigset_t>() ) == 0 );
-	M_ENSURE( sigemptyset( _block.get<sigset_t>() ) == 0 );
 	catch_signal( SIGURG );
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
 		register_handler( SIGINT, call( &HBaseSignalHandlers::signal_INT, _1 ) );
@@ -228,7 +239,6 @@ void HSignalService::flush_handlers( void const* owner_ ) {
 void HSignalService::catch_signal( int sigNo_ ) {
 	M_PROLOG
 	M_ENSURE( sigaddset( _catch.get<sigset_t>(), sigNo_ ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_BLOCK, _catch.get<sigset_t>(), NULL ) == 0 );
 
 	/*
 	 * FreeBSD does not wake sigwait on signal with installed
@@ -236,27 +246,14 @@ void HSignalService::catch_signal( int sigNo_ ) {
 	 * FreeBSD does not wake sigwait even if one specify IGNORED
 	 * signal as blocked.
 	 */
-	struct sigaction act;
-	::memset( &act, 0, sizeof ( act ) );
-	act.sa_flags = SA_RESTART;
-	act.sa_handler = dummy_signal_handler;
-	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
-	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
-	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
+	catch_signal_low( sigNo_ );
 	return;
 	M_EPILOG
 }
 
 void HSignalService::block_signal( int sigNo_ ) {
 	M_PROLOG
-	M_ENSURE( sigaddset( _block.get<sigset_t>(), sigNo_ ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_BLOCK, _block.get<sigset_t>(), NULL ) == 0 );
-	struct sigaction act;
-	::memset( &act, 0, sizeof ( act ) );
-	act.sa_handler = dummy_signal_handler;
-	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
-	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
-	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
+	catch_signal_low( sigNo_ );
 	return;
 	M_EPILOG
 }
@@ -313,26 +310,6 @@ void HSignalService::call_handler( int sigNo_ ) {
 namespace {
 
 /* singnal handler definitions */
-
-void HBaseSignalHandlers::unlock( int sigNo_ ) {
-	M_PROLOG
-	sigset_t set;
-	M_ENSURE( sigemptyset( &set ) == 0 );
-	M_ENSURE( sigaddset( &set, sigNo_ ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &set, NULL ) == 0 );
-	return;
-	M_EPILOG
-}
-
-void HBaseSignalHandlers::lock( int sigNo_ ) {
-	M_PROLOG
-	sigset_t set;
-	M_ENSURE( sigemptyset( &set ) == 0 );
-	M_ENSURE( sigaddset( &set, sigNo_ ) == 0 );
-	M_ENSURE( pthread_sigmask( SIG_BLOCK, &set, NULL ) == 0 );
-	return;
-	M_EPILOG
-}
 
 int HBaseSignalHandlers::signal_INT ( int signum_ ) {
 	M_PROLOG
@@ -397,7 +374,7 @@ int HBaseSignalHandlers::signal_TSTP( int signum_ ) {
 	message += '.';
 	log( LOG_TYPE::INFO ) << message << endl;
 	cerr << "\n" << message << endl;
-	unlock( SIGTSTP );
+	reset_signal_low( SIGTSTP );
 	raise( SIGTSTP );
 	return ( 0 );
 	M_EPILOG
@@ -405,7 +382,7 @@ int HBaseSignalHandlers::signal_TSTP( int signum_ ) {
 
 int HBaseSignalHandlers::signal_CONT( int signum_ ) {
 	M_PROLOG
-	lock( SIGTSTP );
+	catch_signal_low( SIGTSTP );
 	HString message;
 	message = "Process was resurected: ";
 	message += ::strsignal( signum_ );
