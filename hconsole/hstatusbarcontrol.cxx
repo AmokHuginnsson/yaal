@@ -82,13 +82,13 @@ HStatusBarControl::~HStatusBarControl( void ) {
 void HStatusBarControl::do_draw_label( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
-	cons.c_move( cons.get_height() - 2, 0 );
-	cons.c_clrtoeol();
+	cons.move( cons.get_height() - 2, 0 );
+	cons.clrtoeol();
 	HControl::do_draw_label();
 	bar();
 	_columnRaw += _promptLength;
 	_widthRaw -= _promptLength;
-	cons.c_move( _rowRaw, _promptLength );
+	cons.move( _rowRaw, _promptLength );
 	return;
 	M_EPILOG
 }
@@ -99,14 +99,14 @@ void HStatusBarControl::do_refresh( void ) {
 	int origColumn = 0;
 	HConsole& cons = HConsole::get_instance();
 	if ( ! _focused )
-		cons.c_getyx( origRow, origColumn );
+		cons.getyx( origRow, origColumn );
 	if ( _promptLength ) {
 		cons.set_attr( _statusBarAttribute >> 8 );
-		cons.c_mvprintf( _rowRaw, 0, _prompt.raw() );
+		cons.mvprintf( _rowRaw, 0, _prompt.raw() );
 	}
 	HEditControl::do_refresh();
 	if ( ! _focused )
-		cons.c_move ( origRow, origColumn );
+		cons.move( origRow, origColumn );
 	if ( _statusBarAttribute & 0xff ) {
 		_attributeEnabled &= 0xff00;
 		_attributeEnabled |= ( _statusBarAttribute & 0x00ff );
@@ -236,13 +236,13 @@ void HStatusBarControl::update_progress( double step_, char const* title_ ) {
 			_string.erase( length - 6, 5 );
 			_string.insert( length - 6, 4, "done" );
 		}
-		cons.c_mvprintf( _rowRaw, _columnRaw, _string.raw() );
+		cons.mvprintf( _rowRaw, _columnRaw, _string.raw() );
 		_string = "";
 		_lastProgress = nextStep;
 		_lastPercent = nextPercent;
 		_lastMinute = nextMinute;
 		_lastSecond = nextSecond;
-		cons.c_refresh();
+		cons.refresh();
 	}
 	return;
 	M_EPILOG
@@ -315,7 +315,7 @@ void HStatusBarControl::bar( char const* bar_ ) {
 				( cons.get_width() - _labelLength ) - ( _singleLine ? 2 : 1 ) );
 		_message.format( _varTmpBuffer.raw(), bar_ );
 	}
-	cons.c_mvprintf( cons.get_height() - 2,
+	cons.mvprintf( cons.get_height() - 2,
 			_labelLength - ( _singleLine ? 0 : 1 ), _message.raw() );
 	return;
 	M_EPILOG

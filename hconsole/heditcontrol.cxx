@@ -125,10 +125,9 @@ void HEditControl::do_refresh( void ) {
 	int long len = _varTmpBuffer.get_length();
 	if ( len < _widthRaw )
 		_varTmpBuffer.fill( ' ', len, _widthRaw - len );
-	M_ENSURE( cons.c_mvprintf( _rowRaw, _columnRaw, _varTmpBuffer.raw() ) != C_ERR );
+	cons.mvprintf( _rowRaw, _columnRaw, _varTmpBuffer.raw() );
 	if ( _focused ) {
-		M_ENSURE( cons.c_move( _rowRaw,
-					_columnRaw + ( _password ? 0 : _cursorPosition ) ) != C_ERR );
+		cons.move( _rowRaw, _columnRaw + ( _password ? 0 : _cursorPosition ) );
 		cons.curs_set( _replace ? CURSOR::VERY_VISIBLE : CURSOR::VISIBLE );
 	}
 	return;

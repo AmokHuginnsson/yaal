@@ -182,22 +182,22 @@ public:
 	void enter_curses( void );
 	void leave_curses( void );
 	void set_attr( int ) const;
-	int c_move ( int, int );
+	void move( int, int ) const;
 	CURSOR::cursor_t curs_set( CURSOR::cursor_t const& ) const;
-	int c_addch( int );
-	int c_refresh( void );
+	void addch( int );
+	void refresh( void );
 	int endwin( void );
-	void c_getmaxyx( void );
-	void c_getyx( int&, int& );
-	void c_clrtoeol( void );
-	int c_printf( char const* const, ... ) const;
-	int c_mvprintf( int, int, char const* const, ... ) const;
-	int c_cmvprintf( int, int, int, char const* const, ... ) const;
-	int ungetch( int ) const;
+	void getmaxyx( void );
+	void getyx( int&, int& ) const;
+	void clrtoeol( void ) const;
+	void printf( char const* const, ... ) const;
+	void mvprintf( int, int, char const* const, ... ) const;
+	void cmvprintf( int, int, int, char const* const, ... ) const;
+	int ungetch( int );
 	int get_key( void ) const;
 	int kbhit( void ) const;
 	char unsigned get_attr( void ) const;
-	void clrscr( void ) const;
+	void clrscr( void );
 	bool is_enabled( void ) const;
 	int wait_for_user_input( int&, mouse::OMouse&, int = 0 ) const;
 	void bell( void ) const;
@@ -211,9 +211,9 @@ public:
 	int on_mouse( int );
 	static void set_escdelay( int );
 protected:
-	int c_vmvprintf ( int, int, char const* const, void* ) const;
-	int c_vcmvprintf ( int, int, int, char const* const, void* ) const;
-	int c_vprintf ( char const* const, void* ) const;
+	void vmvprintf ( int, int, char const* const, void* ) const;
+	void vcmvprintf ( int, int, int, char const* const, void* ) const;
+	void vprintf ( char const* const, void* ) const;
 	void init( void );
 private:
 	HConsole( void );

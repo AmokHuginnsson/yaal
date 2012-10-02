@@ -207,7 +207,7 @@ void HConsole::enter_curses( void ) {
 	M_ENSURE( fflush( NULL ) == 0 );
 	flushinp(); /* Always returns OK */
 	curs_set( CURSOR::INVISIBLE );
-	M_ENSURE( refresh() != ERR );
+	refresh();
 	/* init color pairs */
 	M_ENSURE( assume_default_colors( COLOR_BLACK, COLOR_BLACK ) == OK );
 	for ( bg = 0; bg < 8; bg ++ )
@@ -265,7 +265,7 @@ void HConsole::leave_curses( void ) {
 	M_ENSURE( intrflush ( stdscr, true ) != ERR );
 	leaveok( stdscr, false ); /* Always OK */
 	immedok( stdscr, true ); /* Always OK */
-	M_ENSURE( refresh() != ERR );
+	refresh();
 	nl(); /* Always OK */
 	standend();
 	M_ENSURE( keypad ( stdscr, false ) != ERR );
@@ -300,8 +300,9 @@ void HConsole::set_attr( int attr_ ) const {
 	M_EPILOG
 }
 
-int HConsole::c_move( int row_, int column_ ) {
-	return ( ::move( row_, column_ ) );
+void HConsole::move( int row_, int column_ ) const {
+	M_ENSURE( ::move( row_, column_ ) != ERR );
+	return;
 }
 
 CURSOR::cursor_t HConsole::curs_set( CURSOR::cursor_t const &cursor_ ) const {
@@ -313,34 +314,64 @@ CURSOR::cursor_t HConsole::curs_set( CURSOR::cursor_t const &cursor_ ) const {
 	return ( CURSOR::INVISIBLE );
 }
 
-int HConsole::c_addch( int char_ ) {
+inline int addch_fwd( int char_ ) {
 	return ( ::addch( char_ ) );
 }
+#undef addch
 
-int HConsole::c_refresh( void ) {
-	return ( ::refresh() );
+void HConsole::addch( int char_ ) {
+	M_PROLOG
+	M_ENSURE( addch_fwd( char_ ) != ERR );
+	return;
+	M_EPILOG
+}
+
+void HConsole::refresh( void ) {
+	M_PROLOG
+	M_ENSURE( ::refresh() != ERR );
+	return;
+	M_EPILOG
 }
 
 int HConsole::endwin ( void ) {
 	return ( ::endwin() );
 }
 
-void HConsole::c_getmaxyx( void ) {
+inline void getmaxyx_fwd( WINDOW* win_, int& height_, int& width_ ) {
+	getmaxyx( win_, height_, width_ );
+	return;
+}
+#undef getmaxyx
+
+void HConsole::getmaxyx( void ) {
 	M_PROLOG
-	getmaxyx( stdscr, _height, _width );
+	getmaxyx_fwd( stdscr, _height, _width );
 	log( LOG_TYPE::INFO ) << "New terminal dimenstions: " << _height << "x" << _width << "." << endl;
 	return;
 	M_EPILOG
 }
 
-void HConsole::c_getyx( int& height_, int& width_ ) {
-	getyx( stdscr, height_, width_ );
+inline void getyx_fwd( WINDOW* win_, int& height_, int& width_ ) {
+	getyx( win_, height_, width_ );
+	return;
+}
+#undef getyx
+
+void HConsole::getyx( int& height_, int& width_ ) const {
+	getyx_fwd( stdscr, height_, width_ );
 	return;
 }
 
-void HConsole::c_clrtoeol( void ) {
-	::clrtoeol();
+inline int clrtoeol_fwd( void ) {
+	return ( ::clrtoeol() );
+}
+#undef clrtoeol
+
+void HConsole::clrtoeol( void ) const {
+	M_PROLOG
+	M_ENSURE( clrtoeol_fwd() != ERR );
 	return;
+	M_EPILOG
 }
 
 int HConsole::get_height( void ) const {
@@ -359,93 +390,86 @@ int HConsole::get_event_fd( void ) const {
 	return ( _event->get_reader_fd() );
 }
 
-int HConsole::c_vmvprintf( int row_, int column_,
+void HConsole::vmvprintf( int row_, int column_,
 							 char const* const format_, void* ap_ ) const {
 	M_PROLOG
 	int origRow = 0;
 	int origColumn = 0;
-	int error = 0;
-	va_list& ap = *static_cast<va_list*>( ap_ );
+	va_list& ap( *static_cast<va_list*>( ap_ ) );
 	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
 	if ( column_ >= _width )
 		M_THROW( "bad column.", column_ );
 	if ( ( row_ < 0 ) || ( row_ >= _height ) )
 		M_THROW( "bad row.", row_ );
-	getyx( stdscr, origRow, origColumn );
+	getyx( origRow, origColumn );
 	if ( column_ < 0 ) {
-		M_ENSURE( move( row_, 0 ) != ERR );
+		move( row_, 0 );
 		clrtoeol(); /* Always OK */
 	} else
-		M_ENSURE( move( row_, column_ ) != ERR );
-	error = vw_printw( stdscr, format_, ap );
-	M_ENSURE( move( origRow, origColumn ) != ERR );
-	return ( error );
+		move( row_, column_ );
+	M_ENSURE( vw_printw( stdscr, format_, ap ) != ERR );
+	move( origRow, origColumn );
+	return;
 	M_EPILOG
 }
 
-int HConsole::c_vcmvprintf( int row_, int column_, int attribute_,
+void HConsole::vcmvprintf( int row_, int column_, int attribute_,
 							 char const* const format_, void* ap_ ) const {
 	M_PROLOG
-	int error = 0;
-	int origAttribute = 0;
 	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
-	origAttribute = get_attr();
+	int origAttribute( get_attr() );
 	set_attr( attribute_ );
-	error = c_vmvprintf( row_, column_, format_, ap_ );
+	vmvprintf( row_, column_, format_, ap_ );
 	set_attr( origAttribute );
-	return ( error );
+	return;
 	M_EPILOG
 }
 	
-int HConsole::c_vprintf ( char const* const format_, void* ap_ ) const {
+void HConsole::vprintf( char const* const format_, void* ap_ ) const {
 	M_PROLOG
-	int error = 0;
 	va_list& ap = *static_cast<va_list*>( ap_ );
 	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
-	error = vw_printw( stdscr, format_, ap );
-	return ( error );
+	M_ENSURE( vw_printw( stdscr, format_, ap ) != ERR );
+	return;
 	M_EPILOG
 }
 
-int HConsole::c_printf( char const* const format_, ... ) const {
+void HConsole::printf( char const* const format_, ... ) const {
 	M_PROLOG
-	int error = 0;
 	va_list ap;
 	va_start( ap, format_ );
-	error = c_vprintf( format_, &ap );
+	vprintf( format_, &ap );
 	va_end( ap );
-	return ( error );
+	return;
 	M_EPILOG
 }
 
-int HConsole::c_mvprintf( int row_, int column_, char const* const format_,
+void HConsole::mvprintf( int row_, int column_, char const* const format_,
 		... ) const {
 	M_PROLOG
-	int error = 0;
 	va_list ap;
 	va_start( ap, format_ );
-	error = c_vmvprintf( row_, column_, format_, &ap );
+	vmvprintf( row_, column_, format_, &ap );
 	va_end( ap );
-	return ( error );
+	return;
 	M_EPILOG
 }
 
-int HConsole::c_cmvprintf( int row_, int column_, int attribute_,
+void HConsole::cmvprintf( int row_, int column_, int attribute_,
 							 char const* const format_, ... ) const {
 	M_PROLOG
-	int error = 0;
 	va_list ap;
 	va_start( ap, format_ );
-	error = c_vcmvprintf( row_, column_, attribute_, format_, &ap );
+	vcmvprintf( row_, column_, attribute_, format_, &ap );
 	va_end( ap );
-	return ( error );
+	return;
 	M_EPILOG
 }
 
-int HConsole::ungetch( int code_ ) const {
+int HConsole::ungetch( int code_ ) {
 	switch ( code_ ) {
 		case ( KEY_CODES::PAGE_DOWN ): code_ = KEY_NPAGE;     break;
 		case ( KEY_CODES::PAGE_UP ):   code_ = KEY_PPAGE;     break;
@@ -485,14 +509,14 @@ int HConsole::get_key( void ) const {
 	}
 	if ( key == KEY<>::ctrl_r( _commandComposeCharacter_ ) ) {
 		origCursState = curs_set( CURSOR::INVISIBLE );
-		c_cmvprintf( _height - 1, -1, COLORS::FG_WHITE, "ctrl-%c",
+		cmvprintf( _height - 1, -1, COLORS::FG_WHITE, "ctrl-%c",
 					_commandComposeCharacter_ );
 		timeout( _commandComposeDelay_ * 100 );
 		key = getch();
 		timeout( -1 );
 		if ( key == ERR ) {
 			key = KEY<>::ctrl_r( _commandComposeCharacter_ );
-			c_cmvprintf( _height - 1, 0, COLORS::FG_LIGHTGRAY, "      " );
+			cmvprintf( _height - 1, 0, COLORS::FG_LIGHTGRAY, "      " );
 		} else {
 			int character = 0;
 			if ( key < KEY_CODES::ESC )
@@ -507,7 +531,7 @@ int HConsole::get_key( void ) const {
 					key = KEY<>::command_r( KEY<>::meta_r( character = key ) );
 			} else
 				key = KEY<>::command_r( character = key );
-			c_cmvprintf( _height - 1, 6, COLORS::FG_WHITE, " %c", character );
+			cmvprintf( _height - 1, 6, COLORS::FG_WHITE, " %c", character );
 		}
 		curs_set( origCursState );
 	}
@@ -579,12 +603,12 @@ char unsigned HConsole::get_attr( void ) const {
 	M_EPILOG
 }
 	
-void HConsole::clrscr( void ) const {
+void HConsole::clrscr( void ) {
 	M_PROLOG
 	if ( ! _terminal_._enabled )
 		M_THROW( "not in curses mode", errno );
 	clear(); /* Always returns OK */
-	M_ENSURE( refresh() != ERR );
+	refresh();
 	return;
 	M_EPILOG
 }
@@ -651,7 +675,7 @@ int HConsole::on_quit( int ) {
 	M_PROLOG
 	if ( is_enabled() ) {
 		if ( tools::_ignoreSignalSIGQUIT_ )
-			c_cmvprintf ( get_height() - 1, 0, COLORS::FG_BRIGHTRED,
+			cmvprintf( get_height() - 1, 0, COLORS::FG_BRIGHTRED,
 					"Hard Quit is disabled by yaal configuration." );
 		else
 			leave_curses();
@@ -664,7 +688,7 @@ int HConsole::on_tstp( int ) {
 	M_PROLOG
 	if ( is_enabled() ) {
 		if ( tools::_ignoreSignalSIGTSTP_ )
-			c_cmvprintf ( get_height() - 1, 0, COLORS::FG_BRIGHTRED,
+			cmvprintf( get_height() - 1, 0, COLORS::FG_BRIGHTRED,
 					"Suspend is disabled by yaal configuration." );
 		else
 			leave_curses();

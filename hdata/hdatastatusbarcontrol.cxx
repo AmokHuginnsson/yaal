@@ -56,7 +56,7 @@ void HDataStatusBarControl::do_draw_label ( void ) {
 	if ( window->is_modified() ) {
 		set_attr_shortcut();
 		HConsole& cons = HConsole::get_instance();
-		cons.c_mvprintf ( cons.get_height() - 2, _labelLength - 4, "[+]" );
+		cons.mvprintf ( cons.get_height() - 2, _labelLength - 4, "[+]" );
 		set_attr_data();
 	}
 	return;

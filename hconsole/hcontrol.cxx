@@ -205,10 +205,10 @@ void HControl::do_draw_label( void ) {
 		return;
 	}
 	set_attr_label();
-	M_ENSURE( cons.c_mvprintf( _rowRaw, _columnRaw, _label.raw() ) != C_ERR );
+	cons.mvprintf( _rowRaw, _columnRaw, _label.raw() );
 	set_attr_shortcut();
-	M_ENSURE( cons.c_mvprintf( _rowRaw, _columnRaw + _shortcutIndex,
-				"%c", _label[ _shortcutIndex ] ) != C_ERR );
+	cons.mvprintf( _rowRaw, _columnRaw + _shortcutIndex,
+				"%c", _label[ _shortcutIndex ] );
 	set_attr_data();
 	if ( _singleLine )
 		_columnRaw += _labelLength, _widthRaw -= _labelLength;

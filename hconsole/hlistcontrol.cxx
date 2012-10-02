@@ -180,28 +180,27 @@ void HListControl::draw_header( int columns_ ) {
 				set_attr_label();
 				_varTmpBuffer.format( "%%-%ds",
 							columnInfo->_widthRaw );
-				M_ENSURE( cons.c_mvprintf( _rowRaw, _columnRaw + columnOffset,
+				cons.mvprintf( _rowRaw, _columnRaw + columnOffset,
 							_varTmpBuffer.raw(),
 								columnInfo->_name.left(
-									columnInfo->_widthRaw ).raw() ) != C_ERR );
+									columnInfo->_widthRaw ).raw() );
 				set_attr_shortcut();
-				M_ENSURE( cons.c_mvprintf( _rowRaw,
+				cons.mvprintf( _rowRaw,
 							_columnRaw + columnOffset + columnInfo->_shortcutIndex,
-							"%c", columnInfo->_shortcut ) != C_ERR );
+							"%c", columnInfo->_shortcut );
 				if ( _sortColumn == ctr )
-					M_ENSURE( cons.c_mvprintf( _rowRaw,
+					cons.mvprintf( _rowRaw,
 								_columnRaw + columnOffset
 								+ columnInfo->_widthRaw - 2,
-								"%c", columnInfo->_descending ? '^' : 'v' ) != C_ERR );
+								"%c", columnInfo->_descending ? '^' : 'v' );
 			}
 			columnOffset += columnInfo->_widthRaw;
 			if ( ctr < columns_ ) {
 				cons.set_attr( _attributeDisabled );
 				for ( ctrLoc = 0; ctrLoc < ( _heightRaw + hR );
 						ctrLoc ++ ) {
-					M_ENSURE( cons.c_move( _rowRaw + ctrLoc,
-								_columnRaw + columnOffset - 1 ) != C_ERR );
-					M_ENSURE( cons.c_addch( GLYPHS::VERTICAL_LINE ) != C_ERR );
+					cons.move( _rowRaw + ctrLoc, _columnRaw + columnOffset - 1 );
+					cons.addch( GLYPHS::VERTICAL_LINE );
 				}
 			}
 		}
@@ -210,7 +209,7 @@ void HListControl::draw_header( int columns_ ) {
 		_varTmpBuffer.format( " %d/%d ", _controlOffset + _cursorPosition + 1, static_cast<int>( _controler->size() ) );
 		if ( _labelLength < _widthRaw ) {
 			int clip = static_cast<int>( ( ( _widthRaw - _labelLength ) < _varTmpBuffer.get_length() ) ? _varTmpBuffer.get_length() - ( _widthRaw - _labelLength ) : 0 );
-			cons.c_mvprintf( _rowRaw - 1, static_cast<int>( _columnRaw + _widthRaw + clip - _varTmpBuffer.get_length() ), _varTmpBuffer.raw() + clip );
+			cons.mvprintf( _rowRaw - 1, static_cast<int>( _columnRaw + _widthRaw + clip - _varTmpBuffer.get_length() ), _varTmpBuffer.raw() + clip );
 		}
 	}
 	return;
@@ -223,8 +222,7 @@ void HListControl::draw_background( int from_ ) {
 	set_attr_data();
 	_varTmpBuffer.fillz( '.', 0, _widthRaw );
 	for ( ; ctr < _heightRaw; ctr ++ )
-		M_ENSURE( HConsole::get_instance().c_mvprintf( _rowRaw + ctr, _columnRaw,
-					_varTmpBuffer.raw() ) != C_ERR );
+		HConsole::get_instance().mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.raw() );
 	return;
 	M_EPILOG
 }
@@ -235,20 +233,18 @@ void HListControl::draw_scroll( int posX_ ) {
 	int size = static_cast<int>( _controler->size() );
 	HConsole& cons = HConsole::get_instance();
 	if ( _controlOffset ) {
-		M_ENSURE( cons.c_move( _rowRaw, posX_ ) != C_ERR );
-		M_ENSURE( cons.c_addch( GLYPHS::UP_ARROW ) != C_ERR );
+		cons.move( _rowRaw, posX_ );
+		cons.addch( GLYPHS::UP_ARROW );
 	}
 	if ( ( size - _controlOffset ) > _heightRaw ) {
-		M_ENSURE( cons.c_move( _rowRaw + _heightRaw - 1, posX_ ) != C_ERR );
-		M_ENSURE( cons.c_addch( GLYPHS::DOWN_ARROW ) != C_ERR );
+		cons.move( _rowRaw + _heightRaw - 1, posX_ );
+		cons.addch( GLYPHS::DOWN_ARROW );
 	}
 	scaled = _heightRaw - 3;
 	scaled *= static_cast<double>(
 			_controlOffset + _cursorPosition );
 	scaled /= static_cast<double>( size );
-	M_ENSURE( cons.c_mvprintf (
-				_rowRaw + static_cast<int>( scaled + 1.5 ),
-				posX_, "#" ) != C_ERR );
+	cons.mvprintf( _rowRaw + static_cast<int>( scaled + 1.5 ), posX_, "#" );
 	return;
 	M_EPILOG
 }
@@ -304,8 +300,7 @@ void HListControl::draw_cell( iterator_t& it_, int row_, int column_, int column
 		else
 			set_attr_data();
 	}
-	M_ENSURE( cons.c_mvprintf( _rowRaw + row_,
-				_columnRaw + columnOffset_, _varTmpBuffer.raw()	) != C_ERR );
+	cons.mvprintf( _rowRaw + row_, _columnRaw + columnOffset_, _varTmpBuffer.raw()	);
 	if ( _searchActived )
 		highlight( _rowRaw + row_,
 				_columnRaw + columnOffset_, _match._matchNumber,

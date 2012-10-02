@@ -73,7 +73,7 @@ void HLogPad::do_refresh( void ) {
 	int bg( _focused ? COLORS::BG_GRAY : COLORS::BG_BLACK );
 	_attribute = COLORS::ATTR_NORMAL | bg;
 	for ( int i( 0 ); i < _heightRaw; ++ i )
-		cons.c_cmvprintf( _rowRaw + i, _columnRaw, _attribute, _varTmpBuffer.raw() );
+		cons.cmvprintf( _rowRaw + i, _columnRaw, _attribute, _varTmpBuffer.raw() );
 	if ( ! _contents.is_empty() ) {
 		int ctr( 0 ); /* number of text lines in _contents iterated so far */
 		int row( 0 ); /* number of lines printed so far */
@@ -91,7 +91,7 @@ void HLogPad::do_refresh( void ) {
 					if ( ( cursor + _varTmpBuffer.get_length() ) > _widthRaw )
 						_varTmpBuffer.set_at( _widthRaw - cursor, 0 );
 					if ( _varTmpBuffer[ 0 ] )
-						cons.c_cmvprintf( _rowRaw + row,
+						cons.cmvprintf( _rowRaw + row,
 								_columnRaw + cursor, _attribute, _varTmpBuffer.raw() );
 				} else
 					_varTmpBuffer = "";

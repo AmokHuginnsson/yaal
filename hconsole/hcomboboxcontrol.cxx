@@ -88,10 +88,10 @@ void HComboboxControl::do_refresh ( void ) {
 			: cons.get_width() + _width - _columnRaw;
 /* end of ripped part */
 		HEditControl::do_refresh();
-		M_ENSURE( cons.c_move( _rowRaw, _columnRaw + width - 1 ) != C_ERR );
+		cons.move( _rowRaw, _columnRaw + width - 1 );
 		set_attr_label();
-		M_ENSURE( cons.c_addch( GLYPHS::DOWN_ARROW ) != C_ERR );
-		M_ENSURE( cons.c_move( _rowRaw, _columnRaw + HEditControl::_cursorPosition ) != C_ERR );
+		cons.addch( GLYPHS::DOWN_ARROW );
+		cons.move( _rowRaw, _columnRaw + HEditControl::_cursorPosition );
 		_heightRaw = 0;
 	} else {
 		int height( _height );

@@ -83,7 +83,7 @@ void HSearchableControl::highlight( int row_, int column_,
 			cons.set_attr( _attributeSearchHighlight_ >> 8 );
 		else
 			cons.set_attr( _attributeSearchHighlight_ );
-		cons.c_mvprintf( row_,
+		cons.mvprintf( row_,
 				static_cast<int>( column_ + ( it->raw() - _varTmpBuffer.raw() ) ),
 				"%.*s", it->size(), it->raw() );
 		ctr ++;

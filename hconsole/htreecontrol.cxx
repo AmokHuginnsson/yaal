@@ -129,7 +129,7 @@ void HTreeControl::do_refresh( void ) {
 	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
 	_varTmpBuffer.fillz( '_', 0, _widthRaw );
 	for ( ctr = 0; ctr < _heightRaw; ctr ++ )
-		cons.c_mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.raw() );
+		cons.mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.raw() );
 	if ( _tree.get_root() )
 		draw_node( _tree.get_root(), _rowRaw );
 	return;
@@ -150,13 +150,13 @@ int HTreeControl::draw_node( tree_t::node_t node_, int row_ ) {
 		(**node_)._widthRaw = static_cast<int>( str.get_length() ) + 2;
 		set_attr_data();
 		if ( ! ( (**node_)._unfolded || ! node_->has_childs() ) )
-			cons.c_mvprintf( row, (**node_)._columnRaw, "+" );
+			cons.mvprintf( row, (**node_)._columnRaw, "+" );
 		else if ( node_->has_childs() )
-			cons.c_mvprintf( row, (**node_)._columnRaw, "-" );
+			cons.mvprintf( row, (**node_)._columnRaw, "-" );
 		if ( node_ == _selected )
 			cons.set_attr( _enabled ? ( _focused ? ~_attributeFocused
 						: ~ _attributeEnabled ) : ~ _attributeDisabled );
-		cons.c_mvprintf( row, (**node_)._columnRaw + 1, str.raw() );
+		cons.mvprintf( row, (**node_)._columnRaw + 1, str.raw() );
 	}
 	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
 		for ( tree_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it )

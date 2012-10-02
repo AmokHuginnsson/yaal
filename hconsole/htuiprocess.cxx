@@ -163,27 +163,27 @@ void HTUIProcess::process_stdin( int code_ ) {
 	_needRepaint_ = true;
 	if ( code_ ) {
 		if ( code_ > KEY<KEY<0>::meta>::command )
-			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
+			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"COMMAND-META-%c: %5d       ",
 					code_ - KEY<KEY<0>::meta>::command, code_ );
 		else if ( code_ > KEY<0>::command )
-			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
+			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"     COMMAND-%c: %5d       ",
 					code_ - KEY<0>::command, code_ );
 		else if ( code_ > KEY<0>::meta )
-			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
+			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"        META-%c: %5d       ",
 					code_ - KEY<0>::meta, code_ );
 		else if ( code_ < KEY_CODES::ESC )
-			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
+			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"        CTRL-%c: %5d       ",
 					code_ + 96, code_);
 		else
-			cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN,
+			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"             %c: %5d       ",
 					code_, code_ );
 	} else
-		cons.c_cmvprintf ( 0, 0, COLORS::FG_GREEN, "                           " );
+		cons.cmvprintf ( 0, 0, COLORS::FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
 	if ( code_ && !! (*_foregroundWindow) )
 		(*_foregroundWindow)->status_bar()->message( COLORS::FG_RED,
@@ -196,7 +196,7 @@ void HTUIProcess::handler_alert( void ) {
 	M_PROLOG
 	if ( _needRepaint_ ) {
 		_needRepaint_ = false;
-		HConsole::get_instance().c_refresh();
+		HConsole::get_instance().refresh();
 	}
 	return;
 	M_EPILOG
@@ -207,7 +207,7 @@ void HTUIProcess::handler_idle( void ) {
 #ifdef __DEBUG__
 	HConsole& cons = HConsole::get_instance();
 	HString clock( HTime( HTime::LOCAL ).string() );
-	cons.c_cmvprintf( 0, static_cast<int>( cons.get_width() - clock.get_length() ),
+	cons.cmvprintf( 0, static_cast<int>( cons.get_width() - clock.get_length() ),
 			COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, clock.raw() );
 	_needRepaint_ = true;
 #endif /* __DEBUG__ */
@@ -237,7 +237,7 @@ int HTUIProcess::handler_mouse( int code_, void const* ) {
 	if ( _needRepaint_ )
 		refresh();
 #ifdef __DEBUGGER_BABUNI__
-	HConsole::get_instance().c_cmvprintf( 0, 0,	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
+	HConsole::get_instance().cmvprintf( 0, 0,	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			mouse._buttons, mouse._row, mouse._column );
 	_needRepaint_ = true;
 #endif /* __DEBUGGER_BABUNI__ */
@@ -266,9 +266,9 @@ int HTUIProcess::handler_refresh( int, void const* ) {
 	HConsole& cons = HConsole::get_instance();
 	cons.endwin();
 	cons.kbhit(); /* cleans all trash from stdio buffer */
-	cons.c_refresh();
-	cons.c_getmaxyx();
-	refresh( true ); /* there is c_clrscr(); and c_refresh() call inside */
+	cons.refresh();
+	cons.getmaxyx();
+	refresh( true ); /* there is c_clrscr(); and refresh() call inside */
 	return ( 0 );
 	M_EPILOG
 }
@@ -338,7 +338,7 @@ void HTUIProcess::refresh( bool force_ ) {
 			(*_foregroundWindow)->schedule_refresh();
 		(*_foregroundWindow)->refresh();
 	}
-	HConsole::get_instance().c_refresh();
+	HConsole::get_instance().refresh();
 	_needRepaint_ = false;
 	return;
 	M_EPILOG
