@@ -34,6 +34,8 @@ namespace yaal {
 
 namespace hcore {
 
+extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHHashMap_[];
+
 /*! \brief HHashContainer util, a helper for HHashMap<> instatiations.
  */
 template<typename key_t, typename value_t>
@@ -60,6 +62,16 @@ public:
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 	typedef HPair<iterator, bool> insert_result;
+	/*! \brief Error codes for HHashMap<> operations.
+	 */
+	struct ERROR {
+		/*! \brief Error codes for HHashMap<> operations.
+		 */
+		typedef enum {
+			OK = 0,     /*!< No error. */
+			INVALID_KEY /*!< Dereferencing nono-existing key. */
+		} error_t;
+	};
 private:
 	typedef HHashContainer<value_type, hasher_type, hashmap_helper<key_type, data_type>, allocator_t> engine_t;
 	engine_t _engine;
@@ -135,8 +147,16 @@ public:
 	allocator_type const& get_allocator( void ) const {
 		return ( _engine.get_allocator() );
 	}
-	data_t& operator [] ( key_t const& key_ )
-		{ M_PROLOG return ( insert( make_pair( key_, data_t() ) ).first->second ); M_EPILOG }
+	data_type& operator [] ( key_type const& key_ )
+		{ M_PROLOG return ( insert( make_pair( key_, data_type() ) ).first->second ); M_EPILOG }
+	data_type const& operator[] ( key_type const& key ) const {
+		M_PROLOG
+		typename engine_t::HIterator it( _engine.find( key ) );
+		if ( ! ( it != _engine.end() ) )
+			throw HInvalidKeyException( _errMsgHHashMap_[ERROR::INVALID_KEY] );
+		return ( it.get().second );
+		M_EPILOG
+	}
 	const_iterator begin( void ) const
 		{ M_PROLOG return ( const_iterator( _engine.begin() ) ); M_EPILOG }
 	const_iterator cbegin( void ) const

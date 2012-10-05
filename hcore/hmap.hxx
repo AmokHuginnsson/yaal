@@ -36,6 +36,8 @@ namespace yaal {
 
 namespace hcore {
 
+extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHMap_[];
+
 /*! \brief HSBBSTree util, a helper for HMap<> instatiations.
  */
 template<typename key_t, typename value_t>
@@ -73,6 +75,16 @@ public:
 	typedef HSBBSTree<value_type, compare_type, map_helper<key_type, data_type>, allocator_t> engine_t;
 	typedef typename engine_t::allocator_type allocator_type;
 	typedef HMap<key_type_t, value_type_t, compare_t, allocator_t> this_type;
+	/*! \brief Error codes for HMap<> operations.
+	 */
+	struct ERROR {
+		/*! \brief Error codes for HMap<> operations.
+		 */
+		typedef enum {
+			OK = 0,     /*!< No error. */
+			INVALID_KEY /*!< Dereferencing nono-existing key. */
+		} error_t;
+	};
 private:
 	engine_t _engine;
 public:
@@ -197,6 +209,14 @@ public:
 	data_type& operator[] ( key_type const& key ) {
 		M_PROLOG
 		return ( insert( value_type( key, data_type() ) ).first->second );
+		M_EPILOG
+	}
+	data_type const& operator[] ( key_type const& key ) const {
+		M_PROLOG
+		typename engine_t::HIterator it( _engine.find( key ) );
+		if ( ! ( it != _engine.end() ) )
+			throw HInvalidKeyException( _errMsgHMap_[ERROR::INVALID_KEY] );
+		return ( it.get().second );
 		M_EPILOG
 	}
 	int long count( key_type const& key_ ) const

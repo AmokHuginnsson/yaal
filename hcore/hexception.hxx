@@ -144,6 +144,8 @@ public:
 
 typedef HExceptionT<HString> HStringException;
 typedef HExceptionT<LexicalCast> HLexicalCastException;
+struct InvalidKey {};
+typedef HExceptionT<InvalidKey> HInvalidKeyException;
 
 /*! \brief Yaal's default exception handling policy.
  */

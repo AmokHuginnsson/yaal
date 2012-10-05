@@ -22,7 +22,9 @@
 ?_disableXON_@hconsole@yaal@@3_NA
 ?_errMsgHArray_@hcore@yaal@@3QBQBDB
 ?_errMsgHDeque_@hcore@yaal@@3QBQBDB
+?_errMsgHHashMap_@hcore@yaal@@3QBQBDB
 ?_errMsgHList_@hcore@yaal@@3QBQBDB
+?_errMsgHMap_@hcore@yaal@@3QBQBDB
 ?_errMsgHMatrix_@hcore@yaal@@3QBQBDB
 ?_errMsgHRing_@tools@yaal@@3QBQBDB
 ?_errMsgHSBBSTree_@hcore@yaal@@3QBQBDB

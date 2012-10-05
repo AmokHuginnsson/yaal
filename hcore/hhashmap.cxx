@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <libintl.h>
+
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
@@ -32,6 +34,11 @@ M_VCSID( "$Id: "__TID__" $" )
 namespace yaal {
 
 namespace hcore {
+
+char const* const _errMsgHHashMap_[ 4 ] = {
+	_( "ok" ),
+	/* HMap::ERROR::INVALID_KEY */  _( "Dereferencing non-existing key" )
+};
 
 }
 
