@@ -37,7 +37,7 @@ namespace hcore {
 
 char const* const _errMsgHHashMap_[ 4 ] = {
 	_( "ok" ),
-	/* HMap::ERROR::INVALID_KEY */  _( "Dereferencing non-existing key" )
+	/* HHashMap::ERROR::INVALID_KEY */  _( "Dereferencing non-existing key" )
 };
 
 }
