@@ -120,8 +120,14 @@ HString type_name( tType const* object_ ) {
 }
 
 template<typename tType>
-HString type_name( void ) {
-	return ( demangle( typeid( tType ).name() ) );
+HString type_name( bool stripTemplateParams_ = false ) {
+	HString typeName( demangle( typeid( tType ).name() ) ); 
+	if ( stripTemplateParams_ ) {
+		int long idx( typeName.find( '<' ) );
+		if ( idx != HString::npos )
+			typeName.erase( idx );
+	}
+	return ( typeName );
 }
 
 /*! \brief Template used to create type specyfic exceptions.
@@ -142,7 +148,7 @@ public:
 		{	}
 };
 template<typename tType, typename base_type_t>
-yaal::hcore::HString const HExceptionT<tType, base_type_t>::_name = type_name<tType>() + "Exception";
+yaal::hcore::HString const HExceptionT<tType, base_type_t>::_name = type_name<tType>( true ) + "Exception";
 
 typedef HExceptionT<HString> HStringException;
 typedef HExceptionT<LexicalCast> HLexicalCastException;
