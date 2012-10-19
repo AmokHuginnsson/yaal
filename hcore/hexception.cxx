@@ -47,24 +47,19 @@ namespace hcore {
 
 FILE* ERROR_STREAM = stderr;
 
-char const* const _exceptionType_ = _( "Exception type" );
-
 HException::HException( char const* fileName_,
 		int const line_, char const* functionName_,
-		HString const& message_, int const code_ )
+		HString const& message_, int const code_,
+		HString const& name_ )
 	: _code( code_ ), _frame( 0 ),
 	_fileName( fileName_ ),
 	_functionName( functionName_ ),
 	_message( message_ ) {
-	hcore::log << "Exception: " << _message << ", code: " << _code;
-	hcore::log << '.' << endl;
-	log( fileName_, line_, functionName_ );
-	/*
-	 * Special case of exception where function name is actually pointer to temporary
-	 * and shall not be remembered.
-	 */
-	if ( _fileName == _exceptionType_ )
-		_functionName = NULL;
+	hcore::log << name_ << ": " << _message << ", code: " << _code << '.' << endl;
+	if ( fileName_ && functionName_ )
+		log( fileName_, line_, functionName_ );
+	else
+		++ _frame;
 	return;
 }
 
@@ -88,9 +83,9 @@ void HException::print_error( void ) const {
 void HException::log( char const* const fileName_, int const line_,
 		char const* const functionName_ ) {
 	if ( ! _frame
-			|| ( ( _fileName != fileName_ ) && ::strcmp( _fileName, fileName_ ) )
+			|| ( ( _fileName != fileName_ ) && ( ! _fileName || ::strcmp( _fileName, fileName_ ) ) )
 			|| ( ! _functionName && functionName_ )
-			|| ( ( _functionName != functionName_ ) && ::strcmp( _functionName, functionName_ ) ) ) {
+			|| ( ( _functionName != functionName_ ) && ( ! _functionName || ::strcmp( _functionName, functionName_ ) ) ) ) {
 		_fileName = fileName_;
 		_functionName = functionName_;
 		HString frame;

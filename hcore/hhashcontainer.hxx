@@ -51,6 +51,7 @@ extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
 template<typename value_t, typename hasher_t, typename get_key_t, typename allocator_t>
 class HHashContainer : private trait::HNonCopyable {
 public:
+	typedef HHashContainer this_type;
 	typedef value_t value_type;
 	typedef hasher_t hasher_type;
 	typedef get_key_t get_key_type;

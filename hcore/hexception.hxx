@@ -85,9 +85,10 @@ protected:
 	 * \param functionName_ - name of the function that throws this exception.
 	 * \param message_ - an exception description.
 	 * \param code_ - error code.
+	 * \param name_ - type name this exception.
 	 */
 	HException( char const* fileName_, int line_, char const* functionName_,
-			HString const& message_, int const code_ = 0 );
+			HString const& message_, int const code_ = 0, HString const& name_ = HString() );
 	HException( HException const& );
 public:
 	virtual ~HException( void );
@@ -105,8 +106,6 @@ public:
 private:
 	HException& operator = ( HException const& );
 };
-
-extern M_YAAL_HCORE_PUBLIC_API char const* const _exceptionType_;
 
 /*! \brief Demangle symbol name.
  *
@@ -129,18 +128,21 @@ HString type_name( void ) {
  */
 template<typename tType, typename base_type_t = HException>
 class HExceptionT : public base_type_t {
+	static yaal::hcore::HString const _name;
 public:
 	typedef base_type_t base_type;
 	typedef HExceptionT<tType, base_type> this_type;
-	HExceptionT( HString const& reason_, int code_ = errno, HString const& symbol_ = type_name<tType>() )
-		: base_type( _exceptionType_, 0, symbol_.raw(), reason_, code_ )
+	HExceptionT( HString const& reason_, int code_ = errno )
+		: base_type( NULL, 0, NULL, reason_, code_, _name )
 		{ }
 	HExceptionT( char const* fileName_,
 			int line_, char const* functionName_,
-			HString const& reason_, int const code_ )
-		: base_type( fileName_, line_, functionName_, reason_, code_ )
+			HString const& reason_, int const code_, HString const& name_ = _name )
+		: base_type( fileName_, line_, functionName_, reason_, code_, name_ )
 		{	}
 };
+template<typename tType, typename base_type_t>
+yaal::hcore::HString const HExceptionT<tType, base_type_t>::_name = type_name<tType>() + "Exception";
 
 typedef HExceptionT<HString> HStringException;
 typedef HExceptionT<LexicalCast> HLexicalCastException;
