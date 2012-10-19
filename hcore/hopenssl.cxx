@@ -372,14 +372,14 @@ int HOpenSSL::check_err( int code ) const {
 	int err( SSL_get_error( static_cast<SSL const*>( _ssl ), code ) );
 	if ( ( err != SSL_ERROR_ZERO_RETURN ) && ( err != SSL_ERROR_WANT_READ ) && ( err != SSL_ERROR_WANT_WRITE ) ) {
 		int errTop( static_cast<int>( ERR_get_error() ) );
-		HString buffer( "OpenSSL: " );
+		HString buffer;
 		if ( ! errTop && ( err == SSL_ERROR_SYSCALL ) ) {
 			if ( code == 0 )
-				buffer += "EOF that violates protocol was observed.";
+				buffer = "EOF that violates protocol was observed.";
 			else if ( code == -1 )
-				buffer += strerror( errno );
+				buffer = strerror( errno );
 			else
-				buffer += "unknown problem occured!";
+				buffer = "unknown problem occured!";
 		} else
 			openssl_helper::format_error_message( buffer, errTop );
 		throw HOpenSSLException( buffer );
