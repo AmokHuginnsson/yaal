@@ -37,11 +37,11 @@ else
 
 	printf "	uniqe lines:       %8d\n" ${UNIQUE_LINES}
 
-	CLASSES=`grep '\<class\>' ${TMP_FILE} | grep -cv 'class.*;'`
+	CLASSES=`grep '^[[:space:]]*class.*[^;]$' ${TMP_FILE} | grep -o 'class[[:space:]][[:alpha:]]*' | sort -u | wc -l`
 
 	printf "	classes:           %8d\n" ${CLASSES}
 
-	STRUCTURES=`grep '\<struct\>' ${TMP_FILE} | grep -cv 'struct.*;'`
+	STRUCTURES=`grep '^[[:space:]]*struct.*[^;]$' ${TMP_FILE} | grep -o 'struct[[:space:]][[:alpha:]]*' | sort -u | wc -l`
 
 	printf "	structures:        %8d\n" ${STRUCTURES}
 
