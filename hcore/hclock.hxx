@@ -38,6 +38,7 @@ namespace hcore {
  */
 class HClock {
 public:
+	typedef HClock this_type;
 	/*! \brief Resolution units for time mesurement.
 	 */
 	struct UNIT {

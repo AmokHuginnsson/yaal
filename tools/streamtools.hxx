@@ -136,6 +136,10 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 }
 
 class HTee : public yaal::hcore::HStreamInterface {
+public:
+	typedef HTee this_type;
+	typedef yaal::hcore::HStreamInterface base_type;
+private:
 	yaal::hcore::HStreamInterface& _stream1;
 	yaal::hcore::HStreamInterface& _stream2;
 public:

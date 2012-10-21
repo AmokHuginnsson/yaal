@@ -38,6 +38,9 @@ namespace hcore {
  * Congurent pseudo random number generator class.
  */
 class HRandomizer {
+public:
+	typedef HRandomizer this_type;
+private:
 	int long unsigned _seed;
 	int _range;
 public:

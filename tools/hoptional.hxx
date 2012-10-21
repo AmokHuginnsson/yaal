@@ -44,6 +44,7 @@ namespace tools {
 template<typename type_t>
 class HOptional {
 public:
+	typedef HOptional<type_t> this_type;
 	struct SemanticContext { SemanticContext const& member( SemanticContext& ) const { return ( *this ); } };
 	typedef SemanticContext const& ( SemanticContext::* safe_bool_t )( SemanticContext& ) const;
 	typedef type_t value_type;

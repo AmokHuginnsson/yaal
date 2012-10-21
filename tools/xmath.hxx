@@ -67,6 +67,8 @@ struct AGGREGATE_TYPE {
  */
 template<typename numeric_t>
 class HNumberSetStats {
+public:
+	typedef HNumberSetStats this_type;
 private:
 	int long _count;
 	numeric_t _minimum;

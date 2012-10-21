@@ -44,9 +44,8 @@ class HTree;
  */
 template<typename value_t, typename allocator_t = allocator::system<value_t>, template <typename, typename> class sequence_t = HList>
 class HTree {
-private:
-	typedef HTree<value_t, allocator_t, sequence_t> tree_t;
 public:
+	typedef HTree<value_t, allocator_t, sequence_t> this_type;
 	typedef value_t value_type;
 	class HNode;
 	typedef typename sequence_t<HNode*, allocator::ref<HNode*, allocator_t> >::allocator_type ref_branch_allocator_type;
@@ -520,7 +519,7 @@ public:
 		return ( _root );
 		M_EPILOG
 	}
-	node_t set_new_root( typename tree_t::node_t node ) {
+	node_t set_new_root( node_t node ) {
 		M_PROLOG
 		if ( node != _root ) {
 			HNode* wasted = _root;

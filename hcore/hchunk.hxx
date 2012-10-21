@@ -39,6 +39,9 @@ namespace hcore {
 /*! \brief Simplest raw memory provisioner.
  */
 class HChunk {
+public:
+	typedef HChunk this_type;
+private:
 	int long _size;
 	void* _data;
 public:

@@ -45,8 +45,8 @@ class HCondition;
 /*! \brief Implementation of multi-threaded synchronizing prymitive - Mutex.
  */
 class HMutex {
-	typedef HMutex this_type;
 public:
+	typedef HMutex this_type;
 	/*! \brief Mutex types.
 	 */
 	struct TYPE {
@@ -130,10 +130,10 @@ typedef HExceptionT<HSemaphore> HSemaphoreException;
  */
 class HThread {
 public:
+	typedef HThread this_type;
 	M_YAAL_HCORE_PUBLIC_API static int _threadStackSize;
 	static int long const INVALID = -1;
 private:
-	typedef HThread this_type;
 	typedef enum {
 		DEAD,
 		SPAWNING,
@@ -249,6 +249,9 @@ typedef HExceptionT<HCondition> HConditionException;
 /*! \brief Asynchronous notification mechanizm.
  */
 class HEvent {
+public:
+	typedef HEvent this_type;
+private:
 	HMutex _mutex;
 	HCondition _condition;
 public:

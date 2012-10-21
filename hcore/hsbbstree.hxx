@@ -104,6 +104,8 @@ protected:
 template<typename key_value_t, typename compare_t, typename key_get_t, typename allocator_t>
 class HSBBSTree : public HSBBSTreeBase {
 public:
+	typedef HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t> this_type;
+	typedef HSBBSTreeBase base_type;
 	typedef key_value_t key_value_type;
 	typedef compare_t compare_type;
 	typedef key_get_t key_get_type;

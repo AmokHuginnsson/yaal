@@ -40,6 +40,9 @@ namespace hcore {
  */
 template<typename type_t, typename sequence_t = HDeque<type_t> >
 class HQueue {
+public:
+	typedef HQueue<type_t, sequence_t> this_type;
+private:
 	typedef sequence_t sequence_type;
 public:
 	typedef typename sequence_type::value_type value_type;

@@ -40,6 +40,9 @@ namespace hcore {
  */
 template<typename type_t, typename sequence_t = HArray<type_t> >
 class HHeap {
+public:
+	typedef HHeap<type_t, sequence_t> this_type;
+private:
 	typedef sequence_t sequence_type;
 public:
 	typedef typename sequence_type::value_type value_type;

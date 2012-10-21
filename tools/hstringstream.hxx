@@ -37,6 +37,10 @@ namespace tools {
 /*! \brief Perform stream operations on character string.
  */
 class HStringStream : public yaal::hcore::HStreamInterface {
+public:
+	typedef HStringStream this_type;
+	typedef yaal::hcore::HStreamInterface base_type;
+private:
 	mutable bool _used; /* FIXME Confirm mutable is necesarry here. */
 	mutable int long _offset;
 	mutable yaal::hcore::HString _buffer;
