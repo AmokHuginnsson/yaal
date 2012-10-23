@@ -37,6 +37,16 @@ class SignalDispatcher {
 	signal_queue_t _queue;
 	sigset_t _block;
 	sigset_t _accept;
+	struct ConsoleEvents {
+		bool _ctrlC;
+		bool _break;
+		bool _close;
+		bool _logoff;
+		bool _shutdown;
+		ConsoleEvents( void )
+			: _ctrlC( false ), _break( false ), _close( false ), _logoff( false ), _shutdown( false )
+			{}
+	} _acceptedConsoleEvents;
 public:
 	SignalDispatcher( void );
 	void dispatch( int );
@@ -44,6 +54,9 @@ public:
 	sigset_t get_mask( void ) const;
 	void set_mask( int, sigset_t const* );
 	bool is_started( void ) const;
+	void set_enabled_console_event( DWORD, bool );
+	bool is_console_event_enabled( DWORD ) const;
+	bool is_console_event_enabled( void ) const;
 } _signalDispatcher_;
 
 SignalsSetup::SignalsSetup( void )
@@ -91,7 +104,7 @@ void SignalsSetup::signal( void ) {
 TLSSignalsSetup _tlsSignalsSetup_;
 
 SignalDispatcher::SignalDispatcher( void )
-	: _started( false ), _queue(), _block(), _accept() {
+	: _started( false ), _queue(), _block(), _accept(), _acceptedConsoleEvents() {
 }
 
 void SignalDispatcher::dispatch( int sigNo_ ) {
@@ -138,6 +151,36 @@ void SignalDispatcher::set_mask( int how_, sigset_t const* set_ ) {
 
 bool SignalDispatcher::is_started( void ) const {
 	return ( _started );
+}
+
+void SignalDispatcher::set_enabled_console_event( DWORD controlType_, bool enabled_ ) {
+	switch ( controlType_ ) {
+		case ( CTRL_C_EVENT ): _acceptedConsoleEvents._ctrlC = enabled_; break;
+		case ( CTRL_BREAK_EVENT ): _acceptedConsoleEvents._break = enabled_; break;
+		case ( CTRL_CLOSE_EVENT ): _acceptedConsoleEvents._close = enabled_; break;
+		case ( CTRL_LOGOFF_EVENT ): _acceptedConsoleEvents._logoff = enabled_; break;
+		case ( CTRL_SHUTDOWN_EVENT ): _acceptedConsoleEvents._shutdown = enabled_; break;
+	}
+}
+
+bool SignalDispatcher::is_console_event_enabled( DWORD controlType_ ) const {
+	bool enabled( false );
+	switch ( controlType_ ) {
+		case ( CTRL_C_EVENT ): enabled = _acceptedConsoleEvents._ctrlC; break;
+		case ( CTRL_BREAK_EVENT ): enabled = _acceptedConsoleEvents._break; break;
+		case ( CTRL_CLOSE_EVENT ): enabled = _acceptedConsoleEvents._close; break;
+		case ( CTRL_LOGOFF_EVENT ): enabled = _acceptedConsoleEvents._logoff; break;
+		case ( CTRL_SHUTDOWN_EVENT ): enabled = _acceptedConsoleEvents._shutdown; break;
+	}
+	return ( enabled );
+}
+
+bool SignalDispatcher::is_console_event_enabled( void ) const {
+	return ( _acceptedConsoleEvents._ctrlC
+			|| _acceptedConsoleEvents._break
+			|| _acceptedConsoleEvents._close
+			|| _acceptedConsoleEvents._logoff
+			|| _acceptedConsoleEvents._shutdown );
 }
 
 }
@@ -204,6 +247,34 @@ void win_signal_handler( int signo ) {
 	_signalDispatcher_.dispatch( signo );
 }
 
+BOOL WINAPI win_console_handler( DWORD controlType_ ) {
+	int signo( 0 );
+	if ( _signalDispatcher_.is_console_event_enabled( controlType_ ) ) {
+		switch ( controlType_ ) {
+			case ( CTRL_C_EVENT ): signo = SIGINT; break;
+			case ( CTRL_BREAK_EVENT ): signo = SIGQUIT; break;
+			case ( CTRL_CLOSE_EVENT ): signo = SIGKILL; break;
+			case ( CTRL_LOGOFF_EVENT ): signo = SIGTERM; break;
+			case ( CTRL_SHUTDOWN_EVENT ): signo = SIGPWR; break;
+		}
+		if ( signo )
+			_signalDispatcher_.dispatch( signo );
+	}
+	return ( 1 );
+}
+
+DWORD signo_to_cosole_control( int signo_ ) {
+	DWORD consoleControl( 0 );
+	switch ( signo_ ) {
+		case ( SIGINT ): consoleControl = CTRL_C_EVENT; break;
+		case ( SIGQUIT ): consoleControl = CTRL_BREAK_EVENT; break;
+		case ( SIGKILL ): consoleControl = CTRL_CLOSE_EVENT; break;
+		case ( SIGTERM ): consoleControl = CTRL_LOGOFF_EVENT; break;
+		case ( SIGPWR ): consoleControl = CTRL_SHUTDOWN_EVENT; break;
+	}
+	return ( consoleControl );
+}
+
 int sigaction( int signo, struct sigaction* sa_, void* ) {
 	if ( ( signo != SIGURG )
 			&& ( signo != SIGBUS )
@@ -211,10 +282,22 @@ int sigaction( int signo, struct sigaction* sa_, void* ) {
 			&& ( signo != SIGSYS )
 			&& ( signo != SIGALRM ) ) /*&& ( signo != 12 ) ) */ {
 		if ( sa_->sa_handler != SIG_DFL ) {
+			if ( ( signo == SIGINT ) || ( signo == SIGQUIT ) || ( signo == SIGKILL ) || ( signo == SIGTERM ) || ( signo == SIGTERM ) || ( signo == SIGPWR ) ) {
+				if ( ! _signalDispatcher_.is_console_event_enabled() )
+					SetConsoleCtrlHandler( &win_console_handler, 1 );
+				_signalDispatcher_.set_enabled_console_event( signo_to_cosole_control( signo ), true );
+			}
 			signal( signo, win_signal_handler );
 			if ( signo == SIGABRT )
 				signal( SIGABRT_COMPAT, win_signal_handler );
 		} else {
+			if ( ( signo == SIGINT ) || ( signo == SIGQUIT ) || ( signo == SIGKILL ) || ( signo == SIGTERM ) || ( signo == SIGTERM ) || ( signo == SIGPWR ) ) {
+				if ( _signalDispatcher_.is_console_event_enabled() ) {
+					_signalDispatcher_.set_enabled_console_event( signo_to_cosole_control( signo ), false );
+					if ( ! _signalDispatcher_.is_console_event_enabled() )
+						SetConsoleCtrlHandler( &win_console_handler, 0 );
+				}
+			}
 			signal( signo, sa_->sa_handler );
 			if ( signo == SIGABRT )
 				signal( SIGABRT_COMPAT, sa_->sa_handler );
