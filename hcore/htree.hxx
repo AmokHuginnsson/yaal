@@ -284,7 +284,7 @@ public:
 			return ( *node->_tree );
 		}
 		tree_t const& get_tree( void ) const {
-			HNode* node( this );
+			HNode const* node( this );
 			while ( node->_trunk )
 				node = node->_trunk;
 			M_ASSERT( node->_tree );
