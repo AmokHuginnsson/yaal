@@ -93,6 +93,40 @@ public:
 				max( _supremum / interval_._infimum, _supremum / interval_._supremum ) );
 		return ( *this );
 	}
+	HInterval& operator ++ ( void ) {
+		++ _infimum;
+		++ _supremum;
+		return ( *this );
+	}
+	HInterval& operator -- ( void ) {
+		-- _infimum;
+		-- _supremum;
+		return ( *this );
+	}
+	HInterval operator + ( HInterval const& interval_ ) const {
+		HInterval interval( *this );
+		return ( interval += interval_ );
+	}
+	HInterval operator - ( HInterval const& interval_ ) const {
+		HInterval interval( *this );
+		return ( interval -= interval_ );
+	}
+	HInterval operator * ( HInterval const& interval_ ) const {
+		HInterval interval( *this );
+		return ( interval *= interval_ );
+	}
+	HInterval operator / ( HInterval const& interval_ ) const {
+		HInterval interval( *this );
+		return ( interval /= interval_ );
+	}
+	HInterval operator ++ ( int ) const {
+		HInterval interval( *this );
+		return ( ++ interval );
+	}
+	HInterval operator -- ( int ) const {
+		HInterval interval( *this );
+		return ( -- interval );
+	}
 };
 
 }
