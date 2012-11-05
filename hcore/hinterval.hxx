@@ -62,6 +62,12 @@ public:
 		if ( _supremum < _infimum )
 			M_THROW( _errMsgHInterval_[ERROR::REVERSED_EDNPOINTS], static_cast<int>( _infimum - _supremum ) );
 	}
+	value_type inf( void ) const {
+		return ( _infimum );
+	}
+	value_type sup( void ) const {
+		return ( _supremum );
+	}
 	HInterval& operator += ( HInterval const& interval_ ) {
 		_infimum += interval_._infimum;
 		_supremum += interval_._supremum;
