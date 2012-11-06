@@ -57,17 +57,34 @@ class HPointer;
  */
 template<typename tType, typename pointer_type_t>
 struct HPointerStrict {
-	static tType* raw( tType* );
-	static typename trait::make_reference<tType>::type object_at( tType*, int );
+	static tType* raw( tType* pointer_ ) {
+		return ( pointer_type_t::raw( pointer_ ) );
+	}
+	static typename trait::make_reference<tType>::type object_at( tType* pointer_, int index_ ) {
+		return ( pointer_type_t::object_at( pointer_[ index_ ], index_ ) );
+	}
 	template<typename deleter_t>
 	inline static void delete_pointee( deleter_t const& deleter_ )
 		{ deleter_->do_delete(); }
 	template<typename ptr_t>
-	static void initialize_from_this( HPointerFromThisInterface<tType>*, ptr_t const& );
+	static void initialize_from_this( HPointerFromThisInterface<tType>* obj, ptr_t const& ptr ) {
+		obj->initialize_observer( ptr );
+		return;
+	}
 	template<typename ptr_t>
-	static void initialize_from_this( void*, ptr_t const& );
-	static void inc_reference_counter( int* );
-	static void dec_reference_counter( int* );
+	static void initialize_from_this( void*, ptr_t const& ) {
+		return;
+	}
+	static void inc_reference_counter( int* referenceCounter_ ) {
+		++ referenceCounter_[ REFERENCE_COUNTER_TYPE::STRICT ];
+		++ referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
+	}
+	static void dec_reference_counter( int* referenceCounter_ ) {
+		M_ASSERT( referenceCounter_[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 );
+		M_ASSERT( referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ] > 0 );
+		-- referenceCounter_[ REFERENCE_COUNTER_TYPE::STRICT ];
+		-- referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
+	}
 };
 
 /*! \brief Pointer's observer access policy.
@@ -76,8 +93,13 @@ template<typename tType, typename pointer_type_t>
 struct HPointerWeak {
 	template<typename deleter_t>
 	inline static void delete_pointee( deleter_t const& ) {}
-	static void inc_reference_counter( int* );
-	static void dec_reference_counter( int* );
+	static void inc_reference_counter( int* referenceCounter_ ) {
+		++ referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
+	}
+	static void dec_reference_counter( int* referenceCounter_ ) {
+		M_ASSERT( referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ] > 0 );
+		-- referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
+	}
 };
 
 /*! \brief Pointer to scalar deletion policy.
@@ -85,8 +107,12 @@ struct HPointerWeak {
 template<typename tType>
 struct HPointerScalar {
 	template<typename real_t>
-	static void delete_pointee( tType* );
-	static tType* raw( tType* );
+	static void delete_pointee( tType* pointer_ ) {
+		M_SAFE( delete static_cast<real_t*>( pointer_ ) );
+	}
+	static tType* raw( tType* pointer_ ) {
+		return ( pointer_ );
+	}
 };
 
 /*! \brief Pointer to array deletion policy.
@@ -94,8 +120,12 @@ struct HPointerScalar {
 template<typename tType>
 struct HPointerArray {
 	template<typename real_t>
-	static void delete_pointee( tType* );
-	static tType& object_at( tType*, int );
+	static void delete_pointee( tType* pointer_ ) {
+		M_SAFE( delete [] static_cast<real_t*>( pointer_ ) );
+	}
+	static tType& object_at( tType* pointer_, int index_ ) {
+		return ( pointer_[ index_ ] );
+	}
 };
 
 struct pointer_helper;
@@ -169,46 +199,175 @@ public:
 	typedef typename trait::make_reference<tType>::type reference;
 	typedef typename trait::make_reference<tType const>::type const_reference;
 	typedef pointer_type_t<tType> pointer_type;
-	HPointer( void );
+	HPointer( void )
+		: _shared( NULL ), _object( NULL ) {
+		return;
+	}
 	template<typename real_t>
-	explicit HPointer( real_t* const );
+	explicit HPointer( real_t* const pointer_ )
+		: _shared( pointer_ ? new HShared<void (*)( tType* )>( &pointer_type::template delete_pointee<real_t>, pointer_ ) : NULL ), _object( pointer_ ) {
+		M_ASSERT( pointer_ );
+		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
+		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
+		access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this );
+		return;
+	}
 	template<typename real_t, typename deleter_t>
-	explicit HPointer( real_t* const, deleter_t );
-	virtual ~HPointer( void );
-	HPointer( HPointer const& );
+	explicit HPointer( real_t* const pointer_,  deleter_t deleter_ )
+		: _shared( pointer_ ? new HShared<deleter_t>( deleter_, pointer_ ) : NULL ), _object( pointer_ ) {
+		M_ASSERT( pointer_ );
+		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
+		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
+		access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this );
+		return;
+	}
+	virtual ~HPointer( void ) {
+		/* The make_pointer() helper part.
+		 */
+		if ( _object )
+			reset();
+		else if ( _shared ) {
+			/* This path is reached only when tType constructor throws
+			 * in make_pointer() helper function.
+			 */
+			delete _shared;
+			_shared = NULL;
+		}
+		return;
+	}
+	HPointer( HPointer const& pointer_ )
+		: _shared( NULL ), _object( NULL ) {
+		acquire( pointer_ );
+		return;
+	}
 	template<typename alien_t, template<typename, typename>class alien_access_t>
-	HPointer( HPointer<alien_t, pointer_type_t, alien_access_t> const& );
-	HPointer& operator = ( HPointer const& );
+	HPointer( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ )
+		: _shared( NULL ), _object( NULL ) {
+		acquire( pointer_ );
+		return;
+	}
+	HPointer& operator = ( HPointer const& pointer_ ) {
+		acquire( pointer_ );
+		return ( *this );
+	}
 	template<typename alien_t, template<typename, typename>class alien_access_t>
-	HPointer& operator = ( HPointer<alien_t, pointer_type_t, alien_access_t> const& );
-	const_reference operator* ( void ) const;
-	reference operator* ( void );
-	const_reference operator[] ( int ) const;
-	reference operator[] ( int );
+	HPointer& operator = ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) {
+		acquire( pointer_ );
+		return ( *this );
+	}
+	const_reference operator* ( void ) const {
+		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
+		return ( *_object );
+	}
+	reference operator* ( void ) {
+		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
+		return ( *_object );
+	}
+	const_reference operator[] ( int index_ ) const {
+		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
+		M_ASSERT( index_ >= 0 );
+		return ( access_type_t<tType, pointer_type_t<tType> >::object_at( _object, index_ ) );
+	}
+	reference operator[] ( int index_ ) {
+		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
+		M_ASSERT( index_ >= 0 );
+		return ( access_type_t<tType, pointer_type_t<tType> >::object_at( _object, index_ ) );
+	}
 	template<typename alien_t, template<typename, typename>class alien_access_t>
-	bool operator == ( HPointer<alien_t, pointer_type_t, alien_access_t> const& ) const;
+	bool operator == ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( _object == reinterpret_cast<alien_t*>( alien->_object ) );
+	}
 	template<typename alien_t>
-	bool operator == ( alien_t const* const ) const;
+	bool operator == ( alien_t const* const pointer_ ) const {
+		return ( _object == pointer_ );
+	}
 	template<typename alien_t, template<typename, typename>class alien_access_t>
-	bool operator != ( HPointer<alien_t, pointer_type_t, alien_access_t> const& ) const;
+	bool operator != ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
+		return ( ! operator == ( pointer_ ) );
+	}
 	template<typename alien_t>
-	bool operator != ( alien_t const* const ) const;
-	tType const* operator->( void ) const;
-	tType* operator->( void );
-	tType const* raw( void ) const;
-	tType* raw( void );
-	tType const* get( void ) const;
-	tType* get( void );
-	bool operator! ( void ) const;
-	void swap( HPointer& );
-	void reset( void );
+	bool operator != ( alien_t const* const pointer_ ) const {
+		return ( ! operator == ( pointer_ ) );
+	}
+	tType const* operator->( void ) const {
+		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
+		return ( access_type_t<tType, pointer_type_t<tType> >::raw( _object ) );
+	}
+	tType* operator->( void ) {
+		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
+		return ( access_type_t<tType, pointer_type_t<tType> >::raw( _object ) );
+	}
+	tType const* raw( void ) const {
+		return ( _object );
+	}
+	tType* raw( void ) {
+		return ( _object );
+	}
+	tType const* get( void ) const {
+		return ( _object );
+	}
+	tType* get( void ) {
+		return ( _object );
+	}
+	bool operator! ( void ) const {
+		return ( ! _object );
+	}
+	void swap( HPointer& p ) {
+		if ( &p != this ) {
+			using yaal::swap;
+			swap( _shared, p._shared );
+			swap( _object, p._object );
+		}
+		return;
+	}
+	void reset( void ) {
+		_shared && release();
+		_shared = NULL;
+		_object = NULL;
+		return;
+	}
 private:
-	bool release( void ) throw();
+	bool release( void ) throw() {
+		M_ASSERT( _shared && _object );
+		if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] == 1 )
+			access_type_t<tType, pointer_type_t<tType> >::delete_pointee( _shared );
+		access_type_t<tType, pointer_type_t<tType> >::dec_reference_counter( _shared->_referenceCounter );
+		if ( ! _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] ) {
+			delete _shared;
+			_shared = NULL;
+		}
+		return ( ! ( _shared && _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] ) );
+	}
 	template<typename alien_t, template<typename, typename> class alien_access_t>
-	void acquire( HPointer<alien_t, pointer_type_t, alien_access_t> const& );
-	void assign( tType*&, tType* );
+	void acquire( HPointer<alien_t, pointer_type_t, alien_access_t> const& from ) {
+		HPointer const& alien = reinterpret_cast<HPointer const&>( from );
+		if ( ( &alien != this ) && ( _shared != alien._shared ) ) {
+			M_ASSERT( ( ! ( _shared && alien._shared ) )
+					|| ( ( _shared && alien._shared )
+						&& ( _object != reinterpret_cast<alien_t*>( alien._object ) ) ) );
+			if ( _shared )
+				release();
+			if ( alien._shared && ( alien._shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) ) {
+				access_type_t<tType, pointer_type_t<tType> >::inc_reference_counter( alien._shared->_referenceCounter );
+				_shared = alien._shared;
+				assign( _object, reinterpret_cast<alien_t*>( alien._object ) );
+			} else {
+				_shared = NULL;
+				_object = NULL;
+			}
+		}
+		return;
+	}
+	void assign( tType*& to, tType* from ) {
+		to = from;
+		return;
+	}
 	template<typename alien_t>
-	void assign( tType*&, alien_t* );
+	void assign( tType*& to, alien_t* from ) {
+		to = dynamic_cast<tType*>( from );
+		return;
+	}
 	friend struct pointer_helper;
 };
 
@@ -221,282 +380,24 @@ protected:
 	typedef HPointer<tType, HPointerScalar, HPointerWeak> weak_t;
 	weak_t _selfObserver;
 public:
-	HPointerFromThisInterface( void );
+	HPointerFromThisInterface( void )
+		: _selfObserver() {
+		return;
+	}
 	virtual ~HPointerFromThisInterface( void ){}
-	ptr_t get_pointer( void );
-	ptr_t const get_pointer( void ) const;
+	ptr_t get_pointer( void ) {
+		return ( _selfObserver );
+	}
+	ptr_t const get_pointer( void ) const {
+		return ( _selfObserver );
+	}
 protected:
-	void initialize_observer( ptr_t const& );
+	void initialize_observer( ptr_t const& firstOwner_ ) {
+		_selfObserver = firstOwner_;
+		return;
+	}
 	friend struct HPointerStrict<tType, HPointerScalar<tType> >;
 };
-
-template<typename tType, typename pointer_type_t>
-typename trait::make_reference<tType>::type HPointerStrict<tType, pointer_type_t>::object_at( tType* pointer_, int index_ ) {
-	return ( pointer_type_t::object_at( pointer_[ index_ ], index_ ) );
-}
-
-template<typename tType, typename pointer_type_t>
-tType* HPointerStrict<tType, pointer_type_t>::raw( tType* pointer_ ) {
-	return ( pointer_type_t::raw( pointer_ ) );
-}
-
-template<typename tType, typename pointer_type_t>
-void HPointerStrict<tType, pointer_type_t>::inc_reference_counter( int* referenceCounter_ ) {
-	++ referenceCounter_[ REFERENCE_COUNTER_TYPE::STRICT ];
-	++ referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
-}
-
-template<typename tType, typename pointer_type_t>
-void HPointerWeak<tType, pointer_type_t>::inc_reference_counter( int* referenceCounter_ ) {
-	++ referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
-}
-
-template<typename tType, typename pointer_type_t>
-void HPointerStrict<tType, pointer_type_t>::dec_reference_counter( int* referenceCounter_ ) {
-	M_ASSERT( referenceCounter_[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 );
-	M_ASSERT( referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ] > 0 );
-	-- referenceCounter_[ REFERENCE_COUNTER_TYPE::STRICT ];
-	-- referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
-}
-
-template<typename tType, typename pointer_type_t>
-void HPointerWeak<tType, pointer_type_t>::dec_reference_counter( int* referenceCounter_ ) {
-	M_ASSERT( referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ] > 0 );
-	-- referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
-}
-
-template<typename tType>
-template<typename real_t>
-void HPointerScalar<tType>::delete_pointee( tType* pointer_ ) {
-	M_SAFE( delete static_cast<real_t*>( pointer_ ) );
-}
-
-template<typename tType>
-template<typename real_t>
-void HPointerArray<tType>::delete_pointee( tType* pointer_ ) {
-	M_SAFE( delete [] static_cast<real_t*>( pointer_ ) );
-}
-
-template<typename tType>
-tType& HPointerArray<tType>::object_at( tType* pointer_, int index_ ) {
-	return ( pointer_[ index_ ] );
-}
-
-template<typename tType>
-tType* HPointerScalar<tType>::raw( tType* pointer_ ) {
-	return ( pointer_ );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-HPointer<tType, pointer_type_t, access_type_t>::HPointer( void )
-	: _shared( NULL ), _object( NULL ) {
-	return;
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-template<typename real_t>
-HPointer<tType, pointer_type_t, access_type_t>::HPointer( real_t* const pointer_ )
-	: _shared( pointer_ ? new HShared<void (*)( tType* )>( &pointer_type::template delete_pointee<real_t>, pointer_ ) : NULL ), _object( pointer_ ) {
-	M_ASSERT( pointer_ );
-	_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
-	_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
-	access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this );
-	return;
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-template<typename real_t, typename deleter_t>
-HPointer<tType, pointer_type_t, access_type_t>::HPointer( real_t* const pointer_,  deleter_t deleter_ )
-	: _shared( pointer_ ? new HShared<deleter_t>( deleter_, pointer_ ) : NULL ), _object( pointer_ ) {
-	M_ASSERT( pointer_ );
-	_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
-	_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
-	access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this );
-	return;
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-HPointer<tType, pointer_type_t, access_type_t>::~HPointer( void ) {
-	/* The make_pointer() helper part.
-	 */
-	if ( _object )
-		reset();
-	else if ( _shared ) {
-		/* This path is reached only when tType constructor throws
-		 * in make_pointer() helper function.
-		 */
-		delete _shared;
-		_shared = NULL;
-	}
-	return;
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<tType, pointer_type_t, access_type_t> const& pointer_ )
-	: _shared( NULL ), _object( NULL ) {
-	acquire( pointer_ );
-	return;
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-template<typename alien_t, template<typename, typename>class alien_access_t>
-HPointer<tType, pointer_type_t, access_type_t>::HPointer( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ )
-	: _shared( NULL ), _object( NULL ) {
-	acquire( pointer_ );
-	return;
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::operator = ( HPointer<tType, pointer_type_t, access_type_t> const& pointer_ ) {
-	acquire( pointer_ );
-	return ( *this );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-template<typename alien_t, template<typename, typename>class alien_access_t>
-HPointer<tType, pointer_type_t, access_type_t>& HPointer<tType, pointer_type_t, access_type_t>::operator = ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) {
-	acquire( pointer_ );
-	return ( *this );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-template<typename alien_t, template<typename, typename>class alien_access_t>
-void HPointer<tType, pointer_type_t, access_type_t>::acquire( HPointer<alien_t, pointer_type_t, alien_access_t> const& from ) {
-	HPointer const& alien = reinterpret_cast<HPointer const&>( from );
-	if ( ( &alien != this ) && ( _shared != alien._shared ) ) {
-		M_ASSERT( ( ! ( _shared && alien._shared ) )
-				|| ( ( _shared && alien._shared )
-					&& ( _object != reinterpret_cast<alien_t*>( alien._object ) ) ) );
-		if ( _shared )
-			release();
-		if ( alien._shared && ( alien._shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) ) {
-			access_type_t<tType, pointer_type_t<tType> >::inc_reference_counter( alien._shared->_referenceCounter );
-			_shared = alien._shared;
-			assign( _object, reinterpret_cast<alien_t*>( alien._object ) );
-		} else {
-			_shared = NULL;
-			_object = NULL;
-		}
-	}
-	return;
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-template<typename alien_t>
-void HPointer<tType, pointer_type_t, access_type_t>::assign( tType*& to, alien_t* from ) {
-	to = dynamic_cast<tType*>( from );
-	return;
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-void HPointer<tType, pointer_type_t, access_type_t>::assign( tType*& to, tType* from ) {
-	to = from;
-	return;
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-void HPointer<tType, pointer_type_t, access_type_t>::swap( HPointer& p ) {
-	if ( &p != this ) {
-		using yaal::swap;
-		swap( _shared, p._shared );
-		swap( _object, p._object );
-	}
-	return;
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::release( void ) throw() {
-	M_ASSERT( _shared && _object );
-	if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] == 1 )
-		access_type_t<tType, pointer_type_t<tType> >::delete_pointee( _shared );
-	access_type_t<tType, pointer_type_t<tType> >::dec_reference_counter( _shared->_referenceCounter );
-	if ( ! _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] ) {
-		delete _shared;
-		_shared = NULL;
-	}
-	return ( ! ( _shared && _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] ) );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-void HPointer<tType, pointer_type_t, access_type_t>::reset( void ) {
-	_shared && release();
-	_shared = NULL;
-	_object = NULL;
-	return;
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-typename HPointer<tType, pointer_type_t, access_type_t>::const_reference HPointer<tType, pointer_type_t, access_type_t>::operator* ( void ) const {
-	M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-	return ( *_object );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-typename HPointer<tType, pointer_type_t, access_type_t>::reference HPointer<tType, pointer_type_t, access_type_t>::operator* ( void ) {
-	M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-	return ( *_object );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-typename HPointer<tType, pointer_type_t, access_type_t>::const_reference HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int index_ ) const {
-	M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-	M_ASSERT( index_ >= 0 );
-	return ( access_type_t<tType, pointer_type_t<tType> >::object_at( _object, index_ ) );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-typename HPointer<tType, pointer_type_t, access_type_t>::reference HPointer<tType, pointer_type_t, access_type_t>::operator[] ( int index_ ) {
-	M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-	M_ASSERT( index_ >= 0 );
-	return ( access_type_t<tType, pointer_type_t<tType> >::object_at( _object, index_ ) );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-template<typename alien_t, template<typename, typename>class alien_access_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator == ( HPointer<alien_t, pointer_type_t, alien_access_t> const & pointer_ ) const {
-	HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-	return ( _object == reinterpret_cast<alien_t*>( alien->_object ) );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-template<typename alien_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator == ( alien_t const* const pointer_ ) const {
-	return ( _object == pointer_ );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-template<typename alien_t, template<typename, typename>class alien_access_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator != ( HPointer<alien_t, pointer_type_t, alien_access_t>const & pointer_ ) const {
-	return ( ! operator == ( pointer_ ) );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-template<typename alien_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator != ( alien_t const* const pointer_ ) const {
-	return ( ! operator == ( pointer_ ) );
-}
 
 template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t, typename alien_t>
@@ -508,86 +409,6 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t, typename alien_t>
 bool operator != ( alien_t const* const pointer_, HPointer<tType, pointer_type_t, access_type_t> const& smartPointer_ ) {
 	return ( smartPointer_ != pointer_ );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-tType const* HPointer<tType, pointer_type_t, access_type_t>::operator->( void ) const {
-	M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-	return ( access_type_t<tType, pointer_type_t<tType> >::raw( _object ) );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-tType* HPointer<tType, pointer_type_t, access_type_t>::operator->( void ) {
-	M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-	return ( access_type_t<tType, pointer_type_t<tType> >::raw( _object ) );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-tType const* HPointer<tType, pointer_type_t, access_type_t>::raw( void ) const {
-	return ( _object );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-tType* HPointer<tType, pointer_type_t, access_type_t>::raw( void ) {
-	return ( _object );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-tType const* HPointer<tType, pointer_type_t, access_type_t>::get( void ) const {
-	return ( _object );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-tType* HPointer<tType, pointer_type_t, access_type_t>::get( void ) {
-	return ( _object );
-}
-
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-bool HPointer<tType, pointer_type_t, access_type_t>::operator ! ( void ) const {
-	return ( ! _object );
-}
-
-template<typename tType, typename pointer_type_t>
-template<typename ptr_t>
-void HPointerStrict<tType, pointer_type_t>::initialize_from_this( HPointerFromThisInterface<tType>* obj,
-		ptr_t const& ptr ) {
-	obj->initialize_observer( ptr );
-	return;
-}
-
-template<typename tType, typename pointer_type_t>
-template<typename ptr_t>
-void HPointerStrict<tType, pointer_type_t>::initialize_from_this( void*,
-		ptr_t const& ) {
-	return;
-}
-
-template<typename tType>
-HPointerFromThisInterface<tType>::HPointerFromThisInterface( void ) : _selfObserver() {
-	return;
-}
-
-template<typename tType>
-void HPointerFromThisInterface<tType>::initialize_observer( ptr_t const& firstOwner_ ) {
-	_selfObserver = firstOwner_;
-	return;
-}
-
-template<typename tType>
-typename HPointerFromThisInterface<tType>::ptr_t HPointerFromThisInterface<tType>::get_pointer( void ) {
-	return ( _selfObserver );
-}
-
-template<typename tType>
-typename HPointerFromThisInterface<tType>::ptr_t const HPointerFromThisInterface<tType>::get_pointer( void ) const {
-	return ( _selfObserver );
 }
 
 struct pointer_helper {
