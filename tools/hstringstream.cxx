@@ -67,7 +67,7 @@ int long HStringStream::do_write( void const* const buffer_, int long size_ ) {
 		_buffer.clear();
 		_used = false;
 	}
-	_buffer.insert( _buffer.get_length(), size_, static_cast<char const* const>( buffer_ ) );
+	_buffer.append( static_cast<char const* const>( buffer_ ), size_ );
 	return ( size_ );
 	M_EPILOG
 }
@@ -80,11 +80,17 @@ void HStringStream::do_flush( void ) {
 
 int long HStringStream::do_read( void* const buffer_, int long size_ ) {
 	M_PROLOG
-	int long length = yaal::min( _buffer.get_length() - _offset, size_ );
+	int long length( _buffer.get_length() );
+	int long toCopy( yaal::min( length - _offset, size_ ) );
 	if ( length > 0 )
-		::strncpy( static_cast<char* const>( buffer_ ), _buffer.raw() + _offset, length );
-	_offset += length;
-	return ( length );
+		::strncpy( static_cast<char* const>( buffer_ ), _buffer.raw() + _offset, toCopy );
+	_offset += toCopy;
+	if ( _offset >= length ) {
+		_offset = 0;
+		_buffer.clear();
+		_used = true;
+	}
+	return ( toCopy );
 	M_EPILOG
 }
 
