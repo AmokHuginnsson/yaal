@@ -63,6 +63,17 @@ public:
 		} error_t;
 	};
 	typedef HVector<value_type> row_t;
+	class HRowRef {
+		row_t& _row;
+		HRowRef( row_t& row_ )
+			: _row( row_ )
+			{}
+	public:
+		value_type& operator[]( int long index_ ) {
+			return ( _row[index_] );
+		}
+	friend class HMatrix<value_type>;
+	};
 private:
 	typedef HArray<row_t> data_t;
 	int _rows;
@@ -97,8 +108,16 @@ public:
 	value_type operator ! ( void ) const;
 	bool operator == ( HMatrix const & ) const;
 	bool operator != ( HMatrix const & ) const;
-	row_t& operator[] ( int );
-	row_t const& operator[] ( int ) const;
+	HRowRef operator[] ( int idx ) {
+		M_PROLOG
+		return ( HRowRef( _data[ idx ] ) );
+		M_EPILOG
+	}
+	row_t const& operator[] ( int idx ) const {
+		M_PROLOG
+		return ( _data[ idx ] );
+		M_EPILOG
+	}
 	template<typename ttType>
 	friend HVector<ttType> operator * ( HVector<ttType> const&,
 			HMatrix const& );
@@ -206,46 +225,47 @@ template<typename value_type>
 value_type HMatrix<value_type>::det( void ) const {
 	M_PROLOG
 	check_dimensions_square();
-	int ctrLocRow = 0, ctrRow = 0, exchanges = 0;
+	int exchanges( 0 );
 	value_type scalar;
-	HMatrix<value_type> matrix ( * this );
-	HVector<value_type> vector ( _columns );
-	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ ) {
+	HMatrix<value_type> matrix( *this );
+	for ( int ctrRow( 0 ); ctrRow < _rows; ctrRow ++ ) {
 		if ( matrix [ ctrRow ] [ ctrRow ] != 0 )
 			continue;
+		using yaal::swap;
+		int ctrLocRow( 0 );
 		for ( ctrLocRow = 0; ctrLocRow < ctrRow; ctrLocRow ++ )
 			if ( ( matrix [ ctrRow ] [ ctrLocRow ] != 0 )
 					&& ( matrix [ ctrLocRow ] [ ctrRow ] != 0 ) ) {
-				vector = matrix [ ctrLocRow ];
-				matrix [ ctrLocRow ] = matrix [ ctrRow ];
-				matrix [ ctrRow ] = vector;
-				exchanges ++;
+				swap( matrix._data[ ctrLocRow ], matrix._data[ ctrRow ] );
+				++ exchanges ;
 				break;
 			}
-		if ( ctrLocRow == ctrRow )
-			for ( ctrLocRow = ctrRow; ctrLocRow < _rows; ctrLocRow ++ )
-				if ( matrix [ ctrRow ] [ ctrLocRow ] != 0 ) {
-					vector = matrix [ ctrLocRow ];
-					matrix [ ctrLocRow ] = matrix [ ctrRow ];
-					matrix [ ctrRow ] = vector;
-					exchanges++;
+		if ( ctrLocRow == ctrRow ) {
+			for ( ctrLocRow = ctrRow; ctrLocRow < _rows; ctrLocRow ++ ) {
+				if ( matrix[ ctrRow ][ ctrLocRow ] != 0 ) {
+					swap( matrix._data[ ctrLocRow ], matrix._data[ ctrRow ] );
+					++ exchanges;
 					break;
 				}
+			}
+		}
 	}
-	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ )
+	row_t tmp( _columns );
+	for ( int ctrRow( 0 ); ctrRow < _rows; ctrRow ++ )
 		if ( matrix [ ctrRow ] [ ctrRow ] == 0 )
 			return ( 0 );
-	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ ) {
-		if ( matrix [ ctrRow ] [ ctrRow ] == 0 )
+	for ( int ctrRow( 0 ); ctrRow < _rows; ctrRow ++ ) {
+		if ( matrix[ ctrRow ][ ctrRow ] == 0 )
 			return ( 0 );
-		for ( ctrLocRow = ctrRow + 1; ctrLocRow < _rows; ctrLocRow ++ ) {
-			scalar = -matrix [ ctrLocRow ] [ ctrRow ] / matrix [ ctrRow ] [ ctrRow ];
-			vector = ( scalar * matrix [ ctrRow ] );
-			matrix [ ctrLocRow ] += vector;
+		for ( int ctrLocRow( ctrRow + 1 ); ctrLocRow < _rows; ctrLocRow ++ ) {
+			scalar = -matrix[ ctrLocRow ][ ctrRow ] / matrix[ ctrRow ][ ctrRow ];
+			tmp = matrix._data[ ctrRow ];
+			tmp *= scalar;
+			matrix._data[ ctrLocRow ] += tmp;
 		}
 	}
 	scalar = 1;
-	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ )
+	for ( int ctrRow( 0 ); ctrRow < _rows; ctrRow ++ )
 		scalar *= matrix [ ctrRow ] [ ctrRow ];
 	if ( exchanges % 2 )
 		scalar = -scalar;
@@ -296,13 +316,12 @@ template<typename value_type>
 HMatrix<value_type> HMatrix<value_type>::_1( void ) {
 	M_PROLOG
 	check_dimensions_square();
-	value_type scalar = 0;
-	int ctrRow = 0, ctrColumn = 0;
+	value_type scalar( 0 );
 	if ( ! ( scalar = det() ) )
 		M_THROW( _errMsgHMatrix_[ ERROR::ODD ], 0 );
 	HMatrix matrix( *this );
-	for ( ctrRow = 0; ctrRow < _rows; ctrRow ++ ) {
-		for ( ctrColumn = 0; ctrColumn < _columns; ctrColumn ++ ) {
+	for ( int ctrRow( 0 ); ctrRow < _rows; ctrRow ++ ) {
+		for ( int ctrColumn( 0 ); ctrColumn < _columns; ctrColumn ++ ) {
 			matrix._data[ ctrRow ][ ctrColumn ] = M( ctrRow,
 					ctrColumn ) * ( ( ( ctrRow + ctrColumn ) % 2 ) ? -1 : 1 );
 		}
@@ -318,7 +337,7 @@ void HMatrix<value_type>::swap( HMatrix& matrix_ ) {
 		using yaal::swap;
 		swap( _rows, matrix_._rows );
 		swap( _columns, matrix_._columns );
-		_data.swap( matrix_._data );
+		swap( _data, matrix_._data );
 	}
 	return;
 	M_EPILOG
@@ -332,20 +351,6 @@ HMatrix<value_type>& HMatrix<value_type>::operator = ( HMatrix const& matrix_ ) 
 		swap( tmp );
 	}
 	return ( *this );
-	M_EPILOG
-}
-
-template<typename value_type>
-typename HMatrix<value_type>::row_t& HMatrix<value_type>::operator[] ( int idx ) {
-	M_PROLOG
-	return ( _data[ idx ] );
-	M_EPILOG
-}
-
-template<typename value_type>
-typename HMatrix<value_type>::row_t const& HMatrix<value_type>::operator[] ( int idx ) const {
-	M_PROLOG
-	return ( _data[ idx ] );
 	M_EPILOG
 }
 

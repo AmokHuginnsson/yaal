@@ -172,3 +172,4 @@ public:
 }
 
 #endif /* #ifndef YAAL_HCORE_HBOUNDCALL_HXX_INCLUDED */
+
