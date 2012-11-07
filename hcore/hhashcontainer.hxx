@@ -43,7 +43,14 @@ namespace hcore {
 
 template<typename key_t>
 struct hash {
-	int long operator () ( key_t const& key_ ) const;
+	int long operator () ( key_t const& ) const;
+};
+
+template<typename key_t>
+struct hash<key_t*> {
+	int long operator () ( key_t* const& key_ ) const {
+		return ( reinterpret_cast<int long>( key_ ) );
+	}
 };
 
 extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
