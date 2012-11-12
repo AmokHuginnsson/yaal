@@ -169,9 +169,12 @@ public:
 	typedef yaal::hcore::HSingleton<HConsole> base_type;
 private:
 	bool _initialized;
+	bool _enabled;
+	bool _brokenBrightBackground;
 	int _width;
 	int _height;
 	int _mouseDes;
+	void* _window;
 	yaal::hcore::HPipe::ptr_t _event;
 public:
 	int get_height( void ) const;
@@ -214,30 +217,13 @@ protected:
 private:
 	HConsole( void );
 	~HConsole( void );
+	HConsole( HConsole const& );
+	HConsole& operator = ( HConsole const& );
 	friend class yaal::hcore::HSingleton<HConsole>;
 	friend class yaal::hcore::HDestructor<HConsole>;
 };
 
 typedef yaal::hcore::HExceptionT<HConsole, yaal::hcore::HSingletonException> HConsoleException;
-
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const bold;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const reset;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const black;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const red;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const green;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brown;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const blue;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const magenta;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const cyan;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const lightgray;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const gray;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightred;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightgreen;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const yellow;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightblue;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightmagenta;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightcyan;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const white;
 
 }
 
