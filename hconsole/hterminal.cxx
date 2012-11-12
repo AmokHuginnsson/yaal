@@ -44,6 +44,10 @@ HTerminal::HTerminal( void )
 	: _exists( ::getenv( "TERM" ) != NULL ), _termios( chunk_size<struct termios>( 1 ) )
 	{}
 
+bool HTerminal::exists( void ) const {
+	return ( isatty( STDIN_FILENO ) );
+}
+
 void HTerminal::init( void ) {
 	M_PROLOG
 	termios termios;

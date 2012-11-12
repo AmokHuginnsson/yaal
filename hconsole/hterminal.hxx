@@ -38,8 +38,7 @@ class HTerminal {
 	yaal::hcore::HChunk _termios;
 public:
 	HTerminal( void );
-	bool exists( void ) const
-		{ return ( _exists ); }
+	bool exists( void ) const;
 	void init( void );
 	void flush( void );
 };

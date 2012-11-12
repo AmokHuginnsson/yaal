@@ -152,14 +152,11 @@ void HConsole::init( void ) {
 void HConsole::enter_curses( void ) {
 	M_PROLOG
 	if ( ! _terminal_.exists() )
-		throw HConsoleException( "Not connected to any terminal." );
-	short colors[] = { COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+		throw HConsoleException( "Not connected to a terminal." );
+	static short const colors[] = { COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
 		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
-	int fg = 0, bg = 0;
 /*	def_shell_mode(); */
 /* this is done automaticly by initscr(), read man next time */
-	if ( ! isatty( STDIN_FILENO ) )
-		M_THROW( "stdin in not a tty", 0 );
 	if ( ! _initialized )
 		init();
 	_terminal_.init();
@@ -180,8 +177,8 @@ void HConsole::enter_curses( void ) {
 	curs_set( CURSOR::INVISIBLE );
 	/* init color pairs */
 	M_ENSURE( assume_default_colors( COLOR_BLACK, COLOR_BLACK ) == OK );
-	for ( bg = 0; bg < 8; bg ++ )
-		for ( fg = 0; fg < 8; fg ++ )
+	for ( int bg( 0 ); bg < 8; bg ++ )
+		for ( int fg( 0 ); fg < 8; fg ++ )
 			init_pair( static_cast<short>( bg * 8 + fg ),
 					colors[ fg ], colors[ bg ] );
 	attrset( COLOR_PAIR( 7 ) );
