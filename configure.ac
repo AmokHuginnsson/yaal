@@ -281,6 +281,8 @@ AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL d
 _CONSOLE_MOUSE=[""];
 AC_CHECK_HEADERS([sys/consio.h],_CONSOLE_MOUSE=["moused"])
 AC_CHECK_HEADERS([execinfo.h])
+AC_CHECK_HEADERS([tty.h])
+AC_CHECK_HEADERS([termio.h])
 AC_CHECK_HEADERS([gpm.h],_CONSOLE_MOUSE=["gpm"])
 if test ["$_CONSOLE_MOUSE"] = [""] -a ["$CONSOLE_MOUSE"] = ["yes"] ; then
 	AC_MSG_ERROR([Cannot continue without console mouse support.])

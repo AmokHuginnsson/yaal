@@ -67,6 +67,8 @@
 #cmakedefine01 HAVE_OPENSSL_SSL_H
 #cmakedefine01 HAVE_LIBXML2_LIBXML_XMLVERSION_H
 #cmakedefine01 HAVE_EXECINFO_H
+#cmakedefine01 HAVE_TERMIO_H
+#cmakedefine01 HAVE_TTY_H
 #cmakedefine HAVE_SQLITE3_H
 #cmakedefine HAVE_POSTGRESQL_LIBPQ_FE_H
 #cmakedefine HAVE_LIBPQ_FE_H

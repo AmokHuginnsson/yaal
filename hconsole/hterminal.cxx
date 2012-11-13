@@ -27,7 +27,15 @@ Copyright:
 #include <cstdlib> /* getenv */
 #include <cstdio>
 #include <unistd.h>
+
+#include "config.hxx"
+
+#ifdef HAVE_TERMIO_H
 #include <termio.h>
+#endif /* #ifdef HAVE_TERMIO_H */
+#ifdef HAVE_TTY_H
+#include <tty.h>
+#endif /* #ifdef HAVE_TTY_H */
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
