@@ -59,7 +59,7 @@ HTerminal::HTerminal( void )
 	{}
 
 bool HTerminal::exists( void ) const {
-	return ( isatty( STDIN_FILENO ) );
+	return ( isatty( STDIN_FILENO ) ? true : false );
 }
 
 void HTerminal::init( void ) {
