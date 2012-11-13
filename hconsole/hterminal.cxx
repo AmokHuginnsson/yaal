@@ -27,6 +27,7 @@ Copyright:
 #include <cstdlib> /* getenv */
 #include <cstdio>
 #include <unistd.h>
+#include <termios.h>
 
 #include "config.hxx"
 
@@ -89,10 +90,16 @@ void HTerminal::flush( void ) {
 	M_EPILOG
 }
 
+namespace {
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+static int const FWD_TIOCGWINSZ = TIOCGWINSZ;
+#pragma GCC diagnostic error "-Wold-style-cast"
+}
+
 HTerminal::coord_t HTerminal::size( void ) const {
 	M_PROLOG
 	winsize w;
-	M_ENSURE( ioctl( 0, TIOCGWINSZ, &w ) >= 0 );
+	M_ENSURE( ioctl( 0, FWD_TIOCGWINSZ, &w ) >= 0 );
 	return ( coord_t( w.ws_row, w.ws_col ) );
 	M_EPILOG
 }
