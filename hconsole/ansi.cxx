@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstdio>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "ansi.hxx"
@@ -56,6 +58,53 @@ char const* const brightblue = _terminal_.exists() ? "\033[1;34m" : EMPTY_STRING
 char const* const brightmagenta = _terminal_.exists() ? "\033[1;35m" : EMPTY_STRING;
 char const* const brightcyan = _terminal_.exists() ? "\033[1;36m" : EMPTY_STRING;
 char const* const white = _terminal_.exists() ? "\033[1;37m" : EMPTY_STRING;
+
+char const* const home = _terminal_.exists() ? "\033[H" : EMPTY_STRING;
+char const* const up = _terminal_.exists() ? "\033[A" : EMPTY_STRING;
+char const* const down = _terminal_.exists() ? "\033[B" : EMPTY_STRING;
+char const* const left = _terminal_.exists() ? "\033[D" : EMPTY_STRING;
+char const* const right = _terminal_.exists() ? "\033[C" : EMPTY_STRING;
+
+char const* const save = _terminal_.exists() ? "\033[s" : EMPTY_STRING;
+char const* const restore = _terminal_.exists() ? "\033[u" : EMPTY_STRING;
+
+char const* const clear = _terminal_.exists() ? "\033[2J" : EMPTY_STRING;
+char const* const clrtoeol = _terminal_.exists() ? "\033[K" : EMPTY_STRING;
+
+char const* move( int row_, int col_ ) {
+	static int const codeBufferSize( 32 );
+	static char code[codeBufferSize];
+	snprintf( code, codeBufferSize - 1, "\033[%d;%dH", row_, col_ );
+	return ( code );
+}
+
+char const* up_n( int by_ ) {
+	static int const codeBufferSize( 16 );
+	static char code[codeBufferSize];
+	snprintf( code, codeBufferSize - 1, "\033[%dA", by_ );
+	return ( code );
+}
+
+char const* down_n( int by_ ) {
+	static int const codeBufferSize( 16 );
+	static char code[codeBufferSize];
+	snprintf( code, codeBufferSize - 1, "\033[%dB", by_ );
+	return ( code );
+}
+
+char const* left_n( int by_ ) {
+	static int const codeBufferSize( 16 );
+	static char code[codeBufferSize];
+	snprintf( code, codeBufferSize - 1, "\033[%dD", by_ );
+	return ( code );
+}
+
+char const* right_n( int by_ ) {
+	static int const codeBufferSize( 16 );
+	static char code[codeBufferSize];
+	snprintf( code, codeBufferSize - 1, "\033[%dC", by_ );
+	return ( code );
+}
 
 }
 

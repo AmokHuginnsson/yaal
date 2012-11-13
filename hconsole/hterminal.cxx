@@ -27,21 +27,23 @@ Copyright:
 #include <cstdlib> /* getenv */
 #include <cstdio>
 #include <unistd.h>
-#include <termios.h>
+#include <termio.h>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 #include "hterminal.hxx"
 #include "hconsole.hxx"
+#include "hcore/hrawfile.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::hconsole;
 
 namespace yaal {
 
 namespace hconsole {
 
 HTerminal::HTerminal( void )
-	: _exists( ::getenv( "TERM" ) != NULL ), _termios( chunk_size<struct termios>( 1 ) )
+	: _termios( chunk_size<struct termios>( 1 ) )
 	{}
 
 bool HTerminal::exists( void ) const {
@@ -76,6 +78,14 @@ void HTerminal::flush( void ) {
 	if ( _disableXON_ )
 		M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, _termios.get<termios>() ) == 0 );
 	return;
+	M_EPILOG
+}
+
+HTerminal::coord_t HTerminal::size( void ) const {
+	M_PROLOG
+	winsize w;
+	M_ENSURE( ioctl( 0, TIOCGWINSZ, &w ) >= 0 );
+	return ( coord_t( w.ws_row, w.ws_col ) );
 	M_EPILOG
 }
 

@@ -45,8 +45,8 @@ namespace hcore {
 char const* const _error_ = _( "file is not opened" );
 int long _writeTimeout_ = 4 * 1000; /* 4 seconds */
 
-HRawFile::HRawFile ( TYPE::raw_file_type_t type_ )
-	: _type( type_ ), _fileDescriptor( -1 ), _timeout( _writeTimeout_ ), _sSL(),
+HRawFile::HRawFile( TYPE::raw_file_type_t type_ )
+	: _type( type_ ), _fileDescriptor( -1 ), _timeout( _writeTimeout_ ), _ssl(),
 	reader( ( ( type_ & TYPE::SSL_SERVER )
 				|| ( type_ & TYPE::SSL_CLIENT ) ) ? &HRawFile::read_ssl_loader : &HRawFile::read_plain ),
 	writer( ( ( type_ & TYPE::SSL_SERVER )
@@ -58,6 +58,14 @@ HRawFile::HRawFile ( TYPE::raw_file_type_t type_ )
 	M_ASSERT( ! ( ( type_ & TYPE::PLAIN ) && ( type_ & TYPE::SSL_SERVER ) ) );
 	M_ASSERT( ! ( ( type_ & TYPE::PLAIN ) && ( type_ & TYPE::SSL_CLIENT ) ) );
 	M_ASSERT( ! ( ( type_ & TYPE::SSL_CLIENT ) && ( type_ & TYPE::SSL_SERVER ) ) );
+	return;
+	M_EPILOG
+}
+
+HRawFile::HRawFile( file_descriptor_t fd_ )
+	: _type( TYPE::DEFAULT ), _fileDescriptor( fd_ ), _timeout( _writeTimeout_ ), _ssl(),
+	reader( &HRawFile::read_plain ), writer( &HRawFile::write_plain ), closer( &HRawFile::close_plain ) {
+	M_PROLOG
 	return;
 	M_EPILOG
 }
@@ -83,14 +91,14 @@ int HRawFile::close_plain( void ) {
 
 int HRawFile::close_ssl( void ) {
 	M_PROLOG
-	_sSL->shutdown();
+	_ssl->shutdown();
 	return ( do_close() );
 	M_EPILOG
 }
 
-int HRawFile::do_close ( void ) {
+int HRawFile::do_close( void ) {
 	M_PROLOG
-	int error = 0;
+	int error( 0 );
 	if ( _fileDescriptor < 0 )
 		M_THROW( "file is not opened", errno );
 	error = static_cast<int>( M_TEMP_FAILURE_RETRY( system::close( _fileDescriptor ) ) );
@@ -99,7 +107,7 @@ int HRawFile::do_close ( void ) {
 	M_EPILOG
 }
 
-file_descriptor_t HRawFile::get_file_descriptor ( void ) const {
+file_descriptor_t HRawFile::get_file_descriptor( void ) const {
 	M_PROLOG
 	return ( _fileDescriptor );
 	M_EPILOG
@@ -117,13 +125,13 @@ int long HRawFile::read_ssl( void* const buffer_, int long size_ ) {
 	M_PROLOG
 	if ( _fileDescriptor < 0 )
 		M_THROW( _error_, errno );
-	return ( _sSL->read( buffer_, size_ ) );
+	return ( _ssl->read( buffer_, size_ ) );
 	M_EPILOG
 }
 
 int long HRawFile::read_ssl_loader( void* const buffer_, int long size_ ) {
 	M_PROLOG
-	_sSL = HOpenSSL::ptr_t( make_pointer<HOpenSSL>( _fileDescriptor, _type & TYPE::SSL_SERVER ? HOpenSSL::TYPE::SERVER : HOpenSSL::TYPE::CLIENT ) );
+	_ssl = HOpenSSL::ptr_t( make_pointer<HOpenSSL>( _fileDescriptor, _type & TYPE::SSL_SERVER ? HOpenSSL::TYPE::SERVER : HOpenSSL::TYPE::CLIENT ) );
 	reader = &HRawFile::read_ssl;
 	writer = &HRawFile::write_ssl;
 	closer = &HRawFile::close_ssl;
@@ -179,7 +187,7 @@ int long HRawFile::write_ssl( void const* const buffer_, int long size_ ) {
 	do {
 		if ( ( _timeout > 0 ) && wait_for( ACTION::BOTH, &timeOut ) )
 			throw HStreamInterfaceException( _( "timeout on write" ) );
-		int long ret = _sSL->write( static_cast<char const* const>( buffer_ ) + nWritten, size_ );
+		int long ret = _ssl->write( static_cast<char const* const>( buffer_ ) + nWritten, size_ );
 		if ( ! ret ) {
 			nWritten = ret;
 			break;
@@ -192,7 +200,7 @@ int long HRawFile::write_ssl( void const* const buffer_, int long size_ ) {
 
 int long HRawFile::write_ssl_loader( void const* const buffer_, int long size_ ) {
 	M_PROLOG
-	_sSL = HOpenSSL::ptr_t( make_pointer<HOpenSSL>( _fileDescriptor, _type & TYPE::SSL_SERVER ? HOpenSSL::TYPE::SERVER : HOpenSSL::TYPE::CLIENT ) );
+	_ssl = HOpenSSL::ptr_t( make_pointer<HOpenSSL>( _fileDescriptor, _type & TYPE::SSL_SERVER ? HOpenSSL::TYPE::SERVER : HOpenSSL::TYPE::CLIENT ) );
 	reader = &HRawFile::read_ssl;
 	writer = &HRawFile::write_ssl;
 	closer = &HRawFile::close_ssl;

@@ -204,7 +204,7 @@ HSocket::ptr_t HSocket::accept( void ) {
 	if ( !!( _type & ( socket_type_t( TYPE::SSL_SERVER  ) | TYPE::SSL_CLIENT ) ) )
 		type &= ~socket_type_t( TYPE::SSL_CLIENT ), type |= TYPE::SSL_SERVER;
 	ptr_t socket( make_pointer<HSocket>( type, -1 ) );
-	M_ASSERT( ! socket->_sSL );
+	M_ASSERT( ! socket->_ssl );
 	socket->_fileDescriptor = fileDescriptor;
 	if ( !!( _type & TYPE::NONBLOCKING ) ) {
 		int flags( ::fcntl( socket->_fileDescriptor, F_GETFL, 0 ) );

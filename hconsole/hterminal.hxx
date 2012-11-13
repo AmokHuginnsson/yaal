@@ -28,19 +28,24 @@ Copyright:
 #define YAAL_HCONSOLE_HTERMINAL_HXX_INCLUDED 1
 
 #include "hcore/hchunk.hxx"
+#include "hcore/hpair.hxx"
 
 namespace yaal {
 
 namespace hconsole {
 
 class HTerminal {
-	bool _exists;
+public:
+	typedef HTerminal this_type;
+	typedef yaal::hcore::HPair<int, int> coord_t;
+private:
 	yaal::hcore::HChunk _termios;
 public:
 	HTerminal( void );
 	bool exists( void ) const;
 	void init( void );
 	void flush( void );
+	coord_t size( void ) const;
 };
 
 extern HTerminal _terminal_;

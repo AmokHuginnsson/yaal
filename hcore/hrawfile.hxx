@@ -70,11 +70,12 @@ protected:
 	TYPE::raw_file_type_t _type;
 	file_descriptor_t _fileDescriptor; /* raw file descriptor of the file */
 	int long _timeout;
-	HOpenSSL::ptr_t _sSL;
+	HOpenSSL::ptr_t _ssl;
 	READER_t reader;
 	WRITER_t writer;
 	CLOSER_t closer;
 public:
+	explicit HRawFile( file_descriptor_t );
 	HRawFile( TYPE::raw_file_type_t = TYPE::DEFAULT );
 	virtual ~HRawFile( void );
 	int close( void );

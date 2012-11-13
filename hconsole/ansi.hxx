@@ -50,6 +50,23 @@ extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightmagenta;
 extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightcyan;
 extern M_YAAL_HCONSOLE_PUBLIC_API char const* const white;
 
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const up;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const down;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const left;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const right;
+
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const save;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const restore;
+
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const clear;
+extern M_YAAL_HCONSOLE_PUBLIC_API char const* const clrtoeol;
+
+char const* move( int, int );
+char const* up_n( int );
+char const* down_n( int );
+char const* left_n( int );
+char const* right_n( int );
+
 }
 
 }
