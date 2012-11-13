@@ -31,6 +31,9 @@ Copyright:
 
 #include "config.hxx"
 
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif /* #ifdef HAVE_SYS_IOCTL_H */
 #ifdef HAVE_TERMIO_H
 #include <termio.h>
 #endif /* #ifdef HAVE_TERMIO_H */
