@@ -110,7 +110,6 @@
 #undef TEMP_FAILURE_RETRY
 #undef HAVE_GETHOSTBYNAME_R
 #define HAVE_GETHOSTBYNAME_R 1
-#define TIOCGWINSZ 0x5413
 #define __va_copy( x, y ) ( ( x ) = ( y ) )
 extern "C" int setenv( char const*, char  const*, int );
 extern "C" int unsetenv( char const* );
