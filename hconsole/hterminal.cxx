@@ -101,6 +101,7 @@ static int const FWD_TIOCGWINSZ = TIOCGWINSZ;
 
 HTerminal::coord_t HTerminal::size( void ) const {
 	M_PROLOG
+	M_ENSURE( exists() );
 	winsize w;
 	M_ENSURE( ioctl( 0, FWD_TIOCGWINSZ, &w ) >= 0 );
 	return ( coord_t( w.ws_row, w.ws_col ) );
