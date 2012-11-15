@@ -280,7 +280,8 @@ int sigaction( int signo, struct sigaction* sa_, void* ) {
 			&& ( signo != SIGBUS )
 			&& ( signo != SIGTRAP )
 			&& ( signo != SIGSYS )
-			&& ( signo != SIGALRM ) ) /*&& ( signo != 12 ) ) */ {
+			&& ( signo != SIGWINCH )
+			&& ( signo != SIGALRM ) ) {
 		if ( sa_->sa_handler != SIG_DFL ) {
 			if ( ( signo == SIGINT ) || ( signo == SIGQUIT ) || ( signo == SIGKILL ) || ( signo == SIGTERM ) || ( signo == SIGTERM ) || ( signo == SIGPWR ) ) {
 				if ( ! _signalDispatcher_.is_console_event_enabled() )

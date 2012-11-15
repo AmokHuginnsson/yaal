@@ -65,6 +65,7 @@ bool HTerminal::exists( void ) const {
 void HTerminal::init( void ) {
 	M_PROLOG
 	termios termios;
+	::memset( &termios, 0, sizeof ( termios ) );
 	if ( _disableXON_ ) {
 		M_ENSURE( tcgetattr( STDIN_FILENO, _termios.get<struct termios>() ) == 0 );
 		M_ENSURE( tcgetattr( STDIN_FILENO, &termios ) == 0 );

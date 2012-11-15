@@ -79,7 +79,7 @@ int main( int argc_, char** argv_ ) {
 			if ( inSymbols ) {
 				vector<string> t;
 				tokenize( line, t );
-				if ( t.size() > 1 )
+				if ( ( t.size() > 1 ) && ( t[1].find( "??_C@_" ) != 0 ) )
 					s.insert( t[1] );
 			}
 		}
