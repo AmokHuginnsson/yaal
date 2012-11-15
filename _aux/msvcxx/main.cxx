@@ -29,6 +29,7 @@
 #include "cleanup.hxx"
 #include "crit.hxx"
 #include "msio.hxx"
+#include "msvcxx.hxx"
 
 using namespace std;
 using namespace yaal;
@@ -371,3 +372,29 @@ int getrusage( __rusage_who_t who_, struct rusage* usage_ ) __THROW {
 	}
 	return ( 0 );
 }
+
+driver_names_t get_drivers( void ) {
+	static int const ARRAY_SIZE( 1024 );
+	LPVOID drivers[ARRAY_SIZE];
+	DWORD cbNeeded( 0 );
+	driver_names_t driverNames;
+	if ( ::EnumDeviceDrivers( drivers, sizeof ( drivers ), &cbNeeded ) && ( cbNeeded < sizeof ( drivers ) ) ) { 
+		TCHAR szDriver[ARRAY_SIZE];
+		int cDrivers( cbNeeded / sizeof ( drivers[0] ) );
+		for ( int i( 0 ); i < cDrivers; ++ i ) {
+			if ( ::GetDeviceDriverBaseName( drivers[i], szDriver, countof ( szDriver ) ) ) {
+				int c( 0 );
+				while ( ( c < countof ( szDriver ) ) && szDriver[c] ) {
+					szDriver[c] = tolower( szDriver[c] );
+					++ c;
+				}
+				driverNames.insert( szDriver );
+			} else
+				log_windows_error( "GetDeviceDriverBaseName" );
+		}
+	} else {
+		log_windows_error( "EnumDeviceDrivers" );
+	}
+	return ( driverNames );
+}
+

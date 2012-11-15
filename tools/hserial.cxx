@@ -88,8 +88,8 @@ bool HSerial::open( void ) {
 	/* O_NONBLOCK allow open device even if nothing seats on other side */
 	_fileDescriptor = ::open( _devicePath.raw(), O_RDWR | O_NOCTTY | O_NONBLOCK );
 	M_ENSURE( _fileDescriptor >= 0 );
-	if ( ! isatty( _fileDescriptor ) )
-		M_THROW( "not a tty", _fileDescriptor );
+	if ( ! ::isatty( _fileDescriptor ) )
+		M_THROW( _( "not a tty device" ), _fileDescriptor );
 	::tcgetattr( _fileDescriptor, _backUpTIO.get<termios>() );
 	::fcntl( _fileDescriptor, F_SETFD, 0 );
 	::fcntl( _fileDescriptor, F_SETFL, 0 );

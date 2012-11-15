@@ -28,6 +28,7 @@
 #undef getpid
 #undef readdir_r
 #undef dirent
+#undef isatty
 
 #include "emu_pwd.hxx"
 #include "hcore/base.hxx"
@@ -38,6 +39,7 @@
 
 #include "cleanup.hxx"
 #include "msio.hxx"
+#include "msvcxx.hxx"
 #include "emu_signals.hxx"
 
 using namespace std;
@@ -265,6 +267,27 @@ int pipe( int* fds_ ) {
 		fds_[1] = writeIO.first;
 	}
 	return ( ok ? 0 : -1 );
+}
+
+M_EXPORT_SYMBOL
+int isatty( int fd_ ) {
+	int val( ::isatty( fd_ ) );
+	if ( ( fd_ == STDIN_FILENO ) || ( fd_ == STDOUT_FILENO ) || ( fd_ == STDERR_FILENO ) ) {
+		static CMutex m;
+		static bool once( true );
+		static bool ansiSysLoaded( false );
+		if ( once ) {
+			CLock l( m );
+			if ( once ) {
+				ansiSysLoaded = get_drivers().count( "ansi.sys" ) > 0;
+				once = false;
+			}
+		}
+		char const* TERM( ::getenv( "TERM" ) );
+		char const* ANSICON( ::getenv( "ANSICON" ) );
+		val = ( TERM || ( val && ( ANSICON || ansiSysLoaded ) ) ) ? 1 : 0;
+	}
+	return ( val );
 }
 
 int close( int const& fd_ ) {

@@ -22,10 +22,12 @@ extern "C" FILE* tmpfile( void );
 #define gethostname gethostname_off
 #define dup2 dup2_off
 #define getuid getuid_off
+#define isatty isatty_off
 #include <glibc/unistd.h>
 #undef gethostname
 #include <sys/types.h>
 #include <libintl.h>
+#undef isatty
 #undef getuid
 #undef timeval
 #undef environ
@@ -63,6 +65,7 @@ void pthread_setname_np( void*, char const* );
 #endif /* #if ! defined( HAVE_PTHREAD_SETNAME_NP ) */
 
 #define dup2 msvcxx::dup2
+#define isatty msvcxx::isatty
 
 inline int pipe( int* fds_ )
 	{ return ( msvcxx::pipe( fds_ ) ); }

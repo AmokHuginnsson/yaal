@@ -93,3 +93,4 @@ private:
 } /* namespace msvcxx */
 
 #endif /* #ifndef YAAL_MSVCXX_MSIO_H_INCLUDED */
+
