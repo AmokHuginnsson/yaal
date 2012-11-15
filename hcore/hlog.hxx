@@ -58,7 +58,7 @@ namespace LOG_TYPE {
 
 /*! \brief Logging utility.
  */
-class HLog : public HField<HFile>, public HSynchronizedStream, public HSingleton<HLog> {
+class M_YAAL_HCORE_PUBLIC_API HLog : public HField<HFile>, public HSynchronizedStream, public HSingleton<HLog> {
 public:
 	typedef HLog this_type;
 	typedef HSynchronizedStream base_type;
@@ -72,9 +72,9 @@ private:
 	HString  _loginName;
 	HString  _hostName;
 	HChunk   _buffer;
-	M_YAAL_HCORE_PUBLIC_API static bool _autoRehash;
+	static bool _autoRehash;
 public:
-	M_YAAL_HCORE_PUBLIC_API static int long _logMask;
+	static int long _logMask;
 public:
 	/* already opened file */
 	void rehash_stream( void* = DEFAULT_LOG_STREAM, char const* const = NULL );

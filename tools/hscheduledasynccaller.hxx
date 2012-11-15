@@ -38,7 +38,7 @@ namespace tools {
  * HScheduledAsyncCaller is capable of invocation of any method of any class
  * at precisely specified moment in time.
  */
-class HScheduledAsyncCaller : public HAbstractAsyncCaller, public yaal::hcore::HSingleton<HScheduledAsyncCaller> {
+class M_YAAL_TOOLS_PUBLIC_API HScheduledAsyncCaller : public HAbstractAsyncCaller, public yaal::hcore::HSingleton<HScheduledAsyncCaller> {
 public:
 	typedef HAbstractAsyncCaller base_type;
 	typedef HScheduledAsyncCaller this_type;

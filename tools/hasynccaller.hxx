@@ -67,7 +67,7 @@ typedef yaal::hcore::HExceptionT<HAbstractAsyncCaller> HAbstractAsyncCallerExcep
 
 /*! \brief Invoke function or method asynchronously.
  */
-class HAsyncCaller : public HAbstractAsyncCaller, public yaal::hcore::HSingleton<HAsyncCaller> {
+class M_YAAL_TOOLS_PUBLIC_API HAsyncCaller : public HAbstractAsyncCaller, public yaal::hcore::HSingleton<HAsyncCaller> {
 public:
 	typedef HAbstractAsyncCaller base_type;
 	typedef HAsyncCaller this_type;

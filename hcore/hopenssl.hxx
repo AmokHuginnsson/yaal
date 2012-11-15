@@ -82,13 +82,13 @@ private:
 		OSSLContext( OSSLContext const& );
 		OSSLContext& operator=( OSSLContext const& );
 	};
-	class OSSLContextServer : public OSSLContext, public HSingleton<OSSLContextServer> {
+	class M_YAAL_HCORE_PUBLIC_API OSSLContextServer : public OSSLContext, public HSingleton<OSSLContextServer> {
 		OSSLContextServer( void );
 		virtual void const* do_method( void ) const;
 		friend class HSingleton<OSSLContextServer>;
 		friend class HDestructor<OSSLContextServer>;
 	};
-	class OSSLContextClient : public OSSLContext, public HSingleton<OSSLContextClient> {
+	class M_YAAL_HCORE_PUBLIC_API OSSLContextClient : public OSSLContext, public HSingleton<OSSLContextClient> {
 		OSSLContextClient( void );
 		virtual void const* do_method( void ) const;
 		friend class HSingleton<OSSLContextClient>;

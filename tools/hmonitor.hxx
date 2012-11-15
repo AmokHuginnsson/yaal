@@ -39,7 +39,7 @@ namespace tools {
 
 /*! \brief Named critical section manager.
  */
-class HMonitor : public yaal::hcore::HSingleton<HMonitor> {
+class M_YAAL_TOOLS_PUBLIC_API HMonitor : public yaal::hcore::HSingleton<HMonitor> {
 public:
 	typedef HMonitor this_type;
 	typedef yaal::hcore::HSingleton<HMonitor> base_type;

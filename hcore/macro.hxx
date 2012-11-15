@@ -223,7 +223,7 @@ class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LIN
 #ifdef __YAAL_HDATA_BUILD__
 #define M_YAAL_HDATA_PUBLIC_API __declspec( dllexport )
 #else /* #ifdef __YAAL_HDATA_BUILD__ */
-#define M_YAAL_HDATA_PUBLIC_API __declspec( dllimport )
+#define M_YAAL_HDATA_PUBLIC_API __declspec( dllexport )
 #endif /* #else #ifdef __YAAL_HDATA_BUILD__ */
 #else /* #ifdef __MSVCXX__ */
 #define M_EXPORT_SYMBOL /**/
