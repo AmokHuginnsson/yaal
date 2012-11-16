@@ -59,7 +59,7 @@ HTerminal::HTerminal( void )
 	{}
 
 bool HTerminal::exists( void ) const {
-	return ( ::isatty( STDIN_FILENO ) && ::isatty( STDOUT_FILENO ) && ::isatty( STDERR_FILENO ) );
+	return ( ::isatty( STDIN_FILENO ) || ::isatty( STDOUT_FILENO ) || ::isatty( STDERR_FILENO ) );
 }
 
 void HTerminal::init( void ) {
@@ -95,16 +95,34 @@ void HTerminal::flush( void ) {
 }
 
 namespace {
+
+static int const BAD_FD( -1 );
+
+int find_term_fd( void ) {
+	int fd( BAD_FD );
+	if ( ::isatty( STDOUT_FILENO ) )
+		fd = STDOUT_FILENO;
+	else if ( ::isatty( STDERR_FILENO ) )
+		fd = STDERR_FILENO;
+	else if ( ::isatty( STDIN_FILENO ) )
+		fd = STDIN_FILENO;
+	return ( fd );
+}
+
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static int const FWD_TIOCGWINSZ = TIOCGWINSZ;
 #pragma GCC diagnostic error "-Wold-style-cast"
+
 }
 
 HTerminal::coord_t HTerminal::size( void ) const {
 	M_PROLOG
 	M_ENSURE( exists() );
 	winsize w;
-	M_ENSURE( ioctl( 0, FWD_TIOCGWINSZ, &w ) >= 0 );
+	::memset( &w, 0, sizeof ( w ) );
+	int termFd( find_term_fd() );
+	M_ASSERT( termFd != BAD_FD );
+	M_ENSURE( ioctl( termFd, FWD_TIOCGWINSZ, &w ) >= 0 );
 	return ( coord_t( w.ws_row, w.ws_col ) );
 	M_EPILOG
 }
