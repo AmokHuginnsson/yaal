@@ -42,7 +42,6 @@ DIR_PKGCONFIG= $(DIR_SHARE)/pkgconfig
 DIR_DOC      = $(DIR_SHARE)/doc/$(LIB_NAME)
 DIRS         = $(DIR_BUILD)
 HAPI_HEADER  = include/$(LIB_NAME)/$(LIB_NAME).hxx
-LD_SO_CONF   = $(DIR_LIB)/ld.so.conf
 DO_@DO_TARGET@=1
 LIB_PREFIX   = @LIB_PREFIX@
 ifeq ($(LIB_PREFIX),lib)
@@ -146,9 +145,8 @@ include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 
 #phony targets
 .PHONY: all bin clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge static stats tags test uninstall
-.NOTPARALLEL: $(HAPI_HEADER) $(LD_SO_CONF)
 
-$(TARGET): $(DIRS) $(TARGETS) $(HAPI_HEADER)
+$(TARGET): $(DIRS) $(HAPI_HEADER)
 
 all: $(TARGET)
 
@@ -179,7 +177,7 @@ uninstall:
 install-environment:
 	@cd $(DIR_ROOT) && ./_aux/msh $(DESTDIR)$(prefix)
 
-$(HAPI_HEADER): $(HDRS)
+$(HAPI_HEADER): $(HDRS) $(TARGETS)
 	@printf "%b" "Making headers ... " && \
 	$(call invoke,$(DIR_ROOT)/_aux/mkheaders --lib-name=$(LIB_NAME) --lib-version=$(LIB_VERSION) --dir-root="$(DIR_ROOT)" --dir-build="$(DIR_BUILD)" --headers="$(HDRS)" && ) \
 	printf "%b$(NL)" "done.$(CL)$(BOLD)" && \
