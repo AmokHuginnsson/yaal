@@ -37,73 +37,78 @@ namespace yaal {
 
 namespace ansi {
 
-namespace {
-char const EMPTY_STRING[] = "";
-}
-char const* const bold = _terminal_.exists() ? "\033[1m" : EMPTY_STRING;
-char const* const reset = _terminal_.exists() ? "\033[0m" : EMPTY_STRING;
-char const* const black = _terminal_.exists() ? "\033[0;30m" : EMPTY_STRING;
-char const* const red = _terminal_.exists() ? "\033[0;31m" : EMPTY_STRING;
-char const* const green = _terminal_.exists() ? "\033[0;32m" : EMPTY_STRING;
-char const* const brown = _terminal_.exists() ? "\033[0;33m" : EMPTY_STRING;
-char const* const blue = _terminal_.exists() ? "\033[0;34m" : EMPTY_STRING;
-char const* const magenta = _terminal_.exists() ? "\033[0;35m" : EMPTY_STRING;
-char const* const cyan = _terminal_.exists() ? "\033[0;36m" : EMPTY_STRING;
-char const* const lightgray = _terminal_.exists() ? "\033[0;37m" : EMPTY_STRING;
-char const* const gray = _terminal_.exists() ? "\033[1;30m" : EMPTY_STRING;
-char const* const brightred = _terminal_.exists() ? "\033[1;31m" : EMPTY_STRING;
-char const* const brightgreen = _terminal_.exists() ? "\033[1;32m" : EMPTY_STRING;
-char const* const yellow = _terminal_.exists() ? "\033[1;33m" : EMPTY_STRING;
-char const* const brightblue = _terminal_.exists() ? "\033[1;34m" : EMPTY_STRING;
-char const* const brightmagenta = _terminal_.exists() ? "\033[1;35m" : EMPTY_STRING;
-char const* const brightcyan = _terminal_.exists() ? "\033[1;36m" : EMPTY_STRING;
-char const* const white = _terminal_.exists() ? "\033[1;37m" : EMPTY_STRING;
+HSequence const bold( "\033[1m" );
+HSequence const reset( "\033[0m" );
+HSequence const black( "\033[0;30m" );
+HSequence const red( "\033[0;31m" );
+HSequence const green( "\033[0;32m" );
+HSequence const brown( "\033[0;33m" );
+HSequence const blue( "\033[0;34m" );
+HSequence const magenta( "\033[0;35m" );
+HSequence const cyan( "\033[0;36m" );
+HSequence const lightgray( "\033[0;37m" );
+HSequence const gray( "\033[1;30m" );
+HSequence const brightred( "\033[1;31m" );
+HSequence const brightgreen( "\033[1;32m" );
+HSequence const yellow( "\033[1;33m" );
+HSequence const brightblue( "\033[1;34m" );
+HSequence const brightmagenta( "\033[1;35m" );
+HSequence const brightcyan( "\033[1;36m" );
+HSequence const white( "\033[1;37m" );
 
-char const* const home = _terminal_.exists() ? "\033[H" : EMPTY_STRING;
-char const* const up = _terminal_.exists() ? "\033[A" : EMPTY_STRING;
-char const* const down = _terminal_.exists() ? "\033[B" : EMPTY_STRING;
-char const* const left = _terminal_.exists() ? "\033[D" : EMPTY_STRING;
-char const* const right = _terminal_.exists() ? "\033[C" : EMPTY_STRING;
+HSequence const home( "\033[H" );
+HSequence const up( "\033[A" );
+HSequence const down( "\033[B" );
+HSequence const left( "\033[D" );
+HSequence const right( "\033[C" );
 
-char const* const save = _terminal_.exists() ? "\033[s" : EMPTY_STRING;
-char const* const restore = _terminal_.exists() ? "\033[u" : EMPTY_STRING;
+HSequence const save( "\033[s" );
+HSequence const restore( "\033[u" );
 
-char const* const clear = _terminal_.exists() ? "\033[2J" : EMPTY_STRING;
-char const* const clrtoeol = _terminal_.exists() ? "\033[K" : EMPTY_STRING;
+HSequence const clear( "\033[2J" );
+HSequence const clrtoeol( "\033[K" );
 
-char const* move( int row_, int col_ ) {
+HSequence move( int row_, int col_ ) {
 	static int const codeBufferSize( 32 );
 	static char code[codeBufferSize];
 	snprintf( code, codeBufferSize - 1, "\033[%d;%dH", row_, col_ );
 	return ( code );
 }
 
-char const* up_n( int by_ ) {
+HSequence up_n( int by_ ) {
 	static int const codeBufferSize( 16 );
 	static char code[codeBufferSize];
 	snprintf( code, codeBufferSize - 1, "\033[%dA", by_ );
 	return ( code );
 }
 
-char const* down_n( int by_ ) {
+HSequence down_n( int by_ ) {
 	static int const codeBufferSize( 16 );
 	static char code[codeBufferSize];
 	snprintf( code, codeBufferSize - 1, "\033[%dB", by_ );
 	return ( code );
 }
 
-char const* left_n( int by_ ) {
+HSequence left_n( int by_ ) {
 	static int const codeBufferSize( 16 );
 	static char code[codeBufferSize];
 	snprintf( code, codeBufferSize - 1, "\033[%dD", by_ );
 	return ( code );
 }
 
-char const* right_n( int by_ ) {
+HSequence right_n( int by_ ) {
 	static int const codeBufferSize( 16 );
 	static char code[codeBufferSize];
 	snprintf( code, codeBufferSize - 1, "\033[%dC", by_ );
 	return ( code );
+}
+
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream_, HSequence const& seq_ ) {
+	M_PROLOG
+	if ( is_a_tty( stream_ ) )
+		stream_ << *seq_;
+	return ( stream_ );
+	M_EPILOG
 }
 
 }

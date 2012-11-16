@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/hchunk.hxx"
 #include "hcore/hpair.hxx"
+#include "hcore/hstreaminterface.hxx"
 
 namespace yaal {
 
@@ -49,6 +50,9 @@ public:
 };
 
 extern HTerminal _terminal_;
+
+template<typename T>
+bool is_a_tty( T const& );
 
 }
 

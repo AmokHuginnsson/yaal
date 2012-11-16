@@ -45,7 +45,7 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "hterminal.hxx"
 #include "hconsole.hxx"
-#include "hcore/hrawfile.hxx"
+#include "hcore/hfile.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole;
@@ -128,6 +128,45 @@ HTerminal::coord_t HTerminal::size( void ) const {
 }
 
 HTerminal _terminal_;
+
+template<>
+bool is_a_tty( int const& fd_ ) {
+	return ( ::isatty( fd_ ) ? true : false );
+}
+
+template<>
+bool is_a_tty( FILE* const& file_ ) {
+	bool isTty( false );
+	if ( file_ == stdout )
+		isTty = ::isatty( STDOUT_FILENO ) ? true : false;
+	else if ( file_ == stderr )
+		isTty = ::isatty( STDERR_FILENO ) ? true : false;
+	else if ( file_ == stdin )
+		isTty = ::isatty( STDIN_FILENO ) ? true : false;
+	return ( isTty );
+}
+
+template<>
+bool is_a_tty( HStreamInterface const& stream_ ) {
+	bool isTty( false );
+	if ( ( &stream_ == &cout ) || ( &stream_ == &clog ) )
+		isTty = ::isatty( STDOUT_FILENO ) ? true : false;
+	else if ( &stream_ == &cerr )
+		isTty = ::isatty( STDERR_FILENO ) ? true : false;
+	else if ( &stream_ == &cin )
+		isTty = ::isatty( STDIN_FILENO ) ? true : false;
+	return ( isTty );
+}
+
+template<>
+bool is_a_tty( HSynchronizedStream const& stream_ ) {
+	return ( is_a_tty<HStreamInterface>( stream_ ) );
+}
+
+template<>
+bool is_a_tty( HFile const& stream_ ) {
+	return ( is_a_tty<HStreamInterface>( stream_ ) );
+}
 
 }
 

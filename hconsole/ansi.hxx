@@ -27,45 +27,66 @@ Copyright:
 #ifndef YAAL_HCONSOLE_ANSI_HXX_INCLUDED
 #define YAAL_HCONSOLE_ANSI_HXX_INCLUDED 1
 
+#include "hcore/hstreaminterface.hxx"
+
 namespace yaal {
 
 namespace ansi {
 
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const bold;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const reset;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const black;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const red;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const green;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brown;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const blue;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const magenta;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const cyan;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const lightgray;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const gray;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightred;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightgreen;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const yellow;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightblue;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightmagenta;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const brightcyan;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const white;
+class HSequence {
+public:
+	typedef HSequence this_type;
+private:
+	char const* const _data;
+public:
+	HSequence( char const* data_ )
+		: _data( data_ )
+		{}
+	HSequence( HSequence const& seq_ )
+		: _data( seq_._data ) { }
+	char const* operator* ( void ) const
+		{ return ( _data ); }
+private:
+	HSequence& operator = ( HSequence const& );
+};
 
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const up;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const down;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const left;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const right;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const bold;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const reset;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const black;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const red;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const green;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brown;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const blue;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const magenta;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const cyan;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const lightgray;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const gray;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brightred;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brightgreen;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const yellow;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brightblue;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brightmagenta;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brightcyan;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const white;
 
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const save;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const restore;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const up;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const down;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const left;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const right;
 
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const clear;
-extern M_YAAL_HCONSOLE_PUBLIC_API char const* const clrtoeol;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const save;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const restore;
 
-char const* move( int, int );
-char const* up_n( int );
-char const* down_n( int );
-char const* left_n( int );
-char const* right_n( int );
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const clear;
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const clrtoeol;
+
+HSequence move( int, int );
+HSequence up_n( int );
+HSequence down_n( int );
+HSequence left_n( int );
+HSequence right_n( int );
+
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, HSequence const& );
 
 }
 
