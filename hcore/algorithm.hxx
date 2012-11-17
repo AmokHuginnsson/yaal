@@ -37,6 +37,7 @@ Copyright:
 #include "hcore/iterator.hxx"
 #include "hcore/functional.hxx"
 #include "hcore/hauxiliarybuffer.hxx"
+#include "hcore/hrandomizer.hxx"
 
 namespace yaal {
 
@@ -1952,6 +1953,76 @@ inline iterator_t unique( iterator_t first_, iterator_t last_, compare_t comp_ )
 template<typename iterator_t>
 inline iterator_t unique( iterator_t first_, iterator_t last_ ) {
 	return ( unique( first_, last_, equal_to<typename hcore::iterator_traits<iterator_t>::value_type>() ) );
+}
+
+/*! \brief Randomly shuffle elements in range using given funcion as source of randomness.
+ *
+ * \param first_ - begining of range of elements to shuffle.
+ * \param last_ - one past the end of range of elements to shuffle.
+ * \param randomGenerator_ - random number generator used as source of randomness.
+ */
+template<typename iterator_t, typename generator_t>
+inline void random_shuffle( iterator_t first_, iterator_t last_, generator_t randomGenerator_ ) {
+	int long count( last_ - first_ );
+	while ( count > 1 ) {
+		int long idx( randomGenerator_( count ) );
+		M_ASSERT( ( idx >= 0 ) && ( idx < count ) );
+		-- count;
+		using yaal::swap;
+		if ( idx != count )
+			swap( *( first_ + idx ), *( first_ + count ) );
+	}
+	return;
+}
+
+/*! \brief Randomly shuffle elements in range.
+ *
+ * \param first_ - begining of range of elements to shuffle.
+ * \param last_ - one past the end of range of elements to shuffle.
+ */
+template<typename iterator_t>
+inline void random_shuffle( iterator_t first_, iterator_t last_ ) {
+	random_shuffle( first_, last_, hcore::randomizer_helper::make_randomizer() );
+	return;
+}
+
+/*! \brief Randomly copy subset of elements from one range onto another range using given funcion as source of randomness.
+ *
+ * \param srcFirst_ - begining of range of elements to copy from.
+ * \param srcLast_ - one past the end of range of elements to copy from.
+ * \param dstFirst_ - begining of range of elements to copy to.
+ * \param dstLast_ - one past the end of range of elements to copy to.
+ * \param randomGenerator_ - random number generator used as source of randomness.
+ */
+template<typename source_iterator_t, typename destination_iterator_t, typename generator_t>
+inline void random_sample( source_iterator_t srcFirst_, source_iterator_t srcLast_, destination_iterator_t dstFirst_, destination_iterator_t dstLast_, generator_t randomGenerator_ ) {
+	source_iterator_t src( srcFirst_ );
+	for ( destination_iterator_t it( dstFirst_ ); it != dstLast_; ++ it, ++ src )
+		*it = *src;
+	int long dstCount( dstLast_ - dstFirst_ );
+	int long srcTop( ( src - srcFirst_ ) + 1 );
+	while ( src != srcLast_ ) {
+		int long idx( randomGenerator_( srcTop ) );
+		if ( idx < dstCount )
+			*( dstFirst_ + idx ) = *src;
+		++ srcTop;
+		++ src;
+	}
+	return;
+}
+
+/*! \brief Randomly copy subset of elements from one range onto another range.
+ *
+ * \param srcFirst_ - begining of range of elements to copy from.
+ * \param srcLast_ - one past the end of range of elements to copy from.
+ * \param dstFirst_ - begining of range of elements to copy to.
+ * \param dstLast_ - one past the end of range of elements to copy to.
+ * \param randomGenerator_ - random number generator used as source of randomness.
+ */
+template<typename source_iterator_t, typename destination_iterator_t>
+inline void random_sample( source_iterator_t srcFirst_, source_iterator_t srcLast_, destination_iterator_t dstFirst_, destination_iterator_t dstLast_ ) {
+	random_sample( srcFirst_, srcLast_, dstFirst_, dstLast_, hcore::randomizer_helper::make_randomizer() );
+	return;
 }
 
 }
