@@ -250,6 +250,39 @@ select( iterator_t first_, iterator_t last_, int long kth_ ) {
 	M_EPILOG
 }
 
+template<typename iterator_t>
+void central_moving_average( iterator_t first_, iterator_t last_, iterator_t dst_, int long range_ ) {
+	M_ENSURE( range_ > 0 );
+	if ( range_ > 1 ) { /* for range == 1 moving average is a no-op */
+		typedef typename hcore::iterator_traits<iterator_t>::value_type value_type;
+		value_type sum = value_type();
+		iterator_t frontTracker_( first_ );
+		iterator_t backTracker_( first_ );
+		int long const rangeTotal( range_ * 2 - 1 );
+		int long valuesInSum( 0 );
+		for ( ; ( valuesInSum < range_ ) && ( frontTracker_ != last_ ); ++ valuesInSum, ++ frontTracker_ )
+			sum += *frontTracker_;
+		bool hadFullRange( false );
+		for ( ; first_ != last_; ++ first_, ++ dst_ ) {
+			*dst_ = sum / static_cast<value_type>( valuesInSum );
+			if ( valuesInSum == rangeTotal )
+				hadFullRange = true;
+			if ( hadFullRange ) {
+				sum -= *backTracker_;
+				++ backTracker_;
+			}
+			if ( frontTracker_ != last_ ) {
+				sum += *frontTracker_;
+				++ frontTracker_;
+				if ( valuesInSum < rangeTotal )
+					++ valuesInSum;
+			} else
+				-- valuesInSum;
+		}
+	}
+	return;
+}
+
 }
 
 }
