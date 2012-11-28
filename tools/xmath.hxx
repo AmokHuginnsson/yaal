@@ -283,6 +283,31 @@ void central_moving_average( iterator_t first_, iterator_t last_, iterator_t dst
 	return;
 }
 
+template<typename iterator_t>
+void moving_average( iterator_t first_, iterator_t last_, iterator_t dst_, int long range_ ) {
+	M_ENSURE( range_ > 0 );
+	if ( range_ > 1 ) { /* for range == 1 moving average is a no-op */
+		typedef typename hcore::iterator_traits<iterator_t>::value_type value_type;
+		value_type sum = value_type();
+		iterator_t backTracker_( first_ );
+		bool hadFullRange( false );
+		int long valuesInSum( 1 );
+		for ( ; first_ != last_; ++ first_, ++ dst_ ) {
+			sum += *first_;
+			*dst_ = sum / static_cast<value_type>( valuesInSum );
+			if ( valuesInSum == range_ )
+				hadFullRange = true;
+			if ( hadFullRange ) {
+				sum -= *backTracker_;
+				++ backTracker_;
+			}
+			if ( valuesInSum < range_ )
+				++ valuesInSum;
+		}
+	}
+	return;
+}
+
 }
 
 }
