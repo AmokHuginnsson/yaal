@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cmath>
+#include <cstring>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -48,9 +49,13 @@ u8_t _negMask_[] = {
 }
 
 void find_primes( primes_t& primes_, int long unsigned lowerLimit_, int long unsigned upperLimit_ ) {
+	M_PROLOG
+	M_ENSURE( upperLimit_ > lowerLimit_ );
 	primes_.clear();
-	HChunk mem( ( ( upperLimit_ >> 3 ) + 1 ) );
-	char* sieve( mem.get<char>() );
+	int long memSize( ( upperLimit_ >> 3 ) + 1 );
+	HChunk mem( memSize );
+	u8_t* sieve( mem.get<u8_t>() );
+	::memset( sieve, 0xff, memSize );
 	int long unsigned limit( static_cast<int long unsigned>( ::sqrt( static_cast<double>( upperLimit_ ) ) ) + 1 );
 	int long unsigned step( 0 );
 	for ( int long unsigned i( 2 ); i <= limit; ++ i ) {
@@ -79,12 +84,14 @@ void find_primes( primes_t& primes_, int long unsigned lowerLimit_, int long uns
 			}
 		}
 	}
-	for ( int long unsigned i( lowerLimit_ ); i <= upperLimit_; ++ i ) {
+	static int long unsigned const FIRST_PRIME( 2 );
+	for ( int long unsigned i( max( lowerLimit_, FIRST_PRIME ) ); i <= upperLimit_; ++ i ) {
 		if ( sieve[ i >> 3 ] & _mask_[ i & 0x07 ] ) {
 			primes_.push_back( i );
 		}
 	}
 	return;
+	M_EPILOG
 }
 
 }
