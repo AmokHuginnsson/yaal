@@ -32,7 +32,6 @@ Copyright:
 
 #include "hcore/base.hxx"
 #include "hcore/hstring.hxx"
-#include "hcore/hpattern.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
 
 namespace yaal {
@@ -56,18 +55,6 @@ iter_t find_local( iter_t it, iter_t end, pred_t pred ) {
 		pred( it );
 	return ( pred() );
 }
-
-struct EscapeTable {
-	static int const ESCAPE_TABLE_SIZE = 256;
-	char _rawToSafe[ESCAPE_TABLE_SIZE];
-	char _safeToRaw[ESCAPE_TABLE_SIZE];
-	EscapeTable( char const*, int, char const*, int );
-};
-
-void escape( yaal::hcore::HString&, EscapeTable const&, char = '\\' );
-void unescape( yaal::hcore::HString&, EscapeTable const&, char = '\\' );
-yaal::hcore::HString escape_copy( yaal::hcore::HString, EscapeTable const&, char = '\\' );
-yaal::hcore::HString unescape_copy( yaal::hcore::HString, EscapeTable const&, char = '\\' );
 yaal::hcore::HString kwota_slownie( double );
 void usun_ogonki( char* );
 double long atof_ex( yaal::hcore::HString const&, bool = false );
@@ -94,39 +81,6 @@ void show_help( void* );
 void dump_configuration( void* );
 
 void failure( int, char const* const, ... ) __attribute__(( __noreturn__, format( printf, 2, 3 ) ));
-
-/*! \brief Various convinient sleep functions.
- */
-namespace sleep {
-
-/*! \brief Suspend execution of current thread for given number of miliseconds.
- *
- * \param miliseconds - sleep that many miliseconds.
- * \param ignoreInterrupts - continue sleeping even if interrupted.
- * \return true iff sleep had been interrupted.
- */
-bool milisecond( int miliseconds, bool ignoreInterrupts = false );
-
-/*! \brief Suspend execution of current thread for given number of seconds.
- *
- * \param seconds - sleep that many miliseconds.
- * \param ignoreInterrupts - continue sleeping even if interrupted.
- * \return true iff sleep had been interrupted.
- */
-bool second( int seconds, bool ignoreInterrupts = false );
-
-}
-
-/*! \brief 3DES cropto algorithm functions.
- */
-namespace crypto {
-
-void crypt_3des( yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HString const& );
-void crypt_3des( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface&, yaal::hcore::HString const& );
-void decrypt_3des( yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HString const& );
-void decrypt_3des( yaal::hcore::HStreamInterface&, yaal::hcore::HStreamInterface&, yaal::hcore::HString const& );
-
-}
 
 /*! \brief The Levenshtein and Levenshtein-Damerau string distance functions.
  */
@@ -174,23 +128,6 @@ template<typename iter_t, typename item_t>
 HAlike<iter_t, item_t> alike( iter_t iter, item_t const& item, bool damerau = true ) {
 	return ( HAlike<iter_t, item_t>( iter, item, damerau ) );
 }
-
-}
-
-namespace filesystem {
-
-struct FILE_TYPE {
-	typedef enum {
-		REGULAR_FILE = 1,
-		DIRECTORY = 2,
-		ALL = REGULAR_FILE | DIRECTORY
-	} enum_t;
-};
-
-typedef yaal::hcore::HArray<yaal::hcore::HString> find_result;
-
-find_result find( yaal::hcore::HString const&, yaal::hcore::HPattern const&,
-		int = 0, int = meta::max_signed<int>::value, FILE_TYPE::enum_t = FILE_TYPE::ALL );
 
 }
 

@@ -29,7 +29,6 @@ Copyright:
 #include <cstring>
 #include <cctype>
 #include <cstdarg>
-#include <sys/time.h> /* timeval (for FreeBSD) */
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -40,11 +39,8 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "hcore/htokenizer.hxx"
 #include "hexpression.hxx"
 #include "hcore/hlog.hxx"
-#include "hdes.hxx"
 #include "xmath.hxx"
 #include "hcore/hrandomizer.hxx"
-#include "hcore/htls.hxx"
-#include "hfsitem.hxx"
 
 using namespace yaal::hcore;
 
@@ -138,89 +134,6 @@ char _koncowka_[][ 3 ][ 6 ] = {
 };
 
 HString _lastErrorMessage_;
-
-EscapeTable::EscapeTable( char const* raw_, int rawLen_, char const* safe_, int safeLen_ )
-	: _rawToSafe(), _safeToRaw() {
-	M_PROLOG
-	M_ASSERT( ( rawLen_ > 0 ) && ( safeLen_ == rawLen_ ) && raw_ && safe_ );
-	for ( int i( 0 ); i < EscapeTable::ESCAPE_TABLE_SIZE; ++ i ) {
-		_rawToSafe[i] = _safeToRaw[i] = static_cast<char>( i );
-	}
-	for ( int i( 0 ); i < rawLen_; ++ i ) {
-		_rawToSafe[static_cast<char unsigned>( raw_[i] )] = safe_[i];
-		_safeToRaw[static_cast<char unsigned>( safe_[i] )] = raw_[i];
-	}
-	return;
-	M_EPILOG
-}
-
-void escape( yaal::hcore::HString& string_, EscapeTable const& et_, char escape_ ) {
-	M_PROLOG
-	typedef HTLS<HChunk> cache_t;
-	static cache_t _cache_;
-	HChunk& cache( *_cache_ );
-	int cacheSize( static_cast<int>( cache.get_size() ) );
-	if ( string_.get_length() >= cacheSize ) {
-		cache.realloc( string_.get_length() );
-		cacheSize = static_cast<int>( cache.get_size() );
-	}
-	int pos( 0 );
-	char* ptr( cache.get<char>() );
-	for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
-		char ch( et_._rawToSafe[static_cast<char unsigned>( *it )] );
-		if ( ( pos + 1 ) >= cacheSize ) {
-			cache.realloc( cacheSize * 2 );
-			cacheSize = static_cast<int>( cache.get_size() );
-			ptr = cache.get<char>();
-		}
-		if ( ch != *it )
-			ptr[pos ++] = escape_;
-		ptr[ pos ] = ch;
-	}
-	string_.assign( ptr, pos );
-	return;
-	M_EPILOG
-}
-
-void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, char escape_ ) {
-	M_PROLOG
-	typedef HTLS<HChunk> cache_t;
-	static cache_t _cache_;
-	HChunk& cache( *_cache_ );
-	int cacheSize( static_cast<int>( cache.get_size() ) );
-	if ( string_.get_length() >= cacheSize ) {
-		cache.realloc( string_.get_length() );
-		cacheSize = static_cast<int>( cache.get_size() );
-	}
-	int pos( 0 );
-	char* ptr( cache.get<char>() );
-	for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
-		if ( *it == escape_ ) {
-			++ it;
-			if ( ! ( it != end ) )
-				break;
-			ptr[pos] = et_._safeToRaw[static_cast<char unsigned>( *it )];
-		} else
-			ptr[pos] = *it;
-	}
-	string_.assign( ptr, pos );
-	return;
-	M_EPILOG
-}
-
-HString escape_copy( yaal::hcore::HString string_, EscapeTable const& et_, char escape_ ) {
-	M_PROLOG
-	escape( string_, et_, escape_ );
-	return ( string_ );
-	M_EPILOG
-}
-
-HString unescape_copy( yaal::hcore::HString string_, EscapeTable const& et_, char escape_ ) {
-	M_PROLOG
-	unescape( string_, et_, escape_ );
-	return ( string_ );
-	M_EPILOG
-}
 
 HString kwota_slownie( double kwota_ ) {
 	M_PROLOG
@@ -658,31 +571,6 @@ void failure( int exitStatus_, char const* const format_, ... ) {
 	M_EPILOG
 }
 
-namespace sleep {
-
-inline bool sleep_real( timeval& time_, bool ignoreInterrrupt_ ) {
-	int err( 0 );
-	while ( ( ( err = ::select( 0, NULL, NULL, NULL, &time_ ) ) == -1 ) && ( errno == EINTR ) && ignoreInterrrupt_ )
-		;
-	return ( ( err != 0 ) && ! ( ( errno == EINTR ) && ignoreInterrrupt_ ) );
-}
-
-bool milisecond( int quantity_, bool ignoreInterrrupt_ ) {
-	timeval wait;
-	wait.tv_sec = quantity_ / 1000;
-	wait.tv_usec = ( quantity_ %  1000 ) * 1000;
-	return ( sleep_real( wait, ignoreInterrrupt_ ) );
-}
-
-bool second( int quantity_, bool ignoreInterrrupt_ ) {
-	timeval wait;
-	wait.tv_sec = quantity_;
-	wait.tv_usec = 0;
-	return ( sleep_real( wait, ignoreInterrrupt_ ) );
-}
-
-}
-
 namespace {
 int min3 ( int a, int b, int c ) {
 	int ret = c;
@@ -743,128 +631,6 @@ int levenshtein_damerau( yaal::hcore::HString const& one_, yaal::hcore::HString 
 	}
 	return ( distanceMatrix[ lengthOne ][ lengthTwo ] );
 	M_EPILOG
-}
-
-}
-
-namespace crypto {
-
-void crypt_3des( yaal::hcore::HStreamInterface::ptr_t src_, yaal::hcore::HStreamInterface::ptr_t dst_, HString const& key_ ) {
-	M_PROLOG
-	crypt_3des( *src_, *dst_, key_ );
-	return;
-	M_EPILOG
-}
-
-void crypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInterface& dst_, HString const& key_ ) {
-	M_PROLOG
-	static int const BUF_SIZE( 128 );
-	HChunk buf( BUF_SIZE );
-	HDes des( key_ );
-	HRandomizer r;
-	int long const toRead( buf.get_size() );
-	M_ASSERT( toRead == BUF_SIZE );
-	char gap( 0 );
-	int long nRead( 0 );
-	while ( ( nRead = src_.read( buf.raw(), toRead ) ) > 0 ) {
-		gap = static_cast<char>( nRead % 8 );
-		if ( gap ) {
-			gap = static_cast<char>( 8 - gap );
-			generate_n( buf.get<char>() + nRead, gap, randomizer_helper::make_randomizer( 255 ) );
-		}
-		int long toWrite( nRead + gap );
-		M_ASSERT( toWrite <= toRead );
-		des.crypt( buf.get<u8_t>(), toWrite, HDes::CRYPT );
-		dst_.write( buf.raw(), toWrite );
-	}
-	dst_.write( &gap, 1 );
-	return;
-	M_EPILOG
-}
-
-void decrypt_3des( yaal::hcore::HStreamInterface::ptr_t src_, yaal::hcore::HStreamInterface::ptr_t dst_, yaal::hcore::HString const& key_ ) {
-	M_PROLOG
-	decrypt_3des( *src_, *dst_, key_ );
-	return;
-	M_EPILOG
-}
-
-void decrypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInterface& dst_, yaal::hcore::HString const& key_ ) {
-	M_PROLOG
-	static int const BUF_SIZE( 128 );
-	HChunk bufA( BUF_SIZE );
-	HChunk bufB( BUF_SIZE );
-	HDes des( key_ );
-	int long const toRead( bufA.get_size() );
-	M_ASSERT( toRead == BUF_SIZE );
-	M_ASSERT( bufB.get_size() == BUF_SIZE );
-	char gap( 0 );
-	int long nRead( 0 );
-	int long toWrite( 0 );
-	char* readBuf( bufA.get<char>() );
-	char* writeBuf( bufB.get<char>() );
-	while ( ( ( nRead = src_.read( readBuf, toRead ) ) > 0 ) || ( toWrite > 0 ) ) {
-		/* There are 3 cases for non-malformed encrypted data:
-		 * 1 - we read only full blocks
-		 * 2 - we read only gap
-		 * 3 - we read both data (some full blocks) and the gap
-		 */
-		if ( nRead > 0 ) {
-			gap = static_cast<char>( nRead % 8 );
-			if ( gap ) {
-				M_ENSURE_EX( gap == 1, "malformed encrypted packet" );
-				-- nRead;
-				gap = readBuf[ nRead ];
-				M_ENSURE_EX( ( gap >= 0 ) && ( gap < 8 ) && ( toWrite > 0 ? ( gap <= toWrite ) : ( gap <= nRead ) ), "malformed gap" );
-			}
-			toWrite -= ( nRead > 0 ? 0 /* full blocks from previous read */ : gap /* only gap has been read */ );
-			if ( toWrite > 0 )
-				dst_.write( writeBuf, toWrite );
-			toWrite = nRead;
-			M_ASSERT( ! ( toWrite % 8 ) );
-			if ( toWrite > 0 )
-				des.crypt( reinterpret_cast<u8_t*>( readBuf ), toWrite, HDes::DECRYPT );
-			toWrite -= gap;
-			swap( readBuf, writeBuf );
-		} else if ( toWrite > 0 ) {
-			dst_.write( writeBuf, toWrite );
-			toWrite = 0;
-		}
-	}
-	return;
-	M_EPILOG
-}
-
-}
-
-namespace filesystem {
-
-find_result find( yaal::hcore::HString const& in, yaal::hcore::HPattern const& pattern_,
-		int minDepth_, int maxDepth_, FILE_TYPE::enum_t fileType_ ) {
-	find_result result;
-	HFSItem p( in );
-	if ( !! p ) {
-		if ( p.is_file() ) {
-			if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::REGULAR_FILE ) && pattern_.matches( in ) ) {
-				result.push_back( in );
-			}
-		} else if ( p.is_directory() ) {
-			for ( HFSItem::HIterator it( p.begin() ), end( p.end() ); it != end; ++ it ) {
-				if ( it->is_file() ) {
-					if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::REGULAR_FILE ) && pattern_.matches( it->get_path() ) )
-						result.push_back( it->get_path() );
-				} else if ( it->is_directory() ) {
-					if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::DIRECTORY ) && pattern_.matches( it->get_path() ) )
-						result.push_back( it->get_path() );
-					if ( maxDepth_ > 0 ) {
-						find_result sub( find( it->get_path(), pattern_, minDepth_ > 0 ? minDepth_ - 1 : 0, maxDepth_ - 1 ) );
-						result.insert( result.end(), sub.begin(), sub.end() );
-					}
-				}
-			}
-		}
-	}
-	return ( result );
 }
 
 }
