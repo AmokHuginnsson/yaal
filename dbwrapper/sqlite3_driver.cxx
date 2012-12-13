@@ -77,8 +77,8 @@ private:
 	OSQLiteResult& operator = ( OSQLiteResult const& );
 };
 
-void* yaal_sqlite3_db_query( ODBLink&, char const* );
-void yaal_sqlite3_rs_unquery( void* );
+void* yaal_sqlite3_db_fetch_query_result( ODBLink&, char const* );
+void yaal_sqlite3_rs_free_query_result( void* );
 void yaal_sqlite3_db_disconnect( ODBLink& );
 
 /* sqlite driver uses convention that database file name should have
@@ -106,9 +106,9 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 		if ( sQLite->_errorCode )
 			sQLite->_errorMessage = ::sqlite3_errmsg( sQLite->_dB );
 		else {
-			void* ptr( yaal_sqlite3_db_query( dbLink_, "PRAGMA empty_result_callbacks = ON;" ) );
+			void* ptr( yaal_sqlite3_db_fetch_query_result( dbLink_, "PRAGMA empty_result_callbacks = ON;" ) );
 			if ( ptr ) {
-				yaal_sqlite3_rs_unquery( ptr );
+				yaal_sqlite3_rs_free_query_result( ptr );
 				dbLink_._valid = true;
 			}
 		}
@@ -163,7 +163,7 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 	return ( msg );
 }
 
-void* yaal_sqlite3_db_query( ODBLink& dbLink_, char const* query_ ) {
+void* yaal_sqlite3_db_fetch_query_result( ODBLink& dbLink_, char const* query_ ) {
 	OSQLite* sQLite( static_cast<OSQLite*>( dbLink_._conn ) );
 	OSQLiteResult* result( new ( memory::yaal ) OSQLiteResult );
 	result->_columns = 0;
@@ -176,21 +176,21 @@ void* yaal_sqlite3_db_query( ODBLink& dbLink_, char const* query_ ) {
 	result->_errorMessage = errmsg;
 	return ( result );
 }
-M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
-M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink&, char const* );
+M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
-	return ( yaal_sqlite3_db_query( dbLink_, query_ ) );
+	return ( yaal_sqlite3_db_fetch_query_result( dbLink_, query_ ) );
 }
 
-void yaal_sqlite3_rs_unquery( void* data_ ) {
+void yaal_sqlite3_rs_free_query_result( void* data_ ) {
 	OSQLiteResult* pr = static_cast<OSQLiteResult*>( data_ );
 	sqlite3_free_table( pr->_data );
 	M_SAFE( delete pr );
 	return;
 }
-M_EXPORT_SYMBOL void rs_unquery( void* );
-M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
-	yaal_sqlite3_rs_unquery( data_ );
+M_EXPORT_SYMBOL void rs_free_query_result( void* );
+M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
+	yaal_sqlite3_rs_free_query_result( data_ );
 }
 
 M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );

@@ -40,8 +40,6 @@ namespace yaal {
 
 namespace dbwrapper {
 
-char _eMode_ [ ] = "record set is not in appropriate mode for operation";
-
 HRecordSet::HRecordSet( database_ptr_t dataBase_,
 		ODBConnector const* connector_, void* reuslt_ )
 	: _dataBase( dataBase_ ), _connector( connector_ ),
@@ -65,7 +63,7 @@ HRecordSet::~HRecordSet ( void ) {
 void HRecordSet::clear( void ) {
 	M_PROLOG
 	if ( _result )
-		(_connector->rs_unquery)( _result );
+		(_connector->rs_free_query_result)( _result );
 	_result = NULL;
 	M_EPILOG
 }
@@ -104,6 +102,16 @@ int HRecordSet::get_errno( void ) const {
 	M_EPILOG
 }
 
+HRecordSet::value_t HRecordSet::get( int cursor_, int field_ ) {
+	M_PROLOG
+	char const* valRaw( (_connector->rs_get)( _result, cursor_, field_ ) );
+	value_t value;
+	if ( valRaw )
+		value = value_t( valRaw );
+	return ( value );
+	M_EPILOG
+}
+
 HRecordSet::iterator HRecordSet::begin( void ) {
 	return ( iterator( this, 0 ) );
 }
@@ -118,178 +126,6 @@ HRecordSet::iterator HRecordSet::rbegin( void ) {
 
 HRecordSet::iterator HRecordSet::rend( void ) {
 	return ( iterator( this, -1 ) );
-}
-
-HSQLDescriptor::HSQLDescriptor( void )
-	: _mode( MODE::SELECT ), _varTmpBuffer(), _SQL(), _table(),
-	_columns ( "*" ), _filter(), _sort(), _fields(), _fieldCount( 0 ),
-	_setSize( 0 ), _values(), _dataBase(), _mutated() {
-	return;
-}
-
-HSQLDescriptor::HSQLDescriptor( database_ptr_t dataBase_ )
-	: _mode( MODE::SELECT ), _varTmpBuffer(), _SQL(), _table(),
-	_columns ( "*" ), _filter(), _sort(), _fields(), _fieldCount( 0 ),
-	_setSize( 0 ), _values(), _dataBase( dataBase_ ), _mutated() {
-	return;
-}
-
-HSQLDescriptor::~HSQLDescriptor( void ) {
-}
-
-HString const& HSQLDescriptor::build_sql( MODE::mode_t const& mode_ ) {
-	M_PROLOG
-	_varTmpBuffer = "";
-	switch ( mode_ ) {
-		case ( MODE::SELECT ): {
-			_SQL.format( "SELECT %s FROM %s", _columns.raw(),
-					_table.raw() );
-			if ( ! _filter.is_empty() )
-				_SQL += ( " WHERE " + _filter );
-			if ( ! _sort.is_empty() )
-				_SQL += ( " ORDER BY " + _sort );
-			_SQL += ';';
-		}
-		break;
-		case ( MODE::UPDATE ): {
-			_SQL = "UPDATE " + _table + " SET ";
-			M_ENSURE( _fields.get_size() == _values.get_size() );
-			int long const size = _values.get_size();
-			bool hasField = false;
-			for ( int i = 0; i < size; ++ i ) {
-				if ( _mutated[ i ] ) {
-					if ( hasField )
-						_SQL += ", ";
-					hasField = true;
-					_SQL += _fields[ i ];
-					if ( _values[ i ] ) {
-						_SQL += " = '";
-						_SQL += *_values[ i ];
-						_SQL += "'";
-					} else
-						_SQL += " = NULL";
-				}
-			}
-			if ( ! _filter.is_empty() ) {
-				_SQL += " WHERE ";
-				_SQL += _filter;
-			}
-			_SQL += ';';
-		}
-		break;
-		case ( MODE::INSERT ): {
-			_SQL = "INSERT INTO " + _table + " ( ";
-			M_ENSURE( _fields.get_size() == _values.get_size() );
-			int long const size = _fields.get_size();
-			for ( int i = 0; i < size; ++ i ) {
-				if ( i > 0 )
-					_SQL += ", ";
-				_SQL += _fields[ i ];
-			}
-			_SQL += " ) VALUES ( ";
-			for ( int i = 0; i < size; ++ i ) {
-				if ( i > 0 )
-					_SQL += ", ";
-				_SQL += "'";
-				_SQL += _fields[ i ];
-				_SQL += "'";
-			}
-			_SQL += " );";
-		}
-		break;
-		case ( MODE::DELETE ): {
-			_SQL = "DELETE FROM ";
-			_SQL += _table;
-			if ( ! _filter.is_empty() ) {
-				_SQL += " WHERE ";
-				_SQL += _filter;
-			}
-			_SQL += ";";
-		}
-		break;
-		default :
-			M_THROW( _eMode_, mode_ );
-		break;
-	}
-	_mode = mode_;
-	return ( _SQL );
-	M_EPILOG
-}
-
-void HSQLDescriptor::sync( int field_, HString& value ) {
-	M_PROLOG
-	if ( _mode == MODE::SELECT ) {
-		if ( _values[ field_ ] )
-			value = *_values[ field_ ];
-		else
-			value.clear();
-	} else
-		_values[ field_ ] = value;
-	M_EPILOG
-}
-
-void HSQLDescriptor::sync( int field_, int long& value ) {
-	M_PROLOG
-	if ( _mode == MODE::SELECT ) {
-		if ( _values[ field_ ] )
-			value = lexical_cast<int long>( *_values[ field_ ] );
-		else
-			value = 0;
-	} else
-		_values[ field_ ] = HRecordSet::value_t( value );
-	M_EPILOG
-}
-
-void HSQLDescriptor::set_table( yaal::hcore::HString const& table_ ) {
-	M_PROLOG
-	_table = table_;
-	return;
-	M_EPILOG
-}
-
-void HSQLDescriptor::set_columns( yaal::hcore::HString const& columns_ ) {
-	M_PROLOG
-	_columns = columns_;
-	return;
-	M_EPILOG
-}
-
-void HSQLDescriptor::set_filter( yaal::hcore::HString const& filter_ ) {
-	M_PROLOG
-	_filter = filter_;
-	return;
-	M_EPILOG
-}
-
-void HSQLDescriptor::set_sort( yaal::hcore::HString const& sort_ ) {
-	M_PROLOG
-	_sort = sort_;
-	return;
-	M_EPILOG
-}
-
-HString HSQLDescriptor::get_table( void ) const {
-	return ( _table );
-}
-
-HString HSQLDescriptor::get_columns( void ) const {
-	return ( _columns );
-}
-
-HString HSQLDescriptor::get_filter( void ) const {
-	return ( _filter );
-}
-
-HString HSQLDescriptor::get_sort( void ) const {
-	return ( _sort );
-}
-
-HSQLDescriptor::MODE::mode_t HSQLDescriptor::get_mode( void ) const {
-	return ( _mode );
-}
-
-int long HSQLDescriptor::get_size( void ) const {
-	return ( _setSize );
 }
 
 HRecordSet::HIterator::HIterator( HRecordSet* owner_, int long position_ )
@@ -347,53 +183,6 @@ HRecordSet::value_t HRecordSet::HIterator::operator[] ( int field_ ) const {
 	if ( valRaw )
 		value = value_t( valRaw );
 	return ( value );
-	M_EPILOG
-}
-
-HRecordSet::ptr_t HSQLDescriptor::execute( void ) {
-	M_PROLOG
-	HRecordSet::ptr_t rs = _dataBase->query( _SQL );
-	_fieldCount = rs->get_field_count();
-	if ( _fields.get_size() != _fieldCount ) {
-		_fields = fields_t( _fieldCount );
-		_values = values_t( _fieldCount );
-		_mutated = mutated_t( _fieldCount );
-	}
-	for ( int ctr = 0; ctr < _fieldCount; ++ ctr ) {
-		_fields[ ctr ] = rs->get_column_name( ctr );
-		_mutated[ ctr ] = false;
-	}
-	_setSize = rs->get_size();
-	return ( rs );
-	M_EPILOG
-}
-
-HRecordSet::ptr_t HSQLDescriptor::execute( MODE::mode_t const& mode_ ) {
-	M_PROLOG
-	build_sql( mode_ );
-	return ( execute() );
-	M_EPILOG
-}
-
-HRecordSet::ptr_t HSQLDescriptor::execute( char const* const query_ ) {
-	M_PROLOG
-	_SQL = query_;
-	return ( execute() );
-	M_EPILOG
-}
-
-void HSQLDescriptor::sync( HRecordSet::iterator const& it ) {
-	M_PROLOG
-	for ( int ctr = 0; ctr < _fieldCount; ++ ctr )
-		_values[ ctr ] = it[ ctr ];
-	M_EPILOG
-}
-
-HRecordSet::value_t& HSQLDescriptor::operator[]( int column_ ) {
-	M_PROLOG
-	M_ASSERT( ( column_ >= 0 ) && ( column_ <= _fieldCount ) );
-	_mutated[ column_ ] = true;
-	return ( _values[ column_ ] );
 	M_EPILOG
 }
 

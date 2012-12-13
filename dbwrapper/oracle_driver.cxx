@@ -106,7 +106,7 @@ private:
 };
 
 void yaal_oracle_db_disconnect( ODBLink& );
-void yaal_oracle_rs_unquery( void* );
+void yaal_oracle_rs_free_query_result( void* );
 char const* yaal_oracle_rs_get( void*, int long, int );
 
 M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
@@ -211,7 +211,7 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* ) {
 
 namespace {
 
-void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
+void* yaal_oracle_db_fetch_query_result( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	OOracle* oracle( static_cast<OOracle*>( dbLink_._conn ) );
 	OQuery* queryObj( new OQuery( &oracle->_status ) );
@@ -226,7 +226,7 @@ void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 	if ( ( oracle->_status != OCI_SUCCESS )
 			&& ( oracle->_status != OCI_SUCCESS_WITH_INFO ) ) {
 		log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to prepare statement." << endl;
-		yaal_oracle_rs_unquery( queryObj );
+		yaal_oracle_rs_free_query_result( queryObj );
 		queryObj = NULL;
 	} else {
 		if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
@@ -331,7 +331,7 @@ void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 		}
 		if ( fail ) {
 			log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to execute statement." << endl;
-			yaal_oracle_rs_unquery( queryObj );
+			yaal_oracle_rs_free_query_result( queryObj );
 			queryObj = NULL;
 		}
 	}
@@ -339,12 +339,12 @@ void* yaal_oracle_db_query( ODBLink& dbLink_, char const* query_ ) {
 }
 
 }
-M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
-M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
-	return ( yaal_oracle_db_query( dbLink_, query_ ) );
+M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink&, char const* );
+M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query_ ) {
+	return ( yaal_oracle_db_fetch_query_result( dbLink_, query_ ) );
 }
 
-void yaal_oracle_rs_unquery( void* data_ ) {
+void yaal_oracle_rs_free_query_result( void* data_ ) {
 	OQuery* query( static_cast<OQuery*>( data_ ) );
 	if ( ( ( *query->_status ) == OCI_SUCCESS )
 			|| ( ( *query->_status ) == OCI_SUCCESS_WITH_INFO ) )
@@ -356,9 +356,9 @@ void yaal_oracle_rs_unquery( void* data_ ) {
 	delete query;
 	return;
 }
-M_EXPORT_SYMBOL void rs_unquery( void* );
-M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
-	yaal_oracle_rs_unquery( data_ );
+M_EXPORT_SYMBOL void rs_free_query_result( void* );
+M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
+	yaal_oracle_rs_free_query_result( data_ );
 }
 
 char const* yaal_oracle_rs_get( void* data_, int long row_, int column_ ) {
@@ -410,9 +410,9 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
-	OQuery* autonumber( static_cast<OQuery*>( yaal_oracle_db_query( dbLink_, "SELECT SYS_CONTEXT( 'CLIENTCONTEXT', 'LAST_INSERT_ID' ) FROM dual" ) ) );
+	OQuery* autonumber( static_cast<OQuery*>( yaal_oracle_db_fetch_query_result( dbLink_, "SELECT SYS_CONTEXT( 'CLIENTCONTEXT', 'LAST_INSERT_ID' ) FROM dual" ) ) );
 	int long id( strtol( yaal_oracle_rs_get( autonumber, 0, 0 ), NULL, 10 ) );
-	yaal_oracle_rs_unquery( autonumber );
+	yaal_oracle_rs_free_query_result( autonumber );
 	return ( id );
 }
 

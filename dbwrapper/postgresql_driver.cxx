@@ -104,14 +104,14 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 	return ( result_ ? ::PQresultErrorMessage( static_cast<PGresult*>( result_ ) ) : ::PQerrorMessage( static_cast<PGconn*>( dbLink_._conn ) ) );
 }
 
-M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
-M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink&, char const* );
+M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	return ( PQexec( static_cast<PGconn*>( dbLink_._conn ), query_ ) );
 }
 
-M_EXPORT_SYMBOL void rs_unquery( void* );
-M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
+M_EXPORT_SYMBOL void rs_free_query_result( void* );
+M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 	PQclear( static_cast<PGresult*>( data_ ) );
 	return;
 }

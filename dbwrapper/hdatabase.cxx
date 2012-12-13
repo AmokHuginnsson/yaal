@@ -73,7 +73,7 @@ HRecordSet::ptr_t HDataBase::query( HString const& query_ ) {
 		M_THROW( "not connected to database", errno );
 	if ( HLog::_logMask & LOG_TYPE::SQL )
 		log << "SQL: " << query_ << endl;
-	void* result = (_connector->db_query)( _dbLink, query_.raw() );
+	void* result = (_connector->db_fetch_query_result)( _dbLink, query_.raw() );
 	if ( (_connector->dbrs_errno)( _dbLink, result ) )
 		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dbLink, result ) );
 	return ( make_pointer<HRecordSet>( get_pointer(), _connector, result ) );

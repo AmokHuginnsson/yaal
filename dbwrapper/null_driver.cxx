@@ -52,11 +52,11 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& /*dbLink_*/, void* /*data
 	return ( "" );
 }
 
-M_EXPORT_SYMBOL void* db_query( ODBLink& /*dbLink_*/, char const* /*query_*/ ) {
+M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& /*dbLink_*/, char const* /*query_*/ ) {
 	return ( NULL );
 }
 
-M_EXPORT_SYMBOL void rs_unquery( void* /*data_*/ ) {
+M_EXPORT_SYMBOL void rs_free_query_result( void* /*data_*/ ) {
 	return;
 }
 

@@ -96,15 +96,15 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* ) {
 	return ( ::mysql_error( static_cast<MYSQL*>( dbLink_._conn ) ) );
 }
 
-M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
-M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink&, char const* );
+M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	mysql_query( static_cast<MYSQL*>( dbLink_._conn ), query_ );
 	return ( mysql_store_result( static_cast<MYSQL*>( dbLink_._conn ) ) );
 }
 
-M_EXPORT_SYMBOL void rs_unquery( void* );
-M_EXPORT_SYMBOL void rs_unquery( void* data_ ) {
+M_EXPORT_SYMBOL void rs_free_query_result( void* );
+M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 	mysql_free_result( static_cast<MYSQL_RES*>( data_ ) );
 	return;
 }

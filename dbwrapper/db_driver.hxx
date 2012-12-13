@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	db_driver_loader.hxx - this file is integral part of `yaal' project.
+	db_driver.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -82,8 +82,8 @@ struct ODBConnector {
 	db_disconnect_t db_disconnect;
 	dbrs_errno_t dbrs_errno;
 	dbrs_error_t dbrs_error;
-	db_query_t db_query;
-	rs_unquery_t rs_unquery;
+	db_query_t db_fetch_query_result;
+	rs_unquery_t rs_free_query_result;
 	rs_get_t rs_get;
 	rs_fields_count_t rs_fields_count;
 	dbrs_records_count_t dbrs_records_count;

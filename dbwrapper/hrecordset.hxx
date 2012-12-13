@@ -63,6 +63,7 @@ public:
 	iterator end( void );
 	iterator rbegin( void );
 	iterator rend( void );
+	value_t get( int, int );
 	bool is_empty( void ) const;
 	int get_field_count( void ) const;
 	int long get_size( void ) const;
@@ -95,67 +96,7 @@ private:
 	friend class HRecordSet;
 };
 
-/*! \brief Build a SQL query based on user supplied meta-data.
- */
-class HSQLDescriptor {
-public:
-	typedef HSQLDescriptor this_type;
-	typedef yaal::hcore::HPointer<this_type> ptr_t;
-	/*! \brief Query types.
-	 */
-	struct MODE {
-		/*! \brief Query types.
-		 */
-		typedef enum {
-			SELECT, /*!< SELECT query. */
-			UPDATE, /*!< Data update query. */
-			INSERT, /*!< INSERT new data query. */
-			DELETE  /*!< DELETER data query. */
-		} mode_t;
-	};
-private:
-	MODE::mode_t _mode;
-	yaal::hcore::HString _varTmpBuffer;
-	yaal::hcore::HString _SQL;
-	yaal::hcore::HString _table;			/* table name */
-	yaal::hcore::HString _columns;		/* columns that should be returned by next query */
-	yaal::hcore::HString _filter;		/* additional constant filter (WHERE clause) */
-	yaal::hcore::HString _sort;			/* additional constant sort (ORDER BY clause) */
-	typedef yaal::hcore::HArray<yaal::hcore::HString> fields_t;
-	typedef HRecordSet::values_t values_t;
-	typedef yaal::hcore::HArray<bool> mutated_t;
-	fields_t _fields;
-	int _fieldCount;		/* number of columns returned by last query */
-	int long _setSize;		/* number of records returned by last query */
-	values_t _values;
-	database_ptr_t _dataBase;
-	mutated_t _mutated;
-public:
-	HSQLDescriptor( void );
-	HSQLDescriptor( yaal::dbwrapper::database_ptr_t );
-	virtual ~HSQLDescriptor( void );
-	void set_table( yaal::hcore::HString const& );
-	void set_columns( yaal::hcore::HString const& );
-	void set_filter( yaal::hcore::HString const& );
-	void set_sort( yaal::hcore::HString const& );
-	yaal::hcore::HString get_table( void ) const;
-	yaal::hcore::HString get_columns( void ) const;
-	yaal::hcore::HString get_filter( void ) const;
-	yaal::hcore::HString get_sort( void ) const;
-	MODE::mode_t get_mode( void ) const;
-	int long get_size( void ) const;
-	void sync( int, int long& );
-	void sync( int, yaal::hcore::HString& );
-	void sync( HRecordSet::iterator const& );
-	HRecordSet::value_t& operator[]( int );
-	yaal::hcore::HString const& build_sql( MODE::mode_t const& );
-	HRecordSet::ptr_t execute( MODE::mode_t const& );
-	HRecordSet::ptr_t execute( char const* const );
-	HRecordSet::ptr_t execute( void );
-};
-
 typedef yaal::hcore::HExceptionT<HRecordSet> HRecordSetException;
-typedef yaal::hcore::HExceptionT<HSQLDescriptor> HSQLDescriptorException;
 
 }
 

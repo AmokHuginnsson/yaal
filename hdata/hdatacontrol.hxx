@@ -27,7 +27,7 @@ Copyright:
 #ifndef YAAL_HDATA_HDATACONTROL_HXX_INCLUDED
 #define YAAL_HDATA_HDATACONTROL_HXX_INCLUDED 1
 
-#include "dbwrapper/hrecordset.hxx"
+#include "dbwrapper/hsqldescriptor.hxx"
 #include "hconsole/hcontrol.hxx"
 #include "hdata/oresource.hxx"
 
