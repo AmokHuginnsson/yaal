@@ -67,16 +67,16 @@ void HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HSt
 	M_EPILOG
 }
 
-HRecordSet::ptr_t HDataBase::query( HString const& query_ ) {
+HRecordSet::ptr_t HDataBase::query( HString const& query_, HRecordSet::CURSOR::cursor_t cursor_ ) {
 	M_PROLOG
 	if ( ! _dbLink._valid )
 		M_THROW( "not connected to database", errno );
 	if ( HLog::_logMask & LOG_TYPE::SQL )
 		log << "SQL: " << query_ << endl;
-	void* result = (_connector->db_fetch_query_result)( _dbLink, query_.raw() );
+	void* result( cursor_ == HRecordSet::CURSOR::RANDOM_ACCESS ? (_connector->db_fetch_query_result)( _dbLink, query_.raw() ) : (_connector->db_query)( _dbLink, query_.raw() ) );
 	if ( (_connector->dbrs_errno)( _dbLink, result ) )
 		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dbLink, result ) );
-	return ( make_pointer<HRecordSet>( get_pointer(), _connector, result ) );
+	return ( make_pointer<HRecordSet>( get_pointer(), _connector, result, cursor_ ) );
 	M_EPILOG
 }
 

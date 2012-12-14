@@ -60,7 +60,23 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* /*data_*/ ) {
 	return;
 }
 
+M_EXPORT_SYMBOL void* db_query( ODBLink& /*dbLink_*/, char const* /*query_*/ ) {
+	return ( NULL );
+}
+
+M_EXPORT_SYMBOL void rs_free_cursor( void* /*data_*/ ) {
+	return;
+}
+
 M_EXPORT_SYMBOL char const* rs_get( void* /*data_*/, int long /*row_*/, int /*column_*/ ) {
+	return ( NULL );
+}
+
+M_EXPORT_SYMBOL bool rs_next( void* ) {
+	return;
+}
+
+M_EXPORT_SYMBOL char const* rs_get_field( void*, int ) {
 	return ( NULL );
 }
 

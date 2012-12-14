@@ -64,9 +64,10 @@ public:
 	/*! \brief Run given query on database connection.
 	 *
 	 * \param query_ - query to be executed.
+	 * \param cursor_ - query result cursor type.
 	 * \return Result set for given query.
 	 */
-	HRecordSet::ptr_t query( yaal::hcore::HString const& query_ );
+	HRecordSet::ptr_t query( yaal::hcore::HString const& query_, HRecordSet::CURSOR::cursor_t cursor_ = HRecordSet::CURSOR::RANDOM_ACCESS );
 	/*! \brief Get error messege for last error that occurred on this connection.
 	 *
 	 * \return Error message for last error that occurred.

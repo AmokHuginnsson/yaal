@@ -361,6 +361,16 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 	yaal_oracle_rs_free_query_result( data_ );
 }
 
+M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
+M_EXPORT_SYMBOL void* db_query( ODBLink& /*dbLink_*/, char const* /*query_*/ ) {
+	return ( NULL );
+}
+
+M_EXPORT_SYMBOL void rs_free_cursor( void* );
+M_EXPORT_SYMBOL void rs_free_cursor( void* /*data_*/ ) {
+	return;
+}
+
 char const* yaal_oracle_rs_get( void* data_, int long row_, int column_ ) {
 	OQuery* query( static_cast<OQuery*>( data_ ) );
 	OQuery::OFieldInfo& fi( query->_fieldInfos[column_] );
@@ -374,6 +384,16 @@ char const* yaal_oracle_rs_get( void* data_, int long row_, int column_ ) {
 M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	return ( yaal_oracle_rs_get( data_, row_, column_ ) );
+}
+
+M_EXPORT_SYMBOL bool rs_next( void* );
+M_EXPORT_SYMBOL bool rs_next( void* ) {
+	return ( true );
+}
+
+M_EXPORT_SYMBOL char const* rs_get_field( void*, int );
+M_EXPORT_SYMBOL char const* rs_get_field( void*, int ) {
+	return ( NULL );
 }
 
 M_EXPORT_SYMBOL int rs_fields_count( void* );

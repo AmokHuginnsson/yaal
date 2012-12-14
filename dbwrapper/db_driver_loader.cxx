@@ -101,16 +101,30 @@ char const* null_dbrs_error( ODBLink const&, void* ) {
 	M_EPILOG
 }
 
-void* null_db_query( ODBLink&, char const* ) {
+void* null_db_fetch_query_result( ODBLink&, char const* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "db_fetch_query_result" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 }
 
-void null_rs_unquery( void* ) {
+void null_rs_free_query_result( void* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "db_unquery" << eend << endl;
+	log( LOG_TYPE::ERROR ) << etag << "rs_free_query_result" << eend << endl;
+	return;
+	M_EPILOG
+}
+
+void* null_db_query( ODBLink&, char const* ) {
+	M_PROLOG
+	log( LOG_TYPE::ERROR ) << etag << "db_query" << eend << endl;
+	return ( NULL );
+	M_EPILOG
+}
+
+void null_rs_free_cursor( void* ) {
+	M_PROLOG
+	log( LOG_TYPE::ERROR ) << etag << "rs_free_cursor" << eend << endl;
 	return;
 	M_EPILOG
 }
@@ -118,6 +132,20 @@ void null_rs_unquery( void* ) {
 char const* null_rs_get( void*, int long, int ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "rs_get" << eend << endl;
+	return ( NULL );
+	M_EPILOG
+}
+
+bool null_rs_next( void* ) {
+	M_PROLOG
+	log( LOG_TYPE::ERROR ) << etag << "rs_next" << eend << endl;
+	return ( true );
+	M_EPILOG
+}
+
+char const* null_rs_get_field( void*, int ) {
+	M_PROLOG
+	log( LOG_TYPE::ERROR ) << etag << "rs_get_field" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 }
@@ -184,7 +212,11 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 			driver.first->resolve( SYMBOL_PREFIX"dbrs_error", driver.second.dbrs_error );
 			driver.first->resolve( SYMBOL_PREFIX"db_fetch_query_result", driver.second.db_fetch_query_result );
 			driver.first->resolve( SYMBOL_PREFIX"rs_free_query_result", driver.second.rs_free_query_result );
+			driver.first->resolve( SYMBOL_PREFIX"db_query", driver.second.db_query );
+			driver.first->resolve( SYMBOL_PREFIX"rs_free_cursor", driver.second.rs_free_cursor );
 			driver.first->resolve( SYMBOL_PREFIX"rs_get", driver.second.rs_get );
+			driver.first->resolve( SYMBOL_PREFIX"rs_next", driver.second.rs_next );
+			driver.first->resolve( SYMBOL_PREFIX"rs_get_field", driver.second.rs_get_field );
 			driver.first->resolve( SYMBOL_PREFIX"rs_fields_count", driver.second.rs_fields_count );
 			driver.first->resolve( SYMBOL_PREFIX"dbrs_records_count", driver.second.dbrs_records_count );
 			driver.first->resolve( SYMBOL_PREFIX"dbrs_id", driver.second.dbrs_id );
@@ -244,9 +276,13 @@ ODBConnector::ODBConnector( void )
 	db_disconnect( null_db_disconnect ),
 	dbrs_errno( null_dbrs_errno ),
 	dbrs_error( null_dbrs_error ),
-	db_fetch_query_result( null_db_query ),
-	rs_free_query_result( null_rs_unquery ),
+	db_fetch_query_result( null_db_fetch_query_result ),
+	rs_free_query_result( null_rs_free_query_result ),
+	db_query( null_db_query ),
+	rs_free_cursor( null_rs_free_cursor ),
 	rs_get( null_rs_get ),
+	rs_next( null_rs_next ),
+	rs_get_field( null_rs_get_field ),
 	rs_fields_count( null_rs_fields_count ),
 	dbrs_records_count( null_dbrs_records_count ),
 	dbrs_id( null_dbrs_id ),

@@ -74,7 +74,9 @@ struct ODBConnector {
 	typedef void* ( * db_query_t )( ODBLink&, char const* );
 	typedef void ( * rs_unquery_t )( void* );
 	typedef char const* ( * rs_get_t )( void*, int long, int );
+	typedef char const* ( * rs_get_field_t )( void*, int );
 	typedef int ( * rs_fields_count_t )( void* );
+	typedef bool ( * rs_next_t )( void* );
 	typedef int long ( * dbrs_records_count_t )( ODBLink&, void* );
 	typedef int long ( * dbrs_id_t )( ODBLink&, void* );
 	typedef char const* ( * rs_column_name_t )( void*, int );
@@ -84,7 +86,11 @@ struct ODBConnector {
 	dbrs_error_t dbrs_error;
 	db_query_t db_fetch_query_result;
 	rs_unquery_t rs_free_query_result;
+	db_query_t db_query;
+	rs_unquery_t rs_free_cursor;
 	rs_get_t rs_get;
+	rs_next_t rs_next;
+	rs_get_field_t rs_get_field;
 	rs_fields_count_t rs_fields_count;
 	dbrs_records_count_t dbrs_records_count;
 	dbrs_id_t dbrs_id;

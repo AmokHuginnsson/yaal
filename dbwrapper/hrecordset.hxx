@@ -49,14 +49,21 @@ public:
 	typedef yaal::hcore::HPointer<HRecordSet> ptr_t;
 	typedef yaal::tools::HOptional<yaal::hcore::HString> value_t;
 	typedef yaal::hcore::HArray<value_t> values_t;
+	struct CURSOR {
+		typedef enum {
+			FORWARD,
+			RANDOM_ACCESS
+		} cursor_t;
+	};
 	class HIterator;
 	typedef HIterator iterator;
 private:
 	mutable database_ptr_t _dataBase; /*!< data-base that this record-set belongs to */
 	mutable ODBConnector const* _connector; /*!< low level database engine connector */
 	mutable void* _result; /*!< very internal for this class used only in base class */
+	CURSOR::cursor_t _cursor; /*!< Query result cursor type. */
 public:
-	HRecordSet( database_ptr_t, ODBConnector const*, void* );
+	HRecordSet( database_ptr_t, ODBConnector const*, void*, CURSOR::cursor_t );
 	virtual ~HRecordSet( void );
 	void clear( void );
 	iterator begin( void );
