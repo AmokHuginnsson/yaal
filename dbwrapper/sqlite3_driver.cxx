@@ -55,9 +55,9 @@ M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 1;
 struct OSQLite {
 	int _errorCode;
 	HString _errorMessage;
-	sqlite3* _dB;
+	sqlite3* _db;
 	OSQLite( void )
-		: _errorCode( 0 ), _errorMessage(), _dB( NULL ) {}
+		: _errorCode( 0 ), _errorMessage(), _db( NULL ) {}
 private:
 	OSQLite( OSQLite const& );
 	OSQLite& operator = ( OSQLite const& );
@@ -66,12 +66,13 @@ private:
 struct OSQLiteResult {
 	int _rows;
 	int _columns;
-	char** _data;
+	void* _data;
 	int _errorCode;
 	HString _errorMessage;
+	bool _randomAccess;
 	OSQLiteResult( void )
 		: _rows( 0 ), _columns( 0 ), _data( NULL ),
-		_errorCode( 0 ), _errorMessage() {}
+		_errorCode( 0 ), _errorMessage(), _randomAccess( false ) {}
 private:
 	OSQLiteResult( OSQLiteResult const& );
 	OSQLiteResult& operator = ( OSQLiteResult const& );
@@ -102,9 +103,9 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 				break;
 			}
 		}
-		sQLite->_errorCode = ::sqlite3_open( dataBase.raw(), &sQLite->_dB );
+		sQLite->_errorCode = ::sqlite3_open( dataBase.raw(), &sQLite->_db );
 		if ( sQLite->_errorCode )
-			sQLite->_errorMessage = ::sqlite3_errmsg( sQLite->_dB );
+			sQLite->_errorMessage = ::sqlite3_errmsg( sQLite->_db );
 		else {
 			void* ptr( yaal_sqlite3_db_fetch_query_result( dbLink_, "PRAGMA empty_result_callbacks = ON;" ) );
 			if ( ptr ) {
@@ -119,8 +120,8 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 void yaal_sqlite3_db_disconnect( ODBLink& dbLink_ ) {
 	OSQLite* sQLite( static_cast<OSQLite*>( dbLink_._conn ) );
 	M_ASSERT( sQLite );
-	if ( sQLite->_dB )
-		sqlite3_close( sQLite->_dB );
+	if ( sQLite->_db )
+		sqlite3_close( sQLite->_db );
 	M_SAFE( delete sQLite );
 	dbLink_.clear();
 	return;
@@ -142,7 +143,7 @@ M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 		if ( sQLite->_errorCode )
 			code = sQLite->_errorCode;
 		else
-			code = sqlite3_errcode( sQLite->_dB );
+			code = sqlite3_errcode( sQLite->_db );
 	}
 	return ( code );
 }
@@ -158,7 +159,7 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 	else if ( sQLite ) {
 		if ( ! sQLite->_errorMessage.is_empty() )
 			return ( sQLite->_errorMessage.raw() );
-		return ( sqlite3_errmsg( sQLite->_dB ) );
+		return ( sqlite3_errmsg( sQLite->_db ) );
 	}
 	return ( msg );
 }
@@ -169,10 +170,13 @@ void* yaal_sqlite3_db_fetch_query_result( ODBLink& dbLink_, char const* query_ )
 	result->_columns = 0;
 	result->_rows = 0;
 	result->_data = NULL;
+	result->_randomAccess = true;
 	char* errmsg( NULL );
-	result->_errorCode = sqlite3_get_table( sQLite->_dB,
-			query_, &result->_data, &result->_rows,
+	char** data( NULL );
+	result->_errorCode = sqlite3_get_table( sQLite->_db,
+			query_, &data, &result->_rows,
 			&result->_columns, &errmsg );
+	result->_data = data;
 	result->_errorMessage = errmsg;
 	return ( result );
 }
@@ -184,7 +188,8 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 
 void yaal_sqlite3_rs_free_query_result( void* data_ ) {
 	OSQLiteResult* pr = static_cast<OSQLiteResult*>( data_ );
-	sqlite3_free_table( pr->_data );
+	M_ASSERT( pr->_randomAccess );
+	sqlite3_free_table( static_cast<char**>( pr->_data ) );
 	M_SAFE( delete pr );
 	return;
 }
@@ -194,31 +199,47 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 }
 
 M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
-M_EXPORT_SYMBOL void* db_query( ODBLink& /*dbLink_*/, char const* /*query_*/ ) {
-	return ( NULL );
+M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+	OSQLite* sQLite( static_cast<OSQLite*>( dbLink_._conn ) );
+	OSQLiteResult* result( new ( memory::yaal ) OSQLiteResult );
+	result->_columns = 0;
+	result->_rows = 0;
+	result->_data = NULL;
+	result->_randomAccess = false;
+	sqlite3_stmt* stmt( NULL );
+	result->_errorCode = sqlite3_prepare_v2( sQLite->_db, query_, -1, &stmt, NULL );
+	result->_data = stmt;
+	result->_columns = sqlite3_column_count( stmt );
+	if ( result->_errorCode != SQLITE_OK )
+		result->_errorMessage = sqlite3_errmsg( sQLite->_db );
+	return ( result );
 }
 
 M_EXPORT_SYMBOL void rs_free_cursor( void* );
-M_EXPORT_SYMBOL void rs_free_cursor( void* /*data_*/ ) {
+M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
+	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
+	sqlite3_finalize( static_cast<sqlite3_stmt*>( result->_data ) );
 	return;
 }
 
 M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
-	char** data = NULL;
-	OSQLiteResult* result = static_cast<OSQLiteResult*>( data_ );
-	data = result->_data;
+	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
+	M_ASSERT( result->_randomAccess );
+	char** data( static_cast<char**>( result->_data ) );
 	return ( data[ ( row_ + 1 ) * result->_columns + column_ ] );
 }
 
 M_EXPORT_SYMBOL bool rs_next( void* );
-M_EXPORT_SYMBOL bool rs_next( void* ) {
-	return ( true );
+M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
+	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
+	return ( sqlite3_step( static_cast<sqlite3_stmt*>( result->_data ) ) != SQLITE_ROW );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );
-M_EXPORT_SYMBOL char const* rs_get_field( void*, int ) {
-	return ( NULL );
+M_EXPORT_SYMBOL char const* rs_get_field( void* data_, int field_ ) {
+	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
+	return ( reinterpret_cast<char const*>( sqlite3_column_text( static_cast<sqlite3_stmt*>( result->_data ), field_ ) ) );
 }
 
 M_EXPORT_SYMBOL int rs_fields_count( void* );
@@ -233,19 +254,20 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& dbLink_, void* dataR_ ) {
 	if ( result && ( result->_columns > 0 ) )
 		return ( result->_rows );
 	else
-		return ( ::sqlite3_changes( static_cast<OSQLite*>( dbLink_._conn )->_dB ) );
+		return ( ::sqlite3_changes( static_cast<OSQLite*>( dbLink_._conn )->_db ) );
 }
 
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	/* FIXME change driver interface to allow 64bit insert row id (from autoincrement) */
-	return ( static_cast<int long>( sqlite3_last_insert_rowid( static_cast<OSQLite*>( dbLink_._conn )->_dB ) ) );
+	return ( static_cast<int long>( sqlite3_last_insert_rowid( static_cast<OSQLite*>( dbLink_._conn )->_db ) ) );
 }
 
 M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
-	return ( static_cast<OSQLiteResult*>( dataR_ )->_data[ field_ ] );
+	OSQLiteResult* result( static_cast<OSQLiteResult*>( dataR_ ) );
+	return ( result->_randomAccess ? static_cast<char**>( result->_data )[ field_ ] : sqlite3_column_name( static_cast<sqlite3_stmt*>( result->_data ), field_ ) );
 }
 
 int yaal_sqlite3_driver_main( int, char** );

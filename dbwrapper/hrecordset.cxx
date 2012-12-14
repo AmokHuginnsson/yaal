@@ -125,7 +125,7 @@ HRecordSet::value_t HRecordSet::get( int cursor_, int field_ ) {
 }
 
 HRecordSet::iterator HRecordSet::begin( void ) {
-	return ( iterator( this, 0 ) );
+	return ( iterator( this, ( _cursor == CURSOR::RANDOM_ACCESS ) ? 0 : ( (_connector->rs_next( _result ) ? INVALID_CURSOR : 0 ) ) ) );
 }
 
 HRecordSet::iterator HRecordSet::end( void ) {
@@ -202,7 +202,9 @@ HRecordSet::value_t HRecordSet::HIterator::operator[] ( int field_ ) const {
 	M_PROLOG
 	M_ASSERT( _owner );
 	M_ENSURE( _cursorPosition != INVALID_CURSOR );
-	char const* valRaw( (_owner->_connector->rs_get)( _owner->_result, _cursorPosition, field_ ) );
+	char const* valRaw( ( _owner->_cursor == HRecordSet::CURSOR::RANDOM_ACCESS )
+			? (_owner->_connector->rs_get)( _owner->_result, _cursorPosition, field_ )
+			: (_owner->_connector->rs_get_field)( _owner->_result, field_ ) );
 	value_t value;
 	if ( valRaw )
 		value = value_t( valRaw );
