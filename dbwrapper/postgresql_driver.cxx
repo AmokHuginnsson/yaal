@@ -61,6 +61,19 @@ M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT a.attnum, a
 		" ORDER BY a.attnum;" );
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 1;
 
+struct OPostgreSQLResult {
+	ODBLink& _link;
+	PGresult* _result;
+	int _index;
+	int _total;
+	bool _randomAccess;
+	OPostgreSQLResult( ODBLink& link_ )
+		: _link( link_ ), _result( NULL ), _index( 0 ), _total( 0 ), _randomAccess( false ) {}
+private:
+	OPostgreSQLResult( OPostgreSQLResult const& );
+	OPostgreSQLResult& operator = ( OPostgreSQLResult const& );
+};
+
 M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
 		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& dataBase_,
@@ -89,7 +102,7 @@ M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 	M_ASSERT( dbLink_._conn );
 	int err( 0 );
 	if ( result_ ) {
-		ExecStatusType status = PQresultStatus( static_cast<PGresult*>( result_ ) );
+		ExecStatusType status = PQresultStatus( static_cast<OPostgreSQLResult*>( result_ )->_result );
 		err = ( ( status == PGRES_COMMAND_OK ) || ( status == PGRES_TUPLES_OK ) ) ? 0 : status;
 	} else {
 		ConnStatusType connStatus( PQstatus( static_cast<PGconn*>( dbLink_._conn ) ) );
@@ -101,58 +114,94 @@ M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const&, void* );
 M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) {
 	M_ASSERT( dbLink_._conn );
-	return ( result_ ? ::PQresultErrorMessage( static_cast<PGresult*>( result_ ) ) : ::PQerrorMessage( static_cast<PGconn*>( dbLink_._conn ) ) );
+	return ( result_ ? ::PQresultErrorMessage( static_cast<OPostgreSQLResult*>( result_ )->_result ) : ::PQerrorMessage( static_cast<PGconn*>( dbLink_._conn ) ) );
 }
 
 M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
-	return ( PQexec( static_cast<PGconn*>( dbLink_._conn ), query_ ) );
+	OPostgreSQLResult* result( new ( memory::yaal ) OPostgreSQLResult( dbLink_ ) );
+	result->_result = PQexec( static_cast<PGconn*>( dbLink_._conn ), query_ );
+	result->_randomAccess = true;
+	return ( result );
 }
 
 M_EXPORT_SYMBOL void rs_free_query_result( void* );
 M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
-	PQclear( static_cast<PGresult*>( data_ ) );
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
+	M_ASSERT( pr->_randomAccess );
+	PQclear( pr->_result );
+	M_SAFE( delete pr );
 	return;
 }
 
 M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
-M_EXPORT_SYMBOL void* db_query( ODBLink& /*dbLink_*/, char const* /*query_*/ ) {
-	return ( NULL );
+M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
+	OPostgreSQLResult* result( new ( memory::yaal ) OPostgreSQLResult( dbLink_ ) );
+	PGconn* conn( static_cast<PGconn*>( dbLink_._conn ) );
+	::PQprepare( conn, "", query_, 0, NULL );
+	result->_result = ::PQdescribePrepared( conn, "" );
+	result->_randomAccess = false;
+	::PQsendQueryPrepared( conn, "", 0, NULL, NULL, NULL, 0 );
+/*	::PQsetSingleRowMode( conn ); */
+	return ( result );
 }
 
 M_EXPORT_SYMBOL void rs_free_cursor( void* );
-M_EXPORT_SYMBOL void rs_free_cursor( void* /*data_*/ ) {
+M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
+	M_ASSERT( ! pr->_randomAccess );
+	::PQclear( pr->_result );
+	M_SAFE( delete pr );
 	return;
 }
 
 M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
-	return ( ::PQgetvalue( static_cast<PGresult*>( data_ ), static_cast<int>( row_ ), column_ ) );
+	return ( ::PQgetvalue( static_cast<OPostgreSQLResult*>( data_ )->_result, static_cast<int>( row_ ), column_ ) );
 }
 
 M_EXPORT_SYMBOL bool rs_next( void* );
-M_EXPORT_SYMBOL bool rs_next( void* ) {
-	return ( true );
+M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
+	M_ASSERT( ! pr->_randomAccess );
+	bool gotMore( false );
+	if ( ++ pr->_index < pr->_total ) {
+		gotMore = true;
+	} else {
+		::PQclear( pr->_result );
+		gotMore = ( pr->_result = ::PQgetResult( static_cast<PGconn*>( pr->_link._conn ) ) ) != NULL;
+		if ( gotMore ) {
+			pr->_index = 0;
+			pr->_total = ::PQntuples( pr->_result );
+			gotMore = pr->_index < pr->_total;
+		} else
+			pr->_total = 0;
+	}
+	return ( ! gotMore );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );
-M_EXPORT_SYMBOL char const* rs_get_field( void*, int ) {
-	return ( NULL );
+M_EXPORT_SYMBOL char const* rs_get_field( void* data_, int field_ ) {
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
+	return ( ::PQgetvalue( pr->_result, pr->_index, field_ ) );
 }
 
 M_EXPORT_SYMBOL int rs_fields_count( void* );
 M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
-	return ( ::PQnfields( static_cast<PGresult*>( data_ ) ) );
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
+	return ( ::PQnfields( pr->_result ) );
 }
 
 M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
-	char* tmp = ::PQcmdTuples( static_cast<PGresult*>( dataR_ ) );
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( dataR_ ) );
+	char* tmp = ::PQcmdTuples( pr->_result );
 	if ( tmp && tmp [ 0 ] )
 		return ( ::strtol( tmp, NULL, 10 ) );
 	else
-		return ( ::PQntuples( static_cast<PGresult*>( dataR_ ) ) );
+		return ( ::PQntuples( pr->_result ) );
 }
 
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
@@ -171,7 +220,8 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 
 M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
-	return ( ::PQfname( static_cast<PGresult*>( dataR_ ), field_ ) );
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( dataR_ ) );
+	return ( ::PQfname( pr->_result, field_ ) );
 }
 
 int yaal_postgresql_driver_main( int, char** );

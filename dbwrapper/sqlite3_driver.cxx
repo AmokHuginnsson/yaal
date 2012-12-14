@@ -200,6 +200,7 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 
 M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	OSQLite* sQLite( static_cast<OSQLite*>( dbLink_._conn ) );
 	OSQLiteResult* result( new ( memory::yaal ) OSQLiteResult );
 	result->_columns = 0;
