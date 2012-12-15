@@ -220,6 +220,7 @@ M_EXPORT_SYMBOL void rs_free_cursor( void* );
 M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
 	sqlite3_finalize( static_cast<sqlite3_stmt*>( result->_data ) );
+	M_SAFE( delete result );
 	return;
 }
 

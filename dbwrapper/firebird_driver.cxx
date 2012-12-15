@@ -309,6 +309,7 @@ M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
 	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 	isc_commit_transaction( res->_status, &res->_tr );
 	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+	M_SAFE( delete res );
 	return;
 }
 
