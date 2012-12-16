@@ -65,10 +65,10 @@ public:
 		typedef HReverseIterator<const_iterator> const_reverse_iterator;
 		typedef HTree<value_t, allocator_t, sequence_t> tree_t;
 	private:
-		value_t _data;    /* object itself */
-		branch_t _branch; /* list of next level nodes */
-		HNode* _trunk;    /* self explanary */
-		tree_t* _tree;
+		value_t _data;    /*!< object itself */
+		branch_t _branch; /*!< list of next level nodes */
+		HNode* _trunk;    /*!< parent node */
+		tree_t* _tree;    /*!< owning tree */
 		typedef allocator::ref<HNode, typename allocator_t::template rebind<HNode>::other> allocator_type;
 		allocator_type _allocator;
 	public:
@@ -80,6 +80,22 @@ public:
 		bool has_childs( void ) const {
 			M_PROLOG
 			return ( ! _branch.is_empty() );
+			M_EPILOG
+		}
+		const_node_t get_child_at( int index_ ) const {
+			M_PROLOG
+			M_ENSURE( ( index_ >= 0 ) && ( index_ < _branch.get_size() ) );
+			typename branch_t::const_iterator it( _branch.begin() );
+			advance( it, index_ );
+			return ( *it );
+			M_EPILOG
+		}
+		node_t get_child_at( int index_ ) {
+			M_PROLOG
+			M_ENSURE( ( index_ >= 0 ) && ( index_ < _branch.get_size() ) );
+			typename branch_t::iterator it( _branch.begin() );
+			advance( it, index_ );
+			return ( *it );
 			M_EPILOG
 		}
 		int get_level( void ) const {
