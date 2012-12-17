@@ -113,10 +113,9 @@ HString const& HStringStream::consume( void ) const {
 	M_EPILOG
 }
 
-char const* operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& stream ) {
+HString const& operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& stream ) {
 	M_PROLOG
-	stream.use();
-	return ( stream.raw() );
+	return ( stream.consume() );
 	M_EPILOG
 }
 

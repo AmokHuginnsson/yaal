@@ -61,7 +61,7 @@ private:
 	virtual bool do_is_valid( void ) const;
 };
 
-char const* operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& );
+yaal::hcore::HString const& operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& );
 
 }
 
