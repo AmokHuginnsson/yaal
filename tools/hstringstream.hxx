@@ -52,7 +52,7 @@ public:
 	yaal::hcore::HString const& string( void ) const;
 	void use( void ) const;
 	void clear( void );
-	char const* consume( void ) const;
+	yaal::hcore::HString const& consume( void ) const;
 	bool is_empty( void ) const;
 private:
 	virtual int long do_write( void const* const, int long );

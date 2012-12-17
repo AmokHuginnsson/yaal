@@ -106,10 +106,10 @@ void HStringStream::clear( void ) {
 	M_EPILOG
 }
 
-char const* HStringStream::consume( void ) const {
+HString const& HStringStream::consume( void ) const {
 	M_PROLOG
 	use();
-	return ( _buffer.raw() );
+	return ( _buffer );
 	M_EPILOG
 }
 
