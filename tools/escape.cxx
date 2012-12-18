@@ -56,54 +56,58 @@ EscapeTable::EscapeTable( char const* raw_, int rawLen_, char const* safe_, int 
 
 void escape( yaal::hcore::HString& string_, EscapeTable const& et_, char escape_ ) {
 	M_PROLOG
-	typedef HTLS<HChunk> cache_t;
-	static cache_t _cache_;
-	HChunk& cache( *_cache_ );
-	int cacheSize( static_cast<int>( cache.get_size() ) );
-	if ( string_.get_length() >= cacheSize ) {
-		cache.realloc( string_.get_length() );
-		cacheSize = static_cast<int>( cache.get_size() );
-	}
-	int pos( 0 );
-	char* ptr( cache.get<char>() );
-	for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
-		char ch( et_._rawToSafe[static_cast<char unsigned>( *it )] );
-		if ( ( pos + 1 ) >= cacheSize ) {
-			cache.realloc( cacheSize * 2 );
+	if ( ! string_.is_empty() ) {
+		typedef HTLS<HChunk> cache_t;
+		static cache_t _cache_;
+		HChunk& cache( *_cache_ );
+		int cacheSize( static_cast<int>( cache.get_size() ) );
+		if ( string_.get_length() > cacheSize ) {
+			cache.realloc( string_.get_length() );
 			cacheSize = static_cast<int>( cache.get_size() );
-			ptr = cache.get<char>();
 		}
-		if ( ch != *it )
-			ptr[pos ++] = escape_;
-		ptr[ pos ] = ch;
+		int pos( 0 );
+		char* ptr( cache.get<char>() );
+		for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
+			char ch( et_._rawToSafe[static_cast<char unsigned>( *it )] );
+			if ( ( pos + 1 ) >= cacheSize ) {
+				cache.realloc( cacheSize * 2 );
+				cacheSize = static_cast<int>( cache.get_size() );
+				ptr = cache.get<char>();
+			}
+			if ( ch != *it )
+				ptr[pos ++] = escape_;
+			ptr[ pos ] = ch;
+		}
+		string_.assign( ptr, pos );
 	}
-	string_.assign( ptr, pos );
 	return;
 	M_EPILOG
 }
 
 void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, char escape_ ) {
 	M_PROLOG
-	typedef HTLS<HChunk> cache_t;
-	static cache_t _cache_;
-	HChunk& cache( *_cache_ );
-	int cacheSize( static_cast<int>( cache.get_size() ) );
-	if ( string_.get_length() >= cacheSize ) {
-		cache.realloc( string_.get_length() );
-		cacheSize = static_cast<int>( cache.get_size() );
+	if ( ! string_.is_empty() ) {
+		typedef HTLS<HChunk> cache_t;
+		static cache_t _cache_;
+		HChunk& cache( *_cache_ );
+		int cacheSize( static_cast<int>( cache.get_size() ) );
+		if ( string_.get_length() > cacheSize ) {
+			cache.realloc( string_.get_length() );
+			cacheSize = static_cast<int>( cache.get_size() );
+		}
+		int pos( 0 );
+		char* ptr( cache.get<char>() );
+		for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
+			if ( *it == escape_ ) {
+				++ it;
+				if ( ! ( it != end ) )
+					break;
+				ptr[pos] = et_._safeToRaw[static_cast<char unsigned>( *it )];
+			} else
+				ptr[pos] = *it;
+		}
+		string_.assign( ptr, pos );
 	}
-	int pos( 0 );
-	char* ptr( cache.get<char>() );
-	for ( HString::const_iterator it( string_.begin() ), end( string_.end() ); it != end; ++ it, ++ pos ) {
-		if ( *it == escape_ ) {
-			++ it;
-			if ( ! ( it != end ) )
-				break;
-			ptr[pos] = et_._safeToRaw[static_cast<char unsigned>( *it )];
-		} else
-			ptr[pos] = *it;
-	}
-	string_.assign( ptr, pos );
 	return;
 	M_EPILOG
 }
