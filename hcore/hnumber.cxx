@@ -47,6 +47,19 @@ int const A_DOT = 1;
 int const A_ZERO = 2;
 int const NUMBER_START = 3;
 int const KARATSUBA_THRESHOLD = 20; /* FIXME: 20 is fine */
+u32_t const DECIMAL_SHIFT[] = {
+	1l,
+	10l,
+	100l,
+	1000l,
+	10000l,
+	100000l,
+	1000000l,
+	10000000l,
+	100000000l,
+	1000000000l,
+};
+
 }
 
 int HNumber::DEFAULT_PRECISION = 100;
@@ -55,7 +68,7 @@ HNumber::HNumber( void )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
 	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
-	_canonical() {
+	_canonical(), _cache() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -71,7 +84,7 @@ HNumber::HNumber( double long number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
 	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
-	_canonical() {
+	_canonical(), _cache() {
 	M_PROLOG
 	from_double( number_ );
 	return;
@@ -82,7 +95,7 @@ HNumber::HNumber( double long number_, int precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
 			? precision_ : HARDCODED_MINIMUM_PRECISION ),
 	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
-	_canonical() {
+	_canonical(), _cache() {
 	M_PROLOG
 	from_double( number_ );
 	return;
@@ -93,7 +106,7 @@ HNumber::HNumber( char const* const number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
 	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
-	_canonical() {
+	_canonical(), _cache() {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -104,7 +117,7 @@ HNumber::HNumber( char const* const number_, int precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
 			? precision_ : HARDCODED_MINIMUM_PRECISION ),
 	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
-	_canonical() {
+	_canonical(), _cache() {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -115,7 +128,7 @@ HNumber::HNumber( HString const& number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
 	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
-	_canonical() {
+	_canonical(), _cache() {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -126,7 +139,7 @@ HNumber::HNumber( HString const& number_, int precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
 			? precision_ : HARDCODED_MINIMUM_PRECISION ),
 	_negative( false ), _digitCount( 0 ), _integralPartSize( 0 ),
-	_canonical() {
+	_canonical(), _cache() {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -138,11 +151,15 @@ HNumber::HNumber( HNumber const& source )
 	_negative( source._negative ),
 	_digitCount( source._digitCount ),
 	_integralPartSize( source._integralPartSize ),
-	_canonical() {
+	_canonical(), _cache() {
 	M_PROLOG
 	if ( source._digitCount ) {
 		_canonical.realloc( source._digitCount, HChunk::STRATEGY::EXACT );
 		::memcpy( _canonical.raw(), source._canonical.raw(), _canonical.get_size() );
+		if ( source._cache.get_size() > 0 ) {
+			_cache.realloc( source._cache.get_size(), HChunk::STRATEGY::EXACT );
+			::memcpy( _cache.raw(), source._cache.raw(), _cache.get_size() );
+		}
 	}
 	return;
 	M_EPILOG
@@ -167,6 +184,7 @@ void HNumber::swap( HNumber& other ) {
 		swap( _digitCount, other._digitCount );
 		swap( _integralPartSize, other._integralPartSize );
 		swap( _canonical, other._canonical );
+		swap( _cache, other._cache );
 	}
 	return;
 	M_EPILOG
@@ -427,18 +445,24 @@ bool HNumber::mutate_addition( char* res, int long ressize,
 
 HNumber HNumber::operator + ( HNumber const& element ) const {
 	M_PROLOG
+	HNumber n( *this );
+	n += element;
+	return ( n );
+	M_EPILOG
+}
+
+HNumber& HNumber::operator += ( HNumber const& element ) {
+	M_PROLOG
 	int long ips = max( _integralPartSize, element._integralPartSize );
 	int long dps = max( decimal_length(), element.decimal_length() );
-	HNumber n;
 	if ( decimal_length() < element.decimal_length() )
-		n._precision = is_exact() ? element._precision : _precision;
+		_precision = is_exact() ? element._precision : _precision;
 	else
-		n._precision = element.is_exact() ? _precision : element._precision;
-	( dps <= n._precision ) || ( dps = n._precision );
+		_precision = element.is_exact() ? _precision : element._precision;
+	( dps <= _precision ) || ( dps = _precision );
 	int long ressize = ips + dps + 1; /* + 1 for possible carrier */
-	n._canonical.realloc( ressize );
-	n._integralPartSize = ips;
-	char* res( n._canonical.get<char>() );
+	_cache.realloc( ressize );
+	char* res( _cache.get<char>() );
 	char const* ep1( _canonical.get<char>() );
 	char const* ep2( element._canonical.get<char>() );
 	int long lm[] = { ips - _integralPartSize, ips - element._integralPartSize };
@@ -449,21 +473,16 @@ HNumber HNumber::operator + ( HNumber const& element ) const {
 	bool sub = ( ( _negative && ! element._negative ) || ( ! _negative && element._negative ) );
 	bool swp = sub && ( absolute_lower( element ) < 0 );
 	mutate_addition( res, ressize, ep, lm, rm, sub, swp );
+	_integralPartSize = ips;
 	if ( ressize > 0 ) {
-		n._negative = sub ? ( _negative ? ! swp : swp ) : ( _negative && element._negative );
-		++ n._integralPartSize;
+		_negative = sub ? ( _negative ? ! swp : swp ) : ( _negative && element._negative );
+		++ _integralPartSize;
 	}
-	n._digitCount = ressize;
-	n.normalize();
-	if ( n._digitCount == 0 )
-		n._negative = false;
-	return ( n );
-	M_EPILOG
-}
-
-HNumber& HNumber::operator += ( HNumber const& element ) {
-	M_PROLOG
-	operator = ( *this + element );
+	_digitCount = ressize;
+	_canonical.swap( _cache );
+	normalize();
+	if ( _digitCount == 0 )
+		_negative = false;
 	return ( *this );
 	M_EPILOG
 }
@@ -485,25 +504,26 @@ HNumber& HNumber::operator -= ( HNumber const& element ) {
 
 HNumber HNumber::operator * ( HNumber const& factor ) const {
 	M_PROLOG
-	HNumber n;
-	if ( factor._digitCount < _digitCount )
-		n = factor * ( *this );
-	else if ( _digitCount && factor._digitCount ) {
-		n._digitCount = _digitCount + factor._digitCount;
-		n._integralPartSize = _integralPartSize + factor._integralPartSize;
-		karatsuba( n._canonical,
-				_canonical.get<char>(), _digitCount,
-				factor._canonical.get<char>(), factor._digitCount );
-		n.normalize();
-		n._negative = ! ( ( _negative && factor._negative ) || ! ( _negative || factor._negative ) );
-	}
+	HNumber n( *this );
+	n *= factor;
 	return ( n );
 	M_EPILOG
 }
 
-HNumber& HNumber::operator *= ( HNumber const& factor ) {
+HNumber& HNumber::operator *= ( HNumber const& factor_ ) {
 	M_PROLOG
-	operator = ( *this * factor );
+	HNumber const& n( factor_._digitCount < _digitCount ? factor_ : *this );
+	HNumber const& factor( factor_._digitCount < _digitCount ? *this : factor_ );
+	if ( n._digitCount && factor._digitCount ) {
+		karatsuba( _cache,
+				n._canonical.get<char>(), n._digitCount,
+				factor._canonical.get<char>(), factor._digitCount );
+		_digitCount = n._digitCount + factor._digitCount;
+		_integralPartSize = n._integralPartSize + factor._integralPartSize;
+		_canonical.swap( _cache );
+		normalize();
+		_negative = ! ( ( n._negative && factor._negative ) || ! ( n._negative || factor._negative ) );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -609,19 +629,23 @@ HNumber HNumber::operator - ( void ) const {
 HNumber HNumber::operator ^ ( int long unsigned exp ) const {
 	M_PROLOG
 	HNumber n( *this );
-	int long unsigned p = exp >> 1;
-	if ( p > 2 )
-		n = n ^ p;
-	else
-		while ( -- p )
-			n *= *this;
-	return ( ( exp % 2 ) ? ( n * n * *this ) : ( n * n ) );
+	n ^= exp;
+	return ( n );
 	M_EPILOG
 }
 
 HNumber& HNumber::operator ^= ( int long unsigned exp ) {
 	M_PROLOG
-	operator = ( *this ^ exp );
+	int long unsigned p( exp >> 1 );
+	HNumber n( *this );
+	if ( p > 2 )
+		operator ^= ( p );
+	else
+		while ( -- p )
+			operator *= ( n );
+	operator *= ( *this );
+	if ( exp % 2 )
+		operator *= ( n );
 	return ( *this );
 	M_EPILOG
 }
@@ -666,7 +690,8 @@ void HNumber::normalize( void ) {
 		_integralPartSize -= shift;
 		_digitCount -= shift;
 		::memmove( res, res + shift, _digitCount );
-	} while ( ( decimal_length() > 0 ) && ( res[ _digitCount - 1 ] == 0 ) )
+	}
+	while ( ( decimal_length() > 0 ) && ( res[ _digitCount - 1 ] == 0 ) )
 		-- _digitCount;
 	if ( _digitCount == ( _integralPartSize + _precision ) )
 		++ _precision;
@@ -674,32 +699,32 @@ void HNumber::normalize( void ) {
 	M_EPILOG
 }
 
-void HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char const* fy, int long fys ) const {
-	int long shift = 0;
+int long HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char const* fy, int long fys ) {
+	int long shift( 0 );
 	while ( ( shift < fxs ) && ! fx[ shift ] )
 		++ shift;
-	int long fxrl = fxs - shift;
-	int long totalShift = shift;
+	int long fxrl( fxs - shift );
+	int long totalShift( shift );
 	shift = 0;
 	while ( ( shift < fys ) && ! fy[ shift ] )
 		++ shift;
-	int long fyrl = fys - shift;
+	int long fyrl( fys - shift );
 	totalShift += shift;
+	int long digitCount( 0 );
 	if ( ( ( fxrl > KARATSUBA_THRESHOLD ) || ( fyrl > KARATSUBA_THRESHOLD ) ) && ( fxrl > 0 ) && ( fyrl > 0 ) ) {
 		fx += ( fxs - fxrl );
 		fy += ( fys - fyrl );
 		fxs = fxrl;
 		fys = fyrl;
-		if ( ! result.size() && ( fxs + fys ) )
-			result.realloc( fxs + fys + totalShift, HChunk::STRATEGY::EXACT );
+		result.realloc( digitCount = fxs + fys + totalShift );
 
-		int long fs = max( fxs, fys );
-		int long fl = min( fxs, fys );
-		int long m = ( fs / 2 ) + ( fs & 1 ); /* Size of upper/lower half of number */
+		int long fs( max( fxs, fys ) );
+		int long fl( min( fxs, fys ) );
+		int long m( ( fs / 2 ) + ( fs & 1 ) ); /* Size of upper/lower half of number */
 		HChunk r2m; /* intermediate result ( fx1 * fx2 ( * B ^ 2m ) ) + 1 for carrier */
-		karatsuba( r2m, fx, fxs - m, fy, fys - m );
+		int long r2ms( karatsuba( r2m, fx, fxs - m, fy, fys - m ) );
 		HChunk r; /* intermediate result ( fx2 * fy2 ) + 1 for carrier */
-		karatsuba( r, fx + ( fxs > m ? fxs - m : 0 ), min( fxs, m ), fy + ( fys > m ? fys - m : 0 ), min( fys, m ) );
+		int long rs( karatsuba( r, fx + ( fxs > m ? fxs - m : 0 ), min( fxs, m ), fy + ( fys > m ? fys - m : 0 ), min( fys, m ) ) );
 		HChunk hx( m + 1 ); /* + 1 for carrier */
 		HChunk hy( m + 1 );
 		/* preparation of hx and hy */
@@ -720,45 +745,44 @@ void HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char cons
 			memcpy( hy.get<char>() + hy.size() - fys, fy, fys );
 		/* find Z */
 		HChunk Z;
-		karatsuba( Z, hx.get<char>(), hx.size(), hy.get<char>(), hy.size() );
+		int long Zs( karatsuba( Z, hx.get<char>(), hx.size(), hy.get<char>(), hy.size() ) );
 		/* combine all results */
 		
-		HChunk tmpres( fxs + fys + 1 );
-		int long size( tmpres.size() );
+		int long size( fxs + fys + 1 ); 
+		HChunk tmpres( size );
 		char* res( tmpres.get<char>() );
 
 		/* res = Z*B^m + r */
-		int long s( Z.size() );
 		char const* p( Z.get<char>() );
 		shift = 0;
-		while ( ( shift < s ) && ! p[ shift ] )
+		while ( ( shift < Zs ) && ! p[ shift ] )
 			++ shift;
-		s -= shift;
+		Zs -= shift;
 		p += shift;
 		ep[ 0 ] = r.get<char>();
 		ep[ 1 ] = p;
-		lm[ 0 ] = s - r.size() + m;
+		lm[ 0 ] = Zs - rs + m;
 		lm[ 1 ] = 0;
 		if ( ep[ 0 ] ) {
-			::memcpy( res + size - r.size(), r.raw(), r.size() );
-			mutate_addition( res + size - m - s - 1, s + 1, ep, lm, NULL, false, false );
+			::memcpy( res + size - rs, r.raw(), rs );
+			mutate_addition( res + size - m - Zs - 1, Zs + 1, ep, lm, NULL, false, false );
 		} else
-			::memcpy( res + size - m - s, p, s );
+			::memcpy( res + size - m - Zs, p, Zs );
 
 		/* res += r2m*B^2m */
-		s = r2m.size();
+		Zs = r2ms;
 		shift = 0;
 		p = r2m.get<char>();
 		lm[ 0 ] = 0;
 		if ( p ) {
-			while ( ( shift < s ) && ! p[ shift ] )
+			while ( ( shift < Zs ) && ! p[ shift ] )
 				++ shift;
-			s -= shift;
+			Zs -= shift;
 			p += shift;
 			ep[ 0 ] = res + 1 + shift;
 			ep[ 1 ] = p;
 			lm[ 1 ] = 0;
-			mutate_addition( res + shift, s + 1, ep, lm, NULL, false, false );
+			mutate_addition( res + shift, Zs + 1, ep, lm, NULL, false, false );
 		}
 
 		/* res -= r2m*B^m, res -= r*B^m */
@@ -769,19 +793,18 @@ void HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char cons
 		ep[ 0 ] = res + ncar;
 		ep[ 1 ] = r2m.get<char>();
 		if ( ep[ 1 ] ) {
-			lm[ 1 ] = size - r2m.size() - m - ncar;
+			lm[ 1 ] = size - r2ms - m - ncar;
 			mutate_addition( res - car, size - m + car, ep, lm, NULL, true, false );
 		}
 		ep[ 1 ] = r.get<char>();
 		if ( ep[ 1 ] ) {
-			lm[ 1 ] = size - r.size() - m - ncar;
+			lm[ 1 ] = size - rs - m - ncar;
 			mutate_addition( res - car, size - m + car, ep, lm, NULL, true, false );
 		}
-		::memcpy( result.get<char>() + totalShift, tmpres.get<char>() + 1, result.size() - totalShift );
+		::memcpy( result.get<char>() + totalShift, res + 1, digitCount - totalShift );
 	} else if ( ( fxrl > 0 ) && ( fyrl > 0 ) ) {
 /* variables for mutate_addition() */
-		if ( ! result.size() )
-			result.realloc( fxs + fys, HChunk::STRATEGY::EXACT );
+		result.realloc( digitCount = fxs + fys );
 		HChunk element( fys + 1 );
 		char* e( element.get<char>() );
 		char* res( ( result.get<char>() + fxs ) - 2 ); /* - 1 for carrier */
@@ -809,7 +832,7 @@ void HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char cons
 				-- res;
 		}
 	}
-	return;
+	return ( digitCount );
 }
 
 }

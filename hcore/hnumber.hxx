@@ -44,6 +44,7 @@ private:
 	int long _digitCount;
 	int long _integralPartSize;
 	HChunk _canonical;
+	HChunk _cache;
 public:
 	M_YAAL_HCORE_PUBLIC_API static int DEFAULT_PRECISION;
 public:
@@ -115,7 +116,7 @@ public:
 private:
 	bool mutate_addition( char*, int long, char const* const[], int long*, int long*, bool, bool ) const;
 	int long absolute_lower( HNumber const& ) const;
-	void karatsuba( HChunk&, char const*, int long, char const*, int long ) const;
+	int long karatsuba( HChunk&, char const*, int long, char const*, int long );
 	int long integral_length( void ) const;
 	int long decimal_length( void ) const;
 	void from_string( HString const& );
