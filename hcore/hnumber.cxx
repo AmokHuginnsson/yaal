@@ -359,7 +359,7 @@ bool HNumber::operator >= ( HNumber const& other ) const {
 
 bool HNumber::mutate_addition( char* res, int long ressize,
 		char const* const ep[], int long* lm, int long* rm, bool sub, bool swp ) const {
-	int carrier = 0;
+	int carrier( 0 );
 	int e[ 2 ];
 	int long lmx[] = { lm ? ( swp ? lm[ 1 ] : lm[ 0 ] ) : 0, lm ? ( swp ? lm[ 0 ] : lm[ 1 ] ) : 0 };
 	int long rmx[] = { rm ? ( swp ? rm[ 1 ] : rm[ 0 ] ) : 0, rm ? ( swp ? rm[ 0 ] : rm[ 1 ] ) : 0 };
@@ -367,10 +367,10 @@ bool HNumber::mutate_addition( char* res, int long ressize,
 		swp ? ep[ 1 ] - lmx[ 0 ] - 1 : ep[ 0 ] - lmx[ 0 ] - 1,
 		swp ? ep[ 0 ] - lmx[ 1 ] - 1 : ep[ 1 ] - lmx[ 1 ] - 1
 	};
-	int long idx = ressize - 1; /* index of first processed digit */
-	int side = ( rmx[ 0 ] > rmx[ 1 ] ) ? 1 : 0;
-	int long off = rmx[ 1 - side ];
-	char const* src = epx[ side ];
+	int long idx( ressize - 1 ); /* index of first processed digit */
+	int side( ( rmx[ 0 ] > rmx[ 1 ] ) ? 1 : 0 );
+	int long off( rmx[ 1 - side ] );
+	char const* src( epx[ side ] );
 	e[ 1 - side ] = 0;
 	while ( off -- && ( idx > 0 ) ) {
 		e[ side ] = src[ idx ];
@@ -683,7 +683,7 @@ HNumber HNumber::operator -- ( int ) {
 void HNumber::normalize( void ) {
 	M_PROLOG
 	char* res( _canonical.get<char>() );
-	int shift = 0;
+	int shift( 0 );
 	while ( ( shift < _integralPartSize ) && ( res[ shift ] == 0 ) )
 		++ shift;
 	if ( shift ) {
@@ -722,9 +722,9 @@ int long HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char 
 		int long fl( min( fxs, fys ) );
 		int long m( ( fs / 2 ) + ( fs & 1 ) ); /* Size of upper/lower half of number */
 		HChunk r2m; /* intermediate result ( fx1 * fx2 ( * B ^ 2m ) ) + 1 for carrier */
-		int long r2ms( karatsuba( r2m, fx, fxs - m, fy, fys - m ) );
+		int long const r2ms( karatsuba( r2m, fx, fxs - m, fy, fys - m ) );
 		HChunk r; /* intermediate result ( fx2 * fy2 ) + 1 for carrier */
-		int long rs( karatsuba( r, fx + ( fxs > m ? fxs - m : 0 ), min( fxs, m ), fy + ( fys > m ? fys - m : 0 ), min( fys, m ) ) );
+		int long const rs( karatsuba( r, fx + ( fxs > m ? fxs - m : 0 ), min( fxs, m ), fy + ( fys > m ? fys - m : 0 ), min( fys, m ) ) );
 		HChunk hx( m + 1 ); /* + 1 for carrier */
 		HChunk hy( m + 1 );
 		/* preparation of hx and hy */
@@ -748,9 +748,9 @@ int long HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char 
 		int long Zs( karatsuba( Z, hx.get<char>(), hx.size(), hy.get<char>(), hy.size() ) );
 		/* combine all results */
 		
-		int long size( fxs + fys + 1 ); 
+		int long const size( fxs + fys + 1 ); 
 		HChunk tmpres( size );
-		char* res( tmpres.get<char>() );
+		char* const res( tmpres.get<char>() );
 
 		/* res = Z*B^m + r */
 		char const* p( Z.get<char>() );
@@ -787,8 +787,8 @@ int long HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char 
 
 		/* res -= r2m*B^m, res -= r*B^m */
 
-		int ncar = ( fl > m ? 1 : 0 );
-		int car = 1 - ncar;
+		int ncar( ( fl > m ? 1 : 0 ) );
+		int car( 1 - ncar );
 
 		ep[ 0 ] = res + ncar;
 		ep[ 1 ] = r2m.get<char>();
@@ -812,11 +812,11 @@ int long HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char 
 /* the end of variables for mutate_addition() */
 		while ( -- fxs >= 0 ) {
 			if ( fx[ fxs ] ) {
-				int carrier = 0;
-				int long inner = fys; /* index of last digit in second factor */
+				int carrier( 0 );
+				int long inner( fys ); /* index of last digit in second factor */
 				while ( -- inner >= 0 ) {
-					int long pos = inner + 1;
-					int x = fx[ fxs ] * fy[ inner ] + carrier;
+					int long pos( inner + 1 );
+					int x( fx[ fxs ] * fy[ inner ] + carrier );
 					if ( x > 9 ) {
 						carrier = x / 10;
 						x %= 10;
