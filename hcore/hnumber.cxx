@@ -25,6 +25,7 @@ Copyright:
 */
 
 #include <cstring>
+#include <cstdio>
 
 #include "base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
@@ -235,21 +236,44 @@ void HNumber::from_string( HString const& number_ ) {
 			end = ( idx != HString::npos ) ? len - idx : start + 1;
 		}
 		M_ASSERT( ( dot == HString::npos ) || ( ( end - dot ) > 0 ) );
-		int long integralPart( dot != HString::npos ? ( ( dot - start ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF : ( ( end - start ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF );
-		int long decimalPart( dot != HString::npos ? ( ( end - dot ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF : 0 );
-		int long leafCount( integralPart + decimalPart );
-		if ( leafCount > 0 )
-			_canonical.realloc( chunk_size<u32_t>( leafCount ) );
+		_integralPartSize = ( dot != HString::npos ? ( ( dot - start ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF : ( ( end - start ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF );
+		int long decimalPart( dot != HString::npos ? ( ( end - ( dot + 1 ) ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF : 0 );
+		_digitCount = _integralPartSize + decimalPart;
+		if ( _digitCount > 0 )
+			_canonical.realloc( chunk_size<u32_t>( _digitCount ) );
 		u32_t* dst( _canonical.get<u32_t>() );
+		u32_t leaf( 0 );
+		int digitInLeaf( 0 );
 		if ( dot != HString::npos ) /* scan decimal part */ {
-			idx = decimalPart;
-			for ( int long i = start; i < end; ++ i ) {
-				if ( src[ i ] == VALID_CHARACTERS[ A_DOT ] )
-					continue;
+			idx = _integralPartSize;
+			for ( int long i( dot + 1 ); i < end; ++ i, ++ digitInLeaf ) {
 				M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
-				dst[ idx ++ ] = static_cast<char>( src[ i ] - VALID_CHARACTERS[ A_ZERO ] );
+				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF ) {
+					dst[idx ++] = leaf;
+					digitInLeaf = 0;
+					leaf = 0;
+				}
+				leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF - digitInLeaf ) - 1 ] );
 			}
-			
+			if ( idx < _digitCount )
+				dst[idx] = leaf;
+		}
+		if ( _integralPartSize > 0 ) {
+			idx = _integralPartSize - 1;
+			leaf = 0;
+			digitInLeaf = 0;
+			for ( int long i( ( dot != HString::npos ? dot : end ) - 1 ); i >= start; -- i, ++ digitInLeaf ) {
+				M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
+				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF ) {
+					M_ASSERT( idx >= 0 );
+					dst[idx --] = leaf;
+					digitInLeaf = 0;
+					leaf = 0;
+				}
+				leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ digitInLeaf ] );
+			}
+			if ( idx >= 0 )
+				dst[idx] = leaf;
 		}
 		if ( dot == HString::npos )
 			_integralPartSize = _digitCount;
@@ -264,19 +288,27 @@ void HNumber::from_string( HString const& number_ ) {
 
 HString HNumber::to_string( void ) const {
 	M_PROLOG
-	HString str = "";
+	u32_t const* const src( _canonical.get<u32_t>() );
+	_cache.realloc( _digitCount * DECIMAL_DIGITS_IN_LEAF + 3 ); /* + 1 for '.', + 1 for '-' and + 1 for terminating NIL */
+	char* ptr( _cache.get<char>() );
 	if ( _negative )
-		str = VALID_CHARACTERS[ A_MINUS ];
-	char const* const src( _canonical.get<char>() );
-	int digit = 0;
+		*ptr ++ = VALID_CHARACTERS[ A_MINUS ];
+	int digit( 0 );
 	for ( ; digit < _integralPartSize; ++ digit )
-		str += static_cast<char>( src[ digit ] + VALID_CHARACTERS[ A_ZERO ] );
+		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF + 1, digit ? "%09u" : "%u", src[ digit ] ); /* + 1 for terminating NIL */
 	if ( _digitCount > _integralPartSize )
-		str += VALID_CHARACTERS[ A_DOT ];
+		*ptr ++ = VALID_CHARACTERS[ A_DOT ];
 	for ( ; digit < _digitCount; ++ digit )
-		str += static_cast<char>( src[ digit ] + VALID_CHARACTERS[ A_ZERO ] );
+		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF + 1, "%09u", src[ digit ] );
 	if ( ! _digitCount )
-		str = "0";
+		*ptr ++ = '0';
+	else if ( _digitCount > _integralPartSize ) {
+		while ( *( ptr - 1 ) == '0' )
+			-- ptr;
+	}
+	*ptr = 0;
+	char const* s( _cache.get<char>() );
+	HString str( s, ptr - s );
 	return ( str );
 	M_EPILOG
 }

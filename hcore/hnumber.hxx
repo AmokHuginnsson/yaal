@@ -44,7 +44,7 @@ private:
 	int long _digitCount;
 	int long _integralPartSize;
 	HChunk _canonical;
-	HChunk _cache;
+	mutable HChunk _cache;
 public:
 	M_YAAL_HCORE_PUBLIC_API static int DEFAULT_PRECISION;
 public:
