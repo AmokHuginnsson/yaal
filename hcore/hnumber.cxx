@@ -47,6 +47,8 @@ int const A_DOT = 1;
 int const A_ZERO = 2;
 int const NUMBER_START = 3;
 int const KARATSUBA_THRESHOLD = 20; /* FIXME: 20 is fine */
+u32_t const LEAF = 1000000000l;
+int const DECIMAL_DIGITS_IN_LEAF = 9;
 u32_t const DECIMAL_SHIFT[] = {
 	1l,
 	10l,
@@ -57,7 +59,7 @@ u32_t const DECIMAL_SHIFT[] = {
 	1000000l,
 	10000000l,
 	100000000l,
-	1000000000l,
+	LEAF,
 };
 
 }
@@ -201,55 +203,58 @@ void HNumber::from_double( double long number_ ) {
 void HNumber::from_string( HString const& number_ ) {
 	M_PROLOG
 	/* ! - represent known but invalid character, ? - represent unknown character */
-	int long start = number_.find_one_of( VALID_CHARACTERS );
-	M_ENSURE( start >= 0 ); /* exclude "!!!!" */
+	int long start( number_.find_one_of( VALID_CHARACTERS ) );
+	M_ENSURE( start != HString::npos ); /* exclude "!!!!" */
 	char const* const src = number_.raw();
 	_negative = ( src[ start ] == VALID_CHARACTERS[ A_MINUS ] ); /* "!!!-???" */
 	if ( _negative )
 		++ start;
-	int long len = number_.get_length();
+	int long len( number_.get_length() );
 	M_ENSURE( start < len ); /* exclude "!!-" */
 	M_ENSURE( number_.find_one_of( VALID_CHARACTERS + A_DOT, start ) == start ); /* exclude "--" and "-!!" */
-	int long idx = number_.find_other_than( "0", start ); /* skip leading 0s */
-	int long end = start + 1;
+	int long idx( number_.find_other_than( "0", start ) ); /* skip leading 0s */
+	int long end( start + 1 );
 	_integralPartSize = 0;
 	_digitCount = 0;
-	if ( idx >= 0 ) do /* "!!![-][.1-9]???" or "000." */ {
-		int long first_valid = start;
+	if ( idx != HString::npos ) do /* "!!![-][.1-9]???" or "000." */ {
+		int long firstValid( start );
 		start = idx;
-		int long dot = number_.find( VALID_CHARACTERS[ A_DOT ], start );
+		int long dot( number_.find( VALID_CHARACTERS[ A_DOT ], start ) );
 		idx = number_.find_other_than( VALID_CHARACTERS + A_DOT, start );
-		if ( ( idx >= 0 ) && ( idx < dot ) ) /* "!!232!!." */
-			dot = -1;
-		int long digit = number_.find_one_of( VALID_CHARACTERS + A_ZERO, start );
-		if ( ( digit < 0 ) && ( first_valid < start ) )
+		if ( ( idx != HString::npos ) && ( idx < dot ) ) /* "!!232.!!!" */
+			dot = HString::npos;
+		int long digit( number_.find_one_of( VALID_CHARACTERS + A_ZERO, start ) );
+		if ( ( digit == HString::npos ) && ( firstValid < start ) )
 			break;
-		M_ENSURE( digit >= 0 ); /* must have digit */
+		M_ENSURE( digit != HString::npos ); /* must have digit */
 		M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
 		end = number_.find_other_than( VALID_CHARACTERS + ( dot >= 0 ? A_ZERO : A_DOT ), dot >= 0 ? dot + 1 : start );
-		( end >= 0 ) || ( end = len );
-		if ( dot >= 0 ) {
+		( end != HString::npos ) || ( end = len );
+		if ( dot != HString::npos ) {
 			idx = number_.reverse_find_other_than( "0", len - end );
-			end = ( idx >= 0 ) ? len - idx : start + 1;
+			end = ( idx != HString::npos ) ? len - idx : start + 1;
 		}
-		_digitCount = end - start;
-		if ( dot >= 0 ) {
-			_integralPartSize = dot - start;
-			-- _digitCount;
-		} else
+		M_ASSERT( ( dot == HString::npos ) || ( ( end - dot ) > 0 ) );
+		int long integralPart( dot != HString::npos ? ( ( dot - start ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF : ( ( end - start ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF );
+		int long decimalPart( dot != HString::npos ? ( ( end - dot ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF : 0 );
+		int long leafCount( integralPart + decimalPart );
+		if ( leafCount > 0 )
+			_canonical.realloc( chunk_size<u32_t>( leafCount ) );
+		u32_t* dst( _canonical.get<u32_t>() );
+		if ( dot != HString::npos ) /* scan decimal part */ {
+			idx = decimalPart;
+			for ( int long i = start; i < end; ++ i ) {
+				if ( src[ i ] == VALID_CHARACTERS[ A_DOT ] )
+					continue;
+				M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
+				dst[ idx ++ ] = static_cast<char>( src[ i ] - VALID_CHARACTERS[ A_ZERO ] );
+			}
+			
+		}
+		if ( dot == HString::npos )
 			_integralPartSize = _digitCount;
 		if ( decimal_length() >= _precision )
 			_precision = decimal_length() + 1;
-		if ( _digitCount )
-			_canonical.realloc( _digitCount );
-		char* dst = _canonical.get<char>();
-		idx = 0;
-		for ( int long i = start; i < end; ++ i ) {
-			if ( src[ i ] == VALID_CHARACTERS[ A_DOT ] )
-				continue;
-			M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
-			dst[ idx ++ ] = static_cast<char>( src[ i ] - VALID_CHARACTERS[ A_ZERO ] );
-		}
 	} while ( 0 );
 	if ( _digitCount == 0 )
 		_negative = false;
