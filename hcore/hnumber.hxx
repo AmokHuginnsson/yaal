@@ -114,9 +114,9 @@ public:
 	HString to_string( void ) const;
 	bool is_exact( void ) const;
 private:
-	bool mutate_addition( char*, int long, char const* const[], int long*, int long*, bool, bool ) const;
+	bool mutate_addition( i32_t*, int long, i32_t const* const[], int long*, int long*, bool, bool ) const;
 	int long absolute_lower( HNumber const& ) const;
-	int long karatsuba( HChunk&, char const*, int long, char const*, int long );
+	int long karatsuba( HChunk&, i32_t const*, int long, i32_t const*, int long );
 	int long integral_length( void ) const;
 	int long decimal_length( void ) const;
 	void from_string( HString const& );

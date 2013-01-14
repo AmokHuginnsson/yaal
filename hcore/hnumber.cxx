@@ -48,9 +48,9 @@ int const A_DOT = 1;
 int const A_ZERO = 2;
 int const NUMBER_START = 3;
 int const KARATSUBA_THRESHOLD = 20; /* FIXME: 20 is fine */
-u32_t const LEAF = 1000000000l;
+i32_t const LEAF = 1000000000l;
 int const DECIMAL_DIGITS_IN_LEAF = 9;
-u32_t const DECIMAL_SHIFT[] = {
+i32_t const DECIMAL_SHIFT[] = {
 	1l,
 	10l,
 	100l,
@@ -157,8 +157,8 @@ HNumber::HNumber( HNumber const& source )
 	_canonical(), _cache() {
 	M_PROLOG
 	if ( source._digitCount ) {
-		_canonical.realloc( source._digitCount, HChunk::STRATEGY::EXACT );
-		::memcpy( _canonical.raw(), source._canonical.raw(), source._digitCount );
+		_canonical.realloc( chunk_size<i32_t>( source._digitCount ), HChunk::STRATEGY::EXACT );
+		::memcpy( _canonical.raw(), source._canonical.raw(), chunk_size<i32_t>( source._digitCount ) );
 		if ( source._cache.get_size() > 0 ) {
 			_cache.realloc( source._cache.get_size(), HChunk::STRATEGY::EXACT );
 			::memcpy( _cache.raw(), source._cache.raw(), source._cache.get_size() );
@@ -240,9 +240,9 @@ void HNumber::from_string( HString const& number_ ) {
 		int long decimalPart( dot != HString::npos ? ( ( end - ( dot + 1 ) ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF : 0 );
 		_digitCount = _integralPartSize + decimalPart;
 		if ( _digitCount > 0 )
-			_canonical.realloc( chunk_size<u32_t>( _digitCount ) );
-		u32_t* dst( _canonical.get<u32_t>() );
-		u32_t leaf( 0 );
+			_canonical.realloc( chunk_size<i32_t>( _digitCount ) );
+		i32_t* dst( _canonical.get<i32_t>() );
+		i32_t leaf( 0 );
 		int digitInLeaf( 0 );
 		if ( dot != HString::npos ) /* scan decimal part */ {
 			idx = _integralPartSize;
@@ -288,7 +288,7 @@ void HNumber::from_string( HString const& number_ ) {
 
 HString HNumber::to_string( void ) const {
 	M_PROLOG
-	u32_t const* const src( _canonical.get<u32_t>() );
+	i32_t const* const src( _canonical.get<i32_t>() );
 	_cache.realloc( _digitCount * DECIMAL_DIGITS_IN_LEAF + 3 ); /* + 1 for '.', + 1 for '-' and + 1 for terminating NIL */
 	char* ptr( _cache.get<char>() );
 	if ( _negative )
@@ -344,14 +344,16 @@ bool HNumber::is_exact( void ) const {
 }
 
 int long HNumber::absolute_lower( HNumber const& other ) const {
-	char const* p1( _canonical.get<char>() );
-	char const* p2( other._canonical.get<char>() );
-	int long cmp = 1;
+	i32_t const* p1( _canonical.get<i32_t>() );
+	i32_t const* p2( other._canonical.get<i32_t>() );
+	int long cmp( 1 );
 	if ( _integralPartSize < other._integralPartSize )
 		cmp = -1;
 	else if ( _integralPartSize == other._integralPartSize ) {
 		int long len = min( _digitCount, other._digitCount );
-		cmp = memcmp( p1, p2, len );
+		cmp = 0;
+		for ( int long i( 0 ); ! cmp && ( i < len ); ++ i )
+			cmp = static_cast<i32_t>( p1[i] ) - static_cast<i32_t>( p2[i] );
 		if ( ! cmp )
 			cmp = _digitCount - other._digitCount;
 	}
@@ -362,7 +364,7 @@ bool HNumber::operator == ( HNumber const& other ) const {
 	return ( ( _negative == other._negative )
 			&& ( _digitCount == other._digitCount )
 			&& ( _integralPartSize == other._integralPartSize )
-			&& ! ::memcmp( _canonical.raw(), other._canonical.raw(), _digitCount ) );
+			&& ! ::memcmp( _canonical.raw(), other._canonical.raw(), chunk_size<i32_t>( _digitCount ) ) );
 }
 
 bool HNumber::operator != ( HNumber const& other ) const {
@@ -394,39 +396,39 @@ bool HNumber::operator >= ( HNumber const& other ) const {
 	return ( other <= *this );
 }
 
-bool HNumber::mutate_addition( char* res, int long ressize,
-		char const* const ep[], int long* lm, int long* rm, bool sub, bool swp ) const {
-	int carrier( 0 );
-	int e[ 2 ];
+bool HNumber::mutate_addition( i32_t* res, int long ressize,
+		i32_t const* const ep[], int long* lm, int long* rm, bool sub, bool swp ) const {
+	i32_t e[ 2 ];
 	int long lmx[] = { lm ? ( swp ? lm[ 1 ] : lm[ 0 ] ) : 0, lm ? ( swp ? lm[ 0 ] : lm[ 1 ] ) : 0 };
 	int long rmx[] = { rm ? ( swp ? rm[ 1 ] : rm[ 0 ] ) : 0, rm ? ( swp ? rm[ 0 ] : rm[ 1 ] ) : 0 };
-	char const* const epx[] = {
+	i32_t const* const epx[] = {
 		swp ? ep[ 1 ] - lmx[ 0 ] - 1 : ep[ 0 ] - lmx[ 0 ] - 1,
 		swp ? ep[ 0 ] - lmx[ 1 ] - 1 : ep[ 1 ] - lmx[ 1 ] - 1
 	};
 	int long idx( ressize - 1 ); /* index of first processed digit */
 	int side( ( rmx[ 0 ] > rmx[ 1 ] ) ? 1 : 0 );
 	int long off( rmx[ 1 - side ] );
-	char const* src( epx[ side ] );
+	i32_t const* src( epx[ side ] );
 	e[ 1 - side ] = 0;
+	i32_t carrier( 0 );
 	while ( off -- && ( idx > 0 ) ) {
 		e[ side ] = src[ idx ];
 		if ( sub ) {
-			int x = e[ 0 ] - carrier;
+			i32_t x( e[ 0 ] - carrier );
 			if ( x < e[ 1 ] ) {
-				x += 10;
+				x += LEAF;
 				carrier = 1;
 			} else
 				carrier = 0;
-			res[ idx ] = static_cast<char>( x - e[ 1 ] );
+			res[ idx ] = x - e[ 1 ];
 		} else {
-		 	int x = e[ 0 ] + e[ 1 ] + carrier;
-			if ( x > 9 ) {
-				x -= 10;
+		 	i32_t x( e[ 0 ] + e[ 1 ] + carrier );
+			if ( x >= LEAF ) {
+				x -= LEAF;
 				carrier = 1;
 			} else
 				carrier = 0;
-			res[ idx ] = static_cast<char>( x );
+			res[ idx ] = x;
 		}
 		-- idx;
 	}
@@ -434,21 +436,21 @@ bool HNumber::mutate_addition( char* res, int long ressize,
 	off = lmx[ 1 - side ];
 	while ( idx > off ) {
 		if ( sub ) {
-			int x = epx[ 0 ][ idx ] - carrier;
+			i32_t x( epx[ 0 ][ idx ] - carrier );
 			if ( x < epx[ 1 ][ idx ] ) {
-				x += 10;
+				x += LEAF;
 				carrier = 1;
 			} else
 				carrier = 0;
-			res[ idx ] = static_cast<char>( x - epx[ 1 ][ idx ] );
+			res[ idx ] = x - epx[ 1 ][ idx ];
 		} else {
-			int x = epx[ 0 ][ idx ] + epx[ 1 ][ idx ] + carrier;
-			if ( x > 9 ) {
-				x -= 10;
+			i32_t x( epx[ 0 ][ idx ] + epx[ 1 ][ idx ] + carrier );
+			if ( x >= LEAF ) {
+				x -= LEAF;
 				carrier = 1;
 			} else
 				carrier = 0;
-			res[ idx ] = static_cast<char>( x );
+			res[ idx ] = x;
 		}
 		-- idx;
 	}
@@ -457,21 +459,21 @@ bool HNumber::mutate_addition( char* res, int long ressize,
 	while ( idx > 0 ) {
 		e[ side ] = src[ idx ];
 		if ( sub ) {
-			int x = e[ 0 ] - carrier;
+			i32_t x( e[ 0 ] - carrier );
 			if ( x < e[ 1 ] ) {
-				x += 10;
+				x += LEAF;
 				carrier = 1;
 			} else
 				carrier = 0;
-			res[ idx ] = static_cast<char>( x - e[ 1 ] );
+			res[ idx ] = x - e[ 1 ];
 		} else {
-			int x = e[ 0 ] + e[ 1 ] + carrier;
-			if ( x > 9 ) {
-				x -= 10;
+			i32_t x( e[ 0 ] + e[ 1 ] + carrier );
+			if ( x >= LEAF ) {
+				x -= LEAF;
 				carrier = 1;
 			} else
 				carrier = 0;
-			res[ idx ] = static_cast<char>( x );
+			res[ idx ] = x;
 		}
 		-- idx;
 	}
@@ -498,15 +500,16 @@ HNumber& HNumber::operator += ( HNumber const& element ) {
 		_precision = element.is_exact() ? _precision : element._precision;
 	( dps <= _precision ) || ( dps = _precision );
 	int long ressize = ips + dps + 1; /* + 1 for possible carrier */
-	_cache.realloc( ressize );
-	char* res( _cache.get<char>() );
-	char const* ep1( _canonical.get<char>() );
-	char const* ep2( element._canonical.get<char>() );
+	_cache.realloc( chunk_size<i32_t>( ressize ) );
+	::memset( _cache.raw(), 0, _cache.get_size() );
+	i32_t* res( _cache.get<i32_t>() );
+	i32_t const* ep1( _canonical.get<i32_t>() );
+	i32_t const* ep2( element._canonical.get<i32_t>() );
 	int long lm[] = { ips - _integralPartSize, ips - element._integralPartSize };
 	int long rm[] = { dps - decimal_length(), dps - element.decimal_length() };
 	( rm[ 0 ] >= 0 ) || ( rm[ 0 ] = 0 );
 	( rm[ 1 ] >= 0 ) || ( rm[ 1 ] = 0 );
-	char const* ep[] = { ep1, ep2 };
+	i32_t const* ep[] = { ep1, ep2 };
 	bool sub = ( ( _negative && ! element._negative ) || ( ! _negative && element._negative ) );
 	bool swp = sub && ( absolute_lower( element ) < 0 );
 	mutate_addition( res, ressize, ep, lm, rm, sub, swp );
@@ -554,8 +557,8 @@ HNumber& HNumber::operator *= ( HNumber const& factor_ ) {
 	if ( n._digitCount && factor._digitCount ) {
 		::memset( _cache.raw(), 0, _cache.get_size() );
 		karatsuba( _cache,
-				n._canonical.get<char>(), n._digitCount,
-				factor._canonical.get<char>(), factor._digitCount );
+				n._canonical.get<i32_t>(), n._digitCount,
+				factor._canonical.get<i32_t>(), factor._digitCount );
 		_digitCount += factor_._digitCount;
 		_integralPartSize += factor_._integralPartSize;
 		_canonical.swap( _cache );
@@ -580,12 +583,12 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const {
 		while ( ( shift < denominator._digitCount ) && ( den[ shift ] == 0 ) )
 			++ shift;
 		int long denlen( denominator._digitCount - shift );
-		HChunk reminder( denlen + 1 ); /* + 1 for carrier */
-		HChunk pseudoden( denlen + 1 );
-		char const* src( _canonical.get<char>() );
-		char* pden( pseudoden.get<char>() );
-		char* rem( reminder.get<char>() );
-		char const* ep[] = { rem, pden };
+		HChunk reminder( chunk_size<i32_t>( denlen + 1 ) ); /* + 1 for carrier */
+		HChunk pseudoden( chunk_size<i32_t>( denlen + 1 ) );
+		i32_t const* src( _canonical.get<i32_t>() );
+		i32_t* pden( pseudoden.get<i32_t>() );
+		i32_t* rem( reminder.get<i32_t>() );
+		i32_t const* ep[] = { rem, pden };
 		int long len( min( _digitCount, denlen ) );
 		::memcpy( pden + 1, denominator._canonical.get<char>() + shift, denlen );
 		::memcpy( rem + 1 + denlen - len, src, len );
@@ -596,7 +599,7 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const {
 		while ( -- shift > 0 )
 			++ n._digitCount;
 		if ( n._digitCount )
-			n._canonical.realloc( n._digitCount );
+			n._canonical.realloc( chunk_size<i32_t>( n._digitCount ) );
 		int cmp = 0;
 		shift = 0;
 		bool carrier( ( denominator._integralPartSize - _integralPartSize - denominator.decimal_length() ) > 0 );
@@ -617,12 +620,12 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const {
 				++ digit;
 			}
 			if ( digit || shift ) {
-				n._canonical.realloc( n._digitCount + 1 );
+				n._canonical.realloc( chunk_size<i32_t>( n._digitCount + 1 ) );
 				n._canonical.get<char>()[ n._digitCount ++ ] = static_cast<char>( digit );
 				shift = 1;
 			}
 			if ( rem[ 0 ] && carrier && ! shift ) {
-				n._canonical.realloc( ++ n._digitCount );
+				n._canonical.realloc( chunk_size<i32_t>( ++ n._digitCount ) );
 				carrier = false;
 			} else if ( rem[ 0 ] && ! shift )
 				ncar = true;
@@ -630,10 +633,10 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const {
 		} while ( ( len <= _digitCount ) || ( ( ( n._digitCount - pred_int ) < n._precision ) && cmp ) );
 		n._integralPartSize = _integralPartSize - denominator._integralPartSize + denominator._digitCount - denlen + ( ! ncar ? 1 : 0 );
 		while ( n._digitCount < n._integralPartSize )
-			n._canonical.realloc( ++ n._digitCount );
+			n._canonical.realloc( chunk_size<i32_t>( ++ n._digitCount ) );
 		char* res( n._canonical.get<char>() );
 		if ( ( n._integralPartSize < 0 ) && ncar ) {
-			n._canonical.realloc( n._digitCount + 1 );
+			n._canonical.realloc( chunk_size<i32_t>( n._digitCount + 1 ) );
 			res = n._canonical.get<char>();
 			::memmove( res + 1, res, n._digitCount );
 			res[ 0 ] = 0;
@@ -723,14 +726,14 @@ HNumber HNumber::operator -- ( int ) {
 
 void HNumber::normalize( void ) {
 	M_PROLOG
-	char* res( _canonical.get<char>() );
+	i32_t* res( _canonical.get<i32_t>() );
 	int shift( 0 );
 	while ( ( shift < _integralPartSize ) && ( res[ shift ] == 0 ) )
 		++ shift;
 	if ( shift ) {
 		_integralPartSize -= shift;
 		_digitCount -= shift;
-		::memmove( res, res + shift, _digitCount );
+		::memmove( res, res + shift, chunk_size<i32_t>( _digitCount ) );
 	}
 	while ( ( decimal_length() > 0 ) && ( res[ _digitCount - 1 ] == 0 ) )
 		-- _digitCount;
@@ -740,7 +743,7 @@ void HNumber::normalize( void ) {
 	M_EPILOG
 }
 
-int long HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char const* fy, int long fys ) {
+int long HNumber::karatsuba( HChunk& result, i32_t const* fx, int long fxs, i32_t const* fy, int long fys ) {
 	int long shift( 0 );
 	while ( ( shift < fxs ) && ! fx[ shift ] )
 		++ shift;
@@ -757,63 +760,63 @@ int long HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char 
 		fy += ( fys - fyrl );
 		fxs = fxrl;
 		fys = fyrl;
-		result.realloc( digitCount = fxs + fys + totalShift );
+		result.realloc( chunk_size<i32_t>( digitCount = fxs + fys + totalShift ) );
 
 		int long fs( max( fxs, fys ) );
 		int long fl( min( fxs, fys ) );
-		int long m( ( fs / 2 ) + ( fs & 1 ) ); /* Size of upper/lower half of number */
+		int long const m( ( fs / 2 ) + ( fs & 1 ) ); /* Size of upper/lower half of number */
 		HChunk r2m; /* intermediate result ( fx1 * fx2 ( * B ^ 2m ) ) + 1 for carrier */
 		int long const r2ms( karatsuba( r2m, fx, fxs - m, fy, fys - m ) );
 		HChunk r; /* intermediate result ( fx2 * fy2 ) + 1 for carrier */
 		int long const rs( karatsuba( r, fx + ( fxs > m ? fxs - m : 0 ), min( fxs, m ), fy + ( fys > m ? fys - m : 0 ), min( fys, m ) ) );
-		HChunk hx( m + 1 ); /* + 1 for carrier */
-		HChunk hy( m + 1 );
+		HChunk hx( chunk_size<i32_t>( m + 1 ) ); /* + 1 for carrier */
+		HChunk hy( chunk_size<i32_t>( m + 1 ) );
 		/* preparation of hx and hy */
 		/* hx = fx / B^m + fx % B^m */
 		int long lm[] = { 2 * m - fxs, 0 };
-		char const* ep[] = { fx, fx + fxs - m };
+		i32_t const* ep[] = { fx, fx + fxs - m };
 		if ( fxs > m )
-			mutate_addition( hx.get<char>(), m + 1, ep, lm, NULL, false, false );
+			mutate_addition( hx.get<i32_t>(), m + 1, ep, lm, NULL, false, false );
 		else
-			memcpy( hx.get<char>() + hx.size() - fxs, fx, fxs );
+			memcpy( hx.get<i32_t>() + m + 1 - fxs, fx, chunk_size<i32_t>( fxs ) );
 		/* hy */
 		lm[ 0 ] = 2 * m - fys;
 		ep[ 0 ] = fy;
 		ep[ 1 ] = fy + fys - m;
 		if ( fys > m )
-			mutate_addition( hy.get<char>(), m + 1, ep, lm, NULL, false, false );
+			mutate_addition( hy.get<i32_t>(), m + 1, ep, lm, NULL, false, false );
 		else
-			memcpy( hy.get<char>() + hy.size() - fys, fy, fys );
+			memcpy( hy.get<i32_t>() + m + 1 - fys, fy, chunk_size<i32_t>( fys ) );
 		/* find Z */
 		HChunk Z;
-		int long Zs( karatsuba( Z, hx.get<char>(), hx.size(), hy.get<char>(), hy.size() ) );
+		int long Zs( karatsuba( Z, hx.get<i32_t>(), m + 1, hy.get<i32_t>(), m + 1 ) );
 		/* combine all results */
 		
 		int long const size( fxs + fys + 1 ); 
-		HChunk tmpres( size );
-		char* const res( tmpres.get<char>() );
+		HChunk tmpres( chunk_size<i32_t>( size ) );
+		i32_t* const res( tmpres.get<i32_t>() );
 
 		/* res = Z*B^m + r */
-		char const* p( Z.get<char>() );
+		i32_t const* p( Z.get<i32_t>() );
 		shift = 0;
 		while ( ( shift < Zs ) && ! p[ shift ] )
 			++ shift;
 		Zs -= shift;
 		p += shift;
-		ep[ 0 ] = r.get<char>();
+		ep[ 0 ] = r.get<i32_t>();
 		ep[ 1 ] = p;
 		lm[ 0 ] = Zs - rs + m;
 		lm[ 1 ] = 0;
 		if ( ep[ 0 ] ) {
-			::memcpy( res + size - rs, r.raw(), rs );
+			::memcpy( res + size - rs, r.raw(), chunk_size<i32_t>( rs ) );
 			mutate_addition( res + size - m - Zs - 1, Zs + 1, ep, lm, NULL, false, false );
 		} else
-			::memcpy( res + size - m - Zs, p, Zs );
+			::memcpy( res + size - m - Zs, p, chunk_size<i32_t>( Zs ) );
 
 		/* res += r2m*B^2m */
 		Zs = r2ms;
 		shift = 0;
-		p = r2m.get<char>();
+		p = r2m.get<i32_t>();
 		lm[ 0 ] = 0;
 		if ( p ) {
 			while ( ( shift < Zs ) && ! p[ shift ] )
@@ -832,40 +835,40 @@ int long HNumber::karatsuba( HChunk& result, char const* fx, int long fxs, char 
 		int car( 1 - ncar );
 
 		ep[ 0 ] = res + ncar;
-		ep[ 1 ] = r2m.get<char>();
+		ep[ 1 ] = r2m.get<i32_t>();
 		if ( ep[ 1 ] ) {
 			lm[ 1 ] = size - r2ms - m - ncar;
 			mutate_addition( res - car, size - m + car, ep, lm, NULL, true, false );
 		}
-		ep[ 1 ] = r.get<char>();
+		ep[ 1 ] = r.get<i32_t>();
 		if ( ep[ 1 ] ) {
 			lm[ 1 ] = size - rs - m - ncar;
 			mutate_addition( res - car, size - m + car, ep, lm, NULL, true, false );
 		}
-		::memcpy( result.get<char>() + totalShift, res + 1, digitCount - totalShift );
+		::memcpy( result.get<i32_t>() + totalShift, res + 1, digitCount - totalShift );
 	} else if ( ( fxrl > 0 ) && ( fyrl > 0 ) ) {
 /* variables for mutate_addition() */
-		result.realloc( digitCount = fxs + fys );
-		HChunk element( fys + 1 );
-		char* e( element.get<char>() );
-		char* res( ( result.get<char>() + fxs ) - 2 ); /* - 1 for carrier */
-		char const* ep[] = { res, e };
+		result.realloc( chunk_size<i32_t>( digitCount = fxs + fys ) );
+		HChunk element( chunk_size<i32_t>( fys + 1 ) );
+		i32_t* e( element.get<i32_t>() );
+		i32_t* res( ( result.get<i32_t>() + fxs ) - 2 ); /* - 1 for carrier */
+		i32_t const* ep[] = { res, e };
 /* the end of variables for mutate_addition() */
 		while ( -- fxs >= 0 ) {
 			if ( fx[ fxs ] ) {
-				int carrier( 0 );
+				i32_t carrier( 0 );
 				int long inner( fys ); /* index of last digit in second factor */
 				while ( -- inner >= 0 ) {
 					int long pos( inner + 1 );
-					int x( fx[ fxs ] * fy[ inner ] + carrier );
-					if ( x > 9 ) {
-						carrier = x / 10;
-						x %= 10;
+					i64_t x( static_cast<i64_t>( fx[ fxs ] ) * fy[ inner ] + carrier );
+					if ( x >= LEAF ) {
+						carrier = static_cast<i32_t>( x / LEAF );
+						x %= LEAF;
 					} else
 						carrier = 0;
-					e[ pos ] = static_cast<char>( x );
+					e[ pos ] = static_cast<i32_t>( x );
 				}
-				e[ 0 ] = static_cast<char>( carrier );
+				e[ 0 ] = carrier;
 				ep[ 0 ] = res + 1;
 				mutate_addition( res, fys + 1 + 1, ep, NULL, NULL, false, false );
 				-- res;
