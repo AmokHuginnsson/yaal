@@ -155,10 +155,10 @@ HNumber::HNumber( HNumber const& source )
 	M_PROLOG
 	if ( source._digitCount ) {
 		_canonical.realloc( source._digitCount, HChunk::STRATEGY::EXACT );
-		::memcpy( _canonical.raw(), source._canonical.raw(), _canonical.get_size() );
+		::memcpy( _canonical.raw(), source._canonical.raw(), source._digitCount );
 		if ( source._cache.get_size() > 0 ) {
 			_cache.realloc( source._cache.get_size(), HChunk::STRATEGY::EXACT );
-			::memcpy( _cache.raw(), source._cache.raw(), _cache.get_size() );
+			::memcpy( _cache.raw(), source._cache.raw(), source._cache.get_size() );
 		}
 	}
 	return;
@@ -515,14 +515,18 @@ HNumber& HNumber::operator *= ( HNumber const& factor_ ) {
 	HNumber const& n( factor_._digitCount < _digitCount ? factor_ : *this );
 	HNumber const& factor( factor_._digitCount < _digitCount ? *this : factor_ );
 	if ( n._digitCount && factor._digitCount ) {
+		::memset( _cache.raw(), 0, _cache.get_size() );
 		karatsuba( _cache,
 				n._canonical.get<char>(), n._digitCount,
 				factor._canonical.get<char>(), factor._digitCount );
-		_digitCount = n._digitCount + factor._digitCount;
-		_integralPartSize = n._integralPartSize + factor._integralPartSize;
+		_digitCount += factor_._digitCount;
+		_integralPartSize += factor_._integralPartSize;
 		_canonical.swap( _cache );
 		normalize();
 		_negative = ! ( ( n._negative && factor._negative ) || ! ( n._negative || factor._negative ) );
+	} else {
+		_digitCount = _integralPartSize = 0;
+		_negative = false;
 	}
 	return ( *this );
 	M_EPILOG
