@@ -459,15 +459,17 @@ class YaalHCoreHNumberPrinter:
 			if self._val['_negative']:
 				s = s + "-"
 			digit = 0
-			data = self._val['_canonical']['_data'].cast( gdb.lookup_type( "char" ).pointer() ).string( 'ascii', 'ignore', self._val['_digitCount'] )
+			data = self._val['_canonical']['_data'].cast( gdb.lookup_type( 'yaal::i32_t' ).pointer() )
 			while digit < self._val['_integralPartSize']:
-				s = s + chr( ord( data[digit] ) + ord( '0' ) )
+				s = s + ( str( data[digit] ).zfill( 9 ) if ( digit > 0 ) else str( data[digit] ) )
 				digit = digit + 1
 			if self._val['_digitCount'] > self._val['_integralPartSize']:
 				s = s + "."
 			while digit < self._val['_digitCount']:
-				s = s + chr( ord( data[digit] ) + ord( '0' ) )
+				s = s + str( data[digit] ).zfill( 9 )
 				digit = digit + 1
+			if self._val['_digitCount'] > self._val['_integralPartSize']:
+				s = s.strip( "0" )
 		else:
 			s = "0"
 		return s
