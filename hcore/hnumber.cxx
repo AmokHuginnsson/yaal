@@ -579,89 +579,17 @@ HNumber& HNumber::operator *= ( HNumber const& factor_ ) {
 
 HNumber HNumber::operator / ( HNumber const& denominator ) const {
 	M_PROLOG
-	M_ENSURE( denominator._digitCount != 0 );
-	HNumber n;
-	if ( _digitCount ) {
-		n._precision = _precision + denominator._precision;
-		i32_t const* const den( denominator._canonical.get<i32_t>() );
-		int long shift( 0 );
-		while ( ( shift < denominator._digitCount ) && ( den[ shift ] == 0 ) )
-			++ shift;
-		int long denlen( denominator._digitCount - shift );
-		HChunk reminder( chunk_size<i32_t>( denlen + 1 ) ); /* + 1 for carrier */
-		HChunk pseudoden( chunk_size<i32_t>( denlen + 1 ) );
-		i32_t const* src( _canonical.get<i32_t>() );
-		i32_t* pden( pseudoden.get<i32_t>() );
-		i32_t* rem( reminder.get<i32_t>() );
-		i32_t const* ep[] = { rem, pden };
-		int long len( min( _digitCount, denlen ) );
-		::memcpy( pden + 1, denominator._canonical.get<i32_t>() + shift, chunk_size<i32_t>( denlen ) );
-		::memcpy( rem + 1 + denlen - len, src, chunk_size<i32_t>( len ) );
-		shift = 0;
-		while ( ( shift < _digitCount ) && ( src[ shift ++ ] == 0 ) )
-			++ n._digitCount;
-		shift = denominator._integralPartSize - _integralPartSize;
-		while ( -- shift > 0 )
-			++ n._digitCount;
-		if ( n._digitCount )
-			n._canonical.realloc( chunk_size<i32_t>( n._digitCount ) );
-		i32_t cmp = 0;
-		shift = 0;
-		bool carrier( ( denominator._integralPartSize - _integralPartSize - denominator.decimal_length() ) > 0 );
-		bool ncar( false );
-		int long pred_int( _integralPartSize - denominator._integralPartSize + denominator._digitCount - denlen );
-		( pred_int >= 0 ) || ( pred_int = 0 );
-		++ pred_int;
-		do {
-			i32_t digit = 0;
-			while ( ( cmp = leafcmp( rem, pden, denlen + 1 ) ) > 0 ) {
-				mutate_addition( rem - 1, denlen + 1 + 1, ep, NULL, NULL, true, false );
-				++ digit;
-			}
-			::memmove( rem, rem + 1, chunk_size<i32_t>( denlen ) );
-			rem[ denlen ] = len < _digitCount ? src[ len ] : '\0';
-			if ( ! cmp ) {
-				::memset( rem, 0, chunk_size<i32_t>( denlen ) );
-				++ digit;
-			}
-			if ( digit || shift ) {
-				n._canonical.realloc( chunk_size<i32_t>( n._digitCount + 1 ) );
-				n._canonical.get<i32_t>()[ n._digitCount ++ ] = digit;
-				shift = 1;
-			}
-			if ( rem[ 0 ] && carrier && ! shift ) {
-				n._canonical.realloc( chunk_size<i32_t>( ++ n._digitCount ) );
-				carrier = false;
-			} else if ( rem[ 0 ] && ! shift )
-				ncar = true;
-			++ len;
-		} while ( ( len <= _digitCount ) || ( ( ( n._digitCount - pred_int ) < n._precision ) && cmp ) );
-		n._integralPartSize = _integralPartSize - denominator._integralPartSize + denominator._digitCount - denlen + ( ! ncar ? 1 : 0 );
-		while ( n._digitCount < n._integralPartSize )
-			n._canonical.realloc( chunk_size<i32_t>( ++ n._digitCount ) );
-		i32_t* res( n._canonical.get<i32_t>() );
-		if ( ( n._integralPartSize < 0 ) && ncar ) {
-			n._canonical.realloc( chunk_size<i32_t>( n._digitCount + 1 ) );
-			res = n._canonical.get<i32_t>();
-			::memmove( res + 1, res, chunk_size<i32_t>( n._digitCount ) );
-			res[ 0 ] = 0;
-			++ n._digitCount;
-		}
-		( n._integralPartSize >= 0 ) || ( n._integralPartSize = 0 );
-		n.normalize();
-		if ( n._digitCount > ( n._integralPartSize + n._precision ) )
-			n._digitCount = n._integralPartSize + n._precision;
-		M_ASSERT( n._integralPartSize >= 0 );
-		M_ASSERT( n._digitCount >= 0 );
-		n._negative = ! ( ( _negative && denominator._negative ) || ! ( _negative || denominator._negative ) );
-	}
+	HNumber n( *this );
+	n /= denominator;
 	return ( n );
 	M_EPILOG
 }
 
 HNumber& HNumber::operator /= ( HNumber const& factor ) {
 	M_PROLOG
-	operator = ( *this / factor );
+	M_ENSURE( denominator._digitCount != 0 );
+	if ( _digitCount ) {
+	}
 	return ( *this );
 	M_EPILOG
 }
