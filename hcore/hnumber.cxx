@@ -585,7 +585,7 @@ HNumber HNumber::operator / ( HNumber const& denominator ) const {
 	M_EPILOG
 }
 
-HNumber& HNumber::operator /= ( HNumber const& factor ) {
+HNumber& HNumber::operator /= ( HNumber const& denominator ) {
 	M_PROLOG
 	M_ENSURE( denominator._digitCount != 0 );
 	if ( _digitCount ) {
