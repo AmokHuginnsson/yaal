@@ -41,7 +41,7 @@ class HNumber {
 private:
 	int long _precision;
 	bool _negative;
-	int long _digitCount;
+	int long _leafCount;
 	int long _integralPartSize;
 	HChunk _canonical;
 	mutable HChunk _cache;
