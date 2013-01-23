@@ -50,12 +50,14 @@ M_VCSID( "$Id: "__TID__" $" )
  *
  *   dividend / divisor = quotient
  *
- *   divisor % divisor = remainder
+ *   dividend % divisor = remainder
  */
 
 namespace yaal {
 
 namespace hcore {
+
+int const HNumber::DECIMAL_DIGITS_IN_LEAF = 1;
 
 namespace {
 int const SPECIAL_CHARS = 3; /* minus, dot, nil */
@@ -67,9 +69,6 @@ int const A_DOT = 1;
 int const A_ZERO = 2;
 int const NUMBER_START = 3;
 int const KARATSUBA_THRESHOLD = 20; /* FIXME: 20 is fine */
-i32_t const LEAF = 1000000000l;
-i32_t const LEAF_SQ = static_cast<i32_t>( ::sqrt( LEAF ) );
-int const DECIMAL_DIGITS_IN_LEAF = 9;
 i32_t const DECIMAL_SHIFT[] = {
 	1l,
 	10l,
@@ -80,8 +79,13 @@ i32_t const DECIMAL_SHIFT[] = {
 	1000000l,
 	10000000l,
 	100000000l,
-	LEAF,
+	1000000000l
 };
+i32_t const LEAF = DECIMAL_SHIFT[ HNumber::DECIMAL_DIGITS_IN_LEAF ];
+i32_t const LEAF_SQ = static_cast<i32_t>( ::sqrt( LEAF ) );
+char ZFORMAT[] = "%00u";
+
+char unused = ZFORMAT[2] = static_cast<char>( '0' + HNumber::DECIMAL_DIGITS_IN_LEAF );
 
 inline i32_t leafcmp( i32_t const* left_, i32_t const* right_, int long len_ ) {
 	i32_t cmp( 0 );
@@ -322,11 +326,11 @@ HString HNumber::to_string( void ) const {
 		*ptr ++ = VALID_CHARACTERS[ A_MINUS ];
 	int leaf( 0 );
 	for ( ; leaf < _integralPartSize; ++ leaf )
-		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF + 1, leaf ? "%09u" : "%u", src[ leaf ] ); /* + 1 for terminating NIL */
+		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF + 1, leaf ? ZFORMAT : "%u", src[ leaf ] ); /* + 1 for terminating NIL */
 	if ( _leafCount > _integralPartSize )
 		*ptr ++ = VALID_CHARACTERS[ A_DOT ];
 	for ( ; leaf < _leafCount; ++ leaf )
-		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF + 1, "%09u", src[ leaf ] );
+		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF + 1, ZFORMAT, src[ leaf ] );
 	if ( ! _leafCount )
 		*ptr ++ = '0';
 	else if ( _leafCount > _integralPartSize ) {
@@ -607,7 +611,7 @@ HNumber HNumber::operator / ( HNumber const& divisor_ ) const {
 
 HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 	M_PROLOG
-	M_ENSURE( divisor_._leafCount != 0 );
+	M_ENSURE( divisor_._leafCount > 0 );
 	if ( _leafCount ) {
 		/*
 		 * We use "long division" pen and paper algorithm.
@@ -636,20 +640,26 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		 */
 		i32_t const* divisor( divisor_._canonical.get<i32_t>() );
 		int long divisorLeafCount( divisor_._leafCount );
-		int long shift( 0 );
-		while ( ! divisor[ shift ] )
-			++ shift;
-		divisor += shift;
-		divisorLeafCount -= shift;
+		int long lshift( 0 );
+		while ( ! divisor[ lshift ] )
+			++ lshift;
+		divisor += lshift;
+		divisorLeafCount -= lshift;
+		int long rshift( 0 );
+		while ( ! divisor[ divisorLeafCount - 1 ] ) {
+			-- divisorLeafCount;
+			++ rshift;
+		}
+		M_ASSERT( ( divisorLeafCount > 0 ) && ! ( lshift && rshift ) );
 		_cache.realloc( chunk_size<i32_t>( _leafCount ) );
 		HChunk buffer( chunk_size<i32_t>( divisorLeafCount * 2 + 1 ) );
 		i32_t* multiplierSample( buffer.get<i32_t>() );
 		i32_t* dividendSample( buffer.get<i32_t>() + divisorLeafCount + 1 );
 		i32_t* dividend( _canonical.get<i32_t>() );
 		int long precision( ( _precision + DECIMAL_DIGITS_IN_LEAF - 1 ) / DECIMAL_DIGITS_IN_LEAF );
-		::memcpy( dividendSample + 1, dividend, chunk_size<i32_t>( _leafCount ) );
+		int long dividendLeafNo( min( _leafCount, divisorLeafCount ) ); /* index of the next leaf to process */
+		::memcpy( dividendSample, dividend, chunk_size<i32_t>( dividendLeafNo ) );
 		int long decimalLeafs( 0 );
-		int long leafNo( divisorLeafCount ); /* index of the next leaf to process */
 		int long quotientLeafNo( 0 );
 		do {
 			/*
@@ -661,10 +671,17 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			i32_t leafHi( LEAF ); /* binary search algo upper bound  */
 			i32_t leaf( LEAF_SQ ); /* guessed leaf */
 			i32_t leafLow( 0 ); /* binary search algo lower bound */
-			int long divSampleLen( divisorLeafCount );
-			while ( leafcmp( dividendSample, divisor, divSampleLen ) < 0 ) /* We establish that divisor_ <= multiplierSample. */ {
-				::memmove( dividendSample, dividendSample + 1, divisorLeafCount );
-				dividendSample[divSampleLen + 1] = leafNo < _leafCount ? dividend[leafNo] : 0;
+			int long shift( 0 );
+			while ( ! dividendSample[ shift ] )
+				++ shift;
+			int long divSampleLen( divisorLeafCount - shift );
+			::memmove( dividendSample, dividendSample + shift, divSampleLen );
+			if ( ( shift > 0 ) && ( dividendLeafNo < _leafCount ) ) {
+				//::memcpy( dividendSample + divSampleLen, dividend + , );
+			}
+
+			if ( leafcmp( dividendSample, divisor, divSampleLen ) < 0 ) /* We establish that divisor_ <= multiplierSample. */ {
+				dividendSample[divSampleLen + 1] = dividendLeafNo < _leafCount ? dividend[dividendLeafNo] : 0;
 				if ( quotientLeafNo > 0 ) {
 					_cache.realloc( chunk_size<i32_t>( quotientLeafNo + 1 ) );
 					_cache.get<i32_t>()[ quotientLeafNo ++ ] = leaf;
@@ -677,15 +694,13 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				i32_t cmp( multiplierLeafCount > divisorLeafCount ? 1 : 0 );
 				if ( ! cmp )
 					cmp = leafcmp( multiplierSample + 1, dividendSample, divisorLeafCount );
-				if ( cmp > 0 ) {
+				if ( cmp > 0 )
 					leafHi = leaf;
-					leaf = ( leafHi + leafLow ) / 2;
-				} else if ( cmp < 0 ) {
+				else if ( cmp < 0 )
 					leafLow = leaf;
-					leaf = ( leafHi + leafLow ) / 2;
-				} else {
+				else
 					break;
-				}
+				leaf = ( leafHi + leafLow ) / 2;
 			}
 			i32_t const* ep[] = { dividendSample, divisor }; /* helper for mutate_addition */
 			mutate_addition( dividendSample + 1, divisorLeafCount + 1 + 1, ep, NULL, NULL, true, false );
@@ -694,6 +709,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 
 		} while ( decimalLeafs < precision );
 		_canonical.swap( _cache );
+		_integralPartSize -= divisor_._integralPartSize;
+		_leafCount = quotientLeafNo;
+		_negative = ! ( ( _negative && divisor_._negative ) || ! ( _negative || divisor_._negative ) );
 	}
 	return ( *this );
 	M_EPILOG

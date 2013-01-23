@@ -46,6 +46,7 @@ private:
 	HChunk _canonical;
 	mutable HChunk _cache;
 public:
+	M_YAAL_HCORE_PUBLIC_API static int const DECIMAL_DIGITS_IN_LEAF;
 	M_YAAL_HCORE_PUBLIC_API static int DEFAULT_PRECISION;
 public:
 	HNumber( void );

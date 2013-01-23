@@ -455,7 +455,7 @@ class YaalHCoreHNumberPrinter:
 
 	def to_string( self ):
 		s = ""
-		if self._val['_digitCount'] > 0:
+		if self._val['_leafCount'] > 0:
 			if self._val['_negative']:
 				s = s + "-"
 			digit = 0
@@ -463,12 +463,12 @@ class YaalHCoreHNumberPrinter:
 			while digit < self._val['_integralPartSize']:
 				s = s + ( str( data[digit] ).zfill( 9 ) if ( digit > 0 ) else str( data[digit] ) )
 				digit = digit + 1
-			if self._val['_digitCount'] > self._val['_integralPartSize']:
+			if self._val['_leafCount'] > self._val['_integralPartSize']:
 				s = s + "."
-			while digit < self._val['_digitCount']:
+			while digit < self._val['_leafCount']:
 				s = s + str( data[digit] ).zfill( 9 )
 				digit = digit + 1
-			if self._val['_digitCount'] > self._val['_integralPartSize']:
+			if self._val['_leafCount'] > self._val['_integralPartSize']:
 				s = s.strip( "0" )
 		else:
 			s = "0"
