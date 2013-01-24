@@ -57,9 +57,8 @@ namespace yaal {
 
 namespace hcore {
 
-int const HNumber::DECIMAL_DIGITS_IN_LEAF = 1;
-
 namespace {
+int const DECIMAL_DIGITS_IN_LEAF_CONST = 1;
 int const SPECIAL_CHARS = 3; /* minus, dot, nil */
 char const VALID_CHARACTERS[] = "-.0123456789";
 int const JUST_DIGITS = 2;
@@ -81,11 +80,11 @@ i32_t const DECIMAL_SHIFT[] = {
 	100000000l,
 	1000000000l
 };
-i32_t const LEAF = DECIMAL_SHIFT[ HNumber::DECIMAL_DIGITS_IN_LEAF ];
+i32_t const LEAF = meta::power<10, DECIMAL_DIGITS_IN_LEAF_CONST>::value;
 i32_t const LEAF_SQ = static_cast<i32_t>( ::sqrt( LEAF ) );
 char ZFORMAT[] = "%00u";
 
-char unused = ZFORMAT[2] = static_cast<char>( '0' + HNumber::DECIMAL_DIGITS_IN_LEAF );
+char unused = ZFORMAT[2] = static_cast<char>( '0' + DECIMAL_DIGITS_IN_LEAF_CONST );
 
 inline i32_t leafcmp( i32_t const* left_, i32_t const* right_, int long len_ ) {
 	i32_t cmp( 0 );
@@ -96,6 +95,7 @@ inline i32_t leafcmp( i32_t const* left_, i32_t const* right_, int long len_ ) {
 
 }
 
+int const HNumber::DECIMAL_DIGITS_IN_LEAF = DECIMAL_DIGITS_IN_LEAF_CONST;
 int HNumber::DEFAULT_PRECISION = 100;
 
 HNumber::HNumber( void )
@@ -267,8 +267,8 @@ void HNumber::from_string( HString const& number_ ) {
 			end = ( idx != HString::npos ) ? len - idx : start + 1;
 		}
 		M_ASSERT( ( dot == HString::npos ) || ( ( end - dot ) > 0 ) );
-		_integralPartSize = ( dot != HString::npos ? ( ( dot - start ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF : ( ( end - start ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF );
-		int long decimalPart( dot != HString::npos ? ( ( end - ( dot + 1 ) ) + ( DECIMAL_DIGITS_IN_LEAF - 1 ) ) / DECIMAL_DIGITS_IN_LEAF : 0 );
+		_integralPartSize = ( dot != HString::npos ? ( ( dot - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : ( ( end - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST );
+		int long decimalPart( dot != HString::npos ? ( ( end - ( dot + 1 ) ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : 0 );
 		_leafCount = _integralPartSize + decimalPart;
 		if ( _leafCount > 0 )
 			_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
@@ -279,12 +279,12 @@ void HNumber::from_string( HString const& number_ ) {
 			idx = _integralPartSize;
 			for ( int long i( dot + 1 ); i < end; ++ i, ++ digitInLeaf ) {
 				M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
-				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF ) {
+				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
 					dst[idx ++] = leaf;
 					digitInLeaf = 0;
 					leaf = 0;
 				}
-				leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF - digitInLeaf ) - 1 ] );
+				leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] );
 			}
 			if ( idx < _leafCount )
 				dst[idx] = leaf;
@@ -295,7 +295,7 @@ void HNumber::from_string( HString const& number_ ) {
 			digitInLeaf = 0;
 			for ( int long i( ( dot != HString::npos ? dot : end ) - 1 ); i >= start; -- i, ++ digitInLeaf ) {
 				M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
-				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF ) {
+				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
 					M_ASSERT( idx >= 0 );
 					dst[idx --] = leaf;
 					digitInLeaf = 0;
@@ -320,17 +320,17 @@ void HNumber::from_string( HString const& number_ ) {
 HString HNumber::to_string( void ) const {
 	M_PROLOG
 	i32_t const* const src( _canonical.get<i32_t>() );
-	_cache.realloc( _leafCount * DECIMAL_DIGITS_IN_LEAF + 3 ); /* + 1 for '.', + 1 for '-' and + 1 for terminating NIL */
+	_cache.realloc( _leafCount * DECIMAL_DIGITS_IN_LEAF_CONST + 3 ); /* + 1 for '.', + 1 for '-' and + 1 for terminating NIL */
 	char* ptr( _cache.get<char>() );
 	if ( _negative )
 		*ptr ++ = VALID_CHARACTERS[ A_MINUS ];
 	int leaf( 0 );
 	for ( ; leaf < _integralPartSize; ++ leaf )
-		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF + 1, leaf ? ZFORMAT : "%u", src[ leaf ] ); /* + 1 for terminating NIL */
+		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF_CONST + 1, leaf ? ZFORMAT : "%u", src[ leaf ] ); /* + 1 for terminating NIL */
 	if ( _leafCount > _integralPartSize )
 		*ptr ++ = VALID_CHARACTERS[ A_DOT ];
 	for ( ; leaf < _leafCount; ++ leaf )
-		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF + 1, ZFORMAT, src[ leaf ] );
+		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF_CONST + 1, ZFORMAT, src[ leaf ] );
 	if ( ! _leafCount )
 		*ptr ++ = '0';
 	else if ( _leafCount > _integralPartSize ) {
@@ -656,7 +656,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		i32_t* multiplierSample( buffer.get<i32_t>() );
 		i32_t* dividendSample( buffer.get<i32_t>() + divisorLeafCount + 1 );
 		i32_t* dividend( _canonical.get<i32_t>() );
-		int long precision( ( _precision + DECIMAL_DIGITS_IN_LEAF - 1 ) / DECIMAL_DIGITS_IN_LEAF );
+		int long precision( ( _precision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
 		int long dividendLeafNo( min( _leafCount, divisorLeafCount ) ); /* index of the next leaf to process */
 		::memcpy( dividendSample, dividend, chunk_size<i32_t>( dividendLeafNo ) );
 		int long decimalLeafs( 0 );
@@ -825,9 +825,10 @@ int long HNumber::karatsuba( HChunk& result, i32_t const* fx, int long fxs, i32_
 		int long const r2ms( karatsuba( r2m, fx, fxs - m, fy, fys - m ) );
 		HChunk r; /* intermediate result ( fx2 * fy2 ) + 1 for carrier */
 		int long const rs( karatsuba( r, fx + ( fxs > m ? fxs - m : 0 ), min( fxs, m ), fy + ( fys > m ? fys - m : 0 ), min( fys, m ) ) );
-		HChunk hxhyBuffer( chunk_size<i32_t>( ( m + 1 ) * 2 ) ); /* + 1 for carrier */
-		i32_t* hx( hxhyBuffer.get<i32_t>() );
-		i32_t* hy( hxhyBuffer.get<i32_t>() + m + 1 );
+		int long const size( fxs + fys + 1 ); 
+		HChunk buffer( chunk_size<i32_t>( size + ( m + 1 ) * 2 ) ); /* + 1 for carrier */
+		i32_t* hx( buffer.get<i32_t>() + size );
+		i32_t* hy( buffer.get<i32_t>() + size + m + 1 );
 		/* preparation of hx and hy */
 		/* hx = fx / B^m + fx % B^m */
 		int long lm[] = { 2 * m - fxs, 0 };
@@ -849,9 +850,7 @@ int long HNumber::karatsuba( HChunk& result, i32_t const* fx, int long fxs, i32_
 		int long Zs( karatsuba( Z, hx, m + 1, hy, m + 1 ) );
 		/* combine all results */
 		
-		int long const size( fxs + fys + 1 ); 
-		HChunk tmpres( chunk_size<i32_t>( size ) );
-		i32_t* const res( tmpres.get<i32_t>() );
+		i32_t* const res( buffer.get<i32_t>() );
 
 		/* res = Z*B^m + r */
 		i32_t const* p( Z.get<i32_t>() );
