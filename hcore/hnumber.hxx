@@ -119,7 +119,7 @@ private:
 	int long absolute_lower( HNumber const& ) const;
 	int long karatsuba( HChunk&, i32_t const*, int long, i32_t const*, int long );
 	int long integral_length( void ) const;
-	int long decimal_length( void ) const;
+	int long fractional_length( void ) const;
 	void from_string( HString const& );
 	void from_double( double long );
 	void normalize( void );

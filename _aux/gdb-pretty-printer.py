@@ -455,18 +455,19 @@ class YaalHCoreHNumberPrinter:
 
 	def to_string( self ):
 		s = ""
+		DDIL = gdb.parse_and_eval( "yaal::hcore::HNumber::DECIMAL_DIGITS_IN_LEAF" )
 		if self._val['_leafCount'] > 0:
 			if self._val['_negative']:
 				s = s + "-"
 			digit = 0
 			data = self._val['_canonical']['_data'].cast( gdb.lookup_type( 'yaal::i32_t' ).pointer() )
 			while digit < self._val['_integralPartSize']:
-				s = s + ( str( data[digit] ).zfill( 9 ) if ( digit > 0 ) else str( data[digit] ) )
+				s = s + ( str( data[digit] ).zfill( DDIL ) if ( digit > 0 ) else str( data[digit] ) )
 				digit = digit + 1
 			if self._val['_leafCount'] > self._val['_integralPartSize']:
 				s = s + "."
 			while digit < self._val['_leafCount']:
-				s = s + str( data[digit] ).zfill( 9 )
+				s = s + str( data[digit] ).zfill( DDIL )
 				digit = digit + 1
 			if self._val['_leafCount'] > self._val['_integralPartSize']:
 				s = s.strip( "0" )

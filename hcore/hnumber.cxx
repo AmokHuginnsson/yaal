@@ -268,14 +268,14 @@ void HNumber::from_string( HString const& number_ ) {
 		}
 		M_ASSERT( ( dot == HString::npos ) || ( ( end - dot ) > 0 ) );
 		_integralPartSize = ( dot != HString::npos ? ( ( dot - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : ( ( end - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST );
-		int long decimalPart( dot != HString::npos ? ( ( end - ( dot + 1 ) ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : 0 );
-		_leafCount = _integralPartSize + decimalPart;
+		int long fractionalPart( dot != HString::npos ? ( ( end - ( dot + 1 ) ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : 0 );
+		_leafCount = _integralPartSize + fractionalPart;
 		if ( _leafCount > 0 )
 			_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
 		i32_t* dst( _canonical.get<i32_t>() );
 		i32_t leaf( 0 );
 		int digitInLeaf( 0 );
-		if ( dot != HString::npos ) /* scan decimal part */ {
+		if ( dot != HString::npos ) /* scan fractional part */ {
 			idx = _integralPartSize;
 			for ( int long i( dot + 1 ); i < end; ++ i, ++ digitInLeaf ) {
 				M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
@@ -308,8 +308,8 @@ void HNumber::from_string( HString const& number_ ) {
 		}
 		if ( dot == HString::npos )
 			_integralPartSize = _leafCount;
-		if ( decimal_length() >= _precision )
-			_precision = decimal_length() + 1;
+		if ( fractional_length() >= _precision )
+			_precision = fractional_length() + 1;
 	} while ( 0 );
 	if ( _leafCount == 0 )
 		_negative = false;
@@ -357,7 +357,7 @@ int long HNumber::get_precision( void ) const {
 void HNumber::set_precision( int long precision_ ) {
 	M_PROLOG
 	if ( ( precision_ >= HARDCODED_MINIMUM_PRECISION )
-			&& ( ( precision_ <= _precision ) || ( decimal_length() < _precision ) ) )
+			&& ( ( precision_ <= _precision ) || ( fractional_length() < _precision ) ) )
 		_precision = precision_;
 	if ( ( _integralPartSize + _precision ) < _leafCount )
 		_leafCount = _integralPartSize + _precision;
@@ -365,7 +365,7 @@ void HNumber::set_precision( int long precision_ ) {
 	M_EPILOG
 }
 
-int long HNumber::decimal_length( void ) const {
+int long HNumber::fractional_length( void ) const {
 	return ( _leafCount - _integralPartSize );
 }
 
@@ -522,8 +522,8 @@ HNumber HNumber::operator + ( HNumber const& addend_ ) const {
 HNumber& HNumber::operator += ( HNumber const& addend_ ) {
 	M_PROLOG
 	int long ips = max( _integralPartSize, addend_._integralPartSize );
-	int long dps = max( decimal_length(), addend_.decimal_length() );
-	if ( decimal_length() < addend_.decimal_length() )
+	int long dps = max( fractional_length(), addend_.fractional_length() );
+	if ( fractional_length() < addend_.fractional_length() )
 		_precision = is_exact() ? addend_._precision : _precision;
 	else
 		_precision = addend_.is_exact() ? _precision : addend_._precision;
@@ -535,7 +535,7 @@ HNumber& HNumber::operator += ( HNumber const& addend_ ) {
 	i32_t const* ep1( _canonical.get<i32_t>() );
 	i32_t const* ep2( addend_._canonical.get<i32_t>() );
 	int long lm[] = { ips - _integralPartSize, ips - addend_._integralPartSize };
-	int long rm[] = { dps - decimal_length(), dps - addend_.decimal_length() };
+	int long rm[] = { dps - fractional_length(), dps - addend_.fractional_length() };
 	( rm[ 0 ] >= 0 ) || ( rm[ 0 ] = 0 );
 	( rm[ 1 ] >= 0 ) || ( rm[ 1 ] = 0 );
 	i32_t const* ep[] = { ep1, ep2 };
@@ -633,10 +633,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		 * 131313.131313 / 13
 		 */
 		/*
-		 * We need memory buffer for dividend sample,
-		 * and another one for dividend multiplier sample.
-		 * Assuming divisor has n leafs, a multiplier sample's buffer must
-		 * be able to accomodate n + 1 leafs ( + 1 for possible carrier).
+		 * Find proper part of divisor, i.e.:
+		 * .00123 -> 123
+		 * 123000 -> 123
 		 */
 		i32_t const* divisor( divisor_._canonical.get<i32_t>() );
 		int long divisorLeafCount( divisor_._leafCount );
@@ -651,16 +650,29 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			++ rshift;
 		}
 		M_ASSERT( ( divisorLeafCount > 0 ) && ! ( lshift && rshift ) );
+		/*
+		 * Pre-allocate memory for result.
+		 */
 		_cache.realloc( chunk_size<i32_t>( _leafCount ) );
+		/*
+		 * We need memory buffer for dividend sample,
+		 * and another one for multiplier sample.
+		 * Assuming divisor has n leafs, a multiplier sample's buffer must
+		 * be able to accomodate n + 1 leafs ( + 1 for possible carrier).
+		 */
 		HChunk buffer( chunk_size<i32_t>( divisorLeafCount * 2 + 1 ) );
 		i32_t* multiplierSample( buffer.get<i32_t>() );
 		i32_t* dividendSample( buffer.get<i32_t>() + divisorLeafCount + 1 );
 		i32_t* dividend( _canonical.get<i32_t>() );
 		int long precision( ( _precision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
-		int long dividendLeafNo( min( _leafCount, divisorLeafCount ) ); /* index of the next leaf to process */
+		int long dividendLeafNo( min( _leafCount, divisorLeafCount ) ); /* Index of the next leaf to process */
 		::memcpy( dividendSample, dividend, chunk_size<i32_t>( dividendLeafNo ) );
-		int long decimalLeafs( 0 );
-		int long quotientLeafNo( 0 );
+		/*
+		 * Number of leafs in quotient after leaf point.
+		 * Variable used to stop calculations based on maximum precision.
+		 */
+		int long fractionalLeafs( 0 );
+		int long quotientLeafNo( 0 ); /* Index of currently guessed quotient leaf. */
 		do {
 			/*
 			 * Using binary search algorithm we have to guess next leaf value.
@@ -671,29 +683,63 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			i32_t leafHi( LEAF ); /* binary search algo upper bound  */
 			i32_t leaf( LEAF_SQ ); /* guessed leaf */
 			i32_t leafLow( 0 ); /* binary search algo lower bound */
+
+			/*
+			 * Fix possible underflow in dividendSample.
+			 */
 			int long shift( 0 );
 			while ( ! dividendSample[ shift ] )
 				++ shift;
 			int long divSampleLen( divisorLeafCount - shift );
-			::memmove( dividendSample, dividendSample + shift, divSampleLen );
+			if ( shift > 0 ) {
+				_cache.realloc( chunk_size<i32_t>( quotientLeafNo + shift ) );
+				::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( shift ) );
+				quotientLeafNo += shift;
+				::memmove( dividendSample, dividendSample + shift, chunk_size<i32_t>( divSampleLen ) );
+			}
+			/*
+			 * Compensate for missing leafs.
+			 */
 			if ( ( shift > 0 ) && ( dividendLeafNo < _leafCount ) ) {
-				//::memcpy( dividendSample + divSampleLen, dividend + , );
+				int long compensationLen( min( _leafCount - dividendLeafNo, divisorLeafCount - divSampleLen ) );
+				::memcpy( dividendSample + divSampleLen, dividend + dividendLeafNo, chunk_size<i32_t>( compensationLen ) );
+				divSampleLen += compensationLen;
 			}
 
+			/*
+			 * Fill rest of dividendSample with 0.
+			 */
+			if ( divSampleLen < divisorLeafCount ) {
+				::memset( dividendSample + divSampleLen, 0, chunk_size<i32_t>( divisorLeafCount - divSampleLen ) );
+				divSampleLen = divisorLeafCount;
+			}
+
+			/*
+			 * If dividendSample is still not enough to produce next quotient leaf
+			 * then fetch next leaf from divident to dividendSample.
+			 */
 			if ( leafcmp( dividendSample, divisor, divSampleLen ) < 0 ) /* We establish that divisor_ <= multiplierSample. */ {
-				dividendSample[divSampleLen + 1] = dividendLeafNo < _leafCount ? dividend[dividendLeafNo] : 0;
+				dividendSample[divSampleLen] = dividendLeafNo < _leafCount ? dividend[dividendLeafNo] : 0;
+				++ divSampleLen;
+				++ dividendLeafNo;
 				if ( quotientLeafNo > 0 ) {
 					_cache.realloc( chunk_size<i32_t>( quotientLeafNo + 1 ) );
-					_cache.get<i32_t>()[ quotientLeafNo ++ ] = leaf;
+					_cache.get<i32_t>()[ quotientLeafNo ++ ] = 0;
 				}
 			}
 			leafLow = 1;
 			/* Binary search loop. */
 			while ( leafHi > ( leaf + 1 ) ) {
-				int long multiplierLeafCount( karatsuba( buffer, &leaf, 1, dividendSample, divisorLeafCount ) );
+				/*
+				 * Multiply current guess about current leaf by divisor.
+				 */
+				int long multiplierLeafCount( karatsuba( buffer, &leaf, 1, divisor, divisorLeafCount ) );
+				/*
+				 * If product has more leafs than divisor than it is bigger.
+				 */
 				i32_t cmp( multiplierLeafCount > divisorLeafCount ? 1 : 0 );
 				if ( ! cmp )
-					cmp = leafcmp( multiplierSample + 1, dividendSample, divisorLeafCount );
+					cmp = leafcmp( multiplierSample + 1, dividendSample, divSampleLen );
 				if ( cmp > 0 )
 					leafHi = leaf;
 				else if ( cmp < 0 )
@@ -702,12 +748,16 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					break;
 				leaf = ( leafHi + leafLow ) / 2;
 			}
-			i32_t const* ep[] = { dividendSample, divisor }; /* helper for mutate_addition */
+			/*
+			 * A helper for mutate_addition.
+			 * The substraction is done `in place'.
+			 */
+			i32_t const* ep[] = { dividendSample, divisor };
 			mutate_addition( dividendSample + 1, divisorLeafCount + 1 + 1, ep, NULL, NULL, true, false );
 			_cache.realloc( chunk_size<i32_t>( quotientLeafNo + 1 ) );
 			_cache.get<i32_t>()[ quotientLeafNo ++ ] = leaf;
 
-		} while ( decimalLeafs < precision );
+		} while ( fractionalLeafs < precision );
 		_canonical.swap( _cache );
 		_integralPartSize -= divisor_._integralPartSize;
 		_leafCount = quotientLeafNo;
@@ -791,7 +841,7 @@ void HNumber::normalize( void ) {
 		_leafCount -= shift;
 		::memmove( res, res + shift, chunk_size<i32_t>( _leafCount ) );
 	}
-	while ( ( decimal_length() > 0 ) && ( res[ _leafCount - 1 ] == 0 ) )
+	while ( ( fractional_length() > 0 ) && ( res[ _leafCount - 1 ] == 0 ) )
 		-- _leafCount;
 	if ( _leafCount == ( _integralPartSize + _precision ) )
 		++ _precision;
