@@ -101,8 +101,8 @@ int HNumber::DEFAULT_PRECISION = 100;
 HNumber::HNumber( void )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_negative( false ), _leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache() {
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -117,8 +117,8 @@ HNumber::~HNumber( void ) {
 HNumber::HNumber( double long number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_negative( false ), _leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache() {
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
 	M_PROLOG
 	from_double( number_ );
 	return;
@@ -128,8 +128,8 @@ HNumber::HNumber( double long number_ )
 HNumber::HNumber( double long number_, int precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
 			? precision_ : HARDCODED_MINIMUM_PRECISION ),
-	_negative( false ), _leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache() {
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
 	M_PROLOG
 	from_double( number_ );
 	return;
@@ -139,8 +139,8 @@ HNumber::HNumber( double long number_, int precision_ )
 HNumber::HNumber( char const* const number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_negative( false ), _leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache() {
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -150,8 +150,8 @@ HNumber::HNumber( char const* const number_ )
 HNumber::HNumber( char const* const number_, int precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
 			? precision_ : HARDCODED_MINIMUM_PRECISION ),
-	_negative( false ), _leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache() {
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -161,8 +161,8 @@ HNumber::HNumber( char const* const number_, int precision_ )
 HNumber::HNumber( HString const& number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_negative( false ), _leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache() {
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -172,8 +172,8 @@ HNumber::HNumber( HString const& number_ )
 HNumber::HNumber( HString const& number_, int precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
 			? precision_ : HARDCODED_MINIMUM_PRECISION ),
-	_negative( false ), _leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache() {
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -182,10 +182,10 @@ HNumber::HNumber( HString const& number_, int precision_ )
 
 HNumber::HNumber( HNumber const& source )
 	: _precision( source._precision ),
-	_negative( source._negative ),
 	_leafCount( source._leafCount ),
 	_integralPartSize( source._integralPartSize ),
-	_canonical(), _cache() {
+	_canonical(), _cache(),
+	_negative( source._negative ) {
 	M_PROLOG
 	if ( source._leafCount ) {
 		_canonical.realloc( chunk_size<i32_t>( source._leafCount ), HChunk::STRATEGY::EXACT );
@@ -214,11 +214,11 @@ void HNumber::swap( HNumber& other ) {
 	if ( &other != this ) {
 		using yaal::swap;
 		swap( _precision, other._precision );
-		swap( _negative, other._negative );
 		swap( _leafCount, other._leafCount );
 		swap( _integralPartSize, other._integralPartSize );
 		swap( _canonical, other._canonical );
 		swap( _cache, other._cache );
+		swap( _negative, other._negative );
 	}
 	return;
 	M_EPILOG
@@ -566,7 +566,13 @@ HNumber HNumber::operator - ( HNumber const& subtrahend_ ) const {
 
 HNumber& HNumber::operator -= ( HNumber const& subtrahend_ ) {
 	M_PROLOG
-	operator += ( -subtrahend_ );
+	_negative = ! _negative;
+	if ( ! _leafCount )
+		_negative = false;
+	operator += ( subtrahend_ );
+	_negative = ! _negative;
+	if ( ! _leafCount )
+		_negative = false;
 	return ( *this );
 	M_EPILOG
 }
