@@ -426,13 +426,13 @@ bool HNumber::operator >= ( HNumber const& other ) const {
 }
 
 bool HNumber::mutate_addition( i32_t* res, int long ressize,
-		i32_t const* const ep[], int long* lm, int long* rm, bool sub, bool swp ) const {
+		i32_t const* const addends[], int long* missingIntegral, int long* missingFractional, bool sub, bool swp ) const {
 	i32_t e[ 2 ];
-	int long lmx[] = { lm ? ( swp ? lm[ 1 ] : lm[ 0 ] ) : 0, lm ? ( swp ? lm[ 0 ] : lm[ 1 ] ) : 0 };
-	int long rmx[] = { rm ? ( swp ? rm[ 1 ] : rm[ 0 ] ) : 0, rm ? ( swp ? rm[ 0 ] : rm[ 1 ] ) : 0 };
+	int long lmx[] = { missingIntegral ? ( swp ? missingIntegral[ 1 ] : missingIntegral[ 0 ] ) : 0, missingIntegral ? ( swp ? missingIntegral[ 0 ] : missingIntegral[ 1 ] ) : 0 };
+	int long rmx[] = { missingFractional ? ( swp ? missingFractional[ 1 ] : missingFractional[ 0 ] ) : 0, missingFractional ? ( swp ? missingFractional[ 0 ] : missingFractional[ 1 ] ) : 0 };
 	i32_t const* const epx[] = {
-		swp ? ep[ 1 ] - lmx[ 0 ] - 1 : ep[ 0 ] - lmx[ 0 ] - 1,
-		swp ? ep[ 0 ] - lmx[ 1 ] - 1 : ep[ 1 ] - lmx[ 1 ] - 1
+		swp ? addends[ 1 ] - lmx[ 0 ] - 1 : addends[ 0 ] - lmx[ 0 ] - 1,
+		swp ? addends[ 0 ] - lmx[ 1 ] - 1 : addends[ 1 ] - lmx[ 1 ] - 1
 	};
 	int long idx( ressize - 1 ); /* index of first processed leaf */
 	int side( ( rmx[ 0 ] > rmx[ 1 ] ) ? 1 : 0 );
@@ -532,16 +532,16 @@ HNumber& HNumber::operator += ( HNumber const& addend_ ) {
 	_cache.realloc( chunk_size<i32_t>( ressize ) );
 	::memset( _cache.raw(), 0, _cache.get_size() );
 	i32_t* res( _cache.get<i32_t>() );
-	i32_t const* ep1( _canonical.get<i32_t>() );
-	i32_t const* ep2( addend_._canonical.get<i32_t>() );
-	int long lm[] = { ips - _integralPartSize, ips - addend_._integralPartSize };
-	int long rm[] = { dps - fractional_length(), dps - addend_.fractional_length() };
-	( rm[ 0 ] >= 0 ) || ( rm[ 0 ] = 0 );
-	( rm[ 1 ] >= 0 ) || ( rm[ 1 ] = 0 );
-	i32_t const* ep[] = { ep1, ep2 };
+	i32_t const* addend1( _canonical.get<i32_t>() );
+	i32_t const* addend2( addend_._canonical.get<i32_t>() );
+	int long missingIntegral[] = { ips - _integralPartSize, ips - addend_._integralPartSize };
+	int long missingFractional[] = { dps - fractional_length(), dps - addend_.fractional_length() };
+	( missingFractional[ 0 ] >= 0 ) || ( missingFractional[ 0 ] = 0 );
+	( missingFractional[ 1 ] >= 0 ) || ( missingFractional[ 1 ] = 0 );
+	i32_t const* addends[] = { addend1, addend2 };
 	bool sub = ( ( _negative && ! addend_._negative ) || ( ! _negative && addend_._negative ) );
 	bool swp = sub && ( absolute_lower( addend_ ) < 0 );
-	mutate_addition( res, ressize, ep, lm, rm, sub, swp );
+	mutate_addition( res, ressize, addends, missingIntegral, missingFractional, sub, swp );
 	_integralPartSize = ips;
 	if ( ressize > 0 ) {
 		_negative = sub ? ( _negative ? ! swp : swp ) : ( _negative && addend_._negative );
@@ -758,8 +758,8 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			 * A helper for mutate_addition.
 			 * The substraction is done `in place'.
 			 */
-			i32_t const* ep[] = { dividendSample, divisor };
-			mutate_addition( dividendSample + 1, divisorLeafCount + 1 + 1, ep, NULL, NULL, true, false );
+			i32_t const* addends[] = { dividendSample, divisor };
+			mutate_addition( dividendSample + 1, divisorLeafCount + 1 + 1, addends, NULL, NULL, true, false );
 			_cache.realloc( chunk_size<i32_t>( quotientLeafNo + 1 ) );
 			_cache.get<i32_t>()[ quotientLeafNo ++ ] = leaf;
 
@@ -874,39 +874,39 @@ int long HNumber::karatsuba( HChunk& result, i32_t const* fx, int long fxs, i32_
 		fys = fyrl;
 		result.realloc( chunk_size<i32_t>( leafCount = fxs + fys + totalShift ) );
 
-		int long fs( max( fxs, fys ) );
-		int long fl( min( fxs, fys ) );
+		int long const fs( max( fxs, fys ) );
+		int long const fl( min( fxs, fys ) );
 		int long const m( ( fs / 2 ) + ( fs & 1 ) ); /* Size of upper/lower half of number */
 		HChunk r2m; /* intermediate result ( fx1 * fx2 ( * B ^ 2m ) ) + 1 for carrier */
 		int long const r2ms( karatsuba( r2m, fx, fxs - m, fy, fys - m ) );
 		HChunk r; /* intermediate result ( fx2 * fy2 ) + 1 for carrier */
 		int long const rs( karatsuba( r, fx + ( fxs > m ? fxs - m : 0 ), min( fxs, m ), fy + ( fys > m ? fys - m : 0 ), min( fys, m ) ) );
 		int long const size( fxs + fys + 1 ); 
-		HChunk buffer( chunk_size<i32_t>( size + ( m + 1 ) * 2 ) ); /* + 1 for carrier */
-		i32_t* hx( buffer.get<i32_t>() + size );
-		i32_t* hy( buffer.get<i32_t>() + size + m + 1 );
+		HChunk buffer( chunk_size<i32_t>( max( size + 1, ( m + 1 ) * 2 ) ) ); /* + 1 for carrier */
+		i32_t* hx( buffer.get<i32_t>() );
+		i32_t* hy( buffer.get<i32_t>() + m + 1 );
 		/* preparation of hx and hy */
 		/* hx = fx / B^m + fx % B^m */
-		int long lm[] = { 2 * m - fxs, 0 };
-		i32_t const* ep[] = { fx, fx + fxs - m };
+		int long missingIntegral[] = { 2 * m - fxs, 0 };
+		i32_t const* addends[] = { fx, fx + fxs - m };
 		if ( fxs > m )
-			mutate_addition( hx, m + 1, ep, lm, NULL, false, false );
+			mutate_addition( hx, m + 1, addends, missingIntegral, NULL, false, false );
 		else
 			::memcpy( hx + m + 1 - fxs, fx, chunk_size<i32_t>( fxs ) );
 		/* hy */
-		lm[ 0 ] = 2 * m - fys;
-		ep[ 0 ] = fy;
-		ep[ 1 ] = fy + fys - m;
+		missingIntegral[ 0 ] = 2 * m - fys;
+		addends[ 0 ] = fy;
+		addends[ 1 ] = fy + fys - m;
 		if ( fys > m )
-			mutate_addition( hy, m + 1, ep, lm, NULL, false, false );
+			mutate_addition( hy, m + 1, addends, missingIntegral, NULL, false, false );
 		else
 			::memcpy( hy + m + 1 - fys, fy, chunk_size<i32_t>( fys ) );
 		/* find Z */
 		HChunk Z;
 		int long Zs( karatsuba( Z, hx, m + 1, hy, m + 1 ) );
 		/* combine all results */
-		
-		i32_t* const res( buffer.get<i32_t>() );
+		i32_t* const res( buffer.get<i32_t>() + 1 ); /* Z*B^m can possibly (front)overflow buffer of size = fxs + fys, hence + 1 in allocation and here. */
+		::memset( res, 0, chunk_size<i32_t>( size ) );
 
 		/* res = Z*B^m + r */
 		i32_t const* p( Z.get<i32_t>() );
@@ -915,13 +915,13 @@ int long HNumber::karatsuba( HChunk& result, i32_t const* fx, int long fxs, i32_
 			++ shift;
 		Zs -= shift;
 		p += shift;
-		ep[ 0 ] = r.get<i32_t>();
-		ep[ 1 ] = p;
-		lm[ 0 ] = Zs - rs + m;
-		lm[ 1 ] = 0;
-		if ( ep[ 0 ] ) {
+		addends[ 0 ] = r.get<i32_t>();
+		addends[ 1 ] = p;
+		missingIntegral[ 0 ] = Zs - rs + m;
+		missingIntegral[ 1 ] = 0;
+		if ( addends[ 0 ] ) {
 			::memcpy( res + size - rs, r.raw(), chunk_size<i32_t>( rs ) );
-			mutate_addition( res + size - m - Zs - 1, Zs + 1, ep, lm, NULL, false, false );
+			mutate_addition( res + size - m - Zs - 1, Zs + 1, addends, missingIntegral, NULL, false, false );
 		} else
 			::memcpy( res + size - m - Zs, p, chunk_size<i32_t>( Zs ) );
 
@@ -929,16 +929,16 @@ int long HNumber::karatsuba( HChunk& result, i32_t const* fx, int long fxs, i32_
 		Zs = r2ms;
 		shift = 0;
 		p = r2m.get<i32_t>();
-		lm[ 0 ] = 0;
+		missingIntegral[ 0 ] = 0;
 		if ( p ) {
 			while ( ( shift < Zs ) && ! p[ shift ] )
 				++ shift;
 			Zs -= shift;
 			p += shift;
-			ep[ 0 ] = res + 1 + shift;
-			ep[ 1 ] = p;
-			lm[ 1 ] = 0;
-			mutate_addition( res + shift, Zs + 1, ep, lm, NULL, false, false );
+			addends[ 0 ] = res + 1 + shift;
+			addends[ 1 ] = p;
+			missingIntegral[ 1 ] = 0;
+			mutate_addition( res + shift, Zs + 1, addends, missingIntegral, NULL, false, false );
 		}
 
 		/* res -= r2m*B^m, res -= r*B^m */
@@ -946,16 +946,16 @@ int long HNumber::karatsuba( HChunk& result, i32_t const* fx, int long fxs, i32_
 		int ncar( ( fl > m ? 1 : 0 ) );
 		int car( 1 - ncar );
 
-		ep[ 0 ] = res + ncar;
-		ep[ 1 ] = r2m.get<i32_t>();
-		if ( ep[ 1 ] ) {
-			lm[ 1 ] = size - r2ms - m - ncar;
-			mutate_addition( res - car, size - m + car, ep, lm, NULL, true, false );
+		addends[ 0 ] = res + ncar;
+		addends[ 1 ] = r2m.get<i32_t>();
+		if ( addends[ 1 ] ) {
+			missingIntegral[ 1 ] = size - r2ms - m - ncar;
+			mutate_addition( res - car, size - m + car, addends, missingIntegral, NULL, true, false );
 		}
-		ep[ 1 ] = r.get<i32_t>();
-		if ( ep[ 1 ] ) {
-			lm[ 1 ] = size - rs - m - ncar;
-			mutate_addition( res - car, size - m + car, ep, lm, NULL, true, false );
+		addends[ 1 ] = r.get<i32_t>();
+		if ( addends[ 1 ] ) {
+			missingIntegral[ 1 ] = size - rs - m - ncar;
+			mutate_addition( res - car, size - m + car, addends, missingIntegral, NULL, true, false );
 		}
 		::memcpy( result.get<i32_t>() + totalShift, res + 1, chunk_size<i32_t>( leafCount - totalShift ) );
 	} else if ( ( fxrl > 0 ) && ( fyrl > 0 ) ) {
@@ -964,7 +964,7 @@ int long HNumber::karatsuba( HChunk& result, i32_t const* fx, int long fxs, i32_
 		HChunk element( chunk_size<i32_t>( fys + 1 ) );
 		i32_t* e( element.get<i32_t>() );
 		i32_t* res( ( result.get<i32_t>() + fxs ) - 2 ); /* - 1 for carrier */
-		i32_t const* ep[] = { res, e };
+		i32_t const* addends[] = { res, e };
 /* the end of variables for mutate_addition() */
 		while ( -- fxs >= 0 ) {
 			if ( fx[ fxs ] ) {
@@ -981,8 +981,8 @@ int long HNumber::karatsuba( HChunk& result, i32_t const* fx, int long fxs, i32_
 					e[ pos ] = static_cast<i32_t>( x );
 				}
 				e[ 0 ] = carrier;
-				ep[ 0 ] = res + 1;
-				mutate_addition( res, fys + 1 + 1, ep, NULL, NULL, false, false );
+				addends[ 0 ] = res + 1;
+				mutate_addition( res, fys + 1 + 1, addends, NULL, NULL, false, false );
 				-- res;
 			} else
 				-- res;
