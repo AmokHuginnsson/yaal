@@ -370,8 +370,19 @@ int long HNumber::fractional_length( void ) const {
 }
 
 bool HNumber::is_exact( void ) const {
-	M_ASSERT( ( _leafCount - _integralPartSize ) <= _precision );
-	return ( ( _leafCount - _integralPartSize ) < _precision );
+	bool exact( true );
+	if ( fractional_length() > 0 ) {
+		int long fractionDecimalDigits( fractional_length() * DECIMAL_DIGITS_IN_LEAF_CONST );
+		i32_t lastLeaf( _canonical.get<i32_t>()[ _leafCount - 1 ] );
+		for ( int i( 1 ); i < ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ); ++ i ) {
+			if ( lastLeaf % DECIMAL_SHIFT[i] )
+				break;
+			-- fractionDecimalDigits;
+		}
+		M_ASSERT( fractionDecimalDigits <= _precision );
+		exact = fractionDecimalDigits < _precision;
+	}
+	return ( exact );
 }
 
 int long HNumber::absolute_lower( HNumber const& other ) const {
@@ -622,7 +633,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		/*
 		 * We use "long division" pen and paper algorithm.
 		 *
-		 * Eamples of pecial cases that have to be handled.
+		 * Eamples of special cases that have to be handled.
 		 * (each digit is one leaf)
 		 *
 		 * 1 / 3
@@ -674,10 +685,12 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		int long dividendLeafNo( min( _leafCount, divisorLeafCount ) ); /* Index of the next leaf to process */
 		::memcpy( dividendSample, dividend, chunk_size<i32_t>( dividendLeafNo ) );
 		/*
-		 * Number of leafs in quotient after leaf point.
+		 * Number of leafs in quotient before leaf point.
 		 * Variable used to stop calculations based on maximum precision.
 		 */
-		int long fractionalLeafs( 0 );
+		int long integralPart( _integralPartSize - divisor_._integralPartSize + ( divisor_._integralPartSize > 0 ? 0 : divisor_.fractional_length() ) );
+		( integralPart >= 0 ) || ( integralPart = 0 ); /* too hackish? */
+		++ integralPart;
 		int long quotientLeafNo( 0 ); /* Index of currently guessed quotient leaf. */
 		do {
 			/*
@@ -694,7 +707,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			 * Fix possible underflow in dividendSample.
 			 */
 			int long shift( 0 );
-			while ( ! dividendSample[ shift ] )
+			while ( ( shift < divisorLeafCount ) && ! dividendSample[ shift ] )
 				++ shift;
 			int long divSampleLen( divisorLeafCount - shift );
 			if ( shift > 0 ) {
@@ -706,18 +719,29 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			/*
 			 * Compensate for missing leafs.
 			 */
-			if ( ( shift > 0 ) && ( dividendLeafNo < _leafCount ) ) {
-				int long compensationLen( min( _leafCount - dividendLeafNo, divisorLeafCount - divSampleLen ) );
-				::memcpy( dividendSample + divSampleLen, dividend + dividendLeafNo, chunk_size<i32_t>( compensationLen ) );
-				divSampleLen += compensationLen;
+			if ( shift > 0 ) {
+				if ( dividendLeafNo < _leafCount ) {
+					int long compensationLen( min( _leafCount - dividendLeafNo, divisorLeafCount - divSampleLen ) );
+					::memcpy( dividendSample + divSampleLen, dividend + dividendLeafNo, chunk_size<i32_t>( compensationLen ) );
+					divSampleLen += compensationLen;
+				} else if ( divSampleLen == 0 )
+					break;
 			}
 
 			/*
 			 * Fill rest of dividendSample with 0.
 			 */
 			if ( divSampleLen < divisorLeafCount ) {
-				::memset( dividendSample + divSampleLen, 0, chunk_size<i32_t>( divisorLeafCount - divSampleLen ) );
+				int long compensationLen( divisorLeafCount - divSampleLen );
+				::memset( dividendSample + divSampleLen, 0, chunk_size<i32_t>( compensationLen ) );
 				divSampleLen = divisorLeafCount;
+				_cache.realloc( chunk_size<i32_t>( quotientLeafNo + compensationLen ) );
+				::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( compensationLen ) );
+				if ( ! quotientLeafNo ) {
+					integralPart -= compensationLen;
+					( integralPart >= 0 ) || ( integralPart = 0 ); /* too hackish? */
+				}
+				quotientLeafNo += compensationLen;
 			}
 
 			/*
@@ -731,19 +755,21 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				if ( quotientLeafNo > 0 ) {
 					_cache.realloc( chunk_size<i32_t>( quotientLeafNo + 1 ) );
 					_cache.get<i32_t>()[ quotientLeafNo ++ ] = 0;
-				}
+				} else if ( integralPart > 0 )
+					-- integralPart;
 			}
 			leafLow = 1;
 			/* Binary search loop. */
-			while ( leafHi > ( leaf + 1 ) ) {
+			while ( leafHi > ( leafLow + 1 ) ) {
 				/*
 				 * Multiply current guess about current leaf by divisor.
 				 */
-				int long multiplierLeafCount( karatsuba( buffer, &leaf, 1, divisor, divisorLeafCount ) );
+				::memset( multiplierSample, 0, chunk_size<i32_t>( divisorLeafCount + 1 ) );
+				karatsuba( buffer, &leaf, 1, divisor, divisorLeafCount );
 				/*
 				 * If product has more leafs than divisor than it is bigger.
 				 */
-				i32_t cmp( multiplierLeafCount > divisorLeafCount ? 1 : 0 );
+				i32_t cmp( multiplierSample[ 0 ] > 0 ? 1 : 0 );
 				if ( ! cmp )
 					cmp = leafcmp( multiplierSample + 1, dividendSample, divSampleLen );
 				if ( cmp > 0 )
@@ -758,16 +784,18 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			 * A helper for mutate_addition.
 			 * The substraction is done `in place'.
 			 */
-			i32_t const* addends[] = { dividendSample, divisor };
-			mutate_addition( dividendSample + 1, divisorLeafCount + 1 + 1, addends, NULL, NULL, true, false );
+			::memset( multiplierSample, 0, chunk_size<i32_t>( divisorLeafCount + 1 ) );
+			karatsuba( buffer, &leaf, 1, divisor, divisorLeafCount );
+			i32_t const* addends[] = { dividendSample, multiplierSample + ( multiplierSample[0] ? 0 : 1 ) };
+			mutate_addition( dividendSample - 1, divSampleLen + 1, addends, NULL, NULL, true, false );
 			_cache.realloc( chunk_size<i32_t>( quotientLeafNo + 1 ) );
 			_cache.get<i32_t>()[ quotientLeafNo ++ ] = leaf;
-
-		} while ( fractionalLeafs < precision );
+		} while ( ( quotientLeafNo - integralPart ) < precision );
 		_canonical.swap( _cache );
-		_integralPartSize -= divisor_._integralPartSize;
+		_integralPartSize = integralPart;
 		_leafCount = quotientLeafNo;
 		_negative = ! ( ( _negative && divisor_._negative ) || ! ( _negative || divisor_._negative ) );
+		normalize();
 	}
 	return ( *this );
 	M_EPILOG
