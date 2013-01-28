@@ -675,25 +675,35 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		 * We need memory buffer for dividend sample,
 		 * and another one for multiplier sample.
 		 * Assuming divisor has n leafs, a multiplier sample's buffer must
-		 * be able to accomodate n + 1 leafs ( + 1 for possible carrier).
+		 * be able to accomodate n + 1 leafs ( + 1 for possible carrier),
+		 * dividendSample also must provide space for n + 1 leafs.
 		 */
-		HChunk buffer( chunk_size<i32_t>( divisorLeafCount * 2 + 1 ) );
+		HChunk buffer( chunk_size<i32_t>( ( divisorLeafCount + 1 ) * 2 ) );
+		/*
+		 * Buffer for trial&error multiplications done while looking for next quotient leaf.
+		 */
 		i32_t* multiplierSample( buffer.get<i32_t>() );
 		i32_t* dividendSample( buffer.get<i32_t>() + divisorLeafCount + 1 );
 		i32_t* dividend( _canonical.get<i32_t>() );
 		int long precision( ( _precision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
-		int long dividendLeafNo( min( _leafCount, divisorLeafCount ) ); /* Index of the next leaf to process */
-		::memcpy( dividendSample, dividend, chunk_size<i32_t>( dividendLeafNo ) );
+		int long shift( 0 );
+		while ( ( shift < _leafCount ) && ! dividend[ shift ] )
+			++ shift;
+		int long dividendLeafNo( min( _leafCount - shift, divisorLeafCount ) ); /* Index of the next leaf to process */
+		::memcpy( dividendSample, dividend + shift, chunk_size<i32_t>( dividendLeafNo ) );
+		dividendLeafNo += shift;
 		/*
 		 * Number of leafs in quotient before leaf point.
 		 * Variable used to stop calculations based on maximum precision.
 		 */
 		int long integralPart( _integralPartSize - divisor_._integralPartSize + ( divisor_._integralPartSize > 0 ? 0 : divisor_.fractional_length() ) );
 		int long quotientLeafNo( 0 ); /* Index of currently guessed quotient leaf. */
-		if ( integralPart < 0 ) {
-			_cache.realloc( chunk_size<i32_t>( quotientLeafNo - integralPart ) );
-			::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( - integralPart ) );
-			quotientLeafNo -= integralPart;
+		if ( integralPart < 0 )
+			shift -= integralPart;
+		if ( shift > 0 ) {
+			_cache.realloc( chunk_size<i32_t>( quotientLeafNo + shift ) );
+			::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( shift ) );
+			quotientLeafNo += shift;
 			integralPart = 0;
 		}
 		++ integralPart;
@@ -703,6 +713,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			 * Assuming that "correctLeaf" is proper next leaf value to be guessed,
 			 * following relation holds:
 			 * leafHi > correctLeaf >= leafLow
+			 * and correct leaf is found when leafHi == ( leafLow + 1 ).
 			 */
 			i32_t leafHi( LEAF ); /* binary search algo upper bound  */
 			i32_t leaf( LEAF_SQ ); /* guessed leaf */
@@ -711,22 +722,39 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			/*
 			 * Fix possible underflow in dividendSample.
 			 */
-			int long shift( 0 );
+			shift = 0;
 			while ( ( shift < divisorLeafCount ) && ! dividendSample[ shift ] )
 				++ shift;
 			int long divSampleLen( divisorLeafCount - shift );
 			if ( shift > 0 ) {
 				_cache.realloc( chunk_size<i32_t>( quotientLeafNo + shift ) );
 				::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( shift ) );
-				::memmove( dividendSample, dividendSample + shift, chunk_size<i32_t>( divSampleLen ) );
+				if ( divSampleLen > 0 )
+					::memmove( dividendSample, dividendSample + shift, chunk_size<i32_t>( divSampleLen ) );
 				quotientLeafNo += shift;
 				dividendLeafNo += shift;
 			}
+
 			/*
 			 * Compensate for missing leafs.
 			 */
 			if ( shift > 0 ) {
 				if ( dividendLeafNo < _leafCount ) {
+					/*
+					 * If we have cleared dividendSample (dividendSample == 0),
+					 * skip following zeros from dividend.
+					 */
+					if ( divSampleLen == 0 ) {
+						shift = 0;
+						while ( ( ( dividendLeafNo + shift ) < _leafCount ) && ! dividend[ dividendLeafNo + shift ] )
+							++ shift;
+						if ( shift > 0 ) {
+							_cache.realloc( chunk_size<i32_t>( quotientLeafNo + shift ) );
+							::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( shift ) );
+							quotientLeafNo += shift;
+							dividendLeafNo += shift;
+						}
+					}
 					int long compensationLen( min( _leafCount - dividendLeafNo, divisorLeafCount - divSampleLen ) );
 					::memcpy( dividendSample + divSampleLen, dividend + dividendLeafNo, chunk_size<i32_t>( compensationLen ) );
 					divSampleLen += compensationLen;
