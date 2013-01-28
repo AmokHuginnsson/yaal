@@ -689,9 +689,14 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		 * Variable used to stop calculations based on maximum precision.
 		 */
 		int long integralPart( _integralPartSize - divisor_._integralPartSize + ( divisor_._integralPartSize > 0 ? 0 : divisor_.fractional_length() ) );
-		( integralPart >= 0 ) || ( integralPart = 0 ); /* too hackish? */
-		++ integralPart;
 		int long quotientLeafNo( 0 ); /* Index of currently guessed quotient leaf. */
+		if ( integralPart < 0 ) {
+			_cache.realloc( chunk_size<i32_t>( quotientLeafNo - integralPart ) );
+			::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( - integralPart ) );
+			quotientLeafNo -= integralPart;
+			integralPart = 0;
+		}
+		++ integralPart;
 		do {
 			/*
 			 * Using binary search algorithm we have to guess next leaf value.
@@ -713,8 +718,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			if ( shift > 0 ) {
 				_cache.realloc( chunk_size<i32_t>( quotientLeafNo + shift ) );
 				::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( shift ) );
-				quotientLeafNo += shift;
 				::memmove( dividendSample, dividendSample + shift, chunk_size<i32_t>( divSampleLen ) );
+				quotientLeafNo += shift;
+				dividendLeafNo += shift;
 			}
 			/*
 			 * Compensate for missing leafs.
