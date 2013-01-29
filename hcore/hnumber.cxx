@@ -803,9 +803,14 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				/*
 				 * If product has more leafs than divisor than it is bigger.
 				 */
-				i32_t cmp( multiplierSample[ 0 ] > 0 ? 1 : 0 );
+				i32_t cmp( 0 );
+				int off( multiplierSample[0] ? 0 : 1 );
+				if ( ( divSampleLen > divisorLeafCount ) && ! multiplierSample[0] )
+					cmp = -1;
+				else if ( multiplierSample[0] && ( divSampleLen == divisorLeafCount ) )
+					cmp = 1;
 				if ( ! cmp )
-					cmp = leafcmp( multiplierSample + 1, dividendSample, divSampleLen );
+					cmp = leafcmp( multiplierSample + off, dividendSample, divSampleLen );
 				if ( cmp > 0 )
 					leafHi = leaf;
 				else if ( cmp < 0 )
