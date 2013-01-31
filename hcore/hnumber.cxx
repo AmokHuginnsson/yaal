@@ -93,6 +93,8 @@ inline i32_t leafcmp( i32_t const* left_, i32_t const* right_, int long len_ ) {
 	return ( cmp );
 }
 
+static HNumber const _one_( 1 );
+
 }
 
 int const HNumber::DECIMAL_DIGITS_IN_LEAF = DECIMAL_DIGITS_IN_LEAF_CONST;
@@ -120,7 +122,84 @@ HNumber::HNumber( double long number_ )
 	_leafCount( 0 ), _integralPartSize( 0 ),
 	_canonical(), _cache(), _negative( false ) {
 	M_PROLOG
-	from_double( number_ );
+	from_floating_point( number_ );
+	return;
+	M_EPILOG
+}
+
+HNumber::HNumber( double number_ )
+	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
+	M_PROLOG
+	from_floating_point( number_ );
+	return;
+	M_EPILOG
+}
+
+HNumber::HNumber( int long long number_ )
+	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
+	M_PROLOG
+	from_integer( number_ );
+	return;
+	M_EPILOG
+}
+
+HNumber::HNumber( int long number_ )
+	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
+	M_PROLOG
+	from_integer( number_ );
+	return;
+	M_EPILOG
+}
+
+HNumber::HNumber( int number_ )
+	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
+	M_PROLOG
+	from_integer( number_ );
+	return;
+	M_EPILOG
+}
+
+HNumber::HNumber( int long long number_, int precision_ )
+	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
+			? precision_ : HARDCODED_MINIMUM_PRECISION ),
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
+	M_PROLOG
+	from_integer( number_ );
+	return;
+	M_EPILOG
+}
+
+HNumber::HNumber( int long number_, int precision_ )
+	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
+			? precision_ : HARDCODED_MINIMUM_PRECISION ),
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
+	M_PROLOG
+	from_integer( number_ );
+	return;
+	M_EPILOG
+}
+
+HNumber::HNumber( int number_, int precision_ )
+	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
+			? precision_ : HARDCODED_MINIMUM_PRECISION ),
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
+	M_PROLOG
+	from_integer( number_ );
 	return;
 	M_EPILOG
 }
@@ -131,7 +210,18 @@ HNumber::HNumber( double long number_, int precision_ )
 	_leafCount( 0 ), _integralPartSize( 0 ),
 	_canonical(), _cache(), _negative( false ) {
 	M_PROLOG
-	from_double( number_ );
+	from_floating_point( number_ );
+	return;
+	M_EPILOG
+}
+
+HNumber::HNumber( double number_, int precision_ )
+	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
+			? precision_ : HARDCODED_MINIMUM_PRECISION ),
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
+	M_PROLOG
+	from_floating_point( number_ );
 	return;
 	M_EPILOG
 }
@@ -224,10 +314,37 @@ void HNumber::swap( HNumber& other ) {
 	M_EPILOG
 }
 
-void HNumber::from_double( double long number_ ) {
+void HNumber::from_floating_point( double long number_ ) {
 	M_PROLOG
 	HString source( number_ );
 	from_string( source );
+	return;
+	M_EPILOG
+}
+
+void HNumber::from_integer( int long long number_ ) {
+	M_PROLOG
+	int long long number( abs( number_ ) );
+	if ( number_ >= ( LEAF * LEAF ) ) {
+		_leafCount = 3;
+		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
+		i32_t* data( _canonical.get<i32_t>() );
+		data[ 0 ] = static_cast<i32_t>( number / ( LEAF * LEAF ) );
+		data[ 1 ] = static_cast<i32_t>( ( number % ( LEAF * LEAF ) ) / LEAF );
+		data[ 2 ] = static_cast<i32_t>( number % LEAF );
+	} else if ( number_ >= LEAF ) {
+		_leafCount = 2;
+		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
+		i32_t* data( _canonical.get<i32_t>() );
+		data[ 0 ] = static_cast<i32_t>( number / LEAF );
+		data[ 1 ] = static_cast<i32_t>( number % LEAF );
+	} else {
+		_leafCount = 1;
+		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
+		_canonical.get<i32_t>()[ 0 ] = static_cast<i32_t>( number );
+	}
+	_integralPartSize = _leafCount;
+	_negative = ( number_ < 0 );
 	return;
 	M_EPILOG
 }
@@ -344,9 +461,30 @@ HString HNumber::to_string( void ) const {
 	M_EPILOG
 }
 
-double long HNumber::to_double( void ) const {
+double long HNumber::to_floating_point( void ) const {
 	M_PROLOG
-	return ( lexical_cast<double>( to_string() ) );
+	return ( lexical_cast<double long>( to_string() ) );
+	M_EPILOG
+}
+
+int long long HNumber::to_integer( void ) const {
+	M_PROLOG
+	if ( _integralPartSize > 3 )
+		throw HNumberException( "integer overflow" );
+	int long long value( 0 );
+	if ( _integralPartSize > 0 ) {
+		i32_t const* data( _canonical.get<i32_t>() );
+		value = data[ 0 ];
+		if ( _integralPartSize > 1 ) {
+			value *= LEAF;
+			value += data[ 1 ];
+		}
+		if ( _integralPartSize > 2 ) {
+			value *= LEAF;
+			value += data[ 2 ];
+		}
+	}
+	return ( value );
 	M_EPILOG
 }
 
@@ -370,6 +508,7 @@ int long HNumber::fractional_length( void ) const {
 }
 
 bool HNumber::is_exact( void ) const {
+	M_PROLOG
 	bool exact( true );
 	if ( fractional_length() > 0 ) {
 		int long fractionDecimalDigits( fractional_length() * DECIMAL_DIGITS_IN_LEAF_CONST );
@@ -383,9 +522,11 @@ bool HNumber::is_exact( void ) const {
 		exact = fractionDecimalDigits < _precision;
 	}
 	return ( exact );
+	M_EPILOG
 }
 
 int long HNumber::absolute_lower( HNumber const& other ) const {
+	M_PROLOG
 	i32_t const* p1( _canonical.get<i32_t>() );
 	i32_t const* p2( other._canonical.get<i32_t>() );
 	int long cmp( 1 );
@@ -398,6 +539,7 @@ int long HNumber::absolute_lower( HNumber const& other ) const {
 			cmp = _leafCount - other._leafCount;
 	}
 	return ( cmp );
+	M_EPILOG
 }
 
 bool HNumber::operator == ( HNumber const& other ) const {
@@ -881,7 +1023,7 @@ HNumber& HNumber::operator ^= ( int long unsigned exp ) {
 
 HNumber& HNumber::operator ++ ( void ) {
 	M_PROLOG
-	operator += ( 1 );
+	operator += ( _one_ );
 	return ( *this );
 	M_EPILOG
 }
@@ -896,7 +1038,7 @@ HNumber HNumber::operator ++ ( int ) {
 
 HNumber& HNumber::operator -- ( void ) {
 	M_PROLOG
-	operator -= ( 1 );
+	operator -= ( _one_ );
 	return ( *this );
 	M_EPILOG
 }

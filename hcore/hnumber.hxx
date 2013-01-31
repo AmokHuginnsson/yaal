@@ -49,9 +49,45 @@ public:
 	M_YAAL_HCORE_PUBLIC_API static int const DECIMAL_DIGITS_IN_LEAF;
 	M_YAAL_HCORE_PUBLIC_API static int DEFAULT_PRECISION;
 public:
+	/*! \brief Default constructor.
+	 * Create new number object and initialize it to value of `0'.
+	 */
 	HNumber( void );
-	HNumber( double long );
-	HNumber( double long, int );
+	/*! \brief Construct new number object from primitive floating point type.
+	 *
+	 * \param value - value for new number object.
+	 */
+	HNumber( double long value );
+	HNumber( double value );
+	/*! \brief Construct new number object from primitive floating point type with given precision.
+	 *
+	 * \param value - value for new number object.
+	 * \param precision - precision for new number object.
+	 */
+	HNumber( double long value, int precision );
+	HNumber( double value, int precision );
+
+	/*! \brief Construct new number object from primitive integral type.
+	 *
+	 * \param value - value for new number object.
+	 */
+	HNumber( int long long value );
+	HNumber( int long value );
+	HNumber( int value );
+	HNumber( int long long unsigned value );
+	HNumber( int long unsigned value );
+	HNumber( int unsigned value );
+	/*! \brief Construct new number object from primitive integral type with given precision.
+	 *
+	 * \param value - value for new number object.
+	 * \param precision - precision for new number object.
+	 */
+	HNumber( int long long value, int precision );
+	HNumber( int long value, int precision );
+	HNumber( int value, int precision );
+	HNumber( int long long unsigned value, int precision );
+	HNumber( int long unsigned value, int precision );
+	HNumber( int unsigned value, int precision );
 
 	/*! Construct a number from supplied string.
 	 *
@@ -111,7 +147,8 @@ public:
 	void swap( HNumber& );
 	void set_precision( int long );
 	int long get_precision( void ) const;
-	double long to_double( void ) const;
+	double long to_floating_point( void ) const;
+	int long long to_integer( void ) const;
 	HString to_string( void ) const;
 	bool is_exact( void ) const;
 private:
@@ -121,7 +158,8 @@ private:
 	int long integral_length( void ) const;
 	int long fractional_length( void ) const;
 	void from_string( HString const& );
-	void from_double( double long );
+	void from_floating_point( double long );
+	void from_integer( int long long );
 	void normalize( void );
 };
 
