@@ -43,6 +43,10 @@ namespace hcore {
  *
  * Each HNumber may be exact or rounded.
  *
+ * Integral part of HNumber is never trimmed, fractional part of HNumber
+ * is trimmed according to its precision.
+ * HNumber's precision can be set to arbitrarily large value.
+ *
  * Every number (HNumber) explicitly specified is by definition exact, i.e.:
  *
  * HNumber n1 = 1; // Exact.
@@ -55,11 +59,18 @@ namespace hcore {
  * Detailed rules of exactness of calculation results follows:
  *
  * For `+', `-' and `*' operations if both operands are exact then result is always exact
- * and its precision is set large enough to ensure this exactness.
+ * and its precision is set large enough to ensure this exactness,
+ * default precision is set to 1 + maximum of operands' precisions for `+' and `-' operations
+ * and to maximum of maximum of operands precisions and sum of real operands precisions.
+ *
+ * Example:
+ * Let n1 and n2 are both exact numbers, and n1 precision is 20 and n2 precision is 30, then:
+ * n1 + n2 precision is 30 (or 31 if necessary) and
+ * n1 * n2 precision is anywhere from 30 to 50.
  *
  * For `+', '-' and '*' operations if any of the operands is rounded (is not exact)
  * then result is also rounded and its precision is equal to precision of rounded
- * operand or minimum of both operands precisions if both operands are rounded.
+ * operand or minimum of both operands precisions if both operands are rounded,
  *
  * For '/' operation if both operands are exact result may be exact
  * if number of decimal (base 10 representation) fractional digits is smaller than
@@ -72,6 +83,11 @@ namespace hcore {
  * Examples:
  *
  * HNumber n = HNumber( 1 ) / HNumber( 3 ) // <-- Rounded.
+ *
+ * HNumber n1 = 1;
+ * n1.set_precision( 16 );
+ * n1 /= 3;
+ * assert( n1 == ".3333333333333333" );
  */
 class HNumber {
 	typedef HNumber this_type;
