@@ -35,6 +35,43 @@ namespace yaal {
 namespace hcore {
 
 /*! \brief Finite precision calculation units (numbers).
+ *
+ * HNumber is a representation for finite precision numbers.
+ * Although HNumbers have finite precision the precision itself
+ * can be arbitrarily large and limited only by the amount
+ * of resources in computer system.
+ *
+ * Each HNumber may be exact or rounded.
+ *
+ * Every number (HNumber) explicitly specified is by definition exact, i.e.:
+ *
+ * HNumber n1 = 1; // Exact.
+ * HNumber n2 = "3.141592653589793"; // Exact.
+ *
+ * HNumbers that are results of calculations may be exact depending on two factors:
+ * 1) type of an operation (calculation)
+ * 2) exactness status of operation operands
+ *
+ * Detailed rules of exactness of calculation results follows:
+ *
+ * For `+', `-' and `*' operations if both operands are exact then result is always exact
+ * and its precision is set large enough to ensure this exactness.
+ *
+ * For `+', '-' and '*' operations if any of the operands is rounded (is not exact)
+ * then result is also rounded and its precision is equal to precision of rounded
+ * operand or minimum of both operands precisions if both operands are rounded.
+ *
+ * For '/' operation if both operands are exact result may be exact
+ * if number of decimal (base 10 representation) fractional digits is smaller than
+ * default maximum precision set for result.
+ *
+ * Fro '/' operation if any of operand is rounded then result is rounded and its precision
+ * is set to precision on the rounded operand or minimum of both operands precision
+ * if both operands are rounded.
+ *
+ * Examples:
+ *
+ * HNumber n = HNumber( 1 ) / HNumber( 3 ) // <-- Rounded.
  */
 class HNumber {
 	typedef HNumber this_type;
