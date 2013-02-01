@@ -505,14 +505,8 @@ void HNumber::set_precision( int long precision_ ) {
 			lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( ( precision_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) ] );
 			while ( ( _leafCount > _integralPartSize ) && ! data[ _leafCount - 1 ] )
 				-- _leafCount;
-			int long zeros( 0 );
-			while ( ( zeros < _leafCount ) && ! data[ zeros ] )
-				++ zeros;
-			if ( zeros == _leafCount ) {
-				_leafCount = 0;
-				_integralPartSize = 0;
+			if ( ! _leafCount )
 				_negative = false;
-			}
 		}
 		_precision = precision_;
 	}
@@ -526,11 +520,13 @@ int long HNumber::fractional_length( void ) const {
 
 int long HNumber::fractional_decimal_digits( void ) const {
 	int long fractionalDecimalDigits( fractional_length() * DECIMAL_DIGITS_IN_LEAF_CONST );
-	i32_t lastLeaf( _canonical.get<i32_t>()[ _leafCount - 1 ] );
-	for ( int i( 1 ); i < ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ); ++ i ) {
-		if ( lastLeaf % DECIMAL_SHIFT[i] )
-			break;
-		-- fractionalDecimalDigits;
+	if ( _leafCount > 0 ) {
+		i32_t lastLeaf( _canonical.get<i32_t>()[ _leafCount - 1 ] );
+		for ( int i( 1 ); i < ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ); ++ i ) {
+			if ( lastLeaf % DECIMAL_SHIFT[i] )
+				break;
+			-- fractionalDecimalDigits;
+		}
 	}
 	return ( fractionalDecimalDigits );
 }
@@ -727,8 +723,6 @@ HNumber& HNumber::operator += ( HNumber const& addend_ ) {
 	_leafCount = ressize;
 	_canonical.swap( _cache );
 	normalize( augendExact && addendExact );
-	if ( _leafCount == 0 )
-		_negative = false;
 	return ( *this );
 	M_EPILOG
 }
@@ -776,8 +770,8 @@ HNumber& HNumber::operator *= ( HNumber const& factor_ ) {
 		_leafCount += factor_._leafCount;
 		_integralPartSize += factor_._integralPartSize;
 		_canonical.swap( _cache );
-		normalize( multiplierExact && factorExact );
 		_negative = ! ( ( n._negative && factor._negative ) || ! ( n._negative || factor._negative ) );
+		normalize( multiplierExact && factorExact );
 	} else {
 		_leafCount = _integralPartSize = 0;
 		_negative = false;
@@ -1097,7 +1091,7 @@ void HNumber::normalize( bool updatePrecision_ ) {
 		_leafCount -= shift;
 		::memmove( res, res + shift, chunk_size<i32_t>( _leafCount ) );
 	}
-	while ( ( fractional_length() > 0 ) && ( res[ _leafCount - 1 ] == 0 ) )
+	while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) )
 		-- _leafCount;
 	int long fractionalDecimalDigits( fractional_decimal_digits() );
 	if ( updatePrecision_ && ( fractionalDecimalDigits == _precision ) )
@@ -1107,6 +1101,10 @@ void HNumber::normalize( bool updatePrecision_ ) {
 		i32_t& lastLeaf( res[ _leafCount - 1 ] );
 		lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( ( _precision % DECIMAL_DIGITS_IN_LEAF_CONST ) ) ] );
 	}
+	while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) )
+		-- _leafCount;
+	if ( ! _leafCount )
+		_negative = false;
 	return;
 	M_EPILOG
 }
