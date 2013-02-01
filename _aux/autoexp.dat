@@ -169,8 +169,8 @@ yaal::hcore::HNumber {
 				"-"
 			),
 			#array (
-				expr: ((char*)($c._canonical._data))[$i],
-				size: $c._digitCount
+				expr: ((int*)($c._canonical._data))[$i],
+				size: $c._leafCount
 			) : [$e,i]
 		)
 	)
