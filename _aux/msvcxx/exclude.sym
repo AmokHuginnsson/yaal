@@ -115,6 +115,7 @@
 ?clrtoeol@ansi@yaal@@3VHSequence@12@B
 ?cout@hcore@yaal@@3VHSynchronizedStream@12@A
 ?cyan@ansi@yaal@@3VHSequence@12@B
+?DECIMAL_DIGITS_IN_LEAF@HNumber@hcore@yaal@@2HB
 ?DEFAULT@HSemaphore@hcore@yaal@@2W4type_t@TYPE@123@A
 ?DEFAULT_PRECISION@HNumber@hcore@yaal@@2HA
 ?down@ansi@yaal@@3VHSequence@12@B

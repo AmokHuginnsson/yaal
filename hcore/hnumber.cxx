@@ -81,7 +81,7 @@ i32_t const DECIMAL_SHIFT[] = {
 	1000000000l
 };
 i32_t const LEAF = meta::power<10, DECIMAL_DIGITS_IN_LEAF_CONST>::value;
-i32_t const LEAF_SQ = static_cast<i32_t>( ::sqrt( LEAF ) );
+i32_t const LEAF_SQ = static_cast<i32_t>( ::sqrt( static_cast<double>( LEAF ) ) );
 char ZFORMAT[] = "%00u";
 
 char unused = ZFORMAT[2] = static_cast<char>( '0' + DECIMAL_DIGITS_IN_LEAF_CONST );

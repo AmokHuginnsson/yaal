@@ -172,7 +172,7 @@ void* yaal_sqlite3_db_fetch_query_result( ODBLink& dbLink_, char const* query_ )
 	result->_data = NULL;
 	result->_randomAccess = true;
 	char* errmsg( NULL );
-	char** data( NULL );
+	char** data = NULL; /* msvcxx initialization workaround */
 	result->_errorCode = sqlite3_get_table( sQLite->_db,
 			query_, &data, &result->_rows,
 			&result->_columns, &errmsg );
@@ -228,7 +228,7 @@ M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
 	M_ASSERT( result->_randomAccess );
-	char** data( static_cast<char**>( result->_data ) );
+	char** data = static_cast<char**>( result->_data ); /* msvcxx initialization workaround */
 	return ( data[ ( row_ + 1 ) * result->_columns + column_ ] );
 }
 
