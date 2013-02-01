@@ -425,8 +425,8 @@ void HNumber::from_string( HString const& number_ ) {
 		}
 		if ( dot == HString::npos )
 			_integralPartSize = _leafCount;
-		if ( fractional_length() >= _precision )
-			_precision = fractional_length() + 1;
+		else if ( ( end - dot - 1 ) >= _precision )
+			_precision = end - dot;
 	} while ( 0 );
 	if ( _leafCount == 0 )
 		_negative = false;
@@ -495,10 +495,11 @@ int long HNumber::get_precision( void ) const {
 void HNumber::set_precision( int long precision_ ) {
 	M_PROLOG
 	if ( ( precision_ >= HARDCODED_MINIMUM_PRECISION )
-			&& ( ( precision_ <= _precision ) || ( fractional_length() < _precision ) ) )
+			&& ( ( precision_ <= _precision ) || is_exact() ) )
 		_precision = precision_;
-	if ( ( _integralPartSize + _precision ) < _leafCount )
-		_leafCount = _integralPartSize + _precision;
+	int long leafPrecision( ( _precision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
+	if ( ( _integralPartSize + leafPrecision ) < _leafCount )
+		_leafCount = _integralPartSize + leafPrecision;
 	return;
 	M_EPILOG
 }
@@ -507,19 +508,24 @@ int long HNumber::fractional_length( void ) const {
 	return ( _leafCount - _integralPartSize );
 }
 
+int long HNumber::fractional_decimal_digits( void ) const {
+	int long fractionalDecimalDigits( fractional_length() * DECIMAL_DIGITS_IN_LEAF_CONST );
+	i32_t lastLeaf( _canonical.get<i32_t>()[ _leafCount - 1 ] );
+	for ( int i( 1 ); i < ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ); ++ i ) {
+		if ( lastLeaf % DECIMAL_SHIFT[i] )
+			break;
+		-- fractionalDecimalDigits;
+	}
+	return ( fractionalDecimalDigits );
+}
+
 bool HNumber::is_exact( void ) const {
 	M_PROLOG
 	bool exact( true );
 	if ( fractional_length() > 0 ) {
-		int long fractionDecimalDigits( fractional_length() * DECIMAL_DIGITS_IN_LEAF_CONST );
-		i32_t lastLeaf( _canonical.get<i32_t>()[ _leafCount - 1 ] );
-		for ( int i( 1 ); i < ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ); ++ i ) {
-			if ( lastLeaf % DECIMAL_SHIFT[i] )
-				break;
-			-- fractionDecimalDigits;
-		}
-		M_ASSERT( fractionDecimalDigits <= _precision );
-		exact = fractionDecimalDigits < _precision;
+		int long fractionalDecimalDigits( fractional_decimal_digits() );
+		M_ASSERT( fractionalDecimalDigits <= _precision );
+		exact = fractionalDecimalDigits < _precision;
 	}
 	return ( exact );
 	M_EPILOG
@@ -676,10 +682,12 @@ HNumber& HNumber::operator += ( HNumber const& addend_ ) {
 	M_PROLOG
 	int long ips = max( _integralPartSize, addend_._integralPartSize );
 	int long dps = max( fractional_length(), addend_.fractional_length() );
+	bool augendExact( is_exact() );
+	bool addendExact( addend_.is_exact() );
 	if ( fractional_length() < addend_.fractional_length() )
-		_precision = is_exact() ? addend_._precision : _precision;
+		_precision = augendExact ? addend_._precision : _precision;
 	else
-		_precision = addend_.is_exact() ? _precision : addend_._precision;
+		_precision = addendExact ? _precision : addend_._precision;
 	( dps <= _precision ) || ( dps = _precision );
 	int long ressize = ips + dps + 1; /* + 1 for possible carrier */
 	_cache.realloc( chunk_size<i32_t>( ressize ) );
@@ -702,7 +710,7 @@ HNumber& HNumber::operator += ( HNumber const& addend_ ) {
 	}
 	_leafCount = ressize;
 	_canonical.swap( _cache );
-	normalize();
+	normalize( augendExact && addendExact );
 	if ( _leafCount == 0 )
 		_negative = false;
 	return ( *this );
@@ -743,6 +751,8 @@ HNumber& HNumber::operator *= ( HNumber const& factor_ ) {
 	HNumber const& n( factor_._leafCount < _leafCount ? factor_ : *this );
 	HNumber const& factor( factor_._leafCount < _leafCount ? *this : factor_ );
 	if ( n._leafCount && factor._leafCount ) {
+		bool multiplierExact( n.is_exact() );
+		bool factorExact( factor.is_exact() );
 		::memset( _cache.raw(), 0, _cache.get_size() );
 		karatsuba( _cache,
 				n._canonical.get<i32_t>(), n._leafCount,
@@ -750,7 +760,7 @@ HNumber& HNumber::operator *= ( HNumber const& factor_ ) {
 		_leafCount += factor_._leafCount;
 		_integralPartSize += factor_._integralPartSize;
 		_canonical.swap( _cache );
-		normalize();
+		normalize( multiplierExact && factorExact );
 		_negative = ! ( ( n._negative && factor._negative ) || ! ( n._negative || factor._negative ) );
 	} else {
 		_leafCount = _integralPartSize = 0;
@@ -827,7 +837,18 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		i32_t* multiplierSample( buffer.get<i32_t>() );
 		i32_t* dividendSample( buffer.get<i32_t>() + divisorLeafCount + 1 );
 		i32_t* dividend( _canonical.get<i32_t>() );
-		int long precision( ( _precision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
+		int long newPrecision( 0 );
+		bool dividendExact( is_exact() );
+		bool divisorExact( divisor_.is_exact() );
+		if ( dividendExact && divisorExact )
+			newPrecision = _precision + divisor_._precision;
+		else if ( ! ( dividendExact || divisorExact ) )
+			newPrecision = min( _precision, divisor_._precision );
+		else if ( dividendExact )
+			newPrecision = divisor_._precision;
+		else
+			newPrecision = _precision;
+		int long precision( ( newPrecision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
 		int long shift( 0 );
 		while ( ( shift < _leafCount ) && ! dividend[ shift ] )
 			++ shift;
@@ -838,7 +859,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		 * Number of leafs in quotient before leaf point.
 		 * Variable used to stop calculations based on maximum precision.
 		 */
-		int long integralPart( _integralPartSize - divisor_._integralPartSize + ( divisor_._integralPartSize > 0 ? 0 : divisor_.fractional_length() - 1 ) - shift );
+		int long integralPart( _integralPartSize - divisor_._integralPartSize + ( divisor_._integralPartSize > 0 ? 0 : lshift ) - shift );
 		int long quotientLeafNo( 0 ); /* Index of currently guessed quotient leaf. */
 		if ( integralPart < 0 ) {
 			_cache.realloc( chunk_size<i32_t>( quotientLeafNo - integralPart ) );
@@ -850,6 +871,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		while ( ! dividend[ _leafCount - 1 ] )
 			-- _leafCount;
 		bool firstLeaf( true );
+		bool exact( false );
 		do {
 			/*
 			 * Using binary search algorithm we have to guess next leaf value.
@@ -876,11 +898,6 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			}
 
 			/*
-			 * Next the `shift' variable will be used to count 0 that possibly will have to be put
-			 * into quotient before next round of quotient leaf guessing will start.
-			 */
-			shift = 0;
-			/*
 			 * Compensate for missing leafs.
 			 */
 			if ( divSampleLen < divisorLeafCount ) {
@@ -890,6 +907,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					 * skip following zeros from dividend.
 					 */
 					if ( divSampleLen == 0 ) {
+						shift = 0;
 						while ( ( ( dividendLeafNo + shift ) < _leafCount ) && ! dividend[ dividendLeafNo + shift ] )
 							++ shift;
 						dividendLeafNo += shift;
@@ -898,8 +916,10 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					::memcpy( dividendSample + divSampleLen, dividend + dividendLeafNo, chunk_size<i32_t>( compensationLen ) );
 					dividendLeafNo += compensationLen;
 					divSampleLen += compensationLen;
-				} else if ( divSampleLen == 0 )
+				} else if ( divSampleLen == 0 ) {
+					exact = true;
 					break;
+				}
 			}
 
 			/*
@@ -910,10 +930,10 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				::memset( dividendSample + divSampleLen, 0, chunk_size<i32_t>( compensationLen ) );
 				divSampleLen = divisorLeafCount;
 				dividendLeafNo += compensationLen;
-				if ( ! quotientLeafNo ) {
-					integralPart -= compensationLen;
-					( integralPart >= 0 ) || ( integralPart = 0 ); /* too hackish? */
-				}
+//				if ( firstLeaf ) {
+//					integralPart -= compensationLen;
+//					( integralPart >= 0 ) || ( integralPart = 0 ); /* too hackish? */
+//				}
 			}
 
 			/*
@@ -927,14 +947,16 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				if ( firstLeaf )
 					-- integralPart;
 			}
-			firstLeaf = false;
 
-			zfill = dividendLeafNo - zfill - 1;
-			if ( zfill > 0 ) {
-				_cache.realloc( chunk_size<i32_t>( quotientLeafNo + zfill ) );
-				::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( zfill ) );
-				quotientLeafNo += zfill;
+			if ( ! firstLeaf ) {
+				zfill = dividendLeafNo - zfill - 1;
+				if ( zfill > 0 ) {
+					_cache.realloc( chunk_size<i32_t>( quotientLeafNo + zfill ) );
+					::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( zfill ) );
+					quotientLeafNo += zfill;
+				}
 			}
+			firstLeaf = false;
 
 			leafLow = 1;
 			/* Binary search loop. */
@@ -969,7 +991,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			 */
 			::memset( multiplierSample, 0, chunk_size<i32_t>( divisorLeafCount + 1 ) );
 			karatsuba( buffer, &leaf, 1, divisor, divisorLeafCount );
-			i32_t const* addends[] = { dividendSample, multiplierSample + ( multiplierSample[0] ? 0 : 1 ) };
+			i32_t const* addends[] = { dividendSample, multiplierSample + ( divSampleLen == divisorLeafCount ? 1 : 0 ) };
 			if ( mutate_addition( dividendSample - 1, divSampleLen + 1, addends, NULL, NULL, true, false ) ) {
 				dividendSample[ -- divSampleLen ] = 0;
 			}
@@ -981,8 +1003,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		if ( quotientLeafNo < _leafCount )
 			::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( _leafCount - quotientLeafNo ) );
 		_negative = ! ( ( _negative && divisor_._negative ) || ! ( _negative || divisor_._negative ) );
+		_precision = newPrecision;
 		_canonical.swap( _cache );
-		normalize();
+		normalize( exact && dividendExact && divisorExact );
 	}
 	return ( *this );
 	M_EPILOG
@@ -1051,7 +1074,7 @@ HNumber HNumber::operator -- ( int ) {
 	M_EPILOG
 }
 
-void HNumber::normalize( void ) {
+void HNumber::normalize( bool updatePrecision_ ) {
 	M_PROLOG
 	i32_t* res( _canonical.get<i32_t>() );
 	int shift( 0 );
@@ -1064,7 +1087,7 @@ void HNumber::normalize( void ) {
 	}
 	while ( ( fractional_length() > 0 ) && ( res[ _leafCount - 1 ] == 0 ) )
 		-- _leafCount;
-	if ( _leafCount == ( _integralPartSize + _precision ) )
+	if ( updatePrecision_ && ( fractional_decimal_digits() == _precision ) )
 		++ _precision;
 	return;
 	M_EPILOG

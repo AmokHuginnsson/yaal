@@ -198,7 +198,11 @@ public:
 	HNumber operator / ( HNumber const& ) const;
 	HNumber operator ^ ( int long unsigned ) const;
 	void swap( HNumber& );
-	void set_precision( int long );
+	/*! \brief Set maximum number of fractional decimal digits that this HNumber can handle.
+	 *
+	 * \param newPrecision - new maximum precision of this HNumber.
+	 */
+	void set_precision( int long precision );
 	int long get_precision( void ) const;
 	double long to_floating_point( void ) const;
 	int long long to_integer( void ) const;
@@ -210,10 +214,11 @@ private:
 	int long karatsuba( HChunk&, i32_t const*, int long, i32_t const*, int long );
 	int long integral_length( void ) const;
 	int long fractional_length( void ) const;
+	int long fractional_decimal_digits( void ) const;
 	void from_string( HString const& );
 	void from_floating_point( double long );
 	void from_integer( int long long );
-	void normalize( void );
+	void normalize( bool );
 };
 
 typedef HExceptionT<HNumber> HNumberException;
