@@ -58,7 +58,7 @@ namespace yaal {
 namespace hcore {
 
 namespace {
-int const DECIMAL_DIGITS_IN_LEAF_CONST = 1;
+int const DECIMAL_DIGITS_IN_LEAF_CONST = 9;
 int const SPECIAL_CHARS = 3; /* minus, dot, nil */
 char const VALID_CHARACTERS[] = "-.0123456789";
 int const JUST_DIGITS = 2;
@@ -325,12 +325,12 @@ void HNumber::from_floating_point( double long number_ ) {
 void HNumber::from_integer( int long long number_ ) {
 	M_PROLOG
 	int long long number( abs( number_ ) );
-	if ( number_ >= ( LEAF * LEAF ) ) {
+	if ( number_ >= ( static_cast<int long long>( LEAF ) * LEAF ) ) {
 		_leafCount = 3;
 		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
 		i32_t* data( _canonical.get<i32_t>() );
-		data[ 0 ] = static_cast<i32_t>( number / ( LEAF * LEAF ) );
-		data[ 1 ] = static_cast<i32_t>( ( number % ( LEAF * LEAF ) ) / LEAF );
+		data[ 0 ] = static_cast<i32_t>( number / ( static_cast<int long long>( LEAF ) * LEAF ) );
+		data[ 1 ] = static_cast<i32_t>( ( number % ( static_cast<int long long>( LEAF ) * LEAF ) ) / LEAF );
 		data[ 2 ] = static_cast<i32_t>( number % LEAF );
 	} else if ( number_ >= LEAF ) {
 		_leafCount = 2;
@@ -495,11 +495,27 @@ int long HNumber::get_precision( void ) const {
 void HNumber::set_precision( int long precision_ ) {
 	M_PROLOG
 	if ( ( precision_ >= HARDCODED_MINIMUM_PRECISION )
-			&& ( ( precision_ <= _precision ) || is_exact() ) )
+			&& ( ( precision_ <= _precision ) || is_exact() ) ) {
+		int long leafPrecision( ( precision_ + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
+		if ( ( _integralPartSize + leafPrecision ) < _leafCount )
+			_leafCount = _integralPartSize + leafPrecision;
+		if ( ( precision_ < _precision ) && ( _leafCount > 0 ) && ( leafPrecision == fractional_length() ) ) {
+			i32_t* data( _canonical.get<i32_t>() );
+			i32_t& lastLeaf( data[ _leafCount - 1 ] );
+			lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( ( precision_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) ] );
+			while ( ( _leafCount > _integralPartSize ) && ! data[ _leafCount - 1 ] )
+				-- _leafCount;
+			int long zeros( 0 );
+			while ( ( zeros < _leafCount ) && ! data[ zeros ] )
+				++ zeros;
+			if ( zeros == _leafCount ) {
+				_leafCount = 0;
+				_integralPartSize = 0;
+				_negative = false;
+			}
+		}
 		_precision = precision_;
-	int long leafPrecision( ( _precision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
-	if ( ( _integralPartSize + leafPrecision ) < _leafCount )
-		_leafCount = _integralPartSize + leafPrecision;
+	}
 	return;
 	M_EPILOG
 }
@@ -930,10 +946,6 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				::memset( dividendSample + divSampleLen, 0, chunk_size<i32_t>( compensationLen ) );
 				divSampleLen = divisorLeafCount;
 				dividendLeafNo += compensationLen;
-//				if ( firstLeaf ) {
-//					integralPart -= compensationLen;
-//					( integralPart >= 0 ) || ( integralPart = 0 ); /* too hackish? */
-//				}
 			}
 
 			/*
@@ -1087,8 +1099,14 @@ void HNumber::normalize( bool updatePrecision_ ) {
 	}
 	while ( ( fractional_length() > 0 ) && ( res[ _leafCount - 1 ] == 0 ) )
 		-- _leafCount;
-	if ( updatePrecision_ && ( fractional_decimal_digits() == _precision ) )
+	int long fractionalDecimalDigits( fractional_decimal_digits() );
+	if ( updatePrecision_ && ( fractionalDecimalDigits == _precision ) )
 		++ _precision;
+	int long leafPrecision( ( _precision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
+	if ( ( _leafCount > 0 ) && ( fractionalDecimalDigits > _precision ) && ( leafPrecision <= fractional_length() ) ) {
+		i32_t& lastLeaf( res[ _leafCount - 1 ] );
+		lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( ( _precision % DECIMAL_DIGITS_IN_LEAF_CONST ) ) ] );
+	}
 	return;
 	M_EPILOG
 }
