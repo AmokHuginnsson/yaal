@@ -6,9 +6,18 @@ def yaal_lookup_function( val_ ):
 	lookup_tag = val_.type.strip_typedefs().tag
 	if lookup_tag == None:
 		return None
+	regex = re.compile( "^yaal::hcore::HPointer<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHPointerPrinter( val_ )
+	regex = re.compile( "^yaal::hcore::HResource<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHResourcePrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HString$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHStringPrinter( val_ )
+	regex = re.compile( "^yaal::hcore::HPair<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHPairPrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HArray<.*>::HIterator<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHArrayHIteratorPrinter( val_ )
@@ -51,6 +60,47 @@ def yaal_lookup_function( val_ ):
 
 	return None
 
+class YaalHCoreHPointerPrinter:
+	"Print a yaal::hcore::HPointer"
+
+	def __init__( self, val_ ):
+		self._val = val_
+		self._ptr = 0
+		shared = self._val['_shared']
+		if shared != 0:
+			self._ptr = shared['_object']
+			if self._ptr != 0:
+				self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
+				if hasattr( self._innerPrinter, 'children' ):
+					def children( self ):
+						return self._innerPrinter.children()
+					setattr( self.__class__, 'children', children )
+
+	def to_string( self ):
+		return self._innerPrinter.to_string() if self._ptr != 0 else 'NULL'
+
+	def display_hint( self ):
+		return self._innerPrinter.display_hint() if self._ptr != 0 else 'string'
+
+class YaalHCoreHResourcePrinter:
+	"Print a yaal::hcore::HResource"
+
+	def __init__( self, val_ ):
+		self._val = val_
+		self._ptr = self._val['_resource']
+		if self._ptr != 0:
+			self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
+			if hasattr( self._innerPrinter, 'children' ):
+				def children( self ):
+					return self._innerPrinter.children()
+				setattr( self.__class__, 'children', children )
+
+	def to_string( self ):
+		return self._innerPrinter.to_string() if self._ptr != 0 else 'NULL'
+
+	def display_hint( self ):
+		return self._innerPrinter.display_hint() if self._ptr != 0 else 'string'
+
 class YaalHCoreHStringPrinter:
 	"Print a yaal::hcore::HString"
 
@@ -65,6 +115,19 @@ class YaalHCoreHStringPrinter:
 		else:
 			s = self._val['_mem'].cast( gdb.lookup_type( 'char' ).pointer().pointer() ).dereference()
 		return s
+
+	def display_hint( self ):
+		return 'string'
+
+class YaalHCoreHPairPrinter:
+	"Print a yaal::hcore::HPair"
+
+	def __init__( self, val_ ):
+		self._val = val_
+
+	def to_string( self ):
+		s = str( self._val['first'] ) + "," + str( self._val['second'] ) + ">"
+		return "<" + s.strip()
 
 	def display_hint( self ):
 		return 'string'
