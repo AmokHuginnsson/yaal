@@ -18,6 +18,15 @@ yaal::hcore::HString {
 	)
 	children ( #( [raw members]: [$c,!] ) )
 }
+yaal::hcore::HPair<*> {
+	preview (
+		#( "<", $e.first, ", ", $e.second, ">" )
+	)
+	stringview (
+		#( "<", $c.first, ", ", $c.second, ">" )
+	)
+	children ( #( [raw members]: [$c,!] ) )
+}
 yaal::hcore::HArray<*,*> {
 	preview ( #( "[", $c._size, "](",
 			#array (
@@ -126,6 +135,29 @@ yaal::hcore::HSet<*,*,*> {
 		)
 	)
 }
+yaal::hcore::HMap<*,*,*,*> {
+	preview (
+		#( "[", $c._engine._size, "](",
+			#tree (
+				head: $c._engine._root,
+				left: _left,
+				right: _right,
+				size: $c._engine._size
+			) : *(yaal::hcore::HPair<$T1,$T2>*)((&$e) + 1), ")"
+		)
+	)
+	children (
+		#(
+			[raw members]: [$c,!],
+			#tree (
+				head: $c._engine._root,
+				left: _left,
+				right: _right,
+				size: $c._engine._size
+			) : *(yaal::hcore::HPair<$T1,$T2>*)((&$e) + 1)
+		)
+	)
+}
 yaal::hcore::HHashSet<*,*,*> {
 	children (
 		#(
@@ -138,6 +170,22 @@ yaal::hcore::HHashSet<*,*,*> {
 					head: $e,
 					next: _next
 				) : ((yaal::hcore::HHashContainer<$T1,$T2,yaal::hcore::hashset_helper<$T1>,$T3>::HAtom*)&$e)->_value
+			)
+		)
+	)
+}
+yaal::hcore::HHashMap<*,*,*,*> {
+	children (
+		#(
+			[raw members]: [$c,!],
+			#array (
+				expr: &((yaal::hcore::HHashContainer<yaal::hcore::HPair<$T1 const ,$T2>,$T3,yaal::hcore::hashmap_helper<$T1,$T2>,$T4>::HAtom**)($c._engine._buckets._data))[$i],
+				size: $c._engine._buckets._size / sizeof ( yaal::hcore::HPair<$T1 const ,$T2>* )
+			) : #if ( $e != 0 ) (
+				#list (
+					head: $e,
+					next: _next
+				) : $e._value
 			)
 		)
 	)
