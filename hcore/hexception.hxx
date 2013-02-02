@@ -150,6 +150,7 @@ public:
 template<typename tType, typename base_type_t>
 yaal::hcore::HString const HExceptionT<tType, base_type_t>::_name = type_name<tType>( true ) + "Exception";
 
+typedef HExceptionT<void> HRuntimeException;
 typedef HExceptionT<HString> HStringException;
 typedef HExceptionT<LexicalCast> HLexicalCastException;
 struct InvalidKey {};
