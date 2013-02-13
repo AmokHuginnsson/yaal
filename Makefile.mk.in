@@ -199,14 +199,14 @@ mrproper: clean
 
 include $(DIR_ROOT)/_aux/mk/d_target-tools.mk
 
-doc: $(DIR_ROOT)/doc/html/doxygen.css
+doc: $(DIR_ROOT)/build/doc/html/doxygen.css
 
-$(DIR_ROOT)/doc/html/doxygen.css: $(SRCS) $(HDRS)
+$(DIR_ROOT)/build/doc/html/doxygen.css: $(SRCS) $(HDRS)
 	@cd $(DIR_ROOT) && doxygen _aux/doxygenrc 2>&1 | grep 'is not documented'; \
-	cat doc/doxygen.css >> doc/html/doxygen.css
+	cat $(DIR_ROOT)/doc/doxygen.css >> $(DIR_ROOT)/build/doc/html/doxygen.css
 
-install-doc: doc/html/doxygen.css
-	@$(call invoke,$(MKDIR_P) $(DIR_DOC) && /bin/cp -fRp $(DIR_ROOT)/doc/html $(DIR_DOC) )
+install-doc: $(DIR_ROOT)/build/doc/html/doxygen.css
+	@$(call invoke,$(MKDIR_P) $(DIR_DOC) && /bin/cp -fRp $(DIR_ROOT)/build/doc/html $(DIR_DOC) )
 
 uninstall-doc:
 	@$(call invoke,/bin/rm -rf $(DIR_DOC))

@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 PROJECT_NAME           = yaal
 PROJECT_NUMBER         = 0.0.31.0
-OUTPUT_DIRECTORY       = doc
+OUTPUT_DIRECTORY       = build/doc
 CREATE_SUBDIRS         = YES
 OUTPUT_LANGUAGE        = English
 USE_WINDOWS_ENCODING   = NO

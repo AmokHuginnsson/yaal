@@ -37,14 +37,26 @@ namespace yaal {
 
 namespace hcore {
 
+/*! \brief Character Class (as in RE's [...]) definition.
+ *
+ * Define set of characters with O(1) size() on set.
+ */
 class HCharacterClass {
 	char const* _data;
 	int _size;
 public:
 	HCharacterClass( char const* data_, int size_ )
 		: _data( data_ ), _size( size_ ) {}
+	/*! \brief Get characters in Character Class.
+	 *
+	 * \return Data in Character Class.
+	 */
 	char const* data( void ) const
 		{ return ( _data ); }
+	/*! \brief Get size of Character Class.
+	 *
+	 * \return Number of characters in Character Class.
+	 */
 	int size( void ) const
 		{ return ( _size ); }
 };
@@ -185,14 +197,61 @@ public:
 	 */
 	HString( void const* const pointer );
 	HString& operator = ( HString const& );
-	HString& operator += ( HString const& );
-	char operator[] ( int const ) const;
-	char operator[] ( int long const ) const;
+	/*! \brief Append another string to this string.
+	 *
+	 * \param str - string to append to this string.
+	 * \return This string.
+	 */
+	HString& operator += ( HString const& str );
+	/*! \brief Get character at given position.
+	 *
+	 * \param position - index of a position to get character for.
+	 * \return character at given position in this string.
+	 */
+	char operator[] ( int const position ) const;
+	/*! \brief Get character at given position.
+	 *
+	 * \param position - index of a position to get character for.
+	 * \return character at given position in this string.
+	 */
+	char operator[] ( int long const position ) const;
 	bool operator ! ( void ) const;
-	char set_at( int long, char );
+	/*! \brief Set givent character at given position.
+	 *
+	 * \param position - index of a position where given character shall be set.
+	 * \param character - character to be set at given position.
+	 */
+	char set_at( int long position, char character );
+	/*! \brief Get access to raw character data stored in this string.
+	 *
+	 * \return pointer to raw character data stored in this string.
+	 */
 	char const* raw( void ) const;
+	/*! \brief Get access to raw character data stored in this string.
+	 *
+	 * An alias for HString::raw().
+	 *
+	 * \return pointer to raw character data stored in this string.
+	 */
 	char const* c_str( void ) const;
+	/*! \brief Get access to raw character data stored in this string.
+	 *
+	 * An alias for HString::raw().
+	 *
+	 * \return pointer to raw character data stored in this string.
+	 */
+	char const* data( void ) const;
+	/*! \brief Get maximum number of characters that can be stored in any string.
+	 *
+	 * Alias for HString::get_max_size().
+	 *
+	 * \return Maximum number of characters that can be stored in any string.
+	 */
 	int long max_size( void ) const;
+	/*! \brief Get maximum number of characters that can be stored in any string.
+	 *
+	 * \return Maximum number of characters that can be stored in any string.
+	 */
 	int long get_max_size( void ) const;
 	iterator begin( void );
 	iterator end( void );
@@ -271,8 +330,20 @@ public:
 	HString& assign( HString const& str, int long offset, int long length );
 	HString& format( char const* const, ... ) __attribute__(( format( printf, 2, 3 ) ));
 	HString& vformat( char const* const, void* ) __attribute__(( format( printf, 2, 0 ) ));
-	int long find( char, int long = 0 ) const;
-	int long find( HString const&, int long = 0 ) const;
+	/*! \brief Find position of given character in this string.
+	 *
+	 * \param character - a character to look for.
+	 * \param offest - position where searching for given character starts.
+	 * \return position of given character in this string if given character is found or HString::npos otherwise.
+	 */
+	int long find( char character, int long offest = 0 ) const;
+	/*! \brief Find position of given string in this string.
+	 *
+	 * \param str - a string to look for.
+	 * \param offest - position where searching for given string starts.
+	 * \return position of given string (first character of it) in this string if given string is found or HString::npos otherwise.
+	 */
+	int long find( HString const& str, int long offset = 0 ) const;
 	int long nfind( HString const&, int long, int long = 0 ) const;
 	int long reverse_find( char, int long = 0 ) const;
 	int long find_last( char, int long = MAX_STRING_LENGTH ) const;
@@ -283,8 +354,20 @@ public:
 	int long reverse_find_other_than( char const* const, int long = 0 ) const;
 	int long find_last_other_than( char const* const, int long = MAX_STRING_LENGTH ) const;
 	HString& replace( HString const&, HString const& );
+	/*! \brief Convert all characters of this string to upper case.
+	 *
+	 * \return Self.
+	 */
 	HString& upper( void );
+	/*! \brief Convert all characters of this string to lower case.
+	 *
+	 * \return Self.
+	 */
 	HString& lower( void );
+	/*! \brief Reverse cases of all characters is this string.
+	 *
+	 * \return Self.
+	 */
 	HString& reverse( void );
 	/*! \brief Get substring of this string by start position and length.
 	 *

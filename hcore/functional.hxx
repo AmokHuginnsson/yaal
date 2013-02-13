@@ -408,6 +408,8 @@ struct logical_xnor : public binary_function<bool, bool, bool> {
 	}
 };
 
+/*! \brief Composition of two unary functions.
+ */
 template<typename F, typename G>
 class unary_compose : public unary_function<typename F::result_type, typename G::argument_type> {
 public:
@@ -424,10 +426,14 @@ public:
 	}
 };
 
+/*! \brief Make unary function by statically composing two unary functions.
+ */
 template<typename F, typename G>
 unary_compose<F, G> compose1( F f_, G g_ )
 	{ return ( unary_compose<F, G>( f_, g_ ) ); }
 
+/*! \brief Composition of binary functions with two unary functions.
+ */
 template<typename F, typename G1, typename G2>
 class binary_compose : public unary_function<typename F::result_type, typename G1::argument_type> {
 public:
@@ -445,10 +451,14 @@ public:
 	}
 };
 
+/*! \brief Make binary function by statically composing binary function with two unary functions.
+ */
 template<typename F, typename G1, typename G2>
 binary_compose<F, G1, G2> compose2( F f_, G1 g1_, G2 g2_ )
 	{ return ( binary_compose<F, G1, G2>( f_, g1_, g2_ ) ); }
 
+/*! \brief Logical negation of an unary function.
+ */
 template<typename F>
 class unary_negate : public unary_function<typename F::result_type, typename F::argument_type> {
 public:
@@ -464,10 +474,14 @@ public:
 	}
 };
 
+/*! \brief Statically negate logical value of unary function result.
+ */
 template<typename F>
 unary_negate<F> not1( F f_ )
 	{ return ( unary_negate<F>( f_ ) ); }
 
+/*! \brief Logical negation of binary function.
+ */
 template<typename F>
 class binary_negate : public binary_function<typename F::result_type, typename F::first_argument_type, typename F::second_argument_type> {
 public:
@@ -484,10 +498,14 @@ public:
 	}
 };
 
+/*! \brief Statically negate logical value of binary function result.
+ */
 template<typename F>
 binary_negate<F> not2( F f_ )
 	{ return ( binary_negate<F>( f_ ) ); }
 
+/*! \brief Identity function.
+ */
 template<typename tType>
 struct identity : public unary_function<tType, tType> {
 	typedef identity<tType> this_type;
@@ -526,6 +544,8 @@ struct project2nd : public binary_function<second_t, first_t, second_t> {
 		{ return ( second_ ); }
 };
 
+/*! \brief Constant that can be used in nullary function contexts.
+ */
 template<typename tType>
 class constant : public nullary_function<tType> {
 	typedef nullary_function<tType> base_type;
@@ -537,6 +557,8 @@ public:
 		{ return ( _constant ); }
 };
 
+/*! \brief Functional (unary function) wrapper for non-functional unary functions.
+ */
 template<typename return_t, typename argument_t>
 class pointer_to_unary_function : public unary_function<return_t, argument_t> {
 public:
@@ -553,6 +575,8 @@ template<typename return_t, typename argument_t>
 pointer_to_unary_function<return_t, argument_t> ptr_fun( return_t (*function_)( argument_t ) )
 	{ return ( pointer_to_unary_function<return_t, argument_t>( function_ ) ); }
 
+/*! \brief Functional (binary function) wrapper for non-functional binary functions.
+ */
 template<typename return_t, typename first_argument_t, typename second_argument_t>
 class pointer_to_binary_function : public binary_function<return_t, first_argument_t, second_argument_t> {
 public:
