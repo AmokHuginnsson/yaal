@@ -17,8 +17,8 @@ clean() {
 					-or -name '*.core' \
 					-or -name '*.core.*' \
 					-or -name '~=+*=' \
-					-or -name '=+*=' \) \
-			| xargs /bin/rm -f
+					-or -name '=+*=' \) -print0 \
+			| xargs -0 /bin/rm -f
 	return 0
 }
 
