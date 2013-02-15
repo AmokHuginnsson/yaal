@@ -215,6 +215,10 @@ public:
 	 * \return character at given position in this string.
 	 */
 	char operator[] ( int long const position ) const;
+	/*! \brief Check if string is empty (has zero length).
+	 *
+	 * \return True iff this string is empty.
+	 */
 	bool operator ! ( void ) const;
 	/*! \brief Set givent character at given position.
 	 *
@@ -253,20 +257,36 @@ public:
 	 * \return Maximum number of characters that can be stored in any string.
 	 */
 	int long get_max_size( void ) const;
+	/*! \brief Get iterator pointing to begining (a first character) of this string.
+	 *
+	 * \return Iterator pointing to begining of this string.
+	 */
 	iterator begin( void );
+	/*! \brief Get iterator pointing to end (one past last character) of this string.
+	 *
+	 * \return Iterator pointing to end (terminating \0) of this string.
+	 */
 	iterator end( void );
+	/*! \brief Get iterator pointing to begining (a first character) of this string.
+	 *
+	 * \return Iterator pointing to begining of this string.
+	 */
 	const_iterator begin( void ) const;
+	/*! \brief Get iterator pointing to end (one past last character) of this string.
+	 *
+	 * \return Iterator pointing to end (terminating \0) of this string.
+	 */
 	const_iterator end( void ) const;
 	/*! \brief Check if string is empty (has zero length).
 	 *
-	 * \return Tue iff this string is empty.
+	 * \return True iff this string is empty.
 	 */
 	bool is_empty( void ) const;
 	/*! \brief Check if string is empty (has zero length).
 	 *
 	 * empty() is really an alias for is_empty().
 	 *
-	 * \return Tue iff this string is empty.
+	 * \return True iff this string is empty.
 	 */
 	bool empty( void ) const;
 	/*! \brief Clear this string contents.
@@ -312,7 +332,11 @@ public:
 	 * \return Number of characters that can be stored in this string without reallocation.
 	 */
 	int long capacity( void ) const;
-	void swap( HString& );
+	/*! \brief Swap contents of this string with another string.
+	 *
+	 * \param other - the other string to swap contents with.
+	 */
+	void swap( HString& other );
 	/*! \brief Erase old content and assign new data from buffer.
 	 *
 	 * \param data - data to be assigned to this string.
@@ -328,7 +352,11 @@ public:
 	 * \return Self.
 	 */
 	HString& assign( HString const& str, int long offset, int long length );
-	HString& format( char const* const, ... ) __attribute__(( format( printf, 2, 3 ) ));
+	/*! \brief Replace contents of this string with result of `C' printf() style format.
+	 *
+	 * \param frmt - `C's printf() style format specification.
+	 */
+	HString& format( char const* const frmt, ... ) __attribute__(( format( printf, 2, 3 ) ));
 	HString& vformat( char const* const, void* ) __attribute__(( format( printf, 2, 0 ) ));
 	/*! \brief Find position of given character in this string.
 	 *
@@ -345,15 +373,41 @@ public:
 	 */
 	int long find( HString const& str, int long offset = 0 ) const;
 	int long nfind( HString const&, int long, int long = 0 ) const;
-	int long reverse_find( char, int long = 0 ) const;
-	int long find_last( char, int long = MAX_STRING_LENGTH ) const;
+	/*! \brief Find distance from the end of last occurance of given character.
+	 *
+	 * HString::reverse_find() is really 100% equivalent of HString::find() on reversed string,
+	 * which means that given character is search from the end and returned index is counted
+	 * relative to the end of the string.
+	 *
+	 * This method is totally different than HString::find_last().
+	 *
+	 * \param character - look for this character in this string.
+	 * \param before - skip that many positions from the end before start looking for given character.
+	 * \param distance from the end to given character if given character can be found or HString::npos otherwise.
+	 */
+	int long reverse_find( char character, int long before = 0 ) const;
+	/*! \brief Find index of last occurence of given character.
+	 *
+	 * This method is totally different than HString::reverse_find().
+	 *
+	 * \param character - look for position of this character in this string.
+	 * \param before - assume that this string is only that long.
+	 * \return index of last occurence of given character if given character can be found or HString::npos otherwise.
+	 */
+	int long find_last( char character, int long before = MAX_STRING_LENGTH ) const;
 	int long find_one_of( char const* const, int long = 0 ) const;
 	int long reverse_find_one_of( char const* const, int long = 0 ) const;
 	int long find_last_one_of( char const* const, int long = MAX_STRING_LENGTH ) const;
 	int long find_other_than( char const* const, int long = 0 ) const;
 	int long reverse_find_other_than( char const* const, int long = 0 ) const;
 	int long find_last_other_than( char const* const, int long = MAX_STRING_LENGTH ) const;
-	HString& replace( HString const&, HString const& );
+	/*! \brief Replace each occurence of given pattern with replacement.
+	 *
+	 * \param pattern - search and replace all occurences of this pattern.
+	 * \param replacement - use this string as a replacement for given pattern.
+	 * \return Self.
+	 */
+	HString& replace( HString const& pattern, HString const& replacement );
 	/*! \brief Convert all characters of this string to upper case.
 	 *
 	 * \return Self.
@@ -376,7 +430,12 @@ public:
 	 * \return Substring.
 	 */
 	HString substr( int long start, int long length = MAX_STRING_LENGTH ) const;
-	HString left( int long ) const;
+	/*! \brief Get left part of this string of given length.
+	 *
+	 * \param len - length of left part of this string to get.
+	 * \param left part of this string with at most len characters.
+	 */
+	HString left( int long len ) const;
 	/*! \brief Get substring of this string by start position and length.
 	 *
 	 * mid() is really an alias for substr().
@@ -386,7 +445,12 @@ public:
 	 * \return Substring.
 	 */
 	HString mid( int long start, int long length = MAX_STRING_LENGTH ) const;
-	HString right( int long ) const;
+	/*! \brief Get right part of this string of given length.
+	 *
+	 * \param len - length of right part of this string to get.
+	 * \param right part of this string with at most len characters.
+	 */
+	HString right( int long len ) const;
 	/*! \brief Trim all consecutive occurrences of given characters from beginning of the string.
 	 *
 	 * \param set - set of characters that shall be removed.
@@ -405,7 +469,11 @@ public:
 	 * \return Self.
 	 */
 	HString& trim( char const* const set = _whiteSpace_.data() );
-	HString& shift_left( int long );
+	/*! \brief Remove first N characters from this string.
+	 * \param len - remove that many characters from beginning of this string.
+	 * \return Self.
+	 */
+	HString& shift_left( int long len );
 	HString& shift_right( int long, char const = ' ' );
 	/*! \brief Fill portion of string with constatnt value.
 	 *
