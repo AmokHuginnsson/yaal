@@ -166,6 +166,7 @@ void HLog::rehash( HString const& logFileName_,
 	void* src( _file::ref().release() );
 	_file::ref().open( logFileName_, HFile::open_t( HFile::OPEN::WRITING ) | HFile::OPEN::APPEND );
 	if ( ! _file::ref() ) {
+		_file::ref().open( src );
 		HException::disable_logging();
 		throw HLogException( _file::ref().get_error() );
 	}

@@ -651,7 +651,6 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 		int* const unknown_ ) {
 	M_PROLOG
 	int val( 0 );
-	HLog::disable_auto_rehash();
 	HString shortOptBuffer;
 	HChunk longOptBuffer( chunk_size<option>( _options.size() + 1 ) ); /* + 1 for array terminator */
 	hcore::log( LOG_TYPE::INFO ) << "Decoding switches ... ";
