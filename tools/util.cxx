@@ -318,6 +318,7 @@ inline bool is_byte( int value ) {
 
 void show_help( void* arg ) {
 	M_PROLOG
+	errno = 0;
 	OOptionInfo& info = *static_cast<OOptionInfo*>( arg );
 	::printf(
 "Usage: %s %s\n"
