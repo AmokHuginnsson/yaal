@@ -72,7 +72,7 @@ struct DEBUG_LEVEL {
  * in \e yaal library.
  */
 class HException {
-protected:
+private:
 	int  _code; /*!< Numeric code for given exception type/cause. */
 	int  _frame; /*!< Frame counter for step-by-step unwinding with logging. */
 	char const* _fileName; /*!< Log each frame only once. */
@@ -87,6 +87,8 @@ protected:
 	 * \param code_ - error code.
 	 * \param name_ - type name this exception.
 	 */
+	static bool _logEnabled;
+protected:
 	HException( char const* fileName_, int line_, char const* functionName_,
 			HString const& message_, int const code_ = 0, HString const& name_ = HString() );
 	HException( HException const& );
@@ -103,6 +105,8 @@ public:
 	char const* what( void ) const;
 	int code( void ) const;
 	static void set_error_stream( void* );
+	static void enable_logging( void );
+	static void disable_logging( void );
 private:
 	HException& operator = ( HException const& );
 };

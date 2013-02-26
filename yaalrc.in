@@ -35,6 +35,11 @@
 # THROW means throw proper exception and possibly continue execution.
 on_alloc_failure THROW
 
+# exception_logging
+# type: bool, default true
+# exception_logging if set to true enables automatic logging information about exceptions.
+exception_logging true
+
 # log_mask
 # type: special(multi-flag), default: (empty)
 # log_mask decides what types of information will be logged

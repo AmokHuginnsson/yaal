@@ -46,6 +46,7 @@ namespace yaal {
 namespace hcore {
 
 FILE* ERROR_STREAM = stderr;
+bool HException::_logEnabled = true;
 
 HException::HException( char const* fileName_,
 		int const line_, char const* functionName_,
@@ -55,7 +56,8 @@ HException::HException( char const* fileName_,
 	_fileName( fileName_ ),
 	_functionName( functionName_ ),
 	_message( message_ ) {
-	hcore::log << name_ << ": " << _message << ", code: " << _code << '.' << endl;
+	if ( _logEnabled )
+		hcore::log << name_ << ": " << _message << ", code: " << _code << '.' << endl;
 	if ( fileName_ && functionName_ )
 		log( fileName_, line_, functionName_ );
 	else
@@ -88,15 +90,18 @@ void HException::log( char const* const fileName_, int const line_,
 			|| ( ( _functionName != functionName_ ) && ( ! _functionName || ::strcmp( _functionName, functionName_ ) ) ) ) {
 		_fileName = fileName_;
 		_functionName = functionName_;
-		HString frame;
-		size_t length( ::strlen( fileName_ ) );
-		frame.format(
-					"Exception frame %2d: %16s : %4d : %s\n", _frame,
-					fileName_ + ( length > 16 ? length - 16 : 0 ),
-					line_, functionName_ );
-		if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK )
-			fprintf( ERROR_STREAM, "%s", frame.raw() );
-		hcore::log << frame;
+		if ( _logEnabled || ( _debugLevel_ >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK ) ) {
+			HString frame;
+			size_t length( ::strlen( fileName_ ) );
+			frame.format(
+						"Exception frame %2d: %16s : %4d : %s\n", _frame,
+						fileName_ + ( length > 16 ? length - 16 : 0 ),
+						line_, functionName_ );
+			if ( _debugLevel_ >= DEBUG_LEVEL::PRINT_EXCEPTION_STACK )
+				fprintf( ERROR_STREAM, "%s", frame.raw() );
+			if ( _logEnabled )
+				hcore::log << frame;
+		}
 		++ _frame;
 	}
 	return;
@@ -116,6 +121,14 @@ void HException::set_error_stream( void* errorStream_ ) {
 	ERROR_STREAM = static_cast<FILE*>( errorStream_ );
 	return;
 	M_EPILOG
+}
+
+void HException::enable_logging( void ) {
+	_logEnabled = true;
+}
+
+void HException::disable_logging( void ) {
+	_logEnabled = false;
 }
 
 void HGlobalScopeExceptionHandlingPolicy::handle_exception( void ) {

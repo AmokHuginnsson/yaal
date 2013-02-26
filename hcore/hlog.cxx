@@ -165,6 +165,10 @@ void HLog::rehash( HString const& logFileName_,
 		M_THROW( "new file name argument is", logFileName_.get_length() );
 	void* src( _file::ref().release() );
 	_file::ref().open( logFileName_, HFile::open_t( HFile::OPEN::WRITING ) | HFile::OPEN::APPEND );
+	if ( ! _file::ref() ) {
+		HException::disable_logging();
+		throw HLogException( _file::ref().get_error() );
+	}
 	do_rehash( src, processName_ );
 	return;
 	M_EPILOG
