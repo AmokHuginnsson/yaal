@@ -29,16 +29,18 @@ Copyright:
 #include <regex.h>			/* this one is obvious */
 #include <libintl.h>
 
-#include "base.hxx"
+#include "hcore/base.hxx"
 M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "hpattern.hxx"
-#include "harray.hxx"
-#include "hchunk.hxx"
+#include "hcore/harray.hxx"
+#include "hcore/hchunk.hxx"
+
+using namespace yaal::hcore;
 
 namespace yaal {
 
-namespace hcore {
+namespace hconsole {
 
 struct OPatternState {
 	bool _ignoreCase;
@@ -52,8 +54,8 @@ struct OPatternState {
 HPattern::HPattern( void )
 	: _initialized( false ),
 	_ignoreCaseDefault( false ), _ignoreCase( false ),
-	_extended( false ), _simpleMatchLength( 0 ), _compiled( sizeof ( regex_t ) ),
-	_patternInput(), _patternReal(), _lastError( 0 ), _errorBuffer(), _errorCause(), _errorMessage() {
+	_extended( false ), _simpleMatchLength( 0 ), _regex(),
+	_pattern(), _errorCause() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -62,8 +64,8 @@ HPattern::HPattern( void )
 HPattern::HPattern( char const* const pattern_ )
 	: _initialized( false ),
 	_ignoreCaseDefault( false ), _ignoreCase( false ),
-	_extended( false ), _simpleMatchLength( 0 ), _compiled( sizeof ( regex_t ) ),
-	_patternInput(), _patternReal(), _lastError( 0 ), _errorBuffer(), _errorCause(), _errorMessage() {
+	_extended( false ), _simpleMatchLength( 0 ), _regex(),
+	_pattern(), _errorCause() {
 	M_PROLOG
 	M_ASSERT( pattern_ );
 	M_ENSURE( pattern_[0] );
@@ -75,8 +77,8 @@ HPattern::HPattern( char const* const pattern_ )
 HPattern::HPattern( HString const& pattern_ )
 	: _initialized( false ),
 	_ignoreCaseDefault( false ), _ignoreCase( false ),
-	_extended( false ), _simpleMatchLength( 0 ), _compiled( sizeof ( regex_t ) ),
-	_patternInput(), _patternReal(), _lastError( 0 ), _errorBuffer(), _errorCause(), _errorMessage() {
+	_extended( false ), _simpleMatchLength( 0 ), _regex(),
+	_pattern(), _errorCause() {
 	M_PROLOG
 	if ( ! pattern_.is_empty() ) {
 		M_ENSURE( ! parse_re( pattern_ ) );
@@ -88,8 +90,8 @@ HPattern::HPattern( HString const& pattern_ )
 HPattern::HPattern( HString const& pattern_, bool ignoreCase_ )
 	: _initialized( false ),
 	_ignoreCaseDefault( ignoreCase_ ), _ignoreCase( false ),
-	_extended( false ), _simpleMatchLength( 0 ), _compiled( sizeof ( regex_t ) ),
-	_patternInput(), _patternReal(), _lastError( 0 ), _errorBuffer(), _errorCause(), _errorMessage() {
+	_extended( false ), _simpleMatchLength( 0 ), _regex(),
+	_pattern(), _errorCause() {
 	M_PROLOG
 	if ( ! pattern_.is_empty() ) {
 		M_ENSURE( ! parse_re( pattern_ ) );
@@ -100,8 +102,6 @@ HPattern::HPattern( HString const& pattern_, bool ignoreCase_ )
 
 HPattern::~HPattern( void ) {
 	M_PROLOG
-	if ( _initialized )
-		::regfree( _compiled.get<regex_t>() );
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -128,20 +128,10 @@ void HPattern::restore_state( void* sp, pluggable_flags_t* f ) {
 	M_EPILOG
 }
 
-void HPattern::error_clear( void ) const {
-	M_PROLOG
-	_lastError = 0;
-	_errorCause.clear();
-	_errorMessage.clear();
-	return;
-	M_EPILOG
-}
-
 int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags ) {
 	M_PROLOG
-	error_clear();
+	_errorCause.clear();
 	char const* const pattern( pattern_.raw() );
-	_patternInput = pattern_;
 /* making copy of flags */
 	OPatternState savePoint;
 	save_state( &savePoint, externalFlags );
@@ -175,7 +165,7 @@ int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags )
 	save_state( &savePoint, externalFlags );
 /* end of copy */
 /* look for switches at the end of pattern */
-	int long endMatch( ctr = _patternInput.get_length() - 1 );
+	int long endMatch( ctr = pattern_.get_length() - 1 );
 	if ( endMatch < 0 )
 		return ( true );
 	while ( ( ctr > 0 ) && ( pattern[ ctr ] != '/' ) ) {
@@ -188,44 +178,33 @@ int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags )
 	if ( ctr )
 		endMatch = ctr - 1;
 /* end of looking at end */
-	_errorCause = _patternReal = _patternInput.mid( begin,
+	_errorCause = _pattern = pattern_.mid( begin,
 			( endMatch - begin ) + 1 );
-	_simpleMatchLength = static_cast<int>( _patternReal.get_length() );
+	_simpleMatchLength = static_cast<int>( _pattern.get_length() );
 	if ( ! _simpleMatchLength ) {
 		err = -1;
 		_errorCause = _( "empty pattern" );
 	}
 	if ( ( ! err ) && _extended )
-		err = parse_re( _patternReal.raw() );
+		err = parse_re( _pattern.raw() );
 	return ( err );
 	M_EPILOG
 }
 
 int HPattern::parse_re( HString const& pattern_ ) {
 	M_PROLOG
-	error_clear();
-	if ( _initialized )
-		::regfree( _compiled.get<regex_t>() );
-	if ( ( _lastError = ::regcomp( _compiled.get<regex_t>(), pattern_.raw(),
-					_ignoreCase ? REG_ICASE : 0 ) ) ) {
-		_errorCause = pattern_;
-		_initialized = false;
-	} else {
-		_initialized = true;
-		_extended = true;
-		_simpleMatchLength = 1; /* it is not really a simple pattern */
-	}
-	return ( _lastError );
+	_errorCause.clear();
+	_regex.compile( pattern_, _ignoreCase ? HRegex::COMPILE::IGNORE_CASE : HRegex::COMPILE::DEFAULT );
+	return ( _regex.error_code() );
 	M_EPILOG
 }
 
 HString const& HPattern::error( void ) const {
-	error_message();
-	return ( _errorMessage );
+	return ( _regex.error_code() ? _regex.error() : _errorCause );
 }
 
 int HPattern::error_code( void ) const {
-	return ( _lastError );
+	return ( _regex.error_code() );
 }
 
 bool HPattern::set_switch( char const switch_, pluggable_flags_t* externalFlags ) {
@@ -256,23 +235,23 @@ char const* HPattern::matches( char const* const string_,
 		int long* const matchLength_ ) const {
 	M_PROLOG
 	M_ASSERT( string_ );
-	error_clear();
+	_errorCause.clear();
 	char const* ptr = NULL;
 	int long matchLength = 0;
-	regmatch_t match;
 	if ( _simpleMatchLength ) {
 		if ( _extended ) {
-			if ( ! ( _lastError = ::regexec( _compiled.get<regex_t>(), string_, 1, &match, 0 ) ) ) {
-				matchLength = match.rm_eo - match.rm_so;
+			HRegex::HMatchIterator it( _regex.find( string_ ) );
+			if ( it != _regex.end() ) {
+				matchLength = it->size();
 				if ( matchLength > 0 )
-					ptr = string_ + match.rm_so;
+					ptr = it->raw();
 			} else
-				_errorCause = _patternReal;
+				_errorCause = _pattern;
 		} else {
 			if ( _ignoreCase )
-				ptr = ::strcasestr( string_, _patternReal.raw() );
+				ptr = ::strcasestr( string_, _pattern.raw() );
 			else
-				ptr = ::strstr( string_, _patternReal.raw() );
+				ptr = ::strstr( string_, _pattern.raw() );
 			if ( ptr )
 				matchLength = _simpleMatchLength;
 		}
@@ -280,25 +259,6 @@ char const* HPattern::matches( char const* const string_,
 	if ( matchLength_ )
 		( *matchLength_ ) = matchLength;
 	return ( ptr );
-	M_EPILOG
-}
-
-char const* HPattern::error_message( int ) const {
-	M_PROLOG
-	if ( _lastError ) {
-		int long size( static_cast<int long>( ::regerror( _lastError, _compiled.get<regex_t>(), NULL, 0 ) ) + 1 );
-		_errorBuffer.realloc( size + 1 );
-		M_ENSURE( static_cast<int>( ::regerror( _lastError, _compiled.get<regex_t>(),
-						_errorBuffer.get<char>(), size ) ) < size );
-		_errorMessage = _errorBuffer.raw();
-		if ( ! _errorCause.is_empty() ) {
-			_errorMessage += ": `";
-			_errorMessage += _errorCause;
-			_errorMessage += "'";
-		}
-	} else
-		_errorMessage = _errorCause;
-	return ( _errorMessage.raw() );
 	M_EPILOG
 }
 

@@ -38,7 +38,7 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "functional.hxx"
 #include "hstring.hxx"
 #include "hchunk.hxx"
-#include "hpattern.hxx"
+#include "hregex.hxx"
 #include "hlog.hxx"
 #include "hcore.hxx"
 
@@ -131,9 +131,8 @@ bool substitute_environment( HString& string_ ) {
 	M_PROLOG
 	bool envVarRefFound = false;
 	if ( ! string_.is_empty() ) {
-		HPattern pattern;
-		M_ENSURE( pattern.parse_re( "${[^{}]\\{1,\\}}" ) == 0 );
-		HPattern::HMatchIterator it = pattern.find( string_.raw() );
+		HRegex pattern( "${[^{}]\\{1,\\}}" );
+		HRegex::HMatchIterator it = pattern.find( string_.raw() );
 		if ( it != pattern.end() ) {
 			HString var = string_.mid( static_cast<int long>( it->raw() - string_.raw() ), it->size() );
 			HString name = var.mid( 2, it->size() - 3 );

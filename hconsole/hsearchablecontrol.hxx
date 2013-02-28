@@ -30,7 +30,7 @@ Copyright:
 #ifndef YAAL_HCONSOLE_HSEARCHABLECONTROL_HXX_INCLUDED
 #define YAAL_HCONSOLE_HSEARCHABLECONTROL_HXX_INCLUDED 1
 
-#include "hcore/hpattern.hxx"
+#include "hconsole/hpattern.hxx"
 #include "hconsole/hcontrol.hxx"
 
 namespace yaal {
@@ -48,7 +48,7 @@ protected:
 	bool _searchActived;	/*!< should we highlight last search */
 	bool _filtered;			/*!< is content of list filtered thru pattern */
 	bool _backwards;			/*!< last search direction */
-	hcore::HPattern	_pattern;	/*!< used for searching */
+	HPattern	_pattern;	/*!< used for searching */
 public:
 	HSearchableControl ( bool );
 	virtual ~HSearchableControl ( void );

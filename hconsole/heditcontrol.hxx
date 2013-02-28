@@ -28,7 +28,7 @@ Copyright:
 #define YAAL_HCONSOLE_HEDITCONTROL_HXX_INCLUDED 1
 
 #include "hcore/hlist.hxx"
-#include "hcore/hpattern.hxx"
+#include "hconsole/hpattern.hxx"
 #include "hconsole/hcontrol.hxx"
 
 namespace yaal {
@@ -65,7 +65,7 @@ protected:
 														 this variable keeps offset of first
 														 character shown */
 	int  _maxHistoryLevel; /*!< how many instertions should history keep */
-	hcore::HPattern _pattern; /*!< regular expression describing what
+	HPattern _pattern; /*!< regular expression describing what
 																characters and in what way can be entered */
 	hcore::HString _string;   /*!< control content */
 	HInfoString _infoString;

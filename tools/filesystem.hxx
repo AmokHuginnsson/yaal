@@ -30,7 +30,8 @@ Copyright:
 #ifndef YAAL_TOOLS_FILESYSTEM_HXX_INCLUDED
 #define YAAL_TOOLS_FILESYSTEM_HXX_INCLUDED 1
 
-#include "hcore/hpattern.hxx"
+#include "hcore/harray.hxx"
+#include "hcore/hregex.hxx"
 
 namespace yaal {
 
@@ -48,7 +49,7 @@ struct FILE_TYPE {
 
 typedef yaal::hcore::HArray<yaal::hcore::HString> find_result;
 
-find_result find( yaal::hcore::HString const&, yaal::hcore::HPattern const&,
+find_result find( yaal::hcore::HString const&, yaal::hcore::HRegex const&,
 		int = 0, int = meta::max_signed<int>::value, FILE_TYPE::enum_t = FILE_TYPE::ALL );
 
 }

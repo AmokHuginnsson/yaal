@@ -35,7 +35,7 @@ namespace tools {
 
 namespace filesystem {
 
-find_result find( yaal::hcore::HString const& in, yaal::hcore::HPattern const& pattern_,
+find_result find( yaal::hcore::HString const& in, yaal::hcore::HRegex const& pattern_,
 		int minDepth_, int maxDepth_, FILE_TYPE::enum_t fileType_ ) {
 	find_result result;
 	HFSItem p( in );
