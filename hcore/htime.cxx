@@ -40,7 +40,7 @@ namespace hcore {
 char const* const _defaultTimeFormat_ = "%a, %d %b %Y %H:%M:%S %z";
 
 HTime::HTime( now_in_t nowIn_ )
-	: _format ( _defaultTimeFormat_ ), _cache(), _value(), _broken() {
+	: _value(), _broken(), _format ( _defaultTimeFormat_ ), _cache() {
 	M_PROLOG
 	set_now( nowIn_ );
 	return;
@@ -48,7 +48,7 @@ HTime::HTime( now_in_t nowIn_ )
 }
 
 HTime::HTime( char const* const strTime_ )
-	: _format ( _defaultTimeFormat_ ), _cache(), _value(), _broken() {
+	: _value(), _broken(), _format ( _defaultTimeFormat_ ), _cache() {
 	M_PROLOG
 	char const* err( ::strptime( strTime_, _format.raw(), &_broken ) );
 	if ( ! err )
@@ -60,24 +60,25 @@ HTime::HTime( char const* const strTime_ )
 }
 
 HTime::HTime( HTime const& time_ )
-	: _format( time_._format ), _cache(),
-	_value( time_._value ), _broken( time_._broken ) {
+	: _value( time_._value ), _broken( time_._broken ),
+	_format( time_._format ), _cache() {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
-HTime::HTime( time_t const& time_ )
-	: _format( _defaultTimeFormat_ ), _cache(), _value( time_ ), _broken() {
+HTime::HTime( i64_t const& time_ )
+	: _value( time_ ), _broken(), _format( _defaultTimeFormat_ ), _cache() {
 	M_PROLOG
-	M_ENSURE( localtime_r( &_value, &_broken ) );
+	time_t t( static_cast<time_t>( _value ) );
+	M_ENSURE( localtime_r( &t, &_broken ) );
 	return;
 	M_EPILOG
 }
 
 HTime::HTime( int const year_, int const month_, int const day_,
 							 int const hour_, int const minute_, int const second_ )
-	: _format( _defaultTimeFormat_ ), _cache(), _value(), _broken() {
+	: _value(), _broken(), _format( _defaultTimeFormat_ ), _cache() {
 	M_PROLOG
 	set_datetime( year_, month_, day_, hour_, minute_, second_ );
 	return;
@@ -90,19 +91,19 @@ HTime::~HTime( void ) {
 	M_EPILOG
 }
 
-void HTime::set( time_t const& time_ ) {
+void HTime::set( i64_t const& time_ ) {
 	M_PROLOG
-	_value = time_;
+	time_t t( static_cast<time_t>( _value = time_ ) );
 	/* In Visual Studio C++ localtime_r is a macro and cannot be prefixed with ::. */
-	M_ENSURE( localtime_r( &_value, &_broken ) );
+	M_ENSURE( localtime_r( &t, &_broken ) );
 	return;
 	M_EPILOG
 }
 
 void HTime::set_now( now_in_t nowIn_ ) {
 	M_PROLOG
-	_value = ::time( NULL );
-	M_ENSURE( ( nowIn_ == UTC ? gmtime_r( &_value, &_broken ) : localtime_r( &_value, &_broken ) ) != NULL );
+	time_t t( static_cast<time_t>( _value = ::time( NULL ) ) );
+	M_ENSURE( ( nowIn_ == UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
 	return;
 	M_EPILOG
 }
@@ -225,43 +226,44 @@ HTime HTime::operator - ( HTime const& time_ ) const {
 
 HTime & HTime::operator -= ( HTime const& time_ ) {
 	M_PROLOG
-	_value = static_cast<time_t>( difftime( _value, time_._value ) );
-	M_ENSURE( gmtime_r( &_value, &_broken ) );
+	_value = static_cast<i64_t>( difftime( static_cast<time_t>( _value ), static_cast<time_t>( time_._value ) ) );
+	time_t t( static_cast<time_t>( _value ) );
+	M_ENSURE( gmtime_r( &t, &_broken ) );
 	return ( *this );
 	M_EPILOG
 }
 
-bool HTime::operator == ( time_t const& time_ ) const {
+bool HTime::operator == ( i64_t const& time_ ) const {
 	M_PROLOG
 	return ( _value == time_ );
 	M_EPILOG
 }
 
-bool HTime::operator != ( time_t const& time_ ) const {
+bool HTime::operator != ( i64_t const& time_ ) const {
 	M_PROLOG
 	return ( _value != time_ );
 	M_EPILOG
 }
 
-bool HTime::operator <= ( time_t const& time_ ) const {
+bool HTime::operator <= ( i64_t const& time_ ) const {
 	M_PROLOG
 	return ( _value <= time_ );
 	M_EPILOG
 }
 
-bool HTime::operator >= ( time_t const& time_ ) const {
+bool HTime::operator >= ( i64_t const& time_ ) const {
 	M_PROLOG
 	return ( _value >= time_ );
 	M_EPILOG
 }
 
-bool HTime::operator < ( time_t const& time_ ) const {
+bool HTime::operator < ( i64_t const& time_ ) const {
 	M_PROLOG
 	return ( _value < time_ );
 	M_EPILOG
 }
 
-bool HTime::operator > ( time_t const& time_ ) const {
+bool HTime::operator > ( i64_t const& time_ ) const {
 	M_PROLOG
 	return ( _value > time_ );
 	M_EPILOG
@@ -288,7 +290,7 @@ HString HTime::string( void ) const {
 	M_EPILOG
 }
 
-time_t HTime::raw( void ) const {
+i64_t HTime::raw( void ) const {
 	return ( _value );
 }
 

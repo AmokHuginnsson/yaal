@@ -29,6 +29,7 @@ Copyright:
 
 #include <ctime>
 
+#include "hcore/pod.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/hchunk.hxx"
 
@@ -48,10 +49,10 @@ public:
 		LOCAL
 	} now_in_t;
 private:
+	i64_t _value;
+	tm _broken;
 	HString	_format;
 	mutable HChunk _cache;
-	time_t	_value;
-	tm			_broken;
 public:
 	/*! \brief Construct HTime object based on current moment in time.
 	 *
@@ -60,13 +61,13 @@ public:
 	HTime( now_in_t nowIn_ );
 	HTime( HTime const& );
 	HTime( char const* const );
-	HTime( time_t const& );
+	HTime( i64_t const& );
 	HTime( int const, int const, int const, int const = 0, int const = 0,
 			int const = 0 );
 	virtual ~HTime ( void );
 	void swap( HTime& );
 	void set_now( now_in_t );
-	void set( time_t const& );
+	void set( i64_t const& );
 	void format( char const* const = _defaultTimeFormat_ );
 	void set_time( int const = 0, int const = 0, int const = 0 );
 	void set_date( int const, int const = 1, int const = 1 );
@@ -81,14 +82,14 @@ public:
 	HTime& operator = ( HTime const& );
 	HTime operator - ( HTime const& ) const;
 	HTime& operator -= ( HTime const& );
-	bool operator == ( time_t const& ) const;
-	bool operator != ( time_t const& ) const;
-	bool operator <= ( time_t const& ) const;
-	bool operator >= ( time_t const& ) const;
-	bool operator < ( time_t const& ) const;
-	bool operator > ( time_t const& ) const;
+	bool operator == ( i64_t const& ) const;
+	bool operator != ( i64_t const& ) const;
+	bool operator <= ( i64_t const& ) const;
+	bool operator >= ( i64_t const& ) const;
+	bool operator < ( i64_t const& ) const;
+	bool operator > ( i64_t const& ) const;
 	HString string( void ) const;
-	time_t raw( void ) const;
+	i64_t raw( void ) const;
 };
 
 typedef HExceptionT<HTime> HTimeException;
