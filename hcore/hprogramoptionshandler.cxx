@@ -114,6 +114,7 @@ int rc_open( HString const& rcPath_, HFile& file_ ) {
 	int error = 0;
 	if ( !! file_ )
 		file_.close();
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	error = file_.open( rcPath_, HFile::OPEN::READING );
 	HString message( rcPath_ );
 	if ( error )
