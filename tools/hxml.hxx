@@ -355,13 +355,13 @@ typedef HOptional<yaal::hcore::HString const&> value_t;
 
 value_t try_node_val( HXml::HConstNodeProxy const& node );
 value_t try_node_val( HXml::HConstIterator const& it );
-value_t try_attr_val( HXml::HConstNodeProxy const& node, char const* const name );
-value_t try_attr_val( HXml::HConstIterator const& it, char const* const name );
+value_t try_attr_val( HXml::HConstNodeProxy const& node, yaal::hcore::HString const& name );
+value_t try_attr_val( HXml::HConstIterator const& it, yaal::hcore::HString const& name );
 
 yaal::hcore::HString const& node_val( HXml::HConstNodeProxy const& node );
 yaal::hcore::HString const& node_val( HXml::HConstIterator const& it );
-yaal::hcore::HString const& attr_val( HXml::HConstNodeProxy const& node, char const* const name );
-yaal::hcore::HString const& attr_val( HXml::HConstIterator const& it, char const* const name );
+yaal::hcore::HString const& attr_val( HXml::HConstNodeProxy const& node, yaal::hcore::HString const& name );
+yaal::hcore::HString const& attr_val( HXml::HConstIterator const& it, yaal::hcore::HString const& name );
 
 }
 

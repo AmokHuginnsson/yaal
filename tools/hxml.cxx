@@ -1176,7 +1176,7 @@ value_t try_node_val( HXml::HConstIterator const& it ) {
 	M_EPILOG
 }
 
-value_t try_attr_val( HXml::HConstNodeProxy const& node, char const* const name ) {
+value_t try_attr_val( HXml::HConstNodeProxy const& node, yaal::hcore::HString const& name ) {
 	M_PROLOG
 	HXml::HNode::properties_t const& props = node.properties();
 	HXml::HNode::properties_t::const_iterator prop = props.find( name );
@@ -1187,7 +1187,7 @@ value_t try_attr_val( HXml::HConstNodeProxy const& node, char const* const name 
 	M_EPILOG
 }
 
-value_t try_attr_val( HXml::HConstIterator const& it, char const* const name ) {
+value_t try_attr_val( HXml::HConstIterator const& it, yaal::hcore::HString const& name ) {
 	M_PROLOG
 	return ( try_attr_val( *it, name ) );
 	M_EPILOG
@@ -1209,7 +1209,7 @@ HString const& node_val( HXml::HConstIterator const& it_ ) {
 	M_EPILOG
 }
 
-HString const& attr_val( HXml::HConstNodeProxy const& node_, char const* const name_ ) {
+HString const& attr_val( HXml::HConstNodeProxy const& node_, yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	value_t attrValue( try_attr_val( node_, name_ ) );
 	M_ENSURE_EX( attrValue, name_ );
@@ -1217,7 +1217,7 @@ HString const& attr_val( HXml::HConstNodeProxy const& node_, char const* const n
 	M_EPILOG
 }
 
-HString const& attr_val( HXml::HConstIterator const& it_, char const* const name_ ) {
+HString const& attr_val( HXml::HConstIterator const& it_, yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	value_t attrValue( try_attr_val( it_, name_ ) );
 	M_ENSURE_EX( attrValue, name_ );
