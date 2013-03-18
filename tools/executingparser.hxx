@@ -165,8 +165,8 @@ HKleeneStar operator* ( HRule const& rule_ );
 HKleenePlus operator+ ( HRule const& rule_ );
 
 class HReal : public HRule {
-	typedef yaal::hcore::HBoundCall<void ( double const& )> action_double_t;
-	typedef yaal::hcore::HBoundCall<void ( double long const& )> action_double_long_t;
+	typedef yaal::hcore::HBoundCall<void ( double )> action_double_t;
+	typedef yaal::hcore::HBoundCall<void ( double long )> action_double_long_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HNumber const& )> action_number_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
 	action_double_t _actionDouble;
@@ -203,8 +203,8 @@ extern HReal real;
 typedef yaal::hcore::HExceptionT<HReal, HRuleException> HRealException;
 
 class HInteger : public HRule {
-	typedef yaal::hcore::HBoundCall<void ( int long const& )> action_int_long_t;
-	typedef yaal::hcore::HBoundCall<void ( int const& )> action_int_t;
+	typedef yaal::hcore::HBoundCall<void ( int long )> action_int_long_t;
+	typedef yaal::hcore::HBoundCall<void ( int )> action_int_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HNumber const& )> action_number_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
 	action_int_long_t _actionIntLong;
@@ -239,7 +239,7 @@ extern HInteger integer;
 typedef yaal::hcore::HExceptionT<HInteger, HRuleException> HIntegerException;
 
 class HCharacter : public HRule {
-	typedef yaal::hcore::HBoundCall<void ( char const& )> action_t;
+	typedef yaal::hcore::HBoundCall<void ( char )> action_t;
 	char _character;
 	action_t _action;
 public:
@@ -262,6 +262,7 @@ extern HCharacter character;
 typedef yaal::hcore::HExceptionT<HCharacter, HRuleException> HCharacterException;
 
 HFollows operator >> ( char character_, HRule const& successor_ );
+HFollows operator >> ( HRule const& successor_, char );
 
 class HString : public HRule {
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_t;
@@ -289,6 +290,8 @@ typedef yaal::hcore::HExceptionT<HString, HRuleException> HStringException;
 
 HFollows operator >> ( char const* string_, HRule const& successor_ );
 HFollows operator >> ( yaal::hcore::HString const& string_, HRule const& successor_ );
+HFollows operator >> ( HRule const& predecessor_, char const* string_ );
+HFollows operator >> ( HRule const& predecessor_, yaal::hcore::HString const& string_ );
 
 }
 

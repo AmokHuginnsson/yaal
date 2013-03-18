@@ -606,6 +606,12 @@ HFollows operator >> ( char character_, HRule const& successor_ ) {
 	M_EPILOG
 }
 
+HFollows operator >> ( HRule const& predecessor_, char character_ ) {
+	M_PROLOG
+	return ( HFollows( predecessor_, HCharacter( character_ ) ) );
+	M_EPILOG
+}
+
 HString::HString( hcore::HString const& string_ )
 	: HRule(), _string( string_ ), _action()
 	{}
@@ -654,6 +660,18 @@ HFollows operator >> ( char const* string_, HRule const& successor_ ) {
 HFollows operator >> ( hcore::HString const& string_, HRule const& successor_ ) {
 	M_PROLOG
 	return ( HFollows( HString( string_ ), successor_  ) );
+	M_EPILOG
+}
+
+HFollows operator >> ( HRule const& predecessor_, char const* string_ ) {
+	M_PROLOG
+	return ( HFollows( predecessor_, HString( string_ ) ) );
+	M_EPILOG
+}
+
+HFollows operator >> ( HRule const& predecessor_, hcore::HString const& string_ ) {
+	M_PROLOG
+	return ( HFollows( predecessor_, HString( string_ ) ) );
 	M_EPILOG
 }
 
