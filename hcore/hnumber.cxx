@@ -446,8 +446,11 @@ HString HNumber::to_string( void ) const {
 	int leaf( 0 );
 	for ( ; leaf < _integralPartSize; ++ leaf )
 		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF_CONST + 1, leaf ? ZFORMAT : "%u", src[ leaf ] ); /* + 1 for terminating NIL */
-	if ( _leafCount > _integralPartSize )
+	if ( _leafCount > _integralPartSize ) {
+		if ( ! _integralPartSize )
+			*ptr ++ = VALID_CHARACTERS[ A_ZERO ];
 		*ptr ++ = VALID_CHARACTERS[ A_DOT ];
+	}
 	for ( ; leaf < _leafCount; ++ leaf )
 		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF_CONST + 1, ZFORMAT, src[ leaf ] );
 	if ( ! _leafCount )
