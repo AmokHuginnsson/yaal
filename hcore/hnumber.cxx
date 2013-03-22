@@ -327,20 +327,20 @@ void HNumber::from_floating_point( double long number_ ) {
 void HNumber::from_integer( int long long number_ ) {
 	M_PROLOG
 	int long long number( abs( number_ ) );
-	if ( number_ >= ( static_cast<int long long>( LEAF ) * LEAF ) ) {
+	if ( number >= ( static_cast<int long long>( LEAF ) * LEAF ) ) {
 		_leafCount = 3;
 		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
 		i32_t* data( _canonical.get<i32_t>() );
 		data[ 0 ] = static_cast<i32_t>( number / ( static_cast<int long long>( LEAF ) * LEAF ) );
 		data[ 1 ] = static_cast<i32_t>( ( number % ( static_cast<int long long>( LEAF ) * LEAF ) ) / LEAF );
 		data[ 2 ] = static_cast<i32_t>( number % LEAF );
-	} else if ( number_ >= LEAF ) {
+	} else if ( number >= LEAF ) {
 		_leafCount = 2;
 		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
 		i32_t* data( _canonical.get<i32_t>() );
 		data[ 0 ] = static_cast<i32_t>( number / LEAF );
 		data[ 1 ] = static_cast<i32_t>( number % LEAF );
-	} else {
+	} else if ( number != 0 ) {
 		_leafCount = 1;
 		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
 		_canonical.get<i32_t>()[ 0 ] = static_cast<i32_t>( number );
