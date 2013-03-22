@@ -40,9 +40,6 @@ namespace tools {
  */
 namespace xmath {
 
-template<typename number_t>
-number_t square_root( number_t );
-
 template<typename iterator_t>
 typename hcore::iterator_traits<iterator_t>::value_type
 select( iterator_t, iterator_t, int long );

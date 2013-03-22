@@ -33,7 +33,8 @@ M_VCSID( "$Id: "__ID__" $" )
 M_VCSID( "$Id: "__TID__" $" )
 #include "algorithm.hxx"
 #include "hnumber.hxx"
-#include "hfile.hxx"
+
+using namespace yaal::hcore;
 
 /*
  * Naming conventions:
@@ -81,7 +82,7 @@ i32_t const DECIMAL_SHIFT[] = {
 	1000000000l
 };
 i32_t const LEAF = meta::power<10, DECIMAL_DIGITS_IN_LEAF_CONST>::value;
-i32_t const LEAF_SQ = static_cast<i32_t>( ::sqrt( static_cast<double>( LEAF ) ) );
+i32_t const LEAF_SQ = static_cast<i32_t>( square_root( static_cast<double long>( LEAF ) ) );
 char ZFORMAT[] = "%00u";
 
 char unused = ZFORMAT[2] = static_cast<char>( '0' + DECIMAL_DIGITS_IN_LEAF_CONST );
@@ -93,6 +94,7 @@ inline i32_t leafcmp( i32_t const* left_, i32_t const* right_, int long len_ ) {
 	return ( cmp );
 }
 
+static HNumber const _zero_( 0 );
 static HNumber const _one_( 1 );
 
 }
@@ -790,7 +792,8 @@ HNumber HNumber::operator / ( HNumber const& divisor_ ) const {
 
 HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 	M_PROLOG
-	M_ENSURE( divisor_._leafCount > 0 );
+	if ( ! ( divisor_._leafCount > 0 ) )
+		throw HNumberException( "division by zero" );
 	if ( _leafCount ) {
 		/*
 		 * We use "long division" pen and paper algorithm.
@@ -1245,6 +1248,48 @@ int long HNumber::karatsuba( HChunk& result, i32_t const* fx, int long fxs, i32_
 	return ( leafCount );
 }
 
+}
+
+yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	HNumber n;
+	do {
+		if ( value_ < _zero_ )
+			throw HNumberException( "square root from negative" );
+		HString s( value_.to_string() );
+		int long digits( 0 );
+		bool aboveOne( value_ >= _one_ );
+		if ( aboveOne ) {
+			digits = s.find( VALID_CHARACTERS[A_DOT] );
+			if ( digits == HString::npos )
+				digits = s.get_length();
+		} else {
+			static int const SKIP_ZERO_DOT( 2 );
+			digits = s.find_other_than( "0", SKIP_ZERO_DOT ); /* SKIP_ZERO_DOT - skip "0." at the beginning */
+			if ( digits == HString::npos ) {
+				n = _zero_;
+				break;
+			}
+			digits -= SKIP_ZERO_DOT;
+		}
+		bool odd( digits & 1l );
+		if ( odd )
+			-- digits;
+		else
+			digits -= 2;
+		digits >>= 1;
+		++ digits;
+		s.fillz( '0', 0, digits );
+		if ( aboveOne )
+			s.set_at( 0, odd ? '2' : '6' );
+		else {
+			s.set_at( 0, '.' );
+			s.set_at( digits - 1, odd ? '2' : '6' );
+		}
+		n = s;
+	} while ( false );
+	return ( n );
+	M_EPILOG
 }
 
 }

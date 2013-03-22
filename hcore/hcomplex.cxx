@@ -105,7 +105,7 @@ double long HComplex::modulus( void ) const {
 		mod = _real;
 	else if ( ! _real )
 		mod = _imaginary;
-	else mod = ::std::sqrt( _real * _real + _imaginary * _imaginary );
+	else mod = square_root( _real * _real + _imaginary * _imaginary );
 	return ( mod );
 	M_EPILOG
 }

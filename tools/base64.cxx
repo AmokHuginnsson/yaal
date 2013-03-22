@@ -82,7 +82,7 @@ yaal::hcore::HString base64_raw_encode( char const* ptr, int long length, bool s
 	M_PROLOG
 	int shifts[] = { 16, 8, 0 };
 	static int const PREALLOCATE = 128;
-	HString output( PREALLOCATE, true );
+	HString output( PREALLOCATE, 0 );
 	u32_t coder = 0;
 	for ( int long i = 0; i < length; ++ i ) {
 		int shift = shifts[ i % 3 ];
@@ -165,7 +165,7 @@ void base64::encode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	int const BASE64LINELEN = 57;
 	char buf[BASE64LINELEN];
 	int long size( 0 );
-	HString line( 80, true );
+	HString line( 80, 0 );
 	int long offset( 0 );
 	bool needEndl( false );
 	while ( ( size = in.read( buf, sizeof ( buf ) ) ) > 0 ) {
@@ -202,8 +202,8 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	int const BUF_LEN = 80;
 	char buf[BUF_LEN];
 	int long size( 0 );
-	HString line( BUF_LEN, true );
-	HString decodebuf( BASE64LINELEN + 1, true );
+	HString line( BUF_LEN, 0 );
+	HString decodebuf( BASE64LINELEN + 1, 0 );
 	int long pos( 0 );
 	while ( in.read_until_n( line, BUF_LEN ) ) {
 		char const* const ptr = line.raw();

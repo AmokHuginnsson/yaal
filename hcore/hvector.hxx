@@ -103,8 +103,8 @@ public:
 	}
 	value_type norm( void ) const {
 		M_PROLOG
-		value_type scalar = accumulate( _data.begin(), _data.end(), 0.0 );
-		return ( sqrt( scalar ) );
+		value_type scalar( accumulate( _data.begin(), _data.end(), 0.0 ) );
+		return ( square_root( scalar ) );
 		M_EPILOG
 	}
 	HVector& operator = ( HVector const& vector_ ) {

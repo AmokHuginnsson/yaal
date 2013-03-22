@@ -37,31 +37,6 @@ namespace tools {
 
 namespace xmath {
 
-template<>
-double long square_root( double long val_ ) {
-	return ( sqrtl( val_ ) );
-}
-
-template<>
-double square_root( double val_ ) {
-	return ( sqrt( val_ ) );
-}
-
-template<>
-float square_root( float val_ ) {
-	return ( sqrtf( val_ ) );
-}
-
-template<typename numeric_t>
-numeric_t square_root( numeric_t val_ ) {
-	return ( static_cast<numeric_t>( sqrt( static_cast<double>( val_ ) ) ) );
-}
-
-template int short square_root( int short );
-template int square_root( int );
-template int long square_root( int long );
-template int long long square_root( int long long );
-
 }
 
 }

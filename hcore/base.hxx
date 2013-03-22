@@ -98,6 +98,10 @@ to_t bit_cast( from_t val_ ) {
 	return ( cast._to );
 }
 
+/*! \brief Disguise base class to look like a field.
+ *
+ * Allows owner class to initialize any of its base classes with a reference to one of its conceptual fields.
+ */
 template<typename field_t, int const id = 0>
 class HField {
 protected:
@@ -131,6 +135,8 @@ public:
 		{ return ( _field ); }
 };
 
+/*! \brief Temporarily backup some value on a side and restore it at end of scope.
+ */
 template<typename tType>
 class HScopedValueReplacement {
 	tType _orig;
@@ -142,12 +148,16 @@ public:
 		{ _value = _orig; }
 };
 
+/*! \brief Create new named type that is not convertible and requires explicit instantiation.
+ */
 template<typename id, typename T>
 struct explicit_type {
 	T _value;
 	explicit explicit_type( T const& value_ ) : _value( value_ ) {}
 };
 
+/*! \brief Helper to find number of elements in C array.
+ */
 template <typename T, int long unsigned N>
 char ( &YaalArrayElementCountHelper( T ( &YaalArrayElementCountHelperArray )[N] ) )[N];
 
@@ -157,6 +167,13 @@ template<typename type_t>
 bool is_binary( type_t const& );
 template<typename type_t>
 bool is_octal( type_t const& );
+
+double long square_root_impl( double long );
+
+template<typename T>
+T square_root( T val_ ) {
+	return ( static_cast<T>( square_root_impl( val_ ) ) );
+}
 
 }
 

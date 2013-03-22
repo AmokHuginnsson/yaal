@@ -273,8 +273,8 @@ double long HExpression::functions( tree_t::const_node_t node_ ) {
 		break;
 		case ( FUNCTION::SQRT ): {
 			if ( leftValue < 0 )
-				throw HExpressionException( _( "sqrt: argument not in domain" ) );
-			retVal = ::std::sqrt( leftValue );
+				throw HExpressionException( _( "square_root: argument not in domain" ) );
+			retVal = square_root( leftValue );
 		}
 		break;
 		case ( FUNCTION::LN ): {
