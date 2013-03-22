@@ -110,9 +110,10 @@ public:
 	 *
 	 * initialize immediately with size
 	 *
-	 * \param size - capacity of newly constructed string.
+	 * \param size_ - capacity of newly constructed string.
+	 * \param fill_ - fill allocated space with given character.
 	 */
-	HString( int long size, bool );
+	HString( int long size_, char fill_ );
 	/*! \brief Destroy string object and deallocate all resources.
 	 */
 	~HString( void );
@@ -408,6 +409,41 @@ public:
 	 * \return Self.
 	 */
 	HString& replace( HString const& pattern, HString const& replacement );
+	/*! \brief Replace part of a this string with supplied string.
+	 *
+	 * \param pos_ - where replaced part starts.
+	 * \param size_ - size of replaced part.
+	 * \param replacement - replacement for given part.
+	 * \return Self.
+	 */
+	HString& replace( int long pos_, int long size_, HString const& replacement );
+	/*! \brief Replace part of a this string with supplied substring.
+	 *
+	 * \param pos_ - where replaced part starts.
+	 * \param size_ - size of replaced part.
+	 * \param replacement - replacement source for given part.
+	 * \param offset_ - where replacement part starts in replacement source.
+	 * \param len_ - length of replacement.
+	 * \return Self.
+	 */
+	HString& replace( int long pos_, int long size_, HString const& replacement, int long offset_, int long len_ );
+	/*! \brief Replace part of a this string with supplied character buffer.
+	 *
+	 * \param pos_ - where replaced part starts.
+	 * \param size_ - size of replaced part.
+	 * \param buffer_ - replacement source for given part.
+	 * \param len_ - length of replacement.
+	 * \return Self.
+	 */
+	HString& replace( int long pos_, int long size_, char const* buffer_, int long len_ );
+	/*! \brief Replace range in this string with supplied string.
+	 *
+	 * \param first_ - where replaced range starts.
+	 * \param last_ - whare replaced range ends.
+	 * \param replacement - replacement for given part.
+	 * \return Self.
+	 */
+	HString& replace( iterator first_, iterator last_, HString const& replacement );
 	/*! \brief Convert all characters of this string to upper case.
 	 *
 	 * \return Self.
@@ -482,7 +518,7 @@ public:
 	 * \param count - fill that many bytes.
 	 * \return Self.
 	 */
-	HString& fill( char value = '\0', int long position = 0, int long lenght = 0 );
+	HString& fill( char value = '\0', int long position = 0, int long lenght = MAX_STRING_LENGTH );
 	/*! \brief Fill portion of string with constatnt value and finish with \0 (zero) byte.
 	 *
 	 * \param value - use this value as a filler.
@@ -490,7 +526,7 @@ public:
 	 * \param count - fill that many bytes.
 	 * \return Self.
 	 */
-	HString& fillz( char value = '\0', int long position = 0, int long count = 0 );
+	HString& fillz( char value = '\0', int long position = 0, int long count = MAX_STRING_LENGTH );
 	/*! \brief Erase part of the string.
 	 *
 	 * \param position_ - start position for part to be erased.
@@ -631,6 +667,9 @@ public:
 	}
 	operator HString::const_iterator ( void ) const {
 		return ( _owner->raw() + _index );
+	}
+	int long operator - ( HIterator const& it_ ) const {
+		return ( _index - it_._index );
 	}
 private:
 	friend class HString;

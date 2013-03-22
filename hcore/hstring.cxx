@@ -50,7 +50,8 @@ enum {
 	UNINITIALIZED,
 	INDEX_OOB,
 	BAD_LENGTH,
-	BAD_OFFSET
+	BAD_OFFSET,
+	OVERFLOW
 };
 
 /* Useful helpers */
@@ -112,7 +113,8 @@ char const* _errMsgHString_[ 7 ] = {
 	_( "use of uninitialized string" ),
 	_( "index out of bound" ),
 	_( "bad length" ),
-	_( "bad offset" )
+	_( "bad offset" ),
+	_( "overflow" )
 };
 
 HString::HString( void ) : _mem() {
@@ -142,11 +144,12 @@ HString::HString( HString const& string_ )
 	M_EPILOG
 }
 
-HString::HString( int long preallocate_, bool )
+HString::HString( int long preallocate_, char fill_ )
 	: _mem() {
 	M_PROLOG
-	hs_realloc( preallocate_ );
-	::std::memset( MEM, 0, preallocate_ );
+	hs_realloc( preallocate_ + 1 );
+	::std::memset( MEM, fill_, preallocate_ );
+	SET_SIZE( fill_ ? preallocate_ : 0 );
 	return;
 	M_EPILOG
 }
@@ -809,6 +812,50 @@ HString& HString::replace( HString const& pattern_,
 	M_EPILOG
 }
 
+HString& HString::replace( int long pos_, int long size_, HString const& replacement ) {
+	M_PROLOG
+	return ( replace( pos_, size_, replacement.raw(), replacement.get_length() ) );
+	M_EPILOG
+}
+
+HString& HString::replace( int long pos_, int long size_, HString const& replacement, int long offset_, int long len_ ) {
+	M_PROLOG
+	if ( offset_ < 0 )
+		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
+	return ( replace( pos_, size_, replacement.raw() + offset_, len_ ) );
+	M_EPILOG
+}
+
+HString& HString::replace( int long pos_, int long size_, char const* buffer_, int long len_ ) {
+	M_PROLOG
+	if ( size_ < 0 )
+		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], size_ );
+	if ( len_ < 0 )
+		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], len_ );
+	if ( pos_ < 0 )
+		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], pos_ );
+	int long oldSize( GET_SIZE );
+	if ( ( pos_ + size_ ) >= oldSize )
+		M_THROW( _errMsgHString_[string_helper::OVERFLOW], pos_ + size_ );
+	int long newSize( oldSize + ( len_ - size_ ) );
+	if ( len_ > size_ )
+		hs_realloc( newSize + 1 );
+	::memmove( MEM + pos_ + len_, MEM + pos_ + size_, oldSize - ( pos_ + size_ ) );
+	memcpy( MEM + pos_, buffer_, len_ );
+	SET_SIZE( newSize );
+	MEM[ newSize ] = 0;
+	return ( *this );
+	M_EPILOG
+}
+
+HString& HString::replace( iterator first_, iterator last_, HString const& replacement ) {
+	M_PROLOG
+	M_ENSURE( first_._owner == this );
+	M_ENSURE( last_._owner == this );
+	return ( replace( static_cast<HString::const_iterator>( first_ ) - MEM, last_ - first_, replacement ) );
+	M_EPILOG
+}
+
 HString& HString::upper( void ) {
 	M_PROLOG
 	for ( int long ctr( 0 ), SIZE( GET_SIZE ); ctr < SIZE; ++ ctr )
@@ -973,18 +1020,21 @@ HString& HString::shift_right( int long shift_, char const filler_ ) {
 
 HString& HString::fill( char filler_, int long offset_, int long count_ ) {
 	M_PROLOG
+	if ( count_ == MAX_STRING_LENGTH )
+		count_ = ( GET_ALLOC_BYTES - offset_ ) - 1; /* we maintain zero terminator (even though it is not fillz()) hence - 1 */
 	if ( count_ < 0 )
 		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], count_ );
 	if ( offset_ < 0 )
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
 	if ( ( offset_ + count_ ) >= GET_ALLOC_BYTES )
-		M_THROW( _( "overflow" ), offset_ + count_ );
-	if ( count_ == 0 )
-		count_ = ( GET_ALLOC_BYTES - offset_ ) - 1; /* we maintain zero terminator (even though it is not fillz()) hence - 1 */
-	if ( ( count_ + offset_ ) > GET_SIZE )
-		SET_SIZE( count_ + offset_ );
-	::std::memset( MEM + offset_, filler_, count_ );
-	MEM[ GET_SIZE ] = 0;
+		M_THROW( _errMsgHString_[string_helper::OVERFLOW], offset_ + count_ );
+	if ( filler_ ) {
+		if ( ( count_ + offset_ ) > GET_SIZE )
+			SET_SIZE( count_ + offset_ );
+		::std::memset( MEM + offset_, filler_, count_ );
+		MEM[ GET_SIZE ] = 0;
+	} else
+		clear();
 	return ( *this );
 	M_EPILOG
 }
@@ -993,6 +1043,7 @@ HString& HString::fillz( char filler_, int long offset_, int long count_ ) {
 	M_PROLOG
 	fill( filler_, offset_, count_ );
 	MEM[ count_ + offset_ ] = 0;
+	SET_SIZE( count_ + offset_ );
 	return ( *this );
 	M_EPILOG
 }
