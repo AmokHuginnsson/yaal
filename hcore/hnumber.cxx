@@ -500,14 +500,16 @@ int long HNumber::get_precision( void ) const {
 void HNumber::set_precision( int long precision_ ) {
 	M_PROLOG
 	if ( ( precision_ >= HARDCODED_MINIMUM_PRECISION )
-			&& ( ( precision_ <= _precision ) || is_exact() ) ) {
+			&& ( ( precision_ < _precision ) || ( ( precision_ > _precision ) && is_exact() ) ) ) {
 		int long leafPrecision( ( precision_ + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
 		if ( ( _integralPartSize + leafPrecision ) < _leafCount )
 			_leafCount = _integralPartSize + leafPrecision;
-		if ( ( precision_ < _precision ) && ( _leafCount > 0 ) && ( leafPrecision == fractional_length() ) ) {
+		if ( precision_ < _precision ) {
 			i32_t* data( _canonical.get<i32_t>() );
-			i32_t& lastLeaf( data[ _leafCount - 1 ] );
-			lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( ( precision_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) ] );
+			if ( ( _leafCount > 0 ) && ( leafPrecision == fractional_length() ) && ( precision_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) {
+				i32_t& lastLeaf( data[ _leafCount - 1 ] );
+				lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( ( precision_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) ] );
+			}
 			while ( ( _leafCount > _integralPartSize ) && ! data[ _leafCount - 1 ] )
 				-- _leafCount;
 			if ( ! _leafCount )
@@ -527,7 +529,7 @@ int long HNumber::fractional_decimal_digits( void ) const {
 	int long fractionalDecimalDigits( fractional_length() * DECIMAL_DIGITS_IN_LEAF_CONST );
 	if ( _leafCount > 0 ) {
 		i32_t lastLeaf( _canonical.get<i32_t>()[ _leafCount - 1 ] );
-		for ( int i( 1 ); i < ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ); ++ i ) {
+		for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
 			if ( lastLeaf % DECIMAL_SHIFT[i] )
 				break;
 			-- fractionalDecimalDigits;
@@ -1104,6 +1106,7 @@ void HNumber::normalize( bool updatePrecision_ ) {
 		++ _precision;
 	int long leafPrecision( ( _precision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
 	if ( ( _leafCount > 0 ) && ( fractionalDecimalDigits > _precision ) && ( leafPrecision <= fractional_length() ) ) {
+		_leafCount -= ( fractional_length() - leafPrecision );
 		i32_t& lastLeaf( res[ _leafCount - 1 ] );
 		lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( ( _precision % DECIMAL_DIGITS_IN_LEAF_CONST ) ) ] );
 	}
