@@ -528,12 +528,14 @@ class YaalHCoreHNumberPrinter:
 				s = s + ( str( data[digit] ).zfill( DDIL ) if ( digit > 0 ) else str( data[digit] ) )
 				digit = digit + 1
 			if self._val['_leafCount'] > self._val['_integralPartSize']:
+				if self._val['_integralPartSize'] == 0:
+					s = s + "0"
 				s = s + "."
 			while digit < self._val['_leafCount']:
 				s = s + str( data[digit] ).zfill( DDIL )
 				digit = digit + 1
 			if self._val['_leafCount'] > self._val['_integralPartSize']:
-				s = s.strip( "0" )
+				s = s.rstrip( "0" )
 		else:
 			s = "0"
 		return s
