@@ -1102,8 +1102,8 @@ void HNumber::normalize( bool updatePrecision_ ) {
 	while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) )
 		-- _leafCount;
 	int long fractionalDecimalDigits( fractional_decimal_digits() );
-	if ( updatePrecision_ && ( fractionalDecimalDigits == _precision ) )
-		++ _precision;
+	if ( updatePrecision_ && ( fractionalDecimalDigits >= _precision ) )
+		_precision = fractionalDecimalDigits + 1;
 	int long leafPrecision( ( _precision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
 	if ( ( _leafCount > 0 ) && ( fractionalDecimalDigits > _precision ) && ( leafPrecision <= fractional_length() ) ) {
 		_leafCount -= ( fractional_length() - leafPrecision );
