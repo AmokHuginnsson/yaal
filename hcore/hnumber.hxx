@@ -90,11 +90,13 @@ namespace hcore {
  * assert( n1 == ".3333333333333333" );
  */
 class HNumber {
+public:
 	typedef HNumber this_type;
+	typedef int size_t;
 private:
-	int long _precision;
-	int long _leafCount;
-	int long _integralPartSize;
+	size_t _precision;
+	size_t _leafCount;
+	size_t _integralPartSize;
 	HChunk _canonical;
 	mutable HChunk _cache;
 	bool _negative;
@@ -117,8 +119,8 @@ public:
 	 * \param value - value for new number object.
 	 * \param precision - precision for new number object.
 	 */
-	HNumber( double long value, int precision );
-	HNumber( double value, int precision );
+	HNumber( double long value, size_t precision );
+	HNumber( double value, size_t precision );
 
 	/*! \brief Construct new number object from primitive integral type.
 	 *
@@ -135,12 +137,12 @@ public:
 	 * \param value - value for new number object.
 	 * \param precision - precision for new number object.
 	 */
-	HNumber( int long long value, int precision );
-	HNumber( int long value, int precision );
-	HNumber( int value, int precision );
-	HNumber( int long long unsigned value, int precision );
-	HNumber( int long unsigned value, int precision );
-	HNumber( int unsigned value, int precision );
+	HNumber( int long long value, size_t precision );
+	HNumber( int long value, size_t precision );
+	HNumber( int value, size_t precision );
+	HNumber( int long long unsigned value, size_t precision );
+	HNumber( int long unsigned value, size_t precision );
+	HNumber( int unsigned value, size_t precision );
 
 	/*! Construct a number from supplied string.
 	 *
@@ -170,9 +172,9 @@ public:
 	 * _-._1_      = ex
 	 */
 	HNumber( char const* const );
-	HNumber( char const* const, int );
+	HNumber( char const* const, size_t );
 	HNumber( HString const& );
-	HNumber( HString const&, int );
+	HNumber( HString const&, size_t );
 	HNumber( HNumber const& );
 	~HNumber( void );
 	HNumber& operator = ( HNumber const& );
@@ -202,23 +204,25 @@ public:
 	 *
 	 * \param newPrecision - new maximum precision of this HNumber.
 	 */
-	void set_precision( int long precision );
-	int long get_precision( void ) const;
+	void set_precision( size_t precision );
+	size_t get_precision( void ) const;
 	double long to_floating_point( void ) const;
 	int long long to_integer( void ) const;
 	HString to_string( void ) const;
 	bool is_exact( void ) const;
 private:
-	bool mutate_addition( i32_t*, int long, i32_t const* const[], int long*, int long*, bool, bool ) const;
-	int long absolute_lower( HNumber const& ) const;
-	int long karatsuba( HChunk&, i32_t const*, int long, i32_t const*, int long );
-	int long integral_length( void ) const;
-	int long fractional_length( void ) const;
-	int long fractional_decimal_digits( void ) const;
+	bool mutate_addition( i32_t*, size_t, i32_t const* const[], size_t*, size_t*, bool, bool ) const;
+	size_t absolute_lower( HNumber const& ) const;
+	size_t karatsuba( HChunk&, i32_t const*, size_t, i32_t const*, size_t );
+	size_t integral_length( void ) const;
+	size_t fractional_length( void ) const;
+	size_t fractional_decimal_digits( void ) const;
 	void from_string( HString const& );
 	void from_floating_point( double long );
 	void from_integer( int long long );
 	void normalize( bool );
+public:
+	struct ElementaryFunctions;
 };
 
 typedef HExceptionT<HNumber> HNumberException;
