@@ -34,8 +34,6 @@ M_VCSID( "$Id: "__TID__" $" )
 #include "algorithm.hxx"
 #include "hnumber.hxx"
 
-#include "hfile.hxx"
-
 using namespace yaal::hcore;
 
 /*
@@ -1293,12 +1291,13 @@ struct HNumber::ElementaryFunctions {
 				digits -= 2;
 			digits >>= 1;
 			++ digits;
-			s.fillz( '0', 0, digits );
-			if ( aboveOne )
+			if ( aboveOne ) {
+				s.fillz( '0', 0, digits );
 				s.set_at( 0, odd ? '2' : '6' );
-			else {
+			} else {
+				s.fillz( '0', 0, digits + 1 );
 				s.set_at( 0, '.' );
-				s.set_at( digits - 1, odd ? '2' : '6' );
+				s.set_at( digits, odd ? '2' : '6' );
 			}
 			n = s;
 			HNumber::size_t precision( n.fractional_decimal_digits() + 1 );
@@ -1308,15 +1307,19 @@ struct HNumber::ElementaryFunctions {
 				tmp.set_precision( precision );
 				two.set_precision( precision );
 				if ( precision >= HARDCODED_MINIMUM_PRECISION ) {
-					n._precision = precision;
-					tmp._precision = precision;
-					two._precision = precision;
+					n._precision = precision + 1;
+					tmp._precision = precision + 1;
+					two._precision = precision + 1;
+				} else {
+					n._precision = HARDCODED_MINIMUM_PRECISION + 1;
+					tmp._precision = HARDCODED_MINIMUM_PRECISION + 1;
+					two._precision = HARDCODED_MINIMUM_PRECISION + 1;
 				}
 				tmp /= n;
-				if ( tmp == n )
-					break;
 				n += tmp;
 				n /= two;
+				if ( ( n * n ) == value_ )
+					break;
 				if ( n._integralPartSize == oldN._integralPartSize ) {
 					i32_t const* a( n._canonical.get<i32_t const>() );
 					i32_t const* b( oldN._canonical.get<i32_t const>() );
@@ -1326,19 +1329,23 @@ struct HNumber::ElementaryFunctions {
 						if ( a[d] != b[d] )
 							break;
 					}
-					if ( ( n._leafCount == oldN._leafCount ) && ( d == SIZE ) )
-						break;
-					HNumber::size_t sameLeafs( d - n._integralPartSize );
-					HNumber::size_t newPrecision( sameLeafs * DECIMAL_DIGITS_IN_LEAF_CONST );
-					i32_t diff( abs( a[d] - b[d] ) );
-					for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
-						if ( ( diff % DECIMAL_SHIFT[DECIMAL_DIGITS_IN_LEAF_CONST - i] ) != diff )
+					HNumber::size_t sameFractionalLeafs( d - n._integralPartSize );
+					if ( sameFractionalLeafs > 0 ) {
+						HNumber::size_t newPrecision( sameFractionalLeafs * DECIMAL_DIGITS_IN_LEAF_CONST );
+						i32_t diff( abs( a[d] - b[d] ) );
+						for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
+							if ( ( diff % DECIMAL_SHIFT[DECIMAL_DIGITS_IN_LEAF_CONST - i] ) != diff )
+								break;
+							++ newPrecision;
+						}
+						if ( newPrecision >= requiredPrecision )
 							break;
-						++ newPrecision;
+						newPrecision = ( newPrecision << 2 ) + ( DECIMAL_DIGITS_IN_LEAF_CONST << 1 ) - 1;
+						if ( newPrecision < HARDCODED_MINIMUM_PRECISION )
+							newPrecision = HARDCODED_MINIMUM_PRECISION;
+						if ( newPrecision > precision )
+							precision = newPrecision;
 					}
-					if ( newPrecision >= requiredPrecision )
-						break;
-					precision = ( newPrecision << 2 ) + ( DECIMAL_DIGITS_IN_LEAF_CONST << 1 ) - 1;
 				}
 				oldN = n;
 			}
