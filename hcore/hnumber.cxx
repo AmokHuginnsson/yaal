@@ -1464,11 +1464,13 @@ struct HNumber::ElementaryFunctions {
 					HNumber::size_t sameFractionalLeafs( d - n._integralPartSize );
 					if ( sameFractionalLeafs > 0 ) {
 						HNumber::size_t newPrecision( sameFractionalLeafs * DECIMAL_DIGITS_IN_LEAF_CONST );
-						i32_t diff( abs( a[d] - b[d] ) );
-						for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
-							if ( ( diff % DECIMAL_SHIFT[DECIMAL_DIGITS_IN_LEAF_CONST - i] ) != diff )
-								break;
-							++ newPrecision;
+						if ( d < SIZE ) {
+							i32_t diff( abs( a[d] - b[d] ) );
+							for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
+								if ( ( diff % DECIMAL_SHIFT[DECIMAL_DIGITS_IN_LEAF_CONST - i] ) != diff )
+									break;
+								++ newPrecision;
+							}
 						}
 						if ( newPrecision >= requiredPrecision )
 							break;
