@@ -211,7 +211,7 @@ public:
 	HString to_string( void ) const;
 	bool is_exact( void ) const;
 private:
-	bool mutate_addition( i32_t*, size_t, i32_t const* const[], size_t*, size_t*, bool, bool ) const;
+	bool mutate_addition( i32_t*, size_t, i32_t const* const[], size_t*, size_t*, bool ) const;
 	size_t absolute_lower( HNumber const& ) const;
 	size_t karatsuba( HChunk&, i32_t const*, size_t, i32_t const*, size_t );
 	size_t integral_length( void ) const;
@@ -220,6 +220,9 @@ private:
 	void from_string( HString const& );
 	void from_floating_point( double long );
 	void from_integer( int long long );
+	void multiply_by_leaf( i32_t );
+	i32_t multiply_by_leaf_low( i32_t*, size_t, i32_t );
+	void divide_by_leaf( i32_t, size_t );
 	void normalize( bool );
 public:
 	struct ElementaryFunctions;
