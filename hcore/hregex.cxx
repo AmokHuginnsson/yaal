@@ -153,7 +153,7 @@ HString const& HRegex::error( void ) const {
 				_errorMessage += "'";
 			}
 		} else
-			_errorMessage = _errorCause[ ERROR::OK ];
+			_errorMessage = _errMsgHRegex_[ ERROR::OK ];
 	}
 	return ( _errorMessage );
 }
