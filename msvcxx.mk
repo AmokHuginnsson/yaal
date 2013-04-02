@@ -4,7 +4,7 @@
 
 PROJECT_NAME=$(notdir $(CURDIR))
 
-VCBUILD=$(wildcard /cygdrive/c/Program\ Files\ (x86)/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)$(wildcard /cygdrive/c/Program\ Files/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)
+VCBUILD=$(wildcard /cygdrive/c/Program\ Files\ (x86)/Microsoft\ Visual\ Studio\ 11.0/VC/vcpackages/vcbuild.exe)$(wildcard /cygdrive/c/Program\ Files/Microsoft\ Visual\ Studio\ 11.0/VC/vcpackages/vcbuild.exe)$(wildcard /cygdrive/c/Program\ Files\ (x86)/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)$(wildcard /cygdrive/c/Program\ Files/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)
 MSBUILD=$(wildcard /cygdrive/c/Windows/Microsoft.NET/Framework/v4*/MSBuild.exe)
 BUILD_ARTIFACT=build.stamp
 CPUS=$(shell grep -c processor /proc/cpuinfo)
@@ -18,7 +18,7 @@ $(BUILD_ARTIFACT): $(wildcard */*.cxx) $(wildcard */*.hxx)  $(wildcard */*/*.cxx
 	if [ "$${VS_VER}" = "x2008" ] ; then \
 		"$(VCBUILD)" /showenv /M$(CPUS) $(PROJECT_NAME).sln "Debug|Win32" ; \
 	else \
-		if [ "$${VS_VER}" = "x2010" ] ; then \
+		if [ "$${VS_VER}" = "x2010" -o "$${VS_VER}" = "x11" ] ; then \
 			"$(MSBUILD)" $(PROJECT_NAME).sln /nologo /m:$(CPUS) /t:Build /clp:NoItemAndPropertyList /p:Configuration=Debug /p:Platform=Win32 ; \
 		else \
 			echo "Cannot guess VS version!" && false ; \
@@ -36,7 +36,7 @@ install: all
 	if [ "$${VS_VER}" = "x2008" ] ; then \
 		"$(VCBUILD)" /showenv /M1 INSTALL.vcproj "Debug|Win32" ; \
 	else \
-		if [ "$${VS_VER}" = "x2010" ] ; then \
+		if [ "$${VS_VER}" = "x2010" -o "$${VS_VER}" = "x11" ] ; then \
 			"$(MSBUILD)" INSTALL.vc*proj /nologo /m:1 /t:Build /clp:NoItemAndPropertyList /p:Configuration=Debug /p:Platform=Win32 ; \
 		else \
 			echo "Cannot guess VS version!" && false ; \
@@ -48,7 +48,7 @@ clean: $(PROJECT_NAME).sln
 	if [ "$${VS_VER}" = "x2008" ] ; then \
 		"$(VCBUILD)" /showenv /M1 $(PROJECT_NAME).sln /clean "Debug|Win32" ; \
 	else \
-		if [ "$${VS_VER}" = "x2010" ] ; then \
+		if [ "$${VS_VER}" = "x2010" -o "$${VS_VER}" = "x11" ] ; then \
 			"$(MSBUILD)" $(PROJECT_NAME).sln /nologo /t:Clean /v:normal /p:Configuration=Debug /p:Platform=Win32 ; \
 		else \
 			echo "Cannot guess VS version!" && false ; \

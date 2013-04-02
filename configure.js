@@ -108,6 +108,8 @@ function boostInfo( install_path ) {
 
 function vcVersion() {
 	var versions = [
+		[ "Wow6432Node\\", "11.0", "Visual Studio 11" ],
+		[ "", "11.0", "Visual Studio 11" ],
 		[ "Wow6432Node\\", "9.0", "Visual Studio 9 2008" ],
 		[ "", "9.0", "Visual Studio 9 2008" ],
 		[ "Wow6432Node\\", "8.0", "Visual Studio 8 2005" ],
