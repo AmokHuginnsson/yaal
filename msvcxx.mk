@@ -4,8 +4,8 @@
 
 PROJECT_NAME=$(notdir $(CURDIR))
 
-VCBUILD=$(wildcard /cygdrive/c/Program\ Files\ (x86)/Microsoft\ Visual\ Studio\ 11.0/VC/vcpackages/vcbuild.exe)$(wildcard /cygdrive/c/Program\ Files/Microsoft\ Visual\ Studio\ 11.0/VC/vcpackages/vcbuild.exe)$(wildcard /cygdrive/c/Program\ Files\ (x86)/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)$(wildcard /cygdrive/c/Program\ Files/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)
-MSBUILD=$(wildcard /cygdrive/c/Windows/Microsoft.NET/Framework/v4*/MSBuild.exe)
+CMAKE=$(wildcard /cygdrive/c/Program\ Files\ (x86)/CMake*/bin/cmake.exe)$(wildcard /cygdrive/c/Program\ Files/CMake*/bin/cmake.exe)
+VCBUILD=$(wildcard /cygdrive/c/Program\ Files\ (x86)/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)$(wildcard /cygdrive/c/Program\ Files/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)
 BUILD_ARTIFACT=build.stamp
 CPUS=$(shell grep -c processor /proc/cpuinfo)
 
@@ -19,7 +19,7 @@ $(BUILD_ARTIFACT): $(wildcard */*.cxx) $(wildcard */*.hxx)  $(wildcard */*/*.cxx
 		"$(VCBUILD)" /showenv /M$(CPUS) $(PROJECT_NAME).sln "Debug|Win32" ; \
 	else \
 		if [ "$${VS_VER}" = "x2010" -o "$${VS_VER}" = "x11" ] ; then \
-			"$(MSBUILD)" $(PROJECT_NAME).sln /nologo /m:$(CPUS) /t:Build /clp:NoItemAndPropertyList /p:Configuration=Debug /p:Platform=Win32 ; \
+			"$(CMAKE)" --build . ; \
 		else \
 			echo "Cannot guess VS version!" && false ; \
 		fi \
@@ -37,7 +37,7 @@ install: all
 		"$(VCBUILD)" /showenv /M1 INSTALL.vcproj "Debug|Win32" ; \
 	else \
 		if [ "$${VS_VER}" = "x2010" -o "$${VS_VER}" = "x11" ] ; then \
-			"$(MSBUILD)" INSTALL.vc*proj /nologo /m:1 /t:Build /clp:NoItemAndPropertyList /p:Configuration=Debug /p:Platform=Win32 ; \
+			"$(CMAKE)" --build . --target install ; \
 		else \
 			echo "Cannot guess VS version!" && false ; \
 		fi \
@@ -49,7 +49,7 @@ clean: $(PROJECT_NAME).sln
 		"$(VCBUILD)" /showenv /M1 $(PROJECT_NAME).sln /clean "Debug|Win32" ; \
 	else \
 		if [ "$${VS_VER}" = "x2010" -o "$${VS_VER}" = "x11" ] ; then \
-			"$(MSBUILD)" $(PROJECT_NAME).sln /nologo /t:Clean /v:normal /p:Configuration=Debug /p:Platform=Win32 ; \
+			"$(CMAKE)" --build . --target clean ; \
 		else \
 			echo "Cannot guess VS version!" && false ; \
 		fi \
