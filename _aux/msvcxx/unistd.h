@@ -9,6 +9,10 @@ extern "C" FILE* tmpfile( void );
 #define _SYS_SOCKET_H 1
 #define _STRUCT_TIMEVAL 1
 #undef EDEADLOCK
+#if ( ETIMEDOUT != WSAETIMEDOUT )
+#undef ETIMEDOUT
+#define ETIMEDOUT WSAETIMEDOUT
+#endif /* #if ( ETIMEDOUT != WSAETIMEDOUT ) */
 #define __socklen_t_defined 1
 #undef environ
 #define unlink unlink_off
