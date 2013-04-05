@@ -59,7 +59,7 @@ function boostInfo( install_path ) {
 	this.version = new versionInfo();
 	this.exists = false;
 	var fs = new ActiveXObject( "Scripting.FileSystemObject" );
-	var versions = [ "1.41", "1.40", "1.39", "1.38.0", "1.37.0", "1.36.0", "1.35.0", "1.34.1", "1.34.0", "1.33.1" ];
+	var versions = [ "1.43", "1.42", "1.41", "1.40", "1.39", "1.38.0", "1.37.0", "1.36.0", "1.35.0" ];
 	for ( var idx in versions ) {
 		if ( this.exists )
 			break;
