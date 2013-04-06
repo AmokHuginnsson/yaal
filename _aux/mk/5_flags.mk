@@ -56,7 +56,7 @@ ifdef DO_RELASSERT
 endif
 ifdef DO_DEBUG
 	TARGET=debug
-	COMPILER_DEBUG_FLAGS = -O0 -g3 -ggdb3 -fno-inline -D__DEBUG__ $(DB)
+	COMPILER_DEBUG_FLAGS = -O0 -g -ggdb -g3 -ggdb3 -fno-inline -D__DEBUG__ $(DB)
 	LIB_INFIX = -d
 endif
 ifdef DO_PROFILING
@@ -80,17 +80,17 @@ endif
 # on host platform.
 # LINKER_PRIME_FLAGS  = -Wl,--demangle
 
-COMPILER_PATH_FLAGS = -I$(DIR_BUILD) -I$(DIR_ROOT) -I$(VPATH) -I/usr/local/include
+COMPILER_PATH_FLAGS = -I$(DIR_BUILD) $(sort -I$(DIR_ROOT) -I$(VPATH)) -I/usr/local/include
 LINKER_PATH_FLAGS   = -L/usr/local/lib
 
-override CXXFLAGS += $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) \
+override CXXFLAGS += $(strip $(CWARNING_FLAGS) $(CXXWARNING_FLAGS) \
 		$(COMPILER_OPTIMIZATION_FLAGS) $(COMPILER_DEBUG_FLAGS) \
 		$(COMPILER_PROFILING_FLAGS) $(COMPILER_COVERAGE_FLAGS) \
-		$(COMPILER_PATH_FLAGS) $(CFLAGS) $(COMPILER_PRIME_FLAGS)
+		$(COMPILER_PATH_FLAGS) $(CFLAGS) $(COMPILER_PRIME_FLAGS))
 
 # WARNING!! $(LINKER_PRIME_FLAGS) must be last option,
 # must be immediately followed by end of line
-override LXXFLAGS = $(LINKER_PATH_FLAGS) $(LINKER_PROFILING_FLAGS) \
-		$(LINKER_COVERAGE_FLAGS) $(LDFLAGS) $(LINKER_PRIME_FLAGS)
+override LXXFLAGS = $(strip $(LINKER_PATH_FLAGS) $(LINKER_PROFILING_FLAGS) \
+		$(LINKER_COVERAGE_FLAGS) $(LDFLAGS) $(LINKER_PRIME_FLAGS))
 
 # vim: ft=make

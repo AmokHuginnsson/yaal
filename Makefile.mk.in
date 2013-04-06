@@ -61,10 +61,8 @@ include $(DIR_ROOT)/_aux/mk/2_term.mk
 include $(DIR_ROOT)/_aux/mk/3_suffix.mk
 include $(DIR_ROOT)/_aux/mk/4_wrapper.mk
 include $(DIR_ROOT)/_aux/mk/5_flags.mk
-override CXXFLAGS+= -D__YAAL_BUILD__ @EXTRA_CXXFLAGS@ @DEFS@ \
-					-I$(DIR_ROOT) -I$(DIR_BUILD) -I/usr/local/include \
-					@EXTRA_INCLUDE_PATHS@
-override LXXFLAGS+= -L. -L/usr/local/lib @EXTRA_LIB_PATHS@ -shared @EXTRA_LXXFLAGS@ @YAAL_LXXFLAGS@
+override CXXFLAGS+= -D__YAAL_BUILD__ @EXTRA_CXXFLAGS@ @DEFS@ @EXTRA_INCLUDE_PATHS@
+override LXXFLAGS+= -L. @EXTRA_LIB_PATHS@ -shared @EXTRA_LXXFLAGS@ @YAAL_LXXFLAGS@
 
 include $(DIR_ROOT)/_aux/mk/7_func.mk
 
@@ -146,7 +144,7 @@ include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 #phony targets
 .PHONY: all bin clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge static stats tags test uninstall
 
-$(TARGET): $(DIRS) $(HAPI_HEADER)
+$(TARGET): $(DIRS) $(TARGETS) $(HAPI_HEADER)
 
 all: $(TARGET)
 
@@ -177,7 +175,7 @@ uninstall:
 install-environment:
 	@cd $(DIR_ROOT) && ./_aux/msh $(DESTDIR)$(prefix)
 
-$(HAPI_HEADER): $(HDRS) $(TARGETS)
+$(HAPI_HEADER): $(HDRS) $(DIR_BUILD)/config.hxx
 	@printf "%b" "Making headers ... " && \
 	$(call invoke,$(DIR_ROOT)/_aux/mkheaders --lib-name=$(LIB_NAME) --lib-version=$(LIB_VERSION) --dir-root="$(DIR_ROOT)" --dir-build="$(DIR_BUILD)" --headers="$(HDRS)" && ) \
 	printf "%b$(NL)" "done.$(CL)$(BOLD)" && \

@@ -272,7 +272,7 @@ AC_DEFUN([YAAL_DETECT_COMMON_FLAGS], [
 	AC_MSG_CHECKING([can we use -pedantic-errors in <cstdlib>])
 	RESULT=["no"]
 	AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstdlib>]])],
-								[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -pedantic-errors -Wno-long-long"]]
+								[EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -pedantic-errors"]] dnl -Wno-long-long is added in _aux/mk/5_flags.mk
 								[_FLAGS=["$_FLAGS -pedantic-errors"]]
 								[RESULT=["yes"]],
 								[AC_MSG_WARN([[Cannot use -pedantic-errors!]])])
