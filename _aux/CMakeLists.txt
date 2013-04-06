@@ -307,6 +307,7 @@ add_dependencies( hconsole tools hcore )
 add_dependencies( hdata hconsole dbwrapper tools hcore )
 
 set( RUNTIME_DESTINATION lib )
+set( HEADER_TARGET "${TARGET_PATH}/include/yaal/yaal.hxx" )
 
 if ( CMAKE_HOST_WIN32 )
 	set( RUNTIME_DESTINATION bin )
@@ -330,15 +331,17 @@ if ( CMAKE_HOST_WIN32 )
 	set_target_properties( hcore PROPERTIES LINK_INTERFACE_LIBRARIES "" )
 	set_target_properties( makedef PROPERTIES COMPILE_DEFINITIONS "YAAL_MSVCXX_FIX_HXX_INCLUDED=1" )
 	set_target_properties( mkheaders PROPERTIES COMPILE_DEFINITIONS "YAAL_MSVCXX_FIX_HXX_INCLUDED=1" )
-	add_custom_target( headers ALL COMMAND mkheaders ${CMAKE_HOME_DIRECTORY} ${TARGET_PATH} "${HEADERS}" DEPENDS hdata mkheaders )
+	add_custom_command( OUTPUT ${HEADER_TARGET} COMMAND mkheaders ${CMAKE_HOME_DIRECTORY} ${TARGET_PATH} "${HEADERS}" MAIN_DEPENDENCY ${TARGET_PATH}/config.hxx DEPENDS mkheaders ${HEADERS} )
 else ( CMAKE_HOST_WIN32 )
 	target_link_libraries( hcore ssl crypto pthread rt nsl )
 	target_link_libraries( tools hcore xml2 xslt exslt dl z )
 	target_link_libraries( dbwrapper tools hcore )
 	target_link_libraries( hconsole tools hcore ncurses gpm )
 	target_link_libraries( hdata hconsole dbwrapper tools hcore )
-	add_custom_target( headers ALL COMMAND ./_aux/mkheaders --lib-name=${CMAKE_PROJECT_NAME} --lib-version=${PROJECT_VERSION} --dir-root=${CMAKE_HOME_DIRECTORY} --dir-build=${TARGET_PATH} --headers='${HEADERS}' DEPENDS hdata mkheaders )
+	add_custom_command( OUTPUT ${HEADER_TARGET} COMMAND ./_aux/mkheaders --lib-name=${CMAKE_PROJECT_NAME} --lib-version=${PACKAGE_VERSION} --dir-root=${CMAKE_HOME_DIRECTORY} --dir-build=${TARGET_PATH} --headers='${HEADERS}' MAIN_DEPENDENCY ${TARGET_PATH}/config.hxx DEPENDS mkheaders ${HEADERS} )
 endif ( CMAKE_HOST_WIN32 )
+
+add_custom_target( headers ALL DEPENDS ${HEADER_TARGET} )
 
 add_definitions( -DHAVE_CONFIG_H )
 

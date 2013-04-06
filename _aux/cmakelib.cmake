@@ -223,16 +223,16 @@ if ( NOT CMAKE_HOST_WIN32 )
 	include_directories( "/usr/local/include" )
 endif ( NOT CMAKE_HOST_WIN32 )
 
-function (today RESULT)
+macro ( today RESULT )
 	if (WIN32)
 		try_run( RUN_RESULT COMPILE_RESULT ${CMAKE_HOME_DIRECTORY}/build ${CMAKE_HOME_DIRECTORY}/../yaal/_aux/cmake-getdate.cxx RUN_OUTPUT_VARIABLE ${RESULT} )
 	elseif(UNIX)
-		execute_process( COMMAND "date" "+%Y%m%d" OUTPUT_VARIABLE ${RESULT} )
+		execute_process( COMMAND "date" "+%Y%m%d" OUTPUT_VARIABLE ${RESULT} OUTPUT_STRIP_TRAILING_WHITESPACE )
 	else (WIN32)
 		message(SEND_ERROR "date not implemented")
 		set(${RESULT} 000000)
 	endif (WIN32)
-endfunction (today)
+endmacro ( today )
 
 find_package(Git)
 if ( GIT_FOUND )
@@ -242,6 +242,7 @@ else()
 endif()
 
 add_definitions( -D__ID__="" -D__TID__="" )
+
 set( TARGET_PATH "${CMAKE_HOME_DIRECTORY}/build/${CMAKE_BUILD_TYPE}" )
 include_directories( ${TARGET_PATH} ${CMAKE_HOME_DIRECTORY} ${CMAKE_INCLUDE_PATH} )
 #set( CMAKE_VERBOSE_MAKEFILE true )
@@ -253,7 +254,7 @@ string( REGEX REPLACE "^SUBVERSION[\\t ]*=[\\t ]*" "" PROJECT_SUBVERSION ${PROJE
 file( STRINGS ${CMAKE_HOME_DIRECTORY}/Makefile.mk.in PROJECT_EXTRAVERSION LIMIT_COUNT 1 REGEX "^EXTRAVERSION[\\t ]*=[\\t ]*" )
 string( REGEX REPLACE "^EXTRAVERSION[\\t ]*=[\\t ]*" "" PROJECT_EXTRAVERSION ${PROJECT_EXTRAVERSION} )
 
-today(TODAY)
+today( TODAY )
 set( VERSION "${PROJECT_VERSION}.${PROJECT_SUBVERSION}.${PROJECT_EXTRAVERSION}-${TODAY}" )
 
 link_directories( ${CMAKE_LIBRARY_PATH} )
