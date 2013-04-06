@@ -203,6 +203,26 @@ elseif ( "${CMAKE_BUILD_TYPE}" STREQUAL "cov" )
 	add_definitions( -D__DEBUG__ )
 endif()
 
+if ( NOT CMAKE_HOST_WIN32 )
+	set( CMAKE_REQUIRED_FLAGS "-Wshadow -Werror" )
+	check_cxx_source_compiles( "#include <pthread.h>
+		int main( int, char** ) { return ( 0 ); }" WSHADOW )
+	if ( WSHADOW )
+		add_definitions( "-Wshadow" )
+	endif( WSHADOW )
+	set( CMAKE_REQUIRED_FLAGS "-pedantic-errors -Wno-long-long -Werror" )
+	check_cxx_source_compiles( "#include <cstdlib>
+		int main( int, char** ) { return ( 0 ); }" PEDANTIC_ERRORS )
+	if ( PEDANTIC_ERRORS )
+		add_definitions( "-pedantic-errors" )
+	endif( PEDANTIC_ERRORS )
+	set( CMAKE_REQUIRED_FLAGS )
+endif( NOT CMAKE_HOST_WIN32 )
+
+if ( NOT CMAKE_HOST_WIN32 )
+	include_directories( "/usr/local/include" )
+endif ( NOT CMAKE_HOST_WIN32 )
+
 function (today RESULT)
 	if (WIN32)
 		try_run( RUN_RESULT COMPILE_RESULT ${CMAKE_HOME_DIRECTORY}/build ${CMAKE_HOME_DIRECTORY}/../yaal/_aux/cmake-getdate.cxx RUN_OUTPUT_VARIABLE ${RESULT} )

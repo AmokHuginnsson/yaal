@@ -147,13 +147,16 @@ if ( HAVE_IBASE_H )
 		set( DEFAULT_DRIVER "Firebird" )
 	endif()
 endif ( HAVE_IBASE_H )
+set( CMAKE_REQUIRED_INCLUDES "$ENV{ORACLE_HOME}/rdbms/public" )
 check_include_file_cxx( oci.h HAVE_OCI_H )
 if ( HAVE_OCI_H )
 	list( APPEND DRIVERS oracle )
 	if ( "${DEFAULT_DRIVER}" STREQUAL "" )
 		set( DEFAULT_DRIVER "Oracle" )
 	endif()
+	include_directories( "$ENV{ORACLE_HOME}/rdbms/public" )
 endif ( HAVE_OCI_H )
+set( CMAKE_REQUIRED_INCLUDES )
 if ( NOT ( "$ENV{ORACLE_SID}" STREQUAL "" ) )
 	set( ORACLE_SID "$ENV{ORACLE_SID}" )
 endif()
@@ -171,20 +174,20 @@ if ( HAVE_NCURSES_CURSES_H )
 else ( HAVE_NCURSES_CURSES_H )
 	set( CURSES_PATH "curses.h" )
 endif ( HAVE_NCURSES_CURSES_H )
-check_cxx_source_compiles("int main( int, char** ) { char const* const p( __PRETTY_FUNCTION__ ); return ( 0 ); }" HAVE_PRETTY_FUNCTION )
+check_cxx_source_compiles( "int main( int, char** ) { char const* const p( __PRETTY_FUNCTION__ ); return ( 0 ); }" HAVE_PRETTY_FUNCTION )
 if ( NOT HAVE_PRETTY_FUNCTION )
-	check_cxx_source_compiles("int main( int, char** ) { char const* const p( __FUNCTION__ ); return ( 0 ); }" HAVE_FUNCTION )
+	check_cxx_source_compiles( "int main( int, char** ) { char const* const p( __FUNCTION__ ); return ( 0 ); }" HAVE_FUNCTION )
 	if ( NOT HAVE_FUNCTION )
-		check_cxx_source_compiles("int main( int, char** ) { char const* const p( __func__ ); return ( 0 ); }" HAVE_FUNC )
+		check_cxx_source_compiles( "int main( int, char** ) { char const* const p( __func__ ); return ( 0 ); }" HAVE_FUNC )
 	endif()
 endif()
 check_cxx_source_compiles("#include <cmath>
 	int main( int, char** ) { ::sqrtl( 0. ); return ( 0 ); }" HAVE_DECL_SQRTL )
-check_cxx_source_compiles("#include <cmath>
+check_cxx_source_compiles( "#include <cmath>
 	int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }" HAVE_POWL )
-check_cxx_source_compiles("#include <cmath>
+check_cxx_source_compiles( "#include <cmath>
 	int main( int, char** ) { ::floorl( 0. ); return ( 0 ); }" HAVE_DECL_FLOORL )
-check_cxx_source_compiles("#include <netdb.h>
+check_cxx_source_compiles( "#include <netdb.h>
 int main( int, char const* const* const )
 	{
 	int i( 0 );
@@ -193,7 +196,7 @@ int main( int, char const* const* const )
 	::gethostbyname_r( \"\", &h, p, 0, &ph, &i );
 	return ( 0 );
 	}" HAVE_GNU_GETHOSTBYNAME_R )
-check_cxx_source_compiles("#include <netdb.h>
+check_cxx_source_compiles( "#include <netdb.h>
 int main( int, char const* const* const )
 	{
 	int i( 0 );
@@ -202,21 +205,21 @@ int main( int, char const* const* const )
 	::gethostbyaddr_r( 0, 0, 0, &h, p, 0, &ph, &i );
 	return ( 0 );
 	}" HAVE_GNU_GETHOSTBYADDR_R )
-check_cxx_source_compiles("#include <cstring>
+check_cxx_source_compiles( "#include <cstring>
 int main( int, char** )
 	{
 	char* p( NULL );
 	basename( p );
 	return ( 0 );
 	}" HAVE_BASENAME_IN_CSTRING )
-check_cxx_source_compiles("#include<cstring>
+check_cxx_source_compiles( "#include<cstring>
 int main( int, char const* const* const )
 	{
 	char const* const p( NULL );
 	basename( p );
 	return ( 0 );
 	}" HAVE_BASENAME_ARG_CONST )
-check_cxx_source_compiles("#include <ctime>
+check_cxx_source_compiles( "#include <ctime>
 int main( int, char const* const* const )
 	{
 	time_t t( time( NULL ) );
@@ -225,7 +228,7 @@ int main( int, char const* const* const )
 	int size( strftime( NULL, 1024, \"%F %T\", &broken ) );
 	return ( ! size );
 	}" HAVE_SMART_STRFTIME )
-check_cxx_source_compiles("#include <iconv.h>
+check_cxx_source_compiles( "#include <iconv.h>
 int main( int, char const* const* const )
 	{
 	iconv_t conv( 0 );
@@ -240,10 +243,10 @@ if ( CMAKE_HOST_WIN32 )
 else ( CMAKE_HOST_WIN32 )
 	set( CMAKE_REQUIRED_LIBRARIES ${CURSES_LIBRARIES} )
 	set( CMAKE_REQUIRED_FLAGS "-Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual" )
-	check_cxx_source_compiles("#include <${CURSES_PATH}>
-		int main( int, char** ){ attr_t* a( NULL ); int short* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }" NCURSES_ATTR_GET_SECOND_ARG_TYPE_int_short)
-	check_cxx_source_compiles("#include <${CURSES_PATH}>
-		int main( int, char** ){ attr_t* a( NULL ); int* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }" NCURSES_ATTR_GET_SECOND_ARG_TYPE_int)
+	check_cxx_source_compiles( "#include <${CURSES_PATH}>
+		int main( int, char** ){ attr_t* a( NULL ); int short* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }" NCURSES_ATTR_GET_SECOND_ARG_TYPE_int_short )
+	check_cxx_source_compiles( "#include <${CURSES_PATH}>
+		int main( int, char** ){ attr_t* a( NULL ); int* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }" NCURSES_ATTR_GET_SECOND_ARG_TYPE_int )
 	set( CMAKE_REQUIRED_FLAGS )
 	set( CMAKE_REQUIRED_LIBRARIES )
 endif ( CMAKE_HOST_WIN32 )
@@ -252,7 +255,7 @@ if ( NCURSES_ATTR_GET_SECOND_ARG_TYPE_int_short )
 elseif ( NCURSES_ATTR_GET_SECOND_ARG_TYPE_int  )
 	set( NCURSES_ATTR_GET_SECOND_ARG_TYPE "int" )
 else ( NCURSES_ATTR_GET_SECOND_ARG_TYPE_int )
-	message( FATAL_ERROR "Unknown type for second argument of attr_get in ncurses library!")
+	message( FATAL_ERROR "Unknown type for second argument of attr_get in ncurses library!" )
 endif ( NCURSES_ATTR_GET_SECOND_ARG_TYPE_int_short )
 if ( CMAKE_HOST_WIN32 )
 	set( CMAKE_REQUIRED_INCLUDES )
@@ -271,7 +274,7 @@ function( yaal_make_component name )
 	file( GLOB DRIVER RELATIVE ${CMAKE_HOME_DIRECTORY} ${CMAKE_HOME_DIRECTORY}/${name}/*_driver.cxx )
 	list( REMOVE_ITEM SRCS ${DRIVER} dummy_item )
 	add_library( ${name} SHARED ${SRCS} ${HDRS} )
-	set( HEADERS ${HEADERS} ${HDRS} )
+	set( HEADERS ${HEADERS} ${HDRS} PARENT_SCOPE )
 	set_target_properties( ${name} PROPERTIES OUTPUT_NAME ${name}${LIB_INFIX} LINKER_LANGUAGE CXX VERSION ${PROJECT_VERSION}.${PROJECT_SUBVERSION} SOVERSION ${PROJECT_VERSION}.${PROJECT_SUBVERSION} )
 	if ( CMAKE_HOST_WIN32 )
 		string( TOUPPER ${name} NAME )
@@ -329,13 +332,15 @@ if ( CMAKE_HOST_WIN32 )
 	set_target_properties( mkheaders PROPERTIES COMPILE_DEFINITIONS "YAAL_MSVCXX_FIX_HXX_INCLUDED=1" )
 	add_custom_target( headers ALL COMMAND mkheaders ${CMAKE_HOME_DIRECTORY} ${TARGET_PATH} "${HEADERS}" DEPENDS hdata mkheaders )
 else ( CMAKE_HOST_WIN32 )
-	target_link_libraries( hcore ssl pthread rt nsl )
-	target_link_libraries( tools hcore xml2 xslt exslt z )
+	target_link_libraries( hcore ssl crypto pthread rt nsl )
+	target_link_libraries( tools hcore xml2 xslt exslt dl z )
 	target_link_libraries( dbwrapper tools hcore )
 	target_link_libraries( hconsole tools hcore ncurses gpm )
 	target_link_libraries( hdata hconsole dbwrapper tools hcore )
 	add_custom_target( headers ALL COMMAND ./_aux/mkheaders --lib-name=${CMAKE_PROJECT_NAME} --lib-version=${PROJECT_VERSION} --dir-root=${CMAKE_HOME_DIRECTORY} --dir-build=${TARGET_PATH} --headers='${HEADERS}' DEPENDS hdata mkheaders )
 endif ( CMAKE_HOST_WIN32 )
+
+add_definitions( -DHAVE_CONFIG_H )
 
 if ( HAVE_SQLITE3_H )
 	target_link_libraries( sqlite3 hcore )
@@ -349,21 +354,29 @@ endif()
 if ( HAVE_LIBPQ_FE_H OR HAVE_POSTGRESQL_LIBPQ_FE_H )
 	if ( CMAKE_HOST_WIN32 )
 	else()
-		target_link_libraries( postgresql pq )
+		target_link_libraries( postgresql pq hcore )
 	endif()
 endif()
 
 if ( HAVE_MYSQL_MYSQL_H )
 	if ( CMAKE_HOST_WIN32 )
 	else()
-		target_link_libraries( mysql -lmysqlclient )
+		target_link_libraries( mysql -lmysqlclient hcore )
 	endif()
 endif()
 
 if ( HAVE_IBASE_H )
 	if ( CMAKE_HOST_WIN32 )
 	else()
-		target_link_libraries( firebird fbclient )
+		target_link_libraries( firebird fbclient hcore )
+	endif()
+endif()
+
+if ( HAVE_OCI_H )
+	if ( CMAKE_HOST_WIN32 )
+	else()
+		set_target_properties( oracle PROPERTIES LINK_FLAGS "-L$ENV{ORACLE_HOME}/lib" )
+		target_link_libraries( oracle -lclntsh hcore )
 	endif()
 endif()
 
