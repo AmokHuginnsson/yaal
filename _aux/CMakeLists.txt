@@ -343,7 +343,9 @@ endif ( CMAKE_HOST_WIN32 )
 
 add_custom_target( headers ALL DEPENDS ${HEADER_TARGET} )
 
-add_definitions( -DHAVE_CONFIG_H )
+if ( NOT CMAKE_HOST_WIN32 )
+	add_definitions( -DHAVE_CONFIG_H )
+endif ( NOT CMAKE_HOST_WIN32 )
 
 if ( HAVE_SQLITE3_H )
 	target_link_libraries( sqlite3 hcore )
