@@ -12,6 +12,7 @@
 
 #ifdef __GNUC__
 #include <dirent.h>
+#include <utime.h>
 #else /* __GNUC__ */
 #ifndef __MSVCXX__
 #error Unknown build environment.
@@ -19,6 +20,7 @@
 #include <io.h>
 #include <direct.h>
 #include <windows.h>
+#include <../include/sys/utime.h>
 #define mkdir( x, y ) _mkdir( ( x ) )
 #define sleep( x ) Sleep( ( x ) * 1000 )
 #define stat _stat
@@ -137,12 +139,24 @@ int main( int argc_, char** argv_ ) {
 	return ( errorCode );
 }
 
+void copy_modification_time( string const& from_, string const& to_ ) {
+	struct stat fromStat;
+	stat( from_.c_str(), &fromStat );
+	struct utimbuf newTimes;
+	newTimes.actime = fromStat.st_atime; /* keep atime unchanged */
+	newTimes.modtime = fromStat.st_mtime;    /* set mtime to current time */
+	utime( to_.c_str(), &newTimes );
+}
+
 void copy_file( string const& src_, string const& dst_ ) {
 	ifstream i( src_.c_str() );
 	ofstream o( dst_.c_str() );
 	string line;
 	while ( ! getline( i, line ).fail() )
 		o << line << endl;
+	i.close();
+	o.close();
+	copy_modification_time( src_, dst_ );
 	return;
 }
 
@@ -155,6 +169,9 @@ void process_file( string const& from, string const& to ) {
 		process_line( line );
 		o << line << endl;
 	}
+	i.close();
+	o.close();
+	copy_modification_time( from, to );
 }
 
 void process_line( string& line ) {
