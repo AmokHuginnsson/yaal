@@ -35,7 +35,7 @@ DIR_HEADERS="${DIR_BUILD}/include/${LIB_NAME}"
 
 for FILE in ${HDRS}; do
 	mkdir -p ${DIR_HEADERS}/`dirname ${FILE}`
-	awk -f -  ${FILE} > ${DIR_HEADERS}/${FILE} << EOF
+	awk -f - ${FILE} > ${DIR_HEADERS}/${FILE} << EOF
 /^#\\t*include "/ {
 	match(\$0, "#\\t*include");
 	printf "%s", substr( \$0, RSTART, RLENGTH );
@@ -43,6 +43,7 @@ for FILE in ${HDRS}; do
 	printf " <${LIB_NAME}/%s>\\n", substr(\$0, RSTART + 1, RLENGTH - 1) }
 !/^#\\t*include "/
 EOF
+	touch -r ${FILE} ${DIR_HEADERS}/${FILE}
 done
 
 CONFIG_SRC_PATH="${DIR_BUILD}/config.hxx"
