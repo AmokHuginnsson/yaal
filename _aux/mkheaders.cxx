@@ -44,6 +44,7 @@ string basename( string const& );
 string strip_prefix( string, string );
 string dirname_basename( string const& );
 void copy_file( string const&, string const& );
+void copy_modification_time( string const&, string const& );
 
 int main( int argc_, char** argv_ ) {
 	int errorCode = 0;
@@ -114,8 +115,10 @@ int main( int argc_, char** argv_ ) {
 		for ( paths_t::const_iterator it = headers.begin(), end = headers.end(); it != end; ++ it )
 			o << "#include <yaal/" << *it << ">" << endl;
 		o << endl << "#endif /* not YAAL_YAAL_HXX_INCLUDED */" << endl << endl;
-		ifstream ci( ( dirBuild + "/config.hxx" ).c_str() );
-		ofstream co( ( dirLibHeaders + "/config.hxx" ).c_str() );
+		string configIn( dirBuild + "/config.hxx" );
+		string configOut( dirLibHeaders + "/config.hxx" );
+		ifstream ci( configIn.c_str() );
+		ofstream co( configOut.c_str() );
 		static char const PACKAGE_S[] = "define PACKAGE_";
 		static char const LIB_INFIX[] = "define LIB_INFIX";
 		while ( ! getline( ci, line ).fail() ) {
@@ -127,6 +130,9 @@ int main( int argc_, char** argv_ ) {
 				line = "#undef LIB_INFIX";
 			co << line << endl;
 		}
+		ci.close();
+		co.close();
+		copy_modification_time( configIn.c_str(), configOut.c_str() );
 #ifndef __GNUC__
 		copy_file( dirRoot + "/_aux/msvcxx/cleanup.hxx", dirLibHeaders + "/cleanup.hxx" );
 		copy_file( dirRoot + "/_aux/msvcxx/client-fix.hxx", dirLibHeaders + "/fix.hxx" );
