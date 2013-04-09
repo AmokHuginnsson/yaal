@@ -4,6 +4,10 @@
 
 PROJECT_NAME=$(notdir $(CURDIR))
 
+ifneq ($(WINDOWS_PREFIX),)
+export PREFIX=$(WINDOWS_PREFIX)
+endif
+
 CMAKE=$(wildcard /cygdrive/c/Program\ Files\ (x86)/CMake*/bin/cmake.exe)$(wildcard /cygdrive/c/Program\ Files/CMake*/bin/cmake.exe)
 VCBUILD=$(wildcard /cygdrive/c/Program\ Files\ (x86)/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)$(wildcard /cygdrive/c/Program\ Files/Microsoft\ Visual\ Studio\ 9.0/VC/vcpackages/vcbuild.exe)
 BUILD_ARTIFACT=build.stamp
