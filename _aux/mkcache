@@ -28,7 +28,10 @@ if [ ! -z "${DIR_LIB}" ] ; then
 			/bin/crle -64 -c ${DIR_LIB}/ls.so.conf -l ${DIR_LIB}
 		;;
 		CYGWIN*)
-			echo "This platform does not use link caching."
+			cd ${DIR_LIB}
+			ls -1 cyg*.dll > dlls.txt
+			/bin/rebaseall -v -p -T ./dlls.txt > /dev/null 2>&1
+			/bin/rm ./dlls.txt
 		;;
 		*)
 			echo "Unknown host operating system type!"
