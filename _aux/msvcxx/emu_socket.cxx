@@ -152,7 +152,7 @@ int shutdown( int fd_, int how_ ) {
 	SystemIO& sysIo( SystemIO::get_instance() );
 	IO& io( *( sysIo.get_io( fd_ ).second ) );
 	int ret( 0 );
-	if ( io.type() == IO::TYPE::SOCKET )
+	if ( ( io.type() == IO::TYPE::SOCKET ) && io.is_connected() )
 		ret = ::shutdown( reinterpret_cast<SOCKET>( io.handle() ), how_ );
 	return ( ret );
 }

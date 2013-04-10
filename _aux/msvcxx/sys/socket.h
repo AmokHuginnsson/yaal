@@ -12,6 +12,9 @@
 #ifndef EINPROGRESS
 #define EINPROGRESS WSAEINPROGRESS
 #endif /* #ifndef EINPROGRESS */
+
+static int const SHUT_RD = SD_RECEIVE;
+static int const SHUT_WR = SD_SEND;
 static int const SHUT_RDWR = SD_RECEIVE | SD_SEND;
 
 #include "emu_socket.hxx"

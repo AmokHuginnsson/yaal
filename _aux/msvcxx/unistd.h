@@ -13,6 +13,10 @@ extern "C" FILE* tmpfile( void );
 #undef ETIMEDOUT
 #define ETIMEDOUT WSAETIMEDOUT
 #endif /* #if ( ETIMEDOUT != WSAETIMEDOUT ) */
+#if ( EINPROGRESS != WSAEINPROGRESS )
+#undef EINPROGRESS
+#define EINPROGRESS WSAEINPROGRESS
+#endif /* #if ( EINPROGRESS != WSAEINPROGRESS ) */
 #define __socklen_t_defined 1
 #undef environ
 #define unlink unlink_off
