@@ -68,19 +68,29 @@ class YaalHCoreHPointerPrinter:
 		self._ptr = 0
 		shared = self._val['_shared']
 		if shared != 0:
-			self._ptr = shared['_object']
+			self._ptr = self._val['_object']
 			if self._ptr != 0:
 				self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
-				if hasattr( self._innerPrinter, 'children' ):
-					def children( self ):
-						return self._innerPrinter.children()
-					setattr( self.__class__, 'children', children )
+				if self._innerPrinter != None:
+					if hasattr( self._innerPrinter, 'children' ):
+						def children( self ):
+							return self._innerPrinter.children()
+						setattr( self.__class__, 'children', children )
 
 	def to_string( self ):
-		return self._innerPrinter.to_string() if self._ptr != 0 else 'NULL'
+		s = "NULL"
+		if self._ptr != 0:
+			if self._innerPrinter != None:
+				s = self._innerPrinter.to_string()
+			else:
+				s = "INVALID"
+		return s
 
 	def display_hint( self ):
-		return self._innerPrinter.display_hint() if self._ptr != 0 else 'string'
+		s = "string";
+		if ( self._ptr != 0 ) and ( self._innerPrinter != None ):
+			s = self._innerPrinter.display_hint()
+		return s
 
 class YaalHCoreHResourcePrinter:
 	"Print a yaal::hcore::HResource"
@@ -90,16 +100,26 @@ class YaalHCoreHResourcePrinter:
 		self._ptr = self._val['_resource']
 		if self._ptr != 0:
 			self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
-			if hasattr( self._innerPrinter, 'children' ):
-				def children( self ):
-					return self._innerPrinter.children()
-				setattr( self.__class__, 'children', children )
+			if self._innerPrinter != None:
+				if hasattr( self._innerPrinter, 'children' ):
+					def children( self ):
+						return self._innerPrinter.children()
+					setattr( self.__class__, 'children', children )
 
 	def to_string( self ):
-		return self._innerPrinter.to_string() if self._ptr != 0 else 'NULL'
+		s = "NULL"
+		if self._ptr != 0:
+			if self._innerPrinter != None:
+				s = self._innerPrinter.to_string()
+			else:
+				s = "INVALID"
+		return s
 
 	def display_hint( self ):
-		return self._innerPrinter.display_hint() if self._ptr != 0 else 'string'
+		s = "string";
+		if ( self._ptr != 0 ) and ( self._innerPrinter != None ):
+			s = self._innerPrinter.display_hint()
+		return s
 
 class YaalHCoreHStringPrinter:
 	"Print a yaal::hcore::HString"
