@@ -83,7 +83,7 @@ class YaalHCoreHPointerPrinter:
 			if self._innerPrinter != None:
 				s = self._innerPrinter.to_string()
 			else:
-				s = "INVALID"
+				s = self._ptr.dereference()
 		return s
 
 	def display_hint( self ):
@@ -112,7 +112,7 @@ class YaalHCoreHResourcePrinter:
 			if self._innerPrinter != None:
 				s = self._innerPrinter.to_string()
 			else:
-				s = "INVALID"
+				s = self._ptr.dereference()
 		return s
 
 	def display_hint( self ):
