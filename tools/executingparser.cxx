@@ -40,13 +40,17 @@ HRule::HRule( void )
 	: _rule(), _action(), _excutors(), _matched( false )
 	{}
 
+/*
+ * Clone is implemented in terms of Copy Constuctor hence
+ * Copy Constuctor cannot be implemented in terms of clone of the same level.
+ */
 HRule::HRule( HRule const& rule_ )
-	: _rule( rule_.clone() ), _action(), _excutors(), _matched( false )
-	{}
+	: _rule( rule_.clone() ), _action( rule_._action ), _excutors(), _matched( false ) {
+}
 
-HRule HRule::operator[]( action_t action_ ) {
+HRule HRule::operator[]( action_t action_ ) const {
 	M_PROLOG
-	return ( HRule( _rule, action_ ) );
+	return ( HRule( clone(), action_ ) );
 	M_EPILOG
 }
 
@@ -79,15 +83,6 @@ void HRule::execute( void ) {
 	M_EPILOG
 }
 
-void HRule::cancel_execution( void ) {
-	M_PROLOG
-	_matched = false;
-	do_cancel_execution();
-	_excutors.clear();
-	return;
-	M_EPILOG
-}
-
 yaal::hcore::HString::const_iterator HRule::parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator it( do_parse( first_, last_ ) );
@@ -108,6 +103,14 @@ bool HRule::is_optional( void ) const {
 	M_EPILOG
 }
 
+HRule::HRule( action_t action_ )
+	: _rule(), _action( action_ ), _excutors(), _matched( false )
+	{}
+
+HRule::HRule( ptr_t rule_ )
+	: _rule( rule_ ), _action(), _excutors(), _matched( false )
+	{}
+
 HRule::HRule( ptr_t rule_, action_t action_ )
 	: _rule( rule_ ), _action( action_ ), _excutors(), _matched( false )
 	{}
@@ -115,7 +118,7 @@ HRule::HRule( ptr_t rule_, action_t action_ )
 yaal::hcore::HString::const_iterator HRule::do_parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator ret( !! _rule ? _rule->parse( first_, last_ ) : first_ );
-	if ( ( ret == last_ ) && !! _action )
+	if ( ( ret != first_ ) && !! _action )
 		_excutors.push_back( _action );
 	return ( ret );
 	M_EPILOG
@@ -125,14 +128,6 @@ void HRule::do_execute( void ) {
 	M_PROLOG
 	if ( !! _rule )
 		_rule->execute();
-	return;
-	M_EPILOG
-}
-
-void HRule::do_cancel_execution( void ) {
-	M_PROLOG
-	if ( !! _rule )
-		_rule->cancel_execution();
 	return;
 	M_EPILOG
 }
@@ -198,17 +193,10 @@ yaal::hcore::HString::const_iterator HFollows::do_parse( yaal::hcore::HString::c
 		if ( ( first_ == old ) && ( !(*it)->is_optional() ) ) {
 			matched = false;
 			break;
-		}
+		} else if ( !! _action && ( first_ != old ) )
+			_excutors.push_back( _action );
 	}
 	return ( matched ? first_ : orig );
-	M_EPILOG
-}
-
-void HFollows::do_cancel_execution( void ) {
-	M_PROLOG
-	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it )
-		(*it)->cancel_execution();
-	return;
 	M_EPILOG
 }
 
@@ -221,12 +209,22 @@ void HFollows::do_execute( void ) {
 }
 
 HKleeneStar::HKleeneStar( HRule const& rule_ )
-	: HRule( rule_ )
+	: HRule( rule_.clone() )
+	{}
+
+HKleeneStar::HKleeneStar( ptr_t rule_, action_t action_ )
+	: HRule( rule_, action_ )
 	{}
 
 HKleeneStar::HKleeneStar( HKleeneStar const& kleeneStar_ )
-	: HRule( *kleeneStar_._rule )
+	: HRule( !! kleeneStar_._rule ? kleeneStar_._rule->clone() : ptr_t(), kleeneStar_._action )
 	{}
+
+HKleeneStar HKleeneStar::operator[]( action_t const& action_ ) const {
+	M_PROLOG
+	return ( HKleeneStar( _rule, action_ ) );
+	M_EPILOG
+}
 
 HRule::ptr_t HKleeneStar::do_clone( void ) const {
 	M_PROLOG
@@ -240,8 +238,11 @@ bool HKleeneStar::do_is_optional( void ) const
 yaal::hcore::HString::const_iterator HKleeneStar::do_parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator old( last_ );
-	while ( ( first_ != last_ ) && ( first_ != old ) )
+	while ( ( first_ != last_ ) && ( first_ != old ) ) {
 		first_ = HRule::do_parse( old = first_, last_ );
+		if ( !! _action && ( first_ != old ) )
+			_excutors.push_back( _action );
+	}
 	return ( first_ );
 	M_EPILOG
 }
@@ -250,8 +251,18 @@ HKleenePlus::HKleenePlus( HRule const& rule_ )
 	: HRule( rule_ )
 	{}
 
+HKleenePlus::HKleenePlus( ptr_t rule_, action_t action_ )
+	: HRule( rule_, action_ )
+	{}
+
+HKleenePlus HKleenePlus::operator[]( action_t const& action_ ) const {
+	M_PROLOG
+	return ( HKleenePlus( _rule, action_ ) );
+	M_EPILOG
+}
+
 HKleenePlus::HKleenePlus( HKleenePlus const& kleenePlus_ )
-	: HRule( *kleenePlus_._rule )
+	: HRule( !! kleenePlus_._rule ? kleenePlus_._rule->clone() : ptr_t(), kleenePlus_._action )
 	{}
 
 HRule::ptr_t HKleenePlus::do_clone( void ) const {
@@ -263,8 +274,11 @@ HRule::ptr_t HKleenePlus::do_clone( void ) const {
 yaal::hcore::HString::const_iterator HKleenePlus::do_parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator old( last_ );
-	while ( ( first_ != last_ ) && ( first_ != old ) )
+	while ( ( first_ != last_ ) && ( first_ != old ) ) {
 		first_ = HRule::do_parse( old = first_, last_ );
+		if ( !! _action && ( first_ != old ) )
+			_excutors.push_back( _action );
+	}
 	return ( first_ );
 	M_EPILOG
 }
@@ -347,38 +361,63 @@ HReal::HReal( void )
 	_actionNumber(), _actionString(), _cache()
 	{}
 
-HReal::HReal( action_double_t actionDouble_, action_double_long_t actionDoubleLong_,
-		action_number_t actionNumber_, action_string_t actionString_ )
-	: HRule(), _actionDouble( actionDouble_ ), _actionDoubleLong( actionDoubleLong_ ),
-	_actionNumber( actionNumber_ ), _actionString( actionString_ ), _cache()
+HReal::HReal( action_t action_ )
+	: HRule( action_ ), _actionDouble(), _actionDoubleLong(),
+	_actionNumber(), _actionString(), _cache()
+	{}
+
+HReal::HReal( action_double_t action_ )
+	: HRule(), _actionDouble( action_ ), _actionDoubleLong(),
+	_actionNumber(), _actionString(), _cache()
+	{}
+
+HReal::HReal( action_double_long_t action_ )
+	: HRule(), _actionDouble(), _actionDoubleLong( action_ ),
+	_actionNumber(), _actionString(), _cache()
+	{}
+
+HReal::HReal( action_number_t action_ )
+	: HRule(), _actionDouble(), _actionDoubleLong(),
+	_actionNumber( action_ ), _actionString(), _cache()
+	{}
+
+HReal::HReal( action_string_t action_ )
+	: HRule(), _actionDouble(), _actionDoubleLong(),
+	_actionNumber(), _actionString( action_ ), _cache()
 	{}
 
 HReal::HReal( HReal const& real_ )
-	: HRule(), _actionDouble( real_._actionDouble ), _actionDoubleLong( real_._actionDoubleLong ),
+	: HRule( real_._action ), _actionDouble( real_._actionDouble ), _actionDoubleLong( real_._actionDoubleLong ),
 	_actionNumber( real_._actionNumber ), _actionString( real_._actionString ), _cache( real_._cache )
 	{}
 
-HReal HReal::operator[]( action_double_t const& action_ ) {
+HReal HReal::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	return ( HReal( action_, action_double_long_t(), action_number_t(), action_string_t() ) );
+	return ( HReal( action_ ) );
 	M_EPILOG
 }
 
-HReal HReal::operator[]( action_double_long_t const& action_ ) {
+HReal HReal::operator[]( action_double_t const& action_ ) const {
 	M_PROLOG
-	return ( HReal( action_double_t(), action_, action_number_t(), action_string_t() ) );
+	return ( HReal( action_ ) );
 	M_EPILOG
 }
 
-HReal HReal::operator[]( action_number_t const& action_ ) {
+HReal HReal::operator[]( action_double_long_t const& action_ ) const {
 	M_PROLOG
-	return ( HReal( action_double_t(), action_double_long_t(), action_, action_string_t() ) );
+	return ( HReal( action_ ) );
 	M_EPILOG
 }
 
-HReal HReal::operator[]( action_string_t const& action_ ) {
+HReal HReal::operator[]( action_number_t const& action_ ) const {
 	M_PROLOG
-	return ( HReal( action_double_t(), action_double_long_t(), action_number_t(), action_ ) );
+	return ( HReal( action_ ) );
+	M_EPILOG
+}
+
+HReal HReal::operator[]( action_string_t const& action_ ) const {
+	M_PROLOG
+	return ( HReal( action_ ) );
 	M_EPILOG
 }
 
@@ -438,7 +477,8 @@ yaal::hcore::HString::const_iterator HReal::do_parse( yaal::hcore::HString::cons
 			_excutors.push_back( call( _actionNumber, _cache ) );
 		} else if ( !! _actionString ) {
 			_excutors.push_back( call( _actionString, _cache ) );
-		}
+		} else if ( !! _action )
+			_excutors.push_back( call( _action ) );
 	}
 	return ( first_ );
 	M_EPILOG
@@ -457,38 +497,63 @@ HInteger::HInteger( void )
 	_actionNumber(), _actionString(), _cache()
 	{}
 
-HInteger::HInteger( action_int_long_t actionDouble_, action_int_t actionDoubleLong_,
-		action_number_t actionNumber_, action_string_t actionString_ )
-	: HRule(), _actionIntLong( actionDouble_ ), _actionInt( actionDoubleLong_ ),
-	_actionNumber( actionNumber_ ), _actionString( actionString_ ), _cache()
+HInteger::HInteger( action_t action_ )
+	: HRule( action_ ), _actionIntLong(), _actionInt(),
+	_actionNumber(), _actionString(), _cache()
 	{}
 
-HInteger::HInteger( HInteger const& real_ )
-	: HRule(), _actionIntLong( real_._actionIntLong ), _actionInt( real_._actionInt ),
-	_actionNumber( real_._actionNumber ), _actionString( real_._actionString ), _cache( real_._cache )
+HInteger::HInteger( action_int_long_t action_ )
+	: HRule(), _actionIntLong( action_ ), _actionInt(),
+	_actionNumber(), _actionString(), _cache()
 	{}
 
-HInteger HInteger::operator[]( action_int_long_t const& action_ ) {
+HInteger::HInteger( action_int_t action_ )
+	: HRule(), _actionIntLong(), _actionInt( action_ ),
+	_actionNumber(), _actionString(), _cache()
+	{}
+
+HInteger::HInteger( action_number_t action_ )
+	: HRule(), _actionIntLong(), _actionInt(),
+	_actionNumber( action_ ), _actionString(), _cache()
+	{}
+
+HInteger::HInteger( action_string_t action_ )
+	: HRule(), _actionIntLong(), _actionInt(),
+	_actionNumber(), _actionString( action_ ), _cache()
+	{}
+
+HInteger::HInteger( HInteger const& integer_ )
+	: HRule( integer_._action ), _actionIntLong( integer_._actionIntLong ), _actionInt( integer_._actionInt ),
+	_actionNumber( integer_._actionNumber ), _actionString( integer_._actionString ), _cache( integer_._cache )
+	{}
+
+HInteger HInteger::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	return ( HInteger( action_, action_int_t(), action_number_t(), action_string_t() ) );
+	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
-HInteger HInteger::operator[]( action_int_t const& action_ ) {
+HInteger HInteger::operator[]( action_int_long_t const& action_ ) const {
 	M_PROLOG
-	return ( HInteger( action_int_long_t(), action_, action_number_t(), action_string_t() ) );
+	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
-HInteger HInteger::operator[]( action_number_t const& action_ ) {
+HInteger HInteger::operator[]( action_int_t const& action_ ) const {
 	M_PROLOG
-	return ( HInteger( action_int_long_t(), action_int_t(), action_, action_string_t() ) );
+	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
-HInteger HInteger::operator[]( action_string_t const& action_ ) {
+HInteger HInteger::operator[]( action_number_t const& action_ ) const {
 	M_PROLOG
-	return ( HInteger( action_int_long_t(), action_int_t(), action_number_t(), action_ ) );
+	return ( HInteger( action_ ) );
+	M_EPILOG
+}
+
+HInteger HInteger::operator[]( action_string_t const& action_ ) const {
+	M_PROLOG
+	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
@@ -537,7 +602,8 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( yaal::hcore::HString::c
 			_excutors.push_back( call( _actionNumber, _cache ) );
 		} else if ( !! _actionString ) {
 			_excutors.push_back( call( _actionString, _cache ) );
-		}
+		} else if ( !! _action )
+			_excutors.push_back( call( _action ) );
 	}
 	return ( first_ );
 	M_EPILOG
@@ -552,24 +618,34 @@ HRule::ptr_t HInteger::do_clone( void ) const {
 HInteger integer;
 
 HCharacter::HCharacter( char character_ )
-	: HRule(), _character( character_ ), _action()
+	: HRule(), _character( character_ ), _actionChar()
 	{}
 
 HCharacter::HCharacter( char character_, action_t action_ )
-	: HRule(), _character( character_ ), _action( action_ )
+	: HRule( action_ ), _character( character_ ), _actionChar()
+	{}
+
+HCharacter::HCharacter( char character_, action_char_t action_ )
+	: HRule(), _character( character_ ), _actionChar( action_ )
 	{}
 
 HCharacter::HCharacter( HCharacter const& character_ )
-	: HRule(), _character( character_._character ), _action( character_._action )
+	: HRule( character_._action ), _character( character_._character ), _actionChar( character_._actionChar )
 	{}
 
-HCharacter HCharacter::operator[]( action_t const& action_ ) {
+HCharacter HCharacter::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	return ( HCharacter( _character, action_ ) );
 	M_EPILOG
 }
 
-HCharacter HCharacter::operator() ( char character_ ) {
+HCharacter HCharacter::operator[]( action_char_t const& action_ ) const {
+	M_PROLOG
+	return ( HCharacter( _character, action_ ) );
+	M_EPILOG
+}
+
+HCharacter HCharacter::operator() ( char character_ ) const {
 	M_PROLOG
 	return ( HCharacter( character_, _action ) );
 	M_EPILOG
@@ -582,8 +658,10 @@ yaal::hcore::HString::const_iterator HCharacter::do_parse( yaal::hcore::HString:
 	char c( *scan );
 	if ( _character ) {
 		if ( ! _character || ( c == _character ) ) {
-			if ( !! _action )
-				_excutors.push_back( call( _action, c ) );
+			if ( !! _actionChar )
+				_excutors.push_back( call( _actionChar, c ) );
+			else if ( !! _action )
+				_excutors.push_back( call( _action ) );
 			++ scan;
 			first_ = scan;
 		}
@@ -613,24 +691,34 @@ HFollows operator >> ( HRule const& predecessor_, char character_ ) {
 }
 
 HString::HString( hcore::HString const& string_ )
-	: HRule(), _string( string_ ), _action()
+	: HRule(), _string( string_ ), _actionString()
 	{}
 
 HString::HString( hcore::HString const& string_, action_t action_ )
-	: HRule(), _string( string_ ), _action( action_ )
+	: HRule( action_ ), _string( string_ ), _actionString()
+	{}
+
+HString::HString( hcore::HString const& string_, action_string_t action_ )
+	: HRule(), _string( string_ ), _actionString( action_ )
 	{}
 
 HString::HString( HString const& string_ )
-	: HRule(), _string( string_._string ), _action( string_._action )
+	: HRule( string_._action ), _string( string_._string ), _actionString( string_._actionString )
 	{}
 
-HString HString::operator[]( action_t const& action_ ) {
+HString HString::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	return ( HString( _string, action_ ) );
 	M_EPILOG
 }
 
-HString HString::operator() ( hcore::HString const& string_ ) {
+HString HString::operator[]( action_string_t const& action_ ) const {
+	M_PROLOG
+	return ( HString( _string, action_ ) );
+	M_EPILOG
+}
+
+HString HString::operator() ( hcore::HString const& string_ ) const {
 	M_PROLOG
 	return ( HString( string_, _action ) );
 	M_EPILOG
@@ -639,6 +727,8 @@ HString HString::operator() ( hcore::HString const& string_ ) {
 hcore::HString::const_iterator HString::do_parse( hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	M_ENSURE( first_ != last_ );
+	if ( ! _string.is_empty() ) {
+	}
 	return ( first_ );
 	M_EPILOG
 }

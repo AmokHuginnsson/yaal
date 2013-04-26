@@ -181,7 +181,7 @@ class HPointer {
 	 * type information is preserved.
 	 *
 	 * It is necessary for proper resolving vtable
-	 * bases in up/down casting of  smart-pointers
+	 * bases in up/down casting of smart-pointers
 	 * of objects of classes from multiple-inheritance
 	 * (virtual or non-virtual) hierarchies.
 	 */
@@ -276,7 +276,7 @@ public:
 	template<typename alien_t, template<typename, typename>class alien_access_t>
 	bool operator == ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
 		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-		return ( _object == reinterpret_cast<alien_t*>( alien->_object ) );
+		return ( _object == reinterpret_cast<alien_t const*>( alien->_object ) );
 	}
 	template<typename alien_t>
 	bool operator == ( alien_t const* const pointer_ ) const {
@@ -284,11 +284,12 @@ public:
 	}
 	template<typename alien_t, template<typename, typename>class alien_access_t>
 	bool operator != ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
-		return ( ! operator == ( pointer_ ) );
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( _object != reinterpret_cast<alien_t const*>( alien->_object ) );
 	}
 	template<typename alien_t>
 	bool operator != ( alien_t const* const pointer_ ) const {
-		return ( ! operator == ( pointer_ ) );
+		return ( _object != pointer_ );
 	}
 	tType const* operator->( void ) const {
 		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
@@ -399,14 +400,14 @@ protected:
 	friend struct HPointerStrict<tType, HPointerScalar<tType> >;
 };
 
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t, typename alien_t>
+template<typename alien_t, typename tType, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t>
 bool operator == ( alien_t const* const pointer_, HPointer<tType, pointer_type_t, access_type_t> const& smartPointer_ ) {
 	return ( smartPointer_ == pointer_ );
 }
 
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t, typename alien_t>
+template<typename alien_t, typename tType, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t>
 bool operator != ( alien_t const* const pointer_, HPointer<tType, pointer_type_t, access_type_t> const& smartPointer_ ) {
 	return ( smartPointer_ != pointer_ );
 }
@@ -431,6 +432,18 @@ struct pointer_helper {
 		if ( dynamic_cast<to_t*>( from_._object ) ) {
 			to._shared = reinterpret_cast<typename HPointer<to_t, pointer_type_t, access_type_t>::HSharedBase*>( from_._shared );
 			to._object = static_cast<to_t*>( from_._object );
+			access_type_t<to_t, pointer_type_t<to_t> >::inc_reference_counter( to._shared->_referenceCounter );
+		}
+		return ( to );
+	}
+
+	template<typename to_t, typename from_t, template<typename>class pointer_type_t,
+					 template<typename, typename>class access_type_t>
+	static typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> do_const_cast( HPointer<from_t, pointer_type_t, access_type_t> from_ ) {
+		HPointer<to_t, pointer_type_t, access_type_t> to;
+		if ( dynamic_cast<to_t*>( from_._object ) ) {
+			to._shared = reinterpret_cast<typename HPointer<to_t, pointer_type_t, access_type_t>::HSharedBase*>( from_._shared );
+			to._object = const_cast<to_t*>( from_._object );
 			access_type_t<to_t, pointer_type_t<to_t> >::inc_reference_counter( to._shared->_referenceCounter );
 		}
 		return ( to );
@@ -478,6 +491,12 @@ template<typename to_t, typename from_t, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> pointer_dynamic_cast( HPointer<from_t, pointer_type_t, access_type_t> from_ ) {
 	return ( pointer_helper::do_dynamic_cast<to_t>( from_ ) );
+}
+
+template<typename to_t, typename from_t, template<typename>class pointer_type_t,
+				 template<typename, typename>class access_type_t>
+typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> pointer_const_cast( HPointer<from_t, pointer_type_t, access_type_t> from_ ) {
+	return ( pointer_helper::do_const_cast<to_t>( from_ ) );
 }
 
 template<typename tType>
