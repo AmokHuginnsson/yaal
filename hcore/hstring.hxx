@@ -136,6 +136,18 @@ public:
 	 * str - old style C string to base new HString on.
 	 */
 	HString( char const* const str );
+	/*! \brief Construct string based on const iterator pair.
+	 *
+	 * first_ - begining of the character range to copy.
+	 * last_ - one past the end of character range to copy.
+	 */
+	HString( const_iterator first_, const_iterator last_ );
+	/*! \brief Construct string based on iterator pair.
+	 *
+	 * first_ - begining of the character range to copy.
+	 * last_ - one past the end of character range to copy.
+	 */
+	HString( iterator first_, iterator last_ );
 	/*! \brief Construct string based on character array.
 	 *
 	 * array - a character array where to initialize new HString object with.

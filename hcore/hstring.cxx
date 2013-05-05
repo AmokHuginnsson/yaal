@@ -199,11 +199,35 @@ HString::HString( char const* const str_ )
 	M_EPILOG
 }
 
+HString::HString( const_iterator first_, const_iterator last_ )
+	: _mem() {
+	M_PROLOG
+	int long newSize( last_ - first_ );
+	hs_realloc( newSize + 1 );
+	::std::strncpy( MEM, first_, newSize );
+	MEM[ newSize ] = 0;
+	SET_SIZE( newSize );
+	return;
+	M_EPILOG
+}
+
+HString::HString( iterator first_, iterator last_ )
+	: _mem() {
+	M_PROLOG
+	int long newSize( last_ - first_ );
+	hs_realloc( newSize + 1 );
+	::std::strncpy( MEM, static_cast<const_iterator>( first_ ), newSize );
+	MEM[ newSize ] = 0;
+	SET_SIZE( newSize );
+	return;
+	M_EPILOG
+}
+
 HString::HString( char const* const array_, int long size_ )
 	: _mem() {
 	M_PROLOG
 	if ( array_ ) {
-		int long newSize( min( static_cast<int long>( ::std::strlen( array_ ) ), size_ ) );
+		int long newSize( static_cast<int long>( ::strnlen( array_, size_ ) ) );
 		hs_realloc( newSize + 1 );
 		::std::strncpy( MEM, array_, newSize );
 		MEM[ newSize ] = 0;
