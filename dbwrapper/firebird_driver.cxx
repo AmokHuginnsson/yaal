@@ -352,13 +352,13 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ 
 	static int const COUNT_BUF_SIZE( 48 ); /* Value taken from firebird sources. */
 	char countBuffer[COUNT_BUF_SIZE];
 	::memset( countBuffer, isc_info_end, COUNT_BUF_SIZE );
-	isc_dsql_sql_info( res->_status, &res->_stmt, sizeof ( items ), items, sizeof ( countBuffer ), countBuffer );
+	isc_dsql_sql_info( res->_status, &res->_stmt, static_cast<int short>( sizeof ( items ) ), items, static_cast<int short>( sizeof ( countBuffer ) ), countBuffer );
 	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 	char statementType( 0 );
 	char const* p( countBuffer );
 	if ( *p == isc_info_sql_stmt_type ) {
 		++ p;
-		int len( isc_vax_integer( p, sizeof ( short ) ) ); /* Stored on two bytes. */
+		int len( isc_vax_integer( p, static_cast<int short>( sizeof ( short ) ) ) ); /* Stored on two bytes. */
 		p += sizeof ( short );
 		statementType = static_cast<char>( isc_vax_integer( p, static_cast<int short>( len ) ) );
 		p += len;
@@ -379,11 +379,11 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink& /*dbLink_*/, void* dataR_ 
 			++ p;
 			++ totalLen;
 			totalLen += static_cast<int>( sizeof ( short ) );
-			totalLen += isc_vax_integer( p, sizeof ( short ) );
+			totalLen += isc_vax_integer( p, static_cast<int short>( sizeof ( short ) ) );
 			p += sizeof ( short );
 			while ( *p != isc_info_end ) {
 				char const countType( *p++ );
-				int len( isc_vax_integer( p, sizeof ( short ) ) ); /* Stored on two bytes. */
+				int len( isc_vax_integer( p, static_cast<int short>( sizeof ( short ) ) ) ); /* Stored on two bytes. */
 				p += sizeof ( short );
 				count = isc_vax_integer( p, static_cast<int short>( len ) );
 				p += len;

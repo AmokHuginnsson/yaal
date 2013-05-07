@@ -43,7 +43,7 @@ Copyright:
  *
  * \post Unmet condition will make compilation fail on line where STATIC_ASSERT is used.
  */
-#define STATIC_ASSERT( condition ) typedef char M_CONCAT( SAF, __LINE__ )[ static_assert_failure<( condition )>::value ]
+#define STATIC_ASSERT( condition ) typedef char M_CONCAT( SAF, __LINE__ )[ static_assert_failure<( condition )>::value ] __attribute__((unused))
 
 namespace yaal {
 

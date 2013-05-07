@@ -73,77 +73,77 @@ inline T fwd_htonl( T arg_ ) {
 HBinaryFormatter& HBinaryFormatter::operator << ( int short v_ ) {
 	M_PROLOG
 	int short v( fwd_htons( v_ ) );
-	return ( binary( &v, sizeof ( v ) ) );
+	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( int short unsigned v_ ) {
 	M_PROLOG
 	int short v( fwd_htons( v_ ) );
-	return ( binary( &v, sizeof ( v ) ) );
+	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( int v_ ) {
 	M_PROLOG
 	int v( fwd_htonl( v_ ) );
-	return ( binary( &v, sizeof ( v ) ) );
+	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( int unsigned v_ ) {
 	M_PROLOG
 	int unsigned v( fwd_htonl( v_ ) );
-	return ( binary( &v, sizeof ( v ) ) );
+	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( int long v_ ) {
 	M_PROLOG
 	int long v( hton( v_ ) );
-	return ( binary( &v, sizeof ( v ) ) );
+	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( int long unsigned v_ ) {
 	M_PROLOG
 	int long unsigned v( hton( v_ ) );
-	return ( binary( &v, sizeof ( v ) ) );
+	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( int long long v_ ) {
 	M_PROLOG
 	int long long v( hton( v_ ) );
-	return ( binary( &v, sizeof ( v ) ) );
+	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( int long long unsigned v_ ) {
 	M_PROLOG
 	int long long unsigned v( hton( v_ ) );
-	return ( binary( &v, sizeof ( v ) ) );
+	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( float v_ ) {
 	M_PROLOG
 	float v( hton( v_ ) );
-	return ( binary( &v, sizeof ( v ) ) );
+	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( double v_ ) {
 	M_PROLOG
 	double v( hton( v_ ) );
-	return ( binary( &v, sizeof ( v ) ) );
+	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
 
 HBinaryFormatter& HBinaryFormatter::operator << ( double long v_ ) {
 	M_PROLOG
 	double long v( hton( v_ ) );
-	return ( binary( &v, sizeof ( v ) ) );
+	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
 

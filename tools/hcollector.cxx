@@ -222,7 +222,7 @@ int HCollector::read_collector ( void ( *process_line )( char const* const, int 
 	while ( error >= 0 ) {
 		error += receive_line( line );
 		/* '\n' is stripped from each line so we need to FIN treat special */
-		if ( ! ::strncmp( line.raw(), PROTOCOL::FIN, sizeof ( PROTOCOL::FIN ) ) )
+		if ( ! ::strncmp( line.raw(), PROTOCOL::FIN, static_cast<int>( sizeof ( PROTOCOL::FIN ) ) ) )
 			break;
 		process_line( line.raw(), _lines );
 	}

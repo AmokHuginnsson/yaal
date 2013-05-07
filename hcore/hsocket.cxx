@@ -167,7 +167,7 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 	make_address( address_, port_ );
 	int reuseAddr( 1 );
 	M_ENSURE( ::setsockopt( _fileDescriptor, SOL_SOCKET, SO_REUSEADDR,
-				reinterpret_cast<char*>( &reuseAddr ), sizeof ( reuseAddr ) ) == 0 );
+				reinterpret_cast<char*>( &reuseAddr ), static_cast<int>( sizeof ( reuseAddr ) ) ) == 0 );
 	M_ENSURE_EX( ( ::bind( _fileDescriptor,
 				static_cast<sockaddr*>( _address ), _addressSize ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	M_ENSURE_EX( ( ::listen( _fileDescriptor, _maximumNumberOfClients ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
@@ -191,11 +191,11 @@ HSocket::ptr_t HSocket::accept( void ) {
 	if ( !!( _type & TYPE::NETWORK ) ) {
 		address = static_cast<sockaddr*>(
 				static_cast<void*>( &addressNetwork ) );
-		addressSize = sizeof ( addressNetwork );
+		addressSize = static_cast<int>( sizeof ( addressNetwork ) );
 	} else {
 		address = static_cast<sockaddr*>(
 				static_cast<void*>( &addressFile ) );
-		addressSize = sizeof ( addressFile );
+		addressSize = static_cast<int>( sizeof ( addressFile ) );
 	}
 	M_ENSURE( ( fileDescriptor = ::accept( _fileDescriptor,
 					address, &addressSize ) ) >= 0 );
@@ -235,7 +235,7 @@ void HSocket::connect( yaal::hcore::HString const& address_, int port_ ) {
 		int up( hcore::system::wait_for_io( NULL, 0, &fd, 1, &timeout ) );
 		if ( up == 1 ) {
 			M_ASSERT( fd == _fileDescriptor );
-			socklen_t optLen( sizeof ( error ) );
+			socklen_t optLen( static_cast<int>( sizeof ( error ) ) );
 			M_ENSURE( ::getsockopt( _fileDescriptor, SOL_SOCKET, SO_ERROR, &error, &optLen ) == 0 );
 		} else if ( ! timeout )
 			M_ENSURE_EX( ! "connection timedout", !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
@@ -272,7 +272,7 @@ void HSocket::make_address( yaal::hcore::HString const& address_, int port_ ) {
 		addressNetwork->sin_port = fwd_htons(
 				static_cast<int short unsigned>( port_ ) );
 		addressNetwork->sin_addr.s_addr = resolver::get_ip( address_ ).raw();
-		_addressSize = sizeof ( sockaddr_in );
+		_addressSize = static_cast<int>( sizeof ( sockaddr_in ) );
 	} else /* _type & TYPE::FILE */ {
 		sockaddr_un* addressFile( static_cast<sockaddr_un*>( _address ) );
 		addressFile->sun_family = AF_UNIX;

@@ -225,7 +225,7 @@ struct context_hier {
 	static trait::true_type has_hier( typename real_class::base_type* );
 	template<typename real_class>
 	static trait::false_type has_hier( ... );
-	typedef typename existing_hier<sizeof ( has_hier<tType>( 0 ) ), tType>::type type;
+	typedef typename existing_hier<static_cast<int>( sizeof ( has_hier<tType>( 0 ) ) ), tType>::type type;
 };
 
 /*! \brief Get type of existing superclass (in hierarchy) of a type.
@@ -234,7 +234,7 @@ struct context_hier {
  * \retval type - superclass in hierarchy.
  */
 template<typename subclass_t>
-struct existing_hier<sizeof ( trait::true_type ), subclass_t> {
+struct existing_hier<static_cast<int>( sizeof ( trait::true_type ) ), subclass_t> {
 	/*! \brief Meta-function, get typedef from protected section of a type.
 	 *
 	 * \tparam hermetic - type to infiltrate.
@@ -250,7 +250,7 @@ struct existing_hier<sizeof ( trait::true_type ), subclass_t> {
 
 /*! \cond */
 template<typename subclass>
-struct existing_hier<sizeof ( trait::false_type ), subclass> {
+struct existing_hier<static_cast<int>( sizeof ( trait::false_type ) ), subclass> {
 	typedef base_type type;
 };
 /*! \endcond */
