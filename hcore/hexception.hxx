@@ -218,6 +218,10 @@ template<int const, typename>
 struct existing_hier;
 
 /*! \brief Get superclass in hierarchy if one exists, predefined value otherwise.
+ *
+ * Access checking is part of substitution process,
+ * hence one cannot detect existance of private or protected members types
+ * using SFINAE based method.
  */
 template<typename tType>
 struct context_hier {
@@ -233,25 +237,15 @@ struct context_hier {
  * \tparam subclass - subclass type in hierarchy.
  * \retval type - superclass in hierarchy.
  */
-template<typename subclass_t>
-struct existing_hier<static_cast<int>( sizeof ( trait::true_type ) ), subclass_t> {
-	/*! \brief Meta-function, get typedef from protected section of a type.
-	 *
-	 * \tparam hermetic - type to infiltrate.
-	 * \retval type - superclass in hierarchy.
-	 */
-	template<typename hermetic>
-	struct get_protected_typedef : public hermetic {
-		~get_protected_typedef( void );
-		typedef typename hermetic::base_type type;
-	};
-	typedef typename get_protected_typedef<subclass_t>::type type;
+template<typename subclass>
+struct existing_hier<static_cast<int>( sizeof ( trait::true_type ) ), subclass> {
+	typedef typename subclass::base_type type;
 };
 
 /*! \cond */
 template<typename subclass>
 struct existing_hier<static_cast<int>( sizeof ( trait::false_type ) ), subclass> {
-	typedef base_type type;
+	typedef void type;
 };
 /*! \endcond */
 
