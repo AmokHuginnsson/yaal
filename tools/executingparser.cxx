@@ -36,49 +36,67 @@ namespace yaal {
 
 namespace tools {
 
-namespace executing_parser {
+HExecutingParser::HExecutingParser( executing_parser::HRuleBase const& rule_ )
+	: _grammar( rule_.clone() ), _excutors(), _matched( false ) {
+}
 
-HRuleBase::HRuleBase( void )
-	: _matched( false ), _action(), _excutors()
-	{}
-
-HRuleBase::HRuleBase( action_t const& action_ )
-	: _matched( false ), _action( action_ ), _excutors()
-	{}
-
-bool HRuleBase::operator()( yaal::hcore::HString const& input_ ) {
+bool HExecutingParser::operator()( yaal::hcore::HString const& input_ ) {
 	M_PROLOG
 	return ( parse( input_.begin(), input_.end() ) != input_.end() );
 	M_EPILOG
 }
 
-bool HRuleBase::operator()( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+bool HExecutingParser::operator()( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	return ( parse( first_, last_ ) != last_ );
 	M_EPILOG
 }
 
-void HRuleBase::operator()( void ) {
+void HExecutingParser::operator()( void ) {
 	M_PROLOG
 	execute();
 	return;
 	M_EPILOG
 }
 
-void HRuleBase::execute( void ) {
+void HExecutingParser::execute( void ) {
 	M_PROLOG
-	do_execute();
+	M_ENSURE( _matched );
+	for ( executors_t::iterator it( _excutors.begin() ), end( _excutors.end() ); it != end; ++ it )
+		(*it)();
 	return;
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HRuleBase::parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HExecutingParser::parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator it( do_parse( first_, last_ ) );
+	yaal::hcore::HString::const_iterator it( _grammar->parse( this, first_, last_ ) );
 	_matched = it != first_;
 	return ( it );
 	M_EPILOG
 }
+
+void HExecutingParser::add_execution_step( yaal::hcore::HString::const_iterator, executor_t const& ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HExecutingParser::drop_execution_steps( yaal::hcore::HString::const_iterator ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+namespace executing_parser {
+
+HRuleBase::HRuleBase( void )
+	: _matched( false ), _action()
+	{}
+
+HRuleBase::HRuleBase( action_t const& action_ )
+	: _matched( false ), _action( action_ )
+	{}
 
 HRuleBase::ptr_t HRuleBase::clone( void ) const {
 	M_PROLOG
@@ -92,18 +110,9 @@ bool HRuleBase::is_optional( void ) const {
 	M_EPILOG
 }
 
-void HRuleBase::do_execute( void ) {
+yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	M_ENSURE( _matched );
-	for ( executors_t::iterator it( _excutors.begin() ), end( _excutors.end() ); it != end; ++ it )
-		(*it)();
-	return;
-	M_EPILOG
-}
-
-yaal::hcore::HString::const_iterator HRuleBase::do_parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator ) {
-	M_PROLOG
-	return ( first_ );
+	return ( do_parse( executingParser_, first_, last_ ) );
 	M_EPILOG
 }
 
@@ -152,23 +161,12 @@ HRule::ptr_t HRule::do_clone( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HRule::do_parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator ret( !! _rule ? _rule->parse( first_, last_ ) : first_ );
+	yaal::hcore::HString::const_iterator ret( !! _rule ? _rule->parse( executingParser_, first_, last_ ) : first_ );
 	if ( ( ret != first_ ) && !! _action )
-		_excutors.push_back( _action );
+		executingParser_->add_execution_step( first_, _action );
 	return ( ret );
-	M_EPILOG
-}
-
-void HRule::do_execute( void ) {
-	M_PROLOG
-	M_ENSURE( _matched );
-	if ( !! _rule )
-		_rule->execute();
-	for ( executors_t::iterator it( _excutors.begin() ), end( _excutors.end() ); it != end; ++ it )
-		(*it)();
-	return;
 	M_EPILOG
 }
 
@@ -215,28 +213,20 @@ HRuleBase::ptr_t HFollows::do_clone( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HFollows::do_parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator orig( first_ );
 	bool matched( true );
 	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		yaal::hcore::HString::const_iterator old( first_ );
-		first_ = (*it)->parse( first_, last_ );
+		first_ = (*it)->parse( executingParser_, first_, last_ );
 		if ( ( first_ == old ) && ( !(*it)->is_optional() ) ) {
 			matched = false;
 			break;
 		} else if ( !! _action && ( first_ != old ) )
-			_excutors.push_back( _action );
+			executingParser_->add_execution_step( old, _action );
 	}
 	return ( matched ? first_ : orig );
-	M_EPILOG
-}
-
-void HFollows::do_execute( void ) {
-	M_PROLOG
-	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it )
-		(*it)->execute();
-	return;
 	M_EPILOG
 }
 
@@ -268,26 +258,15 @@ HRuleBase::ptr_t HKleeneStar::do_clone( void ) const {
 bool HKleeneStar::do_is_optional( void ) const
 	{ return ( true ); }
 
-yaal::hcore::HString::const_iterator HKleeneStar::do_parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HKleeneStar::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator old( last_ );
 	while ( ( first_ != last_ ) && ( first_ != old ) ) {
-		first_ = _rule->parse( old = first_, last_ );
+		first_ = _rule->parse( executingParser_, old = first_, last_ );
 		if ( !! _action && ( first_ != old ) )
-			_excutors.push_back( _action );
+			executingParser_->add_execution_step( old, _action );
 	}
 	return ( first_ );
-	M_EPILOG
-}
-
-void HKleeneStar::do_execute( void ) {
-	M_PROLOG
-	M_ENSURE( _matched );
-	if ( !! _rule )
-		_rule->execute();
-	for ( executors_t::iterator it( _excutors.begin() ), end( _excutors.end() ); it != end; ++ it )
-		(*it)();
-	return;
 	M_EPILOG
 }
 
@@ -316,26 +295,15 @@ HRuleBase::ptr_t HKleenePlus::do_clone( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HKleenePlus::do_parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HKleenePlus::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator old( last_ );
 	while ( ( first_ != last_ ) && ( first_ != old ) ) {
-		first_ = _rule->parse( old = first_, last_ );
+		first_ = _rule->parse( executingParser_, old = first_, last_ );
 		if ( !! _action && ( first_ != old ) )
-			_excutors.push_back( _action );
+			executingParser_->add_execution_step( old, _action );
 	}
 	return ( first_ );
-	M_EPILOG
-}
-
-void HKleenePlus::do_execute( void ) {
-	M_PROLOG
-	M_ENSURE( _matched );
-	if ( !! _rule )
-		_rule->execute();
-	for ( executors_t::iterator it( _excutors.begin() ), end( _excutors.end() ); it != end; ++ it )
-		(*it)();
-	return;
 	M_EPILOG
 }
 
@@ -371,6 +339,14 @@ HRuleBase::ptr_t HAlternative::do_clone( void ) const {
 	M_PROLOG
 	return ( ptr_t( new HAlternative( *this ) ) );
 	M_EPILOG
+}
+
+yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) {
+	return ( NULL );
+}
+
+yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) {
+	return ( NULL );
 }
 
 bool HOptional::do_is_optional( void ) const
@@ -482,7 +458,7 @@ HReal HReal::operator[]( action_string_t const& action_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HReal::do_parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
 	_cache.clear();
@@ -530,16 +506,16 @@ yaal::hcore::HString::const_iterator HReal::do_parse( yaal::hcore::HString::cons
 		first_ = scan;
 		if ( !! _actionDouble ) {
 			double d( lexical_cast<double>( _cache ) );
-			_excutors.push_back( call( _actionDouble, d ) );
+			executingParser_->add_execution_step( first_, call( _actionDouble, d ) );
 		} else if ( !! _actionDoubleLong ) {
 			double long dl( lexical_cast<double long>( _cache ) );
-			_excutors.push_back( call( _actionDoubleLong, dl ) );
+			executingParser_->add_execution_step( first_, call( _actionDoubleLong, dl ) );
 		} else if ( !! _actionNumber ) {
-			_excutors.push_back( call( _actionNumber, _cache ) );
+			executingParser_->add_execution_step( first_, call( _actionNumber, _cache ) );
 		} else if ( !! _actionString ) {
-			_excutors.push_back( call( _actionString, _cache ) );
+			executingParser_->add_execution_step( first_, call( _actionString, _cache ) );
 		} else if ( !! _action )
-			_excutors.push_back( call( _action ) );
+			executingParser_->add_execution_step( first_, call( _action ) );
 	}
 	return ( first_ );
 	M_EPILOG
@@ -623,7 +599,7 @@ HInteger HInteger::operator[]( action_string_t const& action_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HInteger::do_parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
 	_cache.clear();
@@ -660,16 +636,16 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( yaal::hcore::HString::c
 		first_ = scan;
 		if ( !! _actionIntLong ) {
 			int long il( lexical_cast<int long>( _cache ) );
-			_excutors.push_back( call( _actionIntLong, il ) );
+			executingParser_->add_execution_step( first_, call( _actionIntLong, il ) );
 		} else if ( !! _actionInt ) {
 			int i( lexical_cast<int>( _cache ) );
-			_excutors.push_back( call( _actionInt, i ) );
+			executingParser_->add_execution_step( first_, call( _actionInt, i ) );
 		} else if ( !! _actionNumber ) {
-			_excutors.push_back( call( _actionNumber, _cache ) );
+			executingParser_->add_execution_step( first_, call( _actionNumber, _cache ) );
 		} else if ( !! _actionString ) {
-			_excutors.push_back( call( _actionString, _cache ) );
+			executingParser_->add_execution_step( first_, call( _actionString, _cache ) );
 		} else if ( !! _action )
-			_excutors.push_back( call( _action ) );
+			executingParser_->add_execution_step( first_, call( _action ) );
 	}
 	return ( first_ );
 	M_EPILOG
@@ -719,7 +695,7 @@ HCharacter HCharacter::operator() ( char character_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HCharacter::do_parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	M_ENSURE( first_ != last_ );
 	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
@@ -727,9 +703,9 @@ yaal::hcore::HString::const_iterator HCharacter::do_parse( yaal::hcore::HString:
 	if ( _character ) {
 		if ( ! _character || ( c == _character ) ) {
 			if ( !! _actionChar )
-				_excutors.push_back( call( _actionChar, c ) );
+				executingParser_->add_execution_step( first_, call( _actionChar, c ) );
 			else if ( !! _action )
-				_excutors.push_back( call( _action ) );
+				executingParser_->add_execution_step( first_, call( _action ) );
 			++ scan;
 			first_ = scan;
 		}
@@ -794,7 +770,7 @@ HString HString::operator() ( hcore::HString const& string_ ) const {
 	M_EPILOG
 }
 
-hcore::HString::const_iterator HString::do_parse( hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
+hcore::HString::const_iterator HString::do_parse( HExecutingParser*, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	M_ENSURE( first_ != last_ );
 	if ( ! _string.is_empty() ) {
