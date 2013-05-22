@@ -62,8 +62,8 @@ void HExecutingParser::operator()( void ) {
 void HExecutingParser::execute( void ) {
 	M_PROLOG
 	M_ENSURE( _matched );
-	for ( executors_t::iterator it( _excutors.begin() ), end( _excutors.end() ); it != end; ++ it )
-		(*it)();
+	for ( execution_steps_t::iterator it( _excutors.begin() ), end( _excutors.end() ); it != end; ++ it )
+		it->second();
 	return;
 	M_EPILOG
 }
@@ -76,8 +76,9 @@ yaal::hcore::HString::const_iterator HExecutingParser::parse( yaal::hcore::HStri
 	M_EPILOG
 }
 
-void HExecutingParser::add_execution_step( yaal::hcore::HString::const_iterator, executor_t const& ) {
+void HExecutingParser::add_execution_step( yaal::hcore::HString::const_iterator position_, executor_t const& executor_ ) {
 	M_PROLOG
+	_excutors.push_back( make_pair( position_, executor_ ) );
 	return;
 	M_EPILOG
 }
@@ -91,11 +92,11 @@ void HExecutingParser::drop_execution_steps( yaal::hcore::HString::const_iterato
 namespace executing_parser {
 
 HRuleBase::HRuleBase( void )
-	: _matched( false ), _action()
+	: _action()
 	{}
 
 HRuleBase::HRuleBase( action_t const& action_ )
-	: _matched( false ), _action( action_ )
+	: _action( action_ )
 	{}
 
 HRuleBase::ptr_t HRuleBase::clone( void ) const {
@@ -345,8 +346,39 @@ yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser*, 
 	return ( NULL );
 }
 
-yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) {
-	return ( NULL );
+HOptional::HOptional( HRuleBase const& rule_ )
+	: HRuleBase(), _rule( rule_.clone() ) {
+}
+
+HOptional::HOptional( HOptional const& optional_ )
+	: HRuleBase(), _rule( optional_._rule->clone() ) {
+}
+
+HOptional::HOptional( ptr_t const& rule_, action_t const& action_ )
+	: HRuleBase( action_ ), _rule( rule_ ) {
+}
+
+HRuleBase::ptr_t HOptional::do_clone( void ) const {
+	M_PROLOG
+	M_ENSURE( !! _rule );
+	return ( ! _action ? _rule->clone() : ptr_t( new HOptional( _rule->clone(), _action ) ) );
+	M_EPILOG
+}
+
+HOptional HOptional::operator[]( action_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ! _action );
+	return ( HOptional( clone(), action_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+	M_PROLOG
+	yaal::hcore::HString::const_iterator ret( !! _rule ? _rule->parse( executingParser_, first_, last_ ) : first_ );
+	if ( ( ret != first_ ) && !! _action )
+		executingParser_->add_execution_step( first_, _action );
+	return ( ret );
+	M_EPILOG
 }
 
 bool HOptional::do_is_optional( void ) const

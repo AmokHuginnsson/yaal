@@ -50,7 +50,6 @@ class HRuleBase {
 protected:
 	typedef yaal::hcore::HPointer<HRuleBase> ptr_t;
 	typedef yaal::hcore::HBoundCall<> action_t;
-	bool _matched;
 	action_t _action;
 public:
 	typedef HRuleBase this_type;
@@ -150,9 +149,10 @@ class HAlternative : public HRuleBase {
 public:
 	typedef HAlternative this_type;
 	typedef HRuleBase base_type;
-	HAlternative( HRuleBase const& choice1_, HRuleBase const& choice2_ );
-	HAlternative( HAlternative const& alternative_ );
-	HAlternative( HAlternative const& alternative_, HRuleBase const& choice_ );
+	HAlternative( HRuleBase const&, HRuleBase const& );
+	HAlternative( HAlternative const& );
+	HAlternative( HAlternative const&, HRuleBase const& );
+	HAlternative operator[]( action_t const& ) const;
 protected:
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
@@ -161,8 +161,15 @@ protected:
 typedef yaal::hcore::HExceptionT<HAlternative, HRuleBaseException> HAlternativeException;
 
 class HOptional : public HRuleBase {
+	ptr_t _rule;
+public:
+	HOptional( HRuleBase const& );
+	HOptional( HOptional const& );
+	HOptional( ptr_t const&, action_t const& );
+	HOptional operator[]( action_t const& ) const;
 protected:
 	virtual bool do_is_optional( void ) const;
+	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 };
 
@@ -320,9 +327,10 @@ public:
 	typedef yaal::hcore::HBoundCall<> executor_t;
 private:
 	typedef executing_parser::HRuleBase::ptr_t grammar_t;
-	typedef yaal::hcore::HArray<executor_t> executors_t;
+	typedef yaal::hcore::HPair<yaal::hcore::HString::const_iterator, executor_t> execution_step_t;
+	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
 	grammar_t _grammar;
-	executors_t _excutors;
+	execution_steps_t _excutors;
 	bool _matched;
 public:
 	HExecutingParser( executing_parser::HRuleBase const& );
