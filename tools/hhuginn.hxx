@@ -30,6 +30,10 @@ Copyright:
 #ifndef YAAL_TOOLS_HHUGINN_HXX_INCLUDED
 #define YAAL_TOOLS_HHUGINN_HXX_INCLUDED 1
 
+#include "hcore/hmap.hxx"
+#include "hcore/hstreaminterface.hxx"
+#include "tools/executingparser.hxx"
+
 namespace yaal {
 
 namespace tools {
@@ -37,6 +41,8 @@ namespace tools {
 /*! \brief Huginn programming language implementation.
  */
 class HHuginn {
+public:
+	typedef HHuginn this_type;
 	class HObject;
 	class HScope;
 	class HIf;
@@ -44,9 +50,114 @@ class HHuginn {
 	class HClass;
 	class HMethod;
 	class HFunction;
+	class HReference;
+	class HValue;
+	class HInteger;
+	class HFloat;
+	class HString;
+	class HList;
+	class HMap;
+private:
+	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::HFunction> functions_t;
+	functions_t _functions;
+	HExecutingParser _engine;
+public:
+	void parse( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+	void parse( yaal::hcore::HStreamInterface const& );
+	void execute( void );
+	void create_function( void );
+	void call( yaal::hcore::HString const& );
 };
 
 class HHuginn::HObject {
+public:
+	typedef HHuginn::HObject this_type;
+	virtual ~HObject( void ) {}
+};
+
+class HHuginn::HValue : public HHuginn::HObject {
+public:
+	typedef HHuginn::HValue this_type;
+	typedef HHuginn::HObject base_type;
+	typedef yaal::hcore::HPointer<HValue> ptr_t;
+};
+
+class HHuginn::HInteger : public HHuginn::HValue {
+public:
+	typedef HHuginn::HInteger this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	int long long _value;
+};
+
+class HHuginn::HFloat : public HHuginn::HValue {
+public:
+	typedef HHuginn::HFloat this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	double long _value;
+};
+
+class HHuginn::HString : public HHuginn::HValue {
+public:
+	typedef HHuginn::HString this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	yaal::hcore::HString _value;
+};
+
+class HHuginn::HList : public HHuginn::HValue {
+public:
+	typedef HHuginn::HList this_type;
+	typedef HHuginn::HValue base_type;
+};
+
+class HHuginn::HMap : public HHuginn::HValue {
+public:
+	typedef HHuginn::HMap this_type;
+	typedef HHuginn::HValue base_type;
+};
+
+class HHuginn::HScope : public HHuginn::HObject {
+public:
+	typedef HHuginn::HScope this_type;
+	typedef HHuginn::HObject base_type;
+	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::HValue::ptr_t> variables_t;
+private:
+	variables_t _variables;
+	HHuginn::HScope* _parent;
+public:
+	HScope( HScope* );
+private:
+	HScope( HScope const& );
+	HScope& operator = ( HScope const& );
+};
+
+class HHuginn::HIf : public HHuginn::HScope {
+public:
+	typedef HHuginn::HIf this_type;
+	typedef HHuginn::HScope base_type;
+private:
+	HExecutingParser::executor_t _condition;
+	HExecutingParser::executor_t _ifClause;
+	HExecutingParser::executor_t _elseClause;
+public:
+	HIf( HExecutingParser::executor_t, HExecutingParser::executor_t, HExecutingParser::executor_t );
+};
+
+class HHuginn::HWhile : public HHuginn::HScope {
+public:
+	typedef HHuginn::HWhile this_type;
+	typedef HHuginn::HScope base_type;
+private:
+	HExecutingParser::executor_t _condition;
+	HExecutingParser::executor_t _loop;
+};
+
+class HHuginn::HFunction : public HHuginn::HScope {
+public:
+	typedef HHuginn::HFunction this_type;
+	typedef HHuginn::HScope base_type;
 };
 
 }

@@ -819,6 +819,49 @@ HRuleBase::ptr_t HString::do_clone( void ) const {
 
 HString string;
 
+HRegex::HRegex( hcore::HString const& string_ )
+	: HRuleBase(), _regex( new hcore::HRegex( string_ ) ), _actionString()
+	{}
+
+HRegex::HRegex( regex_t const& regex_, action_t action_ )
+	: HRuleBase( action_ ), _regex( regex_ ), _actionString()
+	{}
+
+HRegex::HRegex( regex_t const& regex_, action_string_t action_ )
+	: HRuleBase(), _regex( regex_ ), _actionString( action_ )
+	{}
+
+HRegex::HRegex( HRegex const& regex_ )
+	: HRuleBase( regex_._action ), _regex( regex_._regex ), _actionString( regex_._actionString )
+	{}
+
+HRegex HRegex::operator[]( action_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionString ) );
+	return ( HRegex( _regex, action_ ) );
+	M_EPILOG
+}
+
+HRegex HRegex::operator[]( action_string_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionString ) );
+	return ( HRegex( _regex, action_ ) );
+	M_EPILOG
+}
+
+hcore::HString::const_iterator HRegex::do_parse( HExecutingParser*, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
+	M_PROLOG
+	M_ENSURE( first_ != last_ );
+	return ( first_ );
+	M_EPILOG
+}
+
+HRuleBase::ptr_t HRegex::do_clone( void ) const {
+	M_PROLOG
+	return ( ptr_t( new HRegex( *this ) ) );
+	M_EPILOG
+}
+
 HFollows operator >> ( char const* string_, HRuleBase const& successor_ ) {
 	M_PROLOG
 	return ( HFollows( HString( string_ ), successor_  ) );
@@ -840,6 +883,24 @@ HFollows operator >> ( HRuleBase const& predecessor_, char const* string_ ) {
 HFollows operator >> ( HRuleBase const& predecessor_, hcore::HString const& string_ ) {
 	M_PROLOG
 	return ( HFollows( predecessor_, HString( string_ ) ) );
+	M_EPILOG
+}
+
+HCharacter constant( char character_ ) {
+	M_PROLOG
+	return ( HCharacter( character_ ) );
+	M_EPILOG
+}
+
+HString constant( yaal::hcore::HString const& string_ ) {
+	M_PROLOG
+	return ( HString( string_ ) );
+	M_EPILOG
+}
+
+HRegex regex( yaal::hcore::HString const& pattern_ ) {
+	M_PROLOG
+	return ( HRegex( pattern_ ) );
 	M_EPILOG
 }
 

@@ -32,6 +32,7 @@ Copyright:
 
 #include "hcore/hstring.hxx"
 #include "hcore/hnumber.hxx"
+#include "hcore/hregex.hxx"
 #include "hcore/harray.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/hboundcall.hxx"
@@ -296,8 +297,8 @@ class HString : public HRuleBase {
 public:
 	typedef HString this_type;
 	typedef HRuleBase base_type;
-	HString( yaal::hcore::HString const& string_ = yaal::hcore::HString() );
-	HString( HString const& string_ );
+	HString( yaal::hcore::HString const& = yaal::hcore::HString() );
+	HString( HString const& );
 	virtual ~HString( void )
 		{}
 	HString operator[]( action_t const& ) const;
@@ -314,10 +315,36 @@ extern HString string;
 
 typedef yaal::hcore::HExceptionT<HString, HRuleBaseException> HStringException;
 
+class HRegex : public HRuleBase {
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
+	typedef yaal::hcore::HPointer<yaal::hcore::HRegex> regex_t;
+	regex_t _regex;
+	action_string_t _actionString;
+public:
+	typedef HRegex this_type;
+	typedef HRuleBase base_type;
+	HRegex( yaal::hcore::HString const& );
+	HRegex( HRegex const& );
+	virtual ~HRegex( void )
+		{}
+	HRegex operator[]( action_t const& ) const;
+	HRegex operator[]( action_string_t const& ) const;
+protected:
+	HRegex( regex_t const&, action_t );
+	HRegex( regex_t const&, action_string_t );
+	virtual ptr_t do_clone( void ) const;
+	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+};
+
+typedef yaal::hcore::HExceptionT<HRegex, HRuleBaseException> HRegexException;
+
 HFollows operator >> ( char const* string_, HRuleBase const& successor_ );
 HFollows operator >> ( yaal::hcore::HString const& string_, HRuleBase const& successor_ );
 HFollows operator >> ( HRuleBase const& predecessor_, char const* string_ );
 HFollows operator >> ( HRuleBase const& predecessor_, yaal::hcore::HString const& string_ );
+HCharacter constant( char );
+HString constant( yaal::hcore::HString const& );
+HRegex regex( yaal::hcore::HString const& );
 
 }
 

@@ -32,6 +32,51 @@ namespace yaal {
 
 namespace tools {
 
+namespace executing_parser {
+
+HRule name( regex( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" ) );
+HRule expr;
+HRule absoluteValue( '|' >> expr >> '|' );
+HRule parenthesis( '(' >> expr >> ')' );
+HRule atom( absoluteValue | parenthesis );
+HRule power( atom >> ( * ( '^' >> atom ) ) );
+HRule multiplication( power >> ( * ( '*' >> power ) ) );
+HRule sum( multiplication >> ( * ( '+' >> multiplication ) ) );
+HRule value( sum );
+HRule assignment( *( name >> '=' ) >> value );
+HRule expression( assignment );
+HRule expressionList( + expression );
+HRule ifStatement( executing_parser::constant( "if" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' >> "else" >> '{' >> expressionList >> '}' );
+HRule whileStatement( constant( "while" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' );
+HRule statementList( *( ifStatement | whileStatement | expressionList ) );
+HRule scope( constant( '{' ) >> statementList >> '}' );
+HRule functionDefinition( name >> '(' >> ')' >> scope );
+
+}
+
+void HHuginn::execute( void ) {
+	M_PROLOG
+	call( "main" );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::call( yaal::hcore::HString const& ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+HHuginn::HScope::HScope( HScope* parent_ )
+	: _variables(), _parent( parent_ ) {
+}
+
+HHuginn::HIf::HIf( HExecutingParser::executor_t condition_,
+		HExecutingParser::executor_t ifClause_,
+		HExecutingParser::executor_t elseClause_ )
+	: HScope( NULL ), _condition( condition_ ), _ifClause( ifClause_ ), _elseClause( elseClause_ ) {
+}
+
 }
 
 }
