@@ -148,6 +148,13 @@ HRule::HRule( ptr_t const& rule_, action_t const& action_ )
 	: HRuleBase( action_ ), _rule( rule_ )
 	{}
 
+HRule& HRule::operator %= ( HRuleBase const& ) {
+	M_PROLOG
+	M_ENSURE( ! _rule );
+	return ( *this );
+	M_EPILOG
+}
+
 HRule HRule::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! _action );

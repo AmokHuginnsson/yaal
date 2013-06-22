@@ -80,6 +80,7 @@ public:
 	HRule( ptr_t const& );
 	HRule( ptr_t const&, action_t const& );
 	HRule operator[]( action_t const& ) const;
+	HRule& operator %= ( HRuleBase const& );
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual ptr_t do_clone( void ) const;
@@ -87,6 +88,24 @@ protected:
 };
 
 typedef yaal::hcore::HExceptionT<HRule, HRuleBaseException> HRuleException;
+
+class HRecursiveRule : public HRuleBase {
+	ptr_t _rule;
+public:
+	HRecursiveRule( void );
+	HRecursiveRule( HRecursiveRule const& );
+	HRecursiveRule( HRuleBase const& );
+	HRecursiveRule( ptr_t const& );
+	HRecursiveRule( ptr_t const&, action_t const& );
+	HRecursiveRule operator[]( action_t const& ) const;
+	HRecursiveRule& operator %= ( HRuleBase const& );
+protected:
+	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+	virtual ptr_t do_clone( void ) const;
+	virtual bool do_is_optional( void ) const;
+};
+
+typedef yaal::hcore::HExceptionT<HRecursiveRule, HRuleBaseException> HRecursiveRuleException;
 
 class HFollows : public HRuleBase {
 	typedef yaal::hcore::HList<HRuleBase::ptr_t> rules_t;

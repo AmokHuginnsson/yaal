@@ -34,24 +34,35 @@ namespace tools {
 
 namespace executing_parser {
 
-HRule name( regex( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" ) );
-HRule expr;
-HRule absoluteValue( '|' >> expr >> '|' );
-HRule parenthesis( '(' >> expr >> ')' );
-HRule atom( absoluteValue | parenthesis );
-HRule power( atom >> ( * ( '^' >> atom ) ) );
-HRule multiplication( power >> ( * ( '*' >> power ) ) );
-HRule sum( multiplication >> ( * ( '+' >> multiplication ) ) );
-HRule value( sum );
-HRule assignment( *( name >> '=' ) >> value );
-HRule expression( assignment );
-HRule expressionList( + expression );
-HRule ifStatement( executing_parser::constant( "if" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' >> "else" >> '{' >> expressionList >> '}' );
-HRule whileStatement( constant( "while" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' );
-HRule statementList( *( ifStatement | whileStatement | expressionList ) );
-HRule scope( constant( '{' ) >> statementList >> '}' );
-HRule functionDefinition( name >> '(' >> ')' >> scope );
+HRule huginn_grammar( void );
+HRule huginn_grammar( void ) {
+	M_PROLOG
+	HRule name( regex( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" ) );
+	HRule expression;
+	HRule absoluteValue( '|' >> expression >> '|' );
+	HRule parenthesis( '(' >> expression >> ')' );
+	HRule atom( absoluteValue | parenthesis );
+	HRule power( atom >> ( * ( '^' >> atom ) ) );
+	HRule multiplication( power >> ( * ( '*' >> power ) ) );
+	HRule sum( multiplication >> ( * ( '+' >> multiplication ) ) );
+	HRule value( sum );
+	HRule assignment( *( name >> '=' ) >> value );
+	expression %= assignment;
+	HRule expressionList( + expression );
+	HRule ifStatement( executing_parser::constant( "if" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' >> "else" >> '{' >> expressionList >> '}' );
+	HRule whileStatement( constant( "while" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' );
+	HRule statementList( *( ifStatement | whileStatement | expressionList ) );
+	HRule scope( constant( '{' ) >> statementList >> '}' );
+	HRule functionDefinition( name >> '(' >> ')' >> scope );
+	HRule huginnGrammar( * functionDefinition );
+	return ( huginnGrammar );
+	M_EPILOG
+}
 
+}
+
+HHuginn::HHuginn( void )
+	: _functions(), _engine( executing_parser::huginn_grammar() ) {
 }
 
 void HHuginn::execute( void ) {

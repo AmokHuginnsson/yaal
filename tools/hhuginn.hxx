@@ -62,6 +62,7 @@ private:
 	functions_t _functions;
 	HExecutingParser _engine;
 public:
+	HHuginn( void );
 	void parse( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	void parse( yaal::hcore::HStreamInterface const& );
 	void execute( void );
