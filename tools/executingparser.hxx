@@ -44,6 +44,14 @@ namespace tools {
 class HExecutingParser;
 
 /*! \brief Namespace containing classes composing executing parser infrastructure.
+ *
+ * Executing parser component, besides Parser and Executor part,
+ * defines embedded grammar declaration language, again!,
+ * this language is purely functional, there is no concept of state or values here.
+ *
+ * Once a grammar rule is declared it cannot be modified unless first declaration was empty
+ * and following definition uses %= oparator to denote creation of recursive rule,
+ * still %= operator can be used only once per rule.
  */
 namespace executing_parser {
 
@@ -67,10 +75,16 @@ protected:
 	virtual bool do_is_optional( void ) const;
 	static yaal::hcore::HString::const_iterator skip_space( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	friend class yaal::tools::HExecutingParser;
+private:
+	HRuleBase& operator = ( HRuleBase const& );
 };
 
 typedef yaal::hcore::HExceptionT<HRuleBase> HRuleBaseException;
 
+/*! \brief Abstract rule holder.
+ *
+ * Any rule can be possibly a recursive rule.
+ */
 class HRule : public HRuleBase {
 	ptr_t _rule;
 public:
@@ -85,6 +99,8 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
+private:
+	HRule& operator = ( HRule const& );
 };
 
 typedef yaal::hcore::HExceptionT<HRule, HRuleBaseException> HRuleException;
@@ -103,6 +119,8 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
+private:
+	HRecursiveRule& operator = ( HRecursiveRule const& );
 };
 
 typedef yaal::hcore::HExceptionT<HRecursiveRule, HRuleBaseException> HRecursiveRuleException;
@@ -113,15 +131,25 @@ class HFollows : public HRuleBase {
 public:
 	typedef HFollows this_type;
 	typedef HRuleBase base_type;
-	HFollows( HRuleBase const&, HRuleBase const& );
 	HFollows( HFollows const& );
-	HFollows( HFollows const&, HRuleBase const& );
 	virtual ~HFollows( void )
 		{}
 	HRule operator[]( action_t const& ) const;
 protected:
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+private:
+	HFollows( HRuleBase const&, HRuleBase const& );
+	HFollows( HFollows const&, HRuleBase const& );
+	HFollows& operator = ( HFollows const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::hcore::HString const&, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( char, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, char );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( char const*, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, char const* );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, yaal::hcore::HString const& );
 };
 
 typedef yaal::hcore::HExceptionT<HFollows, HRuleBaseException> HFollowsException;
@@ -131,7 +159,6 @@ class HKleeneStar : public HRuleBase {
 public:
 	typedef HKleeneStar this_type;
 	typedef HRuleBase base_type;
-	HKleeneStar( HRuleBase const& );
 	HKleeneStar( HKleeneStar const& );
 	HKleeneStar operator[]( action_t const& ) const;
 	virtual ~HKleeneStar( void )
@@ -141,6 +168,10 @@ protected:
 	virtual ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+private:
+	HKleeneStar( HRuleBase const& );
+	HKleeneStar& operator = ( HKleeneStar const& );
+	friend yaal::tools::executing_parser::HKleeneStar yaal::tools::executing_parser::operator * ( yaal::tools::executing_parser::HRuleBase const& );
 };
 
 typedef yaal::hcore::HExceptionT<HKleeneStar, HRuleBaseException> HKleeneStarException;
@@ -150,7 +181,6 @@ class HKleenePlus : public HRuleBase {
 public:
 	typedef HKleenePlus this_type;
 	typedef HRuleBase base_type;
-	HKleenePlus( HRuleBase const& rule_ );
 	HKleenePlus( HKleenePlus const& kleenePlus_ );
 	HKleenePlus operator[]( action_t const& ) const;
 	virtual ~HKleenePlus( void )
@@ -159,6 +189,10 @@ protected:
 	HKleenePlus( ptr_t, action_t );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+private:
+	HKleenePlus( HRuleBase const& rule_ );
+	HKleenePlus& operator = ( HKleenePlus const& );
+	friend yaal::tools::executing_parser::HKleenePlus yaal::tools::executing_parser::operator + ( yaal::tools::executing_parser::HRuleBase const& );
 };
 
 typedef yaal::hcore::HExceptionT<HKleenePlus, HRuleBaseException> HKleenePlusException;
@@ -169,13 +203,17 @@ class HAlternative : public HRuleBase {
 public:
 	typedef HAlternative this_type;
 	typedef HRuleBase base_type;
-	HAlternative( HRuleBase const&, HRuleBase const& );
 	HAlternative( HAlternative const& );
-	HAlternative( HAlternative const&, HRuleBase const& );
 	HAlternative operator[]( action_t const& ) const;
 protected:
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+private:
+	HAlternative( HRuleBase const&, HRuleBase const& );
+	HAlternative( HAlternative const&, HRuleBase const& );
+	HAlternative& operator = ( HAlternative const& );
+	friend yaal::tools::executing_parser::HAlternative yaal::tools::executing_parser::operator | ( yaal::tools::executing_parser::HRuleBase const&, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HAlternative yaal::tools::executing_parser::operator | ( yaal::tools::executing_parser::HAlternative const&, yaal::tools::executing_parser::HRuleBase const& );
 };
 
 typedef yaal::hcore::HExceptionT<HAlternative, HRuleBaseException> HAlternativeException;
@@ -183,7 +221,6 @@ typedef yaal::hcore::HExceptionT<HAlternative, HRuleBaseException> HAlternativeE
 class HOptional : public HRuleBase {
 	ptr_t _rule;
 public:
-	HOptional( HRuleBase const& );
 	HOptional( HOptional const& );
 	HOptional( ptr_t const&, action_t const& );
 	HOptional operator[]( action_t const& ) const;
@@ -191,6 +228,9 @@ protected:
 	virtual bool do_is_optional( void ) const;
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+private:
+	HOptional( HRuleBase const& );
+	HOptional& operator = ( HOptional const& );
 };
 
 typedef yaal::hcore::HExceptionT<HOptional, HRuleBaseException> HOptionalException;
@@ -222,7 +262,6 @@ class HReal : public HRuleBase {
 public:
 	typedef HReal this_type;
 	typedef HRuleBase base_type;
-	HReal( void );
 	HReal operator[]( action_t const& ) const;
 	HReal operator[]( action_double_t const& ) const;
 	HReal operator[]( action_double_long_t const& ) const;
@@ -237,9 +276,13 @@ protected:
 	HReal( HReal const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+private:
+	HReal( void );
+	HReal& operator = ( HReal const& );
+	friend HReal const& get_real_instance( void );
 };
 
-extern HReal real;
+extern HReal const& real;
 
 typedef yaal::hcore::HExceptionT<HReal, HRuleBaseException> HRealException;
 
@@ -261,7 +304,6 @@ class HInteger : public HRuleBase {
 public:
 	typedef HInteger this_type;
 	typedef HRuleBase base_type;
-	HInteger( void );
 	HInteger( HInteger const& );
 	HInteger operator[]( action_t const& ) const;
 	HInteger operator[]( action_int_long_t const& ) const;
@@ -276,9 +318,13 @@ protected:
 	HInteger( action_string_t );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+private:
+	HInteger( void );
+	HInteger& operator = ( HInteger const& );
+	friend HInteger const& get_integer_instance( void );
 };
 
-extern HInteger integer;
+extern HInteger const& integer;
 
 typedef yaal::hcore::HExceptionT<HInteger, HRuleBaseException> HIntegerException;
 
@@ -289,7 +335,6 @@ class HCharacter : public HRuleBase {
 public:
 	typedef HCharacter this_type;
 	typedef HRuleBase base_type;
-	HCharacter( char character_ = 0 );
 	HCharacter( HCharacter const& character_ );
 	virtual ~HCharacter( void )
 		{}
@@ -301,8 +346,12 @@ protected:
 	HCharacter( char, action_char_t );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+private:
+	HCharacter( char character_ = 0 );
+	HCharacter& operator = ( HCharacter const& );
+	friend HCharacter const& get_character_instance( void );
 };
-extern HCharacter character;
+extern HCharacter const& character;
 
 typedef yaal::hcore::HExceptionT<HCharacter, HRuleBaseException> HCharacterException;
 
@@ -316,7 +365,6 @@ class HString : public HRuleBase {
 public:
 	typedef HString this_type;
 	typedef HRuleBase base_type;
-	HString( yaal::hcore::HString const& = yaal::hcore::HString() );
 	HString( HString const& );
 	virtual ~HString( void )
 		{}
@@ -328,9 +376,13 @@ protected:
 	HString( yaal::hcore::HString const&, action_string_t );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+private:
+	HString( yaal::hcore::HString const& );
+	HString& operator = ( HString const& );
+	friend HString string( yaal::hcore::HString const& );
 };
 
-extern HString string;
+HString string( yaal::hcore::HString const& );
 
 typedef yaal::hcore::HExceptionT<HString, HRuleBaseException> HStringException;
 
@@ -342,7 +394,6 @@ class HRegex : public HRuleBase {
 public:
 	typedef HRegex this_type;
 	typedef HRuleBase base_type;
-	HRegex( yaal::hcore::HString const& );
 	HRegex( HRegex const& );
 	virtual ~HRegex( void )
 		{}
@@ -353,6 +404,10 @@ protected:
 	HRegex( regex_t const&, action_string_t );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+private:
+	HRegex( yaal::hcore::HString const& );
+	HRegex& operator = ( HRegex const& );
+	friend HRegex regex( yaal::hcore::HString const& );
 };
 
 typedef yaal::hcore::HExceptionT<HRegex, HRuleBaseException> HRegexException;
@@ -367,7 +422,7 @@ HRegex regex( yaal::hcore::HString const& );
 
 }
 
-class HExecutingParser {
+class HExecutingParser : private trait::HNonCopyable {
 public:
 	typedef HExecutingParser this_type;
 	typedef yaal::hcore::HBoundCall<> executor_t;

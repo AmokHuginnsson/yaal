@@ -566,7 +566,14 @@ HRuleBase::ptr_t HReal::do_clone( void ) const {
 	M_EPILOG
 }
 
-HReal real;
+HReal const& get_real_instance( void ) {
+	M_PROLOG
+	static HReal realInstance;
+	return ( realInstance );
+	M_EPILOG
+}
+
+HReal const& real( get_real_instance() );
 
 HInteger::HInteger( void )
 	: HRuleBase(), _actionIntLong(), _actionInt(),
@@ -696,7 +703,14 @@ HRuleBase::ptr_t HInteger::do_clone( void ) const {
 	M_EPILOG
 }
 
-HInteger integer;
+HInteger const& get_integer_instance( void ) {
+	M_PROLOG
+	static HInteger integerInstance;
+	return ( integerInstance );
+	M_EPILOG
+}
+
+HInteger const& integer( get_integer_instance() );
 
 HCharacter::HCharacter( char character_ )
 	: HRuleBase(), _character( character_ ), _actionChar()
@@ -759,17 +773,24 @@ HRuleBase::ptr_t HCharacter::do_clone( void ) const {
 	M_EPILOG
 }
 
-HCharacter character;
+HCharacter const& get_character_instance( void ) {
+	M_PROLOG
+	static HCharacter characterInstance;
+	return ( characterInstance );
+	M_EPILOG
+}
+
+HCharacter const& character( get_character_instance() );
 
 HFollows operator >> ( char character_, HRuleBase const& successor_ ) {
 	M_PROLOG
-	return ( HFollows( HCharacter( character_ ), successor_  ) );
+	return ( HFollows( character( character_ ), successor_  ) );
 	M_EPILOG
 }
 
 HFollows operator >> ( HRuleBase const& predecessor_, char character_ ) {
 	M_PROLOG
-	return ( HFollows( predecessor_, HCharacter( character_ ) ) );
+	return ( HFollows( predecessor_, character( character_ ) ) );
 	M_EPILOG
 }
 
@@ -824,7 +845,11 @@ HRuleBase::ptr_t HString::do_clone( void ) const {
 	M_EPILOG
 }
 
-HString string;
+HString string( yaal::hcore::HString const& string_ ) {
+	M_PROLOG
+	return ( HString( string_ ) );
+	M_EPILOG
+}
 
 HRegex::HRegex( hcore::HString const& string_ )
 	: HRuleBase(), _regex( new hcore::HRegex( string_ ) ), _actionString()
@@ -871,37 +896,37 @@ HRuleBase::ptr_t HRegex::do_clone( void ) const {
 
 HFollows operator >> ( char const* string_, HRuleBase const& successor_ ) {
 	M_PROLOG
-	return ( HFollows( HString( string_ ), successor_  ) );
+	return ( HFollows( string( string_ ), successor_  ) );
 	M_EPILOG
 }
 
 HFollows operator >> ( hcore::HString const& string_, HRuleBase const& successor_ ) {
 	M_PROLOG
-	return ( HFollows( HString( string_ ), successor_  ) );
+	return ( HFollows( string( string_ ), successor_  ) );
 	M_EPILOG
 }
 
 HFollows operator >> ( HRuleBase const& predecessor_, char const* string_ ) {
 	M_PROLOG
-	return ( HFollows( predecessor_, HString( string_ ) ) );
+	return ( HFollows( predecessor_, string( string_ ) ) );
 	M_EPILOG
 }
 
 HFollows operator >> ( HRuleBase const& predecessor_, hcore::HString const& string_ ) {
 	M_PROLOG
-	return ( HFollows( predecessor_, HString( string_ ) ) );
+	return ( HFollows( predecessor_, string( string_ ) ) );
 	M_EPILOG
 }
 
 HCharacter constant( char character_ ) {
 	M_PROLOG
-	return ( HCharacter( character_ ) );
+	return ( character( character_ ) );
 	M_EPILOG
 }
 
 HString constant( yaal::hcore::HString const& string_ ) {
 	M_PROLOG
-	return ( HString( string_ ) );
+	return ( string( string_ ) );
 	M_EPILOG
 }
 
