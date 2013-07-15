@@ -94,7 +94,7 @@ public:
 	HRule( ptr_t const& );
 	HRule( ptr_t const&, action_t const& );
 	HRule operator[]( action_t const& ) const;
-	HRule& operator %= ( HRuleBase const& );
+	HRule& operator %= ( HRuleBase& );
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual ptr_t do_clone( void ) const;
@@ -105,22 +105,18 @@ private:
 
 typedef yaal::hcore::HExceptionT<HRule, HRuleBaseException> HRuleException;
 
-class HRecursiveRule : public HRuleBase {
-	ptr_t _rule;
-public:
-	HRecursiveRule( void );
-	HRecursiveRule( HRecursiveRule const& );
-	HRecursiveRule( HRuleBase const& );
-	HRecursiveRule( ptr_t const& );
-	HRecursiveRule( ptr_t const&, action_t const& );
-	HRecursiveRule operator[]( action_t const& ) const;
-	HRecursiveRule& operator %= ( HRuleBase const& );
+class HRecursiveRule : public HRuleBase, public yaal::hcore::HPointerFromThisInterface<HRecursiveRule> {
+	HRuleBase* _rule;
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	virtual ptr_t do_clone( void ) const;
+	virtual HRuleBase::ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
 private:
+	HRecursiveRule( void );
+	void set_rule( HRuleBase& );
+	HRecursiveRule( HRecursiveRule const& );
 	HRecursiveRule& operator = ( HRecursiveRule const& );
+	friend class HRule;
 };
 
 typedef yaal::hcore::HExceptionT<HRecursiveRule, HRuleBaseException> HRecursiveRuleException;
@@ -231,16 +227,18 @@ protected:
 private:
 	HOptional( HRuleBase const& );
 	HOptional& operator = ( HOptional const& );
+	friend yaal::tools::executing_parser::HOptional yaal::tools::executing_parser::operator - ( yaal::tools::executing_parser::HRuleBase const& );
 };
 
 typedef yaal::hcore::HExceptionT<HOptional, HRuleBaseException> HOptionalException;
 
-HFollows operator >> ( HRuleBase const& predecessor_, HRuleBase const& successor_ );
-HFollows operator >> ( HFollows const& predecessors_, HRuleBase const& successor_ );
-HAlternative operator | ( HRuleBase const& choice1_, HRuleBase const& choice2_ );
-HAlternative operator | ( HAlternative const& alternative_, HRuleBase const& choice_ );
-HKleeneStar operator* ( HRuleBase const& rule_ );
-HKleenePlus operator+ ( HRuleBase const& rule_ );
+HFollows operator >> ( HRuleBase const&, HRuleBase const& );
+HFollows operator >> ( HFollows const&, HRuleBase const& );
+HAlternative operator | ( HRuleBase const&, HRuleBase const& );
+HAlternative operator | ( HAlternative const&, HRuleBase const& );
+HKleeneStar operator* ( HRuleBase const& );
+HKleenePlus operator+ ( HRuleBase const& );
+HOptional operator - ( HRuleBase const& );
 
 class HReal : public HRuleBase {
 	typedef yaal::hcore::HBoundCall<void ( double )> action_double_t;

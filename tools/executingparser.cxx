@@ -129,7 +129,7 @@ yaal::hcore::HString::const_iterator HRuleBase::skip_space( yaal::hcore::HString
 }
 
 HRule::HRule( void )
-	: HRuleBase(), _rule()
+	: HRuleBase(), _rule( new HRecursiveRule() )
 	{}
 
 HRule::HRule( HRule const& rule_ )
@@ -148,9 +148,12 @@ HRule::HRule( ptr_t const& rule_, action_t const& action_ )
 	: HRuleBase( action_ ), _rule( rule_ )
 	{}
 
-HRule& HRule::operator %= ( HRuleBase const& ) {
+HRule& HRule::operator %= ( HRuleBase& rule_ ) {
 	M_PROLOG
 	M_ENSURE( ! _rule );
+	HRecursiveRule* rr( dynamic_cast<HRecursiveRule*>( _rule.get() ) );
+	M_ENSURE( rr );
+	rr->set_rule( rule_ );
 	return ( *this );
 	M_EPILOG
 }
@@ -180,6 +183,35 @@ yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executin
 
 bool HRule::do_is_optional( void ) const
 	{ return ( _rule->is_optional() ); }
+
+HRecursiveRule::HRecursiveRule( void )
+	: _rule( NULL ) {
+}
+
+void HRecursiveRule::set_rule( HRuleBase& rule_ ) {
+	_rule = &rule_;
+	return;
+}
+
+yaal::hcore::HString::const_iterator HRecursiveRule::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+	M_PROLOG
+	M_ENSURE( _rule );
+	return ( _rule->parse( executingParser_, first_, last_ ) );
+	M_EPILOG
+}
+
+HRuleBase::ptr_t HRecursiveRule::do_clone( void ) const {
+	M_PROLOG
+	return ( get_pointer() );
+	M_EPILOG
+}
+
+bool HRecursiveRule::do_is_optional( void ) const {
+	M_PROLOG
+	M_ENSURE( _rule );
+	return ( _rule->is_optional() );
+	M_EPILOG
+}
 
 HFollows::HFollows( HRuleBase const& predecessor_, HRuleBase const& successor_ )
 	: HRuleBase(), _rules() {
@@ -424,6 +456,12 @@ HKleeneStar operator* ( HRuleBase const& rule_ ) {
 HKleenePlus operator+ ( HRuleBase const& rule_ ) {
 	M_PROLOG
 	return ( HKleenePlus( rule_ ) );
+	M_EPILOG
+}
+
+HOptional operator - ( HRuleBase const& rule_ ) {
+	M_PROLOG
+	return ( HOptional( rule_ ) );
 	M_EPILOG
 }
 

@@ -34,6 +34,23 @@ namespace tools {
 
 namespace executing_parser {
 
+#if 0
+/*
+ * Sample code in huginn.
+ */
+
+sum( a, b ) {
+	return ( a + b );
+}
+
+main( args ) {
+	a = integer( args[0] );
+	b = integer( args[1] );
+	return ( sum( 3 + a, sum( 4, ( b + 1 ) * 2 ) ) );
+}
+
+#endif
+
 HRule huginn_grammar( void );
 HRule huginn_grammar( void ) {
 	M_PROLOG
@@ -41,7 +58,9 @@ HRule huginn_grammar( void ) {
 	HRule expression;
 	HRule absoluteValue( '|' >> expression >> '|' );
 	HRule parenthesis( '(' >> expression >> ')' );
-	HRule atom( absoluteValue | parenthesis );
+	HRule argList( expression >> ( * ( ',' >> expression ) ) );
+	HRule functionCall( name >> '(' >> -argList >> ')' );
+	HRule atom( absoluteValue | parenthesis | functionCall | real | name );
 	HRule power( atom >> ( * ( '^' >> atom ) ) );
 	HRule multiplication( power >> ( * ( '*' >> power ) ) );
 	HRule sum( multiplication >> ( * ( '+' >> multiplication ) ) );
@@ -51,9 +70,13 @@ HRule huginn_grammar( void ) {
 	HRule expressionList( + expression );
 	HRule ifStatement( executing_parser::constant( "if" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' >> "else" >> '{' >> expressionList >> '}' );
 	HRule whileStatement( constant( "while" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' );
-	HRule statementList( *( ifStatement | whileStatement | expressionList ) );
-	HRule scope( constant( '{' ) >> statementList >> '}' );
-	HRule functionDefinition( name >> '(' >> ')' >> scope );
+	HRule caseStatement( constant( "case" ) >> '(' >> integer >> ')' >> ':' >> '{' >> expressionList >> '}' );
+	HRule switchStatement( constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> '}' );
+	HRule returnStatement( constant( "return" ) >> '(' >> expression >> ')' );
+	HRule statementList( *( ifStatement | whileStatement | returnStatement | expressionList ) );
+	HRule scope( '{' >> statementList >> '}' );
+	HRule nameList( name >> ( * ( ',' >> name ) ) );
+	HRule functionDefinition( name >> '(' >> -nameList >> ')' >> scope );
 	HRule huginnGrammar( * functionDefinition );
 	return ( huginnGrammar );
 	M_EPILOG
