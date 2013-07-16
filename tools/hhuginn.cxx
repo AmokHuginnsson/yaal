@@ -54,30 +54,31 @@ main( args ) {
 HRule huginn_grammar( void );
 HRule huginn_grammar( void ) {
 	M_PROLOG
-	HRule name( regex( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" ) );
-	HRule expression;
-	HRule absoluteValue( '|' >> expression >> '|' );
-	HRule parenthesis( '(' >> expression >> ')' );
-	HRule argList( expression >> ( * ( ',' >> expression ) ) );
-	HRule functionCall( name >> '(' >> -argList >> ')' );
-	HRule atom( absoluteValue | parenthesis | functionCall | real | name );
-	HRule power( atom >> ( * ( '^' >> atom ) ) );
-	HRule multiplication( power >> ( * ( '*' >> power ) ) );
-	HRule sum( multiplication >> ( * ( '+' >> multiplication ) ) );
-	HRule value( sum );
-	HRule assignment( *( name >> '=' ) >> value );
+	HRule name( "name", regex( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" ) );
+	HRule expression( "expression" );
+	HRule absoluteValue( "absoluteValue", '|' >> expression >> '|' );
+	HRule parenthesis( "parenthesis", '(' >> expression >> ')' );
+	HRule argList( "argList", expression >> ( * ( ',' >> expression ) ) );
+	HRule functionCall( "functionCall", name >> '(' >> -argList >> ')' );
+	HRule atom( "atom", absoluteValue | parenthesis | functionCall | real | name );
+	HRule power( "power", atom >> ( * ( '^' >> atom ) ) );
+	HRule multiplication( "multiplication", power >> ( * ( '*' >> power ) ) );
+	HRule sum( "sum", multiplication >> ( * ( '+' >> multiplication ) ) );
+	HRule value( "value", sum );
+	HRule assignment( "assignment", *( name >> '=' ) >> value );
 	expression %= assignment;
-	HRule expressionList( + expression );
-	HRule ifStatement( executing_parser::constant( "if" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' >> "else" >> '{' >> expressionList >> '}' );
-	HRule whileStatement( constant( "while" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' );
-	HRule caseStatement( constant( "case" ) >> '(' >> integer >> ')' >> ':' >> '{' >> expressionList >> '}' );
-	HRule switchStatement( constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> '}' );
-	HRule returnStatement( constant( "return" ) >> '(' >> expression >> ')' );
-	HRule statementList( *( ifStatement | whileStatement | returnStatement | expressionList ) );
-	HRule scope( '{' >> statementList >> '}' );
-	HRule nameList( name >> ( * ( ',' >> name ) ) );
-	HRule functionDefinition( name >> '(' >> -nameList >> ')' >> scope );
-	HRule huginnGrammar( * functionDefinition );
+	HRule expressionList( "expressionList", + expression );
+	HRule statement( "statement" );
+	HRule ifStatement( "ifStatement", executing_parser::constant( "if" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' >> -( constant( "else" ) >> '{' >> expressionList >> '}' ) );
+	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> expression >> ')' >> '{' >> expressionList >> '}' );
+	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> '{' >> expressionList >> '}' );
+	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> '}' );
+	HRule returnStatement( "returnStatement", constant( "return" ) >> '(' >> expression >> ')' );
+	HRule statementList( "statementList", *( ifStatement | whileStatement | returnStatement | expressionList ) );
+	HRule scope( "scope", '{' >> statementList >> '}' );
+	HRule nameList( "nameList", name >> ( * ( ',' >> name ) ) );
+	HRule functionDefinition( "functionDefinition", name >> '(' >> -nameList >> ')' >> scope );
+	HRule huginnGrammar( "huginnGrammar", * functionDefinition );
 	return ( huginnGrammar );
 	M_EPILOG
 }

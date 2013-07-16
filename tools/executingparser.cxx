@@ -117,6 +117,13 @@ yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executi
 	M_EPILOG
 }
 
+void HRuleBase::describe( grammar_description_t& gd_ ) const {
+	M_PROLOG
+	do_describe( gd_ );
+	return;
+	M_EPILOG
+}
+
 bool HRuleBase::do_is_optional( void ) const
 	{ return ( false ); }
 
@@ -128,24 +135,36 @@ yaal::hcore::HString::const_iterator HRuleBase::skip_space( yaal::hcore::HString
 	M_EPILOG
 }
 
+HRule::HRule( yaal::hcore::HString const& name_ )
+	: HRuleBase(), _rule( new HRecursiveRule() ), _name( name_ )
+	{}
+
 HRule::HRule( void )
-	: HRuleBase(), _rule( new HRecursiveRule() )
+	: HRuleBase(), _rule( new HRecursiveRule() ), _name()
 	{}
 
 HRule::HRule( HRule const& rule_ )
-	: HRuleBase( rule_._action ), _rule( rule_._rule->clone() ) {
+	: HRuleBase( rule_._action ), _rule( rule_._rule->clone() ), _name( rule_._name ) {
 }
 
 HRule::HRule( HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_.clone() ) {
-}
-
-HRule::HRule( ptr_t const& rule_ )
-	: _rule( rule_ )
+	: HRuleBase(), _rule( rule_.clone() ), _name()
 	{}
 
-HRule::HRule( ptr_t const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ )
+HRule::HRule( ptr_t const& rule_ )
+	: _rule( rule_ ), _name()
+	{}
+
+HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_ )
+	: HRuleBase(), _rule( rule_.clone() ), _name( name_ )
+	{}
+
+HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_ )
+	: _rule( rule_ ), _name( name_ )
+	{}
+
+HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_t const& action_ )
+	: HRuleBase( action_ ), _rule( rule_ ), _name( name_ )
 	{}
 
 HRule& HRule::operator %= ( HRuleBase& rule_ ) {
@@ -161,14 +180,20 @@ HRule& HRule::operator %= ( HRuleBase& rule_ ) {
 HRule HRule::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! _action );
-	return ( HRule( clone(), action_ ) );
+	return ( HRule( _name, clone(), action_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HString const& HRule::get_name( void ) const {
+	M_PROLOG
+	return ( _name );
 	M_EPILOG
 }
 
 HRule::ptr_t HRule::do_clone( void ) const {
 	M_PROLOG
 	M_ENSURE( !! _rule );
-	return ( ! _action ? _rule->clone() : ptr_t( new HRule( _rule->clone(), _action ) ) );
+	return ( ! _action ? _rule->clone() : ptr_t( new HRule( _name, _rule->clone(), _action ) ) );
 	M_EPILOG
 }
 
@@ -183,6 +208,12 @@ yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executin
 
 bool HRule::do_is_optional( void ) const
 	{ return ( _rule->is_optional() ); }
+
+void HRule::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
 
 HRecursiveRule::HRecursiveRule( void )
 	: _rule( NULL ) {
@@ -210,6 +241,12 @@ bool HRecursiveRule::do_is_optional( void ) const {
 	M_PROLOG
 	M_ENSURE( _rule );
 	return ( _rule->is_optional() );
+	M_EPILOG
+}
+
+void HRecursiveRule::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
 	M_EPILOG
 }
 
@@ -241,15 +278,26 @@ HFollows::HFollows( HFollows const& predecessors_, HRuleBase const& successor_ )
 	M_EPILOG
 }
 
-HRule HFollows::operator[]( action_t const& action_ ) const {
+HFollows::HFollows( HFollows::rules_t const& rules_, action_t const& action_ )
+	: HRuleBase( action_ ), _rules( rules_ ) {
+	return;
+}
+
+HFollows HFollows::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	return ( HRule( clone(), action_ ) );
+	return ( HFollows( _rules, action_ ) );
 	M_EPILOG
 }
 
 HRuleBase::ptr_t HFollows::do_clone( void ) const {
 	M_PROLOG
 	return ( ptr_t( new HFollows( *this ) ) );
+	M_EPILOG
+}
+
+void HFollows::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
 	M_EPILOG
 }
 
@@ -274,7 +322,7 @@ HKleeneStar::HKleeneStar( HRuleBase const& rule_ )
 	: HRuleBase(), _rule( rule_.clone() )
 	{}
 
-HKleeneStar::HKleeneStar( ptr_t rule_, action_t action_ )
+HKleeneStar::HKleeneStar( ptr_t const& rule_, action_t const& action_ )
 	: HRuleBase( action_ ), _rule( rule_ )
 	{}
 
@@ -310,11 +358,17 @@ yaal::hcore::HString::const_iterator HKleeneStar::do_parse( HExecutingParser* ex
 	M_EPILOG
 }
 
+void HKleeneStar::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
 HKleenePlus::HKleenePlus( HRuleBase const& rule_ )
 	: HRuleBase(), _rule( rule_.clone() )
 	{}
 
-HKleenePlus::HKleenePlus( ptr_t rule_, action_t action_ )
+HKleenePlus::HKleenePlus( ptr_t const& rule_, action_t const& action_ )
 	: HRuleBase( action_ ), _rule( rule_->clone() )
 	{}
 
@@ -344,6 +398,12 @@ yaal::hcore::HString::const_iterator HKleenePlus::do_parse( HExecutingParser* ex
 			executingParser_->add_execution_step( old, _action );
 	}
 	return ( first_ );
+	M_EPILOG
+}
+
+void HKleenePlus::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
 	M_EPILOG
 }
 
@@ -385,6 +445,12 @@ yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser*, 
 	return ( NULL );
 }
 
+void HAlternative::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
 HOptional::HOptional( HRuleBase const& rule_ )
 	: HRuleBase(), _rule( rule_.clone() ) {
 }
@@ -422,6 +488,12 @@ yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser* exec
 
 bool HOptional::do_is_optional( void ) const
 	{ return ( true ); }
+
+void HOptional::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
 
 HFollows operator >> ( HRuleBase const& predecessor_, HRuleBase const& successor_ ) {
 	M_PROLOG
@@ -470,27 +542,27 @@ HReal::HReal( void )
 	_actionNumber(), _actionString(), _cache()
 	{}
 
-HReal::HReal( action_t action_ )
+HReal::HReal( action_t const& action_ )
 	: HRuleBase( action_ ), _actionDouble(), _actionDoubleLong(),
 	_actionNumber(), _actionString(), _cache()
 	{}
 
-HReal::HReal( action_double_t action_ )
+HReal::HReal( action_double_t const& action_ )
 	: HRuleBase(), _actionDouble( action_ ), _actionDoubleLong(),
 	_actionNumber(), _actionString(), _cache()
 	{}
 
-HReal::HReal( action_double_long_t action_ )
+HReal::HReal( action_double_long_t const& action_ )
 	: HRuleBase(), _actionDouble(), _actionDoubleLong( action_ ),
 	_actionNumber(), _actionString(), _cache()
 	{}
 
-HReal::HReal( action_number_t action_ )
+HReal::HReal( action_number_t const& action_ )
 	: HRuleBase(), _actionDouble(), _actionDoubleLong(),
 	_actionNumber( action_ ), _actionString(), _cache()
 	{}
 
-HReal::HReal( action_string_t action_ )
+HReal::HReal( action_string_t const& action_ )
 	: HRuleBase(), _actionDouble(), _actionDoubleLong(),
 	_actionNumber(), _actionString( action_ ), _cache()
 	{}
@@ -604,6 +676,12 @@ HRuleBase::ptr_t HReal::do_clone( void ) const {
 	M_EPILOG
 }
 
+void HReal::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
 HReal const& get_real_instance( void ) {
 	M_PROLOG
 	static HReal realInstance;
@@ -618,27 +696,27 @@ HInteger::HInteger( void )
 	_actionNumber(), _actionString(), _cache()
 	{}
 
-HInteger::HInteger( action_t action_ )
+HInteger::HInteger( action_t const& action_ )
 	: HRuleBase( action_ ), _actionIntLong(), _actionInt(),
 	_actionNumber(), _actionString(), _cache()
 	{}
 
-HInteger::HInteger( action_int_long_t action_ )
+HInteger::HInteger( action_int_long_t const& action_ )
 	: HRuleBase(), _actionIntLong( action_ ), _actionInt(),
 	_actionNumber(), _actionString(), _cache()
 	{}
 
-HInteger::HInteger( action_int_t action_ )
+HInteger::HInteger( action_int_t const& action_ )
 	: HRuleBase(), _actionIntLong(), _actionInt( action_ ),
 	_actionNumber(), _actionString(), _cache()
 	{}
 
-HInteger::HInteger( action_number_t action_ )
+HInteger::HInteger( action_number_t const& action_ )
 	: HRuleBase(), _actionIntLong(), _actionInt(),
 	_actionNumber( action_ ), _actionString(), _cache()
 	{}
 
-HInteger::HInteger( action_string_t action_ )
+HInteger::HInteger( action_string_t const& action_ )
 	: HRuleBase(), _actionIntLong(), _actionInt(),
 	_actionNumber(), _actionString( action_ ), _cache()
 	{}
@@ -741,6 +819,12 @@ HRuleBase::ptr_t HInteger::do_clone( void ) const {
 	M_EPILOG
 }
 
+void HInteger::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
 HInteger const& get_integer_instance( void ) {
 	M_PROLOG
 	static HInteger integerInstance;
@@ -754,11 +838,11 @@ HCharacter::HCharacter( char character_ )
 	: HRuleBase(), _character( character_ ), _actionChar()
 	{}
 
-HCharacter::HCharacter( char character_, action_t action_ )
+HCharacter::HCharacter( char character_, action_t const& action_ )
 	: HRuleBase( action_ ), _character( character_ ), _actionChar()
 	{}
 
-HCharacter::HCharacter( char character_, action_char_t action_ )
+HCharacter::HCharacter( char character_, action_char_t const& action_ )
 	: HRuleBase(), _character( character_ ), _actionChar( action_ )
 	{}
 
@@ -811,6 +895,12 @@ HRuleBase::ptr_t HCharacter::do_clone( void ) const {
 	M_EPILOG
 }
 
+void HCharacter::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
 HCharacter const& get_character_instance( void ) {
 	M_PROLOG
 	static HCharacter characterInstance;
@@ -836,11 +926,11 @@ HString::HString( hcore::HString const& string_ )
 	: HRuleBase(), _string( string_ ), _actionString()
 	{}
 
-HString::HString( hcore::HString const& string_, action_t action_ )
+HString::HString( hcore::HString const& string_, action_t const& action_ )
 	: HRuleBase( action_ ), _string( string_ ), _actionString()
 	{}
 
-HString::HString( hcore::HString const& string_, action_string_t action_ )
+HString::HString( hcore::HString const& string_, action_string_t const& action_ )
 	: HRuleBase(), _string( string_ ), _actionString( action_ )
 	{}
 
@@ -883,6 +973,12 @@ HRuleBase::ptr_t HString::do_clone( void ) const {
 	M_EPILOG
 }
 
+void HString::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
 HString string( yaal::hcore::HString const& string_ ) {
 	M_PROLOG
 	return ( HString( string_ ) );
@@ -893,11 +989,11 @@ HRegex::HRegex( hcore::HString const& string_ )
 	: HRuleBase(), _regex( new hcore::HRegex( string_ ) ), _actionString()
 	{}
 
-HRegex::HRegex( regex_t const& regex_, action_t action_ )
+HRegex::HRegex( regex_t const& regex_, action_t const& action_ )
 	: HRuleBase( action_ ), _regex( regex_ ), _actionString()
 	{}
 
-HRegex::HRegex( regex_t const& regex_, action_string_t action_ )
+HRegex::HRegex( regex_t const& regex_, action_string_t const& action_ )
 	: HRuleBase(), _regex( regex_ ), _actionString( action_ )
 	{}
 
@@ -929,6 +1025,12 @@ hcore::HString::const_iterator HRegex::do_parse( HExecutingParser*, hcore::HStri
 HRuleBase::ptr_t HRegex::do_clone( void ) const {
 	M_PROLOG
 	return ( ptr_t( new HRegex( *this ) ) );
+	M_EPILOG
+}
+
+void HRegex::do_describe( grammar_description_t& ) const {
+	M_PROLOG
+	return;
 	M_EPILOG
 }
 
