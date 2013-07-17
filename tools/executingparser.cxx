@@ -144,7 +144,7 @@ HRule::HRule( void )
 	{}
 
 HRule::HRule( HRule const& rule_ )
-	: HRuleBase( rule_._action ), _rule( rule_._rule->clone() ), _name( rule_._name ) {
+	: HRuleBase( rule_._action ), _rule( rule_._rule ), _name( rule_._name ) {
 }
 
 HRule::HRule( HRuleBase const& rule_ )
