@@ -38,6 +38,9 @@ namespace tools {
 
 HExecutingParser::HExecutingParser( executing_parser::HRuleBase const& rule_ )
 	: _grammar( rule_.clone() ), _excutors(), _matched( false ) {
+	M_PROLOG
+	sanitize();
+	M_EPILOG
 }
 
 bool HExecutingParser::operator()( yaal::hcore::HString const& input_ ) {
@@ -55,6 +58,15 @@ bool HExecutingParser::operator()( yaal::hcore::HString::const_iterator first_, 
 void HExecutingParser::operator()( void ) {
 	M_PROLOG
 	execute();
+	return;
+	M_EPILOG
+}
+
+void HExecutingParser::sanitize( void ) {
+	M_PROLOG
+	executing_parser::grammar_description_t gd;
+	_grammar->describe( gd );
+	M_ENSURE( ! gd.is_empty() );
 	return;
 	M_EPILOG
 }
@@ -136,43 +148,44 @@ yaal::hcore::HString::const_iterator HRuleBase::skip_space( yaal::hcore::HString
 }
 
 HRule::HRule( yaal::hcore::HString const& name_ )
-	: HRuleBase(), _rule( new HRecursiveRule() ), _name( name_ )
+	: HRuleBase(), _rule( new HRecursiveRule() ), _name( name_ ), _completelyDefined( false )
 	{}
 
 HRule::HRule( void )
-	: HRuleBase(), _rule( new HRecursiveRule() ), _name()
+	: HRuleBase(), _rule( new HRecursiveRule() ), _name(), _completelyDefined( false )
 	{}
 
 HRule::HRule( HRule const& rule_ )
-	: HRuleBase( rule_._action ), _rule( rule_._rule ), _name( rule_._name ) {
+	: HRuleBase( rule_._action ), _rule( rule_._rule ), _name( rule_._name ), _completelyDefined( rule_._completelyDefined ) {
 }
 
 HRule::HRule( HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_.clone() ), _name()
+	: HRuleBase(), _rule( rule_.clone() ), _name(), _completelyDefined( true )
 	{}
 
 HRule::HRule( ptr_t const& rule_ )
-	: _rule( rule_ ), _name()
+	: _rule( rule_ ), _name(), _completelyDefined( true )
 	{}
 
 HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_.clone() ), _name( name_ )
+	: HRuleBase(), _rule( rule_.clone() ), _name( name_ ), _completelyDefined( true )
 	{}
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_ )
-	: _rule( rule_ ), _name( name_ )
+	: _rule( rule_ ), _name( name_ ), _completelyDefined( true )
 	{}
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ ), _name( name_ )
+	: HRuleBase( action_ ), _rule( rule_ ), _name( name_ ), _completelyDefined( true )
 	{}
 
-HRule& HRule::operator %= ( HRuleBase& rule_ ) {
+HRule& HRule::operator %= ( HRuleBase const& rule_ ) {
 	M_PROLOG
-	M_ENSURE( ! _rule );
+	M_ENSURE( ! _completelyDefined );
 	HRecursiveRule* rr( dynamic_cast<HRecursiveRule*>( _rule.get() ) );
 	M_ENSURE( rr );
-	rr->set_rule( rule_ );
+	rr->set_rule( rule_.clone() );
+	_completelyDefined = true;
 	return ( *this );
 	M_EPILOG
 }
@@ -193,7 +206,7 @@ yaal::hcore::HString const& HRule::get_name( void ) const {
 HRule::ptr_t HRule::do_clone( void ) const {
 	M_PROLOG
 	M_ENSURE( !! _rule );
-	return ( ! _action ? _rule->clone() : ptr_t( new HRule( _name, _rule->clone(), _action ) ) );
+	return ( ! _action ? _rule : ptr_t( new HRule( _name, _rule, _action ) ) );
 	M_EPILOG
 }
 
@@ -216,11 +229,11 @@ void HRule::do_describe( grammar_description_t& ) const {
 }
 
 HRecursiveRule::HRecursiveRule( void )
-	: _rule( NULL ) {
+	: _rule() {
 }
 
-void HRecursiveRule::set_rule( HRuleBase& rule_ ) {
-	_rule = &rule_;
+void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_ ) {
+	_rule = rule_;
 	return;
 }
 
@@ -263,7 +276,7 @@ HFollows::HFollows( HFollows const& follows_ )
 	: HRuleBase(), _rules() {
 	M_PROLOG
 	for ( rules_t::const_iterator it( follows_._rules.begin() ), end( follows_._rules.end() ); it != end; ++ it )
-		_rules.push_back( (*it)->clone() );
+		_rules.push_back( *it );
 	return;
 	M_EPILOG
 }
@@ -272,7 +285,7 @@ HFollows::HFollows( HFollows const& predecessors_, HRuleBase const& successor_ )
 	: HRuleBase(), _rules() {
 	M_PROLOG
 	for ( rules_t::const_iterator it( predecessors_._rules.begin() ), end( predecessors_._rules.end() ); it != end; ++ it )
-		_rules.push_back( (*it)->clone() );
+		_rules.push_back( *it );
 	_rules.push_back( successor_.clone() );
 	return;
 	M_EPILOG
@@ -327,7 +340,7 @@ HKleeneStar::HKleeneStar( ptr_t const& rule_, action_t const& action_ )
 	{}
 
 HKleeneStar::HKleeneStar( HKleeneStar const& kleeneStar_ )
-	: HRuleBase( kleeneStar_._action ), _rule( kleeneStar_._rule->clone() )
+	: HRuleBase( kleeneStar_._action ), _rule( kleeneStar_._rule )
 	{}
 
 HKleeneStar HKleeneStar::operator[]( action_t const& action_ ) const {
@@ -369,7 +382,7 @@ HKleenePlus::HKleenePlus( HRuleBase const& rule_ )
 	{}
 
 HKleenePlus::HKleenePlus( ptr_t const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_->clone() )
+	: HRuleBase( action_ ), _rule( rule_ )
 	{}
 
 HKleenePlus HKleenePlus::operator[]( action_t const& action_ ) const {
@@ -380,7 +393,7 @@ HKleenePlus HKleenePlus::operator[]( action_t const& action_ ) const {
 }
 
 HKleenePlus::HKleenePlus( HKleenePlus const& kleenePlus_ )
-	: HRuleBase( kleenePlus_._action ), _rule( kleenePlus_._rule->clone() )
+	: HRuleBase( kleenePlus_._action ), _rule( kleenePlus_._rule )
 	{}
 
 HRuleBase::ptr_t HKleenePlus::do_clone( void ) const {
@@ -420,7 +433,7 @@ HAlternative::HAlternative( HAlternative const& alternative_ )
 	: HRuleBase(), _rules() {
 	M_PROLOG
 	for ( rules_t::const_iterator it( alternative_._rules.begin() ), end( alternative_._rules.end() ); it != end; ++ it )
-		_rules.push_back( (*it)->clone() );
+		_rules.push_back( *it );
 	return;
 	M_EPILOG
 }
@@ -429,7 +442,7 @@ HAlternative::HAlternative( HAlternative const& alternative_, HRuleBase const& c
 	: HRuleBase(), _rules() {
 	M_PROLOG
 	for ( rules_t::const_iterator it( alternative_._rules.begin() ), end( alternative_._rules.end() ); it != end; ++ it )
-		_rules.push_back( (*it)->clone() );
+		_rules.push_back( *it );
 	_rules.push_back( choice_.clone() );
 	return;
 	M_EPILOG

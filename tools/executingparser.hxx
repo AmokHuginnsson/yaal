@@ -92,6 +92,7 @@ typedef yaal::hcore::HExceptionT<HRuleBase> HRuleBaseException;
 class HRule : public HRuleBase {
 	ptr_t _rule;
 	yaal::hcore::HString _name;
+	bool _completelyDefined;
 public:
 	HRule( void );
 	HRule( yaal::hcore::HString const& );
@@ -101,7 +102,7 @@ public:
 	HRule( yaal::hcore::HString const&, HRuleBase const& );
 	HRule( yaal::hcore::HString const&, ptr_t const& );
 	HRule operator[]( action_t const& ) const;
-	HRule& operator %= ( HRuleBase& );
+	HRule& operator %= ( HRuleBase const& );
 	yaal::hcore::HString const& get_name( void ) const;
 protected:
 	HRule( yaal::hcore::HString const&, ptr_t const&, action_t const& );
@@ -116,7 +117,7 @@ private:
 typedef yaal::hcore::HExceptionT<HRule, HRuleBaseException> HRuleException;
 
 class HRecursiveRule : public HRuleBase, public yaal::hcore::HPointerFromThisInterface<HRecursiveRule> {
-	HRuleBase* _rule;
+	HRuleBase::ptr_t _rule;
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual HRuleBase::ptr_t do_clone( void ) const;
@@ -124,7 +125,7 @@ protected:
 	virtual void do_describe( grammar_description_t& ) const;
 private:
 	HRecursiveRule( void );
-	void set_rule( HRuleBase& );
+	void set_rule( HRuleBase::ptr_t const& );
 	HRecursiveRule( HRecursiveRule const& );
 	HRecursiveRule& operator = ( HRecursiveRule const& );
 	friend class HRule;
@@ -460,10 +461,13 @@ public:
 	bool operator()( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	void operator()( void );
 	void execute( void );
+	void sanitize( void );
 	yaal::hcore::HString::const_iterator parse( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	void add_execution_step( yaal::hcore::HString::const_iterator, executor_t const& );
 	void drop_execution_steps( yaal::hcore::HString::const_iterator );
 };
+
+typedef yaal::hcore::HExceptionT<HExecutingParser> HExecutingParserException;
 
 }
 
