@@ -30,6 +30,9 @@ Copyright:
 M_VCSID( "$Id: "__ID__" $" )
 #include "executingparser.hxx"
 
+
+#include "hcore/hfile.hxx"
+
 using namespace yaal::hcore;
 
 namespace yaal {
@@ -64,7 +67,7 @@ void HExecutingParser::operator()( void ) {
 
 void HExecutingParser::sanitize( void ) {
 	M_PROLOG
-	executing_parser::grammar_description_t gd;
+	executing_parser::HGrammarDescription gd;
 	_grammar->describe( gd );
 	M_ENSURE( ! gd.is_empty() );
 	return;
@@ -129,7 +132,7 @@ yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executi
 	M_EPILOG
 }
 
-void HRuleBase::describe( grammar_description_t& gd_ ) const {
+void HRuleBase::describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
 	do_describe( gd_ );
 	return;
@@ -222,8 +225,13 @@ yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executin
 bool HRule::do_is_optional( void ) const
 	{ return ( _rule->is_optional() ); }
 
-void HRule::do_describe( grammar_description_t& ) const {
+void HRule::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
+	if ( !! _rule ) {
+		cout << _name << " = ";
+		_rule->describe( gd_ );
+		cout << endl;
+	}
 	return;
 	M_EPILOG
 }
@@ -257,8 +265,12 @@ bool HRecursiveRule::do_is_optional( void ) const {
 	M_EPILOG
 }
 
-void HRecursiveRule::do_describe( grammar_description_t& ) const {
+void HRecursiveRule::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
+	if ( !! _rule && ! gd_.visited( _rule.get() ) ) {
+		gd_.visiting( _rule.get() );
+		_rule->describe( gd_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -308,8 +320,15 @@ HRuleBase::ptr_t HFollows::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HFollows::do_describe( grammar_description_t& ) const {
+void HFollows::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
+	bool next( false );
+	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
+		if ( next )
+			cout << " >> ";
+		(*it)->describe( gd_ );
+		next = true;
+	}
 	return;
 	M_EPILOG
 }
@@ -371,8 +390,11 @@ yaal::hcore::HString::const_iterator HKleeneStar::do_parse( HExecutingParser* ex
 	M_EPILOG
 }
 
-void HKleeneStar::do_describe( grammar_description_t& ) const {
+void HKleeneStar::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
+	cout << "*(";
+	_rule->describe( gd_ );
+	cout << ")";
 	return;
 	M_EPILOG
 }
@@ -414,8 +436,11 @@ yaal::hcore::HString::const_iterator HKleenePlus::do_parse( HExecutingParser* ex
 	M_EPILOG
 }
 
-void HKleenePlus::do_describe( grammar_description_t& ) const {
+void HKleenePlus::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
+	cout << "+(";
+	_rule->describe( gd_ );
+	cout << ")";
 	return;
 	M_EPILOG
 }
@@ -458,8 +483,15 @@ yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser*, 
 	return ( NULL );
 }
 
-void HAlternative::do_describe( grammar_description_t& ) const {
+void HAlternative::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
+	bool next( false );
+	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
+		if ( next )
+			cout << " | ";
+		(*it)->describe( gd_ );
+		next = true;
+	}
 	return;
 	M_EPILOG
 }
@@ -502,8 +534,11 @@ yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser* exec
 bool HOptional::do_is_optional( void ) const
 	{ return ( true ); }
 
-void HOptional::do_describe( grammar_description_t& ) const {
+void HOptional::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
+	cout << "-(";
+	_rule->describe( gd_ );
+	cout << ")";
 	return;
 	M_EPILOG
 }
@@ -689,8 +724,9 @@ HRuleBase::ptr_t HReal::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HReal::do_describe( grammar_description_t& ) const {
+void HReal::do_describe( HGrammarDescription& ) const {
 	M_PROLOG
+	cout << "real";
 	return;
 	M_EPILOG
 }
@@ -832,8 +868,9 @@ HRuleBase::ptr_t HInteger::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HInteger::do_describe( grammar_description_t& ) const {
+void HInteger::do_describe( HGrammarDescription& ) const {
 	M_PROLOG
+	cout << "integer";
 	return;
 	M_EPILOG
 }
@@ -908,8 +945,12 @@ HRuleBase::ptr_t HCharacter::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HCharacter::do_describe( grammar_description_t& ) const {
+void HCharacter::do_describe( HGrammarDescription& ) const {
 	M_PROLOG
+	if ( _character )
+		cout << "'" << _character << "'";
+	else
+		cout << "character";
 	return;
 	M_EPILOG
 }
@@ -986,8 +1027,9 @@ HRuleBase::ptr_t HString::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HString::do_describe( grammar_description_t& ) const {
+void HString::do_describe( HGrammarDescription& ) const {
 	M_PROLOG
+	cout << "\"" << _string << "\"";
 	return;
 	M_EPILOG
 }
@@ -1041,8 +1083,9 @@ HRuleBase::ptr_t HRegex::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HRegex::do_describe( grammar_description_t& ) const {
+void HRegex::do_describe( HGrammarDescription& ) const {
 	M_PROLOG
+	cout << "regex(\"" << _regex->pattern() << "\")";
 	return;
 	M_EPILOG
 }
@@ -1086,6 +1129,41 @@ HString constant( yaal::hcore::HString const& string_ ) {
 HRegex regex( yaal::hcore::HString const& pattern_ ) {
 	M_PROLOG
 	return ( HRegex( pattern_ ) );
+	M_EPILOG
+}
+
+HGrammarDescription::HGrammarDescription( void )
+	: _rules(), _visited()
+	{}
+
+bool HGrammarDescription::is_empty( void ) const {
+	M_PROLOG
+	return ( _rules.is_empty() );
+	M_EPILOG
+}
+
+HGrammarDescription::const_iterator HGrammarDescription::begin( void ) const {
+	M_PROLOG
+	return ( _rules.begin() );
+	M_EPILOG
+}
+
+HGrammarDescription::const_iterator HGrammarDescription::end( void ) const {
+	M_PROLOG
+	return ( _rules.end() );
+	M_EPILOG
+}
+
+bool HGrammarDescription::visited( HRuleBase const* rule_ ) const {
+	M_PROLOG
+	return ( _visited.count( rule_ ) > 0 );
+	M_EPILOG
+}
+
+void HGrammarDescription::visiting( HRuleBase const* rule_ ) {
+	M_PROLOG
+	_visited.insert( rule_ );
+	return;
 	M_EPILOG
 }
 
