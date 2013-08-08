@@ -36,6 +36,8 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/hset.hxx"
+#include "hcore/hmap.hxx"
+#include "hcore/hqueue.hxx"
 #include "hcore/hboundcall.hxx"
 
 namespace yaal {
@@ -64,22 +66,52 @@ public:
 private:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> rules_t;
 	typedef yaal::hcore::HSet<HRuleBase const*> visited_t;
+	typedef yaal::hcore::HMap<yaal::hcore::HString, HRuleBase const*> named_rules_t;
+	typedef yaal::hcore::HQueue<HRuleBase const*> rule_order_t;
 	rules_t _rules;
 	visited_t _visited;
+	named_rules_t _namedRules;
+	rule_order_t _ruleOrder;
 public:
 	typedef rules_t::const_iterator const_iterator;
 	HGrammarDescription( void );
-	void add( yaal::hcore::HString const& );
-	void visiting( HRuleBase const* );
-	bool visited( HRuleBase const* ) const;
 	const_iterator begin( void ) const;
 	const_iterator end( void ) const;
 	bool is_empty( void ) const;
+private:
+	void clear( void );
+	void add( yaal::hcore::HString const& );
+	void visiting( HRuleBase const* );
+	bool visited( HRuleBase const* ) const;
+	friend class HRuleBase;
+	friend class HRecursiveRule;
 };
 
 class HRuleBase {
 protected:
 	typedef yaal::hcore::HPointer<HRuleBase> ptr_t;
+	struct HNamedRule {
+		yaal::hcore::HString _name;
+		ptr_t _rule;
+		HNamedRule( void )
+			: _name(), _rule()
+			{	}
+		HNamedRule( ptr_t rule_ )
+			: _name(), _rule( rule_ )
+			{	}
+		HNamedRule( yaal::hcore::HString const& name_, ptr_t rule_ )
+			: _name( name_ ), _rule( rule_ )
+			{	}
+		HNamedRule( HRuleBase const& );
+		bool operator ! ( void ) const
+			{ return ( ! _rule ); }
+		ptr_t operator->( void )
+			{ return ( _rule ); }
+		ptr_t const operator->( void ) const
+			{ return ( _rule ); }
+		HRuleBase const* id( void ) const
+			{ return ( _rule.get() ); }
+	};
 	typedef yaal::hcore::HBoundCall<> action_t;
 	action_t _action;
 public:
@@ -137,7 +169,7 @@ private:
 typedef yaal::hcore::HExceptionT<HRule, HRuleBaseException> HRuleException;
 
 class HRecursiveRule : public HRuleBase, public yaal::hcore::HPointerFromThisInterface<HRecursiveRule> {
-	HRuleBase::ptr_t _rule;
+	HNamedRule _rule;
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual HRuleBase::ptr_t do_clone( void ) const;
@@ -154,7 +186,7 @@ private:
 typedef yaal::hcore::HExceptionT<HRecursiveRule, HRuleBaseException> HRecursiveRuleException;
 
 class HFollows : public HRuleBase {
-	typedef yaal::hcore::HList<HRuleBase::ptr_t> rules_t;
+	typedef yaal::hcore::HList<HNamedRule> rules_t;
 	rules_t _rules;
 public:
 	typedef HFollows this_type;
@@ -185,7 +217,7 @@ private:
 typedef yaal::hcore::HExceptionT<HFollows, HRuleBaseException> HFollowsException;
 
 class HKleeneStar : public HRuleBase {
-	ptr_t _rule;
+	HNamedRule _rule;
 public:
 	typedef HKleeneStar this_type;
 	typedef HRuleBase base_type;
@@ -194,7 +226,7 @@ public:
 	virtual ~HKleeneStar( void )
 		{}
 protected:
-	HKleeneStar( ptr_t const&, action_t const& );
+	HKleeneStar( HNamedRule const&, action_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
@@ -208,7 +240,7 @@ private:
 typedef yaal::hcore::HExceptionT<HKleeneStar, HRuleBaseException> HKleeneStarException;
 
 class HKleenePlus : public HRuleBase {
-	ptr_t _rule;
+	HNamedRule _rule;
 public:
 	typedef HKleenePlus this_type;
 	typedef HRuleBase base_type;
@@ -217,7 +249,7 @@ public:
 	virtual ~HKleenePlus( void )
 		{}
 protected:
-	HKleenePlus( ptr_t const&, action_t const& );
+	HKleenePlus( HNamedRule const&, action_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HGrammarDescription& ) const;
@@ -230,7 +262,7 @@ private:
 typedef yaal::hcore::HExceptionT<HKleenePlus, HRuleBaseException> HKleenePlusException;
 
 class HAlternative : public HRuleBase {
-	typedef yaal::hcore::HList<HRuleBase::ptr_t> rules_t;
+	typedef yaal::hcore::HList<HNamedRule> rules_t;
 	rules_t _rules;
 public:
 	typedef HAlternative this_type;
@@ -253,12 +285,12 @@ private:
 typedef yaal::hcore::HExceptionT<HAlternative, HRuleBaseException> HAlternativeException;
 
 class HOptional : public HRuleBase {
-	ptr_t _rule;
+	HNamedRule _rule;
 public:
 	HOptional( HOptional const& );
 	HOptional operator[]( action_t const& ) const;
 protected:
-	HOptional( ptr_t const&, action_t const& );
+	HOptional( HNamedRule const&, action_t const& );
 	virtual bool do_is_optional( void ) const;
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );

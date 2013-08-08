@@ -150,6 +150,10 @@ yaal::hcore::HString::const_iterator HRuleBase::skip_space( yaal::hcore::HString
 	M_EPILOG
 }
 
+HRuleBase::HNamedRule::HNamedRule( HRuleBase const& rule_ )
+	: _name( dynamic_cast<HRule const*>( &rule_ ) ? dynamic_cast<HRule const*>( &rule_ )->get_name() : yaal::hcore::HString() ), _rule( rule_.clone() )
+	{ }
+
 HRule::HRule( yaal::hcore::HString const& name_ )
 	: HRuleBase(), _rule( new HRecursiveRule() ), _name( name_ ), _completelyDefined( false )
 	{}
@@ -247,7 +251,7 @@ void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_ ) {
 
 yaal::hcore::HString::const_iterator HRecursiveRule::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	M_ENSURE( _rule );
+	M_ENSURE( !! _rule );
 	return ( _rule->parse( executingParser_, first_, last_ ) );
 	M_EPILOG
 }
@@ -267,8 +271,8 @@ bool HRecursiveRule::do_is_optional( void ) const {
 
 void HRecursiveRule::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
-	if ( !! _rule && ! gd_.visited( _rule.get() ) ) {
-		gd_.visiting( _rule.get() );
+	if ( !! _rule && ! gd_.visited( _rule.id() ) ) {
+		gd_.visiting( _rule.id() );
 		_rule->describe( gd_ );
 	}
 	return;
@@ -278,8 +282,8 @@ void HRecursiveRule::do_describe( HGrammarDescription& gd_ ) const {
 HFollows::HFollows( HRuleBase const& predecessor_, HRuleBase const& successor_ )
 	: HRuleBase(), _rules() {
 	M_PROLOG
-	_rules.push_back( predecessor_.clone() );
-	_rules.push_back( successor_.clone() );
+	_rules.push_back( predecessor_ );
+	_rules.push_back( successor_ );
 	return;
 	M_EPILOG
 }
@@ -298,7 +302,7 @@ HFollows::HFollows( HFollows const& predecessors_, HRuleBase const& successor_ )
 	M_PROLOG
 	for ( rules_t::const_iterator it( predecessors_._rules.begin() ), end( predecessors_._rules.end() ); it != end; ++ it )
 		_rules.push_back( *it );
-	_rules.push_back( successor_.clone() );
+	_rules.push_back( successor_ );
 	return;
 	M_EPILOG
 }
@@ -351,10 +355,10 @@ yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* execu
 }
 
 HKleeneStar::HKleeneStar( HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_.clone() )
+	: HRuleBase(), _rule( rule_ )
 	{}
 
-HKleeneStar::HKleeneStar( ptr_t const& rule_, action_t const& action_ )
+HKleeneStar::HKleeneStar( HNamedRule const& rule_, action_t const& action_ )
 	: HRuleBase( action_ ), _rule( rule_ )
 	{}
 
@@ -400,10 +404,10 @@ void HKleeneStar::do_describe( HGrammarDescription& gd_ ) const {
 }
 
 HKleenePlus::HKleenePlus( HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_.clone() )
+	: HRuleBase(), _rule( rule_ )
 	{}
 
-HKleenePlus::HKleenePlus( ptr_t const& rule_, action_t const& action_ )
+HKleenePlus::HKleenePlus( HNamedRule const& rule_, action_t const& action_ )
 	: HRuleBase( action_ ), _rule( rule_ )
 	{}
 
@@ -448,8 +452,8 @@ void HKleenePlus::do_describe( HGrammarDescription& gd_ ) const {
 HAlternative::HAlternative( HRuleBase const& choice1_, HRuleBase const& choice2_ )
 	: HRuleBase(), _rules() {
 	M_PROLOG
-	_rules.push_back( choice1_.clone() );
-	_rules.push_back( choice2_.clone() );
+	_rules.push_back( choice1_ );
+	_rules.push_back( choice2_ );
 	return;
 	M_EPILOG
 }
@@ -468,7 +472,7 @@ HAlternative::HAlternative( HAlternative const& alternative_, HRuleBase const& c
 	M_PROLOG
 	for ( rules_t::const_iterator it( alternative_._rules.begin() ), end( alternative_._rules.end() ); it != end; ++ it )
 		_rules.push_back( *it );
-	_rules.push_back( choice_.clone() );
+	_rules.push_back( choice_ );
 	return;
 	M_EPILOG
 }
@@ -497,28 +501,27 @@ void HAlternative::do_describe( HGrammarDescription& gd_ ) const {
 }
 
 HOptional::HOptional( HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_.clone() ) {
+	: HRuleBase(), _rule( rule_ ) {
 }
 
 HOptional::HOptional( HOptional const& optional_ )
-	: HRuleBase(), _rule( optional_._rule->clone() ) {
+	: HRuleBase( optional_._action ), _rule( optional_._rule ) {
 }
 
-HOptional::HOptional( ptr_t const& rule_, action_t const& action_ )
+HOptional::HOptional( HNamedRule const& rule_, action_t const& action_ )
 	: HRuleBase( action_ ), _rule( rule_ ) {
 }
 
 HRuleBase::ptr_t HOptional::do_clone( void ) const {
 	M_PROLOG
-	M_ENSURE( !! _rule );
-	return ( ! _action ? _rule->clone() : ptr_t( new HOptional( _rule->clone(), _action ) ) );
+	return ( ptr_t( new HOptional( *this ) ) );
 	M_EPILOG
 }
 
 HOptional HOptional::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! _action );
-	return ( HOptional( clone(), action_ ) );
+	return ( HOptional( _rule, action_ ) );
 	M_EPILOG
 }
 
@@ -1133,8 +1136,18 @@ HRegex regex( yaal::hcore::HString const& pattern_ ) {
 }
 
 HGrammarDescription::HGrammarDescription( void )
-	: _rules(), _visited()
+	: _rules(), _visited(), _namedRules(), _ruleOrder()
 	{}
+
+void HGrammarDescription::clear( void ) {
+	M_PROLOG
+	_rules.clear();
+	_visited.clear();
+	_namedRules.clear();
+	_ruleOrder.clear();
+	return;
+	M_EPILOG
+}
 
 bool HGrammarDescription::is_empty( void ) const {
 	M_PROLOG

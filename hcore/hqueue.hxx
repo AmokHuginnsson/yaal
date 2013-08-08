@@ -111,6 +111,12 @@ public:
 		return;
 		M_EPILOG
 	}
+	void clear( void ) {
+		M_PROLOG
+		_sequence.clear();
+		return;
+		M_EPILOG
+	}
 	bool operator == ( HQueue const& s_ ) const {
 		M_PROLOG
 		return ( ( &s_ == this ) || safe_equal( _sequence.begin(), _sequence.end(), s_._sequence.begin(), s_._sequence.end() ) );
