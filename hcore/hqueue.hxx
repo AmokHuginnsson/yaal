@@ -101,13 +101,13 @@ public:
 	}
 	void push( value_type const& value_ ) {
 		M_PROLOG
-		_sequence.push_front( value_ );
+		_sequence.push_back( value_ );
 		return;
 		M_EPILOG
 	}
 	void pop( void ) {
 		M_PROLOG
-		_sequence.pop_back();
+		_sequence.pop_front();
 		return;
 		M_EPILOG
 	}
