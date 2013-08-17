@@ -31,8 +31,8 @@ Copyright:
 #include <arpa/inet.h>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "streamtools.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hsocket.hxx"

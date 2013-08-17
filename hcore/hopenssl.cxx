@@ -39,8 +39,8 @@ Copyright:
 #endif /* not OPENSSL_THREADS */
 
 #include "base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hopenssl.hxx"
 #include "hcore/memory.hxx"
 #include "system.hxx"

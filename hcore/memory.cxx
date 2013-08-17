@@ -29,8 +29,8 @@ Copyright:
 #include <cstdio>
 
 #include "base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "memory.hxx"
 
 namespace yaal {

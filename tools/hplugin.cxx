@@ -27,8 +27,8 @@ Copyright:
 #include <dlfcn.h>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hplugin.hxx"
 
 using namespace yaal::hcore;

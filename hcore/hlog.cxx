@@ -38,8 +38,8 @@ Copyright:
 #endif /* not HAVE_BASENAME_IN_CSTRING */
 
 #include "base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hlog.hxx"
 #include "system.hxx"
 #include "hcore.hxx"

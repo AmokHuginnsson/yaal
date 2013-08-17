@@ -28,8 +28,8 @@ Copyright:
 #include <libintl.h>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hformat.hxx"
 #include "hcore/memory.hxx"
 #include "hlist.hxx"

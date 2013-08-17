@@ -38,8 +38,8 @@ Copyright:
 #include <libexslt/exsltconfig.h>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hxml.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/htokenizer.hxx"

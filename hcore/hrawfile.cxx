@@ -30,8 +30,8 @@ Copyright:
 #include <sys/time.h> /* timeval */
 
 #include "base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hrawfile.hxx"
 #include "hcore/memory.hxx"
 #include "system.hxx"

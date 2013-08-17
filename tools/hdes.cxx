@@ -27,8 +27,8 @@ Copyright:
 #include <cstring>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hdes.hxx"
 #include "hbitmap.hxx"
 

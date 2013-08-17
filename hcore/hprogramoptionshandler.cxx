@@ -31,8 +31,8 @@ Copyright:
 #include <libintl.h> /* gettext() */
 
 #include "base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "config.hxx"
 #include "hprogramoptionshandler.hxx"
 #include "functional.hxx"

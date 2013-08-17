@@ -28,7 +28,7 @@ Copyright:
 #include <zlib.h>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "hzipstream.hxx"
 #include "tools.hxx"
 

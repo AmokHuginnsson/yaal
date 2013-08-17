@@ -42,7 +42,7 @@ Copyright:
 #endif /* #ifdef __HOST_OS_TYPE_FREEBSD__ */
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "system.hxx"
 #include "algorithm.hxx"
 #include "hclock.hxx"

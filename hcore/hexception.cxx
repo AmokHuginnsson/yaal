@@ -32,8 +32,8 @@ Copyright:
 #include <libintl.h>
 
 #include "base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hexception.hxx"
 #include "memory.hxx"
 #include "hlog.hxx"

@@ -29,8 +29,8 @@ Copyright:
 #include <libintl.h>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "db_driver_loader.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/hstring.hxx"
@@ -59,11 +59,11 @@ char const* const _done_ = "done.\r\n";
 static char const* _driver_[ 8 ] = {
 	"default",
 	"null",
-	LIB_PREFIX"sqlite3_driver"LIB_INFIX"."LIB_EXT,
-	LIB_PREFIX"postgresql_driver"LIB_INFIX"."LIB_EXT,
-	LIB_PREFIX"mysql_driver"LIB_INFIX"."LIB_EXT,
-	LIB_PREFIX"firebird_driver"LIB_INFIX"."LIB_EXT,
-	LIB_PREFIX"oracle_driver"LIB_INFIX"."LIB_EXT,
+	LIB_PREFIX "sqlite3_driver" LIB_INFIX "." LIB_EXT,
+	LIB_PREFIX "postgresql_driver" LIB_INFIX "." LIB_EXT,
+	LIB_PREFIX "mysql_driver" LIB_INFIX "." LIB_EXT,
+	LIB_PREFIX "firebird_driver" LIB_INFIX "." LIB_EXT,
+	LIB_PREFIX "oracle_driver" LIB_INFIX "." LIB_EXT,
 	NULL
 };
 

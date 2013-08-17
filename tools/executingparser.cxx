@@ -27,7 +27,7 @@ Copyright:
 #include <cctype>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "executingparser.hxx"
 
 
@@ -330,8 +330,17 @@ void HFollows::do_describe( HGrammarDescription& gd_ ) const {
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( next )
 			cout << " >> ";
-		(*it)->describe( gd_ );
+		if ( ! it->_name.is_empty() ) {
+			gd_._ruleOrder.push( &*it );
+		} else
+			(*it)->describe( gd_ );
 		next = true;
+	}
+	while ( ! gd_._ruleOrder.is_empty() ) {
+		HNamedRule const* nr( gd_._ruleOrder.front() );
+		gd_._ruleOrder.pop();
+		cout << endl << nr->_name << " = ";
+		nr->_rule->describe( gd_ );
 	}
 	return;
 	M_EPILOG

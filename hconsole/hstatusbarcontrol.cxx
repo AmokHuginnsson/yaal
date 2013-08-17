@@ -29,8 +29,8 @@ Copyright:
 #include <cstdio>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hstatusbarcontrol.hxx"
 #include "hwindow.hxx"
 #include "hconsole.hxx"

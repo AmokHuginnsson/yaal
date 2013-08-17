@@ -40,8 +40,8 @@ Copyright:
 #endif /* HAVE_GPM_H */
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "mouse.hxx"
 #include "console.hxx"
 #include "hcore/hstring.hxx"

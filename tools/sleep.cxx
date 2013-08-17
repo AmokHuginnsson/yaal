@@ -29,7 +29,7 @@ Copyright:
 #include <sys/time.h> /* timeval (for FreeBSD) */
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "sleep.hxx"
 
 namespace yaal {

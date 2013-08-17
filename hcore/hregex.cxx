@@ -30,8 +30,8 @@ Copyright:
 #include <libintl.h>
 
 #include "base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hregex.hxx"
 #include "harray.hxx"
 #include "hchunk.hxx"

@@ -28,8 +28,8 @@ Copyright:
 #include <cstdlib>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hcore.hxx"
 #include "hconsole/hconsole.hxx"
 #include "tools/tools.hxx"

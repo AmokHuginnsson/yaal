@@ -29,7 +29,7 @@ Copyright:
 #include <sys/mman.h>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "hmemorymappedfile.hxx"
 #include "hcore/hexception.hxx"
 

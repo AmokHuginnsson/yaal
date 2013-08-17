@@ -27,7 +27,9 @@ Copyright:
 #include <cstdio> /* snprintf */
 #include <cstdlib> /* strtol */
 
+#ifndef __STRICT_ANSI__
 #define __STRICT_ANSI__
+#endif /* #ifndef __STRICT_ANSI__ */
 #include <oci.h>
 
 #include "hcore/memory.hxx"

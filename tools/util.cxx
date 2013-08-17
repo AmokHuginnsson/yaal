@@ -31,8 +31,8 @@ Copyright:
 #include <cstdarg>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "util.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/hpointer.hxx"

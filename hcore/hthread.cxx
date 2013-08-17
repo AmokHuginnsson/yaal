@@ -39,8 +39,8 @@ Copyright:
 #endif /* #elif ! defined( HAVE_PTHREAD_SETNAME_NP ) && defined( HAVE_PRCTL ) #if defined( HAVE_PTHREAD_SET_NAME_NP ) */
 
 #include "base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hthread.hxx"
 #include "hcore/memory.hxx"
 #include "hlog.hxx"

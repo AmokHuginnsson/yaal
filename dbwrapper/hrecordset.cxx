@@ -27,8 +27,8 @@ Copyright:
 #include <stdlib.h>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "hrecordset.hxx"
 #include "hdatabase.hxx"
 #include "db_driver_loader.hxx"

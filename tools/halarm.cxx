@@ -29,7 +29,7 @@ Copyright:
 #include <csignal>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "halarm.hxx"
 #include "hcore/numeric.hxx"
 

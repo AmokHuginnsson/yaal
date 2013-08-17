@@ -58,37 +58,10 @@ class HExecutingParser;
  */
 namespace executing_parser {
 
-class HRuleBase;
-
-class HGrammarDescription {
-public:
-	typedef HGrammarDescription this_type;
-private:
-	typedef yaal::hcore::HArray<yaal::hcore::HString> rules_t;
-	typedef yaal::hcore::HSet<HRuleBase const*> visited_t;
-	typedef yaal::hcore::HMap<yaal::hcore::HString, HRuleBase const*> named_rules_t;
-	typedef yaal::hcore::HQueue<HRuleBase const*> rule_order_t;
-	rules_t _rules;
-	visited_t _visited;
-	named_rules_t _namedRules;
-	rule_order_t _ruleOrder;
-public:
-	typedef rules_t::const_iterator const_iterator;
-	HGrammarDescription( void );
-	const_iterator begin( void ) const;
-	const_iterator end( void ) const;
-	bool is_empty( void ) const;
-private:
-	void clear( void );
-	void add( yaal::hcore::HString const& );
-	void visiting( HRuleBase const* );
-	bool visited( HRuleBase const* ) const;
-	friend class HRuleBase;
-	friend class HRecursiveRule;
-};
+class HGrammarDescription;
 
 class HRuleBase {
-protected:
+public:
 	typedef yaal::hcore::HPointer<HRuleBase> ptr_t;
 	struct HNamedRule {
 		yaal::hcore::HString _name;
@@ -113,6 +86,7 @@ protected:
 			{ return ( _rule.get() ); }
 	};
 	typedef yaal::hcore::HBoundCall<> action_t;
+protected:
 	action_t _action;
 public:
 	typedef HRuleBase this_type;
@@ -133,6 +107,34 @@ protected:
 	friend class yaal::tools::HExecutingParser;
 private:
 	HRuleBase& operator = ( HRuleBase const& );
+};
+
+class HGrammarDescription {
+public:
+	typedef HGrammarDescription this_type;
+private:
+	typedef yaal::hcore::HArray<yaal::hcore::HString> rules_t;
+	typedef yaal::hcore::HSet<HRuleBase const*> visited_t;
+	typedef yaal::hcore::HMap<yaal::hcore::HString, HRuleBase const*> named_rules_t;
+	typedef yaal::hcore::HQueue<HRuleBase::HNamedRule const*> rule_order_t;
+	rules_t _rules;
+	visited_t _visited;
+	named_rules_t _namedRules;
+	rule_order_t _ruleOrder;
+public:
+	typedef rules_t::const_iterator const_iterator;
+	HGrammarDescription( void );
+	const_iterator begin( void ) const;
+	const_iterator end( void ) const;
+	bool is_empty( void ) const;
+private:
+	void clear( void );
+	void add( yaal::hcore::HString const& );
+	void visiting( HRuleBase const* );
+	bool visited( HRuleBase const* ) const;
+	friend class HRuleBase;
+	friend class HRecursiveRule;
+	friend class HFollows;
 };
 
 typedef yaal::hcore::HExceptionT<HRuleBase> HRuleBaseException;

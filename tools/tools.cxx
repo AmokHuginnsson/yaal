@@ -30,8 +30,8 @@ Copyright:
 #include <libintl.h> /* gettext */
 
 #include "hcore/base.hxx" /* M_PROLOG, M_EPILOG */
-M_VCSID( "$Id: "__ID__" $" )
-M_VCSID( "$Id: "__TID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "tools.hxx"
 #include "hcore/hcore.hxx"
 #include "hcore/hprogramoptionshandler.hxx"    /* read conf from rc */

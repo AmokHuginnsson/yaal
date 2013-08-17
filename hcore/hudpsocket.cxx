@@ -30,7 +30,7 @@ Copyright:
 #include <netinet/in.h>
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "hudpsocket.hxx"
 
 namespace yaal {

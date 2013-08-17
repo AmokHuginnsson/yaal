@@ -42,7 +42,7 @@ Copyright:
 #endif /* #ifdef HAVE_TTY_H */
 
 #include "hcore/base.hxx"
-M_VCSID( "$Id: "__ID__" $" )
+M_VCSID( "$Id: " __ID__ " $" )
 #include "hterminal.hxx"
 #include "hconsole.hxx"
 #include "hcore/hfile.hxx"
