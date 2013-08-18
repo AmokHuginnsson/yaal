@@ -3,6 +3,15 @@ include _aux/mk/0_sanity.mk
 COMMA=,
 include _aux/mk/2_term.mk
 
+ifneq ($(CXX_STANDARD),)
+ifneq ($(CXX_STANDARD),2011)
+$(error "Bad value for CXX_STANDARD flag!")
+else
+override CXX_STANDARD=--enable-C++11
+endif
+unexport CXX_STANDARD
+endif
+
 define PREPARE_MAIN_TARGET
 $(1): build/$(1)/Makefile.mk build/$(1)/config.hxx $$(if $$(wildcard yaalrc.in),build/$(1)/yaalrc build/$(1)/yaal.pc)
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
@@ -30,9 +39,9 @@ build/%/$(1): configure $(1).in
 		mkdir -p $$(DIR) && cd $$(DIR) && \
 		if test -t 1 -a "x$${VERBOSE}" != "xyes" ; then \
 			/bin/rm -f $$(notdir $$(@)) && \
-			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) $$(if $$(LIBDIR),--libdir=$$(LIBDIR)) $$(CONFIGURE) | tee -a make.log | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
+			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) $$(if $$(LIBDIR),--libdir=$$(LIBDIR)) $$(CXX_STANDARD) $$(CONFIGURE) | tee -a make.log | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
 		else \
-			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) $$(if $$(LIBDIR),--libdir=$$(LIBDIR)) $$(CONFIGURE) | tee -a make.log ; \
+			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) $$(if $$(LIBDIR),--libdir=$$(LIBDIR)) $$(CXX_STANDARD) $$(CONFIGURE) | tee -a make.log ; \
 		fi ; test -f $$(notdir $$(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc yaal.pc ; true)
 endef
 
@@ -49,7 +58,7 @@ CONF_cov=--enable-coverage
 DS=d
 FIND=find
 
-.PHONY: all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov debug dep distclean doc install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prof purge static stats tags uninstall
+.PHONY: all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov debug dep distclean doc help install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prof purge static stats tags uninstall
 .NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc build/%/yaal.pc configure config.hxx.in
 
 default: $(.DEFAULT_GOAL)
@@ -87,6 +96,24 @@ distclean purge: mrproper-all
 
 clean-dep:
 	@$(call invoke,$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f)
+
+help:
+	@echo "make [FLAGS...] TARGETS...\n" \
+		"FLAGS:\n" \
+		"VERBOSE=yes       - enable verbose output of build process\n" \
+		"CXX_STANDARD=2011 - enable C++11 version of C++ stanrard\n" \
+		"\n" \
+		"TARGETS:\n" \
+		"all               - build all targets\n" \
+		"bin               - build only binaries\n" \
+		"check             - run checks for built target\n" \
+		"clean             - clean build artifatcs for default target\n" \
+		"clean-all         - clean build artifatcs for all targets\n" \
+		"clean-cov         - clean build artifatcs for coverage target\n" \
+		"clean-debug       - clean build artifatcs for debug target\n" \
+		"clean-prof        - clean build artifatcs for profiling target\n" \
+		""
+# all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov debug dep distclean doc help install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prof purge static stats tags uninstall
 
 .my_make:
 	@./_aux/guess_make

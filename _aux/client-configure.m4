@@ -4,6 +4,7 @@ m4_include([_aux/aclib.m4])
 PRIVILEGES_SANITY
 
 DO_TARGET="RELEASE"
+AC_ARG_ENABLE([C++11],[AC_HELP_STRING([--enable-C++11],[Enable use of C++11 version of the C++ standard.])],[CXX_2011=$enableval])
 AC_ARG_ENABLE([debug],[AC_HELP_STRING([--enable-debug],[Compile with debugging symbols.])],[DO_TARGET="DEBUG" LIB_INFIX="-d"])
 AC_ARG_ENABLE([release],[AC_HELP_STRING([--enable-release],[Compile with full optimizations on (this is the default).])],[DO_TARGET="RELEASE" LIB_INFIX=""])
 AC_ARG_ENABLE([reldeb],[AC_HELP_STRING([--enable-reldeb],[Compile with full optimizations but include debugging information.])],[DO_TARGET="RELDEB" LIB_INFIX="-rd"])
@@ -60,6 +61,8 @@ AC_PROG_MKDIR_P
 AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
 
 YAAL_CHECK_COMPILER_VERSION
+
+YAAL_CXX_STANDARD_CHECK
 
 YAAL_DETECT_COMMON_FLAGS
 

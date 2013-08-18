@@ -11,6 +11,7 @@ AC_DEFUN([PRIVILEGES_SANITY], [
 	fi
 ])
 
+
 dnl YAAL_DETECT_FLAGS(RESULT, FLAGSET)
 dnl Detect if the compiler supports a set of flags
 dnl --------------------------------------------------------------------------
@@ -46,6 +47,23 @@ AC_DEFUN([YAAL_DETECT_FLAGS], [
 	AC_LANG_POP(ifelse( "x$3", "xC++", $3, C ))
 ])
 
+dnl Handle user choice regarding C++ standard.
+dnl --------------------------------------------------------------------------
+AC_DEFUN([YAAL_CXX_STANDARD_CHECK], [
+	CXX_STANDARD_NO=2003
+	if test ["x$CXX_2011"] = ["xyes"] ; then
+		YAAL_DETECT_FLAGS(CXX_STANDARD, [-std=c++11], [C++])
+		if test ["x$CXX_STANDARD"] != ["x"] ; then
+			AC_SUBST( [CXX_STANDARD], ["c++11"] )
+			CXX_STANDARD_NO=2011
+		else
+			AC_MSG_ERROR([Requested C++ Standard version is not available in this environment!])
+		fi
+	else
+		AC_SUBST( [CXX_STANDARD], ["gnu++98"] )
+	fi
+	AC_DEFINE_UNQUOTED([CXX_STANDARD], $CXX_STANDARD_NO, [Version of C++ standard used.])
+])
 
 dnl Checks for which function macros exist
 dnl --------------------------------------------------------------------------
