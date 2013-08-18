@@ -177,6 +177,7 @@ if ( HAVE_NCURSES_CURSES_H )
 else ( HAVE_NCURSES_CURSES_H )
 	set( CURSES_PATH "curses.h" )
 endif ( HAVE_NCURSES_CURSES_H )
+check_cxx_source_compiles( "int main( int, char const* const* const ) { int a = 0; typedef __decltype( a ) a_t; a_t b; return ( 0 ); }" HAVE_DECLTYPE )
 check_cxx_source_compiles( "int main( int, char** ) { char const* const p( __PRETTY_FUNCTION__ ); return ( 0 ); }" HAVE_PRETTY_FUNCTION )
 if ( NOT HAVE_PRETTY_FUNCTION )
 	check_cxx_source_compiles( "int main( int, char** ) { char const* const p( __FUNCTION__ ); return ( 0 ); }" HAVE_FUNCTION )
@@ -191,56 +192,50 @@ check_cxx_source_compiles( "#include <cmath>
 check_cxx_source_compiles( "#include <cmath>
 	int main( int, char** ) { ::floorl( 0. ); return ( 0 ); }" HAVE_DECL_FLOORL )
 check_cxx_source_compiles( "#include <netdb.h>
-int main( int, char const* const* const )
-	{
+int main( int, char const* const* const ) {
 	int i( 0 );
 	char* p( 0 );
 	struct hostent h, * ph( 0 );
 	::gethostbyname_r( \"\", &h, p, 0, &ph, &i );
 	return ( 0 );
-	}" HAVE_GNU_GETHOSTBYNAME_R )
+}" HAVE_GNU_GETHOSTBYNAME_R )
 check_cxx_source_compiles( "#include <netdb.h>
-int main( int, char const* const* const )
-	{
+int main( int, char const* const* const ) {
 	int i( 0 );
 	char* p( 0 );
 	struct hostent h, * ph( 0 );
 	::gethostbyaddr_r( 0, 0, 0, &h, p, 0, &ph, &i );
 	return ( 0 );
-	}" HAVE_GNU_GETHOSTBYADDR_R )
+}" HAVE_GNU_GETHOSTBYADDR_R )
 check_cxx_source_compiles( "#include <cstring>
-int main( int, char** )
-	{
+int main( int, char** ) {
 	char* p( NULL );
 	basename( p );
 	return ( 0 );
-	}" HAVE_BASENAME_IN_CSTRING )
+}" HAVE_BASENAME_IN_CSTRING )
 check_cxx_source_compiles( "#include<cstring>
-int main( int, char const* const* const )
-	{
+int main( int, char const* const* const ) {
 	char const* const p( NULL );
 	basename( p );
 	return ( 0 );
-	}" HAVE_BASENAME_ARG_CONST )
+}" HAVE_BASENAME_ARG_CONST )
 check_cxx_source_compiles( "#include <ctime>
-int main( int, char const* const* const )
-	{
+int main( int, char const* const* const ) {
 	time_t t( time( NULL ) );
 	struct tm broken;
 	localtime_r( &t, &broken );
 	int size( strftime( NULL, 1024, \"%F %T\", &broken ) );
 	return ( ! size );
-	}" HAVE_SMART_STRFTIME )
+}" HAVE_SMART_STRFTIME )
 check_cxx_source_compiles( "#include <iconv.h>
-int main( int, char const* const* const )
-	{
+int main( int, char const* const* const ) {
 	iconv_t conv( 0 );
 	size_t size( 0 );
 	char const* in( NULL );
 	char* out( NULL );
 	iconv( conv, &in, &size, &out, &size );
 	return ( 0 );
-	}" HAVE_ICONV_INPUT_CONST )
+}" HAVE_ICONV_INPUT_CONST )
 if ( CMAKE_HOST_WIN32 )
 	set( NCURSES_ATTR_GET_SECOND_ARG_TYPE_int_short 1 )
 else ( CMAKE_HOST_WIN32 )

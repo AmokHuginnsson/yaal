@@ -24,6 +24,7 @@
 #define SIZEOF_DOUBLE @SIZEOF_DOUBLE@
 #define SIZEOF_DOUBLE_LONG @SIZEOF_DOUBLE_LONG@
 #define __PHYSICAL_MEMORY__ ( @PHYS_MEM@ - 1 + 1 )
+#cmakedefine HAVE_DECLTYPE
 #cmakedefine HAVE_PRETTY_FUNCTION
 #cmakedefine HAVE_FUNCTION
 #cmakedefine HAVE_FUNC
