@@ -56,7 +56,7 @@ GITID   = @GITID@
 RANLIB  = @RANLIB@
 INSTALL = @INSTALL@
 MKDIR_P = @MKDIR_P@
-CXX_STANDARD=@CXX_STANDARD@
+override CXX_STANDARD=@CXX_STANDARD@
 include $(DIR_ROOT)/_aux/mk/1_basic.mk
 include $(DIR_ROOT)/_aux/mk/2_term.mk
 include $(DIR_ROOT)/_aux/mk/3_suffix.mk

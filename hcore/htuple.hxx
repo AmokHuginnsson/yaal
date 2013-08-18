@@ -504,13 +504,13 @@ public:
 	friend struct tuple_helper::getter;
 };
 
-#if __cplusplus >= 201103L
+#if CXX_STANDARD >= 2011
 
 template<typename... T>
 HTuple<T...> make_tuple( T... e_ )
 	{ return ( HTuple<T...>( e_... ) ); }
 
-#else /* #if __cplusplus >= 201103L */
+#else /* #if CXX_STANDARD >= 2011 */
 
 template<typename T0>
 HTuple<T0> make_tuple( T0 const& e0_ )
@@ -574,7 +574,7 @@ HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> make_tuple( T0 const& e0_, T
 		T7 const& e7_, T8 const& e8_, T9 const& e9_, T10 const& e10_, T11 const& e11_ )
 	{ return ( HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>( e0_, e1_, e2_, e3_, e4_, e5_, e6_, e7_, e8_, e9_, e10_, e11_ ) ); }
 
-#endif /* #else #if __cplusplus >= 201103L */
+#endif /* #else #if CXX_STANDARD >= 2011 */
 
 }
 
