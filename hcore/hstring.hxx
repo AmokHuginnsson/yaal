@@ -29,6 +29,7 @@ Copyright:
 
 #include <cstddef>
 
+#include "config.hxx"
 #include "hcore/macro.hxx"
 #include "hcore/numeric.hxx"
 #include "hcore/assert.hxx"
@@ -106,6 +107,13 @@ public:
 	 * \param str - construct new string based on \e str.
 	 */
 	HString( HString const& str );
+#if CXX_STANDARD >= 2011
+	/*! \brief Move constructor.
+	 *
+	 * \param str - construct new string based on \e str.
+	 */
+	HString( HString&& str );
+#endif /* #if CXX_STANDARD >= 2011 */
 	/*! \brief Size based constructor.
 	 *
 	 * initialize immediately with size

@@ -144,6 +144,14 @@ HString::HString( HString const& string_ )
 	M_EPILOG
 }
 
+#if CXX_STANDARD >= 2011
+HString::HString( HString&& string_ )
+	: _mem() {
+	::memcpy( _mem, string_._mem, INPLACE_BUFFER_SIZE );
+	::memset( string_._mem, 0, INPLACE_BUFFER_SIZE );
+}
+#endif /* #if CXX_STANDARD >= 2011 */
+
 HString::HString( int long preallocate_, char fill_ )
 	: _mem() {
 	M_PROLOG
