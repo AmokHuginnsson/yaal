@@ -218,6 +218,13 @@ public:
 	 */
 	HString( void const* const pointer );
 	HString& operator = ( HString const& );
+#if CXX_STANDARD >= 2011
+	/*! \brief Move assignemnt operator.
+	 *
+	 * Move "value" of a string to another string.
+	 */
+	HString& operator = ( HString&& str );
+#endif /* #if CXX_STANDARD >= 2011 */
 	/*! \brief Append another string to this string.
 	 *
 	 * \param str - string to append to this string.
