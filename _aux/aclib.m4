@@ -56,6 +56,7 @@ AC_DEFUN([YAAL_CXX_STANDARD_CHECK], [
 		if test ["x$CXX_STANDARD"] != ["x"] ; then
 			AC_SUBST( [CXX_STANDARD], ["c++11"] )
 			CXX_STANDARD_NO=2011
+			CXXFLAGS=["$CXXFLAGS -std=c++11"]
 		else
 			AC_MSG_ERROR([Requested C++ Standard version is not available in this environment!])
 		fi

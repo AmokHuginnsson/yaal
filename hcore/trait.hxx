@@ -186,7 +186,7 @@ struct find_type {
  * \tparam t0_t, t1_t, ..., t9_t - list of types.
  * \retval type - type from list at given index.
  */
-template<int const index, typename t0_t, typename t1_t = no_type,
+template<int const index, typename t0_t = no_type, typename t1_t = no_type,
 	typename t2_t = no_type, typename t3_t = no_type,
 	typename t4_t = no_type, typename t5_t = no_type,
 	typename t6_t = no_type, typename t7_t = no_type,
@@ -584,6 +584,20 @@ struct is_member
 	{ static bool const value = false; };
 
 /*! \cond */
+#if CXX_STANDARD >= 2011
+template<typename return_t, typename class_t, typename... A>
+struct is_member<return_t ( class_t::* )( A... )>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename... A>
+struct is_member<return_t ( class_t::* )( A... ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename... A>
+struct is_member<return_t ( class_t::* )( A... ) volatile>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename... A>
+struct is_member<return_t ( class_t::* )( A... ) const volatile>
+	{ static bool const value = true; };
+#else /* #if CXX_STANDARD >= 2011 */
 template<typename return_t, typename class_t>
 struct is_member<return_t ( class_t::* )( void )>
 	{ static bool const value = true; };
@@ -774,6 +788,7 @@ template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
 struct is_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const volatile>
 	{ static bool const value = true; };
+#endif /* #else #if CXX_STANDARD >= 2011 */
 
 /*! \brief Check if given type is a const member type.
  *
@@ -785,6 +800,14 @@ struct is_member_const
 	{ static bool const value = false; };
 
 /*! \cond */
+#if CXX_STANDARD >= 2011
+template<typename return_t, typename class_t, typename... A>
+struct is_member_const<return_t ( class_t::* )( A... ) const>
+	{ static bool const value = true; };
+template<typename return_t, typename class_t, typename... A>
+struct is_member_const<return_t ( class_t::* )( A... ) const volatile>
+	{ static bool const value = true; };
+#else /* #if CXX_STANDARD >= 2011 */
 template<typename return_t, typename class_t>
 struct is_member_const<return_t ( class_t::* )( void ) const>
 	{ static bool const value = true; };
@@ -880,6 +903,7 @@ template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
 struct is_member_const<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const>
 	{ static bool const value = true; };
+#endif /* #else #if CXX_STANDARD >= 2011 */
 
 namespace generic_helper {
 
@@ -887,6 +911,26 @@ template<typename T>
 struct return_type
 	{ typedef no_type type; };
 
+#if CXX_STANDARD >= 2011
+template<typename return_t, typename class_t, typename... A>
+struct return_type<return_t ( class_t::* )( A... )>
+	{ typedef return_t type; };
+template<typename return_t, typename class_t, typename... A>
+struct return_type<return_t ( class_t::* )( A... ) const>
+	{ typedef return_t type; };
+template<typename return_t, typename class_t, typename... A>
+struct return_type<return_t ( class_t::* )( A... ) volatile>
+	{ typedef return_t type; };
+template<typename return_t, typename class_t, typename... A>
+struct return_type<return_t ( class_t::* )( A... ) const volatile>
+	{ typedef return_t type; };
+template<typename return_t, typename... A>
+struct return_type<return_t ( * )( A... )>
+	{ typedef return_t type; };
+template<typename return_t, typename... A>
+struct return_type<return_t ( A... )>
+	{ typedef return_t type; };
+#else /* #if CXX_STANDARD >= 2011 */
 template<typename return_t, typename class_t>
 struct return_type<return_t ( class_t::* )( void )>
 	{ typedef return_t type; };
@@ -1167,11 +1211,32 @@ template<typename return_t, typename a0_t, typename a1_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
 struct return_type<return_t ( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
 	{ typedef return_t type; };
+#endif /* #else #if CXX_STANDARD >= 2011 */
 
 template<typename T>
 struct argument_type
 	{ template<int const> struct index { typedef no_type type; }; };
 
+#if CXX_STANDARD >= 2011
+template<typename return_t, typename class_t, typename... A>
+struct argument_type<return_t ( class_t::* )( A... )>
+	{ template<int const no> struct index { typedef typename select_index<no, A...>::type type; }; };
+template<typename return_t, typename class_t, typename... A>
+struct argument_type<return_t ( class_t::* )( A... ) const>
+	{ template<int const no> struct index { typedef typename select_index<no, A...>::type type; }; };
+template<typename return_t, typename class_t, typename... A>
+struct argument_type<return_t ( class_t::* )( A... ) volatile>
+	{ template<int const no> struct index { typedef typename select_index<no, A...>::type type; }; };
+template<typename return_t, typename class_t, typename... A>
+struct argument_type<return_t ( class_t::* )( A... ) const volatile>
+	{ template<int const no> struct index { typedef typename select_index<no, A...>::type type; }; };
+template<typename return_t, typename... A>
+struct argument_type<return_t ( * )( A... )>
+	{ template<int const no> struct index { typedef typename select_index<no, A...>::type type; }; };
+template<typename return_t, typename... A>
+struct argument_type<return_t ( A... )>
+	{ template<int const no> struct index { typedef typename select_index<no, A...>::type type; }; };
+#else /* #if CXX_STANDARD >= 2011 */
 template<typename return_t, typename class_t>
 struct argument_type<return_t ( class_t::* )( void )>
 	{ template<int const> struct index { typedef no_type type; }; };
@@ -1423,6 +1488,7 @@ template<typename return_t, typename a0_t, typename a1_t, typename a2_t, typenam
 	typename a7_t, typename a8_t, typename a9_t, typename a10_t>
 struct argument_type<return_t ( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t )>
 	{ template<int const no> struct index { typedef typename select_index<no, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type type; }; };
+#endif /* #else #if CXX_STANDARD >= 2011 */
 
 }
 
@@ -1662,6 +1728,20 @@ template<typename T>
 struct class_type_from_field;
 
 /*! \cond */
+#if CXX_STANDARD >= 2011
+template<typename return_t, typename class_t, typename... A>
+struct class_type_from_member<return_t ( class_t::* )( A... )>
+	{ typedef class_t type; };
+template<typename return_t, typename class_t, typename... A>
+struct class_type_from_member<return_t ( class_t::* )( A... ) const>
+	{ typedef class_t type; };
+template<typename return_t, typename class_t, typename... A>
+struct class_type_from_member<return_t ( class_t::* )( A... ) volatile>
+	{ typedef class_t type; };
+template<typename return_t, typename class_t, typename... A>
+struct class_type_from_member<return_t ( class_t::* )( A... ) const volatile>
+	{ typedef class_t type; };
+#else /* #if CXX_STANDARD >= 2011 */
 template<typename return_t, typename class_t>
 struct class_type_from_member<return_t ( class_t::* )( void )>
 	{ typedef class_t type; };
@@ -1852,6 +1932,7 @@ template<typename return_t, typename class_t, typename a0_t, typename a1_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
 struct class_type_from_member<return_t ( class_t::* )( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const volatile>
 	{ typedef class_t type; };
+#endif /* #else #if CXX_STANDARD >= 2011 */
 
 template<typename class_t, typename field_t>
 struct class_type_from_field<field_t class_t::*>
@@ -1909,6 +1990,26 @@ template<typename field_t>
 struct argument_count
 	{ static int const value = 0; };
 
+#if CXX_STANDARD >= 2011
+template<typename return_t, typename class_t, typename... A>
+struct argument_count<return_t ( class_t::* )( A... )>
+	{ static int const value = sizeof... ( A ); };
+template<typename return_t, typename class_t, typename... A>
+struct argument_count<return_t ( class_t::* )( A... ) const>
+	{ static int const value = sizeof... ( A ); };
+template<typename return_t, typename class_t, typename... A>
+struct argument_count<return_t ( class_t::* )( A... ) volatile>
+	{ static int const value = sizeof... ( A ); };
+template<typename return_t, typename class_t, typename... A>
+struct argument_count<return_t ( class_t::* )( A... ) const volatile>
+	{ static int const value = sizeof... ( A ); };
+template<typename return_t, typename... A>
+struct argument_count<return_t ( * )( A... )>
+	{ static int const value = sizeof... ( A ); };
+template<typename return_t, typename... A>
+struct argument_count<return_t ( A... )>
+	{ static int const value = sizeof... ( A ); };
+#else /* #if CXX_STANDARD >= 2011 */
 template<typename return_t, typename class_t>
 struct argument_count<return_t ( class_t::* )( void )>
 	{ static int const value = 0; };
@@ -2189,6 +2290,7 @@ template<typename return_t, typename a0_t, typename a1_t,
 	typename a6_t, typename a7_t, typename a8_t, typename a9_t>
 struct argument_count<return_t ( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t )>
 	{ static int const value = 10; };
+#endif /* #else #if CXX_STANDARD >= 2011 */
 /*! \endcond */
 
 }
