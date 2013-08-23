@@ -208,6 +208,17 @@ public:
 		M_EPILOG
 	}
 
+#if CXX_STANDARD >= 2011
+	HList( HList&& list_ )
+		: OListBits(), _allocator(),
+		_size( 0 ), _hook( NULL ) {
+			M_PROLOG
+			swap( list_ );
+			return;
+			M_EPILOG
+		}
+#endif /* #if CXX_STANDARD >= 2011 */
+
 	HList( HList const& list_, allocator_type const& allocator_ )
 		: OListBits(), _allocator( allocator_ ),
 		_size( 0 ), _hook( NULL ) {
@@ -258,7 +269,7 @@ public:
 	}
 	HList& operator = ( HList const& list_ ) {
 		M_PROLOG
-		if ( this != & list_ ) {
+		if ( &list_ != this ) {
 			iterator thisIt = begin();
 			const_iterator otherIt = list_.begin();
 			int long ctr( 0 );
@@ -284,6 +295,17 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
+#if CXX_STANDARD >= 2011
+	HList& operator = ( HList&& list_ ) {
+		M_PROLOG
+		if ( &list_ != this ) {
+			swap( list_ );
+			list_.clear();
+		}
+		return ( *this );
+		M_EPILOG
+	}
+#endif /* #if CXX_STANDARD >= 2011 */
 	void swap( HList& other ) {
 		if ( &other != this ) {
 			using yaal::swap;

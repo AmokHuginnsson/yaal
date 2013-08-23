@@ -176,8 +176,14 @@ public:
 	HNumber( HString const& );
 	HNumber( HString const&, size_t );
 	HNumber( HNumber const& );
+#if CXX_STANDARD >= 2011
+	HNumber( HNumber&& );
+#endif /* #if CXX_STANDARD >= 2011 */
 	~HNumber( void );
 	HNumber& operator = ( HNumber const& );
+#if CXX_STANDARD >= 2011
+	HNumber& operator = ( HNumber&& );
+#endif /* #if CXX_STANDARD >= 2011 */
 	bool operator == ( HNumber const& ) const;
 	bool operator != ( HNumber const& ) const;
 	bool operator < ( HNumber const& ) const;

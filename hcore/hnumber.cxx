@@ -302,6 +302,19 @@ HNumber::HNumber( HNumber const& source )
 	M_EPILOG
 }
 
+#if CXX_STANDARD >= 2011
+HNumber::HNumber( HNumber&& number_ )
+	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
+	M_PROLOG
+	swap( number_ );
+	return;
+	M_EPILOG
+}
+#endif /* #if CXX_STANDARD >= 2011 */
+
 HNumber& HNumber::operator = ( HNumber const& source ) {
 	M_PROLOG
 	if ( &source != this ) {
@@ -311,6 +324,21 @@ HNumber& HNumber::operator = ( HNumber const& source ) {
 	return ( *this );
 	M_EPILOG
 }
+
+#if CXX_STANDARD >= 2011
+HNumber& HNumber::operator = ( HNumber&& source ) {
+	M_PROLOG
+	if ( &source != this ) {
+		swap( source );
+		source._precision = ( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION ? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION );
+		source._leafCount = 0;
+		source._integralPartSize = 0;
+		source._negative = false;
+	}
+	return ( *this );
+	M_EPILOG
+}
+#endif /* #if CXX_STANDARD >= 2011 */
 
 void HNumber::swap( HNumber& other ) {
 	M_PROLOG

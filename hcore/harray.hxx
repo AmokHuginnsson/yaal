@@ -125,6 +125,15 @@ public:
 		return;
 		M_EPILOG
 	}
+#if CXX_STANDARD >= 2011
+	HArray( HArray&& arr_ )
+		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		M_PROLOG
+		swap( arr_ );
+		return;
+		M_EPILOG
+	}
+#endif /* #if CXX_STANDARD >= 2011 */
 	HArray( HArray const& arr_, allocator_t const& )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
@@ -173,6 +182,17 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
+#if CXX_STANDARD >= 2011
+	HArray& operator = ( HArray&& arr_ ) {
+		M_PROLOG
+		if ( &arr_ != this ) {
+			swap( arr_ );
+			arr_.clear();
+		}
+		return ( *this );
+		M_EPILOG
+	}
+#endif /* #if CXX_STANDARD >= 2011 */
 	void swap( HArray& other ) {
 		M_PROLOG
 		if ( &other != this ) {

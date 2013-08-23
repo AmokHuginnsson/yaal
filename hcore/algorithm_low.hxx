@@ -30,8 +30,37 @@ Copyright:
 #ifndef YAAL_HCORE_ALGORITHM_IMPL_HXX_INCLUDED
 #define YAAL_HCORE_ALGORITHM_IMPL_HXX_INCLUDED 1
 
+#if CXX_STANDARD >= 2011
+#include "hcore/trait.hxx"
+#endif /* #if CXX_STANDARD >= 2011 */
+
 namespace yaal {
 
+#if CXX_STANDARD >= 2011
+/*! \brief If possible force use of move constructor or move assignment operator on lvalues.
+ */
+template<typename tType>
+constexpr typename trait::strip_reference<tType>::type&& move( tType&& val_ ) {
+	return ( static_cast<typename trait::strip_reference<tType>::type&&>( val_ ) );
+}
+
+/*! \brief Swap contents of two variables.
+ *
+ * \param left - first variable to be swapped.
+ * \param right - second variable to be swapped.
+ *
+ * \post After the call left holds value of right from before call, and right holds value of left from before call.
+ */
+template<typename tType>
+inline void swap( tType& left, tType& right ) {
+	if ( &left != &right ) {
+		tType tmp( yaal::move( left ) );
+		left = yaal::move( right );
+		right = yaal::move( tmp );
+	}
+	return;
+}
+#else /* #if CXX_STANDARD >= 2011 */
 /*! \brief Swap contents of two variables.
  *
  * \param left - first variable to be swapped.
@@ -48,6 +77,7 @@ inline void swap( tType& left, tType& right ) {
 	}
 	return;
 }
+#endif /* #else #if CXX_STANDARD >= 2011 */
 
 /*! \brief Get smaller of two values.
  *

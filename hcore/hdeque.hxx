@@ -134,6 +134,16 @@ public:
 	HDeque( HDeque const& );
 	HDeque( HDeque const&, allocator_t const& );
 
+#if CXX_STANDARD >= 2011
+	HDeque( HDeque&& deque_ )
+		: _start( 0 ), _size( 0 ), _chunks() {
+		M_PROLOG
+		swap( deque_ );
+		return;
+		M_EPILOG
+	}
+#endif /* #if CXX_STANDARD >= 2011 */
+
 	HDeque& operator = ( HDeque const& deque_ ) {
 		M_PROLOG
 		if ( &deque_ != this ) {
@@ -143,6 +153,18 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
+
+#if CXX_STANDARD >= 2011
+	HDeque& operator = ( HDeque&& deque_ ) {
+		M_PROLOG
+		if ( &deque_ != this ) {
+			swap( deque_ );
+			deque_.clear();
+		}
+		return ( *this );
+		M_EPILOG
+	}
+#endif /* #if CXX_STANDARD >= 2011 */
 
 	void swap( HDeque& deque_ ) {
 		if ( &deque_ != this ) {
