@@ -905,10 +905,20 @@ inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& v
  * \param end - one past the end of first range.
  * \param second - begining of second range.
  */
+template<typename iterator_t>
+inline void swap_ranges( iterator_t first, iterator_t const& end, iterator_t second ) {
+	if ( first != second ) {
+		for ( ; first != end; ++ first, ++ second ) {
+			swap( *first, *second );
+		}
+	}
+	return;
+}
 template<typename first_it_t, typename second_it_t>
 inline void swap_ranges( first_it_t first, first_it_t const& end, second_it_t second ) {
-	for ( ; first != end; ++ first, ++ second )
-		swap( *first, *second ) ;
+	for ( ; first != end; ++ first, ++ second ) {
+		swap( *first, *second );
+	}
 	return;
 }
 

@@ -79,6 +79,17 @@ inline void swap( tType& left, tType& right ) {
 }
 #endif /* #else #if CXX_STANDARD >= 2011 */
 
+template<typename tType, int long unsigned SIZE>
+inline void swap( tType (&left)[SIZE], tType (&right)[SIZE] ) {
+	if ( left != right ) {
+		using yaal::swap;
+		for ( int long unsigned i( 0 ); i < SIZE; ++ i ) {
+			swap( left[i], right[i] );
+		}
+	}
+	return;
+}
+
 /*! \brief Get smaller of two values.
  *
  * \param left - first value to be considered as smaller.

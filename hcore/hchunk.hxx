@@ -60,6 +60,10 @@ public:
 	 * \param size - requested memory chunk size.
 	 */
 	explicit HChunk( int long size, STRATEGY::enum_t = STRATEGY::EXACT );
+#if CXX_STANDARD >= 2011
+	HChunk( HChunk&& );
+	HChunk& operator = ( HChunk&& );
+#endif /* #if CXX_STANDARD >= 2011 */
 	~HChunk( void );
 	template<typename tType>
 	tType const* get() const

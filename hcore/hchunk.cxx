@@ -50,6 +50,26 @@ HChunk::HChunk( int long size_, STRATEGY::enum_t strategy_ )
 	M_EPILOG
 }
 
+#if CXX_STANDARD >= 2011
+HChunk::HChunk( HChunk&& chunk_ )
+	: _size( 0 ), _data( NULL ) {
+	M_PROLOG
+	swap( chunk_ );
+	return;
+	M_EPILOG
+}
+
+HChunk& HChunk::operator = ( HChunk&& chunk_ ) {
+	M_PROLOG
+	if ( &chunk_ != this ) {
+		swap( chunk_ );
+		chunk_.free();
+	}
+	return ( *this );
+	M_EPILOG
+}
+#endif /* #if CXX_STANDARD >= 2011 */
+
 HChunk::~HChunk( void ) {
 	M_PROLOG
 	free();

@@ -27,43 +27,71 @@ Copyright:
 #ifndef YAAL_HCORE_HRANDOMIZER_HXX_INCLUDED
 #define YAAL_HCORE_HRANDOMIZER_HXX_INCLUDED 1
 
+#include "hcore/pod.hxx"
 #include "hcore/numeric.hxx"
 
 namespace yaal {
 
 namespace hcore {
 
-/*! \brief Pseudo=random number generator.
+/*! \brief Pseudo-random number generator.
  *
  * Congurent pseudo random number generator class.
  */
 class HRandomizer {
 public:
 	typedef HRandomizer this_type;
+	static int const STATE_SIZE = 312;
 private:
-	int long unsigned _seed;
-	int _range;
+	int _index;
+	u64_t _range;
+	u64_t _state[STATE_SIZE];
 public:
 /*! \brief Construct new randomizer.
  *
- * \param seed - initialize pseudo-random numebr generator with seed.
- * \param range - upper limit for generated numer.
+ * \param seed - initialize pseudo-random number generator with seed.
+ * \param range - upper limit for generated number.
  */
-	HRandomizer( int long unsigned const seed = 1, int range = meta::max_signed<int>::value );
+	HRandomizer( u64_t seed = 5489ull, u64_t range = meta::max_unsigned<u64_t>::value );
+
+/*! \brief Construct new randomizer.
+ *
+ * \param stateFirst_ - begining of pseudo-random number generator initial state range.
+ * \param stateLast_ - one past the end of pseudo-random number generator initial state range.
+ * \param range - upper limit for generated number.
+ */
+	HRandomizer( u64_t const* stateFirst_, u64_t const* stateLast_, u64_t range = meta::max_unsigned<u64_t>::value );
+
+/*! \brief Copy constructor.
+ */
+	HRandomizer( HRandomizer const& );
+
+/*! \brief Assignment operator.
+ */
+	HRandomizer& operator = ( HRandomizer const& );
+
+#if CXX_STANDARD >= 2011
+	HRandomizer( HRandomizer&& );
+	HRandomizer& operator = ( HRandomizer&& );
+#endif /* #if CXX_STANDARD >= 2011 */
 
 /*! \brief Generate next random number.
  *
- * \param range - upper limit for generated numer.
+ * \param range - upper limit for generated number.
  * \return next random number capped to explicit value.
  */
-	int operator()( int range );
+	u64_t operator()( u64_t range );
 
 /*! \brief Generate next random number.
  *
- * \param range - upper limit for generated numer.
+ * \param range - upper limit for generated number.
  * \return next random number capped to randomizer instance default value.
  */
-	int operator()( void );
+	u64_t operator()( void );
+	void swap( HRandomizer& );
+private:
+	void init( u64_t );
+	void init( u64_t const*, int );
 };
 
 /*! \brief Helper namespace for HRandomizer related utils.
@@ -74,7 +102,7 @@ namespace randomizer_helper {
  *
  * \param range - upper limit for generated numbers.
  */
-HRandomizer make_randomizer( int range = meta::max_signed<int>::value );
+HRandomizer make_randomizer( u64_t range = meta::max_unsigned<u64_t>::value );
 
 }
 
