@@ -202,6 +202,16 @@ public:
 	 * unsignedLongInteger - a long integer to initialize new string with.
 	 */
 	HString( int long unsigned unsignedLongInteger );
+	/*! \brief Construct new HString from long long integer.
+	 *
+	 * longLongInteger - a long long integer to initialize new string with.
+	 */
+	HString( int long long longLongInteger );
+	/*! \brief Construct new HString from unsigned long long integer.
+	 *
+	 * unsignedLongLongInteger - a long long integer to initialize new string with.
+	 */
+	HString( int long long unsigned unsignedLongLongInteger );
 	/*! \brief Construct new HString from double.
 	 *
 	 * real - a double to initialize new string with.

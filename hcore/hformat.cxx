@@ -451,6 +451,25 @@ HFormat HFormat::operator % ( int long unsigned ilu ) {
 	M_EPILOG
 }
 
+HFormat HFormat::operator % ( int long long ill ) {
+	M_PROLOG
+	M_ENSURE( ! _impl->_format.is_empty() );
+	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::INT ) | HFormatImpl::CONVERSION::LONG_LONG );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( ill ) ) );
+	return ( _impl );
+	M_EPILOG
+}
+
+HFormat HFormat::operator % ( int long long unsigned illu ) {
+	M_PROLOG
+	M_ENSURE( ! _impl->_format.is_empty() );
+	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::INT )
+			| HFormatImpl::conversion_t( HFormatImpl::CONVERSION::LONG_LONG ) | HFormatImpl::CONVERSION::UNSIGNED );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( illu ) ) );
+	return ( _impl );
+	M_EPILOG
+}
+
 HFormat HFormat::operator % ( double d ) {
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );

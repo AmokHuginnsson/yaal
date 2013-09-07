@@ -296,6 +296,17 @@ HString::HString( int int_ ) : _mem() {
 	M_EPILOG
 }
 
+HString::HString( int unsigned int_ ) : _mem() {
+	M_PROLOG
+/* cppcheck-suppress nullPointer */
+	int long newSize( ::snprintf( NULL, 0, "%u", int_ ) );
+	hs_realloc( newSize + 1 );
+	M_ENSURE( ::snprintf( MEM, newSize + 1, "%u", int_ ) == newSize );
+	SET_SIZE( newSize );
+	return;
+	M_EPILOG
+}
+
 HString::HString( int long long_ ) : _mem() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
@@ -318,12 +329,23 @@ HString::HString( int long unsigned long_ ) : _mem() {
 	M_EPILOG
 }
 
-HString::HString( int unsigned long_ ) : _mem() {
+HString::HString( int long long longLong_ ) : _mem() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
-	int long newSize( ::snprintf( NULL, 0, "%u", long_ ) );
+	int long newSize( ::snprintf( NULL, 0, "%lld", longLong_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "%u", long_ ) == newSize );
+	M_ENSURE( ::snprintf( MEM, newSize + 1, "%lld", longLong_ ) == newSize );
+	SET_SIZE( newSize );
+	return;
+	M_EPILOG
+}
+
+HString::HString( int long long unsigned longLong_ ) : _mem() {
+	M_PROLOG
+/* cppcheck-suppress nullPointer */
+	int long newSize( ::snprintf( NULL, 0, "%llu", longLong_ ) );
+	hs_realloc( newSize + 1 );
+	M_ENSURE( ::snprintf( MEM, newSize + 1, "%llu", longLong_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG

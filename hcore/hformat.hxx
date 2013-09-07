@@ -58,6 +58,8 @@ public:
 	HFormat operator % ( int unsigned );
 	HFormat operator % ( int long );
 	HFormat operator % ( int long unsigned );
+	HFormat operator % ( int long long );
+	HFormat operator % ( int long long unsigned );
 	HFormat operator % ( float );
 	HFormat operator % ( double );
 	HFormat operator % ( double long );

@@ -48,34 +48,34 @@ class HSimpleRandom {
 public:
 	typedef HSimpleRandom this_type;
 private:
-	int long unsigned _z;
-	int long unsigned _w;
-	int long unsigned _jsr;
-	int long unsigned _jcong;
+	u32_t _z;
+	u32_t _w;
+	u32_t _jsr;
+	u32_t _jcong;
 public:
-	HSimpleRandom( int long unsigned seed_ )
+	HSimpleRandom( u32_t seed_ )
 		: _z( seed_ ^ 362436069 ), _w( seed_ ^ 521288629 ), _jsr( seed_ ^ 123456789 ), _jcong( seed_ ^ 380116160 )
 		{}
-	int long unsigned operator()( void ) {
+	u32_t operator()( void ) {
 		return ( ( mwc() ^ cong() ) + shr3() );
 	}
 private:
-	int long unsigned cong( void ) {
+	u32_t cong( void ) {
 		return ( _jcong = 69069 * _jcong + 1234567 );
 	}
-	int long unsigned shr3( void ) {
+	u32_t shr3( void ) {
 		_jsr ^= ( _jsr >> 13 );
 		_jsr ^= ( _jsr << 17 );
 		_jsr ^= ( _jsr << 5 );
 		return ( _jsr );
 	}
-	int long unsigned znew( void ) {
+	u32_t znew( void ) {
 		return ( _z = 36969 * ( _z & 65535 ) + ( _z >> 16 ) );
 	}
-	int long unsigned wnew( void ) {
+	u32_t wnew( void ) {
 		return ( _w = 18000 * ( _w & 65535 ) + ( _w >> 16 ) );
 	}
-	int long unsigned mwc( void ) {
+	u32_t mwc( void ) {
 		return ( ( znew() << 16 ) + wnew() );
 	}
 };
@@ -83,7 +83,7 @@ private:
 HRandomizer::HRandomizer( u64_t seed_, u64_t cap_ )
 	: _index( STATE_SIZE + 1 ), _range( cap_ ), _state() {
 	M_PROLOG
-	HSimpleRandom sr( seed_ );
+	HSimpleRandom sr( static_cast<u32_t>( ( seed_ >> 32 ) ^ seed_ ) );
 	u64_t state[STATE_SIZE];
 	for ( int i( 0 ); i < STATE_SIZE; ++ i ) {
 		u64_t hi( sr() );
