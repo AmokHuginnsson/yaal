@@ -1921,10 +1921,13 @@ inline iterator_t unique_copy( iterator_t first_, iterator_t last_, iter_out_t d
 		*dest_ = *first_;
 		++ first_;
 		for ( ; first_ != last_; ++ first_ ) {
-			while ( comp_( *first_, *dest_ ) && ( first_ != last_ ) )
+			while ( ( first_ != last_ ) && comp_( *first_, *dest_ ) )
 				++ first_;
-			++ dest_;
-			*dest_ = *first_;
+			if ( first_ != last_ ) {
+				++ dest_;
+				*dest_ = *first_;
+			} else
+				break;
 		}
 		++ dest_;
 	}
