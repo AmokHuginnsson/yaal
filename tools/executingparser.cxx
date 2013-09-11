@@ -233,7 +233,7 @@ void HRule::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
 	if ( !! _rule ) {
 		cout << _name << " = ";
-		_rule->describe( gd_ );
+		gd_.describe( *_rule );
 		cout << endl;
 	}
 	return;
@@ -271,10 +271,8 @@ bool HRecursiveRule::do_is_optional( void ) const {
 
 void HRecursiveRule::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
-	if ( !! _rule && ! gd_.visited( _rule.id() ) ) {
-		gd_.visiting( _rule.id() );
-		_rule->describe( gd_ );
-	}
+	if ( !! _rule )
+		gd_.describe( *_rule.id() );
 	return;
 	M_EPILOG
 }
@@ -332,15 +330,16 @@ void HFollows::do_describe( HGrammarDescription& gd_ ) const {
 			cout << " >> ";
 		if ( ! it->_name.is_empty() ) {
 			gd_._ruleOrder.push( &*it );
+			cout << it->_name;
 		} else
-			(*it)->describe( gd_ );
+			gd_.describe( *it->id() );
 		next = true;
 	}
 	while ( ! gd_._ruleOrder.is_empty() ) {
 		HNamedRule const* nr( gd_._ruleOrder.front() );
 		gd_._ruleOrder.pop();
 		cout << endl << nr->_name << " = ";
-		nr->_rule->describe( gd_ );
+		gd_.describe( *nr->_rule );
 	}
 	return;
 	M_EPILOG
@@ -406,7 +405,7 @@ yaal::hcore::HString::const_iterator HKleeneStar::do_parse( HExecutingParser* ex
 void HKleeneStar::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
 	cout << "*(";
-	_rule->describe( gd_ );
+	gd_.describe( *_rule.id() );
 	cout << ")";
 	return;
 	M_EPILOG
@@ -452,7 +451,7 @@ yaal::hcore::HString::const_iterator HKleenePlus::do_parse( HExecutingParser* ex
 void HKleenePlus::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
 	cout << "+(";
-	_rule->describe( gd_ );
+	gd_.describe( *_rule.id() );
 	cout << ")";
 	return;
 	M_EPILOG
@@ -502,7 +501,7 @@ void HAlternative::do_describe( HGrammarDescription& gd_ ) const {
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( next )
 			cout << " | ";
-		(*it)->describe( gd_ );
+		gd_.describe( *it->id() );
 		next = true;
 	}
 	return;
@@ -549,7 +548,7 @@ bool HOptional::do_is_optional( void ) const
 void HOptional::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
 	cout << "-(";
-	_rule->describe( gd_ );
+	gd_.describe( *_rule.id() );
 	cout << ")";
 	return;
 	M_EPILOG
@@ -1186,6 +1185,15 @@ void HGrammarDescription::visiting( HRuleBase const* rule_ ) {
 	M_PROLOG
 	_visited.insert( rule_ );
 	return;
+	M_EPILOG
+}
+
+void HGrammarDescription::describe( HRuleBase const& rule_ ) {
+	M_PROLOG
+	if ( ! visited( &rule_ ) ) {
+		visiting( &rule_ );
+		rule_.describe( *this );
+	}
 	M_EPILOG
 }
 

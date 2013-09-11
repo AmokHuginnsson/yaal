@@ -127,6 +127,7 @@ public:
 	const_iterator begin( void ) const;
 	const_iterator end( void ) const;
 	bool is_empty( void ) const;
+	void describe( HRuleBase const& );
 private:
 	void clear( void );
 	void add( yaal::hcore::HString const& );
