@@ -84,7 +84,7 @@ void HAbstractAsyncCaller::flush( void* invoker_ ) {
 	M_EPILOG
 }
 
-void* HAbstractAsyncCaller::run( void ) {
+void HAbstractAsyncCaller::run( void ) {
 	M_PROLOG
 	return ( do_work() );
 	M_EPILOG
@@ -111,7 +111,7 @@ void HAsyncCaller::do_signal( void ) {
 	M_EPILOG
 }
 
-void* HAsyncCaller::do_work( void ) {
+void HAsyncCaller::do_work( void ) {
 	M_PROLOG
 	HThread::set_name( "HAsyncCaller" );
 	while ( _loop ) {
@@ -123,7 +123,7 @@ void* HAsyncCaller::do_work( void ) {
 			_queue.erase( it );
 		}
 	}
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 

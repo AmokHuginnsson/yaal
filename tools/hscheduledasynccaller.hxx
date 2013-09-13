@@ -46,7 +46,7 @@ private:
 	yaal::hcore::HCondition _condition;
 	HScheduledAsyncCaller( void );
 	virtual ~HScheduledAsyncCaller( void );
-	virtual void* do_work( void );
+	virtual void do_work( void );
 	virtual void do_signal( void );
 	static int life_time( int );
 	friend class yaal::hcore::HSingleton<HScheduledAsyncCaller>;

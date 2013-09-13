@@ -122,7 +122,7 @@ void HWorkFlow::HWorker::finish( void ) {
 	M_EPILOG
 }
 
-void* HWorkFlow::HWorker::run( void ) {
+void HWorkFlow::HWorker::run( void ) {
 	M_PROLOG
 	HThread::set_name( "HWorkFlow" );
 	HWorkFlow::task_t t;
@@ -130,7 +130,7 @@ void* HWorkFlow::HWorker::run( void ) {
 		t();
 		t.reset();
 	}
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 

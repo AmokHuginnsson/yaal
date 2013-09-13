@@ -114,7 +114,7 @@ private:
 	HWorker( HWorkFlowInterface* );
 	void spawn( void );
 	void finish( void );
-	void* run( void );
+	void run( void );
 	HWorker( HWorker const& );
 	HWorker& operator = ( HWorker const& );
 	friend class HWorkFlow;

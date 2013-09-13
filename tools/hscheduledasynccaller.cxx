@@ -60,7 +60,7 @@ void HScheduledAsyncCaller::do_signal( void ) {
 	M_EPILOG
 }
 
-void* HScheduledAsyncCaller::do_work( void ) {
+void HScheduledAsyncCaller::do_work( void ) {
 	M_PROLOG
 	HLock l( _mutex );
 	HThread::set_name( "HScheduledAsyncCaller" );
@@ -77,7 +77,7 @@ void* HScheduledAsyncCaller::do_work( void ) {
 		} else
 			_condition.wait( 10000, 0 );
 	}
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 

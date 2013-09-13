@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
 #include "assert.hxx"
 #include "algorithm_low.hxx"
 #include "introspect.hxx"

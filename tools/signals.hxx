@@ -71,7 +71,7 @@ public:
 private:
 	HSignalService( void );
 	~HSignalService( void );
-	void* run( void );
+	void run( void );
 	void catch_signal( int );
 	void block_signal( int );
 	static int life_time( int );

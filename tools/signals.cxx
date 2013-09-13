@@ -184,7 +184,7 @@ void HSignalService::stop( void ) {
 	M_EPILOG
 }
 
-void* HSignalService::run( void ) {
+void HSignalService::run( void ) {
 	M_PROLOG
 	HThread::set_name( "HSignalService" );
 	while ( _loop && _thread.is_alive() ) {
@@ -193,7 +193,7 @@ void* HSignalService::run( void ) {
 		HLock lock( _mutex );
 		call_handler( sigNo );
 	}
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 

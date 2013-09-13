@@ -151,7 +151,7 @@ private:
 	mutable HMutex _mutex;
 	HSemaphore _semaphore;
 	HResource<void> _resGuard;
-	typedef HBoundCall<void* ()> call_t;
+	typedef HBoundCall<> call_t;
 	call_t _call;
 	OExceptionInfo _exceptionInfo;
 public:
@@ -166,7 +166,10 @@ public:
 	 *
 	 * \return Working thread low level exit status information.
 	 */
-	void* finish( void );
+	void finish( void );
+	/*! \brief An alias for finish() method.
+	 */
+	void join( void );
 	/*! \brief Signal working thread that it should finish.
 	 */
 	void schedule_finish( void );
@@ -196,7 +199,7 @@ public:
 private:
 	/*! \brief Pass control to user specified call in working thread.
 	 */
-	void* control( void );
+	void control( void );
 	/*! \brief Spawn working thread and execute HThead::control().
 	 */
 	static void* SPAWN( void* );

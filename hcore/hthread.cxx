@@ -120,7 +120,7 @@ void HThread::schedule_finish( void ) {
 	M_EPILOG
 }
 
-void* HThread::finish( void ) {
+void HThread::finish( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	if ( ( _status != ALIVE ) && ( _status != ZOMBIE ) && ( _status != SPAWNING ) )
@@ -134,7 +134,14 @@ void* HThread::finish( void ) {
 	_status = DEAD;
 	if ( _exceptionInfo._stacked )
 		throw HThreadException( _exceptionInfo._message, _exceptionInfo._code );
-	return ( returnValue );
+	return;
+	M_EPILOG
+}
+
+void HThread::join( void ) {
+	M_PROLOG
+	finish();
+	return;
 	M_EPILOG
 }
 
@@ -162,7 +169,7 @@ void* HThread::SPAWN( void* thread_ ) {
 	 * so we die via apropriate fatal signal.
 	 */
 	try {
-		return ( reinterpret_cast<HThread*>( thread_ )->control() );
+		reinterpret_cast<HThread*>( thread_ )->control();
 	} catch ( HException const& e ) {
 		log( LOG_TYPE::ERROR ) << "Uncaught exception: `" << e.what() << "' in thread!" << endl;
 		throw;
@@ -170,6 +177,7 @@ void* HThread::SPAWN( void* thread_ ) {
 		log( LOG_TYPE::ERROR ) << "Unknown uncaught exception in thread!" << endl;
 		throw;
 	}
+	return ( NULL );
 	M_EPILOG
 }
 
@@ -186,7 +194,7 @@ void HThread::CLEANUP( void* ) {
 #ifdef __HOST_OS_TYPE_SOLARIS__
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif /* #ifdef __HOST_OS_TYPE_SOLARIS__ */
-void* HThread::control( void ) {
+void HThread::control( void ) {
 	M_PROLOG
 	M_ENSURE( ::pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL ) == 0 );
 	M_ENSURE( ::pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, NULL ) == 0 );
@@ -195,15 +203,14 @@ void* HThread::control( void ) {
 	 * declared between pthread_cleanup_push and pthread_cleanup_pop
 	 * are not visible after pthread_cleanup_pop.
 	 */
-	void* returnValue( NULL );
 	pthread_cleanup_push( CLEANUP, this );
 	_status = ALIVE;
 	_semaphore.signal();
-	returnValue = _call();
+	_call();
 	pthread_cleanup_pop( 0 );
 	_status = ZOMBIE;
 	_semaphore.signal();
-	return ( returnValue );
+	return;
 	M_EPILOG
 }
 #ifdef __HOST_OS_TYPE_SOLARIS__
