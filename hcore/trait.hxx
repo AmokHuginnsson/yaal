@@ -530,8 +530,8 @@ public:
 		{ return ( *_ref ); }
 	basic_t& operator->( void )
 		{ return ( *_ref ); }
-	template<typename basic_assgnable_t>
-	basic_t& operator = ( basic_assgnable_t const& v ) {
+	template<typename basic_assignable_t>
+	basic_t& operator = ( basic_assignable_t const& v ) {
 		*_ref = v;
 		return ( *_ref );
 	}

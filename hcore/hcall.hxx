@@ -163,6 +163,18 @@ public:
 		{ return ( do_invoke( a0, a1, a2 ) ); }
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2 ) const
 		{ return ( do_invoke( a0, a1, a2 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2 )
+		{ return ( do_invoke( *a0, a1, a2 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2 ) const
+		{ return ( do_invoke( *a0, a1, a2 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 )
+		{ return ( do_invoke( *a0, a1, a2 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 ) const
+		{ return ( do_invoke( *a0, a1, a2 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 )
+		{ return ( do_invoke( *a0, a1, a2 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 ) const
+		{ return ( do_invoke( *a0, a1, a2 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
@@ -187,6 +199,18 @@ public:
 		{ return ( do_invoke( a0, a1, a2, a3 ) ); }
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 ) const
 		{ return ( do_invoke( a0, a1, a2, a3 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3 )
+		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 )
+		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 )
+		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
@@ -212,6 +236,18 @@ public:
 		{ return ( do_invoke( a0, a1, a2, a3, a4 ) ); }
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
 		{ return ( do_invoke( a0, a1, a2, a3, a4 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
@@ -238,6 +274,18 @@ public:
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5 ) ); }
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
@@ -265,6 +313,18 @@ public:
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6 ) ); }
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
@@ -293,6 +353,18 @@ public:
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
@@ -322,6 +394,18 @@ public:
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
@@ -353,6 +437,18 @@ public:
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:
@@ -385,6 +481,18 @@ public:
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
 	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const
 		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const
+		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
 	void const* id( void ) const
 		{ return ( do_id() ); }
 protected:

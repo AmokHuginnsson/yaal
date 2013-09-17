@@ -43,10 +43,23 @@ class HFuture {
 public:
 	typedef HFuture<return_t> this_type;
 private:
+	template<typename basic_t>
+	class ref_fwd {
+		basic_t* _ref;
+	public:
+		ref_fwd( void ) : _ref( NULL ) {}
+		operator basic_t& ( void ) const
+			{ return ( *_ref ); }
+		basic_t& operator = ( basic_t& v ) {
+			_ref = &v;
+			return ( *_ref );
+		}
+	};
 	typedef yaal::hcore::HBoundCall<return_t ( void )> call_t;
+	typedef typename trait::ternary<trait::is_reference<return_t>::value, ref_fwd<typename trait::strip_reference<return_t>::type>, return_t>::type return_type;
 	call_t _call;
 	yaal::hcore::HThread _thread;
-	return_t _return;
+	return_type _return;
 	bool _finished;
 public:
 	HFuture( call_t const& call_ )
