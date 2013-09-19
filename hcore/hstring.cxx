@@ -464,7 +464,7 @@ char HString::set_at( int long const index_, char char_ ) {
 
 bool operator == ( HString const& left, HString const& right ) {
 	M_PROLOG
-	int long len = left.get_length();
+	int long len( left.get_length() );
 	return ( ( &left == &right )
 			|| ( ( len == right.get_length() )
 				&& ( ! ( len && ::std::strcmp( left.raw(), right.raw() ) ) ) ) );
@@ -830,10 +830,10 @@ HString& HString::replace( HString const& pattern_,
 	M_PROLOG
 	if ( pattern_.is_empty() )
 		return ( *this );
-	int long lenPattern = pattern_.get_length();
-	int long lenWith = with_.get_length();
-	int long subWP = lenWith - lenPattern;
-	int long index = 0;
+	int long lenPattern( pattern_.get_length() );
+	int long lenWith( with_.get_length() );
+	int long subWP( lenWith - lenPattern );
+	int long index( 0 );
 	if ( subWP == 0 ) /* replacement is equals to pattern */ {
 		while ( ( index = find( pattern_, index ) ) != npos ) {
 			::std::strncpy( MEM + index, with_.raw(), lenWith );
@@ -846,7 +846,7 @@ HString& HString::replace( HString const& pattern_,
 			index += lenPattern;
 		}
 		HString s;
-		HString* src = NULL;
+		HString* src( NULL );
 		if ( subWP > 0 ) /* replacement is longer than pattern */ {
 			s = *this;
 			s.materialize();
@@ -854,8 +854,8 @@ HString& HString::replace( HString const& pattern_,
 			src = &s;
 		} else /* replacement is shorter than pattern */
 			src = this;
-		int long oldIdx = 0;
-		int long newIdx = 0;
+		int long oldIdx( 0 );
+		int long newIdx( 0 );
 		index = 0;
 		char const* with( with_.raw() );
 		char const* srcBuf( src->raw() );
@@ -872,7 +872,6 @@ HString& HString::replace( HString const& pattern_,
 		}
 		if ( newIdx && ( ( GET_SIZE - oldIdx ) != lenPattern ) )
 			::std::memmove( MEM + newIdx, srcBuf + oldIdx + lenPattern, ( GET_SIZE - oldIdx ) - lenPattern );
-		using yaal::swap;
 		SET_SIZE( newSize );
 		MEM[ newSize ] = 0;
 	}
@@ -1017,7 +1016,7 @@ HString HString::right( int long fromEnd_ ) const {
 
 HString& HString::trim_left( char const* const set_ ) {
 	M_PROLOG
-	int cut = 0;
+	int cut( 0 );
 	while ( MEM[ cut ] && ::std::strchr( set_, MEM[ cut ] ) )
 		++ cut;
 	if ( cut )
@@ -1028,7 +1027,7 @@ HString& HString::trim_left( char const* const set_ ) {
 
 HString& HString::trim_right( char const* const set_ ) {
 	M_PROLOG
-	int long cut = 0;
+	int long cut( 0 );
 	while ( ( cut < GET_SIZE )
 			&& ::std::strchr( set_, MEM[ GET_SIZE - ( cut + 1 ) ] ) )
 		++ cut;
