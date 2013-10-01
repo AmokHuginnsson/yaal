@@ -62,19 +62,6 @@ public:
  */
 	HRandomizer( u64_t const* stateFirst_, u64_t const* stateLast_, u64_t range = meta::max_unsigned<u64_t>::value );
 
-/*! \brief Copy constructor.
- */
-	HRandomizer( HRandomizer const& );
-
-/*! \brief Assignment operator.
- */
-	HRandomizer& operator = ( HRandomizer const& );
-
-#if CXX_STANDARD >= 2011
-	HRandomizer( HRandomizer&& );
-	HRandomizer& operator = ( HRandomizer&& );
-#endif /* #if CXX_STANDARD >= 2011 */
-
 /*! \brief Generate next random number.
  *
  * \param range - upper limit for generated number.
