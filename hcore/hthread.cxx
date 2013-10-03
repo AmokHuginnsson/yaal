@@ -577,6 +577,108 @@ void HEvent::signal( void ) {
 	M_EPILOG
 }
 
+HReadWriteLock::HReadWriteLock( void )
+	: _mutex(), _buf( chunk_size<pthread_rwlock_t>( 1 ) + chunk_size<pthread_rwlockattr_t>( 1 ) ), _writeLockCount() {
+	pthread_rwlockattr_t* attr( static_cast<pthread_rwlockattr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_rwlock_t ) ) ) );
+	M_ENSURE( ::pthread_rwlockattr_init( attr ) == 0 );
+	M_ENSURE( ::pthread_rwlock_init( _buf.get<pthread_rwlock_t>(), attr ) == 0 );
+	return;
+}
+
+HReadWriteLock::~HReadWriteLock( void ) {
+	M_PROLOG
+	M_ENSURE( ::pthread_rwlock_destroy( _buf.get<pthread_rwlock_t>() ) == 0 );
+	pthread_rwlockattr_t* attr( static_cast<pthread_rwlockattr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_rwlock_t ) ) ) );
+	M_ENSURE( ::pthread_rwlockattr_destroy( attr ) == 0 );
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
+void HReadWriteLock::lock_read( void ) {
+	M_PROLOG
+	HLock l( _mutex );
+	M_ENSURE( ::pthread_rwlock_rdlock( _buf.get<pthread_rwlock_t>() ) == 0 );
+	return;
+	M_EPILOG
+}
+
+void HReadWriteLock::unlock_read( void ) {
+	M_PROLOG
+	HLock l( _mutex );
+	M_ENSURE( ::pthread_rwlock_unlock( _buf.get<pthread_rwlock_t>() ) == 0 );
+	return;
+	M_EPILOG
+}
+
+void HReadWriteLock::lock_write( void ) {
+	M_PROLOG
+	int* count( NULL );
+	/* scope for _writeLockCount access */ {
+		HLock l( _mutex );
+		count = &_writeLockCount[ HThread::get_id()];
+	}
+	/*
+	 * `count' is a memory reference that is valid
+	 * even if other thread accesses and modifies _writeLockCount map.
+	 */
+	if ( ! *count ) {
+		M_ENSURE( ::pthread_rwlock_wrlock( _buf.get<pthread_rwlock_t>() ) == 0 );
+	}
+	++ *count;
+	return;
+	M_EPILOG
+}
+
+void HReadWriteLock::unlock_write( void ) {
+	M_PROLOG
+	bool last( false );
+	/* scope for _writeLockCount access */ {
+		HLock l( _mutex );
+		write_lock_count_t::iterator it( _writeLockCount.find( HThread::get_id() ) );
+		M_ENSURE( it != _writeLockCount.end() );
+		-- it->second;
+		if ( ! it->second ) {
+			last = true;
+			_writeLockCount.erase( it );
+		}
+	}
+	if ( last ) {
+		M_ENSURE( ::pthread_rwlock_unlock( _buf.get<pthread_rwlock_t>() ) == 0 );
+	}
+	return;
+	M_EPILOG
+}
+
+HReadWriteLockReadLock::HReadWriteLockReadLock( HReadWriteLock& rwLock_ )
+	: _rwLock( rwLock_ ) {
+	M_PROLOG
+	_rwLock.lock_read();
+	return;
+	M_EPILOG
+}
+
+HReadWriteLockReadLock::~HReadWriteLockReadLock( void ) {
+	M_PROLOG
+	_rwLock.unlock_read();
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
+HReadWriteLockWriteLock::HReadWriteLockWriteLock( HReadWriteLock& rwLock_ )
+	: _rwLock( rwLock_ ) {
+	M_PROLOG
+	_rwLock.lock_write();
+	return;
+	M_EPILOG
+}
+
+HReadWriteLockWriteLock::~HReadWriteLockWriteLock( void ) {
+	M_PROLOG
+	_rwLock.unlock_write();
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
 }
 
 }

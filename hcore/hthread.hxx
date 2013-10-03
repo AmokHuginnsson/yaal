@@ -36,6 +36,7 @@ Copyright:
 #include "hcore/hresource.hxx"
 #include "hcore/hboundcall.hxx"
 #include "hcore/huniquemovable.hxx"
+#include "hcore/hmap.hxx"
 
 namespace yaal {
 
@@ -263,6 +264,59 @@ public:
 	void wait( void );
 	void signal( void );
 };
+
+typedef HExceptionT<HEvent> HEventException;
+
+/*! \brief Read-Write Lock functionality implementation.
+ */
+class HReadWriteLock {
+public:
+	typedef HReadWriteLock this_type;
+private:
+	typedef yaal::hcore::HMap<int long, int> write_lock_count_t;
+	HMutex _mutex;
+	HChunk _buf;
+	write_lock_count_t _writeLockCount;
+public:
+	HReadWriteLock( void );
+	virtual ~HReadWriteLock( void );
+	void lock_read( void );
+	void unlock_read( void );
+	void lock_write( void );
+	void unlock_write( void );
+};
+
+/*! \brief Read-Write Lock reader-guard functionality implementation.
+ */
+class HReadWriteLockReadLock {
+public:
+	typedef HReadWriteLockReadLock this_type;
+private:
+	HReadWriteLock& _rwLock;
+public:
+	explicit HReadWriteLockReadLock( HReadWriteLock& );
+	virtual ~HReadWriteLockReadLock( void );
+private:
+	HReadWriteLockReadLock( HReadWriteLockReadLock const& );
+	HReadWriteLockReadLock& operator = ( HReadWriteLockReadLock const& );
+};
+typedef HUniqueMovable<HReadWriteLockReadLock> external_read_write_lock_read_lock_t;
+
+/*! \brief Read-Write Lock writer-guard functionality implementation.
+ */
+class HReadWriteLockWriteLock {
+public:
+	typedef HReadWriteLockWriteLock this_type;
+private:
+	HReadWriteLock& _rwLock;
+public:
+	explicit HReadWriteLockWriteLock( HReadWriteLock& );
+	virtual ~HReadWriteLockWriteLock( void );
+private:
+	HReadWriteLockWriteLock( HReadWriteLockWriteLock const& );
+	HReadWriteLockWriteLock& operator = ( HReadWriteLockWriteLock const& );
+};
+typedef HUniqueMovable<HReadWriteLockWriteLock> external_read_write_lock_write_lock_t;
 
 }
 
