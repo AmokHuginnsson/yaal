@@ -578,7 +578,7 @@ void HEvent::signal( void ) {
 }
 
 HReadWriteLock::HReadWriteLock( void )
-	: _mutex(), _buf( chunk_size<pthread_rwlock_t>( 1 ) + chunk_size<pthread_rwlockattr_t>( 1 ) ), _writeLockCount() {
+	: _mutex(), _buf( chunk_size<pthread_rwlock_t>( 1 ) + chunk_size<pthread_rwlockattr_t>( 1 ) ), _lockInfo() {
 	pthread_rwlockattr_t* attr( static_cast<pthread_rwlockattr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_rwlock_t ) ) ) );
 	M_ENSURE( ::pthread_rwlockattr_init( attr ) == 0 );
 	M_ENSURE( ::pthread_rwlock_init( _buf.get<pthread_rwlock_t>(), attr ) == 0 );
@@ -596,50 +596,55 @@ HReadWriteLock::~HReadWriteLock( void ) {
 
 void HReadWriteLock::lock_read( void ) {
 	M_PROLOG
-	HLock l( _mutex );
-	M_ENSURE( ::pthread_rwlock_rdlock( _buf.get<pthread_rwlock_t>() ) == 0 );
-	return;
-	M_EPILOG
-}
-
-void HReadWriteLock::unlock_read( void ) {
-	M_PROLOG
-	HLock l( _mutex );
-	M_ENSURE( ::pthread_rwlock_unlock( _buf.get<pthread_rwlock_t>() ) == 0 );
+	OLockInfo* lockInfo( NULL );
+	/* scope for _lockInfo access */ {
+		HLock l( _mutex );
+		lockInfo = &_lockInfo[ HThread::get_id()];
+	}
+	/*
+	 * `lockInfo' is a memory reference that is valid
+	 * even if other thread accesses and modifies _lockInfo map.
+	 */
+	if ( ! lockInfo->_count ) {
+		lockInfo->_firstLockRead = true;
+		M_ENSURE( ::pthread_rwlock_rdlock( _buf.get<pthread_rwlock_t>() ) == 0 );
+	}
+	++ lockInfo->_count;
 	return;
 	M_EPILOG
 }
 
 void HReadWriteLock::lock_write( void ) {
 	M_PROLOG
-	int* count( NULL );
-	/* scope for _writeLockCount access */ {
+	OLockInfo* lockInfo( NULL );
+	/* scope for _lockInfo access */ {
 		HLock l( _mutex );
-		count = &_writeLockCount[ HThread::get_id()];
+		lockInfo = &_lockInfo[ HThread::get_id()];
 	}
 	/*
-	 * `count' is a memory reference that is valid
-	 * even if other thread accesses and modifies _writeLockCount map.
+	 * `lockInfo' is a memory reference that is valid
+	 * even if other thread accesses and modifies _lockInfo map.
 	 */
-	if ( ! *count ) {
+	M_ASSERT( ! lockInfo->_firstLockRead );
+	if ( ! lockInfo->_count ) {
 		M_ENSURE( ::pthread_rwlock_wrlock( _buf.get<pthread_rwlock_t>() ) == 0 );
 	}
-	++ *count;
+	++ lockInfo->_count;
 	return;
 	M_EPILOG
 }
 
-void HReadWriteLock::unlock_write( void ) {
+void HReadWriteLock::unlock( void ) {
 	M_PROLOG
 	bool last( false );
-	/* scope for _writeLockCount access */ {
+	/* scope for _lockInfo access */ {
 		HLock l( _mutex );
-		write_lock_count_t::iterator it( _writeLockCount.find( HThread::get_id() ) );
-		M_ENSURE( it != _writeLockCount.end() );
-		-- it->second;
-		if ( ! it->second ) {
+		lock_info_t::iterator it( _lockInfo.find( HThread::get_id() ) );
+		M_ENSURE( it != _lockInfo.end() );
+		-- it->second._count;
+		if ( ! it->second._count ) {
 			last = true;
-			_writeLockCount.erase( it );
+			_lockInfo.erase( it );
 		}
 	}
 	if ( last ) {
@@ -659,7 +664,7 @@ HReadWriteLockReadLock::HReadWriteLockReadLock( HReadWriteLock& rwLock_ )
 
 HReadWriteLockReadLock::~HReadWriteLockReadLock( void ) {
 	M_PROLOG
-	_rwLock.unlock_read();
+	_rwLock.unlock();
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -674,7 +679,7 @@ HReadWriteLockWriteLock::HReadWriteLockWriteLock( HReadWriteLock& rwLock_ )
 
 HReadWriteLockWriteLock::~HReadWriteLockWriteLock( void ) {
 	M_PROLOG
-	_rwLock.unlock_write();
+	_rwLock.unlock();
 	return;
 	M_DESTRUCTOR_EPILOG
 }

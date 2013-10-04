@@ -273,17 +273,23 @@ class HReadWriteLock {
 public:
 	typedef HReadWriteLock this_type;
 private:
-	typedef yaal::hcore::HMap<int long, int> write_lock_count_t;
+	struct OLockInfo {
+		int _count;
+		bool _firstLockRead;
+		OLockInfo( void )
+			: _count( 0 ), _firstLockRead( false )
+			{}
+	};
+	typedef yaal::hcore::HMap<int long, OLockInfo> lock_info_t;
 	HMutex _mutex;
 	HChunk _buf;
-	write_lock_count_t _writeLockCount;
+	lock_info_t _lockInfo;
 public:
 	HReadWriteLock( void );
 	virtual ~HReadWriteLock( void );
 	void lock_read( void );
-	void unlock_read( void );
 	void lock_write( void );
-	void unlock_write( void );
+	void unlock( void );
 };
 
 /*! \brief Read-Write Lock reader-guard functionality implementation.
