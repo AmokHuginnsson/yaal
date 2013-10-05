@@ -194,6 +194,13 @@ HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_t co
 	: HRuleBase( action_ ), _rule( rule_ ), _name( name_ ), _completelyDefined( true )
 	{}
 
+HRule::~HRule( void ) {
+	M_PROLOG
+	detach();
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
 HRule& HRule::operator %= ( HRuleBase const& rule_ ) {
 	M_PROLOG
 	M_ENSURE( ! _completelyDefined );
@@ -237,8 +244,9 @@ yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executin
 void HRule::do_detach( void ) {
 	M_PROLOG
 	if ( !! _rule ) {
-		_rule->detach();
+		HRuleBase::ptr_t r( _rule );
 		_rule.reset();
+		r->detach();
 	}
 	return;
 	M_EPILOG
@@ -298,8 +306,9 @@ void HRecursiveRule::do_describe( HGrammarDescription& gd_ ) const {
 void HRecursiveRule::do_detach( void ) {
 	M_PROLOG
 	if ( !! _rule ) {
-		_rule->detach();
+		HRuleBase::ptr_t r( _rule._rule );
 		_rule._rule.reset();
+		r->detach();
 	}
 	return;
 	M_EPILOG
@@ -392,9 +401,13 @@ yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* execu
 
 void HFollows::do_detach( void ) {
 	M_PROLOG
-	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
-		it->_rule->detach();
-		it->_rule.reset();
+	rules_t r;
+	r.swap( _rules );
+	for ( rules_t::iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
+		if ( !! it->_rule ) {
+			it->_rule->detach();
+			it->_rule.reset();
+		}
 	}
 	return;
 	M_EPILOG
@@ -452,8 +465,9 @@ void HKleeneStar::do_describe( HGrammarDescription& gd_ ) const {
 void HKleeneStar::do_detach( void ) {
 	M_PROLOG
 	if ( !! _rule ) {
-		_rule->detach();
+		HRuleBase::ptr_t r( _rule._rule );
 		_rule._rule.reset();
+		r->detach();
 	}
 	return;
 	M_EPILOG
@@ -508,8 +522,9 @@ void HKleenePlus::do_describe( HGrammarDescription& gd_ ) const {
 void HKleenePlus::do_detach( void ) {
 	M_PROLOG
 	if ( !! _rule ) {
-		_rule->detach();
+		HRuleBase::ptr_t r( _rule._rule );
 		_rule._rule.reset();
+		r->detach();
 	}
 	return;
 	M_EPILOG
@@ -568,9 +583,13 @@ void HAlternative::do_describe( HGrammarDescription& gd_ ) const {
 
 void HAlternative::do_detach( void ) {
 	M_PROLOG
-	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
-		it->_rule->detach();
-		it->_rule.reset();
+	rules_t r;
+	r.swap( _rules );
+	for ( rules_t::iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
+		if ( !! it->_rule ) {
+			it->_rule->detach();
+			it->_rule.reset();
+		}
 	}
 	return;
 	M_EPILOG
@@ -625,8 +644,9 @@ void HOptional::do_describe( HGrammarDescription& gd_ ) const {
 void HOptional::do_detach( void ) {
 	M_PROLOG
 	if ( !! _rule ) {
-		_rule->detach();
+		HRuleBase::ptr_t r( _rule._rule );
 		_rule._rule.reset();
+		r->detach();
 	}
 	return;
 	M_EPILOG

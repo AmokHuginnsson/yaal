@@ -78,9 +78,9 @@ public:
 		HNamedRule( HRuleBase const& );
 		bool operator ! ( void ) const
 			{ return ( ! _rule ); }
-		ptr_t operator->( void )
+		ptr_t& operator->( void )
 			{ return ( _rule ); }
-		ptr_t const operator->( void ) const
+		ptr_t const& operator->( void ) const
 			{ return ( _rule ); }
 		HRuleBase const* id( void ) const
 			{ return ( _rule.get() ); }
@@ -158,6 +158,7 @@ public:
 	HRule( ptr_t const& );
 	HRule( yaal::hcore::HString const&, HRuleBase const& );
 	HRule( yaal::hcore::HString const&, ptr_t const& );
+	virtual ~HRule( void );
 	HRule operator[]( action_t const& ) const;
 	HRule& operator %= ( HRuleBase const& );
 	yaal::hcore::HString const& get_name( void ) const;
