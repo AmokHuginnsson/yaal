@@ -160,38 +160,38 @@ void HRuleBase::detach( void ) {
 
 HRuleBase::HNamedRule::HNamedRule( HRuleBase const& rule_ )
 	: _name( dynamic_cast<HRule const*>( &rule_ ) ? dynamic_cast<HRule const*>( &rule_ )->get_name() : yaal::hcore::HString() ), _rule( rule_.clone() )
-	{ }
+	{}
 
 HRule::HRule( yaal::hcore::HString const& name_ )
-	: HRuleBase(), _rule( new HRecursiveRule() ), _name( name_ ), _completelyDefined( false )
+	: HRuleBase(), _rule( name_, ptr_t( new HRecursiveRule() ) ), _completelyDefined( false )
 	{}
 
 HRule::HRule( void )
-	: HRuleBase(), _rule( new HRecursiveRule() ), _name(), _completelyDefined( false )
+	: HRuleBase(), _rule( ptr_t( new HRecursiveRule() ) ), _completelyDefined( false )
 	{}
 
 HRule::HRule( HRule const& rule_ )
-	: HRuleBase( rule_._action ), _rule( rule_._rule ), _name( rule_._name ), _completelyDefined( rule_._completelyDefined ) {
+	: HRuleBase( rule_._action ), _rule( rule_._rule ), _completelyDefined( rule_._completelyDefined ) {
 }
 
 HRule::HRule( HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_.clone() ), _name(), _completelyDefined( true )
+	: HRuleBase(), _rule( rule_.clone() ), _completelyDefined( true )
 	{}
 
 HRule::HRule( ptr_t const& rule_ )
-	: _rule( rule_ ), _name(), _completelyDefined( true )
+	: _rule( rule_ ), _completelyDefined( true )
 	{}
 
 HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_.clone() ), _name( name_ ), _completelyDefined( true )
+	: HRuleBase(), _rule( name_, rule_.clone() ), _completelyDefined( true )
 	{}
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_ )
-	: _rule( rule_ ), _name( name_ ), _completelyDefined( true )
+	: _rule( name_, rule_ ), _completelyDefined( true )
 	{}
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ ), _name( name_ ), _completelyDefined( true )
+	: HRuleBase( action_ ), _rule( name_, rule_ ), _completelyDefined( true )
 	{}
 
 HRule::~HRule( void ) {
@@ -204,7 +204,7 @@ HRule::~HRule( void ) {
 HRule& HRule::operator %= ( HRuleBase const& rule_ ) {
 	M_PROLOG
 	M_ENSURE( ! _completelyDefined );
-	HRecursiveRule* rr( dynamic_cast<HRecursiveRule*>( _rule.get() ) );
+	HRecursiveRule* rr( dynamic_cast<HRecursiveRule*>( _rule.id() ) );
 	M_ENSURE( rr );
 	rr->set_rule( rule_.clone() );
 	_completelyDefined = true;
@@ -215,20 +215,20 @@ HRule& HRule::operator %= ( HRuleBase const& rule_ ) {
 HRule HRule::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! _action );
-	return ( HRule( _name, clone(), action_ ) );
+	return ( HRule( _rule._name, clone(), action_ ) );
 	M_EPILOG
 }
 
 yaal::hcore::HString const& HRule::get_name( void ) const {
 	M_PROLOG
-	return ( _name );
+	return ( _rule._name );
 	M_EPILOG
 }
 
 HRule::ptr_t HRule::do_clone( void ) const {
 	M_PROLOG
 	M_ENSURE( !! _rule );
-	return ( ! _action ? _rule : ptr_t( new HRule( _name, _rule, _action ) ) );
+	return ( ! _action ? _rule._rule : ptr_t( new HRule( _rule._name, _rule._rule, _action ) ) );
 	M_EPILOG
 }
 
@@ -244,8 +244,8 @@ yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executin
 void HRule::do_detach( void ) {
 	M_PROLOG
 	if ( !! _rule ) {
-		HRuleBase::ptr_t r( _rule );
-		_rule.reset();
+		HRuleBase::ptr_t r( _rule._rule );
+		_rule._rule.reset();
 		r->detach();
 	}
 	return;
@@ -258,8 +258,8 @@ bool HRule::do_is_optional( void ) const
 void HRule::do_describe( HGrammarDescription& gd_ ) const {
 	M_PROLOG
 	if ( !! _rule ) {
-		cout << _name << " = ";
-		gd_.describe( *_rule );
+		cout << _rule._name << " = ";
+		gd_.describe( *_rule._rule );
 		cout << endl;
 	}
 	return;

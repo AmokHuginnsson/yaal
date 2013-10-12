@@ -78,11 +78,13 @@ public:
 		HNamedRule( HRuleBase const& );
 		bool operator ! ( void ) const
 			{ return ( ! _rule ); }
-		ptr_t& operator->( void )
-			{ return ( _rule ); }
 		ptr_t const& operator->( void ) const
 			{ return ( _rule ); }
+		ptr_t& operator->( void )
+			{ return ( _rule ); }
 		HRuleBase const* id( void ) const
+			{ return ( _rule.get() ); }
+		HRuleBase* id( void )
 			{ return ( _rule.get() ); }
 	};
 	typedef yaal::hcore::HBoundCall<> action_t;
@@ -147,8 +149,7 @@ typedef yaal::hcore::HExceptionT<HRuleBase> HRuleBaseException;
  * Any rule can be possibly a recursive rule.
  */
 class HRule : public HRuleBase {
-	ptr_t _rule;
-	yaal::hcore::HString _name;
+	HNamedRule _rule;
 	bool _completelyDefined;
 public:
 	HRule( void );
