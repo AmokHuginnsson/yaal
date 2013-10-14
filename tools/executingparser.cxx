@@ -151,9 +151,9 @@ yaal::hcore::HString::const_iterator HRuleBase::skip_space( yaal::hcore::HString
 	M_EPILOG
 }
 
-void HRuleBase::detach( void ) {
+void HRuleBase::detach( HRuleBase const* rule_ ) {
 	M_PROLOG
-	do_detach();
+	do_detach( rule_ );
 	return;
 	M_EPILOG
 }
@@ -196,7 +196,6 @@ HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_t co
 
 HRule::~HRule( void ) {
 	M_PROLOG
-	detach();
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -241,12 +240,14 @@ yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executin
 	M_EPILOG
 }
 
-void HRule::do_detach( void ) {
+void HRule::do_detach( HRuleBase const* rule_ ) {
 	M_PROLOG
-	if ( !! _rule ) {
-		HRuleBase::ptr_t r( _rule._rule );
-		_rule._rule.reset();
-		r->detach();
+	HRuleBase::ptr_t r( _rule._rule );
+	if ( !! r ) {
+		if ( r.raw() == rule_ )
+			_rule._rule = make_pointer<HRuleRef>( r );
+		else
+			r->detach( rule_ );
 	}
 	return;
 	M_EPILOG
@@ -272,6 +273,7 @@ HRecursiveRule::HRecursiveRule( void )
 
 void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_ ) {
 	_rule = rule_;
+	_rule->detach( this );
 	return;
 }
 
@@ -303,13 +305,57 @@ void HRecursiveRule::do_describe( HGrammarDescription& gd_ ) const {
 	M_EPILOG
 }
 
-void HRecursiveRule::do_detach( void ) {
+void HRecursiveRule::do_detach( HRuleBase const* rule_ ) {
 	M_PROLOG
-	if ( !! _rule ) {
-		HRuleBase::ptr_t r( _rule._rule );
-		_rule._rule.reset();
-		r->detach();
-	}
+	M_ENSURE( rule_ != this );
+	if ( !! _rule )
+		_rule->detach( rule_ );
+	return;
+	M_EPILOG
+}
+
+HRuleRef::HRuleRef( HRuleBase::ptr_t rule_ )
+	: _rule( rule_ ) {
+	return;
+}
+
+yaal::hcore::HString::const_iterator HRuleRef::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+	M_PROLOG
+	HRuleBase::ptr_t r( _rule );
+	M_ENSURE( !! r );
+	return ( r->parse( executingParser_, first_, last_ ) );
+	M_EPILOG
+}
+
+HRuleBase::ptr_t HRuleRef::do_clone( void ) const {
+	M_PROLOG
+	return ( get_pointer() );
+	M_EPILOG
+}
+
+bool HRuleRef::do_is_optional( void ) const {
+	M_PROLOG
+	HRuleBase::ptr_t r( _rule );
+	M_ENSURE( !! r );
+	return ( r->is_optional() );
+	M_EPILOG
+}
+
+void HRuleRef::do_describe( HGrammarDescription& gd_ ) const {
+	M_PROLOG
+	HRuleBase::ptr_t r( _rule );
+	M_ENSURE( !! r );
+	r->describe( gd_ );
+	return;
+	M_EPILOG
+}
+
+void HRuleRef::do_detach( HRuleBase const* rule_ ) {
+	M_PROLOG
+	HRuleBase::ptr_t r( _rule );
+	M_ENSURE( !! r );
+	if ( r.raw() != rule_ )
+		r->detach( rule_ );
 	return;
 	M_EPILOG
 }
@@ -399,14 +445,15 @@ yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* execu
 	M_EPILOG
 }
 
-void HFollows::do_detach( void ) {
+void HFollows::do_detach( HRuleBase const* rule_ ) {
 	M_PROLOG
-	rules_t r;
-	r.swap( _rules );
-	for ( rules_t::iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
-		if ( !! it->_rule ) {
-			it->_rule->detach();
-			it->_rule.reset();
+	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
+		HRuleBase::ptr_t r( it->_rule );
+		if ( !! r ) {
+			if ( r.raw() == rule_ )
+				it->_rule = make_pointer<HRuleRef>( r );
+			else
+				r->detach( rule_ );
 		}
 	}
 	return;
@@ -462,12 +509,14 @@ void HKleeneStar::do_describe( HGrammarDescription& gd_ ) const {
 	M_EPILOG
 }
 
-void HKleeneStar::do_detach( void ) {
+void HKleeneStar::do_detach( HRuleBase const* rule_ ) {
 	M_PROLOG
-	if ( !! _rule ) {
-		HRuleBase::ptr_t r( _rule._rule );
-		_rule._rule.reset();
-		r->detach();
+	HRuleBase::ptr_t r( _rule._rule );
+	if ( !! r ) {
+		if ( r.raw() == rule_ )
+			_rule._rule = make_pointer<HRuleRef>( r );
+		else
+			r->detach( rule_ );
 	}
 	return;
 	M_EPILOG
@@ -519,12 +568,14 @@ void HKleenePlus::do_describe( HGrammarDescription& gd_ ) const {
 	M_EPILOG
 }
 
-void HKleenePlus::do_detach( void ) {
+void HKleenePlus::do_detach( HRuleBase const* rule_ ) {
 	M_PROLOG
-	if ( !! _rule ) {
-		HRuleBase::ptr_t r( _rule._rule );
-		_rule._rule.reset();
-		r->detach();
+	HRuleBase::ptr_t r( _rule._rule );
+	if ( !! r ) {
+		if ( r.raw() == rule_ )
+			_rule._rule = make_pointer<HRuleRef>( r );
+		else
+			r->detach( rule_ );
 	}
 	return;
 	M_EPILOG
@@ -581,14 +632,15 @@ void HAlternative::do_describe( HGrammarDescription& gd_ ) const {
 	M_EPILOG
 }
 
-void HAlternative::do_detach( void ) {
+void HAlternative::do_detach( HRuleBase const* rule_ ) {
 	M_PROLOG
-	rules_t r;
-	r.swap( _rules );
-	for ( rules_t::iterator it( r.begin() ), end( r.end() ); it != end; ++ it ) {
-		if ( !! it->_rule ) {
-			it->_rule->detach();
-			it->_rule.reset();
+	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
+		HRuleBase::ptr_t r( it->_rule );
+		if ( !! r ) {
+			if ( r.raw() == rule_ )
+				it->_rule = make_pointer<HRuleRef>( r );
+			else
+				r->detach( rule_ );
 		}
 	}
 	return;
@@ -641,12 +693,14 @@ void HOptional::do_describe( HGrammarDescription& gd_ ) const {
 	M_EPILOG
 }
 
-void HOptional::do_detach( void ) {
+void HOptional::do_detach( HRuleBase const* rule_ ) {
 	M_PROLOG
-	if ( !! _rule ) {
-		HRuleBase::ptr_t r( _rule._rule );
-		_rule._rule.reset();
-		r->detach();
+	HRuleBase::ptr_t r( _rule._rule );
+	if ( !! r ) {
+		if ( r.raw() == rule_ )
+			_rule._rule = make_pointer<HRuleRef>( r );
+		else
+			r->detach( rule_ );
 	}
 	return;
 	M_EPILOG
@@ -840,7 +894,7 @@ void HReal::do_describe( HGrammarDescription& ) const {
 	M_EPILOG
 }
 
-void HReal::do_detach( void ) {
+void HReal::do_detach( HRuleBase const* ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -990,7 +1044,7 @@ void HInteger::do_describe( HGrammarDescription& ) const {
 	M_EPILOG
 }
 
-void HInteger::do_detach( void ) {
+void HInteger::do_detach( HRuleBase const* ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -1076,7 +1130,7 @@ void HCharacter::do_describe( HGrammarDescription& ) const {
 	M_EPILOG
 }
 
-void HCharacter::do_detach( void ) {
+void HCharacter::do_detach( HRuleBase const* ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -1161,7 +1215,7 @@ void HString::do_describe( HGrammarDescription& ) const {
 	M_EPILOG
 }
 
-void HString::do_detach( void ) {
+void HString::do_detach( HRuleBase const* ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -1223,7 +1277,7 @@ void HRegex::do_describe( HGrammarDescription& ) const {
 	M_EPILOG
 }
 
-void HRegex::do_detach( void ) {
+void HRegex::do_detach( HRuleBase const* ) {
 	M_PROLOG
 	return;
 	M_EPILOG
