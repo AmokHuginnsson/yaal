@@ -1362,25 +1362,10 @@ HGrammarDescription::const_iterator HGrammarDescription::end( void ) const {
 	M_EPILOG
 }
 
-bool HGrammarDescription::visited( HRuleBase const* rule_ ) const {
-	M_PROLOG
-	return ( _visited.count( rule_ ) > 0 );
-	M_EPILOG
-}
-
-void HGrammarDescription::visiting( HRuleBase const* rule_ ) {
-	M_PROLOG
-	_visited.insert( rule_ );
-	return;
-	M_EPILOG
-}
-
 void HGrammarDescription::describe( HRuleBase const& rule_ ) {
 	M_PROLOG
-	if ( ! visited( &rule_ ) ) {
-		visiting( &rule_ );
+	if ( _visited.insert( &rule_ ).second )
 		rule_.describe( *this );
-	}
 	M_EPILOG
 }
 

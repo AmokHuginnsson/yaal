@@ -136,8 +136,6 @@ public:
 private:
 	void clear( void );
 	void add( yaal::hcore::HString const& );
-	void visiting( HRuleBase const* );
-	bool visited( HRuleBase const* ) const;
 	friend class HRuleBase;
 	friend class HRecursiveRule;
 	friend class HFollows;
