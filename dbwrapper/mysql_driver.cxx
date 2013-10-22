@@ -205,6 +205,7 @@ public:
 } mySQLInitDeinit;
 
 HMySQLInitDeinit::HMySQLInitDeinit( void ) {
+	M_PROLOG
 	yaal_options()( "client_character_set",
 			program_options_helper::option_value( _clientCharacterSet_ ),
 			HProgramOptionsHandler::OOption::TYPE::REQUIRED,
@@ -218,14 +219,17 @@ HMySQLInitDeinit::HMySQLInitDeinit( void ) {
 	if ( characterSetOverride )
 		_clientCharacterSet_ = characterSetOverride;
 	if ( ! ::getenv( "BUGGY_MYSQL_CLIENT" ) )
-		mysql_library_init( 0, NULL, NULL );
+		M_ENSURE( mysql_library_init( 0, NULL, NULL ) == 0 );
 	return;
+	M_EPILOG
 }
 
 HMySQLInitDeinit::~HMySQLInitDeinit( void ) {
+	M_PROLOG
 	if ( ! ::getenv( "BUGGY_MYSQL_CLIENT" ) )
 		mysql_library_end();
 	return;
+	M_DESTRUCTOR_EPILOG
 }
 
 }
