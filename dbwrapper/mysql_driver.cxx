@@ -1,4 +1,3 @@
-
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
@@ -41,6 +40,7 @@ Copyright:
 #include "dbwrapper/db_driver.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
 #include "hcore/hcore.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -70,6 +70,24 @@ private:
 	OMySQLResult( OMySQLResult const& );
 	OMySQLResult& operator = ( OMySQLResult const& );
 };
+
+M_EXPORT_SYMBOL void driver_init( void );
+M_EXPORT_SYMBOL void driver_init( void ) {
+	M_PROLOG
+	log << "Initializing MySQL driver." << endl;
+	M_ENSURE( mysql_library_init( 0, NULL, NULL ) == 0 );
+	return;
+	M_EPILOG
+}
+
+M_EXPORT_SYMBOL void driver_cleanup( void );
+M_EXPORT_SYMBOL void driver_cleanup( void ) {
+	M_PROLOG
+	log << "Cleaning up after MySQL driver." << endl;
+	mysql_library_end();
+	return;
+	M_EPILOG
+}
 
 M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
 		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
@@ -201,7 +219,6 @@ namespace {
 class HMySQLInitDeinit {
 public:
 	HMySQLInitDeinit( void );
-	~HMySQLInitDeinit( void );
 } mySQLInitDeinit;
 
 HMySQLInitDeinit::HMySQLInitDeinit( void ) {
@@ -218,18 +235,8 @@ HMySQLInitDeinit::HMySQLInitDeinit( void ) {
 	char const* characterSetOverride( ::getenv( "YAAL_MYSQL_CLIENT_CHARACTER_SET" ) );
 	if ( characterSetOverride )
 		_clientCharacterSet_ = characterSetOverride;
-	if ( ! ::getenv( "BUGGY_MYSQL_CLIENT" ) )
-		M_ENSURE( mysql_library_init( 0, NULL, NULL ) == 0 );
 	return;
 	M_EPILOG
-}
-
-HMySQLInitDeinit::~HMySQLInitDeinit( void ) {
-	M_PROLOG
-	if ( ! ::getenv( "BUGGY_MYSQL_CLIENT" ) )
-		mysql_library_end();
-	return;
-	M_DESTRUCTOR_EPILOG
 }
 
 }

@@ -54,6 +54,8 @@ private:
 };
 
 struct ODBConnector {
+	typedef ODBConnector this_type;
+	typedef yaal::hcore::HPointer<ODBConnector> ptr_t;
 	struct DRIVER {
 		typedef enum {
 			DEFAULT = -1,
@@ -67,6 +69,8 @@ struct ODBConnector {
 			TERMINATOR
 		} enum_t;
 	};
+	typedef void ( * driver_init_t )( void );
+	typedef void ( * driver_cleanup_t )( void );
 	typedef bool ( * db_connect_t )( ODBLink&, yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
 	typedef void ( * db_disconnect_t )( ODBLink& );
 	typedef int ( * dbrs_errno_t )( ODBLink const&, void* );
@@ -80,6 +84,8 @@ struct ODBConnector {
 	typedef int long ( * dbrs_records_count_t )( ODBLink&, void* );
 	typedef int long ( * dbrs_id_t )( ODBLink&, void* );
 	typedef char const* ( * rs_column_name_t )( void*, int );
+	driver_init_t driver_init;
+	driver_cleanup_t driver_cleanup;
 	db_connect_t db_connect;
 	db_disconnect_t db_disconnect;
 	dbrs_errno_t dbrs_errno;
@@ -99,9 +105,15 @@ struct ODBConnector {
 	char const* _columnListQuery;
 	int _columnNameIndex;
 	ODBConnector( void );
+	virtual ~ODBConnector( void );
+	void init( void );
+	void cleanup( void );
+private:
+	ODBConnector( ODBConnector const& );
+	ODBConnector& operator = ( ODBConnector const& );
 };
 
-typedef yaal::hcore::HPair<yaal::tools::HPlugin::ptr_t, ODBConnector> driver_t;
+typedef yaal::hcore::HPair<yaal::tools::HPlugin::ptr_t, ODBConnector::ptr_t> driver_t;
 
 }
 

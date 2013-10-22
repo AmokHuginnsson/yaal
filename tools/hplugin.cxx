@@ -75,11 +75,17 @@ char const* HPlugin::error_message( int ) {
 	M_EPILOG
 }
 
+void* HPlugin::try_resolve( HString const& symbolName_ ) {
+	M_PROLOG
+	return ( dlsym( _handle, symbolName_.raw() ) );
+	M_EPILOG
+}
+
 void* HPlugin::resolve( HString const& symbolName_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
-	void* sym = NULL;
-	M_ENSURE_EX( ( sym = dlsym( _handle, symbolName_.raw() ) ) != NULL, symbolName_ );
+	void* sym( NULL );
+	M_ENSURE_EX( ( sym = try_resolve( symbolName_ ) ) != NULL, symbolName_ );
 	return ( sym );
 	M_EPILOG
 }

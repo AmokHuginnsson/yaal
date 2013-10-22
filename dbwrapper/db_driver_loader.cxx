@@ -203,35 +203,38 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 	driver_t driver;
 	if ( it == _dBDrivers_.end() ) /* given driver has not been loaded yet */ {
 		try {
-			driver = make_pair( HPlugin::ptr_t( make_pointer<HPlugin>() ), ODBConnector() );
+			driver = make_pair( make_pointer<HPlugin>(), make_pointer<ODBConnector>() );
 			log( LOG_TYPE::NOTICE ) << "Loading [" << _driver_[ driverId_ + 1 ] << "] driver ... ";
 			driver.first->load( _driver_[ driverId_ + 1 ] );
 			cout << "(linking symbols ...) " << flush;
-			driver.first->resolve( SYMBOL_PREFIX"db_disconnect", driver.second.db_disconnect );
-			driver.first->resolve( SYMBOL_PREFIX"dbrs_errno", driver.second.dbrs_errno );
-			driver.first->resolve( SYMBOL_PREFIX"dbrs_error", driver.second.dbrs_error );
-			driver.first->resolve( SYMBOL_PREFIX"db_fetch_query_result", driver.second.db_fetch_query_result );
-			driver.first->resolve( SYMBOL_PREFIX"rs_free_query_result", driver.second.rs_free_query_result );
-			driver.first->resolve( SYMBOL_PREFIX"db_query", driver.second.db_query );
-			driver.first->resolve( SYMBOL_PREFIX"rs_free_cursor", driver.second.rs_free_cursor );
-			driver.first->resolve( SYMBOL_PREFIX"rs_get", driver.second.rs_get );
-			driver.first->resolve( SYMBOL_PREFIX"rs_next", driver.second.rs_next );
-			driver.first->resolve( SYMBOL_PREFIX"rs_get_field", driver.second.rs_get_field );
-			driver.first->resolve( SYMBOL_PREFIX"rs_fields_count", driver.second.rs_fields_count );
-			driver.first->resolve( SYMBOL_PREFIX"dbrs_records_count", driver.second.dbrs_records_count );
-			driver.first->resolve( SYMBOL_PREFIX"dbrs_id", driver.second.dbrs_id );
-			driver.first->resolve( SYMBOL_PREFIX"rs_column_name", driver.second.rs_column_name );
-			driver.first->resolve( SYMBOL_PREFIX"db_connect", driver.second.db_connect );
+			driver.first->try_resolve( SYMBOL_PREFIX"driver_init", driver.second->driver_init );
+			driver.first->try_resolve( SYMBOL_PREFIX"driver_cleanup", driver.second->driver_cleanup );
+			driver.first->resolve( SYMBOL_PREFIX"db_disconnect", driver.second->db_disconnect );
+			driver.first->resolve( SYMBOL_PREFIX"dbrs_errno", driver.second->dbrs_errno );
+			driver.first->resolve( SYMBOL_PREFIX"dbrs_error", driver.second->dbrs_error );
+			driver.first->resolve( SYMBOL_PREFIX"db_fetch_query_result", driver.second->db_fetch_query_result );
+			driver.first->resolve( SYMBOL_PREFIX"rs_free_query_result", driver.second->rs_free_query_result );
+			driver.first->resolve( SYMBOL_PREFIX"db_query", driver.second->db_query );
+			driver.first->resolve( SYMBOL_PREFIX"rs_free_cursor", driver.second->rs_free_cursor );
+			driver.first->resolve( SYMBOL_PREFIX"rs_get", driver.second->rs_get );
+			driver.first->resolve( SYMBOL_PREFIX"rs_next", driver.second->rs_next );
+			driver.first->resolve( SYMBOL_PREFIX"rs_get_field", driver.second->rs_get_field );
+			driver.first->resolve( SYMBOL_PREFIX"rs_fields_count", driver.second->rs_fields_count );
+			driver.first->resolve( SYMBOL_PREFIX"dbrs_records_count", driver.second->dbrs_records_count );
+			driver.first->resolve( SYMBOL_PREFIX"dbrs_id", driver.second->dbrs_id );
+			driver.first->resolve( SYMBOL_PREFIX"rs_column_name", driver.second->rs_column_name );
+			driver.first->resolve( SYMBOL_PREFIX"db_connect", driver.second->db_connect );
 			char const** tlq = NULL; /* msvcxx bug */
 			driver.first->resolve( SYMBOL_PREFIX"TABLE_LIST_QUERY", tlq );
-			driver.second._tableListQuery = *tlq;
+			driver.second->_tableListQuery = *tlq;
 			char const** clq = NULL; /* msvcxx bug */
 			driver.first->resolve( SYMBOL_PREFIX"COLUMN_LIST_QUERY", clq );
-			driver.second._columnListQuery = *clq;
+			driver.second->_columnListQuery = *clq;
 			int* cni( NULL );
 			driver.first->resolve( SYMBOL_PREFIX"COLUMN_NAME_INDEX", cni );
-			driver.second._columnNameIndex = *cni;
+			driver.second->_columnNameIndex = *cni;
 			it = _dBDrivers_.insert( make_pair( driverId_, driver ) ).first;
+			driver.second->init();
 		} catch ( HPluginException& e ) {
 			log( LOG_TYPE::NOTICE ) << "fail." << endl;
 			HStringStream reason;
@@ -245,7 +248,7 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 			dbwrapper_exit();
 		}
 	}
-	return ( &it->second.second );
+	return ( it->second.second.raw() );
 	M_EPILOG
 }
 
@@ -271,8 +274,15 @@ ODBConnector const* load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 	M_EPILOG
 }
 
+/*
+ * ODBConnector implementation is in this file instead of db_driver.cxx because
+ * build system discards implementation files with file name ending with _driver.cxx.
+ */
+
 ODBConnector::ODBConnector( void )
-	: db_connect( null_db_connect ),
+	: driver_init( NULL ),
+	driver_cleanup( NULL ),
+	db_connect( null_db_connect ),
 	db_disconnect( null_db_disconnect ),
 	dbrs_errno( null_dbrs_errno ),
 	dbrs_error( null_dbrs_error ),
@@ -290,6 +300,29 @@ ODBConnector::ODBConnector( void )
 	_tableListQuery( NULL ),
 	_columnListQuery( NULL ),
 	_columnNameIndex( 0 ) {
+}
+
+ODBConnector::~ODBConnector( void ) {
+	M_PROLOG
+	cleanup();
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
+void ODBConnector::cleanup( void ) {
+	M_PROLOG
+	if ( driver_cleanup )
+		driver_cleanup();
+	return;
+	M_EPILOG
+}
+
+void ODBConnector::init( void ) {
+	M_PROLOG
+	if ( driver_init )
+		driver_init();
+	return;
+	M_EPILOG
 }
 
 /* end of driver null section */

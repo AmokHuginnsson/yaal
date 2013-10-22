@@ -34,6 +34,18 @@ M_EXPORT_SYMBOL char* TABLE_LIST_QUERY = const_cast<char*>( ";" );
 M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "%s;" );
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 0;
 
+M_EXPORT_SYMBOL void driver_init( void ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+M_EXPORT_SYMBOL void driver_cleanup( void ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
 M_EXPORT_SYMBOL bool db_connect( ODBLink& /*dbLink_*/,
 		yaal::hcore::HString const&, yaal::hcore::HString const&,
 		yaal::hcore::HString const&, yaal::hcore::HString const& ) {
