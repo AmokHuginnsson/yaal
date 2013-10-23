@@ -140,10 +140,11 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	OPostgreSQLResult* result( new ( memory::yaal ) OPostgreSQLResult( dbLink_ ) );
 	PGconn* conn( static_cast<PGconn*>( dbLink_._conn ) );
-	::PQprepare( conn, "", query_, 0, NULL );
+	PGresult* r( ::PQprepare( conn, "", query_, 0, NULL ) );
 	result->_result = ::PQdescribePrepared( conn, "" );
 	result->_randomAccess = false;
 	::PQsendQueryPrepared( conn, "", 0, NULL, NULL, NULL, 0 );
+	::PQclear( r );
 /*	::PQsetSingleRowMode( conn ); */
 	return ( result );
 }
