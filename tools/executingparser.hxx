@@ -175,6 +175,8 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
 	HRule& operator = ( HRule const& );
+	template<typename tType, typename a0_t, typename a1_t, typename a2_t>
+	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( a0_t const&, a1_t const&, a2_t const& );
 };
 
 typedef yaal::hcore::HExceptionT<HRule, HRuleBaseException> HRuleException;
@@ -197,6 +199,7 @@ private:
 	HRecursiveRule( HRecursiveRule const& );
 	HRecursiveRule& operator = ( HRecursiveRule const& );
 	friend class HRule;
+	friend yaal::hcore::HPointer<HRecursiveRule> yaal::hcore::make_pointer<HRecursiveRule>( void );
 };
 
 typedef yaal::hcore::HExceptionT<HRecursiveRule, HRuleBaseException> HRecursiveRuleException;
@@ -403,6 +406,8 @@ private:
 	HReal( void );
 	HReal& operator = ( HReal const& );
 	friend HReal const& get_real_instance( void );
+	template<typename tType, typename a0_t>
+	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( a0_t const& );
 };
 
 extern HReal const& real;

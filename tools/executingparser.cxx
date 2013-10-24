@@ -154,10 +154,8 @@ yaal::hcore::HString::const_iterator HRuleBase::skip_space( yaal::hcore::HString
 void HRuleBase::detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_PROLOG
 	visited_t::insert_result ir( visited_.insert( this ) );
-	if ( ir.second ) {
+	if ( ir.second )
 		do_detach( rule_, visited_ );
-		visited_.erase( ir.first );
-	}
 	return;
 	M_EPILOG
 }
@@ -167,11 +165,11 @@ HRuleBase::HNamedRule::HNamedRule( HRuleBase const& rule_ )
 	{}
 
 HRule::HRule( yaal::hcore::HString const& name_ )
-	: HRuleBase(), _rule( name_, ptr_t( new HRecursiveRule() ) ), _completelyDefined( false )
+	: HRuleBase(), _rule( name_, make_pointer<HRecursiveRule>() ), _completelyDefined( false )
 	{}
 
 HRule::HRule( void )
-	: HRuleBase(), _rule( ptr_t( new HRecursiveRule() ) ), _completelyDefined( false )
+	: HRuleBase(), _rule( make_pointer<HRecursiveRule>() ), _completelyDefined( false )
 	{}
 
 HRule::HRule( HRule const& rule_ )
@@ -231,7 +229,7 @@ yaal::hcore::HString const& HRule::get_name( void ) const {
 HRule::ptr_t HRule::do_clone( void ) const {
 	M_PROLOG
 	M_ENSURE( !! _rule );
-	return ( ! _action ? _rule._rule : ptr_t( new HRule( _rule._name, _rule._rule, _action ) ) );
+	return ( ! _action ? _rule._rule : pointer_static_cast<HRuleBase>( make_pointer<HRule>( _rule._name, _rule._rule, _action ) ) );
 	M_EPILOG
 }
 
@@ -406,7 +404,7 @@ HFollows HFollows::operator[]( action_t const& action_ ) const {
 
 HRuleBase::ptr_t HFollows::do_clone( void ) const {
 	M_PROLOG
-	return ( ptr_t( new HFollows( *this ) ) );
+	return ( make_pointer<HFollows>( *this ) );
 	M_EPILOG
 }
 
@@ -486,7 +484,7 @@ HKleeneStar HKleeneStar::operator[]( action_t const& action_ ) const {
 
 HRuleBase::ptr_t HKleeneStar::do_clone( void ) const {
 	M_PROLOG
-	return ( ptr_t( new HKleeneStar( *this ) ) );
+	return ( make_pointer<HKleeneStar>( *this ) );
 	M_EPILOG
 }
 
@@ -548,7 +546,7 @@ HKleenePlus::HKleenePlus( HKleenePlus const& kleenePlus_ )
 
 HRuleBase::ptr_t HKleenePlus::do_clone( void ) const {
 	M_PROLOG
-	return ( ptr_t( new HKleenePlus( *this ) ) );
+	return ( make_pointer<HKleenePlus>( *this ) );
 	M_EPILOG
 }
 
@@ -616,7 +614,7 @@ HAlternative::HAlternative( HAlternative const& alternative_, HRuleBase const& c
 
 HRuleBase::ptr_t HAlternative::do_clone( void ) const {
 	M_PROLOG
-	return ( ptr_t( new HAlternative( *this ) ) );
+	return ( make_pointer<HAlternative>( *this ) );
 	M_EPILOG
 }
 
@@ -666,7 +664,7 @@ HOptional::HOptional( HNamedRule const& rule_, action_t const& action_ )
 
 HRuleBase::ptr_t HOptional::do_clone( void ) const {
 	M_PROLOG
-	return ( ptr_t( new HOptional( *this ) ) );
+	return ( make_pointer<HOptional>( *this ) );
 	M_EPILOG
 }
 
@@ -888,7 +886,7 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 
 HRuleBase::ptr_t HReal::do_clone( void ) const {
 	M_PROLOG
-	return ( ptr_t( new HReal( *this ) ) );
+	return ( make_pointer<HReal>( *this ) );
 	M_EPILOG
 }
 
@@ -1038,7 +1036,7 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 
 HRuleBase::ptr_t HInteger::do_clone( void ) const {
 	M_PROLOG
-	return ( ptr_t( new HInteger( *this ) ) );
+	return ( make_pointer<HInteger>( *this ) );
 	M_EPILOG
 }
 
@@ -1121,7 +1119,7 @@ yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* exe
 
 HRuleBase::ptr_t HCharacter::do_clone( void ) const {
 	M_PROLOG
-	return ( ptr_t( new HCharacter( *this ) ) );
+	return ( make_pointer<HCharacter>( *this ) );
 	M_EPILOG
 }
 
@@ -1209,7 +1207,7 @@ hcore::HString::const_iterator HString::do_parse( HExecutingParser*, hcore::HStr
 
 HRuleBase::ptr_t HString::do_clone( void ) const {
 	M_PROLOG
-	return ( ptr_t( new HString( *this ) ) );
+	return ( make_pointer<HString>( *this ) );
 	M_EPILOG
 }
 
@@ -1233,7 +1231,7 @@ HString string( yaal::hcore::HString const& string_ ) {
 }
 
 HRegex::HRegex( hcore::HString const& string_ )
-	: HRuleBase(), _regex( new hcore::HRegex( string_ ) ), _actionString()
+	: HRuleBase(), _regex( make_pointer<hcore::HRegex>( string_ ) ), _actionString()
 	{}
 
 HRegex::HRegex( regex_t const& regex_, action_t const& action_ )
@@ -1271,7 +1269,7 @@ hcore::HString::const_iterator HRegex::do_parse( HExecutingParser*, hcore::HStri
 
 HRuleBase::ptr_t HRegex::do_clone( void ) const {
 	M_PROLOG
-	return ( ptr_t( new HRegex( *this ) ) );
+	return ( make_pointer<HRegex>( *this ) );
 	M_EPILOG
 }
 
@@ -1366,6 +1364,7 @@ void HGrammarDescription::describe( HRuleBase const& rule_ ) {
 	M_PROLOG
 	if ( _visited.insert( &rule_ ).second )
 		rule_.describe( *this );
+	return;
 	M_EPILOG
 }
 
