@@ -129,9 +129,9 @@ void HRandomizer::init( u64_t seed_ ) {
 void HRandomizer::init( u64_t const* state_, int stateSize_ ) {
 	M_PROLOG
 	init( 19650218ull );
-	u64_t i( 1 );
+	int i( 1 );
 	int j( 0 );
-	u64_t k( ( STATE_SIZE > stateSize_ ? STATE_SIZE : stateSize_ ) );
+	int k( ( STATE_SIZE > stateSize_ ? STATE_SIZE : stateSize_ ) );
 	for ( ; k; -- k ) {
 		_state[i] = ( _state[i] ^ ( ( _state[i - 1] ^ ( _state[i - 1] >> 62 ) ) * 3935559000370003845ull ) ) + state_[j] + j; /* non linear */
 		++ i;
@@ -145,7 +145,7 @@ void HRandomizer::init( u64_t const* state_, int stateSize_ ) {
 	}
 	for ( k = STATE_SIZE - 1; k; -- k ) {
 		_state[i] = ( _state[i] ^ ( (_state[i - 1] ^ ( _state[i - 1] >> 62 ) ) * 2862933555777941757ull ) ) - i; /* non linear */
-		i++;
+		++ i;
 		if ( i >= STATE_SIZE ) {
 			_state[0] = _state[STATE_SIZE - 1];
 			i = 1;
