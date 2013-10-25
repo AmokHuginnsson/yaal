@@ -386,6 +386,7 @@ private:
 		DECIMAL = 4
 	} real_paring_state_t;
 public:
+	HReal( HReal const& );
 	HReal operator[]( action_t const& ) const;
 	HReal operator[]( action_double_t const& ) const;
 	HReal operator[]( action_double_long_t const& ) const;
@@ -397,7 +398,6 @@ protected:
 	HReal( action_double_long_t const& );
 	HReal( action_number_t const& );
 	HReal( action_string_t const& );
-	HReal( HReal const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HGrammarDescription& ) const;
