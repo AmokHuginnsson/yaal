@@ -34,7 +34,7 @@
 ?_commandComposeDelay_@hconsole@yaal@@3HA
 ?_compressionLevel_@tools@yaal@@3HA
 ?_dataBaseDriver_@dbwrapper@yaal@@3W4enum_t@DRIVER@ODBConnector@12@A
-?_dBDrivers_@dbwrapper@yaal@@3V?$HMap@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@V?$HPair@V?$HPointer@VHPlugin@tools@yaal@@UHPointerScalar@hcore@3@UHPointerStrict@53@@hcore@yaal@@UODBConnector@dbwrapper@3@@hcore@5@U?$less@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@@5@U?$system@V?$HPair@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@V?$HPair@V?$HPointer@VHPlugin@tools@yaal@@UHPointerScalar@hcore@3@UHPointerStrict@53@@hcore@yaal@@UODBConnector@dbwrapper@3@@hcore@5@@hcore@yaal@@@allocator@5@@hcore@2@A
+?_dBDrivers_@dbwrapper@yaal@@3V?$HMap@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@V?$HPair@V?$HPointer@VHPlugin@tools@yaal@@UHPointerScalar@hcore@3@UHPointerStrict@53@@hcore@yaal@@V?$HPointer@UODBConnector@dbwrapper@yaal@@UHPointerScalar@hcore@3@UHPointerStrict@53@@23@@hcore@5@U?$less@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@@5@U?$system@V?$HPair@W4enum_t@DRIVER@ODBConnector@dbwrapper@yaal@@V?$HPair@V?$HPointer@VHPlugin@tools@yaal@@UHPointerScalar@hcore@3@UHPointerStrict@53@@hcore@yaal@@V?$HPointer@UODBConnector@dbwrapper@yaal@@UHPointerScalar@hcore@3@UHPointerStrict@53@@23@@hcore@5@@hcore@yaal@@@allocator@5@@hcore@2@A
 ?_debugLevel_@hcore@yaal@@3HA
 ?_defaultEncoding_@tools@yaal@@3VHString@hcore@2@A
 ?_defaultTimeFormat_@hcore@yaal@@3QBDB
@@ -109,6 +109,7 @@
 ?brightred@ansi@yaal@@3VHSequence@12@B
 ?brown@ansi@yaal@@3VHSequence@12@B
 ?cerr@hcore@yaal@@3VHSynchronizedStream@12@A
+?character@executing_parser@tools@yaal@@3ABVHCharacter@123@B
 ?cin@hcore@yaal@@3VHSynchronizedStream@12@A
 ?clear@ansi@yaal@@3VHSequence@12@B
 ?clog@hcore@yaal@@3VHSynchronizedStream@12@A
@@ -123,12 +124,14 @@
 ?eols@HStreamInterface@hcore@yaal@@2QBDB
 ?gray@ansi@yaal@@3VHSequence@12@B
 ?green@ansi@yaal@@3VHSequence@12@B
+?integer@executing_parser@tools@yaal@@3ABVHInteger@123@B
 ?left@ansi@yaal@@3VHSequence@12@B
 ?lightgray@ansi@yaal@@3VHSequence@12@B
 ?log@hcore@yaal@@3AAVHLog@12@A
 ?magenta@ansi@yaal@@3VHSequence@12@B
 ?MANAGED_IO@SystemIO@msvcxx@@2HB
 ?PI@math@yaal@@3OA
+?real@executing_parser@tools@yaal@@3ABVHReal@123@B
 ?red@ansi@yaal@@3VHSequence@12@B
 ?reset@ansi@yaal@@3VHSequence@12@B
 ?restore@ansi@yaal@@3VHSequence@12@B

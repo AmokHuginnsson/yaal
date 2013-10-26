@@ -133,8 +133,9 @@ static int const CLOCK_REALTIME = 0;
 #endif /* _CTIME */
 #ifdef _CSTRING_
 #include <errno.h>
-#include <pthread.h>
+#include <sys/time.h>
 #include "hcore/macro.hxx"
+#undef OVERFLOW
 #undef SIG_BLOCK
 #undef SIG_UNBLOCK
 #undef SIG_SETMASK

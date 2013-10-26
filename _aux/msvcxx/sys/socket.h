@@ -44,7 +44,7 @@ inline int connect( int fd_, struct sockaddr* addr_, socklen_t len_ )
 inline int shutdown( int fd_, int how_ )
 	{ return ( msvcxx::shutdown( fd_, how_ ) ); }
 
-inline int setsockopt( int fd_, int level_, int optname_, char* optval_, int unsigned optlen_ )
+inline int setsockopt( int fd_, int level_, int optname_, char* optval_, int optlen_ )
 	{	return ( msvcxx::setsockopt( fd_, level_, optname_, optval_, optlen_ ) ); }
 
 inline int getsockopt( int fd_, int level_, int optname_, void* optval_, socklen_t* optlen_ )

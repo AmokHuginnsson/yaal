@@ -55,6 +55,16 @@ inline void FD_SET_ms( int fd_, fd_set* fdset_ )
 
 using namespace asio;
 
+inline struct tm *gmtime_r(const time_t *timep, struct tm *result) {
+	gmtime_s( result, timep );
+	return ( result );
+}
+
+inline struct tm *localtime_r(const time_t *timep, struct tm *result) {
+	localtime_s( result, timep );
+	return ( result );
+}
+
 typedef int clockid_t;
 typedef void* timer_t;
 

@@ -221,6 +221,26 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t& );
 };
 
+class HFollows;
+class HKleeneStar;
+class HKleenePlus;
+class HAlternative;
+class HOptional;
+
+HFollows operator >> ( HRuleBase const&, HRuleBase const& );
+HFollows operator >> ( HFollows const&, HRuleBase const& );
+HFollows operator >> ( char const*, HRuleBase const& );
+HFollows operator >> ( yaal::hcore::HString const&, HRuleBase const& );
+HFollows operator >> ( HRuleBase const&, char const* );
+HFollows operator >> ( HRuleBase const&, yaal::hcore::HString const& );
+HFollows operator >> ( char character_, HRuleBase const& successor_ );
+HFollows operator >> ( HRuleBase const& successor_, char );
+HAlternative operator | ( HRuleBase const&, HRuleBase const& );
+HAlternative operator | ( HAlternative const&, HRuleBase const& );
+HKleeneStar operator* ( HRuleBase const& );
+HKleenePlus operator+ ( HRuleBase const& );
+HOptional operator - ( HRuleBase const& );
+
 class HFollows : public HRuleBase {
 public:
 	typedef HFollows this_type;
@@ -356,14 +376,6 @@ private:
 
 typedef yaal::hcore::HExceptionT<HOptional, HRuleBaseException> HOptionalException;
 
-HFollows operator >> ( HRuleBase const&, HRuleBase const& );
-HFollows operator >> ( HFollows const&, HRuleBase const& );
-HAlternative operator | ( HRuleBase const&, HRuleBase const& );
-HAlternative operator | ( HAlternative const&, HRuleBase const& );
-HKleeneStar operator* ( HRuleBase const& );
-HKleenePlus operator+ ( HRuleBase const& );
-HOptional operator - ( HRuleBase const& );
-
 class HReal : public HRuleBase {
 public:
 	typedef HReal this_type;
@@ -410,7 +422,7 @@ private:
 	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( a0_t const& );
 };
 
-extern HReal const& real;
+extern M_YAAL_TOOLS_PUBLIC_API HReal const& real;
 
 typedef yaal::hcore::HExceptionT<HReal, HRuleBaseException> HRealException;
 
@@ -456,7 +468,7 @@ private:
 	friend HInteger const& get_integer_instance( void );
 };
 
-extern HInteger const& integer;
+extern M_YAAL_TOOLS_PUBLIC_API HInteger const& integer;
 
 typedef yaal::hcore::HExceptionT<HInteger, HRuleBaseException> HIntegerException;
 
@@ -487,12 +499,10 @@ private:
 	HCharacter& operator = ( HCharacter const& );
 	friend HCharacter const& get_character_instance( void );
 };
-extern HCharacter const& character;
+
+extern M_YAAL_TOOLS_PUBLIC_API HCharacter const& character;
 
 typedef yaal::hcore::HExceptionT<HCharacter, HRuleBaseException> HCharacterException;
-
-HFollows operator >> ( char character_, HRuleBase const& successor_ );
-HFollows operator >> ( HRuleBase const& successor_, char );
 
 class HString : public HRuleBase {
 public:
@@ -556,10 +566,6 @@ private:
 
 typedef yaal::hcore::HExceptionT<HRegex, HRuleBaseException> HRegexException;
 
-HFollows operator >> ( char const*, HRuleBase const& );
-HFollows operator >> ( yaal::hcore::HString const&, HRuleBase const& );
-HFollows operator >> ( HRuleBase const&, char const* );
-HFollows operator >> ( HRuleBase const&, yaal::hcore::HString const& );
 HCharacter constant( char );
 HString constant( yaal::hcore::HString const& );
 HRegex regex( yaal::hcore::HString const& );
