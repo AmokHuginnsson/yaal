@@ -376,7 +376,8 @@ AC_LANG([C++])
 if test ["${ac_cv_type_sighandler_t}"] = ["no"] -a ["${ac_cv_type___sighandler_t}"] = ["no"] ; then
 	AC_CHECK_TYPES([SIG_PF],[],[AC_MSG_ERROR([Cannot continue without signal handler type definition.])],[#include <signal.h>])
 fi
-AC_CHECK_FUNCS([getline memrchr strnlen getaddrinfo getnameinfo gethostbyname_r gethostbyaddr_r strcasestr strtold pthread_setname_np pthread_set_name_np prctl])
+AC_CHECK_FUNCS([getline memrchr strnlen getaddrinfo getnameinfo gethostbyname_r gethostbyaddr_r strcasestr pthread_setname_np pthread_set_name_np prctl])
+AC_CHECK_DECLS([strtold],[],[],[#include <cstdlib>])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])
 AC_MSG_CHECKING([whether basename is declared in cstring])
