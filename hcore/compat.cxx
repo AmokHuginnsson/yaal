@@ -124,9 +124,9 @@ double long sqrtl( double long x ) {
 }
 #endif /* not HAVE_DECL_SQRTL */
 
-#if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 )
+#if ! defined( HAVE_DECL_STRTOLD ) || ( HAVE_DECL_STRTOLD == 0 )
 double long strtold( char const* str, char** tail ) {
 	return ( strtod( str, tail ) );
 }
-#endif /* not HAVE_STRTOLD */
+#endif /* not HAVE_DECL_STRTOLD */
 

@@ -80,9 +80,9 @@ double long floorl( double long );
 double long sqrtl( double long );
 #endif /* #if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 ) */
 
-#if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 )
+#if ! defined( HAVE_DECL_STRTOLD ) || ( HAVE_DECL_STRTOLD == 0 )
 double long strtold( char const*, char** );
-#endif /* #if ! defined( HAVE_STRTOLD ) || ( HAVE_STRTOLD == 0 ) */
+#endif /* #if ! defined( HAVE_DECL_STRTOLD ) || ( HAVE_DECL_STRTOLD == 0 ) */
 
 #if ! defined( LOGIN_NAME_MAX )
 static int const LOGIN_NAME_MAX = 16;
