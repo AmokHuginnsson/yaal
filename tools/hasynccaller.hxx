@@ -41,9 +41,9 @@ namespace tools {
 class HAbstractAsyncCaller {
 public:
 	typedef HAbstractAsyncCaller this_type;
-protected:
 	typedef int long priority_t;
 	typedef yaal::hcore::HBoundCall<> call_t;
+protected:
 	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
 	queue_t _queue;
 	yaal::hcore::HThread _thread;

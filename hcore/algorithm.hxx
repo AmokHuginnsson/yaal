@@ -1137,7 +1137,7 @@ inline void fill_n( dst_it_t it, int long count, filler_t const& filler ) {
 template<typename iterator_t, typename generator_t>
 inline void generate( iterator_t it, iterator_t const& end, generator_t generator ) {
 	for ( ; it != end; ++ it )
-		*it = generator();
+		*it = static_cast<typename hcore::iterator_traits<iterator_t>::value_type>( generator() );
 	return;
 }
 
@@ -1977,7 +1977,7 @@ template<typename iterator_t, typename generator_t>
 inline void random_shuffle( iterator_t first_, iterator_t last_, generator_t randomGenerator_ ) {
 	int long count( last_ - first_ );
 	while ( count > 1 ) {
-		int long idx( randomGenerator_( count ) );
+		int long idx( static_cast<int long>( randomGenerator_( count ) ) );
 		M_ASSERT( ( idx >= 0 ) && ( idx < count ) );
 		-- count;
 		using yaal::swap;
@@ -2014,7 +2014,7 @@ inline void random_sample( source_iterator_t srcFirst_, source_iterator_t srcLas
 	int long dstCount( dstLast_ - dstFirst_ );
 	int long srcTop( ( src - srcFirst_ ) + 1 );
 	while ( src != srcLast_ ) {
-		int long idx( randomGenerator_( srcTop ) );
+		int long idx( static_cast<int long>( randomGenerator_( srcTop ) ) );
 		if ( idx < dstCount )
 			*( dstFirst_ + idx ) = *src;
 		++ srcTop;

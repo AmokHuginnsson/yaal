@@ -1,5 +1,6 @@
 #include <sys/cdefs.h>
 #define log cmath_log
+#include <iterator>
 #include <sstream>
 #undef log
 #include <io.h>
@@ -100,7 +101,7 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 			std::transform( ios, ios + readFds->_count, handles, osCast );
 		}
 		if ( writeFds ) {
-			std::transform( writeFds->_data, writeFds->_data + writeFds->_count, ios + offset, osCast );
+			std::transform( writeFds->_data, writeFds->_data + writeFds->_count, stdext::checked_array_iterator<IO**>( ios + offset, writeFds->_count), osCast );
 			for ( int i( 0 ); i < writeFds->_count; ++ i ) {
 				if ( ios[i + offset]->is_connected() )
 					++ ret;
