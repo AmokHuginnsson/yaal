@@ -130,7 +130,7 @@ extern "C" int getntptimeofday( struct timespec*, struct timezone* );
 inline int clock_gettime( __clockid_t, struct timespec* tp_ )
 	{ return ( getntptimeofday( tp_, NULL ) ); }
 static int const CLOCK_REALTIME = 0;
-#endif /* _CTIME */
+#endif /* #ifdef _CTIME_ */
 #ifdef _CSTRING_
 #include <errno.h>
 #include <sys/time.h>

@@ -4,11 +4,9 @@
 #define CONCATENATE_DIRECT(s1, s2) s1##s2
 #define CONCATENATE(s1, s2) CONCATENATE_DIRECT(s1, s2)
 
-#ifndef _WIN64
-#define _USE_32BIT_TIME_T 1
-#else /* not _WIN64 */
+#ifdef _WIN64
 #define __intptr_t_defined 1
-#endif /* _WIN64 */
+#endif /* #ifdef _WIN64 */
 
 #define __dev_t_defined 1
 #define __ino_t_defined 1

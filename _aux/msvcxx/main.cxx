@@ -342,8 +342,8 @@ int timer_create( clockid_t, struct sigevent*, timer_t* timer_ ) {
 M_EXPORT_SYMBOL
 int timer_settime( timer_t timer_, int, struct itimerspec const* due_, struct itimerspec* ) {
 	int err( 0 );
-	int long miliseconds( due_->it_value.tv_sec * 1000 + due_->it_value.tv_nsec / 1000000 );
-	if ( ! ::ChangeTimerQueueTimer( NULL, timer_, miliseconds ? miliseconds : ULONG_MAX, 0 ) ) {
+	time_t miliseconds( due_->it_value.tv_sec * 1000 + due_->it_value.tv_nsec / 1000000 );
+	if ( ! ::ChangeTimerQueueTimer( NULL, timer_, static_cast<ULONG>( miliseconds ? miliseconds : ULONG_MAX ), 0 ) ) {
 		log_windows_error( "CreateTimerQueueTimer" );
 		err = -1;
 	}

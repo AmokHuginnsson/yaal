@@ -30,6 +30,8 @@ Copyright:
 #ifndef YAAL_HCORE_HCLOCK_HXX_INCLUDED
 #define YAAL_HCORE_HCLOCK_HXX_INCLUDED 1
 
+#include "hcore/pod.hxx"
+
 namespace yaal {
 
 namespace hcore {
@@ -50,16 +52,19 @@ public:
 		} unit_t;
 	};
 private:
-	mutable int long _moment[2];
+	i64_t _moment[2];
 public:
 	HClock( void );
-	/*! \brief Get time that elapsed from last measurement.
+	/*! \brief Get time that elapsed from last reset.
 	 *
 	 * \param unit_ - get time given in specific units.
-	 * \param reset_ - reset timer with this call.
 	 * \return Amount of time that elapsed in given unit.
 	 */
-	int long get_time_elapsed( UNIT::unit_t unit_ = UNIT::SECOND, bool reset_ = false ) const;
+	i64_t get_time_elapsed( UNIT::unit_t unit_ = UNIT::SECOND ) const;
+
+	/*! \brief Reset clock.
+	 */
+	void reset( void );
 };
 
 }

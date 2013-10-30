@@ -123,7 +123,7 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 			output_[ i ] = -1;
 	}
 	if ( timeOut_ )
-		*timeOut_ -= min( *timeOut_, clock.get_time_elapsed( HClock::UNIT::MILISECOND ) );
+		*timeOut_ -= min( *timeOut_, static_cast<int long>( clock.get_time_elapsed( HClock::UNIT::MILISECOND ) ) );
 	return ( ret );
 }
 
