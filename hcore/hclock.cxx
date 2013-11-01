@@ -65,7 +65,7 @@ i64_t HClock::get_time_elapsed( UNIT::unit_t unit_ ) const {
 	timespec time;
 	timespec now;
 	M_ENSURE( clock_gettime( FWD_CLOCK_REALTIME, &now ) == 0 );
-	time.tv_sec = now.tv_sec - _moment[ UNIT::SECOND ];
+	time.tv_sec = static_cast<time_t>( now.tv_sec - _moment[ UNIT::SECOND ] );
 	if ( now.tv_nsec < _moment[ UNIT::NANOSECOND ] ) {
 		-- time.tv_sec;
 		time.tv_nsec = NANO_IN_WHOLE - static_cast<int long>( _moment[ UNIT::NANOSECOND ] - now.tv_nsec );
