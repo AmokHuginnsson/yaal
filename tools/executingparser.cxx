@@ -132,16 +132,16 @@ yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executi
 	M_EPILOG
 }
 
-void HRuleBase::describe( ORuleDescription& rd_ ) const {
+void HRuleBase::describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	do_describe( rd_ );
 	return;
 	M_EPILOG
 }
 
-ORuleDescription HRuleBase::describe( void ) const {
+HRuleDescription HRuleBase::describe( void ) const {
 	M_PROLOG
-	ORuleDescription rd;
+	HRuleDescription rd;
 	do_describe( rd );
 	return ( rd );
 	M_EPILOG
@@ -167,9 +167,39 @@ void HRuleBase::detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_EPILOG
 }
 
-HRuleBase::HNamedRule::HNamedRule( HRuleBase const& rule_ )
+HNamedRule::HNamedRule( HRuleBase const& rule_ )
 	: _name( dynamic_cast<HRule const*>( &rule_ ) ? dynamic_cast<HRule const*>( &rule_ )->get_name() : yaal::hcore::HString() ), _rule( rule_.clone() )
 	{}
+
+yaal::hcore::HString const& HNamedRule::name( void ) const {
+	M_PROLOG
+	return ( _name );
+	M_EPILOG
+}
+
+void HNamedRule::reset( ptr_t const& rule_ ) {
+	M_PROLOG
+	_rule = rule_;
+	return;
+	M_EPILOG
+}
+
+HNamedRule::ptr_t const& HNamedRule::rule( void ) const {
+	M_PROLOG
+	return ( _rule );
+	M_EPILOG
+}
+
+void HNamedRule::describe( HRuleDescription& rd_ ) const {
+	M_PROLOG
+	if ( ! _name.is_empty() ) {
+		rd_.add( this );
+		rd_.desc( _name );
+	} else
+		_rule->describe( rd_ );
+	return;
+	M_EPILOG
+}
 
 HRule::HRule( yaal::hcore::HString const& name_ )
 	: HRuleBase(), _rule( name_, make_pointer<HRecursiveRule>() ), _completelyDefined( false )
@@ -223,20 +253,20 @@ HRule& HRule::operator %= ( HRuleBase const& rule_ ) {
 HRule HRule::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! _action );
-	return ( HRule( _rule._name, clone(), action_ ) );
+	return ( HRule( _rule.name(), clone(), action_ ) );
 	M_EPILOG
 }
 
 yaal::hcore::HString const& HRule::get_name( void ) const {
 	M_PROLOG
-	return ( _rule._name );
+	return ( _rule.name() );
 	M_EPILOG
 }
 
 HRule::ptr_t HRule::do_clone( void ) const {
 	M_PROLOG
 	M_ENSURE( !! _rule );
-	return ( ! _action ? _rule._rule : pointer_static_cast<HRuleBase>( make_pointer<HRule>( _rule._name, _rule._rule, _action ) ) );
+	return ( ! _action ? _rule.rule() : pointer_static_cast<HRuleBase>( make_pointer<HRule>( _rule.name(), _rule.rule(), _action ) ) );
 	M_EPILOG
 }
 
@@ -251,10 +281,10 @@ yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executin
 
 void HRule::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_PROLOG
-	HRuleBase::ptr_t r( _rule._rule );
+	HRuleBase::ptr_t r( _rule.rule() );
 	if ( !! r ) {
 		if ( r.raw() == rule_ )
-			_rule._rule = make_pointer<HRuleRef>( r );
+			_rule.reset( make_pointer<HRuleRef>( r ) );
 		else
 			r->detach( rule_, visited_ );
 	}
@@ -265,12 +295,12 @@ void HRule::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 bool HRule::do_is_optional( void ) const
 	{ return ( _rule->is_optional() ); }
 
-void HRule::do_describe( ORuleDescription& rd_ ) const {
+void HRule::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	if ( !! _rule ) {
-		rd_._description = _rule._name;
-		rd_._description += " = ";
-		_rule._rule->describe( rd_ );
+		rd_.desc( _rule.name() );
+		rd_.desc( " = " );
+		_rule.rule()->describe( rd_ );
 	}
 	return;
 	M_EPILOG
@@ -307,7 +337,7 @@ bool HRecursiveRule::do_is_optional( void ) const {
 	M_EPILOG
 }
 
-void HRecursiveRule::do_describe( ORuleDescription& rd_ ) const {
+void HRecursiveRule::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	if ( !! _rule )
 		_rule->describe( rd_ );
@@ -351,7 +381,7 @@ bool HRuleRef::do_is_optional( void ) const {
 	M_EPILOG
 }
 
-void HRuleRef::do_describe( ORuleDescription& rd_ ) const {
+void HRuleRef::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule );
 	M_ENSURE( !! r );
@@ -415,15 +445,15 @@ HRuleBase::ptr_t HFollows::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HFollows::do_describe( ORuleDescription& rd_ ) const {
+void HFollows::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	bool next( false );
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( next )
-			rd_._description += " >> ";
-		if ( ! it->_name.is_empty() ) {
-			rd_._children.push_back( it->id() );
-			rd_._description += it->_name;
+			rd_.desc( " >> " );
+		if ( ! it->name().is_empty() ) {
+			rd_.add( &*it );
+			rd_.desc( it->name() );
 		} else
 			it->id()->describe( rd_ );
 		next = true;
@@ -452,10 +482,10 @@ yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* execu
 void HFollows::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_PROLOG
 	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
-		HRuleBase::ptr_t r( it->_rule );
+		HRuleBase::ptr_t r( it->rule() );
 		if ( !! r ) {
 			if ( r.raw() == rule_ )
-				it->_rule = make_pointer<HRuleRef>( r );
+				it->reset( make_pointer<HRuleRef>( r ) );
 			else
 				r->detach( rule_, visited_ );
 		}
@@ -504,21 +534,21 @@ yaal::hcore::HString::const_iterator HKleeneStar::do_parse( HExecutingParser* ex
 	M_EPILOG
 }
 
-void HKleeneStar::do_describe( ORuleDescription& rd_ ) const {
+void HKleeneStar::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	rd_._description += "*(";
+	rd_.desc( "*(" );
 	_rule->describe( rd_ );
-	rd_._description += ")";
+	rd_.desc( ")" );
 	return;
 	M_EPILOG
 }
 
 void HKleeneStar::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_PROLOG
-	HRuleBase::ptr_t r( _rule._rule );
+	HRuleBase::ptr_t r( _rule.rule() );
 	if ( !! r ) {
 		if ( r.raw() == rule_ )
-			_rule._rule = make_pointer<HRuleRef>( r );
+			_rule.reset( make_pointer<HRuleRef>( r ) );
 		else
 			r->detach( rule_, visited_ );
 	}
@@ -563,21 +593,21 @@ yaal::hcore::HString::const_iterator HKleenePlus::do_parse( HExecutingParser* ex
 	M_EPILOG
 }
 
-void HKleenePlus::do_describe( ORuleDescription& rd_ ) const {
+void HKleenePlus::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	rd_._description += "+(";
+	rd_.desc( "+(" );
 	_rule->describe( rd_ );
-	rd_._description += ")";
+	rd_.desc( ")" );
 	return;
 	M_EPILOG
 }
 
 void HKleenePlus::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_PROLOG
-	HRuleBase::ptr_t r( _rule._rule );
+	HRuleBase::ptr_t r( _rule.rule() );
 	if ( !! r ) {
 		if ( r.raw() == rule_ )
-			_rule._rule = make_pointer<HRuleRef>( r );
+			_rule.reset( make_pointer<HRuleRef>( r ) );
 		else
 			r->detach( rule_, visited_ );
 	}
@@ -623,17 +653,13 @@ yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser*, 
 	return ( NULL );
 }
 
-void HAlternative::do_describe( ORuleDescription& rd_ ) const {
+void HAlternative::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	bool next( false );
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( next )
-			rd_._description += " | ";
-		if ( ! it->_name.is_empty() ) {
-			rd_._children.push_back( it->id() );
-			rd_._description += it->_name;
-		} else
-			it->id()->describe( rd_ );
+			rd_.desc( " | " );
+		it->describe( rd_ );
 		next = true;
 	}
 	return;
@@ -643,10 +669,10 @@ void HAlternative::do_describe( ORuleDescription& rd_ ) const {
 void HAlternative::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_PROLOG
 	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
-		HRuleBase::ptr_t r( it->_rule );
+		HRuleBase::ptr_t r( it->rule() );
 		if ( !! r ) {
 			if ( r.raw() == rule_ )
-				it->_rule = make_pointer<HRuleRef>( r );
+				it->reset( make_pointer<HRuleRef>( r ) );
 			else
 				r->detach( rule_, visited_ );
 		}
@@ -692,21 +718,21 @@ yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser* exec
 bool HOptional::do_is_optional( void ) const
 	{ return ( true ); }
 
-void HOptional::do_describe( ORuleDescription& rd_ ) const {
+void HOptional::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	rd_._description += "-(";
+	rd_.desc( "-(" );
 	_rule->describe( rd_ );
-	rd_._description += ")";
+	rd_.desc( ")" );
 	return;
 	M_EPILOG
 }
 
 void HOptional::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_PROLOG
-	HRuleBase::ptr_t r( _rule._rule );
+	HRuleBase::ptr_t r( _rule.rule() );
 	if ( !! r ) {
 		if ( r.raw() == rule_ )
-			_rule._rule = make_pointer<HRuleRef>( r );
+			_rule.reset( make_pointer<HRuleRef>( r ) );
 		else
 			r->detach( rule_, visited_ );
 	}
@@ -895,9 +921,9 @@ HRuleBase::ptr_t HReal::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HReal::do_describe( ORuleDescription& rd_ ) const {
+void HReal::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	rd_._description += "real";
+	rd_.desc( "real" );
 	return;
 	M_EPILOG
 }
@@ -1045,9 +1071,9 @@ HRuleBase::ptr_t HInteger::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HInteger::do_describe( ORuleDescription& rd_ ) const {
+void HInteger::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	rd_._description += "integer";
+	rd_.desc( "integer" );
 	return;
 	M_EPILOG
 }
@@ -1128,14 +1154,14 @@ HRuleBase::ptr_t HCharacter::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HCharacter::do_describe( ORuleDescription& rd_ ) const {
+void HCharacter::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	if ( _character ) {
-		rd_._description += "'";
-		rd_._description += _character;
-		rd_._description += "'";
+		rd_.desc( "'" );
+		rd_.desc( _character );
+		rd_.desc( "'" );
 	} else
-		rd_._description += "character";
+		rd_.desc( "character" );
 	return;
 	M_EPILOG
 }
@@ -1218,11 +1244,11 @@ HRuleBase::ptr_t HString::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HString::do_describe( ORuleDescription& rd_ ) const {
+void HString::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	rd_._description += "\"";
-	rd_._description += _string;
-	rd_._description += "\"";
+	rd_.desc( "\"" );
+	rd_.desc( _string );
+	rd_.desc( "\"" );
 	return;
 	M_EPILOG
 }
@@ -1282,11 +1308,11 @@ HRuleBase::ptr_t HRegex::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HRegex::do_describe( ORuleDescription& rd_ ) const {
+void HRegex::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	rd_._description += "regex(\"";
-	rd_._description += _regex->pattern();
-	rd_._description += "\")";
+	rd_.desc( "regex(\"" );
+	rd_.desc( _regex->pattern() );
+	rd_.desc( "\")" );
 	return;
 	M_EPILOG
 }
@@ -1339,11 +1365,30 @@ HRegex regex( yaal::hcore::HString const& pattern_ ) {
 	M_EPILOG
 }
 
-ORuleDescription::ORuleDescription( void )
+HRuleDescription::HRuleDescription( void )
 	: _children(), _description()
 	{}
 
-void ORuleDescription::clear( void ) {
+void HRuleDescription::desc( yaal::hcore::HString const& desc_ ) {
+	M_PROLOG
+	_description += desc_;
+	return;
+	M_EPILOG
+}
+
+yaal::hcore::HString const& HRuleDescription::description( void ) const {
+	M_PROLOG
+	return ( _description );
+	M_EPILOG
+}
+
+HRuleDescription::named_children_t const& HRuleDescription::children( void ) const {
+	M_PROLOG
+	return ( _children );
+	M_EPILOG
+}
+
+void HRuleDescription::clear( void ) {
 	M_PROLOG
 	_children.clear();
 	_description.clear();
@@ -1351,34 +1396,34 @@ void ORuleDescription::clear( void ) {
 	M_EPILOG
 }
 
-HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
-	: _rules(), _visited(), _namedRules(), _ruleOrder() {
+void HRuleDescription::add( HNamedRule const* nr_ ) {
 	M_PROLOG
-	ORuleDescription rd;
-	rule_.describe( rd );
-	_rules.push_back( rd._description );
-	copy( rd._children.begin(), rd._children.end(), push_insert_iterator( _ruleOrder ) );
-	_visited.insert( &rule_ );
-	while ( ! _ruleOrder.is_empty() ) {
-		HRuleBase const* r( _ruleOrder.front() );
-		_ruleOrder.pop();
-		if ( _visited.insert( r ).second ) {
-			rd.clear();
-			r->describe( rd );
-			_rules.push_back( rd._description );
-			copy( rd._children.begin(), rd._children.end(), push_insert_iterator( _ruleOrder ) );
-		}
-	}
+	_children.push_back( nr_ );
 	return;
 	M_EPILOG
 }
 
-void HGrammarDescription::clear( void ) {
+HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
+	: _rules(), _visited(), _namedRules(), _ruleOrder() {
 	M_PROLOG
-	_rules.clear();
-	_visited.clear();
-	_namedRules.clear();
-	_ruleOrder.clear();
+	HRule const* main( dynamic_cast<HRule const*>( &rule_ ) );
+	M_ENSURE( main );
+	HRuleDescription rd;
+	rule_.describe( rd );
+	_rules.push_back( rd.description() );
+	copy( rd.children().begin(), rd.children().end(), push_insert_iterator( _ruleOrder ) );
+	_visited.insert( &rule_ );
+	_namedRules.insert( main->get_name() );
+	while ( ! _ruleOrder.is_empty() ) {
+		HNamedRule const* r( _ruleOrder.front() );
+		_ruleOrder.pop();
+		if ( _visited.insert( r->id() ).second ) {
+			rd.clear();
+			r->id()->describe( rd );
+			_rules.push_back( rd.description() );
+			copy( rd.children().begin(), rd.children().end(), push_insert_iterator( _ruleOrder ) );
+		}
+	}
 	return;
 	M_EPILOG
 }
