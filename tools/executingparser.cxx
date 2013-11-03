@@ -68,8 +68,7 @@ void HExecutingParser::operator()( void ) {
 
 void HExecutingParser::sanitize( void ) {
 	M_PROLOG
-	executing_parser::HGrammarDescription gd;
-	_grammar->describe( gd );
+	executing_parser::HGrammarDescription gd( *_grammar );
 	M_ENSURE( ! gd.is_empty() );
 	return;
 	M_EPILOG
@@ -133,10 +132,18 @@ yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executi
 	M_EPILOG
 }
 
-void HRuleBase::describe( HGrammarDescription& gd_ ) const {
+void HRuleBase::describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
-	do_describe( gd_ );
+	do_describe( rd_ );
 	return;
+	M_EPILOG
+}
+
+ORuleDescription HRuleBase::describe( void ) const {
+	M_PROLOG
+	ORuleDescription rd;
+	do_describe( rd );
+	return ( rd );
 	M_EPILOG
 }
 
@@ -258,12 +265,12 @@ void HRule::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 bool HRule::do_is_optional( void ) const
 	{ return ( _rule->is_optional() ); }
 
-void HRule::do_describe( HGrammarDescription& gd_ ) const {
+void HRule::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
 	if ( !! _rule ) {
-		cout << _rule._name << " = ";
-		gd_.describe( *_rule._rule );
-		cout << endl;
+		rd_._description = _rule._name;
+		rd_._description += " = ";
+		_rule._rule->describe( rd_ );
 	}
 	return;
 	M_EPILOG
@@ -300,10 +307,10 @@ bool HRecursiveRule::do_is_optional( void ) const {
 	M_EPILOG
 }
 
-void HRecursiveRule::do_describe( HGrammarDescription& gd_ ) const {
+void HRecursiveRule::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
 	if ( !! _rule )
-		gd_.describe( *_rule.id() );
+		_rule->describe( rd_ );
 	return;
 	M_EPILOG
 }
@@ -344,11 +351,11 @@ bool HRuleRef::do_is_optional( void ) const {
 	M_EPILOG
 }
 
-void HRuleRef::do_describe( HGrammarDescription& gd_ ) const {
+void HRuleRef::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule );
 	M_ENSURE( !! r );
-	r->describe( gd_ );
+	r->describe( rd_ );
 	return;
 	M_EPILOG
 }
@@ -408,24 +415,18 @@ HRuleBase::ptr_t HFollows::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HFollows::do_describe( HGrammarDescription& gd_ ) const {
+void HFollows::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
 	bool next( false );
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( next )
-			cout << " >> ";
+			rd_._description += " >> ";
 		if ( ! it->_name.is_empty() ) {
-			gd_._ruleOrder.push( &*it );
-			cout << it->_name;
+			rd_._children.push_back( it->id() );
+			rd_._description += it->_name;
 		} else
-			gd_.describe( *it->id() );
+			it->id()->describe( rd_ );
 		next = true;
-	}
-	while ( ! gd_._ruleOrder.is_empty() ) {
-		HNamedRule const* nr( gd_._ruleOrder.front() );
-		gd_._ruleOrder.pop();
-		cout << endl << nr->_name << " = ";
-		gd_.describe( *nr->_rule );
 	}
 	return;
 	M_EPILOG
@@ -503,11 +504,11 @@ yaal::hcore::HString::const_iterator HKleeneStar::do_parse( HExecutingParser* ex
 	M_EPILOG
 }
 
-void HKleeneStar::do_describe( HGrammarDescription& gd_ ) const {
+void HKleeneStar::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
-	cout << "*(";
-	gd_.describe( *_rule.id() );
-	cout << ")";
+	rd_._description += "*(";
+	_rule->describe( rd_ );
+	rd_._description += ")";
 	return;
 	M_EPILOG
 }
@@ -562,11 +563,11 @@ yaal::hcore::HString::const_iterator HKleenePlus::do_parse( HExecutingParser* ex
 	M_EPILOG
 }
 
-void HKleenePlus::do_describe( HGrammarDescription& gd_ ) const {
+void HKleenePlus::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
-	cout << "+(";
-	gd_.describe( *_rule.id() );
-	cout << ")";
+	rd_._description += "+(";
+	_rule->describe( rd_ );
+	rd_._description += ")";
 	return;
 	M_EPILOG
 }
@@ -622,13 +623,17 @@ yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser*, 
 	return ( NULL );
 }
 
-void HAlternative::do_describe( HGrammarDescription& gd_ ) const {
+void HAlternative::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
 	bool next( false );
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( next )
-			cout << " | ";
-		gd_.describe( *it->id() );
+			rd_._description += " | ";
+		if ( ! it->_name.is_empty() ) {
+			rd_._children.push_back( it->id() );
+			rd_._description += it->_name;
+		} else
+			it->id()->describe( rd_ );
 		next = true;
 	}
 	return;
@@ -687,11 +692,11 @@ yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser* exec
 bool HOptional::do_is_optional( void ) const
 	{ return ( true ); }
 
-void HOptional::do_describe( HGrammarDescription& gd_ ) const {
+void HOptional::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
-	cout << "-(";
-	gd_.describe( *_rule.id() );
-	cout << ")";
+	rd_._description += "-(";
+	_rule->describe( rd_ );
+	rd_._description += ")";
 	return;
 	M_EPILOG
 }
@@ -890,9 +895,9 @@ HRuleBase::ptr_t HReal::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HReal::do_describe( HGrammarDescription& ) const {
+void HReal::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
-	cout << "real";
+	rd_._description += "real";
 	return;
 	M_EPILOG
 }
@@ -1040,9 +1045,9 @@ HRuleBase::ptr_t HInteger::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HInteger::do_describe( HGrammarDescription& ) const {
+void HInteger::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
-	cout << "integer";
+	rd_._description += "integer";
 	return;
 	M_EPILOG
 }
@@ -1123,12 +1128,14 @@ HRuleBase::ptr_t HCharacter::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HCharacter::do_describe( HGrammarDescription& ) const {
+void HCharacter::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
-	if ( _character )
-		cout << "'" << _character << "'";
-	else
-		cout << "character";
+	if ( _character ) {
+		rd_._description += "'";
+		rd_._description += _character;
+		rd_._description += "'";
+	} else
+		rd_._description += "character";
 	return;
 	M_EPILOG
 }
@@ -1211,9 +1218,11 @@ HRuleBase::ptr_t HString::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HString::do_describe( HGrammarDescription& ) const {
+void HString::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
-	cout << "\"" << _string << "\"";
+	rd_._description += "\"";
+	rd_._description += _string;
+	rd_._description += "\"";
 	return;
 	M_EPILOG
 }
@@ -1273,9 +1282,11 @@ HRuleBase::ptr_t HRegex::do_clone( void ) const {
 	M_EPILOG
 }
 
-void HRegex::do_describe( HGrammarDescription& ) const {
+void HRegex::do_describe( ORuleDescription& rd_ ) const {
 	M_PROLOG
-	cout << "regex(\"" << _regex->pattern() << "\")";
+	rd_._description += "regex(\"";
+	rd_._description += _regex->pattern();
+	rd_._description += "\")";
 	return;
 	M_EPILOG
 }
@@ -1328,9 +1339,39 @@ HRegex regex( yaal::hcore::HString const& pattern_ ) {
 	M_EPILOG
 }
 
-HGrammarDescription::HGrammarDescription( void )
-	: _rules(), _visited(), _namedRules(), _ruleOrder()
+ORuleDescription::ORuleDescription( void )
+	: _children(), _description()
 	{}
+
+void ORuleDescription::clear( void ) {
+	M_PROLOG
+	_children.clear();
+	_description.clear();
+	return;
+	M_EPILOG
+}
+
+HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
+	: _rules(), _visited(), _namedRules(), _ruleOrder() {
+	M_PROLOG
+	ORuleDescription rd;
+	rule_.describe( rd );
+	_rules.push_back( rd._description );
+	copy( rd._children.begin(), rd._children.end(), push_insert_iterator( _ruleOrder ) );
+	_visited.insert( &rule_ );
+	while ( ! _ruleOrder.is_empty() ) {
+		HRuleBase const* r( _ruleOrder.front() );
+		_ruleOrder.pop();
+		if ( _visited.insert( r ).second ) {
+			rd.clear();
+			r->describe( rd );
+			_rules.push_back( rd._description );
+			copy( rd._children.begin(), rd._children.end(), push_insert_iterator( _ruleOrder ) );
+		}
+	}
+	return;
+	M_EPILOG
+}
 
 void HGrammarDescription::clear( void ) {
 	M_PROLOG
@@ -1357,14 +1398,6 @@ HGrammarDescription::const_iterator HGrammarDescription::begin( void ) const {
 HGrammarDescription::const_iterator HGrammarDescription::end( void ) const {
 	M_PROLOG
 	return ( _rules.end() );
-	M_EPILOG
-}
-
-void HGrammarDescription::describe( HRuleBase const& rule_ ) {
-	M_PROLOG
-	if ( _visited.insert( &rule_ ).second )
-		rule_.describe( *this );
-	return;
 	M_EPILOG
 }
 
