@@ -232,17 +232,28 @@ public:
 		{ coll.insert( elem ); }
 };
 
+/*! \brief (Push)Insertion concept for HInsertIterator.
+ *
+ * May be used for collections that support push insertion.
+ */
+template<typename tType>
+class HPushInsertionConcept {
+public:
+	template<typename elem_t>
+	static void insert( tType& coll, elem_t const& elem )
+		{ coll.push( elem ); }
+};
+
 /*! \brief Iterator class that allows extending existing collections.
  *
  * \tparam tType - collection type.
  * \tparam inserter - insertion concept, tell how collection shall be extended.
  */
 template<typename tType, typename inserter>
-class HInsertIterator {
+class HInsertIterator : public iterator_interface<typename tType::value_type, iterator_category::forward> {
 public:
-	typedef typename tType::iterator::value_type value_type;
-	typedef typename tType::iterator::reference reference;
-	typedef typename tType::iterator::pointer pointer;
+	typedef HInsertIterator this_type;
+	typedef iterator_interface<typename tType::value_type, iterator_category::forward> base_type;
 private:
 	tType& _coll;
 public:
@@ -269,6 +280,10 @@ HInsertIterator<tType, HFrontInsertionConcept<tType> > front_insert_iterator( tT
 template<typename tType>
 HInsertIterator<tType, HInsertionConcept<tType> > insert_iterator( tType& coll )
 	{ return ( HInsertIterator<tType, HInsertionConcept<tType> >( coll ) ); }
+
+template<typename tType>
+HInsertIterator<tType, HPushInsertionConcept<tType> > push_insert_iterator( tType& coll )
+	{ return ( HInsertIterator<tType, HPushInsertionConcept<tType> >( coll ) ); }
 
 }
 
