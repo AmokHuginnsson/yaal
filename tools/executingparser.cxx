@@ -31,7 +31,6 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "executingparser.hxx"
 
-
 #include "hcore/hfile.hxx"
 
 using namespace yaal::hcore;
@@ -68,8 +67,12 @@ void HExecutingParser::operator()( void ) {
 
 void HExecutingParser::sanitize( void ) {
 	M_PROLOG
-	executing_parser::HGrammarDescription gd( *_grammar );
-	M_ENSURE( ! gd.is_empty() );
+	try {
+		executing_parser::HGrammarDescription gd( *_grammar );
+		M_ENSURE( ! gd.is_empty() );
+	} catch ( executing_parser::HGrammarDescriptionException const& e ) {
+		throw HExecutingParserException( e.what() );
+	}
 	return;
 	M_EPILOG
 }
@@ -1402,8 +1405,6 @@ void HRuleDescription::add( HNamedRule const* nr_ ) {
 HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
 	: _rules(), _visited(), _namedRules(), _ruleOrder() {
 	M_PROLOG
-	HRule const* main( dynamic_cast<HRule const*>( &rule_ ) );
-	M_ENSURE( main );
 	HRuleDescription rd;
 	rule_.describe( rd );
 	copy( rd.children().begin(), rd.children().end(), push_insert_iterator( _ruleOrder ) );

@@ -143,6 +143,8 @@ private:
 	HRuleBase& operator = ( HRuleBase const& );
 };
 
+typedef yaal::hcore::HExceptionT<HRuleBase> HRuleBaseException;
+
 class HGrammarDescription {
 public:
 	typedef HGrammarDescription this_type;
@@ -166,7 +168,7 @@ private:
 	friend class HFollows;
 };
 
-typedef yaal::hcore::HExceptionT<HRuleBase> HRuleBaseException;
+typedef yaal::hcore::HExceptionT<HGrammarDescription> HGrammarDescriptionException;
 
 /*! \brief Abstract rule holder.
  *
