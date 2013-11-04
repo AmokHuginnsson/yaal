@@ -300,7 +300,7 @@ void HRule::do_describe( HRuleDescription& rd_ ) const {
 	if ( !! _rule ) {
 		rd_.desc( _rule.name() );
 		rd_.desc( " = " );
-		_rule.rule()->describe( rd_ );
+		_rule.describe( rd_ );
 	}
 	return;
 	M_EPILOG
@@ -340,7 +340,7 @@ bool HRecursiveRule::do_is_optional( void ) const {
 void HRecursiveRule::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	if ( !! _rule )
-		_rule->describe( rd_ );
+		_rule.describe( rd_ );
 	return;
 	M_EPILOG
 }
@@ -451,11 +451,7 @@ void HFollows::do_describe( HRuleDescription& rd_ ) const {
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( next )
 			rd_.desc( " >> " );
-		if ( ! it->name().is_empty() ) {
-			rd_.add( &*it );
-			rd_.desc( it->name() );
-		} else
-			it->id()->describe( rd_ );
+		it->describe( rd_ );
 		next = true;
 	}
 	return;
@@ -537,7 +533,7 @@ yaal::hcore::HString::const_iterator HKleeneStar::do_parse( HExecutingParser* ex
 void HKleeneStar::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	rd_.desc( "*(" );
-	_rule->describe( rd_ );
+	_rule.describe( rd_ );
 	rd_.desc( ")" );
 	return;
 	M_EPILOG
@@ -596,7 +592,7 @@ yaal::hcore::HString::const_iterator HKleenePlus::do_parse( HExecutingParser* ex
 void HKleenePlus::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	rd_.desc( "+(" );
-	_rule->describe( rd_ );
+	_rule.describe( rd_ );
 	rd_.desc( ")" );
 	return;
 	M_EPILOG
@@ -721,7 +717,7 @@ bool HOptional::do_is_optional( void ) const
 void HOptional::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	rd_.desc( "-(" );
-	_rule->describe( rd_ );
+	_rule.describe( rd_ );
 	rd_.desc( ")" );
 	return;
 	M_EPILOG
@@ -1410,15 +1406,15 @@ HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
 	M_ENSURE( main );
 	HRuleDescription rd;
 	rule_.describe( rd );
-	_rules.push_back( rd.description() );
 	copy( rd.children().begin(), rd.children().end(), push_insert_iterator( _ruleOrder ) );
 	_visited.insert( &rule_ );
-	_namedRules.insert( main->get_name() );
 	while ( ! _ruleOrder.is_empty() ) {
 		HNamedRule const* r( _ruleOrder.front() );
 		_ruleOrder.pop();
-		if ( _visited.insert( r->id() ).second ) {
+		if ( _visited.insert( r->id() ).second && _namedRules.insert( r->name() ).second ) {
 			rd.clear();
+			rd.desc( r->name() );
+			rd.desc( " = " );
 			r->id()->describe( rd );
 			_rules.push_back( rd.description() );
 			copy( rd.children().begin(), rd.children().end(), push_insert_iterator( _ruleOrder ) );
