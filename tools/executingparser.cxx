@@ -137,7 +137,10 @@ yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executi
 
 void HRuleBase::describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
+	int long descriptionLen( rd_.description().get_length() );
+	int long childCount( rd_.children().get_size() );
 	do_describe( rd_ );
+	M_ENSURE_EX( ( rd_.description().get_length() > descriptionLen ) || ( rd_.children().get_size() > childCount ), "empty rule" );
 	return;
 	M_EPILOG
 }
@@ -195,9 +198,10 @@ HNamedRule::ptr_t const& HNamedRule::rule( void ) const {
 
 void HNamedRule::describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	if ( ! _name.is_empty() ) {
+	M_ASSERT( !! _rule );
+	if ( dynamic_cast<HRecursiveRule const*>( &*_rule ) || ( ! _name.is_empty() ) ) {
 		rd_.add( this );
-		rd_.desc( _name );
+		rd_.desc( ! _name.is_empty() ? _name : hcore::HString( "rule" ) + static_cast<void const*>( &*_rule ) );
 	} else
 		_rule->describe( rd_ );
 	return;
