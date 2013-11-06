@@ -75,7 +75,7 @@ HRule huginn_grammar( void ) {
 	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> '{' >> statementList >> '}' );
 	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> '}' );
 	HRule returnStatement( "returnStatement", constant( "return" ) >> '(' >> expression >> ')' );
-	HRule statement( "statement", ifStatement | whileStatement | returnStatement | expressionList );
+	HRule statement( "statement", ifStatement | whileStatement | switchStatement | returnStatement | expressionList );
 	statementList %= *statement;
 	HRule scope( "scope", '{' >> statementList >> '}' );
 	HRule nameList( "nameList", name >> ( * ( ',' >> name ) ) );

@@ -70,6 +70,8 @@ void HExecutingParser::sanitize( void ) {
 	try {
 		executing_parser::HGrammarDescription gd( *_grammar );
 		M_ENSURE( ! gd.is_empty() );
+	} catch ( executing_parser::HRuleBaseException const& e ) {
+		throw HExecutingParserException( e.what() );
 	} catch ( executing_parser::HGrammarDescriptionException const& e ) {
 		throw HExecutingParserException( e.what() );
 	}
@@ -131,7 +133,10 @@ bool HRuleBase::is_optional( void ) const {
 
 yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	return ( do_parse( executingParser_, first_, last_ ) );
+	M_ASSERT( first_ && last_ );
+	yaal::hcore::HString::const_iterator it( do_parse( executingParser_, first_, last_ ) );
+	M_ASSERT( it );
+	return ( it );
 	M_EPILOG
 }
 
@@ -158,6 +163,7 @@ bool HRuleBase::do_is_optional( void ) const
 
 yaal::hcore::HString::const_iterator HRuleBase::skip_space( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
+	M_ASSERT( first_ && last_ );
 	while ( ( first_ != last_ ) && isspace( *first_ ) )
 		++ first_;
 	return ( first_ );
@@ -199,7 +205,7 @@ HNamedRule::ptr_t const& HNamedRule::rule( void ) const {
 void HNamedRule::describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
 	M_ASSERT( !! _rule );
-	if ( dynamic_cast<HRecursiveRule const*>( &*_rule ) || ( ! _name.is_empty() ) ) {
+	if ( dynamic_cast<HRuleRef const*>( &*_rule ) || ( ! _name.is_empty() ) ) {
 		rd_.add( this );
 		rd_.desc( ! _name.is_empty() ? _name : hcore::HString( "rule" ) + static_cast<void const*>( &*_rule ) );
 	} else
@@ -472,6 +478,7 @@ yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* execu
 	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		yaal::hcore::HString::const_iterator old( first_ );
 		first_ = (*it)->parse( executingParser_, first_, last_ );
+		M_ASSERT( first_ );
 		if ( ( first_ == old ) && ( !(*it)->is_optional() ) ) {
 			matched = false;
 			break;
@@ -539,9 +546,9 @@ yaal::hcore::HString::const_iterator HKleeneStar::do_parse( HExecutingParser* ex
 
 void HKleeneStar::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	rd_.desc( "*(" );
+	rd_.desc( "*( " );
 	_rule.describe( rd_ );
-	rd_.desc( ")" );
+	rd_.desc( " )" );
 	return;
 	M_EPILOG
 }
@@ -598,9 +605,9 @@ yaal::hcore::HString::const_iterator HKleenePlus::do_parse( HExecutingParser* ex
 
 void HKleenePlus::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	rd_.desc( "+(" );
+	rd_.desc( "+( " );
 	_rule.describe( rd_ );
-	rd_.desc( ")" );
+	rd_.desc( " )" );
 	return;
 	M_EPILOG
 }
@@ -652,8 +659,17 @@ HRuleBase::ptr_t HAlternative::do_clone( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) {
-	return ( NULL );
+yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
+		yaal::hcore::HString::const_iterator old( first_ );
+		first_ = (*it)->parse( executingParser_, first_, last_ );
+		if ( first_ != old ) {
+			if( !! _action )
+				executingParser_->add_execution_step( old, _action );
+			break;
+		}
+	}
+	return ( first_ );
 }
 
 void HAlternative::do_describe( HRuleDescription& rd_ ) const {
@@ -723,9 +739,9 @@ bool HOptional::do_is_optional( void ) const
 
 void HOptional::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	rd_.desc( "-(" );
+	rd_.desc( "-( " );
 	_rule.describe( rd_ );
-	rd_.desc( ")" );
+	rd_.desc( " )" );
 	return;
 	M_EPILOG
 }
@@ -1313,9 +1329,9 @@ HRuleBase::ptr_t HRegex::do_clone( void ) const {
 
 void HRegex::do_describe( HRuleDescription& rd_ ) const {
 	M_PROLOG
-	rd_.desc( "regex(\"" );
+	rd_.desc( "regex( \"" );
 	rd_.desc( _regex->pattern() );
-	rd_.desc( "\")" );
+	rd_.desc( "\" )" );
 	return;
 	M_EPILOG
 }
@@ -1418,7 +1434,7 @@ HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
 		_ruleOrder.pop();
 		if ( _visited.insert( r->id() ).second && _namedRules.insert( r->name() ).second ) {
 			rd.clear();
-			rd.desc( r->name() );
+			rd.desc( ! r->name().is_empty() ? r->name() : hcore::HString( "rule" ) + r->id() );
 			rd.desc( " = " );
 			r->id()->describe( rd );
 			_rules.push_back( rd.description() );
