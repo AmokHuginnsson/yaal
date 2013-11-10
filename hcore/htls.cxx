@@ -37,7 +37,7 @@ namespace hcore {
 
 namespace tls {
 
-STATIC_ASSERT( sizeof ( pthread_key_t ) == sizeof ( key_t ) );
+STATIC_ASSERT( sizeof ( key_t ) >= sizeof ( pthread_key_t ) );
 
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"

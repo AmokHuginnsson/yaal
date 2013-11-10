@@ -45,7 +45,7 @@ class HTLS;
 
 namespace tls {
 
-typedef int key_t;
+typedef long int unsigned key_t;
 typedef void ( *destruct_t )( void* );
 
 key_t create( destruct_t );
