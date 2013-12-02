@@ -105,7 +105,12 @@ public:
 	void seek( int long, seek_t const& = SEEK::SET );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
+	bool is_opened( void ) const;
 	bool operator ! ( void ) const;
+protected:
+	virtual int do_open( HString const&, open_t const& mode );
+	virtual int do_close( void );
+	int get_file_descriptor( void ) const;
 private:
 	virtual int long do_write( void const* const, int long );
 	virtual void do_flush( void );

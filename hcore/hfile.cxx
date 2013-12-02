@@ -76,6 +76,12 @@ HFile::~HFile( void ) {
 
 int HFile::open( HString const& path_, open_t const& open_ ) {
 	M_PROLOG
+	return ( do_open( path_, open_ ) );
+	M_EPILOG
+}
+
+int HFile::do_open( HString const& path_, open_t const& open_ ) {
+	M_PROLOG
 	int saveErrno( errno );
 	char const* mode = NULL;
 	if ( open_ == OPEN::READING )
@@ -118,6 +124,12 @@ int HFile::open( void* const handle ) {
 }
 
 int HFile::close( void ) {
+	M_PROLOG
+	return ( do_close() );
+	M_EPILOG
+}
+
+int HFile::do_close( void ) {
 	M_PROLOG
 	M_ASSERT( _handle );
 	int error = 0;
@@ -252,9 +264,24 @@ void HFile::do_flush( void ) {
 	M_EPILOG
 }
 
+bool HFile::is_opened( void ) const {
+	M_PROLOG
+	return ( _handle != NULL );
+	M_EPILOG
+}
+
 bool HFile::operator ! ( void ) const {
 	M_PROLOG
-	return ( ! _handle );
+	return ( ! is_opened() );
+	M_EPILOG
+}
+
+int HFile::get_file_descriptor( void ) const {
+	M_PROLOG
+	int fd( -1 );
+	if ( is_opened() )
+		M_ENSURE( ( fd = fileno( static_cast<FILE*>( _handle ) ) ) >= 0 );
+	return ( fd );
 	M_EPILOG
 }
 
