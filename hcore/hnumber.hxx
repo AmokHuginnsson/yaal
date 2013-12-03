@@ -76,7 +76,7 @@ namespace hcore {
  * if number of decimal (base 10 representation) fractional digits is smaller than
  * default maximum precision set for result.
  *
- * Fro '/' operation if any of operand is rounded then result is rounded and its precision
+ * For '/' operation if any of operand is rounded then result is rounded and its precision
  * is set to precision on the rounded operand or minimum of both operands precision
  * if both operands are rounded.
  *
@@ -206,6 +206,10 @@ public:
 	HNumber operator / ( HNumber const& ) const;
 	HNumber operator ^ ( int long unsigned ) const;
 	void swap( HNumber& );
+	HNumber& abs( void );
+	HNumber& round( int long );
+	HNumber& floor( void );
+	HNumber& ceil( void );
 	/*! \brief Set maximum number of fractional decimal digits that this HNumber can handle.
 	 *
 	 * \param newPrecision - new maximum precision of this HNumber.
@@ -229,6 +233,8 @@ private:
 	void multiply_by_leaf( i32_t );
 	i32_t multiply_by_leaf_low( i32_t*, size_t, i32_t );
 	void divide_by_leaf( i32_t, size_t );
+	void add_leaf_low( int long, i32_t );
+	void substract_leaf_low( int long, i32_t );
 	void normalize( bool );
 public:
 	struct ElementaryFunctions;

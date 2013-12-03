@@ -365,7 +365,7 @@ void HNumber::from_floating_point( double long number_ ) {
 
 void HNumber::from_integer( int long long number_ ) {
 	M_PROLOG
-	int long long number( abs( number_ ) );
+	int long long number( yaal::abs( number_ ) );
 	if ( number >= ( static_cast<int long long>( LEAF ) * LEAF ) ) {
 		_leafCount = 3;
 		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
@@ -861,6 +861,7 @@ HNumber HNumber::operator / ( HNumber const& divisor_ ) const {
 }
 
 i32_t HNumber::multiply_by_leaf_low( i32_t* data_, size_t leafCount_, i32_t leaf_ ) {
+	M_ASSERT( ( leaf_ >= 0 ) && ( leaf_ < LEAF ) );
 	i32_t carrier( 0 );
 	for ( size_t i( leafCount_ - 1 ); i >= 0; -- i ) {
 		i64_t x( static_cast<i64_t>( data_[ i ] ) * leaf_ + carrier );
@@ -876,6 +877,7 @@ i32_t HNumber::multiply_by_leaf_low( i32_t* data_, size_t leafCount_, i32_t leaf
 
 void HNumber::multiply_by_leaf( i32_t leaf_ ) {
 	M_PROLOG
+	M_ASSERT( ( leaf_ >= 0 ) && ( leaf_ < LEAF ) );
 	if ( _leafCount > 0 ) {
 		i32_t carrier( multiply_by_leaf_low( _canonical.get<i32_t>(), _leafCount, leaf_ ) );
 		i32_t* data( _canonical.get<i32_t>() );
@@ -896,10 +898,11 @@ void HNumber::multiply_by_leaf( i32_t leaf_ ) {
 
 void HNumber::divide_by_leaf( i32_t leaf_, size_t shift_ ) {
 	M_PROLOG
+	M_ASSERT( ( leaf_ >= 0 ) && ( leaf_ < LEAF ) );
 	i32_t* data( _canonical.get<i32_t>() );
 	i64_t remainder( 0 );
 	bool negative( leaf_ < 0 );
-	leaf_ = abs( leaf_ );
+	leaf_ = yaal::abs( leaf_ );
 	if ( shift_ ) {
 		_integralPartSize += shift_;
 		if ( _integralPartSize < 0 ) {
@@ -1419,6 +1422,68 @@ HNumber::size_t HNumber::karatsuba( HChunk& result, i32_t const* fx, size_t fxs,
 	return ( leafCount );
 }
 
+HNumber& HNumber::abs( void ) {
+	M_PROLOG
+	_negative = false;
+	return ( *this );
+	M_EPILOG
+}
+
+HNumber& HNumber::round( int long ) {
+	M_PROLOG
+	return ( *this );
+	M_EPILOG
+}
+
+HNumber& HNumber::floor( void ) {
+	M_PROLOG
+	return ( *this );
+	M_EPILOG
+}
+
+HNumber& HNumber::ceil( void ) {
+	M_PROLOG
+	return ( *this );
+	M_EPILOG
+}
+
+void HNumber::add_leaf_low( int long from_, i32_t leaf_ ) {
+	M_PROLOG
+	i32_t carrier( leaf_ );
+	i32_t* data( _canonical.get<i32_t>() );
+	M_ASSERT( ( leaf_ >= 0 ) && ( leaf_ < LEAF ) );
+	M_ASSERT( ( from_ >= 0 ) && ( from_ < _leafCount ) );
+	int long idx( from_ );
+	while ( ( idx >= 0 ) && ( carrier > 0 ) ) {
+		i32_t& x( data[idx] );
+		x += carrier;
+		if ( x >= LEAF ) {
+			x -= LEAF;
+			carrier = 1;
+		} else
+			carrier = 0;
+		-- idx;
+	}
+	if ( carrier > 0 ) {
+		_canonical.realloc( chunk_size<i32_t>( _leafCount + 1 ) );
+		data = _canonical.get<i32_t>();
+		::memmove( data + 1, data, chunk_size<i32_t>( _leafCount ) );
+		++ _integralPartSize;
+		++ _leafCount;
+		data[0] = carrier;
+	}
+	return;
+	M_EPILOG
+}
+
+void HNumber::substract_leaf_low( int long from_, i32_t leaf_ ) {
+	M_PROLOG
+	M_ASSERT( ( leaf_ >= 0 ) && ( leaf_ < LEAF ) );
+	M_ASSERT( ( from_ >= 0 ) && ( from_ < _leafCount ) );
+	return;
+	M_EPILOG
+}
+
 struct HNumber::ElementaryFunctions {
 	static yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
@@ -1428,8 +1493,6 @@ struct HNumber::ElementaryFunctions {
 		HNumber::size_t requiredPrecision( value_.get_precision() );
 		do {
 			if ( value_._negative )
-				throw HNumberException( "square root from negative" );
-			if ( value_ < _zero_ )
 				throw HNumberException( "square root from negative" );
 			HString s( value_.to_string() );
 			size_t digits( 0 );
@@ -1493,7 +1556,7 @@ struct HNumber::ElementaryFunctions {
 					if ( sameFractionalLeafs > 0 ) {
 						HNumber::size_t newPrecision( sameFractionalLeafs * DECIMAL_DIGITS_IN_LEAF_CONST );
 						if ( d < SIZE ) {
-							i32_t diff( abs( a[d] - b[d] ) );
+							i32_t diff( yaal::abs( a[d] - b[d] ) );
 							for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
 								if ( ( diff % DECIMAL_SHIFT[DECIMAL_DIGITS_IN_LEAF_CONST - i] ) != diff )
 									break;
