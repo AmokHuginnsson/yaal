@@ -1429,8 +1429,23 @@ HNumber& HNumber::abs( void ) {
 	M_EPILOG
 }
 
-HNumber& HNumber::round( int long ) {
+HNumber& HNumber::round( size_t significant_ ) {
 	M_PROLOG
+	M_ENSURE( significant_ >= 0 );
+	if ( significant_ < fractional_decimal_digits() ) {
+		size_t leafSignificant( ( significant_ + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
+		if ( ( _integralPartSize + leafSignificant ) < _leafCount )
+			_leafCount = _integralPartSize + leafSignificant;
+		i32_t* data( _canonical.get<i32_t>() );
+		if ( ( _leafCount > 0 ) && ( leafSignificant == fractional_length() ) && ( significant_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) {
+			i32_t& lastLeaf( data[ _leafCount - 1 ] );
+			lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( ( significant_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) ] );
+		}
+		while ( ( _leafCount > _integralPartSize ) && ! data[ _leafCount - 1 ] )
+			-- _leafCount;
+		if ( ! _leafCount )
+			_negative = false;
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -1457,7 +1472,14 @@ HNumber& HNumber::ceil( void ) {
 	M_EPILOG
 }
 
-void HNumber::add_leaf_low( int long from_, i32_t leaf_ ) {
+HNumber& HNumber::trunc( void ) {
+	M_PROLOG
+	_leafCount = _integralPartSize;
+	return ( *this );
+	M_EPILOG
+}
+
+void HNumber::add_leaf_low( size_t from_, i32_t leaf_ ) {
 	M_PROLOG
 	i32_t carrier( leaf_ );
 	i32_t* data( _canonical.get<i32_t>() );

@@ -207,9 +207,10 @@ public:
 	HNumber operator ^ ( int long unsigned ) const;
 	void swap( HNumber& );
 	HNumber& abs( void );
-	HNumber& round( int long );
+	HNumber& round( size_t );
 	HNumber& floor( void );
 	HNumber& ceil( void );
+	HNumber& trunc( void );
 	/*! \brief Set maximum number of fractional decimal digits that this HNumber can handle.
 	 *
 	 * \param newPrecision - new maximum precision of this HNumber.
@@ -233,7 +234,7 @@ private:
 	void multiply_by_leaf( i32_t );
 	i32_t multiply_by_leaf_low( i32_t*, size_t, i32_t );
 	void divide_by_leaf( i32_t, size_t );
-	void add_leaf_low( int long, i32_t );
+	void add_leaf_low( size_t, i32_t );
 	void normalize( bool );
 public:
 	struct ElementaryFunctions;
