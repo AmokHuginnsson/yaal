@@ -1434,7 +1434,7 @@ HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
 		_ruleOrder.pop();
 		if ( _visited.insert( r->id() ).second && _namedRules.insert( r->name() ).second ) {
 			rd.clear();
-			rd.desc( ! r->name().is_empty() ? r->name() : hcore::HString( "rule" ) + r->id() );
+			rd.desc( ! r->name().is_empty() ? r->name() : hcore::HString( "ruleGD" ) + r->id() );
 			rd.desc( " = " );
 			r->id()->describe( rd );
 			_rules.push_back( rd.description() );

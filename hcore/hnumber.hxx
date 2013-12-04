@@ -234,7 +234,6 @@ private:
 	i32_t multiply_by_leaf_low( i32_t*, size_t, i32_t );
 	void divide_by_leaf( i32_t, size_t );
 	void add_leaf_low( int long, i32_t );
-	void substract_leaf_low( int long, i32_t );
 	void normalize( bool );
 public:
 	struct ElementaryFunctions;

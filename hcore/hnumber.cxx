@@ -898,11 +898,11 @@ void HNumber::multiply_by_leaf( i32_t leaf_ ) {
 
 void HNumber::divide_by_leaf( i32_t leaf_, size_t shift_ ) {
 	M_PROLOG
-	M_ASSERT( ( leaf_ >= 0 ) && ( leaf_ < LEAF ) );
 	i32_t* data( _canonical.get<i32_t>() );
 	i64_t remainder( 0 );
 	bool negative( leaf_ < 0 );
 	leaf_ = yaal::abs( leaf_ );
+	M_ASSERT( leaf_ < LEAF );
 	if ( shift_ ) {
 		_integralPartSize += shift_;
 		if ( _integralPartSize < 0 ) {
@@ -1437,12 +1437,22 @@ HNumber& HNumber::round( int long ) {
 
 HNumber& HNumber::floor( void ) {
 	M_PROLOG
+	int long leafCount( _leafCount );
+	_leafCount = _integralPartSize;
+	if ( _negative && ( leafCount > _integralPartSize ) ) {
+		add_leaf_low( _integralPartSize - 1, 1 );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HNumber& HNumber::ceil( void ) {
 	M_PROLOG
+	int long leafCount( _leafCount );
+	_leafCount = _integralPartSize;
+	if ( ! _negative && ( leafCount > _integralPartSize ) ) {
+		add_leaf_low( _integralPartSize - 1, 1 );
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -1452,7 +1462,11 @@ void HNumber::add_leaf_low( int long from_, i32_t leaf_ ) {
 	i32_t carrier( leaf_ );
 	i32_t* data( _canonical.get<i32_t>() );
 	M_ASSERT( ( leaf_ >= 0 ) && ( leaf_ < LEAF ) );
-	M_ASSERT( ( from_ >= 0 ) && ( from_ < _leafCount ) );
+	/*
+	 * If number is in (-1;1) range the integral part size is equal 0,
+	 * hence from_ can be equal to -1.
+	 */
+	M_ASSERT( ( from_ >= -1 ) && ( from_ < _leafCount ) );
 	int long idx( from_ );
 	while ( ( idx >= 0 ) && ( carrier > 0 ) ) {
 		i32_t& x( data[idx] );
@@ -1472,14 +1486,6 @@ void HNumber::add_leaf_low( int long from_, i32_t leaf_ ) {
 		++ _leafCount;
 		data[0] = carrier;
 	}
-	return;
-	M_EPILOG
-}
-
-void HNumber::substract_leaf_low( int long from_, i32_t leaf_ ) {
-	M_PROLOG
-	M_ASSERT( ( leaf_ >= 0 ) && ( leaf_ < LEAF ) );
-	M_ASSERT( ( from_ >= 0 ) && ( from_ < _leafCount ) );
 	return;
 	M_EPILOG
 }
