@@ -34,8 +34,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "algorithm.hxx"
 #include "hnumber.hxx"
 
-#include "hfile.hxx"
-
 using namespace yaal::hcore;
 
 /*
@@ -541,20 +539,8 @@ void HNumber::set_precision( size_t precision_ ) {
 	if ( precision_ < HARDCODED_MINIMUM_PRECISION )
 		precision_ = HARDCODED_MINIMUM_PRECISION;
 	if ( ( precision_ < _precision ) || ( ( precision_ > _precision ) && is_exact() ) ) {
-		size_t leafPrecision( ( precision_ + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
-		if ( ( _integralPartSize + leafPrecision ) < _leafCount )
-			_leafCount = _integralPartSize + leafPrecision;
-		if ( precision_ < _precision ) {
-			i32_t* data( _canonical.get<i32_t>() );
-			if ( ( _leafCount > 0 ) && ( leafPrecision == fractional_length() ) && ( precision_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) {
-				i32_t& lastLeaf( data[ _leafCount - 1 ] );
-				lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( ( precision_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) ] );
-			}
-			while ( ( _leafCount > _integralPartSize ) && ! data[ _leafCount - 1 ] )
-				-- _leafCount;
-			if ( ! _leafCount )
-				_negative = false;
-		}
+		if ( precision_ < _precision )
+			round( precision_ );
 		_precision = precision_;
 	}
 	return;
@@ -1276,7 +1262,7 @@ void HNumber::normalize( bool updatePrecision_ ) {
 	if ( ( _leafCount > 0 ) && ( fractionalDecimalDigits > _precision ) && ( leafPrecision <= fractional_length() ) ) {
 		_leafCount -= ( fractional_length() - leafPrecision );
 		i32_t& lastLeaf( res[ _leafCount - 1 ] );
-		lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( ( _precision % DECIMAL_DIGITS_IN_LEAF_CONST ) ) ] );
+		lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( _precision % DECIMAL_DIGITS_IN_LEAF_CONST ) ] );
 	}
 	while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) )
 		-- _leafCount;
@@ -1431,16 +1417,43 @@ HNumber& HNumber::abs( void ) {
 
 HNumber& HNumber::round( size_t significant_ ) {
 	M_PROLOG
+	/* !!!
+	 *
+	 * significant_ is not an index, significant_ is an amount!
+	 *
+	 */
 	M_ENSURE( significant_ >= 0 );
 	if ( significant_ < fractional_decimal_digits() ) {
-		size_t leafSignificant( ( significant_ + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
-		if ( ( _integralPartSize + leafSignificant ) < _leafCount )
-			_leafCount = _integralPartSize + leafSignificant;
+		size_t newFractionalLeafCount( ( significant_ + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
+		/*
+		 * Trim total leaf count.
+		 */
+		if ( ( _integralPartSize + newFractionalLeafCount ) < _leafCount )
+			_leafCount = _integralPartSize + newFractionalLeafCount;
+		M_ASSERT( newFractionalLeafCount == fractional_length() );
 		i32_t* data( _canonical.get<i32_t>() );
-		if ( ( _leafCount > 0 ) && ( leafSignificant == fractional_length() ) && ( significant_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) {
+
+		/*
+		 * Get digit that is next to last significant digit.
+		 * From now on nts stands for next-to-significant.
+		 */
+		size_t ntsLeafNo( significant_ / DECIMAL_DIGITS_IN_LEAF_CONST );
+		int ntsDigitInLeafNo( significant_ % DECIMAL_DIGITS_IN_LEAF_CONST );
+		i32_t ntsDigit( data[_integralPartSize + ntsLeafNo] );
+		ntsDigit /= DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - 1 - ntsDigitInLeafNo ];
+		ntsDigit %= 10;
+		if ( ( _leafCount > 0 ) && ( significant_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) {
 			i32_t& lastLeaf( data[ _leafCount - 1 ] );
-			lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( ( significant_ % DECIMAL_DIGITS_IN_LEAF_CONST ) ) ] );
+			lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - significant_ % DECIMAL_DIGITS_IN_LEAF_CONST ] );
+			if ( ntsDigit >= 5 ) {
+				add_leaf_low( _leafCount - 1, DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ntsDigitInLeafNo ] );
+			}
+		} else {
+			if ( ntsDigit >= 5 ) {
+				add_leaf_low( _leafCount - 1, 1 );
+			}
 		}
+
 		while ( ( _leafCount > _integralPartSize ) && ! data[ _leafCount - 1 ] )
 			-- _leafCount;
 		if ( ! _leafCount )

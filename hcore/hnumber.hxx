@@ -207,7 +207,20 @@ public:
 	HNumber operator ^ ( int long unsigned ) const;
 	void swap( HNumber& );
 	HNumber& abs( void );
-	HNumber& round( size_t );
+	/*! \brief Round number to given number of decimal places.
+	 *
+	 * Round halfway cases away from zero.
+	 *
+	 * \warning Given parameter specifies amount of fractional decimal digits, and NOT index of last significant digit.
+	 *
+	 * HNumber n( 1.5555 );
+	 * n.round( 3 );
+	 * assert( n == "1.556" );
+	 *
+	 * \param significant_ - maximum amount of fractional decimal digits to keep after rounding.
+	 * \return Self.
+	 */
+	HNumber& round( size_t significant_ );
 	HNumber& floor( void );
 	HNumber& ceil( void );
 	HNumber& trunc( void );
