@@ -151,6 +151,9 @@ protected:
 	virtual int long do_read( void* const, int long ) __attribute__((noreturn));
 	virtual void do_flush( void );
 	virtual bool do_is_valid( void ) const;
+	virtual bool do_good( void ) const;
+	virtual bool do_fail( void ) const;
+	virtual bool do_bad( void ) const;
 };
 
 HTee tee( yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HStreamInterface::ptr_t  );

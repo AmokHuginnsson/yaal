@@ -51,7 +51,7 @@ public:
 	typedef HStreamInterface::ptr_t owned_stream_t;
 	typedef HStreamInterface& ref_stream_t;
 protected:
-	HMutex _mutex;
+	mutable HMutex _mutex;
 private:
 	owned_stream_t _streamOwned;
 	yaal::hcore::HStreamInterface* _streamRef;
@@ -113,6 +113,14 @@ protected:
 	virtual HStreamInterface& do_set_float_format( FLOAT_FORMAT::enum_t );
 	virtual HStreamInterface& do_set_skipws( bool );
 	virtual HStreamInterface& do_set_boolalpha( bool );
+	bool do_get_skipws( void ) const;
+	bool do_get_boolalpha( void ) const;
+	int do_get_fill( void ) const;
+	int do_get_width( void ) const;
+	int do_get_precision( void ) const;
+	BASES::enum_t do_get_base( void ) const;
+	FLOAT_FORMAT::enum_t do_get_float_format( void ) const;
+	bool do_good( void ) const;
 	virtual int long do_write( void const* const, int long );
 	virtual int long do_read( void* const, int long );
 	virtual void do_flush( void );

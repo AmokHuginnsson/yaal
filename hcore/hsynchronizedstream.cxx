@@ -410,20 +410,72 @@ HStreamInterface& HSynchronizedStream::do_set_boolalpha( bool val_ ) {
 	M_EPILOG
 }
 
+bool HSynchronizedStream::do_get_skipws( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_get_skipws() );
+	M_EPILOG
+}
+
+bool HSynchronizedStream::do_get_boolalpha( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_get_boolalpha() );
+	M_EPILOG
+}
+
+int HSynchronizedStream::do_get_fill( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_get_fill() );
+	M_EPILOG
+}
+
+int HSynchronizedStream::do_get_width( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_get_width() );
+	M_EPILOG
+}
+
+int HSynchronizedStream::do_get_precision( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_get_precision() );
+	M_EPILOG
+}
+
+HStreamInterface::BASES::enum_t HSynchronizedStream::do_get_base( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_get_base() );
+	M_EPILOG
+}
+
+HStreamInterface::FLOAT_FORMAT::enum_t HSynchronizedStream::do_get_float_format( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_get_float_format() );
+	M_EPILOG
+}
+
 int long HSynchronizedStream::do_write( void const* const buf_, int long size_ ) {
 	M_PROLOG
+	HLock l( _mutex );
 	return ( _streamRef ? _streamRef->write( buf_, size_ ) : 0 );
 	M_EPILOG
 }
 
 int long HSynchronizedStream::do_read( void* const buf_, int long size_ ) {
 	M_PROLOG
+	HLock l( _mutex );
 	return ( _streamRef ? _streamRef->read( buf_, size_ ) : 0 );
 	M_EPILOG
 }
 
 void HSynchronizedStream::do_flush( void ) {
 	M_PROLOG
+	HLock l( _mutex );
 	if ( _streamRef )
 		_streamRef->flush();
 	return;
@@ -432,7 +484,15 @@ void HSynchronizedStream::do_flush( void ) {
 
 bool HSynchronizedStream::do_is_valid( void ) const {
 	M_PROLOG
+	HLock l( _mutex );
 	return ( _streamRef ? _streamRef->is_valid() : false );
+	M_EPILOG
+}
+
+bool HSynchronizedStream::do_good( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_good() );
 	M_EPILOG
 }
 

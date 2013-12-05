@@ -93,7 +93,8 @@ protected:
 	FLOAT_FORMAT::enum_t _floatFormat;
 	bool _skipWS;
 	bool _boolAlpha;
-	bool _valid;
+	bool _valid; /*!< Tells if further low-level IO is possible. */
+	bool _fail; /*!< Tells if most recently performed data extraction failed at logical level. */
 public:
 	HStreamInterface( void );
 	virtual ~HStreamInterface( void );
@@ -211,6 +212,12 @@ public:
 	int long write( void const* const, int long );
 	M_YAAL_HCORE_PUBLIC_API static char const* const eols;
 	bool is_valid( void ) const;
+	bool good( void ) const
+		{ return ( do_good() ); }
+	bool fail( void ) const
+		{ return ( do_fail() ); }
+	bool bad( void ) const
+		{ return ( do_bad() ); }
 	void flush( void );
 	int peek( void )
 		{ return ( do_peek() ); }
@@ -228,6 +235,20 @@ public:
 		{ return ( do_set_base( val_ ) ); }
 	HStreamInterface& set_float_format( FLOAT_FORMAT::enum_t val_ )
 		{ return ( do_set_float_format( val_ ) ); }
+	bool get_skipws( void ) const
+		{ return ( do_get_skipws() ); }
+	bool get_boolalpha( void ) const
+		{ return ( do_get_boolalpha() ); }
+	int get_fill( void ) const
+		{ return ( do_get_fill() ); }
+	int get_width( void ) const
+		{ return ( do_get_width() ); }
+	int get_precision( void ) const
+		{ return ( do_get_precision() ); }
+	BASES::enum_t get_base( void ) const
+		{ return ( do_get_base() ); }
+	FLOAT_FORMAT::enum_t get_float_format( void ) const
+		{ return ( do_get_float_format() ); }
 protected:
 	virtual HStreamInterface& do_output( HString const& );
 	virtual HStreamInterface& do_output( char const* );
@@ -277,6 +298,16 @@ protected:
 	virtual HStreamInterface& do_set_float_format( FLOAT_FORMAT::enum_t );
 	virtual HStreamInterface& do_set_skipws( bool );
 	virtual HStreamInterface& do_set_boolalpha( bool );
+	bool do_get_skipws( void ) const;
+	bool do_get_boolalpha( void ) const;
+	int do_get_fill( void ) const;
+	int do_get_width( void ) const;
+	int do_get_precision( void ) const;
+	BASES::enum_t do_get_base( void ) const;
+	FLOAT_FORMAT::enum_t do_get_float_format( void ) const;
+	bool do_good( void ) const;
+	bool do_fail( void ) const;
+	bool do_bad( void ) const;
 private:
 	bool read_word( void );
 	bool read_integer( void );
@@ -372,7 +403,7 @@ private:
 		M_PROLOG
 		if ( _stream ) {
 			*_stream >> _valueCache;
-			if ( ! _stream->is_valid() )
+			if ( ! _stream->good() )
 				_stream = NULL;
 		}
 		return;

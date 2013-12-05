@@ -43,7 +43,7 @@ HStreamInterface::HStreamInterface( void )
 	: _cache( 1, HChunk::STRATEGY::GEOMETRIC ), _offset( 0 ),
 	_wordCache(), _fill( ' ' ), _width( 0 ), _precision( 6 ),
 	_base( BASES::DEC ), _floatFormat( FLOAT_FORMAT::NATURAL ),
-	_skipWS( true ), _boolAlpha( false ), _valid( true ) {
+	_skipWS( true ), _boolAlpha( false ), _valid( true ), _fail( false ) {
 	return;
 }
 
@@ -452,14 +452,14 @@ bool HStreamInterface::read_word( void ) {
 	M_PROLOG
 	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analoguous context */
 	if ( ! _skipWS && ::memchr( _whiteSpace_.data(), HStreamInterface::do_peek(), _whiteSpace_.size() + 1 ) )
-		_valid = false;
+		_fail = true;
 	else {
 		while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_.data(), false ) < 0 )
 			;
 		while ( HStreamInterface::do_read_until( _wordCache, _whiteSpace_.data(), false ) < 0 )
 			;
 	}
-	return ( _valid && ( _wordCache.get_length() > 0 ) );
+	return ( good() && ( _wordCache.get_length() > 0 ) );
 	M_EPILOG
 }
 
@@ -520,7 +520,7 @@ HStreamInterface& HStreamInterface::do_input( char& char_ ) {
 	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analoguous context */
 	char c( 0 );
 	do read( &c, 1 );
-	while ( _valid && _skipWS && ::memchr( _whiteSpace_.data(), c, _whiteSpace_.size() + 1 ) );
+	while ( is_valid() && _skipWS && ::memchr( _whiteSpace_.data(), c, _whiteSpace_.size() + 1 ) );
 	char_ = c;
 	return ( *this );
 	M_EPILOG
@@ -675,6 +675,18 @@ bool HStreamInterface::is_valid( void ) const {
 	M_EPILOG
 }
 
+bool HStreamInterface::do_good( void ) const {
+	return ( ! ( fail() || bad() ) );
+}
+
+bool HStreamInterface::do_fail( void ) const {
+	return ( _fail || ! is_valid() );
+}
+
+bool HStreamInterface::do_bad( void ) const {
+	return ( ! is_valid() );
+}
+
 void HStreamInterface::flush( void ) {
 	M_PROLOG
 	do_flush();
@@ -729,6 +741,34 @@ HStreamInterface& HStreamInterface::do_set_boolalpha( bool boolalpha_ ) {
 	_boolAlpha = boolalpha_;
 	return ( *this );
 	M_EPILOG
+}
+
+bool HStreamInterface::do_get_skipws( void ) const {
+	return ( _skipWS );
+}
+
+bool HStreamInterface::do_get_boolalpha( void ) const {
+	return ( _boolAlpha );
+}
+
+int HStreamInterface::do_get_fill( void ) const {
+	return ( _fill );
+}
+
+int HStreamInterface::do_get_width( void ) const {
+	return ( _width );
+}
+
+int HStreamInterface::do_get_precision( void ) const {
+	return ( _precision );
+}
+
+HStreamInterface::BASES::enum_t HStreamInterface::do_get_base( void ) const {
+	return ( _base );
+}
+
+HStreamInterface::FLOAT_FORMAT::enum_t HStreamInterface::do_get_float_format( void ) const {
+	return ( _floatFormat );
 }
 
 HStreamInterface::HManipulator::HManipulator( int value_, ACTION_t action_ )

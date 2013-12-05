@@ -227,6 +227,24 @@ bool HTee::do_is_valid( void ) const {
 	M_EPILOG
 }
 
+bool HTee::do_good( void ) const {
+	M_PROLOG
+	return ( _stream1.good() && _stream2.good() );
+	M_EPILOG
+}
+
+bool HTee::do_fail( void ) const {
+	M_PROLOG
+	return ( _stream1.fail() || _stream2.fail() );
+	M_EPILOG
+}
+
+bool HTee::do_bad( void ) const {
+	M_PROLOG
+	return ( _stream1.bad() || _stream2.bad() );
+	M_EPILOG
+}
+
 HTee tee( HStreamInterface::ptr_t stream1_, HStreamInterface::ptr_t stream2_ ) {
 	M_PROLOG
 	return ( HTee( *stream1_, *stream2_ ) );
