@@ -281,8 +281,10 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stre
 
 namespace hcore {
 
-yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HNumber const& n ) {
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HNumber const& number_ ) {
 	M_PROLOG
+	HNumber n( number_ );
+	n.round( out.get_precision() );
 	out << n.to_string();
 	return ( out );
 	M_EPILOG
