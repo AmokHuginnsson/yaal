@@ -135,12 +135,26 @@ char _koncowka_[][ 3 ][ 6 ] = {
 
 HString _lastErrorMessage_;
 
+HString money_string( HNumber const& amount_ ) {
+	M_PROLOG
+	HNumber n( amount_ );
+	n.round( 2 );
+	HString string( n.to_string() );
+	int long pos( string.reverse_find( '.' ) );
+	if ( pos == HString::npos )
+		string += ".00";
+	else if ( pos == 1 )
+		string += "0";
+	return ( string );
+	M_EPILOG
+}
+
 HString kwota_slownie( HNumber const& kwota_ ) {
 	M_PROLOG
 	int forma( 0 );
 	HString slownie;
 	HString przypadek;
-	HString string( kwota_.to_string() );
+	HString string( money_string( kwota_ ) );
 	int long length( string.get_length() );
 	for ( int i( 0 ); i < length; i ++ ) {
 		if ( ( i % 3 ) == 0 ) {
