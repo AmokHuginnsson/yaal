@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/base.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
+#include "hcore/hnumber.hxx"
 
 namespace yaal {
 
@@ -55,8 +56,8 @@ iter_t find_local( iter_t it, iter_t end, pred_t pred ) {
 		pred( it );
 	return ( pred() );
 }
-yaal::hcore::HString kwota_slownie( double );
-void usun_ogonki( char* );
+yaal::hcore::HString kwota_slownie( yaal::hcore::HNumber const& );
+void usun_ogonki( yaal::hcore::HString& );
 double long atof_ex( yaal::hcore::HString const&, bool = false );
 bool verify_IBAN( yaal::hcore::HString const& );
 char const* get_last_error( void );

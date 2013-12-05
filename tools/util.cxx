@@ -135,44 +135,40 @@ char _koncowka_[][ 3 ][ 6 ] = {
 
 HString _lastErrorMessage_;
 
-HString kwota_slownie( double kwota_ ) {
+HString kwota_slownie( HNumber const& kwota_ ) {
 	M_PROLOG
-	int ctr = 0;
-	int long length = 0;
-	int forma = 0, sub = 0;
-	char cyfra = 0;
+	int forma( 0 );
 	HString slownie;
-	HString string;
 	HString przypadek;
-	string.format( "%.2f", kwota_ );
-	length = string.get_length();
-	for ( ctr = 0; ctr < length; ctr ++ ) {
-		if ( ( ctr % 3 ) == 0 ) {
-			sub = ( ( length - ctr ) > 1 ? 2 : 1 );
-			forma = lexical_cast<int>( string.mid( ( length - ctr ) - sub, sub ) );
-			if ( ( ctr > 5 ) && ( ( length - ctr ) > 2 ) &&
-					! ::strncmp( string.raw() + ( length - ctr ) - 3, "000", 3 ) )
+	HString string( kwota_.to_string() );
+	int long length( string.get_length() );
+	for ( int i( 0 ); i < length; i ++ ) {
+		if ( ( i % 3 ) == 0 ) {
+			int sub( ( length - i ) > 1 ? 2 : 1 );
+			forma = lexical_cast<int>( string.mid( ( length - i ) - sub, sub ) );
+			if ( ( i > 5 ) && ( ( length - i ) > 2 ) &&
+					! ::strncmp( string.raw() + ( length - i ) - 3, "000", 3 ) )
 				continue;
 		}
-		if ( ctr == 2 )
+		if ( i == 2 )
 			continue;
-		cyfra = static_cast<char>( string[ ( length - ctr ) - 1 ] - '0' );
-		switch ( ctr % 3 ) {
+		char cyfra( static_cast<char>( string[ ( length - i ) - 1 ] - '0' ) );
+		switch ( i % 3 ) {
 			case ( 0 ) : {
-				przypadek = _temat_[ ctr / 3 ];
+				przypadek = _temat_[ i / 3 ];
 				if ( forma == 1 )
-					przypadek += _koncowka_[ ctr / 3 ] [ 0 ];
+					przypadek += _koncowka_[ i / 3 ] [ 0 ];
 				else if ( ( ( ( forma % 10 ) > 1 ) && ( ( forma % 10 ) < 5 ) )
 						&& ( ( forma < 10 ) || ( forma > 20 ) ) )
-					przypadek += _koncowka_[ ctr / 3 ] [ 1 ];
+					przypadek += _koncowka_[ i / 3 ] [ 1 ];
 				else
-					przypadek += _koncowka_[ ctr / 3 ] [ 2 ];
+					przypadek += _koncowka_[ i / 3 ] [ 2 ];
 				slownie = przypadek + slownie;
 				if ( ( forma < 20 ) &&  ( forma > 9 ) )
 					slownie = _jednNastki_[ forma ] + slownie;
 				else if ( cyfra )
 					slownie = _jednNastki_[ static_cast<int>( cyfra ) ] + slownie;
-				else if ( ! forma && ( ( ctr < 3 ) || ( kwota_ < 1 ) ) )
+				else if ( ! forma && ( ( i < 3 ) || ( kwota_ < 1 ) ) )
 					slownie = _jednNastki_[ 0 ] + slownie;
 			}
 			break;
@@ -192,13 +188,10 @@ HString kwota_slownie( double kwota_ ) {
 	M_EPILOG
 }
 
-void usun_ogonki ( char * string_ ) {
+void usun_ogonki( HString& string_ ) {
 	M_PROLOG
-	int ctr = 0;
-	while ( string_ [ ctr ] ) {
-		string_ [ ctr ] = _transTableStripPL_ [ static_cast < char unsigned > ( string_ [ ctr ] ) ];
-		ctr ++;
-	}
+	for ( HString::HIterator it( string_.begin() ), end( string_.end() ); it != end; ++ it )
+		*it = _transTableStripPL_[ static_cast<char unsigned>( *it ) ];
 	return;
 	M_EPILOG
 }
