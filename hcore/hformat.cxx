@@ -89,7 +89,7 @@ private:
 	typedef HList<OToken> tokens_t;
 	typedef HMap<int, OToken*> positions_t;
 	typedef HPointer<positions_t> positions_ptr_t;
-	typedef HVariant<bool, char, int short, int, int long, void const*, double, double long, HString> format_arg_t;
+	typedef HVariant<bool, char, int short, int, int long, int long long, void const*, double, double long, HString> format_arg_t;
 	typedef HMap<int, format_arg_t> args_t;
 	typedef HPointer<args_t> args_ptr_t;
 	int _positionIndex;
@@ -351,8 +351,10 @@ HString HFormat::string( void ) const {
 			if ( !!( conv & HFormatImpl::CONVERSION::INT ) ) {
 				if ( !!( conv & HFormatImpl::CONVERSION::SHORT ) )
 					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int short>::get( *_impl->_args, it->_position ) );
-				else if ( !!( conv & ( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::LONG ) | HFormatImpl::CONVERSION::LONG_LONG ) ) )
+				else if ( !!( conv & HFormatImpl::CONVERSION::LONG ) )
 					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int long>::get( *_impl->_args, it->_position ) );
+				else if ( !!( conv & HFormatImpl::CONVERSION::LONG_LONG ) )
+					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int long long>::get( *_impl->_args, it->_position ) );
 				else {
 					M_ASSERT( conv & HFormatImpl::CONVERSION::INT );
 					_impl->_buffer.format( fmt.raw(), HFormatImpl::variant_shell<int>::get( *_impl->_args, it->_position ) );
