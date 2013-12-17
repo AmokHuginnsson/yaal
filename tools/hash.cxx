@@ -168,29 +168,29 @@ yaal::hcore::HString sha1( HString const& string ) {
 }
 
 void update_md5_state( u32_t* state, HStreamBlockIterator::HBlock const& block ) {
-#define M_F(x, y, z) (((x)&(y)) | (~(x)&(z)))
-#define M_G(x, y, z) (((x)&(z)) | ((y)&~(z)))
-#define M_H(x, y, z) ((x)^(y)^(z))
-#define M_I(x, y, z) ((y)^((x)|~(z)))
+#define M_F( x, y, z ) ( ( ( x ) & ( y ) ) | ( ~( x ) & ( z ) ) )
+#define M_G( x, y, z ) ( ( ( x ) & ( z ) ) | ( ( y ) & ~( z ) ) )
+#define M_H( x, y, z ) ( ( x ) ^ ( y ) ^ ( z ) )
+#define M_I( x, y, z ) ( ( y ) ^ ( ( x ) | ~( z ) ) )
 
-#define M_FF(v, w, x, y, z, s, ac) { \
- v += M_F(w, x, y) + z + static_cast<u32_t>(ac); \
- v = M_ROTATE_LEFT(v, s) + w; \
- }
-#define M_GG(v, w, x, y, z, s, ac) { \
- v += M_G(w, x, y) + z + static_cast<u32_t>(ac); \
- v = M_ROTATE_LEFT(v, s) + w; \
- }
-#define M_HH(v, w, x, y, z, s, ac) { \
- v += M_H(w, x, y) + z + ac; \
- v = M_ROTATE_LEFT(v, s) + w; \
- }
-#define M_II(v, w, x, y, z, s, ac) { \
- v += M_I(w, x, y) + z + ac; \
- v = M_ROTATE_LEFT(v, s) + w; \
- }
+#define M_FF( v, w, x, y, z, s, ac ) { \
+ v += M_F( ( w ), ( x ), ( y ) ) + ( z ) + static_cast<u32_t>( ac ); \
+ v = M_ROTATE_LEFT( v, s ) + w; \
+}
+#define M_GG( v, w, x, y, z, s, ac ) { \
+ v += M_G( ( w ), ( x ), ( y ) ) + ( z ) + static_cast<u32_t>( ac ); \
+ v = M_ROTATE_LEFT( ( v ), ( s ) ) + ( w ); \
+}
+#define M_HH( v, w, x, y, z, s, ac ) { \
+ v += M_H( ( w ), ( x ), ( y ) ) + ( z ) + ( ac ); \
+ v = M_ROTATE_LEFT( ( v ), ( s ) ) + ( w ); \
+}
+#define M_II( v, w, x, y, z, s, ac ) { \
+ v += M_I( ( w ), ( x ), ( y ) ) + ( z ) + ( ac ); \
+ v = M_ROTATE_LEFT( ( v ), ( s ) ) + ( w ); \
+}
 
-#define M_ROTATE_LEFT(x, s) ((x << s) | (x >> (32 - s)))
+#define M_ROTATE_LEFT( x, s ) ( ( ( x ) << ( s ) ) | ( ( x ) >> ( 32 - ( s ) ) ) )
 
 	static int const S11 = 7;
 	static int const S12 = 12;
@@ -214,76 +214,76 @@ void update_md5_state( u32_t* state, HStreamBlockIterator::HBlock const& block )
 	u32_t d = state[ 3 ];
 	u32_t* x = reinterpret_cast<u32_t*>( block.data() );
 	/* Cycle 1 */
-	M_FF(a, b, c, d, x[ 0], S11, 0xd76aa478); /* 1 */
-	M_FF(d, a, b, c, x[ 1], S12, 0xe8c7b756); /* 2 */
-	M_FF(c, d, a, b, x[ 2], S13, 0x242070db); /* 3 */
-	M_FF(b, c, d, a, x[ 3], S14, 0xc1bdceee); /* 4 */
-	M_FF(a, b, c, d, x[ 4], S11, 0xf57c0faf); /* 5 */
-	M_FF(d, a, b, c, x[ 5], S12, 0x4787c62a); /* 6 */
-	M_FF(c, d, a, b, x[ 6], S13, 0xa8304613); /* 7 */
-	M_FF(b, c, d, a, x[ 7], S14, 0xfd469501); /* 8 */
-	M_FF(a, b, c, d, x[ 8], S11, 0x698098d8); /* 9 */
-	M_FF(d, a, b, c, x[ 9], S12, 0x8b44f7af); /* 10 */
-	M_FF(c, d, a, b, x[10], S13, 0xffff5bb1); /* 11 */
-	M_FF(b, c, d, a, x[11], S14, 0x895cd7be); /* 12 */
-	M_FF(a, b, c, d, x[12], S11, 0x6b901122); /* 13 */
-	M_FF(d, a, b, c, x[13], S12, 0xfd987193); /* 14 */
-	M_FF(c, d, a, b, x[14], S13, 0xa679438e); /* 15 */
-	M_FF(b, c, d, a, x[15], S14, 0x49b40821); /* 16 */
+	M_FF( a, b, c, d, x[ 0], S11, 0xd76aa478 ); /* 1 */
+	M_FF( d, a, b, c, x[ 1], S12, 0xe8c7b756 ); /* 2 */
+	M_FF( c, d, a, b, x[ 2], S13, 0x242070db ); /* 3 */
+	M_FF( b, c, d, a, x[ 3], S14, 0xc1bdceee ); /* 4 */
+	M_FF( a, b, c, d, x[ 4], S11, 0xf57c0faf ); /* 5 */
+	M_FF( d, a, b, c, x[ 5], S12, 0x4787c62a ); /* 6 */
+	M_FF( c, d, a, b, x[ 6], S13, 0xa8304613 ); /* 7 */
+	M_FF( b, c, d, a, x[ 7], S14, 0xfd469501 ); /* 8 */
+	M_FF( a, b, c, d, x[ 8], S11, 0x698098d8 ); /* 9 */
+	M_FF( d, a, b, c, x[ 9], S12, 0x8b44f7af ); /* 10 */
+	M_FF( c, d, a, b, x[10], S13, 0xffff5bb1 ); /* 11 */
+	M_FF( b, c, d, a, x[11], S14, 0x895cd7be ); /* 12 */
+	M_FF( a, b, c, d, x[12], S11, 0x6b901122 ); /* 13 */
+	M_FF( d, a, b, c, x[13], S12, 0xfd987193 ); /* 14 */
+	M_FF( c, d, a, b, x[14], S13, 0xa679438e ); /* 15 */
+	M_FF( b, c, d, a, x[15], S14, 0x49b40821 ); /* 16 */
 
 	/* Cycle 2 */
-	M_GG(a, b, c, d, x[ 1], S21, 0xf61e2562); /* 17 */
-	M_GG(d, a, b, c, x[ 6], S22, 0xc040b340); /* 18 */
-	M_GG(c, d, a, b, x[11], S23, 0x265e5a51); /* 19 */
-	M_GG(b, c, d, a, x[ 0], S24, 0xe9b6c7aa); /* 20 */
-	M_GG(a, b, c, d, x[ 5], S21, 0xd62f105d); /* 21 */
-	M_GG(d, a, b, c, x[10], S22,	0x2441453); /* 22 */
-	M_GG(c, d, a, b, x[15], S23, 0xd8a1e681); /* 23 */
-	M_GG(b, c, d, a, x[ 4], S24, 0xe7d3fbc8); /* 24 */
-	M_GG(a, b, c, d, x[ 9], S21, 0x21e1cde6); /* 25 */
-	M_GG(d, a, b, c, x[14], S22, 0xc33707d6); /* 26 */
-	M_GG(c, d, a, b, x[ 3], S23, 0xf4d50d87); /* 27 */
-	M_GG(b, c, d, a, x[ 8], S24, 0x455a14ed); /* 28 */
-	M_GG(a, b, c, d, x[13], S21, 0xa9e3e905); /* 29 */
-	M_GG(d, a, b, c, x[ 2], S22, 0xfcefa3f8); /* 30 */
-	M_GG(c, d, a, b, x[ 7], S23, 0x676f02d9); /* 31 */
-	M_GG(b, c, d, a, x[12], S24, 0x8d2a4c8a); /* 32 */
+	M_GG( a, b, c, d, x[ 1], S21, 0xf61e2562 ); /* 17 */
+	M_GG( d, a, b, c, x[ 6], S22, 0xc040b340 ); /* 18 */
+	M_GG( c, d, a, b, x[11], S23, 0x265e5a51 ); /* 19 */
+	M_GG( b, c, d, a, x[ 0], S24, 0xe9b6c7aa ); /* 20 */
+	M_GG( a, b, c, d, x[ 5], S21, 0xd62f105d ); /* 21 */
+	M_GG( d, a, b, c, x[10], S22,	0x02441453 ); /* 22 */
+	M_GG( c, d, a, b, x[15], S23, 0xd8a1e681 ); /* 23 */
+	M_GG( b, c, d, a, x[ 4], S24, 0xe7d3fbc8 ); /* 24 */
+	M_GG( a, b, c, d, x[ 9], S21, 0x21e1cde6 ); /* 25 */
+	M_GG( d, a, b, c, x[14], S22, 0xc33707d6 ); /* 26 */
+	M_GG( c, d, a, b, x[ 3], S23, 0xf4d50d87 ); /* 27 */
+	M_GG( b, c, d, a, x[ 8], S24, 0x455a14ed ); /* 28 */
+	M_GG( a, b, c, d, x[13], S21, 0xa9e3e905 ); /* 29 */
+	M_GG( d, a, b, c, x[ 2], S22, 0xfcefa3f8 ); /* 30 */
+	M_GG( c, d, a, b, x[ 7], S23, 0x676f02d9 ); /* 31 */
+	M_GG( b, c, d, a, x[12], S24, 0x8d2a4c8a ); /* 32 */
 
 	/* Cycle 3 */
-	M_HH(a, b, c, d, x[ 5], S31, 0xfffa3942); /* 33 */
-	M_HH(d, a, b, c, x[ 8], S32, 0x8771f681); /* 34 */
-	M_HH(c, d, a, b, x[11], S33, 0x6d9d6122); /* 35 */
-	M_HH(b, c, d, a, x[14], S34, 0xfde5380c); /* 36 */
-	M_HH(a, b, c, d, x[ 1], S31, 0xa4beea44); /* 37 */
-	M_HH(d, a, b, c, x[ 4], S32, 0x4bdecfa9); /* 38 */
-	M_HH(c, d, a, b, x[ 7], S33, 0xf6bb4b60); /* 39 */
-	M_HH(b, c, d, a, x[10], S34, 0xbebfbc70); /* 40 */
-	M_HH(a, b, c, d, x[13], S31, 0x289b7ec6); /* 41 */
-	M_HH(d, a, b, c, x[ 0], S32, 0xeaa127fa); /* 42 */
-	M_HH(c, d, a, b, x[ 3], S33, 0xd4ef3085); /* 43 */
-	M_HH(b, c, d, a, x[ 6], S34,	0x4881d05); /* 44 */
-	M_HH(a, b, c, d, x[ 9], S31, 0xd9d4d039); /* 45 */
-	M_HH(d, a, b, c, x[12], S32, 0xe6db99e5); /* 46 */
-	M_HH(c, d, a, b, x[15], S33, 0x1fa27cf8); /* 47 */
-	M_HH(b, c, d, a, x[ 2], S34, 0xc4ac5665); /* 48 */
+	M_HH( a, b, c, d, x[ 5], S31, 0xfffa3942 ); /* 33 */
+	M_HH( d, a, b, c, x[ 8], S32, 0x8771f681 ); /* 34 */
+	M_HH( c, d, a, b, x[11], S33, 0x6d9d6122 ); /* 35 */
+	M_HH( b, c, d, a, x[14], S34, 0xfde5380c ); /* 36 */
+	M_HH( a, b, c, d, x[ 1], S31, 0xa4beea44 ); /* 37 */
+	M_HH( d, a, b, c, x[ 4], S32, 0x4bdecfa9 ); /* 38 */
+	M_HH( c, d, a, b, x[ 7], S33, 0xf6bb4b60 ); /* 39 */
+	M_HH( b, c, d, a, x[10], S34, 0xbebfbc70 ); /* 40 */
+	M_HH( a, b, c, d, x[13], S31, 0x289b7ec6 ); /* 41 */
+	M_HH( d, a, b, c, x[ 0], S32, 0xeaa127fa ); /* 42 */
+	M_HH( c, d, a, b, x[ 3], S33, 0xd4ef3085 ); /* 43 */
+	M_HH( b, c, d, a, x[ 6], S34, 0x04881d05 ); /* 44 */
+	M_HH( a, b, c, d, x[ 9], S31, 0xd9d4d039 ); /* 45 */
+	M_HH( d, a, b, c, x[12], S32, 0xe6db99e5 ); /* 46 */
+	M_HH( c, d, a, b, x[15], S33, 0x1fa27cf8 ); /* 47 */
+	M_HH( b, c, d, a, x[ 2], S34, 0xc4ac5665 ); /* 48 */
 
 	/* Cycle 4 */
-	M_II(a, b, c, d, x[ 0], S41, 0xf4292244); /* 49 */
-	M_II(d, a, b, c, x[ 7], S42, 0x432aff97); /* 50 */
-	M_II(c, d, a, b, x[14], S43, 0xab9423a7); /* 51 */
-	M_II(b, c, d, a, x[ 5], S44, 0xfc93a039); /* 52 */
-	M_II(a, b, c, d, x[12], S41, 0x655b59c3); /* 53 */
-	M_II(d, a, b, c, x[ 3], S42, 0x8f0ccc92); /* 54 */
-	M_II(c, d, a, b, x[10], S43, 0xffeff47d); /* 55 */
-	M_II(b, c, d, a, x[ 1], S44, 0x85845dd1); /* 56 */
-	M_II(a, b, c, d, x[ 8], S41, 0x6fa87e4f); /* 57 */
-	M_II(d, a, b, c, x[15], S42, 0xfe2ce6e0); /* 58 */
-	M_II(c, d, a, b, x[ 6], S43, 0xa3014314); /* 59 */
-	M_II(b, c, d, a, x[13], S44, 0x4e0811a1); /* 60 */
-	M_II(a, b, c, d, x[ 4], S41, 0xf7537e82); /* 61 */
-	M_II(d, a, b, c, x[11], S42, 0xbd3af235); /* 62 */
-	M_II(c, d, a, b, x[ 2], S43, 0x2ad7d2bb); /* 63 */
-	M_II(b, c, d, a, x[ 9], S44, 0xeb86d391); /* 64 */
+	M_II( a, b, c, d, x[ 0], S41, 0xf4292244 ); /* 49 */
+	M_II( d, a, b, c, x[ 7], S42, 0x432aff97 ); /* 50 */
+	M_II( c, d, a, b, x[14], S43, 0xab9423a7 ); /* 51 */
+	M_II( b, c, d, a, x[ 5], S44, 0xfc93a039 ); /* 52 */
+	M_II( a, b, c, d, x[12], S41, 0x655b59c3 ); /* 53 */
+	M_II( d, a, b, c, x[ 3], S42, 0x8f0ccc92 ); /* 54 */
+	M_II( c, d, a, b, x[10], S43, 0xffeff47d ); /* 55 */
+	M_II( b, c, d, a, x[ 1], S44, 0x85845dd1 ); /* 56 */
+	M_II( a, b, c, d, x[ 8], S41, 0x6fa87e4f ); /* 57 */
+	M_II( d, a, b, c, x[15], S42, 0xfe2ce6e0 ); /* 58 */
+	M_II( c, d, a, b, x[ 6], S43, 0xa3014314 ); /* 59 */
+	M_II( b, c, d, a, x[13], S44, 0x4e0811a1 ); /* 60 */
+	M_II( a, b, c, d, x[ 4], S41, 0xf7537e82 ); /* 61 */
+	M_II( d, a, b, c, x[11], S42, 0xbd3af235 ); /* 62 */
+	M_II( c, d, a, b, x[ 2], S43, 0x2ad7d2bb ); /* 63 */
+	M_II( b, c, d, a, x[ 9], S44, 0xeb86d391 ); /* 64 */
 
 	state[ 0 ] += a;
 	state[ 1 ] += b;
