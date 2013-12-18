@@ -59,9 +59,9 @@ yaal::hcore::HString md5( HStreamInterface& stream ) {
 	static u32_t const STATE2 = 0x98badcfe;
 	static u32_t const STATE3 = 0x10325476;
 	HStreamBlockIterator source( stream, BLOCK_SIZE >> 3 );
-	int last = 0;
-	u32_t total = 0;
-	u32_t totalH = 0;
+	int last( 0 );
+	u32_t total( 0 );
+	u32_t totalH( 0 );
 	u32_t state[ STATE_SIZE ] = { STATE0, STATE1, STATE2, STATE3 };
 	do {
 		HStreamBlockIterator::HBlock block = *source;
@@ -120,9 +120,9 @@ yaal::hcore::HString sha1( HStreamInterface& stream ) {
 	static u32_t const STATE3 = 0x10325476;
 	static u32_t const STATE4 = 0xc3d2e1f0;
 	HStreamBlockIterator source( stream, BLOCK_SIZE >> 3 );
-	int last = 0;
-	u32_t total = 0;
-	u32_t totalH = 0;
+	int last( 0 );
+	u32_t total( 0 );
+	u32_t totalH( 0 );
 	u32_t state[ STATE_SIZE ] = { STATE0, STATE1, STATE2, STATE3, STATE4 };
 	do {
 		HStreamBlockIterator::HBlock block = *source;
@@ -314,13 +314,13 @@ void update_sha1_state( u32_t* state, HStreamBlockIterator::HBlock const& block 
 	u32_t e = state[ 4 ];
 	u32_t x[ WORK_BUFFER_SIZE ];
 	::memcpy( x, block.data(), INPUT_CHUNK_SIZE * sizeof ( u32_t ) );
-	u32_t tmp = 0;
+	u32_t tmp( 0 );
 	change_endianess( x, INPUT_CHUNK_SIZE );
 	for ( int i = INPUT_CHUNK_SIZE; i < WORK_BUFFER_SIZE; ++ i )
 		tmp = x[ i - 3 ] ^ x[ i - 8 ] ^ x[ i - 14 ] ^ x[ i - 16 ], x[ i ] = M_ROTATE_LEFT( tmp, 1 );
   for ( int i = 0; i < WORK_BUFFER_SIZE; ++ i ) {
-		u32_t f;
-		u32_t k;
+		u32_t f( 0 );
+		u32_t k( 0 );
 		if ( ( 0 <= i ) && ( i <= 19 ) ) {
 			f = ( b & c ) | ( ( ~ b ) & d );
 			k = 0x5a827999;
