@@ -3,35 +3,45 @@ tags: $(SRCS) $(HDRS)
 	cd $(DIR_ROOT) && $(CTAGS) && \
 	printf "%b\n" "done."
 
-prepare-coverage-baseline:
+DIR_COVERAGE=build/cov
+LCOV_PARAMS=--rc lcov_branch_coverage=1
+
+prepare-coverage-baseline: $(DIR_COVERAGE)
 	@printf "%b" "Preparing coverage base line ... "; \
 	cd $(DIR_ROOT) && \
-	find $(DIR_BUILD) -name '*.gcda' | xargs /bin/rm -f && \
-	lcov --base-directory $(DIR_ROOT) \
-	     --directory $(DIR_BUILD)/hcore \
-	     --directory $(DIR_BUILD)/tools \
-	     --directory $(DIR_BUILD)/dbwrapper \
-	     --directory $(DIR_BUILD)/hconsole \
-	     --directory $(DIR_BUILD)/hdata \
-	     --capture --initial --output-file $(DIR_BUILD)/$(LIB_NAME)-baseline.info && \
+	find $(DIR_COVERAGE) -name '*.gcda' | xargs /bin/rm -f && \
+	lcov $(LCOV_PARAMS) \
+	     --base-directory $(DIR_ROOT) \
+	     --directory $(DIR_COVERAGE)/hcore \
+	     --directory $(DIR_COVERAGE)/tools \
+	     --directory $(DIR_COVERAGE)/dbwrapper \
+	     --directory $(DIR_COVERAGE)/hconsole \
+	     --directory $(DIR_COVERAGE)/hdata \
+	     --capture --initial --output-file $(DIR_COVERAGE)/$(LIB_NAME)-baseline.info && \
 	printf "%b\n" "done."
 
 coverage-stats:
 	@printf "%b" "Preparing coverage statistics ... "; \
 	cd $(DIR_ROOT) && \
-	lcov --base-directory $(DIR_ROOT) \
-	     --directory $(DIR_BUILD)/hcore \
-	     --directory $(DIR_BUILD)/tools \
-	     --directory $(DIR_BUILD)/dbwrapper \
-	     --directory $(DIR_BUILD)/hconsole \
-	     --directory $(DIR_BUILD)/hdata \
+	lcov $(LCOV_PARAMS) \
+	     --base-directory $(DIR_ROOT) \
+	     --directory $(DIR_COVERAGE)/hcore \
+	     --directory $(DIR_COVERAGE)/tools \
+	     --directory $(DIR_COVERAGE)/dbwrapper \
+	     --directory $(DIR_COVERAGE)/hconsole \
+	     --directory $(DIR_COVERAGE)/hdata \
 			 --ignore-errors gcov,source \
-	     --capture --output-file $(DIR_BUILD)/$(LIB_NAME)-test.info ;\
-	lcov --add-tracefile $(DIR_BUILD)/$(LIB_NAME)-baseline.info --add-tracefile $(DIR_BUILD)/$(LIB_NAME)-test.info --output-file $(DIR_BUILD)/$(LIB_NAME)-total.info && \
-	lcov --remove $(DIR_BUILD)/$(LIB_NAME)-total.info '/usr/include/*' '/usr/lib/*' --output-file $(DIR_BUILD)/$(LIB_NAME)-coverage.info && \
+	     --capture --output-file $(DIR_COVERAGE)/$(LIB_NAME)-test.info ;\
+	lcov $(LCOV_PARAMS) \
+	     --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-baseline.info \
+			 --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-test.info \
+			 --output-file $(DIR_COVERAGE)/$(LIB_NAME)-total.info && \
+	lcov $(LCOV_PARAMS) \
+	     --remove $(DIR_COVERAGE)/$(LIB_NAME)-total.info '/usr/include/*' '/usr/lib/*' \
+			 --output-file $(DIR_COVERAGE)/$(LIB_NAME)-coverage.info && \
 	/bin/rm -rf $(DIR_ROOT)/build/coverage-stats && \
 	$(MKDIR_P) $(DIR_ROOT)/build/coverage-stats && \
-	genhtml $(DIR_BUILD)/$(LIB_NAME)-coverage.info --legend --output-directory=$(DIR_ROOT)/build/coverage-stats && \
+	genhtml $(LCOV_PARAMS) $(DIR_COVERAGE)/$(LIB_NAME)-coverage.info --legend --output-directory=$(DIR_ROOT)/build/coverage-stats && \
 	printf "%b\n" "done."
 
 CPPCHECK_CMD= cppcheck -D__ID__=\"\" -D__TID__=\"\" $(filter -D%,$(CXXFLAGS)) -DOPENSSL_THREADS=1 $(filter -I%,$(CXXFLAGS)) \
