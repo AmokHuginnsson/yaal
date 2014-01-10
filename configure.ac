@@ -158,19 +158,30 @@ if test ["$POSTGRES"] != ["no"] ; then
 										fi;POSTGRES=["no"]])
 	LIBS=""
 fi
+MYSQL_REENTRANT=[""]
 if test ["$MYSQL"] != ["no"] ; then
-	AC_CHECK_LIB([mysqlclient],[mysql_init],[],[
-			CXXFLAGS_ORIG="${CXXFLAGS}"
-			CXXFLAGS=["$CXXFLAGS_ORIG -L/usr/local/lib/mysql"]
-			unset ac_cv_lib_mysqlclient_mysql_init
-			AC_CHECK_LIB([mysqlclient],[mysql_init],[EXTRA_LIB_PATHS="-L/usr/local/lib/mysql"],[
-				CXXFLAGS=["$CXXFLAGS_ORIG -L/usr/lib64/mysql/"]
-				unset ac_cv_lib_mysqlclient_mysql_init
-				AC_CHECK_LIB([mysqlclient],[mysql_init],[EXTRA_LIB_PATHS="-L/usr/lib64/mysql/"],[
-					if test ["$MYSQL"] = ["yes"] ; then
-						AC_MSG_ERROR([Cannot continue without MySQL.])
-					fi;MYSQL=["no"]])])])
+	LIBS=""
+	CXXFLAGS_ORIG="${CXXFLAGS}"
+	AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient])
+	if test ["x$LIBS"] = "x" ; then
+		CXXFLAGS=["$CXXFLAGS_ORIG -L/usr/local/lib/mysql"]
+		unset ac_cv_search_mysql_init
+		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIB_PATHS="-L/usr/local/lib/mysql"])
+	fi
+	if test ["x$LIBS"] = "x" ; then
+		CXXFLAGS=["$CXXFLAGS_ORIG -L/usr/lib64/mysql/"]
+		unset ac_cv_search_mysql_init
+		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIB_PATHS="-L/usr/lib64/mysql/"])
+	fi
+	if test ["x$LIBS"] = "x" ; then
+		if test ["$MYSQL"] = ["yes"] ; then
+			AC_MSG_ERROR([Cannot continue without MySQL.])
+		else
+			MySQL=["no"]
+		fi
+	fi
 	CXXFLAGS=$CXXFLAGS_ORIG
+	MYSQLCLIENT_LIBRARY=["$LIBS"]
 	LIBS=""
 fi
 if test ["$FIREBIRD"] != ["no"] ; then
@@ -459,6 +470,7 @@ AC_SUBST([TOOLS_LIBS],[${TOOLS_LIBS}])
 AC_SUBST([HCONSOLE_LIBS],[${HCONSOLE_LIBS}])
 AC_SUBST([DO_TARGET],[${DO_TARGET}])
 AC_SUBST([VERSION],[YAAL_PACKAGE_VERSION])
+AC_SUBST([MYSQLCLIENT_LIBRARY],[${MYSQLCLIENT_LIBRARY}])
 AH_TOP([/* $Id$ */
 
 #ifndef YAAL_CONFIG_HXX_INCLUDED
