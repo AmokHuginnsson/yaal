@@ -151,6 +151,9 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/dfs/dfstab] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_TYPE=[Solaris]
+	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/tizen-release] ; then
+		AC_DEFINE([__HOST_OS_TYPE_TIZEN__], [], [Your operating system is Tizen.])
+		HOST_OS_TYPE=[Tizen]
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -d [c:/windows] ; then
 		AC_DEFINE([__HOST_OS_TYPE_CYGWIN__], [], [Your operating system is Cygwin.])
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--out-implib=lib\$(*).\$(LIB_ARCHIVE_SUFFIX)"]

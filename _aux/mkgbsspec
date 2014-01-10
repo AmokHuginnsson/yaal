@@ -1,0 +1,17 @@
+#! /bin/sh
+
+if [ ! -f ./_aux/yaal.spec ] ; then
+	echo "This script must be executed from yaal top level directory."
+	exit 1
+fi
+
+PROG="VER=\``awk '/^Version:/{gsub(/^Version:\\s*%\(/,"");gsub(/\)$/,"");print}' _aux/yaal.spec`\`"
+
+eval ${PROG}
+
+mkdir -p packaging
+
+sed -e "s@^Version:.*@Version:\\t${VER}@" -e "s@^Source:.*@Source:\\t%{name}-%{version}.tar.gz@" ./_aux/yaal.spec > packaging/yaal.spec
+
+exit 0
+

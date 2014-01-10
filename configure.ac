@@ -115,7 +115,6 @@ YAAL_DETECT_FUNCTION_MACRO
 dnl Check for POD sizes.
 dnl We shall not pollute namespace with unnecessary macros.
 dnl AC_CHECK_SIZEOF([char])
-dnl AC_CHECK_SIZEOF([int short])
 AC_CHECK_SIZEOF([int short])
 AC_CHECK_SIZEOF([int])
 AC_CHECK_SIZEOF([int long])
@@ -123,6 +122,14 @@ AC_CHECK_SIZEOF([int long long])
 AC_CHECK_SIZEOF([float])
 AC_CHECK_SIZEOF([double])
 AC_CHECK_SIZEOF([double long])
+dnl Check for POD alignment.
+AC_CHECK_ALIGNOF([int short])
+AC_CHECK_ALIGNOF([int])
+AC_CHECK_ALIGNOF([int long])
+AC_CHECK_ALIGNOF([int long long])
+AC_CHECK_ALIGNOF([float])
+AC_CHECK_ALIGNOF([double])
+AC_CHECK_ALIGNOF([double long])
 
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])

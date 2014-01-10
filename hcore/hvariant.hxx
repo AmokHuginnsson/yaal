@@ -80,7 +80,12 @@ public:
 		sizeof ( t20_t )>::value;
 	static int const INVALID;
 private:
-	char _mem[ SIZE ];
+	typedef typename yaal::trait::ternary<( SIZE >= ALIGNOF_INT_LONG_LONG ), int long long,
+					typename yaal::trait::ternary<( SIZE >= ALIGNOF_INT_LONG ), int long,
+					typename yaal::trait::ternary<( SIZE >= ALIGNOF_INT ), int,
+					typename yaal::trait::ternary<( SIZE >= ALIGNOF_INT_SHORT ), int short, char>::type>::type>::type>::type aligner_t;
+	static int const ALIGNER_COUNT = SIZE / static_cast<int>( sizeof ( aligner_t ) ) + ( SIZE % static_cast<int>( sizeof ( aligner_t ) ) ? 1 : 0 );
+	aligner_t _mem[ ALIGNER_COUNT ];
 	int _type;
 public:
 	HVariant( void );
@@ -364,7 +369,7 @@ void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
 		if ( _type == v._type )
 			swap( _type, _mem, v._mem );
 		else if ( ( _type != INVALID ) && ( v._type != INVALID ) ) {
-			char tmp[SIZE];
+			aligner_t tmp[ALIGNER_COUNT];
 			default_construct( _type, tmp );
 			swap( _type, _mem, tmp );
 			destroy( _type, _mem );

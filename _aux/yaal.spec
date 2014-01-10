@@ -23,27 +23,30 @@ Summary:	Yet Another Abstraction Layer - general purpose C++ library - developme
 Summary:	Yet Another Abstraction Layer - general purpose C++ library - developer documentation.
 %description -n yaal-doc
 
+%define flagfilter sed -e 's/-O2\\>//g' -e 's/-g\\>//g' -e 's/-Wall\\>//g' -e 's/-Werror\\>//g' -e 's/-Wformat-security\\>//g' -e 's/-Wformat\\>//g'
+%define clearflags export CFLAGS=`echo ${CFLAGS} | %{flagfilter}`;export CXXFLAGS=`echo ${CXXFLAGS} | %{flagfilter}`
+
 %prep
-cd -
+if [ -f "${RPM_SOURCE_DIR}/%{name}-%{version}.tar.gz" ] ; then
+%setup
+fi
 umask 0077
 make purge
 
 %build
-cd -
 umask 0077
+%{clearflags}
 make %{?_smp_mflags} debug release doc PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir} LIBDIR=%{_libdir}
 
 
 %install
 rm -rf ${RPM_BUILD_ROOT}
-cd -
 umask 0077
 make install-debug install-release install-doc DESTDIR=${RPM_BUILD_ROOT}
 rm -f ${RPM_BUILD_ROOT}/%{_libdir}/ld.so.conf ${RPM_BUILD_ROOT}/%{_libdir}/ld.so.cache ${RPM_BUILD_ROOT}/%{_libdir}/mkcache
 
 %clean
 rm -rf ${RPM_BUILD_ROOT}
-cd -
 umask 0077
 make purge
 
