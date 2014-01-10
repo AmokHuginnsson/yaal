@@ -1,6 +1,6 @@
 #! /bin/sh
 
-if [ -f Makefile -a "x`grep NATIVE_MAKE Makefile`" != "x" ] ; then
+if [ -f Makefile -a "x`grep -s NATIVE_MAKE Makefile`" != "x" ] ; then
 	exit 0
 fi
 
