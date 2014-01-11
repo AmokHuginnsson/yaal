@@ -80,10 +80,10 @@ public:
 		sizeof ( t20_t )>::value;
 	static int const INVALID;
 private:
-	typedef typename yaal::trait::ternary<( SIZE >= ALIGNOF_INT_LONG_LONG ), int long long,
-					typename yaal::trait::ternary<( SIZE >= ALIGNOF_INT_LONG ), int long,
-					typename yaal::trait::ternary<( SIZE >= ALIGNOF_INT ), int,
-					typename yaal::trait::ternary<( SIZE >= ALIGNOF_INT_SHORT ), int short, char>::type>::type>::type>::type aligner_t;
+	typedef typename yaal::trait::ternary<( SIZE > ALIGNOF_INT_LONG ), int long long,
+					typename yaal::trait::ternary<( SIZE > ALIGNOF_INT ), int long,
+					typename yaal::trait::ternary<( SIZE > ALIGNOF_INT_SHORT ), int,
+					typename yaal::trait::ternary<( SIZE > sizeof ( char ) ), int short, char>::type>::type>::type>::type aligner_t;
 	static int const ALIGNER_COUNT = SIZE / static_cast<int>( sizeof ( aligner_t ) ) + ( SIZE % static_cast<int>( sizeof ( aligner_t ) ) ? 1 : 0 );
 	aligner_t _mem[ ALIGNER_COUNT ];
 	int _type;

@@ -7,6 +7,7 @@ Group:		System Environment/Libraries
 License:	Commercial
 URL:			http://codestation.org/
 Source:		.
+Source1:	%{name}-%{version}.tar.gz
 # Source: https://codestation.org/repo/yaal.git
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -27,6 +28,10 @@ Summary:	Yet Another Abstraction Layer - general purpose C++ library - developer
 %define clearflags export CFLAGS=`echo ${CFLAGS} | %{flagfilter}`;export CXXFLAGS=`echo ${CXXFLAGS} | %{flagfilter}`
 
 %prep
+if [ ! -f "${RPM_SOURCE_DIR}/%{name}-%{version}.tar.gz" ] ; then
+	cd -
+	tar cf - --transform 's@\./@%{name}-%{version}/@' . | gzip -c > "${RPM_SOURCE_DIR}/%{name}-%{version}.tar.gz"
+fi
 if [ -f "${RPM_SOURCE_DIR}/%{name}-%{version}.tar.gz" ] ; then
 %setup
 fi
