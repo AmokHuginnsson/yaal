@@ -87,25 +87,25 @@ HCharacterClass const* _characterClass_[] = { &_whiteSpace_, &_digit_, &_letter_
 
 static int const ALLOC_BIT_MASK = 128;
 #undef IS_INPLACE
-#define IS_INPLACE ( ! ( _mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
+#define IS_INPLACE ( ! ( reinterpret_cast<char const*>( _mem )[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
 #undef EXT_IS_INPLACE
-#define EXT_IS_INPLACE( base ) ( ! ( base[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
+#define EXT_IS_INPLACE( base ) ( ! ( reinterpret_cast<char const*>( base )[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
 #undef MEM
-#define MEM ( IS_INPLACE ? _mem : *reinterpret_cast<char**>( _mem ) )
+#define MEM ( IS_INPLACE ? reinterpret_cast<char*>( _mem ) : *reinterpret_cast<char**>( _mem ) )
 #undef EXT_MEM
-#define EXT_MEM( base ) ( EXT_IS_INPLACE( base ) ? base : *reinterpret_cast<char**>( base ) )
+#define EXT_MEM( base ) ( EXT_IS_INPLACE( base ) ? reinterpret_cast<char*>( base ) : *reinterpret_cast<char**>( base ) )
 #undef ROMEM
-#define ROMEM ( IS_INPLACE ? _mem : *reinterpret_cast<char const* const*>( _mem ) )
+#define ROMEM ( IS_INPLACE ? reinterpret_cast<char const*>( _mem ) : *reinterpret_cast<char const* const*>( _mem ) )
 #undef GET_SIZE
-#define GET_SIZE ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] : *reinterpret_cast<int long const*>( _mem + sizeof ( char* ) ) )
+#define GET_SIZE ( IS_INPLACE ? reinterpret_cast<char const*>( _mem )[ ALLOC_FLAG_INDEX ] : _mem[ 1 ] )
 #undef SET_SIZE
-#define SET_SIZE( size ) do { ( IS_INPLACE ? static_cast<int long>( _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) ) : *reinterpret_cast<int long*>( _mem + sizeof ( char* ) ) = ( size ) ); } while ( 0 )
+#define SET_SIZE( size ) do { ( IS_INPLACE ? static_cast<int long>( reinterpret_cast<char*>( _mem )[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) ) : _mem[ 1 ] = ( size ) ); } while ( 0 )
 #undef EXT_SET_SIZE
-#define EXT_SET_SIZE( base, size ) do { ( EXT_IS_INPLACE( base ) ? static_cast<int long>( base[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) ) : *reinterpret_cast<int long*>( base + sizeof ( char* ) ) = ( size ) ); } while ( 0 )
+#define EXT_SET_SIZE( base, size ) do { ( EXT_IS_INPLACE( base ) ? static_cast<int long>( reinterpret_cast<char*>( base )[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) ) : base[ 1 ] = ( size ) ); } while ( 0 )
 #undef GET_ALLOC_BYTES
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : static_cast<int long>( ( *reinterpret_cast<int long const*>( _mem + sizeof ( char* ) + sizeof ( int long ) ) ) & ( static_cast<int long unsigned>( -1 ) >> 1 ) ) )
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : static_cast<int long>( _mem[ 2 ] & ( static_cast<int long unsigned>( -1 ) >> 1 ) ) )
 #undef SET_ALLOC_BYTES
-#define SET_ALLOC_BYTES( capacity ) do { ( *reinterpret_cast<int long*>( _mem + sizeof ( char* ) + sizeof ( int long ) ) = ( capacity ) ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); } while ( 0 )
+#define SET_ALLOC_BYTES( capacity ) do { _mem[ 2 ] = ( capacity ); reinterpret_cast<char*>( _mem )[ ALLOC_FLAG_INDEX ] = static_cast<char>( reinterpret_cast<char*>( _mem )[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); } while ( 0 )
 
 char const* _errMsgHString_[ 7 ] = {
 	_( "ok" ),
@@ -178,7 +178,7 @@ void HString::hs_realloc( int long preallocate_ ) {
 		} else {
 			char* newMem( memory::calloc<char>( newAllocBytes ) );
 			int long origSize( GET_SIZE );
-			::std::strncpy( newMem, _mem, origSize );
+			::std::strncpy( newMem, reinterpret_cast<char*>( _mem ), origSize );
 			*reinterpret_cast<char**>( _mem ) = newMem;
 			SET_ALLOC_BYTES( newAllocBytes );
 			SET_SIZE( origSize );
@@ -247,8 +247,8 @@ HString::HString( char const* const array_, int long size_ )
 
 HString::HString( char char_ ) : _mem() {
 	M_PROLOG
-	_mem[ 0 ] = char_;
-	_mem[ 1 ] = 0;
+	reinterpret_cast<char*>( _mem )[ 0 ] = char_;
+	reinterpret_cast<char*>( _mem )[ 1 ] = 0;
 	SET_SIZE( 1 );
 	return;
 	M_EPILOG
@@ -256,8 +256,8 @@ HString::HString( char char_ ) : _mem() {
 
 HString::HString( char unsigned charUnsigned_ ) : _mem() {
 	M_PROLOG
-	_mem[ 0 ] = static_cast<char>( charUnsigned_ );
-	_mem[ 1 ] = 0;
+	reinterpret_cast<char*>( _mem )[ 0 ] = static_cast<char>( charUnsigned_ );
+	reinterpret_cast<char*>( _mem )[ 1 ] = 0;
 	SET_SIZE( 1 );
 	return;
 	M_EPILOG
@@ -591,7 +591,7 @@ int long HString::max_size( void ) const {
 void HString::swap( HString& other ) {
 	if ( &other != this ) {
 		using yaal::swap_ranges;
-		swap_ranges( _mem, _mem + INPLACE_BUFFER_SIZE, other._mem );
+		swap_ranges( _mem, _mem + countof ( _mem ), other._mem );
 	}
 	return;
 }

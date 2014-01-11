@@ -92,7 +92,7 @@ private:
 	static int const INPLACE_BUFFER_SIZE = sizeof ( char* ) + sizeof ( int long ) + sizeof ( int long );
 	static int const ALLOC_FLAG_INDEX = INPLACE_BUFFER_SIZE - 1;
 	static int const MAX_INPLACE_CAPACITY = INPLACE_BUFFER_SIZE - 2; /* -1 for terminating NIL, -1 for ALLOC_FLAG byte. */
-	char _mem[ INPLACE_BUFFER_SIZE ];
+	int long _mem[ 3 ];
 public:
 	static int long const npos = -1;
 	typedef HIterator iterator; /*!< mutable iterator for string characters */
