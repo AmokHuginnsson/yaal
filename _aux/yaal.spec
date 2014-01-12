@@ -7,7 +7,6 @@ Group:		System Environment/Libraries
 License:	Commercial
 URL:			http://codestation.org/
 Source:		.
-Source1:	%{name}-%{version}.tar.gz
 # Source: https://codestation.org/repo/yaal.git
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -28,21 +27,23 @@ Summary:	Yet Another Abstraction Layer - general purpose C++ library - developer
 %define clearflags export CFLAGS=`echo ${CFLAGS} | %{flagfilter}`;export CXXFLAGS=`echo ${CXXFLAGS} | %{flagfilter}`
 
 %prep
-if [ ! -f "${RPM_SOURCE_DIR}/%{name}-%{version}.tar.gz" ] ; then
-	cd -
-	tar cf - --transform 's@\./@%{name}-%{version}/@' . | gzip -c > "${RPM_SOURCE_DIR}/%{name}-%{version}.tar.gz"
-fi
+umask 0077
 if [ -f "${RPM_SOURCE_DIR}/%{name}-%{version}.tar.gz" ] ; then
 %setup
+else
+	cd -
+	/bin/rm -rf "${RPM_BUILD_DIR}/%{name}-%{version}"
+	mkdir "${RPM_BUILD_DIR}/%{name}-%{version}"
+	tar cf - --exclude build . | tar -x -C "${RPM_BUILD_DIR}/%{name}-%{version}"
+	cd -
 fi
-umask 0077
+cd "${RPM_BUILD_DIR}/%{name}-%{version}"
 make purge
 
 %build
 umask 0077
 %{clearflags}
 make %{?_smp_mflags} debug release doc PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir} LIBDIR=%{_libdir}
-
 
 %install
 rm -rf ${RPM_BUILD_ROOT}
