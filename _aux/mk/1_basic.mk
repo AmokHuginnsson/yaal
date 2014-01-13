@@ -1,9 +1,18 @@
 SHELL     = /bin/sh
 RELEASE   = $(VERSION).$(SUBVERSION).$(EXTRAVERSION)
+DIR_PKGCONFIG= $(DIR_SHARE)/pkgconfig
+DIR_DOC      = $(DIR_SHARE)/doc/$(PRJNAME)
 DIR_BUILD ?= $(CURDIR)
 FIND      = find
 ARFLAGS   = cr
 VPATH     = $(DIR_ROOT)
+ifeq ($(LIB_PREFIX),lib)
+LIB_SUFFIX   = so.$(RELEASE)
+LIB_ARCHIVE_SUFFIX = a
+else
+LIB_SUFFIX   = dll
+LIB_ARCHIVE_SUFFIX = dll.a
+endif
 
 define IDENT_HELPER
 	DIR_PREFIX=$$(subst . /,./,$$(foreach IT,$$(subst /, ,$$(subst $$(DIR_ROOT),,$$(DIR_BUILD))),/..))

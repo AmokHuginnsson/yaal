@@ -25,7 +25,8 @@
 # FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 
 $(foreach DIR,$(subst /, ,$(CURDIR)), $(eval $(eval DIR_ROOT_TEST=$(DIR_ROOT_TEST)/$(DIR)) $(if $(wildcard $(DIR_ROOT_TEST)/Makefile.mk.in),export DIR_ROOT ?= $(DIR_ROOT_TEST))))
-LIB_NAME     = yaal
+PRJNAME      = yaal
+LIB_NAME     = $(PRJNAME)
 VERSION      = 0
 SUBVERSION   = 0
 EXTRAVERSION = 31
@@ -38,24 +39,15 @@ DIR_SYSCONF  = $(DESTDIR)@sysconfdir@
 DIR_LIB      = $(DESTDIR)@libdir@
 DIR_HEADERS  = $(DESTDIR)@includedir@
 DIR_SHARE    = $(DESTDIR)@datarootdir@
-DIR_PKGCONFIG= $(DIR_SHARE)/pkgconfig
-DIR_DOC      = $(DIR_SHARE)/doc/$(LIB_NAME)
 DIRS         = $(DIR_BUILD)
+LIB_PREFIX   = @LIB_PREFIX@
+MKDIR_P      = @MKDIR_P@
+INSTALL      = @INSTALL@
+RANLIB       = @RANLIB@
+GITID        = @GITID@
+CTAGS        = @CTAGS@
 HAPI_HEADER  = include/$(LIB_NAME)/$(LIB_NAME).hxx
 DO_@DO_TARGET@=1
-LIB_PREFIX   = @LIB_PREFIX@
-ifeq ($(LIB_PREFIX),lib)
-LIB_SUFFIX   = so.$(RELEASE)
-LIB_ARCHIVE_SUFFIX = a
-else
-LIB_SUFFIX   = dll
-LIB_ARCHIVE_SUFFIX = dll.a
-endif
-CTAGS   = @CTAGS@
-GITID   = @GITID@
-RANLIB  = @RANLIB@
-INSTALL = @INSTALL@
-MKDIR_P = @MKDIR_P@
 override CXX_STANDARD=@CXX_STANDARD@
 include $(DIR_ROOT)/_aux/mk/1_basic.mk
 include $(DIR_ROOT)/_aux/mk/2_term.mk
@@ -158,7 +150,8 @@ install: all
 	$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call INSTALL_TARGET,$(IT))) \
 	$(call invoke,$(INSTALL) -m644 yaal.pc $(DIR_PKGCONFIG)/ && ) \
 	$(call invoke,$(INSTALL) -m644 yaalrc $(DIR_SYSCONF)/ && ) \
-	$(call invoke,$(MKDIR_P) $(DIR_HEADERS) && /bin/cp -fRp $(DIR_BUILD)/include/$(LIB_NAME) $(DIR_HEADERS)/ && ) \
+	$(call invoke,$(INSTALL) -d -m755 $(DIR_SHARE)/$(PRJNAME)/ && /bin/cp -fRp $(DIR_ROOT)/_aux $(DIR_SHARE)/$(PRJNAME) && ) \
+	$(call invoke,$(INSTALL) -d -m755 $(DIR_HEADERS) && /bin/cp -fRp $(DIR_BUILD)/include/$(LIB_NAME) $(DIR_HEADERS)/ && ) \
 	$(call msg,printf "%b" "making cache ... " && ) \
 	printf "%b\n" $(DIR_LIB) > $(DIR_LIB)/ld.so.conf && \
 	/bin/cp -f $(DIR_ROOT)/_aux/mkcache $(DIR_LIB) && \

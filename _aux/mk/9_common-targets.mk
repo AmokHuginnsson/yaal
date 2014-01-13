@@ -1,7 +1,7 @@
 #phony targets
 .PHONY: all bin check clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge static stats tags uninstall
 
-all: debug
+all: $(TARGET)
 
 debug relassert reldeb release prof cov: environment $(REAL_TARGETS)
 
@@ -50,10 +50,11 @@ distclean purge: mrproper
 bin:
 	@( DO_RELEASE=1 $(MAKE) ; make clean )
 
-install: $(TARGET)
-	@printf "%b\n" "i: you need to become root to do this"
-	@install -c -g root -o root -m=u=rwx,g=rx,o=rx $(PRJNAME) $(prefix)
-#	@install -D -g root -o root -m=u=rwx,g=rx,o=rx README COPYRIGHT $(doc)/$(PRJNAME)
-#	@install -D -g root -o root -m=u=rwx,g=rx,o=rx .$(PRJNAME)rc $(doc)/$(PRJNAME)/examples
-	@printf "%b\n" "i: now if you wish you can suid $(TARGET)"
+install: all
+	@$(call msg,printf "%b\n" "i: you need to become root to do this" && ) \
+	$(call invoke,$(INSTALL) -D -m755 $(DIR_BUILD)/$(PRJNAME)/$(EXEC_NAME) $(DIR_BIN)/$(PRJNAME) && ) \
+	$(call invoke,$(INSTALL) -D -m644 $(DIR_ROOT)/$(PRJNAME)rc $(DIR_SYSCONF)/ && ) \
+	$(call invoke,$(INSTALL) -d -m755 $(DIR_DOC) && $(INSTALL) -m644 $(DIR_ROOT)/doc/README $(DIR_ROOT)/doc/COPYRIGHT $(DIR_DOC)/ && ) \
+	$(call msg,printf "%b\n" "i: now if you wish you can suid $(DIR_BIN)/$(PRJNAME)" && ) \
+	$(call msg,printf "%b$(NL)" "done.$(CL)")
 
