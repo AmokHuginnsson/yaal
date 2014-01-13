@@ -65,7 +65,7 @@ ip_t resolver::get_ip( HString const& hostName_ ) {
 	addrinfo* addrInfo( NULL );
 	error = ::getaddrinfo( hostName_.raw(), NULL, NULL, &addrInfo );
 	M_ENSURE_EX( ! error && addrInfo, hostName_ );
-	ip = ip_t( reinterpret_cast<sockaddr_in*>( addrInfo->ai_addr )->sin_addr.s_addr );
+	ip = ip_t( static_cast<sockaddr_in*>( static_cast<void*>( addrInfo->ai_addr ) )->sin_addr.s_addr );
 	::freeaddrinfo( addrInfo );
 #else /* #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 ) */
 	hostent hostName;

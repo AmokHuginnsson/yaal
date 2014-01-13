@@ -87,7 +87,7 @@ void decrypt_3des( yaal::hcore::HStreamInterface& src_, yaal::hcore::HStreamInte
 	int long const toRead( bufA.get_size() );
 	M_ASSERT( toRead == BUF_SIZE );
 	M_ASSERT( bufB.get_size() == BUF_SIZE );
-	char gap( 0 );
+	char signed gap( 0 );
 	int long nRead( 0 );
 	int long toWrite( 0 );
 	char* readBuf( bufA.get<char>() );

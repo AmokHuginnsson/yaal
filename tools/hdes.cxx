@@ -70,13 +70,12 @@ HDes::~HDes( void ) {
 }
 
 void HDes::generate_keys( u8_t const* password_, int len_ ) {
-	int ctr = 0, ctrLoc = 0;
 	u8_t iKeyLow[ DES::BLOCK_SIZE ];
 	u8_t iKeyHigh[ DES::BLOCK_SIZE ];
 	u8_t tmpKey[ DES::BLOCK_SIZE ];
-	for ( ctr = 0; ctr < DES::BLOCK_SIZE; ++ ctr ) {
-		iKeyHigh[ ctr ] = password_[ ctr % len_ ];
-		iKeyLow[ ctr ] = password_[ ( ctr + DES::BLOCK_SIZE ) % len_ ];
+	for ( int i( 0 ); i < DES::BLOCK_SIZE; ++ i ) {
+		iKeyHigh[ i ] = password_[ i % len_ ];
+		iKeyLow[ i ] = password_[ ( i + DES::BLOCK_SIZE ) % len_ ];
 	}
 	permutate( iKeyHigh, _keyPermutation_, 56 );
 	permutate( iKeyLow, _keyPermutation_, 56 );
@@ -84,97 +83,103 @@ void HDes::generate_keys( u8_t const* password_, int len_ ) {
 	HBitmap low;
 	hi.use( iKeyHigh, 2 * DES::HALF_KEY_SIZE );
 	low.use( iKeyHigh, 2 * DES::HALF_KEY_SIZE );
-	for ( ctr = 0; ctr < DES::IKEYS_COUNT; ctr ++ ) {
-		hi.rotate_left( 0, 28, _countOfMoves_[ ctr ] );
-		low.rotate_left( 0, 28, _countOfMoves_[ ctr ] );
-		hi.rotate_left( 28, 28, _countOfMoves_[ ctr ] );
-		low.rotate_left( 28, 28, _countOfMoves_[ ctr ] );
-		for ( ctrLoc = 0; ctrLoc < DES::BLOCK_SIZE; ctrLoc ++ )
-			tmpKey[ ctrLoc ] = iKeyHigh[ ctrLoc ];
+	for ( int key( 0 ); key < DES::IKEYS_COUNT; key ++ ) {
+		hi.rotate_left( 0, 28, _countOfMoves_[ key ] );
+		low.rotate_left( 0, 28, _countOfMoves_[ key ] );
+		hi.rotate_left( 28, 28, _countOfMoves_[ key ] );
+		low.rotate_left( 28, 28, _countOfMoves_[ key ] );
+		for ( int i( 0 ); i < DES::BLOCK_SIZE; ++ i )
+			tmpKey[ i ] = iKeyHigh[ i ];
 		permutate( tmpKey, _permutationOfCompresion_, 48 );
-		for ( ctrLoc = 0; ctrLoc < 6; ctrLoc ++ )
-			_IKeys[ 0 ][ ctr ][ ctrLoc ] = tmpKey[ ctrLoc ];
-		for ( ctrLoc = 0; ctrLoc < DES::BLOCK_SIZE; ctrLoc ++ )
-			tmpKey[ ctrLoc ] = iKeyLow[ ctrLoc ];
+		for ( int i( 0 ); i < 6; ++ i )
+			reinterpret_cast<u8_t*>( _IKeys[ 0 ][ key ] )[ i ] = tmpKey[ i ];
+		for ( int i( 0 ); i < DES::BLOCK_SIZE; ++ i )
+			tmpKey[ i ] = iKeyLow[ i ];
 		permutate( tmpKey, _permutationOfCompresion_, 48 );
-		for ( ctrLoc = 0; ctrLoc < 6; ctrLoc ++ )
-			_IKeys[ 1 ][ ctr ][ ctrLoc ] = tmpKey[ ctrLoc ];
+		for ( int i( 0 ); i < 6; ++ i )
+			reinterpret_cast<u8_t*>( _IKeys[ 1 ][ key ] )[ i ] = tmpKey[ i ];
 	}
 	return;
 }
 
 void HDes::flush_keys( void ) {
-	int ctr = 0, ctrLoc = 0;
-	for ( ctr = 0; ctr < DES::SIDES_COUNT; ctr ++ )
-		for ( ctrLoc = 0; ctrLoc < DES::IKEYS_COUNT; ctrLoc ++ )
+	for ( int ctr( 0 ); ctr < DES::SIDES_COUNT; ctr ++ )
+		for ( int ctrLoc( 0 ); ctrLoc < DES::IKEYS_COUNT; ctrLoc ++ )
 			::memset( _IKeys[ ctr ][ ctrLoc ], 0, DES::IKEY_SIZE );
 	return;
 }
 
 void HDes::crypt( u8_t* buffer_, int long size_, action_t const& action_ ) {
-	M_ASSERT( ( action_ == CRYPT ) || ( action_ == DECRYPT ) );
-	M_ASSERT( ! ( size_ % 8 ) );
-	for ( int long i( 0 ); i < size_; i += 8 )
-		_3des( buffer_ + i, action_ );
+	M_PROLOG
+	M_ENSURE( ( action_ == CRYPT ) || ( action_ == DECRYPT ) );
+	M_ENSURE( ! ( size_ % 8 ) );
+	for ( int long i( 0 ); i < size_; i += 8 ) {
+		u32_t block[2];
+		::memcpy( block, buffer_ + i, 8 );
+		_3des( block, action_ );
+		::memcpy( buffer_ + i, block, 8 );
+	}
 	return;
+	M_EPILOG
 }
 	
-void HDes::_3des( u8_t* block_, int action_ ) {
-	permutate( block_, _beginingPermutation_, 64 );
+void HDes::_3des( u32_t* block_, int action_ ) {
+	permutate( reinterpret_cast<u8_t*>( block_ ), _beginingPermutation_, 64 );
 	_des( block_, action_, 0 );
 	_des( block_, 1 - action_, 1 );
 	_des( block_, action_, 0 );
-	permutate( block_, _endingPermutation_, 64 );
+	permutate( reinterpret_cast<u8_t*>( block_ ), _endingPermutation_, 64 );
 	return;
 }
 	
-void HDes::_des( u8_t* block_, int action_, int part_ ) {
-	int cycle = 0, ctr = 0, ctrLoc, col, row;
-	u8_t buf[ DES::BLOCK_SIZE ], bufT[ DES::BLOCK_SIZE ];
-	u8_t bufL[ DES::BLOCK_SIZE ], bufR[ DES::BLOCK_SIZE ];
-	u8_t mask = 0, * endKey = NULL;
-	reinterpret_cast<u32_t*>( bufL )[ 0 ] = reinterpret_cast<u32_t*>( block_ )[ 0 ];
-	reinterpret_cast<u32_t*>( bufR )[ 0 ] = reinterpret_cast<u32_t*>( block_ )[ 1 ];
-	reinterpret_cast<u32_t*>( bufT )[ 0 ] = reinterpret_cast<u32_t*>( block_ )[ 1 ];
+void HDes::_des( u32_t* block_, int action_, int part_ ) {
+	int col( 0 ), row( 0 );
+	u32_t buf[ DES::BLOCK_SIZE / static_cast<int>( sizeof ( u32_t ) ) ];
+	u32_t bufT[ DES::BLOCK_SIZE / static_cast<int>( sizeof ( u32_t ) ) ];
+	u32_t bufL[ DES::BLOCK_SIZE / static_cast<int>( sizeof ( u32_t ) ) ];
+	u32_t bufR[ DES::BLOCK_SIZE / static_cast<int>( sizeof ( u32_t ) ) ];
+	u8_t mask( 0 );
+	bufL[ 0 ] = block_[ 0 ];
+	bufR[ 0 ] = block_[ 1 ];
+	bufT[ 0 ] = block_[ 1 ];
 	HBitmap src;
 	HBitmap rowBmp;
 	HBitmap colBmp;
 	src.use( bufT, DES::BLOCK_SIZE * DES::BITS_IN_BYTE );
 	rowBmp.use( &row, sizeof ( row ) * DES::BITS_IN_BYTE );
 	colBmp.use( &col, sizeof ( col ) * DES::BITS_IN_BYTE );
-	for ( cycle = 0; cycle < DES::IKEYS_COUNT; ++ cycle ) {
-		reinterpret_cast<u32_t*>( buf )[ 0 ] = 0;
+	for ( int cycle( 0 ); cycle < DES::IKEYS_COUNT; ++ cycle ) {
+		buf[ 0 ] = 0;
+		u32_t* endKey( NULL );
 		if ( action_ )
 			endKey = _IKeys[ part_ ][ cycle ];
 		else
 			endKey = _IKeys[ part_ ][ 15 - cycle ];
-		permutate( bufT, _permutationOfExpanding_, 48 );
-		reinterpret_cast<u32_t*>( bufT )[ 0 ] = reinterpret_cast<u32_t*>( bufT )[ 0 ]
-																											^ reinterpret_cast<u32_t*>( endKey )[ 0 ];
+		permutate( reinterpret_cast<u8_t*>( bufT ), _permutationOfExpanding_, 48 );
+		bufT[ 0 ] = bufT[ 0 ] ^ endKey[ 0 ];
 		reinterpret_cast<u16_t*>( bufT )[ 2 ] = static_cast<u16_t>( reinterpret_cast<u16_t*>( bufT )[ 2 ]
 				^ reinterpret_cast<u16_t*>( endKey )[ 2 ] );
-		for ( ctr = 0; ctr < DES::BLOCK_SIZE; ctr ++ ) {
+		for ( int ctr( 0 ); ctr < DES::BLOCK_SIZE; ctr ++ ) {
 			col = row = 0;
 			rowBmp.set( 6, src.get( static_cast<u32_t>( ctr ) * 6 ) );
 			rowBmp.set( 7, src.get( static_cast<u32_t>( ctr ) * 6 + 5 ) );
-			for ( ctrLoc = 0; ctrLoc < 4; ctrLoc ++ )
-				colBmp.set( static_cast<u32_t>( ctrLoc ) + 4,
-						src.get( static_cast<u32_t>( ctr ) * 6 + ctrLoc + 1 ) );
+			for ( int i( 0 ); i < 4; ++ i )
+				colBmp.set( static_cast<u32_t>( i ) + 4,
+						src.get( static_cast<u32_t>( ctr ) * 6 + i + 1 ) );
 			mask = _sBlock_[ ctr ][ row ][ col ];
 			if ( ! ( ctr & 1 ) )
 				mask = static_cast<char>( mask << 4 );
 				/* FIXME g++ 4.3 bug *///mask <<= 4;
-			buf[ ctr >> 1 ] = static_cast<char>( buf[ ctr >> 1 ] | mask );
+			reinterpret_cast<u8_t*>( buf )[ ctr >> 1 ] = static_cast<char>( reinterpret_cast<u8_t*>( buf )[ ctr >> 1 ] | mask );
 			/* FIXME g++ 4.3 bug *///buf[ ctr >> 1 ] |= mask;
 		}
-		permutate( buf, _pBlockPermutation_, 32 );
-		reinterpret_cast<u32_t*>( bufT )[ 0 ] = reinterpret_cast<u32_t*>( buf )[ 0 ]
-																											^ reinterpret_cast<u32_t*>( bufL )[ 0 ];
-		reinterpret_cast<u32_t*>( bufL )[ 0 ] = reinterpret_cast<u32_t*>( bufR )[ 0 ];
-		reinterpret_cast<u32_t*>( bufR )[ 0 ] = reinterpret_cast<u32_t*>( bufT )[ 0 ];
+		permutate( reinterpret_cast<u8_t*>( buf ), _pBlockPermutation_, 32 );
+		bufT[ 0 ] = buf[ 0 ] ^ bufL[ 0 ];
+		bufL[ 0 ] = bufR[ 0 ];
+		bufR[ 0 ] = bufT[ 0 ];
 	}
-	reinterpret_cast<u32_t*>( block_ )[ 0 ] = reinterpret_cast<u32_t*>( bufR )[ 0 ];
-	reinterpret_cast<u32_t*>( block_ )[ 1 ] = reinterpret_cast<u32_t*>( bufL )[ 0 ];
+	block_[ 0 ] = bufR[ 0 ];
+	block_[ 1 ] = bufL[ 0 ];
 	return;
 }
 

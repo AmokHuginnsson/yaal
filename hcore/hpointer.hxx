@@ -276,7 +276,7 @@ public:
 	template<typename alien_t, template<typename, typename>class alien_access_t>
 	bool operator == ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
 		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-		return ( _object == reinterpret_cast<alien_t const*>( alien->_object ) );
+		return ( _object == static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
 	bool operator == ( alien_t const* const pointer_ ) const {
@@ -285,7 +285,7 @@ public:
 	template<typename alien_t, template<typename, typename>class alien_access_t>
 	bool operator != ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
 		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-		return ( _object != reinterpret_cast<alien_t const*>( alien->_object ) );
+		return ( _object != static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
 	}
 	template<typename alien_t>
 	bool operator != ( alien_t const* const pointer_ ) const {
@@ -346,13 +346,13 @@ private:
 		if ( ( &alien != this ) && ( _shared != alien._shared ) ) {
 			M_ASSERT( ( ! ( _shared && alien._shared ) )
 					|| ( ( _shared && alien._shared )
-						&& ( _object != reinterpret_cast<alien_t*>( alien._object ) ) ) );
+						&& ( _object != static_cast<alien_t*>( static_cast<void*>( alien._object ) ) ) ) );
 			if ( _shared )
 				release();
 			if ( alien._shared && ( alien._shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) ) {
 				access_type_t<tType, pointer_type_t<tType> >::inc_reference_counter( alien._shared->_referenceCounter );
 				_shared = alien._shared;
-				assign( _object, reinterpret_cast<alien_t*>( alien._object ) );
+				assign( _object, static_cast<alien_t*>( static_cast<void*>( alien._object ) ) );
 			} else {
 				_shared = NULL;
 				_object = NULL;

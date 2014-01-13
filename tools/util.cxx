@@ -572,7 +572,7 @@ void failure( int exitStatus_, char const* const format_, ... ) {
 	va_list ap;
 	va_start( ap, format_ );
 	vfprintf( stderr, format_, ap );
-	msg.vformat( format_, ap );
+	msg.vformat( format_, &ap );
 	log << "failure: " << msg;
 	va_end( ap );
 	throw ( exitStatus_ );

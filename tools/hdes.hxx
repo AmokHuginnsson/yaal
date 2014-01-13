@@ -58,7 +58,7 @@ public:
 		DECRYPT = 1
 	} action_t;
 private:
-	u8_t _IKeys[ DES::SIDES_COUNT ][ DES::IKEYS_COUNT ][ DES::IKEY_SIZE ];
+	u32_t _IKeys[ DES::SIDES_COUNT ][ DES::IKEYS_COUNT ][ ( DES::IKEY_SIZE + static_cast<int>( sizeof ( u32_t ) ) - 1 ) / static_cast<int>( sizeof ( u32_t ) ) ];
 public:
 	HDes( yaal::hcore::HString const& );
 	virtual ~HDes( void );
@@ -66,8 +66,8 @@ public:
 	void flush_keys( void );
 private:
 	void generate_keys( u8_t const*, int );
-	void _des( u8_t* /* block */, int /* action */, int /* part */ );
-	void _3des( u8_t* /* block */, int /* action */ );
+	void _des( u32_t* /* block */, int /* action */, int /* part */ );
+	void _3des( u32_t* /* block */, int /* action */ );
 	void permutate( u8_t* /* buffer */, const u8_t* /* tab */, int /* len */ ) const;
 };
 
