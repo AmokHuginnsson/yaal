@@ -15,13 +15,13 @@
 		<td>Debian Stable</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Ubuntu 13.04 (Raring Ringtail)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Ubuntu 14.04 (Raring Ringtail)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Centos 6.4 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Centos 6.5 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>FreeBSD 9.1</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>FreeBSD 9.2</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Sun Solaris 5.10</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
@@ -30,10 +30,10 @@
 		<td>Oracle Solaris 11</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Windows 7 SP1 32bit with Cygwin 1.7.18</td><td class="good">100%</td><td class="fine">99%</td><td class="fail">Fail</td>
+		<td>Windows 7 SP1 32bit with Cygwin 1.7.27</td><td class="good">100%</td><td class="fine">99%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
-		<td>Windows XP SP3 with Cygwin 1.7.18</td><td class="good">100%</td><td class="fine">99%</td><td class="fail">Fail</td>
+		<td>Windows XP SP3 with Cygwin 1.7.27</td><td class="good">100%</td><td class="fine">99%</td><td class="fail">Fail</td>
 	</tr>
 	<tr>
 		<td>Windows 7 SP1 32bit with Visual Studio 2012 (C++)<a class="note" href="#note_fork">4)</a></td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>

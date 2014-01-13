@@ -8,12 +8,12 @@
 
 ** Software:
 	- Debian (latest development branch, currently `unstable' aka `Sid') (Debian stable releases are not supported!)
-	- Ubuntu (latest development branch and latest stable release, currently 12.10 and 13.04 respectively)
-	- Centos (latest stable release, currently 6.4)
-	- FreeBSD (latest stable release, currently 9.1-RELEASE)
+	- Ubuntu (latest development branch and latest stable release, currently 12.10 and 14.04 respectively)
+	- Centos (latest stable release, currently 6.5)
+	- FreeBSD (latest stable release, currently 9.2-RELEASE)
 	- Sun Solaris (latest stable release, currently 5.10)
 	- Oracle Solaris (latest stable release, currently 11)
-	- Windows XP SP3 with Cygwin (latest available cygwin release, currently 1.7.18)
+	- Windows XP SP3 with Cygwin (latest available cygwin release, currently 1.7.27)
 
 [For more detailed information regarding platform support
 please look into HTML documentation.]
@@ -40,5 +40,5 @@ Yaal smart pointers, yaal::hcore::call() (as in boost::bind()),
 program options handling and variant implementation have been created
 with sole educational purposes in mind.
 If you need any of those, do NOT use yaal implementation,
-use BOOST instead.
+use Boost instead.
 
