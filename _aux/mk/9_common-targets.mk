@@ -52,8 +52,8 @@ bin:
 
 install: all
 	@$(call msg,printf "%b\n" "i: you need to become root to do this" && ) \
-	$(call invoke,$(INSTALL) -D -m755 $(DIR_BUILD)/$(PRJNAME)/$(EXEC_NAME) $(DIR_BIN)/$(PRJNAME) && ) \
-	$(call invoke,$(INSTALL) -D -m644 $(DIR_ROOT)/$(PRJNAME)rc $(DIR_SYSCONF)/ && ) \
+	$(call invoke,$(INSTALL) -d -m755 $(DIR_BIN) && $(INSTALL) -m755 $(DIR_BUILD)/$(PRJNAME)/$(EXEC_NAME) $(DIR_BIN)/$(PRJNAME) && ) \
+	$(call invoke,$(INSTALL) -d -m755 $(DIR_SYSCONF) && $(INSTALL) -m644 $(DIR_ROOT)/$(PRJNAME)rc $(DIR_SYSCONF)/ && ) \
 	$(call invoke,$(INSTALL) -d -m755 $(DIR_DOC) && $(INSTALL) -m644 $(DIR_ROOT)/doc/README $(DIR_ROOT)/doc/COPYRIGHT $(DIR_DOC)/ && ) \
 	$(call msg,printf "%b\n" "i: now if you wish you can suid $(DIR_BIN)/$(PRJNAME)" && ) \
 	$(call msg,printf "%b$(NL)" "done.$(CL)")
