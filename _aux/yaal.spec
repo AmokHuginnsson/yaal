@@ -67,6 +67,7 @@ make purge
 %{_libdir}/lib*.a
 %{_includedir}/*
 %{_datadir}/pkgconfig
+%{_datadir}/yaal
 
 %files -n yaal-doc
 %defattr(-,root,root,-)
