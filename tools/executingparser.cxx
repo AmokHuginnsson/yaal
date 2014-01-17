@@ -158,6 +158,20 @@ HRuleDescription HRuleBase::describe( void ) const {
 	M_EPILOG
 }
 
+void HRuleBase::rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	do_rule_use( ruleUse_ );
+	return;
+	M_EPILOG
+}
+
+void HRuleBase::do_rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	++ ruleUse_[ this ];
+	return;
+	M_EPILOG
+}
+
 bool HRuleBase::do_is_optional( void ) const
 	{ return ( false ); }
 
@@ -319,6 +333,15 @@ void HRule::do_describe( HRuleDescription& rd_ ) const {
 	M_EPILOG
 }
 
+void HRule::do_rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	++ ruleUse_[ this ];
+	if ( !! _rule )
+		_rule->rule_use( ruleUse_ );
+	return;
+	M_EPILOG
+}
+
 HRecursiveRule::HRecursiveRule( void )
 	: _rule() {
 }
@@ -471,6 +494,15 @@ void HFollows::do_describe( HRuleDescription& rd_ ) const {
 	M_EPILOG
 }
 
+void HFollows::do_rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	++ ruleUse_[ this ];
+	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it )
+		(*it)->rule_use( ruleUse_ );
+	return;
+	M_EPILOG
+}
+
 yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator orig( first_ );
@@ -553,6 +585,15 @@ void HKleeneStar::do_describe( HRuleDescription& rd_ ) const {
 	M_EPILOG
 }
 
+void HKleeneStar::do_rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	++ ruleUse_[ this ];
+	if ( !! _rule )
+		_rule->rule_use( ruleUse_ );
+	return;
+	M_EPILOG
+}
+
 void HKleeneStar::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule.rule() );
@@ -608,6 +649,15 @@ void HKleenePlus::do_describe( HRuleDescription& rd_ ) const {
 	rd_.desc( "+( " );
 	_rule.describe( rd_ );
 	rd_.desc( " )" );
+	return;
+	M_EPILOG
+}
+
+void HKleenePlus::do_rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	++ ruleUse_[ this ];
+	if ( !! _rule )
+		_rule->rule_use( ruleUse_ );
 	return;
 	M_EPILOG
 }
@@ -685,6 +735,15 @@ void HAlternative::do_describe( HRuleDescription& rd_ ) const {
 	M_EPILOG
 }
 
+void HAlternative::do_rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	++ ruleUse_[ this ];
+	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it )
+		(*it)->rule_use( ruleUse_ );
+	return;
+	M_EPILOG
+}
+
 void HAlternative::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_PROLOG
 	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
@@ -742,6 +801,15 @@ void HOptional::do_describe( HRuleDescription& rd_ ) const {
 	rd_.desc( "-( " );
 	_rule.describe( rd_ );
 	rd_.desc( " )" );
+	return;
+	M_EPILOG
+}
+
+void HOptional::do_rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	++ ruleUse_[ this ];
+	if ( !! _rule )
+		_rule->rule_use( ruleUse_ );
 	return;
 	M_EPILOG
 }
