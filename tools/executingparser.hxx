@@ -111,7 +111,7 @@ public:
 	yaal::hcore::HString const& name( void ) const;
 	ptr_t const& rule( void ) const;
 	void reset( ptr_t const& );
-	void describe( HRuleDescription& ) const;
+	void describe( HRuleDescription&, rule_use_t const& ) const;
 };
 
 class HRuleBase {
@@ -129,8 +129,8 @@ public:
 	ptr_t clone( void ) const;
 	bool is_optional( void ) const;
 	yaal::hcore::HString::const_iterator parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	HRuleDescription describe( void ) const;
-	void describe( HRuleDescription& ) const;
+	HRuleDescription describe( rule_use_t const& ) const;
+	void describe( HRuleDescription&, rule_use_t const& ) const;
 	void detach( HRuleBase const*, visited_t& );
 	void rule_use( rule_use_t& ) const;
 protected:
@@ -138,7 +138,7 @@ protected:
 	virtual ptr_t do_clone( void ) const = 0;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual bool do_is_optional( void ) const;
-	virtual void do_describe( HRuleDescription& ) const = 0;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const = 0;
 	virtual void do_detach( HRuleBase const*, visited_t& ) = 0;
 	static yaal::hcore::HString::const_iterator skip_space( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	friend class yaal::tools::HExecutingParser;
@@ -201,7 +201,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
@@ -222,7 +222,8 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual HRuleBase::ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
+	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
 	HRecursiveRule( void );
@@ -248,7 +249,8 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual HRuleBase::ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const __attribute__((__noreturn__));
+	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 };
 
@@ -288,7 +290,7 @@ protected:
 	HFollows( rules_t const&, action_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
@@ -323,7 +325,7 @@ protected:
 	virtual ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
@@ -349,7 +351,7 @@ protected:
 	HKleenePlus( HNamedRule const&, action_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
@@ -373,7 +375,7 @@ public:
 protected:
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
@@ -401,7 +403,7 @@ protected:
 	virtual bool do_is_optional( void ) const;
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
@@ -448,7 +450,7 @@ protected:
 	HReal( action_string_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
 	HReal( void );
@@ -496,7 +498,7 @@ protected:
 	HInteger( action_string_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
 	HInteger( void );
@@ -528,7 +530,7 @@ protected:
 	HCharacter( char, action_char_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
 	HCharacter( char character_ = 0 );
@@ -560,7 +562,7 @@ protected:
 	HString( yaal::hcore::HString const&, action_string_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
 	HString( yaal::hcore::HString const& );
@@ -592,7 +594,7 @@ protected:
 	HRegex( regex_t const&, action_string_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	virtual void do_describe( HRuleDescription& ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
 	HRegex( yaal::hcore::HString const& );
