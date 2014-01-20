@@ -221,8 +221,9 @@ void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const 
 	M_ASSERT( !! _rule );
 	rule_use_t::const_iterator it( ru_.find( _rule.get() ) );
 	M_ENSURE( it != ru_.end() );
-	if ( ( it->second > 1 ) || ( ! _name.is_empty() ) || dynamic_cast<HRuleRef const*>( &*_rule ) ) {
-		rd_.add( this );
+	HRuleRef const* rr( dynamic_cast<HRuleRef const*>( &*_rule ) );
+	if ( ( it->second > 1 ) || ( ! _name.is_empty() ) || rr ) {
+		rd_.add( rr ? rr->get_rule() : this );
 		rd_.desc( ! _name.is_empty() ? _name : hcore::HString( "rule" ) + static_cast<void const*>( &*_rule ) );
 	} else
 		_rule->describe( rd_, ru_ );
@@ -401,6 +402,12 @@ void HRecursiveRule::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_EPILOG
 }
 
+HNamedRule const* HRecursiveRule::get_named_rule( void ) const {
+	M_PROLOG
+	return ( &_rule );
+	M_EPILOG
+}
+
 HRuleRef::HRuleRef( HRuleBase::ptr_t rule_ )
 	: _rule( rule_ ) {
 	return;
@@ -448,6 +455,15 @@ void HRuleRef::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	if ( r.raw() != rule_ )
 		r->detach( rule_, visited_ );
 	return;
+	M_EPILOG
+}
+
+HNamedRule const* HRuleRef::get_rule( void ) const {
+	M_PROLOG
+	HRuleBase::ptr_t r( _rule );
+	HRecursiveRule const* rr( dynamic_cast<HRecursiveRule const*>( r.get() ) );
+	M_ASSERT( rr );
+	return ( rr->get_named_rule() );
 	M_EPILOG
 }
 
@@ -1517,7 +1533,7 @@ HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
 	while ( ! _ruleOrder.is_empty() ) {
 		HNamedRule const* r( _ruleOrder.front() );
 		_ruleOrder.pop();
-		if ( _visited.insert( r->id() ).second && _namedRules.insert( r->name() ).second ) {
+		if ( _visited.insert( r->id() ).second ) {
 			rd.clear();
 			rd.desc( ! r->name().is_empty() ? r->name() : hcore::HString( "ruleGD" ) + r->id() );
 			rd.desc( " = " );
