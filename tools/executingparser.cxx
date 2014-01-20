@@ -338,8 +338,8 @@ void HRule::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 
 void HRule::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
-	++ ruleUse_[ this ];
-	if ( !! _rule )
+	int use( ++ ruleUse_[ this ] );
+	if ( ( use == 1 ) && !! _rule )
 		_rule->rule_use( ruleUse_ );
 	return;
 	M_EPILOG
@@ -386,8 +386,8 @@ void HRecursiveRule::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ )
 
 void HRecursiveRule::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
-	++ ruleUse_[ this ];
-	if ( !! _rule )
+	int use( ++ ruleUse_[ this ] );
+	if ( ( use == 1 ) && !! _rule )
 		_rule->rule_use( ruleUse_ );
 	return;
 	M_EPILOG
@@ -527,9 +527,11 @@ void HFollows::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const
 
 void HFollows::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
-	++ ruleUse_[ this ];
-	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it )
-		(*it)->rule_use( ruleUse_ );
+	int use( ++ ruleUse_[ this ] );
+	if ( use == 1 ) {
+		for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it )
+			(*it)->rule_use( ruleUse_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -618,8 +620,8 @@ void HKleeneStar::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) co
 
 void HKleeneStar::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
-	++ ruleUse_[ this ];
-	if ( !! _rule )
+	int use( ++ ruleUse_[ this ] );
+	if ( ( use == 1 ) && !! _rule )
 		_rule->rule_use( ruleUse_ );
 	return;
 	M_EPILOG
@@ -686,8 +688,8 @@ void HKleenePlus::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) co
 
 void HKleenePlus::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
-	++ ruleUse_[ this ];
-	if ( !! _rule )
+	int use( ++ ruleUse_[ this ] );
+	if ( ( use == 1 ) && !! _rule )
 		_rule->rule_use( ruleUse_ );
 	return;
 	M_EPILOG
@@ -768,9 +770,11 @@ void HAlternative::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) c
 
 void HAlternative::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
-	++ ruleUse_[ this ];
-	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it )
-		(*it)->rule_use( ruleUse_ );
+	int use( ++ ruleUse_[ this ] );
+	if ( use == 1 ) {
+		for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it )
+			(*it)->rule_use( ruleUse_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -838,8 +842,8 @@ void HOptional::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) cons
 
 void HOptional::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
-	++ ruleUse_[ this ];
-	if ( !! _rule )
+	int use( ++ ruleUse_[ this ] );
+	if ( ( use == 1 ) && !! _rule )
 		_rule->rule_use( ruleUse_ );
 	return;
 	M_EPILOG
