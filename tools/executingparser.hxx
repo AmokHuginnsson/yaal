@@ -153,11 +153,9 @@ public:
 	typedef HGrammarDescription this_type;
 private:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> rules_t;
-	typedef yaal::hcore::HSet<yaal::hcore::HString> named_rules_t;
 	typedef yaal::hcore::HQueue<HNamedRule const*> rule_order_t;
 	rules_t _rules;
 	visited_t _visited;
-	named_rules_t _namedRules;
 	rule_order_t _ruleOrder;
 public:
 	typedef rules_t::const_iterator const_iterator;

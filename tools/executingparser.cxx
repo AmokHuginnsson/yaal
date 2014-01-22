@@ -1527,7 +1527,7 @@ void HRuleDescription::add( HNamedRule const* nr_ ) {
 }
 
 HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
-	: _rules(), _visited(), _namedRules(), _ruleOrder() {
+	: _rules(), _visited(), _ruleOrder() {
 	M_PROLOG
 	HRuleDescription rd;
 	rule_use_t ru;
