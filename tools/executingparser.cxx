@@ -283,7 +283,8 @@ HRule& HRule::operator %= ( HRuleBase const& rule_ ) {
 HRule HRule::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! _action );
-	return ( HRule( _rule.name(), clone(), action_ ) );
+	M_ENSURE( !! _rule );
+	return ( HRule( _rule.name(), _rule.rule(), action_ ) );
 	M_EPILOG
 }
 
