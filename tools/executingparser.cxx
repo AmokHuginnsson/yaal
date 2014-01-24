@@ -216,15 +216,20 @@ HNamedRule::ptr_t const& HNamedRule::rule( void ) const {
 	M_EPILOG
 }
 
+HNamedRule::ptr_t& HNamedRule::rule( void ) {
+	M_PROLOG
+	return ( _rule );
+	M_EPILOG
+}
+
 void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
 	M_ASSERT( !! _rule );
 	rule_use_t::const_iterator it( ru_.find( _rule.get() ) );
-	M_ENSURE( it != ru_.end() );
 	HRuleRef const* rr( dynamic_cast<HRuleRef const*>( &*_rule ) );
-	if ( ( it->second > 1 ) || ( ! _name.is_empty() ) || rr ) {
+	if ( ( ( it != ru_.end() ) && ( it->second > 1 ) ) || ( ! _name.is_empty() ) || rr ) {
 		rd_.add( rr ? rr->get_rule() : this );
-		rd_.desc( ! _name.is_empty() ? _name : hcore::HString( "rule" ) + static_cast<void const*>( &*_rule ) );
+		rd_.desc( ! _name.is_empty() ? _name : hcore::HString( "rule" ) + static_cast<void const*>( _rule.raw() ) );
 	} else
 		_rule->describe( rd_, ru_ );
 	return;
@@ -272,7 +277,7 @@ HRule::~HRule( void ) {
 HRule& HRule::operator %= ( HRuleBase const& rule_ ) {
 	M_PROLOG
 	M_ENSURE( ! _completelyDefined );
-	HRecursiveRule* rr( dynamic_cast<HRecursiveRule*>( _rule.id() ) );
+	HRecursiveRule* rr( dynamic_cast<HRecursiveRule*>( _rule.rule().raw() ) );
 	M_ENSURE( rr );
 	rr->set_rule( rule_.clone() );
 	_completelyDefined = true;
@@ -442,9 +447,8 @@ void HRuleRef::do_describe( HRuleDescription&, rule_use_t const& ) const {
 	M_EPILOG
 }
 
-void HRuleRef::do_rule_use( rule_use_t& ruleUse_ ) const {
+void HRuleRef::do_rule_use( rule_use_t& ) const {
 	M_PROLOG
-	++ ruleUse_[ this ];
 	return;
 	M_EPILOG
 }

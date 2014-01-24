@@ -106,10 +106,9 @@ public:
 		{ return ( _rule ); }
 	HRuleBase const* id( void ) const
 		{ return ( _rule.get() ); }
-	HRuleBase* id( void )
-		{ return ( _rule.get() ); }
 	yaal::hcore::HString const& name( void ) const;
 	ptr_t const& rule( void ) const;
+	ptr_t& rule( void );
 	void reset( ptr_t const& );
 	void describe( HRuleDescription&, rule_use_t const& ) const;
 };
