@@ -133,6 +133,36 @@ void advance( iter_t& it, int long dist ) {
 	return;
 }
 
+template<typename T>
+typename T::const_iterator cbegin( T const& cont_ ) {
+	return ( cont_.begin() );
+}
+
+template<typename T>
+typename T::const_iterator begin( T const& cont_ ) {
+	return ( cont_.begin() );
+}
+
+template<typename T>
+typename T::iterator begin( T& cont_ ) {
+	return ( cont_.begin() );
+}
+
+template<typename T>
+typename T::const_iterator cend( T const& cont_ ) {
+	return ( cont_.end() );
+}
+
+template<typename T>
+typename T::const_iterator end( T const& cont_ ) {
+	return ( cont_.end() );
+}
+
+template<typename T>
+typename T::iterator end( T& cont_ ) {
+	return ( cont_.end() );
+}
+
 namespace hcore {
 
 template<typename iterator_t>
