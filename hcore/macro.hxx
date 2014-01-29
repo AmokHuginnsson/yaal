@@ -70,6 +70,24 @@ Copyright:
 #ifdef M_ENSURE
 #	error Yaal redefines M_ENSURE macro.
 #endif /* #ifdef M_ENSURE */
+#ifdef M_ENSURE_HELPER
+#	error Yaal redefines M_ENSURE_HELPER macro.
+#endif /* #ifdef M_ENSURE_HELPER */
+#ifdef M_ENSURE_HELPER_FORWARD
+#	error Yaal redefines M_ENSURE_HELPER_FORWARD macro.
+#endif /* #ifdef M_ENSURE_HELPER_FORWARD */
+#ifdef M_ENSURE_1
+#	error Yaal redefines M_ENSURE_1 macro.
+#endif /* #ifdef M_ENSURE_1 */
+#ifdef M_ENSURE_2
+#	error Yaal redefines M_ENSURE_2 macro.
+#endif /* #ifdef M_ENSURE_2 */
+#ifdef M_NUM_ARGS
+#	error Yaal redefines M_NUM_ARGS macro.
+#endif /* #ifdef M_NUM_ARGS */
+#ifdef M_NUM_ARGS_COUNTER
+#	error Yaal redefines M_NUM_ARGS_COUNTER macro.
+#endif /* #ifdef M_NUM_ARGS_COUNTER */
 #ifdef M_ENSURE_EX
 #	error Yaal redefines M_ENSURE_EX macro.
 #endif /* #ifdef M_ENSURE_EX */
@@ -161,7 +179,13 @@ Copyright:
  *
  * \param condition - condition to be tested.
  */
-#define M_ENSURE( condition ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition, errno, error_message( errno ) ); } } while ( 0 )
+#define M_ENSURE( ... ) M_ENSURE_HELPER_FORWARD( M_NUM_ARGS( __VA_ARGS__ ), __VA_ARGS__ )
+#define M_ENSURE_HELPER_FORWARD( NUM, ... ) M_ENSURE_HELPER( NUM, __VA_ARGS__ )
+#define M_ENSURE_HELPER( NUM, ... ) M_ENSURE_##NUM( __VA_ARGS__ )
+#define M_NUM_ARGS( ... ) M_NUM_ARGS_COUNTER( __VA_ARGS__, 2, 1 )
+#define M_NUM_ARGS_COUNTER( a1, a2, N ) N
+#define M_ENSURE_1( condition ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition, errno, error_message( errno ) ); } } while ( 0 )
+#define M_ENSURE_2( condition, type ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition, errno, error_message( errno ) ); } } while ( 0 )
 #define M_ENSURE_EX( condition, comment ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition, errno, error_message( errno ), comment ); } } while ( 0 )
 #ifndef NDEBUG
 /*! \brief Run-time assertion tester.

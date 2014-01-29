@@ -31,6 +31,7 @@ Copyright:
 
 #include "config.hxx"
 #include "hcore/macro.hxx"
+#include "hcore/base.hxx"
 #include "hcore/numeric.hxx"
 #include "hcore/assert.hxx"
 
@@ -723,6 +724,25 @@ bool operator >= ( HString const&, HString const& );
 bool operator <= ( HString const&, HString const& );
 bool operator > ( HString const&, HString const& );
 bool operator < ( HString const&, HString const& );
+HString to_string( int short );
+HString to_string( int short unsigned );
+HString to_string( int );
+HString to_string( int unsigned );
+HString to_string( int long );
+HString to_string( int long unsigned );
+HString to_string( int long long );
+HString to_string( int long long unsigned );
+HString to_string( float );
+HString to_string( double );
+HString to_string( double long );
+int stoi( HString const&, int* = NULL, int = 10 );
+int long stol( HString const&, int* = NULL, int = 10 );
+int long unsigned stoul( HString const&, int* = NULL, int = 10 );
+int long long stoll( HString const&, int* = NULL, int = 10 );
+int long long unsigned stoull( HString const&, int* = NULL, int = 10 );
+float stof( HString const&, int* = NULL );
+double stod( HString const&, int* = NULL );
+double long stold( HString const&, int* = NULL );
 
 /*! \brief HString class helpers, utility functions.
  */

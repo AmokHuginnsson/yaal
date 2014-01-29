@@ -166,8 +166,12 @@ void decode_set_env( HString line ) {
 
 namespace {
 
-double long std_strtold( HString const& str_ ) {
-	return ( ::strtold( str_.raw(), NULL ) );
+double long std_strtold( HString const& str_, int* endIdx_ ) {
+	char* endPtr( NULL );
+	double long value( ::strtold( str_.raw(), &endPtr ) );
+	if ( endIdx_ )
+		*endIdx_ = static_cast<int>( endPtr - str_.raw() );
+	return ( value );
 }
 
 }
@@ -184,8 +188,8 @@ void set_strtold_impl( yaal_strtold_t newStrtold_ ) {
 
 }
 
-double long strtold( HString const& str_ ) {
-	return ( extendable::acting_strtold( str_ ) );
+double long strtold( HString const& str_, int* endIdx_ ) {
+	return ( extendable::acting_strtold( str_, endIdx_ ) );
 }
 
 class HCoreInitDeinit {

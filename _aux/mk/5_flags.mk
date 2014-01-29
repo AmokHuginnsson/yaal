@@ -30,7 +30,7 @@ PURE_C_WARNING_FLAGS = \
 ifeq ($(HD),1)
 	DB = -D__DEBUGGER_BABUNI__
 endif
-COMPILER_PRIME_FLAGS = -fmessage-length=0 -std=$(CXX_STANDARD) -Wno-long-long -pipe -D_GNU_SOURCE -D_REENTRANT -D_THREAD_SAFE -D_POSIX_PTHREAD_SEMANTICS
+COMPILER_PRIME_FLAGS = -fmessage-length=0 -std=$(CXX_STANDARD) -Wno-long-long -Wno-variadic-macros -pipe -D_GNU_SOURCE -D_REENTRANT -D_THREAD_SAFE -D_POSIX_PTHREAD_SEMANTICS
 
 ifdef DO_RELDEB
 	DO_RELEASE = 1

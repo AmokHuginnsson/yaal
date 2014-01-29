@@ -24,10 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include <cstdio>
 #include <cstring>
+#include <cstdlib>
+#include <climits>
 #include <cctype>
 #include <cstdarg>
+#include <cstdio>
 #include <libintl.h>
 
 #include "base.hxx"
@@ -37,6 +39,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hstring.hxx"
 #include "memory.hxx"
 #include "hchunk.hxx"
+#include "hcore.hxx"
 
 namespace yaal {
 
@@ -1263,6 +1266,136 @@ void HString::HCharRef::swap( HCharRef& charRef_ ) {
 #undef MEM
 #undef EXT_IS_INPLACE
 #undef IS_INPLACE
+
+HString to_string( int short val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+HString to_string( int short unsigned val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+HString to_string( int val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+HString to_string( int unsigned val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+HString to_string( int long val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+HString to_string( int long unsigned val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+HString to_string( int long long val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+HString to_string( int long long unsigned val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+HString to_string( float val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+HString to_string( double val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+HString to_string( double long val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+int stoi( HString const& str_, int* endIdx_, int base_ ) {
+	M_PROLOG
+	return ( static_cast<int>( stoll( str_, endIdx_, base_ ) ) );
+	M_EPILOG
+}
+
+int long stol( HString const& str_, int* endIdx_, int base_ ) {
+	M_PROLOG
+	return ( static_cast<int long>( stoll( str_, endIdx_, base_ ) ) );
+	M_EPILOG
+}
+
+int long unsigned stoul( HString const& str_, int* endIdx_, int base_ ) {
+	M_PROLOG
+	return ( static_cast<int long unsigned>( stoull( str_, endIdx_, base_ ) ) );
+	M_EPILOG
+}
+
+int long long stoll( HString const& str_, int* endIdx_, int base_ ) {
+	M_PROLOG
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
+	char* end( NULL );
+	int long long val( ::strtoll( str_.raw(), &end, base_ ) );
+	if ( ! val || ( val == LONG_MIN ) || ( val == LONG_MAX ) ) {
+		if ( errno == EINVAL )
+			throw HInvalidArgumentException( str_ );
+		else if ( errno == ERANGE )
+			throw HOutOfRangeException( str_ );
+	}
+	if ( endIdx_ )
+		*endIdx_ = static_cast<int>( end - str_.raw() );
+	return ( val );
+	M_EPILOG
+}
+
+int long long unsigned stoull( HString const& str_, int* endIdx_, int base_ ) {
+	M_PROLOG
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
+	char* end( NULL );
+	int long long unsigned val( ::strtoull( str_.raw(), &end, base_ ) );
+	if ( ! val || ( val == ULONG_MAX ) ) {
+		if ( errno == EINVAL )
+			throw HInvalidArgumentException( str_ );
+		else if ( errno == ERANGE )
+			throw HOutOfRangeException( str_ );
+	}
+	if ( endIdx_ )
+		*endIdx_ = static_cast<int>( end - str_.raw() );
+	return ( val );
+	M_EPILOG
+}
+
+float stof( HString const& str_, int* endIdx_ ) {
+	return ( static_cast<float>( stold( str_, endIdx_ ) ) );
+}
+
+double stod( HString const& str_, int* endIdx_ ) {
+	return ( static_cast<double>( stold( str_, endIdx_ ) ) );
+}
+
+double long stold( HString const& str_, int* endIdx_ ) {
+	return ( hcore::strtold( str_, endIdx_ ) );
+}
 
 namespace string_helper {
 

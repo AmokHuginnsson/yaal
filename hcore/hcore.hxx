@@ -47,11 +47,11 @@ void unset_env( HString const& );
 void decode_set_env( HString );
 void init_locale( char const* const = NULL );
 void banner( char const* = NULL, char const* = NULL );
-double long strtold( HString const& );
+double long strtold( HString const&, int* = NULL );
 
 namespace extendable {
 
-typedef double long ( *yaal_strtold_t )( HString const& );
+typedef double long ( *yaal_strtold_t )( HString const&, int* );
 void set_strtold_impl( yaal_strtold_t );
 
 }

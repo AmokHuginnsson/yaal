@@ -48,9 +48,12 @@ namespace yaal {
 
 namespace {
 
-double long yaal_strtold( HString const& str_ ) {
+double long yaal_strtold( HString const& str_, int* endIdx_ ) {
 	M_PROLOG
-	return ( tools::util::atof_ex( str_, true ) );
+	double long value( tools::util::atof_ex( str_, true ) );
+	if ( *endIdx_ )
+		*endIdx_ = static_cast<int>( str_.get_length() );
+	return ( value );
 	M_EPILOG
 }
 

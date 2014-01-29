@@ -159,6 +159,10 @@ typedef HExceptionT<HString> HStringException;
 typedef HExceptionT<LexicalCast> HLexicalCastException;
 struct InvalidKey {};
 typedef HExceptionT<InvalidKey> HInvalidKeyException;
+struct InvalidArgument {};
+typedef HExceptionT<InvalidArgument> HInvalidArgumentException;
+struct OutOfRange {};
+typedef HExceptionT<OutOfRange> HOutOfRangeException;
 
 /*! \brief Yaal's default exception handling policy.
  */
