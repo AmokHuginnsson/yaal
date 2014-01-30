@@ -154,16 +154,16 @@ HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ 
 
 }
 
+namespace hcore {
+int long long unsigned stoull_impl( char const*, int*, int );
+}
+
 template<>
 int long long unsigned lexical_cast( HString const& str_ ) {
 	M_PROLOG
 	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
-	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	int long long unsigned val( ::strtoull( preParsed.second, NULL, preParsed.first ) );
-	typedef LexicalCast this_type;
-	M_ENSURE_EX( ( val && ( val != ULONG_MAX ) ) || ! errno, str_ );
-	return ( val );
+	return ( hcore::stoull_impl( preParsed.second, NULL, preParsed.first ) );
 	M_EPILOG
 }
 
@@ -188,16 +188,16 @@ int short unsigned lexical_cast( HString const& val ) {
 	M_EPILOG
 }
 
+namespace hcore {
+int long long stoll_impl( char const*, int*, int );
+}
+
 template<>
 int long long lexical_cast( HString const& str_ ) {
 	M_PROLOG
 	char alternateForm[ MAX_VALID_INTEGER_LENGTH ];
 	HPair<int, char const*> preParsed( preparse_integer( str_, alternateForm ) );
-	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	int long long val( ::strtoll( preParsed.second, NULL, preParsed.first ) );
-	typedef LexicalCast this_type;
-	M_ENSURE_EX( ( val && ( val != LONG_MIN ) && ( val != LONG_MAX ) ) || ! errno, str_ );
-	return ( val );
+	return ( hcore::stoll_impl( preParsed.second, NULL, preParsed.first ) );
 	M_EPILOG
 }
 
