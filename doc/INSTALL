@@ -43,12 +43,12 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
   5. Spawn new shell instance to get yaal installed headers and libraries visible.
 
 ( 0 ) $ cd
-( 1a) $ echo 'export PREFIX="${HOME}/usr/"' >> .bashrc                 # for bash or zsh shells
-( 1b) $ echo 'setenv PREFIX "${home}/usr/"' >> .tcshrc                 # for tcsh shell
-( 2a) $ echo 'export SYSCONFDIR="${HOME}/etc/conf"' >> .bashrc         # for bash or zsh shells
-( 2b) $ echo 'setenv SYSCONFDIR "${home}/etc/conf"' >> .tcshrc         # for tcsh shell
-( 3a) $ echo 'export DEFAULT_TARGET="debug"' >> .bashrc                # for bash or zsh shells
-( 3b) $ echo 'setenv DEFAULT_TARGET "debug"' >> .tcshrc                # for tcsh shell
+( 1a) $ echo 'export PREFIX="${HOME}/usr/"' >> ${HOME}/.bashrc         # for bash or zsh shells
+( 1b) $ echo 'setenv PREFIX "${home}/usr/"' >> ${HOME}/.tcshrc         # for tcsh shell
+( 2a) $ echo 'export SYSCONFDIR="${HOME}/etc/conf"' >> ${HOME}/.bashrc # for bash or zsh shells
+( 2b) $ echo 'setenv SYSCONFDIR "${home}/etc/conf"' >> ${HOME}/.tcshrc # for tcsh shell
+( 3a) $ echo 'export DEFAULT_TARGET="debug"' >> ${HOME}/.bashrc        # for bash or zsh shells
+( 3b) $ echo 'setenv DEFAULT_TARGET "debug"' >> ${HOME}/.tcshrc        # for tcsh shell
 ( 4a) $ . "${HOME}/.bashrc"                                            # for bash or zsh shells
 ( 4b) $ source "${HOME}/.tcshrc"                                       # for tcsh shell
 ( 5 ) $ cd "${HOME}/src/yaal/"
