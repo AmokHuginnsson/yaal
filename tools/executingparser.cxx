@@ -228,7 +228,8 @@ void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const 
 	rule_use_t::const_iterator it( ru_.find( _rule.get() ) );
 	HRuleRef const* rr( dynamic_cast<HRuleRef const*>( &*_rule ) );
 	if ( ( ( it != ru_.end() ) && ( it->second > 1 ) ) || ( ! _name.is_empty() ) || rr ) {
-		rd_.add( rr ? rr->get_rule() : this );
+		if ( ! rr )
+			rd_.add( this );
 		rd_.desc( ! _name.is_empty() ? _name : hcore::HString( "rule" ) + static_cast<void const*>( _rule.raw() ) );
 	} else
 		_rule->describe( rd_, ru_ );
