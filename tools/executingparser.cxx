@@ -335,7 +335,7 @@ bool HRule::do_is_optional( void ) const
 void HRule::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
 	if ( !! _rule ) {
-		rd_.desc( _rule.name() );
+		rd_.desc( ! _rule.name().is_empty() ? _rule.name() : hcore::HString( "ruleGD" ) + _rule.id() );
 		rd_.desc( " = " );
 		_rule.describe( rd_, ru_ );
 	}
@@ -1538,6 +1538,9 @@ HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
 	rule_use_t ru;
 	rule_.rule_use( ru );
 	rule_.describe( rd, ru );
+	HRule const* rule( dynamic_cast<HRule const*>( &rule_ ) );
+	if ( ! rule || rule->get_name().is_empty() )
+		_rules.push_back( rd.description() );
 	copy( rd.children().begin(), rd.children().end(), push_insert_iterator( _ruleOrder ) );
 	_visited.insert( &rule_ );
 	while ( ! _ruleOrder.is_empty() ) {
