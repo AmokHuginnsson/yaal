@@ -150,14 +150,6 @@ void HRuleBase::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_EPILOG
 }
 
-HRuleDescription HRuleBase::describe( rule_use_t const& ru_ ) const {
-	M_PROLOG
-	HRuleDescription rd;
-	do_describe( rd, ru_ );
-	return ( rd );
-	M_EPILOG
-}
-
 void HRuleBase::rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
 	do_rule_use( ruleUse_ );
@@ -230,7 +222,7 @@ void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const 
 	if ( ( ( it != ru_.end() ) && ( it->second > 1 ) ) || ( ! _name.is_empty() ) || rr ) {
 		if ( ! rr )
 			rd_.add( this );
-		rd_.desc( ! _name.is_empty() ? _name : hcore::HString( "rule" ) + static_cast<void const*>( _rule.raw() ) );
+		rd_.desc( rd_.make_name( *this ) );
 	} else
 		_rule->describe( rd_, ru_ );
 	return;
@@ -335,7 +327,7 @@ bool HRule::do_is_optional( void ) const
 void HRule::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
 	if ( !! _rule ) {
-		rd_.desc( ! _rule.name().is_empty() ? _rule.name() : hcore::HString( "ruleGD" ) + _rule.id() );
+		rd_.desc( rd_.make_name( _rule ) );
 		rd_.desc( " = " );
 		_rule.describe( rd_, ru_ );
 	}
@@ -1494,7 +1486,7 @@ HRegex regex( yaal::hcore::HString const& pattern_ ) {
 }
 
 HRuleDescription::HRuleDescription( void )
-	: _children(), _description()
+	: _children(), _description(), _automaticNames()
 	{}
 
 void HRuleDescription::desc( yaal::hcore::HString const& desc_ ) {
@@ -1531,6 +1523,25 @@ void HRuleDescription::add( HNamedRule const* nr_ ) {
 	M_EPILOG
 }
 
+yaal::hcore::HString const& HRuleDescription::make_name( HNamedRule const& nr_ ) {
+	M_PROLOG
+	hcore::HString const* name( NULL );
+
+	if ( ! nr_.name().is_empty() )
+		name = &nr_.name();
+	else {
+		automatic_names_t::const_iterator a( _automaticNames.find( nr_.id() ) );
+		if ( a != _automaticNames.end() )
+			name = &a->second;
+		else {
+			static int const MAX_AUTO_NAMES_COUNT = 26;
+			name = &( _automaticNames[nr_.id()] = ( _automaticNames.get_size() < MAX_AUTO_NAMES_COUNT ) ? static_cast<char>( 'A' + _automaticNames.get_size() ) : hcore::HString( "rule" ) + nr_.id() );
+		}
+	}
+	return ( *name );
+	M_EPILOG
+}
+
 HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
 	: _rules(), _visited(), _ruleOrder() {
 	M_PROLOG
@@ -1548,7 +1559,7 @@ HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
 		_ruleOrder.pop();
 		if ( _visited.insert( r->id() ).second ) {
 			rd.clear();
-			rd.desc( ! r->name().is_empty() ? r->name() : hcore::HString( "ruleGD" ) + r->id() );
+			rd.desc( rd.make_name( *r ) );
 			rd.desc( " = " );
 			r->id()->describe( rd, ru );
 			_rules.push_back( rd.description() );

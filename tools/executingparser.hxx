@@ -67,14 +67,17 @@ typedef yaal::hcore::HMap<HRuleBase const*, int> rule_use_t;
 class HRuleDescription {
 public:
 	typedef HRuleDescription this_type;
+	typedef yaal::hcore::HMap<HRuleBase const*, yaal::hcore::HString> automatic_names_t;
 private:
 	typedef yaal::hcore::HArray<HNamedRule const*> named_children_t;
 	named_children_t _children;
 	yaal::hcore::HString _description;
+	automatic_names_t _automaticNames;
 public:
 	HRuleDescription( void );
 	void desc( yaal::hcore::HString const& );
 	void add( HNamedRule const* );
+	yaal::hcore::HString const& make_name( HNamedRule const& );
 	named_children_t const& children( void ) const;
 	yaal::hcore::HString const& description( void ) const;
 	void clear( void ); 
@@ -128,7 +131,6 @@ public:
 	ptr_t clone( void ) const;
 	bool is_optional( void ) const;
 	yaal::hcore::HString::const_iterator parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	HRuleDescription describe( rule_use_t const& ) const;
 	void describe( HRuleDescription&, rule_use_t const& ) const;
 	void detach( HRuleBase const*, visited_t& );
 	void rule_use( rule_use_t& ) const;
