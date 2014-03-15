@@ -185,6 +185,11 @@ void HRuleBase::detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_EPILOG
 }
 
+HNamedRule::HNamedRule( yaal::hcore::HString const& name_, ptr_t rule_ )
+	: _name( name_ ), _rule( rule_ ) {
+	M_ENSURE( name_.is_empty() || ( name_[name_.get_length() - 1] != '_' ) );
+}
+
 HNamedRule::HNamedRule( HRuleBase const& rule_ )
 	: _name( dynamic_cast<HRule const*>( &rule_ ) ? dynamic_cast<HRule const*>( &rule_ )->get_name() : yaal::hcore::HString() ), _rule( rule_.clone() )
 	{}
@@ -1535,7 +1540,9 @@ yaal::hcore::HString const& HRuleDescription::make_name( HNamedRule const& nr_ )
 			name = &a->second;
 		else {
 			static int const MAX_AUTO_NAMES_COUNT = 26;
-			name = &( _automaticNames[nr_.id()] = ( _automaticNames.get_size() < MAX_AUTO_NAMES_COUNT ) ? static_cast<char>( 'A' + _automaticNames.get_size() ) : hcore::HString( "rule" ) + nr_.id() );
+			name = &( _automaticNames[nr_.id()] = ( _automaticNames.get_size() < MAX_AUTO_NAMES_COUNT ) ?
+					hcore::HString( static_cast<char>( 'A' + _automaticNames.get_size() ) ) + '_'
+					: hcore::HString( "rule" ) + nr_.id() );
 		}
 	}
 	return ( *name );

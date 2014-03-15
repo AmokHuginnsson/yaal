@@ -97,9 +97,7 @@ public:
 	HNamedRule( ptr_t rule_ )
 		: _name(), _rule( rule_ )
 		{	}
-	HNamedRule( yaal::hcore::HString const& name_, ptr_t rule_ )
-		: _name( name_ ), _rule( rule_ )
-		{	}
+	HNamedRule( yaal::hcore::HString const&, ptr_t );
 	HNamedRule( HRuleBase const& );
 	bool operator ! ( void ) const
 		{ return ( ! _rule ); }
