@@ -200,6 +200,13 @@ yaal::hcore::HString const& HNamedRule::name( void ) const {
 	M_EPILOG
 }
 
+HRuleBase const* HNamedRule::id( void ) const {
+	M_PROLOG
+	HRuleRef const* rr( dynamic_cast<HRuleRef const*>( _rule.raw() ) );
+	return ( rr ? rr->get_rule()->id() : _rule.raw() );
+	M_EPILOG
+}
+
 void HNamedRule::reset( ptr_t const& rule_ ) {
 	M_PROLOG
 	_rule = rule_;

@@ -105,8 +105,7 @@ public:
 		{ return ( _rule ); }
 	ptr_t& operator->( void )
 		{ return ( _rule ); }
-	HRuleBase const* id( void ) const
-		{ return ( _rule.get() ); }
+	HRuleBase const* id( void ) const;
 	yaal::hcore::HString const& name( void ) const;
 	ptr_t const& rule( void ) const;
 	ptr_t& rule( void );
