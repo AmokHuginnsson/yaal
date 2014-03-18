@@ -487,7 +487,7 @@ HFollows::HFollows( HRuleBase const& predecessor_, HRuleBase const& successor_ )
 }
 
 HFollows::HFollows( HFollows const& follows_ )
-	: HRuleBase(), _rules() {
+	: HRuleBase( follows_._action ), _rules() {
 	M_PROLOG
 	for ( rules_t::const_iterator it( follows_._rules.begin() ), end( follows_._rules.end() ); it != end; ++ it )
 		_rules.push_back( *it );
@@ -557,9 +557,10 @@ yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* execu
 		if ( ( first_ == old ) && ( !(*it)->is_optional() ) ) {
 			matched = false;
 			break;
-		} else if ( !! _action && ( first_ != old ) )
-			executingParser_->add_execution_step( old, _action );
+		}
 	}
+	if ( matched && !! _action )
+		executingParser_->add_execution_step( orig, _action );
 	return ( matched ? first_ : orig );
 	M_EPILOG
 }
@@ -728,7 +729,7 @@ HAlternative::HAlternative( HRuleBase const& choice1_, HRuleBase const& choice2_
 }
 
 HAlternative::HAlternative( HAlternative const& alternative_ )
-	: HRuleBase(), _rules() {
+	: HRuleBase( alternative_._action ), _rules() {
 	M_PROLOG
 	for ( rules_t::const_iterator it( alternative_._rules.begin() ), end( alternative_._rules.end() ); it != end; ++ it )
 		_rules.push_back( *it );
