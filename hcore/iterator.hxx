@@ -163,6 +163,36 @@ typename T::iterator end( T& cont_ ) {
 	return ( cont_.end() );
 }
 
+template<typename T, int const N>
+T const* begin( T const (&tab_)[N] ) {
+	return ( tab_ );
+}
+
+template<typename T, int const N>
+T const* end( T const (&tab_)[N] ) {
+	return ( tab_ + N );
+}
+
+template<typename T, int const N>
+T* begin( T (&tab_)[N] ) {
+	return ( tab_ );
+}
+
+template<typename T, int const N>
+T* end( T (&tab_)[N] ) {
+	return ( tab_ + N );
+}
+
+template<typename T, int const N>
+T const* cbegin( T (&tab_)[N] ) {
+	return ( tab_ );
+}
+
+template<typename T, int const N>
+T const* cend( T (&tab_)[N] ) {
+	return ( tab_ + N );
+}
+
 namespace hcore {
 
 template<typename iterator_t>
