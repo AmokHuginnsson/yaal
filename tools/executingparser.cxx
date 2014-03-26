@@ -203,7 +203,7 @@ yaal::hcore::HString const& HNamedRule::name( void ) const {
 HRuleBase const* HNamedRule::id( void ) const {
 	M_PROLOG
 	HRuleRef const* rr( dynamic_cast<HRuleRef const*>( _rule.raw() ) );
-	return ( rr ? rr->get_rule()->id() : _rule.raw() );
+	return ( rr ? rr->get_rule() : _rule.raw() );
 	M_EPILOG
 }
 
@@ -413,12 +413,6 @@ void HRecursiveRule::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_EPILOG
 }
 
-HNamedRule const* HRecursiveRule::get_named_rule( void ) const {
-	M_PROLOG
-	return ( &_rule );
-	M_EPILOG
-}
-
 HRuleRef::HRuleRef( HRuleBase::ptr_t rule_ )
 	: _rule( rule_ ) {
 	return;
@@ -468,12 +462,12 @@ void HRuleRef::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_EPILOG
 }
 
-HNamedRule const* HRuleRef::get_rule( void ) const {
+HRuleBase const* HRuleRef::get_rule( void ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule );
 	HRecursiveRule const* rr( dynamic_cast<HRecursiveRule const*>( r.get() ) );
 	M_ASSERT( rr );
-	return ( rr->get_named_rule() );
+	return ( rr );
 	M_EPILOG
 }
 

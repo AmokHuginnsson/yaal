@@ -224,7 +224,6 @@ protected:
 private:
 	HRecursiveRule( void );
 	void set_rule( HRuleBase::ptr_t const& );
-	HNamedRule const* get_named_rule( void ) const;
 	HRecursiveRule( HRecursiveRule const& );
 	HRecursiveRule& operator = ( HRecursiveRule const& );
 	friend class HRule;
@@ -243,7 +242,7 @@ private:
 	rule_ref_t _rule;
 public:
 	HRuleRef( HRuleBase::ptr_t );
-	HNamedRule const* get_rule( void ) const;
+	HRuleBase const* get_rule( void ) const;
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual HRuleBase::ptr_t do_clone( void ) const;
