@@ -128,10 +128,11 @@ class YaalHCoreHStringPrinter:
 		self._val = val_
 
 	def to_string( self ):
-		inplace = not ( self._val['_mem'][self._val['_mem'].type.sizeof - 1] & 128 )
+		AFL = self._val['ALLOC_FLAG_INDEX']
+		inplace = not ( ( self._val['_mem'].cast( gdb.lookup_type( 'char' ).pointer() ) )[AFL] & 128 )
 		s = ""
 		if inplace:
-			s = self._val['_mem']
+			s = self._val['_mem'].cast( gdb.lookup_type( 'char' ).pointer() )
 		else:
 			s = self._val['_mem'].cast( gdb.lookup_type( 'char' ).pointer().pointer() ).dereference()
 		return s
@@ -559,23 +560,25 @@ class YaalHCoreHNumberPrinter:
 
 	def to_string( self ):
 		s = ""
-		DDIL = gdb.parse_and_eval( "yaal::hcore::HNumber::DECIMAL_DIGITS_IN_LEAF" )
-		if self._val['_leafCount'] > 0:
+		DDIL = int( gdb.parse_and_eval( "yaal::hcore::HNumber::DECIMAL_DIGITS_IN_LEAF" ) )
+		leftCount = self._val['_leafCount']
+		integralPartSize = self._val['_integralPartSize']
+		if leftCount > 0:
 			if self._val['_negative']:
 				s = s + "-"
 			digit = 0
 			data = self._val['_canonical']['_data'].cast( gdb.lookup_type( 'yaal::i32_t' ).pointer() )
-			while digit < self._val['_integralPartSize']:
+			while digit < integralPartSize:
 				s = s + ( str( data[digit] ).zfill( DDIL ) if ( digit > 0 ) else str( data[digit] ) )
 				digit = digit + 1
-			if self._val['_leafCount'] > self._val['_integralPartSize']:
-				if self._val['_integralPartSize'] == 0:
+			if leftCount > integralPartSize:
+				if integralPartSize == 0:
 					s = s + "0"
 				s = s + "."
-			while digit < self._val['_leafCount']:
+			while digit < leftCount:
 				s = s + str( data[digit] ).zfill( DDIL )
 				digit = digit + 1
-			if self._val['_leafCount'] > self._val['_integralPartSize']:
+			if leftCount > integralPartSize:
 				s = s.rstrip( "0" )
 		else:
 			s = "0"
