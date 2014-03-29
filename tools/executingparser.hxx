@@ -264,8 +264,11 @@ HFollows operator >> ( char const*, HRuleBase const& );
 HFollows operator >> ( yaal::hcore::HString const&, HRuleBase const& );
 HFollows operator >> ( HRuleBase const&, char const* );
 HFollows operator >> ( HRuleBase const&, yaal::hcore::HString const& );
-HFollows operator >> ( char character_, HRuleBase const& successor_ );
-HFollows operator >> ( HRuleBase const& successor_, char );
+HFollows operator >> ( HFollows const&, char const* );
+HFollows operator >> ( HFollows const&, yaal::hcore::HString const& );
+HFollows operator >> ( char, HRuleBase const& );
+HFollows operator >> ( HFollows const&, char );
+HFollows operator >> ( HRuleBase const&, char );
 HAlternative operator | ( HRuleBase const&, HRuleBase const& );
 HAlternative operator | ( HAlternative const&, HRuleBase const& );
 HKleeneStar operator* ( HRuleBase const& );
@@ -300,9 +303,12 @@ private:
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( char, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, char );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, char );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( char const*, yaal::tools::executing_parser::HRuleBase const& );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, char const* );
 	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HRuleBase const&, yaal::hcore::HString const& );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, char const* );
+	friend yaal::tools::executing_parser::HFollows yaal::tools::executing_parser::operator >> ( yaal::tools::executing_parser::HFollows const&, yaal::hcore::HString const& );
 };
 
 typedef yaal::hcore::HExceptionT<HFollows, HRuleBaseException> HFollowsException;

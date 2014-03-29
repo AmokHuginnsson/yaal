@@ -446,8 +446,11 @@ void HRuleRef::do_describe( HRuleDescription&, rule_use_t const& ) const {
 	M_EPILOG
 }
 
-void HRuleRef::do_rule_use( rule_use_t& ) const {
+void HRuleRef::do_rule_use( rule_use_t& ru_ ) const {
 	M_PROLOG
+	HRuleBase::ptr_t r( _rule );
+	M_ENSURE( !! r );
+	return ( r->rule_use( ru_ ) );
 	return;
 	M_EPILOG
 }
@@ -1314,6 +1317,12 @@ HFollows operator >> ( char character_, HRuleBase const& successor_ ) {
 	M_EPILOG
 }
 
+HFollows operator >> ( HFollows const& predecessor_, char character_ ) {
+	M_PROLOG
+	return ( HFollows( predecessor_, character( character_ ) ) );
+	M_EPILOG
+}
+
 HFollows operator >> ( HRuleBase const& predecessor_, char character_ ) {
 	M_PROLOG
 	return ( HFollows( predecessor_, character( character_ ) ) );
@@ -1459,6 +1468,18 @@ HFollows operator >> ( char const* string_, HRuleBase const& successor_ ) {
 HFollows operator >> ( hcore::HString const& string_, HRuleBase const& successor_ ) {
 	M_PROLOG
 	return ( HFollows( string( string_ ), successor_  ) );
+	M_EPILOG
+}
+
+HFollows operator >> ( HFollows const& predecessor_, char const* string_ ) {
+	M_PROLOG
+	return ( HFollows( predecessor_, string( string_ ) ) );
+	M_EPILOG
+}
+
+HFollows operator >> ( HFollows const& predecessor_, hcore::HString const& string_ ) {
+	M_PROLOG
+	return ( HFollows( predecessor_, string( string_ ) ) );
 	M_EPILOG
 }
 
