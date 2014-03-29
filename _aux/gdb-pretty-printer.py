@@ -178,6 +178,9 @@ class YaalHCoreHArrayPrinter:
 		def __iter__(self):
 			return self
 
+		def __next__( self ):
+			return ( self.next() )
+
 		def next(self):
 			if self._count == self._size:
 				raise StopIteration
@@ -237,6 +240,9 @@ class YaalHCoreHDequePrinter:
 		def __iter__( self ):
 			return self
 
+		def __next__( self ):
+			return ( self.next() )
+
 		def next( self ):
 			if self._count == self._size:
 				raise StopIteration
@@ -292,6 +298,9 @@ class YaalHCoreHListPrinter:
 		def __iter__( self ):
 			return self
 
+		def __next__( self ):
+			return ( self.next() )
+
 		def next( self ):
 			if self._count == self._size:
 				raise StopIteration
@@ -342,6 +351,9 @@ class YaalHCoreHMapPrinter:
 		def __iter__( self ):
 			return self
 
+		def __next__( self ):
+			return ( self.next() )
+
 		def next( self ):
 			if self._count == ( self._size * 2 ):
 				raise StopIteration
@@ -385,6 +397,9 @@ class YaalHCoreHSetPrinter:
 
 		def __iter__( self ):
 			return self
+
+		def __next__( self ):
+			return ( self.next() )
 
 		def next( self ):
 			if self._count == self._size:
@@ -448,6 +463,9 @@ class YaalHCoreHHashMapPrinter:
 		def __iter__( self ):
 			return self
 
+		def __next__( self ):
+			return ( self.next() )
+
 		def next( self ):
 			if self._count == ( self._size * 2 ):
 				raise StopIteration
@@ -494,6 +512,9 @@ class YaalHCoreHHashSetPrinter:
 	class Iterator( HashContainterIterator ):
 		def __iter__( self ):
 			return self
+
+		def __next__( self ):
+			return ( self.next() )
 
 		def next( self ):
 			if self._count == self._size:
@@ -592,6 +613,9 @@ class YaalToolsHRingPrinter:
 
 		def __iter__( self ):
 			return self
+
+		def __next__( self ):
+			return ( self.next() )
 
 		def next( self ):
 			if self._count == self._size:
