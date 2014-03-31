@@ -83,6 +83,8 @@ public:
 	void clear( void ); 
 };
 
+typedef yaal::hcore::HExceptionT<HRuleDescription> HRuleDescriptionException;
+
 class HNamedRule {
 public:
 	typedef HNamedRule this_type;
@@ -112,6 +114,8 @@ public:
 	void reset( ptr_t const& );
 	void describe( HRuleDescription&, rule_use_t const& ) const;
 };
+
+typedef yaal::hcore::HExceptionT<HNamedRule> HNamedRuleException;
 
 class HRuleBase {
 public:
