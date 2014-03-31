@@ -304,6 +304,12 @@ yaal::hcore::HString const& HRule::get_name( void ) const {
 	M_EPILOG
 }
 
+HNamedRule const* HRule::get_named_rule( void ) const {
+	M_PROLOG
+	return ( &_rule );
+	M_EPILOG
+}
+
 HRule::ptr_t HRule::do_clone( void ) const {
 	M_PROLOG
 	M_ENSURE( !! _rule );
@@ -1580,7 +1586,7 @@ HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
 	rule_.rule_use( ru );
 	rule_.describe( rd, ru );
 	HRule const* rule( dynamic_cast<HRule const*>( &rule_ ) );
-	if ( ! rule || rule->get_name().is_empty() )
+	if ( ( ! rule || rule->get_name().is_empty() ) && ! ( rule && ( rd.children().size() == 1 ) && ( rd.children()[0] == rule->get_named_rule() ) ) )
 		_rules.push_back( rd.description() );
 	copy( rd.children().begin(), rd.children().end(), push_insert_iterator( _ruleOrder ) );
 	_visited.insert( &rule_ );

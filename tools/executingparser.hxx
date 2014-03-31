@@ -192,6 +192,7 @@ public:
 	HRule operator[]( action_t const& ) const;
 	HRule& operator %= ( HRuleBase const& );
 	yaal::hcore::HString const& get_name( void ) const;
+	HNamedRule const* get_named_rule( void ) const;
 protected:
 	HRule( yaal::hcore::HString const&, ptr_t const&, action_t const& );
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
