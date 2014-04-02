@@ -208,7 +208,7 @@ AC_DEFUN([YAAL_CHECK_GIT], [
 	AC_MSG_CHECKING([git id sub-command])
 	AC_SUBST(GITID,[true])
 	if test ["$HAS_GIT"] = ["yes"] ; then
-		if test -d "${srcdir}/.git" ; then
+		if test -e "${srcdir}/.git" ; then
 			THIS_ID=`git id ${0}.ac 2> /dev/null`
 			if test ["x${THIS_ID}"] != ["x"] ; then
 				AC_SUBST(GITID,["git id"])
