@@ -1369,10 +1369,24 @@ HString HString::operator() ( hcore::HString const& string_ ) const {
 	M_EPILOG
 }
 
-hcore::HString::const_iterator HString::do_parse( HExecutingParser*, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
+hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingParser_, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	M_ENSURE( first_ != last_ );
-	if ( ! _string.is_empty() ) {
+	M_ASSERT( ! _string.is_empty() );
+	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
+	bool ok( true );
+	for ( hcore::HString::const_iterator it( _string.begin() ), end( _string.end() ); it != end; ++ it, ++ scan ) {
+		if ( ( scan == last_ ) || ( *scan != *it ) ) {
+			ok = false;
+			break;
+		}
+	}
+	if ( ok ) {
+		if ( !! _actionString )
+			executingParser_->add_execution_step( first_, call( _actionString, _string ) );
+		else if ( !! _action )
+			executingParser_->add_execution_step( first_, call( _action ) );
+		first_ = scan;
 	}
 	return ( first_ );
 	M_EPILOG
@@ -1507,6 +1521,7 @@ HCharacter constant( char character_ ) {
 
 HString constant( yaal::hcore::HString const& string_ ) {
 	M_PROLOG
+	M_ENSURE( ! string_.is_empty() );
 	return ( string( string_ ) );
 	M_EPILOG
 }
