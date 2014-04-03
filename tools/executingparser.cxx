@@ -1270,15 +1270,13 @@ yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* exe
 	M_ENSURE( first_ != last_ );
 	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
 	char c( *scan );
-	if ( _character ) {
-		if ( ! _character || ( c == _character ) ) {
-			if ( !! _actionChar )
-				executingParser_->add_execution_step( first_, call( _actionChar, c ) );
-			else if ( !! _action )
-				executingParser_->add_execution_step( first_, call( _action ) );
-			++ scan;
-			first_ = scan;
-		}
+	if ( ! _character || ( c == _character ) ) {
+		if ( !! _actionChar )
+			executingParser_->add_execution_step( first_, call( _actionChar, c ) );
+		else if ( !! _action )
+			executingParser_->add_execution_step( first_, call( _action ) );
+		++ scan;
+		first_ = scan;
 	}
 	return ( first_ );
 	M_EPILOG
