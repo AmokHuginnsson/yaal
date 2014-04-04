@@ -1461,7 +1461,7 @@ hcore::HString::const_iterator HRegex::do_parse( HExecutingParser* executingPars
 	M_ENSURE( first_ != last_ );
 	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
 	hcore::HRegex::HMatchIterator it( _regex->find( scan ) );
-	if ( ( it != _regex->end() ) && ( it->size() < ( last_ - scan ) ) ) {
+	if ( ( it != _regex->end() ) && ( it->size() <= ( last_ - scan ) ) ) {
 		if ( !! _actionString )
 			executingParser_->add_execution_step( first_, call( _actionString, hcore::HString( it->raw(), it->size() ) ) );
 		else if ( !! _action )
