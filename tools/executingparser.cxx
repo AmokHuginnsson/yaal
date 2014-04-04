@@ -1427,7 +1427,7 @@ HString string( yaal::hcore::HString const& string_ ) {
 }
 
 HRegex::HRegex( hcore::HString const& string_ )
-	: HRuleBase(), _regex( make_pointer<hcore::HRegex>( string_ ) ), _actionString()
+	: HRuleBase(), _regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ), _actionString()
 	{}
 
 HRegex::HRegex( regex_t const& regex_, action_t const& action_ )
@@ -1456,9 +1456,18 @@ HRegex HRegex::operator[]( action_string_t const& action_ ) const {
 	M_EPILOG
 }
 
-hcore::HString::const_iterator HRegex::do_parse( HExecutingParser*, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
+hcore::HString::const_iterator HRegex::do_parse( HExecutingParser* executingParser_, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	M_ENSURE( first_ != last_ );
+	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
+	hcore::HRegex::HMatchIterator it( _regex->find( scan ) );
+	if ( ( it != _regex->end() ) && ( it->size() < ( last_ - scan ) ) ) {
+		if ( !! _actionString )
+			executingParser_->add_execution_step( first_, call( _actionString, hcore::HString( it->raw(), it->size() ) ) );
+		else if ( !! _action )
+			executingParser_->add_execution_step( first_, call( _action ) );
+		first_ = it->raw() + it->size();
+	}
 	return ( first_ );
 	M_EPILOG
 }
@@ -1472,7 +1481,7 @@ HRuleBase::ptr_t HRegex::do_clone( void ) const {
 void HRegex::do_describe( HRuleDescription& rd_, rule_use_t const& ) const {
 	M_PROLOG
 	rd_.desc( "regex( \"" );
-	rd_.desc( _regex->pattern() );
+	rd_.desc( _regex->pattern().substr( 1 ) );
 	rd_.desc( "\" )" );
 	return;
 	M_EPILOG
@@ -1535,7 +1544,8 @@ HString constant( yaal::hcore::HString const& string_ ) {
 
 HRegex regex( yaal::hcore::HString const& pattern_ ) {
 	M_PROLOG
-	return ( HRegex( pattern_ ) );
+	M_ENSURE( ! pattern_.is_empty() );
+	return ( HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_ ) );
 	M_EPILOG
 }
 
