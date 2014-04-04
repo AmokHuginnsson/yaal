@@ -103,8 +103,13 @@ void HExecutingParser::add_execution_step( yaal::hcore::HString::const_iterator 
 	M_EPILOG
 }
 
-void HExecutingParser::drop_execution_steps( yaal::hcore::HString::const_iterator ) {
+void HExecutingParser::drop_execution_steps( yaal::hcore::HString::const_iterator it_ ) {
 	M_PROLOG
+	execution_steps_t::iterator it( begin( _excutors ) );
+	execution_steps_t::iterator e( end( _excutors ) );
+	while ( ( it != e ) && ( it->first != it_ ) )
+		++ it;
+	_excutors.erase( it, e );
 	return;
 	M_EPILOG
 }
@@ -135,6 +140,8 @@ yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executi
 	M_PROLOG
 	M_ASSERT( first_ && last_ );
 	yaal::hcore::HString::const_iterator it( do_parse( executingParser_, first_, last_ ) );
+	if ( it == first_ )
+		executingParser_->drop_execution_steps( first_ );
 	M_ASSERT( it );
 	return ( it );
 	M_EPILOG
