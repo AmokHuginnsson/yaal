@@ -1040,7 +1040,6 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 		++ scan;
 	}
 	if ( state >= INTEGRAL ) {
-		first_ = scan;
 		if ( !! _actionDouble ) {
 			double d( lexical_cast<double>( _cache ) );
 			executingParser_->add_execution_step( first_, call( _actionDouble, d ) );
@@ -1053,6 +1052,7 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 			executingParser_->add_execution_step( first_, call( _actionString, _cache ) );
 		} else if ( !! _action )
 			executingParser_->add_execution_step( first_, call( _action ) );
+		first_ = scan;
 	}
 	return ( first_ );
 	M_EPILOG
@@ -1190,7 +1190,6 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 		++ scan;
 	}
 	if ( state >= DIGIT ) {
-		first_ = scan;
 		if ( !! _actionIntLong ) {
 			int long il( lexical_cast<int long>( _cache ) );
 			executingParser_->add_execution_step( first_, call( _actionIntLong, il ) );
@@ -1203,6 +1202,7 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 			executingParser_->add_execution_step( first_, call( _actionString, _cache ) );
 		} else if ( !! _action )
 			executingParser_->add_execution_step( first_, call( _action ) );
+		first_ = scan;
 	}
 	return ( first_ );
 	M_EPILOG
