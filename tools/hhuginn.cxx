@@ -92,7 +92,7 @@ HRule huginn_grammar( void ) {
 	scope %= ( '{' >> *statement >> '}' );
 	HRule nameList( "nameList", name >> ( * ( ',' >> name ) ) );
 	HRule functionDefinition( "functionDefinition", name >> '(' >> -nameList >> ')' >> scope );
-	HRule huginnGrammar( "huginnGrammar", * functionDefinition );
+	HRule huginnGrammar( "huginnGrammar", + functionDefinition );
 	return ( huginnGrammar );
 	M_EPILOG
 }
