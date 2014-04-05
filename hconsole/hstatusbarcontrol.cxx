@@ -191,7 +191,7 @@ void HStatusBarControl::update_progress( double step_, char const* title_ ) {
 	M_PROLOG
 	HTime now( HTime::LOCAL ), left( HTime::LOCAL );
 	HConsole& cons( HConsole::get_instance() );
-	now.format( "(%T)" );
+	now.set_format( "(%T)" );
 	if ( _done )
 		return;
 	if ( step_ < 0 )

@@ -37,7 +37,8 @@ namespace yaal {
 
 namespace hcore {
 
-char const* const _defaultTimeFormat_ = "%a, %d %b %Y %H:%M:%S %z";
+char const _defaultTimeFormat_[] = "%a, %d %b %Y %H:%M:%S %z";
+char const _iso8601TimeFormat_[] = "%F %T";
 
 HTime::HTime( now_in_t nowIn_ )
 	: _value(), _broken(), _format ( _defaultTimeFormat_ ), _cache() {
@@ -47,13 +48,14 @@ HTime::HTime( now_in_t nowIn_ )
 	M_EPILOG
 }
 
-HTime::HTime( char const* const strTime_ )
-	: _value(), _broken(), _format ( _defaultTimeFormat_ ), _cache() {
+HTime::HTime( char const* strTime_, char const* format_ )
+	: _value(), _broken(), _format( format_ ), _cache() {
 	M_PROLOG
 	char const* err( ::strptime( strTime_, _format.raw(), &_broken ) );
 	if ( ! err )
 		err = ::strptime( strTime_, "%F %T", &_broken );
 	M_ENSURE( err );
+	_broken.tm_isdst = -1;
 	_value = ::mktime( &_broken );
 	return;
 	M_EPILOG
@@ -67,8 +69,8 @@ HTime::HTime( HTime const& time_ )
 	M_EPILOG
 }
 
-HTime::HTime( i64_t const& time_ )
-	: _value( time_ ), _broken(), _format( _defaultTimeFormat_ ), _cache() {
+HTime::HTime( i64_t time_, char const* format_ )
+	: _value( time_ ), _broken(), _format( format_ ), _cache() {
 	M_PROLOG
 	time_t t( static_cast<time_t>( _value ) );
 	M_ENSURE( localtime_r( &t, &_broken ) );
@@ -76,9 +78,9 @@ HTime::HTime( i64_t const& time_ )
 	M_EPILOG
 }
 
-HTime::HTime( int const year_, int const month_, int const day_,
-							 int const hour_, int const minute_, int const second_ )
-	: _value(), _broken(), _format( _defaultTimeFormat_ ), _cache() {
+HTime::HTime( int year_, int month_, int day_,
+							 int hour_, int minute_, int second_, char const* format_ )
+	: _value(), _broken(), _format( format_ ), _cache() {
 	M_PROLOG
 	set_datetime( year_, month_, day_, hour_, minute_, second_ );
 	return;
@@ -91,7 +93,7 @@ HTime::~HTime( void ) {
 	M_EPILOG
 }
 
-void HTime::set( i64_t const& time_ ) {
+void HTime::set( i64_t time_ ) {
 	M_PROLOG
 	time_t t( static_cast<time_t>( _value = time_ ) );
 	/* In Visual Studio C++ localtime_r is a macro and cannot be prefixed with ::. */
@@ -108,15 +110,14 @@ void HTime::set_now( now_in_t nowIn_ ) {
 	M_EPILOG
 }
 
-void HTime::format( char const* const format_ ) {
+void HTime::set_format( char const* format_ ) {
 	M_PROLOG
 	_format = format_;
 	return;
 	M_EPILOG
 }
 
-void HTime::set_time( int const hour_, int const minute_,
-											 int const second_ ) {
+void HTime::set_time( int hour_, int minute_, int second_ ) {
 	M_PROLOG
 	if ( ( hour_ < 0 ) || ( hour_ > 23 ) )
 		M_THROW( "bad hour", hour_ );
@@ -132,8 +133,7 @@ void HTime::set_time( int const hour_, int const minute_,
 	M_EPILOG
 }
 
-void HTime::set_date( int const year_, int const month_,
-											 int const day_ ) {
+void HTime::set_date( int year_, int month_, int day_ ) {
 	M_PROLOG
 	_broken.tm_year = year_ - 1900;
 	if ( ( month_ < 1 ) || ( month_ > 12 ) )
@@ -147,9 +147,9 @@ void HTime::set_date( int const year_, int const month_,
 	M_EPILOG
 }
 
-void HTime::set_datetime( int const year_, int const month_,
-											 int const day_, int const hour_,
-											 int const minute_, int const second_ ) {
+void HTime::set_datetime( int year_, int month_,
+											 int day_, int hour_,
+											 int minute_, int second_ ) {
 	M_PROLOG
 	set_date( year_, month_, day_ );
 	set_time( hour_, minute_, second_ );
@@ -233,37 +233,37 @@ HTime & HTime::operator -= ( HTime const& time_ ) {
 	M_EPILOG
 }
 
-bool HTime::operator == ( i64_t const& time_ ) const {
+bool HTime::operator == ( i64_t time_ ) const {
 	M_PROLOG
 	return ( _value == time_ );
 	M_EPILOG
 }
 
-bool HTime::operator != ( i64_t const& time_ ) const {
+bool HTime::operator != ( i64_t time_ ) const {
 	M_PROLOG
 	return ( _value != time_ );
 	M_EPILOG
 }
 
-bool HTime::operator <= ( i64_t const& time_ ) const {
+bool HTime::operator <= ( i64_t time_ ) const {
 	M_PROLOG
 	return ( _value <= time_ );
 	M_EPILOG
 }
 
-bool HTime::operator >= ( i64_t const& time_ ) const {
+bool HTime::operator >= ( i64_t time_ ) const {
 	M_PROLOG
 	return ( _value >= time_ );
 	M_EPILOG
 }
 
-bool HTime::operator < ( i64_t const& time_ ) const {
+bool HTime::operator < ( i64_t time_ ) const {
 	M_PROLOG
 	return ( _value < time_ );
 	M_EPILOG
 }
 
-bool HTime::operator > ( i64_t const& time_ ) const {
+bool HTime::operator > ( i64_t time_ ) const {
 	M_PROLOG
 	return ( _value > time_ );
 	M_EPILOG

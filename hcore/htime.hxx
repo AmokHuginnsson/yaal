@@ -37,7 +37,8 @@ namespace yaal {
 
 namespace hcore {
 
-extern M_YAAL_HCORE_PUBLIC_API char const* const _defaultTimeFormat_;
+extern M_YAAL_HCORE_PUBLIC_API char const _defaultTimeFormat_[];
+extern M_YAAL_HCORE_PUBLIC_API char const _iso8601TimeFormat_[];
 
 /*! \brief Date and time handling class.
  */
@@ -60,19 +61,22 @@ public:
 	 */
 	HTime( now_in_t nowIn_ );
 	HTime( HTime const& );
-	HTime( char const* const );
-	HTime( i64_t const& );
-	HTime( int const, int const, int const, int const = 0, int const = 0,
-			int const = 0 );
+	/*! \brief Construct time object from string.
+	 *
+	 * \param time_ - textual representation of time.
+	 * \param format_ - textual time representation format.
+	 */
+	HTime( char const* time_, char const* format_ = _defaultTimeFormat_ );
+	HTime( i64_t, char const* = _defaultTimeFormat_ );
+	HTime( int, int, int, int = 0, int = 0, int = 0, char const* = _defaultTimeFormat_ );
 	virtual ~HTime ( void );
 	void swap( HTime& );
 	void set_now( now_in_t );
-	void set( i64_t const& );
-	void format( char const* const = _defaultTimeFormat_ );
-	void set_time( int const = 0, int const = 0, int const = 0 );
-	void set_date( int const, int const = 1, int const = 1 );
-	void set_datetime( int const, int const = 1, int const = 1,
-						 int const = 0, int const = 0, int const = 0 );
+	void set( i64_t );
+	void set_format( char const* = _defaultTimeFormat_ );
+	void set_time( int = 0, int = 0, int = 0 );
+	void set_date( int, int = 1, int = 1 );
+	void set_datetime( int, int = 1, int = 1, int = 0, int = 0, int = 0 );
 	int get_year( void ) const;
 	int get_month( void ) const;
 	int get_day( void ) const;
@@ -82,12 +86,12 @@ public:
 	HTime& operator = ( HTime const& );
 	HTime operator - ( HTime const& ) const;
 	HTime& operator -= ( HTime const& );
-	bool operator == ( i64_t const& ) const;
-	bool operator != ( i64_t const& ) const;
-	bool operator <= ( i64_t const& ) const;
-	bool operator >= ( i64_t const& ) const;
-	bool operator < ( i64_t const& ) const;
-	bool operator > ( i64_t const& ) const;
+	bool operator == ( i64_t ) const;
+	bool operator != ( i64_t ) const;
+	bool operator <= ( i64_t ) const;
+	bool operator >= ( i64_t ) const;
+	bool operator < ( i64_t ) const;
+	bool operator > ( i64_t ) const;
 	HString string( void ) const;
 	i64_t raw( void ) const;
 };
