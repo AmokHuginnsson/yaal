@@ -114,6 +114,17 @@ void HUDPSocket::bind( int port_, ip_t ip_ ) {
 	M_EPILOG
 }
 
+void HUDPSocket::connect( ip_t ip_, int port_ ) {
+	M_PROLOG
+	sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_port = fwd_htons( static_cast<int short unsigned>( port_ ) );
+	address.sin_addr.s_addr = ip_.raw();
+	M_ENSURE_EX( ( ::connect( _fileDescriptor, reinterpret_cast<sockaddr*>( &address ), static_cast<int>( sizeof ( address ) ) ) == 0 ), resolver::ip_to_string( ip_ ) + ":" + port_ );
+	return;
+	M_EPILOG
+}
+
 void HUDPSocket::send_to( ip_t dest_, int port_, void const* data_, int long size_ ) {
 	M_PROLOG
 	sockaddr_in address;
@@ -121,6 +132,13 @@ void HUDPSocket::send_to( ip_t dest_, int port_, void const* data_, int long siz
 	address.sin_port = fwd_htons( static_cast<int short unsigned>( port_ ) );
 	address.sin_addr.s_addr = dest_.raw();
 	M_ENSURE( ::sendto( _fileDescriptor, data_, size_, 0, reinterpret_cast<sockaddr*>( &address ), static_cast<int>( sizeof ( address ) ) ) == size_ );
+	return;
+	M_EPILOG
+}
+
+void HUDPSocket::send( void const* data_, int long size_ ) {
+	M_PROLOG
+	M_ENSURE( ::write( _fileDescriptor, data_, size_ ) == size_ );
 	return;
 	M_EPILOG
 }

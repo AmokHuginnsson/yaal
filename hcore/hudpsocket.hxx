@@ -73,7 +73,9 @@ public:
 	virtual ~HUDPSocket( void );
 	int get_file_descriptor( void ) const;
 	void bind( int, ip_t = ip_t() );
+	void connect( ip_t, int );
 	void send_to( ip_t, int, void const*, int long );
+	void send( void const*, int long );
 	int long receive( ODatagram& );
 private:
 	void init( socket_type_t );
