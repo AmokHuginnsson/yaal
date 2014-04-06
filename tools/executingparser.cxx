@@ -1253,39 +1253,39 @@ HInteger const& get_integer_instance( void ) {
 
 HInteger const& integer( get_integer_instance() );
 
-HCharacter::HCharacter( char character_ )
-	: HRuleBase(), _character( character_ ), _actionChar()
+HCharacter::HCharacter( void )
+	: HRuleBase(), _characters(), _actionChar()
 	{}
 
-HCharacter::HCharacter( char character_, action_t const& action_ )
-	: HRuleBase( action_ ), _character( character_ ), _actionChar()
+HCharacter::HCharacter( hcore::HString const& characters_, action_t const& action_ )
+	: HRuleBase( action_ ), _characters( characters_ ), _actionChar()
 	{}
 
-HCharacter::HCharacter( char character_, action_char_t const& action_ )
-	: HRuleBase(), _character( character_ ), _actionChar( action_ )
+HCharacter::HCharacter( hcore::HString const& characters_, action_char_t const& action_ )
+	: HRuleBase(), _characters( characters_ ), _actionChar( action_ )
 	{}
 
 HCharacter::HCharacter( HCharacter const& character_ )
-	: HRuleBase( character_._action ), _character( character_._character ), _actionChar( character_._actionChar )
+	: HRuleBase( character_._action ), _characters( character_._characters ), _actionChar( character_._actionChar )
 	{}
 
 HCharacter HCharacter::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ( ! _action ) && ( ! _actionChar ) );
-	return ( HCharacter( _character, action_ ) );
+	return ( HCharacter( _characters, action_ ) );
 	M_EPILOG
 }
 
 HCharacter HCharacter::operator[]( action_char_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ( ! _action ) && ( ! _actionChar ) );
-	return ( HCharacter( _character, action_ ) );
+	return ( HCharacter( _characters, action_ ) );
 	M_EPILOG
 }
 
-HCharacter HCharacter::operator() ( char character_ ) const {
+HCharacter HCharacter::operator() ( hcore::HString const& characters_ ) const {
 	M_PROLOG
-	return ( HCharacter( character_, _action ) );
+	return ( HCharacter( characters_, _action ) );
 	M_EPILOG
 }
 
@@ -1294,7 +1294,7 @@ yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* exe
 	M_ENSURE( first_ != last_ );
 	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
 	char c( *scan );
-	if ( ! _character || ( c == _character ) ) {
+	if ( _characters.is_empty() || ( _characters.find( *scan ) != hcore::HString::npos ) ) {
 		if ( !! _actionChar )
 			executingParser_->add_execution_step( first_, call( _actionChar, c ) );
 		else if ( !! _action )
@@ -1314,9 +1314,9 @@ HRuleBase::ptr_t HCharacter::do_clone( void ) const {
 
 void HCharacter::do_describe( HRuleDescription& rd_, rule_use_t const& ) const {
 	M_PROLOG
-	if ( _character ) {
+	if ( ! _characters.is_empty() ) {
 		rd_.desc( "'" );
-		rd_.desc( _character );
+		rd_.desc( _characters );
 		rd_.desc( "'" );
 	} else
 		rd_.desc( "character" );

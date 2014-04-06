@@ -525,7 +525,7 @@ public:
 	typedef HRuleBase base_type;
 private:
 	typedef yaal::hcore::HBoundCall<void ( char )> action_char_t;
-	char _character;
+	yaal::hcore::HString _characters;
 	action_char_t _actionChar;
 public:
 	HCharacter( HCharacter const& character_ );
@@ -533,16 +533,16 @@ public:
 		{}
 	HCharacter operator[]( action_t const& ) const;
 	HCharacter operator[]( action_char_t const& ) const;
-	HCharacter operator() ( char ) const;
+	HCharacter operator() ( yaal::hcore::HString const& ) const;
 protected:
-	HCharacter( char, action_t const& );
-	HCharacter( char, action_char_t const& );
+	HCharacter( yaal::hcore::HString const&, action_t const& );
+	HCharacter( yaal::hcore::HString const&, action_char_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
-	HCharacter( char character_ = 0 );
+	HCharacter( void );
 	HCharacter& operator = ( HCharacter const& );
 	friend HCharacter const& get_character_instance( void );
 };
