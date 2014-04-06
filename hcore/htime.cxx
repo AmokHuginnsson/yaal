@@ -224,7 +224,7 @@ HTime HTime::operator - ( HTime const& time_ ) const {
 	M_EPILOG
 }
 
-HTime & HTime::operator -= ( HTime const& time_ ) {
+HTime& HTime::operator -= ( HTime const& time_ ) {
 	M_PROLOG
 	_value = static_cast<i64_t>( difftime( static_cast<time_t>( _value ), static_cast<time_t>( time_._value ) ) );
 	time_t t( static_cast<time_t>( _value ) );
@@ -233,39 +233,39 @@ HTime & HTime::operator -= ( HTime const& time_ ) {
 	M_EPILOG
 }
 
-bool HTime::operator == ( i64_t time_ ) const {
+bool HTime::operator == ( HTime const& time_ ) const {
 	M_PROLOG
-	return ( _value == time_ );
+	return ( _value == time_._value );
 	M_EPILOG
 }
 
-bool HTime::operator != ( i64_t time_ ) const {
+bool HTime::operator != ( HTime const& time_ ) const {
 	M_PROLOG
-	return ( _value != time_ );
+	return ( _value != time_._value );
 	M_EPILOG
 }
 
-bool HTime::operator <= ( i64_t time_ ) const {
+bool HTime::operator <= ( HTime const& time_ ) const {
 	M_PROLOG
-	return ( _value <= time_ );
+	return ( _value <= time_._value );
 	M_EPILOG
 }
 
-bool HTime::operator >= ( i64_t time_ ) const {
+bool HTime::operator >= ( HTime const& time_ ) const {
 	M_PROLOG
-	return ( _value >= time_ );
+	return ( _value >= time_._value );
 	M_EPILOG
 }
 
-bool HTime::operator < ( i64_t time_ ) const {
+bool HTime::operator < ( HTime const& time_ ) const {
 	M_PROLOG
-	return ( _value < time_ );
+	return ( _value < time_._value );
 	M_EPILOG
 }
 
-bool HTime::operator > ( i64_t time_ ) const {
+bool HTime::operator > ( HTime const& time_ ) const {
 	M_PROLOG
-	return ( _value > time_ );
+	return ( _value > time_._value );
 	M_EPILOG
 }
 

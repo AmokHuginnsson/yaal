@@ -41,6 +41,10 @@ extern M_YAAL_HCORE_PUBLIC_API char const _defaultTimeFormat_[];
 extern M_YAAL_HCORE_PUBLIC_API char const _iso8601TimeFormat_[];
 
 /*! \brief Date and time handling class.
+ *
+ * HTime stores number of seconds since epoch (1970-01-01).
+ * If we want to have broken-down time diff we must compensate for that fact.
+ * In short time-diff makes no sense for dates in broken-down time form.
  */
 class HTime {
 public:
@@ -86,12 +90,12 @@ public:
 	HTime& operator = ( HTime const& );
 	HTime operator - ( HTime const& ) const;
 	HTime& operator -= ( HTime const& );
-	bool operator == ( i64_t ) const;
-	bool operator != ( i64_t ) const;
-	bool operator <= ( i64_t ) const;
-	bool operator >= ( i64_t ) const;
-	bool operator < ( i64_t ) const;
-	bool operator > ( i64_t ) const;
+	bool operator == ( HTime const& ) const;
+	bool operator != ( HTime const& ) const;
+	bool operator <= ( HTime const& ) const;
+	bool operator >= ( HTime const& ) const;
+	bool operator < ( HTime const& ) const;
+	bool operator > ( HTime const& ) const;
 	HString string( void ) const;
 	i64_t raw( void ) const;
 };
