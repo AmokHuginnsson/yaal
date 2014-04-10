@@ -474,10 +474,11 @@ HMatrix<value_type>& HMatrix<value_type>::operator *= ( value_type const scalar_
 template<typename value_type>
 HMatrix<value_type> & HMatrix<value_type>::operator /= ( value_type const scalar_ ) {
 	M_PROLOG
-	int ctr;
-	if ( scalar_ )
-		for ( ctr = 0; ctr < _rows; ctr++ )
+	if ( scalar_ ) {
+		for ( int ctr( 0 ); ctr < _rows; ++ ctr ) {
 			_data[ ctr ] /= scalar_;
+		}
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -485,9 +486,8 @@ HMatrix<value_type> & HMatrix<value_type>::operator /= ( value_type const scalar
 template<typename value_type>
 HMatrix<value_type> HMatrix<value_type>::operator ~ ( void ) const {
 	M_PROLOG
-	int ctr;
 	HMatrix matrix( _rows, _columns );
-	for ( ctr = 0; ctr < _rows; ctr++ )
+	for ( int ctr( 0 ); ctr < _rows; ++ ctr )
 		matrix [ ctr ] = ~ _data[ ctr ];
 	return ( matrix );
 	M_EPILOG
@@ -501,36 +501,36 @@ value_type HMatrix<value_type>::operator ! ( void ) const {
 }
 
 template<typename value_type>
-bool HMatrix<value_type>::operator == ( HMatrix const & matrix_ ) const {
+bool HMatrix<value_type>::operator == ( HMatrix const& matrix_ ) const {
 	M_PROLOG
 	check_dimensions_rows_columns ( matrix_._rows, matrix_._columns );
-	int ctr = 0;
-	for ( ctr = 0; ctr < _rows; ctr++ )
-		if ( this->_array [ ctr ] != matrix_ [ ctr ] )
+	for ( int ctr( 0 ); ctr < _rows; ++ ctr ) {
+		if ( this->_array [ ctr ] != matrix_ [ ctr ] ) {
 			return ( false );
+		}
+	}
 	return ( true );
 	M_EPILOG
 }
 
 template<typename value_type>
-bool HMatrix<value_type>::operator != ( HMatrix const & matrix_ ) const {
+bool HMatrix<value_type>::operator != ( HMatrix const& matrix_ ) const {
 	M_PROLOG
 	return ( ! ( * this == matrix_ ) );
 	M_EPILOG
 }
 
 template<typename value_type>
-HVector<value_type> operator * ( HVector<value_type> const & vector_,
+HVector<value_type> operator * ( HVector<value_type> const& vector_,
 		HMatrix<value_type> const & matrix_ ) {
 	M_PROLOG
 	value_type scalar;
-	int j, k;
 	if ( vector_.dim() == matrix_._rows ) {
 		HVector<value_type> vector ( matrix_._columns );
-		for ( j = 0; j < matrix_._columns; j++ ) {
+		for ( int j( 0 ); j < matrix_._columns; ++ j ) {
 			scalar = 0;
-			for ( k = 0; k < matrix_._columns; k++ )
-				scalar += vector_ [ k ] * matrix_ [ k ] [ j ];
+			for ( int k( 0 ); k < matrix_._columns; ++ k )
+				scalar += vector_ [ k ] * matrix_[ k ][ j ];
 			vector [ j ] = scalar;
 		}
 		return ( vector );

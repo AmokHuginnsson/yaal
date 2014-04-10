@@ -91,12 +91,12 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 		HString const&, HString const&, HString const& ) {
 	do {
-		char const fileNameExt[] = ".sqlite";
 		struct stat stat;
 		OSQLite* sQLite( NULL );
 		dbLink_._conn = sQLite = new ( memory::yaal ) OSQLite;
 		HString dataBase( dataBase_ );
 		if ( ::stat( dataBase.raw(), &stat ) ) {
+			char const fileNameExt[] = ".sqlite";
 			dataBase += fileNameExt;
 			if ( ::stat( dataBase.raw(), &stat ) ) {
 				sQLite->_errorMessage.format( "Database file `%s' does not exists.", dataBase.raw() );

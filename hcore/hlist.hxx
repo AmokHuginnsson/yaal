@@ -498,9 +498,8 @@ public:
 	}
 	void pop_back( void ) {
 		M_PROLOG
-		HElement* element = NULL;
 		if ( _size > 0 ) {
-			element = _hook->_previous;
+			HElement* element( _hook->_previous );
 			M_SAFE( element->~HElement() );
 			_allocator.deallocate( element, 1 );
 			-- _size;
