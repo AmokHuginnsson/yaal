@@ -318,12 +318,34 @@ private:
 
 typedef yaal::hcore::HExceptionT<HFollows, HRuleBaseException> HFollowsException;
 
-class HKleeneStar : public HRuleBase {
+class HKleeneBase : public HRuleBase {
+public:
+	typedef HKleeneBase this_type;
+	typedef HRuleBase base_type;
+protected:
+	HNamedRule _rule;
+public:
+	virtual ~HKleeneBase( void )
+		{}
+protected:
+	HKleeneBase( void );
+	HKleeneBase( HRuleBase const& );
+	HKleeneBase( action_t const& );
+	HKleeneBase( HNamedRule const&, action_t const& );
+	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+	virtual void do_rule_use( rule_use_t& ) const;
+	virtual void do_detach( HRuleBase const*, visited_t& );
+private:
+	HKleeneBase( HKleeneBase const& );
+	HKleeneBase& operator = ( HKleeneBase const& );
+};
+
+typedef yaal::hcore::HExceptionT<HKleeneBase, HRuleBaseException> HKleeneBaseException;
+
+class HKleeneStar : public HKleeneBase {
 public:
 	typedef HKleeneStar this_type;
-	typedef HRuleBase base_type;
-private:
-	HNamedRule _rule;
+	typedef HKleeneBase base_type;
 public:
 	HKleeneStar( HKleeneStar const& );
 	HKleeneStar operator[]( action_t const& ) const;
@@ -333,24 +355,19 @@ protected:
 	HKleeneStar( HNamedRule const&, action_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
-	virtual void do_rule_use( rule_use_t& ) const;
-	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
 	HKleeneStar( HRuleBase const& );
 	HKleeneStar& operator = ( HKleeneStar const& );
 	friend yaal::tools::executing_parser::HKleeneStar yaal::tools::executing_parser::operator * ( yaal::tools::executing_parser::HRuleBase const& );
 };
 
-typedef yaal::hcore::HExceptionT<HKleeneStar, HRuleBaseException> HKleeneStarException;
+typedef yaal::hcore::HExceptionT<HKleeneStar, HKleeneBaseException> HKleeneStarException;
 
-class HKleenePlus : public HRuleBase {
+class HKleenePlus : public HKleeneBase {
 public:
 	typedef HKleenePlus this_type;
-	typedef HRuleBase base_type;
-private:
-	HNamedRule _rule;
+	typedef HKleeneBase base_type;
 public:
 	HKleenePlus( HKleenePlus const& kleenePlus_ );
 	HKleenePlus operator[]( action_t const& ) const;
@@ -359,17 +376,14 @@ public:
 protected:
 	HKleenePlus( HNamedRule const&, action_t const& );
 	virtual ptr_t do_clone( void ) const;
-	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
-	virtual void do_rule_use( rule_use_t& ) const;
-	virtual void do_detach( HRuleBase const*, visited_t& );
 private:
 	HKleenePlus( HRuleBase const& rule_ );
 	HKleenePlus& operator = ( HKleenePlus const& );
 	friend yaal::tools::executing_parser::HKleenePlus yaal::tools::executing_parser::operator + ( yaal::tools::executing_parser::HRuleBase const& );
 };
 
-typedef yaal::hcore::HExceptionT<HKleenePlus, HRuleBaseException> HKleenePlusException;
+typedef yaal::hcore::HExceptionT<HKleenePlus, HKleeneBaseException> HKleenePlusException;
 
 class HAlternative : public HRuleBase {
 public:

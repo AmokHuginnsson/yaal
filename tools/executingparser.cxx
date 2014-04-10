@@ -590,16 +590,66 @@ void HFollows::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_EPILOG
 }
 
-HKleeneStar::HKleeneStar( HRuleBase const& rule_ )
+HKleeneBase::HKleeneBase( HRuleBase const& rule_ )
 	: HRuleBase(), _rule( rule_ )
 	{}
 
-HKleeneStar::HKleeneStar( HNamedRule const& rule_, action_t const& action_ )
+HKleeneBase::HKleeneBase( HNamedRule const& rule_, action_t const& action_ )
 	: HRuleBase( action_ ), _rule( rule_ )
 	{}
 
+yaal::hcore::HString::const_iterator HKleeneBase::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+	M_PROLOG
+	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator origScan( scan );
+	yaal::hcore::HString::const_iterator old( scan );
+	while ( scan != last_ ) {
+		scan = _rule->parse( executingParser_, old, last_ );
+		if ( scan == old )
+			break;
+		old = scan;
+	}
+	if ( scan != origScan ) {
+		if ( !! _action )
+			executingParser_->add_execution_step( first_, _action );
+		first_ = scan;
+	}
+	return ( first_ );
+	M_EPILOG
+}
+
+void HKleeneBase::do_rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	int use( ++ ruleUse_[ this ] );
+	if ( ( use == 1 ) && !! _rule )
+		_rule->rule_use( ruleUse_ );
+	return;
+	M_EPILOG
+}
+
+void HKleeneBase::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
+	M_PROLOG
+	HRuleBase::ptr_t r( _rule.rule() );
+	if ( !! r ) {
+		if ( r.raw() == rule_ )
+			_rule.reset( make_pointer<HRuleRef>( r ) );
+		else
+			r->detach( rule_, visited_ );
+	}
+	return;
+	M_EPILOG
+}
+
+HKleeneStar::HKleeneStar( HRuleBase const& rule_ )
+	: HKleeneBase( rule_ )
+	{}
+
+HKleeneStar::HKleeneStar( HNamedRule const& rule_, action_t const& action_ )
+	: HKleeneBase( rule_, action_ )
+	{}
+
 HKleeneStar::HKleeneStar( HKleeneStar const& kleeneStar_ )
-	: HRuleBase( kleeneStar_._action ), _rule( kleeneStar_._rule )
+	: HKleeneBase( kleeneStar_._rule, kleeneStar_._action )
 	{}
 
 HKleeneStar HKleeneStar::operator[]( action_t const& action_ ) const {
@@ -618,26 +668,6 @@ HRuleBase::ptr_t HKleeneStar::do_clone( void ) const {
 bool HKleeneStar::do_is_optional( void ) const
 	{ return ( true ); }
 
-yaal::hcore::HString::const_iterator HKleeneStar::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
-	M_PROLOG
-	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
-	yaal::hcore::HString::const_iterator origScan( scan );
-	yaal::hcore::HString::const_iterator old( scan );
-	while ( scan != last_ ) {
-		scan = _rule->parse( executingParser_, old, last_ );
-		if ( scan == old )
-			break;
-		old = scan;
-	}
-	if ( scan != origScan ) {
-		if ( !! _action )
-			executingParser_->add_execution_step( first_, _action );
-		first_ = scan;
-	}
-	return ( first_ );
-	M_EPILOG
-}
-
 void HKleeneStar::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
 	rd_.desc( "*( " );
@@ -647,34 +677,12 @@ void HKleeneStar::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) co
 	M_EPILOG
 }
 
-void HKleeneStar::do_rule_use( rule_use_t& ruleUse_ ) const {
-	M_PROLOG
-	int use( ++ ruleUse_[ this ] );
-	if ( ( use == 1 ) && !! _rule )
-		_rule->rule_use( ruleUse_ );
-	return;
-	M_EPILOG
-}
-
-void HKleeneStar::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
-	M_PROLOG
-	HRuleBase::ptr_t r( _rule.rule() );
-	if ( !! r ) {
-		if ( r.raw() == rule_ )
-			_rule.reset( make_pointer<HRuleRef>( r ) );
-		else
-			r->detach( rule_, visited_ );
-	}
-	return;
-	M_EPILOG
-}
-
 HKleenePlus::HKleenePlus( HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_ )
+	: HKleeneBase( rule_ )
 	{}
 
 HKleenePlus::HKleenePlus( HNamedRule const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_ )
+	: HKleeneBase( rule_, action_ )
 	{}
 
 HKleenePlus HKleenePlus::operator[]( action_t const& action_ ) const {
@@ -685,7 +693,7 @@ HKleenePlus HKleenePlus::operator[]( action_t const& action_ ) const {
 }
 
 HKleenePlus::HKleenePlus( HKleenePlus const& kleenePlus_ )
-	: HRuleBase( kleenePlus_._action ), _rule( kleenePlus_._rule )
+	: HKleeneBase( kleenePlus_._rule, kleenePlus_._action )
 	{}
 
 HRuleBase::ptr_t HKleenePlus::do_clone( void ) const {
@@ -694,53 +702,11 @@ HRuleBase::ptr_t HKleenePlus::do_clone( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HKleenePlus::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
-	M_PROLOG
-	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
-	yaal::hcore::HString::const_iterator origScan( scan );
-	yaal::hcore::HString::const_iterator old( scan );
-	while ( scan != last_ ) {
-		scan = _rule->parse( executingParser_, old, last_ );
-		if ( scan == old )
-			break;
-		old = scan;
-	}
-	if ( scan != origScan ) {
-		if ( !! _action )
-			executingParser_->add_execution_step( first_, _action );
-		first_ = scan;
-	}
-	return ( first_ );
-	M_EPILOG
-}
-
 void HKleenePlus::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
 	rd_.desc( "+( " );
 	_rule.describe( rd_, ru_ );
 	rd_.desc( " )" );
-	return;
-	M_EPILOG
-}
-
-void HKleenePlus::do_rule_use( rule_use_t& ruleUse_ ) const {
-	M_PROLOG
-	int use( ++ ruleUse_[ this ] );
-	if ( ( use == 1 ) && !! _rule )
-		_rule->rule_use( ruleUse_ );
-	return;
-	M_EPILOG
-}
-
-void HKleenePlus::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
-	M_PROLOG
-	HRuleBase::ptr_t r( _rule.rule() );
-	if ( !! r ) {
-		if ( r.raw() == rule_ )
-			_rule.reset( make_pointer<HRuleRef>( r ) );
-		else
-			r->detach( rule_, visited_ );
-	}
 	return;
 	M_EPILOG
 }
