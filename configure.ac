@@ -93,6 +93,7 @@ AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_MKDIR_P
 AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
+AC_CHECK_PROG([GTAGS],[gtags],[gtags],[true])
 
 dnl Looking for main libc headers
 AC_MSG_RESULT([--- Looking for main libc headers ... ---               [[41%]]])

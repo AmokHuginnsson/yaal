@@ -45,6 +45,7 @@ INSTALL      = @INSTALL@
 RANLIB       = @RANLIB@
 GITID        = @GITID@
 CTAGS        = @CTAGS@
+GTAGS        = @GTAGS@
 DIRS         = $(DIR_BUILD)
 HAPI_HEADER  = include/$(LIB_NAME)/$(LIB_NAME).hxx
 DO_@DO_TARGET@=1
