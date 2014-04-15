@@ -4,9 +4,9 @@ MAKEFLAGS+=--no-print-directory
 
 .NOTPARALLEL:
 
-.PHONY: doc
+.PHONY: doc tags
 
-default .DEFAULT doc:
+default .DEFAULT doc tags:
 	@$(MAKE) -f _aux/mk/master.mk $(@)
 
 .my_make:

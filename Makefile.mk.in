@@ -136,7 +136,7 @@ include $(DIR_ROOT)/_aux/mk/b_implicit-compile.mk
 include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 
 #phony targets
-.PHONY: all bin clean clean-dep cov coverage-stats debug dep distclean doc install install-environment mrproper relassert reldeb release prepare-coverage-baseline prof purge static stats tags test uninstall
+.PHONY: all bin clean clean-dep cov coverage-stats debug dep distclean doc install install-environment mrproper relassert reldeb release prepare-coverage-baseline prof purge static stats test uninstall
 
 $(TARGET): $(DIRS) $(TARGETS) $(HAPI_HEADER)
 
