@@ -63,7 +63,6 @@ HDataListControl::~HDataListControl ( void ) {
 void HDataListControl::load( int long /*id_*/ ) {
 	M_PROLOG
 	_SQL->set_filter( "" );
-	int count = 0, ctr = 0, size = static_cast<int>( _dataControler->size() );
 	HDataWindow* parent = dynamic_cast<HDataWindow*>( _parent );
 	M_ASSERT( parent );
 	HRecordSet::ptr_t rs = _SQL->execute( HSQLDescriptor::MODE::SELECT );
@@ -74,9 +73,11 @@ void HDataListControl::load( int long /*id_*/ ) {
 			idColNo = i;
 	HDataWindow::ORowBuffer rb( idColNo, static_cast<int>( _header.size() ) );
 	parent->set_sync_store( &rb );
-	parent->status_bar()->init_progress( static_cast<double>( count ), "Collecting ..." );
+	parent->status_bar()->init_progress( 0., "Collecting ..." );
 	HListControler<>::model_ptr_t model = _dataControler->get_model();
 	HListControler<>::model_t::iterator it = model->begin();
+	int ctr( 0 );
+	int size( static_cast<int>( _dataControler->size() ) );
 	for ( HRecordSet::iterator row( rs->begin() ), end( rs->end() ); row != end; ++ row ) {
 		parent->sync( row );
 		parent->status_bar()->update_progress();

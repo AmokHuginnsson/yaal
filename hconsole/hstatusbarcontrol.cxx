@@ -176,7 +176,7 @@ void HStatusBarControl::init_progress( double max_, char const* title_,
 	M_PROLOG
 	_done = false;
 	_estimate = estimate_;
-	_progressSize = max_;
+	_progressSize = ( max_ > 0 ? max_ : 1 );
 	_lastProgress = - 1;
 	_lastPercent = - 1;
 	_lastStep = 0;
@@ -248,8 +248,7 @@ void HStatusBarControl::update_progress( double step_, char const* title_ ) {
 	M_EPILOG
 }
 
-void HStatusBarControl::message( int attribute_,
-		char const* format_, ... ) {
+void HStatusBarControl::message( int attribute_, char const* format_, ... ) {
 	M_PROLOG
 	if ( ! _focused ) {
 		if ( format_ ) {
