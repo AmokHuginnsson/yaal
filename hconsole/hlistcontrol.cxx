@@ -111,13 +111,12 @@ HListControl::~HListControl( void ) {
 void HListControl::do_refresh( void ) {
 	M_PROLOG
 	int columnOffset = 0;
-	int tmp = 0;
 	int columns = static_cast<int>( _header.size() );
 	int hR = _drawHeader ? 1 : 0; /* HR stands for header row */
 	int size = static_cast<int>( _controler->size() );
 	HColumnInfo * columnInfo = NULL;
 	HConsole& cons = HConsole::get_instance();
-	tmp = _widthRaw;
+	int tmp( _widthRaw );
 	if ( _focused )
 		cons.curs_set( CURSOR::INVISIBLE );
 	draw_label(); /* raw* set here */
@@ -251,31 +250,32 @@ void HListControl::draw_scroll( int posX_ ) {
 
 void HListControl::draw_cell( iterator_t& it_, int row_, int column_, int columnOffset_, HColumnInfo const* const  columnInfo_, bool checked_ ) {
 	M_PROLOG
-	int tmp = 0;
-	HConsole& cons = HConsole::get_instance();
-	tmp = static_cast<int>( _varTmpBuffer.get_length() );
+	HConsole& cons( HConsole::get_instance() );
+	int len( static_cast<int>( _varTmpBuffer.get_length() ) );
 	switch ( columnInfo_->_align ) {
 		case ( BITS::ALIGN::LEFT ): {
-			if ( tmp < columnInfo_->_widthRaw )
-				_varTmpBuffer.fillz( '_', tmp, columnInfo_->_widthRaw - tmp );
+			if ( len < columnInfo_->_widthRaw )
+				_varTmpBuffer.fillz( '_', len, columnInfo_->_widthRaw - len );
+			else if ( len > columnInfo_->_widthRaw )
+				_varTmpBuffer.set_at( columnInfo_->_widthRaw, 0 );
 		}
 		break;
 		case ( BITS::ALIGN::CENTER ): {
-			if ( tmp > columnInfo_->_widthRaw )
+			if ( len > columnInfo_->_widthRaw )
 				_varTmpBuffer = _varTmpBuffer.right(
 						columnInfo_->_widthRaw );
-			else if ( tmp < columnInfo_->_widthRaw ) {
-				_varTmpBuffer.insert( 0, ( columnInfo_->_widthRaw - tmp ) / 2, '_' );
-				tmp = static_cast<int>( _varTmpBuffer.get_length() );
-				_varTmpBuffer.fillz( '_', tmp, columnInfo_->_widthRaw - tmp );
+			else if ( len < columnInfo_->_widthRaw ) {
+				_varTmpBuffer.insert( 0, ( columnInfo_->_widthRaw - len ) / 2, '_' );
+				len = static_cast<int>( _varTmpBuffer.get_length() );
+				_varTmpBuffer.fillz( '_', len, columnInfo_->_widthRaw - len );
 			}
 		}
 		break;
 		case ( BITS::ALIGN::RIGHT ): {
-			if ( tmp > columnInfo_->_widthRaw )
-				_varTmpBuffer.erase( 0, tmp - columnInfo_->_widthRaw );
-			else if ( tmp < columnInfo_->_widthRaw )
-				_varTmpBuffer.insert( 0, ( columnInfo_->_widthRaw - tmp ) - 1, '_' );
+			if ( len > columnInfo_->_widthRaw )
+				_varTmpBuffer.erase( 0, len - columnInfo_->_widthRaw );
+			else if ( len < columnInfo_->_widthRaw )
+				_varTmpBuffer.insert( 0, ( columnInfo_->_widthRaw - len ) - 1, '_' );
 		}
 		break;
 		default :
