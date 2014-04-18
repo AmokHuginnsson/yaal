@@ -32,6 +32,7 @@ namespace yaal {
 namespace hconsole {
 
 extern M_YAAL_HCONSOLE_PUBLIC_API int _latency_;
+extern M_YAAL_HCONSOLE_PUBLIC_API int _screenBackground_;
 extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeDisabled_;
 extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeEnabled_;
 extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeFocused_;

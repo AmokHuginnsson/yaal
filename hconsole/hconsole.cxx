@@ -47,6 +47,7 @@ namespace yaal {
 namespace hconsole {
 
 int _latency_ = 1;
+int _screenBackground_ = COLORS::BG_BLACK;
 int _attributeDisabled_ = ( COLORS::FG_GREEN | COLORS::BG_BLACK | COLORS::BG_BLINK ) << 8
 															| ( COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK | COLORS::BG_BLINK );
 int _attributeEnabled_ = ( COLORS::FG_BRIGHTGREEN | COLORS::BG_BLACK | COLORS::BG_BLINK ) << 8
@@ -105,7 +106,7 @@ int get_color_bits( HString& value_, int what_ ) {
 		return ( COLORS::FG_LIGHTGRAY );
 	else if ( ! strcasecmp( str, "GRAY" ) )
 		return ( COLORS::FG_GRAY );
-	else if ( ! strcasecmp( str, "BRGIHTRED" ) )
+	else if ( ! strcasecmp( str, "BRIGHTRED" ) )
 		return ( COLORS::FG_BRIGHTRED );
 	else if ( ! strcasecmp( str, "BRIGHTGREEN" ) )
 		return ( COLORS::FG_BRIGHTGREEN );
@@ -138,6 +139,8 @@ bool set_hconsole_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
 	if ( ! strcasecmp( option_, "set_env" ) )
 		decode_set_env( value_ );
+	else if ( ! strcasecmp( option_, "screen_background" ) )
+		_screenBackground_ = COLORS::fg_to_bg( get_color_bits( value_, 0 ) );
 	else if ( ! strcasecmp( option_, "attribute_disabled" ) )
 		set_color( value_, _attributeDisabled_ );
 	else if ( ! strcasecmp( option_, "attribute_enabled" ) )

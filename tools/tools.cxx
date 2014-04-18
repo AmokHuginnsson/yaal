@@ -114,7 +114,7 @@ bool set_tools_variables( HString& option_, HString& value_ ) {
 		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it ) {
 			if ( ! strcasecmp( *it, "FLOW_CONTROL_HARDWARE" ) )
 				_serialFlags_ = HSerial::FLAG::FLOW_CONTROL_HARDWARE;
-			else if ( ! strcasecmp( *it, "SOFTWARE_CONTROL_SOFTWARE" ) )
+			else if ( ! strcasecmp( *it, "FLOW_CONTROL_SOFTWARE" ) )
 				_serialFlags_ = HSerial::FLAG::FLOW_CONTROL_SOFTWARE;
 			else if ( ! strcasecmp( *it, "ECHO" ) )
 				_serialFlags_ = HSerial::FLAG::ECHO;

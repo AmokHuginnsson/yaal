@@ -124,6 +124,7 @@ struct COLORS {
 		ATTR_NORMAL      = ( FG_LIGHTGRAY | BG_BLACK ),
 		ATTR_DEFAULT     = -1
 	};
+	static int fg_to_bg( int );
 };
 
 /*! \brief Get special key code values.
@@ -182,6 +183,7 @@ public:
 	void enter_curses( void );
 	void leave_curses( void );
 	void set_attr( int ) const;
+	void set_background( int ) const;
 	void move( int, int ) const;
 	CURSOR::cursor_t curs_set( CURSOR::cursor_t const& ) const;
 	void addch( int );

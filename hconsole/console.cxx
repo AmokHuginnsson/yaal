@@ -91,13 +91,41 @@ struct ATTR {
 	inline static int value_fix( int const attr_ ) {
 		if ( attr_ & 0x80 )
 			return ( static_cast<int>( COLOR_PAIR(
-							( (   attr_ & 0x07 ) << 3 )
+							( ( attr_ & 0x07 ) << 3 )
 						| ( ( attr_ & 0x70 ) >> 4 ) )
-						| ( (   attr_ & 0x08 ) ? A_BLINK : 0 )
+						| ( ( attr_ & 0x08 ) ? A_BLINK : 0 )
 						| A_BOLD | A_REVERSE ) );
 		return ( value( attr_ ) );
 	}
 };
+
+int COLORS::fg_to_bg( int fg_ ) {
+	M_PROLOG
+	int bg( 0 );
+	switch ( fg_ ) {
+		case ( FG_BLACK ):         bg = BG_BLACK; break;
+		case ( FG_RED ):           bg = BG_RED; break;
+		case ( FG_GREEN ):         bg = BG_GREEN; break;
+		case ( FG_BROWN ):         bg = BG_BROWN; break;
+		case ( FG_BLUE ):          bg = BG_BLUE; break;
+		case ( FG_MAGENTA ):       bg = BG_MAGENTA; break;
+		case ( FG_CYAN ):          bg = BG_CYAN; break;
+		case ( FG_LIGHTGRAY ):     bg = BG_LIGHTGRAY; break;
+		case ( FG_GRAY ):          bg = BG_GRAY; break;
+		case ( FG_BRIGHTRED ):     bg = BG_BRIGHTRED; break;
+		case ( FG_BRIGHTGREEN ):   bg = BG_BRIGHTGREEN; break;
+		case ( FG_YELLOW ):        bg = BG_YELLOW; break;
+		case ( FG_BRIGHTBLUE ):    bg = BG_BRIGHTBLUE; break;
+		case ( FG_BRIGHTMAGENTA ): bg = BG_BRIGHTMAGENTA; break;
+		case ( FG_BRIGHTCYAN ):    bg = BG_BRIGHTCYAN; break;
+		case ( FG_WHITE ):         bg = BG_WHITE; break;
+		default: {
+			M_THROW( "Invalid color:", fg_ );
+		}
+	}
+	return ( bg );
+	M_EPILOG
+}
 
 bool _needRepaint_( false );
 
@@ -105,7 +133,7 @@ bool _needRepaint_( false );
 
 HConsole::HConsole( void )
 	: _initialized( false ), _enabled( false ),	_brokenBrightBackground( false ),
-	_width( 0 ), _height( 0 ), _mouseDes( 0 ), _window( NULL ), _event() {
+	_width( 0 ), _height( 0 ), _mouseDes( -1 ), _window( NULL ), _event() {
 	return;
 }
 
@@ -157,6 +185,7 @@ void HConsole::enter_curses( void ) {
 		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
 /*	def_shell_mode(); */
 /* this is done automaticly by initscr(), read man next time */
+	_brokenBrightBackground = ( ::getenv( "MRXVT_TABTITLE" ) != NULL );
 	if ( ! _initialized )
 		init();
 	_terminal_.init();
@@ -176,15 +205,15 @@ void HConsole::enter_curses( void ) {
 	flushinp(); /* Always returns OK */
 	curs_set( CURSOR::INVISIBLE );
 	/* init color pairs */
+	M_ENSURE( use_default_colors() == OK );
 	M_ENSURE( assume_default_colors( COLOR_BLACK, COLOR_BLACK ) == OK );
-	for ( int bg( 0 ); bg < 8; bg ++ )
-		for ( int fg( 0 ); fg < 8; fg ++ )
-			init_pair( static_cast<short>( bg * 8 + fg ),
+	for ( int bg( 0 ); bg < ::COLORS; ++ bg )
+		for ( int fg( 0 ); fg < ::COLORS; ++ fg )
+			init_pair( static_cast<short>( bg * ::COLORS + fg ),
 					colors[ fg ], colors[ bg ] );
-	attrset( COLOR_PAIR( 7 ) );
-	bkgd( ' ' | ATTR::value( COLORS::FG_BLACK | COLORS::BG_BLACK ) | A_INVIS ); /* meaningless value from macro */
-	_brokenBrightBackground = ( ::getenv( "MRXVT_TABTITLE" ) != NULL );
 	_enabled = true;
+	set_attr( COLORS::ATTR_NORMAL );
+	set_background( _screenBackground_ );
 	if ( ::getenv( "YAAL_NO_MOUSE" ) )
 		_useMouse_ = false;
 	if ( _useMouse_ ) {
@@ -222,10 +251,12 @@ void HConsole::leave_curses( void ) {
 	M_PROLOG
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
-	if ( _useMouse_ )
+	if ( _mouseDes >= 0 ) {
 		static_cast<void>( mouse::mouse_close() );
-	bkgd( ' ' | ATTR::value( COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK ) );
-	M_ENSURE( use_default_colors() == OK );
+		_mouseDes = -1;
+	}
+	set_attr( COLORS::ATTR_NORMAL );
+	set_background( COLORS::ATTR_NORMAL );
 	M_ENSURE( printw ( "" ) != ERR );
 	M_ENSURE( fflush ( NULL ) == 0 );
 	flushinp(); /* Always returns OK */
@@ -254,14 +285,24 @@ void HConsole::leave_curses( void ) {
 	
 void HConsole::set_attr( int attr_ ) const {
 	M_PROLOG
-	char unsigned byte = 0;
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
-	byte = static_cast<char unsigned>( attr_ );
+	char unsigned byte( static_cast<char unsigned>( attr_ ) );
 	if ( _brokenBrightBackground )
 		static_cast<void>( attrset( ATTR::value_fix( byte ) ) );
 	else
 		static_cast<void>( attrset( ATTR::value( byte ) ) );
+	return;
+	M_EPILOG
+}
+
+void HConsole::set_background( int color_ ) const {
+	M_PROLOG
+	if ( ! _enabled )
+		M_THROW( "not in curses mode", errno );
+	bkgd( ' '
+			| ( _brokenBrightBackground ? ATTR::value_fix( COLORS::FG_BLACK | color_ )
+				: ATTR::value( COLORS::FG_BLACK | color_ ) ) ); /* meaningless value from macro */
 	return;
 	M_EPILOG
 }
@@ -662,7 +703,7 @@ int HConsole::on_cont( int ) {
 
 int HConsole::on_mouse( int ) {
 	M_PROLOG
-	if ( _useMouse_ ) {
+	if ( _mouseDes >= 0 ) {
 		if ( is_enabled() ) {
 			*_event << 'm';
 			return ( 1 );

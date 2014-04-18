@@ -139,7 +139,7 @@ serial_baudrate B115200
 # type: special(multi flag value),
 # default: FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
 # this option set various flags controlling serial connection behaviour
-# flag names: FLOW_CONTROL_HARDWARE SOFTWARE_CONTROL_SOFTWARE BITS_PER_BYTE_8
+# flag names: FLOW_CONTROL_HARDWARE FLOW_CONTROL_SOFTWARE BITS_PER_BYTE_8
 #             BITS_PER_BYTE_7 BITS_PER_BYTE_6 BITS_PER_BYTE_5 PARITY_CHECK
 #             PARITY_ODD CR2NL ECHO CANONICAL STOP_BITS_1 STOP_BITS_2
 serial_flags FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
@@ -228,6 +228,9 @@ command_compose_delay 16
 #	YELLOW BRIGHTBLUE BRIGHTMAGENTA BRIGHTCYAN WHITE
 
 # colors common to all windows and controls
+
+# screen background color
+screen_background BLACK
 
 # color attributes for disabled control
 attribute_disabled GREEN GRAY LIGHTGRAY GRAY
