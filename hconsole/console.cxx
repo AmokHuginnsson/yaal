@@ -129,10 +129,23 @@ int COLORS::fg_to_bg( int fg_ ) {
 
 bool _needRepaint_( false );
 
+namespace {
+
+bool has_broken_bright_background( void ) {
+	bool hasBrokenBrightBackground(
+			( ::getenv( "MRXVT_TABTITLE" ) != NULL )
+			|| ( ::getenv( "TERMINATOR_UUID" ) != NULL )
+		);
+	return ( hasBrokenBrightBackground );
+}
+
+}
+
 /* public: */
 
 HConsole::HConsole( void )
-	: _initialized( false ), _enabled( false ),	_brokenBrightBackground( false ),
+	: _initialized( false ), _enabled( false ),
+	_brokenBrightBackground( has_broken_bright_background() ),
 	_width( 0 ), _height( 0 ), _mouseDes( -1 ), _window( NULL ), _event() {
 	return;
 }
@@ -185,7 +198,6 @@ void HConsole::enter_curses( void ) {
 		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
 /*	def_shell_mode(); */
 /* this is done automaticly by initscr(), read man next time */
-	_brokenBrightBackground = ( ::getenv( "MRXVT_TABTITLE" ) != NULL );
 	if ( ! _initialized )
 		init();
 	_terminal_.init();
