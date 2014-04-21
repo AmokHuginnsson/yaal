@@ -18,6 +18,7 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
     - SQLite3
     - PostGreSQL
     - MySQL
+    - Firebird
     - OCI
     - gpm
 
@@ -42,49 +43,67 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
   4. Still in yaal sources directory type `make install'.
   5. Spawn new shell instance to get yaal installed headers and libraries visible.
 
-( 0 ) $ cd
-( 1a) $ echo 'export PREFIX="${HOME}/usr/"' >> ${HOME}/.bashrc         # for bash or zsh shells
-( 1b) $ echo 'setenv PREFIX "${home}/usr/"' >> ${HOME}/.tcshrc         # for tcsh shell
-( 2a) $ echo 'export SYSCONFDIR="${HOME}/etc/conf"' >> ${HOME}/.bashrc # for bash or zsh shells
-( 2b) $ echo 'setenv SYSCONFDIR "${home}/etc/conf"' >> ${HOME}/.tcshrc # for tcsh shell
-( 3a) $ echo 'export DEFAULT_TARGET="debug"' >> ${HOME}/.bashrc        # for bash or zsh shells
-( 3b) $ echo 'setenv DEFAULT_TARGET "debug"' >> ${HOME}/.tcshrc        # for tcsh shell
-( 4a) $ . "${HOME}/.bashrc"                                            # for bash or zsh shells
-( 4b) $ source "${HOME}/.tcshrc"                                       # for tcsh shell
-( 5 ) $ cd "${HOME}/src/yaal/"
-( 6 ) $ make
-( 7 ) $ make install-environment                                       # required only once
-( 8 ) $ make install
-( 9 ) $ mkdir -p "${HOME}/var/db/keys"                                 # required only once
-(10 ) $ cd "${HOME}/var/db/keys"                                       # required only once
-(11 ) $ openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 -out yaal.key # required only once
-(12 ) $ openssl req -x509 -new -key yaal.key -out yaal.pem -days 3652  # required only once
+* Details:
 
-Next spawn new shell and you are done!
+First we make sure we start the procedure from your home directory.
 
-* Understanding the installation process:
+      $ cd
 
-In step 0 we make sure we start the procedure from your home directory.
-
-In step 1x you add a line of code to file that is read by your shell every time
-a new shell instance is spawned. Existence of this line of code in your shell
-initialization script will cause that form now on a new environment variable
-will exist, variable named PREFIX with value representing path to some directory
+In next step you shall add a special initialization code to your shell startup script file.
+This code will add new environment variables to your shell sessions,
+variable named PREFIX with value representing path to some directory
 (in case of our example it will be the `usr' directory located directly in your home
 directory).
 
-Similarly to step 1x in step 2x you will set new persistent environment variable
+    # for bash or zsh shells
+
+      $ echo 'export PREFIX="${HOME}/usr/"' >> ${HOME}/.bashrc
+
+    # or, for tcsh shell
+
+      % echo 'setenv PREFIX "${home}/usr/"' >> ${HOME}/.tcshrc
+
+Similarly to previous step now you will set new persistent environment variable
 named SYSCONFDIR.
 
-In step 3x you will set one more new persistent environment variable
-named DEFAULT_TARGET.
+    # for bash or zsh shells
 
-In step 4x you cause your shell to load its initialization file and through that
-to include newly added persistent environment variables to currently running shell session.
+      $ echo 'export SYSCONFDIR="${HOME}/etc/conf"' >> ${HOME}/.bashrc
 
-In step 5 you are expected to enter a directory with `yaal' sources.
+    # or, for tcsh shell
 
-In step 6 you run build of `yaal' sources.
+      % echo 'setenv SYSCONFDIR "${home}/etc/conf"' >> ${HOME}/.tcshrc
+
+Finally, in last step of preparing shell environment variables you will set one more
+new persistent environment variable named DEFAULT_TARGET.
+
+    # for bash or zsh shells
+
+      $ echo 'export DEFAULT_TARGET="debug"' >> ${HOME}/.bashrc
+
+    # or, for tcsh shell
+
+      $ echo 'setenv DEFAULT_TARGET "debug"' >> ${HOME}/.tcshrc
+
+Once required changes to your shell starup scripts are in plave you shall cause your shell
+to load its initialization file and through that to include newly added,
+persistent environment variables to currently running shell session.
+
+    # for bash or zsh shells
+
+      $ . "${HOME}/.bashrc"
+
+    # or, for tcsh shell
+
+      $ source "${HOME}/.tcshrc"
+
+Now you are expected to enter a directory with `yaal' sources.
+
+      $ cd "${HOME}/src/yaal/"
+
+Next, you run build of `yaal' sources.
+
+      $ make
 
 By default `yaal' is build into shared (aka dynamically loaded) libraries,
 moreover one does not need root privileges to install `yaal' libraries.
@@ -95,22 +114,33 @@ outside of default directory location (like /usr/lib or /usr/local/lib) you will
 need to tell your compiler (GCC) and operating system dynamic linker (ld-so)
 where to find these files. To do that you will need to persistently add four
 special variables (C_INCLUDE_PATH, CPLUS_INCLUDE_PATH, LIBRARY_PATH, LD_LIBRARY_PATH)
-to your environment. In step 7 you will do precisely that.
+to your environment. In this step you shall do precisely that.
 
-In step 8 you will install `yaal' headers and binary libraries into correct paths:
+!! This step is required only once !!
+
+      $ make install-environment
+
+In next step you will install `yaal' headers and binary libraries into correct paths:
 headers into ${PREFIX}/include, libraries into ${PREFIX}/lib,
 configuration into ${SYSCONFDIR}.
 
-In step 9 we create directory for OpenSSL keys used by yaal ssl related routines.
+      $ make install
 
-Next, in step 10 we enter directory for yaal SSL keys.
+In another step we create directory for OpenSSL keys used by yaal,
+we enter that directory, and then we create private OpenSSL key
+for yaal SSL related routines, finally we create SSL root certificate.
 
-In step 11 we create private key for yaal SSL related routines.
+!! This step is required only once !!
 
-In step 12 we create SSL root certificate.
+      $ mkdir -p "${HOME}/var/db/keys"
+      $ cd "${HOME}/var/db/keys"
+      $ openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 -out yaal.key
+      $ openssl req -x509 -new -key yaal.key -out yaal.pem -days 3652
 
-Please observe that in step 5 we assumed you downloaded `yaal' sources
-into "${HOME}/src/yaal' directory, if not please modify paths in this step
+Next, spawn new shell and you are done!
+
+Please observe that we assumed you downloaded `yaal' sources
+into "${HOME}/src/yaal' directory, if not please modify paths in this procedure
 accordingly.
 
 * Testing the installation.
