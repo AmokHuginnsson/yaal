@@ -43,7 +43,7 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
   4. Still in yaal sources directory type `make install'.
   5. Spawn new shell instance to get yaal installed headers and libraries visible.
 
-* Details:
+** Installation process details.
 
 First we make sure we start the procedure from your home directory.
 
@@ -55,9 +55,13 @@ variable named PREFIX with value representing path to some directory
 (in case of our example it will be the `usr' directory located directly in your home
 directory).
 
-    # for bash or zsh shells
+    # for bash shell
 
       $ echo 'export PREFIX="${HOME}/usr/"' >> ${HOME}/.bashrc
+
+    # for zsh shell
+
+      $ echo 'export PREFIX="${HOME}/usr/"' >> ${HOME}/.zshrc
 
     # or, for tcsh shell
 
@@ -66,9 +70,13 @@ directory).
 Similarly to previous step now you will set new persistent environment variable
 named SYSCONFDIR.
 
-    # for bash or zsh shells
+    # for bash shell
 
       $ echo 'export SYSCONFDIR="${HOME}/etc/conf"' >> ${HOME}/.bashrc
+
+    # for zsh shell
+
+      $ echo 'export SYSCONFDIR="${HOME}/etc/conf"' >> ${HOME}/.zshrc
 
     # or, for tcsh shell
 
@@ -77,21 +85,29 @@ named SYSCONFDIR.
 Finally, in last step of preparing shell environment variables you will set one more
 new persistent environment variable named DEFAULT_TARGET.
 
-    # for bash or zsh shells
+    # for bash shell
 
       $ echo 'export DEFAULT_TARGET="debug"' >> ${HOME}/.bashrc
+
+    # for zsh shell
+
+      $ echo 'export DEFAULT_TARGET="debug"' >> ${HOME}/.zshrc
 
     # or, for tcsh shell
 
       $ echo 'setenv DEFAULT_TARGET "debug"' >> ${HOME}/.tcshrc
 
-Once required changes to your shell starup scripts are in plave you shall cause your shell
+Once required changes to your shell startup scripts are in place you shall cause your shell
 to load its initialization file and through that to include newly added,
 persistent environment variables to currently running shell session.
 
-    # for bash or zsh shells
+    # for bash shell
 
       $ . "${HOME}/.bashrc"
+
+    # for zsh shell
+
+      $ . "${HOME}/.zshrc"
 
     # or, for tcsh shell
 
