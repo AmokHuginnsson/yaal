@@ -43,7 +43,7 @@ make purge
 %build
 umask 0077
 %{clearflags}
-make %{?_smp_mflags} debug release doc PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir} LIBDIR=%{_libdir}
+make %{?_smp_mflags} debug release doc PREFIX=%{_prefix} SYSCONFDIR=%{_sysconfdir} LIBDIR=%{_libdir} LOCALSTATEDIR=%{_localstatedir}
 
 %install
 rm -rf ${RPM_BUILD_ROOT}
@@ -60,6 +60,7 @@ make purge
 %defattr(-,root,root,-)
 %{_libdir}/lib*[a-z]?.so*
 %{_sysconfdir}/*
+%{_localstatedir}/*
 
 %files -n yaal-devel
 %defattr(-,root,root,-)

@@ -76,12 +76,12 @@ resolve_hostnames true
 # ssl_key
 # type: string, default: (empty)
 # ssl_key is path to file with private ssl key
-ssl_key "${HOME}/var/db/keys/yaal.key"
+ssl_key "@localstatedir@/db/keys/yaal.key"
 
 # ssl_cert
 # type: string, default: (empty)
 # ssl_cert is path to file with ssl certificate
-ssl_cert "${HOME}/var/db/keys/yaal.pem"
+ssl_cert "@localstatedir@/db/keys/yaal.pem"
 
 ### core END
 

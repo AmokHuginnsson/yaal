@@ -50,52 +50,37 @@ First we make sure we start the procedure from your home directory.
       $ cd
 
 In next step you shall add a special initialization code to your shell startup script file.
-This code will add new environment variables to your shell sessions,
-variable named PREFIX with value representing path to some directory
-(in case of our example it will be the `usr' directory located directly in your home
-directory).
+This code will add new environment variables to your shell sessions:
+
+  PREFIX         - your main installation path,
+  SYSCONFDIR     - directory where global host configuration files are stored,
+  LOCALSTATEDIR  - a directory where data files which the programs modify while
+                   they run are stored,
+  DEFAULT_TARGET - which configures default build type.
+
+In case of our example ${PREFIX} will be the `usr' directory located directly in your home
+directory.
 
     # for bash shell
 
-      $ echo 'export PREFIX="${HOME}/usr/"' >> ${HOME}/.bashrc
-
-    # for zsh shell
-
-      $ echo 'export PREFIX="${HOME}/usr/"' >> ${HOME}/.zshrc
-
-    # or, for tcsh shell
-
-      % echo 'setenv PREFIX "${home}/usr/"' >> ${HOME}/.tcshrc
-
-Similarly to previous step now you will set new persistent environment variable
-named SYSCONFDIR.
-
-    # for bash shell
-
+      $ echo 'export PREFIX="${HOME}/usr/"'         >> ${HOME}/.bashrc
       $ echo 'export SYSCONFDIR="${HOME}/etc/conf"' >> ${HOME}/.bashrc
+      $ echo 'export LOCALSTATEDIR="${HOME}/var"'   >> ${HOME}/.bashrc
+      $ echo 'export DEFAULT_TARGET="debug"'        >> ${HOME}/.bashrc
 
     # for zsh shell
 
+      $ echo 'export PREFIX="${HOME}/usr/"'         >> ${HOME}/.zshrc
       $ echo 'export SYSCONFDIR="${HOME}/etc/conf"' >> ${HOME}/.zshrc
+      $ echo 'export LOCALSTATEDIR="${HOME}/var"'   >> ${HOME}/.zshrc
+      $ echo 'export DEFAULT_TARGET="debug"'        >> ${HOME}/.zshrc
 
     # or, for tcsh shell
 
+      % echo 'setenv PREFIX "${home}/usr/"'         >> ${HOME}/.tcshrc
       % echo 'setenv SYSCONFDIR "${home}/etc/conf"' >> ${HOME}/.tcshrc
-
-Finally, in last step of preparing shell environment variables you will set one more
-new persistent environment variable named DEFAULT_TARGET.
-
-    # for bash shell
-
-      $ echo 'export DEFAULT_TARGET="debug"' >> ${HOME}/.bashrc
-
-    # for zsh shell
-
-      $ echo 'export DEFAULT_TARGET="debug"' >> ${HOME}/.zshrc
-
-    # or, for tcsh shell
-
-      $ echo 'setenv DEFAULT_TARGET "debug"' >> ${HOME}/.tcshrc
+      % echo 'setenv LOCALSTATEDIR "${HOME}/var"'   >> ${HOME}/.tcshrc
+      % echo 'setenv DEFAULT_TARGET "debug"'        >> ${HOME}/.tcshrc
 
 Once required changes to your shell startup scripts are in place you shall cause your shell
 to load its initialization file and through that to include newly added,
@@ -111,7 +96,7 @@ persistent environment variables to currently running shell session.
 
     # or, for tcsh shell
 
-      $ source "${HOME}/.tcshrc"
+      % source "${HOME}/.tcshrc"
 
 Now you are expected to enter a directory with `yaal' sources.
 

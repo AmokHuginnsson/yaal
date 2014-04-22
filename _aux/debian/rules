@@ -7,6 +7,7 @@
 
 export PREFIX=/usr
 export SYSCONFDIR=/etc
+export LOCALSTATEDIR=/var
 
 dropprivs: ./debian/dropprivs.c
 	$(CC) $(<) -o $(@)

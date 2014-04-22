@@ -39,9 +39,21 @@ build/%/$(1): configure $(1).in
 		mkdir -p $$(DIR) && cd $$(DIR) && \
 		if test -t 1 -a "x$${VERBOSE}" != "xyes" ; then \
 			/bin/rm -f $$(notdir $$(@)) && \
-			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) $$(if $$(LIBDIR),--libdir=$$(LIBDIR)) $$(CXX_STANDARD) $$(CONFIGURE) | tee -a make.log | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
+			../../configure \
+				$$(CONF_$$(*)) \
+				$$(if $$(PREFIX),--prefix=$$(PREFIX)) \
+				$$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) \
+				$$(if $$(LIBDIR),--libdir=$$(LIBDIR)) \
+				$$(if $$(LOCALSTATEDIR),--localstatedir=$$(LOCALSTATEDIR)) \
+				$$(CXX_STANDARD) $$(CONFIGURE) | tee -a make.log | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
 		else \
-			../../configure $$(CONF_$$(*)) $$(if $$(PREFIX),--prefix=$$(PREFIX)) $$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) $$(if $$(LIBDIR),--libdir=$$(LIBDIR)) $$(CXX_STANDARD) $$(CONFIGURE) | tee -a make.log ; \
+			../../configure \
+				$$(CONF_$$(*)) \
+				$$(if $$(PREFIX),--prefix=$$(PREFIX)) \
+				$$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) \
+				$$(if $$(LIBDIR),--libdir=$$(LIBDIR)) \
+				$$(if $$(LOCALSTATEDIR),--localstatedir=$$(LOCALSTATEDIR)) \
+				$$(CXX_STANDARD) $$(CONFIGURE) | tee -a make.log ; \
 		fi ; test -f $$(notdir $$(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc yaal.pc ; true)
 endef
 

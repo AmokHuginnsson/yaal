@@ -58,8 +58,12 @@ include( CheckTypeSize )
 include( GNUInstallDirs )
 
 if ( NOT ( "$ENV{SYSCONFDIR}" STREQUAL "" ) )
-	set( CMAKE_INSTALL_FULL_SYSCONFDIR  $ENV{SYSCONFDIR} CACHE PATH "Configuration install directory." FORCE )
+	set( CMAKE_INSTALL_FULL_SYSCONFDIR  $ENV{SYSCONFDIR} CACHE PATH "Path to global system configuration directory." FORCE )
 endif ( NOT ( "$ENV{SYSCONFDIR}" STREQUAL "" ) )
+
+if ( NOT ( "$ENV{LOCALSTATEDIR}" STREQUAL "" ) )
+	set( CMAKE_INSTALL_FULL_LOCALSTATEDIR  $ENV{LOCALSTATEDIR} CACHE PATH "Path to data files which the programs modify while they run." FORCE )
+endif ( NOT ( "$ENV{LOCALSTATEDIR}" STREQUAL "" ) )
 
 set( prefix ${CMAKE_INSTALL_PREFIX} )
 set( exec_prefix "\${prefix}" )

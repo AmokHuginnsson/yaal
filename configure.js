@@ -201,6 +201,7 @@ try {
 	var EXTRA_LIBRARY_PATH = "";
 	var PREFIX = "";
 	var SYSCONFDIR = "";
+	var LOCALSTATEDIR = "";
 	var SILENT = 0;
 	var VERBOSE = 0;
 	var VISUAL_STUDIO_VERSION = vcVersion();
@@ -236,6 +237,9 @@ try {
 			case "SYSCONFDIR":
 				SYSCONFDIR = parts[1];
 			break;
+			case "LOCALSTATEDIR":
+				LOCALSTATEDIR = parts[1];
+			break;
 			case "FAST":
 				FAST = 1;
 			break;
@@ -250,6 +254,9 @@ try {
 
 	if ( SYSCONFDIR.length == 0 )
 		SYSCONFDIR = PREFIX + "/etc";
+
+	if ( LOCALSTATEDIR.length == 0 )
+		LOCALSTATEDIR = PREFIX + "/var";
 
 	if ( FAST == -1 ) {
 		if ( WScript.FullName.substr( WScript.FullName.length - 11 ).toLowerCase() == "cscript.exe" )
@@ -309,6 +316,7 @@ try {
 	if ( PREFIX.length > 0 )
 		envProc( "PREFIX" ) = PREFIX;
 	envProc( "SYSCONFDIR" ) = SYSCONFDIR;
+	envProc( "LOCALSTATEDIR" ) = LOCALSTATEDIR;
 	envProc( "CXX" ) = "";
 	envProc( "CC" ) = "";
 	envProc.remove( "CXX" );

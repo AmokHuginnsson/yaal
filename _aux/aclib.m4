@@ -309,4 +309,5 @@ AC_DEFUN([YAAL_DETECT_COMMON_FLAGS], [
 ])
 
 AC_DEFINE_UNQUOTED([SYSCONFDIR], "$sysconfdir", [Path to global system configuration directory.])
+AC_DEFINE_UNQUOTED([LOCALSTATEDIR], "$localstatedir", [Path to data files which the programs modify while they run.])
 
