@@ -92,7 +92,7 @@ private:
 
 template<typename T>
 int long chunk_size( int long count_ ) {
-	return ( sizeof ( T ) * count_ );
+	return ( static_cast<int>( sizeof ( T ) ) * count_ );
 }
 
 }

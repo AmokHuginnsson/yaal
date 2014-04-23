@@ -64,7 +64,7 @@ HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedStream( _file::ref
 	_type( 0 ), _bufferSize( BUFFER_SIZE ),
 	_processName( NULL ),
 	_loginName(), _hostName( system::get_host_name() ),
-	_buffer( _bufferSize ) {
+	_buffer( static_cast<int>( _bufferSize ) ) {
 	M_PROLOG
 	if ( ! _file::ref() )
 		M_THROW( "tmpfile() failed", errno );
@@ -110,7 +110,7 @@ void HLog::do_rehash( void* src_, char const* const processName_ ) {
 		_processName = ::basename( processName_ );
 	FILE* src( static_cast<FILE*>( src_ ) );
 	if ( src ) {
-		_loginName = system::get_user_name( getuid() );
+		_loginName = system::get_user_name( static_cast<int>( getuid() ) );
 		::fseek( src, 0, SEEK_SET );
 		char* buf = _buffer.get<char>();
 #ifdef HAVE_GETLINE
@@ -232,7 +232,7 @@ int HLog::vformat( char const* const format_, va_list ap_ ) {
 	err = ::vsnprintf( buf, _bufferSize, format_, ap_ );
 	if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
 		_file::ref() << buf;
-	eol_reset( buf, ::strlen( buf ) );
+	eol_reset( buf, static_cast<int>( ::strlen( buf ) ) );
 	return ( err );
 	M_EPILOG
 }

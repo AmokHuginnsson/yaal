@@ -177,7 +177,7 @@ void HFile::seek( int long pos, seek_t const& seek_ ) {
 			s = SEEK_END;
 		break;
 		default:
-			M_ASSERT( ! "bad seek type" );
+			M_ASSERT( 0 && "bad seek type" );
 		break;
 	}
 	M_ENSURE( ::std::fseek( static_cast<FILE*>( _handle ), pos, s ) == 0 );
@@ -234,7 +234,7 @@ int long HFile::get_line_length( void ) {
 			SCAN_BUFFER_SIZE, static_cast<FILE*>( _handle ) ) );
 		length += size;
 		ptr = static_cast<char*>( ::std::memchr( buffer,
-					'\n', size ) );
+					'\n', static_cast<size_t>( size ) ) );
 	} while ( ! ptr && ( size == SCAN_BUFFER_SIZE ) );
 	M_ENSURE( ::std::fseek( static_cast<FILE*>( _handle ),
 				- length, SEEK_CUR ) == 0 );
@@ -287,7 +287,7 @@ int HFile::get_file_descriptor( void ) const {
 
 int long HFile::do_read( void* const buffer_, int long size_ ) {
 	M_PROLOG
-	int long len( static_cast<int long>( ::std::fread( buffer_, sizeof ( char ), size_, static_cast<FILE*>( _handle ) ) ) );
+	int long len( static_cast<int long>( ::std::fread( buffer_, sizeof ( char ), static_cast<size_t>( size_ ), static_cast<FILE*>( _handle ) ) ) );
 	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) );
 	M_EPILOG
 }
@@ -295,7 +295,7 @@ int long HFile::do_read( void* const buffer_, int long size_ ) {
 int long HFile::do_write( void const* const string_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
-	int long len( static_cast<int long>( ::std::fwrite( string_, sizeof ( char ), size_, static_cast<FILE*>( _handle ) ) ) );
+	int long len( static_cast<int long>( ::std::fwrite( string_, sizeof ( char ), static_cast<size_t>( size_ ), static_cast<FILE*>( _handle ) ) ) );
 	return ( len ? len : ( ::std::ferror( static_cast<FILE*>( _handle ) ) ? -1 : len ) );
 	M_EPILOG
 }

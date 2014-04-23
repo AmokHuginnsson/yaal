@@ -60,14 +60,11 @@ namespace hcore {
 
 namespace {
 int const DECIMAL_DIGITS_IN_LEAF_CONST = 9;
-int const SPECIAL_CHARS = 3; /* minus, dot, nil */
 char const VALID_CHARACTERS[] = "-.0123456789";
-int const JUST_DIGITS = 2;
 int const HARDCODED_MINIMUM_PRECISION = 16;
 int const A_MINUS = 0;
 int const A_DOT = 1;
 int const A_ZERO = 2;
-int const NUMBER_START = 3;
 int const KARATSUBA_THRESHOLD = 20; /* FIXME: 20 is fine */
 i32_t const DECIMAL_SHIFT[] = {
 	/* 0 */ 1l,
@@ -290,10 +287,10 @@ HNumber::HNumber( HNumber const& source )
 	M_PROLOG
 	if ( source._leafCount ) {
 		_canonical.realloc( chunk_size<i32_t>( source._leafCount ), HChunk::STRATEGY::EXACT );
-		::memcpy( _canonical.raw(), source._canonical.raw(), chunk_size<i32_t>( source._leafCount ) );
+		::memcpy( _canonical.raw(), source._canonical.raw(), static_cast< ::size_t>( chunk_size<i32_t>( source._leafCount ) ) );
 		if ( source._cache.get_size() > 0 ) {
 			_cache.realloc( source._cache.get_size(), HChunk::STRATEGY::EXACT );
-			::memcpy( _cache.raw(), source._cache.raw(), source._cache.get_size() );
+			::memcpy( _cache.raw(), source._cache.raw(), static_cast< ::size_t>( source._cache.get_size() ) );
 		}
 	}
 	return;
@@ -597,7 +594,7 @@ bool HNumber::operator == ( HNumber const& other ) const {
 	return ( ( _negative == other._negative )
 			&& ( _leafCount == other._leafCount )
 			&& ( _integralPartSize == other._integralPartSize )
-			&& ! ::memcmp( _canonical.raw(), other._canonical.raw(), chunk_size<i32_t>( _leafCount ) ) );
+			&& ! ::memcmp( _canonical.raw(), other._canonical.raw(), static_cast< ::size_t>( chunk_size<i32_t>( _leafCount ) ) ) );
 }
 
 bool HNumber::operator != ( HNumber const& other ) const {
@@ -754,7 +751,7 @@ HNumber& HNumber::operator += ( HNumber const& addend_ ) {
 	( dps <= _precision ) || ( dps = _precision );
 	size_t ressize = ips + dps + 1; /* + 1 for possible carrier */
 	_cache.realloc( chunk_size<i32_t>( ressize ) );
-	::memset( _cache.raw(), 0, _cache.get_size() );
+	::memset( _cache.raw(), 0, static_cast< ::size_t>( _cache.get_size() ) );
 	i32_t* res( _cache.get<i32_t>() );
 	i32_t const* addend1( _canonical.get<i32_t>() );
 	i32_t const* addend2( addend_._canonical.get<i32_t>() );
@@ -821,7 +818,7 @@ HNumber& HNumber::operator *= ( HNumber const& factor_ ) {
 	if ( n._leafCount && factor._leafCount ) {
 		bool multiplierExact( n.is_exact() );
 		bool factorExact( factor.is_exact() );
-		::memset( _cache.raw(), 0, _cache.get_size() );
+		::memset( _cache.raw(), 0, static_cast< ::size_t>( _cache.get_size() ) );
 		karatsuba( _cache,
 				n._canonical.get<i32_t>(), n._leafCount,
 				factor._canonical.get<i32_t>(), factor._leafCount );
@@ -872,7 +869,7 @@ void HNumber::multiply_by_leaf( i32_t leaf_ ) {
 		if ( carrier ) {
 			_canonical.realloc( chunk_size<i32_t>( _leafCount + 1 ) );
 			data = _canonical.get<i32_t>();
-			::memmove( data + 1, data, chunk_size<i32_t>( _leafCount ) );
+			::memmove( data + 1, data, static_cast< ::size_t>( chunk_size<i32_t>( _leafCount ) ) );
 			++ _integralPartSize;
 			++ _leafCount;
 			data[0] = carrier;
@@ -894,8 +891,8 @@ void HNumber::divide_by_leaf( i32_t leaf_, size_t shift_ ) {
 		if ( _integralPartSize < 0 ) {
 			_canonical.realloc( chunk_size<i32_t>( _leafCount - _integralPartSize ) );
 			data = _canonical.get<i32_t>();
-			::memmove( data - _integralPartSize, data, chunk_size<i32_t>( _leafCount ) );
-			::memset( data, 0, chunk_size<i32_t>( - _integralPartSize ) );
+			::memmove( data - _integralPartSize, data, static_cast< ::size_t>( chunk_size<i32_t>( _leafCount ) ) );
+			::memset( data, 0, static_cast< ::size_t>( chunk_size<i32_t>( - _integralPartSize ) ) );
 			_leafCount -= _integralPartSize;
 			_integralPartSize = 0;
 		} else if ( _integralPartSize > _leafCount ) {
@@ -909,7 +906,7 @@ void HNumber::divide_by_leaf( i32_t leaf_, size_t shift_ ) {
 		remainder = x % leaf_;
 	}
 	if ( ! data[0] && ( _integralPartSize > 0 ) ) {
-		::memmove( data, data + 1, chunk_size<i32_t>( _leafCount - 1 ) );
+		::memmove( data, data + 1, static_cast< ::size_t>( chunk_size<i32_t>( _leafCount - 1 ) ) );
 		-- _integralPartSize;
 		-- _leafCount;
 	}
@@ -1020,7 +1017,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				while ( ( shift < _leafCount ) && ! dividend[ shift ] )
 					++ shift;
 				size_t divSampleLen( min( _leafCount - shift, divisorLeafCount ) ); /* Index of the next leaf to process */
-				::memcpy( dividendSample, dividend + shift, chunk_size<i32_t>( divSampleLen ) );
+				::memcpy( dividendSample, dividend + shift, static_cast< ::size_t>( chunk_size<i32_t>( divSampleLen ) ) );
 				size_t dividendLeafNo( divSampleLen + shift );
 				/*
 				 * Number of leafs in quotient before leaf point.
@@ -1030,7 +1027,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				size_t quotientLeafNo( 0 ); /* Index of currently guessed quotient leaf. */
 				if ( integralPart < 0 ) {
 					_cache.realloc( chunk_size<i32_t>( quotientLeafNo - integralPart ) );
-					::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( -integralPart ) );
+					::memset( _cache.get<i32_t>() + quotientLeafNo, 0, static_cast< ::size_t>( chunk_size<i32_t>( -integralPart ) ) );
 					quotientLeafNo -= integralPart;
 					integralPart = 0;
 				}
@@ -1050,7 +1047,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					if ( shift > 0 ) {
 						divSampleLen -= shift;
 						if ( divSampleLen > 0 )
-							::memmove( dividendSample, dividendSample + shift, chunk_size<i32_t>( divSampleLen ) );
+							::memmove( dividendSample, dividendSample + shift, static_cast< ::size_t>( chunk_size<i32_t>( divSampleLen ) ) );
 					}
 
 					/*
@@ -1069,7 +1066,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 								dividendLeafNo += shift;
 							}
 							size_t compensationLen( min( _leafCount - dividendLeafNo, divisorLeafCount - divSampleLen ) );
-							::memcpy( dividendSample + divSampleLen, dividend + dividendLeafNo, chunk_size<i32_t>( compensationLen ) );
+							::memcpy( dividendSample + divSampleLen, dividend + dividendLeafNo, static_cast< ::size_t>( chunk_size<i32_t>( compensationLen ) ) );
 							dividendLeafNo += compensationLen;
 							divSampleLen += compensationLen;
 						} else if ( divSampleLen == 0 ) {
@@ -1083,7 +1080,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					 */
 					if ( divSampleLen < divisorLeafCount ) {
 						size_t compensationLen( divisorLeafCount - divSampleLen );
-						::memset( dividendSample + divSampleLen, 0, chunk_size<i32_t>( compensationLen ) );
+						::memset( dividendSample + divSampleLen, 0, static_cast< ::size_t>( chunk_size<i32_t>( compensationLen ) ) );
 						divSampleLen = divisorLeafCount;
 						dividendLeafNo += compensationLen;
 					}
@@ -1106,7 +1103,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 						zfill = dividendLeafNo - zfill - 1;
 						if ( zfill > 0 ) {
 							_cache.realloc( chunk_size<i32_t>( quotientLeafNo + zfill ) );
-							::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( zfill ) );
+							::memset( _cache.get<i32_t>() + quotientLeafNo, 0, static_cast< ::size_t>( chunk_size<i32_t>( zfill ) ) );
 							quotientLeafNo += zfill;
 						}
 					}
@@ -1150,11 +1147,11 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					 * A helper for mutate_addition.
 					 * The substraction is done `in place'.
 					 */
-					::memcpy( multiplierSample + 1, divisor, chunk_size<i32_t>( divisorLeafCount ) );
+					::memcpy( multiplierSample + 1, divisor, static_cast< ::size_t>( chunk_size<i32_t>( divisorLeafCount ) ) );
 					multiplierSample[0] = multiply_by_leaf_low( multiplierSample + 1, divisorLeafCount, static_cast<i32_t>( leaf ) );
 					if ( ( multiplierSample[0] && ! extra ) || ( leafcmp( divisor, multiplierSample + ( divSampleLen == divisorLeafCount ? 1 : 0 ), divisorLeafCount ) < 0 ) ) {
 						-- leaf;
-						::memcpy( multiplierSample + 1, divisor, chunk_size<i32_t>( divisorLeafCount ) );
+						::memcpy( multiplierSample + 1, divisor, static_cast< ::size_t>( chunk_size<i32_t>( divisorLeafCount ) ) );
 						multiplierSample[0] = multiply_by_leaf_low( multiplierSample + 1, divisorLeafCount, static_cast<i32_t>( leaf ) );
 					}
 					i32_t const* addends[] = { dividendSample, multiplierSample + ( divSampleLen == divisorLeafCount ? 1 : 0 ) };
@@ -1168,7 +1165,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				_integralPartSize = integralPart;
 				_leafCount = ( integralPart > quotientLeafNo ? integralPart : quotientLeafNo );
 				if ( quotientLeafNo < _leafCount )
-					::memset( _cache.get<i32_t>() + quotientLeafNo, 0, chunk_size<i32_t>( _leafCount - quotientLeafNo ) );
+					::memset( _cache.get<i32_t>() + quotientLeafNo, 0, static_cast< ::size_t>( chunk_size<i32_t>( _leafCount - quotientLeafNo ) ) );
 				_negative = ! ( ( _negative && normalizedDivisor._negative ) || ! ( _negative || normalizedDivisor._negative ) );
 				_canonical.swap( _cache );
 				normalize( exact && dividendExact && divisorExact );
@@ -1251,7 +1248,7 @@ void HNumber::normalize( bool updatePrecision_ ) {
 	if ( shift ) {
 		_integralPartSize -= shift;
 		_leafCount -= shift;
-		::memmove( res, res + shift, chunk_size<i32_t>( _leafCount ) );
+		::memmove( res, res + shift, static_cast< ::size_t>( chunk_size<i32_t>( _leafCount ) ) );
 	}
 	while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) )
 		-- _leafCount;
@@ -1309,7 +1306,7 @@ HNumber::size_t HNumber::karatsuba( HChunk& result, i32_t const* fx, size_t fxs,
 		if ( fxs > m )
 			mutate_addition( hx, m + 1, addends, missingIntegral, NULL, false );
 		else
-			::memcpy( hx + m + 1 - fxs, fx, chunk_size<i32_t>( fxs ) );
+			::memcpy( hx + m + 1 - fxs, fx, static_cast< ::size_t>( chunk_size<i32_t>( fxs ) ) );
 		/* hy */
 		missingIntegral[ 0 ] = 2 * m - fys;
 		addends[ 0 ] = fy;
@@ -1317,13 +1314,13 @@ HNumber::size_t HNumber::karatsuba( HChunk& result, i32_t const* fx, size_t fxs,
 		if ( fys > m )
 			mutate_addition( hy, m + 1, addends, missingIntegral, NULL, false );
 		else
-			::memcpy( hy + m + 1 - fys, fy, chunk_size<i32_t>( fys ) );
+			::memcpy( hy + m + 1 - fys, fy, static_cast< ::size_t>( chunk_size<i32_t>( fys ) ) );
 		/* find Z */
 		HChunk Z;
 		size_t Zs( karatsuba( Z, hx, m + 1, hy, m + 1 ) );
 		/* combine all results */
 		i32_t* const res( buffer.get<i32_t>() + 1 ); /* Z*B^m can possibly (front)overflow buffer of size = fxs + fys, hence + 1 in allocation and here. */
-		::memset( res, 0, chunk_size<i32_t>( size ) );
+		::memset( res, 0, static_cast< ::size_t>( chunk_size<i32_t>( size ) ) );
 
 		/* res = Z*B^m + r */
 		i32_t const* p( Z.get<i32_t>() );
@@ -1337,10 +1334,10 @@ HNumber::size_t HNumber::karatsuba( HChunk& result, i32_t const* fx, size_t fxs,
 		missingIntegral[ 0 ] = Zs - rs + m;
 		missingIntegral[ 1 ] = 0;
 		if ( addends[ 0 ] ) {
-			::memcpy( res + size - rs, r.raw(), chunk_size<i32_t>( rs ) );
+			::memcpy( res + size - rs, r.raw(), static_cast< ::size_t>( chunk_size<i32_t>( rs ) ) );
 			mutate_addition( res + size - m - Zs - 1, Zs + 1, addends, missingIntegral, NULL, false );
 		} else
-			::memcpy( res + size - m - Zs, p, chunk_size<i32_t>( Zs ) );
+			::memcpy( res + size - m - Zs, p, static_cast< ::size_t>( chunk_size<i32_t>( Zs ) ) );
 
 		/* res += r2m*B^2m */
 		Zs = r2ms;
@@ -1374,7 +1371,7 @@ HNumber::size_t HNumber::karatsuba( HChunk& result, i32_t const* fx, size_t fxs,
 			missingIntegral[ 1 ] = size - rs - m - ncar;
 			mutate_addition( res - car, size - m + car, addends, missingIntegral, NULL, true );
 		}
-		::memcpy( result.get<i32_t>() + totalShift, res + 1, chunk_size<i32_t>( leafCount - totalShift ) );
+		::memcpy( result.get<i32_t>() + totalShift, res + 1, static_cast< ::size_t>( chunk_size<i32_t>( leafCount - totalShift ) ) );
 	} else if ( ( fxrl > 0 ) && ( fyrl > 0 ) ) {
 /* variables for mutate_addition() */
 		result.realloc( chunk_size<i32_t>( leafCount = fxs + fys ) );
@@ -1516,7 +1513,7 @@ void HNumber::add_leaf_low( size_t from_, i32_t leaf_ ) {
 	if ( carrier > 0 ) {
 		_canonical.realloc( chunk_size<i32_t>( _leafCount + 1 ) );
 		data = _canonical.get<i32_t>();
-		::memmove( data + 1, data, chunk_size<i32_t>( _leafCount ) );
+		::memmove( data + 1, data, static_cast< ::size_t>( chunk_size<i32_t>( _leafCount ) ) );
 		++ _integralPartSize;
 		++ _leafCount;
 		data[0] = carrier;

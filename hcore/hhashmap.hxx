@@ -136,7 +136,6 @@ public:
 	}
 	HHashMap& operator = ( HHashMap const& map_ ) {
 		M_PROLOG
-		int i( 0 );
 		if ( &map_ != this ) {
 			HHashMap tmp( map_ );
 			swap( tmp );

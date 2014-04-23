@@ -196,7 +196,6 @@ public:
 	}
 	HVector& operator /= ( value_type const& scalar_ ) {
 		M_PROLOG
-		int long size = _data.size();
 		if ( scalar_ )
 			yaal::transform( _data.begin(), _data.end(), _data.begin(), bind2nd( yaal::divides<value_type>(), scalar_ ) );
 		return ( *this );

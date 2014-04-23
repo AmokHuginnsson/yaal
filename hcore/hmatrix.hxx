@@ -164,7 +164,6 @@ HMatrix<value_type>::HMatrix( int const rows_, int const columns_ )
 	: _rows( rows_ ), _columns( columns_ ),
 	_data( _rows, row_t( columns_ ) ) {
 	M_PROLOG
-	int ctr = 0;
 	if ( rows_ < 1 )
 		M_THROW( _errMsgHMatrix_[ ERROR::BAD_ROWS ], rows_ );
 	else

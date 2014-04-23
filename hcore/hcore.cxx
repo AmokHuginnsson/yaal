@@ -213,7 +213,7 @@ void init_locale( char const* const package_ ) {
 
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
-static int long const FWD_RLIM_INFINITY = RLIM_INFINITY;
+static int long const FWD_RLIM_INFINITY = static_cast<int long>( RLIM_INFINITY );
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 

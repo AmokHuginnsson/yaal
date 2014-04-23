@@ -183,7 +183,6 @@ public:
 	}
 	HHashMultiSet& operator = ( HHashMultiSet const& set_ ) {
 		M_PROLOG
-		int i( 0 );
 		if ( &set_ != this ) {
 			HHashMultiSet tmp( set_ );
 			swap( tmp );

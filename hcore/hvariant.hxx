@@ -165,7 +165,7 @@ HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_
 		case ( 18 ): new ( _mem ) t18_t( *reinterpret_cast<t18_t const*>( v._mem ) ); break;
 		case ( 19 ): new ( _mem ) t19_t( *reinterpret_cast<t19_t const*>( v._mem ) ); break;
 		case ( 20 ): new ( _mem ) t20_t( *reinterpret_cast<t20_t const*>( v._mem ) ); break;
-		default: M_ASSERT( ! "Absurd type number." ); break;
+		default: M_ASSERT( 0 && "Absurd type number." ); break;
 	}
 	_type = v._type;
 }
@@ -242,7 +242,7 @@ void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
 		case ( 18 ): new ( mem_ ) t18_t(); break;
 		case ( 19 ): new ( mem_ ) t19_t(); break;
 		case ( 20 ): new ( mem_ ) t20_t(); break;
-		default: M_ASSERT( ! "Absurd type number." ); break;
+		default: M_ASSERT( 0 && "Absurd type number." ); break;
 	}
 }
 
@@ -282,7 +282,7 @@ void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
 			case ( 18 ): reinterpret_cast<t18_t*>( mem_ )->~t18_t(); break;
 			case ( 19 ): reinterpret_cast<t19_t*>( mem_ )->~t19_t(); break;
 			case ( 20 ): reinterpret_cast<t20_t*>( mem_ )->~t20_t(); break;
-			default: M_ASSERT( ! "Absurd type number." ); break;
+			default: M_ASSERT( 0 && "Absurd type number." ); break;
 		}
 	} catch ( yaal::hcore::HException& e ) {
 		e.log( __FILE__, __LINE__, __PRETTY_FUNCTION__ );
@@ -348,7 +348,7 @@ void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
 		case ( 18 ): swap( *reinterpret_cast<t18_t*>( a_ ), *reinterpret_cast<t18_t*>( b_ ) ); break;
 		case ( 19 ): swap( *reinterpret_cast<t19_t*>( a_ ), *reinterpret_cast<t19_t*>( b_ ) ); break;
 		case ( 20 ): swap( *reinterpret_cast<t20_t*>( a_ ), *reinterpret_cast<t20_t*>( b_ ) ); break;
-		default: M_ASSERT( ! "Absurd type number." ); break;
+		default: M_ASSERT( 0 && "Absurd type number." ); break;
 	}
 	
 }

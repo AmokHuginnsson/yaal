@@ -101,9 +101,9 @@ HComplex& HComplex::set( double long real_, double long imaginary_ ) {
 double long HComplex::modulus( void ) const {
 	M_PROLOG
 	double long mod( 0 );
-	if ( ! _imaginary )
+	if ( _imaginary == 0.0l )
 		mod = _real;
-	else if ( ! _real )
+	else if ( _real == 0.0l )
 		mod = _imaginary;
 	else mod = square_root( _real * _real + _imaginary * _imaginary );
 	return ( mod );
@@ -129,7 +129,7 @@ double long HComplex::argument( void ) const {
 	else if ( reZero && ( _imaginary < 0 ) )
 		arg = -PI / 2.L;
 	else {
-		M_ASSERT( ! "bad code path" );
+		M_ASSERT( 0 && "bad code path" );
 	}
 	return ( arg );
 	M_EPILOG
@@ -200,7 +200,7 @@ HComplex& HComplex::operator *= ( double long value_ ) {
 HComplex& HComplex::operator /= ( HComplex const& complex_ ) {
 	M_PROLOG
 	double long denominator( complex_._real * complex_._real + complex_._imaginary * complex_._imaginary );
-	if ( ! denominator )
+	if ( denominator == 0.0l )
 		M_THROW( "denominator equals 0", errno );
 	double long real( ( _real * complex_._real + _imaginary * complex_._imaginary ) / denominator );
 	double long imaginary( ( complex_._real * _imaginary - _real * complex_._imaginary ) / denominator );
@@ -211,7 +211,7 @@ HComplex& HComplex::operator /= ( HComplex const& complex_ ) {
 
 HComplex& HComplex::operator /= ( double long value_ ) {
 	M_PROLOG
-	if ( ! value_ )
+	if ( value_ == 0.0l )
 		M_THROW( "denominator equals 0", errno );
 	_real /= value_;
 	_imaginary /= value_;
