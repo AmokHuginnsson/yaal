@@ -71,7 +71,7 @@ private:
 			/* Create linked list of free object memory places. */
 			char unsigned* p( reinterpret_cast<char unsigned*>( _mem ) );
 			for ( int i( 0 ); i < OBJECTS_PER_BLOCK; ++ i, p += OBJECT_SPACE ) {
-				*p = i + 1;
+				*p = static_cast<char unsigned>( i + 1 );
 				*( p + OBJECT_SPACE - 1 ) = i;
 			}
 		}

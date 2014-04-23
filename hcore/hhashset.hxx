@@ -161,7 +161,6 @@ public:
 	}
 	HHashSet& operator = ( HHashSet const& set_ ) {
 		M_PROLOG
-		int i( 0 );
 		if ( &set_ != this ) {
 			HHashSet tmp( set_ );
 			swap( tmp );

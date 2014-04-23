@@ -62,17 +62,17 @@ void free0( void* ) throw();
 
 template<typename tType>
 inline tType* alloc( int long count_ ) {
-	return ( static_cast<tType*>( alloc( count_ * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( alloc( count_ * static_cast<int>( sizeof ( tType ) ) ) ) );
 }
 
 template<typename tType>
 inline tType* calloc( int long count_ ) {
-	return ( static_cast<tType*>( calloc( count_ * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( calloc( count_ * static_cast<int>( sizeof ( tType ) ) ) ) );
 }
 
 template<typename tType>
 inline tType* realloc( void* pointer_, int long count_ ) {
-	return ( static_cast<tType*>( realloc( pointer_, count_ * sizeof ( tType ) ) ) );
+	return ( static_cast<tType*>( realloc( pointer_, count_ * static_cast<int>( sizeof ( tType ) ) ) ) );
 }
 
 template<typename tType>

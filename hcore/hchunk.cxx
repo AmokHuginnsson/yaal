@@ -97,7 +97,7 @@ void* HChunk::realloc( int long size_, STRATEGY::enum_t strategy_ ) {
 			M_ASSERT( strategy_ == STRATEGY::EXACT );
 		}
 		_data = memory::realloc<char>( _data, size_ );
-		::memset( static_cast<char*>( _data ) + _size, 0, size_ - _size );
+		::memset( static_cast<char*>( _data ) + _size, 0, static_cast<size_t>( size_ - _size ) );
 		_size = size_;
 	}
 	return ( _data );

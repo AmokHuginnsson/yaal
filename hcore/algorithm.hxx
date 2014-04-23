@@ -1745,7 +1745,6 @@ template<typename iterator_t, typename predicate_t>
 inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, predicate_t predicate_,
 		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
 	typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
-	int long auzSize( aux_.get_size() );
 	value_t* aux( aux_.begin() );
 	value_t* auxEnd( aux_.end() );
 	iterator_t it( first_ );

@@ -127,7 +127,7 @@ HPair<int, char const*> preparse_integer( HString const& str_, char* alternate_ 
 				end = ( len + 1 - offset );
 			if ( end >= ( MAX_VALID_INTEGER_LENGTH - offset ) )
 				M_THROW( "number too long: " + str_, end );
-			strncpy( dst, src, end );
+			::strncpy( dst, src, static_cast<size_t>( end ) );
 			dst[end] = 0;
 			str = alternate_;
 		}

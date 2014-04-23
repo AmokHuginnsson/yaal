@@ -77,7 +77,7 @@ i64_t HClock::get_time_elapsed( UNIT::unit_t unit_ ) const {
 		case ( UNIT::NANOSECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * NANO_IN_WHOLE + time.tv_nsec; break;
 		case ( UNIT::MICROSECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * MICRO_IN_WHOLE + time.tv_nsec / NANO_IN_MICRO; break;
 		case ( UNIT::MILISECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * MILI_IN_WHOLE + time.tv_nsec / NANO_IN_MILI; break;
-		default: M_ASSERT( ! "bad HClock::UNIT!" ); break;
+		default: M_ASSERT( 0 && "bad HClock::UNIT!" ); break;
 	}
 	return ( elapsed );
 	M_EPILOG

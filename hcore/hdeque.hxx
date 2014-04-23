@@ -599,7 +599,6 @@ void HDeque<type_t, allocator_t>::resize( int long size_, type_t const& fillWith
 			new ( chunks[ i / VALUES_PER_CHUNK ] + ( i % VALUES_PER_CHUNK ) ) value_type( fillWith_ );
 	} else if ( size_ < _size ) {
 		value_type** chunks = _chunks.get<value_type*>();
-		bool chunkStart( false );
 		for ( int long i( _start + size_ ), last( _start + _size ); i < last; ++ i )
 			M_SAFE( chunks[ i / VALUES_PER_CHUNK ][ i % VALUES_PER_CHUNK ].~value_type() );
 		for ( int long i( ( ( ( _start + size_ - 1 ) >= _start ? ( _start + size_ - 1 ) : _start + size_ ) / VALUES_PER_CHUNK ) + ( size_ ? 1 : 0 ) ),
