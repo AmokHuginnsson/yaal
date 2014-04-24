@@ -333,14 +333,16 @@ void show_help( void* arg ) {
 "Mandatory arguments to long options are mandatory for short options too.\n"
 "Options:\n",
 			info._name, info._syntax ? info._syntax : "[OPTION]... [FILE]...", info._name, info._intro );
-	size_t longestLongLength( 0 );
-	size_t longestShortLength( 0 );
+	int longestLongLength( 0 );
+	int longestShortLength( 0 );
 	HProgramOptionsHandler::options_t const& opts( info._opt.get_options() );
 	for ( HProgramOptionsHandler::options_t::const_iterator it( opts.begin() ), end( opts.end() );
 			it != end; ++ it ) {
 		HProgramOptionsHandler::OOption const& o = *it;
 		/* + 2 for --, + 1 for =, 2 for [] */
-		size_t tmp = ( o._name ? ::strlen( o._name ) + 2 : 0 ) + ( o._argument ? ::strlen( o._argument ) + 1 : 0 ) + ( o._switchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL ? 2 : 0 );
+		int tmp( static_cast<int>( ( o._name ? ::strlen( o._name ) + 2 : 0 )
+					+ ( o._argument ? ::strlen( o._argument ) + 1 : 0 )
+					+ ( o._switchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL ? 2 : 0 ) ) );
 		if ( tmp > longestLongLength )
 			longestLongLength = tmp;
 		if ( is_byte( it->_shortForm ) )
@@ -350,7 +352,7 @@ void show_help( void* arg ) {
 	char const* description( NULL );
 	char const* envColumns( ::getenv( "COLUMNS" ) );
 	int const columns( envColumns ? xmath::clip( 80, lexical_cast<int>( envColumns ), 128 ): 80 );
-	int cols( static_cast<int>( columns - ( longestLongLength + longestShortLength + 2 + 2 + 2 ) ) );
+	int cols( columns - ( longestLongLength + longestShortLength + 2 + 2 + 2 ) );
 	/* display each option description */
 	int const COUNT = static_cast<int>( opts.size() );
 	for ( int i( 0 ); i < COUNT; ++ i ) {
