@@ -60,6 +60,8 @@ public:
 	yaal::hcore::HString get_user( void ) const;
 	yaal::hcore::HString get_group( void ) const;
 	int get_permissions( void ) const;
+	int get_uid( void ) const;
+	int get_gid( void ) const;
 	HIterator begin( void );
 	HIterator end( void );
 	bool operator ! ( void ) const;

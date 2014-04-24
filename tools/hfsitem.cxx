@@ -96,7 +96,7 @@ int HFSItem::get_permissions( void ) const {
 	M_PROLOG
 	struct stat s;
 	do_stat( &s );
-	return ( s.st_mode );
+	return ( static_cast<int>( s.st_mode ) );
 	M_EPILOG
 }
 
@@ -143,19 +143,31 @@ HString HFSItem::get_name( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString HFSItem::get_user( void ) const {
+int HFSItem::get_uid( void ) const {
 	M_PROLOG
 	struct stat s;
 	do_stat( &s );
-	return ( system::get_user_name( s.st_uid ) );
+	return ( static_cast<int>( s.st_uid ) );
+	M_EPILOG
+}
+
+int HFSItem::get_gid( void ) const {
+	M_PROLOG
+	struct stat s;
+	do_stat( &s );
+	return ( static_cast<int>( s.st_gid ) );
+	M_EPILOG
+}
+
+yaal::hcore::HString HFSItem::get_user( void ) const {
+	M_PROLOG
+	return ( system::get_user_name( get_uid() ) );
 	M_EPILOG
 }
 
 yaal::hcore::HString HFSItem::get_group( void ) const {
 	M_PROLOG
-	struct stat s;
-	do_stat( &s );
-	return ( system::get_group_name( s.st_gid ) );
+	return ( system::get_group_name( get_gid() ) );
 	M_EPILOG
 }
 
@@ -226,7 +238,7 @@ HFSItem::HIterator::HIterator( HIterator const& it_ ) : _path( it_._path ), _dir
 		if ( !! it_._dirEnt ) {
 			int const DIRENT_SIZE( dirent_size( _path.raw() ) );
 			_dirEnt = make_pointer<HChunk>( DIRENT_SIZE );
-			::memcpy( _dirEnt->get<void>(), it_._dirEnt->get<void>(), DIRENT_SIZE );
+			::memcpy( _dirEnt->get<void>(), it_._dirEnt->get<void>(), static_cast<size_t>( DIRENT_SIZE ) );
 		}
 		_item.set_path( it_._item._path, it_._item._nameLen );
 	}
