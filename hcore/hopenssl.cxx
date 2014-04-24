@@ -61,8 +61,8 @@ namespace openssl_helper {
  * \return Error message.
  */
 inline HString& format_error_message( HString& buffer_, int err = 0 ) {
-	int long code( 0 );
-	buffer_ = err ? ERR_error_string( err, NULL ) : "";
+	int long unsigned code( 0 );
+	buffer_ = err ? ERR_error_string( static_cast<unsigned int>( err ), NULL ) : "";
 	while ( ( code = ERR_get_error() ) )
 		buffer_.append( ( buffer_.is_empty() ? "" : "\n" ) ).append( ERR_error_string( code, NULL ) );
 	return ( buffer_ );
@@ -79,14 +79,14 @@ HOpenSSL::OSSLContext::OSSLContext( void ) : _context( NULL ), _users( 0 ) {
 
 
 inline int long unsigned get_thread_id( void ) {
-	return ( HThread::get_id() );
+	return ( static_cast<int long unsigned>( HThread::get_id() ) );
 }
 
 namespace {
 
 int bio_read( BIO* bio_, char* buf_, int size_ ) {
 	M_PROLOG
-	int nRead( static_cast<int>( ::read( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, size_ ) ) );
+	int nRead( static_cast<int>( ::read( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, static_cast<size_t>( size_ ) ) ) );
 	if ( ( nRead < 0 ) && ( errno == EAGAIN ) )
 		BIO_set_retry_read( bio_ );
 	else
@@ -97,7 +97,7 @@ int bio_read( BIO* bio_, char* buf_, int size_ ) {
 
 int bio_write( BIO* bio_, char const* buf_, int size_ ) {
 	M_PROLOG
-	int nWritten( static_cast<int>( ::write( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, size_ ) ) );
+	int nWritten( static_cast<int>( ::write( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, static_cast<size_t>( size_ ) ) ) );
 	if ( ( nWritten < 0 ) && ( errno == EAGAIN ) )
 		BIO_set_retry_write( bio_ );
 	else
@@ -109,7 +109,7 @@ int bio_write( BIO* bio_, char const* buf_, int size_ ) {
 int bio_puts( BIO*, char const* ) __attribute__(( __noreturn__ ));
 int bio_puts( BIO*, char const* ) {
 	M_PROLOG
-	M_ENSURE( ! "BIO_puts call not implemented!" );
+	M_ENSURE( 0 && "BIO_puts call not implemented!" );
 #ifdef __MSVCXX__
 	return ( -1 );
 #endif /* #ifdef __MSVCXX__ */
@@ -119,7 +119,7 @@ int bio_puts( BIO*, char const* ) {
 int bio_gets( BIO*, char*, int ) __attribute__(( __noreturn__ ));
 int bio_gets( BIO*, char*, int ) {
 	M_PROLOG
-	M_ENSURE( ! "BIO_gets call not implemented!" );
+	M_ENSURE( 0 && "BIO_gets call not implemented!" );
 #ifdef __MSVCXX__
 	return ( -1 );
 #endif /* #ifdef __MSVCXX__ */
@@ -220,7 +220,7 @@ HOpenSSL::OSSLContext::~OSSLContext( void ) {
 	_context = NULL;
 	-- _instances;
 	if ( _instances == 0 ) {
-		ERR_remove_state( system::getpid() );
+		ERR_remove_state( static_cast<int unsigned>( system::getpid() ) );
 		ERR_remove_state( 0 );
 		ENGINE_cleanup();
 		CONF_modules_finish();

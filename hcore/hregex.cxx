@@ -145,7 +145,7 @@ HString const& HRegex::error( void ) const {
 			int long size( static_cast<int long>( ::regerror( _lastError, _compiled.get<regex_t>(), NULL, 0 ) ) + 1 );
 			_errorBuffer.realloc( size + 1 );
 			M_ENSURE( static_cast<int>( ::regerror( _lastError, _compiled.get<regex_t>(),
-							_errorBuffer.get<char>(), size ) ) < size );
+							_errorBuffer.get<char>(), static_cast<size_t>( size ) ) ) < size );
 			_errorMessage = _errorBuffer.get<char>();
 			if ( ! _errorCause.is_empty() ) {
 				_errorMessage += ": `";

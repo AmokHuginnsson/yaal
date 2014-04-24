@@ -121,7 +121,7 @@ void HRandomizer::init( u64_t seed_ ) {
 	M_PROLOG
 	_state[0] = seed_;
 	for ( _index = 1; _index < STATE_SIZE; ++ _index ) 
-		_state[_index] = ( 6364136223846793005ull * ( _state[_index-1] ^ ( _state[_index - 1] >> 62 ) ) + _index );
+		_state[_index] = ( 6364136223846793005ull * ( _state[_index-1] ^ ( _state[_index - 1] >> 62 ) ) + static_cast<u64_t>( _index ) );
 	return;
 	M_EPILOG
 }
@@ -133,7 +133,7 @@ void HRandomizer::init( u64_t const* state_, int stateSize_ ) {
 	int j( 0 );
 	int k( ( STATE_SIZE > stateSize_ ? STATE_SIZE : stateSize_ ) );
 	for ( ; k; -- k ) {
-		_state[i] = ( _state[i] ^ ( ( _state[i - 1] ^ ( _state[i - 1] >> 62 ) ) * 3935559000370003845ull ) ) + state_[j] + j; /* non linear */
+		_state[i] = ( _state[i] ^ ( ( _state[i - 1] ^ ( _state[i - 1] >> 62 ) ) * 3935559000370003845ull ) ) + state_[j] + static_cast<u64_t>( j ); /* non linear */
 		++ i;
 		++ j;
 		if ( i >= STATE_SIZE ) {
@@ -144,7 +144,7 @@ void HRandomizer::init( u64_t const* state_, int stateSize_ ) {
 			j = 0;
 	}
 	for ( k = STATE_SIZE - 1; k; -- k ) {
-		_state[i] = ( _state[i] ^ ( (_state[i - 1] ^ ( _state[i - 1] >> 62 ) ) * 2862933555777941757ull ) ) - i; /* non linear */
+		_state[i] = ( _state[i] ^ ( (_state[i - 1] ^ ( _state[i - 1] >> 62 ) ) * 2862933555777941757ull ) ) - static_cast<u64_t>( i ); /* non linear */
 		++ i;
 		if ( i >= STATE_SIZE ) {
 			_state[0] = _state[STATE_SIZE - 1];
@@ -196,7 +196,7 @@ HRandomizer make_randomizer( u64_t cap_ ) {
 	M_PROLOG
 		struct timeval tv;
 	M_ENSURE( gettimeofday( &tv, NULL ) == 0 );
-	return ( HRandomizer( tv.tv_sec + tv.tv_usec, cap_ ) );
+	return ( HRandomizer( static_cast<u64_t>( tv.tv_sec + tv.tv_usec ), cap_ ) );
 	M_EPILOG
 }
 

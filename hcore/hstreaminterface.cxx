@@ -376,7 +376,7 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 	if ( _offset ) {
 		int cached( 0 );
 		for ( ; ( cached < _offset ) && ( cached < maxCount_ ); ++ cached ) {
-			if ( ( byDelim = ( ::memchr( set_, buffer[ cached ], setLen ) ? isStopSet_ : ! isStopSet_ ) ) )
+			if ( ( byDelim = ( ::memchr( set_, buffer[ cached ], static_cast<size_t>( setLen ) ) ? isStopSet_ : ! isStopSet_ ) ) )
 				break;
 		}
 		if ( ( cached == maxCount_ ) || byDelim ) {
@@ -384,7 +384,7 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 			message_.assign( buffer, nRead );
 			if ( nRead ) {
 				_offset -= static_cast<int>( nRead );
-				::memmove( buffer, buffer + nRead, _offset );
+				::memmove( buffer, buffer + nRead, static_cast<size_t>( _offset ) );
 			}
 			if ( byDelim )
 				++ nRead;
@@ -409,7 +409,7 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 			 * nRead < 0 - an error occured, read opration could be externally interrupted.
 			 */
 		} while ( ( nRead > 0 ) /* We increment _offset only if read succeeded. */
-				&& ( ! ( byDelim = ( ::memchr( set_, buffer[ _offset ++ ], setLen ) ? isStopSet_ : ! isStopSet_ ) ) )
+				&& ( ! ( byDelim = ( ::memchr( set_, buffer[ _offset ++ ], static_cast<size_t>( setLen ) ) ? isStopSet_ : ! isStopSet_ ) ) )
 				&& ( ! ( bySize = ( _offset >= maxCount_ ) ) ) );
 		if ( nRead >= 0 ) {
 			if ( ! nRead )
@@ -451,7 +451,7 @@ HStreamInterface& HStreamInterface::do_input( HString& word ) {
 bool HStreamInterface::read_word( void ) {
 	M_PROLOG
 	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analoguous context */
-	if ( ! _skipWS && ::memchr( _whiteSpace_.data(), HStreamInterface::do_peek(), _whiteSpace_.size() + 1 ) )
+	if ( ! _skipWS && ::memchr( _whiteSpace_.data(), HStreamInterface::do_peek(), static_cast<size_t>( _whiteSpace_.size() + 1 ) ) )
 		_fail = true;
 	else {
 		while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_.data(), false ) < 0 )
@@ -520,7 +520,7 @@ HStreamInterface& HStreamInterface::do_input( char& char_ ) {
 	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analoguous context */
 	char c( 0 );
 	do read( &c, 1 );
-	while ( is_valid() && _skipWS && ::memchr( _whiteSpace_.data(), c, _whiteSpace_.size() + 1 ) );
+	while ( is_valid() && _skipWS && ::memchr( _whiteSpace_.data(), c, static_cast<size_t>( _whiteSpace_.size() + 1 ) ) );
 	char_ = c;
 	return ( *this );
 	M_EPILOG
@@ -530,7 +530,7 @@ HStreamInterface& HStreamInterface::do_input( char unsigned& cu ) {
 	M_PROLOG
 	char ch;
 	HStreamInterface::do_input( ch );
-	cu = ch;
+	cu = static_cast<char unsigned>( ch );
 	return ( *this );
 	M_EPILOG
 }
@@ -641,11 +641,11 @@ int long HStreamInterface::read( void* const buffer_, int long size_ ) {
 	if ( _offset ) {
 		void* buffer( _cache.raw() );
 		if ( _offset > size_ ) {
-			::memcpy( buffer_, buffer, nRead = size_ );
-			::memmove( buffer, static_cast<char const*>( buffer ) + size_, _offset - size_ );
+			::memcpy( buffer_, buffer, static_cast<size_t>( nRead = size_ ) );
+			::memmove( buffer, static_cast<char const*>( buffer ) + size_, static_cast<size_t>( _offset - size_ ) );
 			_offset -= static_cast<int>( size_ );
 		} else {
-			::memcpy( buffer_, buffer, nRead = _offset );
+			::memcpy( buffer_, buffer, static_cast<size_t>( nRead = _offset ) );
 			size_ -= _offset;
 			_offset = 0;
 		}

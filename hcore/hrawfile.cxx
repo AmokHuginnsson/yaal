@@ -117,7 +117,7 @@ int long HRawFile::read_plain( void* const buffer_, int long size_ ) {
 	M_PROLOG
 	if ( _fileDescriptor < 0 )
 		M_THROW( _error_, errno );
-	return ( ::read( _fileDescriptor, buffer_, size_ ) );
+	return ( ::read( _fileDescriptor, buffer_, static_cast<size_t>( size_ ) ) );
 	M_EPILOG
 }
 
@@ -166,7 +166,7 @@ int long HRawFile::write_plain( void const* const buffer_, int long size_ ) {
 			throw HStreamInterfaceException( _( "timeout on write" ) );
 		int long ret = M_TEMP_FAILURE_RETRY( ::write( _fileDescriptor,
 					static_cast<char const* const>( buffer_ ) + iWritten,
-					size_ - iWritten ) );
+					static_cast<size_t>( size_ - iWritten ) ) );
 		if ( ret < 0 ) {
 			iWritten = ret;
 			break;

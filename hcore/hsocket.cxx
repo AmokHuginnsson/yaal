@@ -169,7 +169,7 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 	M_ENSURE( ::setsockopt( _fileDescriptor, SOL_SOCKET, SO_REUSEADDR,
 				reinterpret_cast<char*>( &reuseAddr ), static_cast<int>( sizeof ( reuseAddr ) ) ) == 0 );
 	M_ENSURE_EX( ( ::bind( _fileDescriptor,
-				static_cast<sockaddr*>( _address ), _addressSize ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
+				static_cast<sockaddr*>( _address ), static_cast<socklen_t>( _addressSize ) ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	M_ENSURE_EX( ( ::listen( _fileDescriptor, _maximumNumberOfClients ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	_clients = new ( memory::yaal ) clients_t( _maximumNumberOfClients );
 	_needShutdown = true;
@@ -211,7 +211,7 @@ HSocket::ptr_t HSocket::accept( void ) {
 		M_ENSURE( flags >= 0 );
 		M_ENSURE( ::fcntl( socket->_fileDescriptor, F_SETFL, flags | O_NONBLOCK ) == 0 );
 	}
-	socket->_addressSize = addressSize;
+	socket->_addressSize = static_cast<int>( addressSize );
 	socket->_needShutdown = true;
 	socket->set_timeout( _timeout );
 	::memcpy( socket->_address, address, addressSize );
@@ -228,7 +228,7 @@ void HSocket::connect( yaal::hcore::HString const& address_, int port_ ) {
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
 	int saveErrno( errno );
 	make_address( address_, port_ );
-	int error( ::connect( _fileDescriptor, static_cast<sockaddr*>( _address ), _addressSize ) );
+	int error( ::connect( _fileDescriptor, static_cast<sockaddr*>( _address ), static_cast<socklen_t>( _addressSize ) ) );
 	if ( ( !!( _type & TYPE::NONBLOCKING ) ) && error && ( errno == EINPROGRESS ) ) {
 		int fd( _fileDescriptor );
 		int long timeout( _timeout );
@@ -238,7 +238,7 @@ void HSocket::connect( yaal::hcore::HString const& address_, int port_ ) {
 			socklen_t optLen( static_cast<int>( sizeof ( error ) ) );
 			M_ENSURE( ::getsockopt( _fileDescriptor, SOL_SOCKET, SO_ERROR, &error, &optLen ) == 0 );
 		} else if ( ! timeout )
-			M_ENSURE_EX( ! "connection timedout", !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
+			M_ENSURE_EX( ! "connection timedout"[0], !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	}
 	M_ENSURE_EX( error == 0, !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	errno = saveErrno;

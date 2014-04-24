@@ -59,7 +59,7 @@ int HPipe::get_reader_fd( void ) const {
 
 int long HPipe::do_read( void* const buffer_, int long size_ ) {
 	M_PROLOG
-	return ( ::read( _pipe[ 0 ], buffer_, size_ ) );
+	return ( ::read( _pipe[ 0 ], buffer_, static_cast<size_t>( size_ ) ) );
 	M_EPILOG
 }
 
@@ -71,7 +71,7 @@ int long HPipe::do_write( void const* const buffer_, int long size_ ) {
 	do {
 		nWriteChunk = M_TEMP_FAILURE_RETRY( ::write( _pipe[ 1 ],
 					static_cast<char const* const>( buffer_ ) + nWritten,
-					size_ - nWritten ) );
+					static_cast<size_t>( size_ - nWritten ) ) );
 		nWritten += nWriteChunk;
 	} while ( ( nWriteChunk > 0 ) && ( nWritten < size_ ) );
 	return ( nWritten );

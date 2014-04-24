@@ -229,7 +229,7 @@ public:
 			M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], capacity_ );
 		if ( capacity_ > _capacity ) {
 			int long newCapacity( _capacity ? max( capacity_, _capacity * 2 ) : capacity_ );
-			value_type* newBuf( static_cast<value_type*>( ::operator new ( newCapacity * sizeof ( value_type ), memory::yaal ) ) );
+			value_type* newBuf( static_cast<value_type*>( ::operator new ( static_cast<size_t>( newCapacity * static_cast<int>( sizeof ( value_type ) ) ), memory::yaal ) ) );
 			for ( int long i( 0 ); i < _size; ++ i )
 				new ( newBuf + i ) value_type( _buf[ i ] );
 			for ( int long i( 0 ); i < _size; ++ i )

@@ -106,7 +106,7 @@ static int const ALLOC_BIT_MASK = 128;
 #undef EXT_SET_SIZE
 #define EXT_SET_SIZE( base, size ) do { ( EXT_IS_INPLACE( base ) ? static_cast<int long>( reinterpret_cast<char*>( base )[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) ) : base[ 1 ] = ( size ) ); } while ( 0 )
 #undef GET_ALLOC_BYTES
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : static_cast<int long>( _mem[ 2 ] & ( static_cast<int long unsigned>( -1 ) >> 1 ) ) )
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : static_cast<int long>( static_cast<int long unsigned>( _mem[ 2 ] ) & ( static_cast<int long unsigned>( -1 ) >> 1 ) ) )
 #undef SET_ALLOC_BYTES
 #define SET_ALLOC_BYTES( capacity ) do { _mem[ 2 ] = ( capacity ); reinterpret_cast<char*>( _mem )[ ALLOC_FLAG_INDEX ] = static_cast<char>( reinterpret_cast<char*>( _mem )[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); } while ( 0 )
 
@@ -140,7 +140,7 @@ HString::HString( HString const& string_ )
 	if ( ! string_.is_empty() ) {
 		int long newSize( string_.get_length() );
 		hs_realloc( newSize + 1 );
-		::std::strncpy( MEM, string_.raw(), newSize );
+		::std::strncpy( MEM, string_.raw(), static_cast<size_t>( newSize ) );
 		SET_SIZE( newSize );
 	}
 	return;
@@ -159,7 +159,7 @@ HString::HString( int long preallocate_, char fill_ )
 	: _mem() {
 	M_PROLOG
 	hs_realloc( preallocate_ + 1 );
-	::std::memset( MEM, fill_, preallocate_ );
+	::std::memset( MEM, fill_, static_cast<size_t>( preallocate_ ) );
 	SET_SIZE( fill_ ? preallocate_ : 0 );
 	return;
 	M_EPILOG
@@ -177,11 +177,11 @@ void HString::hs_realloc( int long preallocate_ ) {
 		if ( ! IS_INPLACE ) {
 			*reinterpret_cast<char**>( _mem ) = memory::realloc<char>( MEM, newAllocBytes );
 			SET_ALLOC_BYTES( newAllocBytes );
-			::std::memset( MEM + oldAllocBytes, 0, newAllocBytes - oldAllocBytes );
+			::std::memset( MEM + oldAllocBytes, 0, static_cast<size_t>( newAllocBytes - oldAllocBytes ) );
 		} else {
 			char* newMem( memory::calloc<char>( newAllocBytes ) );
 			int long origSize( GET_SIZE );
-			::std::strncpy( newMem, reinterpret_cast<char*>( _mem ), origSize );
+			::std::strncpy( newMem, reinterpret_cast<char*>( _mem ), static_cast<size_t>( origSize ) );
 			*reinterpret_cast<char**>( _mem ) = newMem;
 			SET_ALLOC_BYTES( newAllocBytes );
 			SET_SIZE( origSize );
@@ -203,7 +203,7 @@ HString::HString( char const* const str_ )
 	if ( str_ ) {
 		int long newSize( static_cast<int long>( ::std::strlen( str_ ) ) );
 		hs_realloc( newSize + 1 );
-		::std::strncpy( MEM, str_, newSize );
+		::std::strncpy( MEM, str_, static_cast<size_t>( newSize ) );
 		SET_SIZE( newSize );
 	}
 	return;
@@ -215,7 +215,7 @@ HString::HString( const_iterator first_, const_iterator last_ )
 	M_PROLOG
 	int long newSize( last_ - first_ );
 	hs_realloc( newSize + 1 );
-	::std::strncpy( MEM, first_, newSize );
+	::std::strncpy( MEM, first_, static_cast<size_t>( newSize ) );
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
 	return;
@@ -227,7 +227,7 @@ HString::HString( iterator first_, iterator last_ )
 	M_PROLOG
 	int long newSize( last_ - first_ );
 	hs_realloc( newSize + 1 );
-	::std::strncpy( MEM, static_cast<const_iterator>( first_ ), newSize );
+	::std::strncpy( MEM, static_cast<const_iterator>( first_ ), static_cast<size_t>( newSize ) );
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
 	return;
@@ -238,9 +238,9 @@ HString::HString( char const* const array_, int long size_ )
 	: _mem() {
 	M_PROLOG
 	if ( array_ ) {
-		int long newSize( static_cast<int long>( ::strnlen( array_, size_ ) ) );
+		int long newSize( static_cast<int long>( ::strnlen( array_, static_cast<size_t>( size_ ) ) ) );
 		hs_realloc( newSize + 1 );
-		::std::strncpy( MEM, array_, newSize );
+		::std::strncpy( MEM, array_, static_cast<size_t>( newSize ) );
 		MEM[ newSize ] = 0;
 		SET_SIZE( newSize );
 	}
@@ -271,7 +271,7 @@ HString::HString( int short shortInt_ ) : _mem() {
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%hd", shortInt_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "%hd", shortInt_ ) == newSize );
+	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%hd", shortInt_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -282,7 +282,7 @@ HString::HString( int short unsigned unsignedShortInt_ ) : _mem() {
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%hu", unsignedShortInt_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "%hu", unsignedShortInt_ ) == newSize );
+	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%hu", unsignedShortInt_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -293,7 +293,7 @@ HString::HString( int int_ ) : _mem() {
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%d", int_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "%d", int_ ) == newSize );
+	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%d", int_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -304,7 +304,7 @@ HString::HString( int unsigned int_ ) : _mem() {
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%u", int_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "%u", int_ ) == newSize );
+	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%u", int_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -315,7 +315,7 @@ HString::HString( int long long_ ) : _mem() {
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%ld", long_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "%ld", long_ ) == newSize );
+	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%ld", long_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -326,7 +326,7 @@ HString::HString( int long unsigned long_ ) : _mem() {
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%lu", long_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "%lu", long_ ) == newSize );
+	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%lu", long_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -337,7 +337,7 @@ HString::HString( int long long longLong_ ) : _mem() {
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%lld", longLong_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "%lld", longLong_ ) == newSize );
+	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%lld", longLong_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -348,7 +348,7 @@ HString::HString( int long long unsigned longLong_ ) : _mem() {
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%llu", longLong_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "%llu", longLong_ ) == newSize );
+	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%llu", longLong_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -359,7 +359,7 @@ HString::HString( double double_ ) : _mem() {
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%f", double_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "%f", double_ ) == newSize );
+	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%f", double_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -370,7 +370,7 @@ HString::HString( double long double_ ) : _mem() {
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%.12Lf", double_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "%.12Lf", double_ ) == newSize );
+	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "%.12Lf", double_ ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -386,7 +386,7 @@ HString::HString( void const* const ptrVoid_ )
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE( ::snprintf( MEM, newSize + 1, "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) == newSize );
+	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) == newSize );
 	SET_SIZE( newSize );
 	return;
 	M_EPILOG
@@ -399,7 +399,7 @@ HString& HString::operator = ( HString const& string_ ) {
 		if ( newSize >= GET_ALLOC_BYTES )
 			hs_realloc( newSize + 1 );
 		if ( newSize )
-			::std::strncpy( MEM, string_.raw(), newSize );
+			::std::strncpy( MEM, string_.raw(), static_cast<size_t>( newSize ) );
 		MEM[ newSize ] = 0;
 		SET_SIZE( newSize );
 	}
@@ -610,7 +610,7 @@ HString& HString::assign( HString const& str_, int long offset_, int long length
 	if ( offset_ < s ) {
 		newSize = ( length_ > ( s - offset_ ) ) ? s - offset_ : length_;
 		hs_realloc( newSize + 1 );
-		::memcpy( MEM, str_.raw() + offset_, newSize );
+		::memcpy( MEM, str_.raw() + offset_, static_cast<size_t>( newSize ) );
 	}
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
@@ -624,9 +624,9 @@ HString& HString::assign( char const* const data_, int long length_ ) {
 		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
 	if ( length_ < 0 )
 		M_THROW( _errMsgHString_[ string_helper::BAD_LENGTH ], length_ );
-	int long newSize( ::strnlen( data_, length_ ) );
+	int long newSize( static_cast<int long>( ::strnlen( data_, static_cast<size_t>( length_ ) ) ) );
 	hs_realloc( newSize + 1 );
-	::memcpy( MEM, data_, newSize );
+	::memcpy( MEM, data_, static_cast<size_t>( newSize ) );
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
 	return ( *this );
@@ -656,7 +656,7 @@ HString& HString::vformat( char const* const format_, void* ap_ ) {
 	__va_copy( orig, *static_cast< ::std::va_list*>( ap_ ) );
 	int long newSize = vsnprintf( NULL, 0, format_, *static_cast< ::std::va_list*>( ap_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE ( vsnprintf( MEM, newSize + 1, format_, orig ) == newSize );
+	M_ENSURE ( vsnprintf( MEM, static_cast<size_t>( newSize + 1 ), format_, orig ) == newSize );
 	SET_SIZE( newSize );
 	va_end( orig );
 	return ( *this );
