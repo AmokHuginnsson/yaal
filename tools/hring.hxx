@@ -531,7 +531,6 @@ void HRing<type_t>::insert( iterator pos_, int long count_, type_t const& value_
 	insert_space( pos_._index, count_ );
 	value_type* arr( _buf.get<value_type>() );
 	for ( int long i( pos_._index + _start ), last( pos_._index + count_ ); i < last; ++ i ) {
-		int long idx( i >= curCapacity ? i - curCapacity : i );
 		new ( arr + i ) value_type( value_ );
 	}
 	return;

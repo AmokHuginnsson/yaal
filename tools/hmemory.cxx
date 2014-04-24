@@ -49,7 +49,8 @@ HMemory::~HMemory( void ) {
 
 bool HMemory::operator == ( HMemory const& other ) const {
 	M_PROLOG
-	return ( ( other._memory.get_size() == _memory.get_size() ) && ( ! memcmp( other._memory.get_memory(), _memory.get_memory(), _memory.get_size() ) ) );
+	return ( ( other._memory.get_size() == _memory.get_size() )
+			&& ( ! ::memcmp( other._memory.get_memory(), _memory.get_memory(), static_cast<size_t>( _memory.get_size() ) ) ) );
 	M_EPILOG
 }
 
@@ -63,11 +64,11 @@ int long HMemory::do_write( void const* const src_, int long size_ ) {
 	if ( ( _cursorWrite + size ) > _memory.get_size() ) {
 		int long part1( _memory.get_size() - _cursorWrite );
 		int long part2( size - part1 );
-		::memcpy( static_cast<char*>( _memory.get_memory() ) + _cursorWrite, src_, part1 );
-		::memcpy( static_cast<char*>( _memory.get_memory() ), static_cast<char const* const>( src_ ) + part1, part2 );
+		::memcpy( static_cast<char*>( _memory.get_memory() ) + _cursorWrite, src_, static_cast<size_t>( part1 ) );
+		::memcpy( static_cast<char*>( _memory.get_memory() ), static_cast<char const* const>( src_ ) + part1, static_cast<size_t>( part2 ) );
 		_cursorWrite = part2;
 	} else {
-		::memcpy( static_cast<char*>( _memory.get_memory() ) + _cursorWrite, src_, size );
+		::memcpy( static_cast<char*>( _memory.get_memory() ) + _cursorWrite, src_, static_cast<size_t>( size ) );
 		_cursorWrite += size;
 	}
 	_valid += size;
@@ -87,11 +88,11 @@ int long HMemory::do_read( void* const dest_, int long size_ ) {
 	if ( ( _cursorRead + size ) > _memory.get_size() ) {
 		int long part1( _memory.get_size() - _cursorRead );
 		int long part2( size - part1 );
-		::memcpy( dest_, static_cast<char*>( _memory.get_memory() ) + _cursorRead, part1 );
-		::memcpy( static_cast<char*>( dest_ ) + part1, static_cast<char*>( _memory.get_memory() ), part2 );
+		::memcpy( dest_, static_cast<char*>( _memory.get_memory() ) + _cursorRead, static_cast<size_t>( part1 ) );
+		::memcpy( static_cast<char*>( dest_ ) + part1, static_cast<char*>( _memory.get_memory() ), static_cast<size_t>( part2 ) );
 		_cursorWrite = part2;
 	} else {
-		::memcpy( dest_, static_cast<char const* const>( _memory.get_memory() ) + _cursorRead, size );
+		::memcpy( dest_, static_cast<char const* const>( _memory.get_memory() ) + _cursorRead, static_cast<size_t>( size ) );
 		_cursorRead += size;
 	}
 	_valid -= size;

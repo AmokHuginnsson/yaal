@@ -138,7 +138,6 @@ void HDes::_des( u32_t* block_, int action_, int part_ ) {
 	u32_t bufT[ DES::BLOCK_SIZE / static_cast<int>( sizeof ( u32_t ) ) ];
 	u32_t bufL[ DES::BLOCK_SIZE / static_cast<int>( sizeof ( u32_t ) ) ];
 	u32_t bufR[ DES::BLOCK_SIZE / static_cast<int>( sizeof ( u32_t ) ) ];
-	u8_t mask( 0 );
 	bufL[ 0 ] = block_[ 0 ];
 	bufR[ 0 ] = block_[ 1 ];
 	bufT[ 0 ] = block_[ 1 ];
@@ -165,12 +164,12 @@ void HDes::_des( u32_t* block_, int action_, int part_ ) {
 			rowBmp.set( 7, src.get( static_cast<u32_t>( ctr ) * 6 + 5 ) );
 			for ( int i( 0 ); i < 4; ++ i )
 				colBmp.set( static_cast<u32_t>( i ) + 4,
-						src.get( static_cast<u32_t>( ctr ) * 6 + i + 1 ) );
-			mask = _sBlock_[ ctr ][ row ][ col ];
+						src.get( static_cast<u32_t>( ctr * 6 + i + 1 ) ) );
+			u8_t mask( _sBlock_[ ctr ][ row ][ col ] );
 			if ( ! ( ctr & 1 ) )
-				mask = static_cast<char>( mask << 4 );
+				mask = static_cast<u8_t>( mask << 4 );
 				/* FIXME g++ 4.3 bug *///mask <<= 4;
-			reinterpret_cast<u8_t*>( buf )[ ctr >> 1 ] = static_cast<char>( reinterpret_cast<u8_t*>( buf )[ ctr >> 1 ] | mask );
+			reinterpret_cast<u8_t*>( buf )[ ctr >> 1 ] = static_cast<u8_t>( reinterpret_cast<u8_t*>( buf )[ ctr >> 1 ] | mask );
 			/* FIXME g++ 4.3 bug *///buf[ ctr >> 1 ] |= mask;
 		}
 		permutate( reinterpret_cast<u8_t*>( buf ), _pBlockPermutation_, 32 );

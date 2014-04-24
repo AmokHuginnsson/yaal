@@ -186,8 +186,8 @@ void HSerial::compile_speed( void ) {
 			break;
 		}
 	}
-	cfsetispeed( &tIO, baudRate );
-	cfsetospeed( &tIO, baudRate );
+	cfsetispeed( &tIO, static_cast< ::speed_t>( baudRate ) );
+	cfsetospeed( &tIO, static_cast< ::speed_t>( baudRate ) );
 	return;
 	M_EPILOG
 }

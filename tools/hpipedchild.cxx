@@ -176,7 +176,7 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 		for ( argv_t::const_iterator it( argv_.begin() ), end( argv_.end() ); it != end; ++ it, ++ i )
 			argv.get<char const*>()[ i ] = it->raw();
 		::execv( argv.get<char const*>()[ 0 ], const_cast<char* const*>( argv.get<char const*>() ) );
-		M_ENSURE( !"execv" );
+		M_ENSURE( !"execv"[0] );
 	} else {
 		close_and_invalidate( fileDesIn[ 0 ] );
 		close_and_invalidate( fileDesOut[ 1 ] );
@@ -193,7 +193,7 @@ int long HPipedChild::do_read( void* const buffer_, int long size_ ) {
 	M_PROLOG
 	M_ASSERT( ( _pipeOut >= 0 ) && ( _pipeErr >= 0 ) );
 	int fd = ( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
-	return ( ::read( fd, buffer_, size_ ) );
+	return ( ::read( fd, buffer_, static_cast<size_t>( size_ ) ) );
 	M_EPILOG
 }
 
@@ -205,7 +205,7 @@ int long HPipedChild::do_write( void const* const string_, int long size_ ) {
 	do {
 		nWriteChunk = M_TEMP_FAILURE_RETRY( ::write( _pipeIn,
 					static_cast<char const* const>( string_ ) + nWritten,
-					size_ - nWritten ) );
+					static_cast<size_t>( size_ - nWritten ) ) );
 		nWritten += nWriteChunk;
 	} while ( ( nWriteChunk > 0 ) && ( nWritten < size_ ) );
 	return ( nWritten );

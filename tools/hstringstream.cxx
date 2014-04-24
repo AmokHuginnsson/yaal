@@ -83,7 +83,7 @@ int long HStringStream::do_read( void* const buffer_, int long size_ ) {
 	int long length( _buffer.get_length() );
 	int long toCopy( yaal::min( length - _offset, size_ ) );
 	if ( length > 0 )
-		::strncpy( static_cast<char* const>( buffer_ ), _buffer.raw() + _offset, toCopy );
+		::strncpy( static_cast<char* const>( buffer_ ), _buffer.raw() + _offset, static_cast<size_t>( toCopy ) );
 	_offset += toCopy;
 	if ( _offset >= length ) {
 		_offset = 0;

@@ -139,7 +139,7 @@ void HBitmap::copy( void const* block_, int long size_ ) {
 	M_ASSERT( size_ > 0 );
 	int long copyBytes = octets_for_bits( size_ );
 	ensure_pool( size_ );
-	::memcpy( block(), block_, copyBytes );
+	::memcpy( block(), block_, static_cast<size_t>( copyBytes ) );
 	return;
 	M_EPILOG
 }
@@ -212,10 +212,10 @@ void HBitmap::fill( int long offset, int long amount, bool bit ) {
 	int long byteOffset = octets_for_bits( offset );
 	int long til = offset + amount;
 	int long byteAmount = ( octets_for_bits( offset + amount ) - byteOffset ) - ( ( offset & 7 ) ? 1 : 0 ) - ( ( til & 7 ) ? 1 : 0 );
-	u8_t filler = static_cast<u8_t>( bit ? 0xff : 0 );
-	char* data = static_cast<char*>( block() );
+	u8_t filler( static_cast<u8_t>( bit ? 0xff : 0 ) );
+	u8_t* data( static_cast<u8_t*>( block() ) );
 	if ( byteAmount > 0 )
-		::memset( data + byteOffset, filler, byteAmount );
+		::memset( data + byteOffset, filler, static_cast<size_t>( byteAmount ) );
 	if ( offset & 7 ) {
 		if ( bit )
 			data[ byteOffset - 1 ] = static_cast<u8_t>( data[ byteOffset - 1 ] | _maskBitKeepRight_[ ( offset & 7 ) - 1 ] );
@@ -242,7 +242,7 @@ void HBitmap::reserve( int long size_ ) {
 bool HBitmap::operator == ( HBitmap const& b ) const {
 	M_PROLOG
 	M_ASSERT( _size == b._size );
-	return ( ( _data == b._data ) || ! ::memcmp( block(), b.block(), octets_for_bits( _size ) ) );
+	return ( ( _data == b._data ) || ! ::memcmp( block(), b.block(), static_cast<size_t>( octets_for_bits( _size ) ) ) );
 	M_EPILOG
 }
 

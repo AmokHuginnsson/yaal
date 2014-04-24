@@ -341,7 +341,7 @@ double long HExpression::multiplication( tree_t::const_node_t node_ ) {
 				leftValue *= rightValue;
 			break;
 			case ( OPERATOR::DIVIDE ) :
-				if ( ! rightValue )
+				if ( rightValue == 0.0l )
 					throw HExpressionException( _( "divide by 0" ) );
 				leftValue /= rightValue;
 			break;
@@ -410,7 +410,7 @@ bool HExpression::translate( HString const& formula_ ) {
 			for ( ctr = 0; ctr < 16; ctr++ )
 				if ( strncmp( formula_.raw() + index,
 							_functionsMnemonics_[ ctr ],
-							_functionMnemonicsLength_[ ctr ] ) == 0 ) {
+							static_cast<size_t>( _functionMnemonicsLength_[ ctr ] ) ) == 0 ) {
 				_formula.set_at( realIndex, static_cast<char>( ctr + 1 ) );
 				break;
 			}

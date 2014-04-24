@@ -202,7 +202,7 @@ int long HZipStream::do_read( void* const buf_, int long size_ ) {
 				break;
 			continue;
 		}
-		::memcpy( static_cast<char*>( buf_ ) + copied, buf + _offset, have );
+		::memcpy( static_cast<char*>( buf_ ) + copied, buf + _offset, static_cast<size_t>( have ) );
 		copied += have;
 		_offset += have;
 	}

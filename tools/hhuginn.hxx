@@ -89,6 +89,8 @@ public:
 	typedef HHuginn::HValue base_type;
 private:
 	int long long _value;
+public:
+	HInteger( int long long );
 };
 
 class HHuginn::HFloat : public HHuginn::HValue {
@@ -97,6 +99,8 @@ public:
 	typedef HHuginn::HValue base_type;
 private:
 	double long _value;
+public:
+	HFloat( double long );
 };
 
 class HHuginn::HString : public HHuginn::HValue {

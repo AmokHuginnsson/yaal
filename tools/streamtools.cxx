@@ -61,11 +61,11 @@ namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 template<typename T>
 inline T fwd_htons( T arg_ ) {
-	return ( htons( arg_ ) );
+	return ( static_cast<T>( htons( static_cast<uint16_t>( arg_ ) ) ) );
 }
 template<typename T>
 inline T fwd_htonl( T arg_ ) {
-	return ( htonl( arg_ ) );
+	return ( static_cast<T>( htonl( static_cast<uint32_t> ( arg_ ) ) ) );
 }
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
@@ -79,7 +79,7 @@ HBinaryFormatter& HBinaryFormatter::operator << ( int short v_ ) {
 
 HBinaryFormatter& HBinaryFormatter::operator << ( int short unsigned v_ ) {
 	M_PROLOG
-	int short v( fwd_htons( v_ ) );
+	int short v( static_cast<int short>( fwd_htons( v_ ) ) );
 	return ( binary( &v, static_cast<int>( sizeof ( v ) ) ) );
 	M_EPILOG
 }
@@ -206,7 +206,7 @@ int long HTee::do_write( void const* const data_, int long size_ ) {
 
 int long HTee::do_read( void* const, int long ) {
 	M_PROLOG
-	M_ASSERT( ! "oparation makes no sense for tee stream" );
+	M_ASSERT( 0 && "oparation makes no sense for tee stream" );
 #ifdef __MSVCXX__
 	return ( -1 );
 #endif /* #ifdef __MSVCXX__ */

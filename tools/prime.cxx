@@ -56,7 +56,7 @@ void find_primes( primes_t& primes_, int long unsigned lowerLimit_, int long uns
 	int long memSize( ( upperLimit_ >> 3 ) + 1 );
 	HChunk mem( memSize );
 	u8_t* sieve( mem.get<u8_t>() );
-	::memset( sieve, 0xff, memSize );
+	::memset( sieve, 0xff, static_cast<size_t>( memSize ) );
 	int long unsigned limit( static_cast<int long unsigned>( square_root( static_cast<double long>( upperLimit_ ) ) ) + 1 );
 	int long unsigned step( 0 );
 	for ( int long unsigned i( 2 ); i <= limit; ++ i ) {
