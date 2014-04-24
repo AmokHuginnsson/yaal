@@ -455,7 +455,7 @@ bool HRuleRef::do_is_optional( void ) const {
 
 void HRuleRef::do_describe( HRuleDescription&, rule_use_t const& ) const {
 	M_PROLOG
-	M_ASSERT( ! "recursive describe on rule reference" );
+	M_ASSERT( 0 && "recursive describe on rule reference" );
 	M_EPILOG
 }
 
@@ -1014,7 +1014,7 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 					stop = true;
 			} break;
 			default: {
-				M_ASSERT( ! "invalid hardcoded state" );
+				M_ASSERT( ! "invalid hardcoded state"[0] );
 			}
 		}
 		if ( stop )
@@ -1164,7 +1164,7 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 					stop = true;
 			} break;
 			default: {
-				M_ASSERT( ! "invalid hardcoded state" );
+				M_ASSERT( ! "invalid hardcoded state"[0] );
 			}
 		}
 		if ( stop )

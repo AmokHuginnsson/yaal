@@ -40,7 +40,10 @@ namespace yaal {
 
 namespace tools {
 
-char const _base64EncodeTable_[][65] = { "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" } ;
+char const _base64EncodeTable_[][65] = {
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_",
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" 
+};
 u8_t _base64DecodeTable_[2][ 256 ];
 
 class HBase64DecodeTableInitializer {
@@ -64,7 +67,7 @@ void do_buf_3_to_4( HString& out, u32_t const& in, int mode, int long pad = 0 ) 
 	buf[ 2 ] = _base64EncodeTable_[mode][ ( in >> 6 ) & 63 ];
 	buf[ 3 ] = _base64EncodeTable_[mode][ in & 63 ];
 	if ( pad )
-		::memset( ( ( buf + sizeof ( buf ) ) - pad ) - 1, '=', pad );
+		::memset( ( ( buf + sizeof ( buf ) ) - pad ) - 1, '=', static_cast<size_t>( pad ) );
 	out += buf;
 	return;
 }
@@ -86,7 +89,7 @@ yaal::hcore::HString base64_raw_encode( char const* ptr, int long length, bool s
 	u32_t coder = 0;
 	for ( int long i = 0; i < length; ++ i ) {
 		int shift = shifts[ i % 3 ];
-		coder |= ( static_cast<u8_t>( ptr[ i ] ) << shift );
+		coder |= ( static_cast<u32_t>( ptr[ i ] ) << shift );
 		if ( ! shift ) {
 			do_buf_3_to_4( output, coder, standardCompliantMode ? 1 : 0 );
 			coder = 0;
@@ -130,7 +133,7 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 		char ch = ptr[ i ];
 		M_ENSURE( is_base64_character( ch, standardCompliantMode ) );
 		int shift = shifts[ i % 4 ];
-		coder |= ( _base64DecodeTable_[standardCompliantMode ? 1 : 0][ static_cast<u8_t>( ptr[ i ] ) ] << shift );
+		coder |= static_cast<u32_t>( ( _base64DecodeTable_[standardCompliantMode ? 1 : 0][ static_cast<u8_t>( ptr[ i ] ) ] ) << shift );
 		if ( ! shift ) {
 			do_buf_4_to_3( output + size, coder );
 			size += 3;
