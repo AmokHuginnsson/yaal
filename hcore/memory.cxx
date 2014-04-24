@@ -41,7 +41,7 @@ ON_ALLOC_FAILURE::on_alloc_failure_t _onAllocFailure_ = ON_ALLOC_FAILURE::ABORT;
 
 void* alloc( int long size_ ) {
 	M_ASSERT( ( size_ > 0 ) && "memory::malloc: requested size lower than 0" );
-	register void* newPtr( ::malloc( size_ ) );
+	register void* newPtr( ::malloc( static_cast<size_t>( size_ ) ) );
 	if ( newPtr == 0 ) {
 		char const msg[] = "memory::malloc: malloc returned NULL";
 		if ( _onAllocFailure_ == ON_ALLOC_FAILURE::ABORT ) {
@@ -55,13 +55,13 @@ void* alloc( int long size_ ) {
 
 void* calloc( int long size_ ) {
 	register void* newPtr( alloc( size_ ) );
-	::memset( newPtr, 0, size_ );
+	::memset( newPtr, 0, static_cast<size_t>( size_ ) );
 	return ( newPtr );
 }
 
 void* realloc( void* ptr_, int long size_ ) {
 	M_ASSERT( ( size_ >= 0 ) && "memory::realloc: requested size lower than 0" );
-	register void* newPtr( ::realloc( ptr_, size_ ) );
+	register void* newPtr( ::realloc( ptr_, static_cast<size_t>( size_ ) ) );
 	if ( newPtr == 0 ) {
 		char const msg[] = "memory::realloc: realloc returned NULL";
 		if ( _onAllocFailure_ == ON_ALLOC_FAILURE::ABORT ) {

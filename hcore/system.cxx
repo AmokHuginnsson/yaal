@@ -142,7 +142,7 @@ HString get_user_name( int uid_ ) {
 		bufferSize = GETPW_R_SIZE;
 	HChunk buffer( bufferSize );
 	passwd* any( NULL );
-	M_ENSURE( ! getpwuid_r( uid_, &accountInfo, buffer.get<char>(), bufferSize, &any ) );
+	M_ENSURE( ! getpwuid_r( static_cast<uid_t>( uid_ ), &accountInfo, buffer.get<char>(), static_cast<size_t>( bufferSize ), &any ) );
 	return ( any ? HString( accountInfo.pw_name ) : HString( uid_ ) );
 	M_EPILOG
 }
@@ -155,7 +155,7 @@ HString get_group_name( int gid_ ) {
 		bufferSize = GETGR_R_SIZE;
 	HChunk buffer( bufferSize );
 	group* any( NULL );
-	M_ENSURE( ! getgrgid_r( gid_, &groupInfo, buffer.get<char>(), bufferSize, &any ) );
+	M_ENSURE( ! getgrgid_r( static_cast<gid_t>( gid_ ), &groupInfo, buffer.get<char>(), static_cast<size_t>( bufferSize ), &any ) );
 	return ( any ? HString( groupInfo.gr_name ) : HString( gid_ ) );
 	M_EPILOG
 }
@@ -242,13 +242,13 @@ HResourceInfo get_memory_size_info( void ) {
 	rlimit rlVM = { 0, 0 };
 	M_ENSURE( ::getrlimit( RLIMIT_AS, &rlVM ) == 0 );
 	if ( ( rlVM.rlim_cur > 0 ) && ( ( static_cast<i64_t>( rlVM.rlim_cur ) - usedMemory ) < availableMemory ) )
-		availableMemory = rlVM.rlim_cur - usedMemory;
+		availableMemory = static_cast<i64_t>( rlVM.rlim_cur ) - usedMemory;
 #endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
 #ifndef __HOST_OS_TYPE_CYGWIN__
 	rlimit rlData = { 0, 0 };
 	M_ENSURE( ::getrlimit( RLIMIT_DATA, &rlData ) == 0 );
 	if ( ( rlData.rlim_cur > 0 ) && ( ( static_cast<i64_t>( rlData.rlim_cur ) - usedMemory ) < availableMemory ) )
-		availableMemory = rlData.rlim_cur - usedMemory;
+		availableMemory = static_cast<i64_t>( rlData.rlim_cur ) - usedMemory;
 #endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 	return ( HResourceInfo( availableMemory, freeMemory, totalMemory ) );
 	M_EPILOG

@@ -47,7 +47,7 @@ struct HUniqueMovableRef {
 	explicit HUniqueMovableRef( tType* obj_, bool owner_ )
 		: _mem(), _owner( owner_ ) {
 		if ( owner_ )
-			::memcpy( _mem, obj_, sizeof ( tType ) );
+			::memcpy( static_cast<void*>( _mem ), static_cast<void*>( obj_ ), sizeof ( tType ) );
 	}
 };
 

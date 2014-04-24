@@ -669,7 +669,7 @@ int long HString::find( char char_, int long after_ ) const {
 		return ( npos );
 	if ( after_ < 0 )
 		after_ = 0;
-	char const* str = static_cast<char const*>( ::std::memchr( ROMEM + after_, char_, GET_SIZE - after_ ) );
+	char const* str = static_cast<char const*>( ::std::memchr( ROMEM + after_, char_, static_cast<size_t>( GET_SIZE - after_ ) ) );
 	if ( ! str )
 		return ( npos );
 	return ( static_cast<int long>( str - ROMEM ) );
@@ -808,7 +808,7 @@ int long HString::reverse_find( char char_, int long before_ ) const {
 		return ( npos );
 	if ( before_ < 0 )
 		before_ = 0;
-	char const* str = static_cast<char const*>( ::memrchr( ROMEM, char_, GET_SIZE - before_ ) );
+	char const* str = static_cast<char const*>( ::memrchr( ROMEM, char_, static_cast<size_t>( GET_SIZE - before_ ) ) );
 	if ( ! str )
 		return ( npos );
 	return ( static_cast<int long>( ( GET_SIZE - 1 ) - ( str - ROMEM ) ) );
@@ -821,7 +821,7 @@ int long HString::find_last( char char_, int long before_ ) const {
 		return ( npos );
 	if ( before_ >= GET_SIZE )
 		before_ = GET_SIZE - 1;
-	char const* str( static_cast<char const*>( ::memrchr( ROMEM, char_, before_ + 1 ) ) );
+	char const* str( static_cast<char const*>( ::memrchr( ROMEM, char_, static_cast<size_t>( before_ + 1 ) ) ) );
 	if ( ! str )
 		return ( npos );
 	return ( static_cast<int long>( str - ROMEM ) );
@@ -839,7 +839,7 @@ HString& HString::replace( HString const& pattern_,
 	int long index( 0 );
 	if ( subWP == 0 ) /* replacement is equals to pattern */ {
 		while ( ( index = find( pattern_, index ) ) != npos ) {
-			::std::strncpy( MEM + index, with_.raw(), lenWith );
+			::std::strncpy( MEM + index, with_.raw(), static_cast<size_t>( lenWith ) );
 			index += lenPattern;
 		}
 	} else {
@@ -864,17 +864,17 @@ HString& HString::replace( HString const& pattern_,
 		char const* srcBuf( src->raw() );
 		while ( ( index = src->find( pattern_, index ) ) != npos ) {
 			if ( newIdx && ( ( index - oldIdx ) != lenPattern ) ) {
-				::std::memmove( MEM + newIdx, srcBuf + oldIdx + lenPattern, ( index - oldIdx ) - lenPattern );
+				::std::memmove( MEM + newIdx, srcBuf + oldIdx + lenPattern, static_cast<size_t>( ( index - oldIdx ) - lenPattern ) );
 				newIdx += ( ( index - oldIdx ) - lenPattern );
 			} else if ( ! newIdx )
 				newIdx = index;
 			oldIdx = index;
-			::std::memmove( MEM + newIdx, with, lenWith );
+			::std::memmove( MEM + newIdx, with, static_cast<size_t>( lenWith ) );
 			newIdx += lenWith;
 			index += lenPattern;
 		}
 		if ( newIdx && ( ( GET_SIZE - oldIdx ) != lenPattern ) )
-			::std::memmove( MEM + newIdx, srcBuf + oldIdx + lenPattern, ( GET_SIZE - oldIdx ) - lenPattern );
+			::std::memmove( MEM + newIdx, srcBuf + oldIdx + lenPattern, static_cast<size_t>( ( GET_SIZE - oldIdx ) - lenPattern ) );
 		SET_SIZE( newSize );
 		MEM[ newSize ] = 0;
 	}
@@ -910,8 +910,8 @@ HString& HString::replace( int long pos_, int long size_, char const* buffer_, i
 	int long newSize( oldSize + ( len_ - size_ ) );
 	if ( len_ > size_ )
 		hs_realloc( newSize + 1 );
-	::memmove( MEM + pos_ + len_, MEM + pos_ + size_, oldSize - ( pos_ + size_ ) );
-	memcpy( MEM + pos_, buffer_, len_ );
+	::memmove( MEM + pos_ + len_, MEM + pos_ + size_, static_cast<size_t>( oldSize - ( pos_ + size_ ) ) );
+	::memcpy( MEM + pos_, buffer_, static_cast<size_t>( len_ ) );
 	SET_SIZE( newSize );
 	MEM[ newSize ] = 0;
 	return ( *this );
@@ -965,7 +965,7 @@ void HString::substr( HString& dest_, int long from_, int long length_ ) const {
 		if ( ( newSize + from_ ) > GET_SIZE )
 			newSize = GET_SIZE - from_;
 		dest_.hs_realloc( newSize + 1 );
-		::std::strncpy( EXT_MEM( dest_._mem ), ROMEM + from_, newSize );
+		::std::strncpy( EXT_MEM( dest_._mem ), ROMEM + from_, static_cast<size_t>( newSize ) );
 		EXT_MEM( dest_._mem )[ newSize ] = 0;
 		EXT_SET_SIZE( dest_._mem, newSize );
 	}
@@ -988,7 +988,7 @@ HString HString::left( int long to_ ) const {
 		return ( str );
 	int long newSize( min( to_, GET_SIZE ) );
 	str.hs_realloc( newSize + 1 );
-	::std::strncpy( EXT_MEM( str._mem ), ROMEM, newSize );
+	::std::strncpy( EXT_MEM( str._mem ), ROMEM, static_cast<size_t>( newSize ) );
 	EXT_MEM( str._mem )[ newSize ] = 0;
 	EXT_SET_SIZE( str._mem, newSize );
 	return ( str );
@@ -1010,7 +1010,7 @@ HString HString::right( int long fromEnd_ ) const {
 		return ( str );
 	int long newSize( min( fromEnd_, GET_SIZE ) );
 	str.hs_realloc( newSize + 1 );
-	::std::strncpy( EXT_MEM( str._mem ), ROMEM + GET_SIZE - newSize, newSize );
+	::std::strncpy( EXT_MEM( str._mem ), ROMEM + GET_SIZE - newSize, static_cast<size_t>( newSize ) );
 	EXT_MEM( str._mem )[ newSize ] = 0;
 	EXT_SET_SIZE( str._mem, newSize );
 	return ( str );
@@ -1058,7 +1058,7 @@ HString& HString::shift_left( int long shift_ ) {
 	if ( shift_ ) {
 		if ( shift_ < GET_SIZE ) {
 			SET_SIZE( GET_SIZE - shift_ );
-			::std::memmove( MEM, MEM + shift_, GET_SIZE + 1 );
+			::std::memmove( MEM, MEM + shift_, static_cast<size_t>( GET_SIZE + 1 ) );
 		} else
 			clear();
 	}
@@ -1074,7 +1074,7 @@ HString& HString::shift_right( int long shift_, char const filler_ ) {
 		int long oldSize( GET_SIZE );
 		int long newSize( oldSize + shift_ );
 		hs_realloc( newSize + 1 );
-		::std::memmove( MEM + shift_, MEM, oldSize + 1 );
+		::std::memmove( MEM + shift_, MEM, static_cast<size_t>( oldSize + 1 ) );
 		/* using SET_SIZE twice is not a bug or mistake,
 		 * fill() depends on size and modifies it
 		 * so it must have new size before and we need to
@@ -1101,7 +1101,7 @@ HString& HString::fill( char filler_, int long offset_, int long count_ ) {
 	if ( filler_ ) {
 		if ( ( count_ + offset_ ) > GET_SIZE )
 			SET_SIZE( count_ + offset_ );
-		::std::memset( MEM + offset_, filler_, count_ );
+		::std::memset( MEM + offset_, filler_, static_cast<size_t>( count_ ) );
 		MEM[ GET_SIZE ] = 0;
 	} else
 		clear();
@@ -1125,7 +1125,7 @@ HString& HString::erase( int long from_, int long length_ ) {
 	if ( ( from_ + length_ ) >= GET_SIZE )
 		length_ = GET_SIZE - from_;
 	if ( ( length_ > 0 ) && ( from_ < GET_SIZE ) ) {
-		::std::memmove( MEM + from_, MEM + from_ + length_, GET_SIZE - ( from_ + length_ ) );
+		::std::memmove( MEM + from_, MEM + from_ + length_, static_cast<size_t>( GET_SIZE - ( from_ + length_ ) ) );
 		SET_SIZE( GET_SIZE - length_ );
 		MEM[ GET_SIZE ] = 0;
 	}
@@ -1143,7 +1143,7 @@ HString& HString::insert( int long from_, int long length_, char const* chunk_ )
 	M_PROLOG
 	if ( from_ < 0 ) {
 		if ( chunk_ ) {
-			if ( ( -from_ ) > static_cast<int long>( ::strnlen( chunk_, length_ ) ) )
+			if ( ( -from_ ) > static_cast<int long>( ::strnlen( chunk_, static_cast<size_t>( length_ ) ) ) )
 				M_THROW( "negative offset caused chunk overflow", from_ );
 			chunk_ += -from_;
 		}
@@ -1151,15 +1151,15 @@ HString& HString::insert( int long from_, int long length_, char const* chunk_ )
 		from_ = 0;
 	}
 	if ( ( length_ > 0 ) && ( from_ <= GET_SIZE ) ) {
-		int long chunkLen = chunk_ ? static_cast<int long>( ::strnlen( chunk_, length_ ) ) : 0;
+		int long chunkLen = chunk_ ? static_cast<int long>( ::strnlen( chunk_, static_cast<size_t>( length_ ) ) ) : 0;
 		if ( chunk_ && ( length_ > chunkLen ) )
 			M_THROW( "length too big for this chunk (by)", length_ - chunkLen );
 		int long oldSize( GET_SIZE );
 		int long newSize( oldSize + length_ );
 		hs_realloc( newSize + 1 );
-		::std::memmove( MEM + from_ + length_, MEM + from_, ( oldSize + 1 ) - from_ );
+		::std::memmove( MEM + from_ + length_, MEM + from_, static_cast<size_t>( ( oldSize + 1 ) - from_ ) );
 		if ( chunk_ )
-			::std::strncpy( MEM + from_, chunk_, length_ );
+			::std::strncpy( MEM + from_, chunk_, static_cast<size_t>( length_ ) );
 		SET_SIZE( newSize );
 	}
 	return ( *this );
@@ -1208,7 +1208,7 @@ HString& HString::append( int long count_, char val_ ) {
 	int long oldSize( GET_SIZE );
 	int long newSize( oldSize + count_ );
 	hs_realloc( newSize + 1 );
-	::memset( MEM + oldSize, val_, count_ );
+	::memset( MEM + oldSize, val_, static_cast<size_t>( count_ ) );
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
 	return ( *this );
@@ -1222,7 +1222,7 @@ HString& HString::append( char const* const buf_, int long len_ ) {
 		int long oldSize( GET_SIZE );
 		int long newSize( oldSize + len_ );
 		hs_realloc( newSize + 1 );
-		::memmove( MEM + oldSize, buf_, len_ );
+		::memmove( MEM + oldSize, buf_, static_cast<size_t>( len_ ) );
 		MEM[ newSize ] = 0;
 		SET_SIZE( newSize );
 	}
@@ -1423,7 +1423,7 @@ char* strrnpbrk( char const* const buffer_,
 	int long stopSetSize( static_cast<int long>( ::std::strlen( stopSet_ ) ) );
 	int long index( length_ - 1 );
 	while ( index >= 0 ) {
-		if ( ::std::memchr( stopSet_, buffer_[ index ], stopSetSize ) )
+		if ( ::std::memchr( stopSet_, buffer_[ index ], static_cast<size_t>( stopSetSize ) ) )
 			return ( const_cast<char*>( buffer_ + index ) );
 		-- index;
 	}
@@ -1437,7 +1437,7 @@ int long strrnspn( char const* const buffer_, char const* const skipSet_,
 	int long skipSetSize( static_cast<int long>( ::std::strlen( skipSet_ ) ) );
 	int long index( length_ - 1 );
 	while ( index >= 0 ) {
-		if ( ! ::std::memchr( skipSet_, buffer_[ index ], skipSetSize ) )
+		if ( ! ::std::memchr( skipSet_, buffer_[ index ], static_cast<size_t>( skipSetSize ) ) )
 			return ( index );
 		-- index;
 	}

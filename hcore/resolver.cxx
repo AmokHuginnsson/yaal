@@ -113,7 +113,7 @@ HString resolver::get_name( ip_t ip_ ) {
 	_cache->realloc( size );
 	error = getnameinfo(
 					reinterpret_cast<sockaddr*>( &addr ), static_cast<int>( sizeof ( addr ) ),
-					_cache->get<char>(), size, NULL, 0, NI_NOFQDN );
+					_cache->get<char>(), static_cast<socklen_t>( size ), NULL, 0, NI_NOFQDN );
 	HScopedValueReplacement<int> saveErrno( errno, error );
 	M_ENSURE( error == 0 );
 	name = _cache->get<char>();

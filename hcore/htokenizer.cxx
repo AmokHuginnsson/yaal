@@ -103,7 +103,7 @@ int long HTokenizer::skip_empty( int long start_ ) const {
 			int long delimLen( _delimiter.get_length() );
 			char const* delimRaw( _delimiter.raw() );
 			char const* ptr( _string.raw() );
-			while ( ! ::strncmp( delimRaw, ptr + start_, delimLen ) )
+			while ( ! ::strncmp( delimRaw, ptr + start_, static_cast<size_t>( delimLen ) ) )
 				start_ += delimLen;
 		}
 	} else {

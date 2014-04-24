@@ -131,14 +131,16 @@ void HUDPSocket::send_to( ip_t dest_, int port_, void const* data_, int long siz
 	address.sin_family = AF_INET;
 	address.sin_port = fwd_htons( static_cast<int short unsigned>( port_ ) );
 	address.sin_addr.s_addr = dest_.raw();
-	M_ENSURE( ::sendto( _fileDescriptor, data_, size_, 0, reinterpret_cast<sockaddr*>( &address ), static_cast<int>( sizeof ( address ) ) ) == size_ );
+	M_ENSURE( ::sendto( _fileDescriptor, data_, static_cast<size_t>( size_ ),
+				0, reinterpret_cast<sockaddr*>( &address ),
+				static_cast<int>( sizeof ( address ) ) ) == size_ );
 	return;
 	M_EPILOG
 }
 
 void HUDPSocket::send( void const* data_, int long size_ ) {
 	M_PROLOG
-	M_ENSURE( ::write( _fileDescriptor, data_, size_ ) == size_ );
+	M_ENSURE( ::write( _fileDescriptor, data_, static_cast<size_t>( size_ ) ) == size_ );
 	return;
 	M_EPILOG
 }
@@ -147,7 +149,8 @@ int long HUDPSocket::receive( ODatagram& datagram_ ) {
 	M_PROLOG
 	sockaddr_in address;
 	socklen_t len( static_cast<int>( sizeof ( address ) ) );
-	int long nRead( ::recvfrom( _fileDescriptor, datagram_._data.raw(), datagram_._size, 0, reinterpret_cast<sockaddr*>( &address ), &len ) );
+	int long nRead( ::recvfrom( _fileDescriptor, datagram_._data.raw(),
+				static_cast<size_t>( datagram_._size ), 0, reinterpret_cast<sockaddr*>( &address ), &len ) );
 	datagram_._ip = ip_t( address.sin_addr.s_addr );
 	datagram_._port = fwd_ntohs( address.sin_port );
 	return ( nRead );
