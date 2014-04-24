@@ -88,7 +88,7 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 	HString dbType( dsn_.raw(), dbTypeEnd );
 	dbType.lower();
 	ODBConnector::DRIVER::enum_t driver( db_driver_from_string( dbType ) );
-	HString connectionString = dsn_.substr( dbTypeEnd + sizeof ( SCHEMA_SEPARATOR ) - 1 );
+	HString connectionString = dsn_.substr( dbTypeEnd + static_cast<int>( sizeof ( SCHEMA_SEPARATOR ) ) - 1 );
 	int userPassEnd( static_cast<int>( connectionString.find( '@' ) ) );
 	HString userName;
 	HString password;
