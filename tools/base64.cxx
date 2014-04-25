@@ -133,6 +133,10 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 		char ch = ptr[ i ];
 		M_ENSURE( is_base64_character( ch, standardCompliantMode ) );
 		int shift = shifts[ i % 4 ];
+		/*
+		 * static_cast<u8_t>() is done for clipping.
+		 * static_cast<u32_t>() is done to silence (spurious) clang warning.
+		 */
 		coder |= static_cast<u32_t>( static_cast<u8_t>( ( _base64DecodeTable_[standardCompliantMode ? 1 : 0][ static_cast<u8_t>( ptr[ i ] ) ] ) ) << shift );
 		if ( ! shift ) {
 			do_buf_4_to_3( output + size, coder );
