@@ -196,7 +196,7 @@ void HStatusBarControl::update_progress( double step_, char const* title_ ) {
 		step_ = ++ _lastStep;
 	HTime stoper( now - _start );
 	if ( _estimate ) {
-		if ( step_ )
+		if ( step_ != 0.0 )
 			now.set( static_cast<time_t>( ( _progressSize / step_ ) * static_cast<double>( stoper.raw() ) ) );
 		left = now - stoper;
 	}
@@ -219,7 +219,7 @@ void HStatusBarControl::update_progress( double step_, char const* title_ ) {
 		if ( _estimate ) {
 			_varTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", maxBar );
 			_string.format( _varTmpBuffer.raw(), "-",
-					( step_ ? ( left.string().raw() ) : "(?\?:?\?:?\?)" ),
+					( step_ != 0.0 ? ( left.string().raw() ) : "(?\?:?\?:?\?)" ),
 					stoper.string().raw(),	nextPercent, "%%" );
 		} else {
 			_varTmpBuffer.format ( "|%%-%ds|%%s[%%3d%%s]", maxBar );

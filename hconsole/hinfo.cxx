@@ -309,7 +309,7 @@ double long HInfoString::do_get_double_long( void ) const
 	{ return ( lexical_cast<double long>( _data ) ); }
 
 HTime const& HInfoString::do_get_time( void ) const {
-	M_ASSERT( !"impossible inplace conversion requested" );
+	M_ASSERT( 0 && "impossible inplace conversion requested" );
 #ifdef __MSVCXX__
 	static HTime const dummy( HTime::LOCAL );
 	return ( dummy );
@@ -323,39 +323,39 @@ void* HInfoString::do_get_pointer( void ) const
 	}
 
 void HInfoString::do_set_char( char ) {
-	M_ASSERT( !"writting to read-only location" );
+	M_ASSERT( 0 && "writting to read-only location" );
 }
 
 void HInfoString::do_set_int_short( int short ) {
-	M_ASSERT( !"writting to read-only location" );
+	M_ASSERT( 0 && "writting to read-only location" );
 }
 
 void HInfoString::do_set_int( int ) {
-	M_ASSERT( !"writting to read-only location" );
+	M_ASSERT( 0 && "writting to read-only location" );
 }
 
 void HInfoString::do_set_int_long( int long ) {
-	M_ASSERT( !"writting to read-only location" );
+	M_ASSERT( 0 && "writting to read-only location" );
 }
 
 void HInfoString::do_set_double( double ) {
-	M_ASSERT( !"writting to read-only location" );
+	M_ASSERT( 0 && "writting to read-only location" );
 }
 
 void HInfoString::do_set_double_long( double long ) {
-	M_ASSERT( !"writting to read-only location" );
+	M_ASSERT( 0 && "writting to read-only location" );
 }
 
 void HInfoString::do_set_pointer( void* ) {
-	M_ASSERT( !"writting to read-only location" );
+	M_ASSERT( 0 && "writting to read-only location" );
 }
 
 void HInfoString::do_set_string( HString const& ) {
-	M_ASSERT( !"writting to read-only location" );
+	M_ASSERT( 0 && "writting to read-only location" );
 }
 
 void HInfoString::do_set_time( HTime const& ) {
-	M_ASSERT( !"writting to read-only location" );
+	M_ASSERT( 0 && "writting to read-only location" );
 }
 
 }

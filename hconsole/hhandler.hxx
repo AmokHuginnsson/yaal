@@ -47,7 +47,7 @@ protected:
 	process_handler_command_map_t _commandHandlers;
 	hcore::HString _command;
 public:
-	HHandler( size_t = 32, size_t = 32 );
+	HHandler( int = 32, int = 32 );
 	virtual ~HHandler( void );
 protected:
 	int process_input_with_handlers( int, const process_handler_key_map_t& );

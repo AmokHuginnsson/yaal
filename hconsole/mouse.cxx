@@ -78,7 +78,7 @@ int hunt_tty( int offset_ ) {
 	char const* ttyName = NULL;
 	char const* ptr = NULL;
 	ttyName = ttyname( STDIN_FILENO );
-	if ( ttyName && ! ::strncmp( ttyName, "/dev/ttyv", 8 + offset_ ) )
+	if ( ttyName && ! ::strncmp( ttyName, "/dev/ttyv", static_cast<size_t>( 8 + offset_ ) ) )
 		vC = lexical_cast<int>( ttyName + 8 + offset_ );
 	else {
 		ttyName = ::getenv( "STY" );

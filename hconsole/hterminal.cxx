@@ -70,7 +70,7 @@ void HTerminal::init( void ) {
 	if ( _disableXON_ ) {
 		M_ENSURE( tcgetattr( STDIN_FILENO, _termios.get<struct termios>() ) == 0 );
 		M_ENSURE( tcgetattr( STDIN_FILENO, &termios ) == 0 );
-		termios.c_iflag &= ~IXON;
+		termios.c_iflag &= ~static_cast<int unsigned>( IXON );
 		if ( _leaveCtrlC_ )
 			termios.c_cc[ VINTR ] = 0;
 		if ( _leaveCtrlZ_ )

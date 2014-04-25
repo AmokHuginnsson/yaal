@@ -47,8 +47,8 @@ namespace yaal {
 
 namespace hconsole {
 
-HTUIProcess::HTUIProcess( int noFileHandlers_, size_t keyHandlers_,
-		size_t commandHandlers_ )
+HTUIProcess::HTUIProcess( int noFileHandlers_, int keyHandlers_,
+		int commandHandlers_ )
 	: HHandler( keyHandlers_, commandHandlers_ ),
 	_dispatcher( noFileHandlers_, _latency_ * 1000 ), _mainWindow(), _foregroundWindow(),
 	_windows( new ( memory::yaal ) model_t() ) {
