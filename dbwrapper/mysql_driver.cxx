@@ -119,7 +119,7 @@ M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 
 M_EXPORT_SYMBOL int dbrs_errno( ODBLink const&, void* );
 M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* ) {
-	return ( ::mysql_errno( static_cast<MYSQL*>( dbLink_._conn ) ) );
+	return ( static_cast<int>( ::mysql_errno( static_cast<MYSQL*>( dbLink_._conn ) ) ) );
 }
 
 M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const&, void* );
@@ -166,7 +166,7 @@ M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
 M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	MYSQL_ROW row;
-	mysql_data_seek( static_cast<OMySQLResult*>( data_ )->_result, row_ );
+	::mysql_data_seek( static_cast<OMySQLResult*>( data_ )->_result, static_cast<my_ulonglong>( row_ ) );
 	row = mysql_fetch_row( static_cast<OMySQLResult*>( data_ )->_result );
 	return ( row[ column_ ] );
 }
@@ -187,7 +187,7 @@ M_EXPORT_SYMBOL char const* rs_get_field( void* data_, int field_ ) {
 M_EXPORT_SYMBOL int rs_fields_count( void* );
 M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 	OMySQLResult* pr( static_cast<OMySQLResult*>( data_ ) );
-	return ( ( pr && pr->_result ) ? ::mysql_num_fields( pr->_result ) : 0 );
+	return ( ( pr && pr->_result ) ? static_cast<int>( ::mysql_num_fields( pr->_result ) ) : 0 );
 }
 
 M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* );
@@ -209,7 +209,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	MYSQL_FIELD* field = NULL;
-	field = mysql_fetch_field_direct( static_cast<OMySQLResult*>( dataR_ )->_result, field_ );
+	field = mysql_fetch_field_direct( static_cast<OMySQLResult*>( dataR_ )->_result, static_cast<int unsigned>( field_ ) );
 	return ( field->name );
 }
 

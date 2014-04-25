@@ -69,6 +69,7 @@ fun_console_mouse_open_t mouse_open = NULL;
 fun_console_mouse_get_t mouse_get = NULL;
 fun_console_mouse_close_t mouse_close = NULL;
 
+#if defined( HAVE_SYS_CONSIO_H ) || defined( HAVE_GPM_H )
 namespace {
 
 int hunt_tty( int offset_ ) {
@@ -95,6 +96,7 @@ int hunt_tty( int offset_ ) {
 }
 
 }
+#endif /* #if defined( HAVE_SYS_CONSIO_H ) || defined( HAVE_GPM_H ) */
 
 #ifdef HAVE_SYS_CONSIO_H
 

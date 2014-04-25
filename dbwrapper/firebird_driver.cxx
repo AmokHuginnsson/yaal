@@ -110,11 +110,11 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	*pdpb ++ = isc_dpb_version1;
 	*pdpb ++ = isc_dpb_user_name;
 	*pdpb ++ = static_cast<char>( loginLen );
-	::strncpy( pdpb, login_.raw(), loginLen );
+	::strncpy( pdpb, login_.raw(), static_cast<size_t>( loginLen ) );
 	pdpb += loginLen;
 	*pdpb ++ = isc_dpb_password;
 	*pdpb ++ = static_cast<char>( passLen );
-	::strncpy( pdpb, password_.raw(), passLen );
+	::strncpy( pdpb, password_.raw(), static_cast<size_t>( passLen ) );
 	isc_attach_database( db->_status, dbLen, dataBase_.raw(), &db->_db, dpbLen, dpb );
 	if ( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) )
 		dbLink_._valid = true;
@@ -262,7 +262,7 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 					if ( ( *var->sqlind ) != -1 ) {
 						offsets[i] = offset;
 						int len( var->sqllen - static_cast<int>( sizeof ( short ) ) );
-						::memcpy( buf + offset, var->sqldata + sizeof ( short ), len );
+						::memcpy( buf + offset, var->sqldata + sizeof ( short ), static_cast<size_t>( len ) );
 						offset += len;
 						buf[offset] = 0;
 						++ offset;
