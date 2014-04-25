@@ -242,7 +242,7 @@ void* yaal_oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mo
 		else if ( queryStr.find( "DELETE" ) == 0 )
 			iters = 1;
 		oracle->_status = OCIStmtExecute( oracle->_serviceContext,
-				queryObj->_statement, oracle->_error, iters, 0,
+				queryObj->_statement, oracle->_error, static_cast<ub4>( iters ), 0,
 				NULL, NULL,
 				OCI_DEFAULT | OCI_COMMIT_ON_SUCCESS | ( iters == 0 ? mode_ : 0 ) );
 		bool fail( false );
@@ -271,7 +271,7 @@ void* yaal_oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mo
 						OQuery::OFieldInfo& fi( queryObj->_fieldInfos[i] );
 						if ( ( ( *queryObj->_status ) = OCIParamGet( queryObj->_statement,
 										OCI_HTYPE_STMT, queryObj->_error,
-										reinterpret_cast<void**>( &params[i] ), i + 1 ) ) == OCI_SUCCESS ) {
+										reinterpret_cast<void**>( &params[i] ), static_cast<ub4>( i + 1 ) ) ) == OCI_SUCCESS ) {
 							if ( ( ( *queryObj->_status ) = OCIAttrGet( params[i],
 											OCI_DTYPE_PARAM, &fi._size, 0, OCI_ATTR_DATA_SIZE,
 											queryObj->_error ) ) == OCI_SUCCESS ) {
@@ -311,7 +311,7 @@ void* yaal_oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mo
 						OQuery::OFieldInfo& fi( queryObj->_fieldInfos[i] );
 						OCIDefine* result( NULL );
 						if ( ( ( *queryObj->_status ) = OCIDefineByPos( queryObj->_statement,
-										&result, queryObj->_error, i + 1, fi._buffer = ptr + offset, fi._size + 1,
+										&result, queryObj->_error, static_cast<ub4>( i + 1 ), fi._buffer = ptr + offset, fi._size + 1,
 										SQLT_STR, &fi._isNull, NULL, NULL, OCI_DEFAULT ) ) == OCI_SUCCESS ) {
 							offset += ( fi._size + 1 );
 						} else {
@@ -379,7 +379,7 @@ char const* yaal_oracle_rs_get( void* data_, int long row_, int column_ ) {
 	OQuery::OFieldInfo& fi( query->_fieldInfos[column_] );
 	char const* ptr( NULL );
 	if ( ( ( *query->_status ) = OCIStmtFetch2( query->_statement,
-					query->_error, 1, OCI_FETCH_ABSOLUTE, static_cast<ub4>( row_ + 1 ),
+					query->_error, 1, OCI_FETCH_ABSOLUTE, static_cast<sb4>( row_ + 1 ),
 					OCI_DEFAULT ) ) == OCI_SUCCESS )
 		ptr = fi._buffer;
 	return ( fi._isNull ? NULL : ptr );
