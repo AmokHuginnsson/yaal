@@ -43,6 +43,11 @@ namespace yaal {
 
 namespace hconsole {
 
+HControl::OAttribute const HControl::DEFAULT_ATTRS = { -1, -1 };
+bool HControl::OAttribute::operator == ( OAttribute const& attr_ ) const {
+	return ( ( _label == attr_._label ) && ( _data == attr_._data ) );
+}
+
 HControl::HControl( HWindow* parent_, int row_, int column_,
 										 int height_, int width_, char const* label_ )
 	: _enabled( false ), _focused( false ), _drawLabel( true ),
@@ -218,8 +223,8 @@ void HControl::do_draw_label( void ) {
 	M_EPILOG
 }
 
-void HControl::set_attributes( int attributeDisabled_,
-		int attributeEnabled_, int attributeFocused_ ) {
+void HControl::set_attributes( OAttribute attributeDisabled_,
+		OAttribute attributeEnabled_, OAttribute attributeFocused_ ) {
 	M_PROLOG
 	if ( attributeDisabled_ == DEFAULT_ATTRS )
 		_attributeDisabled = _attributeDisabled_;
@@ -289,19 +294,26 @@ bool HControl::do_hit_test( int row_, int column_ ) const {
 
 int HControl::attr_label( void ) const {
 	M_PROLOG
-	return ( _enabled ? ( _focused ? _attributeFocused >> 8 : _attributeEnabled >> 8 ) : _attributeDisabled >> 8 );
+	return ( _enabled ? ( _focused ? _attributeFocused._label : _attributeEnabled._label ) : _attributeDisabled._label );
 	M_EPILOG
 }
 
 int HControl::attr_shortcut( void ) const {
 	M_PROLOG
-	return ( ! _enabled ? ( ! _focused ? _attributeFocused >> 8 : _attributeEnabled >> 8 ) : _attributeDisabled >> 8 );
+	/*
+	 * *FIXME*
+	 *
+	 * Shortcut does not have separate attribute,
+	 * it is just label attribute reverted with respect to enabled/focused state.
+	 * (maybe?) Add true shortcut attribute .
+	 */
+	return ( ! _enabled ? ( ! _focused ? _attributeFocused._label : _attributeEnabled._label ) : _attributeDisabled._label );
 	M_EPILOG
 }
 
 int HControl::attr_data( void ) const {
 	M_PROLOG
-	return ( _enabled ? ( _focused ? _attributeFocused : _attributeEnabled ) : _attributeDisabled );
+	return ( _enabled ? ( _focused ? _attributeFocused._data : _attributeEnabled._data ) : _attributeDisabled._data );
 	M_EPILOG
 }
 

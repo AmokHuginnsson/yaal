@@ -154,8 +154,8 @@ int HTreeControl::draw_node( tree_t::node_t node_, int row_ ) {
 		else if ( node_->has_childs() )
 			cons.mvprintf( row, (**node_)._columnRaw, "-" );
 		if ( node_ == _selected )
-			cons.set_attr( _enabled ? ( _focused ? ~_attributeFocused
-						: ~ _attributeEnabled ) : ~ _attributeDisabled );
+			cons.set_attr( _enabled ? ( _focused ? ~_attributeFocused._data
+						: ~ _attributeEnabled._data ) : ~ _attributeDisabled._data );
 		cons.mvprintf( row, (**node_)._columnRaw + 1, str.raw() );
 	}
 	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) ) {

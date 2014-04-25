@@ -97,9 +97,9 @@ int HDataWindow::init( void ) {
 /* LCR stands for ListControlResource */
 	OListControlResource* lcr = &listControlResource;
 	attributes._drawLabel = true;
-	attributes._disabledAttribute = -1;
-	attributes._enabledAttribute = -1;
-	attributes._focusedAttribute = -1;
+	attributes._disabledAttribute = HControl::DEFAULT_ATTRS;
+	attributes._enabledAttribute = HControl::DEFAULT_ATTRS;
+	attributes._focusedAttribute = HControl::DEFAULT_ATTRS;
 	HWindow::init();
 	for ( int i( 0 ), SIZE( static_cast<int>( _resourcesArray->size() ) ); i < SIZE; ++ i ) {
 		OResource& r( (*_resourcesArray)[ i ] );

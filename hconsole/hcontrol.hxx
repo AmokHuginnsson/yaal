@@ -45,6 +45,11 @@ class HWindow;
 class HControl {
 public:
 	typedef HControl this_type;
+	struct OAttribute {
+		int _label;
+		int _data;
+		bool operator == ( OAttribute const& attr_ ) const;
+	};
 /*! \brief Various configuration bits for HControl hierarchy.
  */
 	struct BITS {
@@ -60,7 +65,7 @@ public:
 			} align_t;
 		};
 	};
-	static int const DEFAULT_ATTRS = -1; /*!< Default HControl attribites (colors of label and data fore/back-ground) */
+	static OAttribute const DEFAULT_ATTRS; /*!< Default HControl attribites (colors of label and data fore/back-ground) */
 	typedef yaal::hcore::HPointer<HControl> ptr_t;
 protected:
 	bool			_enabled;						/*!< Tells if control is enabled, focus can go only to enabled control. */
@@ -72,9 +77,9 @@ protected:
 	 * three cases keeps label (control title)
 	 * color, low byte keeps work place color */
 	//@{
-	int unsigned _attributeDisabled;	/*!< The attribute of disabled cotrol. */
-	int unsigned _attributeEnabled;	/*!< The attribute of enabled cotrol. */	
-	int unsigned _attributeFocused;	/*!< The attribute of focused cotrol. */
+	OAttribute _attributeDisabled; /*!< The attribute of disabled cotrol. */
+	OAttribute _attributeEnabled;	 /*!< The attribute of enabled cotrol. */	
+	OAttribute _attributeFocused;	 /*!< The attribute of focused cotrol. */
 	//@}
 	int				_row;								/*!< Control top coordinate relative
 																		 to parent window (top or bottom border). */
@@ -219,7 +224,9 @@ public:
  * \param enabled - Colors for control in enabled state.
  * \param focused - Colors for control while its focused.
  */
-	void set_attributes( int disabled = DEFAULT_ATTRS, int enabled = DEFAULT_ATTRS, int focused = DEFAULT_ATTRS );
+	void set_attributes( OAttribute disabled = DEFAULT_ATTRS,
+			OAttribute enabled = DEFAULT_ATTRS,
+			OAttribute focused = DEFAULT_ATTRS );
 
 /*! \brief Decide if label shall be drawn for this particular instance of a control.
  *

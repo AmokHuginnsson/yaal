@@ -66,8 +66,7 @@ HStatusBarControl::HStatusBarControl( HWindow* parent_,
 		_statusBarAttribute = _attributeStatusBar_;
 	attribte = _statusBarAttribute;
 	attribte &= 0x00ff;
-	_attributeFocused &= 0xff00;
-	_attributeFocused |= attribte;
+	_attributeFocused._data = attribte;
 	_statusBarAttribute &= 0xff00;
 	return;
 	M_EPILOG
@@ -108,8 +107,7 @@ void HStatusBarControl::do_refresh( void ) {
 	if ( ! _focused )
 		cons.move( origRow, origColumn );
 	if ( _statusBarAttribute & 0xff ) {
-		_attributeEnabled &= 0xff00;
-		_attributeEnabled |= ( _statusBarAttribute & 0x00ff );
+		_attributeEnabled._data = ( _statusBarAttribute & 0x00ff );
 		_statusBarAttribute &= 0xff00;
 	}
 	return;
@@ -262,9 +260,8 @@ void HStatusBarControl::message( int attribute_, char const* format_, ... ) {
 			_varTmpBuffer.clear();
 		set_text( _varTmpBuffer );
 		if ( ! ( _statusBarAttribute & 0x00ff ) )
-			_statusBarAttribute |= ( _attributeEnabled & 0x00ff );
-		_attributeEnabled &= 0xff00;
-		_attributeEnabled |= ( attribute_ & 0x00ff );
+			_statusBarAttribute |= _attributeEnabled._data;
+		_attributeEnabled._data = ( attribute_ & 0x00ff );
 		schedule_refresh();
 	}
 	return;
@@ -296,9 +293,8 @@ void HStatusBarControl::clear( int attribute_ ) {
 		_varTmpBuffer.clear();
 		set_text( _varTmpBuffer );
 		if ( ! ( _statusBarAttribute & 0x00ff ) )
-			_statusBarAttribute |= ( _attributeEnabled & 0x00ff );
-		_attributeEnabled &= 0xff00;
-		_attributeEnabled |= ( attribute_ & 0x00ff );
+			_statusBarAttribute |= _attributeEnabled._data;
+		_attributeEnabled._data = ( attribute_ & 0x00ff );
 		schedule_refresh();
 	}
 	return;

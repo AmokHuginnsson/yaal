@@ -77,9 +77,9 @@ struct DATACONTROL_BITS {
  */
 struct OAttributes {
 	bool	_drawLabel;					/*!< should be label driven */
-	int		_disabledAttribute;	/*!< attribute of control in disabled state */
-	int		_enabledAttribute;	/*!< attribute of control in enabled state */
-	int		_focusedAttribute;	/*!< attribute of control in focused state */
+	yaal::hconsole::HControl::OAttribute _disabledAttribute;	/*!< attribute of control in disabled state */
+	yaal::hconsole::HControl::OAttribute _enabledAttribute;	/*!< attribute of control in enabled state */
+	yaal::hconsole::HControl::OAttribute _focusedAttribute;	/*!< attribute of control in focused state */
 };
 
 /*! \brief Description of HListControl column.

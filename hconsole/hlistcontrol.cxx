@@ -154,8 +154,8 @@ void HListControl::do_refresh( void ) {
 	draw_header( columns );
 	_rowRaw += hR;
 	cons.set_attr( ! _enabled ?
-			( ! _focused ? _attributeFocused : _attributeEnabled )
-			: _attributeDisabled );
+			( ! _focused ? _attributeFocused._data : _attributeEnabled._data )
+			: _attributeDisabled._data );
 	if ( size > _heightRaw )
 		draw_scroll( _columnRaw + columnOffset - 1 );
 	_rowRaw -= hR;
@@ -195,7 +195,7 @@ void HListControl::draw_header( int columns_ ) {
 			}
 			columnOffset += columnInfo->_widthRaw;
 			if ( ctr < columns_ ) {
-				cons.set_attr( _attributeDisabled );
+				cons.set_attr( _attributeDisabled._data );
 				for ( ctrLoc = 0; ctrLoc < ( _heightRaw + hR );
 						ctrLoc ++ ) {
 					cons.move( _rowRaw + ctrLoc, _columnRaw + columnOffset - 1 );
@@ -285,18 +285,18 @@ void HListControl::draw_cell( iterator_t& it_, int row_, int column_, int column
 	if ( row_ == _cursorPosition ) {
 		if ( checked_ )
 			cons.set_attr( ! _enabled
-					? ( ! _focused ? ~ ( _attributeFocused >> 8 )
-						: ~ ( _attributeEnabled >> 8 ) )
-					: ~ ( _attributeDisabled >> 8 ) );
+					? ( ! _focused ? ~_attributeFocused._label
+						: ~_attributeEnabled._label )
+					: ~_attributeDisabled._label );
 		else
-			cons.set_attr( _enabled ? ( _focused ? ~_attributeFocused
-						: ~ _attributeEnabled ) : ~ _attributeDisabled );
+			cons.set_attr( _enabled ? ( _focused ? ~_attributeFocused._data
+						: ~_attributeEnabled._data ) : ~_attributeDisabled._data );
 	} else {
 		if ( checked_ )
 			cons.set_attr( _enabled
-					? ( _focused ? ~ ( _attributeFocused >> 8 )
-						: ~ ( _attributeEnabled >> 8 ) )
-					: ~ ( _attributeDisabled >> 8 ) );
+					? ( _focused ? ~_attributeFocused._label
+						: ~_attributeEnabled._label )
+					: ~_attributeDisabled._label );
 		else
 			set_attr_data();
 	}

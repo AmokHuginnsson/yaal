@@ -48,12 +48,18 @@ namespace hconsole {
 
 int _latency_ = 1;
 int _screenBackground_ = COLORS::BG_BLACK;
-int _attributeDisabled_ = ( COLORS::FG_GREEN | COLORS::BG_BLACK | COLORS::BG_BLINK ) << 8
-															| ( COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK | COLORS::BG_BLINK );
-int _attributeEnabled_ = ( COLORS::FG_BRIGHTGREEN | COLORS::BG_BLACK | COLORS::BG_BLINK ) << 8
-															| ( COLORS::FG_WHITE | COLORS::BG_BLACK | COLORS::BG_BLINK );
-int _attributeFocused_ = ( COLORS::FG_BRIGHTGREEN | COLORS::BG_BLACK | COLORS::BG_BLINK ) << 8
-															| ( COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY );
+HControl::OAttribute _attributeDisabled_ = {
+	COLORS::FG_GREEN | COLORS::BG_BLACK | COLORS::BG_BLINK,
+	COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK | COLORS::BG_BLINK
+};
+HControl::OAttribute _attributeEnabled_ = {
+	COLORS::FG_BRIGHTGREEN | COLORS::BG_BLACK | COLORS::BG_BLINK,
+	COLORS::FG_WHITE | COLORS::BG_BLACK | COLORS::BG_BLINK
+};
+HControl::OAttribute _attributeFocused_ = {
+	COLORS::FG_BRIGHTGREEN | COLORS::BG_BLACK | COLORS::BG_BLINK,
+	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY
+};
 int _attributeStatusBar_ = ( COLORS::FG_WHITE | COLORS::BG_BLACK ) << 8
 															| ( COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK );
 int _attributeSearchHighlight_ = ( COLORS::FG_BLACK | COLORS::BG_BROWN | COLORS::BG_BLINK ) << 8
@@ -68,7 +74,7 @@ bool	_leaveCtrlBackSlash_ = false;
 char	_commandComposeCharacter_ = 'x';
 int		_commandComposeDelay_ = 16;
 
-inline void set_color_bits( int & word_, int bits_, int what_ ) {
+inline void set_color_bits( int& word_, int bits_, int what_ ) {
 	int unsigned mask = 0x000f;
 	if ( what_ ) {
 		what_ <<= 2;
@@ -121,6 +127,18 @@ int get_color_bits( HString& value_, int what_ ) {
 	else if ( ! strcasecmp( str, "WHITE" ) )
 		return ( COLORS::FG_WHITE );
 	return ( 0 );
+	M_EPILOG
+}
+
+void set_color( HString& value_, HControl::OAttribute& attribute_ ) {
+	M_PROLOG
+	int labelBg( get_color_bits( value_, 1 ) );
+	int labelFg( get_color_bits( value_, 0 ) );
+	int dataBg( get_color_bits( value_, 3 ) );
+	int dataFg( get_color_bits( value_, 2 ) );
+	attribute_._label = static_cast<u8_t>( ( labelBg << 4 ) | labelFg );
+	attribute_._data = static_cast<u8_t>( ( dataBg << 4 ) | dataFg );
+	return;
 	M_EPILOG
 }
 

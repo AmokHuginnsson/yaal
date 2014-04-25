@@ -334,7 +334,7 @@ CURSOR::cursor_t HConsole::curs_set( CURSOR::cursor_t const &cursor_ ) const {
 }
 
 inline int addch_fwd( int char_ ) {
-	return ( ::addch( char_ ) );
+	return ( ::addch( static_cast<chtype>( char_ ) ) );
 }
 #undef addch
 
