@@ -1582,8 +1582,9 @@ yaal::hcore::HString const& HRuleDescription::make_name( HNamedRule const& nr_ )
 			name = &a->second;
 		else {
 			static int const MAX_AUTO_NAMES_COUNT = 26;
+			int autoNamesCount( static_cast<int>( _automaticNames.get_size() ) );
 			name = &( _automaticNames[nr_.id()] = ( _automaticNames.get_size() < MAX_AUTO_NAMES_COUNT ) ?
-					hcore::HString( static_cast<char>( 'A' + _automaticNames.get_size() ) ) + '_'
+					hcore::HString( static_cast<char>( 'A' + autoNamesCount ) ) + '_'
 					: hcore::HString( "rule" ) + nr_.id() );
 		}
 	}
