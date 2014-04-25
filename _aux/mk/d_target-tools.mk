@@ -1,6 +1,6 @@
 tags: $(SRCS) $(HDRS)
 	@printf "%b" "Rehashing tags ... "; \
-	cd $(DIR_ROOT) && $(CTAGS) && \
+	cd $(DIR_ROOT) && $(CTAGS) && $(GTAGS) &&  \
 	printf "%b\n" "done."
 
 DIR_COVERAGE=build/cov
