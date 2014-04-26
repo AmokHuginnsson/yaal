@@ -82,19 +82,19 @@ int GLYPHS::DOWN_ARROW, GLYPHS::UP_ARROW, GLYPHS::VERTICAL_LINE;
  */
 struct ATTR {
 	inline static int value( int const attr_ ) {
-		return ( static_cast<int>( COLOR_PAIR(
-						( ( attr_ & 0x70 ) >> 1 )             /* background */
-						| ( attr_ & 0x07 ) )                  /* foreground */
-					| ( ( attr_ & 0x08 ) ? A_BOLD : 0 )     /* brighter foreground */
-					| ( ( attr_ & 0x80 ) ? A_BLINK : 0 ) ) ); /* brighter background */
+		return ( static_cast<int>( COLOR_PAIR( static_cast<int unsigned>(
+							( ( attr_ & 0x70 ) >> 1 )                 /* background */
+							| ( attr_ & 0x07 ) )                      /* foreground */
+						| ( ( attr_ & 0x08 ) ? A_BOLD : 0 )         /* brighter foreground */
+						| ( ( attr_ & 0x80 ) ? A_BLINK : 0 ) ) ) ); /* brighter background */
 	}
 	inline static int value_fix( int const attr_ ) {
 		if ( attr_ & 0x80 )
-			return ( static_cast<int>( COLOR_PAIR(
-							( ( attr_ & 0x07 ) << 3 )
-						| ( ( attr_ & 0x70 ) >> 4 ) )
-						| ( ( attr_ & 0x08 ) ? A_BLINK : 0 )
-						| A_BOLD | A_REVERSE ) );
+			return ( static_cast<int>( COLOR_PAIR( static_cast<int unsigned>(
+								( ( attr_ & 0x07 ) << 3 )
+								| ( ( attr_ & 0x70 ) >> 4 ) )
+							| ( ( attr_ & 0x08 ) ? A_BLINK : 0 )
+							| A_BOLD | A_REVERSE ) ) );
 		return ( value( attr_ ) );
 	}
 };

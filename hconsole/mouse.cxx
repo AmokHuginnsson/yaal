@@ -118,7 +118,7 @@ int console_mouse_open( void ) {
 	mouse.u.mode.mode = 0;
 	mouse.u.mode.signal = SIGUSR1;
 	vC = hunt_tty( 1 );
-	tty[ 9 ] = '0' + vC;
+	tty[ 9 ] = static_cast<char>( '0' + vC );
 	_mouse_ = ::open( tty, O_RDWR );
 	if ( _mouse_ < 0 ) {
 		error.format( _( "cannot open mouse, %s" ), error_message( errno ) );
