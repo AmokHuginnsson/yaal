@@ -233,10 +233,10 @@ dnl --------------------------------------------------------------------------
 AC_DEFUN([YAAL_DETECT_COMPILER], [
 	AC_MSG_RESULT([--- Testing presence of C and C++ compiler ... ---      [[19%]]])
 	AC_PROG_CC([gcc clang])
-	AC_PROG_CXX([g++ clang])
+	AC_PROG_CXX([g++ clang++ clang])
 	AC_MSG_RESULT([--- Testing presence of C and C++ preprocesor ... ---   [[28%]]])
 	AC_PROG_CPP([gcc clang])
-	AC_PROG_CXXCPP([g++ clang])
+	AC_PROG_CXXCPP([g++ clang++ clang])
 
 	SAVED_CXX=["${CXX}"]
 	SAVED_CC=["${CC}"]

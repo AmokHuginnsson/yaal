@@ -42,7 +42,7 @@ DIR_LOCALSTATE = $(DESTDIR)@localstatedir@
 DIR_HEADERS    = $(DESTDIR)@includedir@
 DIR_SHARE      = $(DESTDIR)@datarootdir@
 LIB_PREFIX     = @LIB_PREFIX@
-CXX           ?= @CXX@
+CXX            = @CXX@
 MKDIR_P        = @MKDIR_P@
 INSTALL        = @INSTALL@
 RANLIB         = @RANLIB@
@@ -68,26 +68,26 @@ SRCS := $(filter-out %_driver.$(SS),$(SRCS))
 OBJS_dbwrapper := $(filter-out %_driver.$(OS),$(OBJS_dbwrapper))
 $(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT))))
 
-LIBS_hcore     = -lc -lssl -lcrypto @HCORE_LIBS@
+LIBS_hcore     = -lssl -lcrypto @HCORE_LIBS@
 DEPS_tools     = $(TARGET_hcore)
-LIBS_tools     = -lhcore$(LIB_INFIX) -lc -lpthread -lxml2 -lxslt -lexslt -lz @RDYNAMIC@ @HCORE_LIBS@ @TOOLS_LIBS@ @HCORE_LIBS@
+LIBS_tools     = -lhcore$(LIB_INFIX) -lpthread -lxml2 -lxslt -lexslt -lz @RDYNAMIC@ @HCORE_LIBS@ @TOOLS_LIBS@ @HCORE_LIBS@
 DEPS_dbwrapper = $(TARGET_hcore) $(TARGET_tools)
-LIBS_dbwrapper = -ltools$(LIB_INFIX) -lhcore$(LIB_INFIX) -lc @HCORE_LIBS@
+LIBS_dbwrapper = -ltools$(LIB_INFIX) -lhcore$(LIB_INFIX) @HCORE_LIBS@
 DEPS_hconsole  = $(TARGET_hcore) $(TARGET_tools)
-LIBS_hconsole  = -ltools$(LIB_INFIX) -lhcore$(LIB_INFIX) -lc -lncurses @HCONSOLE_LIBS@ @HCORE_LIBS@
+LIBS_hconsole  = -ltools$(LIB_INFIX) -lhcore$(LIB_INFIX) -lncurses @HCONSOLE_LIBS@ @HCORE_LIBS@
 DEPS_hdata     = $(TARGET_dbwrapper) $(TARGET_hconsole)
-LIBS_hdata     = -lhconsole$(LIB_INFIX) -ldbwrapper$(LIB_INFIX) -lc -ltools$(LIB_INFIX) -lhcore$(LIB_INFIX) -lncurses @HCORE_LIBS@
+LIBS_hdata     = -lhconsole$(LIB_INFIX) -ldbwrapper$(LIB_INFIX) -ltools$(LIB_INFIX) -lhcore$(LIB_INFIX) -lncurses @HCORE_LIBS@
 
 DEPS_sqlite3_driver    = $(TARGET_hcore)
-LIBS_sqlite3_driver    = -lc -lsqlite3 -lhcore$(LIB_INFIX)
+LIBS_sqlite3_driver    = -lsqlite3 -lhcore$(LIB_INFIX)
 DEPS_postgresql_driver = $(TARGET_hcore)
-LIBS_postgresql_driver = -lc -lpq -lhcore$(LIB_INFIX)
+LIBS_postgresql_driver = -lpq -lhcore$(LIB_INFIX)
 DEPS_mysql_driver      = $(TARGET_hcore)
-LIBS_mysql_driver      = -lc @MYSQLCLIENT_LIBRARY@ -lhcore$(LIB_INFIX)
-DEPS_firebird_driver     = $(TARGET_hcore)
-LIBS_firebird_driver     = -lc -lfbclient -lhcore$(LIB_INFIX)
+LIBS_mysql_driver      = @MYSQLCLIENT_LIBRARY@ -lhcore$(LIB_INFIX)
+DEPS_firebird_driver   = $(TARGET_hcore)
+LIBS_firebird_driver   = -lfbclient -lhcore$(LIB_INFIX)
 DEPS_oracle_driver     = $(TARGET_hcore)
-LIBS_oracle_driver     = -lc -lclntsh -lhcore$(LIB_INFIX)
+LIBS_oracle_driver     = -lclntsh -lhcore$(LIB_INFIX)
 
 -include $(DIR_ROOT)/local.mk
 

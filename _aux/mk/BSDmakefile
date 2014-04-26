@@ -4,7 +4,7 @@
 
 .PHONY: doc tags
 
-default .DEFAULT doc tags:
+default doc tags .DEFAULT:
 	@$(MAKE) -f _aux/mk/master.mk $(@)
 
 .my_make:
