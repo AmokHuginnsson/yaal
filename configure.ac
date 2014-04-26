@@ -42,11 +42,12 @@ AC_CONFIG_SRCDIR([[yaalrc.in]])
 AC_CONFIG_AUX_DIR([_aux])
 
 dnl yaal is not Free Software.
-AC_COPYRIGHT([[yaal (c) 2011 All rights reserved.]])
+AC_COPYRIGHT([[yaal (c) 2014 All rights reserved.]])
 
-YAAL_CHECK_GIT
 dnl yaal is still in alpha stage.
 AC_REVISION(${THIS_ID})
+
+YAAL_CHECK_GIT
 
 dnl We select default language.
 AC_LANG([C++])
@@ -73,22 +74,12 @@ else
 	AC_DEFINE_UNQUOTED([__DYNAMIC_LINKER__],["$DYNAMIC_LINKER"],[Path to your dynamic linker.])
 fi
 
-dnl Testing presence of c compiler
-if test ["$CXX"] = ["colorgcc"] -o ["$CXX"] = ["colorg++"] ; then
-	CXX=["g++"]
-fi
-if test ["$CC"] = ["colorgcc"] ; then
-	CC=["gcc"]
-fi
+YAAL_DETECT_OPERATING_SYSTEM
+YAAL_DETECT_PHYSICAL_MEMORY
 
-AC_MSG_RESULT([--- Testing presence of C and C++ compiler ... ---      [[19%]]])
-AC_PROG_CC
-AC_PROG_CXX
-AC_MSG_RESULT([--- Testing presence of C and C++ preprocesor ... ---   [[28%]]])
-AC_PROG_CPP
-AC_PROG_CXXCPP
+YAAL_DETECT_COMPILER
+
 AC_MSG_RESULT([--- Looking standrad development software ... ---       [[33%]]])
-dnl AC_PROG_MKDIR_P dnl Centos 5.4 has obsolete version of autoconf package.
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_MKDIR_P
@@ -98,9 +89,6 @@ AC_CHECK_PROG([GTAGS],[gtags],[gtags],[true])
 dnl Looking for main libc headers
 AC_MSG_RESULT([--- Looking for main libc headers ... ---               [[41%]]])
 AC_HEADER_MAJOR
-
-YAAL_DETECT_OPERATING_SYSTEM
-YAAL_DETECT_PHYSICAL_MEMORY
 
 dnl What special compiler flags we can set?
 AC_MSG_RESULT([--- Guessing specific compiler/linker features ... ---  [[53%]]])
@@ -461,6 +449,8 @@ if test ["$ORACLE"] = ["no"] -a ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a
 	AC_MSG_WARN([yaal without any data base driver will be unusable for most professional purpouses.])
 fi
 
+CXX=["${SAVED_CXX}"]
+CC=["${SAVED_CC}"]
 AC_SUBST([EXTRA_LIB_PATHS], [${EXTRA_LIB_PATHS}])
 AC_SUBST([EXTRA_INCLUDE_PATHS], [${EXTRA_INCLUDE_PATHS}])
 AC_SUBST([DEFAULT_DRIVER], [${DEFAULT_DRIVER}])

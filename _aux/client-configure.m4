@@ -12,13 +12,6 @@ AC_ARG_ENABLE([relassert],[AC_HELP_STRING([--enable-relassert],[Compile with ful
 AC_ARG_ENABLE([profiling],[AC_HELP_STRING([--enable-profiling],[Provide support for profiling tools.])],[DO_TARGET="PROFILING" LIB_INFIX="-p"])
 AC_ARG_ENABLE([coverage],[AC_HELP_STRING([--enable-coverage],[Get ready to gather coverage data.])],[DO_TARGET="COVERAGE" LIB_INFIX="-c"])
 
-if test ["$CXX"] = ["colorgcc"] -o ["$CXX"] = ["colorg++"] ; then
-	CXX=["g++"]
-fi
-if test ["$CC"] = ["colorgcc"] ; then
-	CC=["gcc"]
-fi
-
 AC_DEFUN_ONCE([YAAL_CONFIGURE_CLIENT_INIT],
 [
 dnl Initialization data.
@@ -29,9 +22,11 @@ dnl Unique file in project: projectnamerc is sample configuration file.
 AC_CONFIG_SRCDIR([[$1rc]])
 
 dnl yaal client is not Free Software.
-AC_COPYRIGHT([[$1 (c) 2009 All rights reserved.]])
+AC_COPYRIGHT([[$1 (c) 2014 All rights reserved.]])
 
 AC_REVISION([$2])
+
+YAAL_CHECK_GIT
 
 dnl We select default language.
 AC_LANG([C++])
@@ -41,24 +36,17 @@ dnl Cheching for machine type.
 
 YAAL_DETECT_OPERATING_SYSTEM
 YAAL_DETECT_PHYSICAL_MEMORY
-YAAL_CHECK_GIT
 
 dnl Looking for main libc headers
 AC_HEADER_MAJOR
 
-dnl Testing presence of C and C++ compiler
-AC_PROG_CC
-AC_PROG_CXX
+YAAL_DETECT_COMPILER
 
-dnl and for C and C++ preprocesor
-AC_PROG_CPP
-AC_PROG_CXXCPP
-
-dnl AC_PROG_MKDIR_P dnl Centos 5.4 has obsolete version of autoconf package.
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_MKDIR_P
 AC_CHECK_PROG([CTAGS],[exctags],[exctags],[ctags])
+AC_CHECK_PROG([GTAGS],[gtags],[gtags],[true])
 
 YAAL_CHECK_COMPILER_VERSION
 
@@ -106,6 +94,8 @@ AH_BOTTOM(
 
 AC_DEFUN([YAAL_CONFIGURE_CLIENT_FINALIZE],
 [
+CXX=["${SAVED_CXX}"]
+CC=["${SAVED_CC}"]
 AC_SUBST([EXTRA_CXXFLAGS],[${EXTRA_CXXFLAGS}])
 AC_SUBST([EXTRA_LXXFLAGS],[${EXTRA_LXXFLAGS}])
 AC_SUBST([YAAL_LXXFLAGS],[${YAAL_LXXFLAGS}])

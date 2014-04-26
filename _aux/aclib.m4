@@ -227,6 +227,26 @@ AC_DEFUN([YAAL_CHECK_GIT], [
 	AC_DEFINE_UNQUOTED([PACKAGE_VCS], "${PACKAGE_VCS}", [Version Control System current commit id.])
 ])
 
+dnl YAAL_DETECT_COMPILER
+dnl Detect installed compiler package.
+dnl --------------------------------------------------------------------------
+AC_DEFUN([YAAL_DETECT_COMPILER], [
+	AC_MSG_RESULT([--- Testing presence of C and C++ compiler ... ---      [[19%]]])
+	AC_PROG_CC([gcc clang])
+	AC_PROG_CXX([g++ clang])
+	AC_MSG_RESULT([--- Testing presence of C and C++ preprocesor ... ---   [[28%]]])
+	AC_PROG_CPP([gcc clang])
+	AC_PROG_CXXCPP([g++ clang])
+
+	SAVED_CXX=["${CXX}"]
+	SAVED_CC=["${CC}"]
+	if test ["${CXX}"] = ["colorgcc"] -o ["${CXX}"] = ["colorg++"] ; then
+		CXX=["g++"]
+	fi
+	if test ["$CC"] = ["colorgcc"] ; then
+		CC=["gcc"]
+	fi
+])
 
 dnl YAAL_CHECK_COMPILER_VERSION
 dnl Check compiler version.
