@@ -43,6 +43,6 @@ endef
 
 define MAKE_DIR
 $(1):
-	@umask 022;/bin/mkdir -p $(1)
+	@umask 022;$$(MKDIR_P) $(1)
 endef
 

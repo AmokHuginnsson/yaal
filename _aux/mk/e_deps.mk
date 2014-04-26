@@ -10,7 +10,7 @@ DIR_MODULES=$(strip $(sort $(dir $(OBJS))))
 $(foreach D,$(DIR_MODULES),$(eval $(call DIR_GEN,$(subst /,,$(subst ./,,$(D))))))
 
 $(DIR_BUILD)/dirs.d:
-	@mkdir -p $(foreach D,$(DIR_MODULES),$(DIR_BUILD)/$(subst /,,$(subst ./,,$(D)))) && touch $(@)
+	@$(MKDIR_P) $(foreach D,$(DIR_MODULES),$(DIR_BUILD)/$(subst /,,$(subst ./,,$(D)))) && touch $(@)
 
 -include $(OBJS:.$(OS)=.$(DS))
 -include $(AOBJS:.$(AOS)=.$(ADS))

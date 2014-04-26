@@ -8,7 +8,7 @@ debug relassert reldeb release prof cov: environment $(REAL_TARGETS)
 environment: $(DIR_BUILD) $(DIRS)
 
 $(DIR_BUILD):
-	@/bin/mkdir -p $(@)
+	@$(MKDIR_P) $(@)
 
 $(PRJNAME).info : src/$(PRJNAME).texinfo
 	@makeinfo src/$(PRJNAME).texinfo
