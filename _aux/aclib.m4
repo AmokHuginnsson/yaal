@@ -1,3 +1,9 @@
+dnl Clear CFLAGS and CXXFLAGS.
+dnl --------------------------------------------------------------------------
+:${CXXFLAGS=""}
+:${CFLAGS=""}
+dnl --------------------------------------------------------------------------
+
 dnl Bail out if running as root.
 dnl --------------------------------------------------------------------------
 AC_DEFUN([PRIVILEGES_SANITY], [
@@ -231,21 +237,16 @@ dnl YAAL_DETECT_COMPILER
 dnl Detect installed compiler package.
 dnl --------------------------------------------------------------------------
 AC_DEFUN([YAAL_DETECT_COMPILER], [
-	AC_MSG_RESULT([--- Testing presence of C and C++ compiler ... ---      [[19%]]])
-	AC_PROG_CC([gcc clang])
-	AC_PROG_CXX([g++ clang++ clang])
-	AC_MSG_RESULT([--- Testing presence of C and C++ preprocesor ... ---   [[28%]]])
-	AC_PROG_CPP([gcc clang])
-	AC_PROG_CXXCPP([g++ clang++ clang])
-
 	SAVED_CXX=["${CXX}"]
 	SAVED_CC=["${CC}"]
-	if test ["${CXX}"] = ["colorgcc"] -o ["${CXX}"] = ["colorg++"] ; then
-		CXX=["g++"]
-	fi
-	if test ["$CC"] = ["colorgcc"] ; then
-		CC=["gcc"]
-	fi
+	CXX=[""]
+	CC=[""]
+	AC_MSG_RESULT([--- Testing presence of C and C++ compiler ... ---      [[19%]]])
+	AC_PROG_CC([gcc clang ${SAVED_CC}])
+	AC_PROG_CXX([g++ clang++ clang ${SAVED_CXX}])
+	AC_MSG_RESULT([--- Testing presence of C and C++ preprocesor ... ---   [[28%]]])
+	AC_PROG_CPP([gcc clang ${SAVED_CC}])
+	AC_PROG_CXXCPP([g++ clang++ clang ${SAVED_CXX}])
 ])
 
 dnl YAAL_CHECK_COMPILER_VERSION
