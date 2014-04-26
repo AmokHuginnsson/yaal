@@ -50,10 +50,10 @@ void update_md5_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
 yaal::hcore::HString md5( HStreamInterface& stream ) {
 	M_PROLOG
-	static int const BLOCK_SIZE = 512;
-	static int const MESSAGE_LENGTH_SIZE = 64;
-	static int const SUPPLEMENT_SIZE = 1;
-	static int const STATE_SIZE = 4;
+	static u32_t const BLOCK_SIZE = 512;
+	static u32_t const MESSAGE_LENGTH_SIZE = 64;
+	static u32_t const SUPPLEMENT_SIZE = 1;
+	static u32_t const STATE_SIZE = 4;
 	static u32_t const STATE0 = 0x67452301;
 	static u32_t const STATE1 = 0xefcdab89;
 	static u32_t const STATE2 = 0x98badcfe;
@@ -110,10 +110,10 @@ void update_sha1_state( u32_t*, HStreamBlockIterator::HBlock const& );
 
 yaal::hcore::HString sha1( HStreamInterface& stream ) {
 	M_PROLOG
-	static int const BLOCK_SIZE = 512;
-	static int const MESSAGE_LENGTH_SIZE = 64;
-	static int const SUPPLEMENT_SIZE = 1;
-	static int const STATE_SIZE = 5;
+	static u32_t const BLOCK_SIZE = 512;
+	static u32_t const MESSAGE_LENGTH_SIZE = 64;
+	static u32_t const SUPPLEMENT_SIZE = 1;
+	static u32_t const STATE_SIZE = 5;
 	static u32_t const STATE0 = 0x67452301;
 	static u32_t const STATE1 = 0xefcdab89;
 	static u32_t const STATE2 = 0x98badcfe;
