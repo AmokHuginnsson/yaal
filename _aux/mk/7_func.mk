@@ -32,7 +32,7 @@ $$(DIR_$(1))/%.$$(OS): $$(DIR_SRC_$(1))/%.$$(SS)
 endef
 
 define CONFIGURE_DRIVER
-	SONAME_$(1) := $$(LIB_PREFIX)$(1)_driver$$(LIB_INFIX).so.$$(VERSION).$$(SUBVERSION)
+	SONAME_$(1)_driver := $$(LIB_PREFIX)$(1)_driver$$(LIB_INFIX).so.$$(VERSION).$$(SUBVERSION)
 	TARGET_$(1)_driver := $$(LIB_PREFIX)$(1)_driver$$(LIB_INFIX).$$(LIB_SUFFIX)
 	TARGETS += $$(TARGET_$(1)_driver)
 	SRCS += $$(patsubst %,$$(DIR_ROOT)/$$(DIR_dbwrapper)/%.$$(SS),$(1)_driver)
