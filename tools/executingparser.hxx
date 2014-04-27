@@ -62,6 +62,7 @@ class HGrammarDescription;
 class HRuleBase;
 class HNamedRule;
 class HRecursionDetector;
+typedef yaal::hcore::HExceptionT<HRecursionDetector> HRecursionDetectorException;
 typedef yaal::hcore::HSet<HRuleBase const*> visited_t;
 typedef yaal::hcore::HMap<HRuleBase const*, int> rule_use_t;
 

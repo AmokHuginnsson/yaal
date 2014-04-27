@@ -43,17 +43,20 @@ namespace executing_parser {
 
 class HRecursionDetector {
 	visited_t _visited;
+	visited_t _stack;
 public:
 	HRecursionDetector( void )
-		: _visited() { }
+		: _visited(), _stack() { }
 	bool visit( HRuleBase const* rule_ ) {
 		M_PROLOG
-		return ( !_visited.insert( rule_ ).second );
+		if ( ! _stack.insert( rule_ ).second )
+			throw HRecursionDetectorException( "Infinite recursion detected." );
+		return ( ! _visited.insert( rule_ ).second );
 		M_EPILOG
 	}
 	void reset_visits( void ) {
 		M_PROLOG
-		_visited.clear();
+		_stack.clear();
 		return;
 		M_EPILOG
 	}
@@ -95,6 +98,8 @@ void HExecutingParser::sanitize( void ) {
 		executing_parser::HRecursionDetector recursionDetector;
 		_grammar->detect_recursion( recursionDetector );
 	} catch ( executing_parser::HRuleBaseException const& e ) {
+		throw HExecutingParserException( e.what() );
+	} catch ( executing_parser::HRecursionDetectorException const& e ) {
 		throw HExecutingParserException( e.what() );
 	} catch ( executing_parser::HGrammarDescriptionException const& e ) {
 		throw HExecutingParserException( e.what() );
@@ -218,9 +223,8 @@ void HRuleBase::detach( HRuleBase const* rule_, visited_t& visited_ ) {
 
 void HRuleBase::detect_recursion( HRecursionDetector& recursionDetector_ ) const {
 	M_PROLOG
-	if ( recursionDetector_.visit( this ) )
-		throw HRuleBaseException( "Infinite recursion detected." );
-	do_detect_recursion( recursionDetector_ );
+	if ( ! recursionDetector_.visit( this ) )
+		do_detect_recursion( recursionDetector_ );
 	return;
 	M_EPILOG
 }
