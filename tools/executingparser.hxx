@@ -61,6 +61,7 @@ namespace executing_parser {
 class HGrammarDescription;
 class HRuleBase;
 class HNamedRule;
+class HRecursionDetector;
 typedef yaal::hcore::HSet<HRuleBase const*> visited_t;
 typedef yaal::hcore::HMap<HRuleBase const*, int> rule_use_t;
 
@@ -135,6 +136,7 @@ public:
 	void describe( HRuleDescription&, rule_use_t const& ) const;
 	void detach( HRuleBase const*, visited_t& );
 	void rule_use( rule_use_t& ) const;
+	void detect_recursion( HRecursionDetector& ) const;
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) = 0;
 	virtual ptr_t do_clone( void ) const = 0;
@@ -142,6 +144,7 @@ protected:
 	virtual bool do_is_optional( void ) const;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const = 0;
 	virtual void do_detach( HRuleBase const*, visited_t& ) = 0;
+	virtual void do_detect_recursion( HRecursionDetector& ) const = 0;
 	static yaal::hcore::HString::const_iterator skip_space( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	friend class yaal::tools::HExecutingParser;
 private:
@@ -205,6 +208,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HRule& operator = ( HRule const& );
 	template<typename tType, typename a0_t, typename a1_t, typename a2_t>
@@ -226,6 +230,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HRecursiveRule( void );
 	void set_rule( HRuleBase::ptr_t const& );
@@ -255,6 +260,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const __attribute__((__noreturn__));
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 };
 
 class HFollows;
@@ -299,6 +305,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HFollows( HRuleBase const&, HRuleBase const& );
 	HFollows( HFollows const&, HRuleBase const& );
@@ -335,6 +342,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HKleeneBase( HKleeneBase const& );
 	HKleeneBase& operator = ( HKleeneBase const& );
@@ -401,6 +409,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HAlternative( HRuleBase const&, HRuleBase const& );
 	HAlternative( HAlternative const&, HRuleBase const& );
@@ -429,6 +438,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HOptional( HRuleBase const& );
 	HOptional& operator = ( HOptional const& );
@@ -475,6 +485,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HReal( void );
 	HReal& operator = ( HReal const& );
@@ -523,6 +534,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HInteger( void );
 	HInteger& operator = ( HInteger const& );
@@ -555,6 +567,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HCharacter( void );
 	HCharacter& operator = ( HCharacter const& );
@@ -587,6 +600,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HString( yaal::hcore::HString const& );
 	HString& operator = ( HString const& );
@@ -619,6 +633,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HRegex( yaal::hcore::HString const& );
 	HRegex& operator = ( HRegex const& );
