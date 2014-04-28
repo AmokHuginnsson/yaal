@@ -343,7 +343,6 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t& );
-	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HKleeneBase( HKleeneBase const& );
 	HKleeneBase& operator = ( HKleeneBase const& );
@@ -365,6 +364,7 @@ protected:
 	virtual ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HKleeneStar( HRuleBase const& );
 	HKleeneStar& operator = ( HKleeneStar const& );
@@ -386,6 +386,7 @@ protected:
 	HKleenePlus( HNamedRule const&, action_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HKleenePlus( HRuleBase const& rule_ );
 	HKleenePlus& operator = ( HKleenePlus const& );

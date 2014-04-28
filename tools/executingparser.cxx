@@ -730,15 +730,6 @@ void HKleeneBase::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 	M_EPILOG
 }
 
-void HKleeneBase::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
-	M_PROLOG
-	HRuleBase::ptr_t r( _rule.rule() );
-	if ( !! r )
-		r->detect_recursion( recursionDetector_ );
-	return;
-	M_EPILOG
-}
-
 HKleeneStar::HKleeneStar( HRuleBase const& rule_ )
 	: HKleeneBase( rule_ )
 	{}
@@ -776,6 +767,18 @@ void HKleeneStar::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) co
 	M_EPILOG
 }
 
+void HKleeneStar::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+	M_PROLOG
+	HRuleBase::ptr_t r( _rule.rule() );
+	if ( !! r ) {
+		recursionDetector_.checkpoints_push();
+		r->detect_recursion( recursionDetector_ );
+		recursionDetector_.checkpoints_pop();
+	}
+	return;
+	M_EPILOG
+}
+
 HKleenePlus::HKleenePlus( HRuleBase const& rule_ )
 	: HKleeneBase( rule_ )
 	{}
@@ -806,6 +809,15 @@ void HKleenePlus::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) co
 	rd_.desc( "+( " );
 	_rule.describe( rd_, ru_ );
 	rd_.desc( " )" );
+	return;
+	M_EPILOG
+}
+
+void HKleenePlus::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+	M_PROLOG
+	HRuleBase::ptr_t r( _rule.rule() );
+	if ( !! r )
+		r->detect_recursion( recursionDetector_ );
 	return;
 	M_EPILOG
 }
@@ -982,8 +994,11 @@ void HOptional::do_detach( HRuleBase const* rule_, visited_t& visited_ ) {
 void HOptional::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule.rule() );
-	if ( !! r )
+	if ( !! r ) {
+		recursionDetector_.checkpoints_push();
 		r->detect_recursion( recursionDetector_ );
+		recursionDetector_.checkpoints_pop();
+	}
 	return;
 	M_EPILOG
 }
