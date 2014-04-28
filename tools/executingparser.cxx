@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "executingparser.hxx"
 
+#include "hcore/hstack.hxx"
 #include "hcore/hfile.hxx"
 
 using namespace yaal::hcore;
@@ -43,21 +44,35 @@ namespace executing_parser {
 
 class HRecursionDetector {
 	visited_t _visited;
-	visited_t _stack;
+	typedef yaal::hcore::HStack<visited_t> checkpoints_t;
+	checkpoints_t _checkpoints;
 public:
 	HRecursionDetector( void )
-		: _visited(), _stack() { }
+		: _visited(), _checkpoints() {
+		_checkpoints.push( visited_t() );
+	}
 	bool visit( HRuleBase const* rule_ ) {
 		M_PROLOG
-		if ( ! _stack.insert( rule_ ).second )
+		if ( ! _checkpoints.top().insert( rule_ ).second )
 			throw HRecursionDetectorException( "Infinite recursion detected." );
 		return ( ! _visited.insert( rule_ ).second );
 		M_EPILOG
 	}
 	void reset_visits( void ) {
 		M_PROLOG
-		_stack.clear();
+		_checkpoints.top().clear();
 		return;
+		M_EPILOG
+	}
+	void checkpoints_push( void ) {
+		M_PROLOG
+		_checkpoints.push( _checkpoints.top() );
+		return;
+		M_EPILOG
+	}
+	void checkpoints_pop( void ) {
+		M_PROLOG
+		_checkpoints.pop();
 		M_EPILOG
 	}
 };
@@ -887,7 +902,9 @@ void HAlternative::do_detect_recursion( HRecursionDetector& recursionDetector_ )
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		HRuleBase::ptr_t r( it->rule() );
 		if ( !! r ) {
+			recursionDetector_.checkpoints_push();
 			r->detect_recursion( recursionDetector_ );
+			recursionDetector_.checkpoints_pop();
 		}
 	}
 	return;
