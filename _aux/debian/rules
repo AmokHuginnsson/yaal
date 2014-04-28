@@ -9,17 +9,22 @@ export PREFIX=/usr
 export SYSCONFDIR=/etc
 export LOCALSTATEDIR=/var
 
+DEBHELPER_DEST_DIR=./tmp
+
 dropprivs: ./debian/dropprivs.c
 	$(CC) $(<) -o $(@)
 
 override_dh_auto_clean: dropprivs
-	./dropprivs dh_auto_clean && /bin/rm -fr ./dropprivs ./debian/tmp
+	./dropprivs dh_auto_clean && /bin/rm -fr ./dropprivs ./$(DEBHELPER_DEST_DIR)
 
 override_dh_auto_build: dropprivs
 	./dropprivs env -u CXXFLAGS -u CFLAGS -u CPPFLAGS -u LDFLAGS dh_auto_build -- debug release doc
 
 override_dh_auto_install: dropprivs
-	./dropprivs dh_auto_install -- install-debug install-release install-doc
+	./dropprivs dh_auto_install --destdir=$(DEBHELPER_DEST_DIR) -- install-debug install-release install-doc
+
+override_dh_install: dropprivs
+	./dropprivs dh_install --sourcedir=$(DEBHELPER_DEST_DIR)
 
 
 %: dropprivs

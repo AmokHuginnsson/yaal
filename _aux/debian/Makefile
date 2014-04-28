@@ -37,7 +37,7 @@ changelog: $(VERIFY_DIR) $(DEBIAN_LINK)
 
 $(ARTIFACTS): $(VERIFY_DIR) changelog
 	cd ../../ && \
-	dpkg-buildpackage -us -uc && \
+	dpkg-buildpackage -Zgzip -us -uc && \
 	mv $(addprefix ../,$(ARTIFACTS)) _aux/debian
 
 package: $(VERIFY_DIR) $(ARTIFACTS)
