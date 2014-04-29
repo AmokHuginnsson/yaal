@@ -66,7 +66,13 @@ HRule huginn_grammar( void ) {
 	HRule multiplication( "multiplication", power >> ( * ( '*' >> power ) ) );
 	HRule sum( "sum", multiplication >> ( * ( '+' >> multiplication ) ) );
 	HRule value( "value", sum );
-	HRule assignment( "assignment", *( name >> '=' ) >> value );
+	HRule ref( "ref", value >> *( '[' >> value >> ']' ) );
+	/*
+	 * Assignment shall work only as aliasing.
+	 * In other words you cannot modify value of referenced object
+	 * with assignment. You can only change where a reference points to.
+	 */
+	HRule assignment( "assignment", *( name >> '=' ) >> ref );
 	expression %= assignment;
 	HRule booleanExpression( "booleanExpression" );
 	HRule booleanValue( "booleanValue", constant( "true" ) | constant( "false" ) | constant( '(' ) >> booleanExpression >> ')' );
