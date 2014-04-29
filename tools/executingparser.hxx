@@ -147,6 +147,8 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t& ) = 0;
 	virtual void do_detect_recursion( HRecursionDetector& ) const = 0;
 	static yaal::hcore::HString::const_iterator skip_space( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+	void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, action_t const& );
+	void report_error( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString const& );
 	friend class yaal::tools::HExecutingParser;
 private:
 	HRuleBase& operator = ( HRuleBase const& );
@@ -654,6 +656,13 @@ class HExecutingParser : private trait::HNonCopyable {
 public:
 	typedef HExecutingParser this_type;
 	typedef yaal::hcore::HBoundCall<> executor_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> messages_t;
+	class HProxy {
+		static void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, executor_t const& );
+		static void drop_execution_steps( HExecutingParser*, yaal::hcore::HString::const_iterator );
+		static void report_error( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString const& );
+		friend class executing_parser::HRuleBase;
+	};
 private:
 	typedef executing_parser::HRuleBase::ptr_t grammar_t;
 	typedef yaal::hcore::HPair<yaal::hcore::HString::const_iterator, executor_t> execution_step_t;
@@ -661,16 +670,25 @@ private:
 	grammar_t _grammar;
 	execution_steps_t _excutors;
 	bool _matched;
+	yaal::hcore::HString::const_iterator _errorPosition;
+	messages_t _errorMessages;
 public:
 	HExecutingParser( executing_parser::HRuleBase const& );
 	bool operator()( yaal::hcore::HString const& );
 	bool operator()( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	void operator()( void );
 	void execute( void );
-	void sanitize( void );
 	yaal::hcore::HString::const_iterator parse( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+	yaal::hcore::HString::const_iterator error_position( void ) const;
+	messages_t const& error_messages( void ) const;
+private:
 	void add_execution_step( yaal::hcore::HString::const_iterator, executor_t const& );
 	void drop_execution_steps( yaal::hcore::HString::const_iterator );
+	void report_error( yaal::hcore::HString::const_iterator, yaal::hcore::HString const& );
+	void sanitize( void );
+	HExecutingParser( HExecutingParser const& );
+	HExecutingParser& operator = ( HExecutingParser const& );
+	friend class HProxy;
 };
 
 typedef yaal::hcore::HExceptionT<HExecutingParser> HExecutingParserException;
