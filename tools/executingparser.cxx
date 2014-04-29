@@ -138,6 +138,11 @@ yaal::hcore::HString::const_iterator HExecutingParser::parse( yaal::hcore::HStri
 	_errorPosition = NULL;
 	_errorMessages.clear();
 	yaal::hcore::HString::const_iterator it( _grammar->parse( this, first_, last_ ) );
+	if ( executing_parser::HRuleBase::skip_space( it, last_ ) == last_ ) {
+		it = last_;
+		_errorPosition = NULL;
+		_errorMessages.clear();
+	}
 	_matched = it != first_;
 	return ( it );
 	M_EPILOG

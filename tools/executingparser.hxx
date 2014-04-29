@@ -138,6 +138,7 @@ public:
 	void detach( HRuleBase const*, visited_t& );
 	void rule_use( rule_use_t& ) const;
 	void detect_recursion( HRecursionDetector& ) const;
+	static yaal::hcore::HString::const_iterator skip_space( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) = 0;
 	virtual ptr_t do_clone( void ) const = 0;
@@ -146,7 +147,6 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const = 0;
 	virtual void do_detach( HRuleBase const*, visited_t& ) = 0;
 	virtual void do_detect_recursion( HRecursionDetector& ) const = 0;
-	static yaal::hcore::HString::const_iterator skip_space( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, action_t const& );
 	void report_error( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString const& );
 	friend class yaal::tools::HExecutingParser;
