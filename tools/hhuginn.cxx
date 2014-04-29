@@ -87,7 +87,7 @@ HRule huginn_grammar( void ) {
 	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> booleanExpression >> ')' >> scope );
 	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> scope );
 	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> '}' );
-	HRule returnStatement( "returnStatement", constant( "return" ) >> '(' >> expression >> ')' );
+	HRule returnStatement( "returnStatement", constant( "return" ) >> '(' >> expression >> ')' >> ';' );
 	HRule statement( "statement", ifStatement | whileStatement | switchStatement | returnStatement | expressionList );
 	scope %= ( '{' >> *statement >> '}' );
 	HRule nameList( "nameList", name >> ( * ( ',' >> name ) ) );
