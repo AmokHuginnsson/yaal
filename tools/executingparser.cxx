@@ -1236,6 +1236,8 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 		} else if ( !! _action )
 			add_execution_step( executingParser_, first_, call( _action ) );
 		first_ = scan;
+	} else {
+		report_error( executingParser_, scan, "expected real number" );
 	}
 	return ( first_ );
 	M_EPILOG
@@ -1393,6 +1395,8 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 		} else if ( !! _action )
 			add_execution_step( executingParser_, first_, call( _action ) );
 		first_ = scan;
+	} else {
+		report_error( executingParser_, scan, "expected integral number" );
 	}
 	return ( first_ );
 	M_EPILOG
@@ -1481,6 +1485,8 @@ yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* exe
 			add_execution_step( executingParser_, first_, call( _action ) );
 		++ scan;
 		first_ = scan;
+	} else {
+		report_error( executingParser_, scan, "expected one of characters: " + _characters );
 	}
 	return ( first_ );
 	M_EPILOG
@@ -1598,6 +1604,8 @@ hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingPar
 		else if ( !! _action )
 			add_execution_step( executingParser_, first_, call( _action ) );
 		first_ = scan;
+	} else {
+		report_error( executingParser_, scan, "expected string: " + _string );
 	}
 	return ( first_ );
 	M_EPILOG
@@ -1678,6 +1686,8 @@ hcore::HString::const_iterator HRegex::do_parse( HExecutingParser* executingPars
 		else if ( !! _action )
 			add_execution_step( executingParser_, first_, call( _action ) );
 		first_ = it->raw() + it->size();
+	} else {
+		report_error( executingParser_, scan, "expected character sequence matching regular expression: " + _regex->pattern() );
 	}
 	return ( first_ );
 	M_EPILOG
