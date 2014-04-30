@@ -565,6 +565,7 @@ void HRecursiveRule::do_detect_recursion( HRecursionDetector& recursionDetector_
 
 HRuleRef::HRuleRef( HRuleBase::ptr_t rule_ )
 	: _rule( rule_ ) {
+	M_ASSERT( !!rule_ );
 	return;
 }
 

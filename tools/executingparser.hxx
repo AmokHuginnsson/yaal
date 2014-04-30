@@ -246,7 +246,7 @@ private:
 
 typedef yaal::hcore::HExceptionT<HRecursiveRule, HRuleBaseException> HRecursiveRuleException;
 
-class HRuleRef : public HRuleBase, public yaal::hcore::HPointerFromThisInterface<HRecursiveRule> {
+class HRuleRef : public HRuleBase, public yaal::hcore::HPointerFromThisInterface<HRuleRef> {
 public:
 	typedef HRuleRef this_type;
 	typedef HRuleBase base_type;

@@ -89,13 +89,29 @@ HRule huginn_grammar( void ) {
 	booleanExpression %= ( booleanEquals | booleanNotEquals | booleanLess | booleanGreater | booleanLessEq | booleanGreaterEq | booleanAnd | booleanOr | booleanXor | booleanNot );
 	HRule expressionList( "expressionList", + ( expression >> ';' ) );
 	HRule scope( "scope" );
+	HRule loopScope( "loopScope" );
 	HRule ifStatement( "ifStatement", executing_parser::constant( "if" ) >> '(' >> booleanExpression >> ')' >> scope >> -( constant( "else" ) >> scope ) );
-	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> booleanExpression >> ')' >> scope );
-	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> scope );
-	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> '}' );
+	HRule continueStatement( "continueStatement", constant( "continue" ) >> ';' );
+	/*
+	 * TODO:
+	 * Allow `break' statement to have literal integer argument
+	 * telling how many scopes given `break' should break,
+	 * i.e.:
+	 * break ( 2 ); // <--- break two levels of nested scopes.
+	 */
+	HRule breakStatement( "breakStatement", constant( "break" ) >> ';' );
+	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> booleanExpression >> ')' >> loopScope );
+	HRule foreachStatement( "foreachStatement", constant( "foreach" ) >> '(' >> name >> ':' >> expression >> ')' >> loopScope );
+	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> scope >> -breakStatement );
+	HRule defaultStatement( "defaultStatement", constant( "default" ) >> ':' >> scope );
+	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> -defaultStatement >> '}' );
 	HRule returnStatement( "returnStatement", constant( "return" ) >> '(' >> expression >> ')' >> ';' );
-	HRule statement( "statement", ifStatement | whileStatement | switchStatement | returnStatement | expressionList );
+	HRule statement( "statement",
+			ifStatement | whileStatement | foreachStatement | switchStatement | returnStatement | expressionList );
+	HRule loopStatement( "loopStatement",
+			ifStatement | whileStatement | foreachStatement | switchStatement | breakStatement | continueStatement | returnStatement | expressionList );
 	scope %= ( '{' >> *statement >> '}' );
+	loopScope %= ( '{' >> *loopStatement >> '}' );
 	HRule nameList( "nameList", name >> ( * ( ',' >> name ) ) );
 	HRule functionDefinition( "functionDefinition", name >> '(' >> -nameList >> ')' >> scope );
 	HRule huginnGrammar( "huginnGrammar", + functionDefinition );
