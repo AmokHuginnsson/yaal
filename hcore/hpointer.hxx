@@ -57,11 +57,23 @@ class HPointer;
  */
 template<typename tType, typename pointer_type_t>
 struct HPointerStrict {
+	static tType const* raw( tType const* pointer_ ) {
+		return ( pointer_type_t::raw( pointer_ ) );
+	}
 	static tType* raw( tType* pointer_ ) {
 		return ( pointer_type_t::raw( pointer_ ) );
 	}
+	static typename trait::make_reference<tType>::type object_at( tType const* pointer_, int index_ ) {
+		return ( pointer_type_t::object_at( pointer_, index_ ) );
+	}
 	static typename trait::make_reference<tType>::type object_at( tType* pointer_, int index_ ) {
-		return ( pointer_type_t::object_at( pointer_[ index_ ], index_ ) );
+		return ( pointer_type_t::object_at( pointer_, index_ ) );
+	}
+	static tType const* pointer( tType const* pointer_ ) {
+		return ( pointer_ );
+	}
+	static tType* pointer( tType* pointer_ ) {
+		return ( pointer_ );
 	}
 	template<typename deleter_t>
 	inline static void delete_pointee( deleter_t const& deleter_ )
@@ -110,6 +122,9 @@ struct HPointerScalar {
 	static void delete_pointee( tType* pointer_ ) {
 		M_SAFE( delete static_cast<real_t*>( pointer_ ) );
 	}
+	static tType const* raw( tType const* pointer_ ) {
+		return ( pointer_ );
+	}
 	static tType* raw( tType* pointer_ ) {
 		return ( pointer_ );
 	}
@@ -122,6 +137,9 @@ struct HPointerArray {
 	template<typename real_t>
 	static void delete_pointee( tType* pointer_ ) {
 		M_SAFE( delete [] static_cast<real_t*>( pointer_ ) );
+	}
+	static tType const& object_at( tType const* pointer_, int index_ ) {
+		return ( pointer_[ index_ ] );
 	}
 	static tType& object_at( tType* pointer_, int index_ ) {
 		return ( pointer_[ index_ ] );
@@ -257,11 +275,11 @@ public:
 	}
 	const_reference operator* ( void ) const {
 		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-		return ( *_object );
+		return ( *access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) );
 	}
 	reference operator* ( void ) {
 		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-		return ( *_object );
+		return ( *access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) );
 	}
 	const_reference operator[] ( int index_ ) const {
 		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
@@ -276,20 +294,20 @@ public:
 	template<typename alien_t, template<typename, typename>class alien_access_t>
 	bool operator == ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
 		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-		return ( _object == static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) == alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
 	}
 	template<typename alien_t>
 	bool operator == ( alien_t const* const pointer_ ) const {
-		return ( _object == pointer_ );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer(_object ) == pointer_ );
 	}
 	template<typename alien_t, template<typename, typename>class alien_access_t>
 	bool operator != ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
 		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-		return ( _object != static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) != alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
 	}
 	template<typename alien_t>
 	bool operator != ( alien_t const* const pointer_ ) const {
-		return ( _object != pointer_ );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) != pointer_ );
 	}
 	tType const* operator->( void ) const {
 		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
@@ -300,19 +318,19 @@ public:
 		return ( access_type_t<tType, pointer_type_t<tType> >::raw( _object ) );
 	}
 	tType const* raw( void ) const {
-		return ( _object );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) );
 	}
 	tType* raw( void ) {
-		return ( _object );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) );
 	}
 	tType const* get( void ) const {
-		return ( _object );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) );
 	}
 	tType* get( void ) {
-		return ( _object );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) );
 	}
 	bool operator! ( void ) const {
-		return ( ! _object );
+		return ( ! access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) );
 	}
 	void swap( HPointer& p ) {
 		if ( &p != this ) {
