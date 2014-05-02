@@ -247,6 +247,7 @@ public:
 	 * \param position - index of a position to get character for.
 	 * \return character at given position in this string.
 	 */
+	HString operator + ( HString const& ) const;
 	char operator[] ( int const position ) const;
 	/*! \brief Get character at given position.
 	 *
@@ -264,6 +265,12 @@ public:
 	 * \param position - index of a position where given character shall be set.
 	 * \param character - character to be set at given position.
 	 */
+	bool operator == ( HString const& ) const;
+	bool operator != ( HString const& ) const;
+	bool operator >= ( HString const& ) const;
+	bool operator <= ( HString const& ) const;
+	bool operator > ( HString const& ) const;
+	bool operator < ( HString const& ) const;
 	char set_at( int long position, char character );
 	/*! \brief Get access to raw character data stored in this string.
 	 *
@@ -716,14 +723,14 @@ private:
 		{}
 };
 
-HString operator + ( HString const&, HString const& );
+HString operator + ( char const*, HString const& );
+bool operator == ( char const*, HString const& );
+bool operator != ( char const*, HString const& );
+bool operator >= ( char const*, HString const& );
+bool operator <= ( char const*, HString const& );
+bool operator > ( char const*, HString const& );
+bool operator < ( char const*, HString const& );
 int strcasecmp( HString const&, HString const& );
-bool operator == ( HString const&, HString const& );
-bool operator != ( HString const&, HString const& );
-bool operator >= ( HString const&, HString const& );
-bool operator <= ( HString const&, HString const& );
-bool operator > ( HString const&, HString const& );
-bool operator < ( HString const&, HString const& );
 HString to_string( int short );
 HString to_string( int short unsigned );
 HString to_string( int );

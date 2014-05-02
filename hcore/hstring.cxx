@@ -421,13 +421,6 @@ HString& HString::operator = ( HString&& string_ ) {
 }
 #endif /* #if CXX_STANDARD >= 2011 */
 
-HString operator + ( HString const& string_, HString const& right ) {
-	M_PROLOG
-	HString str( string_ );
-	return ( str += right );
-	M_EPILOG
-}
-
 HString& HString::operator += ( HString const& string_ ) {
 	M_PROLOG
 	int long otherSize( string_.get_length() );
@@ -439,6 +432,13 @@ HString& HString::operator += ( HString const& string_ ) {
 		SET_SIZE( newSize );
 	}
 	return ( *this );
+	M_EPILOG
+}
+
+HString HString::operator + ( HString const& other_ ) const {
+	M_PROLOG
+	HString str( *this );
+	return ( str += other_ );
 	M_EPILOG
 }
 
@@ -465,42 +465,85 @@ char HString::set_at( int long const index_, char char_ ) {
 	M_EPILOG
 }
 
-bool operator == ( HString const& left, HString const& right ) {
+bool  HString::operator == ( HString const& other_ ) const {
 	M_PROLOG
-	int long len( left.get_length() );
-	return ( ( &left == &right )
-			|| ( ( len == right.get_length() )
-				&& ( ! ( len && ::std::strcmp( left.raw(), right.raw() ) ) ) ) );
+	return ( ( this == &other_ )
+			|| ( ( GET_SIZE == other_.get_length() )
+				&& ( ! ( GET_SIZE && ::std::strcmp( ROMEM, other_.raw() ) ) ) ) );
 	M_EPILOG
 }
 
-bool operator != ( HString const& left, HString const& right ) {
+bool HString::operator != (  HString const& other_ ) const {
 	M_PROLOG
-	return ( ! operator == ( left, right ) );
+	return ( ! operator == ( other_ ) );
 	M_EPILOG
 }
 
-bool operator >= ( HString const& left, HString const& right ) {
+bool  HString::operator >= ( HString const& other_ ) const {
 	M_PROLOG
-	return ( ::std::strcoll( left.raw(), right.raw() ) >= 0 );
+	return ( ::std::strcoll( ROMEM, other_.raw() ) >= 0 );
 	M_EPILOG
 }
 
-bool operator <= ( HString const& left, HString const& right ) {
+bool HString::operator <= ( HString const& other_ ) const {
 	M_PROLOG
-	return ( ::std::strcoll( left.raw(), right.raw() ) <= 0 );
+	return ( ::std::strcoll( ROMEM, other_.raw() ) <= 0 );
 	M_EPILOG
 }
 
-bool operator > ( HString const& left, HString const& right ) {
+bool HString::operator > ( HString const& other_ ) const {
 	M_PROLOG
-	return ( ! operator <= ( left, right ) );
+	return ( ! operator <= ( other_ ) );
 	M_EPILOG
 }
 
-bool operator < ( HString const& left, HString const& right ) {
+bool HString::operator < ( HString const& other_ ) const {
 	M_PROLOG
-	return ( ! operator >= ( left, right ) );
+	return ( ! operator >= ( other_ ) );
+	M_EPILOG
+}
+
+HString operator + ( char const* left_, HString const& right_ ) {
+	M_PROLOG
+	HString tmp( left_ );
+	tmp.operator += ( right_ );
+	return ( tmp );
+	M_EPILOG
+}
+
+bool operator == ( char const* left_, HString const& right_ ) {
+	M_PROLOG
+	return ( right_.operator == ( left_ ) );
+	M_EPILOG
+}
+
+bool operator != ( char const* left_, HString const& right_ ) {
+	M_PROLOG
+	return ( right_.operator != ( left_ ) );
+	M_EPILOG
+}
+
+bool operator >= ( char const* left_, HString const& right_ ) {
+	M_PROLOG
+	return ( right_.operator < ( left_ ) );
+	M_EPILOG
+}
+
+bool operator <= ( char const* left_, HString const& right_ ) {
+	M_PROLOG
+	return ( right_.operator > ( left_ ) );
+	M_EPILOG
+}
+
+bool operator > ( char const* left_, HString const& right_ ) {
+	M_PROLOG
+	return ( right_.operator <= ( left_ ) );
+	M_EPILOG
+}
+
+bool operator < ( char const* left_, HString const& right_ ) {
+	M_PROLOG
+	return ( right_.operator >= ( left_ ) );
 	M_EPILOG
 }
 
