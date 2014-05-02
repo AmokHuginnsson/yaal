@@ -742,6 +742,8 @@ HString to_string( int long long unsigned );
 HString to_string( float );
 HString to_string( double );
 HString to_string( double long );
+HString to_string( char const* );
+HString to_string( void const* );
 int stoi( HString const&, int* = NULL, int = 10 );
 int long stol( HString const&, int* = NULL, int = 10 );
 int long unsigned stoul( HString const&, int* = NULL, int = 10 );

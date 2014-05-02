@@ -1376,6 +1376,18 @@ HString to_string( double long val_ ) {
 	M_EPILOG
 }
 
+HString to_string( char const* val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
+HString to_string( void const* val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
 int stoi( HString const& str_, int* endIdx_, int base_ ) {
 	M_PROLOG
 	return ( static_cast<int>( stoll( str_, endIdx_, base_ ) ) );
