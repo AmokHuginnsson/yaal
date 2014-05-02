@@ -80,6 +80,7 @@ public:
 	void desc( yaal::hcore::HString const& );
 	void add( HNamedRule const* );
 	yaal::hcore::HString const& make_name( HNamedRule const& );
+	yaal::hcore::HString const& make_name_auto( HRuleBase const* );
 	named_children_t const& children( void ) const;
 	yaal::hcore::HString const& description( void ) const;
 	void clear( void ); 

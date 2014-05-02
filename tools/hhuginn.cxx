@@ -110,6 +110,10 @@ HRule huginn_grammar( void ) {
 			ifStatement | whileStatement | foreachStatement | switchStatement | returnStatement | expressionList );
 	HRule loopStatement( "loopStatement",
 			ifStatement | whileStatement | foreachStatement | switchStatement | breakStatement | continueStatement | returnStatement | expressionList );
+	/*
+	 * Problem with clone().
+	 * Detach works on cloned nodes.
+	 */
 	scope %= ( '{' >> *statement >> '}' );
 	loopScope %= ( '{' >> *loopStatement >> '}' );
 	HRule nameList( "nameList", name >> ( * ( ',' >> name ) ) );

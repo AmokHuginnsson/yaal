@@ -1828,16 +1828,24 @@ yaal::hcore::HString const& HRuleDescription::make_name( HNamedRule const& nr_ )
 	if ( ! nr_.name().is_empty() )
 		name = &nr_.name();
 	else {
-		automatic_names_t::const_iterator a( _automaticNames.find( nr_.id() ) );
-		if ( a != _automaticNames.end() )
-			name = &a->second;
-		else {
-			static int const MAX_AUTO_NAMES_COUNT = 26;
-			int autoNamesCount( static_cast<int>( _automaticNames.get_size() ) );
-			name = &( _automaticNames[nr_.id()] = ( _automaticNames.get_size() < MAX_AUTO_NAMES_COUNT ) ?
-					hcore::HString( static_cast<char>( 'A' + autoNamesCount ) ) + '_'
-					: hcore::HString( "rule" ) + nr_.id() );
-		}
+		name = &make_name_auto( nr_.id() );
+	}
+	return ( *name );
+	M_EPILOG
+}
+
+yaal::hcore::HString const& HRuleDescription::make_name_auto( HRuleBase const* rule_ ) {
+	M_PROLOG
+	hcore::HString const* name( NULL );
+	automatic_names_t::const_iterator a( _automaticNames.find( rule_ ) );
+	if ( a != _automaticNames.end() )
+		name = &a->second;
+	else {
+		static int const MAX_AUTO_NAMES_COUNT = 26;
+		int autoNamesCount( static_cast<int>( _automaticNames.get_size() ) );
+		name = &( _automaticNames[rule_] = ( _automaticNames.get_size() < MAX_AUTO_NAMES_COUNT ) ?
+				hcore::HString( static_cast<char>( 'A' + autoNamesCount ) ) + '_'
+				: hcore::HString( "rule" ) + rule_ );
 	}
 	return ( *name );
 	M_EPILOG
@@ -1849,10 +1857,11 @@ HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
 	HRuleDescription rd;
 	rule_use_t ru;
 	rule_.rule_use( ru );
-	rule_.describe( rd, ru );
 	HRule const* rule( dynamic_cast<HRule const*>( &rule_ ) );
+	hcore::HString rootName( ! rule ? rd.make_name_auto( &rule_ ) + " = " : "" );
+	rule_.describe( rd, ru );
 	if ( ( ! rule || rule->get_name().is_empty() ) && ! ( rule && ( rd.children().size() == 1 ) && ( rd.children()[0] == rule->get_named_rule() ) ) )
-		_rules.push_back( rd.description() );
+		_rules.push_back( rootName + rd.description() );
 	copy( rd.children().begin(), rd.children().end(), push_insert_iterator( _ruleOrder ) );
 	_visited.insert( &rule_ );
 	while ( ! _ruleOrder.is_empty() ) {
