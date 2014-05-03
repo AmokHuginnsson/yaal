@@ -202,6 +202,7 @@ public:
 	virtual ~HRule( void );
 	HRule operator[]( action_t const& ) const;
 	HRule& operator %= ( HRuleBase const& );
+	HRule& define( HRuleBase const&, bool );
 	yaal::hcore::HString const& get_name( void ) const;
 	HNamedRule const* get_named_rule( void ) const;
 protected:
@@ -237,7 +238,7 @@ protected:
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
 private:
 	HRecursiveRule( void );
-	void set_rule( HRuleBase::ptr_t const& );
+	void set_rule( HRuleBase::ptr_t const&, bool );
 	HRecursiveRule( HRecursiveRule const& );
 	HRecursiveRule& operator = ( HRecursiveRule const& );
 	friend class HRule;

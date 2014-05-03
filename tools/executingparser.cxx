@@ -408,10 +408,16 @@ HRule::~HRule( void ) {
 
 HRule& HRule::operator %= ( HRuleBase const& rule_ ) {
 	M_PROLOG
+	return ( define( rule_, true ) );
+	M_EPILOG
+}
+
+HRule& HRule::define( HRuleBase const& rule_, bool detach_ ) {
+	M_PROLOG
 	M_ENSURE( ! _completelyDefined );
 	HRecursiveRule* rr( dynamic_cast<HRecursiveRule*>( _rule.rule().raw() ) );
 	M_ENSURE( rr );
-	rr->set_rule( rule_.clone() );
+	rr->set_rule( rule_.clone(), detach_ );
 	_completelyDefined = true;
 	return ( *this );
 	M_EPILOG
@@ -502,10 +508,12 @@ HRecursiveRule::HRecursiveRule( void )
 	: _rule() {
 }
 
-void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_ ) {
+void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_, bool detach_ ) {
 	_rule = rule_;
-	visited_t visited;
-	_rule->detach( this, visited );
+	if ( detach_ ) {
+		visited_t visited;
+		_rule->detach( this, visited );
+	}
 	return;
 }
 

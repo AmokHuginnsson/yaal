@@ -115,7 +115,7 @@ HRule huginn_grammar( void ) {
 	 * Detach works on cloned nodes.
 	 */
 	scope %= ( '{' >> *statement >> '}' );
-	loopScope %= ( '{' >> *loopStatement >> '}' );
+	loopScope.define( '{' >> *loopStatement >> '}', false );
 	HRule nameList( "nameList", name >> ( * ( ',' >> name ) ) );
 	HRule functionDefinition( "functionDefinition", name >> '(' >> -nameList >> ')' >> scope );
 	HRule huginnGrammar( "huginnGrammar", + functionDefinition );
