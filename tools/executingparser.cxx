@@ -79,7 +79,8 @@ public:
 };
 
 class HRecursiveRulesAggregator {
-	typedef yaal::hcore::HMultiMap<HRecursiveRule const*, HNamedRule*> recursions_t;
+	typedef yaal::hcore::HArray<HNamedRule*> named_rules_t;
+	typedef yaal::hcore::HMap<HRecursiveRule const*, named_rules_t> recursions_t;
 	recursions_t _recursions;
 	visited_t _visited;
 public:
@@ -92,7 +93,22 @@ public:
 	}
 	void add( HRecursiveRule const* rule_, HNamedRule* parent_ ) {
 		M_PROLOG
-		_recursions.insert( make_pair( rule_, parent_ ) );
+		_recursions[ rule_ ].push_back( parent_ );
+		return;
+		M_EPILOG
+	}
+	void merge( void ) {
+		M_PROLOG
+		for ( recursions_t::iterator it( _recursions.begin() ), end( _recursions.end() ); it != end; ++ it ) {
+			if ( it->second.size() > 1 ) {
+				named_rules_t& nrs( it->second );
+				named_rules_t::iterator i( nrs.begin() );
+				++ i;
+				for ( named_rules_t::iterator e( nrs.end() ); i != e; ++ i ) {
+					(*i)->reset( make_pointer<HRuleRef>( it->first->get_pointer() ) );
+				}
+			}
+		}
 		return;
 		M_EPILOG
 	}
@@ -720,6 +736,9 @@ HFollows::HFollows( HRuleBase const& predecessor_, HRuleBase const& successor_ )
 	M_PROLOG
 	_rules.push_back( predecessor_ );
 	_rules.push_back( successor_ );
+	HRecursiveRulesAggregator rra;
+	find_recursions( rra );
+	rra.merge();
 	return;
 	M_EPILOG
 }
@@ -739,6 +758,9 @@ HFollows::HFollows( HFollows const& predecessors_, HRuleBase const& successor_ )
 	for ( rules_t::const_iterator it( predecessors_._rules.begin() ), end( predecessors_._rules.end() ); it != end; ++ it )
 		_rules.push_back( *it );
 	_rules.push_back( successor_ );
+	HRecursiveRulesAggregator rra;
+	find_recursions( rra );
+	rra.merge();
 	return;
 	M_EPILOG
 }
@@ -1013,6 +1035,9 @@ HAlternative::HAlternative( HRuleBase const& choice1_, HRuleBase const& choice2_
 	M_PROLOG
 	_rules.push_back( choice1_ );
 	_rules.push_back( choice2_ );
+	HRecursiveRulesAggregator rra;
+	find_recursions( rra );
+	rra.merge();
 	return;
 	M_EPILOG
 }
@@ -1032,6 +1057,9 @@ HAlternative::HAlternative( HAlternative const& alternative_, HRuleBase const& c
 	for ( rules_t::const_iterator it( alternative_._rules.begin() ), end( alternative_._rules.end() ); it != end; ++ it )
 		_rules.push_back( *it );
 	_rules.push_back( choice_ );
+	HRecursiveRulesAggregator rra;
+	find_recursions( rra );
+	rra.merge();
 	return;
 	M_EPILOG
 }
