@@ -556,7 +556,9 @@ HRecursiveRule::HRecursiveRule( void )
 
 void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_, bool detachAll_ ) {
 	M_PROLOG
-	M_ENSURE( ! dynamic_cast<HRecursiveRule const*>( rule_.raw() ) );
+	/*
+	 * HRecursiveRule can be set to other HRecursiveRule! :(
+	 */
 	_rule = rule_;
 	visited_t visited;
 	_rule->detach( this, visited, detachAll_ );
@@ -603,7 +605,10 @@ void HRecursiveRule::do_rule_use( rule_use_t& ruleUse_ ) const {
 
 void HRecursiveRule::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& detachAll_ ) {
 	M_PROLOG
-	M_ENSURE( rule_ != this );
+	/*
+	 * HRecursiveRule can be omitted once while detaching!
+	 * It is impossible then to perform this test: M_ENSURE( rule_ != this ).
+	 */
 	if ( !! _rule )
 		_rule->detach( rule_, visited_, detachAll_ );
 	return;
@@ -629,7 +634,10 @@ void HRecursiveRule::do_find_recursions( HRecursiveRulesAggregator& recursions_ 
 HRuleRef::HRuleRef( HRuleBase::ptr_t rule_ )
 	: _rule( rule_ ) {
 	M_ASSERT( !!rule_ );
-	M_ENSURE( ! dynamic_cast<HRecursiveRule*>( rule_.raw() ) );
+	/*
+	 * HRuleRef is always set to HRecursiveRule.
+	 */
+	M_ENSURE( !!dynamic_cast<HRecursiveRule*>( rule_.raw() ) );
 	return;
 }
 
