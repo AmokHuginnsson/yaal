@@ -205,7 +205,6 @@ public:
 	virtual ~HRule( void );
 	HRule operator[]( action_t const& ) const;
 	HRule& operator %= ( HRuleBase const& );
-	HRule& define( HRuleBase const&, bool );
 	yaal::hcore::HString const& get_name( void ) const;
 	HNamedRule const* get_named_rule( void ) const;
 protected:
@@ -243,7 +242,7 @@ protected:
 	virtual void do_find_recursions( HRecursiveRulesAggregator& );
 private:
 	HRecursiveRule( void );
-	void set_rule( HRuleBase::ptr_t const&, bool );
+	void set_rule( HRuleBase::ptr_t const& );
 	HRecursiveRule( HRecursiveRule const& );
 	HRecursiveRule& operator = ( HRecursiveRule const& );
 	friend class HRule;
@@ -687,16 +686,17 @@ private:
 	grammar_t _grammar;
 	execution_steps_t _excutors;
 	bool _matched;
-	yaal::hcore::HString::const_iterator _errorPosition;
+	int long _errorPosition;
 	messages_t _errorMessages;
+	yaal::hcore::HString::const_iterator _inputStart; /*!< Ephemeric! */
 public:
 	HExecutingParser( executing_parser::HRuleBase const& );
 	bool operator()( yaal::hcore::HString const& );
 	bool operator()( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	void operator()( void );
 	void execute( void );
-	yaal::hcore::HString::const_iterator parse( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	yaal::hcore::HString::const_iterator error_position( void ) const;
+	bool parse( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+	int long error_position( void ) const;
 	messages_t const& error_messages( void ) const;
 private:
 	void add_execution_step( yaal::hcore::HString::const_iterator, executor_t const& );
