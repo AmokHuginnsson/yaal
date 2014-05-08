@@ -94,13 +94,38 @@ public:
 		return ( ! _visited.insert( rule_ ).second );
 		M_EPILOG
 	}
+	void verify( HNamedRule& nr_ ) {
+		M_PROLOG
+		HRuleBase::ptr_t r( nr_.rule() );
+		if ( !! r ) {
+			HRuleRef const* rref( dynamic_cast<HRuleRef const*>( r.raw() ) );
+			if ( rref ) {
+				HRecursiveRule const* rr( dynamic_cast<HRecursiveRule const*>( rref->get_rule() ) );
+				M_ASSERT( !! rr );
+				if ( ! have_strict( rr ) ) {
+					nr_.reset( r = rr->get_pointer() );
+				}
+			}
+			HRecursiveRule const* rr( dynamic_cast<HRecursiveRule const*>( r.raw() ) );
+			if ( rr )
+				add( rr, &nr_ );
+			r->find_recursions( *this );
+		}
+		return;
+		M_EPILOG
+	}
+private:
 	void add( HRecursiveRule const* rule_, HNamedRule* parent_ ) {
 		M_PROLOG
 		_recursions[ rule_ ].push_back( parent_ );
 		return;
 		M_EPILOG
 	}
-private:
+	bool have_strict( HRecursiveRule const* rule_ ) {
+		M_PROLOG
+		return ( _recursions.count( rule_ ) > 0 );
+		M_EPILOG
+	}
 	void merge( void ) {
 		M_PROLOG
 		for ( recursions_t::iterator it( _recursions.begin() ), end( _recursions.end() ); it != end; ++ it ) {
@@ -539,13 +564,7 @@ void HRule::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const 
 
 void HRule::do_find_recursions( HRecursiveRulesAggregator& recursions_ ) {
 	M_PROLOG
-	HRuleBase::ptr_t r( _rule.rule() );
-	if ( !! r ) {
-		HRecursiveRule const* rr( dynamic_cast<HRecursiveRule const*>( r.raw() ) );
-		if ( rr )
-			recursions_.add( rr, &_rule );
-		r->find_recursions( recursions_ );
-	}
+	recursions_.verify( _rule );
 	return;
 	M_EPILOG
 }
@@ -584,7 +603,7 @@ void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_ ) {
 	 */
 	_rule = rule_;
 	visited_t visited;
-	bool detachAll( false );
+	bool detachAll( true );
 	_rule->detach( this, visited, detachAll );
 	return;
 	M_EPILOG
@@ -863,13 +882,7 @@ void HFollows::do_detect_recursion( HRecursionDetector& recursionDetector_ ) con
 void HFollows::do_find_recursions( HRecursiveRulesAggregator& recursions_ ) {
 	M_PROLOG
 	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
-		HRuleBase::ptr_t r( it->rule() );
-		if ( !! r ) {
-			HRecursiveRule const* rr( dynamic_cast<HRecursiveRule const*>( r.raw() ) );
-			if ( rr )
-				recursions_.add( rr, &*it );
-			r->find_recursions( recursions_ );
-		}
+		recursions_.verify( *it );
 	}
 	return;
 	M_EPILOG
@@ -931,13 +944,7 @@ void HKleeneBase::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& 
 
 void HKleeneBase::do_find_recursions( HRecursiveRulesAggregator& recursions_ ) {
 	M_PROLOG
-	HRuleBase::ptr_t r( _rule.rule() );
-	if ( !! r ) {
-		HRecursiveRule const* rr( dynamic_cast<HRecursiveRule const*>( r.raw() ) );
-		if ( rr )
-			recursions_.add( rr, &_rule );
-		r->find_recursions( recursions_ );
-	}
+	recursions_.verify( _rule );
 	return;
 	M_EPILOG
 }
@@ -1144,13 +1151,7 @@ void HAlternative::do_detect_recursion( HRecursionDetector& recursionDetector_ )
 void HAlternative::do_find_recursions( HRecursiveRulesAggregator& recursions_ ) {
 	M_PROLOG
 	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
-		HRuleBase::ptr_t r( it->rule() );
-		if ( !! r ) {
-			HRecursiveRule const* rr( dynamic_cast<HRecursiveRule const*>( r.raw() ) );
-			if ( rr )
-				recursions_.add( rr, &*it );
-			r->find_recursions( recursions_ );
-		}
+		recursions_.verify( *it );
 	}
 	return;
 	M_EPILOG
@@ -1242,13 +1243,7 @@ void HOptional::do_detect_recursion( HRecursionDetector& recursionDetector_ ) co
 
 void HOptional::do_find_recursions( HRecursiveRulesAggregator& recursions_ ) {
 	M_PROLOG
-	HRuleBase::ptr_t r( _rule.rule() );
-	if ( !! r ) {
-		HRecursiveRule const* rr( dynamic_cast<HRecursiveRule const*>( r.raw() ) );
-		if ( rr )
-			recursions_.add( rr, &_rule );
-		r->find_recursions( recursions_ );
-	}
+	recursions_.verify( _rule );
 	return;
 	M_EPILOG
 }
