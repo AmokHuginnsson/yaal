@@ -422,36 +422,40 @@ void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const 
 }
 
 HRule::HRule( yaal::hcore::HString const& name_ )
-	: HRuleBase(), _rule( name_, make_pointer<HRecursiveRule>() ), _completelyDefined( false )
-	{}
+	: HRuleBase(), _rule( name_, make_pointer<HRecursiveRule>() ), _completelyDefined( false ) {
+}
 
 HRule::HRule( void )
-	: HRuleBase(), _rule( make_pointer<HRecursiveRule>() ), _completelyDefined( false )
-	{}
+	: HRuleBase(), _rule( make_pointer<HRecursiveRule>() ), _completelyDefined( false ) {
+}
 
 HRule::HRule( HRule const& rule_ )
 	: HRuleBase( rule_._action ), _rule( rule_._rule ), _completelyDefined( rule_._completelyDefined ) {
 }
 
 HRule::HRule( HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_.clone() ), _completelyDefined( true )
-	{}
+	: HRuleBase(), _rule( rule_.clone() ), _completelyDefined( true ) {
+	HRecursiveRulesAggregator rra( this );
+}
 
 HRule::HRule( ptr_t const& rule_ )
-	: _rule( rule_ ), _completelyDefined( true )
-	{}
+	: _rule( rule_ ), _completelyDefined( true ) {
+	HRecursiveRulesAggregator rra( this );
+}
 
 HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_ )
-	: HRuleBase(), _rule( name_, rule_.clone() ), _completelyDefined( true )
-	{}
+	: HRuleBase(), _rule( name_, rule_.clone() ), _completelyDefined( true ) {
+	HRecursiveRulesAggregator rra( this );
+}
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_ )
-	: _rule( name_, rule_ ), _completelyDefined( true )
-	{}
+	: _rule( name_, rule_ ), _completelyDefined( true ) {
+	HRecursiveRulesAggregator rra( this );
+}
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( name_, rule_ ), _completelyDefined( true )
-	{}
+	: HRuleBase( action_ ), _rule( name_, rule_ ), _completelyDefined( true ) {
+}
 
 HRule::~HRule( void ) {
 	M_PROLOG
@@ -579,8 +583,9 @@ void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_ ) {
 	 * HRecursiveRule can be set to other HRecursiveRule! :(
 	 */
 	_rule = rule_;
-//	visited_t visited;
-//	_rule->detach( this, visited, detachAll_ );
+	visited_t visited;
+	bool detachAll( false );
+	_rule->detach( this, visited, detachAll );
 	return;
 	M_EPILOG
 }
