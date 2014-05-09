@@ -225,9 +225,10 @@ void HConsole::enter_curses( void ) {
 	/* init color pairs */
 	M_ENSURE( use_default_colors() == OK );
 	M_ENSURE( assume_default_colors( COLOR_BLACK, COLOR_BLACK ) == OK );
-	for ( int bg( 0 ); bg < ::COLORS; ++ bg ) {
-		for ( int fg( 0 ); fg < ::COLORS; ++ fg ) {
-			init_pair( static_cast<short>( bg * ::COLORS + fg ),
+	static int const COLOR_MAX( countof ( colors ) );
+	for ( int bg( 0 ); bg < COLOR_MAX; ++ bg ) {
+		for ( int fg( 0 ); fg < COLOR_MAX; ++ fg ) {
+			init_pair( static_cast<short>( bg * COLOR_MAX + fg ),
 					colors[ fg ], colors[ bg ] );
 		}
 	}
