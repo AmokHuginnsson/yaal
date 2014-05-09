@@ -46,23 +46,23 @@ namespace hconsole {
 /*! \brief Special key codes.
  */
 struct KEY_CODES {
-	static int const ESC					= 27;
+	static int const ESC          = 27;
 	/* Coincidentaly KEY_MAX from ncurses is 0777 which is 511. */
 	static int const SPECIAL_KEY  = 0x400;
-	static int const PAGE_UP			= SPECIAL_KEY;
-	static int const PAGE_DOWN		= PAGE_UP		+ 1;
-	static int const DOWN					= PAGE_DOWN	+ 1;
-	static int const UP						= DOWN			+ 1;
-	static int const LEFT					= UP				+ 1;
-	static int const RIGHT				= LEFT			+ 1;
-	static int const HOME					= RIGHT			+ 1;
-	static int const END					= HOME			+ 1;
-	static int const DELETE				= END				+ 1;
-	static int const INSERT				= DELETE		+ 1;
-	static int const BACKSPACE		= INSERT		+ 1;
-	static int const MOUSE				=	BACKSPACE	+ 1;
-	static int const META_BASE		= 0x04000;
-	static int const COMMAND_BASE	= 0x08000;
+	static int const PAGE_UP      = SPECIAL_KEY;
+	static int const PAGE_DOWN    = PAGE_UP   + 1;
+	static int const DOWN         = PAGE_DOWN + 1;
+	static int const UP           = DOWN      + 1;
+	static int const LEFT         = UP        + 1;
+	static int const RIGHT        = LEFT      + 1;
+	static int const HOME         = RIGHT     + 1;
+	static int const END          = HOME      + 1;
+	static int const DELETE       = END       + 1;
+	static int const INSERT       = DELETE    + 1;
+	static int const BACKSPACE    = INSERT    + 1;
+	static int const MOUSE        = BACKSPACE + 1;
+	static int const META_BASE    = 0x04000;
+	static int const COMMAND_BASE = 0x08000;
 };
 
 /*! \brief Quasi graphic glyphs.
@@ -95,14 +95,16 @@ struct COLORS {
 		FG_MAGENTA       = 5,
 		FG_CYAN          = 6,
 		FG_LIGHTGRAY     = 7,
-		FG_GRAY          = 8,
-		FG_BRIGHTRED     = 9,
-		FG_BRIGHTGREEN   = 10,
-		FG_YELLOW        = 11,
-		FG_BRIGHTBLUE    = 12,
-		FG_BRIGHTMAGENTA = 13,
-		FG_BRIGHTCYAN    = 14,
-		FG_WHITE         = 15,
+		FG_BOLD          = 8,
+		FG_GRAY          = FG_BLACK     | FG_BOLD,
+		FG_BRIGHTRED     = FG_RED       | FG_BOLD,
+		FG_BRIGHTGREEN   = FG_GREEN     | FG_BOLD,
+		FG_YELLOW        = FG_BROWN     | FG_BOLD,
+		FG_BRIGHTBLUE    = FG_BLUE      | FG_BOLD,
+		FG_BRIGHTMAGENTA = FG_MAGENTA   | FG_BOLD,
+		FG_BRIGHTCYAN    = FG_CYAN      | FG_BOLD,
+		FG_WHITE         = FG_LIGHTGRAY | FG_BOLD,
+		FG_MASK          = 0x07,
 
 		BG_BLACK         = 0,
 		BG_RED           = 16,
@@ -113,14 +115,15 @@ struct COLORS {
 		BG_CYAN          = 96,
 		BG_LIGHTGRAY     = 112,
 		BG_BLINK         = 128,
-		BG_GRAY          = BG_BLINK,
-		BG_BRIGHTRED     = 16 | BG_BLINK,
-		BG_BRIGHTGREEN   = 32 | BG_BLINK,
-		BG_YELLOW        = 48 | BG_BLINK,
-		BG_BRIGHTBLUE    = 64 | BG_BLINK,
-		BG_BRIGHTMAGENTA = 80 | BG_BLINK,
-		BG_BRIGHTCYAN    = 96 | BG_BLINK,
-		BG_WHITE         = 112 | BG_BLINK,
+		BG_GRAY          = BG_BLACK     | BG_BLINK,
+		BG_BRIGHTRED     = BG_RED       | BG_BLINK,
+		BG_BRIGHTGREEN   = BG_GREEN     | BG_BLINK,
+		BG_YELLOW        = BG_BROWN     | BG_BLINK,
+		BG_BRIGHTBLUE    = BG_BLUE      | BG_BLINK,
+		BG_BRIGHTMAGENTA = BG_MAGENTA   | BG_BLINK,
+		BG_BRIGHTCYAN    = BG_CYAN      | BG_BLINK,
+		BG_WHITE         = BG_LIGHTGRAY | BG_BLINK,
+		BG_MASK          = 0x70,
 		ATTR_NORMAL      = ( FG_LIGHTGRAY | BG_BLACK ),
 		ATTR_DEFAULT     = -1
 	};

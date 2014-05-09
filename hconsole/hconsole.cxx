@@ -136,8 +136,8 @@ void set_color( HString& value_, HControl::OAttribute& attribute_ ) {
 	int labelFg( get_color_bits( value_, 0 ) );
 	int dataBg( get_color_bits( value_, 3 ) );
 	int dataFg( get_color_bits( value_, 2 ) );
-	attribute_._label = static_cast<u8_t>( ( labelBg << 4 ) | labelFg );
-	attribute_._data = static_cast<u8_t>( ( dataBg << 4 ) | dataFg );
+	attribute_._label = static_cast<u8_t>( COLORS::fg_to_bg( labelBg ) | labelFg );
+	attribute_._data = static_cast<u8_t>( COLORS::fg_to_bg( dataBg ) | dataFg );
 	return;
 	M_EPILOG
 }

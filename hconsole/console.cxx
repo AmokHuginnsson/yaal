@@ -83,18 +83,24 @@ int GLYPHS::DOWN_ARROW, GLYPHS::UP_ARROW, GLYPHS::VERTICAL_LINE;
 struct ATTR {
 	inline static int value( int const attr_ ) {
 		return ( static_cast<int>( COLOR_PAIR( static_cast<int unsigned>(
-							( ( attr_ & 0x70 ) >> 1 )                 /* background */
-							| ( attr_ & 0x07 ) )                      /* foreground */
-						| ( ( attr_ & 0x08 ) ? A_BOLD : 0 )         /* brighter foreground */
-						| ( ( attr_ & 0x80 ) ? A_BLINK : 0 ) ) ) ); /* brighter background */
+							( ( attr_ & COLORS::BG_MASK ) >> 1 )              /* background */
+							| ( attr_ & COLORS::FG_MASK ) ) )                 /* foreground */
+					| ( ( attr_ & COLORS::FG_BOLD ) ? A_BOLD : 0 )        /* brighter foreground */
+					| ( ( attr_ & COLORS::BG_BLINK ) ? A_BLINK : 0 ) ) ); /* brighter background */
 	}
 	inline static int value_fix( int const attr_ ) {
-		if ( attr_ & 0x80 )
+		/*
+		 * On broken terminals we use trick to get bright background,
+		 * first we swap foreground and background colord and then
+		 * we add REVERSE attribure.
+		 */
+		if ( attr_ & COLORS::BG_BLINK ) {
 			return ( static_cast<int>( COLOR_PAIR( static_cast<int unsigned>(
-								( ( attr_ & 0x07 ) << 3 )
-								| ( ( attr_ & 0x70 ) >> 4 ) )
-							| ( ( attr_ & 0x08 ) ? A_BLINK : 0 )
-							| A_BOLD | A_REVERSE ) ) );
+								( ( attr_ & COLORS::FG_MASK ) << 3 )
+								| ( ( attr_ & COLORS::BG_MASK ) >> 4 ) ) )
+						| ( ( attr_ & COLORS::FG_BOLD ) ? A_BLINK : 0 )
+						| A_BOLD | A_REVERSE ) );
+		}
 		return ( value( attr_ ) );
 	}
 };
@@ -219,10 +225,12 @@ void HConsole::enter_curses( void ) {
 	/* init color pairs */
 	M_ENSURE( use_default_colors() == OK );
 	M_ENSURE( assume_default_colors( COLOR_BLACK, COLOR_BLACK ) == OK );
-	for ( int bg( 0 ); bg < ::COLORS; ++ bg )
-		for ( int fg( 0 ); fg < ::COLORS; ++ fg )
+	for ( int bg( 0 ); bg < ::COLORS; ++ bg ) {
+		for ( int fg( 0 ); fg < ::COLORS; ++ fg ) {
 			init_pair( static_cast<short>( bg * ::COLORS + fg ),
 					colors[ fg ], colors[ bg ] );
+		}
+	}
 	_enabled = true;
 	set_attr( COLORS::ATTR_NORMAL );
 	set_background( _screenBackground_ );
@@ -246,13 +254,13 @@ void HConsole::enter_curses( void ) {
 			<< _mouseDes << ')' << endl;
 	}
 #ifdef HAVE_ASCII_GRAPHICS
-	GLYPHS::DOWN_ARROW		= static_cast<int>( ACS_DARROW );
-	GLYPHS::UP_ARROW			= static_cast<int>( ACS_UARROW );
-	GLYPHS::VERTICAL_LINE	= static_cast<int>( ACS_VLINE );
+	GLYPHS::DOWN_ARROW    = static_cast<int>( ACS_DARROW );
+	GLYPHS::UP_ARROW      = static_cast<int>( ACS_UARROW );
+	GLYPHS::VERTICAL_LINE = static_cast<int>( ACS_VLINE );
 #else /* than HAVE_ASCII_GRAPHICS */
-	GLYPHS::DOWN_ARROW		= 'v';
-	GLYPHS::UP_ARROW			= '^';
-	GLYPHS::VERTICAL_LINE	= '|';
+	GLYPHS::DOWN_ARROW    = 'v';
+	GLYPHS::UP_ARROW      = '^';
+	GLYPHS::VERTICAL_LINE = '|';
 #endif /* not HAVE_ASCII_GRAPHICS */
 	refresh();
 	return;
