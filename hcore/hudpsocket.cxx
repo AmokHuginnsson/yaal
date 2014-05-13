@@ -41,7 +41,15 @@ namespace hcore {
 HUDPSocket::HUDPSocket( socket_type_t type_ )
 	: _fileDescriptor( -1 ) {
 	M_PROLOG
-	init( type_ );
+	try {
+		init( type_ );
+	} catch ( ... ) {
+		if ( _fileDescriptor >= 0 ) {
+			M_TEMP_FAILURE_RETRY( hcore::system::close( _fileDescriptor ) );
+			_fileDescriptor = -1;
+		}
+		throw;
+	}
 	return;
 	M_EPILOG
 }
@@ -49,8 +57,16 @@ HUDPSocket::HUDPSocket( socket_type_t type_ )
 HUDPSocket::HUDPSocket( int port_, ip_t ip_, socket_type_t type_ )
 	: _fileDescriptor( -1 ) {
 	M_PROLOG
-	init( type_ );
-	bind( port_, ip_ );
+	try {
+		init( type_ );
+		bind( port_, ip_ );
+	} catch ( ... ) {
+		if ( _fileDescriptor >= 0 ) {
+			M_TEMP_FAILURE_RETRY( hcore::system::close( _fileDescriptor ) );
+			_fileDescriptor = -1;
+		}
+		throw;
+	}
 	return;
 	M_EPILOG
 }
@@ -81,11 +97,14 @@ void HUDPSocket::init( socket_type_t type_ ) {
 					static_cast<int>( SOCK_DGRAM ),
 					0 /* info libc "Creating a Socket"
 							 says that "zero is usually right for PROTOCOL" */ ) ) >= 0 );
-	if ( !!( type_ & TYPE::NONBLOCKING ) ) {
-		int flags( ::fcntl( _fileDescriptor, F_GETFL, 0 ) );
-		M_ENSURE( flags >= 0 );
-		M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, flags | O_NONBLOCK ) == 0 );
-	}
+		if ( !!( type_ & TYPE::NONBLOCKING ) ) {
+			int statusFlags( ::fcntl( _fileDescriptor, F_GETFL, 0 ) );
+			M_ENSURE( statusFlags >= 0 );
+			M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, statusFlags | O_NONBLOCK ) == 0 );
+		}
+	int fdFlags( ::fcntl( _fileDescriptor, F_GETFD, 0 ) );
+	M_ENSURE( fdFlags >= 0 );
+	M_ENSURE( ::fcntl( _fileDescriptor, F_SETFD, fdFlags | FD_CLOEXEC ) == 0 );
 	return;
 	M_EPILOG
 }

@@ -26,6 +26,7 @@ Copyright:
 
 #include <cstdio>
 #include <cstring>
+#include <fcntl.h>
 #include <libintl.h>
 
 #include "base.hxx"
@@ -106,8 +107,14 @@ int HFile::do_open( HString const& path_, open_t const& open_ ) {
 		saveErrno = error = errno;
 		_error = error_message( error );
 		_error += ": " + path_;
-	} else
+	} else {
+		int fd( ::fileno( static_cast<FILE*>( _handle ) ) );
+		M_ENSURE( fd >= 0 );
+		int fdFlags( ::fcntl( fd, F_GETFD, 0 ) );
+		M_ENSURE( fdFlags >= 0 );
+		M_ENSURE( ::fcntl( fd, F_SETFD, fdFlags | FD_CLOEXEC ) == 0 );
 		_owner = true;
+	}
 	errno = saveErrno;
 	return ( error );
 	M_EPILOG

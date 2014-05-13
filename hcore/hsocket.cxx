@@ -88,10 +88,19 @@ HSocket::HSocket( socket_type_t const& socketType_,
 						static_cast<int>( SOCK_STREAM ),
 						0 /* info libc "Creating a Socket"
 								 says that "zero is usually right for PROTOCOL" */ ) ) >= 0 );
-		if ( !!( _type & TYPE::NONBLOCKING ) ) {
-			int flags( ::fcntl( _fileDescriptor, F_GETFL, 0 ) );
-			M_ENSURE( flags >= 0 );
-			M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, flags | O_NONBLOCK ) == 0 );
+		try {
+			if ( !!( _type & TYPE::NONBLOCKING ) ) {
+				int statusFlags( ::fcntl( _fileDescriptor, F_GETFL, 0 ) );
+				M_ENSURE( statusFlags >= 0 );
+				M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, statusFlags | O_NONBLOCK ) == 0 );
+			}
+			int fdFlags( ::fcntl( _fileDescriptor, F_GETFD, 0 ) );
+			M_ENSURE( fdFlags >= 0 );
+			M_ENSURE( ::fcntl( _fileDescriptor, F_SETFD, fdFlags | FD_CLOEXEC ) == 0 );
+		} catch ( ... ) {
+			M_TEMP_FAILURE_RETRY( hcore::system::close( _fileDescriptor ) );
+			_fileDescriptor = -1;
+			throw;
 		}
 	}
 	if ( !!( _type & TYPE::NETWORK ) )
@@ -207,10 +216,13 @@ HSocket::ptr_t HSocket::accept( void ) {
 	M_ASSERT( ! socket->_ssl );
 	socket->_fileDescriptor = fileDescriptor;
 	if ( !!( _type & TYPE::NONBLOCKING ) ) {
-		int flags( ::fcntl( socket->_fileDescriptor, F_GETFL, 0 ) );
-		M_ENSURE( flags >= 0 );
-		M_ENSURE( ::fcntl( socket->_fileDescriptor, F_SETFL, flags | O_NONBLOCK ) == 0 );
+		int statusFlags( ::fcntl( socket->_fileDescriptor, F_GETFL, 0 ) );
+		M_ENSURE( statusFlags >= 0 );
+		M_ENSURE( ::fcntl( socket->_fileDescriptor, F_SETFL, statusFlags | O_NONBLOCK ) == 0 );
 	}
+	int fdFlags( ::fcntl( socket->_fileDescriptor, F_GETFD, 0 ) );
+	M_ENSURE( fdFlags >= 0 );
+	M_ENSURE( ::fcntl( socket->_fileDescriptor, F_SETFD, fdFlags | FD_CLOEXEC ) == 0 );
 	socket->_addressSize = static_cast<int>( addressSize );
 	socket->_needShutdown = true;
 	socket->set_timeout( _timeout );
