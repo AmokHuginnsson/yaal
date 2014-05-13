@@ -291,6 +291,7 @@ public:
 		M_ASSERT( index_ >= 0 );
 		return ( access_type_t<tType, pointer_type_t<tType> >::object_at( _object, index_ ) );
 	}
+
 	template<typename alien_t, template<typename, typename>class alien_access_t>
 	bool operator == ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
 		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
@@ -309,6 +310,45 @@ public:
 	bool operator != ( alien_t const* const pointer_ ) const {
 		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) != pointer_ );
 	}
+
+	template<typename alien_t, template<typename, typename>class alien_access_t>
+	bool operator < ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) < alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
+	}
+	template<typename alien_t>
+	bool operator < ( alien_t const* const pointer_ ) const {
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer(_object ) < pointer_ );
+	}
+	template<typename alien_t, template<typename, typename>class alien_access_t>
+	bool operator > ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) > alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
+	}
+	template<typename alien_t>
+	bool operator > ( alien_t const* const pointer_ ) const {
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer(_object ) > pointer_ );
+	}
+
+	template<typename alien_t, template<typename, typename>class alien_access_t>
+	bool operator <= ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) <= alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
+	}
+	template<typename alien_t>
+	bool operator <= ( alien_t const* const pointer_ ) const {
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer(_object ) <= pointer_ );
+	}
+	template<typename alien_t, template<typename, typename>class alien_access_t>
+	bool operator >= ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer( _object ) >= alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
+	}
+	template<typename alien_t>
+	bool operator >= ( alien_t const* const pointer_ ) const {
+		return ( access_type_t<tType, pointer_type_t<tType> >::pointer(_object ) >= pointer_ );
+	}
+
 	tType const* operator->( void ) const {
 		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
 		return ( access_type_t<tType, pointer_type_t<tType> >::raw( _object ) );
