@@ -62,7 +62,7 @@ class HGrammarDescription;
 class HRuleBase;
 class HNamedRule;
 class HRecursionDetector;
-class HRecursiveRulesAggregator;
+class HRuleAggregator;
 typedef yaal::hcore::HExceptionT<HRecursionDetector> HRecursionDetectorException;
 typedef yaal::hcore::HSet<HRuleBase const*> visited_t;
 typedef yaal::hcore::HMap<HRuleBase const*, int> rule_use_t;
@@ -140,7 +140,7 @@ public:
 	void detach( HRuleBase const*, visited_t&, bool& );
 	void rule_use( rule_use_t& ) const;
 	void detect_recursion( HRecursionDetector& ) const;
-	void find_recursions( HRecursiveRulesAggregator& );
+	void find_recursions( HRuleAggregator& );
 	static yaal::hcore::HString::const_iterator skip_space( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) = 0;
@@ -150,7 +150,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const = 0;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) = 0;
 	virtual void do_detect_recursion( HRecursionDetector& ) const = 0;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& ) = 0;
+	virtual void do_find_recursions( HRuleAggregator& ) = 0;
 	void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, action_t const& );
 	void report_error( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString const& );
 	friend class yaal::tools::HExecutingParser;
@@ -216,7 +216,7 @@ protected:
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HRule& operator = ( HRule const& );
 	template<typename tType, typename a0_t, typename a1_t, typename a2_t>
@@ -239,7 +239,7 @@ protected:
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HRecursiveRule( void );
 	void set_rule( HRuleBase::ptr_t const& );
@@ -261,7 +261,7 @@ private:
 	rule_ref_t _rule;
 public:
 	HRuleRef( HRuleBase::ptr_t );
-	HRuleBase const* get_rule( void ) const;
+	HRuleBase::ptr_t get_rule( void ) const;
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual HRuleBase::ptr_t do_clone( void ) const;
@@ -270,7 +270,7 @@ protected:
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 };
 
 class HFollows;
@@ -316,7 +316,7 @@ protected:
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HFollows( HRuleBase const&, HRuleBase const& );
 	HFollows( HFollows const&, HRuleBase const& );
@@ -353,7 +353,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HKleeneBase( HKleeneBase const& );
 	HKleeneBase& operator = ( HKleeneBase const& );
@@ -423,7 +423,7 @@ protected:
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HAlternative( HRuleBase const&, HRuleBase const& );
 	HAlternative( HAlternative const&, HRuleBase const& );
@@ -453,7 +453,7 @@ protected:
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HOptional( HRuleBase const& );
 	HOptional& operator = ( HOptional const& );
@@ -501,7 +501,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HReal( void );
 	HReal& operator = ( HReal const& );
@@ -551,7 +551,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HInteger( void );
 	HInteger& operator = ( HInteger const& );
@@ -585,7 +585,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HCharacter( void );
 	HCharacter& operator = ( HCharacter const& );
@@ -619,7 +619,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HString( yaal::hcore::HString const& );
 	HString& operator = ( HString const& );
@@ -653,7 +653,7 @@ protected:
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
-	virtual void do_find_recursions( HRecursiveRulesAggregator& );
+	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HRegex( yaal::hcore::HString const& );
 	HRegex& operator = ( HRegex const& );
