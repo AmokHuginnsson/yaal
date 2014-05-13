@@ -60,7 +60,7 @@ int long HLog::_logMask = 0;
 
 void* DEFAULT_LOG_STREAM( stderr );
 
-HLog::HLog( void ) : HField<HFile>( tmpfile() ), HSynchronizedStream( _file::ref() ), _realMode( false ), _newLine( true ),
+HLog::HLog( void ) : HField<HFile>( tmpfile(), true ), HSynchronizedStream( _file::ref() ), _realMode( false ), _newLine( true ),
 	_type( 0 ), _bufferSize( BUFFER_SIZE ),
 	_processName( NULL ),
 	_loginName(), _hostName( system::get_host_name() ),
@@ -84,10 +84,9 @@ HLog::~HLog( void ) {
 		_file::ref() << "Process exited normally.\n";
 	}
 	if ( ! _realMode ) {
-		if ( _autoRehash )
+		if ( _autoRehash ) {
 			rehash_stream( stderr, PACKAGE_NAME );
-		else
-			_file::ref().close();
+		}
 	}
 	return;
 	M_DESTRUCTOR_EPILOG
@@ -132,7 +131,8 @@ void HLog::do_rehash( void* src_, char const* const processName_ ) {
 			_type = ::strtol( buf, NULL, 0x10 );
 			if ( ! _type || ( _type & _logMask ) ) {
 				timestamp();
-				_file::ref() << buf + 10; /* 10 for timestamp */
+				static int const TIMESTAMP_LENGTH( 10 );
+				_file::ref() << buf + TIMESTAMP_LENGTH;
 			}
 		}
 		if ( buf[ ::strlen( buf ) - 1 ] == '\n' )
@@ -151,7 +151,7 @@ void HLog::rehash_stream( void* stream_,
 	if ( ! stream_ )
 		M_THROW( "file parameter is", reinterpret_cast<int long>( stream_ ) );
 	void* src( _file::ref().release() );
-	_file::ref().open( stream_ );
+	_file::ref().open( stream_, true );
 	do_rehash( src, processName_ );
 	return;
 	M_EPILOG
@@ -166,7 +166,7 @@ void HLog::rehash( HString const& logFileName_,
 	void* src( _file::ref().release() );
 	_file::ref().open( logFileName_, HFile::open_t( HFile::OPEN::WRITING ) | HFile::OPEN::APPEND );
 	if ( ! _file::ref() ) {
-		_file::ref().open( src );
+		_file::ref().open( src, true );
 		HException::disable_logging();
 		throw HLogException( _file::ref().get_error() );
 	}

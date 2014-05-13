@@ -41,16 +41,16 @@ namespace hcore {
 HFile::HFile( void )
 	: HStreamInterface(),
 	_handle( NULL ), _path(), _error(),
-	_external( false ) {
+	_owner( false ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
-HFile::HFile( void* const handle_ )
+HFile::HFile( void* const handle_, bool owner_ )
 	: HStreamInterface(),
 	_handle( handle_ ), _path(), _error(),
-	_external( handle_ ? true : false ) {
+	_owner( handle_ ? owner_ : false ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -59,7 +59,7 @@ HFile::HFile( void* const handle_ )
 HFile::HFile( yaal::hcore::HString const& path, open_t const& open_ )
 	: HStreamInterface(),
 	_handle( NULL ), _path(), _error(),
-	_external( false ) {
+	_owner( true ) {
 	M_PROLOG
 	open( path, open_ );
 	return;
@@ -68,7 +68,7 @@ HFile::HFile( yaal::hcore::HString const& path, open_t const& open_ )
 
 HFile::~HFile( void ) {
 	M_PROLOG
-	if ( _handle && ! _external )
+	if ( _handle && _owner )
 		close();
 	return;
 	M_DESTRUCTOR_EPILOG
@@ -82,8 +82,8 @@ int HFile::open( HString const& path_, open_t const& open_ ) {
 
 int HFile::do_open( HString const& path_, open_t const& open_ ) {
 	M_PROLOG
-	int saveErrno( errno );
-	char const* mode = NULL;
+	M_ENSURE_EX( ! _handle, "stream already opened" );
+	char const* mode( NULL );
 	if ( open_ == OPEN::READING )
 		mode = "rb";
 	else if ( ( open_ == OPEN::WRITING ) || ( open_ == ( open_t( OPEN::WRITING ) | open_t( OPEN::TRUNCATE ) ) ) )
@@ -98,26 +98,27 @@ int HFile::do_open( HString const& path_, open_t const& open_ ) {
 		mode = "a+b";
 	else
 		M_THROW( "unexpected mode setting", open_.value() );
-	M_ENSURE_EX( ! _handle, "stream already opened" );
+	int saveErrno( errno );
 	_path = path_;
-	_external = false;
 	_handle = ::std::fopen( path_.raw(), mode );
 	int error( 0 );
 	if ( ! _handle ) {
 		saveErrno = error = errno;
 		_error = error_message( error );
 		_error += ": " + path_;
-	}
+	} else
+		_owner = true;
 	errno = saveErrno;
 	return ( error );
 	M_EPILOG
 }
 
-int HFile::open( void* const handle ) {
+int HFile::open( void* const handle_, bool owner_ ) {
 	M_PROLOG
 	M_ENSURE_EX( ! _handle, "stream already opened" );
-	_handle = handle;
-	_external = true;
+	M_ENSURE( handle_ || !owner_ );
+	_handle = handle_;
+	_owner = owner_;
 	_path.clear();
 	return ( 0 );
 	M_EPILOG
@@ -131,24 +132,25 @@ int HFile::close( void ) {
 
 int HFile::do_close( void ) {
 	M_PROLOG
-	M_ASSERT( _handle );
-	int error = 0;
-	error = ::std::fclose( static_cast<FILE*>( _handle ) );
+	M_ENSURE( _handle && _owner );
+	int error( ::std::fclose( static_cast<FILE*>( _handle ) ) );
 	if ( error ) {
 		_error = error_message( error );
-		return ( error );
+	} else {
+		_handle = NULL;
+		_owner = false;
 	}
-	_handle = NULL;
-	return ( 0 );
+	return ( error ); 
 	M_EPILOG
 }
 
 void* HFile::release( void ) {
 	M_PROLOG
-	M_ASSERT( _handle && _external );
+	M_ENSURE( _handle );
 	void* handle( NULL );
 	using yaal::swap;
 	swap( _handle, handle );
+	_owner = false;
 	return ( handle );
 	M_EPILOG
 }
@@ -156,7 +158,7 @@ void* HFile::release( void ) {
 int long HFile::tell( void ) const {
 	M_PROLOG
 	M_ASSERT( _handle );
-	int long pos = 0;
+	int long pos( 0 );
 	M_ENSURE( ( pos = ::std::ftell( static_cast<FILE*>( _handle ) ) ) >= 0 );
 	return ( pos );
 	M_EPILOG
@@ -165,7 +167,7 @@ int long HFile::tell( void ) const {
 void HFile::seek( int long pos, seek_t const& seek_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
-	int s = 0;
+	int s( 0 );
 	switch ( seek_.value() ) {
 		case ( SEEK::SET ):
 			s = SEEK_SET;
@@ -189,21 +191,20 @@ int long HFile::read_line( HString& line_, read_t const& read_,
 		int const maximumLength_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
-	read_t readMode = read_;
+	read_t readMode( read_ );
 	if ( ( !!( readMode & READ::BUFFERED_READS ) ) && ( !!( readMode & READ::UNBUFFERED_READS ) ) )
 		M_THROW( _( "bad buffering setting" ), readMode.value() );
 	if ( ! ( ( !!( readMode & READ::BUFFERED_READS ) ) || ( !!( readMode & READ::UNBUFFERED_READS ) ) ) )
 		readMode |= READ::BUFFERED_READS;
 	if ( ! _handle )
 		M_THROW( _( "no file is opened" ), errno );
-	char * ptr = NULL;
-	int long length = -1;
+	int long length( -1 );
 	if ( !!( readMode & READ::BUFFERED_READS ) ) {
 		length = get_line_length();
 		if ( length ) {
 			if ( maximumLength_ && ( length > maximumLength_ ) )
 				M_THROW( _( "line too long" ), length );
-			ptr = static_cast<char*>( _cache.realloc( length ) );
+			char* ptr( static_cast<char*>( _cache.realloc( length ) ) );
 			M_ENSURE( read( ptr, length ) == length );
 			ptr[ length - 1 ] = 0;
 			line_ = ptr;
@@ -225,10 +226,11 @@ int long HFile::read_line( HString& line_, read_t const& read_,
 int long HFile::get_line_length( void ) {
 	M_PROLOG
 	M_ASSERT( _handle );
-	static int const SCAN_BUFFER_SIZE = 8;
-	int long length = 0, size = 0;
+	static int const SCAN_BUFFER_SIZE( 8 );
 	char buffer[ SCAN_BUFFER_SIZE ];
-	char const* ptr = NULL;
+	char const* ptr( NULL );
+	int long length( 0 );
+	int long size( 0 );
 	do {
 		size = static_cast<int long>( ::std::fread( buffer, sizeof ( char ),
 			SCAN_BUFFER_SIZE, static_cast<FILE*>( _handle ) ) );
@@ -306,10 +308,10 @@ bool HFile::do_is_valid( void ) const {
 	M_EPILOG
 }
 
-HFile cinInstance( stdin );
+HFile cinInstance( stdin, true );
 HSynchronizedStream cin( cinInstance );
-HSynchronizedStream cout( make_pointer<HFile>( stdout ) );
-HFile cerrInstance( stderr );
+HSynchronizedStream cout( make_pointer<HFile>( stdout, true ) );
+HFile cerrInstance( stderr, true );
 HSynchronizedStream cerr( cerrInstance );
 HSynchronizedStream clog;
 

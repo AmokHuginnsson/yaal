@@ -79,16 +79,17 @@ private:
 	void* _handle;
 	HString _path;
 	HString _error;
-	bool _external;
+	bool _owner;
 public:
 	/*! \brief Create closed file stream object.
 	 */
 	HFile( void );
-	/*! \brief Create closed (or based on low level interface) file stream.
+	/*! \brief Create file stream based on existing low level stream (may be closed).
 	 *
 	 * \param raw - low level interface stream handler.
+	 * \param owner - shall this file object take ownership of this low level stream.
 	 */
-	explicit HFile( void* const raw );
+	HFile( void* raw, bool owner );
 	/*! \brief Create new file stream and open file item immediatelly.
 	 *
 	 * \param path - path to file item to be opened.
@@ -97,7 +98,12 @@ public:
 	HFile( yaal::hcore::HString const& path, open_t const& mode );
 	virtual ~HFile( void );
 	int open( HString const&, open_t const& mode );
-	int open( void* const );
+	/*! \brief Assign existing low level stream to this file stream (may be closed).
+	 *
+	 * \param raw - low level interface stream handler.
+	 * \param owner - shall this file object take ownership of this low level stream.
+	 */
+	int open( void* raw, bool owner );
 	int close( void );
 	void* release( void );
 	int long read_line( HString&, read_t const& = READ::DEFAULTS, int const = 0 );
