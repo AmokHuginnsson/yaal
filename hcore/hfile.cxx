@@ -62,7 +62,16 @@ HFile::HFile( yaal::hcore::HString const& path, open_t const& open_ )
 	_handle( NULL ), _path(), _error(),
 	_owner( true ) {
 	M_PROLOG
-	open( path, open_ );
+	try {
+		open( path, open_ );
+	} catch ( ... ) {
+		if ( _handle ) {
+			::fclose( static_cast<FILE*>( _handle ) );
+			_handle = NULL;
+			_owner = false;
+		}
+		throw;
+	}
 	return;
 	M_EPILOG
 }
