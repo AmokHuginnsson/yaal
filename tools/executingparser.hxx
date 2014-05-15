@@ -510,9 +510,9 @@ private:
 	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( a0_t const& );
 };
 
-extern M_YAAL_TOOLS_PUBLIC_API HReal const& real;
-
 typedef yaal::hcore::HExceptionT<HReal, HRuleBaseException> HRealException;
+
+extern M_YAAL_TOOLS_PUBLIC_API HReal const& real;
 
 class HInteger : public HRuleBase {
 public:
@@ -558,9 +558,70 @@ private:
 	friend HInteger const& get_integer_instance( void );
 };
 
+typedef yaal::hcore::HExceptionT<HInteger, HRuleBaseException> HIntegerException;
+
 extern M_YAAL_TOOLS_PUBLIC_API HInteger const& integer;
 
-typedef yaal::hcore::HExceptionT<HInteger, HRuleBaseException> HIntegerException;
+class HStringLiteral : public HRuleBase {
+public:
+	typedef HStringLiteral this_type;
+	typedef HRuleBase base_type;
+private:
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
+	action_string_t _actionString;
+	yaal::hcore::HString _cache;
+public:
+	HStringLiteral( HStringLiteral const& );
+	HStringLiteral operator[]( action_t const& ) const;
+	HStringLiteral operator[]( action_string_t const& ) const;
+protected:
+	HStringLiteral( action_t const& );
+	HStringLiteral( action_string_t const& );
+	virtual ptr_t do_clone( void ) const;
+	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
+	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
+	virtual void do_find_recursions( HRuleAggregator& );
+private:
+	HStringLiteral( void );
+	HStringLiteral& operator = ( HStringLiteral const& );
+	friend HStringLiteral const& get_string_literal_instance( void );
+};
+
+typedef yaal::hcore::HExceptionT<HStringLiteral, HRuleBaseException> HStringLiteralException;
+
+extern M_YAAL_TOOLS_PUBLIC_API HStringLiteral const& string_literal;
+
+class HCharacterLiteral : public HRuleBase {
+public:
+	typedef HCharacterLiteral this_type;
+	typedef HRuleBase base_type;
+private:
+	typedef yaal::hcore::HBoundCall<void ( char )> action_character_t;
+	action_character_t _actionCharacter;
+public:
+	HCharacterLiteral( HCharacterLiteral const& );
+	HCharacterLiteral operator[]( action_t const& ) const;
+	HCharacterLiteral operator[]( action_character_t const& ) const;
+protected:
+	HCharacterLiteral( action_t const& );
+	HCharacterLiteral( action_character_t const& );
+	virtual ptr_t do_clone( void ) const;
+	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
+	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
+	virtual void do_find_recursions( HRuleAggregator& );
+private:
+	HCharacterLiteral( void );
+	HCharacterLiteral& operator = ( HCharacterLiteral const& );
+	friend HCharacterLiteral const& get_character_literal_instance( void );
+};
+
+typedef yaal::hcore::HExceptionT<HCharacterLiteral, HRuleBaseException> HLiteralCharacterException;
+
+extern M_YAAL_TOOLS_PUBLIC_API HCharacterLiteral const& character_literal;
 
 class HCharacter : public HRuleBase {
 public:
@@ -592,9 +653,9 @@ private:
 	friend HCharacter const& get_character_instance( void );
 };
 
-extern M_YAAL_TOOLS_PUBLIC_API HCharacter const& character;
-
 typedef yaal::hcore::HExceptionT<HCharacter, HRuleBaseException> HCharacterException;
+
+extern M_YAAL_TOOLS_PUBLIC_API HCharacter const& character;
 
 class HString : public HRuleBase {
 public:
@@ -626,9 +687,9 @@ private:
 	friend HString string( yaal::hcore::HString const& );
 };
 
-HString string( yaal::hcore::HString const& );
-
 typedef yaal::hcore::HExceptionT<HString, HRuleBaseException> HStringException;
+
+HString string( yaal::hcore::HString const& );
 
 class HRegex : public HRuleBase {
 public:

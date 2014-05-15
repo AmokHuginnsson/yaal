@@ -34,8 +34,10 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hstack.hxx"
 #include "hcore/hfile.hxx"
 #include "hcore/hmultimap.hxx"
+#include "tools/escape.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::tools::util;
 
 namespace yaal {
 
@@ -1495,35 +1497,35 @@ HInteger::HInteger( HInteger const& integer_ )
 
 HInteger HInteger::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) & ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
 	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
 HInteger HInteger::operator[]( action_int_long_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) & ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
 	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
 HInteger HInteger::operator[]( action_int_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) & ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
 	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
 HInteger HInteger::operator[]( action_number_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) & ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
 	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
 HInteger HInteger::operator[]( action_string_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) & ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
 	return ( HInteger( action_ ) );
 	M_EPILOG
 }
@@ -1622,6 +1624,121 @@ HInteger const& get_integer_instance( void ) {
 }
 
 HInteger const& integer( get_integer_instance() );
+
+HStringLiteral::HStringLiteral( void )
+	: HRuleBase(), _actionString(), _cache() {
+}
+
+HStringLiteral::HStringLiteral( action_t const& action_ )
+	: HRuleBase( action_ ), _actionString(), _cache() {
+}
+
+HStringLiteral::HStringLiteral( action_string_t const& action_ )
+	: HRuleBase(), _actionString( action_ ), _cache() {
+}
+
+HStringLiteral::HStringLiteral( HStringLiteral const& stringLiteral_ )
+	: HRuleBase( stringLiteral_._action ), _actionString( stringLiteral_._actionString ),
+	_cache( stringLiteral_._cache ) {
+}
+
+HStringLiteral HStringLiteral::operator[]( action_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionString ) );
+	return ( HStringLiteral( action_ ) );
+	M_EPILOG
+}
+
+HStringLiteral HStringLiteral::operator[]( action_string_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionString ) );
+	return ( HStringLiteral( action_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+	M_PROLOG
+	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
+	_cache.clear();
+	bool valid( false );
+	yaal::hcore::HString::const_iterator start( NULL );
+	do {
+		if ( ( scan != last_ ) && ( *scan == '"' ) ) {
+			++ scan;
+		} else {
+			break;
+		}
+		start = scan;
+		while ( ( scan != last_ ) && ( *scan != '"' ) ) {
+			if ( *scan == '\\' ) {
+				++ scan;
+				if ( ! ( scan != last_ ) ) {
+					break;
+				}
+			}
+			++ scan;
+		}
+		if ( scan != last_ ) {
+			M_ASSERT( *scan == '"' );
+			++ scan;
+			valid = true;
+		}
+	} while ( false );
+	if ( valid ) {
+		_cache.assign( start, scan );
+		static char const raw[] = "\n\r\t\b\a\f\033\v";
+		static char const safe[] = "nrtbafev";
+		static EscapeTable const escapes( raw, static_cast<int>( sizeof ( raw ) ) - 1, safe, static_cast<int>( sizeof ( safe ) ) - 1 );
+		unescape( _cache, escapes );
+		add_execution_step( executingParser_, first_, call( _actionString, _cache ) );
+		first_ = scan;
+	} else {
+		report_error( executingParser_, scan, "expected literal string" );
+	}
+	return ( first_ );
+	M_EPILOG
+}
+
+HRuleBase::ptr_t HStringLiteral::do_clone( void ) const {
+	M_PROLOG
+	return ( make_pointer<HStringLiteral>( *this ) );
+	M_EPILOG
+}
+
+void HStringLiteral::do_describe( HRuleDescription& rd_, rule_use_t const& ) const {
+	M_PROLOG
+	rd_.desc( "string_literal" );
+	return;
+	M_EPILOG
+}
+
+void HStringLiteral::do_detach( HRuleBase const*, visited_t&, bool& ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HStringLiteral::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+	M_PROLOG
+	recursionDetector_.reset_visits();
+	return;
+	M_EPILOG
+}
+
+void HStringLiteral::do_find_recursions( HRuleAggregator& ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+HStringLiteral const& get_string_literal_instance( void ) {
+	M_PROLOG
+	static HStringLiteral stringLiteralInstance;
+	return ( stringLiteralInstance );
+	M_EPILOG
+}
+
+HStringLiteral const& string_literal( get_string_literal_instance() );
 
 HCharacter::HCharacter( void )
 	: HRuleBase(), _characters(), _actionChar()
