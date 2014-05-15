@@ -1256,7 +1256,7 @@ HString& HString::append( HString const& str_, int long idx_, int long len_ ) {
 	M_ENSURE( len_ >= 0 );
 	if ( ( len_ > 0 ) && ( idx_ < str_.get_length() ) )
 		append( str_.raw() + ( idx_ >= 0 ? idx_ : 0 ),
-				( ( idx_ + len_ ) < str_.get_length() ) ? len_ : GET_SIZE - idx_ );
+				( ( idx_ + len_ ) < str_.get_length() ) ? len_ : str_.get_length() - idx_ );
 	return ( *this );
 	M_EPILOG
 }
