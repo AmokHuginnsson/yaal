@@ -69,6 +69,8 @@ HSequence const restore( "\033[u" );
 HSequence const clear( "\033[2J" );
 HSequence const clrtoeol( "\033[K" );
 
+HSequence const up_bol( "\033[F" );
+
 HSequence move( int row_, int col_ ) {
 	static int const codeBufferSize( 32 );
 	static char code[codeBufferSize];
@@ -101,6 +103,13 @@ HSequence right_n( int by_ ) {
 	static int const codeBufferSize( 16 );
 	static char code[codeBufferSize];
 	snprintf( code, codeBufferSize - 1, "\033[%dC", by_ );
+	return ( code );
+}
+
+HSequence up_bol_n( int by_ ) {
+	static int const codeBufferSize( 16 );
+	static char code[codeBufferSize];
+	snprintf( code, codeBufferSize - 1, "\033[%dF", by_ );
 	return ( code );
 }
 

@@ -74,6 +74,8 @@ extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const down;
 extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const left;
 extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const right;
 
+extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const up_bol;
+
 extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const save;
 extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const restore;
 
@@ -85,6 +87,7 @@ HSequence up_n( int );
 HSequence down_n( int );
 HSequence left_n( int );
 HSequence right_n( int );
+HSequence up_bol_n( int );
 
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, HSequence const& );
 
