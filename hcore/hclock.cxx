@@ -45,10 +45,12 @@ namespace hcore {
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
+static int const FWD_CLOCK_THREAD_CPUTIME_ID = CLOCK_THREAD_CPUTIME_ID;
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 
-HClock::HClock( void ) : _moment() {
+HClock::HClock( TYPE::type_t type_ )
+	: _moment(), _type( type_ ) {
 	M_PROLOG
 	reset();
 	return;
@@ -64,7 +66,8 @@ i64_t HClock::get_time_elapsed( UNIT::unit_t unit_ ) const {
 	static int long const NANO_IN_MICRO = power<10, 3>::value;
 	timespec time;
 	timespec now;
-	M_ENSURE( clock_gettime( FWD_CLOCK_REALTIME, &now ) == 0 );
+	clockid_t cid( _type == TYPE::REAL ? FWD_CLOCK_REALTIME : FWD_CLOCK_THREAD_CPUTIME_ID );
+	M_ENSURE( clock_gettime( cid, &now ) == 0 );
 	time.tv_sec = static_cast<time_t>( now.tv_sec - _moment[ UNIT::SECOND ] );
 	if ( now.tv_nsec < _moment[ UNIT::NANOSECOND ] ) {
 		-- time.tv_sec;
@@ -86,7 +89,8 @@ i64_t HClock::get_time_elapsed( UNIT::unit_t unit_ ) const {
 void HClock::reset( void ) {
 	M_PROLOG
 	timespec time;
-	M_ENSURE( clock_gettime( FWD_CLOCK_REALTIME, &time ) == 0 );
+	clockid_t cid( _type == TYPE::REAL ? FWD_CLOCK_REALTIME : FWD_CLOCK_THREAD_CPUTIME_ID );
+	M_ENSURE( clock_gettime( cid, &time ) == 0 );
 	_moment[ UNIT::SECOND ] = time.tv_sec;
 	_moment[ UNIT::NANOSECOND ] = time.tv_nsec;
 	return;
