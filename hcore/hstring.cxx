@@ -676,6 +676,21 @@ HString& HString::assign( char const* const data_, int long length_ ) {
 	M_EPILOG
 }
 
+HString& HString::assign( const_iterator first_, const_iterator last_ ) {
+	M_PROLOG
+	if ( ! ( first_ && last_ ) )
+		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
+	if ( last_ < first_ )
+		M_THROW( _errMsgHString_[ string_helper::BAD_LENGTH ], last_ - first_ );
+	int long newSize( static_cast<int long>( ::strnlen( first_, last_ - first_ ) ) );
+	hs_realloc( newSize + 1 );
+	::memcpy( MEM, first_, static_cast<size_t>( newSize ) );
+	MEM[ newSize ] = 0;
+	SET_SIZE( newSize );
+	return ( *this );
+	M_EPILOG
+}
+
 HString& HString::format( char const* const format_, ... ) {
 	M_PROLOG
 	::std::va_list ap;
@@ -1270,6 +1285,12 @@ HString& HString::append( char const* const buf_, int long len_ ) {
 		SET_SIZE( newSize );
 	}
 	return ( *this );
+	M_EPILOG
+}
+
+HString& HString::append( const_iterator first_, const_iterator last_ ) {
+	M_PROLOG
+	return ( append( first_, static_cast<int long>( last_ - first_ ) ) );
 	M_EPILOG
 }
 

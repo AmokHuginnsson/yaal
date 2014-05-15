@@ -398,6 +398,12 @@ public:
 	 * \return Self.
 	 */
 	HString& assign( HString const& str, int long offset, int long length );
+	/*! \brief Erase old content and assign a range of characters to this string.
+	 *
+	 * first_ - begining of the character range to copy.
+	 * last_ - one past the end of character range to copy.
+	 */
+	HString& assign( const_iterator first_, const_iterator last_ );
 	/*! \brief Replace contents of this string with result of `C' printf() style format.
 	 *
 	 * \param frmt - `C's printf() style format specification.
@@ -637,6 +643,12 @@ public:
 	 * \return Self.
 	 */
 	HString& append( char const* const, int long len_ );
+	/*! \brief Append new data from a range of characters to already existing data in this string.
+	 *
+	 * first_ - begining of the character range to copy.
+	 * last_ - one past the end of character range to copy.
+	 */
+	HString& append( const_iterator first_, const_iterator last_ );
 	/*! \brief Append single character at end of this string.
 	 *
 	 * \param character_ - character to be appended.
