@@ -1253,7 +1253,10 @@ HString& HString::append( HString const& str_ ) {
 
 HString& HString::append( HString const& str_, int long idx_, int long len_ ) {
 	M_PROLOG
-	M_ENSURE( len_ >= 0 );
+	if ( len_ < 0 )
+		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], len_ );
+	if ( idx_ < 0 )
+		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], idx_ );
 	if ( ( len_ > 0 ) && ( idx_ < str_.get_length() ) )
 		append( str_.raw() + ( idx_ >= 0 ? idx_ : 0 ),
 				( ( idx_ + len_ ) < str_.get_length() ) ? len_ : str_.get_length() - idx_ );
