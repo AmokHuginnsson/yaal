@@ -211,6 +211,7 @@ void HExecutingParser::execute( void ) {
 
 bool HExecutingParser::parse( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
+	_excutors.clear();
 	_inputStart = first_;
 	_errorPosition = yaal::hcore::HString::npos;
 	_errorMessages.clear();
@@ -1665,17 +1666,28 @@ HStringLiteral HStringLiteral::operator[]( action_string_t const& action_ ) cons
 	M_EPILOG
 }
 
+namespace {
+
+/*
+ * Only printable characters and horizontal tab are valid in string or character literals.
+ */
+bool is_known_character( char char_ ) {
+	char unsigned c( static_cast<char unsigned>( char_ ) );
+	return ( ( c >= ' ' ) || ( c == '\t' ) );
+}
+
+}
+
 yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
 	bool valid( false );
 	yaal::hcore::HString::const_iterator start( NULL );
 	do {
-		if ( ( scan != last_ ) && ( *scan == '"' ) ) {
-			++ scan;
-		} else {
+		if ( ! ( ( scan != last_ ) && ( *scan == '"' ) ) ) {
 			break;
 		}
+		++ scan;
 		start = scan;
 		while ( ( scan != last_ ) && ( *scan != '"' ) ) {
 			if ( *scan == '\\' ) {
@@ -1684,16 +1696,21 @@ yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser*
 					break;
 				}
 			}
+			if ( ! is_known_character( *scan ) ) {
+				break;
+			}
 			++ scan;
 		}
 		if ( scan != last_ ) {
-			M_ASSERT( *scan == '"' );
-			++ scan;
+			if ( *scan != '"' ) {
+				break;
+			}
 			valid = true;
 		}
 	} while ( false );
 	if ( valid ) {
 		_cache.assign( start, scan );
+		++ scan;
 		unescape( _cache, _escapes_ );
 		if ( !! _actionString )
 			add_execution_step( executingParser_, first_, call( _actionString, _cache ) );
@@ -1785,29 +1802,36 @@ yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingPars
 	bool valid( false );
 	yaal::hcore::HString::const_iterator start( NULL );
 	do {
-		if ( ( scan != last_ ) && ( *scan == '\'' ) ) {
-			++ scan;
-		} else {
+		if ( ! ( ( scan != last_ ) && ( *scan == '\'' ) ) ) {
 			break;
 		}
+		++ scan;
 		start = scan;
-		if ( ( scan != last_ ) && ( *scan != '\'' ) ) {
+		if ( scan != last_ ) {
+			if ( *scan == '\'' ) {
+				break;
+			}
 			if ( *scan == '\\' ) {
 				++ scan;
 				if ( ! ( scan != last_ ) ) {
 					break;
 				}
 			}
+			if ( ! is_known_character( *scan ) ) {
+				break;
+			}
 			++ scan;
 		}
 		if ( scan != last_ ) {
-			M_ASSERT( *scan == '\'' );
-			++ scan;
+			if ( *scan != '\'' ) {
+				break;
+			}
 			valid = true;
 		}
 	} while ( false );
 	if ( valid ) {
 		_cache.assign( start, scan );
+		++ scan;
 		unescape( _cache, _escapes_ );
 		if ( !! _actionCharacter )
 			add_execution_step( executingParser_, first_, call( _actionCharacter, _cache[0] ) );
@@ -1829,7 +1853,7 @@ HRuleBase::ptr_t HCharacterLiteral::do_clone( void ) const {
 
 void HCharacterLiteral::do_describe( HRuleDescription& rd_, rule_use_t const& ) const {
 	M_PROLOG
-	rd_.desc( "string_literal" );
+	rd_.desc( "character_literal" );
 	return;
 	M_EPILOG
 }
