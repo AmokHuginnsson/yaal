@@ -45,6 +45,15 @@ namespace tools {
 
 namespace executing_parser {
 
+namespace {
+
+static char const _raw_[] = "\n\r\t\b\a\f\033\v";
+static char const _safe_[] = "nrtbafev";
+static EscapeTable const _escapes_( _raw_,  static_cast<int>( sizeof ( _raw_ ) )  - 1,
+                                    _safe_, static_cast<int>( sizeof ( _safe_ ) ) - 1 );
+
+}
+
 class HRecursionDetector {
 	visited_t _visited;
 	typedef yaal::hcore::HStack<visited_t> checkpoints_t;
@@ -1659,7 +1668,6 @@ HStringLiteral HStringLiteral::operator[]( action_string_t const& action_ ) cons
 yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
-	_cache.clear();
 	bool valid( false );
 	yaal::hcore::HString::const_iterator start( NULL );
 	do {
@@ -1686,11 +1694,11 @@ yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser*
 	} while ( false );
 	if ( valid ) {
 		_cache.assign( start, scan );
-		static char const raw[] = "\n\r\t\b\a\f\033\v";
-		static char const safe[] = "nrtbafev";
-		static EscapeTable const escapes( raw, static_cast<int>( sizeof ( raw ) ) - 1, safe, static_cast<int>( sizeof ( safe ) ) - 1 );
-		unescape( _cache, escapes );
-		add_execution_step( executingParser_, first_, call( _actionString, _cache ) );
+		unescape( _cache, _escapes_ );
+		if ( !! _actionString )
+			add_execution_step( executingParser_, first_, call( _actionString, _cache ) );
+		else if ( !! _action )
+			add_execution_step( executingParser_, first_, _action );
 		first_ = scan;
 	} else {
 		report_error( executingParser_, scan, "expected literal string" );
@@ -1739,6 +1747,120 @@ HStringLiteral const& get_string_literal_instance( void ) {
 }
 
 HStringLiteral const& string_literal( get_string_literal_instance() );
+
+HCharacterLiteral::HCharacterLiteral( void )
+	: HRuleBase(), _actionCharacter(), _cache() {
+}
+
+HCharacterLiteral::HCharacterLiteral( action_t const& action_ )
+	: HRuleBase( action_ ), _actionCharacter(), _cache() {
+}
+
+HCharacterLiteral::HCharacterLiteral( action_character_t const& action_ )
+	: HRuleBase(), _actionCharacter( action_ ), _cache() {
+}
+
+HCharacterLiteral::HCharacterLiteral( HCharacterLiteral const& stringLiteral_ )
+	: HRuleBase( stringLiteral_._action ), _actionCharacter( stringLiteral_._actionCharacter ),
+	_cache( stringLiteral_._cache ) {
+}
+
+HCharacterLiteral HCharacterLiteral::operator[]( action_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionCharacter ) );
+	return ( HCharacterLiteral( action_ ) );
+	M_EPILOG
+}
+
+HCharacterLiteral HCharacterLiteral::operator[]( action_character_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionCharacter ) );
+	return ( HCharacterLiteral( action_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+	M_PROLOG
+	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
+	bool valid( false );
+	yaal::hcore::HString::const_iterator start( NULL );
+	do {
+		if ( ( scan != last_ ) && ( *scan == '\'' ) ) {
+			++ scan;
+		} else {
+			break;
+		}
+		start = scan;
+		if ( ( scan != last_ ) && ( *scan != '\'' ) ) {
+			if ( *scan == '\\' ) {
+				++ scan;
+				if ( ! ( scan != last_ ) ) {
+					break;
+				}
+			}
+			++ scan;
+		}
+		if ( scan != last_ ) {
+			M_ASSERT( *scan == '\'' );
+			++ scan;
+			valid = true;
+		}
+	} while ( false );
+	if ( valid ) {
+		_cache.assign( start, scan );
+		unescape( _cache, _escapes_ );
+		if ( !! _actionCharacter )
+			add_execution_step( executingParser_, first_, call( _actionCharacter, _cache[0] ) );
+		else if ( !! _action )
+			add_execution_step( executingParser_, first_, _action );
+		first_ = scan;
+	} else {
+		report_error( executingParser_, scan, "expected literal string" );
+	}
+	return ( first_ );
+	M_EPILOG
+}
+
+HRuleBase::ptr_t HCharacterLiteral::do_clone( void ) const {
+	M_PROLOG
+	return ( make_pointer<HCharacterLiteral>( *this ) );
+	M_EPILOG
+}
+
+void HCharacterLiteral::do_describe( HRuleDescription& rd_, rule_use_t const& ) const {
+	M_PROLOG
+	rd_.desc( "string_literal" );
+	return;
+	M_EPILOG
+}
+
+void HCharacterLiteral::do_detach( HRuleBase const*, visited_t&, bool& ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HCharacterLiteral::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+	M_PROLOG
+	recursionDetector_.reset_visits();
+	return;
+	M_EPILOG
+}
+
+void HCharacterLiteral::do_find_recursions( HRuleAggregator& ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+HCharacterLiteral const& get_character_literal_instance( void ) {
+	M_PROLOG
+	static HCharacterLiteral characterLiteralInstance;
+	return ( characterLiteralInstance );
+	M_EPILOG
+}
+
+HCharacterLiteral const& character_literal( get_character_literal_instance() );
 
 HCharacter::HCharacter( void )
 	: HRuleBase(), _characters(), _actionChar()

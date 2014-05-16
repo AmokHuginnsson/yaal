@@ -600,6 +600,7 @@ public:
 private:
 	typedef yaal::hcore::HBoundCall<void ( char )> action_character_t;
 	action_character_t _actionCharacter;
+	yaal::hcore::HString _cache;
 public:
 	HCharacterLiteral( HCharacterLiteral const& );
 	HCharacterLiteral operator[]( action_t const& ) const;
