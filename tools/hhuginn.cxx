@@ -61,7 +61,7 @@ HRule huginn_grammar( void ) {
 	HRule parenthesis( "parenthesis", '(' >> expression >> ')' );
 	HRule argList( "argList", expression >> ( * ( ',' >> expression ) ) );
 	HRule functionCall( "functionCall", name >> '(' >> -argList >> ')' );
-	HRule atom( "atom", absoluteValue | parenthesis | functionCall | real | name );
+	HRule atom( "atom", absoluteValue | parenthesis | functionCall | real | integer | string_literal | character_literal | name );
 	HRule power( "power", atom >> ( * ( '^' >> atom ) ) );
 	HRule multiplication( "multiplication", power >> ( * ( '*' >> power ) ) );
 	HRule sum( "sum", multiplication >> ( * ( '+' >> multiplication ) ) );
