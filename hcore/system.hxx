@@ -131,6 +131,12 @@ HResourceInfo get_disk_space_info( yaal::hcore::HString const& );
  */
 int get_core_count_info( void );
 
+/*! \brief Get size of system memory page.
+ *
+ * \return Size of system memory page in bytes.
+ */
+int get_page_size( void );
+
 }
 
 }

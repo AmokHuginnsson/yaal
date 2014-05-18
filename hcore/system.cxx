@@ -271,6 +271,12 @@ int get_core_count_info( void ) {
 	M_EPILOG
 }
 
+int get_page_size( void ) {
+	M_PROLOG
+	return ( static_cast<int>( ::sysconf( _SC_PAGESIZE ) ) );
+	M_EPILOG
+}
+
 }
 
 }
