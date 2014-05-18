@@ -29,6 +29,11 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hhuginn.hxx"
 
+#include "hcore/system.hxx"
+
+using namespace yaal;
+using namespace yaal::hcore;
+
 namespace yaal {
 
 namespace tools {
@@ -126,11 +131,54 @@ HRule huginn_grammar( void ) {
 }
 
 HHuginn::HHuginn( void )
-	: _functions(), _engine( executing_parser::huginn_grammar() ) {
+	: _state( STATE::EMPTY ), _functions(),
+	_engine( executing_parser::huginn_grammar() ),
+	_sourceName(), _source(), _preprocessedSource() {
+}
+
+void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
+	M_PROLOG
+	M_ENSURE( _state == STATE::EMPTY );
+	static int const PAGE_SIZE( static_cast<int>( system::get_page_size() ) );
+	int nRead( 0 );
+	int block( 0 );
+	do {
+		_source.realloc( ( block + 1 ) * PAGE_SIZE );
+		nRead = static_cast<int>( stream_.read( _source.get<char>() + block * PAGE_SIZE, PAGE_SIZE ) );
+		++ block;
+	} while ( nRead == PAGE_SIZE );
+	_state = STATE::LOADED;
+	return;
+	M_EPILOG
+}
+
+void HHuginn::preprocess( void ) {
+	M_PROLOG
+	M_ENSURE( _state == STATE::LOADED );
+	_state = STATE::PREPROCESSED;
+	return;
+	M_EPILOG
+}
+
+void HHuginn::parse( void ) {
+	M_PROLOG
+	M_ENSURE( _state == STATE::PREPROCESSED );
+	_state = STATE::PARSED;
+	return;
+	M_EPILOG
+}
+
+void HHuginn::compile( void ) {
+	M_PROLOG
+	M_ENSURE( _state == STATE::PARSED );
+	_state = STATE::COMPILED;
+	return;
+	M_EPILOG
 }
 
 void HHuginn::execute( void ) {
 	M_PROLOG
+	M_ENSURE( _state == STATE::COMPILED );
 	call( "main" );
 	return;
 	M_EPILOG
@@ -142,11 +190,17 @@ void HHuginn::call( yaal::hcore::HString const& ) {
 	M_EPILOG
 }
 
+void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
 HHuginn::HScope::HScope( HScope* parent_ )
 	: _variables(), _parent( parent_ ) {
 }
 
-HHuginn::HIf::HIf( HExecutingParser::executor_t condition_,
+HHuginn::HIf::HIf( boolean_expression_t condition_,
 		HExecutingParser::executor_t ifClause_,
 		HExecutingParser::executor_t elseClause_ )
 	: HScope( NULL ), _condition( condition_ ), _ifClause( ifClause_ ), _elseClause( elseClause_ ) {

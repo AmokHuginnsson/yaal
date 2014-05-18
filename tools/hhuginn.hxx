@@ -44,30 +44,70 @@ class HHuginn {
 public:
 	typedef HHuginn this_type;
 	class HObject;
+	typedef yaal::hcore::HPointer<HObject> object_t;
+	class HIterable;
+	typedef yaal::hcore::HPointer<HIterable> iterable_t;
 	class HScope;
+	typedef yaal::hcore::HPointer<HScope> scope_t;
 	class HIf;
 	class HWhile;
+	class HForeach;
 	class HClass;
 	class HMethod;
 	class HFunction;
 	class HReference;
 	class HValue;
+	typedef yaal::hcore::HPointer<HValue> value_t;
 	class HInteger;
 	class HFloat;
 	class HString;
+	class HCharacter;
 	class HList;
 	class HMap;
+	class HExpression;
+	typedef yaal::hcore::HPointer<HExpression> expression_t;
+	class HBooleanExpression;
+	typedef yaal::hcore::HPointer<HBooleanExpression> boolean_expression_t;
 private:
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::HFunction> functions_t;
+	struct STATE {
+		typedef enum {
+			EMPTY,
+			LOADED,
+			PREPROCESSED,
+			PARSED,
+			COMPILED
+		} state_t;
+	};
+	STATE::state_t _state;
 	functions_t _functions;
 	HExecutingParser _engine;
+	yaal::hcore::HString _sourceName;
+	yaal::hcore::HChunk _source;
+	yaal::hcore::HChunk _preprocessedSource;
 public:
 	HHuginn( void );
-	void parse( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	void parse( yaal::hcore::HStreamInterface const& );
+	/*! \brief Store source in internal buffer.
+	 *
+	 * \param  stream_ - stream that contains program source.
+	 */
+	void load( yaal::hcore::HStreamInterface& stream_ );
+	/*! \brief Preprocess loaded program source.
+	 */
+	void preprocess( void );
+	/*! \brief Parse preprocessed program source.
+	 */
+	void parse( void );
+	/*! \brief Compile parsed program.
+	 */
+	void compile( void );
+	/*! \brief Execute compiled program.
+	 */
 	void execute( void );
 	void create_function( void );
 	void call( yaal::hcore::HString const& );
+	void dump_preprocessed_source( yaal::hcore::HStreamInterface& );
+private:
 };
 
 class HHuginn::HObject {
@@ -80,7 +120,12 @@ class HHuginn::HValue : public HHuginn::HObject {
 public:
 	typedef HHuginn::HValue this_type;
 	typedef HHuginn::HObject base_type;
-	typedef yaal::hcore::HPointer<HValue> ptr_t;
+};
+
+class HHuginn::HIterable : public HHuginn::HValue {
+public:
+	typedef HHuginn::HIterable this_type;
+	typedef HHuginn::HValue base_type;
 };
 
 class HHuginn::HInteger : public HHuginn::HValue {
@@ -111,23 +156,35 @@ private:
 	yaal::hcore::HString _value;
 };
 
-class HHuginn::HList : public HHuginn::HValue {
+class HHuginn::HList : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HList this_type;
-	typedef HHuginn::HValue base_type;
+	typedef HHuginn::HIterable base_type;
 };
 
-class HHuginn::HMap : public HHuginn::HValue {
+class HHuginn::HMap : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HMap this_type;
-	typedef HHuginn::HValue base_type;
+	typedef HHuginn::HIterable base_type;
+};
+
+class HHuginn::HExpression : public HHuginn::HObject {
+public:
+	typedef HHuginn::HExpression this_type;
+	typedef HHuginn::HObject base_type;
+};
+
+class HHuginn::HBooleanExpression : public HHuginn::HObject {
+public:
+	typedef HHuginn::HBooleanExpression this_type;
+	typedef HHuginn::HObject base_type;
 };
 
 class HHuginn::HScope : public HHuginn::HObject {
 public:
 	typedef HHuginn::HScope this_type;
 	typedef HHuginn::HObject base_type;
-	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::HValue::ptr_t> variables_t;
+	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::value_t> variables_t;
 private:
 	variables_t _variables;
 	HHuginn::HScope* _parent;
@@ -143,11 +200,11 @@ public:
 	typedef HHuginn::HIf this_type;
 	typedef HHuginn::HScope base_type;
 private:
-	HExecutingParser::executor_t _condition;
+	boolean_expression_t _condition;
 	HExecutingParser::executor_t _ifClause;
 	HExecutingParser::executor_t _elseClause;
 public:
-	HIf( HExecutingParser::executor_t, HExecutingParser::executor_t, HExecutingParser::executor_t );
+	HIf( boolean_expression_t, HExecutingParser::executor_t, HExecutingParser::executor_t );
 };
 
 class HHuginn::HWhile : public HHuginn::HScope {
@@ -155,7 +212,16 @@ public:
 	typedef HHuginn::HWhile this_type;
 	typedef HHuginn::HScope base_type;
 private:
-	HExecutingParser::executor_t _condition;
+	boolean_expression_t _condition;
+	HExecutingParser::executor_t _loop;
+};
+
+class HHuginn::HForeach : public HHuginn::HScope {
+public:
+	typedef HHuginn::HForeach this_type;
+	typedef HHuginn::HScope base_type;
+private:
+	iterable_t _container;
 	HExecutingParser::executor_t _loop;
 };
 
