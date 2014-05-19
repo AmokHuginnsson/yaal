@@ -163,6 +163,47 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
 void HHuginn::preprocess( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::LOADED );
+	_preprocessedSource.realloc( _sourceSize );
+	char const* src( _source.get<char>() );
+	char* dst( _preprocessedSource.get<char>() );
+	static char const COMMENT_START_CHAR1( '/' );
+	static char const COMMENT_START_CHAR2( '*' );
+	static char const COMMENT_STOP_CHAR1( '*' );
+	static char const COMMENT_STOP_CHAR2( '/' );
+	bool inComment( false );
+	for ( int i( 0 ); i < _sourceSize; ++ i, ++ src ) {
+		if ( inComment ) {
+			if ( *src == COMMENT_STOP_CHAR1 ) {
+				++ i;
+				++ src;
+				if ( i >= _sourceSize ) {
+					*dst = COMMENT_STOP_CHAR1;
+					++ dst;
+					break;
+				} else if ( *src == COMMENT_STOP_CHAR2 ) {
+					inComment = false;
+					continue;
+				}
+			}
+		} else {
+			if ( *src == COMMENT_START_CHAR1 ) {
+				++ i;
+				++ src;
+				if ( i >= _sourceSize ) {
+					*dst = COMMENT_START_CHAR1;
+					++ dst;
+					break;
+				} else if ( *src == COMMENT_START_CHAR2 ) {
+					inComment = true;
+				}
+			}
+		}
+		if ( ! inComment ) {
+			*dst = *src;
+			++ dst;
+		}
+	}
+	_preprocessedSourceSize = static_cast<int>( dst - _preprocessedSource.get<char>() );
 	_state = STATE::PREPROCESSED;
 	return;
 	M_EPILOG
