@@ -168,25 +168,33 @@ void HHuginn::preprocess( void ) {
 	char* dst( _preprocessedSource.get<char>() );
 	static char const COMMENT_START_CHAR1( '/' );
 	static char const COMMENT_START_CHAR2( '*' );
+	static char const COMMENT_START_CHAR2ALT( '/' );
 	static char const COMMENT_STOP_CHAR1( '*' );
 	static char const COMMENT_STOP_CHAR2( '/' );
+	static char const NEWLINE( '\n' );
+	static char const DOUBLE_QUOTE( '"' );
+	static char const SINGLE_QUOTE( '\'' );
 	bool inComment( false );
+	bool inSingleQuote( false );
+	bool inDoubleQuote( false );
 	for ( int i( 0 ); i < _sourceSize; ++ i, ++ src ) {
 		if ( inComment ) {
 			if ( *src == COMMENT_STOP_CHAR1 ) {
 				++ i;
 				++ src;
 				if ( i >= _sourceSize ) {
-					*dst = COMMENT_STOP_CHAR1;
-					++ dst;
 					break;
 				} else if ( *src == COMMENT_STOP_CHAR2 ) {
 					inComment = false;
 					continue;
 				}
 			}
-		} else {
-			if ( *src == COMMENT_START_CHAR1 ) {
+		} else if ( ! ( inSingleQuote || inDoubleQuote ) ) {
+			if ( *src == SINGLE_QUOTE ) {
+				inSingleQuote = true;
+			} else if ( *src == DOUBLE_QUOTE ) {
+				inDoubleQuote = true;
+			} else if ( *src == COMMENT_START_CHAR1 ) {
 				++ i;
 				++ src;
 				if ( i >= _sourceSize ) {
@@ -195,8 +203,30 @@ void HHuginn::preprocess( void ) {
 					break;
 				} else if ( *src == COMMENT_START_CHAR2 ) {
 					inComment = true;
+				} else if ( *src == COMMENT_START_CHAR2ALT ) {
+					++ i;
+					++ src;
+					while ( i < _sourceSize ) {
+						if ( *src == NEWLINE )
+							break;
+						++ src;
+						++ i;
+					}
+					if ( i < _sourceSize ) {
+						*dst = NEWLINE;
+						++ dst;
+					}
+					continue;
+				} else {
+					*dst = COMMENT_START_CHAR1;
+					++ dst;
 				}
 			}
+		} else {
+			if ( inSingleQuote && ( *src == SINGLE_QUOTE ) )
+				inSingleQuote = false;
+			else if ( inDoubleQuote && ( *src == DOUBLE_QUOTE ) )
+				inDoubleQuote = false;
 		}
 		if ( ! inComment ) {
 			*dst = *src;
