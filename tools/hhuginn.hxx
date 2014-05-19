@@ -63,6 +63,7 @@ public:
 	class HString;
 	class HCharacter;
 	class HList;
+	typedef yaal::hcore::HPointer<HList> list_t;
 	class HMap;
 	class HExpression;
 	typedef yaal::hcore::HPointer<HExpression> expression_t;
@@ -84,7 +85,10 @@ private:
 	HExecutingParser _engine;
 	yaal::hcore::HString _sourceName;
 	yaal::hcore::HChunk _source;
+	int _sourceSize;
 	yaal::hcore::HChunk _preprocessedSource;
+	int _preprocessedSourceSize;
+	list_t _arguments;
 public:
 	HHuginn( void );
 	/*! \brief Store source in internal buffer.
@@ -105,7 +109,9 @@ public:
 	 */
 	void execute( void );
 	void create_function( void );
+	void add_argument( yaal::hcore::HString const& );
 	void call( yaal::hcore::HString const& );
+	value_t returned_value( void ) const;
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& );
 private:
 };
@@ -154,12 +160,20 @@ public:
 	typedef HHuginn::HValue base_type;
 private:
 	yaal::hcore::HString _value;
+public:
+	HString( yaal::hcore::HString const& );
 };
 
 class HHuginn::HList : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HList this_type;
 	typedef HHuginn::HIterable base_type;
+private:
+	typedef yaal::hcore::HDeque<HHuginn::value_t> values_t;
+	values_t _data;
+public:
+	HList( void );
+	void push_back( value_t const& );
 };
 
 class HHuginn::HMap : public HHuginn::HIterable {

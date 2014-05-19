@@ -133,7 +133,9 @@ HRule huginn_grammar( void ) {
 HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY ), _functions(),
 	_engine( executing_parser::huginn_grammar() ),
-	_sourceName(), _source(), _preprocessedSource() {
+	_sourceName(), _source(), _sourceSize( 0 ),
+	_preprocessedSource(), _preprocessedSourceSize( 0 ),
+	_arguments( new HList() ) {
 }
 
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
@@ -142,9 +144,12 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
 	static int const PAGE_SIZE( static_cast<int>( system::get_page_size() ) );
 	int nRead( 0 );
 	int block( 0 );
+	M_ASSERT( _sourceSize == 0 );
 	do {
 		_source.realloc( ( block + 1 ) * PAGE_SIZE );
 		nRead = static_cast<int>( stream_.read( _source.get<char>() + block * PAGE_SIZE, PAGE_SIZE ) );
+		M_ENSURE( nRead >= 0 );
+		_sourceSize += nRead;
 		++ block;
 	} while ( nRead == PAGE_SIZE );
 	_state = STATE::LOADED;
@@ -152,6 +157,9 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
 	M_EPILOG
 }
 
+/*
+ * Strip C-style comments, concatenate literal strings.
+ */
 void HHuginn::preprocess( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::LOADED );
@@ -184,14 +192,52 @@ void HHuginn::execute( void ) {
 	M_EPILOG
 }
 
+void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
+	M_PROLOG
+	_arguments->push_back( value_t( new HString( arg_ ) ) );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::call( yaal::hcore::HString const& ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
-void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& ) {
+HHuginn::value_t HHuginn::returned_value( void ) const {
 	M_PROLOG
+	return ( value_t() );
+	M_EPILOG
+}
+
+void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ ) {
+	M_PROLOG
+	static int const PAGE_SIZE( static_cast<int>( system::get_page_size() ) );
+	int totalWritten( 0 );
+	do {
+		int nWritten( static_cast<int>( stream_.write( _preprocessedSource.get<char>() + totalWritten,
+						_preprocessedSourceSize - totalWritten >= PAGE_SIZE ? PAGE_SIZE : _preprocessedSourceSize - totalWritten ) ) );
+		M_ENSURE( nWritten >= 0 );
+		totalWritten += nWritten;
+	} while ( totalWritten < _preprocessedSourceSize );
+	return;
+	M_EPILOG
+}
+
+HHuginn::HString::HString( yaal::hcore::HString const& value_ )
+	: HValue(), _value( value_ ) {
+	return;
+}
+
+HHuginn::HList::HList( void )
+	: HIterable(), _data() {
+	return;
+}
+
+void HHuginn::HList::push_back( HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	_data.push_back( value_ );
 	return;
 	M_EPILOG
 }

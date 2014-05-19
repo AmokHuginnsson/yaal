@@ -88,17 +88,18 @@ void* HChunk::realloc( int long size_, STRATEGY::enum_t strategy_ ) {
 	if ( size_ < 1 )
 		M_THROW( "bad size", size_ );
 	if ( size_ > _size ) {
+		int long newSize( 0 );
 		if ( strategy_ == STRATEGY::GEOMETRIC ) {
-			int long newSize = 1;
+			newSize = 1;
 			while ( newSize < size_ )
 				newSize <<= 1;
-			size_ = newSize;
 		} else {
 			M_ASSERT( strategy_ == STRATEGY::EXACT );
+			newSize = size_;
 		}
-		_data = memory::realloc<char>( _data, size_ );
-		::memset( static_cast<char*>( _data ) + _size, 0, static_cast<size_t>( size_ - _size ) );
-		_size = size_;
+		_data = memory::realloc<char>( _data, newSize );
+		::memset( static_cast<char*>( _data ) + _size, 0, static_cast<size_t>( newSize - _size ) );
+		_size = newSize;
 	}
 	return ( _data );
 }
