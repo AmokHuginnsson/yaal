@@ -536,7 +536,7 @@ void HXml::load( yaal::hcore::HStreamInterface& stream, PARSER::parser_t parser_
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	M_ENSURE( stream.is_valid() );
-	init( stream );
+	init( stream, parser_ );
 	parse( parser_ );
 	return;
 	M_EPILOG
