@@ -115,10 +115,6 @@ HRule huginn_grammar( void ) {
 			ifStatement | whileStatement | foreachStatement | switchStatement | returnStatement | expressionList );
 	HRule loopStatement( "loopStatement",
 			ifStatement | whileStatement | foreachStatement | switchStatement | breakStatement | continueStatement | returnStatement | expressionList );
-	/*
-	 * Problem with clone().
-	 * Detach works on cloned nodes.
-	 */
 	scope %= ( '{' >> *statement >> '}' );
 	loopScope %= ( '{' >> *loopStatement >> '}' );
 	HRule nameList( "nameList", name >> ( * ( ',' >> name ) ) );
@@ -172,6 +168,7 @@ void HHuginn::preprocess( void ) {
 	static char const COMMENT_STOP_CHAR1( '*' );
 	static char const COMMENT_STOP_CHAR2( '/' );
 	static char const NEWLINE( '\n' );
+	static char const ESCAPE( '\\' );
 	static char const DOUBLE_QUOTE( '"' );
 	static char const SINGLE_QUOTE( '\'' );
 	bool inComment( false );
@@ -223,6 +220,18 @@ void HHuginn::preprocess( void ) {
 				}
 			}
 		} else {
+			if ( *src == ESCAPE ) {
+				*dst = *src;
+				++ src;
+				++ dst;
+				++ i;
+				if ( i >= _sourceSize ) {
+					break;
+				}
+				*dst = *src;
+				++ dst;
+				continue;
+			}
 			if ( inSingleQuote && ( *src == SINGLE_QUOTE ) )
 				inSingleQuote = false;
 			else if ( inDoubleQuote && ( *src == DOUBLE_QUOTE ) )
