@@ -148,14 +148,6 @@ public:
 		{ _value = _orig; }
 };
 
-/*! \brief Create new named type that is not convertible and requires explicit instantiation.
- */
-template<typename id, typename T>
-struct explicit_type {
-	T _value;
-	explicit explicit_type( T const& value_ ) : _value( value_ ) {}
-};
-
 /*! \brief Helper to find number of elements in C array.
  */
 template <typename T, int long unsigned N>
