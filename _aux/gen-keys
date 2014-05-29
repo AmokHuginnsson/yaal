@@ -1,0 +1,38 @@
+#! /bin/sh
+
+if [ ${#} -lt 1 ] ; then
+	echo "Destination directory not specified."
+	exit 1
+fi
+
+DEST_DIR=${1}
+
+if [ -z ${MKDIR_P} ] ; then
+	MKDIR_P="mkdir -p"
+fi
+
+${MKDIR_P} ${DEST_DIR}
+cd "${DEST_DIR}"
+
+COUNTRY="XX"
+STATE="State"
+LOCATION="Location"
+ORGARNIZATION="Organization"
+ORGARNIZATION_UNIT="Organization Unit"
+COMMON_NAME="common.name.org"
+EMAIL_ADDRESS="admin@common.name.org"
+
+SUBJECT=""
+SUBJECT="${SUBJECT}/C=${COUNTRY}"
+SUBJECT="${SUBJECT}/ST=${STATE}"
+SUBJECT="${SUBJECT}/L=${LOCATION}"
+SUBJECT="${SUBJECT}/O=${ORGARNIZATION}"
+SUBJECT="${SUBJECT}/OU=${ORGARNIZATION_UNIT}"
+SUBJECT="${SUBJECT}/CN=${COMMON_NAME}"
+SUBJECT="${SUBJECT}/emailAddress=${EMAIL_ADDRESS}/"
+
+set -e
+
+openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 -out yaal.key
+openssl req -x509 -new -key yaal.key -out yaal.pem -days 3652 -subj "${SUBJECT}"
+
