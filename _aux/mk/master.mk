@@ -70,7 +70,7 @@ CONF_cov=--enable-coverage
 DS=d
 FIND=find
 
-.PHONY: all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov coverage-stats debug dep distclean doc help install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prepare-coverage-baseline prof purge static stats tags uninstall
+.PHONY: all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov coverage-stats debug dep distclean doc help install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prepare-coverage-baseline prof purge purge-local static stats tags uninstall
 .NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc build/%/yaal.pc configure config.hxx.in
 
 default: $(.DEFAULT_GOAL)
@@ -94,17 +94,25 @@ mrproper-all: $(foreach T, $(MAIN_TARGETS), mrproper-$(T))
 
 clean-all: $(foreach T, $(MAIN_TARGETS), clean-$(T))
 
-distclean purge: mrproper-all
+purge-local:
+	@grep -qs "^purge-local:" Makefile.mk.in && $(MAKE) -f Makefile.mk.in -e purge-local ; \
+	true
+
+do-purge: mrproper-all
 	@sh -c '. ./_aux/clean-lib.sh && clean .' && \
 	if [ -d _aux -a ! -h _aux ] ; then /bin/rm -f _aux/config.guess _aux/config.sub _aux/install-sh _aux/ltmain.sh _aux/missing ; fi && \
 	/bin/rm -rf aclocal.m4 autom4te.cache build config.cache config.status \
 		configure.lineno configure.scan configure Makefile.mk config.hxx config.hxx.in \
-		config.h config.h.in yaalrc yaal.pc config.log dirs.d doc/html \
+		config.h config.h.in config.log dirs.d doc/html \
 		CMakeFiles CMakeCache.txt cmake_install.cmake install_manifest.txt \
 		tags GPATH GRTAGS GSYMS GTAGS make.log *.vcproj.* *.vcproj *.vcxproj.* *.vcxproj \
 		*.sln *.suo *.ncb *.sdf *.dir _UpgradeReport_Files UpgradeLog.XML debug release *.so \
 		ipch Win32 *.sln.cache build.stamp && \
 	if [ "x${OSTYPE}" != "xcygwin" ] ; then /bin/rm -f Makefile ; fi
+
+purge: purge-local do-purge
+
+distclean: do-purge
 
 clean-dep:
 	@$(call invoke,$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f)

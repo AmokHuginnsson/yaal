@@ -3,7 +3,7 @@ MODULE_DEPS=$$(filter ./$(1)/%,$$(OBJS))
 $$(firstword $$(MODULE_DEPS:.$$(OS)=.$$(DS))) $$(lastword $$(MODULE_DEPS:.$$(OS)=.$$(DS))): $$(DIR_BUILD)/dirs.d
 endef
 
-ifeq ($(strip $(foreach GOAL,clean mrproper stats tags doc,$(findstring $(GOAL),$(MAKECMDGOALS)))),)
+ifeq ($(strip $(foreach GOAL,clean mrproper purge-local stats tags doc,$(findstring $(GOAL),$(MAKECMDGOALS)))),)
 ifeq ($(CURDIR),$(DIR_BUILD))
 
 DIR_MODULES=$(strip $(sort $(dir $(OBJS))))

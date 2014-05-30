@@ -139,7 +139,7 @@ include $(DIR_ROOT)/_aux/mk/b_implicit-compile.mk
 include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 
 #phony targets
-.PHONY: all bin clean clean-dep cov coverage-stats debug dep distclean doc install install-environment mrproper relassert reldeb release prepare-coverage-baseline prof purge static stats test uninstall
+.PHONY: all bin clean clean-dep cov coverage-stats debug dep distclean doc flint install install-environment mrproper relassert reldeb release prepare-coverage-baseline prof purge purge-local static stats test uninstall
 
 $(TARGET): $(DIRS) $(TARGETS) $(HAPI_HEADER)
 
@@ -193,6 +193,9 @@ mrproper: clean
 	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
 	printf "%b\n" "done."
+
+purge-local:
+	@/bin/rm -f $(DIR_ROOT)/dropprivs $(DIR_ROOT)/debian
 
 include $(DIR_ROOT)/_aux/mk/d_target-tools.mk
 
