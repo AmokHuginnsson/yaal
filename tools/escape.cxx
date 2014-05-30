@@ -40,7 +40,7 @@ namespace tools {
 
 namespace util {
 
-EscapeTable::EscapeTable( char const* raw_, int rawLen_, char const* safe_, int safeLen_ )
+EscapeTable::EscapeTable( char const* raw_, int rawLen_, char const* safe_, int M_DEBUG_CODE( safeLen_ ) )
 	: _rawToSafe(), _safeToRaw() {
 	M_PROLOG
 	M_ASSERT( ( rawLen_ > 0 ) && ( safeLen_ == rawLen_ ) && raw_ && safe_ );

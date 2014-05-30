@@ -88,10 +88,6 @@ double long strtold( char const*, char** );
 static int const LOGIN_NAME_MAX = 16;
 #endif /* #if ! defined( LOGIN_NAME_MAX ) */
 
-#if ! defined( __DYNAMIC_LINKER__ )
-#define __DYNAMIC_LINKER__ ""
-#endif /* #if ! defined( __DYNAMIC_LINKER__ ) */
-
 #endif /* __YAAL_BUILD__ */
 
 #ifdef __GNUC__

@@ -237,16 +237,16 @@ protected:
 	virtual double long do_get_double_long( void ) const;
 	virtual void* do_get_pointer( void ) const;
 	virtual yaal::hcore::HString const& do_get_string( void ) const;
-	virtual yaal::hcore::HTime const& do_get_time( void ) const __attribute__(( noreturn ));
-	virtual void do_set_char( char ) __attribute__(( noreturn ));
-	virtual void do_set_int_short( int short ) __attribute__(( noreturn ));
-	virtual void do_set_int( int ) __attribute__(( noreturn ));
-	virtual void do_set_int_long( int long ) __attribute__(( noreturn ));
-	virtual void do_set_double( double ) __attribute__(( noreturn ));
-	virtual void do_set_double_long( double long ) __attribute__(( noreturn ));
-	virtual void do_set_pointer( void* ) __attribute__(( noreturn ));
-	virtual void do_set_string( yaal::hcore::HString const& ) __attribute__(( noreturn ));
-	virtual void do_set_time( yaal::hcore::HTime const& ) __attribute__(( noreturn ));
+	virtual yaal::hcore::HTime const& do_get_time( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_char( char ) M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_int_short( int short ) M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_int( int ) M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_int_long( int long ) M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_double( double ) M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_double_long( double long ) M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_pointer( void* ) M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_string( yaal::hcore::HString const& ) M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_time( yaal::hcore::HTime const& ) M_DEBUG_CODE( __attribute__(( noreturn )) );
 private:
 	void purge( void );
 };

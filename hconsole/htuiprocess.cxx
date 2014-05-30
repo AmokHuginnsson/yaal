@@ -248,7 +248,7 @@ int HTUIProcess::handler_mouse( int code_, void const* ) {
 void HTUIProcess::process_terminal_event( int event_ ) {
 	M_PROLOG
 	char type;
-	::read( event_, &type, 1 );
+	M_ENSURE( ::read( event_, &type, 1 ) == 1 );
 	switch( type ) {
 		case 'r':
 			handler_refresh( 0 );

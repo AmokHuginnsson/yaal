@@ -309,8 +309,9 @@ void banner( char const* packageName_, char const* packageVersion_ ) {
 
 }
 
+#ifdef __DYNAMIC_LINKER__
 extern "C"
-int yaal_hcore_main( int, char** );
+int yaal_hcore_main( int, char** ) __attribute__((noreturn));
 extern "C"
 int yaal_hcore_main( int, char** ) {
 	static char const dynamicLinkerPath[]
@@ -321,8 +322,15 @@ int yaal_hcore_main( int, char** ) {
 	if ( dynamicLinkerPath[ 0 ] ) {
 		yaal::hcore::banner();
 		::printf( "\n" );
-		::exit( 0 );
 	}
+	::exit( 0 );
+}
+#else /* #ifdef __DYNAMIC_LINKER__ */
+extern "C"
+int yaal_hcore_main( int, char** );
+extern "C"
+int yaal_hcore_main( int, char** ) {
 	return ( 0 );
 }
+#endif /* #else #ifdef __DYNAMIC_LINKER__ */
 

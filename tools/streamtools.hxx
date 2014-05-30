@@ -148,7 +148,7 @@ public:
 	HTee( HTee const& );
 protected:
 	virtual int long do_write( void const* const, int long );
-	virtual int long do_read( void* const, int long ) __attribute__((noreturn));
+	virtual int long do_read( void* const, int long ) M_DEBUG_CODE( __attribute__((noreturn)) );
 	virtual void do_flush( void );
 	virtual bool do_is_valid( void ) const;
 	virtual bool do_good( void ) const;

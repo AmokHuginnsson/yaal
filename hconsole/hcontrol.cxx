@@ -165,8 +165,8 @@ void HControl::update( void ) {
 
 void HControl::set( HInfo const & ) {
 	M_PROLOG
-	if ( errno || ! errno )
-		M_THROW ( "Abstract method called!", errno );
+	if ( ( errno * errno ) >= 0 ) /* We need something that evaluates to `true' but compiler does not know it. */
+		M_THROW( "Abstract method called!", errno );
 	return;
 	M_EPILOG
 }

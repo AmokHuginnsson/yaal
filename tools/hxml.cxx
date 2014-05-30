@@ -806,7 +806,7 @@ HXml::HNode::TYPE::type_t HXml::HConstNodeProxy::get_type( void ) const {
 
 HString const& HXml::HConstNodeProxy::get_name( void ) const {
 	M_PROLOG
-	HXml::HNode::TYPE::type_t type( (**_node)._type );
+	M_DEBUG_CODE( HXml::HNode::TYPE::type_t type( (**_node)._type ); );
 	M_ASSERT( _node && ( ( type == HXml::HNode::TYPE::NODE ) || ( type == HXml::HNode::TYPE::ENTITY ) ) );
 	return ( (**_node)._text );
 	M_EPILOG

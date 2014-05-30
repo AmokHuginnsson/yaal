@@ -83,9 +83,11 @@ private:
 	typedef typename yaal::trait::ternary<( SIZE > ALIGNOF_INT_LONG ), int long long,
 					typename yaal::trait::ternary<( SIZE > ALIGNOF_INT ), int long,
 					typename yaal::trait::ternary<( SIZE > ALIGNOF_INT_SHORT ), int,
-					typename yaal::trait::ternary<( SIZE > static_cast<int>( sizeof ( char ) ) ), int short, char>::type>::type>::type>::type aligner_t;
-	static int const ALIGNER_COUNT = SIZE / static_cast<int>( sizeof ( aligner_t ) ) + ( SIZE % static_cast<int>( sizeof ( aligner_t ) ) ? 1 : 0 );
-	aligner_t _mem[ ALIGNER_COUNT ];
+					typename yaal::trait::ternary<( SIZE > static_cast<int>( sizeof ( char ) ) ), int short, char>::type>::type>::type>::type aligner_type;
+	static int const ALIGNER_COUNT = SIZE / static_cast<int>( sizeof ( aligner_type ) ) + ( SIZE % static_cast<int>( sizeof ( aligner_type ) ) ? 1 : 0 );
+
+	typedef  aligner_type (aligner_t)[ ALIGNER_COUNT ];
+	aligner_t __attribute__((__may_alias__)) _mem;
 	int _type;
 public:
 	HVariant( void );
@@ -140,34 +142,35 @@ template<typename t0_t, typename t1_t,
 	typename t16_t, typename t17_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
-HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::HVariant( HVariant const& v )
+HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
+	t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::HVariant( HVariant const& v_ )
 	: _mem(), _type( INVALID ) {
-	switch ( v._type ) {
+	switch ( v_._type ) {
 		case ( -1 ): break;
-		case ( 0 ): new ( _mem ) t0_t( *reinterpret_cast<t0_t const*>( v._mem ) ); break;
-		case ( 1 ): new ( _mem ) t1_t( *reinterpret_cast<t1_t const*>( v._mem ) ); break;
-		case ( 2 ): new ( _mem ) t2_t( *reinterpret_cast<t2_t const*>( v._mem ) ); break;
-		case ( 3 ): new ( _mem ) t3_t( *reinterpret_cast<t3_t const*>( v._mem ) ); break;
-		case ( 4 ): new ( _mem ) t4_t( *reinterpret_cast<t4_t const*>( v._mem ) ); break;
-		case ( 5 ): new ( _mem ) t5_t( *reinterpret_cast<t5_t const*>( v._mem ) ); break;
-		case ( 6 ): new ( _mem ) t6_t( *reinterpret_cast<t6_t const*>( v._mem ) ); break;
-		case ( 7 ): new ( _mem ) t7_t( *reinterpret_cast<t7_t const*>( v._mem ) ); break;
-		case ( 8 ): new ( _mem ) t8_t( *reinterpret_cast<t8_t const*>( v._mem ) ); break;
-		case ( 9 ): new ( _mem ) t9_t( *reinterpret_cast<t9_t const*>( v._mem ) ); break;
-		case ( 10 ): new ( _mem ) t10_t( *reinterpret_cast<t10_t const*>( v._mem ) ); break;
-		case ( 11 ): new ( _mem ) t11_t( *reinterpret_cast<t11_t const*>( v._mem ) ); break;
-		case ( 12 ): new ( _mem ) t12_t( *reinterpret_cast<t12_t const*>( v._mem ) ); break;
-		case ( 13 ): new ( _mem ) t13_t( *reinterpret_cast<t13_t const*>( v._mem ) ); break;
-		case ( 14 ): new ( _mem ) t14_t( *reinterpret_cast<t14_t const*>( v._mem ) ); break;
-		case ( 15 ): new ( _mem ) t15_t( *reinterpret_cast<t15_t const*>( v._mem ) ); break;
-		case ( 16 ): new ( _mem ) t16_t( *reinterpret_cast<t16_t const*>( v._mem ) ); break;
-		case ( 17 ): new ( _mem ) t17_t( *reinterpret_cast<t17_t const*>( v._mem ) ); break;
-		case ( 18 ): new ( _mem ) t18_t( *reinterpret_cast<t18_t const*>( v._mem ) ); break;
-		case ( 19 ): new ( _mem ) t19_t( *reinterpret_cast<t19_t const*>( v._mem ) ); break;
-		case ( 20 ): new ( _mem ) t20_t( *reinterpret_cast<t20_t const*>( v._mem ) ); break;
+		case ( 0 ): { t0_t const* v( reinterpret_cast<t0_t const*>( v_._mem ) ); new ( _mem ) t0_t( *v ); } break;
+		case ( 1 ): { t1_t const* v( reinterpret_cast<t1_t const*>( v_._mem ) ); new ( _mem ) t1_t( *v ); } break;
+		case ( 2 ): { t2_t const* v( reinterpret_cast<t2_t const*>( v_._mem ) ); new ( _mem ) t2_t( *v ); } break;
+		case ( 3 ): { t3_t const* v( reinterpret_cast<t3_t const*>( v_._mem ) ); new ( _mem ) t3_t( *v ); } break;
+		case ( 4 ): { t4_t const* v( reinterpret_cast<t4_t const*>( v_._mem ) ); new ( _mem ) t4_t( *v ); } break;
+		case ( 5 ): { t5_t const* v( reinterpret_cast<t5_t const*>( v_._mem ) ); new ( _mem ) t5_t( *v ); } break;
+		case ( 6 ): { t6_t const* v( reinterpret_cast<t6_t const*>( v_._mem ) ); new ( _mem ) t6_t( *v ); } break;
+		case ( 7 ): { t7_t const* v( reinterpret_cast<t7_t const*>( v_._mem ) ); new ( _mem ) t7_t( *v ); } break;
+		case ( 8 ): { t8_t const* v( reinterpret_cast<t8_t const*>( v_._mem ) ); new ( _mem ) t8_t( *v ); } break;
+		case ( 9 ): { t9_t const* v( reinterpret_cast<t9_t const*>( v_._mem ) ); new ( _mem ) t9_t( *v ); } break;
+		case ( 10 ): { t10_t const* v( reinterpret_cast<t10_t const*>( v_._mem ) ); new ( _mem ) t10_t( *v ); } break;
+		case ( 11 ): { t11_t const* v( reinterpret_cast<t11_t const*>( v_._mem ) ); new ( _mem ) t11_t( *v ); } break;
+		case ( 12 ): { t12_t const* v( reinterpret_cast<t12_t const*>( v_._mem ) ); new ( _mem ) t12_t( *v ); } break;
+		case ( 13 ): { t13_t const* v( reinterpret_cast<t13_t const*>( v_._mem ) ); new ( _mem ) t13_t( *v ); } break;
+		case ( 14 ): { t14_t const* v( reinterpret_cast<t14_t const*>( v_._mem ) ); new ( _mem ) t14_t( *v ); } break;
+		case ( 15 ): { t15_t const* v( reinterpret_cast<t15_t const*>( v_._mem ) ); new ( _mem ) t15_t( *v ); } break;
+		case ( 16 ): { t16_t const* v( reinterpret_cast<t16_t const*>( v_._mem ) ); new ( _mem ) t16_t( *v ); } break;
+		case ( 17 ): { t17_t const* v( reinterpret_cast<t17_t const*>( v_._mem ) ); new ( _mem ) t17_t( *v ); } break;
+		case ( 18 ): { t18_t const* v( reinterpret_cast<t18_t const*>( v_._mem ) ); new ( _mem ) t18_t( *v ); } break;
+		case ( 19 ): { t19_t const* v( reinterpret_cast<t19_t const*>( v_._mem ) ); new ( _mem ) t19_t( *v ); } break;
+		case ( 20 ): { t20_t const* v( reinterpret_cast<t20_t const*>( v_._mem ) ); new ( _mem ) t20_t( *v ); } break;
 		default: M_ASSERT( 0 && "Absurd type number." ); break;
 	}
-	_type = v._type;
+	_type = v_._type;
 }
 
 template<typename t0_t, typename t1_t,
@@ -369,7 +372,7 @@ void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
 		if ( _type == v._type )
 			swap( _type, _mem, v._mem );
 		else if ( ( _type != INVALID ) && ( v._type != INVALID ) ) {
-			aligner_t tmp[ALIGNER_COUNT];
+			aligner_t tmp;
 			default_construct( _type, tmp );
 			swap( _type, _mem, tmp );
 			destroy( _type, _mem );
@@ -409,7 +412,8 @@ template<typename t0_t, typename t1_t,
 template<typename tType>
 tType& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::get( void ) {
 	M_ASSERT(( _type == yaal::trait::find_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::value ));
-	return ( *reinterpret_cast<tType*>( _mem ) );
+	tType* v( reinterpret_cast<tType*>( _mem ) );
+	return ( *v );
 }
 
 template<typename t0_t, typename t1_t,
@@ -426,7 +430,8 @@ template<typename t0_t, typename t1_t,
 template<typename tType>
 tType const& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::get( void ) const {
 	M_ASSERT(( _type == yaal::trait::find_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::value ));
-	return ( *reinterpret_cast<tType const*>( _mem ) );
+	tType const* v( reinterpret_cast<tType const*>( _mem ) );
+	return ( *v );
 }
 
 template<typename t0_t, typename t1_t,

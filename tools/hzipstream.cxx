@@ -155,7 +155,7 @@ int long HZipStream::do_write( void const* const buf_, int long size_ ) {
 		zstream->next_out = reinterpret_cast<Bytef*>( buf );
 		int err( deflate( zstream, size_ > 0 ? Z_NO_FLUSH : Z_FINISH ) );
 		M_ASSERT( err != Z_STREAM_ERROR ); /* lets debug zlib library, why the f*ck not */
-		err = 0; /* in release, unused variable warning */
+		static_cast<void>( err ); /* in release, unused variable warning */
 		nWritten += _streamRef->write( buf, CHUNK - zstream->avail_out );
 		size_ -= CHUNK;
 	} while ( zstream->avail_out == 0 );

@@ -40,7 +40,7 @@ ifdef DO_RELASSERT
 endif
 ifdef DO_RELEASE
 	TARGET=release
-	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations -Wno-error
+	COMPILER_OPTIMIZATION_FLAGS = -O3 -fexpensive-optimizations
 	COMPILER_DEBUG_FLAGS = -DNDEBUG
 	LIB_INFIX =
 endif

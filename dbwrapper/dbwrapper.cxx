@@ -171,8 +171,9 @@ void banner( void ) {
 
 }
 
+#ifdef __DYNAMIC_LINKER__
 extern "C"
-int yaal_dbwrapper_main( int, char** );
+int yaal_dbwrapper_main( int, char** ) __attribute__((noreturn));
 extern "C"
 int yaal_dbwrapper_main( int, char** ) {
 	static char const dynamicLinkerPath[]
@@ -187,6 +188,14 @@ int yaal_dbwrapper_main( int, char** ) {
 		::printf( "\n" );
 		::exit( 0 );
 	}
+	::exit( 0 );
+}
+#else /* #ifdef __DYNAMIC_LINKER__ */
+extern "C"
+int yaal_dbwrapper_main( int, char** );
+extern "C"
+int yaal_dbwrapper_main( int, char** ) {
 	return ( 0 );
 }
+#endif /* #else #ifdef __DYNAMIC_LINKER__ */
 

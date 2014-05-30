@@ -266,7 +266,7 @@ protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual HRuleBase::ptr_t do_clone( void ) const;
 	virtual bool do_is_optional( void ) const;
-	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const __attribute__((__noreturn__));
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
 	virtual void do_rule_use( rule_use_t& ) const;
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;

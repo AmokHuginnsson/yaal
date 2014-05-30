@@ -196,8 +196,10 @@ Copyright:
  * \post Normal progam flow is continued only if condition is met, otherwise HFailedAssertion exception is thrown.
  */
 #	define M_ASSERT( condition ) do { if ( ! ( condition ) ) yaal::hcore::failed_assert( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition ); } while ( 0 )
+# define M_DEBUG_CODE( code ) code
 #else /* #ifndef NDEBUG */
 #	define M_ASSERT( c ) /**/
+# define M_DEBUG_CODE( code ) /**/
 #endif /* #else #ifndef NDEBUG */
 /*! \brief Run given code exactly once at the end of currnt scope.
  *

@@ -97,23 +97,22 @@ void HIODispatcher::register_file_descriptor_handler( int fileDescriptor_, call_
 
 void HIODispatcher::unregister_file_descriptor_handler( int fileDescriptor_ ) {
 	M_PROLOG
-	if ( _callbackContext )
+	if ( _callbackContext ) {
 		_droppedFd.push_back( fileDescriptor_ );
-	else {
+	} else {
 		io_handlers_t::iterator it( find_if( _readers.begin(), _readers.end(),
 					compose1( bind1st( equal_to<int>(), fileDescriptor_ ), select1st<io_handlers_t::value_type>() ) ) );
-		bool fail( false );
-		if ( it != _readers.end() )
+		if ( it != _readers.end() ) {
 			_readers.erase( it );
-		else {
+		} else {
 			it = find_if( _writers.begin(), _writers.end(),
 					compose1( bind1st( equal_to<int>(), fileDescriptor_ ), select1st<io_handlers_t::value_type>() ) );
-			if ( it != _writers.end() )
+			if ( it != _writers.end() ) {
 				_writers.erase( it );
-			else
-				fail = true;
+			} else {
+				M_ASSERT( ! "Inconsistent internal HIODispatcher state."[0] );
+			}
 		}
-		M_ASSERT( ! fail );
 	}
 	return;
 	M_EPILOG

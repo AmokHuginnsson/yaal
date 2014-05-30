@@ -193,7 +193,7 @@ public:
 	}
 	void reset( void ) {
 		if ( _owner ) {
-			M_SAFE( static_cast<value_type*>( static_cast<void*>( _mem ) )->~value_type() );
+			M_SAFE( value_type* v( static_cast<value_type*>( static_cast<void*>( _mem ) ) ); v->~value_type() );
 			_owner = false;
 		}
 	}

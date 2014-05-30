@@ -715,6 +715,9 @@ bool HRuleRef::do_is_optional( void ) const {
 void HRuleRef::do_describe( HRuleDescription&, rule_use_t const& ) const {
 	M_PROLOG
 	M_ASSERT( 0 && "recursive describe on rule reference" );
+#ifdef NDEBUG
+	return;
+#endif /* #ifdef NDEBUG */
 	M_EPILOG
 }
 
