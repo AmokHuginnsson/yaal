@@ -89,7 +89,7 @@ private:
 	typedef HList<OToken> tokens_t;
 	typedef HMap<int, OToken*> positions_t;
 	typedef HPointer<positions_t> positions_ptr_t;
-	typedef HVariant<bool, char, int short, int, int long, int long long, void const*, double, double long, HString> format_arg_t;
+	typedef HVariant<bool, char, int short, int, int long, int long long, void const*, float, double, double long, HString> format_arg_t;
 	typedef HMap<int, format_arg_t> args_t;
 	typedef HPointer<args_t> args_ptr_t;
 	int _positionIndex;
@@ -411,7 +411,7 @@ HFormat HFormat::operator % ( int short unsigned isu ) {
 	M_ENSURE( ! _impl->_format.is_empty() );
 	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::INT )
 			| HFormatImpl::conversion_t( HFormatImpl::CONVERSION::SHORT ) | HFormatImpl::CONVERSION::UNSIGNED );
-	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( isu ) ) );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( static_cast<int short>( isu ) ) ) );
 	return ( _impl );
 	M_EPILOG
 }
@@ -429,7 +429,7 @@ HFormat HFormat::operator % ( int unsigned iu ) {
 	M_PROLOG
 	M_ENSURE( ! _impl->_format.is_empty() );
 	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::INT ) | HFormatImpl::CONVERSION::UNSIGNED );
-	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( iu ) ) );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( static_cast<int>( iu ) ) ) );
 	return ( _impl );
 	M_EPILOG
 }
@@ -448,7 +448,7 @@ HFormat HFormat::operator % ( int long unsigned ilu ) {
 	M_ENSURE( ! _impl->_format.is_empty() );
 	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::INT )
 			| HFormatImpl::conversion_t( HFormatImpl::CONVERSION::LONG ) | HFormatImpl::CONVERSION::UNSIGNED );
-	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( ilu ) ) );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( static_cast<int long>( ilu ) ) ) );
 	return ( _impl );
 	M_EPILOG
 }
@@ -467,7 +467,7 @@ HFormat HFormat::operator % ( int long long unsigned illu ) {
 	M_ENSURE( ! _impl->_format.is_empty() );
 	int idx = _impl->next_token( HFormatImpl::conversion_t( HFormatImpl::CONVERSION::INT )
 			| HFormatImpl::conversion_t( HFormatImpl::CONVERSION::LONG_LONG ) | HFormatImpl::CONVERSION::UNSIGNED );
-	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( illu ) ) );
+	_impl->_args->insert( make_pair( idx, HFormatImpl::format_arg_t( static_cast<int long long>( illu ) ) ) );
 	return ( _impl );
 	M_EPILOG
 }
