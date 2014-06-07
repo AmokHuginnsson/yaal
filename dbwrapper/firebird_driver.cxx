@@ -409,7 +409,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	bool ok( false );
 	isc_tr_handle tr( 0 );
 	isc_stmt_handle stmt( 0 );
-	int long lastInsertId( -1 );
+	i64_t lastInsertId( -1 );
 	short nullInd( 0 );
 	do {
 		isc_start_transaction( db->_status, &tr, 1, &db->_db, sizeof ( OFirebird::_tpb ), OFirebird::_tpb );
@@ -433,8 +433,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 		isc_dsql_execute( db->_status, &tr, &stmt, 1, NULL );
 		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
 			break;
-		if ( isc_dsql_fetch( db->_status, &stmt, 1, &desc ) != 0 )
-			break;
+		isc_dsql_fetch( db->_status, &stmt, 1, &desc );
 		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
 			break;
 		ok = true;
@@ -448,7 +447,7 @@ M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 		isc_commit_transaction( db->_status, &tr );
 		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, NULL ) );
 	}
-	return ( nullInd != -1 ? lastInsertId : -1 );
+	return ( nullInd != -1 ? static_cast<int long>( lastInsertId ) : -1 );
 }
 
 M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
