@@ -90,23 +90,23 @@ HCharacterClass const* _characterClass_[] = { &_whiteSpace_, &_digit_, &_letter_
 
 static int const ALLOC_BIT_MASK = 128;
 #undef IS_INPLACE
-#define IS_INPLACE ( ! ( _pun._mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
+#define IS_INPLACE ( ! ( _mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
 #undef EXT_IS_INPLACE
 #define EXT_IS_INPLACE( base ) ( ! ( base._mem[ ALLOC_FLAG_INDEX ] & ALLOC_BIT_MASK ) )
 #undef MEM
-#define MEM ( IS_INPLACE ? _pun._mem : _pun._ptr )
+#define MEM ( IS_INPLACE ? _mem : _ptr )
 #undef EXT_MEM
 #define EXT_MEM( base ) ( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
 #undef GET_SIZE
-#define GET_SIZE ( IS_INPLACE ? _pun._mem[ ALLOC_FLAG_INDEX ] : _pun._len[ 1 ] )
+#define GET_SIZE ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] : _len[ 1 ] )
 #undef SET_SIZE
-#define SET_SIZE( size ) do { ( IS_INPLACE ? _pun._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : _pun._len[ 1 ] = ( size ) ); } while ( 0 )
+#define SET_SIZE( size ) do { ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : _len[ 1 ] = ( size ) ); } while ( 0 )
 #undef EXT_SET_SIZE
 #define EXT_SET_SIZE( base, size ) do { ( EXT_IS_INPLACE( base ) ? base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : base._len[ 1 ] = ( size ) ); } while ( 0 )
 #undef GET_ALLOC_BYTES
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : static_cast<int long>( _pun._len[ 2 ] & ( static_cast<int long unsigned>( -1 ) >> 1 ) ) )
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : static_cast<int long>( _len[ 2 ] & ( static_cast<int long unsigned>( -1 ) >> 1 ) ) )
 #undef SET_ALLOC_BYTES
-#define SET_ALLOC_BYTES( capacity ) do { _pun._len[ 2 ] = ( capacity ); _pun._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _pun._mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); } while ( 0 )
+#define SET_ALLOC_BYTES( capacity ) do { _len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); } while ( 0 )
 
 char const* _errMsgHString_[ 7 ] = {
 	_( "ok" ),
@@ -119,7 +119,7 @@ char const* _errMsgHString_[ 7 ] = {
 };
 
 HString::HString( void )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -128,13 +128,13 @@ HString::HString( void )
 HString::~HString( void ) {
 	M_PROLOG
 	if ( ! IS_INPLACE )
-		memory::free( _pun._ptr );
+		memory::free( _ptr );
 	return;
 	M_DESTRUCTOR_EPILOG
 }
 
 HString::HString( HString const& string_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 	if ( ! string_.is_empty() ) {
 		int long newSize( string_.get_length() );
@@ -148,14 +148,14 @@ HString::HString( HString const& string_ )
 
 #if CXX_STANDARD >= 2011
 HString::HString( HString&& string_ )
-	: _pun() {
-	::memcpy( _pun._mem, string_._pun._mem, INPLACE_BUFFER_SIZE );
-	::memset( string_._pun._mem, 0, INPLACE_BUFFER_SIZE );
+	: _len() {
+	::memcpy( _mem, string_._mem, INPLACE_BUFFER_SIZE );
+	::memset( string_._mem, 0, INPLACE_BUFFER_SIZE );
 }
 #endif /* #if CXX_STANDARD >= 2011 */
 
 HString::HString( int long preallocate_, char fill_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 	hs_realloc( preallocate_ + 1 );
 	::std::memset( MEM, fill_, static_cast<size_t>( preallocate_ ) );
@@ -174,14 +174,14 @@ void HString::hs_realloc( int long preallocate_ ) {
 		while ( newAllocBytes < preallocate_ )
 			newAllocBytes <<= 1;
 		if ( ! IS_INPLACE ) {
-			_pun._ptr = memory::realloc<char>( MEM, newAllocBytes );
+			_ptr = memory::realloc<char>( MEM, newAllocBytes );
 			SET_ALLOC_BYTES( newAllocBytes );
 			::std::memset( MEM + oldAllocBytes, 0, static_cast<size_t>( newAllocBytes - oldAllocBytes ) );
 		} else {
 			char* newMem( memory::calloc<char>( newAllocBytes ) );
 			int long origSize( GET_SIZE );
-			::std::strncpy( newMem, _pun._mem, static_cast<size_t>( origSize ) );
-			_pun._ptr = newMem;
+			::std::strncpy( newMem, _mem, static_cast<size_t>( origSize ) );
+			_ptr = newMem;
 			SET_ALLOC_BYTES( newAllocBytes );
 			SET_SIZE( origSize );
 		}
@@ -197,7 +197,7 @@ void HString::materialize( void ) {
 }
 
 HString::HString( char const* const str_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 	if ( str_ ) {
 		int long newSize( static_cast<int long>( ::std::strlen( str_ ) ) );
@@ -210,7 +210,7 @@ HString::HString( char const* const str_ )
 }
 
 HString::HString( const_iterator first_, const_iterator last_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 	int long newSize( last_ - first_ );
 	hs_realloc( newSize + 1 );
@@ -222,7 +222,7 @@ HString::HString( const_iterator first_, const_iterator last_ )
 }
 
 HString::HString( iterator first_, iterator last_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 	int long newSize( last_ - first_ );
 	hs_realloc( newSize + 1 );
@@ -234,7 +234,7 @@ HString::HString( iterator first_, iterator last_ )
 }
 
 HString::HString( char const* const array_, int long size_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 	if ( array_ ) {
 		int long newSize( static_cast<int long>( ::strnlen( array_, static_cast<size_t>( size_ ) ) ) );
@@ -248,27 +248,27 @@ HString::HString( char const* const array_, int long size_ )
 }
 
 HString::HString( char char_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
-	_pun._mem[ 0 ] = char_;
-	_pun._mem[ 1 ] = 0;
+	_mem[ 0 ] = char_;
+	_mem[ 1 ] = 0;
 	SET_SIZE( 1 );
 	return;
 	M_EPILOG
 }
 
 HString::HString( char unsigned charUnsigned_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
-	_pun._mem[ 0 ] = static_cast<char>( charUnsigned_ );
-	_pun._mem[ 1 ] = 0;
+	_mem[ 0 ] = static_cast<char>( charUnsigned_ );
+	_mem[ 1 ] = 0;
 	SET_SIZE( 1 );
 	return;
 	M_EPILOG
 }
 
 HString::HString( int short shortInt_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%hd", shortInt_ ) );
@@ -280,7 +280,7 @@ HString::HString( int short shortInt_ )
 }
 
 HString::HString( int short unsigned unsignedShortInt_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%hu", unsignedShortInt_ ) );
@@ -292,7 +292,7 @@ HString::HString( int short unsigned unsignedShortInt_ )
 }
 
 HString::HString( int int_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%d", int_ ) );
@@ -304,7 +304,7 @@ HString::HString( int int_ )
 }
 
 HString::HString( int unsigned int_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%u", int_ ) );
@@ -316,7 +316,7 @@ HString::HString( int unsigned int_ )
 }
 
 HString::HString( int long long_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%ld", long_ ) );
@@ -328,7 +328,7 @@ HString::HString( int long long_ )
 }
 
 HString::HString( int long unsigned long_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%lu", long_ ) );
@@ -340,7 +340,7 @@ HString::HString( int long unsigned long_ )
 }
 
 HString::HString( int long long longLong_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%lld", longLong_ ) );
@@ -352,7 +352,7 @@ HString::HString( int long long longLong_ )
 }
 
 HString::HString( int long long unsigned longLong_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%llu", longLong_ ) );
@@ -364,7 +364,7 @@ HString::HString( int long long unsigned longLong_ )
 }
 
 HString::HString( double double_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%f", double_ ) );
@@ -376,7 +376,7 @@ HString::HString( double double_ )
 }
 
 HString::HString( double long double_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 /* cppcheck-suppress nullPointer */
 	int long newSize( ::snprintf( NULL, 0, "%.12Lf", double_ ) );
@@ -388,7 +388,7 @@ HString::HString( double long double_ )
 }
 
 HString::HString( void const* const ptrVoid_ )
-	: _pun() {
+	: _len() {
 	M_PROLOG
 	/*
 	 * Solaris libc omits 0x in %p conversion.
@@ -423,9 +423,9 @@ HString& HString::operator = ( HString&& string_ ) {
 	M_PROLOG
 	if ( &string_ != this ) {
 		if ( ! IS_INPLACE )
-			memory::free( _pun._ptr );
-		::memcpy( _pun._mem, string_._pun._mem, INPLACE_BUFFER_SIZE );
-		::memset( string_._pun._mem, 0, INPLACE_BUFFER_SIZE );
+			memory::free( _ptr );
+		::memcpy( _mem, string_._mem, INPLACE_BUFFER_SIZE );
+		::memset( string_._mem, 0, INPLACE_BUFFER_SIZE );
 	}
 	return ( *this );
 	M_EPILOG
@@ -648,7 +648,7 @@ int long HString::max_size( void ) const {
 void HString::swap( HString& other ) {
 	if ( &other != this ) {
 		using yaal::swap_ranges;
-		swap_ranges( yaal::begin( _pun._mem ), yaal::end( _pun._mem ), other._pun._mem );
+		swap_ranges( yaal::begin( _mem ), yaal::end( _mem ), other._mem );
 	}
 	return;
 }
@@ -1034,9 +1034,9 @@ void HString::substr( HString& dest_, int long from_, int long length_ ) const {
 		if ( ( newSize + from_ ) > GET_SIZE )
 			newSize = GET_SIZE - from_;
 		dest_.hs_realloc( newSize + 1 );
-		::std::strncpy( EXT_MEM( dest_._pun ), MEM + from_, static_cast<size_t>( newSize ) );
-		EXT_MEM( dest_._pun )[ newSize ] = 0;
-		EXT_SET_SIZE( dest_._pun, newSize );
+		::std::strncpy( EXT_MEM( dest_ ), MEM + from_, static_cast<size_t>( newSize ) );
+		EXT_MEM( dest_ )[ newSize ] = 0;
+		EXT_SET_SIZE( dest_, newSize );
 	}
 	return;
 	M_EPILOG
@@ -1057,9 +1057,9 @@ HString HString::left( int long to_ ) const {
 		return ( str );
 	int long newSize( min( to_, GET_SIZE ) );
 	str.hs_realloc( newSize + 1 );
-	::std::strncpy( EXT_MEM( str._pun ), MEM, static_cast<size_t>( newSize ) );
-	EXT_MEM( str._pun )[ newSize ] = 0;
-	EXT_SET_SIZE( str._pun, newSize );
+	::std::strncpy( EXT_MEM( str ), MEM, static_cast<size_t>( newSize ) );
+	EXT_MEM( str )[ newSize ] = 0;
+	EXT_SET_SIZE( str, newSize );
 	return ( str );
 	M_EPILOG
 }
@@ -1079,9 +1079,9 @@ HString HString::right( int long fromEnd_ ) const {
 		return ( str );
 	int long newSize( min( fromEnd_, GET_SIZE ) );
 	str.hs_realloc( newSize + 1 );
-	::std::strncpy( EXT_MEM( str._pun ), MEM + GET_SIZE - newSize, static_cast<size_t>( newSize ) );
-	EXT_MEM( str._pun )[ newSize ] = 0;
-	EXT_SET_SIZE( str._pun, newSize );
+	::std::strncpy( EXT_MEM( str ), MEM + GET_SIZE - newSize, static_cast<size_t>( newSize ) );
+	EXT_MEM( str )[ newSize ] = 0;
+	EXT_SET_SIZE( str, newSize );
 	return ( str );
 	M_EPILOG
 }
