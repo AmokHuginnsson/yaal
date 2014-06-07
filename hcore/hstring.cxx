@@ -118,6 +118,10 @@ char const* _errMsgHString_[ 7 ] = {
 	_( "overflow" )
 };
 
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4004007
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4004007 */
+
 HString::HString( void )
 	: _len() {
 	M_PROLOG
@@ -186,12 +190,6 @@ void HString::hs_realloc( int long preallocate_ ) {
 			SET_SIZE( origSize );
 		}
 	}
-	return;
-	M_EPILOG
-}
-
-void HString::materialize( void ) {
-	M_PROLOG
 	return;
 	M_EPILOG
 }
@@ -399,6 +397,16 @@ HString::HString( void const* const ptrVoid_ )
 	hs_realloc( newSize + 1 );
 	M_ENSURE( ::snprintf( MEM, static_cast<size_t>( newSize + 1 ), "0x%lx", reinterpret_cast<int long>( ptrVoid_ ) ) == newSize );
 	SET_SIZE( newSize );
+	return;
+	M_EPILOG
+}
+
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4004007
+#pragma GCC diagnostic error "-Weffc++"
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4004007 */
+
+void HString::materialize( void ) {
+	M_PROLOG
 	return;
 	M_EPILOG
 }

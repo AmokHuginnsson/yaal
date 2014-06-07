@@ -96,6 +96,32 @@ static int const LOGIN_NAME_MAX = 16;
 #define CXX_EXTENSION_TLS __declspec( thread )
 #endif /* #elif defined( __MSVCXX__ ) #ifdef __GNUC__ */
 
+/*
+ * gcc ver 4.5.2 bocomes 4005002
+ *
+ * Expected use:
+ *
+ * #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002
+ * ... some code ...
+ * #endif
+ *
+ * For non-gcc compilers those conditions must always evaluate to false,
+ * so we define them:
+ * __GCC_VERSION_LOWER_OR_EQUAL__ to be very large,
+ * __GCC_VERSION_GREATER_OR_EQUAL__ to be very small, i.e.:
+ *
+ * "very large" <= 4005002
+ *
+ * will evaluate to false for all practical use cases.
+ */
+#if defined ( __GNUC__ ) && ! defined ( __clang__ )
+#define __GCC_VERSION_LOWER_OR_EQUAL__ ( ( ( __GNUC__ * 1000 ) + __GNUC_MINOR__ ) * 1000 + __GNUC_PATCHLEVEL__ )
+#define __GCC_VERSION_GREATER_OR_EQUAL__ __GCC_VERSION_LOWER_OR_EQUAL__
+#else /* #if defined ( __GNUC__ ) && ! defined ( __clang__ ) */
+#define __GCC_VERSION_LOWER_OR_EQUAL__ 999999999
+#define __GCC_VERSION_GREATER_OR_EQUAL__ 0
+#endif /* #else #if defined ( __GNUC__ ) && ! defined ( __clang__ ) */
+
 #if ! defined( HAVE_PRETTY_FUNCTION )
 #if ! defined( HAVE_FUNCTION )
 #if ! defined( HAVE_FUNC )
