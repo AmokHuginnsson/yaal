@@ -50,6 +50,9 @@ struct OFirebird {
 	OFirebird( void )
 		: _db( 0 ), _connectionString(), _status(), _errorMessageBufer()
 		{}
+private:
+	OFirebird( OFirebird const& );
+	OFirebird& operator = ( OFirebird const& );
 };
 
 char const OFirebird::_tpb[] = {
@@ -74,6 +77,9 @@ struct OFirebirdResult {
 		_metaData(), _cache(), _values(),
 		_status(), _errorMessageBufer()
 		{}
+private:
+	OFirebirdResult( OFirebirdResult const& );
+	OFirebirdResult& operator = ( OFirebirdResult const& );
 };
 
 extern "C" {
