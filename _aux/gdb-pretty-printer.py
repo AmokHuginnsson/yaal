@@ -129,12 +129,12 @@ class YaalHCoreHStringPrinter:
 
 	def to_string( self ):
 		AFL = self._val['ALLOC_FLAG_INDEX']
-		inplace = not ( ( self._val['_mem'].cast( gdb.lookup_type( 'char' ).pointer() ) )[AFL] & 128 )
+		inplace = not ( self._val['_mem'][AFL] & 128 )
 		s = ""
 		if inplace:
-			s = self._val['_mem'].cast( gdb.lookup_type( 'char' ).pointer() )
+			s = self._val['_mem']
 		else:
-			s = self._val['_mem'].cast( gdb.lookup_type( 'char' ).pointer().pointer() ).dereference()
+			s = self._val['_ptr']
 		return s
 
 	def display_hint( self ):
