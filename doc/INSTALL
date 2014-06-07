@@ -174,7 +174,7 @@ Log in as system user `postgres', connect to database with:
 
 While connected do database server run query:
 
-  CREATE USER root SUPERUSER CREATEDB ENCRYPTED PASSWORD '<your_password>';
+  CREATE USER root SUPERUSER CREATEDB CREATEROLE REPLICATION ENCRYPTED PASSWORD '<your_password>';
 
 *** MySQL.
 
