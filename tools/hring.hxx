@@ -468,31 +468,31 @@ HRing<type_t>& HRing<type_t>::operator = ( HRing const& arr_ ) {
 template<typename type_t>
 void HRing<type_t>::resize( capacity_type capacity_, size_type size_, type_t const& fillWith_ ) {
 	M_PROLOG
-	if ( size_._value < 0 )
-		M_THROW( _errMsgHRing_[ ERROR::BAD_SIZE ], size_._value );
-	if ( size_._value > capacity_._value )
-		M_THROW( _errMsgHRing_[ ERROR::BAD_SIZE ], capacity_._value - size_._value );
-	if ( size_._value > _size ) {
-		reserve( capacity_._value );
+	if ( size_ < 0 )
+		M_THROW( _errMsgHRing_[ ERROR::BAD_SIZE ], size_.get() );
+	if ( size_.get() > capacity_ )
+		M_THROW( _errMsgHRing_[ ERROR::BAD_SIZE ], capacity_.get() - size_.get() );
+	if ( size_ > _size ) {
+		reserve( capacity_ );
 		int long curCapacity( get_capacity().get() );
 		value_type* arr( _buf.get<value_type>() );
-		for ( int long i( _size ); i < size_._value; ++ i ) {
+		for ( int long i( _size ); i < size_; ++ i ) {
 			int long idx( i + _start );
 			if ( idx >= curCapacity )
 				idx -= curCapacity;
 			new ( arr + idx ) value_type( fillWith_ );
 		}
-	} else if ( size_._value < _size ) {
+	} else if ( size_ < _size ) {
 		int long curCapacity( get_capacity().get() );
 		value_type* arr( _buf.get<value_type>() );
-		for ( int long i( size_._value ); i < _size; ++ i ) {
+		for ( int long i( size_.get() ); i < _size; ++ i ) {
 			int long idx( i + _start );
 			if ( idx >= curCapacity )
 				idx -= curCapacity;
 			M_SAFE( arr[ idx ].~value_type() );
 		}
 	}
-	_size = size_._value;
+	_size = size_.get();
 	return;
 	M_EPILOG
 }

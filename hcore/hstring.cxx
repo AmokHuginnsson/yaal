@@ -104,7 +104,7 @@ static int const ALLOC_BIT_MASK = 128;
 #undef EXT_SET_SIZE
 #define EXT_SET_SIZE( base, size ) do { ( EXT_IS_INPLACE( base ) ? base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : base._len[ 1 ] = ( size ) ); } while ( 0 )
 #undef GET_ALLOC_BYTES
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : static_cast<int long>( _len[ 2 ] & ( static_cast<int long unsigned>( -1 ) >> 1 ) ) )
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 :  _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 1 ) )
 #undef SET_ALLOC_BYTES
 #define SET_ALLOC_BYTES( capacity ) do { _len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); } while ( 0 )
 
@@ -701,7 +701,7 @@ HString& HString::assign( const_iterator first_, const_iterator last_ ) {
 		M_THROW( _errMsgHString_[ string_helper::NULL_PTR ], errno );
 	if ( last_ < first_ )
 		M_THROW( _errMsgHString_[ string_helper::BAD_LENGTH ], last_ - first_ );
-	int long newSize( static_cast<int long>( ::strnlen( first_, last_ - first_ ) ) );
+	int long newSize( static_cast<int long>( ::strnlen( first_, static_cast<size_t>( last_ - first_ ) ) ) );
 	hs_realloc( newSize + 1 );
 	::memcpy( MEM, first_, static_cast<size_t>( newSize ) );
 	MEM[ newSize ] = 0;
