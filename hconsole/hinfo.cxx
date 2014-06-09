@@ -310,10 +310,10 @@ double long HInfoString::do_get_double_long( void ) const
 
 HTime const& HInfoString::do_get_time( void ) const {
 	M_ASSERT( 0 && "impossible inplace conversion requested" );
-#ifdef NDEBUG
+#if defined( NDEBUG ) || defined( __MSVCXX__ )
 	static HTime const dummy( HTime::LOCAL );
 	return ( dummy );
-#endif /* #ifdef NDEBUG */
+#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
 void* HInfoString::do_get_pointer( void ) const

@@ -207,9 +207,9 @@ int long HTee::do_write( void const* const data_, int long size_ ) {
 int long HTee::do_read( void* const, int long ) {
 	M_PROLOG
 	M_ASSERT( 0 && "oparation makes no sense for tee stream" );
-#ifdef NDEBUG
+#if defined( NDEBUG ) || defined( __MSVCXX__ )
 	return ( -1 );
-#endif /* #ifdef NDEBUG */
+#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 	M_EPILOG
 }
 

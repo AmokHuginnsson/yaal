@@ -31,7 +31,9 @@ extern "C" FILE* tmpfile( void );
 #define dup2 dup2_off
 #define getuid getuid_off
 #define isatty isatty_off
+#define lockf lockf_off
 #include <glibc/unistd.h>
+#include <glibc/stdint.h>
 #undef gethostname
 #include <sys/types.h>
 #include <libintl.h>
@@ -52,6 +54,7 @@ extern "C" FILE* tmpfile( void );
 
 #include <sys/time.h>
 
+#undef lockf
 #define fork ms_fork
 #define getuid ms_getuid
 #define gethostname ms_gethostname
@@ -93,6 +96,9 @@ inline int long recvfrom( int fd_, void* buf_, int long size_, int flags_, socka
 template<typename T>
 inline int close( T const& fd_ )
 	{ return ( msvcxx::close( fd_ ) ); }
+
+inline int lockf( int fd_, int cmd_, __off_t off_ )
+	{ return ( msvcxx::lockf( fd_, cmd_, off_ ) ); }
 
 #include "tools/hpipedchild.hxx"
 

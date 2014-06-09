@@ -45,10 +45,10 @@ namespace hcore {
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
-#ifdef __HOST_OS_TYPE_SOLARIS__
+#if defined( __HOST_OS_TYPE_SOLARIS__ ) || defined( __HOST_OS_TYPE_WINDOWS__ )
 #undef CLOCK_THREAD_CPUTIME_ID
 #define CLOCK_THREAD_CPUTIME_ID CLOCK_REALTIME
-#endif /* #ifdef __HOST_OS_TYPE_SOLARIS__ */
+#endif /* #if defined( __HOST_OS_TYPE_SOLARIS__ ) || defined( __HOST_OS_TYPE_WINDOWS__ ) */
 static int const FWD_CLOCK_THREAD_CPUTIME_ID = CLOCK_THREAD_CPUTIME_ID;
 #pragma GCC diagnostic error "-Wold-style-cast"
 }

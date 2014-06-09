@@ -22,8 +22,11 @@
 ??_7OSSLContextServer@HOpenSSL@hcore@yaal@@6B?$HSingleton@VOSSLContextServer@HOpenSSL@hcore@yaal@@@23@@
 ??_7OSSLContextServer@HOpenSSL@hcore@yaal@@6BOSSLContext@123@@
 ?_attributeDisabled_@hconsole@yaal@@3HA
+?_attributeDisabled_@hconsole@yaal@@3UOAttribute@HControl@12@A
 ?_attributeEnabled_@hconsole@yaal@@3HA
+?_attributeEnabled_@hconsole@yaal@@3UOAttribute@HControl@12@A
 ?_attributeFocused_@hconsole@yaal@@3HA
+?_attributeFocused_@hconsole@yaal@@3UOAttribute@HControl@12@A
 ?_attributeSearchHighlight_@hconsole@yaal@@3HA
 ?_attributeStatusBar_@hconsole@yaal@@3HA
 ?_autoRehash@HLog@hcore@yaal@@0_NA
@@ -66,6 +69,7 @@
 ?_instance@?$HSingleton@VOSSLContextClient@HOpenSSL@hcore@yaal@@@hcore@yaal@@0PAVOSSLContextClient@HOpenSSL@23@A
 ?_instance@?$HSingleton@VOSSLContextServer@HOpenSSL@hcore@yaal@@@hcore@yaal@@0PAVOSSLContextServer@HOpenSSL@23@A
 ?_isKilled_@yaal@@3_NA
+?_iso8601TimeFormat_@hcore@yaal@@3QBDB
 ?_killGracePeriod@HPipedChild@tools@yaal@@2HA
 ?_killGracePeriod@HSignalService@tools@yaal@@2HA
 ?_latency_@hconsole@yaal@@3HA
@@ -88,6 +92,7 @@
 ?_needRepaint_@hconsole@yaal@@3_NA
 ?_primes_@hcore@yaal@@3QBJB
 ?_resolveHostnames@HSocket@hcore@yaal@@2_NA
+?_screenBackground_@hconsole@yaal@@3HA
 ?_serialDevice_@tools@yaal@@3VHString@hcore@2@A
 ?_serialFlags_@tools@yaal@@3V?$HStrongEnum@UFLAG@HSerial@tools@yaal@@@hcore@2@A
 ?_threadStackSize@HThread@hcore@yaal@@2HA
@@ -110,6 +115,7 @@
 ?brown@ansi@yaal@@3VHSequence@12@B
 ?cerr@hcore@yaal@@3VHSynchronizedStream@12@A
 ?character@executing_parser@tools@yaal@@3ABVHCharacter@123@B
+?character_literal@executing_parser@tools@yaal@@3ABVHCharacterLiteral@123@B
 ?cin@hcore@yaal@@3VHSynchronizedStream@12@A
 ?clear@ansi@yaal@@3VHSequence@12@B
 ?clog@hcore@yaal@@3VHSynchronizedStream@12@A
@@ -137,7 +143,9 @@
 ?restore@ansi@yaal@@3VHSequence@12@B
 ?right@ansi@yaal@@3VHSequence@12@B
 ?save@ansi@yaal@@3VHSequence@12@B
+?string_literal@executing_parser@tools@yaal@@3ABVHStringLiteral@123@B
 ?up@ansi@yaal@@3VHSequence@12@B
+?up_bol@ansi@yaal@@3VHSequence@12@B
 ?white@ansi@yaal@@3VHSequence@12@B
 ?yellow@ansi@yaal@@3VHSequence@12@B
 ___sigaddset
@@ -157,6 +165,7 @@ _floorl
 _getgrgid_r
 _getpwuid_r
 _getrusage
+_lockf
 _log10l
 _logl
 _powl

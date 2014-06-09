@@ -15,6 +15,7 @@ M_YAAL_HCORE_PUBLIC_API int pipe( int* );
 M_YAAL_HCORE_PUBLIC_API int isatty( int );
 M_YAAL_HCORE_PUBLIC_API int dup2( int, int );
 M_YAAL_HCORE_PUBLIC_API void log_windows_error( char const* );
+M_YAAL_HCORE_PUBLIC_API int lockf( int, int, int long long );
 void get_memory_size_info( yaal::i64_t&, yaal::i64_t& );
 
 } /* namespace msvcxx */

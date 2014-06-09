@@ -135,9 +135,10 @@ extern "C" int unsetenv( char const* );
  * so getntptimeofday() is presented with object of type
  * `timespec**' while it expects object of type `timespec*'. */
 extern "C" int getntptimeofday( struct timespec*, struct timezone* );
+typedef __clockid_t clockid_t;
 inline int clock_gettime( __clockid_t, struct timespec* tp_ )
 	{ return ( getntptimeofday( tp_, NULL ) ); }
-static int const CLOCK_REALTIME = 0;
+static clockid_t const CLOCK_REALTIME = 0;
 #endif /* #ifdef _CTIME_ */
 #ifdef _CSTRING_
 #include <errno.h>

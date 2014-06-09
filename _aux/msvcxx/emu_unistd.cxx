@@ -48,6 +48,8 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::tools;
 
+extern "C" int fcntl( int fd_, int cmd_, ... );
+
 namespace msvcxx {
 
 struct OsCast {
@@ -171,8 +173,6 @@ int select( int ndfs, fd_set* readFds, fd_set* writeFds, fd_set* exceptFds, stru
 	return ( ret );
 }
 
-extern "C" int fcntl( int fd_, int cmd_, ... );
-
 int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 	LPHANDLE lpWritePipe,
 	LPSECURITY_ATTRIBUTES lpPipeAttributes,
@@ -231,11 +231,10 @@ int APIENTRY CreatePipeEx( LPHANDLE lpReadPipe,
 
 M_EXPORT_SYMBOL
 int fcntl( int fd_, int cmd_, int arg_ ) {
-#undef fcntl
 	int ret( 0 );
-	if ( fd_ < SystemIO::MANAGED_IO )
-		ret = fcntl( fd_, cmd_, arg_ );
-	else {
+	if ( fd_ < SystemIO::MANAGED_IO ) {
+		ret = ::fcntl( fd_, cmd_, arg_ );
+	} else {
 		SystemIO& sysIo( SystemIO::get_instance() );
 		IO& io( *( sysIo.get_io( fd_ ).second ) );
 		ret = io.fcntl( cmd_, arg_ );
@@ -385,6 +384,11 @@ mode_t umask( mode_t umask_ ) {
 	}
 	currentUmask = umask_;
 	return ( oldUmask );
+}
+
+M_EXPORT_SYMBOL
+int lockf( int, int, int long long ) {
+	return ( 0 );
 }
 
 M_EXPORT_SYMBOL
