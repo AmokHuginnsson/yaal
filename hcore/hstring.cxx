@@ -118,9 +118,9 @@ char const* _errMsgHString_[ 7 ] = {
 	_( "overflow" )
 };
 
-#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4004007
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002
 #pragma GCC diagnostic ignored "-Weffc++"
-#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4004007 */
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
 
 HString::HString( void )
 	: _len() {
@@ -401,9 +401,9 @@ HString::HString( void const* const ptrVoid_ )
 	M_EPILOG
 }
 
-#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4004007
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002
 #pragma GCC diagnostic error "-Weffc++"
-#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4004007 */
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
 
 void HString::materialize( void ) {
 	M_PROLOG
