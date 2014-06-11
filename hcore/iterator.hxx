@@ -256,7 +256,7 @@ private:
 	friend class HReverseIterator;
 };
 
-/*! \brief (Back)Insertion concept for HInsertIterator.
+/*! \brief (Back)Insertion concept for HInsertingIterator.
  *
  * May be used for collections that support back insertion.
  */
@@ -268,7 +268,7 @@ public:
 		{ coll.push_back( elem ); }
 };
 
-/*! \brief (Front)Insertion concept for HInsertIterator.
+/*! \brief (Front)Insertion concept for HInsertingIterator.
  *
  * May be used for collections that support front insertion.
  */
@@ -280,7 +280,7 @@ public:
 		{ coll.push_front( elem ); }
 };
 
-/*! \brief Insertion concept for HInsertIterator.
+/*! \brief Insertion concept for HInsertingIterator.
  *
  * Shall be used when insertion to sets/maps is required.
  */
@@ -292,7 +292,7 @@ public:
 		{ coll.insert( elem ); }
 };
 
-/*! \brief (Push)Insertion concept for HInsertIterator.
+/*! \brief (Push)Insertion concept for HInsertingIterator.
  *
  * May be used for collections that support push insertion.
  */
@@ -310,40 +310,145 @@ public:
  * \tparam inserter - insertion concept, tell how collection shall be extended.
  */
 template<typename tType, typename inserter>
-class HInsertIterator : public iterator_interface<typename tType::value_type, iterator_category::forward> {
+class HInsertingIterator : public iterator_interface<typename tType::value_type, iterator_category::forward> {
 public:
-	typedef HInsertIterator this_type;
+	typedef HInsertingIterator this_type;
 	typedef iterator_interface<typename tType::value_type, iterator_category::forward> base_type;
-private:
+protected:
+	typedef inserter inserter_type;
 	tType& _coll;
 public:
-	HInsertIterator( tType& coll ) : _coll( coll ) {}
-	HInsertIterator& operator ++ ( void )
-		{ return ( *this ); }
-	HInsertIterator& operator* ( void )
-		{ return ( *this ); }
+	HInsertingIterator( tType& coll )
+		: _coll( coll ) {
+	}
+	HInsertingIterator& operator ++ ( void ) {
+		return ( *this );
+	}
+	HInsertingIterator& operator* ( void ) {
+		return ( *this );
+	}
 	template<typename arg_t>
-	HInsertIterator& operator = ( arg_t const& elem ) {
-		inserter::insert( _coll, elem );
+	this_type& operator = ( arg_t const& elem_ ) {
+		inserter_type::insert( _coll, elem_ );
+		return ( *this );
+	}
+};
+
+/*! \brief Back inserting iterator class.
+ * Iterator class that allows extending existing collections
+ * by inserting elements at end of given collection.
+ *
+ * \tparam tType - collection type.
+ */
+template<typename tType>
+class HBackInsertIterator : public HInsertingIterator<tType, HBackInsertionConcept<tType> > {
+public:
+	typedef HBackInsertIterator<tType> this_type;
+	typedef HInsertingIterator<tType, HBackInsertionConcept<tType> > base_type;
+	HBackInsertIterator( tType& coll_ )
+		: base_type( coll_ ) {
+	}
+	HBackInsertIterator( base_type const& insertIterator_ )
+		: base_type( insertIterator_ ) {
+	}
+	template<typename arg_t>
+	HBackInsertIterator<tType>& operator = ( arg_t const& elem_ ) {
+		typename base_type::inserter_type::insert( this->_coll, elem_ );
+		return ( *this );
+	}
+};
+
+/*! \brief Front inserting iterator class.
+ * Iterator class that allows extending existing collections
+ * by inserting elements at beginning of given collection.
+ *
+ * \tparam tType - collection type.
+ */
+template<typename tType>
+class HFrontInsertIterator : public HInsertingIterator<tType, HFrontInsertionConcept<tType> > {
+public:
+	typedef HFrontInsertIterator<tType> this_type;
+	typedef HInsertingIterator<tType, HFrontInsertionConcept<tType> > base_type;
+	HFrontInsertIterator( tType& coll_ )
+		: base_type( coll_ ) {
+	}
+	HFrontInsertIterator( base_type const& insertIterator_ )
+		: base_type( insertIterator_ ) {
+	}
+	template<typename arg_t>
+	HFrontInsertIterator<tType>& operator = ( arg_t const& elem_ ) {
+		typename base_type::inserter_type::insert( this->_coll, elem_ );
+		return ( *this );
+	}
+};
+
+/*! \brief Key based inserting iterator class.
+ * Iterator class that allows extending existing collections
+ * by inserting elements using key based insert operation.
+ *
+ * \tparam tType - collection type.
+ */
+template<typename tType>
+class HInsertIterator : public HInsertingIterator<tType, HInsertionConcept<tType> > {
+public:
+	typedef HInsertIterator<tType> this_type;
+	typedef HInsertingIterator<tType, HInsertionConcept<tType> > base_type;
+	HInsertIterator( tType& coll_ )
+		: base_type( coll_ ) {
+	}
+	HInsertIterator( base_type const& insertIterator_ )
+		: base_type( insertIterator_ ) {
+	}
+	template<typename arg_t>
+	HInsertIterator<tType>& operator = ( arg_t const& elem_ ) {
+		typename base_type::inserter_type::insert( this->_coll, elem_ );
+		return ( *this );
+	}
+};
+
+/*! \brief Push based inserting iterator class.
+ * Iterator class that allows extending existing collections
+ * by inserting elements using pushing elements into given collection.
+ *
+ * \tparam tType - collection type.
+ */
+template<typename tType>
+class HPushInsertIterator : public HInsertingIterator<tType, HPushInsertionConcept<tType> > {
+public:
+	typedef HPushInsertIterator<tType> this_type;
+	typedef HInsertingIterator<tType, HPushInsertionConcept<tType> > base_type;
+	HPushInsertIterator( tType& coll_ )
+		: base_type( coll_ ) {
+	}
+	HPushInsertIterator( base_type const& insertIterator_ )
+		: base_type( insertIterator_ ) {
+	}
+	template<typename arg_t>
+	HPushInsertIterator<tType>& operator = ( arg_t const& elem_ ) {
+		typename base_type::inserter_type::insert( this->_coll, elem_ );
 		return ( *this );
 	}
 };
 
 template<typename tType>
-HInsertIterator<tType, HBackInsertionConcept<tType> > back_insert_iterator( tType& coll )
-	{ return ( HInsertIterator<tType, HBackInsertionConcept<tType> >( coll ) ); }
+inline HInsertingIterator<tType, HBackInsertionConcept<tType> > back_insert_iterator( tType& coll ) {
+	return ( HInsertingIterator<tType, HBackInsertionConcept<tType> >( coll ) );
+}
 
 template<typename tType>
-HInsertIterator<tType, HFrontInsertionConcept<tType> > front_insert_iterator( tType& coll )
-	{ return ( HInsertIterator<tType, HFrontInsertionConcept<tType> >( coll ) ); }
+inline HInsertingIterator<tType, HFrontInsertionConcept<tType> > front_insert_iterator( tType& coll ) {
+	return ( HInsertingIterator<tType, HFrontInsertionConcept<tType> >( coll ) );
+}
 
 template<typename tType>
-HInsertIterator<tType, HInsertionConcept<tType> > insert_iterator( tType& coll )
-	{ return ( HInsertIterator<tType, HInsertionConcept<tType> >( coll ) ); }
+inline HInsertingIterator<tType, HInsertionConcept<tType> > insert_iterator( tType& coll ) {
+	return ( HInsertingIterator<tType, HInsertionConcept<tType> >( coll ) );
+}
 
 template<typename tType>
-HInsertIterator<tType, HPushInsertionConcept<tType> > push_insert_iterator( tType& coll )
-	{ return ( HInsertIterator<tType, HPushInsertionConcept<tType> >( coll ) ); }
+inline HInsertingIterator<tType, HPushInsertionConcept<tType> > push_insert_iterator( tType& coll ) {
+	return ( HInsertingIterator<tType, HPushInsertionConcept<tType> >( coll ) );
+}
 
 }
 
