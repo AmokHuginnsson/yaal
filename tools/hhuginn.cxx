@@ -153,6 +153,76 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
 	M_EPILOG
 }
 
+class HPrepocessor {
+public:
+	typedef HPrepocessor this_type;
+	class HIterator;
+private:
+	yaal::hcore::HString::const_iterator _beg;
+	yaal::hcore::HString::const_iterator _end;
+public:
+	HPrepocessor( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ )
+		: _beg( first_ ), _end( last_ ) {
+	}
+	HIterator begin( void ) const;
+	HIterator end( void ) const;
+};
+
+class HPrepocessor::HIterator : public yaal::hcore::iterator_interface<char const, iterator_category::forward> {
+public:
+	typedef HIterator this_type;
+	typedef yaal::hcore::iterator_interface<char const, iterator_category::forward> base_type;
+private:
+	HPrepocessor const* _owner;
+	yaal::hcore::HString::const_iterator _cur;
+public:
+	HIterator( void )
+		: _owner( NULL ), _cur() {
+	}
+	HIterator( HIterator const& it_ )
+		: _owner( it_._owner ), _cur( it_._cur ) {
+	}
+	HIterator& operator = ( HIterator const& it_ ) {
+		if ( &it_ != this ) {
+			_owner = it_._owner;
+			_cur = it_._cur;
+		}
+		return ( *this );
+	}
+	HIterator& operator ++ ( void ) {
+		return ( *this );
+	}
+	HIterator operator ++ ( int ) {
+		HIterator it( *this );
+		++ it;
+		return ( it );
+	}
+	bool operator == ( HIterator const& it_ ) const {
+		M_ASSERT( it_._owner == _owner );
+		return ( it_._cur == _cur );
+	}
+	bool operator != ( HIterator const& it_ ) const {
+		M_ASSERT( it_._owner == _owner );
+		return ( it_._cur != _cur );
+	}
+	value_type const& operator * ( void ) const {
+		M_ASSERT( _owner );
+		return ( *_cur );
+	}
+private:
+	HIterator( HPrepocessor const* owner_, yaal::hcore::HString::const_iterator pos_ )
+		: _owner( owner_ ), _cur( pos_ ) {
+	}
+	friend class HPrepocessor;
+};
+
+HPrepocessor::HIterator HPrepocessor::begin( void ) const {
+	return ( HIterator( this, _beg ) );
+}
+HPrepocessor::HIterator HPrepocessor::end( void ) const {
+	return ( HIterator( this, _end ) );
+}
+
 /*
  * Strip C-style comments, concatenate literal strings.
  */
