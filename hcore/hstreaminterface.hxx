@@ -333,22 +333,30 @@ typedef HExceptionT<HStreamInterface> HStreamInterfaceException;
  *
  * This helper may be useful in algorithms.
  *
- * \tparam HStreamInterface - type of stream wrapped by this iterator.
+ * \tparam out_t - type of elements accepted/traversed by this iterator.
  * \tparam delim_t - type of optional delimiter separating each iteration.
  */
-template<typename delim_t, typename out_t>
+template<typename out_t, typename delim_t = char const*>
 class HStreamIterator {
 	mutable HStreamInterface* _stream;
 	delim_t _delim;
 	mutable out_t _valueCache;
-	mutable int long _steps;
+	mutable int long _skip;
+	mutable bool _inCache;
 public:
 	HStreamIterator( void )
-		: _stream( NULL ), _delim(), _valueCache(), _steps( 0 ) {}
+		: _stream( NULL ), _delim(), _valueCache(),
+		_skip( 0 ), _inCache( false ) {
+	}
 	explicit HStreamIterator( HStreamInterface& stream, delim_t const& delim = delim_t() )
-		: _stream( &stream ), _delim( delim ), _valueCache(), _steps( 0 ) {}
+		: _stream( &stream ), _delim( delim ),
+		_valueCache(), _skip( 0 ), _inCache( false ) {
+	}
 	HStreamIterator( HStreamIterator const& it_ )
-		: _stream( it_._stream ), _delim( it_._delim ), _valueCache( it_._valueCache ), _steps( it_._steps ) {}
+		: _stream( it_._stream ), _delim( it_._delim ),
+		_valueCache( it_._valueCache ), _skip( it_._skip ),
+		_inCache( false ) {
+	}
 	HStreamIterator& operator = ( HStreamIterator const& it_ ) {
 		if ( &it_ != this ) {
 			HStreamIterator tmp( it_ );
@@ -356,10 +364,12 @@ public:
 		}
 		return ( *this );
 	}
-	HStreamIterator& operator* ( void )
-		{ return ( *this ); }
-	HStreamIterator& operator* ( void ) const
-		{ return ( *this ); }
+	HStreamIterator& operator* ( void ) {
+		return ( *this );
+	}
+	HStreamIterator& operator* ( void ) const {
+		return ( *this );
+	}
 	template<typename item_t>
 	HStreamIterator& operator = ( item_t const& item ) {
 		*_stream << item << _delim;
@@ -367,6 +377,13 @@ public:
 	}
 	operator out_t ( void ) const {
 		M_PROLOG
+		while ( _skip > 0 ) {
+			read_value();
+			-- _skip;
+		}
+		if ( ! _inCache ) {
+			read_value();
+		}
 		return ( _valueCache );
 		M_EPILOG
 	}
@@ -374,12 +391,6 @@ public:
 		return ( operator != (  it_ ) );
 	}
 	bool operator != ( HStreamIterator const& it_ ) const {
-		if ( ! _steps )
-			read_value();
-		while ( _steps > 0 ) {
-			read_value();
-			-- _steps;
-		}
 		return ( _stream != it_._stream );
 	}
 	void swap( HStreamIterator& it_ ) {
@@ -388,13 +399,15 @@ public:
 			swap( _stream, it_._stream );
 			swap( _delim, it_._delim );
 			swap( _valueCache, it_._valueCache );
-			swap( _steps, it_._steps );
+			swap( _skip, it_._skip );
+			swap( _inCache, it_._inCache );
 		}
 		return;
 	}
 	HStreamIterator const& operator ++ ( void ) const {
 		M_PROLOG
-		++ _steps;
+		++ _skip;
+		_inCache = false;
 		return ( *this );
 		M_EPILOG
 	}
@@ -403,32 +416,57 @@ private:
 		M_PROLOG
 		if ( _stream ) {
 			*_stream >> _valueCache;
-			if ( ! _stream->good() )
+			if ( ! _stream->good() ) {
 				_stream = NULL;
+			} else {
+				_inCache = true;
+			}
 		}
 		return;
 		M_EPILOG
 	}
 };
 
+/*! \brief Output stream iterator with explicit delimiter type.
+ */
 template<typename delim_t>
-HStreamIterator<delim_t, trait::no_type> stream_iterator( HStreamInterface& stream, delim_t delim )
-	{ return ( HStreamIterator<delim_t, trait::no_type>( stream, delim ) ); }
+inline HStreamIterator<trait::no_type, delim_t> stream_iterator( HStreamInterface& stream, delim_t delim ) {
+	return ( HStreamIterator<trait::no_type, delim_t>( stream, delim ) );
+}
 
-inline HStreamIterator<char const* const, trait::no_type> stream_iterator( HStreamInterface& stream )
-	{ return ( HStreamIterator<char const* const, trait::no_type>( stream, "" ) ); }
+/*! \brief Output stream iterator with default delimiter type.
+ */
+inline HStreamIterator<trait::no_type, char const*> stream_iterator( HStreamInterface& stream ) {
+	return ( HStreamIterator<trait::no_type, char const*>( stream, "" ) );
+}
 
+/*! \brief Input stream iterator with explicit delimiter type.
+ */
 template<typename out_t, typename delim_t>
-HStreamIterator<delim_t, out_t> stream_iterator( HStreamInterface& stream, delim_t delim )
-	{ return ( HStreamIterator<delim_t, out_t>( stream, delim ) ); }
+inline HStreamIterator<out_t, delim_t> stream_iterator( HStreamInterface& stream, delim_t delim ) {
+	return ( HStreamIterator<out_t, delim_t>( stream, delim ) );
+}
 
+/*! \brief Input stream iterator with default delimiter type.
+ */
 template<typename out_t>
-HStreamIterator<char const* const, out_t> stream_iterator( HStreamInterface& stream )
-	{ return ( HStreamIterator<char const* const, out_t>( stream, "" ) ); }
+inline HStreamIterator<out_t, char const*> stream_iterator( HStreamInterface& stream ) {
+	return ( HStreamIterator<out_t, char const*>( stream, "" ) );
+}
 
+/*! \brief End input stream iterator with explicit delimiter type.
+ */
+template<typename out_t, typename delim_t>
+inline HStreamIterator<out_t, delim_t> stream_iterator( void ) {
+	return ( HStreamIterator<out_t, delim_t>() );
+}
+
+/*! \brief End input stream iterator with default delimiter type.
+ */
 template<typename out_t>
-inline HStreamIterator<char const* const, out_t> stream_iterator( void )
-	{ return ( HStreamIterator<char const* const, out_t>() ); }
+inline HStreamIterator<out_t, char const*> stream_iterator( void ) {
+	return ( HStreamIterator<out_t, char const*>() );
+}
 
 }
 
