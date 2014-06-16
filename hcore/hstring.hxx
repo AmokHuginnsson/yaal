@@ -769,6 +769,11 @@ int long long unsigned stoull( HString const&, int* = NULL, int = 10 );
 float stof( HString const&, int* = NULL );
 double stod( HString const&, int* = NULL );
 double long stold( HString const&, int* = NULL );
+bool is_whitespace( char );
+bool is_digit( char );
+bool is_hex_digit( char );
+bool is_letter( char );
+bool is_alpha( char );
 
 /*! \brief HString class helpers, utility functions.
  */

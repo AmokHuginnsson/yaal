@@ -76,11 +76,15 @@ HCharacterClass const _whiteSpace_ = HCharacterClass( D_WHITE_SPACE, static_cast
 #define D_LETTER D_LOWER_CASE_LETTER D_UPPER_CASE_LETTER
 #undef D_DIGIT
 #define D_DIGIT "0123456789"
+#undef D_HEX_DIGIT
+#define D_HEX_DIGIT D_DIGIT "aAbBcCdDeEfF"
 HCharacterClass const _digit_ = HCharacterClass( D_DIGIT, static_cast<int>( sizeof ( D_DIGIT ) - 1 ) );
+HCharacterClass const _hexDigit_ = HCharacterClass( D_HEX_DIGIT, static_cast<int>( sizeof ( D_HEX_DIGIT ) - 1 ) );
 HCharacterClass const _letter_ = HCharacterClass( D_LETTER, static_cast<int>( sizeof ( D_LETTER ) - 1 ) );
 HCharacterClass const _lowerCaseLetter_ = HCharacterClass( D_LOWER_CASE_LETTER, static_cast<int>( sizeof ( D_LOWER_CASE_LETTER ) - 1 ) );
 HCharacterClass const _upperCaseLetter_ = HCharacterClass( D_UPPER_CASE_LETTER, static_cast<int>( sizeof ( D_UPPER_CASE_LETTER ) - 1 ) );
 HCharacterClass const _word_ = HCharacterClass( D_LETTER D_DIGIT "_", static_cast<int>( sizeof ( D_LETTER D_DIGIT "_" ) - 1 ) );
+#undef D_HEX_DIGIT
 #undef D_DIGIT
 #undef D_LETTER
 #undef D_LOWER_CASE_LETTER
@@ -1506,6 +1510,27 @@ double stod( HString const& str_, int* endIdx_ ) {
 
 double long stold( HString const& str_, int* endIdx_ ) {
 	return ( hcore::strtold( str_, endIdx_ ) );
+}
+
+bool is_whitespace( char char_ ) {
+	return ( ::memchr( _whiteSpace_.data(), char_, static_cast<size_t>( _whiteSpace_.size() ) ) != NULL );
+}
+
+bool is_digit( char char_ ) {
+	return ( ::memchr( _digit_.data(), char_, static_cast<size_t>( _digit_.size() ) ) != NULL );
+}
+
+bool is_hex_digit( char char_ ) {
+	return ( ::memchr( _hexDigit_.data(), char_, static_cast<size_t>( _hexDigit_.size() ) ) != NULL );
+}
+
+bool is_letter( char char_ ) {
+	return ( ::memchr( _letter_.data(), char_, static_cast<size_t>( _letter_.size() ) ) != NULL );
+}
+
+bool is_alpha( char char_ ) {
+	char unsigned c( static_cast<char unsigned>( char_ ) );
+	return ( ( c > ' ' ) && ( c <= 127 ) );
 }
 
 namespace string_helper {
