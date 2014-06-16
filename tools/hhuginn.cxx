@@ -199,16 +199,22 @@ public:
 		: _owner( NULL ), _cur(), _state( STATE::NORMAL ), _escape( false ) {
 	}
 	HIterator( HIterator const& it_ )
-		: _owner( it_._owner ), _cur( it_._cur ), _state( it_._state ), _escape( false ) {
+		: _owner( it_._owner ), _cur( it_._cur ), _state( it_._state ), _escape( it_._escape ) {
 	}
 	HIterator& operator = ( HIterator const& it_ ) {
 		if ( &it_ != this ) {
-			_owner = it_._owner;
-			_cur = it_._cur;
-			_state = it_._state;
-			_escape = it_._escape;
 		}
 		return ( *this );
+	}
+	void swap( HIterator& it_ ) {
+		if ( &it_ != this ) {
+			using yaal::swap;
+			swap( _owner, it_._owner );
+			swap( _cur, it_._cur );
+			swap( _state, it_._state );
+			swap( _escape, it_._escape );
+		}
+		return;
 	}
 	HIterator& operator ++ ( void ) {
 		++ _cur;
@@ -256,13 +262,14 @@ HPrepocessor::HIterator HPrepocessor::end( void ) const {
 
 yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_comment( yaal::hcore::HString::const_iterator pos_ ) {
 	yaal::hcore::HString::const_iterator pos( pos_ );
+	yaal::hcore::HString::const_iterator goodPos( pos_ );
 	while ( true ) {
 		if ( *pos == COMMENT_START_CHAR1 ) {
 			/* we are possibly in comment, lets check next character */
 			++ pos;
 			if ( pos == _owner->_end ) {
 				/* We are at end of source, we should not update _cur */
-				pos = pos_;
+				pos = goodPos;
 				break;
 			} else if ( *pos == COMMENT_START_CHAR2 ) {
 #if 0
@@ -277,6 +284,7 @@ yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_comment( yaal
 						if ( pos != _owner->_end ) {
 							if ( *pos == COMMENT_STOP_CHAR2 ) {
 								/* we found end of comment. */
+								++ pos;
 								break;
 							}
 						} else {
@@ -289,6 +297,7 @@ yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_comment( yaal
 				if ( pos == _owner->_end ) {
 					break;
 				}
+				goodPos = pos;
 				continue;
 			} else if ( *pos == COMMENT_START_CHAR2ALT ) {
 				/* We are in single line comment. */
@@ -302,7 +311,10 @@ yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_comment( yaal
 				if ( pos == _owner->_end ) {
 					break;
 				}
+				goodPos = pos;
 				continue;
+			} else {
+				pos = goodPos;
 			}
 		}
 		break;
