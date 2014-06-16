@@ -279,9 +279,15 @@ yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_comment( yaal
 								/* we found end of comment. */
 								break;
 							}
+						} else {
+							/* unfinished comment */
+							break;
 						}
 					}
 					++ pos;
+				}
+				if ( pos == _owner->_end ) {
+					break;
 				}
 				continue;
 			} else if ( *pos == COMMENT_START_CHAR2ALT ) {
@@ -292,6 +298,9 @@ yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_comment( yaal
 						break;
 					}
 					++ pos;
+				}
+				if ( pos == _owner->_end ) {
+					break;
 				}
 				continue;
 			}
