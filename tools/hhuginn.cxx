@@ -173,26 +173,51 @@ public:
 	typedef HIterator this_type;
 	typedef yaal::hcore::iterator_interface<char const, iterator_category::forward> base_type;
 private:
+	static char const COMMENT_START_CHAR1 = '/';
+	static char const COMMENT_START_CHAR2 = '*';
+	static char const COMMENT_START_CHAR2ALT = '/';
+	static char const COMMENT_STOP_CHAR1 = '*';
+	static char const COMMENT_STOP_CHAR2 = '/';
+	static char const NEWLINE = '\n';
+	static char const ESCAPE = '\\';
+	static char const DOUBLE_QUOTE = '"';
+	static char const SINGLE_QUOTE = '\'';
+	struct STATE {
+		typedef enum {
+			NORMAL,
+			IN_COMMENT,
+			IN_SINGLE_QUOTE,
+			IN_DOUBLE_QUOTE
+		} state_t;
+	};
 	HPrepocessor const* _owner;
 	yaal::hcore::HString::const_iterator _cur;
+	STATE::state_t _state;
+	bool _escape; /*!< Is a QUOTE substate. */
 public:
 	HIterator( void )
-		: _owner( NULL ), _cur() {
+		: _owner( NULL ), _cur(), _state( STATE::NORMAL ), _escape( false ) {
 	}
 	HIterator( HIterator const& it_ )
-		: _owner( it_._owner ), _cur( it_._cur ) {
+		: _owner( it_._owner ), _cur( it_._cur ), _state( it_._state ), _escape( false ) {
 	}
 	HIterator& operator = ( HIterator const& it_ ) {
 		if ( &it_ != this ) {
 			_owner = it_._owner;
 			_cur = it_._cur;
+			_state = it_._state;
+			_escape = it_._escape;
 		}
 		return ( *this );
 	}
 	HIterator& operator ++ ( void ) {
+		++ _cur;
+		if ( _cur != _owner->_end ) {
+			make_readable();
+		}
 		return ( *this );
 	}
-	HIterator operator ++ ( int ) {
+	HIterator operator ++ ( int ) const {
 		HIterator it( *this );
 		++ it;
 		return ( it );
@@ -211,9 +236,15 @@ public:
 	}
 private:
 	HIterator( HPrepocessor const* owner_, yaal::hcore::HString::const_iterator pos_ )
-		: _owner( owner_ ), _cur( pos_ ) {
+		: _owner( owner_ ), _cur( pos_ ), _state( STATE::NORMAL ), _escape( false ) {
+		make_readable();
+		return;
 	}
 	friend class HPrepocessor;
+	void make_readable( void );
+	yaal::hcore::HString::const_iterator try_skip_whitespace( yaal::hcore::HString::const_iterator, char );
+	yaal::hcore::HString::const_iterator skip_whitespace( yaal::hcore::HString::const_iterator );
+	yaal::hcore::HString::const_iterator skip_comment( yaal::hcore::HString::const_iterator );
 };
 
 HPrepocessor::HIterator HPrepocessor::begin( void ) const {
@@ -223,6 +254,123 @@ HPrepocessor::HIterator HPrepocessor::end( void ) const {
 	return ( HIterator( this, _end ) );
 }
 
+yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_comment( yaal::hcore::HString::const_iterator pos_ ) {
+	yaal::hcore::HString::const_iterator pos( pos_ );
+	while ( true ) {
+		if ( *pos == COMMENT_START_CHAR1 ) {
+			/* we are possibly in comment, lets check next character */
+			++ pos;
+			if ( pos == _owner->_end ) {
+				/* We are at end of source, we should not update _cur */
+				pos = pos_;
+				break;
+			} else if ( *pos == COMMENT_START_CHAR2 ) {
+#if 0
+				we are in /* ... */ comment
+#endif /* #if 0 */
+				++ pos;
+				while ( pos != _owner->_end ) {
+					/* we look for end of comment */
+					if ( *pos == COMMENT_STOP_CHAR1 ) {
+						/* possibly we found first character of end of comment */
+						++ pos;
+						if ( pos != _owner->_end ) {
+							if ( *pos == COMMENT_STOP_CHAR2 ) {
+								/* we found end of comment. */
+								break;
+							}
+						}
+					}
+					++ pos;
+				}
+				continue;
+			} else if ( *pos == COMMENT_START_CHAR2ALT ) {
+				/* We are in single line comment. */
+				++ pos;
+				while ( pos != _owner->_end ) {
+					if ( *pos == NEWLINE ) {
+						break;
+					}
+					++ pos;
+				}
+				continue;
+			}
+		}
+		break;
+	}
+	return ( pos );
+}
+
+void HPrepocessor::HIterator::make_readable( void ) {
+	/*
+	 * Make_readable always starts in NORMAL state or in one of the QUOTEs,
+	 * and always ends in NORMAL state or in one of the QUOTEs.
+	 */
+	yaal::hcore::HString::const_iterator pos( _cur );
+	if ( _state == STATE::NORMAL ) {
+		pos = skip_comment( pos );
+		if ( *pos == SINGLE_QUOTE ) {
+			_state = STATE::IN_SINGLE_QUOTE;
+		} else if ( *pos == DOUBLE_QUOTE ) {
+			_state = STATE::IN_DOUBLE_QUOTE;
+		}
+	} else {
+		/* We are in quote state. */
+		if ( _escape ) {
+			_escape = false;
+		} else if ( *pos == ESCAPE ) {
+			_escape = true;
+		} else {
+			if ( ( ( _state == STATE::IN_SINGLE_QUOTE ) && ( *pos == SINGLE_QUOTE ) )
+					|| ( ( _state == STATE::IN_DOUBLE_QUOTE ) && ( *pos == DOUBLE_QUOTE ) ) ) {
+				pos = try_skip_whitespace( pos, *pos );
+			}
+		}
+	}
+	_cur = pos;
+	return;
+}
+
+yaal::hcore::HString::const_iterator HPrepocessor::HIterator::skip_whitespace( yaal::hcore::HString::const_iterator pos_ ) {
+	yaal::hcore::HString::const_iterator pos( pos_ );
+	while ( pos != _owner->_end ) {
+		if ( ! is_whitespace( *pos ) ) {
+			break;
+		}
+		++ pos;
+	}
+	return ( pos );
+}
+
+yaal::hcore::HString::const_iterator HPrepocessor::HIterator::try_skip_whitespace( yaal::hcore::HString::const_iterator pos_, char quote_ ) {
+	yaal::hcore::HString::const_iterator pos( pos_ );
+	/* We are at closing quote character. */
+	++ pos;
+	while ( pos != _owner->_end ) {
+		yaal::hcore::HString::const_iterator orig( pos );
+		pos = skip_whitespace( pos );
+		if ( pos == _owner->_end ) {
+			pos = pos_;
+			break;
+		}
+		pos = skip_comment( pos );
+		if ( pos == _owner->_end ) {
+			pos = pos_;
+			break;
+		}
+		if ( pos == orig ) {
+			break;
+		}
+	}
+	if ( ( pos != _owner->_end ) && ( *pos == quote_ ) ) {
+		++ pos;
+	} else {
+		pos = pos_;
+		_state = STATE::NORMAL;
+	}
+	return ( pos );
+}
+
 /*
  * Strip C-style comments, concatenate literal strings.
  */
@@ -230,88 +378,10 @@ void HHuginn::preprocess( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::LOADED );
 	_preprocessedSource.realloc( _sourceSize );
-	char const* src( _source.get<char>() );
+	HPrepocessor pp( _source.get<char>(), _source.get<char>() + _sourceSize );
 	char* dst( _preprocessedSource.get<char>() );
-	static char const COMMENT_START_CHAR1( '/' );
-	static char const COMMENT_START_CHAR2( '*' );
-	static char const COMMENT_START_CHAR2ALT( '/' );
-	static char const COMMENT_STOP_CHAR1( '*' );
-	static char const COMMENT_STOP_CHAR2( '/' );
-	static char const NEWLINE( '\n' );
-	static char const ESCAPE( '\\' );
-	static char const DOUBLE_QUOTE( '"' );
-	static char const SINGLE_QUOTE( '\'' );
-	bool inComment( false );
-	bool inSingleQuote( false );
-	bool inDoubleQuote( false );
-	for ( int i( 0 ); i < _sourceSize; ++ i, ++ src ) {
-		if ( inComment ) {
-			if ( *src == COMMENT_STOP_CHAR1 ) {
-				++ i;
-				++ src;
-				if ( i >= _sourceSize ) {
-					break;
-				} else if ( *src == COMMENT_STOP_CHAR2 ) {
-					inComment = false;
-					continue;
-				}
-			}
-		} else if ( ! ( inSingleQuote || inDoubleQuote ) ) {
-			if ( *src == SINGLE_QUOTE ) {
-				inSingleQuote = true;
-			} else if ( *src == DOUBLE_QUOTE ) {
-				inDoubleQuote = true;
-			} else if ( *src == COMMENT_START_CHAR1 ) {
-				++ i;
-				++ src;
-				if ( i >= _sourceSize ) {
-					*dst = COMMENT_START_CHAR1;
-					++ dst;
-					break;
-				} else if ( *src == COMMENT_START_CHAR2 ) {
-					inComment = true;
-				} else if ( *src == COMMENT_START_CHAR2ALT ) {
-					++ i;
-					++ src;
-					while ( i < _sourceSize ) {
-						if ( *src == NEWLINE )
-							break;
-						++ src;
-						++ i;
-					}
-					if ( i < _sourceSize ) {
-						*dst = NEWLINE;
-						++ dst;
-					}
-					continue;
-				} else {
-					*dst = COMMENT_START_CHAR1;
-					++ dst;
-				}
-			}
-		} else {
-			if ( *src == ESCAPE ) {
-				*dst = *src;
-				++ src;
-				++ dst;
-				++ i;
-				if ( i >= _sourceSize ) {
-					break;
-				}
-				*dst = *src;
-				++ dst;
-				continue;
-			}
-			if ( inSingleQuote && ( *src == SINGLE_QUOTE ) )
-				inSingleQuote = false;
-			else if ( inDoubleQuote && ( *src == DOUBLE_QUOTE ) )
-				inDoubleQuote = false;
-		}
-		if ( ! inComment ) {
-			*dst = *src;
-			++ dst;
-		}
-	}
+	for ( HPrepocessor::HIterator it( pp.begin() ), end( pp.end() ); it != end; ++ it, ++ dst )
+		*dst = *it;
 	_preprocessedSourceSize = static_cast<int>( dst - _preprocessedSource.get<char>() );
 	_state = STATE::PREPROCESSED;
 	return;
