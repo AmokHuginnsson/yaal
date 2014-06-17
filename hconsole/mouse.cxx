@@ -213,7 +213,7 @@ int console_mouse_close( void ) {
 
 int console_mouse_open( void ) {
 	M_PROLOG
-	int a( 1 );
+	volatile int a( 1 );
 	if ( a )
 		throw HMouseException( _( "console mouse support not compiled" ) );
 	return ( 0 );
@@ -222,7 +222,7 @@ int console_mouse_open( void ) {
 
 int console_mouse_get( OMouse& ) {
 	M_PROLOG
-	int a( 1 );
+	volatile int a( 1 );
 	if ( a )
 		throw HMouseException( _( "console mouse support not compiled" ) );
 	return ( 0 );
@@ -231,11 +231,11 @@ int console_mouse_get( OMouse& ) {
 
 int console_mouse_close( void ) {
 	M_PROLOG
-/*	I cannot throw exception here bacause exception was probably
- *	thrown by console_mouse_open in enter_curses and now this
- *	function is probably called from leave_curses from exception
- *	catch block, so new exception would be recursive and would
- *	overload the stack because of infinite number of exceptions */
+/* I cannot throw exception here bacause exception was probably
+ * thrown by console_mouse_open in enter_curses and now this
+ * function is probably called from leave_curses from exception
+ * catch block, so new exception would be recursive and would
+ * overload the stack because of infinite number of exceptions */
 	return ( 0 );
 	M_EPILOG
 }
