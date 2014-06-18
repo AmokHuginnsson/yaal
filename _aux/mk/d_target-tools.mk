@@ -1,15 +1,20 @@
 tags: $(SRCS) $(HDRS)
-	@printf "%b" "Rehashing tags ... "; \
+	@printf "%b" "Rehashing tags ... " && \
 	cd $(DIR_ROOT) && $(CTAGS) && $(GTAGS) &&  \
 	printf "%b\n" "done."
 
 DIR_COVERAGE=build/cov
-LCOV_PARAMS=--rc lcov_branch_coverage=1
+LCOV_PARAMS=
 
 prepare-coverage-baseline: $(DIR_COVERAGE)
-	@printf "%b" "Preparing coverage base line ... "; \
-	cd $(DIR_ROOT) && \
+	@cd $(DIR_ROOT) && \
+	if [ ! -f "$(CLIENT_PATH)/Makefile.mk.in" ] ; then \
+		echo "ERROR: Please specify library's client path with CLIENT_PATH variable." && \
+		exit 1 ; \
+	fi && \
+	printf "%b" "Preparing coverage base line ... " && \
 	find $(DIR_COVERAGE) -name '*.gcda' | xargs /bin/rm -f && \
+	find $(CLIENT_PATH)/$(DIR_COVERAGE) -name '*.gcda' | xargs /bin/rm -f && \
 	lcov $(LCOV_PARAMS) \
 	     --base-directory $(DIR_ROOT) \
 	     --directory $(DIR_COVERAGE)/hcore \
@@ -18,10 +23,19 @@ prepare-coverage-baseline: $(DIR_COVERAGE)
 	     --directory $(DIR_COVERAGE)/hconsole \
 	     --directory $(DIR_COVERAGE)/hdata \
 	     --capture --initial --output-file $(DIR_COVERAGE)/$(LIB_NAME)-baseline.info && \
+	lcov $(LCOV_PARAMS) \
+	     --base-directory ${HOME}/usr/include \
+	     --directory $(CLIENT_PATH)/$(DIR_COVERAGE)/$(lastword $(subst /, ,$(CLIENT_PATH))) \
+	     --capture --initial --output-file $(DIR_COVERAGE)/$(LIB_NAME)-client-baseline.info && \
 	printf "%b\n" "done."
 
 coverage-stats:
-	@printf "%b" "Preparing coverage statistics ... "; \
+	@cd $(DIR_ROOT) && \
+	if [ ! -f "$(CLIENT_PATH)/Makefile.mk.in" ] ; then \
+		echo "ERROR: Please specify library's client path with CLIENT_PATH variable." && \
+		exit 1 ; \
+	fi && \
+	printf "%b" "Preparing coverage statistics ... " && \
 	cd $(DIR_ROOT) && \
 	lcov $(LCOV_PARAMS) \
 	     --base-directory $(DIR_ROOT) \
@@ -33,11 +47,20 @@ coverage-stats:
 			 --ignore-errors gcov,source \
 	     --capture --output-file $(DIR_COVERAGE)/$(LIB_NAME)-test.info ;\
 	lcov $(LCOV_PARAMS) \
+	     --base-directory ${HOME}/usr/include \
+	     --directory $(CLIENT_PATH)/$(DIR_COVERAGE)/$(lastword $(subst /, ,$(CLIENT_PATH))) \
+			 --ignore-errors gcov,source \
+	     --capture --output-file $(DIR_COVERAGE)/$(LIB_NAME)-client-test.info ;\
+	sed -i -e 's@${HOME}/usr/include/$(LIB_NAME)@$(DIR_ROOT)@g' \
+	     $(DIR_COVERAGE)/$(LIB_NAME)-client-baseline.info $(DIR_COVERAGE)/$(LIB_NAME)-client-test.info ;\
+	lcov $(LCOV_PARAMS) \
 	     --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-baseline.info \
+	     --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-client-baseline.info \
 			 --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-test.info \
+			 --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-client-test.info \
 			 --output-file $(DIR_COVERAGE)/$(LIB_NAME)-total.info && \
 	lcov $(LCOV_PARAMS) \
-	     --remove $(DIR_COVERAGE)/$(LIB_NAME)-total.info '/usr/include/*' '/usr/lib/*' \
+	     --extract $(DIR_COVERAGE)/$(LIB_NAME)-total.info '*/$(LIB_NAME)/*' \
 			 --output-file $(DIR_COVERAGE)/$(LIB_NAME)-coverage.info && \
 	/bin/rm -rf $(DIR_ROOT)/build/coverage-stats && \
 	$(MKDIR_P) $(DIR_ROOT)/build/coverage-stats && \

@@ -70,7 +70,7 @@ ifdef DO_COVERAGE
 	TARGET=cov
 	CWARNING_FLAGS += -Wlarger-than-65536
 	COMPILER_COVERAGE_FLAGS = --coverage
-	COMPILER_DEBUG_FLAGS = -D__DEBUG__
+	COMPILER_DEBUG_FLAGS = -D__DEBUG__ -fno-inline -fno-inline-small-functions -fno-default-inline
 	LINKER_COVERAGE_FLAGS   = --coverage
 	LIB_INFIX = -c
 endif
