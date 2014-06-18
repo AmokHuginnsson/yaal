@@ -531,16 +531,16 @@ void HEditControl::set( HInfo const& info_ ) {
 	M_EPILOG
 }
 
-int HEditControl::set_focus ( char shorcut_ ) {
+int HEditControl::set_focus( char shorcut_ ) {
 	M_PROLOG
-	return ( HControl::set_focus ( shorcut_ ) );
+	return ( HControl::set_focus( shorcut_ ) );
 	M_EPILOG
 }
 
-int HEditControl::do_click ( mouse::OMouse & mouse_ ) {
+int HEditControl::do_click( mouse::OMouse & mouse_ ) {
 	M_PROLOG
 	int position = 0;
-	if ( ! HControl::do_click ( mouse_ ) )
+	if ( ! HControl::do_click( mouse_ ) )
 		return ( 1 );
 	position = mouse_._column - _columnRaw;
 	if ( position < _string.get_length() ) {

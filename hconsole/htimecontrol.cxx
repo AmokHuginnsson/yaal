@@ -37,7 +37,8 @@ namespace hconsole {
 
 HTimeControl::HTimeControl( HWindow* parent_, int row_, int column_,
 		int height_, int width_, char const* label_ )
-	: HTime( HTime::LOCAL ), HControl( parent_, row_, column_, height_, width_, label_ ) {
+	: HControl( parent_, row_, column_, height_, width_, label_ ),
+	_time( HTime::LOCAL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -46,6 +47,24 @@ HTimeControl::HTimeControl( HWindow* parent_, int row_, int column_,
 HTimeControl::~HTimeControl ( void ) {
 	M_PROLOG
 	return;
+	M_EPILOG
+}
+
+void HTimeControl::do_refresh( void ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+int HTimeControl::do_process_input( int code_ ) {
+	M_PROLOG
+	return ( code_ );
+	M_EPILOG
+}
+
+int HTimeControl::do_click( mouse::OMouse& ) {
+	M_PROLOG
+	return ( 0 );
 	M_EPILOG
 }
 

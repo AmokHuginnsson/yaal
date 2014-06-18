@@ -38,11 +38,19 @@ namespace hconsole {
  *
  * Time control allows setting and/or getting dates and time.
  */
-class HTimeControl : public hcore::HTime, public HControl {
+class HTimeControl : public virtual HControl {
 public:
 	typedef HTimeControl this_type;
+	typedef HControl base_type;
+private:
+	yaal::hcore::HTime _time;
+public:
 	HTimeControl( HWindow*, int, int, int, int, char const* );
 	virtual ~HTimeControl( void );
+protected:
+	virtual void do_refresh( void );
+	virtual int do_process_input( int );
+	virtual int do_click( mouse::OMouse& );
 };
 
 }
