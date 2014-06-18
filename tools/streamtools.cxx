@@ -37,6 +37,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hfile.hxx"
 #include "hcore/hsocket.hxx"
 #include "hcore/hnumber.hxx"
+#include "hcore/hcomplex.hxx"
 #include "hcore/htime.hxx"
 #include "util.hxx"
 
@@ -293,6 +294,13 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HTime const& t_ ) {
 	M_PROLOG
 	out << t_.string();
+	return ( out );
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HComplex const& c_ ) {
+	M_PROLOG
+	out << "(" << c_.re() << "+" << c_.im() << "i)";
 	return ( out );
 	M_EPILOG
 }

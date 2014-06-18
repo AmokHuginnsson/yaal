@@ -109,7 +109,7 @@ Next, you run build of `yaal' sources.
 By default `yaal' is build into shared (aka dynamically loaded) libraries,
 moreover one does not need root privileges to install `yaal' libraries.
 All installed files can be stored in your home directory.
-Because you will install yaal headers outside of default header directory location 
+Because you will install yaal headers outside of default header directory location
 (like /usr/include or /usr/local/include), and you will install binary libraries
 outside of default directory location (like /usr/lib or /usr/local/lib) you will
 need to tell your compiler (GCC) and operating system dynamic linker (ld-so)
@@ -164,7 +164,7 @@ to postgresql.conf.
 Edit pg_hba.conf and disable all authentication methods but:
 
   local all postgres peer
-	local all all md5
+  local all all md5
 
 Restart server.
 Add user named `root' as database administrator.

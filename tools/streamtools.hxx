@@ -365,6 +365,9 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaa
 class HTime;
 yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HTime const& );
 
+class HComplex;
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HComplex const& );
+
 }
 
 }

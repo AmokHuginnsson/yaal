@@ -40,21 +40,22 @@ namespace yaal {
 
 namespace hcore {
 
-HComplex::HComplex( void ) : _real ( 0 ), _imaginary ( 0 ) {
+HComplex::HComplex( void )
+	: _real( 0 ), _imaginary( 0 ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HComplex::HComplex( double long real_,  double long imaginary_ )
-	: _real ( real_ ), _imaginary ( imaginary_ ) {
+	: _real( real_ ), _imaginary( imaginary_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HComplex::HComplex( HComplex const& complex_ )
-	: _real ( complex_._real ), _imaginary ( complex_._imaginary ) {
+	: _real( complex_._real ), _imaginary( complex_._imaginary ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -78,15 +79,17 @@ double long HComplex::im( void ) const {
 	M_EPILOG
 }
 
-double long HComplex::set_real( double long real_ ) {
+HComplex& HComplex::set_real( double long real_ ) {
 	M_PROLOG
-	return ( _real = real_ );
+	_real = real_;
+	return ( *this );
 	M_EPILOG
 }
 
-double long HComplex::set_imaginary( double long imaginary_ ) {
+HComplex& HComplex::set_imaginary( double long imaginary_ ) {
 	M_PROLOG
-	return ( _imaginary = imaginary_ );
+	_imaginary = imaginary_;
+	return ( *this );
 	M_EPILOG
 }
 
@@ -116,7 +119,7 @@ double long HComplex::argument( void ) const {
 	bool imZero( yaal::abs( _imaginary ) < ( 2.L * std::numeric_limits<double long>::epsilon() ) );
 	if ( reZero && imZero  )
 		M_THROW( "Argument for 0 + 0i is undefined.", errno );
-	
+
 	double long arg( 0.L );
 	if ( _real > 0.L )
 		arg = ::std::atan( _imaginary  / _real );
@@ -154,13 +157,6 @@ bool HComplex::operator != ( HComplex const& complex_ ) const {
 	M_PROLOG
 	return ( ! ( eq( _real, complex_._real )
 				&& eq( _imaginary, complex_._imaginary ) ) );
-	M_EPILOG
-}
-
-HComplex& HComplex::operator = ( double long real_ ) {
-	M_PROLOG
-	set( real_, 0. );
-	return ( *this );
 	M_EPILOG
 }
 
@@ -274,9 +270,29 @@ HComplex HComplex::operator / ( double long value_ ) const {
 	M_EPILOG
 }
 
+HComplex operator + ( double long value_, HComplex const& complex_ ) {
+	M_PROLOG
+	return ( complex_ + value_ );
+	M_EPILOG
+}
+
+HComplex operator - ( double long value_, HComplex const& complex_ ) {
+	M_PROLOG
+	HComplex c( value_ );
+	return ( c - complex_ );
+	M_EPILOG
+}
+
 HComplex operator * ( double long value_, HComplex const& complex_ ) {
 	M_PROLOG
 	return ( complex_ * value_ );
+	M_EPILOG
+}
+
+HComplex operator / ( double long value_, HComplex const& complex_ ) {
+	M_PROLOG
+	HComplex c( value_ );
+	return ( c / complex_ );
 	M_EPILOG
 }
 

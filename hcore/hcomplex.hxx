@@ -51,15 +51,14 @@ public:
 	virtual ~HComplex( void );
 	double long re( void ) const;
 	double long im( void ) const;
-	double long set_real( double long );
-	double long set_imaginary( double long );
+	HComplex& set_real( double long );
+	HComplex& set_imaginary( double long );
 	HComplex& set( double long, double long );
 	double long modulus( void ) const;
 	double long argument( void ) const;
 	HComplex& operator = ( HComplex const& );
 	bool operator == ( HComplex const& ) const;
 	bool operator != ( HComplex const& ) const;
-	HComplex& operator = ( double long );
 	HComplex& operator += ( HComplex const& );
 	HComplex& operator -= ( HComplex const& );
 	HComplex& operator *= ( HComplex const& );
@@ -73,7 +72,10 @@ public:
 	HComplex operator * ( double long ) const;
 	HComplex operator / ( HComplex const& ) const;
 	HComplex operator / ( double long ) const;
+	friend HComplex operator + ( double long, HComplex const& );
+	friend HComplex operator - ( double long, HComplex const& );
 	friend HComplex operator * ( double long, HComplex const& );
+	friend HComplex operator / ( double long, HComplex const& );
 };
 
 typedef yaal::hcore::HExceptionT<HComplex> HComplexException;
