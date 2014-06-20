@@ -44,6 +44,9 @@ namespace hcore {
 extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHArray_[];
 
 /*! \brief Simplest compund data structure.
+ *
+ * \tparam type_t - type of objects that will be stored in array.
+ * \tparam allocator_t - type of internal allocator used for all array's allocations.
  */
 template<typename type_t, typename allocator_t = allocator::system<type_t> >
 class HArray {
@@ -75,14 +78,26 @@ public:
 	typedef HIterator<type_t const> const_iterator;
 	typedef HReverseIterator<iterator> reverse_iterator;
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
+	/*! \brief Construct empty array object.
+	 */
 	HArray( void )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		return;
 	}
+	/*! \brief Construct empty array object using external allocator.
+	 *
+	 * \param allocator_ - external allocator that should be used for all array's allocations.
+	 */
 	explicit HArray( allocator_t const& )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		return;
 	}
+	/*! \brief Construct array of given size.
+	 *
+	 * Array will be filled with default values of array's objects type.
+	 *
+	 * \param size_ - size for newly created array.
+	 */
 	explicit HArray( int long size_ )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
@@ -90,6 +105,13 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Construct array of given size using external allocator.
+	 *
+	 * Array will be filled with default values of array's objects type.
+	 *
+	 * \param size_ - size for newly created array.
+	 * \param allocator_ - external allocator that should be used for all array's allocations.
+	 */
 	HArray( int long size_, allocator_t const& )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
@@ -97,6 +119,14 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Construct array of given size using explicit default value and external allocator.
+	 *
+	 * Array will be filled with objects of given value.
+	 *
+	 * \param size_ - size for newly created array.
+	 * \param fillWith_ - value prototype that should be set for all objects in this newly created array.
+	 * \param allocator_ - external allocator that should be used for all array's allocations.
+	 */
 	HArray( int long size_, type_t const& fillWith_, allocator_t const& = allocator_t() )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
@@ -104,6 +134,13 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Construct array based on given range of objects and external allocator.
+	 *
+	 * \tparam iterator_t -  type of iterator used to specify input range.
+	 * \param first - beginning of input range.
+	 * \param last - one past the end of input range.
+	 * \param allocator_ - external allocator that should be used for all array's allocations.
+	 */
 	template<typename iterator_t>
 	HArray( iterator_t first, iterator_t last, allocator_t const& = allocator_t() )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
@@ -112,6 +149,10 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Copy constructor.
+	 *
+	 * \param arr_ - array object that this new array should be a copy of.
+	 */
 	HArray( HArray const& arr_ )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
@@ -126,6 +167,10 @@ public:
 		M_EPILOG
 	}
 #if CXX_STANDARD >= 2011
+	/*! \brief Moving constructor.
+	 *
+	 * \param arr_ - array whose whole data should be transfered to this newly created array.
+	 */
 	HArray( HArray&& arr_ )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
@@ -134,6 +179,11 @@ public:
 		M_EPILOG
 	}
 #endif /* #if CXX_STANDARD >= 2011 */
+	/*! \brief Copy constructor with external allocator.
+	 *
+	 * \param arr_ - array object that this new array should be a copy of.
+	 * \param allocator_ - external allocator that should be used for all array's allocations.
+	 */
 	HArray( HArray const& arr_, allocator_t const& )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
