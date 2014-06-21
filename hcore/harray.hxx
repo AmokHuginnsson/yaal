@@ -205,12 +205,19 @@ public:
 		return;
 		M_DESTRUCTOR_EPILOG
 	}
+	/*! \brief Remove all elemets from array.
+	 */
 	void clear( void ) {
 		M_PROLOG
 		erase( begin(), end() );
 		return;
 		M_EPILOG
 	}
+	/*! \brief Assing contents of another array to this array.
+	 *
+	 * \param arr_ - other array that's contents will be assigned to this array.
+	 * \return Self.
+	 */
 	HArray& operator = ( HArray const& arr_ ) {
 		M_PROLOG
 		if ( &arr_ != this ) {
@@ -233,6 +240,11 @@ public:
 		M_EPILOG
 	}
 #if CXX_STANDARD >= 2011
+	/*! \brief Replace contents of this array with contents moved from another array.
+	 *
+	 * \param arr_ - other array that's contents will replace current contents of this array.
+	 * \return Self.
+	 */
 	HArray& operator = ( HArray&& arr_ ) {
 		M_PROLOG
 		if ( &arr_ != this ) {
@@ -243,6 +255,10 @@ public:
 		M_EPILOG
 	}
 #endif /* #if CXX_STANDARD >= 2011 */
+	/*! \brief Swap contents of this array with another array.
+	 *
+	 * \param other - the other array that will swap contents with this array.
+	 */
 	void swap( HArray& other ) {
 		M_PROLOG
 		if ( &other != this ) {
