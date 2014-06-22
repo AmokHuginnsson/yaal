@@ -270,9 +270,21 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Get internal allocator instance.
+	 *
+	 * \return Internal allocator instance.
+	 */
 	allocator_type const& get_allocator( void ) const {
 		return ( _allocator );
 	}
+	/*! \brief Resize this array.
+	 *
+	 * Change size of this array to accommodate requested number of elements.
+	 * If necessary remove elements, or add new elements with default value.
+	 *
+	 * \param size_ - requested new number of elements in this array.
+	 * \param fillWith_ - default value for new values if this array will be enlarged.
+	 */
 	void resize( int long size_, type_t const& fillWith_ = value_type() ) {
 		M_PROLOG
 		if ( size_ < 0 )
@@ -289,6 +301,13 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Reserve memory in internal buffer for given number of elements.
+	 *
+	 * If necessary reallocate internal memory buffer so additional elements could be
+	 * inserted into this array without any further reallocation.
+	 *
+	 * \param capacity_ - number of elements that could be stored in array without next reallocation.
+	 */
 	void reserve( int long capacity_ ) {
 		M_PROLOG
 		if ( capacity_ < 0 )
@@ -308,6 +327,11 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Access element at given position in this array.
+	 *
+	 * \param index_ - index of requested element in this array.
+	 * \return Reference to element at requested index.
+	 */
 	type_t& operator[] ( int long index_ ) {
 		M_PROLOG
 		int long idx = ( index_ < 0 ) ? index_ + _size : index_;
@@ -324,6 +348,10 @@ public:
 		return ( _buf[ idx ] );
 		M_EPILOG
 	}
+	/*! \brief Add element at end of this array.
+	 *
+	 * \param val_ - element to be added at end of this array.
+	 */
 	void push_back( type_t const& val_ ) {
 		M_PROLOG
 		M_ASSERT( _size <= _capacity );
@@ -334,6 +362,8 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Remove last element of this array.
+	 */
 	void pop_back( void ) {
 		M_PROLOG
 		M_ASSERT( _size > 0 );
@@ -341,6 +371,10 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Get reference to first element in this array.
+	 *
+	 * \return Reference to first element in this array.
+	 */
 	type_t const& front( void ) const {
 		M_PROLOG
 		M_ASSERT( _size > 0 );
@@ -353,6 +387,10 @@ public:
 		return ( *_buf );
 		M_EPILOG
 	}
+	/*! \brief Get reference to last element in this array.
+	 *
+	 * \return Reference to last element in this array.
+	 */
 	type_t const& back( void ) const {
 		M_PROLOG
 		M_ASSERT( _size > 0 );
@@ -365,9 +403,15 @@ public:
 		return ( _buf[ _size - 1 ] );
 		M_EPILOG
 	}
+	/*! \brief Alias for HArray::get_capacity().
+	 */
 	int long capacity( void ) const {
 		return ( get_capacity() );
 	}
+	/*! \brief Retrieve information about how many elements could be potentially stored in this array without reallocation.
+	 *
+	 * \return Maximum number of elements that could be stored in this array without reallocation.
+	 */
 	int long get_capacity( void ) const {
 		return ( _capacity );
 	}
