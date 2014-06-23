@@ -415,23 +415,44 @@ public:
 	int long get_capacity( void ) const {
 		return ( _capacity );
 	}
+	/*! \brief Alias for HArray::is_empty().
+	 */
 	bool operator ! ( void ) const {
 		M_PROLOG
 		return ( is_empty() );
 		M_EPILOG
 	}
+	/*! \brief Get number of elements in array.
+	 *
+	 * \return Number of elements in this array.
+	 */
 	int long get_size( void ) const {
 		return ( _size );
 	}
+	/*! \brief Alias for HArray::get_size().
+	 */
 	int long size( void ) const {
 		return ( _size );
 	}
+	/*! \brief Tell if this array is empty.
+	 *
+	 * \return True iff this array contains no elements - is empty.
+	 */
 	bool is_empty( void ) const {
 		return ( _size ? false : true );
 	}
+	/*! \brief Alias for HArray::is_empty().
+	 */
 	bool empty( void ) const {
 		return ( _size ? false : true );
 	}
+	/*! \brief Replace contents of this array with contents of given range.
+	 *
+	 * \tparam iterator_t - Type of iterator pair defining an input range.
+	 *
+	 * \param first - begining of the range of values to copy into this array.
+	 * \param last - one past the end of the range of values to copy into this array.
+	 */
 	template<typename iterator_t>
 	void assign( iterator_t first, iterator_t last ) {
 		M_PROLOG
@@ -440,6 +461,11 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Replace contents of this array with given number of given value.
+	 *
+	 * \param size_ - number of elements to fill this array with.
+	 * \param fillWith_ - value that shall be set for all elements in this array.
+	 */
 	void assign( int long size_, type_t const& fillWith_ ) {
 		M_PROLOG
 		int long oldSize( _size );
