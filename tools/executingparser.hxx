@@ -758,7 +758,7 @@ public:
 	void operator()( void );
 	void execute( void );
 	bool parse( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
-	int long error_position( void ) const;
+	int error_position( void ) const;
 	messages_t const& error_messages( void ) const;
 private:
 	void add_execution_step( yaal::hcore::HString::const_iterator, executor_t const& );

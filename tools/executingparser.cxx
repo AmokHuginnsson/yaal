@@ -258,9 +258,9 @@ void HExecutingParser::report_error( yaal::hcore::HString::const_iterator positi
 	M_EPILOG
 }
 
-int long HExecutingParser::error_position( void ) const {
+int HExecutingParser::error_position( void ) const {
 	M_PROLOG
-	return ( _errorPosition );
+	return ( static_cast<int>( _errorPosition ) );
 	M_EPILOG
 }
 
