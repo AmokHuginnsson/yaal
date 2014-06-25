@@ -1156,7 +1156,7 @@ inline void generate_n( iterator_t it, int long count, generator_t generator ) {
 
 /*! \brief Reverses order of elements in range.
  *
- * \param it - begining of range of eleemnts to be reverted.
+ * \param it - begining of range of elemnts to be reverted.
  * \param end - one past last element of range to be reverted.
  */
 template<typename iterator_t>
@@ -1177,7 +1177,7 @@ inline void reverse( iterator_t it, iterator_t end ) {
 
 /*! \brief Generate next, in lexographical order, permutation of the range of elements.
  *
- * \param it - begining of range of eleemnts for permutation.
+ * \param it - begining of range of elemnts for permutation.
  * \param end - one past last element of range for permutation.
  * \return true iff last, in lexographical order, permutation has been generated.
  */
@@ -1218,7 +1218,7 @@ inline bool next_permutation( iterator_t it, iterator_t end ) {
 
 /*! \brief Generate previous, in lexographical order, permutation of the range of elements.
  *
- * \param it - begining of range of eleemnts for permutation.
+ * \param it - begining of range of elemnts for permutation.
  * \param end - one past last element of range for permutation.
  * \return true iff first, in lexographical order, permutation has been generated.
  */
@@ -1259,15 +1259,75 @@ inline bool prev_permutation( iterator_t it, iterator_t end ) {
 
 /*! \brief Calculate sum of elements in range.
  *
- * \param it - begining of range of eleemnts to summed up.
+ * \param it - begining of range of elemnts to summed up.
  * \param end - one past last element of range to be summed up.
  * \param ret - starting value for sum operation.
- * \return sum of all elements in [it, end) + ret.
+ * \return Sum of all elements in [it, end) + ret.
  */
 template<typename iterator_t, typename return_t>
 inline return_t accumulate( iterator_t it, iterator_t end, return_t ret ) {
 	for ( ; it != end; ++ it )
 		ret += *it;
+	return ( ret );
+}
+
+/*! \brief Calculate generalized sum of elements in range.
+ *
+ * \param it - begining of range of elemnts to summed up.
+ * \param end - one past last element of range to be summed up.
+ * \param ret - starting value for sum operation.
+ * \param oper - operator used to calculate generalized sum.
+ * \return Generalized sum of all elements in [it, end) + ret.
+ */
+template<typename iterator_t, typename return_t, typename operator_t>
+inline return_t accumulate( iterator_t it, iterator_t end, return_t ret, operator_t oper ) {
+	for ( ; it != end; ++ it )
+		ret = oper( ret, *it );
+	return ( ret );
+}
+
+/*! \brief Calculate inner product of elements in given two ranges of equal length.
+ *
+ * Calculate inner product of two ranges as sum of products of respective pairs
+ * of elements from both ranges.
+ *
+ * \param itLeft - begining of first range of elemnts to calculate inner product.
+ * \param endLeft - one past last element of first range to calculate inner product.
+ * \param itRight - begining of second range of elemnts to calculate inner product.
+ * \param endRight - one past last element of second range to calculate inner product.
+ * \param ret - starting value for sum operation.
+ * \return Inner product of all elements in ranges [itLeft, endLeft) and [itRight, endRight) + ret.
+ */
+template<typename iter_left_t, typename iter_right_t, typename return_t>
+inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
+		iter_right_t itRight, return_t ret ) {
+	for ( ; itLeft != endLeft; ++ itLeft, ++ itRight )
+		ret += ( ( *itLeft ) * ( *itRight ) );
+	return ( ret );
+}
+
+/*! \brief Calculate generalized inner product of elements in given two ranges of equal length.
+ *
+ * Calculate generalized inner product of two ranges
+ * as generalized sum of generalized products of respective pairs
+ * of elements from both ranges.
+ *
+ * \param itLeft - begining of first range of elemnts to calculate inner product.
+ * \param endLeft - one past last element of first range to calculate inner product.
+ * \param itRight - begining of second range of elemnts to calculate inner product.
+ * \param endRight - one past last element of second range to calculate inner product.
+ * \param ret - starting value for sum operation.
+ * \param sumator - generalized sum operator.
+ * \param multiplicator - generalized multiplication operator.
+ * \return Generalized inner product of all elements in ranges [itLeft, endLeft) and [itRight, endRight) + ret.
+ */
+template<typename iter_left_t, typename iter_right_t, typename return_t,
+	typename sumator_t, typename multiplicator_t>
+inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
+		iter_right_t itRight, return_t ret,
+		sumator_t sumator, multiplicator_t multiplicator ) {
+	for ( ; itLeft != endLeft; ++ itLeft, ++ itRight )
+		ret = sumator( ret, multiplicator( *itLeft, *itRight ) );
 	return ( ret );
 }
 
