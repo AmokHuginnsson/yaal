@@ -114,7 +114,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 			}
 		}
 	} while ( false );
-	return ( ! dbLink_._valid );
+	return ( dbLink_._valid );
 }
 
 void yaal_sqlite3_db_disconnect( ODBLink& dbLink_ ) {
@@ -235,7 +235,7 @@ M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 M_EXPORT_SYMBOL bool rs_next( void* );
 M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
-	return ( sqlite3_step( static_cast<sqlite3_stmt*>( result->_data ) ) != SQLITE_ROW );
+	return ( sqlite3_step( static_cast<sqlite3_stmt*>( result->_data ) ) == SQLITE_ROW );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );

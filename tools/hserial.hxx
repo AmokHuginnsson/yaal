@@ -46,20 +46,20 @@ public:
 	 */
 	struct FLAG {
 		typedef enum {
-			DEFAULT								= 0x0001,
+			DEFAULT               = 0x0001,
 			FLOW_CONTROL_HARDWARE = 0x0002,
 			FLOW_CONTROL_SOFTWARE = 0x0004,
-			STOP_BITS_1						= 0x0008,
-			STOP_BITS_2						= 0x0010,
-			PARITY_CHECK					= 0x0020,
-			PARITY_ODD						= 0x0040,
-			BITS_PER_BYTE_8				= 0x0080,
-			BITS_PER_BYTE_7				= 0x0100,
-			BITS_PER_BYTE_6				= 0x0200,
-			BITS_PER_BYTE_5				= 0x0400,
-			CANONICAL							= 0x0800,
-			ECHO									= 0x1000,
-			CR2NL									= 0x2000
+			STOP_BITS_1           = 0x0008,
+			STOP_BITS_2           = 0x0010,
+			PARITY_CHECK          = 0x0020,
+			PARITY_ODD            = 0x0040,
+			BITS_PER_BYTE_8       = 0x0080,
+			BITS_PER_BYTE_7       = 0x0100,
+			BITS_PER_BYTE_6       = 0x0200,
+			BITS_PER_BYTE_5       = 0x0400,
+			CANONICAL             = 0x0800,
+			ECHO                  = 0x1000,
+			CR2NL                 = 0x2000
 		} enum_t;
 	};
 	typedef yaal::hcore::HStrongEnum<FLAG> flag_t;
@@ -100,7 +100,7 @@ protected:
 public:
 	HSerial( yaal::hcore::HString const& = yaal::hcore::HString() ); /* device path */
 	virtual ~HSerial( void );
-	bool open( void );
+	void open( void );
 	void set_speed( speed_t );
 	void set_flags( flag_t );
 	void flush( int );

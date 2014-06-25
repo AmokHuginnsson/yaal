@@ -373,7 +373,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 					if ( ! strcasecmp( option, it->_name ) )
 						optionOK = true, set_option( *it, value );
 				}
-				if ( rc_callback && rc_callback( option, value )
+				if ( rc_callback && !rc_callback( option, value )
 						&& ! optionOK ) {
 					log << "failed." << endl;
 					message.format( "Error: unknown option found: `%s', "

@@ -127,7 +127,7 @@ bool HRegex::compile( char const* pattern_, compile_t flags_ ) {
 			throw HRegexException( error() );
 		}
 	}
-	return ( _lastError != 0 );
+	return ( _lastError == 0 );
 	M_EPILOG
 }
 

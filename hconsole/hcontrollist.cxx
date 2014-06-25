@@ -53,7 +53,7 @@ void HControlList::next_enabled( char shorcut_ ) {
 		++ _focused;
 		if ( dynamic_cast<HStatusBarControl*>( &(*(*_focused))) )
 			continue;
-		loop = (*_focused)->set_focus( shorcut_ ) ? true : false;
+		loop = ! (*_focused)->set_focus( shorcut_ );
 		if ( _focused == it )
 			loop = false;
 	} while ( loop );
@@ -94,15 +94,20 @@ void HControlList::update_all( void ) {
 	M_EPILOG
 }
 
-int HControlList::hit_test_all( mouse::OMouse& mouse_ ) {
+void HControlList::hit_test_all( mouse::OMouse& mouse_ ) {
 	M_PROLOG
-	if ( (*_focused)->hit_test( mouse_._row, mouse_._column ) )
-		return ( (*_focused)->click( mouse_ ) );
-	for ( model_t::iterator it = _list.begin();
-			it != _list.end(); ++ it )
-		if ( (*it)->hit_test( mouse_._row, mouse_._column ) )
-			return ( (*it)->click( mouse_ ) );
-	return( 0 );
+	if ( (*_focused)->hit_test( mouse_._row, mouse_._column ) ) {
+		(*_focused)->click( mouse_ );
+	} else {
+		for ( model_t::iterator it = _list.begin();
+				it != _list.end(); ++ it ) {
+			if ( (*it)->hit_test( mouse_._row, mouse_._column ) ) {
+				(*it)->click( mouse_ );
+				break;
+			}
+		}
+	}
+	return;
 	M_EPILOG
 }
 

@@ -88,12 +88,14 @@ public:
 	bool normalize( void ) {
 		M_PROLOG
 		value_type lenght = norm();
-		if ( ! lenght )
-			return ( true );
-		int long size = _data.size();
-		for ( int long i = 0; i < size; ++ i )
-			_data[ i ] /= lenght;
-		return ( false );
+		bool normalized( false );
+		if ( lenght != 0 ) {
+			int long size = _data.size();
+			for ( int long i = 0; i < size; ++ i )
+				_data[ i ] /= lenght;
+			normalized = true;
+		}
+		return ( normalized );
 		M_EPILOG
 	}
 	int long dim( void ) const {

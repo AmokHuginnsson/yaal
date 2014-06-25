@@ -155,23 +155,25 @@ void set_color( HString& value_, int& attribute_ ) {
 
 bool set_hconsole_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
-	if ( ! strcasecmp( option_, "set_env" ) )
+	bool fail( false );
+	if ( ! strcasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
-	else if ( ! strcasecmp( option_, "screen_background" ) )
+	} else if ( ! strcasecmp( option_, "screen_background" ) ) {
 		_screenBackground_ = COLORS::fg_to_bg( get_color_bits( value_, 0 ) );
-	else if ( ! strcasecmp( option_, "attribute_disabled" ) )
+	} else if ( ! strcasecmp( option_, "attribute_disabled" ) ) {
 		set_color( value_, _attributeDisabled_ );
-	else if ( ! strcasecmp( option_, "attribute_enabled" ) )
+	} else if ( ! strcasecmp( option_, "attribute_enabled" ) ) {
 		set_color( value_, _attributeEnabled_ );
-	else if ( ! strcasecmp( option_, "attribute_focused" ) )
+	} else if ( ! strcasecmp( option_, "attribute_focused" ) ) {
 		set_color( value_, _attributeFocused_ );
-	else if ( ! strcasecmp( option_, "attribute_statusbar" ) )
+	} else if ( ! strcasecmp( option_, "attribute_statusbar" ) ) {
 		set_color( value_, _attributeStatusBar_ );
-	else if ( ! strcasecmp( option_, "attribute_search_highlight" ) )
+	} else if ( ! strcasecmp( option_, "attribute_search_highlight" ) ) {
 		set_color( value_, _attributeSearchHighlight_ );
-	else
-		return ( true );
-	return ( false );
+	} else {
+		fail = true;
+	}
+	return ( ! fail );
 	M_EPILOG
 }
 

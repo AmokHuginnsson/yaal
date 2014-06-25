@@ -100,14 +100,13 @@ public:
 	virtual ~HEditControl( void );
 	void set_flags( bool = false, bool = false );
 	virtual HInfo const& get( void ) const;
-	virtual int set_focus( char = 0 );
 	virtual void set( HInfo const& );
 	void set_text( yaal::hcore::HString const& );
 	yaal::hcore::HString const& get_text( void ) const;
 protected:
 	virtual void do_refresh( void );
 	virtual int do_process_input( int );
-	virtual int do_click( mouse::OMouse& );
+	virtual bool do_click( mouse::OMouse& );
 private:
 	int find_eow( int );
 	int go_to_eow( int );

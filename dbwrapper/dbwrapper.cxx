@@ -127,13 +127,15 @@ namespace {
 
 bool set_dbwrapper_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
-	if ( ! strcasecmp( option_, "set_env" ) )
+	bool fail( false );
+	if ( ! strcasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
-	else if ( ! strcasecmp( option_, "log_mask" ) ) {
-		if ( ! strcasecmp( value_, "LOG_SQL" ) )
+	} else if ( ! strcasecmp( option_, "log_mask" ) ) {
+		if ( ! strcasecmp( value_, "LOG_SQL" ) ) {
 			HLog::_logMask |= LOG_TYPE::SQL;
-		else
-			return ( true );
+		} else {
+			fail = true;
+		}
 	} else if ( ! strcasecmp( option_, "data_base_driver" ) ) {
 		try {
 			dbwrapper::_dataBaseDriver_ = db_driver_from_string( value_ );
@@ -142,9 +144,10 @@ bool set_dbwrapper_variables( HString& option_, HString& value_ ) {
 			log << "' is unknown driver." << endl;
 			exit( 1 );
 		}
-	} else
-		return ( true );
-	return ( false );
+	} else {
+		fail = true;
+	}
+	return ( ! fail );
 	M_EPILOG
 }
 

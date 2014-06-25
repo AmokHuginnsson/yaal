@@ -80,7 +80,7 @@ HSerial::~HSerial( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-bool HSerial::open( void ) {
+void HSerial::open( void ) {
 	M_PROLOG
 	if ( _fileDescriptor >= 0 )
 		M_THROW( _eAlreadyOpened_, errno );
@@ -90,13 +90,12 @@ bool HSerial::open( void ) {
 	M_ENSURE( _fileDescriptor >= 0 );
 	if ( ! ::isatty( _fileDescriptor ) )
 		M_THROW( _( "not a tty device" ), _fileDescriptor );
-	::tcgetattr( _fileDescriptor, _backUpTIO.get<termios>() );
-	::fcntl( _fileDescriptor, F_SETFD, 0 );
-	::fcntl( _fileDescriptor, F_SETFL, 0 );
-	::tcflush( _fileDescriptor, TCIOFLUSH );
-	::tcsetattr( _fileDescriptor, TCSANOW,
-			_tIO.get<termios const>() );
-	return ( false );
+	M_ENSURE( ::tcgetattr( _fileDescriptor, _backUpTIO.get<termios>() ) == 0 );
+	M_ENSURE( ::fcntl( _fileDescriptor, F_SETFD, 0 ) == 0 );
+	M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, 0 ) == 0 );
+	M_ENSURE( ::tcflush( _fileDescriptor, TCIOFLUSH ) == 0 );
+	M_ENSURE( ::tcsetattr( _fileDescriptor, TCSANOW, _tIO.get<termios const>() ) == 0 );
+	return;
 	M_EPILOG
 }
 

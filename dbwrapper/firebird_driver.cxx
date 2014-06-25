@@ -125,7 +125,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 	if ( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) )
 		dbLink_._valid = true;
 	dbLink_._conn = db.release();
-	return ( ! dbLink_._valid );
+	return ( dbLink_._valid );
 }
 
 M_EXPORT_SYMBOL void db_disconnect( ODBLink& );
@@ -334,7 +334,7 @@ M_EXPORT_SYMBOL bool rs_next( void* );
 M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
-	return ( isc_dsql_fetch( db->_status, &res->_stmt, 1, res->_metaData.get<XSQLDA>() ) != 0 );
+	return ( isc_dsql_fetch( db->_status, &res->_stmt, 1, res->_metaData.get<XSQLDA>() ) == 0 );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );

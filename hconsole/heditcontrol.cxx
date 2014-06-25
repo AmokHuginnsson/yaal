@@ -531,23 +531,19 @@ void HEditControl::set( HInfo const& info_ ) {
 	M_EPILOG
 }
 
-int HEditControl::set_focus( char shorcut_ ) {
+bool HEditControl::do_click( mouse::OMouse & mouse_ ) {
 	M_PROLOG
-	return ( HControl::set_focus( shorcut_ ) );
-	M_EPILOG
-}
-
-int HEditControl::do_click( mouse::OMouse & mouse_ ) {
-	M_PROLOG
-	int position = 0;
-	if ( ! HControl::do_click( mouse_ ) )
-		return ( 1 );
-	position = mouse_._column - _columnRaw;
-	if ( position < _string.get_length() ) {
-		_cursorPosition = position;
-		schedule_refresh();
+	bool handled( HControl::do_click( mouse_ ) );
+	if ( ! handled ) {
+		int position( 0 );
+		position = mouse_._column - _columnRaw;
+		if ( position < _string.get_length() ) {
+			_cursorPosition = position;
+			schedule_refresh();
+			handled = true;
+		}
 	}
-	return ( 0 );
+	return ( handled );
 	M_EPILOG
 }
 

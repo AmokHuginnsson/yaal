@@ -31,7 +31,7 @@ Copyright:
 #include "hconsole/hcontrol.hxx"
 
 namespace yaal {
-	
+
 namespace hconsole {
 
 /*! \brief Implementation of TUI LogPad control class.

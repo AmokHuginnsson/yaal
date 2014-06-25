@@ -121,18 +121,21 @@ int HControl::do_process_input( int code_ ) {
 	M_EPILOG
 }
 
-int HControl::set_focus( char shortCut_ ) {
+bool HControl::set_focus( char shortCut_ ) {
 	M_PROLOG
-	if ( ! _enabled )
-		return ( 1 );
-	if ( ( shortCut_ > 0 ) && ( _label[ _shortcutIndex ] != shortCut_ ) )
-		return ( 1 );
-	_focused = true;
-	if ( ! shortCut_ )
-		_parent->acquire_focus( this );
-	if ( shortCut_ <= 0 )
-		schedule_refresh();
-	return ( 0 );
+	bool focusChanged( false );
+	if ( _enabled && ( ( shortCut_ <= 0 ) || ( _label[ _shortcutIndex ] == shortCut_ ) ) ) {
+		bool oldFocus( _focused );
+		_focused = true;
+		if ( ! shortCut_ ) {
+			_parent->acquire_focus( this );
+		}
+		if ( oldFocus != _focused ) {
+			schedule_refresh();
+			focusChanged = true;
+		}
+	}
+	return ( focusChanged );
 	M_EPILOG
 }
 
@@ -254,20 +257,27 @@ void HControl::move( int row_, int column_, int height_, int width_ ) {
 	M_EPILOG
 }
 
-int HControl::click( mouse::OMouse& mouse_ ) {
+bool HControl::click( mouse::OMouse& mouse_ ) {
 	M_PROLOG
-	if ( ! _valid )
-		update();
-	return ( do_click( mouse_ ) );
+	bool handled( false );
+	if ( _enabled ) {
+		if ( ! _valid ) {
+			update();
+		}
+		handled = do_click( mouse_ );
+	}
+	return ( handled );
 	M_EPILOG
 }
 
-int HControl::do_click( mouse::OMouse& ) {
+bool HControl::do_click( mouse::OMouse& ) {
 	M_PROLOG
-	if ( _focused )
-		return ( 1 );
-	set_focus();
-	return ( 0 );
+	bool handled( false );
+	if ( ! _focused ) {
+		set_focus();
+		handled = true;
+	}
+	return ( handled );
 	M_EPILOG
 }
 
@@ -277,18 +287,24 @@ void HControl::do_update( void ) {
 
 bool HControl::hit_test( int row_, int column_ ) const {
 	M_PROLOG
-	return ( do_hit_test( row_, column_ ) );
+	bool hit( false );
+	if ( _enabled ) {
+		hit = do_hit_test( row_, column_ );
+	}
+	return ( hit );
 	M_EPILOG
 }
 
 bool HControl::do_hit_test( int row_, int column_ ) const {
 	M_PROLOG
-	if ( ( row_ < _rowRaw ) || ( row_ > ( _rowRaw + _heightRaw ) ) )
-		return ( false );
-	if ( ( column_ < _columnRaw )
-			|| ( column_ >= ( _columnRaw + _widthRaw ) ) )
-		return ( false );
-	return ( true );
+	bool hit( true );
+	if ( ( row_ < _rowRaw ) || ( row_ > ( _rowRaw + _heightRaw ) ) ) {
+		hit = false;
+	} if ( ( column_ < _columnRaw )
+			|| ( column_ >= ( _columnRaw + _widthRaw ) ) ) {
+		hit = false;
+	}
+	return ( hit );
 	M_EPILOG
 }
 

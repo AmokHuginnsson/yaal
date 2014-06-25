@@ -267,42 +267,47 @@ bool verify_IBAN( HString const& IBAN_ ) {
 	int long length = IBAN_.get_length();
 	char pattern[ 2 ] = "\0";
 	HString IBAN, tmpString;
-	if ( length < MIN_IBAN_LENGTH ) {
-		_lastErrorMessage_.format( "IBAN: Number too short (%d).", static_cast<int>( length ) );
-		return ( true );
-	}
-	IBAN.hs_realloc( length );
-	for ( ctr = 0; ctr < length; ctr ++ )
-		if ( isalnum( IBAN_[ ctr ] ) )
-			IBAN += IBAN_[ ctr ];
-	length = IBAN.get_length();
-	if ( length < MIN_IBAN_LENGTH ) {
-		_lastErrorMessage_.format( "IBAN: Number too short (%d).", static_cast<int>( length ) );
-		return ( true );
-	}
-	if ( ! ( isalpha( IBAN[ 0 ] ) && isalpha( IBAN[ 1 ] ) ) ) {
-		_lastErrorMessage_ = "IBAN: No country code present.";
-		return ( true );
-	}
-	tmpString = IBAN.left( 4 );
-	IBAN.shift_left ( 4 );
-	IBAN += tmpString;
-/*	M_LOG ( IBAN ); */
-	IBAN.lower();
-	for ( ctr = 0; ctr < length; ctr ++ ) {
-		if ( isalpha ( IBAN[ ctr ] ) ) {
-			tmpString.format( "%02d", ( IBAN[ ctr ] - 'a' ) + 10 );
-			pattern[ 0 ] = IBAN[ ctr ];
-			IBAN.replace( pattern, tmpString );
-			length = IBAN.get_length();
+	bool valid( false );
+	do {
+		if ( length < MIN_IBAN_LENGTH ) {
+			_lastErrorMessage_.format( "IBAN: Number too short (%d).", static_cast<int>( length ) );
+			break;
 		}
-	}
-/*	M_LOG ( IBAN ); */
-	ctr = modulo_ASCII( IBAN, 97 );
-	if ( ctr == 1 )
-		return ( false );
-	_lastErrorMessage_.format( "IBAN: bad checksum: %d", ctr );
-	return ( true );
+		IBAN.hs_realloc( length );
+		for ( ctr = 0; ctr < length; ctr ++ )
+			if ( isalnum( IBAN_[ ctr ] ) )
+				IBAN += IBAN_[ ctr ];
+		length = IBAN.get_length();
+		if ( length < MIN_IBAN_LENGTH ) {
+			_lastErrorMessage_.format( "IBAN: Number too short (%d).", static_cast<int>( length ) );
+			break;
+		}
+		if ( ! ( isalpha( IBAN[ 0 ] ) && isalpha( IBAN[ 1 ] ) ) ) {
+			_lastErrorMessage_ = "IBAN: No country code present.";
+			break;
+		}
+		tmpString = IBAN.left( 4 );
+		IBAN.shift_left ( 4 );
+		IBAN += tmpString;
+	/*	M_LOG ( IBAN ); */
+		IBAN.lower();
+		for ( ctr = 0; ctr < length; ctr ++ ) {
+			if ( isalpha ( IBAN[ ctr ] ) ) {
+				tmpString.format( "%02d", ( IBAN[ ctr ] - 'a' ) + 10 );
+				pattern[ 0 ] = IBAN[ ctr ];
+				IBAN.replace( pattern, tmpString );
+				length = IBAN.get_length();
+			}
+		}
+	/*	M_LOG ( IBAN ); */
+		ctr = modulo_ASCII( IBAN, 97 );
+		if ( ctr != 1 ) {
+			_lastErrorMessage_.format( "IBAN: bad checksum: %d", ctr );
+			break;
+		}
+		valid = true;
+	} while ( false );
+	return ( valid );
 	M_EPILOG
 }
 

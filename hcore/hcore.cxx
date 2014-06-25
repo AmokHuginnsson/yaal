@@ -84,43 +84,47 @@ namespace {
 bool set_hcore_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
 	bool fail( false );
-	if ( ! strcasecmp( option_, "set_env" ) )
+	if ( ! strcasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
-	else if ( ! strcasecmp( option_, "log_mask" ) ) {
+	} else if ( ! strcasecmp( option_, "log_mask" ) ) {
 		HTokenizer t( value_, " \t", HTokenizer::DELIMITED_BY_ANY_OF );
 		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it ) {
-			if ( ! strcasecmp( *it, "LOG_DEBUG" ) )
+			if ( ! strcasecmp( *it, "LOG_DEBUG" ) ) {
 				HLog::_logMask |= LOG_TYPE::DEBUG;
-			else if ( ! strcasecmp( *it, "LOG_INFO" ) )
+			} else if ( ! strcasecmp( *it, "LOG_INFO" ) ) {
 				HLog::_logMask |= LOG_TYPE::INFO;
-			else if ( ! strcasecmp( *it, "LOG_NOTICE" ) )
+			} else if ( ! strcasecmp( *it, "LOG_NOTICE" ) ) {
 				HLog::_logMask |= LOG_TYPE::NOTICE;
-			else if ( ! strcasecmp( *it, "LOG_WARNING" ) )
+			} else if ( ! strcasecmp( *it, "LOG_WARNING" ) ) {
 				HLog::_logMask |= LOG_TYPE::WARNING;
-			else if ( ! strcasecmp( *it, "LOG_ERROR" ) )
+			} else if ( ! strcasecmp( *it, "LOG_ERROR" ) ) {
 				HLog::_logMask |= LOG_TYPE::ERROR;
-			else if ( ! strcasecmp( *it, "LOG_VCSHEADER" ) )
+			} else if ( ! strcasecmp( *it, "LOG_VCSHEADER" ) ) {
 				HLog::_logMask |= LOG_TYPE::VCSHEADER;
-			else
+			} else {
 				fail = true;
+			}
 		}
 	} else if ( ! strcasecmp( option_, "semaphore_type" ) ) {
-		if ( value_ == "POSIX" )
+		if ( value_ == "POSIX" ) {
 			HSemaphore::DEFAULT = HSemaphore::TYPE::POSIX;
-		else if ( value_ == "YAAL" )
+		} else if ( value_ == "YAAL" ) {
 			HSemaphore::DEFAULT = HSemaphore::TYPE::YAAL;
-		else
+		} else {
 			fail = true;
+		}
 	} else if ( ! strcasecmp( option_, "on_alloc_failure" ) ) {
-		if ( value_ == "ABORT" )
+		if ( value_ == "ABORT" ) {
 			memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::ABORT;
-		else if ( value_ == "THROW" )
+		} else if ( value_ == "THROW" ) {
 			memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::THROW;
-		else
+		} else {
 			fail = true;
-	} else
+		}
+	} else {
 		fail = true;
-	return ( fail );
+	}
+	return ( !fail );
 	M_EPILOG
 }
 

@@ -144,7 +144,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& /
 					static_cast<ub4>( _instanceName_.get_length() ) ) ) == OCI_SUCCESS )
 			dbLink_._valid = true;
 	} while ( false );
-	return ( ! dbLink_._valid );
+	return ( dbLink_._valid );
 }
 
 void yaal_oracle_db_disconnect( ODBLink& dbLink_ ) {
@@ -394,7 +394,7 @@ M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 	OQuery* query( static_cast<OQuery*>( data_ ) );
 	return ( ( ( *query->_status ) = OCIStmtFetch2( query->_statement,
 					query->_error, 1, OCI_FETCH_NEXT, 0 /* Ignored for non-scrollable statements. */,
-					OCI_DEFAULT ) ) != OCI_SUCCESS );
+					OCI_DEFAULT ) ) == OCI_SUCCESS );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );

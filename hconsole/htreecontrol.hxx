@@ -207,12 +207,11 @@ public:
 								 char const* );	/* label */
 	virtual ~HTreeControl( void );
 	int draw_node( tree_t::node_t, int );
-	virtual int set_focus( char = 0 );
 	void set_model( HTreeControlModelInterface::ptr_t );
 	HTreeControlModelInterface::ptr_t get_model( void ) const;
 protected:
 	virtual int do_process_input( int );
-	virtual int do_click( mouse::OMouse& );
+	virtual bool do_click( mouse::OMouse& );
 	virtual void do_refresh( void );
 private:
 	bool do_click( tree_t::node_t, mouse::OMouse& );

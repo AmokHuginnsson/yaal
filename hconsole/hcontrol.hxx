@@ -68,40 +68,40 @@ public:
 	static OAttribute const DEFAULT_ATTRS; /*!< Default HControl attribites (colors of label and data fore/back-ground) */
 	typedef yaal::hcore::HPointer<HControl> ptr_t;
 protected:
-	bool			_enabled;						/*!< Tells if control is enabled, focus can go only to enabled control. */
-	bool			_focused;						/*!< Tells if control has focus. */
-	bool			_drawLabel;					/*!< Will be label driven? */
-	bool 			_singleLine;				/*!< Is label in the same line as top of control? */
+	bool _enabled;    /*!< Tells if control is enabled, focus can go only to enabled control. */
+	bool _focused;    /*!< Tells if control has focus. */
+	bool _drawLabel;  /*!< Will be label driven? */
+	bool _singleLine; /*!< Is label in the same line as top of control? */
 	/** \name Control attributes.
 	 * High byte of attribute, in all
 	 * three cases keeps label (control title)
 	 * color, low byte keeps work place color */
 	//@{
 	OAttribute _attributeDisabled; /*!< The attribute of disabled cotrol. */
-	OAttribute _attributeEnabled;	 /*!< The attribute of enabled cotrol. */	
-	OAttribute _attributeFocused;	 /*!< The attribute of focused cotrol. */
+	OAttribute _attributeEnabled;  /*!< The attribute of enabled cotrol. */
+	OAttribute _attributeFocused;  /*!< The attribute of focused cotrol. */
 	//@}
-	int				_row;								/*!< Control top coordinate relative
-																		 to parent window (top or bottom border). */
-	int				_column;						/*!< Control left coordinate relative
-																		 to parent window (left or right border). */
-	int				_height;						/*!< Height or coorinate of bottom of control. */
-	int				_width;							/*!< Width or coorinate of right of control. */
-	int				_rowRaw;						/*!< Control top coordinate relative
-																		 to parent window (after repositioning). */
-	int				_columnRaw;					/*!< Control left coordinate relative
-																		 to parent window (after repositioning). */
-	int				_heightRaw;					/*!< Drawing state keeping helper. */
-	int				_widthRaw;					/*!< Drawing state keeping helper. */
-	hcore::HString	_label;					/*!< Control title. */
-	hcore::HString	_varTmpBuffer;	/*!< Buffer for temporary operations, used
-																			 to keep memory fragmentation low. */
-	HWindow* _parent;						/*!< Window that will hold this control. */
+	int _row;       /*!< Control top coordinate relative
+	                     to parent window (top or bottom border). */
+	int _column;    /*!< Control left coordinate relative
+	                     to parent window (left or right border). */
+	int _height;    /*!< Height or coorinate of bottom of control. */
+	int _width;     /*!< Width or coorinate of right of control. */
+	int _rowRaw;    /*!< Control top coordinate relative
+	                     to parent window (after repositioning). */
+	int _columnRaw; /*!< Control left coordinate relative
+	                     to parent window (after repositioning). */
+	int _heightRaw; /*!< Drawing state keeping helper. */
+	int _widthRaw;  /*!< Drawing state keeping helper. */
+	hcore::HString _label;        /*!< Control title. */
+	hcore::HString _varTmpBuffer; /*!< Buffer for temporary operations, used
+	                                   to keep memory fragmentation low. */
+	HWindow* _parent;   /*!< Window that will hold this control. */
 /* this is used locally, there is no way to modify this variables explicitly */
-	int				_labelLength;	 			/*!< Length of the label. */
-	int				_shortcutIndex;			/*!< Index of shortcut char in label. */
-	bool			_valid;							/*!< Is controler data in sync with control internals. */
-	bool			_needRepaint;				/*!< Does this control need to be repainted. */
+	int _labelLength;   /*!< Length of the label. */
+	int _shortcutIndex; /*!< Index of shortcut char in label. */
+	bool _valid;        /*!< Is model data in sync with control internals. */
+	bool _needRepaint;  /*!< Does this control need to be repainted. */
 public:
 /** \brief Control constructor.
  *
@@ -143,9 +143,9 @@ public:
  * Set focus if control is enabled or if shortcut char is specified.
  *
  * \param shortcut - Alphanumeric portion of keypress event that possibly holds shortcut to this control.
- * \return If focus was successfuly switched return 0, otherwise return 1.
+ * \return True iff focus was successfuly switched to this control.
  */
-	virtual int set_focus( char shortcut = 0 ); /* focused and shortcut char match */
+	virtual bool set_focus( char shortcut = 0 ); /* focused and shortcut char match */
 
 /*! \brief Focus managing method (lose).
  *
@@ -186,11 +186,11 @@ public:
  */
 	void refresh( void );
 
-/*! \brief Update control internals to comply with new Controler data.
+/*! \brief Update control internals to comply with new Model data.
  *
- * The external Controler for this control changed its data,
- * now control must update its internal data structures to resychronize with
- * its Controler.
+ * The external Model for this control changed its data, now control
+ * must update its internal data structures to resychronize with
+ * its Model.
  */
 	void update( void );
 
@@ -199,9 +199,9 @@ public:
  * All mouse input for this control shall be handled inside this method call.
  *
  * \param eventdesc - Full description of mouse event that occured in this control.
- * \return Return 1 if control can be focused or already has a focus, return 0 otherwise.
+ * \return Return true iff click action was handled in whole by this control.
  */
-	int click( mouse::OMouse& eventdesc );
+	bool click( mouse::OMouse& eventdesc );
 
 /*! \brief Test if some point belongs to this control.
  *
@@ -265,7 +265,7 @@ public:
  */
 	void schedule_refresh( void );
 
-/*! \brief Mark this control as no longer synchronized with its internel controler.
+/*! \brief Mark this control as no longer synchronized with its internel model.
  */
 	void invalidate( void );
 
@@ -283,7 +283,7 @@ protected:
 	virtual void do_refresh( void ) = 0;
 	virtual void do_update( void );
 	virtual bool do_hit_test( int, int ) const;
-	virtual int do_click( mouse::OMouse& );
+	virtual bool do_click( mouse::OMouse& );
 	virtual void do_draw_label( void );
 	void draw_label( void );
 private:

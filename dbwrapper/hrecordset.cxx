@@ -125,7 +125,7 @@ HRecordSet::value_t HRecordSet::get( int cursor_, int field_ ) {
 }
 
 HRecordSet::iterator HRecordSet::begin( void ) {
-	return ( iterator( this, ( _cursor == CURSOR::RANDOM_ACCESS ) ? 0 : ( (_connector->rs_next( _result ) ? INVALID_CURSOR : 0 ) ) ) );
+	return ( iterator( this, ( _cursor == CURSOR::RANDOM_ACCESS ) ? 0 : ( (_connector->rs_next( _result ) ? 0 : INVALID_CURSOR ) ) ) );
 }
 
 HRecordSet::iterator HRecordSet::end( void ) {
@@ -182,8 +182,9 @@ HRecordSet::HIterator& HRecordSet::HIterator::operator ++ ( void ) {
 	M_ENSURE( _cursorPosition != INVALID_CURSOR );
 	++ _cursorPosition;
 	if ( _owner->_cursor == HRecordSet::CURSOR::FORWARD ) {
-		if ( _owner->_connector->rs_next( _owner->_result ) )
+		if ( ! _owner->_connector->rs_next( _owner->_result ) ) {
 			_cursorPosition = INVALID_CURSOR;
+		}
 	}
 	return ( *this );
 	M_EPILOG

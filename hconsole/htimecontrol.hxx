@@ -50,7 +50,7 @@ public:
 protected:
 	virtual void do_refresh( void );
 	virtual int do_process_input( int );
-	virtual int do_click( mouse::OMouse& );
+	virtual bool do_click( mouse::OMouse& );
 };
 
 }

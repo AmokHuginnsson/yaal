@@ -310,7 +310,7 @@ public:
 	virtual ~HAbstractControler( void );
 	virtual void sort( list_control_helper::OSortHelper& ) = 0;
 	virtual int long size( void ) = 0;
-	virtual bool empty( void ) = 0;
+	virtual bool is_empty( void ) = 0;
 	virtual HModelIteratorWrapper begin() = 0;
 	virtual HModelIteratorWrapper end() = 0;
 	virtual HModelIteratorWrapper rbegin() = 0;
@@ -388,7 +388,7 @@ public:
 	void remove_tail( void );
 	model_ptr_t get_model( void );
 	virtual void sort( list_control_helper::OSortHelper& );
-	virtual bool empty( void );
+	virtual bool is_empty( void );
 	virtual int long size( void );
 	virtual HModelIteratorWrapper begin();
 	virtual HModelIteratorWrapper end();
@@ -489,7 +489,6 @@ public:
 			BITS::ALIGN::align_t const& = BITS::ALIGN::LEFT,		/* align */
 			type_id_t = TYPE::HSTRING,	/* type */
 			HControl * = NULL );					/* control associated */
-	virtual int set_focus( char = 0 );
 	void set_flags( flag_t, flag_t );
 	void reset( void );
 	list_control_helper::HAbstractControler::ptr_t& get_controler( void );
@@ -503,7 +502,7 @@ protected:
 	virtual int do_process_input( int );
 	virtual bool is_searchable( void );
 	virtual void do_update( void );
-	virtual int do_click( mouse::OMouse& );
+	virtual bool do_click( mouse::OMouse& );
 	virtual void go_to_match( void );
 	virtual void go_to_match_previous( void );
 	void handle_key_page_up( void );
@@ -603,8 +602,8 @@ HAbstractControler::HModelIteratorWrapper HListControler<tType>::rend( void ) {
 }
 
 template<typename tType>
-bool HListControler<tType>::empty( void ) {
-	return ( _list->empty() );
+bool HListControler<tType>::is_empty( void ) {
+	return ( _list->is_empty() );
 }
 
 template<typename tType>

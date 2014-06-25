@@ -263,19 +263,16 @@ int HTreeControl::do_process_input( int code_ ) {
 	M_EPILOG
 }
 
-int HTreeControl::set_focus( char shorcut_ ) {
+bool HTreeControl::do_click( OMouse& mouse_ ) {
 	M_PROLOG
-	return ( HControl::set_focus ( shorcut_ ) );
-	M_EPILOG
-}
-
-int HTreeControl::do_click( OMouse& mouse_ ) {
-	M_PROLOG
-	if ( ! HControl::do_click( mouse_ ) )
-		return ( 1 );
-	if ( _tree.get_root() && do_click( _tree.get_root(), mouse_ ) )
-		schedule_refresh();
-	return ( 0 );
+	bool handled( HControl::do_click( mouse_ ) );
+	if ( ! handled ) {
+		if ( _tree.get_root() && do_click( _tree.get_root(), mouse_ ) ) {
+			schedule_refresh();
+			handled = true;
+		}
+	}
+	return ( handled );
 	M_EPILOG
 }
 

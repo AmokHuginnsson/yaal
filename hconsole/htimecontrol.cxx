@@ -62,9 +62,9 @@ int HTimeControl::do_process_input( int code_ ) {
 	M_EPILOG
 }
 
-int HTimeControl::do_click( mouse::OMouse& ) {
+bool HTimeControl::do_click( mouse::OMouse& ) {
 	M_PROLOG
-	return ( 0 );
+	return ( false );
 	M_EPILOG
 }
 

@@ -77,7 +77,7 @@ public:
  */
 	void schedule_refresh( void );
 private:
-	friend int HControl::set_focus( char );
+	friend bool HControl::set_focus( char );
 	friend void HStatusBarControl::set_prompt( char const *,
 			HStatusBarControl::PROMPT::mode_t,
 			HStatusBarControl::PROMPT::restrict_t );

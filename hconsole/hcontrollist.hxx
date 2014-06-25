@@ -55,7 +55,7 @@ public:
 	void add_control( HControl::ptr_t );
 	void refresh_all( bool );
 	void update_all( void );
-	int hit_test_all( mouse::OMouse& );
+	void hit_test_all( mouse::OMouse& );
 	HControl* get_control_by_no( int );
 	void exchange( int, int );
 };

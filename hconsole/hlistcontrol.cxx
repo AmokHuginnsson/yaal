@@ -455,7 +455,7 @@ void HListControl::handle_key_ctrl_p( void ) {
 }
 
 void HListControl::handle_key_space( void ) {
-	M_ASSERT( ! _controler->empty() );
+	M_ASSERT( ! _controler->is_empty() );
 	M_ASSERT( _cursor.is_valid() );
 	if ( _checkable )
 		_cursor->switch_state();
@@ -544,12 +544,6 @@ void HListControl::add_column( int column_, char const* name_,
 	M_EPILOG
 }
 
-int HListControl::set_focus( char shorcut_ ) {
-	M_PROLOG
-	return ( HControl::set_focus( shorcut_ ) );
-	M_EPILOG
-}
-
 void HListControl::recalculate_column_widths( void ) {
 	M_PROLOG
 	int ctrLoc( 0 );
@@ -595,47 +589,50 @@ void HListControl::sort_by_column( int column_, OSortHelper::sort_order_t order_
 	M_EPILOG
 }
 
-int HListControl::do_click( mouse::OMouse& mouse_ ) {
+bool HListControl::do_click( mouse::OMouse& mouse_ ) {
 	M_PROLOG
-	int row = 0;
+	int row( 0 );
 	int columns( static_cast<int>( _header.size() ) );
 	HColumnInfo* columnInfo = NULL;
-	if ( ! HControl::do_click( mouse_ ) )
-		return ( 1 );
-	row = ( mouse_._row - _rowRaw ) - ( _drawHeader ? 1 : 0 );
-	if ( row < 0 ) /* header clicked */ {
-		int column( mouse_._column + _columnRaw - 1 );
-		int width( 0 );
-		for ( int ctr( 0 ); ctr < columns; ++ ctr ) {
-			columnInfo = &_header [ ctr ];
-			width += columnInfo->_widthRaw;
-			if ( column <= width ) {
-				sort_by_column( ctr,
-						columnInfo->_descending ? OSortHelper::ASCENDING : OSortHelper::DESCENDING );
-				schedule_refresh();
-				break;
+	bool handled( HControl::do_click( mouse_ ) );
+	if ( ! handled ) {
+		row = ( mouse_._row - _rowRaw ) - ( _drawHeader ? 1 : 0 );
+		if ( row < 0 ) /* header clicked */ {
+			int column( mouse_._column + _columnRaw - 1 );
+			int width( 0 );
+			for ( int ctr( 0 ); ctr < columns; ++ ctr ) {
+				columnInfo = &_header [ ctr ];
+				width += columnInfo->_widthRaw;
+				if ( column <= width ) {
+					sort_by_column( ctr,
+							columnInfo->_descending ? OSortHelper::ASCENDING : OSortHelper::DESCENDING );
+					schedule_refresh();
+					handled = true;
+					break;
+				}
 			}
-		}
-	} else if ( row < _controler->size() ) {
-		if ( mouse_._buttons & MOUSE_BITS::BUTTON::WHEEL_UP )
-			scroll_up();
-		else if ( mouse_._buttons & MOUSE_BITS::BUTTON::WHEEL_DOWN )
-			scroll_down();
-		else if ( row == _cursorPosition )
-			return ( 1 );
-		else {
-			if ( row > _cursorPosition ) {
-				for ( int i( _cursorPosition ); i < row; ++ i )
-					++ _cursor;
+		} else if ( row < _controler->size() ) {
+			if ( mouse_._buttons & MOUSE_BITS::BUTTON::WHEEL_UP ) {
+				scroll_up();
+			} else if ( mouse_._buttons & MOUSE_BITS::BUTTON::WHEEL_DOWN ) {
+				scroll_down();
+			} else if ( row == _cursorPosition ) {
+				return ( false );
 			} else {
-				for ( int i( _cursorPosition ); i > row; -- i )
-					-- _cursor;
+				if ( row > _cursorPosition ) {
+					for ( int i( _cursorPosition ); i < row; ++ i )
+						++ _cursor;
+				} else {
+					for ( int i( _cursorPosition ); i > row; -- i )
+						-- _cursor;
+				}
+				_cursorPosition = row;
 			}
-			_cursorPosition = row;
+			schedule_refresh();
+			handled = true;
 		}
-		schedule_refresh();
 	}
-	return ( 0 );
+	return ( handled );
 	M_EPILOG
 }
 

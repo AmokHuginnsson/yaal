@@ -67,7 +67,7 @@ public:
 		M_PROLOG
 		if ( ! _checkpoints.top().insert( rule_ ).second )
 			throw HRecursionDetectorException( "Infinite recursion detected." );
-		return ( ! _visited.insert( rule_ ).second );
+		return ( _visited.insert( rule_ ).second );
 		M_EPILOG
 	}
 	void reset_visits( void ) {
@@ -102,7 +102,7 @@ public:
 	}
 	bool visit( HRuleBase const* rule_ ) {
 		M_PROLOG
-		return ( ! _visited.insert( rule_ ).second );
+		return ( _visited.insert( rule_ ).second );
 		M_EPILOG
 	}
 	void verify( HNamedRule& nr_ ) {
@@ -223,7 +223,7 @@ bool HExecutingParser::parse( yaal::hcore::HString::const_iterator first_, yaal:
 	}
 	_inputStart = NULL;
 	_matched = ( it == last_ );
-	return ( ! _matched );
+	return ( _matched );
 	M_EPILOG
 }
 
@@ -386,7 +386,7 @@ void HRuleBase::detach( HRuleBase const* rule_, visited_t& visited_, bool& detac
 
 void HRuleBase::detect_recursion( HRecursionDetector& recursionDetector_ ) const {
 	M_PROLOG
-	if ( ! recursionDetector_.visit( this ) )
+	if ( recursionDetector_.visit( this ) )
 		do_detect_recursion( recursionDetector_ );
 	return;
 	M_EPILOG
@@ -394,7 +394,7 @@ void HRuleBase::detect_recursion( HRecursionDetector& recursionDetector_ ) const
 
 void HRuleBase::find_recursions( HRuleAggregator& recursions_ ) {
 	M_PROLOG
-	if ( ! recursions_.visit( this ) )
+	if ( recursions_.visit( this ) )
 		do_find_recursions( recursions_ );
 	return;
 	M_EPILOG

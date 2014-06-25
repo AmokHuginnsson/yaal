@@ -62,23 +62,22 @@ protected:
 	MODE::mode_t _mode; /* operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
 	int _droppedWidth;	/* width of dropped list */
 public:
-	HComboboxControl ( HWindow *,			/* parent */
-										 int,						/* row */
-										 int,						/* col */
-										 int,						/* height */
-										 int,						/* width */
-										 char const *,	/* label */
-										 int = 0, 			/* dropped width */
-										 int = 127,			/* max string length */
-										 char const * = _maskDefault_,	/* regexp (mask) */
-										 bool = true		/* searchable */ );		/* focused attribute */
+	HComboboxControl ( HWindow* parent,
+										 int row,
+										 int col,
+										 int height,
+										 int width,
+										 char const * label,
+										 int droppedWidth = 0,
+										 int maxStringLength = 127,
+										 char const* regexp = _maskDefault_,
+										 bool searchable = true );
 	virtual ~HComboboxControl ( void );
-	virtual int set_focus ( char = 0 );
-	virtual int kill_focus ( void ); /* this one will be used here */
+	virtual int kill_focus( void ); /* this one will be used here */
 protected:
-	virtual int do_process_input ( int );
-	virtual void do_refresh ( void );
-	virtual int do_click ( mouse::OMouse & );
+	virtual int do_process_input( int );
+	virtual void do_refresh( void );
+	virtual bool do_click( mouse::OMouse& );
 private:
 	void close_combo ( void );
 };

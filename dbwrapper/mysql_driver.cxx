@@ -104,7 +104,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 				dbLink_._valid = true;
 		}
 	}
-	return ( ! dbLink_._valid );
+	return ( dbLink_._valid );
 }
 
 M_EXPORT_SYMBOL void db_disconnect( ODBLink& );
@@ -175,7 +175,7 @@ M_EXPORT_SYMBOL bool rs_next( void* );
 M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 	OMySQLResult* pr( static_cast<OMySQLResult*>( data_ ) );
 	pr->_row = mysql_fetch_row( pr->_result );
-	return ( pr->_row == NULL );
+	return ( pr->_row != NULL );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );

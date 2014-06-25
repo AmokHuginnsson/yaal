@@ -59,15 +59,7 @@ HComboboxControl::~HComboboxControl ( void ) {
 	M_EPILOG
 }
 
-int HComboboxControl::set_focus ( char code_ ) {
-	M_PROLOG
-	if ( _mode == MODE::EDITCONTROL )
-		return ( HEditControl::set_focus ( code_ ) );
-	return ( HListControl::set_focus ( code_ ) );
-	M_EPILOG
-}
-
-int HComboboxControl::kill_focus ( void ) {
+int HComboboxControl::kill_focus( void ) {
 	M_PROLOG
 	if ( _mode == MODE::LISTCONTROL ) {
 		_mode = MODE::EDITCONTROL;
@@ -78,7 +70,7 @@ int HComboboxControl::kill_focus ( void ) {
 	M_EPILOG
 }
 
-void HComboboxControl::do_refresh ( void ) {
+void HComboboxControl::do_refresh( void ) {
 	M_PROLOG
 	int width( 0 );
 	HConsole& cons( HConsole::get_instance() );
@@ -132,27 +124,37 @@ int HComboboxControl::do_process_input( int code_ ) {
 	M_EPILOG
 }
 
-int HComboboxControl::do_click( mouse::OMouse& mouse_ ) {
+bool HComboboxControl::do_click( mouse::OMouse& mouse_ ) {
 	M_PROLOG
+	bool handled( false );
 	if ( _mode == MODE::EDITCONTROL ) {
-		HEditControl::do_click( mouse_ );
-		_widthRaw = ( _width > 0 ) ? _width
-			: HConsole::get_instance().get_width() + _width - _columnRaw;
-		if ( mouse_._column == ( _columnRaw + _widthRaw - 1 ) ) {
-			_mode = MODE::LISTCONTROL;
-			schedule_refresh();
+		handled = HEditControl::do_click( mouse_ );
+		if ( ! handled ) {
+			_widthRaw = ( _width > 0 ) ? _width
+				: HConsole::get_instance().get_width() + _width - _columnRaw;
+			if ( mouse_._column == ( _columnRaw + _widthRaw - 1 ) ) {
+				_mode = MODE::LISTCONTROL;
+				schedule_refresh();
+				handled = true;
+			}
 		}
-	} else if ( HListControl::do_click( mouse_ ) )
-		close_combo();
-	return ( 0 );
+	} else {
+		handled = HListControl::do_click( mouse_ );
+		if ( ! handled ) {
+			close_combo();
+			handled = true;
+		}
+	}
+	return ( handled );
 	M_EPILOG
 }
-			
+
 void HComboboxControl::close_combo( void ) {
 	M_PROLOG
 	_mode = MODE::EDITCONTROL;
-	if ( _controler->empty() )
+	if ( ! _controler->is_empty() ) {
 		set_text( (*_cursor)[ 0 ].get_string() );
+	}
 	_parent->schedule_refresh();
 	return;
 	M_EPILOG

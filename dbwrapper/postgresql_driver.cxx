@@ -85,7 +85,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, yaal::hcore::HString const& d
 			dataBase_.raw(), login_.raw(), password_.raw() );
 	if ( PQstatus( connection ) == CONNECTION_OK )
 		dbLink_._valid = true;
-	return ( ! dbLink_._valid );
+	return ( dbLink_._valid );
 }
 
 M_EXPORT_SYMBOL void db_disconnect( ODBLink& );
@@ -180,7 +180,7 @@ M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 		} else
 			pr->_total = 0;
 	}
-	return ( ! gotMore );
+	return ( gotMore );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );
