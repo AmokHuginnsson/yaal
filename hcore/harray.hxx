@@ -475,6 +475,14 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Insert range of values at given position.
+	 *
+	 * \tparam iterator_t - Type of iterator pair defining an input range.
+	 *
+	 * \param pos_ - insert values from given range at this position in array.
+	 * \param first_ - begining of the range of values to insert into this array.
+	 * \param last_ - one past the end of the range of values to into into this array.
+	 */
 	template<typename iterator_t>
 	void insert( iterator pos_, iterator_t first_, iterator_t last_ ) {
 		M_PROLOG
