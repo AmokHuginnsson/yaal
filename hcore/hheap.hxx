@@ -55,6 +55,7 @@ public:
 	HHeap( iter_t first_, iter_t last_ ) : _sequence( first_, last_ ) {
 		M_PROLOG
 		make_heap( _sequence.begin(), _sequence.end() );
+		return;
 		M_EPILOG
 	}
 	bool is_empty( void ) const {
@@ -67,31 +68,34 @@ public:
 		return ( _sequence.is_empty() );
 		M_EPILOG
 	}
-	bool get_size( void ) const {
+	int long get_size( void ) const {
 		M_PROLOG
 		return ( _sequence.get_size() );
 		M_EPILOG
 	}
-	bool size( void ) const {
+	int long size( void ) const {
 		M_PROLOG
 		return ( _sequence.get_size() );
 		M_EPILOG
 	}
-	bool clear( void ) {
+	void clear( void ) {
 		M_PROLOG
-		return ( _sequence.clear() );
+		_sequence.clear();
+		return;
 		M_EPILOG
 	}
 	void push( value_type const& value_ ) {
 		M_PROLOG
 		_sequence.push_back( value_ );
 		push_heap( _sequence.begin(), _sequence.end() );
+		return;
 		M_EPILOG
 	}
 	void pop( void ) {
 		M_PROLOG
 		pop_heap( _sequence.begin(), _sequence.end() );
 		_sequence.pop_back();
+		return;
 		M_EPILOG
 	}
 	value_type const& top( void ) const {
