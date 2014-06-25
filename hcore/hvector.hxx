@@ -103,7 +103,7 @@ public:
 	}
 	value_type norm( void ) const {
 		M_PROLOG
-		value_type scalar( accumulate( _data.begin(), _data.end(), 0.0 ) );
+		value_type scalar( inner_product( _data.begin(), _data.end(), _data.begin(), 0.0 ) );
 		return ( square_root( scalar ) );
 		M_EPILOG
 	}
