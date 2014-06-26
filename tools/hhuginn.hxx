@@ -69,6 +69,7 @@ public:
 	typedef yaal::hcore::HPointer<HExpression> expression_t;
 	class HBooleanExpression;
 	typedef yaal::hcore::HPointer<HBooleanExpression> boolean_expression_t;
+	class HErrorCoordinate;
 private:
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::HFunction> functions_t;
 	struct STATE {
@@ -100,8 +101,10 @@ public:
 	 */
 	void preprocess( void );
 	/*! \brief Parse preprocessed program source.
+	 *
+	 * \return True iff whole input source was parsed successfully.
 	 */
-	void parse( void );
+	bool parse( void );
 	/*! \brief Compile parsed program.
 	 */
 	void compile( void );
@@ -113,7 +116,27 @@ public:
 	void call( yaal::hcore::HString const& );
 	value_t returned_value( void ) const;
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& );
+	int error_position( void ) const;
+	HErrorCoordinate error_coordinate( void ) const;
 private:
+};
+
+class HHuginn::HErrorCoordinate {
+public:
+	typedef HErrorCoordinate this_type;
+private:
+	int _line;
+	int _column;
+public:
+	HErrorCoordinate( int line_, int column_ )
+		: _line( line_ ), _column( column_ ) {
+	}
+	int line( void ) const {
+		return ( _line );
+	}
+	int column( void ) const {
+		return ( _column );
+	}
 };
 
 class HHuginn::HObject {

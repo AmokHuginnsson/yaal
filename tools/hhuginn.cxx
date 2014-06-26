@@ -409,11 +409,11 @@ void HHuginn::preprocess( void ) {
 	M_EPILOG
 }
 
-void HHuginn::parse( void ) {
+bool HHuginn::parse( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PREPROCESSED );
 	_state = STATE::PARSED;
-	return;
+	return ( _engine.parse( _preprocessedSource.get<char const>(), _preprocessedSource.get<char const>() + _preprocessedSourceSize ) );
 	M_EPILOG
 }
 
@@ -430,6 +430,21 @@ void HHuginn::execute( void ) {
 	M_ENSURE( _state == STATE::COMPILED );
 	call( "main" );
 	return;
+	M_EPILOG
+}
+
+int HHuginn::error_position( void ) const {
+	M_PROLOG
+	int errorPosition( _engine.error_position() );
+	return ( errorPosition );
+	M_EPILOG
+}
+
+HHuginn::HErrorCoordinate HHuginn::error_coordinate( void ) const {
+	M_PROLOG
+	int line( 0 );
+	int column( 0 );
+	return ( HErrorCoordinate( line, column ) );
 	M_EPILOG
 }
 
