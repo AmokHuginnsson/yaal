@@ -54,7 +54,7 @@ execution_info::strings_ptr_t execution_info::get_call_stack( int )
 	{
 	strings_ptr_t frames( make_pointer<strings_t>() );
 #ifdef _EXECINFO_H
-	
+
 	void** pointer = memory::calloc<void*>( level_ + 1 );
 	int size( backtrace( pointer, level_ ) );
 	char** strings = backtrace_symbols( pointer, size );

@@ -113,7 +113,7 @@ int accept( int fd_, struct sockaddr* addr_, socklen_t* len_ ) {
 		if ( ::ConnectNamedPipe( io.handle(), io.overlapped() ) ) {
 			log_windows_error( "ConnectNamedPipe" );
 			ret = -1;
-		}	
+		}
 		if ( ! ret )
 			ret = np.first;
 		np.second->accept();

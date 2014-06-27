@@ -1,6 +1,6 @@
 [Visualizer]
 yaal::hcore::HString {
-	preview ( 
+	preview (
 		#if ( ($c._mem[((sizeof(int*))*3)-1]&128) ) (
 		 #( [(*(char**)($c._mem)),s] )
 		)

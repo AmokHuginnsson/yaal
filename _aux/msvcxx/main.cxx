@@ -378,7 +378,7 @@ driver_names_t get_drivers( void ) {
 	LPVOID drivers[ARRAY_SIZE];
 	DWORD cbNeeded( 0 );
 	driver_names_t driverNames;
-	if ( ::EnumDeviceDrivers( drivers, sizeof ( drivers ), &cbNeeded ) && ( cbNeeded < sizeof ( drivers ) ) ) { 
+	if ( ::EnumDeviceDrivers( drivers, sizeof ( drivers ), &cbNeeded ) && ( cbNeeded < sizeof ( drivers ) ) ) {
 		TCHAR szDriver[ARRAY_SIZE];
 		int cDrivers( cbNeeded / sizeof ( drivers[0] ) );
 		for ( int i( 0 ); i < cDrivers; ++ i ) {

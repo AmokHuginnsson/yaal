@@ -55,7 +55,7 @@ function boostInfo( install_path ) {
 		this.thread = "";
 		this.target = "";
 		this.lib = "";
-	}   
+	}
 	this.version = new versionInfo();
 	this.exists = false;
 	var fs = new ActiveXObject( "Scripting.FileSystemObject" );

@@ -84,7 +84,7 @@ void HLifeTimeTracker::destruct( void* ) {
 
 typedef void ( *cxa_handle_t )( void* );
 extern "C" int __cxa_atexit( cxa_handle_t, void*, void* );
-extern "C" void* __dso_handle;		
+extern "C" void* __dso_handle;
 
 inline int safe_atexit( cxa_handle_t cxa_handle ) {
 	return ( __cxa_atexit( cxa_handle, 0, __dso_handle ) );

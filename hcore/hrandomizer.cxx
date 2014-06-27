@@ -120,7 +120,7 @@ void HRandomizer::swap( HRandomizer& randomizer_ ) {
 void HRandomizer::init( u64_t seed_ ) {
 	M_PROLOG
 	_state[0] = seed_;
-	for ( _index = 1; _index < STATE_SIZE; ++ _index ) 
+	for ( _index = 1; _index < STATE_SIZE; ++ _index )
 		_state[_index] = ( 6364136223846793005ull * ( _state[_index-1] ^ ( _state[_index - 1] >> 62 ) ) + static_cast<u64_t>( _index ) );
 	return;
 	M_EPILOG
@@ -151,11 +151,11 @@ void HRandomizer::init( u64_t const* state_, int stateSize_ ) {
 			i = 1;
 		}
 	}
-	_state[0] = 1ull << 63; /* MSB is 1; assuring non-zero initial array */ 
+	_state[0] = 1ull << 63; /* MSB is 1; assuring non-zero initial array */
 	return;
 	M_EPILOG
 }
-	
+
 u64_t HRandomizer::operator()( u64_t range_ ) {
 	M_PROLOG
 	return ( operator()() % range_ );

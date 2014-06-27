@@ -22,7 +22,7 @@ int main( int argc, char** argv ) {
 			error = errno;
 			break;
 		}
-		
+
 		char const* username = getenv( "USERNAME" );
 		if ( username == NULL )
 			username = getenv( "LOGNAME" );

@@ -102,7 +102,7 @@ kill_grace_period 1000
 
 # child_kill_grace_period
 # type: integer, default 1000
-# wait for that many milliseconds before killing child process 
+# wait for that many milliseconds before killing child process
 child_kill_grace_period 1000
 
 # default_encoding

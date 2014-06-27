@@ -336,7 +336,7 @@ int HBaseSignalHandlers::signal_HUP( int signum_ ) {
 	return ( -1 );
 	M_EPILOG
 }
-	
+
 int HBaseSignalHandlers::signal_TERM( int signum_ ) {
 	M_PROLOG
 	HString message;
@@ -348,7 +348,7 @@ int HBaseSignalHandlers::signal_TERM( int signum_ ) {
 	return ( -2 );
 	M_EPILOG
 }
-	
+
 int HBaseSignalHandlers::signal_QUIT ( int signum_ ) {
 	M_PROLOG
 	if ( tools::_ignoreSignalSIGQUIT_ )

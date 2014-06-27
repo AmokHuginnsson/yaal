@@ -1121,10 +1121,10 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					 */
 					i64_t leaf( 0 ); /* guessed leaf */
 					i64_t u0( 0 );
-					i64_t u1( 0 ); 
-					i64_t u2( 0 ); 
+					i64_t u1( 0 );
+					i64_t u2( 0 );
 					i64_t v1( divisor[0] );
-					i64_t v2( divisor[1] ); 
+					i64_t v2( divisor[1] );
 					if ( extra ) {
 						u0 = ( dividendSample[0] );
 						u1 = ( dividendSample[1] );
@@ -1295,7 +1295,7 @@ HNumber::size_t HNumber::karatsuba( HChunk& result, i32_t const* fx, size_t fxs,
 		size_t const r2ms( karatsuba( r2m, fx, fxs - m, fy, fys - m ) );
 		HChunk r; /* intermediate result ( fx2 * fy2 ) + 1 for carrier */
 		size_t const rs( karatsuba( r, fx + ( fxs > m ? fxs - m : 0 ), min( fxs, m ), fy + ( fys > m ? fys - m : 0 ), min( fys, m ) ) );
-		size_t const size( fxs + fys + 1 ); 
+		size_t const size( fxs + fys + 1 );
 		HChunk buffer( chunk_size<i32_t>( max( size + 1, ( m + 1 ) * 2 ) ) ); /* + 1 for carrier */
 		i32_t* hx( buffer.get<i32_t>() );
 		i32_t* hy( buffer.get<i32_t>() + m + 1 );

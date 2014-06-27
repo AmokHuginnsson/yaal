@@ -96,6 +96,6 @@ HRandomizer make_randomizer( u64_t range = meta::max_unsigned<u64_t>::value );
 }
 
 }
-	
+
 #endif /* #ifndef YAAL_HCORE_HRANDOMIZER_HXX_INCLUDED */
 

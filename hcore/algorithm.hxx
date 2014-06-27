@@ -1818,7 +1818,7 @@ inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, pr
 		} else {
 			if ( aux != auxEnd ) {
 				*aux = *first_;
-				++ aux; 
+				++ aux;
 				++ first_;
 			} else {
 				aux = aux_.begin();

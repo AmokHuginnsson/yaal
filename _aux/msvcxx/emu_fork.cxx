@@ -95,7 +95,7 @@ int HYaalWorkAroundForNoForkOnWindowsForHPipedChildSpawn::operator()( void ) {
 	int i = 1;
 	for ( HPipedChild::argv_t::iterator it( _argv.begin() ), end( _argv.end() ); it != end; ++ it, ++ i )
 		argv[ i ] = xstrdup( it->raw() );
-	
+
 	intptr_t processHandle( ::spawnvp( P_NOWAIT, _path.raw(), argv ) );
 	if ( processHandle == -1 )
 		log_windows_error( "spawnvp" );

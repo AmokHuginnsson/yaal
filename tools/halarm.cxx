@@ -61,7 +61,7 @@ HAlarm::HAlarm( int long miliseconds_ )
 	event.sigev_signo = SIGALRM;
 	event.sigev_value.sival_ptr = &_timer;
 	M_ENSURE( timer_create( FWD_CLOCK_REALTIME, &event, &_timer ) == 0 );
-	
+
 	int step( 0 );
 	try {
 		sigset_t mask;

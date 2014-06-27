@@ -74,6 +74,6 @@ typedef yaal::hcore::HExceptionT<HCollector, HSerialException> HCollectorExcepti
 }
 
 }
-	
+
 #endif /* #ifndef YAAL_TOOLS_HCOLLECTOR_HXX_INCLUDED */
 

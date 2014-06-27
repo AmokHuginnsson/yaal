@@ -334,7 +334,7 @@ void update_sha1_state( u32_t* state, HStreamBlockIterator::HBlock const& block 
 			f = b ^ c ^ d;
 			k = 0xca62c1d6;
 		}
-		
+
 		tmp = M_ROTATE_LEFT( a, 5 ) + f + e + k + x[ i ];
 		e = d;
 		d = c;

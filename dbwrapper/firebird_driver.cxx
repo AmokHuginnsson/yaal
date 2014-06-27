@@ -227,7 +227,7 @@ void* yaal_firebird_db_query( ODBLink& dbLink_, char const* query_ ) {
 	if ( ! ok ) {
 		isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
 		isc_rollback_transaction( res->_status, &res->_tr );
-	}	
+	}
 	return ( ok ? res.release() : NULL );
 }
 

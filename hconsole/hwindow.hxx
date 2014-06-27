@@ -52,7 +52,7 @@ protected:
 	hcore::HString			_title;					/*!< title of window */
 	HControlList::model_t::cyclic_iterator _focusedChild; /*!< points to control that has focus */
 	HControlList::model_t::cyclic_iterator _previousFocusedChild; /*!< control that had focus before
-																									 focus went to status bar */	
+																									 focus went to status bar */
 	HControlList				_controls;	/*!< list of all control inside _this_ wind */
 	HStatusBarControl::ptr_t		_statusBar;
 public:

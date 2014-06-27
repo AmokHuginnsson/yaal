@@ -36,7 +36,7 @@ mark_as_advanced( yaal_LIBRARY yaal_INCLUDE_DIR )
 set( yaal_INCLUDE_DIRS "${yaal_INCLUDE_DIR}" )
 set( yaal_LIBRARIES    "${yaal_LIBRARY}" )
 
-# handle the QUIETLY and REQUIRED arguments and set yaal_FOUND to TRUE if 
+# handle the QUIETLY and REQUIRED arguments and set yaal_FOUND to TRUE if
 # all listed variables are TRUE
 include( FindPackageHandleStandardArgs )
 find_package_handle_standard_args( yaal DEFAULT_MSG yaal_LIBRARIES yaal_INCLUDE_DIRS )

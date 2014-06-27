@@ -111,7 +111,7 @@ int const FUNCTION::MULTIPLICATION = 2;
 int const FUNCTION::POWER = 3;
 int const FUNCTION::SIGNUM = 4;
 int const FUNCTION::BRACKET = 5;
-	
+
 
 char const* const _syntaxError_ = _( "syntax error" );
 char _functionsMnemonics_ [ ] [ 8 ] = {

@@ -438,7 +438,7 @@ bool HBitmap::get( int long number_ ) const {
 	return ( state ? true : false );
 	M_EPILOG
 }
-	
+
 void HBitmap::set( int long number_, bool state_ ) {
 	M_PROLOG
 	M_ASSERT( number_ >= 0 );
@@ -459,7 +459,7 @@ void HBitmap::set( int long number_, bool state_ ) {
 	return;
 	M_EPILOG
 }
-	
+
 void HBitmap::rotate_right( int long start_,
 		int long len_, int long val_ ) {
 	M_ASSERT( ( val_ > 0 ) && ( val_ < len_ ) && ( start_ >= 0 ) && ( len_ > 0 ) );
@@ -471,7 +471,7 @@ void HBitmap::rotate_right( int long start_,
 		set( start_ + i, tmp.get( start_ + ( i + val_ ) % len_ ) );
 	return ;
 }
-	
+
 void HBitmap::rotate_left( int long start_,
 		int long len_, int long val_ ) {
 	M_ASSERT( ( val_ > 0 ) && ( val_ < len_ ) && ( start_ >= 0 ) && ( len_ > 0 ) );

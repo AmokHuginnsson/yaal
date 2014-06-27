@@ -41,7 +41,7 @@ namespace tools {
 /*! \brief The DES algorithm helper data tables.
  */
 namespace des {
-	
+
 extern const u8_t _beginingPermutation_[];
 extern const u8_t _endingPermutation_[];
 extern const u8_t _keyPermutation_[];
@@ -122,7 +122,7 @@ void HDes::crypt( u8_t* buffer_, int long size_, action_t const& action_ ) {
 	return;
 	M_EPILOG
 }
-	
+
 void HDes::_3des( u32_t* block_, int action_ ) {
 	permutate( reinterpret_cast<u8_t*>( block_ ), _beginingPermutation_, 64 );
 	_des( block_, action_, 0 );
@@ -131,7 +131,7 @@ void HDes::_3des( u32_t* block_, int action_ ) {
 	permutate( reinterpret_cast<u8_t*>( block_ ), _endingPermutation_, 64 );
 	return;
 }
-	
+
 void HDes::_des( u32_t* block_, int action_, int part_ ) {
 	int col( 0 ), row( 0 );
 	u32_t buf[ DES::BLOCK_SIZE / static_cast<int>( sizeof ( u32_t ) ) ];
@@ -195,24 +195,24 @@ void HDes::permutate( u8_t* buffer_, const u8_t* tab_, int len_ ) const {
 				src.get( static_cast<u32_t>( tab_[ ctr ] ) ) );
 	::memcpy( buffer_, bufTmp, DES::BLOCK_SIZE );
 	return;
-}	
-	
+}
+
 namespace des {
-	
+
 const u8_t _beginingPermutation_[] = {
 				57, 49, 41, 33, 25, 17, 9, 1, 59, 51, 43, 35, 27, 19, 11, 3,
 				61, 53, 45, 37, 29, 21, 13, 5, 63, 55, 47, 39, 31, 23, 15, 7,
 				56, 48, 40, 32, 24, 16, 8, 0, 58, 50, 42, 34, 26, 18, 10, 2,
 				60, 52, 44, 36, 28, 20, 12, 4, 62, 54, 46, 38, 30, 22, 14, 6
 	};
-		
+
 const u8_t _endingPermutation_[] = {
 				39, 7, 47, 15, 55, 23, 63, 31, 38, 6, 46, 14, 54, 22, 62, 30,
 				37, 5, 45, 13, 53, 21, 61, 29, 36, 4, 44, 12, 52, 20, 60, 28,
 				35, 3, 43, 11, 51, 19, 59, 27, 34, 2, 42, 10, 50, 18, 58, 26,
 				33, 1, 41, 9, 49, 17, 57, 25, 32, 0, 40, 8, 48, 16, 56, 24
 	};
-		
+
 /* key permutation */
 const u8_t _keyPermutation_[] = {
 				56, 48, 40, 32, 24, 16, 8, 0, 57, 49, 41, 33, 25, 17,
@@ -220,7 +220,7 @@ const u8_t _keyPermutation_[] = {
 				62, 54, 46, 38, 30, 22, 14, 6, 61, 53, 45, 37, 29, 21,
 				13, 5, 60, 52, 44, 36, 28, 20, 12, 4, 27, 19, 11, 3
 	};
-		
+
 /* half-key shift permutation */
 /* iteration number I,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 */
 const u8_t _countOfMoves_[] = {
@@ -234,7 +234,7 @@ const u8_t _permutationOfCompresion_[] = {
 				40, 51, 30, 36, 46, 54, 29, 39, 50, 44, 32, 47,
 				43, 48, 38, 55, 33, 52, 45, 41, 49, 35, 28, 31
 	};
-		
+
 /* extension permutation */
 const u8_t _permutationOfExpanding_[] = {
 				31,  0,  1,  2,  3,  4,  3,  4,  5,  6,
@@ -243,13 +243,13 @@ const u8_t _permutationOfExpanding_[] = {
 				19, 20, 21, 22, 23, 24, 23, 24, 25, 26,
 				27, 28, 27, 28, 29, 30, 31, 0
 	};
-		
+
 /* P-block permutation */
 const u8_t _pBlockPermutation_[] = {
 				15, 6, 19, 20, 28, 11, 27, 16, 0, 14, 22, 25, 4, 17, 30, 9,
 				1, 7, 23, 13, 31, 26, 2, 8, 18, 12, 29, 5, 21, 10, 3, 24
 	};
-		
+
 /* S-Blocks */
 const u8_t _sBlock_[][ 4 ][ 16 ] = { {
 		{ 14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7 }, //S1

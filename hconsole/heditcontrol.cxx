@@ -106,7 +106,7 @@ HEditControl::HEditControl( HWindow* parent_,
 	return;
 	M_EPILOG
 }
-	
+
 HEditControl::~HEditControl( void ) {
 	M_PROLOG
 	return;

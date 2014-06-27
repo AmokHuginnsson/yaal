@@ -267,7 +267,7 @@ void HConsole::enter_curses( void ) {
 	return;
 	M_EPILOG
 }
-	
+
 void HConsole::leave_curses( void ) {
 	M_PROLOG
 	if ( ! _enabled )
@@ -303,7 +303,7 @@ void HConsole::leave_curses( void ) {
 	return;
 	M_EPILOG
 }
-	
+
 void HConsole::set_attr( int attr_ ) const {
 	M_PROLOG
 	if ( ! _enabled )
@@ -441,7 +441,7 @@ void HConsole::vcmvprintf( int row_, int column_, int attribute_,
 	return;
 	M_EPILOG
 }
-	
+
 void HConsole::vprintf( char const* const format_, void* ap_ ) const {
 	M_PROLOG
 	va_list& ap = *static_cast<va_list*>( ap_ );
@@ -574,7 +574,7 @@ int HConsole::get_key( void ) const {
 	return ( key );
 	M_EPILOG
 }
-	
+
 int HConsole::kbhit( void ) const {
 	M_PROLOG
 	if ( ! _enabled )
@@ -596,7 +596,7 @@ inline void fwd_attr_get( T1& val1_, T2& val2_, void* ) {
 }
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
-	
+
 char unsigned HConsole::get_attr( void ) const {
 	M_PROLOG
 	if ( ! _enabled )
@@ -617,7 +617,7 @@ char unsigned HConsole::get_attr( void ) const {
 	return ( static_cast<char unsigned>( attribute ) );
 	M_EPILOG
 }
-	
+
 void HConsole::clrscr( void ) {
 	M_PROLOG
 	if ( ! _enabled )

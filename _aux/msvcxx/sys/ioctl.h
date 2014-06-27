@@ -13,7 +13,7 @@
 #ifdef __MSVCXX__
 
 namespace msvcxx {
-int ioctl( int, int, void* ); 
+int ioctl( int, int, void* );
 }
 
 int ioctl( int fd_, int request_, void* param_ ) {

@@ -1,6 +1,6 @@
 ifeq ($(VERBOSE),yes)
 invoke = printf "%b$(NL)" '$(subst -EOC,,$(subst $(COMMA)-EOC,,$(subst $(COMMA)$(COMMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))' && $(subst -EOC,,$(subst $(COMMA)-EOC,,$(subst $(COMMA)$(COMMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
-msg = 
+msg = # Meaningful trailing whitespace(s).
 else
 invoke = $(subst -EOC,,$(subst $(COMMA)-EOC,,$(subst $(COMMA)$(COMMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
 msg = $(subst -EOC,,$(subst $(COMMA)-EOC,,$(subst $(COMMA)$(COMMA),,$(1),$(2),$(3),$(4),$(5),$(6),$(7),$(8),$(9),$(10),$(11),$(12),$(13),$(14),$(15),-EOC)))
@@ -19,10 +19,10 @@ else
 	CL   := $(shell tput cr;tput dl1)
 endif
 
-PROGRESS_INDICATOR_0=\\\ 
-PROGRESS_INDICATOR_1=| 
-PROGRESS_INDICATOR_2=/ 
-PROGRESS_INDICATOR_3=- 
+PROGRESS_INDICATOR_0=\\\ # Meaningful trailing whitespace(s).
+PROGRESS_INDICATOR_1=| #
+PROGRESS_INDICATOR_2=/ #
+PROGRESS_INDICATOR_3=- #
 NEXT_PROGRESS_INDICATOR_ONCE=PROGRESS_INDICATOR_0
 NEXT_PROGRESS_INDICATOR_0=PROGRESS_INDICATOR_1
 NEXT_PROGRESS_INDICATOR_1=PROGRESS_INDICATOR_2
@@ -37,7 +37,7 @@ DEP_CL=$(CL)
 else
 PROGRESS_INDICATOR_0=.
 NEXT_PROGRESS_INDICATOR_0=PROGRESS_INDICATOR_0
-PROGRESS_INDICATOR_ONCE=Generating dependencies 
+PROGRESS_INDICATOR_ONCE=Generating dependencies # Meaningful trailing whitespace(s).
 CURR_DEP_PROGRESS_INDICATOR=PROGRESS_INDICATOR_ONCE
 endif
 
@@ -51,7 +51,7 @@ else
 
 NL=\n
 PROGRESS_INDICATOR_0=.
-PROGRESS_INDICATOR_ONCE=Generating dependencies 
+PROGRESS_INDICATOR_ONCE=Generating dependencies # Meaningful trailing whitespace(s).
 NEXT_PROGRESS_INDICATOR_ONCE=PROGRESS_INDICATOR_0
 NEXT_PROGRESS_INDICATOR_0=PROGRESS_INDICATOR_0
 CURR_PROGRESS_INDICATOR=

@@ -62,7 +62,7 @@ private:
 	OSQLite( OSQLite const& );
 	OSQLite& operator = ( OSQLite const& );
 };
-	
+
 struct OSQLiteResult {
 	int _rows;
 	int _columns;

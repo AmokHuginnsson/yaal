@@ -82,7 +82,7 @@ void HDataListControl::load( int long /*id_*/ ) {
 		parent->sync( row );
 		parent->status_bar()->update_progress();
 		if ( it != model->end() )
-			{	
+			{
 			(*it) = rb._item;
 			++ it;
 		} else

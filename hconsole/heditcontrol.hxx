@@ -95,7 +95,7 @@ public:
 								char const* label = "", int maxlen = 127,
 								char const* val = "", char const* mask = _maskDefault_,
 								bool replace = false, bool multiline = false,
-								bool readonly = false, bool rightAlign = false,				
+								bool readonly = false, bool rightAlign = false,
 								bool password = false, int maxhist = 8 );
 	virtual ~HEditControl( void );
 	void set_flags( bool = false, bool = false );

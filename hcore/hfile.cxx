@@ -156,7 +156,7 @@ int HFile::do_close( void ) {
 		_handle = NULL;
 		_owner = false;
 	}
-	return ( error ); 
+	return ( error );
 	M_EPILOG
 }
 

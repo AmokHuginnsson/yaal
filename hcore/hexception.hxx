@@ -125,7 +125,7 @@ HString type_name( tType const* object_ ) {
 
 template<typename tType>
 HString type_name( bool stripTemplateParams_ = false ) {
-	HString typeName( demangle( typeid( tType ).name() ) ); 
+	HString typeName( demangle( typeid( tType ).name() ) );
 	if ( stripTemplateParams_ ) {
 		int long idx( typeName.find( '<' ) );
 		if ( idx != HString::npos )

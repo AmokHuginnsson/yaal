@@ -1507,7 +1507,7 @@ struct functional_return_type {
 	template<typename U>
 	struct get<U, true>
 		{ typedef typename U::result_type type; };
-	
+
 	typedef typename get<T, has_result_type_value>::type type;
 };
 

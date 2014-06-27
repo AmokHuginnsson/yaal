@@ -292,7 +292,7 @@ char HInfoString::do_get_byte( int idx_ ) const
 
 char HInfoString::do_get_char( void ) const
 	{ return ( !_data.is_empty() ? _data[0] : static_cast<char>( 0 ) ); }
- 
+
 int short HInfoString::do_get_int_short( void ) const
 	{ return ( static_cast<int short>( lexical_cast<int>( _data ) ) ); }
 

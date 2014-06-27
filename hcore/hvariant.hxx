@@ -353,7 +353,7 @@ void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
 		case ( 20 ): swap( *reinterpret_cast<t20_t*>( a_ ), *reinterpret_cast<t20_t*>( b_ ) ); break;
 		default: M_ASSERT( 0 && "Absurd type number." ); break;
 	}
-	
+
 }
 
 template<typename t0_t, typename t1_t,

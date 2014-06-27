@@ -8,7 +8,7 @@
 #include <../include/openssl/rsa.h>
 #include <openssl/ssl.h>
 #include <openssl/rand.h>
-#undef X509_NAME 
+#undef X509_NAME
 #include <openssl/engine.h>
 #include <openssl/err.h>
 #undef ERROR

@@ -193,7 +193,7 @@ class YaalHCoreHArrayPrinter:
 
 	def __init__(self, val_):
 		self._val = val_
-	
+
 	def sizeof_elem( self ):
 		return self._val.type.template_argument( 0 ).sizeof
 
@@ -258,7 +258,7 @@ class YaalHCoreHDequePrinter:
 	def __init__( self, val_ ):
 		self._val = val_
 		self._VPC = abs( self._val['VALUES_PER_CHUNK'] )
-	
+
 	def children( self ):
 		return self.Iterator( self._val['_chunks']['_data'].cast( self._val.type.template_argument( 0 ).pointer().pointer() ), self._VPC, self._val['_start'], self._val['_size'] )
 
@@ -313,7 +313,7 @@ class YaalHCoreHListPrinter:
 
 	def __init__( self, val_ ):
 		self._val = val_
-	
+
 	def children( self ):
 		return self.Iterator(self._val['_hook'], self._val['_size'])
 
@@ -611,7 +611,7 @@ class YaalToolsHRingPrinter:
 			self._data = data_
 			self._index = index_
 			self._size = size_
-			self._capacity = capacity_ 
+			self._capacity = capacity_
 			self._count = 0
 
 		def __iter__( self ):
@@ -631,7 +631,7 @@ class YaalToolsHRingPrinter:
 
 	def __init__( self, val_ ):
 		self._val = val_
-	
+
 	def sizeof_elem( self ):
 		return self._val.type.template_argument( 0 ).sizeof
 

@@ -98,7 +98,7 @@ int long IO::read( void* buf_, int long size_ ) {
 				if ( _readRequest == 0 ) { /* No pending read operation. */
 					if ( _buffer.get_size() < ( size_ + off ) )
 						_buffer.realloc( size_ + off );
-					ok = ::ReadFile( _handle, _buffer.get<char>() + off, _readRequest = size_, &iRead, &_overlapped ) ? 
+					ok = ::ReadFile( _handle, _buffer.get<char>() + off, _readRequest = size_, &iRead, &_overlapped ) ?
 true : false;
 				}
 				if ( ! ok || ( _readRequest > 0 ) || ( ! _nonBlocking ) ) { /* Previous read operation still pending. */

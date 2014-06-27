@@ -79,7 +79,7 @@ class HMemoryProvider : public HMemoryHandlingStrategyInterface {
 	yaal::hcore::HChunk& _chunk;
 public:
 	HMemoryProvider( yaal::hcore::HChunk& chunk_ )
-		: _chunk( chunk_ ) 
+		: _chunk( chunk_ )
 		{}
 protected:
 	virtual int long do_get_size( void ) const
