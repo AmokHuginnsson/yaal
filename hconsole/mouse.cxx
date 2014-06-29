@@ -75,15 +75,14 @@ namespace {
 int hunt_tty( int offset_ ) {
 	M_PROLOG
 	/* this hack allows to guess current controling virtual terminal screen */
-	int vC = 0;
-	char const* ttyName = NULL;
-	char const* ptr = NULL;
-	ttyName = ttyname( STDIN_FILENO );
+	int vC( 0 );
+	char const* ttyName( ttyname( STDIN_FILENO ) );
 	if ( ttyName && ! ::strncmp( ttyName, "/dev/ttyv", static_cast<size_t>( 8 + offset_ ) ) )
 		vC = lexical_cast<int>( ttyName + 8 + offset_ );
 	else {
 		ttyName = ::getenv( "STY" );
 		if ( ttyName ) {
+			char const* ptr = NULL;
 			if ( ( ptr = ::strstr( ttyName, ".tty" ) ) )
 				vC = lexical_cast<int>( ptr + 4 + offset_ );
 			else if ( ( ptr = ::strstr( ttyName, ".pts" ) ) )

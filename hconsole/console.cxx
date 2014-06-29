@@ -256,13 +256,23 @@ void HConsole::enter_curses( void ) {
 			mouse::mouse_get = mouse::console_mouse_get;
 			mouse::mouse_close = mouse::console_mouse_close;
 		}
-		if ( ( _mouseDes = mouse::mouse_open() ) >= 0 ) {
-			log( LOG_TYPE::INFO )
-				<< ( ( mouse::mouse_open == mouse::x_mouse_open ) ? _( "using ncurses mouse support, at fd(" ) : _( "using console mouse support, at fd(" ) )
-				<< _mouseDes << ')' << endl;
-		} else if ( _useMouse_ == USE_MOUSE::YES ) {
-			M_THROW( _( "mouse is console type"
-						" and we did not recived file descriptor" ), errno );
+		try {
+			if ( ( _mouseDes = mouse::mouse_open() ) >= 0 ) {
+				log( LOG_TYPE::INFO )
+					<< ( ( mouse::mouse_open == mouse::x_mouse_open ) ? _( "using ncurses mouse support, at fd(" ) : _( "using console mouse support, at fd(" ) )
+					<< _mouseDes << ')' << endl;
+			} else if ( _useMouse_ == USE_MOUSE::YES ) {
+				M_THROW( _( "mouse is console type"
+							" and we did not recived file descriptor" ), errno );
+			}
+		} catch ( HConsoleException const& ) {
+			if ( _useMouse_ == USE_MOUSE::YES ) {
+				throw;
+			}
+		} catch ( mouse::HMouseException const& ) {
+			if ( _useMouse_ == USE_MOUSE::YES ) {
+				throw;
+			}
 		}
 	}
 #ifdef HAVE_ASCII_GRAPHICS
