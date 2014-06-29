@@ -258,7 +258,7 @@ int x_mouse_open( void ) {
 				mouseMask & BUTTON3_CLICKED, mouseMask & BUTTON1_DOUBLE_CLICKED );
 		throw ( HMouseException( error ) );
 	}
-	mouseinterval( 500 );
+	mouseinterval( 200 );
 #if defined( HAVE_DECL_HAS_MOUSE ) && ( HAVE_DECL_HAS_MOUSE == 1 )
 	if ( ! has_mouse() )
 		throw HMouseException( "Mouse driver failed to initialize properly." );

@@ -40,7 +40,14 @@ extern M_YAAL_HCONSOLE_PUBLIC_API HControl::OAttribute _attributeEnabled_;
 extern M_YAAL_HCONSOLE_PUBLIC_API HControl::OAttribute _attributeFocused_;
 extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeStatusBar_;
 extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeSearchHighlight_;
-extern M_YAAL_HCONSOLE_PUBLIC_API bool _useMouse_;
+struct USE_MOUSE {
+	typedef enum {
+		YES,
+		NO,
+		AUTO
+	} use_mouse_t;
+};
+extern M_YAAL_HCONSOLE_PUBLIC_API USE_MOUSE::use_mouse_t _useMouse_;
 extern M_YAAL_HCONSOLE_PUBLIC_API bool _disableXON_;
 extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlC_;
 extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlZ_;

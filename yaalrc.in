@@ -1,6 +1,6 @@
 # $Id$
 # yaal library configuration file.
-# comments begin with `#' char and continues until end of line
+# comments begin with `#' char and continue until end of line
 # configuration file is divided into sections, each section
 # begins with [section_name] mark, each option may be placed
 # only in section it belongs to.
@@ -11,10 +11,14 @@
 # value may be surrounded by apostrophes or quotation marks
 # one level of this surrounding is stripped
 # we currently distinguish between four kind of value types:
-# bool   - (true|yes|on|false|no|off)
-# char   - [a-z]
-# int    - [0-9]+
-# string - [^ ].*
+# bool       - ( yes-flag | no-flag )
+# yes-flag   - ( yes | true  | on  | enable  | 1 )
+# no-flag    - ( no  | false | off | disable | 0 )
+# char       - [a-z]
+# int        - [0-9]+
+# string     - [^ ].*
+# enumerator - string choosen from predefined string set
+# bit field  - (sub)set of given set of predefined strings
 #
 # example:
 # log_sql true
@@ -28,7 +32,7 @@
 # variable, set_env can be used in all sections
 
 # on_alloc_failure
-# type: special(alternative-flag), default: ABORT
+# type: enumerator { ABORT, THROW }, default: ABORT
 # on_alloc_failure determines library behavior on memory allocation failure
 # valid memory allocation responses are: ABORT or THROW,
 # where ABORT means terminate process immediately with SIGABRT,
@@ -63,7 +67,7 @@ write_timeout 4000
 thread_stack_size 0
 
 # semaphore_type
-# type: special(alternative-flag), default: POSIX
+# type: enumerator { POSIX, YAAL }, default: POSIX
 # semaphore_type selects preferred default semaphore implementation to be used by Yaal Threads.
 # valid semaphore types are: POSIX or YAAL.
 semaphore_type POSIX
@@ -136,10 +140,10 @@ serial_device '/dev/@SERIAL_DEVICE@'
 serial_baudrate B115200
 
 # serial_flags
-# type: special(multi flag value),
+# type: bit field,
 # default: FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
 # this option set various flags controlling serial connection behaviour
-# flag names: FLOW_CONTROL_HARDWARE FLOW_CONTROL_SOFTWARE BITS_PER_BYTE_8
+# valid bit names: FLOW_CONTROL_HARDWARE FLOW_CONTROL_SOFTWARE BITS_PER_BYTE_8
 #             BITS_PER_BYTE_7 BITS_PER_BYTE_6 BITS_PER_BYTE_5 PARITY_CHECK
 #             PARITY_ODD CR2NL ECHO CANONICAL STOP_BITS_1 STOP_BITS_2
 serial_flags FLOW_CONTROL_HARDWARE BITS_PER_BYTE_8
@@ -184,11 +188,14 @@ leave_ctrl_q true
 leave_ctrl_s true
 
 # use_mouse
-# type: bool, default: false
-# force enabling of mouse interface, warning, when this option
-# is enabled and mouse interface is not available yaal library
-# will not allow execution of any program that uses hconsole api
-use_mouse true
+# type: enumerator { yes-flag, no-flag, auto }, default: auto
+# Enable or disable use of mouse interface.
+# When this option is set to yes-flag and mouse interface is not
+# provided by operating system yaal library will not allow execution
+# of any program that uses hconsole api.
+# Setting this option to auto will enable mouse interface only
+# if provided by operating system.
+use_mouse auto
 
 # latency
 # type: integer, default: 1

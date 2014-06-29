@@ -302,12 +302,16 @@ bool lexical_cast( char const* const& value_ ) {
 		bVal = true;
 	else if ( ! ::strcasecmp( value_, "off" ) )
 		bVal = false;
+	else if ( ! ::strcasecmp( value_, "enable" ) )
+		bVal = true;
+	else if ( ! ::strcasecmp( value_, "disable" ) )
+		bVal = false;
 	else if ( ! ::strcasecmp( value_, "1" ) )
 		bVal = true;
 	else if ( ! ::strcasecmp( value_, "0" ) )
 		bVal = false;
 	else {
-		message = "bad value: ";
+		message = "not a boolean value: ";
 		message += value_;
 		typedef LexicalCast this_type;
 		M_THROW( message, bVal );

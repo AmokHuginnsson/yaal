@@ -243,10 +243,11 @@ void HConsole::enter_curses( void ) {
 	_enabled = true;
 	set_attr( COLORS::ATTR_NORMAL );
 	set_background( _screenBackground_ );
-	if ( ::getenv( "YAAL_NO_MOUSE" ) )
-		_useMouse_ = false;
-	if ( _useMouse_ ) {
-		if ( ::getenv( "DISPLAY" ) ) {
+	if ( ::getenv( "YAAL_NO_MOUSE" ) ) {
+		_useMouse_ = USE_MOUSE::NO;
+	}
+	if ( _useMouse_ != USE_MOUSE::NO ) {
+		if ( ::getenv( "DISPLAY" ) != NULL ) {
 			mouse::mouse_open = mouse::x_mouse_open;
 			mouse::mouse_get = mouse::x_mouse_get;
 			mouse::mouse_close = mouse::x_mouse_close;
@@ -255,12 +256,14 @@ void HConsole::enter_curses( void ) {
 			mouse::mouse_get = mouse::console_mouse_get;
 			mouse::mouse_close = mouse::console_mouse_close;
 		}
-		if ( ( _mouseDes = mouse::mouse_open() ) < 0 )
+		if ( ( _mouseDes = mouse::mouse_open() ) >= 0 ) {
+			log( LOG_TYPE::INFO )
+				<< ( ( mouse::mouse_open == mouse::x_mouse_open ) ? _( "using ncurses mouse support, at fd(" ) : _( "using console mouse support, at fd(" ) )
+				<< _mouseDes << ')' << endl;
+		} else if ( _useMouse_ == USE_MOUSE::YES ) {
 			M_THROW( _( "mouse is console type"
 						" and we did not recived file descriptor" ), errno );
-		log( LOG_TYPE::INFO )
-			<< ( ( mouse::mouse_open == mouse::x_mouse_open ) ? _( "using ncurses mouse support, at fd(" ) : _( "using console mouse support, at fd(" ) )
-			<< _mouseDes << ')' << endl;
+		}
 	}
 #ifdef HAVE_ASCII_GRAPHICS
 	GLYPHS::DOWN_ARROW    = static_cast<int>( ACS_DARROW );

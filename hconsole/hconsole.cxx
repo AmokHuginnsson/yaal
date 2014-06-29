@@ -64,15 +64,15 @@ int _attributeStatusBar_ = ( COLORS::FG_WHITE | COLORS::BG_BLACK ) << 8
 															| ( COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK );
 int _attributeSearchHighlight_ = ( COLORS::FG_BLACK | COLORS::BG_BROWN | COLORS::BG_BLINK ) << 8
 																		| ( COLORS::FG_BLACK | COLORS::BG_BROWN );
-bool	_useMouse_ = false;
-bool	_disableXON_ = false;
-bool	_leaveCtrlC_ = false;
-bool	_leaveCtrlZ_ = false;
-bool	_leaveCtrlS_ = false;
-bool	_leaveCtrlQ_ = false;
-bool	_leaveCtrlBackSlash_ = false;
-char	_commandComposeCharacter_ = 'x';
-int		_commandComposeDelay_ = 16;
+USE_MOUSE::use_mouse_t _useMouse_ = USE_MOUSE::AUTO;
+bool _disableXON_ = false;
+bool _leaveCtrlC_ = false;
+bool _leaveCtrlZ_ = false;
+bool _leaveCtrlS_ = false;
+bool _leaveCtrlQ_ = false;
+bool _leaveCtrlBackSlash_ = false;
+char _commandComposeCharacter_ = 'x';
+int  _commandComposeDelay_ = 16;
 
 inline void set_color_bits( int& word_, int bits_, int what_ ) {
 	int unsigned mask = 0x000f;
@@ -158,6 +158,18 @@ bool set_hconsole_variables( HString& option_, HString& value_ ) {
 	bool fail( false );
 	if ( ! strcasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
+	} else if ( ! strcasecmp( option_, "use_mouse" ) ) {
+		/* enable mouse support */
+		if ( ! strcasecmp( value_, "auto" ) ) {
+			_useMouse_ = USE_MOUSE::AUTO;
+		} else {
+			bool useMouse( lexical_cast<bool>( value_ ) );
+			if ( useMouse ) {
+				_useMouse_ = USE_MOUSE::YES;
+			} else {
+				_useMouse_ = USE_MOUSE::NO;
+			}
+		}
 	} else if ( ! strcasecmp( option_, "screen_background" ) ) {
 		_screenBackground_ = COLORS::fg_to_bg( get_color_bits( value_, 0 ) );
 	} else if ( ! strcasecmp( option_, "attribute_disabled" ) ) {
@@ -189,7 +201,7 @@ HConsoleInitDeinit::HConsoleInitDeinit( void ) {
 	M_PROLOG
 	errno = 0;
 	int escdelay( 0 );
-	yaal_options()( "use_mouse", program_options_helper::option_value( _useMouse_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "enable mouse support" )
+	yaal_options()
 		( "disable_XON", program_options_helper::option_value( _disableXON_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable flow control events" )
 		( "leave_ctrl_c", program_options_helper::option_value( _leaveCtrlC_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+C sequence" )
 		( "leave_ctrl_z", program_options_helper::option_value( _leaveCtrlZ_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+Z sequence" )

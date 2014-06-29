@@ -1,6 +1,6 @@
 " rc syntax highlighting
 
-syn keyword yaalValues true false on off yes no LOG_DEBUG LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_VCSHEADER LOG_SQL
+syn keyword yaalValues true false on off yes no enable disable auto LOG_DEBUG LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_VCSHEADER LOG_SQL
 syn keyword yaalValues BRIGHTMAGENTA MySQL PostgreSQL SQLite null none FLOW_CONTROL_HARDWARE FLOW_CONTROL_SOFTWARE
 syn keyword yaalValues STOP_BITS_1 STOP_BITS_2 PARITY_CHECK PARITY_ODD CANONICAL ECHO CR2NL BITS_PER_BYTE_8 BITS_PER_BYTE_7 BITS_PER_BYTE_6 BITS_PER_BYTE_5
 syn keyword yaalValues POSIX YAAL ABORT THROW
