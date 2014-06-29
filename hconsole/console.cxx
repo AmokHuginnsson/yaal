@@ -159,9 +159,16 @@ HConsole::HConsole( void )
 HConsole::~HConsole( void ) {
 	M_PROLOG
 	if ( _initialized ) {
-		if ( ! isendwin() )
+		/*
+		 * Because of bug in how ::initscr() handles invalid terminal setup and performs
+		 * program abortion ::isendwin() return true even if initscr() fails.
+		 * The only way to call ::isendwin() in case of initscr() failure
+		 * is from global destructor or atexit() callback.
+		 */
+		if ( is_enabled() ) {
 			leave_curses();
-		delwin( stdscr );
+		}
+		delwin( static_cast<WINDOW*>( _window ) );
 		delwin( curscr );
 		delwin( newscr );
 	}
@@ -208,17 +215,18 @@ void HConsole::enter_curses( void ) {
 		init();
 	_terminal_.init();
 	use_env( true );
-	if ( ! _window )
+	if ( ! _window ) {
 		_window = initscr();
+	}
 	M_ENSURE( cbreak() != ERR );
 	M_ENSURE( start_color() != ERR );
-	standout(); /* Macro, returned value without meaning */
+	M_ENSURE( wstandend( static_cast<WINDOW*>( _window ) ) != ERR );
 	M_ENSURE( nonl() == OK );
-	M_ENSURE( keypad( stdscr, true ) != ERR );
-	M_ENSURE( intrflush( stdscr, false ) != ERR );
-	M_ENSURE( scrollok( stdscr, false ) != ERR );
-	M_ENSURE( leaveok( stdscr, false ) != ERR );
-	immedok( stdscr, false );
+	M_ENSURE( keypad( static_cast<WINDOW*>( _window ), true ) != ERR );
+	M_ENSURE( intrflush( static_cast<WINDOW*>( _window ), false ) != ERR );
+	M_ENSURE( scrollok( static_cast<WINDOW*>( _window ), false ) != ERR );
+	M_ENSURE( leaveok( static_cast<WINDOW*>( _window ), false ) != ERR );
+	immedok( static_cast<WINDOW*>( _window ), false );
 	M_ENSURE( fflush( NULL ) == 0 );
 	flushinp(); /* Always returns OK */
 	curs_set( CURSOR::INVISIBLE );
@@ -278,24 +286,24 @@ void HConsole::leave_curses( void ) {
 	}
 	set_attr( COLORS::ATTR_NORMAL );
 	set_background( COLORS::ATTR_NORMAL );
-	M_ENSURE( printw ( "" ) != ERR );
-	M_ENSURE( fflush ( NULL ) == 0 );
+	M_ENSURE( ::wprintw( static_cast<WINDOW*>( _window ), "" ) != ERR );
+	M_ENSURE( ::fflush( NULL ) == 0 );
 	flushinp(); /* Always returns OK */
-	M_ENSURE( intrflush ( stdscr, true ) != ERR );
-	leaveok( stdscr, false ); /* Always OK */
-	immedok( stdscr, true ); /* Always OK */
+	M_ENSURE( ::intrflush( static_cast<WINDOW*>( _window ), true ) != ERR );
+	leaveok( static_cast<WINDOW*>( _window ), false ); /* Always OK */
+	immedok( static_cast<WINDOW*>( _window ), true ); /* Always OK */
 	nl(); /* Always OK */
-	standend();
-	M_ENSURE( keypad ( stdscr, false ) != ERR );
+	M_ENSURE( wstandend( static_cast<WINDOW*>( _window ) ) != ERR );
+	M_ENSURE( keypad( static_cast<WINDOW*>( _window ), false ) != ERR );
 	M_ENSURE( nocbreak() != ERR );
 	curs_set( CURSOR::VISIBLE );
 	refresh();
 /*	reset_shell_mode(); */
 /* see comment near def_shell_mode(), ( automagicly by endwin() ) */
 /*
-	if ( _window )
-		delwin ( static_cast<WINDOW*>( _window ) );
-	_window = NULL;
+	if ( static_cast<WINDOW*>( _window ) )
+		delwin ( static_cast<WINDOW*>( static_cast<WINDOW*>( _window ) ) );
+	static_cast<WINDOW*>( _window ) = NULL;
 */
 	M_ENSURE( endwin() == OK );
 	_terminal_.flush();
@@ -310,9 +318,9 @@ void HConsole::set_attr( int attr_ ) const {
 		M_THROW( "not in curses mode", errno );
 	char unsigned byte( static_cast<char unsigned>( attr_ ) );
 	if ( _brokenBrightBackground )
-		static_cast<void>( attrset( ATTR::value_fix( byte ) ) );
+		static_cast<void>( wattrset( static_cast<WINDOW*>( _window ), ATTR::value_fix( byte ) ) );
 	else
-		static_cast<void>( attrset( ATTR::value( byte ) ) );
+		static_cast<void>( wattrset( static_cast<WINDOW*>( _window ), ATTR::value( byte ) ) );
 	return;
 	M_EPILOG
 }
@@ -321,7 +329,7 @@ void HConsole::set_background( int color_ ) const {
 	M_PROLOG
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
-	bkgd( ' '
+	wbkgd( static_cast<WINDOW*>( _window ), ' '
 			| ( _brokenBrightBackground ? ATTR::value_fix( COLORS::FG_BLACK | color_ )
 				: ATTR::value( COLORS::FG_BLACK | color_ ) ) ); /* meaningless value from macro */
 	return;
@@ -329,7 +337,7 @@ void HConsole::set_background( int color_ ) const {
 }
 
 void HConsole::move( int row_, int column_ ) const {
-	M_ENSURE( ::move( row_, column_ ) != ERR );
+	M_ENSURE( ::wmove( static_cast<WINDOW*>( _window ), row_, column_ ) != ERR );
 	return;
 }
 
@@ -342,27 +350,29 @@ CURSOR::cursor_t HConsole::curs_set( CURSOR::cursor_t const &cursor_ ) const {
 	return ( CURSOR::INVISIBLE );
 }
 
-inline int addch_fwd( int char_ ) {
-	return ( ::addch( static_cast<chtype>( char_ ) ) );
+inline int waddch_fwd( WINDOW* win_, int char_ ) {
+	return ( ::waddch( win_, static_cast<chtype>( char_ ) ) );
 }
-#undef addch
 
+#undef addch
 void HConsole::addch( int char_ ) {
 	M_PROLOG
-	M_ENSURE( addch_fwd( char_ ) != ERR );
+	if ( ! _enabled )
+		M_THROW( "not in curses mode", errno );
+	M_ENSURE( waddch_fwd( static_cast<WINDOW*>( _window ), char_ ) != ERR );
 	return;
 	M_EPILOG
 }
 
 void HConsole::refresh( void ) {
 	M_PROLOG
-	M_ENSURE( ::refresh() != ERR );
-	getmaxyx( stdscr, _height, _width );
+	M_ENSURE( ::wrefresh( static_cast<WINDOW*>( _window ) ) != ERR );
+	getmaxyx( static_cast<WINDOW*>( _window ), _height, _width );
 	return;
 	M_EPILOG
 }
 
-int HConsole::endwin ( void ) {
+int HConsole::endwin( void ) {
 	return ( ::endwin() );
 }
 
@@ -370,21 +380,17 @@ inline void getyx_fwd( WINDOW* win_, int& height_, int& width_ ) {
 	getyx( win_, height_, width_ );
 	return;
 }
-#undef getyx
 
+#undef getyx
 void HConsole::getyx( int& height_, int& width_ ) const {
-	getyx_fwd( stdscr, height_, width_ );
+	getyx_fwd( static_cast<WINDOW*>( _window ), height_, width_ );
 	return;
 }
 
-inline int clrtoeol_fwd( void ) {
-	return ( ::clrtoeol() );
-}
 #undef clrtoeol
-
 void HConsole::clrtoeol( void ) const {
 	M_PROLOG
-	M_ENSURE( clrtoeol_fwd() != ERR );
+	M_ENSURE( wclrtoeol( static_cast<WINDOW*>( _window ) ) != ERR );
 	return;
 	M_EPILOG
 }
@@ -423,7 +429,7 @@ void HConsole::vmvprintf( int row_, int column_,
 		clrtoeol(); /* Always OK */
 	} else
 		move( row_, column_ );
-	M_ENSURE( vw_printw( stdscr, format_, ap ) != ERR );
+	M_ENSURE( vw_printw( static_cast<WINDOW*>( _window ), format_, ap ) != ERR );
 	move( origRow, origColumn );
 	return;
 	M_EPILOG
@@ -447,7 +453,7 @@ void HConsole::vprintf( char const* const format_, void* ap_ ) const {
 	va_list& ap = *static_cast<va_list*>( ap_ );
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
-	M_ENSURE( vw_printw( stdscr, format_, ap ) != ERR );
+	M_ENSURE( vw_printw( static_cast<WINDOW*>( _window ), format_, ap ) != ERR );
 	return;
 	M_EPILOG
 }
@@ -514,9 +520,9 @@ int HConsole::get_key( void ) const {
 	int key( getch() );
 	M_ASSERT( key < KEY_CODES::SPECIAL_KEY );
 	if ( key == KEY_CODES::ESC ) {
-		M_ENSURE( nodelay( stdscr, true ) != ERR );
+		M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 		key = getch();
-		M_ENSURE( nodelay( stdscr, false ) != ERR );
+		M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
 		if ( key == ERR )
 			key = KEY_CODES::ESC;
 		else
@@ -537,9 +543,9 @@ int HConsole::get_key( void ) const {
 			if ( key < KEY_CODES::ESC )
 				key = KEY<>::command_r( character = key + 96 );
 			else if ( key == KEY_CODES::ESC ) {
-				M_ENSURE( nodelay( stdscr, true ) != ERR );
+				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 				key = getch();
-				M_ENSURE( nodelay( stdscr, false ) != ERR );
+				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
 				if ( key == ERR )
 					key = KEY<>::command_r( character = KEY_CODES::ESC );
 				else
@@ -579,9 +585,9 @@ int HConsole::kbhit( void ) const {
 	M_PROLOG
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
-	M_ENSURE( nodelay( stdscr, true ) != ERR );
+	M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 	int key( get_key() );
-	M_ENSURE( nodelay( stdscr, false ) != ERR );
+	M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
 	if ( key == ERR )
 		return ( 0 );
 	return ( key );
@@ -591,8 +597,8 @@ int HConsole::kbhit( void ) const {
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 template <typename T1, typename T2>
-inline void fwd_attr_get( T1& val1_, T2& val2_, void* ) {
-	static_cast<void>( attr_get( val1_, val2_, NULL ) ); /* Ugly macro */
+inline void fwd_attr_get( WINDOW* win_, T1& val1_, T2& val2_, void* ) {
+	static_cast<void>( wattr_get( win_, val1_, val2_, NULL ) ); /* Ugly macro */
 }
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
@@ -607,7 +613,7 @@ char unsigned HConsole::get_attr( void ) const {
 	 * &attr and &color never being NULL. */
 	attr_t* pa( &attr );
 	NCURSES_ATTR_GET_SECOND_ARG_TYPE* pc( &color );
-	fwd_attr_get( pa, pc, NULL );
+	fwd_attr_get( static_cast<WINDOW*>( _window ), pa, pc, NULL );
 	int unsigned attribute = ( color << 1 ) & 56;
 	attribute |= ( color & 7 );
 	if ( attr & A_BOLD )
@@ -622,7 +628,7 @@ void HConsole::clrscr( void ) {
 	M_PROLOG
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
-	clear(); /* Always returns OK */
+	wclear( static_cast<WINDOW*>( _window ) ); /* Always returns OK */
 	refresh();
 	return;
 	M_EPILOG
@@ -678,10 +684,12 @@ int HConsole::on_terminal_resize( int signum_ ) {
 
 int HConsole::console_cleanup( int sigNo_ ) {
 	M_PROLOG
-	if ( ( sigNo_ == SIGINT ) && ( tools::_ignoreSignalSIGINT_ ) )
+	if ( ( sigNo_ == SIGINT ) && ( tools::_ignoreSignalSIGINT_ ) ) {
 		return ( 0 );
-	if ( is_enabled() )
+	}
+	if ( is_enabled() ) {
 		leave_curses();
+	}
 	return ( 0 );
 	M_EPILOG
 }
@@ -689,11 +697,12 @@ int HConsole::console_cleanup( int sigNo_ ) {
 int HConsole::on_quit( int ) {
 	M_PROLOG
 	if ( is_enabled() ) {
-		if ( tools::_ignoreSignalSIGQUIT_ )
+		if ( tools::_ignoreSignalSIGQUIT_ ) {
 			cmvprintf( get_height() - 1, 0, COLORS::FG_BRIGHTRED,
 					"Hard Quit is disabled by yaal configuration." );
-		else
+		} else {
 			leave_curses();
+		}
 	}
 	return ( 0 );
 	M_EPILOG
@@ -702,11 +711,12 @@ int HConsole::on_quit( int ) {
 int HConsole::on_tstp( int ) {
 	M_PROLOG
 	if ( is_enabled() ) {
-		if ( tools::_ignoreSignalSIGTSTP_ )
+		if ( tools::_ignoreSignalSIGTSTP_ ) {
 			cmvprintf( get_height() - 1, 0, COLORS::FG_BRIGHTRED,
 					"Suspend is disabled by yaal configuration." );
-		else
+		} else {
 			leave_curses();
+		}
 	}
 	return ( 0 );
 	M_EPILOG
