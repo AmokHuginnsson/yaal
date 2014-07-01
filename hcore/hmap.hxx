@@ -213,6 +213,19 @@ public:
 	}
 	data_type const& operator[] ( key_type const& key ) const {
 		M_PROLOG
+		return ( at( key ) );
+		M_EPILOG
+	}
+	data_type const& at( key_type const& key ) const {
+		M_PROLOG
+		typename engine_t::HIterator it( _engine.find( key ) );
+		if ( ! ( it != _engine.end() ) )
+			throw HInvalidKeyException( _errMsgHMap_[ERROR::INVALID_KEY] );
+		return ( it.get().second );
+		M_EPILOG
+	}
+	data_type& at( key_type const& key ) {
+		M_PROLOG
 		typename engine_t::HIterator it( _engine.find( key ) );
 		if ( ! ( it != _engine.end() ) )
 			throw HInvalidKeyException( _errMsgHMap_[ERROR::INVALID_KEY] );
