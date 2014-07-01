@@ -470,22 +470,18 @@ HRule::HRule( HRule const& rule_ )
 
 HRule::HRule( HRuleBase const& rule_ )
 	: HRuleBase(), _rule( rule_.clone() ), _completelyDefined( true ) {
-	HRuleAggregator rra( this );
 }
 
 HRule::HRule( ptr_t const& rule_ )
 	: _rule( rule_ ), _completelyDefined( true ) {
-	HRuleAggregator rra( this );
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_ )
 	: HRuleBase(), _rule( name_, rule_.clone() ), _completelyDefined( true ) {
-	HRuleAggregator rra( this );
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_ )
 	: _rule( name_, rule_ ), _completelyDefined( true ) {
-	HRuleAggregator rra( this );
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_t const& action_ )
