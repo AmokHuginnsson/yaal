@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef YAAL_HCONSOLE_HDateCONTROL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HDateCONTROL_HXX_INCLUDED 1
+#ifndef YAAL_HCONSOLE_HDATECONTROL_HXX_INCLUDED
+#define YAAL_HCONSOLE_HDATECONTROL_HXX_INCLUDED 1
 
 #include "hcore/htime.hxx"
 #include "hconsole/hwindow.hxx"
@@ -57,5 +57,5 @@ protected:
 
 }
 
-#endif /* #ifndef YAAL_HCONSOLE_HDateCONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HDATECONTROL_HXX_INCLUDED */
 
