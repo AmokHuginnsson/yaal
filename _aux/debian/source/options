@@ -1,0 +1,3 @@
+tar-ignore = *.tar
+tar-ignore = *.deb
+tar-ignore = yaal-bundle
