@@ -38,6 +38,7 @@ changelog: $(VERIFY_DIR)
 
 $(ARTIFACTS): $(VERIFY_DIR) changelog
 	cd ../../ && \
+	ln -nsf ./_aux/debian && \
 	dpkg-buildpackage -Zgzip -us -uc && \
 	mv $(addprefix ../,$(ARTIFACTS)) _aux/debian
 
@@ -58,6 +59,7 @@ clean: $(VERIFY_DIR) changelog
 	@/bin/rm -f $(ARTIFACTS) $(BUNDLE_WRAP) $(BUNDLE) && \
 	/bin/rm -rf yaal-bundle && \
 	cd ../../ && \
+	ln -nsf ./_aux/debian && \
 	dpkg-buildpackage -Tclean && \
 	/bin/rm debian _aux/debian/changelog
 
