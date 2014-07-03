@@ -496,6 +496,12 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Insert copies of value at given position.
+	 *
+	 * \param pos_ - insert copies of given value at this position.
+	 * \param count_ - insert that many copies of given value.
+	 * \param value_ - insert copies of this value.
+	 */
 	void insert( iterator pos_, int long count_, type_t const& value_ ) {
 		M_PROLOG
 		M_ASSERT( pos_._owner == this );
@@ -507,6 +513,12 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Insert value at given position.
+	 *
+	 * \param pos_ - insert given value at this position.
+	 * \param value_ - value to insert to this array.
+	 * \return Iterator pointing to newly inserted element.
+	 */
 	iterator insert( iterator pos_, type_t const& value_ ) {
 		M_PROLOG
 		M_ASSERT( pos_._owner == this );
@@ -517,6 +529,15 @@ public:
 		return ( pos_ );
 		M_EPILOG
 	}
+	/*! \brief Remove part of array.
+	 *
+	 * Part of array to be removed is defined by pair of valid iterators
+	 * forming a range in this array.
+	 *
+	 * \param first_ - begining of range of elements to be removed from array.
+	 * \param last_ - one past the end of range of elements to be removed from array.
+	 * \return Iterator pointing to first element after removed range.
+	 */
 	iterator erase( iterator first_, iterator last_ ) {
 		M_PROLOG
 		M_ASSERT( first_._owner == this );
@@ -530,9 +551,14 @@ public:
 		for ( iterator it( copy( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it )
 			M_SAFE( (*it).~value_type() );
 		_size -= ( last_._index - first_._index );
-		return ( last_._index < _size ? last_ : end() );
+		return ( first_ );
 		M_EPILOG
 	}
+	/*! \brief Remove element at given position.
+	 *
+	 * \param it - postion of the element to be removed from array.
+	 * \return Iterator pointing to element directly after the removed one.
+	 */
 	iterator erase( iterator it ) {
 		M_PROLOG
 		iterator next( it );

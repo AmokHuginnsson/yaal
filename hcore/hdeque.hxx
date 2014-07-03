@@ -251,7 +251,9 @@ public:
 	void insert( iterator, int long, type_t const& );
 	iterator erase( iterator it ) {
 		M_PROLOG
-		return ( erase( it, it + 1 ) );
+		iterator next( it );
+		++ next;
+		return ( erase( it, next ) );
 		M_EPILOG
 	}
 	iterator erase( iterator, iterator );
@@ -705,7 +707,7 @@ typename HDeque<type_t, allocator_t>::iterator HDeque<type_t, allocator_t>::eras
 	}
 	if ( ! _size )
 		_start = 0;
-	return ( last_._index < _size ? last_ : end() );
+	return ( first_ );
 	M_EPILOG
 }
 

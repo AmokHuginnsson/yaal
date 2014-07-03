@@ -194,11 +194,12 @@ public:
 		return ( newIt );
 		M_EPILOG
 	}
-	void erase( iterator first_, iterator const& last_ ) {
+	iterator erase( iterator first_, iterator const& last_ ) {
 		M_PROLOG
-		while ( first_ != last_ )
+		while ( first_ != last_ ) {
 			first_ = erase( first_ );
-		return;
+		}
+		return ( first_ );
 		M_EPILOG
 	}
 	const_iterator find( key_type const& key ) const {

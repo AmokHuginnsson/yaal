@@ -96,8 +96,8 @@ public:
 	const_reverse_iterator rend( void ) const;
 	int long count( value_type const& ) const;
 	int long erase( value_type const& );
-	void erase( const_iterator const& );
-	void erase( iterator, iterator );
+	iterator erase( const_iterator const& );
+	iterator erase( iterator, iterator );
 	bool operator == ( HTwoWayMap const& ) const;
 	bool operator < ( HTwoWayMap const& ) const;
 	left_view_type const& left( void ) const;
@@ -384,8 +384,10 @@ int long HTwoWayMap<left_type_t, right_type_t>::erase( value_type const& value_ 
 }
 
 template<typename left_type_t, typename right_type_t>
-void HTwoWayMap<left_type_t, right_type_t>::erase( const_iterator const& it ) {
+typename HTwoWayMap<left_type_t, right_type_t>::iterator HTwoWayMap<left_type_t, right_type_t>::erase( const_iterator const& it ) {
 	M_PROLOG
+	iterator next( it );
+	++ next;
 	typename left_view_type::view_storage_type::iterator lvit( _leftView._data.find( &(it->first) ) );
 	M_ASSERT( lvit != _leftView._data.end() );
 	typename storage_type::iterator toErase( lvit->second );
@@ -394,19 +396,17 @@ void HTwoWayMap<left_type_t, right_type_t>::erase( const_iterator const& it ) {
 	M_ASSERT( erasedInRight == 1 );
 	_data.erase( toErase );
 	M_ASSERT( ( _data.get_size() == _leftView._data.get_size() ) && ( _data.get_size() == _rightView._data.get_size() ) );
-	return;
+	return ( next );
 	M_EPILOG
 }
 
 template<typename left_type_t, typename right_type_t>
-void HTwoWayMap<left_type_t, right_type_t>::erase( iterator first, iterator last ) {
+typename HTwoWayMap<left_type_t, right_type_t>::iterator HTwoWayMap<left_type_t, right_type_t>::erase( iterator first, iterator last ) {
 	M_PROLOG
 	for ( ; first != last; ) {
-		iterator del( first );
-		++ first;
-		erase( del );
+		first = erase( first );
 	}
-	return;
+	return ( first );
 	M_EPILOG
 }
 

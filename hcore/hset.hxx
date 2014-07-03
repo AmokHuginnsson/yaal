@@ -199,11 +199,12 @@ public:
 		return ( newIt );
 		M_EPILOG
 	}
-	void erase( HIterator first_, HIterator const& last_ ) {
+	HIterator erase( HIterator first_, HIterator const& last_ ) {
 		M_PROLOG
-		while ( first_ != last_ )
+		while ( first_ != last_ ) {
 			first_ = erase( first_ );
-		return;
+		}
+		return ( first_ );
 		M_EPILOG
 	}
 	HIterator find( value_type const& e ) const

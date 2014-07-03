@@ -238,10 +238,12 @@ public:
 		return;
 		M_EPILOG
 	}
-	void erase( iterator it ) {
+	iterator erase( iterator it ) {
 		M_PROLOG
+		iterator next( it );
+		++ next;
 		_engine.erase( it._engine );
-		return;
+		return ( next );
 		M_EPILOG
 	}
 	/*! \brief Remove given key from map.
@@ -258,11 +260,12 @@ public:
 		return ( erased ? 1 : 0 );
 		M_EPILOG
 	}
-	void erase( iterator first_, iterator const& last_ ) {
+	iterator erase( iterator first_, iterator const& last_ ) {
 		M_PROLOG
-		while ( first_ != last_ )
+		while ( first_ != last_ ) {
 			first_ = erase( first_ );
-		return;
+		}
+		return ( first_ );
 		M_EPILOG
 	}
 	int long count( key_t const& key_ ) const

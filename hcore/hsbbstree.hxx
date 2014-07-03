@@ -119,7 +119,7 @@ private:
 #endif /* #else #ifndef __sun__ */
 	/*! \brief True HSBBSTree contents.
 	 */
-	class	HNode : public HSBBSTreeBase::HAbstractNode {
+	class HNode : public HSBBSTreeBase::HAbstractNode {
 		using HAbstractNode::color_t;
 		using HAbstractNode::_color;
 		using HAbstractNode::_parent;

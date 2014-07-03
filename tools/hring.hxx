@@ -632,7 +632,7 @@ typename HRing<type_t>::iterator HRing<type_t>::erase( iterator first_, iterator
 		}
 	}
 	_size -= ( last_._index - first_._index );
-	return ( last_._index < _size ? last_ : end() );
+	return ( first_ );
 	M_EPILOG
 }
 
