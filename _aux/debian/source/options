@@ -1,3 +1,11 @@
+tar-ignore
+tar-ignore = .gdbhistory
+tar-ignore = .cproject
+tar-ignore = .project
+tar-ignore = .settings
 tar-ignore = *.tar
+tar-ignore = *.tar.gz
 tar-ignore = *.deb
 tar-ignore = yaal-bundle
+tar-ignore = yaal/debian
+tar-ignore = .my_make
