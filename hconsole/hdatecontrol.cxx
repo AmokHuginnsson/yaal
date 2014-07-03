@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	htimecontrol.hxx - this file is integral part of `yaal' project.
+	hdatecontrol.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -24,38 +24,51 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef YAAL_HCONSOLE_HTIMECONTROL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HTIMECONTROL_HXX_INCLUDED 1
+#include "hcore/base.hxx"
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
+#include "hdatecontrol.hxx"
 
-#include "hcore/htime.hxx"
-#include "hconsole/hwindow.hxx"
+using namespace yaal::hcore;
 
 namespace yaal {
 
 namespace hconsole {
 
-/*! \brief Implementation of TUI Time control class.
- *
- * Time control allows setting and/or getting time.
- */
-class HTimeControl : public virtual HControl {
-public:
-	typedef HTimeControl this_type;
-	typedef HControl base_type;
-private:
-	yaal::hcore::HTime _time;
-public:
-	HTimeControl( HWindow*, int, int, int, int, char const* );
-	virtual ~HTimeControl( void );
-protected:
-	virtual void do_refresh( void );
-	virtual int do_process_input( int );
-	virtual bool do_click( mouse::OMouse& );
-};
+HDateControl::HDateControl( HWindow* parent_, int row_, int column_,
+		int height_, int width_, char const* label_ )
+	: HControl( parent_, row_, column_, height_, width_, label_ ),
+	_time( HTime::LOCAL ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
 
+HDateControl::~HDateControl ( void ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HDateControl::do_refresh( void ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+int HDateControl::do_process_input( int code_ ) {
+	M_PROLOG
+	return ( code_ );
+	M_EPILOG
+}
+
+bool HDateControl::do_click( mouse::OMouse& ) {
+	M_PROLOG
+	return ( false );
+	M_EPILOG
 }
 
 }
 
-#endif /* #ifndef YAAL_HCONSOLE_HTIMECONTROL_HXX_INCLUDED */
+}
 

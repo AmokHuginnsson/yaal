@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	htimecontrol.hxx - this file is integral part of `yaal' project.
+	hdatecontrol.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef YAAL_HCONSOLE_HTIMECONTROL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HTIMECONTROL_HXX_INCLUDED 1
+#ifndef YAAL_HCONSOLE_HDateCONTROL_HXX_INCLUDED
+#define YAAL_HCONSOLE_HDateCONTROL_HXX_INCLUDED 1
 
 #include "hcore/htime.hxx"
 #include "hconsole/hwindow.hxx"
@@ -34,19 +34,19 @@ namespace yaal {
 
 namespace hconsole {
 
-/*! \brief Implementation of TUI Time control class.
+/*! \brief Implementation of TUI Date control class.
  *
- * Time control allows setting and/or getting time.
+ * Time control allows setting and/or getting dates.
  */
-class HTimeControl : public virtual HControl {
+class HDateControl : public virtual HControl {
 public:
-	typedef HTimeControl this_type;
+	typedef HDateControl this_type;
 	typedef HControl base_type;
 private:
 	yaal::hcore::HTime _time;
 public:
-	HTimeControl( HWindow*, int, int, int, int, char const* );
-	virtual ~HTimeControl( void );
+	HDateControl( HWindow*, int, int, int, int, char const* );
+	virtual ~HDateControl( void );
 protected:
 	virtual void do_refresh( void );
 	virtual int do_process_input( int );
@@ -57,5 +57,5 @@ protected:
 
 }
 
-#endif /* #ifndef YAAL_HCONSOLE_HTIMECONTROL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HDateCONTROL_HXX_INCLUDED */
 
