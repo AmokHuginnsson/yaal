@@ -63,7 +63,7 @@ namespace tools {
 
 HString _serialDevice_;
 HString _defaultEncoding_ = "ISO-8859-2";
-HSerial::speed_t _baudRate_ = HSerial::SPEED::B_115200;
+HSerial::SPEED::speed_t _baudRate_ = HSerial::SPEED::B_115200;
 HSerial::flag_t _serialFlags_ = HSerial::flag_t( HSerial::FLAG::FLOW_CONTROL_HARDWARE ) | HSerial::FLAG::BITS_PER_BYTE_8;
 int _collectorConnectionTimeOut_ = 9999;
 bool _ignoreSignalSIGINT_ = false;

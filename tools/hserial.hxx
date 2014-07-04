@@ -30,7 +30,7 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/hrawfile.hxx"
-#include "hcore/hstrongenum.hxx"
+#include "hcore/hbitflag.hxx"
 
 namespace yaal {
 
@@ -44,25 +44,24 @@ public:
 	typedef HRawFile base_type;
 	/*! \brief Serial port configuration flags.
 	 */
+	struct FLAG;
+	typedef yaal::hcore::HBitFlag<FLAG> flag_t;
 	struct FLAG {
-		typedef enum {
-			DEFAULT               = 0x0001,
-			FLOW_CONTROL_HARDWARE = 0x0002,
-			FLOW_CONTROL_SOFTWARE = 0x0004,
-			STOP_BITS_1           = 0x0008,
-			STOP_BITS_2           = 0x0010,
-			PARITY_CHECK          = 0x0020,
-			PARITY_ODD            = 0x0040,
-			BITS_PER_BYTE_8       = 0x0080,
-			BITS_PER_BYTE_7       = 0x0100,
-			BITS_PER_BYTE_6       = 0x0200,
-			BITS_PER_BYTE_5       = 0x0400,
-			CANONICAL             = 0x0800,
-			ECHO                  = 0x1000,
-			CR2NL                 = 0x2000
-		} enum_t;
+		static flag_t const DEFAULT;
+		static flag_t const FLOW_CONTROL_HARDWARE;
+		static flag_t const FLOW_CONTROL_SOFTWARE;
+		static flag_t const STOP_BITS_1;
+		static flag_t const STOP_BITS_2;
+		static flag_t const PARITY_CHECK;
+		static flag_t const PARITY_ODD;
+		static flag_t const BITS_PER_BYTE_8;
+		static flag_t const BITS_PER_BYTE_7;
+		static flag_t const BITS_PER_BYTE_6;
+		static flag_t const BITS_PER_BYTE_5;
+		static flag_t const CANONICAL;
+		static flag_t const ECHO;
+		static flag_t const CR2NL;
 	};
-	typedef yaal::hcore::HStrongEnum<FLAG> flag_t;
 	/*! \brief Serial port data trnsmission speeds.
 	 */
 	struct SPEED {
@@ -88,11 +87,10 @@ public:
 #endif /* HAVE_DECL_B7200 */
 			B_4800,
 			B_2400
-		} enum_t;
+		} speed_t;
 	};
-	typedef yaal::hcore::HStrongEnum<SPEED> speed_t;
 protected:
-	speed_t _speed;
+	SPEED::speed_t _speed;
 	flag_t _flags;
 	hcore::HString _devicePath;
 	hcore::HChunk _tIO;
@@ -101,7 +99,7 @@ public:
 	HSerial( yaal::hcore::HString const& = yaal::hcore::HString() ); /* device path */
 	virtual ~HSerial( void );
 	void open( void );
-	void set_speed( speed_t );
+	void set_speed( SPEED::speed_t );
 	void set_flags( flag_t );
 	void flush( int );
 	void wait_for_eot( void );

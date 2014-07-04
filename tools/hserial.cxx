@@ -53,9 +53,25 @@ namespace tools {
 namespace {
 	char const* const _eAlreadyOpened_ = _( "serial port already openend" );
 	char const* const _eNotOpened_ = _( "serial port not opened" );
+	HSerial::flag_t drop = HSerial::flag_t::new_flag();
 }
 
-HSerial::flag_t HSerial::FLAG_TEXT = HSerial::flag_t( HSerial::FLAG::DEFAULT ) | HSerial::FLAG::CANONICAL | HSerial::FLAG::CR2NL;
+HSerial::flag_t const HSerial::FLAG::DEFAULT = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::FLOW_CONTROL_HARDWARE = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::FLOW_CONTROL_SOFTWARE = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::STOP_BITS_1 = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::STOP_BITS_2 = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::PARITY_CHECK = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::PARITY_ODD = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::BITS_PER_BYTE_8 = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::BITS_PER_BYTE_7 = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::BITS_PER_BYTE_6 = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::BITS_PER_BYTE_5 = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::CANONICAL = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::ECHO = HSerial::flag_t::new_flag();
+HSerial::flag_t const HSerial::FLAG::CR2NL = HSerial::flag_t::new_flag();
+
+HSerial::flag_t HSerial::FLAG_TEXT = HSerial::FLAG::DEFAULT | HSerial::FLAG::CANONICAL | HSerial::FLAG::CR2NL;
 
 HSerial::HSerial( HString const& devicePath_ )
 				: HRawFile(), _speed( SPEED::DEFAULT ),
@@ -143,7 +159,7 @@ void HSerial::compile( void ) {
 	M_EPILOG
 }
 
-void HSerial::set_speed( speed_t speed_ ) {
+void HSerial::set_speed( SPEED::speed_t speed_ ) {
 	M_PROLOG
 	_speed = speed_;
 	return;
@@ -158,7 +174,7 @@ void HSerial::compile_speed( void ) {
 	int baudRate = 0;
 	if ( _speed == SPEED::DEFAULT )
 		_speed = tools::_baudRate_;
-	switch ( _speed.value() ) {
+	switch ( _speed ) {
 		case ( SPEED::B_230400 ): baudRate = B230400; break;
 		case ( SPEED::B_115200 ): baudRate = B115200; break;
 #if defined( HAVE_DECL_B76800 ) && ( HAVE_DECL_B76800 == 1 )
@@ -181,7 +197,7 @@ void HSerial::compile_speed( void ) {
 		case ( SPEED::B_2400 ): baudRate = B2400; break;
 		case ( SPEED::DEFAULT ): break;
 		default : {
-			M_THROW( _( "unknown speed" ), _speed.value() );
+			M_THROW( _( "unknown speed" ), _speed );
 			break;
 		}
 	}
