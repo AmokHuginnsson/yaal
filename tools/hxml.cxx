@@ -70,6 +70,12 @@ namespace yaal {
 
 namespace tools {
 
+HXml::parser_t const HXml::PARSER::DEFAULT = HXml::parser_t::new_flag();
+HXml::parser_t const HXml::PARSER::KEEP_EMPTY = HXml::parser_t::new_flag();
+HXml::parser_t const HXml::PARSER::STRIP_COMMENT = HXml::parser_t::new_flag();
+HXml::parser_t const HXml::PARSER::RESOLVE_ENTITIES = HXml::parser_t::new_flag();
+HXml::parser_t const HXml::PARSER::AUTO_XINCLUDE = HXml::parser_t::new_flag();
+
 class HXmlParserG : public HSingleton<HXmlParserG> {
 	HXmlParserG( void );
 	~HXmlParserG( void );
@@ -348,7 +354,7 @@ int HXml::get_node_set_by_path( yaal::hcore::HString const& path_ ) {
 	M_EPILOG
 }
 
-void HXml::init( yaal::hcore::HStreamInterface& stream, PARSER::parser_t parser_ ) {
+void HXml::init( yaal::hcore::HStreamInterface& stream, parser_t parser_ ) {
 	M_PROLOG
 	int savedErrno = errno;
 	HString error;
@@ -412,7 +418,7 @@ void HXml::parse_dtd( void* dtd_ ) {
 	M_EPILOG
 }
 
-void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream, PARSER::parser_t parser_ ) {
+void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream, parser_t parser_ ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	init( *stream, parser_ );
@@ -420,7 +426,7 @@ void HXml::init( yaal::hcore::HStreamInterface::ptr_t stream, PARSER::parser_t p
 	M_EPILOG
 }
 
-void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, PARSER::parser_t parser_ ) {
+void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ ) {
 	M_PROLOG
 	xmlNodePtr node = static_cast<xmlNodePtr>( data_ );
 	while ( node ) {
@@ -528,14 +534,14 @@ void HXml::parse( HString const& xPath_ ) {
 	M_EPILOG
 }
 
-void HXml::parse( PARSER::parser_t parser_ ) {
+void HXml::parse( parser_t parser_ ) {
 	M_PROLOG
 	parse( FULL_TREE, parser_ );
 	return;
 	M_EPILOG
 }
 
-void HXml::parse( HString const& xPath_, PARSER::parser_t parser_ ) {
+void HXml::parse( HString const& xPath_, parser_t parser_ ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	HString xPath( xPath_.is_empty() ? FULL_TREE : xPath_.raw() );
@@ -559,7 +565,7 @@ void HXml::parse( HString const& xPath_, PARSER::parser_t parser_ ) {
 	M_EPILOG
 }
 
-void HXml::load( yaal::hcore::HStreamInterface& stream, PARSER::parser_t parser_ ) {
+void HXml::load( yaal::hcore::HStreamInterface& stream, parser_t parser_ ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	M_ENSURE( stream.is_valid() );
@@ -569,7 +575,7 @@ void HXml::load( yaal::hcore::HStreamInterface& stream, PARSER::parser_t parser_
 	M_EPILOG
 }
 
-void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream, PARSER::parser_t parser_ ) {
+void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream, parser_t parser_ ) {
 	M_PROLOG
 	M_ENSURE( stream->is_valid() );
 	load( *stream, parser_ );

@@ -34,6 +34,7 @@ Copyright:
 
 #include "hcore/hstring.hxx"
 #include "hcore/hmap.hxx"
+#include "hcore/hbitflag.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/htree.hxx"
 #include "hcore/hpointer.hxx"
@@ -64,14 +65,14 @@ public:
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, yaal::hcore::HString> entities_t;
 	typedef entities_t::const_iterator const_entity_iterator;
 	typedef entities_t::iterator entity_iterator;
+	struct PARSER;
+	typedef yaal::hcore::HBitFlag<PARSER> parser_t;
 	struct PARSER {
-		typedef enum {
-			DEFAULT = 0,
-			KEEP_EMPTY = 1,
-			STRIP_COMMENT = 2,
-			RESOLVE_ENTITIES = 4,
-			AUTO_XINCLUDE = 8
-		} parser_t;
+		static parser_t const DEFAULT;
+		static parser_t const KEEP_EMPTY;
+		static parser_t const STRIP_COMMENT;
+		static parser_t const RESOLVE_ENTITIES;
+		static parser_t const AUTO_XINCLUDE;
 	};
 private:
 	struct OConvert;
@@ -94,17 +95,17 @@ public:
 	HXml( HXml const& );
 	void swap( HXml& );
 	HXml& operator = ( HXml const& );
-	void init( yaal::hcore::HStreamInterface&, PARSER::parser_t = PARSER::DEFAULT );
-	void init( yaal::hcore::HStreamInterface::ptr_t, PARSER::parser_t = PARSER::DEFAULT );
+	void init( yaal::hcore::HStreamInterface&, parser_t = PARSER::DEFAULT );
+	void init( yaal::hcore::HStreamInterface::ptr_t, parser_t = PARSER::DEFAULT );
 	void apply_style( yaal::hcore::HString const& );
 	void parse( void );
 	void parse( yaal::hcore::HString const& );
-	void parse( PARSER::parser_t );
-	void parse( yaal::hcore::HString const&, PARSER::parser_t );
+	void parse( parser_t );
+	void parse( yaal::hcore::HString const&, parser_t );
 	HNodeProxy get_root( void );
 	HConstNodeProxy const get_root( void ) const;
-	void load( yaal::hcore::HStreamInterface&, PARSER::parser_t = PARSER::DEFAULT );
-	void load( yaal::hcore::HStreamInterface::ptr_t, PARSER::parser_t = PARSER::DEFAULT );
+	void load( yaal::hcore::HStreamInterface&, parser_t = PARSER::DEFAULT );
+	void load( yaal::hcore::HStreamInterface::ptr_t, parser_t = PARSER::DEFAULT );
 	void save( yaal::hcore::HStreamInterface&, bool = false ) const;
 	void save( yaal::hcore::HStreamInterface::ptr_t, bool = false ) const;
 	void create_root( yaal::hcore::HString const&, yaal::hcore::HString const& = yaal::hcore::HString() );
@@ -121,7 +122,7 @@ private:
 	static int writer_callback( void*, char const*, int );
 	static int reader_callback( void*, char*, int );
 	void do_save( void ) const;
-	void parse( xml_node_ptr_t, tree_t::node_t, PARSER::parser_t );
+	void parse( xml_node_ptr_t, tree_t::node_t, parser_t );
 	void dump_node( void*, HConstNodeProxy const& ) const;
 	yaal::hcore::HString const& convert( yaal::hcore::HString const&, way_t = TO_INTERNAL ) const;
 	int get_node_set_by_path( yaal::hcore::HString const& );
