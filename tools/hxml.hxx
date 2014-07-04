@@ -69,7 +69,8 @@ public:
 			DEFAULT = 0,
 			KEEP_EMPTY = 1,
 			STRIP_COMMENT = 2,
-			RESOLVE_ENTITIES = 4
+			RESOLVE_ENTITIES = 4,
+			AUTO_XINCLUDE = 8
 		} parser_t;
 	};
 private:
@@ -81,9 +82,10 @@ private:
 	mutable yaal::hcore::HString _convertedString;
 	yaal::hcore::HString _varTmpBuffer;
 	yaal::hcore::HString _encoding;
+	yaal::hcore::HString _streamId;
 	xml_low_t _xml;
 	entities_t _entities;
-	tree_t _dOM;
+	tree_t _domTree;
 public:
 	typedef tree_t::node_t xml_element_t;
 	typedef tree_t::const_node_t const_xml_element_t;

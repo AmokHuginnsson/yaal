@@ -145,11 +145,13 @@ struct HXml::OConvert {
 		xmlCharEncodingHandlerPtr encoder = NULL;
 		if ( !! encoding_ )
 			encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
-		else
+		else {
 			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: no encoding declared in `" )
 				<< fileName_ << "'." << endl;
+		}
 		if ( ! encoder ) {
-			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: char encoding handler not found" ) << endl;
+			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: char encoding handler not found in `" )
+				<< fileName_ << "'." << endl;
 			xmlCharEncoding encoding = ::xmlDetectCharEncoding( root_->name,
 					xmlStrlen( root_->name ) );
 			if ( ! encoding )
@@ -218,9 +220,14 @@ void HXmlData::clear( void ) const {
 }
 
 HXml::HXml( void )
-	: _convert( new ( memory::yaal ) HXml::OConvert ), _convertedString(),
-	_varTmpBuffer(), _encoding( _defaultEncoding_ ), _xml(),
-	_entities(), _dOM() {
+	: _convert( new ( memory::yaal ) HXml::OConvert ),
+	_convertedString(),
+	_varTmpBuffer(),
+	_encoding( _defaultEncoding_ ),
+	_streamId(),
+	_xml(),
+	_entities(),
+	_domTree() {
 	M_PROLOG
 	_xml = xml_low_t( new ( memory::yaal ) HXmlData() );
 	return;
@@ -228,9 +235,14 @@ HXml::HXml( void )
 }
 
 HXml::HXml( HXml const& xml_ )
-	: _convert( xml_._convert ), _convertedString( xml_._convertedString ),
-	_varTmpBuffer( xml_._varTmpBuffer ), _encoding( xml_._encoding ), _xml(),
-	_entities( xml_._entities ), _dOM( xml_._dOM ) {
+	: _convert( xml_._convert ),
+	_convertedString( xml_._convertedString ),
+	_varTmpBuffer( xml_._varTmpBuffer ),
+	_encoding( xml_._encoding ),
+	_streamId( xml_._streamId ),
+	_xml(),
+	_entities( xml_._entities ),
+	_domTree( xml_._domTree ) {
 	M_PROLOG
 	_xml = xml_low_t( new ( memory::yaal ) HXmlData( *xml_._xml ) );
 	return;
@@ -252,9 +264,10 @@ void HXml::swap( HXml& xml_ ) {
 		swap( xml_._convertedString, _convertedString );
 		swap( xml_._varTmpBuffer, _varTmpBuffer );
 		swap( xml_._encoding, _encoding );
+		swap( xml_._streamId, _streamId );
 		swap( xml_._xml, _xml );
 		swap( xml_._entities, _entities );
-		swap( xml_._dOM, _dOM );
+		swap( xml_._domTree, _domTree );
 	}
 	return;
 }
@@ -341,23 +354,30 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, PARSER::parser_t parser_
 	HString error;
 	HXmlParserG::get_instance();
 	errno = 0;
-	HString streamId = get_stream_id( &stream );
-	int LOW_LEVEL_PARSING_OPTIONS( XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR | XML_PARSE_XINCLUDE | XML_PARSE_NONET | XML_PARSE_NSCLEAN );
-	if ( parser_ & PARSER::RESOLVE_ENTITIES )
+	_streamId = get_stream_id( &stream );
+	int LOW_LEVEL_PARSING_OPTIONS( XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR | XML_PARSE_NONET | XML_PARSE_NSCLEAN );
+	if ( parser_ & PARSER::AUTO_XINCLUDE ) {
+		LOW_LEVEL_PARSING_OPTIONS |= XML_PARSE_XINCLUDE;
+	}
+	if ( parser_ & PARSER::RESOLVE_ENTITIES ) {
 		LOW_LEVEL_PARSING_OPTIONS |= XML_PARSE_NOENT;
-	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, &stream, streamId.raw(), NULL, LOW_LEVEL_PARSING_OPTIONS ),
+	}
+	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, &stream, _streamId.raw(), NULL, LOW_LEVEL_PARSING_OPTIONS ),
 			xmlFreeDoc );
 	if ( errno ) {
-		log( LOG_TYPE::WARNING ) << error_message( errno ) << ": " << streamId;
+		log( LOG_TYPE::WARNING ) << "XML: " << error_message( errno ) << ": " << _streamId;
 		log << ", code: " << errno << '.' << endl;
 	}
 	errno = savedErrno;
 	if ( ! doc.get() ) {
-		error.format( _( "cannot parse `%s'" ), streamId.raw() );
+		error.format( _( "cannot parse `%s'" ), _streamId.raw() );
 		throw HXmlException( error );
 	}
-	if ( xmlXIncludeProcessFlags( doc.get(), LOW_LEVEL_PARSING_OPTIONS ) < 0 )
-		throw HXmlException( "a flagged processing XInclude failed" );
+	if ( parser_ & PARSER::AUTO_XINCLUDE ) {
+		if ( xmlXIncludeProcessFlags( doc.get(), LOW_LEVEL_PARSING_OPTIONS ) < 0 ) {
+			throw HXmlException( "a flagged processing XInclude failed" );
+		}
+	}
 	xmlNodePtr root = xmlDocGetRootElement( doc.get() );
 	if ( ! root )
 		M_THROW( _( "empty doc" ), errno );
@@ -365,7 +385,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, PARSER::parser_t parser_
 	cout << root->name << endl;
 #endif /* __DEBUGGER_BABUNI__ */
 	(*_convert).init( reinterpret_cast<char const *>( doc.get()->encoding ),
-			root, streamId );
+			root, _streamId );
 	using yaal::swap;
 	swap( _xml->_doc, doc );
 	parse_dtd( _xml->_doc.get()->intSubset );
@@ -382,7 +402,7 @@ void HXml::parse_dtd( void* dtd_ ) {
 			if ( ( node->type == XML_ENTITY_DECL ) && ( node->name && node->content ) )
 				_entities[ reinterpret_cast<char const*>( node->name ) ] = reinterpret_cast<char const*>( node->content );
 			else
-				log_trace << "failed to handle DTD child: " << static_cast<int>( node->type )
+				log( LOG_TYPE::ERROR ) << "XML: `" << _streamId << "' failed to handle DTD child: " << static_cast<int>( node->type )
 					<< " " << ( node->name ? reinterpret_cast<char const*>( node->name ) : "(nil)" )
 					<< " " << ( node->content ? reinterpret_cast<char const*>( node->content ) : "(nil)" )<< endl;
 			node = node->next;
@@ -421,7 +441,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, PARSER::parser_t p
 				if ( node_ )
 					node_ = &*node_->add_node( HNode( this ) );
 				else
-					node_ = _dOM.create_new_root( HNode( this ) );
+					node_ = _domTree.create_new_root( HNode( this ) );
 				(**node_)._text = reinterpret_cast<char const*>( node->name );
 				if ( node->properties ) {
 					xmlAttrPtr attribute = node->properties;
@@ -460,8 +480,15 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, PARSER::parser_t p
 				node_->add_node( HNode( this, HNode::TYPE::COMMENT, _varTmpBuffer ) );
 			}
 			break;
+			case ( XML_XINCLUDE_START ):
+			case ( XML_XINCLUDE_END ):
+				/*
+				 * We support xinclude but we do anything special about them
+				 * except automatical parsing.
+				 */
+			break;
 			default:
-				log_trace << "unsupported type: " << static_cast<int>( node->type ) << endl;
+				log( LOG_TYPE::WARNING ) << "XML: `" << _streamId << "' unsupported type: " << static_cast<int>( node->type ) << endl;
 			break;
 		}
 		node = NULL;
@@ -513,7 +540,7 @@ void HXml::parse( HString const& xPath_, PARSER::parser_t parser_ ) {
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	HString xPath( xPath_.is_empty() ? FULL_TREE : xPath_.raw() );
 	get_node_set_by_path( xPath );
-	_dOM.clear();
+	_domTree.clear();
 	int ctr = 0;
 	while ( xPath[ ctr ] )
 		ctr ++;
@@ -521,7 +548,7 @@ void HXml::parse( HString const& xPath_, PARSER::parser_t parser_ ) {
 	M_ASSERT( ctr >= 0 );
 	if ( _xml->_nodeSet ) {
 		if ( xPath != FULL_TREE ) {
-			tree_t::node_t root = _dOM.create_new_root( HNode( this ) );
+			tree_t::node_t root = _domTree.create_new_root( HNode( this ) );
 			(**root)._text = "xpath_result_set";
 			for ( ctr = 0; ctr < _xml->_nodeSet->nodeNr; ++ ctr )
 				parse( _xml->_nodeSet->nodeTab[ ctr ],
@@ -699,7 +726,7 @@ void HXml::create_root( yaal::hcore::HString const& name_, yaal::hcore::HString 
 	M_PROLOG
 	M_ASSERT( name_ );
 	_encoding = ( !! encoding_ ) ? encoding_ : _defaultEncoding_;
-	tree_t::node_t root = _dOM.create_new_root( HNode( this ) );
+	tree_t::node_t root = _domTree.create_new_root( HNode( this ) );
 	(**root)._text = name_;
 	return;
 	M_EPILOG
@@ -708,7 +735,7 @@ void HXml::create_root( yaal::hcore::HString const& name_, yaal::hcore::HString 
 void HXml::clear( void ) {
 	M_PROLOG
 	_encoding.clear();
-	_dOM.clear();
+	_domTree.clear();
 	_xml->clear();
 	return;
 	M_EPILOG
@@ -716,13 +743,13 @@ void HXml::clear( void ) {
 
 HXml::HNodeProxy HXml::get_root( void ) {
 	M_PROLOG
-	return ( HNodeProxy( _dOM.get_root() ) );
+	return ( HNodeProxy( _domTree.get_root() ) );
 	M_EPILOG
 }
 
 HXml::HConstNodeProxy const HXml::get_root( void ) const {
 	M_PROLOG
-	return ( HConstNodeProxy( _dOM.get_root() ) );
+	return ( HConstNodeProxy( _domTree.get_root() ) );
 	M_EPILOG
 }
 
@@ -1086,13 +1113,13 @@ HXml::const_xml_element_t HXml::get_element_by_id( const_xml_element_t const& no
 
 HXml::HNodeProxy HXml::get_element_by_id( yaal::hcore::HString const& id ) {
 	M_PROLOG
-	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_id( _dOM.get_root(), id ) ) ) );
+	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_id( _domTree.get_root(), id ) ) ) );
 	M_EPILOG
 }
 
 HXml::HConstNodeProxy const HXml::get_element_by_id( yaal::hcore::HString const& id ) const {
 	M_PROLOG
-	return ( HConstNodeProxy( get_element_by_id( _dOM.get_root(), id ) ) );
+	return ( HConstNodeProxy( get_element_by_id( _domTree.get_root(), id ) ) );
 	M_EPILOG
 }
 
@@ -1128,13 +1155,13 @@ HXml::const_xml_element_t HXml::get_element_by_path( const_xml_element_t const& 
 
 HXml::HNodeProxy HXml::get_element_by_path( yaal::hcore::HString const& path ) {
 	M_PROLOG
-	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_path( _dOM.get_root(), path, 1 ) ) ) );
+	return ( HNodeProxy( const_cast<xml_element_t>( get_element_by_path( _domTree.get_root(), path, 1 ) ) ) );
 	M_EPILOG
 }
 
 HXml::HConstNodeProxy const HXml::get_element_by_path( yaal::hcore::HString const& path ) const {
 	M_PROLOG
-	return ( HConstNodeProxy( get_element_by_path( _dOM.get_root(), path, 1 ) ) );
+	return ( HConstNodeProxy( get_element_by_path( _domTree.get_root(), path, 1 ) ) );
 	M_EPILOG
 }
 
