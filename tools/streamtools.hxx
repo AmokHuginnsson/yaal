@@ -42,6 +42,7 @@ Copyright:
 #include "hcore/hhashset.hxx"
 #include "hcore/hhashmap.hxx"
 #include "hcore/htuple.hxx"
+#include "hcore/hbitset.hxx"
 #include "tools/hring.hxx"
 #include "tools/htwowaymap.hxx"
 #include "tools/hbitmap.hxx"
@@ -355,6 +356,14 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out,
 		<< t_.template get<6>() << ", " << t_.template get<7>() << ", "
 		<< t_.template get<8>() << ", " << t_.template get<9>() << ", "
 		<< t_.template get<10>() << ", " << t_.template get<11>() << ">" << yaal::hcore::flush;
+	return ( out );
+	M_EPILOG
+}
+
+template<int const SIZE>
+yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& out, yaal::hcore::HBitset<SIZE> const& bs_ ) {
+	M_PROLOG
+	out << "bitset<" << bs_.to_string() << ">" << yaal::hcore::flush;
 	return ( out );
 	M_EPILOG
 }
