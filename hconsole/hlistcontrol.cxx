@@ -44,6 +44,13 @@ namespace yaal {
 
 namespace hconsole {
 
+HListControl::flag_t const HListControl::FLAG::NONE = HListControl::flag_t::new_flag();
+HListControl::flag_t const HListControl::FLAG::CHECKABLE = HListControl::flag_t::new_flag();
+HListControl::flag_t const HListControl::FLAG::SORTABLE = HListControl::flag_t::new_flag();
+HListControl::flag_t const HListControl::FLAG::EDITABLE = HListControl::flag_t::new_flag();
+HListControl::flag_t const HListControl::FLAG::DRAW_HEADER = HListControl::flag_t::new_flag();
+HListControl::flag_t const HListControl::FLAG::ALL = ~HListControl::FLAG::NONE;
+
 HListControl::HColumnInfo::HColumnInfo( void )
 	: _descending( false ), _widthRaw( 0 ), _width( 0 ), _align( BITS::ALIGN::LEFT ),
 	_shortcutIndex( 0 ), _shortcut( 0 ), _type( TYPE::HSTRING ), _name(),

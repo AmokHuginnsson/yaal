@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hpointer.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/memory.hxx"
+#include "hcore/hbitflag.hxx"
 #include "tools/collections.hxx"
 #include "hconsole/hitem.hxx"
 #include "hconsole/hwindow.hxx"
@@ -413,17 +414,16 @@ public:
 	typedef list_control_helper::HAbstractControler::HModelIteratorWrapper iterator_t;
 	/*! \brief HListControl settings flags.
 	 */
+	struct FLAG;
+	typedef yaal::hcore::HBitFlag<FLAG> flag_t;
 	struct FLAG {
-		typedef enum {
-			NONE = 0,
-			CHECKABLE = 1,
-			SORTABLE = 2,
-			EDITABLE = 4,
-			DRAW_HEADER = 8,
-			ALL = -1
-		} enum_t;
+		static flag_t const NONE;
+		static flag_t const CHECKABLE;
+		static flag_t const SORTABLE;
+		static flag_t const EDITABLE;
+		static flag_t const DRAW_HEADER;
+		static flag_t const ALL;
 	};
-	typedef yaal::hcore::HStrongEnum<FLAG> flag_t;
 	/*! \brief Description of HListControl column meta-data.
 	 */
 	class HColumnInfo {
