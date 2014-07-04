@@ -242,15 +242,15 @@ int long const min<a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a
  * \tparam input - a number in decimal form consisting only 0s and 1s.
  * \retval value - a number of value of binary interpretation of input.
  */
-template<int long unsigned const input>
+template<int long long unsigned const input>
 struct binary {
-	static int long unsigned const value = ( binary<input / 10>::value << 1 ) + ( input % 10 );
+	static int long long unsigned const value = ( binary<input / 10>::value << 1 ) + ( input % 10 );
 };
 
 /*! \cond */
 template<>
 struct binary<0> {
-	static int long unsigned const value = 0;
+	static int long long unsigned const value = 0;
 };
 /*! \endcond */
 
@@ -259,15 +259,15 @@ struct binary<0> {
  * \tparam input - a number in octal form consisting only 0s and 1s.
  * \retval value - a number of value of binary interpretation of input.
  */
-template<int long unsigned const input>
+template<int long long unsigned const input>
 struct obinary {
-	static int long unsigned const value = ( obinary<(input >> 3)>::value << 1 ) + ( input & 7 );
+	static int long long unsigned const value = ( obinary<(input >> 3)>::value << 1 ) + ( input & 7 );
 };
 
 /*! \cond */
 template<>
 struct obinary<0> {
-	static int long unsigned const value = 0;
+	static int long long unsigned const value = 0;
 };
 /*! \endcond */
 
@@ -277,15 +277,15 @@ struct obinary<0> {
  * \tparam exponent - exponent of power function.
  * \retval value - base**exponent.
  */
-template<int long unsigned const base, int long unsigned const exponent, int long unsigned const helper = 1>
+template<int long long unsigned const base, int long unsigned const exponent, int long unsigned const helper = 1>
 struct power {
-	static int long unsigned const value = power<base, exponent - 1, helper * base>::value;
+	static int long long unsigned const value = power<base, exponent - 1, helper * base>::value;
 };
 
 /*! \cond */
-template<int long unsigned const base, int long unsigned const helper>
+template<int long long unsigned const base, int long unsigned const helper>
 struct power<base,0,helper> {
-	static int long unsigned const value = helper;
+	static int long long unsigned const value = helper;
 };
 /*! \endcond */
 
@@ -296,18 +296,18 @@ struct power<base,0,helper> {
  * \tparam value_for_false - value to be used if condition is false.
  * \retval value - conditional value.
  */
-template<bool const condition, int long value_for_true, int long value_for_false>
+template<bool const condition, int long long value_for_true, int long long value_for_false>
 struct ternary;
 
 /*! \cond */
-template<int long value_for_true, int long value_for_false>
+template<int long long value_for_true, int long long value_for_false>
 struct ternary<true, value_for_true, value_for_false> {
-	static int long const value = value_for_true;
+	static int long long const value = value_for_true;
 };
 
-template<int long value_for_true, int long value_for_false>
+template<int long long value_for_true, int long long value_for_false>
 struct ternary<false, value_for_true, value_for_false> {
-	static int long const value = value_for_false;
+	static int long long const value = value_for_false;
 };
 /*! \endcond */
 
@@ -317,7 +317,7 @@ struct ternary<false, value_for_true, value_for_false> {
  * \tparam val2 - second value for comparision.
  * \retval value - true iff val1 > val2.
  */
-template<int long const val1, int long const val2>
+template<int long long const val1, int long long const val2>
 struct greater {
 	static bool const value = val1 > val2;
 };
@@ -328,7 +328,7 @@ struct greater {
  * \tparam val2 - second value for comparision.
  * \retval value - true iff val1 < val2.
  */
-template<int long const val1, int long const val2>
+template<int long long const val1, int long long const val2>
 struct less {
 	static bool const value = val1 < val2;
 };
