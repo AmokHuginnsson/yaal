@@ -214,7 +214,7 @@ private:
 		: base_type(), _owner( owner_ ), _index( idx ) {}
 };
 
-/*! \brief Writtable bit reference interface.
+/*! \brief Writable HBitmap bit reference interface.
  */
 class HBitmap::HBit {
 	HBitmap* _owner;
@@ -233,9 +233,10 @@ private:
 	HBit( HBitmap*, int long );
 };
 
-inline void swap( yaal::tools::HBitmap::HBit a, yaal::tools::HBitmap::HBit b )
-	{ a.swap( b ); }
+}
 
+inline void swap( yaal::tools::HBitmap::HBit& a, yaal::tools::HBitmap::HBit& b ) {
+	a.swap( b );
 }
 
 }

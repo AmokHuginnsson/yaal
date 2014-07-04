@@ -74,10 +74,12 @@ class HBitset {
 	typedef u64_t word_t;
 	static int const BITS_IN_WORD = static_cast<int>( sizeof ( word_t ) ) * 8;
 	static word_t const BIT = 0x1LL << ( BITS_IN_WORD - 1 );
+	static int const WORD_COUNT = SIZE / BITS_IN_WORD + ( SIZE % BITS_IN_WORD ? 1 : 0 );
 public:
 	typedef HBitset<SIZE> this_type;
+	class HBitReference;
 private:
-	word_t _buf[SIZE / BITS_IN_WORD + ( SIZE % BITS_IN_WORD ? 1 : 0 )];
+	word_t _buf[WORD_COUNT];
 public:
 	HBitset()
 		: _buf() {
@@ -150,6 +152,49 @@ public:
 		}
 		return ( c );
 	}
+	int size( void ) const {
+		return ( SIZE );
+	}
+	bool all( void ) const {
+		bool ok( true );
+		int const words( SIZE / BITS_IN_WORD );
+		for ( int i( 0 ); i < words; ++ i ) {
+			if ( ~_buf[i] ) {
+				ok = false;
+				break;
+			}
+		}
+		int const bits( SIZE % BITS_IN_WORD );
+		if ( ok && bits ) {
+			for ( int i( 0 ); i < bits; ++ i ) {
+				if ( !get( i ) ) {
+					ok = false;
+					break;
+				}
+			}
+		}
+		return ( ok );
+	}
+	bool none( void ) const {
+		bool ok( true );
+		for ( int i( 0 ); i < WORD_COUNT; ++ i ) {
+			if ( _buf[i] ) {
+				ok = false;
+				break;
+			}
+		}
+		return ( ok );
+	}
+	bool any( void ) const {
+		return ( !none() );
+	}
+	bool operator[] ( int pos_ ) const {
+		M_ASSERT( pos_ < SIZE );
+		return ( get( pos_ ) );
+	}
+	HBitReference operator[] ( int pos_ ) {
+		return ( HBitReference( this, pos_ ) );
+	}
 	bool operator == ( HBitset const& bs_ ) const {
 		return ( equal( _buf, end( _buf ), bs_._buf ) );
 	}
@@ -203,6 +248,53 @@ YAAL_DEFINE_OPER( ^ )
 	}
 };
 
+/*! \brief Writable HBitset bit reference interface.
+ */
+template<int const SIZE>
+class HBitset<SIZE>::HBitReference {
+	HBitset* _owner;
+	int _pos;
+public:
+	HBitReference( HBitReference const& br_ )
+		: _owner( br_._owner ), _pos( br_._pos ) {
+	}
+	HBitReference& operator = ( HBitReference const& br_ ) {
+		_owner->set( _pos, static_cast<bool>( br_ ) );
+		return ( *this );
+	}
+	HBitReference& operator = ( bool value_ ) {
+		_owner->set( _pos, value_ );
+		return ( *this );
+	}
+	bool operator == ( bool value_ ) const {
+		return ( _owner->get( _pos ) == value_ );
+	}
+	bool operator != ( bool value_ ) const {
+		return ( _owner->get( _pos ) != value_ );
+	}
+	operator bool ( void ) const {
+		return ( _owner->get() );
+	}
+	void swap( HBitset::HBitReference& br_ ) {
+		M_PROLOG
+		bool bit( _owner->get( _pos ) );
+		_owner->set( _pos, static_cast<bool>( br_ ) );
+		br_._owner->set( br_._pos, bit );
+		return;
+		M_EPILOG
+	}
+private:
+	friend class HBitset;
+	HBitReference( HBitset* owner_, int pos_ )
+		: _owner( owner_ ), _pos( pos_ ) {
+	}
+};
+
+}
+
+template<int const SIZE>
+inline void swap( typename yaal::hcore::HBitset<SIZE>::HBitReference& a, typename yaal::hcore::HBitset<SIZE>::HBitReference& b ) {
+	a.swap( b );
 }
 
 }
