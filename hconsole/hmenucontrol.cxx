@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hmenucontrol.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::hconsole::mouse;
 
 namespace yaal {
 
@@ -105,6 +106,21 @@ int HMenuControl::do_process_input( int code_ ) {
 		code_ = 0;
 	}
 	return ( code_ );
+	M_EPILOG
+}
+
+bool HMenuControl::do_click( OMouse& mouse_ ) {
+	M_PROLOG
+	tree_t::node_t selected( _selected );
+	bool unfolded( (**_selected).is_unfolded() );
+	bool handled( HTreeControl::do_click( mouse_ ) );
+	if ( handled && ( _selected == selected ) && ( (**_selected).is_unfolded() == unfolded ) ) {
+		OMenuItem* menu( static_cast<OMenuItem*>( (**_selected)[ 0 ].get_pointer() ) );
+		if ( menu->HANDLER ) {
+			menu->call( _process );
+		}
+	}
+	return ( handled );
 	M_EPILOG
 }
 

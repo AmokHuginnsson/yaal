@@ -58,6 +58,7 @@ public:
 protected:
 	int load_sub_menu( tree_t::node_t, OMenuItem* );
 	virtual int do_process_input( int );
+	virtual bool do_click( mouse::OMouse& );
 private:
 	HMenuControl( HMenuControl const& );
 	HMenuControl& operator = ( HMenuControl const& );

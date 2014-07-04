@@ -187,6 +187,7 @@ protected:
 		virtual ~HNodeControl ( void );
 		HInfo const& operator[]( int ) const;
 		HInfo& operator[]( int );
+		bool is_unfolded( void ) const;
 	protected:
 		void expand( void );
 		void collapse( void );
