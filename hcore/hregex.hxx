@@ -34,7 +34,7 @@ Copyright:
 
 #include "hcore/hchunk.hxx"
 #include "hcore/hstring.hxx"
-#include "hcore/hstrongenum.hxx"
+#include "hcore/hbitflag.hxx"
 
 namespace yaal {
 
@@ -44,26 +44,24 @@ namespace hcore {
  */
 class HRegex {
 public:
+	struct COMPILE;
+	typedef HBitFlag<COMPILE> compile_t;
 	struct COMPILE {
-		typedef enum {
-			NONE = 0,
-			EXTENDED = 1,
-			IGNORE_CASE = 2,
-			NEWLINE = 4,
-			NO_EXCEPTION = 8,
-			DEFAULT = NONE
-		} enum_t;
+		static compile_t const NONE;
+		static compile_t const EXTENDED;
+		static compile_t const IGNORE_CASE;
+		static compile_t const NEWLINE;
+		static compile_t const NO_EXCEPTION;
+		static compile_t const DEFAULT;
 	};
-	typedef HStrongEnum<COMPILE> compile_t;
+	struct MATCH;
+	typedef HBitFlag<MATCH> match_t;
 	struct MATCH {
-		typedef enum {
-			NONE = 0,
-			NOT_BEGINNING_OF_LINE = 1,
-			NOT_END_OF_LINE = 2,
-			DEFAULT = NONE
-		} enum_t;
+		static match_t const NONE;
+		static match_t const NOT_BEGINNING_OF_LINE;
+		static match_t const NOT_END_OF_LINE;
+		static match_t const DEFAULT;
 	};
-	typedef HStrongEnum<MATCH> match_t;
 	class HMatch;
 	class HMatchIterator;
 	typedef HMatchIterator iterator;

@@ -56,6 +56,17 @@ char const* _errMsgHRegex_[ 3 ] = {
 	_( "empty pattern" )
 };
 
+HRegex::compile_t const HRegex::COMPILE::NONE = HRegex::compile_t::new_flag();
+HRegex::compile_t const HRegex::COMPILE::EXTENDED = HRegex::compile_t::new_flag();
+HRegex::compile_t const HRegex::COMPILE::IGNORE_CASE = HRegex::compile_t::new_flag();
+HRegex::compile_t const HRegex::COMPILE::NEWLINE = HRegex::compile_t::new_flag();
+HRegex::compile_t const HRegex::COMPILE::NO_EXCEPTION = HRegex::compile_t::new_flag();
+HRegex::compile_t const HRegex::COMPILE::DEFAULT = HRegex::COMPILE::NONE;
+HRegex::match_t const HRegex::MATCH::NONE = HRegex::match_t::new_flag();
+HRegex::match_t const HRegex::MATCH::NOT_BEGINNING_OF_LINE = HRegex::match_t::new_flag();
+HRegex::match_t const HRegex::MATCH::NOT_END_OF_LINE = HRegex::match_t::new_flag();
+HRegex::match_t const HRegex::MATCH::DEFAULT = HRegex::MATCH::NONE;
+
 HRegex::HRegex( void )
 	: _initialized( false ), _pattern(), _compiled( sizeof ( regex_t ) ),
 	_lastError( 0 ), _errorBuffer(), _errorCause(), _errorMessage() {
