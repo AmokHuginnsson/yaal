@@ -34,7 +34,7 @@ Copyright:
 
 #include "hcore/hexception.hxx"
 #include "hcore/hstring.hxx"
-#include "hcore/hstrongenum.hxx"
+#include "hcore/hbitflag.hxx"
 
 namespace yaal {
 
@@ -45,16 +45,14 @@ namespace hcore {
 class HTokenizer {
 	typedef HTokenizer this_type;
 public:
-	typedef enum {
-		DEFAULT = 0,
-		SKIP_EMPTY = 1,
-		INCLUDE_EMPTY = 2,
-		HANDLE_EMPTY_MASK = SKIP_EMPTY | INCLUDE_EMPTY,
-		DELIMITED_BY_ANY_OF = 4,
-		DELIMITED_BY_WHOLE_STRING = 8,
-		DELIMITED_BY_MASK = DELIMITED_BY_ANY_OF | DELIMITED_BY_WHOLE_STRING
-	} enum_t;
-	typedef HStrongEnum<HTokenizer> behavior_t;
+	typedef HBitFlag<HTokenizer> behavior_t;
+	static behavior_t const DEFAULT;
+	static behavior_t const SKIP_EMPTY;
+	static behavior_t const INCLUDE_EMPTY;
+	static behavior_t const HANDLE_EMPTY_MASK;
+	static behavior_t const DELIMITED_BY_ANY_OF;
+	static behavior_t const DELIMITED_BY_WHOLE_STRING;
+	static behavior_t const DELIMITED_BY_MASK;
 private:
 	behavior_t _behavior;
 	HString _string;
@@ -65,8 +63,8 @@ public:
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
 public:
-	HTokenizer( HString const&, HString const&, enum_t const& = DEFAULT );
-	HTokenizer( HString const&, enum_t const& = DEFAULT );
+	HTokenizer( HString const&, HString const&, behavior_t const& = DEFAULT );
+	HTokenizer( HString const&, behavior_t const& = DEFAULT );
 	void assign( HString const& );
 	HIterator begin( void ) const;
 	HIterator end( void ) const;

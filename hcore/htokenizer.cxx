@@ -35,7 +35,15 @@ namespace yaal {
 
 namespace hcore {
 
-HTokenizer::HTokenizer( HString const& str_, HString const& delim_, enum_t const& behavior_ )
+HTokenizer::behavior_t const HTokenizer::DEFAULT = HTokenizer::behavior_t::new_flag();
+HTokenizer::behavior_t const HTokenizer::SKIP_EMPTY = HTokenizer::behavior_t::new_flag();
+HTokenizer::behavior_t const HTokenizer::INCLUDE_EMPTY = HTokenizer::behavior_t::new_flag();
+HTokenizer::behavior_t const HTokenizer::HANDLE_EMPTY_MASK = HTokenizer::SKIP_EMPTY | HTokenizer::INCLUDE_EMPTY;
+HTokenizer::behavior_t const HTokenizer::DELIMITED_BY_ANY_OF = HTokenizer::behavior_t::new_flag();
+HTokenizer::behavior_t const HTokenizer::DELIMITED_BY_WHOLE_STRING = HTokenizer::behavior_t::new_flag();
+HTokenizer::behavior_t const HTokenizer::DELIMITED_BY_MASK = HTokenizer::DELIMITED_BY_ANY_OF | HTokenizer::DELIMITED_BY_WHOLE_STRING;
+
+HTokenizer::HTokenizer( HString const& str_, HString const& delim_, behavior_t const& behavior_ )
 	: _behavior( behavior_ ), _string( str_ ), _delimiter( delim_ ), _buffer() {
 	M_PROLOG
 	if ( ( _behavior & INCLUDE_EMPTY ) && ( _behavior & SKIP_EMPTY ) )
@@ -50,7 +58,7 @@ HTokenizer::HTokenizer( HString const& str_, HString const& delim_, enum_t const
 	M_EPILOG
 }
 
-HTokenizer::HTokenizer( HString const& delim_, enum_t const& behavior_ )
+HTokenizer::HTokenizer( HString const& delim_, behavior_t const& behavior_ )
 	: _behavior( behavior_ ), _string(), _delimiter( delim_ ), _buffer() {
 }
 
