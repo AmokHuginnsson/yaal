@@ -29,7 +29,6 @@ Copyright:
 
 #include "hcore/trait.hxx"
 #include "hcore/hexception.hxx"
-#include "hcore/hstrongenum.hxx"
 #include "hcore/resolver.hxx"
 #include "hcore/hpointer.hxx"
 
@@ -53,23 +52,20 @@ public:
 	typedef HPointer<HUDPSocket> ptr_t;
 	/*! \brief Socket types.
 	 */
-	struct TYPE {
+	struct MODE {
 		/*! \brief Socket types.
 		 */
 		typedef enum {
-			DEFAULT			= 0x00,
-			BLOCKING		= 0x01,
-			NONBLOCKING	= 0x02,
-			SSL					= 0x04,
-			PLAIN				= 0x08
-		} enum_t;
+			DEFAULT,
+			BLOCKING,
+			NONBLOCKING
+		} socket_mode_t;
 	};
-	typedef HStrongEnum<TYPE> socket_type_t;
 private:
 	int _fileDescriptor;
 public:
-	HUDPSocket( socket_type_t = TYPE::DEFAULT );
-	HUDPSocket( int, ip_t = ip_t(), socket_type_t = TYPE::DEFAULT );
+	HUDPSocket( MODE::socket_mode_t = MODE::DEFAULT );
+	HUDPSocket( int, ip_t = ip_t(), MODE::socket_mode_t = MODE::DEFAULT );
 	virtual ~HUDPSocket( void );
 	int get_file_descriptor( void ) const;
 	void bind( int, ip_t = ip_t() );
@@ -78,7 +74,7 @@ public:
 	void send( void const*, int long );
 	int long receive( ODatagram& );
 private:
-	void init( socket_type_t );
+	void init( MODE::socket_mode_t );
 	void do_bind( int, ip_t );
 };
 

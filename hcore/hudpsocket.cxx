@@ -38,7 +38,7 @@ namespace yaal {
 
 namespace hcore {
 
-HUDPSocket::HUDPSocket( socket_type_t type_ )
+HUDPSocket::HUDPSocket( MODE::socket_mode_t type_ )
 	: _fileDescriptor( -1 ) {
 	M_PROLOG
 	try {
@@ -54,7 +54,7 @@ HUDPSocket::HUDPSocket( socket_type_t type_ )
 	M_EPILOG
 }
 
-HUDPSocket::HUDPSocket( int port_, ip_t ip_, socket_type_t type_ )
+HUDPSocket::HUDPSocket( int port_, ip_t ip_, MODE::socket_mode_t type_ )
 	: _fileDescriptor( -1 ) {
 	M_PROLOG
 	try {
@@ -80,24 +80,17 @@ HUDPSocket::~HUDPSocket( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-void HUDPSocket::init( socket_type_t type_ ) {
+void HUDPSocket::init( MODE::socket_mode_t type_ ) {
 	M_PROLOG
-	if ( type_ == TYPE::DEFAULT )
-		type_ = socket_type_t( TYPE::BLOCKING ) | TYPE::PLAIN;
-	if ( ( !!( type_ & TYPE::BLOCKING ) ) && ( !!( type_ & TYPE::NONBLOCKING ) ) )
-		M_THROW( "bad socket blocking option", type_.value() );
-	if ( ( !!( type_ & TYPE::SSL ) ) && ( !!( type_ & TYPE::PLAIN ) ) )
-		M_THROW( "bad socket ssl option", type_.value() );
-	if ( ! ( type_ & ( socket_type_t( TYPE::BLOCKING ) | TYPE::NONBLOCKING ) ) )
-		type_ |= TYPE::BLOCKING;
-	if ( ! ( type_ & ( socket_type_t( TYPE::SSL ) | TYPE::PLAIN ) ) )
-		type_ |= TYPE::PLAIN;
+	if ( type_ == MODE::DEFAULT ) {
+		type_ = MODE::BLOCKING;
+	}
 	M_ENSURE( ( _fileDescriptor = ::socket(
 					PF_INET,
 					static_cast<int>( SOCK_DGRAM ),
 					0 /* info libc "Creating a Socket"
 							 says that "zero is usually right for PROTOCOL" */ ) ) >= 0 );
-		if ( !!( type_ & TYPE::NONBLOCKING ) ) {
+		if ( !!( type_ & MODE::NONBLOCKING ) ) {
 			int statusFlags( ::fcntl( _fileDescriptor, F_GETFL, 0 ) );
 			M_ENSURE( statusFlags >= 0 );
 			M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, statusFlags | O_NONBLOCK ) == 0 );
