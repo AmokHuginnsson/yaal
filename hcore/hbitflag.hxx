@@ -89,6 +89,9 @@ YAAL_DEFINE_OPER( ^ )
 	static HBitFlag new_flag( void ) {
 		return ( HBitFlag() );
 	}
+	u64_t value( void ) const {
+		return ( _flag );
+	}
 private:
 	HBitFlag( void )
 		: _flag( _nextFlag ) {

@@ -32,7 +32,7 @@ Copyright:
 
 #include "hcore/hstring.hxx"
 #include "hcore/hsynchronizedstream.hxx"
-#include "hcore/hstrongenum.hxx"
+#include "hcore/hbitflag.hxx"
 
 namespace yaal {
 
@@ -44,27 +44,25 @@ class HFile : public HStreamInterface {
 public:
 	typedef HFile this_type;
 	typedef HStreamInterface base_type;
+	struct OPEN;
 	/*! \brief Bits user for specyfying the way files are opened.
 	 */
+	typedef HBitFlag<OPEN> open_t;
 	struct OPEN {
-		typedef enum {
-			READING = 1,
-			WRITING = 2,
-			APPEND = 4,
-			TRUNCATE = 8
-		} enum_t;
+		static open_t const READING;
+		static open_t const WRITING;
+		static open_t const APPEND;
+		static open_t const TRUNCATE;
 	};
-	typedef HStrongEnum<OPEN> open_t;
 	/*! \brief Read operation modifiers.
 	 */
 	struct READ {
 		typedef enum {
-			DEFAULTS = 0, /* BUFFERED_READS */
-			BUFFERED_READS = 1,
-			UNBUFFERED_READS = 2
-		} enum_t;
+			DEFAULTS, /* BUFFERED_READS */
+			BUFFERED_READS,
+			UNBUFFERED_READS
+		} read_t;
 	};
-	typedef HStrongEnum<READ> read_t;
 	/*! \brief Kinds of seek operation.
 	 */
 	struct SEEK {
@@ -72,9 +70,8 @@ public:
 			SET,
 			CUR,
 			END
-		} enum_t;
+		} seek_t;
 	};
-	typedef HStrongEnum<SEEK> seek_t;
 private:
 	void* _handle;
 	HString _path;
@@ -106,9 +103,9 @@ public:
 	int open( void* raw, bool owner );
 	int close( void );
 	void* release( void );
-	int long read_line( HString&, read_t const& = READ::DEFAULTS, int const = 0 );
+	int long read_line( HString&, READ::read_t = READ::DEFAULTS, int const = 0 );
 	int long tell( void ) const;
-	void seek( int long, seek_t const& = SEEK::SET );
+	void seek( int long, SEEK::seek_t const& = SEEK::SET );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
 	bool is_opened( void ) const;

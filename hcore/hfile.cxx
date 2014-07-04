@@ -39,6 +39,15 @@ namespace yaal {
 
 namespace hcore {
 
+namespace {
+HFile::open_t const NONE = HFile::open_t::new_flag();
+}
+
+HFile::open_t const HFile::OPEN::READING = HFile::open_t::new_flag();
+HFile::open_t const HFile::OPEN::WRITING = HFile::open_t::new_flag();
+HFile::open_t const HFile::OPEN::APPEND = HFile::open_t::new_flag();
+HFile::open_t const HFile::OPEN::TRUNCATE = HFile::open_t::new_flag();
+
 HFile::HFile( void )
 	: HStreamInterface(),
 	_handle( NULL ), _path(), _error(),
@@ -96,15 +105,15 @@ int HFile::do_open( HString const& path_, open_t const& open_ ) {
 	char const* mode( NULL );
 	if ( open_ == OPEN::READING )
 		mode = "rb";
-	else if ( ( open_ == OPEN::WRITING ) || ( open_ == ( open_t( OPEN::WRITING ) | open_t( OPEN::TRUNCATE ) ) ) )
+	else if ( ( open_ == OPEN::WRITING ) || ( open_ == ( OPEN::WRITING | OPEN::TRUNCATE ) ) )
 		mode = "wb";
-	else if ( open_ == ( open_t( OPEN::WRITING ) | open_t( OPEN::APPEND ) ) )
+	else if ( open_ == ( OPEN::WRITING | OPEN::APPEND ) )
 		mode = "ab";
-	else if ( open_ == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) ) )
+	else if ( open_ == ( OPEN::READING | OPEN::WRITING ) )
 		mode = "r+b";
-	else if ( open_ == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) | open_t( OPEN::TRUNCATE ) ) )
+	else if ( open_ == ( OPEN::READING | OPEN::WRITING | OPEN::TRUNCATE ) )
 		mode = "w+b";
-	else if ( open_ == ( open_t( OPEN::READING ) | open_t( OPEN::WRITING ) | open_t( OPEN::APPEND ) ) )
+	else if ( open_ == ( OPEN::READING | OPEN::WRITING | OPEN::APPEND ) )
 		mode = "a+b";
 	else
 		M_THROW( "unexpected mode setting", open_.value() );
@@ -180,11 +189,11 @@ int long HFile::tell( void ) const {
 	M_EPILOG
 }
 
-void HFile::seek( int long pos, seek_t const& seek_ ) {
+void HFile::seek( int long pos, SEEK::seek_t const& seek_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
 	int s( 0 );
-	switch ( seek_.value() ) {
+	switch ( seek_ ) {
 		case ( SEEK::SET ):
 			s = SEEK_SET;
 		break;
@@ -203,19 +212,18 @@ void HFile::seek( int long pos, seek_t const& seek_ ) {
 	M_EPILOG
 }
 
-int long HFile::read_line( HString& line_, read_t const& read_,
+int long HFile::read_line( HString& line_, READ::read_t read_,
 		int const maximumLength_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
-	read_t readMode( read_ );
-	if ( ( !!( readMode & READ::BUFFERED_READS ) ) && ( !!( readMode & READ::UNBUFFERED_READS ) ) )
-		M_THROW( _( "bad buffering setting" ), readMode.value() );
-	if ( ! ( ( !!( readMode & READ::BUFFERED_READS ) ) || ( !!( readMode & READ::UNBUFFERED_READS ) ) ) )
-		readMode |= READ::BUFFERED_READS;
+	READ::read_t readMode( read_ );
+	if ( readMode == READ::DEFAULTS ) {
+		readMode = READ::BUFFERED_READS;
+	}
 	if ( ! _handle )
 		M_THROW( _( "no file is opened" ), errno );
 	int long length( -1 );
-	if ( !!( readMode & READ::BUFFERED_READS ) ) {
+	if ( readMode == READ::BUFFERED_READS ) {
 		length = get_line_length();
 		if ( length ) {
 			if ( maximumLength_ && ( length > maximumLength_ ) )
