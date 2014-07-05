@@ -493,6 +493,9 @@ bool HStreamInterface::read_word( void ) {
 	}
 	if ( good() ) {
 		read_while_retry( _wordCache, _whiteSpace_.data(), false );
+		if ( _skipWS ) {
+			_wordCache.clear();
+		}
 		if ( good() ) {
 			read_until_retry( _wordCache, _whiteSpace_.data(), false );
 		}
@@ -504,6 +507,7 @@ bool HStreamInterface::read_word( void ) {
 bool HStreamInterface::read_integer( void ) {
 	M_PROLOG
 	read_while_retry( _wordCache, _whiteSpace_.data(), false );
+	_wordCache.clear();
 	if ( good() ) {
 		bool neg( HStreamInterface::do_peek() == '-' );
 		if ( neg ) {
@@ -525,6 +529,7 @@ bool HStreamInterface::read_floatint_point( void ) {
 	M_PROLOG
 	do {
 		read_while_retry( _wordCache, _whiteSpace_.data(), false );
+		_wordCache.clear();
 		if ( ! good() ) {
 			break;
 		}
@@ -615,24 +620,27 @@ HStreamInterface& HStreamInterface::do_input( int& i ) {
 
 HStreamInterface& HStreamInterface::do_input( int unsigned& iu ) {
 	M_PROLOG
-	if ( read_integer() )
+	if ( read_integer() ) {
 		iu = lexical_cast<int unsigned>( _wordCache );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_input( int long& il ) {
 	M_PROLOG
-	if ( read_integer() )
+	if ( read_integer() ) {
 		il = lexical_cast<int long>( _wordCache );
+	}
 	return ( *this );
 	M_EPILOG
 }
 
 HStreamInterface& HStreamInterface::do_input( int long unsigned& ilu ) {
 	M_PROLOG
-	if ( read_integer() )
+	if ( read_integer() ) {
 		ilu = lexical_cast<int long unsigned>( _wordCache );
+	}
 	return ( *this );
 	M_EPILOG
 }
