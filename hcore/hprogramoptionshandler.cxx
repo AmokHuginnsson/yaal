@@ -61,10 +61,8 @@ struct RC_PATHER {
 		NONE = 0,
 		GLOBAL = 1,
 		LOCAL = 2
-	} enum_t;
+	} placement_state_t;
 };
-
-typedef HStrongEnum<RC_PATHER> placement_bit_t;
 
 int read_rc_line( HString&, HString&, HFile&, int& );
 
@@ -318,7 +316,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 		setup.add_section( section_, program_options_helper::ORCLoader( *this, rcName_, section_, rc_callback ) );
 	struct OPlacement {
 		RC_PATHER::placement_t _placement;
-		placement_bit_t _placementBit;
+		RC_PATHER::placement_state_t _placementBit;
 	} const placementTab[] = {
 		{ RC_PATHER::ETC, RC_PATHER::GLOBAL },
 		{ RC_PATHER::ENV, RC_PATHER::LOCAL },
@@ -327,7 +325,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 	};
 	bool section( false );
 	bool optionOK( false );
-	placement_bit_t successStory( RC_PATHER::NONE );
+	RC_PATHER::placement_state_t successStory( RC_PATHER::NONE );
 	HFile rc;
 	HString option, value, message;
 	log( LOG_TYPE::INFO ) << __FUNCTION__ << ": ";
@@ -336,16 +334,16 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 	typedef HSet<HString> paths_t;
 	paths_t paths;
 	for ( int placementIdx( 0 ); placementIdx < static_cast<int>( sizeof ( placementTab ) / sizeof ( OPlacement ) ); placementIdx ++ ) {
-		if ( ( !! ( successStory & RC_PATHER::GLOBAL ) )
+		if ( ( successStory == RC_PATHER::GLOBAL )
 				&& ( placementTab[ placementIdx ]._placementBit == RC_PATHER::GLOBAL ) )
 			continue;
-		if ( !! ( successStory & RC_PATHER::LOCAL ) )
+		if ( successStory == RC_PATHER::LOCAL )
 			break;
 		HString rcPath( make_path( rcName_, placementTab[ placementIdx ]._placement ) );
 		if ( rcPath.is_empty() )
 			continue;
 		if ( paths.insert( rcPath ).second && ! rc_open( rcPath, rc ) ) {
-			successStory |= placementTab [ placementIdx ]._placementBit;
+			successStory = placementTab[ placementIdx ]._placementBit;
 			int line = 0;
 			while ( read_rc_line( option, value, rc, line ) ) {
 				if ( ! section_.is_empty() ) {
