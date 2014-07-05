@@ -269,11 +269,11 @@ public:
 		{ M_PROLOG return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
 };
 
-}
-
 template<typename value_type, typename compare_t, typename allocator_t>
 inline void swap( yaal::hcore::HMultiSet<value_type, compare_t, allocator_t>& a, yaal::hcore::HMultiSet<value_type, compare_t, allocator_t>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

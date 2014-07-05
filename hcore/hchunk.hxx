@@ -95,10 +95,10 @@ int long chunk_size( int long count_ ) {
 	return ( static_cast<int>( sizeof ( T ) ) * count_ );
 }
 
-}
-
 inline void swap( yaal::hcore::HChunk& a, yaal::hcore::HChunk& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

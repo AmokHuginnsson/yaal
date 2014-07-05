@@ -306,11 +306,11 @@ public:
 private:
 };
 
-}
-
 template<typename key_type, typename hasher_t, typename allocator_t>
 inline void swap( yaal::hcore::HHashMultiSet<key_type, hasher_t, allocator_t>& a, yaal::hcore::HHashMultiSet<key_type, hasher_t, allocator_t>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

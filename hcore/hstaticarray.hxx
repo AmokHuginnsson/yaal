@@ -32,6 +32,7 @@ Copyright:
 
 #include "hcore/hexception.hxx"
 #include "hcore/iterator.hxx"
+#include "hcore/algorithm_low.hxx"
 
 namespace yaal {
 
@@ -216,11 +217,11 @@ public:
 	}
 };
 
-}
-
 template<typename type_t, int const N>
 inline void swap( yaal::hcore::HStaticArray<type_t, N>& a, yaal::hcore::HStaticArray<type_t, N>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

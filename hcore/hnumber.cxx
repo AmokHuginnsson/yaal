@@ -1619,12 +1619,12 @@ struct HNumber::ElementaryFunctions {
 	}
 };
 
-}
-
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::square_root( value_ ) );
 	M_EPILOG
+}
+
 }
 
 }

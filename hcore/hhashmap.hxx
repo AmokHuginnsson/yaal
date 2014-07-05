@@ -351,11 +351,11 @@ private:
 		: base_type(), _engine( it ) {};
 };
 
-}
-
 template<typename key_type, typename data_type, typename hasher_t, typename allocator_t>
 inline void swap( yaal::hcore::HHashMap<key_type, data_type, hasher_t, allocator_t>& a, yaal::hcore::HHashMap<key_type, data_type, hasher_t, allocator_t>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

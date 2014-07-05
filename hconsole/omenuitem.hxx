@@ -52,10 +52,10 @@ public: /* All is public for simpler usage. */
 	void swap( OMenuItem& );
 };
 
-}
-
 inline void swap( yaal::hconsole::OMenuItem& a, yaal::hconsole::OMenuItem& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

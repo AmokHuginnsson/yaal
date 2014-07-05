@@ -364,11 +364,11 @@ void HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::resize( int long
 	M_EPILOG
 }
 
-}
-
 template<typename value_t, typename hasher_t, typename get_key_t, typename allocator_t>
 inline void swap( yaal::hcore::HHashContainer<value_t, hasher_t, get_key_t, allocator_t>& a, yaal::hcore::HHashContainer<value_t, hasher_t, get_key_t, allocator_t>& b )
 	{ a.swap( b );	}
+
+}
 
 }
 

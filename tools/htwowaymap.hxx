@@ -470,11 +470,11 @@ int long HTwoWayMap<left_type_t, right_type_t>::HView<view_type_t>::count( view_
 	return ( _data.count( &key_ ) );
 }
 
-}
-
 template<typename left_type, typename right_type>
 inline void swap( yaal::tools::HTwoWayMap<left_type, right_type>& a, yaal::tools::HTwoWayMap<left_type, right_type>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

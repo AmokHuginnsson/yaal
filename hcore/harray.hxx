@@ -648,13 +648,9 @@ private:
 template<typename type_t, typename allocator_t>
 typename HArray<type_t, allocator_t>::allocator_type HArray<type_t, allocator_t>::_allocator;
 
-}
-
 template<typename type_t, typename allocator_t>
 inline void swap( yaal::hcore::HArray<type_t, allocator_t>& a, yaal::hcore::HArray<type_t, allocator_t>& b )
 	{ a.swap( b ); }
-
-namespace hcore {
 
 /*! \brief Iterator for HArray<> data structure.
  */

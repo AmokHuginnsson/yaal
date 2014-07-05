@@ -32,6 +32,7 @@ Copyright:
 
 #include "config.hxx"
 #include "hcore/memory.hxx"
+#include "hcore/algorithm_low.hxx"
 
 namespace yaal {
 
@@ -190,11 +191,11 @@ int const HPool<T>::OBJECTS_PER_BLOCK;
 template<typename T>
 int const HPool<T>::OBJECT_SPACE;
 
-}
-
 template<typename T>
 inline void swap( yaal::hcore::HPool<T>& a, yaal::hcore::HPool<T>& b ) {
 	a.swap( b );
+}
+
 }
 
 }

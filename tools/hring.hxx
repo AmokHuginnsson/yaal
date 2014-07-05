@@ -294,13 +294,9 @@ private:
 	void insert_space( int long, int long );
 };
 
-}
-
 template<typename type_t>
 inline void swap( yaal::tools::HRing<type_t>& a, yaal::tools::HRing<type_t>& b )
 	{ a.swap( b ); }
-
-namespace tools {
 
 /*! \brief Iterator for HRing<> data structure.
  */

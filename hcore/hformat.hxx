@@ -108,12 +108,12 @@ public:
 
 HString str( HFormat const& );
 
-}
-
 yaal::hcore::HStreamFormatProxy operator << ( yaal::hcore::HStreamInterface&, yaal::hcore::HFormat const& );
 
 inline void swap( yaal::hcore::HFormat& a, yaal::hcore::HFormat& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

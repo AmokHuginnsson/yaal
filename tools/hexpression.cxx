@@ -749,10 +749,10 @@ int HExpression::get_error_token( void ) const {
 	M_EPILOG
 }
 
-}
-
 void swap( yaal::tools::HExpression& a, yaal::tools::HExpression& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

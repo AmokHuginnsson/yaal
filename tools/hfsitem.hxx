@@ -100,12 +100,13 @@ private:
 	explicit HIterator( yaal::hcore::HString const& it );
 };
 
-}
-
 inline void swap( yaal::tools::HFSItem& a, yaal::tools::HFSItem& b )
 	{ a.swap( b ); }
+
 inline void swap( yaal::tools::HFSItem::HIterator& a, yaal::tools::HFSItem::HIterator& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

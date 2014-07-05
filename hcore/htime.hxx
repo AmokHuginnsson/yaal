@@ -110,10 +110,10 @@ inline HTime now_local( void ) {
 	return ( HTime( HTime::LOCAL ) );
 }
 
-}
-
 inline void swap( yaal::hcore::HTime& a, yaal::hcore::HTime& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

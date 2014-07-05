@@ -340,13 +340,9 @@ int long const HDeque<type_t, allocator_t>::MIN_CHUNKS_COUNT;
 template<typename type_t, typename allocator_t>
 typename HDeque<type_t, allocator_t>::allocator_type HDeque<type_t, allocator_t>::_allocator;
 
-}
-
 template<typename type_t, typename allocator_t>
 inline void swap( yaal::hcore::HDeque<type_t>& a, yaal::hcore::HDeque<type_t>& b )
 	{ a.swap( b ); }
-
-namespace hcore {
 
 /*! \brief Iterator for HDeque<> data structure.
  */

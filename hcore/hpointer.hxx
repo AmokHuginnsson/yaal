@@ -689,12 +689,12 @@ HPointer<tType> make_pointer( a0_t const& a0_, a1_t const& a1_,
 	return ( ptr );
 }
 
-}
-
 template<typename tType, template<typename>class pointer_type_t,
 	template<typename, typename>class access_type_t>
 inline void swap( yaal::hcore::HPointer<tType, pointer_type_t, access_type_t>& a, yaal::hcore::HPointer<tType, pointer_type_t, access_type_t>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

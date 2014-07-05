@@ -255,12 +255,12 @@ public:
 
 typedef HExceptionT<HNumber> HNumberException;
 
-}
-
 inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b )
 	{ a.swap( b ); }
 
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& );
+
+}
 
 }
 

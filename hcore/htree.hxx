@@ -887,11 +887,11 @@ private:
 	}
 };
 
-}
-
 template<typename value_t, typename allocator_t, template <typename, typename> class sequence_t>
 inline void swap( yaal::hcore::HTree<value_t, allocator_t, sequence_t>& a, yaal::hcore::HTree<value_t, allocator_t, sequence_t>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

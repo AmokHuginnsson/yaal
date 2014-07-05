@@ -783,13 +783,13 @@ int long kmpcasesearch( char const* const, int long, char const* const, int long
 
 }
 
-}
-
 inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b )
 	{ a.swap( b ); }
 
 inline void swap( yaal::hcore::HString::HCharRef a, yaal::hcore::HString::HCharRef b )
 	{ a.swap( b ); }
+
+}
 
 }
 

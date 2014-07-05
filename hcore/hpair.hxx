@@ -83,11 +83,11 @@ template<typename first_type, typename second_type>
 HPair<first_type, second_type> make_pair( first_type const& first, second_type const& second )
 	{ return ( HPair<first_type, second_type>( first, second ) ); }
 
-}
-
 template<typename first_type, typename second_type>
 inline void swap( yaal::hcore::HPair<first_type, second_type>& a, yaal::hcore::HPair<first_type, second_type>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

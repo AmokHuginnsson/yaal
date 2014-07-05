@@ -274,10 +274,10 @@ int reload_configuration( void );
 
 }
 
-}
-
 inline void swap( yaal::hcore::HProgramOptionsHandler::OOption& a, yaal::hcore::HProgramOptionsHandler::OOption& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

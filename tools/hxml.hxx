@@ -368,10 +368,10 @@ yaal::hcore::HString const& attr_val( HXml::HConstIterator const& it, yaal::hcor
 
 }
 
-}
-
 inline void swap( yaal::tools::HXml& a, yaal::tools::HXml& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

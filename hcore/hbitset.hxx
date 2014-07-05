@@ -263,11 +263,28 @@ private:
 	}
 };
 
+/*! \brief Swap values two HBitset bits.
+ *
+ * To programmers:
+ * Arguments types are intentionally not-references but lvalues
+ * because they must work when returned by HBitset::operator[],
+ * and operator[] returns lvalue.
+ * You cannot bind lvalue to reference to one could not use swap() in following
+ * context:
+ * swap( bs1[k], bs2[j] );
+ *
+ * Because interface does not match standard swap(T&,T&)
+ * this swap() implementation must be in the same namespace as its operands
+ * to be found by Koenig lookup.
+ *
+ * \param a - first of bits to swap.
+ * \param b - second of bits to swap.
+ */
+template<int const SIZE>
+inline void swap( typename yaal::hcore::HBitset<SIZE>::HBitReference a, typename yaal::hcore::HBitset<SIZE>::HBitReference b ) {
+	a.swap( b );
 }
 
-template<int const SIZE>
-inline void swap( typename yaal::hcore::HBitset<SIZE>::HBitReference& a, typename yaal::hcore::HBitset<SIZE>::HBitReference& b ) {
-	a.swap( b );
 }
 
 }

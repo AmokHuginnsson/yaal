@@ -108,9 +108,9 @@ private:
 
 typedef yaal::hcore::HExceptionT<HExpression> HExpressionException;
 
-}
-
 void swap( yaal::tools::HExpression&, yaal::tools::HExpression& );
+
+}
 
 }
 

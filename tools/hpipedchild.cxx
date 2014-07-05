@@ -181,6 +181,7 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 		close_and_invalidate( fileDesIn[ 0 ] );
 		close_and_invalidate( fileDesOut[ 1 ] );
 		close_and_invalidate( fileDesErr[ 1 ] );
+		using yaal::swap;
 		swap( _pipeIn, fileDesIn[ 1 ] );
 		swap( _pipeOut, fileDesOut[ 0 ] );
 		swap( _pipeErr, fileDesErr[ 0 ] );

@@ -202,11 +202,11 @@ inline type_t const& get_optional_value_or( HOptional<type_t const&> const& valu
 	return ( value_ ? *value_ : default_ );
 }
 
-}
-
 template<typename type_t>
 inline void swap( yaal::tools::HOptional<type_t>& a, yaal::tools::HOptional<type_t>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

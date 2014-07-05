@@ -276,11 +276,11 @@ HVector<value_t> operator * ( value_t const scalar_,
 	M_EPILOG
 }
 
-}
-
 template<typename value_t>
 inline void swap( yaal::hcore::HVector<value_t>& a, yaal::hcore::HVector<value_t>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

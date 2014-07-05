@@ -233,10 +233,27 @@ private:
 	HBit( HBitmap*, int long );
 };
 
+/*! \brief Swap values two HBitmap bits.
+ *
+ * To programmers:
+ * Arguments types are intentionally not-references but lvalues
+ * because they must work when returned by HBitmap::HIterator::operator *,
+ * and *it returns lvalue.
+ * You cannot bind lvalue to reference to one could not use swap() in following
+ * context:
+ * swap( *it1, *it2 );
+ *
+ * Because interface does not match standard swap(T&,T&)
+ * this swap() implementation must be in the same namespace as its operands
+ * to be found by Koenig lookup.
+ *
+ * \param a - first of bits to swap.
+ * \param b - second of bits to swap.
+ */
+inline void swap( yaal::tools::HBitmap::HBit a, yaal::tools::HBitmap::HBit b ) {
+	a.swap( b );
 }
 
-inline void swap( yaal::tools::HBitmap::HBit& a, yaal::tools::HBitmap::HBit& b ) {
-	a.swap( b );
 }
 
 }

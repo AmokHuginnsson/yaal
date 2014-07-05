@@ -569,11 +569,11 @@ HVector<value_type> T ( HMatrix<value_type> const& matrix_,
 	M_EPILOG
 }
 
-}
-
 template<typename value_type>
 inline void swap( yaal::hcore::HMatrix<value_type>& a, yaal::hcore::HMatrix<value_type>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

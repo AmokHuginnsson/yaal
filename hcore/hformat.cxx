@@ -792,12 +792,12 @@ char const* HFormat::HFormatImpl::error_message( int ) const {
 	M_EPILOG
 }
 
-}
-
 yaal::hcore::HStreamFormatProxy operator << ( yaal::hcore::HStreamInterface& stream, yaal::hcore::HFormat const& format ) {
 	M_PROLOG
 	return ( yaal::hcore::HStreamFormatProxy( stream, format ) );
 	M_EPILOG
+}
+
 }
 
 }

@@ -1099,11 +1099,11 @@ protected:
 	}
 };
 
-}
-
 template<typename type_t, typename allocator_t>
 inline void swap( yaal::hcore::HList<type_t, allocator_t>& a, yaal::hcore::HList<type_t, allocator_t>& b )
 	{ a.swap( b ); }
+
+}
 
 }
 

@@ -115,11 +115,11 @@ int HItem<tType>::get_value_count( void ) const {
 
 typedef HItem<> HInfoItem;
 
-}
-
 template <typename tType>
 inline void swap( yaal::hconsole::HItem<tType>& a, yaal::hconsole::HItem<tType>& b ) {
 	a.swap( b );
+}
+
 }
 
 }
