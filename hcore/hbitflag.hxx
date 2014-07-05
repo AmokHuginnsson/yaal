@@ -32,6 +32,7 @@ Copyright:
 
 #include "hcore/hexception.hxx"
 #include "hcore/pod.hxx"
+#include "hcore/bit.hxx"
 
 namespace yaal {
 
@@ -91,6 +92,16 @@ YAAL_DEFINE_OPER( ^ )
 	}
 	u64_t value( void ) const {
 		return ( _flag );
+	}
+	/*! \brief Get flag index.
+	 *
+	 * WARNING: This function does not return bit index!!
+	 *
+	 * \return Flag index.
+	 */
+	int index( void ) const {
+		M_ASSERT( bit::count( _flag ) <= 1 );
+		return ( bit::least_significant( _flag ) + 1 );
 	}
 private:
 	HBitFlag( void )

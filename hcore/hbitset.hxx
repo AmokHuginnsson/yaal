@@ -34,38 +34,11 @@ Copyright:
 #include "hcore/algorithm.hxx"
 #include "hcore/iterator.hxx"
 #include "hcore/hstring.hxx"
+#include "hcore/bit.hxx"
 
 namespace yaal {
 
 namespace hcore {
-
-namespace bit {
-
-static int const SHIFT[] = { 1, 2, 4, 8, 16, 32 };
-static u64_t const BIT_MASK[] = {
-	0x5555555555555555,
-	0x3333333333333333,
-	0x0f0f0f0f0f0f0f0f,
-	0x00ff00ff00ff00ff,
-	0x0000ffff0000ffff,
-	0x00000000ffffffff
-};
-
-inline int count( u64_t v_ ) {
-	for ( int i( 0 ); i < countof ( SHIFT ); ++ i ) {
-		v_ = ( v_ & BIT_MASK[i] ) + ( ( v_ >> SHIFT[i] ) & BIT_MASK[i] );
-	}
-	return ( static_cast<int>( v_ ) );
-}
-
-inline u64_t reverse( u64_t v_ ) {
-	for ( int i( 0 ); i < countof ( SHIFT ); ++ i ) {
-		v_ = ( ( v_ >> SHIFT[i] ) & BIT_MASK[i] ) | ( ( v_ & BIT_MASK[i] ) << SHIFT[i] );
-	}
-	return ( v_ );
-}
-
-}
 
 /*! \brief Provision operations for set of bits.
  */
