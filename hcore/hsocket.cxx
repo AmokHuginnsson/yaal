@@ -59,6 +59,14 @@ char const* const _errMsgHSocket_[ 4 ] = {
 	_( "already listening" )
 };
 
+HSocket::socket_type_t const HSocket::TYPE::DEFAULT = HSocket::socket_type_t::new_flag();
+HSocket::socket_type_t const HSocket::TYPE::FILE = HSocket::socket_type_t::new_flag();
+HSocket::socket_type_t const HSocket::TYPE::NETWORK = HSocket::socket_type_t::new_flag();
+HSocket::socket_type_t const HSocket::TYPE::BLOCKING = HSocket::socket_type_t::new_flag();
+HSocket::socket_type_t const HSocket::TYPE::NONBLOCKING = HSocket::socket_type_t::new_flag();
+HSocket::socket_type_t const HSocket::TYPE::SSL_SERVER = HSocket::socket_type_t::new_flag();
+HSocket::socket_type_t const HSocket::TYPE::SSL_CLIENT = HSocket::socket_type_t::new_flag();
+
 bool HSocket::_resolveHostnames = true;
 
 HSocket::HSocket( socket_type_t const& socketType_,
@@ -76,11 +84,11 @@ HSocket::HSocket( socket_type_t const& socketType_,
 		_type |= TYPE::SSL_CLIENT;
 	if ( ( !!( socketType_ & TYPE::FILE ) ) && ( !!( socketType_ & TYPE::NETWORK ) ) )
 		M_THROW( _( "bad socket namespace setting" ), socketType_.value() );
-	if ( ! ( socketType_ & ( socket_type_t( TYPE::FILE ) | TYPE::NETWORK ) ) )
+	if ( ! ( socketType_ & ( TYPE::FILE | TYPE::NETWORK ) ) )
 		_type |= TYPE::NETWORK;
 	if ( ( !!( socketType_ & TYPE::BLOCKING ) ) && ( !!( socketType_ & TYPE::NONBLOCKING ) ) )
 		M_THROW( _( "bad socket option" ), socketType_.value() );
-	if ( ! ( socketType_ & ( socket_type_t( TYPE::BLOCKING ) | TYPE::NONBLOCKING ) ) )
+	if ( ! ( socketType_ & ( TYPE::BLOCKING | TYPE::NONBLOCKING ) ) )
 		_type |= TYPE::BLOCKING;
 	if ( _maximumNumberOfClients >= 0 ) {
 		M_ENSURE( ( _fileDescriptor = ::socket(
@@ -210,8 +218,10 @@ HSocket::ptr_t HSocket::accept( void ) {
 					address, &addressSize ) ) >= 0 );
 	/* - 1 means that constructor shall not create socket */
 	socket_type_t type = _type;
-	if ( !!( _type & ( socket_type_t( TYPE::SSL_SERVER  ) | TYPE::SSL_CLIENT ) ) )
-		type &= ~socket_type_t( TYPE::SSL_CLIENT ), type |= TYPE::SSL_SERVER;
+	if ( !!( _type & ( TYPE::SSL_SERVER | TYPE::SSL_CLIENT ) ) ) {
+		type &= ~TYPE::SSL_CLIENT;
+		type |= TYPE::SSL_SERVER;
+	}
 	ptr_t socket( make_pointer<HSocket>( type, -1 ) );
 	M_ASSERT( ! socket->_ssl );
 	socket->_fileDescriptor = fileDescriptor;

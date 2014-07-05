@@ -34,7 +34,7 @@ Copyright:
 #include "hcore/hrawfile.hxx"
 #include "hcore/hhashmap.hxx"
 #include "hcore/hexception.hxx"
-#include "hcore/hstrongenum.hxx"
+#include "hcore/hbitflag.hxx"
 
 namespace yaal {
 
@@ -53,20 +53,19 @@ public:
 	M_YAAL_HCORE_PUBLIC_API static bool _resolveHostnames;
 	/*! \brief Socket types.
 	 */
+	struct TYPE;
+	/*! \brief Socket types.
+	 */
+	typedef HBitFlag<TYPE> socket_type_t;
 	struct TYPE {
-		/*! \brief Socket types.
-		 */
-		typedef enum {
-			DEFAULT			= 0x00,
-			FILE				= 0x01,
-			NETWORK			= 0x02,
-			BLOCKING		= 0x04,
-			NONBLOCKING	= 0x08,
-			SSL_SERVER	= 0x10,
-			SSL_CLIENT	= 0x20
-		} enum_t;
+		static socket_type_t const DEFAULT;
+		static socket_type_t const FILE;
+		static socket_type_t const NETWORK;
+		static socket_type_t const BLOCKING;
+		static socket_type_t const NONBLOCKING;
+		static socket_type_t const SSL_SERVER;
+		static socket_type_t const SSL_CLIENT;
 	};
-	typedef HStrongEnum<TYPE> socket_type_t;
 protected:
 	typedef HHashMap<int, ptr_t> clients_t;
 public:
