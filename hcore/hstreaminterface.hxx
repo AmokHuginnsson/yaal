@@ -212,10 +212,22 @@ public:
 	int long write( void const* const, int long );
 	M_YAAL_HCORE_PUBLIC_API static char const* const eols;
 	bool is_valid( void ) const;
+	/*! \brief Tell if all operations until now succeeded.
+	 *
+	 * \return True iff all operations until now succeeded.
+	 */
 	bool good( void ) const
 		{ return ( do_good() ); }
+	/*! \brief Tell if any problem occurred with stream at system or semantic level.
+	 *
+	 * \return True iff stream had experienced problems at system of semantic level.
+	 */
 	bool fail( void ) const
 		{ return ( do_fail() ); }
+	/*! \brief Tell if stream operation failed at system level.
+	 *
+	 * \return True iff stream operation failed at system level.
+	 */
 	bool bad( void ) const
 		{ return ( do_bad() ); }
 	void flush( void );
@@ -309,6 +321,8 @@ protected:
 	bool do_fail( void ) const;
 	bool do_bad( void ) const;
 private:
+	int long read_while_retry( yaal::hcore::HString& , char const* const, bool );
+	int long read_until_retry( yaal::hcore::HString& , char const* const, bool );
 	bool read_word( void );
 	bool read_integer( void );
 	bool read_floatint_point( void );

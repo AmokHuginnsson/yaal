@@ -37,6 +37,7 @@ namespace yaal {
 
 namespace hcore {
 
+static int const INVALID_CHARACTER = -256;
 char const* const HStreamInterface::eols = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
@@ -365,8 +366,31 @@ int long HStreamInterface::do_read_while_n( HString& message_, int long maxCount
 	M_EPILOG
 }
 
+int long HStreamInterface::read_while_retry( yaal::hcore::HString& message_,
+		char const* acquire_, bool stripDelim_ ) {
+	M_PROLOG
+	int long nRead( 0 );
+	do {
+		nRead = HStreamInterface::do_read_while( message_, acquire_, stripDelim_ );
+	} while ( good() && nRead < 0 );
+	return ( nRead );
+	M_EPILOG
+}
+
+int long HStreamInterface::read_until_retry( yaal::hcore::HString& message_,
+		char const* stopSet_, bool stripDelim_ ) {
+	M_PROLOG
+	int long nRead( 0 );
+	do {
+		nRead = HStreamInterface::do_read_until( message_, stopSet_, stripDelim_ );
+	} while ( good() && nRead < 0 );
+	return ( nRead );
+	M_EPILOG
+}
+
 int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int long maxCount_, char const* const set_, bool stripDelim_, bool isStopSet_ ) {
 	M_PROLOG
+	M_ASSERT( _offset >= 0 );
 	int long nRead( 0 ); /* how many bytes were read in this single invocation */
 	int long iPoolSize( _cache.size() );
 	char* buffer( _cache.get<char>() ); /* read cache buffer */
@@ -412,12 +436,16 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 				&& ( ! ( byDelim = ( ::memchr( set_, buffer[ _offset ++ ], static_cast<size_t>( setLen ) ) ? isStopSet_ : ! isStopSet_ ) ) )
 				&& ( ! ( bySize = ( _offset >= maxCount_ ) ) ) );
 		if ( nRead >= 0 ) {
-			if ( ! nRead )
+			if ( ! nRead ) {
 				_valid = false;
-			M_ASSERT( _offset >= 0 );
+			}
 			nRead = _offset;
 			message_.assign( buffer, _offset - ( ( ( _offset > 0 ) && byDelim ) ? 1 : 0 ) );
 			if ( byDelim && ! stripDelim_ ) {
+				M_ASSERT( _offset > 0 );
+				/*
+				 * WTF???
+				 */
 				buffer[ 0 ] = buffer[ _offset - 1 ];
 				_offset = 1;
 			} else
@@ -434,10 +462,15 @@ int HStreamInterface::do_peek( void ) {
 		int long iPoolSize( _cache.size() );
 		if ( iPoolSize < 1 )
 			_cache.realloc( 1 );
-		do_read( _cache.raw(), 1 );
-		_offset = 1;
+		int long nRead( 0 );
+		do {
+			nRead = do_read( _cache.raw(), 1 );
+		} while ( nRead < 0 );
+		if ( nRead > 0 ) {
+			_offset = 1;
+		}
 	}
-	return ( _cache.get<char>()[ _offset - 1 ] );
+	return ( _offset > 0 ? _cache.get<char>()[ _offset - 1 ] : INVALID_CHARACTER );
 }
 
 HStreamInterface& HStreamInterface::do_input( HString& word ) {
@@ -451,58 +484,78 @@ HStreamInterface& HStreamInterface::do_input( HString& word ) {
 bool HStreamInterface::read_word( void ) {
 	M_PROLOG
 	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analoguous context */
-	if ( ! _skipWS && ::memchr( _whiteSpace_.data(), HStreamInterface::do_peek(), static_cast<size_t>( _whiteSpace_.size() + 1 ) ) )
-		_fail = true;
-	else {
-		while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_.data(), false ) < 0 )
-			;
-		while ( HStreamInterface::do_read_until( _wordCache, _whiteSpace_.data(), false ) < 0 )
-			;
+	if ( ! _skipWS ) {
+		int peeked( HStreamInterface::do_peek() );
+		if ( ( peeked == INVALID_CHARACTER )
+				|| ( ::memchr( _whiteSpace_.data(), peeked, static_cast<size_t>( _whiteSpace_.size() + 1 ) ) ) ) {
+			_fail = true;
+		}
 	}
-	return ( good() && ( _wordCache.get_length() > 0 ) );
+	if ( good() ) {
+		read_while_retry( _wordCache, _whiteSpace_.data(), false );
+		if ( good() ) {
+			read_until_retry( _wordCache, _whiteSpace_.data(), false );
+		}
+	}
+	return ( _wordCache.get_length() > 0 );
 	M_EPILOG
 }
 
 bool HStreamInterface::read_integer( void ) {
 	M_PROLOG
-	while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_.data(), false ) < 0 )
-		;
-	bool neg( HStreamInterface::do_peek() == '-' );
-	char sink( 0 );
-	if ( neg )
-		HStreamInterface::read( &sink, 1 );
-	while ( HStreamInterface::do_read_while( _wordCache, _digit_.data(), false ) < 0 )
-		;
-	if ( neg )
-		_wordCache.insert( 0, "-" );
+	read_while_retry( _wordCache, _whiteSpace_.data(), false );
+	if ( good() ) {
+		bool neg( HStreamInterface::do_peek() == '-' );
+		if ( neg ) {
+			char sink( 0 );
+			HStreamInterface::read( &sink, 1 );
+		}
+		if ( good() ) {
+			read_while_retry( _wordCache, _digit_.data(), false );
+			if ( neg ) {
+				_wordCache.insert( 0, "-" );
+			}
+		}
+	}
 	return ( _wordCache.get_length() > 0 );
 	M_EPILOG
 }
 
 bool HStreamInterface::read_floatint_point( void ) {
 	M_PROLOG
-	while ( HStreamInterface::do_read_while( _wordCache, _whiteSpace_.data(), false ) < 0 )
-		;
-	bool neg( HStreamInterface::do_peek() == '-' );
-	char sink( 0 );
-	if ( neg )
-		read( &sink, 1 );
-	while ( HStreamInterface::do_read_while( _wordCache, _digit_.data(), false ) < 0 )
-		;
-	if ( neg )
-		_wordCache.insert( 0, "-" );
-	bool dot( HStreamInterface::do_peek() == '.' );
-	if ( dot )
-		HStreamInterface::read( &sink, 1 );
-	if ( dot ) {
-		HString decimal;
-		while ( HStreamInterface::do_read_while( decimal, _digit_.data(), false ) < 0 )
-			;
-		if ( ! decimal.is_empty() ) {
-			_wordCache += sink;
-			_wordCache += decimal;
+	do {
+		read_while_retry( _wordCache, _whiteSpace_.data(), false );
+		if ( ! good() ) {
+			break;
 		}
-	}
+		bool neg( HStreamInterface::do_peek() == '-' );
+		if ( ! good() ) {
+			break;
+		}
+		char sink( 0 );
+		if ( neg ) {
+			read( &sink, 1 );
+		}
+		read_while_retry( _wordCache, _digit_.data(), false );
+		if ( ! good() ) {
+			break;
+		}
+		if ( neg ) {
+			_wordCache.insert( 0, "-" );
+		}
+		bool dot( HStreamInterface::do_peek() == '.' );
+		if ( dot ) {
+			HStreamInterface::read( &sink, 1 );
+		}
+		if ( dot ) {
+			HString decimal;
+			read_while_retry( decimal, _digit_.data(), false );
+			if ( ! decimal.is_empty() ) {
+				_wordCache += sink;
+				_wordCache += decimal;
+			}
+		}
+	} while ( false );
 	return ( _wordCache.get_length() > 0 );
 	M_EPILOG
 }
@@ -519,8 +572,9 @@ HStreamInterface& HStreamInterface::do_input( char& char_ ) {
 	M_PROLOG
 	/* Regarding _whiteSpace_.size() + 1, about "+ 1" see comment in semantic_read in analoguous context */
 	char c( 0 );
-	do read( &c, 1 );
-	while ( is_valid() && _skipWS && ::memchr( _whiteSpace_.data(), c, static_cast<size_t>( _whiteSpace_.size() + 1 ) ) );
+	do {
+		read( &c, 1 );
+	} while ( good() && _skipWS && ::memchr( _whiteSpace_.data(), c, static_cast<size_t>( _whiteSpace_.size() + 1 ) ) );
 	char_ = c;
 	return ( *this );
 	M_EPILOG
