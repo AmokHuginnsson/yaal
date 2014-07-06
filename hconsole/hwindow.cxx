@@ -50,9 +50,9 @@ HWindow::HWindow( char const * title_ ) : _initialised( false ),
 	int search [] = { '/', KEY<'/'>::command, '?', KEY<'?'>::command };
 	if ( ! HConsole::get_instance().is_enabled() )
 		M_THROW( "console not initialised.", errno );
-	register_postprocess_handler( '\t', NULL, &HWindow::handler_jump_tab );
-	register_postprocess_handler( 2, cmds, &HWindow::handler_command );
-	register_postprocess_handler( 4, search, &HWindow::handler_search );
+	register_postprocess_handler( '\t', NULL, call( &HWindow::handler_jump_tab, this, _1 ) );
+	register_postprocess_handler( 2, cmds, call( &HWindow::handler_command, this, _1 ) );
+	register_postprocess_handler( 4, search, call( &HWindow::handler_search, this, _1 ) );
 	return;
 	M_EPILOG
 }
@@ -102,7 +102,7 @@ int HWindow::add_control( HControl::ptr_t control_, int shortCut_ ) {
 	if ( _preprocessHandlers.find( shortCut_ ) != _preprocessHandlers.end() )
 		M_THROW( _( "shortcut occupied" ), shortCut_ );
 	_controls.add_control( control_ );
-	register_postprocess_handler( shortCut_, NULL, &HWindow::handler_jump_direct );
+	register_postprocess_handler( shortCut_, NULL, call( &HWindow::handler_jump_direct, this, _1 ) );
 	return ( 0 );
 	M_EPILOG
 }
@@ -124,7 +124,7 @@ void HWindow::refresh( void ) {
 	M_EPILOG
 }
 
-int HWindow::handler_jump_tab( int code_, void const* ) {
+int HWindow::handler_jump_tab( int code_ ) {
 	M_PROLOG
 	_controls.next_enabled();
 	_needRepaint_ = true;
@@ -133,7 +133,7 @@ int HWindow::handler_jump_tab( int code_, void const* ) {
 	M_EPILOG
 }
 
-int HWindow::handler_jump_direct( int code_, void const* ) {
+int HWindow::handler_jump_direct( int code_ ) {
 	M_PROLOG
 	/* call below is _magic_, HControlList::next_enabled() takes char as an
 	 * argument, so code_ & 0x0ff is passed into the function,
@@ -161,7 +161,7 @@ void HWindow::acquire_focus( HControl const* const control_ ) {
 	M_EPILOG
 }
 
-int HWindow::handler_command( int code_, void const* ) {
+int HWindow::handler_command( int code_ ) {
 	M_PROLOG
 	code_ = 0;
 	_statusBar->set_prompt ( ":", HStatusBarControl::PROMPT::COMMAND );
@@ -169,7 +169,7 @@ int HWindow::handler_command( int code_, void const* ) {
 	M_EPILOG
 }
 
-int HWindow::handler_search( int code_, void const* ) {
+int HWindow::handler_search( int code_ ) {
 	M_PROLOG
 	char prompt [ ] = "/\0";
 	if ( ! (*_focusedChild)->is_searchable() )

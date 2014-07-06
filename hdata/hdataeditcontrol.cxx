@@ -27,8 +27,9 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "hconsole/console.hxx"
 #include "hdataeditcontrol.hxx"
+#include "hconsole/console.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole;

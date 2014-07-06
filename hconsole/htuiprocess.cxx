@@ -83,32 +83,27 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 	_dispatcher.register_file_descriptor_handler( cons.get_event_fd(), call( &HTUIProcess::process_terminal_event, this, _1 ) );
 	_dispatcher.add_alert_handle( call( &HTUIProcess::handler_alert, this ) );
 	_dispatcher.add_idle_handle( call( &HTUIProcess::handler_idle, this ) );
-	register_postprocess_handler( CTRLS_COUNT, ctrls,
-			& HTUIProcess::handler_refresh );
-	register_postprocess_handler( KEY<'x'>::command, NULL,
-			& HTUIProcess::handler_quit );
-	if ( _useMouse_ )
-		register_postprocess_handler( KEY_CODES::MOUSE, NULL,
-				& HTUIProcess::handler_mouse );
+	register_postprocess_handler( CTRLS_COUNT, ctrls, call( &HTUIProcess::handler_refresh, this, _1 ) );
+	register_postprocess_handler( KEY<'x'>::command, NULL, call( &HTUIProcess::handler_quit, this, _1 ) );
+	if ( _useMouse_ ) {
+		register_postprocess_handler( KEY_CODES::MOUSE, NULL, call( &HTUIProcess::handler_mouse, this, _1 ) );
+	}
 	if ( !! mainWindow_ )
 		mainWindow = mainWindow_;
 	else /* Create automatically default main window. */ {
 		mainWindow = make_pointer<HMainWindow>( processName_, _windows, ref( _foregroundWindow ) );
-		register_postprocess_handler( KEY<'\t'>::meta, NULL,
-				&HTUIProcess::handler_jump_meta_tab );
-		register_postprocess_handler( KEY<'q'>::command, NULL,
-				&HTUIProcess::handler_close_window );
+		register_postprocess_handler( KEY<'\t'>::meta, NULL, call( &HTUIProcess::handler_jump_meta_tab, this, _1 ) );
+		register_postprocess_handler( KEY<'q'>::command, NULL, call( &HTUIProcess::handler_close_window, this, _1 ) );
 		for ( int ctr( 0 ); ctr < ALTS_COUNT; ++ ctr )
 			alts[ ctr ] = KEY<>::meta_r( '0' + ctr );
-		register_postprocess_handler( ALTS_COUNT, alts,
-			&HTUIProcess::handler_jump_meta_direct );
+		register_postprocess_handler( ALTS_COUNT, alts, call( &HTUIProcess::handler_jump_meta_direct, this, _1 ) );
 	}
 	_mainWindow = mainWindow;
 	add_window( mainWindow );
 	if ( ! mainWindow->is_initialised() )
 		M_THROW( _( "window has not been initialised" ), errno );
 	_foregroundWindow = _windows->begin();
-	_commandHandlers[ "quit" ] = static_cast<HHandler::HANDLER_t>( &HTUIProcess::handler_quit );
+	_commandHandlers[ "quit" ] = call( &HTUIProcess::handler_quit, this, _1 );
 	refresh();
 	return ( 1 );
 	M_EPILOG
@@ -227,7 +222,7 @@ void HTUIProcess::process_mouse( int ) {
 	M_EPILOG
 }
 
-int HTUIProcess::handler_mouse( int code_, void const* ) {
+int HTUIProcess::handler_mouse( int code_ ) {
 	M_PROLOG
 	code_ = 0;
 	mouse::OMouse mouse;
@@ -261,7 +256,7 @@ void HTUIProcess::process_terminal_event( int event_ ) {
 	M_EPILOG
 }
 
-int HTUIProcess::handler_refresh( int, void const* ) {
+int HTUIProcess::handler_refresh( int ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	cons.endwin();
@@ -271,8 +266,13 @@ int HTUIProcess::handler_refresh( int, void const* ) {
 	return ( 0 );
 	M_EPILOG
 }
+int HTUIProcess::handler_quit( int code_ ) {
+	M_PROLOG
+	return ( do_handler_quit( code_ ) );
+	M_EPILOG
+}
 
-int HTUIProcess::handler_quit( int, void const* ) {
+int HTUIProcess::do_handler_quit( int ) {
 	M_PROLOG
 	_dispatcher.stop();
 	_needRepaint_ = false;
@@ -281,7 +281,7 @@ int HTUIProcess::handler_quit( int, void const* ) {
 	M_EPILOG
 }
 
-int HTUIProcess::handler_jump_meta_tab( int code_, void const* ) {
+int HTUIProcess::handler_jump_meta_tab( int code_ ) {
 	M_PROLOG
 	if ( _dispatcher.idle_cycles() < 5 )
 		++ _foregroundWindow;
@@ -293,7 +293,7 @@ int HTUIProcess::handler_jump_meta_tab( int code_, void const* ) {
 	M_EPILOG
 }
 
-int HTUIProcess::handler_jump_meta_direct( int code_, void const* ) {
+int HTUIProcess::handler_jump_meta_direct( int code_ ) {
 	M_PROLOG
 	code_ = ( code_ & 0xff ) - '0';
 	if ( code_ >= _windows->size() )
@@ -307,7 +307,13 @@ int HTUIProcess::handler_jump_meta_direct( int code_, void const* ) {
 	M_EPILOG
 }
 
-int HTUIProcess::handler_close_window( int code_, void const* ) {
+int HTUIProcess::handler_close_window( int code_ ) {
+	M_PROLOG
+	return ( do_handler_close_window( code_ ) );
+	M_EPILOG
+}
+
+int HTUIProcess::do_handler_close_window( int code_ ) {
 	M_PROLOG
 	model_t::cyclic_iterator it = _foregroundWindow;
 	-- _foregroundWindow;

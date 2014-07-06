@@ -67,12 +67,14 @@ protected:
 	void refresh( bool = false );
 	void handler_alert( void );
 	void handler_idle( void );
-	virtual int handler_mouse( int, void const* = NULL );
-	virtual int handler_refresh( int, void const* = NULL );
-	virtual int handler_quit( int, void const* = NULL );
-	virtual int handler_jump_meta_tab( int, void const* = NULL );
-	virtual int handler_jump_meta_direct( int, void const* = NULL );
-	virtual int handler_close_window( int, void const* = NULL );
+	int handler_mouse( int );
+	int handler_refresh( int );
+	int handler_quit( int );
+	int handler_jump_meta_tab( int );
+	int handler_jump_meta_direct( int );
+	int handler_close_window( int );
+	virtual int do_handler_quit( int );
+	virtual int do_handler_close_window( int );
 private:
 	HTUIProcess( HTUIProcess const& );
 	HTUIProcess& operator = ( HTUIProcess const& );

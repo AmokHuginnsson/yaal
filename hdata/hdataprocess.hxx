@@ -77,8 +77,8 @@ public:
 /* cppcheck-suppress functionConst */
 	dbwrapper::database_ptr_t data_base( void );
 protected:
-	virtual int handler_quit( int, void const* = NULL );
-	virtual int handler_close_window( int, void const* = NULL );
+	virtual int do_handler_quit( int );
+	virtual int do_handler_close_window( int );
 private:
 	yaal::hconsole::OMenuItem* build_sub_menu( yaal::tools::HXml::HConstNodeProxy const&,
 			menu_handlers_map_t const& );

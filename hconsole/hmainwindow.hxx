@@ -57,7 +57,7 @@ public:
 	void init_menu( HTUIProcess*, OMenuItem* );
 	virtual int init( void );
 protected:
-	virtual int handler_close( int, void const* ); /* closes window process */
+	virtual int handler_close( int ); /* closes window process */
 private:
 	HMainWindow( HMainWindow const& );
 	HMainWindow& operator = ( HMainWindow const& );

@@ -61,11 +61,11 @@ public:
 	virtual int init( void );
 	void refresh( void );
 	int process_input( int );
-	virtual int handler_jump_tab( int, void const* ); /* jump thru controlos with tab key */
-	virtual int handler_jump_direct ( int, void const* ); /* direct jump to specified cntrl */
-	virtual int handler_command( int, void const* ); /* put window into command awaiting */
-	virtual int handler_search( int, void const* ); /* put window into search pattern scan */
-	virtual int click( mouse::OMouse& );
+	int handler_jump_tab( int ); /* jump thru controlos with tab key */
+	int handler_jump_direct ( int ); /* direct jump to specified cntrl */
+	int handler_command( int ); /* put window into command awaiting */
+	int handler_search( int ); /* put window into search pattern scan */
+	int click( mouse::OMouse& );
 	int add_control( HControl::ptr_t, int );
 	HStatusBarControl::ptr_t& status_bar( void );
 	hcore::HString get_command( void );

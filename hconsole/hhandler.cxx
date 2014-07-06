@@ -52,7 +52,7 @@ HHandler::~HHandler ( void ) {
 	M_EPILOG
 }
 
-int HHandler::register_preprocess_handler_internal( int codeCount_, int const * codes_,
+int HHandler::register_preprocess_handler( int codeCount_, int const * codes_,
 		HANDLER_t HANDLER ) {
 	M_PROLOG
 	if ( codes_ ) {
@@ -64,7 +64,7 @@ int HHandler::register_preprocess_handler_internal( int codeCount_, int const * 
 	M_EPILOG
 }
 
-int HHandler::register_postprocess_handler_internal( int codeCount_, int const * codes_,
+int HHandler::register_postprocess_handler( int codeCount_, int const * codes_,
 		HANDLER_t HANDLER ) {
 	M_PROLOG
 	if ( codes_ ) {
@@ -79,8 +79,9 @@ int HHandler::register_postprocess_handler_internal( int codeCount_, int const *
 int HHandler::process_input_with_handlers( int code_, process_handler_key_map_t const& map_ ) {
 	M_PROLOG
 	process_handler_key_map_t::const_iterator it( map_.find( code_ ) );
-	if ( it != map_.end() )
-		code_ = ( this->*( it->second ) )( code_, NULL );
+	if ( it != map_.end() ) {
+		code_ = it->second( code_ );
+	}
 	return ( code_ );
 	M_EPILOG
 }
@@ -92,7 +93,8 @@ HString HHandler::process_command( void ) {
 		command = HTokenizer( _command, " \t", HTokenizer::DELIMITED_BY_ANY_OF )[ 0 ];
 		process_handler_command_map_t::iterator it( _commandHandlers.find( command ) );
 		if ( it != _commandHandlers.end() ) {
-			static_cast<void>( ( this->*( it->second ) )( 0, _command.raw() ) );
+			it->second( 0 );
+/*			it->second( 0, _command.raw() ); */
 			_command = "";
 		}
 	}

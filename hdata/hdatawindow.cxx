@@ -56,18 +56,12 @@ HDataWindow::HDataWindow( char const* title_, HDataProcess* owner_,
 	_dB( new ( memory::yaal ) HSQLDescriptor( owner_->data_base() ) ),
 	_mode( HSQLDescriptor::MODE::SELECT ) {
 	M_PROLOG
-	register_postprocess_handler( KEY<'n'>::command, NULL,
-			&HDataWindow::handler_add_new );
-	register_postprocess_handler( KEY<'e'>::command, NULL,
-			&HDataWindow::handler_edit );
-	register_postprocess_handler( KEY<'d'>::command, NULL,
-			&HDataWindow::handler_delete );
-	register_postprocess_handler( KEY<'w'>::command, NULL,
-			&HDataWindow::handler_save );
-	register_postprocess_handler( KEY<'r'>::ctrl, NULL,
-			&HDataWindow::handler_requery );
-	register_postprocess_handler( KEY_CODES::ESC, NULL,
-			&HDataWindow::handler_cancel );
+	register_postprocess_handler( KEY<'n'>::command, NULL, call( &HDataWindow::handler_add_new, this, _1 ) );
+	register_postprocess_handler( KEY<'e'>::command, NULL, call( &HDataWindow::handler_edit, this, _1 ) );
+	register_postprocess_handler( KEY<'d'>::command, NULL, call( &HDataWindow::handler_delete, this, _1 ) );
+	register_postprocess_handler( KEY<'w'>::command, NULL, call( &HDataWindow::handler_save, this, _1 ) );
+	register_postprocess_handler( KEY<'r'>::ctrl, NULL, call( &HDataWindow::handler_requery, this, _1 ) );
+	register_postprocess_handler( KEY_CODES::ESC, NULL, call( &HDataWindow::handler_cancel, this, _1 ) );
 	return;
 	M_EPILOG
 }
@@ -282,7 +276,7 @@ void HDataWindow::set_sync_store( ORowBuffer* rB_ ) {
 	return;
 }
 
-int HDataWindow::handler_add_new( int, void const* ) {
+int HDataWindow::handler_add_new( int ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
@@ -297,7 +291,7 @@ int HDataWindow::handler_add_new( int, void const* ) {
 	M_EPILOG
 }
 
-int HDataWindow::handler_edit( int, void const* ) {
+int HDataWindow::handler_edit( int ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
@@ -315,7 +309,7 @@ int HDataWindow::handler_edit( int, void const* ) {
 	M_EPILOG
 }
 
-int HDataWindow::handler_delete( int, void const* ) {
+int HDataWindow::handler_delete( int ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
@@ -338,7 +332,7 @@ int HDataWindow::handler_delete( int, void const* ) {
 	M_EPILOG
 }
 
-int HDataWindow::handler_save( int, void const* ) {
+int HDataWindow::handler_save( int ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::EDIT ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED, _( "There is nothing to save." ) );
@@ -362,7 +356,7 @@ int HDataWindow::handler_save( int, void const* ) {
 	M_EPILOG
 }
 
-int HDataWindow::handler_requery( int, void const* ) {
+int HDataWindow::handler_requery( int ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
@@ -376,7 +370,7 @@ int HDataWindow::handler_requery( int, void const* ) {
 	M_EPILOG
 }
 
-int HDataWindow::handler_cancel( int, void const* ) {
+int HDataWindow::handler_cancel( int ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::EDIT )
 		return ( 0 );

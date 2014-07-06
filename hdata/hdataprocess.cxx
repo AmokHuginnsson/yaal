@@ -184,7 +184,7 @@ database_ptr_t HDataProcess::data_base( void ) {
 	return ( _dataBase );
 }
 
-int HDataProcess::handler_quit( int code_, void const* ) {
+int HDataProcess::do_handler_quit( int code_ ) {
 	M_PROLOG
 	HDataWindow* window = NULL;
 	if ( _windows->size() ) {
@@ -201,11 +201,11 @@ int HDataProcess::handler_quit( int code_, void const* ) {
 			}
 		}
 	}
-	return ( HTUIProcess::handler_quit( code_ ) );
+	return ( HTUIProcess::do_handler_quit( code_ ) );
 	M_EPILOG
 }
 
-int HDataProcess::handler_close_window( int code_, void const* ) {
+int HDataProcess::do_handler_close_window( int code_ ) {
 	M_PROLOG
 	HDataWindow* window = NULL;
 	if ( !! (*_foregroundWindow) ) {
@@ -215,7 +215,7 @@ int HDataProcess::handler_close_window( int code_, void const* ) {
 				&& ! window->status_bar()->confirm( "close window" ) )
 			return ( 0 );
 	}
-	return ( HTUIProcess::handler_close_window( code_ ) );
+	return ( HTUIProcess::do_handler_close_window( code_ ) );
 	M_EPILOG
 }
 

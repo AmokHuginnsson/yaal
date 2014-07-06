@@ -42,8 +42,7 @@ HMainWindow::HMainWindow( char const* title_, HTUIProcess::model_ptr_t windows_,
 		: HWindow( title_ ), _menu( NULL ), _windowList( windows_ ),
 		_foregroundWindow( foregroundWindow_ ) {
 	M_PROLOG
-	register_postprocess_handler ( KEY<'q'>::command, NULL,
-				& HMainWindow::handler_close );
+	register_postprocess_handler( KEY<'q'>::command, NULL, call( &HMainWindow::handler_close, this, _1 ) );
 	return;
 	M_EPILOG
 }
@@ -86,7 +85,7 @@ void HMainWindow::init_menu( HTUIProcess* process_, OMenuItem* menu_ ) {
 	M_EPILOG
 }
 
-int HMainWindow::handler_close( int code_, void const* ) {
+int HMainWindow::handler_close( int code_ ) {
 	M_PROLOG
 	code_ = KEY<'x'>::command;
 	return ( code_ );
