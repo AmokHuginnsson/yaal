@@ -55,6 +55,23 @@ STATIC_ASSERT( sizeof ( true_type ) != sizeof ( false_type ) );
  */
 class no_type {};
 
+/*! \brief Conditionally expose given type.
+ *
+ * \tparam condition - condition on which given type should be exposed.
+ * \tparam T - type to expose if condition is true.
+ * \retval type - conditionally T type.
+ */
+template<bool const condition, typename T = void>
+struct enable_if {
+	typedef T type;
+};
+
+/* \cond */
+template<typename T>
+struct enable_if<false, T> {
+};
+/* \endcond */
+
 /*! \brief Meta function, tells if two types are the same.
  *
  * \tparam T1 - first of two types to compare.
@@ -313,6 +330,12 @@ struct is_const<T const> {
 	static bool const value = true;
 	typedef trait::true_type type;
 };
+
+template<typename T>
+struct is_const<T const&> {
+	static bool const value = true;
+	typedef trait::true_type type;
+};
 /*! \endcond */
 
 /*! \brief Test if type is a volatile type.
@@ -355,6 +378,26 @@ struct is_reference<T&> {
 };
 template<typename T>
 struct is_reference<T const&> {
+	static bool const value = true;
+	typedef trait::true_type type;
+};
+/*! \endcond */
+
+/*! \brief Test if given type is a C-array type.
+ *
+ * \tparam T - type to test for being C style array.
+ * \retval value - true iff T is C style array.
+ * \return type - true_type iff T is C style array.
+ */
+template<typename T>
+struct is_array {
+	static bool const value = false;
+	typedef trait::false_type type;
+};
+
+/*! \cond */
+template<typename T, int const SIZE>
+struct is_array<T[SIZE]> {
 	static bool const value = true;
 	typedef trait::true_type type;
 };
