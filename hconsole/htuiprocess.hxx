@@ -30,6 +30,7 @@ Copyright:
 #ifndef YAAL_HCONSOLE_HTUIPROCESS_HXX_INCLUDED
 #define YAAL_HCONSOLE_HTUIPROCESS_HXX_INCLUDED 1
 
+#include "hcore/hqueue.hxx"
 #include "tools/hiodispatcher.hxx"
 #include "hconsole/hhandler.hxx"
 #include "hconsole/hwindow.hxx"
@@ -47,18 +48,25 @@ public:
 	typedef HHandler base_type;
 	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
 	typedef yaal::hcore::HPointer<model_t> model_ptr_t;
+	typedef yaal::hcore::HBoundCall<> call_t;
+	typedef yaal::hcore::HQueue<call_t> call_queue_t;
 protected:
 	yaal::tools::HIODispatcher _dispatcher;
-	HWindow::ptr_t _mainWindow; /* self explanary */
+	HWindow::ptr_t _mainWindow;                 /* self explanary */
 	model_t::cyclic_iterator _foregroundWindow; /* self explanary */
-	model_ptr_t _windows;	/* current existing windows */
+	model_ptr_t _windows;                       /* current existing windows */
 	bool _needRepaint;
+	call_queue_t _callQueue;
 public:
 	HTUIProcess( int = 8, int = 32, int = 32 );
 	virtual ~HTUIProcess ( void );
 	int init_tui( char const* = "", HWindow::ptr_t = HWindow::ptr_t() );
 	void run( void );
 	void schedule_repaint( void );
+	void schedule_call( call_t );
+	void quit( void );
+	void close_window( void );
+	void flush_call_queue( void );
 protected:
 	void process_stdin( int );
 	void process_mouse( int );
@@ -69,14 +77,14 @@ protected:
 	void repaint( bool = false );
 	void handler_alert( void );
 	void handler_idle( void );
-	int handler_mouse( int );
-	int handler_refresh( int );
-	int handler_quit( int );
-	int handler_jump_meta_tab( int );
-	int handler_jump_meta_direct( int );
-	int handler_close_window( int );
-	virtual int do_handler_quit( int );
-	virtual int do_handler_close_window( int );
+	bool handler_mouse( HEvent const& );
+	bool handler_refresh( HEvent const& );
+	bool handler_quit( HEvent const& );
+	bool handler_jump_meta_tab( HEvent const& );
+	bool handler_jump_meta_direct( HEvent const& );
+	bool handler_close_window( HEvent const& );
+	virtual void do_quit( void );
+	virtual void do_close_window( void );
 private:
 	HTUIProcess( HTUIProcess const& );
 	HTUIProcess& operator = ( HTUIProcess const& );

@@ -52,7 +52,7 @@ HHandler::~HHandler ( void ) {
 	M_EPILOG
 }
 
-int HHandler::register_preprocess_handler( int codeCount_, int const * codes_,
+int HHandler::register_preprocess_handler( int codeCount_, int const* codes_,
 		HANDLER_t HANDLER ) {
 	M_PROLOG
 	if ( codes_ ) {
@@ -64,7 +64,7 @@ int HHandler::register_preprocess_handler( int codeCount_, int const * codes_,
 	M_EPILOG
 }
 
-int HHandler::register_postprocess_handler( int codeCount_, int const * codes_,
+int HHandler::register_postprocess_handler( int codeCount_, int const* codes_,
 		HANDLER_t HANDLER ) {
 	M_PROLOG
 	if ( codes_ ) {
@@ -76,13 +76,14 @@ int HHandler::register_postprocess_handler( int codeCount_, int const * codes_,
 	M_EPILOG
 }
 
-int HHandler::process_input_with_handlers( int code_, process_handler_key_map_t const& map_ ) {
+bool HHandler::process_input_with_handlers( HKeyPressEvent const& keyPress_, process_handler_key_map_t const& map_ ) {
 	M_PROLOG
-	process_handler_key_map_t::const_iterator it( map_.find( code_ ) );
+	process_handler_key_map_t::const_iterator it( map_.find( keyPress_.get_key_code() ) );
+	bool consumed( false );
 	if ( it != map_.end() ) {
-		code_ = it->second( code_ );
+		consumed = it->second( keyPress_ );
 	}
-	return ( code_ );
+	return ( consumed );
 	M_EPILOG
 }
 
@@ -93,8 +94,7 @@ HString HHandler::process_command( void ) {
 		command = HTokenizer( _command, " \t", HTokenizer::DELIMITED_BY_ANY_OF )[ 0 ];
 		process_handler_command_map_t::iterator it( _commandHandlers.find( command ) );
 		if ( it != _commandHandlers.end() ) {
-			it->second( 0 );
-/*			it->second( 0, _command.raw() ); */
+			it->second( HCommandEvent( _command ) );
 			_command = "";
 		}
 	}

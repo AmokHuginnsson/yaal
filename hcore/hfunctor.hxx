@@ -334,7 +334,12 @@ struct object_resolver {
 		template<typename METHOD_t, typename CLASS_t,
 			typename a0_t>
 		static return_t go( METHOD_t method_, CLASS_t object_,
-			a0_t a0 )
+			a0_t const& a0 )
+			{ return ( (object_.*method_)( a0 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t& a0 )
 			{ return ( (object_.*method_)( a0 ) ); }
 		template<typename METHOD_t, typename CLASS_t>
 		static return_t go( METHOD_t method_, CLASS_t object_ )
@@ -406,7 +411,12 @@ struct object_resolver {
 		template<typename METHOD_t, typename CLASS_t,
 			typename a0_t>
 		static return_t go( METHOD_t method_, CLASS_t object_,
-			a0_t a0 )
+			a0_t const& a0 )
+			{ return ( (object_->*method_)( a0 ) ); }
+		template<typename METHOD_t, typename CLASS_t,
+			typename a0_t>
+		static return_t go( METHOD_t method_, CLASS_t object_,
+			a0_t& a0 )
 			{ return ( (object_->*method_)( a0 ) ); }
 		template<typename METHOD_t, typename CLASS_t>
 		static return_t go( METHOD_t method_, CLASS_t object_ )
@@ -478,7 +488,12 @@ struct object_resolver {
 		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
 			typename a0_t>
 		static return_t go( METHOD_t method_, dummy_t, CLASS_t& object_,
-			a0_t a0 )
+			a0_t const& a0 )
+			{ return ( (object_.*method_)( a0 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t& object_,
+			a0_t& a0 )
 			{ return ( (object_.*method_)( a0 ) ); }
 		template<typename METHOD_t, typename dummy_t, typename CLASS_t>
 		static return_t go( METHOD_t method_, dummy_t, CLASS_t& object_ )
@@ -550,7 +565,12 @@ struct object_resolver {
 		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
 			typename a0_t>
 		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
-			a0_t a0 )
+			a0_t const& a0 )
+			{ return ( (object_->*method_)( a0 ) ); }
+		template<typename METHOD_t, typename dummy_t, typename CLASS_t,
+			typename a0_t>
+		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_,
+			a0_t& a0 )
 			{ return ( (object_->*method_)( a0 ) ); }
 		template<typename METHOD_t, typename dummy_t, typename CLASS_t>
 		static return_t go( METHOD_t method_, dummy_t, CLASS_t object_ )

@@ -276,50 +276,50 @@ void HDataWindow::set_sync_store( ORowBuffer* rB_ ) {
 	return;
 }
 
-int HDataWindow::handler_add_new( int ) {
+bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_ ( "You cannot add new rocord now." ) );
-		return ( 0 );
+		return ( true );
 	}
 	_mode = HSQLDescriptor::MODE::INSERT;
 	if ( _mainControl )
 		_mainControl->add_new();
 	set_mode( DOCUMENT::EDIT );
-	return ( 0 );
+	return ( true );
 	M_EPILOG
 }
 
-int HDataWindow::handler_edit( int ) {
+bool HDataWindow::handler_edit( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_ ( "You cannot start editing of this record." ) );
-		return ( 0 );
+		return ( true );
 	}
 	if ( ! _dB->get_size() ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_ ( "There is nothing to edit." ) );
-		return ( 0 );
+		return ( true );
 	}
 	_mode = HSQLDescriptor::MODE::UPDATE;
 	set_mode( DOCUMENT::EDIT );
-	return ( 0 );
+	return ( true );
 	M_EPILOG
 }
 
-int HDataWindow::handler_delete( int ) {
+bool HDataWindow::handler_delete( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_( "You cannot delete this record." ) );
-		return ( 0 );
+		return ( true );
 	}
 	if ( ! _dB->get_size() ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_( "There is nothing to remove." ) );
-		return ( 0 );
+		return ( true );
 	}
 	if ( _mainControl ) {
 		HString filter;
@@ -328,15 +328,15 @@ int HDataWindow::handler_delete( int ) {
 		_dB->execute( HSQLDescriptor::MODE::DELETE );
 		_mainControl->load();
 	}
-	return ( 0 );
+	return ( true );
 	M_EPILOG
 }
 
-int HDataWindow::handler_save( int ) {
+bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::EDIT ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED, _( "There is nothing to save." ) );
-		return ( 0 );
+		return ( true );
 	}
 	if ( _mode == HSQLDescriptor::MODE::UPDATE ) {
 		HString filter;
@@ -352,35 +352,35 @@ int HDataWindow::handler_save( int ) {
 		set_mode( DOCUMENT::VIEW );
 		_mainControl->load();
 	}
-	return ( 0 );
+	return ( true );
 	M_EPILOG
 }
 
-int HDataWindow::handler_requery( int ) {
+bool HDataWindow::handler_requery( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_( "Finish your current operation first." ) );
-		return ( 0 );
+		return ( true );
 	}
 	set_mode( DOCUMENT::VIEW );
 	_mainControl->load();
 	paint();
-	return ( 0 );
+	return ( true );
 	M_EPILOG
 }
 
-int HDataWindow::handler_cancel( int ) {
+bool HDataWindow::handler_cancel( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::EDIT )
-		return ( 0 );
+		return ( true );
 	set_mode( DOCUMENT::VIEW );
 	if ( ( _mode == HSQLDescriptor::MODE::INSERT ) && _mainControl )
 		_mainControl->cancel_new();
 	_modified = false;
 	_statusBar->paint();
 	_statusBar->message( COLORS::FG_BRIGHTRED, _( "Dropping all changes." ) );
-	return ( 0 );
+	return ( true );
 	M_EPILOG
 }
 

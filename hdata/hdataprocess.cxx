@@ -184,7 +184,7 @@ database_ptr_t HDataProcess::data_base( void ) {
 	return ( _dataBase );
 }
 
-int HDataProcess::do_handler_quit( int code_ ) {
+void HDataProcess::do_quit( void ) {
 	M_PROLOG
 	HDataWindow* window = NULL;
 	if ( _windows->size() ) {
@@ -195,27 +195,31 @@ int HDataProcess::do_handler_quit( int code_ ) {
 			window = dynamic_cast<HDataWindow*>( static_cast<HWindow*>( &*(*it) ) );
 			if ( window && window->is_modified() ) {
 				select( window );
-				handler_refresh( 0 );
-				if ( ! window->status_bar()->confirm( "exit program" ) )
-					return ( 0 );
+				handler_refresh( HKeyPressEvent( 'r' ) );
+				if ( ! window->status_bar()->confirm( "exit program" ) ) {
+					return;
+				}
 			}
 		}
 	}
-	return ( HTUIProcess::do_handler_quit( code_ ) );
+	HTUIProcess::do_quit();
+	return;
 	M_EPILOG
 }
 
-int HDataProcess::do_handler_close_window( int code_ ) {
+void HDataProcess::do_close_window( void ) {
 	M_PROLOG
 	HDataWindow* window = NULL;
 	if ( !! (*_foregroundWindow) ) {
 		window = dynamic_cast<HDataWindow*>( &*(*_foregroundWindow) );
 		if ( window
 				&& window->is_modified()
-				&& ! window->status_bar()->confirm( "close window" ) )
-			return ( 0 );
+				&& ! window->status_bar()->confirm( "close window" ) ) {
+			return;
+		}
 	}
-	return ( HTUIProcess::do_handler_close_window( code_ ) );
+	HTUIProcess::do_close_window();
+	return;
 	M_EPILOG
 }
 

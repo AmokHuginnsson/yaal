@@ -63,23 +63,23 @@ public:
 	virtual int init( void );
 	void set_tui( HTUIProcess* );
 	void paint( void );
-	virtual int process_input( int );
+	bool process_input( HKeyPressEvent const& );
 
 	/*! \brief Jump through controls with tab key.
 	 */
-	int handler_jump_tab( int );
+	bool handler_jump_tab( HEvent const& );
 
 	/*! \brief Direct jump to specified control.
 	 */
-	int handler_jump_direct ( int );
+	bool handler_jump_direct( HEvent const& );
 
 	/*! \brief Put window into command awaiting mode.
 	 */
-	int handler_command( int );
+	bool handler_command( HEvent const& );
 
 	/*! \brief Put window into search pattern scan mode.
 	 */
-	int handler_search( int );
+	bool handler_search( HEvent const& );
 	int click( mouse::OMouse& );
 	int add_control( HControl::ptr_t, int );
 	HStatusBarControl::ptr_t& status_bar( void );

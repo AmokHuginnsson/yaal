@@ -94,17 +94,21 @@ void HWindow::set_tui( yaal::hconsole::HTUIProcess* tui_ ) {
 	M_EPILOG
 }
 
-int HWindow::process_input( int code_ ) {
+bool HWindow::process_input( HKeyPressEvent const& keyPress_ ) {
 	M_PROLOG
-	if ( code_ )
-		code_ = process_input_with_handlers ( code_, _preprocessHandlers );
-	if ( code_ && !! (*_focusedChild) )
-		code_ = (*_focusedChild)->process_input ( code_ );
-	if ( code_ )
-		code_ = process_input_with_handlers ( code_, _postprocessHandlers );
+	bool active( false );
+	if ( keyPress_.get_key_code() ) {
+		active = !process_input_with_handlers( keyPress_, _preprocessHandlers );
+	}
+	if ( active && !! (*_focusedChild) ) {
+		active = (*_focusedChild)->process_input( keyPress_.get_key_code() ) ? true : false;
+	}
+	if ( active ) {
+		active = !process_input_with_handlers( keyPress_, _postprocessHandlers );
+	}
 	if ( ! _command.is_empty() )
 		process_command();
-	return ( code_ );
+	return ( active );
 	M_EPILOG
 }
 
@@ -134,30 +138,32 @@ void HWindow::paint( void ) {
 	M_EPILOG
 }
 
-int HWindow::handler_jump_tab( int code_ ) {
+bool HWindow::handler_jump_tab( HEvent const& ) {
 	M_PROLOG
 	_controls.next_enabled();
 	_tuiProcess->schedule_repaint();
-	code_ = 0;
-	return ( code_ );
+	return ( true );
 	M_EPILOG
 }
 
-int HWindow::handler_jump_direct( int code_ ) {
+bool HWindow::handler_jump_direct( HEvent const& event_ ) {
 	M_PROLOG
+	M_ASSERT( event_.get_type() == HEvent::TYPE::KEY_PRESS );
+	HKeyPressEvent const& keyPress( static_cast<HKeyPressEvent const&>( event_ ) );
 	/* call below is _magic_, HControlList::next_enabled() takes char as an
 	 * argument, so code_ & 0x0ff is passed into the function,
 	 * code_ is consrtructed from ordinary char by KEY_META_ macro,
 	 * see console.h for details */
 	HControlList::model_t::cyclic_iterator it = _focusedChild;
-	if ( code_ & 0x0ff00 ) {
-		_controls.next_enabled( static_cast<char>( code_ ) );
+	bool consumed( false );
+	if ( keyPress.get_key_code() & 0x0ff00 ) {
+		_controls.next_enabled( static_cast<char>( keyPress.get_key_code() ) );
 		if ( _focusedChild != it ) {
-			code_ = 0;
+			consumed = true;
 		}
 		_tuiProcess->schedule_repaint();
 	}
-	return ( code_ );
+	return ( consumed );
 	M_EPILOG
 }
 
@@ -172,25 +178,28 @@ void HWindow::acquire_focus( HControl const* control_ ) {
 	M_EPILOG
 }
 
-int HWindow::handler_command( int code_ ) {
+bool HWindow::handler_command( HEvent const& ) {
 	M_PROLOG
-	code_ = 0;
-	_statusBar->set_prompt ( ":", HStatusBarControl::PROMPT::COMMAND );
-	return ( code_ );
+	_statusBar->set_prompt( ":", HStatusBarControl::PROMPT::COMMAND );
+	return ( true );
 	M_EPILOG
 }
 
-int HWindow::handler_search( int code_ ) {
+bool HWindow::handler_search( HEvent const& event_ ) {
 	M_PROLOG
-	char prompt [ ] = "/\0";
-	if ( ! (*_focusedChild)->is_searchable() )
-		return ( code_ );
-	if ( code_ >= KEY_CODES::COMMAND_BASE )
-		code_ -= KEY_CODES::COMMAND_BASE;
-	prompt [ 0 ] = static_cast < char > ( code_ );
-	_statusBar->set_prompt ( prompt, HStatusBarControl::PROMPT::SEARCH );
-	code_ = 0;
-	return ( code_ );
+	M_ASSERT( event_.get_type() == HEvent::TYPE::KEY_PRESS );
+	HKeyPressEvent const& keyPress( static_cast<HKeyPressEvent const&>( event_ ) );
+	int code( keyPress.get_key_code() );
+	char prompt[] = "/\0";
+	bool consumed( false );
+	if ( (*_focusedChild)->is_searchable() ) {
+		if ( code >= KEY_CODES::COMMAND_BASE )
+			code -= KEY_CODES::COMMAND_BASE;
+		prompt [ 0 ] = static_cast<char>( code );
+		_statusBar->set_prompt ( prompt, HStatusBarControl::PROMPT::SEARCH );
+		consumed = true;
+	}
+	return ( consumed );
 	M_EPILOG
 }
 

@@ -80,15 +80,15 @@ int HMainWindow::init( void ) {
 
 void HMainWindow::init_menu( HTUIProcess* process_, OMenuItem* menu_ ) {
 	M_PROLOG
-	_menu->init( process_,	menu_ );
+	_menu->init( process_, menu_ );
 	return;
 	M_EPILOG
 }
 
-int HMainWindow::handler_close( int code_ ) {
+bool HMainWindow::handler_close( HEvent const& ) {
 	M_PROLOG
-	code_ = KEY<'x'>::command;
-	return ( code_ );
+	_tuiProcess->schedule_call( call( &HTUIProcess::quit, _tuiProcess ) );
+	return ( true );
 	M_EPILOG
 }
 

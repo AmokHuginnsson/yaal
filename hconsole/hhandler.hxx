@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/hhashmap.hxx"
 #include "hcore/hboundcall.hxx"
+#include "hconsole/hevent.hxx"
 
 namespace yaal {
 
@@ -40,7 +41,7 @@ class HHandler {
 public:
 	typedef HHandler this_type;
 protected:
-	typedef yaal::hcore::HBoundCall<int ( int )> HANDLER_t;
+	typedef yaal::hcore::HBoundCall<bool ( HEvent const& )> HANDLER_t;
 	typedef hcore::HHashMap<int, HANDLER_t> process_handler_key_map_t;
 	typedef hcore::HHashMap<hcore::HString, HANDLER_t> process_handler_command_map_t;
 	process_handler_key_map_t _preprocessHandlers;
@@ -51,7 +52,7 @@ public:
 	HHandler( int = 32, int = 32 );
 	virtual ~HHandler( void );
 protected:
-	int process_input_with_handlers( int, const process_handler_key_map_t& );
+	bool process_input_with_handlers( HKeyPressEvent const&, const process_handler_key_map_t& );
 	hcore::HString process_command( void );
 	int register_preprocess_handler( int, int const*, HANDLER_t );
 	int register_postprocess_handler( int, int const*, HANDLER_t );

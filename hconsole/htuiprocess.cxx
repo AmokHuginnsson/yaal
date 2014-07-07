@@ -51,7 +51,7 @@ HTUIProcess::HTUIProcess( int noFileHandlers_, int keyHandlers_,
 		int commandHandlers_ )
 	: HHandler( keyHandlers_, commandHandlers_ ),
 	_dispatcher( noFileHandlers_, _latency_ * 1000 ), _mainWindow(), _foregroundWindow(),
-	_windows( new ( memory::yaal ) model_t() ), _needRepaint( false ) {
+	_windows( new ( memory::yaal ) model_t() ), _needRepaint( false ), _callQueue() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -121,6 +121,23 @@ void HTUIProcess::schedule_repaint( void ) {
 	return;
 }
 
+void HTUIProcess::schedule_call( call_t call_ ) {
+	M_PROLOG
+	_callQueue.push( call_ );
+	return;
+	M_EPILOG
+}
+
+void HTUIProcess::flush_call_queue( void ) {
+	M_PROLOG
+	while ( ! _callQueue.is_empty() ) {
+		_callQueue.front()();
+		_callQueue.pop();
+	}
+	return;
+	M_EPILOG
+}
+
 int HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	M_PROLOG
 	window_->set_tui( this );
@@ -136,19 +153,22 @@ int HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	M_EPILOG
 }
 
-void HTUIProcess::process_stdin( int code_ ) {
+void HTUIProcess::process_stdin( int ) {
 	M_PROLOG
 	HString command;
 	HConsole& cons = HConsole::get_instance();
-	if ( ! code_ )
-		code_ = cons.get_key();
-	if ( code_ )
-		code_ = process_input_with_handlers( code_, _preprocessHandlers );
-	if ( code_ && !! (*_foregroundWindow) )
-			code_ = (*_foregroundWindow)->process_input( code_ );
-	if ( code_ )
-		code_ = process_input_with_handlers( code_, _postprocessHandlers );
-	if ( ! code_ ) {
+	int code( cons.get_key() );
+	bool active( false );
+	if ( code ) {
+		active = !process_input_with_handlers( code, _preprocessHandlers );
+	}
+	if ( active && !! (*_foregroundWindow) ) {
+		active = !(*_foregroundWindow)->process_input( code );
+	}
+	if ( active ) {
+		active = !process_input_with_handlers( code, _postprocessHandlers );
+	}
+	if ( ! active ) {
 		if ( !! (*_foregroundWindow) )
 			_command = (*_foregroundWindow)->get_command();
 		if ( ! _command.is_empty() )
@@ -158,37 +178,38 @@ void HTUIProcess::process_stdin( int code_ ) {
 			(*_foregroundWindow)->status_bar()->message( COLORS::FG_RED,
 					"unknown command: `%s'", command.raw() );
 	}
+	flush_call_queue();
 	if ( _needRepaint )
 		repaint();
 #ifdef __DEBUGGER_BABUNI__
 	_needRepaint = true;
-	if ( code_ ) {
-		if ( code_ > KEY<KEY<0>::meta>::command )
+	if ( code ) {
+		if ( code > KEY<KEY<0>::meta>::command )
 			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"COMMAND-META-%c: %5d       ",
-					code_ - KEY<KEY<0>::meta>::command, code_ );
-		else if ( code_ > KEY<0>::command )
+					code - KEY<KEY<0>::meta>::command, code );
+		else if ( code > KEY<0>::command )
 			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"     COMMAND-%c: %5d       ",
-					code_ - KEY<0>::command, code_ );
-		else if ( code_ > KEY<0>::meta )
+					code - KEY<0>::command, code );
+		else if ( code > KEY<0>::meta )
 			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"        META-%c: %5d       ",
-					code_ - KEY<0>::meta, code_ );
-		else if ( code_ < KEY_CODES::ESC )
+					code - KEY<0>::meta, code );
+		else if ( code < KEY_CODES::ESC )
 			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"        CTRL-%c: %5d       ",
-					code_ + 96, code_);
+					code + 96, code);
 		else
 			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
 					"             %c: %5d       ",
-					code_, code_ );
+					code, code );
 	} else
 		cons.cmvprintf ( 0, 0, COLORS::FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
-	if ( code_ && !! (*_foregroundWindow) )
+	if ( code && !! (*_foregroundWindow) )
 		(*_foregroundWindow)->status_bar()->message( COLORS::FG_RED,
-				"unknown function, err code(%d)", code_ );
+				"unknown function, err code(%d)", code );
 	return;
 	M_EPILOG
 }
@@ -223,14 +244,13 @@ void HTUIProcess::handler_idle( void ) {
 
 void HTUIProcess::process_mouse( int ) {
 	M_PROLOG
-	handler_mouse( 0 );
+	handler_mouse( HMouseEvent( mouse::OMouse() ) );
 	return;
 	M_EPILOG
 }
 
-int HTUIProcess::handler_mouse( int code_ ) {
+bool HTUIProcess::handler_mouse( HEvent const& ) {
 	M_PROLOG
-	code_ = 0;
 	mouse::OMouse mouse;
 	static_cast<void>( mouse::mouse_get( mouse ) );
 	if ( !! (*_foregroundWindow) )
@@ -242,7 +262,7 @@ int HTUIProcess::handler_mouse( int code_ ) {
 			mouse._buttons, mouse._row, mouse._column );
 	_needRepaint = true;
 #endif /* __DEBUGGER_BABUNI__ */
-	return ( code_ );
+	return ( true );
 	M_EPILOG
 }
 
@@ -252,7 +272,7 @@ void HTUIProcess::process_terminal_event( int event_ ) {
 	M_ENSURE( ::read( event_, &type, 1 ) == 1 );
 	switch( type ) {
 		case 'r':
-			handler_refresh( 0 );
+			handler_refresh( HKeyPressEvent( 'r' ) );
 		break;
 		case 'm':
 			process_mouse( 0 );
@@ -262,71 +282,87 @@ void HTUIProcess::process_terminal_event( int event_ ) {
 	M_EPILOG
 }
 
-int HTUIProcess::handler_refresh( int ) {
+bool HTUIProcess::handler_refresh( HEvent const& ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	cons.endwin();
 	cons.kbhit(); /* cleans all trash from stdio buffer */
 	cons.refresh();
 	repaint( true ); /* there is c_clrscr(); and repaint() call inside */
-	return ( 0 );
-	M_EPILOG
-}
-int HTUIProcess::handler_quit( int code_ ) {
-	M_PROLOG
-	return ( do_handler_quit( code_ ) );
+	return ( true );
 	M_EPILOG
 }
 
-int HTUIProcess::do_handler_quit( int ) {
+bool HTUIProcess::handler_quit( HEvent const& ) {
+	M_PROLOG
+	quit();
+	return ( true );
+	M_EPILOG
+}
+
+void HTUIProcess::quit( void ) {
+	M_PROLOG
+	do_quit();
+	return;
+	M_EPILOG
+}
+
+void HTUIProcess::do_quit( void ) {
 	M_PROLOG
 	_dispatcher.stop();
 	_needRepaint = false;
 	HConsole::get_instance().clrscr();
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 
-int HTUIProcess::handler_jump_meta_tab( int code_ ) {
+bool HTUIProcess::handler_jump_meta_tab( HEvent const& ) {
 	M_PROLOG
 	if ( _dispatcher.idle_cycles() < 5 )
 		++ _foregroundWindow;
 	else
 		_foregroundWindow = _windows->begin();
 	repaint( true );
-	code_ = 0;
-	return ( code_ );
+	return ( true );
 	M_EPILOG
 }
 
-int HTUIProcess::handler_jump_meta_direct( int code_ ) {
+bool HTUIProcess::handler_jump_meta_direct( HEvent const& keyPress_ ) {
 	M_PROLOG
-	code_ = ( code_ & 0xff ) - '0';
-	if ( code_ >= _windows->size() )
+	M_ASSERT( keyPress_.get_type() == HEvent::TYPE::KEY_PRESS );
+	HKeyPressEvent const& keyPress( static_cast<HKeyPressEvent const&>( keyPress_ ) );
+	int code( ( keyPress.get_key_code() & 0xff ) - '0' );
+	if ( code >= _windows->size() )
 		return ( 0 );
 	_foregroundWindow = _windows->begin();
-	while ( code_ -- )
+	while ( code -- )
 		++ _foregroundWindow;
 	repaint( true );
-	code_ = 0;
-	return ( code_ );
+	return ( true );
 	M_EPILOG
 }
 
-int HTUIProcess::handler_close_window( int code_ ) {
+bool HTUIProcess::handler_close_window( HEvent const& ) {
 	M_PROLOG
-	return ( do_handler_close_window( code_ ) );
+	close_window();
+	return ( true );
 	M_EPILOG
 }
 
-int HTUIProcess::do_handler_close_window( int code_ ) {
+void HTUIProcess::close_window( void ) {
+	M_PROLOG
+	do_close_window();
+	return;
+	M_EPILOG
+}
+
+void HTUIProcess::do_close_window( void ) {
 	M_PROLOG
 	model_t::cyclic_iterator it = _foregroundWindow;
 	-- _foregroundWindow;
 	_windows->erase( it );
 	repaint( true );
-	code_ = 0;
-	return ( code_ );
+	return;
 	M_EPILOG
 }
 

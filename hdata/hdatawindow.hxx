@@ -92,12 +92,12 @@ protected:
 	void sync( void );
 	void sync( int, hconsole::HEditControl& );
 	void sync( int, HDataListControl& );
-	int handler_add_new( int );
-	int handler_edit( int );
-	int handler_delete( int );
-	int handler_save( int );
-	int handler_requery( int );
-	int handler_cancel( int );
+	bool handler_add_new( hconsole::HEvent const& );
+	bool handler_edit( hconsole::HEvent const& );
+	bool handler_delete( hconsole::HEvent const& );
+	bool handler_save( hconsole::HEvent const& );
+	bool handler_requery( hconsole::HEvent const& );
+	bool handler_cancel( hconsole::HEvent const& );
 private:
 	HDataWindow( HDataWindow const& );
 	HDataWindow& operator = ( HDataWindow const& );
