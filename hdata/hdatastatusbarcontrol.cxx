@@ -51,7 +51,7 @@ void HDataStatusBarControl::do_draw_label ( void ) {
 	M_PROLOG
 	HDataWindow * window = NULL;
 	HStatusBarControl::draw_label();
-	window = dynamic_cast < HDataWindow * > ( _parent );
+	window = dynamic_cast < HDataWindow * > ( _window );
 	M_ASSERT ( window );
 	if ( window->is_modified() ) {
 		set_attr_shortcut();

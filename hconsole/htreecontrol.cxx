@@ -123,7 +123,7 @@ HTreeControl::~HTreeControl( void ) {
 	M_EPILOG
 }
 
-void HTreeControl::do_refresh( void ) {
+void HTreeControl::do_paint( void ) {
 	M_PROLOG
 	int ctr = 0;
 	HConsole& cons = HConsole::get_instance();
@@ -252,7 +252,7 @@ int HTreeControl::do_process_input( int code_ ) {
 		break; /* I have to think more about it. */
 		case ( '\t' ):
 			_focused = false;	/* very  */
-			schedule_refresh();	/* magic */
+			schedule_repaint();	/* magic */
 		/* no break on purpouse, see hlistcontrol.c */
 		default :
 			errorCode = code_;
@@ -260,8 +260,8 @@ int HTreeControl::do_process_input( int code_ ) {
 	}
 	code_ = errorCode;
 	if ( ! errorCode ) {
-		schedule_refresh();
-		_parent->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+		schedule_repaint();
+		_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
 	}
 	return ( code_ );
 	M_EPILOG
@@ -272,7 +272,7 @@ bool HTreeControl::do_click( OMouse& mouse_ ) {
 	bool handled( HControl::do_click( mouse_ ) );
 	if ( ! handled ) {
 		if ( _tree.get_root() && do_click( _tree.get_root(), mouse_ ) ) {
-			schedule_refresh();
+			schedule_repaint();
 			handled = true;
 		}
 	}

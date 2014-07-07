@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hwindow.hxx"
 #include "console.hxx"
+#include "htuiprocess.hxx"
 
 #ifdef __DEBUGGER_BABUNI__
 #include "hcore/hlog.hxx"
@@ -44,7 +45,8 @@ namespace hconsole {
 
 HWindow::HWindow( char const * title_ ) : _initialised( false ),
 	_needRepaint( false ), _title( title_ ), _focusedChild(),
-	_previousFocusedChild(), _controls( _focusedChild ), _statusBar() {
+	_previousFocusedChild(), _controls( _focusedChild ),
+	_statusBar(), _tuiProcess( NULL ) {
 	M_PROLOG
 	int cmds [] = { ':', KEY<':'>::command };
 	int search [] = { '/', KEY<'/'>::command, '?', KEY<'?'>::command };
@@ -68,8 +70,9 @@ HWindow::~HWindow( void ) {
 
 int HWindow::init( void ) {
 	M_PROLOG
+	M_ENSURE( _tuiProcess );
 	HString string;
-	_needRepaint_ = true;
+	_tuiProcess->schedule_repaint();
 	string.format( " [%s]& \n", _title.raw() );
 	new HStatusBarControl( this, string.raw() );
 	/*
@@ -80,6 +83,14 @@ int HWindow::init( void ) {
 	_statusBar->enable( true );
 	_initialised = true;
 	return ( 0 );
+	M_EPILOG
+}
+
+void HWindow::set_tui( yaal::hconsole::HTUIProcess* tui_ ) {
+	M_PROLOG
+	M_ENSURE( !_tuiProcess );
+	_tuiProcess = tui_;
+	return;
 	M_EPILOG
 }
 
@@ -111,15 +122,14 @@ HStatusBarControl::ptr_t& HWindow::status_bar( void ) {
 	return ( _statusBar );
 }
 
-void HWindow::refresh( void ) {
+void HWindow::paint( void ) {
 	M_PROLOG
 	if ( _needRepaint )
 		HConsole::get_instance().clrscr();
 	if ( ( !! _statusBar ) && ( _statusBar != *_focusedChild ) )
-		_statusBar->refresh();
+		_statusBar->paint();
 	_controls.refresh_all( _needRepaint );
 	_needRepaint = false;
-	_needRepaint_ = true;
 	return;
 	M_EPILOG
 }
@@ -127,7 +137,7 @@ void HWindow::refresh( void ) {
 int HWindow::handler_jump_tab( int code_ ) {
 	M_PROLOG
 	_controls.next_enabled();
-	_needRepaint_ = true;
+	_tuiProcess->schedule_repaint();
 	code_ = 0;
 	return ( code_ );
 	M_EPILOG
@@ -142,21 +152,22 @@ int HWindow::handler_jump_direct( int code_ ) {
 	HControlList::model_t::cyclic_iterator it = _focusedChild;
 	if ( code_ & 0x0ff00 ) {
 		_controls.next_enabled( static_cast<char>( code_ ) );
-		if ( _focusedChild != it )
+		if ( _focusedChild != it ) {
 			code_ = 0;
-		_needRepaint_ = true;
+		}
+		_tuiProcess->schedule_repaint();
 	}
 	return ( code_ );
 	M_EPILOG
 }
 
-void HWindow::acquire_focus( HControl const* const control_ ) {
+void HWindow::acquire_focus( HControl const* control_ ) {
 	M_PROLOG
-	if ( (*_focusedChild) == control_ )
-		return;
-	(*_focusedChild)->kill_focus();
-	_controls.select ( control_ );
-	_needRepaint_ = true;
+	if ( (*_focusedChild) != control_ ) {
+		(*_focusedChild)->kill_focus();
+		_controls.select( control_ );
+		_tuiProcess->schedule_repaint();
+	}
 	return;
 	M_EPILOG
 }
@@ -220,9 +231,11 @@ HString const& HWindow::get_title( void ) const {
 	M_EPILOG
 }
 
-void HWindow::schedule_refresh( void ) {
-	_needRepaint = true;
-	_needRepaint_ = true;
+void HWindow::schedule_repaint( bool wholeWindow_ ) {
+	if ( wholeWindow_ ) {
+		_needRepaint = true;
+	}
+	_tuiProcess->schedule_repaint();
 	return;
 }
 

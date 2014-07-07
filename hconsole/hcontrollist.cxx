@@ -29,6 +29,8 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hcontrollist.hxx"
 #include "hstatusbarcontrol.hxx"
+#include "hcore/foreach.hxx"
+#include "hcore/hlog.hxx"
 #include "tools/collections.hxx"
 
 using namespace yaal::hcore;
@@ -76,12 +78,15 @@ void HControlList::add_control( HControl::ptr_t control_ ) {
 
 void HControlList::refresh_all( bool force_ ) {
 	M_PROLOG
-	for ( model_t::iterator it = _list.begin();
-			it != _list.end(); ++ it )
-		if ( ( it != _focused ) && ( force_ || (*it)->need_repaint() ) )
-			(*it)->refresh();
-	if ( !! (*_focused) && ( force_ || (*_focused)->need_repaint() ) )
-		(*_focused)->refresh();
+	bool focusedNeedRepaint( (*_focused)->need_repaint() );
+	for ( model_t::iterator it( _list.begin() ), end( _list.end() ); it != end; ++ it ) {
+		if ( ( it != _focused ) && ( force_ || (*it)->need_repaint() ) ) {
+			(*it)->paint();
+		}
+	}
+	if ( !! (*_focused) && ( force_ || focusedNeedRepaint ) ) {
+		(*_focused)->paint();
+	}
 	return;
 	M_EPILOG
 }
@@ -99,10 +104,9 @@ void HControlList::hit_test_all( mouse::OMouse& mouse_ ) {
 	if ( (*_focused)->hit_test( mouse_._row, mouse_._column ) ) {
 		(*_focused)->click( mouse_ );
 	} else {
-		for ( model_t::iterator it = _list.begin();
-				it != _list.end(); ++ it ) {
-			if ( (*it)->hit_test( mouse_._row, mouse_._column ) ) {
-				(*it)->click( mouse_ );
+		YAAL_FOREACH( HControl::ptr_t& p, _list ) {
+			if ( p->hit_test( mouse_._row, mouse_._column ) ) {
+				p->click( mouse_ );
 				break;
 			}
 		}

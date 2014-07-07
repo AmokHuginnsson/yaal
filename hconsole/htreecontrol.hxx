@@ -213,7 +213,7 @@ public:
 protected:
 	virtual int do_process_input( int );
 	virtual bool do_click( mouse::OMouse& );
-	virtual void do_refresh( void );
+	virtual void do_paint( void );
 private:
 	bool do_click( tree_t::node_t, mouse::OMouse& );
 	void expand( tree_t::node_t );

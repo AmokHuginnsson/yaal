@@ -163,7 +163,6 @@ struct EVENT {
 	};
 };
 
-extern M_YAAL_HCONSOLE_PUBLIC_API bool _needRepaint_;
 
 /*! \brief Low level TUI description and modifier.
  */

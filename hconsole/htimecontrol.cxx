@@ -50,7 +50,7 @@ HTimeControl::~HTimeControl ( void ) {
 	M_EPILOG
 }
 
-void HTimeControl::do_refresh( void ) {
+void HTimeControl::do_paint( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG

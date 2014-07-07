@@ -56,7 +56,7 @@ HControl::HControl( HWindow* parent_, int row_, int column_,
 	_attributeFocused( _attributeFocused_ ), _row( row_ ), _column( column_ ),
 	_height( height_ ), _width( width_ ), _rowRaw( 0 ),
 	_columnRaw( 0 ), _heightRaw( 0 ), _widthRaw( 0 ),
-	_label( label_ ), _varTmpBuffer(), _parent( parent_ ),
+	_label( label_ ), _varTmpBuffer(), _window( parent_ ),
 	_labelLength( 0 ), _shortcutIndex( 0 ), _valid( false ), _needRepaint( false ) {
 	M_PROLOG
 	if ( ! HConsole::get_instance().is_enabled() )
@@ -79,7 +79,7 @@ HControl::HControl( HWindow* parent_, int row_, int column_,
 		}
 	} else
 		_singleLine = true;
-	_parent->add_control( HControl::ptr_t ( this ),
+	_window->add_control( HControl::ptr_t ( this ),
 				KEY<>::meta_r ( _label [ _shortcutIndex ] ) );
 	return;
 	M_EPILOG
@@ -90,7 +90,7 @@ HControl::~HControl( void ) {
 #ifdef __DEBUGGER_BABUNI__
 	log << "destroing control: " << _label << endl;
 #endif /* __DEBUGGER_BABUNI__ */
-	_parent = NULL;
+	_window = NULL;
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -100,7 +100,7 @@ void HControl::enable( bool enable_ ) {
 	_enabled = enable_;
 	if ( ! _enabled )
 		_focused = false;
-	schedule_refresh();
+	schedule_repaint();
 	return;
 	M_EPILOG
 }
@@ -128,10 +128,10 @@ bool HControl::set_focus( char shortCut_ ) {
 		bool oldFocus( _focused );
 		_focused = true;
 		if ( ! shortCut_ ) {
-			_parent->acquire_focus( this );
+			_window->acquire_focus( this );
 		}
 		if ( oldFocus != _focused ) {
-			schedule_refresh();
+			schedule_repaint();
 			focusChanged = true;
 		}
 	}
@@ -144,16 +144,16 @@ int HControl::kill_focus( void ) {
 	if ( ! _focused )
 		return ( 1 );
 	_focused = false;
-	schedule_refresh();
+	schedule_repaint();
 	return ( 0 );
 	M_EPILOG
 }
 
-void HControl::refresh( void ) {
+void HControl::paint( void ) {
 	M_PROLOG
 	if ( ! _valid )
 		update();
-	do_refresh();
+	do_paint();
 	return;
 	M_EPILOG
 }
@@ -198,7 +198,7 @@ void HControl::draw_label( void ) {
 void HControl::do_draw_label( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
-	schedule_refresh();
+	schedule_repaint();
 /* reposition control acordingly to current parent window size */
 	_rowRaw = ( _row >= 0 ) ? _row : cons.get_height() + _row;
 	_columnRaw = ( _column >= 0 ) ? _column
@@ -241,7 +241,7 @@ void HControl::set_attributes( OAttribute attributeDisabled_,
 		_attributeFocused = _attributeFocused_;
 	else
 		_attributeFocused = attributeFocused_;
-	schedule_refresh();
+	schedule_repaint();
 	return;
 	M_EPILOG
 }
@@ -252,7 +252,7 @@ void HControl::move( int row_, int column_, int height_, int width_ ) {
 	_column = column_;
 	_height = height_;
 	_width = width_;
-	schedule_refresh();
+	schedule_repaint();
 	return;
 	M_EPILOG
 }
@@ -359,9 +359,9 @@ void HControl::set_draw_label( bool drawLabel_ ) {
 	return;
 }
 
-void HControl::schedule_refresh( void ) {
+void HControl::schedule_repaint( void ) {
 	_needRepaint = true;
-	_needRepaint_ = true;
+	_window->schedule_repaint( false );
 	return;
 }
 
@@ -372,6 +372,10 @@ void HControl::invalidate( void ) {
 
 bool HControl::need_repaint( void ) const {
 	return ( _needRepaint );
+}
+
+yaal::hcore::HString const& HControl::get_label( void ) const {
+	return ( _label );
 }
 
 }

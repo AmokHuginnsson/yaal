@@ -48,7 +48,7 @@ public:
 	HDateControl( HWindow*, int, int, int, int, char const* );
 	virtual ~HDateControl( void );
 protected:
-	virtual void do_refresh( void );
+	virtual void do_paint( void );
 	virtual int do_process_input( int );
 	virtual bool do_click( mouse::OMouse& );
 };

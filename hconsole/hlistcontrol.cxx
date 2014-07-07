@@ -106,7 +106,7 @@ HListControl::HListControl( HWindow* parent_, int row_, int column_,
 	_cursor(), _firstVisibleRow(), _controler( data_ ) {
 	M_PROLOG
 	_controler->set_control( this );
-	schedule_refresh();
+	schedule_repaint();
 	return;
 	M_EPILOG
 }
@@ -115,7 +115,7 @@ HListControl::~HListControl( void ) {
 	return;
 }
 
-void HListControl::do_refresh( void ) {
+void HListControl::do_paint( void ) {
 	M_PROLOG
 	int columnOffset = 0;
 	int columns = static_cast<int>( _header.size() );
@@ -471,7 +471,7 @@ void HListControl::handle_key_space( void ) {
 
 void HListControl::handle_key_tab( void ) {
 	_focused = false;	/* very  */
-	schedule_refresh();				/* magic */
+	schedule_repaint();				/* magic */
 	return;
 }
 
@@ -511,8 +511,8 @@ int HListControl::do_process_input( int code_ ) {
 	}
 	code_ = errorCode;
 	if ( ! errorCode ) {
-		schedule_refresh();
-		_parent->status_bar()->message( COLORS::FG_LIGHTGRAY, "%s", _varTmpBuffer.raw() );
+		schedule_repaint();
+		_window->status_bar()->message( COLORS::FG_LIGHTGRAY, "%s", _varTmpBuffer.raw() );
 	}
 	return ( code_ );
 	M_EPILOG
@@ -583,13 +583,13 @@ void HListControl::sort_by_column( int column_, OSortHelper::sort_order_t order_
 	_header[ column_ ]._descending = order_ == OSortHelper::DESCENDING;
 	long int size = _controler->size();
 	if ( size > 128 )
-		_parent->status_bar()->init_progress(
+		_window->status_bar()->init_progress(
 				static_cast<double>( size )
 				* static_cast<double>( size ) / 2.,
 				" Sorting ..." );
 	list_control_helper::OSortHelper helper =
 		{ column_, order_, _header[ _sortColumn ]._type,
-		0, _controler->size(), _parent };
+		0, _controler->size(), _window };
 	_controler->sort( helper );
 	_controlOffset = _cursorPosition = 0;
 	return;
@@ -613,7 +613,7 @@ bool HListControl::do_click( mouse::OMouse& mouse_ ) {
 				if ( column <= width ) {
 					sort_by_column( ctr,
 							columnInfo->_descending ? OSortHelper::ASCENDING : OSortHelper::DESCENDING );
-					schedule_refresh();
+					schedule_repaint();
 					handled = true;
 					break;
 				}
@@ -635,7 +635,7 @@ bool HListControl::do_click( mouse::OMouse& mouse_ ) {
 				}
 				_cursorPosition = row;
 			}
-			schedule_refresh();
+			schedule_repaint();
 			handled = true;
 		}
 	}
@@ -909,7 +909,7 @@ void HListControl::remove_current_row ( void ) {
 	if ( flag )
 		++ _cursor;
 	_controler->erase( it );
-	schedule_refresh();
+	schedule_repaint();
 	return;
 	M_EPILOG
 }
@@ -1130,7 +1130,7 @@ template<>
 void HCell<yaal::hcore::HList<HInfoItem>::iterator>::set_child_control_data( HControl* control_ ) {
 	M_PROLOG
 	control_->set( (*_data)[ _column ] );
-	control_->refresh();
+	control_->paint();
 	return;
 	M_EPILOG
 }

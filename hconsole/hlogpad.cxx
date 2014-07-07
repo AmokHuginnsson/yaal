@@ -64,7 +64,7 @@ HLogPad::~HLogPad( void ) {
 	M_EPILOG
 }
 
-void HLogPad::do_refresh( void ) {
+void HLogPad::do_paint( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	draw_label();
@@ -158,7 +158,7 @@ void HLogPad::add( yaal::hcore::HString const& text_ ) {
 	}
 	if ( _lines > _heightRaw )
 		_offsetRow = _lines - _heightRaw;
-	schedule_refresh();
+	schedule_repaint();
 	return;
 	M_EPILOG
 }
@@ -206,7 +206,7 @@ int HLogPad::do_process_input( int code_ ) {
 		break;
 	}
 	if ( ! code )
-		schedule_refresh();
+		schedule_repaint();
 	return ( code );
 	M_EPILOG
 }

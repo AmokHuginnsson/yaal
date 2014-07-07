@@ -90,12 +90,12 @@ HEditControl::HEditControl( HWindow* parent_,
 		M_THROW( _pattern.error(), errorCode );
 	length = static_cast<int>( _string.get_length() );
 /* this is part of draw_label() method, we cannot wait with setting up
- * _widthRaw until draw_label(), which is called from refresh()
+ * _widthRaw until draw_label(), which is called from paint()
  * because ... see next comment */
 	_widthRaw = ( _width > 0 ) ? _width
 		: HConsole::get_instance().get_width() + _width - _columnRaw;
 /* _widthRaw must be set up properly before setting up _cursorPosition and
- * _controlOffset whose are used in refresh() */
+ * _controlOffset whose are used in paint() */
 	if ( length >= _widthRaw ) {
 		_cursorPosition = _widthRaw - 1;
 		_controlOffset = ( length - _widthRaw ) + 1;
@@ -113,7 +113,7 @@ HEditControl::~HEditControl( void ) {
 	M_EPILOG
 }
 
-void HEditControl::do_refresh( void ) {
+void HEditControl::do_paint( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	draw_label();
@@ -486,12 +486,12 @@ int HEditControl::do_process_input ( int code_ ) {
 		_pattern.find( _varTmpBuffer.raw() );
 		errorCode = _pattern.error_code();
 		if ( errorCode )
-			_parent->status_bar()->message( COLORS::BG_BROWN, "%s", _pattern.error().raw() );
+			_window->status_bar()->message( COLORS::BG_BROWN, "%s", _pattern.error().raw() );
 		else {
 			code_ = errorCode;
 			_string = _varTmpBuffer;
-			_parent->status_bar()->clear( COLORS::FG_LIGHTGRAY );
-			schedule_refresh();
+			_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+			schedule_repaint();
 		}
 	}
 	if ( errorCode && ( errorCode != DATA_ENTER ) ) {
@@ -519,7 +519,7 @@ void HEditControl::set_text( HString const& string_ ) {
 		_controlOffset = ( length - _widthRaw ) + 1;
 	} else
 		_cursorPosition = length;
-	schedule_refresh();
+	schedule_repaint();
 	return;
 	M_EPILOG
 }
@@ -539,7 +539,7 @@ bool HEditControl::do_click( mouse::OMouse & mouse_ ) {
 		position = mouse_._column - _columnRaw;
 		if ( position < _string.get_length() ) {
 			_cursorPosition = position;
-			schedule_refresh();
+			schedule_repaint();
 			handled = true;
 		}
 	}

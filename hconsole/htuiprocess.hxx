@@ -52,11 +52,13 @@ protected:
 	HWindow::ptr_t _mainWindow; /* self explanary */
 	model_t::cyclic_iterator _foregroundWindow; /* self explanary */
 	model_ptr_t _windows;	/* current existing windows */
+	bool _needRepaint;
 public:
 	HTUIProcess( int = 8, int = 32, int = 32 );
 	virtual ~HTUIProcess ( void );
 	int init_tui( char const* = "", HWindow::ptr_t = HWindow::ptr_t() );
 	void run( void );
+	void schedule_repaint( void );
 protected:
 	void process_stdin( int );
 	void process_mouse( int );
@@ -64,7 +66,7 @@ protected:
 	int process_commands( void );
 	int add_window( HWindow::ptr_t );
 	void select( HWindow const* const );
-	void refresh( bool = false );
+	void repaint( bool = false );
 	void handler_alert( void );
 	void handler_idle( void );
 	int handler_mouse( int );

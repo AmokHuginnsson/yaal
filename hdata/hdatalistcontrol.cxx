@@ -63,7 +63,7 @@ HDataListControl::~HDataListControl ( void ) {
 void HDataListControl::load( int long /*id_*/ ) {
 	M_PROLOG
 	_SQL->set_filter( "" );
-	HDataWindow* parent = dynamic_cast<HDataWindow*>( _parent );
+	HDataWindow* parent = dynamic_cast<HDataWindow*>( _window );
 	M_ASSERT( parent );
 	HRecordSet::ptr_t rs = _SQL->execute( HSQLDescriptor::MODE::SELECT );
 	int idColNo = -1;

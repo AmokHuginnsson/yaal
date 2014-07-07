@@ -89,7 +89,7 @@ void HMenuControl::init( HTUIProcess* process_, OMenuItem* menu_ ) {
 	}
 	if ( ! _selected && node->has_childs() )
 		_selected = &*node->begin();
-	schedule_refresh();
+	schedule_repaint();
 	return;
 	M_EPILOG
 }

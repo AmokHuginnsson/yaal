@@ -88,7 +88,7 @@ int HDataProcess::init_xrc( char const* processName_,
 	mainWindow = dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) );
 	M_ASSERT( mainWindow );
 	mainWindow->init_menu( this, _rootMenu );
-	mainWindow->refresh();
+	mainWindow->paint();
 	return ( error );
 	M_EPILOG
 }
@@ -209,7 +209,7 @@ int HDataProcess::do_handler_close_window( int code_ ) {
 	M_PROLOG
 	HDataWindow* window = NULL;
 	if ( !! (*_foregroundWindow) ) {
-		window = dynamic_cast<HDataWindow*>( &*_foregroundWindow );
+		window = dynamic_cast<HDataWindow*>( &*(*_foregroundWindow) );
 		if ( window
 				&& window->is_modified()
 				&& ! window->status_bar()->confirm( "close window" ) )

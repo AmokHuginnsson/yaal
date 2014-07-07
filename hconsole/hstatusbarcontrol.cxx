@@ -92,7 +92,7 @@ void HStatusBarControl::do_draw_label( void ) {
 	M_EPILOG
 }
 
-void HStatusBarControl::do_refresh( void ) {
+void HStatusBarControl::do_paint( void ) {
 	M_PROLOG
 	int origRow = 0;
 	int origColumn = 0;
@@ -103,7 +103,7 @@ void HStatusBarControl::do_refresh( void ) {
 		cons.set_attr( _statusBarAttribute >> 8 );
 		cons.mvprintf( _rowRaw, 0, _prompt.raw() );
 	}
-	HEditControl::do_refresh();
+	HEditControl::do_paint();
 	if ( ! _focused )
 		cons.move( origRow, origColumn );
 	if ( _statusBarAttribute & 0xff ) {
@@ -146,15 +146,15 @@ void HStatusBarControl::set_prompt( char const* prompt_, PROMPT::mode_t mode_,
 	M_PROLOG
 	_mode = mode_;
 	_restrict = restrict_;
-	_parent->_previousFocusedChild = _parent->_focusedChild;
-	_parent->_controls.select( _parent->_statusBar );
-	(*_parent->_previousFocusedChild)->kill_focus();
+	_window->_previousFocusedChild = _window->_focusedChild;
+	_window->_controls.select( _window->_statusBar );
+	(*_window->_previousFocusedChild)->kill_focus();
 	set_focus( -1 );
 	if ( prompt_ ) {
 		_prompt = prompt_;
 		_promptLength = static_cast<int>( _prompt.get_length() );
 	}
-	set_text( "" ); /* refresh call inside */
+	set_text( "" ); /* paint call inside */
 	return;
 	M_EPILOG
 }
@@ -180,7 +180,7 @@ void HStatusBarControl::init_progress( double max_, char const* title_,
 	_lastStep = 0;
 	_message = title_;
 	_start.set_now( HTime::LOCAL );
-	refresh();
+	paint();
 	return;
 	M_EPILOG
 }
@@ -214,7 +214,7 @@ void HStatusBarControl::update_progress( double step_, char const* title_ ) {
 			|| ( _lastPercent != nextPercent )
 			|| ( _lastMinute != nextMinute )
 			|| ( _lastSecond != nextSecond )) {
-		schedule_refresh();
+		schedule_repaint();
 		bar( title_ );
 		if ( _estimate ) {
 			_varTmpBuffer.format ( "|%%-%ds|%%s%%s[%%3d%%s]", maxBar );
@@ -262,7 +262,7 @@ void HStatusBarControl::message( int attribute_, char const* format_, ... ) {
 		if ( ! ( _statusBarAttribute & 0x00ff ) )
 			_statusBarAttribute |= _attributeEnabled._data;
 		_attributeEnabled._data = ( attribute_ & 0x00ff );
-		schedule_refresh();
+		schedule_repaint();
 	}
 	return;
 	M_EPILOG
@@ -281,7 +281,7 @@ void HStatusBarControl::message( char const* format_, ... ) {
 		} else
 			_varTmpBuffer.clear();
 		set_text( _varTmpBuffer );
-		schedule_refresh();
+		schedule_repaint();
 	}
 	return;
 	M_EPILOG
@@ -295,7 +295,7 @@ void HStatusBarControl::clear( int attribute_ ) {
 		if ( ! ( _statusBarAttribute & 0x00ff ) )
 			_statusBarAttribute |= _attributeEnabled._data;
 		_attributeEnabled._data = ( attribute_ & 0x00ff );
-		schedule_refresh();
+		schedule_repaint();
 	}
 	return;
 	M_EPILOG
@@ -342,9 +342,9 @@ int HStatusBarControl::process_input_normal( int code_ ) {
 			bool backwards( _prompt[ 0 ] == '?' );
 			end_prompt();
 			if ( mode == PROMPT::COMMAND )
-				_parent->_command = _string;
+				_window->_command = _string;
 			else if ( mode == PROMPT::SEARCH ) {
-				HSearchableControl* searchableControl( dynamic_cast<HSearchableControl*>( &(*(*_parent->_previousFocusedChild)) ) );
+				HSearchableControl* searchableControl( dynamic_cast<HSearchableControl*>( &(*(*_window->_previousFocusedChild)) ) );
 				if ( searchableControl )
 					searchableControl->search( _string, backwards );
 			}
@@ -372,9 +372,9 @@ void HStatusBarControl::end_prompt( void ) {
 	_mode = PROMPT::NORMAL;
 	_prompt = "";
 	_promptLength = 0;
-	_parent->_focusedChild = _parent->_previousFocusedChild;
-	_parent->_statusBar->kill_focus();
-	(*_parent->_focusedChild)->set_focus ( -1 );
+	_window->_focusedChild = _window->_previousFocusedChild;
+	_window->_statusBar->kill_focus();
+	(*_window->_focusedChild)->set_focus ( -1 );
 	return;
 	M_EPILOG
 }

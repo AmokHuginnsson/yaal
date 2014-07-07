@@ -74,7 +74,7 @@ public:
 	void add( int );
 protected:
 	virtual int do_process_input( int );
-	virtual void do_refresh( void );
+	virtual void do_paint( void );
 };
 
 typedef yaal::hcore::HExceptionT<HLogPad, HControlException> HLogPadException;

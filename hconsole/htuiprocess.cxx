@@ -51,7 +51,7 @@ HTUIProcess::HTUIProcess( int noFileHandlers_, int keyHandlers_,
 		int commandHandlers_ )
 	: HHandler( keyHandlers_, commandHandlers_ ),
 	_dispatcher( noFileHandlers_, _latency_ * 1000 ), _mainWindow(), _foregroundWindow(),
-	_windows( new ( memory::yaal ) model_t() ) {
+	_windows( new ( memory::yaal ) model_t() ), _needRepaint( false ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -104,7 +104,7 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 		M_THROW( _( "window has not been initialised" ), errno );
 	_foregroundWindow = _windows->begin();
 	_commandHandlers[ "quit" ] = call( &HTUIProcess::handler_quit, this, _1 );
-	refresh();
+	repaint();
 	return ( 1 );
 	M_EPILOG
 }
@@ -116,8 +116,14 @@ void HTUIProcess::run( void ) {
 	M_EPILOG
 }
 
+void HTUIProcess::schedule_repaint( void ) {
+	_needRepaint = true;
+	return;
+}
+
 int HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	M_PROLOG
+	window_->set_tui( this );
 	window_->init();
 	_windows->push_back( window_ );
 	_foregroundWindow = _windows->rbegin().base();
@@ -125,7 +131,7 @@ int HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	_mainWindow->update_all();
 	if ( ! (*_foregroundWindow)->is_initialised() )
 		M_THROW( _( "window has not been initialised" ), errno );
-	refresh( true );
+	repaint( true );
 	return ( 0 );
 	M_EPILOG
 }
@@ -152,10 +158,10 @@ void HTUIProcess::process_stdin( int code_ ) {
 			(*_foregroundWindow)->status_bar()->message( COLORS::FG_RED,
 					"unknown command: `%s'", command.raw() );
 	}
-	if ( _needRepaint_ )
-		refresh();
+	if ( _needRepaint )
+		repaint();
 #ifdef __DEBUGGER_BABUNI__
-	_needRepaint_ = true;
+	_needRepaint = true;
 	if ( code_ ) {
 		if ( code_ > KEY<KEY<0>::meta>::command )
 			cons.cmvprintf ( 0, 0, COLORS::FG_GREEN,
@@ -189,8 +195,8 @@ void HTUIProcess::process_stdin( int code_ ) {
 
 void HTUIProcess::handler_alert( void ) {
 	M_PROLOG
-	if ( _needRepaint_ ) {
-		_needRepaint_ = false;
+	if ( _needRepaint ) {
+		_needRepaint = false;
 		HConsole::get_instance().refresh();
 	}
 	return;
@@ -204,12 +210,12 @@ void HTUIProcess::handler_idle( void ) {
 	HString clock( HTime( HTime::LOCAL ).string() );
 	cons.cmvprintf( 0, static_cast<int>( cons.get_width() - clock.get_length() ),
 			COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, clock.raw() );
-	_needRepaint_ = true;
+	_needRepaint = true;
 #endif /* __DEBUG__ */
 	if ( !! (*_foregroundWindow) ) {
 		HStatusBarControl::ptr_t& statusBar = (*_foregroundWindow)->status_bar();
 		if ( !! statusBar )
-			statusBar->refresh();
+			statusBar->paint();
 	}
 	return;
 	M_EPILOG
@@ -229,12 +235,12 @@ int HTUIProcess::handler_mouse( int code_ ) {
 	static_cast<void>( mouse::mouse_get( mouse ) );
 	if ( !! (*_foregroundWindow) )
 		(*_foregroundWindow)->click( mouse );
-	if ( _needRepaint_ )
-		refresh();
+	if ( _needRepaint )
+		repaint();
 #ifdef __DEBUGGER_BABUNI__
 	HConsole::get_instance().cmvprintf( 0, 0,	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY, "mouse: %6d, %3d, %3d",
 			mouse._buttons, mouse._row, mouse._column );
-	_needRepaint_ = true;
+	_needRepaint = true;
 #endif /* __DEBUGGER_BABUNI__ */
 	return ( code_ );
 	M_EPILOG
@@ -262,7 +268,7 @@ int HTUIProcess::handler_refresh( int ) {
 	cons.endwin();
 	cons.kbhit(); /* cleans all trash from stdio buffer */
 	cons.refresh();
-	refresh( true ); /* there is c_clrscr(); and refresh() call inside */
+	repaint( true ); /* there is c_clrscr(); and repaint() call inside */
 	return ( 0 );
 	M_EPILOG
 }
@@ -275,7 +281,7 @@ int HTUIProcess::handler_quit( int code_ ) {
 int HTUIProcess::do_handler_quit( int ) {
 	M_PROLOG
 	_dispatcher.stop();
-	_needRepaint_ = false;
+	_needRepaint = false;
 	HConsole::get_instance().clrscr();
 	return ( 0 );
 	M_EPILOG
@@ -287,7 +293,7 @@ int HTUIProcess::handler_jump_meta_tab( int code_ ) {
 		++ _foregroundWindow;
 	else
 		_foregroundWindow = _windows->begin();
-	refresh( true );
+	repaint( true );
 	code_ = 0;
 	return ( code_ );
 	M_EPILOG
@@ -301,7 +307,7 @@ int HTUIProcess::handler_jump_meta_direct( int code_ ) {
 	_foregroundWindow = _windows->begin();
 	while ( code_ -- )
 		++ _foregroundWindow;
-	refresh( true );
+	repaint( true );
 	code_ = 0;
 	return ( code_ );
 	M_EPILOG
@@ -318,7 +324,7 @@ int HTUIProcess::do_handler_close_window( int code_ ) {
 	model_t::cyclic_iterator it = _foregroundWindow;
 	-- _foregroundWindow;
 	_windows->erase( it );
-	refresh( true );
+	repaint( true );
 	code_ = 0;
 	return ( code_ );
 	M_EPILOG
@@ -326,7 +332,7 @@ int HTUIProcess::do_handler_close_window( int code_ ) {
 
 void HTUIProcess::select( HWindow const* const window_ ) {
 	M_PROLOG
-	for ( model_t::iterator it = _windows->begin(); it != _windows->end(); ++ it ) {
+	for ( model_t::iterator it( _windows->begin() ), end( _windows->end() ); it != end; ++ it ) {
 		if ( (*it) == window_ ) {
 			_foregroundWindow = it;
 			break;
@@ -336,15 +342,16 @@ void HTUIProcess::select( HWindow const* const window_ ) {
 	M_EPILOG
 }
 
-void HTUIProcess::refresh( bool force_ ) {
+void HTUIProcess::repaint( bool force_ ) {
 	M_PROLOG
 	if ( ( _foregroundWindow != HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) ) {
-		if ( force_ )
-			(*_foregroundWindow)->schedule_refresh();
-		(*_foregroundWindow)->refresh();
+		if ( force_ ) {
+			(*_foregroundWindow)->schedule_repaint( true );
+		}
+		(*_foregroundWindow)->paint();
 	}
 	HConsole::get_instance().refresh();
-	_needRepaint_ = false;
+	_needRepaint = false;
 	return;
 	M_EPILOG
 }

@@ -50,7 +50,7 @@ HDateControl::~HDateControl ( void ) {
 	M_EPILOG
 }
 
-void HDateControl::do_refresh( void ) {
+void HDateControl::do_paint( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG

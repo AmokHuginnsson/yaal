@@ -97,7 +97,7 @@ int HDataEditControl::do_process_input ( int code_ ) {
 	}
 	code_ = HEditControl::do_process_input ( code_ );
 	if ( ! ( code_ || noChange ) ) {
-		window = dynamic_cast<HDataWindow*>( _parent );
+		window = dynamic_cast<HDataWindow*>( _window );
 		M_ASSERT ( window );
 		window->set_modified();
 	}

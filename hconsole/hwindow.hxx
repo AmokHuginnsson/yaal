@@ -38,6 +38,7 @@ namespace yaal {
 namespace hconsole {
 
 class HControlList;
+class HTUIProcess;
 
 /*! \brief TUI Window implementation.
  */
@@ -47,24 +48,38 @@ public:
 	typedef HHandler base_type;
 	typedef yaal::hcore::HPointer<HWindow> ptr_t;
 protected:
-	bool								_initialised;		/*!< was window properly initialised? */
-	bool								_needRepaint;		/*!< \brief Does this window need to be repainted? */
-	hcore::HString			_title;					/*!< title of window */
-	HControlList::model_t::cyclic_iterator _focusedChild; /*!< points to control that has focus */
+	bool _initialised;                                            /*!< was window properly initialised? */
+	bool _needRepaint;                                            /*!< \brief Does this window need to be repainted? */
+	hcore::HString _title;                                        /*!< title of window */
+	HControlList::model_t::cyclic_iterator _focusedChild;         /*!< points to control that has focus */
 	HControlList::model_t::cyclic_iterator _previousFocusedChild; /*!< control that had focus before
-																									 focus went to status bar */
-	HControlList				_controls;	/*!< list of all control inside _this_ wind */
-	HStatusBarControl::ptr_t		_statusBar;
+	                                                                   focus went to status bar */
+	HControlList _controls;	                                      /*!< list of all control inside _this_ wind */
+	HStatusBarControl::ptr_t _statusBar;
+	HTUIProcess* _tuiProcess;
 public:
 	HWindow( char const* ); /* title */
 	virtual ~HWindow( void );
 	virtual int init( void );
-	void refresh( void );
-	int process_input( int );
-	int handler_jump_tab( int ); /* jump thru controlos with tab key */
-	int handler_jump_direct ( int ); /* direct jump to specified cntrl */
-	int handler_command( int ); /* put window into command awaiting */
-	int handler_search( int ); /* put window into search pattern scan */
+	void set_tui( HTUIProcess* );
+	void paint( void );
+	virtual int process_input( int );
+
+	/*! \brief Jump through controls with tab key.
+	 */
+	int handler_jump_tab( int );
+
+	/*! \brief Direct jump to specified control.
+	 */
+	int handler_jump_direct ( int );
+
+	/*! \brief Put window into command awaiting mode.
+	 */
+	int handler_command( int );
+
+	/*! \brief Put window into search pattern scan mode.
+	 */
+	int handler_search( int );
 	int click( mouse::OMouse& );
 	int add_control( HControl::ptr_t, int );
 	HStatusBarControl::ptr_t& status_bar( void );
@@ -73,17 +88,19 @@ public:
 	void update_all( void );
 	yaal::hcore::HString const& get_title( void ) const;
 
-/*! \brief Schedule full refresh on next refresh cycle.
+/*! \brief Schedule paint request on next refresh cycle.
+ *
+ * \param wholeWindow_ - Schedule repaint for all controls in window.
  */
-	void schedule_refresh( void );
+	void schedule_repaint( bool wholeWindow_ );
 private:
 	friend bool HControl::set_focus( char );
-	friend void HStatusBarControl::set_prompt( char const *,
+	friend void HStatusBarControl::set_prompt( char const*,
 			HStatusBarControl::PROMPT::mode_t,
 			HStatusBarControl::PROMPT::restrict_t );
 	friend void HStatusBarControl::end_prompt( void );
 	friend int HStatusBarControl::process_input_normal( int );
-	void acquire_focus( HControl const* const );
+	void acquire_focus( HControl const* );
 	HWindow( HWindow const& );
 	HWindow& operator = ( HWindow const& );
 };

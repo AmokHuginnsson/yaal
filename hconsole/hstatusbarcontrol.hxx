@@ -79,7 +79,7 @@ protected:
 	int			_lastProgress;	/* last drawed step */
 	int			_lastPercent;		/* last writen percent */
 	int			_lastMinute;		/* all last* variables help */
-	int			_lastSecond;		/* keep progress bar refresh rate low */
+	int			_lastSecond;		/* keep progress bar paint rate low */
 	int			_lastStep;
 	hcore::HString	_message;
 	hcore::HTime		_start;
@@ -102,7 +102,7 @@ public:
 	virtual int process_input_normal( int );
 	virtual int process_input_menu( int );
 protected:
-	virtual void do_refresh( void );
+	virtual void do_paint( void );
 	virtual void do_draw_label( void );
 	virtual bool do_hit_test( int, int ) const;
 	virtual int verify( void );

@@ -104,7 +104,7 @@ public:
 	void set_text( yaal::hcore::HString const& );
 	yaal::hcore::HString const& get_text( void ) const;
 protected:
-	virtual void do_refresh( void );
+	virtual void do_paint( void );
 	virtual int do_process_input( int );
 	virtual bool do_click( mouse::OMouse& );
 private:

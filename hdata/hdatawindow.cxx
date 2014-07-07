@@ -184,7 +184,7 @@ int HDataWindow::init( void ) {
 		_mainControl->load();
 		_mainControl->process_input( KEY_CODES::HOME );
 	}
-	refresh();
+	paint();
 	return ( 0 );
 	M_EPILOG
 }
@@ -365,7 +365,7 @@ int HDataWindow::handler_requery( int ) {
 	}
 	set_mode( DOCUMENT::VIEW );
 	_mainControl->load();
-	refresh();
+	paint();
 	return ( 0 );
 	M_EPILOG
 }
@@ -378,7 +378,7 @@ int HDataWindow::handler_cancel( int ) {
 	if ( ( _mode == HSQLDescriptor::MODE::INSERT ) && _mainControl )
 		_mainControl->cancel_new();
 	_modified = false;
-	_statusBar->refresh();
+	_statusBar->paint();
 	_statusBar->message( COLORS::FG_BRIGHTRED, _( "Dropping all changes." ) );
 	return ( 0 );
 	M_EPILOG
@@ -393,7 +393,7 @@ void HDataWindow::set_modified( bool modified_ ) {
 	bool modified = _modified;
 	_modified = modified_;
 	if ( ! modified )
-		_statusBar->refresh();
+		_statusBar->paint();
 	return;
 	M_EPILOG
 }

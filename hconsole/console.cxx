@@ -133,8 +133,6 @@ int COLORS::fg_to_bg( int fg_ ) {
 	M_EPILOG
 }
 
-bool _needRepaint_( false );
-
 namespace {
 
 bool has_broken_bright_background( void ) {
@@ -152,7 +150,8 @@ bool has_broken_bright_background( void ) {
 HConsole::HConsole( void )
 	: _initialized( false ), _enabled( false ),
 	_brokenBrightBackground( has_broken_bright_background() ),
-	_width( 0 ), _height( 0 ), _mouseDes( -1 ), _window( NULL ), _event() {
+	_width( 0 ), _height( 0 ), _mouseDes( -1 ), _window( NULL ),
+	_event() {
 	return;
 }
 

@@ -96,7 +96,7 @@ protected:
 	hcore::HString _label;        /*!< Control title. */
 	hcore::HString _varTmpBuffer; /*!< Buffer for temporary operations, used
 	                                   to keep memory fragmentation low. */
-	HWindow* _parent;   /*!< Window that will hold this control. */
+	HWindow* _window;   /*!< Window that will hold this control. */
 /* this is used locally, there is no way to modify this variables explicitly */
 	int _labelLength;   /*!< Length of the label. */
 	int _shortcutIndex; /*!< Index of shortcut char in label. */
@@ -184,7 +184,7 @@ public:
 
 /*! \brief Refresh TUI control screen representation.
  */
-	void refresh( void );
+	void paint( void );
 
 /*! \brief Update control internals to comply with new Model data.
  *
@@ -261,9 +261,9 @@ public:
  */
 	int attr_data( void ) const;
 
-/*! \brief Schedule full refresh on next refresh cycle.
+/*! \brief Schedule full paint on next refresh cycle.
  */
-	void schedule_refresh( void );
+	void schedule_repaint( void );
 
 /*! \brief Mark this control as no longer synchronized with its internel model.
  */
@@ -271,16 +271,22 @@ public:
 
 /*! \brief Tells if this control needs to be repainted.
  *
- * \return True if refresh is required.
+ * \return True if paint is required.
  */
 	bool need_repaint( void ) const;
+
+/*! \brief Get control label text.
+ *
+ * \return Current label text.
+ */
+yaal::hcore::HString const& get_label( void ) const;
 
 protected:
 	void set_attr_label( void ) const;
 	void set_attr_shortcut( void ) const;
 	void set_attr_data( void ) const;
 	virtual int do_process_input( int );
-	virtual void do_refresh( void ) = 0;
+	virtual void do_paint( void ) = 0;
 	virtual void do_update( void );
 	virtual bool do_hit_test( int, int ) const;
 	virtual bool do_click( mouse::OMouse& );
