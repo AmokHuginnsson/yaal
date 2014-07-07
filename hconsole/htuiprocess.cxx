@@ -158,17 +158,17 @@ void HTUIProcess::process_stdin( int ) {
 	HString command;
 	HConsole& cons = HConsole::get_instance();
 	int code( cons.get_key() );
-	bool active( false );
+	bool consumed( false );
 	if ( code ) {
-		active = !process_input_with_handlers( code, _preprocessHandlers );
+		consumed = process_input_with_handlers( code, _preprocessHandlers );
 	}
-	if ( active && !! (*_foregroundWindow) ) {
-		active = !(*_foregroundWindow)->process_input( code );
+	if ( !consumed && !! (*_foregroundWindow) ) {
+		consumed = (*_foregroundWindow)->process_input( code );
 	}
-	if ( active ) {
-		active = !process_input_with_handlers( code, _postprocessHandlers );
+	if ( !consumed ) {
+		consumed = process_input_with_handlers( code, _postprocessHandlers );
 	}
-	if ( ! active ) {
+	if ( !consumed ) {
 		if ( !! (*_foregroundWindow) )
 			_command = (*_foregroundWindow)->get_command();
 		if ( ! _command.is_empty() )
@@ -207,7 +207,7 @@ void HTUIProcess::process_stdin( int ) {
 	} else
 		cons.cmvprintf ( 0, 0, COLORS::FG_GREEN, "                           " );
 #endif /* __DEBUGGER_BABUNI__ */
-	if ( code && !! (*_foregroundWindow) )
+	if ( ! consumed && !! (*_foregroundWindow) )
 		(*_foregroundWindow)->status_bar()->message( COLORS::FG_RED,
 				"unknown function, err code(%d)", code );
 	return;

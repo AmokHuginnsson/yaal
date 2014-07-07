@@ -32,10 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hwindow.hxx"
 #include "console.hxx"
 #include "htuiprocess.hxx"
-
-#ifdef __DEBUGGER_BABUNI__
 #include "hcore/hlog.hxx"
-#endif /* __DEBUGGER_BABUNI__ */
 
 using namespace yaal::hcore;
 
@@ -96,19 +93,19 @@ void HWindow::set_tui( yaal::hconsole::HTUIProcess* tui_ ) {
 
 bool HWindow::process_input( HKeyPressEvent const& keyPress_ ) {
 	M_PROLOG
-	bool active( false );
+	bool consumed( false );
 	if ( keyPress_.get_key_code() ) {
-		active = !process_input_with_handlers( keyPress_, _preprocessHandlers );
+		consumed = process_input_with_handlers( keyPress_, _preprocessHandlers );
 	}
-	if ( active && !! (*_focusedChild) ) {
-		active = (*_focusedChild)->process_input( keyPress_.get_key_code() ) ? true : false;
+	if ( ! consumed && !! (*_focusedChild) ) {
+		consumed = (*_focusedChild)->process_input( keyPress_.get_key_code() ) ? false : true;
 	}
-	if ( active ) {
-		active = !process_input_with_handlers( keyPress_, _postprocessHandlers );
+	if ( ! consumed ) {
+		consumed = process_input_with_handlers( keyPress_, _postprocessHandlers );
 	}
 	if ( ! _command.is_empty() )
 		process_command();
-	return ( active );
+	return ( consumed );
 	M_EPILOG
 }
 
