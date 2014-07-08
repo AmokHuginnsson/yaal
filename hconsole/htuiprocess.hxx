@@ -33,12 +33,12 @@ Copyright:
 #include "hcore/hqueue.hxx"
 #include "tools/hiodispatcher.hxx"
 #include "hconsole/hhandler.hxx"
-#include "hconsole/hwindow.hxx"
-#include "hconsole/hwindowlistcontrol.hxx"
 
 namespace yaal {
 
 namespace hconsole {
+
+class HWindow;
 
 /*! \brief A backbone of TUI based application.
  */
@@ -46,13 +46,14 @@ class HTUIProcess : public HHandler {
 public:
 	typedef HTUIProcess this_type;
 	typedef HHandler base_type;
-	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
+	typedef yaal::hcore::HPointer<HWindow> window_t;
+	typedef yaal::hcore::HList<window_t> model_t;
 	typedef yaal::hcore::HPointer<model_t> model_ptr_t;
 	typedef yaal::hcore::HBoundCall<> call_t;
 	typedef yaal::hcore::HQueue<call_t> call_queue_t;
 protected:
 	yaal::tools::HIODispatcher _dispatcher;
-	HWindow::ptr_t _mainWindow;                 /* self explanary */
+	window_t _mainWindow;                 /* self explanary */
 	model_t::cyclic_iterator _foregroundWindow; /* self explanary */
 	model_ptr_t _windows;                       /* current existing windows */
 	bool _needRepaint;
@@ -60,7 +61,7 @@ protected:
 public:
 	HTUIProcess( int = 8, int = 32, int = 32 );
 	virtual ~HTUIProcess ( void );
-	int init_tui( char const* = "", HWindow::ptr_t = HWindow::ptr_t() );
+	int init_tui( char const* = "", window_t = window_t() );
 	void run( void );
 	void schedule_repaint( void );
 	void schedule_call( call_t );
@@ -72,8 +73,8 @@ protected:
 	void process_mouse( int );
 	void process_terminal_event( int );
 	int process_commands( void );
-	int add_window( HWindow::ptr_t );
-	void select( HWindow const* const );
+	int add_window( window_t );
+	void select( HWindow const* );
 	void repaint( bool = false );
 	void handler_alert( void );
 	void handler_idle( void );

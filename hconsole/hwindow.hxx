@@ -95,7 +95,7 @@ public:
 	void schedule_repaint( bool wholeWindow_ );
 private:
 	friend bool HControl::set_focus( char );
-	friend void HStatusBarControl::set_prompt( char const*,
+	friend void HStatusBarControl::set_prompt(  yaal::hcore::HString const&,
 			HStatusBarControl::PROMPT::mode_t,
 			HStatusBarControl::PROMPT::restrict_t );
 	friend void HStatusBarControl::end_prompt( void );

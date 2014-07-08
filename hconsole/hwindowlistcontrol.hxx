@@ -49,9 +49,9 @@ private:
 	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
 	model_t::cyclic_iterator& _foregroundWindow; /* self explanary */
 public:
-	HWindowListControl ( HWindow *, int, int, int, int, char const *,
+	HWindowListControl( HWindow*, int, int, int, int, char const*,
 			list_control_helper::HAbstractControler::ptr_t const&, model_t::cyclic_iterator& );
-	virtual int do_process_input ( int );
+	virtual int do_process_input( int );
 };
 
 typedef yaal::hcore::HExceptionT<HWindowListControl, HListControlException> HWindowListControlException;

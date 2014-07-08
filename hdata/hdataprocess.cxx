@@ -184,6 +184,10 @@ database_ptr_t HDataProcess::data_base( void ) {
 	return ( _dataBase );
 }
 
+namespace {
+void dummy( void ) {}
+}
+
 void HDataProcess::do_quit( void ) {
 	M_PROLOG
 	HDataWindow* window = NULL;
@@ -196,9 +200,8 @@ void HDataProcess::do_quit( void ) {
 			if ( window && window->is_modified() ) {
 				select( window );
 				handler_refresh( HKeyPressEvent( 'r' ) );
-				if ( ! window->status_bar()->confirm( "exit program" ) ) {
-					return;
-				}
+				window->status_bar()->confirm( "exit program", call( &HTUIProcess::quit, this ), call( &dummy ) );
+				return;
 			}
 		}
 	}
@@ -212,9 +215,8 @@ void HDataProcess::do_close_window( void ) {
 	HDataWindow* window = NULL;
 	if ( !! (*_foregroundWindow) ) {
 		window = dynamic_cast<HDataWindow*>( &*(*_foregroundWindow) );
-		if ( window
-				&& window->is_modified()
-				&& ! window->status_bar()->confirm( "close window" ) ) {
+		if ( window && window->is_modified() ) {
+			window->status_bar()->confirm( "close window", call( &HTUIProcess::close_window, this ), call( &dummy ) );
 			return;
 		}
 	}

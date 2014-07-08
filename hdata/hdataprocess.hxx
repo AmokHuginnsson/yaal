@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HDATA_HDATAPROCESS_HXX_INCLUDED 1
 
 #include "hconsole/htuiprocess.hxx"
+#include "hconsole/hwindow.hxx"
 #include "hconsole/omenuitem.hxx"
 #include "tools/hxml.hxx"
 #include "dbwrapper/hdatabase.hxx"

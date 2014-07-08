@@ -31,13 +31,14 @@ Copyright:
 #define YAAL_HCONSOLE_HMAINWINDOW_HXX_INCLUDED 1
 
 #include "hconsole/hwindow.hxx"
-#include "hconsole/omenuitem.hxx"
 #include "hconsole/hmenucontrol.hxx"
 #include "hconsole/hwindowlistcontrol.hxx"
 
 namespace yaal {
 
 namespace hconsole {
+
+struct OMenuItem;
 
 /*! \brief Main window of TUI application.
  *

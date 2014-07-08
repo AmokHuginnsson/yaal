@@ -35,6 +35,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hwindow.hxx"
 #include "hconsole.hxx"
 #include "hsearchablecontrol.hxx"
+#include "hcore/foreach.hxx"
 
 //#ifdef __DEBUGGER_BABUNI__
 #include "hcore/hlog.hxx"
@@ -57,7 +58,7 @@ HStatusBarControl::HStatusBarControl( HWindow* parent_,
 	_lastProgress( -1 ), _lastPercent( - 1 ), _lastMinute( 0 ),
 	_lastSecond( 0 ), _lastStep( 0 ),
 	_message( "" ), /* initialization of this field is required by bar() meth */
-	_start( HTime::LOCAL ) {
+	_start( HTime::LOCAL ), _choices() {
 	M_PROLOG
 	int attribte = 0;
 	if ( statusBarAttribute_ > 0 )
@@ -141,7 +142,7 @@ int HStatusBarControl::do_process_input( int code_ ) {
 	M_EPILOG
 }
 
-void HStatusBarControl::set_prompt( char const* prompt_, PROMPT::mode_t mode_,
+void HStatusBarControl::set_prompt( yaal::hcore::HString const& prompt_, PROMPT::mode_t mode_,
 		PROMPT::restrict_t restrict_ ) {
 	M_PROLOG
 	_mode = mode_;
@@ -150,7 +151,7 @@ void HStatusBarControl::set_prompt( char const* prompt_, PROMPT::mode_t mode_,
 	_window->_controls.select( _window->_statusBar );
 	(*_window->_previousFocusedChild)->kill_focus();
 	set_focus( -1 );
-	if ( prompt_ ) {
+	if ( !prompt_.is_empty() ) {
 		_prompt = prompt_;
 		_promptLength = static_cast<int>( _prompt.get_length() );
 	}
@@ -316,19 +317,35 @@ void HStatusBarControl::bar( char const* bar_ ) {
 	M_EPILOG
 }
 
-int HStatusBarControl::ask( char const* question_,
-		char const* prompt_ ) {
+void HStatusBarControl::ask( char const* question_,
+		choices_t const& choices_ ) {
 	M_PROLOG
+	_choices = choices_;
 	bar( question_ );
-	set_prompt( prompt_ );
-	return ( 0 );
+	HString prompt( "[" );
+	bool first( true );
+	YAAL_FOREACH( choice_t const& c, _choices ) {
+		if ( ! first ) {
+			prompt += "/";
+		} else {
+			first = false;
+		}
+		prompt += c.first;
+	}
+	prompt += "] ";
+	set_prompt( prompt );
+	return;
 	M_EPILOG
 }
 
-bool HStatusBarControl::confirm( char const* question_ ) {
+void HStatusBarControl::confirm( char const* question_,
+		HTUIProcess::call_t yes_, HTUIProcess::call_t no_ ) {
 	M_PROLOG
-	ask( question_, "[yes/no]: " );
-	return ( false );
+	choices_t choices;
+	choices.push_back( make_pair<HString>( "yes", yes_ ) );
+	choices.push_back( make_pair<HString>( "no", no_ ) );
+	ask( question_, choices );
+	return;
 	M_EPILOG
 }
 

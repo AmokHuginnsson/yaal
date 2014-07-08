@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HCONSOLE_HSTATUSBARCONTROL_HXX_INCLUDED 1
 
 #include "hconsole/heditcontrol.hxx"
+#include "hconsole/htuiprocess.hxx"
 #include "hcore/hpointer.hxx"
 
 namespace yaal {
@@ -47,6 +48,8 @@ public:
 	typedef HStatusBarControl this_type;
 	typedef HEditControl base_type;
 	typedef yaal::hcore::HPointer<HStatusBarControl> ptr_t;
+	typedef yaal::hcore::HPair<yaal::hcore::HString, HTUIProcess::call_t> choice_t;
+	typedef yaal::hcore::HArray<choice_t> choices_t;
 	/*! \brief HStatusBarControl prompt configuration.
 	 */
 	struct PROMPT {
@@ -67,28 +70,29 @@ public:
 		} restrict_t;
 	};
 protected:
-	int			_statusBarAttribute;
-	int			_promptLength;
-	PROMPT::mode_t _mode;					/* prompt mode */
-	PROMPT::restrict_t _restrict;	/* prompt restrict mode */
-	hcore::HString	_prompt;
+	int    _statusBarAttribute;
+	int    _promptLength;
+	PROMPT::mode_t _mode;         /* prompt mode */
+	PROMPT::restrict_t _restrict; /* prompt restrict mode */
+	hcore::HString _prompt;
 	/* progress bar data */
-	bool		_done;
-	bool		_estimate;			/* was time left count ? */
-	double	_progressSize;	/* number of steps in progess bar */
-	int			_lastProgress;	/* last drawed step */
-	int			_lastPercent;		/* last writen percent */
-	int			_lastMinute;		/* all last* variables help */
-	int			_lastSecond;		/* keep progress bar paint rate low */
-	int			_lastStep;
-	hcore::HString	_message;
-	hcore::HTime		_start;
+	bool   _done;
+	bool   _estimate;     /* was time left count ? */
+	double _progressSize; /* number of steps in progess bar */
+	int    _lastProgress; /* last drawed step */
+	int    _lastPercent;  /* last writen percent */
+	int    _lastMinute;   /* all last* variables help */
+	int    _lastSecond;   /* keep progress bar paint rate low */
+	int    _lastStep;
+	hcore::HString _message;
+	hcore::HTime   _start;
+	choices_t _choices;
 	/* end of progress bar data */
 public:
 	HStatusBarControl( HWindow*, char const* const, int = -1 );
 	virtual ~HStatusBarControl ( void );
 	void setup( char const*, char const*, int );
-	void set_prompt( char const * = NULL, PROMPT::mode_t = PROMPT::NORMAL,
+	void set_prompt( yaal::hcore::HString const&, PROMPT::mode_t = PROMPT::NORMAL,
 			PROMPT::restrict_t = PROMPT::RELAXED );
 	void end_prompt( void );
 	void init_progress( double, char const*, bool = true );
@@ -97,8 +101,8 @@ public:
 	void message( char const*, ... ) __attribute__(( format( printf, 2, 3 ) ));
 	void clear( int );
 	void bar( char const* = NULL );
-	int ask( char const*, char const* );
-	bool confirm( char const* );
+	void ask( char const*, choices_t const& );
+	void confirm( char const*, HTUIProcess::call_t, HTUIProcess::call_t );
 	virtual int process_input_normal( int );
 	virtual int process_input_menu( int );
 protected:
