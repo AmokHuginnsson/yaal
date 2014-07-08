@@ -53,27 +53,20 @@ public:
 	/*! \brief HStatusBarControl prompt configuration.
 	 */
 	struct PROMPT {
-		/*! \brief HStatusBarControl prompt context.
+		/*! \brief HStatusBarControl prompt mode.
 		 */
 		typedef enum {
 			NORMAL,
 			COMMAND,
 			SEARCH,
+			DIALOG,
 			MENU
 		} mode_t;
-		/*! \brief HStatusBarControl prompt type.
-		 */
-		typedef enum {
-			RELAXED,
-			ONLY_ENTER_CAN_QUIT,
-			MUST_CANCEL
-		} restrict_t;
 	};
 protected:
 	int    _statusBarAttribute;
 	int    _promptLength;
 	PROMPT::mode_t _mode;         /* prompt mode */
-	PROMPT::restrict_t _restrict; /* prompt restrict mode */
 	hcore::HString _prompt;
 	/* progress bar data */
 	bool   _done;
@@ -92,8 +85,7 @@ public:
 	HStatusBarControl( HWindow*, char const* const, int = -1 );
 	virtual ~HStatusBarControl ( void );
 	void setup( char const*, char const*, int );
-	void set_prompt( yaal::hcore::HString const&, PROMPT::mode_t = PROMPT::NORMAL,
-			PROMPT::restrict_t = PROMPT::RELAXED );
+	void set_prompt( yaal::hcore::HString const&, PROMPT::mode_t = PROMPT::NORMAL );
 	void end_prompt( void );
 	void init_progress( double, char const*, bool = true );
 	void update_progress( double = -1, char const * = NULL );

@@ -53,7 +53,7 @@ HStatusBarControl::HStatusBarControl( HWindow* parent_,
 	HEditControl( NULL, 0, 0, 0, 0, NULL, 127, "", _maskLoose_,
 			false, false, false, false, false, 255 ),
 	_statusBarAttribute( 0 ), _promptLength( 0 ),
-	_mode( PROMPT::NORMAL ), _restrict( PROMPT::RELAXED ),
+	_mode( PROMPT::NORMAL ),
 	_prompt(), _done( false ), _estimate( false ), _progressSize( 1 ),
 	_lastProgress( -1 ), _lastPercent( - 1 ), _lastMinute( 0 ),
 	_lastSecond( 0 ), _lastStep( 0 ),
@@ -118,19 +118,23 @@ void HStatusBarControl::do_paint( void ) {
 int HStatusBarControl::do_process_input( int code_ ) {
 	M_PROLOG
 	if ( ( code_ == KEY_CODES::BACKSPACE )
-			&& ( _restrict == PROMPT::RELAXED )
-			&& ( _mode != PROMPT::MENU )
+			&& ( _mode != PROMPT::MENU ) && ( _mode != PROMPT::DIALOG )
 			&& ! _string.get_length() ) {
 		end_prompt();
 		return ( 0 );
 	}
-	if ( code_ != '\t' )
+	if ( code_ != '\t' ) {
 		code_ = HEditControl::do_process_input( code_ );
+	}
 	switch ( _mode ) {
 		case ( PROMPT::NORMAL ):
 		case ( PROMPT::COMMAND ):
 		case ( PROMPT::SEARCH ):
 			code_ = process_input_normal( code_ );
+		break;
+		case ( PROMPT::DIALOG ):
+			process_input_normal( code_ );
+			code_ = 0;
 		break;
 		case ( PROMPT::MENU ):
 			code_ = process_input_menu( code_ );
@@ -142,11 +146,9 @@ int HStatusBarControl::do_process_input( int code_ ) {
 	M_EPILOG
 }
 
-void HStatusBarControl::set_prompt( yaal::hcore::HString const& prompt_, PROMPT::mode_t mode_,
-		PROMPT::restrict_t restrict_ ) {
+void HStatusBarControl::set_prompt( yaal::hcore::HString const& prompt_, PROMPT::mode_t mode_ ) {
 	M_PROLOG
 	_mode = mode_;
-	_restrict = restrict_;
 	_window->_previousFocusedChild = _window->_focusedChild;
 	_window->_controls.select( _window->_statusBar );
 	(*_window->_previousFocusedChild)->kill_focus();
@@ -312,7 +314,7 @@ void HStatusBarControl::bar( char const* bar_ ) {
 		_message.format( _varTmpBuffer.raw(), bar_ );
 	}
 	cons.mvprintf( cons.get_height() - 2,
-			_labelLength - ( _singleLine ? 0 : 1 ), _message.raw() );
+			_labelLength + ( _singleLine ? 1 : 0 ), _message.raw() );
 	return;
 	M_EPILOG
 }
@@ -333,7 +335,7 @@ void HStatusBarControl::ask( char const* question_,
 		prompt += c.first;
 	}
 	prompt += "] ";
-	set_prompt( prompt );
+	set_prompt( prompt, PROMPT::DIALOG );
 	return;
 	M_EPILOG
 }

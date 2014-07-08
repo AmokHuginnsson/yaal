@@ -96,8 +96,7 @@ public:
 private:
 	friend bool HControl::set_focus( char );
 	friend void HStatusBarControl::set_prompt(  yaal::hcore::HString const&,
-			HStatusBarControl::PROMPT::mode_t,
-			HStatusBarControl::PROMPT::restrict_t );
+			HStatusBarControl::PROMPT::mode_t );
 	friend void HStatusBarControl::end_prompt( void );
 	friend int HStatusBarControl::process_input_normal( int );
 	void acquire_focus( HControl const* );
