@@ -323,6 +323,8 @@ resources_t& HDataProcess::build_resource( yaal::hcore::HString const& resourceN
 					r[ i ]._column = lexical_cast<int>( xml::attr_val( attr, "column" ) );
 					r[ i ]._height = lexical_cast<int>( xml::attr_val( attr, "height" ) );
 					r[ i ]._width = lexical_cast<int>( xml::attr_val( attr, "width" ) );
+				} else if ( attrName == "label_stacked" ) {
+					r[ i ]._labelStacked = true;
 				} else if ( attrName == "parent" ) {
 					i2s[ i ] = xml::attr_val( attr, "refid" ).raw();
 				} else if ( r[ i ]._type == DATACONTROL_BITS::TYPE::LIST ) {

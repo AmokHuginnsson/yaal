@@ -50,8 +50,8 @@ namespace hconsole {
 HStatusBarControl::HStatusBarControl( HWindow* parent_,
 		char const* label_, int statusBarAttribute_ )
 	: HControl( parent_, - 2, 0, 2, - 1, label_ ),
-	HEditControl( NULL, 0, 0, 0, 0, NULL, 127, "", _maskLoose_,
-			false, false, false, false, false, 255 ),
+	HEditControl( NULL, 0, 0, 0, 0, NULL,
+			HEditControlAttrubites().pattern( _maskLoose_ ).max_history_level( 255 ).label_decoration( HControl::LABEL::DECORATION::EXPLICIT ) ),
 	_statusBarAttribute( 0 ), _promptLength( 0 ),
 	_mode( PROMPT::NORMAL ),
 	_prompt(), _done( false ), _estimate( false ), _progressSize( 1 ),
@@ -310,11 +310,11 @@ void HStatusBarControl::bar( char const* bar_ ) {
 	set_attr_data();
 	if ( bar_ ) {
 		_varTmpBuffer.format( " %%-%ds ",
-				( cons.get_width() - _labelLength ) - ( _singleLine ? 2 : 1 ) );
+				( cons.get_width() - _labelLength ) - ( _labelPosition == LABEL::POSITION::SIDE_BY_SIDE ? 2 : 1 ) );
 		_message.format( _varTmpBuffer.raw(), bar_ );
 	}
 	cons.mvprintf( cons.get_height() - 2,
-			_labelLength + ( _singleLine ? 1 : 0 ), _message.raw() );
+			_labelLength + ( _labelPosition == LABEL::POSITION::SIDE_BY_SIDE ? 1 : 0 ), _message.raw() );
 	return;
 	M_EPILOG
 }

@@ -56,18 +56,18 @@ protected:
 	bool _multiLine;       /*!< is control multiline */
 	bool _readOnly;        /*!< shall editing be disabled */
 	bool _rightAligned;    /*!< is control content right aligned,
-														 control content can be right aligned
-														 only in single line mode */
+	                            control content can be right aligned
+	                            only in single line mode */
 	bool _password;        /*!< should be entered text visible */
 	int  _maxStringSize;   /*!< maximum length of text in control */
 	int  _cursorPosition;  /*!< cursor position relative to control begining */
 	int  _controlOffset;   /*!< when content is bigger than control size
-														 this variable keeps offset of first
-														 character shown */
+	                            this variable keeps offset of first
+	                            character shown */
 	int  _maxHistoryLevel; /*!< how many instertions should history keep */
-	HPattern _pattern; /*!< regular expression describing what
-																characters and in what way can be entered */
-	hcore::HString _string;   /*!< control content */
+	HPattern _pattern;     /*!< regular expression describing what
+	                            characters and in what way can be entered */
+	hcore::HString _string; /*!< control content */
 	HInfoString _infoString;
 	typedef hcore::HList<yaal::hcore::HString> history_t;
 	history_t	_history;    /*!< history of insertions */
@@ -81,6 +81,18 @@ public:
 	 * \param height - height of a control.
 	 * \param width - width of a control.
 	 * \param label - label of a control.
+	 */
+	HEditControl( HWindow* parent, int top, int left,	int height, int width,
+								char const* label = "", HControlAttributesInterface const& = HControlAttributesInterface() );
+	virtual ~HEditControl( void );
+	void set_flags( bool = false, bool = false );
+	virtual HInfo const& get( void ) const;
+	virtual void set( HInfo const& );
+	void set_text( yaal::hcore::HString const& );
+	yaal::hcore::HString const& get_text( void ) const;
+	void set_pattern( yaal::hcore::HString const& );
+	/*! \brief Set varius bits of internal structure.
+	 *
 	 * \param maxlen - maximum string length.
 	 * \param val - initial content.
 	 * \param mask - regex description of valid content of this edit control.
@@ -91,18 +103,11 @@ public:
 	 * \param password - hide entry content flag.
 	 * \param maxhist - maximum number of entries in history of this control.
 	 */
-	HEditControl( HWindow* parent, int top, int left,	int height, int width,
-								char const* label = "", int maxlen = 127,
-								char const* val = "", char const* mask = _maskDefault_,
-								bool replace = false, bool multiline = false,
-								bool readonly = false, bool rightAlign = false,
-								bool password = false, int maxhist = 8 );
-	virtual ~HEditControl( void );
-	void set_flags( bool = false, bool = false );
-	virtual HInfo const& get( void ) const;
-	virtual void set( HInfo const& );
-	void set_text( yaal::hcore::HString const& );
-	yaal::hcore::HString const& get_text( void ) const;
+	void set_bits( int const* maxlen,
+			yaal::hcore::HString const* val, yaal::hcore::HString const* mask,
+			bool const* replace, bool const* multiline,
+			bool const* readonly, bool const* rightAlign,
+			bool const* password, int const* maxhist );
 protected:
 	virtual void do_paint( void );
 	virtual int do_process_input( int );
@@ -125,6 +130,40 @@ private:
 };
 
 typedef yaal::hcore::HExceptionT<HEditControl, HControlException> HEditControlException;
+
+class HEditControlAttrubites : public HControlAttributes {
+	bool _replace;
+	bool _replaceSet;
+	bool _multiLine;
+	bool _multiLineSet;
+	bool _readOnly;
+	bool _readOnlySet;
+	bool _rightAligned;
+	bool _rightAlignedSet;
+	bool _password;
+	bool _passwordSet;
+	int  _maxStringSize;
+	bool _maxStringSizeSet;
+	int  _maxHistoryLevel;
+	bool _maxHistoryLevelSet;
+	yaal::hcore::HString _pattern;
+	bool _patternSet;
+	yaal::hcore::HString _text;
+	bool _textSet;
+protected:
+	virtual void do_apply( HControl& ) const;
+public:
+	HEditControlAttrubites( void );
+	HEditControlAttrubites& replace( bool );
+	HEditControlAttrubites& multiline( bool );
+	HEditControlAttrubites& readonly( bool );
+	HEditControlAttrubites& rightaligned( bool );
+	HEditControlAttrubites& password( bool );
+	HEditControlAttrubites& max_string_size( int );
+	HEditControlAttrubites& max_history_level( int );
+	HEditControlAttrubites& pattern( yaal::hcore::HString const& );
+	HEditControlAttrubites& text( yaal::hcore::HString const& );
+};
 
 }
 

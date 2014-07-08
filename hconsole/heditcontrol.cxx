@@ -52,43 +52,26 @@ char const* const _maskDefault_  = _maskLetters_;
 
 HEditControl::HEditControl( HWindow* parent_,
 		int row_, int column_, int height_, int width_,
-		char const* label_, int bufferSize_, char const * value_,
-		char const* mask_, bool replace_, bool rightAligned_,
-		bool multiLine_, bool readOnly_, bool password_,
-		int maxHistoryLevel_ )
+		char const* label_, HControlAttributesInterface const& attr_ )
 					: HControl( parent_, row_, column_, height_,
-							width_, label_ ),
-					_replace( replace_ ),
-					_multiLine( multiLine_ || ( height_ > 1 ) ? true : false ),
-					_readOnly( readOnly_ ), _rightAligned( rightAligned_ ),
-					_password( password_ ),
-					_maxStringSize( bufferSize_ ), _cursorPosition ( 0 ),
-					_controlOffset( 0 ), _maxHistoryLevel( maxHistoryLevel_ ),
-					_pattern(), _string( bufferSize_, true ),
+							width_, label_, attr_ ),
+					_replace( false ),
+					_multiLine( height_ > 1 ? true : false ),
+					_readOnly( false ), _rightAligned( false ),
+					_password( false ),
+					_maxStringSize( 127 ), _cursorPosition ( 0 ),
+					_controlOffset( 0 ), _maxHistoryLevel( 8 ),
+					_pattern(), _string(),
 					_infoString( _string ), _history(), _historyIt() {
 	M_PROLOG
-	int errorCode = 0;
-	int length = 0;
-	HString errorMessage;
-	if ( bufferSize_ < 1 )
-		M_THROW( _( "buffer size is ridiculously low" ), bufferSize_ );
-	if ( value_ ) {
-		length = static_cast<int>( ::strlen( value_ ) );
-		if ( length > bufferSize_ )
-			M_THROW( _( "initial value too big" ), length - bufferSize_ );
-	}
-	_varTmpBuffer.hs_realloc ( bufferSize_ + 1 );
-	if ( _rightAligned && _multiLine )
+	attr_.apply( *this );
+	_varTmpBuffer.hs_realloc ( _maxStringSize + 1 );
+	if ( _rightAligned && _multiLine ) {
 		M_THROW( _( "edit-control right aligned and multiline at the same time" ), 0 );
-	_string = value_;
-	_history.push_back ( "" );
+	}
+	_history.push_back( "" );
 	_historyIt = _history.hook();
-	if ( ( errorCode = _pattern.parse_re( mask_ ) ) )
-		M_THROW( _pattern.error(), errorCode );
-	( _pattern.find( value_ ? value_ : "" ) == _pattern.end() ) && ( errorCode = _pattern.error_code() );
-	if ( errorCode )
-		M_THROW( _pattern.error(), errorCode );
-	length = static_cast<int>( _string.get_length() );
+	int length( static_cast<int>( _string.get_length() ) );
 /* this is part of draw_label() method, we cannot wait with setting up
  * _widthRaw until draw_label(), which is called from paint()
  * because ... see next comment */
@@ -99,16 +82,29 @@ HEditControl::HEditControl( HWindow* parent_,
 	if ( length >= _widthRaw ) {
 		_cursorPosition = _widthRaw - 1;
 		_controlOffset = ( length - _widthRaw ) + 1;
-	} else
+	} else {
 		_cursorPosition = length;
-#ifdef __DEBUG__
-#endif /* __DEBUG__ */
+	}
 	return;
 	M_EPILOG
 }
 
 HEditControl::~HEditControl( void ) {
 	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HEditControl::set_pattern( yaal::hcore::HString const& mask_ ) {
+	M_PROLOG
+	int errorCode( 0 );
+	if ( ( errorCode = _pattern.parse_re( mask_ ) ) ) {
+		M_THROW( _pattern.error(), errorCode );
+	}
+	( _pattern.find( _string ) == _pattern.end() ) && ( errorCode = _pattern.error_code() );
+	if ( errorCode ) {
+		M_THROW( _pattern.error(), errorCode );
+	}
 	return;
 	M_EPILOG
 }
@@ -150,6 +146,54 @@ void HEditControl::set_flags( bool replace_, bool password_ ) {
 	M_PROLOG
 	_replace = replace_;
 	_password = password_;
+	return;
+	M_EPILOG
+}
+
+void HEditControl::set_bits( int const* maxlen,
+							yaal::hcore::HString const* val, yaal::hcore::HString const* mask,
+							bool const* replace, bool const* multiline,
+							bool const* readonly, bool const* rightAlign,
+							bool const* password, int const* maxhist ) {
+	M_PROLOG
+	bool wantRepaint( false );
+	if ( maxlen ) {
+		if ( *maxlen < 1 )
+			M_THROW( _( "buffer size is ridiculously low" ), *maxlen );
+		_maxStringSize = *maxlen;
+	}
+	if ( val ) {
+		int length( static_cast<int>( val->get_length() ) );
+		if ( length > _maxStringSize )
+			M_THROW( _( "initial value too big" ), length - _maxStringSize );
+		set_text( *val );
+	}
+	if ( mask ) {
+		set_pattern( *mask );
+	}
+	if ( replace ) {
+		_replace = *replace;
+	}
+	if ( multiline ) {
+		_multiLine = *multiline;
+	}
+	if ( readonly ) {
+		_readOnly = *readonly;
+	}
+	if ( rightAlign ) {
+		wantRepaint = true;
+		_rightAligned = *rightAlign;
+	}
+	if ( password ) {
+		_password = *password;
+		wantRepaint = true;
+	}
+	if ( maxhist ) {
+		_maxHistoryLevel = *maxhist;
+	}
+	if ( wantRepaint ) {
+		schedule_repaint();
+	}
 	return;
 	M_EPILOG
 }
@@ -544,6 +588,122 @@ bool HEditControl::do_click( mouse::OMouse & mouse_ ) {
 		}
 	}
 	return ( handled );
+	M_EPILOG
+}
+
+HEditControlAttrubites::HEditControlAttrubites( void )
+	: HControlAttributes(),
+	_replace( false ),
+	_replaceSet( false ),
+	_multiLine( false ),
+	_multiLineSet( false ),
+	_readOnly( false ),
+	_readOnlySet( false ),
+	_rightAligned( false ),
+	_rightAlignedSet( false ),
+	_password( false ),
+	_passwordSet( false ),
+	_maxStringSize( 127 ),
+	_maxStringSizeSet( false ),
+	_maxHistoryLevel( 8 ),
+	_maxHistoryLevelSet( false ),
+	_pattern( _maskDefault_ ),
+	_patternSet( false ),
+	_text( _maskDefault_ ),
+	_textSet( false ) {
+	return;
+}
+
+void HEditControlAttrubites::do_apply( HControl& control_ ) const {
+	M_PROLOG
+	HEditControl* control( dynamic_cast<HEditControl*>( &control_ ) );
+	if ( control ) {
+		control->set_bits(
+				_maxStringSizeSet   ? &_maxStringSize   : NULL,
+				_textSet            ? &_text            : NULL,
+				_patternSet         ? &_pattern         : NULL,
+				_replaceSet         ? &_replace         : NULL,
+				_multiLineSet       ? &_multiLine       : NULL,
+				_readOnlySet        ? &_readOnly        : NULL,
+				_rightAlignedSet    ? &_rightAligned    : NULL,
+				_passwordSet        ? &_password        : NULL,
+				_maxHistoryLevelSet ? &_maxHistoryLevel : NULL
+		);
+	}
+	HControlAttributes::do_apply( control_ );
+	return;
+	M_EPILOG
+}
+
+HEditControlAttrubites& HEditControlAttrubites::replace( bool replace_ ) {
+	M_PROLOG
+	_replace = replace_;
+	_replaceSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HEditControlAttrubites& HEditControlAttrubites::multiline( bool multiline_ ) {
+	M_PROLOG
+	_multiLine = multiline_;
+	_multiLineSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HEditControlAttrubites& HEditControlAttrubites::readonly( bool readonly_ ) {
+	M_PROLOG
+	_readOnly = readonly_;
+	_readOnlySet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HEditControlAttrubites& HEditControlAttrubites::rightaligned( bool rightaligned_ ) {
+	M_PROLOG
+	_rightAligned = rightaligned_;
+	_rightAlignedSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HEditControlAttrubites& HEditControlAttrubites::password( bool password_ ) {
+	M_PROLOG
+	_password = password_;
+	_passwordSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HEditControlAttrubites& HEditControlAttrubites::max_string_size( int maxStringSize_ ) {
+	M_PROLOG
+	_maxStringSize = maxStringSize_;
+	_maxStringSizeSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HEditControlAttrubites& HEditControlAttrubites::max_history_level( int maxHistoryLevel_ ) {
+	M_PROLOG
+	_maxHistoryLevel = maxHistoryLevel_;
+	_maxHistoryLevelSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HEditControlAttrubites& HEditControlAttrubites::pattern( yaal::hcore::HString const& pattern_ ) {
+	M_PROLOG
+	_pattern = pattern_;
+	_patternSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HEditControlAttrubites& HEditControlAttrubites::text( yaal::hcore::HString const& text_ ) {
+	M_PROLOG
+	_text = text_;
+	_textSet = true;
+	return ( *this );
 	M_EPILOG
 }
 

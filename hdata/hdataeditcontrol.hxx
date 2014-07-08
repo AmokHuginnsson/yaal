@@ -43,21 +43,13 @@ namespace hdata {
  */
 class HDataEditControl : public HDataControl, public virtual hconsole::HEditControl {
 public:
-	HDataEditControl( HDataWindow *,					/* parent */
-								int,								/* top ( parent relative ) */
-								int,								/* left */
-								int,								/* height */
-								int,								/* width */
-								char const * = "",	/* label */
-								int = 127,					/* maximum string length */
-								char const * = "",	/* initial content */
-								char const * = yaal::hconsole::_maskDefault_, /* mask */
-								bool = false,				/* replace */
-								bool = false,				/* multiline */
-								bool = false,				/* read only */
-								bool = false,				/* right alignment */
-								bool = false,				/* password */
-								int = 8 );						/* max history level */
+	HDataEditControl( HDataWindow*, /* parent */
+			int, /* top ( parent relative ) */
+			int, /* left */
+			int, /* height */
+			int, /* width */
+			char const * = "", /* label */
+			hconsole::HControlAttributesInterface const& = hconsole::HControlAttributesInterface() );
 	virtual int do_process_input( int );
 };
 

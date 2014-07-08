@@ -146,19 +146,21 @@ bool HWindow::handler_jump_tab( HEvent const& ) {
 bool HWindow::handler_jump_direct( HEvent const& event_ ) {
 	M_PROLOG
 	M_ASSERT( event_.get_type() == HEvent::TYPE::KEY_PRESS );
-	HKeyPressEvent const& keyPress( static_cast<HKeyPressEvent const&>( event_ ) );
-	/* call below is _magic_, HControlList::next_enabled() takes char as an
-	 * argument, so code_ & 0x0ff is passed into the function,
-	 * code_ is consrtructed from ordinary char by KEY_META_ macro,
-	 * see console.h for details */
-	HControlList::model_t::cyclic_iterator it = _focusedChild;
 	bool consumed( false );
-	if ( keyPress.get_key_code() & 0x0ff00 ) {
-		_controls.next_enabled( static_cast<char>( keyPress.get_key_code() ) );
-		if ( _focusedChild != it ) {
-			consumed = true;
+	if ( *_focusedChild != _statusBar ) {
+		HKeyPressEvent const& keyPress( static_cast<HKeyPressEvent const&>( event_ ) );
+		/* call below is _magic_, HControlList::next_enabled() takes char as an
+		 * argument, so code_ & 0x0ff is passed into the function,
+		 * code_ is consrtructed from ordinary char by KEY_META_ macro,
+		 * see console.h for details */
+		HControlList::model_t::cyclic_iterator it = _focusedChild;
+		if ( keyPress.get_key_code() & 0x0ff00 ) {
+			_controls.next_enabled( static_cast<char>( keyPress.get_key_code() ) );
+			if ( _focusedChild != it ) {
+				consumed = true;
+			}
+			_tuiProcess->schedule_repaint();
 		}
-		_tuiProcess->schedule_repaint();
 	}
 	return ( consumed );
 	M_EPILOG

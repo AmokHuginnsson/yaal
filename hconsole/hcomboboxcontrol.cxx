@@ -41,13 +41,12 @@ HComboboxControl::HComboboxControl ( HWindow * parent_,
 		int row_, int column_, int height_, int width_,
 		char const * label_, int droppedWidth_,
 		int maxLength_, char const * mask_, bool searchable_ )
-								: HControl ( parent_, row_, column_, height_,
-										width_, label_ ),
-									HEditControl ( NULL, 0, 0, 0, 0, NULL, maxLength_, "",
-											mask_ ),
-									HSearchableControl ( searchable_ ),
-									HListControl ( NULL, 0, 0, 0, 0, NULL ),
-									_mode ( MODE::EDITCONTROL ), _droppedWidth ( droppedWidth_ ) {
+	: HControl ( parent_, row_, column_, height_,
+			width_, label_ ),
+		HEditControl( NULL, 0, 0, 0, 0, NULL, HEditControlAttrubites().max_string_size( maxLength_ ).pattern(mask_ ) ),
+		HSearchableControl( searchable_ ),
+		HListControl ( NULL, 0, 0, 0, 0, NULL ),
+		_mode ( MODE::EDITCONTROL ), _droppedWidth ( droppedWidth_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -89,7 +88,7 @@ void HComboboxControl::do_paint( void ) {
 		width = _width;
 		_width = _droppedWidth;
 		int size = static_cast<int>( _controler->size() );
-		int hR = ( _drawLabel ? 1 : 0 ) + ( _drawHeader && ! _singleLine ? 1 : 0 );
+		int hR = ( _drawLabel ? 1 : 0 ) + ( _drawHeader && ( _labelPosition == LABEL::POSITION::STACKED ) ? 1 : 0 );
 		if ( size < ( _height - hR ) )
 			_height = size + hR;
 		HListControl::do_paint();

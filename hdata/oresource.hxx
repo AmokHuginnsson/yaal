@@ -113,6 +113,7 @@ struct OResource {
 	int			_height;						/*!< height of control */
 	int			_width;							/*!< width of control */
 	char const*	_label;			/*!< control label */
+	bool _labelStacked;
 	OAttributes*	_attributes;	/*!< control's attributes */
 /* relative functionality configuration options */
 	DATACONTROL_BITS::ROLE::role_t	_role;		/*!< tell how control should be treaded */

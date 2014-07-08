@@ -43,44 +43,57 @@ namespace yaal {
 
 namespace hconsole {
 
+static int const LABEL_DECORATION_SIZE( static_cast<int>( sizeof ( "  :" ) - 1 ) );
+
 HControl::OAttribute const HControl::DEFAULT_ATTRS = { -1, -1 };
 bool HControl::OAttribute::operator == ( OAttribute const& attr_ ) const {
 	return ( ( _label == attr_._label ) && ( _data == attr_._data ) );
 }
 
 HControl::HControl( HWindow* parent_, int row_, int column_,
-										 int height_, int width_, char const* label_ )
+		int height_, int width_, char const* label_,
+		HControlAttributesInterface const& attr_ )
 	: _enabled( false ), _focused( false ), _drawLabel( true ),
-	_singleLine( false ), _attributeDisabled( _attributeDisabled_ ),
+	_labelPosition( LABEL::POSITION::STACKED ),
+	_labelDecoration( LABEL::DECORATION::AUTO ),
+	_attributeDisabled( _attributeDisabled_ ),
 	_attributeEnabled( _attributeEnabled_ ),
-	_attributeFocused( _attributeFocused_ ), _row( row_ ), _column( column_ ),
+	_attributeFocused( _attributeFocused_ ),
+	_row( row_ ), _column( column_ ),
 	_height( height_ ), _width( width_ ), _rowRaw( 0 ),
 	_columnRaw( 0 ), _heightRaw( 0 ), _widthRaw( 0 ),
 	_label( label_ ), _varTmpBuffer(), _window( parent_ ),
 	_labelLength( 0 ), _shortcutIndex( 0 ), _valid( false ), _needRepaint( false ) {
 	M_PROLOG
-	if ( ! HConsole::get_instance().is_enabled() )
-		M_THROW ( "not in curses mode.", errno );
-	if ( ! parent_ )
-		M_THROW ( "no parent window.", reinterpret_cast<int long>( parent_ ) );
+	if ( ! HConsole::get_instance().is_enabled() ) {
+		M_THROW( "not in curses mode.", errno );
+	}
+	if ( ! parent_ ) {
+		M_THROW( "no parent window.", reinterpret_cast<int long>( parent_ ) );
+	}
 	_shortcutIndex = static_cast<int>( _label.find( '&' ) );
 	if ( _shortcutIndex > -1 ) {
 		_label.set_at( _shortcutIndex, 0 );
 		_label += label_ + _shortcutIndex + 1;
-	} else
+	} else {
 		_shortcutIndex = 0;
+	}
 	_labelLength = label_ ? static_cast<int>( _label.get_length() ) : 0;
 	if ( _labelLength ) {
-		if ( _label[ _labelLength - 1 ] != '\n' )
-			_singleLine = true;
-		else {
-			_singleLine = false;
+		if ( _label[ _labelLength - 1 ] != '\n' ) {
+			_labelPosition = LABEL::POSITION::SIDE_BY_SIDE;
+		} else {
+			_labelPosition = LABEL::POSITION::STACKED;
 			_label.set_at( -- _labelLength, 0 );
 		}
-	} else
-		_singleLine = true;
-	_window->add_control( HControl::ptr_t ( this ),
-				KEY<>::meta_r ( _label [ _shortcutIndex ] ) );
+		if ( _labelDecoration == LABEL::DECORATION::AUTO ) {
+			_labelLength += LABEL_DECORATION_SIZE;
+		}
+	} else {
+		_labelPosition = LABEL::POSITION::SIDE_BY_SIDE;
+	}
+	set_attributes( attr_ );
+	_window->add_control( HControl::ptr_t( this ), KEY<>::meta_r( _label[ _shortcutIndex ] ) );
 	return;
 	M_EPILOG
 }
@@ -213,15 +226,74 @@ void HControl::do_draw_label( void ) {
 		return;
 	}
 	set_attr_label();
-	cons.mvprintf( _rowRaw, _columnRaw, _label.raw() );
+	int col( _columnRaw );
+	if ( _labelDecoration == LABEL::DECORATION::AUTO ) {
+		cons.mvprintf( _rowRaw, col, " %*c: ", _labelLength - LABEL_DECORATION_SIZE, ' ' );
+		++ col;
+	}
+
+	cons.mvprintf( _rowRaw, col, _label.raw() );
 	set_attr_shortcut();
-	cons.mvprintf( _rowRaw, _columnRaw + _shortcutIndex,
+	cons.mvprintf( _rowRaw, col + _shortcutIndex,
 				"%c", _label[ _shortcutIndex ] );
 	set_attr_data();
-	if ( _singleLine )
-		_columnRaw += _labelLength, _widthRaw -= _labelLength;
-	else
+	if ( _labelPosition == LABEL::POSITION::SIDE_BY_SIDE ) {
+		_columnRaw += _labelLength;
+		if ( _width < 0 ) {
+			_widthRaw -= _labelLength;
+		}
+	} else {
 		_rowRaw ++, _heightRaw --;
+	}
+	if ( ( _columnRaw + _widthRaw ) >= cons.get_width() ) {
+		_widthRaw = cons.get_width() - _columnRaw;
+	}
+	if ( ( _rowRaw + _heightRaw ) >= cons.get_height() ) {
+		_heightRaw = cons.get_height() - _heightRaw;
+	}
+	return;
+	M_EPILOG
+}
+
+void HControl::set_attributes( HControlAttributesInterface const& attr_ ) {
+	M_PROLOG
+	attr_.apply( *this );
+	return;
+	M_EPILOG
+}
+
+void HControl::set_attribute_enabled( OAttribute attribute_ ) {
+	M_PROLOG
+	if ( attribute_ == DEFAULT_ATTRS ) {
+		_attributeEnabled = _attributeEnabled_;
+	} else {
+		_attributeEnabled = attribute_;
+	}
+	schedule_repaint();
+	return;
+	M_EPILOG
+}
+
+void HControl::set_attribute_disabled( OAttribute attribute_ ) {
+	M_PROLOG
+	if ( attribute_ == DEFAULT_ATTRS ) {
+		_attributeDisabled = _attributeDisabled_;
+	} else {
+		_attributeDisabled = attribute_;
+	}
+	schedule_repaint();
+	return;
+	M_EPILOG
+}
+
+void HControl::set_attribute_focused( OAttribute attribute_ ) {
+	M_PROLOG
+	if ( attribute_ == DEFAULT_ATTRS ) {
+		_attributeFocused = _attributeFocused_;
+	} else {
+		_attributeFocused = attribute_;
+	}
+	schedule_repaint();
 	return;
 	M_EPILOG
 }
@@ -229,19 +301,9 @@ void HControl::do_draw_label( void ) {
 void HControl::set_attributes( OAttribute attributeDisabled_,
 		OAttribute attributeEnabled_, OAttribute attributeFocused_ ) {
 	M_PROLOG
-	if ( attributeDisabled_ == DEFAULT_ATTRS )
-		_attributeDisabled = _attributeDisabled_;
-	else
-		_attributeDisabled = attributeDisabled_;
-	if ( attributeEnabled_ == DEFAULT_ATTRS )
-		_attributeEnabled = _attributeEnabled_;
-	else
-		_attributeEnabled = attributeEnabled_;
-	if ( attributeFocused_ == DEFAULT_ATTRS )
-		_attributeFocused = _attributeFocused_;
-	else
-		_attributeFocused = attributeFocused_;
-	schedule_repaint();
+	set_attribute_enabled( attributeEnabled_ );
+	set_attribute_disabled( attributeDisabled_ );
+	set_attribute_focused( attributeFocused_ );
 	return;
 	M_EPILOG
 }
@@ -355,14 +417,39 @@ void HControl::set_attr_data( void ) const {
 }
 
 void HControl::set_draw_label( bool drawLabel_ ) {
+	M_PROLOG
 	_drawLabel = drawLabel_;
+	schedule_repaint();
 	return;
+	M_EPILOG
+}
+
+void HControl::set_label_position( LABEL::POSITION::label_position_t labelPosition_ ) {
+	M_PROLOG
+	_labelPosition = labelPosition_;
+	schedule_repaint();
+	return;
+	M_EPILOG
+}
+
+void HControl::set_label_decoration( LABEL::DECORATION::decoration_t decoration_ ) {
+	M_PROLOG
+	_labelDecoration = decoration_;
+	_labelLength = static_cast<int>( _label.get_size() );
+	if ( _labelDecoration == LABEL::DECORATION::AUTO ) {
+		_labelLength += LABEL_DECORATION_SIZE;
+	}
+	schedule_repaint();
+	return;
+	M_EPILOG
 }
 
 void HControl::schedule_repaint( void ) {
+	M_PROLOG
 	_needRepaint = true;
 	_window->schedule_repaint( false );
 	return;
+	M_EPILOG
 }
 
 void HControl::invalidate( void ) {
@@ -376,6 +463,89 @@ bool HControl::need_repaint( void ) const {
 
 yaal::hcore::HString const& HControl::get_label( void ) const {
 	return ( _label );
+}
+
+void HControlAttributesInterface::apply( HControl& control_ ) const {
+	M_PROLOG
+	do_apply( control_ );
+	return;
+	M_EPILOG
+}
+
+HControlAttributes::HControlAttributes( void )
+	: _drawLabel( true ),
+	_drawLabelSet( false ),
+	_labelPosition( HControl::LABEL::POSITION::STACKED ),
+	_labelPositionSet( false ),
+	_labelDecoration( HControl::LABEL::DECORATION::AUTO ),
+	_labelDecorationSet( false ),
+	_attributeDisabled( _attributeDisabled_ ),
+	_attributeDisabledSet( false ),
+	_attributeEnabled( _attributeEnabled_ ),
+	_attributeEnabledSet( false ),
+	_attributeFocused( _attributeFocused_ ),
+	_attributeFocusedSet( false ) {
+	return;
+}
+
+HControlAttributes& HControlAttributes::draw_label( bool drawLabel_ ) {
+	_drawLabel = drawLabel_;
+	_drawLabelSet = true;
+	return ( *this );
+}
+
+HControlAttributes& HControlAttributes::label_position( HControl::LABEL::POSITION::label_position_t labelPosition_ ) {
+	_labelPosition = labelPosition_;
+	_labelPositionSet = true;
+	return ( *this );
+}
+
+HControlAttributes& HControlAttributes::label_decoration( HControl::LABEL::DECORATION::decoration_t decoration_ ) {
+	_labelDecoration = decoration_;
+	_labelDecorationSet = true;
+	return ( *this );
+}
+
+HControlAttributes& HControlAttributes::attribure_enabled( HControl::OAttribute const& attributeEnabled_ ) {
+	_attributeEnabled = attributeEnabled_;
+	_attributeEnabledSet = true;
+	return ( *this );
+}
+
+HControlAttributes& HControlAttributes::attribure_disabled( HControl::OAttribute const& attributeDisabled_ ) {
+	_attributeDisabled = attributeDisabled_;
+	_attributeDisabledSet = true;
+	return ( *this );
+}
+
+HControlAttributes& HControlAttributes::attribure_focused( HControl::OAttribute const& attributeFocused_ ) {
+	_attributeFocused = attributeFocused_;
+	_attributeFocusedSet = true;
+	return ( *this );
+}
+
+void HControlAttributes::do_apply( yaal::hconsole::HControl& control_ ) const {
+	M_PROLOG
+	if ( _drawLabelSet ) {
+		control_.set_draw_label( _drawLabel );
+	}
+	if ( _labelPositionSet ) {
+		control_.set_label_position( _labelPosition );
+	}
+	if ( _labelDecorationSet ) {
+		control_.set_label_decoration( _labelDecoration );
+	}
+	if ( _attributeEnabledSet ) {
+		control_.set_attribute_enabled( _attributeEnabled );
+	}
+	if ( _attributeDisabledSet ) {
+		control_.set_attribute_disabled( _attributeDisabled );
+	}
+	if ( _attributeFocusedSet ) {
+		control_.set_attribute_focused( _attributeFocused );
+	}
+	return;
+	M_EPILOG
 }
 
 }

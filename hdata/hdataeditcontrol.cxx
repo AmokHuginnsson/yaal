@@ -41,19 +41,10 @@ namespace hdata {
 
 HDataEditControl::HDataEditControl( HDataWindow * parent_,
 		int row_, int column_, int height_, int width_,
-		char const * label_, int bufferSize_, char const * value_,
-		char const * mask_, bool replace_, bool multiLine_,
-		bool readOnly_, bool rightAligned_,
-		bool password_, int maxHistoryLevel_ )
-								:	HControl ( parent_, row_, column_, height_,
-										width_, label_ ),
-									HEditControl( parent_,
-										row_, column_, height_, width_,
-										label_, bufferSize_, value_,
-										mask_, replace_, multiLine_,
-										readOnly_, rightAligned_,
-										password_, maxHistoryLevel_ ),
-									HDataControl() {
+		char const* label_, HControlAttributesInterface const& attr_ )
+	:	HControl ( parent_, row_, column_, height_, width_, label_, attr_ ),
+		HEditControl( parent_, row_, column_, height_, width_, label_, attr_ ),
+		HDataControl() {
 	M_PROLOG
 	return;
 	M_EPILOG

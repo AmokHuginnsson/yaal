@@ -211,7 +211,7 @@ void HListControl::draw_header( int columns_ ) {
 			}
 		}
 	}
-	if ( ! _singleLine ) {
+	if ( _labelPosition == LABEL::POSITION::STACKED ) {
 		_varTmpBuffer.format( " %d/%d ", _controlOffset + _cursorPosition + 1, static_cast<int>( _controler->size() ) );
 		if ( _labelLength < _widthRaw ) {
 			int clip = static_cast<int>( ( ( _widthRaw - _labelLength ) < _varTmpBuffer.get_length() ) ? _varTmpBuffer.get_length() - ( _widthRaw - _labelLength ) : 0 );

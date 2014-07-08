@@ -38,6 +38,14 @@ namespace hconsole {
 
 class HWindow;
 
+class HControl;
+class HControlAttributesInterface {
+public:
+	void apply( HControl& ) const;
+private:
+	virtual void do_apply( HControl& ) const {}
+};
+
 /*! \brief Base class for all TUI control classes.
  *
  * This class is a common interface for all TUI control classes.
@@ -59,10 +67,30 @@ public:
 			/*! \brief Align type.
 			 */
 			typedef enum {
-				LEFT, /*!< text ought to be left aligned */
+				LEFT,   /*!< text ought to be left aligned */
 				CENTER, /*!< text ought to be centered */
-				RIGHT /*!< text ought to be right aligned */
+				RIGHT   /*!< text ought to be right aligned */
 			} align_t;
+		};
+	};
+	/*! \brief How control label should be painted.
+	 */
+	struct LABEL {
+		/*! \brief Where should label be painted relative to control contents.
+		 */
+		struct POSITION {
+			/*! \brief Possible label positions relative to control contents.
+			 */
+			typedef enum {
+				SIDE_BY_SIDE, /*!< Label is on the left of control contents. */
+				STACKED       /*!< Label is drawn above of the control contents (TY aerofoam). */
+			} label_position_t;
+		};
+		struct DECORATION {
+			typedef enum {
+				AUTO,
+				EXPLICIT
+			} decoration_t;
 		};
 	};
 	static OAttribute const DEFAULT_ATTRS; /*!< Default HControl attribites (colors of label and data fore/back-ground) */
@@ -71,7 +99,8 @@ protected:
 	bool _enabled;    /*!< Tells if control is enabled, focus can go only to enabled control. */
 	bool _focused;    /*!< Tells if control has focus. */
 	bool _drawLabel;  /*!< Will be label driven? */
-	bool _singleLine; /*!< Is label in the same line as top of control? */
+	LABEL::POSITION::label_position_t _labelPosition; /*!< Is label in the same line as top of control? */
+	LABEL::DECORATION::decoration_t _labelDecoration; /*!< Should this label be auto-decorated? */
 	/** \name Control attributes.
 	 * High byte of attribute, in all
 	 * three cases keeps label (control title)
@@ -114,8 +143,10 @@ public:
  * \param height - Height or coorinate of bottom of control.
  * \param width - Width or coorinate of right of control.
  * \param label - Control title.
+ * \param attributes - Additional attributes for this control.
  */
-	HControl( HWindow* parent, int row, int col, int height, int width, char const* label );
+	HControl( HWindow* parent, int row, int col, int height, int width, char const* label,
+			HControlAttributesInterface const& attributes = HControlAttributesInterface() );
 
 /** \brief Control destructor.
  *
@@ -211,6 +242,51 @@ public:
  */
 	bool hit_test( int row, int col ) const;
 
+/*! \brief Set optional control attributes.
+ *
+ * \param attributes - Optional attributes to set for this control.
+ */
+	void set_attributes( HControlAttributesInterface const& attributes );
+
+/*! \brief Set foreground/background colors for an enabled control.
+ *
+ * Attribute holds information about foreground/background colors of three
+ * specific parts of a control.
+ *
+ * Those parts are:
+ *  - label
+ *  - data
+ *
+ * \param attribute - Colors for control in enabled state.
+ */
+	void set_attribute_enabled( OAttribute attribute );
+
+/*! \brief Set foreground/background colors for an disabled control.
+ *
+ * Attribute holds information about foreground/background colors of three
+ * specific parts of a control.
+ *
+ * Those parts are:
+ *  - label
+ *  - data
+ *
+ * \param attribute - Colors for control in disabled state.
+ */
+	void set_attribute_disabled( OAttribute attribute );
+
+/*! \brief Set foreground/background colors for an enabled control in focused state.
+ *
+ * Attribute holds information about foreground/background colors of three
+ * specific parts of a control.
+ *
+ * Those parts are:
+ *  - label
+ *  - data
+ *
+ * \param attribute - Colors for control in focused state.
+ */
+	void set_attribute_focused( OAttribute attribute );
+
 /*! \brief Set various foreground/background colors for a control.
  *
  * Each attribute holds information about foreground/background colors of three
@@ -233,6 +309,18 @@ public:
  * \param draw - If set to true the label is drawn.
  */
 	void set_draw_label( bool draw );
+
+/*! \brief Set label position.
+ *
+ * \param labelPosition - New position for label in this control.
+ */
+	void set_label_position( LABEL::POSITION::label_position_t labelPosition );
+
+/*! \brief Set label decoraton mode.
+ *
+ * \param decoration - New decoration mode for label in this control.
+ */
+	void set_label_decoration( LABEL::DECORATION::decoration_t decoration );
 
 /*! \brief Set new coordinates and size for a control.
  *
@@ -298,6 +386,31 @@ private:
 };
 
 typedef yaal::hcore::HExceptionT<HControl> HControlException;
+
+class HControlAttributes : public HControlAttributesInterface {
+	bool _drawLabel;
+	bool _drawLabelSet;
+	HControl::LABEL::POSITION::label_position_t _labelPosition;
+	bool _labelPositionSet;
+	HControl::LABEL::DECORATION::decoration_t _labelDecoration;
+	bool _labelDecorationSet;
+	HControl::OAttribute _attributeDisabled;
+	bool _attributeDisabledSet;
+	HControl::OAttribute _attributeEnabled;
+	bool _attributeEnabledSet;
+	HControl::OAttribute _attributeFocused;
+	bool _attributeFocusedSet;
+protected:
+	virtual void do_apply( HControl& ) const;
+public:
+	HControlAttributes( void );
+	HControlAttributes& draw_label( bool );
+	HControlAttributes& label_position( HControl::LABEL::POSITION::label_position_t );
+	HControlAttributes& label_decoration( HControl::LABEL::DECORATION::decoration_t );
+	HControlAttributes& attribure_enabled( HControl::OAttribute const& );
+	HControlAttributes& attribure_disabled( HControl::OAttribute const& );
+	HControlAttributes& attribure_focused( HControl::OAttribute const& );
+};
 
 }
 

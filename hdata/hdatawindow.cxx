@@ -110,14 +110,22 @@ int HDataWindow::init( void ) {
 				editControlResource._rightAligned = false;
 				editControlResource._password = false;
 				editControlResource._maxHistoryLevel = 8;
-				if ( r._typeSpecific )
+				if ( r._typeSpecific ) {
 					ecr = static_cast<OEditControlResource*>( r._typeSpecific );
+				}
+
 				dataControl = new ( memory::yaal ) HDataEditControl( this,
-						M_SETUP_STANDARD, ecr->_maxStringSize, ecr->_value,
-						ecr->_mask, ecr->_replace,
-						ecr->_multiLine, ecr->_readOnly,
-						ecr->_rightAligned, ecr->_password,
-						ecr->_maxHistoryLevel );
+						M_SETUP_STANDARD,
+						HEditControlAttrubites()
+						.max_string_size( ecr->_maxStringSize )
+						.text( ecr->_value )
+						.pattern( ecr->_mask )
+						.replace( ecr->_replace )
+						.multiline( ecr->_multiLine )
+						.readonly( ecr->_readOnly )
+						.rightaligned( ecr->_rightAligned )
+						.password( ecr->_password )
+						.max_history_level( ecr->_maxHistoryLevel ) );
 			}
 			break;
 			case ( DATACONTROL_BITS::TYPE::LIST ): {
@@ -152,6 +160,7 @@ int HDataWindow::init( void ) {
 			dataControl->set_attributes( attr->_disabledAttribute,
 					attr->_enabledAttribute,
 					attr->_focusedAttribute );
+			dataControl->set_label_position( r._labelStacked ? HControl::LABEL::POSITION::STACKED : HControl::LABEL::POSITION::SIDE_BY_SIDE );
 			dataControl->set_resource( &r );
 		}
 		switch ( r._role ) {
