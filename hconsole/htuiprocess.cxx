@@ -78,7 +78,7 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 	_dispatcher.register_file_descriptor_handler( STDIN_FILENO, call( &HTUIProcess::process_stdin, this, _1 ) );
 	HConsole& cons = HConsole::get_instance();
 	int mouseDes( cons.get_mouse_fd() );
-	if ( _useMouse_ && mouseDes )
+	if ( _useMouse_ && ( mouseDes >= 0 ) )
 		_dispatcher.register_file_descriptor_handler( mouseDes, call( &HTUIProcess::process_mouse, this, _1 ) );
 	_dispatcher.register_file_descriptor_handler( cons.get_event_fd(), call( &HTUIProcess::process_terminal_event, this, _1 ) );
 	_dispatcher.add_alert_handle( call( &HTUIProcess::handler_alert, this ) );
