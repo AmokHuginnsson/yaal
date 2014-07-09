@@ -41,6 +41,7 @@ class HWindow;
 class HControl;
 class HControlAttributesInterface {
 public:
+	virtual ~HControlAttributesInterface( void ) {}
 	void apply( HControl& ) const;
 private:
 	virtual void do_apply( HControl& ) const {}
