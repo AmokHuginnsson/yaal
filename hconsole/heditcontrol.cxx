@@ -429,7 +429,7 @@ int HEditControl::update_from_history( void ) {
 	M_EPILOG
 }
 
-int HEditControl::do_process_input ( int code_ ) {
+int HEditControl::do_process_input( int code_ ) {
 	M_PROLOG
 	static int const HISTORY_OPERATION = -1;
 	static int const DATA_ENTER = -2;
@@ -464,16 +464,19 @@ int HEditControl::do_process_input ( int code_ ) {
 		case ( '\t' ):
 		/* enter works like tab without focus movement */
 		case ( '\r' ): {
-			errorCode = static_cast<int>( _history.size() );
-			errorCode ++;
-			while ( -- errorCode )
-				if ( ( *( ++ _historyIt ) ) == _string )
+			int histSize( static_cast<int>( _history.size() ) );
+			++ histSize;
+			while ( -- histSize ) {
+				if ( ( *( ++ _historyIt ) ) == _string ) {
 					break;
-			if ( _string.get_length() && ( ! errorCode ) ) {
+				}
+			}
+			if ( _string.get_length() && ( ! histSize ) ) {
 				_history.push_front( _string );
-				errorCode = static_cast<int>( _history.size() );
-				while ( errorCode -- > _maxHistoryLevel )
+				histSize = static_cast<int>( _history.size() );
+				while ( histSize -- > _maxHistoryLevel ) {
 					_history.pop_back(); /* FIXME investigate if it actually work */
+				}
 				_historyIt = _history.hook();
 				-- _historyIt;
 			} else
@@ -524,14 +527,15 @@ int HEditControl::do_process_input ( int code_ ) {
 			errorCode = insert_char( code_, length );
 		break;
 	}
-	if ( errorCode == HISTORY_OPERATION )
+	if ( errorCode == HISTORY_OPERATION ) {
 		errorCode = update_from_history();
+	}
 	if ( ! errorCode ) {
 		_pattern.find( _varTmpBuffer.raw() );
 		errorCode = _pattern.error_code();
-		if ( errorCode )
+		if ( errorCode ) {
 			_window->status_bar()->message( COLORS::BG_BROWN, "%s", _pattern.error().raw() );
-		else {
+		} else {
 			code_ = errorCode;
 			_string = _varTmpBuffer;
 			_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );

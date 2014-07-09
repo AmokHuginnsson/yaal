@@ -76,7 +76,7 @@ HRegex::HRegex( void )
 }
 
 HRegex::HRegex( char const* const pattern_, compile_t flags_ )
-	: _initialized( false ), _pattern( pattern_ ), _compiled( sizeof ( regex_t ) ),
+	: _initialized( false ), _pattern(), _compiled( sizeof ( regex_t ) ),
 	_lastError( 0 ), _errorBuffer(), _errorCause(), _errorMessage() {
 	M_PROLOG
 	compile( pattern_, flags_ );
@@ -85,7 +85,7 @@ HRegex::HRegex( char const* const pattern_, compile_t flags_ )
 }
 
 HRegex::HRegex( HString const& pattern_, compile_t flags_ )
-	: _initialized( false ), _pattern( pattern_ ), _compiled( sizeof ( regex_t ) ),
+	: _initialized( false ), _pattern(), _compiled( sizeof ( regex_t ) ),
 	_lastError( 0 ), _errorBuffer(), _errorCause(), _errorMessage() {
 	M_PROLOG
 	compile( pattern_, flags_ );
@@ -131,6 +131,7 @@ bool HRegex::compile( char const* pattern_, compile_t flags_ ) {
 	_lastError = ::regcomp( _compiled.get<regex_t>(), pattern_, cflags );
 	if ( ! _lastError ) {
 		_initialized = true;
+		_pattern = pattern_;
 	} else {
 		_errorCause = pattern_;
 		_initialized = false;

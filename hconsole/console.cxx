@@ -47,7 +47,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hterminal.hxx"
 
 /* curses system header is poluted with huge number of macros
- * though it cannot be included at hte top together with rest of sane
+ * though it cannot be included at the top together with rest of sane
  * system headers. */
 
 #ifdef HAVE_CURSES_H

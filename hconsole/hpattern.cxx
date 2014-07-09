@@ -194,7 +194,10 @@ int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags )
 int HPattern::parse_re( HString const& pattern_ ) {
 	M_PROLOG
 	_errorCause.clear();
-	_regex.compile( pattern_, _ignoreCase ? HRegex::COMPILE::IGNORE_CASE : HRegex::COMPILE::DEFAULT );
+	if ( _regex.compile( pattern_, _ignoreCase ? HRegex::COMPILE::IGNORE_CASE : HRegex::COMPILE::DEFAULT ) ) {
+		_extended = true;
+		_simpleMatchLength = static_cast<int>( pattern_.get_length() );
+	}
 	return ( _regex.error_code() );
 	M_EPILOG
 }
