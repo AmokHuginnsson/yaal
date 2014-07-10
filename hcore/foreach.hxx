@@ -29,6 +29,9 @@ Copyright:
  * YAAL_FOREACH() gives for ( type x : col ) functionality to C++2003.
  */
 
+#ifndef YAAL_HCORE_FOREACH_HXX_INCLUDED
+#define YAAL_HCORE_FOREACH_HXX_INCLUDED 1
+
 #include "hcore/trait.hxx"
 
 namespace yaal {
@@ -91,19 +94,29 @@ typename iterator_type<collection_t>::iterator& auto_storage_pick( auto_storage_
 #else /* #if CXX_STANDARD >= 2011 */
 #	ifdef HAVE_DECLTYPE
 #		define YAAL_FOREACH( var, collection ) \
-		for ( yaal::foreach_helper::iterator_type<typeof ( collection )>::iterator YAAL_FOREACH_ID( it )( begin( collection ) ), \
+		if ( bool YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = false ) { \
+		} else for ( yaal::foreach_helper::iterator_type<typeof ( collection )>::iterator YAAL_FOREACH_ID( it )( begin( collection ) ), \
 				YAAL_FOREACH_ID( end )( end( collection ) ); \
-				YAAL_FOREACH_ID( it ) != YAAL_FOREACH_ID( end ); ++ YAAL_FOREACH_ID( it ) ) \
-			if ( bool YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = false ) { \
-			} else for ( var( *YAAL_FOREACH_ID( it ) ); ! YAAL_FOREACH_ID( _FOR_EACH_LOOP ); YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = true )
+				! YAAL_FOREACH_ID( _FOR_EACH_LOOP ) && ( YAAL_FOREACH_ID( it ) != YAAL_FOREACH_ID( end ) ) && ( YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = true ); \
+				++ YAAL_FOREACH_ID( it ) ) \
+			if ( bool YAAL_FOREACH_ID( _FOR_EACH_STEP ) = false ) { \
+			} else for ( var( *YAAL_FOREACH_ID( it ) ); ! YAAL_FOREACH_ID( _FOR_EACH_STEP ); \
+					YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = false, YAAL_FOREACH_ID( _FOR_EACH_STEP ) = true )
 #	else /* # ifdef HAVE_DECLTYPE */
 #		define YAAL_FOREACH( var, collection ) \
-		for ( yaal::foreach_helper::auto_storage_t YAAL_FOREACH_ID( it ) = yaal::foreach_helper::make_iterator( begin( collection ) ), \
+		if ( bool YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = false ) { \
+		} else for ( yaal::foreach_helper::auto_storage_t YAAL_FOREACH_ID( it ) = yaal::foreach_helper::make_iterator( begin( collection ) ), \
 				YAAL_FOREACH_ID( end ) = yaal::foreach_helper::make_iterator( end( collection ) ); \
-				yaal::foreach_helper::auto_storage_pick( YAAL_FOREACH_ID( it ), collection ) != yaal::foreach_helper::auto_storage_pick( YAAL_FOREACH_ID( end ), collection ); \
+				! YAAL_FOREACH_ID( _FOR_EACH_LOOP ) \
+				&& yaal::foreach_helper::auto_storage_pick( YAAL_FOREACH_ID( it ), collection ) \
+				!= yaal::foreach_helper::auto_storage_pick( YAAL_FOREACH_ID( end ), collection ) \
+				&& ( YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = true ); \
 				++ yaal::foreach_helper::auto_storage_pick( YAAL_FOREACH_ID( it ), collection ) ) \
-			if ( bool YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = false ) { \
-			} else for ( var( *yaal::foreach_helper::auto_storage_pick( YAAL_FOREACH_ID( it ), collection ) ); ! YAAL_FOREACH_ID( _FOR_EACH_LOOP ); YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = true )
+			if ( bool YAAL_FOREACH_ID( _FOR_EACH_STEP ) = false ) { \
+			} else for ( var( *yaal::foreach_helper::auto_storage_pick( YAAL_FOREACH_ID( it ), collection ) ); \
+					! YAAL_FOREACH_ID( _FOR_EACH_STEP ); YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = false, YAAL_FOREACH_ID( _FOR_EACH_STEP ) = true )
 #	endif /* #	else # ifdef HAVE_DECLTYPE */
 #endif /* #else #if CXX_STANDARD >= 2011 */
+
+#endif /* #ifndef YAAL_HCORE_FOREACH_HXX_INCLUDED */
 
