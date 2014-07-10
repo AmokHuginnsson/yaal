@@ -80,6 +80,8 @@ public:
 protected:
 	virtual void do_quit( void );
 	virtual void do_close_window( void );
+	void force_close_window( void );
+	void force_quit( void );
 private:
 	yaal::hconsole::OMenuItem* build_sub_menu( yaal::tools::HXml::HConstNodeProxy const&,
 			menu_handlers_map_t const& );

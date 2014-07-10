@@ -240,11 +240,20 @@ HString const& HWindow::get_title( void ) const {
 }
 
 void HWindow::schedule_repaint( bool wholeWindow_ ) {
+	M_PROLOG
 	if ( wholeWindow_ ) {
 		_needRepaint = true;
 	}
 	_tuiProcess->schedule_repaint();
 	return;
+	M_EPILOG
+}
+
+void HWindow::schedule_call( HTUIProcess::call_t call_ ) {
+	M_PROLOG
+	_tuiProcess->schedule_call( call_ );
+	return;
+	M_EPILOG
 }
 
 }

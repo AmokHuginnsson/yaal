@@ -310,7 +310,7 @@ void HStatusBarControl::bar( char const* bar_ ) {
 	set_attr_data();
 	if ( bar_ ) {
 		_varTmpBuffer.format( " %%-%ds ",
-				( cons.get_width() - _labelLength ) - ( _labelPosition == LABEL::POSITION::SIDE_BY_SIDE ? 2 : 1 ) );
+				( cons.get_width() - _labelLength ) - ( _labelPosition == LABEL::POSITION::SIDE_BY_SIDE ? 3 : 2 ) );
 		_message.format( _varTmpBuffer.raw(), bar_ );
 	}
 	cons.mvprintf( cons.get_height() - 2,
@@ -340,6 +340,21 @@ void HStatusBarControl::ask( char const* question_,
 	M_EPILOG
 }
 
+bool HStatusBarControl::dialog( yaal::hcore::HString const& answer_ ) {
+	M_PROLOG
+	M_ENSURE( _mode == PROMPT::DIALOG );
+	bool found( false );
+	for ( choices_t::const_iterator it( _choices.begin() ), end( _choices.end() ); it != end; ++ it ) {
+		if ( it->first == answer_ ) {
+			found = true;
+			_window->schedule_call( it->second );
+			break;
+		}
+	}
+	return ( found );
+	M_EPILOG
+}
+
 void HStatusBarControl::confirm( char const* question_,
 		HTUIProcess::call_t yes_, HTUIProcess::call_t no_ ) {
 	M_PROLOG
@@ -354,19 +369,23 @@ void HStatusBarControl::confirm( char const* question_,
 int HStatusBarControl::process_input_normal( int code_ ) {
 	M_PROLOG
 	int code = code_;
-	PROMPT::mode_t mode = _mode;
 	code_ = 0;
 	switch ( code ) {
 		case ( '\r' ): {
-			bool backwards( _prompt[ 0 ] == '?' );
-			end_prompt();
-			if ( mode == PROMPT::COMMAND )
+			if ( _mode == PROMPT::COMMAND ) {
 				_window->_command = _string;
-			else if ( mode == PROMPT::SEARCH ) {
+			} else if ( _mode == PROMPT::SEARCH ) {
+				bool backwards( _prompt[ 0 ] == '?' );
 				HSearchableControl* searchableControl( dynamic_cast<HSearchableControl*>( &(*(*_window->_previousFocusedChild)) ) );
-				if ( searchableControl )
+				if ( searchableControl ) {
 					searchableControl->search( _string, backwards );
+				}
+			} else if ( _mode == PROMPT::DIALOG ) {
+				if ( ! dialog( _string ) ) {
+					break;
+				}
 			}
+			end_prompt();
 		}
 		break;
 		case ( '\t' ):

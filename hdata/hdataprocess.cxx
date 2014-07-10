@@ -200,11 +200,18 @@ void HDataProcess::do_quit( void ) {
 			if ( window && window->is_modified() ) {
 				select( window );
 				handler_refresh( HKeyPressEvent( 'r' ) );
-				window->status_bar()->confirm( "exit program", call( &HTUIProcess::quit, this ), call( &dummy ) );
+				window->status_bar()->confirm( "exit program", call( &HDataProcess::force_quit, this ), call( &dummy ) );
 				return;
 			}
 		}
 	}
+	HTUIProcess::do_quit();
+	return;
+	M_EPILOG
+}
+
+void HDataProcess::force_quit( void ) {
+	M_PROLOG
 	HTUIProcess::do_quit();
 	return;
 	M_EPILOG
@@ -216,10 +223,17 @@ void HDataProcess::do_close_window( void ) {
 	if ( !! (*_foregroundWindow) ) {
 		window = dynamic_cast<HDataWindow*>( &*(*_foregroundWindow) );
 		if ( window && window->is_modified() ) {
-			window->status_bar()->confirm( "close window", call( &HTUIProcess::close_window, this ), call( &dummy ) );
+			window->status_bar()->confirm( "close window", call( &HDataProcess::force_close_window, this ), call( &dummy ) );
 			return;
 		}
 	}
+	HTUIProcess::do_close_window();
+	return;
+	M_EPILOG
+}
+
+void HDataProcess::force_close_window( void ) {
+	M_PROLOG
 	HTUIProcess::do_close_window();
 	return;
 	M_EPILOG

@@ -93,6 +93,7 @@ public:
  * \param wholeWindow_ - Schedule repaint for all controls in window.
  */
 	void schedule_repaint( bool wholeWindow_ );
+	void schedule_call( HTUIProcess::call_t );
 private:
 	friend bool HControl::set_focus( char );
 	friend void HStatusBarControl::set_prompt(  yaal::hcore::HString const&,

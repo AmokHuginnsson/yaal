@@ -95,6 +95,7 @@ public:
 	void bar( char const* = NULL );
 	void ask( char const*, choices_t const& );
 	void confirm( char const*, HTUIProcess::call_t, HTUIProcess::call_t );
+	bool dialog( yaal::hcore::HString const& );
 	virtual int process_input_normal( int );
 	virtual int process_input_menu( int );
 protected:
