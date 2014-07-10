@@ -40,11 +40,11 @@ namespace hconsole {
 HWindowListControl::HWindowListControl ( HWindow * parent_, int row_,
 		int column_, int height_, int width_, char const * label_,
 		HAbstractControler::ptr_t const& controler_, model_t::cyclic_iterator& foregroundWindow_ )
-									:	HControl ( parent_, row_, column_, height_,
-											width_, label_ ),
-										HSearchableControl( false ),
-										HListControl( parent_, row_, column_, height_,
-												width_, label_, controler_ ), _foregroundWindow( foregroundWindow_ ) {
+	:	HControl ( parent_, row_, column_, height_, width_, label_,
+			HControlAttributes().label_position( HControl::LABEL::POSITION::STACKED ) ),
+		HSearchableControl( false ),
+		HListControl( parent_, row_, column_, height_,
+				width_, label_, controler_ ), _foregroundWindow( foregroundWindow_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG

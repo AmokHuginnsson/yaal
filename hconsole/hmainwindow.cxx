@@ -64,11 +64,11 @@ int HMainWindow::init( void ) {
 		return ( 0 );
 	error = HWindow::init();
 	_menu = new ( memory::yaal ) HMenuControl( this, 1, 1, - 2,	- cons.get_width() / 2 - 1,
-			" &Menu \n" );
+			"&Menu" );
 	_menu->enable( true );
 	_menu->set_focus();
 	HWindowListControl* windowList = new ( memory::yaal ) HWindowListControl( this, 1,
-			- cons.get_width() / 2 + 1, - 2, - 1, " &Opened window list: \n",
+			- cons.get_width() / 2 + 1, - 2, - 1, "&Opened window list",
 			make_pointer<HListControler<HWindow::ptr_t> >( _windowList ),
 			_foregroundWindow );
 	windowList->add_column( -1, "&Okno", 1 );

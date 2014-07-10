@@ -59,7 +59,8 @@ int HMenuControl::load_sub_menu( tree_t::node_t node, OMenuItem* subMenu_ ) {
 HMenuControl::HMenuControl( HWindow* parent_,
 		int row_, int column_, int height_, int width_,
 		char const* label_ )
-	: HControl( parent_, row_, column_, height_, width_, label_ ),
+	: HControl( parent_, row_, column_, height_, width_, label_,
+			HControlAttributes().label_position( HControl::LABEL::POSITION::STACKED ) ),
 	HTreeControl( parent_, row_, column_, height_, width_, label_ ),
 	_process( NULL ) {
 	M_PROLOG
