@@ -56,7 +56,7 @@ HStatusBarControl::HStatusBarControl( HWindow* parent_,
 	_mode( PROMPT::NORMAL ),
 	_prompt(), _done( false ), _estimate( false ), _progressSize( 1 ),
 	_lastProgress( -1 ), _lastPercent( - 1 ), _lastMinute( 0 ),
-	_lastSecond( 0 ), _lastStep( 0 ),
+	_lastSecond( 0 ), _lastStep( 0 ), _currentChoice( -1 ),
 	_message( "" ), /* initialization of this field is required by bar() meth */
 	_start( HTime::LOCAL ), _choices() {
 	M_PROLOG
@@ -104,7 +104,22 @@ void HStatusBarControl::do_paint( void ) {
 		cons.set_attr( _statusBarAttribute >> 8 );
 		cons.mvprintf( _rowRaw, 0, _prompt.raw() );
 	}
-	HEditControl::do_paint();
+	if ( _mode != PROMPT::MENU ) {
+		HEditControl::do_paint();
+	} else {
+		int colRaw( _columnRaw );
+		int current( 0 );
+		YAAL_FOREACH ( choice_t const& c, _choices ) {
+			if ( current == _currentChoice ) {
+				cons.set_attr( _statusBarAttribute >> 8 );
+			} else {
+				cons.set_attr( COLORS::FG_LIGHTGRAY );
+			}
+			cons.mvprintf( _rowRaw, colRaw, "[%s] ", c.first.c_str() );
+			colRaw += ( static_cast<int>( c.first.get_length() ) + 3 );
+			++ current;
+		}
+	}
 	if ( ! _focused )
 		cons.move( origRow, origColumn );
 	if ( _statusBarAttribute & 0xff ) {
@@ -309,20 +324,25 @@ void HStatusBarControl::bar( char const* bar_ ) {
 	HConsole& cons = HConsole::get_instance();
 	set_attr_data();
 	if ( bar_ ) {
-		_varTmpBuffer.format( " %%-%ds ",
-				( cons.get_width() - _labelLength ) - ( _labelPosition == LABEL::POSITION::SIDE_BY_SIDE ? 3 : 2 ) );
-		_message.format( _varTmpBuffer.raw(), bar_ );
+		_message.format( "%-*s", cons.get_width() - ( _labelLength + 1 ), bar_ );
 	}
-	cons.mvprintf( cons.get_height() - 2,
-			_labelLength + ( _labelPosition == LABEL::POSITION::SIDE_BY_SIDE ? 1 : 0 ), _message.raw() );
+	cons.mvprintf( cons.get_height() - 2, _labelLength, _message.raw() );
 	return;
 	M_EPILOG
 }
 
 void HStatusBarControl::ask( char const* question_,
-		choices_t const& choices_ ) {
+		choices_t const& choices_, int default_ ) {
 	M_PROLOG
 	_choices = choices_;
+	_currentChoice = default_;
+	M_ENSURE( default_ < _choices.get_size() );
+	PROMPT::mode_t mode( PROMPT::NORMAL );
+	if ( _currentChoice >= 0 ) {
+		mode = PROMPT::MENU;
+	} else {
+		mode = PROMPT::DIALOG;
+	}
 	bar( question_ );
 	HString prompt( "[" );
 	bool first( true );
@@ -335,19 +355,19 @@ void HStatusBarControl::ask( char const* question_,
 		prompt += c.first;
 	}
 	prompt += "] ";
-	set_prompt( prompt, PROMPT::DIALOG );
+	set_prompt( prompt, mode );
 	return;
 	M_EPILOG
 }
 
 bool HStatusBarControl::dialog( yaal::hcore::HString const& answer_ ) {
 	M_PROLOG
-	M_ENSURE( _mode == PROMPT::DIALOG );
+	M_ENSURE( ( _mode == PROMPT::DIALOG ) || ( _mode == PROMPT::MENU ) );
 	bool found( false );
-	for ( choices_t::const_iterator it( _choices.begin() ), end( _choices.end() ); it != end; ++ it ) {
-		if ( it->first == answer_ ) {
+	YAAL_FOREACH ( choice_t const& c, _choices ) {
+		if ( c.first == answer_ ) {
 			found = true;
-			_window->schedule_call( it->second );
+			_window->schedule_call( c.second );
 			break;
 		}
 	}
@@ -361,7 +381,7 @@ void HStatusBarControl::confirm( char const* question_,
 	choices_t choices;
 	choices.push_back( make_pair<HString>( "yes", yes_ ) );
 	choices.push_back( make_pair<HString>( "no", no_ ) );
-	ask( question_, choices );
+	ask( question_, choices, 1 );
 	return;
 	M_EPILOG
 }
@@ -401,7 +421,26 @@ int HStatusBarControl::process_input_normal( int code_ ) {
 
 int HStatusBarControl::process_input_menu( int code_ ) {
 	M_PROLOG
-	return ( code_ );
+	M_ASSERT( _mode == PROMPT::MENU );
+	switch ( code_ ) {
+		case ( KEY_CODES::LEFT ): {
+			-- _currentChoice;
+			if ( _currentChoice < 0 ) {
+				_currentChoice = static_cast<int>( _choices.get_size() - 1 );
+			}
+			schedule_repaint();
+		} break;
+		case ( KEY_CODES::RIGHT ): {
+			++ _currentChoice;
+			_currentChoice %= static_cast<int>( _choices.get_size() );
+			schedule_repaint();
+		} break;
+		case ( '\r' ): {
+			dialog( _choices[_currentChoice].first );
+			end_prompt();
+		}
+	}
+	return ( 0 );
 	M_EPILOG
 }
 

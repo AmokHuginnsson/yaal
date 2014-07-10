@@ -77,6 +77,7 @@ protected:
 	int    _lastMinute;   /* all last* variables help */
 	int    _lastSecond;   /* keep progress bar paint rate low */
 	int    _lastStep;
+	int    _currentChoice;
 	hcore::HString _message;
 	hcore::HTime   _start;
 	choices_t _choices;
@@ -93,7 +94,7 @@ public:
 	void message( char const*, ... ) __attribute__(( format( printf, 2, 3 ) ));
 	void clear( int );
 	void bar( char const* = NULL );
-	void ask( char const*, choices_t const& );
+	void ask( char const*, choices_t const&, int = -1 );
 	void confirm( char const*, HTUIProcess::call_t, HTUIProcess::call_t );
 	bool dialog( yaal::hcore::HString const& );
 	virtual int process_input_normal( int );
