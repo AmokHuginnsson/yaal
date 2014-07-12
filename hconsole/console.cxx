@@ -342,7 +342,7 @@ void HConsole::set_background( int color_ ) const {
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
 	wbkgd( static_cast<WINDOW*>( _window ), ' '
-			| ( _brokenBrightBackground ? ATTR::value_fix( COLORS::FG_BLACK | color_ )
+			| static_cast<chtype>( _brokenBrightBackground ? ATTR::value_fix( COLORS::FG_BLACK | color_ )
 				: ATTR::value( COLORS::FG_BLACK | color_ ) ) ); /* meaningless value from macro */
 	return;
 	M_EPILOG
