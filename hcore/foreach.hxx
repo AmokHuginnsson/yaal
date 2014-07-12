@@ -64,6 +64,7 @@ struct iterator_type<collection_t const[SIZE]> {
 };
 
 typedef struct auto_storage_base {
+	virtual ~auto_storage_base( void ) {}
 } const& auto_storage_t;
 
 template<typename T>

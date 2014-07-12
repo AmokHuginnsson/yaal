@@ -67,7 +67,7 @@ void* memrchr( void const* ptr, int what, int long from ) {
 
 #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 )
 int long strnlen( char const* str_, int long maxLen_ ) {
-	char const* end( static_cast<char const*>( ::memchr( str_, 0, maxLen_ ) ) );
+	char const* end( static_cast<char const*>( ::memchr( str_, 0, static_cast<size_t>( maxLen_ ) ) ) );
 	return ( end ? end - str_ : maxLen_ );
 }
 #endif /* #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 ) */

@@ -209,8 +209,11 @@ CXXFLAGS=$CXXFLAGS_ORIG
 
 AC_MSG_CHECKING([whether C++ compiler supports __decltype])
 RESULT=["no"]
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([[int main( int, char const* const* const ) { int a = 0; typedef __decltype( a ) a_t; a_t b; return ( 0 ); }]])],
+CXXFLAGS_ORIG=$CXXFLAGS
+CXXFLAGS="$CXXFLAGS -Werror -Wall"
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[int main( int, char const* const* const ) { int a( 0 ); typedef __decltype( a ) a_t; a_t b( 0 ); return ( b ); }]])],
 	[AC_DEFINE([HAVE_DECLTYPE],[],[Is __decltype available?])] RESULT=["yes"])
+CXXFLAGS=$CXXFLAGS_ORIG
 AC_MSG_RESULT([$RESULT])
 AC_MSG_CHECKING([whether `.interp' user section is allowed])
 dnl `
