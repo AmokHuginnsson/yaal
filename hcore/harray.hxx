@@ -608,6 +608,11 @@ public:
 	const_reverse_iterator crend( void ) const {
 		return ( begin() );
 	}
+	/*! \brief Test if another array is equal to this array.
+	 *
+	 * \param a_ - the other array to check for equality with.
+	 * \return True iff other array is euqal to this array.
+	 */
 	bool operator == ( HArray const& a_ ) const {
 		M_PROLOG
 		return ( ( &a_ == this ) || safe_equal( begin(), end(), a_.begin(), a_.end() ) );
