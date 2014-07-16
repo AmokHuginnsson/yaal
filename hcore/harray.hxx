@@ -611,13 +611,18 @@ public:
 	/*! \brief Test if another array is equal to this array.
 	 *
 	 * \param a_ - the other array to check for equality with.
-	 * \return True iff other array is euqal to this array.
+	 * \return True iff other array is equal to this array.
 	 */
 	bool operator == ( HArray const& a_ ) const {
 		M_PROLOG
 		return ( ( &a_ == this ) || safe_equal( begin(), end(), a_.begin(), a_.end() ) );
 		M_EPILOG
 	}
+	/*! \brief Test if this array is lexicographically lesser then given array.
+	 *
+	 * \param a_ - other array for lexicographical comparison.
+	 * \return True iff this array is lexicographically lesser then given array.
+	 */
 	bool operator < ( HArray const& a_ ) const {
 		M_PROLOG
 		return ( ( &a_ != this ) && lexicographical_compare( begin(), end(), a_.begin(), a_.end() ) );
