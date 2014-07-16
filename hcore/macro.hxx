@@ -46,6 +46,9 @@ Copyright:
 #ifdef M_STRINGIFY
 #	error Yaal redefines M_STRINGIFY macro.
 #endif /* #ifdef M_STRINGIFY */
+#ifdef M_YAAL_AUTO_ID
+#	error Yaal redefines M_YAAL_AUTO_ID macro.
+#endif /* #ifdef M_YAAL_AUTO_ID */
 #ifdef M_VCSID
 #	error Yaal redefines M_VCSID macro.
 #endif /* #ifdef M_VCSID */
@@ -138,6 +141,12 @@ Copyright:
  */
 #define M_CONCAT( a, b ) M_CONCAT_REAL( a, b )
 #define M_STRINGIFY( x ) M_STRINGIFY_REAL( x )
+/*! \brief Create automatic C++ identifier name.
+ *
+ * \param name - base for C++ identifier name.
+ * \return Automatic C++ identifier name.
+ */
+#define M_YAAL_AUTO_ID( name ) M_CONCAT( name, __LINE__ )
 /*! \brief Create object file identifier for ident(1) program.
  */
 #define M_VCSID( id ) namespace { static char const M_CONCAT( wrapper_VCSID, __LINE__ )[] __attribute__((unused)) = id; }

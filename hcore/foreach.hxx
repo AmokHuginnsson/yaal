@@ -89,33 +89,32 @@ typename iterator_type<collection_t>::iterator& auto_storage_pick( auto_storage_
 
 }
 
-#define YAAL_FOREACH_ID( name ) M_CONCAT( name, __LINE__ )
 #if CXX_STANDARD >= 2011
 #	define YAAL_FOREACH( var, collection ) for ( var: collection )
 #else /* #if CXX_STANDARD >= 2011 */
 #	ifdef HAVE_DECLTYPE
 #		define YAAL_FOREACH( var, collection ) \
-		if ( bool YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = false ) { \
-		} else for ( yaal::foreach_helper::iterator_type<typeof ( collection )>::iterator YAAL_FOREACH_ID( it )( begin( collection ) ), \
-				YAAL_FOREACH_ID( end )( end( collection ) ); \
-				! YAAL_FOREACH_ID( _FOR_EACH_LOOP ) && ( YAAL_FOREACH_ID( it ) != YAAL_FOREACH_ID( end ) ) && ( YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = true ); \
-				++ YAAL_FOREACH_ID( it ) ) \
-			if ( bool YAAL_FOREACH_ID( _FOR_EACH_STEP ) = false ) { \
-			} else for ( var( *YAAL_FOREACH_ID( it ) ); ! YAAL_FOREACH_ID( _FOR_EACH_STEP ); \
-					YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = false, YAAL_FOREACH_ID( _FOR_EACH_STEP ) = true )
+		if ( bool M_YAAL_AUTO_ID( _FOR_EACH_LOOP ) = false ) { \
+		} else for ( yaal::foreach_helper::iterator_type<typeof ( collection )>::iterator M_YAAL_AUTO_ID( it )( begin( collection ) ), \
+				M_YAAL_AUTO_ID( end )( end( collection ) ); \
+				! M_YAAL_AUTO_ID( _FOR_EACH_LOOP ) && ( M_YAAL_AUTO_ID( it ) != M_YAAL_AUTO_ID( end ) ) && ( M_YAAL_AUTO_ID( _FOR_EACH_LOOP ) = true ); \
+				++ M_YAAL_AUTO_ID( it ) ) \
+			if ( bool M_YAAL_AUTO_ID( _FOR_EACH_STEP ) = false ) { \
+			} else for ( var( *M_YAAL_AUTO_ID( it ) ); ! M_YAAL_AUTO_ID( _FOR_EACH_STEP ); \
+					M_YAAL_AUTO_ID( _FOR_EACH_LOOP ) = false, M_YAAL_AUTO_ID( _FOR_EACH_STEP ) = true )
 #	else /* # ifdef HAVE_DECLTYPE */
 #		define YAAL_FOREACH( var, collection ) \
-		if ( bool YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = false ) { \
-		} else for ( yaal::foreach_helper::auto_storage_t YAAL_FOREACH_ID( it ) = yaal::foreach_helper::make_iterator( begin( collection ) ), \
-				YAAL_FOREACH_ID( end ) = yaal::foreach_helper::make_iterator( end( collection ) ); \
-				! YAAL_FOREACH_ID( _FOR_EACH_LOOP ) \
-				&& yaal::foreach_helper::auto_storage_pick( YAAL_FOREACH_ID( it ), collection ) \
-				!= yaal::foreach_helper::auto_storage_pick( YAAL_FOREACH_ID( end ), collection ) \
-				&& ( YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = true ); \
-				++ yaal::foreach_helper::auto_storage_pick( YAAL_FOREACH_ID( it ), collection ) ) \
-			if ( bool YAAL_FOREACH_ID( _FOR_EACH_STEP ) = false ) { \
-			} else for ( var( *yaal::foreach_helper::auto_storage_pick( YAAL_FOREACH_ID( it ), collection ) ); \
-					! YAAL_FOREACH_ID( _FOR_EACH_STEP ); YAAL_FOREACH_ID( _FOR_EACH_LOOP ) = false, YAAL_FOREACH_ID( _FOR_EACH_STEP ) = true )
+		if ( bool M_YAAL_AUTO_ID( _FOR_EACH_LOOP ) = false ) { \
+		} else for ( yaal::foreach_helper::auto_storage_t M_YAAL_AUTO_ID( it ) = yaal::foreach_helper::make_iterator( begin( collection ) ), \
+				M_YAAL_AUTO_ID( end ) = yaal::foreach_helper::make_iterator( end( collection ) ); \
+				! M_YAAL_AUTO_ID( _FOR_EACH_LOOP ) \
+				&& yaal::foreach_helper::auto_storage_pick( M_YAAL_AUTO_ID( it ), collection ) \
+				!= yaal::foreach_helper::auto_storage_pick( M_YAAL_AUTO_ID( end ), collection ) \
+				&& ( M_YAAL_AUTO_ID( _FOR_EACH_LOOP ) = true ); \
+				++ yaal::foreach_helper::auto_storage_pick( M_YAAL_AUTO_ID( it ), collection ) ) \
+			if ( bool M_YAAL_AUTO_ID( _FOR_EACH_STEP ) = false ) { \
+			} else for ( var( *yaal::foreach_helper::auto_storage_pick( M_YAAL_AUTO_ID( it ), collection ) ); \
+					! M_YAAL_AUTO_ID( _FOR_EACH_STEP ); M_YAAL_AUTO_ID( _FOR_EACH_LOOP ) = false, M_YAAL_AUTO_ID( _FOR_EACH_STEP ) = true )
 #	endif /* #	else # ifdef HAVE_DECLTYPE */
 #endif /* #else #if CXX_STANDARD >= 2011 */
 

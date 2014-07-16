@@ -145,6 +145,10 @@ YAAL_DEFINE_OPER( <= )
 YAAL_DEFINE_OPER( < )
 YAAL_DEFINE_OPER( >= )
 YAAL_DEFINE_OPER( > )
+#pragma GCC diagnostic ignored "-Weffc++"
+YAAL_DEFINE_OPER( && )
+YAAL_DEFINE_OPER( || )
+#pragma GCC diagnostic error "-Weffc++"
 #undef YAAL_DEFINE_OPER
 #define YAAL_DEFINE_OPER( OP ) \
 	HTaggedPOD operator OP ( void ) const { \
@@ -157,6 +161,21 @@ YAAL_DEFINE_OPER( ~ )
 	bool operator ! ( void ) const {
 		return ( ! _value );
 	}
+#define YAAL_DEFINE_OPER( OP ) \
+	HTaggedPOD& operator OP ( int shift_ ) { \
+		_value OP shift_; \
+		return ( *this ); \
+	}
+YAAL_DEFINE_OPER( <<= )
+YAAL_DEFINE_OPER( >>= )
+#undef YAAL_DEFINE_OPER
+#define YAAL_DEFINE_OPER( OP ) \
+	HTaggedPOD operator OP ( int shift_ ) const { \
+		return ( _value OP shift_ ); \
+	}
+YAAL_DEFINE_OPER( << )
+YAAL_DEFINE_OPER( >> )
+#undef YAAL_DEFINE_OPER
 };
 
 }
