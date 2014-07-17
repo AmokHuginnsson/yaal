@@ -374,6 +374,7 @@ int long HTwoWayMap<left_type_t, right_type_t>::erase( value_type const& value_ 
 		typename storage_type::iterator it( lvit->second );
 		int long const erasedInRight( _rightView._data.erase( &(value_.second) ) );
 		M_ASSERT( erasedInRight == 1 );
+		static_cast<void>( erasedInRight );
 		_leftView._data.erase( lvit );
 		_data.erase( it );
 		erased = true;
@@ -394,6 +395,7 @@ typename HTwoWayMap<left_type_t, right_type_t>::iterator HTwoWayMap<left_type_t,
 	_leftView._data.erase( lvit );
 	int long const erasedInRight( _rightView._data.erase( &(it->second) ) );
 	M_ASSERT( erasedInRight == 1 );
+	static_cast<void>( erasedInRight );
 	_data.erase( toErase );
 	M_ASSERT( ( _data.get_size() == _leftView._data.get_size() ) && ( _data.get_size() == _rightView._data.get_size() ) );
 	return ( next );

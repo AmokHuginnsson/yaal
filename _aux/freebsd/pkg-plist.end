@@ -5,3 +5,10 @@
 @dirrm include/yaal/hcore
 @dirrm include/yaal
 @dirrm share/doc/yaal
+@dirrm share/yaal/_aux/debian
+@dirrm share/yaal/_aux/freebsd
+@dirrm share/yaal/_aux/mk
+@dirrm share/yaal/_aux/msvcxx
+@dirrm share/yaal/_aux/solaris
+@dirrm share/yaal/_aux
+@dirrm share/yaal

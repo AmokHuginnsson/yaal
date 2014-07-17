@@ -423,6 +423,8 @@ public:
 				p = p->_trunk;
 			}
 			M_ASSERT( pos._owner == this );
+			static_cast<void>( pos );
+			static_cast<void>( node );
 			return;
 			M_EPILOG
 		}

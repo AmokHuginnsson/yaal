@@ -1,68 +1,89 @@
+# Created by: Marcin Konarski <amok@codestation.org>
 # $FreeBSD$
 # yaal (R) 2012 Copyright codestation.org all rights reserved.
 # NATIVE_MAKE
 
 PORTNAME=      yaal
 PORTVERSION!=  awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in
-#PORTREVISION=  0
 CATEGORIES=    devel
 MASTER_SITES=  http://codestation.org/ https://codestation.org/
 
 MAINTAINER=    amok@codestation.org
 COMMENT=       Yet Another Abstraction Layer
-RESTRICTED=1
+WWW=           http://codestation.org/
 
-BUILD_DEPENDS= autoconf:${PORTSDIR}/devel/autoconf \
+LICENSE=codestation
+LICENSE_NAME=$(LICENSE)
+LICENSE_FILE=../../doc/COPYRIGHT
+LICENSE_PERMS=dist-mirror no-dist-sell pkg-mirror no-pkg-sell
+
+LIB_DEPENDS= \
+	libxml2.so:${PORTSDIR}/textproc/libxml2 \
+	libxslt.so:${PORTSDIR}/textproc/libxslt
+BUILD_DEPENDS= \
 	libtool:${PORTSDIR}/devel/libtool \
-	gmake:${PORTSDIR}/devel/gmake \
 	doxygen:${PORTSDIR}/devel/doxygen
-LIB_DEPENDS= xml2:${PORTSDIR}/textproc/libxml2 \
-	xslt:${PORTSDIR}/textproc/libxslt
 
+USES+=gmake
+USE_AUTOTOOLS+=autoconf
+
+RESTRICTED=1
+NO_CDROM=1
+NO_CHECKSUM=1
 INSTALL_AS_USER=yo
+NEED_ROOT=no
+
+.if ${.MAKE.LEVEL} == 0
+PATH := ${PATH}
+CC := ${CC}
+CXX := ${CXX}
+C_INCLUDE_PATH := ${C_INCLUDE_PATH}
+CPLUS_INCLUDE_PATH := ${CPLUS_INCLUDE_PATH}
+LIBRARY_PATH := ${LIBRARY_PATH}
+USER := ${USER}
+HOME := ${HOME}
+TERM := ${TERM}
+.unexport-env
+.export PATH HOME USER TERM C_INCLUDE_PATH CPLUS_INCLUDE_PATH LIBRARY_PATH
+.endif
 
 WRKDIR=$(.CURDIR)/work
 PKG_DBDIR=$(WRKDIR)/pkg
 PORT_DBDIR=$(WRKDIR)/port
-MY_DESTDIR=$(WRKDIR)/tmp-root
-MY_PREFIX=/usr/local
-LOCALBASE=$(MY_DESTDIR)/$(MY_PREFIX)
-PREFIX=$(LOCALBASE)
-BUILD_ENV=PREFIX=$(MY_PREFIX) DESTDIR=$(MY_DESTDIR) SYSCONFDIR=$(MY_PREFIX)/etc LOCALSTATEDIR=$(MY_PREFIX)/var
+BUILD_ENV=PREFIX=$(PREFIX) DESTDIR=$(STAGEDIR) SYSCONFDIR=$(PREFIX)/etc LOCALSTATEDIR=$(PREFIX)/var
 BINOWN=root
 SHAREOWN=root
 
 .PHONY: clean all package
 
 pre-clean:
-	${RM} -rf $(MY_DESTDIR) pkg-plist $(PORTNAME)-$(PORTVERSION).tbz && \
+	@${RM} -rf $(STAGEDIR) pkg-plist $(PORTNAME)-$(PORTVERSION).tbz && \
 	cd ../../ && $(MAKE) purge
 
 do-fetch:
-	cd ../../ && if [ -f .git/config ] ; then \
-		if grep -q "\<url\>" .git/config ; then \
-			git pull ; \
-		fi \
+	@cd ../../ && if git config --local --get remote.origin.url > /dev/null ; then \
+		git pull ; \
 	fi
 
+do-configure:
+	@/bin/rm -f $(WRKSRC)/configure
+
 do-extract:
-	${MKDIR} $(WRKDIR) && ${LN} -s ../../../ $(WRKSRC)
+	@${MKDIR} $(WRKDIR) && ${LN} -nsf ../../../ $(WRKSRC)
 
 do-build:
-	cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) debug && $(MAKE) $(BUILD_ENV) release && $(MAKE) doc
+	@cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) debug && $(MAKE) $(BUILD_ENV) release && $(MAKE) doc
+
+pre-install:
+	@${MKDIR} $(STAGEDIR) && cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) install-debug install-release install-doc && cd - && \
+	${RM} $(STAGEDIR)/$(PREFIX)/lib/mkcache && \
+	echo "@name $(PORTNAME)-$(PORTVERSION)" > pkg-plist && \
+	${CAT} pkg-plist.begin >> pkg-plist && \
+	${FIND} $(STAGEDIR)/$(PREFIX) -type f -o -type l | ${SED} -e 's;$(STAGEDIR)/$(PREFIX)/;;' >> pkg-plist && \
+	${FIND} -d $(MY_DESTDIR)/$(PREFIX)/share/doc/yaal -type d | ${SED} -e 's;$(MY_DESTDIR)/$(PREFIX)/;@dirrm ;' >> pkg-plist && \
+	${CAT} pkg-plist.end >> pkg-plist
 
 do-install:
-	${MKDIR} $(MY_DESTDIR) && cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) install-debug install-release install-doc
-
-post-install:
-	${RM} $(MY_DESTDIR)/$(MY_PREFIX)/lib/mkcache
-
-do-package:
-	echo "@name $(PORTNAME)-$(PORTVERSION)" > pkg-plist && \
-	cat pkg-plist.begin >> pkg-plist && \
-	find $(MY_DESTDIR)/$(MY_PREFIX) -type f -o -type l | sed -e 's;$(MY_DESTDIR)/$(MY_PREFIX)/;;' >> pkg-plist && \
-	find -d $(MY_DESTDIR)/$(MY_PREFIX)/share/doc/yaal -type d | sed -e 's;$(MY_DESTDIR)/$(MY_PREFIX)/;@dirrm ;' >> pkg-plist && \
-	cat pkg-plist.end >> pkg-plist && \
-	/usr/sbin/pkg_create -S $(MY_DESTDIR) -p $(MY_PREFIX) -f pkg-plist -c -"$(COMMENT)" -d pkg-descr $(PORTNAME)-$(PORTVERSION).tbz
+	@true
 
 .include <bsd.port.mk>
