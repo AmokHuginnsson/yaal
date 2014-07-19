@@ -566,6 +566,10 @@ public:
 		return ( erase( it, next ) );
 		M_EPILOG
 	}
+	/*! \brief Get iterator pointing to the beginning of the collection.
+	 *
+	 * \return Iterator pointing to the beginning of the collection.
+	 */
 	iterator begin( void ) {
 		return ( iterator( this, 0 ) );
 	}
@@ -575,9 +579,17 @@ public:
 	iterator end( void ) {
 		return ( iterator( this, _size ) );
 	}
+	/*! \brief Get iterator pointing to the beginning of the collection.
+	 *
+	 * \return Iterator pointing to the beginning of the collection.
+	 */
 	const_iterator begin( void ) const {
 		return ( const_iterator( this, 0 ) );
 	}
+	/*! \brief Get const iterator pointing to the beginning of the collection.
+	 *
+	 * \return Const iterator pointing to the beginning of the collection.
+	 */
 	const_iterator cbegin( void ) const {
 		return ( const_iterator( this, 0 ) );
 	}
