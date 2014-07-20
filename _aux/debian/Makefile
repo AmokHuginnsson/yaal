@@ -17,14 +17,10 @@ BUNDLE_WRAP=yaal-bundle.tar
 DEBEMAIL=amok@codestation.org
 export DEBEMAIL
 
-ifneq ($(word 2,$(MAKECMDGOALS)),)
-$(error Only one targed allowed at a time.)
-endif
-
 .PHONY: all package clean
 
 all: $(VERIFY_DIR)
-	@echo "Explicit target required!" && echo && echo "supported targets: clean package"
+	@echo "Explicit target required!" && echo && echo "supported targets: clean package bundle"
 
 $(VERIFY_DIR):
 	@echo "You must run this Makefile from yaal/_aux/debian directory." && false
@@ -55,11 +51,12 @@ package: $(VERIFY_DIR) $(ARTIFACTS)
 
 bundle: $(VERIFY_DIR) $(BUNDLE_WRAP)
 
-clean: $(VERIFY_DIR) changelog
+clean: $(VERIFY_DIR)
 	@/bin/rm -f $(ARTIFACTS) $(BUNDLE_WRAP) $(BUNDLE) && \
-	/bin/rm -rf yaal-bundle && \
+	/bin/rm -rf changelog yaal-bundle && \
 	cd ../../ && \
 	ln -nsf ./_aux/debian && \
+	dch --create --newversion $(VERSION) --package yaal "Vendor Release." && \
 	dpkg-buildpackage -Tclean && \
 	/bin/rm debian _aux/debian/changelog
 
