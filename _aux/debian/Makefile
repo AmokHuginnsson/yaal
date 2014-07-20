@@ -26,26 +26,26 @@ $(VERIFY_DIR):
 	@echo "You must run this Makefile from yaal/_aux/debian directory." && false
 
 changelog: $(VERIFY_DIR)
-	/bin/rm -f changelog && \
+	@/bin/rm -f changelog && \
 	cd ../../ && \
 	ln -nsf ./_aux/debian && \
 	dch --create --newversion $(VERSION) --package yaal "Vendor Release." && \
 	dch --release release
 
 $(ARTIFACTS): $(VERIFY_DIR) changelog
-	cd ../../ && \
+	@cd ../../ && \
 	ln -nsf ./_aux/debian && \
 	dpkg-buildpackage -Zgzip -us -uc && \
 	mv $(addprefix ../,$(ARTIFACTS)) _aux/debian
 
 $(BUNDLE): $(VERIFY_DIR) $(ARTIFACTS)
-	/bin/rm -rf yaal-bundle && \
+	@/bin/rm -rf yaal-bundle && \
 	mkdir -p $(BUNDLE_DIR) && \
 	cp $(ARTIFACTS) $(BUNDLE_DIR) && \
 	tar cf $(@) yaal-bundle
 
 $(BUNDLE_WRAP): $(VERIFY_DIR) $(BUNDLE)
-	tar cf $(@) $(BUNDLE)
+	@tar cf $(@) $(BUNDLE)
 
 package: $(VERIFY_DIR) $(ARTIFACTS)
 

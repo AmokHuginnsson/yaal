@@ -48,16 +48,23 @@ TERM := ${TERM}
 .endif
 
 WRKDIR=$(.CURDIR)/work
+PLIST=$(WRKDIR)/pkg-plist
 PKG_DBDIR=$(WRKDIR)/pkg
 PORT_DBDIR=$(WRKDIR)/port
 BUILD_ENV=PREFIX=$(PREFIX) DESTDIR=$(STAGEDIR) SYSCONFDIR=$(PREFIX)/etc LOCALSTATEDIR=$(PREFIX)/var
 BINOWN=root
 SHAREOWN=root
+SYSTEM!= uname -s | tr A-Z a-z
+
+ARTIFACT=$(WRKDIR)/pkg/$(PKGNAME)$(PKG_SUFX)
+BUNDLE_DIR=yaal-bundle/$(SYSTEM)-$(OSREL)/$(ARCH)/$(PORTVERSION)
+BUNDLE=yaal-$(PORTVERSION)-$(SYSTEM)-$(OSREL)-$(ARCH).tar
+BUNDLE_WRAP=yaal-bundle.tar
 
 .PHONY: clean all package
 
 pre-clean:
-	@${RM} -rf $(STAGEDIR) pkg-plist $(PORTNAME)-$(PORTVERSION).tbz && \
+	@${RM} -rf $(STAGEDIR) $(PLIST) $(WRKDIR)/$(BUNDLE_WRAP) $(WRKDIR)/yaal-bundle $(WRKDIR)/$(BUNDLE) && \
 	cd ../../ && $(MAKE) purge
 
 do-fetch:
@@ -77,13 +84,26 @@ do-build:
 pre-install:
 	@${MKDIR} $(STAGEDIR) && cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) install-debug install-release install-doc && cd - && \
 	${RM} $(STAGEDIR)/$(PREFIX)/lib/mkcache && \
-	echo "@name $(PORTNAME)-$(PORTVERSION)" > pkg-plist && \
-	${CAT} pkg-plist.begin >> pkg-plist && \
-	${FIND} $(STAGEDIR)/$(PREFIX) -type f -o -type l | ${SED} -e 's;$(STAGEDIR)/$(PREFIX)/;;' >> pkg-plist && \
-	${FIND} -d $(MY_DESTDIR)/$(PREFIX)/share/doc/yaal -type d | ${SED} -e 's;$(MY_DESTDIR)/$(PREFIX)/;@dirrm ;' >> pkg-plist && \
-	${CAT} pkg-plist.end >> pkg-plist
+	echo "@name $(PORTNAME)-$(PORTVERSION)" > $(PLIST) && \
+	${CAT} pkg-plist.begin >> $(PLIST) && \
+	${FIND} $(STAGEDIR)/$(PREFIX) -type f -o -type l | ${SED} -e 's;$(STAGEDIR)/$(PREFIX)/;;' >> $(PLIST) && \
+	${FIND} -d $(STAGEDIR)/$(PREFIX)/share/doc/yaal -type d | ${SED} -e 's;$(STAGEDIR)/$(PREFIX)/;@dirrm ;' >> $(PLIST) && \
+	${CAT} pkg-plist.end >> $(PLIST)
 
 do-install:
 	@true
+
+$(WRKDIR)/$(BUNDLE): $(ARTIFACT)
+	@cd $(WRKDIR) && \
+	/bin/rm -rf yaal-bundle && \
+	mkdir -p $(BUNDLE_DIR) && \
+	cp $(ARTIFACT) $(BUNDLE_DIR) && \
+	tar cf $(BUNDLE) yaal-bundle
+
+$(WRKDIR)/$(BUNDLE_WRAP): $(WRKDIR)/$(BUNDLE)
+	@cd $(WRKDIR) && \
+	tar cf $(@) $(BUNDLE)
+
+bundle: $(WRKDIR)/$(BUNDLE_WRAP)
 
 .include <bsd.port.mk>
