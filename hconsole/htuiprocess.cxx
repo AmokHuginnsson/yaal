@@ -234,7 +234,7 @@ void HTUIProcess::handler_idle( void ) {
 	_needRepaint = true;
 #endif /* __DEBUG__ */
 	if ( !! (*_foregroundWindow) ) {
-		HStatusBarControl::ptr_t& statusBar = (*_foregroundWindow)->status_bar();
+		HStatusBarWidget::ptr_t& statusBar = (*_foregroundWindow)->status_bar();
 		if ( !! statusBar )
 			statusBar->paint();
 	}

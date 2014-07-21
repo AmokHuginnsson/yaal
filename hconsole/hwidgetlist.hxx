@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hlogpad.hxx - this file is integral part of `yaal' project.
+	hwidgetlist.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef YAAL_HCONSOLE_HLOGPAD_HXX_INCLUDED
-#define YAAL_HCONSOLE_HLOGPAD_HXX_INCLUDED 1
+#ifndef YAAL_HCONSOLE_HWIDGETLIST_HXX_INCLUDED
+#define YAAL_HCONSOLE_HWIDGETLIST_HXX_INCLUDED 1
 
 #include "hcore/hlist.hxx"
 #include "hconsole/hwidget.hxx"
@@ -34,54 +34,37 @@ namespace yaal {
 
 namespace hconsole {
 
-/*! \brief Implementation of TUI LogPad control class.
- *
- * LogPad is read only TUI control that is able to display formatted text.
+class HWidget;
+
+/*! \brief Keep list of TUI widgets for a given window.
  */
-class HLogPad : public HWidget {
+class HWidgetList {
 public:
-	typedef HLogPad this_type;
-	typedef HWidget base_type;
+	typedef HWidgetList this_type;
+	typedef hcore::HList<HWidget::ptr_t> model_t;
 private:
-	/*! \brief Basic unit of data for HLogPad display.
-	 */
-	class HLogLine {
-		typedef enum {
-			NONE,
-			ATTRIBUTE,
-			TEXT,
-			TEXT_EOL
-		} type_t;
-		type_t _type;
-		int _attribute;
-		hcore::HString _text;
-	public:
-		HLogLine( void );
-		virtual ~HLogLine( void );
-		friend class HLogPad;
-	};
-	typedef hcore::HList<HLogLine> contents_t;
-	int _lines;
-	int _offsetRow;
-	int _offsetColumn;
-	int _attribute;
-	contents_t _contents;
+	model_t _list;
+	model_t::cyclic_iterator& _focused;
 public:
-	HLogPad( HWindow*, int, int, int, int, char const * const );
-	virtual ~HLogPad( void );
-	void add( int, yaal::hcore::HString const& );
-	void add( yaal::hcore::HString const& );
-	void add( int );
-protected:
-	virtual int do_process_input( int );
-	virtual void do_paint( void );
+	HWidgetList( model_t::cyclic_iterator& );
+	/* find next enabled widget in window, if short cut char is specified */
+	void next_enabled( char = 0 ); /* enabled and match shortcut char */
+	void pop_front( void );
+	void select( HWidget const* );	/* this one should be private :( */
+	void select( HWidget::ptr_t const& );	/* this one should be private :( */
+	void add_widget( HWidget::ptr_t );
+	void refresh_all( bool );
+	void update_all( void );
+	void hit_test_all( mouse::OMouse& );
+	HWidget* get_widget_by_no( int );
+	void exchange( int, int );
 };
 
-typedef yaal::hcore::HExceptionT<HLogPad, HWidgetException> HLogPadException;
+typedef yaal::hcore::HExceptionT<HWidgetList> HWidgetListException;
 
 }
 
 }
 
-#endif /* #ifndef YAAL_HCONSOLE_HLOGPAD_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HWIDGETLIST_HXX_INCLUDED */
 

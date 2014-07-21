@@ -29,9 +29,9 @@ Copyright:
 
 #include "dbwrapper/hdatabase.hxx"
 #include "hconsole/hwindow.hxx"
-#include "hconsole/hlistcontrol.hxx"
-#include "hdata/hdatacontrol.hxx"
-#include "hdata/hdatalistcontrol.hxx"
+#include "hconsole/hlistwidget.hxx"
+#include "hdata/hdatawidget.hxx"
+#include "hdata/hdatalistwidget.hxx"
 #include "hdata/oresource.hxx"
 
 namespace yaal {
@@ -68,12 +68,12 @@ public:
 protected:
 	bool _modified;
 	DOCUMENT::mode_t _documentMode;
-	HDataControl* _mainControl;
+	HDataWidget* _mainWidget;
 	resources_t* _resourcesArray;
 	ORowBuffer* _syncStore;
-	typedef yaal::hcore::HList<HDataControl*> controls_t;
-	controls_t _viewModeControls;
-	controls_t _editModeControls;
+	typedef yaal::hcore::HList<HDataWidget*> controls_t;
+	controls_t _viewModeWidgets;
+	controls_t _editModeWidgets;
 	HDataProcess* _owner;
 	yaal::dbwrapper::HSQLDescriptor::ptr_t _dB;
 	yaal::dbwrapper::HSQLDescriptor::MODE::mode_t _mode;
@@ -81,17 +81,17 @@ public:
 	HDataWindow( char const*, HDataProcess*, resources_t* = NULL );
 	virtual ~HDataWindow( void );
 	virtual int init( void );
-	virtual hconsole::HStatusBarControl* init_bar( char const* );
+	virtual hconsole::HStatusBarWidget* init_bar( char const* );
 	void set_sync_store( ORowBuffer* = NULL );
 	bool is_modified( void ) const;
 	void set_modified( bool = true );
 	void sync( yaal::dbwrapper::HRecordSet::iterator );
 protected:
-	void link( int, HDataControl* );
+	void link( int, HDataWidget* );
 	void set_mode( DOCUMENT::mode_t );
 	void sync( void );
-	void sync( int, hconsole::HEditControl& );
-	void sync( int, HDataListControl& );
+	void sync( int, hconsole::HEditWidget& );
+	void sync( int, HDataListWidget& );
 	bool handler_add_new( hconsole::HEvent const& );
 	bool handler_edit( hconsole::HEvent const& );
 	bool handler_delete( hconsole::HEvent const& );

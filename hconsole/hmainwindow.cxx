@@ -31,7 +31,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/memory.hxx"
 
 using namespace yaal::hcore;
-using namespace yaal::hconsole::list_control_helper;
+using namespace yaal::hconsole::list_widget_helper;
 
 namespace yaal {
 
@@ -60,20 +60,20 @@ int HMainWindow::init( void ) {
 	M_PROLOG
 	int error = 0;
 	HConsole& cons = HConsole::get_instance();
-	if ( ( _focusedChild != HControlList::model_t::cyclic_iterator() ) && ( !! (*_focusedChild) ) )
+	if ( ( _focusedChild != HWidgetList::model_t::cyclic_iterator() ) && ( !! (*_focusedChild) ) )
 		return ( 0 );
 	error = HWindow::init();
-	_menu = new ( memory::yaal ) HMenuControl( this, 1, 1, - 2,	- cons.get_width() / 2 - 1,
+	_menu = new ( memory::yaal ) HMenuWidget( this, 1, 1, - 2,	- cons.get_width() / 2 - 1,
 			"&Menu" );
 	_menu->enable( true );
 	_menu->set_focus();
-	HWindowListControl* windowList = new ( memory::yaal ) HWindowListControl( this, 1,
+	HWindowListWidget* windowList = new ( memory::yaal ) HWindowListWidget( this, 1,
 			- cons.get_width() / 2 + 1, - 2, - 1, "&Opened window list",
 			make_pointer<HListControler<HWindow::ptr_t> >( _windowList ),
 			_foregroundWindow );
 	windowList->add_column( -1, "&Okno", 1 );
 	windowList->enable( true );
-	_controls.select( _menu );
+	_widgets.select( _menu );
 	return ( error );
 	M_EPILOG
 }

@@ -28,16 +28,16 @@ Copyright:
 #define YAAL_HCONSOLE_HWINDOW_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
-#include "hconsole/hcontrol.hxx"
-#include "hconsole/hcontrollist.hxx"
+#include "hconsole/hwidget.hxx"
+#include "hconsole/hwidgetlist.hxx"
 #include "hconsole/hhandler.hxx"
-#include "hconsole/hstatusbarcontrol.hxx"
+#include "hconsole/hstatusbarwidget.hxx"
 
 namespace yaal {
 
 namespace hconsole {
 
-class HControlList;
+class HWidgetList;
 class HTUIProcess;
 
 /*! \brief TUI Window implementation.
@@ -48,14 +48,14 @@ public:
 	typedef HHandler base_type;
 	typedef yaal::hcore::HPointer<HWindow> ptr_t;
 protected:
-	bool _initialised;                                            /*!< was window properly initialised? */
-	bool _needRepaint;                                            /*!< \brief Does this window need to be repainted? */
-	hcore::HString _title;                                        /*!< title of window */
-	HControlList::model_t::cyclic_iterator _focusedChild;         /*!< points to control that has focus */
-	HControlList::model_t::cyclic_iterator _previousFocusedChild; /*!< control that had focus before
-	                                                                   focus went to status bar */
-	HControlList _controls;	                                      /*!< list of all control inside _this_ wind */
-	HStatusBarControl::ptr_t _statusBar;
+	bool _initialised;                                           /*!< was window properly initialised? */
+	bool _needRepaint;                                           /*!< \brief Does this window need to be repainted? */
+	hcore::HString _title;                                       /*!< title of window */
+	HWidgetList::model_t::cyclic_iterator _focusedChild;         /*!< points to widget that has focus */
+	HWidgetList::model_t::cyclic_iterator _previousFocusedChild; /*!< widget that had focus before
+	                                                                  focus went to status bar */
+	HWidgetList _widgets;	                                       /*!< list of all widget inside _this_ wind */
+	HStatusBarWidget::ptr_t _statusBar;
 	HTUIProcess* _tuiProcess;
 public:
 	HWindow( char const* ); /* title */
@@ -65,11 +65,11 @@ public:
 	void paint( void );
 	bool process_input( HKeyPressEvent const& );
 
-	/*! \brief Jump through controls with tab key.
+	/*! \brief Jump through widgets with tab key.
 	 */
 	bool handler_jump_tab( HEvent const& );
 
-	/*! \brief Direct jump to specified control.
+	/*! \brief Direct jump to specified widget.
 	 */
 	bool handler_jump_direct( HEvent const& );
 
@@ -81,8 +81,8 @@ public:
 	 */
 	bool handler_search( HEvent const& );
 	int click( mouse::OMouse& );
-	int add_control( HControl::ptr_t, int );
-	HStatusBarControl::ptr_t& status_bar( void );
+	int add_widget( HWidget::ptr_t, int );
+	HStatusBarWidget::ptr_t& status_bar( void );
 	hcore::HString get_command( void );
 	bool is_initialised( void ) const;
 	void update_all( void );
@@ -90,17 +90,17 @@ public:
 
 /*! \brief Schedule paint request on next refresh cycle.
  *
- * \param wholeWindow_ - Schedule repaint for all controls in window.
+ * \param wholeWindow_ - Schedule repaint for all widgets in window.
  */
 	void schedule_repaint( bool wholeWindow_ );
 	void schedule_call( HTUIProcess::call_t );
 private:
-	friend bool HControl::set_focus( char );
-	friend void HStatusBarControl::set_prompt(  yaal::hcore::HString const&,
-			HStatusBarControl::PROMPT::mode_t );
-	friend void HStatusBarControl::end_prompt( void );
-	friend int HStatusBarControl::process_input_normal( int );
-	void acquire_focus( HControl const* );
+	friend bool HWidget::set_focus( char );
+	friend void HStatusBarWidget::set_prompt(  yaal::hcore::HString const&,
+			HStatusBarWidget::PROMPT::mode_t );
+	friend void HStatusBarWidget::end_prompt( void );
+	friend int HStatusBarWidget::process_input_normal( int );
+	void acquire_focus( HWidget const* );
 	HWindow( HWindow const& );
 	HWindow& operator = ( HWindow const& );
 };

@@ -50,7 +50,7 @@ HLogPad::HLogLine::~HLogLine ( void ) {
 
 HLogPad::HLogPad ( HWindow* parent_, int row_, int column_,
 		int height_, int width_, char const* const label_ )
-	: HControl ( parent_, row_, column_, height_, width_, label_ ),
+	: HWidget ( parent_, row_, column_, height_, width_, label_ ),
 	_lines( 0 ), _offsetRow( 0 ), _offsetColumn( 0 ),
 	_attribute( 0 ), _contents() {
 	M_PROLOG

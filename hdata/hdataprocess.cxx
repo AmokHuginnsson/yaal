@@ -358,11 +358,11 @@ resources_t& HDataProcess::build_resource( yaal::hcore::HString const& resourceN
 						HXml::HNode::properties_t::const_iterator colTypeIt = col.find( "type" );
 						M_ENSURE( ( alignIt != col.end() ) && ( colTypeIt != col.end() ) );
 						if ( alignIt->second == "left" )
-							r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::LEFT;
+							r[ i ]._columnInfo[ columnNo ]._align = HWidget::BITS::ALIGN::LEFT;
 						else if ( alignIt->second == "center" )
-							r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::CENTER;
+							r[ i ]._columnInfo[ columnNo ]._align = HWidget::BITS::ALIGN::CENTER;
 						else if ( alignIt->second == "right" )
-							r[ i ]._columnInfo[ columnNo ]._align = HControl::BITS::ALIGN::RIGHT;
+							r[ i ]._columnInfo[ columnNo ]._align = HWidget::BITS::ALIGN::RIGHT;
 						else
 							M_THROW( _( "unknown align type" ), i );
 						if ( colTypeIt->second == "string" )

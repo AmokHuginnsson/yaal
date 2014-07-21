@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hmainwindow.hxx - this file is integral part of `yaal' project.
+	hwindowlist.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -23,52 +23,42 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hconsole/hmainwindow.hxx
- * \brief Declaration of HMainWindow class.
- */
 
-#ifndef YAAL_HCONSOLE_HMAINWINDOW_HXX_INCLUDED
-#define YAAL_HCONSOLE_HMAINWINDOW_HXX_INCLUDED 1
+#ifndef YAAL_HCONSOLE_HWINDOWLISTWIDGET_HXX_INCLUDED
+#define YAAL_HCONSOLE_HWINDOWLISTWIDGET_HXX_INCLUDED 1
 
+#include "hconsole/hlistwidget.hxx"
 #include "hconsole/hwindow.hxx"
-#include "hconsole/hmenuwidget.hxx"
-#include "hconsole/hwindowlistwidget.hxx"
 
 namespace yaal {
 
 namespace hconsole {
 
-struct OMenuItem;
+class HWindow;
 
-/*! \brief Main window of TUI application.
+/*! \brief Implementation of TUI Window List control class.
  *
- * Main window of TUI application consists of menu and active window list.
+ * Window List control displays list of currently opened windows,
+ * and allows visual navigation for them.
  */
-class HMainWindow : public HWindow {
+class HWindowListWidget : public HListWidget {
 public:
-	typedef HMainWindow this_type;
-	typedef HWindow base_type;
+	typedef HWindowListWidget this_type;
+	typedef HListWidget base_type;
 private:
-	HMenuWidget* _menu;
-	HTUIProcess::model_ptr_t _windowList;
-	HTUIProcess::model_t::cyclic_iterator& _foregroundWindow;
+	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
+	model_t::cyclic_iterator& _foregroundWindow; /* self explanary */
 public:
-	HMainWindow( char const*, HTUIProcess::model_ptr_t, HTUIProcess::model_t::cyclic_iterator& );
-	virtual ~HMainWindow( void );
-	void init_menu( HTUIProcess*, OMenuItem* );
-	virtual int init( void );
-protected:
-	bool handler_close( HEvent const& ); /* closes window process */
-private:
-	HMainWindow( HMainWindow const& );
-	HMainWindow& operator = ( HMainWindow const& );
+	HWindowListWidget( HWindow*, int, int, int, int, char const*,
+			list_widget_helper::HAbstractControler::ptr_t const&, model_t::cyclic_iterator& );
+	virtual int do_process_input( int );
 };
 
-typedef yaal::hcore::HExceptionT<HMainWindow, HWindowException> HMainWindowException;
+typedef yaal::hcore::HExceptionT<HWindowListWidget, HListWidgetException> HWindowListWidgetException;
 
 }
 
 }
 
-#endif /* #ifndef YAAL_HCONSOLE_HMAINWINDOW_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HWINDOWLISTWIDGET_HXX_INCLUDED */
 

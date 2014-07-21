@@ -34,7 +34,7 @@ namespace yaal {
 
 namespace hconsole {
 
-/*! \brief Basic data unit stored in HListControl and HTreeControl.
+/*! \brief Basic data unit stored in HListWidget and HTreeWidget.
  *
  * tType myst be subclass of HInfo.
  */

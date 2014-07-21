@@ -42,7 +42,7 @@ namespace hconsole {
 
 HWindow::HWindow( char const * title_ ) : _initialised( false ),
 	_needRepaint( false ), _title( title_ ), _focusedChild(),
-	_previousFocusedChild(), _controls( _focusedChild ),
+	_previousFocusedChild(), _widgets( _focusedChild ),
 	_statusBar(), _tuiProcess( NULL ) {
 	M_PROLOG
 	int cmds [] = { ':', KEY<':'>::command };
@@ -71,11 +71,11 @@ int HWindow::init( void ) {
 	HString string;
 	_tuiProcess->schedule_repaint();
 	string.format( " [%s]& \n", _title.raw() );
-	new HStatusBarControl( this, string.raw() );
+	new HStatusBarWidget( this, string.raw() );
 	/*
-	 * After line above window has 1 (one) control which is HStatusBarControl.
-	 * This only control has a focus.
-	 * */
+	 * After line above window has 1 (one) widget which is HStatusBarWidget.
+	 * This only widget has a focus.
+	 */
 	_statusBar = *_focusedChild;
 	_statusBar->enable( true );
 	_initialised = true;
@@ -109,17 +109,17 @@ bool HWindow::process_input( HKeyPressEvent const& keyPress_ ) {
 	M_EPILOG
 }
 
-int HWindow::add_control( HControl::ptr_t control_, int shortCut_ ) {
+int HWindow::add_widget( HWidget::ptr_t widget_, int shortCut_ ) {
 	M_PROLOG
 	if ( _preprocessHandlers.find( shortCut_ ) != _preprocessHandlers.end() )
 		M_THROW( _( "shortcut occupied" ), shortCut_ );
-	_controls.add_control( control_ );
+	_widgets.add_widget( widget_ );
 	register_postprocess_handler( shortCut_, NULL, call( &HWindow::handler_jump_direct, this, _1 ) );
 	return ( 0 );
 	M_EPILOG
 }
 
-HStatusBarControl::ptr_t& HWindow::status_bar( void ) {
+HStatusBarWidget::ptr_t& HWindow::status_bar( void ) {
 	return ( _statusBar );
 }
 
@@ -129,7 +129,7 @@ void HWindow::paint( void ) {
 		HConsole::get_instance().clrscr();
 	if ( ( !! _statusBar ) && ( _statusBar != *_focusedChild ) )
 		_statusBar->paint();
-	_controls.refresh_all( _needRepaint );
+	_widgets.refresh_all( _needRepaint );
 	_needRepaint = false;
 	return;
 	M_EPILOG
@@ -137,7 +137,7 @@ void HWindow::paint( void ) {
 
 bool HWindow::handler_jump_tab( HEvent const& ) {
 	M_PROLOG
-	_controls.next_enabled();
+	_widgets.next_enabled();
 	_tuiProcess->schedule_repaint();
 	return ( true );
 	M_EPILOG
@@ -149,13 +149,15 @@ bool HWindow::handler_jump_direct( HEvent const& event_ ) {
 	bool consumed( false );
 	if ( *_focusedChild != _statusBar ) {
 		HKeyPressEvent const& keyPress( static_cast<HKeyPressEvent const&>( event_ ) );
-		/* call below is _magic_, HControlList::next_enabled() takes char as an
+		/*
+		 * call below is _magic_, HWidgetList::next_enabled() takes char as an
 		 * argument, so code_ & 0x0ff is passed into the function,
 		 * code_ is consrtructed from ordinary char by KEY_META_ macro,
-		 * see console.h for details */
-		HControlList::model_t::cyclic_iterator it = _focusedChild;
+		 * see console.h for details
+		 */
+		HWidgetList::model_t::cyclic_iterator it = _focusedChild;
 		if ( keyPress.get_key_code() & 0x0ff00 ) {
-			_controls.next_enabled( static_cast<char>( keyPress.get_key_code() ) );
+			_widgets.next_enabled( static_cast<char>( keyPress.get_key_code() ) );
 			if ( _focusedChild != it ) {
 				consumed = true;
 			}
@@ -166,11 +168,11 @@ bool HWindow::handler_jump_direct( HEvent const& event_ ) {
 	M_EPILOG
 }
 
-void HWindow::acquire_focus( HControl const* control_ ) {
+void HWindow::acquire_focus( HWidget const* widget_ ) {
 	M_PROLOG
-	if ( (*_focusedChild) != control_ ) {
+	if ( (*_focusedChild) != widget_ ) {
 		(*_focusedChild)->kill_focus();
-		_controls.select( control_ );
+		_widgets.select( widget_ );
 		_tuiProcess->schedule_repaint();
 	}
 	return;
@@ -179,7 +181,7 @@ void HWindow::acquire_focus( HControl const* control_ ) {
 
 bool HWindow::handler_command( HEvent const& ) {
 	M_PROLOG
-	_statusBar->set_prompt( ":", HStatusBarControl::PROMPT::COMMAND );
+	_statusBar->set_prompt( ":", HStatusBarWidget::PROMPT::COMMAND );
 	return ( true );
 	M_EPILOG
 }
@@ -195,7 +197,7 @@ bool HWindow::handler_search( HEvent const& event_ ) {
 		if ( code >= KEY_CODES::COMMAND_BASE )
 			code -= KEY_CODES::COMMAND_BASE;
 		prompt [ 0 ] = static_cast<char>( code );
-		_statusBar->set_prompt ( prompt, HStatusBarControl::PROMPT::SEARCH );
+		_statusBar->set_prompt ( prompt, HStatusBarWidget::PROMPT::SEARCH );
 		consumed = true;
 	}
 	return ( consumed );
@@ -208,7 +210,7 @@ int HWindow::click( mouse::OMouse& mouse_ ) {
 		return ( 1 );
 	if ( (*_focusedChild) == _statusBar )
 		return ( 1 );
-	_controls.hit_test_all( mouse_ );
+	_widgets.hit_test_all( mouse_ );
 	return ( 0 );
 	M_EPILOG
 }
@@ -228,7 +230,7 @@ bool HWindow::is_initialised( void ) const {
 
 void HWindow::update_all( void ) {
 	M_PROLOG
-	_controls.update_all();
+	_widgets.update_all();
 	return;
 	M_EPILOG
 }

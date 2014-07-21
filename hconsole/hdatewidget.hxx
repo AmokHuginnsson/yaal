@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hlogpad.hxx - this file is integral part of `yaal' project.
+	hdatewidget.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -24,64 +24,38 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef YAAL_HCONSOLE_HLOGPAD_HXX_INCLUDED
-#define YAAL_HCONSOLE_HLOGPAD_HXX_INCLUDED 1
+#ifndef YAAL_HCONSOLE_HDATEWIDGET_HXX_INCLUDED
+#define YAAL_HCONSOLE_HDATEWIDGET_HXX_INCLUDED 1
 
-#include "hcore/hlist.hxx"
-#include "hconsole/hwidget.hxx"
+#include "hcore/htime.hxx"
+#include "hconsole/hwindow.hxx"
 
 namespace yaal {
 
 namespace hconsole {
 
-/*! \brief Implementation of TUI LogPad control class.
+/*! \brief Implementation of TUI Date widget class.
  *
- * LogPad is read only TUI control that is able to display formatted text.
+ * Date widget allows setting and/or getting dates.
  */
-class HLogPad : public HWidget {
+class HDateWidget : public virtual HWidget {
 public:
-	typedef HLogPad this_type;
+	typedef HDateWidget this_type;
 	typedef HWidget base_type;
 private:
-	/*! \brief Basic unit of data for HLogPad display.
-	 */
-	class HLogLine {
-		typedef enum {
-			NONE,
-			ATTRIBUTE,
-			TEXT,
-			TEXT_EOL
-		} type_t;
-		type_t _type;
-		int _attribute;
-		hcore::HString _text;
-	public:
-		HLogLine( void );
-		virtual ~HLogLine( void );
-		friend class HLogPad;
-	};
-	typedef hcore::HList<HLogLine> contents_t;
-	int _lines;
-	int _offsetRow;
-	int _offsetColumn;
-	int _attribute;
-	contents_t _contents;
+	yaal::hcore::HTime _time;
 public:
-	HLogPad( HWindow*, int, int, int, int, char const * const );
-	virtual ~HLogPad( void );
-	void add( int, yaal::hcore::HString const& );
-	void add( yaal::hcore::HString const& );
-	void add( int );
+	HDateWidget( HWindow*, int, int, int, int, char const* );
+	virtual ~HDateWidget( void );
 protected:
-	virtual int do_process_input( int );
 	virtual void do_paint( void );
+	virtual int do_process_input( int );
+	virtual bool do_click( mouse::OMouse& );
 };
 
-typedef yaal::hcore::HExceptionT<HLogPad, HWidgetException> HLogPadException;
-
 }
 
 }
 
-#endif /* #ifndef YAAL_HCONSOLE_HLOGPAD_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HDATEWIDGET_HXX_INCLUDED */
 

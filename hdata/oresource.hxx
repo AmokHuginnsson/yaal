@@ -28,7 +28,7 @@ Copyright:
 #define YAAL_HDATA_ORESOURCE_HXX_INCLUDED 1
 
 #include "hcore/harray.hxx"
-#include "hconsole/hcontrol.hxx"
+#include "hconsole/hwidget.hxx"
 
 namespace yaal {
 
@@ -77,26 +77,26 @@ struct DATACONTROL_BITS {
  */
 struct OAttributes {
 	bool	_drawLabel;					/*!< should be label driven */
-	yaal::hconsole::HControl::OAttribute _disabledAttribute;	/*!< attribute of control in disabled state */
-	yaal::hconsole::HControl::OAttribute _enabledAttribute;	/*!< attribute of control in enabled state */
-	yaal::hconsole::HControl::OAttribute _focusedAttribute;	/*!< attribute of control in focused state */
+	yaal::hconsole::HWidget::OAttribute _disabledAttribute;	/*!< attribute of control in disabled state */
+	yaal::hconsole::HWidget::OAttribute _enabledAttribute;	/*!< attribute of control in enabled state */
+	yaal::hconsole::HWidget::OAttribute _focusedAttribute;	/*!< attribute of control in focused state */
 };
 
-/*! \brief Description of HListControl column.
+/*! \brief Description of HListWidget column.
  */
 struct OColumnInfo {
 	int _placement;    /*!< what place should this new column take */
 	char const* _name; /*!< column name */
 	int _width;        /*!< column width */
-	yaal::hconsole::HControl::BITS::ALIGN::align_t _align;	/*!< column alignment */
+	yaal::hconsole::HWidget::BITS::ALIGN::align_t _align;	/*!< column alignment */
 	type_id_t _type;   /*!< data type stored in that column */
 	OColumnInfo( void )
 		: _placement( 0 ), _name( NULL ), _width( 0 ),
-		_align( yaal::hconsole::HControl::BITS::ALIGN::LEFT ),
+		_align( yaal::hconsole::HWidget::BITS::ALIGN::LEFT ),
 		_type( TYPE::HSTRING ) {}
 };
 
-class HDataControl;
+class HDataWidget;
 
 /*! \brief Text mode user interface binary description.
  */

@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hlogpad.hxx - this file is integral part of `yaal' project.
+	hsearchablewidget.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -23,65 +23,47 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file hconsole/hsearchablewidget.hxx
+ * \brief Declaration of HSearchableWidget class.
+ */
 
-#ifndef YAAL_HCONSOLE_HLOGPAD_HXX_INCLUDED
-#define YAAL_HCONSOLE_HLOGPAD_HXX_INCLUDED 1
+#ifndef YAAL_HCONSOLE_HSEARCHABLEWIDGET_HXX_INCLUDED
+#define YAAL_HCONSOLE_HSEARCHABLEWIDGET_HXX_INCLUDED 1
 
-#include "hcore/hlist.hxx"
+#include "hconsole/hpattern.hxx"
 #include "hconsole/hwidget.hxx"
 
 namespace yaal {
 
 namespace hconsole {
 
-/*! \brief Implementation of TUI LogPad control class.
- *
- * LogPad is read only TUI control that is able to display formatted text.
+/*! \brief Provision H*Control classes with search capabilities.
  */
-class HLogPad : public HWidget {
+class HSearchableWidget : public virtual HWidget {
 public:
-	typedef HLogPad this_type;
+	typedef HSearchableWidget this_type;
 	typedef HWidget base_type;
-private:
-	/*! \brief Basic unit of data for HLogPad display.
-	 */
-	class HLogLine {
-		typedef enum {
-			NONE,
-			ATTRIBUTE,
-			TEXT,
-			TEXT_EOL
-		} type_t;
-		type_t _type;
-		int _attribute;
-		hcore::HString _text;
-	public:
-		HLogLine( void );
-		virtual ~HLogLine( void );
-		friend class HLogPad;
-	};
-	typedef hcore::HList<HLogLine> contents_t;
-	int _lines;
-	int _offsetRow;
-	int _offsetColumn;
-	int _attribute;
-	contents_t _contents;
-public:
-	HLogPad( HWindow*, int, int, int, int, char const * const );
-	virtual ~HLogPad( void );
-	void add( int, yaal::hcore::HString const& );
-	void add( yaal::hcore::HString const& );
-	void add( int );
 protected:
-	virtual int do_process_input( int );
-	virtual void do_paint( void );
+	bool _searchable;		/*!< are items searchable */
+	bool _searchActived;	/*!< should we highlight last search */
+	bool _filtered;			/*!< is content of list filtered thru pattern */
+	bool _backwards;			/*!< last search direction */
+	HPattern	_pattern;	/*!< used for searching */
+public:
+	HSearchableWidget ( bool );
+	virtual ~HSearchableWidget ( void );
+	void search( hcore::HString const &, bool );
+protected:
+	void highlight( int, int, int, bool );
+	virtual void go_to_match( void ) = 0;
+	virtual void go_to_match_previous( void ) = 0;
 };
 
-typedef yaal::hcore::HExceptionT<HLogPad, HWidgetException> HLogPadException;
+typedef yaal::hcore::HExceptionT<HSearchableWidget, HWidgetException> HSearchableWidgetException;
 
 }
 
 }
 
-#endif /* #ifndef YAAL_HCONSOLE_HLOGPAD_HXX_INCLUDED */
+#endif /* #ifndef YAAL_HCONSOLE_HSEARCHABLEWIDGET_HXX_INCLUDED */
 

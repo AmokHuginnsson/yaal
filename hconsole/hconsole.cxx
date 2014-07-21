@@ -48,15 +48,15 @@ namespace hconsole {
 
 int _latency_ = 1;
 int _screenBackground_ = COLORS::BG_BLACK;
-HControl::OAttribute _attributeDisabled_ = {
+HWidget::OAttribute _attributeDisabled_ = {
 	COLORS::FG_GREEN | COLORS::BG_BLACK | COLORS::BG_BLINK,
 	COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK | COLORS::BG_BLINK
 };
-HControl::OAttribute _attributeEnabled_ = {
+HWidget::OAttribute _attributeEnabled_ = {
 	COLORS::FG_BRIGHTGREEN | COLORS::BG_BLACK | COLORS::BG_BLINK,
 	COLORS::FG_WHITE | COLORS::BG_BLACK | COLORS::BG_BLINK
 };
-HControl::OAttribute _attributeFocused_ = {
+HWidget::OAttribute _attributeFocused_ = {
 	COLORS::FG_BRIGHTGREEN | COLORS::BG_BLACK | COLORS::BG_BLINK,
 	COLORS::FG_BLACK | COLORS::BG_LIGHTGRAY
 };
@@ -130,7 +130,7 @@ int get_color_bits( HString& value_, int what_ ) {
 	M_EPILOG
 }
 
-void set_color( HString& value_, HControl::OAttribute& attribute_ ) {
+void set_color( HString& value_, HWidget::OAttribute& attribute_ ) {
 	M_PROLOG
 	int labelBg( get_color_bits( value_, 1 ) );
 	int labelFg( get_color_bits( value_, 0 ) );
