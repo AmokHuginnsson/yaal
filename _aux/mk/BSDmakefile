@@ -1,5 +1,3 @@
-.MAKEFILEDEPS:
-
 .sinclude ".my_make"
 
 MAKE?=gmake
