@@ -38,18 +38,18 @@ $(ARTIFACTS): $(VERIFY_DIR) changelog
 	dpkg-buildpackage -Zgzip -us -uc && \
 	mv $(addprefix ../,$(ARTIFACTS)) _aux/debian
 
-$(BUNDLE): $(VERIFY_DIR) $(ARTIFACTS)
-	@/bin/rm -rf yaal-bundle && \
-	mkdir -p $(BUNDLE_DIR) && \
-	cp $(ARTIFACTS) $(BUNDLE_DIR) && \
-	tar cf $(@) yaal-bundle
+tmp/$(BUNDLE): $(VERIFY_DIR) $(ARTIFACTS)
+	@/bin/rm -rf tmp/yaal-bundle && \
+	mkdir -p tmp/$(BUNDLE_DIR) && \
+	cp $(ARTIFACTS) tmp/$(BUNDLE_DIR) && \
+	cd tmp && tar cf $(BUNDLE) yaal-bundle
 
-$(BUNDLE_WRAP): $(VERIFY_DIR) $(BUNDLE)
-	@tar cf $(@) $(BUNDLE)
+tmp/$(BUNDLE_WRAP): $(VERIFY_DIR) tmp/$(BUNDLE)
+	@cd tmp && tar cf $(BUNDLE_WRAP) $(BUNDLE)
 
 package: $(VERIFY_DIR) $(ARTIFACTS)
 
-bundle: $(VERIFY_DIR) $(BUNDLE_WRAP)
+bundle: $(VERIFY_DIR) tmp/$(BUNDLE_WRAP)
 
 clean: $(VERIFY_DIR)
 	@/bin/rm -f $(ARTIFACTS) $(BUNDLE_WRAP) $(BUNDLE) && \
