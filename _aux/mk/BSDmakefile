@@ -2,6 +2,8 @@
 
 .sinclude ".my_make"
 
+MAKE?=gmake
+
 .PHONY: doc tags
 
 default doc tags .DEFAULT:
