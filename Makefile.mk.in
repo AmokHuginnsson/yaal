@@ -49,8 +49,10 @@ RANLIB         = @RANLIB@
 GITID          = @GITID@
 CTAGS          = @CTAGS@
 GTAGS          = @GTAGS@
-DIRS           = $(DIR_BUILD)
-HAPI_HEADER    = include/$(LIB_NAME)/$(LIB_NAME).hxx
+MAIN_LIB_HEADER= include/$(LIB_NAME)/$(LIB_NAME).hxx
+SSL_KEYS_DIR   = db/$(LIB_NAME)/keys/
+SSL_KEYS       = $(SSL_KEYS_DIR)/key $(SSL_KEYS_DIR)/pem
+DIRS           = $(DIR_BUILD) $(SSL_KEYS_DIR)
 DO_@DO_TARGET@=1
 override CXX_STANDARD=@CXX_STANDARD@
 include $(DIR_ROOT)/_aux/mk/1_basic.mk
@@ -145,7 +147,7 @@ include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 #phony targets
 .PHONY: all bin clean clean-dep cov coverage-stats debug dep distclean doc flint install install-environment mrproper relassert reldeb release prepare-coverage-baseline prof purge purge-local static stats test uninstall
 
-$(TARGET): $(DIRS) $(TARGETS) $(HAPI_HEADER)
+$(TARGET): $(DIRS) $(TARGETS) $(SSL_KEYS) $(MAIN_LIB_HEADER)
 
 all: $(TARGET)
 
@@ -162,6 +164,7 @@ install: all
 	$(call invoke,$(INSTALL) -d -m755 $(DIR_SHARE)/$(PRJNAME)/ && ) \
 	$(call invoke,tar cf - -C $(DIR_ROOT) --exclude=tmp --exclude=work _aux | tar xpf - -C $(DIR_SHARE)/$(PRJNAME) && ) \
 	$(call invoke,$(INSTALL) -d -m755 $(DIR_HEADERS) && /bin/cp -fRp $(DIR_BUILD)/include/$(LIB_NAME) $(DIR_HEADERS)/ && ) \
+	$(call invoke,$(INSTALL) -d -m755 $(DIR_LOCALSTATE)/db/$(LIB_NAME) && /bin/cp -fRp $(DIR_BUILD)/db $(DIR_LOCALSTATE)/ && ) \
 	$(call msg,printf "%b" "making cache ... " && ) \
 	printf "%b\n" $(DIR_LIB) > $(DIR_LIB)/ld.so.conf && \
 	/bin/cp -f $(DIR_ROOT)/_aux/mkcache $(DIR_LIB) && \
@@ -173,17 +176,23 @@ uninstall:
 	$(foreach IT,$(COMPONENTS) $(addsuffix _driver,$(DRIVERS)),$(call UNINSTALL_TARGET,$(IT))) \
 	$(call invoke,/bin/rm -f $(DIR_PKGCONFIG)/yaal.pc && ) \
 	$(call invoke,/bin/rm -f $(DIR_SYSCONF)/yaalrc && ) \
-	$(call invoke,/bin/rm -fr $(DIR_HEADERS)/$(LIB_NAME)) \
+	$(call invoke,/bin/rm -fr $(DIR_HEADERS)/$(LIB_NAME) && ) \
+	$(call invoke,/bin/rm -fr $(DIR_LOCALSTATE)/db/$(LIB_NAME)) \
 	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
 
 install-environment:
 	@cd $(DIR_ROOT) && ./_aux/msh $(DESTDIR)$(prefix)
 
-$(HAPI_HEADER): $(HDRS) $(DIR_BUILD)/config.hxx
+$(MAIN_LIB_HEADER): $(HDRS) $(DIR_BUILD)/config.hxx
 	@printf "%b" "Making headers ... " && \
 	$(call invoke,$(DIR_ROOT)/_aux/mkheaders --lib-name=$(LIB_NAME) --lib-version=$(LIB_VERSION) --dir-root="$(DIR_ROOT)" --dir-build="$(DIR_BUILD)" --headers="$(HDRS)" && ) \
 	printf "%b$(NL)" "done.$(CL)$(BOLD)" && \
 	printf "%b\n" "All OK!$(RS)";
+
+$(SSL_KEYS): $(SSL_KEYS_DIR)
+	@printf "%b" "Making SSL keys ... " && \
+	$(call invoke,$(DIR_ROOT)/_aux/gen-keys $(DIR_BUILD)/$(dir $(@))) && \
+	printf "%b$(NL)" "done.$(CL)$(BOLD)"
 
 clean-dep:
 	@$(FIND) . -name '*.$(DS)' | xargs /bin/rm -f

@@ -19,8 +19,8 @@ STATE="State"
 LOCATION="Location"
 ORGARNIZATION="Organization"
 ORGARNIZATION_UNIT="Organization Unit"
-COMMON_NAME="common.name.org"
-EMAIL_ADDRESS="admin@common.name.org"
+COMMON_NAME="example.codestation.org"
+EMAIL_ADDRESS="admin@example.codestation.org"
 
 SUBJECT=""
 SUBJECT="${SUBJECT}/C=${COUNTRY}"
@@ -33,6 +33,6 @@ SUBJECT="${SUBJECT}/emailAddress=${EMAIL_ADDRESS}/"
 
 set -e
 
-openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 -out yaal.key
-openssl req -x509 -new -key yaal.key -out yaal.pem -days 3652 -subj "${SUBJECT}"
+openssl genpkey -algorithm rsa -pkeyopt rsa_keygen_bits:2048 -out key 2> /dev/null
+openssl req -x509 -new -key key -out pem -days 3652 -subj "${SUBJECT}"
 
