@@ -102,7 +102,7 @@ $(WRKDIR)/$(BUNDLE): $(ARTIFACT)
 
 $(WRKDIR)/$(BUNDLE_WRAP): $(WRKDIR)/$(BUNDLE)
 	@cd $(WRKDIR) && \
-	tar cf $(@) $(BUNDLE)
+	tar cf $(BUNDLE_WRAP) $(BUNDLE)
 
 bundle: $(WRKDIR)/$(BUNDLE_WRAP)
 
