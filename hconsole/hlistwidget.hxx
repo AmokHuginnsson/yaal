@@ -480,7 +480,7 @@ public:
 #ifndef _MSC_VER
 			list_widget_helper::HAbstractControler::ptr_t const& = hcore::make_pointer<list_widget_helper::HListControler<> >( hcore::make_pointer<list_widget_helper::HListControler<>::model_t>() ) );	/* label */
 #else /* #ifndef _MSC_VER */
-			list_widget_helper::HAbstractControler::ptr_t const& =  list_widget_helper::HListControler<>::ptr_t( new ( memory::yaal ) list_widget_helper::HListControler<>( list_widget_helper::HListControler<>::model_ptr_t( new ( memory::yaal ) list_widget_helper::HListControler<>::model_t() ) ) ) );	/* label */
+			list_widget_helper::HAbstractControler::ptr_t const& = list_widget_helper::HListControler<>::ptr_t( new ( memory::yaal ) list_widget_helper::HListControler<>( list_widget_helper::HListControler<>::model_ptr_t( new ( memory::yaal ) list_widget_helper::HListControler<>::model_t() ) ) );	/* label */
 #endif /* #else #ifndef _MSC_VER */
 	virtual ~HListWidget ( void );
 	void add_column( int,									/* at position */
