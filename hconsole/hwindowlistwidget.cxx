@@ -53,11 +53,11 @@ HWindowListWidget::HWindowListWidget ( HWindow * parent_, int row_,
 int HWindowListWidget::do_process_input( int code_ ) {
 	M_PROLOG
 	code_ = HListWidget::do_process_input( code_ );
-	int size = static_cast<int>( _controler->size() );
+	int size = static_cast<int>( _model->size() );
 	if ( size > 0 ) {
 		if ( ( code_ == '\r' ) || ( code_ == ' ' ) ) {
 			code_ = KEY<'\t'>::meta;
-			iterator_t it = _controler->begin();
+			iterator_t it = _model->begin();
 			while ( it != _cursor )
 				++ it, ++ _foregroundWindow;
 			-- _foregroundWindow;

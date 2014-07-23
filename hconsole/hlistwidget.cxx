@@ -54,7 +54,7 @@ HListWidget::flag_t const HListWidget::FLAG::ALL = ~HListWidget::FLAG::NONE;
 HListWidget::HColumnInfo::HColumnInfo( void )
 	: _descending( false ), _widthRaw( 0 ), _width( 0 ), _align( BITS::ALIGN::LEFT ),
 	_shortcutIndex( 0 ), _shortcut( 0 ), _type( TYPE::HSTRING ), _name(),
-	_control( NULL ) {
+	_widget( NULL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -62,7 +62,7 @@ HListWidget::HColumnInfo::HColumnInfo( void )
 
 HListWidget::HColumnInfo::~HColumnInfo( void ) {
 	M_PROLOG
-	_control = NULL;
+	_widget = NULL;
 	return;
 	M_EPILOG
 }
@@ -70,7 +70,7 @@ HListWidget::HColumnInfo::~HColumnInfo( void ) {
 HListWidget::HColumnInfo::HColumnInfo( HColumnInfo const& columnInfo_ )
 	: _descending( false ), _widthRaw( 0 ), _width( 0 ), _align( BITS::ALIGN::LEFT ),
 	_shortcutIndex( 0 ), _shortcut( 0 ), _type( TYPE::HSTRING ), _name(),
-	_control( NULL ) {
+	_widget( NULL ) {
 	M_PROLOG
 	( *this ) = columnInfo_;
 	return;
@@ -88,7 +88,7 @@ HListWidget::HColumnInfo& HListWidget::HColumnInfo::operator = ( HColumnInfo con
 		_shortcutIndex = columnInfo_._shortcutIndex;
 		_shortcut = columnInfo_._shortcut;
 		_name = columnInfo_._name;
-		_control = columnInfo_._control;
+		_widget = columnInfo_._widget;
 	}
 	return ( *this );
 	M_EPILOG
@@ -103,9 +103,9 @@ HListWidget::HListWidget( HWindow* parent_, int row_, int column_,
 	_drawHeader( true ), _editable( false ),
 	_widgetOffset( 0 ), _cursorPosition( 0 ), _sumForOne( 0 ),
 	_header(), _sortColumn( -1 ), _match(),
-	_cursor(), _firstVisibleRow(), _controler( data_ ) {
+	_cursor(), _firstVisibleRow(), _model( data_ ) {
 	M_PROLOG
-	_controler->set_control( this );
+	_model->set_control( this );
 	schedule_repaint();
 	return;
 	M_EPILOG
@@ -120,7 +120,7 @@ void HListWidget::do_paint( void ) {
 	int columnOffset = 0;
 	int columns = static_cast<int>( _header.size() );
 	int hR = _drawHeader ? 1 : 0; /* HR stands for header row */
-	int size = static_cast<int>( _controler->size() );
+	int size = static_cast<int>( _model->size() );
 	HColumnInfo * columnInfo = NULL;
 	HConsole& cons = HConsole::get_instance();
 	int tmp( _widthRaw );
@@ -151,8 +151,9 @@ void HListWidget::do_paint( void ) {
 					draw_cell( it, ctr, ctrLoc, columnOffset, columnInfo, checked );
 					columnOffset += columnInfo->_widthRaw;
 				}
-				if ( ( it == _cursor ) && columnInfo->_control )
-					(*it)[ ctrLoc ].set_child_control_data( columnInfo->_control );
+				if ( ( it == _cursor ) && columnInfo->_widget ) {
+					(*it)[ ctrLoc ].set_child_control_data( columnInfo->_widget );
+				}
 			}
 		}
 	}
@@ -212,7 +213,7 @@ void HListWidget::draw_header( int columns_ ) {
 		}
 	}
 	if ( _labelPosition == LABEL::POSITION::STACKED ) {
-		_varTmpBuffer.format( " %d/%d ", _widgetOffset + _cursorPosition + 1, static_cast<int>( _controler->size() ) );
+		_varTmpBuffer.format( " %d/%d ", _widgetOffset + _cursorPosition + 1, static_cast<int>( _model->size() ) );
 		if ( _labelLength < _widthRaw ) {
 			int clip = static_cast<int>( ( ( _widthRaw - _labelLength ) < _varTmpBuffer.get_length() ) ? _varTmpBuffer.get_length() - ( _widthRaw - _labelLength ) : 0 );
 			cons.mvprintf( _rowRaw - 1, static_cast<int>( _columnRaw + _widthRaw + clip - _varTmpBuffer.get_length() ), _varTmpBuffer.raw() + clip );
@@ -236,7 +237,7 @@ void HListWidget::draw_background( int from_ ) {
 void HListWidget::draw_scroll( int posX_ ) {
 	M_PROLOG
 	double scaled = 0;
-	int size = static_cast<int>( _controler->size() );
+	int size = static_cast<int>( _model->size() );
 	HConsole& cons = HConsole::get_instance();
 	if ( _widgetOffset ) {
 		cons.move( _rowRaw, posX_ );
@@ -360,7 +361,7 @@ void HListWidget::handle_key_page_up( void ) {
 			HConsole::get_instance().bell();
 		if ( _widgetOffset < 0 ) {
 			_widgetOffset = 0;
-			_firstVisibleRow = _controler->begin();
+			_firstVisibleRow = _model->begin();
 		}
 	} else {
 		_cursorPosition = 0;
@@ -370,7 +371,7 @@ void HListWidget::handle_key_page_up( void ) {
 }
 
 void HListWidget::handle_key_page_down( void ) {
-	int size = static_cast<int>( _controler->size() );
+	int size = static_cast<int>( _model->size() );
 	if ( size >= _heightRaw ) {
 		if ( _cursorPosition == ( _heightRaw - 1 ) ) {
 			if ( _widgetOffset < ( size - _heightRaw ) ) {
@@ -378,7 +379,7 @@ void HListWidget::handle_key_page_down( void ) {
 				increment( _firstVisibleRow, _heightRaw - 1 );
 				if ( _widgetOffset > ( size - _heightRaw ) ) {
 					_widgetOffset = size - _heightRaw;
-					_firstVisibleRow = _controler->rbegin();
+					_firstVisibleRow = _model->rbegin();
 					decrement( _firstVisibleRow, _heightRaw - 1 );
 				}
 			} else
@@ -391,7 +392,7 @@ void HListWidget::handle_key_page_down( void ) {
 	} else {
 		if ( _cursorPosition != ( size - 1 ) ) {
 			_cursorPosition = size - 1;
-			_cursor = _controler->rbegin();
+			_cursor = _model->rbegin();
 		} else
 			HConsole::get_instance().bell();
 	}
@@ -419,8 +420,8 @@ void HListWidget::handle_key_home( void ) {
 }
 
 void HListWidget::handle_key_end( void ) {
-	int size = static_cast<int>( _controler->size() );
-	_cursor = _controler->rbegin();
+	int size = static_cast<int>( _model->size() );
+	_cursor = _model->rbegin();
 	if ( size >= _heightRaw ) {
 		_cursorPosition = _heightRaw - 1;
 		_widgetOffset = size - _heightRaw;
@@ -432,7 +433,7 @@ void HListWidget::handle_key_end( void ) {
 }
 
 void HListWidget::handle_key_down( void ) {
-	if ( ( _cursorPosition + _widgetOffset ) < ( _controler->size() - 1 ) ) {
+	if ( ( _cursorPosition + _widgetOffset ) < ( _model->size() - 1 ) ) {
 		++ _cursorPosition;
 		++ _cursor;
 		if ( _cursorPosition >= _heightRaw ) {
@@ -462,7 +463,7 @@ void HListWidget::handle_key_ctrl_p( void ) {
 }
 
 void HListWidget::handle_key_space( void ) {
-	M_ASSERT( ! _controler->is_empty() );
+	M_ASSERT( ! _model->is_empty() );
 	M_ASSERT( _cursor.is_valid() );
 	if ( _checkable )
 		_cursor->switch_state();
@@ -520,11 +521,11 @@ int HListWidget::do_process_input( int code_ ) {
 
 void HListWidget::add_column( int column_, char const* name_,
 		int width_, BITS::ALIGN::align_t const& align_, type_id_t type_,
-		HWidget* control_ ) {
+		HWidget* widget_ ) {
 	M_PROLOG
 	int shortcutIndex = 0;
 	HColumnInfo columnInfo;
-	int size = static_cast<int>( _controler->size() );
+	int size = static_cast<int>( _model->size() );
 	if ( size )
 		M_THROW( "cannot add new column when list not empty", size );
 	_varTmpBuffer = name_;
@@ -541,7 +542,7 @@ void HListWidget::add_column( int column_, char const* name_,
 	columnInfo._shortcutIndex = shortcutIndex;
 	columnInfo._shortcut = _varTmpBuffer[ shortcutIndex ];
 	columnInfo._name = _varTmpBuffer;
-	columnInfo._control = control_;
+	columnInfo._widget = widget_;
 	if ( ! _header.is_empty() && ( column_ >= 0 ) )
 		_header.insert( _header.begin() + column_, columnInfo );
 	else
@@ -581,7 +582,7 @@ void HListWidget::sort_by_column( int column_, OSortHelper::sort_order_t order_ 
 		return;
 	_sortColumn = column_;
 	_header[ column_ ]._descending = order_ == OSortHelper::DESCENDING;
-	long int size = _controler->size();
+	long int size = _model->size();
 	if ( size > 128 )
 		_window->status_bar()->init_progress(
 				static_cast<double>( size )
@@ -589,8 +590,8 @@ void HListWidget::sort_by_column( int column_, OSortHelper::sort_order_t order_ 
 				" Sorting ..." );
 	list_widget_helper::OSortHelper helper =
 		{ column_, order_, _header[ _sortColumn ]._type,
-		0, _controler->size(), _window };
-	_controler->sort( helper );
+		0, _model->size(), _window };
+	_model->sort( helper );
 	_widgetOffset = _cursorPosition = 0;
 	return;
 	M_EPILOG
@@ -618,7 +619,7 @@ bool HListWidget::do_click( mouse::OMouse& mouse_ ) {
 					break;
 				}
 			}
-		} else if ( row < _controler->size() ) {
+		} else if ( row < _model->size() ) {
 			if ( mouse_._buttons & MOUSE_BITS::BUTTON::WHEEL_UP ) {
 				scroll_up();
 			} else if ( mouse_._buttons & MOUSE_BITS::BUTTON::WHEEL_DOWN ) {
@@ -659,7 +660,7 @@ void HListWidget::scroll_up( void ) {
 
 void HListWidget::scroll_down( void ) {
 	M_PROLOG
-	if ( ( _widgetOffset + _heightRaw ) < _controler->size() ) {
+	if ( ( _widgetOffset + _heightRaw ) < _model->size() ) {
 		++ _widgetOffset;
 		++ _firstVisibleRow;
 		if ( _cursorPosition > 0 )
@@ -677,7 +678,7 @@ bool HListWidget::is_searchable( void ) {
 
 void HListWidget::reset( void ) {
 	M_PROLOG
-	_firstVisibleRow = _cursor = _controler->begin();
+	_firstVisibleRow = _cursor = _model->begin();
 	_widgetOffset = _cursorPosition = 0;
 	M_EPILOG
 }
@@ -685,7 +686,7 @@ void HListWidget::reset( void ) {
 void HListWidget::go_to_match( void ) {
 	M_PROLOG
 	int ctr = 0, ctrLoc = 0, moveFirstRow = 0;
-	int size = static_cast<int>( _controler->size() );
+	int size = static_cast<int>( _model->size() );
 	int count = size + 1;
 	int columns = static_cast<int>( _header.size() );
 	int widgetOffsetOrig = _widgetOffset, cursorPositionOrig = _cursorPosition;
@@ -727,7 +728,7 @@ void HListWidget::go_to_match( void ) {
 			}
 			++ _cursor;
 		} else {
-			_cursor = _firstVisibleRow = _controler->begin();
+			_cursor = _firstVisibleRow = _model->begin();
 			_widgetOffset = _cursorPosition = 0;
 			moveFirstRow = 0;
 			outcome = _( "search hit BOTTOM, continuing at TOP" );
@@ -759,7 +760,7 @@ void HListWidget::go_to_match( void ) {
 void HListWidget::go_to_match_previous( void ) {
 	M_PROLOG
 	int ctr = 0, ctrLoc = 0, moveFirstRow = 0;
-	int size = static_cast<int>( _controler->size() );
+	int size = static_cast<int>( _model->size() );
 	int count = size + 1;
 	int columns = static_cast<int>( _header.size() );
 	int widgetOffsetOrig = _widgetOffset, cursorPositionOrig = _cursorPosition;
@@ -805,17 +806,17 @@ void HListWidget::go_to_match_previous( void ) {
 				_widgetOffset --;
 				moveFirstRow ++;
 			}
-			cyclic_decrement( _controler, _cursor, 1 );
+			cyclic_decrement( _model, _cursor, 1 );
 		} else {
 			if ( size >= _heightRaw ) {
-				_cursor = _controler->begin();
-				cyclic_decrement( _controler, _cursor, 1 );
+				_cursor = _model->begin();
+				cyclic_decrement( _model, _cursor, 1 );
 				_firstVisibleRow = _cursor;
-				cyclic_decrement( _controler, _firstVisibleRow, _heightRaw - 1 );
+				cyclic_decrement( _model, _firstVisibleRow, _heightRaw - 1 );
 				_cursorPosition = _heightRaw - 1;
 				_widgetOffset = size - _heightRaw;
 			} else {
-				cyclic_decrement( _controler, _cursor, 1 );
+				cyclic_decrement( _model, _cursor, 1 );
 				_cursorPosition = size - 1;
 			}
 			moveFirstRow = 0;
@@ -825,7 +826,7 @@ void HListWidget::go_to_match_previous( void ) {
 	}
 	if ( highlightStart ) {
 		if ( moveFirstRow )
-			cyclic_decrement( _controler, _firstVisibleRow, moveFirstRow );
+			cyclic_decrement( _model, _firstVisibleRow, moveFirstRow );
 		_match._columnWithMatch = ctr;
 		_match._matchNumber = ctrLoc;
 		_match._currentMatch = _cursor;
@@ -885,21 +886,21 @@ bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, type_id_t typ
 }
 
 list_widget_helper::HAbstractControler::ptr_t& HListWidget::get_controler( void ) {
-	return ( _controler );
+	return ( _model );
 }
 
 int long HListWidget::get_row_count( void ) {
-	return ( _controler->size() );
+	return ( _model->size() );
 }
 
 void HListWidget::remove_current_row ( void ) {
 	M_PROLOG
 	bool flag = true;
 	if ( _widgetOffset
-			&& ( ( _widgetOffset + _heightRaw ) == _controler->size() ) ) {
+			&& ( ( _widgetOffset + _heightRaw ) == _model->size() ) ) {
 		_widgetOffset --;
 		++ _firstVisibleRow;
-	} else if ( _cursorPosition && ( _cursorPosition == ( _controler->size() - 1 ) ) )
+	} else if ( _cursorPosition && ( _cursorPosition == ( _model->size() - 1 ) ) )
 		_cursorPosition --;
 	else
 		flag = false;
@@ -908,7 +909,7 @@ void HListWidget::remove_current_row ( void ) {
 	iterator_t it = _cursor;
 	if ( flag )
 		++ _cursor;
-	_controler->erase( it );
+	_model->erase( it );
 	schedule_repaint();
 	return;
 	M_EPILOG
@@ -916,10 +917,10 @@ void HListWidget::remove_current_row ( void ) {
 
 void HListWidget::do_update( void ) {
 	M_PROLOG
-	if ( _controler->size() ) {
+	if ( _model->size() ) {
 		_widgetOffset = _cursorPosition = 0;
-		_firstVisibleRow = _controler->begin();
-		_cursor = _controler->begin();
+		_firstVisibleRow = _model->begin();
+		_cursor = _model->begin();
 	}
 	return;
 	M_EPILOG

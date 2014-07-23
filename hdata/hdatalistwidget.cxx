@@ -48,7 +48,7 @@ HDataListWidget::HDataListWidget(
 										width_, title_ ),
 								HSearchableWidget( true ),
 								HListWidget( NULL, 0, 0, 0, 0, NULL ),
-								HDataWidget(), _dataControler( _controler ) {
+								HDataWidget(), _dataControler( _model ) {
 	M_PROLOG
 	return;
 	M_EPILOG

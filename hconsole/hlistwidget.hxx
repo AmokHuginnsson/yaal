@@ -435,7 +435,7 @@ public:
 		char _shortcut;
 		type_id_t _type;
 		hcore::HString _name;
-		HWidget * _control;
+		HWidget* _widget;
 	public:
 		HColumnInfo( void );
 		virtual ~HColumnInfo( void );
@@ -469,7 +469,7 @@ protected:
 	} _match;
 	iterator_t _cursor; /*!< current row highlight (selection or mark or what ever you name it) */
 	iterator_t _firstVisibleRow;	/*!< pointer to first visible row */
-	list_widget_helper::HAbstractControler::ptr_t _controler;
+	list_widget_helper::HAbstractControler::ptr_t _model;
 public:
 	HListWidget( HWindow* /* parent */,
 			int /* row */,

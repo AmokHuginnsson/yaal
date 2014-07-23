@@ -87,7 +87,7 @@ void HComboboxWidget::do_paint( void ) {
 		int height( _height );
 		width = _width;
 		_width = _droppedWidth;
-		int size = static_cast<int>( _controler->size() );
+		int size = static_cast<int>( _model->size() );
 		int hR = ( _drawLabel ? 1 : 0 ) + ( _drawHeader && ( _labelPosition == LABEL::POSITION::STACKED ) ? 1 : 0 );
 		if ( size < ( _height - hR ) )
 			_height = size + hR;
@@ -150,7 +150,7 @@ bool HComboboxWidget::do_click( mouse::OMouse& mouse_ ) {
 void HComboboxWidget::close_combo( void ) {
 	M_PROLOG
 	_mode = MODE::EDITCONTROL;
-	if ( ! _controler->is_empty() ) {
+	if ( ! _model->is_empty() ) {
 		set_text( (*_cursor)[ 0 ].get_string() );
 	}
 	_window->schedule_repaint( true );
