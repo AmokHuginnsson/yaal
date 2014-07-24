@@ -42,143 +42,12 @@ namespace hconsole {
 
 class HListWidget;
 
-/*! \brief Pack of helpers for "list control" concept.
+/*! \brief Pack of helpers for "list widget" concept.
  *
- * List control helpers are provided as a means of customization
+ * List widget helpers are provided as a means of customization
  * of HAsIsValueListModel class.
  */
 namespace list_widget_helper {
-
-class HListControlModelListenerInterface {
-public:
-	typedef HListControlModelListenerInterface this_type;
-	void paint( void )
-		{ do_paint(); }
-	virtual ~HListControlModelListenerInterface( void )
-		{}
-protected:
-	virtual void do_paint( void ) = 0;
-};
-
-class HListWidgetControlInterface {
-	HListControlModelListenerInterface* _listener;
-public:
-	typedef HListWidgetControlInterface this_type;
-	typedef yaal::hcore::HPointer<HListWidgetControlInterface> ptr_t;
-	HListWidgetControlInterface( void )
-		: _listener( NULL )
-		{}
-	virtual ~HListWidgetControlInterface( void ) {}
-	int get_column_count( void ) const {
-		M_PROLOG
-		return ( do_get_column_count() );
-		M_EPILOG
-	}
-	int long get_row_count( void ) const {
-		M_PROLOG
-		return ( do_get_row_count() );
-		M_EPILOG
-	}
-	yaal::hcore::HString get_value( int long row_, int col_ ) const {
-		M_PROLOG
-		return ( do_get_value( row_, col_ ) );
-		M_EPILOG
-	}
-	bool sort( int column_, bool descending_ ) {
-		M_PROLOG
-		return ( do_sort( column_, descending_ ) );
-		M_EPILOG
-	}
-	void register_listener( HListControlModelListenerInterface* listener_ )
-		{ _listener = listener_; }
-	void paint( void ) {
-		M_PROLOG
-		do_paint();
-		if ( _listener )
-			_listener->paint();
-		return;
-		M_EPILOG
-	}
-protected:
-	virtual int do_get_column_count( void ) const = 0;
-	virtual int long do_get_row_count( void ) const = 0;
-	virtual yaal::hcore::HString do_get_value( int long, int ) const = 0;
-	virtual bool do_sort( int, bool )
-		{ return ( true ); }
-	virtual void do_paint( void ) {}
-private:
-	HListWidgetControlInterface( HListWidgetControlInterface const& );
-	HListWidgetControlInterface& operator = ( HListWidgetControlInterface const& );
-};
-
-template<typename sequence_t>
-class HListControlModel : public HListWidgetControlInterface {
-public:
-	typedef HListControlModel this_type;
-	typedef HListWidgetControlInterface base_type;
-	typedef yaal::hcore::HPointer<sequence_t> sequence_ptr_t;
-private:
-	int _columnCount;
-	sequence_ptr_t _sequence;
-public:
-	HListControlModel( sequence_ptr_t sequence_, int columnCount_ )
-		: HListWidgetControlInterface(), _columnCount( columnCount_ ), _sequence( sequence_ )
-		{}
-protected:
-	int get_column_count( void ) const
-		{ return ( _columnCount ); }
-	int long do_get_row_count( void ) const {
-		M_PROLOG
-		return ( _sequence->get_size() );
-		M_EPILOG
-	}
-	virtual yaal::hcore::HString do_get_value( int long row_, int col_ ) const {
-		M_PROLOG
-		return ( (*_sequence)[ row_ ][ col_ ] );
-		M_EPILOG
-	}
-};
-
-template<typename list_t>
-class HListControlModelListAdaptor : public HListWidgetControlInterface {
-public:
-	typedef HListControlModelListAdaptor this_type;
-	typedef HListWidgetControlInterface base_type;
-	typedef yaal::hcore::HPointer<list_t> list_ptr_t;
-	typedef typename list_ptr_t::value_type value_type;
-	typedef yaal::hcore::HArray<value_type*> view_t;
-private:
-	int _columnCount;
-	list_ptr_t _list;
-	view_t _view;
-public:
-	HListControlModelListAdaptor( list_ptr_t list_, int columnCount_ )
-		: HListWidgetControlInterface(), _columnCount( columnCount_ ), _list( list_ ), _view()
-		{}
-protected:
-	int get_column_count( void ) const
-		{ return ( _columnCount ); }
-	int long do_get_row_count( void ) const {
-		M_PROLOG
-		M_ASSERT( _list->get_size() >= _view.get_size() );
-		return ( _view.get_size() );
-		M_EPILOG
-	}
-	virtual yaal::hcore::HString do_get_value( int long row_, int col_ ) const {
-		M_PROLOG
-		M_ASSERT( _list->get_size() >= _view.get_size() );
-		return ( *(_view[ row_ ][ col_ ]) );
-		M_EPILOG
-	}
-	virtual void do_paint( void ) {
-		M_PROLOG
-		_view.clear();
-		for ( typename list_t::iterator it( _list->begin() ), end( _list->end() ); it != end; ++ it )
-			_view.push_back( &*it );
-		return;
-		M_EPILOG
-	}
-};
 
 /*! \brief HAsIsValueListModel sort helper.
  *
@@ -407,7 +276,7 @@ public:
  * List control allows fancy representation of row based data with handful
  * of display alteration methods.
  */
-class HListWidget : virtual public HSearchableWidget, public list_widget_helper::HListControlModelListenerInterface {
+class HListWidget : virtual public HSearchableWidget {
 public:
 	typedef HListWidget this_type;
 	typedef HSearchableWidget base_type;
