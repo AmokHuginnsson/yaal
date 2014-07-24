@@ -95,7 +95,7 @@ HListWidget::HColumnInfo& HListWidget::HColumnInfo::operator = ( HColumnInfo con
 }
 
 HListWidget::HListWidget( HWindow* parent_, int row_, int column_,
-		int height_, int width_, char const* label_, HAbstractControler::ptr_t const& data_ )
+		int height_, int width_, char const* label_, HAbstractListModel::ptr_t const& data_ )
 						: HWidget( parent_, row_, column_, height_, width_,
 								label_ ),
 							HSearchableWidget( true ),
@@ -885,7 +885,7 @@ bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, type_id_t typ
 	M_EPILOG
 }
 
-list_widget_helper::HAbstractControler::ptr_t& HListWidget::get_controler( void ) {
+list_widget_helper::HAbstractListModel::ptr_t& HListWidget::get_controler( void ) {
 	return ( _model );
 }
 
@@ -970,28 +970,28 @@ bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHe
 }
 
 template<>
-HListControler<>::model_ptr_t HListControler<>::get_model( void ) {
+HAsIsValueListModel<>::model_ptr_t HAsIsValueListModel<>::get_model( void ) {
 	return ( _list );
 }
 
-HAbstractControler::~HAbstractControler( void ) {
+HAbstractListModel::~HAbstractListModel( void ) {
 	return;
 }
 
-HAbstractControler::HAbstractControler( void ) : _control( NULL ) {
+HAbstractListModel::HAbstractListModel( void ) : _control( NULL ) {
 	return;
 }
 
-void HAbstractControler::set_control( HListWidget* control_ ) {
+void HAbstractListModel::set_control( HListWidget* control_ ) {
 	_control = control_;
 	return;
 }
 
-void HAbstractControler::erase( HAbstractControler::HModelIteratorWrapper& ) {
+void HAbstractListModel::erase( HAbstractListModel::HModelIteratorWrapper& ) {
 	return;
 }
 
-void HAbstractControler::add_tail( void ) {
+void HAbstractListModel::add_tail( void ) {
 	return;
 }
 
@@ -1023,55 +1023,55 @@ yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_time( v
 	M_EPILOG
 }
 
-HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( void ) : _iteratorPtr() {
+HAbstractListModel::HModelIteratorWrapper::HModelIteratorWrapper( void ) : _iteratorPtr() {
 	return;
 }
 
-HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( iterator_ptr_t const& it_ ) : _iteratorPtr( it_ ) {
+HAbstractListModel::HModelIteratorWrapper::HModelIteratorWrapper( iterator_ptr_t const& it_ ) : _iteratorPtr( it_ ) {
 	return;
 }
 
-bool HAbstractControler::HModelIteratorWrapper::is_valid( void ) const {
+bool HAbstractListModel::HModelIteratorWrapper::is_valid( void ) const {
 	return ( _iteratorPtr->is_valid() );
 }
 
-bool HAbstractControler::HModelIteratorWrapper::operator==( HAbstractControler::HModelIteratorWrapper const& it_ ) {
+bool HAbstractListModel::HModelIteratorWrapper::operator==( HAbstractListModel::HModelIteratorWrapper const& it_ ) {
 	M_PROLOG
 	return ( _iteratorPtr.raw() ? _iteratorPtr->is_equal( *it_._iteratorPtr ) : it_._iteratorPtr.raw() == NULL );
 	M_EPILOG
 }
 
-bool HAbstractControler::HModelIteratorWrapper::operator!=( HAbstractControler::HModelIteratorWrapper const& it_ ) {
+bool HAbstractListModel::HModelIteratorWrapper::operator!=( HAbstractListModel::HModelIteratorWrapper const& it_ ) {
 	M_PROLOG
 	return ( _iteratorPtr.raw() ? _iteratorPtr->is_not_equal( *it_._iteratorPtr ) : it_._iteratorPtr.raw() != NULL );
 	M_EPILOG
 }
 
-HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator++( void ) {
+HAbstractListModel::HModelIteratorWrapper& HAbstractListModel::HModelIteratorWrapper::operator++( void ) {
 	_iteratorPtr->next();
 	return ( *this );
 }
 
-HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator--( void ) {
+HAbstractListModel::HModelIteratorWrapper& HAbstractListModel::HModelIteratorWrapper::operator--( void ) {
 	_iteratorPtr->previous();
 	return ( *this );
 }
 
-HAbstractRow& HAbstractControler::HModelIteratorWrapper::operator*( void ) {
+HAbstractRow& HAbstractListModel::HModelIteratorWrapper::operator*( void ) {
 	return ( _iteratorPtr->dereference() );
 }
 
-HAbstractRow* HAbstractControler::HModelIteratorWrapper::operator->( void ) {
+HAbstractRow* HAbstractListModel::HModelIteratorWrapper::operator->( void ) {
 	return ( _iteratorPtr->call() );
 }
 
-HAbstractControler::HModelIteratorWrapper::HModelIteratorWrapper( HAbstractControler::HModelIteratorWrapper const& it_ )
+HAbstractListModel::HModelIteratorWrapper::HModelIteratorWrapper( HAbstractListModel::HModelIteratorWrapper const& it_ )
 	: _iteratorPtr() {
 	operator=( it_ );
 	return;
 }
 
-HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWrapper::operator=( HAbstractControler::HModelIteratorWrapper const& it_ ) {
+HAbstractListModel::HModelIteratorWrapper& HAbstractListModel::HModelIteratorWrapper::operator=( HAbstractListModel::HModelIteratorWrapper const& it_ ) {
 	M_PROLOG
 	if ( &it_ != this ) {
 		if ( it_._iteratorPtr.raw() )
@@ -1081,15 +1081,15 @@ HAbstractControler::HModelIteratorWrapper& HAbstractControler::HModelIteratorWra
 	M_EPILOG
 }
 
-HAbstractControler::iterator_ptr_t& HAbstractControler::HModelIteratorWrapper::raw( void ) {
+HAbstractListModel::iterator_ptr_t& HAbstractListModel::HModelIteratorWrapper::raw( void ) {
 	return ( _iteratorPtr );
 }
 
-HAbstractControler::HAbstractModelIterator::HAbstractModelIterator( void ) {
+HAbstractListModel::HAbstractModelIterator::HAbstractModelIterator( void ) {
 	return;
 }
 
-HAbstractControler::HAbstractModelIterator::~HAbstractModelIterator( void ) {
+HAbstractListModel::HAbstractModelIterator::~HAbstractModelIterator( void ) {
 	return;
 }
 

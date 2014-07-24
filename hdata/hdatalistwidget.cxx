@@ -74,8 +74,8 @@ void HDataListWidget::load( int long /*id_*/ ) {
 	HDataWindow::ORowBuffer rb( idColNo, static_cast<int>( _header.size() ) );
 	parent->set_sync_store( &rb );
 	parent->status_bar()->init_progress( 0., "Collecting ..." );
-	HListControler<>::model_ptr_t model = _dataControler->get_model();
-	HListControler<>::model_t::iterator it = model->begin();
+	HAsIsValueListModel<>::model_ptr_t model = _dataControler->get_model();
+	HAsIsValueListModel<>::model_t::iterator it = model->begin();
 	int ctr( 0 );
 	int size( static_cast<int>( _dataControler->size() ) );
 	for ( HRecordSet::iterator row( rs->begin() ), end( rs->end() ); row != end; ++ row ) {

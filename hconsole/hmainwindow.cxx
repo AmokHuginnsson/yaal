@@ -69,7 +69,7 @@ int HMainWindow::init( void ) {
 	_menu->set_focus();
 	HWindowListWidget* windowList = new ( memory::yaal ) HWindowListWidget( this, 1,
 			- cons.get_width() / 2 + 1, - 2, - 1, "&Opened window list",
-			make_pointer<HListControler<HWindow::ptr_t> >( _windowList ),
+			make_pointer<HAsIsValueListModel<HWindow::ptr_t> >( _windowList ),
 			_foregroundWindow );
 	windowList->add_column( -1, "&Okno", 1 );
 	windowList->enable( true );

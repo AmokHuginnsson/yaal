@@ -45,7 +45,7 @@ class HListWidget;
 /*! \brief Pack of helpers for "list control" concept.
  *
  * List control helpers are provided as a means of customization
- * of HListControler class.
+ * of HAsIsValueListModel class.
  */
 namespace list_widget_helper {
 
@@ -60,15 +60,15 @@ protected:
 	virtual void do_paint( void ) = 0;
 };
 
-class HListControlModelInterface {
+class HListWidgetControlInterface {
 	HListControlModelListenerInterface* _listener;
 public:
-	typedef HListControlModelInterface this_type;
-	typedef yaal::hcore::HPointer<HListControlModelInterface> ptr_t;
-	HListControlModelInterface( void )
+	typedef HListWidgetControlInterface this_type;
+	typedef yaal::hcore::HPointer<HListWidgetControlInterface> ptr_t;
+	HListWidgetControlInterface( void )
 		: _listener( NULL )
 		{}
-	virtual ~HListControlModelInterface( void ) {}
+	virtual ~HListWidgetControlInterface( void ) {}
 	int get_column_count( void ) const {
 		M_PROLOG
 		return ( do_get_column_count() );
@@ -107,22 +107,22 @@ protected:
 		{ return ( true ); }
 	virtual void do_paint( void ) {}
 private:
-	HListControlModelInterface( HListControlModelInterface const& );
-	HListControlModelInterface& operator = ( HListControlModelInterface const& );
+	HListWidgetControlInterface( HListWidgetControlInterface const& );
+	HListWidgetControlInterface& operator = ( HListWidgetControlInterface const& );
 };
 
 template<typename sequence_t>
-class HListControlModel : public HListControlModelInterface {
+class HListControlModel : public HListWidgetControlInterface {
 public:
 	typedef HListControlModel this_type;
-	typedef HListControlModelInterface base_type;
+	typedef HListWidgetControlInterface base_type;
 	typedef yaal::hcore::HPointer<sequence_t> sequence_ptr_t;
 private:
 	int _columnCount;
 	sequence_ptr_t _sequence;
 public:
 	HListControlModel( sequence_ptr_t sequence_, int columnCount_ )
-		: HListControlModelInterface(), _columnCount( columnCount_ ), _sequence( sequence_ )
+		: HListWidgetControlInterface(), _columnCount( columnCount_ ), _sequence( sequence_ )
 		{}
 protected:
 	int get_column_count( void ) const
@@ -140,10 +140,10 @@ protected:
 };
 
 template<typename list_t>
-class HListControlModelListAdaptor : public HListControlModelInterface {
+class HListControlModelListAdaptor : public HListWidgetControlInterface {
 public:
 	typedef HListControlModelListAdaptor this_type;
-	typedef HListControlModelInterface base_type;
+	typedef HListWidgetControlInterface base_type;
 	typedef yaal::hcore::HPointer<list_t> list_ptr_t;
 	typedef typename list_ptr_t::value_type value_type;
 	typedef yaal::hcore::HArray<value_type*> view_t;
@@ -153,7 +153,7 @@ private:
 	view_t _view;
 public:
 	HListControlModelListAdaptor( list_ptr_t list_, int columnCount_ )
-		: HListControlModelInterface(), _columnCount( columnCount_ ), _list( list_ ), _view()
+		: HListWidgetControlInterface(), _columnCount( columnCount_ ), _list( list_ ), _view()
 		{}
 protected:
 	int get_column_count( void ) const
@@ -180,7 +180,7 @@ protected:
 	}
 };
 
-/*! \brief HListControler sort helper.
+/*! \brief HAsIsValueListModel sort helper.
  *
  * OSortHelper abstracts compare operation.
  */
@@ -262,7 +262,7 @@ public:
 
 /*! \brief Interface for HListWidget controler from MVC pattern.
  */
-class HAbstractControler {
+class HAbstractListModel {
 public:
 	class HModelIteratorWrapper;
 	class HAbstractModelIterator;
@@ -287,7 +287,7 @@ public:
 protected:
 	HListWidget* _control;
 public:
-	typedef yaal::hcore::HPointer<HAbstractControler> ptr_t;
+	typedef yaal::hcore::HPointer<HAbstractListModel> ptr_t;
 	/*! \brief Model iterator proxy.
 	 */
 	class HModelIteratorWrapper {
@@ -307,8 +307,8 @@ public:
 		bool operator != ( HModelIteratorWrapper const& );
 		bool is_valid( void ) const;
 	};
-	HAbstractControler( void );
-	virtual ~HAbstractControler( void );
+	HAbstractListModel( void );
+	virtual ~HAbstractListModel( void );
 	virtual void sort( list_widget_helper::OSortHelper& ) = 0;
 	virtual int long size( void ) = 0;
 	virtual bool is_empty( void ) = 0;
@@ -320,8 +320,8 @@ public:
 	virtual void add_tail( void );
 	void set_control( HListWidget* );
 private:
-	HAbstractControler( HAbstractControler const& );
-	HAbstractControler& operator = ( HAbstractControler const& );
+	HAbstractListModel( HAbstractListModel const& );
+	HAbstractListModel& operator = ( HAbstractListModel const& );
 };
 
 /*! \brief Controler of HListWidget in MVC idiom.
@@ -340,7 +340,7 @@ private:
  * \tparam tType - basic unit of data held in list model.
  */
 template<typename tType = HInfoItem>
-class HListControler : public HAbstractControler {
+class HAsIsValueListModel : public HAbstractListModel {
 public:
 	typedef yaal::hcore::HList<tType> model_t;
 	typedef typename model_t::iterator iterator_t;
@@ -348,27 +348,27 @@ public:
 private:
 	class HModelIterator : public HAbstractModelIterator {
 		typedef yaal::hcore::HPointer<HModelIterator> ptr_t;
-		HListControler const* _owner;
+		HAsIsValueListModel const* _owner;
 		iterator_t _iterator;
 		row_t _row;
 		HModelIterator( void );
 		HModelIterator( HModelIterator const& );
-		explicit HModelIterator( HListControler const*, iterator_t const& );
+		explicit HModelIterator( HAsIsValueListModel const*, iterator_t const& );
 		HModelIterator& operator = ( HModelIterator const& );
 		virtual HAbstractRow& dereference( void );
 		virtual HAbstractRow* call( void );
 		virtual void next( void );
 		virtual void previous( void );
-		virtual void assign_to( HAbstractControler::iterator_ptr_t& ) const;
+		virtual void assign_to( HAbstractListModel::iterator_ptr_t& ) const;
 		virtual bool is_equal( HAbstractModelIterator const& ) const;
 		virtual bool is_not_equal( HAbstractModelIterator const& ) const;
 		virtual bool is_valid( void ) const;
 		iterator_t& raw( void );
 		friend class HModelIteratorWrapper;
-		friend class HListControler<tType>;
+		friend class HAsIsValueListModel<tType>;
 #ifndef _MSC_VER
-		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HListControler<tType>* const&, typename model_t::iterator const& );
-		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HListControler<tType> const* const&, typename model_t::iterator const& );
+		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HAsIsValueListModel<tType>* const&, typename model_t::iterator const& );
+		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HAsIsValueListModel<tType> const* const&, typename model_t::iterator const& );
 #else /* #ifndef _MSC_VER */
 		template<typename T1, typename T2, typename T3>
 		friend yaal::hcore::HPointer<T1> yaal::hcore::make_pointer<T1>( T2 const&, T3 const& );
@@ -378,12 +378,12 @@ private:
 	};
 public:
 	typedef yaal::hcore::HPointer<HModelIterator> iterator_ptr_t;
-	typedef yaal::hcore::HPointer<HListControler<tType> > ptr_t;
+	typedef yaal::hcore::HPointer<HAsIsValueListModel<tType> > ptr_t;
 	typedef yaal::hcore::HPointer<model_t> model_ptr_t;
 private:
 	model_ptr_t _list;
 public:
-	HListControler( model_ptr_t = model_ptr_t() );
+	HAsIsValueListModel( model_ptr_t = model_ptr_t() );
 	void add_tail( tType const& );
 	void add_orderly( tType const&, int, OSortHelper::sort_order_t = OSortHelper::ASCENDING );
 	void remove_tail( void );
@@ -411,7 +411,7 @@ class HListWidget : virtual public HSearchableWidget, public list_widget_helper:
 public:
 	typedef HListWidget this_type;
 	typedef HSearchableWidget base_type;
-	typedef list_widget_helper::HAbstractControler::HModelIteratorWrapper iterator_t;
+	typedef list_widget_helper::HAbstractListModel::HModelIteratorWrapper iterator_t;
 	/*! \brief HListWidget settings flags.
 	 */
 	struct FLAG;
@@ -469,7 +469,7 @@ protected:
 	} _match;
 	iterator_t _cursor; /*!< current row highlight (selection or mark or what ever you name it) */
 	iterator_t _firstVisibleRow;	/*!< pointer to first visible row */
-	list_widget_helper::HAbstractControler::ptr_t _model;
+	list_widget_helper::HAbstractListModel::ptr_t _model;
 public:
 	HListWidget( HWindow* /* parent */,
 			int /* row */,
@@ -478,9 +478,9 @@ public:
 			int /* width */,
 			char const*,
 #ifndef _MSC_VER
-			list_widget_helper::HAbstractControler::ptr_t const& = hcore::make_pointer<list_widget_helper::HListControler<> >( hcore::make_pointer<list_widget_helper::HListControler<>::model_t>() ) );	/* label */
+			list_widget_helper::HAbstractListModel::ptr_t const& = hcore::make_pointer<list_widget_helper::HAsIsValueListModel<> >( hcore::make_pointer<list_widget_helper::HAsIsValueListModel<>::model_t>() ) );	/* label */
 #else /* #ifndef _MSC_VER */
-			list_widget_helper::HAbstractControler::ptr_t const& = list_widget_helper::HListControler<>::ptr_t( new ( memory::yaal ) list_widget_helper::HListControler<>( list_widget_helper::HListControler<>::model_ptr_t( new ( memory::yaal ) list_widget_helper::HListControler<>::model_t() ) ) );	/* label */
+			list_widget_helper::HAbstractListModel::ptr_t const& = list_widget_helper::HAsIsValueListModel<>::ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>( list_widget_helper::HAsIsValueListModel<>::model_ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>::model_t() ) ) );	/* label */
 #endif /* #else #ifndef _MSC_VER */
 	virtual ~HListWidget ( void );
 	void add_column( int,									/* at position */
@@ -491,7 +491,7 @@ public:
 			HWidget * = NULL );					/* control associated */
 	void set_flags( flag_t, flag_t );
 	void reset( void );
-	list_widget_helper::HAbstractControler::ptr_t& get_controler( void );
+	list_widget_helper::HAbstractListModel::ptr_t& get_controler( void );
 	void remove_current_row();
 	int long get_row_count( void );
 	type_id_t get_column_type( int );
@@ -543,11 +543,11 @@ public:
 };
 
 template<typename tType>
-HListControler<tType>::HListControler( model_ptr_t model_ ) : HAbstractControler(), _list( model_ ) {
+HAsIsValueListModel<tType>::HAsIsValueListModel( model_ptr_t model_ ) : HAbstractListModel(), _list( model_ ) {
 }
 
 template<typename tType>
-void HListControler<tType>::add_tail( tType const& row_ ) {
+void HAsIsValueListModel<tType>::add_tail( tType const& row_ ) {
 	M_PROLOG
 	_list->push_back( row_ );
 	_control->invalidate();
@@ -556,7 +556,7 @@ void HListControler<tType>::add_tail( tType const& row_ ) {
 }
 
 template<typename tType>
-void HListControler<tType>::add_orderly( tType const& row_, int column_, list_widget_helper::OSortHelper::sort_order_t order_ ) {
+void HAsIsValueListModel<tType>::add_orderly( tType const& row_, int column_, list_widget_helper::OSortHelper::sort_order_t order_ ) {
 	M_PROLOG
 	list_widget_helper::OSortHelper helper =
 		{ column_, order_, _control->get_column_type( column_ ),
@@ -568,7 +568,7 @@ void HListControler<tType>::add_orderly( tType const& row_, int column_, list_wi
 }
 
 template<typename tType>
-void HListControler<tType>::remove_tail( void ) {
+void HAsIsValueListModel<tType>::remove_tail( void ) {
 	M_PROLOG
 	_list->pop_back();
 	_control->invalidate();
@@ -577,92 +577,92 @@ void HListControler<tType>::remove_tail( void ) {
 }
 
 template<typename tType>
-int long HListControler<tType>::size( void ) {
+int long HAsIsValueListModel<tType>::size( void ) {
 	return ( _list->size() );
 }
 
 template<typename tType>
-HAbstractControler::HModelIteratorWrapper HListControler<tType>::begin( void ) {
+HAbstractListModel::HModelIteratorWrapper HAsIsValueListModel<tType>::begin( void ) {
 	return ( HModelIteratorWrapper( _list->begin() != _list->end() ? hcore::make_pointer<HModelIterator>( this, _list->begin() ) : iterator_ptr_t() ) );
 }
 
 template<typename tType>
-HAbstractControler::HModelIteratorWrapper HListControler<tType>::end( void ) {
+HAbstractListModel::HModelIteratorWrapper HAsIsValueListModel<tType>::end( void ) {
 	return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->end() ) ) );
 }
 
 template<typename tType>
-HAbstractControler::HModelIteratorWrapper HListControler<tType>::rbegin( void ) {
+HAbstractListModel::HModelIteratorWrapper HAsIsValueListModel<tType>::rbegin( void ) {
 	return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->rbegin().base() ) ) );
 }
 
 template<typename tType>
-HAbstractControler::HModelIteratorWrapper HListControler<tType>::rend( void ) {
+HAbstractListModel::HModelIteratorWrapper HAsIsValueListModel<tType>::rend( void ) {
 	return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->rend().base() ) ) );
 }
 
 template<typename tType>
-bool HListControler<tType>::is_empty( void ) {
+bool HAsIsValueListModel<tType>::is_empty( void ) {
 	return ( _list->is_empty() );
 }
 
 template<typename tType>
-HListControler<tType>::HModelIterator::HModelIterator( HListControler const* owner_, iterator_t const& it_ )
+HAsIsValueListModel<tType>::HModelIterator::HModelIterator( HAsIsValueListModel const* owner_, iterator_t const& it_ )
 	: _owner( owner_ ), _iterator( it_ ), _row( _iterator ) {
 	return;
 }
 
 template<typename tType>
-HListControler<tType>::HModelIterator::~HModelIterator( void ) {
+HAsIsValueListModel<tType>::HModelIterator::~HModelIterator( void ) {
 	return;
 }
 
 template<typename tType>
-bool HListControler<tType>::HModelIterator::is_valid( void ) const {
-	HListControler* lc( const_cast<HListControler*>( _owner ) );
+bool HAsIsValueListModel<tType>::HModelIterator::is_valid( void ) const {
+	HAsIsValueListModel* lc( const_cast<HAsIsValueListModel*>( _owner ) );
 	return ( ( _iterator != iterator_t() ) && ( _iterator != lc->_list->end() ) );
 }
 
 template<typename tType>
-void HListControler<tType>::HModelIterator::next( void ) {
+void HAsIsValueListModel<tType>::HModelIterator::next( void ) {
 	++ _iterator;
 	return;
 }
 
 template<typename tType>
-void HListControler<tType>::HModelIterator::previous( void ) {
+void HAsIsValueListModel<tType>::HModelIterator::previous( void ) {
 	-- _iterator;
 	return;
 }
 
 template<typename tType>
-HAbstractRow& HListControler<tType>::HModelIterator::dereference( void ) {
+HAbstractRow& HAsIsValueListModel<tType>::HModelIterator::dereference( void ) {
 	return ( _row );
 }
 
 template<typename tType>
-HAbstractRow* HListControler<tType>::HModelIterator::call( void ) {
+HAbstractRow* HAsIsValueListModel<tType>::HModelIterator::call( void ) {
 	return ( &_row );
 }
 
 template<typename tType>
-bool HListControler<tType>::HModelIterator::is_equal( typename HListControler<tType>::HAbstractModelIterator const& it_ ) const {
-	return ( _iterator == static_cast<typename HListControler<tType>::HModelIterator const&>( it_ )._iterator );
+bool HAsIsValueListModel<tType>::HModelIterator::is_equal( typename HAsIsValueListModel<tType>::HAbstractModelIterator const& it_ ) const {
+	return ( _iterator == static_cast<typename HAsIsValueListModel<tType>::HModelIterator const&>( it_ )._iterator );
 }
 
 template<typename tType>
-bool HListControler<tType>::HModelIterator::is_not_equal( typename HListControler<tType>::HAbstractModelIterator const& it_ ) const {
-	return ( _iterator != static_cast<typename HListControler<tType>::HModelIterator const&>( it_ )._iterator );
+bool HAsIsValueListModel<tType>::HModelIterator::is_not_equal( typename HAsIsValueListModel<tType>::HAbstractModelIterator const& it_ ) const {
+	return ( _iterator != static_cast<typename HAsIsValueListModel<tType>::HModelIterator const&>( it_ )._iterator );
 }
 
 template<typename tType>
-void HListControler<tType>::HModelIterator::assign_to( HAbstractControler::iterator_ptr_t& it_ ) const {
+void HAsIsValueListModel<tType>::HModelIterator::assign_to( HAbstractListModel::iterator_ptr_t& it_ ) const {
 	it_ = iterator_ptr_t( hcore::make_pointer<HModelIterator>( _owner, _iterator ) );
 	return;
 }
 
 template<typename tType>
-typename HListControler<tType>::iterator_t& HListControler<tType>::HModelIterator::raw( void ) {
+typename HAsIsValueListModel<tType>::iterator_t& HAsIsValueListModel<tType>::HModelIterator::raw( void ) {
 	return ( _iterator );
 }
 
@@ -682,7 +682,7 @@ HCell<tType>::~HCell( void ) {
 }
 
 template<typename tType>
-void HListControler<tType>::sort( list_widget_helper::OSortHelper& helper_ ) {
+void HAsIsValueListModel<tType>::sort( list_widget_helper::OSortHelper& helper_ ) {
 	M_PROLOG
 	_list->sort( CompareListControlItems<tType>( helper_ ) );
 	_control->invalidate();
@@ -690,16 +690,16 @@ void HListControler<tType>::sort( list_widget_helper::OSortHelper& helper_ ) {
 }
 
 template<typename tType>
-void HListControler<tType>::erase( HAbstractControler::HModelIteratorWrapper& it_ ) {
+void HAsIsValueListModel<tType>::erase( HAbstractListModel::HModelIteratorWrapper& it_ ) {
 	M_PROLOG
-	typename HListControler<tType>::iterator_ptr_t it = it_.raw();
+	typename HAsIsValueListModel<tType>::iterator_ptr_t it = it_.raw();
 	_list->erase( it->raw() );
 	return;
 	M_EPILOG
 }
 
 template<typename tType>
-void HListControler<tType>::add_tail( void ) {
+void HAsIsValueListModel<tType>::add_tail( void ) {
 	return;
 }
 
