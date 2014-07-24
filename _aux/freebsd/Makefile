@@ -93,6 +93,10 @@ pre-install:
 do-install:
 	@true
 
+.include <bsd.port.mk>
+
+$(ARTIFACT): $(PACKAGE_COOKIE)
+
 $(WRKDIR)/$(BUNDLE): $(ARTIFACT)
 	@cd $(WRKDIR) && \
 	/bin/rm -rf yaal-bundle && \
@@ -106,4 +110,3 @@ $(WRKDIR)/$(BUNDLE_WRAP): $(WRKDIR)/$(BUNDLE)
 
 bundle: $(WRKDIR)/$(BUNDLE_WRAP)
 
-.include <bsd.port.mk>
