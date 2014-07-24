@@ -9,3 +9,5 @@ tar-ignore = *.deb
 tar-ignore = yaal-bundle
 tar-ignore = yaal/debian
 tar-ignore = .my_make
+tar-ignore = *.log
+tar-ignore = .vimrc
