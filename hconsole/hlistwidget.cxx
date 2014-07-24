@@ -133,7 +133,7 @@ void HListWidget::do_paint( void ) {
 	if ( _widthRaw != tmp )
 		recalculate_column_widths();
 /* we need to decrement _heightRaw because we have additional row,
- * the list control header */
+ * the list widget header */
 	if ( _drawHeader )
 		_heightRaw --;
 	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
@@ -495,7 +495,7 @@ int HListWidget::do_process_input( int code_ ) {
 		case ( '\t' ):                 handle_key_tab();
 /* there is no break in previous `case():', because this list must give up
  * its focus and be refreshed and parent window must give focus
- * to another control */
+ * to another widget */
 		default : {
 			errorCode = static_cast<int>( _header.size() );
 			for ( ctr = 0; ctr < errorCode; ctr ++ )
