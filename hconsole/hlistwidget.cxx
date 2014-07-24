@@ -885,7 +885,7 @@ bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, type_id_t typ
 	M_EPILOG
 }
 
-list_widget_helper::HAbstractListModel::ptr_t& HListWidget::get_controler( void ) {
+list_widget_helper::HAbstractListModel::ptr_t& HListWidget::get_model( void ) {
 	return ( _model );
 }
 
@@ -970,7 +970,7 @@ bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHe
 }
 
 template<>
-HAsIsValueListModel<>::model_ptr_t HAsIsValueListModel<>::get_model( void ) {
+HAsIsValueListModel<>::data_ptr_t HAsIsValueListModel<>::get_data( void ) {
 	return ( _list );
 }
 
@@ -978,12 +978,12 @@ HAbstractListModel::~HAbstractListModel( void ) {
 	return;
 }
 
-HAbstractListModel::HAbstractListModel( void ) : _control( NULL ) {
+HAbstractListModel::HAbstractListModel( void ) : _widget( NULL ) {
 	return;
 }
 
-void HAbstractListModel::set_control( HListWidget* control_ ) {
-	_control = control_;
+void HAbstractListModel::set_control( HListWidget* widget_ ) {
+	_widget = widget_;
 	return;
 }
 
@@ -1128,10 +1128,10 @@ HAbstractCell::~HAbstractCell( void ) {
 }
 
 template<>
-void HCell<yaal::hcore::HList<HInfoItem>::iterator>::set_child_control_data( HWidget* control_ ) {
+void HCell<yaal::hcore::HList<HInfoItem>::iterator>::set_child_control_data( HWidget* widget_ ) {
 	M_PROLOG
-	control_->set( (*_data)[ _column ] );
-	control_->paint();
+	widget_->set( (*_data)[ _column ] );
+	widget_->paint();
 	return;
 	M_EPILOG
 }

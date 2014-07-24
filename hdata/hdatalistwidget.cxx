@@ -48,7 +48,7 @@ HDataListWidget::HDataListWidget(
 										width_, title_ ),
 								HSearchableWidget( true ),
 								HListWidget( NULL, 0, 0, 0, 0, NULL ),
-								HDataWidget(), _dataControler( _model ) {
+								HDataWidget(), _dataModel( _model ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -74,22 +74,22 @@ void HDataListWidget::load( int long /*id_*/ ) {
 	HDataWindow::ORowBuffer rb( idColNo, static_cast<int>( _header.size() ) );
 	parent->set_sync_store( &rb );
 	parent->status_bar()->init_progress( 0., "Collecting ..." );
-	HAsIsValueListModel<>::model_ptr_t model = _dataControler->get_model();
-	HAsIsValueListModel<>::model_t::iterator it = model->begin();
+	HAsIsValueListModel<>::data_ptr_t data( _dataModel->get_data() );
+	HAsIsValueListModel<>::data_t::iterator it( data->begin() );
 	int ctr( 0 );
-	int size( static_cast<int>( _dataControler->size() ) );
+	int size( static_cast<int>( _dataModel->size() ) );
 	for ( HRecordSet::iterator row( rs->begin() ), end( rs->end() ); row != end; ++ row ) {
 		parent->sync( row );
 		parent->status_bar()->update_progress();
-		if ( it != model->end() )
+		if ( it != data->end() )
 			{
 			(*it) = rb._item;
 			++ it;
 		} else
-			model->push_back( rb._item );
+			data->push_back( rb._item );
 		++ ctr;
 	} while ( ctr ++ < size )
-		_dataControler->remove_tail();
+		_dataModel->remove_tail();
 	reset();
 	parent->set_sync_store();
 	return;
@@ -104,7 +104,7 @@ int long HDataListWidget::get_current_id( void ) {
 
 void HDataListWidget::add_new( void ) {
 	M_PROLOG
-	_dataControler->add_tail( HInfoItem( static_cast<int>( _header.size() ) ) );
+	_dataModel->add_tail( HInfoItem( static_cast<int>( _header.size() ) ) );
 	process_input( KEY_CODES::HOME );
 	process_input( KEY_CODES::END );
 	return;
@@ -113,8 +113,8 @@ void HDataListWidget::add_new( void ) {
 
 void HDataListWidget::cancel_new( void ) {
 	M_PROLOG
-	_dataControler->remove_tail();
-	if ( _dataControler->size() ) {
+	_dataModel->remove_tail();
+	if ( _dataModel->size() ) {
 		process_input( KEY_CODES::HOME );
 		process_input( KEY_CODES::END );
 	}
