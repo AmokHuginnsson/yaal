@@ -129,7 +129,7 @@ public:
 	virtual bool get_checked( void );
 };
 
-/*! \brief Interface for HListWidget controler from MVC pattern.
+/*! \brief Interface for HListWidget model from MVC pattern.
  */
 class HAbstractListModel {
 public:
@@ -187,13 +187,13 @@ public:
 	virtual HModelIteratorWrapper rend() = 0;
 	virtual void erase( HModelIteratorWrapper& );
 	virtual void add_tail( void );
-	void set_control( HListWidget* );
+	void set_widget( HListWidget* );
 private:
 	HAbstractListModel( HAbstractListModel const& );
 	HAbstractListModel& operator = ( HAbstractListModel const& );
 };
 
-/*! \brief Controler of HListWidget in MVC idiom.
+/*! \brief Model of HListWidget in MVC idiom.
  *
  * We can decide to give user possibility to choose "model record type"
  * or we can assume that each model record is made of some kind of array
@@ -271,9 +271,9 @@ public:
 
 }
 
-/*! \brief Implementation of TUI List control class.
+/*! \brief Implementation of TUI List widget class.
  *
- * List control allows fancy representation of row based data with handful
+ * List widget allows fancy representation of row based data with handful
  * of display alteration methods.
  */
 class HListWidget : virtual public HSearchableWidget {
@@ -315,14 +315,14 @@ public:
 	};
 protected:
 	bool _checkable;      /*!< can items be checked/unchecked */
-	bool _sortable;       /*!< can control content be sorted */
+	bool _sortable;       /*!< can widget content be sorted */
 	bool _drawHeader;     /*!< should be header driven */
 	bool _editable;       /*!< is list interactively editable */
-	int  _widgetOffset;  /*!< when content is bigger than control
-														size this variable keeps
-														offset of first row shown */
-	int  _cursorPosition; /*!< cursor position relative to control
-														begining */
+	int  _widgetOffset;   /*!< when content is bigger than widget
+	                           size this variable keeps
+	                           offset of first row shown */
+	int  _cursorPosition; /*!< cursor position relative to widget
+	                           begining */
 	int  _sumForOne;      /*!< sum of percentage columns width */
 	typedef yaal::hcore::HArray<HColumnInfo> header_t;
 	header_t _header; /*!< list header info */
@@ -357,7 +357,7 @@ public:
 			int,									/* width */
 			BITS::ALIGN::align_t const& = BITS::ALIGN::LEFT,		/* align */
 			type_id_t = TYPE::HSTRING,	/* type */
-			HWidget * = NULL );					/* control associated */
+			HWidget * = NULL );					/* widget associated */
 	void set_flags( flag_t, flag_t );
 	void reset( void );
 	list_widget_helper::HAbstractListModel::ptr_t& get_model( void );
@@ -403,10 +403,10 @@ namespace list_widget_helper {
 /*! \brief HListWidget sort helper functor.
  */
 template<typename tType>
-class CompareListControlItems {
+class CompareListWidgetItems {
 	list_widget_helper::OSortHelper& _sortHelper;
 public:
-	CompareListControlItems ( list_widget_helper::OSortHelper& sortHelper_ )
+	CompareListWidgetItems ( list_widget_helper::OSortHelper& sortHelper_ )
 		: _sortHelper ( sortHelper_ ) { }
 	bool operator() ( tType const&, tType const& ) const;
 };
@@ -430,7 +430,7 @@ void HAsIsValueListModel<tType>::add_orderly( tType const& row_, int column_, li
 	list_widget_helper::OSortHelper helper =
 		{ column_, order_, _widget->get_column_type( column_ ),
 		0, size(), NULL };
-	tools::collections::add_orderly( *_list, row_, CompareListControlItems<tType>( helper ) );
+	tools::collections::add_orderly( *_list, row_, CompareListWidgetItems<tType>( helper ) );
 	_widget->invalidate();
 	return;
 	M_EPILOG
@@ -553,7 +553,7 @@ HCell<tType>::~HCell( void ) {
 template<typename tType>
 void HAsIsValueListModel<tType>::sort( list_widget_helper::OSortHelper& helper_ ) {
 	M_PROLOG
-	_list->sort( CompareListControlItems<tType>( helper_ ) );
+	_list->sort( CompareListWidgetItems<tType>( helper_ ) );
 	_widget->invalidate();
 	M_EPILOG
 }

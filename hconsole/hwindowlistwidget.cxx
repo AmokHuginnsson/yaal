@@ -136,7 +136,7 @@ void HCell<window_iterator_t>::set_child_widget_data( HWidget* ) {
 }
 
 template<>
-bool CompareListControlItems<HWindow::ptr_t>::operator() ( HWindow::ptr_t const& left_,
+bool CompareListWidgetItems<HWindow::ptr_t>::operator() ( HWindow::ptr_t const& left_,
 		HWindow::ptr_t const& right_ ) const {
 	M_PROLOG
 	HWindow::ptr_t const& left = _sortHelper._order == OSortHelper::ASCENDING ? left_ : right_;

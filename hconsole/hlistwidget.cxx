@@ -105,7 +105,7 @@ HListWidget::HListWidget( HWindow* parent_, int row_, int column_,
 	_header(), _sortColumn( -1 ), _match(),
 	_cursor(), _firstVisibleRow(), _model( data_ ) {
 	M_PROLOG
-	_model->set_control( this );
+	_model->set_widget( this );
 	schedule_repaint();
 	return;
 	M_EPILOG
@@ -982,7 +982,7 @@ HAbstractListModel::HAbstractListModel( void ) : _widget( NULL ) {
 	return;
 }
 
-void HAbstractListModel::set_control( HListWidget* widget_ ) {
+void HAbstractListModel::set_widget( HListWidget* widget_ ) {
 	_widget = widget_;
 	return;
 }
@@ -1137,7 +1137,7 @@ void HCell<yaal::hcore::HList<HInfoItem>::iterator>::set_child_widget_data( HWid
 }
 
 template<>
-bool CompareListControlItems<HInfoItem>::operator() ( HInfoItem const& left_,
+bool CompareListWidgetItems<HInfoItem>::operator() ( HInfoItem const& left_,
 		HInfoItem const& right_ ) const {
 	M_PROLOG
 	HInfoItem const& left = _sortHelper._order == OSortHelper::ASCENDING ? left_ : right_;
