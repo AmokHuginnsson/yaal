@@ -36,9 +36,9 @@ namespace hconsole {
 
 class HWindow;
 
-/*! \brief Implementation of TUI Window List control class.
+/*! \brief Implementation of TUI Window List widget class.
  *
- * Window List control displays list of currently opened windows,
+ * Window List widget displays list of currently opened windows,
  * and allows visual navigation for them.
  */
 class HWindowListWidget : public HListWidget {

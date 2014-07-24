@@ -152,7 +152,7 @@ void HListWidget::do_paint( void ) {
 					columnOffset += columnInfo->_widthRaw;
 				}
 				if ( ( it == _cursor ) && columnInfo->_widget ) {
-					(*it)[ ctrLoc ].set_child_control_data( columnInfo->_widget );
+					(*it)[ ctrLoc ].set_child_widget_data( columnInfo->_widget );
 				}
 			}
 		}
@@ -1128,7 +1128,7 @@ HAbstractCell::~HAbstractCell( void ) {
 }
 
 template<>
-void HCell<yaal::hcore::HList<HInfoItem>::iterator>::set_child_control_data( HWidget* widget_ ) {
+void HCell<yaal::hcore::HList<HInfoItem>::iterator>::set_child_widget_data( HWidget* widget_ ) {
 	M_PROLOG
 	widget_->set( (*_data)[ _column ] );
 	widget_->paint();

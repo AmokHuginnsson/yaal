@@ -39,12 +39,12 @@ namespace hconsole {
 
 HWindowListWidget::HWindowListWidget ( HWindow * parent_, int row_,
 		int column_, int height_, int width_, char const * label_,
-		HAbstractListModel::ptr_t const& controler_, model_t::cyclic_iterator& foregroundWindow_ )
+		HAbstractListModel::ptr_t const& model_, model_t::cyclic_iterator& foregroundWindow_ )
 	:	HWidget ( parent_, row_, column_, height_, width_, label_,
 			HWidgetAttributes().label_position( HWidget::LABEL::POSITION::STACKED ) ),
 		HSearchableWidget( false ),
 		HListWidget( parent_, row_, column_, height_,
-				width_, label_, controler_ ), _foregroundWindow( foregroundWindow_ ) {
+				width_, label_, model_ ), _foregroundWindow( foregroundWindow_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -131,7 +131,7 @@ HString HCell<window_iterator_t>::get_time( void ) {
 }
 
 template<>
-void HCell<window_iterator_t>::set_child_control_data( HWidget* ) {
+void HCell<window_iterator_t>::set_child_widget_data( HWidget* ) {
 	return;
 }
 

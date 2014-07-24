@@ -79,7 +79,7 @@ public:
 	virtual yaal::hcore::HString const get_double( void ) = 0;
 	virtual yaal::hcore::HString const get_string( void ) = 0;
 	virtual yaal::hcore::HString get_time( void ) = 0;
-	virtual void set_child_control_data( HWidget* ) = 0;
+	virtual void set_child_widget_data( HWidget* ) = 0;
 };
 
 /*! \brief Concretization of HAbstractCell.
@@ -97,7 +97,7 @@ public:
 	virtual yaal::hcore::HString const get_double( void );
 	virtual yaal::hcore::HString const get_string( void );
 	virtual yaal::hcore::HString get_time( void );
-	virtual void set_child_control_data( HWidget* );
+	virtual void set_child_widget_data( HWidget* );
 };
 
 /*! \brief Interface for row based access to data (model) in HListWidget.
