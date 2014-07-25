@@ -253,7 +253,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 		case ( '\t' ):
 			_focused = false;	/* very  */
 			schedule_repaint();	/* magic */
-		/* no break on purpouse, see hlistcontrol.c */
+		/* no break on purpouse, see hlistwidget.c */
 		default :
 			errorCode = code_;
 		break;
@@ -335,14 +335,14 @@ HTreeWidget::tree_t::node_t HTreeWidget::next( tree_t::node_t node ) {
 	M_EPILOG
 }
 
-void HTreeWidget::set_model( HTreeControlModelInterface::ptr_t model_ ) {
+void HTreeWidget::set_model( HAbstractTreeModel::ptr_t model_ ) {
 	M_PROLOG
 	_model = model_;
 	return;
 	M_EPILOG
 }
 
-HTreeControlModelInterface::ptr_t HTreeWidget::get_model( void ) const {
+HAbstractTreeModel::ptr_t HTreeWidget::get_model( void ) const {
 	M_PROLOG
 	return ( _model );
 	M_EPILOG
