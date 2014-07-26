@@ -84,14 +84,28 @@ private:
 	int long _start;
 	int long _size;
 public:
+	/*! \brief Construct empty deque object.
+	 */
 	HDeque( void )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		return;
 	}
+
+	/*! \brief Construct empty deque object using external allocator.
+	 *
+	 * \param allocator_ - external allocator that should be used for all deque's allocations.
+	 */
 	explicit HDeque( allocator_t const& )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		return;
 	}
+
+	/*! \brief Construct deque of given size.
+	 *
+	 * Array will be filled with default values of deque's objects type.
+	 *
+	 * \param size_ - size for newly created deque.
+	 */
 	explicit HDeque( int long size_ )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		M_PROLOG
@@ -100,6 +114,13 @@ public:
 		M_EPILOG
 	}
 
+	/*! \brief Construct deque of given size using external allocator.
+	 *
+	 * Array will be filled with default values of deque's objects type.
+	 *
+	 * \param size_ - size for newly created deque.
+	 * \param allocator_ - external allocator that should be used for all deque's allocations.
+	 */
 	HDeque( int long size_, allocator_t const& )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		M_PROLOG
@@ -108,6 +129,14 @@ public:
 		M_EPILOG
 	}
 
+	/*! \brief Construct deque of given size using explicit default value and external allocator.
+	 *
+	 * Array will be filled with objects of given value.
+	 *
+	 * \param size_ - size for newly created deque.
+	 * \param fillWith_ - value prototype that should be set for all objects in this newly created deque.
+	 * \param allocator_ - external allocator that should be used for all deque's allocations.
+	 */
 	HDeque( int long size_, type_t const& fillWith_, allocator_t const& = allocator_t() )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		M_PROLOG
@@ -116,6 +145,13 @@ public:
 		M_EPILOG
 	}
 
+	/*! \brief Construct deque based on given range of objects and external allocator.
+	 *
+	 * \tparam iterator_t -  type of iterator used to specify input range.
+	 * \param first - beginning of input range.
+	 * \param last - one past the end of input range.
+	 * \param allocator_ - external allocator that should be used for all deque's allocations.
+	 */
 	template<typename iterator_t>
 	HDeque( iterator_t first, iterator_t last, allocator_t const& = allocator_t() )
 		: _chunks(), _start( 0 ), _size( 0 ) {
@@ -131,7 +167,18 @@ public:
 		return;
 		M_DESTRUCTOR_EPILOG
 	}
+
+	/*! \brief Copy constructor.
+	 *
+	 * \param arr_ - deque object that this new deque should be a copy of.
+	 */
 	HDeque( HDeque const& );
+
+	/*! \brief Copy constructor with external allocator.
+	 *
+	 * \param arr_ - deque object that this new deque should be a copy of.
+	 * \param allocator_ - external allocator that should be used for all deque's allocations.
+	 */
 	HDeque( HDeque const&, allocator_t const& );
 
 #if CXX_STANDARD >= 2011
