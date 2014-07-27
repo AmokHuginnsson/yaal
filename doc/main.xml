@@ -18,7 +18,7 @@
 		<td>Ubuntu 14.04 (Trusty Tahr)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>Centos 6.5 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Centos 7 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>FreeBSD 10.0 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
