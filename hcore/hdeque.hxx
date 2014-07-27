@@ -191,6 +191,11 @@ public:
 	}
 #endif /* #if CXX_STANDARD >= 2011 */
 
+	/*! \brief Assing contents of another deque to this deque.
+	 *
+	 * \param arr_ - other deque that's contents will be assigned to this deque.
+	 * \return Self.
+	 */
 	HDeque& operator = ( HDeque const& deque_ ) {
 		M_PROLOG
 		if ( &deque_ != this ) {
@@ -213,6 +218,10 @@ public:
 	}
 #endif /* #if CXX_STANDARD >= 2011 */
 
+	/*! \brief Swap contents of this deque with another deque.
+	 *
+	 * \param other - the other deque that will swap contents with this deque.
+	 */
 	void swap( HDeque& deque_ ) {
 		if ( &deque_ != this ) {
 			using yaal::swap;
@@ -223,10 +232,29 @@ public:
 		return;
 	}
 
+	/*! \brief Get internal allocator instance.
+	 *
+	 * \return Internal allocator instance.
+	 */
 	allocator_type const& get_allocator( void ) const {
 		return ( _allocator );
 	}
+
+	/*! \brief Resize this deque.
+	 *
+	 * Change size of this deque to accommodate requested number of elements.
+	 * If necessary remove elements, or add new elements with default value.
+	 *
+	 * \param size_ - requested new number of elements in this deque.
+	 * \param fillWith_ - default value for new values if this deque will be enlarged.
+	 */
 	void resize( int long, type_t const& = value_type() );
+
+	/*! \brief Access element at given position in this deque.
+	 *
+	 * \param index_ - index of requested element in this deque.
+	 * \return Reference to element at requested index.
+	 */
 	type_t const& operator[] ( int long index_ ) const {
 		int long idx = ( index_ < 0 ) ? index_ + _size : index_;
 		if ( ( idx >= _size ) || ( idx < 0 ) )
@@ -242,9 +270,25 @@ public:
 		return ( _chunks.get<value_type*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
 	}
 	void push_front( type_t const& );
+
+	/*! \brief Remove first element of this deque.
+	 */
 	void pop_front( void );
+
+	/*! \brief Add element at end of this deque.
+	 *
+	 * \param val_ - element to be added at end of this deque.
+	 */
 	void push_back( type_t const& );
+
+	/*! \brief Remove last element of this deque.
+	 */
 	void pop_back( void );
+
+	/*! \brief Get reference to last element in this deque.
+	 *
+	 * \return Reference to last element in this deque.
+	 */
 	type_t const& back( void ) const {
 		M_PROLOG
 		M_ASSERT( _size > 0 );
@@ -259,6 +303,11 @@ public:
 		return ( _chunks.get<value_type*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
 		M_EPILOG
 	}
+
+	/*! \brief Get reference to first element in this deque.
+	 *
+	 * \return Reference to first element in this deque.
+	 */
 	type_t const& front( void ) const {
 		M_PROLOG
 		M_ASSERT( _size > 0 );
