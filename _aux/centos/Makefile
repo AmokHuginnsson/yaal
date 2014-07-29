@@ -25,7 +25,7 @@ $(VERIFY_DIR):
 
 $(ARTIFACTS): $(VERIFY_DIR)
 	@cd ../../ && \
-	rpmbuild -D '_topdir $(CURDIR)/_aux/centos/rpm' -bb ./_aux/centos/yaal.spec
+	rpmbuild -D '_topdir $(CURDIR)/rpm' -bb ./_aux/centos/yaal.spec
 
 rpm/$(BUNDLE): $(VERIFY_DIR) $(ARTIFACTS)
 	@/bin/rm -rf rpm/yaal-bundle && \
