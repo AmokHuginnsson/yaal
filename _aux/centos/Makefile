@@ -41,8 +41,8 @@ package: $(VERIFY_DIR) $(ARTIFACTS)
 bundle: $(VERIFY_DIR) rpm/$(BUNDLE_WRAP)
 
 clean: $(VERIFY_DIR)
-	@/bin/rm -f $(ARTIFACTS) $(BUNDLE_WRAP) $(BUNDLE) rpm && \
-	/bin/rm -rf yaal-bundle && \
+	@/bin/rm -f $(ARTIFACTS) $(BUNDLE_WRAP) $(BUNDLE) && \
+	/bin/rm -rf rpm yaal-bundle && \
 	cd ../../ && \
 	make purge
 
