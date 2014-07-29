@@ -17,7 +17,7 @@ BUNDLE_WRAP=yaal-bundle.tar
 DEBEMAIL=amok@codestation.org
 export DEBEMAIL
 
-.PHONY: all package clean
+.PHONY: all package bundle clean
 
 all: $(VERIFY_DIR)
 	@echo "Explicit target required!" && echo && echo "supported targets: clean package bundle"
