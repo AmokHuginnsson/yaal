@@ -111,7 +111,7 @@ M_EXPORT_SYMBOL void db_disconnect( ODBLink& );
 M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 	if ( dbLink_._conn ) {
 		mysql_close( static_cast<MYSQL*>( dbLink_._conn ) );
-		my_thread_end();
+		mysql_thread_end();
 		dbLink_.clear();
 	}
 	return;
