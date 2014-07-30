@@ -322,6 +322,11 @@ public:
 		return ( _chunks.get<value_type*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
 		M_EPILOG
 	}
+
+	/*! \brief Tell if this deque is empty.
+	 *
+	 * \return True iff this deque contains no elements - is empty.
+	 */
 	bool is_empty( void ) const {
 		return ( _size == 0 );
 	}
@@ -339,6 +344,13 @@ public:
 		return ( is_empty() );
 	}
 	iterator insert( iterator, type_t const& );
+	/*! \brief Replace contents of this deque with contents of given range.
+	 *
+	 * \tparam iterator_t - Type of iterator pair defining an input range.
+	 *
+	 * \param first - begining of the range of values to copy into this deque.
+	 * \param last - one past the end of the range of values to copy into this deque.
+	 */
 	template<typename iterator_t>
 	void assign( iterator_t, iterator_t );
 	void assign( int long, type_t const& );
@@ -393,11 +405,23 @@ public:
 
 	iterator find( int long );
 	const_iterator find( int long ) const;
+
+	/*! \brief Test if another deque is equal to this deque.
+	 *
+	 * \param a_ - the other deque to check for equality with.
+	 * \return True iff other deque is equal to this deque.
+	 */
 	bool operator == ( HDeque const& d_ ) const {
 		M_PROLOG
 		return ( ( &d_ == this ) || safe_equal( begin(), end(), d_.begin(), d_.end() ) );
 		M_EPILOG
 	}
+
+	/*! \brief Test if this deque is lexicographically lesser then given deque.
+	 *
+	 * \param a_ - other deque for lexicographical comparison.
+	 * \return True iff this deque is lexicographically lesser then given deque.
+	 */
 	bool operator < ( HDeque const& d_ ) const {
 		M_PROLOG
 		return ( ( &d_ != this ) && lexicographical_compare( begin(), end(), d_.begin(), d_.end() ) );
