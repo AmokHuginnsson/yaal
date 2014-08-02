@@ -38,7 +38,8 @@ namespace yaal {
 namespace hdata {
 
 HDataWidget::HDataWidget( void )
-						: HWidget( NULL, 0, 0, 0, 0, NULL ), _resource( NULL ), _SQL() {
+	: HWidget( NULL, 0, 0, 0, 0, hcore::HString() ),
+	_resource( NULL ), _SQL() {
 	M_PROLOG
 	return;
 	M_EPILOG

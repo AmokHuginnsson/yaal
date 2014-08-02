@@ -51,7 +51,7 @@ bool HWidget::OAttribute::operator == ( OAttribute const& attr_ ) const {
 }
 
 HWidget::HWidget( HWindow* parent_, int row_, int column_,
-		int height_, int width_, char const* label_,
+		int height_, int width_, yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
 	: _enabled( false ), _focused( false ), _drawLabel( true ),
 	_labelPosition( LABEL::POSITION::STACKED ),
@@ -74,11 +74,11 @@ HWidget::HWidget( HWindow* parent_, int row_, int column_,
 	_shortcutIndex = static_cast<int>( _label.find( '&' ) );
 	if ( _shortcutIndex > -1 ) {
 		_label.set_at( _shortcutIndex, 0 );
-		_label += label_ + _shortcutIndex + 1;
+		_label += label_.substr( _shortcutIndex + 1 );
 	} else {
 		_shortcutIndex = 0;
 	}
-	_labelLength = label_ ? static_cast<int>( _label.get_length() ) : 0;
+	_labelLength = ! label_.is_empty() ? static_cast<int>( _label.get_length() ) : 0;
 	if ( _labelLength ) {
 		if ( _label[ _labelLength - 1 ] != '\n' ) {
 			_labelPosition = LABEL::POSITION::SIDE_BY_SIDE;

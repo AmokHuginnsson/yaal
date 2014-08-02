@@ -30,6 +30,7 @@ Copyright:
 #include "hconsole/console.hxx"
 #include "hcore/hpointer.hxx"
 #include "hcore/hstring.hxx"
+#include "tools/hxml.hxx"
 #include "hconsole/hinfo.hxx"
 
 namespace yaal {
@@ -51,7 +52,7 @@ private:
  *
  * This class is a common interface for all TUI widget classes.
  */
-class HWidget {
+class HWidget : public yaal::hcore::HPointerFromThisInterface<HWidget> {
 public:
 	typedef HWidget this_type;
 	struct OAttribute {
@@ -146,7 +147,8 @@ public:
  * \param label - Widget title.
  * \param attributes - Additional attributes for this widget.
  */
-	HWidget( HWindow* parent, int row, int col, int height, int width, char const* label,
+	HWidget( HWindow* parent, int row, int col, int height, int width,
+			yaal::hcore::HString const& label,
 			HWidgetAttributesInterface const& attributes = HWidgetAttributesInterface() );
 
 /*! \brief Widget destructor.

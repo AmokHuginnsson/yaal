@@ -38,7 +38,7 @@ namespace yaal {
 namespace hconsole {
 
 HSearchableWidget::HSearchableWidget( bool searchable_ )
-									: HWidget( NULL, 0, 0, 0, 0, NULL ),
+									: HWidget( NULL, 0, 0, 0, 0, hcore::HString() ),
 	_searchable( searchable_ ), _searchActived( false ),
 	_filtered( false ), _backwards( false ), _pattern() {
 	M_PROLOG

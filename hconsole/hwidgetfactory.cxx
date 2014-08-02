@@ -38,7 +38,7 @@ namespace yaal {
 
 namespace hconsole {
 
-void HWidgetFactory::register_logic_creator( HString const& name_, HWidgetCreatorInterface::ptr_t creator_ ) {
+void HWidgetFactory::register_widget_creator( HString const& name_, HWidgetCreatorInterface::ptr_t creator_ ) {
 	M_PROLOG
 	creators_t::iterator it = _creators.find( name_ );
 	if ( it != _creators.end() ) {
@@ -96,6 +96,13 @@ void HWidgetFactory::cleanup_globals( void ) {
 	M_EPILOG
 }
 
+HWidgetCreatorInterface::OResource::OResource( void )
+	: _row( 0 ), _column( 0 ), _height( 0 ), _width( 0 ),
+	_label( "" ),
+	_labelPosition( HWidget::LABEL::POSITION::SIDE_BY_SIDE ),
+	_labelDecoration( HWidget::LABEL::DECORATION::AUTO ) {
+}
+
 void HWidgetCreatorInterface::initialize_globals( void ) {
 	M_PROLOG
 	do_initialize_globals();
@@ -113,6 +120,20 @@ void HWidgetCreatorInterface::cleanup_globals( void ) {
 HWidget::ptr_t HWidgetCreatorInterface::new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	return ( do_new_instance( window_, node_ ) );
+	M_EPILOG
+}
+
+void HWidgetCreatorInterface::apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	do_apply_resources( widget_, node_ );
+	return;
+	M_EPILOG
+}
+
+void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& attrs_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	do_prepare_attributes( attrs_, node_ );
+	return;
 	M_EPILOG
 }
 

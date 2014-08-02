@@ -39,26 +39,42 @@ namespace yaal {
 namespace hconsole {
 
 class HWidgetCreatorInterface {
+public:
+	struct OResource {
+		int _row;           /*!< top coordinate of control */
+		int _column;        /*!< left coordinate of control */
+		int _height;        /*!< height of control */
+		int _width;         /*!< width of control */
+		yaal::hcore::HString _label; /*!< control label */
+		HWidget::LABEL::POSITION::label_position_t _labelPosition;
+		HWidget::LABEL::DECORATION::decoration_t _labelDecoration;
+		OResource( void );
+	};
 protected:
 	virtual void do_initialize_globals( void ) {};
 	virtual void do_cleanup_globals( void ) {};
 	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& ) = 0;
+	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) = 0;
+	virtual void do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) = 0;
 public:
 	virtual ~HWidgetCreatorInterface( void ) {}
 	void initialize_globals( void );
 	void cleanup_globals( void );
 	HWidget::ptr_t new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	void apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+	void prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
+	OResource get_resource( yaal::tools::HXml::HConstNodeProxy const& );
 	typedef yaal::hcore::HPointer<HWidgetCreatorInterface> ptr_t;
 };
 
-class HWidgetFactory {
+class HWidgetFactory : public yaal::hcore::HSingleton<HWidgetFactory> {
 public:
 	typedef HWidgetFactory this_type;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HWidgetCreatorInterface::ptr_t> creators_t;
 private:
 	creators_t _creators;
 public:
-	void register_logic_creator( yaal::hcore::HString const&, HWidgetCreatorInterface::ptr_t );
+	void register_widget_creator( yaal::hcore::HString const&, HWidgetCreatorInterface::ptr_t );
 	HWidget::ptr_t create_widget( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
 	bool is_type_valid( yaal::hcore::HString const& );
 	creators_t::iterator begin( void );
