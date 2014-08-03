@@ -37,8 +37,11 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hwindow.hxx"
 #include "hcore/hlog.hxx"
 #include "hwidgetfactory.hxx"
+#include "hcore/foreach.hxx"
+#include "tools/hxml.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal {
 
@@ -722,14 +725,44 @@ HWidget::ptr_t HEditWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	M_PROLOG
 	HEditWidgetAttrubites attrs;
 	prepare_attributes( attrs, node_ );
-	OResource r;
-	HWidget* edit( new HEditWidget( window_, 0, 0, 0, 0, "", attrs ) );
+	OResource r( get_resource( node_ ) );
+	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
+	HWidget* edit( new HEditWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( edit->get_pointer(), node_ );
 	return ( edit->get_pointer() );
 	M_EPILOG
 }
 
-void HEditWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) {
+void HEditWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HEditWidgetAttrubites& attrs( dynamic_cast<HEditWidgetAttrubites&>( attributes_ ) );
+	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
+		HString const& name( n.get_name() );
+		if ( name == "max_string_size" )
+			attrs.max_string_size( lexical_cast<int>( xml::node_val( n ) ) );
+		else if ( name == "value" ) {
+			xml::value_t value( xml::try_node_val( n ) );
+			attrs.text( value ? *value : "" );
+		} else if ( name == "mask" ) {
+			attrs.pattern( xml::node_val( n ) );
+		} else if ( name == "replace" ) {
+			attrs.replace( lexical_cast<bool>( xml::node_val( n ) ) );
+		} else if ( name == "multi_line" ) {
+			attrs.multiline( lexical_cast<bool>( xml::node_val( n ) ) );
+		} else if ( name == "read_only" ) {
+			attrs.readonly( lexical_cast<bool>( xml::node_val( n ) ) );
+		} else if ( name == "right_aligned" ) {
+			attrs.rightaligned( lexical_cast<bool>( xml::node_val( n ) ) );
+		} else if ( name == "password" ) {
+			attrs.password( lexical_cast<bool>( xml::node_val( n ) ) );
+		} else if ( name == "max_history_level" ) {
+			attrs.max_history_level( lexical_cast<int>( xml::node_val( n ) ) );
+		} else {
+			M_THROW( "unknown edit attribute name: " + name, 0 );
+		}
+	}
+	return;
+	M_EPILOG
 }
 
 void HEditWidgetCreator::do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) {

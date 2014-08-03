@@ -30,9 +30,11 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hwidgetfactory.hxx"
+#include "hcore/foreach.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal {
 
@@ -134,6 +136,40 @@ void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& at
 	M_PROLOG
 	do_prepare_attributes( attrs_, node_ );
 	return;
+	M_EPILOG
+}
+
+HWidgetCreatorInterface::OResource HWidgetCreatorInterface::get_resource( yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	OResource r;
+	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
+		HString const& name( n.get_name() );
+		if ( name == "position" ) {
+			r._row = lexical_cast<int>( xml::attr_val( n, "row" ) );
+			r._column = lexical_cast<int>( xml::attr_val( n, "column" ) );
+			r._height = lexical_cast<int>( xml::attr_val( n, "height" ) );
+			r._width = lexical_cast<int>( xml::attr_val( n, "width" ) );
+		} else if ( name == "label" ) {
+			r._label = xml::node_val( n );
+			xml::value_t position( xml::try_attr_val( n, "position" ) );
+			if ( position ) {
+				if ( *position == "stacked" ) {
+					r._labelPosition = HWidget::LABEL::POSITION::STACKED;
+				} else if ( *position == "side_by_side" ) {
+					r._labelPosition = HWidget::LABEL::POSITION::SIDE_BY_SIDE;
+				}
+			}
+			xml::value_t decoration( xml::try_attr_val( n, "decoration" ) );
+			if ( decoration ) {
+				if ( *decoration == "auto" ) {
+					r._labelDecoration = HWidget::LABEL::DECORATION::AUTO;
+				} else if ( *decoration == "explicit" ) {
+					r._labelDecoration = HWidget::LABEL::DECORATION::EXPLICIT;
+				}
+			}
+		}
+	}
+	return ( r );
 	M_EPILOG
 }
 
