@@ -40,10 +40,10 @@ namespace hdata {
 
 HDataTreeWidget::HDataTreeWidget(
 		HDataWindow* window_, int row_, int column_, int height_,
-		int width_, char const* title_ )
+		int width_, yaal::hcore::HString const& title_ )
 								: HWidget( window_, row_, column_, height_,
 										width_, title_ ),
-								HTreeWidget( NULL, 0, 0, 0, 0, NULL ),
+								HTreeWidget( NULL, 0, 0, 0, 0, hcore::HString() ),
 								HDataWidget() {
 	M_PROLOG
 	return;

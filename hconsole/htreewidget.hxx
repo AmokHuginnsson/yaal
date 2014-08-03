@@ -200,12 +200,12 @@ protected:
 	tree_t _tree;
 	tree_t::node_t _selected;
 public:
-	HTreeWidget( HWindow*,			/* parent */
-								 int,						/* row */
-								 int,						/* col */
-								 int,						/* height */
-								 int,						/* width */
-								 char const* );	/* label */
+	HTreeWidget( HWindow* parent,
+								 int row,
+								 int col,
+								 int height,
+								 int width,
+								 yaal::hcore::HString const& label );
 	virtual ~HTreeWidget( void );
 	int draw_node( tree_t::node_t, int );
 	void set_model( HAbstractTreeModel::ptr_t );

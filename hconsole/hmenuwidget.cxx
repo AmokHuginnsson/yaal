@@ -58,7 +58,7 @@ int HMenuWidget::load_sub_menu( tree_t::node_t node, OMenuItem* subMenu_ ) {
 
 HMenuWidget::HMenuWidget( HWindow* parent_,
 		int row_, int column_, int height_, int width_,
-		char const* label_ )
+		yaal::hcore::HString const& label_ )
 	: HWidget( parent_, row_, column_, height_, width_, label_,
 			HWidgetAttributes().label_position( HWidget::LABEL::POSITION::STACKED ) ),
 	HTreeWidget( parent_, row_, column_, height_, width_, label_ ),

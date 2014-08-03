@@ -62,16 +62,14 @@ protected:
 	MODE::mode_t _mode; /* operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
 	int _droppedWidth;	/* width of dropped list */
 public:
-	HComboboxWidget ( HWindow* parent,
-										 int row,
-										 int col,
-										 int height,
-										 int width,
-										 char const * label,
-										 int droppedWidth = 0,
-										 int maxStringLength = 127,
-										 char const* regexp = _maskDefault_,
-										 bool searchable = true );
+	HComboboxWidget( HWindow* parent,
+			int row, int col, int height, int width,
+			yaal::hcore::HString const& label,
+			int droppedWidth = 0,
+			int maxStringLength = 127,
+			char const* regexp = _maskDefault_,
+			bool searchable = true
+	);
 	virtual ~HComboboxWidget ( void );
 	virtual int kill_focus( void ); /* this one will be used here */
 protected:

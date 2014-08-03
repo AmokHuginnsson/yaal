@@ -40,7 +40,7 @@ class HDataWindow;
  */
 class HDataTreeWidget : public HDataWidget, public virtual hconsole::HTreeWidget {
 public:
-	HDataTreeWidget( HDataWindow*, int, int, int, int, char const* );
+	HDataTreeWidget( HDataWindow*, int, int, int, int, yaal::hcore::HString const& );
 	virtual ~HDataTreeWidget( void );
 	virtual void load( int long );
 };

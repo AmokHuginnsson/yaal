@@ -67,7 +67,7 @@ private:
 	int _attribute;
 	contents_t _contents;
 public:
-	HLogPad( HWindow*, int, int, int, int, char const * const );
+	HLogPad( HWindow*, int, int, int, int, yaal::hcore::HString const& );
 	virtual ~HLogPad( void );
 	void add( int, yaal::hcore::HString const& );
 	void add( yaal::hcore::HString const& );

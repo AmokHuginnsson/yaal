@@ -43,12 +43,12 @@ namespace hdata {
 
 HDataListWidget::HDataListWidget(
 		HDataWindow* window_, int row_, int column_, int height_,
-		int width_, char const* title_ )
-								: HWidget ( window_, row_, column_, height_,
-										width_, title_ ),
-								HSearchableWidget( true ),
-								HListWidget( NULL, 0, 0, 0, 0, NULL ),
-								HDataWidget(), _dataModel( _model ) {
+		int width_, yaal::hcore::HString const& title_ )
+	: HWidget( window_, row_, column_, height_, width_, title_ ),
+	HSearchableWidget( true ),
+	HListWidget( NULL, 0, 0, 0, 0, HString() ),
+	HDataWidget(),
+	_dataModel( _model ) {
 	M_PROLOG
 	return;
 	M_EPILOG

@@ -41,7 +41,7 @@ namespace hdata {
 
 HDataEditWidget::HDataEditWidget( HDataWindow * parent_,
 		int row_, int column_, int height_, int width_,
-		char const* label_, HWidgetAttributesInterface const& attr_ )
+		yaal::hcore::HString const& label_, HWidgetAttributesInterface const& attr_ )
 	:	HWidget ( parent_, row_, column_, height_, width_, label_, attr_ ),
 		HEditWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
 		HDataWidget() {

@@ -37,10 +37,10 @@ namespace yaal {
 
 namespace hdata {
 
-HDataStatusBarWidget::HDataStatusBarWidget ( HDataWindow * parent_,
-		char const * label_, int statusBarAttribute_ )
-								 : HWidget ( parent_, - 2, 0, 2, - 1, label_ ),
-									HStatusBarWidget ( NULL, NULL, statusBarAttribute_ ) {
+HDataStatusBarWidget::HDataStatusBarWidget( HDataWindow* parent_,
+		yaal::hcore::HString const& label_, int statusBarAttribute_ )
+	: HWidget( parent_, - 2, 0, 2, - 1, label_ ),
+	HStatusBarWidget( NULL, HString(), statusBarAttribute_ ) {
 	M_PROLOG
 	_labelLength += 3; /* for "[+]" */
 	return;

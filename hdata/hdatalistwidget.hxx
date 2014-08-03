@@ -46,7 +46,7 @@ class HDataWindow;
 class HDataListWidget : public HDataWidget, public virtual yaal::hconsole::HListWidget {
 public:
 	yaal::hconsole::list_widget_helper::HAsIsValueListModel<>::ptr_t _dataModel;
-	HDataListWidget( HDataWindow*, int, int, int, int, char const* );
+	HDataListWidget( HDataWindow*, int, int, int, int, yaal::hcore::HString const& );
 	virtual ~HDataListWidget( void );
 	virtual void load( int long );
 	virtual int long get_current_id( void );

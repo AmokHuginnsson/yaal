@@ -345,7 +345,7 @@ public:
 			int /* col */,
 			int /* height */,
 			int /* width */,
-			char const*,
+			yaal::hcore::HString const&,
 #ifndef _MSC_VER
 			list_widget_helper::HAbstractListModel::ptr_t const& = hcore::make_pointer<list_widget_helper::HAsIsValueListModel<> >( hcore::make_pointer<list_widget_helper::HAsIsValueListModel<>::data_t>() ) );	/* label */
 #else /* #ifndef _MSC_VER */

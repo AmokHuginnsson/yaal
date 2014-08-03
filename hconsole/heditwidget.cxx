@@ -53,7 +53,7 @@ char const* const _maskDefault_  = _maskLetters_;
 
 HEditWidget::HEditWidget( HWindow* parent_,
 		int row_, int column_, int height_, int width_,
-		char const* label_, HWidgetAttributesInterface const& attr_ )
+		yaal::hcore::HString const& label_, HWidgetAttributesInterface const& attr_ )
 					: HWidget( parent_, row_, column_, height_,
 							width_, label_, attr_ ),
 					_replace( false ),

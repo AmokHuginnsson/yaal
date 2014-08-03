@@ -83,7 +83,7 @@ protected:
 	choices_t _choices;
 	/* end of progress bar data */
 public:
-	HStatusBarWidget( HWindow*, char const* const, int = -1 );
+	HStatusBarWidget( HWindow*, yaal::hcore::HString const&, int = -1 );
 	virtual ~HStatusBarWidget ( void );
 	void setup( char const*, char const*, int );
 	void set_prompt( yaal::hcore::HString const&, PROMPT::mode_t = PROMPT::NORMAL );

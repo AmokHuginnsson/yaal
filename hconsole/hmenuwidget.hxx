@@ -52,7 +52,7 @@ public:
 								 int,							/* col */
 								 int,							/* height */
 								 int,							/* width */
-								 char const* );	/* label */
+								 yaal::hcore::HString const& );	/* label */
 	virtual ~HMenuWidget( void );
 	void init( HTUIProcess*, OMenuItem* );
 protected:

@@ -83,7 +83,8 @@ public:
 	 * \param label - label of a widget.
 	 */
 	HEditWidget( HWindow* parent, int top, int left,	int height, int width,
-								char const* label = "", HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
+								yaal::hcore::HString const& label = "",
+								HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
 	virtual ~HEditWidget( void );
 	void set_flags( bool = false, bool = false );
 	virtual HInfo const& get( void ) const;

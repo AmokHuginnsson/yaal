@@ -48,7 +48,7 @@ public:
 			int, /* left */
 			int, /* height */
 			int, /* width */
-			char const * = "", /* label */
+			yaal::hcore::HString const& = "", /* label */
 			hconsole::HWidgetAttributesInterface const& = hconsole::HWidgetAttributesInterface() );
 	virtual int do_process_input( int );
 };

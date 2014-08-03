@@ -109,7 +109,7 @@ bool HTreeWidget::HNodeWidget::is_unfolded( void ) const {
 }
 
 HTreeWidget::HTreeWidget( HWindow* parent_, int row_, int column_,
-		int height_, int width_, char const* label_ )
+		int height_, int width_, yaal::hcore::HString const& label_ )
 	: HWidget( parent_, row_, column_, height_, width_, label_ ),
 	_model(), _tree(), _selected( NULL ) {
 	M_PROLOG

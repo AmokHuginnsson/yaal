@@ -95,7 +95,7 @@ HListWidget::HColumnInfo& HListWidget::HColumnInfo::operator = ( HColumnInfo con
 }
 
 HListWidget::HListWidget( HWindow* parent_, int row_, int column_,
-		int height_, int width_, char const* label_, HAbstractListModel::ptr_t const& data_ )
+		int height_, int width_, yaal::hcore::HString const& label_, HAbstractListModel::ptr_t const& data_ )
 						: HWidget( parent_, row_, column_, height_, width_,
 								label_ ),
 							HSearchableWidget( true ),

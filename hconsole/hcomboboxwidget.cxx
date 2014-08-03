@@ -39,13 +39,13 @@ namespace hconsole {
 
 HComboboxWidget::HComboboxWidget ( HWindow * parent_,
 		int row_, int column_, int height_, int width_,
-		char const * label_, int droppedWidth_,
+		yaal::hcore::HString const& label_, int droppedWidth_,
 		int maxLength_, char const * mask_, bool searchable_ )
 	: HWidget ( parent_, row_, column_, height_,
 			width_, label_ ),
-		HEditWidget( NULL, 0, 0, 0, 0, NULL, HEditWidgetAttrubites().max_string_size( maxLength_ ).pattern(mask_ ) ),
+		HEditWidget( NULL, 0, 0, 0, 0, HString(), HEditWidgetAttrubites().max_string_size( maxLength_ ).pattern(mask_ ) ),
 		HSearchableWidget( searchable_ ),
-		HListWidget ( NULL, 0, 0, 0, 0, NULL ),
+		HListWidget ( NULL, 0, 0, 0, 0, HString() ),
 		_mode ( MODE::EDITCONTROL ), _droppedWidth ( droppedWidth_ ) {
 	M_PROLOG
 	return;
