@@ -524,7 +524,7 @@ int HListWidget::do_process_input( int code_ ) {
 	M_EPILOG
 }
 
-void HListWidget::add_column( int column_, char const* name_,
+void HListWidget::add_column( int column_, yaal::hcore::HString const& name_,
 		int width_, BITS::ALIGN::align_t const& align_, type_id_t type_,
 		HWidget* widget_ ) {
 	M_PROLOG
@@ -1276,13 +1276,46 @@ void HListWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attr
 	M_EPILOG
 }
 
-void HListWidgetCreator::do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) {
+void HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
+		HString const& name( n.get_name() );
+		if ( name == "column" ) {
+			int placement( lexical_cast<int>( xml::attr_val( n, "placement" ) ) );
+			HString columnName( xml::attr_val( n, "name" ) );
+			int width( lexical_cast<int>( xml::attr_val( n, "width" ) ) );
+			HXml::HNode::properties_t const& col( n.properties() );
+			HXml::HNode::properties_t::const_iterator alignIt( col.find( "align" ) );
+			HXml::HNode::properties_t::const_iterator colTypeIt( col.find( "type" ) );
+			M_ENSURE( ( alignIt != col.end() ) && ( colTypeIt != col.end() ) );
+			HWidget::BITS::ALIGN::align_t align( HWidget::BITS::ALIGN::LEFT );
+			if ( alignIt->second == "left" ) {
+				align = HWidget::BITS::ALIGN::LEFT;
+			} else if ( alignIt->second == "center" ) {
+				align = HWidget::BITS::ALIGN::CENTER;
+			} else if ( alignIt->second == "right" ) {
+				align = HWidget::BITS::ALIGN::RIGHT;
+			} else {
+				M_THROW( _( "unknown align type" ), 0 );
+			}
+			type_id_t type( TYPE::HSTRING );
+			if ( colTypeIt->second == "string" ) {
+				type = TYPE::HSTRING;
+			} else {
+				M_THROW( _( "unknown column type" ), 0 );
+			}
+			HListWidget* list( dynamic_cast<HListWidget*>( widget_.raw() ) );
+			list->add_column( placement, columnName, width, align, type );
+		}
+	}
+	return;
+	M_EPILOG
 }
 
 namespace {
 
 bool register_creator( void ) {
-	HWidgetFactory::get_instance().register_widget_creator( "edit", HWidgetCreatorInterface::ptr_t( new HListWidgetCreator() ) );
+	HWidgetFactory::get_instance().register_widget_creator( "list", HWidgetCreatorInterface::ptr_t( new HListWidgetCreator() ) );
 	return ( true );
 }
 

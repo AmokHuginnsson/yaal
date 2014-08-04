@@ -353,12 +353,12 @@ public:
 			list_widget_helper::HAbstractListModel::ptr_t const& = list_widget_helper::HAsIsValueListModel<>::ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>( list_widget_helper::HAsIsValueListModel<>::data_ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>::data_t() ) ) );	/* label */
 #endif /* #else #ifndef _MSC_VER */
 	virtual ~HListWidget ( void );
-	void add_column( int,									/* at position */
-			char const*,									/* column name */
-			int,									/* width */
-			BITS::ALIGN::align_t const& = BITS::ALIGN::LEFT,		/* align */
-			type_id_t = TYPE::HSTRING,	/* type */
-			HWidget * = NULL );					/* widget associated */
+	void add_column( int atPosition,
+			yaal::hcore::HString const& columnName,
+			int width,
+			BITS::ALIGN::align_t const& align = BITS::ALIGN::LEFT,
+			type_id_t type = TYPE::HSTRING,
+			HWidget* associatedWidget = NULL );
 	void set_flags( flag_t, flag_t );
 	void reset( void );
 	list_widget_helper::HAbstractListModel::ptr_t& get_model( void );
