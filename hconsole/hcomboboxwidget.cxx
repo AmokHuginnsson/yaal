@@ -43,7 +43,7 @@ HComboboxWidget::HComboboxWidget ( HWindow * parent_,
 		int maxLength_, char const * mask_, bool searchable_ )
 	: HWidget ( parent_, row_, column_, height_,
 			width_, label_ ),
-		HEditWidget( NULL, 0, 0, 0, 0, HString(), HEditWidgetAttrubites().max_string_size( maxLength_ ).pattern(mask_ ) ),
+		HEditWidget( NULL, 0, 0, 0, 0, HString(), HEditWidgetAttributes().max_string_size( maxLength_ ).pattern(mask_ ) ),
 		HSearchableWidget( searchable_ ),
 		HListWidget ( NULL, 0, 0, 0, 0, HString() ),
 		_mode ( MODE::EDITCONTROL ), _droppedWidth ( droppedWidth_ ) {

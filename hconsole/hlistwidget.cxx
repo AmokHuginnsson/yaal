@@ -34,9 +34,13 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hlistwidget.hxx"
 #include "hcore/memory.hxx"
 #include "hconsole.hxx"
+#include "hwidgetfactory.hxx"
+#include "hcore/foreach.hxx"
+#include "tools/hxml.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools;
 using namespace yaal::hconsole::list_widget_helper;
 using namespace yaal::hconsole::mouse;
 
@@ -95,16 +99,17 @@ HListWidget::HColumnInfo& HListWidget::HColumnInfo::operator = ( HColumnInfo con
 }
 
 HListWidget::HListWidget( HWindow* parent_, int row_, int column_,
-		int height_, int width_, yaal::hcore::HString const& label_, HAbstractListModel::ptr_t const& data_ )
-						: HWidget( parent_, row_, column_, height_, width_,
-								label_ ),
-							HSearchableWidget( true ),
+		int height_, int width_, yaal::hcore::HString const& label_, HWidgetAttributesInterface const& attr_,
+		HAbstractListModel::ptr_t const& data_ )
+	: HWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
+	HSearchableWidget( true ),
 	_checkable( false ), _sortable( true ),
 	_drawHeader( true ), _editable( false ),
 	_widgetOffset( 0 ), _cursorPosition( 0 ), _sumForOne( 0 ),
 	_header(), _sortColumn( -1 ), _match(),
 	_cursor(), _firstVisibleRow(), _model( data_ ) {
 	M_PROLOG
+	attr_.apply( *this );
 	_model->set_widget( this );
 	schedule_repaint();
 	return;
@@ -1149,6 +1154,143 @@ bool CompareListWidgetItems<HInfoItem>::operator() ( HInfoItem const& left_,
 
 }
 
+HListWidgetAttributes::HListWidgetAttributes( void )
+	: HWidgetAttributes(),
+	_checkable( false ),
+	_checkableSet( false ),
+	_sortable( false ),
+	_sortableSet( false ),
+	_drawHeader( false ),
+	_drawHeaderSet( false ),
+	_editable( false ),
+	_editableSet( false ) {
+}
+
+void HListWidgetAttributes::do_apply( HWidget& widget_ ) const {
+	M_PROLOG
+	HListWidget* widget( dynamic_cast<HListWidget*>( &widget_ ) );
+	if ( widget ) {
+		HListWidget::flag_t toSet( HListWidget::FLAG::NONE );
+		HListWidget::flag_t flag( HListWidget::FLAG::NONE );
+		if ( _checkableSet ) {
+			toSet |= HListWidget::FLAG::CHECKABLE;
+			if ( _checkable ) {
+				flag |= HListWidget::FLAG::CHECKABLE;
+			}
+		}
+		if ( _editableSet ) {
+			toSet |= HListWidget::FLAG::EDITABLE;
+			if ( _editable ) {
+				flag |= HListWidget::FLAG::EDITABLE;
+			}
+		}
+		if ( _sortableSet ) {
+			toSet |= HListWidget::FLAG::SORTABLE;
+			if ( _sortable ) {
+				flag |= HListWidget::FLAG::SORTABLE;
+			}
+		}
+		if ( _drawHeaderSet ) {
+			toSet |= HListWidget::FLAG::DRAW_HEADER;
+			if ( _drawHeader ) {
+				flag |= HListWidget::FLAG::DRAW_HEADER;
+			}
+		}
+		if ( toSet != HListWidget::FLAG::NONE ) {
+			widget->set_flags( flag, toSet );
+		}
+	}
+	HWidgetAttributes::do_apply( widget_ );
+	return;
+	M_EPILOG
+}
+
+HListWidgetAttributes& HListWidgetAttributes::editable( bool editable_ ) {
+	M_PROLOG
+	_editable = editable_;
+	_editableSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HListWidgetAttributes& HListWidgetAttributes::sortable( bool stortable_ ) {
+	M_PROLOG
+	_sortable = stortable_;
+	_sortableSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HListWidgetAttributes& HListWidgetAttributes::drawheader( bool drawHeader_ ) {
+	M_PROLOG
+	_drawHeader = drawHeader_;
+	_drawHeaderSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HListWidgetAttributes& HListWidgetAttributes::checkable( bool checkable_ ) {
+	M_PROLOG
+	_checkable = checkable_;
+	_checkableSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+class HListWidgetCreator : public HWidgetCreatorInterface {
+	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual void do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+};
+
+HWidget::ptr_t HListWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HListWidgetAttributes attrs;
+	prepare_attributes( attrs, node_ );
+	OResource r( get_resource( node_ ) );
+	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
+	HWidget* edit( new HListWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	apply_resources( edit->get_pointer(), node_ );
+	return ( edit->get_pointer() );
+	M_EPILOG
+}
+
+void HListWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HListWidgetAttributes& attrs( dynamic_cast<HListWidgetAttributes&>( attributes_ ) );
+	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
+		HString const& name( n.get_name() );
+		if ( name == "draw_header" ) {
+			attrs.drawheader( lexical_cast<bool>( xml::node_val( n ) ) );
+		} else if ( name == "editable" ) {
+			attrs.editable( lexical_cast<bool>( xml::node_val( n ) ) );
+		} else if ( name == "checkable" ) {
+			attrs.checkable( lexical_cast<bool>( xml::node_val( n ) ) );
+		} else if ( name == "sortable" ) {
+			attrs.sortable( lexical_cast<bool>( xml::node_val( n ) ) );
+		} else {
+			M_THROW( "unknown edit attribute name: " + name, 0 );
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HListWidgetCreator::do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) {
+}
+
+namespace {
+
+bool register_creator( void ) {
+	HWidgetFactory::get_instance().register_widget_creator( "edit", HWidgetCreatorInterface::ptr_t( new HListWidgetCreator() ) );
+	return ( true );
+}
+
+bool volatile registered = register_creator();
+
 }
 
 }
+
+}
+

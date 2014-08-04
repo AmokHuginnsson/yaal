@@ -132,7 +132,7 @@ private:
 
 typedef yaal::hcore::HExceptionT<HEditWidget, HWidgetException> HEditWidgetException;
 
-class HEditWidgetAttrubites : public HWidgetAttributes {
+class HEditWidgetAttributes : public HWidgetAttributes {
 	bool _replace;
 	bool _replaceSet;
 	bool _multiLine;
@@ -154,16 +154,16 @@ class HEditWidgetAttrubites : public HWidgetAttributes {
 protected:
 	virtual void do_apply( HWidget& ) const;
 public:
-	HEditWidgetAttrubites( void );
-	HEditWidgetAttrubites& replace( bool );
-	HEditWidgetAttrubites& multiline( bool );
-	HEditWidgetAttrubites& readonly( bool );
-	HEditWidgetAttrubites& rightaligned( bool );
-	HEditWidgetAttrubites& password( bool );
-	HEditWidgetAttrubites& max_string_size( int );
-	HEditWidgetAttrubites& max_history_level( int );
-	HEditWidgetAttrubites& pattern( yaal::hcore::HString const& );
-	HEditWidgetAttrubites& text( yaal::hcore::HString const& );
+	HEditWidgetAttributes( void );
+	HEditWidgetAttributes& replace( bool );
+	HEditWidgetAttributes& multiline( bool );
+	HEditWidgetAttributes& readonly( bool );
+	HEditWidgetAttributes& rightaligned( bool );
+	HEditWidgetAttributes& password( bool );
+	HEditWidgetAttributes& max_string_size( int );
+	HEditWidgetAttributes& max_history_level( int );
+	HEditWidgetAttributes& pattern( yaal::hcore::HString const& );
+	HEditWidgetAttributes& text( yaal::hcore::HString const& );
 };
 
 }

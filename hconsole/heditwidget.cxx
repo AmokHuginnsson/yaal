@@ -69,7 +69,7 @@ HEditWidget::HEditWidget( HWindow* parent_,
 					_infoString( _string ), _history(), _historyIt() {
 	M_PROLOG
 	attr_.apply( *this );
-	_varTmpBuffer.hs_realloc ( _maxStringSize + 1 );
+	_varTmpBuffer.hs_realloc( _maxStringSize + 1 );
 	if ( _rightAligned && _multiLine ) {
 		M_THROW( _( "edit-widget right aligned and multiline at the same time" ), 0 );
 	}
@@ -599,7 +599,7 @@ bool HEditWidget::do_click( mouse::OMouse & mouse_ ) {
 	M_EPILOG
 }
 
-HEditWidgetAttrubites::HEditWidgetAttrubites( void )
+HEditWidgetAttributes::HEditWidgetAttributes( void )
 	: HWidgetAttributes(),
 	_replace( false ),
 	_replaceSet( false ),
@@ -622,7 +622,7 @@ HEditWidgetAttrubites::HEditWidgetAttrubites( void )
 	return;
 }
 
-void HEditWidgetAttrubites::do_apply( HWidget& widget_ ) const {
+void HEditWidgetAttributes::do_apply( HWidget& widget_ ) const {
 	M_PROLOG
 	HEditWidget* widget( dynamic_cast<HEditWidget*>( &widget_ ) );
 	if ( widget ) {
@@ -643,7 +643,7 @@ void HEditWidgetAttrubites::do_apply( HWidget& widget_ ) const {
 	M_EPILOG
 }
 
-HEditWidgetAttrubites& HEditWidgetAttrubites::replace( bool replace_ ) {
+HEditWidgetAttributes& HEditWidgetAttributes::replace( bool replace_ ) {
 	M_PROLOG
 	_replace = replace_;
 	_replaceSet = true;
@@ -651,7 +651,7 @@ HEditWidgetAttrubites& HEditWidgetAttrubites::replace( bool replace_ ) {
 	M_EPILOG
 }
 
-HEditWidgetAttrubites& HEditWidgetAttrubites::multiline( bool multiline_ ) {
+HEditWidgetAttributes& HEditWidgetAttributes::multiline( bool multiline_ ) {
 	M_PROLOG
 	_multiLine = multiline_;
 	_multiLineSet = true;
@@ -659,7 +659,7 @@ HEditWidgetAttrubites& HEditWidgetAttrubites::multiline( bool multiline_ ) {
 	M_EPILOG
 }
 
-HEditWidgetAttrubites& HEditWidgetAttrubites::readonly( bool readonly_ ) {
+HEditWidgetAttributes& HEditWidgetAttributes::readonly( bool readonly_ ) {
 	M_PROLOG
 	_readOnly = readonly_;
 	_readOnlySet = true;
@@ -667,7 +667,7 @@ HEditWidgetAttrubites& HEditWidgetAttrubites::readonly( bool readonly_ ) {
 	M_EPILOG
 }
 
-HEditWidgetAttrubites& HEditWidgetAttrubites::rightaligned( bool rightaligned_ ) {
+HEditWidgetAttributes& HEditWidgetAttributes::rightaligned( bool rightaligned_ ) {
 	M_PROLOG
 	_rightAligned = rightaligned_;
 	_rightAlignedSet = true;
@@ -675,7 +675,7 @@ HEditWidgetAttrubites& HEditWidgetAttrubites::rightaligned( bool rightaligned_ )
 	M_EPILOG
 }
 
-HEditWidgetAttrubites& HEditWidgetAttrubites::password( bool password_ ) {
+HEditWidgetAttributes& HEditWidgetAttributes::password( bool password_ ) {
 	M_PROLOG
 	_password = password_;
 	_passwordSet = true;
@@ -683,7 +683,7 @@ HEditWidgetAttrubites& HEditWidgetAttrubites::password( bool password_ ) {
 	M_EPILOG
 }
 
-HEditWidgetAttrubites& HEditWidgetAttrubites::max_string_size( int maxStringSize_ ) {
+HEditWidgetAttributes& HEditWidgetAttributes::max_string_size( int maxStringSize_ ) {
 	M_PROLOG
 	_maxStringSize = maxStringSize_;
 	_maxStringSizeSet = true;
@@ -691,7 +691,7 @@ HEditWidgetAttrubites& HEditWidgetAttrubites::max_string_size( int maxStringSize
 	M_EPILOG
 }
 
-HEditWidgetAttrubites& HEditWidgetAttrubites::max_history_level( int maxHistoryLevel_ ) {
+HEditWidgetAttributes& HEditWidgetAttributes::max_history_level( int maxHistoryLevel_ ) {
 	M_PROLOG
 	_maxHistoryLevel = maxHistoryLevel_;
 	_maxHistoryLevelSet = true;
@@ -699,7 +699,7 @@ HEditWidgetAttrubites& HEditWidgetAttrubites::max_history_level( int maxHistoryL
 	M_EPILOG
 }
 
-HEditWidgetAttrubites& HEditWidgetAttrubites::pattern( yaal::hcore::HString const& pattern_ ) {
+HEditWidgetAttributes& HEditWidgetAttributes::pattern( yaal::hcore::HString const& pattern_ ) {
 	M_PROLOG
 	_pattern = pattern_;
 	_patternSet = true;
@@ -707,7 +707,7 @@ HEditWidgetAttrubites& HEditWidgetAttrubites::pattern( yaal::hcore::HString cons
 	M_EPILOG
 }
 
-HEditWidgetAttrubites& HEditWidgetAttrubites::text( yaal::hcore::HString const& text_ ) {
+HEditWidgetAttributes& HEditWidgetAttributes::text( yaal::hcore::HString const& text_ ) {
 	M_PROLOG
 	_text = text_;
 	_textSet = true;
@@ -723,7 +723,7 @@ class HEditWidgetCreator : public HWidgetCreatorInterface {
 
 HWidget::ptr_t HEditWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	HEditWidgetAttrubites attrs;
+	HEditWidgetAttributes attrs;
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
@@ -735,7 +735,7 @@ HWidget::ptr_t HEditWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 
 void HEditWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	HEditWidgetAttrubites& attrs( dynamic_cast<HEditWidgetAttrubites&>( attributes_ ) );
+	HEditWidgetAttributes& attrs( dynamic_cast<HEditWidgetAttributes&>( attributes_ ) );
 	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
 		HString const& name( n.get_name() );
 		if ( name == "max_string_size" )

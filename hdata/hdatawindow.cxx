@@ -116,7 +116,7 @@ int HDataWindow::init( void ) {
 
 				dataWidget = new ( memory::yaal ) HDataEditWidget( this,
 						M_SETUP_STANDARD,
-						HEditWidgetAttrubites()
+						HEditWidgetAttributes()
 						.max_string_size( ecr->_maxStringSize )
 						.text( ecr->_value )
 						.pattern( ecr->_mask )

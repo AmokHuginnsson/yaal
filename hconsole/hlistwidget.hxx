@@ -346,6 +346,7 @@ public:
 			int /* height */,
 			int /* width */,
 			yaal::hcore::HString const&,
+			HWidgetAttributesInterface const& = HWidgetAttributesInterface(),
 #ifndef _MSC_VER
 			list_widget_helper::HAbstractListModel::ptr_t const& = hcore::make_pointer<list_widget_helper::HAsIsValueListModel<> >( hcore::make_pointer<list_widget_helper::HAsIsValueListModel<>::data_t>() ) );	/* label */
 #else /* #ifndef _MSC_VER */
@@ -575,6 +576,25 @@ void HAsIsValueListModel<tType>::add_tail( void ) {
 }
 
 typedef yaal::hcore::HExceptionT<HListWidget, HSearchableWidgetException> HListWidgetException;
+
+class HListWidgetAttributes : public HWidgetAttributes {
+	bool _checkable;  /*!< can items be checked/unchecked */
+	bool _checkableSet;
+	bool _sortable;   /*!< can widget content be sorted */
+	bool _sortableSet;
+	bool _drawHeader; /*!< should be header driven */
+	bool _drawHeaderSet;
+	bool _editable;   /*!< is list interactively editable */
+	bool _editableSet;
+protected:
+	virtual void do_apply( HWidget& ) const;
+public:
+	HListWidgetAttributes( void );
+	HListWidgetAttributes& checkable( bool );
+	HListWidgetAttributes& sortable( bool );
+	HListWidgetAttributes& drawheader( bool );
+	HListWidgetAttributes& editable( bool );
+};
 
 }
 
