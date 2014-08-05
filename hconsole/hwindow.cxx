@@ -33,14 +33,19 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "console.hxx"
 #include "htuiprocess.hxx"
 #include "hcore/hlog.hxx"
+#include "hwindowfactory.hxx"
+#include "hwidgetfactory.hxx"
+#include "hcore/foreach.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal {
 
 namespace hconsole {
 
-HWindow::HWindow( char const * title_ ) : _initialised( false ),
+HWindow::HWindow( yaal::hcore::HString const& title_ )
+	: _initialised( false ),
 	_needRepaint( false ), _title( title_ ), _focusedChild(),
 	_previousFocusedChild(), _widgets( _focusedChild ),
 	_statusBar(), _tuiProcess( NULL ) {
@@ -256,6 +261,38 @@ void HWindow::schedule_call( HTUIProcess::call_t call_ ) {
 	_tuiProcess->schedule_call( call_ );
 	return;
 	M_EPILOG
+}
+
+class HWindowCreator : public HWindowCreatorInterface {
+protected:
+	virtual HWindow::ptr_t do_new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
+};
+
+HWindow::ptr_t HWindowCreator::do_new_instance( HTUIProcess* tui_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HString name( xml::attr_val( node_, "title" ) );
+	HWindow::ptr_t window( make_pointer<HWindow>( name ) );
+	HWidgetFactory& wf( HWidgetFactory::get_instance() );
+	YAAL_FOREACH( yaal::tools::HXml::HConstNodeProxy const& n, node_ ) {
+		HString type( xml::node_val( n ) );
+		if ( wf.is_type_valid( type ) ) {
+			wf.create_widget( window.raw(), n );
+		}
+	}
+	tui_->add_window( window );
+	return ( window );
+	M_EPILOG
+}
+
+namespace {
+
+bool register_creator( void ) {
+	HWindowFactory::get_instance().register_window_creator( "window", HWindowCreatorInterface::ptr_t( new HWindowCreator() ) );
+	return ( true );
+}
+
+bool volatile registered = register_creator();
+
 }
 
 }

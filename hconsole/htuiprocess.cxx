@@ -138,7 +138,7 @@ void HTUIProcess::flush_call_queue( void ) {
 	M_EPILOG
 }
 
-int HTUIProcess::add_window( HWindow::ptr_t window_ ) {
+void HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	M_PROLOG
 	window_->set_tui( this );
 	window_->init();
@@ -149,7 +149,7 @@ int HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	if ( ! (*_foregroundWindow)->is_initialised() )
 		M_THROW( _( "window has not been initialised" ), errno );
 	repaint( true );
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 

@@ -58,7 +58,7 @@ public:
 private:
 	creators_t _creators;
 public:
-	void register_widget_creator( yaal::hcore::HString const&, HWindowCreatorInterface::ptr_t );
+	void register_window_creator( yaal::hcore::HString const&, HWindowCreatorInterface::ptr_t );
 	HWindow::ptr_t create_window( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
 	bool is_type_valid( yaal::hcore::HString const& );
 	creators_t::iterator begin( void );
@@ -72,8 +72,6 @@ private:
 	friend class yaal::hcore::HSingleton<HWindowFactory>;
 	friend class yaal::hcore::HDestructor<HWindowFactory>;
 };
-
-typedef yaal::hcore::HSingleton<HWindowFactory> HWindowFactoryInstance;
 
 }
 

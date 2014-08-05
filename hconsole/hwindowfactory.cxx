@@ -40,9 +40,9 @@ namespace yaal {
 
 namespace hconsole {
 
-void HWindowFactory::register_widget_creator( HString const& name_, HWindowCreatorInterface::ptr_t creator_ ) {
+void HWindowFactory::register_window_creator( HString const& name_, HWindowCreatorInterface::ptr_t creator_ ) {
 	M_PROLOG
-	creators_t::iterator it = _creators.find( name_ );
+	creators_t::iterator it( _creators.find( name_ ) );
 	if ( it != _creators.end() ) {
 		M_THROW( _( "Window already registered" ), errno );
 	}
@@ -54,7 +54,7 @@ void HWindowFactory::register_widget_creator( HString const& name_, HWindowCreat
 HWindow::ptr_t HWindowFactory::create_window( HTUIProcess* tuiProcess_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HWindow::ptr_t widget;
-	creators_t::iterator it = _creators.find( node_.get_name() );
+	creators_t::iterator it( _creators.find( node_.get_name() ) );
 	if ( it != _creators.end() ) {
 		widget = it->second->new_instance( tuiProcess_, node_ );
 	}
@@ -82,7 +82,7 @@ int HWindowFactory::life_time( int lifeTime_ ) {
 
 void HWindowFactory::initialize_globals( void ) {
 	M_PROLOG
-	for ( creators_t::iterator it = _creators.begin(); it != _creators.end(); ++ it ) {
+	for ( creators_t::iterator it( _creators.begin() ), e( _creators.end() ); it != e; ++ it ) {
 		it->second->initialize_globals();
 	}
 	return;
@@ -91,7 +91,7 @@ void HWindowFactory::initialize_globals( void ) {
 
 void HWindowFactory::cleanup_globals( void ) {
 	M_PROLOG
-	for ( creators_t::iterator it = _creators.begin(); it != _creators.end(); ++ it ) {
+	for ( creators_t::iterator it( _creators.begin() ), e( _creators.end() ); it != e; ++ it ) {
 		it->second->cleanup_globals();
 	}
 	return;

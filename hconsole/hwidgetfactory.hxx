@@ -89,8 +89,6 @@ private:
 	friend class yaal::hcore::HDestructor<HWidgetFactory>;
 };
 
-typedef yaal::hcore::HSingleton<HWidgetFactory> HWidgetFactoryInstance;
-
 }
 
 }

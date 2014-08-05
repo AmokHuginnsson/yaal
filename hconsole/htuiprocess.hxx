@@ -68,12 +68,12 @@ public:
 	void quit( void );
 	void close_window( void );
 	void flush_call_queue( void );
+	void add_window( window_t );
 protected:
 	void process_stdin( int );
 	void process_mouse( int );
 	void process_terminal_event( int );
 	int process_commands( void );
-	int add_window( window_t );
 	void select( HWindow const* );
 	void repaint( bool = false );
 	void handler_alert( void );

@@ -42,7 +42,7 @@ namespace hconsole {
 
 void HWidgetFactory::register_widget_creator( HString const& name_, HWidgetCreatorInterface::ptr_t creator_ ) {
 	M_PROLOG
-	creators_t::iterator it = _creators.find( name_ );
+	creators_t::iterator it( _creators.find( name_ ) );
 	if ( it != _creators.end() ) {
 		M_THROW( _( "Widget already registered" ), errno );
 	}
@@ -54,7 +54,7 @@ void HWidgetFactory::register_widget_creator( HString const& name_, HWidgetCreat
 HWidget::ptr_t HWidgetFactory::create_widget( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HWidget::ptr_t widget;
-	creators_t::iterator it = _creators.find( node_.get_name() );
+	creators_t::iterator it( _creators.find( node_.get_name() ) );
 	if ( it != _creators.end() ) {
 		widget = it->second->new_instance( window_, node_ );
 	}
@@ -82,7 +82,7 @@ int HWidgetFactory::life_time( int lifeTime_ ) {
 
 void HWidgetFactory::initialize_globals( void ) {
 	M_PROLOG
-	for ( creators_t::iterator it = _creators.begin(); it != _creators.end(); ++ it ) {
+	for ( creators_t::iterator it = _creators.begin(), e( _creators.end() ); it != e; ++ it ) {
 		it->second->initialize_globals();
 	}
 	return;
@@ -91,7 +91,7 @@ void HWidgetFactory::initialize_globals( void ) {
 
 void HWidgetFactory::cleanup_globals( void ) {
 	M_PROLOG
-	for ( creators_t::iterator it = _creators.begin(); it != _creators.end(); ++ it ) {
+	for ( creators_t::iterator it = _creators.begin(), e( _creators.end() ); it != e; ++ it ) {
 		it->second->cleanup_globals();
 	}
 	return;

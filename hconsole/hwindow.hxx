@@ -54,11 +54,11 @@ protected:
 	HWidgetList::model_t::cyclic_iterator _focusedChild;         /*!< points to widget that has focus */
 	HWidgetList::model_t::cyclic_iterator _previousFocusedChild; /*!< widget that had focus before
 	                                                                  focus went to status bar */
-	HWidgetList _widgets;	                                       /*!< list of all widget inside _this_ wind */
+	HWidgetList _widgets;                                        /*!< list of all widget inside _this_ wind */
 	HStatusBarWidget::ptr_t _statusBar;
 	HTUIProcess* _tuiProcess;
 public:
-	HWindow( char const* ); /* title */
+	HWindow( yaal::hcore::HString const& title );
 	virtual ~HWindow( void );
 	virtual int init( void );
 	void set_tui( HTUIProcess* );
