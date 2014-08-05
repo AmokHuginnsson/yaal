@@ -6,6 +6,7 @@ tar-ignore = .settings
 tar-ignore = *.tar
 tar-ignore = *.tar.gz
 tar-ignore = *.deb
+tar-ignore = *.changes
 tar-ignore = yaal-bundle
 tar-ignore = yaal/debian
 tar-ignore = .my_make

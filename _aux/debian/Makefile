@@ -52,7 +52,7 @@ package: $(VERIFY_DIR) $(ARTIFACTS)
 bundle: $(VERIFY_DIR) tmp/$(BUNDLE_WRAP)
 
 clean: $(VERIFY_DIR)
-	@/bin/rm -f $(ARTIFACTS) $(BUNDLE_WRAP) $(BUNDLE) && \
+	@/bin/rm -f yaal_*.deb yaal_*.dsc yaal_*.tar.gz yaal_*.changes $(BUNDLE_WRAP) $(BUNDLE) && \
 	/bin/rm -rf changelog yaal-bundle && \
 	cd ../../ && \
 	ln -nsf ./_aux/debian && \
