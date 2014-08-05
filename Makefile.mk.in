@@ -162,7 +162,7 @@ install: all
 	$(call invoke,$(INSTALL) -m644 yaalrc $(DIR_SYSCONF)/ && ) \
 	$(call invoke,$(INSTALL) -d -m755 $(DIR_DOC) && $(INSTALL) -m644 $(DIR_ROOT)/doc/* $(DIR_DOC)/ && ) \
 	$(call invoke,$(INSTALL) -d -m755 $(DIR_SHARE)/$(PRJNAME)/ && ) \
-	$(call invoke,tar cf - -C $(DIR_ROOT) --exclude=tmp --exclude=work --exclude=rpm _aux | tar xpf - -C $(DIR_SHARE)/$(PRJNAME) && ) \
+	$(call invoke,tar cf - -C $(DIR_ROOT) -X $(DIR_ROOT)/_aux/exclude _aux | tar xpf - -C $(DIR_SHARE)/$(PRJNAME) && ) \
 	$(call invoke,$(INSTALL) -d -m755 $(DIR_HEADERS) && /bin/cp -fRp $(DIR_BUILD)/include/$(LIB_NAME) $(DIR_HEADERS)/ && ) \
 	$(call invoke,$(INSTALL) -d -m755 $(DIR_LOCALSTATE)/db/$(LIB_NAME) && /bin/cp -fRp $(DIR_BUILD)/db $(DIR_LOCALSTATE)/ && ) \
 	$(call msg,printf "%b" "making cache ... " && ) \
