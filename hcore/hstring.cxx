@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hstring.cxx - this file is integral part of `yaal' project.
+  hstring.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -58,10 +58,9 @@ enum {
 };
 
 /* Useful helpers */
-char * strrnpbrk( char const* const, char const* const,
-		int long /* no const - used */ );
-int long strrnspn( char const* const, char const* const, int long const );
-int long kmpsearch( char const* const, int long, char const* const, int long );
+char* strrnpbrk( char const*, char const*, int long );
+int long strrnspn( char const* const, char const*, int long );
+int long kmpsearch( char const* const, int long, char const*, int long );
 }
 
 #undef D_WHITE_SPACE
@@ -104,13 +103,22 @@ static int const ALLOC_BIT_MASK = 128;
 #undef GET_SIZE
 #define GET_SIZE ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] : _len[ 1 ] )
 #undef SET_SIZE
-#define SET_SIZE( size ) do { ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : _len[ 1 ] = ( size ) ); } while ( 0 )
+#define SET_SIZE( size ) \
+	do { \
+		( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : _len[ 1 ] = ( size ) ); \
+	} while ( 0 )
 #undef EXT_SET_SIZE
-#define EXT_SET_SIZE( base, size ) do { ( EXT_IS_INPLACE( base ) ? base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : base._len[ 1 ] = ( size ) ); } while ( 0 )
+#define EXT_SET_SIZE( base, size ) \
+	do { \
+		( EXT_IS_INPLACE( base ) ? base._mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( size ) : base._len[ 1 ] = ( size ) ); \
+	} while ( 0 )
 #undef GET_ALLOC_BYTES
-#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 :  _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 1 ) )
+#define GET_ALLOC_BYTES ( IS_INPLACE ? MAX_INPLACE_CAPACITY + 1 : _len[ 2 ] & static_cast<int long>( static_cast<int long unsigned>( -1 ) >> 1 ) )
 #undef SET_ALLOC_BYTES
-#define SET_ALLOC_BYTES( capacity ) do { _len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); } while ( 0 )
+#define SET_ALLOC_BYTES( capacity ) \
+	do { \
+		_len[ 2 ] = ( capacity ); _mem[ ALLOC_FLAG_INDEX ] = static_cast<char>( _mem[ ALLOC_FLAG_INDEX ] | ALLOC_BIT_MASK ); \
+	} while ( 0 )
 
 char const* _errMsgHString_[ 7 ] = {
 	_( "ok" ),
@@ -123,7 +131,7 @@ char const* _errMsgHString_[ 7 ] = {
 };
 
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002
-#pragma GCC diagnostic ignored "-Weffc++"
+# pragma GCC diagnostic ignored "-Weffc++"
 #endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
 
 HString::HString( void )
@@ -406,7 +414,7 @@ HString::HString( void const* const ptrVoid_ )
 }
 
 #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002
-#pragma GCC diagnostic error "-Weffc++"
+# pragma GCC diagnostic error "-Weffc++"
 #endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
 
 void HString::materialize( void ) {
@@ -488,7 +496,7 @@ char HString::set_at( int long const index_, char char_ ) {
 	M_EPILOG
 }
 
-bool  HString::operator == ( HString const& other_ ) const {
+bool HString::operator == ( HString const& other_ ) const {
 	M_PROLOG
 	return ( ( this == &other_ )
 			|| ( ( GET_SIZE == other_.get_length() )
@@ -502,7 +510,7 @@ bool HString::operator != (  HString const& other_ ) const {
 	M_EPILOG
 }
 
-bool  HString::operator >= ( HString const& other_ ) const {
+bool HString::operator >= ( HString const& other_ ) const {
 	M_PROLOG
 	return ( ::std::strcoll( MEM, other_.raw() ) >= 0 );
 	M_EPILOG
@@ -737,7 +745,7 @@ HString& HString::vformat( char const* const format_, void* ap_ ) {
 	__va_copy( orig, *static_cast< ::std::va_list*>( ap_ ) );
 	int long newSize = vsnprintf( NULL, 0, format_, *static_cast< ::std::va_list*>( ap_ ) );
 	hs_realloc( newSize + 1 );
-	M_ENSURE ( vsnprintf( MEM, static_cast<size_t>( newSize + 1 ), format_, orig ) == newSize );
+	M_ENSURE( vsnprintf( MEM, static_cast<size_t>( newSize + 1 ), format_, orig ) == newSize );
 	SET_SIZE( newSize );
 	va_end( orig );
 	return ( *this );
@@ -918,7 +926,7 @@ HString& HString::replace( HString const& pattern_,
 	int long lenWith( with_.get_length() );
 	int long subWP( lenWith - lenPattern );
 	int long index( 0 );
-	if ( subWP == 0 ) /* replacement is equals to pattern */ {
+	if ( subWP == 0 ) { /* replacement is equal lenght to pattern */
 		while ( ( index = find( pattern_, index ) ) != npos ) {
 			::std::strncpy( MEM + index, with_.raw(), static_cast<size_t>( lenWith ) );
 			index += lenPattern;
@@ -931,13 +939,14 @@ HString& HString::replace( HString const& pattern_,
 		}
 		HString s;
 		HString* src( NULL );
-		if ( subWP > 0 ) /* replacement is longer than pattern */ {
+		if ( subWP > 0 ) { /* replacement is longer than pattern */
 			s = *this;
 			s.materialize();
 			hs_realloc( newSize + 1 );
 			src = &s;
-		} else /* replacement is shorter than pattern */
+		} else { /* replacement is shorter than pattern */
 			src = this;
+		}
 		int long oldIdx( 0 );
 		int long newIdx( 0 );
 		index = 0;
@@ -1033,7 +1042,7 @@ HString& HString::reverse( void ) {
 		else
 			MEM[ ctr ] = char_;
 	}
-	return ( * this );
+	return ( *this );
 	M_EPILOG
 }
 
@@ -1171,8 +1180,10 @@ HString& HString::shift_right( int long shift_, char const filler_ ) {
 
 HString& HString::fill( char filler_, int long offset_, int long count_ ) {
 	M_PROLOG
-	if ( count_ == MAX_STRING_LENGTH )
-		count_ = ( GET_ALLOC_BYTES - offset_ ) - 1; /* we maintain zero terminator (even though it is not fillz()) hence - 1 */
+	if ( count_ == MAX_STRING_LENGTH ) {
+		/* we maintain zero terminator (even though it is not fillz()) hence - 1 */
+		count_ = ( GET_ALLOC_BYTES - offset_ ) - 1;
+	}
 	if ( count_ < 0 )
 		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], count_ );
 	if ( offset_ < 0 )
@@ -1536,9 +1547,9 @@ bool is_alpha( char char_ ) {
 namespace string_helper {
 
 /* all str* and mem* functions takes const pointer as argument and returns
-	 non const pointer */
-char* strrnpbrk( char const* const buffer_,
-		char const* const stopSet_, int long length_ ) {
+   non const pointer */
+char* strrnpbrk( char const* buffer_,
+		char const* stopSet_, int long length_ ) {
 	M_PROLOG
 	if ( length_ < 1 )
 		return ( NULL );
@@ -1553,8 +1564,8 @@ char* strrnpbrk( char const* const buffer_,
 	M_EPILOG
 }
 
-int long strrnspn( char const* const buffer_, char const* const skipSet_,
-		int const long length_ ) {
+int long strrnspn( char const* buffer_, char const* skipSet_,
+		int long length_ ) {
 	M_PROLOG
 	int long skipSetSize( static_cast<int long>( ::std::strlen( skipSet_ ) ) );
 	int long index( length_ - 1 );
@@ -1567,7 +1578,7 @@ int long strrnspn( char const* const buffer_, char const* const skipSet_,
 	M_EPILOG
 }
 
-int long kmpsearch( char const* const str, int long lenstr, char const* const pat, int long lenpat ) {
+int long kmpsearch( char const* str, int long lenstr, char const* pat, int long lenpat ) {
 	HChunk KMPnext( chunk_size<int>( lenpat + 1 ) );
 	int* next( KMPnext.get<int>() );
 	int b( next[ 0 ] = -1 );
@@ -1590,7 +1601,7 @@ int long kmpsearch( char const* const str, int long lenstr, char const* const pa
 	return ( start );
 }
 
-int long kmpcasesearch( char const* const str, int long lenstr, char const* const pat, int long lenpat ) {
+int long kmpcasesearch( char const* str, int long lenstr, char const* pat, int long lenpat ) {
 	HChunk KMPnext( chunk_size<int>( lenpat + 1 ) );
 	int* next( KMPnext.get<int>() );
 	int b( next[ 0 ] = -1 );
