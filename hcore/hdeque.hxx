@@ -364,6 +364,15 @@ public:
 		return ( erase( it, next ) );
 		M_EPILOG
 	}
+	/*! \brief Remove part of deque.
+	 *
+	 * Part of deque to be removed is defined by pair of valid iterators
+	 * forming a range in this deque.
+	 *
+	 * \param first_ - begining of range of elements to be removed from deque.
+	 * \param last_ - one past the end of range of elements to be removed from deque.
+	 * \return Iterator pointing to first element after removed range.
+	 */
 	iterator erase( iterator, iterator );
 
 	const_iterator begin( void ) const {
