@@ -357,6 +357,11 @@ public:
 	template<typename iterator_t>
 	void insert( iterator, iterator_t, iterator_t );
 	void insert( iterator, int long, type_t const& );
+	/*! \brief Remove element at given position.
+	 *
+	 * \param it - postion of the element to be removed from deque.
+	 * \return Iterator pointing to element directly after the removed one.
+	 */
 	iterator erase( iterator it ) {
 		M_PROLOG
 		iterator next( it );
