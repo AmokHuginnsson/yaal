@@ -154,13 +154,21 @@ private:
 	TYPE::type_t _type;
 	yaal::hcore::HString _text;
 	properties_t _properties;
+	int _line;
 public:
-	HNode( HXml const* owner_ ) : _owner( owner_ ), _type( TYPE::NODE ), _text(), _properties() { }
-	HNode( HXml const* owner_, TYPE::type_t const& type, yaal::hcore::HString const& value )
-		: _owner( owner_ ), _type( type ), _text( value ), _properties() {}
+	HNode( HXml const* owner_, int line_ = 0 )
+		: _owner( owner_ ), _type( TYPE::NODE ),
+		_text(), _properties(), _line( line_ ) {
+	}
+	HNode( HXml const* owner_, TYPE::type_t const& type,
+			yaal::hcore::HString const& value, int line_ = 0 )
+		: _owner( owner_ ), _type( type ),
+		_text( value ), _properties(), _line( line_ ) {
+	}
 	HNode( HNode const& source )
-		: _owner( source._owner ), _type( source._type ), _text( source._text ), _properties( source._properties )
-		{ }
+		: _owner( source._owner ), _type( source._type ),
+		_text( source._text ), _properties( source._properties ), _line( source._line ) {
+	}
 	HNode& operator = ( HNode const& source ) {
 		M_PROLOG
 		if ( &source != this ) {
@@ -177,6 +185,7 @@ public:
 			swap( _type, node_._type );
 			swap( _text, node_._text );
 			swap( _properties, node_._properties );
+			swap( _line, node_._line );
 		}
 		return;
 	}
@@ -214,6 +223,7 @@ public:
 	bool has_childs( void ) const;
 	int long child_count( void ) const;
 	int get_level( void ) const;
+	int get_line( void ) const;
 	yaal::hcore::HString const& get_name( void ) const;
 	yaal::hcore::HString const& get_value( void ) const;
 	HXml::HNode::properties_t const& properties( void ) const;

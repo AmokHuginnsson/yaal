@@ -153,11 +153,11 @@ struct HXml::OConvert {
 			encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
 		else {
 			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: no encoding declared in `" )
-				<< fileName_ << "'." << endl;
+				<< fileName_ << ":" << root_->line <<"'." << endl;
 		}
 		if ( ! encoder ) {
 			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: char encoding handler not found in `" )
-				<< fileName_ << "'." << endl;
+				<< fileName_ << ":" << root_->line << "'." << endl;
 			xmlCharEncoding encoding = ::xmlDetectCharEncoding( root_->name,
 					xmlStrlen( root_->name ) );
 			if ( ! encoding )
@@ -408,7 +408,8 @@ void HXml::parse_dtd( void* dtd_ ) {
 			if ( ( node->type == XML_ENTITY_DECL ) && ( node->name && node->content ) )
 				_entities[ reinterpret_cast<char const*>( node->name ) ] = reinterpret_cast<char const*>( node->content );
 			else
-				log( LOG_TYPE::ERROR ) << "XML: `" << _streamId << "' failed to handle DTD child: " << static_cast<int>( node->type )
+				log( LOG_TYPE::ERROR ) << "XML: `" << _streamId << ":" << node->line
+					<< "' failed to handle DTD child: " << static_cast<int>( node->type )
 					<< " " << ( node->name ? reinterpret_cast<char const*>( node->name ) : "(nil)" )
 					<< " " << ( node->content ? reinterpret_cast<char const*>( node->content ) : "(nil)" )<< endl;
 			node = node->next;
@@ -445,9 +446,9 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			continue;
 			case ( XML_ELEMENT_NODE ): {
 				if ( node_ )
-					node_ = &*node_->add_node( HNode( this ) );
+					node_ = &*node_->add_node( HNode( this, node->line ) );
 				else
-					node_ = _domTree.create_new_root( HNode( this ) );
+					node_ = _domTree.create_new_root( HNode( this, node->line ) );
 				(**node_)._text = reinterpret_cast<char const*>( node->name );
 				if ( node->properties ) {
 					xmlAttrPtr attribute = node->properties;
@@ -471,19 +472,19 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			case ( XML_ENTITY_REF_NODE ): {
 				M_ASSERT( node->name );
 				entities_t::const_iterator it( _entities.find( reinterpret_cast<char const*>( node->name ) ) );
-				M_ENSURE_EX( it != _entities.end(), HString( "entity not found: " ) + reinterpret_cast<char const*>( node->name ) );
-				node_->add_node( HNode( this, HNode::TYPE::ENTITY, reinterpret_cast<char const*>( node->name ) ) );
+				M_ENSURE_EX( it != _entities.end(), HString( "entity not found: " ) + reinterpret_cast<char const*>( node->name ) + ", at: " + node->line );
+				node_->add_node( HNode( this, HNode::TYPE::ENTITY, reinterpret_cast<char const*>( node->name ), node->line ) );
 			}
 			break;
 			case ( XML_TEXT_NODE ): if ( node->content ) {
 				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
 				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_.data() ) >= 0 ) )
-					node_->add_node( HNode( this, HNode::TYPE::CONTENT, _varTmpBuffer ) );
+					node_->add_node( HNode( this, HNode::TYPE::CONTENT, _varTmpBuffer, node->line ) );
 			}
 			break;
 			case ( XML_COMMENT_NODE ): if ( ! ( parser_ & PARSER::STRIP_COMMENT ) && node->content ) {
 				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
-				node_->add_node( HNode( this, HNode::TYPE::COMMENT, _varTmpBuffer ) );
+				node_->add_node( HNode( this, HNode::TYPE::COMMENT, _varTmpBuffer, node->line ) );
 			}
 			break;
 			case ( XML_XINCLUDE_START ):
@@ -494,7 +495,8 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 				 */
 			break;
 			default:
-				log( LOG_TYPE::WARNING ) << "XML: `" << _streamId << "' unsupported type: " << static_cast<int>( node->type ) << endl;
+				log( LOG_TYPE::WARNING ) << "XML: `" << _streamId << "' unsupported type: " << static_cast<int>( node->type )
+					<< ", at: " << node->line << endl;
 			break;
 		}
 		node = NULL;
@@ -827,6 +829,13 @@ int HXml::HConstNodeProxy::get_level( void ) const {
 	M_PROLOG
 	M_ASSERT( _node );
 	return ( _node->get_level() );
+	M_EPILOG
+}
+
+int HXml::HConstNodeProxy::get_line( void ) const {
+	M_PROLOG
+	M_ASSERT( _node );
+	return ( (**_node)._line );
 	M_EPILOG
 }
 
