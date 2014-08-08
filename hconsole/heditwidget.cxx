@@ -758,7 +758,7 @@ void HEditWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attr
 		} else if ( name == "max_history_level" ) {
 			attrs.max_history_level( lexical_cast<int>( xml::node_val( n ) ) );
 		} else {
-			M_THROW( "unknown edit attribute name: " + name, 0 );
+			M_THROW( "unknown edit attribute name: " + name, n.get_line() );
 		}
 	}
 	return;

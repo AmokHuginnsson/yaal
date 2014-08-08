@@ -1296,13 +1296,13 @@ void HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools
 			} else if ( alignIt->second == "right" ) {
 				align = HWidget::BITS::ALIGN::RIGHT;
 			} else {
-				M_THROW( _( "unknown align type" ), 0 );
+				M_THROW( _( "unknown align type" ), n.get_line() );
 			}
 			type_id_t type( TYPE::HSTRING );
 			if ( colTypeIt->second == "string" ) {
 				type = TYPE::HSTRING;
 			} else {
-				M_THROW( _( "unknown column type" ), 0 );
+				M_THROW( _( "unknown column type" ), n.get_line() );
 			}
 			HListWidget* list( dynamic_cast<HListWidget*>( widget_.raw() ) );
 			list->add_column( placement, columnName, width, align, type );
