@@ -61,6 +61,9 @@ AC_CANONICAL_TARGET
 AC_DEFINE_UNQUOTED(TARGET_CPU,"${target_cpu}",[Target host system CPU.])
 if test "x${target_cpu}" = "xx86_64" ; then
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
+elif test "${target_os}" != "${target_os/solaris/}" ; then
+	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
+	CXXFLAGS="${CXXFLAGS} -m64"
 else
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,32,[Target host system CPU bits.])
 fi
@@ -111,6 +114,7 @@ AC_CHECK_SIZEOF([int long long])
 AC_CHECK_SIZEOF([float])
 AC_CHECK_SIZEOF([double])
 AC_CHECK_SIZEOF([double long])
+AC_CHECK_SIZEOF([void*])
 dnl Check for POD alignment.
 AC_CHECK_ALIGNOF([int short])
 AC_CHECK_ALIGNOF([int])
@@ -119,6 +123,7 @@ AC_CHECK_ALIGNOF([int long long])
 AC_CHECK_ALIGNOF([float])
 AC_CHECK_ALIGNOF([double])
 AC_CHECK_ALIGNOF([double long])
+AC_CHECK_ALIGNOF([void*])
 
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
