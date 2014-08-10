@@ -11,8 +11,7 @@
 	- Ubuntu (latest development branch and latest stable release, currently 14.04 and 14.10 respectively)
 	- Centos (latest stable release, currently 7)
 	- FreeBSD (latest stable release, currently 10.0-RELEASE)
-	- Sun Solaris (latest stable release, currently 5.10)
-	- Oracle Solaris (latest stable release, currently 11)
+	- Oracle Solaris (latest stable release, currently 11.2)
 	- Windows 7 SP1 with Cygwin (latest available cygwin release, currently 1.7.27)
 
 [For more detailed information regarding platform support

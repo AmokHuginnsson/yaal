@@ -23,11 +23,8 @@
 	<tr>
 		<td>FreeBSD 10.0 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
-	<!--tr>
-		<td>Sun Solaris 5.10</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
-	</tr-->
 	<tr>
-		<td>Oracle Solaris 11</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>Oracle Solaris 11.2</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Windows 7 SP1 32bit with Cygwin 1.7.27</td><td class="good">100%</td><td class="fine">99%</td><td class="fail">Fail</td>
