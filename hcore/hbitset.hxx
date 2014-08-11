@@ -248,7 +248,7 @@ public:
 	operator bool ( void ) const {
 		return ( _owner->get() );
 	}
-	void swap( HBitset::HBitReference& br_ ) {
+	void swap( typename HBitset::HBitReference& br_ ) {
 		M_PROLOG
 		bool bit( _owner->get( _pos ) );
 		_owner->set( _pos, static_cast<bool>( br_ ) );

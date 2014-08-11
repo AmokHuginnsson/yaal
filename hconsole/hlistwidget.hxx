@@ -350,7 +350,7 @@ public:
 #ifndef _MSC_VER
 			list_widget_helper::HAbstractListModel::ptr_t const& = hcore::make_pointer<list_widget_helper::HAsIsValueListModel<> >( hcore::make_pointer<list_widget_helper::HAsIsValueListModel<>::data_t>() ) );	/* label */
 #else /* #ifndef _MSC_VER */
-			list_widget_helper::HAbstractListModel::ptr_t const& = list_widget_helper::HAsIsValueListModel<>::ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>( list_widget_helper::HAsIsValueListModel<>::data_ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>::data_t() ) ) );	/* label */
+			list_widget_helper::HAbstractListModel::ptr_t const& = list_widget_helper::HAsIsValueListModel<>::ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>( list_widget_helper::HAsIsValueListModel<>::data_ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>::data_t() ) ) ) );	/* label */
 #endif /* #else #ifndef _MSC_VER */
 	virtual ~HListWidget ( void );
 	void add_column( int atPosition,

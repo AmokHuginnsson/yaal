@@ -1119,7 +1119,8 @@ int long HRow<yaal::hcore::HList<HInfoItem>::iterator>::get_id( void ) {
 }
 
 template<>
-HRow<yaal::hcore::HList<HInfoItem>::iterator>::HRow( iterator_t& it_ ) : _iterator( it_ ), _cells( it_->get_value_count() ) {
+HRow<yaal::hcore::HList<HInfoItem>::iterator>::HRow( iterator_t& it_ )
+	: _iterator( it_ ), _cells( it_->get_value_count() ) {
 	M_PROLOG
 	int long cellCount = it_->get_value_count();
 	for ( int i = 0; i < cellCount; ++ i )

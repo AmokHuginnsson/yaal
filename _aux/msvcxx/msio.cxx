@@ -209,7 +209,7 @@ void IO::set_path( std::string const& path_ ) {
 void IO::swap( IO& io_ ) {
 	using std::swap;
 	swap( _overlapped, io_._overlapped );
-	yaal::swap( _buffer, io_._buffer );
+	swap( _buffer, io_._buffer );
 	swap( _readRequest, io_._readRequest );
 	swap( _inBuffer, io_._inBuffer );
 	swap( _connected, io_._connected );
