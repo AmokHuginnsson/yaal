@@ -61,7 +61,7 @@ AC_CANONICAL_TARGET
 AC_DEFINE_UNQUOTED(TARGET_CPU,"${target_cpu}",[Target host system CPU.])
 if test "x${target_cpu}" = "xx86_64" ; then
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
-elif test "${target_os}" != "${target_os/solaris/}" ; then
+elif test "${target_os}" != "`echo ${target_os} | sed -e 's/solaris//'`" ; then
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
 	CXXFLAGS="${CXXFLAGS} -m64"
 else
