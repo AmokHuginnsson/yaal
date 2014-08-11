@@ -133,13 +133,13 @@ public:
 	~HString( void );
 	/*! \brief Increases string capacity.
 	 *
-	 * String capacity is always size of 2^n.
+	 * String capacity is always size of (2^n)-1 or MAX_INPLACE_CAPACITY.
 	 *
-	 * \param size - new size capacity.
+	 * \param capacity - new string capacity.
 	 *
-	 * \post String capacity has value of smallest 2^n greater or equal to \e size.
+	 * \post String capacity has value of smallest (2^n)-1 greater or equal to \e size.
 	 */
-	void hs_realloc( int long size );
+	void reserve( int long capacity );
 	/*! \brief Materialize string.
 	 *
 	 * Used in copy-on-write implementation.
@@ -371,16 +371,16 @@ public:
 	 * \return String length in characters.
 	 */
 	int long size( void ) const;
-	/*! \brief Tell how many characters can this string store without memory reallocation.
+	/*! \brief Tell how many characters excluding terminating NIL can this string store without memory reallocation.
 	 *
-	 * \return Number of characters that can be stored in this string without reallocation.
+	 * \return Number of characters excluding terminating NIL that can be stored in this string without reallocation.
 	 */
 	int long get_capacity( void ) const;
-	/*! \brief Tell how many characters can this string store without memory reallocation.
+	/*! \brief Tell how many characters excluding terminating NIL can this string store without memory reallocation.
 	 *
 	 * capacity() is really an alias for get_capacity().
 	 *
-	 * \return Number of characters that can be stored in this string without reallocation.
+	 * \return Number of characters excluding terminating NIL that can be stored in this string without reallocation.
 	 */
 	int long capacity( void ) const;
 	/*! \brief Swap contents of this string with another string.

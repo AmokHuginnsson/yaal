@@ -68,7 +68,7 @@ void HLogPad::do_paint( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	draw_label();
-	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
+	_varTmpBuffer.reserve( _widthRaw );
 	_varTmpBuffer.fillz( ' ', 0, _widthRaw );
 	int bg( _focused ? COLORS::BG_GRAY : COLORS::BG_BLACK );
 	_attribute = COLORS::ATTR_NORMAL | bg;

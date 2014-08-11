@@ -53,7 +53,7 @@ HTime::HTime( char const* strTime_, char const* format_ )
 	M_PROLOG
 	char const* err( ::strptime( strTime_, _format.raw(), &_broken ) );
 	if ( ! err )
-		err = ::strptime( strTime_, "%F %T", &_broken );
+		err = ::strptime( strTime_, "%Y-%m-%d %T", &_broken );
 	M_ENSURE( err );
 	_broken.tm_isdst = -1;
 	_value = ::mktime( &_broken );

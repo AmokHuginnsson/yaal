@@ -273,7 +273,7 @@ bool verify_IBAN( HString const& IBAN_ ) {
 			_lastErrorMessage_.format( "IBAN: Number too short (%d).", static_cast<int>( length ) );
 			break;
 		}
-		IBAN.hs_realloc( length );
+		IBAN.reserve( length );
 		for ( ctr = 0; ctr < length; ctr ++ )
 			if ( isalnum( IBAN_[ ctr ] ) )
 				IBAN += IBAN_[ ctr ];

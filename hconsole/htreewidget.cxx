@@ -130,7 +130,7 @@ void HTreeWidget::do_paint( void ) {
 	if ( _focused )
 		cons.curs_set ( CURSOR::INVISIBLE );
 	draw_label();
-	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
+	_varTmpBuffer.reserve( _widthRaw );
 	_varTmpBuffer.fillz( '_', 0, _widthRaw );
 	for ( ctr = 0; ctr < _heightRaw; ctr ++ )
 		cons.mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.raw() );

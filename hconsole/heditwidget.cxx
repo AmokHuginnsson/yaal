@@ -69,7 +69,7 @@ HEditWidget::HEditWidget( HWindow* parent_,
 					_infoString( _string ), _history(), _historyIt() {
 	M_PROLOG
 	attr_.apply( *this );
-	_varTmpBuffer.hs_realloc( _maxStringSize + 1 );
+	_varTmpBuffer.reserve( _maxStringSize );
 	if ( _rightAligned && _multiLine ) {
 		M_THROW( _( "edit-widget right aligned and multiline at the same time" ), 0 );
 	}
@@ -117,7 +117,7 @@ void HEditWidget::do_paint( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	draw_label();
-	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
+	_varTmpBuffer.reserve( _widthRaw );
 	if ( ! _password )
 		_varTmpBuffer = _string.mid( _widgetOffset, _widthRaw );
 	else

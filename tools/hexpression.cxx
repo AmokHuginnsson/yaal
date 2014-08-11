@@ -400,7 +400,7 @@ bool HExpression::translate( HString const& formula_ ) {
 	M_PROLOG
 	int index = 0, realIndex = 0, ctr = 0;
 	int long length = formula_.get_length();
-	_formula.hs_realloc( length + 1 ); /* + 1 for trailing null */
+	_formula.reserve( length );
 	_formula.fillz( '\0', 0, length );
 	_terminalIndexes.resize( length + 1 );
 	while ( index < length ) {

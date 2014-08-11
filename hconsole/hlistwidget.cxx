@@ -141,7 +141,7 @@ void HListWidget::do_paint( void ) {
  * the list widget header */
 	if ( _drawHeader )
 		_heightRaw --;
-	_varTmpBuffer.hs_realloc( _widthRaw + 1 );
+	_varTmpBuffer.reserve( _widthRaw );
 	int ctr( 0 );
 	if ( size > 0 ) {
 		iterator_t it = _firstVisibleRow;

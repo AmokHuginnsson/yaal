@@ -28,6 +28,7 @@ Copyright:
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <libintl.h>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
