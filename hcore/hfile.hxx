@@ -54,6 +54,15 @@ public:
 		static open_t const APPEND;
 		static open_t const TRUNCATE;
 	};
+	/*! \brief Ownership.
+	 */
+	struct OWNERSHIP {
+		typedef enum {
+			NONE,
+			ACQUIRED,
+			EXTERNAL
+		} ownership_t;
+	};
 	/*! \brief Read operation modifiers.
 	 */
 	struct READ {
@@ -76,7 +85,7 @@ private:
 	void* _handle;
 	HString _path;
 	HString _error;
-	bool _owner;
+	OWNERSHIP::ownership_t _ownership;
 public:
 	/*! \brief Create closed file stream object.
 	 */
@@ -84,9 +93,9 @@ public:
 	/*! \brief Create file stream based on existing low level stream (may be closed).
 	 *
 	 * \param raw - low level interface stream handler.
-	 * \param owner - shall this file object take ownership of this low level stream.
+	 * \param ownership - shall this file object take ownership of this low level stream.
 	 */
-	HFile( void* raw, bool owner );
+	HFile( void* raw, OWNERSHIP::ownership_t ownership );
 	/*! \brief Create new file stream and open file item immediatelly.
 	 *
 	 * \param path - path to file item to be opened.
@@ -98,9 +107,9 @@ public:
 	/*! \brief Assign existing low level stream to this file stream (may be closed).
 	 *
 	 * \param raw - low level interface stream handler.
-	 * \param owner - shall this file object take ownership of this low level stream.
+	 * \param ownership - shall this file object take ownership of this low level stream.
 	 */
-	int open( void* raw, bool owner );
+	int open( void* raw, OWNERSHIP::ownership_t ownership );
 	int close( void );
 	void* release( void );
 	int long read_line( HString&, READ::read_t = READ::DEFAULTS, int const = 0 );

@@ -60,7 +60,7 @@ int long HLog::_logMask = 0;
 
 void* DEFAULT_LOG_STREAM( stderr );
 
-HLog::HLog( void ) : HField<HFile>( tmpfile(), true ), HSynchronizedStream( _file::ref() ), _realMode( false ), _newLine( true ),
+HLog::HLog( void ) : HField<HFile>( tmpfile(), HFile::OWNERSHIP::ACQUIRED ), HSynchronizedStream( _file::ref() ), _realMode( false ), _newLine( true ),
 	_type( 0 ), _bufferSize( BUFFER_SIZE ),
 	_processName( NULL ),
 	_loginName(), _hostName( system::get_host_name() ),
@@ -113,20 +113,19 @@ void HLog::do_rehash( void* src_, char const* const processName_ ) {
 		::fseek( src, 0, SEEK_SET );
 		char* buf = _buffer.get<char>();
 #ifdef HAVE_GETLINE
-    while ( ::getline( &buf, &_bufferSize, src ) > 0 )
+		while ( ::getline( &buf, &_bufferSize, src ) > 0 )
 #else /* HAVE_GETLINE */
-    while ( ( len = static_cast<int>( ::fread( buf, sizeof ( char ), _bufferSize, src ) ) ) )
+		while ( ( len = static_cast<int>( ::fread( buf, sizeof ( char ), _bufferSize, src ) ) ) )
 #endif /* not HAVE_GETLINE */
-     {
+		/**/ {
 #ifndef HAVE_GETLINE
-      ptr = static_cast<char*>( ::memchr( buf, '\n', len ) );
-      if ( ! ptr )
-       {
-       	_file::ref() << buf;
-        continue;
-       }
-      * ++ ptr = 0;
-      ::fseek( src, static_cast<int long>( ptr - buf ) - len, SEEK_CUR );
+			ptr = static_cast<char*>( ::memchr( buf, '\n', len ) );
+			if ( ! ptr ) {
+				_file::ref() << buf;
+				continue;
+			}
+			* ++ ptr = 0;
+			::fseek( src, static_cast<int long>( ptr - buf ) - len, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
 			_type = ::strtol( buf, NULL, 0x10 );
 			if ( ! _type || ( _type & _logMask ) ) {
@@ -151,7 +150,7 @@ void HLog::rehash_stream( void* stream_,
 	if ( ! stream_ )
 		M_THROW( "file parameter is", reinterpret_cast<int long>( stream_ ) );
 	void* src( _file::ref().release() );
-	_file::ref().open( stream_, true );
+	_file::ref().open( stream_, HFile::OWNERSHIP::ACQUIRED );
 	do_rehash( src, processName_ );
 	return;
 	M_EPILOG
@@ -166,7 +165,7 @@ void HLog::rehash( HString const& logFileName_,
 	void* src( _file::ref().release() );
 	_file::ref().open( logFileName_, HFile::open_t( HFile::OPEN::WRITING ) | HFile::OPEN::APPEND );
 	if ( ! _file::ref() ) {
-		_file::ref().open( src, true );
+		_file::ref().open( src, HFile::OWNERSHIP::ACQUIRED );
 		HException::disable_logging();
 		throw HLogException( _file::ref().get_error() );
 	}

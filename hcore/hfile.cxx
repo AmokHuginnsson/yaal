@@ -51,16 +51,16 @@ HFile::open_t const HFile::OPEN::TRUNCATE = HFile::open_t::new_flag();
 HFile::HFile( void )
 	: HStreamInterface(),
 	_handle( NULL ), _path(), _error(),
-	_owner( false ) {
+	_ownership( OWNERSHIP::NONE ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
-HFile::HFile( void* const handle_, bool owner_ )
+HFile::HFile( void* const handle_, OWNERSHIP::ownership_t ownership_ )
 	: HStreamInterface(),
 	_handle( handle_ ), _path(), _error(),
-	_owner( handle_ ? owner_ : false ) {
+	_ownership( handle_ ? ownership_ : OWNERSHIP::NONE ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -69,7 +69,7 @@ HFile::HFile( void* const handle_, bool owner_ )
 HFile::HFile( yaal::hcore::HString const& path, open_t const& open_ )
 	: HStreamInterface(),
 	_handle( NULL ), _path(), _error(),
-	_owner( true ) {
+	_ownership( OWNERSHIP::ACQUIRED ) {
 	M_PROLOG
 	try {
 		open( path, open_ );
@@ -77,7 +77,7 @@ HFile::HFile( yaal::hcore::HString const& path, open_t const& open_ )
 		if ( _handle ) {
 			::fclose( static_cast<FILE*>( _handle ) );
 			_handle = NULL;
-			_owner = false;
+			_ownership = OWNERSHIP::NONE;
 		}
 		throw;
 	}
@@ -87,7 +87,7 @@ HFile::HFile( yaal::hcore::HString const& path, open_t const& open_ )
 
 HFile::~HFile( void ) {
 	M_PROLOG
-	if ( _handle && _owner )
+	if ( _handle && ( _ownership == OWNERSHIP::ACQUIRED ) )
 		close();
 	return;
 	M_DESTRUCTOR_EPILOG
@@ -131,19 +131,19 @@ int HFile::do_open( HString const& path_, open_t const& open_ ) {
 		int fdFlags( ::fcntl( fd, F_GETFD, 0 ) );
 		M_ENSURE( fdFlags >= 0 );
 		M_ENSURE( ::fcntl( fd, F_SETFD, fdFlags | FD_CLOEXEC ) == 0 );
-		_owner = true;
+		_ownership = OWNERSHIP::ACQUIRED;
 	}
 	errno = saveErrno;
 	return ( error );
 	M_EPILOG
 }
 
-int HFile::open( void* const handle_, bool owner_ ) {
+int HFile::open( void* const handle_, OWNERSHIP::ownership_t ownership_ ) {
 	M_PROLOG
 	M_ENSURE_EX( ! _handle, "stream already opened" );
-	M_ENSURE( handle_ || !owner_ );
+	M_ENSURE( handle_ || ( ownership_ == OWNERSHIP::NONE ) );
 	_handle = handle_;
-	_owner = owner_;
+	_ownership = ownership_;
 	_path.clear();
 	return ( 0 );
 	M_EPILOG
@@ -157,13 +157,13 @@ int HFile::close( void ) {
 
 int HFile::do_close( void ) {
 	M_PROLOG
-	M_ENSURE( _handle && _owner );
+	M_ENSURE( _handle && ( _ownership == OWNERSHIP::ACQUIRED ) );
 	int error( ::std::fclose( static_cast<FILE*>( _handle ) ) );
 	if ( error ) {
 		_error = error_message( error );
 	} else {
 		_handle = NULL;
-		_owner = false;
+		_ownership = OWNERSHIP::NONE;
 	}
 	return ( error );
 	M_EPILOG
@@ -175,7 +175,7 @@ void* HFile::release( void ) {
 	void* handle( NULL );
 	using yaal::swap;
 	swap( _handle, handle );
-	_owner = false;
+	_ownership = OWNERSHIP::NONE;
 	return ( handle );
 	M_EPILOG
 }
@@ -332,10 +332,10 @@ bool HFile::do_is_valid( void ) const {
 	M_EPILOG
 }
 
-HFile cinInstance( stdin, true );
+HFile cinInstance( stdin, HFile::OWNERSHIP::ACQUIRED );
 HSynchronizedStream cin( cinInstance );
-HSynchronizedStream cout( make_pointer<HFile>( stdout, true ) );
-HFile cerrInstance( stderr, true );
+HSynchronizedStream cout( make_pointer<HFile>( stdout, HFile::OWNERSHIP::ACQUIRED ) );
+HFile cerrInstance( stderr, HFile::OWNERSHIP::ACQUIRED );
 HSynchronizedStream cerr( cerrInstance );
 HSynchronizedStream clog;
 
