@@ -6,6 +6,7 @@
 #define CXX_STANDARD @CXX_STANDARD@
 #define LIB_INFIX "@LIB_INFIX@"
 #cmakedefine HAVE_SGI_STL_EXTENSIONS
+#cmakedefine HAVE_DECL_RTLD_NEXT
 #ifndef __GNUC__
 #define __attribute__( x ) /**/
 #endif /* not __GNUC__ */
