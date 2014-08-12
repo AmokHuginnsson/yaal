@@ -36,7 +36,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "heditwidget.hxx"
 #include "hwindow.hxx"
 #include "hcore/hlog.hxx"
-#include "hwidgetfactory.hxx"
 #include "hcore/foreach.hxx"
 #include "tools/hxml.hxx"
 
@@ -715,12 +714,6 @@ HEditWidgetAttributes& HEditWidgetAttributes::text( yaal::hcore::HString const& 
 	M_EPILOG
 }
 
-class HEditWidgetCreator : public HWidgetCreatorInterface {
-	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual void do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
-};
-
 HWidget::ptr_t HEditWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HEditWidgetAttributes attrs;
@@ -771,7 +764,8 @@ void HEditWidgetCreator::do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::
 namespace {
 
 bool register_creator( void ) {
-	HWidgetFactory::get_instance().register_widget_creator( "edit", HWidgetCreatorInterface::ptr_t( new HEditWidgetCreator() ) );
+	HWidgetFactory::get_instance().register_widget_creator( "edit",
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HEditWidgetCreator() ) ) );
 	return ( true );
 }
 

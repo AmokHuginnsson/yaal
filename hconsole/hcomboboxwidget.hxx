@@ -65,12 +65,10 @@ public:
 	HComboboxWidget( HWindow* parent,
 			int row, int col, int height, int width,
 			yaal::hcore::HString const& label,
-			int droppedWidth = 0,
-			int maxStringLength = 127,
-			char const* regexp = _maskDefault_,
-			bool searchable = true
+			HWidgetAttributesInterface const& = HWidgetAttributesInterface()
 	);
 	virtual ~HComboboxWidget ( void );
+	void set_dropped_width( int );
 	virtual int kill_focus( void ); /* this one will be used here */
 protected:
 	virtual int do_process_input( int );
@@ -81,6 +79,16 @@ private:
 };
 
 typedef yaal::hcore::HExceptionT<HComboboxWidget, HListWidgetException> HComboboxWidgetException;
+
+class HComboboxWidgetAttributes : public virtual HEditWidgetAttributes, public virtual HListWidgetAttributes {
+	int _droppedWidth;
+	bool _droppedWidthSet;
+protected:
+	virtual void do_apply( HWidget& ) const;
+public:
+	HComboboxWidgetAttributes( void );
+	HComboboxWidgetAttributes& dropped_width( int );
+};
 
 }
 

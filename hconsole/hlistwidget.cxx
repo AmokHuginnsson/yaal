@@ -34,7 +34,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hlistwidget.hxx"
 #include "hcore/memory.hxx"
 #include "hconsole.hxx"
-#include "hwidgetfactory.hxx"
 #include "hcore/foreach.hxx"
 #include "tools/hxml.hxx"
 
@@ -1238,21 +1237,15 @@ HListWidgetAttributes& HListWidgetAttributes::checkable( bool checkable_ ) {
 	M_EPILOG
 }
 
-class HListWidgetCreator : public HWidgetCreatorInterface {
-	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual void do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
-};
-
 HWidget::ptr_t HListWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HListWidgetAttributes attrs;
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
-	HWidget* edit( new HListWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
-	apply_resources( edit->get_pointer(), node_ );
-	return ( edit->get_pointer() );
+	HWidget* list( new HListWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	apply_resources( list->get_pointer(), node_ );
+	return ( list->get_pointer() );
 	M_EPILOG
 }
 
@@ -1316,7 +1309,8 @@ void HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools
 namespace {
 
 bool register_creator( void ) {
-	HWidgetFactory::get_instance().register_widget_creator( "list", HWidgetCreatorInterface::ptr_t( new HListWidgetCreator() ) );
+	HWidgetFactory::get_instance().register_widget_creator( "list",
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HListWidgetCreator() ) ) );
 	return ( true );
 }
 

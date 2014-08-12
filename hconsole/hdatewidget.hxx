@@ -45,7 +45,8 @@ public:
 private:
 	yaal::hcore::HTime _time;
 public:
-	HDateWidget( HWindow*, int, int, int, int, yaal::hcore::HString const& );
+	HDateWidget( HWindow*, int, int, int, int, yaal::hcore::HString const&,
+			HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
 	virtual ~HDateWidget( void );
 protected:
 	virtual void do_paint( void );

@@ -30,8 +30,12 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hcomboboxwidget.hxx"
+#include "hcore/foreach.hxx"
+#include "tools/hxml.hxx"
 
+using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal {
 
@@ -39,21 +43,29 @@ namespace hconsole {
 
 HComboboxWidget::HComboboxWidget ( HWindow * parent_,
 		int row_, int column_, int height_, int width_,
-		yaal::hcore::HString const& label_, int droppedWidth_,
-		int maxLength_, char const * mask_, bool searchable_ )
-	: HWidget ( parent_, row_, column_, height_,
-			width_, label_ ),
-		HEditWidget( NULL, 0, 0, 0, 0, HString(), HEditWidgetAttributes().max_string_size( maxLength_ ).pattern(mask_ ) ),
-		HSearchableWidget( searchable_ ),
-		HListWidget ( NULL, 0, 0, 0, 0, HString() ),
-		_mode ( MODE::EDITCONTROL ), _droppedWidth ( droppedWidth_ ) {
+		yaal::hcore::HString const& label_,
+		HWidgetAttributesInterface const& attr_ )
+	: HWidget ( parent_, row_, column_, height_, width_, label_, attr_ ),
+		HEditWidget( NULL, 0, 0, 0, 0, HString() ),
+		HSearchableWidget( false ),
+		HListWidget( NULL, 0, 0, 0, 0, HString() ),
+		_mode( MODE::EDITCONTROL ),
+		_droppedWidth( 0 ) {
 	M_PROLOG
+	attr_.apply( *this );
 	return;
 	M_EPILOG
 }
 
 HComboboxWidget::~HComboboxWidget ( void ) {
 	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HComboboxWidget::set_dropped_width( int droppedWidth_ ) {
+	M_PROLOG
+	_droppedWidth = droppedWidth_;
 	return;
 	M_EPILOG
 }
@@ -156,6 +168,89 @@ void HComboboxWidget::close_combo( void ) {
 	_window->schedule_repaint( true );
 	return;
 	M_EPILOG
+}
+
+HComboboxWidgetAttributes::HComboboxWidgetAttributes( void )
+	: HEditWidgetAttributes(), HListWidgetAttributes(),
+	_droppedWidth( 0 ),
+	_droppedWidthSet( false ) {
+}
+
+void HComboboxWidgetAttributes::do_apply( HWidget& widget_ ) const {
+	M_PROLOG
+	HListWidgetAttributes::do_apply( widget_ );
+	HEditWidgetAttributes::do_apply( widget_ );
+	HComboboxWidget* widget( dynamic_cast<HComboboxWidget*>( &widget_ ) );
+	if ( widget ) {
+		if ( _droppedWidthSet ) {
+			widget->set_dropped_width( _droppedWidth );
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+HComboboxWidgetAttributes& HComboboxWidgetAttributes::dropped_width( int droppedWidth_ ) {
+	M_PROLOG
+	_droppedWidth = droppedWidth_;
+	_droppedWidthSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+class HComboboxWidgetCreator : public virtual HListWidgetCreator, public virtual HEditWidgetCreator {
+	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual void do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+};
+
+HWidget::ptr_t HComboboxWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HComboboxWidgetAttributes attrs;
+	prepare_attributes( attrs, node_ );
+	OResource r( get_resource( node_ ) );
+	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
+	HWidget* combobox( new HComboboxWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	apply_resources( combobox->get_pointer(), node_ );
+	return ( combobox->get_pointer() );
+	M_EPILOG
+}
+
+void HComboboxWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HListWidgetCreator::do_prepare_attributes( attributes_, node_ );
+	HEditWidgetCreator::do_prepare_attributes( attributes_, node_ );
+	HComboboxWidgetAttributes& attrs( dynamic_cast<HComboboxWidgetAttributes&>( attributes_ ) );
+	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
+		HString const& name( n.get_name() );
+		if ( name == "dropped_width" ) {
+			attrs.dropped_width( lexical_cast<int>( xml::node_val( n ) ) );
+		} else {
+			M_THROW( "unknown edit attribute name: " + name, 0 );
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HComboboxWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HListWidgetCreator::do_apply_resources( widget_, node_ );
+	HEditWidgetCreator::do_apply_resources( widget_, node_ );
+	return;
+	M_EPILOG
+}
+
+namespace {
+
+bool register_creator( void ) {
+	HWidgetFactory::get_instance().register_widget_creator( "combobox",
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HComboboxWidgetCreator() ) ) );
+	return ( true );
+}
+
+bool volatile registered = register_creator();
+
 }
 
 }

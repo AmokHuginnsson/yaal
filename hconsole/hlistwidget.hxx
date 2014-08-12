@@ -35,6 +35,7 @@ Copyright:
 #include "hconsole/hitem.hxx"
 #include "hconsole/hwindow.hxx"
 #include "hconsole/hsearchablewidget.hxx"
+#include "hconsole/hwidgetfactory.hxx"
 
 namespace yaal {
 
@@ -577,7 +578,7 @@ void HAsIsValueListModel<tType>::add_tail( void ) {
 
 typedef yaal::hcore::HExceptionT<HListWidget, HSearchableWidgetException> HListWidgetException;
 
-class HListWidgetAttributes : public HWidgetAttributes {
+class HListWidgetAttributes : virtual public HWidgetAttributes {
 	bool _checkable;  /*!< can items be checked/unchecked */
 	bool _checkableSet;
 	bool _sortable;   /*!< can widget content be sorted */
@@ -594,6 +595,13 @@ public:
 	HListWidgetAttributes& sortable( bool );
 	HListWidgetAttributes& drawheader( bool );
 	HListWidgetAttributes& editable( bool );
+};
+
+class HListWidgetCreator : virtual public HWidgetCreatorInterface {
+protected:
+	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual void do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 }

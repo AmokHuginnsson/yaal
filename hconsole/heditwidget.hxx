@@ -30,6 +30,7 @@ Copyright:
 #include "hcore/hlist.hxx"
 #include "hconsole/hpattern.hxx"
 #include "hconsole/hwidget.hxx"
+#include "hconsole/hwidgetfactory.hxx"
 
 namespace yaal {
 
@@ -132,7 +133,7 @@ private:
 
 typedef yaal::hcore::HExceptionT<HEditWidget, HWidgetException> HEditWidgetException;
 
-class HEditWidgetAttributes : public HWidgetAttributes {
+class HEditWidgetAttributes : virtual public HWidgetAttributes {
 	bool _replace;
 	bool _replaceSet;
 	bool _multiLine;
@@ -164,6 +165,13 @@ public:
 	HEditWidgetAttributes& max_history_level( int );
 	HEditWidgetAttributes& pattern( yaal::hcore::HString const& );
 	HEditWidgetAttributes& text( yaal::hcore::HString const& );
+};
+
+class HEditWidgetCreator : virtual public HWidgetCreatorInterface {
+protected:
+	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual void do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 }
