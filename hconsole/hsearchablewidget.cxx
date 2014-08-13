@@ -37,11 +37,12 @@ namespace yaal {
 
 namespace hconsole {
 
-HSearchableWidget::HSearchableWidget( bool searchable_ )
-									: HWidget( NULL, 0, 0, 0, 0, hcore::HString() ),
-	_searchable( searchable_ ), _searchActived( false ),
+HSearchableWidget::HSearchableWidget( HWidgetAttributesInterface const& attrs_ )
+									: HWidget( NULL, 0, 0, 0, 0, hcore::HString(), attrs_ ),
+	_searchable( false ), _searchActived( false ),
 	_filtered( false ), _backwards( false ), _pattern() {
 	M_PROLOG
+	attrs_.apply( *this );
 	return;
 	M_EPILOG
 }
@@ -89,6 +90,41 @@ void HSearchableWidget::highlight( int row_, int column_,
 		ctr ++;
 	}
 	return;
+	M_EPILOG
+}
+
+void HSearchableWidget::set_searchable( bool searchable_ ) {
+	M_PROLOG
+	_searchable = searchable_;
+	return;
+	M_EPILOG
+}
+
+HSearchableWidgetAttributes::HSearchableWidgetAttributes( void )
+	: HWidgetAttributes(),
+	_searchable( false ),
+	_searchableSet( false ) {
+	return;
+}
+
+void HSearchableWidgetAttributes::do_apply( HWidget& widget_ ) const {
+	M_PROLOG
+	HSearchableWidget* widget( dynamic_cast<HSearchableWidget*>( &widget_ ) );
+	if ( widget ) {
+		if ( _searchableSet ) {
+			widget->set_searchable( _searchable );
+		}
+	}
+	HWidgetAttributes::do_apply( widget_ );
+	return;
+	M_EPILOG
+}
+
+HSearchableWidgetAttributes& HSearchableWidgetAttributes::searchable( bool searchable_ ) {
+	M_PROLOG
+	_searchable = searchable_;
+	_searchableSet = true;
+	return ( *this );
 	M_EPILOG
 }
 

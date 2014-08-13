@@ -101,7 +101,7 @@ HListWidget::HListWidget( HWindow* parent_, int row_, int column_,
 		int height_, int width_, yaal::hcore::HString const& label_, HWidgetAttributesInterface const& attr_,
 		HAbstractListModel::ptr_t const& data_ )
 	: HWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
-	HSearchableWidget( true ),
+	HSearchableWidget( attr_ ),
 	_checkable( false ), _sortable( true ),
 	_drawHeader( true ), _editable( false ),
 	_widgetOffset( 0 ), _cursorPosition( 0 ), _sumForOne( 0 ),
@@ -1155,7 +1155,7 @@ bool CompareListWidgetItems<HInfoItem>::operator() ( HInfoItem const& left_,
 }
 
 HListWidgetAttributes::HListWidgetAttributes( void )
-	: HWidgetAttributes(),
+	: HSearchableWidgetAttributes(),
 	_checkable( false ),
 	_checkableSet( false ),
 	_sortable( false ),
@@ -1200,7 +1200,7 @@ void HListWidgetAttributes::do_apply( HWidget& widget_ ) const {
 			widget->set_flags( flag, toSet );
 		}
 	}
-	HWidgetAttributes::do_apply( widget_ );
+	HSearchableWidgetAttributes::do_apply( widget_ );
 	return;
 	M_EPILOG
 }

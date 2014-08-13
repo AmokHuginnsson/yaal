@@ -50,9 +50,10 @@ protected:
 	bool _backwards;			/*!< last search direction */
 	HPattern	_pattern;	/*!< used for searching */
 public:
-	HSearchableWidget ( bool );
-	virtual ~HSearchableWidget ( void );
-	void search( hcore::HString const &, bool );
+	HSearchableWidget( HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
+	virtual ~HSearchableWidget( void );
+	void search( hcore::HString const&, bool );
+	void set_searchable( bool );
 protected:
 	void highlight( int, int, int, bool );
 	virtual void go_to_match( void ) = 0;
@@ -60,6 +61,16 @@ protected:
 };
 
 typedef yaal::hcore::HExceptionT<HSearchableWidget, HWidgetException> HSearchableWidgetException;
+
+class HSearchableWidgetAttributes : virtual public HWidgetAttributes {
+	bool _searchable;   /*!< can widget content be sorted */
+	bool _searchableSet;
+protected:
+	virtual void do_apply( HWidget& ) const;
+public:
+	HSearchableWidgetAttributes( void );
+	HSearchableWidgetAttributes& searchable( bool );
+};
 
 }
 

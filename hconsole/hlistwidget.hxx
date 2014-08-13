@@ -578,7 +578,7 @@ void HAsIsValueListModel<tType>::add_tail( void ) {
 
 typedef yaal::hcore::HExceptionT<HListWidget, HSearchableWidgetException> HListWidgetException;
 
-class HListWidgetAttributes : virtual public HWidgetAttributes {
+class HListWidgetAttributes : virtual public HSearchableWidgetAttributes {
 	bool _checkable;  /*!< can items be checked/unchecked */
 	bool _checkableSet;
 	bool _sortable;   /*!< can widget content be sorted */

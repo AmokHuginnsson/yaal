@@ -44,6 +44,10 @@ class HWidgetAttributesInterface {
 public:
 	virtual ~HWidgetAttributesInterface( void ) {}
 	void apply( HWidget& ) const;
+	template<typename T>
+	T& up( void ) {
+		return ( dynamic_cast<T&>( *this ) );
+	}
 private:
 	virtual void do_apply( HWidget& ) const {}
 };

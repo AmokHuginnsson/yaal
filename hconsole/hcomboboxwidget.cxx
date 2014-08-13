@@ -47,7 +47,7 @@ HComboboxWidget::HComboboxWidget ( HWindow * parent_,
 		HWidgetAttributesInterface const& attr_ )
 	: HWidget ( parent_, row_, column_, height_, width_, label_, attr_ ),
 		HEditWidget( NULL, 0, 0, 0, 0, HString() ),
-		HSearchableWidget( false ),
+		HSearchableWidget( attr_ ),
 		HListWidget( NULL, 0, 0, 0, 0, HString() ),
 		_mode( MODE::EDITCONTROL ),
 		_droppedWidth( 0 ) {
