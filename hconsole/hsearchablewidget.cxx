@@ -30,8 +30,12 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hsearchablewidget.hxx"
 #include "hwindow.hxx"
 #include "hconsole.hxx"
+#include "hcore/foreach.hxx"
+#include "tools/hxml.hxx"
 
+using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal {
 
@@ -125,6 +129,22 @@ HSearchableWidgetAttributes& HSearchableWidgetAttributes::searchable( bool searc
 	_searchable = searchable_;
 	_searchableSet = true;
 	return ( *this );
+	M_EPILOG
+}
+
+void HSearchableWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HSearchableWidgetAttributes& attrs( dynamic_cast<HSearchableWidgetAttributes&>( attributes_ ) );
+	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
+		HString const& name( n.get_name() );
+		if ( name == "searchable" ) {
+			attrs.searchable( lexical_cast<bool>( xml::node_val( n ) ) );
+		} else {
+			M_THROW( "unknown edit attribute name: " + name, 0 );
+		}
+	}
+	HSearchableWidgetCreator::do_prepare_attributes( attributes_, node_ );
+	return;
 	M_EPILOG
 }
 

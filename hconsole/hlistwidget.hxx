@@ -35,7 +35,6 @@ Copyright:
 #include "hconsole/hitem.hxx"
 #include "hconsole/hwindow.hxx"
 #include "hconsole/hsearchablewidget.hxx"
-#include "hconsole/hwidgetfactory.hxx"
 
 namespace yaal {
 
@@ -597,7 +596,7 @@ public:
 	HListWidgetAttributes& editable( bool );
 };
 
-class HListWidgetCreator : virtual public HWidgetCreatorInterface {
+class HListWidgetCreator : virtual public HSearchableWidgetCreator {
 protected:
 	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
 	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );

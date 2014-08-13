@@ -32,6 +32,7 @@ Copyright:
 
 #include "hconsole/hpattern.hxx"
 #include "hconsole/hwidget.hxx"
+#include "hconsole/hwidgetfactory.hxx"
 
 namespace yaal {
 
@@ -70,6 +71,11 @@ protected:
 public:
 	HSearchableWidgetAttributes( void );
 	HSearchableWidgetAttributes& searchable( bool );
+};
+
+class HSearchableWidgetCreator : virtual public HWidgetCreatorInterface {
+protected:
+	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 }

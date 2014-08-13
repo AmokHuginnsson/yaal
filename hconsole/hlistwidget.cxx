@@ -1266,6 +1266,7 @@ void HListWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attr
 			M_THROW( "unknown edit attribute name: " + name, 0 );
 		}
 	}
+	HSearchableWidgetCreator::do_prepare_attributes( attributes_, node_ );
 	return;
 	M_EPILOG
 }
