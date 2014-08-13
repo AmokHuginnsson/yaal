@@ -125,16 +125,33 @@ HWidget::ptr_t HWidgetCreatorInterface::new_instance( HWindow* window_, yaal::to
 	M_EPILOG
 }
 
+char const POSITION_ATTR[] = "position";
+char const LABEL_ATTR[] = "label";
+
 void HWidgetCreatorInterface::apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	do_apply_resources( widget_, node_ );
+	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
+		if ( ! do_apply_resources( widget_, n ) ) {
+			HString const& name( n.get_name() );
+			if ( ( name != POSITION_ATTR ) && ( name != LABEL_ATTR ) ) {
+				M_THROW( "unknown " + node_.get_name() + " attribute name: " + name, n.get_line() );
+			}
+		}
+	}
 	return;
 	M_EPILOG
 }
 
 void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& attrs_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	do_prepare_attributes( attrs_, node_ );
+	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
+		if ( ! do_prepare_attributes( attrs_, n ) ) {
+			HString const& name( n.get_name() );
+			if ( ( name != POSITION_ATTR ) && ( name != LABEL_ATTR ) ) {
+				M_THROW( "unknown " + node_.get_name() + " attribute name: " + name, n.get_line() );
+			}
+		}
+	}
 	return;
 	M_EPILOG
 }
@@ -144,12 +161,12 @@ HWidgetCreatorInterface::OResource HWidgetCreatorInterface::get_resource( yaal::
 	OResource r;
 	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
 		HString const& name( n.get_name() );
-		if ( name == "position" ) {
+		if ( name == POSITION_ATTR ) {
 			r._row = lexical_cast<int>( xml::attr_val( n, "row" ) );
 			r._column = lexical_cast<int>( xml::attr_val( n, "column" ) );
 			r._height = lexical_cast<int>( xml::attr_val( n, "height" ) );
 			r._width = lexical_cast<int>( xml::attr_val( n, "width" ) );
-		} else if ( name == "label" ) {
+		} else if ( name == LABEL_ATTR ) {
 			r._label = xml::node_val( n );
 			xml::value_t position( xml::try_attr_val( n, "position" ) );
 			if ( position ) {

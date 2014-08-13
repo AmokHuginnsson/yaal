@@ -200,8 +200,8 @@ HComboboxWidgetAttributes& HComboboxWidgetAttributes::dropped_width( int dropped
 
 class HComboboxWidgetCreator : public virtual HListWidgetCreator, public virtual HEditWidgetCreator {
 	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual void do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 HWidget::ptr_t HComboboxWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
@@ -216,28 +216,37 @@ HWidget::ptr_t HComboboxWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	M_EPILOG
 }
 
-void HComboboxWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+bool HComboboxWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	HListWidgetCreator::do_prepare_attributes( attributes_, node_ );
-	HEditWidgetCreator::do_prepare_attributes( attributes_, node_ );
-	HComboboxWidgetAttributes& attrs( dynamic_cast<HComboboxWidgetAttributes&>( attributes_ ) );
-	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
-		HString const& name( n.get_name() );
+	bool ok( false );
+	if ( !ok ) {
+		ok = HListWidgetCreator::do_prepare_attributes( attributes_, node_ );
+	}
+	if ( !ok ) {
+		ok = HEditWidgetCreator::do_prepare_attributes( attributes_, node_ );
+	}
+	if ( !ok ) {
+		HComboboxWidgetAttributes& attrs( dynamic_cast<HComboboxWidgetAttributes&>( attributes_ ) );
+		HString const& name( node_.get_name() );
 		if ( name == "dropped_width" ) {
-			attrs.dropped_width( lexical_cast<int>( xml::node_val( n ) ) );
-		} else {
-			M_THROW( "unknown edit attribute name: " + name, 0 );
+			attrs.dropped_width( lexical_cast<int>( xml::node_val( node_ ) ) );
+			ok = true;
 		}
 	}
-	return;
+	return ( ok );
 	M_EPILOG
 }
 
-void HComboboxWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+bool HComboboxWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	HListWidgetCreator::do_apply_resources( widget_, node_ );
-	HEditWidgetCreator::do_apply_resources( widget_, node_ );
-	return;
+	bool ok( false );
+	if ( !ok ) {
+		ok = HListWidgetCreator::do_apply_resources( widget_, node_ );
+	}
+	if ( !ok ) {
+		ok = HEditWidgetCreator::do_apply_resources( widget_, node_ );
+	}
+	return ( ok );
 	M_EPILOG
 }
 

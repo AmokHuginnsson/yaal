@@ -1249,61 +1249,62 @@ HWidget::ptr_t HListWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	M_EPILOG
 }
 
-void HListWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+bool HListWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	HListWidgetAttributes& attrs( dynamic_cast<HListWidgetAttributes&>( attributes_ ) );
-	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
-		HString const& name( n.get_name() );
+	bool ok( HSearchableWidgetCreator::do_prepare_attributes( attributes_, node_ ) );
+	if ( !ok ) {
+		HListWidgetAttributes& attrs( dynamic_cast<HListWidgetAttributes&>( attributes_ ) );
+		HString const& name( node_.get_name() );
+		ok = true;
 		if ( name == "draw_header" ) {
-			attrs.drawheader( lexical_cast<bool>( xml::node_val( n ) ) );
+			attrs.drawheader( lexical_cast<bool>( xml::node_val( node_ ) ) );
 		} else if ( name == "editable" ) {
-			attrs.editable( lexical_cast<bool>( xml::node_val( n ) ) );
+			attrs.editable( lexical_cast<bool>( xml::node_val( node_ ) ) );
 		} else if ( name == "checkable" ) {
-			attrs.checkable( lexical_cast<bool>( xml::node_val( n ) ) );
+			attrs.checkable( lexical_cast<bool>( xml::node_val( node_ ) ) );
 		} else if ( name == "sortable" ) {
-			attrs.sortable( lexical_cast<bool>( xml::node_val( n ) ) );
+			attrs.sortable( lexical_cast<bool>( xml::node_val( node_ ) ) );
 		} else {
-			M_THROW( "unknown edit attribute name: " + name, 0 );
+			ok = false;
 		}
 	}
-	HSearchableWidgetCreator::do_prepare_attributes( attributes_, node_ );
-	return;
+	return ( ok );
 	M_EPILOG
 }
 
-void HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+bool HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
-		HString const& name( n.get_name() );
-		if ( name == "column" ) {
-			int placement( lexical_cast<int>( xml::attr_val( n, "placement" ) ) );
-			HString columnName( xml::attr_val( n, "name" ) );
-			int width( lexical_cast<int>( xml::attr_val( n, "width" ) ) );
-			HXml::HNode::properties_t const& col( n.properties() );
-			HXml::HNode::properties_t::const_iterator alignIt( col.find( "align" ) );
-			HXml::HNode::properties_t::const_iterator colTypeIt( col.find( "type" ) );
-			M_ENSURE( ( alignIt != col.end() ) && ( colTypeIt != col.end() ) );
-			HWidget::BITS::ALIGN::align_t align( HWidget::BITS::ALIGN::LEFT );
-			if ( alignIt->second == "left" ) {
-				align = HWidget::BITS::ALIGN::LEFT;
-			} else if ( alignIt->second == "center" ) {
-				align = HWidget::BITS::ALIGN::CENTER;
-			} else if ( alignIt->second == "right" ) {
-				align = HWidget::BITS::ALIGN::RIGHT;
-			} else {
-				M_THROW( _( "unknown align type" ), n.get_line() );
-			}
-			type_id_t type( TYPE::HSTRING );
-			if ( colTypeIt->second == "string" ) {
-				type = TYPE::HSTRING;
-			} else {
-				M_THROW( _( "unknown column type" ), n.get_line() );
-			}
-			HListWidget* list( dynamic_cast<HListWidget*>( widget_.raw() ) );
-			list->add_column( placement, columnName, width, align, type );
+	bool ok( false );
+	HString const& name( node_.get_name() );
+	if ( name == "column" ) {
+		int placement( lexical_cast<int>( xml::attr_val( node_, "placement" ) ) );
+		HString columnName( xml::attr_val( node_, "name" ) );
+		int width( lexical_cast<int>( xml::attr_val( node_, "width" ) ) );
+		HXml::HNode::properties_t const& col( node_.properties() );
+		HXml::HNode::properties_t::const_iterator alignIt( col.find( "align" ) );
+		HXml::HNode::properties_t::const_iterator colTypeIt( col.find( "type" ) );
+		M_ENSURE( ( alignIt != col.end() ) && ( colTypeIt != col.end() ) );
+		HWidget::BITS::ALIGN::align_t align( HWidget::BITS::ALIGN::LEFT );
+		if ( alignIt->second == "left" ) {
+			align = HWidget::BITS::ALIGN::LEFT;
+		} else if ( alignIt->second == "center" ) {
+			align = HWidget::BITS::ALIGN::CENTER;
+		} else if ( alignIt->second == "right" ) {
+			align = HWidget::BITS::ALIGN::RIGHT;
+		} else {
+			M_THROW( _( "unknown align type" ), node_.get_line() );
 		}
+		type_id_t type( TYPE::HSTRING );
+		if ( colTypeIt->second == "string" ) {
+			type = TYPE::HSTRING;
+		} else {
+			M_THROW( _( "unknown column type" ), node_.get_line() );
+		}
+		HListWidget* list( dynamic_cast<HListWidget*>( widget_.raw() ) );
+		list->add_column( placement, columnName, width, align, type );
+		ok = true;
 	}
-	return;
+	return ( ok );
 	M_EPILOG
 }
 

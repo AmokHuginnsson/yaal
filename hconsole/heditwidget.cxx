@@ -726,39 +726,39 @@ HWidget::ptr_t HEditWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	M_EPILOG
 }
 
-void HEditWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+bool HEditWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HEditWidgetAttributes& attrs( dynamic_cast<HEditWidgetAttributes&>( attributes_ ) );
-	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
-		HString const& name( n.get_name() );
-		if ( name == "max_string_size" )
-			attrs.max_string_size( lexical_cast<int>( xml::node_val( n ) ) );
-		else if ( name == "value" ) {
-			xml::value_t value( xml::try_node_val( n ) );
-			attrs.text( value ? *value : "" );
-		} else if ( name == "mask" ) {
-			attrs.pattern( xml::node_val( n ) );
-		} else if ( name == "replace" ) {
-			attrs.replace( lexical_cast<bool>( xml::node_val( n ) ) );
-		} else if ( name == "multi_line" ) {
-			attrs.multiline( lexical_cast<bool>( xml::node_val( n ) ) );
-		} else if ( name == "read_only" ) {
-			attrs.readonly( lexical_cast<bool>( xml::node_val( n ) ) );
-		} else if ( name == "right_aligned" ) {
-			attrs.rightaligned( lexical_cast<bool>( xml::node_val( n ) ) );
-		} else if ( name == "password" ) {
-			attrs.password( lexical_cast<bool>( xml::node_val( n ) ) );
-		} else if ( name == "max_history_level" ) {
-			attrs.max_history_level( lexical_cast<int>( xml::node_val( n ) ) );
-		} else {
-			M_THROW( "unknown edit attribute name: " + name, n.get_line() );
-		}
+	HString const& name( node_.get_name() );
+	bool ok( true );
+	if ( name == "max_string_size" ) {
+		attrs.max_string_size( lexical_cast<int>( xml::node_val( node_ ) ) );
+	} else if ( name == "value" ) {
+		xml::value_t value( xml::try_node_val( node_ ) );
+		attrs.text( value ? *value : "" );
+	} else if ( name == "mask" ) {
+		attrs.pattern( xml::node_val( node_ ) );
+	} else if ( name == "replace" ) {
+		attrs.replace( lexical_cast<bool>( xml::node_val( node_ ) ) );
+	} else if ( name == "multi_line" ) {
+		attrs.multiline( lexical_cast<bool>( xml::node_val( node_ ) ) );
+	} else if ( name == "read_only" ) {
+		attrs.readonly( lexical_cast<bool>( xml::node_val( node_ ) ) );
+	} else if ( name == "right_aligned" ) {
+		attrs.rightaligned( lexical_cast<bool>( xml::node_val( node_ ) ) );
+	} else if ( name == "password" ) {
+		attrs.password( lexical_cast<bool>( xml::node_val( node_ ) ) );
+	} else if ( name == "max_history_level" ) {
+		attrs.max_history_level( lexical_cast<int>( xml::node_val( node_ ) ) );
+	} else {
+		ok = false;
 	}
-	return;
+	return ( ok );
 	M_EPILOG
 }
 
-void HEditWidgetCreator::do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) {
+bool HEditWidgetCreator::do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) {
+	return ( false );
 }
 
 namespace {

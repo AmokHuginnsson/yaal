@@ -75,7 +75,7 @@ public:
 
 class HSearchableWidgetCreator : virtual public HWidgetCreatorInterface {
 protected:
-	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 }

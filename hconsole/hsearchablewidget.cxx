@@ -132,19 +132,16 @@ HSearchableWidgetAttributes& HSearchableWidgetAttributes::searchable( bool searc
 	M_EPILOG
 }
 
-void HSearchableWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+bool HSearchableWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HSearchableWidgetAttributes& attrs( dynamic_cast<HSearchableWidgetAttributes&>( attributes_ ) );
-	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
-		HString const& name( n.get_name() );
-		if ( name == "searchable" ) {
-			attrs.searchable( lexical_cast<bool>( xml::node_val( n ) ) );
-		} else {
-			M_THROW( "unknown edit attribute name: " + name, 0 );
-		}
+	HString const& name( node_.get_name() );
+	bool ok( false );
+	if ( name == "searchable" ) {
+		attrs.searchable( lexical_cast<bool>( xml::node_val( node_ ) ) );
+		ok = true;
 	}
-	HSearchableWidgetCreator::do_prepare_attributes( attributes_, node_ );
-	return;
+	return ( ok );
 	M_EPILOG
 }
 

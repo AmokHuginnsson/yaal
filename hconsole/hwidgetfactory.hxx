@@ -54,8 +54,8 @@ protected:
 	virtual void do_initialize_globals( void ) {};
 	virtual void do_cleanup_globals( void ) {};
 	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& ) = 0;
-	virtual void do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) = 0;
-	virtual void do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) = 0;
+	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) = 0;
+	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) = 0;
 public:
 	virtual ~HWidgetCreatorInterface( void ) {}
 	void initialize_globals( void );
