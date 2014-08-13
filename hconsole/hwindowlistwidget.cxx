@@ -71,7 +71,7 @@ int HWindowListWidget::do_process_input( int code_ ) {
 namespace list_widget_helper {
 
 template<>
-yaal::hcore::HString const HCell<HWindow::ptr_t>::get_string( void ) {
+yaal::hcore::HString HCell<HWindow::ptr_t>::get_string( void ) const {
 	M_PROLOG
 	return ( _data->get_title() );
 	M_EPILOG
@@ -110,24 +110,24 @@ bool HRow<window_iterator_t>::get_checked( void ) {
 }
 
 template<>
-yaal::hcore::HString const HCell<window_iterator_t>::get_long( void ) {
+yaal::hcore::HString HCell<window_iterator_t>::get_long( void ) const {
 	return ( 0 );
 }
 
 template<>
-yaal::hcore::HString const HCell<window_iterator_t>::get_double( void ) {
+yaal::hcore::HString HCell<window_iterator_t>::get_double( void ) const {
 	return ( 0 );
 }
 
 template<>
-yaal::hcore::HString const HCell<window_iterator_t>::get_string( void ) {
+yaal::hcore::HString HCell<window_iterator_t>::get_string( void ) const {
 	M_PROLOG
 	return ( (*_data)->get_title() );
 	M_EPILOG
 }
 
 template<>
-HString HCell<window_iterator_t>::get_time( void ) {
+HString HCell<window_iterator_t>::get_time( void ) const {
 	return ( "" );
 }
 

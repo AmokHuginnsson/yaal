@@ -75,10 +75,10 @@ class HAbstractCell {
 public:
 	typedef yaal::hcore::HPointer<HAbstractCell> ptr_t;
 	virtual ~HAbstractCell( void );
-	virtual yaal::hcore::HString const get_long( void ) = 0;
-	virtual yaal::hcore::HString const get_double( void ) = 0;
-	virtual yaal::hcore::HString const get_string( void ) = 0;
-	virtual yaal::hcore::HString get_time( void ) = 0;
+	virtual yaal::hcore::HString get_long( void ) const = 0;
+	virtual yaal::hcore::HString get_double( void ) const = 0;
+	virtual yaal::hcore::HString get_string( void ) const = 0;
+	virtual yaal::hcore::HString get_time( void ) const = 0;
 	virtual void set_child_widget_data( HWidget* ) = 0;
 };
 
@@ -93,10 +93,10 @@ class HCell : public HAbstractCell {
 public:
 	explicit HCell( tType&, int );
 	virtual ~HCell( void );
-	virtual yaal::hcore::HString const get_long( void );
-	virtual yaal::hcore::HString const get_double( void );
-	virtual yaal::hcore::HString const get_string( void );
-	virtual yaal::hcore::HString get_time( void );
+	virtual yaal::hcore::HString get_long( void ) const;
+	virtual yaal::hcore::HString get_double( void ) const;
+	virtual yaal::hcore::HString get_string( void ) const;
+	virtual yaal::hcore::HString get_time( void ) const;
 	virtual void set_child_widget_data( HWidget* );
 };
 

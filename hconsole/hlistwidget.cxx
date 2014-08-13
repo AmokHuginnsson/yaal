@@ -1000,28 +1000,28 @@ void HAbstractListModel::add_tail( void ) {
 }
 
 template<>
-yaal::hcore::HString const HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_long( void ) {
+yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_long( void ) const {
 	M_PROLOG
 	return ( HString ( (*_data)[ _column ].get_int_long() ) );
 	M_EPILOG
 }
 
 template<>
-yaal::hcore::HString const HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_double( void ) {
+yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_double( void ) const {
 	M_PROLOG
 	return ( HString ( (*_data)[ _column ].get_double() ) );
 	M_EPILOG
 }
 
 template<>
-yaal::hcore::HString const HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_string( void ) {
+yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_string( void ) const {
 	M_PROLOG
 	return ( (*_data)[ _column ].get_string() );
 	M_EPILOG
 }
 
 template<>
-yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_time( void ) {
+yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_time( void ) const {
 	M_PROLOG
 	return ( ( (*_data)[ _column ].get_time() ).string() );
 	M_EPILOG

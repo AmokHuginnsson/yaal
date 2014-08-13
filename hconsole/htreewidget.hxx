@@ -39,52 +39,69 @@ class HAbstractTreeModel {
 public:
 	typedef HAbstractTreeModel this_type;
 	typedef yaal::hcore::HPointer<HAbstractTreeModel> ptr_t;
+	typedef u64_t id_t;
 	class HAbstractTreeModelNode {
 	public:
 		typedef HAbstractTreeModelNode this_type;
 		typedef yaal::hcore::HPointer<HAbstractTreeModelNode> ptr_t;
+		id_t get_id( void ) const {
+			M_PROLOG
+			return ( do_get_id() );
+			M_EPILOG
+		}
+		int get_child_count( void ) const {
+			M_PROLOG
+			return ( do_get_child_count() );
+			M_EPILOG
+		}
+		HAbstractTreeModelNode::ptr_t get_child( int childNo_ ) const {
+			M_PROLOG
+			return ( do_get_child( childNo_ ) );
+			M_EPILOG
+		}
+		HAbstractTreeModelNode::ptr_t get_parent( void ) const {
+			M_PROLOG
+			return ( do_get_parent() );
+			M_EPILOG
+		}
+		yaal::hcore::HString const get_long( void ) const {
+			M_PROLOG
+			return ( do_get_long() );
+			M_EPILOG
+		}
+		yaal::hcore::HString const get_double( void ) const {
+			M_PROLOG
+			return ( do_get_double() );
+			M_EPILOG
+		}
+		yaal::hcore::HString const get_string( void ) const {
+			M_PROLOG
+			return ( do_get_string() );
+			M_EPILOG
+		}
+		yaal::hcore::HString get_time( void ) const {
+			M_PROLOG
+			return ( do_get_time() );
+			M_EPILOG
+		}
+	protected:
+		virtual id_t do_get_id( void ) const;
+		virtual int do_get_child_count( void ) const = 0;
+		virtual HAbstractTreeModelNode::ptr_t do_get_child( int ) const = 0;
+		virtual HAbstractTreeModelNode::ptr_t do_get_parent( void ) const = 0;
+		virtual yaal::hcore::HString const do_get_long( void ) const = 0;
+		virtual yaal::hcore::HString const do_get_double( void ) const = 0;
+		virtual yaal::hcore::HString const do_get_string( void ) const = 0;
+		virtual yaal::hcore::HString do_get_time( void ) const = 0;
 	};
 	virtual ~HAbstractTreeModel( void );
-	HAbstractTreeModelNode::ptr_t create_node_proxy( void ) {
+	HAbstractTreeModelNode::ptr_t get_root( void ) const {
 		M_PROLOG
-		return ( do_create_node_proxy() );
-		M_EPILOG
-	}
-	void get_root( HAbstractTreeModelNode::ptr_t node_ ) const {
-		M_PROLOG
-		do_get_root( node_ );
-		return;
-		M_EPILOG
-	}
-	int long get_id( HAbstractTreeModelNode::ptr_t node_ ) const {
-		M_PROLOG
-		return ( do_get_id( node_ ) );
-		M_EPILOG
-	}
-	int get_child_count( HAbstractTreeModelNode::ptr_t node_ ) const {
-		M_PROLOG
-		return ( do_get_child_count( node_ ) );
-		M_EPILOG
-	}
-	void get_child( HAbstractTreeModelNode::ptr_t node_, int childNo_, HAbstractTreeModelNode::ptr_t child_ ) const {
-		M_PROLOG
-		do_get_child( node_, childNo_, child_ );
-		return;
-		M_EPILOG
-	}
-	void get_parent( HAbstractTreeModelNode::ptr_t node_, HAbstractTreeModelNode::ptr_t parent_ ) const {
-		M_PROLOG
-		do_get_parent( node_, parent_ );
-		return;
+		return ( do_get_root() );
 		M_EPILOG
 	}
 protected:
-	virtual HAbstractTreeModelNode::ptr_t do_create_node_proxy( void ) = 0;
-	virtual void do_get_root( HAbstractTreeModelNode::ptr_t ) const = 0;
-	virtual int long do_get_id( HAbstractTreeModelNode::ptr_t ) const;
-	virtual int do_get_child_count( HAbstractTreeModelNode::ptr_t ) const = 0;
-	virtual void do_get_child( HAbstractTreeModelNode::ptr_t, int, HAbstractTreeModelNode::ptr_t ) const = 0;
-	virtual void do_get_parent( HAbstractTreeModelNode::ptr_t, HAbstractTreeModelNode::ptr_t ) const = 0;
+	virtual HAbstractTreeModelNode::ptr_t do_get_root( void ) const = 0;
 };
 
 template<typename T>
@@ -97,66 +114,63 @@ private:
 	typedef yaal::hcore::HPointer<data_t> data_ptr_t;
 	class HAsIsValueTreeModelNode : public HAbstractTreeModelNode {
 		typedef typename data_t::node_t node_t;
-		typedef typename data_t::HNode::const_iterator iterator;
 		node_t _node;
-		iterator _iter;
-		int _lastAccessedChild;
-		HAsIsValueTreeModelNode( void )
+		HAsIsValueTreeModelNode( node_t node_ )
 			: HAbstractTreeModelNode(),
-			_node( NULL ), _iter(), _lastAccessedChild( -1 )
-			{}
-		void set( node_t node_ ) {
-			_node = node_;
+			_node( node_ ) {
 		}
-		node_t get( void ) const {
-			return ( _node );
-		}
-		node_t nth_child( int childNo_ ) {
+		virtual id_t do_get_id( void ) const {
 			M_PROLOG
-			if ( childNo_ != _lastAccessedChild ) {
-				_lastAccessedChild = childNo_;
-			}
-			return ( &*_iter );
+			return ( reinterpret_cast<id_t>( _node ) );
+			M_EPILOG
+		}
+		virtual int do_get_child_count( void ) const {
+			M_PROLOG
+			return ( _node->child_count() );
+			M_EPILOG
+		}
+		virtual HAbstractTreeModelNode::ptr_t do_get_child( int childNo_ ) const {
+			M_PROLOG
+			typename data_t::const_iterator it( _node->begin() );
+			advance( it, childNo_ );
+			return ( hcore::make_pointer<HAsIsValueTreeModelNode>( &*it ) );
+			M_EPILOG
+		}
+		virtual HAbstractTreeModelNode::ptr_t do_get_parent( void ) const {
+			M_PROLOG
+			return ( hcore::make_pointer<HAsIsValueTreeModelNode>( _node->get_parent() ) );
+			M_EPILOG
+		}
+		yaal::hcore::HString do_get_long( void ) const {
+			M_PROLOG
+			return ( (**_node).get_int_long() );
+			M_EPILOG
+		}
+		yaal::hcore::HString do_get_double( void ) const {
+			M_PROLOG
+			return ( (**_node).get_double() );
+			M_EPILOG
+		}
+		yaal::hcore::HString do_get_string( void ) const {
+			M_PROLOG
+			return ( (**_node).get_string() );
+			M_EPILOG
+		}
+		yaal::hcore::HString do_get_time( void ) const {
+			M_PROLOG
+			return ( (**_node).get_time().string() );
 			M_EPILOG
 		}
 	};
 	data_ptr_t _data;
 public:
 	HAsIsValueTreeModel( data_ptr_t data_ )
-		: _data( data_ )
-		{}
-protected:
-	virtual HAbstractTreeModelNode::ptr_t do_create_node_proxy( void ) {
-		M_PROLOG
-		return ( hcore::make_pointer<HAsIsValueTreeModelNode>() );
-		M_EPILOG
+		: _data( data_ ) {
 	}
+protected:
 	virtual void do_get_root( HAbstractTreeModelNode::ptr_t node_ ) const {
 		M_PROLOG
-		static_cast<HAsIsValueTreeModelNode*>( node_.get() )->set( _data->get_root() );
-		return;
-		M_EPILOG
-	}
-	virtual int long do_get_id( HAbstractTreeModelNode::ptr_t node_ ) const {
-		M_PROLOG
-		return ( reinterpret_cast<int long>( static_cast<HAsIsValueTreeModelNode*>( node_.get() )->get() ) );
-		M_EPILOG
-	}
-	virtual int do_get_child_count( HAbstractTreeModelNode::ptr_t node_ ) const {
-		M_PROLOG
-		return ( static_cast<HAsIsValueTreeModelNode*>( node_.get() )->get()->child_count() );
-		M_EPILOG
-	}
-	virtual void do_get_child( HAbstractTreeModelNode::ptr_t node_, int childNo_, HAbstractTreeModelNode::ptr_t child_ ) const {
-		M_PROLOG
-		typename data_t::const_iterator it( static_cast<HAsIsValueTreeModelNode*>( node_.get() )->get()->begin() );
-		advance( it, childNo_ );
-		static_cast<HAsIsValueTreeModelNode*>( child_.get() )->set( &*it );
-		M_EPILOG
-	}
-	virtual void do_get_parent( HAbstractTreeModelNode::ptr_t node_, HAbstractTreeModelNode::ptr_t parent_ ) const {
-		M_PROLOG
-		return ( static_cast<HAsIsValueTreeModelNode*>( parent_.get() )->set( static_cast<HAsIsValueTreeModelNode*>( node_.get() )->get()->get_parent() ) );
+		return ( hcore::make_pointer<HAsIsValueTreeModelNode>( _data->get_root() ) );
 		M_EPILOG
 	}
 };
