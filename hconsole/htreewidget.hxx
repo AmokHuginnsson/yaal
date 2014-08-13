@@ -170,7 +170,7 @@ public:
 		: _data( data_ ) {
 	}
 protected:
-	virtual void do_get_root( HAbstractTreeModelNode::ptr_t node_ ) const {
+	virtual HAbstractTreeModelNode::ptr_t do_get_root( void ) const {
 		M_PROLOG
 		return ( hcore::make_pointer<HAsIsValueTreeModelNode>( _data->get_root() ) );
 		M_EPILOG
