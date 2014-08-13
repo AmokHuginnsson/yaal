@@ -44,6 +44,8 @@ public:
 	public:
 		typedef HAbstractTreeModelNode this_type;
 		typedef yaal::hcore::HPointer<HAbstractTreeModelNode> ptr_t;
+		virtual ~HAbstractTreeModelNode() {
+		}
 		id_t get_id( void ) const {
 			M_PROLOG
 			return ( do_get_id() );
@@ -64,17 +66,17 @@ public:
 			return ( do_get_parent() );
 			M_EPILOG
 		}
-		yaal::hcore::HString const get_long( void ) const {
+		yaal::hcore::HString get_long( void ) const {
 			M_PROLOG
 			return ( do_get_long() );
 			M_EPILOG
 		}
-		yaal::hcore::HString const get_double( void ) const {
+		yaal::hcore::HString get_double( void ) const {
 			M_PROLOG
 			return ( do_get_double() );
 			M_EPILOG
 		}
-		yaal::hcore::HString const get_string( void ) const {
+		yaal::hcore::HString get_string( void ) const {
 			M_PROLOG
 			return ( do_get_string() );
 			M_EPILOG
@@ -89,9 +91,9 @@ public:
 		virtual int do_get_child_count( void ) const = 0;
 		virtual HAbstractTreeModelNode::ptr_t do_get_child( int ) const = 0;
 		virtual HAbstractTreeModelNode::ptr_t do_get_parent( void ) const = 0;
-		virtual yaal::hcore::HString const do_get_long( void ) const = 0;
-		virtual yaal::hcore::HString const do_get_double( void ) const = 0;
-		virtual yaal::hcore::HString const do_get_string( void ) const = 0;
+		virtual yaal::hcore::HString do_get_long( void ) const = 0;
+		virtual yaal::hcore::HString do_get_double( void ) const = 0;
+		virtual yaal::hcore::HString do_get_string( void ) const = 0;
 		virtual yaal::hcore::HString do_get_time( void ) const = 0;
 	};
 	virtual ~HAbstractTreeModel( void );
