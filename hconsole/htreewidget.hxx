@@ -120,12 +120,19 @@ class HAsIsValueTreeModel : public HAbstractTreeModel {
 public:
 	typedef HAsIsValueTreeModel this_type;
 	typedef HAbstractTreeModel base_type;
-private:
 	typedef yaal::hcore::HTree<T> data_t;
 	typedef yaal::hcore::HPointer<data_t> data_ptr_t;
 	class HAsIsValueTreeModelNode : public HAbstractTreeModelNode {
 		typedef typename data_t::node_t node_t;
 		node_t _node;
+	public:
+		T const& get( void ) const {
+			return ( **_node );
+		}
+		T& get( void ) {
+			return ( **_node );
+		}
+	private:
 		HAsIsValueTreeModelNode( node_t node_ )
 			: HAbstractTreeModelNode(),
 			_node( node_ ) {
@@ -172,12 +179,19 @@ private:
 			return ( (**_node).get_time().string() );
 			M_EPILOG
 		}
+	private:
+		HAsIsValueTreeModelNode( HAsIsValueTreeModelNode const& );
+		HAsIsValueTreeModelNode& operator = ( HAsIsValueTreeModelNode const& );
 	};
+private:
 	data_ptr_t _data;
 	HTreeWidgetModelListener* _listener;
 public:
 	HAsIsValueTreeModel( data_ptr_t data_ )
 		: _data( data_ ), _listener( NULL ) {
+	}
+	data_ptr_t get_data( void ) {
+		return ( _data );
 	}
 protected:
 	virtual HAbstractTreeModelNode::ptr_t do_get_root( void ) const {
@@ -189,6 +203,9 @@ protected:
 		_listener = listener_;
 		return;
 	}
+private:
+	HAsIsValueTreeModel( HAsIsValueTreeModel const& );
+	HAsIsValueTreeModel& operator = ( HAsIsValueTreeModel const& );
 };
 
 /*! \brief Implementation of TUI Tree control class.
@@ -213,11 +230,10 @@ protected:
 		int _widthRaw;
 		HAbstractTreeModel::HAbstractTreeModelNode::ptr_t _data;
 	public:
-		HNodeWidget( int = 0 );
+		HNodeWidget( void );
 		virtual ~HNodeWidget ( void );
-		HInfo const& operator[]( int ) const;
-		HInfo& operator[]( int );
 		bool is_unfolded( void ) const;
+		HAbstractTreeModel::HAbstractTreeModelNode::ptr_t data( void );
 	protected:
 		void expand( void );
 		void collapse( void );

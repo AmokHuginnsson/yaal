@@ -91,8 +91,13 @@ class HCell : public HAbstractCell {
 	int _column;
 	tType& _data;
 public:
-	explicit HCell( tType&, int );
-	virtual ~HCell( void );
+	explicit HCell( tType& it_, int column_ )
+		: _column( column_ ), _data( it_ ) {
+		return;
+	}
+	virtual ~HCell( void ) {
+		return;
+	}
 	virtual yaal::hcore::HString get_long( void ) const;
 	virtual yaal::hcore::HString get_double( void ) const;
 	virtual yaal::hcore::HString get_string( void ) const;
@@ -123,7 +128,9 @@ class HRow : public HAbstractRow {
 	cells_t _cells;
 public:
 	HRow( tType& );
-	virtual HAbstractCell& operator[]( int );
+	virtual HAbstractCell& operator[]( int column_ ) {
+		return ( *(_cells[ column_ ]) );
+	}
 	virtual void switch_state( void );
 	virtual int long get_id( void );
 	virtual bool get_checked( void );
@@ -179,8 +186,8 @@ public:
 	HAbstractListModel( void );
 	virtual ~HAbstractListModel( void );
 	virtual void sort( list_widget_helper::OSortHelper& ) = 0;
-	virtual int long size( void ) = 0;
-	virtual bool is_empty( void ) = 0;
+	virtual int long size( void ) const = 0;
+	virtual bool is_empty( void ) const = 0;
 	virtual HModelIteratorWrapper begin() = 0;
 	virtual HModelIteratorWrapper end() = 0;
 	virtual HModelIteratorWrapper rbegin() = 0;
@@ -215,36 +222,7 @@ public:
 	typedef typename data_t::iterator iterator_t;
 	typedef HRow<iterator_t> row_t;
 private:
-	class HModelIterator : public HAbstractModelIterator {
-		typedef yaal::hcore::HPointer<HModelIterator> ptr_t;
-		HAsIsValueListModel const* _owner;
-		iterator_t _iterator;
-		row_t _row;
-		HModelIterator( void );
-		HModelIterator( HModelIterator const& );
-		explicit HModelIterator( HAsIsValueListModel const*, iterator_t const& );
-		HModelIterator& operator = ( HModelIterator const& );
-		virtual HAbstractRow& dereference( void );
-		virtual HAbstractRow* call( void );
-		virtual void next( void );
-		virtual void previous( void );
-		virtual void assign_to( HAbstractListModel::iterator_ptr_t& ) const;
-		virtual bool is_equal( HAbstractModelIterator const& ) const;
-		virtual bool is_not_equal( HAbstractModelIterator const& ) const;
-		virtual bool is_valid( void ) const;
-		iterator_t& raw( void );
-		friend class HModelIteratorWrapper;
-		friend class HAsIsValueListModel<tType>;
-#ifndef _MSC_VER
-		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HAsIsValueListModel<tType>* const&, typename data_t::iterator const& );
-		friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HAsIsValueListModel<tType> const* const&, typename data_t::iterator const& );
-#else /* #ifndef _MSC_VER */
-		template<typename T1, typename T2, typename T3>
-		friend yaal::hcore::HPointer<T1> yaal::hcore::make_pointer<T1>( T2 const&, T3 const& );
-#endif /* #else #ifndef _MSC_VER */
-	public:
-		~HModelIterator( void );
-	};
+	class HModelIterator;
 public:
 	typedef yaal::hcore::HPointer<HModelIterator> iterator_ptr_t;
 	typedef yaal::hcore::HPointer<HAsIsValueListModel<tType> > ptr_t;
@@ -252,21 +230,98 @@ public:
 private:
 	data_ptr_t _list;
 public:
-	HAsIsValueListModel( data_ptr_t = data_ptr_t() );
-	void add_tail( tType const& );
-	void add_orderly( tType const&, int, OSortHelper::sort_order_t = OSortHelper::ASCENDING );
+	HAsIsValueListModel( data_ptr_t data_ = data_ptr_t() )
+		: HAbstractListModel(),
+		_list( data_ ) {
+	}
+	void add_tail( tType const& row_ );
+	void add_orderly( tType const& row_, int column_, list_widget_helper::OSortHelper::sort_order_t order_ = OSortHelper::ASCENDING );
 	void remove_tail( void );
+	virtual int long size( void ) const {
+		return ( _list->size() );
+	}
 	data_ptr_t get_data( void );
 	virtual void sort( list_widget_helper::OSortHelper& );
-	virtual bool is_empty( void );
-	virtual int long size( void );
-	virtual HModelIteratorWrapper begin();
-	virtual HModelIteratorWrapper end();
-	virtual HModelIteratorWrapper rbegin();
-	virtual HModelIteratorWrapper rend();
+	virtual bool is_empty( void ) const {
+		return ( _list->is_empty() );
+	}
+	virtual HAbstractListModel::HModelIteratorWrapper begin( void ) {
+		return ( HModelIteratorWrapper( _list->begin() != _list->end()
+					? hcore::make_pointer<HModelIterator>( this, _list->begin() )
+					: iterator_ptr_t() ) );
+	}
+	virtual HAbstractListModel::HModelIteratorWrapper end( void ) {
+		return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->end() ) ) );
+	}
+	virtual HAbstractListModel::HModelIteratorWrapper rbegin( void ) {
+		return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->rbegin().base() ) ) );
+	}
+	virtual HAbstractListModel::HModelIteratorWrapper rend( void ) {
+		return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->rend().base() ) ) );
+	}
 	virtual void erase( HModelIteratorWrapper& );
 	virtual void add_tail( void );
 	friend class HModelIterator;
+};
+
+template<typename tType>
+class HAsIsValueListModel<tType>::HModelIterator : public HAbstractModelIterator {
+	typedef yaal::hcore::HPointer<HModelIterator> ptr_t;
+	HAsIsValueListModel const* _owner;
+	iterator_t _iterator;
+	row_t _row;
+	HModelIterator( void );
+	explicit HModelIterator( HAsIsValueListModel const* owner_, iterator_t const& it_ )
+		: _owner( owner_ ), _iterator( it_ ), _row( _iterator ) {
+		return;
+	}
+	HModelIterator( HModelIterator const& );
+	HModelIterator& operator = ( HModelIterator const& );
+	virtual HAbstractRow& dereference( void ) {
+		return ( _row );
+	}
+	virtual HAbstractRow* call( void ) {
+		return ( &_row );
+	}
+	virtual void next( void ) {
+		++ _iterator;
+		return;
+	}
+	virtual void previous( void ) {
+		-- _iterator;
+		return;
+	}
+	virtual void assign_to( HAbstractListModel::iterator_ptr_t& it_ ) const {
+		it_ = iterator_ptr_t( hcore::make_pointer<HModelIterator>( _owner, _iterator ) );
+		return;
+	}
+	virtual bool is_equal( HAbstractModelIterator const& it_ ) const {
+		return ( _iterator == static_cast<typename HAsIsValueListModel<tType>::HModelIterator const&>( it_ )._iterator );
+	}
+	virtual bool is_not_equal( HAbstractModelIterator const& it_ ) const {
+		return ( _iterator != static_cast<typename HAsIsValueListModel<tType>::HModelIterator const&>( it_ )._iterator );
+	}
+
+	virtual bool is_valid( void ) const {
+		HAsIsValueListModel* lc( const_cast<HAsIsValueListModel*>( _owner ) );
+		return ( ( _iterator != iterator_t() ) && ( _iterator != lc->_list->end() ) );
+	}
+	iterator_t& raw( void ) {
+		return ( _iterator );
+	}
+	friend class HModelIteratorWrapper;
+	friend class HAsIsValueListModel<tType>;
+#ifndef _MSC_VER
+	friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HAsIsValueListModel<tType>* const&, typename data_t::iterator const& );
+	friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HAsIsValueListModel<tType> const* const&, typename data_t::iterator const& );
+#else /* #ifndef _MSC_VER */
+	template<typename T1, typename T2, typename T3>
+	friend yaal::hcore::HPointer<T1> yaal::hcore::make_pointer<T1>( T2 const&, T3 const& );
+#endif /* #else #ifndef _MSC_VER */
+public:
+	virtual ~HModelIterator( void ) {
+		return;
+	}
 };
 
 }
@@ -340,18 +395,19 @@ protected:
 	iterator_t _firstVisibleRow;	/*!< pointer to first visible row */
 	list_widget_helper::HAbstractListModel::ptr_t _model;
 public:
-	HListWidget( HWindow* /* parent */,
-			int /* row */,
-			int /* col */,
-			int /* height */,
-			int /* width */,
-			yaal::hcore::HString const&,
+	HListWidget( HWindow* parent,
+			int row,
+			int col,
+			int height,
+			int width,
+			yaal::hcore::HString const& label,
 			HWidgetAttributesInterface const& = HWidgetAttributesInterface(),
 #ifndef _MSC_VER
-			list_widget_helper::HAbstractListModel::ptr_t const& = hcore::make_pointer<list_widget_helper::HAsIsValueListModel<> >( hcore::make_pointer<list_widget_helper::HAsIsValueListModel<>::data_t>() ) );	/* label */
+			list_widget_helper::HAbstractListModel::ptr_t const& = hcore::make_pointer<list_widget_helper::HAsIsValueListModel<> >( hcore::make_pointer<list_widget_helper::HAsIsValueListModel<>::data_t>() )
 #else /* #ifndef _MSC_VER */
-			list_widget_helper::HAbstractListModel::ptr_t const& = list_widget_helper::HAsIsValueListModel<>::ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>( list_widget_helper::HAsIsValueListModel<>::data_ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>::data_t() ) ) ) );	/* label */
+			list_widget_helper::HAbstractListModel::ptr_t const& = list_widget_helper::HAsIsValueListModel<>::ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>( list_widget_helper::HAsIsValueListModel<>::data_ptr_t( new ( memory::yaal ) list_widget_helper::HAsIsValueListModel<>::data_t() ) ) )
 #endif /* #else #ifndef _MSC_VER */
+	);
 	virtual ~HListWidget ( void );
 	void add_column( int atPosition,
 			yaal::hcore::HString const& columnName,
@@ -413,10 +469,6 @@ public:
 };
 
 template<typename tType>
-HAsIsValueListModel<tType>::HAsIsValueListModel( data_ptr_t data_ ) : HAbstractListModel(), _list( data_ ) {
-}
-
-template<typename tType>
 void HAsIsValueListModel<tType>::add_tail( tType const& row_ ) {
 	M_PROLOG
 	_list->push_back( row_ );
@@ -444,111 +496,6 @@ void HAsIsValueListModel<tType>::remove_tail( void ) {
 	_widget->invalidate();
 	return;
 	M_EPILOG
-}
-
-template<typename tType>
-int long HAsIsValueListModel<tType>::size( void ) {
-	return ( _list->size() );
-}
-
-template<typename tType>
-HAbstractListModel::HModelIteratorWrapper HAsIsValueListModel<tType>::begin( void ) {
-	return ( HModelIteratorWrapper( _list->begin() != _list->end() ? hcore::make_pointer<HModelIterator>( this, _list->begin() ) : iterator_ptr_t() ) );
-}
-
-template<typename tType>
-HAbstractListModel::HModelIteratorWrapper HAsIsValueListModel<tType>::end( void ) {
-	return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->end() ) ) );
-}
-
-template<typename tType>
-HAbstractListModel::HModelIteratorWrapper HAsIsValueListModel<tType>::rbegin( void ) {
-	return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->rbegin().base() ) ) );
-}
-
-template<typename tType>
-HAbstractListModel::HModelIteratorWrapper HAsIsValueListModel<tType>::rend( void ) {
-	return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->rend().base() ) ) );
-}
-
-template<typename tType>
-bool HAsIsValueListModel<tType>::is_empty( void ) {
-	return ( _list->is_empty() );
-}
-
-template<typename tType>
-HAsIsValueListModel<tType>::HModelIterator::HModelIterator( HAsIsValueListModel const* owner_, iterator_t const& it_ )
-	: _owner( owner_ ), _iterator( it_ ), _row( _iterator ) {
-	return;
-}
-
-template<typename tType>
-HAsIsValueListModel<tType>::HModelIterator::~HModelIterator( void ) {
-	return;
-}
-
-template<typename tType>
-bool HAsIsValueListModel<tType>::HModelIterator::is_valid( void ) const {
-	HAsIsValueListModel* lc( const_cast<HAsIsValueListModel*>( _owner ) );
-	return ( ( _iterator != iterator_t() ) && ( _iterator != lc->_list->end() ) );
-}
-
-template<typename tType>
-void HAsIsValueListModel<tType>::HModelIterator::next( void ) {
-	++ _iterator;
-	return;
-}
-
-template<typename tType>
-void HAsIsValueListModel<tType>::HModelIterator::previous( void ) {
-	-- _iterator;
-	return;
-}
-
-template<typename tType>
-HAbstractRow& HAsIsValueListModel<tType>::HModelIterator::dereference( void ) {
-	return ( _row );
-}
-
-template<typename tType>
-HAbstractRow* HAsIsValueListModel<tType>::HModelIterator::call( void ) {
-	return ( &_row );
-}
-
-template<typename tType>
-bool HAsIsValueListModel<tType>::HModelIterator::is_equal( typename HAsIsValueListModel<tType>::HAbstractModelIterator const& it_ ) const {
-	return ( _iterator == static_cast<typename HAsIsValueListModel<tType>::HModelIterator const&>( it_ )._iterator );
-}
-
-template<typename tType>
-bool HAsIsValueListModel<tType>::HModelIterator::is_not_equal( typename HAsIsValueListModel<tType>::HAbstractModelIterator const& it_ ) const {
-	return ( _iterator != static_cast<typename HAsIsValueListModel<tType>::HModelIterator const&>( it_ )._iterator );
-}
-
-template<typename tType>
-void HAsIsValueListModel<tType>::HModelIterator::assign_to( HAbstractListModel::iterator_ptr_t& it_ ) const {
-	it_ = iterator_ptr_t( hcore::make_pointer<HModelIterator>( _owner, _iterator ) );
-	return;
-}
-
-template<typename tType>
-typename HAsIsValueListModel<tType>::iterator_t& HAsIsValueListModel<tType>::HModelIterator::raw( void ) {
-	return ( _iterator );
-}
-
-template<typename tType>
-HAbstractCell& HRow<tType>::operator[] ( int column_ ) {
-	return ( *(_cells[ column_ ]) );
-}
-
-template<typename tType>
-HCell<tType>::HCell( tType& it_, int column_ ) : _column( column_ ), _data( it_ ) {
-	return;
-}
-
-template<typename tType>
-HCell<tType>::~HCell( void ) {
-	return;
 }
 
 template<typename tType>

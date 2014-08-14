@@ -38,9 +38,10 @@ namespace yaal {
 
 namespace hconsole {
 
-HTreeWidget::HNodeWidget::HNodeWidget( int cols )
-						: _unfolded( false ),
-						_rowRaw( 0 ), _columnRaw( 0 ), _widthRaw( 0 ), _data( cols ) {
+HTreeWidget::HNodeWidget::HNodeWidget( void )
+	: _unfolded( false ),
+	_rowRaw( 0 ), _columnRaw( 0 ),
+	_widthRaw( 0 ), _data() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -49,18 +50,6 @@ HTreeWidget::HNodeWidget::HNodeWidget( int cols )
 HTreeWidget::HNodeWidget::~HNodeWidget( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
-}
-
-HInfo const& HTreeWidget::HNodeWidget::operator[]( int idx ) const {
-	M_PROLOG
-	return ( _data[ idx ] );
-	M_EPILOG
-}
-
-HInfo& HTreeWidget::HNodeWidget::operator[]( int idx ) {
-	M_PROLOG
-	return ( _data[ idx ] );
 	M_EPILOG
 }
 
@@ -108,6 +97,10 @@ bool HTreeWidget::HNodeWidget::is_unfolded( void ) const {
 	return ( _unfolded );
 }
 
+HAbstractTreeModel::HAbstractTreeModelNode::ptr_t HTreeWidget::HNodeWidget::data( void ) {
+	return ( _data );
+}
+
 HTreeWidget::HTreeWidget( HWindow* parent_, int row_, int column_,
 		int height_, int width_, yaal::hcore::HString const& label_ )
 	: HWidget( parent_, row_, column_, height_, width_, label_ ),
@@ -145,10 +138,9 @@ int HTreeWidget::draw_node( tree_view_t::node_t node_, int row_ ) {
 	int row = row_;
 	HConsole& cons = HConsole::get_instance();
 	M_ASSERT( node_ );
-	if ( (**node_)._data.get_value_count() ) {
+	if ( !! (**node_)._data ) {
 		row ++;
-		HInfo const& info = (**node_)._data[ 0 ];
-		HString const& str = info.get_string();
+		HString const& str = (**node_)._data->get_string();
 		(**node_)._rowRaw = row;
 		(**node_)._columnRaw = _columnRaw + node_->get_level() * 2 - 1;
 		(**node_)._widthRaw = static_cast<int>( str.get_length() ) + 2;

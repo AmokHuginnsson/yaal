@@ -44,6 +44,7 @@ public:
 	typedef HMenuWidget this_type;
 	typedef HTreeWidget base_type;
 	typedef yaal::hcore::HPointer<HMenuWidget> ptr_t;
+	typedef HAsIsValueTreeModel<HInfoItem> menu_model_t;
 protected:
 	HTUIProcess* _process;
 public:
@@ -56,7 +57,8 @@ public:
 	virtual ~HMenuWidget( void );
 	void init( HTUIProcess*, OMenuItem* );
 protected:
-	int load_sub_menu( tree_t::node_t, OMenuItem* );
+	int load_sub_menu( menu_model_t::data_t::node_t, OMenuItem* );
+	OMenuItem* get_selected( void );
 	virtual int do_process_input( int );
 	virtual bool do_click( mouse::OMouse& );
 private:
