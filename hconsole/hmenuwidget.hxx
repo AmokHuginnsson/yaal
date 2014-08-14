@@ -47,12 +47,12 @@ public:
 protected:
 	HTUIProcess* _process;
 public:
-	HMenuWidget( HWindow*,				/* parent */
-								 int,							/* row */
-								 int,							/* col */
-								 int,							/* height */
-								 int,							/* width */
-								 yaal::hcore::HString const& );	/* label */
+	HMenuWidget( HWindow* parent,
+			int row,
+			int col,
+			int height,
+			int width,
+			yaal::hcore::HString const& label );
 	virtual ~HMenuWidget( void );
 	void init( HTUIProcess*, OMenuItem* );
 protected:

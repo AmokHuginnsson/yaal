@@ -64,7 +64,7 @@ HInfo& HTreeWidget::HNodeWidget::operator[]( int idx ) {
 	M_EPILOG
 }
 
-void HTreeWidget::expand( tree_t::node_t node ) {
+void HTreeWidget::expand( tree_view_t::node_t node ) {
 	M_PROLOG
 	(**node)._unfolded = true;
 	if ( node->get_parent() )
@@ -73,12 +73,12 @@ void HTreeWidget::expand( tree_t::node_t node ) {
 	M_EPILOG
 }
 
-void HTreeWidget::collapse( tree_t::node_t node ) {
+void HTreeWidget::collapse( tree_view_t::node_t node ) {
 	M_PROLOG
 	(**node)._unfolded = false;
   if ( ! node->has_childs() )
 		return;
-	for ( tree_t::HNode::iterator it = node->begin(); it != node->end(); ++ it )
+	for ( tree_view_t::HNode::iterator it = node->begin(); it != node->end(); ++ it )
 		collapse( &*it );
 	return;
 	M_EPILOG
@@ -111,7 +111,7 @@ bool HTreeWidget::HNodeWidget::is_unfolded( void ) const {
 HTreeWidget::HTreeWidget( HWindow* parent_, int row_, int column_,
 		int height_, int width_, yaal::hcore::HString const& label_ )
 	: HWidget( parent_, row_, column_, height_, width_, label_ ),
-	_model(), _tree(), _selected( NULL ) {
+	_model(), _view(), _selected( NULL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -134,13 +134,13 @@ void HTreeWidget::do_paint( void ) {
 	_varTmpBuffer.fillz( '_', 0, _widthRaw );
 	for ( ctr = 0; ctr < _heightRaw; ctr ++ )
 		cons.mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.raw() );
-	if ( _tree.get_root() )
-		draw_node( _tree.get_root(), _rowRaw );
+	if ( _view.get_root() )
+		draw_node( _view.get_root(), _rowRaw );
 	return;
 	M_EPILOG
 }
 
-int HTreeWidget::draw_node( tree_t::node_t node_, int row_ ) {
+int HTreeWidget::draw_node( tree_view_t::node_t node_, int row_ ) {
 	M_PROLOG
 	int row = row_;
 	HConsole& cons = HConsole::get_instance();
@@ -163,7 +163,7 @@ int HTreeWidget::draw_node( tree_t::node_t node_, int row_ ) {
 		cons.mvprintf( row, (**node_)._columnRaw + 1, str.raw() );
 	}
 	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
-		for ( tree_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it )
+		for ( tree_view_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it )
 			row = draw_node( &*it, row );
 	}
 	return ( row );
@@ -175,15 +175,15 @@ int HTreeWidget::do_process_input( int code_ ) {
 	bool wasFolded = false;
 	int errorCode = 0;
 	code_ = HWidget::do_process_input( code_ );
-	tree_t::node_t node = _selected;
+	tree_view_t::node_t node = _selected;
 	switch ( code_ ) {
 		case ( KEY_CODES::HOME ):
-			node = _tree.get_root();
+			node = _view.get_root();
 			if ( node->has_childs() )
 				_selected = &*node->begin();
 		break;
 		case ( KEY_CODES::END ):
-			node = _tree.get_root();
+			node = _view.get_root();
 			if ( node->has_childs() )
 				_selected = &*node->rbegin().base();
 		break;
@@ -271,7 +271,7 @@ bool HTreeWidget::do_click( OMouse& mouse_ ) {
 	M_PROLOG
 	bool handled( HWidget::do_click( mouse_ ) );
 	if ( ! handled ) {
-		if ( _tree.get_root() && do_click( _tree.get_root(), mouse_ ) ) {
+		if ( _view.get_root() && do_click( _view.get_root(), mouse_ ) ) {
 			schedule_repaint();
 			handled = true;
 		}
@@ -280,7 +280,7 @@ bool HTreeWidget::do_click( OMouse& mouse_ ) {
 	M_EPILOG
 }
 
-bool HTreeWidget::do_click( tree_t::node_t node_, OMouse& mouse_ ) {
+bool HTreeWidget::do_click( tree_view_t::node_t node_, OMouse& mouse_ ) {
 	M_PROLOG
 	if ( (**node_).hit_test( mouse_._row, mouse_._column ) ) {
 		(**node_).click( mouse_._column );
@@ -288,7 +288,7 @@ bool HTreeWidget::do_click( tree_t::node_t node_, OMouse& mouse_ ) {
 		return ( true );
 	}
 	if ( node_->has_childs() && ( (**node_)._unfolded || ! node_->get_level() ) ) {
-		for ( tree_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it )
+		for ( tree_view_t::HNode::iterator it = node_->begin(); it != node_->end(); ++ it )
 			if ( do_click( &*it, mouse_ ) )
 				return ( true );
 	}
@@ -296,12 +296,12 @@ bool HTreeWidget::do_click( tree_t::node_t node_, OMouse& mouse_ ) {
 	M_EPILOG
 }
 
-HTreeWidget::tree_t::node_t HTreeWidget::previous( tree_t::node_t node, bool wrap ) {
+HTreeWidget::tree_view_t::node_t HTreeWidget::previous( tree_view_t::node_t node, bool wrap ) {
 	M_PROLOG
-	tree_t::node_t p = NULL;
-	tree_t::node_t parent = node->get_parent();
+	tree_view_t::node_t p = NULL;
+	tree_view_t::node_t parent = node->get_parent();
 	if ( parent ) {
-		tree_t::HNode::iterator it;
+		tree_view_t::HNode::iterator it;
 		for ( it = parent->begin(); ( it != parent->end() ) && ( &*it != node ); ++ it )
 			;
 		if ( it != parent->end() ) {
@@ -318,12 +318,12 @@ HTreeWidget::tree_t::node_t HTreeWidget::previous( tree_t::node_t node, bool wra
 	M_EPILOG
 }
 
-HTreeWidget::tree_t::node_t HTreeWidget::next( tree_t::node_t node ) {
+HTreeWidget::tree_view_t::node_t HTreeWidget::next( tree_view_t::node_t node ) {
 	M_PROLOG
-	tree_t::node_t parent = node->get_parent();
-	tree_t::node_t n = NULL;
+	tree_view_t::node_t parent = node->get_parent();
+	tree_view_t::node_t n = NULL;
 	if ( parent ) {
-		tree_t::HNode::iterator it;
+		tree_view_t::HNode::iterator it;
 		for ( it = parent->begin(); ( it != parent->end() ) && ( &*it != node ); ++ it )
 			;
 		if ( it != parent->end() )
@@ -345,6 +345,12 @@ void HTreeWidget::set_model( HAbstractTreeModel::ptr_t model_ ) {
 HAbstractTreeModel::ptr_t HTreeWidget::get_model( void ) const {
 	M_PROLOG
 	return ( _model );
+	M_EPILOG
+}
+
+void HTreeWidget::do_on_model_changed( void ) {
+	M_PROLOG
+	return;
 	M_EPILOG
 }
 

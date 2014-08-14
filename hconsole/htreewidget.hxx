@@ -35,6 +35,14 @@ namespace yaal {
 
 namespace hconsole {
 
+class HTreeWidgetModelListener {
+public:
+	virtual ~HTreeWidgetModelListener( void ) {}
+	void notice( void );
+protected:
+	virtual void do_on_model_changed( void ) = 0;
+};
+
 class HAbstractTreeModel {
 public:
 	typedef HAbstractTreeModel this_type;
@@ -102,6 +110,7 @@ public:
 		return ( do_get_root() );
 		M_EPILOG
 	}
+	virtual void register_listener( HTreeWidgetModelListener* ) = 0;
 protected:
 	virtual HAbstractTreeModelNode::ptr_t do_get_root( void ) const = 0;
 };
@@ -165,15 +174,20 @@ private:
 		}
 	};
 	data_ptr_t _data;
+	HTreeWidgetModelListener* _listener;
 public:
 	HAsIsValueTreeModel( data_ptr_t data_ )
-		: _data( data_ ) {
+		: _data( data_ ), _listener( NULL ) {
 	}
 protected:
 	virtual HAbstractTreeModelNode::ptr_t do_get_root( void ) const {
 		M_PROLOG
 		return ( hcore::make_pointer<HAsIsValueTreeModelNode>( _data->get_root() ) );
 		M_EPILOG
+	}
+	virtual void register_listener( HTreeWidgetModelListener* listener_ ) {
+		_listener = listener_;
+		return;
 	}
 };
 
@@ -182,7 +196,7 @@ protected:
  * Tree control allows fancy representation of tree based data with handful
  * of display alteration methods.
  */
-class HTreeWidget : public virtual HWidget {
+class HTreeWidget : public virtual HWidget, public HTreeWidgetModelListener {
 public:
 	typedef HTreeWidget this_type;
 	typedef HWidget base_type;
@@ -197,7 +211,7 @@ protected:
 		int _rowRaw;
 		int	_columnRaw;
 		int _widthRaw;
-		HInfoItem _data;
+		HAbstractTreeModel::HAbstractTreeModelNode::ptr_t _data;
 	public:
 		HNodeWidget( int = 0 );
 		virtual ~HNodeWidget ( void );
@@ -211,10 +225,10 @@ protected:
 		void click( int );
 		friend class HTreeWidget;
 	};
-	typedef yaal::hcore::HTree<HNodeWidget> tree_t;
+	typedef yaal::hcore::HTree<HNodeWidget> tree_view_t;
 	HAbstractTreeModel::ptr_t _model;
-	tree_t _tree;
-	tree_t::node_t _selected;
+	tree_view_t _view;
+	tree_view_t::node_t _selected;
 public:
 	HTreeWidget( HWindow* parent,
 								 int row,
@@ -223,19 +237,20 @@ public:
 								 int width,
 								 yaal::hcore::HString const& label );
 	virtual ~HTreeWidget( void );
-	int draw_node( tree_t::node_t, int );
+	int draw_node( tree_view_t::node_t, int );
 	void set_model( HAbstractTreeModel::ptr_t );
 	HAbstractTreeModel::ptr_t get_model( void ) const;
 protected:
 	virtual int do_process_input( int );
 	virtual bool do_click( mouse::OMouse& );
 	virtual void do_paint( void );
+	virtual void do_on_model_changed( void );
 private:
-	bool do_click( tree_t::node_t, mouse::OMouse& );
-	void expand( tree_t::node_t );
-	void collapse( tree_t::node_t );
-	tree_t::node_t next( tree_t::node_t );
-	tree_t::node_t previous( tree_t::node_t, bool = false );
+	bool do_click( tree_view_t::node_t, mouse::OMouse& );
+	void expand( tree_view_t::node_t );
+	void collapse( tree_view_t::node_t );
+	tree_view_t::node_t next( tree_view_t::node_t );
+	tree_view_t::node_t previous( tree_view_t::node_t, bool = false );
 	HTreeWidget( HTreeWidget const& );
 	HTreeWidget& operator = ( HTreeWidget const& );
 };
