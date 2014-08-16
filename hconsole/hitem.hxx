@@ -47,8 +47,8 @@ public:
 private:
 	data_t _data;
 public:
-	int long	_id;
-	bool	_checked;
+	int long _id;
+	bool _checked;
 	HItem( int = 0 );
 	virtual ~HItem ( void );
 	HItem( HItem const& );

@@ -53,6 +53,7 @@ public:
 		typedef HAbstractTreeModelNode this_type;
 		typedef yaal::hcore::HPointer<HAbstractTreeModelNode> ptr_t;
 		virtual ~HAbstractTreeModelNode() {
+			return;
 		}
 		id_t get_id( void ) const {
 			M_PROLOG
@@ -95,7 +96,7 @@ public:
 			M_EPILOG
 		}
 	protected:
-		virtual id_t do_get_id( void ) const;
+		virtual id_t do_get_id( void ) const = 0;
 		virtual int do_get_child_count( void ) const = 0;
 		virtual HAbstractTreeModelNode::ptr_t do_get_child( int ) const = 0;
 		virtual HAbstractTreeModelNode::ptr_t do_get_parent( void ) const = 0;
@@ -104,7 +105,9 @@ public:
 		virtual yaal::hcore::HString do_get_string( void ) const = 0;
 		virtual yaal::hcore::HString do_get_time( void ) const = 0;
 	};
-	virtual ~HAbstractTreeModel( void );
+	virtual ~HAbstractTreeModel( void ) {
+		return;
+	}
 	HAbstractTreeModelNode::ptr_t get_root( void ) const {
 		M_PROLOG
 		return ( do_get_root() );
@@ -115,7 +118,7 @@ protected:
 	virtual HAbstractTreeModelNode::ptr_t do_get_root( void ) const = 0;
 };
 
-template<typename T>
+template<typename T = HInfoItem>
 class HAsIsValueTreeModel : public HAbstractTreeModel {
 public:
 	typedef HAsIsValueTreeModel this_type;
@@ -123,20 +126,17 @@ public:
 	typedef yaal::hcore::HTree<T> data_t;
 	typedef yaal::hcore::HPointer<data_t> data_ptr_t;
 	class HAsIsValueTreeModelNode : public HAbstractTreeModelNode {
-		typedef typename data_t::node_t node_t;
+		typedef typename data_t::const_node_t node_t;
 		node_t _node;
 	public:
-		T const& get( void ) const {
-			return ( **_node );
-		}
-		T& get( void ) {
-			return ( **_node );
-		}
-	private:
 		HAsIsValueTreeModelNode( node_t node_ )
 			: HAbstractTreeModelNode(),
 			_node( node_ ) {
 		}
+		T const& get( void ) const {
+			return ( **_node );
+		}
+	private:
 		virtual id_t do_get_id( void ) const {
 			M_PROLOG
 			return ( reinterpret_cast<id_t>( _node ) );
@@ -144,12 +144,12 @@ public:
 		}
 		virtual int do_get_child_count( void ) const {
 			M_PROLOG
-			return ( _node->child_count() );
+			return ( static_cast<int>( _node->child_count() ) );
 			M_EPILOG
 		}
 		virtual HAbstractTreeModelNode::ptr_t do_get_child( int childNo_ ) const {
 			M_PROLOG
-			typename data_t::const_iterator it( _node->begin() );
+			typename data_t::HNode::const_iterator it( _node->begin() );
 			advance( it, childNo_ );
 			return ( hcore::make_pointer<HAsIsValueTreeModelNode>( &*it ) );
 			M_EPILOG
@@ -161,22 +161,22 @@ public:
 		}
 		yaal::hcore::HString do_get_long( void ) const {
 			M_PROLOG
-			return ( (**_node).get_int_long() );
+			return ( (**_node)[0].get_int_long() );
 			M_EPILOG
 		}
 		yaal::hcore::HString do_get_double( void ) const {
 			M_PROLOG
-			return ( (**_node).get_double() );
+			return ( (**_node)[0].get_double() );
 			M_EPILOG
 		}
 		yaal::hcore::HString do_get_string( void ) const {
 			M_PROLOG
-			return ( (**_node).get_string() );
+			return ( (**_node)[0].get_string() );
 			M_EPILOG
 		}
 		yaal::hcore::HString do_get_time( void ) const {
 			M_PROLOG
-			return ( (**_node).get_time().string() );
+			return ( (**_node)[0].get_time().string() );
 			M_EPILOG
 		}
 	private:
@@ -247,11 +247,14 @@ protected:
 	tree_view_t::node_t _selected;
 public:
 	HTreeWidget( HWindow* parent,
-								 int row,
-								 int col,
-								 int height,
-								 int width,
-								 yaal::hcore::HString const& label );
+			int row,
+			int col,
+			int height,
+			int width,
+			yaal::hcore::HString const& label,
+			HWidgetAttributesInterface const& = HWidgetAttributesInterface(),
+			HAbstractTreeModel::ptr_t = hcore::make_pointer<HAsIsValueTreeModel<> >( hcore::make_pointer<HAsIsValueTreeModel<>::data_t>() )
+	);
 	virtual ~HTreeWidget( void );
 	int draw_node( tree_view_t::node_t, int );
 	void set_model( HAbstractTreeModel::ptr_t );
