@@ -89,6 +89,7 @@ void HMenuWidget::init( HTUIProcess* process_, OMenuItem* menu_ ) {
 	if ( ! _view.get_root() ) {
 		node = static_cast<menu_model_t*>( _model.get() )->get_data()->create_new_root();
 		load_sub_menu( node, menu_ );
+		on_model_changed();
 	}
 	if ( ! _selected && node->has_childs() ) {
 		_selected = &*_view.get_root()->begin();

@@ -38,10 +38,10 @@ namespace yaal {
 
 namespace hconsole {
 
-HTreeWidget::HNodeWidget::HNodeWidget( void )
+HTreeWidget::HNodeWidget::HNodeWidget( HAbstractTreeModel::HAbstractTreeModelNode::ptr_t data_ )
 	: _unfolded( false ),
 	_rowRaw( 0 ), _columnRaw( 0 ),
-	_widthRaw( 0 ), _data() {
+	_widthRaw( 0 ), _data( data_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -109,6 +109,7 @@ HTreeWidget::HTreeWidget( HWindow* parent_, int row_, int column_,
 	_model( model_ ), _view(), _selected( NULL ) {
 	M_PROLOG
 	attr_.apply( *this );
+	_model->register_listener( this );
 	return;
 	M_EPILOG
 }
@@ -333,6 +334,7 @@ HTreeWidget::tree_view_t::node_t HTreeWidget::next( tree_view_t::node_t node ) {
 void HTreeWidget::set_model( HAbstractTreeModel::ptr_t model_ ) {
 	M_PROLOG
 	_model = model_;
+	_model->register_listener( this );
 	return;
 	M_EPILOG
 }
@@ -343,8 +345,21 @@ HAbstractTreeModel::ptr_t HTreeWidget::get_model( void ) const {
 	M_EPILOG
 }
 
+void HTreeWidgetModelListener::on_model_changed( void ) {
+	M_PROLOG
+	do_on_model_changed();
+	return;
+	M_EPILOG
+}
+
 void HTreeWidget::do_on_model_changed( void ) {
 	M_PROLOG
+	tree_view_t tv;
+	HAbstractTreeModel::HAbstractTreeModelNode::ptr_t n( _model->get_root() );
+	if ( n->is_valid() ) {
+		_selected = tv.create_new_root( n );
+	}
+	_view.swap( tv );
 	return;
 	M_EPILOG
 }

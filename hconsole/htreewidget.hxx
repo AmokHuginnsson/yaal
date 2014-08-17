@@ -38,7 +38,7 @@ namespace hconsole {
 class HTreeWidgetModelListener {
 public:
 	virtual ~HTreeWidgetModelListener( void ) {}
-	void notice( void );
+	void on_model_changed( void );
 protected:
 	virtual void do_on_model_changed( void ) = 0;
 };
@@ -95,8 +95,14 @@ public:
 			return ( do_get_time() );
 			M_EPILOG
 		}
+		bool is_valid( void ) const {
+			M_PROLOG
+			return ( do_is_valid() );
+			M_EPILOG
+		}
 	protected:
 		virtual id_t do_get_id( void ) const = 0;
+		virtual bool do_is_valid( void ) const = 0;
 		virtual int do_get_child_count( void ) const = 0;
 		virtual HAbstractTreeModelNode::ptr_t do_get_child( int ) const = 0;
 		virtual HAbstractTreeModelNode::ptr_t do_get_parent( void ) const = 0;
@@ -140,6 +146,11 @@ public:
 		virtual id_t do_get_id( void ) const {
 			M_PROLOG
 			return ( reinterpret_cast<id_t>( _node ) );
+			M_EPILOG
+		}
+		virtual bool do_is_valid( void ) const {
+			M_PROLOG
+			return ( _node != NULL );
 			M_EPILOG
 		}
 		virtual int do_get_child_count( void ) const {
@@ -230,7 +241,7 @@ protected:
 		int _widthRaw;
 		HAbstractTreeModel::HAbstractTreeModelNode::ptr_t _data;
 	public:
-		HNodeWidget( void );
+		HNodeWidget( HAbstractTreeModel::HAbstractTreeModelNode::ptr_t );
 		virtual ~HNodeWidget ( void );
 		bool is_unfolded( void ) const;
 		HAbstractTreeModel::HAbstractTreeModelNode::ptr_t data( void );
