@@ -142,7 +142,7 @@ int HTreeWidget::draw_node( tree_view_t::node_t node_, int row_ ) {
 	int row = row_;
 	HConsole& cons = HConsole::get_instance();
 	M_ASSERT( node_ );
-	if ( !! (**node_)._data ) {
+	if ( (**node_)._data->is_valid() ) {
 		row ++;
 		HString const& str = (**node_)._data->get_string();
 		(**node_)._rowRaw = row;
@@ -352,13 +352,22 @@ void HTreeWidgetModelListener::on_model_changed( void ) {
 	M_EPILOG
 }
 
+void HTreeWidget::build_view( tree_view_t::node_t viewNode_, HAbstractTreeModel::HAbstractTreeModelNode::ptr_t modelNode_ ) {
+	M_PROLOG
+	for ( int i( 0 ), COUNT( modelNode_->get_child_count() ); i < COUNT; ++ i ) {
+		HAbstractTreeModel::HAbstractTreeModelNode::ptr_t mn( modelNode_->get_child( i ) );
+		tree_view_t::node_t vn( &*viewNode_->add_node( mn ) );
+		build_view( vn, mn );
+	}
+	return;
+	M_EPILOG
+}
+
 void HTreeWidget::do_on_model_changed( void ) {
 	M_PROLOG
 	tree_view_t tv;
 	HAbstractTreeModel::HAbstractTreeModelNode::ptr_t n( _model->get_root() );
-	if ( n->is_valid() ) {
-		_selected = tv.create_new_root( n );
-	}
+	build_view( tv.create_new_root( n ), n );
 	_view.swap( tv );
 	return;
 	M_EPILOG

@@ -150,7 +150,7 @@ public:
 		}
 		virtual bool do_is_valid( void ) const {
 			M_PROLOG
-			return ( _node != NULL );
+			return ( ( _node != NULL ) && ( (**_node).get_value_count() > 0 ) );
 			M_EPILOG
 		}
 		virtual int do_get_child_count( void ) const {
@@ -276,6 +276,7 @@ protected:
 	virtual void do_paint( void );
 	virtual void do_on_model_changed( void );
 private:
+	void build_view( tree_view_t::node_t viewNode_, HAbstractTreeModel::HAbstractTreeModelNode::ptr_t modelNode_ );
 	bool do_click( tree_view_t::node_t, mouse::OMouse& );
 	void expand( tree_view_t::node_t );
 	void collapse( tree_view_t::node_t );

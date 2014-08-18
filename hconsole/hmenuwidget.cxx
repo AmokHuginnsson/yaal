@@ -48,8 +48,9 @@ int HMenuWidget::load_sub_menu( menu_model_t::data_t::node_t node, OMenuItem* su
 		info[ 0 ].set_string( subMenu_ [ ctr ]._label );
 		info[ 0 ].set_pointer( static_cast<void*>( &subMenu_[ ctr ] ) );
 		menu_model_t::data_t::HNode::iterator it = node->add_node( info );
-		if ( subMenu_[ ctr ]._subMenu )
+		if ( subMenu_[ ctr ]._subMenu ) {
 			load_sub_menu( &*it, subMenu_[ ctr ]._subMenu );
+		}
 		++ ctr;
 	}
 	return ( ctr );
