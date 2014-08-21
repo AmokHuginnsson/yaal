@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hwidgetfactory.hxx"
 #include "hcore/foreach.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -148,7 +149,7 @@ void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& at
 		if ( ! do_prepare_attributes( attrs_, n ) ) {
 			HString const& name( n.get_name() );
 			if ( ( name != POSITION_ATTR ) && ( name != LABEL_ATTR ) ) {
-				M_THROW( "unknown " + node_.get_name() + " attribute name: " + name, n.get_line() );
+				log << "unknown " << node_.get_name() << " attribute name: " << name << ", at: " << n.get_line() << endl;
 			}
 		}
 	}
