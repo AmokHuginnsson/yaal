@@ -264,7 +264,11 @@ public:
 			int width,
 			yaal::hcore::HString const& label,
 			HWidgetAttributesInterface const& = HWidgetAttributesInterface(),
-			HAbstractTreeModel::ptr_t = hcore::make_pointer<HAsIsValueTreeModel<> >( hcore::make_pointer<HAsIsValueTreeModel<>::data_t>() )
+#ifndef _MSC_VER
+			HAbstractTreeModel::ptr_t const& = hcore::make_pointer<HAsIsValueTreeModel<> >( hcore::make_pointer<HAsIsValueTreeModel<>::data_t>() )
+#else /* #ifndef _MSC_VER */
+			HAbstractTreeModel::ptr_t const& = HAsIsValueTreeModel<>::ptr_t( new ( memory::yaal ) HAsIsValueTreeModel<>( HAsIsValueTreeModel<>::data_ptr_t( new ( memory::yaal ) HAsIsValueTreeModel<>::data_t() ) ) )
+#endif /* #else #ifndef _MSC_VER */
 	);
 	virtual ~HTreeWidget( void );
 	int draw_node( tree_view_t::node_t, int );

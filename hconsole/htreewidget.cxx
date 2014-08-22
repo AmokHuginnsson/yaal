@@ -104,7 +104,7 @@ HAbstractTreeModel::HAbstractTreeModelNode::ptr_t HTreeWidget::HNodeWidget::data
 HTreeWidget::HTreeWidget( HWindow* parent_, int row_, int column_,
 		int height_, int width_, yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_,
-		HAbstractTreeModel::ptr_t model_ )
+		HAbstractTreeModel::ptr_t const& model_ )
 	: HWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
 	_model( model_ ), _view(), _selected( NULL ) {
 	M_PROLOG
