@@ -47,20 +47,20 @@ public:
 	struct FLAG;
 	typedef yaal::hcore::HBitFlag<FLAG> flag_t;
 	struct FLAG {
-		static flag_t const DEFAULT;
-		static flag_t const FLOW_CONTROL_HARDWARE;
-		static flag_t const FLOW_CONTROL_SOFTWARE;
-		static flag_t const STOP_BITS_1;
-		static flag_t const STOP_BITS_2;
-		static flag_t const PARITY_CHECK;
-		static flag_t const PARITY_ODD;
-		static flag_t const BITS_PER_BYTE_8;
-		static flag_t const BITS_PER_BYTE_7;
-		static flag_t const BITS_PER_BYTE_6;
-		static flag_t const BITS_PER_BYTE_5;
-		static flag_t const CANONICAL;
-		static flag_t const ECHO;
-		static flag_t const CR2NL;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const DEFAULT;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const FLOW_CONTROL_HARDWARE;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const FLOW_CONTROL_SOFTWARE;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const STOP_BITS_1;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const STOP_BITS_2;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const PARITY_CHECK;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const PARITY_ODD;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const BITS_PER_BYTE_8;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const BITS_PER_BYTE_7;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const BITS_PER_BYTE_6;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const BITS_PER_BYTE_5;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const CANONICAL;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const ECHO;
+		static M_YAAL_TOOLS_PUBLIC_API flag_t const CR2NL;
 	};
 	/*! \brief Serial port data trnsmission speeds.
 	 */

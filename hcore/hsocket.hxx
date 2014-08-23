@@ -58,13 +58,13 @@ public:
 	 */
 	typedef HBitFlag<TYPE> socket_type_t;
 	struct TYPE {
-		static socket_type_t const DEFAULT;
-		static socket_type_t const FILE;
-		static socket_type_t const NETWORK;
-		static socket_type_t const BLOCKING;
-		static socket_type_t const NONBLOCKING;
-		static socket_type_t const SSL_SERVER;
-		static socket_type_t const SSL_CLIENT;
+		static M_YAAL_HCORE_PUBLIC_API socket_type_t const DEFAULT;
+		static M_YAAL_HCORE_PUBLIC_API socket_type_t const FILE;
+		static M_YAAL_HCORE_PUBLIC_API socket_type_t const NETWORK;
+		static M_YAAL_HCORE_PUBLIC_API socket_type_t const BLOCKING;
+		static M_YAAL_HCORE_PUBLIC_API socket_type_t const NONBLOCKING;
+		static M_YAAL_HCORE_PUBLIC_API socket_type_t const SSL_SERVER;
+		static M_YAAL_HCORE_PUBLIC_API socket_type_t const SSL_CLIENT;
 	};
 protected:
 	typedef HHashMap<int, ptr_t> clients_t;

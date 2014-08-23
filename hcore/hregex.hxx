@@ -47,29 +47,29 @@ public:
 	struct COMPILE;
 	typedef HBitFlag<COMPILE> compile_t;
 	struct COMPILE {
-		static compile_t const NONE;
-		static compile_t const EXTENDED;
-		static compile_t const IGNORE_CASE;
-		static compile_t const NEWLINE;
-		static compile_t const NO_EXCEPTION;
-		static compile_t const DEFAULT;
+		static M_YAAL_HCORE_PUBLIC_API compile_t const NONE;
+		static M_YAAL_HCORE_PUBLIC_API compile_t const EXTENDED;
+		static M_YAAL_HCORE_PUBLIC_API compile_t const IGNORE_CASE;
+		static M_YAAL_HCORE_PUBLIC_API compile_t const NEWLINE;
+		static M_YAAL_HCORE_PUBLIC_API compile_t const NO_EXCEPTION;
+		static M_YAAL_HCORE_PUBLIC_API compile_t const DEFAULT;
 	};
 	struct MATCH;
 	typedef HBitFlag<MATCH> match_t;
 	struct MATCH {
-		static match_t const NONE;
-		static match_t const NOT_BEGINNING_OF_LINE;
-		static match_t const NOT_END_OF_LINE;
-		static match_t const DEFAULT;
+		static M_YAAL_HCORE_PUBLIC_API match_t const NONE;
+		static M_YAAL_HCORE_PUBLIC_API match_t const NOT_BEGINNING_OF_LINE;
+		static M_YAAL_HCORE_PUBLIC_API match_t const NOT_END_OF_LINE;
+		static M_YAAL_HCORE_PUBLIC_API match_t const DEFAULT;
 	};
 	class HMatch;
 	class HMatchIterator;
 	typedef HMatchIterator iterator;
 	typedef HRegex this_type;
 private:
-	bool		_initialized;          /*!< is regex initialized */
+	bool    _initialized;          /*!< is regex initialized */
 	HString _pattern;              /*!< original regex pattern */
-	HChunk	_compiled;             /*!< compiled regular expression for search patterns */
+	HChunk  _compiled;             /*!< compiled regular expression for search patterns */
 	mutable int _lastError;
 	/* All fields below are conceptually a memory cache. */
 	mutable HChunk _errorBuffer;   /*!< buffer for error message */

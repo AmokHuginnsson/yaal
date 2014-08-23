@@ -341,12 +341,12 @@ public:
 	struct FLAG;
 	typedef yaal::hcore::HBitFlag<FLAG> flag_t;
 	struct FLAG {
-		static flag_t const NONE;
-		static flag_t const CHECKABLE;
-		static flag_t const SORTABLE;
-		static flag_t const EDITABLE;
-		static flag_t const DRAW_HEADER;
-		static flag_t const ALL;
+		static M_YAAL_HCONSOLE_PUBLIC_API flag_t const NONE;
+		static M_YAAL_HCONSOLE_PUBLIC_API flag_t const CHECKABLE;
+		static M_YAAL_HCONSOLE_PUBLIC_API flag_t const SORTABLE;
+		static M_YAAL_HCONSOLE_PUBLIC_API flag_t const EDITABLE;
+		static M_YAAL_HCONSOLE_PUBLIC_API flag_t const DRAW_HEADER;
+		static M_YAAL_HCONSOLE_PUBLIC_API flag_t const ALL;
 	};
 	/*! \brief Description of HListWidget column meta-data.
 	 */

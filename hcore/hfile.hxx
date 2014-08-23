@@ -49,10 +49,10 @@ public:
 	 */
 	typedef HBitFlag<OPEN> open_t;
 	struct OPEN {
-		static open_t const READING;
-		static open_t const WRITING;
-		static open_t const APPEND;
-		static open_t const TRUNCATE;
+		static M_YAAL_HCORE_PUBLIC_API open_t const READING;
+		static M_YAAL_HCORE_PUBLIC_API open_t const WRITING;
+		static M_YAAL_HCORE_PUBLIC_API open_t const APPEND;
+		static M_YAAL_HCORE_PUBLIC_API open_t const TRUNCATE;
 	};
 	/*! \brief Ownership.
 	 */

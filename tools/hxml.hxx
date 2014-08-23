@@ -68,11 +68,11 @@ public:
 	struct PARSER;
 	typedef yaal::hcore::HBitFlag<PARSER> parser_t;
 	struct PARSER {
-		static parser_t const DEFAULT;
-		static parser_t const KEEP_EMPTY;
-		static parser_t const STRIP_COMMENT;
-		static parser_t const RESOLVE_ENTITIES;
-		static parser_t const AUTO_XINCLUDE;
+		static M_YAAL_TOOLS_PUBLIC_API parser_t const DEFAULT;
+		static M_YAAL_TOOLS_PUBLIC_API parser_t const KEEP_EMPTY;
+		static M_YAAL_TOOLS_PUBLIC_API parser_t const STRIP_COMMENT;
+		static M_YAAL_TOOLS_PUBLIC_API parser_t const RESOLVE_ENTITIES;
+		static M_YAAL_TOOLS_PUBLIC_API parser_t const AUTO_XINCLUDE;
 	};
 private:
 	struct OConvert;

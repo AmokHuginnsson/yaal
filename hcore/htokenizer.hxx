@@ -46,13 +46,13 @@ class HTokenizer {
 	typedef HTokenizer this_type;
 public:
 	typedef HBitFlag<HTokenizer> behavior_t;
-	static behavior_t const DEFAULT;
-	static behavior_t const SKIP_EMPTY;
-	static behavior_t const INCLUDE_EMPTY;
-	static behavior_t const HANDLE_EMPTY_MASK;
-	static behavior_t const DELIMITED_BY_ANY_OF;
-	static behavior_t const DELIMITED_BY_WHOLE_STRING;
-	static behavior_t const DELIMITED_BY_MASK;
+	static M_YAAL_HCORE_PUBLIC_API behavior_t const DEFAULT;
+	static M_YAAL_HCORE_PUBLIC_API behavior_t const SKIP_EMPTY;
+	static M_YAAL_HCORE_PUBLIC_API behavior_t const INCLUDE_EMPTY;
+	static M_YAAL_HCORE_PUBLIC_API behavior_t const HANDLE_EMPTY_MASK;
+	static M_YAAL_HCORE_PUBLIC_API behavior_t const DELIMITED_BY_ANY_OF;
+	static M_YAAL_HCORE_PUBLIC_API behavior_t const DELIMITED_BY_WHOLE_STRING;
+	static M_YAAL_HCORE_PUBLIC_API behavior_t const DELIMITED_BY_MASK;
 private:
 	behavior_t _behavior;
 	HString _string;
