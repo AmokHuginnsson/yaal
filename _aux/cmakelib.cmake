@@ -17,7 +17,7 @@ if ( ${CMAKE_HOME_DIRECTORY} MATCHES "/_aux" )
 	get_filename_component( CMAKE_HOME_DIRECTORY ${CMAKE_HOME_DIRECTORY}/../ ABSOLUTE )
 else()
 	if ( CMAKE_HOST_WIN32 )
-		add_definitions( -D__MSVCXX__ /FIyaal/fix.hxx )
+		add_definitions( -D__MSVCXX__ /FIyaal/fix.hxx -D_USE_32BIT_TIME_T )
 	endif()
 endif()
 
