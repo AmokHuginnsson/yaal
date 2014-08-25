@@ -76,6 +76,10 @@ struct ODBConnector {
 	typedef int ( * dbrs_errno_t )( ODBLink const&, void* );
 	typedef char const* ( * dbrs_error_t )( ODBLink const&, void* );
 	typedef void* ( * db_query_t )( ODBLink&, char const* );
+	typedef void* ( * db_prepare_query_t )( ODBLink&, char const* );
+	typedef void ( * query_bind_t )( ODBLink&, void*, int, yaal::hcore::HString const& );
+	typedef void* ( * query_execute_t )( ODBLink&, void* );
+	typedef void ( * query_free_t )( ODBLink&, void* );
 	typedef void ( * rs_unquery_t )( void* );
 	typedef char const* ( * rs_get_t )( void*, int long, int );
 	typedef char const* ( * rs_get_field_t )( void*, int );
@@ -93,6 +97,10 @@ struct ODBConnector {
 	db_query_t db_fetch_query_result;
 	rs_unquery_t rs_free_query_result;
 	db_query_t db_query;
+	db_prepare_query_t db_prepare_query;
+	query_bind_t query_bind;
+	query_execute_t query_execute;
+	query_free_t query_free;
 	rs_unquery_t rs_free_cursor;
 	rs_get_t rs_get;
 	rs_next_t rs_next;

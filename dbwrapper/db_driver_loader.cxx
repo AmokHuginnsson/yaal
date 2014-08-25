@@ -122,6 +122,34 @@ void* null_db_query( ODBLink&, char const* ) {
 	M_EPILOG
 }
 
+void* null_db_prepare_query( ODBLink&, char const* ) {
+	M_PROLOG
+	log( LOG_TYPE::ERROR ) << etag << "db_prepare_query" << eend << endl;
+	return ( NULL );
+	M_EPILOG
+}
+
+void null_query_bind( ODBLink&, void*, int, yaal::hcore::HString const& ) {
+	M_PROLOG
+	log( LOG_TYPE::ERROR ) << etag << "query_bind" << eend << endl;
+	return;
+	M_EPILOG
+}
+
+void* null_query_execute( ODBLink&, void* ) {
+	M_PROLOG
+	log( LOG_TYPE::ERROR ) << etag << "query_execute" << eend << endl;
+	return ( NULL );
+	M_EPILOG
+}
+
+void null_query_free( ODBLink&, void* ) {
+	M_PROLOG
+	log( LOG_TYPE::ERROR ) << etag << "query_free" << eend << endl;
+	return;
+	M_EPILOG
+}
+
 void null_rs_free_cursor( void* ) {
 	M_PROLOG
 	log( LOG_TYPE::ERROR ) << etag << "rs_free_cursor" << eend << endl;
@@ -215,6 +243,10 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 			driver.first->resolve( SYMBOL_PREFIX"db_fetch_query_result", driver.second->db_fetch_query_result );
 			driver.first->resolve( SYMBOL_PREFIX"rs_free_query_result", driver.second->rs_free_query_result );
 			driver.first->resolve( SYMBOL_PREFIX"db_query", driver.second->db_query );
+			driver.first->resolve( SYMBOL_PREFIX"db_prepare_query", driver.second->db_prepare_query );
+			driver.first->resolve( SYMBOL_PREFIX"query_bind", driver.second->query_bind );
+			driver.first->resolve( SYMBOL_PREFIX"query_execute", driver.second->query_execute );
+			driver.first->resolve( SYMBOL_PREFIX"query_free", driver.second->query_free );
 			driver.first->resolve( SYMBOL_PREFIX"rs_free_cursor", driver.second->rs_free_cursor );
 			driver.first->resolve( SYMBOL_PREFIX"rs_get", driver.second->rs_get );
 			driver.first->resolve( SYMBOL_PREFIX"rs_next", driver.second->rs_next );
@@ -289,6 +321,10 @@ ODBConnector::ODBConnector( void )
 	db_fetch_query_result( null_db_fetch_query_result ),
 	rs_free_query_result( null_rs_free_query_result ),
 	db_query( null_db_query ),
+	db_prepare_query( null_db_prepare_query ),
+	query_bind( null_query_bind ),
+	query_execute( null_query_execute ),
+	query_free( null_query_free ),
 	rs_free_cursor( null_rs_free_cursor ),
 	rs_get( null_rs_get ),
 	rs_next( null_rs_next ),

@@ -149,6 +149,26 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( result );
 }
 
+M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* );
+M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* ) {
+	return ( NULL );
+}
+
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& ) {
+	return;
+}
+
+M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
+M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* ) {
+	return ( NULL );
+}
+
+M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
+M_EXPORT_SYMBOL void query_free( ODBLink&, void* ) {
+	return;
+}
+
 M_EXPORT_SYMBOL void rs_free_cursor( void* );
 M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
 	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
