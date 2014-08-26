@@ -28,6 +28,12 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hquery.hxx"
+#include "hdatabase.hxx"
+#include "hrecordset.hxx"
+#include "hcore/hlog.hxx"
+
+using namespace yaal;
+using namespace yaal::hcore;
 
 namespace yaal {
 
@@ -41,6 +47,37 @@ HQuery::HQuery(
 	)
 	: _dataBase( database_ ), _connector( connector_ ), _query( query_ ), _sql( sql_ ) {
 	return;
+}
+
+HQuery::~HQuery( void ) {
+	if ( _query ) {
+		(*_connector->query_free)( _dataBase->_dbLink, _query );
+		_query = NULL;
+	}
+	return;
+}
+
+void HQuery::bind( int parameterNo_, yaal::hcore::HString const& parameterValue_ ) {
+	M_PROLOG
+	(*_connector->query_bind)( _dataBase->_dbLink, _query, parameterNo_, parameterValue_ );
+	return;
+	M_EPILOG
+}
+
+HRecordSet::ptr_t HQuery::execute( void ) {
+	M_PROLOG
+	if ( ! _dataBase->_dbLink._valid ) {
+		M_THROW( "not connected to database", errno );
+	}
+	if ( HLog::_logMask & LOG_TYPE::SQL ) {
+		log << "SQL: " << _sql << endl;
+	}
+	void* result( (_connector->query_execute)( _dataBase->_dbLink, _query ) );
+	if ( (_connector->dbrs_errno)( _dataBase->_dbLink, result ) ) {
+		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dataBase->_dbLink, result ) );
+	}
+	return ( make_pointer<HRecordSet>( _dataBase, _connector, result, HRecordSet::CURSOR::FORWARD ) );
+	M_EPILOG
 }
 
 }

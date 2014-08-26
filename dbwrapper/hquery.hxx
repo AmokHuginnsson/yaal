@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hpointer.hxx"
 #include "dbwrapper/db_driver.hxx"
+#include "dbwrapper/hrecordset.hxx"
 
 namespace yaal {
 
@@ -50,7 +51,9 @@ private:
 	void* _query; /*!< low level query data */
 	yaal::hcore::HString _sql;
 public:
+	virtual ~HQuery( void );
 	void bind( int, yaal::hcore::HString const& );
+	HRecordSet::ptr_t execute( void );
 private:
 	HQuery( database_ptr_t, ODBConnector const*, yaal::hcore::HString const&, void* );
 	HQuery( HQuery const& );

@@ -49,8 +49,9 @@ HDataBase::HDataBase( void ) : HPointerFromThisInterface<HDataBase>(),
 
 HDataBase::~HDataBase( void ) {
 	M_PROLOG
-	if ( _dbLink._conn )
+	if ( _dbLink._conn ) {
 		(_connector->db_disconnect)( _dbLink );
+	}
 	_dbLink.clear();
 	return;
 	M_DESTRUCTOR_EPILOG
@@ -72,11 +73,13 @@ HRecordSet::ptr_t HDataBase::execute_query( HString const& query_, HRecordSet::C
 	M_PROLOG
 	if ( ! _dbLink._valid )
 		M_THROW( "not connected to database", errno );
-	if ( HLog::_logMask & LOG_TYPE::SQL )
+	if ( HLog::_logMask & LOG_TYPE::SQL ) {
 		log << "SQL: " << query_ << endl;
+	}
 	void* result( cursor_ == HRecordSet::CURSOR::RANDOM_ACCESS ? (_connector->db_fetch_query_result)( _dbLink, query_.raw() ) : (_connector->db_query)( _dbLink, query_.raw() ) );
-	if ( (_connector->dbrs_errno)( _dbLink, result ) )
+	if ( (_connector->dbrs_errno)( _dbLink, result ) ) {
 		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dbLink, result ) );
+	}
 	return ( make_pointer<HRecordSet>( get_pointer(), _connector, result, cursor_ ) );
 	M_EPILOG
 }
@@ -88,8 +91,9 @@ HQuery::ptr_t HDataBase::prepare_query( HString const& query_ ) {
 	if ( HLog::_logMask & LOG_TYPE::SQL )
 		log << "SQL: " << query_ << endl;
 	void* result( (_connector->db_prepare_query)( _dbLink, query_.raw() ) );
-	if ( (_connector->dbrs_errno)( _dbLink, result ) )
+	if ( (_connector->dbrs_errno)( _dbLink, result ) ) {
 		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dbLink, result ) );
+	}
 	return ( make_pointer<HQuery>( get_pointer(), _connector, query_, result ) );
 	M_EPILOG
 }
@@ -119,8 +123,9 @@ HDataBase::table_list_t HDataBase::get_tables( void ) const {
 	M_ASSERT( _connector->_tableListQuery );
 	table_list_t tl;
 	HRecordSet::ptr_t rs( const_cast<HDataBase*>( this )->execute_query( _connector->_tableListQuery ) );
-	for ( HRecordSet::iterator it( rs->begin() ), end( rs->end() ); it != end; ++ it )
+	for ( HRecordSet::iterator it( rs->begin() ), end( rs->end() ); it != end; ++ it ) {
 		tl.push_back( *it[0] );
+	}
 	return ( tl );
 	M_EPILOG
 }
@@ -132,8 +137,9 @@ HDataBase::column_list_t HDataBase::get_columns( yaal::hcore::HString const& tab
 	HString q;
 	q.format( _connector->_columnListQuery, tableName_.raw() );
 	HRecordSet::ptr_t rs( const_cast<HDataBase*>( this )->execute_query( q ) );
-	for ( HRecordSet::iterator it( rs->begin() ), end( rs->end() ); it != end; ++ it )
+	for ( HRecordSet::iterator it( rs->begin() ), end( rs->end() ); it != end; ++ it ) {
 		cl.push_back( *it[_connector->_columnNameIndex] );
+	}
 	return ( cl );
 	M_EPILOG
 }

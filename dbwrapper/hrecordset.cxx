@@ -67,10 +67,11 @@ HRecordSet::~HRecordSet ( void ) {
 void HRecordSet::clear( void ) {
 	M_PROLOG
 	if ( _result ) {
-		if ( _cursor == CURSOR::RANDOM_ACCESS )
+		if ( _cursor == CURSOR::RANDOM_ACCESS ) {
 			(_connector->rs_free_query_result)( _result );
-		else
+		} else {
 			(_connector->rs_free_cursor)( _result );
+		}
 	}
 	_result = NULL;
 	M_EPILOG

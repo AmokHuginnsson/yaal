@@ -102,6 +102,7 @@ private:
 	HDataBase& operator = ( HDataBase const& );
 	friend class yaal::hcore::pointer_helper::HSpaceHolderDeleter<HDataBase>;
 	friend class HRecordSet;
+	friend class HQuery;
 	friend ptr_t yaal::hcore::make_pointer<HDataBase>( void );
 };
 
