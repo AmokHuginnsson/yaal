@@ -138,7 +138,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& mode_ ) {
 
 HRecordSet::ptr_t HSQLDescriptor::execute( void ) {
 	M_PROLOG
-	HRecordSet::ptr_t rs = _dataBase->query( _SQL );
+	HRecordSet::ptr_t rs = _dataBase->execute_query( _SQL );
 	_fieldCount = rs->get_field_count();
 	if ( _fields.get_size() != _fieldCount ) {
 		_fields = fields_t( _fieldCount );

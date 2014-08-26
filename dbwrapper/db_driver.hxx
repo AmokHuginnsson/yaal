@@ -122,6 +122,8 @@ private:
 };
 
 typedef yaal::hcore::HPair<yaal::tools::HPlugin::ptr_t, ODBConnector::ptr_t> driver_t;
+class HDataBase;
+typedef yaal::hcore::HPointer<HDataBase> database_ptr_t;
 
 }
 

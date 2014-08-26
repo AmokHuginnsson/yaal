@@ -32,14 +32,11 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/hpointer.hxx"
 #include "tools/hoptional.hxx"
-#include "dbwrapper/db_driver_loader.hxx"
+#include "dbwrapper/db_driver.hxx"
 
 namespace yaal {
 
 namespace dbwrapper {
-
-class HDataBase;
-typedef yaal::hcore::HPointer<HDataBase> database_ptr_t;
 
 /*! \brief Relational database query result representation.
  */

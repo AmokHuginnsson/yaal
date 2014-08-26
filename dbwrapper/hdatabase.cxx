@@ -68,7 +68,7 @@ void HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HSt
 	M_EPILOG
 }
 
-HRecordSet::ptr_t HDataBase::query( HString const& query_, HRecordSet::CURSOR::cursor_t cursor_ ) {
+HRecordSet::ptr_t HDataBase::execute_query( HString const& query_, HRecordSet::CURSOR::cursor_t cursor_ ) {
 	M_PROLOG
 	if ( ! _dbLink._valid )
 		M_THROW( "not connected to database", errno );
@@ -78,6 +78,19 @@ HRecordSet::ptr_t HDataBase::query( HString const& query_, HRecordSet::CURSOR::c
 	if ( (_connector->dbrs_errno)( _dbLink, result ) )
 		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dbLink, result ) );
 	return ( make_pointer<HRecordSet>( get_pointer(), _connector, result, cursor_ ) );
+	M_EPILOG
+}
+
+HQuery::ptr_t HDataBase::prepare_query( HString const& query_ ) {
+	M_PROLOG
+	if ( ! _dbLink._valid )
+		M_THROW( "not connected to database", errno );
+	if ( HLog::_logMask & LOG_TYPE::SQL )
+		log << "SQL: " << query_ << endl;
+	void* result( (_connector->db_prepare_query)( _dbLink, query_.raw() ) );
+	if ( (_connector->dbrs_errno)( _dbLink, result ) )
+		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dbLink, result ) );
+	return ( make_pointer<HQuery>( get_pointer(), _connector, query_, result ) );
 	M_EPILOG
 }
 
@@ -105,7 +118,7 @@ HDataBase::table_list_t HDataBase::get_tables( void ) const {
 	M_PROLOG
 	M_ASSERT( _connector->_tableListQuery );
 	table_list_t tl;
-	HRecordSet::ptr_t rs( const_cast<HDataBase*>( this )->query( _connector->_tableListQuery ) );
+	HRecordSet::ptr_t rs( const_cast<HDataBase*>( this )->execute_query( _connector->_tableListQuery ) );
 	for ( HRecordSet::iterator it( rs->begin() ), end( rs->end() ); it != end; ++ it )
 		tl.push_back( *it[0] );
 	return ( tl );
@@ -118,7 +131,7 @@ HDataBase::column_list_t HDataBase::get_columns( yaal::hcore::HString const& tab
 	column_list_t cl;
 	HString q;
 	q.format( _connector->_columnListQuery, tableName_.raw() );
-	HRecordSet::ptr_t rs( const_cast<HDataBase*>( this )->query( q ) );
+	HRecordSet::ptr_t rs( const_cast<HDataBase*>( this )->execute_query( q ) );
 	for ( HRecordSet::iterator it( rs->begin() ), end( rs->end() ); it != end; ++ it )
 		cl.push_back( *it[_connector->_columnNameIndex] );
 	return ( cl );
