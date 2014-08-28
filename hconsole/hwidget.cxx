@@ -181,7 +181,8 @@ void HWidget::update( void ) {
 
 void HWidget::set( HInfo const & ) {
 	M_PROLOG
-	if ( ( errno * errno ) >= 0 ) /* We need something that evaluates to `true' but compiler does not know it. */
+	bool volatile always( true );
+	if ( always ) /* We need something that evaluates to `true' but compiler does not know it. */
 		M_THROW( "Abstract method called!", errno );
 	return;
 	M_EPILOG
