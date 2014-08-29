@@ -219,7 +219,7 @@ void HConsole::enter_curses( void ) {
 	}
 	M_ENSURE( cbreak() != ERR );
 	M_ENSURE( start_color() != ERR );
-	M_ENSURE( wstandend( static_cast<WINDOW*>( _window ) ) != ERR );
+	M_ENSURE( static_cast<int>( wstandend( static_cast<WINDOW*>( _window ) ) ) != ERR );
 	M_ENSURE( nonl() == OK );
 	M_ENSURE( keypad( static_cast<WINDOW*>( _window ), true ) != ERR );
 	M_ENSURE( intrflush( static_cast<WINDOW*>( _window ), false ) != ERR );
@@ -305,7 +305,7 @@ void HConsole::leave_curses( void ) {
 	leaveok( static_cast<WINDOW*>( _window ), false ); /* Always OK */
 	immedok( static_cast<WINDOW*>( _window ), true ); /* Always OK */
 	nl(); /* Always OK */
-	M_ENSURE( wstandend( static_cast<WINDOW*>( _window ) ) != ERR );
+	M_ENSURE( static_cast<int>( wstandend( static_cast<WINDOW*>( _window ) ) ) != ERR );
 	M_ENSURE( keypad( static_cast<WINDOW*>( _window ), false ) != ERR );
 	M_ENSURE( nocbreak() != ERR );
 	curs_set( CURSOR::VISIBLE );
