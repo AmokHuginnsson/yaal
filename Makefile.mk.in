@@ -204,7 +204,7 @@ clean: clean-dep
 mrproper: clean
 	@printf "%b" "Purging ... "; \
 	/bin/rm -rf include make.log; \
-	$(FIND) . \( -name .git -prune -name 'tags' -or -name '.depend' -or -name '*.a' \) -a ! -name .git \
+	$(FIND) . \( -name .git -prune -name 'tags' -o -name '.depend' -o -name '*.a' \) -a ! -name .git \
 | xargs /bin/rm -f; \
 	printf "%b\n" "done."
 
