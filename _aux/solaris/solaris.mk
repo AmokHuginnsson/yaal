@@ -1,12 +1,5 @@
-# NATIVE_MAKE
-
-VPATH :sh = pwd
 VERIFY_DIR=../../yaalrc.in
-ARCH :sh = isalist | awk '{print $1}'
-OS :sh = uname -r
 PKGFILENAME=yaal-$(VERSION)-solaris$(OS)-$(ARCH).pkg
-
-VERSION :sh = awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $3;DOT="."}END{print VERSION}' ../../Makefile.mk.in
 PREFIX=/usr/local
 SYSCONFDIR=/etc
 LOCALSTATEDIR=/var
