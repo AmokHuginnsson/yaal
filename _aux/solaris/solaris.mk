@@ -20,7 +20,7 @@ $(ARTIFACT): $(VERIFY_DIR)
 
 build: $(ARTIFACT)
 
-$(PKGFILENAME): $(ARTIFACT) pkginfo.in Makefile
+$(PKGFILENAME): $(ARTIFACT) pkginfo.in solaris.mk GNUmakefile makefile
 	@echo "i pkginfo" > Prototype && \
 	pkgproto pkg= | awk '{print $$1" "$$2" "$$3" "$$4" root root"}' | sed -e 's/ 0700 / 0755 /' >> Prototype && \
 	sed -e 's/@VERSION@/$(VERSION)/' -e 's/@ARCH@/$(ARCH)/' pkginfo.in > pkginfo && \

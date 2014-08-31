@@ -14,6 +14,7 @@
 .vimrc
 rpm
 tmp
+pkg
 work
 yaal-bundle
 yaal/debian
