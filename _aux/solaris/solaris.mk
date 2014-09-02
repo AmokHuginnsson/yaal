@@ -6,6 +6,9 @@ LOCALSTATEDIR=/var
 DESTDIR=$(VPATH)/pkg
 MAKE_ENV=PREFIX=$(PREFIX) SYSCONFDIR=$(SYSCONFDIR) LOCALSTATEDIR=$(LOCALSTATEDIR) DESTDIR=$(DESTDIR)
 ARTIFACT=$(DESTDIR)/$(PREFIX)/lib/libhdata.so
+BUNDLE_DIR=yaal-bundle/solaris-$(OS)/$(ARCH)/$(PORTVERSION)
+BUNDLE=yaal-$(VERSION)-$(SYSTEM)-$(OS)-$(ARCH).tar
+BUNDLE_WRAP=yaal-bundle.tar
 
 all: $(VERIFY_DIR)
 	@echo "Explicit target required!" && echo && echo "supported targets: clean build package"
@@ -31,6 +34,19 @@ $(PKGFILENAME): $(ARTIFACT) pkginfo.in solaris.mk GNUmakefile makefile
 package: $(PKGFILENAME)
 
 clean: $(VERIFY_DIR)
-	@/bin/rm -rf pkg $(PKGFILENAME) pkginfo Prototype && \
+	@/bin/rm -rf pkg tmp $(PKGFILENAME) pkginfo Prototype && \
 	cd ../../ && $(MAKE) purge
+
+tmp/$(BUNDLE): $(PKGFILENAME)
+	@mkdir -p tmp && cd tmp && \
+	/bin/rm -rf yaal-bundle && \
+	mkdir -p $(BUNDLE_DIR) && \
+	cp ../$(PKGFILENAME) $(BUNDLE_DIR) && \
+	tar cf $(BUNDLE) yaal-bundle
+
+tmp/$(BUNDLE_WRAP): tmp/$(BUNDLE)
+	@cd tmp && \
+	tar cf $(BUNDLE_WRAP) $(BUNDLE)
+
+bundle: tmp/$(BUNDLE_WRAP)
 
