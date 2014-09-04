@@ -80,6 +80,8 @@ private:
 
 void* yaal_sqlite3_db_fetch_query_result( ODBLink&, char const* );
 void yaal_sqlite3_rs_free_query_result( void* );
+void* yaal_db_query( ODBLink&, char const* );
+void yaal_rs_free_cursor( void* );
 void yaal_sqlite3_db_disconnect( ODBLink& );
 
 /* sqlite driver uses convention that database file name should have
@@ -198,8 +200,7 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 	yaal_sqlite3_rs_free_query_result( data_ );
 }
 
-M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
-M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+void* yaal_db_query( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	OSQLite* sQLite( static_cast<OSQLite*>( dbLink_._conn ) );
 	OSQLiteResult* result( new ( memory::yaal ) OSQLiteResult );
@@ -216,19 +217,26 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( result );
 }
 
+M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
+M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
+	return ( yaal_db_query( dbLink_, query_ ) );
+}
+
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* );
-M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* ) {
-	return ( NULL );
+M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
+	return ( yaal_db_query( dbLink_, query_ ) );
 }
 
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& ) {
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HString const& value_ ) {
+	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
+	sqlite3_bind_text( static_cast<sqlite3_stmt*>( result->_data ), argNo_, value_.c_str(), static_cast<int>( value_.get_length() ), SQLITE_STATIC );
 	return;
 }
 
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
-M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* ) {
-	return ( NULL );
+M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* data_ ) {
+	return ( data_ );
 }
 
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
@@ -236,11 +244,15 @@ M_EXPORT_SYMBOL void query_free( ODBLink&, void* ) {
 	return;
 }
 
-M_EXPORT_SYMBOL void rs_free_cursor( void* );
-M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
+void yaal_rs_free_cursor( void* data_ ) {
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
 	sqlite3_finalize( static_cast<sqlite3_stmt*>( result->_data ) );
 	M_SAFE( delete result );
+	return;
+}
+M_EXPORT_SYMBOL void rs_free_cursor( void* );
+M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
+	yaal_rs_free_cursor( data_ );
 	return;
 }
 

@@ -45,7 +45,9 @@ HQuery::HQuery(
 		yaal::hcore::HString const& sql_,
 		void* query_
 	)
-	: _dataBase( database_ ), _connector( connector_ ), _query( query_ ), _sql( sql_ ) {
+	: _dataBase( database_ ), _connector( connector_ ),
+	_query( query_ ), _sql( sql_ ),
+	_bindBuffer() {
 	return;
 }
 
@@ -59,7 +61,11 @@ HQuery::~HQuery( void ) {
 
 void HQuery::bind( int parameterNo_, yaal::hcore::HString const& parameterValue_ ) {
 	M_PROLOG
-	(*_connector->query_bind)( _dataBase->_dbLink, _query, parameterNo_, parameterValue_ );
+	if ( parameterValue_ >= _bindBuffer.get_size() ) {
+		_bindBuffer.resize( parameterNo_ + 1 );
+	}
+	_bindBuffer[parameterNo_] = parameterValue_;
+	(*_connector->query_bind)( _dataBase->_dbLink, _query, parameterNo_, _bindBuffer[parameterNo_] );
 	return;
 	M_EPILOG
 }

@@ -45,11 +45,13 @@ class HQuery {
 public:
 	typedef HQuery this_type;
 	typedef yaal::hcore::HPointer<HQuery> ptr_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> bind_buffer_t;
 private:
 	mutable database_ptr_t _dataBase; /*!< data-base that this record-set belongs to */
 	mutable ODBConnector const* _connector; /*!< low level database engine connector */
 	void* _query; /*!< low level query data */
 	yaal::hcore::HString _sql;
+	bind_buffer_t _bindBuffer;
 public:
 	virtual ~HQuery( void );
 	void bind( int, yaal::hcore::HString const& );
