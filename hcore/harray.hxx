@@ -371,6 +371,22 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Get underlying buffer.
+	 *
+	 * \return Pointer C-style array containing this HArray data.
+	 */
+	type_t const* data( void ) const {
+		M_PROLOG
+		M_ASSERT( _buf != NULL );
+		return ( _buf );
+		M_EPILOG
+	}
+	type_t* data( void ) {
+		M_PROLOG
+		M_ASSERT( _buf != NULL );
+		return ( _buf );
+		M_EPILOG
+	}
 	/*! \brief Get reference to first element in this array.
 	 *
 	 * \return Reference to first element in this array.
