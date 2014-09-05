@@ -39,6 +39,7 @@ Copyright:
 #endif /* not HAVE_LIBPQ_FE_H */
 
 #include "hcore/memory.hxx"
+#include "hcore/harray.hxx"
 #include "dbwrapper/db_driver.hxx"
 
 using namespace yaal;
@@ -62,13 +63,18 @@ M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT a.attnum, a
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 1;
 
 struct OPostgreSQLResult {
+	typedef HArray<char const*> params_t;
 	ODBLink& _link;
 	PGresult* _result;
+	HString _id;
+	HString _query;
 	int _index;
 	int _total;
 	bool _randomAccess;
+	params_t _params;
 	OPostgreSQLResult( ODBLink& link_ )
-		: _link( link_ ), _result( NULL ), _index( 0 ), _total( 0 ), _randomAccess( false ) {}
+		: _link( link_ ), _result( NULL ), _id( static_cast<void*>( this ) ),
+		_query(), _index( 0 ), _total( 0 ), _randomAccess( false ), _params() {}
 private:
 	OPostgreSQLResult( OPostgreSQLResult const& );
 	OPostgreSQLResult& operator = ( OPostgreSQLResult const& );
@@ -101,8 +107,9 @@ M_EXPORT_SYMBOL int dbrs_errno( ODBLink const&, void* );
 M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 	M_ASSERT( dbLink_._conn );
 	int err( 0 );
-	if ( result_ ) {
-		ExecStatusType status = PQresultStatus( static_cast<OPostgreSQLResult*>( result_ )->_result );
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( result_ ) );
+	if ( pr && pr->_result ) {
+		ExecStatusType status = PQresultStatus( pr->_result );
 		err = ( ( status == PGRES_COMMAND_OK ) || ( status == PGRES_TUPLES_OK ) ) ? 0 : status;
 	} else {
 		ConnStatusType connStatus( PQstatus( static_cast<PGconn*>( dbLink_._conn ) ) );
@@ -139,33 +146,59 @@ M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	OPostgreSQLResult* result( new ( memory::yaal ) OPostgreSQLResult( dbLink_ ) );
-	PGconn* conn( static_cast<PGconn*>( dbLink_._conn ) );
-	PGresult* r( ::PQprepare( conn, "", query_, 0, NULL ) );
-	result->_result = ::PQdescribePrepared( conn, "" );
 	result->_randomAccess = false;
-	::PQsendQueryPrepared( conn, "", 0, NULL, NULL, NULL, 0 );
+	PGconn* conn( static_cast<PGconn*>( dbLink_._conn ) );
+	PGresult* r( ::PQprepare( conn, result->_id.c_str(), query_, 0, NULL ) );
+	result->_result = ::PQdescribePrepared( conn, result->_id.c_str() );
+	::PQsendQueryPrepared( conn, result->_id.c_str(), 0, NULL, NULL, NULL, 0 );
 	::PQclear( r );
 /*	::PQsetSingleRowMode( conn ); */
 	return ( result );
 }
 
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* );
-M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* ) {
-	return ( NULL );
+M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
+	OPostgreSQLResult* result( new ( memory::yaal ) OPostgreSQLResult( dbLink_ ) );
+	result->_randomAccess = false;
+	result->_query = query_;
+	return ( result );
 }
 
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& ) {
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HString const& param_ ) {
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
+	if ( argNo_ >= static_cast<int>( pr->_params.get_size() ) ) {
+		pr->_params.resize( argNo_ );
+	}
+	pr->_params[argNo_ - 1] = param_.c_str();
 	return;
 }
 
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
-M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* ) {
-	return ( NULL );
+M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
+	PGconn* conn( static_cast<PGconn*>( dbLink_._conn ) );
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
+	PGresult* r( ::PQprepare( conn, pr->_id.c_str(), pr->_query.c_str(), static_cast<int>( pr->_params.get_size() ), NULL ) );
+	ExecStatusType status = PQresultStatus( r );
+	int err = ( ( status == PGRES_COMMAND_OK ) || ( status == PGRES_TUPLES_OK ) ) ? 0 : status;
+	if ( ! err ) {
+		pr->_result = ::PQdescribePrepared( conn, pr->_id.c_str() );
+		::PQsendQueryPrepared( conn, pr->_id.c_str(), static_cast<int>( pr->_params.get_size() ), pr->_params.data(), NULL, NULL, 0 );
+		::PQclear( r );
+	} else {
+		pr->_result = r;
+	}
+	return ( pr );
 }
 
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
-M_EXPORT_SYMBOL void query_free( ODBLink&, void* ) {
+M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
+	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
+	M_ASSERT( ! pr->_randomAccess );
+	::PQclear( pr->_result );
+	M_SAFE( delete pr );
 	return;
 }
 

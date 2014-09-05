@@ -93,6 +93,7 @@ M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
 M_EXPORT_SYMBOL bool db_connect( ODBLink& dbLink_, HString const& dataBase_,
 		HString const&, HString const&, HString const& ) {
 	do {
+		HScopedValueReplacement<int> saveErrno( errno, 0 );
 		struct stat stat;
 		OSQLite* sQLite( NULL );
 		dbLink_._conn = sQLite = new ( memory::yaal ) OSQLite;
@@ -202,6 +203,7 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 
 void* yaal_db_query( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	OSQLite* sQLite( static_cast<OSQLite*>( dbLink_._conn ) );
 	OSQLiteResult* result( new ( memory::yaal ) OSQLiteResult );
 	result->_columns = 0;
@@ -240,7 +242,8 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* data_ ) {
 }
 
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
-M_EXPORT_SYMBOL void query_free( ODBLink&, void* ) {
+M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
+	yaal_rs_free_cursor( data_ );
 	return;
 }
 
@@ -266,6 +269,7 @@ M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 
 M_EXPORT_SYMBOL bool rs_next( void* );
 M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
 	return ( sqlite3_step( static_cast<sqlite3_stmt*>( result->_data ) ) == SQLITE_ROW );
 }
