@@ -60,20 +60,32 @@ M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SHOW COLUMNS FROM 
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 0;
 
 struct OMySQLResult {
+	struct OField {
+		int long unsigned _length;
+		my_bool _isNull;
+	};
 	typedef HArray<MYSQL_BIND> binds_t;
+	typedef HArray<OField> field_meta_t;
 	ODBLink& _link;
 	MYSQL_STMT* _statement;
-	binds_t _binds;
+	binds_t _params;
+	binds_t _results;
+	field_meta_t _fields;
+	HChunk _buffer;
 	MYSQL_RES* _result;
 	MYSQL_ROW _row;
 	bool _randomAccess;
 	OMySQLResult( ODBLink& link_ )
-		: _link( link_ ), _statement( NULL ), _binds(), _result( NULL ),
+		: _link( link_ ), _statement( NULL ), _params(), _results(), _fields(), _buffer(), _result( NULL ),
 		_row(), _randomAccess( false ) {}
 private:
 	OMySQLResult( OMySQLResult const& );
 	OMySQLResult& operator = ( OMySQLResult const& );
 };
+
+void* mysql_db_prepare_query( ODBLink&, char const* );
+void* mysql_query_execute( ODBLink&, void* );
+void mysql_query_free( ODBLink&, void* );
 
 M_EXPORT_SYMBOL void driver_init( void );
 M_EXPORT_SYMBOL void driver_init( void ) {
@@ -152,55 +164,94 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
-	OMySQLResult* result( new ( memory::yaal ) OMySQLResult( dbLink_ ) );
-	::mysql_query( static_cast<MYSQL*>( dbLink_._conn ), query_ );
-	result->_randomAccess = false;
-	result->_result = ::mysql_use_result( static_cast<MYSQL*>( dbLink_._conn ) );
+	void* result( mysql_db_prepare_query( dbLink_, query_ ) );
+	mysql_query_execute( dbLink_, result );
 	return ( result );
+}
+
+void* mysql_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
+	OMySQLResult* query( new ( memory::yaal ) OMySQLResult( dbLink_ ) );
+	query->_statement = mysql_stmt_init( static_cast<MYSQL*>( dbLink_._conn ) );
+	query->_randomAccess = false;
+	if ( ! mysql_stmt_prepare( query->_statement, query_, static_cast<int unsigned>( ::strlen( query_ ) ) ) ) {
+		query->_result = mysql_stmt_result_metadata( query->_statement );
+		int numFields( mysql_num_fields( query->_result ) );
+		if ( numFields > 0 ) {
+			query->_results.resize( numFields );
+			query->_fields.resize( numFields );
+			int dataLength( 0 );
+			for ( int i( 0 ); i < numFields; ++ i ) {
+				::memset( &query->_results[i], 0, sizeof ( OMySQLResult::binds_t::value_type ) );
+				MYSQL_FIELD* field( mysql_fetch_field_direct( query->_result, i ) );
+				query->_results[i].buffer_type = MYSQL_TYPE_STRING;
+				query->_results[i].buffer_length = field->length + 1;
+				query->_results[i].length = &query->_fields[i]._length;
+				query->_results[i].is_null = &query->_fields[i]._isNull;
+				dataLength += static_cast<int>( field->length + 1 );
+			}
+			query->_buffer.realloc( dataLength, HChunk::STRATEGY::EXACT );
+			int offset( 0 );
+			for ( int i( 0 ); i < numFields; ++ i ) {
+				query->_results[i].buffer = query->_buffer.get<char>() + offset;
+				offset += static_cast<int>( query->_results[i].buffer_length );
+			}
+		}
+	}
+	return ( query );
 }
 
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
-	OMySQLResult* query( new ( memory::yaal ) OMySQLResult( dbLink_ ) );
-	query->_statement = mysql_stmt_init( static_cast<MYSQL*>( dbLink_._conn ) );
-	mysql_stmt_prepare( query->_statement, query_, static_cast<int unsigned>( ::strlen( query_ ) ) );
-	return ( query );
+	return ( mysql_db_prepare_query( dbLink_, query_ ) );
 }
 
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HString const& value_ ) {
 	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
-	if ( argNo_ >= static_cast<int>( pq->_binds.get_size() ) ) {
-		pq->_binds.resize( argNo_ );
+	if ( argNo_ >= static_cast<int>( pq->_params.get_size() ) ) {
+		pq->_params.resize( argNo_ );
 	}
-	::memset( &pq->_binds[argNo_ - 1], 0, sizeof ( OMySQLResult::binds_t::value_type ) );
-	pq->_binds[argNo_ - 1].buffer_type = MYSQL_TYPE_STRING;
-	pq->_binds[argNo_ - 1].buffer = const_cast<char*>( value_.c_str() );
-	pq->_binds[argNo_ - 1].buffer_length = static_cast<int unsigned>( value_.get_size() );
+	::memset( &pq->_params[argNo_ - 1], 0, sizeof ( OMySQLResult::binds_t::value_type ) );
+	pq->_params[argNo_ - 1].buffer_type = MYSQL_TYPE_STRING;
+	pq->_params[argNo_ - 1].buffer = const_cast<char*>( value_.c_str() );
+	pq->_params[argNo_ - 1].buffer_length = static_cast<int unsigned>( value_.get_size() );
 	return;
 }
 
-M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
-M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* data_ ) {
+void* mysql_query_execute( ODBLink&, void* data_ ) {
 	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
-	mysql_stmt_bind_param( pq->_statement, pq->_binds.data() );
+	if ( ! pq->_params.is_empty() ) {
+		mysql_stmt_bind_param( pq->_statement, pq->_params.data() );
+	}
+	mysql_stmt_bind_result( pq->_statement, pq->_results.data() );
 	mysql_stmt_execute( pq->_statement );
-	return ( NULL );
+	return ( pq );
+}
+M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
+M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
+	return ( mysql_query_execute( dbLink_, data_ ) );
 }
 
-M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
-M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
+void mysql_query_free( ODBLink&, void* data_ ) {
 	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
-	::mysql_stmt_close( pq->_statement );
+	if ( pq->_result ) {
+		::mysql_free_result( pq->_result );
+	}
+	if ( pq->_statement ) {
+		::mysql_stmt_close( pq->_statement );
+	}
 	M_SAFE( delete pq );
+	return;
+}
+M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
+M_EXPORT_SYMBOL void query_free( ODBLink& dbLink_, void* data_ ) {
+	mysql_query_free( dbLink_, data_ );
 	return;
 }
 
 M_EXPORT_SYMBOL void rs_free_cursor( void* );
 M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
-	OMySQLResult* pr( static_cast<OMySQLResult*>( data_ ) );
-	::mysql_free_result( pr->_result );
-	M_SAFE( delete pr );
+	mysql_query_free( *static_cast<ODBLink*>( NULL ), data_ );
 	return;
 }
 
@@ -215,14 +266,13 @@ M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 M_EXPORT_SYMBOL bool rs_next( void* );
 M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 	OMySQLResult* pr( static_cast<OMySQLResult*>( data_ ) );
-	pr->_row = mysql_fetch_row( pr->_result );
-	return ( pr->_row != NULL );
+	return ( mysql_stmt_fetch( pr->_statement ) == 0 );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );
 M_EXPORT_SYMBOL char const* rs_get_field( void* data_, int field_ ) {
 	OMySQLResult* pr( static_cast<OMySQLResult*>( data_ ) );
-	return ( pr->_row[field_] );
+	return ( pr->_fields[field_]._isNull ? NULL : static_cast<char const*>( pr->_results[field_].buffer ) );
 }
 
 M_EXPORT_SYMBOL int rs_fields_count( void* );
