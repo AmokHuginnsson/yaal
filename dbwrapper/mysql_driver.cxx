@@ -175,14 +175,14 @@ void* mysql_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	query->_randomAccess = false;
 	if ( ! mysql_stmt_prepare( query->_statement, query_, static_cast<int unsigned>( ::strlen( query_ ) ) ) ) {
 		query->_result = mysql_stmt_result_metadata( query->_statement );
-		int numFields( mysql_num_fields( query->_result ) );
+		int numFields( static_cast<int>( mysql_num_fields( query->_result ) ) );
 		if ( numFields > 0 ) {
 			query->_results.resize( numFields );
 			query->_fields.resize( numFields );
 			int dataLength( 0 );
 			for ( int i( 0 ); i < numFields; ++ i ) {
 				::memset( &query->_results[i], 0, sizeof ( OMySQLResult::binds_t::value_type ) );
-				MYSQL_FIELD* field( mysql_fetch_field_direct( query->_result, i ) );
+				MYSQL_FIELD* field( mysql_fetch_field_direct( query->_result, static_cast<int unsigned>( i ) ) );
 				query->_results[i].buffer_type = MYSQL_TYPE_STRING;
 				query->_results[i].buffer_length = field->length + 1;
 				query->_results[i].length = &query->_fields[i]._length;
