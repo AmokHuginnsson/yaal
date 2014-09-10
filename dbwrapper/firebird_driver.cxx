@@ -64,18 +64,33 @@ char const OFirebird::_tpb[] = {
 struct OFirebirdResult {
 	typedef HPointer<HChunk> chunk_t;
 	typedef HArray<chunk_t> values_t;
+	struct OParam {
+		char const* _data;
+		int _size;
+		OParam( void )
+			: _data( NULL ), _size( 0 ) {
+		}
+		OParam( OParam const& p_ )
+			: _data( p_._data ), _size( p_._size ) {
+		}
+	};
+	typedef HArray<OParam> params_t;
 	ODBLink& _dbLink;
 	isc_stmt_handle _stmt;
 	isc_tr_handle _tr;
-	HChunk _metaData;
+	HChunk _descIn;
+	HChunk _descOut;
 	HChunk _cache;
+	params_t _params;
 	values_t _values;
 	ISC_STATUS _status[ OFirebird::MAX_ERROR_COUNT ];
 	HChunk _errorMessageBufer;
+	bool _ok;
 	OFirebirdResult( ODBLink& dbLink_ )
 		: _dbLink( dbLink_ ), _stmt( 0 ), _tr( 0 ),
-		_metaData(), _cache(), _values(),
-		_status(), _errorMessageBufer()
+		_descIn(), _descOut(), _cache(),
+		_params(), _values(), _status(),
+		_errorMessageBufer(), _ok( false )
 		{}
 private:
 	OFirebirdResult( OFirebirdResult const& );
@@ -171,33 +186,54 @@ namespace {
 
 typedef HResource<OFirebirdResult> firebird_result_resource_guard_t;
 
-void* yaal_firebird_db_query( ODBLink& dbLink_, char const* query_ ) {
+void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
 	M_ASSERT( db );
 	firebird_result_resource_guard_t res( new OFirebirdResult( dbLink_ ) );
-	bool ok( false );
+	res->_ok = false;
 	do {
 		isc_start_transaction( db->_status, &res->_tr, 1, &db->_db, sizeof ( OFirebird::_tpb ), OFirebird::_tpb );
 		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
 			break;
-		XSQLDA desc;
-		desc.version = SQLDA_VERSION1;
-		desc.sqln = 1;
-		desc.sqld = 1;
+		XSQLDA descIn;
+		XSQLDA descOut;
+		memset( &descIn, 0, sizeof ( descIn ) );
+		memset( &descOut, 0, sizeof ( descOut ) );
+		descIn.version = SQLDA_VERSION1;
+		descOut.version = SQLDA_VERSION1;
 		isc_dsql_allocate_statement( db->_status, &db->_db, &res->_stmt );
 		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
-		isc_dsql_prepare( db->_status, &res->_tr, &res->_stmt, 0, query_, 3, &desc ); /* Dialect version 3. */
+		isc_dsql_prepare( db->_status, &res->_tr, &res->_stmt, 0, query_, 3, &descOut ); /* Dialect version 3. */
 		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
 			break;
-		isc_dsql_describe( db->_status, &res->_stmt, 1, &desc );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+		isc_dsql_describe_bind( db->_status, &res->_stmt, 1, &descIn );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
 			break;
-		XSQLDA* out( NULL );
-		if ( desc.sqld > 0 ) {
-			res->_metaData.realloc( XSQLDA_LENGTH( desc.sqld ) );
-			out = res->_metaData.get<XSQLDA>();
+		}
+		if ( descIn.sqld > 0 ) {
+			res->_descIn.realloc( XSQLDA_LENGTH( descIn.sqld ), HChunk::STRATEGY::EXACT );
+			XSQLDA* in( res->_descIn.get<XSQLDA>() );
+			in->version = SQLDA_VERSION1;
+			in->sqln = in->sqld = descIn.sqld;
+			isc_dsql_describe_bind( db->_status, &res->_stmt, 1, in );
+			if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+				break;
+			}
+			int i( 0 );
+			XSQLVAR* var( NULL );
+			for ( i = 0, var = in->sqlvar; i < in->sqld; ++ i, ++ var ) {
+				var->sqltype = SQL_TEXT;
+			}
+		}
+		isc_dsql_describe( db->_status, &res->_stmt, 1, &descOut );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+			break;
+		}
+		if ( descOut.sqld > 0 ) {
+			res->_descOut.realloc( XSQLDA_LENGTH( descOut.sqld ), HChunk::STRATEGY::EXACT );
+			XSQLDA* out( res->_descOut.get<XSQLDA>() );
 			out->version = SQLDA_VERSION1;
-			out->sqld = out->sqln = desc.sqld;
+			out->sqld = out->sqln = descOut.sqld;
 			isc_dsql_describe( db->_status, &res->_stmt, 1, out );
 			if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
 				break;
@@ -219,22 +255,35 @@ void* yaal_firebird_db_query( ODBLink& dbLink_, char const* query_ ) {
 				var->sqltype = SQL_VARYING + 1; /* get everything as null terminated text */
 			}
 		}
-		isc_dsql_execute( db->_status, &res->_tr, &res->_stmt, 1, NULL );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
-			break;
-		ok = true;
+		res->_ok = true;
 	} while ( false );
-	if ( ! ok ) {
+	if ( ! res->_ok ) {
 		isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
 		isc_rollback_transaction( res->_status, &res->_tr );
 	}
-	return ( ok ? res.release() : NULL );
+	return ( res->_ok ? res.release() : NULL );
+}
+
+void* firebird_query_execute( ODBLink& dbLink_, void* data_ ) {
+	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
+	M_ASSERT( db );
+	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
+	if ( res ) {
+		isc_dsql_execute( db->_status, &res->_tr, &res->_stmt, 1, NULL );
+		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+			isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
+			isc_rollback_transaction( res->_status, &res->_tr );
+			M_SAFE( delete res );
+			res = NULL;
+		}
+	}
+	return ( res );
 }
 
 int yaal_firebird_rs_fields_count( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	M_ASSERT( res );
-	XSQLDA* out( res->_metaData.get<XSQLDA>() );
+	XSQLDA* out( res->_descOut.get<XSQLDA>() );
 	return ( out ? out->sqld : 0 );
 }
 
@@ -244,12 +293,12 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query_ ) {
 	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
 	M_ASSERT( db );
-	firebird_result_resource_guard_t rs( static_cast<OFirebirdResult*>( yaal_firebird_db_query( dbLink_, query_ ) ) );
+	firebird_result_resource_guard_t rs( static_cast<OFirebirdResult*>( firebird_query_execute( dbLink_, firebird_db_prepare_query( dbLink_, query_ ) ) ) );
 	OFirebirdResult* res( rs.get() );
 	bool ok( false );
 	do {
 		if ( res && ( yaal_firebird_rs_fields_count( res ) > 0 ) ) {
-			XSQLDA* out( res->_metaData.get<XSQLDA>() );
+			XSQLDA* out( res->_descOut.get<XSQLDA>() );
 			int retcode( 0 );
 			while ( ( retcode = static_cast<int>( isc_dsql_fetch( db->_status, &res->_stmt, 1, out ) ) ) == 0 ) {
 				int valuesBufferSize( 0 );
@@ -285,7 +334,7 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 	if ( ! ok ) {
 		isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
 		isc_rollback_transaction( res->_status, &res->_tr );
-	} else {
+	} else if ( res ) {
 		isc_commit_transaction( res->_status, &res->_tr );
 		M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 	}
@@ -304,31 +353,40 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 
 M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
-	return ( yaal_firebird_db_query( dbLink_, query_ ) );
+	return ( firebird_query_execute( dbLink_, firebird_db_prepare_query( dbLink_, query_ ) ) );
 }
 
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* );
-M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* ) {
-	return ( NULL );
+M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
+	return ( firebird_db_prepare_query( dbLink_, query_ ) );
 }
 
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
-M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& ) {
+M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int paramNo_, yaal::hcore::HString const& value_ ) {
+	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
+	M_ASSERT( res );
+	XSQLDA* in( res->_descIn.get<XSQLDA>() );
+	if ( paramNo_ < in->sqld ) {
+		XSQLVAR* var( in->sqlvar + paramNo_ );
+		var->sqldata = const_cast<char*>( value_.c_str() );
+	}
 	return;
 }
 
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
-M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* ) {
-	return ( NULL );
+M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
+	return ( firebird_query_execute( dbLink_, data_ ) );
 }
 
+void firebird_rs_free_cursor( void* );
+
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
-M_EXPORT_SYMBOL void query_free( ODBLink&, void* ) {
+M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
+	firebird_rs_free_cursor( data_ );
 	return;
 }
 
-M_EXPORT_SYMBOL void rs_free_cursor( void* );
-M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
+void firebird_rs_free_cursor( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	M_ASSERT( res );
 	isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
@@ -338,13 +396,18 @@ M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
 	M_SAFE( delete res );
 	return;
 }
+M_EXPORT_SYMBOL void rs_free_cursor( void* );
+M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
+	firebird_rs_free_cursor( data_ );
+	return;
+}
 
 M_EXPORT_SYMBOL char const* rs_get( void*, int long, int );
 M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	M_ASSERT( res );
 	OFirebirdResult::chunk_t c( res->_values[row_] );
-	XSQLDA* out( res->_metaData.get<XSQLDA>() );
+	XSQLDA* out( res->_descOut.get<XSQLDA>() );
 	int* offsets( c->get<int>() );
 	char* buf( reinterpret_cast<char*>( offsets + out->sqld ) );
 	return ( offsets[column_] >= 0 ? buf + offsets[column_] : NULL );
@@ -354,13 +417,13 @@ M_EXPORT_SYMBOL bool rs_next( void* );
 M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
-	return ( isc_dsql_fetch( db->_status, &res->_stmt, 1, res->_metaData.get<XSQLDA>() ) == 0 );
+	return ( isc_dsql_fetch( db->_status, &res->_stmt, 1, res->_descOut.get<XSQLDA>() ) == 0 );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );
 M_EXPORT_SYMBOL char const* rs_get_field( void* data_, int field_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
-	XSQLDA* out( res->_metaData.get<XSQLDA>() );
+	XSQLDA* out( res->_descOut.get<XSQLDA>() );
 	XSQLVAR* var( out->sqlvar + field_ );
 	return ( *var->sqlind != -1 ? var->sqldata + sizeof ( short ) : NULL );
 }
@@ -474,7 +537,7 @@ M_EXPORT_SYMBOL char const* rs_column_name( void*, int );
 M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( dataR_ ) );
 	M_ASSERT( res );
-	XSQLDA* out( res->_metaData.get<XSQLDA>() );
+	XSQLDA* out( res->_descOut.get<XSQLDA>() );
 	return ( out->sqlvar[field_].aliasname );
 }
 
