@@ -269,12 +269,15 @@ void* firebird_query_execute( ODBLink& dbLink_, void* data_ ) {
 	M_ASSERT( db );
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	if ( res ) {
-		isc_dsql_execute( db->_status, &res->_tr, &res->_stmt, 1, NULL );
+		XSQLDA* in( res->_descIn.get<XSQLDA>() );
+		XSQLDA* out( res->_descOut.get<XSQLDA>() );
+		if ( in ) {
+			isc_dsql_execute2( db->_status, &res->_tr, &res->_stmt, 1, in, out );
+		} else {
+			isc_dsql_execute( db->_status, &res->_tr, &res->_stmt, 1, out );
+		}
 		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
-			isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
-			isc_rollback_transaction( res->_status, &res->_tr );
-			M_SAFE( delete res );
-			res = NULL;
+			res->_ok = false;
 		}
 	}
 	return ( res );
@@ -295,9 +298,9 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 	M_ASSERT( db );
 	firebird_result_resource_guard_t rs( static_cast<OFirebirdResult*>( firebird_query_execute( dbLink_, firebird_db_prepare_query( dbLink_, query_ ) ) ) );
 	OFirebirdResult* res( rs.get() );
-	bool ok( false );
 	do {
 		if ( res && ( yaal_firebird_rs_fields_count( res ) > 0 ) ) {
+			res->_ok = false;
 			XSQLDA* out( res->_descOut.get<XSQLDA>() );
 			int retcode( 0 );
 			while ( ( retcode = static_cast<int>( isc_dsql_fetch( db->_status, &res->_stmt, 1, out ) ) ) == 0 ) {
@@ -328,17 +331,19 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 			}
 			if ( retcode != 100 )
 				break;
+			res->_ok = true;
 		}
-		ok = true;
 	} while ( false );
-	if ( ! ok ) {
-		isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
-		isc_rollback_transaction( res->_status, &res->_tr );
-	} else if ( res ) {
-		isc_commit_transaction( res->_status, &res->_tr );
-		M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+	if ( res ) {
+		if ( res->_ok ) {
+			isc_commit_transaction( res->_status, &res->_tr );
+			M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+		} else {
+			isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
+			isc_rollback_transaction( res->_status, &res->_tr );
+		}
 	}
-	return ( ok ? rs.release() : NULL );
+	return ( res && res->_ok ? rs.release() : NULL );
 }
 
 M_EXPORT_SYMBOL void rs_free_query_result( void* );
@@ -369,6 +374,7 @@ M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int paramNo_, yaal::hcor
 	if ( paramNo_ < in->sqld ) {
 		XSQLVAR* var( in->sqlvar + paramNo_ );
 		var->sqldata = const_cast<char*>( value_.c_str() );
+		var->sqllen = static_cast<ISC_SHORT>( value_.get_size() );
 	}
 	return;
 }
@@ -391,7 +397,11 @@ void firebird_rs_free_cursor( void* data_ ) {
 	M_ASSERT( res );
 	isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
 	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
-	isc_commit_transaction( res->_status, &res->_tr );
+	if ( res->_ok ) {
+		isc_commit_transaction( res->_status, &res->_tr );
+	} else {
+		isc_rollback_transaction( res->_status, &res->_tr );
+	}
 	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 	M_SAFE( delete res );
 	return;
