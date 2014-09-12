@@ -157,10 +157,12 @@ M_EXPORT_SYMBOL void db_disconnect( ODBLink& dbLink_ ) {
 }
 
 M_EXPORT_SYMBOL int dbrs_errno( ODBLink const&, void* );
-M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* ) {
+M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
+	OFirebirdResult* res( static_cast<OFirebirdResult*>( result_ ) );
 	M_ASSERT( db );
-	return ( isc_sqlcode( db->_status ) );
+	ISC_STATUS const* status( res && res->_stmt ? res->_status : db->_status );
+	return ( isc_sqlcode( status ) );
 }
 
 M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const&, void* );
@@ -169,8 +171,8 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( result_ ) );
 	M_ASSERT( db || res );
 	static int const MIN_ERROR_BUFFER_SIZE( 512 ); /* no documentation is available why 512 is correct here :( */
-	ISC_STATUS const* status( res ? res->_status : db->_status );
-	HChunk& errBuf( res ? res->_errorMessageBufer : db->_errorMessageBufer );
+	ISC_STATUS const* status( res && res->_stmt ? res->_status : db->_status );
+	HChunk& errBuf( res && res->_stmt ? res->_errorMessageBufer : db->_errorMessageBufer );
 	errBuf.realloc( MIN_ERROR_BUFFER_SIZE );
 	char* msg( errBuf.get<char>() );
 	int msgLen( 0 );
@@ -203,11 +205,11 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 		descOut.version = SQLDA_VERSION1;
 		isc_dsql_allocate_statement( db->_status, &db->_db, &res->_stmt );
 		M_ENSURE( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ) );
-		isc_dsql_prepare( db->_status, &res->_tr, &res->_stmt, 0, query_, 3, &descOut ); /* Dialect version 3. */
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+		isc_dsql_prepare( res->_status, &res->_tr, &res->_stmt, 0, query_, 3, &descOut ); /* Dialect version 3. */
+		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) )
 			break;
-		isc_dsql_describe_bind( db->_status, &res->_stmt, 1, &descIn );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+		isc_dsql_describe_bind( res->_status, &res->_stmt, 1, &descIn );
+		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
 			break;
 		}
 		if ( descIn.sqld > 0 ) {
@@ -215,8 +217,8 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 			XSQLDA* in( res->_descIn.get<XSQLDA>() );
 			in->version = SQLDA_VERSION1;
 			in->sqln = in->sqld = descIn.sqld;
-			isc_dsql_describe_bind( db->_status, &res->_stmt, 1, in );
-			if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+			isc_dsql_describe_bind( res->_status, &res->_stmt, 1, in );
+			if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
 				break;
 			}
 			int i( 0 );
@@ -225,8 +227,8 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 				var->sqltype = SQL_TEXT;
 			}
 		}
-		isc_dsql_describe( db->_status, &res->_stmt, 1, &descOut );
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+		isc_dsql_describe( res->_status, &res->_stmt, 1, &descOut );
+		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
 			break;
 		}
 		if ( descOut.sqld > 0 ) {
@@ -234,8 +236,8 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 			XSQLDA* out( res->_descOut.get<XSQLDA>() );
 			out->version = SQLDA_VERSION1;
 			out->sqld = out->sqln = descOut.sqld;
-			isc_dsql_describe( db->_status, &res->_stmt, 1, out );
-			if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) )
+			isc_dsql_describe( res->_status, &res->_stmt, 1, out );
+			if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) )
 				break;
 			int i( 0 );
 			XSQLVAR* var( NULL );
@@ -258,8 +260,10 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 		res->_ok = true;
 	} while ( false );
 	if ( ! res->_ok ) {
-		isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
-		isc_rollback_transaction( res->_status, &res->_tr );
+		isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+		res->_stmt = 0;
+		isc_rollback_transaction( db->_status, &res->_tr );
+		res->_tr = 0;
 	}
 	return ( res->_ok ? res.release() : NULL );
 }
@@ -272,11 +276,11 @@ void* firebird_query_execute( ODBLink& dbLink_, void* data_ ) {
 		XSQLDA* in( res->_descIn.get<XSQLDA>() );
 		XSQLDA* out( res->_descOut.get<XSQLDA>() );
 		if ( in ) {
-			isc_dsql_execute2( db->_status, &res->_tr, &res->_stmt, 1, in, out );
+			isc_dsql_execute2( res->_status, &res->_tr, &res->_stmt, 1, in, out );
 		} else {
-			isc_dsql_execute( db->_status, &res->_tr, &res->_stmt, 1, out );
+			isc_dsql_execute( res->_status, &res->_tr, &res->_stmt, 1, out );
 		}
-		if ( ( db->_status[0] == 1 ) && ( db->_status[1] != 0 ) ) {
+		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
 			res->_ok = false;
 		}
 	}
@@ -303,7 +307,7 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 			res->_ok = false;
 			XSQLDA* out( res->_descOut.get<XSQLDA>() );
 			int retcode( 0 );
-			while ( ( retcode = static_cast<int>( isc_dsql_fetch( db->_status, &res->_stmt, 1, out ) ) ) == 0 ) {
+			while ( ( retcode = static_cast<int>( isc_dsql_fetch( res->_status, &res->_stmt, 1, out ) ) ) == 0 ) {
 				int valuesBufferSize( 0 );
 				int i( 0 );
 				XSQLVAR* var( NULL );
@@ -336,11 +340,13 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 	} while ( false );
 	if ( res ) {
 		if ( res->_ok ) {
-			isc_commit_transaction( res->_status, &res->_tr );
-			M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+			isc_commit_transaction( db->_status, &res->_tr );
+			M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( dbLink_, res ) );
 		} else {
-			isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
-			isc_rollback_transaction( res->_status, &res->_tr );
+			isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+			res->_stmt = 0;
+			isc_rollback_transaction( db->_status, &res->_tr );
+			res->_tr = 0;
 		}
 	}
 	return ( res && res->_ok ? rs.release() : NULL );
@@ -349,9 +355,11 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 M_EXPORT_SYMBOL void rs_free_query_result( void* );
 M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
+	OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
 	M_ASSERT( res );
-	isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
-	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+	isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+	res->_stmt = 0;
+	M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 	M_SAFE( delete res );
 	return;
 }
@@ -395,14 +403,17 @@ M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
 void firebird_rs_free_cursor( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	M_ASSERT( res );
-	isc_dsql_free_statement( res->_status, &res->_stmt, DSQL_drop );
-	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+	OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
+	isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+	res->_stmt = 0;
+	M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 	if ( res->_ok ) {
-		isc_commit_transaction( res->_status, &res->_tr );
+		isc_commit_transaction( db->_status, &res->_tr );
 	} else {
-		isc_rollback_transaction( res->_status, &res->_tr );
+		isc_rollback_transaction( db->_status, &res->_tr );
 	}
-	M_ENSURE_EX( ( res->_status[0] != 1 ) || ( res->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+	res->_tr = 0;
+	M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 	M_SAFE( delete res );
 	return;
 }
@@ -426,8 +437,7 @@ M_EXPORT_SYMBOL char const* rs_get( void* data_, int long row_, int column_ ) {
 M_EXPORT_SYMBOL bool rs_next( void* );
 M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
-	OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
-	return ( isc_dsql_fetch( db->_status, &res->_stmt, 1, res->_descOut.get<XSQLDA>() ) == 0 );
+	return ( isc_dsql_fetch( res->_status, &res->_stmt, 1, res->_descOut.get<XSQLDA>() ) == 0 );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );
