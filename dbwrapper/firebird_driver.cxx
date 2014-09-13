@@ -64,24 +64,12 @@ char const OFirebird::_tpb[] = {
 struct OFirebirdResult {
 	typedef HPointer<HChunk> chunk_t;
 	typedef HArray<chunk_t> values_t;
-	struct OParam {
-		char const* _data;
-		int _size;
-		OParam( void )
-			: _data( NULL ), _size( 0 ) {
-		}
-		OParam( OParam const& p_ )
-			: _data( p_._data ), _size( p_._size ) {
-		}
-	};
-	typedef HArray<OParam> params_t;
 	ODBLink& _dbLink;
 	isc_stmt_handle _stmt;
 	isc_tr_handle _tr;
 	HChunk _descIn;
 	HChunk _descOut;
 	HChunk _cache;
-	params_t _params;
 	values_t _values;
 	ISC_STATUS _status[ OFirebird::MAX_ERROR_COUNT ];
 	HChunk _errorMessageBufer;
@@ -89,7 +77,7 @@ struct OFirebirdResult {
 	OFirebirdResult( ODBLink& dbLink_ )
 		: _dbLink( dbLink_ ), _stmt( 0 ), _tr( 0 ),
 		_descIn(), _descOut(), _cache(),
-		_params(), _values(), _status(),
+		_values(), _status(),
 		_errorMessageBufer(), _ok( false )
 		{}
 private:
@@ -274,11 +262,10 @@ void* firebird_query_execute( ODBLink& dbLink_, void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	if ( res ) {
 		XSQLDA* in( res->_descIn.get<XSQLDA>() );
-		XSQLDA* out( res->_descOut.get<XSQLDA>() );
 		if ( in ) {
-			isc_dsql_execute2( res->_status, &res->_tr, &res->_stmt, 1, in, out );
+			isc_dsql_execute2( res->_status, &res->_tr, &res->_stmt, 1, in, NULL );
 		} else {
-			isc_dsql_execute( res->_status, &res->_tr, &res->_stmt, 1, out );
+			isc_dsql_execute( res->_status, &res->_tr, &res->_stmt, 1, NULL );
 		}
 		if ( ( res->_status[0] == 1 ) && ( res->_status[1] != 0 ) ) {
 			res->_ok = false;
@@ -379,8 +366,9 @@ M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int paramNo_, yaal::hcor
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	M_ASSERT( res );
 	XSQLDA* in( res->_descIn.get<XSQLDA>() );
-	if ( paramNo_ < in->sqld ) {
-		XSQLVAR* var( in->sqlvar + paramNo_ );
+	int paramIdx( paramNo_ - 1 );
+	if ( paramIdx < in->sqld ) {
+		XSQLVAR* var( in->sqlvar + paramIdx );
 		var->sqldata = const_cast<char*>( value_.c_str() );
 		var->sqllen = static_cast<ISC_SHORT>( value_.get_size() );
 	}
