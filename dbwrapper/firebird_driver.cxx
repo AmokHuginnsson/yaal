@@ -256,9 +256,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( res->_ok ? res.release() : NULL );
 }
 
-void* firebird_query_execute( ODBLink& dbLink_, void* data_ ) {
-	OFirebird* db( static_cast<OFirebird*>( dbLink_._conn ) );
-	M_ASSERT( db );
+void* firebird_query_execute( ODBLink&, void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	if ( res ) {
 		XSQLDA* in( res->_descIn.get<XSQLDA>() );
