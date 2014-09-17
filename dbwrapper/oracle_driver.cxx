@@ -98,9 +98,11 @@ struct OQuery {
 	OCIStmt* _statement;
 	field_infos_t _fieldInfos;
 	HChunk _buffer;
+	ub4 _mode;
+	HString _sql;
 	OQuery( int* status_ )
 		: _status( status_ ), _error( NULL ), _statement( NULL ),
-		_fieldInfos(), _buffer()
+		_fieldInfos(), _buffer(), _mode(), _sql()
 		{}
 private:
 	OQuery( OQuery const& );
@@ -213,137 +215,144 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* ) {
 
 namespace {
 
-void* yaal_oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mode_ ) {
+void* oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mode_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	OOracle* oracle( static_cast<OOracle*>( dbLink_._conn ) );
 	OQuery* queryObj( new OQuery( &oracle->_status ) );
-	HString queryStr( query_ );
-	queryStr.trim();
-	queryStr.trim_right( ";" );
+	queryObj->_mode = mode_;
+	queryObj->_sql = query_;
+	queryObj->_sql.trim();
+	queryObj->_sql.trim_right( ";" );
 	oracle->_status = OCIStmtPrepare2( oracle->_serviceContext,
 			&queryObj->_statement, oracle->_error,
-			reinterpret_cast<OraText const*>( queryStr.raw() ),
-			static_cast<ub4>( queryStr.get_length() ), NULL, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
+			reinterpret_cast<OraText const*>( queryObj->_sql.raw() ),
+			static_cast<ub4>( queryObj->_sql.get_length() ), NULL, 0, OCI_NTV_SYNTAX, OCI_DEFAULT );
 	queryObj->_error = oracle->_error;
 	if ( ( oracle->_status != OCI_SUCCESS )
 			&& ( oracle->_status != OCI_SUCCESS_WITH_INFO ) ) {
 		log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to prepare statement." << endl;
 		yaal_oracle_rs_free_query( queryObj );
 		queryObj = NULL;
-	} else {
-		if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
-			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, NULL ) << endl;
-		queryStr.upper();
-		int iters( 0 );
-		if ( queryStr.find( "INSERT" ) == 0 )
-			iters = 1;
-		else if ( queryStr.find( "UPDATE" ) == 0 )
-			iters = 1;
-		else if ( queryStr.find( "DELETE" ) == 0 )
-			iters = 1;
-		oracle->_status = OCIStmtExecute( oracle->_serviceContext,
-				queryObj->_statement, oracle->_error, static_cast<ub4>( iters ), 0,
-				NULL, NULL,
-				OCI_DEFAULT | OCI_COMMIT_ON_SUCCESS | ( iters == 0 ? mode_ : 0 ) );
-		bool fail( false );
-		typedef HArray<OCIParam*> params_t;
-		params_t params;
-		do {
-			if ( ( oracle->_status != OCI_SUCCESS )
-					&& ( oracle->_status != OCI_SUCCESS_WITH_INFO ) ) {
-				fail = true;
-				break;
-			} else if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
-				log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, NULL ) << endl;
-			if ( queryObj ) {
-				int fc( -1 );
-				if ( ( ( *queryObj->_status ) = OCIAttrGet( queryObj->_statement,
-								OCI_HTYPE_STMT, &fc, 0, OCI_ATTR_PARAM_COUNT,
-								queryObj->_error ) ) != OCI_SUCCESS ) {
-					fail = true;
-					break;
-				}
-				if ( fc > 0 ) {
-					params.resize( fc, NULL );
-					queryObj->_fieldInfos.resize( fc );
-					int maxRowSize( 0 );
-					for ( int i( 0 ); i < fc; ++ i ) {
-						OQuery::OFieldInfo& fi( queryObj->_fieldInfos[i] );
-						if ( ( ( *queryObj->_status ) = OCIParamGet( queryObj->_statement,
-										OCI_HTYPE_STMT, queryObj->_error,
-										reinterpret_cast<void**>( &params[i] ), static_cast<ub4>( i + 1 ) ) ) == OCI_SUCCESS ) {
-							if ( ( ( *queryObj->_status ) = OCIAttrGet( params[i],
-											OCI_DTYPE_PARAM, &fi._size, 0, OCI_ATTR_DATA_SIZE,
-											queryObj->_error ) ) == OCI_SUCCESS ) {
-								maxRowSize += fi._size;
-							} else {
-								fail = true;
-								break;
-							}
-							int nameLength( 0 );
-							text* name( NULL );
-							if ( ( ( *queryObj->_status ) = OCIAttrGet( params[i],
-											OCI_DTYPE_PARAM, &name,
-											reinterpret_cast<ub4*>( &nameLength ),
-											OCI_ATTR_NAME, queryObj->_error ) ) == OCI_SUCCESS ) {
-								if ( nameLength >= 0 ) {
-									name[ nameLength ] = 0;
-									fi._name = reinterpret_cast<char const*>( name );
-								} else {
-									fail = true;
-									break;
-								}
-							} else {
-								fail = true;
-								break;
-							}
-						} else {
-							fail = true;
-							break;
-						}
-					}
-					if ( fail )
-						break;
-					queryObj->_buffer.realloc( maxRowSize + fc, HChunk::STRATEGY::EXACT );
-					char* ptr( queryObj->_buffer.get<char>() );
-					int offset( 0 );
-					for ( int i( 0 ); i < fc; ++ i ) {
-						OQuery::OFieldInfo& fi( queryObj->_fieldInfos[i] );
-						OCIDefine* result( NULL );
-						if ( ( ( *queryObj->_status ) = OCIDefineByPos( queryObj->_statement,
-										&result, queryObj->_error, static_cast<ub4>( i + 1 ), fi._buffer = ptr + offset, fi._size + 1,
-										SQLT_STR, &fi._isNull, NULL, NULL, OCI_DEFAULT ) ) == OCI_SUCCESS ) {
-							offset += ( fi._size + 1 );
-						} else {
-							fail = true;
-							break;
-						}
-					}
-					if ( fail )
-						break;
-				} else if ( iters == 0 ) {
-					fail = true;
-					break;
-				}
-			}
-		} while ( false );
-		for ( params_t::iterator it( params.begin() ), endIt( params.end() ); it != endIt; ++ it ) {
-			if ( *it )
-				OCIDescriptorFree( *it, OCI_DTYPE_PARAM );
-		}
-		if ( fail ) {
-			log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to execute statement." << endl;
-			yaal_oracle_rs_free_query( queryObj );
-			queryObj = NULL;
-		}
+	} else if ( oracle->_status == OCI_SUCCESS_WITH_INFO ) {
+		log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, NULL ) << endl;
 	}
 	return ( queryObj );
+}
+
+void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
+	M_ASSERT( dbLink_._conn && dbLink_._valid );
+	OOracle* oracle( static_cast<OOracle*>( dbLink_._conn ) );
+	OQuery* query( static_cast<OQuery*>( data_ ) );
+	query->_sql.upper();
+	int iters( 0 );
+	if ( query->_sql.find( "INSERT" ) == 0 )
+		iters = 1;
+	else if ( query->_sql.find( "UPDATE" ) == 0 )
+		iters = 1;
+	else if ( query->_sql.find( "DELETE" ) == 0 )
+		iters = 1;
+	oracle->_status = OCIStmtExecute( oracle->_serviceContext,
+			query->_statement, oracle->_error, static_cast<ub4>( iters ), 0,
+			NULL, NULL,
+			OCI_DEFAULT | OCI_COMMIT_ON_SUCCESS | ( iters == 0 ? query->_mode : 0 ) );
+	bool fail( false );
+	typedef HArray<OCIParam*> params_t;
+	params_t params;
+	do {
+		if ( ( oracle->_status != OCI_SUCCESS )
+				&& ( oracle->_status != OCI_SUCCESS_WITH_INFO ) ) {
+			fail = true;
+			break;
+		} else if ( oracle->_status == OCI_SUCCESS_WITH_INFO )
+			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, NULL ) << endl;
+		if ( query ) {
+			int fc( -1 );
+			if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
+							OCI_HTYPE_STMT, &fc, 0, OCI_ATTR_PARAM_COUNT,
+							query->_error ) ) != OCI_SUCCESS ) {
+				fail = true;
+				break;
+			}
+			if ( fc > 0 ) {
+				params.resize( fc, NULL );
+				query->_fieldInfos.resize( fc );
+				int maxRowSize( 0 );
+				for ( int i( 0 ); i < fc; ++ i ) {
+					OQuery::OFieldInfo& fi( query->_fieldInfos[i] );
+					if ( ( ( *query->_status ) = OCIParamGet( query->_statement,
+									OCI_HTYPE_STMT, query->_error,
+									reinterpret_cast<void**>( &params[i] ), static_cast<ub4>( i + 1 ) ) ) == OCI_SUCCESS ) {
+						if ( ( ( *query->_status ) = OCIAttrGet( params[i],
+										OCI_DTYPE_PARAM, &fi._size, 0, OCI_ATTR_DATA_SIZE,
+										query->_error ) ) == OCI_SUCCESS ) {
+							maxRowSize += fi._size;
+						} else {
+							fail = true;
+							break;
+						}
+						int nameLength( 0 );
+						text* name( NULL );
+						if ( ( ( *query->_status ) = OCIAttrGet( params[i],
+										OCI_DTYPE_PARAM, &name,
+										reinterpret_cast<ub4*>( &nameLength ),
+										OCI_ATTR_NAME, query->_error ) ) == OCI_SUCCESS ) {
+							if ( nameLength >= 0 ) {
+								name[ nameLength ] = 0;
+								fi._name = reinterpret_cast<char const*>( name );
+							} else {
+								fail = true;
+								break;
+							}
+						} else {
+							fail = true;
+							break;
+						}
+					} else {
+						fail = true;
+						break;
+					}
+				}
+				if ( fail )
+					break;
+				query->_buffer.realloc( maxRowSize + fc, HChunk::STRATEGY::EXACT );
+				char* ptr( query->_buffer.get<char>() );
+				int offset( 0 );
+				for ( int i( 0 ); i < fc; ++ i ) {
+					OQuery::OFieldInfo& fi( query->_fieldInfos[i] );
+					OCIDefine* result( NULL );
+					if ( ( ( *query->_status ) = OCIDefineByPos( query->_statement,
+									&result, query->_error, static_cast<ub4>( i + 1 ), fi._buffer = ptr + offset, fi._size + 1,
+									SQLT_STR, &fi._isNull, NULL, NULL, OCI_DEFAULT ) ) == OCI_SUCCESS ) {
+						offset += ( fi._size + 1 );
+					} else {
+						fail = true;
+						break;
+					}
+				}
+				if ( fail )
+					break;
+			} else if ( iters == 0 ) {
+				fail = true;
+				break;
+			}
+		}
+	} while ( false );
+	for ( params_t::iterator it( params.begin() ), endIt( params.end() ); it != endIt; ++ it ) {
+		if ( *it )
+			OCIDescriptorFree( *it, OCI_DTYPE_PARAM );
+	}
+	if ( fail ) {
+		log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to execute statement." << endl;
+		yaal_oracle_rs_free_query( query );
+		query = NULL;
+	}
+	return ( query );
 }
 
 }
 M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query_ ) {
-	return ( yaal_oracle_db_prepare_query( dbLink_, query_, OCI_STMT_SCROLLABLE_READONLY ) );
+	return ( oracle_query_execute( dbLink_, oracle_db_prepare_query( dbLink_, query_, OCI_STMT_SCROLLABLE_READONLY ) ) );
 }
 
 void yaal_oracle_rs_free_query( void* data_ ) {
@@ -365,12 +374,12 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 
 M_EXPORT_SYMBOL void* db_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
-	return ( yaal_oracle_db_prepare_query( dbLink_, query_, 0 ) );
+	return ( oracle_query_execute( dbLink_, oracle_db_prepare_query( dbLink_, query_, 0 ) ) );
 }
 
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* );
-M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* ) {
-	return ( NULL );
+M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
+	return ( oracle_db_prepare_query( dbLink_, query_, 0 ) );
 }
 
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
@@ -379,8 +388,8 @@ M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString cons
 }
 
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
-M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* ) {
-	return ( NULL );
+M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
+	return ( oracle_query_execute( dbLink_, data_ ) );
 }
 
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
@@ -458,7 +467,8 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink& dbLink_, void* ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
-	OQuery* autonumber( static_cast<OQuery*>( yaal_oracle_db_prepare_query( dbLink_, "SELECT SYS_CONTEXT( 'CLIENTCONTEXT', 'LAST_INSERT_ID' ) FROM dual", OCI_STMT_SCROLLABLE_READONLY ) ) );
+	OQuery* autonumber( static_cast<OQuery*>( oracle_query_execute( dbLink_,
+					oracle_db_prepare_query( dbLink_, "SELECT SYS_CONTEXT( 'CLIENTCONTEXT', 'LAST_INSERT_ID' ) FROM dual", OCI_STMT_SCROLLABLE_READONLY ) ) ) );
 	int long id( strtol( yaal_oracle_rs_get( autonumber, 0, 0 ), NULL, 10 ) );
 	yaal_oracle_rs_free_query( autonumber );
 	return ( id );
