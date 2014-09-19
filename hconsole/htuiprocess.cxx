@@ -69,7 +69,7 @@ HTUIProcess::~HTUIProcess( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-int HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::ptr_t mainWindow_ ) {
+void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::ptr_t mainWindow_ ) {
 	M_PROLOG
 	static int const CTRLS_COUNT( 2 );
 	static int const ALTS_COUNT( 10 );
@@ -106,7 +106,7 @@ int HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::pt
 	_foregroundWindow = _windows->begin();
 	_commandHandlers[ "quit" ] = call( &HTUIProcess::handler_quit, this, _1 );
 	repaint();
-	return ( 1 );
+	return;
 	M_EPILOG
 }
 

@@ -63,7 +63,7 @@ protected:
 public:
 	HTUIProcess( int = 8, int = 32, int = 32 );
 	virtual ~HTUIProcess ( void );
-	int init_tui( yaal::hcore::HString const& = yaal::hcore::HString(), window_t = window_t() );
+	void init_tui( yaal::hcore::HString const& = yaal::hcore::HString(), window_t = window_t() );
 	void init_xrc( yaal::hcore::HString const&, yaal::hcore::HString const& );
 	void run( void );
 	void schedule_repaint( void );

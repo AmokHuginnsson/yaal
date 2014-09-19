@@ -74,10 +74,10 @@ HDataProcess::~HDataProcess( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-int HDataProcess::init_xrc( char const* processName_,
+void HDataProcess::init_xrc( char const* processName_,
 		char const* resource_, menu_handlers_map_t const & handlers_ ) {
 	M_PROLOG
-	int error = HTUIProcess::init_tui( processName_ );
+	HTUIProcess::init_tui( processName_ );
 	HMainWindow* mainWindow = NULL;
 	if ( dbwrapper::_dBDrivers_.is_empty() )
 		M_THROW( "no database driver loaded", errno );
@@ -89,7 +89,7 @@ int HDataProcess::init_xrc( char const* processName_,
 	M_ASSERT( mainWindow );
 	mainWindow->init_menu( this, _rootMenu );
 	mainWindow->paint();
-	return ( error );
+	return;
 	M_EPILOG
 }
 

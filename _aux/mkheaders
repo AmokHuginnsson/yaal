@@ -5,6 +5,12 @@ LIB_VERSION=""
 DIR_ROOT=""
 DIR_BUILD=""
 HDRS=""
+export LC_COLLATE="C"
+export LC_CTYPE="C"
+export LC_TIME="C"
+export LC_ALL="C"
+export LANGUAGE="en"
+export LANG="en"
 
 for arg in "${@}" ; do
 	case ${arg} in
