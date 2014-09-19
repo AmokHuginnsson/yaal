@@ -37,7 +37,7 @@ namespace yaal {
 
 namespace hconsole {
 
-HMainWindow::HMainWindow( char const* title_, HTUIProcess::model_ptr_t windows_,
+HMainWindow::HMainWindow( yaal::hcore::HString const& title_, HTUIProcess::model_ptr_t windows_,
 		HTUIProcess::model_t::cyclic_iterator& foregroundWindow_ )
 		: HWindow( title_ ), _menu( NULL ), _windowList( windows_ ),
 		_foregroundWindow( foregroundWindow_ ) {

@@ -51,7 +51,8 @@ HTUIProcess::HTUIProcess( int noFileHandlers_, int keyHandlers_,
 		int commandHandlers_ )
 	: HHandler( keyHandlers_, commandHandlers_ ),
 	_dispatcher( noFileHandlers_, _latency_ * 1000 ), _mainWindow(), _foregroundWindow(),
-	_windows( new ( memory::yaal ) model_t() ), _needRepaint( false ), _callQueue() {
+	_windows( new ( memory::yaal ) model_t() ), _needRepaint( false ), _callQueue(),
+	_resource() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -68,7 +69,7 @@ HTUIProcess::~HTUIProcess( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ ) {
+int HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::ptr_t mainWindow_ ) {
 	M_PROLOG
 	static int const CTRLS_COUNT( 2 );
 	static int const ALTS_COUNT( 10 );
@@ -88,9 +89,9 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 	if ( _useMouse_ ) {
 		register_postprocess_handler( KEY_CODES::MOUSE, NULL, call( &HTUIProcess::handler_mouse, this, _1 ) );
 	}
-	if ( !! mainWindow_ )
+	if ( !! mainWindow_ ) {
 		mainWindow = mainWindow_;
-	else /* Create automatically default main window. */ {
+	} else /* Create automatically default main window. */ {
 		mainWindow = make_pointer<HMainWindow>( processName_, _windows, ref( _foregroundWindow ) );
 		register_postprocess_handler( KEY<'\t'>::meta, NULL, call( &HTUIProcess::handler_jump_meta_tab, this, _1 ) );
 		register_postprocess_handler( KEY<'q'>::command, NULL, call( &HTUIProcess::handler_close_window, this, _1 ) );
@@ -106,6 +107,21 @@ int HTUIProcess::init_tui( char const* processName_, HWindow::ptr_t mainWindow_ 
 	_commandHandlers[ "quit" ] = call( &HTUIProcess::handler_quit, this, _1 );
 	repaint();
 	return ( 1 );
+	M_EPILOG
+}
+
+void HTUIProcess::init_xrc( yaal::hcore::HString const& name_, yaal::hcore::HString const& path_ ) {
+	M_PROLOG
+	do_init_xrc( name_, path_ );
+	return;
+	M_EPILOG
+}
+
+void HTUIProcess::do_init_xrc( yaal::hcore::HString const& name_, yaal::hcore::HString const& path_ ) {
+	M_PROLOG
+	_resource = make_pointer<HResource>( this, path_ );
+	init_tui( name_ );
+	return;
 	M_EPILOG
 }
 

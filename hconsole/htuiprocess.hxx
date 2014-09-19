@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/hqueue.hxx"
 #include "tools/hiodispatcher.hxx"
 #include "hconsole/hhandler.hxx"
+#include "hconsole/hresource.hxx"
 
 namespace yaal {
 
@@ -58,10 +59,12 @@ protected:
 	model_ptr_t _windows;                       /* current existing windows */
 	bool _needRepaint;
 	call_queue_t _callQueue;
+	HResource::ptr_t _resource;
 public:
 	HTUIProcess( int = 8, int = 32, int = 32 );
 	virtual ~HTUIProcess ( void );
-	int init_tui( char const* = "", window_t = window_t() );
+	int init_tui( yaal::hcore::HString const& = yaal::hcore::HString(), window_t = window_t() );
+	void init_xrc( yaal::hcore::HString const&, yaal::hcore::HString const& );
 	void run( void );
 	void schedule_repaint( void );
 	void schedule_call( call_t );
@@ -86,6 +89,7 @@ protected:
 	bool handler_close_window( HEvent const& );
 	virtual void do_quit( void );
 	virtual void do_close_window( void );
+	virtual void do_init_xrc( yaal::hcore::HString const&, yaal::hcore::HString const& );
 private:
 	HTUIProcess( HTUIProcess const& );
 	HTUIProcess& operator = ( HTUIProcess const& );
