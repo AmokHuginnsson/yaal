@@ -70,7 +70,14 @@ HWindow::~HWindow( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-int HWindow::init( void ) {
+void HWindow::init( void ) {
+	M_PROLOG
+	do_init();
+	return;
+	M_EPILOG
+}
+
+void HWindow::do_init( void ) {
 	M_PROLOG
 	M_ENSURE( _tuiProcess );
 	HString string;
@@ -84,7 +91,7 @@ int HWindow::init( void ) {
 	_statusBar = *_focusedChild;
 	_statusBar->enable( true );
 	_initialised = true;
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 

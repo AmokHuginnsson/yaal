@@ -77,7 +77,7 @@ HDataWindow::~HDataWindow( void ) {
 
 #define M_SETUP_STANDARD r._row, r._column, r._height, r._width, r._label
 
-int HDataWindow::init( void ) {
+void HDataWindow::do_init( void ) {
 	M_PROLOG
 	char value[] = "";
 	char const* mask = _maskDefault_;
@@ -94,7 +94,7 @@ int HDataWindow::init( void ) {
 	attributes._disabledAttribute = HWidget::DEFAULT_ATTRS;
 	attributes._enabledAttribute = HWidget::DEFAULT_ATTRS;
 	attributes._focusedAttribute = HWidget::DEFAULT_ATTRS;
-	HWindow::init();
+	HWindow::do_init();
 	for ( int i( 0 ), SIZE( static_cast<int>( _resourcesArray->size() ) ); i < SIZE; ++ i ) {
 		OResource& r( (*_resourcesArray)[ i ] );
 		if ( r._attributes )
@@ -194,7 +194,7 @@ int HDataWindow::init( void ) {
 		_mainWidget->process_input( KEY_CODES::HOME );
 	}
 	paint();
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 

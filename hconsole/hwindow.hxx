@@ -60,7 +60,7 @@ protected:
 public:
 	HWindow( yaal::hcore::HString const& title );
 	virtual ~HWindow( void );
-	virtual int init( void );
+	void init( void );
 	void set_tui( HTUIProcess* );
 	void paint( void );
 	bool process_input( HKeyPressEvent const& );
@@ -94,6 +94,8 @@ public:
  */
 	void schedule_repaint( bool wholeWindow_ );
 	void schedule_call( HTUIProcess::call_t );
+protected:
+	virtual void do_init( void );
 private:
 	friend bool HWidget::set_focus( char );
 	friend void HStatusBarWidget::set_prompt(  yaal::hcore::HString const&,

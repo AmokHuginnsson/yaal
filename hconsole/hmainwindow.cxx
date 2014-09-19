@@ -56,15 +56,14 @@ HMainWindow::~HMainWindow( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-int HMainWindow::init( void ) {
+void HMainWindow::do_init( void ) {
 	M_PROLOG
-	int error = 0;
 	HConsole& cons = HConsole::get_instance();
-	if ( ( _focusedChild != HWidgetList::model_t::cyclic_iterator() ) && ( !! (*_focusedChild) ) )
-		return ( 0 );
-	error = HWindow::init();
-	_menu = new ( memory::yaal ) HMenuWidget( this, 1, 1, - 2,	- cons.get_width() / 2 - 1,
-			"&Menu" );
+	if ( ( _focusedChild != HWidgetList::model_t::cyclic_iterator() ) && ( !! (*_focusedChild) ) ) {
+		return;
+	}
+	HWindow::do_init();
+	_menu = new ( memory::yaal ) HMenuWidget( this, 1, 1, -2, - cons.get_width() / 2 - 1, "&Menu" );
 	_menu->enable( true );
 	_menu->set_focus();
 	HWindowListWidget* windowList = new ( memory::yaal ) HWindowListWidget( this, 1,
@@ -74,7 +73,7 @@ int HMainWindow::init( void ) {
 	windowList->add_column( -1, "&Okno", 1 );
 	windowList->enable( true );
 	_widgets.select( _menu );
-	return ( error );
+	return;
 	M_EPILOG
 }
 

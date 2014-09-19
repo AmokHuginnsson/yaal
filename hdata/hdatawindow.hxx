@@ -80,7 +80,6 @@ protected:
 public:
 	HDataWindow( char const*, HDataProcess*, resources_t* = NULL );
 	virtual ~HDataWindow( void );
-	virtual int init( void );
 	virtual hconsole::HStatusBarWidget* init_bar( char const* );
 	void set_sync_store( ORowBuffer* = NULL );
 	bool is_modified( void ) const;
@@ -98,6 +97,7 @@ protected:
 	bool handler_save( hconsole::HEvent const& );
 	bool handler_requery( hconsole::HEvent const& );
 	bool handler_cancel( hconsole::HEvent const& );
+	virtual void do_init( void );
 private:
 	HDataWindow( HDataWindow const& );
 	HDataWindow& operator = ( HDataWindow const& );
