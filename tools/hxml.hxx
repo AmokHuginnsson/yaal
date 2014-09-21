@@ -59,6 +59,8 @@ public:
 	class HConstNodeProxy;
 	class HIterator;
 	class HConstIterator;
+	class HNodeSet;
+	class HConstNodeSet;
 	typedef HIterator iterator;
 	typedef HConstIterator const_iterator;
 	typedef yaal::hcore::HTree<HNode> tree_t;
@@ -131,6 +133,8 @@ private:
 	void parse_dtd( void* );
 	char const* error_message( int ) const;
 };
+
+typedef yaal::hcore::HExceptionT<HXml> HXmlException;
 
 /*! \brief Basic building block of XML document.
  */
@@ -358,7 +362,83 @@ private:
 	HConstIterator( HXml::HConstNodeProxy const*, HXml::tree_t::HNode::const_iterator const& );
 };
 
-typedef yaal::hcore::HExceptionT<HXml> HXmlException;
+class HXml::HConstNodeSet {
+public:
+	typedef HConstNodeSet this_type;
+	class HConstIterator;
+private:
+	typedef yaal::hcore::HArray<HXml::const_xml_element_t> nodes_t;
+	nodes_t _nodes;
+public:
+	HConstIterator begin( void ) const;
+	HConstIterator end( void ) const;
+	int long get_size( void ) const;
+	int long size( void ) const;
+	bool is_empty( void ) const;
+	bool empty( void ) const;
+	HConstNodeProxy operator[] ( int ) const;
+private:
+	HConstNodeSet( void );
+	void add( HXml::const_xml_element_t );
+};
+
+class HXml::HConstNodeSet::HConstIterator : public yaal::hcore::iterator_interface<HXml::HConstNodeProxy, yaal::hcore::iterator_category::random_access> {
+public:
+	typedef HConstIterator this_type;
+	typedef yaal::hcore::iterator_interface<HXml::HConstNodeProxy, yaal::hcore::iterator_category::random_access> base_type;
+	HXml::HConstNodeSet const* _owner;
+	int _iterator;
+public:
+	HConstIterator( void );
+	HConstIterator( HConstIterator const& );
+	HConstIterator& operator ++ ( void ) {
+		++ _iterator;
+		return ( *this );
+	}
+	HConstIterator operator ++ ( int ) {
+		HConstIterator it( *this );
+		++ _iterator;
+		return ( it );
+	}
+	HConstIterator& operator -- ( void ) {
+		-- _iterator;
+		return ( *this );
+	}
+	HConstIterator operator -- ( int ) {
+		HConstIterator it( *this );
+		-- _iterator;
+		return ( it );
+	}
+	HConstIterator& operator = ( HConstIterator const& );
+	bool operator == ( HConstIterator const& ) const;
+	bool operator != ( HConstIterator const& ) const;
+	HXml::HConstNodeProxy const operator* ( void ) const;
+private:
+	friend class HXml::HConstNodeSet;
+	HConstIterator( HXml::HConstNodeSet const*, int );
+};
+
+class HXml::HNodeSet : public HXml::HConstNodeSet {
+public:
+	typedef HXml::HNodeSet this_type;
+	typedef HXml::HConstNodeSet base_type;
+	class HIterator;
+	HIterator begin( void );
+	HIterator end( void );
+	HNodeProxy operator[] ( int );
+private:
+	HNodeSet( void );
+};
+
+class HXml::HNodeSet::HIterator : public HXml::HConstNodeSet::HConstIterator {
+public:
+	typedef HIterator this_type;
+	typedef HXml::HConstNodeSet::HConstIterator base_type;
+	HXml::HNodeProxy operator* ( void );
+private:
+	friend class HXml::HNodeSet;
+	HIterator( HXml::HConstNodeSet const*, int );
+};
 
 /*! \brief HXml related convenience and helper functions.
  */
