@@ -1154,9 +1154,11 @@ HXml::const_xml_element_t HXml::get_element_by_path( const_xml_element_t const& 
 	HString name = t[ part ];
 	if ( ! name.is_empty() ) {
 		if ( (**node)._text == name ) {
-			for ( tree_t::HNode::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
-				if ( (**it)._type == HXml::HNode::TYPE::NODE )
+			for ( tree_t::HNode::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it ) {
+				if ( (**it)._type == HXml::HNode::TYPE::NODE ) {
 					result = get_element_by_path( &*it, path, part + 1 );
+				}
+			}
 		}
 	} else {
 		if ( node->get_level() )
@@ -1178,6 +1180,51 @@ HXml::HConstNodeProxy const HXml::get_element_by_path( yaal::hcore::HString cons
 	M_PROLOG
 	return ( HConstNodeProxy( get_element_by_path( _domTree.get_root(), path, 1 ) ) );
 	M_EPILOG
+}
+
+HXml::HConstNodeSet HXml::get_elements_by_name( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	HConstNodeSet ns;
+	get_elements_by_name( ns, _domTree.get_root(), name_ );
+	return ( ns );
+	M_EPILOG
+}
+
+HXml::HNodeSet HXml::get_elements_by_name( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	HNodeSet ns;
+	get_elements_by_name( ns, const_cast<const_xml_element_t>( _domTree.get_root() ), name_ );
+	return ( ns );
+	M_EPILOG
+}
+
+void HXml::get_elements_by_name( yaal::tools::HXml::HConstNodeSet& ns_, const_xml_element_t node_, yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	if ( (**node_)._text == name_ ) {
+		ns_.add( node_ );
+	}
+	for ( tree_t::HNode::const_iterator it( node_->begin() ), endIt( node_->end() ); it != endIt; ++ it ) {
+		if ( (**it)._type == HXml::HNode::TYPE::NODE ) {
+			get_elements_by_name( ns_, &*it, name_ );
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+HXml::HConstNodeSet::HConstNodeSet( void )
+	: _nodes() {
+}
+
+void HXml::HConstNodeSet::add( HXml::const_xml_element_t node_ ) {
+	M_PROLOG
+	_nodes.push_back( node_ );
+	return;
+	M_EPILOG
+}
+
+HXml::HNodeSet::HNodeSet( void )
+	: HConstNodeSet() {
 }
 
 char const* HXml::error_message( int code ) const {

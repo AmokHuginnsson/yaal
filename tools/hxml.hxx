@@ -116,6 +116,8 @@ public:
 	HConstNodeProxy const get_element_by_id( yaal::hcore::HString const& ) const;
 	HNodeProxy get_element_by_path( yaal::hcore::HString const& );
 	HConstNodeProxy const get_element_by_path( yaal::hcore::HString const& ) const;
+	HConstNodeSet get_elements_by_name( yaal::hcore::HString const& ) const;
+	HNodeSet get_elements_by_name( yaal::hcore::HString const& );
 	const_entity_iterator entity_begin( void ) const;
 	const_entity_iterator entity_end( void ) const;
 	entity_iterator entity_begin( void );
@@ -130,6 +132,7 @@ private:
 	int get_node_set_by_path( yaal::hcore::HString const& );
 	const_xml_element_t get_element_by_id( const_xml_element_t const&, yaal::hcore::HString const& ) const;
 	const_xml_element_t get_element_by_path( const_xml_element_t const&, yaal::hcore::HString const&, int ) const;
+	void get_elements_by_name( HConstNodeSet&, const_xml_element_t, yaal::hcore::HString const& ) const;
 	void parse_dtd( void* );
 	char const* error_message( int ) const;
 };
@@ -370,6 +373,7 @@ private:
 	typedef yaal::hcore::HArray<HXml::const_xml_element_t> nodes_t;
 	nodes_t _nodes;
 public:
+	virtual ~HConstNodeSet( void ) {}
 	HConstIterator begin( void ) const;
 	HConstIterator end( void ) const;
 	int long get_size( void ) const;
@@ -380,6 +384,7 @@ public:
 private:
 	HConstNodeSet( void );
 	void add( HXml::const_xml_element_t );
+	friend class HXml;
 };
 
 class HXml::HConstNodeSet::HConstIterator : public yaal::hcore::iterator_interface<HXml::HConstNodeProxy, yaal::hcore::iterator_category::random_access> {
@@ -423,11 +428,13 @@ public:
 	typedef HXml::HNodeSet this_type;
 	typedef HXml::HConstNodeSet base_type;
 	class HIterator;
+	virtual ~HNodeSet( void ) {}
 	HIterator begin( void );
 	HIterator end( void );
 	HNodeProxy operator[] ( int );
 private:
 	HNodeSet( void );
+	friend class HXml;
 };
 
 class HXml::HNodeSet::HIterator : public HXml::HConstNodeSet::HConstIterator {
