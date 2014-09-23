@@ -1106,7 +1106,7 @@ HXml::HNodeProxy HXml::HIterator::operator* ( void ) {
 	M_EPILOG
 }
 
-HXml::HConstNodeProxy const HXml::HConstIterator::operator* ( void ) const {
+HXml::HConstNodeProxy HXml::HConstIterator::operator* ( void ) const {
 	M_PROLOG
 	M_ASSERT( _owner );
 	M_ASSERT( _iterator != const_cast<HXml::tree_t::const_node_t>( _owner->_node )->end() );
@@ -1214,6 +1214,7 @@ void HXml::get_elements_by_name( yaal::tools::HXml::HConstNodeSet& ns_, const_xm
 
 HXml::HConstNodeSet::HConstNodeSet( void )
 	: _nodes() {
+	return;
 }
 
 void HXml::HConstNodeSet::add( HXml::const_xml_element_t node_ ) {
@@ -1223,8 +1224,87 @@ void HXml::HConstNodeSet::add( HXml::const_xml_element_t node_ ) {
 	M_EPILOG
 }
 
+HXml::HConstNodeSet::HConstIterator HXml::HConstNodeSet::begin( void ) const {
+	M_PROLOG
+	return ( HXml::HConstNodeSet::HConstIterator( this, 0 ) );
+	M_EPILOG
+}
+
+HXml::HConstNodeSet::HConstIterator HXml::HConstNodeSet::end( void ) const {
+	M_PROLOG
+	return ( HXml::HConstNodeSet::HConstIterator( this, static_cast<int>( _nodes.get_size() ) ) );
+	M_EPILOG
+}
+
+int HXml::HConstNodeSet::get_size( void ) const {
+	M_PROLOG
+	return ( static_cast<int>( _nodes.get_size() ) );
+	M_EPILOG
+}
+
+int HXml::HConstNodeSet::size( void ) const {
+	return ( get_size() );
+}
+
+bool HXml::HConstNodeSet::is_empty( void ) const {
+	M_PROLOG
+	return ( _nodes.is_empty() );
+	M_EPILOG
+}
+
+bool HXml::HConstNodeSet::empty( void ) const {
+	return ( is_empty() );
+}
+
+HXml::HConstNodeProxy HXml::HConstNodeSet::operator[]( int index_ ) const {
+	M_PROLOG
+	return ( _nodes[index_] );
+	M_EPILOG
+}
+
+HXml::HConstNodeSet::HConstIterator::HConstIterator( HXml::HConstNodeSet const* owner_, int index_ )
+	: _owner( owner_ ), _iterator( index_ ) {
+	return;
+}
+
+HXml::HConstNodeProxy HXml::HConstNodeSet::HConstIterator::operator* ( void ) const {
+	M_PROLOG
+	return ( _owner->_nodes[_iterator] );
+	M_EPILOG
+}
+
 HXml::HNodeSet::HNodeSet( void )
 	: HConstNodeSet() {
+	return;
+}
+
+HXml::HNodeSet::HIterator HXml::HNodeSet::begin( void ) {
+	M_PROLOG
+	return ( HXml::HNodeSet::HIterator( this, 0 ) );
+	M_EPILOG
+}
+
+HXml::HNodeSet::HIterator HXml::HNodeSet::end( void ) {
+	M_PROLOG
+	return ( HXml::HNodeSet::HIterator( this, static_cast<int>( _nodes.get_size() ) ) );
+	M_EPILOG
+}
+
+HXml::HNodeProxy HXml::HNodeSet::operator[]( int index_ ) {
+	M_PROLOG
+	return ( const_cast<HXml::xml_element_t>( _nodes[index_] ) );
+	M_EPILOG
+}
+
+HXml::HNodeSet::HIterator::HIterator( HXml::HConstNodeSet const* owner_, int index_ )
+	: HConstIterator( owner_, index_ ) {
+	return;
+}
+
+HXml::HNodeProxy HXml::HNodeSet::HIterator::operator* ( void ) {
+	M_PROLOG
+	return ( const_cast<HXml::xml_element_t>( _owner->_nodes[_iterator] ) );
+	M_EPILOG
 }
 
 char const* HXml::error_message( int code ) const {

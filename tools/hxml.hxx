@@ -323,7 +323,7 @@ public:
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
 	HXml::HNodeProxy operator* ( void );
-	HXml::HConstNodeProxy const operator* ( void ) const;
+	HXml::HConstNodeProxy operator* ( void ) const;
 private:
 	friend class HXml::HNodeProxy;
 	HIterator( HXml::HNodeProxy const*, HXml::tree_t::HNode::iterator const& );
@@ -359,7 +359,7 @@ public:
 	HConstIterator& operator = ( HConstIterator const& );
 	bool operator == ( HConstIterator const& ) const;
 	bool operator != ( HConstIterator const& ) const;
-	HXml::HConstNodeProxy const operator* ( void ) const;
+	HXml::HConstNodeProxy operator* ( void ) const;
 private:
 	friend class HXml::HConstNodeProxy;
 	HConstIterator( HXml::HConstNodeProxy const*, HXml::tree_t::HNode::const_iterator const& );
@@ -376,14 +376,28 @@ public:
 	virtual ~HConstNodeSet( void ) {}
 	HConstIterator begin( void ) const;
 	HConstIterator end( void ) const;
-	int long get_size( void ) const;
-	int long size( void ) const;
+	int get_size( void ) const;
+	int size( void ) const;
 	bool is_empty( void ) const;
 	bool empty( void ) const;
 	HConstNodeProxy operator[] ( int ) const;
 private:
 	HConstNodeSet( void );
 	void add( HXml::const_xml_element_t );
+	friend class HXml;
+};
+
+class HXml::HNodeSet : public HXml::HConstNodeSet {
+public:
+	typedef HXml::HNodeSet this_type;
+	typedef HXml::HConstNodeSet base_type;
+	class HIterator;
+	virtual ~HNodeSet( void ) {}
+	HIterator begin( void );
+	HIterator end( void );
+	HNodeProxy operator[] ( int );
+private:
+	HNodeSet( void );
 	friend class HXml;
 };
 
@@ -417,24 +431,11 @@ public:
 	HConstIterator& operator = ( HConstIterator const& );
 	bool operator == ( HConstIterator const& ) const;
 	bool operator != ( HConstIterator const& ) const;
-	HXml::HConstNodeProxy const operator* ( void ) const;
+	HXml::HConstNodeProxy operator* ( void ) const;
 private:
 	friend class HXml::HConstNodeSet;
+	friend class HXml::HNodeSet::HIterator;
 	HConstIterator( HXml::HConstNodeSet const*, int );
-};
-
-class HXml::HNodeSet : public HXml::HConstNodeSet {
-public:
-	typedef HXml::HNodeSet this_type;
-	typedef HXml::HConstNodeSet base_type;
-	class HIterator;
-	virtual ~HNodeSet( void ) {}
-	HIterator begin( void );
-	HIterator end( void );
-	HNodeProxy operator[] ( int );
-private:
-	HNodeSet( void );
-	friend class HXml;
 };
 
 class HXml::HNodeSet::HIterator : public HXml::HConstNodeSet::HConstIterator {
