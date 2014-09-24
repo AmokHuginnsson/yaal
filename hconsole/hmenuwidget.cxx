@@ -140,6 +140,12 @@ bool HMenuWidget::do_click( OMouse& mouse_ ) {
 	M_EPILOG
 }
 
+HMenuWidget::menu_model_ptr_t HMenuWidget::get_model( void ) {
+	M_PROLOG
+	return ( pointer_dynamic_cast<HAsIsValueTreeModel<HInfoItem> >( _model ) );
+	M_EPILOG
+}
+
 }
 
 }

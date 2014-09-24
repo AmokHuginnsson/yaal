@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hresource.hxx"
 #include "hcore/hfile.hxx"
+#include "hcore/foreach.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -40,8 +41,16 @@ namespace hconsole {
 
 HResource::HResource( HTUIProcess* tui_, yaal::hcore::HString const& path_ )
 	: _tui( tui_ ), _xml() {
-	_xml.load( make_pointer<HFile>( path_, HFile::OPEN::READING ) );
+	_xml.load( make_pointer<HFile>( path_, HFile::OPEN::READING ), HXml::PARSER::STRIP_COMMENT );
 	return;
+}
+
+void HResource::load( void ) {
+	M_PROLOG
+	YAAL_FOREACH( HXml::HConstNodeProxy const& n, const_cast<HXml const&>( _xml ).get_root() ) {
+	}
+	return;
+	M_EPILOG
 }
 
 }

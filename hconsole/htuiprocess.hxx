@@ -40,6 +40,7 @@ namespace yaal {
 namespace hconsole {
 
 class HWindow;
+class HMainWindow;
 
 /*! \brief A backbone of TUI based application.
  */
@@ -72,6 +73,7 @@ public:
 	void close_window( void );
 	void flush_call_queue( void );
 	void add_window( window_t );
+	HMainWindow* main_window( void );
 protected:
 	void process_stdin( int );
 	void process_mouse( int );

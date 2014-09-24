@@ -49,6 +49,7 @@ private:
 	yaal::tools::HXml _xml;
 public:
 	HResource( HTUIProcess*, yaal::hcore::HString const& );
+	void load( void );
 private:
 	HResource( HResource const& );
 	HResource& operator = ( HResource const& );

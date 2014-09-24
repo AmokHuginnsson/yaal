@@ -408,6 +408,15 @@ void HTUIProcess::repaint( bool force_ ) {
 	M_EPILOG
 }
 
+HMainWindow* HTUIProcess::main_window( void ) {
+	M_PROLOG
+	M_ASSERT( ( _foregroundWindow != model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
+	HMainWindow* mainWindow( dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) ) );
+	M_ASSERT( mainWindow );
+	return ( mainWindow );
+	M_EPILOG
+}
+
 }
 
 }

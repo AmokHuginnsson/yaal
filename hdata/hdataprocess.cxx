@@ -78,14 +78,13 @@ void HDataProcess::init_xrc( char const* processName_,
 		char const* resource_, menu_handlers_map_t const & handlers_ ) {
 	M_PROLOG
 	HTUIProcess::init_tui( processName_ );
-	HMainWindow* mainWindow = NULL;
 	if ( dbwrapper::_dBDrivers_.is_empty() )
 		M_THROW( "no database driver loaded", errno );
 	_resource.load( make_pointer<HFile>( resource_, HFile::OPEN::READING ), HXml::PARSER::STRIP_COMMENT );
 	HXml::HNodeProxy const node = _resource.get_element_by_path( "/resource/menu" );
 	_rootMenu = build_sub_menu( node, handlers_ );
 	M_ASSERT( ( _foregroundWindow != HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
-	mainWindow = dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) );
+	HMainWindow* mainWindow( dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) ) );
 	M_ASSERT( mainWindow );
 	mainWindow->init_menu( this, _rootMenu );
 	mainWindow->paint();
