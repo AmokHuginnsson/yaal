@@ -1293,6 +1293,20 @@ HXml::HConstNodeProxy HXml::HConstNodeSet::HConstIterator::operator* ( void ) co
 	M_EPILOG
 }
 
+bool HXml::HConstNodeSet::HConstIterator::operator != ( HXml::HConstNodeSet::HConstIterator const& other ) const {
+	M_PROLOG
+	M_ASSERT( _owner == other._owner );
+	return ( _iterator != other._iterator );
+	M_EPILOG
+}
+
+bool HXml::HConstNodeSet::HConstIterator::operator == ( HXml::HConstNodeSet::HConstIterator const& other ) const {
+	M_PROLOG
+	M_ASSERT( _owner == other._owner );
+	return ( _iterator == other._iterator );
+	M_EPILOG
+}
+
 HXml::HNodeSet::HNodeSet( void )
 	: HConstNodeSet() {
 	return;
