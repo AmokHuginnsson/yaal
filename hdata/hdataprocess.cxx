@@ -81,8 +81,8 @@ void HDataProcess::init_xrc( char const* processName_,
 	if ( dbwrapper::_dBDrivers_.is_empty() )
 		M_THROW( "no database driver loaded", errno );
 	_resource.load( make_pointer<HFile>( resource_, HFile::OPEN::READING ), HXml::PARSER::STRIP_COMMENT );
-	HXml::HNodeProxy const node = _resource.get_element_by_path( "/resource/menu" );
-	_rootMenu = build_sub_menu( node, handlers_ );
+	HXml::HConstNodeSet nodeSet = _resource.get_elements_by_path( "/resource/menu" );
+	_rootMenu = build_sub_menu( nodeSet[0], handlers_ );
 	M_ASSERT( ( _foregroundWindow != HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
 	HMainWindow* mainWindow( dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) ) );
 	M_ASSERT( mainWindow );

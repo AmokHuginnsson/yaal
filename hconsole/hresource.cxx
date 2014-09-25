@@ -47,8 +47,6 @@ HResource::HResource( HTUIProcess* tui_, yaal::hcore::HString const& path_ )
 
 void HResource::load( void ) {
 	M_PROLOG
-	YAAL_FOREACH( HXml::HConstNodeProxy const& n, const_cast<HXml const&>( _xml ).get_root() ) {
-	}
 	return;
 	M_EPILOG
 }

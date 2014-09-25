@@ -41,6 +41,7 @@ Copyright:
 #include "hcore/hresource.hxx"
 #include "hcore/hhashmap.hxx"
 #include "hcore/hstreaminterface.hxx"
+#include "hcore/htokenizer.hxx"
 #include "tools/hoptional.hxx"
 
 namespace yaal {
@@ -112,10 +113,10 @@ public:
 	void save( yaal::hcore::HStreamInterface::ptr_t, bool = false ) const;
 	void create_root( yaal::hcore::HString const&, yaal::hcore::HString const& = yaal::hcore::HString() );
 	void clear( void );
+	HConstNodeProxy get_element_by_id( yaal::hcore::HString const& ) const;
 	HNodeProxy get_element_by_id( yaal::hcore::HString const& );
-	HConstNodeProxy const get_element_by_id( yaal::hcore::HString const& ) const;
-	HNodeProxy get_element_by_path( yaal::hcore::HString const& );
-	HConstNodeProxy const get_element_by_path( yaal::hcore::HString const& ) const;
+	HConstNodeSet get_elements_by_path( yaal::hcore::HString const& ) const;
+	HNodeSet get_elements_by_path( yaal::hcore::HString const& );
 	HConstNodeSet get_elements_by_name( yaal::hcore::HString const& ) const;
 	HNodeSet get_elements_by_name( yaal::hcore::HString const& );
 	const_entity_iterator entity_begin( void ) const;
@@ -131,7 +132,7 @@ private:
 	yaal::hcore::HString const& convert( yaal::hcore::HString const&, way_t = TO_INTERNAL ) const;
 	int get_node_set_by_path( yaal::hcore::HString const& );
 	const_xml_element_t get_element_by_id( const_xml_element_t const&, yaal::hcore::HString const& ) const;
-	const_xml_element_t get_element_by_path( const_xml_element_t const&, yaal::hcore::HString const&, int ) const;
+	void get_elements_by_path( HConstNodeSet&, const_xml_element_t, yaal::hcore::HTokenizer const&, yaal::hcore::HTokenizer::iterator ) const;
 	void get_elements_by_name( HConstNodeSet&, const_xml_element_t, yaal::hcore::HString const& ) const;
 	void parse_dtd( void* );
 	char const* error_message( int ) const;
