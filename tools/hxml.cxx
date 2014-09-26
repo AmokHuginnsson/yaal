@@ -1287,6 +1287,19 @@ HXml::HConstNodeSet::HConstIterator::HConstIterator( HXml::HConstNodeSet const* 
 	return;
 }
 
+HXml::HConstNodeSet::HConstIterator::HConstIterator( HXml::HConstNodeSet::HConstIterator const& it_ )
+	: _owner( it_._owner ), _iterator( it_._iterator ) {
+	return;
+}
+
+HXml::HConstNodeSet::HConstIterator& HXml::HConstNodeSet::HConstIterator::operator = ( HXml::HConstNodeSet::HConstIterator const& it_ ) {
+	if ( &it_ != this ) {
+		_owner = it_._owner;
+		_iterator = it_._iterator;
+	}
+	return ( *this );
+}
+
 HXml::HConstNodeProxy HXml::HConstNodeSet::HConstIterator::operator* ( void ) const {
 	M_PROLOG
 	return ( _owner->_nodes[_iterator] );
