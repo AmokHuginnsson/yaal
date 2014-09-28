@@ -79,7 +79,10 @@ private:
 	typedef HPointer<call_t> call_ptr_t;
 	call_ptr_t _call;
 public:
-	HBoundCall( void ) : _call() {}
+	HBoundCall( void )
+		: _call() {
+		return;
+	}
 	template<int free_args_count, typename return_t, typename CALL_type,
 		typename b0_t, typename b1_t,
 		typename b2_t, typename b3_t,
@@ -87,9 +90,11 @@ public:
 		typename b6_t, typename b7_t,
 		typename b8_t, typename b9_t,
 		typename b10_t>
-	HBoundCall( HCall<free_args_count, return_t, CALL_type, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& call_ )
-	 : _call( make_pointer<HCall<free_args_count, return_t, CALL_type, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >( call_ ) )
-		{ }
+	HBoundCall( HCall<free_args_count, return_t, CALL_type, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& boundCall_ )
+		: _call( make_pointer<HCall<free_args_count, return_t, CALL_type,
+				 b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >( boundCall_ ) ) {
+		return;
+	}
 	result_type operator()( void ) const
 		{ return ( (*_call)() ); }
 	result_type operator()( void )
@@ -165,7 +170,18 @@ public:
 	}
 	bool operator ! ( void ) const
 		{ return ( ! _call ); }
+	void swap( HBoundCall& boundCall_ ) {
+		if ( &boundCall_ != this ) {
+			using yaal::swap;
+			swap( boundCall_._call, _call );
+		}
+		return;
+	}
 };
+
+template<typename signature_t>
+inline void swap( HBoundCall<signature_t>& a, HBoundCall<signature_t>& b )
+	{ a.swap( b ); }
 
 }
 
