@@ -258,6 +258,7 @@ public:
 private:
 	HMutex _mutex;
 	HCondition _condition;
+	bool _signaled;
 public:
 	HEvent( void );
 	~HEvent( void );

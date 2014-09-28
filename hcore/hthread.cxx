@@ -548,7 +548,7 @@ void HCondition::broadcast( void ) {
 }
 
 HEvent::HEvent( void )
-	: _mutex(), _condition( _mutex ) {
+	: _mutex(), _condition( _mutex ), _signaled( false ) {
 	M_PROLOG
 	_mutex.lock();
 	return;
@@ -565,7 +565,10 @@ HEvent::~HEvent( void ) {
 void HEvent::wait( void ) {
 	M_PROLOG
 	M_ASSERT( _mutex.is_owned() );
-	_condition.wait( 0x1fffffff, 0 ); /* FreeBSD strange limit. */
+	while ( ! _signaled ) {
+		_condition.wait( 0x1fffffff, 0 ); /* FreeBSD strange limit. */
+	}
+	_signaled = false;
 	return;
 	M_EPILOG
 }
@@ -573,6 +576,7 @@ void HEvent::wait( void ) {
 void HEvent::signal( void ) {
 	M_PROLOG
 	HLock l( _mutex );
+	_signaled = true;
 	_condition.signal();
 	return;
 	M_EPILOG
