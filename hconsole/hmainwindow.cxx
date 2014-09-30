@@ -72,14 +72,8 @@ void HMainWindow::do_init( void ) {
 			_foregroundWindow );
 	windowList->add_column( -1, "&Okno", 1 );
 	windowList->enable( true );
+	_menu->init( _tuiProcess );
 	_widgets.select( _menu );
-	return;
-	M_EPILOG
-}
-
-void HMainWindow::init_menu( HTUIProcess* process_, OMenuItem* menu_ ) {
-	M_PROLOG
-	_menu->init( process_, menu_ );
 	return;
 	M_EPILOG
 }
@@ -88,6 +82,12 @@ bool HMainWindow::handler_close( HEvent const& ) {
 	M_PROLOG
 	_tuiProcess->schedule_call( call( &HTUIProcess::quit, _tuiProcess ) );
 	return ( true );
+	M_EPILOG
+}
+
+void HMainWindow::set_menu( HMenuWidget::data_ptr_t menu_ ) {
+	M_PROLOG
+	return ( _menu->set_data( menu_ ) );
 	M_EPILOG
 }
 

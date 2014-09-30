@@ -52,21 +52,15 @@ static int const MENU_HANDLERS_MAP_SIZE = 32;
 
 HDataProcess::HDataProcess( void )
 	: HTUIProcess(), _dataBase( HDataBase::get_connector() ),
-	_autoHandlers( MENU_HANDLERS_MAP_SIZE ),
 	_resource(), _resourceCache(), _columnCache(),
-	_editCache(), _listCache(), _rootMenu( NULL ) {
+	_editCache(), _listCache() {
 	M_PROLOG
-	menu_handlers_map_t& handlers = _autoHandlers;
-	M_REGISTER_MENU_HANDLER( create_window );
 	return;
 	M_EPILOG
 }
 
 HDataProcess::~HDataProcess( void ) {
 	M_PROLOG
-	if ( _rootMenu )
-		destroy_menu( _rootMenu );
-	_rootMenu = NULL;
 #ifdef __DEBUGGER_BABUNI__
 	log_trace << "destruction success" << endl;
 #endif /* __DEBUGGER_BABUNI__ */
@@ -75,106 +69,16 @@ HDataProcess::~HDataProcess( void ) {
 }
 
 void HDataProcess::init_xrc( char const* processName_,
-		char const* resource_, menu_handlers_map_t const & handlers_ ) {
+		char const* resource_ ) {
 	M_PROLOG
 	HTUIProcess::init_tui( processName_ );
 	if ( dbwrapper::_dBDrivers_.is_empty() )
 		M_THROW( "no database driver loaded", errno );
 	_resource.load( make_pointer<HFile>( resource_, HFile::OPEN::READING ), HXml::PARSER::STRIP_COMMENT );
-	HXml::HConstNodeSet nodeSet = _resource.get_elements_by_path( "/resource/menu" );
-	_rootMenu = build_sub_menu( nodeSet[0], handlers_ );
 	M_ASSERT( ( _foregroundWindow != HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
 	HMainWindow* mainWindow( dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) ) );
 	M_ASSERT( mainWindow );
-	mainWindow->init_menu( this, _rootMenu );
 	mainWindow->paint();
-	return;
-	M_EPILOG
-}
-
-OMenuItem* HDataProcess::build_sub_menu( HXml::HConstNodeProxy const& node_,
-		menu_handlers_map_t const& handlers_ ) {
-	M_PROLOG
-	char const* const error = _( "malformed resource file (menu section)" );
-	char const* const unexpected = _( ": unexpected node: " );
-	OMenuItem menuItem, * menu = NULL;
-	typedef HList<OMenuItem> menu_item_list_t;
-	menu_item_list_t subMenu;
-	if ( ! node_.child_count() )
-		M_THROW( HString( error ) + unexpected, errno );
-
-	if ( node_.get_name() == "menu" ) {
-		for ( HXml::HConstIterator it( node_.begin() ), end( node_.end() ); it != end; ++ it ) {
-			menuItem.reset();
-			build_menu_item( *it, menuItem, handlers_ );
-			subMenu.push_back( menuItem );
-		}
-	} else
-		M_THROW( HString( error ) + unexpected + node_.get_name()
-				+ '=' + node_.get_value(), errno );
-	menuItem.reset();
-	subMenu.push_back( menuItem );
-	menu = new ( memory::yaal ) OMenuItem[ subMenu.size() ];
-	int ctr = 0;
-	for ( menu_item_list_t::iterator it( subMenu.begin() ), end( subMenu.end() ); it != end; ++ it, ++ ctr )
-		menu[ ctr ] = *it;
-	return ( menu );
-	M_EPILOG
-}
-
-void HDataProcess::build_menu_item( HXml::HConstNodeProxy const& node_,
-		OMenuItem& menuItem_, menu_handlers_map_t const& handlers_ ) {
-	M_PROLOG
-	char const* const error = _( "malformed resource file (menu section)" );
-	char const* const unexpected = _( ": unexpected node: " );
-	if ( ! node_.has_childs() )
-		M_THROW ( HString ( error ) + unexpected, errno );
-
-	if ( node_.get_name() == "menu_item" ) {
-		for ( HXml::HConstIterator it( node_.begin() ), end( node_.end() ); it != end; ++ it ) {
-			HString const& name = (*it).get_name();
-			HXml::HConstIterator handlerIt = (*it).begin();
-			HString contents = ( ( handlerIt != (*it).end() ) && ( (*handlerIt).get_type() == HXml::HNode::TYPE::CONTENT ) ) ? (*(*it).begin()).get_value() : "";
-			if ( name == "label" )
-				menuItem_._label = contents;
-			else if ( name == "handler" ) {
-				HXml::HNode::properties_t const& props = (*it).properties();
-				HXml::HNode::properties_t::const_iterator nameIt = props.find( "name" );
-				if ( nameIt != props.end() )
-					contents = nameIt->second;
-				menu_handlers_map_t::const_iterator handle( handlers_.find( contents ) );
-				if ( handle == handlers_.end() ) {
-					handle = _autoHandlers.find( contents );
-					if ( handle == _autoHandlers.end() )
-						M_THROW( HString( _( "no such handler: " ) ) + contents, errno );
-				}
-				menuItem_.HANDLER = handle->second;
-				HXml::HNode::properties_t::const_iterator paramIt = props.find( "param" );
-				if ( paramIt != props.end() )
-					menuItem_._param = const_cast<HString*>( &paramIt->second );
-			} else if ( name == "menu" )
-				menuItem_._subMenu = build_sub_menu( *it, handlers_ );
-			else
-				M_THROW( HString( error ) + unexpected + name
-						+ '=' + contents, errno );
-		}
-	} else
-		M_THROW( HString( error ) + unexpected + node_.get_name()
-				+ '=' + node_.get_value(), errno );
-	return;
-	M_EPILOG
-}
-
-void HDataProcess::destroy_menu( OMenuItem* menu_ ) {
-	M_PROLOG
-	int ctr = 0;
-	M_ASSERT( menu_ );
-	while ( ! menu_[ ctr ]._label.is_empty() ) {
-		if ( menu_[ ctr ]._subMenu )
-			destroy_menu( menu_ [ ctr ]._subMenu );
-		ctr ++;
-	}
-	M_SAFE( delete [] menu_ );
 	return;
 	M_EPILOG
 }

@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/hexception.hxx"
 #include "hcore/hpointer.hxx"
 #include "tools/hxml.hxx"
+#include "hconsole/hmenuwidget.hxx"
 
 namespace yaal {
 
@@ -51,6 +52,9 @@ public:
 	HResource( HTUIProcess*, yaal::hcore::HString const& );
 	void load( void );
 private:
+	void build_sub_menu( yaal::tools::HXml::HConstNodeProxy const&, HMenuWidget::data_t::node_t );
+	void build_menu_item( yaal::tools::HXml::HConstNodeProxy const&, HMenuWidget::data_t::node_t );
+	void create_window( yaal::hcore::HString const& );
 	HResource( HResource const& );
 	HResource& operator = ( HResource const& );
 };

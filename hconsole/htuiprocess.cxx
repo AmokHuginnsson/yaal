@@ -91,12 +91,13 @@ void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::p
 	}
 	if ( !! mainWindow_ ) {
 		mainWindow = mainWindow_;
-	} else /* Create automatically default main window. */ {
+	} else { /* Create automatically default main window. */
 		mainWindow = make_pointer<HMainWindow>( processName_, _windows, ref( _foregroundWindow ) );
 		register_postprocess_handler( KEY<'\t'>::meta, NULL, call( &HTUIProcess::handler_jump_meta_tab, this, _1 ) );
 		register_postprocess_handler( KEY<'q'>::command, NULL, call( &HTUIProcess::handler_close_window, this, _1 ) );
-		for ( int ctr( 0 ); ctr < ALTS_COUNT; ++ ctr )
+		for ( int ctr( 0 ); ctr < ALTS_COUNT; ++ ctr ) {
 			alts[ ctr ] = KEY<>::meta_r( '0' + ctr );
+		}
 		register_postprocess_handler( ALTS_COUNT, alts, call( &HTUIProcess::handler_jump_meta_direct, this, _1 ) );
 	}
 	_mainWindow = mainWindow;
@@ -121,6 +122,7 @@ void HTUIProcess::do_init_xrc( yaal::hcore::HString const& name_, yaal::hcore::H
 	M_PROLOG
 	_resource = make_pointer<HResource>( this, path_ );
 	init_tui( name_ );
+	_resource->load();
 	return;
 	M_EPILOG
 }

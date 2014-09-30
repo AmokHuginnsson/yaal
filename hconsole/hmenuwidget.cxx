@@ -39,24 +39,6 @@ namespace yaal {
 
 namespace hconsole {
 
-int HMenuWidget::load_sub_menu( menu_model_t::data_t::node_t node, OMenuItem* subMenu_ ) {
-	M_PROLOG
-	int ctr = 0;
-	HString str;
-	while ( ! subMenu_[ ctr ]._label.is_empty() ) {
-		HInfoItem info( 1 );
-		info[ 0 ].set_string( subMenu_ [ ctr ]._label );
-		info[ 0 ].set_pointer( static_cast<void*>( &subMenu_[ ctr ] ) );
-		menu_model_t::data_t::HNode::iterator it = node->add_node( info );
-		if ( subMenu_[ ctr ]._subMenu ) {
-			load_sub_menu( &*it, subMenu_[ ctr ]._subMenu );
-		}
-		++ ctr;
-	}
-	return ( ctr );
-	M_EPILOG
-}
-
 HMenuWidget::HMenuWidget( HWindow* parent_,
 		int row_, int column_, int height_, int width_,
 		yaal::hcore::HString const& label_ )
@@ -76,34 +58,21 @@ HMenuWidget::~HMenuWidget ( void ) {
 	M_EPILOG
 }
 
-void HMenuWidget::init( HTUIProcess* process_, OMenuItem* menu_ ) {
+void HMenuWidget::init( HTUIProcess* process_ ) {
 	M_PROLOG
-	if ( _view.get_root() && menu_ ) {
+	M_ASSERT( process_ );
+	if ( _view.get_root() ) {
 		M_THROW( "menu already initialised", errno );
 	}
-	if ( ! process_ || ! ( _view.get_root() || menu_ ) ) {
-		M_THROW( "process cannot run without core data ( process, menu )",
-				errno );
-	}
 	_process = process_;
-	menu_model_t::data_t::node_t node( NULL );
-	if ( ! _view.get_root() ) {
-		node = static_cast<menu_model_t*>( _model.get() )->get_data()->create_new_root();
-		load_sub_menu( node, menu_ );
-		on_model_changed();
-	}
-	if ( ! _selected && node->has_childs() ) {
-		_selected = &*_view.get_root()->begin();
-	}
-	schedule_repaint();
 	return;
 	M_EPILOG
 }
 
-OMenuItem* HMenuWidget::get_selected( void ) {
+OMenuItem const* HMenuWidget::get_selected( void ) {
 	M_PROLOG
 	menu_model_t::HAsIsValueTreeModelNode* node( static_cast<menu_model_t::HAsIsValueTreeModelNode*>( (**_selected).data().get() ) );
-	OMenuItem* menu( static_cast<OMenuItem*>( node->get()[0].get_pointer() ) );
+	OMenuItem const* menu( &node->get() );
 	return ( menu );
 	M_EPILOG
 }
@@ -115,9 +84,9 @@ int HMenuWidget::do_process_input( int code_ ) {
 	}
 	code_ = HTreeWidget::do_process_input ( code_ );
 	if ( ( code_ == '\r' ) || ( code_ == ' ' ) ) {
-		OMenuItem* menu( get_selected() );
-		if ( menu->HANDLER ) {
-			menu->call( _process );
+		OMenuItem const* menu( get_selected() );
+		if ( !! menu->_call ) {
+			menu->_call();
 		}
 		code_ = 0;
 	}
@@ -131,18 +100,28 @@ bool HMenuWidget::do_click( OMouse& mouse_ ) {
 	bool unfolded( (**_selected).is_unfolded() );
 	bool handled( HTreeWidget::do_click( mouse_ ) );
 	if ( handled && ( _selected == selected ) && ( (**_selected).is_unfolded() == unfolded ) ) {
-		OMenuItem* menu( get_selected() );
-		if ( menu->HANDLER ) {
-			menu->call( _process );
+		OMenuItem const* menu( get_selected() );
+		if ( !! menu->_call ) {
+			menu->_call();
 		}
 	}
 	return ( handled );
 	M_EPILOG
 }
 
-HMenuWidget::menu_model_ptr_t HMenuWidget::get_model( void ) {
+void HMenuWidget::set_data( HMenuWidget::data_ptr_t data_ ) {
 	M_PROLOG
-	return ( pointer_dynamic_cast<HAsIsValueTreeModel<HInfoItem> >( _model ) );
+	_model = make_pointer<HAsIsValueTreeModel<OMenuItem> >( data_ );
+	menu_model_t::data_t::node_t node( NULL );
+	if ( ! _view.get_root() ) {
+		node = static_cast<menu_model_t*>( _model.get() )->get_data()->create_new_root();
+		on_model_changed();
+	}
+	if ( ! _selected && node->has_childs() ) {
+		_selected = &*_view.get_root()->begin();
+	}
+	schedule_repaint();
+	return;
 	M_EPILOG
 }
 

@@ -374,7 +374,7 @@ public:
  *
  * \return Current label text.
  */
-yaal::hcore::HString const& get_label( void ) const;
+	yaal::hcore::HString const& get_label( void ) const;
 
 protected:
 	void set_attr_label( void ) const;

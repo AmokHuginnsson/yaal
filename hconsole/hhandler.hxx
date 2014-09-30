@@ -51,9 +51,11 @@ protected:
 public:
 	HHandler( int = 32, int = 32 );
 	virtual ~HHandler( void );
+	void execute_command( yaal::hcore::HString const& );
 protected:
 	bool process_input_with_handlers( HKeyPressEvent const&, const process_handler_key_map_t& );
 	hcore::HString process_command( void );
+	bool process_command( yaal::hcore::HString const& );
 	int register_preprocess_handler( int, int const*, HANDLER_t );
 	int register_postprocess_handler( int, int const*, HANDLER_t );
 };

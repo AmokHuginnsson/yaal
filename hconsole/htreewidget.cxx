@@ -30,6 +30,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "htreewidget.hxx"
+#include "hwindow.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole::mouse;

@@ -37,24 +37,14 @@ namespace yaal {
 namespace hconsole {
 
 OMenuItem::OMenuItem( void )
-	: _subMenu( NULL ), HANDLER( NULL ), _param( NULL ), _label() {
-	M_PROLOG
-	return;
-	M_EPILOG
-}
-
-OMenuItem::OMenuItem( OMenuItem* const menuItem_, HANDLER_t const handler,
-		void* param_, HString const& label_ )
-	: _subMenu( menuItem_ ), HANDLER( handler ),
-	_param( param_ ), _label ( label_ ) {
+	: _call(), _label() {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 OMenuItem::OMenuItem( OMenuItem const& menuItem_ )
-	: _subMenu( menuItem_._subMenu ), HANDLER( menuItem_.HANDLER ),
-	_param( menuItem_._param ), _label( menuItem_._label ) {
+	: _call( menuItem_._call ), _label( menuItem_._label ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -72,17 +62,15 @@ OMenuItem& OMenuItem::operator = ( OMenuItem const& menuItem_ ) {
 
 void OMenuItem::reset( void ) {
 	M_PROLOG
-	_subMenu = NULL;
-	HANDLER = NULL;
-	_param = NULL;
+	_call.reset();
 	_label = "";
 	return;
 	M_EPILOG
 }
 
-void OMenuItem::call( HTUIProcess* proc ) {
+void OMenuItem::call( void ) {
 	M_PROLOG
-	static_cast<void>( ( proc->*( HANDLER ) )( _param ) );
+	_call();
 	return;
 	M_EPILOG
 }
@@ -91,13 +79,37 @@ void OMenuItem::swap( OMenuItem& other ) {
 	M_PROLOG
 	if ( &other != this ) {
 		using yaal::swap;
-		swap( _subMenu, other._subMenu );
-		swap( HANDLER, other.HANDLER );
-		swap( _param, other._param );
+		swap( _call, other._call );
 		swap( _label, other._label );
 	}
 	return;
 	M_EPILOG
+}
+
+yaal::hcore::HString const& OMenuItem::get_string( void ) const {
+	return ( _label );
+}
+
+int long OMenuItem::get_int_long( void ) const {
+	M_ASSERT( 0 && "invalid call" );
+#ifdef NDEBUG
+	return ( 0 );
+#endif /* #ifdef NDEBUG */
+}
+
+double OMenuItem::get_double( void ) const {
+	M_ASSERT( 0 && "invalid call" );
+#ifdef NDEBUG
+	return ( 0 );
+#endif /* #ifdef NDEBUG */
+}
+
+yaal::hcore::HTime const& OMenuItem::get_time( void ) const {
+	M_ASSERT( 0 && "invalid call" );
+#ifdef NDEBUG
+	static HTime t;
+	return ( t );
+#endif /* #ifdef NDEBUG */
 }
 
 }

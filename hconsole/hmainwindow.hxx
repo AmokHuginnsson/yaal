@@ -55,7 +55,7 @@ private:
 public:
 	HMainWindow( yaal::hcore::HString const&, HTUIProcess::model_ptr_t, HTUIProcess::model_t::cyclic_iterator& );
 	virtual ~HMainWindow( void );
-	void init_menu( HTUIProcess*, OMenuItem* );
+	void set_menu( HMenuWidget::data_ptr_t );
 protected:
 	virtual void do_init( void );
 	bool handler_close( HEvent const& ); /* closes window process */

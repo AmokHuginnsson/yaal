@@ -28,12 +28,14 @@ Copyright:
 #define YAAL_HCONSOLE_HTREEWIDGET_HXX_INCLUDED 1
 
 #include "hcore/htree.hxx"
-#include "hconsole/hitem.hxx"
-#include "hconsole/hwindow.hxx"
+#include "hconsole/hwidget.hxx"
+#include "hconsole/hinfo.hxx"
 
 namespace yaal {
 
 namespace hconsole {
+
+class HWindow;
 
 class HTreeWidgetModelListener {
 public:
@@ -124,7 +126,7 @@ protected:
 	virtual HAbstractTreeModelNode::ptr_t do_get_root( void ) const = 0;
 };
 
-template<typename T = HInfoItem>
+template<typename T = HInfoMultiVal>
 class HAsIsValueTreeModel : public HAbstractTreeModel {
 public:
 	typedef HAsIsValueTreeModel this_type;
@@ -150,7 +152,7 @@ public:
 		}
 		virtual bool do_is_valid( void ) const {
 			M_PROLOG
-			return ( ( _node != NULL ) && ( (**_node).get_value_count() > 0 ) );
+			return ( _node != NULL );
 			M_EPILOG
 		}
 		virtual int do_get_child_count( void ) const {
@@ -172,22 +174,22 @@ public:
 		}
 		yaal::hcore::HString do_get_long( void ) const {
 			M_PROLOG
-			return ( (**_node)[0].get_int_long() );
+			return ( (**_node).get_int_long() );
 			M_EPILOG
 		}
 		yaal::hcore::HString do_get_double( void ) const {
 			M_PROLOG
-			return ( (**_node)[0].get_double() );
+			return ( (**_node).get_double() );
 			M_EPILOG
 		}
 		yaal::hcore::HString do_get_string( void ) const {
 			M_PROLOG
-			return ( (**_node)[0].get_string() );
+			return ( (**_node).get_string() );
 			M_EPILOG
 		}
 		yaal::hcore::HString do_get_time( void ) const {
 			M_PROLOG
-			return ( (**_node)[0].get_time().string() );
+			return ( (**_node).get_time().string() );
 			M_EPILOG
 		}
 	private:

@@ -92,13 +92,29 @@ HString HHandler::process_command( void ) {
 	HString command;
 	if ( ! _command.is_empty() ) {
 		command = HTokenizer( _command, " \t", HTokenizer::DELIMITED_BY_ANY_OF )[ 0 ];
-		process_handler_command_map_t::iterator it( _commandHandlers.find( command ) );
-		if ( it != _commandHandlers.end() ) {
-			it->second( HCommandEvent( _command ) );
+		if ( process_command( command ) ) {
 			_command = "";
 		}
 	}
 	return ( _command );
+	M_EPILOG
+}
+
+bool HHandler::process_command( yaal::hcore::HString const& command_ ) {
+	M_PROLOG
+	bool found( false );
+	process_handler_command_map_t::iterator it( _commandHandlers.find( command_ ) );
+	if ( it != _commandHandlers.end() ) {
+		found = true;
+		it->second( HCommandEvent( command_ ) );
+	}
+	return ( found );
+	M_EPILOG
+}
+
+void HHandler::execute_command( yaal::hcore::HString const& command_ ) {
+	M_PROLOG
+	process_command( command_ );
 	M_EPILOG
 }
 

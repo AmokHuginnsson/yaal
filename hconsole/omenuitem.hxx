@@ -27,29 +27,34 @@ Copyright:
 #ifndef YAAL_HCONSOLE_OMENUITEM_HXX_INCLUDED
 #define YAAL_HCONSOLE_OMENUITEM_HXX_INCLUDED 1
 
-#include "hconsole/htuiprocess.hxx"
+#include "hcore/hboundcall.hxx"
+#include "hcore/hstring.hxx"
+#include "hcore/htime.hxx"
 
 namespace yaal {
 
 namespace hconsole {
 
+class HTUIProcess;
+
 /*! \brief TUI menu node.
  */
 struct OMenuItem {
 public: /* All is public for simpler usage. */
-	typedef int ( HTUIProcess::* HANDLER_t )( void* );
-	OMenuItem* _subMenu;
-	HANDLER_t HANDLER;
-	void* _param;
+	typedef yaal::hcore::HBoundCall<> call_t;
+	call_t _call;
 	yaal::hcore::HString _label;
 /* Methods */
 	OMenuItem( void );
-	OMenuItem( OMenuItem* const, HANDLER_t const, void*, yaal::hcore::HString const& );
 	OMenuItem( OMenuItem const& );
 	OMenuItem& operator = ( OMenuItem const& );
 	void reset( void );
-	void call( HTUIProcess* );
+	void call( void );
 	void swap( OMenuItem& );
+	yaal::hcore::HString const& get_string( void ) const;
+	int long get_int_long( void ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
+	double get_double( void ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
+	yaal::hcore::HTime const& get_time( void ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
 
 inline void swap( yaal::hconsole::OMenuItem& a, yaal::hconsole::OMenuItem& b )
