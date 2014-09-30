@@ -107,7 +107,7 @@ double OMenuItem::get_double( void ) const {
 yaal::hcore::HTime const& OMenuItem::get_time( void ) const {
 	M_ASSERT( 0 && "invalid call" );
 #ifdef NDEBUG
-	static HTime t;
+	static HTime t( HTime::LOCAL );
 	return ( t );
 #endif /* #ifdef NDEBUG */
 }
