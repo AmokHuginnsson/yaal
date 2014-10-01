@@ -273,21 +273,29 @@ void HWindow::schedule_call( HTUIProcess::call_t call_ ) {
 class HWindowCreator : public HWindowCreatorInterface {
 protected:
 	virtual HWindow::ptr_t do_new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
+	void create_widgets( HWindow::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 HWindow::ptr_t HWindowCreator::do_new_instance( HTUIProcess* tui_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HString name( xml::attr_val( node_, "title" ) );
 	HWindow::ptr_t window( make_pointer<HWindow>( name ) );
+	create_widgets( window, node_ );
+	tui_->add_window( window );
+	return ( window );
+	M_EPILOG
+}
+
+void HWindowCreator::create_widgets( HWindow::ptr_t window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
 	HWidgetFactory& wf( HWidgetFactory::get_instance() );
 	YAAL_FOREACH( yaal::tools::HXml::HConstNodeProxy const& n, node_ ) {
 		HString type( xml::node_val( n ) );
 		if ( wf.is_type_valid( type ) ) {
-			wf.create_widget( window.raw(), n );
+			wf.create_widget( window_.raw(), n );
 		}
 	}
-	tui_->add_window( window );
-	return ( window );
+	return;
 	M_EPILOG
 }
 

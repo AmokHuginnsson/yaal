@@ -53,12 +53,12 @@ void HWindowFactory::register_window_creator( HString const& name_, HWindowCreat
 
 HWindow::ptr_t HWindowFactory::create_window( HTUIProcess* tuiProcess_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	HWindow::ptr_t widget;
+	HWindow::ptr_t window;
 	creators_t::iterator it( _creators.find( node_.get_name() ) );
 	if ( it != _creators.end() ) {
-		widget = it->second->new_instance( tuiProcess_, node_ );
+		window = it->second->new_instance( tuiProcess_, node_ );
 	}
-	return ( widget );
+	return ( window );
 	M_EPILOG
 }
 

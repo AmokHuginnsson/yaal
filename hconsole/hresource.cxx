@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hfile.hxx"
 #include "hcore/foreach.hxx"
 #include "hconsole/hmainwindow.hxx"
+#include "hconsole/hwindowfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -129,8 +130,14 @@ void HResource::build_menu_item( HXml::HConstNodeProxy const& xmlNode_,
 	M_EPILOG
 }
 
-void HResource::create_window( yaal::hcore::HString const& ) {
+void HResource::create_window( yaal::hcore::HString const& id_ ) {
 	M_PROLOG
+	HXml::HConstNodeProxy xmlWin( _xml.get_element_by_id( id_ ) );
+	if ( ! xmlWin ) {
+		M_THROW( _( "cannot find resources for this window: " ) + id_, errno );
+	}
+	HWindow::ptr_t win( HWindowFactory::get_instance().create_window( _tui, xmlWin ) );
+	_tui->add_window( win );
 	return;
 	M_EPILOG
 }
