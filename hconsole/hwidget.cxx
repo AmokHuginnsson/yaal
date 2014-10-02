@@ -466,6 +466,10 @@ yaal::hcore::HString const& HWidget::get_label( void ) const {
 	return ( _label );
 }
 
+HWindow* HWidget::get_window( void ) const {
+	return ( _window );
+}
+
 void HWidgetAttributesInterface::apply( HWidget& widget_ ) const {
 	M_PROLOG
 	do_apply( widget_ );

@@ -1280,28 +1280,33 @@ bool HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools
 		int placement( lexical_cast<int>( xml::attr_val( node_, "placement" ) ) );
 		HString columnName( xml::attr_val( node_, "name" ) );
 		int width( lexical_cast<int>( xml::attr_val( node_, "width" ) ) );
-		HXml::HNode::properties_t const& col( node_.properties() );
-		HXml::HNode::properties_t::const_iterator alignIt( col.find( "align" ) );
-		HXml::HNode::properties_t::const_iterator colTypeIt( col.find( "type" ) );
-		M_ENSURE( ( alignIt != col.end() ) && ( colTypeIt != col.end() ) );
+		HString xmlAlign( xml::attr_val( node_, "align" ) );
+		HString xmlType( xml::attr_val( node_, "type" ) );
 		HWidget::BITS::ALIGN::align_t align( HWidget::BITS::ALIGN::LEFT );
-		if ( alignIt->second == "left" ) {
+		if ( xmlAlign == "left" ) {
 			align = HWidget::BITS::ALIGN::LEFT;
-		} else if ( alignIt->second == "center" ) {
+		} else if ( xmlAlign == "center" ) {
 			align = HWidget::BITS::ALIGN::CENTER;
-		} else if ( alignIt->second == "right" ) {
+		} else if ( xmlAlign == "right" ) {
 			align = HWidget::BITS::ALIGN::RIGHT;
 		} else {
 			M_THROW( _( "unknown align type" ), node_.get_line() );
 		}
 		type_id_t type( TYPE::HSTRING );
-		if ( colTypeIt->second == "string" ) {
+		if ( xmlType == "string" ) {
 			type = TYPE::HSTRING;
 		} else {
 			M_THROW( _( "unknown column type" ), node_.get_line() );
 		}
+		xml::value_t refid( xml::try_attr_val( node_, "refid" ) );
+		HWidget::ptr_t field;
+		if ( !! refid ) {
+			HXml::HConstNodeProxy xmlField( node_.xml()->get_element_by_id( *refid ) );
+			M_ENSURE( !! xmlField );
+			field = HWidgetFactory::get_instance().create_widget( widget_->get_window(), xmlField );
+		}
 		HListWidget* list( dynamic_cast<HListWidget*>( widget_.raw() ) );
-		list->add_column( placement, columnName, width, align, type );
+		list->add_column( placement, columnName, width, align, type, field.raw() );
 		ok = true;
 	}
 	return ( ok );

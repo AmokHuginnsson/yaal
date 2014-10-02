@@ -53,7 +53,6 @@ HDataEditWidget::HDataEditWidget( HDataWindow * parent_,
 int HDataEditWidget::do_process_input ( int code_ ) {
 	M_PROLOG
 	bool noChange = false;
-	HDataWindow * window = NULL;
 	switch ( code_ ) {
 		case ( '\t' ):
 		case ( '\r' ):
@@ -88,9 +87,9 @@ int HDataEditWidget::do_process_input ( int code_ ) {
 	}
 	code_ = HEditWidget::do_process_input ( code_ );
 	if ( ! ( code_ || noChange ) ) {
-		window = dynamic_cast<HDataWindow*>( _window );
-		M_ASSERT ( window );
-		window->set_modified();
+		HDataWindow* win( dynamic_cast<HDataWindow*>( _window ) );
+		M_ASSERT ( win );
+		win->set_modified();
 	}
 	return ( code_ );
 	M_EPILOG

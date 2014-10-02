@@ -225,8 +225,7 @@ public:
 	const_iterator end() const;
 	const_reverse_iterator rbegin() const;
 	const_reverse_iterator rend() const;
-	const_iterator get_element_by_id( yaal::hcore::HString const& ) const;
-	const_iterator query( yaal::hcore::HString const& ) const;
+	HXml const* xml( void ) const;
 	HXml::HNode::TYPE::type_t get_type() const;
 	bool has_childs( void ) const;
 	int long child_count( void ) const;
@@ -264,10 +263,8 @@ public:
 	using HConstNodeProxy::rbegin;
 	reverse_iterator rend();
 	using HConstNodeProxy::rend;
-	iterator get_element_by_id( yaal::hcore::HString const& );
-	using HConstNodeProxy::get_element_by_id;
-	iterator query( yaal::hcore::HString const& );
-	using HConstNodeProxy::query;
+	HXml* xml( void );
+	using HConstNodeProxy::xml;
 	void set_name( yaal::hcore::HString const& );
 	void set_value( yaal::hcore::HString const& );
 	HXml::HNode::properties_t& properties( void );

@@ -49,11 +49,10 @@ HDataStatusBarWidget::HDataStatusBarWidget( HDataWindow* parent_,
 
 void HDataStatusBarWidget::do_draw_label ( void ) {
 	M_PROLOG
-	HDataWindow * window = NULL;
 	HStatusBarWidget::draw_label();
-	window = dynamic_cast < HDataWindow * > ( _window );
-	M_ASSERT ( window );
-	if ( window->is_modified() ) {
+	HDataWindow* win( dynamic_cast<HDataWindow*>( _window ) );
+	M_ASSERT ( win );
+	if ( win->is_modified() ) {
 		set_attr_shortcut();
 		HConsole& cons = HConsole::get_instance();
 		cons.mvprintf ( cons.get_height() - 2, _labelLength - 4, "[+]" );

@@ -291,7 +291,7 @@ void HWindowCreator::create_widgets( HWindow::ptr_t window_, yaal::tools::HXml::
 	HWidgetFactory& wf( HWidgetFactory::get_instance() );
 	YAAL_FOREACH( yaal::tools::HXml::HConstNodeProxy const& n, node_ ) {
 		HString type( xml::node_val( n ) );
-		if ( wf.is_type_valid( type ) ) {
+		if ( wf.is_type_valid( type ) && ! xml::try_attr_val( n, "id" ) ) {
 			wf.create_widget( window_.raw(), n );
 		}
 	}

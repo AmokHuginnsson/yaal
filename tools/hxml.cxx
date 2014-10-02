@@ -824,6 +824,10 @@ HXml::HConstNodeProxy& HXml::HConstNodeProxy::operator = ( HConstNodeProxy const
 	return ( *this );
 }
 
+HXml const* HXml::HConstNodeProxy::xml( void ) const {
+	return ( (**_node)._owner );
+}
+
 int HXml::HConstNodeProxy::get_level( void ) const {
 	M_PROLOG
 	M_ASSERT( _node );
@@ -865,6 +869,10 @@ HString const& HXml::HConstNodeProxy::get_value( void ) const {
 	}
 	return ( type == HXml::HNode::TYPE::ENTITY ? *val : (**_node)._text );
 	M_EPILOG
+}
+
+HXml* HXml::HNodeProxy::xml( void ) {
+	return ( const_cast<HXml*>( (**_node)._owner ) );
 }
 
 HXml::HNode::properties_t& HXml::HNodeProxy::properties( void ) {

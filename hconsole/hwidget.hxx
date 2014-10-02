@@ -376,6 +376,12 @@ public:
  */
 	yaal::hcore::HString const& get_label( void ) const;
 
+/*! \brief Get this widget parent window (owner).
+ *
+ * \return This widget parent window (owner).
+ */
+HWindow* get_window( void ) const;
+
 protected:
 	void set_attr_label( void ) const;
 	void set_attr_shortcut( void ) const;
