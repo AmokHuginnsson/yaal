@@ -32,22 +32,26 @@ Copyright:
 
 #include "hcore/hsingleton.hxx"
 #include "tools/hxml.hxx"
-#include "hconsole/hwindow.hxx"
 
 namespace yaal {
 
 namespace hconsole {
 
+class HWindow;
+class HTUIProcess;
+
 class HWindowCreatorInterface {
+public:
+	typedef yaal::hcore::HPointer<HWindow> window_ptr_t;
 protected:
 	virtual void do_initialize_globals( void ) {};
 	virtual void do_cleanup_globals( void ) {};
-	virtual HWindow::ptr_t do_new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& ) = 0;
+	virtual window_ptr_t do_new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& ) = 0;
 public:
 	virtual ~HWindowCreatorInterface( void ) {}
 	void initialize_globals( void );
 	void cleanup_globals( void );
-	HWindow::ptr_t new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
+	window_ptr_t new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
 	typedef yaal::hcore::HPointer<HWindowCreatorInterface> ptr_t;
 };
 
@@ -59,7 +63,7 @@ private:
 	creators_t _creators;
 public:
 	void register_window_creator( yaal::hcore::HString const&, HWindowCreatorInterface::ptr_t );
-	HWindow::ptr_t create_window( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
+	HWindowCreatorInterface::window_ptr_t create_window( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
 	bool is_type_valid( yaal::hcore::HString const& );
 	creators_t::iterator begin( void );
 	creators_t::iterator end( void );

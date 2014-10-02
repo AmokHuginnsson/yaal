@@ -32,6 +32,7 @@ Copyright:
 #include "hconsole/hwidgetlist.hxx"
 #include "hconsole/hhandler.hxx"
 #include "hconsole/hstatusbarwidget.hxx"
+#include "hconsole/hwindowfactory.hxx"
 
 namespace yaal {
 
@@ -108,6 +109,12 @@ private:
 };
 
 typedef yaal::hcore::HExceptionT<HWindow, HHandlerException> HWindowException;
+
+class HWindowCreator : public HWindowCreatorInterface {
+protected:
+	virtual HWindow::ptr_t do_new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
+	void create_widgets( HWindow::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+};
 
 }
 

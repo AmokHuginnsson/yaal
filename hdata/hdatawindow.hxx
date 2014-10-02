@@ -69,7 +69,6 @@ protected:
 	bool _modified;
 	DOCUMENT::mode_t _documentMode;
 	HDataWidget* _mainWidget;
-	resources_t* _resourcesArray;
 	ORowBuffer* _syncStore;
 	typedef yaal::hcore::HList<HDataWidget*> controls_t;
 	controls_t _viewModeWidgets;
@@ -77,16 +76,24 @@ protected:
 	HDataProcess* _owner;
 	yaal::dbwrapper::HSQLDescriptor::ptr_t _dB;
 	yaal::dbwrapper::HSQLDescriptor::MODE::mode_t _mode;
+	yaal::hcore::HString _idColumnName;
 public:
-	HDataWindow( char const*, HDataProcess*, resources_t* = NULL );
+	HDataWindow( yaal::hcore::HString const&, HDataProcess* );
 	virtual ~HDataWindow( void );
 	virtual hconsole::HStatusBarWidget* init_bar( char const* );
 	void set_sync_store( ORowBuffer* = NULL );
 	bool is_modified( void ) const;
 	void set_modified( bool = true );
 	void sync( yaal::dbwrapper::HRecordSet::iterator );
+	void set_widget_role( HDataWidget*, DATACONTROL_BITS::ROLE::role_t );
+	void set_record_descriptor(
+			yaal::hcore::HString const&,
+			yaal::hcore::HString const&,
+			yaal::hcore::HString const&,
+			yaal::hcore::HString const&,
+			yaal::hcore::HString const& );
+	yaal::hcore::HString const& id_column_name( void ) const;
 protected:
-	void link( int, HDataWidget* );
 	void set_mode( DOCUMENT::mode_t );
 	void sync( void );
 	void sync( int, hconsole::HEditWidget& );
@@ -101,6 +108,11 @@ protected:
 private:
 	HDataWindow( HDataWindow const& );
 	HDataWindow& operator = ( HDataWindow const& );
+};
+
+class HDataWindowCreator : public hconsole::HWindowCreator {
+protected:
+	virtual hconsole::HWindow::ptr_t do_new_instance( hconsole::HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 }

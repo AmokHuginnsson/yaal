@@ -36,6 +36,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hconsole.hxx"
 #include "hcore/foreach.hxx"
 #include "tools/hxml.hxx"
+#include "hconsole/hwindow.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

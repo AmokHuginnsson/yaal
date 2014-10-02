@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hwindowfactory.hxx"
 #include "hcore/foreach.hxx"
+#include "hconsole/hwindow.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -51,7 +52,7 @@ void HWindowFactory::register_window_creator( HString const& name_, HWindowCreat
 	M_EPILOG
 }
 
-HWindow::ptr_t HWindowFactory::create_window( HTUIProcess* tuiProcess_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+HWindowCreatorInterface::window_ptr_t HWindowFactory::create_window( HTUIProcess* tuiProcess_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HWindow::ptr_t window;
 	creators_t::iterator it( _creators.find( node_.get_name() ) );
@@ -112,7 +113,7 @@ void HWindowCreatorInterface::cleanup_globals( void ) {
 	M_EPILOG
 }
 
-HWindow::ptr_t HWindowCreatorInterface::new_instance( HTUIProcess* tuiProcess_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+HWindowCreatorInterface::window_ptr_t HWindowCreatorInterface::new_instance( HTUIProcess* tuiProcess_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	return ( do_new_instance( tuiProcess_, node_ ) );
 	M_EPILOG

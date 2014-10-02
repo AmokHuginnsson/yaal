@@ -24,14 +24,18 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <libintl.h>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hdatawidget.hxx"
+#include "hdatawindow.hxx"
 
 using namespace yaal::hcore;
-using namespace yaal::hconsole;
+using namespace yaal::tools;
 using namespace yaal::dbwrapper;
+using namespace yaal::hconsole;
 
 namespace yaal {
 
@@ -39,7 +43,7 @@ namespace hdata {
 
 HDataWidget::HDataWidget( void )
 	: HWidget( NULL, 0, 0, 0, 0, hcore::HString() ),
-	_resource( NULL ), _SQL() {
+	_SQL() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -48,12 +52,6 @@ HDataWidget::HDataWidget( void )
 HDataWidget::~HDataWidget( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
-}
-
-void HDataWidget::set_resource( OResource const* resource_ ) {
-	M_PROLOG
-	_resource = resource_;
 	M_EPILOG
 }
 
@@ -83,6 +81,21 @@ void HDataWidget::add_new( void ) {
 
 void HDataWidget::cancel_new( void ) {
 	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void apply_role( HDataWindow* window_, HDataWidget* widget_, yaal::tools::HXml::HConstNodeProxy node_ ) {
+	M_PROLOG
+	HString xmlRole( xml::attr_val( node_, "role" ) );
+	DATACONTROL_BITS::ROLE::role_t role( DATACONTROL_BITS::ROLE::INVALID );
+	if ( xmlRole == "main" )
+		role = DATACONTROL_BITS::ROLE::MAIN;
+	else if ( xmlRole == "data" )
+		role = DATACONTROL_BITS::ROLE::DATA;
+	else
+		M_THROW( _( "unknown role" ), node_.get_line() );
+	window_->set_widget_role( widget_, role );
 	return;
 	M_EPILOG
 }

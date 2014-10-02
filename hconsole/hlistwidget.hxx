@@ -33,13 +33,13 @@ Copyright:
 #include "hcore/hbitflag.hxx"
 #include "tools/collections.hxx"
 #include "hconsole/hitem.hxx"
-#include "hconsole/hwindow.hxx"
 #include "hconsole/hsearchablewidget.hxx"
 
 namespace yaal {
 
 namespace hconsole {
 
+class HWindow;
 class HListWidget;
 
 /*! \brief Pack of helpers for "list widget" concept.

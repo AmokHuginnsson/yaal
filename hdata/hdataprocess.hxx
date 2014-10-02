@@ -58,11 +58,6 @@ protected:
 	typedef yaal::hcore::HList<yaal::hcore::HChunk> column_cache_t;
 	typedef yaal::hconsole::HWindow::ptr_t ( *window_factory_t )( yaal::hcore::HString const&, HDataProcess*, resources_t* );
 	dbwrapper::database_ptr_t _dataBase;
-	yaal::tools::HXml _resource;
-	resource_cache_t _resourceCache;
-	column_cache_t _columnCache;
-	edit_cache_t _editCache;
-	list_cache_t _listCache;
 public:
 	HDataProcess( void );
 	virtual ~HDataProcess( void );
@@ -74,10 +69,6 @@ protected:
 	virtual void do_close_window( void );
 	void force_close_window( void );
 	void force_quit( void );
-private:
-	resources_t* get_resource( yaal::hcore::HString const&, yaal::tools::HXml::HConstNodeProxy const& );
-	resources_t& build_resource( yaal::hcore::HString const&, yaal::tools::HXml::HConstNodeProxy const& );
-	int create_window( void* );
 private:
 	HDataProcess( HDataProcess const& );
 	HDataProcess& operator = ( HDataProcess const& );

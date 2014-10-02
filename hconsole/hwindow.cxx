@@ -33,7 +33,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "console.hxx"
 #include "htuiprocess.hxx"
 #include "hcore/hlog.hxx"
-#include "hwindowfactory.hxx"
 #include "hwidgetfactory.hxx"
 #include "hcore/foreach.hxx"
 
@@ -269,12 +268,6 @@ void HWindow::schedule_call( HTUIProcess::call_t call_ ) {
 	return;
 	M_EPILOG
 }
-
-class HWindowCreator : public HWindowCreatorInterface {
-protected:
-	virtual HWindow::ptr_t do_new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
-	void create_widgets( HWindow::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
-};
 
 HWindow::ptr_t HWindowCreator::do_new_instance( HTUIProcess* tui_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG

@@ -28,6 +28,7 @@ Copyright:
 #define YAAL_HDATA_HDATAWIDGET_HXX_INCLUDED 1
 
 #include "dbwrapper/hsqldescriptor.hxx"
+#include "tools/hxml.hxx"
 #include "hconsole/hwidget.hxx"
 #include "hdata/oresource.hxx"
 
@@ -35,16 +36,16 @@ namespace yaal {
 
 namespace hdata {
 
+class HDataWindow;
+
 /*! \brief Base class for database connected TUI controls.
  */
 class HDataWidget : public virtual hconsole::HWidget {
 protected:
-	OResource const* _resource;
 	dbwrapper::HSQLDescriptor::ptr_t _SQL;
 public:
 	HDataWidget( void );
 	virtual ~HDataWidget( void );
-	void set_resource( OResource const* );
 	void set_dbd( dbwrapper::HSQLDescriptor::ptr_t );
 	virtual void load( int long = 0 );
 	virtual int long get_current_id( void );
@@ -54,6 +55,8 @@ private:
 	HDataWidget ( HDataWidget const & );
 	HDataWidget & operator = ( HDataWidget const & );
 };
+
+void apply_role( HDataWindow*, HDataWidget*, yaal::tools::HXml::HConstNodeProxy );
 
 }
 

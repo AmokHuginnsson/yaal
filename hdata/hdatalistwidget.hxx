@@ -45,13 +45,22 @@ class HDataWindow;
  */
 class HDataListWidget : public HDataWidget, public virtual yaal::hconsole::HListWidget {
 public:
+	typedef HDataListWidget this_type;
+	typedef yaal::hconsole::HListWidget base_type;
+public:
 	yaal::hconsole::list_widget_helper::HAsIsValueListModel<>::ptr_t _dataModel;
-	HDataListWidget( HDataWindow*, int, int, int, int, yaal::hcore::HString const& );
+	HDataListWidget( HDataWindow*, int, int, int, int, yaal::hcore::HString const&,
+			hconsole::HWidgetAttributesInterface const& = hconsole::HWidgetAttributesInterface() );
 	virtual ~HDataListWidget( void );
 	virtual void load( int long );
 	virtual int long get_current_id( void );
 	virtual void add_new( void );
 	virtual void cancel_new( void );
+};
+
+class HDataListWidgetCreator : virtual public yaal::hconsole::HListWidgetCreator {
+protected:
+	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 }
