@@ -76,6 +76,13 @@ int HHandler::register_postprocess_handler( int codeCount_, int const* codes_,
 	M_EPILOG
 }
 
+void HHandler::register_command_handler( yaal::hcore::HString const& command_, HANDLER_t handler_ ) {
+	M_PROLOG
+	_commandHandlers[command_] = handler_;
+	return;
+	M_EPILOG
+}
+
 bool HHandler::process_input_with_handlers( HKeyPressEvent const& keyPress_, process_handler_key_map_t const& map_ ) {
 	M_PROLOG
 	process_handler_key_map_t::const_iterator it( map_.find( keyPress_.get_key_code() ) );

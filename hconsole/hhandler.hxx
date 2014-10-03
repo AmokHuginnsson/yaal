@@ -52,6 +52,7 @@ public:
 	HHandler( int = 32, int = 32 );
 	virtual ~HHandler( void );
 	void execute_command( yaal::hcore::HString const& );
+	void register_command_handler( yaal::hcore::HString const&, HANDLER_t );
 protected:
 	bool process_input_with_handlers( HKeyPressEvent const&, const process_handler_key_map_t& );
 	hcore::HString process_command( void );
