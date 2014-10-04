@@ -201,7 +201,7 @@ int HMatrix<value_type>::set( value_type const** scalar_ ) {
 	M_PROLOG
 	int ctr;
 	for ( ctr = 0; ctr < _rows; ctr++ )
-		this->_array [ ctr ]->set( scalar_[ ctr ] );
+		this->_data[ ctr ]->set( scalar_[ ctr ] );
 	return ( 0 );
 	M_EPILOG
 }
@@ -504,7 +504,7 @@ bool HMatrix<value_type>::operator == ( HMatrix const& matrix_ ) const {
 	M_PROLOG
 	check_dimensions_rows_columns ( matrix_._rows, matrix_._columns );
 	for ( int ctr( 0 ); ctr < _rows; ++ ctr ) {
-		if ( this->_array [ ctr ] != matrix_ [ ctr ] ) {
+		if ( this->_data[ ctr ] != matrix_ [ ctr ] ) {
 			return ( false );
 		}
 	}

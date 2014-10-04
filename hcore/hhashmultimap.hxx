@@ -100,7 +100,7 @@ public:
 		M_EPILOG
 	}
 	HHashMultiMap( HHashMultiMap const& multimap_ )
-		: _engine( multimap_.hasher(), multimap_.get_allocator() ) {
+		: _engine( multimap_._engine.hasher(), multimap_.get_allocator() ) {
 		M_PROLOG
 		_engine.copy_from( multimap_._engine );
 		return;

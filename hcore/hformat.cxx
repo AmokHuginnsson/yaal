@@ -724,10 +724,16 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 			conversion = CONVERSION::POINTER;
 		break;
 		case ( '%' ): {
-			if ( s[ i - 1 ] == '%' )
+			if ( s[ i - 1 ] == '%' ) {
 				break;
+			}
 		}
-		default: M_THROW( "bad conversion", s[ i ]  ); break;
+		/* % conversion can only occur immediately after %, eg: %% is ok but %*% is not */
+		/* no break */
+		default: {
+			M_THROW( "bad conversion", s[ i ]  );
+			break;
+		}
 	}
 	char const* const BAD_LEN_MOD = _( "bad length mod." );
 	switch ( lenMod ) {

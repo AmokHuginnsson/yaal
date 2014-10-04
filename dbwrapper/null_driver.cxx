@@ -85,7 +85,7 @@ M_EXPORT_SYMBOL char const* rs_get( void* /*data_*/, int long /*row_*/, int /*co
 }
 
 M_EXPORT_SYMBOL bool rs_next( void* ) {
-	return;
+	return ( false );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int ) {

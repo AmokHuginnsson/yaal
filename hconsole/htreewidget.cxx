@@ -215,6 +215,7 @@ int HTreeWidget::do_process_input( int code_ ) {
 			}
 		}
 		/* when node is unfolded, right key works as down key */
+		/* no break */
 		case ( KEY_CODES::DOWN ): {
 			if ( (**node)._unfolded ) {
 				if ( node->has_childs() )

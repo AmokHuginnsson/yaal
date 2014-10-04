@@ -47,9 +47,9 @@ public:
 	static int const OBJECTS_PER_BLOCK = 256;
 	static int const OBJECT_SIZE = sizeof ( T );
 #if TARGET_CPU_BITS == 64
-	static int const OBJECT_SPACE = meta::ternary<OBJECT_SIZE < 2, 2,
-	                                meta::ternary<OBJECT_SIZE < 4, 4,
-	                                meta::ternary<OBJECT_SIZE < 8, 8,
+	static int const OBJECT_SPACE = meta::ternary<(OBJECT_SIZE < 2), 2,
+	                                meta::ternary<(OBJECT_SIZE < 4), 4,
+	                                meta::ternary<(OBJECT_SIZE < 8), 8,
 	                                (OBJECT_SIZE + 8) & ~7u>::value>::value>::value;
 #elif TARGET_CPU_BITS == 32 /* #if TARGET_CPU_BITS == 64 */
 	static int const OBJECT_SPACE = meta::ternary<(OBJECT_SIZE < 2), 2,

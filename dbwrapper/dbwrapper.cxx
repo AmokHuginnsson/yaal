@@ -118,9 +118,6 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 
 }
 
-void dbwrapper_error( void );
-void dbwrapper_exit( void ) __attribute__(( __noreturn__ ));
-
 ODBConnector::DRIVER::enum_t _dataBaseDriver_ = ODBConnector::DRIVER::NONE;
 
 namespace {
