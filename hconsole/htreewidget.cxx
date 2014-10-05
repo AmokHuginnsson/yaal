@@ -143,7 +143,7 @@ int HTreeWidget::draw_node( tree_view_t::node_t node_, int row_ ) {
 	int row = row_;
 	HConsole& cons = HConsole::get_instance();
 	M_ASSERT( node_ );
-	if ( (**node_)._data->is_valid() ) {
+	if ( (**node_)._data->is_valid() && ! (**node_)._data->get_string().is_empty() ) {
 		row ++;
 		HString const& str = (**node_)._data->get_string();
 		(**node_)._rowRaw = row;

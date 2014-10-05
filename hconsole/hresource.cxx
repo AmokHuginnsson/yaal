@@ -116,7 +116,7 @@ void HResource::build_menu_item( HXml::HConstNodeProxy const& xmlNode_,
 					(**node_)._call = call( &HTUIProcess::execute_command, _tui, contents );
 				}
 			} else if ( name == "menu" ) {
-				build_sub_menu( *it, &*(node_->add_node()) );
+				build_sub_menu( *it, node_ );
 			} else {
 				M_THROW( HString( error ) + unexpected + name
 						+ '=' + contents, xmlNode_.get_line() );
