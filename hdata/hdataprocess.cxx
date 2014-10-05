@@ -48,8 +48,6 @@ namespace yaal {
 
 namespace hdata {
 
-static int const MENU_HANDLERS_MAP_SIZE = 32;
-
 HDataProcess::HDataProcess( void )
 	: HTUIProcess(), _dataBase( HDataBase::get_connector() ) {
 	M_PROLOG

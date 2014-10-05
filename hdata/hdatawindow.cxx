@@ -323,7 +323,7 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 	create_widgets( window, node_ );
 	HDataWindow* dw( dynamic_cast<HDataWindow*>( window.raw() ) );
 	YAAL_FOREACH( yaal::tools::HXml::HConstNodeProxy const& n, node_ ) {
-		HString node( xml::node_val( n ) );
+		HString node( n.get_name() );
 		if ( node == "db" ) {
 			HString table( xml::attr_val( n, "table" ) );
 			HString columns( xml::attr_val( n, "column" ) );
@@ -337,6 +337,17 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 	tui_->add_window( window );
 	return ( window );
 	M_EPILOG
+}
+
+namespace {
+
+bool register_creator( void ) {
+	HWindowFactory::get_instance().register_window_creator( "datawindow", HWindowCreatorInterface::ptr_t( new HDataWindowCreator() ) );
+	return ( true );
+}
+
+bool volatile registered = register_creator();
+
 }
 
 }
