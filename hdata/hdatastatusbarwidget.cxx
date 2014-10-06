@@ -49,7 +49,7 @@ HDataStatusBarWidget::HDataStatusBarWidget( HDataWindow* parent_,
 
 void HDataStatusBarWidget::do_draw_label ( void ) {
 	M_PROLOG
-	HStatusBarWidget::draw_label();
+	HStatusBarWidget::do_draw_label();
 	HDataWindow* win( dynamic_cast<HDataWindow*>( _window ) );
 	M_ASSERT ( win );
 	if ( win->is_modified() ) {

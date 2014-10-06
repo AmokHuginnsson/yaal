@@ -334,7 +334,6 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 			break;
 		}
 	}
-	tui_->add_window( window );
 	return ( window );
 	M_EPILOG
 }
