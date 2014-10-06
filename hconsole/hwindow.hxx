@@ -88,6 +88,7 @@ public:
 	bool is_initialised( void ) const;
 	void update_all( void );
 	yaal::hcore::HString const& get_title( void ) const;
+	HStatusBarWidget* init_bar( char const* );
 
 /*! \brief Schedule paint request on next refresh cycle.
  *
@@ -97,6 +98,7 @@ public:
 	void schedule_call( HTUIProcess::call_t );
 protected:
 	virtual void do_init( void );
+	virtual HStatusBarWidget* do_init_bar( char const* );
 private:
 	friend bool HWidget::set_focus( char );
 	friend void HStatusBarWidget::set_prompt(  yaal::hcore::HString const&,

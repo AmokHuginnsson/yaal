@@ -80,17 +80,26 @@ void HWindow::do_init( void ) {
 	M_PROLOG
 	M_ENSURE( _tuiProcess );
 	HString string;
-	_tuiProcess->schedule_repaint();
+	if ( _tuiProcess ) {
+		_tuiProcess->schedule_repaint();
+	}
 	string.format( " [%s]& \n", _title.raw() );
-	new HStatusBarWidget( this, string.raw() );
-	/*
-	 * After line above window has 1 (one) widget which is HStatusBarWidget.
-	 * This only widget has a focus.
-	 */
-	_statusBar = *_focusedChild;
+	_statusBar = init_bar( string.raw() )->get_pointer();
 	_statusBar->enable( true );
 	_initialised = true;
 	return;
+	M_EPILOG
+}
+
+HStatusBarWidget* HWindow::init_bar( char const* label_ ) {
+	M_PROLOG
+	return ( do_init_bar( label_ ) );
+	M_EPILOG
+}
+
+HStatusBarWidget* HWindow::do_init_bar( char const* label_ ) {
+	M_PROLOG
+	return ( new HStatusBarWidget( this, label_ ) );
 	M_EPILOG
 }
 
@@ -257,14 +266,18 @@ void HWindow::schedule_repaint( bool wholeWindow_ ) {
 	if ( wholeWindow_ ) {
 		_needRepaint = true;
 	}
-	_tuiProcess->schedule_repaint();
+	if ( _tuiProcess ) {
+		_tuiProcess->schedule_repaint();
+	}
 	return;
 	M_EPILOG
 }
 
 void HWindow::schedule_call( HTUIProcess::call_t call_ ) {
 	M_PROLOG
-	_tuiProcess->schedule_call( call_ );
+	if ( _tuiProcess ) {
+		_tuiProcess->schedule_call( call_ );
+	}
 	return;
 	M_EPILOG
 }

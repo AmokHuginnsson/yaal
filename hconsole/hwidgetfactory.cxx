@@ -126,16 +126,17 @@ HWidget::ptr_t HWidgetCreatorInterface::new_instance( HWindow* window_, yaal::to
 	M_EPILOG
 }
 
-char const POSITION_ATTR[] = "position";
-char const LABEL_ATTR[] = "label";
+char const POSITION_NAME[] = "position";
+char const LABEL_NAME[] = "label";
+
 
 void HWidgetCreatorInterface::apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
 		if ( ! do_apply_resources( widget_, n ) ) {
 			HString const& name( n.get_name() );
-			if ( ( name != POSITION_ATTR ) && ( name != LABEL_ATTR ) ) {
-				M_THROW( "unknown " + node_.get_name() + " attribute name: " + name, n.get_line() );
+			if ( ( name != POSITION_NAME ) && ( name != LABEL_NAME ) ) {
+				log << "unknown " << node_.get_name() << " attribute name: " << name << ", at: " << n.get_line() << endl;
 			}
 		}
 	}
@@ -148,7 +149,7 @@ void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& at
 	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
 		if ( ! do_prepare_attributes( attrs_, n ) ) {
 			HString const& name( n.get_name() );
-			if ( ( name != POSITION_ATTR ) && ( name != LABEL_ATTR ) ) {
+			if ( ( name != POSITION_NAME ) && ( name != LABEL_NAME ) ) {
 				log << "unknown " << node_.get_name() << " attribute name: " << name << ", at: " << n.get_line() << endl;
 			}
 		}
@@ -162,12 +163,12 @@ HWidgetCreatorInterface::OResource HWidgetCreatorInterface::get_resource( yaal::
 	OResource r;
 	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
 		HString const& name( n.get_name() );
-		if ( name == POSITION_ATTR ) {
+		if ( name == POSITION_NAME ) {
 			r._row = lexical_cast<int>( xml::attr_val( n, "row" ) );
 			r._column = lexical_cast<int>( xml::attr_val( n, "column" ) );
 			r._height = lexical_cast<int>( xml::attr_val( n, "height" ) );
 			r._width = lexical_cast<int>( xml::attr_val( n, "width" ) );
-		} else if ( name == LABEL_ATTR ) {
+		} else if ( name == LABEL_NAME ) {
 			r._label = xml::node_val( n );
 			xml::value_t position( xml::try_attr_val( n, "position" ) );
 			if ( position ) {
