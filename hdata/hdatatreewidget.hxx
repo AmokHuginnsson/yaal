@@ -40,9 +40,15 @@ class HDataWindow;
  */
 class HDataTreeWidget : public HDataWidget, public virtual hconsole::HTreeWidget {
 public:
-	HDataTreeWidget( HDataWindow*, int, int, int, int, yaal::hcore::HString const& );
+	HDataTreeWidget( HDataWindow*, int, int, int, int, yaal::hcore::HString const&,
+			hconsole::HWidgetAttributesInterface const& = hconsole::HWidgetAttributesInterface() );
 	virtual ~HDataTreeWidget( void );
 	virtual void load( int long );
+};
+
+class HDataTreeWidgetCreator : virtual public yaal::hconsole::HTreeWidgetCreator {
+protected:
+	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 }

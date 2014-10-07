@@ -53,6 +53,11 @@ public:
 	virtual int do_process_input( int );
 };
 
+class HDataEditWidgetCreator : virtual public yaal::hconsole::HEditWidgetCreator {
+protected:
+	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+};
+
 }
 
 }

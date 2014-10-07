@@ -95,6 +95,33 @@ int HDataEditWidget::do_process_input ( int code_ ) {
 	M_EPILOG
 }
 
+HWidget::ptr_t HDataEditWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HEditWidgetAttributes attrs;
+	HDataWindow* window( dynamic_cast<HDataWindow*>( window_ ) );
+	M_ENSURE( window );
+	prepare_attributes( attrs, node_ );
+	OResource r( get_resource( node_ ) );
+	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
+	HDataEditWidget* list( new HDataEditWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	apply_resources( list->get_pointer(), node_ );
+	apply_role( window, list, node_ );
+	return ( list->get_pointer() );
+	M_EPILOG
+}
+
+namespace {
+
+bool register_creator( void ) {
+	HWidgetFactory::get_instance().register_widget_creator( "dataedit",
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HDataEditWidgetCreator() ) ) );
+	return ( true );
+}
+
+bool volatile registered = register_creator();
+
+}
+
 }
 
 }

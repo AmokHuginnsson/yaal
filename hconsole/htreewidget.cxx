@@ -375,6 +375,43 @@ void HTreeWidget::do_on_model_changed( void ) {
 	M_EPILOG
 }
 
+HWidget::ptr_t HTreeWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HTreeWidgetAttributes attrs;
+	prepare_attributes( attrs, node_ );
+	OResource r( get_resource( node_ ) );
+	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
+	HWidget* tree( new HTreeWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	apply_resources( tree->get_pointer(), node_ );
+	return ( tree->get_pointer() );
+	M_EPILOG
+}
+
+bool HTreeWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HTreeWidgetAttributes& attrs( dynamic_cast<HTreeWidgetAttributes&>( attributes_ ) );
+	HString const& name( node_.get_name() );
+	bool ok( true );
+	return ( ok );
+	M_EPILOG
+}
+
+bool HTreeWidgetCreator::do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) {
+	return ( false );
+}
+
+namespace {
+
+bool register_creator( void ) {
+	HWidgetFactory::get_instance().register_widget_creator( "tree",
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HTreeWidgetCreator() ) ) );
+	return ( true );
+}
+
+bool volatile registered = register_creator();
+
+}
+
 }
 
 }
