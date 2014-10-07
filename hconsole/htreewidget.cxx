@@ -387,12 +387,9 @@ HWidget::ptr_t HTreeWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	M_EPILOG
 }
 
-bool HTreeWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+bool HTreeWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) {
 	M_PROLOG
-	HTreeWidgetAttributes& attrs( dynamic_cast<HTreeWidgetAttributes&>( attributes_ ) );
-	HString const& name( node_.get_name() );
-	bool ok( true );
-	return ( ok );
+	return ( true );
 	M_EPILOG
 }
 
