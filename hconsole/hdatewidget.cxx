@@ -36,9 +36,9 @@ namespace yaal {
 namespace hconsole {
 
 HDateWidget::HDateWidget( HWindow* parent_, int row_, int column_,
-		int height_, int width_, yaal::hcore::HString const& label_,
+		yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
-	: HWidget( parent_, row_, column_, height_, width_, label_ ),
+	: HWidget( parent_, row_, column_, 1, static_cast<int>( sizeof ( " 0000-00-00 " ) ) - 1, label_ ),
 	_time( HTime::LOCAL ) {
 	M_PROLOG
 	attr_.apply( *this );
@@ -46,7 +46,7 @@ HDateWidget::HDateWidget( HWindow* parent_, int row_, int column_,
 	M_EPILOG
 }
 
-HDateWidget::~HDateWidget ( void ) {
+HDateWidget::~HDateWidget( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -68,6 +68,14 @@ bool HDateWidget::do_click( mouse::OMouse& ) {
 	M_PROLOG
 	return ( false );
 	M_EPILOG
+}
+
+HInfo const& HDateWidget::do_get_data( void ) const {
+	static HInfoMultiVal i;
+	return ( i );
+}
+
+void HDateWidget::do_set_data( HInfo const& ) {
 }
 
 }

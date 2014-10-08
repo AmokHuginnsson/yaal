@@ -200,7 +200,7 @@ public:
  *
  * \param data - Data that shall be stored inside of this widget.
  */
-	virtual void set( HInfo const& data );
+	void set_data( HInfo const& data );
 
 /*! \brief Interface for getting widget data.
  *
@@ -209,7 +209,7 @@ public:
  *
  * \return Data that has been stored inside of this widget.
  */
-	virtual HInfo const& get( void ) const;
+	HInfo const& get_data( void ) const;
 
 /*! \brief Interface for checking is particular widget instance support searching.
  *
@@ -392,6 +392,8 @@ protected:
 	virtual bool do_hit_test( int, int ) const;
 	virtual bool do_click( mouse::OMouse& );
 	virtual void do_draw_label( void );
+	virtual void do_set_data( HInfo const& data );
+	virtual HInfo const& do_get_data( void ) const;
 	void draw_label( void );
 private:
 	HWidget ( HWidget const& );

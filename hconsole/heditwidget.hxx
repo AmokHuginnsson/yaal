@@ -43,6 +43,39 @@ extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskExtended_;
 extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskLoose_;
 extern M_YAAL_HCONSOLE_PUBLIC_API char const* const _maskDefault_;
 
+class HInfoString : public HInfo {
+private:
+	yaal::hcore::HString& _data;
+public:
+	typedef HInfoString this_type;
+	typedef HInfo base_type;
+	HInfoString( yaal::hcore::HString& );
+	HInfoString( HInfoString const& );
+	virtual ~HInfoString( void );
+protected:
+	virtual char do_get_byte( int ) const;
+	virtual char do_get_char( void ) const;
+	virtual int short do_get_int_short( void ) const;
+	virtual int do_get_int( void ) const;
+	virtual int long do_get_int_long( void ) const;
+	virtual double do_get_double( void ) const;
+	virtual double long do_get_double_long( void ) const;
+	virtual void* do_get_pointer( void ) const;
+	virtual yaal::hcore::HString const& do_get_string( void ) const;
+	virtual yaal::hcore::HTime const& do_get_time( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_char( char );
+	virtual void do_set_int_short( int short );
+	virtual void do_set_int( int );
+	virtual void do_set_int_long( int long );
+	virtual void do_set_double( double );
+	virtual void do_set_double_long( double long );
+	virtual void do_set_pointer( void* );
+	virtual void do_set_string( yaal::hcore::HString const& );
+	virtual void do_set_time( yaal::hcore::HTime const& );
+private:
+	void purge( void );
+};
+
 /*! \brief Implementation of TUI Edit widget class.
  *
  * Edit widget allows convenient text editing with handful
@@ -88,8 +121,6 @@ public:
 								HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
 	virtual ~HEditWidget( void );
 	void set_flags( bool = false, bool = false );
-	virtual HInfo const& get( void ) const;
-	virtual void set( HInfo const& );
 	void set_text( yaal::hcore::HString const& );
 	yaal::hcore::HString const& get_text( void ) const;
 	void set_pattern( yaal::hcore::HString const& );
@@ -114,6 +145,8 @@ protected:
 	virtual void do_paint( void );
 	virtual int do_process_input( int );
 	virtual bool do_click( mouse::OMouse& );
+	virtual HInfo const& do_get_data( void ) const;
+	virtual void do_set_data( HInfo const& );
 private:
 	int find_eow( int );
 	int go_to_eow( int );

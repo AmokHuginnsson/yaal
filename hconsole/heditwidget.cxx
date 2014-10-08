@@ -139,7 +139,7 @@ HString const& HEditWidget::get_text( void ) const {
 	M_EPILOG
 }
 
-HInfo const& HEditWidget::get( void ) const {
+HInfo const& HEditWidget::do_get_data( void ) const {
 	M_PROLOG
 	return ( _infoString );
 	M_EPILOG
@@ -575,7 +575,7 @@ void HEditWidget::set_text( HString const& string_ ) {
 	M_EPILOG
 }
 
-void HEditWidget::set( HInfo const& info_ ) {
+void HEditWidget::do_set_data( HInfo const& info_ ) {
 	M_PROLOG
 	set_text( info_.get_string() );
 	return;
@@ -771,6 +771,91 @@ bool register_creator( void ) {
 
 bool volatile registered = register_creator();
 
+}
+
+HInfoString::HInfoString( HString& string_ )
+	: _data( string_ )
+	{ }
+
+HInfoString::HInfoString( HInfoString const& info_ )
+	: HInfo(), _data( info_._data )
+	{ }
+
+HInfoString::~HInfoString( void )
+	{ }
+
+HString const& HInfoString::do_get_string( void ) const
+	{ return ( _data ); }
+
+char HInfoString::do_get_byte( int idx_ ) const
+	{ return ( _data[idx_] ); }
+
+char HInfoString::do_get_char( void ) const
+	{ return ( !_data.is_empty() ? _data[0] : static_cast<char>( 0 ) ); }
+
+int short HInfoString::do_get_int_short( void ) const
+	{ return ( static_cast<int short>( lexical_cast<int>( _data ) ) ); }
+
+int HInfoString::do_get_int( void ) const
+	{ return ( lexical_cast<int>( _data ) ); }
+
+int long HInfoString::do_get_int_long( void ) const
+	{ return ( lexical_cast<int long>( _data ) ); }
+
+double HInfoString::do_get_double( void ) const
+	{ return ( lexical_cast<double>( _data ) ); }
+
+double long HInfoString::do_get_double_long( void ) const
+	{ return ( lexical_cast<double long>( _data ) ); }
+
+HTime const& HInfoString::do_get_time( void ) const {
+	M_ASSERT( 0 && "impossible inplace conversion requested" );
+#if defined( NDEBUG ) || defined( __MSVCXX__ )
+	static HTime const dummy( HTime::LOCAL );
+	return ( dummy );
+#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
+}
+
+void* HInfoString::do_get_pointer( void ) const
+	{
+	int long val( ::strtol( _data.raw(), NULL, 16 ) );
+	return ( reinterpret_cast<void*>( val ) );
+	}
+
+void HInfoString::do_set_char( char char_ ) {
+	_data = char_;
+}
+
+void HInfoString::do_set_int_short( int short intShort_ ) {
+	_data = intShort_;
+}
+
+void HInfoString::do_set_int( int int_ ) {
+	_data = int_;
+}
+
+void HInfoString::do_set_int_long( int long intLong_ ) {
+	_data = intLong_;
+}
+
+void HInfoString::do_set_double( double double_ ) {
+	_data = double_;
+}
+
+void HInfoString::do_set_double_long( double long doubleLong_ ) {
+	_data = doubleLong_;
+}
+
+void HInfoString::do_set_pointer( void* ptr_ ) {
+	_data = ptr_;
+}
+
+void HInfoString::do_set_string( HString const& str_ ) {
+	_data = str_;
+}
+
+void HInfoString::do_set_time( HTime const& time_ ) {
+	_data = time_.string();
 }
 
 }

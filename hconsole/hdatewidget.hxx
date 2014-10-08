@@ -45,13 +45,15 @@ public:
 private:
 	yaal::hcore::HTime _time;
 public:
-	HDateWidget( HWindow*, int, int, int, int, yaal::hcore::HString const&,
+	HDateWidget( HWindow*, int, int, yaal::hcore::HString const&,
 			HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
 	virtual ~HDateWidget( void );
 protected:
 	virtual void do_paint( void );
 	virtual int do_process_input( int );
 	virtual bool do_click( mouse::OMouse& );
+	virtual HInfo const& do_get_data( void ) const;
+	virtual void do_set_data( HInfo const& );
 };
 
 }

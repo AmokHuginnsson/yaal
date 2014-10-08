@@ -179,7 +179,14 @@ void HWidget::update( void ) {
 	M_EPILOG
 }
 
-void HWidget::set( HInfo const & ) {
+void HWidget::set_data( HInfo const& data_ ) {
+	M_PROLOG
+	do_set_data( data_ );
+	return;
+	M_EPILOG
+}
+
+void HWidget::do_set_data( HInfo const & ) {
 	M_PROLOG
 	bool volatile always( true );
 	if ( always ) /* We need something that evaluates to `true' but compiler does not know it. */
@@ -188,7 +195,13 @@ void HWidget::set( HInfo const & ) {
 	M_EPILOG
 }
 
-HInfo const& HWidget::get( void ) const {
+HInfo const& HWidget::get_data( void ) const {
+	M_PROLOG
+	return ( do_get_data() );
+	M_EPILOG
+}
+
+HInfo const& HWidget::do_get_data( void ) const {
 	M_PROLOG
 	static HInfoMultiVal info;
 	return ( info );

@@ -128,8 +128,8 @@ private:
 	type_id_t   _type;
 	char        _char;
 	int short   _intShort;
-	int			  	_int;
-	int long  	_intLong;
+	int         _int;
+	int long    _intLong;
 	double      _double;
 	double long _doubleLong;
 	void*       _pointer;
@@ -214,39 +214,6 @@ protected:
 	virtual void do_set_pointer( void* );
 	virtual void do_set_string( yaal::hcore::HString const& );
 	virtual void do_set_time( yaal::hcore::HTime const& );
-private:
-	void purge( void );
-};
-
-class HInfoString : public HInfo {
-private:
-	yaal::hcore::HString const& _data;
-public:
-	typedef HInfoString this_type;
-	typedef HInfo base_type;
-	HInfoString( yaal::hcore::HString const& );
-	HInfoString( HInfoString const& );
-	virtual ~HInfoString( void );
-protected:
-	virtual char do_get_byte( int ) const;
-	virtual char do_get_char( void ) const;
-	virtual int short do_get_int_short( void ) const;
-	virtual int do_get_int( void ) const;
-	virtual int long do_get_int_long( void ) const;
-	virtual double do_get_double( void ) const;
-	virtual double long do_get_double_long( void ) const;
-	virtual void* do_get_pointer( void ) const;
-	virtual yaal::hcore::HString const& do_get_string( void ) const;
-	virtual yaal::hcore::HTime const& do_get_time( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_char( char ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_int_short( int short ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_int( int ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_int_long( int long ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_double( double ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_double_long( double long ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_pointer( void* ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_string( yaal::hcore::HString const& ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_time( yaal::hcore::HTime const& ) M_DEBUG_CODE( __attribute__(( noreturn )) );
 private:
 	void purge( void );
 };

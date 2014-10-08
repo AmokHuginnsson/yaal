@@ -1136,7 +1136,7 @@ HAbstractCell::~HAbstractCell( void ) {
 template<>
 void HCell<yaal::hcore::HList<HInfoItem>::iterator>::set_child_widget_data( HWidget* widget_ ) {
 	M_PROLOG
-	widget_->set( (*_data)[ _column ] );
+	widget_->set_data( (*_data)[ _column ] );
 	widget_->paint();
 	return;
 	M_EPILOG

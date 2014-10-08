@@ -138,7 +138,7 @@ void HDataWindow::sync( void ) {
 	M_ASSERT( _documentMode == DOCUMENT::EDIT );
 	int i( 0 );
 	for ( controls_t::iterator it( _editModeWidgets.begin() ), end( _editModeWidgets.end() ); it != end; ++ it, ++ i )
-		(*_dB)[ i ] = (*it)->get().get_string();
+		(*_dB)[ i ] = (*it)->get_data().get_string();
 	return;
 	M_EPILOG
 }
