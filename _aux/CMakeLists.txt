@@ -231,7 +231,7 @@ int main( int, char const* const* const ) {
 	time_t t( time( NULL ) );
 	struct tm broken;
 	localtime_r( &t, &broken );
-	int size( strftime( NULL, 1024, \"%F %T\", &broken ) );
+	int size( strftime( NULL, 1024, \"%Y-%m-%d %T\", &broken ) );
 	return ( ! size );
 }" HAVE_SMART_STRFTIME )
 check_cxx_source_compiles( "#include <iconv.h>

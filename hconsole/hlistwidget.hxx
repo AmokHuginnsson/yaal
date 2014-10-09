@@ -365,6 +365,7 @@ public:
 		virtual ~HColumnInfo( void );
 		HColumnInfo( HColumnInfo const& );
 		HColumnInfo& operator = ( HColumnInfo const& );
+		void swap( HColumnInfo& );
 		friend class HListWidget;
 		static int const ADD_AT_THE_END = -1;
 	};

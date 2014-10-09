@@ -236,7 +236,7 @@ int main( int, char const* const* const )
 	time_t t( time( NULL ) );
 	struct tm broken;
 	localtime_r( &t, &broken );
-	int size( strftime( NULL, 1024, "%F %T", &broken ) );
+	int size( strftime( NULL, 1024, "%Y-%m-%d %T", &broken ) );
 	return ( ! size );
 	}]])], [AC_DEFINE([HAVE_SMART_STRFTIME],[],[Can your strftime calculate output length?])] [RESULT=["yes"]])
 AC_MSG_RESULT([$RESULT])

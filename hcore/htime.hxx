@@ -38,7 +38,9 @@ namespace yaal {
 namespace hcore {
 
 extern M_YAAL_HCORE_PUBLIC_API char const _defaultTimeFormat_[];
+extern M_YAAL_HCORE_PUBLIC_API char const _iso8601DateFormat_[];
 extern M_YAAL_HCORE_PUBLIC_API char const _iso8601TimeFormat_[];
+extern M_YAAL_HCORE_PUBLIC_API char const _iso8601DateTimeFormat_[];
 
 /*! \brief Date and time handling class.
  *
@@ -62,15 +64,16 @@ public:
 	/*! \brief Construct HTime object based on current moment in time.
 	 *
 	 * \param nowIn_ - get time as UTC or local time (time considering current time zone).
+	 * \param format_ - textual time representation format.
 	 */
-	HTime( now_in_t nowIn_ );
+	HTime( now_in_t nowIn_, char const* format_ = _defaultTimeFormat_ );
 	HTime( HTime const& );
 	/*! \brief Construct time object from string.
 	 *
 	 * \param time_ - textual representation of time.
 	 * \param format_ - textual time representation format.
 	 */
-	HTime( char const* time_, char const* format_ = _defaultTimeFormat_ );
+	HTime( yaal::hcore::HString const& time_, char const* format_ = _defaultTimeFormat_ );
 	HTime( i64_t, char const* = _defaultTimeFormat_ );
 	HTime( int, int, int, int = 0, int = 0, int = 0, char const* = _defaultTimeFormat_ );
 	virtual ~HTime ( void );
@@ -81,6 +84,7 @@ public:
 	void set_time( int = 0, int = 0, int = 0 );
 	void set_date( int, int = 1, int = 1 );
 	void set_datetime( int, int = 1, int = 1, int = 0, int = 0, int = 0 );
+	void from_string( yaal::hcore::HString const& );
 	int get_year( void ) const;
 	int get_month( void ) const;
 	int get_day( void ) const;
@@ -97,6 +101,7 @@ public:
 	bool operator < ( HTime const& ) const;
 	bool operator > ( HTime const& ) const;
 	HString string( void ) const;
+	HString to_string( void ) const;
 	i64_t raw( void ) const;
 };
 

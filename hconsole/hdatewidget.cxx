@@ -39,7 +39,7 @@ HDateWidget::HDateWidget( HWindow* parent_, int row_, int column_,
 		yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
 	: HWidget( parent_, row_, column_, 1, static_cast<int>( sizeof ( " 0000-00-00 " ) ) - 1, label_ ),
-	_time( HTime::LOCAL ) {
+	_time( HTime::LOCAL, _iso8601DateFormat_ ), _infoTime( _time ) {
 	M_PROLOG
 	attr_.apply( *this );
 	return;
@@ -54,6 +54,9 @@ HDateWidget::~HDateWidget( void ) {
 
 void HDateWidget::do_paint( void ) {
 	M_PROLOG
+	HConsole& cons = HConsole::get_instance();
+	draw_label();
+	cons.mvprintf( _rowRaw, _columnRaw, " %s ", _time.string().c_str() );
 	return;
 	M_EPILOG
 }
@@ -71,11 +74,15 @@ bool HDateWidget::do_click( mouse::OMouse& ) {
 }
 
 HInfo const& HDateWidget::do_get_data( void ) const {
-	static HInfoMultiVal i;
-	return ( i );
+	return ( _infoTime );
 }
 
-void HDateWidget::do_set_data( HInfo const& ) {
+void HDateWidget::do_set_data( HInfo const& data_ ) {
+	M_PROLOG
+	_time = data_.get_time();
+	_time.set_format( _iso8601DateFormat_ );
+	return;
+	M_EPILOG
 }
 
 }

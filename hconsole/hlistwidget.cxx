@@ -72,29 +72,39 @@ HListWidget::HColumnInfo::~HColumnInfo( void ) {
 }
 
 HListWidget::HColumnInfo::HColumnInfo( HColumnInfo const& columnInfo_ )
-	: _descending( false ), _widthRaw( 0 ), _width( 0 ), _align( BITS::ALIGN::LEFT ),
-	_shortcutIndex( 0 ), _shortcut( 0 ), _type( TYPE::HSTRING ), _name(),
-	_widget( NULL ) {
+	: _descending( columnInfo_._descending ), _widthRaw( columnInfo_._widthRaw ),
+	_width( columnInfo_._width ), _align( columnInfo_._align ),
+	_shortcutIndex( columnInfo_._shortcutIndex ), _shortcut( columnInfo_._shortcut ),
+	_type( columnInfo_._type ), _name( columnInfo_._name ),
+	_widget( columnInfo_._widget ) {
 	M_PROLOG
-	( *this ) = columnInfo_;
 	return;
 	M_EPILOG
 }
 
 HListWidget::HColumnInfo& HListWidget::HColumnInfo::operator = ( HColumnInfo const& columnInfo_ ) {
-	M_PROLOG
 	if ( this != & columnInfo_ ) {
-		_descending = columnInfo_._descending;
-		_widthRaw = columnInfo_._widthRaw;
-		_width = columnInfo_._width;
-		_type = columnInfo_._type;
-		_align = columnInfo_._align;
-		_shortcutIndex = columnInfo_._shortcutIndex;
-		_shortcut = columnInfo_._shortcut;
-		_name = columnInfo_._name;
-		_widget = columnInfo_._widget;
+		HColumnInfo tmp( columnInfo_ );
+		swap( tmp );
 	}
 	return ( *this );
+}
+
+void HListWidget::HColumnInfo::swap( HColumnInfo& columnInfo_ ) {
+	M_PROLOG
+	if ( this != & columnInfo_ ) {
+		using yaal::swap;
+		swap( _descending, columnInfo_._descending );
+		swap( _widthRaw, columnInfo_._widthRaw );
+		swap( _width, columnInfo_._width );
+		swap( _type, columnInfo_._type );
+		swap( _align, columnInfo_._align );
+		swap( _shortcutIndex, columnInfo_._shortcutIndex );
+		swap( _shortcut, columnInfo_._shortcut );
+		swap( _name, columnInfo_._name );
+		swap( _widget, columnInfo_._widget );
+	}
+	return;
 	M_EPILOG
 }
 

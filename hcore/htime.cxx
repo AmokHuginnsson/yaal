@@ -38,25 +38,22 @@ namespace yaal {
 namespace hcore {
 
 char const _defaultTimeFormat_[] = "%a, %d %b %Y %H:%M:%S %z";
-char const _iso8601TimeFormat_[] = "%F %T";
+char const _iso8601TimeFormat_[] = "%T";
+char const _iso8601DateFormat_[] = "%Y-%m-%d";
+char const _iso8601DateTimeFormat_[] = "%Y-%m-%d %T";
 
-HTime::HTime( now_in_t nowIn_ )
-	: _value(), _broken(), _format ( _defaultTimeFormat_ ), _cache() {
+HTime::HTime( now_in_t nowIn_, char const* format_ )
+	: _value(), _broken(), _format ( format_ ), _cache() {
 	M_PROLOG
 	set_now( nowIn_ );
 	return;
 	M_EPILOG
 }
 
-HTime::HTime( char const* strTime_, char const* format_ )
+HTime::HTime( yaal::hcore::HString const& strTime_, char const* format_ )
 	: _value(), _broken(), _format( format_ ), _cache() {
 	M_PROLOG
-	char const* err( ::strptime( strTime_, _format.raw(), &_broken ) );
-	if ( ! err )
-		err = ::strptime( strTime_, "%Y-%m-%d %T", &_broken );
-	M_ENSURE( err );
-	_broken.tm_isdst = -1;
-	_value = ::mktime( &_broken );
+	from_string( strTime_ );
 	return;
 	M_EPILOG
 }
@@ -153,6 +150,27 @@ void HTime::set_datetime( int year_, int month_,
 	M_PROLOG
 	set_date( year_, month_, day_ );
 	set_time( hour_, minute_, second_ );
+	return;
+	M_EPILOG
+}
+
+void HTime::from_string( yaal::hcore::HString const& str_ ) {
+	M_PROLOG
+	char const* err( ::strptime( str_.c_str(), _format.raw(), &_broken ) );
+	if ( ! err ) {
+		err = ::strptime( str_.c_str(), _iso8601DateTimeFormat_, &_broken );
+	}
+/*
+	if ( ! err ) {
+		err = ::strptime( str_.c_str(), _iso8601DateFormat_, &_broken );
+	}
+	if ( ! err ) {
+		err = ::strptime( str_.c_str(), _iso8601TimeFormat_, &_broken );
+	}
+*/
+	M_ENSURE( err );
+	_broken.tm_isdst = -1;
+	_value = ::mktime( &_broken );
 	return;
 	M_EPILOG
 }
@@ -269,7 +287,7 @@ bool HTime::operator > ( HTime const& time_ ) const {
 	M_EPILOG
 }
 
-HString HTime::string( void ) const {
+HString HTime::to_string( void ) const {
 	M_PROLOG
 #ifdef HAVE_SMART_STRFTIME
 	static int const MIN_TIME_STRING_LENGTH( 32 );
@@ -288,6 +306,10 @@ HString HTime::string( void ) const {
 #endif /* not HAVE_SMART_STRFTIME */
 	return ( _cache.get<char>() );
 	M_EPILOG
+}
+
+HString HTime::string( void ) const {
+	return ( to_string() );
 }
 
 i64_t HTime::raw( void ) const {

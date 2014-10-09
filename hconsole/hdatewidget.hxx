@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/htime.hxx"
 #include "hconsole/hwindow.hxx"
+#include "hconsole/hinfotime.hxx"
 
 namespace yaal {
 
@@ -44,6 +45,7 @@ public:
 	typedef HWidget base_type;
 private:
 	yaal::hcore::HTime _time;
+	HInfoTime _infoTime;
 public:
 	HDateWidget( HWindow*, int, int, yaal::hcore::HString const&,
 			HWidgetAttributesInterface const& = HWidgetAttributesInterface() );

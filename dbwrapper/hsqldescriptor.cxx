@@ -171,12 +171,26 @@ HRecordSet::ptr_t HSQLDescriptor::execute( char const* const query_ ) {
 void HSQLDescriptor::sync( int field_, HString& value ) {
 	M_PROLOG
 	if ( _mode == MODE::SELECT ) {
-		if ( _values[ field_ ] )
+		if ( _values[ field_ ] ) {
 			value = *_values[ field_ ];
-		else
+		} else {
 			value.clear();
+		}
 	} else
 		_values[ field_ ] = value;
+	M_EPILOG
+}
+
+void HSQLDescriptor::sync( int field_, HTime& value ) {
+	M_PROLOG
+	if ( _mode == MODE::SELECT ) {
+		if ( _values[ field_ ] ) {
+			value.from_string( *_values[ field_ ] );
+		} else {
+			value.set_now( HTime::LOCAL );
+		}
+	} else
+		_values[ field_ ] = value.string();
 	M_EPILOG
 }
 
