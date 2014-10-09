@@ -43,7 +43,7 @@ char const _iso8601DateFormat_[] = "%Y-%m-%d";
 char const _iso8601DateTimeFormat_[] = "%Y-%m-%d %T";
 
 HTime::HTime( now_in_t nowIn_, char const* format_ )
-	: _value(), _broken(), _format ( format_ ), _cache() {
+	: _value(), _broken(), _format( format_ ), _cache() {
 	M_PROLOG
 	set_now( nowIn_ );
 	return;
@@ -118,12 +118,12 @@ void HTime::set_time( int hour_, int minute_, int second_ ) {
 	M_PROLOG
 	if ( ( hour_ < 0 ) || ( hour_ > 23 ) )
 		M_THROW( "bad hour", hour_ );
-	_broken.tm_hour = hour_;
 	if ( ( minute_ < 0 ) || ( minute_ > 59 ) )
 		M_THROW( "bad minute", minute_ );
-	_broken.tm_min = minute_;
 	if ( ( second_ < 0 ) || ( second_ > 59 ) )
 		M_THROW( "bad second", second_ );
+	_broken.tm_hour = hour_;
+	_broken.tm_min = minute_;
 	_broken.tm_sec = second_;
 	_value = ::mktime( &_broken );
 	return;
@@ -132,12 +132,12 @@ void HTime::set_time( int hour_, int minute_, int second_ ) {
 
 void HTime::set_date( int year_, int month_, int day_ ) {
 	M_PROLOG
-	_broken.tm_year = year_ - 1900;
 	if ( ( month_ < 1 ) || ( month_ > 12 ) )
 		M_THROW( "bad month in year", month_ );
-	_broken.tm_mon = month_ - 1;
 	if ( ( day_ < 1 ) || ( day_ > 31 ) )
 		M_THROW( "bad day of month", day_ );
+	_broken.tm_year = year_ - 1900;
+	_broken.tm_mon = month_ - 1;
 	_broken.tm_mday = day_;
 	_value = ::mktime( &_broken );
 	return;
@@ -160,14 +160,12 @@ void HTime::from_string( yaal::hcore::HString const& str_ ) {
 	if ( ! err ) {
 		err = ::strptime( str_.c_str(), _iso8601DateTimeFormat_, &_broken );
 	}
-/*
 	if ( ! err ) {
 		err = ::strptime( str_.c_str(), _iso8601DateFormat_, &_broken );
 	}
 	if ( ! err ) {
 		err = ::strptime( str_.c_str(), _iso8601TimeFormat_, &_broken );
 	}
-*/
 	M_ENSURE( err );
 	_broken.tm_isdst = -1;
 	_value = ::mktime( &_broken );
@@ -209,6 +207,71 @@ int HTime::get_second( void ) const {
 	M_PROLOG
 	return ( _broken.tm_sec );
 	M_EPILOG
+}
+
+int HTime::get_day_of_week( void ) const {
+	M_PROLOG
+	return ( ( _broken.tm_wday + DAYS_IN_WEEK - 1 ) % DAYS_IN_WEEK );
+	M_EPILOG
+}
+
+int HTime::get_days_in_month( void ) const {
+	M_PROLOG
+	static int const daysInMonth[] = {
+		31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+	};
+	int year( get_year() );
+	bool leapYear( ( ( ( year % 4 ) == 0 ) && ( year % 100 ) != 0 ) || ( ( year % 400 ) == 0 ) );
+	return ( daysInMonth[_broken.tm_mon] + ( ( _broken.tm_mon == 1 ) && leapYear ? 1 : 0 ) );
+	M_EPILOG
+}
+
+void HTime::mod_year( int mod_ ) {
+	_broken.tm_year += mod_;
+	_value = ::mktime( &_broken );
+	return;
+}
+
+void HTime::mod_month( int mod_ ) {
+	_broken.tm_year += mod_ / MONTHS_IN_YEAR;
+	_broken.tm_mon += mod_ % MONTHS_IN_YEAR;
+	if ( _broken.tm_mon < 0 ) {
+		_broken.tm_mon += MONTHS_IN_YEAR;
+		-- _broken.tm_year;
+	} else if ( _broken.tm_mon >= MONTHS_IN_YEAR ) {
+		_broken.tm_mon -= MONTHS_IN_YEAR;
+		++ _broken.tm_year;
+	}
+	_value = ::mktime( &_broken );
+	return;
+}
+
+void HTime::mod_day( int mod_ ) {
+	_value += ( mod_ * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE );
+	time_t t( static_cast<time_t>( _value ) );
+	M_ENSURE( localtime_r( &t, &_broken ) );
+	return;
+}
+
+void HTime::mod_hour( int mod_ ) {
+	_value += ( mod_ * MINUTES_IN_HOUR * SECONDS_IN_MINUTE );
+	time_t t( static_cast<time_t>( _value ) );
+	M_ENSURE( localtime_r( &t, &_broken ) );
+	return;
+}
+
+void HTime::mod_minute( int mod_ ) {
+	_value += ( mod_ * SECONDS_IN_MINUTE );
+	time_t t( static_cast<time_t>( _value ) );
+	M_ENSURE( localtime_r( &t, &_broken ) );
+	return;
+}
+
+void HTime::mod_second( int mod_ ) {
+	_value += mod_;
+	time_t t( static_cast<time_t>( _value ) );
+	M_ENSURE( localtime_r( &t, &_broken ) );
+	return;
 }
 
 void HTime::swap( HTime& time_ ) {
@@ -287,20 +350,21 @@ bool HTime::operator > ( HTime const& time_ ) const {
 	M_EPILOG
 }
 
-HString HTime::to_string( void ) const {
+HString HTime::to_string( HString const& format_ ) const {
 	M_PROLOG
+	HString const& format( ! format_.is_empty() ? format_ : _format );
 #ifdef HAVE_SMART_STRFTIME
 	static int const MIN_TIME_STRING_LENGTH( 32 );
-	int long size( static_cast<int long>( ::strftime( NULL, 1024, _format.raw(), &_broken ) + 1 ) );
+	int long size( static_cast<int long>( ::strftime( NULL, 1024, format.raw(), &_broken ) + 1 ) );
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 	_cache.realloc( max<int long>( size, MIN_TIME_STRING_LENGTH ) );
 	M_ENSURE( static_cast<int>( ::strftime( _cache.get<char>(),
-					static_cast<size_t>( size ), _format.raw(), &_broken ) ) < size );
+					static_cast<size_t>( size ), format.raw(), &_broken ) ) < size );
 #else /* HAVE_SMART_STRFTIME */
 	static int const MIN_TIME_STRING_LENGTH( 64 );
 	_cache.realloc( MIN_TIME_STRING_LENGTH ); /* FIXME that is pretty dumb hack */
-	int long size( static_cast<int long>( ::strftime( _cache.get<char>(), MIN_TIME_STRING_LENGTH - 1, _format.raw(), &_broken ) ) + 1 );
+	int long size( static_cast<int long>( ::strftime( _cache.get<char>(), MIN_TIME_STRING_LENGTH - 1, format.raw(), &_broken ) ) + 1 );
 	if ( size < 2 )
 		M_THROW( "bad format", errno );
 #endif /* not HAVE_SMART_STRFTIME */

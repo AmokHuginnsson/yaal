@@ -55,6 +55,11 @@ public:
 		UTC,
 		LOCAL
 	} now_in_t;
+	static int const MONTHS_IN_YEAR = 12;
+	static int const DAYS_IN_WEEK = 7;
+	static int const HOURS_IN_DAY = 24;
+	static int const MINUTES_IN_HOUR = 60;
+	static int const SECONDS_IN_MINUTE = 60;
 private:
 	i64_t _value;
 	tm _broken;
@@ -91,6 +96,14 @@ public:
 	int get_hour( void ) const;
 	int get_minute( void ) const;
 	int get_second( void ) const;
+	int get_day_of_week( void ) const;
+	int get_days_in_month( void ) const;
+	void mod_year( int );
+	void mod_month( int );
+	void mod_day( int );
+	void mod_hour( int );
+	void mod_minute( int );
+	void mod_second( int );
 	HTime& operator = ( HTime const& );
 	HTime operator - ( HTime const& ) const;
 	HTime& operator -= ( HTime const& );
@@ -101,7 +114,7 @@ public:
 	bool operator < ( HTime const& ) const;
 	bool operator > ( HTime const& ) const;
 	HString string( void ) const;
-	HString to_string( void ) const;
+	HString to_string( HString const& = HString() ) const;
 	i64_t raw( void ) const;
 };
 
