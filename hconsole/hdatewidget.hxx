@@ -44,8 +44,15 @@ public:
 	typedef HDateWidget this_type;
 	typedef HWidget base_type;
 private:
+	struct MODE {
+		typedef enum {
+			VIEW,
+			EDIT
+		} mode_t;
+	};
 	yaal::hcore::HTime _time;
 	HInfoTime _infoTime;
+	MODE::mode_t _mode;
 public:
 	HDateWidget( HWindow*, int, int, yaal::hcore::HString const&,
 			HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
@@ -56,6 +63,11 @@ protected:
 	virtual bool do_click( mouse::OMouse& );
 	virtual HInfo const& do_get_data( void ) const;
 	virtual void do_set_data( HInfo const& );
+	void on_key_down( void );
+	void on_key_up( void );
+	void on_key_left( void );
+	void on_key_right( void );
+	char const* week_day_name( int );
 };
 
 }
