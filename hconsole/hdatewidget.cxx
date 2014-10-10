@@ -132,7 +132,7 @@ int HDateWidget::do_process_input( int code_ ) {
 	if ( !unknown ) {
 		code_ = 0;
 		schedule_repaint();
-		_window->status_bar()->message( COLORS::FG_LIGHTGRAY, "%s", _varTmpBuffer.raw() );
+		_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
 	}
 	return ( code_ );
 	M_EPILOG
@@ -203,6 +203,40 @@ void HDateWidget::do_set_data( HInfo const& data_ ) {
 	_time.set_format( _iso8601DateFormat_ );
 	return;
 	M_EPILOG
+}
+
+HWidget::ptr_t HDateWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HWidgetAttributes attrs;
+	prepare_attributes( attrs, node_ );
+	OResource r( get_resource( node_ ) );
+	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
+	HWidget* edit( new HDateWidget( window_, r._row, r._column, r._label, attrs ) );
+	apply_resources( edit->get_pointer(), node_ );
+	return ( edit->get_pointer() );
+	M_EPILOG
+}
+
+bool HDateWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) {
+	M_PROLOG
+	return ( true );
+	M_EPILOG
+}
+
+bool HDateWidgetCreator::do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) {
+	return ( false );
+}
+
+namespace {
+
+bool register_creator( void ) {
+	HWidgetFactory::get_instance().register_widget_creator( "date",
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HDateWidgetCreator() ) ) );
+	return ( true );
+}
+
+bool volatile registered = register_creator();
+
 }
 
 }

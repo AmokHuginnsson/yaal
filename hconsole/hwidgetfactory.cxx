@@ -166,8 +166,10 @@ HWidgetCreatorInterface::OResource HWidgetCreatorInterface::get_resource( yaal::
 		if ( name == POSITION_NAME ) {
 			r._row = lexical_cast<int>( xml::attr_val( n, "row" ) );
 			r._column = lexical_cast<int>( xml::attr_val( n, "column" ) );
-			r._height = lexical_cast<int>( xml::attr_val( n, "height" ) );
-			r._width = lexical_cast<int>( xml::attr_val( n, "width" ) );
+			xml::value_t height( xml::try_attr_val( n, "height" ) );
+			r._height = !! height ? lexical_cast<int>( *height ) : 0;
+			xml::value_t width( xml::try_attr_val( n, "width" ) );
+			r._width = !! width ? lexical_cast<int>( *width ) : 0;
 		} else if ( name == LABEL_NAME ) {
 			r._label = xml::node_val( n );
 			xml::value_t position( xml::try_attr_val( n, "position" ) );
