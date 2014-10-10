@@ -63,11 +63,16 @@ protected:
 	virtual bool do_click( mouse::OMouse& );
 	virtual HInfo const& do_get_data( void ) const;
 	virtual void do_set_data( HInfo const& );
+	virtual void do_kill_focus( void );
 	void on_key_down( void );
 	void on_key_up( void );
 	void on_key_left( void );
 	void on_key_right( void );
+	void on_key_page_down( void );
+	void on_key_page_up( void );
+	void on_key_enter( void );
 	char const* week_day_name( int );
+	int get_first_day_of_month_in_week_index( void ) const;
 };
 
 class HDateWidgetCreator : virtual public HWidgetCreatorInterface {

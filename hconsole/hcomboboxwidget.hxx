@@ -69,13 +69,13 @@ public:
 	);
 	virtual ~HComboboxWidget ( void );
 	void set_dropped_width( int );
-	virtual int kill_focus( void ); /* this one will be used here */
 protected:
 	virtual int do_process_input( int );
 	virtual void do_paint( void );
 	virtual bool do_click( mouse::OMouse& );
+	virtual void do_kill_focus( void ); /* this one will be used here */
 private:
-	void close_combo ( void );
+	void close_combo( void );
 };
 
 typedef yaal::hcore::HExceptionT<HComboboxWidget, HListWidgetException> HComboboxWidgetException;

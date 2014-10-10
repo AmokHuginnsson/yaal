@@ -46,12 +46,15 @@ void center( HString& str_, int toLen_ ) {
 	}
 }
 
+static int const CAL_EDIT_WIDTH = 22;
+static int const CAL_VIEW_WIDTH = static_cast<int>( sizeof ( " 0000-00-00 " ) ) - 1;
+
 }
 
 HDateWidget::HDateWidget( HWindow* parent_, int row_, int column_,
 		yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
-	: HWidget( parent_, row_, column_, 1, static_cast<int>( sizeof ( " 0000-00-00 " ) ) - 1, label_ ),
+	: HWidget( parent_, row_, column_, 1, CAL_VIEW_WIDTH, label_ ),
 	_time( HTime::LOCAL, _iso8601DateFormat_ ), _infoTime( _time ), _mode( MODE::VIEW ) {
 	M_PROLOG
 	attr_.apply( *this );
@@ -74,6 +77,8 @@ void HDateWidget::do_paint( void ) {
 	draw_label();
 	if ( _mode == MODE::VIEW ) {
 		cons.mvprintf( _rowRaw, _columnRaw, " %s ", _time.string().c_str() );
+		_heightRaw = 1;
+		_widthRaw = CAL_VIEW_WIDTH;
 	} else {
 		int rowOffset( 0 );
 		HString month( _time.to_string( "%B %Y" ) );
@@ -84,14 +89,13 @@ void HDateWidget::do_paint( void ) {
 			cons.mvprintf( _rowRaw + rowOffset, _columnRaw + i * 3, " %s ", week_day_name( ( i + 1 ) % HTime::DAYS_IN_WEEK ) );
 		}
 		++ rowOffset;
-		HTime firstDayOfMonth( _time.get_year(), _time.get_month(), 1 );
-		int firstDayOfMonthInWeekIdx( firstDayOfMonth.get_day_of_week() );
+		int firstDayOfMonthInWeekIdx( get_first_day_of_month_in_week_index() );
 		int weeksInMonth( ( _time.get_days_in_month() + firstDayOfMonthInWeekIdx + HTime::DAYS_IN_WEEK - 1 ) / HTime::DAYS_IN_WEEK );
 		cons.set_attr( COLORS::ATTR_NORMAL );
-		cons.mvprintf( _rowRaw + rowOffset + 5, _columnRaw, "%*c", 22, ' ' );
+		cons.mvprintf( _rowRaw + rowOffset + 5, _columnRaw, "%*c", CAL_EDIT_WIDTH, ' ' );
 		set_attr_data();
 		for ( int i( 0 ); i < weeksInMonth; ++ i ) {
-			cons.mvprintf( _rowRaw + rowOffset + i, _columnRaw, "%*c", 22, ' ' );
+			cons.mvprintf( _rowRaw + rowOffset + i, _columnRaw, "%*c", CAL_EDIT_WIDTH, ' ' );
 		}
 		for ( int i( 0 ), dim( _time.get_days_in_month() ); i < dim; ++ i ) {
 			int row( ( i + firstDayOfMonthInWeekIdx ) / HTime::DAYS_IN_WEEK );
@@ -104,7 +108,27 @@ void HDateWidget::do_paint( void ) {
 				set_attr_data();
 			}
 		}
+		_heightRaw = weeksInMonth + 2;
+		_widthRaw = CAL_EDIT_WIDTH;
 	}
+	return;
+	M_EPILOG
+}
+
+int HDateWidget::get_first_day_of_month_in_week_index( void ) const {
+	M_PROLOG
+	HTime firstDayOfMonth( _time.get_year(), _time.get_month(), 1 );
+	return ( firstDayOfMonth.get_day_of_week() );
+	M_EPILOG
+}
+
+void HDateWidget::do_kill_focus( void ) {
+	M_PROLOG
+	if ( _mode == MODE::EDIT ) {
+		_mode = MODE::VIEW;
+		_window->schedule_repaint( true );
+	}
+	HWidget::do_kill_focus();
 	return;
 	M_EPILOG
 }
@@ -125,6 +149,15 @@ int HDateWidget::do_process_input( int code_ ) {
 		case ( KEY_CODES::RIGHT ): {
 			on_key_right();
 		} break;
+		case ( KEY_CODES::PAGE_DOWN ): {
+			on_key_page_down();
+		} break;
+		case ( KEY_CODES::PAGE_UP ): {
+			on_key_page_up();
+		} break;
+		case ( '\r' ): {
+			on_key_enter();
+		} break;
 		default: {
 			unknown = true;
 		}
@@ -138,12 +171,24 @@ int HDateWidget::do_process_input( int code_ ) {
 	M_EPILOG
 }
 
+void HDateWidget::on_key_enter( void ) {
+	M_PROLOG
+	if ( _mode == MODE::EDIT ) {
+		_mode = MODE::VIEW;
+		_window->schedule_repaint( true );
+	} else {
+		_mode = MODE::EDIT;
+	}
+	return;
+	M_EPILOG
+}
+
 void HDateWidget::on_key_down( void ) {
 	M_PROLOG
-	if ( _mode == MODE::VIEW ) {
-		_mode = MODE::EDIT;
-	} else {
+	if ( _mode == MODE::EDIT ) {
 		_time.mod_day( HTime::DAYS_IN_WEEK );
+	} else {
+		_mode = MODE::EDIT;
 	}
 	return;
 	M_EPILOG
@@ -157,14 +202,16 @@ void HDateWidget::on_key_up( void ) {
 	return;
 	M_EPILOG
 }
+
 void HDateWidget::on_key_left( void ) {
 	M_PROLOG
 	if ( _mode == MODE::EDIT ) {
-		_time.mod_day( - 1 );
+		_time.mod_day( -1 );
 	}
 	return;
 	M_EPILOG
 }
+
 void HDateWidget::on_key_right( void ) {
 	M_PROLOG
 	if ( _mode == MODE::EDIT ) {
@@ -174,9 +221,47 @@ void HDateWidget::on_key_right( void ) {
 	M_EPILOG
 }
 
-bool HDateWidget::do_click( mouse::OMouse& ) {
+void HDateWidget::on_key_page_down( void ) {
 	M_PROLOG
-	return ( false );
+	if ( _mode == MODE::EDIT ) {
+		_time.mod_month( 1 );
+	}
+	return;
+	M_EPILOG
+}
+
+void HDateWidget::on_key_page_up( void ) {
+	M_PROLOG
+	if ( _mode == MODE::EDIT ) {
+		_time.mod_month( -1 );
+	}
+	return;
+	M_EPILOG
+}
+
+bool HDateWidget::do_click( mouse::OMouse& mouse_ ) {
+	M_PROLOG
+	bool handled( HWidget::do_click( mouse_ ) );
+	if ( ! handled ) {
+		if ( _mode == MODE::EDIT ) {
+			int row( ( mouse_._row - _rowRaw ) - 2 );
+			int col( ( mouse_._column - _columnRaw ) / 3 );
+			int day( ( HTime::DAYS_IN_WEEK * row + col - get_first_day_of_month_in_week_index() ) + 1 );
+			if ( day == _time.get_day() ) {
+				on_key_enter();
+				handled = true;
+			} else if ( ( day > 0 ) && ( day <= _time.get_days_in_month() ) ) {
+				_time.mod_day( day - _time.get_day() );
+				schedule_repaint();
+				handled = true;
+			}
+		} else {
+			_mode = MODE::EDIT;
+			schedule_repaint();
+			handled = true;
+		}
+	}
+	return ( handled );
 	M_EPILOG
 }
 

@@ -132,11 +132,10 @@ HListWidget::~HListWidget( void ) {
 
 void HListWidget::do_paint( void ) {
 	M_PROLOG
-	int columnOffset = 0;
-	int columns = static_cast<int>( _header.size() );
+	int columnOffset( 0 );
+	int columns( static_cast<int>( _header.size() ) );
 	int hR = _drawHeader ? 1 : 0; /* HR stands for header row */
 	int size = static_cast<int>( _model->size() );
-	HColumnInfo * columnInfo = NULL;
 	HConsole& cons = HConsole::get_instance();
 	int tmp( _widthRaw );
 	if ( _focused )
@@ -159,15 +158,12 @@ void HListWidget::do_paint( void ) {
 					ctr < ( size > _heightRaw ? _heightRaw : size );
 					++ ctr, ++ it ) {
 			columnOffset = 0;
-			for ( int ctrLoc( 0 ); ctrLoc < columns; ctrLoc ++ ) {
-				columnInfo = & _header[ ctrLoc ];
+			for ( int ctrLoc( 0 ); ctrLoc < columns; ++ ctrLoc ) {
+				HColumnInfo* columnInfo( &_header[ ctrLoc ] );
 				if ( columnInfo->_widthRaw ) {
 					bool checked( get_text_for_cell( it, ctrLoc, columnInfo->_type ) );
 					draw_cell( it, ctr, ctrLoc, columnOffset, columnInfo, checked );
 					columnOffset += columnInfo->_widthRaw;
-				}
-				if ( ( it == _cursor ) && columnInfo->_widget ) {
-					(*it)[ ctrLoc ].set_child_widget_data( columnInfo->_widget );
 				}
 			}
 		}
@@ -381,6 +377,7 @@ void HListWidget::handle_key_page_up( void ) {
 	} else {
 		_cursorPosition = 0;
 		_cursor = _firstVisibleRow;
+		update_children();
 	}
 	return;
 }
@@ -403,11 +400,13 @@ void HListWidget::handle_key_page_down( void ) {
 			_cursorPosition = _heightRaw - 1;
 			_cursor = _firstVisibleRow;
 			increment( _cursor, _heightRaw - 1 );
+			update_children();
 		}
 	} else {
 		if ( _cursorPosition != ( size - 1 ) ) {
 			_cursorPosition = size - 1;
 			_cursor = _model->rbegin();
+			update_children();
 		} else
 			HConsole::get_instance().bell();
 	}
@@ -424,6 +423,7 @@ void HListWidget::handle_key_up( void ) {
 			-- _cursor;
 			-- _widgetOffset;
 		}
+		update_children();
 	} else
 		HConsole::get_instance().bell();
 	return;
@@ -442,8 +442,10 @@ void HListWidget::handle_key_end( void ) {
 		_widgetOffset = size - _heightRaw;
 		_firstVisibleRow = _cursor;
 		decrement( _firstVisibleRow, _heightRaw - 1 );
-	} else
+	} else {
 		_cursorPosition = size - 1;
+	}
+	update_children();
 	return;
 }
 
@@ -456,33 +458,44 @@ void HListWidget::handle_key_down( void ) {
 			++ _widgetOffset;
 			++ _firstVisibleRow;
 		}
-	} else
+		update_children();
+	} else {
 		HConsole::get_instance().bell();
+	}
 	return;
 }
 
 void HListWidget::handle_key_ctrl_n ( void ) {
-	if ( _backwards )
+	M_PROLOG
+	if ( _backwards ) {
 		go_to_match_previous();
-	else
+	} else {
 		go_to_match();
+	}
 	return;
+	M_EPILOG
 }
 
 void HListWidget::handle_key_ctrl_p( void ) {
-	if ( _backwards )
+	M_PROLOG
+	if ( _backwards ) {
 		go_to_match();
-	else
+	} else {
 		go_to_match_previous();
+	}
 	return;
+	M_EPILOG
 }
 
 void HListWidget::handle_key_space( void ) {
+	M_PROLOG
 	M_ASSERT( ! _model->is_empty() );
 	M_ASSERT( _cursor.is_valid() );
-	if ( _checkable )
+	if ( _checkable ) {
 		_cursor->switch_state();
+	}
 	return;
+	M_EPILOG
 }
 
 void HListWidget::handle_key_tab( void ) {
@@ -643,13 +656,16 @@ bool HListWidget::do_click( mouse::OMouse& mouse_ ) {
 				return ( false );
 			} else {
 				if ( row > _cursorPosition ) {
-					for ( int i( _cursorPosition ); i < row; ++ i )
+					for ( int i( _cursorPosition ); i < row; ++ i ) {
 						++ _cursor;
+					}
 				} else {
-					for ( int i( _cursorPosition ); i > row; -- i )
+					for ( int i( _cursorPosition ); i > row; -- i ) {
 						-- _cursor;
+					}
 				}
 				_cursorPosition = row;
+				update_children();
 			}
 			schedule_repaint();
 			handled = true;
@@ -664,10 +680,12 @@ void HListWidget::scroll_up( void ) {
 	if ( _widgetOffset > 0 ) {
 		-- _widgetOffset;
 		-- _firstVisibleRow;
-		if ( _cursorPosition < ( _heightRaw - 1 ) )
+		if ( _cursorPosition < ( _heightRaw - 1 ) ) {
 			++ _cursorPosition;
-		else
+		} else {
 			-- _cursor;
+			update_children();
+		}
 	}
 	return;
 	M_EPILOG
@@ -678,10 +696,12 @@ void HListWidget::scroll_down( void ) {
 	if ( ( _widgetOffset + _heightRaw ) < _model->size() ) {
 		++ _widgetOffset;
 		++ _firstVisibleRow;
-		if ( _cursorPosition > 0 )
+		if ( _cursorPosition > 0 ) {
 			-- _cursorPosition;
-		else
+		} else {
 			++ _cursor;
+			update_children();
+		}
 	}
 	return;
 	M_EPILOG
@@ -695,6 +715,8 @@ void HListWidget::reset( void ) {
 	M_PROLOG
 	_firstVisibleRow = _cursor = _model->begin();
 	_widgetOffset = _cursorPosition = 0;
+	update_children();
+	return;
 	M_EPILOG
 }
 
@@ -766,8 +788,10 @@ void HListWidget::go_to_match( void ) {
 		_match._columnWithMatch = 0;
 		_varTmpBuffer = HString( _( "pattern not found: " ) ) + _pattern.error();
 	}
-	if ( outcome )
+	if ( outcome ) {
 		_varTmpBuffer = outcome;
+	}
+	update_children();
 	return;
 	M_EPILOG
 }
@@ -855,8 +879,10 @@ void HListWidget::go_to_match_previous( void ) {
 		_match._columnWithMatch = 0;
 		_varTmpBuffer = _( "pattern not found" );
 	}
-	if ( outcome )
+	if ( outcome ) {
 		_varTmpBuffer = outcome;
+	}
+	update_children();
 	return;
 	M_EPILOG
 }
@@ -908,7 +934,7 @@ int long HListWidget::get_row_count( void ) {
 	return ( _model->size() );
 }
 
-void HListWidget::remove_current_row ( void ) {
+void HListWidget::remove_current_row( void ) {
 	M_PROLOG
 	bool flag = true;
 	if ( _widgetOffset
@@ -919,13 +945,16 @@ void HListWidget::remove_current_row ( void ) {
 		_cursorPosition --;
 	else
 		flag = false;
-	if ( _cursor == _firstVisibleRow )
+	if ( _cursor == _firstVisibleRow ) {
 		++ _firstVisibleRow;
+	}
 	iterator_t it = _cursor;
-	if ( flag )
+	if ( flag ) {
 		++ _cursor;
+	}
 	_model->erase( it );
 	schedule_repaint();
+	update_children();
 	return;
 	M_EPILOG
 }
@@ -936,6 +965,22 @@ void HListWidget::do_update( void ) {
 		_widgetOffset = _cursorPosition = 0;
 		_firstVisibleRow = _model->begin();
 		_cursor = _model->begin();
+		update_children();
+	}
+	return;
+	M_EPILOG
+}
+
+void HListWidget::update_children( void ) {
+	M_PROLOG
+	int columns( static_cast<int>( _header.size() ) );
+	if ( ! _model->is_empty() ) {
+		for ( int i( 0 ); i < columns; ++ i ) {
+			HColumnInfo* columnInfo( &_header[ i ] );
+			if ( columnInfo->_widget ) {
+				(*_cursor)[ i ].set_child_widget_data( columnInfo->_widget );
+			}
+		}
 	}
 	return;
 	M_EPILOG

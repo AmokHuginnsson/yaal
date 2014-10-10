@@ -152,13 +152,19 @@ bool HWidget::set_focus( char shortCut_ ) {
 	M_EPILOG
 }
 
-int HWidget::kill_focus( void ) {
+void HWidget::kill_focus( void ) {
 	M_PROLOG
-	if ( ! _focused )
-		return ( 1 );
-	_focused = false;
-	schedule_repaint();
-	return ( 0 );
+	do_kill_focus();
+	M_EPILOG
+}
+
+void HWidget::do_kill_focus( void ) {
+	M_PROLOG
+	if ( _focused ) {
+		_focused = false;
+		schedule_repaint();
+	}
+	return;
 	M_EPILOG
 }
 
@@ -257,7 +263,10 @@ void HWidget::do_draw_label( void ) {
 			_widthRaw -= _labelLength;
 		}
 	} else {
-		_rowRaw ++, _heightRaw --;
+		++ _rowRaw;
+		if ( _height < 0 ) {
+			-- _heightRaw;
+		}
 	}
 	if ( ( _columnRaw + _widthRaw ) >= cons.get_width() ) {
 		_widthRaw = cons.get_width() - _columnRaw;
@@ -374,7 +383,7 @@ bool HWidget::hit_test( int row_, int column_ ) const {
 bool HWidget::do_hit_test( int row_, int column_ ) const {
 	M_PROLOG
 	bool hit( true );
-	if ( ( row_ < _rowRaw ) || ( row_ > ( _rowRaw + _heightRaw ) ) ) {
+	if ( ( row_ < _rowRaw ) || ( row_ >= ( _rowRaw + _heightRaw ) ) ) {
 		hit = false;
 	} if ( ( column_ < _columnRaw )
 			|| ( column_ >= ( _columnRaw + _widthRaw ) ) ) {

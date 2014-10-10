@@ -71,13 +71,14 @@ void HComboboxWidget::set_dropped_width( int droppedWidth_ ) {
 	M_EPILOG
 }
 
-int HComboboxWidget::kill_focus( void ) {
+void HComboboxWidget::do_kill_focus( void ) {
 	M_PROLOG
 	if ( _mode == MODE::LISTCONTROL ) {
 		_mode = MODE::EDITCONTROL;
 		_window->schedule_repaint( true );
 	}
-	return ( HWidget::kill_focus() );
+	HWidget::do_kill_focus();
+	return;
 	M_EPILOG
 }
 

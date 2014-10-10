@@ -188,10 +188,8 @@ public:
 /*! \brief Focus managing method (lose).
  *
  * Allows for focus removal from widget owner context.
- *
- * \return Return 0 if focus was really dropped, otherwise return 1.
  */
-	virtual int kill_focus( void );
+	void kill_focus( void );
 
 /*! \brief Interface for setting widget data.
  *
@@ -380,7 +378,7 @@ public:
  *
  * \return This widget parent window (owner).
  */
-HWindow* get_window( void ) const;
+	HWindow* get_window( void ) const;
 
 protected:
 	void set_attr_label( void ) const;
@@ -389,6 +387,7 @@ protected:
 	virtual int do_process_input( int );
 	virtual void do_paint( void ) = 0;
 	virtual void do_update( void );
+	virtual void do_kill_focus( void );
 	virtual bool do_hit_test( int, int ) const;
 	virtual bool do_click( mouse::OMouse& );
 	virtual void do_draw_label( void );

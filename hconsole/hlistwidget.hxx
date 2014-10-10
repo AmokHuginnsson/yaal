@@ -425,6 +425,7 @@ public:
 protected:
 	virtual bool get_text_for_cell( iterator_t&, int, type_id_t );
 	virtual void do_paint( void );
+	void update_children( void );
 	void draw_cell( iterator_t&, int, int, int, HColumnInfo const* const, bool );
 	virtual int do_process_input( int );
 	virtual bool is_searchable( void );
