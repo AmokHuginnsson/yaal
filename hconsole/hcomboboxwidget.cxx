@@ -51,7 +51,8 @@ HComboboxWidget::HComboboxWidget ( HWindow * parent_,
 		HSearchableWidget( attr_ ),
 		HListWidget( NULL, 0, 0, 0, 0, HString() ),
 		_mode( MODE::EDITCONTROL ),
-		_droppedWidth( 0 ) {
+		_droppedWidth( 0 ),
+		_origSelection() {
 	M_PROLOG
 	attr_.apply( *this );
 	return;
@@ -115,24 +116,34 @@ void HComboboxWidget::do_paint( void ) {
 
 int HComboboxWidget::do_process_input( int code_ ) {
 	M_PROLOG
+	int code( 0 );
 	if ( _mode == MODE::EDITCONTROL ) {
 		switch ( code_ ) {
-			case ( KEY_CODES::UP ):
+			case ( KEY_CODES::UP ): {
 				_mode = MODE::LISTCONTROL;
-			break;
-			case ( KEY_CODES::DOWN ):
+				save_selection();
+			} break;
+			case ( KEY_CODES::DOWN ): {
 				_mode = MODE::LISTCONTROL;
-			break;
-			default :
-				return ( HEditWidget::do_process_input ( code_ ) );
+				save_selection();
+			} break;
+			default: {
+				code = HEditWidget::do_process_input( code_ );
+			}
 		}
 		schedule_repaint();
 	} else {
-		if ( code_ != '\r' )
-			return ( HListWidget::do_process_input ( code_ ) );
-		close_combo();
+		if ( code_ == '\r' ) {
+			save_selection();
+			close_combo();
+		} else if ( code_ == KEY_CODES::ESC ) {
+			restore_selection();
+			close_combo();
+		} else {
+			code = HListWidget::do_process_input( code_ );
+		}
 	}
-	return ( 0 );
+	return ( code );
 	M_EPILOG
 }
 
@@ -153,6 +164,7 @@ bool HComboboxWidget::do_click( mouse::OMouse& mouse_ ) {
 	} else {
 		handled = HListWidget::do_click( mouse_ );
 		if ( ! handled ) {
+			save_selection();
 			close_combo();
 			handled = true;
 		}
@@ -171,6 +183,40 @@ void HComboboxWidget::close_combo( void ) {
 	return;
 	M_EPILOG
 }
+
+void HComboboxWidget::save_selection( void ) {
+	M_PROLOG
+	_origSelection._cursor = _cursor;
+	_origSelection._firstVisibleRow = _firstVisibleRow;
+	_origSelection._widgetOffset = HListWidget::_widgetOffset;
+	_origSelection._cursorPosition = HListWidget::_cursorPosition;
+	return;
+	M_EPILOG
+}
+
+void HComboboxWidget::restore_selection( void ) {
+	M_PROLOG
+	_cursor = _origSelection._cursor;
+	_firstVisibleRow = _origSelection._firstVisibleRow;
+	HListWidget::_widgetOffset = _origSelection._widgetOffset;
+	HListWidget::_cursorPosition = _origSelection._cursorPosition;
+	schedule_repaint();
+	return;
+	M_EPILOG
+}
+
+void HComboboxWidget::select_by_index( int ) {
+	save_selection();
+}
+
+int HComboboxWidget::get_selected_index( void ) const {
+	return ( _origSelection._widgetOffset + _origSelection._cursorPosition );
+}
+
+yaal::hcore::HString const& HComboboxWidget::get_selected_text( void ) const {
+	return ( _string );
+}
+
 
 HComboboxWidgetAttributes::HComboboxWidgetAttributes( void )
 	: HEditWidgetAttributes(), HListWidgetAttributes(),

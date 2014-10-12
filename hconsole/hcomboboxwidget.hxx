@@ -61,6 +61,15 @@ public:
 protected:
 	MODE::mode_t _mode; /* operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
 	int _droppedWidth;	/* width of dropped list */
+	struct OSelection {
+		iterator_t _cursor;
+		iterator_t _firstVisibleRow;
+		int  _widgetOffset;
+		int  _cursorPosition;
+		OSelection( void )
+			: _cursor(), _firstVisibleRow(), _widgetOffset( 0 ), _cursorPosition( 0 ) {
+		}
+	} _origSelection;
 public:
 	HComboboxWidget( HWindow* parent,
 			int row, int col, int height, int width,
@@ -69,7 +78,12 @@ public:
 	);
 	virtual ~HComboboxWidget ( void );
 	void set_dropped_width( int );
+	void select_by_index( int );
+	int get_selected_index( void ) const;
+	yaal::hcore::HString const& get_selected_text( void ) const;
 protected:
+	void save_selection( void );
+	void restore_selection( void );
 	virtual int do_process_input( int );
 	virtual void do_paint( void );
 	virtual bool do_click( mouse::OMouse& );
