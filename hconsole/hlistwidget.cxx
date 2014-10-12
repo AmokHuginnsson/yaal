@@ -218,7 +218,7 @@ void HListWidget::draw_header( int columns_ ) {
 				for ( ctrLoc = 0; ctrLoc < ( _heightRaw + hR );
 						ctrLoc ++ ) {
 					cons.move( _rowRaw + ctrLoc, _columnRaw + columnOffset - 1 );
-					cons.addch( GLYPHS::VERTICAL_LINE );
+					cons.addch( GLYPHS::LINE::SINGLE::VERTICAL );
 				}
 			}
 		}
@@ -252,11 +252,11 @@ void HListWidget::draw_scroll( int posX_ ) {
 	HConsole& cons = HConsole::get_instance();
 	if ( _widgetOffset ) {
 		cons.move( _rowRaw, posX_ );
-		cons.addch( GLYPHS::UP_ARROW );
+		cons.addch( GLYPHS::ARROW::UP );
 	}
 	if ( ( size - _widgetOffset ) > _heightRaw ) {
 		cons.move( _rowRaw + _heightRaw - 1, posX_ );
-		cons.addch( GLYPHS::DOWN_ARROW );
+		cons.addch( GLYPHS::ARROW::DOWN );
 	}
 	scaled = _heightRaw - 3;
 	scaled *= static_cast<double>(

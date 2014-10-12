@@ -69,7 +69,60 @@ namespace hconsole {
 
 STATIC_ASSERT( KEY_CODES::SPECIAL_KEY > KEY_MAX );
 
-int GLYPHS::DOWN_ARROW, GLYPHS::UP_ARROW, GLYPHS::VERTICAL_LINE;
+#ifdef HAVE_ASCII_GRAPHICS
+int const GLYPHS::ARROW::DOWN       = static_cast<int>( ACS_DARROW );
+int const GLYPHS::ARROW::UP         = static_cast<int>( ACS_UARROW );
+int const GLYPHS::ARROW::LEFT       = static_cast<int>( ACS_LARROW );
+int const GLYPHS::ARROW::RIGHT      = static_cast<int>( ACS_RARROW );
+int const GLYPHS::ARROW::HORIZONTAL = static_cast<int>( ACS_RARROW );
+int const GLYPHS::ARROW::VERTICAL   = static_cast<int>( ACS_RARROW );
+
+int const GLYPHS::CHECKER::SPARSE = static_cast<int>( ACS_BOARD );
+int const GLYPHS::CHECKER::MEDIUM = static_cast<int>( ACS_BOARD );
+int const GLYPHS::CHECKER::DENSE  = static_cast<int>( ACS_CKBOARD );
+
+int const GLYPHS::LINE::SINGLE::VERTICAL          = static_cast<int>( ACS_VLINE );
+int const GLYPHS::LINE::SINGLE::HORIZONTAL        = static_cast<int>( ACS_HLINE );
+int const GLYPHS::LINE::SINGLE::BOTTOM_LEFT       = static_cast<int>( ACS_URCORNER );
+int const GLYPHS::LINE::SINGLE::BOTTOM_RIGHT      = static_cast<int>( ACS_ULCORNER );
+int const GLYPHS::LINE::SINGLE::TOP_LEFT          = static_cast<int>( ACS_LRCORNER );
+int const GLYPHS::LINE::SINGLE::TOP_RIGHT         = static_cast<int>( ACS_LLCORNER );
+int const GLYPHS::LINE::SINGLE::VERTICAL_LEFT     = static_cast<int>( ACS_RTEE );
+int const GLYPHS::LINE::SINGLE::VERTICAL_RIGHT    = static_cast<int>( ACS_LTEE );
+int const GLYPHS::LINE::SINGLE::HORIZONTAL_TOP    = static_cast<int>( ACS_BTEE );
+int const GLYPHS::LINE::SINGLE::HORIZONTAL_BOTTOM = static_cast<int>( ACS_TTEE );
+int const GLYPHS::LINE::SINGLE::CROSS             = static_cast<int>( ACS_PLUS );
+
+int const GLYPHS::LINE::DOUBLE::VERTICAL          = static_cast<int>( ACS_VLINE );
+int const GLYPHS::LINE::DOUBLE::HORIZONTAL        = static_cast<int>( ACS_HLINE );
+int const GLYPHS::LINE::DOUBLE::BOTTOM_LEFT       = static_cast<int>( ACS_URCORNER );
+int const GLYPHS::LINE::DOUBLE::BOTTOM_RIGHT      = static_cast<int>( ACS_ULCORNER );
+int const GLYPHS::LINE::DOUBLE::TOP_LEFT          = static_cast<int>( ACS_LRCORNER );
+int const GLYPHS::LINE::DOUBLE::TOP_RIGHT         = static_cast<int>( ACS_LLCORNER );
+int const GLYPHS::LINE::DOUBLE::VERTICAL_LEFT     = static_cast<int>( ACS_RTEE );
+int const GLYPHS::LINE::DOUBLE::VERTICAL_RIGHT    = static_cast<int>( ACS_LTEE );
+int const GLYPHS::LINE::DOUBLE::HORIZONTAL_TOP    = static_cast<int>( ACS_BTEE );
+int const GLYPHS::LINE::DOUBLE::HORIZONTAL_BOTTOM = static_cast<int>( ACS_TTEE );
+int const GLYPHS::LINE::DOUBLE::CROSS             = static_cast<int>( ACS_PLUS );
+
+int const GLYPHS::MATH::NOT_EQUAL     = static_cast<int>( ACS_NEQUAL );
+int const GLYPHS::MATH::LESS_EQUAL    = static_cast<int>( ACS_LEQUAL );
+int const GLYPHS::MATH::GREATER_EQUAL = static_cast<int>( ACS_GEQUAL );
+int const GLYPHS::MATH::APPROXIMATELY = '~';
+int const GLYPHS::MATH::PI            = static_cast<int>( ACS_PI );
+
+#if 0
+int const GLYPHS::MATH::SQUARE_ROOT   = static_cast<int>( ACS_ );
+int const GLYPHS::MATH::INFINITY      = static_cast<int>( ACS_ );
+#endif
+
+int const GLYPHS::FACE::WHITE = '@';
+int const GLYPHS::FACE::BLACK = '@';
+#else /* than HAVE_ASCII_GRAPHICS */
+	GLYPHS::DOWN_ARROW    = 'v';
+	GLYPHS::UP_ARROW      = '^';
+	GLYPHS::VERTICAL_LINE = '|';
+#endif /* not HAVE_ASCII_GRAPHICS */
 
 /* Bbbbffff
  * B - blink
@@ -274,15 +327,6 @@ void HConsole::enter_curses( void ) {
 			}
 		}
 	}
-#ifdef HAVE_ASCII_GRAPHICS
-	GLYPHS::DOWN_ARROW    = static_cast<int>( ACS_DARROW );
-	GLYPHS::UP_ARROW      = static_cast<int>( ACS_UARROW );
-	GLYPHS::VERTICAL_LINE = static_cast<int>( ACS_VLINE );
-#else /* than HAVE_ASCII_GRAPHICS */
-	GLYPHS::DOWN_ARROW    = 'v';
-	GLYPHS::UP_ARROW      = '^';
-	GLYPHS::VERTICAL_LINE = '|';
-#endif /* not HAVE_ASCII_GRAPHICS */
 	refresh();
 	return;
 	M_EPILOG

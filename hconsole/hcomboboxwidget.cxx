@@ -95,7 +95,7 @@ void HComboboxWidget::do_paint( void ) {
 		HEditWidget::do_paint();
 		cons.move( _rowRaw, _columnRaw + width - 1 );
 		set_attr_label();
-		cons.addch( GLYPHS::DOWN_ARROW );
+		cons.addch( GLYPHS::ARROW::DOWN );
 		cons.move( _rowRaw, _columnRaw + HEditWidget::_cursorPosition );
 		_heightRaw = 0;
 	} else {

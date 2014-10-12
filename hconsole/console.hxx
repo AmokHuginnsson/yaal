@@ -68,9 +68,60 @@ struct KEY_CODES {
 /*! \brief Quasi graphic glyphs.
  */
 struct GLYPHS {
-	static int DOWN_ARROW;
-	static int UP_ARROW;
-	static int VERTICAL_LINE;
+	struct ARROW {
+		static int const DOWN;
+		static int const UP;
+		static int const LEFT;
+		static int const RIGHT;
+		static int const HORIZONTAL;
+		static int const VERTICAL;
+	};
+	struct CHECKER {
+		static int const SPARSE;
+		static int const MEDIUM;
+		static int const DENSE;
+	};
+	struct LINE {
+		struct SINGLE {
+			static int const VERTICAL;
+			static int const HORIZONTAL;
+			static int const BOTTOM_LEFT;
+			static int const BOTTOM_RIGHT;
+			static int const TOP_LEFT;
+			static int const TOP_RIGHT;
+			static int const VERTICAL_LEFT;
+			static int const VERTICAL_RIGHT;
+			static int const HORIZONTAL_TOP;
+			static int const HORIZONTAL_BOTTOM;
+			static int const CROSS;
+		};
+		struct DOUBLE {
+			static int const VERTICAL;
+			static int const HORIZONTAL;
+			static int const BOTTOM_LEFT;
+			static int const BOTTOM_RIGHT;
+			static int const TOP_LEFT;
+			static int const TOP_RIGHT;
+			static int const VERTICAL_LEFT;
+			static int const VERTICAL_RIGHT;
+			static int const HORIZONTAL_TOP;
+			static int const HORIZONTAL_BOTTOM;
+			static int const CROSS;
+		};
+	};
+	struct MATH {
+		static int const NOT_EQUAL;
+		static int const LESS_EQUAL;
+		static int const GREATER_EQUAL;
+		static int const APPROXIMATELY;
+		static int const SQUARE_ROOT;
+		static int const PI;
+		static int const INFINITY;
+	};
+	struct FACE {
+		static int const WHITE;
+		static int const BLACK;
+	};
 };
 
 /*! \brief Cursor visibility types.
