@@ -51,6 +51,7 @@ private:
 		} mode_t;
 	};
 	yaal::hcore::HTime _time;
+	yaal::hcore::HTime _selectedTime;
 	HInfoTime _infoTime;
 	MODE::mode_t _mode;
 public:

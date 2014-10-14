@@ -55,7 +55,9 @@ HDateWidget::HDateWidget( HWindow* parent_, int row_, int column_,
 		yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
 	: HWidget( parent_, row_, column_, 1, CAL_VIEW_WIDTH, label_ ),
-	_time( HTime::LOCAL, _iso8601DateFormat_ ), _infoTime( _time ), _mode( MODE::VIEW ) {
+	_time( HTime::LOCAL, _iso8601DateFormat_ ),
+	_selectedTime( HTime::LOCAL, _iso8601DateFormat_ ),
+	_infoTime( _selectedTime ), _mode( MODE::VIEW ) {
 	M_PROLOG
 	attr_.apply( *this );
 	return;
@@ -126,6 +128,7 @@ void HDateWidget::do_kill_focus( void ) {
 	M_PROLOG
 	if ( _mode == MODE::EDIT ) {
 		_mode = MODE::VIEW;
+		_time = _selectedTime;
 		_window->schedule_repaint( true );
 	}
 	HWidget::do_kill_focus();
@@ -158,6 +161,11 @@ int HDateWidget::do_process_input( int code_ ) {
 		case ( '\r' ): {
 			on_key_enter();
 		} break;
+		case ( KEY_CODES::ESC ): {
+			_time = _selectedTime;
+			on_key_enter();
+			break;
+		}
 		default: {
 			unknown = true;
 		}
@@ -174,6 +182,7 @@ int HDateWidget::do_process_input( int code_ ) {
 void HDateWidget::on_key_enter( void ) {
 	M_PROLOG
 	if ( _mode == MODE::EDIT ) {
+		_selectedTime = _time;
 		_mode = MODE::VIEW;
 		_window->schedule_repaint( true );
 	} else {
