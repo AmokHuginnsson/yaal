@@ -50,6 +50,12 @@ private:
 			EDIT
 		} mode_t;
 	};
+	struct ACTION {
+		typedef enum {
+			APPLY,
+			CANCEL
+		} action_t;
+	};
 	yaal::hcore::HTime _time;
 	yaal::hcore::HTime _selectedTime;
 	HInfoTime _infoTime;
@@ -72,6 +78,7 @@ protected:
 	void on_key_page_down( void );
 	void on_key_page_up( void );
 	void on_key_enter( void );
+	void close_calendar( ACTION::action_t );
 	char const* week_day_name( int );
 	int get_first_day_of_month_in_week_index( void ) const;
 };

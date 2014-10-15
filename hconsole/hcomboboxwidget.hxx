@@ -58,6 +58,12 @@ public:
 			LISTCONTROL  /*!< Combobox expanded. */
 		} mode_t;
 	};
+	struct ACTION {
+		typedef enum {
+			APPLY,
+			CANCEL
+		} action_t;
+	};
 protected:
 	MODE::mode_t _mode; /* operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
 	int _droppedWidth;	/* width of dropped list */
@@ -89,7 +95,7 @@ protected:
 	virtual bool do_click( mouse::OMouse& );
 	virtual void do_kill_focus( void ); /* this one will be used here */
 private:
-	void close_combo( void );
+	void close_combo( ACTION::action_t );
 };
 
 typedef yaal::hcore::HExceptionT<HComboboxWidget, HListWidgetException> HComboboxWidgetException;

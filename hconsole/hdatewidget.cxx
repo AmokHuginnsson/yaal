@@ -127,11 +127,22 @@ int HDateWidget::get_first_day_of_month_in_week_index( void ) const {
 void HDateWidget::do_kill_focus( void ) {
 	M_PROLOG
 	if ( _mode == MODE::EDIT ) {
-		_mode = MODE::VIEW;
-		_time = _selectedTime;
-		_window->schedule_repaint( true );
+		close_calendar( ACTION::CANCEL );
 	}
 	HWidget::do_kill_focus();
+	return;
+	M_EPILOG
+}
+
+void HDateWidget::close_calendar( ACTION::action_t action_ ) {
+	M_PROLOG
+	_mode = MODE::VIEW;
+	if ( action_ == ACTION::APPLY ) {
+		_selectedTime = _time;
+	} else {
+		_time = _selectedTime;
+	}
+	_window->schedule_repaint( true );
 	return;
 	M_EPILOG
 }
@@ -162,7 +173,6 @@ int HDateWidget::do_process_input( int code_ ) {
 			on_key_enter();
 		} break;
 		case ( KEY_CODES::ESC ): {
-			_time = _selectedTime;
 			on_key_enter();
 			break;
 		}
@@ -182,9 +192,7 @@ int HDateWidget::do_process_input( int code_ ) {
 void HDateWidget::on_key_enter( void ) {
 	M_PROLOG
 	if ( _mode == MODE::EDIT ) {
-		_selectedTime = _time;
-		_mode = MODE::VIEW;
-		_window->schedule_repaint( true );
+		close_calendar( ACTION::APPLY );
 	} else {
 		_mode = MODE::EDIT;
 	}

@@ -46,7 +46,7 @@ HComboboxWidget::HComboboxWidget ( HWindow * parent_,
 		int row_, int column_, int height_, int width_,
 		yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
-	: HWidget ( parent_, row_, column_, height_, width_, label_, attr_ ),
+	: HWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
 		HEditWidget( NULL, 0, 0, 0, 0, HString() ),
 		HSearchableWidget( attr_ ),
 		HListWidget( NULL, 0, 0, 0, 0, HString() ),
@@ -75,8 +75,7 @@ void HComboboxWidget::set_dropped_width( int droppedWidth_ ) {
 void HComboboxWidget::do_kill_focus( void ) {
 	M_PROLOG
 	if ( _mode == MODE::LISTCONTROL ) {
-		_mode = MODE::EDITCONTROL;
-		_window->schedule_repaint( true );
+		close_combo( ACTION::CANCEL );
 	}
 	HWidget::do_kill_focus();
 	return;
@@ -134,11 +133,9 @@ int HComboboxWidget::do_process_input( int code_ ) {
 		schedule_repaint();
 	} else {
 		if ( code_ == '\r' ) {
-			save_selection();
-			close_combo();
+			close_combo( ACTION::APPLY );
 		} else if ( code_ == KEY_CODES::ESC ) {
-			restore_selection();
-			close_combo();
+			close_combo( ACTION::CANCEL );
 		} else {
 			code = HListWidget::do_process_input( code_ );
 		}
@@ -164,8 +161,7 @@ bool HComboboxWidget::do_click( mouse::OMouse& mouse_ ) {
 	} else {
 		handled = HListWidget::do_click( mouse_ );
 		if ( ! handled ) {
-			save_selection();
-			close_combo();
+			close_combo( ACTION::APPLY );
 			handled = true;
 		}
 	}
@@ -173,11 +169,16 @@ bool HComboboxWidget::do_click( mouse::OMouse& mouse_ ) {
 	M_EPILOG
 }
 
-void HComboboxWidget::close_combo( void ) {
+void HComboboxWidget::close_combo( ACTION::action_t action_ ) {
 	M_PROLOG
 	_mode = MODE::EDITCONTROL;
-	if ( ! _model->is_empty() ) {
-		set_text( (*_cursor)[ 0 ].get_string() );
+	if ( action_ == ACTION::APPLY ) {
+		if ( ! _model->is_empty() ) {
+			set_text( (*_cursor)[ 0 ].get_string() );
+		}
+		save_selection();
+	} else {
+		restore_selection();
 	}
 	_window->schedule_repaint( true );
 	return;
