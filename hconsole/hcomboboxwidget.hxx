@@ -94,6 +94,8 @@ protected:
 	virtual void do_paint( void );
 	virtual bool do_click( mouse::OMouse& );
 	virtual void do_kill_focus( void ); /* this one will be used here */
+	virtual HInfo const& do_get_data( void ) const;
+	virtual void do_set_data( HInfo const& );
 private:
 	void close_combo( ACTION::action_t );
 };

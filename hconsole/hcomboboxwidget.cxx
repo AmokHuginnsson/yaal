@@ -214,6 +214,13 @@ int HComboboxWidget::get_selected_index( void ) const {
 	return ( _origSelection._widgetOffset + _origSelection._cursorPosition );
 }
 
+HInfo const& HComboboxWidget::do_get_data( void ) const {
+	return (  );
+}
+
+void HComboboxWidget::do_set_data( HInfo const& ) {
+}
+
 yaal::hcore::HString const& HComboboxWidget::get_selected_text( void ) const {
 	return ( _string );
 }
