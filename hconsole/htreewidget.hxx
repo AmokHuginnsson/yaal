@@ -175,12 +175,12 @@ public:
 		}
 		yaal::hcore::HString do_get_long( void ) const {
 			M_PROLOG
-			return ( (**_node).get_int_long() );
+			return ( (**_node).get_integer() );
 			M_EPILOG
 		}
 		yaal::hcore::HString do_get_double( void ) const {
 			M_PROLOG
-			return ( (**_node).get_double() );
+			return ( (**_node).get_real() );
 			M_EPILOG
 		}
 		yaal::hcore::HString do_get_string( void ) const {
