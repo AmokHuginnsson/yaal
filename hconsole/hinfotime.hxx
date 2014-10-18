@@ -44,23 +44,12 @@ public:
 	HInfoTime( HInfoTime const& );
 	virtual ~HInfoTime( void );
 protected:
-	virtual char do_get_byte( int ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual char do_get_char( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual int short do_get_int_short( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual int do_get_int( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual int long do_get_int_long( void ) const;
-	virtual double do_get_double( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual double long do_get_double_long( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void* do_get_pointer( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual int long long do_get_integer( void ) const;
+	virtual double long do_get_real( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
 	virtual yaal::hcore::HString const& do_get_string( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
 	virtual yaal::hcore::HTime const& do_get_time( void ) const;
-	virtual void do_set_char( char ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_int_short( int short ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_int( int ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_int_long( int long );
-	virtual void do_set_double( double ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_double_long( double long ) M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_pointer( void* ) M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_integer( int long long );
+	virtual void do_set_real( double long ) M_DEBUG_CODE( __attribute__(( noreturn )) );
 	virtual void do_set_string( yaal::hcore::HString const& );
 	virtual void do_set_time( yaal::hcore::HTime const& );
 private:

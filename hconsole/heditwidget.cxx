@@ -787,25 +787,10 @@ HInfoString::~HInfoString( void )
 HString const& HInfoString::do_get_string( void ) const
 	{ return ( _data ); }
 
-char HInfoString::do_get_byte( int idx_ ) const
-	{ return ( _data[idx_] ); }
+int long long HInfoString::do_get_integer( void ) const
+	{ return ( lexical_cast<int long long>( _data ) ); }
 
-char HInfoString::do_get_char( void ) const
-	{ return ( !_data.is_empty() ? _data[0] : static_cast<char>( 0 ) ); }
-
-int short HInfoString::do_get_int_short( void ) const
-	{ return ( static_cast<int short>( lexical_cast<int>( _data ) ) ); }
-
-int HInfoString::do_get_int( void ) const
-	{ return ( lexical_cast<int>( _data ) ); }
-
-int long HInfoString::do_get_int_long( void ) const
-	{ return ( lexical_cast<int long>( _data ) ); }
-
-double HInfoString::do_get_double( void ) const
-	{ return ( lexical_cast<double>( _data ) ); }
-
-double long HInfoString::do_get_double_long( void ) const
+double long HInfoString::do_get_real( void ) const
 	{ return ( lexical_cast<double long>( _data ) ); }
 
 HTime const& HInfoString::do_get_time( void ) const {
@@ -816,38 +801,12 @@ HTime const& HInfoString::do_get_time( void ) const {
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
-void* HInfoString::do_get_pointer( void ) const
-	{
-	int long val( ::strtol( _data.raw(), NULL, 16 ) );
-	return ( reinterpret_cast<void*>( val ) );
-	}
-
-void HInfoString::do_set_char( char char_ ) {
-	_data = char_;
+void HInfoString::do_set_integer( int long long data_ ) {
+	_data = data_;
 }
 
-void HInfoString::do_set_int_short( int short intShort_ ) {
-	_data = intShort_;
-}
-
-void HInfoString::do_set_int( int int_ ) {
-	_data = int_;
-}
-
-void HInfoString::do_set_int_long( int long intLong_ ) {
-	_data = intLong_;
-}
-
-void HInfoString::do_set_double( double double_ ) {
-	_data = double_;
-}
-
-void HInfoString::do_set_double_long( double long doubleLong_ ) {
-	_data = doubleLong_;
-}
-
-void HInfoString::do_set_pointer( void* ptr_ ) {
-	_data = ptr_;
+void HInfoString::do_set_real( double long data_ ) {
+	_data = data_;
 }
 
 void HInfoString::do_set_string( HString const& str_ ) {
