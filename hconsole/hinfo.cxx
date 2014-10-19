@@ -38,106 +38,57 @@ namespace yaal {
 namespace hconsole {
 
 HInfoMultiVal::HInfoMultiVal( void )
-	: _type( TYPE::VOID ), _char( 0 ),
-	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
-	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
+	: _type( TYPE::UNKNOWN ),
+	_integer( 0 ), _real( 0 ),
+	_string(), _time( HTime::LOCAL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
-HInfoMultiVal::HInfoMultiVal( int int_ )
-	: _type( TYPE::VOID ), _char( 0 ),
-	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
-	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
+HInfoMultiVal::HInfoMultiVal( int long long data_ )
+	: _type( TYPE::INT_LONG_LONG ),
+	_integer( data_ ), _real( 0 ),
+	_string(), _time( HTime::LOCAL ) {
 	M_PROLOG
-	_type = TYPE::INT;
-	_int = int_;
 	return;
 	M_EPILOG
 }
 
-HInfoMultiVal::HInfoMultiVal( int long longInt_ )
-	: _type( TYPE::VOID ), _char( 0 ),
-	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
-	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
+HInfoMultiVal::HInfoMultiVal( double long data_ )
+	: _type( TYPE::DOUBLE_LONG ),
+	_integer( 0 ), _real( data_ ),
+	_string(), _time( HTime::LOCAL ) {
 	M_PROLOG
-	_type = TYPE::INT_LONG;
-	_intLong = longInt_;
-	return;
-	M_EPILOG
-}
-
-HInfoMultiVal::HInfoMultiVal ( double double_ )
-	: _type( TYPE::VOID ), _char( 0 ),
-	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
-	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
-	M_PROLOG
-	_type = TYPE::DOUBLE;
-	_double = double_;
-	return;
-	M_EPILOG
-}
-
-HInfoMultiVal::HInfoMultiVal( void* const pointer_ )
-	: _type( TYPE::VOID ), _char( 0 ),
-	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
-	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
-	M_PROLOG
-	_type = TYPE::VOID_PTR;
-	_pointer = pointer_;
-	return;
-	M_EPILOG
-}
-
-HInfoMultiVal::HInfoMultiVal( char const* const buffer_ )
-	: _type( TYPE::VOID ), _char( 0 ),
-	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
-	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
-	M_PROLOG
-	_type = TYPE::HSTRING;
-	_string = buffer_;
 	return;
 	M_EPILOG
 }
 
 HInfoMultiVal::HInfoMultiVal( HString const& string_ )
-	: _type( TYPE::VOID ), _char( 0 ),
-	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
-	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
+	: _type( TYPE::HSTRING ),
+	_integer( 0 ), _real( 0 ),
+	_string( string_ ), _time( HTime::LOCAL ) {
 	M_PROLOG
-	_type = TYPE::HSTRING;
-	_string = string_;
 	return;
 	M_EPILOG
 }
 
 HInfoMultiVal::HInfoMultiVal( HTime const& time_ )
-	: _type( TYPE::VOID ), _char( 0 ),
-	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
-	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
+	: _type( TYPE::HTIME ),
+	_integer( 0 ), _real( 0 ),
+	_string(), _time( time_ ) {
 	M_PROLOG
-	_type = TYPE::HTIME;
-	_time = time_;
 	return;
 	M_EPILOG
 }
 
 HInfoMultiVal::HInfoMultiVal( HInfoMultiVal const& info_ )
-	: HInfo(), _type( TYPE::VOID ), _char( 0 ),
-	_intShort( 0 ), _int( 0 ), _intLong( 0 ),
-	_double( 0 ), _doubleLong( 0 ),
-	_pointer( NULL ), _string( "" ), _time( HTime::LOCAL ) {
+	: HInfo(), _type( TYPE::UNKNOWN ),
+	_integer( info_._integer ),
+	_real( info_._real ),
+	_string( info_._string ),
+	_time( info_._time ) {
 	M_PROLOG
-	( * this ) = info_;
 	return;
 	M_EPILOG
 }
@@ -151,59 +102,40 @@ HInfoMultiVal::~HInfoMultiVal( void ) {
 
 void HInfoMultiVal::purge( void ) {
 	M_PROLOG
-	_type = TYPE::VOID;
-	_int = 0;
-	_intLong = 0;
-	_double = 0;
-	_string = "";
-	_time = HTime( HTime::LOCAL );
-	_pointer = NULL;
+	_type = TYPE::UNKNOWN;
+	_integer = 0;
+	_real = 0;
+	_string.clear();
+	_time.set_now( HTime::LOCAL );
 	return;
-	M_EPILOG
-}
-
-char HInfoMultiVal::do_get_byte ( int index_ ) const {
-	M_PROLOG
-	return ( _string[ index_ ] );
 	M_EPILOG
 }
 
 HInfoMultiVal& HInfoMultiVal::operator = ( HInfoMultiVal const& info_ ) {
 	M_PROLOG
-	if ( this != & info_ ) {
-		_type = info_._type;
-		_int = info_._int;
-		_intLong = info_._intLong;
-		_double = info_._double;
-		_string = info_._string;
-		_time = info_._time;
-		_pointer = info_._pointer;
+	if ( &info_ != this ) {
+		HInfoMultiVal tmp( info_ );
+		swap( tmp );
 	}
 	return ( * this );
 	M_EPILOG
 }
 
-char HInfoMultiVal::do_get_char( void ) const {
-	M_PROLOG
-	return ( static_cast<char>( _int ) );
-	M_EPILOG
+void HInfoMultiVal::swap( HInfoMultiVal& info_ ) {
+	if ( &info_ != this ) {
+		using yaal::swap;
+		swap( _type, info_._type );
+		swap( _integer, info_._integer );
+		swap( _real, info_._real );
+		swap( _string, info_._string );
+		swap( _time, info_._time );
+	}
+	return;
 }
 
-short HInfoMultiVal::do_get_int_short( void ) const {
+int long long HInfoMultiVal::do_get_integer( void ) const {
 	M_PROLOG
-	return ( static_cast<short>( _int ) );
-	M_EPILOG
-}
-
-int HInfoMultiVal::do_get_int( void ) const {
-	M_PROLOG
-	return ( _int );
-	M_EPILOG
-}
-
-int long HInfoMultiVal::do_get_int_long( void ) const {
-	M_PROLOG
-	return ( _intLong );
+	return ( _integer );
 	M_EPILOG
 }
 

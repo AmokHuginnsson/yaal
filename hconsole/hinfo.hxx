@@ -92,12 +92,12 @@ public:
 	HInfoMultiVal( void );
 	HInfoMultiVal( int long long );
 	HInfoMultiVal( double long );
-	HInfoMultiVal( char const* const );
 	HInfoMultiVal( yaal::hcore::HString const& );
 	HInfoMultiVal( yaal::hcore::HTime const& );
 	HInfoMultiVal( HInfoMultiVal const& );
 	HInfoMultiVal& operator = ( HInfoMultiVal const& );
 	virtual ~HInfoMultiVal( void );
+	void swap( HInfoMultiVal& );
 protected:
 	virtual int long long do_get_integer( void ) const;
 	virtual double long do_get_real( void ) const;
@@ -122,7 +122,6 @@ public:
 	HInfoVariant( void );
 	HInfoVariant( int long long );
 	HInfoVariant( double long );
-	HInfoVariant( char const* const );
 	HInfoVariant( yaal::hcore::HString const& );
 	HInfoVariant( yaal::hcore::HTime const& );
 	HInfoVariant( HInfoVariant const& );

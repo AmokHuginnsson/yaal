@@ -499,7 +499,7 @@ void dump_configuration( void* arg ) {
 				case ( TYPE::BOOL ): ::printf( "boolean\n" ); break;
 				case ( TYPE::INT ): case ( TYPE::INT_SHORT ): case ( TYPE::INT_LONG ): ::printf( "integer\n" ); break;
 				case ( TYPE::FLOAT ): case ( TYPE::DOUBLE ): case ( TYPE::DOUBLE_LONG ): ::printf( "floating point\n" ); break;
-				case ( TYPE::CHAR_PTR ): case ( TYPE::HSTRING ): ::printf( "character string\n" ); break;
+				case ( TYPE::HSTRING ): ::printf( "character string\n" ); break;
 				default: ::printf( "special\n" ); break;
 			}
 		} else
@@ -536,14 +536,6 @@ void dump_configuration( void* arg ) {
 					HString const& s = o._value->get<HString>();
 					if ( ! s.is_empty() )
 						::printf( "%s \"%s\"\n", o._name, s.raw() );
-					else
-						::printf( "# %s\n", o._name );
-				}
-				break;
-				case ( TYPE::CHAR_PTR ): {
-					char const* ptr = o._value->get<char const*>();
-					if ( ptr && ptr[0] )
-						::printf( "%s %s\n", o._name, ptr );
 					else
 						::printf( "# %s\n", o._name );
 				}
