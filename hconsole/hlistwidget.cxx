@@ -1011,10 +1011,10 @@ bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHe
 	bool lower = false;
 	switch ( sortHelper_._type.value() ) {
 		case ( TYPE::INT_LONG ):
-			lower = left_.get_int_long() < right_.get_int_long();
+			lower = left_.get_integer() < right_.get_integer();
 		break;
 		case ( TYPE::DOUBLE ):
-			lower = left_.get_double() < right_.get_double();
+			lower = left_.get_real() < right_.get_real();
 		break;
 		case ( TYPE::HSTRING ):
 			lower = strcasecmp( left_.get_string(), right_.get_string() ) < 0;
@@ -1058,14 +1058,14 @@ void HAbstractListModel::add_tail( void ) {
 template<>
 yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_long( void ) const {
 	M_PROLOG
-	return ( HString ( (*_data)[ _column ].get_int_long() ) );
+	return ( HString ( (*_data)[ _column ].get_integer() ) );
 	M_EPILOG
 }
 
 template<>
 yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_double( void ) const {
 	M_PROLOG
-	return ( HString ( (*_data)[ _column ].get_double() ) );
+	return ( HString ( (*_data)[ _column ].get_real() ) );
 	M_EPILOG
 }
 

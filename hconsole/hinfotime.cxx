@@ -56,46 +56,11 @@ HString const& HInfoTime::do_get_string( void ) const {
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
 
-char HInfoTime::do_get_byte( int ) const {
-	M_ASSERT( 0 && "data lost in conversion" );
-#if defined( NDEBUG ) || defined( __MSVCXX__ )
-	return ( 0 );
-#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
+int long long HInfoTime::do_get_integer( void ) const {
+	return ( _data.raw() );
 }
 
-char HInfoTime::do_get_char( void ) const {
-	M_ASSERT( 0 && "data lost in conversion" );
-#if defined( NDEBUG ) || defined( __MSVCXX__ )
-	return ( 0 );
-#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
-}
-
-int short HInfoTime::do_get_int_short( void ) const {
-	M_ASSERT( 0 && "data lost in conversion" );
-#if defined( NDEBUG ) || defined( __MSVCXX__ )
-	return ( 0 );
-#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
-}
-
-int HInfoTime::do_get_int( void ) const {
-	M_ASSERT( 0 && "data lost in conversion" );
-#if defined( NDEBUG ) || defined( __MSVCXX__ )
-	return ( 0 );
-#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
-}
-
-int long HInfoTime::do_get_int_long( void ) const {
-	return ( static_cast<int long>( _data.raw() ) );
-}
-
-double HInfoTime::do_get_double( void ) const {
-	M_ASSERT( 0 && "data lost in conversion" );
-#if defined( NDEBUG ) || defined( __MSVCXX__ )
-	return ( 0 );
-#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
-}
-
-double long HInfoTime::do_get_double_long( void ) const {
+double long HInfoTime::do_get_real( void ) const {
 	M_ASSERT( 0 && "data lost in conversion" );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
 	return ( 0 );
@@ -106,38 +71,11 @@ HTime const& HInfoTime::do_get_time( void ) const {
 	return ( _data );
 }
 
-void* HInfoTime::do_get_pointer( void ) const {
-	M_ASSERT( 0 && "data lost in conversion" );
-#if defined( NDEBUG ) || defined( __MSVCXX__ )
-	return ( 0 );
-#endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
-}
-
-void HInfoTime::do_set_char( char ) {
-	M_ASSERT( 0 && "invalid API called" );
-}
-
-void HInfoTime::do_set_int_short( int short ) {
-	M_ASSERT( 0 && "invalid API called" );
-}
-
-void HInfoTime::do_set_int( int ) {
-	M_ASSERT( 0 && "invalid API called" );
-}
-
-void HInfoTime::do_set_int_long( int long intLong_ ) {
+void HInfoTime::do_set_integer( int long long intLong_ ) {
 	_data = HTime( intLong_, _iso8601DateTimeFormat_ );
 }
 
-void HInfoTime::do_set_double( double ) {
-	M_ASSERT( 0 && "invalid API called" );
-}
-
-void HInfoTime::do_set_double_long( double long ) {
-	M_ASSERT( 0 && "invalid API called" );
-}
-
-void HInfoTime::do_set_pointer( void* ) {
+void HInfoTime::do_set_real( double long ) {
 	M_ASSERT( 0 && "invalid API called" );
 }
 

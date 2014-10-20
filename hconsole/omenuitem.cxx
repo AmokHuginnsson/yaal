@@ -90,14 +90,14 @@ yaal::hcore::HString const& OMenuItem::get_string( void ) const {
 	return ( _label );
 }
 
-int long OMenuItem::get_int_long( void ) const {
+int long OMenuItem::get_integer( void ) const {
 	M_ASSERT( 0 && "invalid call" );
 #ifdef NDEBUG
 	return ( 0 );
 #endif /* #ifdef NDEBUG */
 }
 
-double OMenuItem::get_double( void ) const {
+double OMenuItem::get_real( void ) const {
 	M_ASSERT( 0 && "invalid call" );
 #ifdef NDEBUG
 	return ( 0 );

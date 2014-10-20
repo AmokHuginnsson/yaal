@@ -139,15 +139,9 @@ int long long HInfoMultiVal::do_get_integer( void ) const {
 	M_EPILOG
 }
 
-double HInfoMultiVal::do_get_double( void ) const {
+double long HInfoMultiVal::do_get_real( void ) const {
 	M_PROLOG
-	return ( _double );
-	M_EPILOG
-}
-
-double long HInfoMultiVal::do_get_double_long( void ) const {
-	M_PROLOG
-	return ( _double );
+	return ( _real );
 	M_EPILOG
 }
 
@@ -163,38 +157,12 @@ HTime const& HInfoMultiVal::do_get_time( void ) const {
 	M_EPILOG
 }
 
-void* HInfoMultiVal::do_get_pointer( void ) const {
-	M_PROLOG
-	return ( _pointer );
-	M_EPILOG
+void HInfoMultiVal::do_set_integer( int long long data_ ) {
+	_integer = data_;
 }
 
-void HInfoMultiVal::do_set_char( char char_ ) {
-	_char = char_;
-}
-
-void HInfoMultiVal::do_set_int_short( int short short_ ) {
-	_intShort = short_;
-}
-
-void HInfoMultiVal::do_set_int( int int_ ) {
-	_int = int_;
-}
-
-void HInfoMultiVal::do_set_int_long( int long intLong_ ) {
-	_intLong = intLong_;
-}
-
-void HInfoMultiVal::do_set_double( double double_ ) {
-	_double = double_;
-}
-
-void HInfoMultiVal::do_set_double_long( double long doubleLong_ ) {
-	_doubleLong = doubleLong_;
-}
-
-void HInfoMultiVal::do_set_pointer( void* pointer_ ) {
-	_pointer = pointer_;
+void HInfoMultiVal::do_set_real( double long data_ ) {
+	_real = data_;
 }
 
 void HInfoMultiVal::do_set_string( HString const& string_ ) {

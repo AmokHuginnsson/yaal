@@ -52,8 +52,8 @@ public: /* All is public for simpler usage. */
 	void call( void );
 	void swap( OMenuItem& );
 	yaal::hcore::HString const& get_string( void ) const;
-	int long get_int_long( void ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
-	double get_double( void ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
+	int long get_integer( void ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
+	double get_real( void ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
 	yaal::hcore::HTime const& get_time( void ) const M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
 
