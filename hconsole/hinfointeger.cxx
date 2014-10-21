@@ -66,7 +66,7 @@ HString const& HInfoInteger::do_get_string( void ) const {
 HTime const& HInfoInteger::do_get_time( void ) const {
 	M_ASSERT( 0 && "impossible inplace conversion requested" );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
-	static HString const dummy;
+	static HTime const dummy( HTime::LOCAL );
 	return ( dummy );
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
