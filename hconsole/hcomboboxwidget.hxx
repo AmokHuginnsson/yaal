@@ -32,6 +32,7 @@ Copyright:
 
 #include "hconsole/heditwidget.hxx"
 #include "hconsole/hlistwidget.hxx"
+#include "hconsole/hinfointeger.hxx"
 
 namespace yaal {
 
@@ -76,6 +77,7 @@ protected:
 			: _cursor(), _firstVisibleRow(), _widgetOffset( 0 ), _cursorPosition( 0 ) {
 		}
 	} _origSelection;
+	HInfoInteger _infoInteger;
 public:
 	HComboboxWidget( HWindow* parent,
 			int row, int col, int height, int width,

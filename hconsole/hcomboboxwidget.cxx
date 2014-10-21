@@ -52,7 +52,8 @@ HComboboxWidget::HComboboxWidget ( HWindow * parent_,
 		HListWidget( NULL, 0, 0, 0, 0, HString() ),
 		_mode( MODE::EDITCONTROL ),
 		_droppedWidth( 0 ),
-		_origSelection() {
+		_origSelection(),
+		_infoInteger( 0 ) {
 	M_PROLOG
 	attr_.apply( *this );
 	return;
@@ -215,6 +216,10 @@ int HComboboxWidget::get_selected_index( void ) const {
 }
 
 void HComboboxWidget::do_set_data( HInfo const& ) {
+}
+
+HInfo const& HComboboxWidget::do_get_data( void ) const {
+	return ( _infoInteger );
 }
 
 yaal::hcore::HString const& HComboboxWidget::get_selected_text( void ) const {
