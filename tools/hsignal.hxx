@@ -45,7 +45,7 @@ public:
 	typedef return_t result_type;
 	template<typename iterator>
 	result_type operator()( iterator first_, iterator last_ ) {
-		result_type result();
+		result_type result;
 		for ( ; first_ != last_; ++ first_ ) {
 			result = *first_;
 		}
