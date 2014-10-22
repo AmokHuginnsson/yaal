@@ -306,8 +306,9 @@ public:
 	 */
 	void reserve( int long capacity_ ) {
 		M_PROLOG
-		if ( capacity_ < 0 )
+		if ( capacity_ < 0 ) {
 			M_THROW( _errMsgHArray_[ ERROR::BAD_SIZE ], capacity_ );
+		}
 		if ( capacity_ > _capacity ) {
 			int long newCapacity( _capacity ? max( capacity_, _capacity * 2 ) : capacity_ );
 			value_type* newBuf( static_cast<value_type*>( ::operator new ( static_cast<size_t>( newCapacity * static_cast<int>( sizeof ( value_type ) ) ), memory::yaal ) ) );
@@ -554,13 +555,13 @@ public:
 		M_PROLOG
 		M_ASSERT( first_._owner == this );
 		M_ASSERT( last_._owner == this );
-		if ( ( first_._index < 0 ) || ( first_._index > _size ) )
+		if ( ( first_._index < 0 ) || ( first_._index > _size ) ) {
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], first_._index );
-		if ( ( last_._index < 0 ) || ( last_._index > _size ) )
+		}
+		if ( ( last_._index < 0 ) || ( last_._index > _size ) ) {
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index );
-#pragma GCC diagnostic ignored "-Wstrict-overflow"
+		}
 		if ( last_._index < first_._index ) {
-#pragma GCC diagnostic error "-Wstrict-overflow"
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index - first_._index );
 		}
 		for ( iterator it( copy( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it ) {

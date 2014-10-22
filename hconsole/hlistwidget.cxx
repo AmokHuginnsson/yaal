@@ -332,10 +332,8 @@ namespace {
 
 template<typename tType>
 inline void increment( tType& iterator, int count ) {
-#pragma GCC diagnostic ignored "-Wstrict-overflow"
 	for ( int i = 0; i < count; ++ i, ++ iterator ) {
 	}
-#pragma GCC diagnostic error "-Wstrict-overflow"
 }
 
 template<typename tType>

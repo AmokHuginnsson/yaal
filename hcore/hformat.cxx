@@ -249,18 +249,14 @@ HFormat::HFormat( char const* const aFmt )
 		M_ENSURE( firstToken || ( anyTokenHaveExplicitIndex && thisTokenHasExplicitIndex ) || ( ! ( anyTokenHaveExplicitIndex || thisTokenHasExplicitIndex ) ) );
 		if ( it->_width == -1 )
 			it->_width = ( - pos ) - 2;
-#pragma GCC diagnostic ignored "-Wstrict-overflow"
 		if ( it->_width < 0 ) {
-#pragma GCC diagnostic error "-Wstrict-overflow"
 			widthIdxs.insert( - ( it->_width + 2 ) );
 			_impl->_positions->insert( make_pair( - ( it->_width + 2 ), static_cast<HFormatImpl::OToken*>( NULL ) ) );
 			++ pos;
 		}
 		if ( it->_precision == -1 )
 			it->_precision = ( - pos ) - 2;
-#pragma GCC diagnostic ignored "-Wstrict-overflow"
 		if ( it->_precision < 0 ) {
-#pragma GCC diagnostic error "-Wstrict-overflow"
 			precIdxs.insert( - ( it->_precision + 2 ) );
 			_impl->_positions->insert( make_pair( - ( it->_precision + 2 ), static_cast<HFormatImpl::OToken*>( NULL ) ) );
 			++ pos;

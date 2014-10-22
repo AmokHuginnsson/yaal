@@ -1091,8 +1091,8 @@ inline iter_out_t set_union( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, it
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t>
 inline iter_out_t set_intersection( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out ) {
 	for ( ; ( it1 != end1 ) && ( it2 != end2 ); ++ it1 ) {
-		for ( ; ( it2 != end2 ) && ( *it2 < *it1 ); ++ it2 )
-			;
+		for ( ; ( it2 != end2 ) && ( *it2 < *it1 ); ++ it2 ) {
+		}
 		if ( ( it2 != end2 ) && ! ( *it1 < *it2 ) ) {
 			*out = *it1;
 			++ out;

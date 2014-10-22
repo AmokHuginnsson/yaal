@@ -153,7 +153,7 @@ set( CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} -D_GNU_SOURCE -D_R
 use_cxx_compiler_flag( -pthread )
 use_cxx_compiler_flag( -fmessage-length=0 )
 use_cxx_compiler_flag( -std=c++11 )
-use_cxx_compiler_flag( -Wno-long-long )
+use_cxx_compiler_flag( -Wno-strict-overflow )
 use_cxx_compiler_flag( -Wno-variadic-macros )
 use_cxx_compiler_flag( -pipe )
 use_cxx_compiler_flag( -m64 )
