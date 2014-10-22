@@ -481,7 +481,6 @@ public:
 		return;
 		M_EPILOG
 	}
-#if CXX_STANDARD >= 2011
 	HTree( HTree&& tree_ )
 		: _allocator(), _branchAllocator(), _root( NULL ) {
 		M_PROLOG
@@ -489,7 +488,6 @@ public:
 		return;
 		M_EPILOG
 	}
-#endif /* #if CXX_STANDARD >= 2011 */
 	HTree( HTree const& t, allocator_type const& allocator_ )
 		: _allocator( allocator_ ), _branchAllocator( t._branchAllocator ), _root( NULL ) {
 		M_PROLOG
@@ -510,7 +508,6 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
-#if CXX_STANDARD >= 2011
 	HTree& operator = ( HTree&& tree_ ) {
 		M_PROLOG
 		if ( &tree_ != this ) {
@@ -520,7 +517,6 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
-#endif /* #if CXX_STANDARD >= 2011 */
 	void swap( HTree& other ) {
 		if ( &other != this ) {
 			using yaal::swap;

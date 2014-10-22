@@ -166,7 +166,6 @@ public:
 		return;
 		M_EPILOG
 	}
-#if CXX_STANDARD >= 2011
 	/*! \brief Moving constructor.
 	 *
 	 * \param arr_ - array whose whole data should be transfered to this newly created array.
@@ -178,7 +177,6 @@ public:
 		return;
 		M_EPILOG
 	}
-#endif /* #if CXX_STANDARD >= 2011 */
 	/*! \brief Copy constructor with external allocator.
 	 *
 	 * \param arr_ - array object that this new array should be a copy of.
@@ -239,7 +237,6 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
-#if CXX_STANDARD >= 2011
 	/*! \brief Replace contents of this array with contents moved from another array.
 	 *
 	 * \param arr_ - other array that's contents will replace current contents of this array.
@@ -254,7 +251,6 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
-#endif /* #if CXX_STANDARD >= 2011 */
 	/*! \brief Swap contents of this array with another array.
 	 *
 	 * \param other - the other array that will swap contents with this array.

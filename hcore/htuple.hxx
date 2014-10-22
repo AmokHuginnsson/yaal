@@ -504,77 +504,10 @@ public:
 	friend struct tuple_helper::getter;
 };
 
-#if CXX_STANDARD >= 2011
 
 template<typename... T>
 HTuple<T...> make_tuple( T... e_ )
 	{ return ( HTuple<T...>( e_... ) ); }
-
-#else /* #if CXX_STANDARD >= 2011 */
-
-template<typename T0>
-HTuple<T0> make_tuple( T0 const& e0_ )
-	{ return ( HTuple<T0>( e0_ ) ); }
-
-template<typename T0, typename T1>
-HTuple<T0, T1> make_tuple( T0 const& e0_, T1 const& e1_ )
-	{ return ( HTuple<T0, T1>( e0_, e1_ ) ); }
-
-template<typename T0, typename T1, typename T2>
-HTuple<T0, T1, T2> make_tuple( T0 const& e0_, T1 const& e1_, T2 const& e2_ )
-	{ return ( HTuple<T0, T1, T2>( e0_, e1_, e2_ ) ); }
-
-template<typename T0, typename T1, typename T2, typename T3>
-HTuple<T0, T1, T2, T3> make_tuple( T0 const& e0_, T1 const& e1_, T2 const& e2_, T3 const& e3_ )
-	{ return ( HTuple<T0, T1, T2, T3>( e0_, e1_, e2_, e3_ ) ); }
-
-template<typename T0, typename T1, typename T2, typename T3, typename T4>
-HTuple<T0, T1, T2, T3, T4> make_tuple( T0 const& e0_, T1 const& e1_, T2 const& e2_, T3 const& e3_, T4 const& e4_ )
-	{ return ( HTuple<T0, T1, T2, T3, T4>( e0_, e1_, e2_, e3_, e4_ ) ); }
-
-template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5>
-HTuple<T0, T1, T2, T3, T4, T5> make_tuple( T0 const& e0_, T1 const& e1_, T2 const& e2_, T3 const& e3_, T4 const& e4_, T5 const& e5_ )
-	{ return ( HTuple<T0, T1, T2, T3, T4, T5>( e0_, e1_, e2_, e3_, e4_, e5_ ) ); }
-
-template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-HTuple<T0, T1, T2, T3, T4, T5, T6> make_tuple( T0 const& e0_, T1 const& e1_,
-		T2 const& e2_, T3 const& e3_, T4 const& e4_, T5 const& e5_, T6 const& e6_ )
-	{ return ( HTuple<T0, T1, T2, T3, T4, T5, T6>( e0_, e1_, e2_, e3_, e4_, e5_, e6_ ) ); }
-
-template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
-HTuple<T0, T1, T2, T3, T4, T5, T6, T7> make_tuple( T0 const& e0_, T1 const& e1_,
-		T2 const& e2_, T3 const& e3_, T4 const& e4_, T5 const& e5_, T6 const& e6_,
-		T7 const& e7_ )
-	{ return ( HTuple<T0, T1, T2, T3, T4, T5, T6, T7>( e0_, e1_, e2_, e3_, e4_, e5_, e6_, e7_ ) ); }
-
-template<typename T0, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
-HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8> make_tuple( T0 const& e0_, T1 const& e1_,
-		T2 const& e2_, T3 const& e3_, T4 const& e4_, T5 const& e5_, T6 const& e6_,
-		T7 const& e7_, T8 const& e8_ )
-	{ return ( HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8>( e0_, e1_, e2_, e3_, e4_, e5_, e6_, e7_, e8_ ) ); }
-
-template<typename T0, typename T1, typename T2, typename T3,
-	typename T4, typename T5, typename T6, typename T7, typename T8, typename T9>
-HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9> make_tuple( T0 const& e0_, T1 const& e1_,
-		T2 const& e2_, T3 const& e3_, T4 const& e4_, T5 const& e5_, T6 const& e6_,
-		T7 const& e7_, T8 const& e8_, T9 const& e9_ )
-	{ return ( HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>( e0_, e1_, e2_, e3_, e4_, e5_, e6_, e7_, e8_, e9_ ) ); }
-
-template<typename T0, typename T1, typename T2, typename T3,
-	typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
-HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> make_tuple( T0 const& e0_, T1 const& e1_,
-		T2 const& e2_, T3 const& e3_, T4 const& e4_, T5 const& e5_, T6 const& e6_,
-		T7 const& e7_, T8 const& e8_, T9 const& e9_, T10 const& e10_ )
-	{ return ( HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>( e0_, e1_, e2_, e3_, e4_, e5_, e6_, e7_, e8_, e9_, e10_ ) ); }
-
-template<typename T0, typename T1, typename T2, typename T3,
-	typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11>
-HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> make_tuple( T0 const& e0_, T1 const& e1_,
-		T2 const& e2_, T3 const& e3_, T4 const& e4_, T5 const& e5_, T6 const& e6_,
-		T7 const& e7_, T8 const& e8_, T9 const& e9_, T10 const& e10_, T11 const& e11_ )
-	{ return ( HTuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>( e0_, e1_, e2_, e3_, e4_, e5_, e6_, e7_, e8_, e9_, e10_, e11_ ) ); }
-
-#endif /* #else #if CXX_STANDARD >= 2011 */
 
 }
 

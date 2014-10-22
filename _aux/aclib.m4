@@ -56,20 +56,14 @@ AC_DEFUN([YAAL_DETECT_FLAGS], [
 dnl Handle user choice regarding C++ standard.
 dnl --------------------------------------------------------------------------
 AC_DEFUN([YAAL_CXX_STANDARD_CHECK], [
-	CXX_STANDARD_NO=2003
-	if test ["x$CXX_2011"] = ["xyes"] ; then
-		YAAL_DETECT_FLAGS(CXX_STANDARD, [-std=c++11], [C++])
-		if test ["x$CXX_STANDARD"] != ["x"] ; then
-			AC_SUBST( [CXX_STANDARD], ["c++11"] )
-			CXX_STANDARD_NO=2011
-			CXXFLAGS=["$CXXFLAGS -std=c++11"]
-		else
-			AC_MSG_ERROR([Requested C++ Standard version is not available in this environment!])
-		fi
+	YAAL_DETECT_FLAGS(CXX_STANDARD, [-std=c++11], [C++])
+	if test ["x$CXX_STANDARD"] != ["x"] ; then
+		AC_SUBST( [CXX_STANDARD], ["c++11"] )
+		CXX_STANDARD_NO=2011
+		CXXFLAGS=["$CXXFLAGS -std=c++11"]
 	else
-		AC_SUBST( [CXX_STANDARD], ["gnu++98"] )
+		AC_MSG_ERROR([Requested C++ Standard version is not available in this environment!])
 	fi
-	AC_DEFINE_UNQUOTED([CXX_STANDARD], $CXX_STANDARD_NO, [Version of C++ standard used.])
 ])
 
 dnl Checks for which function macros exist

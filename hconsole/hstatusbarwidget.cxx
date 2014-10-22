@@ -35,11 +35,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hwindow.hxx"
 #include "hconsole.hxx"
 #include "hsearchablewidget.hxx"
-#include "hcore/foreach.hxx"
-
-//#ifdef __DEBUGGER_BABUNI__
 #include "hcore/hlog.hxx"
-//#endif /* __DEBUGGER_BABUNI__ */
 
 using namespace yaal::hcore;
 
@@ -109,7 +105,7 @@ void HStatusBarWidget::do_paint( void ) {
 	} else {
 		int colRaw( _columnRaw );
 		int current( 0 );
-		YAAL_FOREACH ( choice_t const& c, _choices ) {
+		for ( choice_t const& c : _choices ) {
 			if ( current == _currentChoice ) {
 				cons.set_attr( _statusBarAttribute >> 8 );
 			} else {
@@ -346,7 +342,7 @@ void HStatusBarWidget::ask( char const* question_,
 	bar( question_ );
 	HString prompt( "[" );
 	bool first( true );
-	YAAL_FOREACH( choice_t const& c, _choices ) {
+	for ( choice_t const& c : _choices ) {
 		if ( ! first ) {
 			prompt += "/";
 		} else {
@@ -364,7 +360,7 @@ bool HStatusBarWidget::dialog( yaal::hcore::HString const& answer_ ) {
 	M_PROLOG
 	M_ENSURE( ( _mode == PROMPT::DIALOG ) || ( _mode == PROMPT::MENU ) );
 	bool found( false );
-	YAAL_FOREACH ( choice_t const& c, _choices ) {
+	for  ( choice_t const& c : _choices ) {
 		if ( c.first == answer_ ) {
 			found = true;
 			_window->schedule_call( c.second );

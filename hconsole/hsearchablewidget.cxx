@@ -30,7 +30,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hsearchablewidget.hxx"
 #include "hwindow.hxx"
 #include "hconsole.hxx"
-#include "hcore/foreach.hxx"
 #include "tools/hxml.hxx"
 
 using namespace yaal;

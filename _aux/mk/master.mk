@@ -3,15 +3,6 @@ include _aux/mk/0_sanity.mk
 COMMA=,
 include _aux/mk/2_term.mk
 
-ifneq ($(CXX_STANDARD),)
-ifneq ($(CXX_STANDARD),2011)
-$(error "Bad value for CXX_STANDARD flag!")
-else
-override CXX_STANDARD=--enable-C++11
-endif
-unexport CXX_STANDARD
-endif
-
 define PREPARE_MAIN_TARGET
 $(1): build/$(1)/Makefile.mk build/$(1)/config.hxx $$(if $$(wildcard yaalrc.in),build/$(1)/yaalrc build/$(1)/yaal.pc)
 	@test -t 1 && TERMINAL="TERM" && export TERMINAL ; \
@@ -45,7 +36,7 @@ build/%/$(1): configure $(1).in
 				$$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) \
 				$$(if $$(LIBDIR),--libdir=$$(LIBDIR)) \
 				$$(if $$(LOCALSTATEDIR),--localstatedir=$$(LOCALSTATEDIR)) \
-				$$(CXX_STANDARD) $$(CONFIGURE) | tee -a make.log | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
+				$$(CONFIGURE) | tee -a make.log | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$$$0}' ; \
 		else \
 			../../configure \
 				$$(CONF_$$(*)) \
@@ -53,7 +44,7 @@ build/%/$(1): configure $(1).in
 				$$(if $$(SYSCONFDIR),--sysconfdir=$$(SYSCONFDIR)) \
 				$$(if $$(LIBDIR),--libdir=$$(LIBDIR)) \
 				$$(if $$(LOCALSTATEDIR),--localstatedir=$$(LOCALSTATEDIR)) \
-				$$(CXX_STANDARD) $$(CONFIGURE) | tee -a make.log ; \
+				$$(CONFIGURE) | tee -a make.log ; \
 		fi ; test -f $$(notdir $$(@)) || exit 1 ; touch -c config.hxx Makefile.mk yaalrc yaal.pc ; true)
 endef
 
@@ -121,7 +112,6 @@ help:
 	@echo "make [FLAGS...] TARGETS...\n" \
 		"FLAGS:\n" \
 		"VERBOSE=yes       - enable verbose output of build process\n" \
-		"CXX_STANDARD=2011 - enable C++11 version of C++ stanrard\n" \
 		"\n" \
 		"TARGETS:\n" \
 		"all               - build all targets\n" \

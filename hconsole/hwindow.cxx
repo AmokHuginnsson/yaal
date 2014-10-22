@@ -34,7 +34,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "htuiprocess.hxx"
 #include "hcore/hlog.hxx"
 #include "hwidgetfactory.hxx"
-#include "hcore/foreach.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -295,7 +294,7 @@ HWindow::ptr_t HWindowCreator::do_new_instance( HTUIProcess* tui_, yaal::tools::
 void HWindowCreator::create_widgets( HWindow::ptr_t window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HWidgetFactory& wf( HWidgetFactory::get_instance() );
-	YAAL_FOREACH( yaal::tools::HXml::HConstNodeProxy const& n, node_ ) {
+	for ( yaal::tools::HXml::HConstNodeProxy const& n : node_ ) {
 		HString type( n.get_name() );
 		if ( wf.is_type_valid( type ) && ! xml::try_attr_val( n, "id" ) ) {
 			wf.create_widget( window_.raw(), n );

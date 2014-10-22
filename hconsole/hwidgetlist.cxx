@@ -29,7 +29,6 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hwidgetlist.hxx"
 #include "hstatusbarwidget.hxx"
-#include "hcore/foreach.hxx"
 #include "hcore/hlog.hxx"
 #include "tools/collections.hxx"
 
@@ -104,7 +103,7 @@ void HWidgetList::hit_test_all( mouse::OMouse& mouse_ ) {
 	if ( (*_focused)->hit_test( mouse_._row, mouse_._column ) ) {
 		(*_focused)->click( mouse_ );
 	} else {
-		YAAL_FOREACH( HWidget::ptr_t& p, _list ) {
+		for ( HWidget::ptr_t& p : _list ) {
 			if ( p->hit_test( mouse_._row, mouse_._column ) ) {
 				p->click( mouse_ );
 				break;

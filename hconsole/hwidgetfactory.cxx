@@ -30,7 +30,6 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hwidgetfactory.hxx"
-#include "hcore/foreach.hxx"
 #include "hcore/hlog.hxx"
 
 using namespace yaal;
@@ -132,7 +131,7 @@ char const LABEL_NAME[] = "label";
 
 void HWidgetCreatorInterface::apply_resources( HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
+	for ( HXml::HConstNodeProxy const& n : node_ ) {
 		if ( ! do_apply_resources( widget_, n ) ) {
 			HString const& name( n.get_name() );
 			if ( ( name != POSITION_NAME ) && ( name != LABEL_NAME ) ) {
@@ -146,7 +145,7 @@ void HWidgetCreatorInterface::apply_resources( HWidget::ptr_t widget_, yaal::too
 
 void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& attrs_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
+	for ( HXml::HConstNodeProxy const& n : node_ ) {
 		if ( ! do_prepare_attributes( attrs_, n ) ) {
 			HString const& name( n.get_name() );
 			if ( ( name != POSITION_NAME ) && ( name != LABEL_NAME ) ) {
@@ -161,7 +160,7 @@ void HWidgetCreatorInterface::prepare_attributes( HWidgetAttributesInterface& at
 HWidgetCreatorInterface::OResource HWidgetCreatorInterface::get_resource( yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	OResource r;
-	YAAL_FOREACH( HXml::HConstNodeProxy const& n, node_ ) {
+	for ( HXml::HConstNodeProxy const& n : node_ ) {
 		HString const& name( n.get_name() );
 		if ( name == POSITION_NAME ) {
 			r._row = lexical_cast<int>( xml::attr_val( n, "row" ) );

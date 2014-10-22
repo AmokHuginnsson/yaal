@@ -162,13 +162,11 @@ HString::HString( HString const& string_ )
 	M_EPILOG
 }
 
-#if CXX_STANDARD >= 2011
 HString::HString( HString&& string_ )
 	: _len() {
 	::memcpy( _mem, string_._mem, INPLACE_BUFFER_SIZE );
 	::memset( string_._mem, 0, INPLACE_BUFFER_SIZE );
 }
-#endif /* #if CXX_STANDARD >= 2011 */
 
 HString::HString( int long preallocate_, char fill_ )
 	: _len() {
@@ -440,7 +438,6 @@ HString& HString::operator = ( HString const& string_ ) {
 	M_EPILOG
 }
 
-#if CXX_STANDARD >= 2011
 HString& HString::operator = ( HString&& string_ ) {
 	M_PROLOG
 	if ( &string_ != this ) {
@@ -452,7 +449,6 @@ HString& HString::operator = ( HString&& string_ ) {
 	return ( *this );
 	M_EPILOG
 }
-#endif /* #if CXX_STANDARD >= 2011 */
 
 HString& HString::operator += ( HString const& string_ ) {
 	M_PROLOG

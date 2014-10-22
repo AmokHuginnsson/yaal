@@ -31,7 +31,6 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hresource.hxx"
 #include "hcore/hfile.hxx"
-#include "hcore/foreach.hxx"
 #include "hconsole/hmainwindow.hxx"
 #include "hconsole/hwindowfactory.hxx"
 

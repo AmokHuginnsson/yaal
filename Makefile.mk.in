@@ -54,7 +54,6 @@ SSL_KEYS_DIR   = db/$(LIB_NAME)/keys/
 SSL_KEYS       = $(SSL_KEYS_DIR)/key $(SSL_KEYS_DIR)/pem
 DIRS           = $(DIR_BUILD) $(SSL_KEYS_DIR)
 DO_@DO_TARGET@=1
-override CXX_STANDARD=@CXX_STANDARD@
 include $(DIR_ROOT)/_aux/mk/1_basic.mk
 include $(DIR_ROOT)/_aux/mk/2_term.mk
 include $(DIR_ROOT)/_aux/mk/3_suffix.mk

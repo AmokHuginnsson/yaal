@@ -181,7 +181,6 @@ public:
 	 */
 	HDeque( HDeque const&, allocator_t const& );
 
-#if CXX_STANDARD >= 2011
 	HDeque( HDeque&& deque_ )
 		: _start( 0 ), _size( 0 ), _chunks() {
 		M_PROLOG
@@ -189,7 +188,6 @@ public:
 		return;
 		M_EPILOG
 	}
-#endif /* #if CXX_STANDARD >= 2011 */
 
 	/*! \brief Assing contents of another deque to this deque.
 	 *
@@ -206,7 +204,6 @@ public:
 		M_EPILOG
 	}
 
-#if CXX_STANDARD >= 2011
 	HDeque& operator = ( HDeque&& deque_ ) {
 		M_PROLOG
 		if ( &deque_ != this ) {
@@ -216,7 +213,6 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
-#endif /* #if CXX_STANDARD >= 2011 */
 
 	/*! \brief Swap contents of this deque with another deque.
 	 *

@@ -32,7 +32,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hdatawindow.hxx"
 #include "hcore/hcore.hxx"
 #include "hcore/memory.hxx"
-#include "hcore/foreach.hxx"
 #include "hdatalistwidget.hxx"
 #include "hdatatreewidget.hxx"
 #include "hdataeditwidget.hxx"
@@ -322,7 +321,7 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 	HWindow::ptr_t window( make_pointer<HDataWindow>( name, dp ) );
 	create_widgets( window, node_ );
 	HDataWindow* dw( dynamic_cast<HDataWindow*>( window.raw() ) );
-	YAAL_FOREACH( yaal::tools::HXml::HConstNodeProxy const& n, node_ ) {
+	for ( yaal::tools::HXml::HConstNodeProxy const& n : node_ ) {
 		HString node( n.get_name() );
 		if ( node == "db" ) {
 			HString table( xml::attr_val( n, "table" ) );

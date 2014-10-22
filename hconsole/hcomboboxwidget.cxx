@@ -30,7 +30,6 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hcomboboxwidget.hxx"
-#include "hcore/foreach.hxx"
 #include "tools/hxml.hxx"
 #include "hconsole/hwindow.hxx"
 

@@ -113,13 +113,11 @@ public:
 	 * \param str - construct new string based on \e str.
 	 */
 	HString( HString const& str );
-#if CXX_STANDARD >= 2011
 	/*! \brief Move constructor.
 	 *
 	 * \param str - construct new string based on \e str.
 	 */
 	HString( HString&& str );
-#endif /* #if CXX_STANDARD >= 2011 */
 	/*! \brief Size based constructor.
 	 *
 	 * initialize immediately with size
@@ -234,13 +232,11 @@ public:
 	 */
 	HString( void const* const pointer );
 	HString& operator = ( HString const& );
-#if CXX_STANDARD >= 2011
 	/*! \brief Move assignemnt operator.
 	 *
 	 * Move "value" of a string to another string.
 	 */
 	HString& operator = ( HString&& str );
-#endif /* #if CXX_STANDARD >= 2011 */
 	/*! \brief Append another string to this string.
 	 *
 	 * \param str - string to append to this string.

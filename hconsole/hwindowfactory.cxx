@@ -30,7 +30,6 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hwindowfactory.hxx"
-#include "hcore/foreach.hxx"
 #include "hconsole/hwindow.hxx"
 
 using namespace yaal;
