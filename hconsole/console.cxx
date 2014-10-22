@@ -74,8 +74,8 @@ int const GLYPHS::ARROW::DOWN       = static_cast<int>( ACS_DARROW );
 int const GLYPHS::ARROW::UP         = static_cast<int>( ACS_UARROW );
 int const GLYPHS::ARROW::LEFT       = static_cast<int>( ACS_LARROW );
 int const GLYPHS::ARROW::RIGHT      = static_cast<int>( ACS_RARROW );
-int const GLYPHS::ARROW::HORIZONTAL = static_cast<int>( ACS_RARROW );
-int const GLYPHS::ARROW::VERTICAL   = static_cast<int>( ACS_RARROW );
+int const GLYPHS::ARROW::HORIZONTAL = static_cast<int>( ACS_HLINE );
+int const GLYPHS::ARROW::VERTICAL   = static_cast<int>( ACS_VLINE );
 
 int const GLYPHS::CHECKER::SPARSE = static_cast<int>( ACS_BOARD );
 int const GLYPHS::CHECKER::MEDIUM = static_cast<int>( ACS_BOARD );
@@ -119,9 +119,7 @@ int const GLYPHS::MATH::INFINITY      = static_cast<int>( ACS_ );
 int const GLYPHS::FACE::WHITE = '@';
 int const GLYPHS::FACE::BLACK = '@';
 #else /* than HAVE_ASCII_GRAPHICS */
-	GLYPHS::DOWN_ARROW    = 'v';
-	GLYPHS::UP_ARROW      = '^';
-	GLYPHS::VERTICAL_LINE = '|';
+#error No ASCII box drawing.
 #endif /* not HAVE_ASCII_GRAPHICS */
 
 /* Bbbbffff

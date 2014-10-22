@@ -77,7 +77,7 @@ protected:
 			: _cursor(), _firstVisibleRow(), _widgetOffset( 0 ), _cursorPosition( 0 ) {
 		}
 	} _origSelection;
-	HInfoInteger _infoInteger;
+	mutable HInfoInteger _infoInteger;
 public:
 	HComboboxWidget( HWindow* parent,
 			int row, int col, int height, int width,

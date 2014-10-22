@@ -174,9 +174,6 @@ void HComboboxWidget::close_combo( ACTION::action_t action_ ) {
 	M_PROLOG
 	_mode = MODE::EDITCONTROL;
 	if ( action_ == ACTION::APPLY ) {
-		if ( ! _model->is_empty() ) {
-			set_text( (*_cursor)[ 0 ].get_string() );
-		}
 		save_selection();
 	} else {
 		restore_selection();
@@ -192,6 +189,9 @@ void HComboboxWidget::save_selection( void ) {
 	_origSelection._firstVisibleRow = _firstVisibleRow;
 	_origSelection._widgetOffset = HListWidget::_widgetOffset;
 	_origSelection._cursorPosition = HListWidget::_cursorPosition;
+	if ( ! _model->is_empty() ) {
+		set_text( (*_cursor)[ 0 ].get_string() );
+	}
 	return;
 	M_EPILOG
 }
@@ -207,19 +207,30 @@ void HComboboxWidget::restore_selection( void ) {
 	M_EPILOG
 }
 
-void HComboboxWidget::select_by_index( int ) {
+void HComboboxWidget::select_by_index( int index_ ) {
+	M_PROLOG
+	set_cursor_position( index_ );
 	save_selection();
+	return;
+	M_EPILOG
 }
 
 int HComboboxWidget::get_selected_index( void ) const {
 	return ( _origSelection._widgetOffset + _origSelection._cursorPosition );
 }
 
-void HComboboxWidget::do_set_data( HInfo const& ) {
+void HComboboxWidget::do_set_data( HInfo const& data_ ) {
+	M_PROLOG
+	select_by_index( static_cast<int>( data_.get_integer() ) );
+	return;
+	M_EPILOG
 }
 
 HInfo const& HComboboxWidget::do_get_data( void ) const {
+	M_PROLOG
+	_infoInteger.set_integer( get_selected_index() );
 	return ( _infoInteger );
+	M_EPILOG
 }
 
 yaal::hcore::HString const& HComboboxWidget::get_selected_text( void ) const {

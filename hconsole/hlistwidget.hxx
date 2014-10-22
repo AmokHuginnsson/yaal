@@ -422,6 +422,8 @@ public:
 	void remove_current_row();
 	int long get_row_count( void );
 	type_id_t get_column_type( int );
+	void set_cursor_position( int );
+	int get_cursor_position( void ) const;
 protected:
 	virtual bool get_text_for_cell( iterator_t&, int, type_id_t );
 	virtual void do_paint( void );
@@ -445,6 +447,8 @@ protected:
 	void handle_key_tab( void );
 	void scroll_up( void );
 	void scroll_down( void );
+	void move_cursor_up( void );
+	void move_cursor_down( void );
 private:
 	void sort_by_column( int, list_widget_helper::OSortHelper::sort_order_t = list_widget_helper::OSortHelper::ASCENDING );
 	void recalculate_column_widths( void );

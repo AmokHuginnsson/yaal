@@ -363,6 +363,27 @@ inline void cyclic_decrement( ttType& model, tType& iterator, int count ) {
 
 }
 
+void HListWidget::set_cursor_position( int index_ ) {
+	M_PROLOG
+	M_ENSURE( ( index_ >= 0 ) && ( index_ < _model->size() ) );
+	int currentCursorPosition( get_cursor_position() );
+	if ( index_ > currentCursorPosition ) {
+		for ( int i( 0 ), count( index_ - currentCursorPosition ); i < count; ++ i ) {
+			move_cursor_up();
+		}
+	} else if ( index_ < currentCursorPosition ) {
+		for ( int i( 0 ), count( currentCursorPosition - index_ ); i < count; ++ i ) {
+			move_cursor_down();
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+int HListWidget::get_cursor_position( void ) const {
+	return ( _widgetOffset + _cursorPosition );
+}
+
 void HListWidget::handle_key_page_up( void ) {
 	if ( ! _cursorPosition ) {
 		if ( _widgetOffset ) {
@@ -413,16 +434,23 @@ void HListWidget::handle_key_page_down( void ) {
 	return;
 }
 
+void HListWidget::move_cursor_up( void ) {
+	M_PROLOG
+	if ( _cursorPosition > 0 ) {
+		-- _cursorPosition;
+		-- _cursor;
+	} else if ( _widgetOffset > 0 ) {
+		-- _firstVisibleRow;
+		-- _cursor;
+		-- _widgetOffset;
+	}
+	return;
+	M_EPILOG
+}
+
 void HListWidget::handle_key_up( void ) {
 	if ( ( _widgetOffset + _cursorPosition ) > 0 ) {
-		if ( _cursorPosition > 0 ) {
-			-- _cursorPosition;
-			-- _cursor;
-		} else if ( _widgetOffset > 0 ) {
-			-- _firstVisibleRow;
-			-- _cursor;
-			-- _widgetOffset;
-		}
+		move_cursor_up();
 		update_children();
 	} else
 		HConsole::get_instance().bell();
@@ -435,6 +463,7 @@ void HListWidget::handle_key_home( void ) {
 }
 
 void HListWidget::handle_key_end( void ) {
+	M_PROLOG
 	int size = static_cast<int>( _model->size() );
 	_cursor = _model->rbegin();
 	if ( size >= _heightRaw ) {
@@ -447,22 +476,32 @@ void HListWidget::handle_key_end( void ) {
 	}
 	update_children();
 	return;
+	M_EPILOG
+}
+
+void HListWidget::move_cursor_down( void ) {
+	M_PROLOG
+	++ _cursorPosition;
+	++ _cursor;
+	if ( _cursorPosition >= _heightRaw ) {
+		_cursorPosition = _heightRaw - 1;
+		++ _widgetOffset;
+		++ _firstVisibleRow;
+	}
+	return;
+	M_EPILOG
 }
 
 void HListWidget::handle_key_down( void ) {
+	M_PROLOG
 	if ( ( _cursorPosition + _widgetOffset ) < ( _model->size() - 1 ) ) {
-		++ _cursorPosition;
-		++ _cursor;
-		if ( _cursorPosition >= _heightRaw ) {
-			_cursorPosition = _heightRaw - 1;
-			++ _widgetOffset;
-			++ _firstVisibleRow;
-		}
+		move_cursor_down();
 		update_children();
 	} else {
 		HConsole::get_instance().bell();
 	}
 	return;
+	M_EPILOG
 }
 
 void HListWidget::handle_key_ctrl_n ( void ) {
