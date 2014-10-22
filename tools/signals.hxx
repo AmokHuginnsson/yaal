@@ -36,8 +36,7 @@ Copyright:
 
 namespace yaal {
 
-namespace tools
-{
+namespace tools {
 
 /*! \brief Posix signal manager.
  *
