@@ -554,14 +554,18 @@ public:
 		M_PROLOG
 		M_ASSERT( first_._owner == this );
 		M_ASSERT( last_._owner == this );
-		if ( ( first_._index < 0 ) && ( first_._index > _size ) )
+		if ( ( first_._index < 0 ) || ( first_._index > _size ) )
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], first_._index );
-		if ( ( last_._index < 0 ) && ( last_._index > _size ) )
+		if ( ( last_._index < 0 ) || ( last_._index > _size ) )
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index );
-		if ( last_._index < first_._index )
+#pragma GCC diagnostic ignored "-Wstrict-overflow"
+		if ( last_._index < first_._index ) {
+#pragma GCC diagnostic error "-Wstrict-overflow"
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index - first_._index );
-		for ( iterator it( copy( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it )
+		}
+		for ( iterator it( copy( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it ) {
 			M_SAFE( (*it).~value_type() );
+		}
 		_size -= ( last_._index - first_._index );
 		return ( first_ );
 		M_EPILOG

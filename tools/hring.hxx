@@ -611,9 +611,9 @@ typename HRing<type_t>::iterator HRing<type_t>::erase( iterator first_, iterator
 	M_PROLOG
 	M_ASSERT( first_._owner == this );
 	M_ASSERT( last_._owner == this );
-	if ( ( first_._index < 0 ) && ( first_._index > _size ) )
+	if ( ( first_._index < 0 ) || ( first_._index > _size ) )
 		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], first_._index );
-	if ( ( last_._index < 0 ) && ( last_._index > _size ) )
+	if ( ( last_._index < 0 ) || ( last_._index > _size ) )
 		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], last_._index );
 	if ( last_._index < first_._index )
 		M_THROW( _errMsgHRing_[ ERROR::INVALID_ITERATOR ], last_._index - first_._index );

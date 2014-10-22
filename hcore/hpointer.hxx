@@ -389,8 +389,11 @@ public:
 private:
 	bool release( void ) throw() {
 		M_ASSERT( _shared && _object );
-		if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] == 1 )
+#pragma GCC diagnostic ignored "-Wstrict-overflow"
+		if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] == 1 ) {
+#pragma GCC diagnostic error "-Wstrict-overflow"
 			access_type_t<value_type, pointer_type_t<value_type> >::delete_pointee( _shared );
+		}
 		access_type_t<value_type, pointer_type_t<value_type> >::dec_reference_counter( _shared->_referenceCounter );
 		if ( ! _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] ) {
 			delete _shared;

@@ -281,8 +281,11 @@ public:
 			}
 			if ( _size > list_._size ) {
 				count = _size - list_._size;
-				while ( count -- )
+#pragma GCC diagnostic ignored "-Wstrict-overflow"
+				while ( count -- ) {
+#pragma GCC diagnostic error "-Wstrict-overflow"
 					pop_back();
+				}
 			} else if ( _size < list_._size ) {
 				for ( ; ctr < list_._size; ++ ctr, ++ otherIt ) {
 					push_back( *otherIt );
@@ -875,7 +878,9 @@ private:
 				merge_sort( rightIt, right, comp_ );
 			HElement* first = NULL;
 			++ stepsLeft;
+#pragma GCC diagnostic ignored "-Wstrict-overflow"
 			while ( stepsLeft -- ) {
+#pragma GCC diagnostic error "-Wstrict-overflow"
 				if ( comp_( rightIt->_value, left->_value ) ) {
 					HElement* ptr = rightIt;
 					if ( ! first )
