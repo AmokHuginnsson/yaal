@@ -41,6 +41,24 @@ constexpr typename trait::strip_reference<tType>::type&& move( tType&& val_ ) {
 	return ( static_cast<typename trait::strip_reference<tType>::type&&>( val_ ) );
 }
 
+/*! \brief Allow "perfect forwarding", make sure correct type is used for both lvalues and rvalues.
+ *
+ * Forward rvalue.
+ */
+template<typename tType>
+constexpr tType&& forward( typename trait::strip_reference<tType>::type&& val_ ) {
+	return ( static_cast<tType&&>( val_ ) );
+}
+
+/*! \brief Allow "perfect forwarding", make sure correct type is used for both lvalues and rvalues.
+ *
+ * Forward lvalue.
+ */
+template<typename tType>
+constexpr tType&& forward( typename trait::strip_reference<tType>::type& val_ ) {
+	return ( static_cast<tType&&>( val_ ) );
+}
+
 /*! \brief Swap contents of two variables.
  *
  * \param left - first variable to be swapped.
