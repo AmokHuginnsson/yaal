@@ -527,12 +527,28 @@ template<int free_args, typename descriptor_t, typename return_t, typename CALL_
 class HCall;
 
 template<typename METHOD_t,
-	typename fa0_t = trait::no_type, typename fa1_t = trait::no_type,
-	typename fa2_t = trait::no_type, typename fa3_t = trait::no_type,
-	typename fa4_t = trait::no_type, typename fa5_t = trait::no_type,
-	typename fa6_t = trait::no_type, typename fa7_t = trait::no_type,
-	typename fa8_t = trait::no_type, typename fa9_t = trait::no_type, typename fa10_t = trait::no_type>
+	typename q_fa0_t = trait::no_type, typename q_fa1_t = trait::no_type,
+	typename q_fa2_t = trait::no_type, typename q_fa3_t = trait::no_type,
+	typename q_fa4_t = trait::no_type, typename q_fa5_t = trait::no_type,
+	typename q_fa6_t = trait::no_type, typename q_fa7_t = trait::no_type,
+	typename q_fa8_t = trait::no_type, typename q_fa9_t = trait::no_type,
+	typename q_fa10_t = trait::no_type>
 struct call_calculator {
+	template<typename T>
+	struct strip {
+		typedef typename trait::ternary<trait::is_kind_of<T, higher_order::placeholder_base>::value, typename trait::strip<T>::type, T>::type type;
+	};
+	typedef typename strip<q_fa0_t>::type fa0_t;
+	typedef typename strip<q_fa1_t>::type fa1_t;
+	typedef typename strip<q_fa2_t>::type fa2_t;
+	typedef typename strip<q_fa3_t>::type fa3_t;
+	typedef typename strip<q_fa4_t>::type fa4_t;
+	typedef typename strip<q_fa5_t>::type fa5_t;
+	typedef typename strip<q_fa6_t>::type fa6_t;
+	typedef typename strip<q_fa7_t>::type fa7_t;
+	typedef typename strip<q_fa8_t>::type fa8_t;
+	typedef typename strip<q_fa9_t>::type fa9_t;
+	typedef typename strip<q_fa10_t>::type fa10_t;
 	typedef call_calculator<METHOD_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t> descriptor;
 	struct free_standing_args_count {
 		static int const value =
@@ -746,22 +762,38 @@ struct call_calculator {
 		inline static type make( METHOD_t m, fa0_t )
 			{ return ( type( m ) ); }
 	};
-	typedef typename trait::ternary<trait::is_member<METHOD_t>::value, /* we have method */
-					typename trait::ternary<meta::greater<trait::find_type<fa0_t, /* is 'this' a free standing arg? */
-					higher_order::placeholder<1>,
-					higher_order::placeholder<2>,
-					higher_order::placeholder<3>,
-					higher_order::placeholder<4>,
-					higher_order::placeholder<5>,
-					higher_order::placeholder<6>,
-					higher_order::placeholder<7>,
-					higher_order::placeholder<8>,
-					higher_order::placeholder<9>,
-					higher_order::placeholder<10> >::value, -1>::value,
-						functor_this, functor>::type,
-						typename trait::ternary<trait::is_field<METHOD_t>::value,
-							typename trait::ternary<trait::same_type<fa0_t, higher_order::placeholder<1> >::value,
-								field_this, field>::type, function>::type>::type type;
+	typedef typename trait::ternary<
+			trait::is_member<METHOD_t>::value, /* we have method */
+			typename trait::ternary<
+					meta::greater<
+							trait::find_type<
+									fa0_t, /* is 'this' a free standing arg? */
+									higher_order::placeholder<1>,
+									higher_order::placeholder<2>,
+									higher_order::placeholder<3>,
+									higher_order::placeholder<4>,
+									higher_order::placeholder<5>,
+									higher_order::placeholder<6>,
+									higher_order::placeholder<7>,
+									higher_order::placeholder<8>,
+									higher_order::placeholder<9>,
+									higher_order::placeholder<10>
+							>::value,
+							-1
+					>::value,
+					functor_this,
+					functor
+			>::type,
+			typename trait::ternary<
+					trait::is_field<METHOD_t>::value,
+					typename trait::ternary<
+							trait::same_type<fa0_t, higher_order::placeholder<1> >::value,
+							field_this,
+							field
+					>::type,
+					function
+			>::type
+	>::type type;
 };
 
 /*! \brief Base class for HCall<1..10>.
@@ -4490,82 +4522,10 @@ public:
 
 /*! \endcond */
 
-template<typename METHOD_t>
-typename call_calculator<METHOD_t>::type::type call( METHOD_t A_METHOD )
-	{ return ( call_calculator<METHOD_t>::type::make( A_METHOD ) ); }
-
-template<typename METHOD_t, typename a0_t>
-typename call_calculator<METHOD_t, a0_t>::type::type call( METHOD_t A_METHOD, a0_t a0 )
-	{ return ( call_calculator<METHOD_t, a0_t>::type::make( A_METHOD, a0 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t>
-typename call_calculator<METHOD_t, a0_t, a1_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1 )
-	{ return ( call_calculator<METHOD_t, a0_t, a1_t>::type::make( A_METHOD, a0, a1 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t>
-typename call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2 )
-	{ return ( call_calculator<METHOD_t, a0_t, a1_t, a2_t>::type::make( A_METHOD, a0, a1, a2 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t>
-typename call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-	{ return ( call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t>::type::make( A_METHOD, a0, a1, a2, a3 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t>
-typename call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::type call( METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-	{ return ( call_calculator<METHOD_t, a0_t, a1_t, a2_t, a3_t, a4_t>::type::make( A_METHOD, a0, a1, a2, a3, a4 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::type call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-	{ return ( call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::type call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-	{ return ( call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::type call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-	{ return ( call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::type call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-	{ return ( call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t, typename a9_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::type call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-	{ return ( call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-
-template<typename METHOD_t, typename a0_t, typename a1_t, typename a2_t,
-	typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t,
-	typename a8_t, typename a9_t, typename a10_t>
-typename call_calculator<METHOD_t,
-				 a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::type call(
-						 METHOD_t A_METHOD, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-	{ return ( call_calculator<METHOD_t,
-			a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>::type::make( A_METHOD, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
+template<typename METHOD_t, typename... arg_t>
+typename call_calculator<METHOD_t, arg_t...>::type::type call( METHOD_t A_METHOD, arg_t&&... arg_ ) {
+	return ( call_calculator<METHOD_t, arg_t...>::type::make( A_METHOD, yaal::forward<arg_t>( arg_ )... ) );
+}
 
 }
 

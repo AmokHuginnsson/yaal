@@ -1410,14 +1410,14 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 	if ( state >= INTEGRAL ) {
 		if ( !! _actionDouble ) {
 			double d( lexical_cast<double>( _cache ) );
-			add_execution_step( executingParser_, first_, call( _actionDouble, d ) );
+			add_execution_step( executingParser_, first_, call( _actionDouble, yaal::move( d ) ) );
 		} else if ( !! _actionDoubleLong ) {
 			double long dl( lexical_cast<double long>( _cache ) );
-			add_execution_step( executingParser_, first_, call( _actionDoubleLong, dl ) );
+			add_execution_step( executingParser_, first_, call( _actionDoubleLong, yaal::move( dl ) ) );
 		} else if ( !! _actionNumber ) {
-			add_execution_step( executingParser_, first_, call( _actionNumber, _cache ) );
+			add_execution_step( executingParser_, first_, call( _actionNumber, yaal::move( _cache ) ) );
 		} else if ( !! _actionString ) {
-			add_execution_step( executingParser_, first_, call( _actionString, _cache ) );
+			add_execution_step( executingParser_, first_, call( _actionString, yaal::move( _cache ) ) );
 		} else if ( !! _action )
 			add_execution_step( executingParser_, first_, call( _action ) );
 		first_ = scan;
@@ -1575,14 +1575,14 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 	if ( state >= DIGIT ) {
 		if ( !! _actionIntLong ) {
 			int long il( lexical_cast<int long>( _cache ) );
-			add_execution_step( executingParser_, first_, call( _actionIntLong, il ) );
+			add_execution_step( executingParser_, first_, call( _actionIntLong, yaal::move( il ) ) );
 		} else if ( !! _actionInt ) {
 			int i( lexical_cast<int>( _cache ) );
-			add_execution_step( executingParser_, first_, call( _actionInt, i ) );
+			add_execution_step( executingParser_, first_, call( _actionInt, yaal::move( i ) ) );
 		} else if ( !! _actionNumber ) {
-			add_execution_step( executingParser_, first_, call( _actionNumber, _cache ) );
+			add_execution_step( executingParser_, first_, call( _actionNumber, yaal::move( _cache ) ) );
 		} else if ( !! _actionString ) {
-			add_execution_step( executingParser_, first_, call( _actionString, _cache ) );
+			add_execution_step( executingParser_, first_, call( _actionString, yaal::move( _cache ) ) );
 		} else if ( !! _action )
 			add_execution_step( executingParser_, first_, call( _action ) );
 		first_ = scan;
@@ -1712,7 +1712,7 @@ yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser*
 		++ scan;
 		unescape( _cache, _escapes_ );
 		if ( !! _actionString )
-			add_execution_step( executingParser_, first_, call( _actionString, _cache ) );
+			add_execution_step( executingParser_, first_, call( _actionString, yaal::move( _cache ) ) );
 		else if ( !! _action )
 			add_execution_step( executingParser_, first_, _action );
 		first_ = scan;
@@ -1833,7 +1833,7 @@ yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingPars
 		++ scan;
 		unescape( _cache, _escapes_ );
 		if ( !! _actionCharacter )
-			add_execution_step( executingParser_, first_, call( _actionCharacter, _cache[0] ) );
+			add_execution_step( executingParser_, first_, call( _actionCharacter, yaal::move( _cache[0] ) ) );
 		else if ( !! _action )
 			add_execution_step( executingParser_, first_, _action );
 		first_ = scan;
@@ -1928,7 +1928,7 @@ yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* exe
 	char c( *scan );
 	if ( _characters.is_empty() || ( _characters.find( *scan ) != hcore::HString::npos ) ) {
 		if ( !! _actionChar )
-			add_execution_step( executingParser_, first_, call( _actionChar, c ) );
+			add_execution_step( executingParser_, first_, call( _actionChar, yaal::move( c ) ) );
 		else if ( !! _action )
 			add_execution_step( executingParser_, first_, call( _action ) );
 		++ scan;
@@ -2054,7 +2054,7 @@ hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingPar
 	}
 	if ( ok ) {
 		if ( !! _actionString )
-			add_execution_step( executingParser_, first_, call( _actionString, _string ) );
+			add_execution_step( executingParser_, first_, call( _actionString, yaal::move( _string ) ) );
 		else if ( !! _action )
 			add_execution_step( executingParser_, first_, call( _action ) );
 		first_ = scan;
