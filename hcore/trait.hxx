@@ -287,31 +287,6 @@ template<typename tType, typename t0_t, typename t1_t,
 	typename t18_t, typename t19_t, typename t20_t>
 int const count_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::value;
 
-/*! \brief Test if type is a pointer type.
- *
- * \tparam T - type to check for pointer trait.
- * \retval value - true iff T is a pointer type.
- * \retval type - true_type iff T is a pointer type.
- */
-template<typename T>
-struct is_pointer {
-	static bool const value = false;
-	typedef trait::false_type type;
-};
-
-/*! \cond */
-template<typename T>
-struct is_pointer<T*> {
-	static bool const value = true;
-	typedef trait::true_type type;
-};
-template<typename T>
-struct is_pointer<T const*> {
-	static bool const value = true;
-	typedef trait::true_type type;
-};
-/*! \endcond */
-
 /*! \brief Test if type is a const type.
  *
  * \tparam T - type to check for constness trait.
@@ -448,6 +423,10 @@ template<typename T>
 struct strip_reference<T&> {
 	typedef T type;
 };
+template<typename T>
+struct strip_reference<T&&> {
+	typedef T type;
+};
 /*! \endcond */
 
 /*! \brief Meta function used to add one level of pointer to a type.
@@ -526,6 +505,68 @@ struct strip_const<T const> {
 };
 /*! \endcond */
 
+/*! \brief Meta function used to strip volatile from type.
+ *
+ * \tparam T - type to strip volatile from.
+ * \retval type - a type without volatileness trait.
+ */
+template<typename T>
+struct strip_volatile {
+	typedef T type;
+};
+
+/*! \cond */
+template<typename T>
+struct strip_volatile<T volatile> {
+	typedef T type;
+};
+/*! \endcond */
+
+/*! \brief Meta function used to strip both const and volatile qualifiers from type.
+ *
+ * \tparam T - type to strip cv-qualifiers from.
+ * \retval type - a type without any cv-qualifiers trait.
+ */
+template<typename T>
+struct strip_cv {
+	typedef typename strip_volatile<typename strip_const<T>::type>::type type;
+};
+
+/*! \brief Meta function used to strip all type modifiers.
+ *
+ * \tparam T - type to strip all modifiers from.
+ * \retval type - a type without any modifiers.
+ */
+template<typename T>
+struct strip {
+	typedef typename strip_cv<typename strip_reference<T>::type>::type type;
+};
+
+/*! \cond */
+template<typename T>
+struct is_pointer_helper {
+	static bool const value = false;
+	typedef trait::false_type type;
+};
+template<typename T>
+struct is_pointer_helper<T*> {
+	static bool const value = true;
+	typedef trait::true_type type;
+};
+/*! \endcond */
+
+/*! \brief Test if type is a pointer type.
+ *
+ * \tparam T - type to check for pointer trait.
+ * \retval value - true iff T is a pointer type.
+ * \retval type - true_type iff T is a pointer type.
+ */
+template<typename T>
+struct is_pointer {
+	typedef typename is_pointer_helper<typename strip_cv<T>::type>::type type;
+	static bool const value = boolean_value<type>::value;
+};
+
 /*! \brief Copy constness (or lack of it) from on type to another.
  *
  * \tparam source - get constness from this type.
@@ -588,9 +629,9 @@ public:
  */
 template<typename derived_t, typename base_t>
 struct is_kind_of {
-	static true_type calc( base_t const* );
+	static true_type calc( typename strip_reference<base_t>::type const* );
 	static false_type calc( ... );
-	static bool const value = sizeof ( calc( static_cast<derived_t const*>( NULL ) ) ) == sizeof ( true_type );
+	static bool const value = sizeof ( calc( static_cast<typename strip_reference<derived_t>::type const*>( NULL ) ) ) == sizeof ( true_type );
 };
 
 /*! \brief Interface preventing copying of objects.
