@@ -250,7 +250,7 @@ void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
 	typedef HArray<OCIParam*> params_t;
 	params_t params;
 	do {
-		ub2 stmtType( -1 );
+		ub2 stmtType( static_cast<ub2>( -1 ) );
 		if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
 						OCI_HTYPE_STMT, &stmtType, 0, OCI_ATTR_STMT_TYPE,
 						query->_error ) ) != OCI_SUCCESS ) {
@@ -413,7 +413,7 @@ M_EXPORT_SYMBOL void query_bind( ODBLink& dbLink_, void* data_, int attrNo_, yaa
 	OCIBind* dummy( NULL );
 	query->_inNullInd.push_back( 0 );
 	if ( ( ( *query->_status ) = OCIBindByPos( query->_statement, &dummy, query->_error,
-			attrNo_, const_cast<char*>( value_.c_str() ), static_cast<sb4>( value_.get_size() ) + 1,
+			static_cast<ub4>( attrNo_ ), const_cast<char*>( value_.c_str() ), static_cast<sb4>( value_.get_size() ) + 1,
 			SQLT_STR, &query->_inNullInd.back(), NULL, NULL, 0, NULL, OCI_DEFAULT ) ) != OCI_SUCCESS ) {
 		log( LOG_TYPE::ERROR ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, query ) << endl;
 	}

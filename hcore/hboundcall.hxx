@@ -95,81 +95,22 @@ public:
 				 b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >( boundCall_ ) ) {
 		return;
 	}
-	result_type operator()( void ) const
-		{ return ( (*_call)() ); }
-	result_type operator()( void )
-		{ return ( (*_call)() ); }
-	template<typename fa0_t>
-	result_type operator()( fa0_t fa0 ) const
-		{ return ( (*_call)( fa0 ) ); }
-	template<typename fa0_t>
-	result_type operator()( fa0_t fa0 )
-		{ return ( (*_call)( fa0 ) ); }
-	template<typename fa0_t, typename fa1_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1 ) const
-		{ return ( (*_call)( fa0, fa1 ) ); }
-	template<typename fa0_t, typename fa1_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1 )
-		{ return ( (*_call)( fa0, fa1 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2 ) const
-		{ return ( (*_call)( fa0, fa1, fa2 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2 )
-		{ return ( (*_call)( fa0, fa1, fa2 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 ) const
-		{ return ( (*_call)( fa0, fa1, fa2, fa3 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
-		{ return ( (*_call)( fa0, fa1, fa2, fa3 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 ) const
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 ) const
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4, fa5 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4, fa5 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 ) const
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 ) const
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 ) const
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
-		typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t,
-		typename fa8_t, typename fa9_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 ) const
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
-		typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t,
-		typename fa8_t, typename fa9_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
-		{ return ( (*_call)( fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
+	template<typename... arg_t>
+	result_type operator()( arg_t&&... arg_ ) const {
+		return ( (*_call)( yaal::forward<arg_t>( arg_ )... ) );
+	}
+	template<typename... arg_t>
+	result_type operator()( arg_t&&... arg_ ) {
+		return ( (*_call)( yaal::forward<arg_t>( arg_ )... ) );
+	}
 	void const* id( void ) const
 		{ return ( _call->id() ); }
 	void reset( void ) {
 		_call.reset();
 	}
-	bool operator ! ( void ) const
-		{ return ( ! _call ); }
+	bool operator ! ( void ) const {
+		return ( ! _call );
+	}
 	void swap( HBoundCall& boundCall_ ) {
 		if ( &boundCall_ != this ) {
 			using yaal::swap;
@@ -180,8 +121,9 @@ public:
 };
 
 template<typename signature_t>
-inline void swap( HBoundCall<signature_t>& a, HBoundCall<signature_t>& b )
-	{ a.swap( b ); }
+inline void swap( HBoundCall<signature_t>& a, HBoundCall<signature_t>& b ) {
+	a.swap( b );
+}
 
 }
 
