@@ -98,43 +98,6 @@ to_t bit_cast( from_t val_ ) {
 	return ( cast._to );
 }
 
-/*! \brief Disguise base class to look like a field.
- *
- * Allows owner class to initialize any of its base classes with a reference to one of its conceptual fields.
- */
-template<typename field_t, int const id = 0>
-class HField {
-protected:
-	field_t _field;
-public:
-	HField( void ) : _field() {}
-	template<typename a0_t>
-	HField( a0_t a0_ ) : _field( a0_ ) {}
-	template<typename a0_t, typename a1_t>
-	HField( a0_t a0_, a1_t a1_ ) : _field( a0_, a1_ ) {}
-	template<typename a0_t, typename a1_t, typename a2_t>
-	HField( a0_t a0_, a1_t a1_, a2_t a2_ ) : _field( a0_, a1_, a2_ ) {}
-	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_ ) : _field( a0_, a1_, a2_, a3_ ) {}
-	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
-	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_ ) : _field( a0_, a1_, a2_, a3_, a4_ ) {}
-	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_ ) : _field( a0_, a1_, a2_, a3_, a4_, a5_ ) {}
-	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_ ) : _field( a0_, a1_, a2_, a3_, a4_, a5_, a6_ ) {}
-	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_ ) : _field( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_ ) {}
-	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t>
-	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, a8_t a8_ ) : _field( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_ ) {}
-	template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t, typename a9_t>
-	HField( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, a8_t a8_, a9_t a9_ ) : _field( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_ ) {}
-	virtual ~HField( void ) {}
-	field_t& ref( void )
-		{ return ( _field ); }
-	field_t const& ref( void ) const
-		{ return ( _field ); }
-};
-
 /*! \brief Temporarily backup some value on a side and restore it at end of scope.
  */
 template<typename tType>

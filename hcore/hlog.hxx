@@ -31,6 +31,7 @@ Copyright:
 
 #include "hcore/hsingleton.hxx"
 #include "hcore/hchunk.hxx"
+#include "hcore/hfield.hxx"
 #include "hcore/hfile.hxx"
 
 namespace yaal {
