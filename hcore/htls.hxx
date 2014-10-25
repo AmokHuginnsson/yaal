@@ -69,38 +69,9 @@ public:
 		tType _object;
 		owner_t* _owner;
 	public:
-		explicit HTLSHolder( owner_t* owner_ )
-			: _object(), _owner( owner_ ) {}
-		template<typename a0_t>
-		explicit HTLSHolder( a0_t a0_, owner_t* owner_ )
-			: _object( a0_ ), _owner( owner_ ) {}
-		template<typename a0_t, typename a1_t>
-		explicit HTLSHolder( a0_t a0_, a1_t a1_, owner_t* owner_ )
-			: _object( a0_, a1_ ), _owner( owner_ ) {}
-		template<typename a0_t, typename a1_t, typename a2_t>
-		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, owner_t* owner_ )
-			: _object( a0_, a1_, a2_ ), _owner( owner_ ) {}
-		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t>
-		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, owner_t* owner_ )
-			: _object( a0_, a1_, a2_, a3_ ), _owner( owner_ ) {}
-		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t>
-		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, owner_t* owner_ )
-			: _object( a0_, a1_, a2_, a3_, a4_ ), _owner( owner_ ) {}
-		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t>
-		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, owner_t* owner_ )
-			: _object( a0_, a1_, a2_, a3_, a4_, a5_ ), _owner( owner_ ) {}
-		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t>
-		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, owner_t* owner_ )
-			: _object( a0_, a1_, a2_, a3_, a4_, a5_, a6_ ), _owner( owner_ ) {}
-		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t>
-		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, owner_t* owner_ )
-			: _object( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_ ), _owner( owner_ ) {}
-		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t>
-		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, a8_t a8_, owner_t* owner_ )
-			: _object( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_ ), _owner( owner_ ) {}
-		template<typename a0_t, typename a1_t, typename a2_t, typename a3_t, typename a4_t, typename a5_t, typename a6_t, typename a7_t, typename a8_t, typename a9_t>
-		explicit HTLSHolder( a0_t a0_, a1_t a1_, a2_t a2_, a3_t a3_, a4_t a4_, a5_t a5_, a6_t a6_, a7_t a7_, a8_t a8_, a9_t a9_, owner_t* owner_ )
-			: _object( a0_, a1_, a2_, a3_, a4_, a5_, a6_, a7_, a8_, a9_ ), _owner( owner_ ) {}
+		template<typename... arg_t>
+		explicit HTLSHolder( owner_t* owner_, arg_t&&... arg_ )
+			: _object( yaal::forward<arg_t>( arg_ )... ), _owner( owner_ ) {}
 		virtual ~HTLSHolder( void ) {}
 		operator tType const& ( void ) const
 			{ return ( _object ); }
@@ -144,7 +115,7 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		tls_holder_res_t res( new HTLSHolder( yaal::forward<arg_t>( arg_ )..., this ) );
+		tls_holder_res_t res( new HTLSHolder( this, yaal::forward<arg_t>( arg_ )... ) );
 		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
 		tls::set( _key, res.get() );
 		M_ASSERT( res->get_owner() );
