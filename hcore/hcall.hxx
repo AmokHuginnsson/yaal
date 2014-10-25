@@ -636,28 +636,53 @@ struct call_calculator {
 						arg0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 )
-			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9, fa10 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
-			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
-			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
-			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
-			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5, fa6 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
-			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4, fa5 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
-			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3, fa4 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
-			{ return ( type( functor_t( fa0, m ), fa1, fa2, fa3 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
-			{ return ( type( functor_t( fa0, m ), fa1, fa2 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 )
-			{ return ( type( functor_t( fa0, m ), fa1 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0 )
-			{ return ( type( functor_t( fa0, m ) ) ); }
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ),
+						yaal::move( fa9 ), yaal::move( fa10 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ),
+						yaal::move( fa9 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa1 ), yaal::move( fa2 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa1 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ) ) );
+		}
 	};
 	struct functor_this {
 		typedef HFunctor<fa0_t, METHOD_t> functor_t;
@@ -683,28 +708,55 @@ struct call_calculator {
 						typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 )
-			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9, fa10 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
-			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
-			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
-			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
-			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
-			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4, fa5 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
-			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3, fa4 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
-			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2, fa3 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
-			{ return ( type( functor_t( fa0, m ), fa0, fa1, fa2 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 )
-			{ return ( type( functor_t( fa0, m ), fa0, fa1 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0 )
-			{ return ( type( functor_t( fa0, m ), fa0 ) ); }
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ), yaal::move( fa9 ),
+						yaal::move( fa10 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ), yaal::move( fa9 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
+						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa0 ), yaal::move( fa1 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0 ) {
+			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa0 ) ) );
+		}
 	};
 	struct function {
 		typedef HCall<free_standing_args_count::value, descriptor, typename trait::return_type<METHOD_t>::type,
@@ -727,40 +779,65 @@ struct call_calculator {
 						arg0_t, typename sorted_real_args::a1_t, typename sorted_real_args::a2_t, typename sorted_real_args::a3_t,
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 )
-			{ return ( type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 )
-			{ return ( type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 )
-			{ return ( type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 )
-			{ return ( type( m, fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 )
-			{ return ( type( m, fa0, fa1, fa2, fa3, fa4, fa5 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 )
-			{ return ( type( m, fa0, fa1, fa2, fa3, fa4 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 )
-			{ return ( type( m, fa0, fa1, fa2, fa3 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 )
-			{ return ( type( m, fa0, fa1, fa2 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 )
-			{ return ( type( m, fa0, fa1 ) ); }
-		inline static type make( METHOD_t m, fa0_t fa0 )
-			{ return ( type( m, fa0 ) ); }
-		inline static type make( METHOD_t m )
-			{ return ( type( m ) ); }
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 ) {
+			return ( type( m, yaal::move( fa0 ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ),
+						yaal::move( fa9 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 ) {
+			return ( type( m, yaal::move( fa0 ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 ) {
+			return ( type( m, yaal::move( fa0 ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 ) {
+			return ( type( m, yaal::move( fa0 ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ), yaal::move( fa6 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 ) {
+			return ( type( m, yaal::move( fa0 ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
+						yaal::move( fa5 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 ) {
+			return ( type( m, yaal::move( fa0 ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 ) {
+			return ( type( m, yaal::move( fa0 ),
+						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 ) {
+			return ( type( m, yaal::move( fa0 ),
+						yaal::move( fa1 ), yaal::move( fa2 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 ) {
+			return ( type( m, yaal::move( fa0 ), yaal::move( fa1 ) ) );
+		}
+		inline static type make( METHOD_t m, fa0_t fa0 ) {
+			return ( type( m, yaal::move( fa0 ) ) );
+		}
+		inline static type make( METHOD_t m ) {
+			return ( type( m ) );
+		}
 	};
 	struct field {
 		typedef HCall<-2, descriptor, typename trait::field_type<METHOD_t>::type,
 						fa0_t, METHOD_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
 		inline static type make( METHOD_t m, fa0_t a0 )
-			{ return ( type( m, a0 ) ); }
+			{ return ( type( yaal::move( m ), yaal::move( a0 ) ) ); }
 	};
 	struct field_this {
 		typedef HCall<-1, descriptor, typename trait::field_type<METHOD_t>::type,
 						fa0_t, METHOD_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
 		inline static type make( METHOD_t m, fa0_t )
-			{ return ( type( m ) ); }
+			{ return ( type( yaal::move( m ) ) ); }
 	};
 	typedef typename trait::ternary<
 			trait::is_member<METHOD_t>::value, /* we have method */
@@ -806,7 +883,8 @@ class HCallBase : public descriptor::type::interface_type {
 protected:
 	CALL_t _call;
 public:
-	HCallBase( CALL_t call_ ) : _call( call_ ) {}
+	HCallBase( CALL_t call_ )
+		: _call( yaal::move( call_ ) ) {}
 protected:
 	virtual void const* do_id( void ) const
 		{ return ( caller_id( _call ) ); }
@@ -823,7 +901,10 @@ private:
 	field_t _field;
 	class_t _object;
 public:
-	HCall(  field_t field_, class_t object_ ) : _field( field_ ), _object( object_ ) {}
+	HCall(  field_t field_, class_t object_ )
+		: _field( yaal::move( field_ ) ), _object( yaal::move( object_ ) ) {
+		return;
+	}
 	return_t const& operator()( void ) const {
 		return ( _object->*_field );
 	}
@@ -842,7 +923,10 @@ public:
 private:
 	field_t _field;
 public:
-	HCall( field_t field_ ) : _field( field_ ) {}
+	HCall( field_t field_ )
+		: _field( yaal::move( field_ ) ) {
+		return;
+	}
 	return_t const& operator()( argument_type const& obj_ ) const {
 		return ( obj_.*_field );
 	}
@@ -870,7 +954,9 @@ public:
 	trait::no_type, trait::no_type, trait::no_type> base_type;
 public:
 	HCall( CALL_t call_ )
-		: base_type( call_ ) {}
+		: base_type( yaal::move( call_ ) ) {
+		return;
+	}
 	virtual return_t do_invoke( void )
 		{ return ( (base_type::_call)() ); }
 	virtual return_t do_invoke( void ) const
@@ -896,7 +982,9 @@ private:
 	a0_t _a0;
 public:
 	HCall( CALL_t call_, a0_t a0 )
-		: base_type( call_ ), _a0( a0 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( void )
 		{ return ( (base_type::_call)( _a0 ) ); }
 	virtual return_t do_invoke( void ) const
@@ -920,7 +1008,9 @@ private:
 	a1_t _a1;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( void )
 		{ return ( (base_type::_call)( _a0, _a1 ) ); }
 	virtual return_t do_invoke( void ) const
@@ -946,7 +1036,10 @@ private:
 	a2_t _a2;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( void )
 		{ return ( (base_type::_call)( _a0, _a1, _a2 ) ); }
 	virtual return_t do_invoke( void ) const
@@ -973,7 +1066,10 @@ private:
 	a3_t _a3;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( void )
 		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3 ) ); }
 	virtual return_t do_invoke( void ) const
@@ -1002,7 +1098,11 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( void )
 		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4 ) ); }
 	virtual return_t do_invoke( void ) const
@@ -1029,7 +1129,11 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( void )
 		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
 	virtual return_t do_invoke( void ) const
@@ -1062,7 +1166,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( void )
 		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
 	virtual return_t do_invoke( void ) const
@@ -1096,7 +1205,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( void )
 		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
 	virtual return_t do_invoke( void ) const
@@ -1131,7 +1245,13 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( void )
 		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
 	virtual return_t do_invoke( void ) const
@@ -1166,7 +1286,13 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( void )
 		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
 	virtual return_t do_invoke( void ) const
@@ -1193,7 +1319,9 @@ private:
 	a0_t _a0;
 public:
 	HCall( CALL_t call_, a0_t a0 )
-		: base_type( call_ ), _a0( a0 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) ); }
 };
@@ -1218,7 +1346,9 @@ private:
 	a1_t _a1;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ) ) ); }
@@ -1249,7 +1379,10 @@ private:
 	a2_t _a2;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
@@ -1283,7 +1416,10 @@ private:
 	a3_t _a3;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
@@ -1321,7 +1457,11 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
@@ -1361,7 +1501,11 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
@@ -1405,7 +1549,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
@@ -1452,7 +1601,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
@@ -1502,7 +1656,13 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
@@ -1554,7 +1714,13 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
@@ -1609,7 +1775,14 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10)
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
+		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
@@ -1657,7 +1830,9 @@ private:
 	a1_t _a1;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ) ) ); }
@@ -1689,7 +1864,10 @@ private:
 	a2_t _a2;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
@@ -1724,7 +1902,10 @@ private:
 	a3_t _a3;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
@@ -1763,7 +1944,11 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
@@ -1804,7 +1989,11 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
@@ -1849,7 +2038,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
@@ -1897,7 +2091,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
@@ -1948,7 +2147,13 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
@@ -2001,7 +2206,13 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
@@ -2057,7 +2268,14 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
+		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
@@ -2108,7 +2326,10 @@ private:
 	a2_t _a2;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
@@ -2144,7 +2365,10 @@ private:
 	a3_t _a3;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
@@ -2184,7 +2408,11 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
@@ -2226,7 +2454,11 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
@@ -2272,7 +2504,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
@@ -2321,7 +2558,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
@@ -2373,7 +2615,13 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
@@ -2427,7 +2675,13 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
@@ -2484,7 +2738,14 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
+		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
@@ -2537,7 +2798,10 @@ private:
 	a3_t _a3;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
@@ -2578,7 +2842,11 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
@@ -2621,7 +2889,11 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
@@ -2668,7 +2940,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
@@ -2718,7 +2995,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
@@ -2771,7 +3053,13 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
@@ -2826,7 +3114,13 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
@@ -2884,7 +3178,14 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
+		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
@@ -2940,7 +3241,11 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
@@ -2984,7 +3289,11 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
@@ -3032,7 +3341,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
@@ -3083,7 +3397,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
@@ -3137,7 +3456,13 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
@@ -3193,7 +3518,13 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
@@ -3252,7 +3583,14 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
+		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
@@ -3309,7 +3647,11 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
@@ -3358,7 +3700,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
@@ -3410,7 +3757,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
@@ -3465,7 +3817,13 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
@@ -3522,7 +3880,13 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
@@ -3582,7 +3946,14 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
+		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
@@ -3642,7 +4013,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
@@ -3695,7 +4071,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
@@ -3751,7 +4132,13 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
@@ -3809,7 +4196,13 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
@@ -3870,7 +4263,14 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
+		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
@@ -3932,7 +4332,12 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -3989,7 +4394,13 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -4048,7 +4459,13 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -4110,7 +4527,14 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
+		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -4174,7 +4598,13 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -4234,7 +4664,13 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -4297,7 +4733,14 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
+		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -4362,7 +4805,13 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<10, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
@@ -4426,7 +4875,14 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
+		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<10, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
@@ -4493,7 +4949,14 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( call_ ), _a0( a0 ), _a1( a1 ), _a2( a2 ), _a3( a3 ), _a4( a4 ), _a5( a5 ), _a6( a6 ), _a7( a7 ), _a8( a8 ), _a9( a9 ), _a10( a10 ) {}
+		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
+		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
+		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
+		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
+		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
+		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		return;
+	}
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9, fa10_t a10 ) { return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<11, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
 				free_standing_call_args::resolve_arg<11, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
@@ -4523,7 +4986,7 @@ public:
 /*! \endcond */
 
 template<typename METHOD_t, typename... arg_t>
-typename call_calculator<METHOD_t, arg_t...>::type::type call( METHOD_t A_METHOD, arg_t&&... arg_ ) {
+typename call_calculator<METHOD_t, arg_t...>::type::type call( METHOD_t A_METHOD, arg_t... arg_ ) {
 	return ( call_calculator<METHOD_t, arg_t...>::type::make( A_METHOD, yaal::forward<arg_t>( arg_ )... ) );
 }
 
