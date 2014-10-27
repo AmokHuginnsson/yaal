@@ -45,6 +45,9 @@ public:
 	typedef return_t result_type;
 	template<typename iterator>
 	result_type operator()( iterator first_, iterator last_ ) {
+		if ( first_ == last_ ) {
+			return ( result_type() );
+		}
 		result_type result;
 		for ( ; first_ != last_; ++ first_ ) {
 			result = *first_;
@@ -53,6 +56,23 @@ public:
 	}
 };
 
+template<>
+class HLast<void> {
+public:
+	typedef void result_type;
+	template<typename iterator>
+	void operator()( iterator first_, iterator last_ ) {
+		for ( ; first_ != last_; ++ first_ ) {
+			*first_;
+		}
+	}
+};
+
+}
+
+template<typename R, typename call_t, typename... arg_t>
+R callback( call_t call_, arg_t... arg_ ) {
+	return ( call_( arg_... ) );
 }
 
 /*! \brief Implementation of signals and slot system.
@@ -62,93 +82,26 @@ template<typename signature_t,
 class HSignal {
 public:
 	typedef HSignal<signature_t> this_type;
+	typedef yaal::hcore::HBoundCall<signature_t> call_t;
 	class HSlot;
 	typedef yaal::hcore::HArray<HSlot> slots_t;
 	typedef result_agregator_t result_agregator;
-	typedef typename result_agregator_t::result_type result_type;
+	typedef typename trait::return_type<signature_t>::type result_type;
+	typedef typename result_agregator_t::result_type agregated_result_type;
 private:
+	template<typename callback_t>
 	class HIterator;
 	slots_t _slots;
 public:
 	void connect( typename HSlot::call_t slot_ ) {
 		_slots.push_back( slot_ );
 	}
-	result_type operator()( void ) const {
+	template<typename... arg_t>
+	result_type operator()( arg_t&&... arg_ ) {
 		M_PROLOG
-		return ( result_agregator()( HIterator( _slots.begin() ), HIterator( _slots.end() ) ) );
-		M_EPILOG
-	}
-	template<typename fa0_t>
-	result_type operator()( fa0_t fa0 ) const {
-		M_PROLOG
-		return ( result_agregator()( HIterator( _slots.begin(), fa0 ),
-					HIterator( _slots.end(), fa0 ) ) );
-		M_EPILOG
-	}
-	template<typename fa0_t, typename fa1_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1 ) const {
-		M_PROLOG
-		return ( result_agregator()( HIterator( _slots.begin(), fa0, fa1 ),
-					HIterator( _slots.end(), fa0, fa1 ) ) );
-		M_EPILOG
-	}
-	template<typename fa0_t, typename fa1_t, typename fa2_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2 ) const {
-		M_PROLOG
-		return ( result_agregator()( HIterator( _slots.begin(), fa0, fa1, fa2 ),
-					HIterator( _slots.end(), fa0, fa1, fa2 ) ) );
-		M_EPILOG
-	}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 ) const {
-		M_PROLOG
-		return ( result_agregator()( HIterator( _slots.begin(), fa0, fa1, fa2, fa3 ),
-					HIterator( _slots.end(), fa0, fa1, fa2, fa3 ) ) );
-		M_EPILOG
-	}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 ) const {
-		M_PROLOG
-		return ( result_agregator()( HIterator( _slots.begin(), fa0, fa1, fa2, fa3, fa4 ),
-					HIterator( _slots.end(), fa0, fa1, fa2, fa3, fa4 ) ) );
-		M_EPILOG
-	}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 ) const {
-		M_PROLOG
-		return ( result_agregator()( HIterator( _slots.begin(), fa0, fa1, fa2, fa3, fa4, fa5 ),
-					HIterator( _slots.end(), fa0, fa1, fa2, fa3, fa4, fa5 ) ) );
-		M_EPILOG
-	}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 ) const {
-		M_PROLOG
-		return ( result_agregator()( HIterator( _slots.begin(), fa0, fa1, fa2, fa3, fa4, fa5, fa6 ),
-					HIterator( _slots.end(), fa0, fa1, fa2, fa3, fa4, fa5, fa6 ) ) );
-		M_EPILOG
-	}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 ) const {
-		M_PROLOG
-		return ( result_agregator()( HIterator( _slots.begin(), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ),
-					HIterator( _slots.end(), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7 ) ) );
-		M_EPILOG
-	}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
-		typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 ) const {
-		M_PROLOG
-		return ( result_agregator()( HIterator( _slots.begin(), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ),
-					HIterator( _slots.end(), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8 ) ) );
-		M_EPILOG
-	}
-	template<typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
-		typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t,
-		typename fa8_t, typename fa9_t>
-	result_type operator()( fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 ) const {
-		M_PROLOG
-		return ( result_agregator()( HIterator( _slots.begin(), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ),
-					HIterator( _slots.end(), fa0, fa1, fa2, fa3, fa4, fa5, fa6, fa7, fa8, fa9 ) ) );
+		typedef yaal::hcore::HBoundCall<result_type ( call_t& )> callback_t;
+		callback_t c( call( static_cast<result_type ( call_t::* )( arg_t&&... )>( &HSlot::call_t::operator() ), hcore::_1, arg_... ) );
+		return ( result_agregator()( HIterator<callback_t>( _slots.begin(), c, this ), HIterator<callback_t>( _slots.end(), c, this ) ) );
 		M_EPILOG
 	}
 };
@@ -156,15 +109,53 @@ public:
 template<typename signature_t, typename result_agregator_t>
 class HSignal<signature_t, result_agregator_t>::HSlot {
 public:
-	typedef yaal::hcore::HBoundCall<signature_t> call_t;
+	typedef typename HSignal<signature_t, result_agregator_t>::call_t call_t;
 private:
 	call_t _call;
+public:
+	HSlot( call_t call_ )
+		: _call( yaal::move( call_ ) ) {
+		return;
+	}
+private:
+	template<typename callback_t>
+	friend class HSignal<signature_t, result_agregator_t>::HIterator;
 };
 
 template<typename signature_t, typename result_agregator_t>
+template<typename callback_t>
 class HSignal<signature_t, result_agregator_t>::HIterator : public yaal::hcore::iterator_interface<typename trait::return_type<result_agregator_t>::type, yaal::hcore::iterator_category::forward> {
+public:
+	typedef HSignal<signature_t, result_agregator_t>::HIterator<callback_t> this_type;
+	typedef yaal::hcore::iterator_interface<typename trait::return_type<result_agregator_t>::type, yaal::hcore::iterator_category::forward> base_type;
+	typedef typename trait::return_type<signature_t>::type result_type;
+	typedef typename HSignal<signature_t, result_agregator_t>::slots_t slots_t;
+private:
 	typedef HSignal<signature_t, result_agregator_t> owner_t;
-
+	typename slots_t::iterator _it;
+	callback_t _callback;
+	owner_t const* _owner;
+public:
+	result_type operator* ( void ) {
+		return ( _callback( _it->_call ) );
+	}
+	bool operator == ( HIterator const it_ ) const {
+		M_ASSERT( it_._owner == _owner );
+		return ( it_._it == _it );
+	}
+	bool operator != ( HIterator const it_ ) const {
+		M_ASSERT( it_._owner == _owner );
+		return ( it_._it != _it );
+	}
+	HIterator& operator ++ ( void ) {
+		++ _it;
+		return ( *this );
+	}
+private:
+	HIterator( typename slots_t::iterator it_, callback_t callback_, owner_t const* owner_  )
+		: _it( it_ ), _callback( callback_ ), _owner( owner_ ) {
+	}
+	friend class HSignal<signature_t, result_agregator_t>;
 };
 
 }
