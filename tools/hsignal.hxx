@@ -70,11 +70,6 @@ public:
 
 }
 
-template<typename R, typename call_t, typename... arg_t>
-R callback( call_t call_, arg_t... arg_ ) {
-	return ( call_( arg_... ) );
-}
-
 /*! \brief Implementation of signals and slot system.
  */
 template<typename signature_t,
@@ -82,44 +77,143 @@ template<typename signature_t,
 class HSignal {
 public:
 	typedef HSignal<signature_t> this_type;
-	typedef yaal::hcore::HBoundCall<signature_t> call_t;
-	class HSlot;
-	typedef yaal::hcore::HArray<HSlot> slots_t;
 	typedef result_agregator_t result_agregator;
 	typedef typename trait::return_type<signature_t>::type result_type;
 	typedef typename result_agregator_t::result_type agregated_result_type;
+	typedef yaal::hcore::HBoundCall<signature_t> call_t;
+	typedef yaal::hcore::HBoundCall<result_type ( call_t& )> callback_t;
+	class HSlot;
+	class HConnection;
+	typedef yaal::hcore::HPointer<HSlot> slot_t;
+	typedef yaal::hcore::HArray<slot_t> slots_t;
 private:
 	template<typename callback_t>
 	class HIterator;
 	slots_t _slots;
 public:
-	void connect( typename HSlot::call_t slot_ ) {
-		_slots.push_back( slot_ );
+	virtual ~HSignal( void ) {
+		for ( slot_t& slot : _slots ) {
+			slot->disown();
+		}
+	}
+	HConnection connect( typename HSlot::call_t slot_ ) {
+		M_PROLOG
+		slot_t slot( hcore::make_pointer<HSlot>( slot_, this ) );
+		_slots.push_back( slot );
+		return ( HConnection( slot ) );
+		M_EPILOG
 	}
 	template<typename... arg_t>
 	result_type operator()( arg_t&&... arg_ ) {
 		M_PROLOG
-		typedef yaal::hcore::HBoundCall<result_type ( call_t& )> callback_t;
 		callback_t c( call( static_cast<result_type ( call_t::* )( arg_t&&... )>( &HSlot::call_t::operator() ), hcore::_1, arg_... ) );
 		return ( result_agregator()( HIterator<callback_t>( _slots.begin(), c, this ), HIterator<callback_t>( _slots.end(), c, this ) ) );
 		M_EPILOG
 	}
+	void swap( HSignal& signal_ ) {
+		if ( &signal_ != this ) {
+			using yaal::swap;
+			swap( _slots, signal_._slots );
+		}
+		return;
+	}
+private:
+	void disconnect( HSlot* slot_ ) {
+		M_PROLOG
+		typename slots_t::iterator it( find( _slots.begin(), _slots.end(), slot_ ) );
+		M_ENSURE( it != _slots.end() );
+		(*it)->disown();
+		_slots.erase( it );
+		return;
+		M_EPILOG
+	}
+	friend class HSlot;
 };
 
 template<typename signature_t, typename result_agregator_t>
 class HSignal<signature_t, result_agregator_t>::HSlot {
 public:
-	typedef typename HSignal<signature_t, result_agregator_t>::call_t call_t;
+	typedef HSignal<signature_t, result_agregator_t> signal_t;
+	typedef typename signal_t::call_t call_t;
+	typedef typename signal_t::callback_t callback_t;
+	typedef typename signal_t::result_type result_type;
 private:
 	call_t _call;
+	signal_t* _owner;
+	bool _enabled;
 public:
-	HSlot( call_t call_ )
-		: _call( yaal::move( call_ ) ) {
+	HSlot( call_t call_, signal_t* owner_ )
+		: _call( yaal::move( call_ ) ), _owner( owner_ ), _enabled( true ) {
 		return;
+	}
+	result_type call( callback_t callback_ ) {
+		M_PROLOG
+		return ( callback_( _call ) );
+		M_EPILOG
+	}
+	void disable( void ) {
+		M_PROLOG
+		_enabled = false;
+		return;
+		M_EPILOG
+	}
+	void enable( void ) {
+		M_PROLOG
+		_enabled = true;
+		return;
+		M_EPILOG
+	}
+	void disconnect( void ) {
+		M_PROLOG
+		if ( _owner != nullptr ) {
+			_owner->disconnect( this );
+		}
+		return;
+		M_EPILOG
+	}
+	bool is_enabled( void ) const {
+		return ( ( _owner != nullptr ) && _enabled );
+	}
+	void disown( void ) {
+		M_PROLOG
+		_owner = nullptr;
+		return;
+		M_EPILOG
 	}
 private:
 	template<typename callback_t>
 	friend class HSignal<signature_t, result_agregator_t>::HIterator;
+};
+
+template<typename signature_t, typename result_agregator_t>
+class HSignal<signature_t, result_agregator_t>::HConnection {
+public:
+	typedef HSignal<signature_t, result_agregator_t>::HConnection this_type;
+	typedef typename HSignal<signature_t, result_agregator_t>::slot_t slot_t;
+private:
+	slot_t _slot;
+public:
+	HConnection( slot_t slot_ )
+		: _slot( slot_ ) {
+	}
+	void disable( void ) {
+		M_PROLOG
+		_slot->disable();
+		return;
+		M_EPILOG
+	}
+	void enable( void ) {
+		M_PROLOG
+		_slot->enable();
+		return;
+		M_EPILOG
+	}
+	void disconnect( void ) {
+		M_PROLOG
+		_slot->disconnect();
+		return;
+		M_EPILOG
+	}
 };
 
 template<typename signature_t, typename result_agregator_t>
@@ -137,7 +231,7 @@ private:
 	owner_t const* _owner;
 public:
 	result_type operator* ( void ) {
-		return ( _callback( _it->_call ) );
+		return ( (*_it)->call( _callback ) );
 	}
 	bool operator == ( HIterator const it_ ) const {
 		M_ASSERT( it_._owner == _owner );
@@ -148,7 +242,9 @@ public:
 		return ( it_._it != _it );
 	}
 	HIterator& operator ++ ( void ) {
-		++ _it;
+		do {
+			++ _it;
+		} while ( ( _it != _owner->_slots.end() ) && ! (*_it)->is_enabled() );
 		return ( *this );
 	}
 private:
@@ -157,6 +253,11 @@ private:
 	}
 	friend class HSignal<signature_t, result_agregator_t>;
 };
+
+template<typename signature_t, typename result_agregator_t>
+inline void swap( HSignal<signature_t, result_agregator_t>& a, HSignal<signature_t, result_agregator_t>& b ) {
+	a.swap( b );
+}
 
 }
 
