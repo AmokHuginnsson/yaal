@@ -61,14 +61,8 @@ private:
 	HQuery( HQuery const& );
 	HQuery& operator = ( HQuery const& );
 	friend class yaal::hcore::pointer_helper::HSpaceHolderDeleter<HQuery>;
-	friend ptr_t yaal::hcore::make_pointer<
-		HQuery,
-		database_ptr_t,
-		ODBConnector const*,
-		yaal::hcore::HString,
-		void*
-			>( dbwrapper::database_ptr_t const&, dbwrapper::ODBConnector const* const&,
-					yaal::hcore::HString const&, void* const& );
+	template<typename tType, typename... arg_t>
+	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( arg_t&&... );
 };
 
 typedef yaal::hcore::HExceptionT<HQuery> HQueryException;

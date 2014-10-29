@@ -311,13 +311,8 @@ class HAsIsValueListModel<tType>::HModelIterator : public HAbstractModelIterator
 	}
 	friend class HModelIteratorWrapper;
 	friend class HAsIsValueListModel<tType>;
-#ifndef _MSC_VER
-	friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HAsIsValueListModel<tType>* const&, typename data_t::iterator const& );
-	friend ptr_t yaal::hcore::make_pointer<HModelIterator>( HAsIsValueListModel<tType> const* const&, typename data_t::iterator const& );
-#else /* #ifndef _MSC_VER */
-	template<typename T1, typename T2, typename T3>
-	friend yaal::hcore::HPointer<T1> yaal::hcore::make_pointer<T1>( T2 const&, T3 const& );
-#endif /* #else #ifndef _MSC_VER */
+	template<typename T, typename... arg_t>
+	friend yaal::hcore::HPointer<T> yaal::hcore::make_pointer( arg_t&&... );
 public:
 	virtual ~HModelIterator( void ) {
 		return;

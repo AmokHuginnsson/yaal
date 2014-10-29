@@ -219,8 +219,8 @@ protected:
 	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HRule& operator = ( HRule const& );
-	template<typename tType, typename a0_t, typename a1_t, typename a2_t>
-	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( a0_t const&, a1_t const&, a2_t const& );
+	template<typename tType, typename... arg_t>
+	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( arg_t&&... );
 };
 
 typedef yaal::hcore::HExceptionT<HRule, HRuleBaseException> HRuleException;
@@ -507,7 +507,7 @@ private:
 	HReal& operator = ( HReal const& );
 	friend HReal const& get_real_instance( void );
 	template<typename tType, typename a0_t>
-	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( a0_t const& );
+	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( a0_t const&& );
 };
 
 typedef yaal::hcore::HExceptionT<HReal, HRuleBaseException> HRealException;
