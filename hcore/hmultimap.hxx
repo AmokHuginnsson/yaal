@@ -107,8 +107,9 @@ public:
 	allocator_type const& get_allocator( void ) const {
 		return ( _engine.get_allocator() );
 	}
-	int long size( void ) const
-		{ return ( get_size() ); }
+	int long size( void ) const {
+		return ( get_size() );
+	}
 	int long get_size( void ) const {
 		M_PROLOG
 		int long sizeAcc( 0 );
@@ -117,23 +118,27 @@ public:
 		return ( sizeAcc );
 		M_EPILOG
 	}
-	bool empty( void ) const
-		{ return ( is_empty() );	}
-	bool is_empty( void ) const
-		{ return ( _engine.is_empty() );	}
-	iterator push_back( key_type const& key, data_type const& value ) {
+	bool empty( void ) const {
+		return ( is_empty() );
+	}
+	bool is_empty( void ) const {
+		return ( _engine.is_empty() );
+	}
+	iterator push_back( value_type const& value_ ) {
 		M_PROLOG
-		typename multimap_engine_t::iterator major = ensure_key( key );
-		major->second->push_back( storage_t::value( key, value ) );
+		typename multimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_back( storage_t::value( value_ ) );
 		typename value_list_t::reverse_iterator minor = major->second->rbegin();
 		return ( iterator( this, major, minor.base() ) );
 		M_EPILOG
 	}
-	iterator insert( value_type const& e ) {
-		typename multimap_engine_t::iterator major = ensure_key( e.first );
-		major->second->push_back( storage_t::value( e ) );
+	iterator insert( value_type const& value_ ) {
+		M_PROLOG
+		typename multimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_back( storage_t::value( value_ ) );
 		typename value_list_t::iterator minor = major->second->rbegin().base();
 		return ( iterator( this, major, minor ) );
+		M_EPILOG
 	}
 	template<typename iterator_t>
 	void insert( iterator_t first, iterator_t last ) {
@@ -151,10 +156,10 @@ public:
 		return;
 		M_EPILOG
 	}
-	iterator push_front( key_type const& key, data_type const& value ) {
+	iterator push_front( value_type const& value_ ) {
 		M_PROLOG
-		typename multimap_engine_t::iterator major = ensure_key( key );
-		major->second->push_front( storage_t::value( key, value ) );
+		typename multimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_front( storage_t::value( value_ ) );
 		typename value_list_t::iterator minor = major->second->begin();
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
@@ -297,14 +302,18 @@ public:
 		return ( end() );
 		M_EPILOG
 	}
-	const_reverse_iterator rend( void ) const
-		{ return ( begin() ); }
-	const_reverse_iterator crend( void ) const
-		{ return ( begin() ); }
-	reverse_iterator rend( void )
-		{ return ( begin() ); }
-	void clear( void )
-		{ _engine.clear(); }
+	const_reverse_iterator rend( void ) const {
+		return ( begin() );
+	}
+	const_reverse_iterator crend( void ) const {
+		return ( begin() );
+	}
+	reverse_iterator rend( void ) {
+		return ( begin() );
+	}
+	void clear( void ) {
+		_engine.clear();
+	}
 	int long count( key_type const& key ) const {
 		M_PROLOG
 		typename multimap_engine_t::const_iterator major = _engine.find( key );
@@ -321,10 +330,16 @@ public:
 		}
 		return;
 	}
-	bool operator == ( HMultiMap const& map_ ) const
-		{ M_PROLOG return ( ( &map_ == this ) || safe_equal( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
-	bool operator < ( HMultiMap const& map_ ) const
-		{ M_PROLOG return ( ( &map_ != this ) && lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
+	bool operator == ( HMultiMap const& map_ ) const {
+		M_PROLOG
+		return ( ( &map_ == this ) || safe_equal( begin(), end(), map_.begin(), map_.end() ) );
+		M_EPILOG
+	}
+	bool operator < ( HMultiMap const& map_ ) const {
+		M_PROLOG
+		return ( ( &map_ != this ) && lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) );
+		M_EPILOG
+	}
 private:
 	typename multimap_engine_t::iterator ensure_key( key_type const& key ) {
 		M_PROLOG

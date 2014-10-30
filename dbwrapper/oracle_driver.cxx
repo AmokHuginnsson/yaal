@@ -24,6 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "config.hxx"
+
+#ifdef HAVE_OCI_H
+
 #include <cstdio> /* snprintf */
 #include <cstdlib> /* strtol */
 
@@ -527,4 +531,6 @@ int yaal_oracle_driver_main( int, char** ) {
 }
 
 }
+
+#endif /* #ifdef HAVE_OCI_H */
 

@@ -76,6 +76,11 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Copy (backup) all visited nodes so far.
+	 *
+	 * Top of _checkpoints can be always messed with and throw away when no longer
+	 * needed when going back to the `root' on grammar tree.
+	 */
 	void checkpoints_push( void ) {
 		M_PROLOG
 		_checkpoints.push( _checkpoints.top() );
@@ -85,6 +90,7 @@ public:
 	void checkpoints_pop( void ) {
 		M_PROLOG
 		_checkpoints.pop();
+		return;
 		M_EPILOG
 	}
 };

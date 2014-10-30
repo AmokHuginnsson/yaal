@@ -24,6 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include "config.hxx"
+
+#ifdef HAVE_IBASE_H
+
 #include <cstring>
 #include <ibase.h>
 
@@ -553,4 +557,6 @@ int yaal_firebird_driver_main( int, char** ) {
 }
 
 }
+
+#endif /* #ifdef HAVE_IBASE_H */
 

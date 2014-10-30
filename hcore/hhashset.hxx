@@ -131,18 +131,20 @@ public:
 	HHashSet( iterator_t first, iterator_t last, hasher_type const& hasher_ = hasher_type(), allocator_type const& allocator_ = allocator_type() )
 		: _engine( hasher_, allocator_ ) {
 		M_PROLOG
-		for ( ; first != last; ++ first )
+		for ( ; first != last; ++ first ) {
 			insert( *first );
+		}
 		return;
 		M_EPILOG
 	}
 	template<typename iterator_t>
 	HHashSet( iterator_t first, iterator_t last, int long size_, hasher_type const& hasher_ = hasher_type(), allocator_type const& allocator_ = allocator_type() )
-		: _engine( hasher_ ) {
+		: _engine( hasher_, allocator_ ) {
 		M_PROLOG
-		resize( size_, allocator_ );
-		for ( ; first != last; ++ first )
+		resize( size_ );
+		for ( ; first != last; ++ first ) {
 			insert( *first );
+		}
 		return;
 		M_EPILOG
 	}

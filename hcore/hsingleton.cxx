@@ -94,7 +94,7 @@ inline int safe_atexit( cxa_handle_t cxa_handle ) {
 void HLifeTimeTracker::register_destructor( destructor_ptr_t destructor_, int lifeTime_ ) {
 	M_PROLOG
 	HLock lock( _mutex );
-	_destructors.push_back( lifeTime_, destructor_ );
+	_destructors.push_back( make_pair( lifeTime_, destructor_ ) );
 #if ! defined( __HOST_OS_TYPE_FREEBSD__ )
 	M_ENSURE( atexit( HLifeTimeTracker::destruct ) == 0 );
 #else /* not __HOST_OS_TYPE_FREEBSD__ */

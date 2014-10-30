@@ -200,7 +200,7 @@ void HSignalService::run( void ) {
 void HSignalService::register_handler( int sigNo_, handler_t handler_, void const* owner_ ) {
 	M_PROLOG
 	HLock lock( _mutex );
-	_handlers.push_front( sigNo_, make_pair( handler_, owner_ ) );
+	_handlers.push_front( make_pair( sigNo_, make_pair( handler_, owner_ ) ) );
 	int SYNCHRONOUS_SIGNALS[] = { SIGSEGV, SIGBUS, SIGFPE, SIGILL };
 	if ( find( SYNCHRONOUS_SIGNALS, SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ), sigNo_ ) == ( SYNCHRONOUS_SIGNALS + countof ( SYNCHRONOUS_SIGNALS ) ) ) {
 		catch_signal( sigNo_ );

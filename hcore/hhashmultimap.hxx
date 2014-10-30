@@ -128,23 +128,27 @@ public:
 	allocator_type const& get_allocator( void ) const {
 		return ( _engine.get_allocator() );
 	}
-	bool empty( void ) const
-		{ return ( is_empty() );	}
-	bool is_empty( void ) const
-		{ return ( _engine.is_empty() );	}
-	iterator push_back( key_type const& key, data_type const& value ) {
+	bool empty( void ) const {
+		return ( is_empty() );
+	}
+	bool is_empty( void ) const {
+		return ( _engine.is_empty() );
+	}
+	iterator push_back( value_type const& value_ ) {
 		M_PROLOG
-		typename hashmultimap_engine_t::iterator major = ensure_key( key );
-		major->second->push_back( storage_t::value( key, value ) );
+		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_back( storage_t::value( value_ ) );
 		typename value_list_t::iterator minor = major->second->rbegin();
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 	}
-	iterator insert( value_type const& e ) {
-		typename hashmultimap_engine_t::iterator major = ensure_key( e.first );
-		major->second->push_back( storage_t::value( e ) );
+	iterator insert( value_type const& value_ ) {
+		M_PROLOG
+		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_back( storage_t::value( value_ ) );
 		typename value_list_t::iterator minor = major->second->rbegin().base();
 		return ( iterator( this, major, minor ) );
+		M_EPILOG
 	}
 	template<typename iterator_t>
 	void insert( iterator_t first, iterator_t last ) {
@@ -162,10 +166,10 @@ public:
 		return;
 		M_EPILOG
 	}
-	iterator push_front( key_type const& key, data_type const& value ) {
+	iterator push_front( value_type const& value_ ) {
 		M_PROLOG
-		typename hashmultimap_engine_t::iterator major = ensure_key( key );
-		major->second->push_front( storage_t::value( key, value ) );
+		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_front( storage_t::value( value_ ) );
 		typename value_list_t::iterator minor = major->second->begin();
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
@@ -235,10 +239,16 @@ public:
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 	}
-	const_iterator lower_bound( key_type const& key_ ) const
-		{ M_PROLOG return ( find( key_ ) ); M_EPILOG }
-	iterator lower_bound( key_type const& key_ )
-		{ M_PROLOG return ( find( key_ ) ); M_EPILOG }
+	const_iterator lower_bound( key_type const& key_ ) const {
+		M_PROLOG
+		return ( find( key_ ) );
+		M_EPILOG
+	}
+	iterator lower_bound( key_type const& key_ ) {
+		M_PROLOG
+		return ( find( key_ ) );
+		M_EPILOG
+	}
 	const_iterator upper_bound( key_type const& key ) const {
 		M_PROLOG
 		typename hashmultimap_engine_t::const_iterator major = _engine.find( key );
@@ -282,12 +292,15 @@ public:
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 	}
-	const_iterator end( void ) const
-		{ return ( const_iterator( this, _engine.end(), typename value_list_t::const_iterator() ) ); }
-	const_iterator cend( void ) const
-		{ return ( end() ); }
-	iterator end( void )
-		{ return ( iterator( this, _engine.end(), typename value_list_t::iterator() ) ); }
+	const_iterator end( void ) const {
+		return ( const_iterator( this, _engine.end(), typename value_list_t::const_iterator() ) );
+	}
+	const_iterator cend( void ) const {
+		return ( end() );
+	}
+	iterator end( void ) {
+		return ( iterator( this, _engine.end(), typename value_list_t::iterator() ) );
+	}
 	const_reverse_iterator rbegin( void ) const {
 		M_PROLOG
 		return ( end() );
@@ -318,8 +331,9 @@ public:
 		return ( begin() );
 		M_EPILOG
 	}
-	void clear( void )
-		{ _engine.clear(); }
+	void clear( void ) {
+		_engine.clear();
+	}
 	int long count( key_type const& key ) const {
 		M_PROLOG
 		typename hashmultimap_engine_t::const_iterator major = _engine.find( key );
@@ -336,10 +350,16 @@ public:
 		}
 		return;
 	}
-	bool operator == ( HHashMultiMap const& map_ ) const
-		{ M_PROLOG return ( ( &map_ == this ) || safe_equal( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
-	bool operator < ( HHashMultiMap const& map_ ) const
-		{ M_PROLOG return ( ( &map_ != this ) && lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
+	bool operator == ( HHashMultiMap const& map_ ) const {
+		M_PROLOG
+		return ( ( &map_ == this ) || safe_equal( begin(), end(), map_.begin(), map_.end() ) );
+		M_EPILOG
+	}
+	bool operator < ( HHashMultiMap const& map_ ) const {
+		M_PROLOG
+		return ( ( &map_ != this ) && lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) );
+		M_EPILOG
+	}
 private:
 	typename hashmultimap_engine_t::iterator ensure_key( key_type const& key ) {
 		M_PROLOG

@@ -64,7 +64,7 @@ void HAbstractAsyncCaller::start( void ) {
 void HAbstractAsyncCaller::register_call( priority_t prio, call_t call ) {
 	M_PROLOG {
 		HLock l( _mutex );
-		_queue.push_back( prio, call );
+		_queue.push_back( make_pair( prio, call ) );
 	}
 	do_signal();
 	return;

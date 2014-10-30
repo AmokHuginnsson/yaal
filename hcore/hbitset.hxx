@@ -246,7 +246,7 @@ public:
 		return ( _owner->get( _pos ) != value_ );
 	}
 	operator bool ( void ) const {
-		return ( _owner->get() );
+		return ( _owner->get( _pos ) );
 	}
 	void swap( typename HBitset::HBitReference& br_ ) {
 		M_PROLOG

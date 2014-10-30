@@ -32,11 +32,15 @@ Copyright:
 
 #ifdef HAVE_POSTGRESQL_LIBPQ_FE_H
 #	include <postgresql/libpq-fe.h>
+# define HAVE_POSTGRESQL_H 1
 #elif defined ( HAVE_LIBPQ_FE_H )
 #	include <libpq-fe.h>
+# define HAVE_POSTGRESQL_H 1
 #else /* HAVE_LIBPQ_FE_H */
-#	error "No libpq-fe.h header available."
+#	warning "No libpq-fe.h header available."
 #endif /* not HAVE_LIBPQ_FE_H */
+
+#ifdef HAVE_POSTGRESQL_H
 
 #include "hcore/memory.hxx"
 #include "hcore/harray.hxx"
@@ -284,4 +288,6 @@ int yaal_postgresql_driver_main( int, char** ) {
 }
 
 }
+
+#endif /* #ifdef HAVE_POSTGRESQL_H */
 
