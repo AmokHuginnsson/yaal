@@ -1102,13 +1102,15 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
-	bool operator == ( HIterator const& iterator_ ) const {
+	template<typename other_const_qual_t, OListBits::treatment_t const other_treatment>
+	bool operator == ( HIterator<other_const_qual_t, other_treatment> const& iterator_ ) const {
 		M_PROLOG
 		M_ASSERT( ( ! ( _owner && iterator_._owner ) ) || ( _owner == iterator_._owner ) );
 		return ( _current == iterator_._current );
 		M_EPILOG
 	}
-	bool operator != ( HIterator const& iterator_ ) const {
+	template<typename other_const_qual_t, OListBits::treatment_t const other_treatment>
+	bool operator != ( HIterator<other_const_qual_t, other_treatment> const& iterator_ ) const {
 		M_PROLOG
 		M_ASSERT( ( ! ( _owner && iterator_._owner ) ) || ( _owner == iterator_._owner ) );
 		return ( _current != iterator_._current );
