@@ -120,11 +120,6 @@ private:
 	/*! \brief True HSBBSTree contents.
 	 */
 	class HNode : public HSBBSTreeBase::HAbstractNode {
-		using HAbstractNode::color_t;
-		using HAbstractNode::_color;
-		using HAbstractNode::_parent;
-		using HAbstractNode::_left;
-		using HAbstractNode::_right;
 		key_value_type _key;
 		HNode( key_value_type const& key_ )
 			: HAbstractNode(), _key( key_ )
@@ -159,8 +154,6 @@ private:
 public:
 	typedef typename allocator_t::template rebind<HNode>::other allocator_type;
 private:
-	using HSBBSTreeBase::_root;
-	using HSBBSTreeBase::_size;
 	compare_type _compare;
 	allocator_type _allocator;
 public:
