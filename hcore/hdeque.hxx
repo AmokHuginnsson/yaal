@@ -265,7 +265,26 @@ public:
 		int long itemIndex( _start + idx );
 		return ( _chunks.get<value_type*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
 	}
-	void push_front( type_t const& );
+
+	/*! \brief Add element at in the begining of this deque.
+	 *
+	 * \param value_ - element to be added in the begining of this deque.
+	 */
+	void push_front( type_t const& value_ ) {
+		M_PROLOG
+		new ( space_front() ) value_type( value_ );
+		++ _size;
+		return;
+		M_EPILOG
+	}
+	template<typename... arg_t>
+	void emplace_front( arg_t&&... arg_ ) {
+		M_PROLOG
+		new ( space_front() ) value_type( yaal::forward<arg_t>( arg_ )... );
+		++ _size;
+		return;
+		M_EPILOG
+	}
 
 	/*! \brief Remove first element of this deque.
 	 */
@@ -273,9 +292,23 @@ public:
 
 	/*! \brief Add element at end of this deque.
 	 *
-	 * \param val_ - element to be added at end of this deque.
+	 * \param value_ - element to be added at end of this deque.
 	 */
-	void push_back( type_t const& );
+	void push_back( type_t const& value_ ) {
+		M_PROLOG
+		new ( space_back() ) value_type( value_ );
+		++ _size;
+		return;
+		M_EPILOG
+	}
+	template<typename... arg_t>
+	void emplace_back( arg_t&&... arg_ ) {
+		M_PROLOG
+		new ( space_back() ) value_type( yaal::forward<arg_t>( arg_ )... );
+		++ _size;
+		return;
+		M_EPILOG
+	}
 
 	/*! \brief Remove last element of this deque.
 	 */
@@ -340,6 +373,9 @@ public:
 		return ( is_empty() );
 	}
 	iterator insert( iterator, type_t const& );
+	template<typename... arg_t>
+	iterator emplace( iterator, arg_t&&... );
+
 	/*! \brief Replace contents of this deque with contents of given range.
 	 *
 	 * \tparam iterator_t - Type of iterator pair defining an input range.
@@ -451,6 +487,8 @@ private:
 		return;
 		M_EPILOG
 	}
+	value_type* space_front( void );
+	value_type* space_back( void );
 	void insert_space( int long, int long );
 	void accommodate_chunks( int long );
 	int long minimal_cover_chunks_count( int long size_ ) const {
@@ -838,18 +876,18 @@ typename HDeque<type_t, allocator_t>::iterator HDeque<type_t, allocator_t>::eras
 }
 
 template<typename type_t, typename allocator_t>
-void HDeque<type_t, allocator_t>::push_back( type_t const& value_ ) {
+typename HDeque<type_t, allocator_t>::value_type* HDeque<type_t, allocator_t>::space_back( void ) {
 	M_PROLOG
 	int long idx( _start + _size );
 	int long chunk( idx / VALUES_PER_CHUNK );
 	int long offset( idx % VALUES_PER_CHUNK );
 	value_type** chunks = NULL;
-	if ( ! offset ) /* We start new chunk. */ {
+	if ( ! offset ) { /* We start new chunk. */
 		int long availableChunksCount( _chunks.count_of<value_type*>() );
-		if ( chunk >= availableChunksCount ) /* We need at least to move chunks. */ {
+		if ( chunk >= availableChunksCount ) { /* We need at least to move chunks. */
 			int long usedChunksCount( used_chunks() );
 			int long newUsedChunksCount( usedChunksCount + 1 );
-			if ( newUsedChunksCount > availableChunksCount ) /* We need allocate more space for chunks. */ {
+			if ( newUsedChunksCount > availableChunksCount ) { /* We need allocate more space for chunks. */
 				_chunks.realloc( chunk_size<value_type*>( max( newUsedChunksCount, MIN_CHUNKS_COUNT ) ) );
 				availableChunksCount = _chunks.count_of<value_type*>();
 			}
@@ -871,32 +909,33 @@ void HDeque<type_t, allocator_t>::push_back( type_t const& value_ ) {
 					M_ASSERT( ( ( _start + _size ) / VALUES_PER_CHUNK ) < availableChunksCount );
 				}
 				M_ASSERT( ( _start >= 0 ) && ( ( _start / VALUES_PER_CHUNK ) == newFirstUsedChunk ) );
-			} else
+			} else {
 				_start = newFirstUsedChunk * VALUES_PER_CHUNK;
+			}
 			chunk = ( _start + _size ) / VALUES_PER_CHUNK;
-		} else /* We have enough space and we do not need to move chunks. */
+		} else { /* We have enough space and we do not need to move chunks. */
 			chunks = _chunks.get<value_type*>();
+		}
 		chunks[ chunk ] = static_cast<value_type*>( ::operator new ( CHUNK_SIZE, memory::yaal ) );
-	} else /* We use old chunk. */
+	} else { /* We use old chunk. */
 		chunks = _chunks.get<value_type*>();
-	new ( _chunks.get<value_type*>()[ chunk ] + offset ) value_type( value_ );
-	++ _size;
-	return;
+	}
+	return ( _chunks.get<value_type*>()[ chunk ] + offset );
 	M_EPILOG
 }
 
 template<typename type_t, typename allocator_t>
-void HDeque<type_t, allocator_t>::push_front( type_t const& value_ ) {
+typename HDeque<type_t, allocator_t>::value_type* HDeque<type_t, allocator_t>::space_front( void ) {
 	M_PROLOG
 	int long chunk( 0 );
 	int long offset( 0 );
 	value_type** chunks = NULL;
-	if ( ! ( _start % VALUES_PER_CHUNK ) ) /* New chunk in front required. */ {
-		if ( ! _start ) /* We need at least to move chunks. */ {
+	if ( ! ( _start % VALUES_PER_CHUNK ) ) { /* New chunk in front required. */
+		if ( ! _start ) { /* We need at least to move chunks. */
 			int long availableChunksCount( _chunks.count_of<value_type*>() );
 			int long usedChunksCount( used_chunks() );
 			int long newUsedChunksCount( usedChunksCount + 1 );
-			if ( newUsedChunksCount > availableChunksCount ) /* We need allocate more space for chunks. */ {
+			if ( newUsedChunksCount > availableChunksCount ) { /* We need allocate more space for chunks. */
 				_chunks.realloc( chunk_size<value_type*>( max( newUsedChunksCount, MIN_CHUNKS_COUNT ) ) );
 				availableChunksCount = _chunks.count_of<value_type*>();
 			}
@@ -912,8 +951,9 @@ void HDeque<type_t, allocator_t>::push_front( type_t const& value_ ) {
 				M_ASSERT( ( _start > 0 ) && ( ( _start / VALUES_PER_CHUNK ) == oldFirstUsedChunk ) );
 			} else
 				_start = oldFirstUsedChunk * VALUES_PER_CHUNK;
-		} else /* We have enough space and we do not need to move chunks. */
+		} else { /* We have enough space and we do not need to move chunks. */
 			chunks = _chunks.get<value_type*>();
+		}
 		-- _start;
 		chunk = _start / VALUES_PER_CHUNK;
 		offset = VALUES_PER_CHUNK - 1;
@@ -924,9 +964,7 @@ void HDeque<type_t, allocator_t>::push_front( type_t const& value_ ) {
 		chunk = _start / VALUES_PER_CHUNK;
 		offset = _start % VALUES_PER_CHUNK;
 	}
-	new ( _chunks.get<value_type*>()[ chunk ] + offset ) value_type( value_ );
-	++ _size;
-	return;
+	return ( _chunks.get<value_type*>()[ chunk ] + offset );
 	M_EPILOG
 }
 
@@ -1011,6 +1049,21 @@ typename HDeque<type_t, allocator_t>::iterator HDeque<type_t, allocator_t>::inse
 	value_type** chunks = _chunks.get<value_type*>();
 	int long idx( _start + pos_._index );
 	new ( chunks[ idx / VALUES_PER_CHUNK ] + ( idx % VALUES_PER_CHUNK ) ) value_type( value_ );
+	return ( pos_ );
+	M_EPILOG
+}
+
+template<typename type_t, typename allocator_t>
+template<typename... arg_t>
+typename HDeque<type_t, allocator_t>::iterator HDeque<type_t, allocator_t>::emplace( iterator pos_, arg_t&&... arg_ ) {
+	M_PROLOG
+	M_ASSERT( pos_._owner == this );
+	if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+		M_THROW( _errMsgHDeque_[ ERROR::INVALID_ITERATOR ], pos_._index );
+	insert_space( pos_._index, 1 );
+	value_type** chunks = _chunks.get<value_type*>();
+	int long idx( _start + pos_._index );
+	new ( chunks[ idx / VALUES_PER_CHUNK ] + ( idx % VALUES_PER_CHUNK ) ) value_type( yaal::forward<arg_t>( arg_ )... );
 	return ( pos_ );
 	M_EPILOG
 }

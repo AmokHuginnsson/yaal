@@ -47,7 +47,7 @@ class true_type { char x; true_type( void ); true_type( true_type const& ); true
 /*! \brief Type that represents \e false in type calculus context.
  */
 class false_type { char x[100]; false_type(); false_type( false_type const& ); false_type& operator = ( false_type const& ); };
-STATIC_ASSERT( sizeof ( true_type ) != sizeof ( false_type ) );
+static_assert( sizeof ( true_type ) != sizeof ( false_type ), "true_type and false_type are not statically distinguishable" );
 
 /*! \brief A dummy class.
  *

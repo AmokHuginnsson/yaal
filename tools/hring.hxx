@@ -125,9 +125,37 @@ public:
 	void reserve( capacity_type );
 	type_t& operator [] ( int long );
 	type_t const& operator [] ( int long ) const;
-	void push_back( type_t const& );
+	void push_back( type_t const& value_ ) {
+		M_PROLOG
+		new ( space_back() ) value_type( value_ );
+		++ _size;
+		return;
+		M_EPILOG
+	}
+	template<typename... arg_t>
+	void push_back( arg_t&&... arg_ ) {
+		M_PROLOG
+		new ( space_back() ) value_type( yaal::forward<arg_t>( arg_ )... );
+		++ _size;
+		return;
+		M_EPILOG
+	}
 	void pop_back( void );
-	void push_front( type_t const& );
+	void push_front( type_t const& value_ ) {
+		M_PROLOG
+		new ( space_front() ) value_type( value_ );
+		++ _size;
+		return;
+		M_EPILOG
+	}
+	template<typename... arg_t>
+	void push_front( arg_t&&... arg_ ) {
+		M_PROLOG
+		new ( space_front() ) value_type( yaal::forward<arg_t>( arg_ )... );
+		++ _size;
+		return;
+		M_EPILOG
+	}
 	void pop_front( void );
 	type_t const& front( void ) const {
 		M_PROLOG
@@ -291,6 +319,8 @@ private:
 		return;
 		M_EPILOG
 	}
+	value_type* space_front( void );
+	value_type* space_back( void );
 	void insert_space( int long, int long );
 };
 
@@ -702,7 +732,7 @@ void HRing<type_t>::swap( HRing& other ) {
 }
 
 template<typename type_t>
-void HRing<type_t>::push_back( type_t const& val_ ) {
+typename HRing<type_t>::value_type* HRing<type_t>::space_back( void ) {
 	M_PROLOG
 	int long curCapacity( get_capacity().get() );
 	M_ASSERT( _size <= curCapacity );
@@ -711,14 +741,12 @@ void HRing<type_t>::push_back( type_t const& val_ ) {
 	int long idx( _start + _size );
 	if ( idx >= curCapacity )
 		idx -= curCapacity;
-	new ( arr + idx ) value_type( val_ );
-	++ _size;
-	return;
+	return ( arr + idx );
 	M_EPILOG
 }
 
 template<typename type_t>
-void HRing<type_t>::push_front( type_t const& val_ ) {
+typename HRing<type_t>::value_type* HRing<type_t>::space_front( void ) {
 	M_PROLOG
 	int long curCapacity( get_capacity().get() );
 	M_ASSERT( _size <= curCapacity );
@@ -727,9 +755,7 @@ void HRing<type_t>::push_front( type_t const& val_ ) {
 	if ( _start < 0 )
 		_start = curCapacity - 1;
 	value_type* arr( _buf.get<value_type>() );
-	new ( arr + _start ) value_type( val_ );
-	++ _size;
-	return;
+	return ( arr + _start );
 	M_EPILOG
 }
 

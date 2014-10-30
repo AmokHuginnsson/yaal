@@ -359,6 +359,18 @@ public:
 		return;
 		M_EPILOG
 	}
+	/*! \brief Add element at end of this array contructing it directly in place.
+	 *
+	 * \param arg_ - arguments passed to value_type constuctor.
+	 */
+	template<typename... arg_t>
+	void emplace_back( arg_t&&... arg_ ) {
+		M_ASSERT( _size <= _capacity );
+		if ( _size == _capacity )
+			reserve( _capacity + 1 );
+		new ( _buf + _size ) value_type( yaal::forward<arg_t>( arg_ )... );
+		++ _size;
+	}
 	/*! \brief Remove last element of this array.
 	 */
 	void pop_back( void ) {

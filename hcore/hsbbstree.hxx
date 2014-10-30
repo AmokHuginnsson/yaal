@@ -347,8 +347,9 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::insert( key_value_typ
 			_root = node;
 			static_cast<HNode*>( _root )->_color = HAbstractNode::BLACK;
 		}
-	} else
+	} else {
 		node = nodeHolder._node;
+	}
 	M_ASSERT( ( ! _root ) || ( static_cast<HNode*>( _root )->_parent == NULL ) );
 	M_ASSERT( ( ! _root ) || ( static_cast<HNode*>( _root )->_color == HAbstractNode::BLACK ) );
 	return ( make_pair( HIterator( this, node ), ! nodeHolder._exists ) );
@@ -411,12 +412,13 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::find_node( key_type c
 	M_EPILOG
 }
 
-}
-
 template<typename key_value_t, typename compare_t, typename key_get_t, typename allocator_t>
 inline void swap( yaal::hcore::HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>& a,
-		yaal::hcore::HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>& b )
-	{ a.swap( b );	}
+		yaal::hcore::HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>& b ) {
+	a.swap( b );
+}
+
+}
 
 }
 

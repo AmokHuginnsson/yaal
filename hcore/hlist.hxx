@@ -97,14 +97,16 @@ private:
 		HElement* _previous;
 		HElement* _next;
 		type_t _value; /*!< The Object itself. */
-		explicit HElement( HElement* element_ )
-			: _previous ( NULL ), _next ( NULL ), _value() {
+		template<typename... arg_t>
+		explicit HElement( HElement* element_, trait::true_type const*, arg_t&&... arg_ )
+			: _previous ( NULL ), _next ( NULL ), _value( yaal::forward<arg_t>( arg_ )... ) {
 			connect( element_ );
 		}
-		explicit HElement( HElement* element_, type_t const& value_ )
+		explicit HElement( HElement* element_, trait::false_type const*, type_t const& value_ )
 			: _previous ( NULL ), _next ( NULL ), _value( value_ ) {
 			connect( element_ );
 		}
+
 		~HElement( void ) {
 			_previous->_next = _next;
 			_next->_previous = _previous;
@@ -376,8 +378,9 @@ public:
 			while ( diff -- )
 				pop_back();
 		} else if ( _size < size_ ) {
-			while ( diff -- )
+			while ( diff -- ) {
 				push_back( value_ );
+			}
 		}
 		return;
 		M_EPILOG
@@ -420,7 +423,7 @@ public:
 	typename OListBits::iterator<type_t, allocator_t, treatment>::type insert( HIterator<type_t, treatment> const& it ) {
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
-		new ( element ) HElement( it._current ? it._current : _hook );
+		new ( element ) HElement( it._current ? it._current : _hook, static_cast<trait::true_type const*>( nullptr ) );
 		if ( ( _size == 0 ) || ( ( it._current == _hook ) && ( treatment == TREAT_AS_OPENED ) ) )
 			_hook = element;
 		_size ++;
@@ -431,7 +434,18 @@ public:
 	typename OListBits::iterator<type_t, allocator_t, treatment>::type insert( HIterator<type_t, treatment> const& it, type_t const& val ) {
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
-		new ( element ) HElement( it._current ? it._current : _hook, val );
+		new ( element ) HElement( it._current ? it._current : _hook, static_cast<trait::false_type const*>( nullptr ), val );
+		if ( ( _size == 0 ) || ( ( it._current == _hook ) && ( treatment == TREAT_AS_OPENED ) ) )
+			_hook = element;
+		_size ++;
+		return ( iterator( this, element ) );
+		M_EPILOG
+	}
+	template<OListBits::treatment_t const treatment, typename... arg_t>
+	typename OListBits::iterator<type_t, allocator_t, treatment>::type insert( HIterator<type_t, treatment> const& it, arg_t&&... arg_ ) {
+		M_PROLOG
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( it._current ? it._current : _hook, static_cast<trait::true_type const*>( nullptr ), yaal::forward<arg_t>( arg_ )... );
 		if ( ( _size == 0 ) || ( ( it._current == _hook ) && ( treatment == TREAT_AS_OPENED ) ) )
 			_hook = element;
 		_size ++;
@@ -462,7 +476,7 @@ public:
 	type_t& add_head( void ) {
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
-		new ( element ) HElement( _hook );
+		new ( element ) HElement( _hook, static_cast<trait::true_type const*>( nullptr ) );
 		_hook = element;
 		++ _size;
 		return ( _hook->_value );
@@ -476,7 +490,7 @@ public:
 	type_t& add_tail( void ) {
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
-		new ( element ) HElement( _hook );
+		new ( element ) HElement( _hook, static_cast<trait::true_type const*>( nullptr ) );
 		if ( _size == 0 )
 			_hook = element;
 		++ _size;
@@ -486,7 +500,18 @@ public:
 	void push_back( type_t const& object_ ) {
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
-		new ( element ) HElement( _hook, object_ );
+		new ( element ) HElement( _hook, static_cast<trait::false_type const*>( nullptr ), object_ );
+		if ( _size == 0 )
+			_hook = element;
+		++ _size;
+		return;
+		M_EPILOG
+	}
+	template<typename... arg_t>
+	void emplace_back( arg_t&&... arg_ ) {
+		M_PROLOG
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( _hook, static_cast<trait::true_type const*>( nullptr ), yaal::forward<arg_t>( arg_ )... );
 		if ( _size == 0 )
 			_hook = element;
 		++ _size;
@@ -510,7 +535,17 @@ public:
 	void push_front( type_t const& object_ ) {
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
-		new ( element ) HElement( _hook, object_ );
+		new ( element ) HElement( _hook, static_cast<trait::false_type const*>( nullptr ), object_ );
+		_hook = element;
+		++ _size;
+		return;
+		M_EPILOG
+	}
+	template<typename... arg_t>
+	void push_front( arg_t&&... arg_ ) {
+		M_PROLOG
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( _hook, static_cast<trait::true_type const*>( nullptr ), yaal::forward<arg_t>( arg_ )... );
 		_hook = element;
 		++ _size;
 		return;
