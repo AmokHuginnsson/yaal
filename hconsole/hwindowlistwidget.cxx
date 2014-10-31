@@ -39,7 +39,7 @@ namespace hconsole {
 
 HWindowListWidget::HWindowListWidget ( HWindow * parent_, int row_,
 		int column_, int height_, int width_, char const * label_,
-		HAbstractListModel::ptr_t const& model_, model_t::cyclic_iterator& foregroundWindow_ )
+		HAbstractListModel::ptr_t const& model_, cyclic_iterator& foregroundWindow_ )
 	:	HWidget( parent_, row_, column_, height_, width_, label_,
 			HWidgetAttributes().label_position( HWidget::LABEL::POSITION::STACKED ) ),
 		HSearchableWidget( HSearchableWidgetAttributes() ),

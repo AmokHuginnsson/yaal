@@ -51,9 +51,9 @@ public:
 private:
 	HMenuWidget* _menu;
 	HTUIProcess::model_ptr_t _windowList;
-	HTUIProcess::model_t::cyclic_iterator& _foregroundWindow;
+	HTUIProcess::cyclic_iterator& _foregroundWindow;
 public:
-	HMainWindow( yaal::hcore::HString const&, HTUIProcess::model_ptr_t, HTUIProcess::model_t::cyclic_iterator& );
+	HMainWindow( yaal::hcore::HString const&, HTUIProcess::model_ptr_t, HTUIProcess::cyclic_iterator& );
 	virtual ~HMainWindow( void );
 	void set_menu( HMenuWidget::data_ptr_t );
 protected:

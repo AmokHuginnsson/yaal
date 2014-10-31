@@ -644,7 +644,7 @@ class HTree<value_t, allocator_t, sequence_t>::HNode::HIterator
 	typedef typename tree_t::const_node_t owner_t;
 	typedef typename trait::copy_const<const_qual_t, HNode>::type const_qual_node_t;
 	typedef typename trait::copy_const<const_qual_t, HNode*>::type const_qual_node_ptr_t;
-	typedef typename HTree<value_t, allocator_t, sequence_t>::HNode::branch_t::template HIterator<const_qual_node_ptr_t, OListBits::TREAT_AS_OPENED> list_it_t;
+	typedef typename HTree<value_t, allocator_t, sequence_t>::HNode::branch_t::template HIterator<const_qual_node_ptr_t> list_it_t;
 	owner_t _owner;
 	list_it_t _iterator;
 public:
@@ -753,7 +753,7 @@ class HTree<value_t, allocator_t, sequence_t>::HIterator : public iterator_inter
 	typedef tree_t const* owner_t;
 	typedef typename trait::copy_const<const_qual_t, HNode>::type const_qual_node_t;
 	typedef typename trait::copy_const<const_qual_t, HNode*>::type const_qual_node_ptr_t;
-	typedef typename HTree<value_t, allocator_t, sequence_t>::HNode::branch_t::template HIterator<const_qual_node_ptr_t, OListBits::TREAT_AS_OPENED> list_it_t;
+	typedef typename HTree<value_t, allocator_t, sequence_t>::HNode::branch_t::template HIterator<const_qual_node_ptr_t> list_it_t;
 	typedef HArray<list_it_t> it_stack_t;
 	owner_t _owner;
 	it_stack_t _track;

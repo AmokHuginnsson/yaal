@@ -53,10 +53,11 @@ public:
 	typedef yaal::hcore::HPointer<model_t> model_ptr_t;
 	typedef yaal::hcore::HBoundCall<> call_t;
 	typedef yaal::hcore::HQueue<call_t> call_queue_t;
+	typedef hcore::HCyclicIterator<model_t> cyclic_iterator;
 protected:
 	yaal::tools::HIODispatcher _dispatcher;
 	window_t _mainWindow;                 /* self explanary */
-	model_t::cyclic_iterator _foregroundWindow; /* self explanary */
+	cyclic_iterator _foregroundWindow; /* self explanary */
 	model_ptr_t _windows;                       /* current existing windows */
 	bool _needRepaint;
 	call_queue_t _callQueue;

@@ -47,10 +47,11 @@ public:
 	typedef HListWidget base_type;
 private:
 	typedef yaal::hcore::HList<HWindow::ptr_t> model_t;
-	model_t::cyclic_iterator& _foregroundWindow; /* self explanary */
+	typedef hcore::HCyclicIterator<model_t> cyclic_iterator;
+	cyclic_iterator& _foregroundWindow; /* self explanary */
 public:
 	HWindowListWidget( HWindow*, int, int, int, int, char const*,
-			list_widget_helper::HAbstractListModel::ptr_t const&, model_t::cyclic_iterator& );
+			list_widget_helper::HAbstractListModel::ptr_t const&, cyclic_iterator& );
 	virtual int do_process_input( int );
 };
 

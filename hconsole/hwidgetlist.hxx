@@ -42,11 +42,12 @@ class HWidgetList {
 public:
 	typedef HWidgetList this_type;
 	typedef hcore::HList<HWidget::ptr_t> model_t;
+	typedef hcore::HCyclicIterator<model_t> cyclic_iterator;
 private:
 	model_t _list;
-	model_t::cyclic_iterator& _focused;
+	cyclic_iterator& _focused;
 public:
-	HWidgetList( model_t::cyclic_iterator& );
+	HWidgetList( cyclic_iterator& );
 	/* find next enabled widget in window, if short cut char is specified */
 	void next_enabled( char = 0 ); /* enabled and match shortcut char */
 	void pop_front( void );

@@ -40,7 +40,7 @@ namespace yaal {
 
 namespace hconsole {
 
-HWidgetList::HWidgetList( model_t::cyclic_iterator& focused_ ) : _list(), _focused( focused_ ) {
+HWidgetList::HWidgetList( cyclic_iterator& focused_ ) : _list(), _focused( focused_ ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -49,7 +49,7 @@ HWidgetList::HWidgetList( model_t::cyclic_iterator& focused_ ) : _list(), _focus
 void HWidgetList::next_enabled( char shorcut_ ) {
 	M_PROLOG
 	bool loop( true );
-	HWidgetList::model_t::cyclic_iterator it( _focused );
+	HWidgetList::cyclic_iterator it( _focused );
 	do {
 		++ _focused;
 		if ( dynamic_cast<HStatusBarWidget*>( &(*(*_focused))) )
@@ -69,8 +69,9 @@ void HWidgetList::next_enabled( char shorcut_ ) {
 void HWidgetList::add_widget( HWidget::ptr_t widget_ ) {
 	M_PROLOG
 	_list.push_back( widget_ );
-	if ( _focused == _list.end() )
-		_focused = _list.rbegin().base();
+	if ( _focused == _list.end() ) {
+		_focused = cyclic_iterator( &_list, _list.rbegin().base() );
+	}
 	return;
 	M_EPILOG
 }
@@ -79,7 +80,7 @@ void HWidgetList::refresh_all( bool force_ ) {
 	M_PROLOG
 	bool focusedNeedRepaint( (*_focused)->need_repaint() );
 	for ( model_t::iterator it( _list.begin() ), end( _list.end() ); it != end; ++ it ) {
-		if ( ( it != _focused ) && ( force_ || (*it)->need_repaint() ) ) {
+		if ( ( it != _focused.base() ) && ( force_ || (*it)->need_repaint() ) ) {
 			(*it)->paint();
 		}
 	}
@@ -135,12 +136,13 @@ void HWidgetList::select( HWidget const* widget_ ) {
 		model_t::iterator it( _list.begin() );
 		for ( model_t::iterator end( _list.end() ); it != end; ++ it ) {
 			if ( (*it) == widget_ ) {
-				_focused = it;
+				_focused = cyclic_iterator( &_list, it );
 				break;
 			}
 		}
-		if ( it == _list.end() )
+		if ( it == _list.end() ) {
 			M_THROW( "bogus object", reinterpret_cast<int long>( widget_ ) );
+		}
 	}
 	return;
 	M_EPILOG

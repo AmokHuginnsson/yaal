@@ -94,7 +94,8 @@ protected:
 	HInfoString _infoString;
 	typedef hcore::HList<yaal::hcore::HString> history_t;
 	history_t	_history;    /*!< history of insertions */
-	history_t::cyclic_iterator _historyIt;
+	typedef hcore::HCyclicIterator<history_t> cyclic_iterator;
+	cyclic_iterator _historyIt;
 public:
 	/*! \brief Constructor of edit widget.
 	 *

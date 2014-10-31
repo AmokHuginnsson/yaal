@@ -38,7 +38,7 @@ namespace yaal {
 namespace hconsole {
 
 HMainWindow::HMainWindow( yaal::hcore::HString const& title_, HTUIProcess::model_ptr_t windows_,
-		HTUIProcess::model_t::cyclic_iterator& foregroundWindow_ )
+		HTUIProcess::cyclic_iterator& foregroundWindow_ )
 		: HWindow( title_ ), _menu( NULL ), _windowList( windows_ ),
 		_foregroundWindow( foregroundWindow_ ) {
 	M_PROLOG
@@ -59,7 +59,7 @@ HMainWindow::~HMainWindow( void ) {
 void HMainWindow::do_init( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
-	if ( ( _focusedChild != HWidgetList::model_t::cyclic_iterator() ) && ( !! (*_focusedChild) ) ) {
+	if ( ( _focusedChild != HWidgetList::cyclic_iterator() ) && ( !! (*_focusedChild) ) ) {
 		return;
 	}
 	HWindow::do_init();

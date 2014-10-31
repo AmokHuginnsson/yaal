@@ -174,7 +174,7 @@ bool HWindow::handler_jump_direct( HEvent const& event_ ) {
 		 * code_ is consrtructed from ordinary char by KEY_META_ macro,
 		 * see console.h for details
 		 */
-		HWidgetList::model_t::cyclic_iterator it = _focusedChild;
+		HWidgetList::cyclic_iterator it = _focusedChild;
 		if ( keyPress.get_key_code() & 0x0ff00 ) {
 			_widgets.next_enabled( static_cast<char>( keyPress.get_key_code() ) );
 			if ( _focusedChild != it ) {

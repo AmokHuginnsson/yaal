@@ -52,8 +52,8 @@ protected:
 	bool _initialised;                                           /*!< was window properly initialised? */
 	bool _needRepaint;                                           /*!< \brief Does this window need to be repainted? */
 	hcore::HString _title;                                       /*!< title of window */
-	HWidgetList::model_t::cyclic_iterator _focusedChild;         /*!< points to widget that has focus */
-	HWidgetList::model_t::cyclic_iterator _previousFocusedChild; /*!< widget that had focus before
+	HWidgetList::cyclic_iterator _focusedChild;         /*!< points to widget that has focus */
+	HWidgetList::cyclic_iterator _previousFocusedChild; /*!< widget that had focus before
 	                                                                  focus went to status bar */
 	HWidgetList _widgets;                                        /*!< list of all widget inside _this_ wind */
 	HStatusBarWidget::ptr_t _statusBar;

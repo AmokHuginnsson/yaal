@@ -104,7 +104,7 @@ void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::p
 	add_window( mainWindow );
 	if ( ! mainWindow->is_initialised() )
 		M_THROW( _( "window has not been initialised" ), errno );
-	_foregroundWindow = _windows->begin();
+	_foregroundWindow = hcore::cyclic_iterator( *_windows );
 	_commandHandlers[ "quit" ] = call( &HTUIProcess::handler_quit, this, _1 );
 	repaint();
 	return;
@@ -161,7 +161,7 @@ void HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	window_->set_tui( this );
 	window_->init();
 	_windows->push_back( window_ );
-	_foregroundWindow = _windows->rbegin().base();
+	_foregroundWindow = cyclic_iterator( &*_windows, _windows->rbegin().base() );
 	M_ASSERT( _foregroundWindow != _windows->end() );
 	_mainWindow->update_all();
 	if ( ! (*_foregroundWindow)->is_initialised() )
@@ -336,10 +336,11 @@ void HTUIProcess::do_quit( void ) {
 
 bool HTUIProcess::handler_jump_meta_tab( HEvent const& ) {
 	M_PROLOG
-	if ( _dispatcher.idle_cycles() < 5 )
+	if ( _dispatcher.idle_cycles() < 5 ) {
 		++ _foregroundWindow;
-	else
-		_foregroundWindow = _windows->begin();
+	} else {
+		_foregroundWindow = hcore::cyclic_iterator( *_windows );
+	}
 	repaint( true );
 	return ( true );
 	M_EPILOG
@@ -350,11 +351,13 @@ bool HTUIProcess::handler_jump_meta_direct( HEvent const& keyPress_ ) {
 	M_ASSERT( keyPress_.get_type() == HEvent::TYPE::KEY_PRESS );
 	HKeyPressEvent const& keyPress( static_cast<HKeyPressEvent const&>( keyPress_ ) );
 	int code( ( keyPress.get_key_code() & 0xff ) - '0' );
-	if ( code >= _windows->size() )
+	if ( code >= _windows->size() ) {
 		return ( 0 );
-	_foregroundWindow = _windows->begin();
-	while ( code -- )
+	}
+	_foregroundWindow = hcore::cyclic_iterator( *_windows );
+	while ( code -- ) {
 		++ _foregroundWindow;
+	}
 	repaint( true );
 	return ( true );
 	M_EPILOG
@@ -376,9 +379,9 @@ void HTUIProcess::close_window( void ) {
 
 void HTUIProcess::do_close_window( void ) {
 	M_PROLOG
-	model_t::cyclic_iterator it = _foregroundWindow;
+	cyclic_iterator it = _foregroundWindow;
 	-- _foregroundWindow;
-	_windows->erase( it );
+	_windows->erase( it.base() );
 	repaint( true );
 	return;
 	M_EPILOG
@@ -388,7 +391,7 @@ void HTUIProcess::select( HWindow const* const window_ ) {
 	M_PROLOG
 	for ( model_t::iterator it( _windows->begin() ), end( _windows->end() ); it != end; ++ it ) {
 		if ( (*it) == window_ ) {
-			_foregroundWindow = it;
+			_foregroundWindow = cyclic_iterator( &*_windows, it );
 			break;
 		}
 	}
@@ -398,7 +401,7 @@ void HTUIProcess::select( HWindow const* const window_ ) {
 
 void HTUIProcess::repaint( bool force_ ) {
 	M_PROLOG
-	if ( ( _foregroundWindow != HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) ) {
+	if ( ( _foregroundWindow != HTUIProcess::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) ) {
 		if ( force_ ) {
 			(*_foregroundWindow)->schedule_repaint( true );
 		}
@@ -412,7 +415,7 @@ void HTUIProcess::repaint( bool force_ ) {
 
 HMainWindow* HTUIProcess::main_window( void ) {
 	M_PROLOG
-	M_ASSERT( ( _foregroundWindow != model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
+	M_ASSERT( ( _foregroundWindow != cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
 	HMainWindow* mainWindow( dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) ) );
 	M_ASSERT( mainWindow );
 	return ( mainWindow );

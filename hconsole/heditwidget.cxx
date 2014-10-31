@@ -72,7 +72,7 @@ HEditWidget::HEditWidget( HWindow* parent_,
 		M_THROW( _( "edit-widget right aligned and multiline at the same time" ), 0 );
 	}
 	_history.push_back( "" );
-	_historyIt = _history.hook();
+	_historyIt = hcore::cyclic_iterator( _history );
 	int length( static_cast<int>( _string.get_length() ) );
 /* this is part of draw_label() method, we cannot wait with setting up
  * _widthRaw until draw_label(), which is called from paint()
@@ -447,11 +447,11 @@ int HEditWidget::do_process_input( int code_ ) {
 	length = static_cast<int>( _varTmpBuffer.get_length() );
 	switch ( code_ ) {
 		case ( KEY_CODES::PAGE_UP ):
-			_historyIt = _history.hook();
+			_historyIt = hcore::cyclic_iterator( _history );
 			errorCode = HISTORY_OPERATION;
 		break;
 		case ( KEY_CODES::PAGE_DOWN ):
-			_historyIt = _history.hook();
+			_historyIt = hcore::cyclic_iterator( _history );
 			-- _historyIt;
 			errorCode = HISTORY_OPERATION;
 		break;
@@ -479,7 +479,7 @@ int HEditWidget::do_process_input( int code_ ) {
 				while ( histSize -- > _maxHistoryLevel ) {
 					_history.pop_back(); /* FIXME investigate if it actually work */
 				}
-				_historyIt = _history.hook();
+				_historyIt = hcore::cyclic_iterator( _history );
 				-- _historyIt;
 			} else
 				-- _historyIt;

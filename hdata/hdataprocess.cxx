@@ -70,7 +70,7 @@ void HDataProcess::init_xrc( char const* processName_,
 	HTUIProcess::init_xrc( processName_, resource_ );
 	if ( dbwrapper::_dBDrivers_.is_empty() )
 		M_THROW( "no database driver loaded", errno );
-	M_ASSERT( ( _foregroundWindow != HTUIProcess::model_t::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
+	M_ASSERT( ( _foregroundWindow != HTUIProcess::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) );
 	HMainWindow* mainWindow( dynamic_cast<HMainWindow*>( &*(*_foregroundWindow) ) );
 	M_ASSERT( mainWindow );
 	mainWindow->paint();

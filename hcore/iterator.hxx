@@ -29,6 +29,7 @@ Copyright:
 
 #include "hcore/hexception.hxx"
 #include "hcore/trait.hxx"
+#include "hcore/algorithm_low.hxx"
 
 namespace yaal {
 
@@ -255,6 +256,111 @@ private:
 	template<typename other_iterator_t>
 	friend class HReverseIterator;
 };
+
+template<typename container_t>
+class HCyclicIterator
+	: public iterator_interface<
+			typename trait::ternary<
+				trait::is_const<container_t>::value,
+				typename container_t::value_type const,
+				typename container_t::value_type
+			>::type,
+			iterator_category::forward
+		> {
+public:
+	typedef HCyclicIterator<container_t> this_type;
+	typedef typename trait::ternary<
+				trait::is_const<container_t>::value,
+				typename container_t::const_iterator,
+				typename container_t::iterator
+			>::type iterator_type;
+	typedef typename trait::ternary<
+				trait::is_const<container_t>::value,
+				typename container_t::value_type const,
+				typename container_t::value_type
+			>::type value_type;
+private:
+	container_t* _owner;
+	iterator_type _it;
+public:
+	HCyclicIterator( void )
+		: _owner( nullptr ), _it() {
+		return;
+	}
+	HCyclicIterator( container_t* owner_, iterator_type it_ )
+		: _owner( owner_ ), _it( it_ ) {
+		return;
+	}
+	HCyclicIterator( HCyclicIterator const& it_ )
+		: _owner( it_._owner ), _it( it_._it ) {
+		return;
+	}
+	HCyclicIterator& operator = ( HCyclicIterator const& it_ ) {
+		if ( &it_ != this ) {
+			_owner = it_._owner;
+			_it = it_._it;
+		}
+		return ( *this );
+	}
+	HCyclicIterator& operator ++ ( void ) {
+		++ _it;
+		if ( _it == end( *_owner ) ) {
+			_it = begin( *_owner );
+		}
+		return ( *this );
+	}
+	HCyclicIterator operator ++ ( int ) {
+		HCyclicIterator it( *this );
+		++ _it;
+		return ( it );
+	}
+	HCyclicIterator& operator -- ( void ) {
+		if ( _it == begin( *_owner ) ) {
+			_it = end( *_owner );
+		}
+		-- _it;
+		return ( *this );
+	}
+	HCyclicIterator operator -- ( int ) {
+		HCyclicIterator it( *this );
+		-- _it;
+		return ( it );
+	}
+	value_type& operator* ( void ) {
+		return ( *_it );
+	}
+	value_type* operator-> ( void ) {
+		return ( &*_it );
+	}
+	iterator_type base( void ) const {
+		return ( _it );
+	}
+	bool operator != ( HCyclicIterator const& it_ ) {
+		M_ASSERT( _owner == it_._owner );
+		return ( _it != it_._it );
+	}
+	bool operator == ( HCyclicIterator const& it_ ) {
+		M_ASSERT( _owner == it_._owner );
+		return ( _it == it_._it );
+	}
+	bool operator != ( typename container_t::const_iterator const& it_ ) {
+		return ( _it != it_ );
+	}
+	bool operator == ( typename container_t::const_iterator const& it_ ) {
+		return ( _it == it_ );
+	}
+	bool operator != ( typename container_t::iterator const& it_ ) {
+		return ( _it != it_ );
+	}
+	bool operator == ( typename container_t::iterator const& it_ ) {
+		return ( _it == it_ );
+	}
+};
+
+template<typename container_t>
+HCyclicIterator<container_t> cyclic_iterator( container_t& container_ ) {
+	return ( HCyclicIterator<container_t>( &container_, container_.begin() ) );
+}
 
 /*! \brief (Back)Insertion concept for HInsertingIterator.
  *
