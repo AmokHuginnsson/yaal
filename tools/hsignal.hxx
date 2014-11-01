@@ -127,6 +127,17 @@ public:
 		return ( HConnection( slot ) );
 		M_EPILOG
 	}
+	HConnection connect( group_by groupBy_, typename HSlot::call_t slot_, signal::POSITION position_ = signal::POSITION::AT_BACK ) {
+		M_PROLOG
+		slot_t slot( hcore::make_pointer<HSlot>( slot_, this ) );
+		if ( position_ == signal::POSITION::AT_BACK ) {
+			_slotsPrio.push_back( make_pair( groupBy_, slot ) );
+		} else {
+			_slotsPrio.push_front( make_pair( groupBy_, slot ) );
+		}
+		return ( HConnection( slot ) );
+		M_EPILOG
+	}
 	template<typename... arg_t>
 	result_type operator()( arg_t&&... arg_ ) {
 		M_PROLOG
@@ -154,8 +165,19 @@ private:
 			_slotsPre.erase( it );
 		} else {
 			it = find( _slotsPost.begin(), _slotsPost.end(), slot_ );
-			M_ENSURE( it != _slotsPost.end() );
-			_slotsPost.erase( it );
+			if ( it != _slotsPost.end() ) {
+				_slotsPost.erase( it );
+			} else {
+				typename ordered_slots_t::iterator itPrio(
+						find_if( _slotsPrio.begin(), _slotsPrio.end(),
+							[slot_]( typename ordered_slots_t::value_type const& val_ ) {
+								return ( val_.second == slot_ );
+							}
+						)
+				);
+				M_ENSURE( itPrio != _slotsPrio.end() );
+				_slotsPrio.erase( itPrio );
+			}
 		}
 		return;
 		M_EPILOG
@@ -258,6 +280,7 @@ public:
 	typedef yaal::hcore::iterator_interface<typename trait::return_type<result_agregator_t>::type, yaal::hcore::iterator_category::forward> base_type;
 	typedef typename trait::return_type<signature_t>::type result_type;
 	typedef typename HSignal<signature_t, result_agregator_t, group_by>::slots_t slots_t;
+	typedef typename HSignal<signature_t, result_agregator_t, group_by>::ordered_slots_t ordered_slots_t;
 	enum class STATE {
 		PRE,
 		PRIO,
@@ -266,20 +289,24 @@ public:
 private:
 	typedef HSignal<signature_t, result_agregator_t, group_by> owner_t;
 	typename slots_t::iterator _it;
+	typename ordered_slots_t::iterator _itPrio;
 	callback_t _callback;
 	owner_t* _owner;
 	STATE _state;
 public:
 	result_type operator* ( void ) {
-		return ( (*_it)->call( _callback ) );
+		if ( ( _state == STATE::PRE ) || ( _state == STATE::POST ) ) {
+			return ( (*_it)->call( _callback ) );
+		}
+		return ( _itPrio->second->call( _callback ) );
 	}
 	bool operator == ( HIterator const it_ ) const {
 		M_ASSERT( it_._owner == _owner );
-		return ( ( it_._state == _state ) && ( it_._it == _it ) );
+		return ( ! operator != ( it_ ) );
 	}
 	bool operator != ( HIterator const it_ ) const {
 		M_ASSERT( it_._owner == _owner );
-		return ( ( it_._state != _state ) || ( it_._it != _it ) );
+		return ( ( it_._state != _state ) || ( ( _state == STATE::PRIO ) && ( it_._itPrio != _itPrio ) ) || ( ( _state != STATE::PRIO ) && ( it_._it != _it ) ) );
 	}
 	HIterator& operator ++ ( void ) {
 		switch ( _state ) {
@@ -287,6 +314,7 @@ public:
 				++ _it;
 			} break;
 			case ( STATE::PRIO ): {
+				++ _itPrio;
 			} break;
 			case ( STATE::POST ): {
 				++ _it;
@@ -297,18 +325,27 @@ public:
 	}
 private:
 	void validate( void ) {
+		M_PROLOG
 		switch ( _state ) {
 			case ( STATE::PRE ): {
 				while ( ( _it != _owner->_slotsPre.end() ) && ! (*_it)->is_enabled() ) {
 					++ _it;
 				}
 				if ( _it == _owner->_slotsPre.end() ) {
-					_state = STATE::POST;
-					_it = _owner->_slotsPost.begin();
+					_state = STATE::PRIO;
+					_itPrio = _owner->_slotsPrio.begin();
 					validate();
 				}
 			} break;
 			case ( STATE::PRIO ): {
+				while ( ( _itPrio != _owner->_slotsPrio.end() ) && ! _itPrio->second->is_enabled() ) {
+					++ _itPrio;
+				}
+				if ( _itPrio == _owner->_slotsPrio.end() ) {
+					_state = STATE::POST;
+					_it = _owner->_slotsPost.begin();
+					validate();
+				}
 			} break;
 			case ( STATE::POST ): {
 				while ( ( _it != _owner->_slotsPost.end() ) && ! (*_it)->is_enabled() ) {
@@ -316,6 +353,8 @@ private:
 				}
 			} break;
 		}
+		return;
+		M_EPILOG
 	}
 	HIterator( typename slots_t::iterator it_, callback_t callback_, owner_t* owner_, STATE state_ )
 		: _it( it_ ), _callback( callback_ ), _owner( owner_ ), _state( state_ ) {
