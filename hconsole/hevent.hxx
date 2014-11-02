@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HCONSOLE_HEVENT_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
+#include "tools/hsignal.hxx"
 #include "hconsole/mouse.hxx"
 
 namespace yaal {
@@ -56,6 +57,9 @@ public:
 private:
 	virtual TYPE::type_t do_get_type( void ) const = 0;
 };
+
+typedef hcore::HBoundCall<bool ( HEvent const& )> event_listener_t;
+typedef tools::HSignal<bool ( HEvent const& )> event_dispatcher_t;
 
 class HKeyPressEvent : public HEvent {
 public:

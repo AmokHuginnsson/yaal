@@ -32,6 +32,7 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "tools/hxml.hxx"
 #include "hconsole/hinfo.hxx"
+#include "hconsole/hevent.hxx"
 
 namespace yaal {
 
@@ -137,6 +138,7 @@ protected:
 	int _shortcutIndex; /*!< Index of shortcut char in label. */
 	bool _valid;        /*!< Is model data in sync with widget internals. */
 	bool _needRepaint;  /*!< Does this widget need to be repainted. */
+	event_dispatcher_t _eventDispatcher;
 public:
 /*! \brief Widget constructor.
  *
@@ -379,6 +381,12 @@ public:
  * \return This widget parent window (owner).
  */
 	HWindow* get_window( void ) const;
+
+/*! \brief Register event listener.
+ *
+ * \param liserner - event listener to register.
+ */
+	void register_event_listener( event_listener_t const& );
 
 protected:
 	void set_attr_label( void ) const;

@@ -63,7 +63,8 @@ HWidget::HWidget( HWindow* parent_, int row_, int column_,
 	_height( height_ ), _width( width_ ), _rowRaw( 0 ),
 	_columnRaw( 0 ), _heightRaw( 0 ), _widthRaw( 0 ),
 	_label( label_ ), _varTmpBuffer(), _window( parent_ ),
-	_labelLength( 0 ), _shortcutIndex( 0 ), _valid( false ), _needRepaint( false ) {
+	_labelLength( 0 ), _shortcutIndex( 0 ), _valid( false ), _needRepaint( false ),
+	_eventDispatcher() {
 	M_PROLOG
 	if ( ! HConsole::get_instance().is_enabled() ) {
 		M_THROW( "not in curses mode.", errno );
@@ -490,6 +491,13 @@ yaal::hcore::HString const& HWidget::get_label( void ) const {
 
 HWindow* HWidget::get_window( void ) const {
 	return ( _window );
+}
+
+void HWidget::register_event_listener( event_listener_t const& listener_ ) {
+	M_PROLOG
+	_eventDispatcher.connect( listener_ );
+	return;
+	M_EPILOG
 }
 
 void HWidgetAttributesInterface::apply( HWidget& widget_ ) const {
