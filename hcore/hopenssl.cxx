@@ -38,6 +38,12 @@ Copyright:
 #error Thread support in OpenSSL library is missing.
 #endif /* not OPENSSL_THREADS */
 
+#include "config.hxx"
+
+#ifdef HAVE_VALGRIND_MEMCHECK_H
+#include <valgrind/memcheck.h>
+#endif /* #ifdef HAVE_VALGRIND_MEMCHECK_H */
+
 #include "base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -97,6 +103,9 @@ int bio_read( BIO* bio_, char* buf_, int size_ ) {
 
 int bio_write( BIO* bio_, char const* buf_, int size_ ) {
 	M_PROLOG
+#ifdef HAVE_VALGRIND_MEMCHECK_H
+	VALGRIND_MAKE_MEM_DEFINED( buf_, size_ );
+#endif /* #ifdef HAVE_VALGRIND_MEMCHECK_H */
 	int nWritten( static_cast<int>( ::write( static_cast<int>( reinterpret_cast<int long>( bio_->ptr ) ), buf_, static_cast<size_t>( size_ ) ) ) );
 	if ( ( nWritten < 0 ) && ( errno == EAGAIN ) )
 		BIO_set_retry_write( bio_ );
@@ -396,8 +405,14 @@ int long HOpenSSL::read( void* const buffer_, int long size_ ) {
 	int nRead( -1 );
 	if ( ! _pendingOperation ) {
 		nRead = SSL_read( static_cast<SSL*>( _ssl ), buffer_, static_cast<int>( size_ ) );
-		if ( nRead <= 0 )
+#ifdef HAVE_VALGRIND_MEMCHECK_H
+		if ( nRead > 0 ) {
+			VALGRIND_MAKE_MEM_DEFINED( buffer_, nRead );
+		}
+#endif /* #ifdef HAVE_VALGRIND_MEMCHECK_H */
+		if ( nRead <= 0 ) {
 			nRead = check_err( nRead );
+		}
 	}
 	return ( nRead );
 	M_EPILOG

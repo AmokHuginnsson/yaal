@@ -302,6 +302,7 @@ AC_CHECK_HEADERS([tty.h])
 AC_CHECK_HEADERS([termio.h])
 AC_CHECK_HEADERS([sys/ioctl.h])
 AC_CHECK_HEADERS([gpm.h],_CONSOLE_MOUSE=["gpm"])
+AC_CHECK_HEADERS([valgrind/memcheck.h])
 if test ["$_CONSOLE_MOUSE"] = [""] -a ["$CONSOLE_MOUSE"] = ["yes"] ; then
 	AC_MSG_ERROR([Cannot continue without console mouse support.])
 fi
