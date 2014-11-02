@@ -230,8 +230,11 @@ public:
 		return;
 		M_EPILOG
 	}
+	bool is_valid( void ) const {
+		return ( _owner != nullptr );
+	}
 	bool is_enabled( void ) const {
-		return ( ( _owner != nullptr ) && _enabled );
+		return ( is_valid() && _enabled );
 	}
 	void disown( void ) {
 		M_PROLOG
@@ -300,6 +303,8 @@ private:
 	owner_t* _owner;
 	STATE _state;
 public:
+	HIterator( HIterator const& ) = default;
+	HIterator& operator = ( HIterator const& ) = default;
 	result_type operator* ( void ) {
 		if ( ( _state == STATE::PRE ) || ( _state == STATE::POST ) ) {
 			return ( (*_it)->call( _callback ) );
@@ -363,7 +368,7 @@ private:
 		M_EPILOG
 	}
 	HIterator( typename slots_t::iterator it_, callback_t callback_, owner_t* owner_, STATE state_ )
-		: _it( it_ ), _callback( callback_ ), _owner( owner_ ), _state( state_ ) {
+		: _it( it_ ), _itPrio(), _callback( callback_ ), _owner( owner_ ), _state( state_ ) {
 		validate();
 		return;
 	}
