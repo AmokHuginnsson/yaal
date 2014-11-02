@@ -105,6 +105,10 @@ private:
 	ordered_slots_t _slotsPrio;
 	slots_t _slotsPost;
 public:
+	HSignal( void )
+		: _slotsPre(), _slotsPrio(), _slotsPost() {
+		return;
+	}
 	virtual ~HSignal( void ) {
 		for ( slot_t& slot : _slotsPre ) {
 			slot->disown();
@@ -236,6 +240,8 @@ public:
 		M_EPILOG
 	}
 private:
+	HSlot( HSlot const& ) = delete;
+	HSlot& operator = ( HSlot const& ) = delete;
 	template<typename callback_t>
 	friend class HSignal<signature_t, result_agregator_t, group_by>::HIterator;
 };
