@@ -336,11 +336,11 @@ public:
 		return ( _it );
 	}
 	bool operator != ( HCyclicIterator const& it_ ) {
-		M_ASSERT( _owner == it_._owner );
+		M_ASSERT( ( _owner == it_._owner ) || ! ( _owner && it_._owner ) );
 		return ( _it != it_._it );
 	}
 	bool operator == ( HCyclicIterator const& it_ ) {
-		M_ASSERT( _owner == it_._owner );
+		M_ASSERT( ( _owner == it_._owner ) || ! ( _owner && it_._owner ) );
 		return ( _it == it_._it );
 	}
 	bool operator != ( typename container_t::const_iterator const& it_ ) {
