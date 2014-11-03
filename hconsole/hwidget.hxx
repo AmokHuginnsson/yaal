@@ -434,6 +434,27 @@ public:
 	HWidgetAttributes& attribure_focused( HWidget::OAttribute const& );
 };
 
+class HWidgetEvent : public HEvent {
+public:
+	typedef HWidgetEvent this_type;
+	typedef HEvent base_type;
+private:
+	HWidget* _widget;
+public:
+	HWidgetEvent( HWidget* widget_ )
+		: _widget( widget_ ) {
+	}
+	HWidgetEvent( HWidgetEvent const& ) = default;
+	HWidgetEvent& operator = ( HWidgetEvent const& ) = default;
+	HWidget* get_source( void ) const {
+		return ( _widget );
+	}
+private:
+	virtual TYPE::type_t do_get_type( void ) const {
+		return ( TYPE::WINDOW );
+	}
+};
+
 }
 
 }

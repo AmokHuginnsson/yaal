@@ -45,7 +45,9 @@ public:
 		typedef enum {
 			KEY_PRESS,
 			MOUSE,
-			COMMAND
+			COMMAND,
+			WINDOW,
+			WIDGET
 		} type_t;
 	};
 public:

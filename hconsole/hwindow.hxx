@@ -118,6 +118,27 @@ protected:
 	void create_widgets( HWindow::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
+class HWindowEvent : public HEvent {
+public:
+	typedef HWindowEvent this_type;
+	typedef HEvent base_type;
+private:
+	HWindow* _window;
+public:
+	HWindowEvent( HWindow* window_ )
+		: _window( window_ ) {
+	}
+	HWindowEvent( HWindowEvent const& ) = default;
+	HWindowEvent& operator = ( HWindowEvent const& ) = default;
+	HWindow* get_source( void ) const {
+		return ( _window );
+	}
+private:
+	virtual TYPE::type_t do_get_type( void ) const {
+		return ( TYPE::WINDOW );
+	}
+};
+
 }
 
 }
