@@ -51,7 +51,7 @@ public:
 		if ( first_ == last_ ) {
 			return ( result_type() );
 		}
-		result_type result;
+		result_type result = result_type();
 		for ( ; first_ != last_; ++ first_ ) {
 			result = *first_;
 		}
