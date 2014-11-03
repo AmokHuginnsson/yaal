@@ -180,15 +180,17 @@ HString::HString( int long preallocate_, char fill_ )
 
 void HString::reserve( int long preallocate_ ) {
 	M_PROLOG
-	if ( ( preallocate_ < 0 ) || ( preallocate_ > MAX_STRING_LENGTH ) )
+	if ( ( preallocate_ < 0 ) || ( preallocate_ > MAX_STRING_LENGTH ) ) {
 		M_THROW( _( "bad new buffer size requested" ), preallocate_ );
+	}
 	/* Increase requested buffer size to accomodate space terminating NIL. */
 	++ preallocate_;
 	int long oldAllocBytes( GET_ALLOC_BYTES );
 	if ( preallocate_ > oldAllocBytes ) {
 		int long newAllocBytes = 1;
-		while ( newAllocBytes < preallocate_ )
+		while ( newAllocBytes < preallocate_ ) {
 			newAllocBytes <<= 1;
+		}
 		if ( ! IS_INPLACE ) {
 			_ptr = memory::realloc<char>( MEM, newAllocBytes );
 			SET_ALLOC_BYTES( newAllocBytes );
@@ -716,6 +718,19 @@ HString& HString::assign( const_iterator first_, const_iterator last_ ) {
 	::memcpy( MEM, first_, static_cast<size_t>( newSize ) );
 	MEM[ newSize ] = 0;
 	SET_SIZE( newSize );
+	return ( *this );
+	M_EPILOG
+}
+
+HString& HString::assign( int long size_, char fill_ ) {
+	M_PROLOG
+	if ( size_ < 0 ) {
+		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], size_ );
+	}
+	reserve( size_ );
+	::memset( MEM, fill_, static_cast<size_t>( size_ ) );
+	MEM[ size_ ] = 0;
+	SET_SIZE( fill_ ? size_ : 0 );
 	return ( *this );
 	M_EPILOG
 }

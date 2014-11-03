@@ -405,6 +405,12 @@ public:
 	 * last_ - one past the end of character range to copy.
 	 */
 	HString& assign( const_iterator first_, const_iterator last_ );
+	/*! \brief Erase old content and fill string with N copies of given character.
+	 *
+	 * \param size_ - number of copies of given character to make.
+	 * \param fill_ - fill allocated space with given character.
+	 */
+	HString& assign( int long size_, char fill_ );
 	/*! \brief Replace contents of this string with result of `C' printf() style format.
 	 *
 	 * \param frmt - `C's printf() style format specification.
