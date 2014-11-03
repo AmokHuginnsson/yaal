@@ -419,6 +419,7 @@ public:
 	type_id_t get_column_type( int );
 	void set_cursor_position( int );
 	int get_cursor_position( void ) const;
+	void selection_change( void );
 protected:
 	virtual bool get_text_for_cell( iterator_t&, int, type_id_t );
 	virtual void do_paint( void );

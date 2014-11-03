@@ -145,8 +145,10 @@ void HListWidget::do_paint( void ) {
 		return;
 	if ( _widthRaw != tmp )
 		recalculate_column_widths();
-/* we need to decrement _heightRaw because we have additional row,
- * the list widget header */
+/*
+ * we need to decrement _heightRaw because we have additional row,
+ * the list widget header
+ */
 	if ( _drawHeader )
 		_heightRaw --;
 	_varTmpBuffer.reserve( _widthRaw );
@@ -384,12 +386,14 @@ int HListWidget::get_cursor_position( void ) const {
 }
 
 void HListWidget::handle_key_page_up( void ) {
+	M_PROLOG
 	if ( ! _cursorPosition ) {
 		if ( _widgetOffset ) {
 			_widgetOffset -= ( _heightRaw - 1 );
 			decrement( _firstVisibleRow, _heightRaw - 1 );
-		} else
+		} else {
 			HConsole::get_instance().bell();
+		}
 		if ( _widgetOffset < 0 ) {
 			_widgetOffset = 0;
 			_firstVisibleRow = _model->begin();
@@ -397,13 +401,14 @@ void HListWidget::handle_key_page_up( void ) {
 	} else {
 		_cursorPosition = 0;
 		_cursor = _firstVisibleRow;
-		update_children();
 	}
 	return;
+	M_EPILOG
 }
 
 void HListWidget::handle_key_page_down( void ) {
-	int size = static_cast<int>( _model->size() );
+	M_PROLOG
+	int size( static_cast<int>( _model->size() ) );
 	if ( size >= _heightRaw ) {
 		if ( _cursorPosition == ( _heightRaw - 1 ) ) {
 			if ( _widgetOffset < ( size - _heightRaw ) ) {
@@ -414,27 +419,29 @@ void HListWidget::handle_key_page_down( void ) {
 					_firstVisibleRow = _model->rbegin();
 					decrement( _firstVisibleRow, _heightRaw - 1 );
 				}
-			} else
+			} else {
 				HConsole::get_instance().bell();
+			}
 		} else {
 			_cursorPosition = _heightRaw - 1;
 			_cursor = _firstVisibleRow;
 			increment( _cursor, _heightRaw - 1 );
-			update_children();
 		}
 	} else {
 		if ( _cursorPosition != ( size - 1 ) ) {
 			_cursorPosition = size - 1;
 			_cursor = _model->rbegin();
-			update_children();
-		} else
+		} else {
 			HConsole::get_instance().bell();
+		}
 	}
 	return;
+	M_EPILOG
 }
 
 void HListWidget::move_cursor_up( void ) {
 	M_PROLOG
+	M_ASSERT( get_cursor_position() != 0 );
 	if ( _cursorPosition > 0 ) {
 		-- _cursorPosition;
 		-- _cursor;
@@ -448,22 +455,28 @@ void HListWidget::move_cursor_up( void ) {
 }
 
 void HListWidget::handle_key_up( void ) {
-	if ( ( _widgetOffset + _cursorPosition ) > 0 ) {
+	M_PROLOG
+	if ( get_cursor_position() > 0 ) {
 		move_cursor_up();
-		update_children();
-	} else
+	} else {
 		HConsole::get_instance().bell();
+	}
 	return;
+	M_EPILOG
 }
 
 void HListWidget::handle_key_home( void ) {
-	reset();
+	M_PROLOG
+	if ( get_cursor_position() > 0 ) {
+		reset();
+	}
 	return;
+	M_EPILOG
 }
 
 void HListWidget::handle_key_end( void ) {
 	M_PROLOG
-	int size = static_cast<int>( _model->size() );
+	int size( static_cast<int>( _model->size() ) );
 	_cursor = _model->rbegin();
 	if ( size >= _heightRaw ) {
 		_cursorPosition = _heightRaw - 1;
@@ -473,7 +486,6 @@ void HListWidget::handle_key_end( void ) {
 	} else {
 		_cursorPosition = size - 1;
 	}
-	update_children();
 	return;
 	M_EPILOG
 }
@@ -493,9 +505,8 @@ void HListWidget::move_cursor_down( void ) {
 
 void HListWidget::handle_key_down( void ) {
 	M_PROLOG
-	if ( ( _cursorPosition + _widgetOffset ) < ( _model->size() - 1 ) ) {
+	if ( get_cursor_position() < ( _model->size() - 1 ) ) {
 		move_cursor_down();
-		update_children();
 	} else {
 		HConsole::get_instance().bell();
 	}
@@ -542,10 +553,18 @@ void HListWidget::handle_key_tab( void ) {
 	return;
 }
 
+void HListWidget::selection_change( void ) {
+	M_PROLOG
+	update_children();
+	_eventDispatcher( HWidgetEvent( this ) );
+	return;
+	M_EPILOG
+}
+
 int HListWidget::do_process_input( int code_ ) {
 	M_PROLOG
-	int ctr = 0;
-	int errorCode = 0;
+	int errorCode( 0 );
+	int origCursorPosition( get_cursor_position() );
 	code_ = HWidget::do_process_input( code_ );
 	_varTmpBuffer = "";
 	switch ( code_ ) {
@@ -563,16 +582,20 @@ int HListWidget::do_process_input( int code_ ) {
  * its focus and be refreshed and parent window must give focus
  * to another widget */
 		default : {
-			errorCode = static_cast<int>( _header.size() );
-			for ( ctr = 0; ctr < errorCode; ctr ++ )
-				if ( tolower( code_ ) == tolower( _header[ ctr ]._shortcut ) )
+			int columns( static_cast<int>( _header.size() ) );
+			int selectedolumn( 0 );
+			for ( ; selectedolumn < columns; ++ selectedolumn ) {
+				if ( tolower( code_ ) == tolower( _header[ selectedolumn ]._shortcut ) ) {
 					break;
-			if ( ctr < errorCode ) {
+				}
+			}
+			if ( selectedolumn < columns ) {
 				errorCode = 0;
-				sort_by_column( ctr,
+				sort_by_column( selectedolumn,
 						code_ == tolower( code_ ) ? OSortHelper::ASCENDING : OSortHelper::DESCENDING );
-			} else
+			} else {
 				errorCode = code_;
+			}
 		}
 		break;
 	}
@@ -580,6 +603,9 @@ int HListWidget::do_process_input( int code_ ) {
 	if ( ! errorCode ) {
 		schedule_repaint();
 		_window->status_bar()->message( COLORS::FG_LIGHTGRAY, "%s", _varTmpBuffer.raw() );
+	}
+	if ( get_cursor_position() != origCursorPosition ) {
+		selection_change();
 	}
 	return ( code_ );
 	M_EPILOG
@@ -667,6 +693,7 @@ bool HListWidget::do_click( mouse::OMouse& mouse_ ) {
 	M_PROLOG
 	int row( 0 );
 	int columns( static_cast<int>( _header.size() ) );
+	int origCursorPosition( get_cursor_position() );
 	HColumnInfo* columnInfo = NULL;
 	bool handled( HWidget::do_click( mouse_ ) );
 	if ( ! handled ) {
@@ -703,11 +730,13 @@ bool HListWidget::do_click( mouse::OMouse& mouse_ ) {
 					}
 				}
 				_cursorPosition = row;
-				update_children();
 			}
 			schedule_repaint();
 			handled = true;
 		}
+	}
+	if ( get_cursor_position() != origCursorPosition ) {
+		selection_change();
 	}
 	return ( handled );
 	M_EPILOG
@@ -722,7 +751,6 @@ void HListWidget::scroll_up( void ) {
 			++ _cursorPosition;
 		} else {
 			-- _cursor;
-			update_children();
 		}
 	}
 	return;
@@ -738,7 +766,6 @@ void HListWidget::scroll_down( void ) {
 			-- _cursorPosition;
 		} else {
 			++ _cursor;
-			update_children();
 		}
 	}
 	return;
@@ -753,35 +780,40 @@ void HListWidget::reset( void ) {
 	M_PROLOG
 	_firstVisibleRow = _cursor = _model->begin();
 	_widgetOffset = _cursorPosition = 0;
-	update_children();
+	selection_change();
 	return;
 	M_EPILOG
 }
 
 void HListWidget::go_to_match( void ) {
 	M_PROLOG
-	int ctr = 0, ctrLoc = 0, moveFirstRow = 0;
-	int size = static_cast<int>( _model->size() );
-	int count = size + 1;
-	int columns = static_cast<int>( _header.size() );
-	int widgetOffsetOrig = _widgetOffset, cursorPositionOrig = _cursorPosition;
-	char const * highlightStart = NULL;
-	char const * outcome = NULL;
+	int moveFirstRow = 0;
+	int size( static_cast<int>( _model->size() ) );
+	int count( size + 1 );
+	int columns( static_cast<int>( _header.size() ) );
+	int widgetOffsetOrig( _widgetOffset );
+	int cursorPositionOrig( _cursorPosition );
+	char const* highlightStart( NULL );
+	char const* outcome( NULL );
 	iterator_t cursorOrig = _cursor;
 	iterator_t firstVisibleRowOrig = _firstVisibleRow;
-	if ( ! _searchActived )
+	if ( ! _searchActived ) {
 		return;
-	if ( _match._currentMatch != _cursor )
+	}
+	if ( _match._currentMatch != _cursor ) {
 		_match._matchNumber = -1;
+	}
 	_match._currentMatch = _cursor;
+	int columnWithMatch( 0 );
+	int matchNumber( 0 );
 	while ( count -- ) {
-		for ( ctr = _match._columnWithMatch; ctr < columns; ctr ++ ) {
-			get_text_for_cell( _cursor, ctr, TYPE::HSTRING );
+		for ( columnWithMatch = _match._columnWithMatch; columnWithMatch < columns; ++ columnWithMatch ) {
+			get_text_for_cell( _cursor, columnWithMatch, TYPE::HSTRING );
 			highlightStart = NULL;
-			ctrLoc = 0;
+			matchNumber = 0;
 			for ( HPattern::HMatchIterator it = _pattern.find( _varTmpBuffer.raw() ),
-					end = _pattern.end(); it != end; ++ it, ++ ctrLoc ) {
-				if ( ctrLoc > _match._matchNumber ) {
+					end = _pattern.end(); it != end; ++ it, ++ matchNumber ) {
+				if ( matchNumber > _match._matchNumber ) {
 					highlightStart = it->raw();
 					break;
 				}
@@ -794,12 +826,12 @@ void HListWidget::go_to_match( void ) {
 			break;
 		_match._columnWithMatch = 0;
 /* this part is from process_input, but slightly modified */
-		if ( ( _cursorPosition + _widgetOffset ) < ( size - 1 ) ) {
-			_cursorPosition ++;
+		if ( get_cursor_position() < ( size - 1 ) ) {
+			++ _cursorPosition;
 			if ( _cursorPosition >= _heightRaw ) {
 				_cursorPosition = _heightRaw - 1;
-				_widgetOffset ++;
-				moveFirstRow ++;
+				++ _widgetOffset;
+				++ moveFirstRow;
 			}
 			++ _cursor;
 		} else {
@@ -811,10 +843,11 @@ void HListWidget::go_to_match( void ) {
 /* end od it */
 	}
 	if ( highlightStart ) {
-		if ( moveFirstRow )
+		if ( moveFirstRow ) {
 			increment( _firstVisibleRow, moveFirstRow );
-		_match._columnWithMatch = ctr;
-		_match._matchNumber = ctrLoc;
+		}
+		_match._columnWithMatch = columnWithMatch;
+		_match._matchNumber = matchNumber;
 		_match._currentMatch = _cursor;
 		_varTmpBuffer = "";
 	} else {
@@ -829,7 +862,6 @@ void HListWidget::go_to_match( void ) {
 	if ( outcome ) {
 		_varTmpBuffer = outcome;
 	}
-	update_children();
 	return;
 	M_EPILOG
 }
@@ -840,9 +872,10 @@ void HListWidget::go_to_match_previous( void ) {
 	int size = static_cast<int>( _model->size() );
 	int count = size + 1;
 	int columns = static_cast<int>( _header.size() );
-	int widgetOffsetOrig = _widgetOffset, cursorPositionOrig = _cursorPosition;
-	char const * highlightStart = NULL;
-	char const * outcome = NULL;
+	int widgetOffsetOrig( _widgetOffset );
+	int cursorPositionOrig( _cursorPosition );
+	char const* highlightStart( NULL );
+	char const* outcome( NULL );
 	iterator_t cursorOrig = _cursor;
 	iterator_t firstVisibleRowOrig = _firstVisibleRow;
 	if ( ! _searchActived )
@@ -876,12 +909,12 @@ void HListWidget::go_to_match_previous( void ) {
 			break;
 		_match._columnWithMatch = columns - 1;
 /* this part is from process_input, but slightly modified */
-		if ( ( _widgetOffset + _cursorPosition ) > 0 ) {
-			if ( _cursorPosition > 0 )
-				_cursorPosition --;
-			else if ( _widgetOffset > 0 ) {
-				_widgetOffset --;
-				moveFirstRow ++;
+		if ( get_cursor_position() > 0 ) {
+			if ( _cursorPosition > 0 ) {
+				-- _cursorPosition;
+			} else if ( _widgetOffset > 0 ) {
+				-- _widgetOffset;
+				++ moveFirstRow;
 			}
 			cyclic_decrement( _model, _cursor, 1 );
 		} else {
@@ -920,7 +953,6 @@ void HListWidget::go_to_match_previous( void ) {
 	if ( outcome ) {
 		_varTmpBuffer = outcome;
 	}
-	update_children();
 	return;
 	M_EPILOG
 }
@@ -992,7 +1024,7 @@ void HListWidget::remove_current_row( void ) {
 	}
 	_model->erase( it );
 	schedule_repaint();
-	update_children();
+	selection_change();
 	return;
 	M_EPILOG
 }
@@ -1003,7 +1035,7 @@ void HListWidget::do_update( void ) {
 		_widgetOffset = _cursorPosition = 0;
 		_firstVisibleRow = _model->begin();
 		_cursor = _model->begin();
-		update_children();
+		selection_change();
 	}
 	return;
 	M_EPILOG
