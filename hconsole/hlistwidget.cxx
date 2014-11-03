@@ -239,6 +239,7 @@ void HListWidget::draw_background( int from_ ) {
 	M_PROLOG
 	int ctr = from_;
 	set_attr_data();
+	_varTmpBuffer.reserve( _widthRaw );
 	_varTmpBuffer.fillz( '.', 0, _widthRaw );
 	for ( ; ctr < _heightRaw; ctr ++ )
 		HConsole::get_instance().mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.raw() );
@@ -274,10 +275,12 @@ void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnO
 	int len( static_cast<int>( _varTmpBuffer.get_length() ) );
 	switch ( columnInfo_->_align ) {
 		case ( BITS::ALIGN::LEFT ): {
-			if ( len < columnInfo_->_widthRaw )
+			if ( len < columnInfo_->_widthRaw ) {
+				_varTmpBuffer.reserve( columnInfo_->_widthRaw );
 				_varTmpBuffer.fillz( '_', len, columnInfo_->_widthRaw - len );
-			else if ( len > columnInfo_->_widthRaw )
+			} else if ( len > columnInfo_->_widthRaw ) {
 				_varTmpBuffer.set_at( columnInfo_->_widthRaw, 0 );
+			}
 		}
 		break;
 		case ( BITS::ALIGN::CENTER ): {
@@ -287,6 +290,7 @@ void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnO
 			else if ( len < columnInfo_->_widthRaw ) {
 				_varTmpBuffer.insert( 0, ( columnInfo_->_widthRaw - len ) / 2, '_' );
 				len = static_cast<int>( _varTmpBuffer.get_length() );
+				_varTmpBuffer.reserve( columnInfo_->_widthRaw );
 				_varTmpBuffer.fillz( '_', len, columnInfo_->_widthRaw - len );
 			}
 		}
@@ -566,7 +570,7 @@ int HListWidget::do_process_input( int code_ ) {
 	int errorCode( 0 );
 	int origCursorPosition( get_cursor_position() );
 	code_ = HWidget::do_process_input( code_ );
-	_varTmpBuffer = "";
+	_varTmpBuffer.clear();
 	switch ( code_ ) {
 		case ( KEY_CODES::PAGE_UP ):   handle_key_page_up();   break;
 		case ( KEY_CODES::PAGE_DOWN ): handle_key_page_down(); break;
@@ -849,7 +853,7 @@ void HListWidget::go_to_match( void ) {
 		_match._columnWithMatch = columnWithMatch;
 		_match._matchNumber = matchNumber;
 		_match._currentMatch = _cursor;
-		_varTmpBuffer = "";
+		_varTmpBuffer.clear();
 	} else {
 		_cursor = cursorOrig;
 		_firstVisibleRow = firstVisibleRowOrig;
@@ -940,7 +944,7 @@ void HListWidget::go_to_match_previous( void ) {
 		_match._columnWithMatch = ctr;
 		_match._matchNumber = ctrLoc;
 		_match._currentMatch = _cursor;
-		_varTmpBuffer = "";
+		_varTmpBuffer.clear();
 	} else {
 		_cursor = cursorOrig;
 		_firstVisibleRow = firstVisibleRowOrig;

@@ -249,7 +249,7 @@ void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 			_string.insert( length - 6, 4, "done" );
 		}
 		cons.mvprintf( _rowRaw, _columnRaw, _string.raw() );
-		_string = "";
+		_string.clear();
 		_lastProgress = nextStep;
 		_lastPercent = nextPercent;
 		_lastMinute = nextMinute;

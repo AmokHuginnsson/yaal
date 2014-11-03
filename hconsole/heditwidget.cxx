@@ -115,14 +115,16 @@ void HEditWidget::do_paint( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	draw_label();
-	_varTmpBuffer.reserve( _widthRaw );
-	if ( ! _password )
+	if ( ! _password ) {
 		_varTmpBuffer = _string.mid( _widgetOffset, _widthRaw );
-	else
+	} else {
 		_varTmpBuffer.clear();
+	}
 	int long len = _varTmpBuffer.get_length();
-	if ( len < _widthRaw )
+	if ( len < _widthRaw ) {
+		_varTmpBuffer.reserve( _widthRaw );
 		_varTmpBuffer.fill( ' ', len, _widthRaw - len );
+	}
 	cons.mvprintf( _rowRaw, _columnRaw, _varTmpBuffer.raw() );
 	if ( _focused ) {
 		cons.move( _rowRaw, _columnRaw + ( _password ? 0 : _cursorPosition ) );
