@@ -162,7 +162,7 @@ double long HInfoMultiVal::do_get_real( void ) const {
 		} else if ( _type & TYPE::HTIME ) {
 			val = _time.raw();
 		} else {
-			M_ASSERT( ! _real && ( _type == TYPE::UNKNOWN ) );
+			M_ASSERT( ( _real == 0. ) && ( _type == TYPE::UNKNOWN ) );
 		}
 	}
 	return ( val );
