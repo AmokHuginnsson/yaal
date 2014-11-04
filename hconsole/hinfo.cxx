@@ -135,18 +135,53 @@ void HInfoMultiVal::swap( HInfoMultiVal& info_ ) {
 
 int long long HInfoMultiVal::do_get_integer( void ) const {
 	M_PROLOG
-	return ( _integer );
+	int long long val( _integer );
+	if ( ! ( _type & TYPE::INT_LONG_LONG ) ) {
+		if ( _type & TYPE::DOUBLE_LONG ) {
+			val = static_cast<int long long>( _real );
+		} else if ( _type & TYPE::HSTRING ) {
+			val = lexical_cast<int long long>( _string );
+		} else if ( _type & TYPE::HTIME ) {
+			val = _time.raw();
+		} else {
+			M_ASSERT( ! _integer && ( _type == TYPE::UNKNOWN ) );
+		}
+	}
+	return ( val );
 	M_EPILOG
 }
 
 double long HInfoMultiVal::do_get_real( void ) const {
 	M_PROLOG
-	return ( _real );
+	double long val( _real );
+	if ( ! ( _type & TYPE::DOUBLE_LONG ) ) {
+		if ( _type & TYPE::INT_LONG_LONG ) {
+			val = _integer;
+		} else if ( _type & TYPE::HSTRING ) {
+			val = lexical_cast<double long>( _string );
+		} else if ( _type & TYPE::HTIME ) {
+			val = _time.raw();
+		} else {
+			M_ASSERT( ! _real && ( _type == TYPE::UNKNOWN ) );
+		}
+	}
+	return ( val );
 	M_EPILOG
 }
 
 HString const& HInfoMultiVal::do_get_string( void ) const {
 	M_PROLOG
+	if ( ! ( _type & TYPE::HSTRING ) ) {
+		if ( _type & TYPE::DOUBLE_LONG ) {
+			_string = _real;
+		} else if ( _type & TYPE::INT_LONG_LONG ) {
+			_string = _integer;
+		} else if ( _type & TYPE::HTIME ) {
+			_string = _time.string();
+		} else {
+			M_ASSERT( _string.is_empty() && ( _type == TYPE::UNKNOWN ) );
+		}
+	}
 	return ( _string );
 	M_EPILOG
 }

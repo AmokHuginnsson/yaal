@@ -81,11 +81,11 @@ protected:
 
 class HInfoMultiVal : public HInfo {
 private:
-	u64_t   _type;
-	int long    _integer;
+	u64_t _type;
+	int long _integer;
 	double long _real;
-	yaal::hcore::HString _string;
-	yaal::hcore::HTime   _time;
+	mutable yaal::hcore::HString _string;
+	mutable yaal::hcore::HTime _time;
 public:
 	typedef HInfoMultiVal this_type;
 	typedef HInfo base_type;
