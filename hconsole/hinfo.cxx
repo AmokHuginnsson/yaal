@@ -83,7 +83,7 @@ HInfoMultiVal::HInfoMultiVal( HTime const& time_ )
 }
 
 HInfoMultiVal::HInfoMultiVal( HInfoMultiVal const& info_ )
-	: HInfo(), _type( TYPE::UNKNOWN ),
+	: HInfo(), _type( info_._type ),
 	_integer( info_._integer ),
 	_real( info_._real ),
 	_string( info_._string ),
@@ -159,18 +159,26 @@ HTime const& HInfoMultiVal::do_get_time( void ) const {
 
 void HInfoMultiVal::do_set_integer( int long long data_ ) {
 	_integer = data_;
+	_type = _type | TYPE::INT_LONG_LONG;
+	return;
 }
 
 void HInfoMultiVal::do_set_real( double long data_ ) {
 	_real = data_;
+	_type |= TYPE::DOUBLE_LONG;
+	return;
 }
 
 void HInfoMultiVal::do_set_string( HString const& string_ ) {
 	_string = string_;
+	_type |= TYPE::HSTRING;
+	return;
 }
 
 void HInfoMultiVal::do_set_time( HTime const& time_ ) {
 	_time = time_;
+	_type |= TYPE::HTIME;
+	return;
 }
 
 }

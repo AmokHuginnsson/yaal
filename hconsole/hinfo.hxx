@@ -81,7 +81,7 @@ protected:
 
 class HInfoMultiVal : public HInfo {
 private:
-	type_id_t   _type;
+	u64_t   _type;
 	int long    _integer;
 	double long _real;
 	yaal::hcore::HString _string;
@@ -113,7 +113,7 @@ private:
 
 class HInfoVariant : public HInfo {
 private:
-	type_id_t		_type;
+	type_id_t _type;
 	typedef yaal::hcore::HVariant<int long long, double long, yaal::hcore::HString, yaal::hcore::HTime> data_t;
 	data_t _data;
 public:
