@@ -214,6 +214,27 @@ HRecordSet::value_t HRecordSet::HIterator::operator[] ( int field_ ) const {
 	M_EPILOG
 }
 
+HRecordSet::values_t HRecordSet::HIterator::operator* ( void ) const {
+	M_PROLOG
+	HRecordSet::values_t values;
+	int fieldCount( _owner->get_field_count() );
+	if ( fieldCount > 0 ) {
+		values.reserve( _owner->get_field_count() );
+		for ( int i( 0 ); i < fieldCount; ++ i ) {
+			char const* valRaw( ( _owner->_cursor == HRecordSet::CURSOR::RANDOM_ACCESS )
+					? (_owner->_connector->rs_get)( _owner->_result, _cursorPosition, i )
+					: (_owner->_connector->rs_get_field)( _owner->_result, i ) );
+			if ( valRaw ) {
+				values.emplace_back( valRaw );
+			} else {
+				values.emplace_back();
+			}
+		}
+	}
+	return ( values );
+	M_EPILOG
+}
+
 }
 
 }

@@ -94,6 +94,7 @@ public:
 	HIterator operator -- ( int );
 	bool operator == ( HIterator const& ) const;
 	bool operator != ( HIterator const& ) const;
+	HRecordSet::values_t operator* ( void ) const;
 	HRecordSet::value_t operator[] ( int ) const;
 private:
 	HIterator( HRecordSet*, int long );
