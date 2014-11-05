@@ -69,58 +69,58 @@ struct KEY_CODES {
  */
 struct GLYPHS {
 	struct ARROW {
-		static int const DOWN;
-		static int const UP;
-		static int const LEFT;
-		static int const RIGHT;
-		static int const HORIZONTAL;
-		static int const VERTICAL;
+		static int DOWN;
+		static int UP;
+		static int LEFT;
+		static int RIGHT;
+		static int HORIZONTAL;
+		static int VERTICAL;
 	};
 	struct CHECKER {
-		static int const SPARSE;
-		static int const MEDIUM;
-		static int const DENSE;
+		static int SPARSE;
+		static int MEDIUM;
+		static int DENSE;
 	};
 	struct LINE {
 		struct SINGLE {
-			static int const VERTICAL;
-			static int const HORIZONTAL;
-			static int const BOTTOM_LEFT;
-			static int const BOTTOM_RIGHT;
-			static int const TOP_LEFT;
-			static int const TOP_RIGHT;
-			static int const VERTICAL_LEFT;
-			static int const VERTICAL_RIGHT;
-			static int const HORIZONTAL_TOP;
-			static int const HORIZONTAL_BOTTOM;
-			static int const CROSS;
+			static int VERTICAL;
+			static int HORIZONTAL;
+			static int BOTTOM_LEFT;
+			static int BOTTOM_RIGHT;
+			static int TOP_LEFT;
+			static int TOP_RIGHT;
+			static int VERTICAL_LEFT;
+			static int VERTICAL_RIGHT;
+			static int HORIZONTAL_TOP;
+			static int HORIZONTAL_BOTTOM;
+			static int CROSS;
 		};
 		struct DOUBLE {
-			static int const VERTICAL;
-			static int const HORIZONTAL;
-			static int const BOTTOM_LEFT;
-			static int const BOTTOM_RIGHT;
-			static int const TOP_LEFT;
-			static int const TOP_RIGHT;
-			static int const VERTICAL_LEFT;
-			static int const VERTICAL_RIGHT;
-			static int const HORIZONTAL_TOP;
-			static int const HORIZONTAL_BOTTOM;
-			static int const CROSS;
+			static int VERTICAL;
+			static int HORIZONTAL;
+			static int BOTTOM_LEFT;
+			static int BOTTOM_RIGHT;
+			static int TOP_LEFT;
+			static int TOP_RIGHT;
+			static int VERTICAL_LEFT;
+			static int VERTICAL_RIGHT;
+			static int HORIZONTAL_TOP;
+			static int HORIZONTAL_BOTTOM;
+			static int CROSS;
 		};
 	};
 	struct MATH {
-		static int const NOT_EQUAL;
-		static int const LESS_EQUAL;
-		static int const GREATER_EQUAL;
-		static int const APPROXIMATELY;
-		static int const SQUARE_ROOT;
-		static int const PI;
-		static int const INFINITY;
+		static int NOT_EQUAL;
+		static int LESS_EQUAL;
+		static int GREATER_EQUAL;
+		static int APPROXIMATELY;
+		static int SQUARE_ROOT;
+		static int PI;
+		static int INFINITY;
 	};
 	struct FACE {
-		static int const WHITE;
-		static int const BLACK;
+		static int WHITE;
+		static int BLACK;
 	};
 };
 
