@@ -96,7 +96,6 @@ void HComboboxWidget::do_paint( void ) {
 		set_attr_label();
 		cons.addch( GLYPHS::ARROW::DOWN );
 		cons.move( _rowRaw, _columnRaw + HEditWidget::_cursorPosition );
-		_heightRaw = 0;
 	} else {
 		int height( _height );
 		width = _width;
@@ -109,6 +108,14 @@ void HComboboxWidget::do_paint( void ) {
 		_height = height;
 		_width = width;
 	}
+	return;
+	M_EPILOG
+}
+
+void HComboboxWidget::do_update( void ) {
+	M_PROLOG
+	HListWidget::do_update();
+	save_selection();
 	return;
 	M_EPILOG
 }
@@ -141,6 +148,33 @@ int HComboboxWidget::do_process_input( int code_ ) {
 		}
 	}
 	return ( code );
+	M_EPILOG
+}
+
+bool HComboboxWidget::do_hit_test( int row_, int col_ ) const {
+	M_PROLOG
+	bool hit( false );
+	if ( _mode == MODE::EDITCONTROL ) {
+		/*
+		 * We try to reuse as much of HWidget::do_hit_test() as possible.
+		 * We virtually move mouse cursor to the very bottom of expanded
+		 * combobox.
+		 *
+		 * HListWidget in HComboboxWidget does not draw column headers
+		 * so we need to compensate for that too.
+		 *
+		 * _heightRaw is compensated for disabled column headers in HListWidget::do_paint(),
+		 * but for MODE::EDITCONTROL we do not call it, so _heightRaw calculated in draw_label()
+		 * is 1 too big here.
+		 */
+		hit = HEditWidget::do_hit_test( row_ + _heightRaw - 1, col_ );
+		if ( row_ != _rowRaw ) {
+			hit = false;
+		}
+	} else {
+		hit = HListWidget::do_hit_test( row_, col_ );
+	}
+	return ( hit );
 	M_EPILOG
 }
 

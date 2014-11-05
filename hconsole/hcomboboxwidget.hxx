@@ -92,8 +92,10 @@ public:
 protected:
 	void save_selection( void );
 	void restore_selection( void );
+	virtual void do_update( void );
 	virtual int do_process_input( int );
 	virtual void do_paint( void );
+	virtual bool do_hit_test( int, int ) const;
 	virtual bool do_click( mouse::OMouse& );
 	virtual void do_kill_focus( void ); /* this one will be used here */
 	virtual HInfo const& do_get_data( void ) const;

@@ -75,8 +75,8 @@ class HAbstractCell {
 public:
 	typedef yaal::hcore::HPointer<HAbstractCell> ptr_t;
 	virtual ~HAbstractCell( void );
-	virtual yaal::hcore::HString get_long( void ) const = 0;
-	virtual yaal::hcore::HString get_double( void ) const = 0;
+	virtual int long long get_integer( void ) const = 0;
+	virtual double long get_real( void ) const = 0;
 	virtual yaal::hcore::HString get_string( void ) const = 0;
 	virtual yaal::hcore::HString get_time( void ) const = 0;
 	virtual void set_child_widget_data( HWidget* ) = 0;
@@ -98,8 +98,8 @@ public:
 	virtual ~HCell( void ) {
 		return;
 	}
-	virtual yaal::hcore::HString get_long( void ) const;
-	virtual yaal::hcore::HString get_double( void ) const;
+	virtual int long long get_integer( void ) const;
+	virtual double long get_real( void ) const;
 	virtual yaal::hcore::HString get_string( void ) const;
 	virtual yaal::hcore::HString get_time( void ) const;
 	virtual void set_child_widget_data( HWidget* );
@@ -414,6 +414,7 @@ public:
 	void set_flags( flag_t, flag_t );
 	void reset( void );
 	list_widget_helper::HAbstractListModel::ptr_t& get_model( void );
+	list_widget_helper::HAbstractRow& get_current_row( void );
 	void remove_current_row();
 	int long get_row_count( void );
 	type_id_t get_column_type( int );

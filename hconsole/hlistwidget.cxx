@@ -141,16 +141,19 @@ void HListWidget::do_paint( void ) {
 		cons.curs_set( CURSOR::INVISIBLE );
 	draw_label(); /* raw* set here */
 	_rowRaw += hR;
-	if ( ! _sumForOne )
+	if ( ! _sumForOne ) {
 		return;
-	if ( _widthRaw != tmp )
+	}
+	if ( _widthRaw != tmp ) {
 		recalculate_column_widths();
+	}
 /*
  * we need to decrement _heightRaw because we have additional row,
  * the list widget header
  */
-	if ( _drawHeader )
-		_heightRaw --;
+	if ( _drawHeader ) {
+		-- _heightRaw;
+	}
 	_varTmpBuffer.reserve( _widthRaw );
 	int ctr( 0 );
 	if ( size > 0 ) {
@@ -176,8 +179,9 @@ void HListWidget::do_paint( void ) {
 	cons.set_attr( ! _enabled ?
 			( ! _focused ? _attributeFocused._data : _attributeEnabled._data )
 			: _attributeDisabled._data );
-	if ( size > _heightRaw )
+	if ( size > _heightRaw ) {
 		draw_scroll( _columnRaw + columnOffset - 1 );
+	}
 	_rowRaw -= hR;
 	return;
 	M_EPILOG
@@ -241,8 +245,9 @@ void HListWidget::draw_background( int from_ ) {
 	set_attr_data();
 	_varTmpBuffer.reserve( _widthRaw );
 	_varTmpBuffer.fillz( '.', 0, _widthRaw );
-	for ( ; ctr < _heightRaw; ctr ++ )
+	for ( ; ctr < _heightRaw; ctr ++ ) {
 		HConsole::get_instance().mvprintf( _rowRaw + ctr, _columnRaw, _varTmpBuffer.raw() );
+	}
 	return;
 	M_EPILOG
 }
@@ -372,15 +377,17 @@ void HListWidget::set_cursor_position( int index_ ) {
 	M_PROLOG
 	M_ENSURE( ( index_ >= 0 ) && ( index_ < _model->size() ) );
 	int currentCursorPosition( get_cursor_position() );
+	M_ENSURE( ( currentCursorPosition >= 0 ) && ( currentCursorPosition < _model->size() ) );
 	if ( index_ > currentCursorPosition ) {
 		for ( int i( 0 ), count( index_ - currentCursorPosition ); i < count; ++ i ) {
-			move_cursor_up();
+			move_cursor_down();
 		}
 	} else if ( index_ < currentCursorPosition ) {
 		for ( int i( 0 ), count( currentCursorPosition - index_ ); i < count; ++ i ) {
-			move_cursor_down();
+			move_cursor_up();
 		}
 	}
+	M_ASSERT( get_cursor_position() == index_ );
 	return;
 	M_EPILOG
 }
@@ -981,10 +988,10 @@ bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, type_id_t typ
 	HAbstractRow& item = *it_;
 	switch ( type_.value() ) {
 		case ( TYPE::INT_LONG ):
-			_varTmpBuffer = item[ column_ ].get_long();
+			_varTmpBuffer = item[ column_ ].get_integer();
 		break;
 		case ( TYPE::DOUBLE ):
-			_varTmpBuffer = item[ column_ ].get_double();
+			_varTmpBuffer = item[ column_ ].get_real();
 		break;
 		case ( TYPE::HSTRING ):
 			_varTmpBuffer = item[ column_ ].get_string();
@@ -1006,6 +1013,12 @@ list_widget_helper::HAbstractListModel::ptr_t& HListWidget::get_model( void ) {
 
 int long HListWidget::get_row_count( void ) {
 	return ( _model->size() );
+}
+
+list_widget_helper::HAbstractRow& HListWidget::get_current_row( void ) {
+	M_PROLOG
+	return ( *_cursor );
+	M_EPILOG
 }
 
 void HListWidget::remove_current_row( void ) {
@@ -1130,16 +1143,16 @@ void HAbstractListModel::add_tail( void ) {
 }
 
 template<>
-yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_long( void ) const {
+int long long HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_integer( void ) const {
 	M_PROLOG
-	return ( HString ( (*_data)[ _column ].get_integer() ) );
+	return ( (*_data)[ _column ].get_integer() );
 	M_EPILOG
 }
 
 template<>
-yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_double( void ) const {
+double long HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_real( void ) const {
 	M_PROLOG
-	return ( HString ( (*_data)[ _column ].get_real() ) );
+	return ( (*_data)[ _column ].get_real() );
 	M_EPILOG
 }
 

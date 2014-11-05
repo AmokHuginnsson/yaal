@@ -110,12 +110,12 @@ bool HRow<window_iterator_t>::get_checked( void ) {
 }
 
 template<>
-yaal::hcore::HString HCell<window_iterator_t>::get_long( void ) const {
+int long long HCell<window_iterator_t>::get_integer( void ) const {
 	return ( 0 );
 }
 
 template<>
-yaal::hcore::HString HCell<window_iterator_t>::get_double( void ) const {
+double long HCell<window_iterator_t>::get_real( void ) const {
 	return ( 0 );
 }
 
