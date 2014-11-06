@@ -43,6 +43,11 @@ namespace hdata {
  */
 class HDataEditWidget : public HDataWidget, public virtual hconsole::HEditWidget {
 public:
+	typedef HDataEditWidget this_type;
+	typedef HEditWidget base_type;
+private:
+	hcore::HRegex _valid;
+public:
 	HDataEditWidget( HDataWindow*, /* parent */
 			int, /* top ( parent relative ) */
 			int, /* left */

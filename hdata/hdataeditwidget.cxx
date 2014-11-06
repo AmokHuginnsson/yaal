@@ -44,7 +44,7 @@ HDataEditWidget::HDataEditWidget( HDataWindow * parent_,
 		yaal::hcore::HString const& label_, HWidgetAttributesInterface const& attr_ )
 	:	HWidget ( parent_, row_, column_, height_, width_, label_, attr_ ),
 		HEditWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
-		HDataWidget() {
+		HDataWidget(), _valid() {
 	M_PROLOG
 	return;
 	M_EPILOG

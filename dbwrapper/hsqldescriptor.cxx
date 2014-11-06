@@ -43,21 +43,21 @@ char const _eMode_[] = "record set is not in appropriate mode for operation";
 HSQLDescriptor::HSQLDescriptor( void )
 	: _mode( MODE::SELECT ), _varTmpBuffer(), _SQL(), _table(),
 	_columns ( "*" ), _filter(), _sort(), _fields(), _fieldCount( 0 ),
-	_setSize( 0 ), _values(), _dataBase(), _mutated() {
+	_setSize( 0 ), _values(), _dataBase(), _query(), _mutated() {
 	return;
 }
 
 HSQLDescriptor::HSQLDescriptor( database_ptr_t dataBase_ )
 	: _mode( MODE::SELECT ), _varTmpBuffer(), _SQL(), _table(),
 	_columns ( "*" ), _filter(), _sort(), _fields(), _fieldCount( 0 ),
-	_setSize( 0 ), _values(), _dataBase( dataBase_ ), _mutated() {
+	_setSize( 0 ), _values(), _dataBase( dataBase_ ), _query(), _mutated() {
 	return;
 }
 
 HSQLDescriptor::~HSQLDescriptor( void ) {
 }
 
-HString const& HSQLDescriptor::build_sql( MODE::mode_t const& mode_ ) {
+void HSQLDescriptor::build_query( MODE::mode_t const& mode_ ) {
 	M_PROLOG
 	_varTmpBuffer = "";
 	switch ( mode_ ) {
@@ -69,6 +69,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& mode_ ) {
 			if ( ! _sort.is_empty() )
 				_SQL += ( " ORDER BY " + _sort );
 			_SQL += ';';
+			_query = _dataBase->prepare_query( _SQL );
 		}
 		break;
 		case ( MODE::UPDATE ): {
@@ -83,9 +84,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& mode_ ) {
 					hasField = true;
 					_SQL += _fields[ i ];
 					if ( _values[ i ] ) {
-						_SQL += " = '";
-						_SQL += *_values[ i ];
-						_SQL += "'";
+						_SQL += " = ?";
 					} else
 						_SQL += " = NULL";
 				}
@@ -95,6 +94,10 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& mode_ ) {
 				_SQL += _filter;
 			}
 			_SQL += ';';
+			_query = _dataBase->prepare_query( _SQL );
+			for ( int i = 0; i < size; ++ i ) {
+				_query->bind( i + 1, *_values[ i ] );
+			}
 		}
 		break;
 		case ( MODE::INSERT ): {
@@ -110,11 +113,13 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& mode_ ) {
 			for ( int i = 0; i < size; ++ i ) {
 				if ( i > 0 )
 					_SQL += ", ";
-				_SQL += "'";
-				_SQL += _fields[ i ];
-				_SQL += "'";
+				_SQL += "?";
 			}
 			_SQL += " );";
+			_query = _dataBase->prepare_query( _SQL );
+			for ( int i = 0; i < size; ++ i ) {
+				_query->bind( i + 1, *_values[ i ] );
+			}
 		}
 		break;
 		case ( MODE::DELETE ): {
@@ -125,6 +130,7 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& mode_ ) {
 				_SQL += _filter;
 			}
 			_SQL += ";";
+			_query = _dataBase->prepare_query( _SQL );
 		}
 		break;
 		default :
@@ -132,18 +138,18 @@ HString const& HSQLDescriptor::build_sql( MODE::mode_t const& mode_ ) {
 		break;
 	}
 	_mode = mode_;
-	return ( _SQL );
+	return;
 	M_EPILOG
 }
 
 HRecordSet::ptr_t HSQLDescriptor::execute( void ) {
 	M_PROLOG
-	HRecordSet::ptr_t rs = _dataBase->execute_query( _SQL );
+	HRecordSet::ptr_t rs = _query->execute();
 	_fieldCount = rs->get_field_count();
 	if ( _fields.get_size() != _fieldCount ) {
-		_fields = fields_t( _fieldCount );
-		_values = values_t( _fieldCount );
-		_mutated = mutated_t( _fieldCount );
+		_fields.resize( _fieldCount );
+		_values.resize( _fieldCount );
+		_mutated.resize( _fieldCount );
 	}
 	for ( int ctr = 0; ctr < _fieldCount; ++ ctr ) {
 		_fields[ ctr ] = rs->get_column_name( ctr );
@@ -156,7 +162,7 @@ HRecordSet::ptr_t HSQLDescriptor::execute( void ) {
 
 HRecordSet::ptr_t HSQLDescriptor::execute( MODE::mode_t const& mode_ ) {
 	M_PROLOG
-	build_sql( mode_ );
+	build_query( mode_ );
 	return ( execute() );
 	M_EPILOG
 }
@@ -164,6 +170,7 @@ HRecordSet::ptr_t HSQLDescriptor::execute( MODE::mode_t const& mode_ ) {
 HRecordSet::ptr_t HSQLDescriptor::execute( char const* const query_ ) {
 	M_PROLOG
 	_SQL = query_;
+	_query = _dataBase->prepare_query( _SQL );
 	return ( execute() );
 	M_EPILOG
 }

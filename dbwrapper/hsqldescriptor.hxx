@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_DBWRAPPER_HSQLDESCRIPTOR_HXX_INCLUDED 1
 
 #include "hcore/htime.hxx"
+#include "dbwrapper/hquery.hxx"
 #include "dbwrapper/hrecordset.hxx"
 
 namespace yaal {
@@ -71,6 +72,7 @@ private:
 	int long _setSize;		/* number of records returned by last query */
 	values_t _values;
 	database_ptr_t _dataBase;
+	dbwrapper::HQuery::ptr_t _query;
 	mutated_t _mutated;
 public:
 	HSQLDescriptor( void );
@@ -91,7 +93,7 @@ public:
 	void sync( int, yaal::hcore::HTime& );
 	void sync( HRecordSet::iterator const& );
 	HRecordSet::value_t& operator[]( int );
-	yaal::hcore::HString const& build_sql( MODE::mode_t const& );
+	void build_query( MODE::mode_t const& );
 	HRecordSet::ptr_t execute( MODE::mode_t const& );
 	HRecordSet::ptr_t execute( char const* const );
 	HRecordSet::ptr_t execute( void );

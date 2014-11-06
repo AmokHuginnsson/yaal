@@ -626,19 +626,20 @@ void HListWidget::add_column( int column_, yaal::hcore::HString const& name_,
 		int width_, BITS::ALIGN::align_t const& align_, type_id_t type_,
 		HWidget* widget_ ) {
 	M_PROLOG
-	int shortcutIndex = 0;
-	HColumnInfo columnInfo;
-	int size = static_cast<int>( _model->size() );
-	if ( size )
+	int size( static_cast<int>( _model->size() ) );
+	if ( size ) {
 		M_THROW( "cannot add new column when list not empty", size );
+	}
 	_varTmpBuffer = name_;
-	shortcutIndex = static_cast<int>( _varTmpBuffer.find( '&' ) );
-	if ( shortcutIndex > -1 ) {
+	int shortcutIndex( static_cast<int>( _varTmpBuffer.find( '&' ) ) );
+	if ( shortcutIndex != HString::npos ) {
 		_varTmpBuffer.set_at( shortcutIndex, 0 );
-		_varTmpBuffer += name_ + shortcutIndex + 1;
-	} else
+		_varTmpBuffer.append( name_, shortcutIndex + 1 );
+	} else {
 		shortcutIndex = 0;
+	}
 	_sumForOne += width_;
+	HColumnInfo columnInfo;
 	columnInfo._width = width_;
 	columnInfo._type = type_;
 	columnInfo._align = align_;

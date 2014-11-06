@@ -641,7 +641,7 @@ public:
 	 * \param length - a length of substring to get.
 	 * \return Self.
 	 */
-	HString& append( HString const&, int long idx_, int long len_ );
+	HString& append( HString const&, int long idx_, int long len_ = MAX_STRING_LENGTH );
 	HString& append( int long count_, char val_ );
 	/*! \brief Append new data from buffer to already existing data in this string.
 	 *
