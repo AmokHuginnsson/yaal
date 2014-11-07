@@ -78,9 +78,7 @@ HRecordSet::ptr_t HQuery::execute( void ) {
 	if ( (_connector->dbrs_errno)( _dataBase->_dbLink, result ) ) {
 		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dataBase->_dbLink, result ) );
 	}
-	HRecordSet::ptr_t rs( make_pointer<HRecordSet>( _dataBase, _connector, result, HRecordSet::CURSOR::FORWARD ) );
-	_query = NULL;
-	return ( rs );
+	return ( make_pointer<HRecordSet>( _dataBase, _connector, result, HRecordSet::CURSOR::FORWARD ) );
 	M_EPILOG
 }
 

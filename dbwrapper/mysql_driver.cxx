@@ -71,6 +71,7 @@ struct OMySQLResult {
 	typedef HArray<MYSQL_BIND> binds_t;
 	typedef HArray<OField> field_meta_t;
 	ODBLink& _link;
+	int _useCount;
 	MYSQL_STMT* _statement;
 	binds_t _params;
 	binds_t _results;
@@ -80,8 +81,11 @@ struct OMySQLResult {
 	MYSQL_ROW _row;
 	bool _randomAccess;
 	OMySQLResult( ODBLink& link_ )
-		: _link( link_ ), _statement( NULL ), _params(), _results(), _fields(), _buffer(), _result( NULL ),
-		_row(), _randomAccess( false ) {}
+		: _link( link_ ), _useCount( 1 ), _statement( NULL ), _params(),
+		_results(), _fields(), _buffer(), _result( NULL ),
+		_row(), _randomAccess( false ) {
+		return;
+	}
 private:
 	OMySQLResult( OMySQLResult const& );
 	OMySQLResult& operator = ( OMySQLResult const& );
@@ -160,8 +164,12 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 M_EXPORT_SYMBOL void rs_free_query_result( void* );
 M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 	OMySQLResult* pr( static_cast<OMySQLResult*>( data_ ) );
-	::mysql_free_result( pr->_result );
-	M_SAFE( delete pr );
+	M_ASSERT( pr->_useCount > 0 );
+	-- pr->_useCount;
+	if ( ! pr->_useCount ) {
+		::mysql_free_result( pr->_result );
+		M_SAFE( delete pr );
+	}
 	return;
 }
 
@@ -229,6 +237,7 @@ void* mysql_query_execute( ODBLink&, void* data_ ) {
 	}
 	mysql_stmt_bind_result( pq->_statement, pq->_results.data() );
 	mysql_stmt_execute( pq->_statement );
+	++ pq->_useCount;
 	return ( pq );
 }
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
@@ -238,13 +247,17 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
 
 void mysql_query_free( ODBLink&, void* data_ ) {
 	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
-	if ( pq->_result ) {
-		::mysql_free_result( pq->_result );
+	M_ASSERT( pq->_useCount > 0 );
+	-- pq->_useCount;
+	if ( ! pq->_useCount ) {
+		if ( pq->_result ) {
+			::mysql_free_result( pq->_result );
+		}
+		if ( pq->_statement ) {
+			::mysql_stmt_close( pq->_statement );
+		}
+		M_SAFE( delete pq );
 	}
-	if ( pq->_statement ) {
-		::mysql_stmt_close( pq->_statement );
-	}
-	M_SAFE( delete pq );
 	return;
 }
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );

@@ -69,6 +69,7 @@ struct OFirebirdResult {
 	typedef HPointer<HChunk> chunk_t;
 	typedef HArray<chunk_t> values_t;
 	ODBLink& _dbLink;
+	int _useCount;
 	isc_stmt_handle _stmt;
 	isc_tr_handle _tr;
 	HChunk _descIn;
@@ -79,7 +80,7 @@ struct OFirebirdResult {
 	HChunk _errorMessageBufer;
 	bool _ok;
 	OFirebirdResult( ODBLink& dbLink_ )
-		: _dbLink( dbLink_ ), _stmt( 0 ), _tr( 0 ),
+		: _dbLink( dbLink_ ), _useCount( 1 ), _stmt( 0 ), _tr( 0 ),
 		_descIn(), _descOut(), _cache(),
 		_values(), _status(),
 		_errorMessageBufer(), _ok( false )
@@ -346,10 +347,14 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
 	M_ASSERT( res );
-	isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
-	res->_stmt = 0;
-	M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
-	M_SAFE( delete res );
+	M_ASSERT( res->_useCount > 0 );
+	-- res->_useCount;
+	if ( ! res->_useCount ) {
+		isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+		res->_stmt = 0;
+		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+		M_SAFE( delete res );
+	}
 	return;
 }
 
@@ -379,6 +384,8 @@ M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int paramNo_, yaal::hcor
 
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
 M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
+	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
+	++ res->_useCount;
 	return ( firebird_query_execute( dbLink_, data_ ) );
 }
 
@@ -393,18 +400,22 @@ M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
 void firebird_rs_free_cursor( void* data_ ) {
 	OFirebirdResult* res( static_cast<OFirebirdResult*>( data_ ) );
 	M_ASSERT( res );
-	OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
-	isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
-	res->_stmt = 0;
-	M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
-	if ( res->_ok ) {
-		isc_commit_transaction( db->_status, &res->_tr );
-	} else {
-		isc_rollback_transaction( db->_status, &res->_tr );
+	M_ASSERT( res->_useCount > 0 );
+	-- res->_useCount;
+	if ( ! res->_useCount ) {
+		OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
+		isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+		res->_stmt = 0;
+		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+		if ( res->_ok ) {
+			isc_commit_transaction( db->_status, &res->_tr );
+		} else {
+			isc_rollback_transaction( db->_status, &res->_tr );
+		}
+		res->_tr = 0;
+		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
+		M_SAFE( delete res );
 	}
-	res->_tr = 0;
-	M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
-	M_SAFE( delete res );
 	return;
 }
 M_EXPORT_SYMBOL void rs_free_cursor( void* );

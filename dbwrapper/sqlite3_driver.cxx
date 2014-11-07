@@ -68,6 +68,7 @@ private:
 };
 
 struct OSQLiteResult {
+	int _useCount;
 	int _rows;
 	int _columns;
 	void* _data;
@@ -77,8 +78,11 @@ struct OSQLiteResult {
 	bool _stepped;
 	bool _last;
 	OSQLiteResult( void )
-		: _rows( 0 ), _columns( 0 ), _data( NULL ),
-		_errorCode( 0 ), _errorMessage(), _randomAccess( false ), _stepped( false ), _last( false ) {}
+		: _useCount( 1 ), _rows( 0 ), _columns( 0 ), _data( NULL ),
+		_errorCode( 0 ), _errorMessage(), _randomAccess( false ),
+		_stepped( false ), _last( false ) {
+		return;
+	}
 private:
 	OSQLiteResult( OSQLiteResult const& );
 	OSQLiteResult& operator = ( OSQLiteResult const& );
@@ -204,8 +208,12 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 void yaal_sqlite3_rs_free_query_result( void* data_ ) {
 	OSQLiteResult* pr = static_cast<OSQLiteResult*>( data_ );
 	M_ASSERT( pr->_randomAccess );
-	sqlite3_free_table( static_cast<char**>( pr->_data ) );
-	M_SAFE( delete pr );
+	M_ASSERT( pr->_useCount > 0 );
+	-- pr->_useCount;
+	if ( pr->_useCount ) {
+		sqlite3_free_table( static_cast<char**>( pr->_data ) );
+		M_SAFE( delete pr );
+	}
 	return;
 }
 M_EXPORT_SYMBOL void rs_free_query_result( void* );
@@ -253,6 +261,7 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* data_ ) {
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
+	++ result->_useCount;
 	result->_errorCode = sqlite3_reset( static_cast<sqlite3_stmt*>( result->_data ) );
 	result->_last = sqlite3_step( static_cast<sqlite3_stmt*>( result->_data ) ) == SQLITE_ROW;
 	result->_stepped = true;
@@ -267,8 +276,12 @@ M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
 
 void yaal_rs_free_cursor( void* data_ ) {
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
-	sqlite3_finalize( static_cast<sqlite3_stmt*>( result->_data ) );
-	M_SAFE( delete result );
+	M_ASSERT( result->_useCount > 0 );
+	-- result->_useCount;
+	if ( !result->_useCount ) {
+		sqlite3_finalize( static_cast<sqlite3_stmt*>( result->_data ) );
+		M_SAFE( delete result );
+	}
 	return;
 }
 M_EXPORT_SYMBOL void rs_free_cursor( void* );

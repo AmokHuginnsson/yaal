@@ -69,6 +69,7 @@ M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 1;
 struct OPostgreSQLResult {
 	typedef HArray<char const*> params_t;
 	ODBLink& _link;
+	int _useCount;
 	PGresult* _result;
 	HString _id;
 	HString _query;
@@ -77,8 +78,12 @@ struct OPostgreSQLResult {
 	bool _randomAccess;
 	params_t _params;
 	OPostgreSQLResult( ODBLink& link_ )
-		: _link( link_ ), _result( NULL ), _id( static_cast<void*>( this ) ),
-		_query(), _index( 0 ), _total( 0 ), _randomAccess( false ), _params() {}
+		: _link( link_ ), _useCount( 1 ), _result( NULL ),
+		_id( static_cast<void*>( this ) ),
+		_query(), _index( 0 ), _total( 0 ),
+		_randomAccess( false ), _params() {
+		return;
+	}
 private:
 	OPostgreSQLResult( OPostgreSQLResult const& );
 	OPostgreSQLResult& operator = ( OPostgreSQLResult const& );
@@ -141,8 +146,12 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* );
 M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
 	M_ASSERT( pr->_randomAccess );
-	PQclear( pr->_result );
-	M_SAFE( delete pr );
+	M_ASSERT( pr->_useCount > 0 );
+	-- pr->_useCount;
+	if ( ! pr->_useCount ) {
+		PQclear( pr->_result );
+		M_SAFE( delete pr );
+	}
 	return;
 }
 
@@ -191,6 +200,7 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
 		pr->_result = ::PQdescribePrepared( conn, pr->_id.c_str() );
 		::PQsendQueryPrepared( conn, pr->_id.c_str(), static_cast<int>( pr->_params.get_size() ), pr->_params.data(), NULL, NULL, 0 );
 		::PQclear( r );
+		++ pr->_useCount;
 	} else {
 		pr->_result = r;
 	}
@@ -201,8 +211,12 @@ M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
 	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
 	M_ASSERT( ! pr->_randomAccess );
-	::PQclear( pr->_result );
-	M_SAFE( delete pr );
+	M_ASSERT( pr->_useCount > 0 );
+	-- pr->_useCount;
+	if ( ! pr->_useCount ) {
+		::PQclear( pr->_result );
+		M_SAFE( delete pr );
+	}
 	return;
 }
 
@@ -210,8 +224,12 @@ M_EXPORT_SYMBOL void rs_free_cursor( void* );
 M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
 	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
 	M_ASSERT( ! pr->_randomAccess );
-	::PQclear( pr->_result );
-	M_SAFE( delete pr );
+	M_ASSERT( pr->_useCount > 0 );
+	-- pr->_useCount;
+	if ( ! pr->_useCount ) {
+		::PQclear( pr->_result );
+		M_SAFE( delete pr );
+	}
 	return;
 }
 

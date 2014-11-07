@@ -98,6 +98,7 @@ struct OQuery {
 	};
 	typedef HArray<OFieldInfo> field_infos_t;
 	typedef HList<sb2> in_null_ind_t;
+	int _useCount;
 	int* _status;
 	OCIError* _error;
 	OCIStmt* _statement;
@@ -107,7 +108,7 @@ struct OQuery {
 	HString _sql;
 	in_null_ind_t _inNullInd;
 	OQuery( int* status_ )
-		: _status( status_ ), _error( NULL ), _statement( NULL ),
+		: _useCount( 1 ), _status( status_ ), _error( NULL ), _statement( NULL ),
 		_fieldInfos(), _buffer(), _mode(), _sql(), _inNullInd()
 		{}
 private:
@@ -386,14 +387,18 @@ M_EXPORT_SYMBOL void* db_fetch_query_result( ODBLink& dbLink_, char const* query
 
 void oracle_free_query( void* data_ ) {
 	OQuery* query( static_cast<OQuery*>( data_ ) );
-	if ( ( ( *query->_status ) == OCI_SUCCESS )
-			|| ( ( *query->_status ) == OCI_SUCCESS_WITH_INFO ) )
-		( *query->_status ) = OCIStmtRelease( query->_statement,
-				query->_error, NULL, 0, OCI_DEFAULT );
-	else
-		OCIStmtRelease( query->_statement,
-				NULL, NULL, 0, OCI_DEFAULT );
-	delete query;
+	M_ASSERT( query->_useCount > 0 );
+	-- query->_useCount;
+	if ( ! query->_useCount ) {
+		if ( ( ( *query->_status ) == OCI_SUCCESS )
+				|| ( ( *query->_status ) == OCI_SUCCESS_WITH_INFO ) )
+			( *query->_status ) = OCIStmtRelease( query->_statement,
+					query->_error, NULL, 0, OCI_DEFAULT );
+		else
+			OCIStmtRelease( query->_statement,
+					NULL, NULL, 0, OCI_DEFAULT );
+		M_SAFE( delete query );
+	}
 	return;
 }
 M_EXPORT_SYMBOL void rs_free_query_result( void* );
@@ -426,6 +431,8 @@ M_EXPORT_SYMBOL void query_bind( ODBLink& dbLink_, void* data_, int attrNo_, yaa
 
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
 M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
+	OQuery* query( static_cast<OQuery*>( data_ ) );
+	++ query->_useCount;
 	return ( oracle_query_execute( dbLink_, data_ ) );
 }
 
