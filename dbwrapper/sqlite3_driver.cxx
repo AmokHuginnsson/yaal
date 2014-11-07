@@ -74,9 +74,11 @@ struct OSQLiteResult {
 	int _errorCode;
 	HString _errorMessage;
 	bool _randomAccess;
+	bool _stepped;
+	bool _last;
 	OSQLiteResult( void )
 		: _rows( 0 ), _columns( 0 ), _data( NULL ),
-		_errorCode( 0 ), _errorMessage(), _randomAccess( false ) {}
+		_errorCode( 0 ), _errorMessage(), _randomAccess( false ), _stepped( false ), _last( false ) {}
 private:
 	OSQLiteResult( OSQLiteResult const& );
 	OSQLiteResult& operator = ( OSQLiteResult const& );
@@ -144,13 +146,17 @@ M_EXPORT_SYMBOL int dbrs_errno( ODBLink const& dbLink_, void* result_ ) {
 	OSQLiteResult* r( static_cast<OSQLiteResult*>( result_ ) );
 	M_ASSERT( sQLite );
 	int code( errno );
-	if ( r && r->_errorCode )
+	if ( r && r->_errorCode ) {
 		code = r->_errorCode;
-	else if ( sQLite ) {
-		if ( sQLite->_errorCode )
+	} else if ( sQLite ) {
+		if ( sQLite->_errorCode ) {
 			code = sQLite->_errorCode;
-		else
+		} else {
 			code = sqlite3_errcode( sQLite->_db );
+			if ( ( code == SQLITE_ROW ) || ( code == SQLITE_DONE ) ) {
+				code = SQLITE_OK;
+			}
+		}
 	}
 	return ( code );
 }
@@ -160,13 +166,15 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* result_ ) 
 	OSQLite* sQLite = static_cast<OSQLite*>( dbLink_._conn );
 	OSQLiteResult* r = static_cast<OSQLiteResult*>( result_ );
 	M_ASSERT( sQLite );
-	char const* msg( "" );
-	if ( r && ! r->_errorMessage.is_empty() )
+	char const* msg = "";
+	if ( r && ! r->_errorMessage.is_empty() ) {
 		msg = r->_errorMessage.raw();
-	else if ( sQLite ) {
-		if ( ! sQLite->_errorMessage.is_empty() )
-			return ( sQLite->_errorMessage.raw() );
-		return ( sqlite3_errmsg( sQLite->_db ) );
+	} else if ( sQLite ) {
+		if ( ! sQLite->_errorMessage.is_empty() ) {
+			msg = sQLite->_errorMessage.raw();
+		} else {
+			msg = sqlite3_errmsg( sQLite->_db );
+		}
 	}
 	return ( msg );
 }
@@ -218,8 +226,9 @@ void* yaal_db_query( ODBLink& dbLink_, char const* query_ ) {
 	result->_errorCode = sqlite3_prepare_v2( sQLite->_db, query_, -1, &stmt, NULL );
 	result->_data = stmt;
 	result->_columns = sqlite3_column_count( stmt );
-	if ( result->_errorCode != SQLITE_OK )
+	if ( result->_errorCode != SQLITE_OK ) {
 		result->_errorMessage = sqlite3_errmsg( sQLite->_db );
+	}
 	return ( result );
 }
 
@@ -242,6 +251,11 @@ M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore:
 
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* data_ ) {
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
+	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
+	result->_errorCode = sqlite3_reset( static_cast<sqlite3_stmt*>( result->_data ) );
+	result->_last = sqlite3_step( static_cast<sqlite3_stmt*>( result->_data ) ) == SQLITE_ROW;
+	result->_stepped = true;
 	return ( data_ );
 }
 
@@ -275,7 +289,9 @@ M_EXPORT_SYMBOL bool rs_next( void* );
 M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
-	return ( sqlite3_step( static_cast<sqlite3_stmt*>( result->_data ) ) == SQLITE_ROW );
+	bool stepped( false );
+	swap( result->_stepped, stepped );
+	return ( stepped ? result->_last : sqlite3_step( static_cast<sqlite3_stmt*>( result->_data ) ) == SQLITE_ROW );
 }
 
 M_EXPORT_SYMBOL char const* rs_get_field( void*, int );

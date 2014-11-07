@@ -61,11 +61,7 @@ HQuery::~HQuery( void ) {
 
 void HQuery::bind( int parameterNo_, yaal::hcore::HString const& parameterValue_ ) {
 	M_PROLOG
-	if ( parameterValue_ >= _bindBuffer.get_size() ) {
-		_bindBuffer.resize( parameterNo_ + 1 );
-	}
-	_bindBuffer[parameterNo_] = parameterValue_;
-	(*_connector->query_bind)( _dataBase->_dbLink, _query, parameterNo_, _bindBuffer[parameterNo_] );
+	(*_connector->query_bind)( _dataBase->_dbLink, _query, parameterNo_, _bindBuffer[parameterNo_] = parameterValue_ );
 	return;
 	M_EPILOG
 }

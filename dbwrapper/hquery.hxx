@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_DBWRAPPER_HQUERY_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
+#include "hcore/hhashmap.hxx"
 #include "hcore/hpointer.hxx"
 #include "dbwrapper/db_driver.hxx"
 #include "dbwrapper/hrecordset.hxx"
@@ -45,7 +46,7 @@ class HQuery {
 public:
 	typedef HQuery this_type;
 	typedef yaal::hcore::HPointer<HQuery> ptr_t;
-	typedef yaal::hcore::HArray<yaal::hcore::HString> bind_buffer_t;
+	typedef yaal::hcore::HHashMap<int, yaal::hcore::HString> bind_buffer_t;
 private:
 	mutable database_ptr_t _dataBase; /*!< data-base that this record-set belongs to */
 	mutable ODBConnector const* _connector; /*!< low level database engine connector */

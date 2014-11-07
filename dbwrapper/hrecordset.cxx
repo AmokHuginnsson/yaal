@@ -57,7 +57,7 @@ HRecordSet::HRecordSet( database_ptr_t dataBase_,
 	M_EPILOG
 }
 
-HRecordSet::~HRecordSet ( void ) {
+HRecordSet::~HRecordSet( void ) {
 	M_PROLOG
 	clear();
 	return;
