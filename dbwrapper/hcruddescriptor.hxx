@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hsqldescriptor.hxx - this file is integral part of `yaal' project.
+	hcruddescriptor.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -23,12 +23,12 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file dbwrapper/hsqldescriptor.hxx
- * \brief Declaration of HSQLDescriptor class.
+/*! \file dbwrapper/hcruddescriptor.hxx
+ * \brief Declaration of HCRUDDescriptor class.
  */
 
-#ifndef YAAL_DBWRAPPER_HSQLDESCRIPTOR_HXX_INCLUDED
-#define YAAL_DBWRAPPER_HSQLDESCRIPTOR_HXX_INCLUDED 1
+#ifndef YAAL_DBWRAPPER_HCRUDDESCRIPTOR_HXX_INCLUDED
+#define YAAL_DBWRAPPER_HCRUDDESCRIPTOR_HXX_INCLUDED 1
 
 #include "hcore/htime.hxx"
 #include "dbwrapper/hquery.hxx"
@@ -40,9 +40,9 @@ namespace dbwrapper {
 
 /*! \brief Build a SQL query based on user supplied meta-data.
  */
-class HSQLDescriptor {
+class HCRUDDescriptor {
 public:
-	typedef HSQLDescriptor this_type;
+	typedef HCRUDDescriptor this_type;
 	typedef yaal::hcore::HPointer<this_type> ptr_t;
 	/*! \brief Query types.
 	 */
@@ -75,9 +75,9 @@ private:
 	dbwrapper::HQuery::ptr_t _query;
 	mutated_t _mutated;
 public:
-	HSQLDescriptor( void );
-	HSQLDescriptor( yaal::dbwrapper::database_ptr_t );
-	virtual ~HSQLDescriptor( void );
+	HCRUDDescriptor( void );
+	HCRUDDescriptor( yaal::dbwrapper::database_ptr_t );
+	virtual ~HCRUDDescriptor( void );
 	void set_table( yaal::hcore::HString const& );
 	void set_columns( yaal::hcore::HString const& );
 	void set_filter( yaal::hcore::HString const& );
@@ -98,11 +98,11 @@ public:
 	HRecordSet::ptr_t execute( char const* const );
 	HRecordSet::ptr_t execute( void );
 };
-typedef yaal::hcore::HExceptionT<HSQLDescriptor> HSQLDescriptorException;
+typedef yaal::hcore::HExceptionT<HCRUDDescriptor> HCRUDDescriptorException;
 
 }
 
 }
 
-#endif /* #ifndef YAAL_DBWRAPPER_HSQLDESCRIPTOR_HXX_INCLUDED */
+#endif /* #ifndef YAAL_DBWRAPPER_HCRUDDESCRIPTOR_HXX_INCLUDED */
 

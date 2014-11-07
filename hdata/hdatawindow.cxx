@@ -53,8 +53,8 @@ HDataWindow::HDataWindow( HString const& title_, HDataProcess* owner_ )
 	_modified( false ), _documentMode( DOCUMENT::VIEW ), _mainWidget( NULL ),
 	_syncStore( NULL ),
 	_viewModeWidgets(), _editModeWidgets(), _owner( owner_ ),
-	_dB( new ( memory::yaal ) HSQLDescriptor( owner_->data_base() ) ),
-	_mode( HSQLDescriptor::MODE::SELECT ),
+	_crud( new ( memory::yaal ) HCRUDDescriptor( owner_->data_base() ) ),
+	_mode( HCRUDDescriptor::MODE::SELECT ),
 	_idColumnName() {
 	M_PROLOG
 	register_postprocess_handler( KEY<'n'>::command, NULL, call( &HDataWindow::handler_add_new, this, _1 ) );
@@ -137,7 +137,7 @@ void HDataWindow::sync( void ) {
 	M_ASSERT( _documentMode == DOCUMENT::EDIT );
 	int i( 0 );
 	for ( controls_t::iterator it( _editModeWidgets.begin() ), end( _editModeWidgets.end() ); it != end; ++ it, ++ i )
-		(*_dB)[ i ] = (*it)->get_data().get_string();
+		(*_crud)[ i ] = (*it)->get_data().get_string();
 	return;
 	M_EPILOG
 }
@@ -154,7 +154,7 @@ bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {
 				_ ( "You cannot add new rocord now." ) );
 		return ( true );
 	}
-	_mode = HSQLDescriptor::MODE::INSERT;
+	_mode = HCRUDDescriptor::MODE::INSERT;
 	if ( _mainWidget )
 		_mainWidget->add_new();
 	set_mode( DOCUMENT::EDIT );
@@ -169,12 +169,12 @@ bool HDataWindow::handler_edit( hconsole::HEvent const& ) {
 				_ ( "You cannot start editing of this record." ) );
 		return ( true );
 	}
-	if ( ! _dB->get_size() ) {
+	if ( ! _crud->get_size() ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_ ( "There is nothing to edit." ) );
 		return ( true );
 	}
-	_mode = HSQLDescriptor::MODE::UPDATE;
+	_mode = HCRUDDescriptor::MODE::UPDATE;
 	set_mode( DOCUMENT::EDIT );
 	return ( true );
 	M_EPILOG
@@ -187,7 +187,7 @@ bool HDataWindow::handler_delete( hconsole::HEvent const& ) {
 				_( "You cannot delete this record." ) );
 		return ( true );
 	}
-	if ( ! _dB->get_size() ) {
+	if ( ! _crud->get_size() ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED,
 				_( "There is nothing to remove." ) );
 		return ( true );
@@ -195,8 +195,8 @@ bool HDataWindow::handler_delete( hconsole::HEvent const& ) {
 	if ( _mainWidget ) {
 		HString filter;
 		filter.format( "id = %ld", _mainWidget->get_current_id() );
-		_dB->set_filter( filter );
-		_dB->execute( HSQLDescriptor::MODE::DELETE );
+		_crud->set_filter( filter );
+		_crud->execute( HCRUDDescriptor::MODE::DELETE );
 		_mainWidget->load();
 	}
 	return ( true );
@@ -209,13 +209,13 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED, _( "There is nothing to save." ) );
 		return ( true );
 	}
-	if ( _mode == HSQLDescriptor::MODE::UPDATE ) {
+	if ( _mode == HCRUDDescriptor::MODE::UPDATE ) {
 		HString filter;
 		filter.format( "id = %ld", _mainWidget->get_current_id() );
-		_dB->set_filter( filter );
+		_crud->set_filter( filter );
 	}
 	sync();
-	HRecordSet::ptr_t rs = _dB->execute( _mode );
+	HRecordSet::ptr_t rs = _crud->execute( _mode );
 	if ( rs->get_errno() )
 		_statusBar->message( COLORS::FG_BRIGHTRED, "%s", rs->get_error() );
 	else {
@@ -246,7 +246,7 @@ bool HDataWindow::handler_cancel( hconsole::HEvent const& ) {
 	if ( _documentMode != DOCUMENT::EDIT )
 		return ( true );
 	set_mode( DOCUMENT::VIEW );
-	if ( ( _mode == HSQLDescriptor::MODE::INSERT ) && _mainWidget )
+	if ( ( _mode == HCRUDDescriptor::MODE::INSERT ) && _mainWidget )
 		_mainWidget->cancel_new();
 	_modified = false;
 	_statusBar->paint();
@@ -299,12 +299,12 @@ void HDataWindow::set_record_descriptor( yaal::hcore::HString const& table_,
 		yaal::hcore::HString const& sort_,
 		yaal::hcore::HString const& idCol_ ) {
 	M_PROLOG
-	_dB->set_table( table_ );
-	_dB->set_columns( columns_ );
-	_dB->set_filter( filter_ );
-	_dB->set_sort( sort_ );
+	_crud->set_table( table_ );
+	_crud->set_columns( columns_ );
+	_crud->set_filter( filter_ );
+	_crud->set_sort( sort_ );
 	_idColumnName = idCol_;
-	_mainWidget->set_dbd( _dB );
+	_mainWidget->set_crud_descriptor( _crud );
 	return;
 	M_EPILOG
 }

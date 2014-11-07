@@ -27,7 +27,7 @@ Copyright:
 #ifndef YAAL_HDATA_HDATAWIDGET_HXX_INCLUDED
 #define YAAL_HDATA_HDATAWIDGET_HXX_INCLUDED 1
 
-#include "dbwrapper/hsqldescriptor.hxx"
+#include "dbwrapper/hcruddescriptor.hxx"
 #include "tools/hxml.hxx"
 #include "hconsole/hwidget.hxx"
 #include "hdata/oresource.hxx"
@@ -42,11 +42,11 @@ class HDataWindow;
  */
 class HDataWidget : public virtual hconsole::HWidget {
 protected:
-	dbwrapper::HSQLDescriptor::ptr_t _SQL;
+	dbwrapper::HCRUDDescriptor::ptr_t _crud;
 public:
 	HDataWidget( void );
 	virtual ~HDataWidget( void );
-	void set_dbd( dbwrapper::HSQLDescriptor::ptr_t );
+	void set_crud_descriptor( dbwrapper::HCRUDDescriptor::ptr_t );
 	virtual void load( int long = 0 );
 	virtual int long get_current_id( void );
 	virtual void add_new( void );

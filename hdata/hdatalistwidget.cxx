@@ -64,10 +64,10 @@ HDataListWidget::~HDataListWidget ( void ) {
 
 void HDataListWidget::load( int long /*id_*/ ) {
 	M_PROLOG
-	_SQL->set_filter( "" );
+	_crud->set_filter( "" );
 	HDataWindow* parent = dynamic_cast<HDataWindow*>( _window );
 	M_ASSERT( parent );
-	HRecordSet::ptr_t rs = _SQL->execute( HSQLDescriptor::MODE::SELECT );
+	HRecordSet::ptr_t rs = _crud->execute( HCRUDDescriptor::MODE::SELECT );
 	int idColNo = -1;
 	int const colCount = rs->get_field_count();
 	for ( int i = 0; i < colCount; ++ i ) {

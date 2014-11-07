@@ -74,8 +74,8 @@ protected:
 	controls_t _viewModeWidgets;
 	controls_t _editModeWidgets;
 	HDataProcess* _owner;
-	yaal::dbwrapper::HSQLDescriptor::ptr_t _dB;
-	yaal::dbwrapper::HSQLDescriptor::MODE::mode_t _mode;
+	yaal::dbwrapper::HCRUDDescriptor::ptr_t _crud;
+	yaal::dbwrapper::HCRUDDescriptor::MODE::mode_t _mode;
 	yaal::hcore::HString _idColumnName;
 public:
 	HDataWindow( yaal::hcore::HString const&, HDataProcess* );

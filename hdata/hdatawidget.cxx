@@ -43,7 +43,7 @@ namespace hdata {
 
 HDataWidget::HDataWidget( void )
 	: HWidget( NULL, 0, 0, 0, 0, hcore::HString() ),
-	_SQL() {
+	_crud() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -55,9 +55,9 @@ HDataWidget::~HDataWidget( void ) {
 	M_EPILOG
 }
 
-void HDataWidget::set_dbd( HSQLDescriptor::ptr_t dbd ) {
+void HDataWidget::set_crud_descriptor( HCRUDDescriptor::ptr_t crud_ ) {
 	M_PROLOG
-	_SQL = dbd;
+	_crud = crud_;
 	M_EPILOG
 }
 
