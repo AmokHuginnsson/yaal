@@ -47,7 +47,7 @@ static int const INVALID_CURSOR( -1 );
 HRecordSet::HRecordSet( database_ptr_t dataBase_,
 		ODBConnector const* connector_, void* reuslt_, CURSOR::cursor_t cursor_ )
 	: _dataBase( dataBase_ ), _connector( connector_ ),
-	_result( reuslt_ ), _cursor( cursor_ ) {
+	_result( reuslt_ ), _cursor( cursor_ ), _iterating( false ) {
 	M_PROLOG
 	if ( ( _cursor == CURSOR::RANDOM_ACCESS ) && ( get_size() < 0 ) )
 		log( LOG_TYPE::ERROR ) << "SQL error (query): " << (_connector->dbrs_error)( _dataBase->_dbLink, _result ) << endl;
@@ -92,6 +92,12 @@ int long HRecordSet::get_size( void ) const {
 	M_EPILOG
 }
 
+int long HRecordSet::get_dml_size( void ) const {
+	M_PROLOG
+	return ( (_connector->dbrs_records_count)( _dataBase->_dbLink, _result ) );
+	M_EPILOG
+}
+
 char const* HRecordSet::get_column_name( int column_ ) const {
 	return ( (_connector->rs_column_name)( _result, column_ ) );
 }
@@ -126,7 +132,11 @@ HRecordSet::value_t HRecordSet::get( int cursor_, int field_ ) {
 }
 
 HRecordSet::iterator HRecordSet::begin( void ) {
+	M_PROLOG
+	M_ENSURE( ( _cursor == CURSOR::RANDOM_ACCESS ) || ! _iterating );
+	_iterating = true;
 	return ( iterator( this, ( _cursor == CURSOR::RANDOM_ACCESS ) ? 0 : ( (_connector->rs_next( _result ) ? 0 : INVALID_CURSOR ) ) ) );
+	M_EPILOG
 }
 
 HRecordSet::iterator HRecordSet::end( void ) {
