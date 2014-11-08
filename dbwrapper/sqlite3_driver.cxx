@@ -210,7 +210,7 @@ void yaal_sqlite3_rs_free_query_result( void* data_ ) {
 	M_ASSERT( pr->_randomAccess );
 	M_ASSERT( pr->_useCount > 0 );
 	-- pr->_useCount;
-	if ( pr->_useCount ) {
+	if ( ! pr->_useCount ) {
 		sqlite3_free_table( static_cast<char**>( pr->_data ) );
 		M_SAFE( delete pr );
 	}
@@ -278,7 +278,7 @@ void yaal_rs_free_cursor( void* data_ ) {
 	OSQLiteResult* result( static_cast<OSQLiteResult*>( data_ ) );
 	M_ASSERT( result->_useCount > 0 );
 	-- result->_useCount;
-	if ( !result->_useCount ) {
+	if ( ! result->_useCount ) {
 		sqlite3_finalize( static_cast<sqlite3_stmt*>( result->_data ) );
 		M_SAFE( delete result );
 	}

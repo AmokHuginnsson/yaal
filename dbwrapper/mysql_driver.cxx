@@ -237,11 +237,12 @@ void* mysql_query_execute( ODBLink&, void* data_ ) {
 	}
 	mysql_stmt_bind_result( pq->_statement, pq->_results.data() );
 	mysql_stmt_execute( pq->_statement );
-	++ pq->_useCount;
 	return ( pq );
 }
 M_EXPORT_SYMBOL void* query_execute( ODBLink&, void* );
 M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
+	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
+	++ pq->_useCount;
 	return ( mysql_query_execute( dbLink_, data_ ) );
 }
 

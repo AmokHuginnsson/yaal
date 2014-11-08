@@ -59,6 +59,7 @@ private:
 	mutable ODBConnector const* _connector; /*!< low level database engine connector */
 	mutable void* _result; /*!< very internal for this class used only in base class */
 	CURSOR::cursor_t _cursor; /*!< Query result cursor type. */
+	bool _iterating;
 public:
 	HRecordSet( database_ptr_t, ODBConnector const*, void*, CURSOR::cursor_t );
 	virtual ~HRecordSet( void );
@@ -71,6 +72,7 @@ public:
 	bool is_empty( void ) const;
 	int get_field_count( void ) const;
 	int long get_size( void ) const;
+	int long get_dml_size( void ) const;
 	char const* get_column_name( int ) const;
 	int long get_insert_id( void ) const;
 	char const* get_error( void ) const;
