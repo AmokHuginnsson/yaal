@@ -61,8 +61,10 @@ private:
 
 char const OFirebird::_tpb[] = {
 	isc_tpb_version3,
-	isc_tpb_consistency,
-	isc_tpb_write
+	isc_tpb_write,
+	isc_tpb_read_committed,
+	isc_tpb_rec_version,
+	isc_tpb_wait
 };
 
 struct OFirebirdResult {
@@ -253,7 +255,9 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 		res->_ok = true;
 	} while ( false );
 	if ( ! res->_ok ) {
-		isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+		if ( res->_stmt ) {
+			isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+		}
 		res->_stmt = 0;
 		isc_rollback_transaction( db->_status, &res->_tr );
 		res->_tr = 0;
@@ -350,7 +354,9 @@ M_EXPORT_SYMBOL void rs_free_query_result( void* data_ ) {
 	M_ASSERT( res->_useCount > 0 );
 	-- res->_useCount;
 	if ( ! res->_useCount ) {
-		isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+		if ( res->_stmt ) {
+			isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+		}
 		res->_stmt = 0;
 		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 		M_SAFE( delete res );
@@ -404,7 +410,9 @@ void firebird_rs_free_cursor( void* data_ ) {
 	-- res->_useCount;
 	if ( ! res->_useCount ) {
 		OFirebird* db( static_cast<OFirebird*>( res->_dbLink._conn ) );
-		isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+		if ( res->_stmt ) {
+			isc_dsql_free_statement( db->_status, &res->_stmt, DSQL_drop );
+		}
 		res->_stmt = 0;
 		M_ENSURE_EX( ( db->_status[0] != 1 ) || ( db->_status[1] == 0 ), dbrs_error( res->_dbLink, res ) );
 		if ( res->_ok ) {
