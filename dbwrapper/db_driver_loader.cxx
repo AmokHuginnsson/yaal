@@ -361,7 +361,40 @@ void ODBConnector::init( void ) {
 	M_EPILOG
 }
 
-/* end of driver null section */
+yaal::hcore::HString transform_sql( yaal::hcore::HString sql_, place_holder_generator_t gen_ ) {
+	M_PROLOG
+	int placeholerNo( 1 );
+	int len( static_cast<int>( sql_.get_length() ) );
+	bool inSingleQuote( false );
+	bool inDoubleQuote( false );
+	for ( int pos( 0 ), i( 0 ); i < len; ++ i, ++ pos ) {
+		char currChar( sql_[pos] );
+		if ( inSingleQuote ) {
+			if ( currChar == '\'' ) {
+				inSingleQuote = false;
+			}
+		} else if ( inDoubleQuote ) {
+			if ( currChar == '"' ) {
+				inDoubleQuote = false;
+			}
+		} else {
+			if ( currChar == '\'' ) {
+				inSingleQuote = true;
+			} else if ( currChar == '"' ) {
+				inDoubleQuote = true;
+			} else if ( currChar == '?' ) {
+				HString placeholer( gen_( placeholerNo ++ ) );
+				M_ENSURE( placeholer.get_length() > 0 );
+				if ( placeholer != "?" ) {
+					sql_.replace( pos, 1, placeholer );
+					pos += ( static_cast<int>( placeholer.get_length() ) - 1 );
+				}
+			}
+		}
+	}
+	return ( sql_ );
+	M_EPILOG
+}
 
 } /* namespace dbwrapper */
 

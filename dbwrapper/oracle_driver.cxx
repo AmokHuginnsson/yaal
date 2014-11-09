@@ -222,12 +222,18 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* ) {
 
 namespace {
 
+HString placeholder_generator( int no_ ) {
+	HString placeholder;
+	placeholder.format( ":%d", no_ );
+	return ( placeholder );
+}
+
 void* oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mode_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	OOracle* oracle( static_cast<OOracle*>( dbLink_._conn ) );
 	OQuery* queryObj( new OQuery( &oracle->_status ) );
 	queryObj->_mode = mode_;
-	queryObj->_sql = query_;
+	queryObj->_sql = transform_sql( query_, &placeholder_generator );
 	queryObj->_sql.trim();
 	queryObj->_sql.trim_right( ";" );
 	oracle->_status = OCIStmtPrepare2( oracle->_serviceContext,

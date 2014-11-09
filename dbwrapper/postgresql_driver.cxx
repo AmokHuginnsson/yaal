@@ -169,12 +169,20 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( result );
 }
 
+namespace {
+HString placeholder_generator( int no_ ) {
+	HString placeholder;
+	placeholder.format( "$%d", no_ );
+	return ( placeholder );
+}
+}
+
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	OPostgreSQLResult* result( new ( memory::yaal ) OPostgreSQLResult( dbLink_ ) );
 	result->_randomAccess = false;
-	result->_query = query_;
+	result->_query = transform_sql( query_, &placeholder_generator );
 	return ( result );
 }
 

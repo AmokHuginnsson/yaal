@@ -125,6 +125,9 @@ typedef yaal::hcore::HPair<yaal::tools::HPlugin::ptr_t, ODBConnector::ptr_t> dri
 class HDataBase;
 typedef yaal::hcore::HPointer<HDataBase> database_ptr_t;
 
+typedef yaal::hcore::HString ( *place_holder_generator_t ) ( int );
+yaal::hcore::HString transform_sql( yaal::hcore::HString, place_holder_generator_t );
+
 }
 
 namespace hcore {
