@@ -24,6 +24,7 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <atomic>
 #include <cstdlib>
 #include <cstring>
 #include <errno.h>
@@ -50,6 +51,44 @@ using namespace yaal;
 using namespace yaal::hcore;
 using namespace yaal::dbwrapper;
 
+struct OPostgreSQLResult {
+	typedef HArray<char const*> params_t;
+	typedef std::atomic<u64_t> statement_id_source_t;
+	static statement_id_source_t _statementIdSource;
+	ODBLink& _link;
+	int _useCount;
+	PGresult* _result;
+	HString _id;
+	HString _query;
+	int _index;
+	int _total;
+	params_t _params;
+	bool _randomAccess;
+	bool _requireSync;
+	OPostgreSQLResult( ODBLink& link_ )
+		: _link( link_ ), _useCount( 1 ), _result( NULL ),
+		_id( ++ _statementIdSource ),
+		_query(), _index( 0 ), _total( 0 ),
+		_params(),
+		_randomAccess( false ),
+		_requireSync( false ) {
+		return;
+	}
+private:
+	OPostgreSQLResult( OPostgreSQLResult const& );
+	OPostgreSQLResult& operator = ( OPostgreSQLResult const& );
+};
+
+OPostgreSQLResult::statement_id_source_t OPostgreSQLResult::_statementIdSource = { 0 };
+
+namespace {
+HString placeholder_generator( int no_ ) {
+	HString placeholder;
+	placeholder.format( "$%d", no_ );
+	return ( placeholder );
+}
+}
+
 extern "C" {
 
 M_EXPORT_SYMBOL char* TABLE_LIST_QUERY = const_cast<char*>( "SELECT table_name, table_schema"
@@ -65,29 +104,6 @@ M_EXPORT_SYMBOL char* COLUMN_LIST_QUERY = const_cast<char*>( "SELECT a.attnum, a
 		" AND a.atttypid = t.oid"
 		" ORDER BY a.attnum;" );
 M_EXPORT_SYMBOL int COLUMN_NAME_INDEX = 1;
-
-struct OPostgreSQLResult {
-	typedef HArray<char const*> params_t;
-	ODBLink& _link;
-	int _useCount;
-	PGresult* _result;
-	HString _id;
-	HString _query;
-	int _index;
-	int _total;
-	bool _randomAccess;
-	params_t _params;
-	OPostgreSQLResult( ODBLink& link_ )
-		: _link( link_ ), _useCount( 1 ), _result( NULL ),
-		_id( static_cast<void*>( this ) ),
-		_query(), _index( 0 ), _total( 0 ),
-		_randomAccess( false ), _params() {
-		return;
-	}
-private:
-	OPostgreSQLResult( OPostgreSQLResult const& );
-	OPostgreSQLResult& operator = ( OPostgreSQLResult const& );
-};
 
 M_EXPORT_SYMBOL bool db_connect( ODBLink&, yaal::hcore::HString const&,
 		yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& );
@@ -169,14 +185,6 @@ M_EXPORT_SYMBOL void* db_query( ODBLink& dbLink_, char const* query_ ) {
 	return ( result );
 }
 
-namespace {
-HString placeholder_generator( int no_ ) {
-	HString placeholder;
-	placeholder.format( "$%d", no_ );
-	return ( placeholder );
-}
-}
-
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink&, char const* );
 M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
@@ -201,16 +209,24 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
 	PGconn* conn( static_cast<PGconn*>( dbLink_._conn ) );
 	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( data_ ) );
-	PGresult* r( ::PQprepare( conn, pr->_id.c_str(), pr->_query.c_str(), static_cast<int>( pr->_params.get_size() ), NULL ) );
-	ExecStatusType status = PQresultStatus( r );
-	int err = ( ( status == PGRES_COMMAND_OK ) || ( status == PGRES_TUPLES_OK ) ) ? 0 : status;
-	if ( ! err ) {
+	bool ok( true );
+	if ( ! pr->_result ) {
+		PGresult* r( ::PQprepare( conn, pr->_id.c_str(), pr->_query.c_str(), static_cast<int>( pr->_params.get_size() ), NULL ) );
+		ExecStatusType status = PQresultStatus( r );
+		::PQclear( r );
+		if ( ( ( status == PGRES_COMMAND_OK ) || ( status == PGRES_TUPLES_OK ) ) ? 0 : status ) {
+			ok = false;
+			pr->_result = r;
+		}
+	}
+	if ( ok ) {
+		if ( pr->_result ) {
+			::PQclear( pr->_result );
+		}
 		pr->_result = ::PQdescribePrepared( conn, pr->_id.c_str() );
 		::PQsendQueryPrepared( conn, pr->_id.c_str(), static_cast<int>( pr->_params.get_size() ), pr->_params.data(), NULL, NULL, 0 );
-		::PQclear( r );
 		++ pr->_useCount;
-	} else {
-		pr->_result = r;
+		pr->_requireSync = true;
 	}
 	return ( pr );
 }
@@ -256,6 +272,7 @@ M_EXPORT_SYMBOL bool rs_next( void* data_ ) {
 	} else {
 		::PQclear( pr->_result );
 		gotMore = ( pr->_result = ::PQgetResult( static_cast<PGconn*>( pr->_link._conn ) ) ) != NULL;
+
 		if ( gotMore ) {
 			pr->_index = 0;
 			pr->_total = ::PQntuples( pr->_result );
@@ -281,11 +298,21 @@ M_EXPORT_SYMBOL int rs_fields_count( void* data_ ) {
 M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* );
 M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 	OPostgreSQLResult* pr( static_cast<OPostgreSQLResult*>( dataR_ ) );
-	char* tmp = ::PQcmdTuples( pr->_result );
-	if ( tmp && tmp [ 0 ] )
-		return ( ::strtol( tmp, NULL, 10 ) );
-	else
-		return ( ::PQntuples( pr->_result ) );
+	if ( pr->_requireSync ) {
+		::PQclear( pr->_result );
+		pr->_result = ::PQgetResult( static_cast<PGconn*>( pr->_link._conn ) );
+		pr->_requireSync = false;
+	}
+	int long count( -1 );
+	if ( pr->_result ) {
+		char const* tmp( ::PQcmdTuples( pr->_result ) );
+		if ( tmp && tmp [ 0 ] ) {
+			count = ::strtol( tmp, NULL, 10 );
+		} else {
+			count = ::PQntuples( pr->_result );
+		}
+	}
+	return ( count );
 }
 
 M_EXPORT_SYMBOL int long dbrs_id( ODBLink&, void* );

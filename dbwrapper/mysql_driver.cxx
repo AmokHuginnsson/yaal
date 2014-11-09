@@ -187,7 +187,7 @@ void* mysql_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 	query->_randomAccess = false;
 	if ( ! mysql_stmt_prepare( query->_statement, query_, static_cast<int unsigned>( ::strlen( query_ ) ) ) ) {
 		query->_result = mysql_stmt_result_metadata( query->_statement );
-		int numFields( static_cast<int>( mysql_num_fields( query->_result ) ) );
+		int numFields( query->_result ? static_cast<int>( mysql_num_fields( query->_result ) ) : 0 );
 		if ( numFields > 0 ) {
 			query->_results.resize( numFields );
 			query->_fields.resize( numFields );
@@ -220,7 +220,7 @@ M_EXPORT_SYMBOL void* db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void*, int, yaal::hcore::HString const& );
 M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore::HString const& value_ ) {
 	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
-	if ( argNo_ >= static_cast<int>( pq->_params.get_size() ) ) {
+	if ( argNo_ > static_cast<int>( pq->_params.get_size() ) ) {
 		pq->_params.resize( argNo_ );
 	}
 	::memset( &pq->_params[argNo_ - 1], 0, sizeof ( OMySQLResult::binds_t::value_type ) );
@@ -232,10 +232,18 @@ M_EXPORT_SYMBOL void query_bind( ODBLink&, void* data_, int argNo_, yaal::hcore:
 
 void* mysql_query_execute( ODBLink&, void* data_ ) {
 	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
+	if ( pq->_result ) {
+		::mysql_free_result( pq->_result );
+		pq->_result = nullptr;
+		mysql_stmt_reset( pq->_statement );
+		pq->_result = mysql_stmt_result_metadata( pq->_statement );
+	}
 	if ( ! pq->_params.is_empty() ) {
 		mysql_stmt_bind_param( pq->_statement, pq->_params.data() );
 	}
-	mysql_stmt_bind_result( pq->_statement, pq->_results.data() );
+	if ( ! pq->_results.is_empty() ) {
+		mysql_stmt_bind_result( pq->_statement, pq->_results.data() );
+	}
 	mysql_stmt_execute( pq->_statement );
 	return ( pq );
 }
