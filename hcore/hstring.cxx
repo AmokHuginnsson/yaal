@@ -1380,6 +1380,17 @@ void HString::HCharRef::swap( HCharRef& charRef_ ) {
 #undef EXT_IS_INPLACE
 #undef IS_INPLACE
 
+HString to_string( char val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+HString to_string( char unsigned val_ ) {
+	M_PROLOG
+	return ( HString( val_ ) );
+	M_EPILOG
+}
+
 HString to_string( int short val_ ) {
 	M_PROLOG
 	return ( HString( val_ ) );

@@ -750,6 +750,8 @@ bool operator <= ( char const*, HString const& );
 bool operator > ( char const*, HString const& );
 bool operator < ( char const*, HString const& );
 int strcasecmp( HString const&, HString const& );
+HString to_string( char );
+HString to_string( char unsigned );
 HString to_string( int short );
 HString to_string( int short unsigned );
 HString to_string( int );
