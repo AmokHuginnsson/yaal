@@ -84,15 +84,15 @@ DEPS_hdata     = $(TARGET_dbwrapper) $(TARGET_hconsole)
 LIBS_hdata     = $(LIBS_BASE) -lhconsole$(LIB_INFIX) -ldbwrapper$(LIB_INFIX) -ltools$(LIB_INFIX) -lhcore$(LIB_INFIX) -lncurses @HCORE_LIBS@
 
 DEPS_sqlite3_driver    = $(TARGET_hcore)
-LIBS_sqlite3_driver    = $(LIBS_BASE) -lsqlite3 -lhcore$(LIB_INFIX)
+LIBS_sqlite3_driver    = $(LIBS_BASE) -lsqlite3
 DEPS_postgresql_driver = $(TARGET_hcore)
-LIBS_postgresql_driver = $(LIBS_BASE) -lpq -lhcore$(LIB_INFIX)
+LIBS_postgresql_driver = $(LIBS_BASE) -lpq
 DEPS_mysql_driver      = $(TARGET_hcore)
-LIBS_mysql_driver      = @MYSQLCLIENT_LIBRARY@ -lhcore$(LIB_INFIX)
+LIBS_mysql_driver      = @MYSQLCLIENT_LIBRARY@
 DEPS_firebird_driver   = $(TARGET_hcore)
-LIBS_firebird_driver   = $(LIBS_BASE) -lfbclient -lhcore$(LIB_INFIX)
+LIBS_firebird_driver   = $(LIBS_BASE) -lfbclient
 DEPS_oracle_driver     = $(TARGET_hcore)
-LIBS_oracle_driver     = $(LIBS_BASE) -lclntsh -lhcore$(LIB_INFIX)
+LIBS_oracle_driver     = $(LIBS_BASE) -lclntsh
 
 -include $(DIR_ROOT)/local.mk
 
@@ -104,7 +104,7 @@ LIBS_oracle_driver     = $(LIBS_BASE) -lclntsh -lhcore$(LIB_INFIX)
 
 $(LIB_PREFIX)%$(LIB_INFIX).$(LIB_SUFFIX): $$(OBJS_$$(*)) $$(DEPS_$$(*))
 	@$(call msg,printf "%b" "Linking \`$(@)' ... $(BOLD)$(RED)";) \
-	$(call invoke,$(LXX) $(LIBS) $(LXXFLAGS) @SONAME_FLAG@ -o $(@) \
+	$(call invoke,$(LXX) $(LIBS) $(LXXFLAGS) $(if $(findstring driver,$(@)),,@LXXFLAGS_NO_UNDEFINED@) @SONAME_FLAG@ -o $(@) \
 			@START_GROUP@ $(OBJS_$(*)) @END_GROUP@ $(LIBS_$(*)) 2>&1 | tee -a make.log) ; $(call msg, printf "%b" "$(RS)";)
 	@test -f $(@) || exit 1
 ifeq ($(LIB_PREFIX),lib)

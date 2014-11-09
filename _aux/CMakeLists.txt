@@ -364,7 +364,7 @@ endif()
 if ( HAVE_LIBPQ_FE_H OR HAVE_POSTGRESQL_LIBPQ_FE_H )
 	if ( CMAKE_HOST_WIN32 )
 	else()
-		target_link_libraries( postgresql pq hcore )
+		target_link_libraries( postgresql pq dbwrapper hcore )
 	endif()
 endif()
 

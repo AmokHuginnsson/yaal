@@ -269,7 +269,7 @@ AC_DEFUN([YAAL_DETECT_COMMON_FLAGS], [
 	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--demangle], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,-C], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--export-dynamic], [C++], [${FATAL_WARNINGS}])
-	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--no-undefined], [C++])
+	YAAL_DETECT_FLAGS(LXXFLAGS_NO_UNDEFINED, [-Wl,--no-undefined], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-Wl,--enable-auto-import], [C++])
 
 	YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])
@@ -322,6 +322,7 @@ AC_DEFUN([YAAL_DETECT_COMMON_FLAGS], [
 	AC_MSG_RESULT([Compiler extra flags are: $_FLAGS])
 	CXXFLAGS=$CXXFLAGS_ORIG;
 	CPPFLAGS=$CXXFLAGS_ORIG;
+	AC_SUBST(LXXFLAGS_NO_UNDEFINED, [${LXXFLAGS_NO_UNDEFINED}])
 ])
 
 AC_DEFINE_UNQUOTED([SYSCONFDIR], "$sysconfdir", [Path to global system configuration directory.])
