@@ -89,7 +89,9 @@ class HRecordSet::HIterator {
 	int long _cursorPosition; /* cursor position in record-set */
 public:
 	HIterator( HIterator const& );
+	HIterator( HIterator&& );
 	HIterator& operator = ( HIterator const& );
+	HIterator& operator = ( HIterator&& );
 	HIterator& operator ++ ( void );
 	HIterator& operator -- ( void );
 	HIterator operator ++ ( int );

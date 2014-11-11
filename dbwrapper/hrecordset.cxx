@@ -163,12 +163,30 @@ HRecordSet::HIterator::HIterator( HRecordSet* owner_, int long position_ )
 
 HRecordSet::HIterator::HIterator( HIterator const& it )
 	: _owner( it._owner ), _cursorPosition( it._cursorPosition ) {
+	M_ASSERT( it._owner->_cursor == CURSOR::RANDOM_ACCESS );
+}
+
+HRecordSet::HIterator::HIterator( HIterator&& it_ )
+	: _owner( it_._owner ), _cursorPosition( it_._cursorPosition ) {
+	it_._owner = nullptr;
+	it_._cursorPosition = INVALID_CURSOR;
 }
 
 HRecordSet::HIterator& HRecordSet::HIterator::operator = ( HIterator const& it ) {
+	M_ASSERT( it._owner->_cursor == CURSOR::RANDOM_ACCESS );
 	if ( &it != this ) {
 		_owner = it._owner;
 		_cursorPosition = it._cursorPosition;
+	}
+	return ( *this );
+}
+
+HRecordSet::HIterator& HRecordSet::HIterator::operator = ( HIterator&& it_ ) {
+	if ( &it_ != this ) {
+		_owner = it_._owner;
+		_cursorPosition = it_._cursorPosition;
+		it_._owner = nullptr;
+		it_._cursorPosition = INVALID_CURSOR;
 	}
 	return ( *this );
 }
