@@ -42,14 +42,14 @@ char const _eMode_[] = "record set is not in appropriate mode for operation";
 
 HCRUDDescriptor::HCRUDDescriptor( void )
 	: _mode( MODE::SELECT ), _varTmpBuffer(), _SQL(), _table(),
-	_columns ( "*" ), _filter(), _sort(), _fields(), _fieldCount( 0 ),
+	_columns( "*" ), _filter(), _sort(), _fields(), _fieldCount( 0 ),
 	_setSize( 0 ), _values(), _dataBase(), _query(), _mutated() {
 	return;
 }
 
 HCRUDDescriptor::HCRUDDescriptor( database_ptr_t dataBase_ )
 	: _mode( MODE::SELECT ), _varTmpBuffer(), _SQL(), _table(),
-	_columns ( "*" ), _filter(), _sort(), _fields(), _fieldCount( 0 ),
+	_columns( "*" ), _filter(), _sort(), _fields(), _fieldCount( 0 ),
 	_setSize( 0 ), _values(), _dataBase( dataBase_ ), _query(), _mutated() {
 	return;
 }
@@ -59,7 +59,8 @@ HCRUDDescriptor::~HCRUDDescriptor( void ) {
 
 void HCRUDDescriptor::build_query( MODE::mode_t const& mode_ ) {
 	M_PROLOG
-	_varTmpBuffer = "";
+	_varTmpBuffer.clear();
+	_query.reset();
 	switch ( mode_ ) {
 		case ( MODE::SELECT ): {
 			_SQL.format( "SELECT %s FROM %s", _columns.raw(),
@@ -69,7 +70,6 @@ void HCRUDDescriptor::build_query( MODE::mode_t const& mode_ ) {
 			if ( ! _sort.is_empty() )
 				_SQL += ( " ORDER BY " + _sort );
 			_SQL += ';';
-			_query = _dataBase->prepare_query( _SQL );
 		}
 		break;
 		case ( MODE::UPDATE ): {
@@ -103,22 +103,28 @@ void HCRUDDescriptor::build_query( MODE::mode_t const& mode_ ) {
 		case ( MODE::INSERT ): {
 			_SQL = "INSERT INTO " + _table + " ( ";
 			M_ENSURE( _fields.get_size() == _values.get_size() );
-			int long const size = _fields.get_size();
-			for ( int i = 0; i < size; ++ i ) {
-				if ( i > 0 )
-					_SQL += ", ";
-				_SQL += _fields[ i ];
+			int long const size( _fields.get_size() );
+			for ( int i( 0 ); i < size; ++ i ) {
+				if ( !! _values[i] ) {
+					if ( i > 0 )
+						_SQL += ", ";
+					_SQL += _fields[ i ];
+				}
 			}
 			_SQL += " ) VALUES ( ";
 			for ( int i = 0; i < size; ++ i ) {
-				if ( i > 0 )
-					_SQL += ", ";
-				_SQL += "?";
+				if ( !! _values[i] ) {
+					if ( i > 0 )
+						_SQL += ", ";
+					_SQL += "?";
+				}
 			}
 			_SQL += " );";
 			_query = _dataBase->prepare_query( _SQL );
-			for ( int i = 0; i < size; ++ i ) {
-				_query->bind( i + 1, *_values[ i ] );
+			for ( int i( 0 ), pos( 1 ); i < size; ++ i ) {
+				if ( !! _values[i] ) {
+					_query->bind( pos ++, *_values[ i ] );
+				}
 			}
 		}
 		break;
@@ -144,7 +150,7 @@ void HCRUDDescriptor::build_query( MODE::mode_t const& mode_ ) {
 
 HRecordSet::ptr_t HCRUDDescriptor::execute( void ) {
 	M_PROLOG
-	HRecordSet::ptr_t rs = _query->execute();
+	HRecordSet::ptr_t rs = !! _query ? _query->execute() : _dataBase->execute_query( _SQL );
 	_fieldCount = rs->get_field_count();
 	if ( _fields.get_size() != _fieldCount ) {
 		_fields.resize( _fieldCount );
@@ -155,7 +161,11 @@ HRecordSet::ptr_t HCRUDDescriptor::execute( void ) {
 		_fields[ ctr ] = rs->get_column_name( ctr );
 		_mutated[ ctr ] = false;
 	}
-	_setSize = rs->get_size();
+	if ( _mode == MODE::SELECT ) {
+		_setSize = rs->get_size();
+	} else {
+		_setSize = rs->get_dml_size();
+	}
 	return ( rs );
 	M_EPILOG
 }
@@ -170,7 +180,7 @@ HRecordSet::ptr_t HCRUDDescriptor::execute( MODE::mode_t const& mode_ ) {
 HRecordSet::ptr_t HCRUDDescriptor::execute( char const* const query_ ) {
 	M_PROLOG
 	_SQL = query_;
-	_query = _dataBase->prepare_query( _SQL );
+	_query.reset();
 	return ( execute() );
 	M_EPILOG
 }
