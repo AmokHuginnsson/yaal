@@ -730,7 +730,6 @@ void HConsole::clrscr( void ) {
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
 	wclear( static_cast<WINDOW*>( _window ) ); /* Always returns OK */
-	refresh();
 	return;
 	M_EPILOG
 }
