@@ -83,7 +83,7 @@ void HCRUDDescriptor::build_query( MODE::mode_t const& mode_ ) {
 						_SQL += ", ";
 					hasField = true;
 					_SQL += _fields[ i ];
-					if ( _values[ i ] ) {
+					if ( !! _values[ i ] ) {
 						_SQL += " = ?";
 					} else
 						_SQL += " = NULL";
@@ -96,7 +96,9 @@ void HCRUDDescriptor::build_query( MODE::mode_t const& mode_ ) {
 			_SQL += ';';
 			_query = _dataBase->prepare_query( _SQL );
 			for ( int i = 0; i < size; ++ i ) {
-				_query->bind( i + 1, *_values[ i ] );
+				if ( !! _values[i] ) {
+					_query->bind( i + 1, *_values[ i ] );
+				}
 			}
 		}
 		break;
