@@ -116,6 +116,12 @@ public:
 	HComboboxWidgetAttributes& dropped_width( int );
 };
 
+class HComboboxWidgetCreator : public virtual HListWidgetCreator, public virtual HEditWidgetCreator {
+	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+};
+
 }
 
 }
