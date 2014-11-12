@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hdataeditwidget.cxx - this file is integral part of `yaal' project.
+	hdatadatewidget.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -27,7 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "hdataeditwidget.hxx"
+#include "hdatadatewidget.hxx"
 #include "hconsole/console.hxx"
 #include "hcore/hlog.hxx"
 
@@ -39,63 +39,18 @@ namespace yaal {
 
 namespace hdata {
 
-HDataEditWidget::HDataEditWidget( HDataWindow * parent_,
+HDataDateWidget::HDataDateWidget( HDataWindow * parent_,
 		int row_, int column_, int height_, int width_,
 		yaal::hcore::HString const& label_, HWidgetAttributesInterface const& attr_ )
 	:	HWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
-		HEditWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
-		HDataWidget(), _valid() {
+		HDateWidget( parent_, row_, column_, label_, attr_ ),
+		HDataWidget() {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
-int HDataEditWidget::do_process_input ( int code_ ) {
-	M_PROLOG
-	bool noChange = false;
-	switch ( code_ ) {
-		case ( '\t' ):
-		case ( '\r' ):
-		case ( KEY_CODES::LEFT ):
-		case ( KEY_CODES::RIGHT ):
-		case ( KEY < 'a' >::ctrl ):
-		case ( KEY_CODES::HOME ):
-		case ( KEY < 'e' >::ctrl ):
-		case ( KEY_CODES::END ):
-		case ( KEY_CODES::INSERT ):
-		case ( KEY < 'f' >::meta ):
-		case ( KEY < 'b' >::meta ):
-			noChange = true;
-		break;
-		case ( KEY_CODES::PAGE_UP ):
-		case ( KEY_CODES::PAGE_DOWN ):
-		case ( KEY_CODES::UP ):
-		case ( KEY_CODES::DOWN ):
-			if ( _multiLine )
-				noChange = true;
-		break;
-		case ( KEY_CODES::BACKSPACE ):
-			if ( ! ( _widgetOffset + _cursorPosition ) )
-				noChange = true;
-		break;
-		case ( KEY_CODES::DELETE ):
-			if ( _string.is_empty() )
-				noChange = true;
-		break;
-		default:
-		break;
-	}
-	code_ = HEditWidget::do_process_input ( code_ );
-	if ( ! ( code_ || noChange ) ) {
-		HDataWindow* win( dynamic_cast<HDataWindow*>( _window ) );
-		M_ASSERT ( win );
-		win->set_modified();
-	}
-	return ( code_ );
-	M_EPILOG
-}
-
-HWidget::ptr_t HDataEditWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+HWidget::ptr_t HDataDateWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HEditWidgetAttributes attrs;
 	HDataWindow* window( dynamic_cast<HDataWindow*>( window_ ) );
@@ -103,7 +58,7 @@ HWidget::ptr_t HDataEditWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
-	HDataEditWidget* list( new HDataEditWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	HDataDateWidget* list( new HDataDateWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( list->get_pointer(), node_ );
 	apply_role( window, list, node_ );
 	return ( list->get_pointer() );
@@ -113,8 +68,8 @@ HWidget::ptr_t HDataEditWidgetCreator::do_new_instance( HWindow* window_, yaal::
 namespace {
 
 bool register_creator( void ) {
-	HWidgetFactory::get_instance().register_widget_creator( "dataedit",
-			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HDataEditWidgetCreator() ) ) );
+	HWidgetFactory::get_instance().register_widget_creator( "datadate",
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HDataDateWidgetCreator() ) ) );
 	return ( true );
 }
 

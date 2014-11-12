@@ -125,8 +125,9 @@ void HDataWindow::sync( HRecordSet::iterator it ) {
 	M_ASSERT( _syncStore );
 	M_ASSERT( _documentMode == DOCUMENT::VIEW );
 	int long count = _syncStore->_item.get_value_count();
-	for ( int i = 0; i < count; i ++ )
-		_syncStore->_item[ i ].set_string( *it[ i ] );
+	for ( int i = 0; i < count; i ++ ) {
+		_syncStore->_item[ i ].set_string( it[i] ? *it[ i ] : "" );
+	}
 	if ( _syncStore->_idColNo >= 0 )
 		_syncStore->_item._id = lexical_cast<int>( *it[ _syncStore->_idColNo ] );
 	M_EPILOG
