@@ -402,7 +402,7 @@ public:
 		M_EPILOG
 	}
 	template<typename... arg_t>
-	iterator insert( iterator const& it, arg_t&&... arg_ ) {
+	iterator emplace( iterator const& it, arg_t&&... arg_ ) {
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
 		new ( element ) HElement( it._current ? it._current : _hook, static_cast<trait::true_type const*>( nullptr ), yaal::forward<arg_t>( arg_ )... );
@@ -502,7 +502,7 @@ public:
 		M_EPILOG
 	}
 	template<typename... arg_t>
-	void push_front( arg_t&&... arg_ ) {
+	void emplace_front( arg_t&&... arg_ ) {
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
 		new ( element ) HElement( _hook, static_cast<trait::true_type const*>( nullptr ), yaal::forward<arg_t>( arg_ )... );
