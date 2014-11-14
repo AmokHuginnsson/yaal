@@ -66,8 +66,8 @@ public:
 		} action_t;
 	};
 protected:
-	MODE::mode_t _mode; /* operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
-	int _droppedWidth;	/* width of dropped list */
+	MODE::mode_t _mode; /*!< operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
+	int _droppedWidth;  /*!< width of dropped list */
 	struct OSelection {
 		iterator_t _cursor;
 		iterator_t _firstVisibleRow;
@@ -78,6 +78,8 @@ protected:
 		}
 	} _origSelection;
 	mutable HInfoInteger _infoInteger;
+	HInfoItem* _none;
+	yaal::hcore::HString _noneText;
 public:
 	HComboboxWidget( HWindow* parent,
 			int row, int col, int height, int width,
@@ -87,11 +89,13 @@ public:
 	virtual ~HComboboxWidget ( void );
 	void set_dropped_width( int );
 	void select_by_index( int );
+	void set_none_text( yaal::hcore::HString const& );
 	int get_selected_index( void ) const;
 	yaal::hcore::HString const& get_selected_text( void ) const;
 protected:
 	void save_selection( void );
 	void restore_selection( void );
+	void prepend_none( void );
 	virtual void do_update( void );
 	virtual int do_process_input( int );
 	virtual void do_paint( void );
@@ -102,6 +106,8 @@ protected:
 	virtual void do_set_data( HInfo const& );
 private:
 	void close_combo( ACTION::action_t );
+	HComboboxWidget( HComboboxWidget const& ) = delete;
+	HComboboxWidget& operator = ( HComboboxWidget const& ) = delete;
 };
 
 typedef yaal::hcore::HExceptionT<HComboboxWidget, HListWidgetException> HComboboxWidgetException;
@@ -109,11 +115,14 @@ typedef yaal::hcore::HExceptionT<HComboboxWidget, HListWidgetException> HCombobo
 class HComboboxWidgetAttributes : public virtual HEditWidgetAttributes, public virtual HListWidgetAttributes {
 	int _droppedWidth;
 	bool _droppedWidthSet;
+	yaal::hcore::HString _noneText;
+	bool _noneTextSet;
 protected:
 	virtual void do_apply( HWidget& ) const;
 public:
 	HComboboxWidgetAttributes( void );
 	HComboboxWidgetAttributes& dropped_width( int );
+	HComboboxWidgetAttributes& none_text( yaal::hcore::HString const& );
 };
 
 class HComboboxWidgetCreator : public virtual HListWidgetCreator, public virtual HEditWidgetCreator {

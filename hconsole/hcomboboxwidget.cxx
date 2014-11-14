@@ -52,7 +52,9 @@ HComboboxWidget::HComboboxWidget ( HWindow * parent_,
 		_mode( MODE::EDITCONTROL ),
 		_droppedWidth( 0 ),
 		_origSelection(),
-		_infoInteger( 0 ) {
+		_infoInteger( 0 ),
+		_none( nullptr ),
+		_noneText() {
 	M_PROLOG
 	attr_.apply( *this );
 	return;
@@ -114,6 +116,7 @@ void HComboboxWidget::do_paint( void ) {
 
 void HComboboxWidget::do_update( void ) {
 	M_PROLOG
+	prepend_none();
 	HListWidget::do_update();
 	save_selection();
 	return;
@@ -240,16 +243,40 @@ void HComboboxWidget::restore_selection( void ) {
 	M_EPILOG
 }
 
+void HComboboxWidget::prepend_none( void ) {
+	M_PROLOG
+	list_widget_helper::HAsIsValueListModel<>* model( dynamic_cast<list_widget_helper::HAsIsValueListModel<>*>( get_model().raw() ) );
+	if ( model ) {
+		list_widget_helper::HAsIsValueListModel<>::data_ptr_t data( model->get_data() );
+		if ( data->is_empty() || ! _none || ( &data->head() != _none ) ) {
+			data->emplace_front( 1 );
+			_none = &data->head();
+			(*_none)[0].set_string( _noneText );
+			_cursor = _origSelection._cursor = model->begin();
+			_firstVisibleRow = _origSelection._firstVisibleRow = model->begin();
+			HListWidget::_widgetOffset = _origSelection._widgetOffset = 0;
+			HListWidget::_cursorPosition = _origSelection._cursorPosition = 0;
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HComboboxWidget::set_none_text( yaal::hcore::HString const& text_ ) {
+	_noneText = text_;
+	return;
+}
+
 void HComboboxWidget::select_by_index( int index_ ) {
 	M_PROLOG
-	set_cursor_position( index_ );
+	set_cursor_position( index_ + 1 );
 	save_selection();
 	return;
 	M_EPILOG
 }
 
 int HComboboxWidget::get_selected_index( void ) const {
-	return ( _origSelection._widgetOffset + _origSelection._cursorPosition );
+	return ( _origSelection._widgetOffset + _origSelection._cursorPosition - 1 );
 }
 
 void HComboboxWidget::do_set_data( HInfo const& data_ ) {
@@ -274,7 +301,9 @@ yaal::hcore::HString const& HComboboxWidget::get_selected_text( void ) const {
 HComboboxWidgetAttributes::HComboboxWidgetAttributes( void )
 	: HEditWidgetAttributes(), HListWidgetAttributes(),
 	_droppedWidth( 0 ),
-	_droppedWidthSet( false ) {
+	_droppedWidthSet( false ),
+	_noneText(),
+	_noneTextSet( false ) {
 }
 
 void HComboboxWidgetAttributes::do_apply( HWidget& widget_ ) const {
@@ -286,6 +315,9 @@ void HComboboxWidgetAttributes::do_apply( HWidget& widget_ ) const {
 		if ( _droppedWidthSet ) {
 			widget->set_dropped_width( _droppedWidth );
 		}
+		if ( _noneTextSet ) {
+			widget->set_none_text( _noneText );
+		}
 	}
 	return;
 	M_EPILOG
@@ -295,6 +327,14 @@ HComboboxWidgetAttributes& HComboboxWidgetAttributes::dropped_width( int dropped
 	M_PROLOG
 	_droppedWidth = droppedWidth_;
 	_droppedWidthSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
+HComboboxWidgetAttributes& HComboboxWidgetAttributes::none_text( yaal::hcore::HString const& noneText_ ) {
+	M_PROLOG
+	_noneText = noneText_;
+	_noneTextSet = true;
 	return ( *this );
 	M_EPILOG
 }
@@ -326,6 +366,8 @@ bool HComboboxWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& 
 		if ( name == "dropped_width" ) {
 			attrs.dropped_width( lexical_cast<int>( xml::node_val( node_ ) ) );
 			ok = true;
+		} else if ( name == "none_text" ) {
+			attrs.none_text( xml::node_val( node_ ) );
 		}
 	}
 	return ( ok );
