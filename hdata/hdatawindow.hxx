@@ -33,6 +33,7 @@ Copyright:
 #include "hdata/hdatawidget.hxx"
 #include "hdata/hdatalistwidget.hxx"
 #include "hdata/oresource.hxx"
+#include "hdata/hdictionary.hxx"
 
 namespace yaal {
 
@@ -58,6 +59,7 @@ public:
 			EDIT  /*!< Edit current record. */
 		} mode_t;
 	};
+	typedef yaal::hcore::HHashMap<yaal::hcore::HString, HDictionary::ptr_t> dictionaries_t;
 	/*! \brief DML helper, buffer for currently edited row.
 	 */
 	struct ORowBuffer {
@@ -77,6 +79,7 @@ protected:
 	yaal::dbwrapper::HCRUDDescriptor::ptr_t _crud;
 	yaal::dbwrapper::HCRUDDescriptor::MODE::mode_t _mode;
 	yaal::hcore::HString _idColumnName;
+	dictionaries_t _dictionaries;
 public:
 	HDataWindow( yaal::hcore::HString const&, HDataProcess* );
 	virtual ~HDataWindow( void );
@@ -92,6 +95,7 @@ public:
 			yaal::hcore::HString const&,
 			yaal::hcore::HString const& );
 	yaal::hcore::HString const& id_column_name( void ) const;
+	void add_dictionary( yaal::hcore::HString const&, HDictionary::ptr_t const& );
 protected:
 	void set_mode( DOCUMENT::mode_t );
 	void sync( void );

@@ -55,7 +55,7 @@ HDataWindow::HDataWindow( HString const& title_, HDataProcess* owner_ )
 	_viewModeWidgets(), _editModeWidgets(), _owner( owner_ ),
 	_crud( new ( memory::yaal ) HCRUDDescriptor( owner_->data_base() ) ),
 	_mode( HCRUDDescriptor::MODE::SELECT ),
-	_idColumnName() {
+	_idColumnName(), _dictionaries() {
 	M_PROLOG
 	register_postprocess_handler( KEY<'n'>::command, NULL, call( &HDataWindow::handler_add_new, this, _1 ) );
 	register_postprocess_handler( KEY<'e'>::command, NULL, call( &HDataWindow::handler_edit, this, _1 ) );
@@ -314,6 +314,14 @@ yaal::hcore::HString const& HDataWindow::id_column_name( void ) const {
 	return ( _idColumnName );
 }
 
+void HDataWindow::add_dictionary( yaal::hcore::HString const& name_,
+		HDictionary::ptr_t const& dict_ ) {
+	M_PROLOG
+	M_ENSURE( _dictionaries.insert( make_pair( name_, dict_ ) ).second );
+	return;
+	M_EPILOG
+}
+
 hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProcess* tui_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HDataProcess* dp( dynamic_cast<HDataProcess*>( tui_ ) );
@@ -332,6 +340,15 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 			xml::value_t sort( xml::try_attr_val( n, "sort" ) );
 			dw->set_record_descriptor( table, columns, filter ? *filter : "", sort ? *sort : "", id );
 			break;
+		} else if ( node == "dicts" ) {
+			for ( yaal::tools::HXml::HConstNodeProxy const& dict : n ) {
+				HString dictName( xml::attr_val( dict, "name" ) );
+				HString table( xml::attr_val( dict, "table" ) );
+				HString id( xml::attr_val( dict, "id_column" ) );
+				HString value( xml::attr_val( dict, "value_column" ) );
+				HDictionary::ptr_t d( new HDictionary( table, id, value ) );
+				dw->add_dictionary( dictName, d );
+			}
 		}
 	}
 	return ( window );
