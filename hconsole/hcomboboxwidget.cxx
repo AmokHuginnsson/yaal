@@ -297,7 +297,6 @@ yaal::hcore::HString const& HComboboxWidget::get_selected_text( void ) const {
 	return ( _string );
 }
 
-
 HComboboxWidgetAttributes::HComboboxWidgetAttributes( void )
 	: HEditWidgetAttributes(), HListWidgetAttributes(),
 	_droppedWidth( 0 ),

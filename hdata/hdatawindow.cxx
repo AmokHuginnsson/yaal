@@ -77,6 +77,9 @@ HDataWindow::~HDataWindow( void ) {
 
 void HDataWindow::do_init( void ) {
 	M_PROLOG
+	for ( dictionaries_t::value_type& val : _dictionaries ) {
+		val.second->load();
+	}
 	HWindow::do_init();
 	_mainWidget->set_focus();
 	if ( _mainWidget ) {
@@ -322,33 +325,42 @@ void HDataWindow::add_dictionary( yaal::hcore::HString const& name_,
 	M_EPILOG
 }
 
+HDictionary::ptr_t HDataWindow::get_dictionary( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	return ( _dictionaries.at( name_ ) );
+	M_EPILOG
+}
+
 hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProcess* tui_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HDataProcess* dp( dynamic_cast<HDataProcess*>( tui_ ) );
 	M_ENSURE( dp );
 	HString name( xml::attr_val( node_, "title" ) );
 	HWindow::ptr_t window( make_pointer<HDataWindow>( name, dp ) );
-	create_widgets( window, node_ );
 	HDataWindow* dw( dynamic_cast<HDataWindow*>( window.raw() ) );
 	for ( yaal::tools::HXml::HConstNodeProxy const& n : node_ ) {
-		HString node( n.get_name() );
-		if ( node == "db" ) {
+		HString nodeName( n.get_name() );
+		if ( nodeName == "dicts" ) {
+			for ( yaal::tools::HXml::HConstNodeProxy const& dict : n ) {
+				HString dictName( xml::attr_val( dict, "name" ) );
+				HString table( xml::attr_val( dict, "table" ) );
+				HString id( xml::attr_val( dict, "id_column" ) );
+				HString value( xml::attr_val( dict, "value_column" ) );
+				HDictionary::ptr_t d( new HDictionary( dp->data_base(), table, id, value ) );
+				dw->add_dictionary( dictName, d );
+			}
+		}
+	}
+	create_widgets( window, node_ );
+	for ( yaal::tools::HXml::HConstNodeProxy const& n : node_ ) {
+		HString nodeName( n.get_name() );
+		if ( nodeName == "db" ) {
 			HString table( xml::attr_val( n, "table" ) );
 			HString columns( xml::attr_val( n, "column" ) );
 			HString id( xml::attr_val( n, "id_column" ) );
 			xml::value_t filter( xml::try_attr_val( n, "filter" ) );
 			xml::value_t sort( xml::try_attr_val( n, "sort" ) );
 			dw->set_record_descriptor( table, columns, filter ? *filter : "", sort ? *sort : "", id );
-			break;
-		} else if ( node == "dicts" ) {
-			for ( yaal::tools::HXml::HConstNodeProxy const& dict : n ) {
-				HString dictName( xml::attr_val( dict, "name" ) );
-				HString table( xml::attr_val( dict, "table" ) );
-				HString id( xml::attr_val( dict, "id_column" ) );
-				HString value( xml::attr_val( dict, "value_column" ) );
-				HDictionary::ptr_t d( new HDictionary( table, id, value ) );
-				dw->add_dictionary( dictName, d );
-			}
 		}
 	}
 	return ( window );

@@ -95,6 +95,7 @@ public:
 			yaal::hcore::HString const& );
 	yaal::hcore::HString const& id_column_name( void ) const;
 	void add_dictionary( yaal::hcore::HString const&, HDictionary::ptr_t const& );
+	HDictionary::ptr_t get_dictionary( yaal::hcore::HString const& );
 protected:
 	void set_mode( DOCUMENT::mode_t );
 	void sync( void );

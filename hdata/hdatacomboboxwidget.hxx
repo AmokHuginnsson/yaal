@@ -30,6 +30,7 @@ Copyright:
 #ifndef YAAL_HDATA_HDATACOMBOBOXWIDGET_HXX_INCLUDED
 #define YAAL_HDATA_HDATACOMBOBOXWIDGET_HXX_INCLUDED 1
 
+#include "tools/htwowaymap.hxx"
 #include "hconsole/hcomboboxwidget.hxx"
 #include "hdata/hdatawindow.hxx"
 
@@ -45,7 +46,10 @@ class HDataComboboxWidget : public HDataWidget, public virtual hconsole::HCombob
 public:
 	typedef HDataComboboxWidget this_type;
 	typedef HComboboxWidget base_type;
+	typedef tools::HTwoWayMap<int, int> index_id_t;
 private:
+	index_id_t _indexId;
+	yaal::hcore::HString _dictName;
 public:
 	HDataComboboxWidget( HDataWindow*, /* parent */
 			int, /* top ( parent relative ) */
@@ -54,11 +58,27 @@ public:
 			int, /* width */
 			yaal::hcore::HString const& = "", /* label */
 			hconsole::HWidgetAttributesInterface const& = hconsole::HWidgetAttributesInterface() );
+	void set_dict_name( yaal::hcore::HString const& );
+protected:
+	virtual void do_update( void );
+	virtual hconsole::HInfo const& do_get_data( void ) const;
+	virtual void do_set_data( hconsole::HInfo const& );
+};
+
+class HDataComboboxWidgetAttributes : public virtual hconsole::HComboboxWidgetAttributes {
+	yaal::hcore::HString _dictName;
+	bool _dictNameSet;
+protected:
+	virtual void do_apply( hconsole::HWidget& ) const;
+public:
+	HDataComboboxWidgetAttributes( void );
+	HDataComboboxWidgetAttributes& dict_name( yaal::hcore::HString const& );
 };
 
 class HDataComboboxWidgetCreator : virtual public yaal::hconsole::HComboboxWidgetCreator {
 protected:
 	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual bool do_prepare_attributes( hconsole::HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 }
