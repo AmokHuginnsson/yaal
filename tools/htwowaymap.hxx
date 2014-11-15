@@ -243,6 +243,7 @@ public:
 	typedef HIterator const_iterator;
 	typedef yaal::hcore::HReverseIterator<iterator> reverse_iterator;
 	typedef yaal::hcore::HReverseIterator<const_iterator> const_reverse_iterator;
+	typedef typename selector_t::result_type result_type;
 private:
 	view_storage_type _data;
 public:
@@ -263,6 +264,15 @@ public:
 	}
 	int long count( view_type_t const& key_ ) const {
 		return ( _data.count( &key_ ) );
+	}
+	result_type const& at( view_type_t const& key_ ) const {
+		M_PROLOG
+		typename view_storage_type::const_iterator it( _data.find( &key_ ) );
+		if ( ! ( it != _data.end() ) ) {
+			throw hcore::HInvalidKeyException( "bad key" );
+		}
+		return ( selector_t()( *(it->second) ) );
+		M_EPILOG
 	}
 	const_reverse_iterator rbegin( void ) const;
 	const_reverse_iterator rend( void ) const;
