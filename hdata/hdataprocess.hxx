@@ -35,7 +35,6 @@ Copyright:
 #include "hconsole/omenuitem.hxx"
 #include "tools/hxml.hxx"
 #include "dbwrapper/hdatabase.hxx"
-#include "hdata/oresource.hxx"
 
 namespace yaal {
 
@@ -51,12 +50,6 @@ public:
 	typedef HDataProcess this_type;
 	typedef HTUIProcess base_type;
 protected:
-	typedef yaal::hcore::HList<yaal::hcore::HString> param_cache_t;
-	typedef yaal::hcore::HMap<yaal::hcore::HString, resources_t> resource_cache_t;
-	typedef yaal::hcore::HList<OEditControlResource> edit_cache_t;
-	typedef yaal::hcore::HList<OListControlResource> list_cache_t;
-	typedef yaal::hcore::HList<yaal::hcore::HChunk> column_cache_t;
-	typedef yaal::hconsole::HWindow::ptr_t ( *window_factory_t )( yaal::hcore::HString const&, HDataProcess*, resources_t* );
 	dbwrapper::database_ptr_t _dataBase;
 public:
 	HDataProcess( void );

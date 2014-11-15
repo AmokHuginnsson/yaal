@@ -37,7 +37,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hconsole/hmainwindow.hxx"
 #include "dbwrapper/db_driver_loader.hxx"
 #include "hdatawindow.hxx"
-#include "oresource.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::hconsole;

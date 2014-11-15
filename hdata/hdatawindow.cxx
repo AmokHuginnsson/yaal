@@ -270,19 +270,19 @@ void HDataWindow::set_modified( bool modified_ ) {
 	M_EPILOG
 }
 
-void HDataWindow::set_widget_role( yaal::hdata::HDataWidget* widget_, DATACONTROL_BITS::ROLE::role_t role_ ) {
+void HDataWindow::set_widget_role( yaal::hdata::HDataWidget* widget_, HDataWidget::ROLE::role_t role_ ) {
 	M_PROLOG
 	switch ( role_ ) {
-		case ( DATACONTROL_BITS::ROLE::MAIN ): {
+		case ( HDataWidget::ROLE::MAIN ): {
 			_mainWidget = widget_;
 			_viewModeWidgets.push_back( widget_ );
 			widget_->enable( true );
 		}
 		break;
-		case ( DATACONTROL_BITS::ROLE::DATA ):
+		case ( HDataWidget::ROLE::DATA ):
 			_editModeWidgets.push_back( widget_ );
 		break;
-		case ( DATACONTROL_BITS::ROLE::FILTER ):
+		case ( HDataWidget::ROLE::FILTER ):
 			widget_->enable( true );
 			_viewModeWidgets.push_back( widget_ );
 		break;

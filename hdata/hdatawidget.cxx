@@ -88,11 +88,11 @@ void HDataWidget::cancel_new( void ) {
 void apply_role( HDataWindow* window_, HDataWidget* widget_, yaal::tools::HXml::HConstNodeProxy node_ ) {
 	M_PROLOG
 	HString xmlRole( xml::attr_val( node_, "role" ) );
-	DATACONTROL_BITS::ROLE::role_t role( DATACONTROL_BITS::ROLE::INVALID );
+	HDataWidget::ROLE::role_t role( HDataWidget::ROLE::INVALID );
 	if ( xmlRole == "main" )
-		role = DATACONTROL_BITS::ROLE::MAIN;
+		role = HDataWidget::ROLE::MAIN;
 	else if ( xmlRole == "data" )
-		role = DATACONTROL_BITS::ROLE::DATA;
+		role = HDataWidget::ROLE::DATA;
 	else
 		M_THROW( _( "unknown role" ), node_.get_line() );
 	window_->set_widget_role( widget_, role );

@@ -32,7 +32,6 @@ Copyright:
 #include "hconsole/hlistwidget.hxx"
 #include "hdata/hdatawidget.hxx"
 #include "hdata/hdatalistwidget.hxx"
-#include "hdata/oresource.hxx"
 #include "hdata/hdictionary.hxx"
 
 namespace yaal {
@@ -87,7 +86,7 @@ public:
 	bool is_modified( void ) const;
 	void set_modified( bool = true );
 	void sync( yaal::dbwrapper::HRecordSet::iterator );
-	void set_widget_role( HDataWidget*, DATACONTROL_BITS::ROLE::role_t );
+	void set_widget_role( HDataWidget*, HDataWidget::ROLE::role_t );
 	void set_record_descriptor(
 			yaal::hcore::HString const&,
 			yaal::hcore::HString const&,

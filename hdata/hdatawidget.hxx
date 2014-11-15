@@ -30,7 +30,6 @@ Copyright:
 #include "dbwrapper/hcruddescriptor.hxx"
 #include "tools/hxml.hxx"
 #include "hconsole/hwidget.hxx"
-#include "hdata/oresource.hxx"
 
 namespace yaal {
 
@@ -41,6 +40,35 @@ class HDataWindow;
 /*! \brief Base class for database connected TUI controls.
  */
 class HDataWidget : public virtual hconsole::HWidget {
+public:
+	/*! \brief control role flags
+	 */
+	struct ROLE {
+		/*! \brief the flags
+		 */
+		typedef enum {
+			INVALID,
+			MAIN,		/*!< main control of a window, contents of this control holds
+										 data of main record-set of a window */
+
+			FILTER,	/*!< this kind of control is meant to setup filter for main
+										control for `view mode' */
+			DATA		/*!< this kind of control is used to store record-set data in `edit mode' */
+		} role_t;
+	};
+	/*! \brief control types
+	 */
+	struct TYPE {
+		typedef enum {
+			INVALID,
+			EDIT,
+			LIST,
+			TREE,
+			COMBO,
+			DATE,
+			CHECK
+		} type_t;
+	};
 protected:
 	dbwrapper::HCRUDDescriptor::ptr_t _crud;
 public:
