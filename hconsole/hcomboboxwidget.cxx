@@ -41,7 +41,7 @@ namespace yaal {
 
 namespace hconsole {
 
-HComboboxWidget::HComboboxWidget ( HWindow * parent_,
+HComboboxWidget::HComboboxWidget( HWindow* parent_,
 		int row_, int column_, int height_, int width_,
 		yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
@@ -57,6 +57,9 @@ HComboboxWidget::HComboboxWidget ( HWindow * parent_,
 		_noneText() {
 	M_PROLOG
 	attr_.apply( *this );
+	_readOnly = true;
+	add_column( -1, "", 1, HWidget::BITS::ALIGN::LEFT, TYPE::HSTRING );
+	HListWidget::set_flags( HListWidget::FLAG::NONE, HListWidget::FLAG::DRAW_HEADER );
 	return;
 	M_EPILOG
 }
@@ -86,12 +89,10 @@ void HComboboxWidget::do_kill_focus( void ) {
 
 void HComboboxWidget::do_paint( void ) {
 	M_PROLOG
-	int width( 0 );
 	HConsole& cons( HConsole::get_instance() );
 	if ( _mode == MODE::EDITCONTROL ) {
 /* ripped from HWidget::draw_label() */
-		width = ( _width > 0 ) ? _width
-			: cons.get_width() + _width - _columnRaw;
+		int width( ( _width > 0 ) ? _width : cons.get_width() + _width - _columnRaw );
 /* end of ripped part */
 		HEditWidget::do_paint();
 		cons.move( _rowRaw, _columnRaw + width - 1 );
@@ -100,8 +101,10 @@ void HComboboxWidget::do_paint( void ) {
 		cons.move( _rowRaw, _columnRaw + HEditWidget::_cursorPosition );
 	} else {
 		int height( _height );
-		width = _width;
-		_width = _droppedWidth;
+		int width( _width );
+		if ( _droppedWidth ) {
+			_width = _droppedWidth;
+		}
 		int size = static_cast<int>( _model->size() );
 		int hR = ( _drawLabel ? 1 : 0 ) + ( _drawHeader && ( _labelPosition == LABEL::POSITION::STACKED ) ? 1 : 0 );
 		if ( size < ( _height - hR ) )

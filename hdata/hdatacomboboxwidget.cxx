@@ -79,6 +79,7 @@ void HDataComboboxWidget::do_update( void ) {
 		HInfoItem info( 1 );
 		info[0].set_string( val.first );
 		_indexId.insert( make_pair( index, val.second ) );
+		data->push_back( info );
 		++ index;
 	}
 	return;
@@ -86,13 +87,21 @@ void HDataComboboxWidget::do_update( void ) {
 }
 
 HInfo const& HDataComboboxWidget::do_get_data( void ) const {
+	M_PROLOG
 	int index( get_selected_index() );
-	//int id( index >= 0 ? _indexId.left() : -1 );
-	_infoInteger.set_integer( index );
+	int id( index >= 0 ? _indexId.left().at( index ) : -1 );
+	_infoInteger.set_integer( id );
 	return ( _infoInteger );
+	M_EPILOG
 }
 
-void HDataComboboxWidget::do_set_data( HInfo const& ) {
+void HDataComboboxWidget::do_set_data( HInfo const& info_ ) {
+	M_PROLOG
+	int id( static_cast<int>( info_.get_integer() ) );
+	int index( id >= 0 ? _indexId.right().at( id ) : -1 );
+	select_by_index( index );
+	return;
+	M_EPILOG
 }
 
 void HDataComboboxWidget::set_dict_name( yaal::hcore::HString const& dictName_ ) {

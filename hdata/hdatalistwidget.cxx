@@ -108,7 +108,13 @@ int long HDataListWidget::get_current_id( void ) {
 
 void HDataListWidget::add_new( void ) {
 	M_PROLOG
-	_dataModel->add_tail( HInfoItem( static_cast<int>( _header.size() ) ) );
+	int size( static_cast<int>( _header.size() ) );
+	HInfoItem item( size );
+	for ( int i( 0 ); i < size; ++ i ) {
+		item[i].set_string( "" );
+		item[i].set_integer( -1 );
+	}
+	_dataModel->add_tail( item );
 	process_input( KEY_CODES::HOME );
 	process_input( KEY_CODES::END );
 	return;

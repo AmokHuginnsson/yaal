@@ -35,6 +35,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hdatalistwidget.hxx"
 #include "hdatatreewidget.hxx"
 #include "hdataeditwidget.hxx"
+#include "hdatadatewidget.hxx"
+#include "hdatacomboboxwidget.hxx"
 #include "hdatastatusbarwidget.hxx"
 #include "hdataprocess.hxx"
 #include "hcore/hformat.hxx"
@@ -140,8 +142,16 @@ void HDataWindow::sync( void ) {
 	M_PROLOG
 	M_ASSERT( _documentMode == DOCUMENT::EDIT );
 	int i( 0 );
-	for ( controls_t::iterator it( _editModeWidgets.begin() ), end( _editModeWidgets.end() ); it != end; ++ it, ++ i )
-		(*_crud)[ i ] = (*it)->get_data().get_string();
+	for ( controls_t::iterator it( _editModeWidgets.begin() ), end( _editModeWidgets.end() ); it != end; ++ it, ++ i ) {
+		HWidget* w( *it );
+		if ( dynamic_cast<HDateWidget*>( w ) ) {
+			(*_crud)[ i ] = w->get_data().get_time().string();
+		} else if ( dynamic_cast<HComboboxWidget*>( w ) ) {
+			(*_crud)[ i ] = to_string( w->get_data().get_integer() );
+		} else {
+			(*_crud)[ i ] = w->get_data().get_string();
+		}
+	}
 	return;
 	M_EPILOG
 }
