@@ -235,6 +235,11 @@ private:
 	}
 };
 
+template<typename tType, typename... arg_t>
+HResource<tType> make_resource( arg_t&&... arg_ ) {
+	return ( HResource<tType>( new tType( yaal::forward<arg_t>( arg_ )... ) ) );
+}
+
 template<typename type_t, typename free_t, template<typename>class hold_by_t, typename allocated_t>
 inline void swap( yaal::hcore::HResource<type_t, free_t, hold_by_t, allocated_t>& a,
 		yaal::hcore::HResource<type_t, free_t, hold_by_t, allocated_t>& b ) {
