@@ -194,7 +194,7 @@ HTime const& HInfoMultiVal::do_get_time( void ) const {
 
 void HInfoMultiVal::do_set_integer( int long long data_ ) {
 	_integer = data_;
-	_type = _type | TYPE::INT_LONG_LONG;
+	_type |= TYPE::INT_LONG_LONG;
 	return;
 }
 

@@ -39,7 +39,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hdatacomboboxwidget.hxx"
 #include "hdatastatusbarwidget.hxx"
 #include "hdataprocess.hxx"
-#include "hcore/hformat.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -79,9 +79,6 @@ HDataWindow::~HDataWindow( void ) {
 
 void HDataWindow::do_init( void ) {
 	M_PROLOG
-	for ( dictionaries_t::value_type& val : _dictionaries ) {
-		val.second->load();
-	}
 	HWindow::do_init();
 	_mainWidget->set_focus();
 	if ( _mainWidget ) {
@@ -133,8 +130,9 @@ void HDataWindow::sync( HRecordSet::iterator it ) {
 	for ( int i = 0; i < count; i ++ ) {
 		_syncStore->_item[ i ].set_string( it[i] ? *it[ i ] : "" );
 	}
-	if ( _syncStore->_idColNo >= 0 )
+	if ( _syncStore->_idColNo >= 0 ) {
 		_syncStore->_item._id = lexical_cast<int>( *it[ _syncStore->_idColNo ] );
+	}
 	M_EPILOG
 }
 
@@ -146,10 +144,15 @@ void HDataWindow::sync( void ) {
 		HWidget* w( *it );
 		if ( dynamic_cast<HDateWidget*>( w ) ) {
 			(*_crud)[ i ] = w->get_data().get_time().string();
+			log << "date: " << w->get_label() << ": [" << *(*_crud)[ i ] << "]" << endl;
 		} else if ( dynamic_cast<HComboboxWidget*>( w ) ) {
 			(*_crud)[ i ] = to_string( w->get_data().get_integer() );
+			log << "combo: " << w->get_label() << ": [" << *(*_crud)[ i ] << "]" << endl;
+		} else if ( dynamic_cast<HListWidget*>( w ) ) {
+			-- i;
 		} else {
 			(*_crud)[ i ] = w->get_data().get_string();
+			log << "edit: " << w->get_label() << ": [" << *(*_crud)[ i ] << "]" << endl;
 		}
 	}
 	return;
@@ -249,6 +252,9 @@ bool HDataWindow::handler_requery( hconsole::HEvent const& ) {
 		return ( true );
 	}
 	set_mode( DOCUMENT::VIEW );
+	for ( dictionaries_t::value_type& val : _dictionaries ) {
+		val.second->load();
+	}
 	_mainWidget->load();
 	paint();
 	return ( true );
@@ -358,6 +364,7 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 				HString value( xml::attr_val( dict, "value_column" ) );
 				HDictionary::ptr_t d( new HDictionary( dp->data_base(), table, id, value ) );
 				dw->add_dictionary( dictName, d );
+				d->load();
 			}
 		}
 	}

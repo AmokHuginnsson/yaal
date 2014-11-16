@@ -54,11 +54,21 @@ HListWidget::flag_t const HListWidget::FLAG::EDITABLE = HListWidget::flag_t::new
 HListWidget::flag_t const HListWidget::FLAG::DRAW_HEADER = HListWidget::flag_t::new_flag();
 HListWidget::flag_t const HListWidget::FLAG::ALL = ~HListWidget::FLAG::NONE;
 
-HListWidget::HColumnInfo::HColumnInfo( void )
-	: _descending( false ), _widthRaw( 0 ), _width( 0 ), _align( BITS::ALIGN::LEFT ),
-	_shortcutIndex( 0 ), _shortcut( 0 ), _type( TYPE::HSTRING ), _name(),
-	_widget( NULL ) {
+HListWidget::HColumnInfo::HColumnInfo( yaal::hcore::HString const& name_,
+		int width_, BITS::ALIGN::align_t const& align_, type_id_t type_,
+		HWidget* widget_ )
+	: _descending( false ), _widthRaw( 0 ), _width( width_ ), _align( align_ ),
+	_shortcutIndex( 0 ), _shortcut( 0 ), _type( type_ ), _name( name_ ),
+	_widget( widget_ ) {
 	M_PROLOG
+	int shortcutIndex( static_cast<int>( _name.find( '&' ) ) );
+	if ( shortcutIndex != HString::npos ) {
+		_name.erase( shortcutIndex, 1 );
+	} else {
+		shortcutIndex = 0;
+	}
+	_shortcutIndex = shortcutIndex;
+	_shortcut = _name[ shortcutIndex ];
 	return;
 	M_EPILOG
 }
@@ -66,43 +76,6 @@ HListWidget::HColumnInfo::HColumnInfo( void )
 HListWidget::HColumnInfo::~HColumnInfo( void ) {
 	M_PROLOG
 	_widget = NULL;
-	return;
-	M_EPILOG
-}
-
-HListWidget::HColumnInfo::HColumnInfo( HColumnInfo const& columnInfo_ )
-	: _descending( columnInfo_._descending ), _widthRaw( columnInfo_._widthRaw ),
-	_width( columnInfo_._width ), _align( columnInfo_._align ),
-	_shortcutIndex( columnInfo_._shortcutIndex ), _shortcut( columnInfo_._shortcut ),
-	_type( columnInfo_._type ), _name( columnInfo_._name ),
-	_widget( columnInfo_._widget ) {
-	M_PROLOG
-	return;
-	M_EPILOG
-}
-
-HListWidget::HColumnInfo& HListWidget::HColumnInfo::operator = ( HColumnInfo const& columnInfo_ ) {
-	if ( this != & columnInfo_ ) {
-		HColumnInfo tmp( columnInfo_ );
-		swap( tmp );
-	}
-	return ( *this );
-}
-
-void HListWidget::HColumnInfo::swap( HColumnInfo& columnInfo_ ) {
-	M_PROLOG
-	if ( this != & columnInfo_ ) {
-		using yaal::swap;
-		swap( _descending, columnInfo_._descending );
-		swap( _widthRaw, columnInfo_._widthRaw );
-		swap( _width, columnInfo_._width );
-		swap( _type, columnInfo_._type );
-		swap( _align, columnInfo_._align );
-		swap( _shortcutIndex, columnInfo_._shortcutIndex );
-		swap( _shortcut, columnInfo_._shortcut );
-		swap( _name, columnInfo_._name );
-		swap( _widget, columnInfo_._widget );
-	}
 	return;
 	M_EPILOG
 }
@@ -163,7 +136,7 @@ void HListWidget::do_paint( void ) {
 					++ ctr, ++ it ) {
 			columnOffset = 0;
 			for ( int ctrLoc( 0 ); ctrLoc < columns; ++ ctrLoc ) {
-				HColumnInfo* columnInfo( &_header[ ctrLoc ] );
+				HColumnInfo* columnInfo( _header[ ctrLoc ].get() );
 				if ( columnInfo->_widthRaw ) {
 					bool checked( get_text_for_cell( it, ctrLoc, columnInfo->_type ) );
 					draw_cell( it, ctr, ctrLoc, columnOffset, columnInfo, checked );
@@ -189,14 +162,11 @@ void HListWidget::do_paint( void ) {
 
 void HListWidget::draw_header( int columns_ ) {
 	M_PROLOG
-	int ctr = 0;
-	int ctrLoc = 0;
-	int columnOffset = 0;
+	int columnOffset( 0 );
 	int hR = _drawHeader ? 1 : 0; /* HR stands for header row */
-	HColumnInfo * columnInfo = NULL;
-	HConsole& cons = HConsole::get_instance();
-	for ( ctr = 0; ctr < columns_; ctr ++ ) {
-		columnInfo = & _header[ ctr ];
+	HConsole& cons( HConsole::get_instance() );
+	for ( int colNo( 0 ); colNo < columns_; ++ colNo ) {
+		HColumnInfo* columnInfo( _header[ colNo ].get() );
 		if ( columnInfo->_widthRaw ) {
 			if ( _drawHeader ) {
 				_varTmpBuffer = columnInfo->_name;
@@ -211,18 +181,17 @@ void HListWidget::draw_header( int columns_ ) {
 				cons.mvprintf( _rowRaw,
 							_columnRaw + columnOffset + columnInfo->_shortcutIndex,
 							"%c", columnInfo->_shortcut );
-				if ( _sortColumn == ctr )
+				if ( _sortColumn == colNo )
 					cons.mvprintf( _rowRaw,
 								_columnRaw + columnOffset
 								+ columnInfo->_widthRaw - 2,
 								"%c", columnInfo->_descending ? '^' : 'v' );
 			}
 			columnOffset += columnInfo->_widthRaw;
-			if ( ctr < columns_ ) {
+			if ( colNo < columns_ ) {
 				cons.set_attr( _attributeDisabled._data );
-				for ( ctrLoc = 0; ctrLoc < ( _heightRaw + hR );
-						ctrLoc ++ ) {
-					cons.move( _rowRaw + ctrLoc, _columnRaw + columnOffset - 1 );
+				for ( int row = 0; row < ( _heightRaw + hR ); ++ row ) {
+					cons.move( _rowRaw + row, _columnRaw + columnOffset - 1 );
 					cons.addch( GLYPHS::LINE::SINGLE::VERTICAL );
 				}
 			}
@@ -596,7 +565,7 @@ int HListWidget::do_process_input( int code_ ) {
 			int columns( static_cast<int>( _header.size() ) );
 			int selectedolumn( 0 );
 			for ( ; selectedolumn < columns; ++ selectedolumn ) {
-				if ( tolower( code_ ) == tolower( _header[ selectedolumn ]._shortcut ) ) {
+				if ( tolower( code_ ) == tolower( _header[ selectedolumn ]->_shortcut ) ) {
 					break;
 				}
 			}
@@ -622,35 +591,18 @@ int HListWidget::do_process_input( int code_ ) {
 	M_EPILOG
 }
 
-void HListWidget::add_column( int column_, yaal::hcore::HString const& name_,
-		int width_, BITS::ALIGN::align_t const& align_, type_id_t type_,
-		HWidget* widget_ ) {
+void HListWidget::add_column( int columnPosition_, HColumnInfo::ptr_t column_ ) {
 	M_PROLOG
 	int size( static_cast<int>( _model->size() ) );
 	if ( size ) {
 		M_THROW( "cannot add new column when list not empty", size );
 	}
-	_varTmpBuffer = name_;
-	int shortcutIndex( static_cast<int>( _varTmpBuffer.find( '&' ) ) );
-	if ( shortcutIndex != HString::npos ) {
-		_varTmpBuffer.set_at( shortcutIndex, 0 );
-		_varTmpBuffer.append( name_, shortcutIndex + 1 );
+	_sumForOne += column_->_width;
+	if ( ! _header.is_empty() && ( columnPosition_ >= 0 ) ) {
+		_header.insert( _header.begin() + columnPosition_, yaal::move( column_ ) );
 	} else {
-		shortcutIndex = 0;
+		_header.push_back( yaal::move( column_ ) );
 	}
-	_sumForOne += width_;
-	HColumnInfo columnInfo;
-	columnInfo._width = width_;
-	columnInfo._type = type_;
-	columnInfo._align = align_;
-	columnInfo._shortcutIndex = shortcutIndex;
-	columnInfo._shortcut = _varTmpBuffer[ shortcutIndex ];
-	columnInfo._name = _varTmpBuffer;
-	columnInfo._widget = widget_;
-	if ( ! _header.is_empty() && ( column_ >= 0 ) )
-		_header.insert( _header.begin() + column_, columnInfo );
-	else
-		_header.push_back( columnInfo );
 	recalculate_column_widths();
 	return;
 	M_EPILOG
@@ -662,20 +614,20 @@ void HListWidget::recalculate_column_widths( void ) {
 	int columnOffset( 0 );
 	int columns( static_cast<int>( _header.size() ) );
 	for ( int ctr( 0 ); ctr < columns; ctr ++ ) {
-		int newWidth( _header[ ctr ]._width );
+		int newWidth( _header[ ctr ]->_width );
 		if ( newWidth ) {
 			if ( ! _sumForOne )
 				M_THROW( "width of all columns equals 0", _sumForOne );
 			newWidth *= _widthRaw;
 			newWidth /= _sumForOne;
 			ctrLoc = ctr; /* last one with non zero width */
-			_header[ ctr ]._widthRaw = newWidth;
+			_header[ ctr ]->_widthRaw = newWidth;
 			columnOffset += newWidth;
 		}
 	}
 	/* last column with non zero width should fill space */
-	columnOffset -= _header[ ctrLoc ]._widthRaw;
-	_header[ ctrLoc ]._widthRaw = ( _widthRaw - columnOffset );
+	columnOffset -= _header[ ctrLoc ]->_widthRaw;
+	_header[ ctrLoc ]->_widthRaw = ( _widthRaw - columnOffset );
 	return;
 	M_EPILOG
 }
@@ -685,7 +637,7 @@ void HListWidget::sort_by_column( int column_, OSortHelper::sort_order_t order_ 
 	if ( ! _sortable )
 		return;
 	_sortColumn = column_;
-	_header[ column_ ]._descending = order_ == OSortHelper::DESCENDING;
+	_header[ column_ ]->_descending = order_ == OSortHelper::DESCENDING;
 	long int size = _model->size();
 	if ( size > 128 )
 		_window->status_bar()->init_progress(
@@ -693,7 +645,7 @@ void HListWidget::sort_by_column( int column_, OSortHelper::sort_order_t order_ 
 				* static_cast<double>( size ) / 2.,
 				" Sorting ..." );
 	list_widget_helper::OSortHelper helper =
-		{ column_, order_, _header[ _sortColumn ]._type,
+		{ column_, order_, _header[ _sortColumn ]->_type,
 		0, _model->size(), _window };
 	_model->sort( helper );
 	_widgetOffset = _cursorPosition = 0;
@@ -703,18 +655,16 @@ void HListWidget::sort_by_column( int column_, OSortHelper::sort_order_t order_ 
 
 bool HListWidget::do_click( mouse::OMouse& mouse_ ) {
 	M_PROLOG
-	int row( 0 );
 	int columns( static_cast<int>( _header.size() ) );
 	int origCursorPosition( get_cursor_position() );
-	HColumnInfo* columnInfo = NULL;
 	bool handled( HWidget::do_click( mouse_ ) );
 	if ( ! handled ) {
-		row = ( mouse_._row - _rowRaw ) - ( _drawHeader ? 1 : 0 );
+		int row( ( mouse_._row - _rowRaw ) - ( _drawHeader ? 1 : 0 ) );
 		if ( row < 0 ) /* header clicked */ {
 			int column( mouse_._column + _columnRaw - 1 );
 			int width( 0 );
 			for ( int ctr( 0 ); ctr < columns; ++ ctr ) {
-				columnInfo = &_header [ ctr ];
+				HColumnInfo* columnInfo( _header [ ctr ].get() );
 				width += columnInfo->_widthRaw;
 				if ( column <= width ) {
 					sort_by_column( ctr,
@@ -988,12 +938,20 @@ bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, type_id_t typ
 	M_ASSERT( it_.is_valid() );
 	HAbstractRow& item = *it_;
 	switch ( type_.value() ) {
-		case ( TYPE::INT_LONG ):
-			_varTmpBuffer = item[ column_ ].get_integer();
-		break;
-		case ( TYPE::DOUBLE ):
-			_varTmpBuffer = item[ column_ ].get_real();
-		break;
+		case ( TYPE::INT_LONG_LONG ): {
+			try {
+				_varTmpBuffer = item[ column_ ].get_integer();
+			} catch ( HLexicalCastException const& e ) {
+				_varTmpBuffer = e.what();
+			}
+		} break;
+		case ( TYPE::DOUBLE_LONG ): {
+			try {
+				_varTmpBuffer = item[ column_ ].get_real();
+			} catch ( HLexicalCastException const& e ) {
+				_varTmpBuffer = e.what();
+			}
+		} break;
 		case ( TYPE::HSTRING ):
 			_varTmpBuffer = item[ column_ ].get_string();
 		break;
@@ -1064,7 +1022,7 @@ void HListWidget::update_children( void ) {
 	int columns( static_cast<int>( _header.size() ) );
 	if ( ! _model->is_empty() ) {
 		for ( int i( 0 ); i < columns; ++ i ) {
-			HColumnInfo* columnInfo( &_header[ i ] );
+			HColumnInfo* columnInfo( _header[ i ].get() );
 			if ( columnInfo->_widget ) {
 				(*_cursor)[ i ].set_child_widget_data( columnInfo->_widget );
 			}
@@ -1076,7 +1034,7 @@ void HListWidget::update_children( void ) {
 
 type_id_t HListWidget::get_column_type( int column_ ) {
 	M_PROLOG
-	return ( _header[ column_ ]._type );
+	return ( _header[ column_ ]->_type );
 	M_EPILOG
 }
 
@@ -1456,10 +1414,36 @@ bool HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools
 			field = HWidgetFactory::get_instance().create_widget( widget_->get_window(), xmlField );
 		}
 		HListWidget* list( dynamic_cast<HListWidget*>( widget_.raw() ) );
-		list->add_column( placement, columnName, width, align, type, field.raw() );
+		list->add_column( placement, make_column( node_, list, columnName, width, align, type, field.raw() ) );
 		ok = true;
 	}
 	return ( ok );
+	M_EPILOG
+}
+
+HListWidget::HColumnInfo::ptr_t HListWidgetCreator::make_column(
+		yaal::tools::HXml::HConstNodeProxy const& node_,
+		HListWidget* widget_,
+		yaal::hcore::HString const& columnName,
+		int width,
+		HListWidget::BITS::ALIGN::align_t const& align,
+		type_id_t type,
+		HWidget* associatedWidget ) {
+	M_PROLOG
+	return ( do_make_column( node_, widget_, columnName, width, align, type, associatedWidget ) );
+	M_EPILOG
+}
+
+HListWidget::HColumnInfo::ptr_t HListWidgetCreator::do_make_column(
+		yaal::tools::HXml::HConstNodeProxy const&,
+		HListWidget*,
+		yaal::hcore::HString const& columnName,
+		int width,
+		HListWidget::BITS::ALIGN::align_t const& align,
+		type_id_t type,
+		HWidget* associatedWidget ) {
+	M_PROLOG
+	return ( make_resource<HListWidget::HColumnInfo>( columnName, width, align, type, associatedWidget ) );
 	M_EPILOG
 }
 

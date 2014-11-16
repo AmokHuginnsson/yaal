@@ -42,6 +42,18 @@ namespace yaal {
 
 namespace hdata {
 
+HDataListWidget::HDataColumnInfo::HDataColumnInfo(
+		yaal::hcore::HString const& columnName_,
+		int width_,
+		BITS::ALIGN::align_t const& align_,
+		type_id_t type_,
+		HWidget* associatedWidget_,
+		HDictionary::ptr_t const& dict_ )
+	: HColumnInfo( columnName_, width_, align_, type_, associatedWidget_ ),
+	_dict( dict_ ) {
+	return;
+}
+
 HDataListWidget::HDataListWidget(
 		HDataWindow* window_, int row_, int column_, int height_,
 		int width_, yaal::hcore::HString const& title_, HWidgetAttributesInterface const& attr_ )
@@ -75,7 +87,8 @@ void HDataListWidget::load( int long /*id_*/ ) {
 			idColNo = i;
 		}
 	}
-	HDataWindow::ORowBuffer rb( idColNo, static_cast<int>( _header.size() ) );
+	int columnCount( static_cast<int>( _header.size() ) );
+	HDataWindow::ORowBuffer rb( idColNo, columnCount );
 	parent->set_sync_store( &rb );
 	parent->status_bar()->init_progress( 0., "Collecting ..." );
 	HAsIsValueListModel<>::data_ptr_t data( _dataModel->get_data() );
@@ -84,6 +97,14 @@ void HDataListWidget::load( int long /*id_*/ ) {
 	int size( static_cast<int>( _dataModel->size() ) );
 	for ( HRecordSet::iterator row( rs->begin() ), end( rs->end() ); row != end; ++ row ) {
 		parent->sync( row );
+		for ( int i( 0 ); i < columnCount; ++ i ) {
+			HDataListWidget::HDataColumnInfo* ci( static_cast<HDataListWidget::HDataColumnInfo*>( _header[i].get() ) );
+			if ( !! ci->_dict ) {
+				int id( static_cast<int>( rb._item[i].get_integer() ) );
+				rb._item[i].set_integer( id );
+				rb._item[i].set_string( (*(ci->_dict))[id] );
+			}
+		}
 		parent->status_bar()->update_progress();
 		if ( it != data->end() )
 			{
@@ -144,6 +165,28 @@ HWidget::ptr_t HDataListWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	apply_resources( list->get_pointer(), node_ );
 	apply_role( window, list, node_ );
 	return ( list->get_pointer() );
+	M_EPILOG
+}
+
+HListWidget::HColumnInfo::ptr_t HDataListWidgetCreator::do_make_column(
+		yaal::tools::HXml::HConstNodeProxy const& node_,
+		HListWidget* widget_,
+		yaal::hcore::HString const& columnName,
+		int width,
+		HListWidget::BITS::ALIGN::align_t const& align,
+		type_id_t type,
+		HWidget* associatedWidget ) {
+	M_PROLOG
+	HString const& name( node_.get_name() );
+	M_ASSERT( name == "column" );
+	xml::value_t dictName( xml::try_attr_val( node_, "dict" ) );
+	HDictionary::ptr_t dict;
+	if ( !! dictName ) {
+		HDataWindow* window( dynamic_cast<HDataWindow*>( widget_->get_window() ) );
+		M_ASSERT( window );
+		dict = window->get_dictionary( *dictName );
+	}
+	return ( HListWidget::HColumnInfo::ptr_t( new HDataListWidget::HDataColumnInfo( columnName, width, align, type, associatedWidget, dict ) ) );
 	M_EPILOG
 }
 

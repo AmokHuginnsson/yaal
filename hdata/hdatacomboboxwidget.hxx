@@ -63,6 +63,8 @@ protected:
 	virtual void do_update( void );
 	virtual hconsole::HInfo const& do_get_data( void ) const;
 	virtual void do_set_data( hconsole::HInfo const& );
+private:
+	void init( void );
 };
 
 class HDataComboboxWidgetAttributes : public virtual hconsole::HComboboxWidgetAttributes {

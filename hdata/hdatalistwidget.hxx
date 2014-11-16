@@ -32,6 +32,7 @@ Copyright:
 
 #include "hconsole/hlistwidget.hxx"
 #include "hdata/hdatawidget.hxx"
+#include "hdata/hdictionary.hxx"
 
 namespace yaal {
 
@@ -47,6 +48,17 @@ class HDataListWidget : public HDataWidget, public virtual yaal::hconsole::HList
 public:
 	typedef HDataListWidget this_type;
 	typedef yaal::hconsole::HListWidget base_type;
+	class HDataColumnInfo : public HListWidget::HColumnInfo {
+	public:
+		HDictionary::ptr_t _dict;
+		HDataColumnInfo(
+				yaal::hcore::HString const& columnName,
+				int width,
+				BITS::ALIGN::align_t const& align = BITS::ALIGN::LEFT,
+				type_id_t type = yaal::TYPE::HSTRING,
+				HWidget* associatedWidget = NULL,
+				HDictionary::ptr_t const& = HDictionary::ptr_t() );
+	};
 public:
 	yaal::hconsole::list_widget_helper::HAsIsValueListModel<>::ptr_t _dataModel;
 	HDataListWidget( HDataWindow*, int, int, int, int, yaal::hcore::HString const&,
@@ -61,6 +73,14 @@ public:
 class HDataListWidgetCreator : virtual public yaal::hconsole::HListWidgetCreator {
 protected:
 	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual hconsole::HListWidget::HColumnInfo::ptr_t do_make_column(
+			yaal::tools::HXml::HConstNodeProxy const&,
+			hconsole::HListWidget*,
+			yaal::hcore::HString const& columnName,
+			int width,
+			hconsole::HListWidget::BITS::ALIGN::align_t const& align,
+			type_id_t type,
+			hconsole::HWidget* associatedWidget );
 };
 
 }

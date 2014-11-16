@@ -58,7 +58,7 @@ HComboboxWidget::HComboboxWidget( HWindow* parent_,
 	M_PROLOG
 	attr_.apply( *this );
 	_readOnly = true;
-	add_column( -1, "", 1, HWidget::BITS::ALIGN::LEFT, TYPE::HSTRING );
+	add_column( -1, HColumnInfo::ptr_t( new HColumnInfo( "", 1, HWidget::BITS::ALIGN::LEFT, TYPE::HSTRING ) ) );
 	HListWidget::set_flags( HListWidget::FLAG::NONE, HListWidget::FLAG::DRAW_HEADER );
 	return;
 	M_EPILOG
@@ -272,6 +272,7 @@ void HComboboxWidget::set_none_text( yaal::hcore::HString const& text_ ) {
 
 void HComboboxWidget::select_by_index( int index_ ) {
 	M_PROLOG
+	HScopedValueReplacement<int> heightRaw( _heightRaw, _height > 0 ? _height : HConsole::get_instance().get_height() + _height - _rowRaw );
 	set_cursor_position( index_ + 1 );
 	save_selection();
 	return;

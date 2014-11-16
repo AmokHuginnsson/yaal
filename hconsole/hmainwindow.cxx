@@ -70,7 +70,7 @@ void HMainWindow::do_init( void ) {
 			- cons.get_width() / 2 + 1, - 2, - 1, "&Opened window list",
 			make_pointer<HAsIsValueListModel<HWindow::ptr_t> >( _windowList ),
 			_foregroundWindow );
-	windowList->add_column( -1, "&Okno", 1 );
+	windowList->add_column( -1, make_resource<HListWidget::HColumnInfo>( "&Okno", 1 ) );
 	windowList->enable( true );
 	_menu->init( _tuiProcess );
 	_widgets.select( _menu );

@@ -53,11 +53,19 @@ HDataComboboxWidget::HDataComboboxWidget( HDataWindow* parent_,
 		_dictName() {
 	M_PROLOG
 	attr_.apply( *this );
+	init();
 	return;
 	M_EPILOG
 }
 
 void HDataComboboxWidget::do_update( void ) {
+	M_PROLOG
+	init();
+	return;
+	M_EPILOG
+}
+
+void HDataComboboxWidget::init( void ) {
 	M_PROLOG
 	M_ENSURE( ! _dictName.is_empty() );
 	list_widget_helper::HAsIsValueListModel<>* model( dynamic_cast<list_widget_helper::HAsIsValueListModel<>*>( get_model().raw() ) );

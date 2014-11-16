@@ -346,6 +346,9 @@ public:
 	/*! \brief Description of HListWidget column meta-data.
 	 */
 	class HColumnInfo {
+	public:
+		typedef yaal::hcore::HResource<HColumnInfo> ptr_t;
+	private:
 		bool _descending;
 		int _widthRaw;
 		int _width;
@@ -356,13 +359,19 @@ public:
 		hcore::HString _name;
 		HWidget* _widget;
 	public:
-		HColumnInfo( void );
+		HColumnInfo(
+				yaal::hcore::HString const& columnName,
+				int width,
+				BITS::ALIGN::align_t const& align = BITS::ALIGN::LEFT,
+				type_id_t type = TYPE::HSTRING,
+				HWidget* associatedWidget = NULL );
 		virtual ~HColumnInfo( void );
-		HColumnInfo( HColumnInfo const& );
-		HColumnInfo& operator = ( HColumnInfo const& );
 		void swap( HColumnInfo& );
 		friend class HListWidget;
 		static int const ADD_AT_THE_END = -1;
+	private:
+		HColumnInfo( HColumnInfo const& ) = delete;
+		HColumnInfo& operator = ( HColumnInfo const& ) = delete;
 	};
 protected:
 	bool _checkable;      /*!< can items be checked/unchecked */
@@ -375,7 +384,7 @@ protected:
 	int  _cursorPosition; /*!< cursor position relative to widget
 	                           begining */
 	int  _sumForOne;      /*!< sum of percentage columns width */
-	typedef yaal::hcore::HArray<HColumnInfo> header_t;
+	typedef yaal::hcore::HArray<HColumnInfo::ptr_t> header_t;
 	header_t _header; /*!< list header info */
 /* for internal use only */
 	int  _sortColumn;     /*!< column used for current sort operation */
@@ -405,12 +414,7 @@ public:
 #endif /* #else #ifndef _MSC_VER */
 	);
 	virtual ~HListWidget ( void );
-	void add_column( int atPosition,
-			yaal::hcore::HString const& columnName,
-			int width,
-			BITS::ALIGN::align_t const& align = BITS::ALIGN::LEFT,
-			type_id_t type = TYPE::HSTRING,
-			HWidget* associatedWidget = NULL );
+	void add_column( int atPosition, HColumnInfo::ptr_t );
 	void set_flags( flag_t, flag_t );
 	void reset( void );
 	list_widget_helper::HAbstractListModel::ptr_t& get_model( void );
@@ -547,10 +551,27 @@ public:
 };
 
 class HListWidgetCreator : virtual public HSearchableWidgetCreator {
+public:
+	HListWidget::HColumnInfo::ptr_t make_column(
+			yaal::tools::HXml::HConstNodeProxy const&,
+			HListWidget*,
+			yaal::hcore::HString const& columnName,
+			int width,
+			HListWidget::BITS::ALIGN::align_t const& align,
+			type_id_t type,
+			HWidget* associatedWidget );
 protected:
 	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
 	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
 	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual HListWidget::HColumnInfo::ptr_t do_make_column(
+			yaal::tools::HXml::HConstNodeProxy const&,
+			HListWidget*,
+			yaal::hcore::HString const& columnName,
+			int width,
+			HListWidget::BITS::ALIGN::align_t const& align,
+			type_id_t type,
+			HWidget* associatedWidget );
 };
 
 }
