@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 
 import re
+import datetime
+import time
 
 def yaal_lookup_function( val_ ):
 	lookup_tag = val_.type.strip_typedefs().tag
@@ -15,6 +17,9 @@ def yaal_lookup_function( val_ ):
 	regex = re.compile( "^yaal::hcore::HString$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHStringPrinter( val_ )
+	regex = re.compile( "^yaal::hcore::HTime$" )
+	if regex.match( lookup_tag ):
+		return YaalHCoreHTimePrinter( val_ )
 	regex = re.compile( "^yaal::hcore::HPair<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHPairPrinter( val_ )
@@ -54,6 +59,9 @@ def yaal_lookup_function( val_ ):
 	regex = re.compile( "^yaal::hcore::HVariant<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalHCoreHVariantPrinter( val_ )
+	regex = re.compile( "^yaal::tools::HTwoWayMap<.*>$" )
+	if regex.match( lookup_tag ):
+		return YaalToolsHTwoWayMapPrinter( val_ )
 	regex = re.compile( "^yaal::tools::HRing<.*>$" )
 	if regex.match( lookup_tag ):
 		return YaalToolsHRingPrinter( val_ )
@@ -136,6 +144,18 @@ class YaalHCoreHStringPrinter:
 		else:
 			s = self._val['_ptr']
 		return s
+
+	def display_hint( self ):
+		return 'string'
+
+class YaalHCoreHTimePrinter:
+	"Print a yaal::hcore::HTime"
+
+	def __init__( self, val_ ):
+		self._val = val_
+
+	def to_string( self ):
+		return time.strftime( str( self._val['_format'] )[1:-1], time.localtime( int( self._val['_value'] ) ) )
 
 	def display_hint( self ):
 		return 'string'
@@ -602,6 +622,19 @@ class YaalHCoreHVariantPrinter:
 
 	def display_hint( self ):
 		return 'string'
+
+class YaalToolsHTwoWayMapPrinter:
+	def __init__( self, val_ ):
+		self._val = val_
+
+	def children( self ):
+		return YaalHCoreHListPrinter( self._val['_data'] ).children()
+
+	def to_string( self ):
+		return ( "yaal::tools::HTwoWayMap of `%s<->%s' of length %d" % ( self._val.type.template_argument( 0 ), self._val.type.template_argument( 1 ), self._val['_data']['_size'] ) )
+
+	def display_hint( self ):
+		return 'array'
 
 class YaalToolsHRingPrinter:
 	"Print a yaal::tools::HRing"
