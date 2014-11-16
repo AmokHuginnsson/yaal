@@ -313,7 +313,7 @@ public:
 			int long newCapacity( _capacity ? max( capacity_, _capacity * 2 ) : capacity_ );
 			value_type* newBuf( static_cast<value_type*>( ::operator new ( static_cast<size_t>( newCapacity * static_cast<int>( sizeof ( value_type ) ) ), memory::yaal ) ) );
 			for ( int long i( 0 ); i < _size; ++ i )
-				new ( newBuf + i ) value_type( _buf[ i ] );
+				new ( newBuf + i ) value_type( yaal::move( _buf[ i ] ) );
 			for ( int long i( 0 ); i < _size; ++ i )
 				M_SAFE( _buf[ i ].~value_type() );
 			using yaal::swap;
@@ -355,6 +355,16 @@ public:
 		if ( _size == _capacity )
 			reserve( _capacity + 1 );
 		new ( _buf + _size ) value_type( val_ );
+		++ _size;
+		return;
+		M_EPILOG
+	}
+	void push_back( type_t&& val_ ) {
+		M_PROLOG
+		M_ASSERT( _size <= _capacity );
+		if ( _size == _capacity )
+			reserve( _capacity + 1 );
+		new ( _buf + _size ) value_type( yaal::move( val_ ) );
 		++ _size;
 		return;
 		M_EPILOG
@@ -554,6 +564,33 @@ public:
 		return ( pos_ );
 		M_EPILOG
 	}
+	iterator insert( iterator pos_, type_t&& value_ ) {
+		M_PROLOG
+		M_ASSERT( pos_._owner == this );
+		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
+		insert_space( pos_._index, 1 );
+		new ( _buf + pos_._index ) value_type( yaal::move( value_ ) );
+		return ( pos_ );
+		M_EPILOG
+	}
+	/*! \brief Insert value at given position, contructing it directly in place.
+	 *
+	 * \param pos_ - insert given value at this position.
+	 * \param arg_ - arguments passed to value_type constuctor.
+	 * \return Iterator pointing to newly inserted element.
+	 */
+	template<typename... arg_t>
+	iterator emplace( iterator pos_, arg_t&&... arg_ ) {
+		M_PROLOG
+		M_ASSERT( pos_._owner == this );
+		if ( ( pos_._index < 0 ) && ( pos_._index > _size ) )
+			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], pos_._index );
+		insert_space( pos_._index, 1 );
+		new ( _buf + pos_._index ) value_type( yaal::forward<arg_t>( arg_ )... );
+		return ( pos_ );
+		M_EPILOG
+	}
 	/*! \brief Remove part of array.
 	 *
 	 * Part of array to be removed is defined by pair of valid iterators
@@ -576,7 +613,7 @@ public:
 		if ( last_._index < first_._index ) {
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index - first_._index );
 		}
-		for ( iterator it( copy( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it ) {
+		for ( iterator it( move( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it ) {
 			M_SAFE( (*it).~value_type() );
 		}
 		_size -= ( last_._index - first_._index );
@@ -689,7 +726,7 @@ private:
 		reserve( _size + size_ );
 		_size += size_;
 		for ( int long src( oldSize - 1 ), dst( _size - 1 ); src >= pos_; -- src, -- dst ) {
-			new ( _buf + dst ) value_type( _buf[ src ] );
+			new ( _buf + dst ) value_type( yaal::move( _buf[ src ] ) );
 			M_SAFE( _buf[ src ].~value_type() );
 		}
 		return;

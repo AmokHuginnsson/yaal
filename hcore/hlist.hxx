@@ -401,6 +401,17 @@ public:
 		return ( iterator( this, element ) );
 		M_EPILOG
 	}
+	iterator insert( iterator const& it, type_t&& val ) {
+		M_PROLOG
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( it._current ? it._current : _hook, static_cast<trait::false_type const*>( nullptr ), yaal::move( val ) );
+		if ( ( _size == 0 ) || ( it._current == _hook ) ) {
+			_hook = element;
+		}
+		++ _size;
+		return ( iterator( this, element ) );
+		M_EPILOG
+	}
 	template<typename... arg_t>
 	iterator emplace( iterator const& it, arg_t&&... arg_ ) {
 		M_PROLOG
@@ -467,6 +478,16 @@ public:
 		return;
 		M_EPILOG
 	}
+	void push_back( type_t&& object_ ) {
+		M_PROLOG
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( _hook, static_cast<trait::false_type const*>( nullptr ), yaal::move( object_ ) );
+		if ( _size == 0 )
+			_hook = element;
+		++ _size;
+		return;
+		M_EPILOG
+	}
 	template<typename... arg_t>
 	void emplace_back( arg_t&&... arg_ ) {
 		M_PROLOG
@@ -496,6 +517,15 @@ public:
 		M_PROLOG
 		HElement* element( _allocator.allocate( 1 ) );
 		new ( element ) HElement( _hook, static_cast<trait::false_type const*>( nullptr ), object_ );
+		_hook = element;
+		++ _size;
+		return;
+		M_EPILOG
+	}
+	void push_front( type_t&& object_ ) {
+		M_PROLOG
+		HElement* element( _allocator.allocate( 1 ) );
+		new ( element ) HElement( _hook, static_cast<trait::false_type const*>( nullptr ), yaal::move( object_ ) );
 		_hook = element;
 		++ _size;
 		return;
