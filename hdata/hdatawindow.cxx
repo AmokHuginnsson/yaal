@@ -53,7 +53,6 @@ namespace hdata {
 HDataWindow::HDataWindow( HString const& title_, HDataProcess* owner_ )
 	: HWindow( title_ ),
 	_modified( false ), _documentMode( DOCUMENT::VIEW ), _mainWidget( NULL ),
-	_syncStore( NULL ),
 	_viewModeWidgets(), _editModeWidgets(), _owner( owner_ ),
 	_crud( new ( memory::yaal ) HCRUDDescriptor( owner_->data_base() ) ),
 	_mode( HCRUDDescriptor::MODE::SELECT ),
@@ -72,7 +71,6 @@ HDataWindow::HDataWindow( HString const& title_, HDataProcess* owner_ )
 HDataWindow::~HDataWindow( void ) {
 	M_PROLOG
 	_mainWidget = NULL;
-	_syncStore = NULL;
 	return;
 	M_EPILOG
 }
@@ -122,20 +120,6 @@ void HDataWindow::set_mode( DOCUMENT::mode_t mode_ ) {
 	M_EPILOG
 }
 
-void HDataWindow::sync( HRecordSet::iterator it ) {
-	M_PROLOG
-	M_ASSERT( _syncStore );
-	M_ASSERT( _documentMode == DOCUMENT::VIEW );
-	int long count = _syncStore->_item.get_value_count();
-	for ( int i = 0; i < count; i ++ ) {
-		_syncStore->_item[ i ].set_string( it[i] ? *it[ i ] : "" );
-	}
-	if ( _syncStore->_idColNo >= 0 ) {
-		_syncStore->_item._id = lexical_cast<int>( *it[ _syncStore->_idColNo ] );
-	}
-	M_EPILOG
-}
-
 void HDataWindow::sync( void ) {
 	M_PROLOG
 	M_ASSERT( _documentMode == DOCUMENT::EDIT );
@@ -157,11 +141,6 @@ void HDataWindow::sync( void ) {
 	}
 	return;
 	M_EPILOG
-}
-
-void HDataWindow::set_sync_store( ORowBuffer* rB_ ) {
-	_syncStore = rB_;
-	return;
 }
 
 bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {

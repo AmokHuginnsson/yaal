@@ -366,7 +366,9 @@ public:
 				type_id_t type = TYPE::HSTRING,
 				HWidget* associatedWidget = NULL );
 		virtual ~HColumnInfo( void );
-		void swap( HColumnInfo& );
+		type_id_t type( void ) const {
+			return ( _type );
+		}
 		friend class HListWidget;
 		static int const ADD_AT_THE_END = -1;
 	private:

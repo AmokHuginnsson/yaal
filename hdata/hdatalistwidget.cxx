@@ -88,35 +88,39 @@ void HDataListWidget::load( int long /*id_*/ ) {
 		}
 	}
 	int columnCount( static_cast<int>( _header.size() ) );
-	HDataWindow::ORowBuffer rb( idColNo, columnCount );
-	parent->set_sync_store( &rb );
 	parent->status_bar()->init_progress( 0., "Collecting ..." );
 	HAsIsValueListModel<>::data_ptr_t data( _dataModel->get_data() );
 	HAsIsValueListModel<>::data_t::iterator it( data->begin() );
 	int ctr( 0 );
 	int size( static_cast<int>( _dataModel->size() ) );
+	HItem<> item( columnCount );
 	for ( HRecordSet::iterator row( rs->begin() ), end( rs->end() ); row != end; ++ row ) {
-		parent->sync( row );
 		for ( int i( 0 ); i < columnCount; ++ i ) {
 			HDataListWidget::HDataColumnInfo* ci( static_cast<HDataListWidget::HDataColumnInfo*>( _header[i].get() ) );
 			if ( !! ci->_dict ) {
-				int id( static_cast<int>( rb._item[i].get_integer() ) );
-				rb._item[i].set_integer( id );
-				rb._item[i].set_string( (*(ci->_dict))[id] );
+				int id( lexical_cast<int>( *row[i] ) );
+				item[i].set_integer( id );
+				item[i].set_string( (*(ci->_dict))[id] );
+			} else if ( ci->type() == yaal::TYPE::HTIME ) {
+				item[ i ].set_time( HTime( row[i] ? *row[ i ] : "", _iso8601DateFormat_ ) );
+			} else {
+				item[ i ].set_string( row[i] ? *row[ i ] : "" );
 			}
+		}
+		if ( idColNo >= 0 ) {
+			item._id = lexical_cast<int>( *row[ idColNo ] );
 		}
 		parent->status_bar()->update_progress();
 		if ( it != data->end() )
 			{
-			(*it) = rb._item;
+			(*it) = item;
 			++ it;
 		} else
-			data->push_back( rb._item );
+			data->push_back( item );
 		++ ctr;
 	} while ( ctr ++ < size )
 		_dataModel->remove_tail();
 	reset();
-	parent->set_sync_store();
 	return;
 	M_EPILOG
 }
@@ -177,8 +181,7 @@ HListWidget::HColumnInfo::ptr_t HDataListWidgetCreator::do_make_column(
 		type_id_t type,
 		HWidget* associatedWidget ) {
 	M_PROLOG
-	HString const& name( node_.get_name() );
-	M_ASSERT( name == "column" );
+	M_ASSERT( node_.get_name() == "column" );
 	xml::value_t dictName( xml::try_attr_val( node_, "dict" ) );
 	HDictionary::ptr_t dict;
 	if ( !! dictName ) {

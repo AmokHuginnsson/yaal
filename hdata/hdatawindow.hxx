@@ -59,18 +59,10 @@ public:
 		} mode_t;
 	};
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, HDictionary::ptr_t> dictionaries_t;
-	/*! \brief DML helper, buffer for currently edited row.
-	 */
-	struct ORowBuffer {
-		int _idColNo;
-		yaal::hconsole::HInfoItem _item;
-		ORowBuffer( int idColNo_, int size_ ) : _idColNo( idColNo_ ), _item( size_ ) {}
-	};
 protected:
 	bool _modified;
 	DOCUMENT::mode_t _documentMode;
 	HDataWidget* _mainWidget;
-	ORowBuffer* _syncStore;
 	typedef yaal::hcore::HList<HDataWidget*> controls_t;
 	controls_t _viewModeWidgets;
 	controls_t _editModeWidgets;
@@ -82,7 +74,6 @@ protected:
 public:
 	HDataWindow( yaal::hcore::HString const&, HDataProcess* );
 	virtual ~HDataWindow( void );
-	void set_sync_store( ORowBuffer* = NULL );
 	bool is_modified( void ) const;
 	void set_modified( bool = true );
 	void sync( yaal::dbwrapper::HRecordSet::iterator );
