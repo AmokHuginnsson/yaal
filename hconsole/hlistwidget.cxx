@@ -87,7 +87,7 @@ HListWidget::HListWidget( HWindow* parent_, int row_, int column_,
 	HSearchableWidget( attr_ ),
 	_checkable( false ), _sortable( true ),
 	_drawHeader( true ), _editable( false ),
-	_widgetOffset( 0 ), _cursorPosition( 0 ), _sumForOne( 0 ),
+	_widgetOffset( 0 ), _cursorPosition( 0 ), _visibleColumn( false ),
 	_header(), _sortColumn( -1 ), _match(),
 	_cursor(), _firstVisibleRow(), _model( data_ ) {
 	M_PROLOG
@@ -114,7 +114,7 @@ void HListWidget::do_paint( void ) {
 		cons.curs_set( CURSOR::INVISIBLE );
 	draw_label(); /* raw* set here */
 	_rowRaw += hR;
-	if ( ! _sumForOne ) {
+	if ( ! _visibleColumn ) {
 		return;
 	}
 	if ( _widthRaw != tmp ) {
@@ -597,37 +597,51 @@ void HListWidget::add_column( int columnPosition_, HColumnInfo::ptr_t column_ ) 
 	if ( size ) {
 		M_THROW( "cannot add new column when list not empty", size );
 	}
-	_sumForOne += column_->_width;
+	if ( column_->_width != 0 ) {
+		_visibleColumn = true;
+	}
 	if ( ! _header.is_empty() && ( columnPosition_ >= 0 ) ) {
 		_header.insert( _header.begin() + columnPosition_, yaal::move( column_ ) );
 	} else {
 		_header.push_back( yaal::move( column_ ) );
 	}
-	recalculate_column_widths();
+	if ( _visibleColumn ) {
+		recalculate_column_widths();
+	}
 	return;
 	M_EPILOG
 }
 
 void HListWidget::recalculate_column_widths( void ) {
 	M_PROLOG
-	int ctrLoc( 0 );
-	int columnOffset( 0 );
+	int allColumnsWidth( 0 );
 	int columns( static_cast<int>( _header.size() ) );
-	for ( int ctr( 0 ); ctr < columns; ctr ++ ) {
-		int newWidth( _header[ ctr ]->_width );
-		if ( newWidth ) {
-			if ( ! _sumForOne )
-				M_THROW( "width of all columns equals 0", _sumForOne );
-			newWidth *= _widthRaw;
-			newWidth /= _sumForOne;
-			ctrLoc = ctr; /* last one with non zero width */
-			_header[ ctr ]->_widthRaw = newWidth;
-			columnOffset += newWidth;
+	int percentages( 0 );
+	int absolutes( 0 );
+	for ( int i( 0 ); i < columns; ++ i ) {
+		HColumnInfo* ci( _header[i].get() );
+		if ( ci->_width > 0 ) {
+			percentages += ci->_width;
+		} else if ( ci->_width < 0 ) {
+			absolutes += ( 1 - ci->_width );
 		}
 	}
+	int last( -1 );
+	for ( int i( 0 ); i < columns; ++ i ) {
+		HColumnInfo* ci( _header[i].get() );
+		if ( ci->_width > 0 ) {
+			ci->_widthRaw = ( ci->_width * ( _widthRaw - absolutes ) ) / percentages;
+			last = i;
+		} else if ( ci->_width < 0 ) {
+			ci->_widthRaw = 1 - ci->_width;
+		}
+		allColumnsWidth += ci->_widthRaw;
+	}
 	/* last column with non zero width should fill space */
-	columnOffset -= _header[ ctrLoc ]->_widthRaw;
-	_header[ ctrLoc ]->_widthRaw = ( _widthRaw - columnOffset );
+	if ( last >= 0 ) {
+		allColumnsWidth -= _header[ last ]->_widthRaw;
+		_header[ last ]->_widthRaw = ( _widthRaw - allColumnsWidth );
+	}
 	return;
 	M_EPILOG
 }

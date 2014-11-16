@@ -385,7 +385,7 @@ protected:
 	                           offset of first row shown */
 	int  _cursorPosition; /*!< cursor position relative to widget
 	                           begining */
-	int  _sumForOne;      /*!< sum of percentage columns width */
+	bool _visibleColumn;  /*!< tells if list contain any visible column */
 	typedef yaal::hcore::HArray<HColumnInfo::ptr_t> header_t;
 	header_t _header; /*!< list header info */
 /* for internal use only */

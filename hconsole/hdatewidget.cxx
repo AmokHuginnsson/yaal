@@ -303,6 +303,7 @@ void HDateWidget::do_set_data( HInfo const& data_ ) {
 	M_PROLOG
 	_time = data_.get_time();
 	_time.set_format( _iso8601DateFormat_ );
+	_selectedTime = _time;
 	return;
 	M_EPILOG
 }
