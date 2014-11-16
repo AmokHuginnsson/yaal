@@ -395,6 +395,56 @@ inline dst_it_t copy_n( src_it_t src, int long count, dst_it_t dst ) {
 	return ( dst );
 }
 
+/*! \brief Move range of values onto another range.
+ *
+ * \param src - begining of source range of elements.
+ * \param end - one past the end of source range of elements.
+ * \param dst - begining of destination range.
+ * \return one past end of destination range.
+ */
+template<typename src_it_t, typename dst_it_t>
+inline dst_it_t move( src_it_t src, src_it_t const& end, dst_it_t dst ) {
+	for ( ; src != end; ++ src, ++ dst ) {
+		*dst = yaal::move( *src );
+	}
+	return ( dst );
+}
+
+/*! \brief Move range of values onto another range.
+ *
+ * \param first - begining of source range of elements.
+ * \param last - one past the end of source range of elements.
+ * \param dst - one past end of destination range.
+ * \return begining of destination range.
+ */
+template<typename src_it_t, typename dst_it_t>
+inline dst_it_t move_backward( src_it_t const& first, src_it_t last, dst_it_t dst ) {
+	if ( first != last ) {
+		-- last;
+		-- dst;
+		for ( ; first != last; -- last, -- dst ) {
+			*dst = yaal::move( *last );
+		}
+		*dst = yaal::move( *last );
+	}
+	return ( dst );
+}
+
+/*! \brief Move given number of elements from range of values onto another range.
+ *
+ * \param src - begining of source range of elements.
+ * \param count - number of elements to move.
+ * \param dst - begining of destination range.
+ * \return one past end of destination range.
+ */
+template<typename src_it_t, typename dst_it_t>
+inline dst_it_t move_n( src_it_t src, int long count, dst_it_t dst ) {
+	for ( int long i = 0; i < count; ++ i, ++ src, ++ dst ) {
+		*dst = yaal::move( *src );
+	}
+	return ( dst );
+}
+
 /*! \brief Remove all occurences of given value from range.
  *
  * \param first_ - begining of range of elements to filter.
