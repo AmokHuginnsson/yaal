@@ -281,6 +281,7 @@ void HListWidget::draw_cell( iterator_t& it_, int row_, int column_, int columnO
 		break;
 	}
 	if ( row_ == _cursorPosition ) {
+		M_ASSERT( it_ == _cursor );
 		if ( checked_ )
 			cons.set_attr( ! _enabled
 					? ( ! _focused ? ~_attributeFocused._label
@@ -1036,21 +1037,32 @@ void HListWidget::remove_current_row( void ) {
 	M_ASSERT( ! _model->is_empty() );
 	M_ASSERT( _cursor != _model->end() );
 	iterator_t it( _cursor );
-	bool last( get_cursor_position() == ( _model->size() - 1 ) );
-	if ( ( _widgetOffset > 0 ) && ( _heightRaw >= ( _model->size() - _widgetOffset ) ) ) {
-		-- _widgetOffset;
-		-- _firstVisibleRow;
-	}
 	if ( _cursor == _firstVisibleRow ) {
-		++ _firstVisibleRow;
-	}
-	if ( last ) {
-		-- _cursor;
-		if ( _heightRaw >= _model->size() ) {
-			-- _cursorPosition;
+		if ( ( _widgetOffset > 0 ) && ( _heightRaw >= ( _model->size() - _widgetOffset ) ) ) {
+			-- _firstVisibleRow;
+			-- _widgetOffset;
+			-- _cursor;
+		} else {
+			++ _firstVisibleRow;
+			++ _cursor;
 		}
 	} else {
-		++ _cursor;
+		if ( get_cursor_position() == ( _model->size() - 1 ) ) {
+			if ( _widgetOffset > 0 ) {
+				-- _firstVisibleRow;
+				-- _widgetOffset;
+			} else {
+				-- _cursorPosition;
+			}
+			-- _cursor;
+		} else {
+			if ( ( _widgetOffset > 0 ) && ( _heightRaw >= ( _model->size() - _widgetOffset ) ) ) {
+				-- _firstVisibleRow;
+				-- _widgetOffset;
+				++ _cursorPosition;
+			}
+			++ _cursor;
+		}
 	}
 	_model->erase( it );
 	schedule_repaint();
