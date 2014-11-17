@@ -142,7 +142,9 @@ void HDateWidget::close_calendar( ACTION::action_t action_ ) {
 	} else {
 		_time = _selectedTime;
 	}
-	_window->schedule_repaint( true );
+	if ( _window ) {
+		_window->schedule_repaint( true );
+	}
 	return;
 	M_EPILOG
 }
@@ -183,7 +185,9 @@ int HDateWidget::do_process_input( int code_ ) {
 	if ( !unknown ) {
 		code_ = 0;
 		schedule_repaint();
-		_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+		if ( _window ) {
+			_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+		}
 	}
 	return ( code_ );
 	M_EPILOG

@@ -61,9 +61,11 @@ void HSearchableWidget::search( HString const& pattern_, bool backwards_ ) {
 	HPattern::pluggable_flags_t pf;
 	pf.push_back( make_pair( 'f', &_filtered ) );
 	_searchActived = ! _pattern.parse( pattern_, &pf );
-	if ( ! _searchActived )
-		_window->status_bar()->message( "%s", _pattern.error().raw() );
-	else {
+	if ( ! _searchActived ) {
+		if ( _window ) {
+			_window->status_bar()->message( "%s", _pattern.error().raw() );
+		}
+	} else {
 		_backwards = backwards_;
 		if ( _backwards )
 			go_to_match_previous();

@@ -396,8 +396,20 @@ protected:
 		int _columnWithMatch;
 		int _matchNumber;
 		iterator_t _currentMatch; /*!< row that has current pattern match */
-		match_t() : _columnWithMatch( 0 ), _matchNumber( -1 ), _currentMatch() { }
+		match_t()
+			: _columnWithMatch( 0 ), _matchNumber( -1 ), _currentMatch() {
+		}
 	} _match;
+	/*! \brief Editable mode helpers.
+	 */
+	struct OCellEditor {
+		bool _editing;
+		int _currentColumn;
+		HWidget::ptr_t _edit;
+		OCellEditor()
+			: _editing( false ), _currentColumn( 0 ), _edit() {
+		}
+	} _cellEditor;
 	iterator_t _cursor; /*!< current row highlight (selection or mark or what ever you name it) */
 	iterator_t _firstVisibleRow;	/*!< pointer to first visible row */
 	list_widget_helper::HAbstractListModel::ptr_t _model;
@@ -450,16 +462,20 @@ protected:
 	void handle_key_tab( void );
 	void handle_key_insert( void );
 	void handle_key_delete( void );
+	void handle_key_edit( void );
 	void scroll_up( void );
 	void scroll_down( void );
 	void move_cursor_up( void );
 	void move_cursor_down( void );
 private:
+	int process_input_view( int );
+	int process_input_edit( int );
 	void sort_by_column( int, list_widget_helper::OSortHelper::sort_order_t = list_widget_helper::OSortHelper::ASCENDING );
 	void recalculate_column_widths( void );
 	void draw_background( int );
 	void draw_header( int );
 	void draw_scroll( int );
+	int column_offset( int ) const;
 	HListWidget( HListWidget const& );
 	HListWidget& operator = ( HListWidget const& );
 };

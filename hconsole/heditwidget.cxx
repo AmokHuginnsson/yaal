@@ -538,11 +538,15 @@ int HEditWidget::do_process_input( int code_ ) {
 		_pattern.find( _varTmpBuffer.raw() );
 		errorCode = _pattern.error_code();
 		if ( errorCode ) {
-			_window->status_bar()->message( COLORS::BG_BROWN, "%s", _pattern.error().raw() );
+			if ( _window ) {
+				_window->status_bar()->message( COLORS::BG_BROWN, "%s", _pattern.error().raw() );
+			}
 		} else {
 			code_ = errorCode;
 			_string = _varTmpBuffer;
-			_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+			if ( _window ) {
+				_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+			}
 			schedule_repaint();
 		}
 	}

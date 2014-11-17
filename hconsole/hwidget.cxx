@@ -69,9 +69,6 @@ HWidget::HWidget( HWindow* parent_, int row_, int column_,
 	if ( ! HConsole::get_instance().is_enabled() ) {
 		M_THROW( "not in curses mode.", errno );
 	}
-	if ( ! parent_ ) {
-		M_THROW( "no parent window.", reinterpret_cast<int long>( parent_ ) );
-	}
 	_shortcutIndex = static_cast<int>( _label.find( '&' ) );
 	if ( _shortcutIndex > -1 ) {
 		_label.set_at( _shortcutIndex, 0 );
@@ -94,7 +91,9 @@ HWidget::HWidget( HWindow* parent_, int row_, int column_,
 		_labelPosition = LABEL::POSITION::SIDE_BY_SIDE;
 	}
 	set_attributes( attr_ );
-	_window->add_widget( HWidget::ptr_t( this ), KEY<>::meta_r( _label[ _shortcutIndex ] ) );
+	if ( _window ) {
+		_window->add_widget( HWidget::ptr_t( this ), KEY<>::meta_r( _label[ _shortcutIndex ] ) );
+	}
 	return;
 	M_EPILOG
 }
@@ -141,7 +140,7 @@ bool HWidget::set_focus( char shortCut_ ) {
 	if ( _enabled && ( ( shortCut_ <= 0 ) || ( _label[ _shortcutIndex ] == shortCut_ ) ) ) {
 		bool oldFocus( _focused );
 		_focused = true;
-		if ( ! shortCut_ ) {
+		if ( ! shortCut_ && _window ) {
 			_window->acquire_focus( this );
 		}
 		if ( oldFocus != _focused ) {
@@ -471,7 +470,9 @@ void HWidget::set_label_decoration( LABEL::DECORATION::decoration_t decoration_ 
 void HWidget::schedule_repaint( void ) {
 	M_PROLOG
 	_needRepaint = true;
-	_window->schedule_repaint( false );
+	if ( _window ) {
+		_window->schedule_repaint( false );
+	}
 	return;
 	M_EPILOG
 }

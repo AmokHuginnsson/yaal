@@ -223,7 +223,9 @@ void HComboboxWidget::close_combo( ACTION::action_t action_ ) {
 	} else {
 		restore_selection();
 	}
-	_window->schedule_repaint( true );
+	if ( _window ) {
+		_window->schedule_repaint( true );
+	}
 	return;
 	M_EPILOG
 }

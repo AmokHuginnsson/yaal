@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hlistwidget.hxx"
 #include "hcore/memory.hxx"
+#include "hcore/hlog.hxx"
 #include "hconsole.hxx"
 #include "tools/hxml.hxx"
 #include "hconsole/hwindow.hxx"
@@ -88,7 +89,7 @@ HListWidget::HListWidget( HWindow* parent_, int row_, int column_,
 	_checkable( false ), _sortable( true ),
 	_drawHeader( true ), _editable( false ),
 	_widgetOffset( 0 ), _cursorPosition( 0 ), _visibleColumn( false ),
-	_header(), _sortColumn( -1 ), _match(),
+	_header(), _sortColumn( -1 ), _match(), _cellEditor(),
 	_cursor(), _firstVisibleRow(), _model( data_ ) {
 	M_PROLOG
 	attr_.apply( *this );
@@ -156,6 +157,9 @@ void HListWidget::do_paint( void ) {
 		draw_scroll( _columnRaw + columnOffset - 1 );
 	}
 	_rowRaw -= hR;
+	if ( _cellEditor._editing ) {
+		_cellEditor._edit->paint();
+	}
 	return;
 	M_EPILOG
 }
@@ -372,11 +376,13 @@ void HListWidget::handle_key_page_up( void ) {
 		if ( _widgetOffset ) {
 			_widgetOffset -= ( _heightRaw - 1 );
 			decrement( _firstVisibleRow, _heightRaw - 1 );
+			decrement( _cursor, _heightRaw - 1 );
 		} else {
 			HConsole::get_instance().bell();
 		}
 		if ( _widgetOffset < 0 ) {
 			_widgetOffset = 0;
+			_cursor = _model->begin();
 			_firstVisibleRow = _model->begin();
 		}
 	} else {
@@ -390,14 +396,15 @@ void HListWidget::handle_key_page_up( void ) {
 void HListWidget::handle_key_page_down( void ) {
 	M_PROLOG
 	int size( static_cast<int>( _model->size() ) );
-	if ( size >= _heightRaw ) {
+	if ( size > _heightRaw ) {
 		if ( _cursorPosition == ( _heightRaw - 1 ) ) {
-			if ( _widgetOffset < ( size - _heightRaw ) ) {
+			if ( get_cursor_position() < ( size - 1 ) ) {
 				_widgetOffset += ( _heightRaw - 1 );
 				increment( _firstVisibleRow, _heightRaw - 1 );
+				increment( _cursor, _heightRaw - 1 );
 				if ( _widgetOffset > ( size - _heightRaw ) ) {
 					_widgetOffset = size - _heightRaw;
-					_firstVisibleRow = _model->rbegin();
+					_cursor = _firstVisibleRow = _model->rbegin();
 					decrement( _firstVisibleRow, _heightRaw - 1 );
 				}
 			} else {
@@ -530,8 +537,18 @@ void HListWidget::handle_key_space( void ) {
 }
 
 void HListWidget::handle_key_tab( void ) {
-	_focused = false;   /* very  */
-	schedule_repaint(); /* magic */
+	if ( _cellEditor._editing ) {
+		++ _cellEditor._currentColumn;
+		_cellEditor._currentColumn %= static_cast<int>( _header.get_size() );
+		_cellEditor._edit->move(
+				_rowRaw + _cursorPosition + ( _drawHeader ? 1 : 0 ),
+				_columnRaw + column_offset( _cellEditor._currentColumn ),
+				1,
+				_header[_cellEditor._currentColumn]->_widthRaw - 1 );
+	} else {
+		_focused = false;   /* very  */
+		schedule_repaint(); /* magic */
+	}
 	return;
 }
 
@@ -557,6 +574,27 @@ void HListWidget::handle_key_delete( void ) {
 	M_EPILOG
 }
 
+void HListWidget::handle_key_edit( void ) {
+	M_PROLOG
+	M_ASSERT( _editable );
+	if ( ! _model->is_empty() && ! _cellEditor._editing ) {
+		if ( ! _cellEditor._edit ) {
+			_cellEditor._edit = make_pointer<HEditWidget>( nullptr, 0, 0, 0, 0, "", HEditWidgetAttributes().draw_label( false ) );
+			_cellEditor._edit->enable( true );
+		}
+		_cellEditor._edit->move(
+				_rowRaw + _cursorPosition + ( _drawHeader ? 1 : 0 ),
+				_columnRaw + column_offset( _cellEditor._currentColumn ),
+				1,
+				_header[_cellEditor._currentColumn]->_widthRaw - 1 );
+		_cellEditor._edit->set_focus();
+		_cellEditor._editing = true;
+		schedule_repaint();
+	}
+	return;
+	M_EPILOG
+}
+
 void HListWidget::selection_change( void ) {
 	M_PROLOG
 	update_children();
@@ -566,6 +604,29 @@ void HListWidget::selection_change( void ) {
 }
 
 int HListWidget::do_process_input( int code_ ) {
+	M_PROLOG
+	if ( _cellEditor._editing ) {
+		code_ = process_input_edit( code_ );
+	}
+	if ( code_ || ! _cellEditor._editing ) {
+		code_ = process_input_view( code_ );
+	}
+	return ( code_ );
+	M_EPILOG
+}
+
+int HListWidget::process_input_edit( int code_ ) {
+	M_PROLOG
+	M_ASSERT( _editable && _cellEditor._editing );
+	code_ = _cellEditor._edit->process_input( code_ );
+	if ( ! code_ ) {
+		_cellEditor._edit->schedule_repaint();
+	}
+	return ( code_ );
+	M_EPILOG
+}
+
+int HListWidget::process_input_view( int code_ ) {
 	M_PROLOG
 	int errorCode( 0 );
 	int origCursorPosition( get_cursor_position() );
@@ -589,6 +650,11 @@ int HListWidget::do_process_input( int code_ ) {
 		case ( KEY_CODES::DELETE ): {
 			if ( _editable ) {
 				handle_key_delete();
+			}
+		} break;
+		case ( KEY_CODES::F2 ): {
+			if ( _editable ) {
+				handle_key_edit();
 			}
 		} break;
 		case ( '\t' ):                 handle_key_tab();
@@ -616,7 +682,9 @@ int HListWidget::do_process_input( int code_ ) {
 	code_ = errorCode;
 	if ( ! errorCode ) {
 		schedule_repaint();
-		_window->status_bar()->message( COLORS::FG_LIGHTGRAY, "%s", _varTmpBuffer.raw() );
+		if ( _window ) {
+			_window->status_bar()->message( COLORS::FG_LIGHTGRAY, "%s", _varTmpBuffer.raw() );
+		}
 	}
 	if ( get_cursor_position() != origCursorPosition ) {
 		selection_change();
@@ -643,6 +711,16 @@ void HListWidget::add_column( int columnPosition_, HColumnInfo::ptr_t column_ ) 
 		recalculate_column_widths();
 	}
 	return;
+	M_EPILOG
+}
+
+int HListWidget::column_offset( int column_ ) const {
+	M_PROLOG
+	int offset( 0 );
+	for ( int i( 0 ); i < column_; ++ i ) {
+		offset += _header[ i ]->_widthRaw;
+	}
+	return ( offset );
 	M_EPILOG
 }
 
@@ -687,11 +765,12 @@ void HListWidget::sort_by_column( int column_, OSortHelper::sort_order_t order_ 
 	_sortColumn = column_;
 	_header[ column_ ]->_descending = order_ == OSortHelper::DESCENDING;
 	long int size = _model->size();
-	if ( size > 128 )
+	if ( _window && ( size > 128 ) ) {
 		_window->status_bar()->init_progress(
 				static_cast<double>( size )
 				* static_cast<double>( size ) / 2.,
 				" Sorting ..." );
+	}
 	list_widget_helper::OSortHelper helper =
 		{ column_, order_, _header[ _sortColumn ]->_type,
 		0, _model->size(), _window };
@@ -1109,8 +1188,9 @@ namespace list_widget_helper {
 void OSortHelper::progress( void ) {
 	M_PROLOG
 	++ _comparedItems;
-	if ( ( _size > 1024 ) && ! ( _comparedItems % 1024 ) )
+	if ( _window && ( _size > 1024 ) && ! ( _comparedItems % 1024 ) ) {
 		_window->status_bar()->update_progress( static_cast<double>( _comparedItems ) );
+	}
 	return;
 	M_EPILOG
 }
@@ -1118,8 +1198,9 @@ void OSortHelper::progress( void ) {
 template<>
 bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHelper_ ) {
 	M_PROLOG
-	if ( sortHelper_._window )
+	if ( sortHelper_._window ) {
 		sortHelper_.progress();
+	}
 	bool lower = false;
 	switch ( sortHelper_._type.value() ) {
 		case ( TYPE::INT_LONG ):

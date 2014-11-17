@@ -259,7 +259,9 @@ int HTreeWidget::do_process_input( int code_ ) {
 	code_ = errorCode;
 	if ( ! errorCode ) {
 		schedule_repaint();
-		_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+		if ( _window ) {
+			_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
+		}
 	}
 	return ( code_ );
 	M_EPILOG
