@@ -89,6 +89,7 @@ public:
 	void update_all( void );
 	yaal::hcore::HString const& get_title( void ) const;
 	HStatusBarWidget* init_bar( char const* );
+	HWidget* get_focused_child( void ) const;
 
 /*! \brief Schedule paint request on next refresh cycle.
  *

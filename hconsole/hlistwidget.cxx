@@ -465,6 +465,8 @@ void HListWidget::handle_key_end( void ) {
 		decrement( _firstVisibleRow, _heightRaw - 1 );
 	} else {
 		_cursorPosition = size - 1;
+		_widgetOffset = 0;
+		_firstVisibleRow = _model->begin();
 	}
 	return;
 	M_EPILOG
@@ -518,9 +520,8 @@ void HListWidget::handle_key_ctrl_p( void ) {
 
 void HListWidget::handle_key_space( void ) {
 	M_PROLOG
-	M_ASSERT( ! _model->is_empty() );
-	M_ASSERT( _cursor.is_valid() );
-	if ( _checkable ) {
+	if ( _checkable && ! _model->is_empty() ) {
+		M_ASSERT( _cursor.is_valid() );
 		_cursor->switch_state();
 	}
 	return;
@@ -528,9 +529,31 @@ void HListWidget::handle_key_space( void ) {
 }
 
 void HListWidget::handle_key_tab( void ) {
-	_focused = false;	/* very  */
-	schedule_repaint();				/* magic */
+	_focused = false;   /* very  */
+	schedule_repaint(); /* magic */
 	return;
+}
+
+void HListWidget::handle_key_insert( void ) {
+	M_PROLOG
+	M_ASSERT( _editable );
+	int size( static_cast<int>( _header.get_size() ) );
+	HAsIsValueListModel<>* model( dynamic_cast<HAsIsValueListModel<>*>( _model.get() ) );
+	M_ASSERT( model );
+	model->get_data()->emplace_back( size );
+	handle_key_end();
+	return;
+	M_EPILOG
+}
+
+void HListWidget::handle_key_delete( void ) {
+	M_PROLOG
+	M_ASSERT( _editable );
+	if ( ! _model->is_empty() ) {
+		remove_current_row();
+	}
+	return;
+	M_EPILOG
 }
 
 void HListWidget::selection_change( void ) {
@@ -557,6 +580,16 @@ int HListWidget::do_process_input( int code_ ) {
 		case ( KEY<'n'>::ctrl ):       handle_key_ctrl_n();    break;
 		case ( KEY<'p'>::ctrl ):       handle_key_ctrl_p();    break;
 		case ( ' ' ):                  handle_key_space();     break;
+		case ( KEY_CODES::INSERT ): {
+			if ( _editable ) {
+				handle_key_insert();
+			}
+		} break;
+		case ( KEY_CODES::DELETE ): {
+			if ( _editable ) {
+				handle_key_delete();
+			}
+		} break;
 		case ( '\t' ):                 handle_key_tab();
 /* there is no break in previous `case():', because this list must give up
  * its focus and be refreshed and parent window must give focus
@@ -939,8 +972,12 @@ void HListWidget::set_flags( flag_t flags_, flag_t mask_ ) {
 		_sortable = !!( flags_ & FLAG::SORTABLE ) ? true : false;
 	if ( !!( mask_ & FLAG::CHECKABLE ) )
 		_checkable = !!( flags_ & FLAG::CHECKABLE ) ? true : false;
-	if ( !!( mask_ & FLAG::EDITABLE ) )
+	if ( !!( mask_ & FLAG::EDITABLE ) ) {
 		_editable = !!( flags_ & FLAG::EDITABLE ) ? true : false;
+		if ( _editable ) {
+			M_ENSURE( dynamic_cast<HAsIsValueListModel<>*>( _model.get() ) );
+		}
+	}
 	if ( !!( mask_ & FLAG::DRAW_HEADER ) )
 		_drawHeader = !!( flags_ & FLAG::DRAW_HEADER ) ? true : false;
 	return;
@@ -996,20 +1033,23 @@ list_widget_helper::HAbstractRow& HListWidget::get_current_row( void ) {
 
 void HListWidget::remove_current_row( void ) {
 	M_PROLOG
-	bool flag = true;
-	if ( _widgetOffset
-			&& ( ( _widgetOffset + _heightRaw ) == _model->size() ) ) {
-		_widgetOffset --;
-		++ _firstVisibleRow;
-	} else if ( _cursorPosition && ( _cursorPosition == ( _model->size() - 1 ) ) )
-		_cursorPosition --;
-	else
-		flag = false;
+	M_ASSERT( ! _model->is_empty() );
+	M_ASSERT( _cursor != _model->end() );
+	iterator_t it( _cursor );
+	bool last( get_cursor_position() == ( _model->size() - 1 ) );
+	if ( ( _widgetOffset > 0 ) && ( _heightRaw >= ( _model->size() - _widgetOffset ) ) ) {
+		-- _widgetOffset;
+		-- _firstVisibleRow;
+	}
 	if ( _cursor == _firstVisibleRow ) {
 		++ _firstVisibleRow;
 	}
-	iterator_t it = _cursor;
-	if ( flag ) {
+	if ( last ) {
+		-- _cursor;
+		if ( _heightRaw >= _model->size() ) {
+			-- _cursorPosition;
+		}
+	} else {
 		++ _cursor;
 	}
 	_model->erase( it );
@@ -1089,29 +1129,17 @@ bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHe
 	M_EPILOG
 }
 
-template<>
-HAsIsValueListModel<>::data_ptr_t HAsIsValueListModel<>::get_data( void ) {
-	return ( _list );
-}
-
 HAbstractListModel::~HAbstractListModel( void ) {
 	return;
 }
 
-HAbstractListModel::HAbstractListModel( void ) : _widget( NULL ) {
+HAbstractListModel::HAbstractListModel( void )
+	: _widget( NULL ) {
 	return;
 }
 
 void HAbstractListModel::set_widget( HListWidget* widget_ ) {
 	_widget = widget_;
-	return;
-}
-
-void HAbstractListModel::erase( HAbstractListModel::HModelIteratorWrapper& ) {
-	return;
-}
-
-void HAbstractListModel::add_tail( void ) {
 	return;
 }
 
@@ -1143,11 +1171,13 @@ yaal::hcore::HString HCell<yaal::hcore::HList<HInfoItem>::iterator>::get_time( v
 	M_EPILOG
 }
 
-HAbstractListModel::HModelIteratorWrapper::HModelIteratorWrapper( void ) : _iteratorPtr() {
+HAbstractListModel::HModelIteratorWrapper::HModelIteratorWrapper( void )
+	: _iteratorPtr() {
 	return;
 }
 
-HAbstractListModel::HModelIteratorWrapper::HModelIteratorWrapper( iterator_ptr_t const& it_ ) : _iteratorPtr( it_ ) {
+HAbstractListModel::HModelIteratorWrapper::HModelIteratorWrapper( iterator_ptr_t const& it_ )
+	: _iteratorPtr( it_ ) {
 	return;
 }
 
@@ -1186,16 +1216,16 @@ HAbstractRow* HAbstractListModel::HModelIteratorWrapper::operator->( void ) {
 }
 
 HAbstractListModel::HModelIteratorWrapper::HModelIteratorWrapper( HAbstractListModel::HModelIteratorWrapper const& it_ )
-	: _iteratorPtr() {
-	operator=( it_ );
+	: _iteratorPtr( it_._iteratorPtr.raw() ? it_._iteratorPtr->clone() : iterator_ptr_t() ) {
 	return;
 }
 
-HAbstractListModel::HModelIteratorWrapper& HAbstractListModel::HModelIteratorWrapper::operator=( HAbstractListModel::HModelIteratorWrapper const& it_ ) {
+HAbstractListModel::HModelIteratorWrapper& HAbstractListModel::HModelIteratorWrapper::operator = ( HAbstractListModel::HModelIteratorWrapper const& it_ ) {
 	M_PROLOG
 	if ( &it_ != this ) {
-		if ( it_._iteratorPtr.raw() )
-			it_._iteratorPtr->assign_to( _iteratorPtr );
+		if ( it_._iteratorPtr.raw() ) {
+			_iteratorPtr = it_._iteratorPtr->clone();
+		}
 	}
 	return ( *this );
 	M_EPILOG
@@ -1219,27 +1249,27 @@ HAbstractRow::~HAbstractRow( void ) {
 
 template<>
 void HRow<yaal::hcore::HList<HInfoItem>::iterator>::switch_state( void ) {
-	_iterator->_checked = ! _iterator->_checked;
+	(*_iterator)->_checked = ! (*_iterator)->_checked;
 	return;
 }
 
 template<>
 bool HRow<yaal::hcore::HList<HInfoItem>::iterator>::get_checked( void ) {
-	return ( _iterator->_checked );
+	return ( (*_iterator)->_checked );
 }
 
 template<>
 int long HRow<yaal::hcore::HList<HInfoItem>::iterator>::get_id( void ) {
-	return ( _iterator->_id );
+	return ( (*_iterator)->_id );
 }
 
 template<>
-HRow<yaal::hcore::HList<HInfoItem>::iterator>::HRow( iterator_t& it_ )
-	: _iterator( it_ ), _cells( it_->get_value_count() ) {
+HRow<yaal::hcore::HList<HInfoItem>::iterator>::HRow( iterator_t* it_ )
+	: _iterator( it_ ), _cells( it_ ? (*it_)->get_value_count() : 0 ) {
 	M_PROLOG
-	int long cellCount = it_->get_value_count();
+	int long cellCount = it_ ? (*it_)->get_value_count() : 0;
 	for ( int i = 0; i < cellCount; ++ i )
-		_cells[ i ] = make_pointer<HCell<yaal::hcore::HList<HInfoItem>::iterator> >( ref( _iterator ), i );
+		_cells[ i ] = make_pointer<HCell<yaal::hcore::HList<HInfoItem>::iterator> >( ref( *_iterator ), i );
 	return;
 	M_EPILOG
 }

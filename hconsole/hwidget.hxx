@@ -366,9 +366,15 @@ public:
 
 /*! \brief Tells if this widget needs to be repainted.
  *
- * \return True if paint is required.
+ * \return True iff paint is required.
  */
 	bool need_repaint( void ) const;
+
+/*! \brief Tell if this widget has input focus.
+ *
+ * \return True iff this widget currently holds input focus.
+ */
+	bool has_focus( void ) const;
 
 /*! \brief Get widget label text.
  *

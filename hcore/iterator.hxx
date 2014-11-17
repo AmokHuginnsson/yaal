@@ -326,10 +326,10 @@ public:
 		-- _it;
 		return ( it );
 	}
-	value_type& operator* ( void ) {
+	value_type& operator* ( void ) const {
 		return ( *_it );
 	}
-	value_type* operator-> ( void ) {
+	value_type* operator-> ( void ) const {
 		return ( &*_it );
 	}
 	iterator_type base( void ) const {

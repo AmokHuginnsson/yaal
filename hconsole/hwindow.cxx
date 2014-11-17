@@ -198,6 +198,10 @@ void HWindow::acquire_focus( HWidget const* widget_ ) {
 	M_EPILOG
 }
 
+HWidget* HWindow::get_focused_child( void ) const {
+	return ( _focusedChild->get() );
+}
+
 bool HWindow::handler_command( HEvent const& ) {
 	M_PROLOG
 	_statusBar->set_prompt( ":", HStatusBarWidget::PROMPT::COMMAND );

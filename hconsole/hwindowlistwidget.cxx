@@ -89,8 +89,8 @@ bool compare_cells( HWindow::ptr_t const& left_, HWindow::ptr_t const& right_, O
 typedef yaal::hcore::HList<HWindow::ptr_t>::iterator window_iterator_t;
 
 template<>
-HRow<window_iterator_t>::HRow( iterator_t& it_ ) : _iterator( it_ ), _cells( 1 ) {
-	_cells[ 0 ] = make_pointer<HCell<window_iterator_t> >( ref( _iterator ), 0 );
+HRow<window_iterator_t>::HRow( iterator_t* it_ ) : _iterator( it_ ), _cells( 1 ) {
+	_cells[ 0 ] = make_pointer<HCell<window_iterator_t> >( ref( *_iterator ), 0 );
 	return;
 }
 

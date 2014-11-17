@@ -485,6 +485,10 @@ bool HWidget::need_repaint( void ) const {
 	return ( _needRepaint );
 }
 
+bool HWidget::has_focus( void ) const {
+	return ( _enabled && _focused );
+}
+
 yaal::hcore::HString const& HWidget::get_label( void ) const {
 	return ( _label );
 }

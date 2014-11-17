@@ -59,7 +59,13 @@ HComboboxWidget::HComboboxWidget( HWindow* parent_,
 	attr_.apply( *this );
 	_readOnly = true;
 	add_column( -1, HColumnInfo::ptr_t( new HColumnInfo( "", 1, HWidget::BITS::ALIGN::LEFT, TYPE::HSTRING ) ) );
-	HListWidget::set_flags( HListWidget::FLAG::NONE, HListWidget::FLAG::DRAW_HEADER );
+	HListWidget::set_flags(
+			HListWidget::FLAG::NONE,
+			HListWidget::FLAG::DRAW_HEADER
+			| HListWidget::FLAG::EDITABLE
+			| HListWidget::FLAG::CHECKABLE
+			| HListWidget::FLAG::SORTABLE
+	);
 	return;
 	M_EPILOG
 }
