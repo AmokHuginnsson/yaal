@@ -110,6 +110,10 @@ void HWindow::set_tui( yaal::hconsole::HTUIProcess* tui_ ) {
 	M_EPILOG
 }
 
+HTUIProcess* HWindow::get_tui( void ) const {
+	return ( _tuiProcess );
+}
+
 bool HWindow::process_input( HKeyPressEvent const& keyPress_ ) {
 	M_PROLOG
 	bool consumed( false );

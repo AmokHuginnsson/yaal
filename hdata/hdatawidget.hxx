@@ -75,10 +75,17 @@ public:
 	HDataWidget( void );
 	virtual ~HDataWidget( void );
 	void set_crud_descriptor( dbwrapper::HCRUDDescriptor::ptr_t );
-	virtual void load( int long = 0 );
-	virtual int long get_current_id( void );
-	virtual void add_new( void );
-	virtual void cancel_new( void );
+	int long get_current_id( void );
+	void load( int long = 0 );
+	void save( int long = 0 );
+	void add_new( void );
+	void cancel_new( void );
+protected:
+	virtual void do_load( int long );
+	virtual void do_save( int long );
+	virtual void do_add_new( void );
+	virtual void do_cancel_new( void );
+	virtual int long do_get_current_id( void );
 private:
 	HDataWidget ( HDataWidget const & );
 	HDataWidget & operator = ( HDataWidget const & );

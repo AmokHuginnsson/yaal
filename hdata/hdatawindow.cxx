@@ -205,16 +205,23 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED, _( "There is nothing to save." ) );
 		return ( true );
 	}
+	int long id( _mainWidget->get_current_id() );
 	if ( _mode == HCRUDDescriptor::MODE::UPDATE ) {
 		HString filter;
-		filter.format( "id = %ld", _mainWidget->get_current_id() );
+		filter.format( "id = %ld", id );
 		_crud->set_filter( filter );
 	}
 	sync();
 	HRecordSet::ptr_t rs = _crud->execute( _mode );
-	if ( rs->get_errno() )
+	if ( rs->get_errno() ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED, "%s", rs->get_error() );
-	else {
+	} else {
+		if ( _mode == HCRUDDescriptor::MODE::INSERT ) {
+			id = rs->get_insert_id();
+		}
+		for ( HDataWidget* dw : _editModeWidgets ) {
+			dw->save( id );
+		}
 		_modified = false;
 		set_mode( DOCUMENT::VIEW );
 		_mainWidget->load();
@@ -252,6 +259,13 @@ bool HDataWindow::handler_cancel( hconsole::HEvent const& ) {
 	_statusBar->message( COLORS::FG_BRIGHTRED, _( "Dropping all changes." ) );
 	return ( true );
 	M_EPILOG
+}
+
+bool HDataWindow::on_sel_change( yaal::hconsole::HEvent const& ) {
+	for ( HDataWidget* dw : _editModeWidgets ) {
+		dw->load( _mainWidget->get_current_id() );
+	}
+	return ( true );
 }
 
 bool HDataWindow::is_modified( void ) const {
@@ -294,9 +308,9 @@ void HDataWindow::set_widget_role( yaal::hdata::HDataWidget* widget_, HDataWidge
 
 void HDataWindow::set_record_descriptor( yaal::hcore::HString const& table_,
 		yaal::hcore::HString const& columns_,
+		yaal::hcore::HString const& idCol_,
 		yaal::hcore::HString const& filter_,
-		yaal::hcore::HString const& sort_,
-		yaal::hcore::HString const& idCol_ ) {
+		yaal::hcore::HString const& sort_ ) {
 	M_PROLOG
 	_crud->set_table( table_ );
 	_crud->set_columns( columns_ );
@@ -304,12 +318,19 @@ void HDataWindow::set_record_descriptor( yaal::hcore::HString const& table_,
 	_crud->set_sort( sort_ );
 	_idColumnName = idCol_;
 	_mainWidget->set_crud_descriptor( _crud );
+	_mainWidget->register_event_listener( call( &HDataWindow::on_sel_change, this, _1 ) );
 	return;
 	M_EPILOG
 }
 
 yaal::hcore::HString const& HDataWindow::id_column_name( void ) const {
 	return ( _idColumnName );
+}
+
+int long HDataWindow::get_current_id( void ) const {
+	M_PROLOG
+	return ( _mainWidget ? _mainWidget->get_current_id() : -1 );
+	M_EPILOG
 }
 
 void HDataWindow::add_dictionary( yaal::hcore::HString const& name_,
@@ -339,9 +360,9 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 			for ( yaal::tools::HXml::HConstNodeProxy const& dict : n ) {
 				HString dictName( xml::attr_val( dict, "name" ) );
 				HString table( xml::attr_val( dict, "table" ) );
-				HString id( xml::attr_val( dict, "id_column" ) );
+				HString idColumn( xml::attr_val( dict, "id_column" ) );
 				HString value( xml::attr_val( dict, "value_column" ) );
-				HDictionary::ptr_t d( new HDictionary( dp->data_base(), table, id, value ) );
+				HDictionary::ptr_t d( new HDictionary( dp->data_base(), table, idColumn, value ) );
 				dw->add_dictionary( dictName, d );
 				d->load();
 			}
@@ -353,10 +374,10 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 		if ( nodeName == "db" ) {
 			HString table( xml::attr_val( n, "table" ) );
 			HString columns( xml::attr_val( n, "column" ) );
-			HString id( xml::attr_val( n, "id_column" ) );
+			HString idColumn( xml::attr_val( n, "id_column" ) );
 			xml::value_t filter( xml::try_attr_val( n, "filter" ) );
 			xml::value_t sort( xml::try_attr_val( n, "sort" ) );
-			dw->set_record_descriptor( table, columns, filter ? *filter : "", sort ? *sort : "", id );
+			dw->set_record_descriptor( table, columns, idColumn, filter ? *filter : "", sort ? *sort : "" );
 		}
 	}
 	return ( window );

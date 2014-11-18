@@ -61,13 +61,27 @@ void HDataWidget::set_crud_descriptor( HCRUDDescriptor::ptr_t crud_ ) {
 	M_EPILOG
 }
 
-void HDataWidget::load( int long ) {
+void HDataWidget::load( int long id_ ) {
 	M_PROLOG
+	do_load( id_ );
+	return;
+	M_EPILOG
+}
+
+void HDataWidget::save( int long id_ ) {
+	M_PROLOG
+	do_save( id_ );
 	return;
 	M_EPILOG
 }
 
 int long HDataWidget::get_current_id( void ) {
+	M_PROLOG
+	return ( do_get_current_id() );
+	M_EPILOG
+}
+
+int long HDataWidget::do_get_current_id( void ) {
 	M_PROLOG
 	return ( -1 );
 	M_EPILOG
@@ -75,14 +89,32 @@ int long HDataWidget::get_current_id( void ) {
 
 void HDataWidget::add_new( void ) {
 	M_PROLOG
+	do_add_new();
 	return;
 	M_EPILOG
 }
 
 void HDataWidget::cancel_new( void ) {
 	M_PROLOG
+	do_cancel_new();
 	return;
 	M_EPILOG
+}
+
+void HDataWidget::do_load( int long ) {
+	return;
+}
+
+void HDataWidget::do_save( int long ) {
+	return;
+}
+
+void HDataWidget::do_add_new( void ) {
+	return;
+}
+
+void HDataWidget::do_cancel_new( void ) {
+	return;
 }
 
 void apply_role( HDataWindow* window_, HDataWidget* widget_, yaal::tools::HXml::HConstNodeProxy node_ ) {

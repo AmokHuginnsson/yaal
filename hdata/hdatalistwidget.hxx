@@ -59,20 +59,37 @@ public:
 				HWidget* associatedWidget = NULL,
 				HDictionary::ptr_t const& = HDictionary::ptr_t() );
 	};
+private:
+	yaal::hcore::HString _table;
+	yaal::hcore::HString _columns;
+	yaal::hcore::HString _filterColumn;
+	yaal::hcore::HString _idColumn;
+	yaal::hcore::HString _sort;
 public:
 	yaal::hconsole::list_widget_helper::HAsIsValueListModel<>::ptr_t _dataModel;
 	HDataListWidget( HDataWindow*, int, int, int, int, yaal::hcore::HString const&,
 			hconsole::HWidgetAttributesInterface const& = hconsole::HWidgetAttributesInterface() );
 	virtual ~HDataListWidget( void );
-	virtual void load( int long );
-	virtual int long get_current_id( void );
-	virtual void add_new( void );
-	virtual void cancel_new( void );
+	void set_record_descriptor(
+			yaal::hcore::HString const&,
+			yaal::hcore::HString const&,
+			yaal::hcore::HString const&,
+			yaal::hcore::HString const&,
+			yaal::hcore::HString const& );
+protected:
+	virtual int long do_get_current_id( void );
+	virtual void do_load( int long );
+	virtual void do_save( int long );
+	virtual void do_add_new( void );
+	virtual void do_cancel_new( void );
+private:
+	void make_crud( int long );
 };
 
 class HDataListWidgetCreator : virtual public yaal::hconsole::HListWidgetCreator {
 protected:
 	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual bool do_apply_resources( hconsole::HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
 	virtual hconsole::HListWidget::HColumnInfo::ptr_t do_make_column(
 			yaal::tools::HXml::HConstNodeProxy const&,
 			hconsole::HListWidget*,

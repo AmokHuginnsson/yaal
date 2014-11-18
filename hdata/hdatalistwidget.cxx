@@ -31,6 +31,8 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hdatalistwidget.hxx"
 #include "hdatawindow.hxx"
+#include "hdataprocess.hxx"
+#include "hcore/hset.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -61,6 +63,11 @@ HDataListWidget::HDataListWidget(
 	HSearchableWidget( HSearchableWidgetAttributes().searchable( true ) ),
 	HListWidget( NULL, 0, 0, 0, 0, HString(), attr_ ),
 	HDataWidget(),
+	_table(),
+	_columns(),
+	_filterColumn(),
+	_idColumn(),
+	_sort(),
 	_dataModel( _model ) {
 	attr_.apply( *this );
 	M_PROLOG
@@ -74,16 +81,40 @@ HDataListWidget::~HDataListWidget ( void ) {
 	M_EPILOG
 }
 
-void HDataListWidget::load( int long /*id_*/ ) {
+void HDataListWidget::make_crud( int long id_ ) {
 	M_PROLOG
-	_crud->set_filter( "" );
+	if ( ! _crud ) {
+		HDataProcess* proc( dynamic_cast<HDataProcess*>( _window->get_tui() ) );
+		_crud = make_pointer<HCRUDDescriptor>( proc->data_base() );
+	}
+	if ( ! ( _table.is_empty() || _columns.is_empty() || _idColumn.is_empty() ) ) {
+		_crud->set_table( _table );
+		_crud->set_columns( _columns );
+		if ( ! _filterColumn.is_empty() ) {
+			HString filter( _filterColumn );
+			filter.append( " = " );
+			filter.append( to_string( id_ ) );
+			_crud->set_filter( filter );
+		}
+		_crud->set_sort( _sort );
+	}
+	return;
+	M_EPILOG
+}
+
+void HDataListWidget::do_load( int long id_ ) {
+	M_PROLOG
+	make_crud( id_ );
 	HDataWindow* parent = dynamic_cast<HDataWindow*>( _window );
 	M_ASSERT( parent );
+	if ( _idColumn.is_empty() ) {
+		_idColumn = parent->id_column_name();
+	}
 	HRecordSet::ptr_t rs = _crud->execute( HCRUDDescriptor::MODE::SELECT );
 	int idColNo = -1;
 	int const colCount = rs->get_field_count();
 	for ( int i = 0; i < colCount; ++ i ) {
-		if (  rs->get_column_name( i ) == parent->id_column_name() ) {
+		if (  rs->get_column_name( i ) == _idColumn ) {
 			idColNo = i;
 		}
 	}
@@ -125,13 +156,43 @@ void HDataListWidget::load( int long /*id_*/ ) {
 	M_EPILOG
 }
 
-int long HDataListWidget::get_current_id( void ) {
+void HDataListWidget::do_save( int long id_ ) {
 	M_PROLOG
-	return ( _cursor->get_id() );
+	make_crud( id_ );
+	_crud->set_columns( _idColumn );
+	HRecordSet::ptr_t rs( _crud->execute( HCRUDDescriptor::MODE::SELECT ) );
+	typedef HSet<int> ids_t;
+	ids_t ids;
+	for ( HRecordSet::values_t const& values : *rs ) {
+		ids.insert( lexical_cast<int>( *(values[0]) ) );
+	}
+	rs.reset();
+	HAsIsValueListModel<>::data_ptr_t data( _dataModel->get_data() );
+	for ( HItem<> const& item : *data ) {
+		if ( item._id > 0 ) {
+			_crud->set_columns( _columns );
+			_crud->execute( HCRUDDescriptor::MODE::UPDATE );
+			M_ENSURE( ids.erase( static_cast<int>( item._id ) ) );
+		} else {
+			_crud->set_columns( _columns + "," + _filterColumn );
+			_crud->execute( HCRUDDescriptor::MODE::INSERT );
+		}
+	}
+	for ( int id : ids ) {
+		_crud->set_filter( _idColumn + " = " + to_string( id ) );
+		_crud->execute( HCRUDDescriptor::MODE::DELETE );
+	}
+	return;
 	M_EPILOG
 }
 
-void HDataListWidget::add_new( void ) {
+int long HDataListWidget::do_get_current_id( void ) {
+	M_PROLOG
+	return ( _cursor.is_valid() ? _cursor->get_id() : -1 );
+	M_EPILOG
+}
+
+void HDataListWidget::do_add_new( void ) {
 	M_PROLOG
 	int size( static_cast<int>( _header.size() ) );
 	HInfoItem item( size );
@@ -146,13 +207,28 @@ void HDataListWidget::add_new( void ) {
 	M_EPILOG
 }
 
-void HDataListWidget::cancel_new( void ) {
+void HDataListWidget::do_cancel_new( void ) {
 	M_PROLOG
 	_dataModel->remove_tail();
 	if ( _dataModel->size() ) {
 		process_input( KEY_CODES::HOME );
 		process_input( KEY_CODES::END );
 	}
+	return;
+	M_EPILOG
+}
+
+void HDataListWidget::set_record_descriptor( yaal::hcore::HString const& table_,
+		yaal::hcore::HString const& columns_,
+		yaal::hcore::HString const& filterColumn_,
+		yaal::hcore::HString const& idColumn_,
+		yaal::hcore::HString const& sort_ ) {
+	M_PROLOG
+	_table = table_;
+	_columns = columns_;
+	_filterColumn = filterColumn_;
+	_idColumn = idColumn_;
+	_sort = sort_;
 	return;
 	M_EPILOG
 }
@@ -169,6 +245,23 @@ HWidget::ptr_t HDataListWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	apply_resources( list->get_pointer(), node_ );
 	apply_role( window, list, node_ );
 	return ( list->get_pointer() );
+	M_EPILOG
+}
+
+bool HDataListWidgetCreator::do_apply_resources( hconsole::HWidget::ptr_t widget_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	bool ok( HListWidgetCreator::do_apply_resources( widget_, node_ ) );
+	HString nodeName( node_.get_name() );
+	HDataListWidget* dl( dynamic_cast<HDataListWidget*>( widget_.raw() ) );
+	if ( nodeName == "db" ) {
+		HString table( xml::attr_val( node_, "table" ) );
+		HString columns( xml::attr_val( node_, "column" ) );
+		HString idColumn( xml::attr_val( node_, "id_column" ) );
+		HString filterColumn( xml::attr_val( node_, "filter_column" ) );
+		xml::value_t sort( xml::try_attr_val( node_, "sort" ) );
+		dl->set_record_descriptor( table, columns, filterColumn, idColumn, sort ? *sort : "" );
+	}
+	return ( ok );
 	M_EPILOG
 }
 

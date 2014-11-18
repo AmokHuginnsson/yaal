@@ -63,6 +63,7 @@ public:
 	virtual ~HWindow( void );
 	void init( void );
 	void set_tui( HTUIProcess* );
+	HTUIProcess* get_tui( void ) const;
 	void paint( void );
 	bool process_input( HKeyPressEvent const& );
 

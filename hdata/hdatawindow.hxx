@@ -85,6 +85,7 @@ public:
 			yaal::hcore::HString const&,
 			yaal::hcore::HString const& );
 	yaal::hcore::HString const& id_column_name( void ) const;
+	int long get_current_id( void ) const;
 	void add_dictionary( yaal::hcore::HString const&, HDictionary::ptr_t const& );
 	HDictionary::ptr_t get_dictionary( yaal::hcore::HString const& );
 protected:
@@ -98,6 +99,7 @@ protected:
 	bool handler_save( hconsole::HEvent const& );
 	bool handler_requery( hconsole::HEvent const& );
 	bool handler_cancel( hconsole::HEvent const& );
+  bool on_sel_change( yaal::hconsole::HEvent const& );
 	virtual void do_init( void );
 	virtual hconsole::HStatusBarWidget* do_init_bar( char const* );
 private:
