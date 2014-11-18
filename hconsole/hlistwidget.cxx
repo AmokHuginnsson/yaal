@@ -37,6 +37,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hconsole.hxx"
 #include "tools/hxml.hxx"
 #include "hconsole/hwindow.hxx"
+#include "tools/hexpression.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -538,13 +539,11 @@ void HListWidget::handle_key_space( void ) {
 
 void HListWidget::handle_key_tab( void ) {
 	if ( _cellEditor._editing ) {
-		++ _cellEditor._currentColumn;
-		_cellEditor._currentColumn %= static_cast<int>( _header.get_size() );
-		_cellEditor._edit->move(
-				_rowRaw + _cursorPosition + ( _drawHeader ? 1 : 0 ),
-				_columnRaw + column_offset( _cellEditor._currentColumn ),
-				1,
-				_header[_cellEditor._currentColumn]->_widthRaw - 1 );
+		if ( commit_edit() ) {
+			++ _cellEditor._currentColumn;
+			_cellEditor._currentColumn %= static_cast<int>( _header.get_size() );
+			show_edit();
+		}
 	} else {
 		_focused = false;   /* very  */
 		schedule_repaint(); /* magic */
@@ -578,20 +577,76 @@ void HListWidget::handle_key_edit( void ) {
 	M_PROLOG
 	M_ASSERT( _editable );
 	if ( ! _model->is_empty() && ! _cellEditor._editing ) {
-		if ( ! _cellEditor._edit ) {
-			_cellEditor._edit = make_pointer<HEditWidget>( nullptr, 0, 0, 0, 0, "", HEditWidgetAttributes().draw_label( false ) );
-			_cellEditor._edit->enable( true );
-		}
-		_cellEditor._edit->move(
-				_rowRaw + _cursorPosition + ( _drawHeader ? 1 : 0 ),
-				_columnRaw + column_offset( _cellEditor._currentColumn ),
-				1,
-				_header[_cellEditor._currentColumn]->_widthRaw - 1 );
-		_cellEditor._edit->set_focus();
+		show_edit();
 		_cellEditor._editing = true;
-		schedule_repaint();
 	}
 	return;
+	M_EPILOG
+}
+
+void HListWidget::show_edit( void ) {
+	M_PROLOG
+	if ( ! _cellEditor._edit ) {
+		_cellEditor._edit = make_pointer<HEditWidget>( nullptr, 0, 0, 0, 0, "", HEditWidgetAttributes().draw_label( false ) );
+		_cellEditor._edit->enable( true );
+		_cellEditor._edit->set_focus();
+	}
+	_cellEditor._edit->move(
+			_rowRaw + _cursorPosition + ( _drawHeader ? 1 : 0 ),
+			_columnRaw + column_offset( _cellEditor._currentColumn ),
+			1,
+			_header[_cellEditor._currentColumn]->_widthRaw - 1 );
+	HAsIsValueListModel<>::HModelIterator* it( dynamic_cast<HAsIsValueListModel<>::HModelIterator*>( _cursor.raw().raw() ) );
+	M_ASSERT( it );
+	_cellEditor._edit->set_data( (*(it->raw()))[_cellEditor._currentColumn] );
+	_cellEditor._edit->schedule_repaint();
+	schedule_repaint();
+	return;
+	M_EPILOG
+}
+
+bool HListWidget::commit_edit( void ) {
+	M_PROLOG
+	bool ok( true );
+	HAsIsValueListModel<>::HModelIterator* it( dynamic_cast<HAsIsValueListModel<>::HModelIterator*>( _cursor.raw().raw() ) );
+	M_ASSERT( it );
+	switch ( _header[_cellEditor._currentColumn]->_type ) {
+		case ( TYPE::HSTRING ): {
+			(*(it->raw()))[_cellEditor._currentColumn].set_string( _cellEditor._edit->get_data().get_string() );
+		} break;
+		case ( TYPE::INT_LONG_LONG ): {
+			try {
+				(*(it->raw()))[_cellEditor._currentColumn].set_integer( _cellEditor._edit->get_data().get_integer() );
+			} catch ( HLexicalCastException const& e ) {
+				ok = false;
+				if ( _window ) {
+					_window->status_bar()->message( COLORS::FG_RED, "%s", e.what() );
+				}
+			}
+		} break;
+		case ( TYPE::DOUBLE_LONG ): {
+			try {
+				(*(it->raw()))[_cellEditor._currentColumn].set_real( _cellEditor._edit->get_data().get_real() );
+			} catch ( HExpressionException const& e ) {
+				ok = false;
+				if ( _window ) {
+					_window->status_bar()->message( COLORS::FG_RED, "%s", e.what() );
+				}
+			} catch ( HLexicalCastException const& e ) {
+				ok = false;
+				if ( _window ) {
+					_window->status_bar()->message( COLORS::FG_RED, "%s", e.what() );
+				}
+			}
+		} break;
+		case ( TYPE::HTIME ): {
+			(*(it->raw()))[_cellEditor._currentColumn].set_time( _cellEditor._edit->get_data().get_time() );
+		} break;
+		default: {
+			M_ASSERT( !"bad column type" );
+		}
+	}
+	return ( ok );
 	M_EPILOG
 }
 
@@ -619,10 +674,30 @@ int HListWidget::process_input_edit( int code_ ) {
 	M_PROLOG
 	M_ASSERT( _editable && _cellEditor._editing );
 	code_ = _cellEditor._edit->process_input( code_ );
-	if ( ! code_ ) {
-		_cellEditor._edit->schedule_repaint();
+	int code( 0 );
+	switch ( code_ ) {
+		case ( '\t' ): {
+			handle_key_tab();
+		} break;
+		case ( '\r' ): {
+			if ( commit_edit() ) {
+				_cellEditor._editing = false;
+				schedule_repaint();
+			}
+		} break;
+		case ( KEY_CODES::ESCAPE ): {
+			_cellEditor._editing = false;
+			schedule_repaint();
+		} break;
+		default: {
+			code = code_;
+		}
 	}
-	return ( code_ );
+	if ( ! code ) {
+		_cellEditor._edit->schedule_repaint();
+		schedule_repaint();
+	}
+	return ( code );
 	M_EPILOG
 }
 

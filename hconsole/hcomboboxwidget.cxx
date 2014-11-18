@@ -153,7 +153,7 @@ int HComboboxWidget::do_process_input( int code_ ) {
 	} else {
 		if ( code_ == '\r' ) {
 			close_combo( ACTION::APPLY );
-		} else if ( code_ == KEY_CODES::ESC ) {
+		} else if ( code_ == KEY_CODES::ESCAPE ) {
 			close_combo( ACTION::CANCEL );
 		} else {
 			code = HListWidget::do_process_input( code_ );

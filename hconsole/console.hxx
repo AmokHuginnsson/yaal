@@ -46,7 +46,7 @@ namespace hconsole {
 /*! \brief Special key codes.
  */
 struct KEY_CODES {
-	static int const ESC          = 27;
+	static int const ESCAPE       = 27;
 	/* Coincidentaly KEY_MAX from ncurses is 0777 which is 511. */
 	static int const SPECIAL_KEY  = 0x400;
 	static int const PAGE_UP      = SPECIAL_KEY;

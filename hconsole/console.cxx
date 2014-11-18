@@ -644,12 +644,12 @@ int HConsole::get_key( void ) const {
 	M_ENSURE( ::fflush( NULL ) == 0 );
 	int key( getch() );
 	M_ASSERT( key < KEY_CODES::SPECIAL_KEY );
-	if ( key == KEY_CODES::ESC ) {
+	if ( key == KEY_CODES::ESCAPE ) {
 		M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 		key = getch();
 		M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
 		if ( key == ERR )
-			key = KEY_CODES::ESC;
+			key = KEY_CODES::ESCAPE;
 		else
 			key = KEY<>::meta_r( key );
 	}
@@ -665,14 +665,14 @@ int HConsole::get_key( void ) const {
 			cmvprintf( _height - 1, 0, COLORS::FG_LIGHTGRAY, "      " );
 		} else {
 			int character = 0;
-			if ( key < KEY_CODES::ESC )
+			if ( key < KEY_CODES::ESCAPE )
 				key = KEY<>::command_r( character = key + 96 );
-			else if ( key == KEY_CODES::ESC ) {
+			else if ( key == KEY_CODES::ESCAPE ) {
 				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 				key = getch();
 				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
 				if ( key == ERR )
-					key = KEY<>::command_r( character = KEY_CODES::ESC );
+					key = KEY<>::command_r( character = KEY_CODES::ESCAPE );
 				else
 					key = KEY<>::command_r( KEY<>::meta_r( character = key ) );
 			} else

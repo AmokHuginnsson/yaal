@@ -174,7 +174,7 @@ int HDateWidget::do_process_input( int code_ ) {
 		case ( '\r' ): {
 			on_key_enter();
 		} break;
-		case ( KEY_CODES::ESC ): {
+		case ( KEY_CODES::ESCAPE ): {
 			on_key_enter();
 			break;
 		}

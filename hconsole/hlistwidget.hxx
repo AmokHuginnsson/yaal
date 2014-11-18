@@ -470,6 +470,8 @@ protected:
 private:
 	int process_input_view( int );
 	int process_input_edit( int );
+	void show_edit( void );
+	bool commit_edit( void );
 	void sort_by_column( int, list_widget_helper::OSortHelper::sort_order_t = list_widget_helper::OSortHelper::ASCENDING );
 	void recalculate_column_widths( void );
 	void draw_background( int );

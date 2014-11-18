@@ -63,7 +63,7 @@ HDataWindow::HDataWindow( HString const& title_, HDataProcess* owner_ )
 	register_postprocess_handler( KEY<'d'>::command, NULL, call( &HDataWindow::handler_delete, this, _1 ) );
 	register_postprocess_handler( KEY<'w'>::command, NULL, call( &HDataWindow::handler_save, this, _1 ) );
 	register_postprocess_handler( KEY<'r'>::ctrl, NULL, call( &HDataWindow::handler_requery, this, _1 ) );
-	register_postprocess_handler( KEY_CODES::ESC, NULL, call( &HDataWindow::handler_cancel, this, _1 ) );
+	register_postprocess_handler( KEY_CODES::ESCAPE, NULL, call( &HDataWindow::handler_cancel, this, _1 ) );
 	return;
 	M_EPILOG
 }
