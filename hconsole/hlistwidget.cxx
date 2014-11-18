@@ -643,7 +643,7 @@ bool HListWidget::commit_edit( void ) {
 			(*(it->raw()))[_cellEditor._currentColumn].set_time( _cellEditor._edit->get_data().get_time() );
 		} break;
 		default: {
-			M_ASSERT( !"bad column type" );
+			M_ASSERT( !"bad column type"[0] );
 		}
 	}
 	return ( ok );
