@@ -76,7 +76,7 @@ HThread::HThread( void )
 		<< " and we will use: " << ( _threadStackSize ? _threadStackSize : static_cast<int>( stackSize ) ) << endl;
 	if ( _threadStackSize > 0 )
 		M_ENSURE( pthread_attr_setstacksize( attr, static_cast<size_t>( _threadStackSize ) ) == 0 );
-	HResource<void> res( attr, do_pthread_attr_destroy );
+	HResource<void, void (*)( void* )> res( attr, do_pthread_attr_destroy );
 	_resGuard.swap( res );
 	M_ENSURE( ::pthread_attr_setdetachstate( attr, PTHREAD_CREATE_JOINABLE ) == 0 );
 	M_ENSURE( ::pthread_attr_setinheritsched( attr, PTHREAD_INHERIT_SCHED ) == 0 );
@@ -270,7 +270,7 @@ HMutex::HMutex( TYPE::mutex_type_t const type_ ) : _type( type_ ),
 		_type = TYPE::NON_RECURSIVE;
 	pthread_mutexattr_t* attr( static_cast<pthread_mutexattr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_mutex_t ) ) ) );
 	::pthread_mutexattr_init( attr );
-	HResource<void> res( attr, do_pthread_mutexattr_destroy );
+	HResource<void, void (*)( void* )> res( attr, do_pthread_mutexattr_destroy );
 	_resGuard.swap( res );
 	M_ENSURE( ::pthread_mutexattr_settype( attr,
 				_type & TYPE::RECURSIVE ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );

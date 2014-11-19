@@ -63,7 +63,7 @@ private:
 	/*{*/
 	TYPE::mutex_type_t _type;
 	HChunk _buf;
-	HResource<void> _resGuard;
+	HResource<void, void (*)( void* )> _resGuard;
 	int long _owner;
 	/*}*/
 public:
@@ -151,7 +151,7 @@ private:
 	HChunk _buf;
 	mutable HMutex _mutex;
 	HSemaphore _semaphore;
-	HResource<void> _resGuard;
+	HResource<void, void (*)( void* )> _resGuard;
 	typedef HBoundCall<> call_t;
 	call_t _call;
 	OExceptionInfo _exceptionInfo;
