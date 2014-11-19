@@ -57,10 +57,13 @@ enum {
 	OVERFLOW
 };
 
-/* Useful helpers */
+/*! \brief HString class helpers, utility functions.
+ */
 char* strrnpbrk( char const*, char const*, int long );
 int long strrnspn( char const* const, char const*, int long );
 int long kmpsearch( char const* const, int long, char const*, int long );
+int long kmpcasesearch( char const* const, int long, char const* const, int long );
+
 }
 
 #undef D_WHITE_SPACE

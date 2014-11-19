@@ -765,6 +765,9 @@ HString to_string( double );
 HString to_string( double long );
 HString to_string( char const* );
 HString to_string( void const* );
+inline HString to_string( HString const& v_ ) {
+	return ( v_ );
+}
 int stoi( HString const&, int* = NULL, int = 10 );
 int long stol( HString const&, int* = NULL, int = 10 );
 int long unsigned stoul( HString const&, int* = NULL, int = 10 );
@@ -779,19 +782,13 @@ bool is_hex_digit( char );
 bool is_letter( char );
 bool is_alpha( char );
 
-/*! \brief HString class helpers, utility functions.
- */
-namespace string_helper {
-
-int long kmpcasesearch( char const* const, int long, char const* const, int long );
-
+inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b ) {
+	a.swap( b );
 }
 
-inline void swap( yaal::hcore::HString& a, yaal::hcore::HString& b )
-	{ a.swap( b ); }
-
-inline void swap( yaal::hcore::HString::HCharRef a, yaal::hcore::HString::HCharRef b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HString::HCharRef a, yaal::hcore::HString::HCharRef b ) {
+	a.swap( b );
+}
 
 }
 
