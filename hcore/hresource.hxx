@@ -69,47 +69,45 @@ struct trait<T[]> {
 };
 
 template<typename T, typename deleter, bool const default_deleter>
-class HResourceHolder;
+class OResourceHolder;
 
 template<typename T, typename deleter>
-class HResourceHolder<T, deleter, true> {
-protected:
+struct OResourceHolder<T, deleter, true> {
 	T* _resource;
-public:
-	HResourceHolder( void )
+	OResourceHolder( void )
 		: _resource( nullptr ) {
 	}
-	HResourceHolder( T* val_ )
+	OResourceHolder( T* val_ )
 		: _resource( val_ ) {
 	}
 	void do_delete( void ) {
 		deleter()( _resource );
 	}
-	void swap( HResourceHolder& other ) {
+	void swap( OResourceHolder& other ) {
 		if ( &other != this ) {
 			using yaal::swap;
 			swap( _resource, other._resource );
 		}
 		return;
 	}
+	OResourceHolder( OResourceHolder const& ) = default;
+	OResourceHolder& operator = ( OResourceHolder const& ) = default;
 };
 
 template<typename T, typename deleter>
-class HResourceHolder<T, deleter, false> {
-protected:
+struct OResourceHolder<T, deleter, false> {
 	T* _resource;
 	deleter _deleter;
-public:
-	HResourceHolder( void )
+	OResourceHolder( void )
 		: _resource( nullptr ), _deleter() {
 	}
-	HResourceHolder( T* val_, deleter deleter_ )
+	OResourceHolder( T* val_, deleter deleter_ )
 		: _resource( val_ ), _deleter( deleter_ ) {
 	}
 	void do_delete( void ) {
 		_deleter( _resource );
 	}
-	void swap( HResourceHolder& other ) {
+	void swap( OResourceHolder& other ) {
 		if ( &other != this ) {
 			using yaal::swap;
 			swap( _resource, other._resource );
@@ -117,6 +115,8 @@ public:
 		}
 		return;
 	}
+	OResourceHolder( OResourceHolder const& ) = default;
+	OResourceHolder& operator = ( OResourceHolder const& ) = default;
 };
 
 }
@@ -124,37 +124,31 @@ public:
 /*! \brief Raw resource life time tracker.
  */
 template<typename type_t, typename free_t = resource_helper::HResourceDeleter<type_t>>
-class HResource
-	: public resource_helper::HResourceHolder<
-		typename resource_helper::trait<type_t>::type,
-		free_t,
-		trait::same_type<free_t, resource_helper::HResourceDeleter<type_t>>::value
-	> {
+class HResource {
 public:
-	typedef resource_helper::HResourceHolder<
-		typename resource_helper::trait<type_t>::type,
-		free_t,
-		trait::same_type<free_t, resource_helper::HResourceDeleter<type_t>>::value
-	> base_type;
 	typedef typename resource_helper::trait<type_t>::type value_type;
 	typedef typename trait::make_reference<typename trait::strip_const<value_type>::type>::type reference;
 	typedef typename trait::make_reference<value_type const>::type reference_const;
 	typedef value_type* pointer;
 	typedef value_type const* pointer_const;
+	typedef resource_helper::OResourceHolder<
+		value_type,
+		free_t,
+		trait::same_type<free_t, resource_helper::HResourceDeleter<type_t>>::value
+	> holder;
 private:
-	using base_type::_resource;
-	using base_type::do_delete;
+	holder _holder;
 public:
 	HResource( void )
-		: base_type() {
+		: _holder() {
 		return;
 	}
 	explicit HResource( pointer resource_ )
-		: base_type( resource_ ) {
+		: _holder( resource_ ) {
 		return;
 	}
 	HResource( pointer resource_, free_t free_ )
-		: base_type( resource_, free_ ) {
+		: _holder( resource_, free_ ) {
 		return;
 	}
 	~HResource( void ) {
@@ -163,13 +157,13 @@ public:
 	}
 	HResource( HResource const& ) = delete;
 	HResource( HResource&& src_ )
-		: base_type() {
+		: _holder() {
 		pass( yaal::move( src_ ) );
 		return;
 	}
 	template<typename real_t>
 	HResource( HResource<real_t, free_t>&& src_ )
-		: base_type() {
+		: _holder() {
 		pass( yaal::move( src_ ) );
 		return;
 	}
@@ -189,68 +183,73 @@ public:
 	}
 	reference_const operator*( void ) const {
 		static_assert( !resource_helper::trait<type_t>::is_array, "indirection operator is called for an array" );
-		M_ASSERT( _resource );
-		return ( *_resource );
+		M_ASSERT( _holder._resource );
+		return ( *_holder._resource );
 	}
 	reference operator*( void ) {
 		static_assert( !resource_helper::trait<type_t>::is_array, "indirection operator is called for an array" );
-		M_ASSERT( _resource );
-		return ( *_resource );
+		M_ASSERT( _holder._resource );
+		return ( *_holder._resource );
 	}
 	pointer_const operator->( void ) const {
 		static_assert( !resource_helper::trait<type_t>::is_array, "structure dereference operator is called for an array" );
-		M_ASSERT( _resource );
-		return ( _resource );
+		M_ASSERT( _holder._resource );
+		return ( _holder._resource );
 	}
 	pointer operator->( void ) {
 		static_assert( !resource_helper::trait<type_t>::is_array, "structure dereference operator is called for an array" );
-		M_ASSERT( _resource );
-		return ( _resource );
+		M_ASSERT( _holder._resource );
+		return ( _holder._resource );
 	}
 	reference_const operator[] ( int index_ ) const {
 		static_assert( resource_helper::trait<type_t>::is_array, "array subscript operator is called for a scalar" );
-		M_ASSERT( _resource );
-		return ( _resource[index_] );
+		M_ASSERT( _holder._resource );
+		return ( _holder._resource[index_] );
 	}
 	reference operator[] ( int index_ ) {
 		static_assert( resource_helper::trait<type_t>::is_array, "array subscript operator is called for a scalar" );
-		M_ASSERT( _resource );
-		return ( _resource[index_] );
+		M_ASSERT( _holder._resource );
+		return ( _holder._resource[index_] );
 	}
 	pointer_const raw( void ) const {
-		return ( _resource );
+		return ( _holder._resource );
 	}
 	pointer raw( void ) {
-		return ( _resource );
+		return ( _holder._resource );
 	}
 	pointer_const get( void ) const {
-		return ( _resource );
+		return ( _holder._resource );
 	}
 	pointer get( void ) {
-		return ( _resource );
+		return ( _holder._resource );
 	}
 	void reset( void ) {
-		if ( _resource != nullptr ) {
-			do_delete();
-			_resource = nullptr;
+		if ( _holder._resource != nullptr ) {
+			_holder.do_delete();
+			_holder._resource = nullptr;
 		}
 		return;
 	}
 	pointer release( void ) {
-		pointer val( _resource );
-		_resource = nullptr;
+		pointer val( _holder._resource );
+		_holder._resource = nullptr;
 		return ( val );
 	}
 	bool operator ! ( void ) const {
-		return ( _resource == nullptr );
+		return ( _holder._resource == nullptr );
 	}
-	using base_type::swap;
+	void swap( HResource& other_ ) {
+		if ( &other_ != this ) {
+			_holder.swap( other_._holder );
+		}
+		return;
+	}
 private:
 	template<typename alien_t>
 	void pass( alien_t&& src_ ) {
 		HResource& src = reinterpret_cast<HResource&>( src_ );
 		using yaal::swap;
-		base_type::swap( src );
+		_holder.swap( src._holder );
 		src_.reset();
 		return;
 	}
