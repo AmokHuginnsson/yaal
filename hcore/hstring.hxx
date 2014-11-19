@@ -398,7 +398,7 @@ public:
 	 * \param length - a length of substring to get.
 	 * \return Self.
 	 */
-	HString& assign( HString const& str, int long offset, int long length );
+	HString& assign( HString const& str, int long offset = 0, int long length = MAX_STRING_LENGTH );
 	/*! \brief Erase old content and assign a range of characters to this string.
 	 *
 	 * first_ - begining of the character range to copy.

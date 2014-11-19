@@ -127,15 +127,15 @@ void HDataWindow::sync( void ) {
 	for ( controls_t::iterator it( _editModeWidgets.begin() ), end( _editModeWidgets.end() ); it != end; ++ it, ++ i ) {
 		HWidget* w( *it );
 		if ( dynamic_cast<HDateWidget*>( w ) ) {
-			(*_crud)[ i ] = w->get_data().get_time().string();
+			hdata::sync( (*_crud)[ i ], w->get_data(), TYPE::HTIME );
 			log << "date: " << w->get_label() << ": [" << *(*_crud)[ i ] << "]" << endl;
 		} else if ( dynamic_cast<HComboboxWidget*>( w ) ) {
-			(*_crud)[ i ] = to_string( w->get_data().get_integer() );
+			hdata::sync( (*_crud)[ i ], w->get_data(), TYPE::INT_LONG_LONG );
 			log << "combo: " << w->get_label() << ": [" << *(*_crud)[ i ] << "]" << endl;
 		} else if ( dynamic_cast<HListWidget*>( w ) ) {
 			-- i;
 		} else {
-			(*_crud)[ i ] = w->get_data().get_string();
+			hdata::sync( (*_crud)[ i ], w->get_data(), TYPE::HSTRING );
 			log << "edit: " << w->get_label() << ": [" << *(*_crud)[ i ] << "]" << endl;
 		}
 	}

@@ -29,8 +29,11 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hcruddescriptor.hxx"
 #include "hdatabase.hxx"
+#include "tools/stringalgo.hxx"
 
+using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal {
 
@@ -195,8 +198,11 @@ void HCRUDDescriptor::sync( int field_, HString& value ) {
 		} else {
 			value.clear();
 		}
-	} else
+	} else {
 		_values[ field_ ] = value;
+		_mutated[ field_ ] = true;
+	}
+	return;
 	M_EPILOG
 }
 
@@ -208,8 +214,11 @@ void HCRUDDescriptor::sync( int field_, HTime& value ) {
 		} else {
 			value.set_now( HTime::LOCAL );
 		}
-	} else
+	} else {
 		_values[ field_ ] = value.string();
+		_mutated[ field_ ] = true;
+	}
+	return;
 	M_EPILOG
 }
 
@@ -220,8 +229,11 @@ void HCRUDDescriptor::sync( int field_, int long& value ) {
 			value = lexical_cast<int long>( *_values[ field_ ] );
 		else
 			value = 0;
-	} else
+	} else {
 		_values[ field_ ] = HRecordSet::value_t( value );
+		_mutated[ field_ ] = true;
+	}
+	return;
 	M_EPILOG
 }
 
@@ -235,6 +247,28 @@ void HCRUDDescriptor::set_table( yaal::hcore::HString const& table_ ) {
 void HCRUDDescriptor::set_columns( yaal::hcore::HString const& columns_ ) {
 	M_PROLOG
 	_columns = columns_;
+	return;
+	M_EPILOG
+}
+
+void HCRUDDescriptor::set_columns( fields_t&& fields_ ) {
+	M_PROLOG
+	_fields.swap( fields_ );
+	_fieldCount = static_cast<int>( _fields.get_size() );
+	_columns = string::join( _fields, "," );
+	_values.resize( _fieldCount );
+	_mutated.resize( _fieldCount );
+	return;
+	M_EPILOG
+}
+
+void HCRUDDescriptor::set_columns( fields_t const& fields_ ) {
+	M_PROLOG
+	_fields = fields_;
+	_fieldCount = static_cast<int>( _fields.get_size() );
+	_columns = string::join( _fields, "," );
+	_values.resize( _fieldCount );
+	_mutated.resize( _fieldCount );
 	return;
 	M_EPILOG
 }
@@ -275,13 +309,6 @@ HCRUDDescriptor::MODE::mode_t HCRUDDescriptor::get_mode( void ) const {
 
 int long HCRUDDescriptor::get_size( void ) const {
 	return ( _setSize );
-}
-
-void HCRUDDescriptor::sync( HRecordSet::iterator const& it ) {
-	M_PROLOG
-	for ( int ctr = 0; ctr < _fieldCount; ++ ctr )
-		_values[ ctr ] = it[ ctr ];
-	M_EPILOG
 }
 
 HRecordSet::value_t& HCRUDDescriptor::operator[]( int column_ ) {

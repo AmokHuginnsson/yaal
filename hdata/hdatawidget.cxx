@@ -117,6 +117,29 @@ void HDataWidget::do_cancel_new( void ) {
 	return;
 }
 
+void sync( HRecordSet::value_t& to_, HInfo const& from_, TYPE::enum_t type_ ) {
+	M_PROLOG
+	switch ( type_ ) {
+		case ( TYPE::HSTRING ): {
+			to_ = from_.get_string();
+		} break;
+		case ( TYPE::INT_LONG_LONG ): {
+			to_ = to_string( from_.get_integer() );
+		} break;
+		case ( TYPE::DOUBLE_LONG ): {
+			to_ = to_string( from_.get_real() );
+		} break;
+		case ( TYPE::HTIME ): {
+			to_ = from_.get_time().string();
+		} break;
+		default: {
+			M_ASSERT( !"bad field type"[0] );
+		}
+	}
+	return;
+	M_EPILOG
+}
+
 void apply_role( HDataWindow* window_, HDataWidget* widget_, yaal::tools::HXml::HConstNodeProxy node_ ) {
 	M_PROLOG
 	HString xmlRole( xml::attr_val( node_, "role" ) );
