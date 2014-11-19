@@ -69,7 +69,7 @@ struct trait<T[]> {
 };
 
 template<typename T, typename deleter, bool const default_deleter>
-class OResourceHolder;
+struct OResourceHolder;
 
 template<typename T, typename deleter>
 struct OResourceHolder<T, deleter, true> {
