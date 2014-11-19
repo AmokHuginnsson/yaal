@@ -658,14 +658,49 @@ template<typename class_t, typename T>
 struct is_field<T class_t::*>
 	{ static bool const value = true; };
 
+/*! \brief Check if given type is a function type.
+ *
+ * \tparam T - type to check for being a function.
+ * \retval value - true iff given type is a function type.
+ */
+template<typename T>
+struct is_function {
+	static bool const value = false;
+};
+
+/*! \cond */
+template<typename return_t, typename... arg_t>
+struct is_function<return_t (&)( arg_t... )> {
+	static bool const value = true;
+};
+/*! \endcond */
+
+/*! \brief Check if given type is a function pointer type.
+ *
+ * \tparam T - type to check for being a function pointer.
+ * \retval value - true iff given type is a function pointer type.
+ */
+template<typename T>
+struct is_function_pointer {
+	static bool const value = false;
+};
+
+/*! \cond */
+template<typename return_t, typename... arg_t>
+struct is_function_pointer<return_t (*)( arg_t... )> {
+	static bool const value = true;
+};
+/*! \endcond */
+
 /*! \brief Check if given type is a member type.
  *
  * \tparam T - type to check for being a member.
  * \retval value - true iff given type is a member type.
  */
 template<typename T>
-struct is_member
-	{ static bool const value = false; };
+struct is_member {
+	static bool const value = false;
+};
 
 /*! \cond */
 template<typename return_t, typename class_t, typename... A>
@@ -680,6 +715,7 @@ struct is_member<return_t ( class_t::* )( A... ) volatile>
 template<typename return_t, typename class_t, typename... A>
 struct is_member<return_t ( class_t::* )( A... ) const volatile>
 	{ static bool const value = true; };
+/*! \endcond */
 
 /*! \brief Check if given type is a const member type.
  *
@@ -697,6 +733,7 @@ struct is_member_const<return_t ( class_t::* )( A... ) const>
 template<typename return_t, typename class_t, typename... A>
 struct is_member_const<return_t ( class_t::* )( A... ) const volatile>
 	{ static bool const value = true; };
+/*! \endcond */
 
 namespace generic_helper {
 
@@ -747,6 +784,8 @@ struct argument_type<return_t ( A... )>
 	{ template<int const no> struct index { typedef typename select_index<no, A...>::type type; }; };
 
 }
+
+/*! \cond */
 
 template<typename T>
 struct functional_return_type {
