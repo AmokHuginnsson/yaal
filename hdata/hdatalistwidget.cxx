@@ -93,8 +93,7 @@ void HDataListWidget::make_crud( int long id_ ) {
 		_crud->set_columns( _columns );
 		if ( ! _filterColumn.is_empty() ) {
 			HString filter( _filterColumn );
-			filter.append( " = " );
-			filter.append( to_string( id_ ) );
+			filter.append( " = " ).append( to_string( id_ ) );
 			_crud->set_filter( filter );
 		}
 		_crud->set_sort( _sort );

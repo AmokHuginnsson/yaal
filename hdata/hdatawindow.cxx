@@ -208,7 +208,7 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 	int long id( _mainWidget->get_current_id() );
 	if ( _mode == HCRUDDescriptor::MODE::UPDATE ) {
 		HString filter;
-		filter.format( "id = %ld", id );
+		filter.assign( _idColumnName ).append( " = " ).append( to_string( id ) );
 		_crud->set_filter( filter );
 	}
 	sync();
@@ -224,6 +224,7 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 		}
 		_modified = false;
 		set_mode( DOCUMENT::VIEW );
+		_crud->set_filter( "" );
 		_mainWidget->load();
 	}
 	return ( true );
