@@ -28,7 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "stringalgo.hxx"
-#include "hcore/hpointer.hxx"
+#include "hcore/hresource.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -68,8 +68,8 @@ int levenshtein_damerau( yaal::hcore::HString const& one_, yaal::hcore::HString 
 		return ( lengthTwo );
 	lengthOne ++;
 	lengthTwo ++;
-	HPointer<int*, HPointerArray> distanceMatrixHolder( new ( memory::yaal ) int*[ lengthOne ] );
-	HPointer<int, HPointerArray> distanceMatrixBuffer( new ( memory::yaal ) int[ lengthOne * lengthTwo ] );
+	HResource<int*[]> distanceMatrixHolder( new ( memory::yaal ) int*[ lengthOne ] );
+	HResource<int[]> distanceMatrixBuffer( new ( memory::yaal ) int[ lengthOne * lengthTwo ] );
 	distanceMatrix = distanceMatrixHolder.raw();
 	for ( indexOne = 0; indexOne < lengthOne; ++ indexOne )
 		distanceMatrix[ indexOne ] = distanceMatrixBuffer.raw() + indexOne * lengthTwo;
