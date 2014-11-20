@@ -1350,7 +1350,7 @@ HAbstractListModel::HModelIteratorWrapper::HModelIteratorWrapper( iterator_ptr_t
 }
 
 bool HAbstractListModel::HModelIteratorWrapper::is_valid( void ) const {
-	return ( _iteratorPtr->is_valid() );
+	return ( !! _iteratorPtr ? _iteratorPtr->is_valid() : false );
 }
 
 bool HAbstractListModel::HModelIteratorWrapper::operator==( HAbstractListModel::HModelIteratorWrapper const& it_ ) {

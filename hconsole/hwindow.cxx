@@ -289,12 +289,10 @@ void HWindow::schedule_call( HTUIProcess::call_t call_ ) {
 	M_EPILOG
 }
 
-HWindow::ptr_t HWindowCreator::do_new_instance( HTUIProcess* tui_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+HWindow::ptr_t HWindowCreator::do_new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	HString name( xml::attr_val( node_, "title" ) );
 	HWindow::ptr_t window( make_pointer<HWindow>( name ) );
-	create_widgets( window, node_ );
-	tui_->add_window( window );
 	return ( window );
 	M_EPILOG
 }
@@ -309,6 +307,13 @@ void HWindowCreator::create_widgets( HWindow::ptr_t window_, yaal::tools::HXml::
 		}
 	}
 	return;
+	M_EPILOG
+}
+
+bool HWindowCreator::do_apply_resources( HTUIProcess*, window_ptr_t window, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	create_widgets( window, node_ );
+	return ( true );
 	M_EPILOG
 }
 

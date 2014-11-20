@@ -57,6 +57,7 @@ HWindowCreatorInterface::window_ptr_t HWindowFactory::create_window( HTUIProcess
 	creators_t::iterator it( _creators.find( node_.get_name() ) );
 	if ( it != _creators.end() ) {
 		window = it->second->new_instance( tuiProcess_, node_ );
+		it->second->apply_resources( tuiProcess_, window, node_ );
 	}
 	return ( window );
 	M_EPILOG
@@ -115,6 +116,12 @@ void HWindowCreatorInterface::cleanup_globals( void ) {
 HWindowCreatorInterface::window_ptr_t HWindowCreatorInterface::new_instance( HTUIProcess* tuiProcess_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
 	return ( do_new_instance( tuiProcess_, node_ ) );
+	M_EPILOG
+}
+
+bool HWindowCreatorInterface::apply_resources( HTUIProcess* tui_, HWindow::ptr_t window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	return ( do_apply_resources( tui_, window_, node_ ) );
 	M_EPILOG
 }
 

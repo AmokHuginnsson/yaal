@@ -66,7 +66,6 @@ protected:
 	typedef yaal::hcore::HList<HDataWidget*> controls_t;
 	controls_t _viewModeWidgets;
 	controls_t _editModeWidgets;
-	HDataProcess* _owner;
 	yaal::dbwrapper::HCRUDDescriptor::ptr_t _crud;
 	yaal::dbwrapper::HCRUDDescriptor::MODE::mode_t _mode;
 	yaal::hcore::HString _idColumnName;
@@ -110,6 +109,7 @@ private:
 class HDataWindowCreator : public hconsole::HWindowCreator {
 protected:
 	virtual hconsole::HWindow::ptr_t do_new_instance( hconsole::HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual bool do_apply_resources( hconsole::HTUIProcess*, window_ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 }

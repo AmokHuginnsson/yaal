@@ -118,6 +118,7 @@ class HWindowCreator : public HWindowCreatorInterface {
 protected:
 	virtual HWindow::ptr_t do_new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
 	void create_widgets( HWindow::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual bool do_apply_resources( HTUIProcess*, window_ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 class HWindowEvent : public HEvent {

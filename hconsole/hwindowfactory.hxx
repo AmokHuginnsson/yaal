@@ -47,11 +47,15 @@ protected:
 	virtual void do_initialize_globals( void ) {};
 	virtual void do_cleanup_globals( void ) {};
 	virtual window_ptr_t do_new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& ) = 0;
+	virtual bool do_apply_resources( HTUIProcess*, window_ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) {
+		return ( true );
+	}
 public:
 	virtual ~HWindowCreatorInterface( void ) {}
 	void initialize_globals( void );
 	void cleanup_globals( void );
 	window_ptr_t new_instance( HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
+	bool apply_resources( HTUIProcess*, window_ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
 	typedef yaal::hcore::HPointer<HWindowCreatorInterface> ptr_t;
 };
 

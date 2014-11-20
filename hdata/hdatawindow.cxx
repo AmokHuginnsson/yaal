@@ -53,7 +53,7 @@ namespace hdata {
 HDataWindow::HDataWindow( HString const& title_, HDataProcess* owner_ )
 	: HWindow( title_ ),
 	_modified( false ), _documentMode( DOCUMENT::VIEW ), _mainWidget( NULL ),
-	_viewModeWidgets(), _editModeWidgets(), _owner( owner_ ),
+	_viewModeWidgets(), _editModeWidgets(),
 	_crud( new ( memory::yaal ) HCRUDDescriptor( owner_->data_base() ) ),
 	_mode( HCRUDDescriptor::MODE::SELECT ),
 	_idColumnName(), _dictionaries() {
@@ -354,7 +354,15 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 	M_ENSURE( dp );
 	HString name( xml::attr_val( node_, "title" ) );
 	HWindow::ptr_t window( make_pointer<HDataWindow>( name, dp ) );
-	HDataWindow* dw( dynamic_cast<HDataWindow*>( window.raw() ) );
+	return ( window );
+	M_EPILOG
+}
+
+bool HDataWindowCreator::do_apply_resources( hconsole::HTUIProcess* tui_, window_ptr_t window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HDataWindow* dw( dynamic_cast<HDataWindow*>( window_.raw() ) );
+	HDataProcess* dp( dynamic_cast<HDataProcess*>( tui_ ) );
+	M_ENSURE( dp );
 	for ( yaal::tools::HXml::HConstNodeProxy const& n : node_ ) {
 		HString nodeName( n.get_name() );
 		if ( nodeName == "dicts" ) {
@@ -369,7 +377,7 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 			}
 		}
 	}
-	create_widgets( window, node_ );
+	create_widgets( window_, node_ );
 	for ( yaal::tools::HXml::HConstNodeProxy const& n : node_ ) {
 		HString nodeName( n.get_name() );
 		if ( nodeName == "db" ) {
@@ -381,7 +389,7 @@ hconsole::HWindow::ptr_t HDataWindowCreator::do_new_instance( hconsole::HTUIProc
 			dw->set_record_descriptor( table, columns, idColumn, filter ? *filter : "", sort ? *sort : "" );
 		}
 	}
-	return ( window );
+	return ( true );
 	M_EPILOG
 }
 
