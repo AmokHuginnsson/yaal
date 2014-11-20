@@ -39,6 +39,12 @@ namespace tools {
 
 namespace filesystem {
 
+struct FileSystem {};
+typedef yaal::hcore::HExceptionT<FileSystem> HFileSystemException;
+
+void remove( yaal::hcore::HString const& );
+void rename( yaal::hcore::HString const&, yaal::hcore::HString const& );
+
 struct FILE_TYPE {
 	typedef enum {
 		REGULAR_FILE = 1,

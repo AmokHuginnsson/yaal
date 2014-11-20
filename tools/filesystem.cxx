@@ -24,17 +24,39 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstdio>
+#include <unistd.h>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "filesystem.hxx"
 #include "hfsitem.hxx"
 
+using namespace yaal;
+using namespace yaal::hcore;
+
 namespace yaal {
 
 namespace tools {
 
 namespace filesystem {
+
+void remove( yaal::hcore::HString const& path_ ) {
+	int err( ::unlink( path_.c_str() ) );
+	if ( ( err != 0 ) && ( errno != ENOENT ) ) {
+		throw HFileSystemException( "Failed to remove: `" + path_ + "'" );
+	}
+	return;
+}
+
+void rename( yaal::hcore::HString const& old_, yaal::hcore::HString const& new_ ) {
+	int err( ::rename( old_.c_str(), new_.c_str() ) );
+	if ( err != 0 ) {
+		throw HFileSystemException( to_string( "Failed to rename: `" ).append( old_ ).append( "' to `" ).append( new_ ).append( "'" ) );
+	}
+	return;
+}
 
 find_result find( yaal::hcore::HString const& in, yaal::hcore::HRegex const& pattern_,
 		int minDepth_, int maxDepth_, FILE_TYPE::enum_t fileType_ ) {
