@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hwindowfactory.hxx"
 #include "hconsole/hwindow.hxx"
+#include "hcore/hlog.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -47,6 +48,7 @@ void HWindowFactory::register_window_creator( HString const& name_, HWindowCreat
 		M_THROW( _( "Window already registered" ), errno );
 	}
 	_creators[ name_ ] = creator_;
+	log << "window creator for: `" << name_ << "' registered" << endl;
 	return;
 	M_EPILOG
 }
@@ -58,6 +60,8 @@ HWindowCreatorInterface::window_ptr_t HWindowFactory::create_window( HTUIProcess
 	if ( it != _creators.end() ) {
 		window = it->second->new_instance( tuiProcess_, node_ );
 		it->second->apply_resources( tuiProcess_, window, node_ );
+	} else {
+		M_THROW( "no window creator for: " + node_.get_name() + ", at: ", node_.get_line() );
 	}
 	return ( window );
 	M_EPILOG

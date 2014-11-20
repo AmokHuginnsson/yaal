@@ -136,6 +136,9 @@ void HResource::create_window( yaal::hcore::HString const& id_ ) {
 		M_THROW( _( "cannot find resources for this window: " ) + id_, errno );
 	}
 	HWindow::ptr_t win( HWindowFactory::get_instance().create_window( _tui, xmlWin ) );
+	if ( ! win ) {
+		M_THROW( _( "failed to contruct window, at: " ), xmlWin.get_line() );
+	}
 	_tui->add_window( win );
 	return;
 	M_EPILOG
