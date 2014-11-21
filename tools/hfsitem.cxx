@@ -36,6 +36,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hfsitem.hxx"
 #include "hcore/memory.hxx"
 #include "hcore/system.hxx"
+#include "tools/filesystem.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -56,9 +57,7 @@ HFSItem::~HFSItem( void ) {
 
 bool HFSItem::is_directory( void ) const {
 	M_PROLOG
-	struct stat s;
-	do_stat( &s );
-	return ( S_ISDIR( s.st_mode ) );
+	return ( filesystem::is_directory( _path ) );
 	M_EPILOG
 }
 

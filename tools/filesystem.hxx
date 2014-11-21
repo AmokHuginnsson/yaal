@@ -41,9 +41,23 @@ namespace filesystem {
 
 struct FileSystem {};
 typedef yaal::hcore::HExceptionT<FileSystem> HFileSystemException;
+typedef yaal::hcore::HString path_t;
 
-void remove( yaal::hcore::HString const& );
-void rename( yaal::hcore::HString const&, yaal::hcore::HString const& );
+path_t normalize_path( path_t const& );
+
+bool exists( path_t const& );
+bool is_directory( path_t const& );
+bool is_symbolic_link( path_t const& );
+void remove( path_t const& );
+void rename( path_t const&, path_t const& );
+
+enum class DIRECTORY_MODIFICATION {
+	EXACT,
+	RECURSIVE
+};
+
+void create_directory( path_t const&, u32_t, DIRECTORY_MODIFICATION = DIRECTORY_MODIFICATION::EXACT );
+void remove_directory( path_t const&, DIRECTORY_MODIFICATION = DIRECTORY_MODIFICATION::EXACT );
 
 struct FILE_TYPE {
 	typedef enum {
