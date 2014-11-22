@@ -85,12 +85,12 @@ Copyright:
 #ifdef M_ENSURE_2
 #	error Yaal redefines M_ENSURE_2 macro.
 #endif /* #ifdef M_ENSURE_2 */
-#ifdef M_NUM_ARGS
-#	error Yaal redefines M_NUM_ARGS macro.
-#endif /* #ifdef M_NUM_ARGS */
-#ifdef M_NUM_ARGS_COUNTER
-#	error Yaal redefines M_NUM_ARGS_COUNTER macro.
-#endif /* #ifdef M_NUM_ARGS_COUNTER */
+#ifdef M_NUM_ARGC
+#	error Yaal redefines M_NUM_ARGC macro.
+#endif /* #ifdef M_NUM_ARGC */
+#ifdef M_NUM_ARGC_COUNTER
+#	error Yaal redefines M_NUM_ARGC_COUNTER macro.
+#endif /* #ifdef M_NUM_ARGC_COUNTER */
 #ifdef M_ENSURE_EX
 #	error Yaal redefines M_ENSURE_EX macro.
 #endif /* #ifdef M_ENSURE_EX */
@@ -133,8 +133,8 @@ Copyright:
 #define M_STRINGIFY_REAL( x ) #x
 #define M_CONCAT_REAL( a, b ) a ## b
 #define M_MACRO_ARGC_HELPER( MACRO, NUM, ... ) M_CONCAT( MACRO, NUM )( __VA_ARGS__ )
-#define M_NUM_ARGS( ... ) M_NUM_ARGS_COUNTER( __VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 )
-#define M_NUM_ARGS_COUNTER( a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, N ) N
+#define M_NUM_ARGC( ... ) M_NUM_ARGC_COUNTER( __VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 )
+#define M_NUM_ARGC_COUNTER( a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, N, ... ) N
 /*! \endcond */
 /*! \brief Create uniqe C++ identifier from two other identifier.
  *
@@ -150,7 +150,7 @@ Copyright:
  * \param ... - any number of arguments that shall be passed to MACRO call.
  * \return A call to MACRO_n( ... ), where n is number of argument originally passed to M_MACRO_ARGC.
  */
-#define M_MACRO_ARGC( MACRO, ... ) M_MACRO_ARGC_HELPER( MACRO, M_NUM_ARGS( __VA_ARGS__ ), __VA_ARGS__ )
+#define M_MACRO_ARGC( MACRO, ... ) M_MACRO_ARGC_HELPER( MACRO, M_NUM_ARGC( __VA_ARGS__ ), __VA_ARGS__ )
 /*! \brief Create automatic C++ identifier name.
  *
  * \param name - base for C++ identifier name.
