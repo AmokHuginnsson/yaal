@@ -73,12 +73,12 @@ Copyright:
 #ifdef M_ENSURE
 #	error Yaal redefines M_ENSURE macro.
 #endif /* #ifdef M_ENSURE */
-#ifdef M_ENSURE_HELPER
-#	error Yaal redefines M_ENSURE_HELPER macro.
-#endif /* #ifdef M_ENSURE_HELPER */
-#ifdef M_ENSURE_HELPER_FORWARD
-#	error Yaal redefines M_ENSURE_HELPER_FORWARD macro.
-#endif /* #ifdef M_ENSURE_HELPER_FORWARD */
+#ifdef M_MACRO_ARGC_HELPER
+#	error Yaal redefines M_MACRO_ARGC_HELPER macro.
+#endif /* #ifdef M_MACRO_ARGC_HELPER */
+#ifdef M_MACRO_ARGC
+#	error Yaal redefines M_MACRO_ARGC macro.
+#endif /* #ifdef M_MACRO_ARGC */
 #ifdef M_ENSURE_1
 #	error Yaal redefines M_ENSURE_1 macro.
 #endif /* #ifdef M_ENSURE_1 */
@@ -132,6 +132,9 @@ Copyright:
 /*! \cond */
 #define M_STRINGIFY_REAL( x ) #x
 #define M_CONCAT_REAL( a, b ) a ## b
+#define M_MACRO_ARGC_HELPER( MACRO, NUM, ... ) M_CONCAT( MACRO, NUM )( __VA_ARGS__ )
+#define M_NUM_ARGS( ... ) M_NUM_ARGS_COUNTER( __VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 )
+#define M_NUM_ARGS_COUNTER( a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, N ) N
 /*! \endcond */
 /*! \brief Create uniqe C++ identifier from two other identifier.
  *
@@ -141,6 +144,13 @@ Copyright:
  */
 #define M_CONCAT( a, b ) M_CONCAT_REAL( a, b )
 #define M_STRINGIFY( x ) M_STRINGIFY_REAL( x )
+/*! \brief Create call which name differs based on number of arguments passed to this macro.
+ *
+ * \param MACRO - name for a call to make.
+ * \param ... - any number of arguments that shall be passed to MACRO call.
+ * \return A call to MACRO_n( ... ), where n is number of argument originally passed to M_MACRO_ARGC.
+ */
+#define M_MACRO_ARGC( MACRO, ... ) M_MACRO_ARGC_HELPER( MACRO, M_NUM_ARGS( __VA_ARGS__ ), __VA_ARGS__ )
 /*! \brief Create automatic C++ identifier name.
  *
  * \param name - base for C++ identifier name.
@@ -188,11 +198,7 @@ Copyright:
  *
  * \param condition - condition to be tested.
  */
-#define M_ENSURE( ... ) M_ENSURE_HELPER_FORWARD( M_NUM_ARGS( __VA_ARGS__ ), __VA_ARGS__ )
-#define M_ENSURE_HELPER_FORWARD( NUM, ... ) M_ENSURE_HELPER( NUM, __VA_ARGS__ )
-#define M_ENSURE_HELPER( NUM, ... ) M_ENSURE_##NUM( __VA_ARGS__ )
-#define M_NUM_ARGS( ... ) M_NUM_ARGS_COUNTER( __VA_ARGS__, 2, 1 )
-#define M_NUM_ARGS_COUNTER( a1, a2, N ) N
+#define M_ENSURE( ... ) M_MACRO_ARGC( M_ENSURE_, __VA_ARGS__ )
 #define M_ENSURE_1( condition ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition, errno, error_message( errno ) ); } } while ( 0 )
 #define M_ENSURE_2( condition, type ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition, errno, error_message( errno ) ); } } while ( 0 )
 #define M_ENSURE_EX( condition, comment ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition, errno, error_message( errno ), comment ); } } while ( 0 )
