@@ -27,6 +27,8 @@ Copyright:
 #ifndef YAAL_HCORE_HLIST_HXX_INCLUDED
 #define YAAL_HCORE_HLIST_HXX_INCLUDED 1
 
+#include <initializer_list>
+
 #include "hcore/base.hxx"
 #include "hcore/allocator.hxx"
 #include "hcore/algorithm.hxx"
@@ -219,6 +221,20 @@ public:
 		: _allocator( allocator_ ), _size( 0 ), _hook( NULL ) {
 		M_PROLOG
 		initialize( first_, last_, typename trait::add_pointer<typename is_integral<iter_t>::type>::type() );
+		return;
+		M_EPILOG
+	}
+
+	/*! \brief Construct list based on compile time constant data set.
+	 *
+	 * \tparam T - type of compile time constants to insert into this list.
+	 * \param constants_ - set of compile time constants to into into this list.
+	 */
+	template<typename T>
+	HList( std::initializer_list<T> constants_ )
+		: _allocator(), _size( 0 ), _hook( NULL ) {
+		M_PROLOG
+		initialize( constants_.begin(), constants_.end(), static_cast<trait::false_type*>( nullptr ) );
 		return;
 		M_EPILOG
 	}

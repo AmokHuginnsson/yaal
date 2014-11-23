@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_HCORE_HARRAY_HXX_INCLUDED 1
 
 #include <new>
+#include <initializer_list>
 
 #include "hcore/base.hxx"
 #include "hcore/allocator.hxx"
@@ -146,6 +147,19 @@ public:
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
 		initialize( first, last, typename trait::add_pointer<typename is_integral<iterator_t>::type>::type() );
+		return;
+		M_EPILOG
+	}
+	/*! \brief Construct array based on compile time constant data set.
+	 *
+	 * \tparam T - type of compile time constants to insert into this array.
+	 * \param constants_ - set of compile time constants to into into this array.
+	 */
+	template<typename T>
+	HArray( std::initializer_list<T> constants_ )
+		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		M_PROLOG
+		initialize( constants_.begin(), constants_.end(), static_cast<trait::false_type*>( nullptr ) );
 		return;
 		M_EPILOG
 	}

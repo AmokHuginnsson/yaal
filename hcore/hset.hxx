@@ -30,6 +30,8 @@ Copyright:
 #ifndef YAAL_HCORE_HSET_HXX_INCLUDED
 #define YAAL_HCORE_HSET_HXX_INCLUDED 1
 
+#include <initializer_list>
+
 #include "hcore/hsbbstree.hxx"
 #include "hcore/iterator.hxx"
 #include "hcore/functional.hxx"
@@ -117,19 +119,36 @@ private:
 	engine_t _engine;
 public:
 	HSet( void )
-		: _engine( compare_type(), allocator_type() )
-		{}
+		: _engine( compare_type(), allocator_type() ) {
+		return;
+	}
 	explicit HSet( compare_type const& compare_ )
-		: _engine( compare_, allocator_type() )
-		{}
+		: _engine( compare_, allocator_type() ) {
+		return;
+	}
 	explicit HSet( allocator_type const& allocator_ )
-		: _engine( compare_type(), allocator_ )
-		{}
+		: _engine( compare_type(), allocator_ ) {
+		return;
+	}
 	template<typename iterator_t>
 	HSet( iterator_t first, iterator_t last, compare_type const& compare_ = compare_type(), allocator_type const& allocator_ = allocator_type() )
 		: _engine( compare_, allocator_ ) {
 		M_PROLOG
 		insert( first, last );
+		return;
+		M_EPILOG
+	}
+
+	/*! \brief Construct set based on compile time constant data set.
+	 *
+	 * \tparam T - type of compile time constants to insert into this set.
+	 * \param constants_ - set of compile time constants to into into this set.
+	 */
+	template<typename T>
+	HSet( std::initializer_list<T> constants_ )
+		: _engine( compare_type(), allocator_type() ) {
+		M_PROLOG
+		insert( constants_.begin(), constants_.end() );
 		return;
 		M_EPILOG
 	}
