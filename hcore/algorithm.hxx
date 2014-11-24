@@ -1819,7 +1819,7 @@ inline iterator_t partition( iterator_t first_, iterator_t last_, predicate_t pr
 			++ fit;
 		}
 	}
-	if ( predicate_( *fit ) )
+	if ( ( fit != last_ ) &&  predicate_( *fit ) )
 		++ fit;
 	return ( fit );
 }
