@@ -138,19 +138,25 @@ HString type_name( bool stripTemplateParams_ = false ) {
  */
 template<typename tType, typename base_type_t = HException>
 class HExceptionT : public base_type_t {
+	static bool _decodeErrno;
 	static yaal::hcore::HString const _name;
 public:
 	typedef base_type_t base_type;
 	typedef HExceptionT<tType, base_type> this_type;
 	HExceptionT( HString const& reason_, int code_ = errno )
-		: base_type( NULL, 0, NULL, reason_, code_, _name )
+		: base_type( NULL, 0, NULL, reason_ + ( _decodeErrno ? to_string( ": " ).append( error_message( code_ ) ) : "" ), code_, _name )
 		{ }
 	HExceptionT( char const* fileName_,
 			int line_, char const* functionName_,
 			HString const& reason_, int const code_, HString const& name_ = _name )
 		: base_type( fileName_, line_, functionName_, reason_, code_, name_ )
 		{	}
+	static bool decode_errno( void ) {
+		return ( _decodeErrno = true );
+	}
 };
+template<typename tType, typename base_type_t>
+bool HExceptionT<tType, base_type_t>::_decodeErrno = false;
 template<typename tType, typename base_type_t>
 yaal::hcore::HString const HExceptionT<tType, base_type_t>::_name = type_name<tType>( true ) + "Exception";
 
