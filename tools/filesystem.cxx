@@ -61,14 +61,54 @@ void do_stat( struct stat* s, path_t const& path_ ) {
 
 path_t normalize_path( path_t const& path_ ) {
 	M_PROLOG
-	HString path;
-	bool sep( false );
-	for ( char c : path_ ) {
-		if ( sep && ( c == '/' ) ) {
-			continue;
+	HString path( path_ );
+	bool absolute( ! path.is_empty() && path[0] == '/' );
+	int origLen( -1 );
+	while ( origLen != static_cast<int>( path.get_length() ) ) {
+		origLen = static_cast<int>( path.get_length() );
+		path.replace( "/./", "/" );
+		path.replace( "//", "/" );
+	}
+	int pos( 0 );
+	int back( 0 );
+	while ( ( back = static_cast<int>( path.find( "/../", pos ) ) ) != HString::npos ) {
+		pos = back + 1;
+		int prev( static_cast<int>( path.find_last( '/', back - 1 ) ) );
+		if ( prev != HString::npos ) {
+			if ( ! ( ( ( back - prev ) == 3 ) && ( path[prev + 1] == '.' ) && ( path[prev + 2] == '.' ) ) ) {
+				path.erase( prev + 1, back - prev + 3 );
+				pos = prev;
+			}
+		} else if ( ! path.is_empty() && ( path.find( "../" ) != 0 ) && ( path.find( "./" ) != 0 ) ) {
+			path.erase( pos = 0, back + 3 + ( absolute ? 0 : 1 ) );
 		}
-		sep = ( c == '/' );
-		path.push_back( c );
+	}
+	if ( path.find( "/..", path.get_length() - 3 ) != HString::npos ) {
+		int prev( static_cast<int>( path.find_last( '/', path.get_length() - 4 ) ) );
+		if ( prev != HString::npos ) {
+			if ( ! ( ( ( back - prev ) == 3 ) && ( path[prev + 1] == '.' ) && ( path[prev + 2] == '.' ) ) ) {
+				path.erase( prev ? prev : 1 );
+			}
+		} else if ( ! path.is_empty() && ( path.find( "../" ) != 0 ) && ( path.find( "./" ) != 0 ) ) {
+			path.erase( absolute ? 1 : 0 );
+		}
+	}
+	if ( path.find( "./" ) == 0 ) {
+		path.erase( 0, 2 );
+	}
+	if ( ( ( path.get_length() > 1 ) || ! ( absolute || path.is_empty() ) ) && ( path[path.get_length() - 1] == '/' ) ) {
+		path.erase( path.get_length() - 1 );
+	}
+	if ( path.find( "/.", path.get_length() - 2 ) != HString::npos ) {
+		if ( path.get_length() != 2 ) {
+			path.erase( path.get_length() - 2 );
+		} else {
+			path.erase( absolute ? 1 : 0 );
+		}
+	} else if ( path == "/.." ) {
+		path.erase( absolute ? 1 : 0 );
+	} else if ( path == "." ) {
+		path.clear();
 	}
 	return ( path );
 	M_EPILOG
