@@ -63,9 +63,7 @@ bool HFSItem::is_directory( void ) const {
 
 bool HFSItem::is_file( void ) const {
 	M_PROLOG
-	struct stat s;
-	do_stat( &s );
-	return ( S_ISREG( s.st_mode ) );
+	return ( filesystem::is_regular_file( _path ) );
 	M_EPILOG
 }
 

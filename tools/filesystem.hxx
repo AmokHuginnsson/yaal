@@ -48,6 +48,9 @@ path_t normalize_path( path_t const& );
 bool exists( path_t const& );
 bool is_directory( path_t const& );
 bool is_symbolic_link( path_t const& );
+bool is_regular_file( path_t const& );
+bool is_other( path_t const& );
+i64_t file_size( path_t const& );
 void remove( path_t const& );
 void rename( path_t const&, path_t const& );
 
@@ -67,7 +70,7 @@ struct FILE_TYPE {
 	} enum_t;
 };
 
-typedef yaal::hcore::HArray<yaal::hcore::HString> find_result;
+typedef yaal::hcore::HArray<path_t> find_result;
 
 find_result find( yaal::hcore::HString const&, yaal::hcore::HRegex const&,
 		int = 0, int = meta::max_signed<int>::value, FILE_TYPE::enum_t = FILE_TYPE::ALL );

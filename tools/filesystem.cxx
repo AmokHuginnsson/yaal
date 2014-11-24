@@ -35,6 +35,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "filesystem.hxx"
 #include "stringalgo.hxx"
 #include "hfsitem.hxx"
+#include "hcore/hcall.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -48,12 +49,20 @@ namespace filesystem {
 typedef FileSystem this_type;
 
 namespace {
+bool const initHFileSystemException = HFileSystemException::decode_errno();
+}
 
-void do_stat( struct stat* s, path_t const& path_ ) {
+namespace {
+
+bool do_stat( struct stat* s, path_t const& path_ ) {
 	M_PROLOG
 	::memset( s, 0, sizeof ( *s ) );
-	M_ENSURE( ( ::stat( path_.raw(), s ) == 0 ) || ( ::lstat( path_.raw(), s ) == 0 ) );
-	return;
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
+	bool success( ( ::stat( path_.raw(), s ) == 0 ) || ( ::lstat( path_.raw(), s ) == 0 ) );
+	if ( ! success && ( errno != ENOENT ) ) {
+		throw HFileSystemException( to_string( "Cannot acquire metadata for `" ).append( path_ ).append( "'" ) );
+	}
+	return ( success );
 	M_EPILOG
 }
 
@@ -125,16 +134,35 @@ bool exists( path_t const& path_ ) {
 bool is_directory( path_t const& path_ ) {
 	M_PROLOG
 	struct stat s;
-	do_stat( &s, path_ );
-	return ( S_ISDIR( s.st_mode ) );
+	return ( do_stat( &s, path_ ) && S_ISDIR( s.st_mode ) );
 	M_EPILOG
 }
 
 bool is_symbolic_link( path_t const& path_ ) {
 	M_PROLOG
 	struct stat s;
-	do_stat( &s, path_ );
-	return ( S_ISLNK( s.st_mode ) );
+	return ( do_stat( &s, path_ ) && S_ISLNK( s.st_mode ) );
+	M_EPILOG
+}
+
+bool is_regular_file( path_t const& path_ ) {
+	M_PROLOG
+	struct stat s;
+	return ( do_stat( &s, path_ ) && S_ISREG( s.st_mode ) );
+	M_EPILOG
+}
+
+bool is_other( path_t const& path_ ) {
+	M_PROLOG
+	struct stat s;
+	return ( do_stat( &s, path_ ) && ! ( S_ISREG( s.st_mode ) || S_ISDIR( s.st_mode ) || S_ISLNK( s.st_mode ) ) );
+	M_EPILOG
+}
+
+i64_t file_size( path_t const& path_ ) {
+	M_PROLOG
+	struct stat s;
+	return ( do_stat( &s, path_ ) ? static_cast<i64_t>( s.st_size ) : -1 );
 	M_EPILOG
 }
 
@@ -158,18 +186,25 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 	M_PROLOG
 	HString path( normalize_path( path_ ) );
 	M_ENSURE( ! path.is_empty() );
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	if ( directoryModification_ == DIRECTORY_MODIFICATION::EXACT ) {
-		int err( ::mkdir( path_.c_str(), mode_ ) );
-		if ( ( err != 0 ) && ( ( errno != EEXIST ) || ! is_directory( path_ ) ) ) {
-			throw HFileSystemException( to_string( "Failed to create directory `" ).append( path_ ).append( "'" ) );
+		int err( ::mkdir( path.c_str(), mode_ ) );
+		if ( ( err != 0 ) && ( ( errno != EEXIST ) || ! is_directory( path ) ) ) {
+			throw HFileSystemException( to_string( "Failed to create directory `" ).append( path ).append( "'" ) );
 		}
 	} else {
 		typedef HArray<yaal::hcore::HString> file_names_t;
-		file_names_t fileNames( string::split<file_names_t>( path_, "/", HTokenizer::SKIP_EMPTY ) );
+		file_names_t fileNames( string::split<file_names_t>( path, "/", HTokenizer::SKIP_EMPTY ) );
 		path.assign( path[0] == '/' ? "/" : "" );
+		bool real( false );
 		for ( yaal::hcore::HString const fn : fileNames ) {
+			if ( fn != ".." ) {
+				real = true;
+			}
 			path.append( fn );
-			create_directory( path, mode_, DIRECTORY_MODIFICATION::EXACT );
+			if ( real ) {
+				create_directory( path, mode_, DIRECTORY_MODIFICATION::EXACT );
+			}
 			path.append( "/" );
 		}
 	}
@@ -178,12 +213,26 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 }
 
 void remove_directory( path_t const& path_, DIRECTORY_MODIFICATION directoryModification_ ) {
+	HString path( normalize_path( path_ ) );
+	M_ENSURE( ! path.is_empty() );
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	if ( directoryModification_ == DIRECTORY_MODIFICATION::EXACT ) {
-		int err( ::rmdir( path_.c_str() ) );
-		if ( ( err != 0 ) && ( ( errno != ENOENT ) || is_directory( path_ ) ) ) {
-			throw HFileSystemException( to_string( "Failed to remove directory `" ).append( path_ ).append( "'" ) );
+		int err( ::rmdir( path.c_str() ) );
+		if ( ( err != 0 ) && ( ( errno != ENOENT ) || is_directory( path ) ) ) {
+			throw HFileSystemException( to_string( "Failed to remove directory `" ).append( path ).append( "'" ) );
 		}
 	} else {
+		find_result fr( find( path, ".*" ) );
+		find_result::iterator lim(
+			yaal::stable_partition( fr.begin(), fr.end(),
+				[]( path_t const& p ) {
+					return ( ! is_directory( p ) );
+				}
+			)
+		);
+		for_each( fr.begin(), lim, ptr_fun( &remove ) );
+		for_each( fr.rbegin(), HReverseIterator<find_result::iterator>( lim ), call( &remove_directory, _1, DIRECTORY_MODIFICATION::EXACT ) );
+		remove_directory( path_, DIRECTORY_MODIFICATION::EXACT );
 	}
 }
 
@@ -192,17 +241,9 @@ find_result find( yaal::hcore::HString const& in, yaal::hcore::HRegex const& pat
 	find_result result;
 	HFSItem p( in );
 	if ( !! p ) {
-		if ( p.is_file() ) {
-			if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::REGULAR_FILE ) && pattern_.matches( in ) ) {
-				result.push_back( in );
-			}
-		} else if ( p.is_directory() ) {
+		if ( is_directory( p.get_path() ) ) {
 			for ( HFSItem::HIterator it( p.begin() ), end( p.end() ); it != end; ++ it ) {
-				if ( it->is_file() ) {
-					if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::REGULAR_FILE ) && pattern_.matches( it->get_path() ) ) {
-						result.emplace_back( it->get_path() );
-					}
-				} else if ( it->is_directory() ) {
+				if ( is_directory( it->get_path() ) ) {
 					if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::DIRECTORY ) && pattern_.matches( it->get_path() ) ) {
 						result.emplace_back( it->get_path() );
 					}
@@ -210,7 +251,15 @@ find_result find( yaal::hcore::HString const& in, yaal::hcore::HRegex const& pat
 						find_result sub( find( it->get_path(), pattern_, minDepth_ > 0 ? minDepth_ - 1 : 0, maxDepth_ - 1 ) );
 						result.insert( result.end(), sub.begin(), sub.end() );
 					}
+				} else {
+					if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::REGULAR_FILE ) && pattern_.matches( it->get_path() ) ) {
+						result.emplace_back( it->get_path() );
+					}
 				}
+			}
+		} else {
+			if ( ( minDepth_ == 0 ) && ( fileType_ & FILE_TYPE::REGULAR_FILE ) && pattern_.matches( in ) ) {
+				result.emplace_back( in );
 			}
 		}
 	}
