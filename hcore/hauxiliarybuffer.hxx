@@ -63,6 +63,9 @@ public:
 	template<typename iter_t>
 	void init( iter_t, iter_t );
 	void clear( void );
+private:
+	HAuxiliaryBuffer( HAuxiliaryBuffer const& ) = delete;
+	HAuxiliaryBuffer& operator = ( HAuxiliaryBuffer const& ) = delete;
 };
 
 template<typename type_t>
