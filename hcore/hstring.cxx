@@ -1383,6 +1383,10 @@ void HString::HCharRef::swap( HCharRef& charRef_ ) {
 #undef EXT_IS_INPLACE
 #undef IS_INPLACE
 
+HString operator ""_ys ( char const* str_, size_t len_ ) {
+	return ( HString( str_, static_cast<int>( len_ ) ) );
+}
+
 HString to_string( char val_ ) {
 	M_PROLOG
 	return ( HString( val_ ) );
