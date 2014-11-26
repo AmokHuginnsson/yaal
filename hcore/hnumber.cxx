@@ -157,6 +157,17 @@ HNumber::HNumber( int long long number_ )
 	M_EPILOG
 }
 
+HNumber::HNumber( int long long unsigned number_ )
+	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
+	_leafCount( 0 ), _integralPartSize( 0 ),
+	_canonical(), _cache(), _negative( false ) {
+	M_PROLOG
+	from_integer( number_ );
+	return;
+	M_EPILOG
+}
+
 HNumber::HNumber( int long number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
 			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
@@ -356,27 +367,33 @@ void HNumber::from_floating_point( double long number_ ) {
 
 void HNumber::from_integer( int long long number_ ) {
 	M_PROLOG
-	int long long number( yaal::abs( number_ ) );
-	if ( number >= ( static_cast<int long long>( LEAF ) * LEAF ) ) {
+	from_integer( yaal::abs( number_ ) );
+	_negative = ( number_ < 0 );
+	return;
+	M_EPILOG
+}
+
+void HNumber::from_unsigned_integer( int long long unsigned number_ ) {
+	M_PROLOG
+	if ( number_ >= ( static_cast<int long long>( LEAF ) * LEAF ) ) {
 		_leafCount = 3;
 		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
 		i32_t* data( _canonical.get<i32_t>() );
-		data[ 0 ] = static_cast<i32_t>( number / ( static_cast<int long long>( LEAF ) * LEAF ) );
-		data[ 1 ] = static_cast<i32_t>( ( number % ( static_cast<int long long>( LEAF ) * LEAF ) ) / LEAF );
-		data[ 2 ] = static_cast<i32_t>( number % LEAF );
-	} else if ( number >= LEAF ) {
+		data[ 0 ] = static_cast<i32_t>( number_ / ( static_cast<int long long unsigned>( LEAF ) * LEAF ) );
+		data[ 1 ] = static_cast<i32_t>( ( number_ % ( static_cast<int long long unsigned>( LEAF ) * LEAF ) ) / LEAF );
+		data[ 2 ] = static_cast<i32_t>( number_ % LEAF );
+	} else if ( number_ >= LEAF ) {
 		_leafCount = 2;
 		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
 		i32_t* data( _canonical.get<i32_t>() );
-		data[ 0 ] = static_cast<i32_t>( number / LEAF );
-		data[ 1 ] = static_cast<i32_t>( number % LEAF );
-	} else if ( number != 0 ) {
+		data[ 0 ] = static_cast<i32_t>( number_ / LEAF );
+		data[ 1 ] = static_cast<i32_t>( number_ % LEAF );
+	} else if ( number_ != 0 ) {
 		_leafCount = 1;
 		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
-		_canonical.get<i32_t>()[ 0 ] = static_cast<i32_t>( number );
+		_canonical.get<i32_t>()[ 0 ] = static_cast<i32_t>( number_ );
 	}
 	_integralPartSize = _leafCount;
-	_negative = ( number_ < 0 );
 	return;
 	M_EPILOG
 }
@@ -1614,6 +1631,18 @@ struct HNumber::ElementaryFunctions {
 		M_EPILOG
 	}
 };
+
+HNumber operator ""_yn ( char const* str_, size_t len_ ) {
+	return ( HString( str_, static_cast<int>( len_ ) ) );
+}
+
+HNumber operator ""_yn ( double long val_ ) {
+	return ( val_ );
+}
+
+HNumber operator ""_yn ( int long long unsigned val_ ) {
+	return ( val_ );
+}
 
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG

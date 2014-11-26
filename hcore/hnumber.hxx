@@ -240,6 +240,7 @@ private:
 	void from_string( HString const& );
 	void from_floating_point( double long );
 	void from_integer( int long long );
+	void from_unsigned_integer( int long long unsigned );
 	void multiply_by_leaf( i32_t );
 	i32_t multiply_by_leaf_low( i32_t*, size_t, i32_t );
 	void divide_by_leaf( i32_t, size_t );
@@ -251,8 +252,13 @@ public:
 
 typedef HExceptionT<HNumber> HNumberException;
 
-inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b )
-	{ a.swap( b ); }
+HNumber operator ""_yn ( char const*, size_t );
+HNumber operator ""_yn ( double long );
+HNumber operator ""_yn ( int long long unsigned );
+
+inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b ) {
+	a.swap( b );
+}
 
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& );
 
