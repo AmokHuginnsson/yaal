@@ -98,7 +98,7 @@ private:
 	positions_ptr_t _positions;
 	args_ptr_t _args;
 	mutable HString _errorMessage;
-	HFormatImpl( char const* const );
+	HFormatImpl( HString const& );
 	HFormatImpl( HFormatImpl const& );
 	HFormatImpl& operator = ( HFormatImpl const& );
 	void swap( HFormatImpl& );
@@ -151,7 +151,7 @@ HFormat::HFormatImpl::flag_t const HFormat::HFormatImpl::FLAG::LEFT_ALIGNED = HF
 HFormat::HFormatImpl::flag_t const HFormat::HFormatImpl::FLAG::SPACE_PADDED = HFormat::HFormatImpl::flag_t::new_flag();
 HFormat::HFormatImpl::flag_t const HFormat::HFormatImpl::FLAG::SIGN_PREFIX = HFormat::HFormatImpl::flag_t::new_flag();
 
-HFormat::HFormatImpl::HFormatImpl( char const* const fmt )
+HFormat::HFormatImpl::HFormatImpl( HString const& fmt )
 	: _positionIndex( 0 ), _format( fmt ), _buffer(), _string(), _tokens(),
 	_positions( new ( memory::yaal ) positions_t ), _args( new ( memory::yaal ) args_t ),
 	_errorMessage() {}
@@ -212,23 +212,24 @@ bool does_intersect( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2 ) {
 
 }
 
-HFormat::HFormat( char const* const aFmt )
-	: _impl( new ( memory::yaal ) HFormatImpl( aFmt ) ) {
+HFormat::HFormat( HString const& aFmt_ )
+	: _impl( new ( memory::yaal ) HFormatImpl( aFmt_ ) ) {
 	M_PROLOG
-	HString fmt( aFmt );
 	HFormatImpl::OToken t;
 	int idx = 0;
 	HFormatImpl& impl( *_impl );
 	while ( true ) {
 		t = HFormatImpl::OToken();
-		if ( impl.has_conversion( fmt, idx ) )
-			t = impl.next_conversion( fmt, idx );
-		else if ( impl.has_constant( fmt, idx ) )
-			t = impl.next_constant( fmt, idx );
-		if ( t._conversion != HFormatImpl::CONVERSION::EMPTY )
+		if ( impl.has_conversion( aFmt_, idx ) ) {
+			t = impl.next_conversion( aFmt_, idx );
+		} else if ( impl.has_constant( aFmt_, idx ) ) {
+			t = impl.next_constant( aFmt_, idx );
+		}
+		if ( t._conversion != HFormatImpl::CONVERSION::EMPTY ) {
 			_impl->_tokens.push_back( t );
-		else
+		} else {
 			break;
+		}
 	}
 	bool anyTokenHaveExplicitIndex = false;
 	bool firstToken = true;
@@ -783,6 +784,10 @@ HFormat::HFormatImpl::flag_t HFormat::HFormatImpl::get_flag( HString const& s, i
 	-- i;
 	return ( flag );
 	M_EPILOG
+}
+
+HFormat operator ""_yf ( char const* str_, size_t len_ ) {
+	return ( HString( str_, static_cast<int>( len_ ) ) );
 }
 
 HString str( HFormat const& format_ ) {

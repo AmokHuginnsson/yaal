@@ -45,7 +45,7 @@ class HFormat {
 	typedef HPointer<HFormatImpl> format_impl_ptr_t;
 	format_impl_ptr_t _impl;
 public:
-	HFormat( char const* const = "" );
+	HFormat( HString const& = HString() );
 	HFormat( format_impl_ptr_t );
 	HFormat( HFormat const& );
 	HFormat& operator = ( HFormat const& );
@@ -71,6 +71,8 @@ public:
 };
 
 typedef HExceptionT<HFormat> HFormatException;
+
+HFormat operator ""_yf ( char const*, size_t );
 
 /*! \brief Proxy between HFormat and HStreamInterface classes.
  *
