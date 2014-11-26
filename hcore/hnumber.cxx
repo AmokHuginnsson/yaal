@@ -367,7 +367,7 @@ void HNumber::from_floating_point( double long number_ ) {
 
 void HNumber::from_integer( int long long number_ ) {
 	M_PROLOG
-	from_unsigned_integer( yaal::abs( number_ ) );
+	from_unsigned_integer( static_cast<int long long unsigned>( yaal::abs( number_ ) ) );
 	_negative = ( number_ < 0 );
 	return;
 	M_EPILOG
