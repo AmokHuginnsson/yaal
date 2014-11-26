@@ -380,35 +380,35 @@ i64_t HTime::raw( void ) const {
 	return ( _value );
 }
 
-HTime operator ""_yt ( char const* str_, size_t len_ ) {
+HTime operator "" _yt ( char const* str_, size_t len_ ) {
 	return ( HString( str_, static_cast<int>( len_ ) ) );
 }
 
-HTime operator ""_ys ( int long long unsigned seconds_ ) {
+HTime operator "" _ys ( int long long unsigned seconds_ ) {
 	return ( HTime( static_cast<i64_t>( seconds_ ) ) );
 }
 
-HTime operator ""_ym ( int long long unsigned minutes_ ) {
+HTime operator "" _ym ( int long long unsigned minutes_ ) {
 	return ( HTime( static_cast<i64_t>( minutes_ * HTime::SECONDS_IN_MINUTE ) ) );
 }
 
-HTime operator ""_yh ( int long long unsigned hours_ ) {
+HTime operator "" _yh ( int long long unsigned hours_ ) {
 	return ( HTime( static_cast<i64_t>( hours_ * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) ) );
 }
 
-HTime operator ""_yD ( int long long unsigned days_ ) {
+HTime operator "" _yD ( int long long unsigned days_ ) {
 	return ( HTime( static_cast<i64_t>( days_ * HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) ) );
 }
 
-HTime operator ""_yW ( int long long unsigned weeks_ ) {
+HTime operator "" _yW ( int long long unsigned weeks_ ) {
 	return ( HTime( static_cast<i64_t>( weeks_ * HTime::DAYS_IN_WEEK * HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) ) );
 }
 
-HTime operator ""_yM ( int long long unsigned mounths_ ) {
+HTime operator "" _yM ( int long long unsigned mounths_ ) {
 	return ( HTime( static_cast<int>( mounths_ ) / HTime::MONTHS_IN_YEAR, ( static_cast<int>( mounths_ ) % HTime::MONTHS_IN_YEAR ) + 1, 0 ) );
 }
 
-HTime operator ""_yY ( int long long unsigned years_ ) {
+HTime operator "" _yY ( int long long unsigned years_ ) {
 	return ( HTime( static_cast<int>( years_ ), 0, 0 ) );
 }
 

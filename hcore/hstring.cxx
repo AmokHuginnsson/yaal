@@ -1383,7 +1383,7 @@ void HString::HCharRef::swap( HCharRef& charRef_ ) {
 #undef EXT_IS_INPLACE
 #undef IS_INPLACE
 
-HString operator ""_ys ( char const* str_, size_t len_ ) {
+HString operator "" _ys ( char const* str_, size_t len_ ) {
 	return ( HString( str_, static_cast<int>( len_ ) ) );
 }
 

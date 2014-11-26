@@ -252,9 +252,9 @@ public:
 
 typedef HExceptionT<HNumber> HNumberException;
 
-HNumber operator ""_yn ( char const*, size_t );
-HNumber operator ""_yn ( double long );
-HNumber operator ""_yn ( int long long unsigned );
+HNumber operator "" _yn ( char const*, size_t );
+HNumber operator "" _yn ( double long );
+HNumber operator "" _yn ( int long long unsigned );
 
 inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b ) {
 	a.swap( b );

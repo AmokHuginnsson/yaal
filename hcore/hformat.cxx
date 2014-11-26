@@ -786,7 +786,7 @@ HFormat::HFormatImpl::flag_t HFormat::HFormatImpl::get_flag( HString const& s, i
 	M_EPILOG
 }
 
-HFormat operator ""_yf ( char const* str_, size_t len_ ) {
+HFormat operator "" _yf ( char const* str_, size_t len_ ) {
 	return ( HString( str_, static_cast<int>( len_ ) ) );
 }
 

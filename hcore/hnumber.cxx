@@ -1632,15 +1632,15 @@ struct HNumber::ElementaryFunctions {
 	}
 };
 
-HNumber operator ""_yn ( char const* str_, size_t len_ ) {
+HNumber operator "" _yn ( char const* str_, size_t len_ ) {
 	return ( HString( str_, static_cast<int>( len_ ) ) );
 }
 
-HNumber operator ""_yn ( double long val_ ) {
+HNumber operator "" _yn ( double long val_ ) {
 	return ( val_ );
 }
 
-HNumber operator ""_yn ( int long long unsigned val_ ) {
+HNumber operator "" _yn ( int long long unsigned val_ ) {
 	return ( val_ );
 }
 

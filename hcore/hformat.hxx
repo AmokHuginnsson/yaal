@@ -72,7 +72,7 @@ public:
 
 typedef HExceptionT<HFormat> HFormatException;
 
-HFormat operator ""_yf ( char const*, size_t );
+HFormat operator "" _yf ( char const*, size_t );
 
 /*! \brief Proxy between HFormat and HStreamInterface classes.
  *

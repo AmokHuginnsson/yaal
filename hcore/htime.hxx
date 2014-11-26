@@ -120,14 +120,14 @@ public:
 
 typedef HExceptionT<HTime> HTimeException;
 
-HTime operator ""_yt ( char const*, size_t );
-HTime operator ""_ys ( int long long unsigned );
-HTime operator ""_ym ( int long long unsigned );
-HTime operator ""_yh ( int long long unsigned );
-HTime operator ""_yD ( int long long unsigned );
-HTime operator ""_yW ( int long long unsigned );
-HTime operator ""_yM ( int long long unsigned );
-HTime operator ""_yY ( int long long unsigned );
+HTime operator "" _yt ( char const*, size_t );
+HTime operator "" _ys ( int long long unsigned );
+HTime operator "" _ym ( int long long unsigned );
+HTime operator "" _yh ( int long long unsigned );
+HTime operator "" _yD ( int long long unsigned );
+HTime operator "" _yW ( int long long unsigned );
+HTime operator "" _yM ( int long long unsigned );
+HTime operator "" _yY ( int long long unsigned );
 
 inline HTime now_utc( void ) {
 	return ( HTime( HTime::UTC ) );

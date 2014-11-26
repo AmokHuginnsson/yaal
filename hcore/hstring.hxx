@@ -742,7 +742,7 @@ private:
 		{}
 };
 
-HString operator ""_ys ( char const*, size_t );
+HString operator "" _ys ( char const*, size_t );
 HString operator + ( char const*, HString const& );
 bool operator == ( char const*, HString const& );
 bool operator != ( char const*, HString const& );
