@@ -34,7 +34,7 @@ $(PKGFILENAME): $(ARTIFACT) pkginfo.in solaris.mk GNUmakefile makefile
 package: $(PKGFILENAME)
 
 clean: $(VERIFY_DIR)
-	@/bin/rm -rf pkg tmp $(PKGFILENAME) pkginfo Prototype && \
+	@/bin/rm -rf pkg tmp yaal-*-solaris*-*.pkg pkginfo Prototype && \
 	cd ../../ && $(MAKE) purge
 
 tmp/$(BUNDLE): $(PKGFILENAME)
