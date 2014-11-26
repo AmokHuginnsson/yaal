@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	harray.hxx - this file is integral part of `yaal' project.
+  harray.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -170,8 +170,7 @@ public:
 	HArray( HArray const& arr_ )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
-		if ( arr_._size > 0 )
-			{
+		if ( arr_._size > 0 ) {
 			reserve( arr_._size );
 			_size = arr_._size;
 			for ( int long i = 0; i < _size; ++ i )
@@ -199,8 +198,7 @@ public:
 	HArray( HArray const& arr_, allocator_t const& )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
-		if ( arr_._size > 0 )
-			{
+		if ( arr_._size > 0 ) {
 			reserve( arr_._size );
 			_size = arr_._size;
 			for ( int long i = 0; i < _size; ++ i )
@@ -212,7 +210,7 @@ public:
 	virtual ~HArray( void ) {
 		M_PROLOG
 		clear();
-		:: operator delete ( _buf, memory::yaal );
+		::operator delete ( _buf, memory::yaal );
 		_capacity = 0;
 		return;
 		M_DESTRUCTOR_EPILOG
@@ -333,7 +331,7 @@ public:
 			using yaal::swap;
 			swap( newBuf, _buf );
 			_capacity = newCapacity;
-			:: operator delete ( newBuf, memory::yaal );
+			::operator delete ( newBuf, memory::yaal );
 		}
 		return;
 		M_EPILOG
@@ -751,8 +749,9 @@ template<typename type_t, typename allocator_t>
 typename HArray<type_t, allocator_t>::allocator_type HArray<type_t, allocator_t>::_allocator;
 
 template<typename type_t, typename allocator_t>
-inline void swap( yaal::hcore::HArray<type_t, allocator_t>& a, yaal::hcore::HArray<type_t, allocator_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HArray<type_t, allocator_t>& a, yaal::hcore::HArray<type_t, allocator_t>& b ) {
+	a.swap( b );
+}
 
 /*! \brief Iterator for HArray<> data structure.
  */

@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcore/hdeque.hxx - this file is integral part of `yaal' project.
+  hcore/hdeque.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -552,8 +552,9 @@ template<typename type_t, typename allocator_t>
 typename HDeque<type_t, allocator_t>::allocator_type HDeque<type_t, allocator_t>::_allocator;
 
 template<typename type_t, typename allocator_t>
-inline void swap( yaal::hcore::HDeque<type_t>& a, yaal::hcore::HDeque<type_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HDeque<type_t>& a, yaal::hcore::HDeque<type_t>& b ) {
+	a.swap( b );
+}
 
 /*! \brief Iterator for HDeque<> data structure.
  */
@@ -739,7 +740,7 @@ void HDeque<type_t, allocator_t>::accommodate_chunks( int long size_ ) {
 	int long newFirstChunkIndex( firstUsedChunkIndex );
 	int long newUsedChunksCount( usedChunksCount );
 	int long newAvailableChunksCount( availableChunksCount );
-	if ( size_ > 0 ) /* Add chunks at back of HDeque<>. */ {
+	if ( size_ > 0 ) { /* Add chunks at back of HDeque<>. */
 		int long newLastChunkIndex = ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK;
 		newUsedChunksCount = newLastChunkIndex + 1 - firstUsedChunkIndex;
 		if ( newLastChunkIndex >= availableChunksCount ) {
@@ -750,7 +751,7 @@ void HDeque<type_t, allocator_t>::accommodate_chunks( int long size_ ) {
 			}
 			newFirstChunkIndex = ( newAvailableChunksCount - newUsedChunksCount ) / 2;
 		}
-	} else if ( size_ < 0 ) /* Add chunks in front of HDeque<>. */ {
+	} else if ( size_ < 0 ) { /* Add chunks in front of HDeque<>. */
 		int long newStart( _start + size_ );
 		if ( newStart < 0 ) {
 			int long frontExtension( minimal_cover_chunks_count( - newStart ) + firstUsedChunkIndex );
@@ -767,11 +768,11 @@ void HDeque<type_t, allocator_t>::accommodate_chunks( int long size_ ) {
 		int long moveBy( firstUsedChunkIndex - newFirstChunkIndex );
 		value_type** chunks = _chunks.get<value_type*>();
 		if ( _size > 0 ) {
-			if ( moveBy > 0 ) /* move to front */ {
+			if ( moveBy > 0 ) { /* move to front */
 				copy( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstChunkIndex );
 				fill( chunks + firstUsedChunkIndex + usedChunksCount - min( moveBy, usedChunksCount ), chunks + firstUsedChunkIndex + usedChunksCount, static_cast<value_type*>( NULL ) );
 				_start -= ( moveBy * VALUES_PER_CHUNK );
-			} else if ( moveBy < 0 ) /* move to back */ {
+			} else if ( moveBy < 0 ) { /* move to back */
 				M_ASSERT( ( newFirstChunkIndex + usedChunksCount ) <= newAvailableChunksCount );
 				copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstChunkIndex + usedChunksCount );
 				fill( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + min( - moveBy, usedChunksCount ), static_cast<value_type*>( NULL ) );
@@ -824,7 +825,7 @@ void HDeque<type_t, allocator_t>::resize( int long size_, type_t const& fillWith
 template<typename type_t, typename allocator_t>
 void HDeque<type_t, allocator_t>::insert_space( int long index_, int long size_ ) {
 	M_PROLOG
-	accommodate_chunks( ( index_ <= _size / 2 ) ? - size_ : size_ );
+	accommodate_chunks( ( index_ <= _size / 2 ) ? -size_ : size_ );
 	value_type** chunks = _chunks.get<value_type*>();
 	/* When we insert space we should ensure that we will move as little of
 	 * existing objects as possible. We have something like "used chunks" in
@@ -837,12 +838,12 @@ void HDeque<type_t, allocator_t>::insert_space( int long index_, int long size_ 
 	if ( index_ <= ( _size / 2 ) )
 		_start -= size_;
 	if ( _size > 0 ) {
-		if ( index_ <= ( _size / 2 ) ) /* Move from back to front. */ {
+		if ( index_ <= ( _size / 2 ) ) { /* Move from back to front. */
 			for ( int long src( _start + size_ ), dst( _start ); dst < ( index_ + _start ); ++ src, ++ dst ) {
 				new ( chunks[ dst / VALUES_PER_CHUNK ] + ( dst % VALUES_PER_CHUNK ) ) value_type( yaal::move( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] ) );
 				M_SAFE( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ].~value_type() );
 			}
-		} else /* Move from front to back. */ {
+		} else { /* Move from front to back. */
 			for ( int long src( _start + _size - 1 ), dst( _start + _size + size_ - 1 ); src >= ( _start + index_ ); -- src, -- dst ) {
 				new ( chunks[ dst / VALUES_PER_CHUNK ] + ( dst % VALUES_PER_CHUNK ) ) value_type( yaal::move( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] ) );
 				M_SAFE( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ].~value_type() );
@@ -896,7 +897,7 @@ typename HDeque<type_t, allocator_t>::iterator HDeque<type_t, allocator_t>::eras
 				chunks[ chunkIndex ] = NULL;
 			}
 			_start += toRemove;
-		} else /* Move back. */ {
+		} else { /* Move back. */
 			for ( int long src( _start + last_._index ), dst( _start + first_._index ); src < ( _start + _size ); ++ src, ++ dst )
 				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ];
 			for ( int long del( _start + _size - toRemove ); del < ( _start + _size ); ++ del )
@@ -940,11 +941,11 @@ typename HDeque<type_t, allocator_t>::value_type* HDeque<type_t, allocator_t>::s
 			int long newFirstUsedChunk( ( availableChunksCount - newUsedChunksCount ) / 2 );
 			int long moveBy( firstUsedChunkIndex - newFirstUsedChunk );
 			if ( _size > 0 ) {
-				if ( moveBy > 0 ) /* move to front */ {
+				if ( moveBy > 0 ) { /* move to front */
 					copy( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstUsedChunk );
 					fill( chunks + firstUsedChunkIndex + usedChunksCount - min( moveBy, usedChunksCount ), chunks + firstUsedChunkIndex + usedChunksCount, static_cast<value_type*>( NULL ) );
 					_start -= ( moveBy * VALUES_PER_CHUNK );
-				} else if ( moveBy < 0 ) /* move to back */ {
+				} else if ( moveBy < 0 ) { /* move to back */
 					M_ASSERT( ( newFirstUsedChunk + usedChunksCount ) <= availableChunksCount );
 					copy_backward( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + usedChunksCount, chunks + newFirstUsedChunk + usedChunksCount );
 					fill( chunks + firstUsedChunkIndex, chunks + firstUsedChunkIndex + min( - moveBy, usedChunksCount ), static_cast<value_type*>( NULL ) );
@@ -1001,7 +1002,7 @@ typename HDeque<type_t, allocator_t>::value_type* HDeque<type_t, allocator_t>::s
 		chunk = _start / VALUES_PER_CHUNK;
 		offset = VALUES_PER_CHUNK - 1;
 		chunks[ chunk ] = static_cast<value_type*>( ::operator new ( CHUNK_SIZE, memory::yaal ) );
-	} else /* We use old chunk. */ {
+	} else { /* We use old chunk. */
 		chunks = _chunks.get<value_type*>();
 		-- _start;
 		chunk = _start / VALUES_PER_CHUNK;

@@ -477,7 +477,7 @@ HString HString::operator + ( HString const& other_ ) const {
 }
 
 char HString::operator[] ( int const index_ ) const {
-	return ( operator[]( static_cast<int long>( index_ ) ) );
+	return ( operator[] ( static_cast<int long>( index_ ) ) );
 }
 
 char HString::operator[] ( int long const index_ ) const {

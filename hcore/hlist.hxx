@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hlist.hxx - this file is integral part of `yaal' project.
+  hlist.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -63,9 +63,9 @@ public:
 private:
 
 #ifndef __sun__
-#pragma pack( push, 1 )
+#	pragma pack( push, 1 )
 #else /* #ifndef __sun__ */
-#pragma pack( 1 )
+#	pragma pack( 1 )
 #endif /* #else #ifndef __sun__ */
 
 	/*! \brief HList<> element class provisions basic building block for doubly-linked list.
@@ -77,11 +77,11 @@ private:
 		type_t _value; /*!< The Object itself. */
 		template<typename... arg_t>
 		explicit HElement( HElement* element_, trait::true_type const*, arg_t&&... arg_ )
-			: _previous ( NULL ), _next ( NULL ), _value( yaal::forward<arg_t>( arg_ )... ) {
+			: _previous( NULL ), _next( NULL ), _value( yaal::forward<arg_t>( arg_ )... ) {
 			connect( element_ );
 		}
 		explicit HElement( HElement* element_, trait::false_type const*, type_t const& value_ )
-			: _previous ( NULL ), _next ( NULL ), _value( value_ ) {
+			: _previous( NULL ), _next( NULL ), _value( value_ ) {
 			connect( element_ );
 		}
 
@@ -102,16 +102,16 @@ private:
 			}
 		}
 	private:
-		HElement( HElement const & );
+		HElement( HElement const& );
 		HElement& operator = ( HElement const& );
 		friend class HList<type_t, allocator_t>;
 		friend class HIterator<type_t>;
 	};
 
 #ifndef __sun__
-#pragma pack( pop )
+#	pragma pack( pop )
 #else /* #ifndef __sun__ */
-#pragma pack()
+#	pragma pack()
 #endif /* #else #ifndef __sun__ */
 
 public:
@@ -184,11 +184,11 @@ public:
 
 	HList( HList&& list_ )
 		: _allocator(), _size( 0 ), _hook( NULL ) {
-			M_PROLOG
-			swap( list_ );
-			return;
-			M_EPILOG
-		}
+		M_PROLOG
+		swap( list_ );
+		return;
+		M_EPILOG
+	}
 
 	HList( HList const& list_, allocator_type const& allocator_ )
 		: _allocator( allocator_ ), _size( 0 ), _hook( NULL ) {
@@ -567,7 +567,7 @@ public:
 			M_THROW( _errMsgHList_[ ERROR::EMPTY ], errno );
 		M_SAFE( element->~HElement() );
 		_allocator.deallocate( element, 1 );
-		_size--;
+		-- _size;
 		if ( _size == 0 )
 			_hook = NULL;
 		return;
@@ -607,7 +607,7 @@ public:
 		HElement* element( iterator_._current );
 		M_SAFE( element->~HElement() );
 		_allocator.deallocate( element, 1 );
-		_size --;
+		-- _size;
 		if ( _size == 0 )
 			_hook = NULL;
 		return ( it );
@@ -1004,11 +1004,11 @@ private:
 			_hook = right_;
 		else if ( right_ == _hook )
 			_hook = left_;
-	/*
-	 *                         ( p L n )
-	 *          ( p R n ) <------+   +------> ( p R n )
-	 *  ( L ) <---+   +---> ( L )     ( L ) <---+   +---> ( L )
-	 */
+/*
+ *                         ( p L n )
+ *          ( p R n ) <------+   +------> ( p R n )
+ *  ( L ) <---+   +---> ( L )     ( L ) <---+   +---> ( L )
+ */
 		next = right_->_next;
 		previous = right_->_previous;
 		left_->_next->_previous = right_;
@@ -1074,7 +1074,7 @@ public:
 	}
 	HIterator const operator ++ ( int ) {
 		M_PROLOG
-		HIterator iterator ( *this );
+		HIterator iterator( *this );
 		operator ++ ();
 		return ( iterator );
 		M_EPILOG
@@ -1126,7 +1126,7 @@ public:
 	const_qual_t& operator* ( void ) const {
 		return ( _current->_value );
 	}
-	const_qual_t* operator->( void ) const {
+	const_qual_t* operator-> ( void ) const {
 		return ( &_current->_value );
 	}
 protected:
@@ -1139,8 +1139,9 @@ protected:
 };
 
 template<typename type_t, typename allocator_t>
-inline void swap( yaal::hcore::HList<type_t, allocator_t>& a, yaal::hcore::HList<type_t, allocator_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HList<type_t, allocator_t>& a, yaal::hcore::HList<type_t, allocator_t>& b ) {
+	a.swap( b );
+}
 
 }
 
