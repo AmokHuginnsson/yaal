@@ -163,7 +163,7 @@ HNumber::HNumber( int long long unsigned number_ )
 	_leafCount( 0 ), _integralPartSize( 0 ),
 	_canonical(), _cache(), _negative( false ) {
 	M_PROLOG
-	from_integer( number_ );
+	from_unsigned_integer( number_ );
 	return;
 	M_EPILOG
 }
@@ -367,7 +367,7 @@ void HNumber::from_floating_point( double long number_ ) {
 
 void HNumber::from_integer( int long long number_ ) {
 	M_PROLOG
-	from_integer( yaal::abs( number_ ) );
+	from_unsigned_integer( yaal::abs( number_ ) );
 	_negative = ( number_ < 0 );
 	return;
 	M_EPILOG
@@ -375,14 +375,14 @@ void HNumber::from_integer( int long long number_ ) {
 
 void HNumber::from_unsigned_integer( int long long unsigned number_ ) {
 	M_PROLOG
-	if ( number_ >= ( static_cast<int long long>( LEAF ) * LEAF ) ) {
+	if ( number_ >= ( static_cast<int long long unsigned>( LEAF ) * LEAF ) ) {
 		_leafCount = 3;
 		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
 		i32_t* data( _canonical.get<i32_t>() );
 		data[ 0 ] = static_cast<i32_t>( number_ / ( static_cast<int long long unsigned>( LEAF ) * LEAF ) );
 		data[ 1 ] = static_cast<i32_t>( ( number_ % ( static_cast<int long long unsigned>( LEAF ) * LEAF ) ) / LEAF );
 		data[ 2 ] = static_cast<i32_t>( number_ % LEAF );
-	} else if ( number_ >= LEAF ) {
+	} else if ( number_ >= static_cast<int long long unsigned>( LEAF ) ) {
 		_leafCount = 2;
 		_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
 		i32_t* data( _canonical.get<i32_t>() );
