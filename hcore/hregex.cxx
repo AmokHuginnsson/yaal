@@ -75,6 +75,18 @@ HRegex::HRegex( void )
 	M_EPILOG
 }
 
+HRegex::HRegex( HRegex&& reg_ )
+	: _initialized( reg_._initialized ), _pattern( yaal::move( reg_._pattern ) ),
+	_compiled( yaal::move( reg_._compiled ) ), _lastError( reg_._lastError ),
+	_errorBuffer( yaal::move( reg_._errorBuffer ) ), _errorCause( yaal::move( reg_._errorCause ) ),
+	_errorMessage( yaal::move( reg_._errorMessage ) ) {
+	M_PROLOG
+	reg_._initialized = false;
+	reg_._lastError = 0;
+	return;
+	M_EPILOG
+}
+
 HRegex::HRegex( char const* const pattern_, compile_t flags_ )
 	: _initialized( false ), _pattern(), _compiled( sizeof ( regex_t ) ),
 	_lastError( 0 ), _errorBuffer(), _errorCause(), _errorMessage() {
@@ -95,10 +107,47 @@ HRegex::HRegex( HString const& pattern_, compile_t flags_ )
 
 HRegex::~HRegex( void ) {
 	M_PROLOG
-	if ( _initialized )
-		::regfree( _compiled.get<regex_t>() );
+	clear();
 	return;
 	M_DESTRUCTOR_EPILOG
+}
+
+HRegex& HRegex::operator = ( yaal::hcore::HRegex&& reg_ ) {
+	M_PROLOG
+	if ( &reg_ != this ) {
+		swap( reg_ );
+		reg_.clear();
+	}
+	return ( *this );
+	M_EPILOG
+}
+
+void HRegex::swap( HRegex& reg_ ) {
+	if ( &reg_ != this ) {
+		using yaal::swap;
+		swap( _initialized, reg_._initialized );
+		swap( _pattern, reg_._pattern );
+		swap( _compiled, reg_._compiled );
+		swap( _lastError, reg_._lastError );
+		swap( _errorBuffer, reg_._errorBuffer );
+		swap( _errorCause, reg_._errorCause );
+		swap( _errorMessage, reg_._errorMessage );
+	}
+	return;
+}
+
+void HRegex::clear( void ) {
+	M_PROLOG
+	if ( _initialized ) {
+		::regfree( _compiled.get<regex_t>() );
+	}
+	_initialized = false;
+	_lastError = 0;
+	_pattern.clear();
+	_errorCause.clear();
+	_errorMessage.clear();
+	return;
+	M_EPILOG
 }
 
 void HRegex::error_clear( void ) const {

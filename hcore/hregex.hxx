@@ -79,6 +79,8 @@ public:
 	/*! \brief Create uninitialized regex object.
 	 */
 	HRegex( void );
+	HRegex( HRegex&& );
+	HRegex& operator = ( HRegex&& );
 	/*! \brief Construct regex with regex rule.
 	 *
 	 * \param regex - regex pattern to construct regex object.
@@ -135,7 +137,11 @@ public:
 	 * \return True iff given string matches this regex.
 	 */
 	bool matches( HString const& string_ ) const;
+	void swap( HRegex& );
+	void clear( void );
 private:
+	HRegex( HRegex const& ) = delete;
+	HRegex& operator = ( HRegex const& ) = delete;
 	void error_clear( void ) const;
 	char const* matches( char const*, int long* ) const;
 };
@@ -173,6 +179,10 @@ private:
 };
 
 typedef HExceptionT<HRegex> HRegexException;
+
+inline void swap( HRegex& a, HRegex& b ) {
+	a.swap( b );
+}
 
 }
 
