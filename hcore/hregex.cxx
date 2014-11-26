@@ -316,6 +316,10 @@ HRegex::HMatchIterator& HRegex::HMatchIterator::operator ++ ( void ) {
 	M_EPILOG
 }
 
+HRegex operator ""_yr ( char const* str_, size_t len_ ) {
+	return ( HRegex( HString( str_, static_cast<int>( len_ ) ) ) );
+}
+
 }
 
 }

@@ -180,6 +180,8 @@ private:
 
 typedef HExceptionT<HRegex> HRegexException;
 
+HRegex operator ""_yr ( char const*, size_t );
+
 inline void swap( HRegex& a, HRegex& b ) {
 	a.swap( b );
 }
