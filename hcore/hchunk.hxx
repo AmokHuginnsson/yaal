@@ -84,8 +84,8 @@ public:
 	int long count_of( void ) const
 		{ return ( _size / static_cast<int>( sizeof ( T ) ) ); }
 private:
-	HChunk( HChunk const& );
-	HChunk& operator = ( HChunk const& );
+	HChunk( HChunk const& ) = delete;
+	HChunk& operator = ( HChunk const& ) = delete;
 };
 
 template<typename T>
