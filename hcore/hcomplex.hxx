@@ -78,6 +78,9 @@ public:
 	friend HComplex operator / ( double long, HComplex const& );
 };
 
+HComplex operator ""_yi ( double long );
+HComplex operator ""_yi ( int long long unsigned );
+
 typedef yaal::hcore::HExceptionT<HComplex> HComplexException;
 
 }

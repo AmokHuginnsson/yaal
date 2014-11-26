@@ -296,6 +296,14 @@ HComplex operator / ( double long value_, HComplex const& complex_ ) {
 	M_EPILOG
 }
 
+HComplex operator ""_yi ( double long val_ ) {
+	return ( HComplex( 0, val_ ) );
+}
+
+HComplex operator ""_yi ( int long long unsigned val_ ) {
+	return ( HComplex( 0, val_ ) );
+}
+
 }
 
 }
