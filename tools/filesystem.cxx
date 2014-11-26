@@ -188,7 +188,7 @@ void create_directory( path_t const& path_, u32_t mode_, DIRECTORY_MODIFICATION 
 	M_ENSURE( ! path.is_empty() );
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	if ( directoryModification_ == DIRECTORY_MODIFICATION::EXACT ) {
-		int err( ::mkdir( path.c_str(), mode_ ) );
+		int err( ::mkdir( path.c_str(), static_cast<mode_t>( mode_ ) ) );
 		if ( ( err != 0 ) && ( ( errno != EEXIST ) || ! is_directory( path ) ) ) {
 			throw HFileSystemException( to_string( "Failed to create directory `" ).append( path ).append( "'" ) );
 		}

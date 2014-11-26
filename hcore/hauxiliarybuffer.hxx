@@ -83,7 +83,7 @@ void HAuxiliaryBuffer<type_t>::init( iter_t first_, iter_t last_ ) {
 	_requestedSize = distance( first_, last_, typename hcore::iterator_traits<iter_t>::category_type() );
 	int long canCopy( _allocated );
 	if ( _requestedSize > _allocated ) {
-		int long newCanCopy( static_cast<int long>( hcore::system::get_memory_size_info().available() ) / sizeof ( value_type ) );
+		int long newCanCopy( static_cast<int long>( hcore::system::get_memory_size_info().available() ) / static_cast<int>( sizeof ( value_type ) ) );
 		if ( newCanCopy > canCopy )
 			canCopy = newCanCopy;
 	}
@@ -98,7 +98,7 @@ void HAuxiliaryBuffer<type_t>::init( iter_t first_, iter_t last_ ) {
 				_data = NULL;
 				_allocated = 0;
 			}
-			_data = static_cast<value_type*>( ::operator new ( auxSize * sizeof ( value_type ), memory::yaal ) );
+			_data = static_cast<value_type*>( ::operator new ( static_cast<size_t>( auxSize * static_cast<int>( sizeof ( value_type ) ) ), memory::yaal ) );
 			_allocated = auxSize;
 		}
 		_size = auxSize;
