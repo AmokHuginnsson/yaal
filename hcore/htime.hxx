@@ -37,7 +37,7 @@ namespace yaal {
 
 namespace hcore {
 
-extern M_YAAL_HCORE_PUBLIC_API char const _defaultTimeFormat_[];
+extern M_YAAL_HCORE_PUBLIC_API char const _rfc2822DateTimeFormat_[];
 extern M_YAAL_HCORE_PUBLIC_API char const _iso8601DateFormat_[];
 extern M_YAAL_HCORE_PUBLIC_API char const _iso8601TimeFormat_[];
 extern M_YAAL_HCORE_PUBLIC_API char const _iso8601DateTimeFormat_[];
@@ -51,45 +51,51 @@ extern M_YAAL_HCORE_PUBLIC_API char const _iso8601DateTimeFormat_[];
 class HTime {
 public:
 	typedef HTime this_type;
-	typedef enum {
+	enum class TZ {
 		UTC,
 		LOCAL
-	} now_in_t;
+	};
 	static int const MONTHS_IN_YEAR = 12;
 	static int const DAYS_IN_WEEK = 7;
 	static int const HOURS_IN_DAY = 24;
 	static int const MINUTES_IN_HOUR = 60;
 	static int const SECONDS_IN_MINUTE = 60;
+	static i64_t const SECONDS_TO_UNIX_EPOCH = 62167219200LL;
 private:
 	i64_t _value;
 	tm _broken;
-	HString	_format;
+	TZ _tz;
+	HString _format;
 	mutable HChunk _cache;
 public:
 	/*! \brief Construct HTime object based on current moment in time.
 	 *
-	 * \param nowIn_ - get time as UTC or local time (time considering current time zone).
+	 * \param tz_ - get time as UTC or local time (time considering current time zone).
 	 * \param format_ - textual time representation format.
 	 */
-	HTime( now_in_t nowIn_, char const* format_ = _defaultTimeFormat_ );
+	HTime( TZ tz_, char const* format_ = _iso8601DateTimeFormat_ );
 	HTime( HTime const& );
 	/*! \brief Construct time object from string.
 	 *
 	 * \param time_ - textual representation of time.
 	 * \param format_ - textual time representation format.
 	 */
-	HTime( yaal::hcore::HString const& time_, char const* format_ = _defaultTimeFormat_ );
-	HTime( i64_t, char const* = _defaultTimeFormat_ );
-	HTime( int, int, int, int = 0, int = 0, int = 0, char const* = _defaultTimeFormat_ );
-	virtual ~HTime ( void );
+	HTime( yaal::hcore::HString const& time_, char const* format_ = _iso8601DateTimeFormat_ );
+	HTime( TZ, yaal::hcore::HString const& time_, char const* format_ = _iso8601DateTimeFormat_ );
+	HTime( i64_t, char const* = _iso8601DateTimeFormat_ );
+	HTime( TZ, i64_t, char const* = _iso8601DateTimeFormat_ );
+	HTime( int, int, int, int = 0, int = 0, int = 0, char const* = _iso8601DateTimeFormat_ );
+	HTime( TZ, int, int, int, int = 0, int = 0, int = 0, char const* = _iso8601DateTimeFormat_ );
+	virtual ~HTime( void );
 	void swap( HTime& );
-	void set_now( now_in_t );
-	void set( i64_t );
-	void set_format( char const* = _defaultTimeFormat_ );
-	void set_time( int = 0, int = 0, int = 0 );
-	void set_date( int, int = 1, int = 1 );
-	void set_datetime( int, int = 1, int = 1, int = 0, int = 0, int = 0 );
-	void from_string( yaal::hcore::HString const& );
+	HTime& set_tz( TZ );
+	HTime& set_now( void );
+	HTime& set( i64_t );
+	HTime& set_format( char const* = _iso8601DateTimeFormat_ );
+	HTime& set_time( int = 0, int = 0, int = 0 );
+	HTime& set_date( int, int = 1, int = 1 );
+	HTime& set_datetime( int, int = 1, int = 1, int = 0, int = 0, int = 0 );
+	HTime& from_string( yaal::hcore::HString const& );
 	int get_year( void ) const;
 	int get_month( void ) const;
 	int get_day( void ) const;
@@ -98,15 +104,17 @@ public:
 	int get_second( void ) const;
 	int get_day_of_week( void ) const;
 	int get_days_in_month( void ) const;
-	void mod_year( int );
-	void mod_month( int );
-	void mod_day( int );
-	void mod_hour( int );
-	void mod_minute( int );
-	void mod_second( int );
+	HTime& mod_year( int );
+	HTime& mod_month( int );
+	HTime& mod_day( int );
+	HTime& mod_hour( int );
+	HTime& mod_minute( int );
+	HTime& mod_second( int );
 	HTime& operator = ( HTime const& );
-	HTime operator - ( HTime const& ) const;
 	HTime& operator -= ( HTime const& );
+	HTime operator - ( HTime const& ) const;
+	HTime& operator += ( HTime const& );
+	HTime operator + ( HTime const& ) const;
 	bool operator == ( HTime const& ) const;
 	bool operator != ( HTime const& ) const;
 	bool operator <= ( HTime const& ) const;
@@ -130,15 +138,18 @@ HTime operator "" _yM ( int long long unsigned );
 HTime operator "" _yY ( int long long unsigned );
 
 inline HTime now_utc( void ) {
-	return ( HTime( HTime::UTC ) );
+	return ( HTime( HTime::TZ::UTC ) );
 }
 
 inline HTime now_local( void ) {
-	return ( HTime( HTime::LOCAL ) );
+	return ( HTime( HTime::TZ::LOCAL ) );
 }
 
-inline void swap( yaal::hcore::HTime& a, yaal::hcore::HTime& b )
-	{ a.swap( b ); }
+i64_t mkgmtime( struct tm* );
+
+inline void swap( yaal::hcore::HTime& a, yaal::hcore::HTime& b ) {
+	a.swap( b );
+}
 
 }
 

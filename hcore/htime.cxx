@@ -37,21 +37,41 @@ namespace yaal {
 
 namespace hcore {
 
-char const _defaultTimeFormat_[] = "%a, %d %b %Y %H:%M:%S %z";
+char const _rfc2822DateTimeFormat_[] = "%a, %d %b %Y %H:%M:%S %z";
 char const _iso8601TimeFormat_[] = "%T";
 char const _iso8601DateFormat_[] = "%Y-%m-%d";
 char const _iso8601DateTimeFormat_[] = "%Y-%m-%d %T";
 
-HTime::HTime( now_in_t nowIn_, char const* format_ )
-	: _value(), _broken(), _format( format_ ), _cache() {
+static i64_t const DAYS_IN_MILION_MONTHS = 30436875;
+static int const DAYS_IN_MONTH[] = {
+	31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+};
+static int const DAYS_SINCE_JANUARY_FOR_MONTH[] = {
+	0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334
+};
+
+inline bool is_leap_year( int year_ ) {
+	return ( ( ( ( year_ % 4 ) == 0 ) && ( year_ % 100 ) != 0 ) || ( ( year_ % 400 ) == 0 ) );
+}
+
+HTime::HTime( TZ tz_, char const* format_ )
+	: _value(), _broken(), _tz( tz_ ), _format( format_ ), _cache() {
 	M_PROLOG
-	set_now( nowIn_ );
+	set_now();
 	return;
 	M_EPILOG
 }
 
 HTime::HTime( yaal::hcore::HString const& strTime_, char const* format_ )
-	: _value(), _broken(), _format( format_ ), _cache() {
+	: HTime( TZ::LOCAL, strTime_, format_ ) {
+	M_PROLOG
+	from_string( strTime_ );
+	return;
+	M_EPILOG
+}
+
+HTime::HTime( TZ tz_, yaal::hcore::HString const& strTime_, char const* format_ )
+	: _value(), _broken(), _tz( tz_ ), _format( format_ ), _cache() {
 	M_PROLOG
 	from_string( strTime_ );
 	return;
@@ -59,7 +79,7 @@ HTime::HTime( yaal::hcore::HString const& strTime_, char const* format_ )
 }
 
 HTime::HTime( HTime const& time_ )
-	: _value( time_._value ), _broken( time_._broken ),
+	: _value( time_._value ), _broken( time_._broken ), _tz( time_._tz ),
 	_format( time_._format ), _cache() {
 	M_PROLOG
 	return;
@@ -67,17 +87,28 @@ HTime::HTime( HTime const& time_ )
 }
 
 HTime::HTime( i64_t time_, char const* format_ )
-	: _value( time_ ), _broken(), _format( format_ ), _cache() {
+	: HTime( TZ::LOCAL, time_, format_ ) {
+	return;
+}
+
+HTime::HTime( TZ tz_, i64_t time_, char const* format_ )
+	: _value( time_ ), _broken(), _tz( tz_ ), _format( format_ ), _cache() {
 	M_PROLOG
-	time_t t( static_cast<time_t>( _value ) );
-	M_ENSURE( localtime_r( &t, &_broken ) );
+	time_t t( static_cast<time_t>( _value ) - SECONDS_TO_UNIX_EPOCH );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
 	return;
 	M_EPILOG
 }
 
 HTime::HTime( int year_, int month_, int day_,
-							 int hour_, int minute_, int second_, char const* format_ )
-	: _value(), _broken(), _format( format_ ), _cache() {
+		int hour_, int minute_, int second_, char const* format_ )
+	: HTime( TZ::LOCAL, year_, month_, day_, hour_, minute_, second_, format_ ) {
+	return;
+}
+
+HTime::HTime( TZ tz_, int year_, int month_, int day_,
+		int hour_, int minute_, int second_, char const* format_ )
+	: _value(), _broken(), _tz( tz_ ), _format( format_ ), _cache() {
 	M_PROLOG
 	set_datetime( year_, month_, day_, hour_, minute_, second_ );
 	return;
@@ -90,31 +121,41 @@ HTime::~HTime( void ) {
 	M_EPILOG
 }
 
-void HTime::set( i64_t time_ ) {
+HTime& HTime::set( i64_t time_ ) {
 	M_PROLOG
-	time_t t( static_cast<time_t>( _value = time_ ) );
+	time_t t( static_cast<time_t>( _value = time_ ) - SECONDS_TO_UNIX_EPOCH );
 	/* In Visual Studio C++ localtime_r is a macro and cannot be prefixed with ::. */
-	M_ENSURE( localtime_r( &t, &_broken ) );
-	return;
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	return ( *this );
 	M_EPILOG
 }
 
-void HTime::set_now( now_in_t nowIn_ ) {
+HTime& HTime::set_tz( TZ tz_ ) {
 	M_PROLOG
-	time_t t( static_cast<time_t>( _value = ::time( NULL ) ) );
-	M_ENSURE( ( nowIn_ == UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
-	return;
+	_tz = tz_;
+	time_t t( static_cast<time_t>( _value ) - SECONDS_TO_UNIX_EPOCH );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	return ( *this );
 	M_EPILOG
 }
 
-void HTime::set_format( char const* format_ ) {
+HTime& HTime::set_now( void ) {
+	M_PROLOG
+	_value = ::time( NULL ) + SECONDS_TO_UNIX_EPOCH;
+	time_t t( static_cast<time_t>( _value ) - SECONDS_TO_UNIX_EPOCH );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	return ( *this );
+	M_EPILOG
+}
+
+HTime& HTime::set_format( char const* format_ ) {
 	M_PROLOG
 	_format = format_;
-	return;
+	return ( *this );
 	M_EPILOG
 }
 
-void HTime::set_time( int hour_, int minute_, int second_ ) {
+HTime& HTime::set_time( int hour_, int minute_, int second_ ) {
 	M_PROLOG
 	if ( ( hour_ < 0 ) || ( hour_ > 23 ) )
 		M_THROW( "bad hour", hour_ );
@@ -125,12 +166,13 @@ void HTime::set_time( int hour_, int minute_, int second_ ) {
 	_broken.tm_hour = hour_;
 	_broken.tm_min = minute_;
 	_broken.tm_sec = second_;
-	_value = ::mktime( &_broken );
-	return;
+	_broken.tm_isdst = -1;
+	_value = ( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) ) + SECONDS_TO_UNIX_EPOCH;
+	return ( *this );
 	M_EPILOG
 }
 
-void HTime::set_date( int year_, int month_, int day_ ) {
+HTime& HTime::set_date( int year_, int month_, int day_ ) {
 	M_PROLOG
 	if ( ( month_ < 1 ) || ( month_ > 12 ) )
 		M_THROW( "bad month in year", month_ );
@@ -139,22 +181,23 @@ void HTime::set_date( int year_, int month_, int day_ ) {
 	_broken.tm_year = year_ - 1900;
 	_broken.tm_mon = month_ - 1;
 	_broken.tm_mday = day_;
-	_value = ::mktime( &_broken );
-	return;
+	_broken.tm_isdst = -1;
+	_value = ( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) ) + SECONDS_TO_UNIX_EPOCH;
+	return ( *this );
 	M_EPILOG
 }
 
-void HTime::set_datetime( int year_, int month_,
-											 int day_, int hour_,
-											 int minute_, int second_ ) {
+HTime& HTime::set_datetime(
+		int year_, int month_, int day_,
+		int hour_, int minute_, int second_ ) {
 	M_PROLOG
 	set_date( year_, month_, day_ );
 	set_time( hour_, minute_, second_ );
-	return;
+	return ( *this );
 	M_EPILOG
 }
 
-void HTime::from_string( yaal::hcore::HString const& str_ ) {
+HTime& HTime::from_string( yaal::hcore::HString const& str_ ) {
 	M_PROLOG
 	char const* err( ::strptime( str_.c_str(), _format.raw(), &_broken ) );
 	if ( ! err ) {
@@ -168,8 +211,8 @@ void HTime::from_string( yaal::hcore::HString const& str_ ) {
 	}
 	M_ENSURE( err );
 	_broken.tm_isdst = -1;
-	_value = ::mktime( &_broken );
-	return;
+	_value = ( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) ) + SECONDS_TO_UNIX_EPOCH;
+	return ( *this );
 	M_EPILOG
 }
 
@@ -217,22 +260,17 @@ int HTime::get_day_of_week( void ) const {
 
 int HTime::get_days_in_month( void ) const {
 	M_PROLOG
-	static int const daysInMonth[] = {
-		31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
-	};
-	int year( get_year() );
-	bool leapYear( ( ( ( year % 4 ) == 0 ) && ( year % 100 ) != 0 ) || ( ( year % 400 ) == 0 ) );
-	return ( daysInMonth[_broken.tm_mon] + ( ( _broken.tm_mon == 1 ) && leapYear ? 1 : 0 ) );
+	return ( DAYS_IN_MONTH[_broken.tm_mon] + ( ( _broken.tm_mon == 1 ) && is_leap_year( get_year() ) ? 1 : 0 ) );
 	M_EPILOG
 }
 
-void HTime::mod_year( int mod_ ) {
+HTime& HTime::mod_year( int mod_ ) {
 	_broken.tm_year += mod_;
-	_value = ::mktime( &_broken );
-	return;
+	_value = ( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) ) + SECONDS_TO_UNIX_EPOCH;
+	return ( *this );
 }
 
-void HTime::mod_month( int mod_ ) {
+HTime& HTime::mod_month( int mod_ ) {
 	_broken.tm_year += mod_ / MONTHS_IN_YEAR;
 	_broken.tm_mon += mod_ % MONTHS_IN_YEAR;
 	if ( _broken.tm_mon < 0 ) {
@@ -242,36 +280,36 @@ void HTime::mod_month( int mod_ ) {
 		_broken.tm_mon -= MONTHS_IN_YEAR;
 		++ _broken.tm_year;
 	}
-	_value = ::mktime( &_broken );
-	return;
+	_value = ( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) ) + SECONDS_TO_UNIX_EPOCH;
+	return ( *this );
 }
 
-void HTime::mod_day( int mod_ ) {
+HTime& HTime::mod_day( int mod_ ) {
 	_value += ( mod_ * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE );
-	time_t t( static_cast<time_t>( _value ) );
-	M_ENSURE( localtime_r( &t, &_broken ) );
-	return;
+	time_t t( static_cast<time_t>( _value ) - SECONDS_TO_UNIX_EPOCH );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	return ( *this );
 }
 
-void HTime::mod_hour( int mod_ ) {
+HTime& HTime::mod_hour( int mod_ ) {
 	_value += ( mod_ * MINUTES_IN_HOUR * SECONDS_IN_MINUTE );
-	time_t t( static_cast<time_t>( _value ) );
-	M_ENSURE( localtime_r( &t, &_broken ) );
-	return;
+	time_t t( static_cast<time_t>( _value ) - SECONDS_TO_UNIX_EPOCH );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	return ( *this );
 }
 
-void HTime::mod_minute( int mod_ ) {
+HTime& HTime::mod_minute( int mod_ ) {
 	_value += ( mod_ * SECONDS_IN_MINUTE );
-	time_t t( static_cast<time_t>( _value ) );
-	M_ENSURE( localtime_r( &t, &_broken ) );
-	return;
+	time_t t( static_cast<time_t>( _value ) - SECONDS_TO_UNIX_EPOCH );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	return ( *this );
 }
 
-void HTime::mod_second( int mod_ ) {
+HTime& HTime::mod_second( int mod_ ) {
 	_value += mod_;
-	time_t t( static_cast<time_t>( _value ) );
-	M_ENSURE( localtime_r( &t, &_broken ) );
-	return;
+	time_t t( static_cast<time_t>( _value ) - SECONDS_TO_UNIX_EPOCH );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	return ( *this );
 }
 
 void HTime::swap( HTime& time_ ) {
@@ -297,6 +335,15 @@ HTime& HTime::operator = ( HTime const& time_ ) {
 	M_EPILOG
 }
 
+HTime& HTime::operator -= ( HTime const& time_ ) {
+	M_PROLOG
+	_value = static_cast<i64_t>( difftime( static_cast<time_t>( _value ), static_cast<time_t>( time_._value ) ) );
+	time_t t( static_cast<time_t>( _value ) - SECONDS_TO_UNIX_EPOCH );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	return ( *this );
+	M_EPILOG
+}
+
 HTime HTime::operator - ( HTime const& time_ ) const {
 	M_PROLOG
 	HTime time( *this );
@@ -305,12 +352,20 @@ HTime HTime::operator - ( HTime const& time_ ) const {
 	M_EPILOG
 }
 
-HTime& HTime::operator -= ( HTime const& time_ ) {
+HTime& HTime::operator += ( HTime const& time_ ) {
 	M_PROLOG
-	_value = static_cast<i64_t>( difftime( static_cast<time_t>( _value ), static_cast<time_t>( time_._value ) ) );
-	time_t t( static_cast<time_t>( _value ) );
-	M_ENSURE( gmtime_r( &t, &_broken ) );
+	_value += time_._value;
+	time_t t( static_cast<time_t>( _value ) - SECONDS_TO_UNIX_EPOCH );
+	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
 	return ( *this );
+	M_EPILOG
+}
+
+HTime HTime::operator + ( HTime const& time_ ) const {
+	M_PROLOG
+	HTime time( *this );
+	time += time_;
+	return ( time );
 	M_EPILOG
 }
 
@@ -385,31 +440,57 @@ HTime operator "" _yt ( char const* str_, size_t len_ ) {
 }
 
 HTime operator "" _ys ( int long long unsigned seconds_ ) {
-	return ( HTime( static_cast<i64_t>( seconds_ ) ) );
+	return ( HTime( HTime::TZ::UTC, static_cast<i64_t>( seconds_ ) ) );
 }
 
 HTime operator "" _ym ( int long long unsigned minutes_ ) {
-	return ( HTime( static_cast<i64_t>( minutes_ * HTime::SECONDS_IN_MINUTE ) ) );
+	return ( HTime( HTime::TZ::UTC, static_cast<i64_t>( minutes_ * HTime::SECONDS_IN_MINUTE ) ) );
 }
 
 HTime operator "" _yh ( int long long unsigned hours_ ) {
-	return ( HTime( static_cast<i64_t>( hours_ * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) ) );
+	return ( HTime( HTime::TZ::UTC, static_cast<i64_t>( hours_ * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) ) );
 }
 
 HTime operator "" _yD ( int long long unsigned days_ ) {
-	return ( HTime( static_cast<i64_t>( days_ * HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) ) );
+	return ( HTime( HTime::TZ::UTC, static_cast<i64_t>( days_ * HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) ) );
 }
 
 HTime operator "" _yW ( int long long unsigned weeks_ ) {
-	return ( HTime( static_cast<i64_t>( weeks_ * HTime::DAYS_IN_WEEK * HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) ) );
+	return ( HTime( HTime::TZ::UTC, static_cast<i64_t>( weeks_ * HTime::DAYS_IN_WEEK * HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) ) );
 }
 
-HTime operator "" _yM ( int long long unsigned mounths_ ) {
-	return ( HTime( static_cast<int>( mounths_ ) / HTime::MONTHS_IN_YEAR, ( static_cast<int>( mounths_ ) % HTime::MONTHS_IN_YEAR ) + 1, 0 ) );
+HTime operator "" _yM ( int long long unsigned months_ ) {
+	/*
+	 * Month has 30.436875 days on average.
+	 * We try our best not to loose any precision so we do all out calculations on 64 bit integers.
+	 * First we multiply average number of days in a month by 10^6 so it becomes a integer number.
+	 * Next we do calculations trying not to overflow and not to loose precision until last step
+	 * which means we do division in parts:
+	 * a) 10^6 == 1600 * 625
+	 * b) 24 * 60 * 60 == 86400 is divisible by 1600 without remainder ( 86400 / 1600 == 54.(0) )
+	 * we use that facts in our calculations.
+	 */
+	return ( HTime( HTime::TZ::UTC, static_cast<i64_t>( months_ * DAYS_IN_MILION_MONTHS * ( ( HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE ) / 1600 ) ) / 625 ) );
 }
 
 HTime operator "" _yY ( int long long unsigned years_ ) {
-	return ( HTime( static_cast<int>( years_ ), 0, 0 ) );
+	return ( HTime( HTime::TZ::UTC, static_cast<int>( years_ ), 1, 1 ) );
+}
+
+i64_t mkgmtime( struct tm* tm_ ) {
+	int year( tm_->tm_year + 1900 );
+	bool leapYear( is_leap_year( year ) );
+	i64_t days( year * 365 + ( year / 4 ) - ( year / 100 ) + ( year / 400 ) + ( ! leapYear ? 1 : 0 ) );
+	days += DAYS_SINCE_JANUARY_FOR_MONTH[tm_->tm_mon];
+	if ( ( tm_->tm_mon > 1 ) && leapYear ) {
+		++ days;
+	}
+	days += ( tm_->tm_mday - 1 );
+	i64_t seconds( days * HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE );
+	seconds += ( tm_->tm_hour * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE );
+	seconds += ( tm_->tm_min * HTime::SECONDS_IN_MINUTE );
+	seconds += tm_->tm_sec;
+	return ( seconds - HTime::SECONDS_TO_UNIX_EPOCH );
 }
 
 }

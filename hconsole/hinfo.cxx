@@ -40,7 +40,7 @@ namespace hconsole {
 HInfoMultiVal::HInfoMultiVal( void )
 	: _type( TYPE::UNKNOWN ),
 	_integer( 0 ), _real( 0 ),
-	_string(), _time( HTime::LOCAL ) {
+	_string(), _time( HTime::TZ::LOCAL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -49,7 +49,7 @@ HInfoMultiVal::HInfoMultiVal( void )
 HInfoMultiVal::HInfoMultiVal( int long long data_ )
 	: _type( TYPE::INT_LONG_LONG ),
 	_integer( data_ ), _real( 0 ),
-	_string(), _time( HTime::LOCAL ) {
+	_string(), _time( HTime::TZ::LOCAL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -58,7 +58,7 @@ HInfoMultiVal::HInfoMultiVal( int long long data_ )
 HInfoMultiVal::HInfoMultiVal( double long data_ )
 	: _type( TYPE::DOUBLE_LONG ),
 	_integer( 0 ), _real( data_ ),
-	_string(), _time( HTime::LOCAL ) {
+	_string(), _time( HTime::TZ::LOCAL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -67,7 +67,7 @@ HInfoMultiVal::HInfoMultiVal( double long data_ )
 HInfoMultiVal::HInfoMultiVal( HString const& string_ )
 	: _type( TYPE::HSTRING ),
 	_integer( 0 ), _real( 0 ),
-	_string( string_ ), _time( HTime::LOCAL ) {
+	_string( string_ ), _time( HTime::TZ::LOCAL ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -106,7 +106,7 @@ void HInfoMultiVal::purge( void ) {
 	_integer = 0;
 	_real = 0;
 	_string.clear();
-	_time.set_now( HTime::LOCAL );
+	_time.set_now();
 	return;
 	M_EPILOG
 }

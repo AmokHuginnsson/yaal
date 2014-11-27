@@ -54,7 +54,7 @@ HStatusBarWidget::HStatusBarWidget( HWindow* parent_,
 	_lastProgress( -1 ), _lastPercent( - 1 ), _lastMinute( 0 ),
 	_lastSecond( 0 ), _lastStep( 0 ), _currentChoice( -1 ),
 	_message( "" ), /* initialization of this field is required by bar() meth */
-	_start( HTime::LOCAL ), _choices() {
+	_start( HTime::TZ::LOCAL ), _choices() {
 	M_PROLOG
 	int attribte = 0;
 	if ( statusBarAttribute_ > 0 )
@@ -193,7 +193,7 @@ void HStatusBarWidget::init_progress( double max_, char const* title_,
 	_lastPercent = - 1;
 	_lastStep = 0;
 	_message = title_;
-	_start.set_now( HTime::LOCAL );
+	_start.set_now();
 	paint();
 	return;
 	M_EPILOG
@@ -201,7 +201,7 @@ void HStatusBarWidget::init_progress( double max_, char const* title_,
 
 void HStatusBarWidget::update_progress( double step_, char const* title_ ) {
 	M_PROLOG
-	HTime now( HTime::LOCAL ), left( HTime::LOCAL );
+	HTime now( HTime::TZ::LOCAL ), left( HTime::TZ::LOCAL );
 	HConsole& cons( HConsole::get_instance() );
 	now.set_format( "(%T)" );
 	if ( _done )

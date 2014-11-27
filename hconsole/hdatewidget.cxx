@@ -55,8 +55,8 @@ HDateWidget::HDateWidget( HWindow* parent_, int row_, int column_,
 		yaal::hcore::HString const& label_,
 		HWidgetAttributesInterface const& attr_ )
 	: HWidget( parent_, row_, column_, 1, CAL_VIEW_WIDTH, label_ ),
-	_time( HTime::LOCAL, _iso8601DateFormat_ ),
-	_selectedTime( HTime::LOCAL, _iso8601DateFormat_ ),
+	_time( HTime::TZ::LOCAL, _iso8601DateFormat_ ),
+	_selectedTime( HTime::TZ::LOCAL, _iso8601DateFormat_ ),
 	_infoTime( _selectedTime ), _mode( MODE::VIEW ) {
 	M_PROLOG
 	attr_.apply( *this );

@@ -212,7 +212,7 @@ void HCRUDDescriptor::sync( int field_, HTime& value ) {
 		if ( _values[ field_ ] ) {
 			value.from_string( *_values[ field_ ] );
 		} else {
-			value.set_now( HTime::LOCAL );
+			value.set_now();
 		}
 	} else {
 		_values[ field_ ] = value.string();
