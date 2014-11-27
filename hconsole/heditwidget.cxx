@@ -801,7 +801,7 @@ double long HInfoString::do_get_real( void ) const
 HTime const& HInfoString::do_get_time( void ) const {
 	M_ASSERT( 0 && "impossible inplace conversion requested" );
 #if defined( NDEBUG ) || defined( __MSVCXX__ )
-	static HTime const dummy( HTime::LOCAL );
+	static HTime const dummy( HTime::TZ::LOCAL );
 	return ( dummy );
 #endif /* #if defined( NDEBUG ) || defined( __MSVCXX__ ) */
 }
