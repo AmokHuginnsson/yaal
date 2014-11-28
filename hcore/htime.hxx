@@ -44,9 +44,12 @@ extern M_YAAL_HCORE_PUBLIC_API char const _iso8601DateTimeFormat_[];
 
 /*! \brief Date and time handling class.
  *
- * HTime stores number of seconds since epoch (1970-01-01).
+ * HTime stores number of seconds since epoch:
+ * 0-01-01 00:00:00 - on systems with 64 bit time_t,
+ * 1970-01-01 00:00:00 - on system with 32 bit time_t.
  * If we want to have broken-down time diff we must compensate for that fact.
- * In short time-diff makes no sense for dates in broken-down time form.
+ * In short time-diff makes no sense for dates in broken-down time form
+ * on 32 bit time_t systems.
  */
 class HTime {
 public:

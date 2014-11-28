@@ -346,7 +346,11 @@ HTime& HTime::operator = ( HTime const& time_ ) {
 HTime& HTime::operator -= ( HTime const& time_ ) {
 	M_PROLOG
 	_value = static_cast<i64_t>( difftime( static_cast<time_t>( _value ), static_cast<time_t>( time_._value ) ) );
+#if SIZEOF_TIME_T == 8
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
+#else
+	time_t t( static_cast<time_t>( _value ) );
+#endif
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
 	return ( *this );
 	M_EPILOG

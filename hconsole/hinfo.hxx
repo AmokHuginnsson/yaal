@@ -82,7 +82,7 @@ protected:
 class HInfoMultiVal : public HInfo {
 private:
 	u64_t _type;
-	int long _integer;
+	int long long _integer;
 	double long _real;
 	mutable yaal::hcore::HString _string;
 	mutable yaal::hcore::HTime _time;

@@ -114,6 +114,7 @@ AC_CHECK_SIZEOF([float])
 AC_CHECK_SIZEOF([double])
 AC_CHECK_SIZEOF([double long])
 AC_CHECK_SIZEOF([void*])
+AC_CHECK_SIZEOF([time_t])
 dnl Check for POD alignment.
 AC_CHECK_ALIGNOF([int short])
 AC_CHECK_ALIGNOF([int])
@@ -123,6 +124,7 @@ AC_CHECK_ALIGNOF([float])
 AC_CHECK_ALIGNOF([double])
 AC_CHECK_ALIGNOF([double long])
 AC_CHECK_ALIGNOF([void*])
+AC_CHECK_ALIGNOF([time_t])
 
 dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
