@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcall.hxx - this file is integral part of `yaal' project.
+  hcall.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -66,12 +66,15 @@ class HCallInterface<0, return_t,
 	trait::no_type, trait::no_type, trait::no_type> {
 public:
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( void )
-		{ return ( do_invoke() ); }
-	return_t operator()( void ) const
-		{ return ( do_invoke() ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( void ) {
+		return ( do_invoke() );
+	}
+	return_t operator()( void ) const {
+		return ( do_invoke() );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( void ) = 0;
 	virtual return_t do_invoke( void ) const = 0;
@@ -88,24 +91,33 @@ public:
 	typedef typename base_type::result_type result_type;
 	typedef typename base_type::argument_type argument_type;
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( a0_t a0 )
-		{ return ( do_invoke( a0 ) ); }
-	return_t operator()( a0_t a0 ) const
-		{ return ( do_invoke( a0 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type* a0 )
-		{ return ( do_invoke( *a0 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0 ) const
-		{ return ( do_invoke( *a0 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0 )
-		{ return ( do_invoke( *a0 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0 ) const
-		{ return ( do_invoke( *a0 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0 )
-		{ return ( do_invoke( *a0 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0 ) const
-		{ return ( do_invoke( *a0 ) ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( a0_t a0 ) {
+		return ( do_invoke( a0 ) );
+	}
+	return_t operator()( a0_t a0 ) const {
+		return ( do_invoke( a0 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0 ) {
+		return ( do_invoke( *a0 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0 ) const {
+		return ( do_invoke( *a0 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0 ) {
+		return ( do_invoke( *a0 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0 ) const {
+		return ( do_invoke( *a0 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0 ) {
+		return ( do_invoke( *a0 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0 ) const {
+		return ( do_invoke( *a0 ) );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( a0_t ) = 0;
 	virtual return_t do_invoke( a0_t ) const = 0;
@@ -124,24 +136,33 @@ public:
 	typedef typename base_type::first_argument_type first_argument_type;
 	typedef typename base_type::second_argument_type second_argument_type;
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( a0_t a0, a1_t a1 )
-		{ return ( do_invoke( a0, a1 ) ); }
-	return_t operator()( a0_t a0, a1_t a1 ) const
-		{ return ( do_invoke( a0, a1 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1 )
-		{ return ( do_invoke( *a0, a1 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1 ) const
-		{ return ( do_invoke( *a0, a1 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 )
-		{ return ( do_invoke( *a0, a1 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 ) const
-		{ return ( do_invoke( *a0, a1 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 )
-		{ return ( do_invoke( *a0, a1 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 ) const
-		{ return ( do_invoke( *a0, a1 ) ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( a0_t a0, a1_t a1 ) {
+		return ( do_invoke( a0, a1 ) );
+	}
+	return_t operator()( a0_t a0, a1_t a1 ) const {
+		return ( do_invoke( a0, a1 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1 ) {
+		return ( do_invoke( *a0, a1 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1 ) const {
+		return ( do_invoke( *a0, a1 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 ) {
+		return ( do_invoke( *a0, a1 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 ) const {
+		return ( do_invoke( *a0, a1 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 ) {
+		return ( do_invoke( *a0, a1 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1 ) const {
+		return ( do_invoke( *a0, a1 ) );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( a0_t, a1_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t ) const = 0;
@@ -159,24 +180,33 @@ public:
 	typedef a1_t second_argument_type;
 	typedef a2_t third_argument_type;
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2 )
-		{ return ( do_invoke( a0, a1, a2 ) ); }
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2 ) const
-		{ return ( do_invoke( a0, a1, a2 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2 )
-		{ return ( do_invoke( *a0, a1, a2 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2 ) const
-		{ return ( do_invoke( *a0, a1, a2 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 )
-		{ return ( do_invoke( *a0, a1, a2 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 ) const
-		{ return ( do_invoke( *a0, a1, a2 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 )
-		{ return ( do_invoke( *a0, a1, a2 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 ) const
-		{ return ( do_invoke( *a0, a1, a2 ) ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2 ) {
+		return ( do_invoke( a0, a1, a2 ) );
+	}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2 ) const {
+		return ( do_invoke( a0, a1, a2 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2 ) {
+		return ( do_invoke( *a0, a1, a2 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2 ) const {
+		return ( do_invoke( *a0, a1, a2 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 ) {
+		return ( do_invoke( *a0, a1, a2 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 ) const {
+		return ( do_invoke( *a0, a1, a2 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 ) {
+		return ( do_invoke( *a0, a1, a2 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2 ) const {
+		return ( do_invoke( *a0, a1, a2 ) );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t ) const = 0;
@@ -195,24 +225,33 @@ public:
 	typedef a2_t third_argument_type;
 	typedef a3_t fourth_argument_type;
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		{ return ( do_invoke( a0, a1, a2, a3 ) ); }
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 ) const
-		{ return ( do_invoke( a0, a1, a2, a3 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3 )
-		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 )
-		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 )
-		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3 ) ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 ) {
+		return ( do_invoke( a0, a1, a2, a3 ) );
+	}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3 ) const {
+		return ( do_invoke( a0, a1, a2, a3 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3 ) {
+		return ( do_invoke( *a0, a1, a2, a3 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3 ) const {
+		return ( do_invoke( *a0, a1, a2, a3 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 ) {
+		return ( do_invoke( *a0, a1, a2, a3 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 ) const {
+		return ( do_invoke( *a0, a1, a2, a3 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 ) {
+		return ( do_invoke( *a0, a1, a2, a3 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3 ) const {
+		return ( do_invoke( *a0, a1, a2, a3 ) );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t ) const = 0;
@@ -232,24 +271,33 @@ public:
 	typedef a3_t fourth_argument_type;
 	typedef a4_t fifth_argument_type;
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		{ return ( do_invoke( a0, a1, a2, a3, a4 ) ); }
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
-		{ return ( do_invoke( a0, a1, a2, a3, a4 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4 ) ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) {
+		return ( do_invoke( a0, a1, a2, a3, a4 ) );
+	}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const {
+		return ( do_invoke( a0, a1, a2, a3, a4 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4 ) );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t ) const = 0;
@@ -270,24 +318,33 @@ public:
 	typedef a4_t fifth_argument_type;
 	typedef a5_t sixth_argument_type;
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5 ) ); }
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5 ) );
+	}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5 ) );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t ) const = 0;
@@ -309,24 +366,33 @@ public:
 	typedef a5_t sixth_argument_type;
 	typedef a6_t seventh_argument_type;
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6 ) ); }
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5, a6 ) );
+	}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5, a6 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6 ) );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t ) const = 0;
@@ -349,24 +415,33 @@ public:
 	typedef a6_t seventh_argument_type;
 	typedef a7_t eighth_argument_type;
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7 ) );
+	}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7 ) );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t ) const = 0;
@@ -390,24 +465,33 @@ public:
 	typedef a7_t eighth_argument_type;
 	typedef a8_t ninth_argument_type;
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) );
+	}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8 ) );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t ) const = 0;
@@ -433,24 +517,33 @@ public:
 	typedef a8_t ninth_argument_type;
 	typedef a9_t tenth_argument_type;
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) );
+	}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t ) const = 0;
@@ -477,24 +570,33 @@ public:
 	typedef a9_t tenth_argument_type;
 	typedef a10_t eleventh_argument_type;
 	virtual ~HCallInterface( void ) {}
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const
-		{ return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const
-		{ return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ); }
-	void const* id( void ) const
-		{ return ( do_id() ); }
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) );
+	}
+	return_t operator()( a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const {
+		return ( do_invoke( a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) );
+	}
+	return_t operator()( typename trait::strip_reference<a0_t>::type const* a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) );
+	}
+	return_t operator()( HPointer<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) );
+	}
+	return_t operator()( HResource<typename trait::strip_reference<a0_t>::type> a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 ) const {
+		return ( do_invoke( *a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) );
+	}
+	void const* id( void ) const {
+		return ( do_id() );
+	}
 protected:
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) = 0;
 	virtual return_t do_invoke( a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t ) const = 0;
@@ -502,12 +604,14 @@ protected:
 };
 
 template<typename CLASS_t, typename METHOD_t>
-void const* caller_id( HFunctor<CLASS_t, METHOD_t> const& functor_ )
-	{ return ( functor_.id() ); }
+void const* caller_id( HFunctor<CLASS_t, METHOD_t> const& functor_ ) {
+	return ( functor_.id() );
+}
 
 template<typename CLASS_t>
-void const* caller_id( CLASS_t const& object_ )
-	{ return ( &object_ ); }
+void const* caller_id( CLASS_t const& object_ ) {
+	return ( &object_ );
+}
 
 /*! \brief Implementation of abstraction of any-method of any-class invocation.
  *
@@ -830,14 +934,16 @@ struct call_calculator {
 	struct field {
 		typedef HCall<-2, descriptor, typename trait::field_type<METHOD_t>::type,
 						fa0_t, METHOD_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
-		inline static type make( METHOD_t m, fa0_t a0 )
-			{ return ( type( yaal::move( m ), yaal::move( a0 ) ) ); }
+		inline static type make( METHOD_t m, fa0_t a0 ) {
+			return ( type( yaal::move( m ), yaal::move( a0 ) ) );
+		}
 	};
 	struct field_this {
 		typedef HCall<-1, descriptor, typename trait::field_type<METHOD_t>::type,
 						fa0_t, METHOD_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
-		inline static type make( METHOD_t m, fa0_t )
-			{ return ( type( yaal::move( m ) ) ); }
+		inline static type make( METHOD_t m, fa0_t ) {
+			return ( type( yaal::move( m ) ) );
+		}
 	};
 	typedef typename trait::ternary<
 			trait::is_member<METHOD_t>::value, /* we have method */
@@ -886,8 +992,9 @@ public:
 	HCallBase( CALL_t call_ )
 		: _call( yaal::move( call_ ) ) {}
 protected:
-	virtual void const* do_id( void ) const
-		{ return ( caller_id( _call ) ); }
+	virtual void const* do_id( void ) const {
+		return ( caller_id( _call ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename class_t, typename field_t>
@@ -957,10 +1064,12 @@ public:
 		: base_type( yaal::move( call_ ) ) {
 		return;
 	}
-	virtual return_t do_invoke( void )
-		{ return ( (base_type::_call)() ); }
-	virtual return_t do_invoke( void ) const
-		{ return ( (base_type::_call)() ); }
+	virtual return_t do_invoke( void ) {
+		return ( (base_type::_call)() );
+	}
+	virtual return_t do_invoke( void ) const {
+		return ( (base_type::_call)() );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t, typename a0_t>
@@ -985,10 +1094,12 @@ public:
 		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( void )
-		{ return ( (base_type::_call)( _a0 ) ); }
-	virtual return_t do_invoke( void ) const
-		{ return ( (base_type::_call)( _a0 ) ); }
+	virtual return_t do_invoke( void ) {
+		return ( (base_type::_call)( _a0 ) );
+	}
+	virtual return_t do_invoke( void ) const {
+		return ( (base_type::_call)( _a0 ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
@@ -1011,10 +1122,12 @@ public:
 		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( void )
-		{ return ( (base_type::_call)( _a0, _a1 ) ); }
-	virtual return_t do_invoke( void ) const
-		{ return ( (base_type::_call)( _a0, _a1 ) ); }
+	virtual return_t do_invoke( void ) {
+		return ( (base_type::_call)( _a0, _a1 ) );
+	}
+	virtual return_t do_invoke( void ) const {
+		return ( (base_type::_call)( _a0, _a1 ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1040,10 +1153,12 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( void )
-		{ return ( (base_type::_call)( _a0, _a1, _a2 ) ); }
-	virtual return_t do_invoke( void ) const
-		{ return ( (base_type::_call)( _a0, _a1, _a2 ) ); }
+	virtual return_t do_invoke( void ) {
+		return ( (base_type::_call)( _a0, _a1, _a2 ) );
+	}
+	virtual return_t do_invoke( void ) const {
+		return ( (base_type::_call)( _a0, _a1, _a2 ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1070,10 +1185,12 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( void )
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3 ) ); }
-	virtual return_t do_invoke( void ) const
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3 ) ); }
+	virtual return_t do_invoke( void ) {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3 ) );
+	}
+	virtual return_t do_invoke( void ) const {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3 ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1103,10 +1220,12 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( void )
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4 ) ); }
-	virtual return_t do_invoke( void ) const
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4 ) ); }
+	virtual return_t do_invoke( void ) {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4 ) );
+	}
+	virtual return_t do_invoke( void ) const {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4 ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1134,10 +1253,12 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( void )
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
-	virtual return_t do_invoke( void ) const
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) ); }
+	virtual return_t do_invoke( void ) {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) );
+	}
+	virtual return_t do_invoke( void ) const {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1172,10 +1293,12 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( void )
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
-	virtual return_t do_invoke( void ) const
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) ); }
+	virtual return_t do_invoke( void ) {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) );
+	}
+	virtual return_t do_invoke( void ) const {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1211,10 +1334,12 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( void )
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
-	virtual return_t do_invoke( void ) const
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) ); }
+	virtual return_t do_invoke( void ) {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) );
+	}
+	virtual return_t do_invoke( void ) const {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1252,10 +1377,12 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( void )
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
-	virtual return_t do_invoke( void ) const
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) ); }
+	virtual return_t do_invoke( void ) {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) );
+	}
+	virtual return_t do_invoke( void ) const {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1293,10 +1420,12 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( void )
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
-	virtual return_t do_invoke( void ) const
-		{ return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) ); }
+	virtual return_t do_invoke( void ) {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) );
+	}
+	virtual return_t do_invoke( void ) const {
+		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t, typename a0_t>
@@ -1322,8 +1451,12 @@ public:
 		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) ); }
-	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) ); }
+	virtual return_t do_invoke( fa0_t a0 ) {
+		return ( (base_type::_call)( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) );
+	}
+	virtual return_t do_invoke( fa0_t a0 ) const {
+		return ( (base_type::_call)( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) );
+	}
 };
 
 template<typename descriptor, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
@@ -1349,7 +1482,8 @@ public:
 		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)(
@@ -1383,7 +1517,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ) ) ); }
@@ -1420,7 +1555,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1462,7 +1598,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1506,7 +1643,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1555,7 +1693,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1607,7 +1746,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1663,7 +1803,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1721,7 +1862,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1783,7 +1925,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
 				free_standing_call_args::resolve_arg<1, a1_t, fa0_t>::get( _a1, a0 ),
 				free_standing_call_args::resolve_arg<1, a2_t, fa0_t>::get( _a2, a0 ),
@@ -1833,7 +1976,8 @@ public:
 		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_type::_call)(
@@ -1868,7 +2012,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ) ) ); }
@@ -1906,7 +2051,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1949,7 +2095,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -1994,7 +2141,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -2044,7 +2192,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -2097,7 +2246,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -2154,7 +2304,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -2213,7 +2364,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -2276,7 +2428,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
 				free_standing_call_args::resolve_arg<2, a2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
@@ -2330,7 +2483,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ) ) ); }
@@ -2369,7 +2523,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -2413,7 +2568,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -2459,7 +2615,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -2510,7 +2667,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -2564,7 +2722,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -2622,7 +2781,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -2682,7 +2842,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -2746,7 +2907,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
 				free_standing_call_args::resolve_arg<3, a2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
@@ -2802,7 +2964,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -2847,7 +3010,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -2894,7 +3058,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -2946,7 +3111,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -3001,7 +3167,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -3060,7 +3227,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -3121,7 +3289,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -3186,7 +3355,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
 				free_standing_call_args::resolve_arg<4, a2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
@@ -3246,7 +3416,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -3294,7 +3465,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -3347,7 +3519,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -3403,7 +3576,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -3463,7 +3637,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -3525,7 +3700,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -3591,7 +3767,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
 				free_standing_call_args::resolve_arg<5, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
@@ -3652,7 +3829,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -3706,7 +3884,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -3763,7 +3942,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -3824,7 +4004,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -3887,7 +4068,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -3954,7 +4136,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
 				free_standing_call_args::resolve_arg<6, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
@@ -4019,7 +4202,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -4077,7 +4261,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -4139,7 +4324,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -4203,7 +4389,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -4271,7 +4458,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
 				free_standing_call_args::resolve_arg<7, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
@@ -4338,7 +4526,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -4401,7 +4590,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -4466,7 +4656,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -4535,7 +4726,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
 				free_standing_call_args::resolve_arg<8, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -4605,7 +4797,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -4671,7 +4864,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -4741,7 +4935,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
 				free_standing_call_args::resolve_arg<9, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -4812,7 +5007,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<10, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
@@ -4883,7 +5079,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<10, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
 				free_standing_call_args::resolve_arg<10, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
@@ -4957,7 +5154,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
-	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9, fa10_t a10 ) { return ( (base_type::_call)(
+	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9, fa10_t a10 ) {
+		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<11, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
 				free_standing_call_args::resolve_arg<11, a1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
 				free_standing_call_args::resolve_arg<11, a2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
