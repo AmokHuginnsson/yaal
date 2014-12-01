@@ -34,6 +34,7 @@ Copyright:
 #include "tools/collections.hxx"
 #include "hconsole/hitem.hxx"
 #include "hconsole/hsearchablewidget.hxx"
+#include "hcore/hformat.hxx"
 
 namespace yaal {
 
@@ -356,6 +357,7 @@ public:
 		int _shortcutIndex;
 		char _shortcut;
 		type_id_t _type;
+		hcore::HFormat _format;
 		hcore::HString _name;
 		HWidget* _widget;
 	public:
@@ -364,6 +366,7 @@ public:
 				int width,
 				BITS::ALIGN::align_t const& align = BITS::ALIGN::LEFT,
 				type_id_t type = TYPE::HSTRING,
+				yaal::hcore::HString const& format_ = hcore::HString(),
 				HWidget* associatedWidget = NULL );
 		virtual ~HColumnInfo( void );
 		type_id_t type( void ) const {
@@ -440,7 +443,7 @@ public:
 	int get_cursor_position( void ) const;
 	void selection_change( void );
 protected:
-	virtual bool get_text_for_cell( iterator_t&, int, type_id_t );
+	virtual bool get_text_for_cell( iterator_t&, int, type_id_t, hcore::HFormat* = nullptr );
 	virtual void do_paint( void );
 	void update_children( void );
 	void draw_cell( iterator_t&, int, int, int, HColumnInfo const* const, bool );
@@ -581,6 +584,7 @@ public:
 			int width,
 			HListWidget::BITS::ALIGN::align_t const& align,
 			type_id_t type,
+			yaal::hcore::HString const& format_,
 			HWidget* associatedWidget );
 protected:
 	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
@@ -589,11 +593,12 @@ protected:
 	virtual HListWidget::HColumnInfo::ptr_t do_make_column(
 			yaal::tools::HXml::HConstNodeProxy const&,
 			HListWidget*,
-			yaal::hcore::HString const& columnName,
-			int width,
-			HListWidget::BITS::ALIGN::align_t const& align,
-			type_id_t type,
-			HWidget* associatedWidget );
+			yaal::hcore::HString const&,
+			int,
+			HListWidget::BITS::ALIGN::align_t const&,
+			type_id_t,
+			yaal::hcore::HString const&,
+			HWidget* );
 };
 
 }

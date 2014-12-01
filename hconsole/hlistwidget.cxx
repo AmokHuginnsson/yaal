@@ -56,12 +56,28 @@ HListWidget::flag_t const HListWidget::FLAG::EDITABLE = HListWidget::flag_t::new
 HListWidget::flag_t const HListWidget::FLAG::DRAW_HEADER = HListWidget::flag_t::new_flag();
 HListWidget::flag_t const HListWidget::FLAG::ALL = ~HListWidget::FLAG::NONE;
 
+namespace {
+char const* default_format( type_id_t type_ ) {
+	char const* df = NULL;
+	switch ( type_ ) {
+		case ( TYPE::HSTRING ):       df = "%s"; break;
+		case ( TYPE::INT_LONG_LONG ): df = "%lld"; break;
+		case ( TYPE::DOUBLE_LONG ):   df = "%.12Lf"; break;
+		case ( TYPE::HTIME ):         df = "%s"; break;
+		default: {
+			M_ASSERT( !"bad type"[0] );
+		}
+	}
+	return ( df );
+}
+}
+
 HListWidget::HColumnInfo::HColumnInfo( yaal::hcore::HString const& name_,
 		int width_, BITS::ALIGN::align_t const& align_, type_id_t type_,
-		HWidget* widget_ )
+		yaal::hcore::HString const& format_, HWidget* widget_ )
 	: _descending( false ), _widthRaw( 0 ), _width( width_ ), _align( align_ ),
-	_shortcutIndex( 0 ), _shortcut( 0 ), _type( type_ ), _name( name_ ),
-	_widget( widget_ ) {
+	_shortcutIndex( 0 ), _shortcut( 0 ), _type( type_ ), _format( ! format_.is_empty() ? format_ : default_format( _type ) ),
+	_name( name_ ), _widget( widget_ ) {
 	M_PROLOG
 	int shortcutIndex( static_cast<int>( _name.find( '&' ) ) );
 	if ( shortcutIndex != HString::npos ) {
@@ -140,7 +156,7 @@ void HListWidget::do_paint( void ) {
 			for ( int ctrLoc( 0 ); ctrLoc < columns; ++ ctrLoc ) {
 				HColumnInfo* columnInfo( _header[ ctrLoc ].get() );
 				if ( columnInfo->_widthRaw ) {
-					bool checked( get_text_for_cell( it, ctrLoc, columnInfo->_type ) );
+					bool checked( get_text_for_cell( it, ctrLoc, columnInfo->_type, &columnInfo->_format ) );
 					draw_cell( it, ctr, ctrLoc, columnOffset, columnInfo, checked );
 					columnOffset += columnInfo->_widthRaw;
 				}
@@ -1139,31 +1155,35 @@ void HListWidget::set_flags( flag_t flags_, flag_t mask_ ) {
 	M_EPILOG
 }
 
-bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, type_id_t type_ ) {
+bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, type_id_t type_, hcore::HFormat* format_ ) {
 	M_PROLOG
 	M_ASSERT( it_.is_valid() );
 	HAbstractRow& item = *it_;
 	switch ( type_.value() ) {
 		case ( TYPE::INT_LONG_LONG ): {
 			try {
-				_varTmpBuffer = item[ column_ ].get_integer();
+				int long long v( item[ column_ ].get_integer() );
+				_varTmpBuffer.assign( format_ ? ( *format_ % v ).string() : v );
 			} catch ( HLexicalCastException const& e ) {
 				_varTmpBuffer = e.what();
 			}
 		} break;
 		case ( TYPE::DOUBLE_LONG ): {
 			try {
-				_varTmpBuffer = item[ column_ ].get_real();
+				double long v( item[ column_ ].get_real() );
+				_varTmpBuffer.assign( format_ ? ( *format_ % v ).string() : v );
 			} catch ( HLexicalCastException const& e ) {
 				_varTmpBuffer = e.what();
 			}
 		} break;
-		case ( TYPE::HSTRING ):
-			_varTmpBuffer = item[ column_ ].get_string();
-		break;
-		case ( TYPE::HTIME ):
-			_varTmpBuffer = item[ column_ ].get_time();
-		break;
+		case ( TYPE::HSTRING ): {
+			HString const& v( item[ column_ ].get_string() );
+			_varTmpBuffer.assign( format_ ? ( *format_ % v ).string() : v );
+		} break;
+		case ( TYPE::HTIME ): {
+			HTime const& v( item[ column_ ].get_time() );
+			_varTmpBuffer.assign( format_ ? ( *format_ % v.to_string() ).string() : v.to_string() );
+		} break;
 		default :
 			M_THROW( "unknown type", type_.value() );
 		break;
@@ -1596,6 +1616,7 @@ bool HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools
 		int width( lexical_cast<int>( xml::attr_val( node_, "width" ) ) );
 		HString xmlAlign( xml::attr_val( node_, "align" ) );
 		HString xmlType( xml::attr_val( node_, "type" ) );
+		xml::value_t format( xml::try_attr_val( node_, "format" ) );
 		HWidget::BITS::ALIGN::align_t align( HWidget::BITS::ALIGN::LEFT );
 		if ( xmlAlign == "left" ) {
 			align = HWidget::BITS::ALIGN::LEFT;
@@ -1626,7 +1647,7 @@ bool HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools
 			field = HWidgetFactory::get_instance().create_widget( widget_->get_window(), xmlField );
 		}
 		HListWidget* list( dynamic_cast<HListWidget*>( widget_.raw() ) );
-		list->add_column( placement, make_column( node_, list, columnName, width, align, type, field.raw() ) );
+		list->add_column( placement, make_column( node_, list, columnName, width, align, type, !! format ? *format : "", field.raw() ) );
 		ok = true;
 	}
 	return ( ok );
@@ -1640,9 +1661,10 @@ HListWidget::HColumnInfo::ptr_t HListWidgetCreator::make_column(
 		int width,
 		HListWidget::BITS::ALIGN::align_t const& align,
 		type_id_t type,
+		yaal::hcore::HString const& format_,
 		HWidget* associatedWidget ) {
 	M_PROLOG
-	return ( do_make_column( node_, widget_, columnName, width, align, type, associatedWidget ) );
+	return ( do_make_column( node_, widget_, columnName, width, align, type, format_, associatedWidget ) );
 	M_EPILOG
 }
 
@@ -1653,9 +1675,10 @@ HListWidget::HColumnInfo::ptr_t HListWidgetCreator::do_make_column(
 		int width,
 		HListWidget::BITS::ALIGN::align_t const& align,
 		type_id_t type,
+		yaal::hcore::HString const& format_,
 		HWidget* associatedWidget ) {
 	M_PROLOG
-	return ( make_resource<HListWidget::HColumnInfo>( columnName, width, align, type, associatedWidget ) );
+	return ( make_resource<HListWidget::HColumnInfo>( columnName, width, align, type, format_, associatedWidget ) );
 	M_EPILOG
 }
 

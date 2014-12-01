@@ -50,9 +50,10 @@ HDataListWidget::HDataColumnInfo::HDataColumnInfo(
 		int width_,
 		BITS::ALIGN::align_t const& align_,
 		type_id_t type_,
+		hcore::HString const& format_,
 		HWidget* associatedWidget_,
 		HDictionary::ptr_t const& dict_ )
-	: HColumnInfo( columnName_, width_, align_, type_, associatedWidget_ ),
+	: HColumnInfo( columnName_, width_, align_, type_, format_, associatedWidget_ ),
 	_dict( dict_ ) {
 	return;
 }
@@ -292,6 +293,7 @@ HListWidget::HColumnInfo::ptr_t HDataListWidgetCreator::do_make_column(
 		int width,
 		HListWidget::BITS::ALIGN::align_t const& align,
 		type_id_t type,
+		yaal::hcore::HString const& format_,
 		HWidget* associatedWidget ) {
 	M_PROLOG
 	M_ASSERT( node_.get_name() == "column" );
@@ -302,7 +304,8 @@ HListWidget::HColumnInfo::ptr_t HDataListWidgetCreator::do_make_column(
 		M_ASSERT( window );
 		dict = window->get_dictionary( *dictName );
 	}
-	return ( HListWidget::HColumnInfo::ptr_t( new HDataListWidget::HDataColumnInfo( columnName, width, align, type, associatedWidget, dict ) ) );
+	return ( HListWidget::HColumnInfo::ptr_t(
+			new HDataListWidget::HDataColumnInfo( columnName, width, align, type, format_, associatedWidget, dict ) ) );
 	M_EPILOG
 }
 
