@@ -274,6 +274,7 @@ int HTime::get_days_in_month( void ) const {
 
 HTime& HTime::mod_year( int mod_ ) {
 	_broken.tm_year += mod_;
+	_broken.tm_isdst = -1;
 	_value = unix_epoch_to_yaal_epoch( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) );
 	return ( *this );
 }
@@ -281,6 +282,7 @@ HTime& HTime::mod_year( int mod_ ) {
 HTime& HTime::mod_month( int mod_ ) {
 	_broken.tm_year += mod_ / MONTHS_IN_YEAR;
 	_broken.tm_mon += mod_ % MONTHS_IN_YEAR;
+	_broken.tm_isdst = -1;
 	if ( _broken.tm_mon < 0 ) {
 		_broken.tm_mon += MONTHS_IN_YEAR;
 		-- _broken.tm_year;
