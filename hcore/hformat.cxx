@@ -546,7 +546,7 @@ HFormat HFormat::operator % ( HString const& s ) {
 
 int HFormat::HFormatImpl::next_token( HFormatImpl::conversion_t const& conv ) {
 	M_PROLOG
-	if ( ! _string.empty() ) {
+	if ( _positions->get_size() == _args->get_size() ) {
 		_positionIndex = 0;
 		_string.clear();
 		_args->clear();
@@ -679,8 +679,8 @@ HFormat::HFormatImpl::conversion_t HFormat::HFormatImpl::get_conversion( HString
 		conversion_t _converion;
 	} length[] = { { "hh", CONVERSION::BYTE },
 				{ "h", CONVERSION::SHORT },
-				{ "l", CONVERSION::LONG },
 				{ "ll", CONVERSION::LONG_LONG },
+				{ "l", CONVERSION::LONG },
 				{ "q", CONVERSION::LONG_LONG },
 				{ "L", CONVERSION::LONG_LONG } };
 	int lenMod = -1;
