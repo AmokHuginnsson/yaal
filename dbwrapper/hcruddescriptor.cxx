@@ -182,7 +182,7 @@ HRecordSet::ptr_t HCRUDDescriptor::execute( MODE::mode_t const& mode_ ) {
 	M_EPILOG
 }
 
-HRecordSet::ptr_t HCRUDDescriptor::execute( char const* const query_ ) {
+HRecordSet::ptr_t HCRUDDescriptor::execute( HString const& query_ ) {
 	M_PROLOG
 	_SQL = query_;
 	_query.reset();
@@ -251,7 +251,7 @@ void HCRUDDescriptor::set_columns( yaal::hcore::HString const& columns_ ) {
 	M_EPILOG
 }
 
-void HCRUDDescriptor::set_columns( fields_t&& fields_ ) {
+void HCRUDDescriptor::set_columns( field_names_t&& fields_ ) {
 	M_PROLOG
 	_fields.swap( fields_ );
 	_fieldCount = static_cast<int>( _fields.get_size() );
@@ -262,7 +262,7 @@ void HCRUDDescriptor::set_columns( fields_t&& fields_ ) {
 	M_EPILOG
 }
 
-void HCRUDDescriptor::set_columns( fields_t const& fields_ ) {
+void HCRUDDescriptor::set_columns( field_names_t const& fields_ ) {
 	M_PROLOG
 	_fields = fields_;
 	_fieldCount = static_cast<int>( _fields.get_size() );

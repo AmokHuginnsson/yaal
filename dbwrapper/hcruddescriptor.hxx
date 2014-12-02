@@ -44,6 +44,7 @@ class HCRUDDescriptor {
 public:
 	typedef HCRUDDescriptor this_type;
 	typedef yaal::hcore::HPointer<this_type> ptr_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
 	/*! \brief Query types.
 	 */
 	struct MODE {
@@ -64,10 +65,9 @@ private:
 	yaal::hcore::HString _columns;		/* columns that should be returned by next query */
 	yaal::hcore::HString _filter;		/* additional constant filter (WHERE clause) */
 	yaal::hcore::HString _sort;			/* additional constant sort (ORDER BY clause) */
-	typedef yaal::hcore::HArray<yaal::hcore::HString> fields_t;
 	typedef HRecordSet::values_t values_t;
 	typedef yaal::hcore::HArray<bool> mutated_t;
-	fields_t _fields;
+	field_names_t _fields;
 	int _fieldCount;		/* number of columns returned by last query */
 	int long _setSize;		/* number of records returned by last query */
 	values_t _values;
@@ -80,8 +80,8 @@ public:
 	virtual ~HCRUDDescriptor( void );
 	void set_table( yaal::hcore::HString const& );
 	void set_columns( yaal::hcore::HString const& );
-	void set_columns( fields_t&& );
-	void set_columns( fields_t const& );
+	void set_columns( field_names_t&& );
+	void set_columns( field_names_t const& );
 	void set_filter( yaal::hcore::HString const& );
 	void set_sort( yaal::hcore::HString const& );
 	yaal::hcore::HString get_table( void ) const;
@@ -96,7 +96,7 @@ public:
 	HRecordSet::value_t& operator[]( int );
 	void build_query( MODE::mode_t const& );
 	HRecordSet::ptr_t execute( MODE::mode_t const& );
-	HRecordSet::ptr_t execute( char const* const );
+	HRecordSet::ptr_t execute( yaal::hcore::HString const& );
 	HRecordSet::ptr_t execute( void );
 };
 typedef yaal::hcore::HExceptionT<HCRUDDescriptor> HCRUDDescriptorException;

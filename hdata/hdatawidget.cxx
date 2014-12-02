@@ -43,7 +43,8 @@ namespace hdata {
 
 HDataWidget::HDataWidget( void )
 	: HWidget( NULL, 0, 0, 0, 0, hcore::HString() ),
-	_crud() {
+	_crud(),
+	_viewQuery() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -58,6 +59,13 @@ HDataWidget::~HDataWidget( void ) {
 void HDataWidget::set_crud_descriptor( HCRUDDescriptor::ptr_t crud_ ) {
 	M_PROLOG
 	_crud = crud_;
+	M_EPILOG
+}
+
+void HDataWidget::set_view_query( yaal::hcore::HString const& viewQuery_ ) {
+	M_PROLOG
+	_viewQuery = viewQuery_;
+	return;
 	M_EPILOG
 }
 

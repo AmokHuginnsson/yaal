@@ -40,6 +40,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hdatastatusbarwidget.hxx"
 #include "hdataprocess.hxx"
 #include "hcore/hlog.hxx"
+#include "tools/stringalgo.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::tools;
@@ -56,7 +57,7 @@ HDataWindow::HDataWindow( HString const& title_, HDataProcess* owner_ )
 	_viewModeWidgets(), _editModeWidgets(),
 	_crud( new ( memory::yaal ) HCRUDDescriptor( owner_->data_base() ) ),
 	_mode( HCRUDDescriptor::MODE::SELECT ),
-	_idColumnName(), _dictionaries() {
+	_columns(), _idColumnName(), _dictionaries() {
 	M_PROLOG
 	register_postprocess_handler( KEY<'n'>::command, NULL, call( &HDataWindow::handler_add_new, this, _1 ) );
 	register_postprocess_handler( KEY<'e'>::command, NULL, call( &HDataWindow::handler_edit, this, _1 ) );
@@ -206,6 +207,7 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 		return ( true );
 	}
 	int long id( _mainWidget->get_current_id() );
+	_crud->set_columns( _columns );
 	if ( _mode == HCRUDDescriptor::MODE::UPDATE ) {
 		HString filter;
 		filter.assign( _idColumnName ).append( " = " ).append( to_string( id ) );
@@ -311,14 +313,19 @@ void HDataWindow::set_record_descriptor( yaal::hcore::HString const& table_,
 		yaal::hcore::HString const& columns_,
 		yaal::hcore::HString const& idCol_,
 		yaal::hcore::HString const& filter_,
-		yaal::hcore::HString const& sort_ ) {
+		yaal::hcore::HString const& sort_,
+		yaal::hcore::HString const& view_ ) {
 	M_PROLOG
 	_crud->set_table( table_ );
-	_crud->set_columns( columns_ );
+	_columns = string::split<HCRUDDescriptor::field_names_t>( columns_, "," );
+	M_ENSURE( _columns.back().trim() == idCol_ );
+	_columns.pop_back();
+	_crud->set_columns( _columns );
 	_crud->set_filter( filter_ );
 	_crud->set_sort( sort_ );
 	_idColumnName = idCol_;
 	_mainWidget->set_crud_descriptor( _crud );
+	_mainWidget->set_view_query( view_ );
 	_mainWidget->register_event_listener( call( &HDataWindow::on_sel_change, this, _1 ) );
 	return;
 	M_EPILOG
@@ -381,12 +388,13 @@ bool HDataWindowCreator::do_apply_resources( hconsole::HTUIProcess* tui_, window
 	for ( yaal::tools::HXml::HConstNodeProxy const& n : node_ ) {
 		HString nodeName( n.get_name() );
 		if ( nodeName == "db" ) {
+			xml::value_t view( xml::try_node_val( n ) );
 			HString table( xml::attr_val( n, "table" ) );
 			HString columns( xml::attr_val( n, "column" ) );
 			HString idColumn( xml::attr_val( n, "id_column" ) );
 			xml::value_t filter( xml::try_attr_val( n, "filter" ) );
 			xml::value_t sort( xml::try_attr_val( n, "sort" ) );
-			dw->set_record_descriptor( table, columns, idColumn, filter ? *filter : "", sort ? *sort : "" );
+			dw->set_record_descriptor( table, columns, idColumn, filter ? *filter : "", sort ? *sort : "", view ? *view : "" );
 		}
 	}
 	return ( true );

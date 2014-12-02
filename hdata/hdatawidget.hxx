@@ -71,6 +71,7 @@ public:
 	};
 protected:
 	dbwrapper::HCRUDDescriptor::ptr_t _crud;
+	yaal::hcore::HString _viewQuery;
 public:
 	HDataWidget( void );
 	virtual ~HDataWidget( void );
@@ -80,6 +81,7 @@ public:
 	void save( int long = 0 );
 	void add_new( void );
 	void cancel_new( void );
+	void set_view_query( yaal::hcore::HString const& );
 protected:
 	virtual void do_load( int long );
 	virtual void do_save( int long );

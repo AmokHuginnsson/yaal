@@ -111,12 +111,13 @@ void HDataListWidget::do_load( int long id_ ) {
 	if ( _idColumn.is_empty() ) {
 		_idColumn = parent->id_column_name();
 	}
-	HRecordSet::ptr_t rs = _crud->execute( HCRUDDescriptor::MODE::SELECT );
-	int idColNo = -1;
+	HRecordSet::ptr_t rs( _viewQuery.is_empty() ? _crud->execute( HCRUDDescriptor::MODE::SELECT ) : _crud->execute( _viewQuery ) );
+	int idColNo( -1 );
 	int const colCount = rs->get_field_count();
 	for ( int i = 0; i < colCount; ++ i ) {
 		if (  rs->get_column_name( i ) == _idColumn ) {
 			idColNo = i;
+			break;
 		}
 	}
 	int columnCount( static_cast<int>( _header.size() ) );
@@ -168,8 +169,7 @@ void HDataListWidget::do_save( int long id_ ) {
 		ids.insert( lexical_cast<int>( *(values[0]) ) );
 	}
 	rs.reset();
-	typedef HArray<HString> column_names_t;
-	column_names_t columnNames( string::split<column_names_t>( _columns, "," ) );
+	HCRUDDescriptor::field_names_t columnNames( string::split<HCRUDDescriptor::field_names_t>( _columns, "," ) );
 	_crud->set_columns( columnNames );
 	HAsIsValueListModel<>::data_ptr_t data( _dataModel->get_data() );
 	M_ENSURE( columnNames.back().trim() == _idColumn );

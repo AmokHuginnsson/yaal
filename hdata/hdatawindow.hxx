@@ -68,6 +68,7 @@ protected:
 	controls_t _editModeWidgets;
 	yaal::dbwrapper::HCRUDDescriptor::ptr_t _crud;
 	yaal::dbwrapper::HCRUDDescriptor::MODE::mode_t _mode;
+	yaal::dbwrapper::HCRUDDescriptor::field_names_t _columns;
 	yaal::hcore::HString _idColumnName;
 	dictionaries_t _dictionaries;
 public:
@@ -78,6 +79,7 @@ public:
 	void sync( yaal::dbwrapper::HRecordSet::iterator );
 	void set_widget_role( HDataWidget*, HDataWidget::ROLE::role_t );
 	void set_record_descriptor(
+			yaal::hcore::HString const&,
 			yaal::hcore::HString const&,
 			yaal::hcore::HString const&,
 			yaal::hcore::HString const&,

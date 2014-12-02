@@ -1181,8 +1181,8 @@ bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, type_id_t typ
 			_varTmpBuffer.assign( format_ ? ( *format_ % v ).string() : v );
 		} break;
 		case ( TYPE::HTIME ): {
-			HTime const& v( item[ column_ ].get_time() );
-			_varTmpBuffer.assign( format_ ? ( *format_ % v.to_string() ).string() : v.to_string() );
+			HString const& v( item[ column_ ].get_time() );
+			_varTmpBuffer.assign( format_ ? ( *format_ % v ).string() : v );
 		} break;
 		default :
 			M_THROW( "unknown type", type_.value() );
@@ -1298,10 +1298,10 @@ bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHe
 	}
 	bool lower = false;
 	switch ( sortHelper_._type.value() ) {
-		case ( TYPE::INT_LONG ):
+		case ( TYPE::INT_LONG_LONG ):
 			lower = left_.get_integer() < right_.get_integer();
 		break;
-		case ( TYPE::DOUBLE ):
+		case ( TYPE::DOUBLE_LONG ):
 			lower = left_.get_real() < right_.get_real();
 		break;
 		case ( TYPE::HSTRING ):
