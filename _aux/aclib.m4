@@ -156,7 +156,8 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 		HOST_OS_TYPE=[Tizen]
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -d [c:/windows] ; then
 		AC_DEFINE([__HOST_OS_TYPE_CYGWIN__], [], [Your operating system is Cygwin.])
-		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--out-implib=lib\$(*).\$(LIB_ARCHIVE_SUFFIX)"]
+		EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -U__STRICT_ANSI__"]
+		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(*).\$(LIB_ARCHIVE_SUFFIX)"]
 		HOST_OS_TYPE=[Cygwin]
 		LIB_PREFIX=["cyg"]
 		LIB_EXT=['"dll"']
