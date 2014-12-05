@@ -54,7 +54,7 @@ public:
 		: _object( yaal::move( ea_._object ) ), _lock( yaal::move( ea_._lock ) ) {
 		return;
 	}
-	HExclusiveAccessor& operator = ( HExclusiveAccessor& ea_ ) {
+	HExclusiveAccessor& operator = ( HExclusiveAccessor&& ea_ ) {
 		if ( &ea_ != this ) {
 			_object = yaal::move( ea_._object );
 			_lock = yaal::move( ea_._lock );
