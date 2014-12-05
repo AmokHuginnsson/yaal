@@ -67,7 +67,10 @@ coverage-stats:
 	genhtml $(LCOV_PARAMS) $(DIR_COVERAGE)/$(LIB_NAME)-coverage.info --legend --output-directory=$(DIR_ROOT)/build/coverage-stats && \
 	printf "%b\n" "done."
 
+HASH=\#
 CPPCHECK_CMD= cppcheck -D__ID__=\"\" -D__TID__=\"\" $(filter -D%,$(CXXFLAGS)) -DOPENSSL_THREADS=1 $(filter -I%,$(CXXFLAGS)) \
+	$(shell awk '/$(HASH)undef /{printf "-U"$$3" "}' $(DIR_ROOT)/build/debug/config.hxx) \
+	$(shell echo | $(CXX) -xc++ -E -v - 2>&1 | grep -v '[\t ]-' | awk '/^ \//{printf "-I"$$1" "}') \
 	$(if $(SRC_TARGETS),$(if ${CPLUS_INCLUDE_PATH},-I$(subst :, -I,${CPLUS_INCLUDE_PATH}),),) \
 	--enable=all --inline-suppr --report-progress --verbose \
 	$(if $(CPPCHECK_JOBS),-j$(CPPCHECK_JOBS),) \
@@ -75,8 +78,8 @@ CPPCHECK_CMD= cppcheck -D__ID__=\"\" -D__TID__=\"\" $(filter -D%,$(CXXFLAGS)) -D
 
 check: $(SRCS) $(HDRS)
 	@cd $(DIR_ROOT) && if test -t 1 -a "x$${VERBOSE}" != "xyes" ; then \
-		$(CPPCHECK_CMD) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$0}' ; \
+		$(call invoke, $(CPPCHECK_CMD) | awk -v CL="`tput cr;tput dl1`" '{printf CL"%s\r", $$0}') ; \
 	else \
-		$(CPPCHECK_CMD) ; \
+		$(call invoke, $(CPPCHECK_CMD)) ; \
 	fi
 
