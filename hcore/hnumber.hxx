@@ -92,11 +92,11 @@ namespace hcore {
 class HNumber {
 public:
 	typedef HNumber this_type;
-	typedef int size_t;
+	typedef int integer_t;
 private:
-	size_t _precision;
-	size_t _leafCount;
-	size_t _integralPartSize;
+	integer_t _precision;
+	integer_t _leafCount;
+	integer_t _integralPartSize;
 	HChunk _canonical;
 	mutable HChunk _cache;
 	bool _negative;
@@ -119,8 +119,8 @@ public:
 	 * \param value - value for new number object.
 	 * \param precision - precision for new number object.
 	 */
-	HNumber( double long value, size_t precision );
-	HNumber( double value, size_t precision );
+	HNumber( double long value, integer_t precision );
+	HNumber( double value, integer_t precision );
 
 	/*! \brief Construct new number object from primitive integral type.
 	 *
@@ -137,12 +137,12 @@ public:
 	 * \param value - value for new number object.
 	 * \param precision - precision for new number object.
 	 */
-	HNumber( int long long value, size_t precision );
-	HNumber( int long value, size_t precision );
-	HNumber( int value, size_t precision );
-	HNumber( int long long unsigned value, size_t precision );
-	HNumber( int long unsigned value, size_t precision );
-	HNumber( int unsigned value, size_t precision );
+	HNumber( int long long value, integer_t precision );
+	HNumber( int long value, integer_t precision );
+	HNumber( int value, integer_t precision );
+	HNumber( int long long unsigned value, integer_t precision );
+	HNumber( int long unsigned value, integer_t precision );
+	HNumber( int unsigned value, integer_t precision );
 
 	/*! Construct a number from supplied string.
 	 *
@@ -172,9 +172,9 @@ public:
 	 * _-._1_      = ex
 	 */
 	HNumber( char const* const );
-	HNumber( char const* const, size_t );
+	HNumber( char const* const, integer_t );
 	HNumber( HString const& );
-	HNumber( HString const&, size_t );
+	HNumber( HString const&, integer_t );
 	HNumber( HNumber const& );
 	HNumber( HNumber&& );
 	~HNumber( void );
@@ -216,7 +216,7 @@ public:
 	 * \param significant_ - maximum amount of fractional decimal digits to keep after rounding.
 	 * \return Self.
 	 */
-	HNumber& round( size_t significant_ );
+	HNumber& round( integer_t significant_ );
 	HNumber& floor( void );
 	HNumber& ceil( void );
 	HNumber& trunc( void );
@@ -224,27 +224,27 @@ public:
 	 *
 	 * \param newPrecision - new maximum precision of this HNumber.
 	 */
-	void set_precision( size_t precision );
-	size_t get_precision( void ) const;
+	void set_precision( integer_t precision );
+	integer_t get_precision( void ) const;
 	double long to_floating_point( void ) const;
 	int long long to_integer( void ) const;
 	HString to_string( void ) const;
 	bool is_exact( void ) const;
 private:
-	bool mutate_addition( i32_t*, size_t, i32_t const* const[], size_t*, size_t*, bool ) const;
-	size_t absolute_lower( HNumber const& ) const;
-	size_t karatsuba( HChunk&, i32_t const*, size_t, i32_t const*, size_t );
-	size_t integral_length( void ) const;
-	size_t fractional_length( void ) const;
-	size_t fractional_decimal_digits( void ) const;
+	bool mutate_addition( i32_t*, integer_t, i32_t const* const[], integer_t*, integer_t*, bool ) const;
+	integer_t absolute_lower( HNumber const& ) const;
+	integer_t karatsuba( HChunk&, i32_t const*, integer_t, i32_t const*, integer_t );
+	integer_t integral_length( void ) const;
+	integer_t fractional_length( void ) const;
+	integer_t fractional_decimal_digits( void ) const;
 	void from_string( HString const& );
 	void from_floating_point( double long );
 	void from_integer( int long long );
 	void from_unsigned_integer( int long long unsigned );
 	void multiply_by_leaf( i32_t );
-	i32_t multiply_by_leaf_low( i32_t*, size_t, i32_t );
-	void divide_by_leaf( i32_t, size_t );
-	void add_leaf_low( size_t, i32_t );
+	i32_t multiply_by_leaf_low( i32_t*, integer_t, i32_t );
+	void divide_by_leaf( i32_t, integer_t );
+	void add_leaf_low( integer_t, i32_t );
 	void normalize( bool );
 public:
 	struct ElementaryFunctions;
