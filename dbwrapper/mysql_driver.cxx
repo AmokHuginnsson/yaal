@@ -93,7 +93,7 @@ private:
 
 void* mysql_db_prepare_query( ODBLink&, char const* );
 void* mysql_query_execute( ODBLink&, void* );
-void mysql_query_free( ODBLink&, void* );
+void mysql_query_free( void* );
 
 M_EXPORT_SYMBOL void driver_init( void );
 M_EXPORT_SYMBOL void driver_init( void ) {
@@ -254,7 +254,7 @@ M_EXPORT_SYMBOL void* query_execute( ODBLink& dbLink_, void* data_ ) {
 	return ( mysql_query_execute( dbLink_, data_ ) );
 }
 
-void mysql_query_free( ODBLink&, void* data_ ) {
+void mysql_query_free( void* data_ ) {
 	OMySQLResult* pq( static_cast<OMySQLResult*>( data_ ) );
 	M_ASSERT( pq->_useCount > 0 );
 	-- pq->_useCount;
@@ -270,14 +270,14 @@ void mysql_query_free( ODBLink&, void* data_ ) {
 	return;
 }
 M_EXPORT_SYMBOL void query_free( ODBLink&, void* );
-M_EXPORT_SYMBOL void query_free( ODBLink& dbLink_, void* data_ ) {
-	mysql_query_free( dbLink_, data_ );
+M_EXPORT_SYMBOL void query_free( ODBLink&, void* data_ ) {
+	mysql_query_free( data_ );
 	return;
 }
 
 M_EXPORT_SYMBOL void rs_free_cursor( void* );
 M_EXPORT_SYMBOL void rs_free_cursor( void* data_ ) {
-	mysql_query_free( *static_cast<ODBLink*>( NULL ), data_ );
+	mysql_query_free( data_ );
 	return;
 }
 

@@ -411,7 +411,6 @@ void HNumber::from_string( HString const& number_ ) {
 	M_ENSURE( start < len ); /* exclude "!!-" */
 	M_ENSURE( number_.find_one_of( VALID_CHARACTERS + A_DOT, start ) == start ); /* exclude "--" and "-!!" */
 	size_t idx( static_cast<size_t>( number_.find_other_than( "0", start ) ) ); /* skip leading 0s */
-	size_t end( start + 1 );
 	_integralPartSize = 0;
 	_leafCount = 0;
 	if ( idx != HString::npos ) do /* "!!![-][.1-9]???" or "000." */ {
@@ -426,7 +425,7 @@ void HNumber::from_string( HString const& number_ ) {
 			break;
 		M_ENSURE( digit != HString::npos ); /* must have digit */
 		M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
-		end = static_cast<size_t>( number_.find_other_than( VALID_CHARACTERS + ( dot >= 0 ? A_ZERO : A_DOT ), dot >= 0 ? dot + 1 : start ) );
+		size_t end( static_cast<size_t>( number_.find_other_than( VALID_CHARACTERS + ( dot >= 0 ? A_ZERO : A_DOT ), dot >= 0 ? dot + 1 : start ) ) );
 		( end != HString::npos ) || ( end = len );
 		if ( dot != HString::npos ) {
 			idx = static_cast<size_t>( number_.reverse_find_other_than( "0", len - end ) );

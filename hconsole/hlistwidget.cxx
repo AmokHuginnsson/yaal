@@ -833,6 +833,7 @@ void HListWidget::recalculate_column_widths( void ) {
 	for ( int i( 0 ); i < columns; ++ i ) {
 		HColumnInfo* ci( _header[i].get() );
 		if ( ci->_width > 0 ) {
+			M_ASSERT( percentages > 0 );
 			ci->_widthRaw = ( ci->_width * ( _widthRaw - absolutes ) ) / percentages;
 			last = i;
 		} else if ( ci->_width < 0 ) {

@@ -94,7 +94,6 @@ void unescape( yaal::hcore::HString& string_, EscapeTable const& et_, char escap
 		int cacheSize( static_cast<int>( cache.get_size() ) );
 		if ( string_.get_length() > cacheSize ) {
 			cache.realloc( string_.get_length() );
-			cacheSize = static_cast<int>( cache.get_size() );
 		}
 		int pos( 0 );
 		char* ptr( cache.get<char>() );

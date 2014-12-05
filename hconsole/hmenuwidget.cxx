@@ -113,10 +113,9 @@ void HMenuWidget::set_data( HMenuWidget::data_ptr_t data_ ) {
 	M_PROLOG
 	_model = make_pointer<HAsIsValueTreeModel<OMenuItem> >( data_ );
 	menu_model_t::data_t::node_t node( NULL );
-	if ( ! _view.get_root() ) {
-		node = static_cast<menu_model_t*>( _model.get() )->get_data()->get_root();
-		on_model_changed();
-	}
+	_view.clear();
+	node = static_cast<menu_model_t*>( _model.get() )->get_data()->get_root();
+	on_model_changed();
 	if ( ! _selected && node->has_childs() ) {
 		_selected = &*_view.get_root()->begin();
 	}

@@ -27,6 +27,7 @@ Copyright:
 #include <cmath>
 #include <cstring>
 #include <cstdlib>
+#include <limits>
 #include <libintl.h>
 
 #include "hcore/base.hxx"
@@ -238,15 +239,17 @@ double long HExpression::functions( tree_t::const_node_t node_ ) {
 						( leftValue / PI ) ) )
 				throw HExpressionException( _( "ctg: argument not in domain" ) );
 			leftValue = ::std::tan( leftValue );
-			if ( leftValue == 0 )
-				retVal = 0;
+			if ( leftValue == 0 ) {
+				leftValue =  std::numeric_limits<double long>::epsilon();
+			}
 			retVal = 1. / leftValue;
 		}
 		break;
 		case ( FUNCTION::CTGH ): {
 			leftValue = ::std::tanh( leftValue );
-			if ( leftValue == 0 )
-				retVal = 0;
+			if ( leftValue == 0 ) {
+				leftValue = std::numeric_limits<double long>::epsilon();
+			}
 			retVal = 1. / leftValue;
 		}
 		break;

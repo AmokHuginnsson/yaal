@@ -187,21 +187,28 @@ HResourceInfo get_memory_size_info( void ) {
 		HTokenizer t( line, ":" );
 		HString tokens;
 		i64_t cachedMemory( 0 );
-		char const TAGS[][9] = { "MemFree", "MemTotal", "Cached" };
-		i64_t* vars[] = { &freeMemory, &totalMemory, &cachedMemory };
+		struct TagVar {
+			char const* _tag;
+			i64_t* _var;
+		};
+		TagVar tagVars[] = {
+			{ "MemFree", &freeMemory },
+			{ "MemTotal", &totalMemory },
+			{ "Cached", &cachedMemory }
+		};
 		int hit( 0 );
-		while ( ( hit < countof ( TAGS ) ) && ( meminfo.read_line( line ) > 0 ) ) {
+		while ( ( hit < countof ( tagVars ) ) && ( meminfo.read_line( line ) > 0 ) ) {
 			t.assign( line );
 			if ( t.begin() != t.end() ) {
 				tokens = *t.begin();
-				for ( int f( 0 ); f < countof ( TAGS ); ++ f ) {
-					if ( ! strcasecmp( tokens, TAGS[f] ) ) {
+				for ( TagVar const& tagVar : tagVars ) {
+					if ( ! strcasecmp( tokens, tagVar._tag ) ) {
 						HTokenizer::iterator it( t.begin() );
 						++ it;
 						if ( it != t.end() ) {
 							tokens = *it;
 							tokens.trim();
-							*(vars[f]) = lexical_cast<i64_t>( tokens ) * 1024;
+							*(tagVar._var) = lexical_cast<i64_t>( tokens ) * 1024;
 							++ hit;
 						}
 					}
