@@ -36,42 +36,29 @@ namespace yaal {
 
 namespace tools {
 
-/*! \brief Implementation of automatic exclusive access concept.
- */
-template<typename T>
-struct HExclusiveAccessorRef {
-	T _object;
-	yaal::hcore::external_lock_t _lock;
-	HExclusiveAccessorRef( yaal::hcore::external_lock_t lock_, T object_ )
-		: _object( object_ ), _lock( lock_ ) { }
-private:
-	HExclusiveAccessorRef( HExclusiveAccessorRef const& );
-};
-
 template<typename T>
 class HExclusiveAccessor {
 	T _object;
 	yaal::hcore::external_lock_t _lock;
 public:
 	HExclusiveAccessor( yaal::hcore::external_lock_t lock_, T object_ )
-		: _object( object_ ), _lock( lock_ ) { }
-	HExclusiveAccessor( HExclusiveAccessor& ea_ )
-		: _object( ea_._object ), _lock( ea_._lock ) { }
+		: _object( yaal::move( object_ ) ), _lock( yaal::move( lock_ ) ) {
+		return;
+	}
+	HExclusiveAccessor( HExclusiveAccessor&& ea_ )
+		: _object( yaal::move( ea_._object ) ), _lock( yaal::move( ea_._lock ) ) {
+		return;
+	}
 	template<typename real_t>
-	HExclusiveAccessor( HExclusiveAccessor<real_t>& ea_ )
-		: _object( ea_._object ), _lock( ea_._lock ) { }
-	HExclusiveAccessor( HExclusiveAccessorRef<T> ear_ )
-		: _object( ear_._object ), _lock( ear_._lock ) { }
+	HExclusiveAccessor( HExclusiveAccessor<real_t>&& ea_ )
+		: _object( yaal::move( ea_._object ) ), _lock( yaal::move( ea_._lock ) ) {
+		return;
+	}
 	HExclusiveAccessor& operator = ( HExclusiveAccessor& ea_ ) {
 		if ( &ea_ != this ) {
-			_object = ea_._object;
-			_lock = ea_._lock;
+			_object = yaal::move( ea_._object );
+			_lock = yaal::move( ea_._lock );
 		}
-		return ( *this );
-	}
-	HExclusiveAccessor& operator = ( HExclusiveAccessorRef<T> ea_ ) {
-		_object = ea_._object;
-		_lock = ea_._lock;
 		return ( *this );
 	}
 	T& operator->( void ) {
@@ -95,11 +82,9 @@ public:
 		HExclusiveAccessor<real_t> ea( _lock, _object );
 		return ( ea );
 	}
-	template<typename real_t>
-	operator HExclusiveAccessorRef<real_t>( void ) {
-		HExclusiveAccessorRef<real_t> ref( _lock, _object );
-		return ( ref );
-	}
+private:
+	HExclusiveAccessor( HExclusiveAccessor const& ) = delete;
+	HExclusiveAccessor& operator = ( HExclusiveAccessor const& ) = delete;
 };
 
 }
