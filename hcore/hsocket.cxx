@@ -1,7 +1,7 @@
 /*
 ---          `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hsocket.cxx - this file is integral part of `yaal' project.
+  hsocket.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -160,12 +160,14 @@ int HSocket::do_close( void ) {
 void HSocket::shutdown_client( int fileDescriptor_ ) {
 	M_PROLOG
 	ptr_t client;
-	if ( ! _clients )
+	if ( ! _clients ) {
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
+	}
 /* cppcheck-suppress nullPointer */
 	clients_t::iterator it( _clients->find( fileDescriptor_ ) );
-	if ( it == _clients->end() )
+	if ( it == _clients->end() ) {
 		M_THROW( _( "no such client" ), fileDescriptor_ );
+	}
 	M_ASSERT( !! it->second );
 	_clients->erase( fileDescriptor_ );
 	return;

@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hnumber.cxx - this file is integral part of `yaal' project.
+  hnumber.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -405,24 +405,27 @@ void HNumber::from_string( HString const& number_ ) {
 	M_ENSURE( start != HString::npos ); /* exclude "!!!!" */
 	char const* const src = number_.raw();
 	_negative = ( src[ start ] == VALID_CHARACTERS[ A_MINUS ] ); /* "!!!-???" */
-	if ( _negative )
+	if ( _negative ) {
 		++ start;
+	}
 	integer_t len( static_cast<integer_t>( number_.get_length() ) );
 	M_ENSURE( start < len ); /* exclude "!!-" */
 	M_ENSURE( number_.find_one_of( VALID_CHARACTERS + A_DOT, start ) == start ); /* exclude "--" and "-!!" */
 	integer_t idx( static_cast<integer_t>( number_.find_other_than( "0", start ) ) ); /* skip leading 0s */
 	_integralPartSize = 0;
 	_leafCount = 0;
-	if ( idx != HString::npos ) do /* "!!![-][.1-9]???" or "000." */ {
+	if ( idx != HString::npos ) do { /* "!!![-][.1-9]???" or "000." */
 		integer_t firstValid( start );
 		start = idx;
 		integer_t dot( static_cast<integer_t>( number_.find( VALID_CHARACTERS[ A_DOT ], start ) ) );
 		idx = static_cast<integer_t>( number_.find_other_than( VALID_CHARACTERS + A_DOT, start ) );
-		if ( ( idx != HString::npos ) && ( idx < dot ) ) /* "!!232.!!!" */
+		if ( ( idx != HString::npos ) && ( idx < dot ) ) { /* "!!232.!!!" */
 			dot = HString::npos;
+		}
 		integer_t digit( static_cast<integer_t>( number_.find_one_of( VALID_CHARACTERS + A_ZERO, start ) ) );
-		if ( ( digit == HString::npos ) && ( firstValid < start ) )
+		if ( ( digit == HString::npos ) && ( firstValid < start ) ) {
 			break;
+		}
 		M_ENSURE( digit != HString::npos ); /* must have digit */
 		M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
 		integer_t end( static_cast<integer_t>( number_.find_other_than( VALID_CHARACTERS + ( dot >= 0 ? A_ZERO : A_DOT ), dot >= 0 ? dot + 1 : start ) ) );
@@ -435,12 +438,13 @@ void HNumber::from_string( HString const& number_ ) {
 		_integralPartSize = ( dot != HString::npos ? ( ( dot - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : ( ( end - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST );
 		integer_t fractionalPart( dot != HString::npos ? ( ( end - ( dot + 1 ) ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : 0 );
 		_leafCount = _integralPartSize + fractionalPart;
-		if ( _leafCount > 0 )
+		if ( _leafCount > 0 ) {
 			_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
+		}
 		i32_t* dst( _canonical.get<i32_t>() );
 		i32_t leaf( 0 );
 		int digitInLeaf( 0 );
-		if ( dot != HString::npos ) /* scan fractional part */ {
+		if ( dot != HString::npos ) { /* scan fractional part */
 			idx = _integralPartSize;
 			for ( integer_t i( dot + 1 ); i < end; ++ i, ++ digitInLeaf ) {
 				M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
@@ -451,8 +455,9 @@ void HNumber::from_string( HString const& number_ ) {
 				}
 				leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] );
 			}
-			if ( idx < _leafCount )
+			if ( idx < _leafCount ) {
 				dst[idx] = leaf;
+			}
 		}
 		if ( _integralPartSize > 0 ) {
 			idx = _integralPartSize - 1;
@@ -468,16 +473,19 @@ void HNumber::from_string( HString const& number_ ) {
 				}
 				leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ digitInLeaf ] );
 			}
-			if ( idx >= 0 )
+			if ( idx >= 0 ) {
 				dst[idx] = leaf;
+			}
 		}
-		if ( dot == HString::npos )
+		if ( dot == HString::npos ) {
 			_integralPartSize = _leafCount;
-		else if ( ( end - dot - 1 ) >= _precision )
+		} else if ( ( end - dot - 1 ) >= _precision ) {
 			_precision = end - dot;
+		}
 	} while ( 0 );
-	if ( _leafCount == 0 )
+	if ( _leafCount == 0 ) {
 		_negative = false;
+	}
 	return;
 	M_EPILOG
 }
@@ -487,23 +495,28 @@ HString HNumber::to_string( void ) const {
 	i32_t const* const src( _canonical.get<i32_t>() );
 	_cache.realloc( _leafCount * DECIMAL_DIGITS_IN_LEAF_CONST + 3 ); /* + 1 for '.', + 1 for '-' and + 1 for terminating NIL */
 	char* ptr( _cache.get<char>() );
-	if ( _negative )
+	if ( _negative ) {
 		*ptr ++ = VALID_CHARACTERS[ A_MINUS ];
+	}
 	integer_t leaf( 0 );
-	for ( ; leaf < _integralPartSize; ++ leaf )
+	for ( ; leaf < _integralPartSize; ++ leaf ) {
 		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF_CONST + 1, leaf ? ZFORMAT : "%u", src[ leaf ] ); /* + 1 for terminating NIL */
+	}
 	if ( _leafCount > _integralPartSize ) {
-		if ( ! _integralPartSize )
+		if ( ! _integralPartSize ) {
 			*ptr ++ = VALID_CHARACTERS[ A_ZERO ];
+		}
 		*ptr ++ = VALID_CHARACTERS[ A_DOT ];
 	}
-	for ( ; leaf < _leafCount; ++ leaf )
+	for ( ; leaf < _leafCount; ++ leaf ) {
 		ptr += snprintf( ptr, DECIMAL_DIGITS_IN_LEAF_CONST + 1, ZFORMAT, src[ leaf ] );
-	if ( ! _leafCount )
+	}
+	if ( ! _leafCount ) {
 		*ptr ++ = '0';
-	else if ( _leafCount > _integralPartSize ) {
-		while ( *( ptr - 1 ) == '0' )
+	} else if ( _leafCount > _integralPartSize ) {
+		while ( *( ptr - 1 ) == '0' ) {
 			-- ptr;
+		}
 	}
 	*ptr = 0;
 	char const* s( _cache.get<char>() );
@@ -520,8 +533,9 @@ double long HNumber::to_floating_point( void ) const {
 
 int long long HNumber::to_integer( void ) const {
 	M_PROLOG
-	if ( _integralPartSize > 3 )
+	if ( _integralPartSize > 3 ) {
 		throw HNumberException( "integer overflow" );
+	}
 	int long long value( 0 );
 	if ( _integralPartSize > 0 ) {
 		i32_t const* data( _canonical.get<i32_t>() );
@@ -548,8 +562,9 @@ void HNumber::set_precision( integer_t precision_ ) {
 	if ( precision_ < HARDCODED_MINIMUM_PRECISION )
 		precision_ = HARDCODED_MINIMUM_PRECISION;
 	if ( ( precision_ < _precision ) || ( ( precision_ > _precision ) && is_exact() ) ) {
-		if ( precision_ < _precision )
-			round( precision_ );
+		if ( precision_ < _precision ) {
+			static_cast<void>( round( precision_ ) );
+		}
 		_precision = precision_;
 	}
 	return;
@@ -565,8 +580,9 @@ HNumber::integer_t HNumber::fractional_decimal_digits( void ) const {
 	if ( fractionalDecimalDigits > 0 ) {
 		i32_t lastLeaf( _canonical.get<i32_t>()[ _leafCount - 1 ] );
 		for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
-			if ( lastLeaf % DECIMAL_SHIFT[i] )
+			if ( lastLeaf % DECIMAL_SHIFT[i] ) {
 				break;
+			}
 			-- fractionalDecimalDigits;
 		}
 	}
@@ -590,13 +606,14 @@ HNumber::integer_t HNumber::absolute_lower( HNumber const& other ) const {
 	i32_t const* p1( _canonical.get<i32_t>() );
 	i32_t const* p2( other._canonical.get<i32_t>() );
 	integer_t cmp( 1 );
-	if ( _integralPartSize < other._integralPartSize )
+	if ( _integralPartSize < other._integralPartSize ) {
 		cmp = -1;
-	else if ( _integralPartSize == other._integralPartSize ) {
+	} else if ( _integralPartSize == other._integralPartSize ) {
 		integer_t len = min( _leafCount, other._leafCount );
 		cmp = leafcmp( p1, p2, len );
-		if ( ! cmp )
+		if ( ! cmp ) {
 			cmp = _leafCount - other._leafCount;
+		}
 	}
 	return ( cmp );
 	M_EPILOG
@@ -615,13 +632,14 @@ bool HNumber::operator != ( HNumber const& other ) const {
 
 bool HNumber::operator < ( HNumber const& other ) const {
 	bool lower = false;
-	if ( _negative && ! other._negative )
+	if ( _negative && ! other._negative ) {
 		lower = true;
-	else if ( ( _negative && other._negative ) || ( ! ( _negative || other._negative ) ) ) {
+	} else if ( ( _negative && other._negative ) || ( ! ( _negative || other._negative ) ) ) {
 		integer_t cmp = absolute_lower( other );
 		lower = cmp < 0;
-		if ( cmp && _negative && other._negative )
+		if ( cmp && _negative && other._negative ) {
 			lower = ! lower;
+		}
 	}
 	return ( lower );
 }
@@ -662,8 +680,9 @@ bool HNumber::mutate_addition( i32_t* res, integer_t ressize,
 			if ( x < e[ 1 ] ) {
 				x += LEAF;
 				carrier = 1;
-			} else
+			} else {
 				carrier = 0;
+			}
 			res[ idx ] = x - e[ 1 ];
 			-- idx;
 		}
@@ -674,8 +693,9 @@ bool HNumber::mutate_addition( i32_t* res, integer_t ressize,
 			if ( x >= LEAF ) {
 				x -= LEAF;
 				carrier = 1;
-			} else
+			} else {
 				carrier = 0;
+			}
 			res[ idx ] = x;
 			-- idx;
 		}
@@ -693,8 +713,9 @@ bool HNumber::mutate_addition( i32_t* res, integer_t ressize,
 			if ( x < epx[ 1 ][ idx ] ) {
 				x += LEAF;
 				carrier = 1;
-			} else
+			} else {
 				carrier = 0;
+			}
 			res[ idx ] = x - epx[ 1 ][ idx ];
 			-- idx;
 		}
@@ -704,8 +725,9 @@ bool HNumber::mutate_addition( i32_t* res, integer_t ressize,
 			if ( x >= LEAF ) {
 				x -= LEAF;
 				carrier = 1;
-			} else
+			} else {
 				carrier = 0;
+			}
 			res[ idx ] = x;
 			-- idx;
 		}
@@ -719,8 +741,9 @@ bool HNumber::mutate_addition( i32_t* res, integer_t ressize,
 			if ( x < e[ 1 ] ) {
 				x += LEAF;
 				carrier = 1;
-			} else
+			} else {
 				carrier = 0;
+			}
 			res[ idx ] = x - e[ 1 ];
 			-- idx;
 		}
@@ -731,14 +754,16 @@ bool HNumber::mutate_addition( i32_t* res, integer_t ressize,
 			if ( x >= LEAF ) {
 				x -= LEAF;
 				carrier = 1;
-			} else
+			} else {
 				carrier = 0;
+			}
 			res[ idx ] = x;
 			-- idx;
 		}
 	}
-	if ( carrier && ! sub )
+	if ( carrier && ! sub ) {
 		++ res[ 0 ];
+	}
 	return ( carrier ? true : false );
 }
 
@@ -756,10 +781,11 @@ HNumber& HNumber::operator += ( HNumber const& addend_ ) {
 	integer_t dps = max( fractional_length(), addend_.fractional_length() );
 	bool augendExact( is_exact() );
 	bool addendExact( addend_.is_exact() );
-	if ( fractional_length() < addend_.fractional_length() )
+	if ( fractional_length() < addend_.fractional_length() ) {
 		_precision = augendExact ? addend_._precision : _precision;
-	else
+	} else {
 		_precision = addendExact ? _precision : addend_._precision;
+	}
 	( dps <= _precision ) || ( dps = _precision );
 	integer_t ressize = ips + dps + 1; /* + 1 for possible carrier */
 	_cache.realloc( chunk_size<i32_t>( ressize ) );
@@ -805,12 +831,14 @@ HNumber HNumber::operator - ( HNumber const& subtrahend_ ) const {
 HNumber& HNumber::operator -= ( HNumber const& subtrahend_ ) {
 	M_PROLOG
 	_negative = ! _negative;
-	if ( ! _leafCount )
+	if ( ! _leafCount ) {
 		_negative = false;
+	}
 	operator += ( subtrahend_ );
 	_negative = ! _negative;
-	if ( ! _leafCount )
+	if ( ! _leafCount ) {
 		_negative = false;
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -863,8 +891,9 @@ i32_t HNumber::multiply_by_leaf_low( i32_t* data_, integer_t leafCount_, i32_t l
 		if ( x >= LEAF ) {
 			carrier = static_cast<i32_t>( x / LEAF );
 			x %= LEAF;
-		} else
+		} else {
 			carrier = 0;
+		}
 		data_[ i ] = static_cast<i32_t>( x );
 	}
 	return ( carrier );
@@ -876,8 +905,9 @@ void HNumber::multiply_by_leaf( i32_t leaf_ ) {
 	if ( _leafCount > 0 ) {
 		i32_t carrier( multiply_by_leaf_low( _canonical.get<i32_t>(), _leafCount, leaf_ ) );
 		i32_t* data( _canonical.get<i32_t>() );
-		while ( ( _leafCount > _integralPartSize ) && ! data[_leafCount - 1] )
+		while ( ( _leafCount > _integralPartSize ) && ! data[_leafCount - 1] ) {
 			-- _leafCount;
+		}
 		if ( carrier ) {
 			_canonical.realloc( chunk_size<i32_t>( _leafCount + 1 ) );
 			data = _canonical.get<i32_t>();
@@ -939,8 +969,9 @@ void HNumber::divide_by_leaf( i32_t leaf_, integer_t shift_ ) {
 
 HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 	M_PROLOG
-	if ( ! ( divisor_._leafCount > 0 ) )
+	if ( ! ( divisor_._leafCount > 0 ) ) {
 		throw HNumberException( "division by zero" );
+	}
 	if ( _leafCount ) {
 		/*
 		 * We use "long division" pen and paper algorithm
@@ -972,8 +1003,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 		} else {
 			i32_t const* divisorTest( divisor_._canonical.get<i32_t>() );
 			integer_t test( 0 );
-			while ( ! divisorTest[ test ] )
+			while ( ! divisorTest[ test ] ) {
 				++ test;
+			}
 			i32_t normalizator( LEAF / ( divisorTest[ test ] + 1 ) );
 			HNumber divisorCopy;
 			if ( normalizator != 1 ) {
@@ -986,8 +1018,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			i32_t const* divisor( normalizedDivisor._canonical.get<i32_t>() );
 			integer_t divisorLeafCount( normalizedDivisor._leafCount );
 			integer_t lshift( 0 );
-			while ( ! divisor[ lshift ] )
+			while ( ! divisor[ lshift ] ) {
 				++ lshift;
+			}
 			divisor += lshift;
 			divisorLeafCount -= lshift;
 			integer_t rshift( 0 );
@@ -1020,14 +1053,16 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				integer_t newPrecision( 0 );
 				bool dividendExact( is_exact() );
 				bool divisorExact( normalizedDivisor.is_exact() );
-				if ( dividendExact && divisorExact )
+				if ( dividendExact && divisorExact ) {
 					newPrecision = _precision + normalizedDivisor._precision;
-				else
+				} else {
 					_precision = newPrecision = min( _precision, normalizedDivisor._precision );
+				}
 				integer_t precision( ( newPrecision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
 				integer_t shift( 0 );
-				while ( ( shift < _leafCount ) && ! dividend[ shift ] )
+				while ( ( shift < _leafCount ) && ! dividend[ shift ] ) {
 					++ shift;
+				}
 				integer_t divSampleLen( min( _leafCount - shift, divisorLeafCount ) ); /* Index of the next leaf to process */
 				::memcpy( dividendSample, dividend + shift, static_cast<size_t>( chunk_size<i32_t>( divSampleLen ) ) );
 				integer_t dividendLeafNo( divSampleLen + shift );
@@ -1044,8 +1079,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					integralPart = 0;
 				}
 				++ integralPart;
-				while ( ! dividend[ _leafCount - 1 ] )
+				while ( ! dividend[ _leafCount - 1 ] ) {
 					-- _leafCount;
+				}
 				bool firstLeaf( true );
 				bool exact( false );
 				do {
@@ -1054,8 +1090,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					 * Fix possible underflow in dividendSample.
 					 */
 					shift = 0;
-					while ( ( shift < divSampleLen ) && ! dividendSample[ shift ] )
+					while ( ( shift < divSampleLen ) && ! dividendSample[ shift ] ) {
 						++ shift;
+					}
 					if ( shift > 0 ) {
 						divSampleLen -= shift;
 						if ( divSampleLen > 0 )
@@ -1073,8 +1110,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 							 */
 							if ( divSampleLen == 0 ) {
 								shift = 0;
-								while ( ( ( dividendLeafNo + shift ) < _leafCount ) && ! dividend[ dividendLeafNo + shift ] )
+								while ( ( ( dividendLeafNo + shift ) < _leafCount ) && ! dividend[ dividendLeafNo + shift ] ) {
 									++ shift;
+								}
 								dividendLeafNo += shift;
 							}
 							integer_t compensationLen( min( _leafCount - dividendLeafNo, divisorLeafCount - divSampleLen ) );
@@ -1102,7 +1140,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					 * then fetch next leaf from divident to dividendSample.
 					 */
 					bool extra( false );
-					if ( leafcmp( dividendSample, divisor, divSampleLen ) < 0 ) /* We establish that normalizedDivisor <= multiplierSample. */ {
+					if ( leafcmp( dividendSample, divisor, divSampleLen ) < 0 ) { /* We establish that normalizedDivisor <= multiplierSample. */
 						dividendSample[divSampleLen] = dividendLeafNo < _leafCount ? dividend[dividendLeafNo] : 0;
 						++ divSampleLen;
 						++ dividendLeafNo;
@@ -1145,9 +1183,9 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 						u1 = ( dividendSample[0] );
 						u2 = ( dividendSample[1] );
 					}
-					if ( u0 == v1 )
+					if ( u0 == v1 ) {
 						leaf = LEAF - 1;
-					else {
+					} else {
 						leaf = ( u0 * LEAF + u1 ) / v1;
 					}
 					if ( ( v2 * leaf ) > ( ( ( ( ( u0 * LEAF ) + u1 ) - leaf * v1 ) * LEAF ) + u2 ) ) {
@@ -1255,41 +1293,48 @@ void HNumber::normalize( bool updatePrecision_ ) {
 	M_PROLOG
 	i32_t* res( _canonical.get<i32_t>() );
 	integer_t shift( 0 );
-	while ( ( shift < _integralPartSize ) && ( res[ shift ] == 0 ) )
+	while ( ( shift < _integralPartSize ) && ( res[ shift ] == 0 ) ) {
 		++ shift;
+	}
 	if ( shift ) {
 		_integralPartSize -= shift;
 		_leafCount -= shift;
 		::memmove( res, res + shift, static_cast<size_t>( chunk_size<i32_t>( _leafCount ) ) );
 	}
-	while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) )
+	while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) ) {
 		-- _leafCount;
+	}
 	integer_t fractionalDecimalDigits( fractional_decimal_digits() );
-	if ( updatePrecision_ && ( fractionalDecimalDigits >= _precision ) )
+	if ( updatePrecision_ && ( fractionalDecimalDigits >= _precision ) ) {
 		_precision = fractionalDecimalDigits + 1;
+	}
 	integer_t leafPrecision( ( _precision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
 	if ( ( _leafCount > 0 ) && ( fractionalDecimalDigits > _precision ) && ( leafPrecision <= fractional_length() ) ) {
 		_leafCount -= ( fractional_length() - leafPrecision );
 		i32_t& lastLeaf( res[ _leafCount - 1 ] );
 		lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( _precision % DECIMAL_DIGITS_IN_LEAF_CONST ) ] );
 	}
-	while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) )
+	while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) ) {
 		-- _leafCount;
-	if ( ! _leafCount )
+	}
+	if ( ! _leafCount ) {
 		_negative = false;
+	}
 	return;
 	M_EPILOG
 }
 
 HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_t fxs, i32_t const* fy, integer_t fys ) {
 	integer_t shift( 0 );
-	while ( ( shift < fxs ) && ! fx[ shift ] )
+	while ( ( shift < fxs ) && ! fx[ shift ] ) {
 		++ shift;
+	}
 	integer_t fxrl( fxs - shift );
 	integer_t totalShift( shift );
 	shift = 0;
-	while ( ( shift < fys ) && ! fy[ shift ] )
+	while ( ( shift < fys ) && ! fy[ shift ] ) {
 		++ shift;
+	}
 	integer_t fyrl( fys - shift );
 	totalShift += shift;
 	integer_t leafCount( 0 );
@@ -1315,18 +1360,20 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 		/* hx = fx / B^m + fx % B^m */
 		integer_t missingIntegral[] = { 2 * m - fxs, 0 };
 		i32_t const* addends[] = { fx, fx + fxs - m };
-		if ( fxs > m )
+		if ( fxs > m ) {
 			mutate_addition( hx, m + 1, addends, missingIntegral, NULL, false );
-		else
+		} else {
 			::memcpy( hx + m + 1 - fxs, fx, static_cast<size_t>( chunk_size<i32_t>( fxs ) ) );
+		}
 		/* hy */
 		missingIntegral[ 0 ] = 2 * m - fys;
 		addends[ 0 ] = fy;
 		addends[ 1 ] = fy + fys - m;
-		if ( fys > m )
+		if ( fys > m ) {
 			mutate_addition( hy, m + 1, addends, missingIntegral, NULL, false );
-		else
+		} else {
 			::memcpy( hy + m + 1 - fys, fy, static_cast<size_t>( chunk_size<i32_t>( fys ) ) );
+		}
 		/* find Z */
 		HChunk Z;
 		integer_t Zs( karatsuba( Z, hx, m + 1, hy, m + 1 ) );
@@ -1337,8 +1384,9 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 		/* res = Z*B^m + r */
 		i32_t const* p( Z.get<i32_t>() );
 		shift = 0;
-		while ( ( shift < Zs ) && ! p[ shift ] )
+		while ( ( shift < Zs ) && ! p[ shift ] ) {
 			++ shift;
+		}
 		Zs -= shift;
 		p += shift;
 		addends[ 0 ] = r.get<i32_t>();
@@ -1348,8 +1396,9 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 		if ( addends[ 0 ] ) {
 			::memcpy( res + size - rs, r.raw(), static_cast<size_t>( chunk_size<i32_t>( rs ) ) );
 			mutate_addition( res + size - m - Zs - 1, Zs + 1, addends, missingIntegral, NULL, false );
-		} else
+		} else {
 			::memcpy( res + size - m - Zs, p, static_cast<size_t>( chunk_size<i32_t>( Zs ) ) );
+		}
 
 		/* res += r2m*B^2m */
 		Zs = r2ms;
@@ -1357,8 +1406,9 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 		p = r2m.get<i32_t>();
 		missingIntegral[ 0 ] = 0;
 		if ( p ) {
-			while ( ( shift < Zs ) && ! p[ shift ] )
+			while ( ( shift < Zs ) && ! p[ shift ] ) {
 				++ shift;
+			}
 			Zs -= shift;
 			p += shift;
 			addends[ 0 ] = res + 1 + shift;
@@ -1402,16 +1452,18 @@ HNumber::integer_t HNumber::karatsuba( HChunk& result, i32_t const* fx, integer_
 					if ( x >= LEAF ) {
 						carrier = static_cast<i32_t>( x / LEAF );
 						x %= LEAF;
-					} else
+					} else {
 						carrier = 0;
+					}
 					e[ pos ] = static_cast<i32_t>( x );
 				}
 				e[ 0 ] = carrier;
 				addends[ 0 ] = res + 1;
 				mutate_addition( res, fys + 1 + 1, addends, NULL, NULL, false );
 				-- res;
-			} else
+			} else {
 				-- res;
+			}
 		}
 	}
 	return ( leafCount );
@@ -1437,8 +1489,9 @@ HNumber& HNumber::round( integer_t significant_ ) {
 		/*
 		 * Trim total leaf count.
 		 */
-		if ( ( _integralPartSize + newFractionalLeafCount ) < _leafCount )
+		if ( ( _integralPartSize + newFractionalLeafCount ) < _leafCount ) {
 			_leafCount = _integralPartSize + newFractionalLeafCount;
+		}
 		M_ASSERT( newFractionalLeafCount == fractional_length() );
 		i32_t* data( _canonical.get<i32_t>() );
 
@@ -1518,8 +1571,9 @@ void HNumber::add_leaf_low( integer_t from_, i32_t leaf_ ) {
 		if ( x >= LEAF ) {
 			x -= LEAF;
 			carrier = 1;
-		} else
+		} else {
 			carrier = 0;
+		}
 		-- idx;
 	}
 	if ( carrier > 0 ) {
@@ -1542,15 +1596,17 @@ struct HNumber::ElementaryFunctions {
 		HNumber oldN;
 		HNumber::integer_t requiredPrecision( value_.get_precision() );
 		do {
-			if ( value_._negative )
+			if ( value_._negative ) {
 				throw HNumberException( "square root from negative" );
+			}
 			HString s( value_.to_string() );
 			integer_t digits( 0 );
 			bool aboveOne( value_ >= _one_ );
 			if ( aboveOne ) {
 				digits = static_cast<integer_t>( s.find( VALID_CHARACTERS[A_DOT] ) );
-				if ( digits == HString::npos )
+				if ( digits == HString::npos ) {
 					digits = static_cast<integer_t>( s.get_length() );
+				}
 			} else {
 				static int const SKIP_ZERO_DOT( 2 );
 				digits = static_cast<integer_t>( s.find_other_than( "0", SKIP_ZERO_DOT ) ); /* SKIP_ZERO_DOT - skip "0." at the beginning */
@@ -1561,10 +1617,11 @@ struct HNumber::ElementaryFunctions {
 				digits -= SKIP_ZERO_DOT;
 			}
 			bool odd( digits & 1l );
-			if ( odd )
+			if ( odd ) {
 				-- digits;
-			else if ( digits > 0 )
+			} else if ( digits > 0 ) {
 				digits -= 2;
+			}
 			digits >>= 1;
 			++ digits;
 			if ( aboveOne ) {
@@ -1591,16 +1648,18 @@ struct HNumber::ElementaryFunctions {
 				tmp /= n;
 				n += tmp;
 				n *= _half_;
-				if ( n.is_exact() && ( ( n * n ) == value_ ) )
+				if ( n.is_exact() && ( ( n * n ) == value_ ) ) {
 					break;
+				}
 				if ( n._integralPartSize == oldN._integralPartSize ) {
 					i32_t const* a( n._canonical.get<i32_t const>() );
 					i32_t const* b( oldN._canonical.get<i32_t const>() );
 					HNumber::integer_t d( 0 );
 					HNumber::integer_t SIZE( min( n._leafCount, oldN._leafCount ) );
 					for ( ; d < SIZE; ++ d ) {
-						if ( a[d] != b[d] )
+						if ( a[d] != b[d] ) {
 							break;
+						}
 					}
 					HNumber::integer_t sameFractionalLeafs( d - n._integralPartSize );
 					if ( sameFractionalLeafs > 0 ) {
@@ -1608,18 +1667,22 @@ struct HNumber::ElementaryFunctions {
 						if ( d < SIZE ) {
 							i32_t diff( yaal::abs( a[d] - b[d] ) );
 							for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
-								if ( ( diff % DECIMAL_SHIFT[DECIMAL_DIGITS_IN_LEAF_CONST - i] ) != diff )
+								if ( ( diff % DECIMAL_SHIFT[DECIMAL_DIGITS_IN_LEAF_CONST - i] ) != diff ) {
 									break;
+								}
 								++ newPrecision;
 							}
 						}
-						if ( newPrecision >= requiredPrecision )
+						if ( newPrecision >= requiredPrecision ) {
 							break;
+						}
 						newPrecision = ( newPrecision << 2 ) + ( DECIMAL_DIGITS_IN_LEAF_CONST << 1 ) - 1;
-						if ( newPrecision < HARDCODED_MINIMUM_PRECISION )
+						if ( newPrecision < HARDCODED_MINIMUM_PRECISION ) {
 							newPrecision = HARDCODED_MINIMUM_PRECISION;
-						if ( newPrecision > precision )
+						}
+						if ( newPrecision > precision ) {
 							precision = newPrecision;
+						}
 					}
 				}
 				oldN = n;

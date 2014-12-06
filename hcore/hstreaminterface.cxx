@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hstreaminterface.cxx - this file is integral part of `yaal' project.
+  hstreaminterface.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -395,7 +395,6 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 	int long iPoolSize( _cache.size() );
 	char* buffer( _cache.get<char>() ); /* read cache buffer */
 	bool byDelim( false );
-	bool bySize( false );
 	int setLen( static_cast<int>( ::strlen( set_ ) + 1 ) ); /* + 1 for terminating \0 byte that also could be searched for */
 	if ( _offset ) {
 		int cached( 0 );
@@ -434,7 +433,7 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 			 */
 		} while ( ( nRead > 0 ) /* We increment _offset only if read succeeded. */
 				&& ( ! ( byDelim = ( ::memchr( set_, buffer[ _offset ++ ], static_cast<size_t>( setLen ) ) ? isStopSet_ : ! isStopSet_ ) ) )
-				&& ( ! ( bySize = ( _offset >= maxCount_ ) ) ) );
+				&& ( ! ( _offset >= maxCount_ ) ) );
 		if ( nRead >= 0 ) {
 			if ( ! nRead ) {
 				_valid = false;

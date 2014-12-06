@@ -1,7 +1,7 @@
 /*
 ---           yaal 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	base64.cxx - this file is integral part of `yaal' project.
+  base64.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -177,8 +177,8 @@ void base64::encode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 	bool needEndl( false );
 	while ( ( size = in.read( buf, sizeof ( buf ) ) ) > 0 ) {
 		line = base64_raw_encode( buf, size, standardCompliantMode );
-		int long nRead( line.get_length() );
 		if ( wrap_ ) {
+			int long nRead( line.get_length() );
 			char const* ptr = line.raw();
 			while ( ( offset + nRead ) >= wrap_ ) {
 				int long nWrite( wrap_ - offset );

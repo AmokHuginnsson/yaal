@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	htime.cxx - this file is integral part of `yaal' project.
+  htime.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -126,7 +126,7 @@ HTime::HTime( TZ tz_, int year_, int month_, int day_,
 HTime::~HTime( void ) {
 	M_PROLOG
 	return;
-	M_EPILOG
+	M_DESTRUCTOR_EPILOG
 }
 
 HTime& HTime::set( i64_t time_ ) {
@@ -327,9 +327,10 @@ void HTime::swap( HTime& time_ ) {
 	if ( &time_ != this ) {
 		using yaal::swap;
 		swap( _value, time_._value );
+		swap( _broken, time_._broken );
+		swap( _tz, time_._tz );
 		swap( _format, time_._format );
 		swap( _cache, time_._cache );
-		swap( _broken, time_._broken );
 	}
 	return;
 	M_EPILOG

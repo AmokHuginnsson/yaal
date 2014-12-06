@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcore/algorithm.hxx - this file is integral part of `yaal' project.
+  hcore/algorithm.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -1468,18 +1468,20 @@ inline void make_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 		int long pos( i );
 		while ( pos < size ) {
 			int long left( ( pos * 2 ) + 1 );
-			int long right( ( pos * 2 ) + 2 );
 			if ( left < size ) {
+				int long right( ( pos * 2 ) + 2 );
 				int long child( right < size ? ( comp_( *( first_ + left ), *( first_ + right ) ) ? right : left ) : left );
 				iterator_t fp( first_ + pos );
 				iterator_t fc( first_ + child );
-				if ( comp_( *fp, *fc ) )
+				if ( comp_( *fp, *fc ) ) {
 					swap( *fp, *fc );
-				else
+				} else {
 					break;
+				}
 				pos = child;
-			} else
+			} else {
 				break;
+			}
 		}
 	}
 	return;
@@ -1537,18 +1539,20 @@ inline void pop_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 		int long pos( 0 );
 		while ( pos < size ) {
 			int long left( ( pos * 2 ) + 1 );
-			int long right( ( pos * 2 ) + 2 );
 			if ( left < size ) {
+				int long right( ( pos * 2 ) + 2 );
 				int long child( right < size ? ( comp_( *( first_ + left ), *( first_ + right ) ) ? right : left ) : left );
 				iterator_t fp( first_ + pos );
 				iterator_t fc( first_ + child );
-				if ( comp_( *fp, *fc ) )
+				if ( comp_( *fp, *fc ) ) {
 					swap( *fp, *fc );
-				else
+				} else {
 					break;
+				}
 				pos = child;
-			} else
+			} else {
 				break;
+			}
 		}
 	}
 	return;

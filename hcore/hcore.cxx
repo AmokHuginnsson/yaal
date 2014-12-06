@@ -6,9 +6,9 @@ char const COPYRIGHT [ ] =
 "\n"
 /* hcore.cxx - this file is integral part of `yaal' project.
  */
-"	i.  You may not make any changes in Copyright information.\n"
-"	ii. You must attach Copyright information to any part of every copy\n"
-"	    of this software.\n"
+"  i.  You may not make any changes in Copyright information.\n"
+"  ii. You must attach Copyright information to any part of every copy\n"
+"      of this software.\n"
 "\n"
 "Copyright:\n"
 "\n"
@@ -240,15 +240,11 @@ void ensure_limit( int resource_, char const* message_ ) {
 }
 
 HCoreInitDeinit::HCoreInitDeinit( void ) {
-/* cppcheck-suppress variableHidingTypedef */
-	STATIC_ASSERT( sizeof( int ) >= 4 );
-/* cppcheck-suppress variableHidingTypedef */
-	STATIC_ASSERT( sizeof( u8_t ) == 1 );
-/* cppcheck-suppress variableHidingTypedef */
-	STATIC_ASSERT( sizeof( u16_t ) == 2 );
-/* cppcheck-suppress variableHidingTypedef */
-	STATIC_ASSERT( sizeof( u32_t ) == 4 );
-	STATIC_ASSERT( sizeof( u64_t ) == 8 );
+	static_assert( sizeof( int ) >= 4, "insufficient size of `int' type" );
+	static_assert( sizeof( u8_t ) == 1, "bad size of `u8_t' type" );
+	static_assert( sizeof( u16_t ) == 2, "bad size of `u16_t' type" );
+	static_assert( sizeof( u32_t ) == 4, "bad size of `u32_t' type" );
+	static_assert( sizeof( u64_t ) == 8, "bad size of `u64_t' type" );
 	errno = 0;
 	if ( ! ( getuid() && geteuid() ) ) {
 		::perror( "running with super-user privileges - bailing out" );

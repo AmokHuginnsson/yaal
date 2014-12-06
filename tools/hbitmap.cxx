@@ -212,21 +212,24 @@ void HBitmap::fill( int long offset, int long amount, bool bit ) {
 	int long byteOffset = octets_for_bits( offset );
 	int long til = offset + amount;
 	int long byteAmount = ( octets_for_bits( offset + amount ) - byteOffset ) - ( ( offset & 7 ) ? 1 : 0 ) - ( ( til & 7 ) ? 1 : 0 );
-	u8_t filler( static_cast<u8_t>( bit ? 0xff : 0 ) );
 	u8_t* data( static_cast<u8_t*>( block() ) );
-	if ( byteAmount > 0 )
+	if ( byteAmount > 0 ) {
+		u8_t filler( static_cast<u8_t>( bit ? 0xff : 0 ) );
 		::memset( data + byteOffset, filler, static_cast<size_t>( byteAmount ) );
+	}
 	if ( offset & 7 ) {
-		if ( bit )
+		if ( bit ) {
 			data[ byteOffset - 1 ] = static_cast<u8_t>( data[ byteOffset - 1 ] | _maskBitKeepRight_[ ( offset & 7 ) - 1 ] );
-		else
+		} else {
 			data[ byteOffset - 1 ] = static_cast<u8_t>( data[ byteOffset - 1 ] & _maskBitKeepLeft_[ ( offset & 7 ) - 1 ] );
+		}
 	}
 	if ( til & 7 ) {
-		if ( bit )
+		if ( bit ) {
 			data[ byteOffset + byteAmount ] = static_cast<u8_t>( data[ byteOffset - 1 ] | _maskBitKeepLeft_[ ( til & 7 ) - 1 ] );
-		else
+		} else {
 			data[ byteOffset + byteOffset ] = static_cast<u8_t>( data[ byteOffset - 1 ] & _maskBitKeepRight_[ ( til & 7 ) - 1 ] );
+		}
 	}
 	return;
 	M_EPILOG
