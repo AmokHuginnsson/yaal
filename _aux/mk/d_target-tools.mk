@@ -72,7 +72,9 @@ CPPCHECK_CMD= cppcheck -D__ID__=\"\" -D__TID__=\"\" $(filter -D%,$(CXXFLAGS)) -D
 	$(shell awk '/$(HASH)undef /{printf "-U"$$3" "}' $(DIR_ROOT)/build/debug/config.hxx) \
 	$(shell echo | $(CXX) -xc++ -E -v - 2>&1 | grep -v '[\t ]-' | awk '/^ \//{printf "-I"$$1" "}') \
 	$(if $(SRC_TARGETS),$(if ${CPLUS_INCLUDE_PATH},-I$(subst :, -I,${CPLUS_INCLUDE_PATH}),),) \
-	--enable=all --inline-suppr --report-progress --verbose \
+	--enable=warning,style,performance,portability,information,missingInclude \
+	--suppressions-list=$(DIR_ROOT)/_aux/cppcheck.supp \
+	--inline-suppr --report-progress --verbose --error-exitcode=255 \
 	$(if $(CPPCHECK_JOBS),-j$(CPPCHECK_JOBS),) \
 	$(if $(CPPCHECK_TARGET),$(CPPCHECK_TARGET),$(if $(SRC_TARGETS),$(SRC_TARGETS),$(COMPONENTS))) 2>&1 | tee -a $(DIR_BUILD)/make.log
 
