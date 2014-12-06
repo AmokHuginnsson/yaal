@@ -506,7 +506,7 @@ HRule& HRule::operator %= ( HRuleBase const& rule_ ) {
 	HRecursiveRule* rr( dynamic_cast<HRecursiveRule*>( _rule.rule().raw() ) );
 	M_ENSURE( rr );
 	rr->set_rule( rule_.clone() );
-	HRuleAggregator( this );
+	HRuleAggregator rra( this );
 	_completelyDefined = true;
 	return ( *this );
 	M_EPILOG

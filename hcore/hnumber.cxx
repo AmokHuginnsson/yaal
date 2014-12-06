@@ -414,75 +414,77 @@ void HNumber::from_string( HString const& number_ ) {
 	integer_t idx( static_cast<integer_t>( number_.find_other_than( "0", start ) ) ); /* skip leading 0s */
 	_integralPartSize = 0;
 	_leafCount = 0;
-	if ( idx != HString::npos ) do { /* "!!![-][.1-9]???" or "000." */
-		integer_t firstValid( start );
-		start = idx;
-		integer_t dot( static_cast<integer_t>( number_.find( VALID_CHARACTERS[ A_DOT ], start ) ) );
-		idx = static_cast<integer_t>( number_.find_other_than( VALID_CHARACTERS + A_DOT, start ) );
-		if ( ( idx != HString::npos ) && ( idx < dot ) ) { /* "!!232.!!!" */
-			dot = HString::npos;
-		}
-		integer_t digit( static_cast<integer_t>( number_.find_one_of( VALID_CHARACTERS + A_ZERO, start ) ) );
-		if ( ( digit == HString::npos ) && ( firstValid < start ) ) {
-			break;
-		}
-		M_ENSURE( digit != HString::npos ); /* must have digit */
-		M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
-		integer_t end( static_cast<integer_t>( number_.find_other_than( VALID_CHARACTERS + ( dot >= 0 ? A_ZERO : A_DOT ), dot >= 0 ? dot + 1 : start ) ) );
-		( end != HString::npos ) || ( end = len );
-		if ( dot != HString::npos ) {
-			idx = static_cast<integer_t>( number_.reverse_find_other_than( "0", len - end ) );
-			end = ( idx != HString::npos ) ? len - idx : start + 1;
-		}
-		M_ASSERT( ( dot == HString::npos ) || ( ( end - dot ) > 0 ) );
-		_integralPartSize = ( dot != HString::npos ? ( ( dot - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : ( ( end - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST );
-		integer_t fractionalPart( dot != HString::npos ? ( ( end - ( dot + 1 ) ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : 0 );
-		_leafCount = _integralPartSize + fractionalPart;
-		if ( _leafCount > 0 ) {
-			_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
-		}
-		i32_t* dst( _canonical.get<i32_t>() );
-		i32_t leaf( 0 );
-		int digitInLeaf( 0 );
-		if ( dot != HString::npos ) { /* scan fractional part */
-			idx = _integralPartSize;
-			for ( integer_t i( dot + 1 ); i < end; ++ i, ++ digitInLeaf ) {
-				M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
-				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
-					dst[idx ++] = leaf;
-					digitInLeaf = 0;
-					leaf = 0;
+	if ( idx != HString::npos ) {
+		do { /* "!!![-][.1-9]???" or "000." */
+			integer_t firstValid( start );
+			start = idx;
+			integer_t dot( static_cast<integer_t>( number_.find( VALID_CHARACTERS[ A_DOT ], start ) ) );
+			idx = static_cast<integer_t>( number_.find_other_than( VALID_CHARACTERS + A_DOT, start ) );
+			if ( ( idx != HString::npos ) && ( idx < dot ) ) { /* "!!232.!!!" */
+				dot = HString::npos;
+			}
+			integer_t digit( static_cast<integer_t>( number_.find_one_of( VALID_CHARACTERS + A_ZERO, start ) ) );
+			if ( ( digit == HString::npos ) && ( firstValid < start ) ) {
+				break;
+			}
+			M_ENSURE( digit != HString::npos ); /* must have digit */
+			M_ENSURE( ( digit - start ) <= 1 ); /* exclude "-..!!" and "..!!" */
+			integer_t end( static_cast<integer_t>( number_.find_other_than( VALID_CHARACTERS + ( dot >= 0 ? A_ZERO : A_DOT ), dot >= 0 ? dot + 1 : start ) ) );
+			( end != HString::npos ) || ( end = len );
+			if ( dot != HString::npos ) {
+				idx = static_cast<integer_t>( number_.reverse_find_other_than( "0", len - end ) );
+				end = ( idx != HString::npos ) ? len - idx : start + 1;
+			}
+			M_ASSERT( ( dot == HString::npos ) || ( ( end - dot ) > 0 ) );
+			_integralPartSize = ( dot != HString::npos ? ( ( dot - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : ( ( end - start ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST );
+			integer_t fractionalPart( dot != HString::npos ? ( ( end - ( dot + 1 ) ) + ( DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) ) / DECIMAL_DIGITS_IN_LEAF_CONST : 0 );
+			_leafCount = _integralPartSize + fractionalPart;
+			if ( _leafCount > 0 ) {
+				_canonical.realloc( chunk_size<i32_t>( _leafCount ) );
+			}
+			i32_t* dst( _canonical.get<i32_t>() );
+			i32_t leaf( 0 );
+			int digitInLeaf( 0 );
+			if ( dot != HString::npos ) { /* scan fractional part */
+				idx = _integralPartSize;
+				for ( integer_t i( dot + 1 ); i < end; ++ i, ++ digitInLeaf ) {
+					M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
+					if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
+						dst[idx ++] = leaf;
+						digitInLeaf = 0;
+						leaf = 0;
+					}
+					leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] );
 				}
-				leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ ( DECIMAL_DIGITS_IN_LEAF_CONST - digitInLeaf ) - 1 ] );
-			}
-			if ( idx < _leafCount ) {
-				dst[idx] = leaf;
-			}
-		}
-		if ( _integralPartSize > 0 ) {
-			idx = _integralPartSize - 1;
-			leaf = 0;
-			digitInLeaf = 0;
-			for ( integer_t i( ( dot != HString::npos ? dot : end ) - 1 ); i >= start; -- i, ++ digitInLeaf ) {
-				M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
-				if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
-					M_ASSERT( idx >= 0 );
-					dst[idx --] = leaf;
-					digitInLeaf = 0;
-					leaf = 0;
+				if ( idx < _leafCount ) {
+					dst[idx] = leaf;
 				}
-				leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ digitInLeaf ] );
 			}
-			if ( idx >= 0 ) {
-				dst[idx] = leaf;
+			if ( _integralPartSize > 0 ) {
+				idx = _integralPartSize - 1;
+				leaf = 0;
+				digitInLeaf = 0;
+				for ( integer_t i( ( dot != HString::npos ? dot : end ) - 1 ); i >= start; -- i, ++ digitInLeaf ) {
+					M_ASSERT( src[ i ] >= VALID_CHARACTERS[ A_ZERO ] );
+					if ( digitInLeaf == DECIMAL_DIGITS_IN_LEAF_CONST ) {
+						M_ASSERT( idx >= 0 );
+						dst[idx --] = leaf;
+						digitInLeaf = 0;
+						leaf = 0;
+					}
+					leaf += ( ( src[ i ] - VALID_CHARACTERS[ A_ZERO ] ) * DECIMAL_SHIFT[ digitInLeaf ] );
+				}
+				if ( idx >= 0 ) {
+					dst[idx] = leaf;
+				}
 			}
-		}
-		if ( dot == HString::npos ) {
-			_integralPartSize = _leafCount;
-		} else if ( ( end - dot - 1 ) >= _precision ) {
-			_precision = end - dot;
-		}
-	} while ( 0 );
+			if ( dot == HString::npos ) {
+				_integralPartSize = _leafCount;
+			} else if ( ( end - dot - 1 ) >= _precision ) {
+				_precision = end - dot;
+			}
+		} while ( 0 );
+	}
 	if ( _leafCount == 0 ) {
 		_negative = false;
 	}
@@ -689,7 +691,7 @@ bool HNumber::mutate_addition( i32_t* res, integer_t ressize,
 	} else {
 		while ( off -- && ( idx > 0 ) ) {
 			e[ side ] = src[ idx ];
-		 	i32_t x( e[ 0 ] + e[ 1 ] + carrier );
+			i32_t x( e[ 0 ] + e[ 1 ] + carrier );
 			if ( x >= LEAF ) {
 				x -= LEAF;
 				carrier = 1;
@@ -934,7 +936,7 @@ void HNumber::divide_by_leaf( i32_t leaf_, integer_t shift_ ) {
 			_canonical.realloc( chunk_size<i32_t>( _leafCount - _integralPartSize ) );
 			data = _canonical.get<i32_t>();
 			::memmove( data - _integralPartSize, data, static_cast<size_t>( chunk_size<i32_t>( _leafCount ) ) );
-			::memset( data, 0, static_cast<size_t>( chunk_size<i32_t>( - _integralPartSize ) ) );
+			::memset( data, 0, static_cast<size_t>( chunk_size<i32_t>( -_integralPartSize ) ) );
 			_leafCount -= _integralPartSize;
 			_integralPartSize = 0;
 		} else if ( _integralPartSize > _leafCount ) {
