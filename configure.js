@@ -2,7 +2,7 @@
  *
  *  configure.js
  *
- *  Script file to setup and run cmake to create VS 2008 solution
+ *  Script file to setup and run cmake to create VS 2013 solution
  *  and projects for the yaal library.
  *
  ******************************************************************/
@@ -108,12 +108,8 @@ function boostInfo( install_path ) {
 
 function vcVersion() {
 	var versions = [
-		[ "Wow6432Node\\", "11.0", "Visual Studio 11" ],
-		[ "", "11.0", "Visual Studio 11" ],
-		[ "Wow6432Node\\", "9.0", "Visual Studio 9 2008" ],
-		[ "", "9.0", "Visual Studio 9 2008" ],
-		[ "Wow6432Node\\", "8.0", "Visual Studio 8 2005" ],
-		[ "", "8.0", "Visual Studio 8 2005" ]
+		[ "Wow6432Node\\", "12.0", "Visual Studio 12" ],
+		[ "", "12.0", "Visual Studio 12" ]
 	];
 	var version = "";
 	var keyPrefix = "HKEY_LOCAL_MACHINE\\SOFTWARE\\";
