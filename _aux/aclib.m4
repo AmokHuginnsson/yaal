@@ -157,7 +157,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -d [c:/windows] ; then
 		AC_DEFINE([__HOST_OS_TYPE_CYGWIN__], [], [Your operating system is Cygwin.])
 		EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -U__STRICT_ANSI__"]
-		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(*).\$(LIB_ARCHIVE_SUFFIX)"]
+		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(*)\$(LIB_INFIX).\$(LIB_ARCHIVE_SUFFIX)"]
 		HOST_OS_TYPE=[Cygwin]
 		LIB_PREFIX=["cyg"]
 		LIB_EXT=['"dll"']
@@ -168,6 +168,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_DEFINE_UNQUOTED([LIB_INFIX],"${LIB_INFIX}",[Target dependent library name infix.])
 	AC_DEFINE_UNQUOTED([LIB_EXT],${LIB_EXT},[Dynamic library file name extension used on this platform.])
 	AC_DEFINE_UNQUOTED([EXE_SUFFIX],${EXE_SUFFIX},[Suffix used for binary program executable on this platform.])
+	AC_SUBST([LIB_EXT],[${LIB_EXT}])
 
 	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
 		AC_MSG_ERROR([Cannot recognize host operating system type!])
