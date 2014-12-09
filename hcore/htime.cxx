@@ -230,9 +230,9 @@ int HTime::get_year( void ) const {
 	M_EPILOG
 }
 
-int HTime::get_month( void ) const {
+HTime::MONTH::month_t HTime::get_month( void ) const {
 	M_PROLOG
-	return ( _broken.tm_mon + 1 );
+	return ( static_cast<MONTH::month_t>( _broken.tm_mon + 1 ) );
 	M_EPILOG
 }
 
@@ -260,9 +260,9 @@ int HTime::get_second( void ) const {
 	M_EPILOG
 }
 
-int HTime::get_day_of_week( void ) const {
+HTime::DAY_OF_WEEK HTime::get_day_of_week( void ) const {
 	M_PROLOG
-	return ( ( _broken.tm_wday + DAYS_IN_WEEK - 1 ) % DAYS_IN_WEEK );
+	return ( static_cast<HTime::DAY_OF_WEEK>( ( _broken.tm_wday + DAYS_IN_WEEK - 1 ) % DAYS_IN_WEEK ) );
 	M_EPILOG
 }
 

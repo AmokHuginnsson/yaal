@@ -120,7 +120,7 @@ void HDateWidget::do_paint( void ) {
 int HDateWidget::get_first_day_of_month_in_week_index( void ) const {
 	M_PROLOG
 	HTime firstDayOfMonth( _time.get_year(), _time.get_month(), 1 );
-	return ( firstDayOfMonth.get_day_of_week() );
+	return ( static_cast<int>( firstDayOfMonth.get_day_of_week() ) );
 	M_EPILOG
 }
 

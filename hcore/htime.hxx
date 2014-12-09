@@ -58,6 +58,31 @@ public:
 		UTC,
 		LOCAL
 	};
+	struct MONTH {
+		enum month_t {
+			JANUARY = 1,
+			FEBRUARY,
+			MARCH,
+			APRIL,
+			MAY,
+			JUNE,
+			JULY,
+			AUGUST,
+			SEPTEMBER,
+			OCTOBER,
+			NOVEMBER,
+			DECEMBER
+		};
+	};
+	enum class DAY_OF_WEEK {
+		MONDAY = 0,
+		TUESDAY,
+		WEDNESDAY,
+		THURSDAY,
+		FRIDAY,
+		SATURDAY,
+		SUNDAY
+	};
 	static int const MONTHS_IN_YEAR = 12;
 	static int const DAYS_IN_WEEK = 7;
 	static int const HOURS_IN_DAY = 24;
@@ -100,12 +125,12 @@ public:
 	HTime& set_datetime( int, int = 1, int = 1, int = 0, int = 0, int = 0 );
 	HTime& from_string( yaal::hcore::HString const& );
 	int get_year( void ) const;
-	int get_month( void ) const;
+	MONTH::month_t get_month( void ) const;
 	int get_day( void ) const;
 	int get_hour( void ) const;
 	int get_minute( void ) const;
 	int get_second( void ) const;
-	int get_day_of_week( void ) const;
+	DAY_OF_WEEK get_day_of_week( void ) const;
 	int get_days_in_month( void ) const;
 	HTime& mod_year( int );
 	HTime& mod_month( int );
