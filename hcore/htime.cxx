@@ -104,6 +104,7 @@ HTime::HTime( TZ tz_, i64_t time_, char const* format_ )
 	M_PROLOG
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	mkgmtime( &_broken );
 	return;
 	M_EPILOG
 }
@@ -134,6 +135,7 @@ HTime& HTime::set( i64_t time_ ) {
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value = time_ ) ) );
 	/* In Visual Studio C++ localtime_r is a macro and cannot be prefixed with ::. */
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
 }
@@ -143,6 +145,7 @@ HTime& HTime::set_tz( TZ tz_ ) {
 	_tz = tz_;
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
 }
@@ -152,6 +155,7 @@ HTime& HTime::set_now( void ) {
 	time_t t( ::time( NULL ) );
 	_value = unix_epoch_to_yaal_epoch( t );
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
 }
@@ -176,6 +180,7 @@ HTime& HTime::set_time( int hour_, int minute_, int second_ ) {
 	_broken.tm_sec = second_;
 	_broken.tm_isdst = -1;
 	_value = unix_epoch_to_yaal_epoch( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) );
+	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
 }
@@ -191,6 +196,7 @@ HTime& HTime::set_date( int year_, int month_, int day_ ) {
 	_broken.tm_mday = day_;
 	_broken.tm_isdst = -1;
 	_value = unix_epoch_to_yaal_epoch( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) );
+	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
 }
@@ -220,6 +226,7 @@ HTime& HTime::from_string( yaal::hcore::HString const& str_ ) {
 	M_ENSURE( err );
 	_broken.tm_isdst = -1;
 	_value = unix_epoch_to_yaal_epoch( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) );
+	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
 }
@@ -276,6 +283,7 @@ HTime& HTime::mod_year( int mod_ ) {
 	_broken.tm_year += mod_;
 	_broken.tm_isdst = -1;
 	_value = unix_epoch_to_yaal_epoch( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) );
+	mkgmtime( &_broken );
 	return ( *this );
 }
 
@@ -291,6 +299,7 @@ HTime& HTime::mod_month( int mod_ ) {
 		++ _broken.tm_year;
 	}
 	_value = unix_epoch_to_yaal_epoch( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) );
+	mkgmtime( &_broken );
 	return ( *this );
 }
 
@@ -298,6 +307,7 @@ HTime& HTime::mod_day( int mod_ ) {
 	_value += ( mod_ * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE );
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	mkgmtime( &_broken );
 	return ( *this );
 }
 
@@ -305,6 +315,7 @@ HTime& HTime::mod_hour( int mod_ ) {
 	_value += ( mod_ * MINUTES_IN_HOUR * SECONDS_IN_MINUTE );
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	mkgmtime( &_broken );
 	return ( *this );
 }
 
@@ -312,6 +323,7 @@ HTime& HTime::mod_minute( int mod_ ) {
 	_value += ( mod_ * SECONDS_IN_MINUTE );
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	mkgmtime( &_broken );
 	return ( *this );
 }
 
@@ -319,6 +331,7 @@ HTime& HTime::mod_second( int mod_ ) {
 	_value += mod_;
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	mkgmtime( &_broken );
 	return ( *this );
 }
 
@@ -355,6 +368,7 @@ HTime& HTime::operator -= ( HTime const& time_ ) {
 	time_t t( static_cast<time_t>( _value ) );
 #endif
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
 }
@@ -372,6 +386,7 @@ HTime& HTime::operator += ( HTime const& time_ ) {
 	_value += time_._value;
 	time_t t( static_cast<time_t>( yaal_epoch_to_unix_epoch( _value ) ) );
 	M_ENSURE( ( _tz == TZ::UTC ? gmtime_r( &t, &_broken ) : localtime_r( &t, &_broken ) ) != NULL );
+	mkgmtime( &_broken );
 	return ( *this );
 	M_EPILOG
 }
@@ -493,6 +508,7 @@ HTime operator "" _yY ( int long long unsigned years_ ) {
 }
 
 i64_t mkgmtime( struct tm* tm_ ) {
+	static HTime::DAY_OF_WEEK const dayOfWeekOnFirstDayOfEpoch( HTime::DAY_OF_WEEK::SATURDAY );
 	int year( tm_->tm_year + 1900 );
 	bool leapYear( is_leap_year( year ) );
 	i64_t days( year * 365 + ( year / 4 ) - ( year / 100 ) + ( year / 400 ) + ( ! leapYear ? 1 : 0 ) );
@@ -501,6 +517,12 @@ i64_t mkgmtime( struct tm* tm_ ) {
 		++ days;
 	}
 	days += ( tm_->tm_mday - 1 );
+	/*
+	 * +1 because days of week in HTime::DAY_OF_WEEK are counted from 0 and week starts on MONDAY,
+	 * and in broken down time the `tm_wday' days of week are also counted from 0
+	 * but week starts on SUNDAY.
+	 */
+	tm_->tm_wday = static_cast<int>( ( static_cast<int>( dayOfWeekOnFirstDayOfEpoch ) + 1 + days ) % HTime::DAYS_IN_WEEK );
 	i64_t seconds( days * HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE );
 	seconds += ( tm_->tm_hour * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE );
 	seconds += ( tm_->tm_min * HTime::SECONDS_IN_MINUTE );

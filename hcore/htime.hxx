@@ -173,7 +173,14 @@ inline HTime now_local( void ) {
 	return ( HTime( HTime::TZ::LOCAL ) );
 }
 
-i64_t mkgmtime( struct tm* );
+/*! \brief Get number of seconds since Unix Epoch.
+ *
+ * Also fix day of week.
+ *
+ * \param tm_ - broken down time.
+ * \return Number of seconds since Unix Epoch.
+ */
+i64_t mkgmtime( struct tm* tm_ );
 
 inline void swap( yaal::hcore::HTime& a, yaal::hcore::HTime& b ) {
 	a.swap( b );
