@@ -223,6 +223,9 @@ HTime& HTime::from_string( yaal::hcore::HString const& str_ ) {
 	if ( ! err ) {
 		err = ::strptime( str_.c_str(), _iso8601TimeFormat_, &_broken );
 	}
+	if ( ! err ) {
+		err = ::strptime( str_.c_str(), _rfc2822DateTimeFormat_, &_broken );
+	}
 	M_ENSURE( err );
 	_broken.tm_isdst = -1;
 	_value = unix_epoch_to_yaal_epoch( _tz == TZ::UTC ? mkgmtime( &_broken ) : mktime( &_broken ) );
