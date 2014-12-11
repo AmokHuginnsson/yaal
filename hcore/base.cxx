@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	base.cxx - this file is integral part of `yaal' project.
+  base.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -47,10 +47,12 @@ template<>
 bool is_hexadecimal( HString const& str_ ) {
 	int long const len( str_.get_length() );
 	char const* str( str_.raw() );
-	if ( ( len >= 4 ) && ( str[ 0 ] == '-' ) ) /* -0x0 */
+	if ( ( len >= 4 ) && ( str[ 0 ] == '-' ) ) { /* -0x0 */
 		++ str;
-	if ( ( len >= 3 ) && ( str[ 0 ] == '0' ) ) /* 0x0 */
+	}
+	if ( ( len >= 3 ) && ( str[ 0 ] == '0' ) ) { /* 0x0 */
 		++ str;
+	}
 	return ( ( len >= 2 )
 			&& ( ( str[0] == 'x' ) || ( str[0] == 'X' ) )
 			&& ( ( ( str[1] >= '0' ) && ( str[1] <= '9' ) )
@@ -63,8 +65,9 @@ bool is_binary( HString const& str_ ) {
 	int long const len( str_.get_length() );
 	char const* str( str_.raw() );
 	int offset( 0 );
-	if ( ( len >= 3 ) && ( str[ 0 ] == '-' ) ) /* -0b */
+	if ( ( len >= 3 ) && ( str[ 0 ] == '-' ) ) { /* -0b */
 		++ offset;
+	}
 	int long binaryMark( str_.find_other_than( "01", offset ) );
 	return ( ( binaryMark > 0 ) && ( ( str[binaryMark] == 'b' ) || ( str[binaryMark] == 'B' ) ) );
 }
@@ -323,7 +326,7 @@ bool lexical_cast( char const* const& value_ ) {
 template<>
 bool lexical_cast( char* const& value_ ) {
 	M_PROLOG
-	return ( lexical_cast<bool,char const*>( value_ ) );
+	return ( lexical_cast<bool, char const*>( value_ ) );
 	M_EPILOG
 }
 

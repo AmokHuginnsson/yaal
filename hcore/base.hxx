@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	base.hxx - this file is integral part of `yaal' project.
+  base.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -105,10 +105,19 @@ class HScopedValueReplacement {
 	tType _orig;
 	tType& _value;
 public:
-	HScopedValueReplacement( tType& value_ ) : _orig( value_), _value( value_ ) {}
-	HScopedValueReplacement( tType& value_, tType const& tmp_ ) : _orig( value_), _value( value_ ) { _value = tmp_; }
-	~HScopedValueReplacement( void )
-		{ _value = _orig; }
+	HScopedValueReplacement( tType& value_ )
+		: _orig( value_ ), _value( value_ ) {
+		return;
+	}
+	HScopedValueReplacement( tType& value_, tType const& tmp_ )
+		: _orig( value_ ), _value( value_ ) {
+		_value = tmp_;
+		return;
+	}
+	~HScopedValueReplacement( void ) {
+		_value = _orig;
+		return;
+	}
 };
 
 /*! \brief Helper to find number of elements in C array.

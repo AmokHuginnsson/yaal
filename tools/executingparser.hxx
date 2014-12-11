@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	tools/executingparser.hxx - this file is integral part of `yaal' project.
+  tools/executingparser.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -98,19 +98,24 @@ private:
 	ptr_t _rule;
 public:
 	HNamedRule( void )
-		: _name(), _rule()
-		{	}
+		: _name(), _rule() {
+		return;
+	}
 	HNamedRule( ptr_t rule_ )
-		: _name(), _rule( rule_ )
-		{	}
+		: _name(), _rule( rule_ ) {
+		return;
+	}
 	HNamedRule( yaal::hcore::HString const&, ptr_t );
 	HNamedRule( HRuleBase const& );
-	bool operator ! ( void ) const
-		{ return ( ! _rule ); }
-	ptr_t const& operator->( void ) const
-		{ return ( _rule ); }
-	ptr_t& operator->( void )
-		{ return ( _rule ); }
+	bool operator ! ( void ) const {
+		return ( ! _rule );
+	}
+	ptr_t const& operator->( void ) const {
+		return ( _rule );
+	}
+	ptr_t& operator->( void ) {
+		return ( _rule );
+	}
 	HRuleBase const* id( void ) const;
 	yaal::hcore::HString const& name( void ) const;
 	ptr_t const& rule( void ) const;
@@ -131,8 +136,9 @@ protected:
 public:
 	HRuleBase( void );
 	HRuleBase( action_t const& );
-	virtual ~HRuleBase( void )
-		{}
+	virtual ~HRuleBase( void ) {
+		return;
+	}
 	ptr_t clone( void ) const;
 	bool is_optional( void ) const;
 	yaal::hcore::HString::const_iterator parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
@@ -305,8 +311,9 @@ private:
 	rules_t _rules;
 public:
 	HFollows( HFollows const& );
-	virtual ~HFollows( void )
-		{}
+	virtual ~HFollows( void ) {
+		return;
+	}
 	HFollows operator[]( action_t const& ) const;
 protected:
 	HFollows( rules_t const&, action_t const& );
@@ -343,8 +350,9 @@ public:
 protected:
 	HNamedRule _rule;
 public:
-	virtual ~HKleeneBase( void )
-		{}
+	virtual ~HKleeneBase( void ) {
+		return;
+	}
 protected:
 	HKleeneBase( void );
 	HKleeneBase( HRuleBase const& );
@@ -368,8 +376,9 @@ public:
 public:
 	HKleeneStar( HKleeneStar const& );
 	HKleeneStar operator[]( action_t const& ) const;
-	virtual ~HKleeneStar( void )
-		{}
+	virtual ~HKleeneStar( void ) {
+		return;
+	}
 protected:
 	HKleeneStar( HNamedRule const&, action_t const& );
 	virtual ptr_t do_clone( void ) const;
@@ -391,8 +400,9 @@ public:
 public:
 	HKleenePlus( HKleenePlus const& kleenePlus_ );
 	HKleenePlus operator[]( action_t const& ) const;
-	virtual ~HKleenePlus( void )
-		{}
+	virtual ~HKleenePlus( void ) {
+		return;
+	}
 protected:
 	HKleenePlus( HNamedRule const&, action_t const& );
 	virtual ptr_t do_clone( void ) const;
@@ -634,8 +644,9 @@ private:
 	action_char_t _actionChar;
 public:
 	HCharacter( HCharacter const& character_ );
-	virtual ~HCharacter( void )
-		{}
+	virtual ~HCharacter( void ) {
+		return;
+	}
 	HCharacter operator[]( action_t const& ) const;
 	HCharacter operator[]( action_char_t const& ) const;
 	HCharacter operator() ( yaal::hcore::HString const& ) const;
@@ -668,8 +679,8 @@ private:
 	action_string_t _actionString;
 public:
 	HString( HString const& );
-	virtual ~HString( void )
-		{}
+	virtual ~HString( void ) {
+	}
 	HString operator[]( action_t const& ) const;
 	HString operator[]( action_string_t const& ) const;
 	HString operator() ( yaal::hcore::HString const& ) const;
@@ -703,8 +714,9 @@ private:
 	action_string_t _actionString;
 public:
 	HRegex( HRegex const& );
-	virtual ~HRegex( void )
-		{}
+	virtual ~HRegex( void ) {
+		return;
+	}
 	HRegex operator[]( action_t const& ) const;
 	HRegex operator[]( action_string_t const& ) const;
 protected:

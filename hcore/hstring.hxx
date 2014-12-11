@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hstring.hxx - this file is integral part of `yaal' project.
+  hstring.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -53,14 +53,16 @@ public:
 	 *
 	 * \return Data in Character Class.
 	 */
-	char const* data( void ) const
-		{ return ( _data ); }
+	char const* data( void ) const {
+		return ( _data );
+	}
 	/*! \brief Get size of Character Class.
 	 *
 	 * \return Number of characters in Character Class.
 	 */
-	int size( void ) const
-		{ return ( _size ); }
+	int size( void ) const {
+		return ( _size );
+	}
 };
 
 extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const _whiteSpace_;
@@ -677,8 +679,9 @@ public:
 private:
 	friend class HString;
 	HCharRef( HString& string_, int long index_ )
-		: _string( string_ ), _index( index_ )
-		{}
+		: _string( string_ ), _index( index_ ) {
+		return;
+	}
 };
 
 class HString::HIterator {
@@ -686,11 +689,13 @@ class HString::HIterator {
 	int long _index;
 public:
 	HIterator( void )
-		: _owner( NULL ), _index( 0 )
-		{}
+		: _owner( NULL ), _index( 0 ) {
+		return;
+	}
 	HIterator( HIterator const& it_ )
-		: _owner( it_._owner ), _index( it_._index )
-		{}
+		: _owner( it_._owner ), _index( it_._index ) {
+		return;
+	}
 	HIterator& operator = ( HIterator const& it_ ) {
 		if ( &it_ != this ) {
 			_owner = it_._owner;
@@ -738,8 +743,9 @@ public:
 private:
 	friend class HString;
 	HIterator( HString* owner_, int long index_ )
-		: _owner( owner_ ), _index( index_ )
-		{}
+		: _owner( owner_ ), _index( index_ ) {
+		return;
+	}
 };
 
 HString operator "" _ys ( char const*, size_t );
