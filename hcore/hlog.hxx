@@ -42,7 +42,7 @@ namespace hcore {
 #	error Yaal redefines log_trace macro.
 #endif /* #ifdef log_trace */
 
-#define log_trace ( yaal::hcore::log << "Log: " << __FILE__ << " : " << __LINE__ << " : " << __PRETTY_FUNCTION__ << " : " )
+#define log_trace yaal::hcore::trace( PACKAGE_NAME, __FILE__, __LINE__, __PRETTY_FUNCTION__ )
 
 extern void* DEFAULT_LOG_STREAM;
 
@@ -111,6 +111,8 @@ private:
 
 typedef HExceptionT<HLog, HSynchronizedStreamException> HLogException;
 extern M_YAAL_HCORE_PUBLIC_API HLog& log;
+
+yaal::hcore::HStreamInterface& trace( char const*, char const*, int, char const* );
 
 }
 

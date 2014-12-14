@@ -307,6 +307,21 @@ bool HLog::do_is_valid( void ) const {
 	M_EPILOG
 }
 
+yaal::hcore::HStreamInterface& trace( char const* packageName_, char const* file_, int line_, char const* function_ ) {
+	M_PROLOG
+	char const* p( strstr( file_, packageName_ ) );
+	if ( p ) {
+		p += strlen( packageName_ );
+		if ( *p == '/' ) {
+			++ p;
+		}
+	} else {
+		p = file_;
+	}
+	return ( log << "trace: " << p << ":" << line_ << ": " << function_ << ": " );
+	M_EPILOG
+}
+
 }
 
 }
