@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hexception.hxx - this file is integral part of `yaal' project.
+  hexception.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -144,13 +144,15 @@ public:
 	typedef base_type_t base_type;
 	typedef HExceptionT<tType, base_type> this_type;
 	HExceptionT( HString const& reason_, int code_ = errno )
-		: base_type( NULL, 0, NULL, reason_ + ( _decodeErrno ? to_string( ": " ).append( error_message( code_ ) ) : "" ), code_, _name )
-		{ }
+		: base_type( NULL, 0, NULL, reason_ + ( _decodeErrno ? to_string( ": " ).append( error_message( code_ ) ) : "" ), code_, _name ) {
+		return;
+	}
 	HExceptionT( char const* fileName_,
 			int line_, char const* functionName_,
 			HString const& reason_, int const code_, HString const& name_ = _name )
-		: base_type( fileName_, line_, functionName_, reason_, code_, name_ )
-		{	}
+		: base_type( fileName_, line_, functionName_, reason_, code_, name_ ) {
+		return;
+	}
 	static bool decode_errno( void ) {
 		return ( _decodeErrno = true );
 	}
@@ -188,8 +190,9 @@ public:
 	HExceptionSafeGlobal( a0_t const& a0_ ) try : _object( a0_ ) {} catch ( ... ) { exception_handling_policy_t::handle_exception(); }
 	template<typename a0_t, typename a1_t>
 	HExceptionSafeGlobal( a0_t const& a0_, a1_t const& a1_ ) try : _object( a0_, a1_ ) {} catch ( ... ) { exception_handling_policy_t::handle_exception(); }
-	global_t& instance( void )
-		{ return ( _object ); }
+	global_t& instance( void ) {
+		return ( _object );
+	}
 };
 
 void kill_interior( char const* const = NULL );
