@@ -77,7 +77,7 @@ HSocket::HSocket( socket_type_t const& socketType_,
 				? HRawFile::TYPE::SSL_CLIENT : HRawFile::TYPE::DEFAULT ) ),
 	_needShutdown( false ), _type( socketType_ ),
 	_maximumNumberOfClients( maximumNumberOfClients_ ),
-	_addressSize( 0 ), _address( NULL ), _clients( NULL ),
+	_addressSize( 0 ), _address( NULL ), _clients(),
 	_hostName() {
 	M_PROLOG
 	if ( _type == TYPE::DEFAULT )
@@ -139,9 +139,8 @@ void HSocket::shutdown( void ) {
 int HSocket::do_close( void ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	if ( _clients ) {
-		M_SAFE( delete _clients );
-		_clients = NULL;
+	if ( !!_clients ) {
+		_clients.reset();
 		if ( ( !!( _type & TYPE::FILE ) ) && ( _address ) ) {
 			sockaddr_un* addressFile( static_cast<sockaddr_un*>( _address ) );
 			if ( addressFile->sun_path [ 0 ] )
@@ -178,7 +177,7 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	if ( _fileDescriptor < 0 )
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
-	if ( _clients )
+	if ( !!_clients )
 		M_THROW( _errMsgHSocket_[ ALREADY_LISTENING ], _fileDescriptor );
 	if ( _maximumNumberOfClients < 1 )
 		M_THROW( _( "bad maximum number of clients" ), _maximumNumberOfClients );
@@ -189,7 +188,7 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 	M_ENSURE_EX( ( ::bind( _fileDescriptor,
 				static_cast<sockaddr*>( _address ), static_cast<socklen_t>( _addressSize ) ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	M_ENSURE_EX( ( ::listen( _fileDescriptor, _maximumNumberOfClients ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
-	_clients = new ( memory::yaal ) clients_t( _maximumNumberOfClients );
+	_clients = make_resource<clients_t>( _maximumNumberOfClients );
 	_needShutdown = true;
 	return;
 	M_EPILOG
@@ -323,10 +322,9 @@ int HSocket::get_port( void ) const {
 
 HSocket::ptr_t HSocket::get_client( int fileDescriptor_ ) const {
 	M_PROLOG
-	ptr_t client;
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
-	clients_t::iterator it( _clients->find( fileDescriptor_ ) );
+	clients_t::const_iterator it( _clients->find( fileDescriptor_ ) );
 	if ( it == _clients->end() )
 		M_THROW( _( "no such client" ), fileDescriptor_ );
 	return ( it->second );
@@ -337,8 +335,7 @@ HSocket::iterator HSocket::begin( void ) const {
 	M_PROLOG
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
-	clients_t const* c = _clients;
-	return ( c->begin() );
+	return ( _clients->begin() );
 	M_EPILOG
 }
 
@@ -346,8 +343,7 @@ HSocket::iterator HSocket::end( void ) const {
 	M_PROLOG
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
-	clients_t const* c = _clients;
-	return ( c->end() );
+	return ( _clients->end() );
 	M_EPILOG
 }
 
@@ -355,8 +351,7 @@ HSocket::iterator HSocket::find( int socket_ ) const {
 	M_PROLOG
 	if ( ! _clients )
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
-	clients_t const* c = _clients;
-	return ( c->find( socket_ ) );
+	return ( _clients->find( socket_ ) );
 	M_EPILOG
 }
 

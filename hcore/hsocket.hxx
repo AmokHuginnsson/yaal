@@ -68,6 +68,7 @@ public:
 	};
 protected:
 	typedef HHashMap<int, ptr_t> clients_t;
+	typedef HResource<clients_t> clients_res_t;
 public:
 	typedef clients_t::const_iterator iterator;
 protected:
@@ -76,7 +77,7 @@ protected:
 	int _maximumNumberOfClients;
 	int _addressSize;
 	void* _address;
-	clients_t* _clients;
+	clients_res_t _clients;
 	HString _hostName;
 public:
 	HSocket( socket_type_t const& = TYPE::DEFAULT, int = 0 );
