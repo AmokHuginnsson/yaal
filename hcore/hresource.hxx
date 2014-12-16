@@ -257,7 +257,7 @@ private:
 
 template<typename tType, typename... arg_t>
 HResource<tType> make_resource( arg_t&&... arg_ ) {
-	return ( HResource<tType>( new tType( yaal::forward<arg_t>( arg_ )... ) ) );
+	return ( HResource<tType>( new ( memory::yaal ) tType( yaal::forward<arg_t>( arg_ )... ) ) );
 }
 
 template<typename type_t, typename free_t>

@@ -52,7 +52,7 @@ void HResource::load( void ) {
 	M_PROLOG
 	HXml::HConstNodeSet menuXml( _xml.get_elements_by_path( "/resource/menu" ) );
 	M_ENSURE( menuXml.get_size() == 1 );
-	HMenuWidget::data_ptr_t menu( new HMenuWidget::data_t );
+	HMenuWidget::data_ptr_t menu( new ( memory::yaal ) HMenuWidget::data_t );
 	build_sub_menu( menuXml[0], menu->create_new_root() );
 	_tui->main_window()->set_menu( menu );
 	return;

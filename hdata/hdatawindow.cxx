@@ -378,7 +378,7 @@ bool HDataWindowCreator::do_apply_resources( hconsole::HTUIProcess* tui_, window
 				HString table( xml::attr_val( dict, "table" ) );
 				HString idColumn( xml::attr_val( dict, "id_column" ) );
 				HString value( xml::attr_val( dict, "value_column" ) );
-				HDictionary::ptr_t d( new HDictionary( dp->data_base(), table, idColumn, value ) );
+				HDictionary::ptr_t d( new ( memory::yaal ) HDictionary( dp->data_base(), table, idColumn, value ) );
 				dw->add_dictionary( dictName, d );
 				d->load();
 			}
@@ -404,7 +404,7 @@ bool HDataWindowCreator::do_apply_resources( hconsole::HTUIProcess* tui_, window
 namespace {
 
 bool register_creator( void ) {
-	HWindowFactory::get_instance().register_window_creator( "datawindow", HWindowCreatorInterface::ptr_t( new HDataWindowCreator() ) );
+	HWindowFactory::get_instance().register_window_creator( "datawindow", HWindowCreatorInterface::ptr_t( new ( memory::yaal ) HDataWindowCreator() ) );
 	return ( true );
 }
 

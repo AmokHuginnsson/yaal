@@ -98,7 +98,7 @@ HStatusBarWidget* HWindow::init_bar( char const* label_ ) {
 
 HStatusBarWidget* HWindow::do_init_bar( char const* label_ ) {
 	M_PROLOG
-	return ( new HStatusBarWidget( this, label_ ) );
+	return ( new ( memory::yaal ) HStatusBarWidget( this, label_ ) );
 	M_EPILOG
 }
 
@@ -320,7 +320,7 @@ bool HWindowCreator::do_apply_resources( HTUIProcess*, window_ptr_t window, yaal
 namespace {
 
 bool register_creator( void ) {
-	HWindowFactory::get_instance().register_window_creator( "window", HWindowCreatorInterface::ptr_t( new HWindowCreator() ) );
+	HWindowFactory::get_instance().register_window_creator( "window", HWindowCreatorInterface::ptr_t( new ( memory::yaal ) HWindowCreator() ) );
 	return ( true );
 }
 

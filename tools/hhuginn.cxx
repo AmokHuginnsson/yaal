@@ -131,7 +131,7 @@ HHuginn::HHuginn( void )
 	_engine( executing_parser::huginn_grammar() ),
 	_sourceName(), _source(), _sourceSize( 0 ),
 	_preprocessedSource(), _preprocessedSourceSize( 0 ),
-	_arguments( new HList() ) {
+	_arguments( new ( memory::yaal ) HList() ) {
 }
 
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
@@ -450,7 +450,7 @@ HHuginn::HErrorCoordinate HHuginn::error_coordinate( void ) const {
 
 void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_PROLOG
-	_arguments->push_back( value_t( new HString( arg_ ) ) );
+	_arguments->push_back( value_t( new ( memory::yaal ) HString( arg_ ) ) );
 	return;
 	M_EPILOG
 }

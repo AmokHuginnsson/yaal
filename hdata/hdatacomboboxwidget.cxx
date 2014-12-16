@@ -154,7 +154,7 @@ HWidget::ptr_t HDataComboboxWidgetCreator::do_new_instance( HWindow* window_, ya
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
-	HDataComboboxWidget* list( new HDataComboboxWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	HDataComboboxWidget* list( new ( memory::yaal ) HDataComboboxWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( list->get_pointer(), node_ );
 	apply_role( window, list, node_ );
 	return ( list->get_pointer() );
@@ -182,7 +182,7 @@ namespace {
 
 bool register_creator( void ) {
 	HWidgetFactory::get_instance().register_widget_creator( "datacombobox",
-			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HDataComboboxWidgetCreator() ) ) );
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new ( memory::yaal ) HDataComboboxWidgetCreator() ) ) );
 	return ( true );
 }
 

@@ -1578,7 +1578,7 @@ HWidget::ptr_t HListWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
-	HWidget* list( new HListWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	HWidget* list( new ( memory::yaal ) HListWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( list->get_pointer(), node_ );
 	return ( list->get_pointer() );
 	M_EPILOG
@@ -1687,7 +1687,7 @@ namespace {
 
 bool register_creator( void ) {
 	HWidgetFactory::get_instance().register_widget_creator( "list",
-			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HListWidgetCreator() ) ) );
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new ( memory::yaal ) HListWidgetCreator() ) ) );
 	return ( true );
 }
 

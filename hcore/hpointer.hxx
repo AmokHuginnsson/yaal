@@ -223,7 +223,7 @@ public:
 	}
 	template<typename real_t>
 	explicit HPointer( real_t* const pointer_ )
-		: _shared( pointer_ ? new HShared<void (*)( tType* )>( &pointer_type::template delete_pointee<real_t>, pointer_ ) : NULL ), _object( pointer_ ) {
+		: _shared( pointer_ ? new ( memory::yaal ) HShared<void (*)( tType* )>( &pointer_type::template delete_pointee<real_t>, pointer_ ) : NULL ), _object( pointer_ ) {
 		M_ASSERT( pointer_ );
 		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
 		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
@@ -232,7 +232,7 @@ public:
 	}
 	template<typename real_t, typename deleter_t>
 	explicit HPointer( real_t* const pointer_,  deleter_t deleter_ )
-		: _shared( pointer_ ? new HShared<deleter_t>( deleter_, pointer_ ) : NULL ), _object( pointer_ ) {
+		: _shared( pointer_ ? new ( memory::yaal ) HShared<deleter_t>( deleter_, pointer_ ) : NULL ), _object( pointer_ ) {
 		M_ASSERT( pointer_ );
 		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
 		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;

@@ -262,7 +262,7 @@ HWidget::ptr_t HDataListWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
-	HDataListWidget* list( new HDataListWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	HDataListWidget* list( new ( memory::yaal ) HDataListWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( list->get_pointer(), node_ );
 	apply_role( window, list, node_ );
 	return ( list->get_pointer() );
@@ -305,7 +305,7 @@ HListWidget::HColumnInfo::ptr_t HDataListWidgetCreator::do_make_column(
 		dict = window->get_dictionary( *dictName );
 	}
 	return ( HListWidget::HColumnInfo::ptr_t(
-			new HDataListWidget::HDataColumnInfo( columnName, width, align, type, format_, associatedWidget, dict ) ) );
+			new ( memory::yaal ) HDataListWidget::HDataColumnInfo( columnName, width, align, type, format_, associatedWidget, dict ) ) );
 	M_EPILOG
 }
 
@@ -313,7 +313,7 @@ namespace {
 
 bool register_creator( void ) {
 	HWidgetFactory::get_instance().register_widget_creator( "datalist",
-			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HDataListWidgetCreator() ) ) );
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new ( memory::yaal ) HDataListWidgetCreator() ) ) );
 	return ( true );
 }
 

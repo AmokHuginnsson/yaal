@@ -71,7 +71,7 @@ HWidget::ptr_t HDataTreeWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
-	HDataTreeWidget* list( new HDataTreeWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	HDataTreeWidget* list( new ( memory::yaal ) HDataTreeWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( list->get_pointer(), node_ );
 	apply_role( window, list, node_ );
 	return ( list->get_pointer() );
@@ -82,7 +82,7 @@ namespace {
 
 bool register_creator( void ) {
 	HWidgetFactory::get_instance().register_widget_creator( "datatree",
-			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HDataTreeWidgetCreator() ) ) );
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new ( memory::yaal ) HDataTreeWidgetCreator() ) ) );
 	return ( true );
 }
 

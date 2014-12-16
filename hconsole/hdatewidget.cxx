@@ -318,7 +318,7 @@ HWidget::ptr_t HDateWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
-	HWidget* edit( new HDateWidget( window_, r._row, r._column, r._label, attrs ) );
+	HWidget* edit( new ( memory::yaal ) HDateWidget( window_, r._row, r._column, r._label, attrs ) );
 	apply_resources( edit->get_pointer(), node_ );
 	return ( edit->get_pointer() );
 	M_EPILOG
@@ -338,7 +338,7 @@ namespace {
 
 bool register_creator( void ) {
 	HWidgetFactory::get_instance().register_widget_creator( "date",
-			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HDateWidgetCreator() ) ) );
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new ( memory::yaal ) HDateWidgetCreator() ) ) );
 	return ( true );
 }
 

@@ -58,7 +58,7 @@ HWidget::ptr_t HDataDateWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
-	HDataDateWidget* list( new HDataDateWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	HDataDateWidget* list( new ( memory::yaal ) HDataDateWidget( window, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( list->get_pointer(), node_ );
 	apply_role( window, list, node_ );
 	return ( list->get_pointer() );
@@ -69,7 +69,7 @@ namespace {
 
 bool register_creator( void ) {
 	HWidgetFactory::get_instance().register_widget_creator( "datadate",
-			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HDataDateWidgetCreator() ) ) );
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new ( memory::yaal ) HDataDateWidgetCreator() ) ) );
 	return ( true );
 }
 

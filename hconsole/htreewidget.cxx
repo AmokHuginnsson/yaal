@@ -383,7 +383,7 @@ HWidget::ptr_t HTreeWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
-	HWidget* tree( new HTreeWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	HWidget* tree( new ( memory::yaal ) HTreeWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( tree->get_pointer(), node_ );
 	return ( tree->get_pointer() );
 	M_EPILOG
@@ -403,7 +403,7 @@ namespace {
 
 bool register_creator( void ) {
 	HWidgetFactory::get_instance().register_widget_creator( "tree",
-			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HTreeWidgetCreator() ) ) );
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new ( memory::yaal ) HTreeWidgetCreator() ) ) );
 	return ( true );
 }
 

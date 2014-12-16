@@ -58,7 +58,7 @@ HComboboxWidget::HComboboxWidget( HWindow* parent_,
 	M_PROLOG
 	attr_.apply( *this );
 	_readOnly = true;
-	add_column( -1, HColumnInfo::ptr_t( new HColumnInfo( "", 1, HWidget::BITS::ALIGN::LEFT, TYPE::HSTRING ) ) );
+	add_column( -1, HColumnInfo::ptr_t( new ( memory::yaal ) HColumnInfo( "", 1, HWidget::BITS::ALIGN::LEFT, TYPE::HSTRING ) ) );
 	HListWidget::set_flags(
 			HListWidget::FLAG::NONE,
 			HListWidget::FLAG::DRAW_HEADER
@@ -356,7 +356,7 @@ HWidget::ptr_t HComboboxWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
-	HWidget* combobox( new HComboboxWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	HWidget* combobox( new ( memory::yaal ) HComboboxWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( combobox->get_pointer(), node_ );
 	return ( combobox->get_pointer() );
 	M_EPILOG
@@ -402,7 +402,7 @@ namespace {
 
 bool register_creator( void ) {
 	HWidgetFactory::get_instance().register_widget_creator( "combobox",
-			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HComboboxWidgetCreator() ) ) );
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new ( memory::yaal ) HComboboxWidgetCreator() ) ) );
 	return ( true );
 }
 

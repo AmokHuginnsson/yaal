@@ -115,7 +115,7 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		M_ASSERT( ! tls::get( _key ) );
-		tls_holder_res_t res( new HTLSHolder( this, yaal::forward<arg_t>( arg_ )... ) );
+		tls_holder_res_t res( new ( memory::yaal ) HTLSHolder( this, yaal::forward<arg_t>( arg_ )... ) );
 		typename instances_t::insert_result ir( _instances.insert( res.get() ) );
 		tls::set( _key, res.get() );
 		M_ASSERT( res->get_owner() );

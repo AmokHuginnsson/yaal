@@ -725,7 +725,7 @@ HWidget::ptr_t HEditWidgetCreator::do_new_instance( HWindow* window_, yaal::tool
 	prepare_attributes( attrs, node_ );
 	OResource r( get_resource( node_ ) );
 	attrs.label_position( r._labelPosition ).label_decoration( r._labelDecoration );
-	HWidget* edit( new HEditWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
+	HWidget* edit( new ( memory::yaal ) HEditWidget( window_, r._row, r._column, r._height, r._width, r._label, attrs ) );
 	apply_resources( edit->get_pointer(), node_ );
 	return ( edit->get_pointer() );
 	M_EPILOG
@@ -770,7 +770,7 @@ namespace {
 
 bool register_creator( void ) {
 	HWidgetFactory::get_instance().register_widget_creator( "edit",
-			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new HEditWidgetCreator() ) ) );
+			HWidgetCreatorInterface::ptr_t( static_cast<HWidgetCreatorInterface*>( new ( memory::yaal ) HEditWidgetCreator() ) ) );
 	return ( true );
 }
 
