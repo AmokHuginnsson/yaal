@@ -72,6 +72,7 @@ public:
 	class HErrorCoordinate;
 private:
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::HFunction> functions_t;
+	typedef yaal::hcore::HMap<int, int> skips_t;
 	struct STATE {
 		typedef enum {
 			EMPTY,
@@ -89,6 +90,7 @@ private:
 	int _sourceSize;
 	yaal::hcore::HChunk _preprocessedSource;
 	int _preprocessedSourceSize;
+	skips_t _skips;
 	list_t _arguments;
 public:
 	HHuginn( void );

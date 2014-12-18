@@ -29,8 +29,6 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hhuginn.hxx"
 
-#include "hcore/system.hxx"
-
 using namespace yaal;
 using namespace yaal::hcore;
 
@@ -131,6 +129,7 @@ HHuginn::HHuginn( void )
 	_engine( executing_parser::huginn_grammar() ),
 	_sourceName(), _source(), _sourceSize( 0 ),
 	_preprocessedSource(), _preprocessedSourceSize( 0 ),
+	_skips(),
 	_arguments( new ( memory::yaal ) HList() ) {
 }
 
@@ -239,6 +238,9 @@ public:
 	value_type const& operator * ( void ) const {
 		M_ASSERT( _owner );
 		return ( *_cur );
+	}
+	yaal::hcore::HString::const_iterator raw( void ) const {
+		return ( _cur );
 	}
 private:
 	HIterator( HPrepocessor const* owner_, yaal::hcore::HString::const_iterator pos_ )
@@ -401,8 +403,18 @@ void HHuginn::preprocess( void ) {
 	_preprocessedSource.realloc( _sourceSize );
 	HPrepocessor pp( _source.get<char>(), _source.get<char>() + _sourceSize );
 	char* dst( _preprocessedSource.get<char>() );
-	for ( HPrepocessor::HIterator it( pp.begin() ), end( pp.end() ); it != end; ++ it, ++ dst )
+	_skips[0] = 0;
+	int pos( -1 );
+	int skipsTotal( 0 );
+	for ( HPrepocessor::HIterator it( pp.begin() ), end( pp.end() ); it != end; ++ it, ++ dst ) {
+		int newPos( static_cast<int>( it.raw() - _source.get<char>() ) );
+		if ( newPos > ( pos + 1 ) ) {
+			skipsTotal += ( newPos - ( pos + 1 ) );
+			_skips[static_cast<int>( dst - _preprocessedSource.get<char>() )] = skipsTotal;
+		}
+		pos = newPos;
 		*dst = *it;
+	}
 	_preprocessedSourceSize = static_cast<int>( dst - _preprocessedSource.get<char>() );
 	_state = STATE::PREPROCESSED;
 	return;
@@ -435,7 +447,11 @@ void HHuginn::execute( void ) {
 
 int HHuginn::error_position( void ) const {
 	M_PROLOG
-	int errorPosition( _engine.error_position() );
+	int preprocessedErrorPosition( _engine.error_position() );
+	skips_t::const_iterator it( _skips.upper_bound( preprocessedErrorPosition ) );
+	-- it;
+	M_ENSURE( it != _skips.end() );
+	int errorPosition( it->second + preprocessedErrorPosition );
 	return ( errorPosition );
 	M_EPILOG
 }
