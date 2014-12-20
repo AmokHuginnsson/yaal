@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cstring>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -124,6 +126,10 @@ HRule huginn_grammar( void ) {
 
 }
 
+namespace {
+static char const NEWLINE = '\n';
+}
+
 HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY ), _functions(),
 	_engine( executing_parser::huginn_grammar() ),
@@ -177,7 +183,6 @@ private:
 	static char const COMMENT_START_CHAR2ALT = '/';
 	static char const COMMENT_STOP_CHAR1 = '*';
 	static char const COMMENT_STOP_CHAR2 = '/';
-	static char const NEWLINE = '\n';
 	static char const ESCAPE = '\\';
 	static char const DOUBLE_QUOTE = '"';
 	static char const SINGLE_QUOTE = '\'';
@@ -458,8 +463,19 @@ int HHuginn::error_position( void ) const {
 
 HHuginn::HErrorCoordinate HHuginn::error_coordinate( void ) const {
 	M_PROLOG
-	int line( 0 );
-	int column( 0 );
+	int position( error_position() );
+	char const* src( _source.get<char>() );
+	/* +1 because we count lines starting from 1 (not starting from 0) */
+	int line( static_cast<int>( count( src, src + position, NEWLINE ) ) + 1 );
+	int lastNewlinePosition( 0 );
+	if ( line > 1 ) {
+		char const* nl( static_cast<char const*>( ::memrchr( src, NEWLINE, position ) ) );
+		M_ASSERT( nl );
+		int nlPos( static_cast<int>( nl - src ) );
+		++ nlPos;
+		lastNewlinePosition = nlPos;
+	}
+	int column( ( position - lastNewlinePosition ) + 1 );
 	return ( HErrorCoordinate( line, column ) );
 	M_EPILOG
 }
