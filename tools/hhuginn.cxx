@@ -469,7 +469,7 @@ HHuginn::HErrorCoordinate HHuginn::error_coordinate( void ) const {
 	int line( static_cast<int>( count( src, src + position, NEWLINE ) ) + 1 );
 	int lastNewlinePosition( 0 );
 	if ( line > 1 ) {
-		char const* nl( static_cast<char const*>( ::memrchr( src, NEWLINE, position ) ) );
+		char const* nl( static_cast<char const*>( ::memrchr( src, NEWLINE, static_cast<size_t>( position ) ) ) );
 		M_ASSERT( nl );
 		int nlPos( static_cast<int>( nl - src ) );
 		++ nlPos;
