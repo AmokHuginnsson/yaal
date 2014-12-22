@@ -123,8 +123,8 @@ public:
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& );
 	int error_position( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;
-private:
 	executing_parser::HRule make_engine( void );
+private:
 };
 
 class HHuginn::HErrorCoordinate {

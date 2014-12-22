@@ -451,17 +451,40 @@ HNamedRule::ptr_t& HNamedRule::rule( void ) {
 	M_EPILOG
 }
 
+/*
+ * Rule definition may be inlined in grammar description or have independent definition stanza,
+ * e.g.:
+ *
+ * inlined:
+ * R = '{' >> ( real >> *( ',' >> real ) ) >> '}'
+ *
+ * or
+ *
+ * independent definition stanza:
+ * R = '{' >> S >> '}'
+ * S = real >> *( ',' >> real )
+ *
+ * Which of those two forms are used depends on two factors:
+ * 1. does given rule have a name?
+ * 2. was given rule referenced more than once?
+ *
+ * If any of above conditions are met the second form is used,
+ * meaning, if rule have a name or was referenced more than once
+ * then independent definition stanza is used.
+ */
 void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
 	M_ASSERT( !! _rule );
 	rule_use_t::const_iterator it( ru_.find( _rule.get() ) );
 	HRuleRef const* rr( dynamic_cast<HRuleRef const*>( &*_rule ) );
 	if ( ( ( it != ru_.end() ) && ( it->second > 1 ) ) || ( ! _name.is_empty() ) || rr ) {
-		if ( ! rr )
+		if ( ! rr ) {
 			rd_.add( this );
+		}
 		rd_.desc( rd_.make_name( *this ) );
-	} else
+	} else {
 		_rule->describe( rd_, ru_ );
+	}
 	return;
 	M_EPILOG
 }
