@@ -207,6 +207,7 @@ public:
 	HRule( HRuleBase const& );
 	HRule( ptr_t const& );
 	HRule( yaal::hcore::HString const&, HRuleBase const& );
+	HRule( yaal::hcore::HString const&, HRuleBase const&, action_t const& );
 	HRule( yaal::hcore::HString const&, ptr_t const& );
 	virtual ~HRule( void );
 	HRule operator[]( action_t const& ) const;

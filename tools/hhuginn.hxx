@@ -113,6 +113,9 @@ public:
 	/*! \brief Execute compiled program.
 	 */
 	void execute( void );
+	/*! \brief Dump Huginn Virtual Machine state.
+	 */
+	void dump_vm_state( yaal::hcore::HStreamInterface& );
 	void create_function( void );
 	void add_argument( yaal::hcore::HString const& );
 	void call( yaal::hcore::HString const& );
@@ -121,6 +124,7 @@ public:
 	int error_position( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;
 private:
+	executing_parser::HRule make_engine( void );
 };
 
 class HHuginn::HErrorCoordinate {

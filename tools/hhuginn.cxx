@@ -38,7 +38,9 @@ namespace yaal {
 
 namespace tools {
 
-namespace executing_parser {
+namespace {
+static char const NEWLINE = '\n';
+}
 
 #if 0
 /*
@@ -57,9 +59,9 @@ main( args ) {
 
 #endif
 
-HRule huginn_grammar( void );
-HRule huginn_grammar( void ) {
+executing_parser::HRule HHuginn::make_engine( void ) {
 	M_PROLOG
+	using namespace executing_parser;
 	HRule name( "name", regex( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" ) );
 	HRule expression( "expression" );
 	HRule absoluteValue( "absoluteValue", '|' >> expression >> '|' );
@@ -118,21 +120,15 @@ HRule huginn_grammar( void ) {
 	scope %= ( '{' >> *statement >> '}' );
 	loopScope %= ( '{' >> *loopStatement >> '}' );
 	HRule nameList( "nameList", name >> ( * ( ',' >> name ) ) );
-	HRule functionDefinition( "functionDefinition", name >> '(' >> -nameList >> ')' >> scope );
+	HRule functionDefinition( "functionDefinition", name >> '(' >> -nameList >> ')' >> scope, hcore::call( &HHuginn::create_function, this ) );
 	HRule huginnGrammar( "huginnGrammar", + functionDefinition );
 	return ( huginnGrammar );
 	M_EPILOG
 }
 
-}
-
-namespace {
-static char const NEWLINE = '\n';
-}
-
 HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY ), _functions(),
-	_engine( executing_parser::huginn_grammar() ),
+	_engine( make_engine() ),
 	_sourceName(), _source(), _sourceSize( 0 ),
 	_preprocessedSource(), _preprocessedSourceSize( 0 ),
 	_skips(),
@@ -509,6 +505,21 @@ void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ )
 		M_ENSURE( nWritten >= 0 );
 		totalWritten += nWritten;
 	} while ( totalWritten < _preprocessedSourceSize );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
+	M_PROLOG
+	for ( functions_t::value_type const& f : _functions ) {
+		stream_ << f.first << endl;
+	}
+	return;
+	M_EPILOG
+}
+
+void HHuginn::create_function( void ) {
+	M_PROLOG
 	return;
 	M_EPILOG
 }

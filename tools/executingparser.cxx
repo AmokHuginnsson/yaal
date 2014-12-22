@@ -490,6 +490,10 @@ HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_ )
 	: HRuleBase(), _rule( name_, rule_.clone() ), _completelyDefined( true ) {
 }
 
+HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_, action_t const& action_ )
+	: HRuleBase( action_ ), _rule( name_, rule_.clone() ), _completelyDefined( true ) {
+}
+
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_ )
 	: _rule( name_, rule_ ), _completelyDefined( true ) {
 }
