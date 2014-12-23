@@ -30,6 +30,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hhuginn.hxx"
+#include "streamtools.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -149,6 +150,7 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
 		_sourceSize += nRead;
 		++ block;
 	} while ( nRead == PAGE_SIZE );
+	_sourceName = get_stream_id( &stream_ );
 	_state = STATE::LOADED;
 	return;
 	M_EPILOG
@@ -474,6 +476,25 @@ HHuginn::HErrorCoordinate HHuginn::error_coordinate( void ) const {
 	int column( ( position - lastNewlinePosition ) + 1 );
 	return ( HErrorCoordinate( line, column ) );
 	M_EPILOG
+}
+
+yaal::hcore::HString HHuginn::error_message( void ) const {
+	M_PROLOG
+	hcore::HString message( _sourceName );
+	HErrorCoordinate coord( error_coordinate() );
+	HExecutingParser::messages_t const& m( _engine.error_messages() );
+	if ( ! m.is_empty() ) {
+	message.append( ':' ).append( coord.line() ).append( ':' ).append( coord.column() )
+		.append( ": " ).append( m[0] );
+	} else {
+		message.append( ": no error" );
+	}
+	return ( message );
+	M_EPILOG
+}
+
+char const* HHuginn::error_message( int code_ ) const {
+	return ( ::error_message( code_ ) );
 }
 
 void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
