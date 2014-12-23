@@ -71,8 +71,28 @@ public:
 	typedef yaal::hcore::HPointer<HBooleanExpression> boolean_expression_t;
 	class HErrorCoordinate;
 private:
+	class HSource {
+		typedef HSource this_type;
+		typedef yaal::hcore::HMap<int, int> skips_t;
+		yaal::hcore::HString _name;
+		yaal::hcore::HChunk _orig;
+		int _origSize;
+		yaal::hcore::HChunk _preprocessed;
+		int _preprocessedSize;
+		skips_t _skips;
+	public:
+		HSource( void );
+		void load( yaal::hcore::HStreamInterface& );
+		void preprocess( void );
+		char const* error_message( int ) const;
+		int error_position( int ) const;
+		HHuginn::HErrorCoordinate error_coordinate( int ) const;
+		yaal::hcore::HString const& name( void ) const;
+		yaal::hcore::HString::const_iterator begin( void ) const;
+		yaal::hcore::HString::const_iterator end( void ) const;
+		void dump_preprocessed( yaal::hcore::HStreamInterface& ) const;
+	};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::HFunction> functions_t;
-	typedef yaal::hcore::HMap<int, int> skips_t;
 	struct STATE {
 		typedef enum {
 			EMPTY,
@@ -85,12 +105,7 @@ private:
 	STATE::state_t _state;
 	functions_t _functions;
 	HExecutingParser _engine;
-	yaal::hcore::HString _sourceName;
-	yaal::hcore::HChunk _source;
-	int _sourceSize;
-	yaal::hcore::HChunk _preprocessedSource;
-	int _preprocessedSourceSize;
-	skips_t _skips;
+	HSource _source;
 	list_t _arguments;
 public:
 	HHuginn( void );
