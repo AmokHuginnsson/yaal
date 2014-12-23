@@ -475,15 +475,20 @@ HNamedRule::ptr_t& HNamedRule::rule( void ) {
 void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
 	M_ASSERT( !! _rule );
-	rule_use_t::const_iterator it( ru_.find( _rule.get() ) );
-	HRuleRef const* rr( dynamic_cast<HRuleRef const*>( &*_rule ) );
-	if ( ( ( it != ru_.end() ) && ( it->second > 1 ) ) || ( ! _name.is_empty() ) || rr ) {
-		if ( ! rr ) {
-			rd_.add( this );
-		}
-		rd_.desc( rd_.make_name( *this ) );
+	HRule const* r( dynamic_cast<HRule const*>( &*_rule ) );
+	if ( r && ! _name.is_empty() && ( r->get_name() == _name ) ) {
+		r->get_named_rule()->describe( rd_, ru_ );
 	} else {
-		_rule->describe( rd_, ru_ );
+		rule_use_t::const_iterator it( ru_.find( _rule.get() ) );
+		HRuleRef const* rr( dynamic_cast<HRuleRef const*>( &*_rule ) );
+		if ( ( ( it != ru_.end() ) && ( it->second > 1 ) ) || ( ! _name.is_empty() ) || rr ) {
+			if ( ! rr ) {
+				rd_.add( this );
+			}
+			rd_.desc( rd_.make_name( *this ) );
+		} else {
+			_rule->describe( rd_, ru_ );
+		}
 	}
 	return;
 	M_EPILOG
