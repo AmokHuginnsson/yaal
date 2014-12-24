@@ -697,12 +697,12 @@ protected:
 private:
 	HString( yaal::hcore::HString const& );
 	HString& operator = ( HString const& );
-	friend HString string( yaal::hcore::HString const& );
+	friend HString string( yaal::hcore::HString const&, HString::action_string_t const& );
 };
 
 typedef yaal::hcore::HExceptionT<HString, HRuleBaseException> HStringException;
 
-HString string( yaal::hcore::HString const& );
+HString string( yaal::hcore::HString const&, HString::action_string_t const& = HString::action_string_t() );
 
 class HRegex : public HRuleBase {
 public:
@@ -731,15 +731,18 @@ protected:
 	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HRegex( yaal::hcore::HString const& );
+	HRegex( yaal::hcore::HString const&, action_string_t const& );
 	HRegex& operator = ( HRegex const& );
-	friend HRegex regex( yaal::hcore::HString const& );
+	friend HRegex regex( yaal::hcore::HString const&, HRegex::action_string_t const& );
+	friend HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_t const& );
 };
 
 typedef yaal::hcore::HExceptionT<HRegex, HRuleBaseException> HRegexException;
 
 HCharacter constant( char );
 HString constant( yaal::hcore::HString const& );
-HRegex regex( yaal::hcore::HString const& );
+HRegex regex( yaal::hcore::HString const&, HRegex::action_string_t const& = HRegex::action_string_t() );
+HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_t const& = HRegex::action_string_t() );
 
 }
 

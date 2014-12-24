@@ -63,13 +63,22 @@ main( args ) {
 executing_parser::HRule HHuginn::make_engine( void ) {
 	M_PROLOG
 	using namespace executing_parser;
-	HRule name( "name", regex( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" ) );
+	hcore::HString identifier( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" );
 	HRule expression( "expression" );
 	HRule absoluteValue( "absoluteValue", '|' >> expression >> '|' );
 	HRule parenthesis( "parenthesis", '(' >> expression >> ')' );
 	HRule argList( "argList", expression >> ( * ( ',' >> expression ) ) );
-	HRule functionCall( "functionCall", name >> '(' >> -argList >> ')' );
-	HRule atom( "atom", absoluteValue | parenthesis | functionCall | real | integer | string_literal | character_literal | name );
+	HRule functionCall( "functionCall", regex( "functionCallIdentifier", identifier ) >> '(' >> -argList >> ')' );
+	HRule variableIdentifier( regex( "variableIdentifier", identifier ) );
+	HRule atom( "atom",
+		absoluteValue
+		| parenthesis
+		| functionCall
+		| real
+		| integer
+		| string_literal
+		| character_literal
+		| variableIdentifier );
 	HRule power( "power", atom >> ( * ( '^' >> atom ) ) );
 	HRule multiplication( "multiplication", power >> ( * ( '*' >> power ) ) );
 	HRule sum( "sum", multiplication >> ( * ( '+' >> multiplication ) ) );
@@ -80,7 +89,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	 * In other words you cannot modify value of referenced object
 	 * with assignment. You can only change where a reference points to.
 	 */
-	HRule assignment( "assignment", *( name >> '=' ) >> ref );
+	HRule assignment( "assignment", *( variableIdentifier >> '=' ) >> ref );
 	expression %= assignment;
 	HRule booleanExpression( "booleanExpression" );
 	HRule booleanValue( "booleanValue", constant( "true" ) | constant( "false" ) | constant( '(' ) >> booleanExpression >> ')' );
@@ -109,7 +118,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	 */
 	HRule breakStatement( "breakStatement", constant( "break" ) >> ';' );
 	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> booleanExpression >> ')' >> loopScope );
-	HRule foreachStatement( "foreachStatement", constant( "foreach" ) >> '(' >> name >> ':' >> expression >> ')' >> loopScope );
+	HRule foreachStatement( "foreachStatement", constant( "foreach" ) >> '(' >> variableIdentifier >> ':' >> expression >> ')' >> loopScope );
 	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> scope >> -breakStatement );
 	HRule defaultStatement( "defaultStatement", constant( "default" ) >> ':' >> scope );
 	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> -defaultStatement >> '}' );
@@ -120,8 +129,10 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			ifStatement | whileStatement | foreachStatement | switchStatement | breakStatement | continueStatement | returnStatement | expressionList );
 	scope %= ( '{' >> *statement >> '}' );
 	loopScope %= ( '{' >> *loopStatement >> '}' );
-	HRule nameList( "nameList", name >> ( * ( ',' >> name ) ) );
-	HRule functionDefinition( "functionDefinition", name >> '(' >> -nameList >> ')' >> scope, hcore::call( &HHuginn::create_function, this ) );
+	HRule nameList( "nameList", variableIdentifier >> ( * ( ',' >> variableIdentifier ) ) );
+	HRule functionDefinition( "functionDefinition",
+		regex( "functionDefinitionIdentifier", identifier ) >> '(' >> -nameList >> ')' >> scope,
+		hcore::call( &HHuginn::create_function, this ) );
 	HRule huginnGrammar( "huginnGrammar", + functionDefinition );
 	return ( huginnGrammar );
 	M_EPILOG

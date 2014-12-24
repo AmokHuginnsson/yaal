@@ -2182,9 +2182,9 @@ void HString::do_find_recursions( HRuleAggregator& ) {
 	M_EPILOG
 }
 
-HString string( yaal::hcore::HString const& string_ ) {
+HString string( yaal::hcore::HString const& string_, HString::action_string_t const& action_ ) {
 	M_PROLOG
-	return ( HString( string_ ) );
+	return ( HString( string_, action_ ) );
 	M_EPILOG
 }
 
@@ -2192,6 +2192,13 @@ HRegex::HRegex( hcore::HString const& string_ )
 	: HRuleBase(),
 	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
 	_actionString() {
+	return;
+}
+
+HRegex::HRegex( hcore::HString const& string_, action_string_t const& action_ )
+	: HRuleBase(),
+	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
+	_actionString( action_ ) {
 	return;
 }
 
@@ -2326,10 +2333,18 @@ HString constant( yaal::hcore::HString const& string_ ) {
 	M_EPILOG
 }
 
-HRegex regex( yaal::hcore::HString const& pattern_ ) {
+HRegex regex( yaal::hcore::HString const& pattern_, HRegex::action_string_t const& action_ ) {
 	M_PROLOG
 	M_ENSURE( ! pattern_.is_empty() );
-	return ( HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_ ) );
+	return ( HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_, action_ ) );
+	M_EPILOG
+}
+
+HRule regex( yaal::hcore::HString const& name_, yaal::hcore::HString const& pattern_, HRegex::action_string_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! name_.is_empty() );
+	M_ENSURE( ! pattern_.is_empty() );
+	return ( HRule( name_, HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_, action_ ) ) );
 	M_EPILOG
 }
 
