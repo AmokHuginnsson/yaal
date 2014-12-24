@@ -76,7 +76,8 @@ protected:
 		HAbstractNode& operator = ( HAbstractNode const & );
 		void set_child( HAbstractNode*, HAbstractNode* );
 		friend class HSBBSTreeBase;
-		virtual ~HAbstractNode( void ) {}
+	protected:
+		~HAbstractNode( void ) {}
 	};
 protected:
 	HAbstractNode* _root;
@@ -134,23 +135,7 @@ private:
 #else /* #ifndef __sun__ */
 #pragma pack()
 #endif /* #else #ifndef __sun__ */
-	struct ONodePtr {
-		HNode* _node;
-		bool _exists;
-		ONodePtr( void )
-			: _node( NULL ), _exists( false )
-			{ }
-		ONodePtr( ONodePtr const& np )
-			: _node( np._node ), _exists( np._exists )
-			{}
-		ONodePtr& operator = ( ONodePtr const& np ) {
-			if ( &np != this ) {
-				_node = np._node;
-				_exists = np._exists;
-			}
-			return ( *this );
-		}
-	};
+	typedef yaal::hcore::HPair<HNode**, HNode*> hint_t;
 public:
 	typedef typename allocator_t::template rebind<HNode>::other allocator_type;
 private:
@@ -181,8 +166,7 @@ public:
 	}
 	HIterator find( key_type const& key_ ) const {
 		M_PROLOG
-		ONodePtr nodePtr = find_node( key_ );
-		return ( HIterator( this, nodePtr._exists ? nodePtr._node : NULL ) );
+		return ( HIterator( this, *(find_node( key_ ).first) ) );
 		M_EPILOG
 	}
 	HIterator lower_bound( key_type const& ) const;
@@ -228,7 +212,7 @@ public:
 		return ( _allocator );
 	}
 private:
-	ONodePtr find_node( key_type const& ) const;
+	hint_t find_node( key_type const& ) const;
 	HNode* copy_node( HNode const* source ) {
 		M_PROLOG
 		HNode* node( _allocator.allocate( 1 ) );
@@ -318,34 +302,32 @@ template<typename key_value_t, typename compare_t, typename key_get_t, typename 
 HPair<typename HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::HIterator, bool>
 HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::insert( key_value_type const& key_ ) {
 	M_PROLOG
-	ONodePtr nodeHolder;
-	HNode* node( NULL );
-	if ( _root )
-		nodeHolder = find_node( key_get_type::key( key_ ) );
-	if ( ! nodeHolder._exists ) {
+	hint_t hint( find_node( key_get_type::key( key_ ) ) );
+	HNode* node( *hint.first );
+	bool existed( !! node );
+	if ( ! existed ) {
 		node = _allocator.allocate( 1 );
-		new ( node ) HNode( key_ );
+		try {
+			new ( node ) HNode( key_ );
+		} catch ( ... ) {
+			_allocator.deallocate( node, 1 );
+			throw;
+		}
+		*(hint.first) = node;
 		++ _size;
-		if ( _root ) {
-			node->_parent = nodeHolder._node;
-			if ( _compare( key_get_type::key( key_ ), key_get_type::key( nodeHolder._node->_key ) ) ) {
-				M_ASSERT( ! nodeHolder._node->_left );
-				nodeHolder._node->_left = node;
-			} else {
-				M_ASSERT( ! nodeHolder._node->_right );
-				nodeHolder._node->_right = node;
-			}
+		/*
+		 * _size > 1 means that _root existed before insertion of this node
+		 */
+		if ( _size > 1 ) {
+			node->_parent = hint.second;
 			insert_rebalance( node );
 		} else {
-			_root = node;
 			static_cast<HNode*>( _root )->_color = HAbstractNode::BLACK;
 		}
-	} else {
-		node = nodeHolder._node;
 	}
 	M_ASSERT( ( ! _root ) || ( static_cast<HNode*>( _root )->_parent == NULL ) );
 	M_ASSERT( ( ! _root ) || ( static_cast<HNode*>( _root )->_color == HAbstractNode::BLACK ) );
-	return ( make_pair( HIterator( this, node ), ! nodeHolder._exists ) );
+	return ( make_pair( HIterator( this, node ), ! existed ) );
 	M_EPILOG
 }
 
@@ -355,10 +337,15 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::lower_bound( key_type
 	M_PROLOG
 	HIterator it( this, NULL );
 	if ( _root ) {
-		ONodePtr nodeHolder( find_node( key_ ) );
-		it._current = nodeHolder._node;
-		if ( nodeHolder._node && ! nodeHolder._exists && _compare( key_get_type::key( nodeHolder._node->_key ), key_ ) )
-			++ it;
+		hint_t hint( find_node( key_ ) );
+		if ( *(hint.first) ) {
+			it._current = *(hint.first);
+		} else {
+			it._current = hint.second;
+			if ( hint.first == reinterpret_cast<HNode* const*>( &( hint.second->_right ) ) ) {
+				++ it;
+			}
+		}
 	}
 	return ( it );
 	M_EPILOG
@@ -370,38 +357,39 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::upper_bound( key_type
 	M_PROLOG
 	HIterator it( this, NULL );
 	if ( _root ) {
-		ONodePtr nodeHolder( find_node( key_ ) );
-		it._current = nodeHolder._node;
-		if ( nodeHolder._node && ( nodeHolder._exists || _compare( key_get_type::key( nodeHolder._node->_key ), key_ ) ) )
+		hint_t hint( find_node( key_ ) );
+		if ( *(hint.first) ) {
+			it._current = *(hint.first);
 			++ it;
+		} else {
+			it._current = hint.second;
+			if ( hint.first == reinterpret_cast<HNode* const*>( &( hint.second->_right ) ) ) {
+				++ it;
+			}
+		}
 	}
 	return ( it );
 	M_EPILOG
 }
 
 template<typename key_value_t, typename compare_t, typename key_get_t, typename allocator_t>
-typename HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::ONodePtr
+typename HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::hint_t
 HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::find_node( key_type const& key_ ) const {
 	M_PROLOG
-	ONodePtr nodePtr;
-	if ( _root ) {
-		nodePtr._node = static_cast<HNode*>( _root );
-		while ( ! nodePtr._exists ) {
-			if ( _compare( key_, key_get_type::key( nodePtr._node->_key ) ) ) {
-				if ( nodePtr._node->_left )
-					nodePtr._node = static_cast<HNode*>( nodePtr._node->_left );
-				else
-					break;
-			} else if ( _compare( key_get_type::key( nodePtr._node->_key ), key_ ) ) {
-				if ( nodePtr._node->_right )
-					nodePtr._node = static_cast<HNode*>( nodePtr._node->_right );
-				else
-					break;
-			} else
-				nodePtr._exists = true;
+	HNode* parent( nullptr );
+	HNode** node( reinterpret_cast<HNode**>( const_cast<HAbstractNode**>( &_root ) ) );
+	while ( *node ) {
+		if ( _compare( key_, key_get_type::key( (*node)->_key ) ) ) {
+			parent = *node;
+			node = reinterpret_cast<HNode**>( &((*node)->_left) );
+		} else if ( _compare( key_get_type::key( (*node)->_key ), key_ ) ) {
+			parent = *node;
+			node = reinterpret_cast<HNode**>( &((*node)->_right) );
+		} else {
+			break;
 		}
 	}
-	return ( nodePtr );
+	return ( make_pair( node, parent ) );
 	M_EPILOG
 }
 
