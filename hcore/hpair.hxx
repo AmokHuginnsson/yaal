@@ -47,45 +47,101 @@ public:
 	typedef second_t second_type;
 	first_type first;
 	second_type second;
-	HPair( void ) : first(), second() {}
-	HPair( first_type const& key, second_type const& value ) : first( key ), second( value ) {}
-	HPair( HPair const& pair ) : first( pair.first ), second( pair.second ) {}
+	HPair( void )
+		: first(), second() {
+		return;
+	}
+	HPair( first_type const& key_, second_type const& value_ )
+		: first( key_ ), second( value_ ) {
+		return;
+	}
+	HPair( first_type const& key_, typename trait::strip_reference<second_type>::type&& value_ )
+		: first( key_ ), second( yaal::move( value_ ) ) {
+		return;
+	}
+	HPair( typename trait::strip_reference<first_type>::type&& key_, second_type const& value_ )
+		: first( yaal::move( key_ ) ), second( value_ ) {
+		return;
+	}
+	HPair( typename trait::strip_reference<first_type>::type&& key_, typename trait::strip_reference<second_type>::type&& value_ )
+		: first( yaal::move( key_ ) ), second( yaal::move( value_ ) ) {
+		return;
+	}
+	HPair( HPair const& pair_ )
+		: first( pair_.first ), second( pair_.second ) {
+		return;
+	}
+	HPair( HPair&& pair_ )
+		: first( yaal::move( pair_.first ) ), second( yaal::move( pair_.second ) ) {
+		return;
+	}
 	template<typename alt_first_t, typename alt_second_t>
-	HPair( HPair<alt_first_t, alt_second_t> const& p ) : first( p.first ), second( p.second ) {}
-	HPair& operator = ( HPair const& pair ) {
+	HPair( HPair<alt_first_t, alt_second_t> const& altPair_ )
+		: first( altPair_.first ), second( altPair_.second ) {
+		return;
+	}
+	HPair& operator = ( HPair const& pair_ ) {
 		M_PROLOG
-		if ( &pair != this ) {
-			HPair tmp( pair );
+		if ( &pair_ != this ) {
+			HPair tmp( pair_ );
 			swap( tmp );
 		}
 		return ( *this );
 		M_EPILOG
 	}
-	bool operator == ( HPair const& pair ) const
-		{	return ( ( first == pair.first ) && ( second == pair.second ) );	}
-	bool operator != ( HPair const& pair ) const
-		{	return ( ! operator == ( pair ) );	}
-	bool operator < ( HPair const& pair ) const {
-		return ( ( first < pair.first )
-				|| ( ! ( pair.first < first ) && ( second < pair.second ) ) );
+	HPair& operator = ( HPair&& pair_ ) {
+		M_PROLOG
+		if ( &pair_ != this ) {
+			swap( pair_ );
+			pair_ = HPair();
+		}
+		return ( *this );
+		M_EPILOG
 	}
-	void swap( HPair& pair ) {
-		if ( &pair != this ) {
+	bool operator == ( HPair const& pair_ ) const {
+		return ( ( first == pair_.first ) && ( second == pair_.second ) );
+	}
+	bool operator != ( HPair const& pair_ ) const {
+		return ( ! operator == ( pair_ ) );
+	}
+	bool operator < ( HPair const& pair_ ) const {
+		return ( ( first < pair_.first )
+				|| ( ! ( pair_.first < first ) && ( second < pair_.second ) ) );
+	}
+	void swap( HPair& pair_ ) {
+		if ( &pair_ != this ) {
 			using yaal::swap;
-			swap( first, pair.first );
-			swap( second, pair.second );
+			swap( first, pair_.first );
+			swap( second, pair_.second );
 		}
 		return;
 	}
 };
 
 template<typename first_type, typename second_type>
-HPair<first_type, second_type> make_pair( first_type const& first, second_type const& second )
-	{ return ( HPair<first_type, second_type>( first, second ) ); }
+inline HPair<first_type, second_type> make_pair( first_type const& first_, second_type const& second_ ) {
+	return ( HPair<first_type, second_type>( first_, second_ ) );
+}
 
 template<typename first_type, typename second_type>
-inline void swap( yaal::hcore::HPair<first_type, second_type>& a, yaal::hcore::HPair<first_type, second_type>& b )
-	{ a.swap( b ); }
+inline HPair<first_type, second_type> make_pair( first_type const& first_, typename trait::strip_reference<second_type>::type&& second_ ) {
+	return ( HPair<first_type, second_type>( first_, yaal::move( second_ ) ) );
+}
+
+template<typename first_type, typename second_type>
+inline HPair<first_type, second_type> make_pair( typename trait::strip_reference<first_type>::type&& first_, second_type const& second_ ) {
+	return ( HPair<first_type, second_type>( yaal::move( first_ ), second_ ) );
+}
+
+template<typename first_type, typename second_type>
+inline HPair<first_type, second_type> make_pair( typename trait::strip_reference<first_type>::type&& first_, typename trait::strip_reference<second_type>::type&& second_ ) {
+	return ( HPair<first_type, second_type>( yaal::move( first_ ), yaal::move( second_ ) ) );
+}
+
+template<typename first_type, typename second_type>
+inline void swap( yaal::hcore::HPair<first_type, second_type>& a, yaal::hcore::HPair<first_type, second_type>& b ) {
+	a.swap( b );
+}
 
 }
 
