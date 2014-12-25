@@ -185,6 +185,12 @@ public:
 		return ( make_pair( HIterator( p.first ), p.second ) );
 		M_EPILOG
 	}
+	insert_result insert( value_type&& elem ) {
+		M_PROLOG
+		HPair<typename engine_t::HIterator, bool> p = _engine.insert( yaal::move( elem ) );
+		return ( make_pair( HIterator( p.first ), p.second ) );
+		M_EPILOG
+	}
 	template<typename iter_t>
 	void insert( iter_t i, iter_t endIt ) {
 		M_PROLOG
