@@ -136,6 +136,10 @@ public:
 		HPair<typename engine_t::HIterator, bool> p = _engine.insert( e );
 		return ( make_pair( iterator( p.first ), p.second ) );
 	}
+	insert_result insert( value_type&& e ) {
+		HPair<typename engine_t::HIterator, bool> p = _engine.insert( yaal::move( e ) );
+		return ( make_pair( iterator( p.first ), p.second ) );
+	}
 	template<typename iter_t>
 	void insert( iter_t i, iter_t endIt ) {
 		M_PROLOG
