@@ -74,8 +74,13 @@ private:
 		HAtom* _next;
 		value_type _value;
 		HAtom( value_type const& value_ )
-			: _next( NULL ), _value( value_ )
-			{}
+			: _next( NULL ), _value( value_ ) {
+			return;
+		}
+		HAtom( value_type&& value_ )
+			: _next( NULL ), _value( yaal::move( value_ ) ) {
+			return;
+		}
 		HAtom( HAtom const& );
 		HAtom& operator = ( HAtom const& );
 		friend class HHashContainer;
@@ -86,6 +91,24 @@ private:
 #else /* #ifndef __sun__ */
 #pragma pack()
 #endif /* #else #ifndef __sun__ */
+	struct constructor_copy {
+		value_type const& _value;
+		constructor_copy( value_type const& val_ )
+			: _value( val_ ) {
+		}
+		void construct( HAtom* atom ) {
+			new ( atom ) HAtom( _value );
+		}
+	};
+	struct constructor_move {
+		value_type& _value;
+		constructor_move( value_type& val_ )
+			: _value( val_ ) {
+		}
+		void construct( HAtom* atom ) {
+			new ( atom ) HAtom( yaal::move( _value ) );
+		}
+	};
 public:
 	typedef typename allocator_t::template rebind<HAtom>::other allocator_type;
 	/*! \brief Iterator for HHashContainer data structure.
@@ -223,7 +246,12 @@ public:
 		return ( _hasher );
 	}
 	HIterator find( key_type const& ) const;
-	HPair<HIterator, bool> insert( value_type const& );
+	HPair<HIterator, bool> insert( value_type const& val_ ) {
+		return ( insert_impl( constructor_copy( val_ ) ) );
+	}
+	HPair<HIterator, bool> insert( value_type&& val_ ) {
+		return ( insert_impl( constructor_move( val_ ) ) );
+	}
 	HIterator begin( void ) const {
 		M_PROLOG
 		HIterator it( this, _prime, NULL );
@@ -287,6 +315,9 @@ public:
 		}
 		return;
 	}
+private:
+	template<typename constructor_t>
+	HPair<HIterator, bool> insert_impl( constructor_t&& );
 };
 
 template<typename value_t, typename hasher_t, typename get_key_t, typename allocator_t>
@@ -298,28 +329,36 @@ HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::find( key_type const&
 	if ( _prime ) {
 		idx = yaal::abs( _hasher( key_ ) ) % _prime;
 		atom = _buckets.get<HAtom*>()[ idx ];
-		while ( atom && ! ( get_key_type::key( atom->_value ) == key_ ) )
+		while ( atom && ! ( get_key_type::key( atom->_value ) == key_ ) ) {
 			atom = atom->_next;
+		}
 	}
 	return ( atom ? HIterator( this, idx, atom ) : end() );
 	M_EPILOG
 }
 
 template<typename value_t, typename hasher_t, typename get_key_t, typename allocator_t>
+template<typename constructor_t>
 HPair<typename HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::HIterator, bool>
-HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::insert( value_type const& val_ ) {
+HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::insert_impl( constructor_t&& constructor_ ) {
 	M_PROLOG
-	HIterator it( _prime ? find( get_key_type::key( val_ ) ) : end() );
+	HIterator it( _prime ? find( get_key_type::key( constructor_._value ) ) : end() );
 	bool inserted( false );
-	if ( it == end() ) {
-		if ( ( _size + 1 ) > _prime )
+	if ( ! ( it != end() ) ) {
+		if ( ( _size + 1 ) > _prime ) {
 			resize( ( _size + 1 ) * 2 );
-		HAtom* atom( _allocator.allocate( 1 ) );
-		new ( atom ) HAtom( val_ );
+		}
 
-		/* I cannot use index calculated in find() call above because here we use different prime.
-		 */
-		int long newHash = yaal::abs( _hasher( get_key_type::key( val_ ) ) ) % _prime;
+		int long newHash( yaal::abs( _hasher( get_key_type::key( constructor_._value ) ) ) % _prime );
+
+		HAtom* atom( _allocator.allocate( 1 ) );
+		try {
+			constructor_.construct( atom );
+		} catch ( ... ) {
+			_allocator.deallocate( atom, 1 );
+			throw;
+		}
+
 		HAtom** buckets = _buckets.get<HAtom*>();
 		atom->_next = buckets[ newHash ];
 		buckets[ newHash ] = atom;
@@ -365,8 +404,10 @@ void HHashContainer<value_t, hasher_t, get_key_t, allocator_t>::resize( int long
 }
 
 template<typename value_t, typename hasher_t, typename get_key_t, typename allocator_t>
-inline void swap( yaal::hcore::HHashContainer<value_t, hasher_t, get_key_t, allocator_t>& a, yaal::hcore::HHashContainer<value_t, hasher_t, get_key_t, allocator_t>& b )
-	{ a.swap( b );	}
+inline void swap( yaal::hcore::HHashContainer<value_t, hasher_t, get_key_t, allocator_t>& a,
+	yaal::hcore::HHashContainer<value_t, hasher_t, get_key_t, allocator_t>& b ) {
+	a.swap( b );
+}
 
 }
 
