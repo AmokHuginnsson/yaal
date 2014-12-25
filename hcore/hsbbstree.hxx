@@ -125,8 +125,11 @@ private:
 #pragma GCC diagnostic error "-Weffc++"
 		key_value_type _key;
 		HNode( key_value_type const& key_ )
-			: HAbstractNode(), _key( key_ )
-			{}
+			: HAbstractNode(), _key( key_ ) {
+		}
+		HNode( key_value_type&& key_ )
+			: HAbstractNode(), _key( yaal::move( key_ ) ) {
+		}
 		HNode( HNode const& );
 		HNode& operator = ( HNode const& );
 		friend class HSBBSTree;
@@ -138,6 +141,24 @@ private:
 #pragma pack()
 #endif /* #else #ifndef __sun__ */
 	typedef yaal::hcore::HPair<HNode**, HNode*> hint_t;
+	struct constructor_copy {
+		key_value_type const& _key;
+		constructor_copy( key_value_type const& key_ )
+			: _key( key_ ) {
+		}
+		void construct( HNode* node ) {
+			new ( node ) HNode( _key );
+		}
+	};
+	struct constructor_move {
+		key_value_type& _key;
+		constructor_move( key_value_type& key_ )
+			: _key( key_ ) {
+		}
+		void construct( HNode* node ) {
+			new ( node ) HNode( yaal::move( _key ) );
+		}
+	};
 public:
 	typedef typename allocator_t::template rebind<HNode>::other allocator_type;
 private:
@@ -153,7 +174,12 @@ public:
 		return;
 		M_DESTRUCTOR_EPILOG
 	}
-	HPair<HIterator, bool> insert( key_value_type const& );
+	HPair<HIterator, bool> insert( key_value_type const& key_ ) {
+		return ( insert_impl( constructor_copy( key_ ) ) );
+	}
+	HPair<HIterator, bool> insert( key_value_type&& key_ ) {
+		return ( insert_impl( constructor_move( key_ ) ) );
+	}
 	void remove( HIterator const& it_ ) {
 		M_PROLOG
 		if ( ! it_._current )
@@ -215,6 +241,8 @@ public:
 	}
 private:
 	hint_t find_node( key_type const& ) const;
+	template<typename constructor_t>
+	HPair<HIterator, bool> insert_impl( constructor_t&& );
 	HNode* copy_node( HNode const* source ) {
 		M_PROLOG
 		HNode* node( _allocator.allocate( 1 ) );
@@ -301,16 +329,17 @@ private:
 };
 
 template<typename key_value_t, typename compare_t, typename key_get_t, typename allocator_t>
+template<typename constructor_t>
 HPair<typename HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::HIterator, bool>
-HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::insert( key_value_type const& key_ ) {
+HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::insert_impl( constructor_t&& constructor_ ) {
 	M_PROLOG
-	hint_t hint( find_node( key_get_type::key( key_ ) ) );
+	hint_t hint( find_node( key_get_type::key( constructor_._key ) ) );
 	HNode* node( *hint.first );
 	bool existed( !! node );
 	if ( ! existed ) {
 		node = _allocator.allocate( 1 );
 		try {
-			new ( node ) HNode( key_ );
+			constructor_.construct( node );
 		} catch ( ... ) {
 			_allocator.deallocate( node, 1 );
 			throw;
