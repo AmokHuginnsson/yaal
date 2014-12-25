@@ -93,7 +93,11 @@ public:
 		M_PROLOG
 		if ( &pair_ != this ) {
 			swap( pair_ );
-			pair_ = HPair();
+			first_type f{};
+			second_type s{};
+			using yaal::swap;
+			swap( pair_.first, f );
+			swap( pair_.second, s );
 		}
 		return ( *this );
 		M_EPILOG
