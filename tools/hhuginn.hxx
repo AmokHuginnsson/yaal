@@ -92,7 +92,12 @@ private:
 		yaal::hcore::HString::const_iterator end( void ) const;
 		void dump_preprocessed( yaal::hcore::HStreamInterface& ) const;
 	};
-	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::HFunction> functions_t;
+	struct OCompiler {
+		yaal::hcore::HString _functionName;
+		OCompiler( void );
+		void set_function_name( yaal::hcore::HString const& );
+	};
+	typedef yaal::hcore::HMap<yaal::hcore::HString, scope_t> functions_t;
 	struct STATE {
 		typedef enum {
 			EMPTY,
@@ -106,6 +111,7 @@ private:
 	functions_t _functions;
 	HExecutingParser _engine;
 	HSource _source;
+	OCompiler _compiler;
 	list_t _arguments;
 public:
 	HHuginn( void );
@@ -250,6 +256,7 @@ private:
 	HHuginn::HScope* _parent;
 public:
 	HScope( HScope* );
+	HScope( HScope&& ) = default;
 private:
 	HScope( HScope const& );
 	HScope& operator = ( HScope const& );
@@ -289,6 +296,8 @@ class HHuginn::HFunction : public HHuginn::HScope {
 public:
 	typedef HHuginn::HFunction this_type;
 	typedef HHuginn::HScope base_type;
+	HFunction( void );
+	HFunction( HFunction&& ) = default;
 };
 
 }

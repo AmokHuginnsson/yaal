@@ -131,7 +131,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	loopScope %= ( '{' >> *loopStatement >> '}' );
 	HRule nameList( "nameList", variableIdentifier >> ( * ( ',' >> variableIdentifier ) ) );
 	HRule functionDefinition( "functionDefinition",
-		regex( "functionDefinitionIdentifier", identifier ) >> '(' >> -nameList >> ')' >> scope,
+		regex( "functionDefinitionIdentifier", identifier, hcore::call( &HHuginn::OCompiler::set_function_name, &_compiler, _1 ) ) >> '(' >> -nameList >> ')' >> scope,
 		hcore::call( &HHuginn::create_function, this ) );
 	HRule huginnGrammar( "huginnGrammar", + functionDefinition );
 	return ( huginnGrammar );
@@ -491,10 +491,22 @@ void HHuginn::HSource::dump_preprocessed( yaal::hcore::HStreamInterface& stream_
 	M_EPILOG
 }
 
+HHuginn::OCompiler::OCompiler( void )
+	: _functionName() {
+}
+
+void HHuginn::OCompiler::set_function_name( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	_functionName = name_;
+	return;
+	M_EPILOG
+}
+
 HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY ), _functions(),
 	_engine( make_engine() ),
 	_source(),
+	_compiler(),
 	_arguments( new ( memory::yaal ) HList() ) {
 }
 
@@ -528,6 +540,7 @@ void HHuginn::compile( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PARSED );
 	_state = STATE::COMPILED;
+	_engine.execute();
 	return;
 	M_EPILOG
 }
@@ -577,7 +590,7 @@ char const* HHuginn::error_message( int code_ ) const {
 
 void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_PROLOG
-	_arguments->push_back( value_t( new ( memory::yaal ) HString( arg_ ) ) );
+	_arguments->push_back( make_pointer<HString>( arg_ ) );
 	return;
 	M_EPILOG
 }
@@ -603,6 +616,7 @@ void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ )
 
 void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
+	stream_ << "Huginn VM state for `" << _source.name() << "':\nfunctions:" << endl;
 	for ( functions_t::value_type const& f : _functions ) {
 		stream_ << f.first << endl;
 	}
@@ -612,6 +626,8 @@ void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 
 void HHuginn::create_function( void ) {
 	M_PROLOG
+	M_ENSURE( ! _compiler._functionName.is_empty() );
+	_functions.insert( make_pair<hcore::HString const, scope_t>( yaal::move( _compiler._functionName ), yaal::move( make_pointer<HFunction>() ) ) );
 	return;
 	M_EPILOG
 }
@@ -641,6 +657,11 @@ HHuginn::HIf::HIf( boolean_expression_t condition_,
 		HExecutingParser::executor_t ifClause_,
 		HExecutingParser::executor_t elseClause_ )
 	: HScope( NULL ), _condition( condition_ ), _ifClause( ifClause_ ), _elseClause( elseClause_ ) {
+}
+
+HHuginn::HFunction::HFunction( void )
+	: HScope( nullptr ) {
+	return;
 }
 
 }
