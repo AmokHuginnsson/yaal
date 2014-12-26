@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hmultiset.hxx - this file is integral part of `yaal' project.
+  hmultiset.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -43,14 +43,15 @@ namespace hcore {
 template<typename type_t>
 struct multiset_helper {
 	typedef typename type_t::first_type key_type;
-	inline static key_type const& key( type_t const& key_ )
-		{	return ( key_.first );	}
+	inline static key_type const& key( type_t const& key_ ) {
+		return ( key_.first );
+	}
 };
 
-/*! \brief Binary tree based set.
+/*! \brief Binary tree based multi set.
  *
  * HMultiSet<> is a template representing self balancing binary search tree
- * data structure that holds set of keys.
+ * data structure that holds set of (non-unique) keys.
  *
  * \tparam type_t - type of values held in set.
  * \tparam helper_t - HSBBSTree plugable code.
@@ -143,14 +144,17 @@ private:
 	engine_t _engine;
 public:
 	HMultiSet( void )
-		: _engine( compare_type(), allocator_type() )
-		{}
+		: _engine( compare_type(), allocator_type() ) {
+		return;
+	}
 	explicit HMultiSet( compare_type const& compare_ )
-		: _engine( compare_, allocator_type() )
-		{}
+		: _engine( compare_, allocator_type() ) {
+		return;
+	}
 	explicit HMultiSet( allocator_type const& allocator_ )
-		: _engine( compare_type(), allocator_ )
-		{}
+		: _engine( compare_type(), allocator_ ) {
+		return;
+	}
 	template<typename iterator_t>
 	HMultiSet( iterator_t first, iterator_t last, compare_type const& compare_ = compare_type(), allocator_type const& allocator_ = allocator_type() )
 		: _engine( compare_, allocator_ ) {
@@ -178,8 +182,9 @@ public:
 	allocator_type const& get_allocator( void ) const {
 		return ( _engine.get_allocator() );
 	}
-	int long size( void ) const
-		{ return ( get_size() ); }
+	int long size( void ) const {
+		return ( get_size() );
+	}
 	int long get_size( void ) const {
 		M_PROLOG
 		int long sizeAcc( 0 );
@@ -188,13 +193,23 @@ public:
 		return ( sizeAcc );
 		M_EPILOG
 	}
-	bool empty( void ) const
-		{ return ( is_empty() );	}
-	bool is_empty( void ) const
-		{ return ( _engine.is_empty() );	}
+	bool empty( void ) const {
+		return ( is_empty() );
+	}
+	bool is_empty( void ) const {
+		return ( _engine.is_empty() );
+	}
 	HIterator insert( value_type const& elem ) {
 		M_PROLOG
-		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair( elem, 1 ) ) );
+		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair( elem, 1L ) ) );
+		if ( ! p.second )
+			++ p.first.get().second;
+		return ( HIterator( &_engine, p.first, p.first.get().second - 1 ) );
+		M_EPILOG
+	}
+	HIterator insert( value_type&& elem ) {
+		M_PROLOG
+		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair<value_type, int long>( yaal::move( elem ), yaal::move( 1L ) ) ) );
 		if ( ! p.second )
 			++ p.first.get().second;
 		return ( HIterator( &_engine, p.first, p.first.get().second - 1 ) );
@@ -241,37 +256,52 @@ public:
 		return ( first_ );
 		M_EPILOG
 	}
-	HIterator find( value_type const& e ) const
-		{ return ( HIterator( &_engine, _engine.find( e ), 0 ) ); }
-	HIterator lower_bound( value_type const& e ) const
-		{ return ( HIterator( &_engine, _engine.lower_bound( e ), 0 ) ); }
-	HIterator upper_bound( value_type const& e ) const
-		{ return ( HIterator( &_engine, _engine.upper_bound( e ), 0 ) ); }
-	HIterator begin( void ) const
-		{ return ( HIterator( &_engine, _engine.begin(), 0 ) ); }
-	HIterator end( void ) const
-		{ return ( HIterator( &_engine, _engine.end(), 0 ) ); }
-	reverse_iterator rbegin( void ) const
-		{ return ( end() ); }
-	reverse_iterator rend( void ) const
-		{ return ( begin() ); }
-	void clear( void )
-		{ _engine.clear(); }
+	HIterator find( value_type const& e ) const {
+		return ( HIterator( &_engine, _engine.find( e ), 0 ) );
+	}
+	HIterator lower_bound( value_type const& e ) const {
+		return ( HIterator( &_engine, _engine.lower_bound( e ), 0 ) );
+	}
+	HIterator upper_bound( value_type const& e ) const {
+		return ( HIterator( &_engine, _engine.upper_bound( e ), 0 ) );
+	}
+	HIterator begin( void ) const {
+		return ( HIterator( &_engine, _engine.begin(), 0 ) );
+	}
+	HIterator end( void ) const {
+		return ( HIterator( &_engine, _engine.end(), 0 ) );
+	}
+	reverse_iterator rbegin( void ) const {
+		return ( end() );
+	}
+	reverse_iterator rend( void ) const {
+		return ( begin() );
+	}
+	void clear( void ) {
+		_engine.clear();
+	}
 	void swap( HMultiSet& other ) {
 		if ( &other != this ) {
 			using yaal::swap;
 			_engine.swap( other._engine );
 		}
 	}
-	bool operator == ( HMultiSet const& set_ ) const
-		{ M_PROLOG return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
-	bool operator < ( HMultiSet const& set_ ) const
-		{ M_PROLOG return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
+	bool operator == ( HMultiSet const& set_ ) const {
+		M_PROLOG
+		return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) );
+		M_EPILOG
+	}
+	bool operator < ( HMultiSet const& set_ ) const {
+		M_PROLOG
+		return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) );
+		M_EPILOG
+	}
 };
 
 template<typename value_type, typename compare_t, typename allocator_t>
-inline void swap( yaal::hcore::HMultiSet<value_type, compare_t, allocator_t>& a, yaal::hcore::HMultiSet<value_type, compare_t, allocator_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HMultiSet<value_type, compare_t, allocator_t>& a, yaal::hcore::HMultiSet<value_type, compare_t, allocator_t>& b ) {
+	a.swap( b );
+}
 
 }
 
