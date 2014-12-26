@@ -78,7 +78,8 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| integer
 		| string_literal
 		| character_literal
-		| variableIdentifier );
+		| variableIdentifier
+	);
 	HRule power( "power", atom >> ( * ( '^' >> atom ) ) );
 	HRule multiplication( "multiplication", power >> ( * ( '*' >> power ) ) );
 	HRule sum( "sum", multiplication >> ( * ( '+' >> multiplication ) ) );
@@ -103,7 +104,18 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule booleanOr( "booleanOr", booleanValue >> "||" >> booleanValue );
 	HRule booleanXor( "booleanXor", booleanValue >> "^^" >> booleanValue );
 	HRule booleanNot( "booleanNot", constant( '!' ) >> booleanValue );
-	booleanExpression %= ( booleanEquals | booleanNotEquals | booleanLess | booleanGreater | booleanLessEq | booleanGreaterEq | booleanAnd | booleanOr | booleanXor | booleanNot );
+	booleanExpression %= (
+		booleanEquals
+		| booleanNotEquals
+		| booleanLess
+		| booleanGreater
+		| booleanLessEq
+		| booleanGreaterEq
+		| booleanAnd
+		| booleanOr
+		| booleanXor
+		| booleanNot
+	);
 	HRule expressionList( "expressionList", + ( expression >> ';' ) );
 	HRule scope( "scope" );
 	HRule loopScope( "loopScope" );
@@ -124,9 +136,23 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> -defaultStatement >> '}' );
 	HRule returnStatement( "returnStatement", constant( "return" ) >> '(' >> expression >> ')' >> ';' );
 	HRule statement( "statement",
-			ifStatement | whileStatement | foreachStatement | switchStatement | returnStatement | expressionList );
+		ifStatement
+		| whileStatement
+		| foreachStatement
+		| switchStatement
+		| returnStatement
+		| expressionList
+	);
 	HRule loopStatement( "loopStatement",
-			ifStatement | whileStatement | foreachStatement | switchStatement | breakStatement | continueStatement | returnStatement | expressionList );
+		ifStatement
+		| whileStatement
+		| foreachStatement
+		| switchStatement
+		| breakStatement
+		| continueStatement
+		| returnStatement
+		| expressionList
+	);
 	scope %= ( '{' >> *statement >> '}' );
 	loopScope %= ( '{' >> *loopStatement >> '}' );
 	HRule nameList( "nameList", variableIdentifier >> ( * ( ',' >> variableIdentifier ) ) );
@@ -137,6 +163,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	return ( huginnGrammar );
 	M_EPILOG
 }
+
 class HPrepocessor {
 public:
 	typedef HPrepocessor this_type;
@@ -147,6 +174,7 @@ private:
 public:
 	HPrepocessor( yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ )
 		: _beg( first_ ), _end( last_ ) {
+		return;
 	}
 	HIterator begin( void ) const;
 	HIterator end( void ) const;
@@ -186,6 +214,8 @@ public:
 	}
 	HIterator& operator = ( HIterator const& it_ ) {
 		if ( &it_ != this ) {
+			HIterator tmp( it_ );
+			swap( tmp );
 		}
 		return ( *this );
 	}
@@ -239,9 +269,13 @@ private:
 	yaal::hcore::HString::const_iterator skip_comment( yaal::hcore::HString::const_iterator );
 };
 
+/*
+ * These cannot be declared inside HPrepocessor body because HIterator is not fully declared there.
+ */
 HPrepocessor::HIterator HPrepocessor::begin( void ) const {
 	return ( HIterator( this, _beg ) );
 }
+
 HPrepocessor::HIterator HPrepocessor::end( void ) const {
 	return ( HIterator( this, _end ) );
 }
@@ -650,7 +684,8 @@ void HHuginn::HList::push_back( HHuginn::value_t const& value_ ) {
 }
 
 HHuginn::HScope::HScope( HScope* parent_ )
-	: _variables(), _parent( parent_ ) {
+	: _variables(), _statements(), _parent( parent_ ) {
+	return;
 }
 
 HHuginn::HIf::HIf( boolean_expression_t condition_,

@@ -47,6 +47,8 @@ public:
 	typedef yaal::hcore::HPointer<HObject> object_t;
 	class HIterable;
 	typedef yaal::hcore::HPointer<HIterable> iterable_t;
+	class HStatement;
+	typedef yaal::hcore::HPointer<HStatement> statement_t;
 	class HScope;
 	typedef yaal::hcore::HPointer<HScope> scope_t;
 	class HIf;
@@ -234,10 +236,16 @@ public:
 	typedef HHuginn::HIterable base_type;
 };
 
-class HHuginn::HExpression : public HHuginn::HObject {
+class HHuginn::HStatement : public HHuginn::HObject {
+public:
+	typedef HHuginn::HStatement this_type;
+	typedef HHuginn::HObject base_type;
+};
+
+class HHuginn::HExpression : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HExpression this_type;
-	typedef HHuginn::HObject base_type;
+	typedef HHuginn::HStatement base_type;
 };
 
 class HHuginn::HBooleanExpression : public HHuginn::HObject {
@@ -246,13 +254,15 @@ public:
 	typedef HHuginn::HObject base_type;
 };
 
-class HHuginn::HScope : public HHuginn::HObject {
+class HHuginn::HScope : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HScope this_type;
-	typedef HHuginn::HObject base_type;
+	typedef HHuginn::HStatement base_type;
+	typedef yaal::hcore::HList<HHuginn::statement_t> statements_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::value_t> variables_t;
 private:
 	variables_t _variables;
+	statements_t _statements;
 	HHuginn::HScope* _parent;
 public:
 	HScope( HScope* );
