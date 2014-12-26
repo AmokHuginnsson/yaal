@@ -195,6 +195,12 @@ public:
 		return ( make_pair( iterator( it.first ), it.second ) );
 		M_EPILOG
 	}
+	insert_result insert( value_type&& val_ ) {
+		M_PROLOG
+		HPair<typename engine_t::HIterator, bool> it( _engine.insert( yaal::move( val_ ) ) );
+		return ( make_pair( iterator( it.first ), it.second ) );
+		M_EPILOG
+	}
 	void resize( int long size_ ) {
 		M_PROLOG
 		_engine.resize( size_ );
@@ -266,8 +272,9 @@ private:
 };
 
 template<typename key_type, typename hasher_t, typename allocator_t>
-inline void swap( yaal::hcore::HHashSet<key_type, hasher_t, allocator_t>& a, yaal::hcore::HHashSet<key_type, hasher_t, allocator_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HHashSet<key_type, hasher_t, allocator_t>& a, yaal::hcore::HHashSet<key_type, hasher_t, allocator_t>& b ) {
+	a.swap( b );
+}
 
 }
 
