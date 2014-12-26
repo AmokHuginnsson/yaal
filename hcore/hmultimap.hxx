@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hmultimap.hxx - this file is integral part of `yaal' project.
+  hmultimap.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -72,14 +72,17 @@ public:
 	typedef typename multimap_engine_t::allocator_type allocator_type;
 	typedef HMultiMap<key_type_t, value_type_t, compare_t, allocator_t, storage_policy_t> this_type;
 	HMultiMap( void )
-		: _engine()
-		{}
+		: _engine() {
+		return;
+	}
 	explicit HMultiMap( compare_type const& compare_ )
-		: _engine( compare_ )
-		{}
+		: _engine( compare_ ) {
+		return;
+	}
 	explicit HMultiMap( allocator_type const& allocator_ )
-		: _engine( allocator_ )
-		{}
+		: _engine( allocator_ ) {
+		return;
+	}
 	template<typename iterator_t>
 	HMultiMap( iterator_t first, iterator_t last, compare_type const& compare_ = compare_type(), allocator_type const& allocator_ = allocator_type() )
 		: _engine( compare_, allocator_ ) {
@@ -132,10 +135,26 @@ public:
 		return ( iterator( this, major, minor.base() ) );
 		M_EPILOG
 	}
+	iterator push_back( value_type&& value_ ) {
+		M_PROLOG
+		typename multimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_back( yaal::move( storage_t::value( value_ ) ) );
+		typename value_list_t::reverse_iterator minor = major->second->rbegin();
+		return ( iterator( this, major, minor.base() ) );
+		M_EPILOG
+	}
 	iterator insert( value_type const& value_ ) {
 		M_PROLOG
 		typename multimap_engine_t::iterator major = ensure_key( value_.first );
 		major->second->push_back( storage_t::value( value_ ) );
+		typename value_list_t::iterator minor = major->second->rbegin().base();
+		return ( iterator( this, major, minor ) );
+		M_EPILOG
+	}
+	iterator insert( value_type&& value_ ) {
+		M_PROLOG
+		typename multimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_back( yaal::move( storage_t::value( value_ ) ) );
 		typename value_list_t::iterator minor = major->second->rbegin().base();
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
@@ -160,6 +179,14 @@ public:
 		M_PROLOG
 		typename multimap_engine_t::iterator major = ensure_key( value_.first );
 		major->second->push_front( storage_t::value( value_ ) );
+		typename value_list_t::iterator minor = major->second->begin();
+		return ( iterator( this, major, minor ) );
+		M_EPILOG
+	}
+	iterator push_front( value_type&& value_ ) {
+		M_PROLOG
+		typename multimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_front( yaal::move( storage_t::value( value_ ) ) );
 		typename value_list_t::iterator minor = major->second->begin();
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
@@ -281,12 +308,15 @@ public:
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 	}
-	const_iterator end( void ) const
-		{ return ( const_iterator( this, _engine.end(), typename value_list_t::const_iterator() ) ); }
-	const_iterator cend( void ) const
-		{ return ( end() ); }
-	iterator end( void )
-		{ return ( iterator( this, _engine.end(), typename value_list_t::iterator() ) ); }
+	const_iterator end( void ) const {
+		return ( const_iterator( this, _engine.end(), typename value_list_t::const_iterator() ) );
+	}
+	const_iterator cend( void ) const {
+		return ( end() );
+	}
+	iterator end( void ) {
+		return ( iterator( this, _engine.end(), typename value_list_t::iterator() ) );
+	}
 	const_reverse_iterator rbegin( void ) const {
 		M_PROLOG
 		return ( end() );
@@ -429,14 +459,18 @@ public:
 		operator--();
 		return ( it );
 	}
-	typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t operator* ( void ) const
-		{	return ( multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );	}
-	typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_ptr_t operator->( void ) const
-		{	return ( &multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );	}
-	bool operator == ( HIterator const& it ) const
-		{ return ( ( _major == it._major ) && ( _minor == it._minor ) ); }
-	bool operator != ( HIterator const& it ) const
-		{ return ( ! ( ( _major == it._major ) && ( _minor == it._minor ) ) ); }
+	typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t operator* ( void ) const {
+		return ( multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );
+	}
+	typename multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_ptr_t operator->( void ) const {
+		return ( &multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );
+	}
+	bool operator == ( HIterator const& it ) const {
+		return ( ( _major == it._major ) && ( _minor == it._minor ) );
+	}
+	bool operator != ( HIterator const& it ) const {
+		return ( ! ( ( _major == it._major ) && ( _minor == it._minor ) ) );
+	}
 private:
 	friend class HMultiMap<key_type, data_type, compare_type, allocator_t, storage_policy_t>;
 	explicit HIterator( multi_map_t const* const owner_,
@@ -448,8 +482,9 @@ private:
 
 template<typename key_type_t, typename value_type_t, typename compare_t, typename allocator_t, template<typename, typename>class storage_policy_t>
 inline void swap( yaal::hcore::HMultiMap<key_type_t, value_type_t, compare_t, allocator_t, storage_policy_t>& a,
-		yaal::hcore::HMultiMap<key_type_t, value_type_t, compare_t, allocator_t, storage_policy_t>& b )
-	{ a.swap( b ); }
+		yaal::hcore::HMultiMap<key_type_t, value_type_t, compare_t, allocator_t, storage_policy_t>& b ) {
+	a.swap( b );
+}
 
 }
 
