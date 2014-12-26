@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hhashmap.hxx - this file is integral part of `yaal' project.
+  hhashmap.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -221,6 +221,12 @@ public:
 	insert_result insert( value_type const& val_ ) {
 		M_PROLOG
 		HPair<typename engine_t::HIterator, bool> it( _engine.insert( val_ ) );
+		return ( make_pair( iterator( it.first ), it.second ) );
+		M_EPILOG
+	}
+	insert_result insert( value_type&& val_ ) {
+		M_PROLOG
+		HPair<typename engine_t::HIterator, bool> it( _engine.insert( yaal::move( val_ ) ) );
 		return ( make_pair( iterator( it.first ), it.second ) );
 		M_EPILOG
 	}
