@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hhashmultiset.hxx - this file is integral part of `yaal' project.
+  hhashmultiset.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -63,11 +63,13 @@ public:
 	public:
 		typedef iterator_interface<value_type const, iterator_category::forward> base_type;
 		HIterator( void )
-			: base_type(), _index( 0 ), _owner( NULL ), _engine()
-			{}
+			: base_type(), _index( 0 ), _owner( NULL ), _engine() {
+			return;
+		}
 		HIterator( HIterator const& it_ )
-			: base_type(), _index( it_._index ), _owner( it_._owner ), _engine( it_._engine )
-			{}
+			: base_type(), _index( it_._index ), _owner( it_._owner ), _engine( it_._engine ) {
+			return;
+		}
 		HIterator& operator = ( HIterator const& it_ ) {
 			if ( &it_ != this ) {
 				_index = it_._index;
@@ -76,9 +78,9 @@ public:
 			return ( *this );
 		}
 		HIterator& operator ++ ( void ) {
-			if ( _index < ( _engine.get().second - 1 ) )
+			if ( _index < ( _engine.get().second - 1 ) ) {
 				++ _index;
-			else {
+			} else {
 				_index = 0;
 				++ _engine;
 			}
@@ -94,8 +96,9 @@ public:
 				-- _index;
 			} else {
 				-- _engine;
-				if ( _engine != _owner->end() )
+				if ( _engine != _owner->end() ) {
 					_index = _engine.get().second - 1;
+				}
 			}
 			return ( *this );
 		}
@@ -104,19 +107,24 @@ public:
 			operator -- ();
 			return ( it );
 		}
-		key_type const& operator* ( void ) const
-			{ return ( _engine.get().first ); }
-		key_type const* operator-> ( void ) const
-			{ return ( &_engine.get().first ); }
-		bool operator == ( HIterator const& it ) const
-			{ return ( ( _engine == it._engine ) && ( _index == it._index )  ); }
-		bool operator != ( HIterator const& it ) const
-			{ return ( ( _engine != it._engine ) || ( _index != it._index ) ); }
+		key_type const& operator* ( void ) const {
+			return ( _engine.get().first );
+		}
+		key_type const* operator-> ( void ) const {
+			return ( &_engine.get().first );
+		}
+		bool operator == ( HIterator const& it ) const {
+			return ( ( _engine == it._engine ) && ( _index == it._index )  );
+		}
+		bool operator != ( HIterator const& it ) const {
+			return ( ( _engine != it._engine ) || ( _index != it._index ) );
+		}
 	private:
 		friend class HHashMultiSet<key_type, hasher_type, allocator_t>;
 		explicit HIterator( engine_t const* owner_, typename engine_t::HIterator const& it, int long index_ )
-			: base_type(), _index( index_ ), _owner( owner_ ), _engine( it )
-			{}
+			: base_type(), _index( index_ ), _owner( owner_ ), _engine( it ) {
+			return;
+		}
 	};
 	typedef HIterator iterator;
 	typedef HIterator const_iterator;
@@ -126,14 +134,17 @@ private:
 	engine_t _engine;
 public:
 	HHashMultiSet( void )
-		: _engine( hasher_type(), allocator_type() )
-		{}
+		: _engine( hasher_type(), allocator_type() ) {
+		return;
+	}
 	explicit HHashMultiSet( hasher_type const& hasher_ )
-		: _engine( hasher_, allocator_type() )
-		{}
+		: _engine( hasher_, allocator_type() ) {
+		return;
+	}
 	explicit HHashMultiSet( allocator_type const& allocator_ )
-		: _engine( hasher_type(), allocator_ )
-		{}
+		: _engine( hasher_type(), allocator_ ) {
+		return;
+	}
 	/*! \brief Lower bound of size of map's table */
 	explicit HHashMultiSet( int long size_ )
 		: _engine( hasher_type(), allocator_type() ) {
@@ -226,6 +237,15 @@ public:
 		return ( iterator( &_engine, p.first, p.first.get().second - 1 ) );
 		M_EPILOG
 	}
+	iterator insert( value_type&& val_ ) {
+		M_PROLOG
+		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair<value_type, int long>( yaal::move( val_ ), 1L ) ) );
+		if ( ! p.second ) {
+			++ p.first.get().second;
+		}
+		return ( iterator( &_engine, p.first, p.first.get().second - 1 ) );
+		M_EPILOG
+	}
 	void resize( int long size_ ) {
 		M_PROLOG
 		_engine.resize( size_ );
@@ -276,8 +296,11 @@ public:
 		return ( it != end() ? it._engine.get().second : 0 );
 		M_EPILOG
 	}
-	void clear( void )
-		{ M_PROLOG _engine.clear(); return; M_EPILOG }
+	void clear( void ) {
+		M_PROLOG
+		_engine.clear(); return;
+		M_EPILOG
+	}
 	int long get_size( void ) const {
 		M_PROLOG
 		int long sizeAcc( 0 );
@@ -286,12 +309,21 @@ public:
 		return ( sizeAcc );
 		M_EPILOG
 	}
-	int long size( void ) const
-		{ M_PROLOG return ( get_size() ); M_EPILOG }
-	bool is_empty( void ) const
-		{ M_PROLOG return ( _engine.is_empty() ); M_EPILOG }
-	bool empty( void ) const
-		{ M_PROLOG return ( _engine.is_empty() ); M_EPILOG }
+	int long size( void ) const {
+		M_PROLOG
+		return ( get_size() );
+		M_EPILOG
+	}
+	bool is_empty( void ) const {
+		M_PROLOG
+		return ( _engine.is_empty() );
+		M_EPILOG
+	}
+	bool empty( void ) const {
+		M_PROLOG
+		return ( _engine.is_empty() );
+		M_EPILOG
+	}
 	void swap( HHashMultiSet& set_ ) {
 		if ( &set_ != this ) {
 			using yaal::swap;
@@ -299,16 +331,24 @@ public:
 		}
 		return;
 	}
-	bool operator == ( HHashMultiSet const& set_ ) const
-		{ M_PROLOG return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
-	bool operator < ( HHashMultiSet const& set_ ) const
-		{ M_PROLOG return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
+	bool operator == ( HHashMultiSet const& set_ ) const {
+		M_PROLOG
+		return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) );
+		M_EPILOG
+	}
+	bool operator < ( HHashMultiSet const& set_ ) const {
+		M_PROLOG
+		return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) );
+		M_EPILOG
+	}
 private:
 };
 
 template<typename key_type, typename hasher_t, typename allocator_t>
-inline void swap( yaal::hcore::HHashMultiSet<key_type, hasher_t, allocator_t>& a, yaal::hcore::HHashMultiSet<key_type, hasher_t, allocator_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HHashMultiSet<key_type, hasher_t, allocator_t>& a,
+		yaal::hcore::HHashMultiSet<key_type, hasher_t, allocator_t>& b ) {
+	a.swap( b );
+}
 
 }
 
