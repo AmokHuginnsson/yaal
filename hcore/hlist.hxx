@@ -84,6 +84,10 @@ private:
 			: _previous( NULL ), _next( NULL ), _value( value_ ) {
 			connect( element_ );
 		}
+		explicit HElement( HElement* element_, trait::false_type const*, type_t&& value_ )
+			: _previous( NULL ), _next( NULL ), _value( yaal::move( value_ ) ) {
+			connect( element_ );
+		}
 
 		~HElement( void ) {
 			_previous->_next = _next;
