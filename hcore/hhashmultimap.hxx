@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hhashmultimap.hxx - this file is integral part of `yaal' project.
+  hhashmultimap.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -41,8 +41,9 @@ namespace hcore {
 template<typename key_t, typename value_t>
 struct hashmultimap_helper {
 	typedef key_t key_type;
-	inline static key_type const& key( HPair<key_t, value_t> const& key_ )
-		{	return ( key_.first ); }
+	inline static key_type const& key( HPair<key_t, value_t> const& key_ ) {
+		return ( key_.first );
+	}
 };
 
 /*! \brief Hash map with relation one-to-many on keys to values.
@@ -80,17 +81,21 @@ private:
 public:
 	typedef typename hashmultimap_engine_t::allocator_type allocator_type;
 	HHashMultiMap( void )
-		: _engine()
-		{}
+		: _engine() {
+		return;
+	}
 	explicit HHashMultiMap( hasher_type const& hasher_ )
-		: _engine( hasher_ )
-		{}
+		: _engine( hasher_ ) {
+		return;
+	}
 	explicit HHashMultiMap( allocator_type const& allocator_ )
-		: _engine( allocator_ )
-		{}
+		: _engine( allocator_ ) {
+		return;
+	}
 	explicit HHashMultiMap( int long size_ )
-		: _engine( size_ )
-		{}
+		: _engine( size_ ) {
+		return;
+	}
 	template<typename iterator_t>
 	HHashMultiMap( iterator_t first, iterator_t last, hasher_type const& hasher_ = hasher_type(), allocator_type const& allocator_ = allocator_type() )
 		: _engine( hasher_, allocator_ ) {
@@ -115,8 +120,9 @@ public:
 		return ( *this );
 		M_EPILOG
 	}
-	int long size( void ) const
-		{ return ( get_size() ); }
+	int long size( void ) const {
+		return ( get_size() );
+	}
 	int long get_size( void ) const {
 		M_PROLOG
 		int long sizeAcc( 0 );
@@ -138,7 +144,15 @@ public:
 		M_PROLOG
 		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
 		major->second->push_back( storage_t::value( value_ ) );
-		typename value_list_t::iterator minor = major->second->rbegin();
+		typename value_list_t::iterator minor = major->second->rbegin().base();
+		return ( iterator( this, major, minor ) );
+		M_EPILOG
+	}
+	iterator push_back( value_type&& value_ ) {
+		M_PROLOG
+		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_back( yaal::move( storage_t::value( value_ ) ) );
+		typename value_list_t::iterator minor = major->second->rbegin().base();
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
 	}
@@ -146,6 +160,14 @@ public:
 		M_PROLOG
 		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
 		major->second->push_back( storage_t::value( value_ ) );
+		typename value_list_t::iterator minor = major->second->rbegin().base();
+		return ( iterator( this, major, minor ) );
+		M_EPILOG
+	}
+	iterator insert( value_type&& value_ ) {
+		M_PROLOG
+		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_back( yaal::move( storage_t::value( value_ ) ) );
 		typename value_list_t::iterator minor = major->second->rbegin().base();
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
@@ -170,6 +192,14 @@ public:
 		M_PROLOG
 		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
 		major->second->push_front( storage_t::value( value_ ) );
+		typename value_list_t::iterator minor = major->second->begin();
+		return ( iterator( this, major, minor ) );
+		M_EPILOG
+	}
+	iterator push_front( value_type&& value_ ) {
+		M_PROLOG
+		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
+		major->second->push_front( yaal::move( storage_t::value( value_ ) ) );
 		typename value_list_t::iterator minor = major->second->begin();
 		return ( iterator( this, major, minor ) );
 		M_EPILOG
@@ -449,19 +479,25 @@ public:
 		operator--();
 		return ( it );
 	}
-	typename hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t operator* ( void ) const
-		{	return ( hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );	}
-	typename hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_ptr_t operator->( void ) const
-		{	return ( &hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );	}
-	bool operator == ( HIterator const& it ) const
-		{ return ( ( _major == it._major ) && ( _minor == it._minor ) ); }
-	bool operator != ( HIterator const& it ) const
-		{ return ( ! ( ( _major == it._major ) && ( _minor == it._minor ) ) ); }
+	typename hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_t operator* ( void ) const {
+		return ( hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );
+	}
+	typename hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor_ptr_t operator->( void ) const {
+		return ( &hash_multi_map_t::storage_t::template const_aware_type<const_qual_t>::accessor( _major->first, *_minor ) );
+	}
+	bool operator == ( HIterator const& it ) const {
+		return ( ( _major == it._major ) && ( _minor == it._minor ) );
+	}
+	bool operator != ( HIterator const& it ) const {
+		return ( ! ( ( _major == it._major ) && ( _minor == it._minor ) ) );
+	}
 private:
 	friend class HHashMultiMap<key_type, data_type, hasher_type, allocator_t, storage_policy_t>;
 	explicit HIterator( hash_multi_map_t const* const owner_,
 			key_iterator_t const& major,
-			value_iterator_t const& minor ) : base_type(), _owner( owner_ ), _major( major ), _minor( minor ) {};
+			value_iterator_t const& minor ) : base_type(), _owner( owner_ ), _major( major ), _minor( minor ) {
+		return;
+	}
 };
 
 }
@@ -469,9 +505,9 @@ private:
 template<typename key_type, typename data_type, typename hasher_t, typename allocator_t, template<typename, typename>class storage_policy_t>
 inline void swap(
 		yaal::hcore::HHashMultiMap<key_type, data_type, hasher_t, allocator_t, storage_policy_t>& a,
-		yaal::hcore::HHashMultiMap<key_type, data_type, hasher_t, allocator_t, storage_policy_t>& b
-		)
-	{ a.swap( b ); }
+		yaal::hcore::HHashMultiMap<key_type, data_type, hasher_t, allocator_t, storage_policy_t>& b ) {
+	a.swap( b );
+}
 
 }
 
