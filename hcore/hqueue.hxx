@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcore/hqueue.hxx - this file is integral part of `yaal' project.
+  hcore/hqueue.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -102,6 +102,19 @@ public:
 	void push( value_type const& value_ ) {
 		M_PROLOG
 		_sequence.push_back( value_ );
+		return;
+		M_EPILOG
+	}
+	void push( value_type&& value_ ) {
+		M_PROLOG
+		_sequence.push_back( yaal::move( value_ ) );
+		return;
+		M_EPILOG
+	}
+	template<typename... arg_t>
+	void emplace( arg_t&&... arg_ ) {
+		M_PROLOG
+		_sequence.emplace_back( yaal::forward<arg_t>( arg_ )... );
 		return;
 		M_EPILOG
 	}
