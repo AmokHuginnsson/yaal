@@ -683,6 +683,29 @@ void HHuginn::HList::push_back( HHuginn::value_t const& value_ ) {
 	M_EPILOG
 }
 
+HHuginn::HStatement::HStatement( void )
+	: _executionSteps(), _continue( false ) {
+	return;
+}
+
+void HHuginn::HStatement::execute( void ) {
+	M_PROLOG
+	_continue = true;
+	for ( HExecutingParser::executor_t& e : _executionSteps ) {
+		e();
+		if ( ! _continue ) {
+			break;
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HStatement::break_execution( void ) {
+	_continue = false;
+	return;
+}
+
 HHuginn::HScope::HScope( HScope* parent_ )
 	: _variables(), _statements(), _parent( parent_ ) {
 	return;

@@ -61,7 +61,7 @@ public:
 	class HValue;
 	typedef yaal::hcore::HPointer<HValue> value_t;
 	class HInteger;
-	class HFloat;
+	class HReal;
 	class HString;
 	class HCharacter;
 	class HList;
@@ -198,14 +198,14 @@ public:
 	HInteger( int long long );
 };
 
-class HHuginn::HFloat : public HHuginn::HValue {
+class HHuginn::HReal : public HHuginn::HValue {
 public:
-	typedef HHuginn::HFloat this_type;
+	typedef HHuginn::HReal this_type;
 	typedef HHuginn::HValue base_type;
 private:
 	double long _value;
 public:
-	HFloat( double long );
+	HReal( double long );
 };
 
 class HHuginn::HString : public HHuginn::HValue {
@@ -240,6 +240,14 @@ class HHuginn::HStatement : public HHuginn::HObject {
 public:
 	typedef HHuginn::HStatement this_type;
 	typedef HHuginn::HObject base_type;
+private:
+	typedef yaal::hcore::HArray<HExecutingParser::executor_t> execution_steps_t;
+	execution_steps_t _executionSteps;
+	bool _continue;
+public:
+	HStatement( void );
+	void execute( void );
+	void break_execution( void );
 };
 
 class HHuginn::HExpression : public HHuginn::HStatement {
