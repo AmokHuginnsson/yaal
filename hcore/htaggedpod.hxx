@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hcore/htaggedpod.hxx - this file is integral part of `yaal' project.
+  hcore/htaggedpod.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -177,6 +177,11 @@ YAAL_DEFINE_OPER( << )
 YAAL_DEFINE_OPER( >> )
 #undef YAAL_DEFINE_OPER
 };
+
+template<typename pod_t, typename TAG>
+inline void swap( HTaggedPOD<pod_t, TAG>& a, HTaggedPOD<pod_t, TAG>& b ) {
+	a.swap( b );
+}
 
 }
 
