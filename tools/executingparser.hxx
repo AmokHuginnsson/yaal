@@ -39,6 +39,7 @@ Copyright:
 #include "hcore/hmap.hxx"
 #include "hcore/hqueue.hxx"
 #include "hcore/hboundcall.hxx"
+#include "hcore/htaggedpod.hxx"
 
 namespace yaal {
 
@@ -66,6 +67,8 @@ class HRuleAggregator;
 typedef yaal::hcore::HExceptionT<HRecursionDetector> HRecursionDetectorException;
 typedef yaal::hcore::HSet<HRuleBase const*> visited_t;
 typedef yaal::hcore::HMap<HRuleBase const*, int> rule_use_t;
+struct Position {};
+typedef yaal::hcore::HTaggedPOD<int, Position> position_t;
 
 class HRuleDescription {
 public:
@@ -131,7 +134,7 @@ public:
 	typedef HRuleBase this_type;
 	typedef HNamedRule::ptr_t ptr_t;
 	typedef yaal::hcore::HBoundCall<> action_t;
-	typedef yaal::hcore::HBoundCall<void ( int )> action_position_t;
+	typedef yaal::hcore::HBoundCall<void ( position_t )> action_position_t;
 protected:
 	action_t _action;
 	action_position_t _actionPosition;
@@ -500,13 +503,13 @@ public:
 	typedef HRuleBase base_type;
 private:
 	typedef yaal::hcore::HBoundCall<void ( double )> action_double_t;
-	typedef yaal::hcore::HBoundCall<void ( double, int )> action_double_position_t;
+	typedef yaal::hcore::HBoundCall<void ( double, position_t )> action_double_position_t;
 	typedef yaal::hcore::HBoundCall<void ( double long )> action_double_long_t;
-	typedef yaal::hcore::HBoundCall<void ( double long, int )> action_double_long_position_t;
+	typedef yaal::hcore::HBoundCall<void ( double long, position_t )> action_double_long_position_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HNumber const& )> action_number_t;
-	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HNumber const&, int )> action_number_position_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HNumber const&, position_t )> action_number_position_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
-	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, int )> action_string_position_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, position_t )> action_string_position_t;
 	action_double_t _actionDouble;
 	action_double_position_t _actionDoublePosition;
 	action_double_long_t _actionDoubleLong;
@@ -569,14 +572,26 @@ public:
 	typedef HInteger this_type;
 	typedef HRuleBase base_type;
 private:
+	typedef yaal::hcore::HBoundCall<void ( int long long )> action_int_long_long_t;
+	typedef yaal::hcore::HBoundCall<void ( int long long, position_t )> action_int_long_long_position_t;
 	typedef yaal::hcore::HBoundCall<void ( int long )> action_int_long_t;
+	typedef yaal::hcore::HBoundCall<void ( int long, position_t )> action_int_long_position_t;
 	typedef yaal::hcore::HBoundCall<void ( int )> action_int_t;
+	typedef yaal::hcore::HBoundCall<void ( int, position_t )> action_int_position_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HNumber const& )> action_number_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HNumber const&, position_t )> action_number_position_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, position_t )> action_string_position_t;
+	action_int_long_long_t _actionIntLongLong;
+	action_int_long_long_position_t _actionIntLongLongPosition;
 	action_int_long_t _actionIntLong;
+	action_int_long_position_t _actionIntLongPosition;
 	action_int_t _actionInt;
+	action_int_position_t _actionIntPosition;
 	action_number_t _actionNumber;
+	action_number_position_t _actionNumberPosition;
 	action_string_t _actionString;
+	action_string_position_t _actionStringPosition;
 	yaal::hcore::HString _cache;
 	typedef enum {
 		START = 0,
@@ -586,16 +601,30 @@ private:
 public:
 	HInteger( HInteger const& );
 	HInteger operator[]( action_t const& ) const;
+	HInteger operator[]( action_position_t const& ) const;
+	HInteger operator[]( action_int_long_long_t const& ) const;
+	HInteger operator[]( action_int_long_long_position_t const& ) const;
 	HInteger operator[]( action_int_long_t const& ) const;
+	HInteger operator[]( action_int_long_position_t const& ) const;
 	HInteger operator[]( action_int_t const& ) const;
+	HInteger operator[]( action_int_position_t const& ) const;
 	HInteger operator[]( action_number_t const& ) const;
+	HInteger operator[]( action_number_position_t const& ) const;
 	HInteger operator[]( action_string_t const& ) const;
+	HInteger operator[]( action_string_position_t const& ) const;
 protected:
 	HInteger( action_t const& );
+	HInteger( action_position_t const& );
+	HInteger( action_int_long_long_t const& );
+	HInteger( action_int_long_long_position_t const& );
 	HInteger( action_int_long_t const& );
+	HInteger( action_int_long_position_t const& );
 	HInteger( action_int_t const& );
+	HInteger( action_int_position_t const& );
 	HInteger( action_number_t const& );
+	HInteger( action_number_position_t const& );
 	HInteger( action_string_t const& );
+	HInteger( action_string_position_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
@@ -616,17 +645,23 @@ class HStringLiteral : public HRuleBase {
 public:
 	typedef HStringLiteral this_type;
 	typedef HRuleBase base_type;
-private:
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, position_t )> action_string_position_t;
+private:
 	action_string_t _actionString;
+	action_string_position_t _actionStringPosition;
 	yaal::hcore::HString _cache;
 public:
 	HStringLiteral( HStringLiteral const& );
 	HStringLiteral operator[]( action_t const& ) const;
+	HStringLiteral operator[]( action_position_t const& ) const;
 	HStringLiteral operator[]( action_string_t const& ) const;
+	HStringLiteral operator[]( action_string_position_t const& ) const;
 protected:
 	HStringLiteral( action_t const& );
+	HStringLiteral( action_position_t const& );
 	HStringLiteral( action_string_t const& );
+	HStringLiteral( action_string_position_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
@@ -649,7 +684,7 @@ public:
 	typedef HRuleBase base_type;
 private:
 	typedef yaal::hcore::HBoundCall<void ( char )> action_character_t;
-	typedef yaal::hcore::HBoundCall<void ( char, int )> action_character_position_t;
+	typedef yaal::hcore::HBoundCall<void ( char, position_t )> action_character_position_t;
 	action_character_t _actionCharacter;
 	action_character_position_t _actionCharacterPosition;
 	yaal::hcore::HString _cache;
@@ -685,7 +720,7 @@ public:
 	typedef HCharacter this_type;
 	typedef HRuleBase base_type;
 	typedef yaal::hcore::HBoundCall<void ( char )> action_character_t;
-	typedef yaal::hcore::HBoundCall<void ( char, int )> action_character_position_t;
+	typedef yaal::hcore::HBoundCall<void ( char, position_t )> action_character_position_t;
 private:
 	yaal::hcore::HString _characters;
 	action_character_t _actionCharacter;
@@ -726,19 +761,25 @@ public:
 	typedef HString this_type;
 	typedef HRuleBase base_type;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, position_t )> action_string_position_t;
 private:
 	yaal::hcore::HString _string;
 	action_string_t _actionString;
+	action_string_position_t _actionStringPosition;
 public:
 	HString( HString const& );
 	virtual ~HString( void ) {
 	}
 	HString operator[]( action_t const& ) const;
+	HString operator[]( action_position_t const& ) const;
 	HString operator[]( action_string_t const& ) const;
+	HString operator[]( action_string_position_t const& ) const;
 	HString operator() ( yaal::hcore::HString const& ) const;
 protected:
 	HString( yaal::hcore::HString const&, action_t const& );
+	HString( yaal::hcore::HString const&, action_position_t const& );
 	HString( yaal::hcore::HString const&, action_string_t const& );
+	HString( yaal::hcore::HString const&, action_string_position_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
@@ -760,20 +801,26 @@ public:
 	typedef HRegex this_type;
 	typedef HRuleBase base_type;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, position_t )> action_string_position_t;
 private:
 	typedef yaal::hcore::HPointer<yaal::hcore::HRegex> regex_t;
 	regex_t _regex;
 	action_string_t _actionString;
+	action_string_position_t _actionStringPosition;
 public:
 	HRegex( HRegex const& );
 	virtual ~HRegex( void ) {
 		return;
 	}
 	HRegex operator[]( action_t const& ) const;
+	HRegex operator[]( action_position_t const& ) const;
 	HRegex operator[]( action_string_t const& ) const;
+	HRegex operator[]( action_string_position_t const& ) const;
 protected:
 	HRegex( regex_t const&, action_t const& );
+	HRegex( regex_t const&, action_position_t const& );
 	HRegex( regex_t const&, action_string_t const& );
+	HRegex( regex_t const&, action_string_position_t const& );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
@@ -782,7 +829,10 @@ protected:
 	virtual void do_find_recursions( HRuleAggregator& );
 private:
 	HRegex( yaal::hcore::HString const& );
+	HRegex( yaal::hcore::HString const&, action_t const& );
+	HRegex( yaal::hcore::HString const&, action_position_t const& );
 	HRegex( yaal::hcore::HString const&, action_string_t const& );
+	HRegex( yaal::hcore::HString const&, action_string_position_t const& );
 	HRegex& operator = ( HRegex const& );
 	friend HRegex regex( yaal::hcore::HString const&, HRegex::action_string_t const& );
 	friend HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_t const& );

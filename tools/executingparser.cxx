@@ -345,8 +345,9 @@ yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executi
 	M_PROLOG
 	M_ASSERT( first_ && last_ );
 	yaal::hcore::HString::const_iterator it( do_parse( executingParser_, first_, last_ ) );
-	if ( it == first_ )
+	if ( it == first_ ) {
 		HExecutingParser::HProxy::drop_execution_steps( executingParser_, first_ );
+	}
 	M_ASSERT( it );
 	return ( it );
 	M_EPILOG
@@ -537,7 +538,10 @@ HRule::HRule( void )
 }
 
 HRule::HRule( HRule const& rule_ )
-	: HRuleBase( rule_._action ), _rule( rule_._rule ), _completelyDefined( rule_._completelyDefined ) {
+	: HRuleBase( rule_._action, rule_._actionPosition ),
+	_rule( rule_._rule ),
+	_completelyDefined( rule_._completelyDefined ) {
+	return;
 }
 
 HRule::HRule( HRuleBase const& rule_ )
@@ -637,15 +641,18 @@ HRule::ptr_t HRule::do_clone( void ) const {
 
 yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator ret( !! _rule ? _rule->parse( executingParser_, first_, last_ ) : first_ );
-	if ( ret != first_ ) {
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
+	if ( scan != start ) {
 		if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, start, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+			add_execution_step( executingParser_, start, call( _actionPosition, position( executingParser_, start ) ) );
 		}
+	} else {
+		scan = first_;
 	}
-	return ( ret );
+	return ( scan );
 	M_EPILOG
 }
 
@@ -951,20 +958,28 @@ void HFollows::do_rule_use( rule_use_t& ruleUse_ ) const {
 
 yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator orig( first_ );
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( start );
 	bool matched( true );
 	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
-		yaal::hcore::HString::const_iterator old( first_ );
-		first_ = (*it)->parse( executingParser_, first_, last_ );
-		M_ASSERT( first_ );
-		if ( ( first_ == old ) && ( !(*it)->is_optional() ) ) {
+		yaal::hcore::HString::const_iterator old( scan );
+		scan = (*it)->parse( executingParser_, scan, last_ );
+		M_ASSERT( scan );
+		if ( ( scan == old ) && ( !(*it)->is_optional() ) ) {
 			matched = false;
 			break;
 		}
 	}
-	if ( matched && !! _action )
-		add_execution_step( executingParser_, orig, _action );
-	return ( matched ? first_ : orig );
+	if ( matched ) {
+		if ( !! _action ) {
+			add_execution_step( executingParser_, start, _action );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, start, call( _actionPosition, position( executingParser_, start ) ) );
+		}
+	} else {
+		scan = first_;
+	}
+	return ( scan );
 	M_EPILOG
 }
 
@@ -974,11 +989,12 @@ void HFollows::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& det
 		HRuleBase::ptr_t r( it->rule() );
 		if ( !! r ) {
 			bool detachThis( r.raw() == rule_ );
-			if ( detachThis && detachAll_ )
+			if ( detachThis && detachAll_ ) {
 				it->reset( make_pointer<HRuleRef>( r ) );
-			else {
-				if ( detachThis )
+			} else {
+				if ( detachThis ) {
 					detachAll_ = true;
+				}
 				r->detach( rule_, visited_, detachAll_ );
 			}
 		}
@@ -1030,24 +1046,26 @@ HKleeneBase::HKleeneBase( HNamedRule const& rule_, action_t const& action_, acti
 
 yaal::hcore::HString::const_iterator HKleeneBase::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
-	yaal::hcore::HString::const_iterator origScan( scan );
-	yaal::hcore::HString::const_iterator old( scan );
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( start );
+	yaal::hcore::HString::const_iterator oldScan( scan );
 	while ( scan != last_ ) {
-		scan = _rule->parse( executingParser_, old, last_ );
-		if ( scan == old )
+		scan = _rule->parse( executingParser_, scan, last_ );
+		if ( scan == oldScan ) {
 			break;
-		old = scan;
-	}
-	if ( scan != origScan ) {
-		if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
-		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, origScan ) ) );
 		}
-		first_ = scan;
+		oldScan = scan;
 	}
-	return ( first_ );
+	if ( scan != start ) {
+		if ( !! _action ) {
+			add_execution_step( executingParser_, start, _action );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, start, call( _actionPosition, position( executingParser_, start ) ) );
+		}
+	} else {
+		scan = first_;
+	}
+	return ( scan );
 	M_EPILOG
 }
 
@@ -1267,21 +1285,23 @@ HAlternative HAlternative::operator[]( action_position_t const& action_ ) const 
 }
 
 yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
-	yaal::hcore::HString::const_iterator scan( first_ );
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( start );
 	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
-		if ( ( scan = (*it)->parse( executingParser_, first_, last_ ) ) != first_ ) {
+		if ( ( scan = (*it)->parse( executingParser_, start, last_ ) ) != start ) {
 			break;
 		}
 	}
-	if ( scan != first_ ) {
+	if ( scan != start ) {
 		if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, start, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+			add_execution_step( executingParser_, start, call( _actionPosition, position( executingParser_, start ) ) );
 		}
-		first_ = scan;
+	} else {
+		scan = first_;
 	}
-	return ( first_ );
+	return ( scan );
 }
 
 void HAlternative::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
@@ -1391,15 +1411,18 @@ HOptional HOptional::operator[]( action_position_t const& action_ ) const {
 
 yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator ret( !! _rule ? _rule->parse( executingParser_, first_, last_ ) : first_ );
-	if ( ret != first_ ) {
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
+	if ( scan != start ) {
 		if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, start, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+			add_execution_step( executingParser_, start, call( _actionPosition, position( executingParser_, start ) ) );
 		}
+	} else {
+		scan = first_;
 	}
-	return ( ret );
+	return ( scan );
 	M_EPILOG
 }
 
@@ -1724,7 +1747,8 @@ HReal HReal::operator[]( action_string_position_t const& action_ ) const {
 
 yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( start );
 	_cache.clear();
 	real_paring_state_t state( START );
 	while ( scan != last_ ) {
@@ -1767,23 +1791,37 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 		++ scan;
 	}
 	if ( state >= INTEGRAL ) {
+		int pos( position( executingParser_, start ) );
 		if ( !! _actionDouble ) {
 			double d( lexical_cast<double>( _cache ) );
-			add_execution_step( executingParser_, first_, call( _actionDouble, d ) );
+			add_execution_step( executingParser_, start, call( _actionDouble, d ) );
+		} else if ( !! _actionDoublePosition ) {
+			double d( lexical_cast<double>( _cache ) );
+			add_execution_step( executingParser_, start, call( _actionDoublePosition, d, pos ) );
 		} else if ( !! _actionDoubleLong ) {
 			double long dl( lexical_cast<double long>( _cache ) );
-			add_execution_step( executingParser_, first_, call( _actionDoubleLong, dl ) );
+			add_execution_step( executingParser_, start, call( _actionDoubleLong, dl ) );
+		} else if ( !! _actionDoubleLongPosition ) {
+			double long dl( lexical_cast<double long>( _cache ) );
+			add_execution_step( executingParser_, start, call( _actionDoubleLongPosition, dl, pos ) );
 		} else if ( !! _actionNumber ) {
-			add_execution_step( executingParser_, first_, call( _actionNumber, yaal::move( _cache ) ) );
+			add_execution_step( executingParser_, start, call( _actionNumber, yaal::move( _cache ) ) );
+		} else if ( !! _actionNumberPosition ) {
+			add_execution_step( executingParser_, start, call( _actionNumberPosition, yaal::move( _cache ), pos ) );
 		} else if ( !! _actionString ) {
-			add_execution_step( executingParser_, first_, call( _actionString, yaal::move( _cache ) ) );
-		} else if ( !! _action )
-			add_execution_step( executingParser_, first_, call( _action ) );
-		first_ = scan;
+			add_execution_step( executingParser_, start, call( _actionString, yaal::move( _cache ) ) );
+		} else if ( !! _actionString ) {
+			add_execution_step( executingParser_, start, call( _actionStringPosition, yaal::move( _cache ), pos ) );
+		} else if ( !! _action ) {
+			add_execution_step( executingParser_, start, call( _action ) );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+		}
 	} else {
 		report_error( executingParser_, scan, "expected real number" );
+		scan = first_;
 	}
-	return ( first_ );
+	return ( scan );
 	M_EPILOG
 }
 
@@ -1829,85 +1867,319 @@ HReal const& get_real_instance( void ) {
 HReal const& real( get_real_instance() );
 
 HInteger::HInteger( void )
-	: HRuleBase(), _actionIntLong(), _actionInt(),
-	_actionNumber(), _actionString(), _cache() {
+	: HRuleBase(),
+	_actionIntLongLong(), _actionIntLongLongPosition(),
+	_actionIntLong(), _actionIntLongPosition(),
+	_actionInt(), _actionIntPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
 	return;
 }
 
 HInteger::HInteger( action_t const& action_ )
-	: HRuleBase( action_ ), _actionIntLong(), _actionInt(),
-	_actionNumber(), _actionString(), _cache() {
+	: HRuleBase( action_ ),
+	_actionIntLongLong(), _actionIntLongLongPosition(),
+	_actionIntLong(), _actionIntLongPosition(),
+	_actionInt(), _actionIntPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HInteger::HInteger( action_position_t const& action_ )
+	: HRuleBase( action_ ),
+	_actionIntLongLong(), _actionIntLongLongPosition(),
+	_actionIntLong(), _actionIntLongPosition(),
+	_actionInt(), _actionIntPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HInteger::HInteger( action_int_long_long_t const& action_ )
+	: HRuleBase(),
+	_actionIntLongLong( action_ ), _actionIntLongLongPosition(),
+	_actionIntLong(), _actionIntLongPosition(),
+	_actionInt(), _actionIntPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HInteger::HInteger( action_int_long_long_position_t const& action_ )
+	: HRuleBase(),
+	_actionIntLongLong(), _actionIntLongLongPosition( action_ ),
+	_actionIntLong(), _actionIntLongPosition(),
+	_actionInt(), _actionIntPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
 	return;
 }
 
 HInteger::HInteger( action_int_long_t const& action_ )
-	: HRuleBase(), _actionIntLong( action_ ), _actionInt(),
-	_actionNumber(), _actionString(), _cache() {
+	: HRuleBase(),
+	_actionIntLongLong(), _actionIntLongLongPosition(),
+	_actionIntLong( action_ ), _actionIntLongPosition(),
+	_actionInt(), _actionIntPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HInteger::HInteger( action_int_long_position_t const& action_ )
+	: HRuleBase(),
+	_actionIntLongLong(), _actionIntLongLongPosition(),
+	_actionIntLong(), _actionIntLongPosition( action_ ),
+	_actionInt(), _actionIntPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
 	return;
 }
 
 HInteger::HInteger( action_int_t const& action_ )
-	: HRuleBase(), _actionIntLong(), _actionInt( action_ ),
-	_actionNumber(), _actionString(), _cache() {
+	: HRuleBase(),
+	_actionIntLongLong(), _actionIntLongLongPosition(),
+	_actionIntLong(), _actionIntLongPosition(),
+	_actionInt( action_ ), _actionIntPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HInteger::HInteger( action_int_position_t const& action_ )
+	: HRuleBase(),
+	_actionIntLongLong(), _actionIntLongLongPosition(),
+	_actionIntLong(), _actionIntLongPosition(),
+	_actionInt(), _actionIntPosition( action_ ),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
 	return;
 }
 
 HInteger::HInteger( action_number_t const& action_ )
-	: HRuleBase(), _actionIntLong(), _actionInt(),
-	_actionNumber( action_ ), _actionString(), _cache() {
+	: HRuleBase(),
+	_actionIntLongLong(), _actionIntLongLongPosition(),
+	_actionIntLong(), _actionIntLongPosition(),
+	_actionInt(), _actionIntPosition(),
+	_actionNumber( action_ ), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HInteger::HInteger( action_number_position_t const& action_ )
+	: HRuleBase(),
+	_actionIntLongLong(), _actionIntLongLongPosition(),
+	_actionIntLong(), _actionIntLongPosition(),
+	_actionInt(), _actionIntPosition(),
+	_actionNumber(), _actionNumberPosition( action_ ),
+	_actionString(), _actionStringPosition(),
+	_cache() {
 	return;
 }
 
 HInteger::HInteger( action_string_t const& action_ )
-	: HRuleBase(), _actionIntLong(), _actionInt(),
-	_actionNumber(), _actionString( action_ ), _cache() {
+	: HRuleBase(),
+	_actionIntLongLong(), _actionIntLongLongPosition(),
+	_actionIntLong(), _actionIntLongPosition(),
+	_actionInt(), _actionIntPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString( action_ ), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HInteger::HInteger( action_string_position_t const& action_ )
+	: HRuleBase(),
+	_actionIntLongLong(), _actionIntLongLongPosition(),
+	_actionIntLong(), _actionIntLongPosition(),
+	_actionInt(), _actionIntPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition( action_ ),
+	_cache() {
 	return;
 }
 
 HInteger::HInteger( HInteger const& integer_ )
-	: HRuleBase( integer_._action ), _actionIntLong( integer_._actionIntLong ), _actionInt( integer_._actionInt ),
-	_actionNumber( integer_._actionNumber ), _actionString( integer_._actionString ), _cache( integer_._cache ) {
+	: HRuleBase( integer_._action, integer_._actionPosition ),
+	_actionIntLongLong( integer_._actionIntLongLong ), _actionIntLongLongPosition( integer_._actionIntLongLongPosition ),
+	_actionIntLong( integer_._actionIntLong ), _actionIntLongPosition( integer_._actionIntLongPosition ),
+	_actionInt( integer_._actionInt ), _actionIntPosition( integer_._actionIntPosition ),
+	_actionNumber( integer_._actionNumber ), _actionNumberPosition( integer_._actionNumberPosition ),
+	_actionString( integer_._actionString ), _actionStringPosition( integer_._actionStringPosition ),
+	_cache( integer_._cache ) {
 	return;
 }
 
 HInteger HInteger::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
+	return ( HInteger( action_ ) );
+	M_EPILOG
+}
+
+HInteger HInteger::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
+	return ( HInteger( action_ ) );
+	M_EPILOG
+}
+
+HInteger HInteger::operator[]( action_int_long_long_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
+	return ( HInteger( action_ ) );
+	M_EPILOG
+}
+
+HInteger HInteger::operator[]( action_int_long_long_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
 	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
 HInteger HInteger::operator[]( action_int_long_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
+	return ( HInteger( action_ ) );
+	M_EPILOG
+}
+
+HInteger HInteger::operator[]( action_int_long_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
 	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
 HInteger HInteger::operator[]( action_int_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
+	return ( HInteger( action_ ) );
+	M_EPILOG
+}
+
+HInteger HInteger::operator[]( action_int_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
 	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
 HInteger HInteger::operator[]( action_number_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
+	return ( HInteger( action_ ) );
+	M_EPILOG
+}
+
+HInteger HInteger::operator[]( action_number_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
 	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
 HInteger HInteger::operator[]( action_string_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionIntLong ) && ( ! _actionInt ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
+	return ( HInteger( action_ ) );
+	M_EPILOG
+}
+
+HInteger HInteger::operator[]( action_string_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionIntLongLong ) && ( ! _actionIntLongLongPosition )
+		&& ( ! _actionIntLong ) && ( ! _actionIntLongPosition )
+		&& ( ! _actionInt ) && ( ! _actionIntPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition )
+	);
 	return ( HInteger( action_ ) );
 	M_EPILOG
 }
 
 yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( start );
 	_cache.clear();
 	real_paring_state_t state( START );
 	while ( scan != last_ ) {
@@ -1939,23 +2211,43 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 		++ scan;
 	}
 	if ( state >= DIGIT ) {
-		if ( !! _actionIntLong ) {
+		int pos( position( executingParser_, start ) );
+		if ( !! _actionIntLongLong ) {
+			int long long ill( lexical_cast<int long long>( _cache ) );
+			add_execution_step( executingParser_, start, call( _actionIntLongLong, ill ) );
+		} else if ( !! _actionIntLongLongPosition ) {
+			int long long ill( lexical_cast<int long long>( _cache ) );
+			add_execution_step( executingParser_, start, call( _actionIntLongLongPosition, ill, pos ) );
+		} else if ( !! _actionIntLong ) {
 			int long il( lexical_cast<int long>( _cache ) );
-			add_execution_step( executingParser_, first_, call( _actionIntLong, il ) );
+			add_execution_step( executingParser_, start, call( _actionIntLong, il ) );
+		} else if ( !! _actionIntLongPosition ) {
+			int long il( lexical_cast<int long>( _cache ) );
+			add_execution_step( executingParser_, start, call( _actionIntLongPosition, il, pos ) );
 		} else if ( !! _actionInt ) {
 			int i( lexical_cast<int>( _cache ) );
-			add_execution_step( executingParser_, first_, call( _actionInt, i ) );
+			add_execution_step( executingParser_, start, call( _actionInt, i ) );
+		} else if ( !! _actionIntPosition ) {
+			int i( lexical_cast<int>( _cache ) );
+			add_execution_step( executingParser_, start, call( _actionIntPosition, i, pos ) );
 		} else if ( !! _actionNumber ) {
-			add_execution_step( executingParser_, first_, call( _actionNumber, yaal::move( _cache ) ) );
+			add_execution_step( executingParser_, start, call( _actionNumber, yaal::move( _cache ) ) );
+		} else if ( !! _actionNumberPosition ) {
+			add_execution_step( executingParser_, start, call( _actionNumberPosition, yaal::move( _cache ), pos ) );
 		} else if ( !! _actionString ) {
-			add_execution_step( executingParser_, first_, call( _actionString, yaal::move( _cache ) ) );
-		} else if ( !! _action )
-			add_execution_step( executingParser_, first_, call( _action ) );
-		first_ = scan;
+			add_execution_step( executingParser_, start, call( _actionString, yaal::move( _cache ) ) );
+		} else if ( !! _actionStringPosition ) {
+			add_execution_step( executingParser_, start, call( _actionStringPosition, yaal::move( _cache ), pos ) );
+		} else if ( !! _action ) {
+			add_execution_step( executingParser_, start, call( _action ) );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+		}
 	} else {
 		report_error( executingParser_, scan, "expected integral number" );
+		scan = first_;
 	}
-	return ( first_ );
+	return ( scan );
 	M_EPILOG
 }
 
@@ -2001,32 +2293,56 @@ HInteger const& get_integer_instance( void ) {
 HInteger const& integer( get_integer_instance() );
 
 HStringLiteral::HStringLiteral( void )
-	: HRuleBase(), _actionString(), _cache() {
+	: HRuleBase(), _actionString(), _actionStringPosition(), _cache() {
 }
 
 HStringLiteral::HStringLiteral( action_t const& action_ )
-	: HRuleBase( action_ ), _actionString(), _cache() {
+	: HRuleBase( action_ ), _actionString(), _actionStringPosition(), _cache() {
+}
+
+HStringLiteral::HStringLiteral( action_position_t const& action_ )
+	: HRuleBase( action_ ), _actionString(), _actionStringPosition(), _cache() {
 }
 
 HStringLiteral::HStringLiteral( action_string_t const& action_ )
-	: HRuleBase(), _actionString( action_ ), _cache() {
+	: HRuleBase(), _actionString( action_ ), _actionStringPosition(), _cache() {
+}
+
+HStringLiteral::HStringLiteral( action_string_position_t const& action_ )
+	: HRuleBase(), _actionString(), _actionStringPosition( action_ ), _cache() {
 }
 
 HStringLiteral::HStringLiteral( HStringLiteral const& stringLiteral_ )
-	: HRuleBase( stringLiteral_._action ), _actionString( stringLiteral_._actionString ),
+	: HRuleBase( stringLiteral_._action, stringLiteral_._actionPosition ),
+	_actionString( stringLiteral_._actionString ),
+	_actionStringPosition( stringLiteral_._actionStringPosition ),
 	_cache( stringLiteral_._cache ) {
 }
 
 HStringLiteral HStringLiteral::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
+	return ( HStringLiteral( action_ ) );
+	M_EPILOG
+}
+
+HStringLiteral HStringLiteral::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
 	return ( HStringLiteral( action_ ) );
 	M_EPILOG
 }
 
 HStringLiteral HStringLiteral::operator[]( action_string_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
+	return ( HStringLiteral( action_ ) );
+	M_EPILOG
+}
+
+HStringLiteral HStringLiteral::operator[]( action_string_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
 	return ( HStringLiteral( action_ ) );
 	M_EPILOG
 }
@@ -2045,15 +2361,16 @@ bool is_known_character( char char_ ) {
 
 yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( start );
 	bool valid( false );
-	yaal::hcore::HString::const_iterator start( NULL );
+	yaal::hcore::HString::const_iterator from( NULL );
 	do {
 		if ( ! ( ( scan != last_ ) && ( *scan == '"' ) ) ) {
 			break;
 		}
 		++ scan;
-		start = scan;
+		from = scan;
 		while ( ( scan != last_ ) && ( *scan != '"' ) ) {
 			if ( *scan == '\\' ) {
 				++ scan;
@@ -2074,18 +2391,24 @@ yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser*
 		}
 	} while ( false );
 	if ( valid ) {
-		_cache.assign( start, scan );
+		_cache.assign( from, scan );
 		++ scan;
 		unescape( _cache, _escapes_ );
-		if ( !! _actionString )
-			add_execution_step( executingParser_, first_, call( _actionString, yaal::move( _cache ) ) );
-		else if ( !! _action )
-			add_execution_step( executingParser_, first_, _action );
-		first_ = scan;
+		int pos( position( executingParser_, start ) );
+		if ( !! _actionString ) {
+			add_execution_step( executingParser_, start, call( _actionString, yaal::move( _cache ) ) );
+		} else if ( !! _actionStringPosition ) {
+			add_execution_step( executingParser_, start, call( _actionStringPosition, yaal::move( _cache ), pos ) );
+		} else if ( !! _action ) {
+			add_execution_step( executingParser_, start, _action );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+		}
 	} else {
 		report_error( executingParser_, scan, "expected literal string" );
+		scan = first_;
 	}
-	return ( first_ );
+	return ( scan );
 	M_EPILOG
 }
 
@@ -2138,41 +2461,64 @@ HCharacterLiteral::HCharacterLiteral( action_t const& action_ )
 	: HRuleBase( action_ ), _actionCharacter(), _actionCharacterPosition(), _cache() {
 }
 
+HCharacterLiteral::HCharacterLiteral( action_position_t const& action_ )
+	: HRuleBase( action_ ), _actionCharacter(), _actionCharacterPosition(), _cache() {
+}
+
 HCharacterLiteral::HCharacterLiteral( action_character_t const& action_ )
 	: HRuleBase(), _actionCharacter( action_ ), _actionCharacterPosition(), _cache() {
 }
 
+HCharacterLiteral::HCharacterLiteral( action_character_position_t const& action_ )
+	: HRuleBase(), _actionCharacter(), _actionCharacterPosition( action_ ), _cache() {
+}
+
 HCharacterLiteral::HCharacterLiteral( HCharacterLiteral const& characterLiteral_ )
-	: HRuleBase( characterLiteral_._action ), _actionCharacter( characterLiteral_._actionCharacter ),
+	: HRuleBase( characterLiteral_._action, characterLiteral_._actionPosition ), _actionCharacter( characterLiteral_._actionCharacter ),
 	_actionCharacterPosition( characterLiteral_._actionCharacterPosition ),
 	_cache( characterLiteral_._cache ) {
 }
 
 HCharacterLiteral HCharacterLiteral::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionCharacter ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionCharacter ) && ( ! _actionCharacterPosition ) );
+	return ( HCharacterLiteral( action_ ) );
+	M_EPILOG
+}
+
+HCharacterLiteral HCharacterLiteral::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionCharacter ) && ( ! _actionCharacterPosition ) );
 	return ( HCharacterLiteral( action_ ) );
 	M_EPILOG
 }
 
 HCharacterLiteral HCharacterLiteral::operator[]( action_character_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionCharacter ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionCharacter ) && ( ! _actionCharacterPosition ) );
+	return ( HCharacterLiteral( action_ ) );
+	M_EPILOG
+}
+
+HCharacterLiteral HCharacterLiteral::operator[]( action_character_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionCharacter ) && ( ! _actionCharacterPosition ) );
 	return ( HCharacterLiteral( action_ ) );
 	M_EPILOG
 }
 
 yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( start );
 	bool valid( false );
-	yaal::hcore::HString::const_iterator start( NULL );
+	yaal::hcore::HString::const_iterator from( NULL );
 	do {
 		if ( ! ( ( scan != last_ ) && ( *scan == '\'' ) ) ) {
 			break;
 		}
 		++ scan;
-		start = scan;
+		from = scan;
 		if ( scan != last_ ) {
 			if ( *scan == '\'' ) {
 				break;
@@ -2196,23 +2542,24 @@ yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingPars
 		}
 	} while ( false );
 	if ( valid ) {
-		_cache.assign( start, scan );
+		_cache.assign( from, scan );
 		++ scan;
 		unescape( _cache, _escapes_ );
+		int pos( position( executingParser_, start ) );
 		if ( !! _actionCharacter ) {
-			add_execution_step( executingParser_, first_, call( _actionCharacter, _cache[0] ) );
+			add_execution_step( executingParser_, start, call( _actionCharacter, _cache[0] ) );
 		} else if ( !! _actionCharacterPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionCharacterPosition, _cache[0], position( executingParser_, start ) ) );
+			add_execution_step( executingParser_, start, call( _actionCharacterPosition, _cache[0], pos ) );
 		} else if ( !! _action ) {
-			add_execution_step( executingParser_, first_, _action );
+			add_execution_step( executingParser_, start, _action );
 		} else if ( !! _actionPosition ) {
-			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, start ) ) );
+			add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
 		}
-		first_ = scan;
 	} else {
 		report_error( executingParser_, scan, "expected literal string" );
+		scan = first_;
 	}
-	return ( first_ );
+	return ( scan );
 	M_EPILOG
 }
 
@@ -2283,8 +2630,10 @@ HCharacter::HCharacter( hcore::HString const& characters_, action_character_posi
 }
 
 HCharacter::HCharacter( HCharacter const& character_ )
-	: HRuleBase( character_._action ), _characters( character_._characters ),
-	_actionCharacter( character_._actionCharacter ), _actionCharacterPosition( character_._actionCharacterPosition ) {
+	: HRuleBase( character_._action, character_._actionPosition ),
+	_characters( character_._characters ),
+	_actionCharacter( character_._actionCharacter ),
+	_actionCharacterPosition( character_._actionCharacterPosition ) {
 	return;
 }
 
@@ -2324,20 +2673,31 @@ HCharacter HCharacter::operator() ( hcore::HString const& characters_ ) const {
 
 yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	M_ENSURE( first_ != last_ );
-	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
-	char c( *scan );
-	if ( _characters.is_empty() || ( _characters.find( *scan ) != hcore::HString::npos ) ) {
-		if ( !! _actionCharacter )
-			add_execution_step( executingParser_, first_, call( _actionCharacter, c ) );
-		else if ( !! _action )
-			add_execution_step( executingParser_, first_, call( _action ) );
-		++ scan;
-		first_ = scan;
-	} else {
-		report_error( executingParser_, scan, "expected one of characters: " + _characters );
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( start );
+	bool matched( false );
+	if ( first_ != last_ ) {
+		char c( *scan );
+		if ( _characters.is_empty() || ( _characters.find( *scan ) != hcore::HString::npos ) ) {
+			int pos( position( executingParser_, start ) );
+			if ( !! _actionCharacter ) {
+				add_execution_step( executingParser_, start, call( _actionCharacter, c ) );
+			} else if ( !! _actionCharacterPosition ) {
+				add_execution_step( executingParser_, start, call( _actionCharacterPosition, c, pos ) );
+			} else if ( !! _action ) {
+				add_execution_step( executingParser_, start, call( _action ) );
+			} else if ( !! _actionPosition ) {
+				add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+			}
+			++ scan;
+			matched = true;
+		}
 	}
-	return ( first_ );
+	if ( ! matched ) {
+		report_error( executingParser_, scan, "expected one of characters: " + _characters );
+		scan = first_;
+	}
+	return ( scan );
 	M_EPILOG
 }
 
@@ -2406,36 +2766,62 @@ HFollows operator >> ( HRuleBase const& predecessor_, char character_ ) {
 }
 
 HString::HString( hcore::HString const& string_ )
-	: HRuleBase(), _string( string_ ), _actionString() {
+	: HRuleBase(), _string( string_ ), _actionString(), _actionStringPosition() {
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_t const& action_ )
-	: HRuleBase( action_ ), _string( string_ ), _actionString() {
+	: HRuleBase( action_ ), _string( string_ ), _actionString(), _actionStringPosition() {
+	return;
+}
+
+HString::HString( hcore::HString const& string_, action_position_t const& action_ )
+	: HRuleBase( action_ ), _string( string_ ), _actionString(), _actionStringPosition() {
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_string_t const& action_ )
-	: HRuleBase(), _string( string_ ), _actionString( action_ ) {
+	: HRuleBase(), _string( string_ ), _actionString( action_ ), _actionStringPosition() {
+	return;
+}
+
+HString::HString( hcore::HString const& string_, action_string_position_t const& action_ )
+	: HRuleBase(), _string( string_ ), _actionString(), _actionStringPosition( action_ ) {
 	return;
 }
 
 HString::HString( HString const& string_ )
-	: HRuleBase( string_._action ), _string( string_._string ),
-	_actionString( string_._actionString ) {
+	: HRuleBase( string_._action, string_._actionPosition ),
+	_string( string_._string ),
+	_actionString( string_._actionString ),
+	_actionStringPosition( string_._actionStringPosition ) {
 	return;
 }
 
 HString HString::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
+	return ( HString( _string, action_ ) );
+	M_EPILOG
+}
+
+HString HString::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
 	return ( HString( _string, action_ ) );
 	M_EPILOG
 }
 
 HString HString::operator[]( action_string_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
+	return ( HString( _string, action_ ) );
+	M_EPILOG
+}
+
+HString HString::operator[]( action_string_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
 	return ( HString( _string, action_ ) );
 	M_EPILOG
 }
@@ -2448,26 +2834,36 @@ HString HString::operator() ( hcore::HString const& string_ ) const {
 
 hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingParser_, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	M_ENSURE( first_ != last_ );
 	M_ASSERT( ! _string.is_empty() );
-	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
-	bool ok( true );
-	for ( hcore::HString::const_iterator it( _string.begin() ), end( _string.end() ); it != end; ++ it, ++ scan ) {
-		if ( ( scan == last_ ) || ( *scan != *it ) ) {
-			ok = false;
-			break;
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( start );
+	bool matched( false );
+	if ( first_ != last_ ) {
+		matched = true;
+		for ( hcore::HString::const_iterator it( _string.begin() ), end( _string.end() ); it != end; ++ it, ++ scan ) {
+			if ( ( scan == last_ ) || ( *scan != *it ) ) {
+				matched = false;
+				break;
+			}
+		}
+		if ( matched ) {
+			int pos( position( executingParser_, start ) );
+			if ( !! _actionString ) {
+				add_execution_step( executingParser_, start, call( _actionString, yaal::move( _string ) ) );
+			} else if ( !! _actionStringPosition ) {
+				add_execution_step( executingParser_, start, call( _actionStringPosition, yaal::move( _string ), pos ) );
+			} else if ( !! _action ) {
+				add_execution_step( executingParser_, start, call( _action ) );
+			} else if ( !! _actionPosition ) {
+				add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+			}
 		}
 	}
-	if ( ok ) {
-		if ( !! _actionString )
-			add_execution_step( executingParser_, first_, call( _actionString, yaal::move( _string ) ) );
-		else if ( !! _action )
-			add_execution_step( executingParser_, first_, call( _action ) );
-		first_ = scan;
-	} else {
+	if ( ! matched ) {
 		report_error( executingParser_, scan, "expected string: " + _string );
+		scan = first_;
 	}
-	return ( first_ );
+	return ( scan );
 	M_EPILOG
 }
 
@@ -2514,62 +2910,129 @@ HString string( yaal::hcore::HString const& string_, HString::action_string_t co
 HRegex::HRegex( hcore::HString const& string_ )
 	: HRuleBase(),
 	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
-	_actionString() {
+	_actionString(), _actionStringPosition() {
+	return;
+}
+
+HRegex::HRegex( hcore::HString const& string_, action_t const& action_ )
+	: HRuleBase( action_ ),
+	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
+	_actionString(),
+	_actionStringPosition() {
+	return;
+}
+
+HRegex::HRegex( hcore::HString const& string_, action_position_t const& action_ )
+	: HRuleBase( action_ ),
+	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
+	_actionString(),
+	_actionStringPosition() {
 	return;
 }
 
 HRegex::HRegex( hcore::HString const& string_, action_string_t const& action_ )
 	: HRuleBase(),
 	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
-	_actionString( action_ ) {
+	_actionString( action_ ),
+	_actionStringPosition() {
+	return;
+}
+
+HRegex::HRegex( hcore::HString const& string_, action_string_position_t const& action_ )
+	: HRuleBase(),
+	_regex( make_pointer<hcore::HRegex>( string_, hcore::HRegex::COMPILE::EXTENDED ) ),
+	_actionString(),
+	_actionStringPosition( action_ ) {
 	return;
 }
 
 HRegex::HRegex( regex_t const& regex_, action_t const& action_ )
-	: HRuleBase( action_ ), _regex( regex_ ), _actionString() {
+	: HRuleBase( action_ ), _regex( regex_ ),
+	_actionString(), _actionStringPosition() {
+	return;
+}
+
+HRegex::HRegex( regex_t const& regex_, action_position_t const& action_ )
+	: HRuleBase( action_ ), _regex( regex_ ),
+	_actionString(), _actionStringPosition() {
 	return;
 }
 
 HRegex::HRegex( regex_t const& regex_, action_string_t const& action_ )
-	: HRuleBase(), _regex( regex_ ), _actionString( action_ ) {
+	: HRuleBase(), _regex( regex_ ),
+	_actionString( action_ ), _actionStringPosition() {
+	return;
+}
+
+HRegex::HRegex( regex_t const& regex_, action_string_position_t const& action_ )
+	: HRuleBase(), _regex( regex_ ),
+	_actionString(), _actionStringPosition( action_ ) {
 	return;
 }
 
 HRegex::HRegex( HRegex const& regex_ )
-	: HRuleBase( regex_._action ), _regex( regex_._regex ),
-	_actionString( regex_._actionString ) {
+	: HRuleBase( regex_._action, regex_._actionPosition ),
+	_regex( regex_._regex ),
+	_actionString( regex_._actionString ),
+	_actionStringPosition( regex_._actionStringPosition ) {
 	return;
 }
 
 HRegex HRegex::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
+	return ( HRegex( _regex, action_ ) );
+	M_EPILOG
+}
+
+HRegex HRegex::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
 	return ( HRegex( _regex, action_ ) );
 	M_EPILOG
 }
 
 HRegex HRegex::operator[]( action_string_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
+	return ( HRegex( _regex, action_ ) );
+	M_EPILOG
+}
+
+HRegex HRegex::operator[]( action_string_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionString ) && ( ! _actionStringPosition ) );
 	return ( HRegex( _regex, action_ ) );
 	M_EPILOG
 }
 
 hcore::HString::const_iterator HRegex::do_parse( HExecutingParser* executingParser_, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
 	M_PROLOG
-	M_ENSURE( first_ != last_ );
-	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
-	hcore::HRegex::HMatchIterator it( _regex->find( scan ) );
-	if ( ( it != _regex->end() ) && ( it->size() <= ( last_ - scan ) ) ) {
-		if ( !! _actionString )
-			add_execution_step( executingParser_, first_, call( _actionString, hcore::HString( it->raw(), it->size() ) ) );
-		else if ( !! _action )
-			add_execution_step( executingParser_, first_, call( _action ) );
-		first_ = it->raw() + it->size();
-	} else {
-		report_error( executingParser_, scan, "expected character sequence matching regular expression: " + _regex->pattern() );
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( start );
+	bool matched( false );
+	if ( first_ != last_ ) {
+		hcore::HRegex::HMatchIterator it( _regex->find( scan ) );
+		if ( ( it != _regex->end() ) && ( it->size() <= ( last_ - scan ) ) ) {
+			int pos( position( executingParser_, start ) );
+			if ( !! _actionString ) {
+				add_execution_step( executingParser_, start, call( _actionString, hcore::HString( it->raw(), it->size() ) ) );
+			} else if ( !! _actionStringPosition ) {
+				add_execution_step( executingParser_, start, call( _actionStringPosition, hcore::HString( it->raw(), it->size() ), pos ) );
+			} else if ( !! _action ) {
+				add_execution_step( executingParser_, start, call( _action ) );
+			} else if ( !! _actionPosition ) {
+				add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+			}
+			scan = it->raw() + it->size();
+			matched = true;
+		}
 	}
-	return ( first_ );
+	if ( ! matched ) {
+		report_error( executingParser_, scan, "expected character sequence matching regular expression: " + _regex->pattern() );
+		scan = first_;
+	}
+	return ( scan );
 	M_EPILOG
 }
 
