@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_TOOLS_HHUGINN_HXX_INCLUDED 1
 
 #include "hcore/hmap.hxx"
+#include "hcore/hstack.hxx"
 #include "hcore/hstreaminterface.hxx"
 #include "tools/executingparser.hxx"
 
@@ -95,9 +96,14 @@ private:
 		void dump_preprocessed( yaal::hcore::HStreamInterface& ) const;
 	};
 	struct OCompiler {
+		typedef yaal::hcore::HArray<statement_t> statement_list_t;
+		typedef yaal::hcore::HStack<statement_list_t> statement_stack_t;
 		yaal::hcore::HString _functionName;
+		statement_stack_t _statementStack;
 		OCompiler( void );
 		void set_function_name( yaal::hcore::HString const& );
+		void add_statement_frame( void );
+		void make_scope( void );
 	};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, scope_t> functions_t;
 	struct STATE {

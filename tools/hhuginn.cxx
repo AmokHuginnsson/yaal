@@ -117,8 +117,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| booleanNot
 	);
 	HRule expressionList( "expressionList", + ( expression >> ';' ) );
-	HRule scope( "scope" );
-	HRule loopScope( "loopScope" );
+	HRule scope( "scope", HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::make_scope, &_compiler ) ) );
 	HRule ifStatement( "ifStatement", executing_parser::constant( "if" ) >> '(' >> booleanExpression >> ')' >> scope >> -( constant( "else" ) >> scope ) );
 	HRule continueStatement( "continueStatement", constant( "continue" ) >> ';' );
 	/*
@@ -129,8 +128,8 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	 * break ( 2 ); // <--- break two levels of nested scopes.
 	 */
 	HRule breakStatement( "breakStatement", constant( "break" ) >> ';' );
-	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> booleanExpression >> ')' >> loopScope );
-	HRule foreachStatement( "foreachStatement", constant( "foreach" ) >> '(' >> variableIdentifier >> ':' >> expression >> ')' >> loopScope );
+	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> booleanExpression >> ')' >> scope );
+	HRule foreachStatement( "foreachStatement", constant( "foreach" ) >> '(' >> variableIdentifier >> ':' >> expression >> ')' >> scope );
 	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> scope >> -breakStatement );
 	HRule defaultStatement( "defaultStatement", constant( "default" ) >> ':' >> scope );
 	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> -defaultStatement >> '}' );
@@ -140,25 +139,16 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| whileStatement
 		| foreachStatement
 		| switchStatement
-		| returnStatement
-		| expressionList
-	);
-	HRule loopStatement( "loopStatement",
-		ifStatement
-		| whileStatement
-		| foreachStatement
-		| switchStatement
 		| breakStatement
 		| continueStatement
 		| returnStatement
 		| expressionList
 	);
-	scope %= ( '{' >> *statement >> '}' );
-	loopScope %= ( '{' >> *loopStatement >> '}' );
+	scope %= ( constant( '{', HRuleBase::action_t( hcore::call( &OCompiler::add_statement_frame, &_compiler ) ) ) >> *statement >> '}' );
 	HRule nameList( "nameList", variableIdentifier >> ( * ( ',' >> variableIdentifier ) ) );
 	HRule functionDefinition( "functionDefinition",
 		regex( "functionDefinitionIdentifier", identifier, hcore::call( &HHuginn::OCompiler::set_function_name, &_compiler, _1 ) ) >> '(' >> -nameList >> ')' >> scope,
-		hcore::call( &HHuginn::create_function, this ) );
+		HRuleBase::action_t( hcore::call( &HHuginn::create_function, this ) ) );
 	HRule huginnGrammar( "huginnGrammar", + functionDefinition );
 	return ( huginnGrammar );
 	M_EPILOG
@@ -526,12 +516,26 @@ void HHuginn::HSource::dump_preprocessed( yaal::hcore::HStreamInterface& stream_
 }
 
 HHuginn::OCompiler::OCompiler( void )
-	: _functionName() {
+	: _functionName(), _statementStack() {
+	return;
 }
 
 void HHuginn::OCompiler::set_function_name( yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	_functionName = name_;
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::add_statement_frame( void ) {
+	M_PROLOG
+	_statementStack.emplace();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::make_scope( void ) {
+	M_PROLOG
 	return;
 	M_EPILOG
 }
