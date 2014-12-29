@@ -83,7 +83,7 @@ public:
 	 */
 	void checkpoints_push( void ) {
 		M_PROLOG
-		_checkpoints.push( _checkpoints.top() );
+		_checkpoints.emplace( _checkpoints.top() );
 		return;
 		M_EPILOG
 	}
@@ -253,15 +253,19 @@ void HExecutingParser::drop_execution_steps( yaal::hcore::HString::const_iterato
 
 void HExecutingParser::report_error( yaal::hcore::HString::const_iterator position_, yaal::hcore::HString const& message_ ) {
 	M_PROLOG
-	int long position( position_ - _inputStart );
-	if ( position > _errorPosition ) {
+	int long pos( position( position_ ) );
+	if ( pos > _errorPosition ) {
 		_errorMessages.clear();
-		_errorPosition = position;
+		_errorPosition = pos;
 	}
-	if ( position == _errorPosition )
+	if ( pos == _errorPosition )
 		_errorMessages.push_back( message_ );
 	return;
 	M_EPILOG
+}
+
+int HExecutingParser::position( yaal::hcore::HString::const_iterator position_ ) {
+	return ( static_cast<int>( position_ - _inputStart ) );
 }
 
 int HExecutingParser::error_position( void ) const {
@@ -297,15 +301,31 @@ void HExecutingParser::HProxy::report_error( HExecutingParser* executingParser_,
 	M_EPILOG
 }
 
+int HExecutingParser::HProxy::position( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_ ) {
+	M_PROLOG
+	return ( executingParser_->position( position_ ) );
+	M_EPILOG
+}
+
 namespace executing_parser {
 
 HRuleBase::HRuleBase( void )
-	: _action() {
+	: _action(), _actionPosition() {
 	return;
 }
 
 HRuleBase::HRuleBase( action_t const& action_ )
-	: _action( action_ ) {
+	: _action( action_ ), _actionPosition() {
+	return;
+}
+
+HRuleBase::HRuleBase( action_position_t const& action_ )
+	: _action(), _actionPosition( action_ ) {
+	return;
+}
+
+HRuleBase::HRuleBase( action_t const& action_, action_position_t const& actionPosition_ )
+	: _action( action_ ), _actionPosition( actionPosition_ ) {
 	return;
 }
 
@@ -343,6 +363,12 @@ void HRuleBase::report_error( HExecutingParser* executingParser_, yaal::hcore::H
 	M_PROLOG
 	HExecutingParser::HProxy::report_error( executingParser_, position_, message_ );
 	return;
+	M_EPILOG
+}
+
+int HRuleBase::position( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_ ) {
+	M_PROLOG
+	return ( HExecutingParser::HProxy::position( executingParser_, position_ ) );
 	M_EPILOG
 }
 
@@ -498,6 +524,14 @@ HRule::HRule( yaal::hcore::HString const& name_ )
 	: HRuleBase(), _rule( name_, make_pointer<HRecursiveRule>() ), _completelyDefined( false ) {
 }
 
+HRule::HRule( yaal::hcore::HString const& name_, action_t const& action_ )
+	: HRuleBase( action_ ), _rule( name_, make_pointer<HRecursiveRule>() ), _completelyDefined( false ) {
+}
+
+HRule::HRule( yaal::hcore::HString const& name_, action_position_t const& action_ )
+	: HRuleBase( action_ ), _rule( name_, make_pointer<HRecursiveRule>() ), _completelyDefined( false ) {
+}
+
 HRule::HRule( void )
 	: HRuleBase(), _rule( make_pointer<HRecursiveRule>() ), _completelyDefined( false ) {
 }
@@ -522,11 +556,19 @@ HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_, action_
 	: HRuleBase( action_ ), _rule( name_, rule_.clone() ), _completelyDefined( true ) {
 }
 
+HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_, action_position_t const& action_ )
+	: HRuleBase( action_ ), _rule( name_, rule_.clone() ), _completelyDefined( true ) {
+}
+
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_ )
 	: _rule( name_, rule_ ), _completelyDefined( true ) {
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_t const& action_ )
+	: HRuleBase( action_ ), _rule( name_, rule_ ), _completelyDefined( true ) {
+}
+
+HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_position_t const& action_ )
 	: HRuleBase( action_ ), _rule( name_, rule_ ), _completelyDefined( true ) {
 }
 
@@ -550,7 +592,15 @@ HRule& HRule::operator %= ( HRuleBase const& rule_ ) {
 
 HRule HRule::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ! _action );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) );
+	M_ENSURE( !! _rule );
+	return ( HRule( _rule.name(), _rule.rule(), action_ ) );
+	M_EPILOG
+}
+
+HRule HRule::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) );
 	M_ENSURE( !! _rule );
 	return ( HRule( _rule.name(), _rule.rule(), action_ ) );
 	M_EPILOG
@@ -571,15 +621,30 @@ HNamedRule const* HRule::get_named_rule( void ) const {
 HRule::ptr_t HRule::do_clone( void ) const {
 	M_PROLOG
 	M_ENSURE( !! _rule );
-	return ( ! _action ? _rule.rule() : pointer_static_cast<HRuleBase>( make_pointer<HRule>( _rule.name(), _rule.rule(), _action ) ) );
+	HRule::ptr_t rule;
+	if ( ( ! _action ) && ( ! _actionPosition ) ) {
+		rule = _rule.rule();
+	} else {
+		if ( !! _action ) {
+			rule = pointer_static_cast<HRuleBase>( make_pointer<HRule>( _rule.name(), _rule.rule(), _action ) );
+		} else {
+			rule = pointer_static_cast<HRuleBase>( make_pointer<HRule>( _rule.name(), _rule.rule(), _actionPosition ) );
+		}
+	}
+	return ( rule );
 	M_EPILOG
 }
 
 yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator ret( !! _rule ? _rule->parse( executingParser_, first_, last_ ) : first_ );
-	if ( ( ret != first_ ) && !! _action )
-		add_execution_step( executingParser_, first_, _action );
+	if ( ret != first_ ) {
+		if ( !! _action ) {
+			add_execution_step( executingParser_, first_, _action );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+		}
+	}
 	return ( ret );
 	M_EPILOG
 }
@@ -815,10 +880,8 @@ HFollows::HFollows( HRuleBase const& predecessor_, HRuleBase const& successor_ )
 }
 
 HFollows::HFollows( HFollows const& follows_ )
-	: HRuleBase( follows_._action ), _rules() {
+	: HRuleBase( follows_._action, follows_._actionPosition ), _rules( follows_._rules ) {
 	M_PROLOG
-	for ( rules_t::const_iterator it( follows_._rules.begin() ), end( follows_._rules.end() ); it != end; ++ it )
-		_rules.push_back( *it );
 	return;
 	M_EPILOG
 }
@@ -839,7 +902,18 @@ HFollows::HFollows( HFollows::rules_t const& rules_, action_t const& action_ )
 	return;
 }
 
+HFollows::HFollows( HFollows::rules_t const& rules_, action_position_t const& action_ )
+	: HRuleBase( action_ ), _rules( rules_ ) {
+	return;
+}
+
 HFollows HFollows::operator[]( action_t const& action_ ) const {
+	M_PROLOG
+	return ( HFollows( _rules, action_ ) );
+	M_EPILOG
+}
+
+HFollows HFollows::operator[]( action_position_t const& action_ ) const {
 	M_PROLOG
 	return ( HFollows( _rules, action_ ) );
 	M_EPILOG
@@ -944,6 +1018,16 @@ HKleeneBase::HKleeneBase( HNamedRule const& rule_, action_t const& action_ )
 	return;
 }
 
+HKleeneBase::HKleeneBase( HNamedRule const& rule_, action_position_t const& action_ )
+	: HRuleBase( action_ ), _rule( rule_ ) {
+	return;
+}
+
+HKleeneBase::HKleeneBase( HNamedRule const& rule_, action_t const& action_, action_position_t const& actionPosition_ )
+	: HRuleBase( action_, actionPosition_ ), _rule( rule_ ) {
+	return;
+}
+
 yaal::hcore::HString::const_iterator HKleeneBase::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
@@ -956,8 +1040,11 @@ yaal::hcore::HString::const_iterator HKleeneBase::do_parse( HExecutingParser* ex
 		old = scan;
 	}
 	if ( scan != origScan ) {
-		if ( !! _action )
+		if ( !! _action ) {
 			add_execution_step( executingParser_, first_, _action );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, origScan ) ) );
+		}
 		first_ = scan;
 	}
 	return ( first_ );
@@ -1007,14 +1094,26 @@ HKleeneStar::HKleeneStar( HNamedRule const& rule_, action_t const& action_ )
 	return;
 }
 
+HKleeneStar::HKleeneStar( HNamedRule const& rule_, action_position_t const& action_ )
+	: HKleeneBase( rule_, action_ ) {
+	return;
+}
+
 HKleeneStar::HKleeneStar( HKleeneStar const& kleeneStar_ )
-	: HKleeneBase( kleeneStar_._rule, kleeneStar_._action ) {
+	: HKleeneBase( kleeneStar_._rule, kleeneStar_._action, kleeneStar_._actionPosition ) {
 	return;
 }
 
 HKleeneStar HKleeneStar::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ! _action );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) );
+	return ( HKleeneStar( _rule, action_ ) );
+	M_EPILOG
+}
+
+HKleeneStar HKleeneStar::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) );
 	return ( HKleeneStar( _rule, action_ ) );
 	M_EPILOG
 }
@@ -1060,15 +1159,27 @@ HKleenePlus::HKleenePlus( HNamedRule const& rule_, action_t const& action_ )
 	return;
 }
 
+HKleenePlus::HKleenePlus( HNamedRule const& rule_, action_position_t const& action_ )
+	: HKleeneBase( rule_, action_ ) {
+	return;
+}
+
 HKleenePlus HKleenePlus::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ! _action );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) );
+	return ( HKleenePlus( _rule, action_ ) );
+	M_EPILOG
+}
+
+HKleenePlus HKleenePlus::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) );
 	return ( HKleenePlus( _rule, action_ ) );
 	M_EPILOG
 }
 
 HKleenePlus::HKleenePlus( HKleenePlus const& kleenePlus_ )
-	: HKleeneBase( kleenePlus_._rule, kleenePlus_._action ) {
+	: HKleeneBase( kleenePlus_._rule, kleenePlus_._action, kleenePlus_._actionPosition ) {
 	return;
 }
 
@@ -1107,11 +1218,8 @@ HAlternative::HAlternative( HRuleBase const& choice1_, HRuleBase const& choice2_
 }
 
 HAlternative::HAlternative( HAlternative const& alternative_ )
-	: HRuleBase( alternative_._action ), _rules() {
+	: HRuleBase( alternative_._action, alternative_._actionPosition ), _rules( alternative_._rules ) {
 	M_PROLOG
-	for ( rules_t::const_iterator it( alternative_._rules.begin() ), end( alternative_._rules.end() ); it != end; ++ it ) {
-		_rules.push_back( *it );
-	}
 	return;
 	M_EPILOG
 }
@@ -1128,9 +1236,33 @@ HAlternative::HAlternative( HAlternative const& alternative_, HRuleBase const& c
 	M_EPILOG
 }
 
+HAlternative::HAlternative( rules_t const& rules_, action_t const& action_ )
+	: HRuleBase( action_ ), _rules( rules_ ) {
+	return;
+}
+
+HAlternative::HAlternative( rules_t const& rules_, action_position_t const& action_ )
+	: HRuleBase( action_ ), _rules( rules_ ) {
+	return;
+}
+
 HRuleBase::ptr_t HAlternative::do_clone( void ) const {
 	M_PROLOG
 	return ( make_pointer<HAlternative>( *this ) );
+	M_EPILOG
+}
+
+HAlternative HAlternative::operator[]( action_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) );
+	return ( HAlternative( _rules, action_ ) );
+	M_EPILOG
+}
+
+HAlternative HAlternative::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) );
+	return ( HAlternative( _rules, action_ ) );
 	M_EPILOG
 }
 
@@ -1144,6 +1276,8 @@ yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser* e
 	if ( scan != first_ ) {
 		if ( !! _action ) {
 			add_execution_step( executingParser_, first_, _action );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
 		}
 		first_ = scan;
 	}
@@ -1223,11 +1357,16 @@ HOptional::HOptional( HRuleBase const& rule_ )
 }
 
 HOptional::HOptional( HOptional const& optional_ )
-	: HRuleBase( optional_._action ), _rule( optional_._rule ) {
+	: HRuleBase( optional_._action, optional_._actionPosition ), _rule( optional_._rule ) {
 }
 
 HOptional::HOptional( HNamedRule const& rule_, action_t const& action_ )
 	: HRuleBase( action_ ), _rule( rule_ ) {
+}
+
+HOptional::HOptional( HNamedRule const& rule_, action_position_t const& action_ )
+	: HRuleBase( action_ ), _rule( rule_ ) {
+	return;
 }
 
 HRuleBase::ptr_t HOptional::do_clone( void ) const {
@@ -1238,7 +1377,14 @@ HRuleBase::ptr_t HOptional::do_clone( void ) const {
 
 HOptional HOptional::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ! _action );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) );
+	return ( HOptional( _rule, action_ ) );
+	M_EPILOG
+}
+
+HOptional HOptional::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) );
 	return ( HOptional( _rule, action_ ) );
 	M_EPILOG
 }
@@ -1246,8 +1392,13 @@ HOptional HOptional::operator[]( action_t const& action_ ) const {
 yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator ret( !! _rule ? _rule->parse( executingParser_, first_, last_ ) : first_ );
-	if ( ( ret != first_ ) && !! _action )
-		add_execution_step( executingParser_, first_, _action );
+	if ( ret != first_ ) {
+		if ( !! _action ) {
+			add_execution_step( executingParser_, first_, _action );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, first_ ) ) );
+		}
+	}
 	return ( ret );
 	M_EPILOG
 }
@@ -1353,78 +1504,220 @@ HOptional operator - ( HRuleBase const& rule_ ) {
 }
 
 HReal::HReal( void )
-	: HRuleBase(), _actionDouble(), _actionDoubleLong(),
-	_actionNumber(), _actionString(), _cache() {
+	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
+	_actionDoubleLong(), _actionDoubleLongPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
 	return;
 }
 
 HReal::HReal( action_t const& action_ )
-	: HRuleBase( action_ ), _actionDouble(), _actionDoubleLong(),
-	_actionNumber(), _actionString(), _cache() {
+	: HRuleBase( action_ ), _actionDouble(), _actionDoublePosition(),
+	_actionDoubleLong(), _actionDoubleLongPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HReal::HReal( action_position_t const& action_ )
+	: HRuleBase( action_ ), _actionDouble(), _actionDoublePosition(),
+	_actionDoubleLong(), _actionDoubleLongPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
 	return;
 }
 
 HReal::HReal( action_double_t const& action_ )
-	: HRuleBase(), _actionDouble( action_ ), _actionDoubleLong(),
-	_actionNumber(), _actionString(), _cache() {
+	: HRuleBase(), _actionDouble( action_ ), _actionDoublePosition(),
+	_actionDoubleLong(), _actionDoubleLongPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HReal::HReal( action_double_position_t const& action_ )
+	: HRuleBase(), _actionDouble(), _actionDoublePosition( action_ ),
+	_actionDoubleLong(), _actionDoubleLongPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
 	return;
 }
 
 HReal::HReal( action_double_long_t const& action_ )
-	: HRuleBase(), _actionDouble(), _actionDoubleLong( action_ ),
-	_actionNumber(), _actionString(), _cache() {
+	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
+	_actionDoubleLong( action_ ), _actionDoubleLongPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HReal::HReal( action_double_long_position_t const& action_ )
+	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
+	_actionDoubleLong(), _actionDoubleLongPosition( action_ ),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
 	return;
 }
 
 HReal::HReal( action_number_t const& action_ )
-	: HRuleBase(), _actionDouble(), _actionDoubleLong(),
-	_actionNumber( action_ ), _actionString(), _cache() {
+	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
+	_actionDoubleLong(), _actionDoubleLongPosition(),
+	_actionNumber( action_ ), _actionNumberPosition(),
+	_actionString(), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HReal::HReal( action_number_position_t const& action_ )
+	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
+	_actionDoubleLong(), _actionDoubleLongPosition(),
+	_actionNumber(), _actionNumberPosition( action_ ),
+	_actionString(), _actionStringPosition(),
+	_cache() {
 	return;
 }
 
 HReal::HReal( action_string_t const& action_ )
-	: HRuleBase(), _actionDouble(), _actionDoubleLong(),
-	_actionNumber(), _actionString( action_ ), _cache() {
+	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
+	_actionDoubleLong(), _actionDoubleLongPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString( action_ ), _actionStringPosition(),
+	_cache() {
+	return;
+}
+
+HReal::HReal( action_string_position_t const& action_ )
+	: HRuleBase(), _actionDouble(), _actionDoublePosition(),
+	_actionDoubleLong(), _actionDoubleLongPosition(),
+	_actionNumber(), _actionNumberPosition(),
+	_actionString(), _actionStringPosition( action_ ),
+	_cache() {
 	return;
 }
 
 HReal::HReal( HReal const& real_ )
-	: HRuleBase( real_._action ), _actionDouble( real_._actionDouble ), _actionDoubleLong( real_._actionDoubleLong ),
-	_actionNumber( real_._actionNumber ), _actionString( real_._actionString ), _cache( real_._cache ) {
+	: HRuleBase( real_._action, real_._actionPosition ),
+	_actionDouble( real_._actionDouble ), _actionDoublePosition( real_._actionDoublePosition ),
+	_actionDoubleLong( real_._actionDoubleLong ), _actionDoubleLongPosition( real_._actionDoubleLongPosition ),
+	_actionNumber( real_._actionNumber ), _actionNumberPosition( real_._actionNumberPosition ),
+	_actionString( real_._actionString ), _actionStringPosition( real_._actionStringPosition ),
+	_cache( real_._cache ) {
 	return;
 }
 
 HReal HReal::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionDouble ) && ( ! _actionDoubleLong ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionDouble ) && ( ! _actionDoublePosition )
+		&& ( ! _actionDoubleLong ) && ( ! _actionDoubleLongPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition ) );
+	return ( HReal( action_ ) );
+	M_EPILOG
+}
+
+HReal HReal::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionDouble ) && ( ! _actionDoublePosition )
+		&& ( ! _actionDoubleLong ) && ( ! _actionDoubleLongPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition ) );
 	return ( HReal( action_ ) );
 	M_EPILOG
 }
 
 HReal HReal::operator[]( action_double_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionDouble ) && ( ! _actionDoubleLong ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionDouble ) && ( ! _actionDoublePosition )
+		&& ( ! _actionDoubleLong ) && ( ! _actionDoubleLongPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition ) );
+	return ( HReal( action_ ) );
+	M_EPILOG
+}
+
+HReal HReal::operator[]( action_double_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionDouble ) && ( ! _actionDoublePosition )
+		&& ( ! _actionDoubleLong ) && ( ! _actionDoubleLongPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition ) );
 	return ( HReal( action_ ) );
 	M_EPILOG
 }
 
 HReal HReal::operator[]( action_double_long_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionDouble ) && ( ! _actionDoubleLong ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionDouble ) && ( ! _actionDoublePosition )
+		&& ( ! _actionDoubleLong ) && ( ! _actionDoubleLongPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition ) );
+	return ( HReal( action_ ) );
+	M_EPILOG
+}
+
+HReal HReal::operator[]( action_double_long_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionDouble ) && ( ! _actionDoublePosition )
+		&& ( ! _actionDoubleLong ) && ( ! _actionDoubleLongPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition ) );
 	return ( HReal( action_ ) );
 	M_EPILOG
 }
 
 HReal HReal::operator[]( action_number_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionDouble ) && ( ! _actionDoubleLong ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionDouble ) && ( ! _actionDoublePosition )
+		&& ( ! _actionDoubleLong ) && ( ! _actionDoubleLongPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition ) );
+	return ( HReal( action_ ) );
+	M_EPILOG
+}
+
+HReal HReal::operator[]( action_number_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionDouble ) && ( ! _actionDoublePosition )
+		&& ( ! _actionDoubleLong ) && ( ! _actionDoubleLongPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition ) );
 	return ( HReal( action_ ) );
 	M_EPILOG
 }
 
 HReal HReal::operator[]( action_string_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionDouble ) && ( ! _actionDoubleLong ) && ( ! _actionNumber ) && ( ! _actionString ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionDouble ) && ( ! _actionDoublePosition )
+		&& ( ! _actionDoubleLong ) && ( ! _actionDoubleLongPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition ) );
+	return ( HReal( action_ ) );
+	M_EPILOG
+}
+
+HReal HReal::operator[]( action_string_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition )
+		&& ( ! _actionDouble ) && ( ! _actionDoublePosition )
+		&& ( ! _actionDoubleLong ) && ( ! _actionDoubleLongPosition )
+		&& ( ! _actionNumber ) && ( ! _actionNumberPosition )
+		&& ( ! _actionString ) && ( ! _actionStringPosition ) );
 	return ( HReal( action_ ) );
 	M_EPILOG
 }
@@ -1838,20 +2131,21 @@ HStringLiteral const& get_string_literal_instance( void ) {
 HStringLiteral const& string_literal( get_string_literal_instance() );
 
 HCharacterLiteral::HCharacterLiteral( void )
-	: HRuleBase(), _actionCharacter(), _cache() {
+	: HRuleBase(), _actionCharacter(), _actionCharacterPosition(), _cache() {
 }
 
 HCharacterLiteral::HCharacterLiteral( action_t const& action_ )
-	: HRuleBase( action_ ), _actionCharacter(), _cache() {
+	: HRuleBase( action_ ), _actionCharacter(), _actionCharacterPosition(), _cache() {
 }
 
 HCharacterLiteral::HCharacterLiteral( action_character_t const& action_ )
-	: HRuleBase(), _actionCharacter( action_ ), _cache() {
+	: HRuleBase(), _actionCharacter( action_ ), _actionCharacterPosition(), _cache() {
 }
 
-HCharacterLiteral::HCharacterLiteral( HCharacterLiteral const& stringLiteral_ )
-	: HRuleBase( stringLiteral_._action ), _actionCharacter( stringLiteral_._actionCharacter ),
-	_cache( stringLiteral_._cache ) {
+HCharacterLiteral::HCharacterLiteral( HCharacterLiteral const& characterLiteral_ )
+	: HRuleBase( characterLiteral_._action ), _actionCharacter( characterLiteral_._actionCharacter ),
+	_actionCharacterPosition( characterLiteral_._actionCharacterPosition ),
+	_cache( characterLiteral_._cache ) {
 }
 
 HCharacterLiteral HCharacterLiteral::operator[]( action_t const& action_ ) const {
@@ -1905,10 +2199,15 @@ yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingPars
 		_cache.assign( start, scan );
 		++ scan;
 		unescape( _cache, _escapes_ );
-		if ( !! _actionCharacter )
+		if ( !! _actionCharacter ) {
 			add_execution_step( executingParser_, first_, call( _actionCharacter, _cache[0] ) );
-		else if ( !! _action )
+		} else if ( !! _actionCharacterPosition ) {
+			add_execution_step( executingParser_, first_, call( _actionCharacterPosition, _cache[0], position( executingParser_, start ) ) );
+		} else if ( !! _action ) {
 			add_execution_step( executingParser_, first_, _action );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, first_, call( _actionPosition, position( executingParser_, start ) ) );
+		}
 		first_ = scan;
 	} else {
 		report_error( executingParser_, scan, "expected literal string" );
@@ -1959,36 +2258,60 @@ HCharacterLiteral const& get_character_literal_instance( void ) {
 HCharacterLiteral const& character_literal( get_character_literal_instance() );
 
 HCharacter::HCharacter( void )
-	: HRuleBase(), _characters(), _actionChar() {
+	: HRuleBase(), _characters(), _actionCharacter(), _actionCharacterPosition() {
 	return;
 }
 
 HCharacter::HCharacter( hcore::HString const& characters_, action_t const& action_ )
-	: HRuleBase( action_ ), _characters( characters_ ), _actionChar() {
+	: HRuleBase( action_ ), _characters( characters_ ), _actionCharacter(), _actionCharacterPosition() {
 	return;
 }
 
-HCharacter::HCharacter( hcore::HString const& characters_, action_char_t const& action_ )
-	: HRuleBase(), _characters( characters_ ), _actionChar( action_ ) {
+HCharacter::HCharacter( hcore::HString const& characters_, action_position_t const& action_ )
+	: HRuleBase( action_ ), _characters( characters_ ), _actionCharacter(), _actionCharacterPosition() {
+	return;
+}
+
+HCharacter::HCharacter( hcore::HString const& characters_, action_character_t const& action_ )
+	: HRuleBase(), _characters( characters_ ), _actionCharacter( action_ ), _actionCharacterPosition() {
+	return;
+}
+
+HCharacter::HCharacter( hcore::HString const& characters_, action_character_position_t const& action_ )
+	: HRuleBase(), _characters( characters_ ), _actionCharacter(), _actionCharacterPosition( action_ ) {
 	return;
 }
 
 HCharacter::HCharacter( HCharacter const& character_ )
 	: HRuleBase( character_._action ), _characters( character_._characters ),
-	_actionChar( character_._actionChar ) {
+	_actionCharacter( character_._actionCharacter ), _actionCharacterPosition( character_._actionCharacterPosition ) {
 	return;
 }
 
 HCharacter HCharacter::operator[]( action_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionChar ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionCharacter ) && ( ! _actionCharacterPosition ) );
 	return ( HCharacter( _characters, action_ ) );
 	M_EPILOG
 }
 
-HCharacter HCharacter::operator[]( action_char_t const& action_ ) const {
+HCharacter HCharacter::operator[]( action_position_t const& action_ ) const {
 	M_PROLOG
-	M_ENSURE( ( ! _action ) && ( ! _actionChar ) );
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionCharacter ) && ( ! _actionCharacterPosition ) );
+	return ( HCharacter( _characters, action_ ) );
+	M_EPILOG
+}
+
+HCharacter HCharacter::operator[]( action_character_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionCharacter ) && ( ! _actionCharacterPosition ) );
+	return ( HCharacter( _characters, action_ ) );
+	M_EPILOG
+}
+
+HCharacter HCharacter::operator[]( action_character_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ( ! _action ) && ( ! _actionPosition ) && ( ! _actionCharacter ) && ( ! _actionCharacterPosition ) );
 	return ( HCharacter( _characters, action_ ) );
 	M_EPILOG
 }
@@ -2005,8 +2328,8 @@ yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* exe
 	yaal::hcore::HString::const_iterator scan( skip_space( first_, last_ ) );
 	char c( *scan );
 	if ( _characters.is_empty() || ( _characters.find( *scan ) != hcore::HString::npos ) ) {
-		if ( !! _actionChar )
-			add_execution_step( executingParser_, first_, call( _actionChar, c ) );
+		if ( !! _actionCharacter )
+			add_execution_step( executingParser_, first_, call( _actionCharacter, c ) );
 		else if ( !! _action )
 			add_execution_step( executingParser_, first_, call( _action ) );
 		++ scan;
@@ -2323,6 +2646,30 @@ HFollows operator >> ( HRuleBase const& predecessor_, hcore::HString const& stri
 HCharacter constant( char character_ ) {
 	M_PROLOG
 	return ( character( character_ ) );
+	M_EPILOG
+}
+
+HCharacter constant( char character_, HRuleBase::action_t const& action_ ) {
+	M_PROLOG
+	return ( character( character_ )[ action_ ] );
+	M_EPILOG
+}
+
+HCharacter constant( char character_, HRuleBase::action_position_t const& action_ ) {
+	M_PROLOG
+	return ( character( character_ )[ action_ ] );
+	M_EPILOG
+}
+
+HCharacter constant( char character_, HCharacter::action_character_t const& action_ ) {
+	M_PROLOG
+	return ( character( character_ )[ action_ ] );
+	M_EPILOG
+}
+
+HCharacter constant( char character_, HCharacter::action_character_position_t const& action_ ) {
+	M_PROLOG
+	return ( character( character_ )[ action_ ] );
 	M_EPILOG
 }
 
