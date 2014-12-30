@@ -3136,10 +3136,94 @@ HCharacter constant( char character_, HCharacter::action_character_position_t co
 	M_EPILOG
 }
 
+HCharacter characters( yaal::hcore::HString const& string_ ) {
+	M_PROLOG
+	M_ENSURE( ! string_.is_empty() );
+	return ( character( string_ ) );
+	M_EPILOG
+}
+
+HCharacter characters( yaal::hcore::HString const& string_, HRuleBase::action_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! string_.is_empty() );
+	return ( character( string_ )[ action_ ] );
+	M_EPILOG
+}
+
+HCharacter characters( yaal::hcore::HString const& string_, HRuleBase::action_position_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! string_.is_empty() );
+	return ( character( string_ )[ action_ ] );
+	M_EPILOG
+}
+
+HCharacter characters( yaal::hcore::HString const& string_, HCharacter::action_character_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! string_.is_empty() );
+	return ( character( string_ )[ action_ ] );
+	M_EPILOG
+}
+
+HCharacter characters( yaal::hcore::HString const& string_, HCharacter::action_character_position_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! string_.is_empty() );
+	return ( character( string_ )[ action_ ] );
+	M_EPILOG
+}
+
 HString constant( yaal::hcore::HString const& string_ ) {
 	M_PROLOG
 	M_ENSURE( ! string_.is_empty() );
 	return ( string( string_ ) );
+	M_EPILOG
+}
+
+HString constant( yaal::hcore::HString const& string_, HRuleBase::action_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! string_.is_empty() );
+	return ( string( string_ )[ action_ ] );
+	M_EPILOG
+}
+
+HString constant( yaal::hcore::HString const& string_, HRuleBase::action_position_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! string_.is_empty() );
+	return ( string( string_ )[ action_ ] );
+	M_EPILOG
+}
+
+HString constant( yaal::hcore::HString const& string_, HString::action_string_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! string_.is_empty() );
+	return ( string( string_ )[ action_ ] );
+	M_EPILOG
+}
+
+HString constant( yaal::hcore::HString const& string_, HString::action_string_position_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! string_.is_empty() );
+	return ( string( string_ )[ action_ ] );
+	M_EPILOG
+}
+
+HRegex regex( yaal::hcore::HString const& pattern_ ) {
+	M_PROLOG
+	M_ENSURE( ! pattern_.is_empty() );
+	return ( HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_ ) );
+	M_EPILOG
+}
+
+HRegex regex( yaal::hcore::HString const& pattern_, HRuleBase::action_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! pattern_.is_empty() );
+	return ( HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_, action_ ) );
+	M_EPILOG
+}
+
+HRegex regex( yaal::hcore::HString const& pattern_, HRuleBase::action_position_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! pattern_.is_empty() );
+	return ( HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_, action_ ) );
 	M_EPILOG
 }
 
@@ -3150,7 +3234,46 @@ HRegex regex( yaal::hcore::HString const& pattern_, HRegex::action_string_t cons
 	M_EPILOG
 }
 
+HRegex regex( yaal::hcore::HString const& pattern_, HRegex::action_string_position_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! pattern_.is_empty() );
+	return ( HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_, action_ ) );
+	M_EPILOG
+}
+
+HRule regex( yaal::hcore::HString const& name_, yaal::hcore::HString const& pattern_ ) {
+	M_PROLOG
+	M_ENSURE( ! name_.is_empty() );
+	M_ENSURE( ! pattern_.is_empty() );
+	return ( HRule( name_, HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_ ) ) );
+	M_EPILOG
+}
+
+HRule regex( yaal::hcore::HString const& name_, yaal::hcore::HString const& pattern_, HRegex::action_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! name_.is_empty() );
+	M_ENSURE( ! pattern_.is_empty() );
+	return ( HRule( name_, HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_, action_ ) ) );
+	M_EPILOG
+}
+
+HRule regex( yaal::hcore::HString const& name_, yaal::hcore::HString const& pattern_, HRegex::action_position_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! name_.is_empty() );
+	M_ENSURE( ! pattern_.is_empty() );
+	return ( HRule( name_, HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_, action_ ) ) );
+	M_EPILOG
+}
+
 HRule regex( yaal::hcore::HString const& name_, yaal::hcore::HString const& pattern_, HRegex::action_string_t const& action_ ) {
+	M_PROLOG
+	M_ENSURE( ! name_.is_empty() );
+	M_ENSURE( ! pattern_.is_empty() );
+	return ( HRule( name_, HRegex( pattern_[0] == '^' ? pattern_  : "^" + pattern_, action_ ) ) );
+	M_EPILOG
+}
+
+HRule regex( yaal::hcore::HString const& name_, yaal::hcore::HString const& pattern_, HRegex::action_string_position_t const& action_ ) {
 	M_PROLOG
 	M_ENSURE( ! name_.is_empty() );
 	M_ENSURE( ! pattern_.is_empty() );

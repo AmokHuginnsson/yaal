@@ -834,8 +834,16 @@ private:
 	HRegex( yaal::hcore::HString const&, action_string_t const& );
 	HRegex( yaal::hcore::HString const&, action_string_position_t const& );
 	HRegex& operator = ( HRegex const& );
+	friend HRegex regex( yaal::hcore::HString const& );
+	friend HRegex regex( yaal::hcore::HString const&, HRuleBase::action_t const& );
+	friend HRegex regex( yaal::hcore::HString const&, HRuleBase::action_position_t const& );
 	friend HRegex regex( yaal::hcore::HString const&, HRegex::action_string_t const& );
+	friend HRegex regex( yaal::hcore::HString const&, HRegex::action_string_position_t const& );
+	friend HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const& );
+	friend HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRuleBase::action_t const& );
+	friend HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRuleBase::action_position_t const& );
 	friend HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_t const& );
+	friend HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_position_t const& );
 };
 
 typedef yaal::hcore::HExceptionT<HRegex, HRuleBaseException> HRegexException;
@@ -845,11 +853,26 @@ HCharacter constant( char, HRuleBase::action_t const& );
 HCharacter constant( char, HRuleBase::action_position_t const& );
 HCharacter constant( char, HCharacter::action_character_t const& );
 HCharacter constant( char, HCharacter::action_character_position_t const& );
+HCharacter characters( yaal::hcore::HString const& );
+HCharacter characters( yaal::hcore::HString const&, HRuleBase::action_t const& );
+HCharacter characters( yaal::hcore::HString const&, HRuleBase::action_position_t const& );
+HCharacter characters( yaal::hcore::HString const&, HCharacter::action_character_t const& );
+HCharacter characters( yaal::hcore::HString const&, HCharacter::action_character_position_t const& );
 HString constant( yaal::hcore::HString const& );
 HString constant( yaal::hcore::HString const&, HRuleBase::action_t const& );
+HString constant( yaal::hcore::HString const&, HRuleBase::action_position_t const& );
 HString constant( yaal::hcore::HString const&, HString::action_string_t const& );
-HRegex regex( yaal::hcore::HString const&, HRegex::action_string_t const& = HRegex::action_string_t() );
-HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_t const& = HRegex::action_string_t() );
+HString constant( yaal::hcore::HString const&, HString::action_string_position_t const& );
+HRegex regex( yaal::hcore::HString const& );
+HRegex regex( yaal::hcore::HString const&, HRuleBase::action_t const& );
+HRegex regex( yaal::hcore::HString const&, HRuleBase::action_position_t const& );
+HRegex regex( yaal::hcore::HString const&, HRegex::action_string_t const& );
+HRegex regex( yaal::hcore::HString const&, HRegex::action_string_position_t const& );
+HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const& );
+HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRuleBase::action_t const& );
+HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRuleBase::action_position_t const& );
+HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_t const& );
+HRule regex( yaal::hcore::HString const&, yaal::hcore::HString const&, HRegex::action_string_position_t const& );
 
 }
 
