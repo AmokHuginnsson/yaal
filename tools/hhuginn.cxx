@@ -141,10 +141,10 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| switchStatement
 		| breakStatement
 		| continueStatement
-		| returnStatement
+		| returnStatement[HRuleBase::action_t( hcore::call( &OCompiler::add_return_statement, &_compiler ) )]
 		| expressionList
 	);
-	scope %= ( constant( '{', HRuleBase::action_t( hcore::call( &OCompiler::add_statement_frame, &_compiler ) ) ) >> *statement >> '}' );
+	scope %= ( constant( '{', HRuleBase::action_t( hcore::call( &OCompiler::add_scope, &_compiler ) ) ) >> *statement >> '}' );
 	HRule nameList( "nameList", variableIdentifier >> ( * ( ',' >> variableIdentifier ) ) );
 	HRule functionDefinition( "functionDefinition",
 		regex( "functionDefinitionIdentifier", identifier, hcore::call( &HHuginn::OCompiler::set_function_name, &_compiler, _1 ) ) >> '(' >> -nameList >> ')' >> scope,
@@ -516,7 +516,7 @@ void HHuginn::HSource::dump_preprocessed( yaal::hcore::HStreamInterface& stream_
 }
 
 HHuginn::OCompiler::OCompiler( void )
-	: _functionName(), _statementStack() {
+	: _functionName(), _functionScope(), _scopeStack(), _statementList() {
 	return;
 }
 
@@ -527,15 +527,34 @@ void HHuginn::OCompiler::set_function_name( yaal::hcore::HString const& name_ ) 
 	M_EPILOG
 }
 
-void HHuginn::OCompiler::add_statement_frame( void ) {
+void HHuginn::OCompiler::add_scope( void ) {
 	M_PROLOG
-	_statementStack.emplace();
+	HScope* top( ! _scopeStack.is_empty() ? _scopeStack.top().raw() : nullptr );
+	if ( top ) {
+		M_ASSERT( _functionScope );
+		_scopeStack.emplace( top );
+		top->add_statement( _scopeStack.top() );
+	} else {
+		M_ASSERT( ! _functionScope );
+		_functionScope = make_pointer<HFunction>();
+		_scopeStack.emplace( _functionScope );
+	}
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::make_scope( void ) {
 	M_PROLOG
+	_scopeStack.pop();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::add_return_statement( void ) {
+	M_PROLOG
+	M_ASSERT( ! _scopeStack.is_empty() && ( !! _functionScope ) );
+	HScope* top( _scopeStack.top().raw() );
+	_scopeStack.top()->add_statement( make_pointer<HReturn>( top ) );
 	return;
 	M_EPILOG
 }
@@ -665,7 +684,8 @@ void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 void HHuginn::create_function( void ) {
 	M_PROLOG
 	M_ENSURE( ! _compiler._functionName.is_empty() );
-	_functions.insert( make_pair<hcore::HString const, scope_t>( yaal::move( _compiler._functionName ), yaal::move( make_pointer<HFunction>() ) ) );
+	M_ENSURE( _compiler._scopeStack.is_empty() );
+	_functions.insert( make_pair<hcore::HString const, scope_t>( yaal::move( _compiler._functionName ), yaal::move( _compiler._functionScope ) ) );
 	return;
 	M_EPILOG
 }
@@ -688,19 +708,13 @@ void HHuginn::HList::push_back( HHuginn::value_t const& value_ ) {
 }
 
 HHuginn::HStatement::HStatement( void )
-	: _executionSteps(), _continue( false ) {
+	: _continue( true ) {
 	return;
 }
 
 void HHuginn::HStatement::execute( void ) {
 	M_PROLOG
-	_continue = true;
-	for ( HExecutingParser::executor_t& e : _executionSteps ) {
-		e();
-		if ( ! _continue ) {
-			break;
-		}
-	}
+	do_execute();
 	return;
 	M_EPILOG
 }
@@ -710,9 +724,60 @@ void HHuginn::HStatement::break_execution( void ) {
 	return;
 }
 
+bool HHuginn::HStatement::can_continue( void ) const {
+	return ( _continue );
+}
+
+HHuginn::HExpression::HExpression( void )
+	: HStatement(), _executionSteps() {
+	return;
+}
+
+void HHuginn::HExpression::do_execute( void ) {
+	M_PROLOG
+	for ( HExecutingParser::executor_t& e : _executionSteps ) {
+		e();
+		if ( ! can_continue() ) {
+			break;
+		}
+	}
+	return;
+	M_EPILOG
+}
+
 HHuginn::HScope::HScope( HScope* parent_ )
 	: _variables(), _statements(), _parent( parent_ ) {
 	return;
+}
+
+void HHuginn::HScope::add_statement( statement_t statement_ ) {
+	M_PROLOG
+	_statements.emplace_back( statement_ );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HScope::do_execute( void ) {
+	M_PROLOG
+	for ( HHuginn::statement_t& s : _statements ) {
+		s->execute();
+		if ( ! can_continue() ) {
+			break;
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+HHuginn::HReturn::HReturn( HHuginn::HScope* scope_ )
+	: _scope( scope_ ) {
+	return;
+}
+
+void HHuginn::HReturn::do_execute( void ) {
+	M_PROLOG
+	return;
+	M_EPILOG
 }
 
 HHuginn::HIf::HIf( boolean_expression_t condition_,

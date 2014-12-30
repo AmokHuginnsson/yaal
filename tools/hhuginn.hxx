@@ -55,9 +55,11 @@ public:
 	class HIf;
 	class HWhile;
 	class HForeach;
+	class HReturn;
 	class HClass;
 	class HMethod;
 	class HFunction;
+	typedef yaal::hcore::HPointer<HFunction> function_t;
 	class HReference;
 	class HValue;
 	typedef yaal::hcore::HPointer<HValue> value_t;
@@ -73,6 +75,7 @@ public:
 	class HBooleanExpression;
 	typedef yaal::hcore::HPointer<HBooleanExpression> boolean_expression_t;
 	class HErrorCoordinate;
+	typedef yaal::hcore::HArray<statement_t> statement_list_t;
 private:
 	class HSource {
 		typedef HSource this_type;
@@ -96,16 +99,18 @@ private:
 		void dump_preprocessed( yaal::hcore::HStreamInterface& ) const;
 	};
 	struct OCompiler {
-		typedef yaal::hcore::HArray<statement_t> statement_list_t;
-		typedef yaal::hcore::HStack<statement_list_t> statement_stack_t;
+		typedef yaal::hcore::HStack<scope_t> scope_stack_t;
 		yaal::hcore::HString _functionName;
-		statement_stack_t _statementStack;
+		function_t _functionScope;
+		scope_stack_t _scopeStack;
+		statement_list_t _statementList;
 		OCompiler( void );
 		void set_function_name( yaal::hcore::HString const& );
-		void add_statement_frame( void );
+		void add_scope( void );
 		void make_scope( void );
+		void add_return_statement( void );
 	};
-	typedef yaal::hcore::HMap<yaal::hcore::HString, scope_t> functions_t;
+	typedef yaal::hcore::HMap<yaal::hcore::HString, function_t> functions_t;
 	struct STATE {
 		typedef enum {
 			EMPTY,
@@ -247,19 +252,30 @@ public:
 	typedef HHuginn::HStatement this_type;
 	typedef HHuginn::HObject base_type;
 private:
-	typedef yaal::hcore::HArray<HExecutingParser::executor_t> execution_steps_t;
-	execution_steps_t _executionSteps;
 	bool _continue;
 public:
 	HStatement( void );
+	virtual ~HStatement( void ) {
+		return;
+	}
 	void execute( void );
 	void break_execution( void );
+	bool can_continue( void ) const;
+protected:
+	virtual void do_execute( void ) {}
 };
 
 class HHuginn::HExpression : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HExpression this_type;
 	typedef HHuginn::HStatement base_type;
+private:
+	typedef yaal::hcore::HArray<HExecutingParser::executor_t> execution_steps_t;
+	execution_steps_t _executionSteps;
+public:
+	HExpression( void );
+protected:
+	virtual void do_execute( void );
 };
 
 class HHuginn::HBooleanExpression : public HHuginn::HObject {
@@ -272,18 +288,38 @@ class HHuginn::HScope : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HScope this_type;
 	typedef HHuginn::HStatement base_type;
-	typedef yaal::hcore::HList<HHuginn::statement_t> statements_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::value_t> variables_t;
 private:
 	variables_t _variables;
-	statements_t _statements;
+	HHuginn::statement_list_t _statements;
 	HHuginn::HScope* _parent;
 public:
 	HScope( HScope* );
 	HScope( HScope&& ) = default;
+	virtual ~HScope( void ) {
+		return;
+	}
+	void add_statement( statement_t );
+protected:
+	virtual void do_execute( void );
 private:
 	HScope( HScope const& );
 	HScope& operator = ( HScope const& );
+};
+
+class HHuginn::HReturn : public HHuginn::HStatement {
+public:
+	typedef HHuginn::HReturn this_type;
+	typedef HHuginn::HStatement base_type;
+private:
+	HScope* _scope; /*!< enclosing scope */
+public:
+	HReturn( HScope* );
+protected:
+	virtual void do_execute( void );
+private:
+	HReturn( HReturn const& ) = delete;
+	HReturn& operator = ( HReturn const& ) = delete;
 };
 
 class HHuginn::HIf : public HHuginn::HScope {
