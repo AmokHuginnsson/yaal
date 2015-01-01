@@ -63,8 +63,9 @@ main( args ) {
 executing_parser::HRule HHuginn::make_engine( void ) {
 	M_PROLOG
 	using namespace executing_parser;
+	namespace e_p = executing_parser;
 	hcore::HString identifier( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" );
-	HRule expression( "expression" );
+	HRule expression( "expression", HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler ) ) );
 	HRule absoluteValue( "absoluteValue", '|' >> expression >> '|' );
 	HRule parenthesis( "parenthesis", '(' >> expression >> ')' );
 	HRule argList( "argList", expression >> ( * ( ',' >> expression ) ) );
@@ -81,8 +82,28 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| variableIdentifier
 	);
 	HRule power( "power", atom >> ( * ( '^' >> atom ) ) );
-	HRule multiplication( "multiplication", power >> ( * ( '*' >> power ) ) );
-	HRule sum( "sum", multiplication >> ( * ( '+' >> multiplication ) ) );
+	HRule multiplication(
+		"multiplication",
+		power >> (
+			* (
+				characters(
+					"*/", e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )
+				) >> power
+			)
+		),
+		e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_mul_div, &_compiler ) )
+	);
+	HRule sum(
+		"sum",
+		multiplication >> (
+			* (
+				characters(
+					"+-", e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )
+				) >> multiplication
+			)
+		),
+		e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_plus_minus, &_compiler ) )
+	);
 	HRule value( "value", sum );
 	HRule ref( "ref", value >> *( '[' >> value >> ']' ) );
 	/*
@@ -117,7 +138,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| booleanNot
 	);
 	HRule expressionList( "expressionList", + ( expression >> ';' ) );
-	HRule scope( "scope", HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::make_scope, &_compiler ) ) );
+	HRule scope( "scope", HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_scope, &_compiler ) ) );
 	HRule ifStatement( "ifStatement", executing_parser::constant( "if" ) >> '(' >> booleanExpression >> ')' >> scope >> -( constant( "else" ) >> scope ) );
 	HRule continueStatement( "continueStatement", constant( "continue" ) >> ';' );
 	/*
@@ -144,10 +165,14 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| returnStatement[HRuleBase::action_t( hcore::call( &OCompiler::add_return_statement, &_compiler ) )]
 		| expressionList
 	);
-	scope %= ( constant( '{', HRuleBase::action_t( hcore::call( &OCompiler::add_scope, &_compiler ) ) ) >> *statement >> '}' );
+	scope %= ( constant( '{', HRuleBase::action_t( hcore::call( &OCompiler::create_scope, &_compiler ) ) ) >> *statement >> '}' );
 	HRule nameList( "nameList", variableIdentifier >> ( * ( ',' >> variableIdentifier ) ) );
 	HRule functionDefinition( "functionDefinition",
-		regex( "functionDefinitionIdentifier", identifier, hcore::call( &HHuginn::OCompiler::set_function_name, &_compiler, _1 ) ) >> '(' >> -nameList >> ')' >> scope,
+		regex(
+			"functionDefinitionIdentifier",
+			identifier,
+			e_p::HRegex::action_string_t( hcore::call( &HHuginn::OCompiler::set_function_name, &_compiler, _1 ) )
+		) >> '(' >> -nameList >> ')' >> scope,
 		HRuleBase::action_t( hcore::call( &HHuginn::create_function, this ) ) );
 	HRule huginnGrammar( "huginnGrammar", + functionDefinition );
 	return ( huginnGrammar );
@@ -516,7 +541,11 @@ void HHuginn::HSource::dump_preprocessed( yaal::hcore::HStreamInterface& stream_
 }
 
 HHuginn::OCompiler::OCompiler( void )
-	: _functionName(), _functionScope(), _scopeStack(), _statementList() {
+	: _functionName(),
+	_functionScope(),
+	_expression( make_pointer<HExpression>() ),
+	_scopeStack(),
+	_statementList() {
 	return;
 }
 
@@ -527,7 +556,7 @@ void HHuginn::OCompiler::set_function_name( yaal::hcore::HString const& name_ ) 
 	M_EPILOG
 }
 
-void HHuginn::OCompiler::add_scope( void ) {
+void HHuginn::OCompiler::create_scope( void ) {
 	M_PROLOG
 	HScope* top( ! _scopeStack.is_empty() ? _scopeStack.top().raw() : nullptr );
 	if ( top ) {
@@ -543,7 +572,7 @@ void HHuginn::OCompiler::add_scope( void ) {
 	M_EPILOG
 }
 
-void HHuginn::OCompiler::make_scope( void ) {
+void HHuginn::OCompiler::commit_scope( void ) {
 	M_PROLOG
 	_scopeStack.pop();
 	return;
@@ -555,6 +584,36 @@ void HHuginn::OCompiler::add_return_statement( void ) {
 	M_ASSERT( ! _scopeStack.is_empty() && ( !! _functionScope ) );
 	HScope* top( _scopeStack.top().raw() );
 	_scopeStack.top()->add_statement( make_pointer<HReturn>( top ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::commit_expression( void ) {
+	M_PROLOG
+	M_ASSERT( ! _scopeStack.is_empty() && ( !! _functionScope ) );
+	_scopeStack.top()->add_statement( _expression );
+	_expression = make_pointer<HExpression>();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::defer_oper( char oper_ ) {
+	M_PROLOG
+	_expression->add_execution_step( hcore::call( &HExpression::oper, _expression.raw(), oper_ ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::defer_plus_minus( void ) {
+	M_PROLOG
+	_expression->add_execution_step( hcore::call( &HExpression::plus_minus, _expression.raw() ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::defer_mul_div( void ) {
+	M_PROLOG
+	_expression->add_execution_step( hcore::call( &HExpression::mul_div, _expression.raw() ) );
 	return;
 	M_EPILOG
 }
@@ -686,6 +745,8 @@ void HHuginn::create_function( void ) {
 	M_ENSURE( ! _compiler._functionName.is_empty() );
 	M_ENSURE( _compiler._scopeStack.is_empty() );
 	_functions.insert( make_pair<hcore::HString const, scope_t>( yaal::move( _compiler._functionName ), yaal::move( _compiler._functionScope ) ) );
+	_compiler._functionScope.reset();
+	_compiler._functionName.clear();
 	return;
 	M_EPILOG
 }
@@ -719,7 +780,14 @@ void HHuginn::HStatement::execute( void ) {
 	M_EPILOG
 }
 
-void HHuginn::HStatement::break_execution( void ) {
+void HHuginn::HStatement::break_execution( int level_ ) {
+	M_PROLOG
+	do_break_execution( level_ );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HStatement::do_break_execution( int ) {
 	_continue = false;
 	return;
 }
@@ -731,6 +799,22 @@ bool HHuginn::HStatement::can_continue( void ) const {
 HHuginn::HExpression::HExpression( void )
 	: HStatement(), _executionSteps() {
 	return;
+}
+
+void HHuginn::HExpression::add_execution_step( HExecutingParser::executor_t const& executionStep_ ) {
+	M_PROLOG
+	_executionSteps.push_back( executionStep_ );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::oper( char ) {
+}
+
+void HHuginn::HExpression::plus_minus( void ) {
+}
+
+void HHuginn::HExpression::mul_div( void ) {
 }
 
 void HHuginn::HExpression::do_execute( void ) {
@@ -769,6 +853,16 @@ void HHuginn::HScope::do_execute( void ) {
 	M_EPILOG
 }
 
+void HHuginn::HScope::do_break_execution( int level_ ) {
+	M_PROLOG
+	HStatement::do_break_execution( level_ );
+	if ( _parent && ( level_ > 0 ) ) {
+		_parent->break_execution( level_ );
+	}
+	return;
+	M_EPILOG
+}
+
 HHuginn::HReturn::HReturn( HHuginn::HScope* scope_ )
 	: _scope( scope_ ) {
 	return;
@@ -776,6 +870,7 @@ HHuginn::HReturn::HReturn( HHuginn::HScope* scope_ )
 
 void HHuginn::HReturn::do_execute( void ) {
 	M_PROLOG
+	_scope->break_execution();
 	return;
 	M_EPILOG
 }
@@ -784,6 +879,23 @@ HHuginn::HIf::HIf( boolean_expression_t condition_,
 		HExecutingParser::executor_t ifClause_,
 		HExecutingParser::executor_t elseClause_ )
 	: HScope( NULL ), _condition( condition_ ), _ifClause( ifClause_ ), _elseClause( elseClause_ ) {
+	return;
+}
+
+void HHuginn::HWhile::do_break_execution( int level_ ) {
+	M_PROLOG
+	-- level_;
+	HScope::do_break_execution( level_ );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HForeach::do_break_execution( int level_ ) {
+	M_PROLOG
+	-- level_;
+	HScope::do_break_execution( level_ );
+	return;
+	M_EPILOG
 }
 
 HHuginn::HFunction::HFunction( void )

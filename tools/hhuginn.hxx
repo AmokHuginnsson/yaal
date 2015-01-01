@@ -102,13 +102,18 @@ private:
 		typedef yaal::hcore::HStack<scope_t> scope_stack_t;
 		yaal::hcore::HString _functionName;
 		function_t _functionScope;
+		expression_t _expression;
 		scope_stack_t _scopeStack;
 		statement_list_t _statementList;
 		OCompiler( void );
 		void set_function_name( yaal::hcore::HString const& );
-		void add_scope( void );
-		void make_scope( void );
+		void create_scope( void );
+		void commit_scope( void );
 		void add_return_statement( void );
+		void commit_expression( void );
+		void defer_oper( char );
+		void defer_plus_minus( void );
+		void defer_mul_div( void );
 	};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, function_t> functions_t;
 	struct STATE {
@@ -259,10 +264,11 @@ public:
 		return;
 	}
 	void execute( void );
-	void break_execution( void );
+	void break_execution( int = meta::max_signed<int>::value );
 	bool can_continue( void ) const;
 protected:
 	virtual void do_execute( void ) {}
+	virtual void do_break_execution( int );
 };
 
 class HHuginn::HExpression : public HHuginn::HStatement {
@@ -274,6 +280,10 @@ private:
 	execution_steps_t _executionSteps;
 public:
 	HExpression( void );
+	void add_execution_step( HExecutingParser::executor_t const& );
+	void oper( char );
+	void plus_minus( void );
+	void mul_div( void );
 protected:
 	virtual void do_execute( void );
 };
@@ -302,6 +312,7 @@ public:
 	void add_statement( statement_t );
 protected:
 	virtual void do_execute( void );
+	virtual void do_break_execution( int );
 private:
 	HScope( HScope const& );
 	HScope& operator = ( HScope const& );
@@ -341,6 +352,8 @@ public:
 private:
 	boolean_expression_t _condition;
 	HExecutingParser::executor_t _loop;
+protected:
+	virtual void do_break_execution( int );
 };
 
 class HHuginn::HForeach : public HHuginn::HScope {
@@ -350,6 +363,8 @@ public:
 private:
 	iterable_t _container;
 	HExecutingParser::executor_t _loop;
+protected:
+	virtual void do_break_execution( int );
 };
 
 class HHuginn::HFunction : public HHuginn::HScope {
