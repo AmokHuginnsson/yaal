@@ -209,8 +209,9 @@ void HExecutingParser::sanitize( void ) {
 void HExecutingParser::execute( void ) {
 	M_PROLOG
 	M_ENSURE( _matched );
-	for ( execution_steps_t::iterator it( _excutors.begin() ), end( _excutors.end() ); it != end; ++ it )
+	for ( execution_steps_t::iterator it( _excutors.begin() ), end( _excutors.end() ); it != end; ++ it ) {
 		it->second();
+	}
 	return;
 	M_EPILOG
 }

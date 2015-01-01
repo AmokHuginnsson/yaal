@@ -114,6 +114,10 @@ private:
 		void defer_oper( char );
 		void defer_plus_minus( void );
 		void defer_mul_div( void );
+		void defer_store_real( double long );
+		void defer_store_integer( int long long );
+		void defer_store_string( yaal::hcore::HString const& );
+		void defer_store_character( char );
 	};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, function_t> functions_t;
 	struct STATE {
@@ -284,6 +288,10 @@ public:
 	void oper( char );
 	void plus_minus( void );
 	void mul_div( void );
+	void store_real( double long );
+	void store_integer( int long long );
+	void store_string( yaal::hcore::HString const& );
+	void store_character( char );
 protected:
 	virtual void do_execute( void );
 };

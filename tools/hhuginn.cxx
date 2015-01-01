@@ -75,10 +75,10 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		absoluteValue
 		| parenthesis
 		| functionCall
-		| real
-		| integer
-		| string_literal
-		| character_literal
+		| real[e_p::HReal::action_double_long_t( hcore::call( &HHuginn::OCompiler::defer_store_real, &_compiler, _1 ) )]
+		| integer[e_p::HInteger::action_int_long_long_t( hcore::call( &HHuginn::OCompiler::defer_store_integer, &_compiler, _1 ) )]
+		| string_literal[e_p::HStringLiteral::action_string_t( hcore::call( &HHuginn::OCompiler::defer_store_string, &_compiler, _1 ) )]
+		| character_literal[e_p::HCharacterLiteral::action_character_t( hcore::call( &HHuginn::OCompiler::defer_store_character, &_compiler, _1 ) )]
 		| variableIdentifier
 	);
 	HRule power( "power", atom >> ( * ( '^' >> atom ) ) );
@@ -618,6 +618,31 @@ void HHuginn::OCompiler::defer_mul_div( void ) {
 	M_EPILOG
 }
 
+void HHuginn::OCompiler::defer_store_real( double long value_ ) {
+	M_PROLOG
+	_expression->add_execution_step( hcore::call( &HExpression::store_real, _expression.raw(), value_ ) );
+	return;
+	M_EPILOG
+}
+void HHuginn::OCompiler::defer_store_integer( int long long value_ ) {
+	M_PROLOG
+	_expression->add_execution_step( hcore::call( &HExpression::store_integer, _expression.raw(), value_ ) );
+	return;
+	M_EPILOG
+}
+void HHuginn::OCompiler::defer_store_string( yaal::hcore::HString const& value_ ) {
+	M_PROLOG
+	_expression->add_execution_step( hcore::call( &HExpression::store_string, _expression.raw(), value_ ) );
+	return;
+	M_EPILOG
+}
+void HHuginn::OCompiler::defer_store_character( char value_ ) {
+	M_PROLOG
+	_expression->add_execution_step( hcore::call( &HExpression::store_character, _expression.raw(), value_ ) );
+	return;
+	M_EPILOG
+}
+
 HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY ), _functions(),
 	_engine( make_engine() ),
@@ -815,6 +840,18 @@ void HHuginn::HExpression::plus_minus( void ) {
 }
 
 void HHuginn::HExpression::mul_div( void ) {
+}
+
+void HHuginn::HExpression::store_real( double long ) {
+}
+
+void HHuginn::HExpression::store_integer( int long long ) {
+}
+
+void HHuginn::HExpression::store_string( yaal::hcore::HString const& ) {
+}
+
+void HHuginn::HExpression::store_character( char ) {
 }
 
 void HHuginn::HExpression::do_execute( void ) {

@@ -506,7 +506,6 @@ class HReal : public HRuleBase {
 public:
 	typedef HReal this_type;
 	typedef HRuleBase base_type;
-private:
 	typedef yaal::hcore::HBoundCall<void ( double )> action_double_t;
 	typedef yaal::hcore::HBoundCall<void ( double, position_t )> action_double_position_t;
 	typedef yaal::hcore::HBoundCall<void ( double long )> action_double_long_t;
@@ -515,6 +514,7 @@ private:
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HNumber const&, position_t )> action_number_position_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, position_t )> action_string_position_t;
+private:
 	action_double_t _actionDouble;
 	action_double_position_t _actionDoublePosition;
 	action_double_long_t _actionDoubleLong;
@@ -577,7 +577,6 @@ class HInteger : public HRuleBase {
 public:
 	typedef HInteger this_type;
 	typedef HRuleBase base_type;
-private:
 	typedef yaal::hcore::HBoundCall<void ( int long long )> action_int_long_long_t;
 	typedef yaal::hcore::HBoundCall<void ( int long long, position_t )> action_int_long_long_position_t;
 	typedef yaal::hcore::HBoundCall<void ( int long )> action_int_long_t;
@@ -588,6 +587,7 @@ private:
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HNumber const&, position_t )> action_number_position_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, position_t )> action_string_position_t;
+private:
 	action_int_long_long_t _actionIntLongLong;
 	action_int_long_long_position_t _actionIntLongLongPosition;
 	action_int_long_t _actionIntLong;
@@ -690,9 +690,9 @@ class HCharacterLiteral : public HRuleBase {
 public:
 	typedef HCharacterLiteral this_type;
 	typedef HRuleBase base_type;
-private:
 	typedef yaal::hcore::HBoundCall<void ( char )> action_character_t;
 	typedef yaal::hcore::HBoundCall<void ( char, position_t )> action_character_position_t;
+private:
 	action_character_t _actionCharacter;
 	action_character_position_t _actionCharacterPosition;
 	yaal::hcore::HString _cache;
