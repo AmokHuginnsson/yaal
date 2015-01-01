@@ -88,6 +88,7 @@ public:
 	named_children_t const& children( void ) const;
 	yaal::hcore::HString const& description( void ) const;
 	void clear( void );
+	void reset_names( void );
 };
 
 typedef yaal::hcore::HExceptionT<HRuleDescription> HRuleDescriptionException;
@@ -154,6 +155,7 @@ public:
 	void rule_use( rule_use_t& ) const;
 	void detect_recursion( HRecursionDetector& ) const;
 	void find_recursions( HRuleAggregator& );
+	bool has_action( void ) const;
 	static yaal::hcore::HString::const_iterator skip_space( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 protected:
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) = 0;
@@ -164,6 +166,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& ) = 0;
 	virtual void do_detect_recursion( HRecursionDetector& ) const = 0;
 	virtual void do_find_recursions( HRuleAggregator& ) = 0;
+	virtual bool do_has_action( void ) const;
 	void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, action_t const& );
 	void report_error( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString const& );
 	int position( HExecutingParser*, yaal::hcore::HString::const_iterator );
@@ -215,6 +218,8 @@ public:
 	HRule( yaal::hcore::HString const&, action_position_t const& );
 	HRule( HRule const& );
 	HRule( HRuleBase const& );
+	HRule( HRuleBase const&, action_t const& );
+	HRule( HRuleBase const&, action_position_t const& );
 	HRule( ptr_t const& );
 	HRule( yaal::hcore::HString const&, HRuleBase const& );
 	HRule( yaal::hcore::HString const&, HRuleBase const&, action_t const& );
@@ -555,6 +560,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
 	virtual void do_find_recursions( HRuleAggregator& );
+	virtual bool do_has_action( void ) const;
 private:
 	HReal( void );
 	HReal& operator = ( HReal const& );
@@ -631,6 +637,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
 	virtual void do_find_recursions( HRuleAggregator& );
+	virtual bool do_has_action( void ) const;
 private:
 	HInteger( void );
 	HInteger& operator = ( HInteger const& );
@@ -668,6 +675,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
 	virtual void do_find_recursions( HRuleAggregator& );
+	virtual bool do_has_action( void ) const;
 private:
 	HStringLiteral( void );
 	HStringLiteral& operator = ( HStringLiteral const& );
@@ -705,6 +713,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
 	virtual void do_find_recursions( HRuleAggregator& );
+	virtual bool do_has_action( void ) const;
 private:
 	HCharacterLiteral( void );
 	HCharacterLiteral& operator = ( HCharacterLiteral const& );
@@ -746,6 +755,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
 	virtual void do_find_recursions( HRuleAggregator& );
+	virtual bool do_has_action( void ) const;
 private:
 	HCharacter( void );
 	HCharacter& operator = ( HCharacter const& );
@@ -786,6 +796,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
 	virtual void do_find_recursions( HRuleAggregator& );
+	virtual bool do_has_action( void ) const;
 private:
 	HString( yaal::hcore::HString const& );
 	HString& operator = ( HString const& );
@@ -827,6 +838,7 @@ protected:
 	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
 	virtual void do_detect_recursion( HRecursionDetector& ) const;
 	virtual void do_find_recursions( HRuleAggregator& );
+	virtual bool do_has_action( void ) const;
 private:
 	HRegex( yaal::hcore::HString const& );
 	HRegex( yaal::hcore::HString const&, action_t const& );
