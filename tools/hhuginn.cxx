@@ -69,11 +69,11 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule absoluteValue( "absoluteValue",
 		constant( '|', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) )
 		>> expression
-		>> constant( '|', e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_close_parenthesis, &_compiler ) ) ) );
+		>> constant( '|', e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::close_parenthesis ) ) ) );
 	HRule parenthesis( "parenthesis",
 		constant( '(', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) )
 		>> expression
-		>> constant( ')', e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_close_parenthesis, &_compiler ) ) ) );
+		>> constant( ')', e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::close_parenthesis ) ) ) );
 	HRule argList( "argList", expression >> ( * ( ',' >> expression ) ) );
 	HRule functionCall( "functionCall", regex( "functionCallIdentifier", identifier ) >> '(' >> -argList >> ')' );
 	HRule variableIdentifier( regex( "variableIdentifier", identifier ) );
@@ -87,17 +87,21 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| character_literal[e_p::HCharacterLiteral::action_character_t( hcore::call( &HHuginn::OCompiler::defer_store_character, &_compiler, _1 ) )]
 		| variableIdentifier
 	);
-	HRule power( "power", atom >> ( * ( '^' >> atom ) ) );
+	HRule power(
+		"power",
+		atom >> ( * ( constant( '^', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> atom ) ),
+		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::power ) )
+	);
 	HRule multiplication(
 		"multiplication",
 		power >> (
 			* (
 				characters(
-					"*/", e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )
+					"*/%", e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )
 				) >> power
 			)
 		),
-		e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_mul_div, &_compiler ) )
+		e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::mul_div_mod ) )
 	);
 	HRule sum(
 		"sum",
@@ -108,7 +112,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 				) >> multiplication
 			)
 		),
-		e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_plus_minus, &_compiler ) )
+		e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::plus_minus ) )
 	);
 	HRule value( "value", sum );
 	HRule ref( "ref", value >> *( '[' >> value >> ']' ) );
@@ -610,23 +614,9 @@ void HHuginn::OCompiler::defer_oper( char oper_ ) {
 	M_EPILOG
 }
 
-void HHuginn::OCompiler::defer_close_parenthesis( void ) {
+void HHuginn::OCompiler::defer_action( expression_action_t const& expressionAction_ ) {
 	M_PROLOG
-	_expression->add_execution_step( hcore::call( &HExpression::close_parenthesis, _expression.raw() ) );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::OCompiler::defer_plus_minus( void ) {
-	M_PROLOG
-	_expression->add_execution_step( hcore::call( &HExpression::plus_minus, _expression.raw() ) );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::OCompiler::defer_mul_div( void ) {
-	M_PROLOG
-	_expression->add_execution_step( hcore::call( &HExpression::mul_div, _expression.raw() ) );
+	_expression->add_execution_step( hcore::call( expressionAction_, _expression.raw() ) );
 	return;
 	M_EPILOG
 }
@@ -805,6 +795,62 @@ HHuginn::value_t HHuginn::HValue::div( HHuginn::value_t const&, HHuginn::value_t
 	return ( value_t() );
 }
 
+HHuginn::value_t HHuginn::HValue::mod( value_t const&, value_t const& ) {
+	return ( value_t() );
+}
+
+HHuginn::value_t HHuginn::HValue::pow( value_t const&, value_t const& ) {
+	return ( value_t() );
+}
+
+HHuginn::value_t HHuginn::HValue::abs( value_t const& ) {
+	return ( value_t() );
+}
+
+HHuginn::value_t HHuginn::HValue::neg( value_t const& ) {
+	return ( value_t() );
+}
+
+bool HHuginn::HValue::equals( value_t const&, value_t const& ) {
+	return ( false );
+}
+
+bool HHuginn::HValue::less( value_t const&, value_t const& ) {
+	return ( false );
+}
+
+bool HHuginn::HValue::greater( value_t const&, value_t const& ) {
+	return ( false );
+}
+
+bool HHuginn::HValue::less_or_equal( value_t const&, value_t const& ) {
+	return ( false );
+}
+
+bool HHuginn::HValue::greater_or_equal( value_t const&, value_t const& ) {
+	return ( false );
+}
+
+HHuginn::value_t HHuginn::HValue::string( value_t const& ) {
+	return ( value_t() );
+}
+
+HHuginn::value_t HHuginn::HValue::integer( value_t const& ) {
+	return ( value_t() );
+}
+
+HHuginn::value_t HHuginn::HValue::real( value_t const& ) {
+	return ( value_t() );
+}
+
+HHuginn::value_t HHuginn::HValue::character( value_t const& ) {
+	return ( value_t() );
+}
+
+HHuginn::value_t HHuginn::HValue::number( value_t const& ) {
+	return ( value_t() );
+}
+
 HHuginn::HReal::HReal( double long value_ )
 	: HValue(), _value( value_ ) {
 	return;
@@ -922,17 +968,39 @@ void HHuginn::HExpression::plus_minus( void ) {
 	M_EPILOG
 }
 
-void HHuginn::HExpression::mul_div( void ) {
+void HHuginn::HExpression::mul_div_mod( void ) {
 	M_PROLOG
 	M_ASSERT( !_operations.is_empty() );
 	OPERATORS op( _operations.top() );
 	_operations.pop();
-	M_ASSERT( ( op == OPERATORS::MULTIPLY ) || ( op == OPERATORS::DIVIDE ) );
+	M_ASSERT( ( op == OPERATORS::MULTIPLY ) || ( op == OPERATORS::DIVIDE ) || ( op == OPERATORS::MODULO ) );
 	value_t v2( _values.top() );
 	_values.pop();
 	value_t v1( _values.top() );
 	_values.pop();
-	_values.push( op == OPERATORS::MULTIPLY ? HHuginn::HValue::mul( v1, v2 ) : HHuginn::HValue::div( v1, v2 ) );
+	_values.push(
+		op == OPERATORS::MULTIPLY
+		? HHuginn::HValue::mul( v1, v2 )
+		: (
+			op == OPERATORS::DIVIDE
+			? HHuginn::HValue::div( v1, v2 )
+			: HHuginn::HValue::mod( v1, v2 )
+		)
+	);
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::power( void ) {
+	M_PROLOG
+	while ( ! _operations.is_empty() && ( _operations.top() == OPERATORS::POWER ) ) {
+		_operations.pop();
+		value_t v2( _values.top() );
+		_values.pop();
+		value_t v1( _values.top() );
+		_values.pop();
+		_values.push( HHuginn::HValue::pow( v1, v2 ) );
+	}
 	return;
 	M_EPILOG
 }

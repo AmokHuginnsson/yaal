@@ -67,6 +67,7 @@ public:
 	class HReal;
 	class HString;
 	class HCharacter;
+	class HNumber;
 	class HList;
 	typedef yaal::hcore::HPointer<HList> list_t;
 	class HMap;
@@ -99,6 +100,7 @@ private:
 		void dump_preprocessed( yaal::hcore::HStreamInterface& ) const;
 	};
 	struct OCompiler {
+		typedef void ( HHuginn::HExpression::* expression_action_t ) ( void );
 		typedef yaal::hcore::HStack<scope_t> scope_stack_t;
 		yaal::hcore::HString _functionName;
 		function_t _functionScope;
@@ -112,9 +114,7 @@ private:
 		void add_return_statement( void );
 		void commit_expression( void );
 		void defer_oper( char );
-		void defer_close_parenthesis( void );
-		void defer_plus_minus( void );
-		void defer_mul_div( void );
+		void defer_action( expression_action_t const& );
 		void defer_store_real( double long );
 		void defer_store_integer( int long long );
 		void defer_store_string( yaal::hcore::HString const& );
@@ -201,10 +201,36 @@ class HHuginn::HValue : public HHuginn::HObject {
 public:
 	typedef HHuginn::HValue this_type;
 	typedef HHuginn::HObject base_type;
+	enum class TYPE {
+		INTEGER,
+		REAL,
+		STRING,
+		CHARACTER,
+		NUMBER,
+		LIST,
+		MAP
+	};
 	static value_t add( value_t const&, value_t const& );
 	static value_t sub( value_t const&, value_t const& );
 	static value_t mul( value_t const&, value_t const& );
 	static value_t div( value_t const&, value_t const& );
+	static value_t mod( value_t const&, value_t const& );
+	static value_t pow( value_t const&, value_t const& );
+	static value_t abs( value_t const& );
+	static value_t neg( value_t const& );
+	static bool equals( value_t const&, value_t const& );
+	static bool less( value_t const&, value_t const& );
+	static bool greater( value_t const&, value_t const& );
+	static bool less_or_equal( value_t const&, value_t const& );
+	static bool greater_or_equal( value_t const&, value_t const& );
+	static value_t string( value_t const& );
+	static value_t integer( value_t const& );
+	static value_t real( value_t const& );
+	static value_t character( value_t const& );
+	static value_t number( value_t const& );
+	TYPE type( void ) const;
+protected:
+	TYPE do_type( void ) const;
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {
@@ -319,7 +345,8 @@ public:
 	void oper( char );
 	void close_parenthesis( void );
 	void plus_minus( void );
-	void mul_div( void );
+	void mul_div_mod( void );
+	void power( void );
 	void store_real( double long );
 	void store_integer( int long long );
 	void store_string( yaal::hcore::HString const& );
