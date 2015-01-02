@@ -112,6 +112,7 @@ private:
 		void add_return_statement( void );
 		void commit_expression( void );
 		void defer_oper( char );
+		void defer_close_parenthesis( void );
 		void defer_plus_minus( void );
 		void defer_mul_div( void );
 		void defer_store_real( double long );
@@ -200,6 +201,10 @@ class HHuginn::HValue : public HHuginn::HObject {
 public:
 	typedef HHuginn::HValue this_type;
 	typedef HHuginn::HObject base_type;
+	static value_t add( value_t const&, value_t const& );
+	static value_t sub( value_t const&, value_t const& );
+	static value_t mul( value_t const&, value_t const& );
+	static value_t div( value_t const&, value_t const& );
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {
@@ -236,6 +241,16 @@ private:
 	yaal::hcore::HString _value;
 public:
 	HString( yaal::hcore::HString const& );
+};
+
+class HHuginn::HCharacter : public HHuginn::HValue {
+public:
+	typedef HHuginn::HCharacter this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	char _value;
+public:
+	HCharacter( char );
 };
 
 class HHuginn::HList : public HHuginn::HIterable {
@@ -279,13 +294,30 @@ class HHuginn::HExpression : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HExpression this_type;
 	typedef HHuginn::HStatement base_type;
+	enum class OPERATORS {
+		PLUS,
+		MINUS,
+		MULTIPLY,
+		DIVIDE,
+		MODULO,
+		POWER,
+		ABSOLUTE,
+		PARENTHESIS,
+		ASSIGN,
+		NONE
+	};
 private:
 	typedef yaal::hcore::HArray<HExecutingParser::executor_t> execution_steps_t;
+	typedef yaal::hcore::HStack<OPERATORS> operations_t;
+	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
 	execution_steps_t _executionSteps;
+	operations_t _operations;
+	values_t _values;
 public:
 	HExpression( void );
 	void add_execution_step( HExecutingParser::executor_t const& );
 	void oper( char );
+	void close_parenthesis( void );
 	void plus_minus( void );
 	void mul_div( void );
 	void store_real( double long );

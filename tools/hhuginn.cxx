@@ -66,8 +66,14 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	namespace e_p = executing_parser;
 	hcore::HString identifier( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" );
 	HRule expression( "expression", HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler ) ) );
-	HRule absoluteValue( "absoluteValue", '|' >> expression >> '|' );
-	HRule parenthesis( "parenthesis", '(' >> expression >> ')' );
+	HRule absoluteValue( "absoluteValue",
+		constant( '|', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) )
+		>> expression
+		>> constant( '|', e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_close_parenthesis, &_compiler ) ) ) );
+	HRule parenthesis( "parenthesis",
+		constant( '(', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) )
+		>> expression
+		>> constant( ')', e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_close_parenthesis, &_compiler ) ) ) );
 	HRule argList( "argList", expression >> ( * ( ',' >> expression ) ) );
 	HRule functionCall( "functionCall", regex( "functionCallIdentifier", identifier ) >> '(' >> -argList >> ')' );
 	HRule variableIdentifier( regex( "variableIdentifier", identifier ) );
@@ -604,6 +610,13 @@ void HHuginn::OCompiler::defer_oper( char oper_ ) {
 	M_EPILOG
 }
 
+void HHuginn::OCompiler::defer_close_parenthesis( void ) {
+	M_PROLOG
+	_expression->add_execution_step( hcore::call( &HExpression::close_parenthesis, _expression.raw() ) );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::OCompiler::defer_plus_minus( void ) {
 	M_PROLOG
 	_expression->add_execution_step( hcore::call( &HExpression::plus_minus, _expression.raw() ) );
@@ -776,7 +789,38 @@ void HHuginn::create_function( void ) {
 	M_EPILOG
 }
 
+HHuginn::value_t HHuginn::HValue::add( HHuginn::value_t const&, HHuginn::value_t const& ) {
+	return ( value_t() );
+}
+
+HHuginn::value_t HHuginn::HValue::sub( HHuginn::value_t const&, HHuginn::value_t const& ) {
+	return ( value_t() );
+}
+
+HHuginn::value_t HHuginn::HValue::mul( HHuginn::value_t const&, HHuginn::value_t const& ) {
+	return ( value_t() );
+}
+
+HHuginn::value_t HHuginn::HValue::div( HHuginn::value_t const&, HHuginn::value_t const& ) {
+	return ( value_t() );
+}
+
+HHuginn::HReal::HReal( double long value_ )
+	: HValue(), _value( value_ ) {
+	return;
+}
+
+HHuginn::HInteger::HInteger( int long long value_ )
+	: HValue(), _value( value_ ) {
+	return;
+}
+
 HHuginn::HString::HString( yaal::hcore::HString const& value_ )
+	: HValue(), _value( value_ ) {
+	return;
+}
+
+HHuginn::HCharacter::HCharacter( char value_ )
 	: HValue(), _value( value_ ) {
 	return;
 }
@@ -822,7 +866,7 @@ bool HHuginn::HStatement::can_continue( void ) const {
 }
 
 HHuginn::HExpression::HExpression( void )
-	: HStatement(), _executionSteps() {
+	: HStatement(), _executionSteps(), _operations(), _values() {
 	return;
 }
 
@@ -833,25 +877,92 @@ void HHuginn::HExpression::add_execution_step( HExecutingParser::executor_t cons
 	M_EPILOG
 }
 
-void HHuginn::HExpression::oper( char ) {
+void HHuginn::HExpression::oper( char operator_ ) {
+	M_PROLOG
+	OPERATORS o( OPERATORS::NONE );
+	switch ( operator_ ) {
+		case ( '+' ): o = OPERATORS::PLUS;        break;
+		case ( '-' ): o = OPERATORS::MINUS;       break;
+		case ( '*' ): o = OPERATORS::MULTIPLY;    break;
+		case ( '/' ): o = OPERATORS::DIVIDE;      break;
+		case ( '%' ): o = OPERATORS::MODULO;      break;
+		case ( '^' ): o = OPERATORS::POWER;       break;
+		case ( '(' ): o = OPERATORS::PARENTHESIS; break;
+		case ( '|' ): o = OPERATORS::ABSOLUTE;    break;
+		default: {
+			M_ASSERT( ! "bad code path"[0] );
+		}
+	}
+	_operations.push( o );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::close_parenthesis( void ) {
+	M_PROLOG
+	M_ASSERT( !_operations.is_empty() );
+	M_ASSERT( ( _operations.top() == OPERATORS::ABSOLUTE ) || ( _operations.top() == OPERATORS::PARENTHESIS ) );
+	_operations.pop();
+	return;
+	M_EPILOG
 }
 
 void HHuginn::HExpression::plus_minus( void ) {
+	M_PROLOG
+	M_ASSERT( !_operations.is_empty() );
+	OPERATORS op( _operations.top() );
+	_operations.pop();
+	M_ASSERT( ( op == OPERATORS::PLUS ) || ( op == OPERATORS::MINUS ) );
+	value_t v2( _values.top() );
+	_values.pop();
+	value_t v1( _values.top() );
+	_values.pop();
+	_values.push( op == OPERATORS::PLUS ? HHuginn::HValue::add( v1, v2 ) : HHuginn::HValue::sub( v1, v2 ) );
+	return;
+	M_EPILOG
 }
 
 void HHuginn::HExpression::mul_div( void ) {
+	M_PROLOG
+	M_ASSERT( !_operations.is_empty() );
+	OPERATORS op( _operations.top() );
+	_operations.pop();
+	M_ASSERT( ( op == OPERATORS::MULTIPLY ) || ( op == OPERATORS::DIVIDE ) );
+	value_t v2( _values.top() );
+	_values.pop();
+	value_t v1( _values.top() );
+	_values.pop();
+	_values.push( op == OPERATORS::MULTIPLY ? HHuginn::HValue::mul( v1, v2 ) : HHuginn::HValue::div( v1, v2 ) );
+	return;
+	M_EPILOG
 }
 
-void HHuginn::HExpression::store_real( double long ) {
+void HHuginn::HExpression::store_real( double long value_ ) {
+	M_PROLOG
+	_values.push( make_pointer<HReal>( value_ ) );
+	return;
+	M_EPILOG
 }
 
-void HHuginn::HExpression::store_integer( int long long ) {
+void HHuginn::HExpression::store_integer( int long long value_ ) {
+	M_PROLOG
+	_values.push( make_pointer<HInteger>( value_ ) );
+	return;
+	M_EPILOG
 }
 
-void HHuginn::HExpression::store_string( yaal::hcore::HString const& ) {
+void HHuginn::HExpression::store_string( yaal::hcore::HString const& value_ ) {
+	M_PROLOG
+	_values.push( make_pointer<HString>( value_ ) );
+	return;
+	M_EPILOG
 }
 
-void HHuginn::HExpression::store_character( char ) {
+void HHuginn::HExpression::store_character( char value_ ) {
+	M_PROLOG
+	_values.push( make_pointer<HCharacter>( value_ ) );
+	return;
+	M_EPILOG
 }
 
 void HHuginn::HExpression::do_execute( void ) {
