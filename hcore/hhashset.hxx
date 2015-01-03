@@ -27,6 +27,8 @@ Copyright:
 #ifndef YAAL_HCORE_HHASHSET_HXX_INCLUDED
 #define YAAL_HCORE_HHASHSET_HXX_INCLUDED 1
 
+#include <initializer_list>
+
 #include "hcore/hhashcontainer.hxx"
 #include "hcore/hexception.hxx"
 
@@ -144,6 +146,17 @@ public:
 		resize( size_ );
 		for ( ; first != last; ++ first ) {
 			insert( *first );
+		}
+		return;
+		M_EPILOG
+	}
+	template<typename T>
+	HHashSet( std::initializer_list<T> constants_ )
+		: _engine( hasher_type(), allocator_type() ) {
+		M_PROLOG
+		_engine.resize( constants_.size() );
+		for ( T const& v : constants_ ) {
+			insert( v );
 		}
 		return;
 		M_EPILOG

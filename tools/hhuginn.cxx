@@ -60,6 +60,38 @@ main( args ) {
 
 #endif
 
+namespace {
+
+typedef yaal::hcore::HHashSet<yaal::hcore::HString>  keywords_t;
+keywords_t _keywords_ = {{
+	"break",
+	"case",
+	"catch",
+	"character",
+	"class",
+	"continue",
+	"default",
+	"else",
+	"for",
+	"if",
+	"integer",
+	"list",
+	"map",
+	"nil",
+	"none",
+	"null",
+	"number",
+	"real",
+	"return",
+	"string",
+	"switch",
+	"this",
+	"throw",
+	"while"
+}};
+
+}
+
 executing_parser::HRule HHuginn::make_engine( void ) {
 	M_PROLOG
 	using namespace executing_parser;
@@ -160,7 +192,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	 */
 	HRule breakStatement( "breakStatement", constant( "break" ) >> ';' );
 	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> booleanExpression >> ')' >> scope );
-	HRule foreachStatement( "foreachStatement", constant( "foreach" ) >> '(' >> variableIdentifier >> ':' >> expression >> ')' >> scope );
+	HRule forStatement( "forStatement", constant( "for" ) >> '(' >> variableIdentifier >> ':' >> expression >> ')' >> scope );
 	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> scope >> -breakStatement );
 	HRule defaultStatement( "defaultStatement", constant( "default" ) >> ':' >> scope );
 	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> -defaultStatement >> '}' );
@@ -168,7 +200,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule statement( "statement",
 		ifStatement
 		| whileStatement
-		| foreachStatement
+		| forStatement
 		| switchStatement
 		| breakStatement
 		| continueStatement
@@ -739,8 +771,13 @@ void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_EPILOG
 }
 
-void HHuginn::call( yaal::hcore::HString const& ) {
+void HHuginn::call( yaal::hcore::HString const& functionName_ ) {
 	M_PROLOG
+	functions_t::const_iterator f( _functions.find( functionName_ ) );
+	if ( f != _functions.end() ) {
+//		f->second->
+	} else {
+	}
 	return;
 	M_EPILOG
 }
@@ -777,6 +814,28 @@ void HHuginn::create_function( void ) {
 	_compiler._functionName.clear();
 	return;
 	M_EPILOG
+}
+
+HHuginn::HValue::HValue( TYPE type_ )
+	: _type( type_ ), _methods() {
+	return;
+}
+
+HHuginn::HValue::TYPE HHuginn::HValue::type( void ) const {
+	return ( _type );
+}
+
+yaal::hcore::HString const& HHuginn::HValue::type_name( TYPE type_ ) {
+	static yaal::hcore::HString const names[] = {
+		"integer",
+		"real",
+		"string",
+		"character",
+		"number",
+		"list",
+		"map"
+	};
+	return ( names[static_cast<int>( type_ )] );
 }
 
 HHuginn::value_t HHuginn::HValue::add( HHuginn::value_t const&, HHuginn::value_t const& ) {
@@ -852,27 +911,37 @@ HHuginn::value_t HHuginn::HValue::number( value_t const& ) {
 }
 
 HHuginn::HReal::HReal( double long value_ )
-	: HValue(), _value( value_ ) {
+	: HValue( TYPE::REAL ), _value( value_ ) {
 	return;
 }
 
 HHuginn::HInteger::HInteger( int long long value_ )
-	: HValue(), _value( value_ ) {
+	: HValue( TYPE::INTEGER ), _value( value_ ) {
 	return;
 }
 
 HHuginn::HString::HString( yaal::hcore::HString const& value_ )
-	: HValue(), _value( value_ ) {
+	: HValue( TYPE::STRING ), _value( value_ ) {
 	return;
 }
 
 HHuginn::HCharacter::HCharacter( char value_ )
-	: HValue(), _value( value_ ) {
+	: HValue( TYPE::CHARACTER ), _value( value_ ) {
+	return;
+}
+
+HHuginn::HIterable::HIterable( TYPE type_ )
+	: HValue( type_ ) {
 	return;
 }
 
 HHuginn::HList::HList( void )
-	: HIterable(), _data() {
+	: HIterable( TYPE::LIST ), _data() {
+	return;
+}
+
+HHuginn::HMap::HMap( void )
+	: HIterable( TYPE::MAP ), _data() {
 	return;
 }
 

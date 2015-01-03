@@ -31,6 +31,7 @@ Copyright:
 #define YAAL_TOOLS_HHUGINN_HXX_INCLUDED 1
 
 #include "hcore/hmap.hxx"
+#include "hcore/hhashmap.hxx"
 #include "hcore/hstack.hxx"
 #include "hcore/hstreaminterface.hxx"
 #include "tools/executingparser.hxx"
@@ -210,6 +211,15 @@ public:
 		LIST,
 		MAP
 	};
+	typedef yaal::hcore::HBoundCall<void ( HValue* )> method_t;
+	typedef yaal::hcore::HHashMap<yaal::hcore::HString, method_t> methods_t;
+private:
+	TYPE const _type;
+	methods_t _methods;
+public:
+	HValue( TYPE );
+	TYPE type( void ) const;
+	static yaal::hcore::HString const& type_name( TYPE );
 	static value_t add( value_t const&, value_t const& );
 	static value_t sub( value_t const&, value_t const& );
 	static value_t mul( value_t const&, value_t const& );
@@ -228,15 +238,13 @@ public:
 	static value_t real( value_t const& );
 	static value_t character( value_t const& );
 	static value_t number( value_t const& );
-	TYPE type( void ) const;
-protected:
-	TYPE do_type( void ) const;
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {
 public:
 	typedef HHuginn::HIterable this_type;
 	typedef HHuginn::HValue base_type;
+	HIterable( TYPE );
 };
 
 class HHuginn::HInteger : public HHuginn::HValue {
@@ -247,6 +255,11 @@ private:
 	int long long _value;
 public:
 	HInteger( int long long );
+	void to_character( void ) const;
+	void to_integer( void ) const;
+	void to_number( void ) const;
+	void to_real( void ) const;
+	void to_string( void ) const;
 };
 
 class HHuginn::HReal : public HHuginn::HValue {
@@ -257,6 +270,11 @@ private:
 	double long _value;
 public:
 	HReal( double long );
+	void to_integer( void ) const;
+	void to_number( void ) const;
+	void to_real( void ) const;
+	void to_string( void ) const;
+	/* There is no direct convertion to character. */
 };
 
 class HHuginn::HString : public HHuginn::HValue {
@@ -267,6 +285,11 @@ private:
 	yaal::hcore::HString _value;
 public:
 	HString( yaal::hcore::HString const& );
+	void to_character( void ) const;
+	void to_integer( void ) const;
+	void to_number( void ) const;
+	void to_real( void ) const;
+	void to_string( void ) const;
 };
 
 class HHuginn::HCharacter : public HHuginn::HValue {
@@ -277,6 +300,23 @@ private:
 	char _value;
 public:
 	HCharacter( char );
+	void to_character( void ) const;
+	void to_integer( void ) const;
+	void to_string( void ) const;
+};
+
+class HHuginn::HNumber : public HHuginn::HValue {
+public:
+	typedef HHuginn::HNumber this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	yaal::hcore::HNumber _value;
+public:
+	HNumber( yaal::hcore::HNumber const& );
+	void to_integer( void ) const;
+	void to_number( void ) const;
+	void to_real( void ) const;
+	void to_string( void ) const;
 };
 
 class HHuginn::HList : public HHuginn::HIterable {
@@ -295,6 +335,11 @@ class HHuginn::HMap : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HMap this_type;
 	typedef HHuginn::HIterable base_type;
+private:
+	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t> values_t;
+	values_t _data;
+public:
+	HMap( void );
 };
 
 class HHuginn::HStatement : public HHuginn::HObject {
