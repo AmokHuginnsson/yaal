@@ -85,7 +85,7 @@ HOpenSSL::OSSLContext::OSSLContext( void ) : _context( NULL ), _users( 0 ) {
 
 
 inline int long unsigned get_thread_id( void ) {
-	return ( static_cast<int long unsigned>( HThread::get_id() ) );
+	return ( static_cast<int long unsigned>( HThread::get_current_thread_id() ) );
 }
 
 namespace {

@@ -66,7 +66,7 @@ void do_pthread_attr_destroy( void* attr ) {
 
 HThread::HThread( void )
 	: _status( DEAD ), _buf( chunk_size<pthread_t>( 1 ) + chunk_size<pthread_attr_t>( 1 ) ),
-	_mutex( HMutex::TYPE::RECURSIVE ), _semaphore(), _resGuard(), _call(), _exceptionInfo() {
+	_mutex( HMutex::TYPE::RECURSIVE ), _semaphore(), _resGuard(), _call(), _id( INVALID ), _exceptionInfo() {
 	M_PROLOG
 	pthread_attr_t* attr( static_cast<pthread_attr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_t ) ) ) );
 	M_ENSURE( ::pthread_attr_init( attr ) == 0 );
@@ -206,10 +206,12 @@ void HThread::control( void ) {
 	 */
 	pthread_cleanup_push( CLEANUP, this );
 	_status = ALIVE;
+	_id = get_current_thread_id();
 	_semaphore.signal();
 	_call();
 	pthread_cleanup_pop( 0 );
 	_status = ZOMBIE;
+	_id = INVALID;
 	_semaphore.signal();
 	return;
 	M_EPILOG
@@ -225,8 +227,12 @@ bool HThread::is_alive( void ) const {
 	M_EPILOG
 }
 
-int long HThread::get_id( void ) {
-	return ( reinterpret_cast<int long>( reinterpret_cast<void*>( pthread_self() ) ) );
+HThread::id_t HThread::get_id( void ) const {
+	return ( _id );
+}
+
+HThread::id_t HThread::get_current_thread_id( void ) {
+	return ( reinterpret_cast<id_t>( reinterpret_cast<void*>( pthread_self() ) ) );
 }
 
 void HThread::set_name( char const* name_ ) {
@@ -294,7 +300,7 @@ void HMutex::lock( void ) {
 	int error = ::pthread_mutex_lock( _buf.get<pthread_mutex_t>() );
 	if ( ! ( _type & TYPE::RECURSIVE ) )
 		M_ENSURE( error != EDEADLK );
-	_owner = HThread::get_id();
+	_owner = HThread::get_current_thread_id();
 	return;
 	M_EPILOG
 }
@@ -311,13 +317,13 @@ void HMutex::unlock( void ) {
 
 bool HMutex::is_owned( void ) const {
 	M_PROLOG
-	return ( _owner == HThread::get_id() );
+	return ( _owner == HThread::get_current_thread_id() );
 	M_EPILOG
 }
 
 void HMutex::reown( void ) {
 	M_PROLOG
-	_owner = HThread::get_id();
+	_owner = HThread::get_current_thread_id();
 	return;
 	M_EPILOG
 }
@@ -604,7 +610,7 @@ void HReadWriteLock::lock_read( void ) {
 	OLockInfo* lockInfo( NULL );
 	/* scope for _lockInfo access */ {
 		HLock l( _mutex );
-		lockInfo = &_lockInfo[ HThread::get_id()];
+		lockInfo = &_lockInfo[ HThread::get_current_thread_id()];
 	}
 	/*
 	 * `lockInfo' is a memory reference that is valid
@@ -624,7 +630,7 @@ void HReadWriteLock::lock_write( void ) {
 	OLockInfo* lockInfo( NULL );
 	/* scope for _lockInfo access */ {
 		HLock l( _mutex );
-		lockInfo = &_lockInfo[ HThread::get_id()];
+		lockInfo = &_lockInfo[ HThread::get_current_thread_id()];
 	}
 	/*
 	 * `lockInfo' is a memory reference that is valid
@@ -644,7 +650,7 @@ void HReadWriteLock::unlock( void ) {
 	bool last( false );
 	/* scope for _lockInfo access */ {
 		HLock l( _mutex );
-		lock_info_t::iterator it( _lockInfo.find( HThread::get_id() ) );
+		lock_info_t::iterator it( _lockInfo.find( HThread::get_current_thread_id() ) );
 		M_ENSURE( it != _lockInfo.end() );
 		-- it->second._count;
 		if ( ! it->second._count ) {

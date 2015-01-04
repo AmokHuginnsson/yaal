@@ -42,6 +42,10 @@ namespace yaal {
 
 namespace hcore {
 
+namespace thread_helper {
+typedef i64_t thread_id_t;
+}
+
 class HCondition;
 /*! \brief Implementation of multi-threaded synchronizing prymitive - Mutex.
  */
@@ -64,7 +68,7 @@ private:
 	TYPE::mutex_type_t _type;
 	HChunk _buf;
 	HResource<void, void (*)( void* )> _resGuard;
-	int long _owner;
+	thread_helper::thread_id_t _owner;
 	/*}*/
 public:
 	/*{*/
@@ -132,8 +136,10 @@ typedef HExceptionT<HSemaphore> HSemaphoreException;
 class HThread {
 public:
 	typedef HThread this_type;
+	typedef HBoundCall<> call_t;
+	typedef thread_helper::thread_id_t id_t;
 	M_YAAL_HCORE_PUBLIC_API static int _threadStackSize;
-	static int long const INVALID = -1;
+	static id_t const INVALID = -1;
 private:
 	typedef enum {
 		DEAD,
@@ -152,8 +158,8 @@ private:
 	mutable HMutex _mutex;
 	HSemaphore _semaphore;
 	HResource<void, void (*)( void* )> _resGuard;
-	typedef HBoundCall<> call_t;
 	call_t _call;
+	id_t _id;
 	OExceptionInfo _exceptionInfo;
 public:
 	HThread( void );
@@ -187,11 +193,16 @@ public:
 	 * \param code_ - additional excepion information code.
 	 */
 	void stack_exception( yaal::hcore::HString const& message_, int code_ = 0 );
-	/*! \brief Get operationg system level working thread ID.
+	/*! \brief Get operationg system level working thread ID for this HThread object.
+	 *
+	 * \return Thread ID for this HThread object.
+	 */
+	id_t get_id( void ) const;
+	/*! \brief Get operationg system level working thread ID for calling thread.
 	 *
 	 * \return Working thread ID.
 	 */
-	static int long get_id( void );
+	static id_t get_current_thread_id( void );
 	/*! \brief Set thread name.
 	 *
 	 * \param name_ - new name for working thread.
