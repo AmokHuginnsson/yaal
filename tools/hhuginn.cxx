@@ -822,12 +822,107 @@ HHuginn::HThread::HThread( yaal::hcore::HThread::id_t id_ )
 	return;
 }
 
-HHuginn::HThread::frames_t& HHuginn::HThread::frames( void ) {
-	return ( _frames );
+HHuginn::HFrame* HHuginn::HThread::current_frame( void ) {
+	M_PROLOG
+	return ( ! _frames.is_empty() ? _frames.top().raw() : nullptr );
+	M_EPILOG
 }
 
-HHuginn::HFrame::HFrame( HFrame* parent_, bool bump_ )
-	: _variables(), _number( parent_ ? ( parent_->_number + ( bump_ ? 1 : 0 ) ) : 1 ), _parent( parent_ ) {
+HHuginn::HFrame const* HHuginn::HThread::current_frame( void ) const {
+	M_PROLOG
+	return ( ! _frames.is_empty() ? _frames.top().raw() : nullptr );
+	M_EPILOG
+}
+
+void HHuginn::HThread::create_function_frame( void ) {
+	M_PROLOG
+	HHuginn::HFrame* parent( current_frame() );
+	_frames.push( make_pointer<HFrame>( parent, true, false ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HThread::create_loop_frame( void ) {
+	M_PROLOG
+	HHuginn::HFrame* parent( current_frame() );
+	_frames.push( make_pointer<HFrame>( parent, false, true ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HThread::create_scope_frame( void ) {
+	M_PROLOG
+	HHuginn::HFrame* parent( current_frame() );
+	_frames.push( make_pointer<HFrame>( parent, false, false ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HThread::pop_frame( void ) {
+	M_PROLOG
+	_frames.pop();
+	return;
+	M_EPILOG
+}
+
+bool HHuginn::HThread::can_continue( void ) const {
+	M_PROLOG
+	M_ASSERT( current_frame() );
+	return ( current_frame()->can_continue() );
+	M_EPILOG
+}
+
+void HHuginn::HThread::break_execution( HFrame::STATE state_, int level_ ) {
+	M_PROLOG
+	M_ASSERT( ( state_ == HHuginn::HFrame::STATE::RETURN ) || ( state_ == HHuginn::HFrame::STATE::BREAK ) );
+	int level( 0 );
+	HFrame* f( current_frame() );
+	int no( f->number() );
+	while ( f ) {
+		f->break_execution( state_ );
+		if ( f->is_loop() ) {
+			++ level;
+		}
+		f = f->parent();
+		if ( ! f ) {
+			break;
+		} else if ( f->number() != no ) {
+			break;
+		} else if ( ( state_ == HHuginn::HFrame::STATE::BREAK ) && ( level >= level_ ) ) {
+			break;
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+HHuginn::HFrame::HFrame( HFrame* parent_, bool bump_, bool loop_ )
+	: _variables(),
+	_number( parent_ ? ( parent_->_number + ( bump_ ? 1 : 0 ) ) : 1 ),
+	_parent( parent_ ),
+	_loop( loop_ ),
+	_state( STATE::NORMAL ) {
+	return;
+}
+
+int HHuginn::HFrame::number( void ) const {
+	return ( _number );
+}
+
+HHuginn::HFrame* HHuginn::HFrame::parent( void ) {
+	return ( _parent );
+}
+
+bool HHuginn::HFrame::is_loop( void ) const {
+	return ( _loop );
+}
+
+bool HHuginn::HFrame::can_continue( void ) const {
+	return ( _state == STATE::NORMAL );
+}
+
+void HHuginn::HFrame::break_execution( STATE state_ ) {
+	_state = state_;
 	return;
 }
 
@@ -1012,32 +1107,15 @@ void HHuginn::HList::push_back( HHuginn::value_t const& value_ ) {
 	M_EPILOG
 }
 
-HHuginn::HStatement::HStatement( void )
-	: _continue( true ) {
+HHuginn::HStatement::HStatement( void ) {
 	return;
 }
 
-void HHuginn::HStatement::execute( void ) {
+void HHuginn::HStatement::execute( HHuginn::HThread* thread_ ) const {
 	M_PROLOG
-	do_execute();
+	do_execute( thread_ );
 	return;
 	M_EPILOG
-}
-
-void HHuginn::HStatement::break_execution( int level_ ) {
-	M_PROLOG
-	do_break_execution( level_ );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::HStatement::do_break_execution( int ) {
-	_continue = false;
-	return;
-}
-
-bool HHuginn::HStatement::can_continue( void ) const {
-	return ( _continue );
 }
 
 HHuginn::HExpression::HExpression( void )
@@ -1162,11 +1240,11 @@ void HHuginn::HExpression::store_character( char value_ ) {
 	M_EPILOG
 }
 
-void HHuginn::HExpression::do_execute( void ) {
+void HHuginn::HExpression::do_execute( HHuginn::HThread* thread_ ) const {
 	M_PROLOG
-	for ( HExecutingParser::executor_t& e : _executionSteps ) {
+	for ( HExecutingParser::executor_t const& e : _executionSteps ) {
 		e();
-		if ( ! can_continue() ) {
+		if ( ! thread_->can_continue() ) {
 			break;
 		}
 	}
@@ -1186,23 +1264,13 @@ void HHuginn::HScope::add_statement( statement_t statement_ ) {
 	M_EPILOG
 }
 
-void HHuginn::HScope::do_execute( void ) {
+void HHuginn::HScope::do_execute( HHuginn::HThread* thread_ ) const {
 	M_PROLOG
-	for ( HHuginn::statement_t& s : _statements ) {
-		s->execute();
-		if ( ! can_continue() ) {
+	for ( HHuginn::statement_t const& s : _statements ) {
+		s->execute( thread_ );
+		if ( ! thread_->can_continue() ) {
 			break;
 		}
-	}
-	return;
-	M_EPILOG
-}
-
-void HHuginn::HScope::do_break_execution( int level_ ) {
-	M_PROLOG
-	HStatement::do_break_execution( level_ );
-	if ( _parent && ( level_ > 0 ) ) {
-		_parent->break_execution( level_ );
 	}
 	return;
 	M_EPILOG
@@ -1213,9 +1281,9 @@ HHuginn::HReturn::HReturn( HHuginn::HScope* scope_ )
 	return;
 }
 
-void HHuginn::HReturn::do_execute( void ) {
+void HHuginn::HReturn::do_execute( HHuginn::HThread* thread_ ) const {
 	M_PROLOG
-	_scope->break_execution();
+	thread_->break_execution( HHuginn::HFrame::STATE::RETURN );
 	return;
 	M_EPILOG
 }
@@ -1227,22 +1295,6 @@ HHuginn::HIf::HIf( boolean_expression_t condition_,
 	return;
 }
 
-void HHuginn::HWhile::do_break_execution( int level_ ) {
-	M_PROLOG
-	-- level_;
-	HScope::do_break_execution( level_ );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::HFor::do_break_execution( int level_ ) {
-	M_PROLOG
-	-- level_;
-	HScope::do_break_execution( level_ );
-	return;
-	M_EPILOG
-}
-
 HHuginn::HFunction::HFunction( void )
 	: HScope( nullptr ), _argumentNames() {
 	return;
@@ -1251,19 +1303,21 @@ HHuginn::HFunction::HFunction( void )
 HHuginn::value_t HHuginn::HFunction::execute( HThread* thread_, values_t const& values_ ) const {
 	M_PROLOG
 	if ( values_.get_size() != _argumentNames.get_size() ) {
+		throw HHuginnException( "Mismatching number of parameters in call to: `"_ys.append( "" ).append( "', expected: " ).append( _argumentNames.get_size() ).append( ", got: " ).append( values_.get_size() ).append( "." ) );
 	}
 	argument_names_t::const_iterator n( _argumentNames.begin() );
 	argument_names_t::const_iterator ne( _argumentNames.end() );
 	values_t::const_iterator v( values_.begin() );
 	values_t::const_iterator ve( values_.end() );
-	HHuginn::HFrame* parent( ! thread_->frames().is_empty() ? thread_->frames().top().raw() : nullptr );
-	thread_->frames().push( make_pointer<HFrame>( parent, true ) );
+	thread_->create_function_frame();
 	while ( n != ne ) {
 		M_ASSERT( v != ve );
-		thread_->frames().top()->set_variable( *n, *v );
+		thread_->current_frame()->set_variable( *n, *v );
 		++ n;
 		++ v;
 	}
+	execute( thread_ );
+	thread_->pop_frame();
 	return ( _none_ );
 	M_EPILOG
 }

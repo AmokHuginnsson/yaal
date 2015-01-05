@@ -255,14 +255,28 @@ class HHuginn::HFrame {
 public:
 	typedef HHuginn::HFrame this_type;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::value_t> variables_t;
+	enum class STATE {
+		NORMAL,
+		RETURN,
+		BREAK,
+		CONTINUE,
+		EXCEPTION
+	};
 private:
 	variables_t _variables;
 	int const _number;
 	HFrame* const _parent;
+	bool _loop;
+	STATE _state;
 public:
-	HFrame( HFrame*, bool = false );
+	HFrame( HFrame*, bool, bool );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const& );
 	value_t& get_variable( yaal::hcore::HString const& );
+	bool can_continue( void ) const;
+	void break_execution( STATE );
+	int number( void ) const;
+	HFrame* parent( void );
+	bool is_loop( void ) const;
 private:
 	HFrame( HFrame const& ) = delete;
 	HFrame& operator = ( HFrame const& ) = delete;
@@ -277,7 +291,14 @@ private:
 	yaal::hcore::HThread::id_t _id;
 public:
 	HThread( yaal::hcore::HThread::id_t );
-	frames_t& frames( void );
+	void create_function_frame( void );
+	void create_loop_frame( void );
+	void create_scope_frame( void );
+	void pop_frame( void );
+	HFrame* current_frame( void );
+	HFrame const* current_frame( void ) const;
+	void break_execution( HFrame::STATE, int = meta::max_signed<int>::value );
+	bool can_continue( void ) const;
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {
@@ -386,19 +407,14 @@ class HHuginn::HStatement : public HHuginn::HObject {
 public:
 	typedef HHuginn::HStatement this_type;
 	typedef HHuginn::HObject base_type;
-private:
-	bool _continue;
 public:
 	HStatement( void );
 	virtual ~HStatement( void ) {
 		return;
 	}
-	void execute( void );
-	void break_execution( int = meta::max_signed<int>::value );
-	bool can_continue( void ) const;
+	void execute( HHuginn::HThread* ) const;
 protected:
-	virtual void do_execute( void ) {}
-	virtual void do_break_execution( int );
+	virtual void do_execute( HHuginn::HThread* ) const {}
 };
 
 class HHuginn::HExpression : public HHuginn::HStatement {
@@ -437,7 +453,7 @@ public:
 	void store_string( yaal::hcore::HString const& );
 	void store_character( char );
 protected:
-	virtual void do_execute( void );
+	virtual void do_execute( HHuginn::HThread* ) const;
 };
 
 class HHuginn::HBooleanExpression : public HHuginn::HObject {
@@ -461,8 +477,7 @@ public:
 	}
 	void add_statement( statement_t );
 protected:
-	virtual void do_execute( void );
-	virtual void do_break_execution( int );
+	virtual void do_execute( HHuginn::HThread* ) const;
 private:
 	HScope( HScope const& );
 	HScope& operator = ( HScope const& );
@@ -477,7 +492,7 @@ private:
 public:
 	HReturn( HScope* );
 protected:
-	virtual void do_execute( void );
+	virtual void do_execute( HHuginn::HThread* ) const;
 private:
 	HReturn( HReturn const& ) = delete;
 	HReturn& operator = ( HReturn const& ) = delete;
@@ -503,7 +518,6 @@ private:
 	boolean_expression_t _condition;
 	HExecutingParser::executor_t _loop;
 protected:
-	virtual void do_break_execution( int );
 };
 
 class HHuginn::HFor : public HHuginn::HScope {
@@ -514,7 +528,6 @@ private:
 	iterable_t _container;
 	HExecutingParser::executor_t _loop;
 protected:
-	virtual void do_break_execution( int );
 };
 
 class HHuginn::HFunction : public HHuginn::HScope {
@@ -527,6 +540,7 @@ private:
 public:
 	HFunction( void );
 	HFunction( HFunction&& ) = default;
+	using HStatement::execute;
 	value_t execute( HThread*, values_t const& ) const;
 };
 
