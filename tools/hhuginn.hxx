@@ -257,9 +257,10 @@ public:
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::value_t> variables_t;
 private:
 	variables_t _variables;
-	HFrame* _parent;
+	int const _number;
+	HFrame* const _parent;
 public:
-	HFrame( HFrame* );
+	HFrame( HFrame*, bool = false );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const& );
 	value_t& get_variable( yaal::hcore::HString const& );
 private:

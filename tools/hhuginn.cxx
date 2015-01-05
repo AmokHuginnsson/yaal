@@ -734,6 +734,7 @@ void HHuginn::execute( void ) {
 	if ( f != _functions.end() ) {
 		f->second->execute( t->second.raw(), _arguments );
 	} else {
+		throw HHuginnException( "function `main' is not defined" );
 	}
 	_threads.clear();
 	return;
@@ -825,8 +826,8 @@ HHuginn::HThread::frames_t& HHuginn::HThread::frames( void ) {
 	return ( _frames );
 }
 
-HHuginn::HFrame::HFrame( HFrame* parent_ )
-	: _variables(), _parent( parent_ ) {
+HHuginn::HFrame::HFrame( HFrame* parent_, bool bump_ )
+	: _variables(), _number( parent_ ? ( parent_->_number + ( bump_ ? 1 : 0 ) ) : 1 ), _parent( parent_ ) {
 	return;
 }
 
@@ -836,7 +837,7 @@ HHuginn::value_t& HHuginn::HFrame::get_variable( yaal::hcore::HString const& nam
 	HHuginn::value_t* v( nullptr );
 	if ( it != _variables.end() ) {
 		v = &it->second;
-	} else if ( _parent ) {
+	} else if ( _parent && ( _parent->_number == _number ) ) {
 		v = &_parent->get_variable( name_ );
 	} else {
 		throw HHuginnException( "variable `"_ys.append( name_ ).append( "' does not exist" ) );
@@ -854,7 +855,11 @@ void HHuginn::HFrame::set_variable( yaal::hcore::HString const& name_, HHuginn::
 		if ( it != _variables.end() ) {
 			break;
 		}
-		f = f->_parent;
+		if ( f->_parent && ( f->_parent->_number == _number ) ) {
+			f = f->_parent;
+		} else {
+			f = nullptr;
+		}
 	}
 	if ( f ) {
 		it->second = value_;
@@ -1252,7 +1257,7 @@ HHuginn::value_t HHuginn::HFunction::execute( HThread* thread_, values_t const& 
 	values_t::const_iterator v( values_.begin() );
 	values_t::const_iterator ve( values_.end() );
 	HHuginn::HFrame* parent( ! thread_->frames().is_empty() ? thread_->frames().top().raw() : nullptr );
-	thread_->frames().push( make_pointer<HFrame>( parent ) );
+	thread_->frames().push( make_pointer<HFrame>( parent, true ) );
 	while ( n != ne ) {
 		M_ASSERT( v != ve );
 		thread_->frames().top()->set_variable( *n, *v );
