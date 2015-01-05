@@ -34,6 +34,7 @@ Copyright:
 #include "hcore/hhashmap.hxx"
 #include "hcore/hstack.hxx"
 #include "hcore/hstreaminterface.hxx"
+#include "hcore/hthread.hxx"
 #include "tools/executingparser.hxx"
 
 namespace yaal {
@@ -55,7 +56,7 @@ public:
 	typedef yaal::hcore::HPointer<HScope> scope_t;
 	class HIf;
 	class HWhile;
-	class HForeach;
+	class HFor;
 	class HReturn;
 	class HClass;
 	class HMethod;
@@ -78,6 +79,12 @@ public:
 	typedef yaal::hcore::HPointer<HBooleanExpression> boolean_expression_t;
 	class HErrorCoordinate;
 	typedef yaal::hcore::HArray<statement_t> statement_list_t;
+	typedef yaal::hcore::HArray<value_t> values_t;
+	class HFrame;
+	typedef yaal::hcore::HPointer<HFrame> frame_t;
+	class HThread;
+	typedef yaal::hcore::HPointer<HThread> thread_t;
+	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
 private:
 	class HSource {
 		typedef HSource this_type;
@@ -136,7 +143,8 @@ private:
 	HExecutingParser _engine;
 	HSource _source;
 	OCompiler _compiler;
-	list_t _arguments;
+	threads_t _threads;
+	values_t _arguments;
 public:
 	HHuginn( void );
 	/*! \brief Store source in internal buffer.
@@ -163,7 +171,6 @@ public:
 	void dump_vm_state( yaal::hcore::HStreamInterface& );
 	void create_function( void );
 	void add_argument( yaal::hcore::HString const& );
-	void call( yaal::hcore::HString const& );
 	value_t returned_value( void ) const;
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& );
 	int error_position( void ) const;
@@ -173,6 +180,8 @@ public:
 private:
 	char const* error_message( int ) const;
 };
+
+typedef yaal::hcore::HExceptionT<HHuginn> HHuginnException;
 
 class HHuginn::HErrorCoordinate {
 public:
@@ -203,6 +212,7 @@ public:
 	typedef HHuginn::HValue this_type;
 	typedef HHuginn::HObject base_type;
 	enum class TYPE {
+		NONE,
 		INTEGER,
 		REAL,
 		STRING,
@@ -217,6 +227,7 @@ private:
 	TYPE const _type;
 	methods_t _methods;
 public:
+	HValue( void );
 	HValue( TYPE );
 	TYPE type( void ) const;
 	static yaal::hcore::HString const& type_name( TYPE );
@@ -238,6 +249,34 @@ public:
 	static value_t real( value_t const& );
 	static value_t character( value_t const& );
 	static value_t number( value_t const& );
+};
+
+class HHuginn::HFrame {
+public:
+	typedef HHuginn::HFrame this_type;
+	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::value_t> variables_t;
+private:
+	variables_t _variables;
+	HFrame* _parent;
+public:
+	HFrame( HFrame* );
+	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const& );
+	value_t& get_variable( yaal::hcore::HString const& );
+private:
+	HFrame( HFrame const& ) = delete;
+	HFrame& operator = ( HFrame const& ) = delete;
+};
+
+class HHuginn::HThread {
+public:
+	typedef HHuginn::HThread this_type;
+	typedef yaal::hcore::HStack<HHuginn::frame_t> frames_t;
+private:
+	frames_t _frames;
+	yaal::hcore::HThread::id_t _id;
+public:
+	HThread( yaal::hcore::HThread::id_t );
+	frames_t& frames( void );
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {
@@ -410,9 +449,7 @@ class HHuginn::HScope : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HScope this_type;
 	typedef HHuginn::HStatement base_type;
-	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::value_t> variables_t;
 private:
-	variables_t _variables;
 	HHuginn::statement_list_t _statements;
 	HHuginn::HScope* _parent;
 public:
@@ -468,9 +505,9 @@ protected:
 	virtual void do_break_execution( int );
 };
 
-class HHuginn::HForeach : public HHuginn::HScope {
+class HHuginn::HFor : public HHuginn::HScope {
 public:
-	typedef HHuginn::HForeach this_type;
+	typedef HHuginn::HFor this_type;
 	typedef HHuginn::HScope base_type;
 private:
 	iterable_t _container;
@@ -483,8 +520,13 @@ class HHuginn::HFunction : public HHuginn::HScope {
 public:
 	typedef HHuginn::HFunction this_type;
 	typedef HHuginn::HScope base_type;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> argument_names_t;
+private:
+	argument_names_t _argumentNames;
+public:
 	HFunction( void );
 	HFunction( HFunction&& ) = default;
+	value_t execute( HThread*, values_t const& ) const;
 };
 
 }

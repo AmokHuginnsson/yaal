@@ -90,6 +90,8 @@ keywords_t _keywords_ = {{
 	"while"
 }};
 
+HHuginn::value_t _none_ = make_pointer<HHuginn::HValue>();
+
 }
 
 executing_parser::HRule HHuginn::make_engine( void ) {
@@ -679,11 +681,13 @@ void HHuginn::OCompiler::defer_store_character( char value_ ) {
 }
 
 HHuginn::HHuginn( void )
-	: _state( STATE::EMPTY ), _functions(),
+	: _state( STATE::EMPTY ),
+	_functions(),
 	_engine( make_engine() ),
 	_source(),
 	_compiler(),
-	_arguments( new ( memory::yaal ) HList() ) {
+	_threads(),
+	_arguments() {
 }
 
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
@@ -724,7 +728,14 @@ void HHuginn::compile( void ) {
 void HHuginn::execute( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::COMPILED );
-	call( "main" );
+	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
+	threads_t::iterator t( _threads.insert( make_pair( threadId, make_pointer<HThread>( threadId ) ) ).first );
+	functions_t::const_iterator f( _functions.find( "main" ) );
+	if ( f != _functions.end() ) {
+		f->second->execute( t->second.raw(), _arguments );
+	} else {
+	}
+	_threads.clear();
 	return;
 	M_EPILOG
 }
@@ -766,18 +777,7 @@ char const* HHuginn::error_message( int code_ ) const {
 
 void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_PROLOG
-	_arguments->push_back( make_pointer<HString>( arg_ ) );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::call( yaal::hcore::HString const& functionName_ ) {
-	M_PROLOG
-	functions_t::const_iterator f( _functions.find( functionName_ ) );
-	if ( f != _functions.end() ) {
-//		f->second->
-	} else {
-	}
+	_arguments.push_back( make_pointer<HString>( arg_ ) );
 	return;
 	M_EPILOG
 }
@@ -816,6 +816,60 @@ void HHuginn::create_function( void ) {
 	M_EPILOG
 }
 
+HHuginn::HThread::HThread( yaal::hcore::HThread::id_t id_ )
+	: _frames(), _id( id_ ) {
+	return;
+}
+
+HHuginn::HThread::frames_t& HHuginn::HThread::frames( void ) {
+	return ( _frames );
+}
+
+HHuginn::HFrame::HFrame( HFrame* parent_ )
+	: _variables(), _parent( parent_ ) {
+	return;
+}
+
+HHuginn::value_t& HHuginn::HFrame::get_variable( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	variables_t::iterator it( _variables.find( name_ ) );
+	HHuginn::value_t* v( nullptr );
+	if ( it != _variables.end() ) {
+		v = &it->second;
+	} else if ( _parent ) {
+		v = &_parent->get_variable( name_ );
+	} else {
+		throw HHuginnException( "variable `"_ys.append( name_ ).append( "' does not exist" ) );
+	}
+	return ( *v );
+	M_EPILOG
+}
+
+void HHuginn::HFrame::set_variable( yaal::hcore::HString const& name_, HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	HFrame* f( this );
+	variables_t::iterator it;
+	while ( f ) {
+		it = _variables.find( name_ );
+		if ( it != _variables.end() ) {
+			break;
+		}
+		f = f->_parent;
+	}
+	if ( f ) {
+		it->second = value_;
+	} else {
+		_variables.insert( make_pair( name_, value_ ) );
+	}
+	return;
+	M_EPILOG
+}
+
+HHuginn::HValue::HValue( void )
+	: _type( TYPE::NONE ), _methods() {
+	return;
+}
+
 HHuginn::HValue::HValue( TYPE type_ )
 	: _type( type_ ), _methods() {
 	return;
@@ -827,6 +881,7 @@ HHuginn::HValue::TYPE HHuginn::HValue::type( void ) const {
 
 yaal::hcore::HString const& HHuginn::HValue::type_name( TYPE type_ ) {
 	static yaal::hcore::HString const names[] = {
+		"none",
 		"integer",
 		"real",
 		"string",
@@ -1115,7 +1170,7 @@ void HHuginn::HExpression::do_execute( void ) {
 }
 
 HHuginn::HScope::HScope( HScope* parent_ )
-	: _variables(), _statements(), _parent( parent_ ) {
+	: _statements(), _parent( parent_ ) {
 	return;
 }
 
@@ -1175,7 +1230,7 @@ void HHuginn::HWhile::do_break_execution( int level_ ) {
 	M_EPILOG
 }
 
-void HHuginn::HForeach::do_break_execution( int level_ ) {
+void HHuginn::HFor::do_break_execution( int level_ ) {
 	M_PROLOG
 	-- level_;
 	HScope::do_break_execution( level_ );
@@ -1184,8 +1239,28 @@ void HHuginn::HForeach::do_break_execution( int level_ ) {
 }
 
 HHuginn::HFunction::HFunction( void )
-	: HScope( nullptr ) {
+	: HScope( nullptr ), _argumentNames() {
 	return;
+}
+
+HHuginn::value_t HHuginn::HFunction::execute( HThread* thread_, values_t const& values_ ) const {
+	M_PROLOG
+	if ( values_.get_size() != _argumentNames.get_size() ) {
+	}
+	argument_names_t::const_iterator n( _argumentNames.begin() );
+	argument_names_t::const_iterator ne( _argumentNames.end() );
+	values_t::const_iterator v( values_.begin() );
+	values_t::const_iterator ve( values_.end() );
+	HHuginn::HFrame* parent( ! thread_->frames().is_empty() ? thread_->frames().top().raw() : nullptr );
+	thread_->frames().push( make_pointer<HFrame>( parent ) );
+	while ( n != ne ) {
+		M_ASSERT( v != ve );
+		thread_->frames().top()->set_variable( *n, *v );
+		++ n;
+		++ v;
+	}
+	return ( _none_ );
+	M_EPILOG
 }
 
 }
