@@ -61,7 +61,10 @@ public:
 		typename engine_t::HIterator _engine;
 	public:
 		typedef iterator_interface<value_type const, iterator_category::forward> base_type;
-		HIterator( void ) : base_type(), _engine() {}
+		HIterator( void )
+			: base_type(), _engine() {
+			return;
+		}
 		HIterator& operator = ( HIterator const& it_ ) {
 			if ( &it_ != this )
 				_engine = it_._engine;
@@ -85,14 +88,18 @@ public:
 			-- _engine;
 			return ( it );
 		}
-		key_type const& operator* ( void ) const
-			{ return ( _engine.get() ); }
-		key_type const* operator-> ( void ) const
-			{ return ( &_engine.get() ); }
-		bool operator == ( HIterator const& it ) const
-			{ return ( _engine == it._engine ); }
-		bool operator != ( HIterator const& it ) const
-			{ return ( _engine != it._engine ); }
+		key_type const& operator* ( void ) const {
+			return ( _engine.get() );
+		}
+		key_type const* operator-> ( void ) const {
+			return ( &_engine.get() );
+		}
+		bool operator == ( HIterator const& it ) const {
+			return ( _engine == it._engine );
+		}
+		bool operator != ( HIterator const& it ) const {
+			return ( _engine != it._engine );
+		}
 	private:
 		friend class HHashSet<key_type, hasher_type, allocator_t>;
 		explicit HIterator( typename engine_t::HIterator const& it ) : base_type(), _engine( it ) {};
@@ -106,14 +113,17 @@ private:
 	engine_t _engine;
 public:
 	HHashSet( void )
-		: _engine( hasher_type(), allocator_type() )
-		{}
+		: _engine( hasher_type(), allocator_type() ) {
+		return;
+	}
 	explicit HHashSet( hasher_type const& hasher_ )
-		: _engine( hasher_, allocator_type() )
-		{}
+		: _engine( hasher_, allocator_type() ) {
+		return;
+	}
 	explicit HHashSet( allocator_type const& allocator_ )
-		: _engine( hasher_type(), allocator_ )
-		{}
+		: _engine( hasher_type(), allocator_ ) {
+		return;
+	}
 	/*! \brief Lower bound of size of map's table */
 	HHashSet( int long size_ )
 		: _engine( hasher_type(), allocator_type() ) {
@@ -186,10 +196,16 @@ public:
 	allocator_type const& get_allocator( void ) const {
 		return ( _engine.get_allocator() );
 	}
-	iterator begin( void ) const
-		{ M_PROLOG return ( iterator( _engine.begin() ) ); M_EPILOG }
-	iterator end( void ) const
-		{ M_PROLOG return ( iterator( _engine.end() ) ); M_EPILOG }
+	iterator begin( void ) const {
+		M_PROLOG
+		return ( iterator( _engine.begin() ) );
+		M_EPILOG
+	}
+	iterator end( void ) const {
+		M_PROLOG
+		return ( iterator( _engine.end() ) );
+		M_EPILOG
+	}
 	reverse_iterator rbegin( void ) const {
 		M_PROLOG
 		return ( end() );
@@ -200,8 +216,10 @@ public:
 		return ( begin() );
 		M_EPILOG
 	}
-	iterator find( type_t const& key_ ) const
-		{ M_PROLOG return ( iterator( _engine.find( key_ ) ) ); M_EPILOG }
+	iterator find( type_t const& key_ ) const {
+		M_PROLOG
+		return ( iterator( _engine.find( key_ ) ) ); M_EPILOG
+	}
 	insert_result insert( value_type const& val_ ) {
 		M_PROLOG
 		HPair<typename engine_t::HIterator, bool> it( _engine.insert( val_ ) );
@@ -258,18 +276,37 @@ public:
 		return ( first_ );
 		M_EPILOG
 	}
-	int long count( type_t const& key_ ) const
-		{ M_PROLOG return ( find( key_ ) != end() ? 1 : 0 ); M_EPILOG }
-	void clear( void )
-		{ M_PROLOG _engine.clear(); return; M_EPILOG }
-	int long get_size( void ) const
-		{ M_PROLOG return ( _engine.get_size() ); M_EPILOG }
-	int long size( void ) const
-		{ M_PROLOG return ( _engine.get_size() ); M_EPILOG }
-	bool is_empty( void ) const
-		{ M_PROLOG return ( _engine.is_empty() ); M_EPILOG }
-	bool empty( void ) const
-		{ M_PROLOG return ( _engine.is_empty() ); M_EPILOG }
+	int long count( type_t const& key_ ) const {
+		M_PROLOG
+		return ( find( key_ ) != end() ? 1 : 0 );
+		M_EPILOG
+	}
+	void clear( void ) {
+		M_PROLOG
+		_engine.clear();
+		return;
+		M_EPILOG
+	}
+	int long get_size( void ) const {
+		M_PROLOG
+		return ( _engine.get_size() );
+		M_EPILOG
+	}
+	int long size( void ) const {
+		M_PROLOG
+		return ( _engine.get_size() );
+		M_EPILOG
+	}
+	bool is_empty( void ) const {
+		M_PROLOG
+		return ( _engine.is_empty() );
+		M_EPILOG
+	}
+	bool empty( void ) const {
+		M_PROLOG
+		return ( _engine.is_empty() );
+		M_EPILOG
+	}
 	void swap( HHashSet& set_ ) {
 		if ( &set_ != this ) {
 			using yaal::swap;
@@ -277,10 +314,16 @@ public:
 		}
 		return;
 	}
-	bool operator == ( HHashSet const& set_ ) const
-		{ M_PROLOG return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
-	bool operator < ( HHashSet const& set_ ) const
-		{ M_PROLOG return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
+	bool operator == ( HHashSet const& set_ ) const {
+		M_PROLOG
+		return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) );
+		M_EPILOG
+	}
+	bool operator < ( HHashSet const& set_ ) const {
+		M_PROLOG
+		return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) );
+		M_EPILOG
+	}
 private:
 };
 
