@@ -286,23 +286,27 @@ public:
 	}
 	void copy_from( HHashContainer const& src_ ) {
 		M_PROLOG
-		HChunk newBuckets( src_._buckets.get_size(), HChunk::STRATEGY::EXACT );
-		HAtom const* const* otherBuckets = src_._buckets.template get<HAtom const*>();
-		HAtom** buckets = newBuckets.get<HAtom*>();
-		for ( int long i( 0 ); i < src_._prime; ++ i ) {
-			HAtom const* origAtom( otherBuckets[ i ] );
-			while ( origAtom ) {
-				HAtom* atom( _allocator.allocate( 1 ) );
-				new ( atom ) HAtom( origAtom->_value );
-				origAtom = origAtom->_next;
-				atom->_next = buckets[ i ];
-				buckets[ i ] = atom;
+		if ( src_._size > 0 ) {
+			HChunk newBuckets( src_._buckets.get_size(), HChunk::STRATEGY::EXACT );
+			HAtom const* const* otherBuckets = src_._buckets.template get<HAtom const*>();
+			HAtom** buckets = newBuckets.get<HAtom*>();
+			for ( int long i( 0 ); i < src_._prime; ++ i ) {
+				HAtom const* origAtom( otherBuckets[ i ] );
+				while ( origAtom ) {
+					HAtom* atom( _allocator.allocate( 1 ) );
+					new ( atom ) HAtom( origAtom->_value );
+					origAtom = origAtom->_next;
+					atom->_next = buckets[ i ];
+					buckets[ i ] = atom;
+				}
 			}
+			clear();
+			_prime = src_._prime;
+			_size = src_._size;
+			_buckets.swap( newBuckets );
+		} else {
+			clear();
 		}
-		clear();
-		_prime = src_._prime;
-		_size = src_._size;
-		_buckets.swap( newBuckets );
 		return;
 		M_EPILOG
 	}
