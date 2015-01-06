@@ -62,33 +62,44 @@ main( args ) {
 
 namespace {
 
-typedef yaal::hcore::HHashSet<yaal::hcore::HString>  keywords_t;
-keywords_t _keywords_ = {{
+typedef yaal::hcore::HHashSet<yaal::hcore::HString>  words_t;
+
+words_t _keywords_ = {{
 	"break",
 	"case",
 	"catch",
-	"character",
 	"class",
 	"continue",
 	"default",
 	"else",
 	"for",
 	"if",
-	"integer",
-	"list",
-	"map",
 	"nil",
 	"none",
 	"null",
-	"number",
-	"real",
 	"return",
-	"string",
 	"switch",
 	"this",
 	"throw",
 	"while"
 }};
+
+words_t _builtin_ = {{
+	"character",
+	"integer",
+	"list",
+	"map",
+	"number",
+	"real",
+	"string",
+	"print"
+}};
+
+bool is_restricted( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	return ( ( _keywords_.count( name_ ) > 0 ) || ( _builtin_.count( name_ ) > 0 ) );
+	M_EPILOG
+}
 
 HHuginn::value_t _none_ = make_pointer<HHuginn::HValue>();
 
@@ -99,7 +110,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	using namespace executing_parser;
 	namespace e_p = executing_parser;
 	hcore::HString identifier( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" );
-	HRule expression( "expression", HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler ) ) );
+	HRule expression( "expression" );
 	HRule absoluteValue( "absoluteValue",
 		constant( '|', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) )
 		>> expression
@@ -108,8 +119,17 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		constant( '(', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) )
 		>> expression
 		>> constant( ')', e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::close_parenthesis ) ) ) );
-	HRule argList( "argList", expression >> ( * ( ',' >> expression ) ) );
-	HRule functionCall( "functionCall", regex( "functionCallIdentifier", identifier ) >> '(' >> -argList >> ')' );
+	HRule arg( "argument", expression, HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::add_arg ) ) );
+	HRule argList( "argList", arg >> ( * ( ',' >> arg ) ) );
+	HRule functionCall(
+		"functionCall",
+		regex(
+			"functionCallIdentifier",
+			identifier,
+			e_p::HStringLiteral::action_string_t( hcore::call( &HHuginn::OCompiler::defer_function_call, &_compiler, _1 ) )
+		) >> '(' >> -argList >> ')',
+		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::function_call_exec ) )
+	);
 	HRule variableIdentifier( regex( "variableIdentifier", identifier ) );
 	HRule atom( "atom",
 		absoluteValue
@@ -181,7 +201,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| booleanXor
 		| booleanNot
 	);
-	HRule expressionList( "expressionList", + ( expression >> ';' ) );
+	HRule expressionList( "expressionList", + ( expression[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler ) )] >> ';' ) );
 	HRule scope( "scope", HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_scope, &_compiler ) ) );
 	HRule ifStatement( "ifStatement", executing_parser::constant( "if" ) >> '(' >> booleanExpression >> ')' >> scope >> -( constant( "else" ) >> scope ) );
 	HRule continueStatement( "continueStatement", constant( "continue" ) >> ';' );
@@ -584,10 +604,11 @@ void HHuginn::HSource::dump_preprocessed( yaal::hcore::HStreamInterface& stream_
 	M_EPILOG
 }
 
-HHuginn::OCompiler::OCompiler( void )
-	: _functionName(),
+HHuginn::OCompiler::OCompiler( HHuginn* huginn_ )
+	: _huginn( huginn_ ),
+	_functionName(),
 	_functionScope(),
-	_expression( make_pointer<HExpression>() ),
+	_expression( make_pointer<HExpression>( _huginn ) ),
 	_scopeStack(),
 	_statementList() {
 	return;
@@ -595,6 +616,9 @@ HHuginn::OCompiler::OCompiler( void )
 
 void HHuginn::OCompiler::set_function_name( yaal::hcore::HString const& name_ ) {
 	M_PROLOG
+	if ( is_restricted( name_ ) ) {
+		throw HHuginnException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ) );
+	}
 	_functionName = name_;
 	return;
 	M_EPILOG
@@ -636,7 +660,7 @@ void HHuginn::OCompiler::commit_expression( void ) {
 	M_PROLOG
 	M_ASSERT( ! _scopeStack.is_empty() && ( !! _functionScope ) );
 	_scopeStack.top()->add_statement( _expression );
-	_expression = make_pointer<HExpression>();
+	_expression = make_pointer<HExpression>( _huginn );
 	return;
 	M_EPILOG
 }
@@ -655,24 +679,34 @@ void HHuginn::OCompiler::defer_action( expression_action_t const& expressionActi
 	M_EPILOG
 }
 
+void HHuginn::OCompiler::defer_function_call( yaal::hcore::HString const& value_ ) {
+	M_PROLOG
+	_expression->add_execution_step( hcore::call( &HExpression::function_call, _expression.raw(), value_ ) );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::OCompiler::defer_store_real( double long value_ ) {
 	M_PROLOG
 	_expression->add_execution_step( hcore::call( &HExpression::store_real, _expression.raw(), value_ ) );
 	return;
 	M_EPILOG
 }
+
 void HHuginn::OCompiler::defer_store_integer( int long long value_ ) {
 	M_PROLOG
 	_expression->add_execution_step( hcore::call( &HExpression::store_integer, _expression.raw(), value_ ) );
 	return;
 	M_EPILOG
 }
+
 void HHuginn::OCompiler::defer_store_string( yaal::hcore::HString const& value_ ) {
 	M_PROLOG
 	_expression->add_execution_step( hcore::call( &HExpression::store_string, _expression.raw(), value_ ) );
 	return;
 	M_EPILOG
 }
+
 void HHuginn::OCompiler::defer_store_character( char value_ ) {
 	M_PROLOG
 	_expression->add_execution_step( hcore::call( &HExpression::store_character, _expression.raw(), value_ ) );
@@ -685,7 +719,7 @@ HHuginn::HHuginn( void )
 	_functions(),
 	_engine( make_engine() ),
 	_source(),
-	_compiler(),
+	_compiler( this ),
 	_threads(),
 	_arguments() {
 }
@@ -1080,6 +1114,14 @@ HHuginn::HString::HString( yaal::hcore::HString const& value_ )
 	return;
 }
 
+yaal::hcore::HString const& HHuginn::HString::value( void ) const {
+	return ( _value );
+}
+
+yaal::hcore::HString& HHuginn::HString::value( void ) {
+	return ( _value );
+}
+
 HHuginn::HCharacter::HCharacter( char value_ )
 	: HValue( TYPE::CHARACTER ), _value( value_ ) {
 	return;
@@ -1118,8 +1160,12 @@ void HHuginn::HStatement::execute( HHuginn::HThread* thread_ ) const {
 	M_EPILOG
 }
 
-HHuginn::HExpression::HExpression( void )
-	: HStatement(), _executionSteps(), _operations(), _values() {
+HHuginn::HExpression::HExpression( HHuginn* huginn_ )
+	: HStatement(),
+	_executionSteps(),
+	_operations(),
+	_values(),
+	_huginn( huginn_ ) {
 	return;
 }
 
@@ -1156,6 +1202,43 @@ void HHuginn::HExpression::close_parenthesis( void ) {
 	M_ASSERT( !_operations.is_empty() );
 	M_ASSERT( ( _operations.top() == OPERATORS::ABSOLUTE ) || ( _operations.top() == OPERATORS::PARENTHESIS ) );
 	_operations.pop();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::function_call( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	_operations.push( OPERATORS::FUNCTION_CALL );
+	_values.push( make_pointer<HString>( name_ ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::add_arg( void ) {
+	M_PROLOG
+	_operations.push( OPERATORS::FUNCTION_ARGUMENT );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::function_call_exec( void ) {
+	M_PROLOG
+	M_ASSERT( !_operations.is_empty() );
+	M_ASSERT( !_values.is_empty() );
+	HHuginn::values_t values;
+	while ( _operations.top() == OPERATORS::FUNCTION_ARGUMENT ) {
+		_operations.pop();
+		M_ASSERT( !_operations.is_empty() );
+		values.push_back( yaal::move( _values.top() ) );
+		_values.pop();
+		M_ASSERT( !_values.is_empty() );
+	}
+	M_ASSERT( _operations.top() == OPERATORS::FUNCTION_CALL );
+	M_ASSERT( _values.top()->type() == HHuginn::HValue::TYPE::STRING );
+	hcore::HString name( yaal::move( static_cast<HString*>( _values.top().raw() )->value() ) );
+	_operations.pop();
+	_values.pop();
+	reverse( values.begin(), values.end() );
 	return;
 	M_EPILOG
 }
@@ -1291,7 +1374,7 @@ void HHuginn::HReturn::do_execute( HHuginn::HThread* thread_ ) const {
 HHuginn::HIf::HIf( boolean_expression_t condition_,
 		HExecutingParser::executor_t ifClause_,
 		HExecutingParser::executor_t elseClause_ )
-	: HScope( NULL ), _condition( condition_ ), _ifClause( ifClause_ ), _elseClause( elseClause_ ) {
+	: HStatement(), _condition( condition_ ), _ifClause( ifClause_ ), _elseClause( elseClause_ ) {
 	return;
 }
 

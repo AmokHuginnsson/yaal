@@ -110,23 +110,28 @@ private:
 	struct OCompiler {
 		typedef void ( HHuginn::HExpression::* expression_action_t ) ( void );
 		typedef yaal::hcore::HStack<scope_t> scope_stack_t;
+		HHuginn* _huginn;
 		yaal::hcore::HString _functionName;
 		function_t _functionScope;
 		expression_t _expression;
 		scope_stack_t _scopeStack;
 		statement_list_t _statementList;
-		OCompiler( void );
+		OCompiler( HHuginn* );
 		void set_function_name( yaal::hcore::HString const& );
 		void create_scope( void );
 		void commit_scope( void );
 		void add_return_statement( void );
 		void commit_expression( void );
+		void defer_function_call( yaal::hcore::HString const& );
 		void defer_oper( char );
 		void defer_action( expression_action_t const& );
 		void defer_store_real( double long );
 		void defer_store_integer( int long long );
 		void defer_store_string( yaal::hcore::HString const& );
 		void defer_store_character( char );
+	private:
+		OCompiler( OCompiler const& ) = delete;
+		OCompiler& operator = ( OCompiler const& ) = delete;
 	};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, function_t> functions_t;
 	struct STATE {
@@ -346,6 +351,8 @@ private:
 	yaal::hcore::HString _value;
 public:
 	HString( yaal::hcore::HString const& );
+	yaal::hcore::HString const& value( void ) const;
+	yaal::hcore::HString& value( void );
 	void to_character( void ) const;
 	void to_integer( void ) const;
 	void to_number( void ) const;
@@ -431,6 +438,8 @@ public:
 		ABSOLUTE,
 		PARENTHESIS,
 		ASSIGN,
+		FUNCTION_CALL,
+		FUNCTION_ARGUMENT,
 		NONE
 	};
 private:
@@ -440,13 +449,17 @@ private:
 	execution_steps_t _executionSteps;
 	operations_t _operations;
 	values_t _values;
+	HHuginn* _huginn;
 public:
-	HExpression( void );
+	HExpression( HHuginn* );
 	void add_execution_step( HExecutingParser::executor_t const& );
 	void oper( char );
 	void close_parenthesis( void );
 	void plus_minus( void );
 	void mul_div_mod( void );
+	void add_arg( void );
+	void function_call( yaal::hcore::HString const& );
+	void function_call_exec( void );
 	void power( void );
 	void store_real( double long );
 	void store_integer( int long long );
@@ -454,6 +467,9 @@ public:
 	void store_character( char );
 protected:
 	virtual void do_execute( HHuginn::HThread* ) const;
+private:
+	HExpression( HExpression const& ) = delete;
+	HExpression& operator = ( HExpression const& ) = delete;
 };
 
 class HHuginn::HBooleanExpression : public HHuginn::HObject {
@@ -498,10 +514,10 @@ private:
 	HReturn& operator = ( HReturn const& ) = delete;
 };
 
-class HHuginn::HIf : public HHuginn::HScope {
+class HHuginn::HIf : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HIf this_type;
-	typedef HHuginn::HScope base_type;
+	typedef HHuginn::HStatement base_type;
 private:
 	boolean_expression_t _condition;
 	HExecutingParser::executor_t _ifClause;
@@ -510,20 +526,20 @@ public:
 	HIf( boolean_expression_t, HExecutingParser::executor_t, HExecutingParser::executor_t );
 };
 
-class HHuginn::HWhile : public HHuginn::HScope {
+class HHuginn::HWhile : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HWhile this_type;
-	typedef HHuginn::HScope base_type;
+	typedef HHuginn::HStatement base_type;
 private:
 	boolean_expression_t _condition;
 	HExecutingParser::executor_t _loop;
 protected:
 };
 
-class HHuginn::HFor : public HHuginn::HScope {
+class HHuginn::HFor : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HFor this_type;
-	typedef HHuginn::HScope base_type;
+	typedef HHuginn::HStatement base_type;
 private:
 	iterable_t _container;
 	HExecutingParser::executor_t _loop;
