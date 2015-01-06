@@ -518,9 +518,7 @@ void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const 
 		rule_use_t::const_iterator it( ru_.find( _rule.get() ) );
 		HRuleRef const* rr( dynamic_cast<HRuleRef const*>( &*_rule ) );
 		if ( ( ( it != ru_.end() ) && ( it->second > 1 ) ) || ( ! _name.is_empty() ) || rr || ( r && r->has_action() ) ) {
-			if ( ! rr || ( r && r->has_action() ) ) {
-				rd_.add( this );
-			}
+			rd_.add( this );
 			rd_.desc( rd_.make_name( *this ) );
 		} else {
 			_rule->describe( rd_, ru_ );
@@ -3311,24 +3309,26 @@ HGrammarDescription::HGrammarDescription( HRuleBase const& rule_ )
 	rule_use_t ru;
 	rule_.rule_use( ru );
 	HRule const* rule( dynamic_cast<HRule const*>( &rule_ ) );
-	hcore::HString rootName( ! rule ? rd.make_name_auto( &rule_ ) + " = " : "" );
+	hcore::HString rootName( ! rule ? rd.make_name_auto( &rule_ ) : "" );
 	rule_.describe( rd, ru );
 	if ( ( ( ! rule || rule->get_name().is_empty() ) && ! ( rule && ( rd.children().size() == 1 ) && ( rd.children()[0] == rule->get_named_rule() ) ) )
 		|| ( rule && rule->has_action() && rule->get_name().is_empty() ) ) {
 		if ( rootName.is_empty() ) {
 			rd.clear();
 			rd.reset_names();
-			rootName = rd.make_name_auto( &rule_ ) + " = ";
+			rootName = rd.make_name_auto( &rule_ );
 			rule_.describe( rd, ru );
 		}
-		_rules.push_back( rootName + rd.description() );
+		_rules.push_back( rootName + " = " + rd.description() );
 	}
 	copy( rd.children().begin(), rd.children().end(), push_insert_iterator( _ruleOrder ) );
-	_visited.insert( &rule_ );
+	if ( ! rootName.is_empty() ) {
+		_visited.insert( rootName + &rule_ );
+	}
 	while ( ! _ruleOrder.is_empty() ) {
 		HNamedRule const* r( _ruleOrder.front() );
 		_ruleOrder.pop();
-		if ( _visited.insert( r->id() ).second ) {
+		if ( _visited.insert( r->name() + r->id() ).second ) {
 			rd.clear();
 			rd.desc( rd.make_name( *r ) );
 			rd.desc( " = " );

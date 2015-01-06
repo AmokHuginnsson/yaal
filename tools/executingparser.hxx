@@ -35,8 +35,8 @@ Copyright:
 #include "hcore/hregex.hxx"
 #include "hcore/harray.hxx"
 #include "hcore/hlist.hxx"
-#include "hcore/hset.hxx"
-#include "hcore/hmap.hxx"
+#include "hcore/hhashset.hxx"
+#include "hcore/hhashmap.hxx"
 #include "hcore/hqueue.hxx"
 #include "hcore/hboundcall.hxx"
 #include "hcore/htaggedpod.hxx"
@@ -65,15 +65,15 @@ class HNamedRule;
 class HRecursionDetector;
 class HRuleAggregator;
 typedef yaal::hcore::HExceptionT<HRecursionDetector> HRecursionDetectorException;
-typedef yaal::hcore::HSet<HRuleBase const*> visited_t;
-typedef yaal::hcore::HMap<HRuleBase const*, int> rule_use_t;
+typedef yaal::hcore::HHashSet<HRuleBase const*> visited_t;
+typedef yaal::hcore::HHashMap<HRuleBase const*, int> rule_use_t;
 struct Position {};
 typedef yaal::hcore::HTaggedPOD<int, Position> position_t;
 
 class HRuleDescription {
 public:
 	typedef HRuleDescription this_type;
-	typedef yaal::hcore::HMap<HRuleBase const*, yaal::hcore::HString> automatic_names_t;
+	typedef yaal::hcore::HHashMap<HRuleBase const*, yaal::hcore::HString> automatic_names_t;
 private:
 	typedef yaal::hcore::HArray<HNamedRule const*> named_children_t;
 	named_children_t _children;
@@ -183,6 +183,7 @@ public:
 private:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> rules_t;
 	typedef yaal::hcore::HQueue<HNamedRule const*> rule_order_t;
+	typedef yaal::hcore::HHashSet<yaal::hcore::HString> visited_t;
 	rules_t _rules;
 	visited_t _visited;
 	rule_order_t _ruleOrder;
