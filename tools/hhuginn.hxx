@@ -149,7 +149,8 @@ private:
 	HSource _source;
 	OCompiler _compiler;
 	threads_t _threads;
-	values_t _arguments;
+	list_t _argv;
+	value_t _result;
 public:
 	HHuginn( void );
 	/*! \brief Store source in internal buffer.
@@ -173,6 +174,8 @@ public:
 	void execute( void );
 	/*! \brief Dump Huginn Virtual Machine state.
 	 */
+	value_t call( yaal::hcore::HString const&, values_t const& );
+	value_t result( void ) const;
 	void dump_vm_state( yaal::hcore::HStreamInterface& );
 	void create_function( void );
 	void add_argument( yaal::hcore::HString const& );
@@ -269,6 +272,7 @@ public:
 	};
 private:
 	variables_t _variables;
+	HHuginn::value_t _result;
 	int const _number;
 	HFrame* const _parent;
 	bool _loop;
@@ -282,6 +286,8 @@ public:
 	int number( void ) const;
 	HFrame* parent( void );
 	bool is_loop( void ) const;
+	HHuginn::value_t result( void ) const;
+	void set_result( HHuginn::value_t const& );
 private:
 	HFrame( HFrame const& ) = delete;
 	HFrame& operator = ( HFrame const& ) = delete;
@@ -302,7 +308,7 @@ public:
 	void pop_frame( void );
 	HFrame* current_frame( void );
 	HFrame const* current_frame( void ) const;
-	void break_execution( HFrame::STATE, int = meta::max_signed<int>::value );
+	void break_execution( HFrame::STATE, HHuginn::value_t const& = HHuginn::value_t(), int = meta::max_signed<int>::value );
 	bool can_continue( void ) const;
 };
 
@@ -321,6 +327,7 @@ private:
 	int long long _value;
 public:
 	HInteger( int long long );
+	int long long value( void ) const;
 	void to_character( void ) const;
 	void to_integer( void ) const;
 	void to_number( void ) const;
@@ -336,6 +343,7 @@ private:
 	double long _value;
 public:
 	HReal( double long );
+	double long value( void ) const;
 	void to_integer( void ) const;
 	void to_number( void ) const;
 	void to_real( void ) const;
@@ -368,6 +376,7 @@ private:
 	char _value;
 public:
 	HCharacter( char );
+	char value( void ) const;
 	void to_character( void ) const;
 	void to_integer( void ) const;
 	void to_string( void ) const;
@@ -381,6 +390,7 @@ private:
 	yaal::hcore::HNumber _value;
 public:
 	HNumber( yaal::hcore::HNumber const& );
+	yaal::hcore::HNumber const& value( void ) const;
 	void to_integer( void ) const;
 	void to_number( void ) const;
 	void to_real( void ) const;
@@ -397,6 +407,7 @@ private:
 public:
 	HList( void );
 	void push_back( value_t const& );
+	int long size( void ) const;
 };
 
 class HHuginn::HMap : public HHuginn::HIterable {
@@ -452,6 +463,7 @@ private:
 	HHuginn* _huginn;
 public:
 	HExpression( HHuginn* );
+	HHuginn::value_t result( void ) const;
 	void add_execution_step( HExecutingParser::executor_t const& );
 	void oper( char );
 	void close_parenthesis( void );
@@ -504,9 +516,10 @@ public:
 	typedef HHuginn::HReturn this_type;
 	typedef HHuginn::HStatement base_type;
 private:
-	HScope* _scope; /*!< enclosing scope */
+	expression_t _expression;
+	HHuginn* _huginn; /*!< enclosing scope */
 public:
-	HReturn( HScope* );
+	HReturn( expression_t const&, HHuginn* );
 protected:
 	virtual void do_execute( HHuginn::HThread* ) const;
 private:
@@ -552,9 +565,10 @@ public:
 	typedef HHuginn::HScope base_type;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> argument_names_t;
 private:
+	yaal::hcore::HString _name;
 	argument_names_t _argumentNames;
 public:
-	HFunction( void );
+	HFunction( yaal::hcore::HString const& );
 	HFunction( HFunction&& ) = default;
 	using HStatement::execute;
 	value_t execute( HThread*, values_t const& ) const;

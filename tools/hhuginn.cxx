@@ -85,7 +85,9 @@ words_t _keywords_ = {{
 }};
 
 words_t _builtin_ = {{
+	"boolean",
 	"character",
+	"file",
 	"integer",
 	"list",
 	"map",
@@ -135,7 +137,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		absoluteValue
 		| parenthesis
 		| functionCall
-		| real[e_p::HReal::action_double_long_t( hcore::call( &HHuginn::OCompiler::defer_store_real, &_compiler, _1 ) )]
+		| real( e_p::HReal::PARSE::STRICT )[e_p::HReal::action_double_long_t( hcore::call( &HHuginn::OCompiler::defer_store_real, &_compiler, _1 ) )]
 		| integer[e_p::HInteger::action_int_long_long_t( hcore::call( &HHuginn::OCompiler::defer_store_integer, &_compiler, _1 ) )]
 		| string_literal[e_p::HStringLiteral::action_string_t( hcore::call( &HHuginn::OCompiler::defer_store_string, &_compiler, _1 ) )]
 		| character_literal[e_p::HCharacterLiteral::action_character_t( hcore::call( &HHuginn::OCompiler::defer_store_character, &_compiler, _1 ) )]
@@ -150,23 +152,25 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"multiplication",
 		power >> (
 			* (
-				characters(
-					"*/%", e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )
-				) >> power
+					(
+					characters(
+						"*/%", e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )
+					) >> power
+				)[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::mul_div_mod ) )]
 			)
-		),
-		e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::mul_div_mod ) )
+		)
 	);
 	HRule sum(
 		"sum",
 		multiplication >> (
 			* (
-				characters(
-					"+-", e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )
-				) >> multiplication
+					(
+					characters(
+						"+-", e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )
+					) >> multiplication
+				)[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::plus_minus ) )]
 			)
-		),
-		e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::plus_minus ) )
+		)
 	);
 	HRule value( "value", sum );
 	HRule ref( "ref", value >> *( '[' >> value >> ']' ) );
@@ -218,7 +222,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> scope >> -breakStatement );
 	HRule defaultStatement( "defaultStatement", constant( "default" ) >> ':' >> scope );
 	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> -defaultStatement >> '}' );
-	HRule returnStatement( "returnStatement", constant( "return" ) >> '(' >> expression >> ')' >> ';' );
+	HRule returnStatement( "returnStatement", constant( "return" ) >> -( '(' >> expression >> ')' ) >> ';' );
 	HRule statement( "statement",
 		ifStatement
 		| whileStatement
@@ -633,7 +637,7 @@ void HHuginn::OCompiler::create_scope( void ) {
 		top->add_statement( _scopeStack.top() );
 	} else {
 		M_ASSERT( ! _functionScope );
-		_functionScope = make_pointer<HFunction>();
+		_functionScope = make_pointer<HFunction>( _functionName );
 		_scopeStack.emplace( _functionScope );
 	}
 	return;
@@ -650,8 +654,8 @@ void HHuginn::OCompiler::commit_scope( void ) {
 void HHuginn::OCompiler::add_return_statement( void ) {
 	M_PROLOG
 	M_ASSERT( ! _scopeStack.is_empty() && ( !! _functionScope ) );
-	HScope* top( _scopeStack.top().raw() );
-	_scopeStack.top()->add_statement( make_pointer<HReturn>( top ) );
+	_scopeStack.top()->add_statement( make_pointer<HReturn>( _expression, _huginn ) );
+	_expression = make_pointer<HExpression>( _huginn );
 	return;
 	M_EPILOG
 }
@@ -721,7 +725,8 @@ HHuginn::HHuginn( void )
 	_source(),
 	_compiler( this ),
 	_threads(),
-	_arguments() {
+	_argv( new ( memory::yaal ) HList() ),
+	_result() {
 }
 
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
@@ -764,15 +769,34 @@ void HHuginn::execute( void ) {
 	M_ENSURE( _state == STATE::COMPILED );
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	threads_t::iterator t( _threads.insert( make_pair( threadId, make_pointer<HThread>( threadId ) ) ).first );
-	functions_t::const_iterator f( _functions.find( "main" ) );
-	if ( f != _functions.end() ) {
-		f->second->execute( t->second.raw(), _arguments );
-	} else {
-		throw HHuginnException( "function `main' is not defined" );
+	values_t args;
+	if ( _argv->size() > 0 ) {
+		args.push_back( _argv );
 	}
+	_result = call( "main", args );
 	_threads.clear();
 	return;
 	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::call( yaal::hcore::HString const& name_, values_t const& values_ ) {
+	M_PROLOG
+	functions_t::const_iterator f( _functions.find( name_ ) );
+	value_t res;
+	if ( f != _functions.end() ) {
+		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
+		threads_t::iterator t( _threads.find( threadId ) );
+		M_ASSERT( t != _threads.end() );
+		res = f->second->execute( t->second.raw(), values_ );
+	} else {
+		throw HHuginnException( "function `"_ys.append( name_ ).append( "' is not defined" ) );
+	}
+	return ( res );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::result( void ) const {
+	return ( _result );
 }
 
 int HHuginn::error_position( void ) const {
@@ -812,7 +836,7 @@ char const* HHuginn::error_message( int code_ ) const {
 
 void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_PROLOG
-	_arguments.push_back( make_pointer<HString>( arg_ ) );
+	_argv->push_back( make_pointer<HString>( arg_ ) );
 	return;
 	M_EPILOG
 }
@@ -906,14 +930,16 @@ bool HHuginn::HThread::can_continue( void ) const {
 	M_EPILOG
 }
 
-void HHuginn::HThread::break_execution( HFrame::STATE state_, int level_ ) {
+void HHuginn::HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& value_, int level_ ) {
 	M_PROLOG
 	M_ASSERT( ( state_ == HHuginn::HFrame::STATE::RETURN ) || ( state_ == HHuginn::HFrame::STATE::BREAK ) );
 	int level( 0 );
 	HFrame* f( current_frame() );
+	HFrame* target( f );
 	int no( f->number() );
 	while ( f ) {
 		f->break_execution( state_ );
+		target = f;
 		if ( f->is_loop() ) {
 			++ level;
 		}
@@ -926,12 +952,16 @@ void HHuginn::HThread::break_execution( HFrame::STATE state_, int level_ ) {
 			break;
 		}
 	}
+	if ( target ) {
+		target->set_result( value_ );
+	}
 	return;
 	M_EPILOG
 }
 
 HHuginn::HFrame::HFrame( HFrame* parent_, bool bump_, bool loop_ )
 	: _variables(),
+	_result(),
 	_number( parent_ ? ( parent_->_number + ( bump_ ? 1 : 0 ) ) : 1 ),
 	_parent( parent_ ),
 	_loop( loop_ ),
@@ -958,6 +988,17 @@ bool HHuginn::HFrame::can_continue( void ) const {
 void HHuginn::HFrame::break_execution( STATE state_ ) {
 	_state = state_;
 	return;
+}
+
+void HHuginn::HFrame::set_result( HHuginn::value_t const& result_ ) {
+	M_PROLOG
+	_result = result_;
+	return;
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HFrame::result( void ) const {
+	return ( _result );
 }
 
 HHuginn::value_t& HHuginn::HFrame::get_variable( yaal::hcore::HString const& name_ ) {
@@ -1104,9 +1145,17 @@ HHuginn::HReal::HReal( double long value_ )
 	return;
 }
 
+double long HHuginn::HReal::value( void ) const {
+	return ( _value );
+}
+
 HHuginn::HInteger::HInteger( int long long value_ )
 	: HValue( TYPE::INTEGER ), _value( value_ ) {
 	return;
+}
+
+int long long HHuginn::HInteger::value( void ) const {
+	return ( _value );
 }
 
 HHuginn::HString::HString( yaal::hcore::HString const& value_ )
@@ -1125,6 +1174,10 @@ yaal::hcore::HString& HHuginn::HString::value( void ) {
 HHuginn::HCharacter::HCharacter( char value_ )
 	: HValue( TYPE::CHARACTER ), _value( value_ ) {
 	return;
+}
+
+char HHuginn::HCharacter::value( void ) const {
+	return ( _value );
 }
 
 HHuginn::HIterable::HIterable( TYPE type_ )
@@ -1149,6 +1202,10 @@ void HHuginn::HList::push_back( HHuginn::value_t const& value_ ) {
 	M_EPILOG
 }
 
+int long HHuginn::HList::size( void ) const {
+	return ( _data.get_size() );
+}
+
 HHuginn::HStatement::HStatement( void ) {
 	return;
 }
@@ -1167,6 +1224,12 @@ HHuginn::HExpression::HExpression( HHuginn* huginn_ )
 	_values(),
 	_huginn( huginn_ ) {
 	return;
+}
+
+HHuginn::value_t HHuginn::HExpression::result( void ) const {
+	M_PROLOG
+	return ( ! _values.is_empty() ? _values.top() : _none_ );
+	M_EPILOG
 }
 
 void HHuginn::HExpression::add_execution_step( HExecutingParser::executor_t const& executionStep_ ) {
@@ -1239,6 +1302,7 @@ void HHuginn::HExpression::function_call_exec( void ) {
 	_operations.pop();
 	_values.pop();
 	reverse( values.begin(), values.end() );
+	_values.push( _huginn->call( name, values ) );
 	return;
 	M_EPILOG
 }
@@ -1359,14 +1423,17 @@ void HHuginn::HScope::do_execute( HHuginn::HThread* thread_ ) const {
 	M_EPILOG
 }
 
-HHuginn::HReturn::HReturn( HHuginn::HScope* scope_ )
-	: _scope( scope_ ) {
+HHuginn::HReturn::HReturn( HHuginn::expression_t const& expression_, HHuginn* huginn_ )
+	: _expression( expression_ ), _huginn( huginn_ ) {
 	return;
 }
 
 void HHuginn::HReturn::do_execute( HHuginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->break_execution( HHuginn::HFrame::STATE::RETURN );
+	if ( !! _expression ) {
+		_expression->execute( thread_ );
+	}
+	thread_->break_execution( HHuginn::HFrame::STATE::RETURN, !! _expression ? _expression->result() : HHuginn::value_t() );
 	return;
 	M_EPILOG
 }
@@ -1378,15 +1445,18 @@ HHuginn::HIf::HIf( boolean_expression_t condition_,
 	return;
 }
 
-HHuginn::HFunction::HFunction( void )
-	: HScope( nullptr ), _argumentNames() {
+HHuginn::HFunction::HFunction( yaal::hcore::HString const& name_ )
+	: HScope( nullptr ), _name( name_ ), _argumentNames() {
 	return;
 }
 
 HHuginn::value_t HHuginn::HFunction::execute( HThread* thread_, values_t const& values_ ) const {
 	M_PROLOG
 	if ( values_.get_size() != _argumentNames.get_size() ) {
-		throw HHuginnException( "Mismatching number of parameters in call to: `"_ys.append( "" ).append( "', expected: " ).append( _argumentNames.get_size() ).append( ", got: " ).append( values_.get_size() ).append( "." ) );
+		throw HHuginnException( "Mismatching number of parameters in call to: `"_ys
+			.append( _name ).append( "', expected: " )
+			.append( _argumentNames.get_size() ).append( ", got: " )
+			.append( values_.get_size() ).append( "." ) );
 	}
 	argument_names_t::const_iterator n( _argumentNames.begin() );
 	argument_names_t::const_iterator ne( _argumentNames.end() );
@@ -1400,8 +1470,9 @@ HHuginn::value_t HHuginn::HFunction::execute( HThread* thread_, values_t const& 
 		++ v;
 	}
 	execute( thread_ );
+	HHuginn::value_t res( thread_->current_frame()->result() );
 	thread_->pop_frame();
-	return ( _none_ );
+	return ( res );
 	M_EPILOG
 }
 
