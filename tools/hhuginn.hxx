@@ -310,6 +310,7 @@ public:
 	HFrame const* current_frame( void ) const;
 	void break_execution( HFrame::STATE, HHuginn::value_t const& = HHuginn::value_t(), int = meta::max_signed<int>::value );
 	bool can_continue( void ) const;
+	yaal::hcore::HThread::id_t id( void ) const;
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {
@@ -517,9 +518,8 @@ public:
 	typedef HHuginn::HStatement base_type;
 private:
 	expression_t _expression;
-	HHuginn* _huginn; /*!< enclosing scope */
 public:
-	HReturn( expression_t const&, HHuginn* );
+	HReturn( expression_t const& );
 protected:
 	virtual void do_execute( HHuginn::HThread* ) const;
 private:

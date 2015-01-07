@@ -164,7 +164,7 @@ public:
 	HHashSet( std::initializer_list<T> constants_ )
 		: _engine( hasher_type(), allocator_type() ) {
 		M_PROLOG
-		_engine.resize( constants_.size() );
+		_engine.resize( static_cast<int>( constants_.size() ) );
 		for ( T const& v : constants_ ) {
 			insert( v );
 		}

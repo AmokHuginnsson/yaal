@@ -654,7 +654,7 @@ void HHuginn::OCompiler::commit_scope( void ) {
 void HHuginn::OCompiler::add_return_statement( void ) {
 	M_PROLOG
 	M_ASSERT( ! _scopeStack.is_empty() && ( !! _functionScope ) );
-	_scopeStack.top()->add_statement( make_pointer<HReturn>( _expression, _huginn ) );
+	_scopeStack.top()->add_statement( make_pointer<HReturn>( _expression ) );
 	_expression = make_pointer<HExpression>( _huginn );
 	return;
 	M_EPILOG
@@ -878,6 +878,10 @@ void HHuginn::create_function( void ) {
 HHuginn::HThread::HThread( yaal::hcore::HThread::id_t id_ )
 	: _frames(), _id( id_ ) {
 	return;
+}
+
+yaal::hcore::HThread::id_t HHuginn::HThread::id( void ) const {
+	return ( _id );
 }
 
 HHuginn::HFrame* HHuginn::HThread::current_frame( void ) {
@@ -1423,8 +1427,8 @@ void HHuginn::HScope::do_execute( HHuginn::HThread* thread_ ) const {
 	M_EPILOG
 }
 
-HHuginn::HReturn::HReturn( HHuginn::expression_t const& expression_, HHuginn* huginn_ )
-	: _expression( expression_ ), _huginn( huginn_ ) {
+HHuginn::HReturn::HReturn( HHuginn::expression_t const& expression_ )
+	: _expression( expression_ ) {
 	return;
 }
 
