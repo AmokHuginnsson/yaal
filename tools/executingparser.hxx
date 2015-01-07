@@ -515,6 +515,10 @@ public:
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HNumber const&, position_t )> action_number_position_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> action_string_t;
 	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const&, position_t )> action_string_position_t;
+	enum class PARSE {
+		GREEDY,
+		STRICT
+	};
 private:
 	action_double_t _actionDouble;
 	action_double_position_t _actionDoublePosition;
@@ -524,6 +528,7 @@ private:
 	action_number_position_t _actionNumberPosition;
 	action_string_t _actionString;
 	action_string_position_t _actionStringPosition;
+	PARSE _parse;
 	yaal::hcore::HString _cache;
 	typedef enum {
 		START = 0,
@@ -544,17 +549,18 @@ public:
 	HReal operator[]( action_number_position_t const& ) const;
 	HReal operator[]( action_string_t const& ) const;
 	HReal operator[]( action_string_position_t const& ) const;
+	HReal operator() ( PARSE ) const;
 protected:
-	HReal( action_t const& );
-	HReal( action_position_t const& );
-	HReal( action_double_t const& );
-	HReal( action_double_position_t const& );
-	HReal( action_double_long_t const& );
-	HReal( action_double_long_position_t const& );
-	HReal( action_number_t const& );
-	HReal( action_number_position_t const& );
-	HReal( action_string_t const& );
-	HReal( action_string_position_t const& );
+	HReal( action_t const&, PARSE = PARSE::GREEDY );
+	HReal( action_position_t const&, PARSE = PARSE::GREEDY );
+	HReal( action_double_t const&, PARSE = PARSE::GREEDY );
+	HReal( action_double_position_t const&, PARSE = PARSE::GREEDY );
+	HReal( action_double_long_t const&, PARSE = PARSE::GREEDY );
+	HReal( action_double_long_position_t const&, PARSE = PARSE::GREEDY );
+	HReal( action_number_t const&, PARSE = PARSE::GREEDY );
+	HReal( action_number_position_t const&, PARSE = PARSE::GREEDY );
+	HReal( action_string_t const&, PARSE = PARSE::GREEDY );
+	HReal( action_string_position_t const&, PARSE = PARSE::GREEDY );
 	virtual ptr_t do_clone( void ) const;
 	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
@@ -563,7 +569,7 @@ protected:
 	virtual void do_find_recursions( HRuleAggregator& );
 	virtual bool do_has_action( void ) const;
 private:
-	HReal( void );
+	HReal( PARSE = PARSE::GREEDY );
 	HReal& operator = ( HReal const& );
 	friend HReal const& get_real_instance( void );
 	template<typename tType, typename a0_t>
