@@ -126,6 +126,7 @@ private:
 		void defer_function_call( yaal::hcore::HString const& );
 		void defer_get_variable( yaal::hcore::HString const& );
 		void defer_oper( char );
+		void defer_str_oper( yaal::hcore::HString const& );
 		void defer_action( expression_action_t const& );
 		void defer_store_real( double long );
 		void defer_store_integer( int long long );
@@ -243,6 +244,7 @@ public:
 	HValue( TYPE );
 	TYPE type( void ) const;
 	static yaal::hcore::HString const& type_name( TYPE );
+	static value_t subscript( value_t const&, value_t const& );
 	static value_t add( value_t const&, value_t const& );
 	static value_t sub( value_t const&, value_t const& );
 	static value_t mul( value_t const&, value_t const& );
@@ -256,6 +258,10 @@ public:
 	static bool greater( value_t const&, value_t const& );
 	static bool less_or_equal( value_t const&, value_t const& );
 	static bool greater_or_equal( value_t const&, value_t const& );
+	static value_t boolean_and( value_t const&, value_t const& );
+	static value_t boolean_or( value_t const&, value_t const& );
+	static value_t boolean_xor( value_t const&, value_t const& );
+	static value_t boolean_not( value_t const& );
 	static value_t string( value_t const& );
 	static value_t integer( value_t const& );
 	static value_t real( value_t const& );
@@ -456,7 +462,7 @@ class HHuginn::HExpression : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HExpression this_type;
 	typedef HHuginn::HStatement base_type;
-	enum class OPERATORS {
+	enum class OPERATOR {
 		PLUS,
 		MINUS,
 		MULTIPLY,
@@ -466,13 +472,25 @@ public:
 		ABSOLUTE,
 		PARENTHESIS,
 		ASSIGN,
+		SUBSCRIPT,
+		NEGATE,
 		FUNCTION_CALL,
 		FUNCTION_ARGUMENT,
+		EQUALS,
+		NOT_EQUALS,
+		LESS,
+		GREATER,
+		LESS_OR_EQUAL,
+		GREATER_OR_EQUAL,
+		BOOLEAN_AND,
+		BOOLEAN_OR,
+		BOOLEAN_XOR,
+		BOOLEAN_NOT,
 		NONE
 	};
 private:
 	typedef yaal::hcore::HArray<HExecutingParser::executor_t> execution_steps_t;
-	typedef yaal::hcore::HStack<OPERATORS> operations_t;
+	typedef yaal::hcore::HStack<OPERATOR> operations_t;
 	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
 	execution_steps_t _executionSteps;
 	operations_t _operations;
@@ -482,7 +500,7 @@ public:
 	HExpression( HHuginn* );
 	HHuginn::value_t result( void ) const;
 	void add_execution_step( HExecutingParser::executor_t const& );
-	void oper( char );
+	void oper( OPERATOR );
 	void close_parenthesis( void );
 	void plus_minus( void );
 	void mul_div_mod( void );
@@ -490,7 +508,18 @@ public:
 	void function_call( yaal::hcore::HString const& );
 	void function_call_exec( void );
 	void get_variable( yaal::hcore::HString const& );
+	void subscript( void );
 	void power( void );
+	void equals( void );
+	void not_equals( void );
+	void less( void );
+	void greater( void );
+	void less_or_equal( void );
+	void greater_or_equal( void );
+	void boolean_and( void );
+	void boolean_or( void );
+	void boolean_xor( void );
+	void boolean_not( void );
 	void store_real( double long );
 	void store_integer( int long long );
 	void store_string( yaal::hcore::HString const& );

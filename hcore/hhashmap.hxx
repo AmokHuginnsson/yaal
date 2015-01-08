@@ -27,6 +27,8 @@ Copyright:
 #ifndef YAAL_HCORE_HHASHMAP_HXX_INCLUDED
 #define YAAL_HCORE_HHASHMAP_HXX_INCLUDED 1
 
+#include <initializer_list>
+
 #include "hcore/hhashcontainer.hxx"
 #include "hcore/hexception.hxx"
 
@@ -41,8 +43,9 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHHashMap_[];
 template<typename key_t, typename value_t>
 struct hashmap_helper {
 	typedef key_t key_type;
-	inline static key_type const& key( HPair<key_t const, value_t> const& key_ )
-		{	return ( key_.first ); }
+	inline static key_type const& key( HPair<key_t const, value_t> const& key_ ) {
+		return ( key_.first );
+	}
 };
 
 /*! \brief Hash map container implementation.
@@ -79,14 +82,17 @@ public:
 	typedef typename engine_t::allocator_type allocator_type;
 	typedef HHashMap<key_type, data_type, hasher_type, allocator_t> this_type;
 	HHashMap( void )
-		: _engine( hasher_type(), allocator_type() )
-		{}
+		: _engine( hasher_type(), allocator_type() ) {
+		return;
+	}
 	explicit HHashMap( hasher_type const& hasher_ )
-		: _engine( hasher_, allocator_type() )
-		{}
+		: _engine( hasher_, allocator_type() ) {
+		return;
+	}
 	explicit HHashMap( allocator_type const& allocator_ )
-		: _engine( hasher_type(), allocator_ )
-		{}
+		: _engine( hasher_type(), allocator_ ) {
+		return;
+	}
 	/*! \brief Lower bound of size of map's table */
 	explicit HHashMap( int long size_ )
 		: _engine( hasher_type(), allocator_type() ) {
@@ -118,6 +124,16 @@ public:
 		resize( size_ );
 		for ( ; first != last; ++ first )
 			insert( *first );
+		return;
+		M_EPILOG
+	}
+	HHashMap( std::initializer_list<value_type> constants_ )
+		: _engine( hasher_type(), allocator_type() ) {
+		M_PROLOG
+		_engine.resize( static_cast<int>( constants_.size() ) );
+		for ( value_type const& v : constants_ ) {
+			insert( v );
+		}
 		return;
 		M_EPILOG
 	}
@@ -172,18 +188,36 @@ public:
 		return ( it.get().second );
 		M_EPILOG
 	}
-	const_iterator begin( void ) const
-		{ M_PROLOG return ( const_iterator( _engine.begin() ) ); M_EPILOG }
-	const_iterator cbegin( void ) const
-		{ M_PROLOG return ( const_iterator( _engine.begin() ) ); M_EPILOG }
-	iterator begin( void )
-		{ M_PROLOG return ( iterator( _engine.begin() ) ); M_EPILOG }
-	const_iterator end( void ) const
-		{ M_PROLOG return ( const_iterator( _engine.end() ) ); M_EPILOG }
-	const_iterator cend( void ) const
-		{ M_PROLOG return ( const_iterator( _engine.end() ) ); M_EPILOG }
-	iterator end( void )
-		{ M_PROLOG return ( iterator( _engine.end() ) ); M_EPILOG }
+	const_iterator begin( void ) const {
+		M_PROLOG
+		return ( const_iterator( _engine.begin() ) );
+		M_EPILOG
+	}
+	const_iterator cbegin( void ) const {
+		M_PROLOG
+		return ( const_iterator( _engine.begin() ) );
+		M_EPILOG
+	}
+	iterator begin( void ) {
+		M_PROLOG
+		return ( iterator( _engine.begin() ) );
+		M_EPILOG
+	}
+	const_iterator end( void ) const {
+		M_PROLOG
+		return ( const_iterator( _engine.end() ) );
+		M_EPILOG
+	}
+	const_iterator cend( void ) const {
+		M_PROLOG
+		return ( const_iterator( _engine.end() ) );
+		M_EPILOG
+	}
+	iterator end( void ) {
+		M_PROLOG
+		return ( iterator( _engine.end() ) );
+		M_EPILOG
+	}
 	const_reverse_iterator rbegin( void ) const {
 		M_PROLOG
 		return ( end() );
@@ -214,10 +248,16 @@ public:
 		return ( begin() );
 		M_EPILOG
 	}
-	const_iterator find( key_t const& key_ ) const
-		{ M_PROLOG return ( const_iterator( _engine.find( key_ ) ) ); M_EPILOG }
-	iterator find( key_t const& key_ )
-		{ M_PROLOG return ( iterator( _engine.find( key_ ) ) ); M_EPILOG }
+	const_iterator find( key_t const& key_ ) const {
+		M_PROLOG
+		return ( const_iterator( _engine.find( key_ ) ) );
+		M_EPILOG
+	}
+	iterator find( key_t const& key_ ) {
+		M_PROLOG
+		return ( iterator( _engine.find( key_ ) ) );
+		M_EPILOG
+	}
 	insert_result insert( value_type const& val_ ) {
 		M_PROLOG
 		HPair<typename engine_t::HIterator, bool> it( _engine.insert( val_ ) );
@@ -274,18 +314,37 @@ public:
 		return ( first_ );
 		M_EPILOG
 	}
-	int long count( key_t const& key_ ) const
-		{ M_PROLOG return ( find( key_ ) != end() ? 1 : 0 ); M_EPILOG }
-	void clear( void )
-		{ M_PROLOG _engine.clear(); return; M_EPILOG }
-	int long get_size( void ) const
-		{ M_PROLOG return ( _engine.get_size() ); M_EPILOG }
-	int long size( void ) const
-		{ M_PROLOG return ( _engine.get_size() ); M_EPILOG }
-	bool is_empty( void ) const
-		{ M_PROLOG return ( _engine.is_empty() ); M_EPILOG }
-	bool empty( void ) const
-		{ M_PROLOG return ( _engine.is_empty() ); M_EPILOG }
+	int long count( key_t const& key_ ) const {
+		M_PROLOG
+		return ( find( key_ ) != end() ? 1 : 0 );
+		M_EPILOG
+	}
+	void clear( void ) {
+		M_PROLOG
+		_engine.clear();
+		return;
+		M_EPILOG
+	}
+	int long get_size( void ) const {
+		M_PROLOG
+		return ( _engine.get_size() );
+		M_EPILOG
+	}
+	int long size( void ) const {
+		M_PROLOG
+		return ( _engine.get_size() );
+		M_EPILOG
+	}
+	bool is_empty( void ) const {
+		M_PROLOG
+		return ( _engine.is_empty() );
+		M_EPILOG
+	}
+	bool empty( void ) const {
+		M_PROLOG
+		return ( _engine.is_empty() );
+		M_EPILOG
+	}
 	void swap( HHashMap& map_ ) {
 		if ( &map_ != this ) {
 			using yaal::swap;
@@ -293,10 +352,16 @@ public:
 		}
 		return;
 	}
-	bool operator == ( HHashMap const& map_ ) const
-		{ M_PROLOG return ( ( &map_ == this ) || safe_equal( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
-	bool operator < ( HHashMap const& map_ ) const
-		{ M_PROLOG return ( ( &map_ != this ) && lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) ); M_EPILOG }
+	bool operator == ( HHashMap const& map_ ) const {
+		M_PROLOG
+		return ( ( &map_ == this ) || safe_equal( begin(), end(), map_.begin(), map_.end() ) );
+		M_EPILOG
+	}
+	bool operator < ( HHashMap const& map_ ) const {
+		M_PROLOG
+		return ( ( &map_ != this ) && lexicographical_compare( begin(), end(), map_.begin(), map_.end() ) );
+		M_EPILOG
+	}
 private:
 };
 
@@ -310,7 +375,10 @@ class HHashMap<key_type_t, data_type_t, hasher_t, allocator_t>::HIterator : publ
 	typename hashmap_t::engine_t::HIterator _engine;
 public:
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
-	HIterator( void ) : base_type(), _engine() {}
+	HIterator( void )
+		: base_type(), _engine() {
+		return;
+	}
 	template<typename other_const_qual_t>
 	HIterator( HIterator<other_const_qual_t> const& it_ )
 		: base_type(), _engine( it_._engine ) {
@@ -339,27 +407,34 @@ public:
 		-- _engine;
 		return ( it );
 	}
-	const_qual_t& operator* ( void ) const
-		{ return ( _engine.get() ); }
-	const_qual_t* operator-> ( void ) const
-		{ return ( &_engine.get() ); }
+	const_qual_t& operator* ( void ) const {
+		return ( _engine.get() );
+	}
+	const_qual_t* operator-> ( void ) const {
+		return ( &_engine.get() );
+	}
 	template<typename other_const_qual_t>
-	bool operator == ( HIterator<other_const_qual_t> const& it ) const
-		{ return ( _engine == it._engine ); }
+	bool operator == ( HIterator<other_const_qual_t> const& it ) const {
+		return ( _engine == it._engine );
+	}
 	template<typename other_const_qual_t>
-	bool operator != ( HIterator<other_const_qual_t> const& it ) const
-		{ return ( _engine != it._engine ); }
+	bool operator != ( HIterator<other_const_qual_t> const& it ) const {
+		return ( _engine != it._engine );
+	}
 private:
 	friend class HHashMap<key_type, data_type, hasher_t, allocator_t>;
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	explicit HIterator( typename hashmap_t::engine_t::HIterator const& it )
-		: base_type(), _engine( it ) {};
+		: base_type(), _engine( it ) {
+		return;
+	}
 };
 
 template<typename key_type, typename data_type, typename hasher_t, typename allocator_t>
-inline void swap( yaal::hcore::HHashMap<key_type, data_type, hasher_t, allocator_t>& a, yaal::hcore::HHashMap<key_type, data_type, hasher_t, allocator_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HHashMap<key_type, data_type, hasher_t, allocator_t>& a, yaal::hcore::HHashMap<key_type, data_type, hasher_t, allocator_t>& b ) {
+	a.swap( b );
+}
 
 }
 
