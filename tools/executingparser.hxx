@@ -41,6 +41,17 @@ Copyright:
 #include "hcore/hboundcall.hxx"
 #include "hcore/htaggedpod.hxx"
 
+/*
+ * *TODO*
+ * Implement AND rule and NOT rule as per PEG definition:
+ * AND:
+ * The parsing expression `foo & bar' matches and consumes the text "foo" but only if it is followed by the text "bar",
+ * still "bar" is never consumed.
+ * NOT:
+ * The parsing expression `foo ^ bar' matches and consumes the text "foo" but only if it is NOT followed by the text "bar",
+ * still whatever follows "foo" is never consumed.
+ */
+
 namespace yaal {
 
 namespace tools {

@@ -952,6 +952,7 @@ HRuleBase::ptr_t HFollows::do_clone( void ) const {
 void HFollows::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
 	bool next( false );
+	rd_.desc( "( " );
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( next ) {
 			rd_.desc( " >> " );
@@ -959,6 +960,7 @@ void HFollows::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const
 		it->describe( rd_, ru_ );
 		next = true;
 	}
+	rd_.desc( " )" );
 	return;
 	M_EPILOG
 }
@@ -1166,9 +1168,8 @@ bool HKleeneStar::do_is_optional( void ) const {
 
 void HKleeneStar::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
-	rd_.desc( "*( " );
+	rd_.desc( "*" );
 	_rule.describe( rd_, ru_ );
-	rd_.desc( " )" );
 	return;
 	M_EPILOG
 }
@@ -1227,9 +1228,8 @@ HRuleBase::ptr_t HKleenePlus::do_clone( void ) const {
 
 void HKleenePlus::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
-	rd_.desc( "+( " );
+	rd_.desc( "+" );
 	_rule.describe( rd_, ru_ );
-	rd_.desc( " )" );
 	return;
 	M_EPILOG
 }
@@ -1325,6 +1325,7 @@ yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser* e
 void HAlternative::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
 	bool next( false );
+	rd_.desc( "( " );
 	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( next ) {
 			rd_.desc( " | " );
@@ -1332,6 +1333,7 @@ void HAlternative::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) c
 		it->describe( rd_, ru_ );
 		next = true;
 	}
+	rd_.desc( " )" );
 	return;
 	M_EPILOG
 }
@@ -1450,9 +1452,8 @@ bool HOptional::do_is_optional( void ) const {
 
 void HOptional::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
 	M_PROLOG
-	rd_.desc( "-( " );
+	rd_.desc( "-" );
 	_rule.describe( rd_, ru_ );
-	rd_.desc( " )" );
 	return;
 	M_EPILOG
 }
