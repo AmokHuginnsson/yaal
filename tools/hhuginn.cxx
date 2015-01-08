@@ -740,6 +740,7 @@ void HHuginn::OCompiler::defer_oper( char operator_ ) {
 		case ( '[' ): o = HHuginn::HExpression::OPERATOR::SUBSCRIPT;   break;
 		case ( '<' ): o = HHuginn::HExpression::OPERATOR::LESS;        break;
 		case ( '>' ): o = HHuginn::HExpression::OPERATOR::GREATER;     break;
+		case ( '!' ): o = HHuginn::HExpression::OPERATOR::BOOLEAN_NOT; break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
 		}
