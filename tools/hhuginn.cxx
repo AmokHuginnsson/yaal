@@ -141,7 +141,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| integer[e_p::HInteger::action_int_long_long_t( hcore::call( &HHuginn::OCompiler::defer_store_integer, &_compiler, _1 ) )]
 		| string_literal[e_p::HStringLiteral::action_string_t( hcore::call( &HHuginn::OCompiler::defer_store_string, &_compiler, _1 ) )]
 		| character_literal[e_p::HCharacterLiteral::action_character_t( hcore::call( &HHuginn::OCompiler::defer_store_character, &_compiler, _1 ) )]
-		| variableIdentifier
+		| regex( "variableIdentifier", identifier, e_p::HStringLiteral::action_string_t( hcore::call( &HHuginn::OCompiler::defer_get_variable, &_compiler, _1 ) ) )
 	);
 	HRule power(
 		"power",
@@ -173,13 +173,19 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		)
 	);
 	HRule value( "value", sum );
-	HRule ref( "ref", value >> *( '[' >> value >> ']' ) );
+	HRule subscript( "subscript", ( functionCall | variableIdentifier ) >> +( '[' >> value >> ']' ) );
 	/*
 	 * Assignment shall work only as aliasing.
 	 * In other words you cannot modify value of referenced object
 	 * with assignment. You can only change where a reference points to.
 	 */
-	HRule assignment( "assignment", *( variableIdentifier >> '=' ) >> ref );
+	HRule assignment(
+		"assignment",
+		* (
+			( subscript | variableIdentifier ) >>
+			constant( '=' )[e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )]
+		) >> ( subscript | value )
+	);
 	expression %= assignment;
 	HRule booleanExpression( "booleanExpression" );
 	HRule booleanValue( "booleanValue", constant( "true" ) | constant( "false" ) | constant( '(' ) >> booleanExpression >> ')' );
@@ -690,6 +696,13 @@ void HHuginn::OCompiler::defer_function_call( yaal::hcore::HString const& value_
 	M_EPILOG
 }
 
+void HHuginn::OCompiler::defer_get_variable( yaal::hcore::HString const& value_ ) {
+	M_PROLOG
+	_expression->add_execution_step( hcore::call( &HExpression::get_variable, _expression.raw(), value_ ) );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::OCompiler::defer_store_real( double long value_ ) {
 	M_PROLOG
 	_expression->add_execution_step( hcore::call( &HExpression::store_real, _expression.raw(), value_ ) );
@@ -792,6 +805,15 @@ HHuginn::value_t HHuginn::call( yaal::hcore::HString const& name_, values_t cons
 		throw HHuginnException( "function `"_ys.append( name_ ).append( "' is not defined" ) );
 	}
 	return ( res );
+	M_EPILOG
+}
+
+HHuginn::HFrame* HHuginn::current_frame( void ) {
+	M_PROLOG
+	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
+	threads_t::iterator t( _threads.find( threadId ) );
+	M_ASSERT( t != _threads.end() );
+	return ( t->second->current_frame() );
 	M_EPILOG
 }
 
@@ -1061,11 +1083,12 @@ HHuginn::HValue::TYPE HHuginn::HValue::type( void ) const {
 yaal::hcore::HString const& HHuginn::HValue::type_name( TYPE type_ ) {
 	static yaal::hcore::HString const names[] = {
 		"none",
+		"boolean",
 		"integer",
 		"real",
 		"string",
-		"character",
 		"number",
+		"character",
 		"list",
 		"map"
 	};
@@ -1150,6 +1173,15 @@ HHuginn::HReal::HReal( double long value_ )
 }
 
 double long HHuginn::HReal::value( void ) const {
+	return ( _value );
+}
+
+HHuginn::HBoolean::HBoolean( bool value_ )
+	: HValue( TYPE::BOOLEAN ), _value( value_ ) {
+	return;
+}
+
+bool HHuginn::HBoolean::value( void ) const {
 	return ( _value );
 }
 
@@ -1255,6 +1287,7 @@ void HHuginn::HExpression::oper( char operator_ ) {
 		case ( '^' ): o = OPERATORS::POWER;       break;
 		case ( '(' ): o = OPERATORS::PARENTHESIS; break;
 		case ( '|' ): o = OPERATORS::ABSOLUTE;    break;
+		case ( '=' ): o = OPERATORS::ASSIGN;      break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
 		}
@@ -1277,6 +1310,13 @@ void HHuginn::HExpression::function_call( yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	_operations.push( OPERATORS::FUNCTION_CALL );
 	_values.push( make_pointer<HString>( name_ ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::get_variable( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	_values.push( _huginn->current_frame()->get_variable( name_ ) );
 	return;
 	M_EPILOG
 }

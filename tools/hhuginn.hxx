@@ -65,6 +65,7 @@ public:
 	class HReference;
 	class HValue;
 	typedef yaal::hcore::HPointer<HValue> value_t;
+	class HBoolean;
 	class HInteger;
 	class HReal;
 	class HString;
@@ -123,6 +124,7 @@ private:
 		void add_return_statement( void );
 		void commit_expression( void );
 		void defer_function_call( yaal::hcore::HString const& );
+		void defer_get_variable( yaal::hcore::HString const& );
 		void defer_oper( char );
 		void defer_action( expression_action_t const& );
 		void defer_store_real( double long );
@@ -177,6 +179,7 @@ public:
 	value_t call( yaal::hcore::HString const&, values_t const& );
 	value_t result( void ) const;
 	void dump_vm_state( yaal::hcore::HStreamInterface& );
+	HFrame* current_frame( void );
 	void create_function( void );
 	void add_argument( yaal::hcore::HString const& );
 	value_t returned_value( void ) const;
@@ -221,11 +224,12 @@ public:
 	typedef HHuginn::HObject base_type;
 	enum class TYPE {
 		NONE,
+		BOOLEAN,
 		INTEGER,
 		REAL,
 		STRING,
-		CHARACTER,
 		NUMBER,
+		CHARACTER,
 		LIST,
 		MAP
 	};
@@ -318,6 +322,18 @@ public:
 	typedef HHuginn::HIterable this_type;
 	typedef HHuginn::HValue base_type;
 	HIterable( TYPE );
+};
+
+class HHuginn::HBoolean : public HHuginn::HValue {
+public:
+	typedef HHuginn::HBoolean this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	bool _value;
+public:
+	HBoolean( bool );
+	bool value( void ) const;
+	void to_string( void ) const;
 };
 
 class HHuginn::HInteger : public HHuginn::HValue {
@@ -473,6 +489,7 @@ public:
 	void add_arg( void );
 	void function_call( yaal::hcore::HString const& );
 	void function_call_exec( void );
+	void get_variable( yaal::hcore::HString const& );
 	void power( void );
 	void store_real( double long );
 	void store_integer( int long long );
