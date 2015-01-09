@@ -566,10 +566,8 @@ public:
 	typedef HHuginn::HStatement base_type;
 private:
 	HHuginn::statement_list_t _statements;
-	HHuginn::HScope* _parent;
 public:
-	HScope( HScope* );
-	HScope( HScope&& ) = default;
+	HScope( void );
 	virtual ~HScope( void ) {
 		return;
 	}
@@ -578,6 +576,7 @@ protected:
 	virtual void do_execute( HHuginn::HThread* ) const;
 private:
 	HScope( HScope const& ) = delete;
+	HScope( HScope&& ) = delete;
 	HScope& operator = ( HScope const& ) = delete;
 };
 
@@ -631,6 +630,9 @@ protected:
 class HHuginn::HFunctionInterface {
 public:
 	typedef HHuginn::HFunctionInterface this_type;
+	virtual ~HFunctionInterface( void ) {
+		return;
+	}
 	value_t execute( HThread*, values_t const& ) const;
 protected:
 	virtual value_t do_execute( HThread*, values_t const& ) const = 0;

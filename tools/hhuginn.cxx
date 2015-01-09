@@ -723,7 +723,7 @@ void HHuginn::OCompiler::add_paramater( yaal::hcore::HString const& name_ ) {
 void HHuginn::OCompiler::create_scope( void ) {
 	M_PROLOG
 	HScope* top( ! _scopeStack.is_empty() ? _scopeStack.top().raw() : nullptr );
-	_scopeStack.emplace( make_pointer<HScope>( top ) );
+	_scopeStack.emplace( make_pointer<HScope>() );
 	if ( top ) {
 		top->add_statement( _scopeStack.top() );
 	}
@@ -2059,8 +2059,8 @@ void HHuginn::HExpression::do_execute( HHuginn::HThread* thread_ ) const {
 	M_EPILOG
 }
 
-HHuginn::HScope::HScope( HScope* parent_ )
-	: _statements(), _parent( parent_ ) {
+HHuginn::HScope::HScope( void )
+	: _statements() {
 	return;
 }
 
