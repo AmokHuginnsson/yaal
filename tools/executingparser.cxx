@@ -512,7 +512,7 @@ void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const 
 	M_PROLOG
 	M_ASSERT( !! _rule );
 	HRule const* r( dynamic_cast<HRule const*>( &*_rule ) );
-	if ( r && ! _name.is_empty() && ( r->get_name() == _name ) ) {
+	if ( r && ( ( ! _name.is_empty() && ( r->get_name() == _name ) ) || ( _name.is_empty() && r->has_action() ) ) ) {
 		r->get_named_rule()->describe( rd_, ru_ );
 	} else {
 		rule_use_t::const_iterator it( ru_.find( _rule.get() ) );
