@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hhuginn.hxx"
 #include "streamtools.hxx"
+#include "hcore/hfile.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -87,19 +88,23 @@ words_t _keywords_ = {{
 words_t _builtin_ = {{
 	"boolean",
 	"character",
-	"file",
 	"integer",
 	"list",
 	"map",
 	"number",
 	"real",
 	"string",
+	"type"
+}};
+
+words_t _standardLibrary_ = {{
+	"file",
 	"print"
 }};
 
 bool is_restricted( yaal::hcore::HString const& name_ ) {
 	M_PROLOG
-	return ( ( _keywords_.count( name_ ) > 0 ) || ( _builtin_.count( name_ ) > 0 ) );
+	return ( ( _keywords_.count( name_ ) > 0 ) || ( _builtin_.count( name_ ) > 0 ) || ( _standardLibrary_.count( name_ ) > 0 ) );
 	M_EPILOG
 }
 
@@ -132,7 +137,12 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		) >> '(' >> -argList >> ')',
 		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::function_call_exec ) )
 	);
-	HRule variableIdentifier( regex( "variableIdentifier", identifier ) );
+	HRule variableGetter(
+		regex(
+			"variableGetter",
+			identifier, e_p::HStringLiteral::action_string_t( hcore::call( &HHuginn::OCompiler::defer_get_variable, &_compiler, _1 ) )
+		)
+	);
 	HRule atom( "atom",
 		absoluteValue
 		| parenthesis
@@ -141,7 +151,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| integer[e_p::HInteger::action_int_long_long_t( hcore::call( &HHuginn::OCompiler::defer_store_integer, &_compiler, _1 ) )]
 		| string_literal[e_p::HStringLiteral::action_string_t( hcore::call( &HHuginn::OCompiler::defer_store_string, &_compiler, _1 ) )]
 		| character_literal[e_p::HCharacterLiteral::action_character_t( hcore::call( &HHuginn::OCompiler::defer_store_character, &_compiler, _1 ) )]
-		| regex( "variableIdentifier", identifier, e_p::HStringLiteral::action_string_t( hcore::call( &HHuginn::OCompiler::defer_get_variable, &_compiler, _1 ) ) )
+		| variableGetter
 	);
 	HRule power(
 		"power",
@@ -175,7 +185,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule value( "value", sum );
 	HRule subscript( "subscript" );
 	subscript %= (
-		/* subscript base */ ( functionCall | variableIdentifier ) >>
+		/* subscript base */ ( functionCall | variableGetter ) >>
 		/* repeat at least once */ + (
 			/* subscript operator it self */ (
 				constant( '[', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> ( value | subscript ) >> ']'
@@ -190,9 +200,20 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule assignment(
 		"assignment",
 		* (
-			( subscript | variableIdentifier ) >>
+			/* make reference */ (
+				subscript
+				| regex(
+					"variableSetter",
+					identifier,
+					e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_make_variable, &_compiler, _1 ) )
+				)
+			) >>
 			constant( '=' )[e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )]
-		) >> ( subscript | value )
+		) >> (
+			subscript[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::dereference ) )]
+			| value
+		),
+		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::set_variable ) )
 	);
 	expression %= assignment;
 	HRule booleanExpression( "booleanExpression" );
@@ -259,7 +280,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| booleanXor
 		| booleanNot
 	);
-	HRule expressionList( "expressionList", + ( expression[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler ) )] >> ';' ) );
+	HRule expressionStatement( "expressionStatement", expression[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler ) )] >> ';' );
 	HRule scope( "scope", HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_scope, &_compiler ) ) );
 	HRule ifStatement( "ifStatement", executing_parser::constant( "if" ) >> '(' >> booleanExpression >> ')' >> scope >> -( constant( "else" ) >> scope ) );
 	HRule continueStatement( "continueStatement", constant( "continue" ) >> ';' );
@@ -272,6 +293,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	 */
 	HRule breakStatement( "breakStatement", constant( "break" ) >> ';' );
 	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> booleanExpression >> ')' >> scope );
+	HRule variableIdentifier( regex( "variableIdentifier", identifier ) );
 	HRule forStatement( "forStatement", constant( "for" ) >> '(' >> variableIdentifier >> ':' >> expression >> ')' >> scope );
 	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> scope >> -breakStatement );
 	HRule defaultStatement( "defaultStatement", constant( "default" ) >> ':' >> scope );
@@ -285,10 +307,17 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| breakStatement
 		| continueStatement
 		| returnStatement[HRuleBase::action_t( hcore::call( &OCompiler::add_return_statement, &_compiler ) )]
-		| expressionList
+		| expressionStatement
 	);
 	scope %= ( constant( '{', HRuleBase::action_t( hcore::call( &OCompiler::create_scope, &_compiler ) ) ) >> *statement >> '}' );
-	HRule nameList( "nameList", variableIdentifier >> ( * ( ',' >> variableIdentifier ) ) );
+	HRule parameter(
+		regex(
+			"parameter",
+			identifier,
+			HRegex::action_string_t( hcore::call( &HHuginn::OCompiler::add_paramater, &_compiler, _1 ) )
+		)
+	);
+	HRule nameList( "nameList", parameter >> ( * ( ',' >> parameter ) ) );
 	HRule functionDefinition( "functionDefinition",
 		regex(
 			"functionDefinitionIdentifier",
@@ -666,6 +695,7 @@ void HHuginn::HSource::dump_preprocessed( yaal::hcore::HStreamInterface& stream_
 HHuginn::OCompiler::OCompiler( HHuginn* huginn_ )
 	: _huginn( huginn_ ),
 	_functionName(),
+	_parameters(),
 	_functionScope(),
 	_expression( make_pointer<HExpression>( _huginn ) ),
 	_scopeStack(),
@@ -683,17 +713,19 @@ void HHuginn::OCompiler::set_function_name( yaal::hcore::HString const& name_ ) 
 	M_EPILOG
 }
 
+void HHuginn::OCompiler::add_paramater( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	_parameters.push_back( name_ );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::OCompiler::create_scope( void ) {
 	M_PROLOG
 	HScope* top( ! _scopeStack.is_empty() ? _scopeStack.top().raw() : nullptr );
+	_scopeStack.emplace( make_pointer<HScope>( top ) );
 	if ( top ) {
-		M_ASSERT( _functionScope );
-		_scopeStack.emplace( top );
 		top->add_statement( _scopeStack.top() );
-	} else {
-		M_ASSERT( ! _functionScope );
-		_functionScope = make_pointer<HFunction>( _functionName );
-		_scopeStack.emplace( _functionScope );
 	}
 	return;
 	M_EPILOG
@@ -701,14 +733,21 @@ void HHuginn::OCompiler::create_scope( void ) {
 
 void HHuginn::OCompiler::commit_scope( void ) {
 	M_PROLOG
+	scope_t s( _scopeStack.top() );
 	_scopeStack.pop();
+	if ( _scopeStack.is_empty() ) {
+		M_ASSERT( ! _functionScope );
+		_functionScope = s;
+	} else {
+		M_ASSERT( !! _functionScope );
+	}
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::add_return_statement( void ) {
 	M_PROLOG
-	M_ASSERT( ! _scopeStack.is_empty() && ( !! _functionScope ) );
+	M_ASSERT( ! _scopeStack.is_empty() );
 	_scopeStack.top()->add_statement( make_pointer<HReturn>( _expression ) );
 	_expression = make_pointer<HExpression>( _huginn );
 	return;
@@ -717,7 +756,7 @@ void HHuginn::OCompiler::add_return_statement( void ) {
 
 void HHuginn::OCompiler::commit_expression( void ) {
 	M_PROLOG
-	M_ASSERT( ! _scopeStack.is_empty() && ( !! _functionScope ) );
+	M_ASSERT( ! _scopeStack.is_empty() );
 	_scopeStack.top()->add_statement( _expression );
 	_expression = make_pointer<HExpression>( _huginn );
 	return;
@@ -788,6 +827,13 @@ void HHuginn::OCompiler::defer_get_variable( yaal::hcore::HString const& value_ 
 	M_EPILOG
 }
 
+void HHuginn::OCompiler::defer_make_variable( yaal::hcore::HString const& value_ ) {
+	M_PROLOG
+	_expression->add_execution_step( hcore::call( &HExpression::make_variable, _expression.raw(), value_ ) );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::OCompiler::defer_store_real( double long value_ ) {
 	M_PROLOG
 	_expression->add_execution_step( hcore::call( &HExpression::store_real, _expression.raw(), value_ ) );
@@ -825,6 +871,10 @@ HHuginn::HHuginn( void )
 	_threads(),
 	_argv( new ( memory::yaal ) HList() ),
 	_result() {
+	M_PROLOG
+	register_builtins();
+	return;
+	M_EPILOG
 }
 
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
@@ -973,10 +1023,13 @@ void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 
 void HHuginn::create_function( void ) {
 	M_PROLOG
-	M_ENSURE( ! _compiler._functionName.is_empty() );
-	M_ENSURE( _compiler._scopeStack.is_empty() );
-	_functions.insert( make_pair<hcore::HString const, scope_t>( yaal::move( _compiler._functionName ), yaal::move( _compiler._functionScope ) ) );
+	M_ASSERT( ! _compiler._functionName.is_empty() );
+	M_ASSERT( !! _compiler._functionScope );
+	M_ASSERT( _compiler._scopeStack.is_empty() );
+	function_t f( make_pointer<HFunction>( _compiler._functionName, _compiler._parameters, yaal::move( _compiler._functionScope ) ) );
+	_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( _compiler._functionName ), yaal::move( f ) ) );
 	_compiler._functionScope.reset();
+	_compiler._parameters.clear();
 	_compiler._functionName.clear();
 	return;
 	M_EPILOG
@@ -1129,6 +1182,14 @@ HHuginn::value_t& HHuginn::HFrame::get_variable( yaal::hcore::HString const& nam
 
 void HHuginn::HFrame::set_variable( yaal::hcore::HString const& name_, HHuginn::value_t const& value_ ) {
 	M_PROLOG
+	value_t ref( make_variable( name_ ) );
+	static_cast<HReference*>( ref.raw() )->value() = value_;
+	return;
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HFrame::make_variable( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
 	HFrame* f( this );
 	variables_t::iterator it;
 	while ( f ) {
@@ -1142,12 +1203,10 @@ void HHuginn::HFrame::set_variable( yaal::hcore::HString const& name_, HHuginn::
 			f = nullptr;
 		}
 	}
-	if ( f ) {
-		it->second = value_;
-	} else {
-		_variables.insert( make_pair( name_, value_ ) );
+	if ( ! f ) {
+		it = _variables.insert( make_pair( name_, _none_ ) ).first;
 	}
-	return;
+	return ( make_pointer<HReference>( it->second ) );
 	M_EPILOG
 }
 
@@ -1180,40 +1239,183 @@ yaal::hcore::HString const& HHuginn::HValue::type_name( TYPE type_ ) {
 	return ( names[static_cast<int>( type_ )] );
 }
 
-HHuginn::value_t HHuginn::HValue::subscript( HHuginn::value_t const&, HHuginn::value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::subscript( HHuginn::value_t& base_, HHuginn::value_t const& index_ ) {
+	M_ASSERT( index_->type() == TYPE::INTEGER );
+	TYPE baseType( base_->type() );
+	HInteger const* i( static_cast<HInteger const*>( index_.raw() ) );
+	int long long index( i->value() );
+	value_t res;
+	if ( ( baseType != TYPE::LIST ) && ( baseType != TYPE::STRING ) ) {
+		throw HHuginnException( "Subscript is not supported on `"_ys.append( type_name( baseType ) ).append( "'." ) );
+	} else if ( baseType == TYPE::LIST ) {
+		HList* l( static_cast<HList*>( base_.raw() ) );
+		if ( ( index < 0 ) || ( index >= l->size() ) ) {
+			throw HHuginnException( "Bad index." );
+		}
+		res = l->get( index );
+	} else {
+		M_ASSERT( baseType == TYPE::STRING );
+		HString* s( static_cast<HString*>( base_.raw() ) );
+		if ( ( index < 0 ) || ( index >= s->value().get_length() ) ) {
+			throw HHuginnException( "Bad index." );
+		}
+		res = make_pointer<HCharacter>( s->value()[static_cast<int>( index )] );
+	}
+	return ( res );
 }
 
-HHuginn::value_t HHuginn::HValue::add( HHuginn::value_t const&, HHuginn::value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::add( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
+	M_ASSERT( v1_->type() == v2_->type() );
+	value_t res;
+	switch ( v1_->type() ) {
+		case ( TYPE::INTEGER ): {
+			res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() + static_cast<HInteger const*>( v2_.raw() )->value() );
+		} break;
+		case ( TYPE::REAL ): {
+			res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() + static_cast<HReal const*>( v2_.raw() )->value() );
+		} break;
+		case ( TYPE::STRING ): {
+			res = make_pointer<HString>( static_cast<HString const*>( v1_.raw() )->value() + static_cast<HString const*>( v2_.raw() )->value() );
+		} break;
+		case ( TYPE::NUMBER ): {
+			res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() + static_cast<HNumber const*>( v2_.raw() )->value() );
+		} break;
+		default: {
+			throw HHuginnException( "There is no `+' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ) );
+		}
+	}
+	return ( res );
 }
 
-HHuginn::value_t HHuginn::HValue::sub( HHuginn::value_t const&, HHuginn::value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::sub( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
+	M_ASSERT( v1_->type() == v2_->type() );
+	value_t res;
+	switch ( v1_->type() ) {
+		case ( TYPE::INTEGER ): {
+			res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() - static_cast<HInteger const*>( v2_.raw() )->value() );
+		} break;
+		case ( TYPE::REAL ): {
+			res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() - static_cast<HReal const*>( v2_.raw() )->value() );
+		} break;
+		case ( TYPE::NUMBER ): {
+			res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() - static_cast<HNumber const*>( v2_.raw() )->value() );
+		} break;
+		default: {
+			throw HHuginnException( "There is no `-' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ) );
+		}
+	}
+	return ( res );
 }
 
-HHuginn::value_t HHuginn::HValue::mul( HHuginn::value_t const&, HHuginn::value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::mul( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
+	M_ASSERT( v1_->type() == v2_->type() );
+	value_t res;
+	switch ( v1_->type() ) {
+		case ( TYPE::INTEGER ): {
+			res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() * static_cast<HInteger const*>( v2_.raw() )->value() );
+		} break;
+		case ( TYPE::REAL ): {
+			res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() * static_cast<HReal const*>( v2_.raw() )->value() );
+		} break;
+		case ( TYPE::NUMBER ): {
+			res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() * static_cast<HNumber const*>( v2_.raw() )->value() );
+		} break;
+		default: {
+			throw HHuginnException( "There is no `*' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ) );
+		}
+	}
+	return ( res );
 }
 
-HHuginn::value_t HHuginn::HValue::div( HHuginn::value_t const&, HHuginn::value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::div( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
+	M_ASSERT( v1_->type() == v2_->type() );
+	value_t res;
+	switch ( v1_->type() ) {
+		case ( TYPE::INTEGER ): {
+			res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() / static_cast<HInteger const*>( v2_.raw() )->value() );
+		} break;
+		case ( TYPE::REAL ): {
+			res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() / static_cast<HReal const*>( v2_.raw() )->value() );
+		} break;
+		case ( TYPE::NUMBER ): {
+			res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() / static_cast<HNumber const*>( v2_.raw() )->value() );
+		} break;
+		default: {
+			throw HHuginnException( "There is no `/' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ) );
+		}
+	}
+	return ( res );
 }
 
-HHuginn::value_t HHuginn::HValue::mod( value_t const&, value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::mod( value_t const& v1_, value_t const& v2_ ) {
+	M_ASSERT( v1_->type() == v2_->type() );
+	value_t res;
+	switch ( v1_->type() ) {
+		case ( TYPE::INTEGER ): {
+			res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() % static_cast<HInteger const*>( v2_.raw() )->value() );
+		} break;
+		default: {
+			throw HHuginnException( "There is no `%' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ) );
+		}
+	}
+	return ( res );
 }
 
 HHuginn::value_t HHuginn::HValue::pow( value_t const&, value_t const& ) {
 	return ( value_t() );
 }
 
-HHuginn::value_t HHuginn::HValue::abs( value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::abs( value_t const& v_ ) {
+	value_t res;
+	switch ( v_->type() ) {
+		case ( TYPE::INTEGER ): {
+			int long long v( static_cast<HInteger const*>( v_.raw() )->value() );
+			if ( v >= 0 ) {
+				res = v_;
+			} else {
+				res = make_pointer<HInteger>( -v );
+			}
+		} break;
+		case ( TYPE::REAL ): {
+			double long v( static_cast<HReal const*>( v_.raw() )->value() );
+			if ( v >= 0 ) {
+				res = v_;
+			} else {
+				res = make_pointer<HReal>( -v );
+			}
+		} break;
+		case ( TYPE::NUMBER ): {
+			yaal::hcore::HNumber const& v( static_cast<HNumber const*>( v_.raw() )->value() );
+			if ( v >= 0 ) {
+				res = v_;
+			} else {
+				res = make_pointer<HNumber>( -v );
+			}
+		} break;
+		default: {
+			throw HHuginnException( "There is no |.| operator for `"_ys.append( type_name( v_->type() ) ).append( "'." ) );
+		}
+	}
+	return ( res );
 }
 
-HHuginn::value_t HHuginn::HValue::neg( value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::neg( value_t const& v_ ) {
+	value_t res;
+	switch ( v_->type() ) {
+		case ( TYPE::INTEGER ): {
+			res = make_pointer<HInteger>( -static_cast<HInteger const*>( v_.raw() )->value() );
+		} break;
+		case ( TYPE::REAL ): {
+			res = make_pointer<HReal>( -static_cast<HReal const*>( v_.raw() )->value() );
+		} break;
+		case ( TYPE::NUMBER ): {
+			res = make_pointer<HNumber>( -static_cast<HNumber const*>( v_.raw() )->value() );
+		} break;
+		default: {
+			throw HHuginnException( "There is no `negate` operator for `"_ys.append( type_name( v_->type() ) ).append( "'." ) );
+		}
+	}
+	return ( res );
 }
 
 bool HHuginn::HValue::equals( value_t const&, value_t const& ) {
@@ -1252,24 +1454,142 @@ HHuginn::value_t HHuginn::HValue::boolean_not( value_t const& ) {
 	return ( value_t() );
 }
 
-HHuginn::value_t HHuginn::HValue::string( value_t const& ) {
+HHuginn::value_t HHuginn::HValue::string( value_t const& v_ ) {
+	value_t res;
+	switch ( v_->type() ) {
+		case ( TYPE::STRING ): {
+			res = v_;
+		} break;
+		case ( TYPE::NUMBER ): {
+			res = make_pointer<HString>( static_cast<HNumber const*>( v_.raw() )->value().to_string() );
+		} break;
+		case ( TYPE::REAL ): {
+			res = make_pointer<HString>( static_cast<HReal const*>( v_.raw() )->value() );
+		} break;
+		case ( TYPE::CHARACTER ): {
+			res = make_pointer<HString>( static_cast<HCharacter const*>( v_.raw() )->value() );
+		} break;
+		case ( TYPE::INTEGER ): {
+			res = make_pointer<HString>( static_cast<HInteger const*>( v_.raw() )->value() );
+		} break;
+		default: {
+			throw HHuginnException( "Conversion from `"_ys
+				.append( type_name( v_->type() ) )
+				.append( "' to `string' is not supported." )
+			);
+		}
+	}
+	return ( res );
+}
+
+HHuginn::value_t HHuginn::HValue::boolean( value_t const& ) {
 	return ( value_t() );
 }
 
-HHuginn::value_t HHuginn::HValue::integer( value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::integer( value_t const& v_ ) {
+	value_t res;
+	switch ( v_->type() ) {
+		case ( TYPE::STRING ): {
+			res = make_pointer<HInteger>( lexical_cast<int long long>( static_cast<HString const*>( v_.raw() )->value() ) );
+		} break;
+		case ( TYPE::NUMBER ): {
+			res = make_pointer<HInteger>( static_cast<HNumber const*>( v_.raw() )->value().to_integer() );
+		} break;
+		case ( TYPE::REAL ): {
+			res = make_pointer<HInteger>( static_cast<int long long>( static_cast<HReal const*>( v_.raw() )->value() ) );
+		} break;
+		case ( TYPE::CHARACTER ): {
+			res = make_pointer<HInteger>( static_cast<int long long>( static_cast<HCharacter const*>( v_.raw() )->value() ) );
+		} break;
+		case ( TYPE::INTEGER ): {
+			res = v_;
+		} break;
+		default: {
+			throw HHuginnException( "Conversion from `"_ys
+				.append( type_name( v_->type() ) )
+				.append( "' to `integer' is not supported." )
+			);
+		}
+	}
+	return ( res );
 }
 
-HHuginn::value_t HHuginn::HValue::real( value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::real( value_t const& v_ ) {
+	value_t res;
+	switch ( v_->type() ) {
+		case ( TYPE::STRING ): {
+			res = make_pointer<HReal>( lexical_cast<double long>( static_cast<HString const*>( v_.raw() )->value() ) );
+		} break;
+		case ( TYPE::NUMBER ): {
+			res = make_pointer<HReal>( static_cast<HNumber const*>( v_.raw() )->value().to_floating_point() );
+		} break;
+		case ( TYPE::REAL ): {
+			res = v_;
+		} break;
+		case ( TYPE::INTEGER ): {
+			res = make_pointer<HReal>( static_cast<double long>( static_cast<HInteger const*>( v_.raw() )->value() ) );
+		} break;
+		default: {
+			throw HHuginnException( "Conversion from `"_ys
+				.append( type_name( v_->type() ) )
+				.append( "' to `real' is not supported." )
+			);
+		}
+	}
+	return ( res );
 }
 
-HHuginn::value_t HHuginn::HValue::character( value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::character( value_t const& v_ ) {
+	value_t res;
+	switch ( v_->type() ) {
+		case ( TYPE::CHARACTER ): {
+			res = v_;
+		} break;
+		case ( TYPE::INTEGER ): {
+			res = make_pointer<HCharacter>( static_cast<char>( static_cast<HCharacter const*>( v_.raw() )->value() ) );
+		} break;
+		default: {
+			throw HHuginnException( "Conversion from `"_ys
+				.append( type_name( v_->type() ) )
+				.append( "' to `character' is not supported." )
+			);
+		}
+	}
+	return ( res );
 }
 
-HHuginn::value_t HHuginn::HValue::number( value_t const& ) {
-	return ( value_t() );
+HHuginn::value_t HHuginn::HValue::number( value_t const& v_ ) {
+	value_t res;
+	switch ( v_->type() ) {
+		case ( TYPE::STRING ): {
+			res = make_pointer<HNumber>( static_cast<HString const*>( v_.raw() )->value() );
+		} break;
+		case ( TYPE::NUMBER ): {
+			res = v_;
+		} break;
+		case ( TYPE::REAL ): {
+			res = make_pointer<HNumber>( static_cast<HReal const*>( v_.raw() )->value() );
+		} break;
+		case ( TYPE::INTEGER ): {
+			res = make_pointer<HNumber>( static_cast<HInteger const*>( v_.raw() )->value() );
+		} break;
+		default: {
+			throw HHuginnException( "Conversion from `"_ys
+				.append( type_name( v_->type() ) )
+				.append( "' to `number' is not supported." )
+			);
+		}
+	}
+	return ( res );
+}
+
+HHuginn::HReference::HReference( HHuginn::value_t& value_ )
+	: HValue( TYPE::REFERENCE ), _value( value_ ) {
+	return;
+}
+
+HHuginn::value_t& HHuginn::HReference::value( void ) const {
+	return ( _value );
 }
 
 HHuginn::HReal::HReal( double long value_ )
@@ -1312,6 +1632,15 @@ yaal::hcore::HString& HHuginn::HString::value( void ) {
 	return ( _value );
 }
 
+HHuginn::HNumber::HNumber( yaal::hcore::HNumber const& value_ )
+	: HValue( TYPE::NUMBER ), _value( value_ ) {
+	return;
+}
+
+yaal::hcore::HNumber const& HHuginn::HNumber::value( void ) const {
+	return ( _value );
+}
+
 HHuginn::HCharacter::HCharacter( char value_ )
 	: HValue( TYPE::CHARACTER ), _value( value_ ) {
 	return;
@@ -1345,6 +1674,13 @@ void HHuginn::HList::push_back( HHuginn::value_t const& value_ ) {
 
 int long HHuginn::HList::size( void ) const {
 	return ( _data.get_size() );
+}
+
+HHuginn::value_t HHuginn::HList::get( int long long index_ ) {
+	M_PROLOG
+	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
+	return ( make_pointer<HReference>( _data[index_] ) );
+	M_EPILOG
 }
 
 HHuginn::HStatement::HStatement( void ) {
@@ -1407,6 +1743,32 @@ void HHuginn::HExpression::function_call( yaal::hcore::HString const& name_ ) {
 void HHuginn::HExpression::get_variable( yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	_values.push( _huginn->current_frame()->get_variable( name_ ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::make_variable( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	_values.push( _huginn->current_frame()->make_variable( name_ ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::set_variable( void ) {
+	M_PROLOG
+	while ( ! _operations.is_empty() && ( _operations.top() == OPERATOR::ASSIGN ) ) {
+		_operations.pop();
+		value_t value( _values.top() );
+		_values.pop();
+		value_t ref( _values.top() );
+		_values.pop();
+		if ( ref->type() != HValue::TYPE::REFERENCE ) {
+			M_ASSERT( ref->type() == HValue::TYPE::CHARACTER );
+			throw HHuginnException( "String does not support item assignment." );
+		}
+		static_cast<HReference*>( ref.raw() )->value() = value;
+		_values.push( value );
+	}
 	return;
 	M_EPILOG
 }
@@ -1503,6 +1865,18 @@ void HHuginn::HExpression::subscript( void ) {
 	value_t base( _values.top() );
 	_values.pop();
 	_values.push( HHuginn::HValue::subscript( base, index ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::dereference( void ) {
+	M_PROLOG
+	M_ASSERT( ! _values.is_empty() );
+	if ( _values.top()->type() == HHuginn::HValue::TYPE::REFERENCE ) {
+		value_t v( _values.top() );
+		_values.pop();
+		_values.push( static_cast<HHuginn::HReference*>( v.raw() )->value() );
+	}
 	return;
 	M_EPILOG
 }
@@ -1731,21 +2105,29 @@ HHuginn::HIf::HIf( boolean_expression_t condition_,
 	return;
 }
 
-HHuginn::HFunction::HFunction( yaal::hcore::HString const& name_ )
-	: HScope( nullptr ), _name( name_ ), _argumentNames() {
+HHuginn::value_t HHuginn::HFunctionInterface::execute( yaal::tools::HHuginn::HThread * thread_, values_t  const& values_ ) const {
+	M_PROLOG
+	return ( do_execute( thread_, values_ ) );
+	M_EPILOG
+}
+
+HHuginn::HFunction::HFunction( yaal::hcore::HString const& name_,
+	parameter_names_t const& parameterNames_,
+	HHuginn::scope_t const& scope_ )
+	: _name( name_ ), _parameterNames( parameterNames_ ), _scope( scope_ ) {
 	return;
 }
 
-HHuginn::value_t HHuginn::HFunction::execute( HThread* thread_, values_t const& values_ ) const {
+HHuginn::value_t HHuginn::HFunction::do_execute( HThread* thread_, values_t const& values_ ) const {
 	M_PROLOG
-	if ( values_.get_size() != _argumentNames.get_size() ) {
+	if ( values_.get_size() != _parameterNames.get_size() ) {
 		throw HHuginnException( "Mismatching number of parameters in call to: `"_ys
 			.append( _name ).append( "', expected: " )
-			.append( _argumentNames.get_size() ).append( ", got: " )
+			.append( _parameterNames.get_size() ).append( ", got: " )
 			.append( values_.get_size() ).append( "." ) );
 	}
-	argument_names_t::const_iterator n( _argumentNames.begin() );
-	argument_names_t::const_iterator ne( _argumentNames.end() );
+	parameter_names_t::const_iterator n( _parameterNames.begin() );
+	parameter_names_t::const_iterator ne( _parameterNames.end() );
 	values_t::const_iterator v( values_.begin() );
 	values_t::const_iterator ve( values_.end() );
 	thread_->create_function_frame();
@@ -1755,10 +2137,108 @@ HHuginn::value_t HHuginn::HFunction::execute( HThread* thread_, values_t const& 
 		++ n;
 		++ v;
 	}
-	execute( thread_ );
+	_scope->execute( thread_ );
 	HHuginn::value_t res( thread_->current_frame()->result() );
 	thread_->pop_frame();
 	return ( res );
+	M_EPILOG
+}
+
+namespace huginn_builtin {
+
+class HConversion : public HHuginn::HFunctionInterface {
+public:
+	typedef HConversion this_type;
+	typedef HHuginn::HFunctionInterface base_type;
+private:
+	HHuginn::HValue::TYPE _toType;
+public:
+	HConversion( HHuginn::HValue::TYPE toType_ )
+		: _toType( toType_ ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_execute( HHuginn::HThread*, HHuginn::values_t const& values_ ) const {
+		M_PROLOG
+		if ( values_.get_size() != 1 ) {
+			throw HHuginnException( ""_ys
+				.append( HHuginn::HValue::type_name( _toType ) )
+				.append( "() expects exactly one parameter, got: " )
+				.append( values_.get_size() )
+			);
+		}
+		HHuginn::value_t res;
+		switch ( _toType ) {
+			case ( HHuginn::HValue::TYPE::INTEGER ): res = HHuginn::HValue::integer( values_.front() ); break;
+			case ( HHuginn::HValue::TYPE::REAL ): res = HHuginn::HValue::real( values_.front() ); break;
+			case ( HHuginn::HValue::TYPE::STRING ): res = HHuginn::HValue::string( values_.front() ); break;
+			case ( HHuginn::HValue::TYPE::NUMBER ): res = HHuginn::HValue::number( values_.front() ); break;
+			case ( HHuginn::HValue::TYPE::BOOLEAN ): res = HHuginn::HValue::boolean( values_.front() ); break;
+			case ( HHuginn::HValue::TYPE::CHARACTER ): res = HHuginn::HValue::character( values_.front() ); break;
+			default: {
+				throw HHuginnException( "Conversion to `"_ys.append( HHuginn::HValue::type_name( _toType ) ).append( "' is not supported." ) );
+			}
+		}
+		return ( res );
+		M_EPILOG
+	}
+};
+
+class HPrint : public HHuginn::HFunctionInterface {
+public:
+	typedef HPrint this_type;
+	typedef HHuginn::HFunctionInterface base_type;
+protected:
+	virtual HHuginn::value_t do_execute( HHuginn::HThread*, HHuginn::values_t const& values_ ) const {
+		M_PROLOG
+		if ( values_.get_size() != 1 ) {
+			throw HHuginnException( ""_ys
+				.append( "print() expects exactly one parameter, got: " )
+				.append( values_.get_size() )
+			);
+		}
+		HHuginn::HValue const* v( values_.front().raw() );
+		switch ( v->type() ) {
+			case ( HHuginn::HValue::TYPE::INTEGER ): {
+				cout << static_cast<HHuginn::HInteger const*>( v )->value();
+			} break;
+			case ( HHuginn::HValue::TYPE::REAL ): {
+				cout << static_cast<HHuginn::HReal const*>( v )->value();
+			} break;
+			case ( HHuginn::HValue::TYPE::STRING ): {
+				cout << static_cast<HHuginn::HString const*>( v )->value();
+			} break;
+			case ( HHuginn::HValue::TYPE::NUMBER ): {
+				cout << static_cast<HHuginn::HNumber const*>( v )->value();
+			} break;
+			case ( HHuginn::HValue::TYPE::BOOLEAN ): {
+				cout << static_cast<HHuginn::HBoolean const*>( v )->value();
+			} break;
+			case ( HHuginn::HValue::TYPE::CHARACTER ): {
+				cout << static_cast<HHuginn::HCharacter const*>( v )->value();
+			} break;
+			default: {
+				throw HHuginnException( "printing `"_ys.append( HHuginn::HValue::type_name( v->type() ) ).append( "'s is not supported." ) );
+			}
+		}
+		cout << flush;
+		return ( _none_ );
+		M_EPILOG
+	}
+};
+
+}
+
+void HHuginn::register_builtins( void ) {
+	M_PROLOG
+	_functions.insert( make_pair<yaal::hcore::HString const>( "integer", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::INTEGER ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "real", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::REAL ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "string", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::STRING ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "number", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::NUMBER ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "boolean", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::BOOLEAN ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "character", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::CHARACTER ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "print", make_pointer<huginn_builtin::HPrint>() ) );
+	return;
 	M_EPILOG
 }
 

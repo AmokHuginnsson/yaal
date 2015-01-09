@@ -60,8 +60,9 @@ public:
 	class HReturn;
 	class HClass;
 	class HMethod;
+	class HFunctionInterface;
 	class HFunction;
-	typedef yaal::hcore::HPointer<HFunction> function_t;
+	typedef yaal::hcore::HPointer<HFunctionInterface> function_t;
 	class HReference;
 	class HValue;
 	typedef yaal::hcore::HPointer<HValue> value_t;
@@ -110,21 +111,25 @@ private:
 	};
 	struct OCompiler {
 		typedef void ( HHuginn::HExpression::* expression_action_t ) ( void );
+		typedef yaal::hcore::HArray<yaal::hcore::HString> parameter_names_t;
 		typedef yaal::hcore::HStack<scope_t> scope_stack_t;
 		HHuginn* _huginn;
 		yaal::hcore::HString _functionName;
-		function_t _functionScope;
+		parameter_names_t _parameters;
+		scope_t _functionScope;
 		expression_t _expression;
 		scope_stack_t _scopeStack;
 		statement_list_t _statementList;
 		OCompiler( HHuginn* );
 		void set_function_name( yaal::hcore::HString const& );
+		void add_paramater( yaal::hcore::HString const& );
 		void create_scope( void );
 		void commit_scope( void );
 		void add_return_statement( void );
 		void commit_expression( void );
 		void defer_function_call( yaal::hcore::HString const& );
 		void defer_get_variable( yaal::hcore::HString const& );
+		void defer_make_variable( yaal::hcore::HString const& );
 		void defer_oper( char );
 		void defer_str_oper( yaal::hcore::HString const& );
 		void defer_action( expression_action_t const& );
@@ -190,6 +195,7 @@ public:
 	yaal::hcore::HString error_message( void ) const;
 	executing_parser::HRule make_engine( void );
 private:
+	void register_builtins( void );
 	char const* error_message( int ) const;
 };
 
@@ -232,7 +238,8 @@ public:
 		NUMBER,
 		CHARACTER,
 		LIST,
-		MAP
+		MAP,
+		REFERENCE
 	};
 	typedef yaal::hcore::HBoundCall<void ( HValue* )> method_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, method_t> methods_t;
@@ -244,7 +251,7 @@ public:
 	HValue( TYPE );
 	TYPE type( void ) const;
 	static yaal::hcore::HString const& type_name( TYPE );
-	static value_t subscript( value_t const&, value_t const& );
+	static value_t subscript( value_t&, value_t const& );
 	static value_t add( value_t const&, value_t const& );
 	static value_t sub( value_t const&, value_t const& );
 	static value_t mul( value_t const&, value_t const& );
@@ -265,6 +272,7 @@ public:
 	static value_t string( value_t const& );
 	static value_t integer( value_t const& );
 	static value_t real( value_t const& );
+	static value_t boolean( value_t const& );
 	static value_t character( value_t const& );
 	static value_t number( value_t const& );
 };
@@ -289,6 +297,7 @@ private:
 	STATE _state;
 public:
 	HFrame( HFrame*, bool, bool );
+	value_t make_variable( yaal::hcore::HString const& );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const& );
 	value_t& get_variable( yaal::hcore::HString const& );
 	bool can_continue( void ) const;
@@ -321,6 +330,17 @@ public:
 	void break_execution( HFrame::STATE, HHuginn::value_t const& = HHuginn::value_t(), int = meta::max_signed<int>::value );
 	bool can_continue( void ) const;
 	yaal::hcore::HThread::id_t id( void ) const;
+};
+
+class HHuginn::HReference : public HHuginn::HValue {
+public:
+	typedef HHuginn::HReference this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	HHuginn::value_t& _value;
+public:
+	HReference( HHuginn::value_t& );
+	HHuginn::value_t& value( void ) const;
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {
@@ -384,7 +404,6 @@ public:
 	HString( yaal::hcore::HString const& );
 	yaal::hcore::HString const& value( void ) const;
 	yaal::hcore::HString& value( void );
-	void to_character( void ) const;
 	void to_integer( void ) const;
 	void to_number( void ) const;
 	void to_real( void ) const;
@@ -431,6 +450,7 @@ public:
 	HList( void );
 	void push_back( value_t const& );
 	int long size( void ) const;
+	value_t get( int long long );
 };
 
 class HHuginn::HMap : public HHuginn::HIterable {
@@ -508,6 +528,8 @@ public:
 	void function_call( yaal::hcore::HString const& );
 	void function_call_exec( void );
 	void get_variable( yaal::hcore::HString const& );
+	void make_variable( yaal::hcore::HString const& );
+	void set_variable( void );
 	void subscript( void );
 	void power( void );
 	void equals( void );
@@ -524,6 +546,7 @@ public:
 	void store_integer( int long long );
 	void store_string( yaal::hcore::HString const& );
 	void store_character( char );
+	void dereference( void );
 protected:
 	virtual void do_execute( HHuginn::HThread* ) const;
 private:
@@ -554,8 +577,8 @@ public:
 protected:
 	virtual void do_execute( HHuginn::HThread* ) const;
 private:
-	HScope( HScope const& );
-	HScope& operator = ( HScope const& );
+	HScope( HScope const& ) = delete;
+	HScope& operator = ( HScope const& ) = delete;
 };
 
 class HHuginn::HReturn : public HHuginn::HStatement {
@@ -605,19 +628,28 @@ private:
 protected:
 };
 
-class HHuginn::HFunction : public HHuginn::HScope {
+class HHuginn::HFunctionInterface {
+public:
+	typedef HHuginn::HFunctionInterface this_type;
+	value_t execute( HThread*, values_t const& ) const;
+protected:
+	virtual value_t do_execute( HThread*, values_t const& ) const = 0;
+};
+
+class HHuginn::HFunction : public HHuginn::HFunctionInterface {
 public:
 	typedef HHuginn::HFunction this_type;
-	typedef HHuginn::HScope base_type;
-	typedef yaal::hcore::HArray<yaal::hcore::HString> argument_names_t;
+	typedef HHuginn::HFunctionInterface base_type;
+	typedef HHuginn::OCompiler::parameter_names_t parameter_names_t;
 private:
 	yaal::hcore::HString _name;
-	argument_names_t _argumentNames;
+	parameter_names_t _parameterNames;
+	HHuginn::scope_t _scope;
 public:
-	HFunction( yaal::hcore::HString const& );
+	HFunction( yaal::hcore::HString const&, parameter_names_t const&, HHuginn::scope_t const& );
 	HFunction( HFunction&& ) = default;
-	using HStatement::execute;
-	value_t execute( HThread*, values_t const& ) const;
+protected:
+	virtual value_t do_execute( HThread*, values_t const& ) const;
 };
 
 }
