@@ -551,7 +551,7 @@ int long long HNumber::to_integer( void ) const {
 			value += data[ 2 ];
 		}
 	}
-	return ( value );
+	return ( ! _negative ? value : -value );
 	M_EPILOG
 }
 
