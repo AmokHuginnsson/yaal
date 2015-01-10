@@ -77,8 +77,6 @@ public:
 	class HMap;
 	class HExpression;
 	typedef yaal::hcore::HPointer<HExpression> expression_t;
-	class HBooleanExpression;
-	typedef yaal::hcore::HPointer<HBooleanExpression> boolean_expression_t;
 	class HErrorCoordinate;
 	typedef yaal::hcore::HArray<statement_t> statement_list_t;
 	typedef yaal::hcore::HArray<value_t> values_t;
@@ -462,6 +460,7 @@ private:
 	values_t _data;
 public:
 	HMap( void );
+	int long size( void ) const;
 };
 
 class HHuginn::HStatement : public HHuginn::HObject {
@@ -554,12 +553,6 @@ private:
 	HExpression& operator = ( HExpression const& ) = delete;
 };
 
-class HHuginn::HBooleanExpression : public HHuginn::HObject {
-public:
-	typedef HHuginn::HBooleanExpression this_type;
-	typedef HHuginn::HObject base_type;
-};
-
 class HHuginn::HScope : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HScope this_type;
@@ -600,11 +593,11 @@ public:
 	typedef HHuginn::HIf this_type;
 	typedef HHuginn::HStatement base_type;
 private:
-	boolean_expression_t _condition;
-	HExecutingParser::executor_t _ifClause;
-	HExecutingParser::executor_t _elseClause;
+	expression_t _condition;
+	scope_t _ifClause;
+	scope_t _elseClause;
 public:
-	HIf( boolean_expression_t, HExecutingParser::executor_t, HExecutingParser::executor_t );
+	HIf( expression_t const&, scope_t const&, scope_t const& );
 };
 
 class HHuginn::HWhile : public HHuginn::HStatement {
@@ -612,8 +605,10 @@ public:
 	typedef HHuginn::HWhile this_type;
 	typedef HHuginn::HStatement base_type;
 private:
-	boolean_expression_t _condition;
-	HExecutingParser::executor_t _loop;
+	expression_t _condition;
+	scope_t _loop;
+public:
+	HWhile( expression_t const&, scope_t const& );
 protected:
 };
 
@@ -622,8 +617,11 @@ public:
 	typedef HHuginn::HFor this_type;
 	typedef HHuginn::HStatement base_type;
 private:
-	iterable_t _container;
-	HExecutingParser::executor_t _loop;
+	yaal::hcore::HString _variableName;
+	expression_t _source;
+	scope_t _loop;
+public:
+	HFor( yaal::hcore::HString const&, expression_t const&, scope_t const& );
 protected:
 };
 
