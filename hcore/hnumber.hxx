@@ -190,7 +190,7 @@ public:
 	HNumber& operator *= ( HNumber const& );
 	HNumber& operator -= ( HNumber const& );
 	HNumber& operator /= ( HNumber const& );
-	HNumber& operator ^= ( int long unsigned );
+	HNumber& operator ^= ( int long long );
 	HNumber& operator ++ ( void );
 	HNumber operator ++ ( int );
 	HNumber& operator -- ( void );
@@ -200,7 +200,7 @@ public:
 	HNumber operator - ( HNumber const& ) const;
 	HNumber operator - ( void ) const;
 	HNumber operator / ( HNumber const& ) const;
-	HNumber operator ^ ( int long unsigned ) const;
+	HNumber operator ^ ( int long long ) const;
 	void swap( HNumber& );
 	HNumber& abs( void );
 	/*! \brief Round number to given number of decimal places.

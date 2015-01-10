@@ -1231,13 +1231,14 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 HNumber HNumber::operator - ( void ) const {
 	M_PROLOG
 	HNumber n( *this );
-	if ( _leafCount )
+	if ( _leafCount > 0 ) {
 		n._negative = ! n._negative;
+	}
 	return ( n );
 	M_EPILOG
 }
 
-HNumber HNumber::operator ^ ( int long unsigned exp ) const {
+HNumber HNumber::operator ^ ( int long long exp ) const {
 	M_PROLOG
 	HNumber n( *this );
 	n ^= exp;
@@ -1245,18 +1246,35 @@ HNumber HNumber::operator ^ ( int long unsigned exp ) const {
 	M_EPILOG
 }
 
-HNumber& HNumber::operator ^= ( int long unsigned exp ) {
+HNumber& HNumber::operator ^= ( int long long exp_ ) {
 	M_PROLOG
-	int long unsigned p( exp >> 1 );
-	HNumber n( *this );
-	if ( p > 2 )
-		operator ^= ( p );
-	else
-		while ( -- p )
-			operator *= ( n );
-	operator *= ( *this );
-	if ( exp % 2 )
-		operator *= ( n );
+	if ( _leafCount > 0 ) {
+		if ( exp_ != 0 ) {
+			int long long unsigned exp( yaal::abs( exp_ ) );
+			int long long unsigned p( exp >> 1 );
+			HNumber n( *this );
+			if ( p > 2 ) {
+				operator ^= ( static_cast<int long long>( p ) );
+			} else {
+				while ( -- p ) {
+					operator *= ( n );
+				}
+			}
+			operator *= ( *this );
+			if ( exp % 2 ) {
+				operator *= ( n );
+			}
+			if ( exp_ < 0 ) {
+				n = *this;
+				from_integer( 1 );
+				operator /= ( n );
+			}
+		} else {
+			from_integer( 1 );
+		}
+	} else if ( exp_ == 0 ) {
+		throw HNumberException( "indeterminate form 0^0" );
+	}
 	return ( *this );
 	M_EPILOG
 }
