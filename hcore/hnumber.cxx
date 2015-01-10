@@ -1250,7 +1250,7 @@ HNumber& HNumber::operator ^= ( int long long exp_ ) {
 	M_PROLOG
 	if ( _leafCount > 0 ) {
 		if ( exp_ != 0 ) {
-			int long long unsigned exp( yaal::abs( exp_ ) );
+			int long long unsigned exp( static_cast<int long long unsigned>( yaal::abs( exp_ ) ) );
 			int long long unsigned p( exp >> 1 );
 			HNumber n( *this );
 			if ( p > 2 ) {
