@@ -445,7 +445,7 @@ HPrepocessor::HIterator HPrepocessor::begin( void ) const {
 	int const hashBangLen( static_cast<int>( sizeof ( hashBang ) - 1 ) );
 	int offset( 0 );
 	if ( ( len >= hashBangLen ) && ! strncmp( _beg, hashBang, hashBangLen ) ) {
-		char const* nl( static_cast<char const*>( ::memchr( _beg, NEWLINE, len ) ) );
+		char const* nl( static_cast<char const*>( ::memchr( _beg, NEWLINE, static_cast<size_t>( len ) ) ) );
 		if ( nl ) {
 			offset = static_cast<int>( nl + 1 - _beg );
 		}
