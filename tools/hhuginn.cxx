@@ -308,6 +308,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| continueStatement
 		| returnStatement[HRuleBase::action_t( hcore::call( &OCompiler::add_return_statement, &_compiler ) )]
 		| expressionStatement
+		| scope
 	);
 	scope %= ( constant( '{', HRuleBase::action_t( hcore::call( &OCompiler::create_scope, &_compiler ) ) ) >> *statement >> '}' );
 	HRule parameter(
@@ -743,13 +744,12 @@ void HHuginn::OCompiler::create_scope( void ) {
 
 void HHuginn::OCompiler::commit_scope( void ) {
 	M_PROLOG
+	M_ASSERT( ! _functionScope );
+	M_ASSERT( ! _scopeStack.is_empty() );
 	scope_t s( _scopeStack.top() );
 	_scopeStack.pop();
 	if ( _scopeStack.is_empty() ) {
-		M_ASSERT( ! _functionScope );
 		_functionScope = s;
-	} else {
-		M_ASSERT( !! _functionScope );
 	}
 	return;
 	M_EPILOG
@@ -2100,12 +2100,14 @@ void HHuginn::HScope::add_statement( statement_t statement_ ) {
 
 void HHuginn::HScope::do_execute( HHuginn::HThread* thread_ ) const {
 	M_PROLOG
+	thread_->create_scope_frame();
 	for ( HHuginn::statement_t const& s : _statements ) {
 		s->execute( thread_ );
 		if ( ! thread_->can_continue() ) {
 			break;
 		}
 	}
+	thread_->pop_frame();
 	return;
 	M_EPILOG
 }
