@@ -524,6 +524,7 @@ public:
 	void plus_minus( void );
 	void mul_div_mod( void );
 	void add_arg( void );
+	void negate( void );
 	void function_call( yaal::hcore::HString const& );
 	void function_call_exec( void );
 	void get_variable( yaal::hcore::HString const& );

@@ -157,9 +157,14 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| functionCall
 		| variableGetter
 	);
+	HRule negation(
+		"negation",
+		( '-' >> atom )[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::negate ) )]
+		| atom
+	);
 	HRule power(
 		"power",
-		atom >> ( * ( constant( '^', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> atom ) ),
+		negation >> ( * ( constant( '^', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> negation ) ),
 		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::power ) )
 	);
 	HRule multiplication(
@@ -1864,6 +1869,16 @@ void HHuginn::HExpression::mul_div_mod( void ) {
 			: HHuginn::HValue::mod( v1, v2 )
 		)
 	);
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::negate( void ) {
+	M_PROLOG
+	M_ASSERT( ! _values.is_empty() );
+	value_t v( _values.top() );
+	_values.pop();
+	_values.push( HValue::neg( v ) );
 	return;
 	M_EPILOG
 }
