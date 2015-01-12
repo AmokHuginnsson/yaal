@@ -348,7 +348,7 @@ bool HRuleBase::is_optional( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	M_ASSERT( first_ && last_ );
 	yaal::hcore::HString::const_iterator it( do_parse( executingParser_, first_, last_ ) );
@@ -360,21 +360,21 @@ yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executi
 	M_EPILOG
 }
 
-void HRuleBase::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_, action_t const& executor_ ) {
+void HRuleBase::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_, action_t const& executor_ ) const {
 	M_PROLOG
 	HExecutingParser::HProxy::add_execution_step( executingParser_, position_, executor_ );
 	return;
 	M_EPILOG
 }
 
-void HRuleBase::report_error( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_, yaal::hcore::HString const& message_ ) {
+void HRuleBase::report_error( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_, yaal::hcore::HString const& message_ ) const {
 	M_PROLOG
 	HExecutingParser::HProxy::report_error( executingParser_, position_, message_ );
 	return;
 	M_EPILOG
 }
 
-int HRuleBase::position( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_ ) {
+int HRuleBase::position( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_ ) const {
 	M_PROLOG
 	return ( HExecutingParser::HProxy::position( executingParser_, position_ ) );
 	M_EPILOG
@@ -717,7 +717,7 @@ HRule::ptr_t HRule::do_clone( void ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HRule::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
@@ -807,7 +807,7 @@ void HRecursiveRule::set_rule( HRuleBase::ptr_t const& rule_ ) {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HRecursiveRule::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HRecursiveRule::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	M_ENSURE( !! _rule );
 	return ( _rule->parse( executingParser_, first_, last_ ) );
@@ -880,7 +880,7 @@ HRuleRef::HRuleRef( HRuleBase::ptr_t rule_ )
 	return;
 }
 
-yaal::hcore::HString::const_iterator HRuleRef::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HRuleRef::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule );
 	M_ASSERT( !! r );
@@ -1040,12 +1040,12 @@ void HFollows::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HFollows::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
 	bool matched( true );
-	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
+	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		yaal::hcore::HString::const_iterator old( scan );
 		scan = (*it)->parse( executingParser_, scan, last_ );
 		M_ASSERT( scan );
@@ -1128,7 +1128,7 @@ HKleeneBase::HKleeneBase( HNamedRule const& rule_, action_t const& action_, acti
 	return;
 }
 
-yaal::hcore::HString::const_iterator HKleeneBase::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HKleeneBase::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
@@ -1367,10 +1367,10 @@ HAlternative HAlternative::operator[]( action_position_t const& action_ ) const 
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HAlternative::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
-	for ( rules_t::iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
+	for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 		if ( ( scan = (*it)->parse( executingParser_, start, last_ ) ) != start ) {
 			break;
 		}
@@ -1494,7 +1494,7 @@ HOptional HOptional::operator[]( action_position_t const& action_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HOptional::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
@@ -1817,7 +1817,7 @@ bool HReal::do_has_action( void ) const {
 	);
 }
 
-yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
@@ -2186,7 +2186,7 @@ bool HInteger::do_has_action( void ) const {
 	);
 }
 
-yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
@@ -2373,7 +2373,7 @@ bool is_known_character( char char_ ) {
 
 }
 
-yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
@@ -2525,7 +2525,7 @@ bool HCharacterLiteral::do_has_action( void ) const {
 	return ( HRuleBase::do_has_action() || ( !! _actionCharacter ) || ( !! _actionCharacterPosition ) );
 }
 
-yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
@@ -2693,7 +2693,7 @@ HCharacter HCharacter::operator() ( hcore::HString const& characters_ ) const {
 	M_EPILOG
 }
 
-yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) {
+yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
@@ -2789,26 +2789,31 @@ HFollows operator >> ( HRuleBase const& predecessor_, char character_ ) {
 
 HString::HString( hcore::HString const& string_ )
 	: HRuleBase(), _string( string_ ), _actionString(), _actionStringPosition() {
+	M_ASSERT( ! _string.is_empty() );
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_t const& action_ )
 	: HRuleBase( action_ ), _string( string_ ), _actionString(), _actionStringPosition() {
+	M_ASSERT( ! _string.is_empty() );
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_position_t const& action_ )
 	: HRuleBase( action_ ), _string( string_ ), _actionString(), _actionStringPosition() {
+	M_ASSERT( ! _string.is_empty() );
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_string_t const& action_ )
 	: HRuleBase(), _string( string_ ), _actionString( action_ ), _actionStringPosition() {
+	M_ASSERT( ! _string.is_empty() );
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_string_position_t const& action_ )
 	: HRuleBase(), _string( string_ ), _actionString(), _actionStringPosition( action_ ) {
+	M_ASSERT( ! _string.is_empty() );
 	return;
 }
 
@@ -2817,6 +2822,7 @@ HString::HString( HString const& string_ )
 	_string( string_._string ),
 	_actionString( string_._actionString ),
 	_actionStringPosition( string_._actionStringPosition ) {
+	M_ASSERT( ! _string.is_empty() );
 	return;
 }
 
@@ -2854,11 +2860,12 @@ bool HString::do_has_action( void ) const {
 
 HString HString::operator() ( hcore::HString const& string_ ) const {
 	M_PROLOG
+	M_ENSURE( ! string_.is_empty() );
 	return ( HString( string_, _action ) );
 	M_EPILOG
 }
 
-hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingParser_, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
+hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingParser_, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	M_ASSERT( ! _string.is_empty() );
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
@@ -2875,9 +2882,9 @@ hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingPar
 		if ( matched ) {
 			int pos( position( executingParser_, start ) );
 			if ( !! _actionString ) {
-				add_execution_step( executingParser_, start, call( _actionString, yaal::move( _string ) ) );
+				add_execution_step( executingParser_, start, call( _actionString, _string ) );
 			} else if ( !! _actionStringPosition ) {
-				add_execution_step( executingParser_, start, call( _actionStringPosition, yaal::move( _string ), pos ) );
+				add_execution_step( executingParser_, start, call( _actionStringPosition, _string, pos ) );
 			} else if ( !! _action ) {
 				add_execution_step( executingParser_, start, call( _action ) );
 			} else if ( !! _actionPosition ) {
@@ -3036,7 +3043,7 @@ bool HRegex::do_has_action( void ) const {
 	return ( HRuleBase::do_has_action() || ( !! _actionString ) || ( !! _actionStringPosition ) );
 }
 
-hcore::HString::const_iterator HRegex::do_parse( HExecutingParser* executingParser_, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) {
+hcore::HString::const_iterator HRegex::do_parse( HExecutingParser* executingParser_, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
