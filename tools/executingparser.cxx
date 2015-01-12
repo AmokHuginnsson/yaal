@@ -55,19 +55,23 @@ static EscapeTable const _escapes_( _raw_,  static_cast<int>( sizeof ( _raw_ ) )
 }
 
 class HRecursionDetector {
-	visited_t _visited;
 	typedef yaal::hcore::HStack<visited_t> checkpoints_t;
+	checkpoints_t _visited;
 	checkpoints_t _checkpoints;
 public:
 	HRecursionDetector( void )
-		: _visited(), _checkpoints() {
-		_checkpoints.push( visited_t() );
+		: _visited(),
+		_checkpoints() {
+		_visited.emplace();
+		_checkpoints.emplace();
+		return;
 	}
 	bool visit( HRuleBase const* rule_ ) {
 		M_PROLOG
-		if ( ! _checkpoints.top().insert( rule_ ).second )
+		if ( ! _checkpoints.top().insert( rule_ ).second ) {
 			throw HRecursionDetectorException( "Infinite recursion detected." );
-		return ( _visited.insert( rule_ ).second );
+		}
+		return ( _visited.top().insert( rule_ ).second );
 		M_EPILOG
 	}
 	void reset_visits( void ) {
@@ -83,6 +87,7 @@ public:
 	 */
 	void checkpoints_push( void ) {
 		M_PROLOG
+		_visited.emplace( _visited.top() );
 		_checkpoints.emplace( _checkpoints.top() );
 		return;
 		M_EPILOG
@@ -90,6 +95,7 @@ public:
 	void checkpoints_pop( void ) {
 		M_PROLOG
 		_checkpoints.pop();
+		_visited.pop();
 		return;
 		M_EPILOG
 	}
@@ -422,8 +428,9 @@ void HRuleBase::detach( HRuleBase const* rule_, visited_t& visited_, bool& detac
 
 void HRuleBase::detect_recursion( HRecursionDetector& recursionDetector_ ) const {
 	M_PROLOG
-	if ( recursionDetector_.visit( this ) )
+	if ( recursionDetector_.visit( this ) ) {
 		do_detect_recursion( recursionDetector_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -528,20 +535,46 @@ void HNamedRule::describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const 
 	M_EPILOG
 }
 
+HRule::HRule( void )
+	: HRuleBase(),
+	_rule( make_pointer<HRecursiveRule>() ),
+	_completelyDefined( false ) {
+	return;
+}
+
+HRule::HRule( action_t const& action_ )
+	: HRuleBase( action_ ),
+	_rule( make_pointer<HRecursiveRule>() ),
+	_completelyDefined( false ) {
+	return;
+}
+
+HRule::HRule( action_position_t const& action_ )
+	: HRuleBase( action_ ),
+	_rule( make_pointer<HRecursiveRule>() ),
+	_completelyDefined( false ) {
+	return;
+}
+
 HRule::HRule( yaal::hcore::HString const& name_ )
-	: HRuleBase(), _rule( name_, make_pointer<HRecursiveRule>() ), _completelyDefined( false ) {
+	: HRuleBase(),
+	_rule( name_, make_pointer<HRecursiveRule>() ),
+	_completelyDefined( false ) {
+	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( name_, make_pointer<HRecursiveRule>() ), _completelyDefined( false ) {
+	: HRuleBase( action_ ),
+	_rule( name_, make_pointer<HRecursiveRule>() ),
+	_completelyDefined( false ) {
+	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _rule( name_, make_pointer<HRecursiveRule>() ), _completelyDefined( false ) {
-}
-
-HRule::HRule( void )
-	: HRuleBase(), _rule( make_pointer<HRecursiveRule>() ), _completelyDefined( false ) {
+	: HRuleBase( action_ ),
+	_rule( name_, make_pointer<HRecursiveRule>() ),
+	_completelyDefined( false ) {
+	return;
 }
 
 HRule::HRule( HRule const& rule_ )
@@ -552,43 +585,72 @@ HRule::HRule( HRule const& rule_ )
 }
 
 HRule::HRule( HRuleBase const& rule_ )
-	: HRuleBase(), _rule( rule_.clone() ), _completelyDefined( true ) {
+	: HRuleBase(),
+	_rule( rule_.clone() ),
+	_completelyDefined( true ) {
+	return;
 }
 
 HRule::HRule( HRuleBase const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_.clone() ), _completelyDefined( true ) {
+	: HRuleBase( action_ ),
+	_rule( rule_.clone() ),
+	_completelyDefined( true ) {
+	return;
 }
 
 HRule::HRule( HRuleBase const& rule_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _rule( rule_.clone() ), _completelyDefined( true ) {
+	: HRuleBase( action_ ),
+	_rule( rule_.clone() ),
+	_completelyDefined( true ) {
+	return;
 }
 
 HRule::HRule( ptr_t const& rule_ )
-	: _rule( rule_ ), _completelyDefined( true ) {
+	: HRuleBase(),
+	_rule( rule_ ),
+	_completelyDefined( true ) {
+	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_ )
-	: HRuleBase(), _rule( name_, rule_.clone() ), _completelyDefined( true ) {
+	: HRuleBase(),
+	_rule( name_, rule_.clone() ),
+	_completelyDefined( true ) {
+	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( name_, rule_.clone() ), _completelyDefined( true ) {
+	: HRuleBase( action_ ),
+	_rule( name_, rule_.clone() ),
+	_completelyDefined( true ) {
+	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, HRuleBase const& rule_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _rule( name_, rule_.clone() ), _completelyDefined( true ) {
+	: HRuleBase( action_ ),
+	_rule( name_, rule_.clone() ),
+	_completelyDefined( true ) {
+	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_ )
-	: _rule( name_, rule_ ), _completelyDefined( true ) {
+	: _rule( name_, rule_ ),
+	_completelyDefined( true ) {
+	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_t const& action_ )
-	: HRuleBase( action_ ), _rule( name_, rule_ ), _completelyDefined( true ) {
+	: HRuleBase( action_ ),
+	_rule( name_, rule_ ),
+	_completelyDefined( true ) {
+	return;
 }
 
 HRule::HRule( yaal::hcore::HString const& name_, ptr_t const& rule_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _rule( name_, rule_ ), _completelyDefined( true ) {
+	: HRuleBase( action_ ),
+	_rule( name_, rule_ ),
+	_completelyDefined( true ) {
+	return;
 }
 
 HRule::~HRule( void ) {
@@ -692,8 +754,9 @@ void HRule::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& detach
 void HRule::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule.rule() );
-	if ( !! r )
+	if ( !! r ) {
 		r->detect_recursion( recursionDetector_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -796,8 +859,9 @@ void HRecursiveRule::do_detach( HRuleBase const* rule_, visited_t& visited_, boo
 
 void HRecursiveRule::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
 	M_PROLOG
-	if ( !! _rule )
+	if ( !! _rule ) {
 		_rule->detect_recursion( recursionDetector_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -1237,8 +1301,9 @@ void HKleenePlus::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) co
 void HKleenePlus::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
 	M_PROLOG
 	HRuleBase::ptr_t r( _rule.rule() );
-	if ( !! r )
+	if ( !! r ) {
 		r->detect_recursion( recursionDetector_ );
+	}
 	return;
 	M_EPILOG
 }

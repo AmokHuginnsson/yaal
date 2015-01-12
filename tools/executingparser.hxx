@@ -225,6 +225,8 @@ private:
 	bool _completelyDefined;
 public:
 	HRule( void );
+	HRule( action_t const& );
+	HRule( action_position_t const& );
 	HRule( yaal::hcore::HString const& );
 	HRule( yaal::hcore::HString const&, action_t const& );
 	HRule( yaal::hcore::HString const&, action_position_t const& );
