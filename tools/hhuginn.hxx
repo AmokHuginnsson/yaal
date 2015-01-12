@@ -135,6 +135,7 @@ private:
 		void defer_store_integer( int long long );
 		void defer_store_string( yaal::hcore::HString const& );
 		void defer_store_character( char );
+		void defer_store_boolean( bool );
 	private:
 		OCompiler( OCompiler const& ) = delete;
 		OCompiler& operator = ( OCompiler const& ) = delete;
@@ -546,6 +547,8 @@ public:
 	void store_integer( int long long );
 	void store_string( yaal::hcore::HString const& );
 	void store_character( char );
+	void store_boolean( bool );
+	void store_none( void );
 	void dereference( void );
 protected:
 	virtual void do_execute( HHuginn::HThread* ) const;
