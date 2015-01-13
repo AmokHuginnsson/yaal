@@ -110,21 +110,36 @@ private:
 	struct OCompiler {
 		typedef void ( HHuginn::HExpression::* expression_action_t ) ( HFrame* );
 		typedef yaal::hcore::HArray<yaal::hcore::HString> parameter_names_t;
-		typedef yaal::hcore::HStack<scope_t> scope_stack_t;
-		typedef yaal::hcore::HStack<expression_t> expression_stack_t;
+		struct OContext {
+			scope_t _scope;
+			expression_t _expression;
+			OContext( HHuginn* );
+			OContext( scope_t const&, expression_t const& );
+		};
+		struct OCompilationFrame {
+			typedef yaal::hcore::HArray<OContext> contexts_t;
+			OContext _context;
+			contexts_t _contextsChain;
+			scope_t _else;
+			OCompilationFrame( HHuginn* );
+		};
+		typedef yaal::hcore::HStack<OCompilationFrame> compilation_stack_t;
 		HHuginn* _huginn;
 		yaal::hcore::HString _functionName;
 		parameter_names_t _parameters;
-		expression_stack_t _expressionStack;
-		scope_stack_t _scopeStack;
-		statement_list_t _statementList;
+		compilation_stack_t _compilationStack;
 		OCompiler( HHuginn* );
 		void set_function_name( yaal::hcore::HString const& );
 		void add_paramater( yaal::hcore::HString const& );
+		scope_t& current_scope( void );
+		expression_t& current_expression( void );
 		void create_scope( void );
 		void commit_scope( void );
+		void commit_if_clause( void );
+		void commit_else_clause( void );
 		void add_return_statement( void );
 		void add_while_statement( void );
+		void add_if_statement( void );
 		void commit_expression( void );
 		void defer_function_call( yaal::hcore::HString const& );
 		void defer_get_variable( yaal::hcore::HString const& );
@@ -600,12 +615,14 @@ class HHuginn::HIf : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HIf this_type;
 	typedef HHuginn::HStatement base_type;
+	typedef HHuginn::OCompiler::OCompilationFrame::contexts_t if_clauses_t;
 private:
-	expression_t _condition;
-	scope_t _ifClause;
+	if_clauses_t _ifClauses;
 	scope_t _elseClause;
 public:
-	HIf( expression_t const&, scope_t const&, scope_t const& );
+	HIf( if_clauses_t const&, scope_t const& );
+protected:
+	virtual void do_execute( HThread* ) const;
 };
 
 class HHuginn::HWhile : public HHuginn::HStatement {
