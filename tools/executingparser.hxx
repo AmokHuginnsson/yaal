@@ -41,17 +41,6 @@ Copyright:
 #include "hcore/hboundcall.hxx"
 #include "hcore/htaggedpod.hxx"
 
-/*
- * *TODO*
- * Implement AND rule and NOT rule as per PEG definition:
- * AND:
- * The parsing expression `foo & bar' matches and consumes the text "foo" but only if it is followed by the text "bar",
- * still "bar" is never consumed.
- * NOT:
- * The parsing expression `foo ^ bar' matches and consumes the text "foo" but only if it is NOT followed by the text "bar",
- * still whatever follows "foo" is never consumed.
- */
-
 namespace yaal {
 
 namespace tools {
@@ -317,6 +306,8 @@ class HKleeneStar;
 class HKleenePlus;
 class HAlternative;
 class HOptional;
+class HAnd;
+class HNot;
 
 HFollows operator >> ( HRuleBase const&, HRuleBase const& );
 HFollows operator >> ( HFollows const&, HRuleBase const& );
@@ -331,6 +322,14 @@ HFollows operator >> ( HFollows const&, char );
 HFollows operator >> ( HRuleBase const&, char );
 HAlternative operator | ( HRuleBase const&, HRuleBase const& );
 HAlternative operator | ( HAlternative const&, HRuleBase const& );
+HAnd operator & ( HRuleBase const&, HRuleBase const& );
+HAnd operator & ( HRuleBase const&, char );
+HAnd operator & ( HRuleBase const&, char const* );
+HAnd operator & ( HRuleBase const&, yaal::hcore::HString const );
+HNot operator ^ ( HRuleBase const&, HRuleBase const& );
+HNot operator ^ ( HRuleBase const&, char );
+HNot operator ^ ( HRuleBase const&, char const* );
+HNot operator ^ ( HRuleBase const&, yaal::hcore::HString const& );
 HKleeneStar operator* ( HRuleBase const& );
 HKleenePlus operator+ ( HRuleBase const& );
 HOptional operator - ( HRuleBase const& );
@@ -515,6 +514,72 @@ private:
 };
 
 typedef yaal::hcore::HExceptionT<HOptional, HRuleBaseException> HOptionalException;
+
+class HAnd : public HRuleBase {
+public:
+	typedef HAnd this_type;
+	typedef HRuleBase base_type;
+private:
+	HNamedRule _rule;
+	HNamedRule _and;
+public:
+	HAnd( HAnd const& );
+	HAnd operator[]( action_t const& ) const;
+	HAnd operator[]( action_position_t const& ) const;
+protected:
+	HAnd( HNamedRule const&, HNamedRule const&, action_t const& );
+	HAnd( HNamedRule const&, HNamedRule const&, action_position_t const& );
+	virtual bool do_is_optional( void ) const;
+	virtual ptr_t do_clone( void ) const;
+	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
+	virtual void do_rule_use( rule_use_t& ) const;
+	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
+	virtual void do_find_recursions( HRuleAggregator& );
+private:
+	HAnd( HRuleBase const&, HRuleBase const& );
+	HAnd& operator = ( HAnd const& ) = delete;
+	friend yaal::tools::executing_parser::HAnd yaal::tools::executing_parser::operator & ( yaal::tools::executing_parser::HRuleBase const&, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HAnd yaal::tools::executing_parser::operator & ( yaal::tools::executing_parser::HRuleBase const&, char );
+	friend yaal::tools::executing_parser::HAnd yaal::tools::executing_parser::operator & ( yaal::tools::executing_parser::HRuleBase const&, char const* );
+	friend yaal::tools::executing_parser::HAnd yaal::tools::executing_parser::operator & ( yaal::tools::executing_parser::HRuleBase const&, yaal::hcore::HString const& );
+};
+
+typedef yaal::hcore::HExceptionT<HAnd, HRuleBaseException> HAndException;
+
+class HNot : public HRuleBase {
+public:
+	typedef HNot this_type;
+	typedef HRuleBase base_type;
+private:
+	HNamedRule _rule;
+	HNamedRule _not;
+public:
+	HNot( HNot const& );
+	HNot operator[]( action_t const& ) const;
+	HNot operator[]( action_position_t const& ) const;
+protected:
+	HNot( HNamedRule const&, HNamedRule const&, action_t const& );
+	HNot( HNamedRule const&, HNamedRule const&, action_position_t const& );
+	virtual bool do_is_optional( void ) const;
+	virtual ptr_t do_clone( void ) const;
+	virtual yaal::hcore::HString::const_iterator do_parse( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator ) const;
+	virtual void do_describe( HRuleDescription&, rule_use_t const& ) const;
+	virtual void do_rule_use( rule_use_t& ) const;
+	virtual void do_detach( HRuleBase const*, visited_t&, bool& );
+	virtual void do_detect_recursion( HRecursionDetector& ) const;
+	virtual void do_find_recursions( HRuleAggregator& );
+private:
+	HNot( HRuleBase const&, HRuleBase const& );
+	HNot& operator = ( HNot const& ) = delete;
+	friend yaal::tools::executing_parser::HNot yaal::tools::executing_parser::operator ^ ( yaal::tools::executing_parser::HRuleBase const&, yaal::tools::executing_parser::HRuleBase const& );
+	friend yaal::tools::executing_parser::HNot yaal::tools::executing_parser::operator ^ ( yaal::tools::executing_parser::HRuleBase const&, char );
+	friend yaal::tools::executing_parser::HNot yaal::tools::executing_parser::operator ^ ( yaal::tools::executing_parser::HRuleBase const&, char const* );
+	friend yaal::tools::executing_parser::HNot yaal::tools::executing_parser::operator ^ ( yaal::tools::executing_parser::HRuleBase const&, yaal::hcore::HString const& );
+};
+
+typedef yaal::hcore::HExceptionT<HNot, HRuleBaseException> HNotException;
 
 class HReal : public HRuleBase {
 public:

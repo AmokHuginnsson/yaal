@@ -1035,8 +1035,9 @@ void HFollows::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
 	int use( ++ ruleUse_[ this ] );
 	if ( use == 1 ) {
-		for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it )
+		for ( rules_t::const_iterator it( _rules.begin() ), end( _rules.end() ); it != end; ++ it ) {
 			(*it)->rule_use( ruleUse_ );
+		}
 	}
 	return;
 	M_EPILOG
@@ -1158,8 +1159,9 @@ yaal::hcore::HString::const_iterator HKleeneBase::do_parse( HExecutingParser* ex
 void HKleeneBase::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
 	int use( ++ ruleUse_[ this ] );
-	if ( ( use == 1 ) && !! _rule )
+	if ( use == 1 ) {
 		_rule->rule_use( ruleUse_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -1169,11 +1171,12 @@ void HKleeneBase::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& 
 	HRuleBase::ptr_t r( _rule.rule() );
 	if ( !! r ) {
 		bool detachThis( r.raw() == rule_ );
-		if ( detachThis && detachAll_ )
+		if ( detachThis && detachAll_ ) {
 			_rule.reset( make_pointer<HRuleRef>( r ) );
-		else {
-			if ( detachThis )
+		} else {
+			if ( detachThis ) {
 				detachAll_ = true;
+			}
 			r->detach( rule_, visited_, detachAll_ );
 		}
 	}
@@ -1423,11 +1426,12 @@ void HAlternative::do_detach( HRuleBase const* rule_, visited_t& visited_, bool&
 		HRuleBase::ptr_t r( it->rule() );
 		if ( !! r ) {
 			bool detachThis( r.raw() == rule_ );
-			if ( detachThis && detachAll_ )
+			if ( detachThis && detachAll_ ) {
 				it->reset( make_pointer<HRuleRef>( r ) );
-			else {
-				if ( detachThis )
+			} else {
+				if ( detachThis ) {
 					detachAll_ = true;
+				}
 				r->detach( rule_, visited_, detachAll_ );
 			}
 		}
@@ -1461,14 +1465,18 @@ void HAlternative::do_find_recursions( HRuleAggregator& recursions_ ) {
 
 HOptional::HOptional( HRuleBase const& rule_ )
 	: HRuleBase(), _rule( rule_ ) {
+	return;
 }
 
 HOptional::HOptional( HOptional const& optional_ )
-	: HRuleBase( optional_._action, optional_._actionPosition ), _rule( optional_._rule ) {
+	: HRuleBase( optional_._action, optional_._actionPosition ),
+	_rule( optional_._rule ) {
+	return;
 }
 
 HOptional::HOptional( HNamedRule const& rule_, action_t const& action_ )
 	: HRuleBase( action_ ), _rule( rule_ ) {
+	return;
 }
 
 HOptional::HOptional( HNamedRule const& rule_, action_position_t const& action_ )
@@ -1528,8 +1536,9 @@ void HOptional::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) cons
 void HOptional::do_rule_use( rule_use_t& ruleUse_ ) const {
 	M_PROLOG
 	int use( ++ ruleUse_[ this ] );
-	if ( ( use == 1 ) && !! _rule )
+	if ( use == 1 ) {
 		_rule->rule_use( ruleUse_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -1539,11 +1548,12 @@ void HOptional::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& de
 	HRuleBase::ptr_t r( _rule.rule() );
 	if ( !! r ) {
 		bool detachThis( r.raw() == rule_ );
-		if ( detachThis && detachAll_ )
+		if ( detachThis && detachAll_ ) {
 			_rule.reset( make_pointer<HRuleRef>( r ) );
-		else {
-			if ( detachThis )
+		} else {
+			if ( detachThis ) {
 				detachAll_ = true;
+			}
 			r->detach( rule_, visited_, detachAll_ );
 		}
 	}
@@ -1570,6 +1580,278 @@ void HOptional::do_find_recursions( HRuleAggregator& recursions_ ) {
 	M_EPILOG
 }
 
+HAnd::HAnd( HRuleBase const& rule_, HRuleBase const& and_ )
+	: HRuleBase(), _rule( rule_ ), _and( and_ ) {
+	return;
+}
+
+HAnd::HAnd( HAnd const& and_ )
+	: HRuleBase( and_._action, and_._actionPosition ),
+	_rule( and_._rule ),
+	_and( and_._and ) {
+	return;
+}
+
+HAnd::HAnd( HNamedRule const& rule_, HNamedRule const& and_, action_t const& action_ )
+	: HRuleBase( action_ ), _rule( rule_ ), _and( and_ ) {
+	return;
+}
+
+HAnd::HAnd( HNamedRule const& rule_, HNamedRule const& and_, action_position_t const& action_ )
+	: HRuleBase( action_ ), _rule( rule_ ), _and( and_ ) {
+	return;
+}
+
+HRuleBase::ptr_t HAnd::do_clone( void ) const {
+	M_PROLOG
+	return ( make_pointer<HAnd>( *this ) );
+	M_EPILOG
+}
+
+HAnd HAnd::operator[]( action_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ! has_action() );
+	return ( HAnd( _rule, _and, action_ ) );
+	M_EPILOG
+}
+
+HAnd HAnd::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ! has_action() );
+	return ( HAnd( _rule, _and, action_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HString::const_iterator HAnd::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+	M_PROLOG
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
+	yaal::hcore::HString::const_iterator andScan( !! _and ? _and->parse( executingParser_, scan, last_ ) : scan );
+	if ( ( scan != start ) && ( andScan != scan ) ) {
+		if ( !! _action ) {
+			add_execution_step( executingParser_, start, _action );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, start, call( _actionPosition, position( executingParser_, start ) ) );
+		}
+	} else {
+		scan = first_;
+	}
+	return ( scan );
+	M_EPILOG
+}
+
+bool HAnd::do_is_optional( void ) const {
+	return ( true );
+}
+
+void HAnd::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
+	M_PROLOG
+	rd_.desc( "( " );
+	_rule.describe( rd_, ru_ );
+	rd_.desc( " & " );
+	_and.describe( rd_, ru_ );
+	rd_.desc( " )" );
+	return;
+	M_EPILOG
+}
+
+void HAnd::do_rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	int use( ++ ruleUse_[ this ] );
+	if ( use == 1 ) {
+		_rule->rule_use( ruleUse_ );
+		_and->rule_use( ruleUse_ );
+	}
+	return;
+	M_EPILOG
+}
+
+void HAnd::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& detachAll_ ) {
+	M_PROLOG
+	HNamedRule* rules[2] = {
+		&_rule,
+		&_and
+	};
+	for ( HNamedRule* rule : rules ) {
+		HRuleBase::ptr_t r( rule->rule() );
+		if ( !! r ) {
+			bool detachThis( r.raw() == rule_ );
+			if ( detachThis && detachAll_ ) {
+				rule->reset( make_pointer<HRuleRef>( r ) );
+			} else {
+				if ( detachThis ) {
+					detachAll_ = true;
+				}
+				r->detach( rule_, visited_, detachAll_ );
+			}
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HAnd::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+	M_PROLOG
+	HNamedRule const* rules[2] = {
+		&_rule,
+		&_and
+	};
+	for ( HNamedRule const* rule : rules ) {
+		HRuleBase::ptr_t r( rule->rule() );
+		if ( !! r ) {
+			recursionDetector_.checkpoints_push();
+			r->detect_recursion( recursionDetector_ );
+			recursionDetector_.checkpoints_pop();
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HAnd::do_find_recursions( HRuleAggregator& recursions_ ) {
+	M_PROLOG
+	recursions_.verify( _rule );
+	recursions_.verify( _and );
+	return;
+	M_EPILOG
+}
+
+HNot::HNot( HRuleBase const& rule_, HRuleBase const& not_ )
+	: HRuleBase(), _rule( rule_ ), _not( not_ ) {
+	return;
+}
+
+HNot::HNot( HNot const& not_ )
+	: HRuleBase( not_._action, not_._actionPosition ),
+	_rule( not_._rule ),
+	_not( not_._not ) {
+	return;
+}
+
+HNot::HNot( HNamedRule const& rule_, HNamedRule const& not_, action_t const& action_ )
+	: HRuleBase( action_ ), _rule( rule_ ), _not( not_ ) {
+	return;
+}
+
+HNot::HNot( HNamedRule const& rule_, HNamedRule const& not_, action_position_t const& action_ )
+	: HRuleBase( action_ ), _rule( rule_ ), _not( not_ ) {
+	return;
+}
+
+HRuleBase::ptr_t HNot::do_clone( void ) const {
+	M_PROLOG
+	return ( make_pointer<HNot>( *this ) );
+	M_EPILOG
+}
+
+HNot HNot::operator[]( action_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ! has_action() );
+	return ( HNot( _rule, _not, action_ ) );
+	M_EPILOG
+}
+
+HNot HNot::operator[]( action_position_t const& action_ ) const {
+	M_PROLOG
+	M_ENSURE( ! has_action() );
+	return ( HNot( _rule, _not, action_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HString::const_iterator HNot::do_parse( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator first_, yaal::hcore::HString::const_iterator last_ ) const {
+	M_PROLOG
+	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
+	yaal::hcore::HString::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
+	yaal::hcore::HString::const_iterator notScan( !! _not ? _not->parse( executingParser_, scan, last_ ) : scan );
+	if ( ( scan != start ) && ( notScan == scan ) ) {
+		if ( !! _action ) {
+			add_execution_step( executingParser_, start, _action );
+		} else if ( !! _actionPosition ) {
+			add_execution_step( executingParser_, start, call( _actionPosition, position( executingParser_, start ) ) );
+		}
+	} else {
+		scan = first_;
+	}
+	return ( scan );
+	M_EPILOG
+}
+
+bool HNot::do_is_optional( void ) const {
+	return ( true );
+}
+
+void HNot::do_describe( HRuleDescription& rd_, rule_use_t const& ru_ ) const {
+	M_PROLOG
+	rd_.desc( "( " );
+	_rule.describe( rd_, ru_ );
+	rd_.desc( " ^ " );
+	_not.describe( rd_, ru_ );
+	rd_.desc( " )" );
+	return;
+	M_EPILOG
+}
+
+void HNot::do_rule_use( rule_use_t& ruleUse_ ) const {
+	M_PROLOG
+	int use( ++ ruleUse_[ this ] );
+	if ( use == 1 ) {
+		_rule->rule_use( ruleUse_ );
+		_not->rule_use( ruleUse_ );
+	}
+	return;
+	M_EPILOG
+}
+
+void HNot::do_detach( HRuleBase const* rule_, visited_t& visited_, bool& detachAll_ ) {
+	M_PROLOG
+	HNamedRule* rules[2] = {
+		&_rule,
+		&_not
+	};
+	for ( HNamedRule* rule : rules ) {
+		HRuleBase::ptr_t r( rule->rule() );
+		if ( !! r ) {
+			bool detachThis( r.raw() == rule_ );
+			if ( detachThis && detachAll_ ) {
+				rule->reset( make_pointer<HRuleRef>( r ) );
+			} else {
+				if ( detachThis ) {
+					detachAll_ = true;
+				}
+				r->detach( rule_, visited_, detachAll_ );
+			}
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HNot::do_detect_recursion( HRecursionDetector& recursionDetector_ ) const {
+	M_PROLOG
+	HNamedRule const* rules[2] = {
+		&_rule,
+		&_not
+	};
+	for ( HNamedRule const* rule : rules ) {
+		HRuleBase::ptr_t r( rule->rule() );
+		if ( !! r ) {
+			recursionDetector_.checkpoints_push();
+			r->detect_recursion( recursionDetector_ );
+			recursionDetector_.checkpoints_pop();
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HNot::do_find_recursions( HRuleAggregator& recursions_ ) {
+	M_PROLOG
+	recursions_.verify( _rule );
+	recursions_.verify( _not );
+	return;
+	M_EPILOG
+}
+
 HFollows operator >> ( HRuleBase const& predecessor_, HRuleBase const& successor_ ) {
 	M_PROLOG
 	return ( HFollows( predecessor_, successor_ ) );
@@ -1591,6 +1873,54 @@ HAlternative operator | ( HRuleBase const& choice1_, HRuleBase const& choice2_ )
 HAlternative operator | ( HAlternative const& alternative_, HRuleBase const& choice_ ) {
 	M_PROLOG
 	return ( HAlternative( alternative_, choice_ ) );
+	M_EPILOG
+}
+
+HAnd operator & ( HRuleBase const& rule_, HRuleBase const& and_ ) {
+	M_PROLOG
+	return ( HAnd( rule_, and_ ) );
+	M_EPILOG
+}
+
+HAnd operator & ( HRuleBase const& rule_, char character_ ) {
+	M_PROLOG
+	return ( HAnd( rule_, character( character_ ) ) );
+	M_EPILOG
+}
+
+HAnd operator & ( HRuleBase const& rule_, char const* string_ ) {
+	M_PROLOG
+	return ( HAnd( rule_, string( string_ ) ) );
+	M_EPILOG
+}
+
+HAnd operator & ( HRuleBase const& rule_, yaal::hcore::HString const& string_ ) {
+	M_PROLOG
+	return ( HAnd( rule_, string( string_ ) ) );
+	M_EPILOG
+}
+
+HNot operator ^ ( HRuleBase const& rule_, HRuleBase const& not_ ) {
+	M_PROLOG
+	return ( HNot( rule_, not_ ) );
+	M_EPILOG
+}
+
+HNot operator ^ ( HRuleBase const& rule_, char character_ ) {
+	M_PROLOG
+	return ( HNot( rule_, character( character_ ) ) );
+	M_EPILOG
+}
+
+HNot operator ^ ( HRuleBase const& rule_, char const* string_ ) {
+	M_PROLOG
+	return ( HNot( rule_, string( string_ ) ) );
+	M_EPILOG
+}
+
+HNot operator ^ ( HRuleBase const& rule_, yaal::hcore::HString const& string_ ) {
+	M_PROLOG
+	return ( HNot( rule_, string( string_ ) ) );
 	M_EPILOG
 }
 
