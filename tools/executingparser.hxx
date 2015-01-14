@@ -325,7 +325,7 @@ HAlternative operator | ( HAlternative const&, HRuleBase const& );
 HAnd operator & ( HRuleBase const&, HRuleBase const& );
 HAnd operator & ( HRuleBase const&, char );
 HAnd operator & ( HRuleBase const&, char const* );
-HAnd operator & ( HRuleBase const&, yaal::hcore::HString const );
+HAnd operator & ( HRuleBase const&, yaal::hcore::HString const& );
 HNot operator ^ ( HRuleBase const&, HRuleBase const& );
 HNot operator ^ ( HRuleBase const&, char );
 HNot operator ^ ( HRuleBase const&, char const* );
