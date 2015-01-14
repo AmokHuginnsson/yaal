@@ -30,6 +30,8 @@ Copyright:
 #ifndef YAAL_TOOLS_HHUGINN_HXX_INCLUDED
 #define YAAL_TOOLS_HHUGINN_HXX_INCLUDED 1
 
+#include <atomic>
+
 #include "hcore/hmap.hxx"
 #include "hcore/hhashmap.hxx"
 #include "hcore/hstack.hxx"
@@ -174,6 +176,8 @@ private:
 	threads_t _threads;
 	list_t _argv;
 	value_t _result;
+	typedef std::atomic<bool> flag_t;
+	static flag_t _grammarVerified;
 public:
 	HHuginn( void );
 	/*! \brief Store source in internal buffer.

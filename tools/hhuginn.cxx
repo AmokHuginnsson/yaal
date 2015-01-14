@@ -1004,16 +1004,19 @@ void HHuginn::OCompiler::defer_store_boolean( bool value_ ) {
 	M_EPILOG
 }
 
+HHuginn::flag_t HHuginn::_grammarVerified{ false };
+
 HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY ),
 	_functions(),
-	_engine( make_engine() ),
+	_engine( make_engine(), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR ),
 	_source(),
 	_compiler( this ),
 	_threads(),
 	_argv( new ( memory::yaal ) HList() ),
 	_result() {
 	M_PROLOG
+	_grammarVerified.store( true );
 	register_builtins();
 	return;
 	M_EPILOG
