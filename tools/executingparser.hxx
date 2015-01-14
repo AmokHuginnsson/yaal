@@ -913,6 +913,10 @@ public:
 	typedef HExecutingParser this_type;
 	typedef yaal::hcore::HBoundCall<> executor_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> messages_t;
+	enum class INIT_MODE {
+		VERIFY_GRAMMAR,
+		TRUST_GRAMMAR
+	};
 	class HProxy {
 		static void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, executor_t const& );
 		static void drop_execution_steps( HExecutingParser*, yaal::hcore::HString::const_iterator );
@@ -931,7 +935,7 @@ private:
 	messages_t _errorMessages;
 	yaal::hcore::HString::const_iterator _inputStart; /*!< Ephemeric! */
 public:
-	HExecutingParser( executing_parser::HRuleBase const& );
+	HExecutingParser( executing_parser::HRuleBase const&, INIT_MODE = INIT_MODE::VERIFY_GRAMMAR );
 	bool operator()( yaal::hcore::HString const& );
 	bool operator()( yaal::hcore::HString::const_iterator, yaal::hcore::HString::const_iterator );
 	void operator()( void );

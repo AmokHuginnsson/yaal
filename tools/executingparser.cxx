@@ -166,12 +166,14 @@ private:
 
 }
 
-HExecutingParser::HExecutingParser( executing_parser::HRuleBase const& rule_ )
+HExecutingParser::HExecutingParser( executing_parser::HRuleBase const& rule_, INIT_MODE initMode_ )
 	: _grammar( rule_.clone() ), _excutors(), _matched( false ),
 	_errorPosition( yaal::hcore::HString::npos ), _errorMessages(),
 	_inputStart( NULL ) {
 	M_PROLOG
-	sanitize();
+	if ( initMode_ == INIT_MODE::VERIFY_GRAMMAR ) {
+		sanitize();
+	}
 	M_EPILOG
 }
 
@@ -3379,7 +3381,7 @@ yaal::hcore::HString const& HRuleDescription::make_name_auto( HRuleBase const* r
 	else {
 		static int const MAX_AUTO_NAMES_COUNT = 26;
 		int autoNamesCount( static_cast<int>( _automaticNames.get_size() ) );
-		name = &( _automaticNames[rule_] = ( _automaticNames.get_size() < MAX_AUTO_NAMES_COUNT ) ?
+		name = &( _automaticNames[rule_] = ( autoNamesCount < MAX_AUTO_NAMES_COUNT ) ?
 				hcore::HString( static_cast<char>( 'A' + autoNamesCount ) ) + '_'
 				: hcore::HString( "rule" ) + rule_ );
 	}
