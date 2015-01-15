@@ -1891,6 +1891,12 @@ HAlternative operator | ( HAlternative const& alternative_, HRuleBase const& cho
 	M_EPILOG
 }
 
+HString operator | ( HString const& string_, yaal::hcore::HString const& token_ ) {
+	M_PROLOG
+	return ( HString( string_, token_ ) );
+	M_EPILOG
+}
+
 HAnd operator & ( HRuleBase const& rule_, HRuleBase const& and_ ) {
 	M_PROLOG
 	return ( HAnd( rule_, and_ ) );
@@ -3135,69 +3141,135 @@ HFollows operator >> ( HRuleBase const& predecessor_, char character_ ) {
 }
 
 HString::HString( hcore::HString const& string_ )
-	: HRuleBase(), _string( string_ ), _actionString(), _actionStringPosition() {
-	M_ASSERT( ! _string.is_empty() );
+	: HRuleBase(),
+	_dictionary( 1, string_ ),
+	_actionString(),
+	_actionStringPosition() {
+	M_ASSERT( ! string_.is_empty() );
+	return;
+}
+
+HString::HString( HString const& string_, yaal::hcore::HString const& token_ )
+	: HRuleBase( string_._action, string_._actionPosition ),
+	_dictionary( string_._dictionary ),
+	_actionString( string_._actionString ),
+	_actionStringPosition( string_._actionStringPosition ) {
+	M_ASSERT( ! token_.is_empty() );
+	for ( yaal::hcore::HString const& s : _dictionary ) {
+		if ( token_.find( s ) == 0 ) {
+			throw HStringException( "token `"_ys.append( token_ ).append( "' would be hidden" ) );
+		}
+	}
+	_dictionary.emplace_back( token_ );
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_t const& action_ )
-	: HRuleBase( action_ ), _string( string_ ), _actionString(), _actionStringPosition() {
-	M_ASSERT( ! _string.is_empty() );
+	: HRuleBase( action_ ),
+	_dictionary( 1, string_ ),
+	_actionString(),
+	_actionStringPosition() {
+	M_ASSERT( ! string_.is_empty() );
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_position_t const& action_ )
-	: HRuleBase( action_ ), _string( string_ ), _actionString(), _actionStringPosition() {
-	M_ASSERT( ! _string.is_empty() );
+	: HRuleBase( action_ ),
+	_dictionary( 1, string_ ),
+	_actionString(),
+	_actionStringPosition() {
+	M_ASSERT( ! string_.is_empty() );
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_string_t const& action_ )
-	: HRuleBase(), _string( string_ ), _actionString( action_ ), _actionStringPosition() {
-	M_ASSERT( ! _string.is_empty() );
+	: HRuleBase(),
+	_dictionary( 1, string_ ),
+	_actionString( action_ ),
+	_actionStringPosition() {
+	M_ASSERT( ! string_.is_empty() );
 	return;
 }
 
 HString::HString( hcore::HString const& string_, action_string_position_t const& action_ )
-	: HRuleBase(), _string( string_ ), _actionString(), _actionStringPosition( action_ ) {
-	M_ASSERT( ! _string.is_empty() );
+	: HRuleBase(),
+	_dictionary( 1, string_ ),
+	_actionString(),
+	_actionStringPosition( action_ ) {
+	M_ASSERT( ! string_.is_empty() );
+	return;
+}
+
+HString::HString( dictionary_t const& dictionary_, action_t const& action_ )
+	: HRuleBase( action_ ),
+	_dictionary( dictionary_ ),
+	_actionString(),
+	_actionStringPosition() {
+	M_ASSERT( ! _dictionary.is_empty() );
+	return;
+}
+
+HString::HString( dictionary_t const& dictionary_, action_position_t const& action_ )
+	: HRuleBase( action_ ),
+	_dictionary( dictionary_ ),
+	_actionString(),
+	_actionStringPosition() {
+	M_ASSERT( ! _dictionary.is_empty() );
+	return;
+}
+
+HString::HString( dictionary_t const& dictionary_, action_string_t const& action_ )
+	: HRuleBase(),
+	_dictionary( dictionary_ ),
+	_actionString( action_ ),
+	_actionStringPosition() {
+	M_ASSERT( ! _dictionary.is_empty() );
+	return;
+}
+
+HString::HString( dictionary_t const& dictionary_, action_string_position_t const& action_ )
+	: HRuleBase(),
+	_dictionary( dictionary_ ),
+	_actionString(),
+	_actionStringPosition( action_ ) {
+	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
 
 HString::HString( HString const& string_ )
 	: HRuleBase( string_._action, string_._actionPosition ),
-	_string( string_._string ),
+	_dictionary( string_._dictionary ),
 	_actionString( string_._actionString ),
 	_actionStringPosition( string_._actionStringPosition ) {
-	M_ASSERT( ! _string.is_empty() );
+	M_ASSERT( ! _dictionary.is_empty() );
 	return;
 }
 
 HString HString::operator[]( action_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HString( _string, action_ ) );
+	return ( HString( _dictionary, action_ ) );
 	M_EPILOG
 }
 
 HString HString::operator[]( action_position_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HString( _string, action_ ) );
+	return ( HString( _dictionary, action_ ) );
 	M_EPILOG
 }
 
 HString HString::operator[]( action_string_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HString( _string, action_ ) );
+	return ( HString( _dictionary, action_ ) );
 	M_EPILOG
 }
 
 HString HString::operator[]( action_string_position_t const& action_ ) const {
 	M_PROLOG
 	M_ENSURE( ! has_action() );
-	return ( HString( _string, action_ ) );
+	return ( HString( _dictionary, action_ ) );
 	M_EPILOG
 }
 
@@ -3205,45 +3277,62 @@ bool HString::do_has_action( void ) const {
 	return ( HRuleBase::do_has_action() || ( !! _actionString ) || ( !! _actionStringPosition ) );
 }
 
-HString HString::operator() ( hcore::HString const& string_ ) const {
-	M_PROLOG
-	M_ENSURE( ! string_.is_empty() );
-	return ( HString( string_, _action ) );
-	M_EPILOG
-}
-
 hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingParser_, hcore::HString::const_iterator first_, hcore::HString::const_iterator last_ ) const {
 	M_PROLOG
-	M_ASSERT( ! _string.is_empty() );
+	M_ASSERT( ! _dictionary.is_empty() );
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
 	bool matched( false );
 	if ( first_ != last_ ) {
-		matched = true;
-		for ( hcore::HString::const_iterator it( _string.begin() ), end( _string.end() ); it != end; ++ it, ++ scan ) {
-			if ( ( scan == last_ ) || ( *scan != *it ) ) {
-				matched = false;
-				break;
+		for ( yaal::hcore::HString const& s : _dictionary ) {
+			matched = true;
+			for ( hcore::HString::const_iterator it( s.begin() ), end( s.end() ); it != end; ++ it, ++ scan ) {
+				if ( ( scan == last_ ) || ( *scan != *it ) ) {
+					matched = false;
+					break;
+				}
 			}
-		}
-		if ( matched ) {
-			int pos( position( executingParser_, start ) );
-			if ( !! _actionString ) {
-				add_execution_step( executingParser_, start, call( _actionString, _string ) );
-			} else if ( !! _actionStringPosition ) {
-				add_execution_step( executingParser_, start, call( _actionStringPosition, _string, pos ) );
-			} else if ( !! _action ) {
-				add_execution_step( executingParser_, start, call( _action ) );
-			} else if ( !! _actionPosition ) {
-				add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+			if ( matched ) {
+				int pos( position( executingParser_, start ) );
+				if ( !! _actionString ) {
+					add_execution_step( executingParser_, start, call( _actionString, s ) );
+				} else if ( !! _actionStringPosition ) {
+					add_execution_step( executingParser_, start, call( _actionStringPosition, s, pos ) );
+				} else if ( !! _action ) {
+					add_execution_step( executingParser_, start, call( _action ) );
+				} else if ( !! _actionPosition ) {
+					add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
+				}
+				break;
 			}
 		}
 	}
 	if ( ! matched ) {
-		report_error( executingParser_, scan, "expected string: " + _string );
+		report_error( executingParser_, scan, "expected string: " + desc() );
 		scan = first_;
 	}
 	return ( scan );
+	M_EPILOG
+}
+
+yaal::hcore::HString HString::desc( void ) const {
+	M_PROLOG
+	hcore::HString d;
+	if ( _dictionary.get_size() > 1 ) {
+		d.assign( "( \"" );
+		bool next( false );
+		for ( yaal::hcore::HString const& s : _dictionary ) {
+			if ( next ) {
+				d.append( "\" | \"" );
+			}
+			d.append( s );
+			next = true;
+		}
+		d.append( "\" )" );
+	} else {
+		d.append( "\"" ).append( _dictionary.front() ).append( "\"" );
+	}
+	return ( d );
 	M_EPILOG
 }
 
@@ -3255,9 +3344,7 @@ HRuleBase::ptr_t HString::do_clone( void ) const {
 
 void HString::do_describe( HRuleDescription& rd_, rule_use_t const& ) const {
 	M_PROLOG
-	rd_.desc( "\"" );
-	rd_.desc( _string );
-	rd_.desc( "\"" );
+	rd_.desc( desc() );
 	return;
 	M_EPILOG
 }
@@ -3281,7 +3368,31 @@ void HString::do_find_recursions( HRuleAggregator& ) {
 	M_EPILOG
 }
 
+HString string( yaal::hcore::HString const& string_ ) {
+	M_PROLOG
+	return ( HString( string_ ) );
+	M_EPILOG
+}
+
 HString string( yaal::hcore::HString const& string_, HString::action_string_t const& action_ ) {
+	M_PROLOG
+	return ( HString( string_, action_ ) );
+	M_EPILOG
+}
+
+HString string( yaal::hcore::HString const& string_, HString::action_string_position_t const& action_ ) {
+	M_PROLOG
+	return ( HString( string_, action_ ) );
+	M_EPILOG
+}
+
+HString string( yaal::hcore::HString const& string_, HString::action_t const& action_ ) {
+	M_PROLOG
+	return ( HString( string_, action_ ) );
+	M_EPILOG
+}
+
+HString string( yaal::hcore::HString const& string_, HString::action_position_t const& action_ ) {
 	M_PROLOG
 	return ( HString( string_, action_ ) );
 	M_EPILOG
