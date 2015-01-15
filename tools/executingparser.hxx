@@ -168,6 +168,7 @@ protected:
 	virtual void do_find_recursions( HRuleAggregator& ) = 0;
 	virtual bool do_has_action( void ) const;
 	void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, action_t const& ) const;
+	void drop_execution_steps( HExecutingParser*, yaal::hcore::HString::const_iterator ) const;
 	void report_error( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString const& ) const;
 	int position( HExecutingParser*, yaal::hcore::HString::const_iterator ) const;
 	friend class yaal::tools::HExecutingParser;

@@ -235,6 +235,8 @@ bool HExecutingParser::parse( yaal::hcore::HString::const_iterator first_, yaal:
 		it = last_;
 		_errorPosition = yaal::hcore::HString::npos;
 		_errorMessages.clear();
+	} else if ( _errorPosition == yaal::hcore::HString::npos ) {
+		report_error( it, "failed to consume input" );
 	}
 	_inputStart = NULL;
 	_matched = ( it == last_ );
@@ -253,8 +255,9 @@ void HExecutingParser::drop_execution_steps( yaal::hcore::HString::const_iterato
 	M_PROLOG
 	execution_steps_t::iterator it( begin( _excutors ) );
 	execution_steps_t::iterator e( end( _excutors ) );
-	while ( ( it != e ) && ( it->first != it_ ) )
+	while ( ( it != e ) && ( it->first != it_ ) ) {
 		++ it;
+	}
 	_excutors.erase( it, e );
 	return;
 	M_EPILOG
@@ -267,8 +270,9 @@ void HExecutingParser::report_error( yaal::hcore::HString::const_iterator positi
 		_errorMessages.clear();
 		_errorPosition = pos;
 	}
-	if ( pos == _errorPosition )
+	if ( pos == _errorPosition ) {
 		_errorMessages.push_back( message_ );
+	}
 	return;
 	M_EPILOG
 }
@@ -365,6 +369,13 @@ yaal::hcore::HString::const_iterator HRuleBase::parse( HExecutingParser* executi
 void HRuleBase::add_execution_step( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_, action_t const& executor_ ) const {
 	M_PROLOG
 	HExecutingParser::HProxy::add_execution_step( executingParser_, position_, executor_ );
+	return;
+	M_EPILOG
+}
+
+void HRuleBase::drop_execution_steps( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_ ) const {
+	M_PROLOG
+	HExecutingParser::HProxy::drop_execution_steps( executingParser_, position_ );
 	return;
 	M_EPILOG
 }
@@ -1628,6 +1639,7 @@ yaal::hcore::HString::const_iterator HAnd::do_parse( HExecutingParser* executing
 	yaal::hcore::HString::const_iterator scan( !! _rule ? _rule->parse( executingParser_, start, last_ ) : start );
 	yaal::hcore::HString::const_iterator andScan( !! _and ? _and->parse( executingParser_, scan, last_ ) : scan );
 	if ( ( scan != start ) && ( andScan != scan ) ) {
+		drop_execution_steps( executingParser_, scan );
 		if ( !! _action ) {
 			add_execution_step( executingParser_, start, _action );
 		} else if ( !! _actionPosition ) {
@@ -1770,6 +1782,9 @@ yaal::hcore::HString::const_iterator HNot::do_parse( HExecutingParser* executing
 			add_execution_step( executingParser_, start, call( _actionPosition, position( executingParser_, start ) ) );
 		}
 	} else {
+		if ( scan != start ) {
+			report_error( executingParser_, scan, "NOT's follower matched" );
+		}
 		scan = first_;
 	}
 	return ( scan );
