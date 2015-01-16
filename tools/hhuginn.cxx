@@ -122,12 +122,12 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule absoluteValue( "absoluteValue",
 		constant( '|', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) )
 		>> expression
-		>> constant( '|', e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::close_parenthesis ) ) ) );
+		>> constant( '|', e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::ABSOLUTE ) ) ) );
 	HRule parenthesis( "parenthesis",
 		constant( '(', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) )
 		>> expression
-		>> constant( ')', e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::close_parenthesis ) ) ) );
-	HRule arg( "argument", expression, HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::add_arg ) ) );
+		>> constant( ')', e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::PARENTHESIS ) ) ) );
+	HRule arg( "argument", expression, HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_oper_direct, &_compiler, OPERATOR::FUNCTION_ARGUMENT ) ) );
 	HRule argList( "argList", arg >> ( * ( ',' >> arg ) ) );
 	HRule functionCall(
 		"functionCall",
@@ -136,7 +136,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			identifier,
 			e_p::HStringLiteral::action_string_t( hcore::call( &HHuginn::OCompiler::defer_function_call, &_compiler, _1 ) )
 		) >> '(' >> -argList >> ')',
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::function_call_exec ) )
+		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::FUNCTION_CALL ) )
 	);
 	HRule variableGetter(
 		regex(
@@ -163,13 +163,13 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule negation(
 		"negation",
-		( '-' >> atom )[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::negate ) )]
+		( '-' >> atom )[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::NEGATE ) )]
 		| atom
 	);
 	HRule power(
 		"power",
 		negation >> ( * ( constant( '^', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> negation ) ),
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::power ) )
+		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::POWER ) )
 	);
 	HRule multiplication(
 		"multiplication",
@@ -179,7 +179,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 					characters(
 						"*/%", e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )
 					) >> power
-				)[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::mul_div_mod ) )]
+				)[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::MULTIPLY ) )]
 			)
 		)
 	);
@@ -191,7 +191,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 					characters(
 						"+-", e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )
 					) >> multiplication
-				)[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::plus_minus ) )]
+				)[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::PLUS ) )]
 			)
 		)
 	);
@@ -201,7 +201,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		/* repeat at least once */ + (
 			/* subscript operator it self */ (
 				constant( '[', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> ( value | subscript ) >> ']'
-			)[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::subscript ) )]
+			)[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::SUBSCRIPT ) )]
 		)
 	);
 	/*
@@ -222,7 +222,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			) >>
 			constant( '=' )[e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )]
 		) >> value,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::set_variable ) )
+		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::ASSIGN ) )
 	);
 	expression %= assignment;
 	/*
@@ -244,43 +244,19 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	 */
 	HRule booleanExpression( "booleanExpression" );
 	HRule anyExpression( "anyExpression", ( '(' >> booleanExpression >> ')' ) | ( '(' >> expression >> ')' ) | value );
-	HRule testEquals(
-		"testEquals",
-		anyExpression >> constant( "==", e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) ) ) >> anyExpression,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::equals ) )
+	HRule testEqualsNotEquals(
+		"testEqualsNotEquals",
+		anyExpression >> ( constant( "==" ) | "!=" )[e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) )] >> anyExpression,
+		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::EQUALS ) )
 	);
-	HRule testNotEquals(
-		"testNotEquals",
-		anyExpression >> constant( "!=", e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) ) ) >> anyExpression,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::not_equals ) )
-	);
-	HRule testLess(
-		"testLess",
-		expression >> constant( '<', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> expression,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::less ) )
-	);
-	HRule testGreater(
-		"testGreater",
-		expression >> constant( '>', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> expression,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::greater ) )
-	);
-	HRule testLessEq(
-		"testLessEq",
-		expression >> constant( "<=", e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) ) ) >> expression,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::less_or_equal ) )
-	);
-	HRule testGreaterEq(
-		"testGreaterEq",
-		expression >> constant( ">=", e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) ) ) >> expression,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::greater_or_equal ) )
+	HRule testCompare(
+		"testCompare",
+		expression >> ( constant( "<=" ) | ">=" | "<" | ">" )[e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) )] >> expression,
+		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::LESS ) )
 	);
 	HRule booleanTest( "booleanTest",
-		testEquals
-		| testNotEquals
-		| testLess
-		| testGreater
-		| testLessEq
-		| testGreaterEq
+		testEqualsNotEquals
+		| testCompare
 	);
 	HRule booleanAtom( "booleanAtom",
 		booleanLiteralTrue
@@ -288,30 +264,18 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| ( '(' >> booleanTest >> ')' )
 		| ( constant( "boolean" ) >> '(' >> expression >> ')' )
 	);
-	HRule booleanAnd(
-		"booleanAnd",
-		booleanAtom >> constant( "&&", e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) ) ) >> booleanAtom,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::boolean_and ) )
-	);
-	HRule booleanOr(
-		"booleanOr",
-		booleanAtom >> constant( "||", e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) ) ) >> booleanAtom,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::boolean_or ) )
-	);
-	HRule booleanXor(
-		"booleanXor",
-		booleanAtom >> constant( "^^", e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) ) ) >> booleanAtom,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::boolean_xor ) )
+	HRule booleanAndOrXor(
+		"booleanAndOrXor",
+		booleanAtom >> ( constant( "&&" ) | "||" | "^^" )[e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) )] >> booleanAtom,
+		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::BOOLEAN_AND ) )
 	);
 	HRule booleanNot(
 		"booleanNot",
 		constant( '!', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> booleanAtom,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::boolean_not ) )
+		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::BOOLEAN_NOT ) )
 	);
 	HRule booleanValue( "booleanValue",
-		booleanAnd
-		| booleanOr
-		| booleanXor
+		booleanAndOrXor
 		| booleanNot
 		| booleanTest
 		| booleanAtom
@@ -329,7 +293,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			) >>
 			constant( '=' )[e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )]
 		) >> booleanValue,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::set_variable ) )
+		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::ASSIGN ) )
 	);
 	booleanExpression %= ( booleanValue | ( '(' >> booleanAssignment >> ')' ) );
 	HRule expressionStatement( "expressionStatement", expression[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler ) )] >> ';' );
@@ -788,7 +752,8 @@ HHuginn::OCompiler::OCompiler( HHuginn* huginn_ )
 	: _huginn( huginn_ ),
 	_functionName(),
 	_parameters(),
-	_compilationStack() {
+	_compilationStack(),
+	_operations() {
 	return;
 }
 
@@ -835,11 +800,19 @@ void HHuginn::OCompiler::commit_scope( void ) {
 	M_EPILOG
 }
 
+void HHuginn::OCompiler::reset_expression( void ) {
+	M_PROLOG
+	current_expression() = make_pointer<HExpression>( _huginn );
+	M_ASSERT( _operations.is_empty() );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::OCompiler::add_return_statement( void ) {
 	M_PROLOG
 	M_ASSERT( ! _compilationStack.is_empty() );
 	current_scope()->add_statement( make_pointer<HReturn>( current_expression() ) );
-	current_expression() = make_pointer<HExpression>( _huginn );
+	reset_expression();
 	return;
 	M_EPILOG
 }
@@ -850,7 +823,7 @@ void HHuginn::OCompiler::add_while_statement( void ) {
 	scope_t scope( current_scope() );
 	_compilationStack.pop();
 	current_scope()->add_statement( make_pointer<HWhile>( current_expression(), scope ) );
-	current_expression() = make_pointer<HExpression>( _huginn );
+	reset_expression();
 	return;
 	M_EPILOG
 }
@@ -861,7 +834,7 @@ void HHuginn::OCompiler::commit_if_clause( void ) {
 	scope_t scope( current_scope() );
 	_compilationStack.pop();
 	_compilationStack.top()._contextsChain.emplace_back( scope, current_expression() );
-	current_expression() = make_pointer<HExpression>( _huginn );
+	reset_expression();
 	return;
 	M_EPILOG
 }
@@ -872,7 +845,7 @@ void HHuginn::OCompiler::commit_else_clause( void ) {
 	scope_t scope( current_scope() );
 	_compilationStack.pop();
 	_compilationStack.top()._else = scope;
-	current_expression() = make_pointer<HExpression>( _huginn );
+	reset_expression();
 	return;
 	M_EPILOG
 }
@@ -884,7 +857,7 @@ void HHuginn::OCompiler::add_if_statement( void ) {
 	_compilationStack.top()._contextsChain.clear();
 	_compilationStack.top()._else.reset();
 	current_scope()->add_statement( ifStatement );
-	current_expression() = make_pointer<HExpression>( _huginn );
+	reset_expression();
 	return;
 	M_EPILOG
 }
@@ -893,50 +866,145 @@ void HHuginn::OCompiler::commit_expression( void ) {
 	M_PROLOG
 	M_ASSERT( ! _compilationStack.is_empty() );
 	current_scope()->add_statement( current_expression() );
-	current_expression() = make_pointer<HExpression>( _huginn );
+	reset_expression();
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::defer_oper( char operator_ ) {
 	M_PROLOG
-	HHuginn::HExpression::OPERATOR o( HHuginn::HExpression::OPERATOR::NONE );
+	HHuginn::OPERATOR o( HHuginn::OPERATOR::NONE );
 	switch ( operator_ ) {
-		case ( '+' ): o = HHuginn::HExpression::OPERATOR::PLUS;        break;
-		case ( '-' ): o = HHuginn::HExpression::OPERATOR::MINUS;       break;
-		case ( '*' ): o = HHuginn::HExpression::OPERATOR::MULTIPLY;    break;
-		case ( '/' ): o = HHuginn::HExpression::OPERATOR::DIVIDE;      break;
-		case ( '%' ): o = HHuginn::HExpression::OPERATOR::MODULO;      break;
-		case ( '^' ): o = HHuginn::HExpression::OPERATOR::POWER;       break;
-		case ( '(' ): o = HHuginn::HExpression::OPERATOR::PARENTHESIS; break;
-		case ( '|' ): o = HHuginn::HExpression::OPERATOR::ABSOLUTE;    break;
-		case ( '=' ): o = HHuginn::HExpression::OPERATOR::ASSIGN;      break;
-		case ( '[' ): o = HHuginn::HExpression::OPERATOR::SUBSCRIPT;   break;
-		case ( '<' ): o = HHuginn::HExpression::OPERATOR::LESS;        break;
-		case ( '>' ): o = HHuginn::HExpression::OPERATOR::GREATER;     break;
-		case ( '!' ): o = HHuginn::HExpression::OPERATOR::BOOLEAN_NOT; break;
+		case ( '+' ): o = HHuginn::OPERATOR::PLUS;        break;
+		case ( '-' ): o = HHuginn::OPERATOR::MINUS;       break;
+		case ( '*' ): o = HHuginn::OPERATOR::MULTIPLY;    break;
+		case ( '/' ): o = HHuginn::OPERATOR::DIVIDE;      break;
+		case ( '%' ): o = HHuginn::OPERATOR::MODULO;      break;
+		case ( '^' ): o = HHuginn::OPERATOR::POWER;       break;
+		case ( '(' ): o = HHuginn::OPERATOR::PARENTHESIS; break;
+		case ( '|' ): o = HHuginn::OPERATOR::ABSOLUTE;    break;
+		case ( '=' ): o = HHuginn::OPERATOR::ASSIGN;      break;
+		case ( '[' ): o = HHuginn::OPERATOR::SUBSCRIPT;   break;
+		case ( '!' ): o = HHuginn::OPERATOR::BOOLEAN_NOT; break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
 		}
 	}
 	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), o, _1 ) );
+	_operations.push( o );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::defer_str_oper( yaal::hcore::HString const& operator_ ) {
 	M_PROLOG
-	typedef yaal::hcore::HHashMap<yaal::hcore::HString, HHuginn::HExpression::OPERATOR> operator_lookup_t;
+	typedef yaal::hcore::HHashMap<yaal::hcore::HString, HHuginn::OPERATOR> operator_lookup_t;
 	static operator_lookup_t const operatorLookup( {
-		{ "==", HHuginn::HExpression::OPERATOR::EQUALS },
-		{ "!=", HHuginn::HExpression::OPERATOR::NOT_EQUALS },
-		{ "<=", HHuginn::HExpression::OPERATOR::LESS_OR_EQUAL },
-		{ ">=", HHuginn::HExpression::OPERATOR::GREATER_OR_EQUAL },
-		{ "&&", HHuginn::HExpression::OPERATOR::BOOLEAN_AND },
-		{ "||", HHuginn::HExpression::OPERATOR::BOOLEAN_OR },
-		{ "^^", HHuginn::HExpression::OPERATOR::BOOLEAN_XOR }
+		{ "==", HHuginn::OPERATOR::EQUALS },
+		{ "!=", HHuginn::OPERATOR::NOT_EQUALS },
+		{ "<=", HHuginn::OPERATOR::LESS_OR_EQUAL },
+		{ ">=", HHuginn::OPERATOR::GREATER_OR_EQUAL },
+		{ "&&", HHuginn::OPERATOR::BOOLEAN_AND },
+		{ "||", HHuginn::OPERATOR::BOOLEAN_OR },
+		{ "^^", HHuginn::OPERATOR::BOOLEAN_XOR },
+		{ "<", HHuginn::OPERATOR::LESS },
+		{ ">", HHuginn::OPERATOR::GREATER }
 	} );
-	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), operatorLookup.at( operator_ ), _1 ) );
+	OPERATOR o( operatorLookup.at( operator_ ) );
+	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), o, _1 ) );
+	_operations.push( o );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::defer_oper_direct( OPERATOR operator_ ) {
+	M_PROLOG
+	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), operator_, _1 ) );
+	_operations.push( operator_ );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::dispatch_action( OPERATOR oper_ ) {
+	M_PROLOG
+	OPERATOR o( ! _operations.is_empty() ? _operations.top() : OPERATOR::NONE );
+	switch ( oper_ ) {
+		case ( OPERATOR::PLUS ): {
+			M_ASSERT( ( o == OPERATOR::PLUS ) || ( o == OPERATOR::MINUS ) );
+			defer_action( o == OPERATOR::PLUS ? &HExpression::plus : &HExpression::minus );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::MULTIPLY ): {
+			M_ASSERT( ( o == OPERATOR::MULTIPLY ) || ( o == OPERATOR::DIVIDE ) || ( o == OPERATOR::MODULO ) );
+			defer_action( o == OPERATOR::MULTIPLY ? &HExpression::mul : ( o == OPERATOR::DIVIDE ? &HExpression::div : &HExpression::mod ) );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::POWER ): {
+			defer_action( &HExpression::power );
+			while ( ! _operations.is_empty() && ( _operations.top() == OPERATOR::POWER ) ) {
+				_operations.pop();
+			}
+		} break;
+		case ( OPERATOR::NEGATE ): {
+			defer_action( &HExpression::negate );
+		} break;
+		case ( OPERATOR::SUBSCRIPT ): {
+			M_ASSERT( o == OPERATOR::SUBSCRIPT );
+			defer_action( &HExpression::subscript );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::ASSIGN ): {
+			defer_action( &HExpression::set_variable );
+			while ( ! _operations.is_empty() && ( _operations.top() == OPERATOR::ASSIGN ) ) {
+				_operations.pop();
+			}
+		} break;
+		case ( OPERATOR::FUNCTION_CALL ): {
+			defer_action( &HExpression::function_call_exec );
+			while ( ! _operations.is_empty() && ( _operations.top() == OPERATOR::FUNCTION_ARGUMENT ) ) {
+				_operations.pop();
+			}
+			M_ASSERT( ! _operations.is_empty() && ( _operations.top() == OPERATOR::FUNCTION_CALL ) );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::PARENTHESIS ):
+		case ( OPERATOR::ABSOLUTE ): {
+			M_ASSERT( ( o == OPERATOR::ABSOLUTE ) || ( o == OPERATOR::PARENTHESIS ) );
+			defer_action( &HExpression::close_parenthesis );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::EQUALS ): {
+			M_ASSERT( ( o == OPERATOR::EQUALS ) || ( o == OPERATOR::NOT_EQUALS ) );
+			defer_action( o == OPERATOR::EQUALS ? &HExpression::equals : &HExpression::not_equals );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::LESS ): {
+			M_ASSERT( ( o == OPERATOR::LESS ) || ( o == OPERATOR::GREATER ) || ( o == OPERATOR::LESS_OR_EQUAL ) || ( o == OPERATOR::GREATER_OR_EQUAL ) );
+			switch ( o ) {
+				case ( OPERATOR::LESS ):             { defer_action( &HExpression::less );             } break;
+				case ( OPERATOR::GREATER ):          { defer_action( &HExpression::greater );          } break;
+				case ( OPERATOR::LESS_OR_EQUAL ):    { defer_action( &HExpression::less_or_equal );    } break;
+				case ( OPERATOR::GREATER_OR_EQUAL ): { defer_action( &HExpression::greater_or_equal ); } break;
+				default: {
+					M_ASSERT( ! "bad code path"[0] );
+				}
+			}
+			_operations.pop();
+		} break;
+		case ( OPERATOR::BOOLEAN_AND ): {
+			M_ASSERT( ( o == OPERATOR::BOOLEAN_AND ) || ( o == OPERATOR::BOOLEAN_OR ) || ( o == OPERATOR::BOOLEAN_XOR ) );
+			defer_action( o == OPERATOR::BOOLEAN_AND ? &HExpression::boolean_and : ( o == OPERATOR::BOOLEAN_OR ? &HExpression::boolean_or : &HExpression::boolean_xor ) );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::BOOLEAN_NOT ): {
+			M_ASSERT( o == OPERATOR::BOOLEAN_NOT );
+			defer_action( &HExpression::boolean_not );
+			_operations.pop();
+		} break;
+		default: {
+			M_ASSERT( ! "bad code path"[0] );
+		}
+	}
 	return;
 	M_EPILOG
 }
@@ -951,6 +1019,7 @@ void HHuginn::OCompiler::defer_action( expression_action_t const& expressionActi
 void HHuginn::OCompiler::defer_function_call( yaal::hcore::HString const& value_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::function_call, current_expression().raw(), value_, _1 ) );
+	_operations.push( OPERATOR::FUNCTION_CALL );
 	return;
 	M_EPILOG
 }
@@ -1365,7 +1434,7 @@ HHuginn::value_t HHuginn::HFrame::make_variable( yaal::hcore::HString const& nam
 	M_EPILOG
 }
 
-HHuginn::HFrame::operations_t& HHuginn::HFrame::operations( void ) {
+HHuginn::operations_t& HHuginn::HFrame::operations( void ) {
 	return ( _operations );
 }
 
@@ -2088,13 +2157,6 @@ void HHuginn::HExpression::set_variable( HFrame* frame_ ) {
 	M_EPILOG
 }
 
-void HHuginn::HExpression::add_arg( HFrame* frame_ ) {
-	M_PROLOG
-	frame_->operations().push( OPERATOR::FUNCTION_ARGUMENT );
-	return;
-	M_EPILOG
-}
-
 void HHuginn::HExpression::function_call_exec( HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( !frame_->operations().is_empty() );
@@ -2118,40 +2180,72 @@ void HHuginn::HExpression::function_call_exec( HFrame* frame_ ) {
 	M_EPILOG
 }
 
-void HHuginn::HExpression::plus_minus( HFrame* frame_ ) {
+void HHuginn::HExpression::plus( HFrame* frame_ ) {
 	M_PROLOG
-	M_ASSERT( !frame_->operations().is_empty() );
-	OPERATOR op( frame_->operations().top() );
+	M_ASSERT( ! frame_->operations().is_empty() );
+	M_ASSERT( frame_->operations().top() == OPERATOR::PLUS );
 	frame_->operations().pop();
-	M_ASSERT( ( op == OPERATOR::PLUS ) || ( op == OPERATOR::MINUS ) );
 	value_t v2( frame_->values().top() );
 	frame_->values().pop();
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	frame_->values().push( op == OPERATOR::PLUS ? HHuginn::HValue::add( v1, v2 ) : HHuginn::HValue::sub( v1, v2 ) );
+	frame_->values().push( HHuginn::HValue::add( v1, v2 ) );
 	return;
 	M_EPILOG
 }
 
-void HHuginn::HExpression::mul_div_mod( HFrame* frame_ ) {
+void HHuginn::HExpression::minus( HFrame* frame_ ) {
 	M_PROLOG
-	M_ASSERT( !frame_->operations().is_empty() );
-	OPERATOR op( frame_->operations().top() );
+	M_ASSERT( ! frame_->operations().is_empty() );
+	M_ASSERT( frame_->operations().top() == OPERATOR::MINUS );
 	frame_->operations().pop();
-	M_ASSERT( ( op == OPERATOR::MULTIPLY ) || ( op == OPERATOR::DIVIDE ) || ( op == OPERATOR::MODULO ) );
 	value_t v2( frame_->values().top() );
 	frame_->values().pop();
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	frame_->values().push(
-		op == OPERATOR::MULTIPLY
-		? HHuginn::HValue::mul( v1, v2 )
-		: (
-			op == OPERATOR::DIVIDE
-			? HHuginn::HValue::div( v1, v2 )
-			: HHuginn::HValue::mod( v1, v2 )
-		)
-	);
+	frame_->values().push( HHuginn::HValue::sub( v1, v2 ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::mul( HFrame* frame_ ) {
+	M_PROLOG
+	M_ASSERT( ! frame_->operations().is_empty() );
+	M_ASSERT( frame_->operations().top() == OPERATOR::MULTIPLY );
+	frame_->operations().pop();
+	value_t v2( frame_->values().top() );
+	frame_->values().pop();
+	value_t v1( frame_->values().top() );
+	frame_->values().pop();
+	frame_->values().push( HHuginn::HValue::mul( v1, v2 ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::div( HFrame* frame_ ) {
+	M_PROLOG
+	M_ASSERT( ! frame_->operations().is_empty() );
+	M_ASSERT( frame_->operations().top() == OPERATOR::DIVIDE );
+	frame_->operations().pop();
+	value_t v2( frame_->values().top() );
+	frame_->values().pop();
+	value_t v1( frame_->values().top() );
+	frame_->values().pop();
+	frame_->values().push( HHuginn::HValue::div( v1, v2 ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::mod( HFrame* frame_ ) {
+	M_PROLOG
+	M_ASSERT( ! frame_->operations().is_empty() );
+	M_ASSERT( frame_->operations().top() == OPERATOR::MODULO );
+	frame_->operations().pop();
+	value_t v2( frame_->values().top() );
+	frame_->values().pop();
+	value_t v1( frame_->values().top() );
+	frame_->values().pop();
+	frame_->values().push( HHuginn::HValue::mod( v1, v2 ) );
 	return;
 	M_EPILOG
 }

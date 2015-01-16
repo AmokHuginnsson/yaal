@@ -87,6 +87,33 @@ public:
 	class HThread;
 	typedef yaal::hcore::HPointer<HThread> thread_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
+	enum class OPERATOR {
+		PLUS,
+		MINUS,
+		MULTIPLY,
+		DIVIDE,
+		MODULO,
+		POWER,
+		ABSOLUTE,
+		PARENTHESIS,
+		ASSIGN,
+		SUBSCRIPT,
+		NEGATE,
+		FUNCTION_CALL,
+		FUNCTION_ARGUMENT,
+		EQUALS,
+		NOT_EQUALS,
+		LESS,
+		GREATER,
+		LESS_OR_EQUAL,
+		GREATER_OR_EQUAL,
+		BOOLEAN_AND,
+		BOOLEAN_OR,
+		BOOLEAN_XOR,
+		BOOLEAN_NOT,
+		NONE
+	};
+	typedef yaal::hcore::HStack<OPERATOR> operations_t;
 private:
 	class HSource {
 		typedef HSource this_type;
@@ -130,11 +157,13 @@ private:
 		yaal::hcore::HString _functionName;
 		parameter_names_t _parameters;
 		compilation_stack_t _compilationStack;
+		operations_t _operations;
 		OCompiler( HHuginn* );
 		void set_function_name( yaal::hcore::HString const& );
 		void add_paramater( yaal::hcore::HString const& );
 		scope_t& current_scope( void );
 		expression_t& current_expression( void );
+		void reset_expression( void );
 		void create_scope( void );
 		void commit_scope( void );
 		void commit_if_clause( void );
@@ -148,6 +177,8 @@ private:
 		void defer_make_variable( yaal::hcore::HString const& );
 		void defer_oper( char );
 		void defer_str_oper( yaal::hcore::HString const& );
+		void defer_oper_direct( OPERATOR );
+		void dispatch_action( OPERATOR );
 		void defer_action( expression_action_t const& );
 		void defer_store_real( double long );
 		void defer_store_integer( int long long );
@@ -314,32 +345,6 @@ class HHuginn::HExpression : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HExpression this_type;
 	typedef HHuginn::HStatement base_type;
-	enum class OPERATOR {
-		PLUS,
-		MINUS,
-		MULTIPLY,
-		DIVIDE,
-		MODULO,
-		POWER,
-		ABSOLUTE,
-		PARENTHESIS,
-		ASSIGN,
-		SUBSCRIPT,
-		NEGATE,
-		FUNCTION_CALL,
-		FUNCTION_ARGUMENT,
-		EQUALS,
-		NOT_EQUALS,
-		LESS,
-		GREATER,
-		LESS_OR_EQUAL,
-		GREATER_OR_EQUAL,
-		BOOLEAN_AND,
-		BOOLEAN_OR,
-		BOOLEAN_XOR,
-		BOOLEAN_NOT,
-		NONE
-	};
 private:
 	typedef yaal::hcore::HBoundCall<void ( HFrame* )> execution_step_t;
 	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
@@ -350,9 +355,11 @@ public:
 	void add_execution_step( execution_step_t const& );
 	void oper( OPERATOR, HFrame* );
 	void close_parenthesis( HFrame* );
-	void plus_minus( HFrame* );
-	void mul_div_mod( HFrame* );
-	void add_arg( HFrame* );
+	void plus( HFrame* );
+	void minus( HFrame* );
+	void mul( HFrame* );
+	void div( HFrame* );
+	void mod( HFrame* );
 	void negate( HFrame* );
 	void function_call( yaal::hcore::HString const&, HFrame* );
 	void function_call_exec( HFrame* );
@@ -389,7 +396,6 @@ class HHuginn::HFrame {
 public:
 	typedef HHuginn::HFrame this_type;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::value_t> variables_t;
-	typedef yaal::hcore::HStack<HExpression::OPERATOR> operations_t;
 	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
 	enum class STATE {
 		NORMAL,
