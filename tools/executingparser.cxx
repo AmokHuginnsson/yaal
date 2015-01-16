@@ -253,11 +253,15 @@ void HExecutingParser::add_execution_step( yaal::hcore::HString::const_iterator 
 
 void HExecutingParser::drop_execution_steps( yaal::hcore::HString::const_iterator it_ ) {
 	M_PROLOG
-	execution_steps_t::iterator it( begin( _excutors ) );
 	execution_steps_t::iterator e( end( _excutors ) );
-	while ( ( it != e ) && ( it->first != it_ ) ) {
-		++ it;
-	}
+	execution_steps_t::iterator it(
+		lower_bound(
+			begin( _excutors ), e, it_,
+			[]( execution_step_t const& s_, yaal::hcore::HString::const_iterator i ) {
+				return ( s_.first < i );
+			}
+		)
+	);
 	_excutors.erase( it, e );
 	return;
 	M_EPILOG
