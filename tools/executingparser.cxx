@@ -3286,6 +3286,7 @@ hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingPar
 	if ( first_ != last_ ) {
 		for ( yaal::hcore::HString const& s : _dictionary ) {
 			matched = true;
+			scan = start;
 			for ( hcore::HString::const_iterator it( s.begin() ), end( s.end() ); it != end; ++ it, ++ scan ) {
 				if ( ( scan == last_ ) || ( *scan != *it ) ) {
 					matched = false;
