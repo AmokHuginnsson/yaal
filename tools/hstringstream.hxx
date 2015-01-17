@@ -47,9 +47,11 @@ private:
 public:
 	HStringStream( void );
 	HStringStream( yaal::hcore::HString const& );
-	HStringStream& operator = ( yaal::hcore::HString const& );
 	char const* raw( void ) const;
 	yaal::hcore::HString const& string( void ) const;
+	void set_buffer( yaal::hcore::HString const& );
+	yaal::hcore::HString const& str( void ) const;
+	void str( yaal::hcore::HString const& );
 	void use( void ) const;
 	void clear( void );
 	yaal::hcore::HString const& consume( void ) const;
@@ -59,6 +61,8 @@ private:
 	virtual void do_flush( void );
 	virtual int long do_read( void* const, int long );
 	virtual bool do_is_valid( void ) const;
+	HStringStream( HStringStream const& ) = delete;
+	HStringStream& operator = ( HStringStream const& ) = delete;
 };
 
 yaal::hcore::HString const& operator << ( yaal::hcore::HStreamInterface const&, HStringStream const& );

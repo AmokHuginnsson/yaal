@@ -46,11 +46,20 @@ HStringStream::HStringStream( HString const& init_ )
 	: _used( false ), _offset( 0 ), _buffer( init_ ) {
 }
 
-HStringStream& HStringStream::operator = ( HString const& s ) {
-	_buffer = s;
+void HStringStream::set_buffer( HString const& s_ ) {
+	M_PROLOG
+	_buffer.assign( s_ );
 	_offset = 0;
 	_used = false;
-	return ( *this );
+	return;
+	M_EPILOG
+}
+
+void HStringStream::str( HString const& s_ ) {
+	M_PROLOG
+	set_buffer( s_ );
+	return;
+	M_EPILOG
 }
 
 char const* HStringStream::raw( void ) const {
@@ -59,6 +68,10 @@ char const* HStringStream::raw( void ) const {
 
 yaal::hcore::HString const& HStringStream::string( void ) const {
 	return ( _buffer );
+}
+
+yaal::hcore::HString const& HStringStream::str( void ) const {
+	return ( string() );
 }
 
 int long HStringStream::do_write( void const* const buffer_, int long size_ ) {
@@ -82,8 +95,9 @@ int long HStringStream::do_read( void* const buffer_, int long size_ ) {
 	M_PROLOG
 	int long length( _buffer.get_length() );
 	int long toCopy( yaal::min( length - _offset, size_ ) );
-	if ( length > 0 )
+	if ( length > 0 ) {
 		::strncpy( static_cast<char* const>( buffer_ ), _buffer.raw() + _offset, static_cast<size_t>( toCopy ) );
+	}
 	_offset += toCopy;
 	if ( _offset >= length ) {
 		_offset = 0;
