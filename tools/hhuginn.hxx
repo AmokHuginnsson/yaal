@@ -113,6 +113,20 @@ public:
 		BOOLEAN_NOT,
 		NONE
 	};
+	enum class TYPE {
+		NONE,
+		BOOLEAN,
+		INTEGER,
+		REAL,
+		STRING,
+		NUMBER,
+		CHARACTER,
+		LIST,
+		MAP,
+		REFERENCE,
+		UNKNOWN,
+		NOT_BOOLEAN
+	};
 	typedef yaal::hcore::HStack<OPERATOR> operations_t;
 private:
 	class HSource {
@@ -153,11 +167,13 @@ private:
 			OCompilationFrame( HHuginn* );
 		};
 		typedef yaal::hcore::HStack<OCompilationFrame> compilation_stack_t;
+		typedef yaal::hcore::HStack<TYPE> type_stack_t;
 		HHuginn* _huginn;
 		yaal::hcore::HString _functionName;
 		parameter_names_t _parameters;
 		compilation_stack_t _compilationStack;
 		operations_t _operations;
+		type_stack_t _valueTypes;
 		OCompiler( HHuginn* );
 		void set_function_name( yaal::hcore::HString const& );
 		void add_paramater( yaal::hcore::HString const& );
@@ -185,6 +201,7 @@ private:
 		void defer_store_string( yaal::hcore::HString const& );
 		void defer_store_character( char );
 		void defer_store_boolean( bool );
+		void defer_store_none( void );
 	private:
 		OCompiler( OCompiler const& ) = delete;
 		OCompiler& operator = ( OCompiler const& ) = delete;
@@ -279,18 +296,6 @@ class HHuginn::HValue : public HHuginn::HObject {
 public:
 	typedef HHuginn::HValue this_type;
 	typedef HHuginn::HObject base_type;
-	enum class TYPE {
-		NONE,
-		BOOLEAN,
-		INTEGER,
-		REAL,
-		STRING,
-		NUMBER,
-		CHARACTER,
-		LIST,
-		MAP,
-		REFERENCE
-	};
 	typedef yaal::hcore::HBoundCall<void ( HValue* )> method_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, method_t> methods_t;
 private:

@@ -146,7 +146,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule subscript( "subscript" );
 	HRule stringLiteral( "stringLiteral", string_literal[e_p::HStringLiteral::action_string_t( hcore::call( &HHuginn::OCompiler::defer_store_string, &_compiler, _1 ) )] );
-	HRule literalNone( "none", constant( "none", e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::store_none ) ) ) );
+	HRule literalNone( "none", constant( "none", e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_store_none, &_compiler ) ) ) );
 	HRule booleanLiteralTrue( "true", constant( "true", e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_store_boolean, &_compiler, true ) ) ) );
 	HRule booleanLiteralFalse( "false", constant( "false", e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_store_boolean, &_compiler, false ) ) ) );
 	HRule atom( "atom",
@@ -163,12 +163,19 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule negation(
 		"negation",
-		( '-' >> atom )[e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::NEGATE ) )]
-		| atom
+		( constant( '-' )[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_oper_direct, &_compiler, OPERATOR::NEGATE ) )] >> atom )[
+			e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::NEGATE ) )
+		] | atom
+	);
+	HRule booleanNot(
+		"booleanNot",
+		( constant( '!' )[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::defer_oper_direct, &_compiler, OPERATOR::BOOLEAN_NOT ) )] >> negation )[
+			e_p::HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::BOOLEAN_NOT ) )
+		] | negation
 	);
 	HRule power(
 		"power",
-		negation >> ( * ( constant( '^', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> negation ) ),
+		booleanNot >> ( * ( constant( '^', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> booleanNot ) ),
 		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::POWER ) )
 	);
 	HRule multiplication(
@@ -195,7 +202,56 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			)
 		)
 	);
-	HRule value( "value", sum );
+	HRule compare(
+		"compare",
+		sum >> -(
+			/* compare action */ (
+				/* comparator operator */ (
+					constant( "<=" ) | ">=" | "<" | ">"
+				)[e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) )]
+				>> sum
+			)[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::LESS ) )]
+		)
+	);
+	HRule equality(
+		"equality",
+		compare >> -(
+			/* compare action */ (
+				/* comparator operator */ (
+					constant( "==" ) | "!="
+				)[e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) )]
+				>> compare
+			)[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::EQUALS ) )]
+		)
+	);
+	HRule booleanAnd(
+		"booleanAnd",
+		equality >> -(
+			/* compare action */ (
+				constant( "&&" )[e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) )]
+				>> equality
+			)[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::BOOLEAN_AND ) )]
+		)
+	);
+	HRule booleanOr(
+		"booleanOr",
+		booleanAnd >> -(
+			/* compare action */ (
+				constant( "||" )[e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) )]
+				>> booleanAnd
+			)[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::BOOLEAN_OR ) )]
+		)
+	);
+	HRule booleanXor(
+		"booleanXor",
+		booleanOr >> -(
+			/* compare action */ (
+				constant( "^^" )[e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) )]
+				>> booleanOr
+			)[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::BOOLEAN_XOR ) )]
+		)
+	);
+	HRule value( "value", booleanXor );
 	subscript %= (
 		/* subscript base */ ( functionCall | variableGetter | stringLiteral ) >>
 		/* repeat at least once */ + (
@@ -220,87 +276,16 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 					e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_make_variable, &_compiler, _1 ) )
 				)
 			) >>
-			constant( '=' )[e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )]
+			constant( '=' )[e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )] ^ '='
 		) >> value,
 		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::ASSIGN ) )
 	);
 	expression %= assignment;
-	/*
-	 * booleanExpression must match all the following and only the following:
-	 * true
-	 * false
-	 * boolean( expr )
-	 * expr1 == expr2
-	 * ( expr1 == expr2 ) && ( expr3 == expr4 )
-	 * boolean( expr1 ) && ( expr2 == expr3 )
-	 *
-	 * if ( true )
-	 * if ( x == 1 )
-	 * if ( x[0] == 1 )
-	 * if ( x[0] == x[1] )
-	 * if ( ( x[0] == x[1] ) == ( q < s ) )
-	 * if ( ( ( z = x[0] ) == ( n = x[1] ) ) == ( ( f = e[2] ) < ( o = k[3] ) ) )
-	 * if ( ( ( z = ( x[0] > 0 ) ) == ( n = ( x[1] != 9 ) ) ) == ( ( f = e[2] ) < ( o = k[3] ) ) )
-	 */
-	HRule booleanExpression( "booleanExpression" );
-	HRule anyExpression( "anyExpression", ( '(' >> booleanExpression >> ')' ) | ( '(' >> expression >> ')' ) | value );
-	HRule testEqualsNotEquals(
-		"testEqualsNotEquals",
-		anyExpression >> ( constant( "==" ) | "!=" )[e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) )] >> anyExpression,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::EQUALS ) )
-	);
-	HRule testCompare(
-		"testCompare",
-		expression >> ( constant( "<=" ) | ">=" | "<" | ">" )[e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) )] >> expression,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::LESS ) )
-	);
-	HRule booleanTest( "booleanTest",
-		testEqualsNotEquals
-		| testCompare
-	);
-	HRule booleanAtom( "booleanAtom",
-		booleanLiteralTrue
-		| booleanLiteralFalse
-		| ( '(' >> booleanTest >> ')' )
-		| ( constant( "boolean" ) >> '(' >> expression >> ')' )
-	);
-	HRule booleanAndOrXor(
-		"booleanAndOrXor",
-		booleanAtom >> ( constant( "&&" ) | "||" | "^^" )[e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1 ) )] >> booleanAtom,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::BOOLEAN_AND ) )
-	);
-	HRule booleanNot(
-		"booleanNot",
-		constant( '!', e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) ) ) >> booleanAtom,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::BOOLEAN_NOT ) )
-	);
-	HRule booleanValue( "booleanValue",
-		booleanAndOrXor
-		| booleanNot
-		| booleanTest
-		| booleanAtom
-	);
-	HRule booleanAssignment(
-		"booleanAssignment",
-		* (
-			/* make reference */ (
-				subscript
-				| regex(
-					"variableSetter",
-					identifier,
-					e_p::HString::action_string_t( hcore::call( &HHuginn::OCompiler::defer_make_variable, &_compiler, _1 ) )
-				)
-			) >>
-			constant( '=' )[e_p::HCharacter::action_character_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1 ) )]
-		) >> booleanValue,
-		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::ASSIGN ) )
-	);
-	booleanExpression %= ( booleanValue | ( '(' >> booleanAssignment >> ')' ) );
 	HRule expressionStatement( "expressionStatement", expression[HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler ) )] >> ';' );
 	HRule scope( "scope" );
 	HRule ifClause(
 		"ifClause",
-		e_p::constant( "if" ) >> '(' >> booleanExpression >> ')' >> scope,
+		e_p::constant( "if" ) >> '(' >> expression >> ')' >> scope,
 		HRuleBase::action_t( hcore::call( &HHuginn::OCompiler::commit_if_clause, &_compiler ) )
 	);
 	HRule ifStatement(
@@ -318,7 +303,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	 * break ( 2 ); // <--- break two levels of nested scopes.
 	 */
 	HRule breakStatement( "breakStatement", constant( "break" ) >> ';' );
-	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> booleanExpression >> ')' >> scope );
+	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> expression >> ')' >> scope );
 	HRule variableIdentifier( regex( "variableIdentifier", identifier ) );
 	HRule forStatement( "forStatement", constant( "for" ) >> '(' >> variableIdentifier >> ':' >> expression >> ')' >> scope );
 	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> scope >> -breakStatement );
@@ -753,7 +738,8 @@ HHuginn::OCompiler::OCompiler( HHuginn* huginn_ )
 	_functionName(),
 	_parameters(),
 	_compilationStack(),
-	_operations() {
+	_operations(),
+	_valueTypes() {
 	return;
 }
 
@@ -946,7 +932,9 @@ void HHuginn::OCompiler::dispatch_action( OPERATOR oper_ ) {
 			}
 		} break;
 		case ( OPERATOR::NEGATE ): {
+			M_ASSERT( o == OPERATOR::NEGATE );
 			defer_action( &HExpression::negate );
+			_operations.pop();
 		} break;
 		case ( OPERATOR::SUBSCRIPT ): {
 			M_ASSERT( o == OPERATOR::SUBSCRIPT );
@@ -992,8 +980,18 @@ void HHuginn::OCompiler::dispatch_action( OPERATOR oper_ ) {
 			_operations.pop();
 		} break;
 		case ( OPERATOR::BOOLEAN_AND ): {
-			M_ASSERT( ( o == OPERATOR::BOOLEAN_AND ) || ( o == OPERATOR::BOOLEAN_OR ) || ( o == OPERATOR::BOOLEAN_XOR ) );
-			defer_action( o == OPERATOR::BOOLEAN_AND ? &HExpression::boolean_and : ( o == OPERATOR::BOOLEAN_OR ? &HExpression::boolean_or : &HExpression::boolean_xor ) );
+			M_ASSERT( o == OPERATOR::BOOLEAN_AND );
+			defer_action( &HExpression::boolean_and );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::BOOLEAN_OR ): {
+			M_ASSERT( o == OPERATOR::BOOLEAN_OR );
+			defer_action( &HExpression::boolean_or );
+			_operations.pop();
+		} break;
+		case ( OPERATOR::BOOLEAN_XOR ): {
+			M_ASSERT( o == OPERATOR::BOOLEAN_XOR );
+			defer_action( &HExpression::boolean_xor );
 			_operations.pop();
 		} break;
 		case ( OPERATOR::BOOLEAN_NOT ): {
@@ -1041,6 +1039,7 @@ void HHuginn::OCompiler::defer_make_variable( yaal::hcore::HString const& value_
 void HHuginn::OCompiler::defer_store_real( double long value_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_real, current_expression().raw(), value_, _1 ) );
+	_valueTypes.push( TYPE::REAL );
 	return;
 	M_EPILOG
 }
@@ -1048,6 +1047,7 @@ void HHuginn::OCompiler::defer_store_real( double long value_ ) {
 void HHuginn::OCompiler::defer_store_integer( int long long value_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_integer, current_expression().raw(), value_, _1 ) );
+	_valueTypes.push( TYPE::INTEGER );
 	return;
 	M_EPILOG
 }
@@ -1055,6 +1055,7 @@ void HHuginn::OCompiler::defer_store_integer( int long long value_ ) {
 void HHuginn::OCompiler::defer_store_string( yaal::hcore::HString const& value_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_string, current_expression().raw(), value_, _1 ) );
+	_valueTypes.push( TYPE::STRING );
 	return;
 	M_EPILOG
 }
@@ -1062,6 +1063,7 @@ void HHuginn::OCompiler::defer_store_string( yaal::hcore::HString const& value_ 
 void HHuginn::OCompiler::defer_store_character( char value_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_character, current_expression().raw(), value_, _1 ) );
+	_valueTypes.push( TYPE::CHARACTER );
 	return;
 	M_EPILOG
 }
@@ -1069,6 +1071,15 @@ void HHuginn::OCompiler::defer_store_character( char value_ ) {
 void HHuginn::OCompiler::defer_store_boolean( bool value_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_boolean, current_expression().raw(), value_, _1 ) );
+	_valueTypes.push( TYPE::BOOLEAN );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::defer_store_none( void ) {
+	M_PROLOG
+	current_expression()->add_execution_step( hcore::call( &HExpression::store_none, current_expression().raw(), _1 ) );
+	_valueTypes.push( TYPE::NONE );
 	return;
 	M_EPILOG
 }
@@ -1452,7 +1463,7 @@ HHuginn::HValue::HValue( TYPE type_ )
 	return;
 }
 
-HHuginn::HValue::TYPE HHuginn::HValue::type( void ) const {
+HHuginn::TYPE HHuginn::HValue::type( void ) const {
 	return ( _type );
 }
 
@@ -1466,7 +1477,10 @@ yaal::hcore::HString const& HHuginn::HValue::type_name( TYPE type_ ) {
 		"number",
 		"character",
 		"list",
-		"map"
+		"map",
+		"reference",
+		"unknown",
+		"not-boolean"
 	};
 	return ( names[static_cast<int>( type_ )] );
 }
@@ -2146,8 +2160,8 @@ void HHuginn::HExpression::set_variable( HFrame* frame_ ) {
 		frame_->values().pop();
 		value_t ref( frame_->values().top() );
 		frame_->values().pop();
-		if ( ref->type() != HValue::TYPE::REFERENCE ) {
-			M_ASSERT( ref->type() == HValue::TYPE::CHARACTER );
+		if ( ref->type() != TYPE::REFERENCE ) {
+			M_ASSERT( ref->type() == TYPE::CHARACTER );
 			throw HHuginnException( "String does not support item assignment." );
 		}
 		static_cast<HReference*>( ref.raw() )->value() = value;
@@ -2170,7 +2184,7 @@ void HHuginn::HExpression::function_call_exec( HFrame* frame_ ) {
 		M_ASSERT( !frame_->values().is_empty() );
 	}
 	M_ASSERT( frame_->operations().top() == OPERATOR::FUNCTION_CALL );
-	M_ASSERT( frame_->values().top()->type() == HHuginn::HValue::TYPE::STRING );
+	M_ASSERT( frame_->values().top()->type() == HHuginn::TYPE::STRING );
 	hcore::HString name( yaal::move( static_cast<HString*>( frame_->values().top().raw() )->value() ) );
 	frame_->operations().pop();
 	frame_->values().pop();
@@ -2252,6 +2266,9 @@ void HHuginn::HExpression::mod( HFrame* frame_ ) {
 
 void HHuginn::HExpression::negate( HFrame* frame_ ) {
 	M_PROLOG
+	M_ASSERT( ! frame_->operations().is_empty() );
+	M_ASSERT( frame_->operations().top() == OPERATOR::NEGATE );
+	frame_->operations().pop();
 	M_ASSERT( ! frame_->values().is_empty() );
 	value_t v( frame_->values().top() );
 	frame_->values().pop();
@@ -2291,7 +2308,7 @@ void HHuginn::HExpression::subscript( HFrame* frame_ ) {
 void HHuginn::HExpression::dereference( HFrame* frame_ ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->values().is_empty() );
-	if ( frame_->values().top()->type() == HHuginn::HValue::TYPE::REFERENCE ) {
+	if ( frame_->values().top()->type() == HHuginn::TYPE::REFERENCE ) {
 		value_t v( frame_->values().top() );
 		frame_->values().pop();
 		frame_->values().push( static_cast<HHuginn::HReference*>( v.raw() )->value() );
@@ -2555,7 +2572,7 @@ void HHuginn::HIf::do_execute( HHuginn::HThread* thread_ ) const {
 		it->_expression->execute( thread_ );
 		if ( thread_->can_continue() ) {
 			value_t v( f->result() );
-			M_ASSERT( v->type() == HValue::TYPE::BOOLEAN );
+			M_ASSERT( v->type() == TYPE::BOOLEAN );
 			if ( static_cast<HBoolean*>( v.raw() )->value() ) {
 				done = true;
 				it->_scope->execute( thread_ );
@@ -2587,7 +2604,7 @@ void HHuginn::HWhile::do_execute( HHuginn::HThread* thread_ ) const {
 		_condition->execute( thread_ );
 		if ( thread_->can_continue() ) {
 			value_t v( f->result() );
-			M_ASSERT( v->type() == HValue::TYPE::BOOLEAN );
+			M_ASSERT( v->type() == TYPE::BOOLEAN );
 			if ( static_cast<HBoolean*>( v.raw() )->value() ) {
 				_loop->execute( thread_ );
 			} else {
@@ -2656,9 +2673,9 @@ public:
 	typedef HConversion this_type;
 	typedef HHuginn::HFunctionInterface base_type;
 private:
-	HHuginn::HValue::TYPE _toType;
+	HHuginn::TYPE _toType;
 public:
-	HConversion( HHuginn::HValue::TYPE toType_ )
+	HConversion( HHuginn::TYPE toType_ )
 		: _toType( toType_ ) {
 		return;
 	}
@@ -2674,12 +2691,12 @@ protected:
 		}
 		HHuginn::value_t res;
 		switch ( _toType ) {
-			case ( HHuginn::HValue::TYPE::INTEGER ): res = HHuginn::HValue::integer( values_.front() ); break;
-			case ( HHuginn::HValue::TYPE::REAL ): res = HHuginn::HValue::real( values_.front() ); break;
-			case ( HHuginn::HValue::TYPE::STRING ): res = HHuginn::HValue::string( values_.front() ); break;
-			case ( HHuginn::HValue::TYPE::NUMBER ): res = HHuginn::HValue::number( values_.front() ); break;
-			case ( HHuginn::HValue::TYPE::BOOLEAN ): res = HHuginn::HValue::boolean( values_.front() ); break;
-			case ( HHuginn::HValue::TYPE::CHARACTER ): res = HHuginn::HValue::character( values_.front() ); break;
+			case ( HHuginn::TYPE::INTEGER ): res = HHuginn::HValue::integer( values_.front() ); break;
+			case ( HHuginn::TYPE::REAL ): res = HHuginn::HValue::real( values_.front() ); break;
+			case ( HHuginn::TYPE::STRING ): res = HHuginn::HValue::string( values_.front() ); break;
+			case ( HHuginn::TYPE::NUMBER ): res = HHuginn::HValue::number( values_.front() ); break;
+			case ( HHuginn::TYPE::BOOLEAN ): res = HHuginn::HValue::boolean( values_.front() ); break;
+			case ( HHuginn::TYPE::CHARACTER ): res = HHuginn::HValue::character( values_.front() ); break;
 			default: {
 				throw HHuginnException( "Conversion to `"_ys.append( HHuginn::HValue::type_name( _toType ) ).append( "' is not supported." ) );
 			}
@@ -2705,13 +2722,13 @@ protected:
 		HHuginn::HValue const* v( values_.front().raw() );
 		int long long s( 0 );
 		switch ( v->type() ) {
-			case ( HHuginn::HValue::TYPE::STRING ): {
+			case ( HHuginn::TYPE::STRING ): {
 				s = static_cast<HHuginn::HString const*>( v )->value().get_length();
 			} break;
-			case ( HHuginn::HValue::TYPE::LIST ): {
+			case ( HHuginn::TYPE::LIST ): {
 				s = static_cast<HHuginn::HList const*>( v )->size();
 			} break;
-			case ( HHuginn::HValue::TYPE::MAP ): {
+			case ( HHuginn::TYPE::MAP ): {
 				s = static_cast<HHuginn::HMap const*>( v )->size();
 			} break;
 			default: {
@@ -2757,22 +2774,22 @@ protected:
 		}
 		HHuginn::HValue const* v( values_.front().raw() );
 		switch ( v->type() ) {
-			case ( HHuginn::HValue::TYPE::INTEGER ): {
+			case ( HHuginn::TYPE::INTEGER ): {
 				cout << static_cast<HHuginn::HInteger const*>( v )->value();
 			} break;
-			case ( HHuginn::HValue::TYPE::REAL ): {
+			case ( HHuginn::TYPE::REAL ): {
 				cout << static_cast<HHuginn::HReal const*>( v )->value();
 			} break;
-			case ( HHuginn::HValue::TYPE::STRING ): {
+			case ( HHuginn::TYPE::STRING ): {
 				cout << static_cast<HHuginn::HString const*>( v )->value();
 			} break;
-			case ( HHuginn::HValue::TYPE::NUMBER ): {
+			case ( HHuginn::TYPE::NUMBER ): {
 				cout << static_cast<HHuginn::HNumber const*>( v )->value();
 			} break;
-			case ( HHuginn::HValue::TYPE::BOOLEAN ): {
+			case ( HHuginn::TYPE::BOOLEAN ): {
 				cout << static_cast<HHuginn::HBoolean const*>( v )->value();
 			} break;
-			case ( HHuginn::HValue::TYPE::CHARACTER ): {
+			case ( HHuginn::TYPE::CHARACTER ): {
 				cout << static_cast<HHuginn::HCharacter const*>( v )->value();
 			} break;
 			default: {
@@ -2789,12 +2806,12 @@ protected:
 
 void HHuginn::register_builtins( void ) {
 	M_PROLOG
-	_functions.insert( make_pair<yaal::hcore::HString const>( "integer", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::INTEGER ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "real", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::REAL ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "string", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::STRING ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "number", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::NUMBER ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "boolean", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::BOOLEAN ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "character", make_pointer<huginn_builtin::HConversion>( HValue::TYPE::CHARACTER ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "integer", make_pointer<huginn_builtin::HConversion>( TYPE::INTEGER ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "real", make_pointer<huginn_builtin::HConversion>( TYPE::REAL ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "string", make_pointer<huginn_builtin::HConversion>( TYPE::STRING ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "number", make_pointer<huginn_builtin::HConversion>( TYPE::NUMBER ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "boolean", make_pointer<huginn_builtin::HConversion>( TYPE::BOOLEAN ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "character", make_pointer<huginn_builtin::HConversion>( TYPE::CHARACTER ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "size", make_pointer<huginn_builtin::HSize>() ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "type", make_pointer<huginn_builtin::HType>() ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "print", make_pointer<huginn_builtin::HPrint>() ) );

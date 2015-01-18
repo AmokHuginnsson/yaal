@@ -3842,9 +3842,14 @@ yaal::hcore::HString const& HRuleDescription::make_name_auto( HRuleBase const* r
 	else {
 		static int const MAX_AUTO_NAMES_COUNT = 26;
 		int autoNamesCount( static_cast<int>( _automaticNames.get_size() ) );
-		name = &( _automaticNames[rule_] = ( autoNamesCount < MAX_AUTO_NAMES_COUNT ) ?
-				hcore::HString( static_cast<char>( 'A' + autoNamesCount ) ) + '_'
-				: hcore::HString( "rule" ) + rule_ );
+		if ( autoNamesCount < MAX_AUTO_NAMES_COUNT ) {
+			name = &( _automaticNames[rule_] = hcore::HString( static_cast<char>( 'A' + autoNamesCount ) ) + '_' );
+		} else {
+			autoNamesCount -= MAX_AUTO_NAMES_COUNT;
+			char hi( static_cast<char>( 'A' + ( autoNamesCount / MAX_AUTO_NAMES_COUNT ) ) );
+			char lo( static_cast<char>( 'A' + ( autoNamesCount % MAX_AUTO_NAMES_COUNT ) ) );
+			name = &( _automaticNames[rule_] = hcore::HString( hi ) + lo + '_' );
+		}
 	}
 	return ( *name );
 	M_EPILOG
