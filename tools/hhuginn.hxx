@@ -127,7 +127,16 @@ public:
 		UNKNOWN,
 		NOT_BOOLEAN
 	};
-	typedef yaal::hcore::HStack<OPERATOR> operations_t;
+	struct OPositionedOperator {
+		OPERATOR _operator;
+		int _position;
+		OPositionedOperator( OPERATOR operator_, int position_ )
+			: _operator( operator_ ), _position( position_ ) {
+			return;
+		}
+	};
+	typedef yaal::hcore::HStack<OPositionedOperator> operations_t;
+	class HHuginnRuntimeException;
 private:
 	class HSource {
 		typedef HSource this_type;
@@ -151,7 +160,7 @@ private:
 		void dump_preprocessed( yaal::hcore::HStreamInterface& ) const;
 	};
 	struct OCompiler {
-		typedef void ( HHuginn::HExpression::* expression_action_t ) ( HFrame* );
+		typedef void ( HHuginn::HExpression::* expression_action_t ) ( HFrame*, int );
 		typedef yaal::hcore::HArray<yaal::hcore::HString> parameter_names_t;
 		struct OContext {
 			scope_t _scope;
@@ -175,33 +184,33 @@ private:
 		operations_t _operations;
 		type_stack_t _valueTypes;
 		OCompiler( HHuginn* );
-		void set_function_name( yaal::hcore::HString const& );
-		void add_paramater( yaal::hcore::HString const& );
+		void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
+		void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
 		scope_t& current_scope( void );
 		expression_t& current_expression( void );
 		void reset_expression( void );
-		void create_scope( void );
-		void commit_scope( void );
-		void commit_if_clause( void );
-		void commit_else_clause( void );
-		void add_return_statement( void );
-		void add_while_statement( void );
-		void add_if_statement( void );
-		void commit_expression( void );
-		void defer_function_call( yaal::hcore::HString const& );
-		void defer_get_variable( yaal::hcore::HString const& );
-		void defer_make_variable( yaal::hcore::HString const& );
-		void defer_oper( char );
-		void defer_str_oper( yaal::hcore::HString const& );
-		void defer_oper_direct( OPERATOR );
-		void dispatch_action( OPERATOR );
-		void defer_action( expression_action_t const& );
-		void defer_store_real( double long );
-		void defer_store_integer( int long long );
-		void defer_store_string( yaal::hcore::HString const& );
-		void defer_store_character( char );
-		void defer_store_boolean( bool );
-		void defer_store_none( void );
+		void create_scope( executing_parser::position_t );
+		void commit_scope( executing_parser::position_t );
+		void commit_if_clause( executing_parser::position_t );
+		void commit_else_clause( executing_parser::position_t );
+		void add_return_statement( executing_parser::position_t );
+		void add_while_statement( executing_parser::position_t );
+		void add_if_statement( executing_parser::position_t );
+		void commit_expression( executing_parser::position_t );
+		void defer_function_call( yaal::hcore::HString const&, executing_parser::position_t );
+		void defer_get_variable( yaal::hcore::HString const&, executing_parser::position_t );
+		void defer_make_variable( yaal::hcore::HString const&, executing_parser::position_t );
+		void defer_oper( char, executing_parser::position_t );
+		void defer_str_oper( yaal::hcore::HString const&, executing_parser::position_t );
+		void defer_oper_direct( OPERATOR, executing_parser::position_t );
+		void dispatch_action( OPERATOR, executing_parser::position_t );
+		void defer_action( expression_action_t const&, executing_parser::position_t );
+		void defer_store_real( double long, executing_parser::position_t );
+		void defer_store_integer( int long long, executing_parser::position_t );
+		void defer_store_string( yaal::hcore::HString const&, executing_parser::position_t );
+		void defer_store_character( char, executing_parser::position_t );
+		void defer_store_boolean( bool, executing_parser::position_t );
+		void defer_store_none( executing_parser::position_t );
 	private:
 		OCompiler( OCompiler const& ) = delete;
 		OCompiler& operator = ( OCompiler const& ) = delete;
@@ -224,6 +233,8 @@ private:
 	threads_t _threads;
 	list_t _argv;
 	value_t _result;
+	yaal::hcore::HString _errorMessage;
+	int _errorPosition;
 	typedef std::atomic<bool> flag_t;
 	static flag_t _grammarVerified;
 public:
@@ -243,17 +254,17 @@ public:
 	bool parse( void );
 	/*! \brief Compile parsed program.
 	 */
-	void compile( void );
+	bool compile( void );
 	/*! \brief Execute compiled program.
 	 */
 	void execute( void );
 	/*! \brief Dump Huginn Virtual Machine state.
 	 */
-	value_t call( yaal::hcore::HString const&, values_t const& );
+	value_t call( yaal::hcore::HString const&, values_t const&, int );
 	value_t result( void ) const;
 	void dump_vm_state( yaal::hcore::HStreamInterface& );
 	HFrame* current_frame( void );
-	void create_function( void );
+	void create_function( executing_parser::position_t );
 	void add_argument( yaal::hcore::HString const& );
 	value_t returned_value( void ) const;
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& );
@@ -286,6 +297,18 @@ public:
 	}
 };
 
+class HHuginn::HHuginnRuntimeException {
+public:
+	typedef HHuginn::HHuginnRuntimeException this_type;
+private:
+	yaal::hcore::HString _message;
+	int _position;
+public:
+	HHuginnRuntimeException( yaal::hcore::HString const&, int );
+	yaal::hcore::HString const& message( void ) const;
+	int position( void ) const;
+};
+
 class HHuginn::HObject {
 public:
 	typedef HHuginn::HObject this_type;
@@ -306,30 +329,30 @@ public:
 	HValue( TYPE );
 	TYPE type( void ) const;
 	static yaal::hcore::HString const& type_name( TYPE );
-	static value_t subscript( value_t&, value_t const& );
-	static value_t add( value_t const&, value_t const& );
-	static value_t sub( value_t const&, value_t const& );
-	static value_t mul( value_t const&, value_t const& );
-	static value_t div( value_t const&, value_t const& );
-	static value_t mod( value_t const&, value_t const& );
-	static value_t pow( value_t const&, value_t const& );
-	static value_t abs( value_t const& );
-	static value_t neg( value_t const& );
-	static bool equals( value_t const&, value_t const& );
-	static bool less( value_t const&, value_t const& );
-	static bool greater( value_t const&, value_t const& );
-	static bool less_or_equal( value_t const&, value_t const& );
-	static bool greater_or_equal( value_t const&, value_t const& );
-	static value_t boolean_and( value_t const&, value_t const& );
-	static value_t boolean_or( value_t const&, value_t const& );
-	static value_t boolean_xor( value_t const&, value_t const& );
-	static value_t boolean_not( value_t const& );
-	static value_t string( value_t const& );
-	static value_t integer( value_t const& );
-	static value_t real( value_t const& );
-	static value_t boolean( value_t const& );
-	static value_t character( value_t const& );
-	static value_t number( value_t const& );
+	static value_t subscript( value_t&, value_t const&, int );
+	static value_t add( value_t const&, value_t const&, int );
+	static value_t sub( value_t const&, value_t const&, int );
+	static value_t mul( value_t const&, value_t const&, int );
+	static value_t div( value_t const&, value_t const&, int );
+	static value_t mod( value_t const&, value_t const&, int );
+	static value_t pow( value_t const&, value_t const&, int );
+	static value_t abs( value_t const&, int );
+	static value_t neg( value_t const&, int );
+	static bool equals( value_t const&, value_t const&, int );
+	static bool less( value_t const&, value_t const&, int );
+	static bool greater( value_t const&, value_t const&, int );
+	static bool less_or_equal( value_t const&, value_t const&, int );
+	static bool greater_or_equal( value_t const&, value_t const&, int );
+	static value_t boolean_and( value_t const&, value_t const&, int );
+	static value_t boolean_or( value_t const&, value_t const&, int );
+	static value_t boolean_xor( value_t const&, value_t const&, int );
+	static value_t boolean_not( value_t const&, int );
+	static value_t string( value_t const&, int );
+	static value_t integer( value_t const&, int );
+	static value_t real( value_t const&, int );
+	static value_t boolean( value_t const&, int );
+	static value_t character( value_t const&, int );
+	static value_t number( value_t const&, int );
 };
 
 class HHuginn::HStatement : public HHuginn::HObject {
@@ -358,38 +381,38 @@ private:
 public:
 	HExpression( HHuginn* );
 	void add_execution_step( execution_step_t const& );
-	void oper( OPERATOR, HFrame* );
-	void close_parenthesis( HFrame* );
-	void plus( HFrame* );
-	void minus( HFrame* );
-	void mul( HFrame* );
-	void div( HFrame* );
-	void mod( HFrame* );
-	void negate( HFrame* );
-	void function_call( yaal::hcore::HString const&, HFrame* );
-	void function_call_exec( HFrame* );
-	void get_variable( yaal::hcore::HString const&, HFrame* );
-	void make_variable( yaal::hcore::HString const&, HFrame* );
-	void set_variable( HFrame* );
-	void subscript( HFrame* );
-	void power( HFrame* );
-	void equals( HFrame* );
-	void not_equals( HFrame* );
-	void less( HFrame* );
-	void greater( HFrame* );
-	void less_or_equal( HFrame* );
-	void greater_or_equal( HFrame* );
-	void boolean_and( HFrame* );
-	void boolean_or( HFrame* );
-	void boolean_xor( HFrame* );
-	void boolean_not( HFrame* );
-	void store_real( double long, HFrame* );
-	void store_integer( int long long, HFrame* );
-	void store_string( yaal::hcore::HString const&, HFrame* );
-	void store_character( char, HFrame* );
-	void store_boolean( bool, HFrame* );
-	void store_none( HFrame* );
-	void dereference( HFrame* );
+	void oper( OPERATOR, HFrame*, int );
+	void close_parenthesis( HFrame*, int );
+	void plus( HFrame*, int );
+	void minus( HFrame*, int );
+	void mul( HFrame*, int );
+	void div( HFrame*, int );
+	void mod( HFrame*, int );
+	void negate( HFrame*, int );
+	void function_call( yaal::hcore::HString const&, HFrame*, int );
+	void function_call_exec( HFrame*, int );
+	void get_variable( yaal::hcore::HString const&, HFrame*, int );
+	void make_variable( yaal::hcore::HString const&, HFrame*, int );
+	void set_variable( HFrame*, int );
+	void subscript( HFrame*, int );
+	void power( HFrame*, int );
+	void equals( HFrame*, int );
+	void not_equals( HFrame*, int );
+	void less( HFrame*, int );
+	void greater( HFrame*, int );
+	void less_or_equal( HFrame*, int );
+	void greater_or_equal( HFrame*, int );
+	void boolean_and( HFrame*, int );
+	void boolean_or( HFrame*, int );
+	void boolean_xor( HFrame*, int );
+	void boolean_not( HFrame*, int );
+	void store_real( double long, HFrame*, int );
+	void store_integer( int long long, HFrame*, int );
+	void store_string( yaal::hcore::HString const&, HFrame*, int );
+	void store_character( char, HFrame*, int );
+	void store_boolean( bool, HFrame*, int );
+	void store_none( HFrame*, int );
+	void dereference( HFrame*, int );
 protected:
 	virtual void do_execute( HHuginn::HThread* ) const;
 private:
@@ -420,9 +443,9 @@ private:
 	STATE _state;
 public:
 	HFrame( HFrame*, bool, bool );
-	value_t make_variable( yaal::hcore::HString const& );
-	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const& );
-	value_t& get_variable( yaal::hcore::HString const& );
+	value_t make_variable( yaal::hcore::HString const&, int );
+	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const&, int );
+	value_t& get_variable( yaal::hcore::HString const&, int );
 	bool can_continue( void ) const;
 	void break_execution( STATE );
 	int number( void ) const;
@@ -672,9 +695,9 @@ public:
 	virtual ~HFunctionInterface( void ) {
 		return;
 	}
-	value_t execute( HThread*, values_t const& ) const;
+	value_t execute( HThread*, values_t const&, int ) const;
 protected:
-	virtual value_t do_execute( HThread*, values_t const& ) const = 0;
+	virtual value_t do_execute( HThread*, values_t const&, int ) const = 0;
 };
 
 class HHuginn::HFunction : public HHuginn::HFunctionInterface {
@@ -690,7 +713,7 @@ public:
 	HFunction( yaal::hcore::HString const&, parameter_names_t const&, HHuginn::scope_t const& );
 	HFunction( HFunction&& ) = default;
 protected:
-	virtual value_t do_execute( HThread*, values_t const& ) const;
+	virtual value_t do_execute( HThread*, values_t const&, int ) const;
 };
 
 }
