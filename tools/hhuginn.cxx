@@ -278,9 +278,12 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			)[HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::EQUALS, _1 ) )]
 		)
 	);
+	/*
+	 * ( a == b ) && ( c == d ) || ( e == f ) && ( g == h )
+	 */
 	HRule booleanAnd(
 		"booleanAnd",
-		equality >> -(
+		equality >> *(
 			/* compare action */ (
 				constant( "&&" )[e_p::HString::action_string_position_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1, _2 ) )]
 				>> equality
@@ -289,7 +292,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule booleanOr(
 		"booleanOr",
-		booleanAnd >> -(
+		booleanAnd >> *(
 			/* compare action */ (
 				constant( "||" )[e_p::HString::action_string_position_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1, _2 ) )]
 				>> booleanAnd
