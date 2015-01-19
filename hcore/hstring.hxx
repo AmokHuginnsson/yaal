@@ -663,6 +663,9 @@ public:
 	 * \param character_ - character to be appended.
 	 */
 	void push_back( char character_ );
+	/*! \brief Remove single character from end of this string.
+	 */
+	void pop_back( void );
 private:
 	void substr( HString&, int long, int long ) const;
 };

@@ -1217,10 +1217,13 @@ HString& HString::fillz( char filler_, int long offset_, int long count_ ) {
 
 HString& HString::erase( int long from_, int long length_ ) {
 	M_PROLOG
-	if ( from_ < 0 )
-		length_ += from_, from_ = 0;
-	if ( ( from_ + length_ ) >= GET_SIZE )
+	if ( from_ < 0 ) {
+		length_ += from_;
+		from_ = 0;
+	}
+	if ( ( from_ + length_ ) > GET_SIZE ) {
 		length_ = GET_SIZE - from_;
+	}
 	if ( ( length_ > 0 ) && ( from_ < GET_SIZE ) ) {
 		::std::memmove( MEM + from_, MEM + from_ + length_, static_cast<size_t>( GET_SIZE - ( from_ + length_ ) ) );
 		SET_SIZE( GET_SIZE - length_ );
@@ -1339,6 +1342,13 @@ HString& HString::append( const_iterator first_, const_iterator last_ ) {
 void HString::push_back( char character_ ) {
 	M_PROLOG
 	append( 1, character_ );
+	return;
+	M_EPILOG
+}
+
+void HString::pop_back( void ) {
+	M_PROLOG
+	erase( GET_SIZE - 1, 1 );
 	return;
 	M_EPILOG
 }
