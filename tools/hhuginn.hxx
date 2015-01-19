@@ -124,6 +124,7 @@ public:
 		LIST,
 		MAP,
 		REFERENCE,
+		FUNCTION_REFERENCE,
 		UNKNOWN,
 		NOT_BOOLEAN
 	};
@@ -186,6 +187,17 @@ private:
 		OCompiler( HHuginn* );
 		void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
 		void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
+		bool is_numeric( TYPE ) const;
+		bool is_numeric_congruent( TYPE ) const;
+		bool is_summable( TYPE ) const;
+		bool is_comparable( TYPE ) const;
+		bool is_comparable_congruent( TYPE ) const;
+		bool is_boolean_congruent( TYPE ) const;
+		bool is_unknown( TYPE ) const;
+		bool is_reference_congruent( TYPE ) const;
+		bool is_integer_congruent( TYPE ) const;
+		bool are_congruous( TYPE, TYPE ) const;
+		TYPE congruent( TYPE, TYPE ) const;
 		scope_t& current_scope( void );
 		expression_t& current_expression( void );
 		void reset_expression( void );
@@ -204,6 +216,15 @@ private:
 		void defer_str_oper( yaal::hcore::HString const&, executing_parser::position_t );
 		void defer_oper_direct( OPERATOR, executing_parser::position_t );
 		void dispatch_action( OPERATOR, executing_parser::position_t );
+		void dispatch_plus( executing_parser::position_t );
+		void dispatch_mul( executing_parser::position_t );
+		void dispatch_power( executing_parser::position_t );
+		void dispatch_compare( executing_parser::position_t );
+		void dispatch_equals( executing_parser::position_t );
+		void dispatch_boolean( expression_action_t const&, executing_parser::position_t );
+		void dispatch_assign( executing_parser::position_t );
+		void dispatch_subscript( executing_parser::position_t );
+		void dispatch_function_call( executing_parser::position_t );
 		void defer_action( expression_action_t const&, executing_parser::position_t );
 		void defer_store_real( double long, executing_parser::position_t );
 		void defer_store_integer( int long long, executing_parser::position_t );
@@ -328,6 +349,7 @@ public:
 	HValue( void );
 	HValue( TYPE );
 	TYPE type( void ) const;
+	yaal::hcore::HString const& type_name( void ) const;
 	static yaal::hcore::HString const& type_name( TYPE );
 	static value_t subscript( value_t&, value_t const&, int );
 	static value_t add( value_t const&, value_t const&, int );
