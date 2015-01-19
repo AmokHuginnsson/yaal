@@ -274,11 +274,15 @@ public:
 	 */
 	bool parse( void );
 	/*! \brief Compile parsed program.
+	 *
+	 * \return True iff compilation finished with no errors.
 	 */
 	bool compile( void );
 	/*! \brief Execute compiled program.
+	 *
+	 * \return True iff execution finished with no errors.
 	 */
-	void execute( void );
+	bool execute( void );
 	/*! \brief Dump Huginn Virtual Machine state.
 	 */
 	value_t call( yaal::hcore::HString const&, values_t const&, int );

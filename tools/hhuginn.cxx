@@ -1192,9 +1192,8 @@ void HHuginn::OCompiler::dispatch_assign( executing_parser::position_t position_
 void HHuginn::OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OPositionedOperator po( _operations.top() );
-	OPERATOR o( po._operator );
 	int p( po._position );
-	M_ASSERT( o == OPERATOR::SUBSCRIPT );
+	M_ASSERT( po._operator == OPERATOR::SUBSCRIPT );
 	defer_action( &HExpression::subscript, position_ );
 	_operations.pop();
 	M_ASSERT( _valueTypes.get_size() >= 2 );
@@ -1452,7 +1451,7 @@ bool HHuginn::compile( void ) {
 	M_EPILOG
 }
 
-void HHuginn::execute( void ) {
+bool HHuginn::execute( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::COMPILED );
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
@@ -1461,9 +1460,16 @@ void HHuginn::execute( void ) {
 	if ( _argv->size() > 0 ) {
 		args.push_back( _argv );
 	}
-	_result = call( "main", args, 0 );
+	bool ok( false );
+	try {
+		_result = call( "main", args, 0 );
+		ok = true;
+	} catch ( HHuginnRuntimeException const& e ) {
+		_errorMessage = e.message();
+		_errorPosition = e.position();
+	}
 	_threads.clear();
-	return;
+	return ( ok );
 	M_EPILOG
 }
 
