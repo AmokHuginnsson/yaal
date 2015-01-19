@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hhuginn.cxx - this file is integral part of `yaal' project.
+  hhuginn.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -1001,11 +1001,11 @@ bool HHuginn::OCompiler::is_comparable_congruent( TYPE type_ ) const {
 }
 
 bool HHuginn::OCompiler::is_reference_congruent( TYPE type_ ) const {
-	return ( ( type_ == TYPE::REFERENCE ) || ( type_ == TYPE::UNKNOWN ) || ( type_ == TYPE::NOT_BOOLEAN ) );
+	return ( ( type_ == TYPE::REFERENCE ) || ( type_ == TYPE::UNKNOWN ) );
 }
 
 bool HHuginn::OCompiler::is_integer_congruent( TYPE type_ ) const {
-	return ( ( type_ == TYPE::INTEGER ) || ( type_ == TYPE::UNKNOWN ) || ( type_ == TYPE::NOT_BOOLEAN ) );
+	return ( ( type_ == TYPE::INTEGER ) || is_unknown( type_ ) );
 }
 
 bool HHuginn::OCompiler::is_summable( TYPE type_ ) const {
@@ -1013,9 +1013,16 @@ bool HHuginn::OCompiler::is_summable( TYPE type_ ) const {
 }
 
 bool HHuginn::OCompiler::are_congruous( TYPE t1_, TYPE t2_ ) const {
-	bool congruous( ( t1_ == t2_ ) || ( t1_ == TYPE::UNKNOWN ) || ( t2_ == TYPE::UNKNOWN ) || ( t1_ == TYPE::REFERENCE ) || ( t2_ == TYPE::REFERENCE ) );
+	bool congruous(
+		( t1_ == t2_ )
+		|| ( t1_ == TYPE::UNKNOWN )
+		|| ( t2_ == TYPE::UNKNOWN )
+		|| ( t1_ == TYPE::REFERENCE )
+		|| ( t2_ == TYPE::REFERENCE )
+	);
 	if ( ! congruous ) {
-		congruous = ( ( t1_ != TYPE::BOOLEAN ) && ( t2_ == TYPE::NOT_BOOLEAN ) ) || ( ( t2_ != TYPE::BOOLEAN ) && ( t1_ == TYPE::NOT_BOOLEAN ) );
+		congruous = ( ( t1_ != TYPE::BOOLEAN ) && ( t2_ == TYPE::NOT_BOOLEAN ) )
+			|| ( ( t2_ != TYPE::BOOLEAN ) && ( t1_ == TYPE::NOT_BOOLEAN ) );
 	}
 	return ( congruous );
 }
