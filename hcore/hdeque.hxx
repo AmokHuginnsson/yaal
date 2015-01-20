@@ -197,7 +197,7 @@ public:
 	HDeque( HDeque const&, allocator_t const& );
 
 	HDeque( HDeque&& deque_ )
-		: _start( 0 ), _size( 0 ), _chunks() {
+		: _chunks(), _start( 0 ), _size( 0 ) {
 		M_PROLOG
 		swap( deque_ );
 		return;
