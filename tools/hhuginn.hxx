@@ -78,6 +78,7 @@ public:
 	typedef yaal::hcore::HPointer<HList> list_t;
 	class HMap;
 	class HExpression;
+	class HAnd;
 	typedef yaal::hcore::HPointer<HExpression> expression_t;
 	class HErrorCoordinate;
 	typedef yaal::hcore::HArray<statement_t> statement_list_t;
@@ -163,11 +164,15 @@ private:
 	struct OCompiler {
 		typedef void ( HHuginn::HExpression::* expression_action_t ) ( HFrame*, int );
 		typedef yaal::hcore::HArray<yaal::hcore::HString> parameter_names_t;
+		typedef yaal::hcore::HArray<expression_t> expressions_t;
+		typedef yaal::hcore::HStack<expressions_t> expressions_stack_t;
 		struct OContext {
 			scope_t _scope;
-			expression_t _expression;
+			expressions_stack_t _expressionsStack;
 			OContext( HHuginn* );
 			OContext( scope_t const&, expression_t const& );
+			expression_t const& expression( void ) const;
+			expression_t& expression( void );
 		};
 		struct OCompilationFrame {
 			typedef yaal::hcore::HArray<OContext> contexts_t;
@@ -201,6 +206,9 @@ private:
 		scope_t& current_scope( void );
 		expression_t& current_expression( void );
 		void reset_expression( void );
+		void start_subexpression( executing_parser::position_t );
+		void add_subexpression( yaal::hcore::HString const&, executing_parser::position_t );
+		void commit_and( executing_parser::position_t );
 		void create_scope( executing_parser::position_t );
 		void commit_scope( executing_parser::position_t );
 		void commit_if_clause( executing_parser::position_t );
@@ -226,6 +234,7 @@ private:
 		void dispatch_subscript( executing_parser::position_t );
 		void dispatch_function_call( executing_parser::position_t );
 		void defer_action( expression_action_t const&, executing_parser::position_t );
+		void defer_store_direct( value_t const&, executing_parser::position_t );
 		void defer_store_real( double long, executing_parser::position_t );
 		void defer_store_integer( int long long, executing_parser::position_t );
 		void defer_store_string( yaal::hcore::HString const&, executing_parser::position_t );
@@ -369,7 +378,6 @@ public:
 	static bool greater( value_t const&, value_t const&, int );
 	static bool less_or_equal( value_t const&, value_t const&, int );
 	static bool greater_or_equal( value_t const&, value_t const&, int );
-	static value_t boolean_and( value_t const&, value_t const&, int );
 	static value_t boolean_or( value_t const&, value_t const&, int );
 	static value_t boolean_xor( value_t const&, value_t const&, int );
 	static value_t boolean_not( value_t const&, int );
@@ -403,10 +411,13 @@ private:
 	typedef yaal::hcore::HBoundCall<void ( HFrame* )> execution_step_t;
 	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
 	execution_steps_t _executionSteps;
+	int _position;
 	HHuginn* _huginn;
 public:
-	HExpression( HHuginn* );
+	HExpression( HHuginn*, int = 0 );
+	int position( void ) const;
 	void add_execution_step( execution_step_t const& );
+	void merge( HExpression& );
 	void oper( OPERATOR, HFrame*, int );
 	void close_parenthesis( HFrame*, int );
 	void plus( HFrame*, int );
@@ -432,6 +443,7 @@ public:
 	void boolean_or( HFrame*, int );
 	void boolean_xor( HFrame*, int );
 	void boolean_not( HFrame*, int );
+	void store_direct( value_t const&, HFrame*, int );
 	void store_real( double long, HFrame*, int );
 	void store_integer( int long long, HFrame*, int );
 	void store_string( yaal::hcore::HString const&, HFrame*, int );
@@ -459,16 +471,17 @@ public:
 		EXCEPTION
 	};
 private:
+	HThread* _thread;
+	HFrame* const _parent;
 	variables_t _variables;
 	operations_t _operations;
 	values_t _values;
 	HHuginn::value_t _result;
 	int const _number;
-	HFrame* const _parent;
 	bool _loop;
 	STATE _state;
 public:
-	HFrame( HFrame*, bool, bool );
+	HFrame( HThread*, HFrame*, bool, bool );
 	value_t make_variable( yaal::hcore::HString const&, int );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const&, int );
 	value_t& get_variable( yaal::hcore::HString const&, int );
@@ -476,6 +489,7 @@ public:
 	void break_execution( STATE );
 	int number( void ) const;
 	HFrame* parent( void );
+	HThread* thread( void ) const;
 	bool is_loop( void ) const;
 	HHuginn::value_t result( void ) const;
 	void set_result( HHuginn::value_t const& );
@@ -516,6 +530,18 @@ private:
 public:
 	HReference( HHuginn::value_t& );
 	HHuginn::value_t& value( void ) const;
+};
+
+class HHuginn::HAnd : public HHuginn::HValue {
+public:
+	typedef HHuginn::HAnd this_type;
+	typedef HHuginn::HValue base_type;
+	typedef yaal::hcore::HArray<expression_t> expressions_t;
+private:
+	expressions_t _expressions;
+public:
+	HAnd( expressions_t const& );
+	bool execute( HThread* );
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {
