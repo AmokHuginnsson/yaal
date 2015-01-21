@@ -2486,6 +2486,9 @@ bool HHuginn::HBooleanEvaluator::execute( HThread* thread_ ) {
 	HFrame* f( thread_->current_frame() );
 	for ( expression_t const& e : _expressions ) {
 		e->execute( thread_ );
+		if ( f->can_continue() ) {
+			break;
+		}
 		value_t result( f->result() );
 		if ( result->type() != TYPE::BOOLEAN ) {
 			throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], e->position() );
