@@ -369,8 +369,14 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	 */
 	HRule breakStatement( "breakStatement", constant( "break" ) >> ';' );
 	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> expression >> ')' >> scope );
-	HRule variableIdentifier( regex( "variableIdentifier", identifier ) );
-	HRule forStatement( "forStatement", constant( "for" ) >> '(' >> variableIdentifier >> ':' >> expression >> ')' >> scope );
+	HRule forIdentifier(
+		regex(
+			"forIdentifier",
+			identifier,
+			e_p::HRegex::action_string_position_t( hcore::call( &HHuginn::OCompiler::set_for_identifier, &_compiler, _1, _2 ) )
+		)
+	);
+	HRule forStatement( "forStatement", constant( "for" ) >> '(' >> forIdentifier >> ':' >> expression >> ')' >> scope );
 	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> scope >> -breakStatement );
 	HRule defaultStatement( "defaultStatement", constant( "default" ) >> ':' >> scope );
 	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> -defaultStatement >> '}' );
@@ -378,7 +384,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule statement( "statement",
 		ifStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_if_statement, &_compiler, _1 ) )]
 		| whileStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_while_statement, &_compiler, _1 ) )]
-		| forStatement
+		| forStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_for_statement, &_compiler, _1 ) )]
 		| switchStatement
 		| breakStatement
 		| continueStatement
@@ -804,7 +810,9 @@ HHuginn::expression_t& HHuginn::OCompiler::OContext::expression( void ) {
 HHuginn::OCompiler::OCompilationFrame::OCompilationFrame( HHuginn* huginn_ )
 	: _context( huginn_ ),
 	_contextsChain(),
-	_else() {
+	_else(),
+	_forIdentifier(),
+	_forPosition( 0 ) {
 	return;
 }
 
@@ -917,6 +925,27 @@ void HHuginn::OCompiler::add_while_statement( executing_parser::position_t ) {
 	scope_t scope( current_scope() );
 	_compilationStack.pop();
 	current_scope()->add_statement( make_pointer<HWhile>( current_expression(), scope ) );
+	reset_expression();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::set_for_identifier( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	OCompilationFrame& f( _compilationStack.top() );
+	f._forIdentifier = name_;
+	f._forPosition = position_.get();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::add_for_statement( executing_parser::position_t ) {
+	M_PROLOG
+	M_ASSERT( ! _compilationStack.is_empty() );
+	scope_t scope( current_scope() );
+	_compilationStack.pop();
+	OCompilationFrame const& f( _compilationStack.top() );
+	current_scope()->add_statement( make_pointer<HFor>( f._forIdentifier, current_expression(), scope, f._forPosition ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -2436,9 +2465,103 @@ char HHuginn::HCharacter::value( void ) const {
 	return ( _value );
 }
 
+namespace {
+
+class HIteratorInterface {
+public:
+	virtual ~HIteratorInterface( void ) {
+		return;
+	}
+	HHuginn::value_t value( void ) {
+		return ( do_value() );
+	}
+	bool is_valid( void ) {
+		return ( do_is_valid() );
+	}
+	void next( void ) {
+		do_next();
+	}
+protected:
+	virtual HHuginn::value_t do_value( void ) = 0;
+	virtual bool do_is_valid( void ) = 0;
+	virtual void do_next( void ) = 0;
+};
+
+class HListIterator : public HIteratorInterface {
+	HHuginn::HList* _list;
+	int _index;
+public:
+	HListIterator( HHuginn::HList* list_ )
+		: _list( list_ ),
+		_index( 0 ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( void ) {
+		return ( _list->get( _index ) );
+	}
+	virtual bool do_is_valid( void ) {
+		return ( _index < _list->size() );
+	}
+	virtual void do_next( void ) {
+		++ _index;
+	}
+private:
+	HListIterator( HListIterator const& ) = delete;
+	HListIterator& operator = ( HListIterator const& ) = delete;
+};
+
+class HMapIterator : public HIteratorInterface {
+	HHuginn::HMap* _map;
+public:
+	HMapIterator( HHuginn::HMap* map_ )
+		: _map( map_ ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( void ) {
+		return ( HHuginn::value_t() );
+	}
+	virtual bool do_is_valid( void ) {
+		return ( false );
+	}
+	virtual void do_next( void ) {
+	}
+private:
+	HMapIterator( HMapIterator const& ) = delete;
+	HMapIterator& operator = ( HMapIterator const& ) = delete;
+};
+
+}
+
+class HHuginn::HIterable::HIterator {
+public:
+	typedef HResource<HIteratorInterface> iterator_implementation_t;
+private:
+	iterator_implementation_t _impl;
+public:
+	HIterator( iterator_implementation_t&& impl_ )
+		: _impl( yaal::move( impl_ ) ) {
+		return;
+	}
+	value_t value( void ) {
+		return ( _impl->value() );
+	}
+	bool is_valid( void ) {
+		return ( _impl->is_valid() );
+	}
+	void next( void ) {
+		_impl->next();
+	}
+};
+
 HHuginn::HIterable::HIterable( TYPE type_ )
 	: HValue( type_ ) {
 	return;
+}
+
+HHuginn::HIterable::HIterator HHuginn::HIterable::iterator( void ) {
+	return ( do_iterator() );
 }
 
 HHuginn::HList::HList( void )
@@ -2464,6 +2587,11 @@ HHuginn::value_t HHuginn::HList::get( int long long index_ ) {
 	M_EPILOG
 }
 
+HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( void ) {
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HListIterator( this ) );
+	return ( HIterator( yaal::move( impl ) ) );
+}
+
 HHuginn::HMap::HMap( void )
 	: HIterable( TYPE::MAP ), _data() {
 	return;
@@ -2471,6 +2599,11 @@ HHuginn::HMap::HMap( void )
 
 int long HHuginn::HMap::size( void ) const {
 	return ( _data.get_size() );
+}
+
+HHuginn::HIterable::HIterator HHuginn::HMap::do_iterator( void ) {
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HMapIterator( this ) );
+	return ( HIterator( yaal::move( impl ) ) );
 }
 
 HHuginn::HBooleanEvaluator::HBooleanEvaluator( expressions_t const& expressions_, OPERATOR operator_ )
@@ -2486,7 +2619,7 @@ bool HHuginn::HBooleanEvaluator::execute( HThread* thread_ ) {
 	HFrame* f( thread_->current_frame() );
 	for ( expression_t const& e : _expressions ) {
 		e->execute( thread_ );
-		if ( f->can_continue() ) {
+		if ( thread_->can_continue() ) {
 			break;
 		}
 		value_t result( f->result() );
@@ -3126,12 +3259,38 @@ void HHuginn::HWhile::do_execute( HHuginn::HThread* thread_ ) const {
 
 HHuginn::HFor::HFor( yaal::hcore::HString const& variableName_,
 	expression_t const& source_,
-	scope_t const& loop_ )
+	scope_t const& loop_,
+	int position_ )
 	: HStatement(),
 	_variableName( variableName_ ),
 	_source( source_ ),
-	_loop( loop_ ) {
+	_loop( loop_ ),
+	_position( position_ ) {
 	return;
+}
+
+void HHuginn::HFor::do_execute( HHuginn::HThread* thread_ ) const {
+	M_PROLOG
+	thread_->create_loop_frame();
+	HFrame* f( thread_->current_frame() );
+	_source->execute( thread_ );
+	if ( thread_->can_continue() ) {
+		value_t source( f->result() );
+		HIterable* coll( dynamic_cast<HIterable*>( source.raw() ) );
+		if ( ! coll ) {
+			throw HHuginnRuntimeException( "`For' source is not an iterable.", _position );
+		}
+		HIterable::HIterator it( coll->iterator() );
+		while ( thread_->can_continue() && it.is_valid() ) {
+			M_ASSERT( dynamic_cast<HHuginn::HReference*>( it.value().raw() ) );
+			f->set_variable( _variableName, static_cast<HHuginn::HReference*>( it.value().raw() )->value(), _position );
+			_loop->execute( thread_ );
+			it.next();
+		}
+	}
+	thread_->pop_frame();
+	return;
+	M_EPILOG
 }
 
 HHuginn::value_t HHuginn::HFunctionInterface::execute( yaal::tools::HHuginn::HThread * thread_, values_t  const& values_, int position_ ) const {

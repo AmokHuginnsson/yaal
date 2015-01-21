@@ -179,6 +179,8 @@ private:
 			OContext _context;
 			contexts_t _contextsChain;
 			scope_t _else;
+			yaal::hcore::HString _forIdentifier;
+			int _forPosition;
 			OCompilationFrame( HHuginn* );
 		};
 		typedef yaal::hcore::HStack<OCompilationFrame> compilation_stack_t;
@@ -191,6 +193,7 @@ private:
 		type_stack_t _valueTypes;
 		OCompiler( HHuginn* );
 		void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
+		void set_for_identifier( yaal::hcore::HString const&, executing_parser::position_t );
 		void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
 		bool is_numeric( TYPE ) const;
 		bool is_numeric_congruent( TYPE ) const;
@@ -215,6 +218,7 @@ private:
 		void commit_else_clause( executing_parser::position_t );
 		void add_return_statement( executing_parser::position_t );
 		void add_while_statement( executing_parser::position_t );
+		void add_for_statement( executing_parser::position_t );
 		void add_if_statement( executing_parser::position_t );
 		void commit_expression( executing_parser::position_t );
 		void defer_function_call( yaal::hcore::HString const&, executing_parser::position_t );
@@ -548,7 +552,11 @@ class HHuginn::HIterable : public HHuginn::HValue {
 public:
 	typedef HHuginn::HIterable this_type;
 	typedef HHuginn::HValue base_type;
+	class HIterator;
 	HIterable( TYPE );
+	HIterator iterator( void );
+protected:
+	virtual HIterator do_iterator( void ) = 0;
 };
 
 class HHuginn::HBoolean : public HHuginn::HValue {
@@ -652,6 +660,8 @@ public:
 	void push_back( value_t const& );
 	int long size( void ) const;
 	value_t get( int long long );
+protected:
+	virtual HIterator do_iterator( void );
 };
 
 class HHuginn::HMap : public HHuginn::HIterable {
@@ -664,6 +674,8 @@ private:
 public:
 	HMap( void );
 	int long size( void ) const;
+protected:
+	virtual HIterator do_iterator( void );
 };
 
 class HHuginn::HScope : public HHuginn::HStatement {
@@ -736,9 +748,11 @@ private:
 	yaal::hcore::HString _variableName;
 	expression_t _source;
 	scope_t _loop;
+	int _position;
 public:
-	HFor( yaal::hcore::HString const&, expression_t const&, scope_t const& );
+	HFor( yaal::hcore::HString const&, expression_t const&, scope_t const&, int );
 protected:
+	virtual void do_execute( HThread* ) const;
 };
 
 class HHuginn::HFunctionInterface {
