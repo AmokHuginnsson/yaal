@@ -603,7 +603,7 @@ public:
 	/* There is no direct convertion to character. */
 };
 
-class HHuginn::HString : public HHuginn::HValue {
+class HHuginn::HString : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HString this_type;
 	typedef HHuginn::HValue base_type;
@@ -617,6 +617,8 @@ public:
 	void to_number( void ) const;
 	void to_real( void ) const;
 	void to_string( void ) const;
+protected:
+	virtual HIterator do_iterator( void );
 };
 
 class HHuginn::HCharacter : public HHuginn::HValue {

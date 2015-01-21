@@ -2434,19 +2434,6 @@ int long long HHuginn::HInteger::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::HString::HString( yaal::hcore::HString const& value_ )
-	: HValue( TYPE::STRING ), _value( value_ ) {
-	return;
-}
-
-yaal::hcore::HString const& HHuginn::HString::value( void ) const {
-	return ( _value );
-}
-
-yaal::hcore::HString& HHuginn::HString::value( void ) {
-	return ( _value );
-}
-
 HHuginn::HNumber::HNumber( yaal::hcore::HNumber const& value_ )
 	: HValue( TYPE::NUMBER ), _value( value_ ) {
 	return;
@@ -2485,6 +2472,30 @@ protected:
 	virtual HHuginn::value_t do_value( void ) = 0;
 	virtual bool do_is_valid( void ) = 0;
 	virtual void do_next( void ) = 0;
+};
+
+class HStringIterator : public HIteratorInterface {
+	HHuginn::HString* _string;
+	int _index;
+public:
+	HStringIterator( HHuginn::HString* string_ )
+		: _string( string_ ),
+		_index( 0 ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( void ) {
+		return ( make_pointer<HHuginn::HCharacter>( _string->value()[ _index ] ) );
+	}
+	virtual bool do_is_valid( void ) {
+		return ( _index < _string->value().get_size() );
+	}
+	virtual void do_next( void ) {
+		++ _index;
+	}
+private:
+	HStringIterator( HStringIterator const& ) = delete;
+	HStringIterator& operator = ( HStringIterator const& ) = delete;
 };
 
 class HListIterator : public HIteratorInterface {
@@ -2564,6 +2575,25 @@ HHuginn::HIterable::HIterator HHuginn::HIterable::iterator( void ) {
 	return ( do_iterator() );
 }
 
+HHuginn::HString::HString( yaal::hcore::HString const& value_ )
+	: HIterable( TYPE::STRING ),
+	_value( value_ ) {
+	return;
+}
+
+yaal::hcore::HString const& HHuginn::HString::value( void ) const {
+	return ( _value );
+}
+
+yaal::hcore::HString& HHuginn::HString::value( void ) {
+	return ( _value );
+}
+
+HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( void ) {
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStringIterator( this ) );
+	return ( HIterator( yaal::move( impl ) ) );
+}
+
 HHuginn::HList::HList( void )
 	: HIterable( TYPE::LIST ), _data() {
 	return;
@@ -2619,7 +2649,7 @@ bool HHuginn::HBooleanEvaluator::execute( HThread* thread_ ) {
 	HFrame* f( thread_->current_frame() );
 	for ( expression_t const& e : _expressions ) {
 		e->execute( thread_ );
-		if ( thread_->can_continue() ) {
+		if ( ! thread_->can_continue() ) {
 			break;
 		}
 		value_t result( f->result() );
@@ -3282,8 +3312,13 @@ void HHuginn::HFor::do_execute( HHuginn::HThread* thread_ ) const {
 		}
 		HIterable::HIterator it( coll->iterator() );
 		while ( thread_->can_continue() && it.is_valid() ) {
-			M_ASSERT( dynamic_cast<HHuginn::HReference*>( it.value().raw() ) );
-			f->set_variable( _variableName, static_cast<HHuginn::HReference*>( it.value().raw() )->value(), _position );
+			value_t v( it.value() );
+			if ( v->type() == TYPE::REFERENCE ) {
+				v = static_cast<HHuginn::HReference*>( it.value().raw() )->value();
+			} else {
+				M_ASSERT( v->type() == TYPE::CHARACTER );
+			}
+			f->set_variable( _variableName, v, _position );
 			_loop->execute( thread_ );
 			it.next();
 		}
