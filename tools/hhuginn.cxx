@@ -285,20 +285,21 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"booleanAnd",
 		equality[e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::start_subexpression, &_compiler, _1 ) )] >> *(
 			/* compare action */ (
-				constant( "&&" )[e_p::HString::action_string_position_t( hcore::call( &HHuginn::OCompiler::add_subexpression, &_compiler, _1, _2 ) )]
+				constant( "&&" )[e_p::HString::action_position_t( hcore::call( &HHuginn::OCompiler::add_subexpression, &_compiler, OPERATOR::BOOLEAN_AND, _1 ) )]
 				>> equality
 			)[HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::BOOLEAN_AND, _1 ) )]
 		),
-		e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::commit_and, &_compiler, _1 ) )
+		e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::commit_boolean, &_compiler, OPERATOR::BOOLEAN_AND, _1 ) )
 	);
 	HRule booleanOr(
 		"booleanOr",
-		booleanAnd >> *(
+		HRule( booleanAnd, e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::start_subexpression, &_compiler, _1 ) ) ) >> *(
 			/* compare action */ (
-				constant( "||" )[e_p::HString::action_string_position_t( hcore::call( &HHuginn::OCompiler::defer_str_oper, &_compiler, _1, _2 ) )]
+				constant( "||" )[e_p::HString::action_position_t( hcore::call( &HHuginn::OCompiler::add_subexpression, &_compiler, OPERATOR::BOOLEAN_OR, _1 ) )]
 				>> booleanAnd
 			)[HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::BOOLEAN_OR, _1 ) )]
-		)
+		),
+		e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::commit_boolean, &_compiler, OPERATOR::BOOLEAN_OR, _1 ) )
 	);
 	HRule booleanXor(
 		"booleanXor",
@@ -876,22 +877,22 @@ void HHuginn::OCompiler::start_subexpression( executing_parser::position_t posit
 	M_EPILOG
 }
 
-void HHuginn::OCompiler::add_subexpression( yaal::hcore::HString const& op_, executing_parser::position_t position_ ) {
+void HHuginn::OCompiler::add_subexpression( OPERATOR op_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	_compilationStack.top()._context._expressionsStack.top().emplace_back( make_pointer<HExpression>( _huginn, position_.get() ) );
-	_operations.emplace( op_ == "&&" ? OPERATOR::BOOLEAN_AND : OPERATOR::BOOLEAN_OR, position_.get() );
+	_operations.emplace( op_, position_.get() );
 	return;
 	M_EPILOG
 }
 
-void HHuginn::OCompiler::commit_and( executing_parser::position_t position_ ) {
+void HHuginn::OCompiler::commit_boolean( OPERATOR operator_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	if ( _compilationStack.top()._context._expressionsStack.top().get_size() > 1 ) {
-		value_t And( make_pointer<HAnd>( _compilationStack.top()._context._expressionsStack.top() ) );
+		value_t And( make_pointer<HBooleanEvaluator>( _compilationStack.top()._context._expressionsStack.top(), operator_ ) );
 		_compilationStack.top()._context._expressionsStack.pop();
 		defer_store_direct( And, position_ );
-		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), OPERATOR::BOOLEAN_AND, _1, position_.get() ) );
-		defer_action( &HExpression::boolean_and, position_.get() );
+		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), operator_, _1, position_.get() ) );
+		defer_action( operator_ == OPERATOR::BOOLEAN_AND ? &HExpression::boolean_and : &HExpression::boolean_or, position_.get() );
 	} else {
 		expression_t e( _compilationStack.top()._context.expression() );
 		_compilationStack.top()._context._expressionsStack.pop();
@@ -1322,7 +1323,7 @@ void HHuginn::OCompiler::dispatch_action( OPERATOR oper_, executing_parser::posi
 		} break;
 		case ( OPERATOR::BOOLEAN_OR ): {
 			M_ASSERT( o == OPERATOR::BOOLEAN_OR );
-			dispatch_boolean( &HExpression::boolean_or, position_ );
+			dispatch_boolean( nullptr, position_ );
 		} break;
 		case ( OPERATOR::BOOLEAN_XOR ): {
 			M_ASSERT( o == OPERATOR::BOOLEAN_XOR );
@@ -2209,11 +2210,6 @@ bool HHuginn::HValue::greater_or_equal( value_t const& v1_, value_t const& v2_, 
 	return ( res );
 }
 
-HHuginn::value_t HHuginn::HValue::boolean_or( value_t const& v1_, value_t const& v2_, int ) {
-	M_ASSERT( ( v1_->type() == TYPE::BOOLEAN ) && ( v2_->type() == TYPE::BOOLEAN ) );
-	return ( make_pointer<HBoolean>( static_cast<HBoolean const*>( v1_.raw() )->value() || static_cast<HBoolean const*>( v2_.raw() )->value() ) );
-}
-
 HHuginn::value_t HHuginn::HValue::boolean_xor( value_t const& v1_, value_t const& v2_, int ) {
 	M_ASSERT( ( v1_->type() == TYPE::BOOLEAN ) && ( v2_->type() == TYPE::BOOLEAN ) );
 	bool v1( static_cast<HBoolean const*>( v1_.raw() )->value() );
@@ -2477,14 +2473,16 @@ int long HHuginn::HMap::size( void ) const {
 	return ( _data.get_size() );
 }
 
-HHuginn::HAnd::HAnd( expressions_t const& expressions_ )
-	: _expressions( expressions_ ) {
+HHuginn::HBooleanEvaluator::HBooleanEvaluator( expressions_t const& expressions_, OPERATOR operator_ )
+	: HValue( TYPE::BOOLEAN ),
+	_expressions( expressions_ ),
+	_operator( operator_ ) {
 	return;
 }
 
-bool HHuginn::HAnd::execute( HThread* thread_ ) {
+bool HHuginn::HBooleanEvaluator::execute( HThread* thread_ ) {
 	M_PROLOG
-	bool ret( true );
+	bool all( true );
 	HFrame* f( thread_->current_frame() );
 	for ( expression_t const& e : _expressions ) {
 		e->execute( thread_ );
@@ -2492,11 +2490,13 @@ bool HHuginn::HAnd::execute( HThread* thread_ ) {
 		if ( result->type() != TYPE::BOOLEAN ) {
 			throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], e->position() );
 		}
-		if ( !static_cast<HBoolean*>( result.raw() )->value() ) {
-			ret = false;
+		bool v( static_cast<HBoolean*>( result.raw() )->value() );
+		if ( ( ( _operator == OPERATOR::BOOLEAN_AND ) && ! v ) || ( ( _operator == OPERATOR::BOOLEAN_OR ) && v ) ) {
+			all = false;
 			break;
 		}
 	}
+	bool ret( _operator == OPERATOR::BOOLEAN_AND ? all : ! all );
 	return ( ret );
 	M_EPILOG
 }
@@ -2897,8 +2897,8 @@ void HHuginn::HExpression::boolean_and( HFrame* frame_, int ) {
 	frame_->operations().pop();
 	value_t v( frame_->values().top() );
 	frame_->values().pop();
-	M_ASSERT( dynamic_cast<HAnd*>( v.raw() ) );
-	frame_->values().push( make_pointer<HBoolean>( static_cast<HAnd*>( v.raw() )->execute( frame_->thread() ) ) );
+	M_ASSERT( dynamic_cast<HBooleanEvaluator*>( v.raw() ) );
+	frame_->values().push( make_pointer<HBoolean>( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
 	return;
 	M_EPILOG
 }
@@ -2907,16 +2907,11 @@ void HHuginn::HExpression::boolean_or( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::BOOLEAN_OR );
-	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
-	value_t v2( frame_->values().top() );
+	value_t v( frame_->values().top() );
 	frame_->values().pop();
-	value_t v1( frame_->values().top() );
-	frame_->values().pop();
-	if ( ( v1->type() != TYPE::BOOLEAN ) || ( v2->type() != TYPE::BOOLEAN ) ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], p );
-	}
-	frame_->values().push( HHuginn::HValue::boolean_or( v1, v2, p ) );
+	M_ASSERT( dynamic_cast<HBooleanEvaluator*>( v.raw() ) );
+	frame_->values().push( make_pointer<HBoolean>( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
 	return;
 	M_EPILOG
 }
@@ -3036,6 +3031,8 @@ void HHuginn::HScope::do_execute( HHuginn::HThread* thread_ ) const {
 	thread_->create_scope_frame();
 	for ( HHuginn::statement_t const& s : _statements ) {
 		s->execute( thread_ );
+		M_ASSERT( thread_->current_frame()->values().is_empty() );
+		M_ASSERT( thread_->current_frame()->operations().is_empty() );
 		if ( ! thread_->can_continue() ) {
 			break;
 		}

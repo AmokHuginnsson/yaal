@@ -78,7 +78,7 @@ public:
 	typedef yaal::hcore::HPointer<HList> list_t;
 	class HMap;
 	class HExpression;
-	class HAnd;
+	class HBooleanEvaluator;
 	typedef yaal::hcore::HPointer<HExpression> expression_t;
 	class HErrorCoordinate;
 	typedef yaal::hcore::HArray<statement_t> statement_list_t;
@@ -207,8 +207,8 @@ private:
 		expression_t& current_expression( void );
 		void reset_expression( void );
 		void start_subexpression( executing_parser::position_t );
-		void add_subexpression( yaal::hcore::HString const&, executing_parser::position_t );
-		void commit_and( executing_parser::position_t );
+		void add_subexpression( OPERATOR, executing_parser::position_t );
+		void commit_boolean( OPERATOR, executing_parser::position_t );
 		void create_scope( executing_parser::position_t );
 		void commit_scope( executing_parser::position_t );
 		void commit_if_clause( executing_parser::position_t );
@@ -378,7 +378,6 @@ public:
 	static bool greater( value_t const&, value_t const&, int );
 	static bool less_or_equal( value_t const&, value_t const&, int );
 	static bool greater_or_equal( value_t const&, value_t const&, int );
-	static value_t boolean_or( value_t const&, value_t const&, int );
 	static value_t boolean_xor( value_t const&, value_t const&, int );
 	static value_t boolean_not( value_t const&, int );
 	static value_t string( value_t const&, int );
@@ -532,15 +531,16 @@ public:
 	HHuginn::value_t& value( void ) const;
 };
 
-class HHuginn::HAnd : public HHuginn::HValue {
+class HHuginn::HBooleanEvaluator : public HHuginn::HValue {
 public:
-	typedef HHuginn::HAnd this_type;
+	typedef HHuginn::HBooleanEvaluator this_type;
 	typedef HHuginn::HValue base_type;
 	typedef yaal::hcore::HArray<expression_t> expressions_t;
 private:
 	expressions_t _expressions;
+	OPERATOR _operator;
 public:
-	HAnd( expressions_t const& );
+	HBooleanEvaluator( expressions_t const&, OPERATOR );
 	bool execute( HThread* );
 };
 
