@@ -1619,7 +1619,7 @@ HHuginn::value_t HHuginn::call( yaal::hcore::HString const& name_, values_t cons
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 		threads_t::iterator t( _threads.find( threadId ) );
 		M_ASSERT( t != _threads.end() );
-		res = f->second->execute( t->second.raw(), values_, position_ );
+		res = f->second( t->second.raw(), values_, position_ );
 	} else {
 		throw HHuginnRuntimeException( "function `"_ys.append( name_ ).append( "' is not defined" ), position_ );
 	}
@@ -1713,7 +1713,7 @@ void HHuginn::create_function( executing_parser::position_t ) {
 	M_PROLOG
 	M_ASSERT( ! _compiler._functionName.is_empty() );
 	M_ASSERT( ! _compiler._compilationStack.is_empty() );
-	function_t f( make_pointer<HFunction>( _compiler._functionName, _compiler._parameters, yaal::move( _compiler.current_scope() ) ) );
+	function_t f( hcore::call( &HFunction::execute, make_pointer<HFunction>( _compiler._functionName, _compiler._parameters, yaal::move( _compiler.current_scope() ) ), _1, _2, _3 ) );
 	_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( _compiler._functionName ), yaal::move( f ) ) );
 	_compiler._compilationStack.pop();
 	M_ASSERT( _compiler._compilationStack.is_empty() );
@@ -3441,12 +3441,6 @@ void HHuginn::HFor::do_execute( HHuginn::HThread* thread_ ) const {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HFunctionInterface::execute( yaal::tools::HHuginn::HThread * thread_, values_t  const& values_, int position_ ) const {
-	M_PROLOG
-	return ( do_execute( thread_, values_, position_ ) );
-	M_EPILOG
-}
-
 HHuginn::HFunction::HFunction( yaal::hcore::HString const& name_,
 	parameter_names_t const& parameterNames_,
 	HHuginn::scope_t const& scope_ )
@@ -3454,7 +3448,7 @@ HHuginn::HFunction::HFunction( yaal::hcore::HString const& name_,
 	return;
 }
 
-HHuginn::value_t HHuginn::HFunction::do_execute( HThread* thread_, values_t const& values_, int position_ ) const {
+HHuginn::value_t HHuginn::HFunction::execute( HThread* thread_, values_t const& values_, int position_ ) const {
 	M_PROLOG
 	if ( values_.get_size() != _parameterNames.get_size() ) {
 		throw HHuginnRuntimeException(
@@ -3485,168 +3479,137 @@ HHuginn::value_t HHuginn::HFunction::do_execute( HThread* thread_, values_t cons
 
 namespace huginn_builtin {
 
-class HConversion : public HHuginn::HFunctionInterface {
-public:
-	typedef HConversion this_type;
-	typedef HHuginn::HFunctionInterface base_type;
-private:
-	HHuginn::TYPE _toType;
-public:
-	HConversion( HHuginn::TYPE toType_ )
-		: _toType( toType_ ) {
-		return;
+inline HHuginn::value_t convert( HHuginn::TYPE toType_, HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	if ( values_.get_size() != 1 ) {
+		throw HHuginn::HHuginnRuntimeException(
+			""_ys
+			.append( HHuginn::HValue::type_name( toType_ ) )
+			.append( "() expects exactly one parameter, got: " )
+			.append( values_.get_size() ),
+			position_
+		);
 	}
-protected:
-	virtual HHuginn::value_t do_execute( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) const {
-		M_PROLOG
-		if ( values_.get_size() != 1 ) {
+	HHuginn::value_t res;
+	switch ( toType_ ) {
+		case ( HHuginn::TYPE::INTEGER ): res = HHuginn::HValue::integer( values_.front(), position_ ); break;
+		case ( HHuginn::TYPE::REAL ): res = HHuginn::HValue::real( values_.front(), position_ ); break;
+		case ( HHuginn::TYPE::STRING ): res = HHuginn::HValue::string( values_.front(), position_ ); break;
+		case ( HHuginn::TYPE::NUMBER ): res = HHuginn::HValue::number( values_.front(), position_ ); break;
+		case ( HHuginn::TYPE::BOOLEAN ): res = HHuginn::HValue::boolean( values_.front(), position_ ); break;
+		case ( HHuginn::TYPE::CHARACTER ): res = HHuginn::HValue::character( values_.front(), position_ ); break;
+		default: {
 			throw HHuginn::HHuginnRuntimeException(
-				""_ys
-				.append( HHuginn::HValue::type_name( _toType ) )
-				.append( "() expects exactly one parameter, got: " )
-				.append( values_.get_size() ),
+				"Conversion to `"_ys.append( HHuginn::HValue::type_name( toType_ ) ).append( "' is not supported." ),
 				position_
 			);
 		}
-		HHuginn::value_t res;
-		switch ( _toType ) {
-			case ( HHuginn::TYPE::INTEGER ): res = HHuginn::HValue::integer( values_.front(), position_ ); break;
-			case ( HHuginn::TYPE::REAL ): res = HHuginn::HValue::real( values_.front(), position_ ); break;
-			case ( HHuginn::TYPE::STRING ): res = HHuginn::HValue::string( values_.front(), position_ ); break;
-			case ( HHuginn::TYPE::NUMBER ): res = HHuginn::HValue::number( values_.front(), position_ ); break;
-			case ( HHuginn::TYPE::BOOLEAN ): res = HHuginn::HValue::boolean( values_.front(), position_ ); break;
-			case ( HHuginn::TYPE::CHARACTER ): res = HHuginn::HValue::character( values_.front(), position_ ); break;
-			default: {
-				throw HHuginn::HHuginnRuntimeException(
-					"Conversion to `"_ys.append( HHuginn::HValue::type_name( _toType ) ).append( "' is not supported." ),
-					position_
-				);
-			}
-		}
-		return ( res );
-		M_EPILOG
 	}
-};
+	return ( res );
+	M_EPILOG
+}
 
-class HSize : public HHuginn::HFunctionInterface {
-public:
-	typedef HSize this_type;
-	typedef HHuginn::HFunctionInterface base_type;
-protected:
-	virtual HHuginn::value_t do_execute( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) const {
-		M_PROLOG
-		if ( values_.get_size() != 1 ) {
+inline HHuginn::value_t size( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	if ( values_.get_size() != 1 ) {
+		throw HHuginn::HHuginnRuntimeException(
+			""_ys
+			.append( "size() expects exactly one parameter, got: " )
+			.append( values_.get_size() ),
+			position_
+		);
+	}
+	HHuginn::HValue const* v( values_.front().raw() );
+	int long long s( 0 );
+	switch ( v->type() ) {
+		case ( HHuginn::TYPE::STRING ): {
+			s = static_cast<HHuginn::HString const*>( v )->value().get_length();
+		} break;
+		case ( HHuginn::TYPE::LIST ): {
+			s = static_cast<HHuginn::HList const*>( v )->size();
+		} break;
+		case ( HHuginn::TYPE::MAP ): {
+			s = static_cast<HHuginn::HMap const*>( v )->size();
+		} break;
+		default: {
 			throw HHuginn::HHuginnRuntimeException(
-				""_ys
-				.append( "size() expects exactly one parameter, got: " )
-				.append( values_.get_size() ),
+				"Getting size of `"_ys.append( HHuginn::HValue::type_name( v->type() ) ).append( "'s is not supported." ),
 				position_
 			);
 		}
-		HHuginn::HValue const* v( values_.front().raw() );
-		int long long s( 0 );
-		switch ( v->type() ) {
-			case ( HHuginn::TYPE::STRING ): {
-				s = static_cast<HHuginn::HString const*>( v )->value().get_length();
-			} break;
-			case ( HHuginn::TYPE::LIST ): {
-				s = static_cast<HHuginn::HList const*>( v )->size();
-			} break;
-			case ( HHuginn::TYPE::MAP ): {
-				s = static_cast<HHuginn::HMap const*>( v )->size();
-			} break;
-			default: {
-				throw HHuginn::HHuginnRuntimeException(
-					"Getting size of `"_ys.append( HHuginn::HValue::type_name( v->type() ) ).append( "'s is not supported." ),
-					position_
-				);
-			}
-		}
-		return ( make_pointer<HHuginn::HInteger>( s ) );
-		M_EPILOG
 	}
-};
+	return ( make_pointer<HHuginn::HInteger>( s ) );
+	M_EPILOG
+}
 
-class HType : public HHuginn::HFunctionInterface {
-public:
-	typedef HType this_type;
-	typedef HHuginn::HFunctionInterface base_type;
-protected:
-	virtual HHuginn::value_t do_execute( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) const {
-		M_PROLOG
-		if ( values_.get_size() != 1 ) {
-			throw HHuginn::HHuginnRuntimeException( ""_ys
-				.append( "type() expects exactly one parameter, got: " )
-				.append( values_.get_size() ),
-				position_
-			);
-		}
-		HHuginn::HValue const* v( values_.front().raw() );
-		return ( make_pointer<HHuginn::HString>( HHuginn::HValue::type_name( v->type() ) ) );
-		M_EPILOG
+inline HHuginn::value_t type( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	if ( values_.get_size() != 1 ) {
+		throw HHuginn::HHuginnRuntimeException( ""_ys
+			.append( "type() expects exactly one parameter, got: " )
+			.append( values_.get_size() ),
+			position_
+		);
 	}
-};
+	HHuginn::HValue const* v( values_.front().raw() );
+	return ( make_pointer<HHuginn::HString>( HHuginn::HValue::type_name( v->type() ) ) );
+	M_EPILOG
+}
 
-class HPrint : public HHuginn::HFunctionInterface {
-public:
-	typedef HPrint this_type;
-	typedef HHuginn::HFunctionInterface base_type;
-protected:
-	virtual HHuginn::value_t do_execute( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) const {
-		M_PROLOG
-		if ( values_.get_size() != 1 ) {
-			throw HHuginn::HHuginnRuntimeException( ""_ys
-				.append( "print() expects exactly one parameter, got: " )
-				.append( values_.get_size() ),
+inline HHuginn::value_t print( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	if ( values_.get_size() != 1 ) {
+		throw HHuginn::HHuginnRuntimeException( ""_ys
+			.append( "print() expects exactly one parameter, got: " )
+			.append( values_.get_size() ),
+			position_
+		);
+	}
+	HHuginn::HValue const* v( values_.front().raw() );
+	switch ( v->type() ) {
+		case ( HHuginn::TYPE::INTEGER ): {
+			cout << static_cast<HHuginn::HInteger const*>( v )->value();
+		} break;
+		case ( HHuginn::TYPE::REAL ): {
+			cout << static_cast<HHuginn::HReal const*>( v )->value();
+		} break;
+		case ( HHuginn::TYPE::STRING ): {
+			cout << static_cast<HHuginn::HString const*>( v )->value();
+		} break;
+		case ( HHuginn::TYPE::NUMBER ): {
+			cout << static_cast<HHuginn::HNumber const*>( v )->value();
+		} break;
+		case ( HHuginn::TYPE::BOOLEAN ): {
+			cout << static_cast<HHuginn::HBoolean const*>( v )->value();
+		} break;
+		case ( HHuginn::TYPE::CHARACTER ): {
+			cout << static_cast<HHuginn::HCharacter const*>( v )->value();
+		} break;
+		default: {
+			throw HHuginn::HHuginnRuntimeException(
+				"Printing `"_ys.append( HHuginn::HValue::type_name( v->type() ) ).append( "'s is not supported." ),
 				position_
 			);
 		}
-		HHuginn::HValue const* v( values_.front().raw() );
-		switch ( v->type() ) {
-			case ( HHuginn::TYPE::INTEGER ): {
-				cout << static_cast<HHuginn::HInteger const*>( v )->value();
-			} break;
-			case ( HHuginn::TYPE::REAL ): {
-				cout << static_cast<HHuginn::HReal const*>( v )->value();
-			} break;
-			case ( HHuginn::TYPE::STRING ): {
-				cout << static_cast<HHuginn::HString const*>( v )->value();
-			} break;
-			case ( HHuginn::TYPE::NUMBER ): {
-				cout << static_cast<HHuginn::HNumber const*>( v )->value();
-			} break;
-			case ( HHuginn::TYPE::BOOLEAN ): {
-				cout << static_cast<HHuginn::HBoolean const*>( v )->value();
-			} break;
-			case ( HHuginn::TYPE::CHARACTER ): {
-				cout << static_cast<HHuginn::HCharacter const*>( v )->value();
-			} break;
-			default: {
-				throw HHuginn::HHuginnRuntimeException(
-					"Printing `"_ys.append( HHuginn::HValue::type_name( v->type() ) ).append( "'s is not supported." ),
-					position_
-				);
-			}
-		}
-		cout << flush;
-		return ( _none_ );
-		M_EPILOG
 	}
-};
+	cout << flush;
+	return ( _none_ );
+	M_EPILOG
+}
 
 }
 
 void HHuginn::register_builtins( void ) {
 	M_PROLOG
-	_functions.insert( make_pair<yaal::hcore::HString const>( "integer", make_pointer<huginn_builtin::HConversion>( TYPE::INTEGER ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "real", make_pointer<huginn_builtin::HConversion>( TYPE::REAL ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "string", make_pointer<huginn_builtin::HConversion>( TYPE::STRING ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "number", make_pointer<huginn_builtin::HConversion>( TYPE::NUMBER ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "boolean", make_pointer<huginn_builtin::HConversion>( TYPE::BOOLEAN ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "character", make_pointer<huginn_builtin::HConversion>( TYPE::CHARACTER ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "size", make_pointer<huginn_builtin::HSize>() ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "type", make_pointer<huginn_builtin::HType>() ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "print", make_pointer<huginn_builtin::HPrint>() ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "integer", hcore::call( &huginn_builtin::convert, TYPE::INTEGER, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "real", hcore::call( &huginn_builtin::convert, TYPE::REAL, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "string", hcore::call( &huginn_builtin::convert, TYPE::STRING, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "number", hcore::call( &huginn_builtin::convert, TYPE::NUMBER, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "boolean", hcore::call( &huginn_builtin::convert, TYPE::BOOLEAN, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "character", hcore::call( &huginn_builtin::convert, TYPE::CHARACTER, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "size", hcore::call( &huginn_builtin::size, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "type", hcore::call( &huginn_builtin::type, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "print", hcore::call( &huginn_builtin::print, _1, _2, _3 ) ) );
 	return;
 	M_EPILOG
 }

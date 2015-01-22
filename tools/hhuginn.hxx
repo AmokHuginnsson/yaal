@@ -64,9 +64,7 @@ public:
 	class HReturn;
 	class HClass;
 	class HMethod;
-	class HFunctionInterface;
 	class HFunction;
-	typedef yaal::hcore::HPointer<HFunctionInterface> function_t;
 	class HReference;
 	class HValue;
 	typedef yaal::hcore::HPointer<HValue> value_t;
@@ -88,6 +86,7 @@ public:
 	class HFrame;
 	typedef yaal::hcore::HPointer<HFrame> frame_t;
 	class HThread;
+	typedef yaal::hcore::HBoundCall<value_t ( HThread*, values_t const&, int )> function_t;
 	typedef yaal::hcore::HPointer<HThread> thread_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
 	enum class OPERATOR {
@@ -791,21 +790,9 @@ protected:
 	virtual void do_execute( HThread* ) const;
 };
 
-class HHuginn::HFunctionInterface {
-public:
-	typedef HHuginn::HFunctionInterface this_type;
-	virtual ~HFunctionInterface( void ) {
-		return;
-	}
-	value_t execute( HThread*, values_t const&, int ) const;
-protected:
-	virtual value_t do_execute( HThread*, values_t const&, int ) const = 0;
-};
-
-class HHuginn::HFunction : public HHuginn::HFunctionInterface {
+class HHuginn::HFunction {
 public:
 	typedef HHuginn::HFunction this_type;
-	typedef HHuginn::HFunctionInterface base_type;
 	typedef HHuginn::OCompiler::parameter_names_t parameter_names_t;
 private:
 	yaal::hcore::HString _name;
@@ -814,8 +801,7 @@ private:
 public:
 	HFunction( yaal::hcore::HString const&, parameter_names_t const&, HHuginn::scope_t const& );
 	HFunction( HFunction&& ) = default;
-protected:
-	virtual value_t do_execute( HThread*, values_t const&, int ) const;
+	value_t execute( HThread*, values_t const&, int ) const;
 };
 
 }
