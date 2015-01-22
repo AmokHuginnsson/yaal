@@ -3421,7 +3421,7 @@ void HHuginn::HFor::do_execute( HHuginn::HThread* thread_ ) const {
 		value_t source( f->result() );
 		HIterable* coll( dynamic_cast<HIterable*>( source.raw() ) );
 		if ( ! coll ) {
-			throw HHuginnRuntimeException( "`For' source is not an iterable.", _position );
+			throw HHuginnRuntimeException( "`For' source is not an iterable.", _source->position() );
 		}
 		HIterable::HIterator it( coll->iterator() );
 		while ( thread_->can_continue() && it.is_valid() ) {
