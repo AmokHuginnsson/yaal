@@ -32,8 +32,6 @@ Copyright:
 
 #include "hcore/hfunctor.hxx"
 #include "hcore/functional.hxx"
-#include "hcore/hpointer.hxx"
-#include "hcore/hresource.hxx"
 
 namespace yaal {
 

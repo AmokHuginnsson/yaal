@@ -33,6 +33,8 @@ Copyright:
 #include "hcore/base.hxx"
 #include "hcore/algorithm_low.hxx"
 #include "hcore/placeholder.hxx"
+#include "hcore/hpointer.hxx"
+#include "hcore/hresource.hxx"
 
 namespace yaal {
 
@@ -357,7 +359,22 @@ struct getter<N, -1, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7
 }
 
 struct object_resolver {
-	typedef enum { REF, PTR, FREE_REF, FREE_PTR } object_type_t;
+	template<typename tType>
+	struct is_smart_pointer {
+		template<typename T, template<typename>class K, template<typename, typename>class A>
+		static constexpr bool sfinae( typename yaal::hcore::HPointer<T, K, A> const* ) {
+			return ( true );
+		}
+		template<typename T, typename D>
+		static constexpr bool sfinae( typename yaal::hcore::HResource<T, D> const* ) {
+			return ( true );
+		}
+		static constexpr bool sfinae( ... ) {
+			return ( false );
+		}
+		static bool const value = sfinae( static_cast<tType const*>( nullptr ) );
+	};
+	typedef enum { REF, PTR, SMART, FREE_REF, FREE_PTR } object_type_t;
 	template<typename CLASS_t, typename arg_t = int>
 	struct object_type {
 		static object_type_t const value = static_cast<object_type_t>(
@@ -379,13 +396,28 @@ struct object_resolver {
 								-1
 						>::value,
 						meta::ternary<trait::is_pointer<typename trait::strip_reference<arg_t>::type>::value, FREE_PTR, FREE_REF>::value,
-						meta::ternary<trait::is_pointer<typename trait::strip_reference<CLASS_t>::type>::value, PTR, REF>::value
+						meta::ternary<
+							trait::is_pointer<typename trait::strip_reference<CLASS_t>::type>::value,
+							PTR,
+							meta::ternary<is_smart_pointer<CLASS_t>::value, SMART, REF>::value
+						>::value
 				>::value
 		);
 	};
 	template<typename return_t, object_type_t>
 	struct invoke;
 
+	template<typename return_t>
+	struct invoke<return_t, SMART> {
+		template<typename METHOD_t, typename CLASS_t, typename... arg_t>
+		static return_t go( METHOD_t method_, CLASS_t object_, arg_t&&... arg_ ) {
+			return ( (*object_.*method_)( yaal::forward<arg_t>( arg_ )... ) );
+		}
+		template<typename CLASS_t, typename dummy_t>
+		static CLASS_t* id( CLASS_t object_, dummy_t ) {
+			return ( reinterpret_cast<CLASS_t*>( object_.raw() ) );
+		}
+	};
 	template<typename return_t>
 	struct invoke<return_t, REF> {
 		template<typename METHOD_t, typename CLASS_t, typename... arg_t>
