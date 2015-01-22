@@ -59,6 +59,8 @@ public:
 	class HIf;
 	class HWhile;
 	class HFor;
+	class HSwitch;
+	class HBreak;
 	class HReturn;
 	class HClass;
 	class HMethod;
@@ -195,17 +197,17 @@ private:
 		void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
 		void set_for_identifier( yaal::hcore::HString const&, executing_parser::position_t );
 		void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
-		bool is_numeric( TYPE ) const;
-		bool is_numeric_congruent( TYPE ) const;
-		bool is_summable( TYPE ) const;
-		bool is_comparable( TYPE ) const;
-		bool is_comparable_congruent( TYPE ) const;
-		bool is_boolean_congruent( TYPE ) const;
-		bool is_unknown( TYPE ) const;
-		bool is_reference_congruent( TYPE ) const;
-		bool is_integer_congruent( TYPE ) const;
-		bool are_congruous( TYPE, TYPE ) const;
-		TYPE congruent( TYPE, TYPE ) const;
+		static bool is_numeric( TYPE );
+		static bool is_numeric_congruent( TYPE );
+		static bool is_summable( TYPE );
+		static bool is_comparable( TYPE );
+		static bool is_comparable_congruent( TYPE );
+		static bool is_boolean_congruent( TYPE );
+		static bool is_unknown( TYPE );
+		static bool is_reference_congruent( TYPE );
+		static bool is_integer_congruent( TYPE );
+		static bool are_congruous( TYPE, TYPE );
+		static TYPE congruent( TYPE, TYPE );
 		scope_t& current_scope( void );
 		expression_t& current_expression( void );
 		void reset_expression( void );
@@ -217,10 +219,13 @@ private:
 		void commit_if_clause( executing_parser::position_t );
 		void commit_else_clause( executing_parser::position_t );
 		void add_return_statement( executing_parser::position_t );
+		void add_break_statement( executing_parser::position_t );
 		void add_while_statement( executing_parser::position_t );
 		void add_for_statement( executing_parser::position_t );
 		void add_if_statement( executing_parser::position_t );
+		void add_switch_statement( executing_parser::position_t );
 		void commit_expression( executing_parser::position_t );
+		void mark_expression_position( executing_parser::position_t );
 		void defer_function_call( yaal::hcore::HString const&, executing_parser::position_t );
 		void defer_get_variable( yaal::hcore::HString const&, executing_parser::position_t );
 		void defer_make_variable( yaal::hcore::HString const&, executing_parser::position_t );
@@ -419,6 +424,7 @@ private:
 public:
 	HExpression( HHuginn*, int = 0 );
 	int position( void ) const;
+	void set_position( int );
 	void add_execution_step( execution_step_t const& );
 	void merge( HExpression& );
 	void oper( OPERATOR, HFrame*, int );
@@ -519,7 +525,7 @@ public:
 	void pop_frame( void );
 	HFrame* current_frame( void );
 	HFrame const* current_frame( void ) const;
-	void break_execution( HFrame::STATE, HHuginn::value_t const& = HHuginn::value_t(), int = meta::max_signed<int>::value );
+	void break_execution( HFrame::STATE, HHuginn::value_t const& = HHuginn::value_t(), int = 0 );
 	bool can_continue( void ) const;
 	yaal::hcore::HThread::id_t id( void ) const;
 };
@@ -715,6 +721,19 @@ private:
 	HReturn& operator = ( HReturn const& ) = delete;
 };
 
+class HHuginn::HBreak : public HHuginn::HStatement {
+public:
+	typedef HHuginn::HBreak this_type;
+	typedef HHuginn::HStatement base_type;
+public:
+	HBreak( void );
+protected:
+	virtual void do_execute( HHuginn::HThread* ) const;
+private:
+	HBreak( HBreak const& ) = delete;
+	HBreak& operator = ( HBreak const& ) = delete;
+};
+
 class HHuginn::HIf : public HHuginn::HStatement {
 public:
 	typedef HHuginn::HIf this_type;
@@ -725,6 +744,21 @@ private:
 	scope_t _elseClause;
 public:
 	HIf( if_clauses_t const&, scope_t const& );
+protected:
+	virtual void do_execute( HThread* ) const;
+};
+
+class HHuginn::HSwitch : public HHuginn::HStatement {
+public:
+	typedef HHuginn::HSwitch this_type;
+	typedef HHuginn::HStatement base_type;
+	typedef HHuginn::OCompiler::OCompilationFrame::contexts_t cases_t;
+private:
+	expression_t _expression;
+	cases_t _cases;
+	scope_t _default;
+public:
+	HSwitch( expression_t const&, cases_t const&, scope_t const& );
 protected:
 	virtual void do_execute( HThread* ) const;
 };

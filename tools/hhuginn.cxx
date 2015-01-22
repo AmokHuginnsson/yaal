@@ -151,7 +151,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	using namespace executing_parser;
 	namespace e_p = executing_parser;
 	hcore::HString identifier( "\\<[a-zA-Z_][a-zA-Z0-9_]*\\>" );
-	HRule expression( "expression" );
+	HRule expression( "expression", e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::mark_expression_position, &_compiler, _1 ) ) );
 	HRule absoluteValue( "absoluteValue",
 		constant( '|', e_p::HCharacter::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1, _2 ) ) )
 		>> expression
@@ -345,7 +345,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	expression %= assignment;
 	HRule expressionStatement(
 		"expressionStatement",
-		expression[HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler, _1 ) )] >> ';'
+		HRule( expression, HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler, _1 ) ) ) >> ';'
 	);
 	HRule scope( "scope" );
 	HRule ifClause(
@@ -377,16 +377,25 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		)
 	);
 	HRule forStatement( "forStatement", constant( "for" ) >> '(' >> forIdentifier >> ':' >> expression >> ')' >> scope );
-	HRule caseStatement( "caseStatement", constant( "case" ) >> '(' >> integer >> ')' >> ':' >> scope >> -breakStatement );
+	HRule caseStatement(
+		"caseStatement",
+		constant( "case" ) >> '(' >> expression >> ')' >> ':' >> scope >> -( breakStatement[HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::add_break_statement, &_compiler, _1 ) )] ),
+		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::commit_if_clause, &_compiler, _1 ) )
+	);
 	HRule defaultStatement( "defaultStatement", constant( "default" ) >> ':' >> scope );
-	HRule switchStatement( "switchStatement", constant( "switch" ) >> '(' >> expression >> ')' >> '{' >> +caseStatement >> -defaultStatement >> '}' );
+	HRule switchStatement(
+		"switchStatement",
+		constant( "switch" ) >> '(' >> expression >> ')' >>
+		constant( '{', HRuleBase::action_position_t( hcore::call( &OCompiler::create_scope, &_compiler, _1 ) ) ) >> +caseStatement >>
+		-( defaultStatement[HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::commit_else_clause, &_compiler, _1 ) )] ) >> '}'
+	);
 	HRule returnStatement( "returnStatement", constant( "return" ) >> -( '(' >> expression >> ')' ) >> ';' );
 	HRule statement( "statement",
 		ifStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_if_statement, &_compiler, _1 ) )]
 		| whileStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_while_statement, &_compiler, _1 ) )]
 		| forStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_for_statement, &_compiler, _1 ) )]
-		| switchStatement
-		| breakStatement
+		| switchStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_switch_statement, &_compiler, _1 ) )]
+		| breakStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_break_statement, &_compiler, _1 ) )]
 		| continueStatement
 		| returnStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_return_statement, &_compiler, _1 ) )]
 		| expressionStatement
@@ -919,6 +928,15 @@ void HHuginn::OCompiler::add_return_statement( executing_parser::position_t ) {
 	M_EPILOG
 }
 
+void HHuginn::OCompiler::add_break_statement( executing_parser::position_t ) {
+	M_PROLOG
+	M_ASSERT( ! _compilationStack.is_empty() );
+	current_scope()->add_statement( make_pointer<HBreak>() );
+	reset_expression();
+	return;
+	M_EPILOG
+}
+
 void HHuginn::OCompiler::add_while_statement( executing_parser::position_t ) {
 	M_PROLOG
 	M_ASSERT( ! _compilationStack.is_empty() );
@@ -985,11 +1003,38 @@ void HHuginn::OCompiler::add_if_statement( executing_parser::position_t ) {
 	M_EPILOG
 }
 
+void HHuginn::OCompiler::add_switch_statement( executing_parser::position_t ) {
+	M_PROLOG
+	M_ASSERT( ! _compilationStack.is_empty() );
+	OCompilationFrame::contexts_t contexts( yaal::move( _compilationStack.top()._contextsChain ) );
+	scope_t Default( _compilationStack.top()._else );
+	_compilationStack.pop();
+	statement_t switchStatement(
+		make_pointer<HSwitch>(
+			current_expression(),
+			contexts,
+			Default
+		)
+	);
+	current_scope()->add_statement( switchStatement );
+	reset_expression();
+	return;
+	M_EPILOG
+}
+
 void HHuginn::OCompiler::commit_expression( executing_parser::position_t ) {
 	M_PROLOG
 	M_ASSERT( ! _compilationStack.is_empty() );
 	current_scope()->add_statement( current_expression() );
 	reset_expression();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::mark_expression_position( executing_parser::position_t position_ ) {
+	M_PROLOG
+	M_ASSERT( ! _compilationStack.is_empty() );
+	current_expression()->set_position( position_.get() );
 	return;
 	M_EPILOG
 }
@@ -1048,11 +1093,11 @@ void HHuginn::OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser
 	M_EPILOG
 }
 
-bool HHuginn::OCompiler::is_numeric( TYPE type_ ) const {
+bool HHuginn::OCompiler::is_numeric( TYPE type_ ) {
 	return ( ( type_ == TYPE::INTEGER ) || ( type_ == TYPE::REAL ) || ( type_ == TYPE::NUMBER ) );
 }
 
-bool HHuginn::OCompiler::is_comparable( TYPE type_ ) const {
+bool HHuginn::OCompiler::is_comparable( TYPE type_ ) {
 	return (
 		is_numeric( type_ )
 		|| ( type_ == TYPE::STRING )
@@ -1060,35 +1105,35 @@ bool HHuginn::OCompiler::is_comparable( TYPE type_ ) const {
 	);
 }
 
-bool HHuginn::OCompiler::is_boolean_congruent( TYPE type_ ) const {
+bool HHuginn::OCompiler::is_boolean_congruent( TYPE type_ ) {
 	return ( ( type_ == TYPE::BOOLEAN ) || ( type_ == TYPE::UNKNOWN ) || ( type_ == TYPE::REFERENCE ) );
 }
 
-bool HHuginn::OCompiler::is_unknown( TYPE type_ ) const {
+bool HHuginn::OCompiler::is_unknown( TYPE type_ ) {
 	return ( ( type_ == TYPE::NOT_BOOLEAN ) || ( type_ == TYPE::UNKNOWN ) || ( type_ == TYPE::REFERENCE ) );
 }
 
-bool HHuginn::OCompiler::is_numeric_congruent( TYPE type_ ) const {
+bool HHuginn::OCompiler::is_numeric_congruent( TYPE type_ ) {
 	return ( is_numeric( type_ ) || is_unknown( type_ ) );
 }
 
-bool HHuginn::OCompiler::is_comparable_congruent( TYPE type_ ) const {
+bool HHuginn::OCompiler::is_comparable_congruent( TYPE type_ ) {
 	return ( is_comparable( type_ ) || is_unknown( type_ ) );
 }
 
-bool HHuginn::OCompiler::is_reference_congruent( TYPE type_ ) const {
+bool HHuginn::OCompiler::is_reference_congruent( TYPE type_ ) {
 	return ( ( type_ == TYPE::REFERENCE ) || ( type_ == TYPE::UNKNOWN ) );
 }
 
-bool HHuginn::OCompiler::is_integer_congruent( TYPE type_ ) const {
+bool HHuginn::OCompiler::is_integer_congruent( TYPE type_ ) {
 	return ( ( type_ == TYPE::INTEGER ) || is_unknown( type_ ) );
 }
 
-bool HHuginn::OCompiler::is_summable( TYPE type_ ) const {
+bool HHuginn::OCompiler::is_summable( TYPE type_ ) {
 	return ( is_numeric_congruent( type_ ) || ( type_ == TYPE::STRING ) );
 }
 
-bool HHuginn::OCompiler::are_congruous( TYPE t1_, TYPE t2_ ) const {
+bool HHuginn::OCompiler::are_congruous( TYPE t1_, TYPE t2_ ) {
 	bool congruous(
 		( t1_ == t2_ )
 		|| ( t1_ == TYPE::UNKNOWN )
@@ -1103,7 +1148,7 @@ bool HHuginn::OCompiler::are_congruous( TYPE t1_, TYPE t2_ ) const {
 	return ( congruous );
 }
 
-HHuginn::TYPE HHuginn::OCompiler::congruent( TYPE t1_, TYPE t2_ ) const {
+HHuginn::TYPE HHuginn::OCompiler::congruent( TYPE t1_, TYPE t2_ ) {
 	TYPE t( TYPE::NOT_BOOLEAN );
 	if ( t1_ == t2_ ) {
 		if ( ( t1_ != TYPE::UNKNOWN ) && ( t1_ != TYPE::REFERENCE ) ) {
@@ -1755,7 +1800,7 @@ void HHuginn::HThread::break_execution( HFrame::STATE state_, HHuginn::value_t c
 			break;
 		} else if ( f->number() != no ) {
 			break;
-		} else if ( ( state_ == HHuginn::HFrame::STATE::BREAK ) && ( level >= level_ ) ) {
+		} else if ( ( state_ == HHuginn::HFrame::STATE::BREAK ) && ( level > level_ ) ) {
 			break;
 		}
 	}
@@ -2692,6 +2737,13 @@ int HHuginn::HExpression::position( void ) const {
 	M_EPILOG
 }
 
+void HHuginn::HExpression::set_position( int position_ ) {
+	M_PROLOG
+	_position = position_;
+	return;
+	M_EPILOG
+}
+
 void HHuginn::HExpression::add_execution_step( execution_step_t const& executionStep_ ) {
 	M_PROLOG
 	_executionSteps.push_back( executionStep_ );
@@ -3223,6 +3275,17 @@ void HHuginn::HReturn::do_execute( HHuginn::HThread* thread_ ) const {
 	M_EPILOG
 }
 
+HHuginn::HBreak::HBreak( void ) {
+	return;
+}
+
+void HHuginn::HBreak::do_execute( HHuginn::HThread* thread_ ) const {
+	M_PROLOG
+	thread_->break_execution( HHuginn::HFrame::STATE::BREAK );
+	return;
+	M_EPILOG
+}
+
 HHuginn::HIf::HIf(
 	if_clauses_t const& ifClause_,
 	scope_t const& elseClause_
@@ -3253,6 +3316,56 @@ void HHuginn::HIf::do_execute( HHuginn::HThread* thread_ ) const {
 	}
 	if ( ! done && thread_->can_continue() && !! _elseClause ) {
 		_elseClause->execute( thread_ );
+	}
+	thread_->pop_frame();
+	return;
+	M_EPILOG
+}
+
+HHuginn::HSwitch::HSwitch(
+	expression_t const& expression_,
+	cases_t const& cases_,
+	scope_t const& default_
+) : HStatement(),
+	_expression( expression_ ),
+	_cases( cases_ ),
+	_default( default_ ) {
+	return;
+}
+
+void HHuginn::HSwitch::do_execute( HHuginn::HThread* thread_ ) const {
+	M_PROLOG
+	thread_->create_loop_frame();
+	HFrame* f( thread_->current_frame() );
+	_expression->execute( thread_ );
+	if ( thread_->can_continue() ) {
+		value_t v( f->result() );
+		if ( ! OCompiler::is_comparable( v->type() ) ) {
+			throw HHuginnRuntimeException( "Expression does not evaluate to comparable type.", _expression->position() );
+		}
+		bool matched( false );
+		for ( cases_t::const_iterator it( _cases.begin() ), end( _cases.end() );
+			( it != end ) && thread_->can_continue(); ++ it ) {
+			if ( ! matched ) {
+				it->expression()->execute( thread_ );
+			}
+			if ( thread_->can_continue() ) {
+				if ( ! matched ) {
+					if ( v->type() != f->result()->type() ) {
+						throw HHuginnRuntimeException( "Case type does not match switch type.", it->expression()->position() );
+					}
+				}
+				if ( matched || HValue::equals( v, f->result(), it->expression()->position() ) ) {
+					matched = true;
+					it->_scope->execute( thread_ );
+				}
+			} else {
+				break;
+			}
+		}
+		if ( thread_->can_continue() && !! _default ) {
+			_default->execute( thread_ );
+		}
 	}
 	thread_->pop_frame();
 	return;
