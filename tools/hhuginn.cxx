@@ -323,7 +323,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 				constant(
 					'[',
 					e_p::HCharacter::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1, _2 ) )
-				) >> ( value | subscript ) >> ']'
+				) >> expression >> ']'
 			)[e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::SUBSCRIPT, _1 ) )]
 		)
 	);
@@ -332,8 +332,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	 * In other words you cannot modify value of referenced object
 	 * with assignment. You can only change where a reference points to.
 	 */
-	HRule assignment(
-		"assignment",
+	expression %= HRule(
 		* (
 			/* make reference */ (
 				subscript
@@ -347,7 +346,6 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		) >> value,
 		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::ASSIGN, _1 ) )
 	);
-	expression %= assignment;
 	HRule expressionStatement(
 		"expressionStatement",
 		HRule( expression, HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler, _1 ) ) ) >> ';'
