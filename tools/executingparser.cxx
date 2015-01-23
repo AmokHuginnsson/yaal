@@ -2239,7 +2239,7 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 			add_execution_step( executingParser_, start, call( _actionNumberPosition, yaal::move( _cache ), pos ) );
 		} else if ( !! _actionString ) {
 			add_execution_step( executingParser_, start, call( _actionString, yaal::move( _cache ) ) );
-		} else if ( !! _actionString ) {
+		} else if ( !! _actionStringPosition ) {
 			add_execution_step( executingParser_, start, call( _actionStringPosition, yaal::move( _cache ), pos ) );
 		} else if ( !! _action ) {
 			add_execution_step( executingParser_, start, call( _action ) );
