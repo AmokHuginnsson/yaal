@@ -246,6 +246,7 @@ private:
 		void defer_store_real( double long, executing_parser::position_t );
 		void defer_store_integer( int long long, executing_parser::position_t );
 		void defer_store_string( yaal::hcore::HString const&, executing_parser::position_t );
+		void defer_store_number( yaal::hcore::HString const&, executing_parser::position_t );
 		void defer_store_character( char, executing_parser::position_t );
 		void defer_store_boolean( bool, executing_parser::position_t );
 		void defer_store_none( executing_parser::position_t );
@@ -275,6 +276,12 @@ private:
 	int _errorPosition;
 	typedef std::atomic<bool> flag_t;
 	static flag_t _grammarVerified;
+	yaal::hcore::HStreamInterface::ptr_t _inputStream;
+	yaal::hcore::HStreamInterface* _inputStreamRaw;
+	yaal::hcore::HStreamInterface::ptr_t _outputStream;
+	yaal::hcore::HStreamInterface* _outputStreamRaw;
+	yaal::hcore::HStreamInterface::ptr_t _errorStream;
+	yaal::hcore::HStreamInterface* _errorStreamRaw;
 public:
 	HHuginn( void );
 	/*! \brief Store source in internal buffer.
@@ -313,10 +320,21 @@ public:
 	int error_position( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;
 	yaal::hcore::HString error_message( void ) const;
+	void set_input_stream( yaal::hcore::HStreamInterface& );
+	void set_input_stream( yaal::hcore::HStreamInterface::ptr_t );
+	void set_output_stream( yaal::hcore::HStreamInterface& );
+	void set_output_stream( yaal::hcore::HStreamInterface::ptr_t );
+	void set_error_stream( yaal::hcore::HStreamInterface& );
+	void set_error_stream( yaal::hcore::HStreamInterface::ptr_t );
 	executing_parser::HRule make_engine( void );
+	yaal::hcore::HStreamInterface& input_stream( void );
+	yaal::hcore::HStreamInterface& output_stream( void );
+	yaal::hcore::HStreamInterface& error_stream( void );
 private:
 	void register_builtins( void );
 	char const* error_message( int ) const;
+	HHuginn( HHuginn const& ) = delete;
+	HHuginn& operator = ( HHuginn const& ) = delete;
 };
 
 typedef yaal::hcore::HExceptionT<HHuginn> HHuginnException;
@@ -455,6 +473,7 @@ public:
 	void store_real( double long, HFrame*, int );
 	void store_integer( int long long, HFrame*, int );
 	void store_string( yaal::hcore::HString const&, HFrame*, int );
+	void store_number( yaal::hcore::HString const&, HFrame*, int );
 	void store_character( char, HFrame*, int );
 	void store_boolean( bool, HFrame*, int );
 	void store_none( HFrame*, int );
@@ -516,8 +535,9 @@ public:
 private:
 	frames_t _frames;
 	yaal::hcore::HThread::id_t _id;
+	HHuginn* _huginn;
 public:
-	HThread( yaal::hcore::HThread::id_t );
+	HThread( HHuginn*, yaal::hcore::HThread::id_t );
 	void create_function_frame( void );
 	void create_loop_frame( void );
 	void create_scope_frame( void );
@@ -527,6 +547,10 @@ public:
 	void break_execution( HFrame::STATE, HHuginn::value_t const& = HHuginn::value_t(), int = 0 );
 	bool can_continue( void ) const;
 	yaal::hcore::HThread::id_t id( void ) const;
+	HHuginn& huginn( void );
+private:
+	HThread( HThread const& ) = delete;
+	HThread& operator = ( HThread const& ) = delete;
 };
 
 class HHuginn::HReference : public HHuginn::HValue {

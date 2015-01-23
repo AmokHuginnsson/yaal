@@ -199,10 +199,15 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"false",
 		constant( "false", e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::defer_store_boolean, &_compiler, false, _1 ) ) )
 	);
+	HRule numberLiteral(
+		"numberLiteral",
+		constant( '$' ) >> real[e_p::HReal::action_string_position_t( hcore::call( &HHuginn::OCompiler::defer_store_number, &_compiler, _1, _2 ) )]
+	);
 	HRule atom( "atom",
 		absoluteValue
 		| parenthesis
 		| real( e_p::HReal::PARSE::STRICT )[e_p::HReal::action_double_long_position_t( hcore::call( &HHuginn::OCompiler::defer_store_real, &_compiler, _1, _2 ) )]
+		| numberLiteral
 		| integer[e_p::HInteger::action_int_long_long_position_t( hcore::call( &HHuginn::OCompiler::defer_store_integer, &_compiler, _1, _2 ) )]
 		| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_store_character, &_compiler, _1, _2 ) )]
 		| subscript[e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::dereference, _1 ) )]
@@ -1484,6 +1489,14 @@ void HHuginn::OCompiler::defer_store_string( yaal::hcore::HString const& value_,
 	M_EPILOG
 }
 
+void HHuginn::OCompiler::defer_store_number( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	current_expression()->add_execution_step( hcore::call( &HExpression::store_number, current_expression().raw(), value_, _1, position_.get() ) );
+	_valueTypes.push( TYPE::NUMBER );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::OCompiler::defer_store_character( char value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_character, current_expression().raw(), value_, _1, position_.get() ) );
@@ -1534,7 +1547,13 @@ HHuginn::HHuginn( void )
 	_argv( new ( memory::yaal ) HList() ),
 	_result(),
 	_errorMessage(),
-	_errorPosition( -1 ) {
+	_errorPosition( -1 ),
+	_inputStream(),
+	_inputStreamRaw( &cin ),
+	_outputStream(),
+	_outputStreamRaw( &cout ),
+	_errorStream(),
+	_errorStreamRaw( &cerr ) {
 	M_PROLOG
 	_grammarVerified.store( true );
 	register_builtins();
@@ -1593,7 +1612,7 @@ bool HHuginn::execute( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::COMPILED );
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
-	threads_t::iterator t( _threads.insert( make_pair( threadId, make_pointer<HThread>( threadId ) ) ).first );
+	threads_t::iterator t( _threads.insert( make_pair( threadId, make_pointer<HThread>( this, threadId ) ) ).first );
 	values_t args;
 	if ( _argv->size() > 0 ) {
 		args.push_back( _argv );
@@ -1679,6 +1698,75 @@ char const* HHuginn::error_message( int code_ ) const {
 	return ( ::error_message( code_ ) );
 }
 
+void HHuginn::set_input_stream( yaal::hcore::HStreamInterface::ptr_t stream_ ) {
+	M_PROLOG
+	_inputStream = stream_;
+	_inputStreamRaw = _inputStream.raw();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::set_input_stream( yaal::hcore::HStreamInterface& stream_ ) {
+	M_PROLOG
+	_inputStream.reset();
+	_inputStreamRaw = &stream_;
+	return;
+	M_EPILOG
+}
+
+void HHuginn::set_output_stream( yaal::hcore::HStreamInterface::ptr_t stream_ ) {
+	M_PROLOG
+	_outputStream = stream_;
+	_outputStreamRaw = _outputStream.raw();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::set_output_stream( yaal::hcore::HStreamInterface& stream_ ) {
+	M_PROLOG
+	_outputStream.reset();
+	_outputStreamRaw = &stream_;
+	return;
+	M_EPILOG
+}
+
+void HHuginn::set_error_stream( yaal::hcore::HStreamInterface::ptr_t stream_ ) {
+	M_PROLOG
+	_errorStream = stream_;
+	_errorStreamRaw = _errorStream.raw();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::set_error_stream( yaal::hcore::HStreamInterface& stream_ ) {
+	M_PROLOG
+	_errorStream.reset();
+	_errorStreamRaw = &stream_;
+	return;
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface& HHuginn::input_stream( void ) {
+	M_PROLOG
+	M_ENSURE( _inputStreamRaw );
+	return ( *_inputStreamRaw );
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface& HHuginn::output_stream( void ) {
+	M_PROLOG
+	M_ENSURE( _outputStreamRaw );
+	return ( *_outputStreamRaw );
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface& HHuginn::error_stream( void ) {
+	M_PROLOG
+	M_ENSURE( _errorStreamRaw );
+	return ( *_errorStreamRaw );
+	M_EPILOG
+}
+
 void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_PROLOG
 	_argv->push_back( make_pointer<HString>( arg_ ) );
@@ -1723,8 +1811,8 @@ void HHuginn::create_function( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-HHuginn::HThread::HThread( yaal::hcore::HThread::id_t id_ )
-	: _frames(), _id( id_ ) {
+HHuginn::HThread::HThread( HHuginn* huginn_, yaal::hcore::HThread::id_t id_ )
+	: _frames(), _id( id_ ), _huginn( huginn_ ) {
 	return;
 }
 
@@ -1809,6 +1897,10 @@ void HHuginn::HThread::break_execution( HFrame::STATE state_, HHuginn::value_t c
 	}
 	return;
 	M_EPILOG
+}
+
+HHuginn& HHuginn::HThread::huginn( void ) {
+	return ( *_huginn );
 }
 
 HHuginn::HFrame::HFrame( HThread* thread_, HFrame* parent_, bool bump_, bool loop_ )
@@ -3196,6 +3288,13 @@ void HHuginn::HExpression::store_string( yaal::hcore::HString const& value_, HFr
 	M_EPILOG
 }
 
+void HHuginn::HExpression::store_number( yaal::hcore::HString const& value_, HFrame* frame_, int ) {
+	M_PROLOG
+	frame_->values().push( make_pointer<HNumber>( value_ ) );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::HExpression::store_character( char value_, HFrame* frame_, int ) {
 	M_PROLOG
 	frame_->values().push( make_pointer<HCharacter>( value_ ) );
@@ -3556,7 +3655,18 @@ inline HHuginn::value_t type( HHuginn::HThread*, HHuginn::values_t const& values
 	M_EPILOG
 }
 
-inline HHuginn::value_t print( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t list( HHuginn::HThread*, HHuginn::values_t const& values_, int ) {
+	M_PROLOG
+	HHuginn::value_t v( make_pointer<HHuginn::HList>() );
+	HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
+	for ( HHuginn::value_t const& e : values_ ) {
+		l->push_back( e );
+	}
+	return ( v );
+	M_EPILOG
+}
+
+inline HHuginn::value_t print( HHuginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException( ""_ys
@@ -3566,24 +3676,25 @@ inline HHuginn::value_t print( HHuginn::HThread*, HHuginn::values_t const& value
 		);
 	}
 	HHuginn::HValue const* v( values_.front().raw() );
+	yaal::hcore::HStreamInterface& out( thread_->huginn().output_stream() );
 	switch ( v->type() ) {
 		case ( HHuginn::TYPE::INTEGER ): {
-			cout << static_cast<HHuginn::HInteger const*>( v )->value();
+			out << static_cast<HHuginn::HInteger const*>( v )->value();
 		} break;
 		case ( HHuginn::TYPE::REAL ): {
-			cout << static_cast<HHuginn::HReal const*>( v )->value();
+			out << static_cast<HHuginn::HReal const*>( v )->value();
 		} break;
 		case ( HHuginn::TYPE::STRING ): {
-			cout << static_cast<HHuginn::HString const*>( v )->value();
+			out << static_cast<HHuginn::HString const*>( v )->value();
 		} break;
 		case ( HHuginn::TYPE::NUMBER ): {
-			cout << static_cast<HHuginn::HNumber const*>( v )->value();
+			out << static_cast<HHuginn::HNumber const*>( v )->value();
 		} break;
 		case ( HHuginn::TYPE::BOOLEAN ): {
-			cout << static_cast<HHuginn::HBoolean const*>( v )->value();
+			out << static_cast<HHuginn::HBoolean const*>( v )->value();
 		} break;
 		case ( HHuginn::TYPE::CHARACTER ): {
-			cout << static_cast<HHuginn::HCharacter const*>( v )->value();
+			out << static_cast<HHuginn::HCharacter const*>( v )->value();
 		} break;
 		default: {
 			throw HHuginn::HHuginnRuntimeException(
@@ -3592,8 +3703,16 @@ inline HHuginn::value_t print( HHuginn::HThread*, HHuginn::values_t const& value
 			);
 		}
 	}
-	cout << flush;
+	out << flush;
 	return ( _none_ );
+	M_EPILOG
+}
+
+inline HHuginn::value_t input( HHuginn::HThread* thread_, HHuginn::values_t const&, int ) {
+	M_PROLOG
+	yaal::hcore::HString l;
+	thread_->huginn().input_stream().read_until( l );
+	return ( make_pointer<HHuginn::HString>( l ) );
 	M_EPILOG
 }
 
@@ -3609,7 +3728,9 @@ void HHuginn::register_builtins( void ) {
 	_functions.insert( make_pair<yaal::hcore::HString const>( "character", hcore::call( &huginn_builtin::convert, TYPE::CHARACTER, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "size", hcore::call( &huginn_builtin::size, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "type", hcore::call( &huginn_builtin::type, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "list", hcore::call( &huginn_builtin::list, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "print", hcore::call( &huginn_builtin::print, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "input", hcore::call( &huginn_builtin::input, _1, _2, _3 ) ) );
 	return;
 	M_EPILOG
 }
