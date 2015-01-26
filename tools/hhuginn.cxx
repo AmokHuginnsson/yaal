@@ -421,7 +421,25 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		) >> '(' >> -nameList >> ')' >> scope,
 		HRuleBase::action_position_t( hcore::call( &HHuginn::create_function, this, _1 ) )
 	);
-	HRule huginnGrammar( "huginnGrammar", + functionDefinition );
+	HRule literal(
+		"literal",
+		real
+		| numberLiteral
+		| integer
+		| character_literal
+		| stringLiteral
+		| literalNone
+		| booleanLiteralTrue
+		| booleanLiteralFalse
+	);
+	HRule field( "field", regex( "fieldIdentifier", identifier ) >> '=' >> literal >> ';' );
+	HRule classDefinition(
+		"classDefinition",
+		constant( "class" ) >> regex( "classIdentifier", identifier )
+		>> -( ':' >> regex( "baseIdentifier", identifier ) )
+		>> '{' >> +( field | functionDefinition ) >> '}'
+	);
+	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition ) );
 	return ( huginnGrammar );
 	M_EPILOG
 }
