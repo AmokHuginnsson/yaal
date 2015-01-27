@@ -66,6 +66,7 @@ public:
 	class HMethod;
 	class HFunction;
 	class HReference;
+	class HFunctionReference;
 	class HValue;
 	typedef yaal::hcore::HPointer<HValue> value_t;
 	class HBoolean;
@@ -330,6 +331,7 @@ public:
 	yaal::hcore::HStreamInterface& input_stream( void );
 	yaal::hcore::HStreamInterface& output_stream( void );
 	yaal::hcore::HStreamInterface& error_stream( void );
+	function_t get_function( yaal::hcore::HString const& );
 private:
 	void register_builtins( void );
 	char const* error_message( int ) const;
@@ -511,7 +513,8 @@ public:
 	HFrame( HThread*, HFrame*, bool, bool );
 	value_t make_variable( yaal::hcore::HString const&, int );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const&, int );
-	value_t& get_variable( yaal::hcore::HString const&, int );
+	value_t get_variable( yaal::hcore::HString const&, int );
+	value_t try_variable( yaal::hcore::HString const&, int );
 	bool can_continue( void ) const;
 	void break_execution( STATE );
 	int number( void ) const;
@@ -826,6 +829,18 @@ public:
 	HFunction( yaal::hcore::HString const&, parameter_names_t const&, HHuginn::scope_t const& );
 	HFunction( HFunction&& ) = default;
 	value_t execute( HThread*, values_t const&, int ) const;
+};
+
+class HHuginn::HFunctionReference : public HHuginn::HValue {
+	typedef HHuginn::HFunctionReference this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	yaal::hcore::HString _name;
+	HHuginn::function_t _function;
+public:
+	HFunctionReference( yaal::hcore::HString const&, HHuginn::function_t const& );
+	yaal::hcore::HString const& name( void ) const;
+	HHuginn::function_t const& function( void ) const;
 };
 
 }

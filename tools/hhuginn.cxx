@@ -1675,6 +1675,13 @@ HHuginn::value_t HHuginn::result( void ) const {
 	return ( _result );
 }
 
+HHuginn::function_t HHuginn::get_function( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	functions_t::const_iterator it( _functions.find( name_ ) );
+	return ( it != _functions.end() ? it->second : function_t() );
+	M_EPILOG
+}
+
 int HHuginn::error_position( void ) const {
 	M_PROLOG
 	return ( _source.error_position( _errorPosition ) );
@@ -1976,18 +1983,31 @@ void HHuginn::HFrame::reset( void ) {
 	M_EPILOG
 }
 
-HHuginn::value_t& HHuginn::HFrame::get_variable( yaal::hcore::HString const& name_, int position_ ) {
+HHuginn::value_t HHuginn::HFrame::try_variable( yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	variables_t::iterator it( _variables.find( name_ ) );
-	HHuginn::value_t* v( nullptr );
+	HHuginn::value_t v;
 	if ( it != _variables.end() ) {
-		v = &it->second;
+		v = it->second;
 	} else if ( _parent && ( _parent->_number == _number ) ) {
-		v = &_parent->get_variable( name_, position_ );
+		v = _parent->try_variable( name_, position_ );
 	} else {
+		HHuginn::function_t f( _thread->huginn().get_function( name_ ) );
+		if ( !! f ) {
+			v = make_pointer<HFunctionReference>( name_, f );
+		}
+	}
+	return ( v );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HFrame::get_variable( yaal::hcore::HString const& name_, int position_ ) {
+	M_PROLOG
+	HHuginn::value_t v( try_variable( name_, position_ ) );
+	if ( ! v ) {
 		throw HHuginnRuntimeException( "variable `"_ys.append( name_ ).append( "' does not exist" ), position_ );
 	}
-	return ( *v );
+	return ( v );
 	M_EPILOG
 }
 
@@ -2893,7 +2913,11 @@ void HHuginn::HExpression::close_parenthesis( HFrame* frame_, int position_ ) {
 void HHuginn::HExpression::function_call( yaal::hcore::HString const& name_, HFrame* frame_, int position_ ) {
 	M_PROLOG
 	frame_->operations().emplace( OPERATOR::FUNCTION_CALL, position_ );
-	frame_->values().push( make_pointer<HString>( name_ ) );
+	value_t v( frame_->try_variable( name_, position_ ) );
+	if ( ! v ) {
+		throw HHuginnRuntimeException( "function `"_ys.append( name_ ).append( "' is not defined" ), position_ );
+	}
+	frame_->values().push( ( !! v && ( v->type() == TYPE::FUNCTION_REFERENCE ) ) ? v : pointer_static_cast<HValue>( make_pointer<HString>( name_ ) ) );
 	return;
 	M_EPILOG
 }
@@ -2932,7 +2956,7 @@ void HHuginn::HExpression::set_variable( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HHuginn::HExpression::function_call_exec( HFrame* frame_, int ) {
+void HHuginn::HExpression::function_call_exec( HFrame* frame_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
 	M_ASSERT( ! frame_->values().is_empty() );
@@ -2945,13 +2969,16 @@ void HHuginn::HExpression::function_call_exec( HFrame* frame_, int ) {
 		M_ASSERT( ! frame_->values().is_empty() );
 	}
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_CALL );
-	M_ASSERT( frame_->values().top()->type() == HHuginn::TYPE::STRING );
-	hcore::HString name( yaal::move( static_cast<HString*>( frame_->values().top().raw() )->value() ) );
+	TYPE t( frame_->values().top()->type() );
+	if ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) {
+		throw HHuginnRuntimeException( "Reference is not a function.", position_ );
+	}
+	value_t f(  frame_->values().top() );
+	frame_->values().pop();
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
-	frame_->values().pop();
 	reverse( values.begin(), values.end() );
-	frame_->values().push( _huginn->call( name, values, p ) );
+	frame_->values().push( static_cast<HFunctionReference*>( f.raw() )->function()( frame_->thread(), values, p ) );
 	return;
 	M_EPILOG
 }
@@ -3590,6 +3617,23 @@ HHuginn::value_t HHuginn::HFunction::execute( HThread* thread_, values_t const& 
 	thread_->pop_frame();
 	return ( res );
 	M_EPILOG
+}
+
+HHuginn::HFunctionReference::HFunctionReference(
+	yaal::hcore::HString const& name_,
+	function_t const& function_
+) : HValue( TYPE::FUNCTION_REFERENCE ),
+	_name( name_ ),
+	_function( function_ ) {
+	return;
+}
+
+yaal::hcore::HString const& HHuginn::HFunctionReference::name( void ) const {
+	return ( _name );
+}
+
+HHuginn::function_t const& HHuginn::HFunctionReference::function( void ) const {
+	return ( _function );
 }
 
 namespace huginn_builtin {
