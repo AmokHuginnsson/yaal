@@ -166,14 +166,18 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::defer_oper_direct, &_compiler, OPERATOR::FUNCTION_ARGUMENT, _1 ) )
 	);
 	HRule argList( "argList", arg >> ( * ( ',' >> arg ) ) );
+	HRule functionCallOperator(
+		"functionCallOperator",
+		'(' >> -argList >> ')',
+		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::FUNCTION_CALL, _1 ) )
+	);
 	HRule functionCall(
 		"functionCall",
 		regex(
 			"functionCallIdentifier",
 			identifier,
 			e_p::HStringLiteral::action_string_position_t( hcore::call( &HHuginn::OCompiler::defer_function_call, &_compiler, _1, _2 ) )
-		) >> '(' >> -argList >> ')',
-		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::FUNCTION_CALL, _1 ) )
+		) >> functionCallOperator
 	);
 	HRule variableGetter(
 		regex(
@@ -316,17 +320,15 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		)
 	);
 	HRule value( "value", booleanXor );
-	subscript %= (
-		/* subscript base */ ( functionCall | variableGetter | stringLiteral ) >>
-		/* repeat at least once */ + (
-			/* subscript operator it self */ (
-				constant(
-					'[',
-					e_p::HCharacter::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1, _2 ) )
-				) >> expression >> ']'
-			)[e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::SUBSCRIPT, _1 ) )]
-		)
+	HRule subscriptOperator(
+		"subscriptOperator",
+		constant(
+			'[',
+			e_p::HCharacter::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1, _2 ) )
+		) >> expression >> ']',
+		e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::SUBSCRIPT, _1 ) )
 	);
+	subscript %= ( ( functionCall | variableGetter | stringLiteral ) >> +subscriptOperator );
 	/*
 	 * Assignment shall work only as aliasing.
 	 * In other words you cannot modify value of referenced object
