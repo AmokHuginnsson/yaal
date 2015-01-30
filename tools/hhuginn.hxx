@@ -226,8 +226,7 @@ private:
 		void add_switch_statement( executing_parser::position_t );
 		void commit_expression( executing_parser::position_t );
 		void mark_expression_position( executing_parser::position_t );
-		void defer_function_call( yaal::hcore::HString const&, executing_parser::position_t );
-		void defer_get_variable( yaal::hcore::HString const&, executing_parser::position_t );
+		void defer_get_reference( yaal::hcore::HString const&, executing_parser::position_t );
 		void defer_make_variable( yaal::hcore::HString const&, executing_parser::position_t );
 		void defer_oper( char, executing_parser::position_t );
 		void defer_str_oper( yaal::hcore::HString const&, executing_parser::position_t );
@@ -316,7 +315,6 @@ public:
 	HFrame* current_frame( void );
 	void create_function( executing_parser::position_t );
 	void add_argument( yaal::hcore::HString const& );
-	value_t returned_value( void ) const;
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& );
 	int error_position( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;
@@ -454,9 +452,8 @@ public:
 	void div( HFrame*, int );
 	void mod( HFrame*, int );
 	void negate( HFrame*, int );
-	void function_call( yaal::hcore::HString const&, HFrame*, int );
-	void function_call_exec( HFrame*, int );
-	void get_variable( yaal::hcore::HString const&, HFrame*, int );
+	void function_call( HFrame*, int );
+	void get_reference( yaal::hcore::HString const&, HFrame*, int );
 	void make_variable( yaal::hcore::HString const&, HFrame*, int );
 	void set_variable( HFrame*, int );
 	void subscript( HFrame*, int );
@@ -513,8 +510,8 @@ public:
 	HFrame( HThread*, HFrame*, bool, bool );
 	value_t make_variable( yaal::hcore::HString const&, int );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const&, int );
-	value_t get_variable( yaal::hcore::HString const&, int );
-	value_t try_variable( yaal::hcore::HString const&, int );
+	value_t get_reference( yaal::hcore::HString const&, int );
+	value_t try_reference( yaal::hcore::HString const&, int );
 	bool can_continue( void ) const;
 	void break_execution( STATE );
 	int number( void ) const;

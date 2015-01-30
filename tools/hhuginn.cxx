@@ -118,8 +118,7 @@ HHuginn::value_t _none_ = make_pointer<HHuginn::HValue>();
 
 namespace ERR_CODE {
 enum {
-	OP_TYPES_NOT_MATCH = 0,
-	OP_NOT_SUM,
+	OP_NOT_SUM = 0,
 	OP_NOT_SUB,
 	OP_NOT_MUL,
 	OP_NOT_DIV,
@@ -132,7 +131,6 @@ enum {
 }
 
 char const* _errMsgHHuginn_[ 10 ] = {
-	_( "Operand types do not match." ),
 	_( "Operands are not summable." ),
 	_( "Operands are not substractable." ),
 	_( "Operands are not multipliable." ),
@@ -145,6 +143,8 @@ char const* _errMsgHHuginn_[ 10 ] = {
 };
 
 }
+
+void operands_type_mismatch( char const*, HHuginn::TYPE, HHuginn::TYPE, int ) __attribute__(( noreturn ));
 
 executing_parser::HRule HHuginn::make_engine( void ) {
 	M_PROLOG
@@ -168,25 +168,12 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule argList( "argList", arg >> ( * ( ',' >> arg ) ) );
 	HRule functionCallOperator(
 		"functionCallOperator",
-		'(' >> -argList >> ')',
+		constant(
+			'(',
+			HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::defer_oper_direct, &_compiler, OPERATOR::FUNCTION_CALL, _1 ) )
+		) >> -argList >> ')',
 		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::FUNCTION_CALL, _1 ) )
 	);
-	HRule functionCall(
-		"functionCall",
-		regex(
-			"functionCallIdentifier",
-			identifier,
-			e_p::HStringLiteral::action_string_position_t( hcore::call( &HHuginn::OCompiler::defer_function_call, &_compiler, _1, _2 ) )
-		) >> functionCallOperator
-	);
-	HRule variableGetter(
-		regex(
-			"variableGetter",
-			identifier,
-			e_p::HStringLiteral::action_string_position_t( hcore::call( &HHuginn::OCompiler::defer_get_variable, &_compiler, _1, _2 ) )
-		)
-	);
-	HRule subscript( "subscript" );
 	HRule stringLiteral(
 		"stringLiteral",
 		string_literal[e_p::HStringLiteral::action_string_position_t( hcore::call( &HHuginn::OCompiler::defer_store_string, &_compiler, _1, _2 ) )]
@@ -207,6 +194,22 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"numberLiteral",
 		constant( '$' ) >> real[e_p::HReal::action_string_position_t( hcore::call( &HHuginn::OCompiler::defer_store_number, &_compiler, _1, _2 ) )]
 	);
+	HRule subscriptOperator(
+		"subscriptOperator",
+		constant(
+			'[',
+			e_p::HCharacter::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1, _2 ) )
+		) >> expression >> ']',
+		e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::SUBSCRIPT, _1 ) )
+	);
+	HRule reference(
+		regex(
+			"reference",
+			identifier,
+			e_p::HStringLiteral::action_string_position_t( hcore::call( &HHuginn::OCompiler::defer_get_reference, &_compiler, _1, _2 ) )
+		)
+	);
+	HRule dereference( "dereference", ( reference >> *( subscriptOperator | functionCallOperator ) ) );
 	HRule atom( "atom",
 		absoluteValue
 		| parenthesis
@@ -214,11 +217,9 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| numberLiteral
 		| integer[e_p::HInteger::action_int_long_long_position_t( hcore::call( &HHuginn::OCompiler::defer_store_integer, &_compiler, _1, _2 ) )]
 		| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_store_character, &_compiler, _1, _2 ) )]
-		| subscript[e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::dereference, _1 ) )]
-		| stringLiteral
-		| functionCall
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
-		| variableGetter
+		| dereference[e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::dereference, _1 ) )]
+		| ( stringLiteral >> -( subscriptOperator ) )
 	);
 	HRule negation(
 		"negation",
@@ -320,15 +321,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		)
 	);
 	HRule value( "value", booleanXor );
-	HRule subscriptOperator(
-		"subscriptOperator",
-		constant(
-			'[',
-			e_p::HCharacter::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1, _2 ) )
-		) >> expression >> ']',
-		e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::SUBSCRIPT, _1 ) )
-	);
-	subscript %= ( ( functionCall | variableGetter | stringLiteral ) >> +subscriptOperator );
+	HRule subscript( "subscript", ( reference >> +( subscriptOperator | functionCallOperator ) ) );
 	/*
 	 * Assignment shall work only as aliasing.
 	 * In other words you cannot modify value of referenced object
@@ -1315,7 +1308,7 @@ void HHuginn::OCompiler::dispatch_equals( executing_parser::position_t position_
 	TYPE t2( _valueTypes.top() );
 	_valueTypes.pop();
 	if ( ! are_congruous( t1, t2 ) ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( ( o == OPERATOR::EQUALS ? "==" : "!=" ), t1, t2, p );
 	}
 	_valueTypes.push( TYPE::BOOLEAN );
 	return;
@@ -1362,19 +1355,15 @@ void HHuginn::OCompiler::dispatch_subscript( executing_parser::position_t positi
 
 void HHuginn::OCompiler::dispatch_function_call( executing_parser::position_t position_ ) {
 	M_PROLOG
-	defer_action( &HExpression::function_call_exec, position_ );
 	while ( ! _operations.is_empty() && ( _operations.top()._operator == OPERATOR::FUNCTION_ARGUMENT ) ) {
 		_operations.pop();
 		_valueTypes.pop();
 	}
-	M_ASSERT( ! _operations.is_empty() && ( _operations.top()._operator == OPERATOR::FUNCTION_CALL ) );
-	int p( _operations.top()._position );
-	_operations.pop();
-	if ( _valueTypes.top() != TYPE::FUNCTION_REFERENCE ) {
-		throw HHuginnRuntimeException( "Not a function.", p );
-	}
 	_valueTypes.pop();
 	_valueTypes.push( TYPE::UNKNOWN );
+	M_ASSERT( _operations.top()._operator == OPERATOR::FUNCTION_CALL );
+	defer_action( &HExpression::function_call, position_ );
+	_operations.pop();
 	return;
 	M_EPILOG
 }
@@ -1397,8 +1386,8 @@ void HHuginn::OCompiler::dispatch_action( OPERATOR oper_, executing_parser::posi
 				throw HHuginnRuntimeException( "Operand is not a numeric value.", p );
 			}
 		} break;
-		case ( OPERATOR::SUBSCRIPT ): { dispatch_subscript( position_ ); } break;
-		case ( OPERATOR::ASSIGN ): { dispatch_assign( position_ ); } break;
+		case ( OPERATOR::SUBSCRIPT ):     { dispatch_subscript( position_ );     } break;
+		case ( OPERATOR::ASSIGN ):        { dispatch_assign( position_ );        } break;
 		case ( OPERATOR::FUNCTION_CALL ): { dispatch_function_call( position_ ); } break;
 		case ( OPERATOR::PARENTHESIS ):
 		case ( OPERATOR::ABSOLUTE ): {
@@ -1450,18 +1439,9 @@ void HHuginn::OCompiler::defer_action( expression_action_t const& expressionActi
 	M_EPILOG
 }
 
-void HHuginn::OCompiler::defer_function_call( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
+void HHuginn::OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( &HExpression::function_call, current_expression().raw(), value_, _1, position_.get() ) );
-	_operations.emplace( OPERATOR::FUNCTION_CALL, position_.get() );
-	_valueTypes.push( TYPE::FUNCTION_REFERENCE );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::OCompiler::defer_get_variable( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
-	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( &HExpression::get_variable, current_expression().raw(), value_, _1, position_.get() ) );
+	current_expression()->add_execution_step( hcore::call( &HExpression::get_reference, current_expression().raw(), value_, _1, position_.get() ) );
 	_valueTypes.push( TYPE::UNKNOWN );
 	return;
 	M_EPILOG
@@ -1799,12 +1779,6 @@ void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::returned_value( void ) const {
-	M_PROLOG
-	return ( value_t() );
-	M_EPILOG
-}
-
 void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
 	_source.dump_preprocessed( stream_ );
@@ -1934,7 +1908,7 @@ HHuginn::HFrame::HFrame( HThread* thread_, HFrame* parent_, bool bump_, bool loo
 	_variables(),
 	_operations(),
 	_values(),
-	_result(),
+	_result( _none_ ),
 	_number( parent_ ? ( parent_->_number + ( bump_ ? 1 : 0 ) ) : 1 ),
 	_loop( loop_ ),
 	_state( STATE::NORMAL ) {
@@ -1985,14 +1959,14 @@ void HHuginn::HFrame::reset( void ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HFrame::try_variable( yaal::hcore::HString const& name_, int position_ ) {
+HHuginn::value_t HHuginn::HFrame::try_reference( yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
 	variables_t::iterator it( _variables.find( name_ ) );
 	HHuginn::value_t v;
 	if ( it != _variables.end() ) {
 		v = it->second;
 	} else if ( _parent && ( _parent->_number == _number ) ) {
-		v = _parent->try_variable( name_, position_ );
+		v = _parent->try_reference( name_, position_ );
 	} else {
 		HHuginn::function_t f( _thread->huginn().get_function( name_ ) );
 		if ( !! f ) {
@@ -2003,11 +1977,11 @@ HHuginn::value_t HHuginn::HFrame::try_variable( yaal::hcore::HString const& name
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HFrame::get_variable( yaal::hcore::HString const& name_, int position_ ) {
+HHuginn::value_t HHuginn::HFrame::get_reference( yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
-	HHuginn::value_t v( try_variable( name_, position_ ) );
+	HHuginn::value_t v( try_reference( name_, position_ ) );
 	if ( ! v ) {
-		throw HHuginnRuntimeException( "variable `"_ys.append( name_ ).append( "' does not exist" ), position_ );
+		throw HHuginnRuntimeException( "Name `"_ys.append( name_ ).append( "' is not defined." ), position_ );
 	}
 	return ( v );
 	M_EPILOG
@@ -2912,21 +2886,10 @@ void HHuginn::HExpression::close_parenthesis( HFrame* frame_, int position_ ) {
 	M_EPILOG
 }
 
-void HHuginn::HExpression::function_call( yaal::hcore::HString const& name_, HFrame* frame_, int position_ ) {
+void HHuginn::HExpression::get_reference( yaal::hcore::HString const& name_, HFrame* frame_, int position_ ) {
 	M_PROLOG
-	frame_->operations().emplace( OPERATOR::FUNCTION_CALL, position_ );
-	value_t v( frame_->try_variable( name_, position_ ) );
-	if ( ! v ) {
-		throw HHuginnRuntimeException( "function `"_ys.append( name_ ).append( "' is not defined" ), position_ );
-	}
-	frame_->values().push( ( !! v && ( v->type() == TYPE::FUNCTION_REFERENCE ) ) ? v : pointer_static_cast<HValue>( make_pointer<HString>( name_ ) ) );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::HExpression::get_variable( yaal::hcore::HString const& name_, HFrame* frame_, int position_ ) {
-	M_PROLOG
-	frame_->values().push( frame_->get_variable( name_, position_ ) );
+	value_t v( frame_->get_reference( name_, position_ ) );
+	frame_->values().push( v );
 	return;
 	M_EPILOG
 }
@@ -2958,7 +2921,7 @@ void HHuginn::HExpression::set_variable( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HHuginn::HExpression::function_call_exec( HFrame* frame_, int position_ ) {
+void HHuginn::HExpression::function_call( HFrame* frame_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
 	M_ASSERT( ! frame_->values().is_empty() );
@@ -2971,14 +2934,14 @@ void HHuginn::HExpression::function_call_exec( HFrame* frame_, int position_ ) {
 		M_ASSERT( ! frame_->values().is_empty() );
 	}
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_CALL );
+	int p( frame_->operations().top()._position );
+	frame_->operations().pop();
 	TYPE t( frame_->values().top()->type() );
 	if ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) {
 		throw HHuginnRuntimeException( "Reference is not a function.", position_ );
 	}
 	value_t f(  frame_->values().top() );
 	frame_->values().pop();
-	int p( frame_->operations().top()._position );
-	frame_->operations().pop();
 	reverse( values.begin(), values.end() );
 	frame_->values().push( static_cast<HFunctionReference*>( f.raw() )->function()( frame_->thread(), values, p ) );
 	return;
@@ -2996,7 +2959,7 @@ void HHuginn::HExpression::plus( HFrame* frame_, int ) {
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
 	if ( v1->type() != v2->type() ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( "+", v1->type(), v2->type(), p );
 	}
 	frame_->values().push( HHuginn::HValue::add( v1, v2, p ) );
 	return;
@@ -3014,7 +2977,7 @@ void HHuginn::HExpression::minus( HFrame* frame_, int ) {
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
 	if ( v1->type() != v2->type() ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( "-", v1->type(), v2->type(), p );
 	}
 	frame_->values().push( HHuginn::HValue::sub( v1, v2, p ) );
 	return;
@@ -3032,7 +2995,7 @@ void HHuginn::HExpression::mul( HFrame* frame_, int ) {
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
 	if ( v1->type() != v2->type() ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( "*", v1->type(), v2->type(), p );
 	}
 	frame_->values().push( HHuginn::HValue::mul( v1, v2, p ) );
 	return;
@@ -3050,7 +3013,7 @@ void HHuginn::HExpression::div( HFrame* frame_, int ) {
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
 	if ( v1->type() != v2->type() ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( "/", v1->type(), v2->type(), p );
 	}
 	frame_->values().push( HHuginn::HValue::div( v1, v2, p ) );
 	return;
@@ -3068,7 +3031,7 @@ void HHuginn::HExpression::mod( HFrame* frame_, int ) {
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
 	if ( v1->type() != v2->type() ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( "%", v1->type(), v2->type(), p );
 	}
 	frame_->values().push( HHuginn::HValue::mod( v1, v2, p ) );
 	return;
@@ -3099,7 +3062,7 @@ void HHuginn::HExpression::power( HFrame* frame_, int ) {
 		value_t v1( frame_->values().top() );
 		frame_->values().pop();
 		if ( v1->type() != v2->type() ) {
-			throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+			operands_type_mismatch( "^", v1->type(), v2->type(), p );
 		}
 		frame_->values().push( HHuginn::HValue::pow( v1, v2, p ) );
 	}
@@ -3148,7 +3111,7 @@ void HHuginn::HExpression::equals( HFrame* frame_, int ) {
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
 	if ( v1->type() != v2->type() ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( "==", v1->type(), v2->type(), p );
 	}
 	frame_->values().push( make_pointer<HBoolean>( HHuginn::HValue::equals( v1, v2, p ) ) );
 	return;
@@ -3166,7 +3129,7 @@ void HHuginn::HExpression::not_equals( HFrame* frame_, int ) {
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
 	if ( v1->type() != v2->type() ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( "!=", v1->type(), v2->type(), p );
 	}
 	frame_->values().push( make_pointer<HBoolean>( ! HHuginn::HValue::equals( v1, v2, p ) ) );
 	return;
@@ -3184,7 +3147,7 @@ void HHuginn::HExpression::less( HFrame* frame_, int ) {
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
 	if ( v1->type() != v2->type() ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( "<", v1->type(), v2->type(), p );
 	}
 	frame_->values().push( make_pointer<HBoolean>( HHuginn::HValue::less( v1, v2, p ) ) );
 	return;
@@ -3202,7 +3165,7 @@ void HHuginn::HExpression::greater( HFrame* frame_, int ) {
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
 	if ( v1->type() != v2->type() ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( ">", v1->type(), v2->type(), p );
 	}
 	frame_->values().push( make_pointer<HBoolean>( HHuginn::HValue::greater( v1, v2, p ) ) );
 	return;
@@ -3220,7 +3183,7 @@ void HHuginn::HExpression::less_or_equal( HFrame* frame_, int ) {
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
 	if ( v1->type() != v2->type() ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( "<=", v1->type(), v2->type(), p );
 	}
 	frame_->values().push( make_pointer<HBoolean>( HHuginn::HValue::less_or_equal( v1, v2, p ) ) );
 	return;
@@ -3238,7 +3201,7 @@ void HHuginn::HExpression::greater_or_equal( HFrame* frame_, int ) {
 	value_t v1( frame_->values().top() );
 	frame_->values().pop();
 	if ( v1->type() != v2->type() ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_TYPES_NOT_MATCH], p );
+		operands_type_mismatch( ">=", v1->type(), v2->type(), p );
 	}
 	frame_->values().push( make_pointer<HBoolean>( HHuginn::HValue::greater_or_equal( v1, v2, p ) ) );
 	return;
@@ -3795,6 +3758,17 @@ void HHuginn::register_builtins( void ) {
 	_functions.insert( make_pair<yaal::hcore::HString const>( "input", hcore::call( &huginn_builtin::input, _1, _2, _3 ) ) );
 	return;
 	M_EPILOG
+}
+
+void operands_type_mismatch( char const* op_, HHuginn::TYPE t1_, HHuginn::TYPE t2_, int pos_ ) {
+	hcore::HString msg( "Operand types for `" );
+	msg.append( op_ )
+		.append( "' do not match: " )
+		.append( HHuginn::HValue::type_name( t1_ ) )
+		.append( " vs " )
+		.append( HHuginn::HValue::type_name( t2_ ) )
+		.append( "." ),
+	throw HHuginn::HHuginnRuntimeException( msg, pos_ );
 }
 
 }
