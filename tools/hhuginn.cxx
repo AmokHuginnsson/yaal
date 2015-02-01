@@ -218,7 +218,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| integer[e_p::HInteger::action_int_long_long_position_t( hcore::call( &HHuginn::OCompiler::defer_store_integer, &_compiler, _1, _2 ) )]
 		| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_store_character, &_compiler, _1, _2 ) )]
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
-		| dereference[e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::defer_action, &_compiler, &HHuginn::HExpression::dereference, _1 ) )]
+		| dereference
 		| ( stringLiteral >> -( subscriptOperator ) )
 	);
 	HRule negation(
@@ -330,7 +330,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	expression %= HRule(
 		* (
 			/* make reference */ (
-				subscript
+				subscript[e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::make_reference, &_compiler, _1 ) )]
 				| regex(
 					"variableSetter",
 					identifier,
@@ -847,7 +847,8 @@ HHuginn::OCompiler::OCompiler( HHuginn* huginn_ )
 	_parameters(),
 	_compilationStack(),
 	_operations(),
-	_valueTypes() {
+	_valueTypes(),
+	_lastDereferenceOperator( OPERATOR::NONE ) {
 	return;
 }
 
@@ -1340,7 +1341,7 @@ void HHuginn::OCompiler::dispatch_subscript( executing_parser::position_t positi
 	OPositionedOperator po( _operations.top() );
 	int p( po._position );
 	M_ASSERT( po._operator == OPERATOR::SUBSCRIPT );
-	defer_action( &HExpression::subscript, position_ );
+	current_expression()->add_execution_step( hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::SUBSCRIPT::VALUE, _1, position_.get() ) );
 	_operations.pop();
 	M_ASSERT( _valueTypes.get_size() >= 2 );
 	if ( ! is_integer_congruent( _valueTypes.top() ) ) {
@@ -1349,6 +1350,7 @@ void HHuginn::OCompiler::dispatch_subscript( executing_parser::position_t positi
 	_valueTypes.pop();
 	_valueTypes.pop();
 	_valueTypes.push( TYPE::REFERENCE );
+	_lastDereferenceOperator = OPERATOR::SUBSCRIPT;
 	return;
 	M_EPILOG
 }
@@ -1370,6 +1372,7 @@ void HHuginn::OCompiler::dispatch_function_call( executing_parser::position_t po
 
 void HHuginn::OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t position_ ) {
 	M_PROLOG
+	_lastDereferenceOperator = OPERATOR::NONE;
 	OPositionedOperator po( ! _operations.is_empty() ? _operations.top() : OPositionedOperator( OPERATOR::NONE, 0 ) );
 	OPERATOR o( po._operator );
 	int p( po._position );
@@ -1435,6 +1438,17 @@ void HHuginn::OCompiler::dispatch_action( OPERATOR oper_, executing_parser::posi
 void HHuginn::OCompiler::defer_action( expression_action_t const& expressionAction_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( expressionAction_, current_expression().raw(), _1, position_.get() ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::make_reference( executing_parser::position_t position_ ) {
+	M_PROLOG
+	if ( _lastDereferenceOperator != OPERATOR::SUBSCRIPT ) {
+		throw HHuginnRuntimeException( "Assignment to function result.", position_.get() );
+	}
+	current_expression()->pop_execution_step();
+	current_expression()->add_execution_step( hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::SUBSCRIPT::REFERENCE, _1, position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -2058,7 +2072,7 @@ yaal::hcore::HString const& HHuginn::HValue::type_name( TYPE type_ ) {
 	return ( names[static_cast<int>( type_ )] );
 }
 
-HHuginn::value_t HHuginn::HValue::subscript( HHuginn::value_t& base_, HHuginn::value_t const& index_, int position_ ) {
+HHuginn::value_t HHuginn::HValue::subscript( HExpression::SUBSCRIPT subscript_, HHuginn::value_t& base_, HHuginn::value_t const& index_, int position_ ) {
 	M_ASSERT( index_->type() == TYPE::INTEGER );
 	TYPE baseType( base_->type() );
 	HInteger const* i( static_cast<HInteger const*>( index_.raw() ) );
@@ -2071,7 +2085,7 @@ HHuginn::value_t HHuginn::HValue::subscript( HHuginn::value_t& base_, HHuginn::v
 		if ( ( index < 0 ) || ( index >= l->size() ) ) {
 			throw HHuginnRuntimeException( "Bad index.", position_ );
 		}
-		res = l->get( index );
+		res = ( subscript_ == HExpression::SUBSCRIPT::VALUE ? l->get( index ) : l->get_ref( index ) );
 	} else {
 		M_ASSERT( baseType == TYPE::STRING );
 		HString* s( static_cast<HString*>( base_.raw() ) );
@@ -2762,6 +2776,13 @@ int long HHuginn::HList::size( void ) const {
 HHuginn::value_t HHuginn::HList::get( int long long index_ ) {
 	M_PROLOG
 	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
+	return ( _data[index_] );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HList::get_ref( int long long index_ ) {
+	M_PROLOG
+	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
 	return ( make_pointer<HReference>( _data[index_] ) );
 	M_EPILOG
 }
@@ -2851,6 +2872,13 @@ void HHuginn::HExpression::set_position( int position_ ) {
 void HHuginn::HExpression::add_execution_step( execution_step_t const& executionStep_ ) {
 	M_PROLOG
 	_executionSteps.push_back( executionStep_ );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::pop_execution_step( void ) {
+	M_PROLOG
+	_executionSteps.pop_back();
 	return;
 	M_EPILOG
 }
@@ -3070,7 +3098,7 @@ void HHuginn::HExpression::power( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HHuginn::HExpression::subscript( HFrame* frame_, int ) {
+void HHuginn::HExpression::subscript( SUBSCRIPT subscript_, HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::SUBSCRIPT );
@@ -3083,19 +3111,7 @@ void HHuginn::HExpression::subscript( HFrame* frame_, int ) {
 	if ( index->type() != TYPE::INTEGER ) {
 		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT], p );
 	}
-	frame_->values().push( HHuginn::HValue::subscript( base, index, p ) );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::HExpression::dereference( HFrame* frame_, int ) {
-	M_PROLOG
-	M_ASSERT( ! frame_->values().is_empty() );
-	if ( frame_->values().top()->type() == HHuginn::TYPE::REFERENCE ) {
-		value_t v( frame_->values().top() );
-		frame_->values().pop();
-		frame_->values().push( static_cast<HHuginn::HReference*>( v.raw() )->value() );
-	}
+	frame_->values().push( HHuginn::HValue::subscript( subscript_, base, index, p ) );
 	return;
 	M_EPILOG
 }
@@ -3533,11 +3549,6 @@ void HHuginn::HFor::do_execute( HHuginn::HThread* thread_ ) const {
 		HIterable::HIterator it( coll->iterator() );
 		while ( thread_->can_continue() && it.is_valid() ) {
 			value_t v( it.value() );
-			if ( v->type() == TYPE::REFERENCE ) {
-				v = static_cast<HHuginn::HReference*>( it.value().raw() )->value();
-			} else {
-				M_ASSERT( v->type() == TYPE::CHARACTER );
-			}
 			f->set_variable( _variableName, v, _position );
 			_loop->execute( thread_ );
 			it.next();

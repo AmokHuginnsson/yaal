@@ -193,6 +193,7 @@ private:
 		compilation_stack_t _compilationStack;
 		operations_t _operations;
 		type_stack_t _valueTypes;
+		OPERATOR _lastDereferenceOperator;
 		OCompiler( HHuginn* );
 		void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
 		void set_for_identifier( yaal::hcore::HString const&, executing_parser::position_t );
@@ -226,6 +227,7 @@ private:
 		void add_switch_statement( executing_parser::position_t );
 		void commit_expression( executing_parser::position_t );
 		void mark_expression_position( executing_parser::position_t );
+		void make_reference( executing_parser::position_t );
 		void defer_get_reference( yaal::hcore::HString const&, executing_parser::position_t );
 		void defer_make_variable( yaal::hcore::HString const&, executing_parser::position_t );
 		void defer_oper( char, executing_parser::position_t );
@@ -375,6 +377,80 @@ public:
 	virtual ~HObject( void ) {}
 };
 
+class HHuginn::HStatement : public HHuginn::HObject {
+public:
+	typedef HHuginn::HStatement this_type;
+	typedef HHuginn::HObject base_type;
+public:
+	HStatement( void );
+	virtual ~HStatement( void ) {
+		return;
+	}
+	void execute( HHuginn::HThread* ) const;
+protected:
+	virtual void do_execute( HHuginn::HThread* ) const {}
+};
+
+class HHuginn::HExpression : public HHuginn::HStatement {
+public:
+	typedef HHuginn::HExpression this_type;
+	typedef HHuginn::HStatement base_type;
+	enum class SUBSCRIPT {
+		VALUE,
+		REFERENCE
+	};
+private:
+	typedef yaal::hcore::HBoundCall<void ( HFrame* )> execution_step_t;
+	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
+	execution_steps_t _executionSteps;
+	int _position;
+	HHuginn* _huginn;
+public:
+	HExpression( HHuginn*, int = 0 );
+	int position( void ) const;
+	void set_position( int );
+	void add_execution_step( execution_step_t const& );
+	void pop_execution_step( void );
+	void merge( HExpression& );
+	void oper( OPERATOR, HFrame*, int );
+	void close_parenthesis( HFrame*, int );
+	void plus( HFrame*, int );
+	void minus( HFrame*, int );
+	void mul( HFrame*, int );
+	void div( HFrame*, int );
+	void mod( HFrame*, int );
+	void negate( HFrame*, int );
+	void function_call( HFrame*, int );
+	void get_reference( yaal::hcore::HString const&, HFrame*, int );
+	void make_variable( yaal::hcore::HString const&, HFrame*, int );
+	void set_variable( HFrame*, int );
+	void subscript( SUBSCRIPT, HFrame*, int );
+	void power( HFrame*, int );
+	void equals( HFrame*, int );
+	void not_equals( HFrame*, int );
+	void less( HFrame*, int );
+	void greater( HFrame*, int );
+	void less_or_equal( HFrame*, int );
+	void greater_or_equal( HFrame*, int );
+	void boolean_and( HFrame*, int );
+	void boolean_or( HFrame*, int );
+	void boolean_xor( HFrame*, int );
+	void boolean_not( HFrame*, int );
+	void store_direct( value_t const&, HFrame*, int );
+	void store_real( double long, HFrame*, int );
+	void store_integer( int long long, HFrame*, int );
+	void store_string( yaal::hcore::HString const&, HFrame*, int );
+	void store_number( yaal::hcore::HString const&, HFrame*, int );
+	void store_character( char, HFrame*, int );
+	void store_boolean( bool, HFrame*, int );
+	void store_none( HFrame*, int );
+protected:
+	virtual void do_execute( HHuginn::HThread* ) const;
+private:
+	HExpression( HExpression const& ) = delete;
+	HExpression& operator = ( HExpression const& ) = delete;
+};
+
 class HHuginn::HValue : public HHuginn::HObject {
 public:
 	typedef HHuginn::HValue this_type;
@@ -390,7 +466,7 @@ public:
 	TYPE type( void ) const;
 	yaal::hcore::HString const& type_name( void ) const;
 	static yaal::hcore::HString const& type_name( TYPE );
-	static value_t subscript( value_t&, value_t const&, int );
+	static value_t subscript( HExpression::SUBSCRIPT, value_t&, value_t const&, int );
 	static value_t add( value_t const&, value_t const&, int );
 	static value_t sub( value_t const&, value_t const&, int );
 	static value_t mul( value_t const&, value_t const&, int );
@@ -412,76 +488,6 @@ public:
 	static value_t boolean( value_t const&, int );
 	static value_t character( value_t const&, int );
 	static value_t number( value_t const&, int );
-};
-
-class HHuginn::HStatement : public HHuginn::HObject {
-public:
-	typedef HHuginn::HStatement this_type;
-	typedef HHuginn::HObject base_type;
-public:
-	HStatement( void );
-	virtual ~HStatement( void ) {
-		return;
-	}
-	void execute( HHuginn::HThread* ) const;
-protected:
-	virtual void do_execute( HHuginn::HThread* ) const {}
-};
-
-class HHuginn::HExpression : public HHuginn::HStatement {
-public:
-	typedef HHuginn::HExpression this_type;
-	typedef HHuginn::HStatement base_type;
-private:
-	typedef yaal::hcore::HBoundCall<void ( HFrame* )> execution_step_t;
-	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
-	execution_steps_t _executionSteps;
-	int _position;
-	HHuginn* _huginn;
-public:
-	HExpression( HHuginn*, int = 0 );
-	int position( void ) const;
-	void set_position( int );
-	void add_execution_step( execution_step_t const& );
-	void merge( HExpression& );
-	void oper( OPERATOR, HFrame*, int );
-	void close_parenthesis( HFrame*, int );
-	void plus( HFrame*, int );
-	void minus( HFrame*, int );
-	void mul( HFrame*, int );
-	void div( HFrame*, int );
-	void mod( HFrame*, int );
-	void negate( HFrame*, int );
-	void function_call( HFrame*, int );
-	void get_reference( yaal::hcore::HString const&, HFrame*, int );
-	void make_variable( yaal::hcore::HString const&, HFrame*, int );
-	void set_variable( HFrame*, int );
-	void subscript( HFrame*, int );
-	void power( HFrame*, int );
-	void equals( HFrame*, int );
-	void not_equals( HFrame*, int );
-	void less( HFrame*, int );
-	void greater( HFrame*, int );
-	void less_or_equal( HFrame*, int );
-	void greater_or_equal( HFrame*, int );
-	void boolean_and( HFrame*, int );
-	void boolean_or( HFrame*, int );
-	void boolean_xor( HFrame*, int );
-	void boolean_not( HFrame*, int );
-	void store_direct( value_t const&, HFrame*, int );
-	void store_real( double long, HFrame*, int );
-	void store_integer( int long long, HFrame*, int );
-	void store_string( yaal::hcore::HString const&, HFrame*, int );
-	void store_number( yaal::hcore::HString const&, HFrame*, int );
-	void store_character( char, HFrame*, int );
-	void store_boolean( bool, HFrame*, int );
-	void store_none( HFrame*, int );
-	void dereference( HFrame*, int );
-protected:
-	virtual void do_execute( HHuginn::HThread* ) const;
-private:
-	HExpression( HExpression const& ) = delete;
-	HExpression& operator = ( HExpression const& ) = delete;
 };
 
 class HHuginn::HFrame {
@@ -691,6 +697,7 @@ public:
 	void push_back( value_t const& );
 	int long size( void ) const;
 	value_t get( int long long );
+	value_t get_ref( int long long );
 protected:
 	virtual HIterator do_iterator( void );
 };
