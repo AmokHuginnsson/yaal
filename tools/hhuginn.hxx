@@ -169,12 +169,16 @@ private:
 		typedef yaal::hcore::HArray<expression_t> expressions_t;
 		typedef yaal::hcore::HStack<expressions_t> expressions_stack_t;
 		struct OContext {
+			HHuginn* _huginn;
 			scope_t _scope;
 			expressions_stack_t _expressionsStack;
 			OContext( HHuginn* );
-			OContext( scope_t const&, expression_t const& );
+			OContext( HHuginn*, scope_t const&, expression_t const& );
 			expression_t const& expression( void ) const;
 			expression_t& expression( void );
+			void clear( void );
+			OContext( OContext const& ) = default;
+			OContext& operator = ( OContext const& ) = default;
 		};
 		struct OCompilationFrame {
 			typedef yaal::hcore::HArray<OContext> contexts_t;
@@ -184,12 +188,15 @@ private:
 			yaal::hcore::HString _forIdentifier;
 			int _forPosition;
 			OCompilationFrame( HHuginn* );
+			void clear( void );
 		};
 		typedef yaal::hcore::HStack<OCompilationFrame> compilation_stack_t;
 		typedef yaal::hcore::HStack<TYPE> type_stack_t;
 		HHuginn* _huginn;
 		yaal::hcore::HString _functionName;
 		parameter_names_t _parameters;
+		expressions_t _defaultValues;
+		int _lastDefaultValuePosition;
 		compilation_stack_t _compilationStack;
 		operations_t _operations;
 		type_stack_t _valueTypes;
@@ -198,6 +205,7 @@ private:
 		void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
 		void set_for_identifier( yaal::hcore::HString const&, executing_parser::position_t );
 		void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
+		void verify_default_argument( executing_parser::position_t );
 		static bool is_numeric( TYPE );
 		static bool is_numeric_congruent( TYPE );
 		static bool is_summable( TYPE );
@@ -225,6 +233,7 @@ private:
 		void add_for_statement( executing_parser::position_t );
 		void add_if_statement( executing_parser::position_t );
 		void add_switch_statement( executing_parser::position_t );
+		void add_default_value( executing_parser::position_t );
 		void commit_expression( executing_parser::position_t );
 		void mark_expression_position( executing_parser::position_t );
 		void make_reference( executing_parser::position_t );
@@ -825,12 +834,14 @@ class HHuginn::HFunction {
 public:
 	typedef HHuginn::HFunction this_type;
 	typedef HHuginn::OCompiler::parameter_names_t parameter_names_t;
+	typedef HHuginn::OCompiler::expressions_t expressions_t;
 private:
 	yaal::hcore::HString _name;
 	parameter_names_t _parameterNames;
+	expressions_t _defaultValues;
 	HHuginn::scope_t _scope;
 public:
-	HFunction( yaal::hcore::HString const&, parameter_names_t const&, HHuginn::scope_t const& );
+	HFunction( yaal::hcore::HString const&, parameter_names_t const&, HHuginn::scope_t const&, expressions_t const& );
 	HFunction( HFunction&& ) = default;
 	value_t execute( HThread*, values_t const&, int ) const;
 };

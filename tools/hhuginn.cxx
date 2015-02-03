@@ -401,33 +401,28 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	scope %= ( constant( '{', HRuleBase::action_position_t( hcore::call( &OCompiler::create_scope, &_compiler, _1 ) ) ) >> *statement >> '}' );
 	HRule parameter(
+		"parameter",
 		regex(
-			"parameter",
+			"parameterIdentifier",
 			identifier,
 			HRegex::action_string_position_t( hcore::call( &HHuginn::OCompiler::add_paramater, &_compiler, _1, _2 ) )
-		)
+		) >> -( constant( '=' ) >> HRule( expression, HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::add_default_value, &_compiler, _1 ) ) ) )
 	);
-	HRule nameList( "nameList", parameter >> ( * ( ',' >> parameter ) ) );
+	HRule nameList(
+		"nameList",
+		parameter >> ( * ( ',' >> parameter ) )
+	);
 	HRule functionDefinition( "functionDefinition",
 		regex(
 			"functionDefinitionIdentifier",
 			identifier,
 			e_p::HRegex::action_string_position_t( hcore::call( &HHuginn::OCompiler::set_function_name, &_compiler, _1, _2 ) )
-		) >> '(' >> -nameList >> ')' >> scope,
+		) >> '(' >> -nameList >>
+		constant( ')', HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::verify_default_argument, &_compiler, _1 ) ) )
+		>> scope,
 		HRuleBase::action_position_t( hcore::call( &HHuginn::create_function, this, _1 ) )
 	);
-	HRule literal(
-		"literal",
-		real
-		| numberLiteral
-		| integer
-		| character_literal
-		| stringLiteral
-		| literalNone
-		| booleanLiteralTrue
-		| booleanLiteralFalse
-	);
-	HRule field( "field", regex( "fieldIdentifier", identifier ) >> '=' >> literal >> ';' );
+	HRule field( "field", regex( "fieldIdentifier", identifier ) >> '=' >> expression >> ';' );
 	HRule classDefinition(
 		"classDefinition",
 		constant( "class" ) >> regex( "classIdentifier", identifier )
@@ -811,17 +806,28 @@ void HHuginn::HSource::dump_preprocessed( yaal::hcore::HStreamInterface& stream_
 }
 
 HHuginn::OCompiler::OContext::OContext( HHuginn* huginn_ )
-	: _scope( make_pointer<HScope>() ),
+	: _huginn( huginn_ ),
+	_scope( make_pointer<HScope>() ),
 	_expressionsStack() {
 	_expressionsStack.emplace( 1, make_pointer<HExpression>( huginn_ ) );
 	return;
 }
 
-HHuginn::OCompiler::OContext::OContext( scope_t const& scope_, expression_t const& expression_ )
-	: _scope( scope_ ),
+HHuginn::OCompiler::OContext::OContext( HHuginn* huginn_, scope_t const& scope_, expression_t const& expression_ )
+	: _huginn( huginn_ ),
+	_scope( scope_ ),
 	_expressionsStack() {
 	_expressionsStack.emplace( 1, expression_ );
 	return;
+}
+
+void HHuginn::OCompiler::OContext::clear( void ) {
+	M_PROLOG
+	_scope = make_pointer<HScope>();
+	_expressionsStack.clear();
+	_expressionsStack.emplace( 1, make_pointer<HExpression>( _huginn ) );
+	return;
+	M_EPILOG
 }
 
 HHuginn::expression_t const& HHuginn::OCompiler::OContext::expression( void ) const {
@@ -841,14 +847,27 @@ HHuginn::OCompiler::OCompilationFrame::OCompilationFrame( HHuginn* huginn_ )
 	return;
 }
 
+void HHuginn::OCompiler::OCompilationFrame::clear( void ) {
+	M_PROLOG
+	_contextsChain.clear();
+	_else.reset();
+	_forIdentifier.clear();
+	_forPosition = 0;
+	return;
+	M_EPILOG
+}
+
 HHuginn::OCompiler::OCompiler( HHuginn* huginn_ )
 	: _huginn( huginn_ ),
 	_functionName(),
 	_parameters(),
+	_defaultValues(),
+	_lastDefaultValuePosition( -1 ),
 	_compilationStack(),
 	_operations(),
 	_valueTypes(),
 	_lastDereferenceOperator( OPERATOR::NONE ) {
+	_compilationStack.emplace( _huginn );
 	return;
 }
 
@@ -870,8 +889,18 @@ void HHuginn::OCompiler::set_function_name( yaal::hcore::HString const& name_, e
 	M_EPILOG
 }
 
-void HHuginn::OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_parser::position_t ) {
+void HHuginn::OCompiler::verify_default_argument( executing_parser::position_t position_ ) {
 	M_PROLOG
+	if ( ( _lastDefaultValuePosition >= 0 ) && ( _lastDefaultValuePosition < static_cast<int>( _parameters.get_size() - 1 ) ) ) {
+		throw HHuginnRuntimeException( "Missing default argument.", position_.get() );
+	}
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	verify_default_argument( position_ );
 	_parameters.push_back( name_ );
 	return;
 	M_EPILOG
@@ -991,7 +1020,7 @@ void HHuginn::OCompiler::commit_if_clause( executing_parser::position_t ) {
 	M_ASSERT( ! _compilationStack.is_empty() );
 	scope_t scope( current_scope() );
 	_compilationStack.pop();
-	_compilationStack.top()._contextsChain.emplace_back( scope, current_expression() );
+	_compilationStack.top()._contextsChain.emplace_back( _huginn, scope, current_expression() );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1043,6 +1072,16 @@ void HHuginn::OCompiler::commit_expression( executing_parser::position_t ) {
 	M_PROLOG
 	M_ASSERT( ! _compilationStack.is_empty() );
 	current_scope()->add_statement( current_expression() );
+	reset_expression();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::add_default_value( executing_parser::position_t ) {
+	M_PROLOG
+	M_ASSERT( ! _compilationStack.is_empty() );
+	_lastDefaultValuePosition = static_cast<int>( _parameters.get_size() - 1 );
+	_defaultValues.push_back( current_expression() );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1814,11 +1853,25 @@ void HHuginn::create_function( executing_parser::position_t ) {
 	M_PROLOG
 	M_ASSERT( ! _compiler._functionName.is_empty() );
 	M_ASSERT( ! _compiler._compilationStack.is_empty() );
-	function_t f( hcore::call( &HFunction::execute, make_pointer<HFunction>( _compiler._functionName, _compiler._parameters, yaal::move( _compiler.current_scope() ) ), _1, _2, _3 ) );
+	function_t f(
+		hcore::call(
+			&HFunction::execute,
+			make_pointer<HFunction>(
+				_compiler._functionName,
+				_compiler._parameters,
+				yaal::move( _compiler.current_scope() ),
+				_compiler._defaultValues
+			),
+			_1, _2, _3
+		)
+	);
 	_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( _compiler._functionName ), yaal::move( f ) ) );
 	_compiler._compilationStack.pop();
-	M_ASSERT( _compiler._compilationStack.is_empty() );
+	M_ASSERT( _compiler._compilationStack.get_size() == 1 );
+	_compiler._compilationStack.top().clear();
 	_compiler._parameters.clear();
+	_compiler._defaultValues.clear();
+	_compiler._lastDefaultValuePosition = -1;
 	_compiler._functionName.clear();
 	return;
 	M_EPILOG
@@ -3561,34 +3614,50 @@ void HHuginn::HFor::do_execute( HHuginn::HThread* thread_ ) const {
 
 HHuginn::HFunction::HFunction( yaal::hcore::HString const& name_,
 	parameter_names_t const& parameterNames_,
-	HHuginn::scope_t const& scope_ )
-	: _name( name_ ), _parameterNames( parameterNames_ ), _scope( scope_ ) {
+	HHuginn::scope_t const& scope_,
+	expressions_t const& defaultValues_ )
+	: _name( name_ ),
+	_parameterNames( parameterNames_ ),
+	_defaultValues( defaultValues_ ),
+	_scope( scope_ ) {
 	return;
 }
 
 HHuginn::value_t HHuginn::HFunction::execute( HThread* thread_, values_t const& values_, int position_ ) const {
 	M_PROLOG
-	if ( values_.get_size() != _parameterNames.get_size() ) {
+	if ( values_.get_size() < ( _parameterNames.get_size() - _defaultValues.get_size() ) ) {
 		throw HHuginnRuntimeException(
 			"Mismatching number of parameters in call to: `"_ys
-			.append( _name ).append( "', expected: " )
-			.append( _parameterNames.get_size() ).append( ", got: " )
+			.append( _name ).append( "', expected at least: " )
+			.append( _parameterNames.get_size() - _defaultValues.get_size() ).append( ", got: " )
 			.append( values_.get_size() ).append( "." ),
 			position_
 		);
 	}
-	parameter_names_t::const_iterator n( _parameterNames.begin() );
-	parameter_names_t::const_iterator ne( _parameterNames.end() );
-	values_t::const_iterator v( values_.begin() );
-	values_t::const_iterator ve( values_.end() );
 	thread_->create_function_frame();
-	while ( n != ne ) {
-		M_ASSERT( v != ve );
-		thread_->current_frame()->set_variable( *n, *v, position_ );
-		++ n;
-		++ v;
+	HFrame* f( thread_->current_frame() );
+	for (
+		int i( 0 ),
+			NAME_COUNT( static_cast<int>( _parameterNames.get_size() ) ),
+			VALUE_COUNT( static_cast<int>( values_.get_size() ) ),
+			DEFAULT_VALUE_COUNT( static_cast<int>( _defaultValues.get_size() ) );
+		i < NAME_COUNT;
+		++ i
+	) {
+		if ( i < VALUE_COUNT ) {
+			thread_->current_frame()->set_variable( _parameterNames[i], values_[i], position_ );
+		} else {
+			int defaultValueIndex( i - ( NAME_COUNT - DEFAULT_VALUE_COUNT ) );
+			_defaultValues[defaultValueIndex]->execute( thread_ );
+			if ( ! thread_->can_continue() ) {
+				break;
+			}
+			thread_->current_frame()->set_variable( _parameterNames[i], f->result(), position_ );
+		}
 	}
-	_scope->execute( thread_ );
+	if ( thread_->can_continue() ) {
+		_scope->execute( thread_ );
+	}
 	HHuginn::value_t res( thread_->current_frame()->result() );
 	thread_->pop_frame();
 	return ( res );
