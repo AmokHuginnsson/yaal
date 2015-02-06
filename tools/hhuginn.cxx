@@ -1377,15 +1377,10 @@ void HHuginn::OCompiler::dispatch_assign( executing_parser::position_t position_
 
 void HHuginn::OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 	M_PROLOG
-	OPositionedOperator po( _operations.top() );
-	int p( po._position );
-	M_ASSERT( po._operator == OPERATOR::SUBSCRIPT );
+	M_ASSERT( _operations.top()._operator == OPERATOR::SUBSCRIPT );
 	current_expression()->add_execution_step( hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::SUBSCRIPT::VALUE, _1, position_.get() ) );
 	_operations.pop();
 	M_ASSERT( _valueTypes.get_size() >= 2 );
-	if ( ! is_integer_congruent( _valueTypes.top() ) ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT], p );
-	}
 	_valueTypes.pop();
 	_valueTypes.pop();
 	_valueTypes.push( TYPE::REFERENCE );
@@ -2126,26 +2121,33 @@ yaal::hcore::HString const& HHuginn::HValue::type_name( TYPE type_ ) {
 }
 
 HHuginn::value_t HHuginn::HValue::subscript( HExpression::SUBSCRIPT subscript_, HHuginn::value_t& base_, HHuginn::value_t const& index_, int position_ ) {
-	M_ASSERT( index_->type() == TYPE::INTEGER );
 	TYPE baseType( base_->type() );
-	HInteger const* i( static_cast<HInteger const*>( index_.raw() ) );
-	int long long index( i->value() );
 	value_t res;
-	if ( ( baseType != TYPE::LIST ) && ( baseType != TYPE::STRING ) ) {
-		throw HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( type_name( baseType ) ).append( "'." ), position_ );
-	} else if ( baseType == TYPE::LIST ) {
-		HList* l( static_cast<HList*>( base_.raw() ) );
-		if ( ( index < 0 ) || ( index >= l->size() ) ) {
-			throw HHuginnRuntimeException( "Bad index.", position_ );
+	if ( ( baseType == TYPE::LIST ) || ( baseType == TYPE::STRING ) ) {
+		if ( index_->type() != TYPE::INTEGER ) {
+			throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT], position_ );
 		}
-		res = ( subscript_ == HExpression::SUBSCRIPT::VALUE ? l->get( index ) : l->get_ref( index ) );
+		HInteger const* i( static_cast<HInteger const*>( index_.raw() ) );
+		int long long index( i->value() );
+		if ( baseType == TYPE::LIST ) {
+			HList* l( static_cast<HList*>( base_.raw() ) );
+			if ( ( index < 0 ) || ( index >= l->size() ) ) {
+				throw HHuginnRuntimeException( "Bad index.", position_ );
+			}
+			res = ( subscript_ == HExpression::SUBSCRIPT::VALUE ? l->get( index ) : l->get_ref( index ) );
+		} else {
+			M_ASSERT( baseType == TYPE::STRING );
+			HString* s( static_cast<HString*>( base_.raw() ) );
+			if ( ( index < 0 ) || ( index >= s->value().get_length() ) ) {
+				throw HHuginnRuntimeException( "Bad index.", position_ );
+			}
+			res = make_pointer<HCharacter>( s->value()[static_cast<int>( index )] );
+		}
+	} else if ( baseType == TYPE::MAP ) {
+		HMap* m( static_cast<HMap*>( base_.raw() ) );
+		res = ( subscript_ == HExpression::SUBSCRIPT::VALUE ? m->get( index_, position_ ) : m->get_ref( index_, position_ ) );
 	} else {
-		M_ASSERT( baseType == TYPE::STRING );
-		HString* s( static_cast<HString*>( base_.raw() ) );
-		if ( ( index < 0 ) || ( index >= s->value().get_length() ) ) {
-			throw HHuginnRuntimeException( "Bad index.", position_ );
-		}
-		res = make_pointer<HCharacter>( s->value()[static_cast<int>( index )] );
+		throw HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( type_name( baseType ) ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2349,6 +2351,10 @@ bool HHuginn::HValue::equals( value_t const& v1_, value_t const& v2_, int positi
 		res = v1_->type() == v2_->type();
 	}
 	return ( res );
+}
+
+bool HHuginn::HValue::less_low( value_t const& v1_, value_t const& v2_ ) {
+	return ( less( v1_, v2_, 0 ) );
 }
 
 bool HHuginn::HValue::less( value_t const& v1_, value_t const& v2_, int position_ ) {
@@ -2739,20 +2745,22 @@ private:
 };
 
 class HMapIterator : public HIteratorInterface {
-	HHuginn::HMap* _map;
+	HHuginn::HMap::values_t* _map;
+	HHuginn::HMap::values_t::iterator _it;
 public:
-	HMapIterator( HHuginn::HMap* map_ )
-		: _map( map_ ) {
+	HMapIterator( HHuginn::HMap::values_t* map_ )
+		: _map( map_ ), _it( map_->begin() ) {
 		return;
 	}
 protected:
 	virtual HHuginn::value_t do_value( void ) {
-		return ( HHuginn::value_t() );
+		return ( _it->first );
 	}
 	virtual bool do_is_valid( void ) {
-		return ( false );
+		return ( _it != _map->end() );
 	}
 	virtual void do_next( void ) {
+		++ _it;
 	}
 private:
 	HMapIterator( HMapIterator const& ) = delete;
@@ -2846,7 +2854,9 @@ HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( void ) {
 }
 
 HHuginn::HMap::HMap( void )
-	: HIterable( TYPE::MAP ), _data() {
+	: HIterable( TYPE::MAP ),
+	_data( &HHuginn::HValue::less_low ),
+	_keyType( HHuginn::TYPE::NONE ) {
 	return;
 }
 
@@ -2854,8 +2864,37 @@ int long HHuginn::HMap::size( void ) const {
 	return ( _data.get_size() );
 }
 
+void HHuginn::HMap::verify_key_type( HHuginn::TYPE type_, int position_ ) {
+	if ( ( _keyType != TYPE::NONE ) && ( type_ != _keyType ) ) {
+		throw HHuginnRuntimeException( "Non-uniform key types.", position_ );
+	}
+	if ( ! HHuginn::OCompiler::is_comparable( type_ ) ) {
+		throw HHuginnRuntimeException( "Key type `"_ys.append( HValue::type_name( type_ ) ).append( "' is not a comparable." ), position_ );
+	}
+	return;
+}
+
+HHuginn::value_t HHuginn::HMap::get( HHuginn::value_t const& key_, int position_ ) {
+	M_PROLOG
+	verify_key_type( key_->type(), position_ );
+	values_t::iterator it( _data.find( key_ ) );
+	if ( ! ( it != _data.end() ) ) {
+		throw HHuginnRuntimeException( "Key does not exist in map.", position_ );
+	}
+	return ( it->second );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HMap::get_ref( HHuginn::value_t const& key_, int position_ ) {
+	M_PROLOG
+	verify_key_type( key_->type(), position_ );
+	_keyType = key_->type();
+	return ( make_pointer<HReference>( _data[key_] ) );
+	M_EPILOG
+}
+
 HHuginn::HIterable::HIterator HHuginn::HMap::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HMapIterator( this ) );
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HMapIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
@@ -3161,9 +3200,6 @@ void HHuginn::HExpression::subscript( SUBSCRIPT subscript_, HFrame* frame_, int 
 	frame_->values().pop();
 	value_t base( frame_->values().top() );
 	frame_->values().pop();
-	if ( index->type() != TYPE::INTEGER ) {
-		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT], p );
-	}
 	frame_->values().push( HHuginn::HValue::subscript( subscript_, base, index, p ) );
 	return;
 	M_EPILOG
@@ -3771,6 +3807,19 @@ inline HHuginn::value_t list( HHuginn::HThread*, HHuginn::values_t const& values
 	M_EPILOG
 }
 
+inline HHuginn::value_t map( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	if ( ! values_.is_empty() ) {
+		throw HHuginn::HHuginnRuntimeException( ""_ys
+			.append( "map() does not expect any parameters, got: " )
+			.append( values_.get_size() ),
+			position_
+		);
+	}
+	return ( make_pointer<HHuginn::HMap>() );
+	M_EPILOG
+}
+
 inline HHuginn::value_t print( HHuginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
@@ -3834,6 +3883,7 @@ void HHuginn::register_builtins( void ) {
 	_functions.insert( make_pair<yaal::hcore::HString const>( "size", hcore::call( &huginn_builtin::size, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "type", hcore::call( &huginn_builtin::type, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "list", hcore::call( &huginn_builtin::list, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "map", hcore::call( &huginn_builtin::map, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "print", hcore::call( &huginn_builtin::print, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "input", hcore::call( &huginn_builtin::input, _1, _2, _3 ) ) );
 	return;

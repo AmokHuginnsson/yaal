@@ -486,6 +486,7 @@ public:
 	static value_t neg( value_t const&, int );
 	static bool equals( value_t const&, value_t const&, int );
 	static bool less( value_t const&, value_t const&, int );
+	static bool less_low( value_t const&, value_t const& );
 	static bool greater( value_t const&, value_t const&, int );
 	static bool less_or_equal( value_t const&, value_t const&, int );
 	static bool greater_or_equal( value_t const&, value_t const&, int );
@@ -715,14 +716,20 @@ class HHuginn::HMap : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HMap this_type;
 	typedef HHuginn::HIterable base_type;
+	typedef bool (*cmp_t)( HHuginn::value_t const&, HHuginn::value_t const& );
+	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, cmp_t> values_t;
 private:
-	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t> values_t;
 	values_t _data;
+	HHuginn::TYPE _keyType;
 public:
 	HMap( void );
 	int long size( void ) const;
+	value_t get( HHuginn::value_t const&, int );
+	value_t get_ref( HHuginn::value_t const&, int );
 protected:
 	virtual HIterator do_iterator( void );
+private:
+	void verify_key_type( HHuginn::TYPE, int );
 };
 
 class HHuginn::HScope : public HHuginn::HStatement {
