@@ -8,5 +8,5 @@ Name: yaal
 Version: @VERSION@
 Description: Yet Another Abstraction Layer
 Requires: pthread zlib rt dl libxml2 libxslt1 openssl ncurses
-Libs: -lhcore-d -ltools-d -ldbwrapper-d -lhconsole-d -lhdata-d -lncurses
+Libs: -lyaal_hcore-d -lyaal_tools-d -lyaal_dbwrapper-d -lyaal_hconsole-d -lyaal_hdata-d -lncurses
 

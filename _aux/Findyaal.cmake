@@ -23,10 +23,10 @@ find_path( yaal_INCLUDE_DIR yaal/yaal.hxx HINTS ${_yaal_INCLUDE_SEARCH_DIRS} )
 
 foreach( component ${yaal_FIND_COMPONENTS} )
 	string( TOUPPER ${component} COMPONENT )
-	find_library( yaal_LIBRARY_${COMPONENT} NAMES ${component}${LIB_INFIX} HINTS ${_yaal_LIBRARIES_SEARCH_DIRS} )
+	find_library( yaal_LIBRARY_${COMPONENT} NAMES yaal_${component}${LIB_INFIX} HINTS ${_yaal_LIBRARIES_SEARCH_DIRS} )
 	mark_as_advanced( yaal_LIBRARY_${COMPONENT} )
-	if ( NOT ( "${yaal_LIBRARY_${COMPONENT}}" STREQUAL "" ) )
-		set( yaal_LIBRARY ${yaal_LIBRARY} ${component}${LIB_INFIX} )
+	if ( NOT ( "${yaal_LIBRARY_${COMPONENT}}" STREQUAL "yaal_LIBRARY_${COMPONENT}-NOTFOUND" ) )
+		set( yaal_LIBRARY ${yaal_LIBRARY} yaal_${component}${LIB_INFIX} )
 	endif()
 endforeach()
 

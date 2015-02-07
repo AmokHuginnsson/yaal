@@ -41,6 +41,7 @@
 #cmakedefine HAVE_SIG_PF
 #cmakedefine01 HAVE_STRCASESTR
 #cmakedefine01 HAVE_ASPRINTF
+#cmakedefine01 HAVE_ASCII_GRAPHICS
 #cmakedefine01 HAVE_DECL_STRTOLD
 #cmakedefine HAVE_PTHREAD_SETNAME_NP
 #cmakedefine HAVE_PTHREAD_SET_NAME_NP
