@@ -34,6 +34,7 @@ Copyright:
 
 #include "hcore/hstring.hxx"
 #include "hcore/hmap.hxx"
+#include "hcore/hhashset.hxx"
 #include "hcore/hbitflag.hxx"
 #include "hcore/hlist.hxx"
 #include "hcore/htree.hxx"
@@ -62,10 +63,12 @@ public:
 	class HConstIterator;
 	class HNodeSet;
 	class HConstNodeSet;
+	class HNameSpace;
 	typedef HIterator iterator;
 	typedef HConstIterator const_iterator;
 	typedef yaal::hcore::HTree<HNode> tree_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, yaal::hcore::HString> entities_t;
+	typedef yaal::hcore::HHashSet<HNameSpace> namespaces_t;
 	typedef entities_t::const_iterator const_entity_iterator;
 	typedef entities_t::iterator entity_iterator;
 	struct PARSER;
@@ -89,6 +92,7 @@ private:
 	yaal::hcore::HString _streamId;
 	xml_low_t _xml;
 	entities_t _entities;
+	namespaces_t _namespaces;
 	tree_t _domTree;
 public:
 	typedef tree_t::node_t xml_element_t;
@@ -157,25 +161,33 @@ public:
 		} type_t;
 	};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
+	typedef yaal::hcore::HArray<HXml::HNameSpace const*> namespace_definitions_t;
 private:
 	HXml const* _owner;
 	TYPE::type_t _type;
 	yaal::hcore::HString _text;
 	properties_t _properties;
+	namespace_definitions_t _namespaceDefinitions;
 	int _line;
 public:
 	HNode( HXml const* owner_, int line_ = 0 )
 		: _owner( owner_ ), _type( TYPE::NODE ),
-		_text(), _properties(), _line( line_ ) {
+		_text(), _properties(),
+		_namespaceDefinitions(), _line( line_ ) {
+		return;
 	}
 	HNode( HXml const* owner_, TYPE::type_t const& type,
 			yaal::hcore::HString const& value, int line_ = 0 )
 		: _owner( owner_ ), _type( type ),
-		_text( value ), _properties(), _line( line_ ) {
+		_text( value ), _properties(),
+		_namespaceDefinitions(), _line( line_ ) {
+		return;
 	}
 	HNode( HNode const& source )
 		: _owner( source._owner ), _type( source._type ),
-		_text( source._text ), _properties( source._properties ), _line( source._line ) {
+		_text( source._text ), _properties( source._properties ),
+		_namespaceDefinitions( source._namespaceDefinitions ), _line( source._line ) {
+		return;
 	}
 	HNode& operator = ( HNode const& source ) {
 		M_PROLOG
@@ -193,6 +205,7 @@ public:
 			swap( _type, node_._type );
 			swap( _text, node_._text );
 			swap( _properties, node_._properties );
+			swap( _namespaceDefinitions, node_._namespaceDefinitions );
 			swap( _line, node_._line );
 		}
 		return;
@@ -284,6 +297,7 @@ public:
 	HNodeProxy& operator = ( HNodeProxy const& );
 	bool operator ! ( void ) const;
 private:
+	void reset_owner( HXml const* );
 	friend class HXml;
 	friend class HXml::HIterator;
 	friend class HXml::HConstNodeProxy;

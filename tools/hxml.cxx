@@ -227,6 +227,26 @@ void HXmlData::clear( void ) const {
 	M_EPILOG
 }
 
+class HXml::HNameSpace {
+	yaal::hcore::HString _prefix;
+	yaal::hcore::HString _href;
+public:
+	HNameSpace( yaal::hcore::HString const& prefix_, yaal::hcore::HString const& href_ )
+		: _prefix( prefix_ ),
+		_href( href_ ) {
+		return;
+	}
+	bool operator == ( HNameSpace const& ns_ ) const {
+		return ( ( _prefix == ns_._prefix ) && ( _href == ns_._href ) );
+	}
+	yaal::hcore::HString const& prefix( void ) const {
+		return ( _prefix );
+	}
+	yaal::hcore::HString const& href( void ) const {
+		return ( _href );
+	}
+};
+
 HXml::HXml( void )
 	: _convert( new ( memory::yaal ) HXml::OConvert ),
 	_convertedString(),
@@ -235,6 +255,7 @@ HXml::HXml( void )
 	_streamId(),
 	_xml(),
 	_entities(),
+	_namespaces(),
 	_domTree() {
 	M_PROLOG
 	_xml = xml_low_t( new ( memory::yaal ) HXmlData() );
@@ -250,9 +271,11 @@ HXml::HXml( HXml const& xml_ )
 	_streamId( xml_._streamId ),
 	_xml(),
 	_entities( xml_._entities ),
+	_namespaces( xml_._namespaces ),
 	_domTree( xml_._domTree ) {
 	M_PROLOG
 	_xml = xml_low_t( new ( memory::yaal ) HXmlData( *xml_._xml ) );
+	get_root().reset_owner( this );
 	return;
 	M_EPILOG
 }
@@ -275,6 +298,7 @@ void HXml::swap( HXml& xml_ ) {
 		swap( xml_._streamId, _streamId );
 		swap( xml_._xml, _xml );
 		swap( xml_._entities, _entities );
+		swap( xml_._namespaces, _namespaces );
 		swap( xml_._domTree, _domTree );
 	}
 	return;
@@ -454,6 +478,21 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 					node_ = &*node_->add_node( HNode( this, node->line ) );
 				} else {
 					node_ = _domTree.create_new_root( HNode( this, node->line ) );
+				}
+				if ( node->nsDef ) {
+					xmlNs* nsDef( node->nsDef );
+					while ( nsDef ) {
+						HNameSpace ns(
+							nsDef->prefix ? reinterpret_cast<char const*>( node->nsDef->prefix ) : "",
+							nsDef->href ? reinterpret_cast<char const*>( node->nsDef->href ) : ""
+						);
+						namespaces_t::iterator it( _namespaces.insert( ns ).first );
+						HNode::namespace_definitions_t& n( (**node_)._namespaceDefinitions );
+						if ( find( n.begin(), n.end(), &*it ) == n.end() ) {
+							n.push_back( &*it );
+						}
+						nsDef = nsDef->next;
+					}
 				}
 				(**node_)._text = reinterpret_cast<char const*>( node->name );
 				if ( node->properties ) {
@@ -704,7 +743,7 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 	M_PROLOG
 	writer_resource_t& writer = *static_cast<writer_resource_t*>( writer_p );
 	HString const& str = node_.get_name();
-	int rc = xmlTextWriterStartElement( writer.get(), reinterpret_cast<xmlChar const* const>( str.raw() ) );
+	int rc = xmlTextWriterStartElement( writer.get(), reinterpret_cast<xmlChar const*>( str.raw() ) );
 	if ( rc < 0 ) {
 		throw HXmlException( HString( "Unable to write start element: " ) + str );
 	}
@@ -713,10 +752,29 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 		HString const& pname = it->first;
 		HString const& pvalue = it->second;
 		rc = xmlTextWriterWriteAttribute( writer.get(),
-				reinterpret_cast<xmlChar const* const>( pname.raw() ),
-				reinterpret_cast<xmlChar const* const>( convert( pvalue.raw(), TO_EXTERNAL ).raw() ) );
+				reinterpret_cast<xmlChar const*>( pname.raw() ),
+				reinterpret_cast<xmlChar const*>( convert( pvalue.raw(), TO_EXTERNAL ).raw() ) );
 		if ( rc < 0 ) {
 			throw HXmlException( HString( "Unable to write a property: " ) + str + ", with value: " + pvalue );
+		}
+	}
+	HString prefix;
+	for ( HNameSpace const* ns : (*(node_._node))->_namespaceDefinitions ) {
+		prefix = "xmlns";
+		if ( ! ns->prefix().is_empty() ) {
+			prefix.append( ":" ).append( ns->prefix() );
+		}
+		rc = xmlTextWriterWriteAttribute( writer.get(),
+			reinterpret_cast<xmlChar const*>( prefix.raw() ),
+			reinterpret_cast<xmlChar const*>( ns->href().raw() )
+		);
+		if ( rc < 0 ) {
+			throw HXmlException(
+				"Unable to write a namespace definition: "_ys
+					.append( ns->prefix() )
+					.append( ":" )
+					.append( ns->href() )
+			);
 		}
 	}
 	for ( HXml::HConstIterator it( node_.begin() ), end( node_.end() ); it != end; ++ it ) {
@@ -978,10 +1036,24 @@ HXml::HIterator HXml::HNodeProxy::insert_node( HXml::HIterator it, yaal::hcore::
 	M_EPILOG
 }
 
+void HXml::HNodeProxy::reset_owner( HXml const* owner_ ) {
+	M_PROLOG
+	if ( (**_node)._owner != owner_ ) {
+		(**_node)._namespaceDefinitions.clear();
+	}
+	(**_node)._owner = owner_;
+	for ( HXml::tree_t::HNode& e : *_node ) {
+		HNodeProxy( &e ).reset_owner( owner_ );
+	}
+	return;
+	M_EPILOG
+}
+
 HXml::HIterator HXml::HNodeProxy::move_node( HXml::HIterator it, HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
 	tree_t::HNode::iterator newIt = _node->move_node( it._iterator, node._node );
+	reset_owner( (**_node)._owner );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 }
@@ -990,6 +1062,7 @@ HXml::HIterator HXml::HNodeProxy::move_node( HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
 	tree_t::HNode::iterator newIt = _node->move_node( node._node );
+	reset_owner( (**_node)._owner );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 }
@@ -998,6 +1071,7 @@ HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HIterator it, HXml::HNodeProx
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
 	tree_t::HNode::iterator newIt = _node->copy_node( it._iterator, node._node );
+	reset_owner( (**_node)._owner );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 }
@@ -1006,6 +1080,7 @@ HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
 	tree_t::HNode::iterator newIt = _node->copy_node( node._node );
+	reset_owner( (**_node)._owner );
 	return ( HXml::HIterator( this, newIt ) );
 	M_EPILOG
 }
@@ -1490,6 +1565,15 @@ HString const& attr_val( HXml::HConstIterator const& it_, yaal::hcore::HString c
 	M_EPILOG
 }
 
+}
+
+}
+
+namespace hcore {
+
+template<>
+int long hash<HXml::HNameSpace>::operator () ( HXml::HNameSpace const& ns_ ) const {
+	return ( hash<HString>()( ns_.prefix() ) + hash<HString>()( ns_.href() ) );
 }
 
 }
