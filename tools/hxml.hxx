@@ -126,7 +126,7 @@ public:
 private:
 	static int writer_callback( void*, char const*, int );
 	static int reader_callback( void*, char*, int );
-	void do_save( void ) const;
+	void generate_intermediate_form( bool ) const;
 	void parse( xml_node_ptr_t, tree_t::node_t, parser_t );
 	void dump_node( void*, HConstNodeProxy const& ) const;
 	yaal::hcore::HString const& convert( yaal::hcore::HString const&, way_t = TO_INTERNAL ) const;

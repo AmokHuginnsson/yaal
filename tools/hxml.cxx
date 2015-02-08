@@ -138,8 +138,9 @@ struct HXml::OConvert {
 	void init( HString const& encoding_ ) {
 		M_PROLOG
 		xmlCharEncodingHandlerPtr encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
-		if ( ! encoder )
+		if ( ! encoder ) {
 			M_THROW( _( "cannot enable internal convertion" ), errno );
+		}
 		_encoder = encoder_resource_t( encoder, xmlCharEncCloseFunc );
 		_iconvToExternal = _encoder->iconv_in;
 		_iconvToInternal = _encoder->iconv_out;
@@ -148,9 +149,9 @@ struct HXml::OConvert {
 	void init( yaal::hcore::HString const& encoding_, xmlNodePtr root_, yaal::hcore::HString const& fileName_ ) {
 		M_PROLOG
 		xmlCharEncodingHandlerPtr encoder = NULL;
-		if ( !! encoding_ )
+		if ( !! encoding_ ) {
 			encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
-		else {
+		} else {
 			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: no encoding declared in `" )
 				<< fileName_ << ":" << root_->line <<"'." << endl;
 		}
@@ -159,12 +160,14 @@ struct HXml::OConvert {
 				<< fileName_ << ":" << root_->line << "'." << endl;
 			xmlCharEncoding encoding = ::xmlDetectCharEncoding( root_->name,
 					xmlStrlen( root_->name ) );
-			if ( ! encoding )
+			if ( ! encoding ) {
 				M_THROW( _( "cannot detect character encoding" ), errno );
+			}
 			encoder = xmlGetCharEncodingHandler( encoding );
 		}
-		if ( ! encoder )
+		if ( ! encoder ) {
 			M_THROW( _( "cannot enable internal convertion" ), errno );
+		}
 		_encoder = encoder_resource_t( encoder, xmlCharEncCloseFunc );
 		_iconvToExternal = _encoder->iconv_in;
 		_iconvToInternal = _encoder->iconv_out;
@@ -334,8 +337,9 @@ int HXml::get_node_set_by_path( yaal::hcore::HString const& path_ ) {
 			objPtr = xmlXPathEvalExpression(
 					reinterpret_cast<xmlChar const*>( _varTmpBuffer.raw() ),
 					ctx.get() );
-			if ( objPtr )
+			if ( objPtr ) {
 				break;
+			}
 			_varTmpBuffer.set_at( length --, 0 );
 		}
 		xpath_object_resource_t obj( objPtr, xmlXPathFreeObject );
@@ -384,8 +388,9 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, parser_t parser_ ) {
 		}
 	}
 	xmlNodePtr root = xmlDocGetRootElement( doc.get() );
-	if ( ! root )
+	if ( ! root ) {
 		M_THROW( _( "empty doc" ), errno );
+	}
 #ifdef __DEBUGGER_BABUNI__
 	cout << root->name << endl;
 #endif /* __DEBUGGER_BABUNI__ */
@@ -404,13 +409,14 @@ void HXml::parse_dtd( void* dtd_ ) {
 		xmlDtdPtr dtd( static_cast<xmlDtdPtr>( dtd_ ) );
 		xmlNodePtr node( dtd->children );
 		while ( node ) {
-			if ( ( node->type == XML_ENTITY_DECL ) && ( node->name && node->content ) )
+			if ( ( node->type == XML_ENTITY_DECL ) && ( node->name && node->content ) ) {
 				_entities[ reinterpret_cast<char const*>( node->name ) ] = reinterpret_cast<char const*>( node->content );
-			else
+			} else {
 				log( LOG_TYPE::ERROR ) << "XML: `" << _streamId << ":" << node->line
 					<< "' failed to handle DTD child: " << static_cast<int>( node->type )
 					<< " " << ( node->name ? reinterpret_cast<char const*>( node->name ) : "(nil)" )
 					<< " " << ( node->content ? reinterpret_cast<char const*>( node->content ) : "(nil)" )<< endl;
+			}
 			node = node->next;
 		}
 	}
@@ -444,19 +450,21 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			}
 			continue;
 			case ( XML_ELEMENT_NODE ): {
-				if ( node_ )
+				if ( node_ ) {
 					node_ = &*node_->add_node( HNode( this, node->line ) );
-				else
+				} else {
 					node_ = _domTree.create_new_root( HNode( this, node->line ) );
+				}
 				(**node_)._text = reinterpret_cast<char const*>( node->name );
 				if ( node->properties ) {
 					xmlAttrPtr attribute = node->properties;
 					while ( attribute ) {
 						char const* name( reinterpret_cast<char const*>( attribute->name ) );
 						if ( name ) {
-							if ( attribute->children )
+							if ( attribute->children ) {
 								(**node_)._properties[ name ] = attribute->children->content ? convert(
 										reinterpret_cast<char*>( attribute->children->content ) ) : "";
+							}
 						}
 						attribute = attribute->next;
 					}
@@ -477,8 +485,9 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 			break;
 			case ( XML_TEXT_NODE ): if ( node->content ) {
 				_varTmpBuffer = convert( reinterpret_cast<char*>( node->content ) );
-				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_.data() ) >= 0 ) )
+				if ( ( parser_ & PARSER::KEEP_EMPTY ) || ( _varTmpBuffer.find_other_than( _whiteSpace_.data() ) >= 0 ) ) {
 					node_->add_node( HNode( this, HNode::TYPE::CONTENT, _varTmpBuffer, node->line ) );
+				}
 			}
 			break;
 			case ( XML_COMMENT_NODE ): if ( ! ( parser_ & PARSER::STRIP_COMMENT ) && node->content ) {
@@ -506,14 +515,18 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 
 void HXml::apply_style( yaal::hcore::HString const& path_ ) {
 	M_PROLOG
+	if ( !! get_root() ) {
+		generate_intermediate_form( false );
+	}
 	M_ASSERT( _xml->_doc.get() );
 	HXsltParserG::get_instance();
 	xsltStylesheet* pstyle( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( path_.raw() ) ) );
 	M_ENSURE_EX( pstyle, HString( "failure parsing XSLT file: " ) + path_ );
 	style_resource_t style( pstyle, xsltFreeStylesheet );
 	doc_resource_t doc( xsltApplyStylesheet( style.get(), _xml->_doc.get(), NULL ), xmlFreeDoc );
-	if ( ! doc.get() )
+	if ( ! doc.get() ) {
 		throw HXmlException( HString( "cannot apply stylesheet: " ) + path_ );
+	}
 	_xml->clear();
 	using yaal::swap;
 	swap( _xml->_doc, doc );
@@ -584,61 +597,77 @@ void HXml::load( yaal::hcore::HStreamInterface::ptr_t stream, parser_t parser_ )
 	M_EPILOG
 }
 
-void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const {
+void HXml::generate_intermediate_form( bool indent_ ) const {
 	M_PROLOG
-	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	M_ENSURE( stream.is_valid() );
 	doc_resource_t doc;
-	/* flush writer to DOM. */
 	M_ENSURE( !! get_root() ); {
 		xmlDocPtr pDoc = NULL;
 		writer_resource_t writer( xmlNewTextWriterDoc( &pDoc, 0 ), xmlFreeTextWriter );
-		if ( ! writer.get() )
+		if ( ! writer.get() ) {
 			throw HXmlException( _( "Cannot create the xml DOC writer." ) );
+		}
 		doc_resource_t dummy( pDoc, xmlFreeDoc );
 		using yaal::swap;
 		swap( doc, dummy );
 		int rc = ::xmlTextWriterStartDocument( writer.get(), NULL, _encoding.raw(), NULL );
-		if ( rc < 0 )
+		if ( rc < 0 ) {
 			throw HXmlException( HString( "Unable to start document with encoding: " ) + _encoding );
+		}
 		if ( indent_ ) {
 			rc = xmlTextWriterSetIndent( writer.get(), 1 );
-			if ( rc < 0 )
+			if ( rc < 0 ) {
 				throw HXmlException( "Unable to enable indenting." );
+			}
 			static char const* const INDENTION_STRING = "\t";
 			rc = xmlTextWriterSetIndentString( writer.get(), reinterpret_cast<xmlChar const* const>( INDENTION_STRING ) );
-			if ( rc < 0 )
+			if ( rc < 0 ) {
 				throw HXmlException( "Cannot set indent string." );
+			}
 		}
-		if ( ! (*_convert) )
+		if ( ! (*_convert) ) {
 			(*_convert).init( _encoding );
+		}
 		if ( ! _entities.is_empty() ) {
 			rc = xmlTextWriterStartDTD( writer.get(), reinterpret_cast<xmlChar const*>( "workaround" ), NULL, NULL );
-			if ( rc < 0 )
+			if ( rc < 0 ) {
 				throw HXmlException( "Unable to start DTD section." );
+			}
 			for ( entities_t::const_iterator it( _entities.begin() ), end( _entities.end() ); it != end; ++ it ) {
 				rc = xmlTextWriterWriteDTDInternalEntity( writer.get(), 0,
 						reinterpret_cast<xmlChar const*>( it->first.raw() ),
 						reinterpret_cast<xmlChar const*>( convert( it->second, TO_EXTERNAL ).raw() ) );
-				if ( rc < 0 )
+				if ( rc < 0 ) {
 					throw HXmlException( HString( "Cannot save entity declaration: " ) + it->first );
+				}
 			}
 			rc = xmlTextWriterEndDTD( writer.get() );
-			if ( rc < 0 )
+			if ( rc < 0 ) {
 				throw HXmlException( "Unable to end DTD section." );
+			}
 		}
 		dump_node( &writer, get_root() );
 		rc = xmlTextWriterEndDocument( writer.get() );
-		if ( rc < 0 )
+		if ( rc < 0 ) {
 			throw HXmlException( "Unable to end document." );
+		}
 	}
 	_xml->clear();
-	if ( _xml->_doc.get() )
+	if ( _xml->_doc.get() ) {
 		xmlFreeNode( xmlDocSetRootElement( const_cast<xmlDoc*>( _xml->_doc.get() ), xmlDocGetRootElement( doc.get() ) ) );
-	else {
+	} else {
 		using yaal::swap;
 		swap( const_cast<doc_resource_t&>( _xml->_doc ), doc );
 	}
+	return;
+	M_EPILOG
+}
+
+void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const {
+	M_PROLOG
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
+	M_ENSURE( stream.is_valid() );
+	/* flush writer to DOM. */
+	generate_intermediate_form( indent_ );
 	M_ASSERT( _xml->_doc.get() );
 	if ( _xml->_style.get() ) {
 		outputbuffer_resource_t obuf( ::xmlOutputBufferCreateIO( writer_callback,
@@ -646,10 +675,11 @@ void HXml::save( yaal::hcore::HStreamInterface& stream, bool indent_ ) const {
 				xmlOutputBufferClose );
 		M_ENSURE( ::xsltSaveResultTo( obuf.get(),
 					const_cast<xmlDoc*>( _xml->_doc.get() ), const_cast<xsltStylesheet*>( _xml->_style.get() ) ) != -1 );
-	} else
+	} else {
 		M_ENSURE( ::xmlSaveFileTo( ::xmlOutputBufferCreateIO( writer_callback,
 						NULL, &stream, ::xmlFindCharEncodingHandler( _encoding.raw() ) ),
 					const_cast<xmlDoc*>( _xml->_doc.get() ), _encoding.raw() ) != -1 );
+	}
 	return;
 	M_EPILOG
 }
@@ -675,8 +705,9 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 	writer_resource_t& writer = *static_cast<writer_resource_t*>( writer_p );
 	HString const& str = node_.get_name();
 	int rc = xmlTextWriterStartElement( writer.get(), reinterpret_cast<xmlChar const* const>( str.raw() ) );
-	if ( rc < 0 )
+	if ( rc < 0 ) {
 		throw HXmlException( HString( "Unable to write start element: " ) + str );
+	}
 	HNode::properties_t const& prop = node_.properties();
 	for ( HNode::properties_t::const_iterator it( prop.begin() ), end( prop.end() ); it != end; ++ it ) {
 		HString const& pname = it->first;
@@ -684,47 +715,55 @@ void HXml::dump_node( void* writer_p, HConstNodeProxy const& node_ ) const {
 		rc = xmlTextWriterWriteAttribute( writer.get(),
 				reinterpret_cast<xmlChar const* const>( pname.raw() ),
 				reinterpret_cast<xmlChar const* const>( convert( pvalue.raw(), TO_EXTERNAL ).raw() ) );
-		if ( rc < 0 )
+		if ( rc < 0 ) {
 			throw HXmlException( HString( "Unable to write a property: " ) + str + ", with value: " + pvalue );
+		}
 	}
 	for ( HXml::HConstIterator it( node_.begin() ), end( node_.end() ); it != end; ++ it ) {
 		HXml::HNode::TYPE::type_t type( (*it).get_type() );
-		if ( type == HXml::HNode::TYPE::NODE )
+		if ( type == HXml::HNode::TYPE::NODE ) {
 			dump_node( writer_p, *it );
-		else if ( type == HXml::HNode::TYPE::CONTENT ) {
+		} else if ( type == HXml::HNode::TYPE::CONTENT ) {
 			HString const& value = (*it).get_value();
-			if ( ! value.is_empty() && ( value[0] == '&' ) && ( value[value.get_length() - 1] == ';' ) )
+			if ( ! value.is_empty() && ( value[0] == '&' ) && ( value[value.get_length() - 1] == ';' ) ) {
 				rc = xmlTextWriterWriteRaw( writer.get(),
 						reinterpret_cast<xmlChar const*>( convert( value, TO_EXTERNAL ).raw() ) );
-			else
+			} else {
 				rc = xmlTextWriterWriteString( writer.get(),
 						reinterpret_cast<xmlChar const*>( convert( value, TO_EXTERNAL ).raw() ) );
-			if ( rc < 0 )
+			}
+			if ( rc < 0 ) {
 				throw HXmlException( HString( "Unable to write a node value: " ) + value );
+			}
 		} else if ( type == HXml::HNode::TYPE::ENTITY ) {
 			HString const& name( (*it).get_name() );
 			rc = xmlTextWriterWriteFormatRaw( writer.get(),
 					"&%s;", reinterpret_cast<xmlChar const*>( name.raw() ) );
-			if ( rc < 0 )
+			if ( rc < 0 ) {
 				throw HXmlException( HString( "Unable to write an entity referenc: " ) + name );
+			}
 		} else {
 			M_ASSERT( type == HXml::HNode::TYPE::COMMENT );
 			rc = xmlTextWriterStartComment( writer.get() );
-			if ( rc < 0 )
+			if ( rc < 0 ) {
 				throw HXmlException( "Unable to write start comment." );
+			}
 			HString const& value = (*it).get_value();
 			rc = xmlTextWriterWriteString( writer.get(),
 					reinterpret_cast<xmlChar const*>( convert( value, TO_EXTERNAL ).raw() ) );
-			if ( rc < 0 )
+			if ( rc < 0 ) {
 				throw HXmlException( HString( "Unable to write a comment value: " ) + value );
+			}
 			rc = xmlTextWriterEndComment( writer.get() );
-			if ( rc < 0 )
+			if ( rc < 0 ) {
 				throw HXmlException( "Unable to write end comment." );
+			}
 		}
 	}
 	rc = xmlTextWriterEndElement( writer.get() );
-	if ( rc < 0 )
+	if ( rc < 0 ) {
 		throw HXmlException( HString( "Unable to write end element: " ) + str );
+	}
 	return;
 	M_EPILOG
 }
@@ -1125,10 +1164,12 @@ HXml::const_xml_element_t HXml::get_element_by_id( const_xml_element_t const& no
 	M_PROLOG
 	const_xml_element_t result = NULL;
 	HXml::HNode::properties_t::const_iterator idIt = (*node)->_properties.find( "id" );
-	if ( ( idIt != (*node)->_properties.end() ) && ( idIt->second == id ) )
+	if ( ( idIt != (*node)->_properties.end() ) && ( idIt->second == id ) ) {
 		result = node;
-	for ( tree_t::HNode::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it )
+	}
+	for ( tree_t::HNode::const_iterator it = node->begin(); ! result && ( it != node->end() ); ++ it ) {
 		result = get_element_by_id( &*it, id );
+	}
 	return ( result );
 	M_EPILOG
 }

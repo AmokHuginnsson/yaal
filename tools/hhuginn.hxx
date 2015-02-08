@@ -48,6 +48,7 @@ namespace tools {
 class HHuginn {
 public:
 	typedef HHuginn this_type;
+	typedef yaal::hcore::HPointer<HHuginn> ptr_t;
 	class HObject;
 	typedef yaal::hcore::HPointer<HObject> object_t;
 	class HIterable;
