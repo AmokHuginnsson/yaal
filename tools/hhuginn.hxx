@@ -262,6 +262,7 @@ private:
 		void defer_store_character( char, executing_parser::position_t );
 		void defer_store_boolean( bool, executing_parser::position_t );
 		void defer_store_none( executing_parser::position_t );
+		void defer_make_list( executing_parser::position_t );
 	private:
 		OCompiler( OCompiler const& ) = delete;
 		OCompiler& operator = ( OCompiler const& ) = delete;

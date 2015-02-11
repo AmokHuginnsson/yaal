@@ -194,6 +194,14 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"numberLiteral",
 		constant( '$' ) >> real[e_p::HReal::action_string_position_t( hcore::call( &HHuginn::OCompiler::defer_store_number, &_compiler, _1, _2 ) )]
 	);
+	HRule listLiteral(
+		"listLiteral",
+		constant(
+			'[',
+			HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::defer_make_list, &_compiler, _1 ) )
+		) >> -argList >> ']',
+		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::FUNCTION_CALL, _1 ) )
+	);
 	HRule subscriptOperator(
 		"subscriptOperator",
 		constant(
@@ -217,9 +225,10 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| numberLiteral
 		| integer[e_p::HInteger::action_int_long_long_position_t( hcore::call( &HHuginn::OCompiler::defer_store_integer, &_compiler, _1, _2 ) )]
 		| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_store_character, &_compiler, _1, _2 ) )]
+		| ( listLiteral >> -( subscriptOperator >> *( subscriptOperator | functionCallOperator ) ) )
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
 		| dereference
-		| ( stringLiteral >> -( subscriptOperator ) )
+		| ( stringLiteral >> -subscriptOperator )
 	);
 	HRule negation(
 		"negation",
@@ -1472,6 +1481,14 @@ void HHuginn::OCompiler::dispatch_action( OPERATOR oper_, executing_parser::posi
 void HHuginn::OCompiler::defer_action( expression_action_t const& expressionAction_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( expressionAction_, current_expression().raw(), _1, position_.get() ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::defer_make_list( executing_parser::position_t position_ ) {
+	M_PROLOG
+	defer_get_reference( "list", position_ );
+	defer_oper_direct( OPERATOR::FUNCTION_CALL, position_ );
 	return;
 	M_EPILOG
 }
