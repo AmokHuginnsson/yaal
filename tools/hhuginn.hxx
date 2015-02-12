@@ -81,6 +81,7 @@ public:
 	class HMap;
 	class HExpression;
 	class HBooleanEvaluator;
+	class HTernaryEvaluator;
 	typedef yaal::hcore::HPointer<HExpression> expression_t;
 	class HErrorCoordinate;
 	typedef yaal::hcore::HArray<statement_t> statement_list_t;
@@ -115,6 +116,7 @@ public:
 		BOOLEAN_OR,
 		BOOLEAN_XOR,
 		BOOLEAN_NOT,
+		TERNARY,
 		NONE
 	};
 	enum class TYPE {
@@ -224,6 +226,7 @@ private:
 		void start_subexpression( executing_parser::position_t );
 		void add_subexpression( OPERATOR, executing_parser::position_t );
 		void commit_boolean( OPERATOR, executing_parser::position_t );
+		void commit_ternary( executing_parser::position_t );
 		void create_scope( executing_parser::position_t );
 		void commit_scope( executing_parser::position_t );
 		void commit_if_clause( executing_parser::position_t );
@@ -250,6 +253,7 @@ private:
 		void dispatch_compare( executing_parser::position_t );
 		void dispatch_equals( executing_parser::position_t );
 		void dispatch_boolean( expression_action_t const&, executing_parser::position_t );
+		void dispatch_ternary( void );
 		void dispatch_assign( executing_parser::position_t );
 		void dispatch_subscript( executing_parser::position_t );
 		void dispatch_function_call( executing_parser::position_t );
@@ -447,6 +451,7 @@ public:
 	void boolean_or( HFrame*, int );
 	void boolean_xor( HFrame*, int );
 	void boolean_not( HFrame*, int );
+	void ternary( HFrame*, int );
 	void store_direct( value_t const&, HFrame*, int );
 	void store_real( double long, HFrame*, int );
 	void store_integer( int long long, HFrame*, int );
@@ -593,6 +598,19 @@ private:
 public:
 	HBooleanEvaluator( expressions_t const&, OPERATOR );
 	bool execute( HThread* );
+};
+
+class HHuginn::HTernaryEvaluator : public HHuginn::HValue {
+public:
+	typedef HHuginn::HTernaryEvaluator this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	expression_t _condition;
+	expression_t _ifTrue;
+	expression_t _ifFalse;
+public:
+	HTernaryEvaluator( expression_t const&, expression_t const&, expression_t const& );
+	value_t execute( HThread* );
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {

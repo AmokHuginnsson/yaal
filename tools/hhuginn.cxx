@@ -329,7 +329,19 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			)[HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::BOOLEAN_XOR, _1 ) )]
 		)
 	);
-	HRule value( "value", booleanXor );
+	HRule ternary(
+		"ternary",
+		HRule( booleanXor, e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::start_subexpression, &_compiler, _1 ) ) ) >> -(
+			/* ternary action */ (
+				constant( '?' )[e_p::HString::action_position_t( hcore::call( &HHuginn::OCompiler::add_subexpression, &_compiler, OPERATOR::TERNARY, _1 ) )]
+				>> expression
+				>> constant( ':' )[e_p::HString::action_position_t( hcore::call( &HHuginn::OCompiler::add_subexpression, &_compiler, OPERATOR::TERNARY, _1 ) )]
+				>> expression
+			)[HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::TERNARY, _1 ) )]
+		),
+		e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::commit_ternary, &_compiler, _1 ) )
+	);
+	HRule value( "value", ternary );
 	HRule subscript( "subscript", ( reference >> +( subscriptOperator | functionCallOperator ) ) );
 	/*
 	 * Assignment shall work only as aliasing.
@@ -974,6 +986,22 @@ void HHuginn::OCompiler::commit_boolean( OPERATOR operator_, executing_parser::p
 	M_EPILOG
 }
 
+void HHuginn::OCompiler::commit_ternary( executing_parser::position_t position_ ) {
+	expressions_t const& exprs( _compilationStack.top()._context._expressionsStack.top() );
+	if ( exprs.get_size() > 1 ) {
+		M_ASSERT( exprs.get_size() == 3 );
+		value_t ternary( make_pointer<HTernaryEvaluator>( exprs[0], exprs[1], exprs[2] ) );
+		_compilationStack.top()._context._expressionsStack.pop();
+		defer_store_direct( ternary, position_ );
+		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), OPERATOR::TERNARY, _1, position_.get() ) );
+		defer_action( &HExpression::ternary, position_.get() );
+	} else {
+		expression_t e( _compilationStack.top()._context.expression() );
+		_compilationStack.top()._context._expressionsStack.pop();
+		_compilationStack.top()._context.expression()->merge( *e );
+	}
+}
+
 void HHuginn::OCompiler::add_return_statement( executing_parser::position_t ) {
 	M_PROLOG
 	M_ASSERT( ! _compilationStack.is_empty() );
@@ -1326,7 +1354,7 @@ void HHuginn::OCompiler::dispatch_boolean( expression_action_t const& action_, e
 	M_PROLOG
 	OPositionedOperator po( _operations.top() );
 	int p( po._position );
-	if ( action_ ) {
+	if ( !! action_ ) {
 		defer_action( action_, position_ );
 	}
 	_operations.pop();
@@ -1339,6 +1367,26 @@ void HHuginn::OCompiler::dispatch_boolean( expression_action_t const& action_, e
 		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], p );
 	}
 	_valueTypes.push( TYPE::BOOLEAN );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::dispatch_ternary( void ) {
+	M_PROLOG
+	M_ASSERT( _operations.top()._operator == OPERATOR::TERNARY );
+	_operations.pop();
+	M_ASSERT( _operations.top()._operator == OPERATOR::TERNARY );
+	int p( _operations.top()._position );
+	_operations.pop();
+	M_ASSERT( _valueTypes.get_size() >= 3 );
+	_valueTypes.pop();
+	_valueTypes.pop();
+	TYPE t0( _valueTypes.top() );
+	_valueTypes.pop();
+	if ( ! is_boolean_congruent( t0 ) ) {
+		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
+	}
+	_valueTypes.push( TYPE::UNKNOWN );
 	return;
 	M_EPILOG
 }
@@ -1470,6 +1518,7 @@ void HHuginn::OCompiler::dispatch_action( OPERATOR oper_, executing_parser::posi
 				throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
 			}
 		} break;
+		case ( OPERATOR::TERNARY ): { dispatch_ternary(); } break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
 		}
@@ -2946,6 +2995,34 @@ bool HHuginn::HBooleanEvaluator::execute( HThread* thread_ ) {
 	M_EPILOG
 }
 
+HHuginn::HTernaryEvaluator::HTernaryEvaluator(
+	expression_t const& condition_,
+	expression_t const& ifTrue_,
+	expression_t const& ifFalse_
+) : HValue( TYPE::UNKNOWN ),
+	_condition( condition_ ),
+	_ifTrue( ifTrue_ ),
+	_ifFalse( ifFalse_ ) {
+	return;
+}
+
+HHuginn::value_t HHuginn::HTernaryEvaluator::execute( HThread* thread_ ) {
+	M_PROLOG
+	_condition->execute( thread_ );
+	HFrame* f( thread_->current_frame() );
+	value_t v( f->result() );
+	if ( v->type() != TYPE::BOOLEAN ) {
+		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], _condition->position() );
+	}
+	if ( static_cast<HBoolean*>( v.raw() )->value() ) {
+		_ifTrue->execute( thread_ );
+	} else {
+		_ifFalse->execute( thread_ );
+	}
+	return ( f->result() );
+	M_EPILOG
+}
+
 HHuginn::HStatement::HStatement( void ) {
 	return;
 }
@@ -3386,6 +3463,19 @@ void HHuginn::HExpression::boolean_not( HFrame* frame_, int ) {
 		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
 	}
 	frame_->values().push( HHuginn::HValue::boolean_not( v, p ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::ternary( HFrame* frame_, int ) {
+	M_PROLOG
+	M_ASSERT( ! frame_->operations().is_empty() );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::TERNARY );
+	frame_->operations().pop();
+	value_t v( frame_->values().top() );
+	frame_->values().pop();
+	M_ASSERT( dynamic_cast<HTernaryEvaluator*>( v.raw() ) );
+	frame_->values().push( static_cast<HTernaryEvaluator*>( v.raw() )->execute( frame_->thread() ) );
 	return;
 	M_EPILOG
 }
