@@ -1010,6 +1010,8 @@ public:
 		: _field( yaal::move( field_ ) ), _object( yaal::move( object_ ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	return_t const& operator()( void ) const {
 		return ( _object->*_field );
 	}
@@ -1032,6 +1034,8 @@ public:
 		: _field( yaal::move( field_ ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	return_t const& operator()( argument_type const& obj_ ) const {
 		return ( obj_.*_field );
 	}
@@ -1062,6 +1066,8 @@ public:
 		: base_type( yaal::move( call_ ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)() );
 	}
@@ -1092,6 +1098,8 @@ public:
 		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0 ) );
 	}
@@ -1120,6 +1128,8 @@ public:
 		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1 ) );
 	}
@@ -1151,6 +1161,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2 ) );
 	}
@@ -1183,6 +1195,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3 ) );
 	}
@@ -1218,6 +1232,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4 ) );
 	}
@@ -1251,6 +1267,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5 ) );
 	}
@@ -1291,6 +1309,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6 ) );
 	}
@@ -1332,6 +1352,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7 ) );
 	}
@@ -1375,6 +1397,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8 ) );
 	}
@@ -1418,6 +1442,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( void ) {
 		return ( (base_type::_call)( _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9 ) );
 	}
@@ -1449,6 +1475,8 @@ public:
 		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)( free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ) ) );
 	}
@@ -1480,6 +1508,8 @@ public:
 		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
@@ -1515,6 +1545,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
@@ -1553,6 +1585,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
@@ -1596,6 +1630,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
@@ -1641,6 +1677,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
@@ -1691,6 +1729,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
@@ -1744,6 +1784,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
@@ -1801,6 +1843,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
@@ -1860,6 +1904,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
@@ -1923,6 +1969,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<1, a0_t, fa0_t>::get( _a0, a0 ),
@@ -1974,6 +2022,8 @@ public:
 		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
@@ -2010,6 +2060,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
@@ -2049,6 +2101,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
@@ -2093,6 +2147,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
@@ -2139,6 +2195,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
@@ -2190,6 +2248,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
@@ -2244,6 +2304,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
@@ -2302,6 +2364,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
@@ -2362,6 +2426,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
@@ -2426,6 +2492,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<2, a0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
@@ -2481,6 +2549,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
@@ -2521,6 +2591,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
@@ -2566,6 +2638,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
@@ -2613,6 +2687,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
@@ -2665,6 +2741,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
@@ -2720,6 +2798,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
@@ -2779,6 +2859,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
@@ -2840,6 +2922,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
@@ -2905,6 +2989,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<3, a0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
@@ -2962,6 +3048,8 @@ public:
 		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
@@ -3008,6 +3096,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
@@ -3056,6 +3146,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
@@ -3109,6 +3201,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
@@ -3165,6 +3259,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
@@ -3225,6 +3321,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
@@ -3287,6 +3385,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
@@ -3353,6 +3453,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<4, a0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
@@ -3414,6 +3516,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
@@ -3463,6 +3567,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
@@ -3517,6 +3623,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
@@ -3574,6 +3682,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
@@ -3635,6 +3745,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
@@ -3698,6 +3810,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
@@ -3765,6 +3879,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<5, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
@@ -3827,6 +3943,8 @@ public:
 		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
@@ -3882,6 +4000,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
@@ -3940,6 +4060,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
@@ -4002,6 +4124,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
@@ -4066,6 +4190,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
@@ -4134,6 +4260,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<6, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
@@ -4200,6 +4328,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
@@ -4259,6 +4389,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
@@ -4322,6 +4454,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
@@ -4387,6 +4521,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
@@ -4456,6 +4592,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<7, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
@@ -4524,6 +4662,8 @@ public:
 		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -4588,6 +4728,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -4654,6 +4796,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -4724,6 +4868,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<8, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
@@ -4795,6 +4941,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -4862,6 +5010,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -4933,6 +5083,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<9, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
@@ -5005,6 +5157,8 @@ public:
 		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<10, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
@@ -5077,6 +5231,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<10, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
@@ -5152,6 +5308,8 @@ public:
 		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
 		return;
 	}
+	HCall( HCall const& ) = default;
+	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9, fa10_t a10 ) {
 		return ( (base_type::_call)(
 				free_standing_call_args::resolve_arg<11, a0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
