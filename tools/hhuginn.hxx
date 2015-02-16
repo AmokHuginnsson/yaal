@@ -117,6 +117,7 @@ public:
 		BOOLEAN_XOR,
 		BOOLEAN_NOT,
 		TERNARY,
+		MAKE_MAP,
 		NONE
 	};
 	enum class TYPE {
@@ -256,7 +257,7 @@ private:
 		void dispatch_ternary( void );
 		void dispatch_assign( executing_parser::position_t );
 		void dispatch_subscript( executing_parser::position_t );
-		void dispatch_function_call( executing_parser::position_t );
+		void dispatch_function_call( expression_action_t const&, executing_parser::position_t );
 		void defer_action( expression_action_t const&, executing_parser::position_t );
 		void defer_store_direct( value_t const&, executing_parser::position_t );
 		void defer_store_real( double long, executing_parser::position_t );
@@ -266,7 +267,7 @@ private:
 		void defer_store_character( char, executing_parser::position_t );
 		void defer_store_boolean( bool, executing_parser::position_t );
 		void defer_store_none( executing_parser::position_t );
-		void defer_make_list( executing_parser::position_t );
+		void defer_call( yaal::hcore::HString const&, executing_parser::position_t );
 	private:
 		OCompiler( OCompiler const& ) = delete;
 		OCompiler& operator = ( OCompiler const& ) = delete;
@@ -436,6 +437,7 @@ public:
 	void mod( HFrame*, int );
 	void negate( HFrame*, int );
 	void function_call( HFrame*, int );
+	void make_map( HFrame*, int );
 	void get_reference( yaal::hcore::HString const&, HFrame*, int );
 	void make_variable( yaal::hcore::HString const&, HFrame*, int );
 	void set_variable( HFrame*, int );
@@ -746,6 +748,7 @@ public:
 	int long size( void ) const;
 	value_t get( HHuginn::value_t const&, int );
 	value_t get_ref( HHuginn::value_t const&, int );
+	void insert( HHuginn::value_t const&, HHuginn::value_t const&, int );
 protected:
 	virtual HIterator do_iterator( void );
 private:

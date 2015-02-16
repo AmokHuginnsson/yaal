@@ -198,9 +198,21 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"listLiteral",
 		constant(
 			'[',
-			HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::defer_make_list, &_compiler, _1 ) )
+			HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::defer_call, &_compiler, "list", _1 ) )
 		) >> -argList >> ']',
 		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::FUNCTION_CALL, _1 ) )
+	);
+	HRule mapLiteralElement(
+		"mapLiteralElement",
+		arg >> ':' >>	arg
+	);
+	HRule mapLiteral(
+		"mapLiteral",
+		constant(
+			'{',
+			HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::defer_oper_direct, &_compiler, OPERATOR::FUNCTION_CALL, _1 ) )
+		) >> -( mapLiteralElement >> *( ',' >> mapLiteralElement ) ) >> '}',
+		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::MAKE_MAP, _1 ) )
 	);
 	HRule subscriptOperator(
 		"subscriptOperator",
@@ -226,6 +238,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| integer[e_p::HInteger::action_int_long_long_position_t( hcore::call( &HHuginn::OCompiler::defer_store_integer, &_compiler, _1, _2 ) )]
 		| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_store_character, &_compiler, _1, _2 ) )]
 		| ( listLiteral >> -( subscriptOperator >> *( subscriptOperator | functionCallOperator ) ) )
+		| ( mapLiteral >> -( subscriptOperator >> *( subscriptOperator | functionCallOperator ) ) )
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
 		| dereference
 		| ( stringLiteral >> -subscriptOperator )
@@ -1446,16 +1459,18 @@ void HHuginn::OCompiler::dispatch_subscript( executing_parser::position_t positi
 	M_EPILOG
 }
 
-void HHuginn::OCompiler::dispatch_function_call( executing_parser::position_t position_ ) {
+void HHuginn::OCompiler::dispatch_function_call( expression_action_t const& action_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	while ( ! _operations.is_empty() && ( _operations.top()._operator == OPERATOR::FUNCTION_ARGUMENT ) ) {
 		_operations.pop();
 		_valueTypes.pop();
 	}
-	_valueTypes.pop();
+	if ( action_ == &HExpression::function_call ) {
+		_valueTypes.pop();
+	}
 	_valueTypes.push( TYPE::UNKNOWN );
 	M_ASSERT( _operations.top()._operator == OPERATOR::FUNCTION_CALL );
-	defer_action( &HExpression::function_call, position_ );
+	defer_action( action_, position_ );
 	_operations.pop();
 	return;
 	M_EPILOG
@@ -1482,7 +1497,8 @@ void HHuginn::OCompiler::dispatch_action( OPERATOR oper_, executing_parser::posi
 		} break;
 		case ( OPERATOR::SUBSCRIPT ):     { dispatch_subscript( position_ );     } break;
 		case ( OPERATOR::ASSIGN ):        { dispatch_assign( position_ );        } break;
-		case ( OPERATOR::FUNCTION_CALL ): { dispatch_function_call( position_ ); } break;
+		case ( OPERATOR::FUNCTION_CALL ): { dispatch_function_call( &HExpression::function_call, position_ ); } break;
+		case ( OPERATOR::MAKE_MAP ):      { dispatch_function_call( &HExpression::make_map, position_ ); } break;
 		case ( OPERATOR::PARENTHESIS ):
 		case ( OPERATOR::ABSOLUTE ): {
 			M_ASSERT( ( o == OPERATOR::ABSOLUTE ) || ( o == OPERATOR::PARENTHESIS ) );
@@ -1534,9 +1550,9 @@ void HHuginn::OCompiler::defer_action( expression_action_t const& expressionActi
 	M_EPILOG
 }
 
-void HHuginn::OCompiler::defer_make_list( executing_parser::position_t position_ ) {
+void HHuginn::OCompiler::defer_call( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	defer_get_reference( "list", position_ );
+	defer_get_reference( name_, position_ );
 	defer_oper_direct( OPERATOR::FUNCTION_CALL, position_ );
 	return;
 	M_EPILOG
@@ -2959,6 +2975,15 @@ HHuginn::value_t HHuginn::HMap::get_ref( HHuginn::value_t const& key_, int posit
 	M_EPILOG
 }
 
+void HHuginn::HMap::insert( HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
+	M_PROLOG
+	verify_key_type( key_->type(), position_ );
+	_data.insert( make_pair( key_, value_ ) );
+	_keyType = key_->type();
+	return;
+	M_EPILOG
+}
+
 HHuginn::HIterable::HIterator HHuginn::HMap::do_iterator( void ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HMapIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );
@@ -3158,6 +3183,40 @@ void HHuginn::HExpression::function_call( HFrame* frame_, int position_ ) {
 	frame_->values().pop();
 	reverse( values.begin(), values.end() );
 	frame_->values().push( static_cast<HFunctionReference*>( f.raw() )->function()( frame_->thread(), values, p ) );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HExpression::make_map( HFrame* frame_, int ) {
+	M_PROLOG
+	M_ASSERT( ! frame_->operations().is_empty() );
+	M_ASSERT( ! frame_->values().is_empty() );
+	struct ValuePosition {
+		value_t _value;
+		int _position;
+		ValuePosition( value_t const& val_, int pos_ )
+			: _value( val_ ), _position( pos_ ) {
+		}
+	};
+	typedef yaal::hcore::HArray<ValuePosition> positioned_values_t;
+	positioned_values_t values;
+	while ( frame_->operations().top()._operator == OPERATOR::FUNCTION_ARGUMENT ) {
+		M_ASSERT( ! frame_->operations().is_empty() );
+		values.emplace_back( yaal::move( frame_->values().top() ), frame_->operations().top()._position );
+		frame_->operations().pop();
+		frame_->values().pop();
+		M_ASSERT( ! frame_->operations().is_empty() );
+	}
+	M_ASSERT( ( values.get_size() % 2 ) == 0 );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_CALL );
+	frame_->operations().pop();
+	reverse( values.begin(), values.end() );
+	value_t map( make_pointer<HMap>() );
+	HMap* m( static_cast<HMap*>( map.raw() ) );
+	for ( int i( 0 ), S( static_cast<int>( values.get_size() ) ); i < S; i += 2 ) {
+		m->insert( values[i]._value, values[i + 1]._value, values[i]._position );
+	}
+	frame_->values().push( map );
 	return;
 	M_EPILOG
 }
