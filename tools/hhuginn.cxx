@@ -214,6 +214,23 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		) >> -( mapLiteralElement >> *( ',' >> mapLiteralElement ) ) >> '}',
 		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::MAKE_MAP, _1 ) )
 	);
+	HRule parameter(
+		"parameter",
+		regex(
+			"parameterIdentifier",
+			identifier,
+			HRegex::action_string_position_t( hcore::call( &HHuginn::OCompiler::add_paramater, &_compiler, _1, _2 ) )
+		) >> -( constant( '=' ) >> HRule( expression, HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::add_default_value, &_compiler, _1 ) ) ) )
+	);
+	HRule nameList(
+		"nameList",
+		parameter >> ( * ( ',' >> parameter ) )
+	);
+	HRule scope( "scope" );
+	HRule lambda(
+		"lambda",
+		constant( '@' ) >> '(' >> -nameList >> ')' >> scope
+	);
 	HRule subscriptOperator(
 		"subscriptOperator",
 		constant(
@@ -242,6 +259,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
 		| dereference
 		| ( stringLiteral >> -subscriptOperator )
+		| lambda
 	);
 	HRule negation(
 		"negation",
@@ -379,7 +397,6 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"expressionStatement",
 		HRule( expression, HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::commit_expression, &_compiler, _1 ) ) ) >> ';'
 	);
-	HRule scope( "scope" );
 	HRule ifClause(
 		"ifClause",
 		e_p::constant( "if" ) >> '(' >> expression >> ')' >> scope,
@@ -434,18 +451,6 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| scope[HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::commit_scope, &_compiler, _1 ) )]
 	);
 	scope %= ( constant( '{', HRuleBase::action_position_t( hcore::call( &OCompiler::create_scope, &_compiler, _1 ) ) ) >> *statement >> '}' );
-	HRule parameter(
-		"parameter",
-		regex(
-			"parameterIdentifier",
-			identifier,
-			HRegex::action_string_position_t( hcore::call( &HHuginn::OCompiler::add_paramater, &_compiler, _1, _2 ) )
-		) >> -( constant( '=' ) >> HRule( expression, HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::add_default_value, &_compiler, _1 ) ) ) )
-	);
-	HRule nameList(
-		"nameList",
-		parameter >> ( * ( ',' >> parameter ) )
-	);
 	HRule functionDefinition( "functionDefinition",
 		regex(
 			"functionDefinitionIdentifier",
