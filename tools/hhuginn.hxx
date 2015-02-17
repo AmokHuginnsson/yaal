@@ -172,21 +172,21 @@ private:
 		typedef yaal::hcore::HArray<yaal::hcore::HString> parameter_names_t;
 		typedef yaal::hcore::HArray<expression_t> expressions_t;
 		typedef yaal::hcore::HStack<expressions_t> expressions_stack_t;
-		struct OContext {
+		struct OScopeContext {
 			HHuginn* _huginn;
 			scope_t _scope;
 			expressions_stack_t _expressionsStack;
-			OContext( HHuginn* );
-			OContext( HHuginn*, scope_t const&, expression_t const& );
+			OScopeContext( HHuginn* );
+			OScopeContext( HHuginn*, scope_t const&, expression_t const& );
 			expression_t const& expression( void ) const;
 			expression_t& expression( void );
 			void clear( void );
-			OContext( OContext const& ) = default;
-			OContext& operator = ( OContext const& ) = default;
+			OScopeContext( OScopeContext const& ) = default;
+			OScopeContext& operator = ( OScopeContext const& ) = default;
 		};
 		struct OCompilationFrame {
-			typedef yaal::hcore::HArray<OContext> contexts_t;
-			OContext _context;
+			typedef yaal::hcore::HArray<OScopeContext> contexts_t;
+			OScopeContext _context;
 			contexts_t _contextsChain;
 			scope_t _else;
 			yaal::hcore::HString _forIdentifier;
@@ -194,18 +194,24 @@ private:
 			OCompilationFrame( HHuginn* );
 			void clear( void );
 		};
-		typedef yaal::hcore::HStack<OCompilationFrame> compilation_stack_t;
-		typedef yaal::hcore::HStack<TYPE> type_stack_t;
+		struct OFunctionContext {
+			typedef yaal::hcore::HStack<OCompilationFrame> compilation_stack_t;
+			typedef yaal::hcore::HStack<TYPE> type_stack_t;
+			yaal::hcore::HString _functionName;
+			parameter_names_t _parameters;
+			expressions_t _defaultValues;
+			int _lastDefaultValuePosition;
+			compilation_stack_t _compilationStack;
+			operations_t _operations;
+			type_stack_t _valueTypes;
+			OPERATOR _lastDereferenceOperator;
+			OFunctionContext( HHuginn* );
+		};
+		typedef yaal::hcore::HStack<OFunctionContext> function_contexts_t;
+		function_contexts_t _functionContexts;
 		HHuginn* _huginn;
-		yaal::hcore::HString _functionName;
-		parameter_names_t _parameters;
-		expressions_t _defaultValues;
-		int _lastDefaultValuePosition;
-		compilation_stack_t _compilationStack;
-		operations_t _operations;
-		type_stack_t _valueTypes;
-		OPERATOR _lastDereferenceOperator;
 		OCompiler( HHuginn* );
+		OFunctionContext& f( void );
 		void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
 		void set_for_identifier( yaal::hcore::HString const&, executing_parser::position_t );
 		void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );

@@ -844,7 +844,7 @@ void HHuginn::HSource::dump_preprocessed( yaal::hcore::HStreamInterface& stream_
 	M_EPILOG
 }
 
-HHuginn::OCompiler::OContext::OContext( HHuginn* huginn_ )
+HHuginn::OCompiler::OScopeContext::OScopeContext( HHuginn* huginn_ )
 	: _huginn( huginn_ ),
 	_scope( make_pointer<HScope>() ),
 	_expressionsStack() {
@@ -852,7 +852,7 @@ HHuginn::OCompiler::OContext::OContext( HHuginn* huginn_ )
 	return;
 }
 
-HHuginn::OCompiler::OContext::OContext( HHuginn* huginn_, scope_t const& scope_, expression_t const& expression_ )
+HHuginn::OCompiler::OScopeContext::OScopeContext( HHuginn* huginn_, scope_t const& scope_, expression_t const& expression_ )
 	: _huginn( huginn_ ),
 	_scope( scope_ ),
 	_expressionsStack() {
@@ -860,7 +860,7 @@ HHuginn::OCompiler::OContext::OContext( HHuginn* huginn_, scope_t const& scope_,
 	return;
 }
 
-void HHuginn::OCompiler::OContext::clear( void ) {
+void HHuginn::OCompiler::OScopeContext::clear( void ) {
 	M_PROLOG
 	_scope = make_pointer<HScope>();
 	_expressionsStack.clear();
@@ -869,11 +869,11 @@ void HHuginn::OCompiler::OContext::clear( void ) {
 	M_EPILOG
 }
 
-HHuginn::expression_t const& HHuginn::OCompiler::OContext::expression( void ) const {
+HHuginn::expression_t const& HHuginn::OCompiler::OScopeContext::expression( void ) const {
 	return ( _expressionsStack.top().back() );
 }
 
-HHuginn::expression_t& HHuginn::OCompiler::OContext::expression( void ) {
+HHuginn::expression_t& HHuginn::OCompiler::OScopeContext::expression( void ) {
 	return ( _expressionsStack.top().back() );
 }
 
@@ -896,9 +896,8 @@ void HHuginn::OCompiler::OCompilationFrame::clear( void ) {
 	M_EPILOG
 }
 
-HHuginn::OCompiler::OCompiler( HHuginn* huginn_ )
-	: _huginn( huginn_ ),
-	_functionName(),
+HHuginn::OCompiler::OFunctionContext::OFunctionContext( HHuginn* huginn_ )
+	: _functionName(),
 	_parameters(),
 	_defaultValues(),
 	_lastDefaultValuePosition( -1 ),
@@ -906,16 +905,27 @@ HHuginn::OCompiler::OCompiler( HHuginn* huginn_ )
 	_operations(),
 	_valueTypes(),
 	_lastDereferenceOperator( OPERATOR::NONE ) {
-	_compilationStack.emplace( _huginn );
+	_compilationStack.emplace( huginn_ );
 	return;
 }
 
+HHuginn::OCompiler::OCompiler( HHuginn* huginn_ )
+	: _functionContexts(),
+	_huginn( huginn_ ) {
+	_functionContexts.emplace( _huginn );
+	return;
+}
+
+HHuginn::OCompiler::OFunctionContext& HHuginn::OCompiler::f( void ) {
+	return ( _functionContexts.top() );
+}
+
 HHuginn::scope_t& HHuginn::OCompiler::current_scope( void ) {
-	return ( _compilationStack.top()._context._scope );
+	return ( f()._compilationStack.top()._context._scope );
 }
 
 HHuginn::expression_t& HHuginn::OCompiler::current_expression( void ) {
-	return ( _compilationStack.top()._context.expression() );
+	return ( f()._compilationStack.top()._context.expression() );
 }
 
 void HHuginn::OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
@@ -923,14 +933,16 @@ void HHuginn::OCompiler::set_function_name( yaal::hcore::HString const& name_, e
 	if ( is_restricted( name_ ) ) {
 		throw HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
-	_functionName = name_;
+	f()._functionName = name_;
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::verify_default_argument( executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( ( _lastDefaultValuePosition >= 0 ) && ( _lastDefaultValuePosition < static_cast<int>( _parameters.get_size() - 1 ) ) ) {
+	OFunctionContext& fc( f() );
+	int lastDefaultValuePosition( fc._lastDefaultValuePosition );
+	if ( ( lastDefaultValuePosition >= 0 ) && ( lastDefaultValuePosition < static_cast<int>( fc._parameters.get_size() - 1 ) ) ) {
 		throw HHuginnRuntimeException( "Missing default argument.", position_.get() );
 	}
 	return;
@@ -940,24 +952,25 @@ void HHuginn::OCompiler::verify_default_argument( executing_parser::position_t p
 void HHuginn::OCompiler::add_paramater( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	verify_default_argument( position_ );
-	_parameters.push_back( name_ );
+	f()._parameters.push_back( name_ );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::create_scope( executing_parser::position_t ) {
 	M_PROLOG
-	_compilationStack.emplace( _huginn );
+	f()._compilationStack.emplace( _huginn );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::commit_scope( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
 	scope_t scope( current_scope() );
-	_compilationStack.pop();
-	M_ASSERT( ! _compilationStack.is_empty() );
+	fc._compilationStack.pop();
+	M_ASSERT( ! fc._compilationStack.is_empty() );
 	current_scope()->add_statement( scope );
 	return;
 	M_EPILOG
@@ -966,63 +979,67 @@ void HHuginn::OCompiler::commit_scope( executing_parser::position_t ) {
 void HHuginn::OCompiler::reset_expression( void ) {
 	M_PROLOG
 	current_expression() = make_pointer<HExpression>( _huginn );
-	M_ASSERT( _operations.is_empty() );
-	_valueTypes.clear();
+	OFunctionContext& fc( f() );
+	M_ASSERT( fc._operations.is_empty() );
+	fc._valueTypes.clear();
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::start_subexpression( executing_parser::position_t position_ ) {
 	M_PROLOG
-	_compilationStack.top()._context._expressionsStack.emplace( 1, make_pointer<HExpression>( _huginn, position_.get() ) );
+	f()._compilationStack.top()._context._expressionsStack.emplace( 1, make_pointer<HExpression>( _huginn, position_.get() ) );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::add_subexpression( OPERATOR op_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	_compilationStack.top()._context._expressionsStack.top().emplace_back( make_pointer<HExpression>( _huginn, position_.get() ) );
-	_operations.emplace( op_, position_.get() );
+	OFunctionContext& fc( f() );
+	fc._compilationStack.top()._context._expressionsStack.top().emplace_back( make_pointer<HExpression>( _huginn, position_.get() ) );
+	fc._operations.emplace( op_, position_.get() );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::commit_boolean( OPERATOR operator_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( _compilationStack.top()._context._expressionsStack.top().get_size() > 1 ) {
-		value_t And( make_pointer<HBooleanEvaluator>( _compilationStack.top()._context._expressionsStack.top(), operator_ ) );
-		_compilationStack.top()._context._expressionsStack.pop();
+	OFunctionContext& fc( f() );
+	if ( fc._compilationStack.top()._context._expressionsStack.top().get_size() > 1 ) {
+		value_t And( make_pointer<HBooleanEvaluator>( fc._compilationStack.top()._context._expressionsStack.top(), operator_ ) );
+		fc._compilationStack.top()._context._expressionsStack.pop();
 		defer_store_direct( And, position_ );
 		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), operator_, _1, position_.get() ) );
 		defer_action( operator_ == OPERATOR::BOOLEAN_AND ? &HExpression::boolean_and : &HExpression::boolean_or, position_.get() );
 	} else {
-		expression_t e( _compilationStack.top()._context.expression() );
-		_compilationStack.top()._context._expressionsStack.pop();
-		_compilationStack.top()._context.expression()->merge( *e );
+		expression_t e( fc._compilationStack.top()._context.expression() );
+		fc._compilationStack.top()._context._expressionsStack.pop();
+		fc._compilationStack.top()._context.expression()->merge( *e );
 	}
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::commit_ternary( executing_parser::position_t position_ ) {
-	expressions_t const& exprs( _compilationStack.top()._context._expressionsStack.top() );
+	OFunctionContext& fc( f() );
+	expressions_t const& exprs( fc._compilationStack.top()._context._expressionsStack.top() );
 	if ( exprs.get_size() > 1 ) {
 		M_ASSERT( exprs.get_size() == 3 );
 		value_t ternary( make_pointer<HTernaryEvaluator>( exprs[0], exprs[1], exprs[2] ) );
-		_compilationStack.top()._context._expressionsStack.pop();
+		fc._compilationStack.top()._context._expressionsStack.pop();
 		defer_store_direct( ternary, position_ );
 		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), OPERATOR::TERNARY, _1, position_.get() ) );
 		defer_action( &HExpression::ternary, position_.get() );
 	} else {
-		expression_t e( _compilationStack.top()._context.expression() );
-		_compilationStack.top()._context._expressionsStack.pop();
-		_compilationStack.top()._context.expression()->merge( *e );
+		expression_t e( fc._compilationStack.top()._context.expression() );
+		fc._compilationStack.top()._context._expressionsStack.pop();
+		fc._compilationStack.top()._context.expression()->merge( *e );
 	}
 }
 
 void HHuginn::OCompiler::add_return_statement( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
+	M_ASSERT( ! f()._compilationStack.is_empty() );
 	current_scope()->add_statement( make_pointer<HReturn>( current_expression() ) );
 	reset_expression();
 	return;
@@ -1031,7 +1048,7 @@ void HHuginn::OCompiler::add_return_statement( executing_parser::position_t ) {
 
 void HHuginn::OCompiler::add_break_statement( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
+	M_ASSERT( ! f()._compilationStack.is_empty() );
 	current_scope()->add_statement( make_pointer<HBreak>() );
 	reset_expression();
 	return;
@@ -1040,9 +1057,10 @@ void HHuginn::OCompiler::add_break_statement( executing_parser::position_t ) {
 
 void HHuginn::OCompiler::add_while_statement( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
 	scope_t scope( current_scope() );
-	_compilationStack.pop();
+	fc._compilationStack.pop();
 	current_scope()->add_statement( make_pointer<HWhile>( current_expression(), scope ) );
 	reset_expression();
 	return;
@@ -1051,20 +1069,21 @@ void HHuginn::OCompiler::add_while_statement( executing_parser::position_t ) {
 
 void HHuginn::OCompiler::set_for_identifier( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	OCompilationFrame& f( _compilationStack.top() );
-	f._forIdentifier = name_;
-	f._forPosition = position_.get();
+	OCompilationFrame& cf( f()._compilationStack.top() );
+	cf._forIdentifier = name_;
+	cf._forPosition = position_.get();
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::add_for_statement( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
 	scope_t scope( current_scope() );
-	_compilationStack.pop();
-	OCompilationFrame const& f( _compilationStack.top() );
-	current_scope()->add_statement( make_pointer<HFor>( f._forIdentifier, current_expression(), scope, f._forPosition ) );
+	fc._compilationStack.pop();
+	OCompilationFrame const& cf( fc._compilationStack.top() );
+	current_scope()->add_statement( make_pointer<HFor>( cf._forIdentifier, current_expression(), scope, cf._forPosition ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1072,10 +1091,11 @@ void HHuginn::OCompiler::add_for_statement( executing_parser::position_t ) {
 
 void HHuginn::OCompiler::commit_if_clause( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
 	scope_t scope( current_scope() );
-	_compilationStack.pop();
-	_compilationStack.top()._contextsChain.emplace_back( _huginn, scope, current_expression() );
+	fc._compilationStack.pop();
+	fc._compilationStack.top()._contextsChain.emplace_back( _huginn, scope, current_expression() );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1083,10 +1103,11 @@ void HHuginn::OCompiler::commit_if_clause( executing_parser::position_t ) {
 
 void HHuginn::OCompiler::commit_else_clause( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
 	scope_t scope( current_scope() );
-	_compilationStack.pop();
-	_compilationStack.top()._else = scope;
+	fc._compilationStack.pop();
+	fc._compilationStack.top()._else = scope;
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1094,10 +1115,11 @@ void HHuginn::OCompiler::commit_else_clause( executing_parser::position_t ) {
 
 void HHuginn::OCompiler::add_if_statement( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
-	statement_t ifStatement( make_pointer<HIf>( _compilationStack.top()._contextsChain, _compilationStack.top()._else ) );
-	_compilationStack.top()._contextsChain.clear();
-	_compilationStack.top()._else.reset();
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
+	statement_t ifStatement( make_pointer<HIf>( fc._compilationStack.top()._contextsChain, fc._compilationStack.top()._else ) );
+	fc._compilationStack.top()._contextsChain.clear();
+	fc._compilationStack.top()._else.reset();
 	current_scope()->add_statement( ifStatement );
 	reset_expression();
 	return;
@@ -1106,10 +1128,11 @@ void HHuginn::OCompiler::add_if_statement( executing_parser::position_t ) {
 
 void HHuginn::OCompiler::add_switch_statement( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
-	OCompilationFrame::contexts_t contexts( yaal::move( _compilationStack.top()._contextsChain ) );
-	scope_t Default( _compilationStack.top()._else );
-	_compilationStack.pop();
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
+	OCompilationFrame::contexts_t contexts( yaal::move( fc._compilationStack.top()._contextsChain ) );
+	scope_t Default( fc._compilationStack.top()._else );
+	fc._compilationStack.pop();
 	statement_t switchStatement(
 		make_pointer<HSwitch>(
 			current_expression(),
@@ -1125,7 +1148,7 @@ void HHuginn::OCompiler::add_switch_statement( executing_parser::position_t ) {
 
 void HHuginn::OCompiler::commit_expression( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
+	M_ASSERT( ! f()._compilationStack.is_empty() );
 	current_scope()->add_statement( current_expression() );
 	reset_expression();
 	return;
@@ -1134,9 +1157,10 @@ void HHuginn::OCompiler::commit_expression( executing_parser::position_t ) {
 
 void HHuginn::OCompiler::add_default_value( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
-	_lastDefaultValuePosition = static_cast<int>( _parameters.get_size() - 1 );
-	_defaultValues.push_back( current_expression() );
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
+	fc._lastDefaultValuePosition = static_cast<int>( fc._parameters.get_size() - 1 );
+	fc._defaultValues.push_back( current_expression() );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -1144,7 +1168,7 @@ void HHuginn::OCompiler::add_default_value( executing_parser::position_t ) {
 
 void HHuginn::OCompiler::mark_expression_position( executing_parser::position_t position_ ) {
 	M_PROLOG
-	M_ASSERT( ! _compilationStack.is_empty() );
+	M_ASSERT( ! f()._compilationStack.is_empty() );
 	current_expression()->set_position( position_.get() );
 	return;
 	M_EPILOG
@@ -1170,7 +1194,7 @@ void HHuginn::OCompiler::defer_oper( char operator_, executing_parser::position_
 		}
 	}
 	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), o, _1, position_.get() ) );
-	_operations.emplace( o, position_.get() );
+	f()._operations.emplace( o, position_.get() );
 	return;
 	M_EPILOG
 }
@@ -1191,7 +1215,7 @@ void HHuginn::OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, 
 	} );
 	OPERATOR o( operatorLookup.at( operator_ ) );
 	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), o, _1, position_.get() ) );
-	_operations.emplace( o, position_.get() );
+	f()._operations.emplace( o, position_.get() );
 	return;
 	M_EPILOG
 }
@@ -1199,7 +1223,7 @@ void HHuginn::OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, 
 void HHuginn::OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), operator_, _1, position_.get() ) );
-	_operations.emplace( operator_, position_.get() );
+	f()._operations.emplace( operator_, position_.get() );
 	return;
 	M_EPILOG
 }
@@ -1277,63 +1301,66 @@ HHuginn::TYPE HHuginn::OCompiler::congruent( TYPE t1_, TYPE t2_ ) {
 
 void HHuginn::OCompiler::dispatch_plus( executing_parser::position_t position_ ) {
 	M_PROLOG
-	M_ASSERT( ! _operations.is_empty() );
-	M_ASSERT( _valueTypes.get_size() >= 2 );
-	OPositionedOperator po( _operations.top() );
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._operations.is_empty() );
+	M_ASSERT( fc._valueTypes.get_size() >= 2 );
+	OPositionedOperator po( fc._operations.top() );
 	OPERATOR o( po._operator );
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::PLUS ) || ( o == OPERATOR::MINUS ) );
 	defer_action( o == OPERATOR::PLUS ? &HExpression::plus : &HExpression::minus, position_ );
-	_operations.pop();
-	TYPE t1( _valueTypes.top() );
-	_valueTypes.pop();
-	TYPE t2( _valueTypes.top() );
-	_valueTypes.pop();
+	fc._operations.pop();
+	TYPE t1( fc._valueTypes.top() );
+	fc._valueTypes.pop();
+	TYPE t2( fc._valueTypes.top() );
+	fc._valueTypes.pop();
 	if ( ! ( are_congruous( t1, t2 ) && is_summable( t1 ) && is_summable( t2 ) ) ) {
 		throw HHuginnRuntimeException( o == OPERATOR::PLUS ? _errMsgHHuginn_[ERR_CODE::OP_NOT_SUM] : _errMsgHHuginn_[ERR_CODE::OP_NOT_SUB], p );
 	}
-	_valueTypes.push( congruent( t1, t2 ) );
+	fc._valueTypes.push( congruent( t1, t2 ) );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::dispatch_mul( executing_parser::position_t position_ ) {
 	M_PROLOG
-	M_ASSERT( ! _operations.is_empty() );
-	M_ASSERT( _valueTypes.get_size() >= 2 );
-	OPositionedOperator po( _operations.top() );
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._operations.is_empty() );
+	M_ASSERT( fc._valueTypes.get_size() >= 2 );
+	OPositionedOperator po( fc._operations.top() );
 	OPERATOR o( po._operator );
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::MULTIPLY ) || ( o == OPERATOR::DIVIDE ) || ( o == OPERATOR::MODULO ) );
 	defer_action( o == OPERATOR::MULTIPLY ? &HExpression::mul : ( o == OPERATOR::DIVIDE ? &HExpression::div : &HExpression::mod ), position_ );
-	_operations.pop();
-	TYPE t1( _valueTypes.top() );
-	_valueTypes.pop();
-	TYPE t2( _valueTypes.top() );
-	_valueTypes.pop();
+	fc._operations.pop();
+	TYPE t1( fc._valueTypes.top() );
+	fc._valueTypes.pop();
+	TYPE t2( fc._valueTypes.top() );
+	fc._valueTypes.pop();
 	if ( ! ( are_congruous( t1, t2 ) && is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
 		throw HHuginnRuntimeException( o == OPERATOR::MULTIPLY ? _errMsgHHuginn_[ERR_CODE::OP_NOT_MUL] : _errMsgHHuginn_[ERR_CODE::OP_NOT_DIV], p );
 	}
-	_valueTypes.push( congruent( t1, t2 ) );
+	fc._valueTypes.push( congruent( t1, t2 ) );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::dispatch_power( executing_parser::position_t position_ ) {
 	M_PROLOG
+	OFunctionContext& fc( f() );
 	defer_action( &HExpression::power, position_ );
-	while ( ! _operations.is_empty() && ( _operations.top()._operator == OPERATOR::POWER ) ) {
-		M_ASSERT( _valueTypes.get_size() >= 2 );
-		int p( _operations.top()._position );
-		_operations.pop();
-		TYPE t1( _valueTypes.top() );
-		_valueTypes.pop();
-		TYPE t2( _valueTypes.top() );
-		_valueTypes.pop();
+	while ( ! fc._operations.is_empty() && ( fc._operations.top()._operator == OPERATOR::POWER ) ) {
+		M_ASSERT( fc._valueTypes.get_size() >= 2 );
+		int p( fc._operations.top()._position );
+		fc._operations.pop();
+		TYPE t1( fc._valueTypes.top() );
+		fc._valueTypes.pop();
+		TYPE t2( fc._valueTypes.top() );
+		fc._valueTypes.pop();
 		if ( ! ( are_congruous( t1, t2 ) && is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
 			throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_EXP], p );
 		}
-		_valueTypes.push( congruent( t1, t2 ) );
+		fc._valueTypes.push( congruent( t1, t2 ) );
 	}
 	return;
 	M_EPILOG
@@ -1341,7 +1368,8 @@ void HHuginn::OCompiler::dispatch_power( executing_parser::position_t position_ 
 
 void HHuginn::OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
 	M_PROLOG
-	OPositionedOperator po( _operations.top() );
+	OFunctionContext& fc( f() );
+	OPositionedOperator po( fc._operations.top() );
 	OPERATOR o( po._operator );
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::LESS ) || ( o == OPERATOR::GREATER ) || ( o == OPERATOR::LESS_OR_EQUAL ) || ( o == OPERATOR::GREATER_OR_EQUAL ) );
@@ -1354,97 +1382,101 @@ void HHuginn::OCompiler::dispatch_compare( executing_parser::position_t position
 			M_ASSERT( ! "bad code path"[0] );
 		}
 	}
-	_operations.pop();
-	M_ASSERT( _valueTypes.get_size() >= 2 );
-	TYPE t1( _valueTypes.top() );
-	_valueTypes.pop();
-	TYPE t2( _valueTypes.top() );
-	_valueTypes.pop();
+	fc._operations.pop();
+	M_ASSERT( fc._valueTypes.get_size() >= 2 );
+	TYPE t1( fc._valueTypes.top() );
+	fc._valueTypes.pop();
+	TYPE t2( fc._valueTypes.top() );
+	fc._valueTypes.pop();
 	if ( ! ( are_congruous( t1, t2 ) && is_comparable_congruent( t1 ) && is_comparable_congruent( t2 ) ) ) {
 		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_CMP], p );
 	}
-	_valueTypes.push( TYPE::BOOLEAN );
+	fc._valueTypes.push( TYPE::BOOLEAN );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::dispatch_boolean( expression_action_t const& action_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	OPositionedOperator po( _operations.top() );
+	OFunctionContext& fc( f() );
+	OPositionedOperator po( fc._operations.top() );
 	int p( po._position );
 	if ( !! action_ ) {
 		defer_action( action_, position_ );
 	}
-	_operations.pop();
-	M_ASSERT( _valueTypes.get_size() >= 2 );
-	TYPE t1( _valueTypes.top() );
-	_valueTypes.pop();
-	TYPE t2( _valueTypes.top() );
-	_valueTypes.pop();
+	fc._operations.pop();
+	M_ASSERT( fc._valueTypes.get_size() >= 2 );
+	TYPE t1( fc._valueTypes.top() );
+	fc._valueTypes.pop();
+	TYPE t2( fc._valueTypes.top() );
+	fc._valueTypes.pop();
 	if ( ! ( is_boolean_congruent( t1 ) && is_boolean_congruent( t2 ) ) ) {
 		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], p );
 	}
-	_valueTypes.push( TYPE::BOOLEAN );
+	fc._valueTypes.push( TYPE::BOOLEAN );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::dispatch_ternary( void ) {
 	M_PROLOG
-	M_ASSERT( _operations.top()._operator == OPERATOR::TERNARY );
-	_operations.pop();
-	M_ASSERT( _operations.top()._operator == OPERATOR::TERNARY );
-	int p( _operations.top()._position );
-	_operations.pop();
-	M_ASSERT( _valueTypes.get_size() >= 3 );
-	_valueTypes.pop();
-	_valueTypes.pop();
-	TYPE t0( _valueTypes.top() );
-	_valueTypes.pop();
+	OFunctionContext& fc( f() );
+	M_ASSERT( fc._operations.top()._operator == OPERATOR::TERNARY );
+	fc._operations.pop();
+	M_ASSERT( fc._operations.top()._operator == OPERATOR::TERNARY );
+	int p( fc._operations.top()._position );
+	fc._operations.pop();
+	M_ASSERT( fc._valueTypes.get_size() >= 3 );
+	fc._valueTypes.pop();
+	fc._valueTypes.pop();
+	TYPE t0( fc._valueTypes.top() );
+	fc._valueTypes.pop();
 	if ( ! is_boolean_congruent( t0 ) ) {
 		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
 	}
-	_valueTypes.push( TYPE::UNKNOWN );
+	fc._valueTypes.push( TYPE::UNKNOWN );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::dispatch_equals( executing_parser::position_t position_ ) {
 	M_PROLOG
-	OPositionedOperator po( _operations.top() );
+	OFunctionContext& fc( f() );
+	OPositionedOperator po( fc._operations.top() );
 	OPERATOR o( po._operator );
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::EQUALS ) || ( o == OPERATOR::NOT_EQUALS ) );
 	defer_action( o == OPERATOR::EQUALS ? &HExpression::equals : &HExpression::not_equals, position_ );
-	_operations.pop();
-	M_ASSERT( _valueTypes.get_size() >= 2 );
-	TYPE t1( _valueTypes.top() );
-	_valueTypes.pop();
-	TYPE t2( _valueTypes.top() );
-	_valueTypes.pop();
+	fc._operations.pop();
+	M_ASSERT( fc._valueTypes.get_size() >= 2 );
+	TYPE t1( fc._valueTypes.top() );
+	fc._valueTypes.pop();
+	TYPE t2( fc._valueTypes.top() );
+	fc._valueTypes.pop();
 	if ( ! are_congruous( t1, t2 ) ) {
 		operands_type_mismatch( ( o == OPERATOR::EQUALS ? "==" : "!=" ), t1, t2, p );
 	}
-	_valueTypes.push( TYPE::BOOLEAN );
+	fc._valueTypes.push( TYPE::BOOLEAN );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 	M_PROLOG
+	OFunctionContext& fc( f() );
 	defer_action( &HExpression::set_variable, position_ );
-	while ( ! _operations.is_empty() && ( _operations.top()._operator == OPERATOR::ASSIGN ) ) {
-		M_ASSERT( _valueTypes.get_size() >= 2 );
-		int p( _operations.top()._position );
-		_operations.pop();
-		TYPE t1( _valueTypes.top() );
-		_valueTypes.pop();
-		TYPE t2( _valueTypes.top() );
-		_valueTypes.pop();
+	while ( ! fc._operations.is_empty() && ( fc._operations.top()._operator == OPERATOR::ASSIGN ) ) {
+		M_ASSERT( fc._valueTypes.get_size() >= 2 );
+		int p( fc._operations.top()._position );
+		fc._operations.pop();
+		TYPE t1( fc._valueTypes.top() );
+		fc._valueTypes.pop();
+		TYPE t2( fc._valueTypes.top() );
+		fc._valueTypes.pop();
 		if ( ! is_reference_congruent( t2 ) ) {
 			throw HHuginnRuntimeException( "Setting a non reference location.", p );
 		}
-		_valueTypes.push( t1 );
+		fc._valueTypes.push( t1 );
 	}
 	return;
 	M_EPILOG
@@ -1452,39 +1484,42 @@ void HHuginn::OCompiler::dispatch_assign( executing_parser::position_t position_
 
 void HHuginn::OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 	M_PROLOG
-	M_ASSERT( _operations.top()._operator == OPERATOR::SUBSCRIPT );
+	OFunctionContext& fc( f() );
+	M_ASSERT( fc._operations.top()._operator == OPERATOR::SUBSCRIPT );
 	current_expression()->add_execution_step( hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::SUBSCRIPT::VALUE, _1, position_.get() ) );
-	_operations.pop();
-	M_ASSERT( _valueTypes.get_size() >= 2 );
-	_valueTypes.pop();
-	_valueTypes.pop();
-	_valueTypes.push( TYPE::REFERENCE );
-	_lastDereferenceOperator = OPERATOR::SUBSCRIPT;
+	fc._operations.pop();
+	M_ASSERT( fc._valueTypes.get_size() >= 2 );
+	fc._valueTypes.pop();
+	fc._valueTypes.pop();
+	fc._valueTypes.push( TYPE::REFERENCE );
+	fc._lastDereferenceOperator = OPERATOR::SUBSCRIPT;
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::dispatch_function_call( expression_action_t const& action_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	while ( ! _operations.is_empty() && ( _operations.top()._operator == OPERATOR::FUNCTION_ARGUMENT ) ) {
-		_operations.pop();
-		_valueTypes.pop();
+	OFunctionContext& fc( f() );
+	while ( ! fc._operations.is_empty() && ( fc._operations.top()._operator == OPERATOR::FUNCTION_ARGUMENT ) ) {
+		fc._operations.pop();
+		fc._valueTypes.pop();
 	}
 	if ( action_ == &HExpression::function_call ) {
-		_valueTypes.pop();
+		fc._valueTypes.pop();
 	}
-	_valueTypes.push( TYPE::UNKNOWN );
-	M_ASSERT( _operations.top()._operator == OPERATOR::FUNCTION_CALL );
+	fc._valueTypes.push( TYPE::UNKNOWN );
+	M_ASSERT( fc._operations.top()._operator == OPERATOR::FUNCTION_CALL );
 	defer_action( action_, position_ );
-	_operations.pop();
+	fc._operations.pop();
 	return;
 	M_EPILOG
 }
 
 void HHuginn::OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	_lastDereferenceOperator = OPERATOR::NONE;
-	OPositionedOperator po( ! _operations.is_empty() ? _operations.top() : OPositionedOperator( OPERATOR::NONE, 0 ) );
+	OFunctionContext& fc( f() );
+	fc._lastDereferenceOperator = OPERATOR::NONE;
+	OPositionedOperator po( ! fc._operations.is_empty() ? fc._operations.top() : OPositionedOperator( OPERATOR::NONE, 0 ) );
 	OPERATOR o( po._operator );
 	int p( po._position );
 	switch ( oper_ ) {
@@ -1493,10 +1528,10 @@ void HHuginn::OCompiler::dispatch_action( OPERATOR oper_, executing_parser::posi
 		case ( OPERATOR::POWER ):    { dispatch_power( position_ ); } break;
 		case ( OPERATOR::NEGATE ): {
 			M_ASSERT( o == OPERATOR::NEGATE );
-			M_ASSERT( ! _valueTypes.is_empty() );
+			M_ASSERT( ! fc._valueTypes.is_empty() );
 			defer_action( &HExpression::negate, position_ );
-			_operations.pop();
-			if ( ! is_numeric_congruent( _valueTypes.top() ) ) {
+			fc._operations.pop();
+			if ( ! is_numeric_congruent( fc._valueTypes.top() ) ) {
 				throw HHuginnRuntimeException( "Operand is not a numeric value.", p );
 			}
 		} break;
@@ -1508,10 +1543,10 @@ void HHuginn::OCompiler::dispatch_action( OPERATOR oper_, executing_parser::posi
 		case ( OPERATOR::ABSOLUTE ): {
 			M_ASSERT( ( o == OPERATOR::ABSOLUTE ) || ( o == OPERATOR::PARENTHESIS ) );
 			defer_action( &HExpression::close_parenthesis, position_ );
-			_operations.pop();
+			fc._operations.pop();
 			if ( o == OPERATOR::ABSOLUTE ) {
-				M_ASSERT( ! _valueTypes.is_empty() );
-				if ( ! is_numeric_congruent( _valueTypes.top() ) ) {
+				M_ASSERT( ! fc._valueTypes.is_empty() );
+				if ( ! is_numeric_congruent( fc._valueTypes.top() ) ) {
 					throw HHuginnRuntimeException( "Operand is not a numeric value.", p );
 				}
 			}
@@ -1532,10 +1567,10 @@ void HHuginn::OCompiler::dispatch_action( OPERATOR oper_, executing_parser::posi
 		} break;
 		case ( OPERATOR::BOOLEAN_NOT ): {
 			M_ASSERT( o == OPERATOR::BOOLEAN_NOT );
-			M_ASSERT( ! _valueTypes.is_empty() );
+			M_ASSERT( ! fc._valueTypes.is_empty() );
 			defer_action( &HExpression::boolean_not, position_ );
-			_operations.pop();
-			if ( ! is_boolean_congruent( _valueTypes.top() ) ) {
+			fc._operations.pop();
+			if ( ! is_boolean_congruent( fc._valueTypes.top() ) ) {
 				throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
 			}
 		} break;
@@ -1565,7 +1600,7 @@ void HHuginn::OCompiler::defer_call( yaal::hcore::HString const& name_, executin
 
 void HHuginn::OCompiler::make_reference( executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( _lastDereferenceOperator != OPERATOR::SUBSCRIPT ) {
+	if ( f()._lastDereferenceOperator != OPERATOR::SUBSCRIPT ) {
 		throw HHuginnRuntimeException( "Assignment to function result.", position_.get() );
 	}
 	current_expression()->pop_execution_step();
@@ -1577,7 +1612,7 @@ void HHuginn::OCompiler::make_reference( executing_parser::position_t position_ 
 void HHuginn::OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::get_reference, current_expression().raw(), value_, _1, position_.get() ) );
-	_valueTypes.push( TYPE::UNKNOWN );
+	f()._valueTypes.push( TYPE::UNKNOWN );
 	return;
 	M_EPILOG
 }
@@ -1585,7 +1620,7 @@ void HHuginn::OCompiler::defer_get_reference( yaal::hcore::HString const& value_
 void HHuginn::OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::make_variable, current_expression().raw(), value_, _1, position_.get() ) );
-	_valueTypes.push( TYPE::UNKNOWN );
+	f()._valueTypes.push( TYPE::UNKNOWN );
 	return;
 	M_EPILOG
 }
@@ -1593,7 +1628,7 @@ void HHuginn::OCompiler::defer_make_variable( yaal::hcore::HString const& value_
 void HHuginn::OCompiler::defer_store_direct( value_t const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_direct, current_expression().raw(), value_, _1, position_.get() ) );
-	_valueTypes.push( value_->type() );
+	f()._valueTypes.push( value_->type() );
 	return;
 	M_EPILOG
 }
@@ -1601,7 +1636,7 @@ void HHuginn::OCompiler::defer_store_direct( value_t const& value_, executing_pa
 void HHuginn::OCompiler::defer_store_real( double long value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_real, current_expression().raw(), value_, _1, position_.get() ) );
-	_valueTypes.push( TYPE::REAL );
+	f()._valueTypes.push( TYPE::REAL );
 	return;
 	M_EPILOG
 }
@@ -1609,7 +1644,7 @@ void HHuginn::OCompiler::defer_store_real( double long value_, executing_parser:
 void HHuginn::OCompiler::defer_store_integer( int long long value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_integer, current_expression().raw(), value_, _1, position_.get() ) );
-	_valueTypes.push( TYPE::INTEGER );
+	f()._valueTypes.push( TYPE::INTEGER );
 	return;
 	M_EPILOG
 }
@@ -1617,7 +1652,7 @@ void HHuginn::OCompiler::defer_store_integer( int long long value_, executing_pa
 void HHuginn::OCompiler::defer_store_string( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_string, current_expression().raw(), value_, _1, position_.get() ) );
-	_valueTypes.push( TYPE::STRING );
+	f()._valueTypes.push( TYPE::STRING );
 	return;
 	M_EPILOG
 }
@@ -1625,7 +1660,7 @@ void HHuginn::OCompiler::defer_store_string( yaal::hcore::HString const& value_,
 void HHuginn::OCompiler::defer_store_number( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_number, current_expression().raw(), value_, _1, position_.get() ) );
-	_valueTypes.push( TYPE::NUMBER );
+	f()._valueTypes.push( TYPE::NUMBER );
 	return;
 	M_EPILOG
 }
@@ -1633,7 +1668,7 @@ void HHuginn::OCompiler::defer_store_number( yaal::hcore::HString const& value_,
 void HHuginn::OCompiler::defer_store_character( char value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_character, current_expression().raw(), value_, _1, position_.get() ) );
-	_valueTypes.push( TYPE::CHARACTER );
+	f()._valueTypes.push( TYPE::CHARACTER );
 	return;
 	M_EPILOG
 }
@@ -1641,7 +1676,7 @@ void HHuginn::OCompiler::defer_store_character( char value_, executing_parser::p
 void HHuginn::OCompiler::defer_store_boolean( bool value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_boolean, current_expression().raw(), value_, _1, position_.get() ) );
-	_valueTypes.push( TYPE::BOOLEAN );
+	f()._valueTypes.push( TYPE::BOOLEAN );
 	return;
 	M_EPILOG
 }
@@ -1649,7 +1684,7 @@ void HHuginn::OCompiler::defer_store_boolean( bool value_, executing_parser::pos
 void HHuginn::OCompiler::defer_store_none( executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_none, current_expression().raw(), _1, position_.get() ) );
-	_valueTypes.push( TYPE::NONE );
+	f()._valueTypes.push( TYPE::NONE );
 	return;
 	M_EPILOG
 }
@@ -1933,34 +1968,37 @@ void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 
 void HHuginn::create_function( executing_parser::position_t ) {
 	M_PROLOG
-	M_ASSERT( ! _compiler._functionName.is_empty() );
-	M_ASSERT( ! _compiler._compilationStack.is_empty() );
+	OCompiler::OFunctionContext& fc( _compiler.f() );
+	M_ASSERT( ! fc._functionName.is_empty() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
 	function_t f(
 		hcore::call(
 			&HFunction::execute,
 			make_pointer<HFunction>(
-				_compiler._functionName,
-				_compiler._parameters,
+				fc._functionName,
+				fc._parameters,
 				yaal::move( _compiler.current_scope() ),
-				_compiler._defaultValues
+				fc._defaultValues
 			),
 			_1, _2, _3
 		)
 	);
-	_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( _compiler._functionName ), yaal::move( f ) ) );
-	_compiler._compilationStack.pop();
-	M_ASSERT( _compiler._compilationStack.get_size() == 1 );
-	_compiler._compilationStack.top().clear();
-	_compiler._parameters.clear();
-	_compiler._defaultValues.clear();
-	_compiler._lastDefaultValuePosition = -1;
-	_compiler._functionName.clear();
+	_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( fc._functionName ), yaal::move( f ) ) );
+	fc._compilationStack.pop();
+	M_ASSERT( fc._compilationStack.get_size() == 1 );
+	fc._compilationStack.top().clear();
+	fc._parameters.clear();
+	fc._defaultValues.clear();
+	fc._lastDefaultValuePosition = -1;
+	fc._functionName.clear();
 	return;
 	M_EPILOG
 }
 
 HHuginn::HThread::HThread( HHuginn* huginn_, yaal::hcore::HThread::id_t id_ )
-	: _frames(), _id( id_ ), _huginn( huginn_ ) {
+	: _frames(),
+	_id( id_ ),
+	_huginn( huginn_ ) {
 	return;
 }
 
