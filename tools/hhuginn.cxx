@@ -229,7 +229,13 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule scope( "scope" );
 	HRule lambda(
 		"lambda",
-		constant( '@' ) >> '(' >> -nameList >> ')' >> scope
+		constant(
+			'@',
+			e_p::HRegex::action_position_t( hcore::call( &HHuginn::OCompiler::set_lambda_name, &_compiler, _1 ) )
+		) >> '(' >> -nameList >>
+		constant( ')', HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::verify_default_argument, &_compiler, _1 ) ) )
+		>> scope,
+		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::create_lambda, &_compiler, _1 ) )
 	);
 	HRule subscriptOperator(
 		"subscriptOperator",
@@ -912,7 +918,6 @@ HHuginn::OCompiler::OFunctionContext::OFunctionContext( HHuginn* huginn_ )
 HHuginn::OCompiler::OCompiler( HHuginn* huginn_ )
 	: _functionContexts(),
 	_huginn( huginn_ ) {
-	_functionContexts.emplace( _huginn );
 	return;
 }
 
@@ -930,10 +935,57 @@ HHuginn::expression_t& HHuginn::OCompiler::current_expression( void ) {
 
 void HHuginn::OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
+	_functionContexts.emplace( _huginn );
 	if ( is_restricted( name_ ) ) {
 		throw HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
 	f()._functionName = name_;
+	return;
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
+	M_PROLOG
+	HHuginn::HErrorCoordinate ec( _huginn->get_coordinate( position_.get() ) );
+	_functionContexts.emplace( _huginn );
+	f()._functionName.assign( "@" ).append( ec.line() ).append( ":" ).append( ec.column() );
+	return;
+	M_EPILOG
+}
+
+HHuginn::function_t HHuginn::OCompiler::create_function( executing_parser::position_t ) {
+	M_PROLOG
+	OCompiler::OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._functionName.is_empty() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
+	function_t fun(
+		hcore::call(
+			&HFunction::execute,
+			make_pointer<HFunction>(
+				fc._functionName,
+				fc._parameters,
+				yaal::move( current_scope() ),
+				fc._defaultValues
+			),
+			_1, _2, _3
+		)
+	);
+	fc._compilationStack.pop();
+	M_ASSERT( fc._compilationStack.get_size() == 1 );
+	fc._compilationStack.top().clear();
+	fc._parameters.clear();
+	fc._defaultValues.clear();
+	fc._lastDefaultValuePosition = -1;
+	return ( fun );
+	M_EPILOG
+}
+
+void HHuginn::OCompiler::create_lambda( executing_parser::position_t position_ ) {
+	M_PROLOG
+	function_t fun( create_function( position_ ) );
+	value_t fRef( make_pointer<HFunctionReference>( f()._functionName, fun ) );
+	_functionContexts.pop();
+	defer_store_direct( fRef, position_ );
 	return;
 	M_EPILOG
 }
@@ -1846,6 +1898,12 @@ HHuginn::HErrorCoordinate HHuginn::error_coordinate( void ) const {
 	M_EPILOG
 }
 
+HHuginn::HErrorCoordinate HHuginn::get_coordinate( int position_ ) const {
+	M_PROLOG
+	return ( _source.error_coordinate( _source.error_position( position_ ) ) );
+	M_EPILOG
+}
+
 yaal::hcore::HString HHuginn::error_message( void ) const {
 	M_PROLOG
 	hcore::HString message( _source.name() );
@@ -1966,31 +2024,11 @@ void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	M_EPILOG
 }
 
-void HHuginn::create_function( executing_parser::position_t ) {
+void HHuginn::create_function( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OCompiler::OFunctionContext& fc( _compiler.f() );
-	M_ASSERT( ! fc._functionName.is_empty() );
-	M_ASSERT( ! fc._compilationStack.is_empty() );
-	function_t f(
-		hcore::call(
-			&HFunction::execute,
-			make_pointer<HFunction>(
-				fc._functionName,
-				fc._parameters,
-				yaal::move( _compiler.current_scope() ),
-				fc._defaultValues
-			),
-			_1, _2, _3
-		)
-	);
-	_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( fc._functionName ), yaal::move( f ) ) );
-	fc._compilationStack.pop();
-	M_ASSERT( fc._compilationStack.get_size() == 1 );
-	fc._compilationStack.top().clear();
-	fc._parameters.clear();
-	fc._defaultValues.clear();
-	fc._lastDefaultValuePosition = -1;
-	fc._functionName.clear();
+	_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( fc._functionName ), _compiler.create_function( position_ ) ) );
+	_compiler._functionContexts.pop();
 	return;
 	M_EPILOG
 }

@@ -213,6 +213,9 @@ private:
 		OCompiler( HHuginn* );
 		OFunctionContext& f( void );
 		void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
+		void set_lambda_name( executing_parser::position_t );
+		function_t create_function( executing_parser::position_t );
+		void create_lambda( executing_parser::position_t );
 		void set_for_identifier( yaal::hcore::HString const&, executing_parser::position_t );
 		void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
 		void verify_default_argument( executing_parser::position_t );
@@ -342,6 +345,7 @@ public:
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& );
 	int error_position( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;
+	HErrorCoordinate get_coordinate( int ) const;
 	yaal::hcore::HString error_message( void ) const;
 	void set_input_stream( yaal::hcore::HStreamInterface& );
 	void set_input_stream( yaal::hcore::HStreamInterface::ptr_t );
