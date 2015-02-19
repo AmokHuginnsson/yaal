@@ -265,7 +265,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
 		| dereference
 		| ( stringLiteral >> -subscriptOperator )
-		| lambda
+		| ( lambda >> -( functionCallOperator >> *( subscriptOperator | functionCallOperator ) ) )
 	);
 	HRule negation(
 		"negation",
