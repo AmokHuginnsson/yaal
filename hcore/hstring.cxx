@@ -1308,12 +1308,14 @@ HString& HString::append( HString const& str_, int long idx_, int long len_ ) {
 
 HString& HString::append( int long count_, char val_ ) {
 	M_PROLOG
-	int long oldSize( GET_SIZE );
-	int long newSize( oldSize + count_ );
-	reserve( newSize );
-	::memset( MEM + oldSize, val_, static_cast<size_t>( count_ ) );
-	MEM[ newSize ] = 0;
-	SET_SIZE( newSize );
+	if ( val_ ) {
+		int long oldSize( GET_SIZE );
+		int long newSize( oldSize + count_ );
+		reserve( newSize );
+		::memset( MEM + oldSize, val_, static_cast<size_t>( count_ ) );
+		MEM[ newSize ] = 0;
+		SET_SIZE( newSize );
+	}
 	return ( *this );
 	M_EPILOG
 }
