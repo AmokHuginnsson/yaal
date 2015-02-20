@@ -242,7 +242,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		constant(
 			'[',
 			e_p::HCharacter::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1, _2 ) )
-		) >> expression >> ']',
+		) >> ( ( ':' >> -expression ) | ( expression >> -( ':' >> -expression ) >> ']' ) ),
 		e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::SUBSCRIPT, _1 ) )
 	);
 	HRule reference(
