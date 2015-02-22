@@ -237,12 +237,19 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		>> scope,
 		HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::create_lambda, &_compiler, _1 ) )
 	);
+	HRule rangeOper(
+		"rangeOper",
+		constant(
+			':',
+			e_p::HCharacter::action_position_t( hcore::call( &HHuginn::OCompiler::defer_oper_direct, &_compiler, OPERATOR::SUBSCRIPT_ARGUMENT, _1 ) )
+		)
+	);
 	HRule subscriptOperator(
 		"subscriptOperator",
 		constant(
 			'[',
-			e_p::HCharacter::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1, _2 ) )
-		) >> ( ( ':' >> -expression ) | ( expression >> -( ':' >> -expression ) >> ']' ) ),
+			e_p::HCharacter::action_position_t( hcore::call( &HHuginn::OCompiler::defer_oper_direct, &_compiler, OPERATOR::SUBSCRIPT, _1 ) )
+		) >> ( ( ( rangeOper >> -arg ) | ( arg >> -( rangeOper >> -arg ) ) ) >> -( rangeOper >> -arg ) ) >> ']',
 		e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::dispatch_action, &_compiler, OPERATOR::SUBSCRIPT, _1 ) )
 	);
 	HRule reference(
@@ -1239,7 +1246,6 @@ void HHuginn::OCompiler::defer_oper( char operator_, executing_parser::position_
 		case ( '(' ): o = HHuginn::OPERATOR::PARENTHESIS; break;
 		case ( '|' ): o = HHuginn::OPERATOR::ABSOLUTE;    break;
 		case ( '=' ): o = HHuginn::OPERATOR::ASSIGN;      break;
-		case ( '[' ): o = HHuginn::OPERATOR::SUBSCRIPT;   break;
 		case ( '!' ): o = HHuginn::OPERATOR::BOOLEAN_NOT; break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
@@ -1537,11 +1543,30 @@ void HHuginn::OCompiler::dispatch_assign( executing_parser::position_t position_
 void HHuginn::OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	OPERATOR op( fc._operations.top()._operator );
+	int range( 0 );
+	bool nonInteger( false );
+	int p( position_.get() );
+	while ( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) ) {
+		if ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) {
+			++ range;
+		} else {
+			if ( ! ( nonInteger || is_integer_congruent( fc._valueTypes.top() ) || ( fc._valueTypes.top() == TYPE::NONE ) ) ) {
+				nonInteger = true;
+				p = fc._operations.top()._position;
+			}
+			fc._valueTypes.pop();
+		}
+		fc._operations.pop();
+		op = fc._operations.top()._operator;
+	}
+	if ( ( range > 0 ) && nonInteger ) {
+		throw HHuginnRuntimeException( "Range specifier is not an integer.", p );
+	}
 	M_ASSERT( fc._operations.top()._operator == OPERATOR::SUBSCRIPT );
 	current_expression()->add_execution_step( hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::SUBSCRIPT::VALUE, _1, position_.get() ) );
 	fc._operations.pop();
-	M_ASSERT( fc._valueTypes.get_size() >= 2 );
-	fc._valueTypes.pop();
+	M_ASSERT( fc._valueTypes.get_size() >= 1 );
 	fc._valueTypes.pop();
 	fc._valueTypes.push( TYPE::REFERENCE );
 	fc._lastDereferenceOperator = OPERATOR::SUBSCRIPT;
@@ -2292,18 +2317,19 @@ HHuginn::value_t HHuginn::HValue::subscript( HExpression::SUBSCRIPT subscript_, 
 		}
 		HInteger const* i( static_cast<HInteger const*>( index_.raw() ) );
 		int long long index( i->value() );
+		int long size( baseType == TYPE::LIST ? static_cast<HList*>( base_.raw() )->size() : static_cast<HString*>( base_.raw() )->value().get_length() );
+		if ( ( index < -size ) || ( index >= size ) ) {
+			throw HHuginnRuntimeException( "Bad index.", position_ );
+		}
+		if ( index < 0 ) {
+			index += size;
+		}
 		if ( baseType == TYPE::LIST ) {
 			HList* l( static_cast<HList*>( base_.raw() ) );
-			if ( ( index < 0 ) || ( index >= l->size() ) ) {
-				throw HHuginnRuntimeException( "Bad index.", position_ );
-			}
 			res = ( subscript_ == HExpression::SUBSCRIPT::VALUE ? l->get( index ) : l->get_ref( index ) );
 		} else {
 			M_ASSERT( baseType == TYPE::STRING );
 			HString* s( static_cast<HString*>( base_.raw() ) );
-			if ( ( index < 0 ) || ( index >= s->value().get_length() ) ) {
-				throw HHuginnRuntimeException( "Bad index.", position_ );
-			}
 			res = make_pointer<HCharacter>( s->value()[static_cast<int>( index )] );
 		}
 	} else if ( baseType == TYPE::MAP ) {
@@ -2311,6 +2337,83 @@ HHuginn::value_t HHuginn::HValue::subscript( HExpression::SUBSCRIPT subscript_, 
 		res = ( subscript_ == HExpression::SUBSCRIPT::VALUE ? m->get( index_, position_ ) : m->get_ref( index_, position_ ) );
 	} else {
 		throw HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( type_name( baseType ) ).append( "'." ), position_ );
+	}
+	return ( res );
+}
+
+HHuginn::value_t HHuginn::HValue::range(
+	HHuginn::value_t& base_,
+	HHuginn::value_t const& from_,
+	HHuginn::value_t const& to_,
+	HHuginn::value_t const& step_,
+	int position_
+) {
+	TYPE baseType( base_->type() );
+	value_t res;
+	if ( ( baseType == TYPE::LIST ) || ( baseType == TYPE::STRING ) ) {
+		if ( ( from_->type() != TYPE::INTEGER ) && ( from_->type() != TYPE::NONE ) ) {
+			throw HHuginnRuntimeException( "Range operand `from' is not an integer.", position_ );
+		}
+		if ( ( to_->type() != TYPE::INTEGER ) && ( to_->type() != TYPE::NONE ) ) {
+			throw HHuginnRuntimeException( "Range operand `to' is not an integer.", position_ );
+		}
+		if ( ( step_->type() != TYPE::INTEGER ) && ( step_->type() != TYPE::NONE ) ) {
+			throw HHuginnRuntimeException( "Range operand `step' is not an integer.", position_ );
+		}
+		int long size( baseType == TYPE::LIST ? static_cast<HList*>( base_.raw() )->size() : static_cast<HString*>( base_.raw() )->value().get_length() );
+		HInteger const* integer( from_->type() == TYPE::INTEGER ? static_cast<HInteger const*>( from_.raw() ) : nullptr );
+		int long from( integer ? static_cast<int long>( integer->value() ) : 0 );
+		integer = to_->type() == TYPE::INTEGER ? static_cast<HInteger const*>( to_.raw() ) : nullptr;
+		int long to( integer ? static_cast<int long>( integer->value() ) : size );
+		integer = step_->type() == TYPE::INTEGER ? static_cast<HInteger const*>( step_.raw() ) : nullptr;
+		int long step( integer ? static_cast<int long>( integer->value() ) : 1 );
+		if ( step == 0 ) {
+			throw HHuginnRuntimeException( "Range step cannot be zero.", position_ );
+		}
+		res = ( baseType == TYPE::LIST ) ? pointer_static_cast<HValue>( make_pointer<HList>() ) : pointer_static_cast<HValue>( make_pointer<HString>( "" ) );
+
+		if ( ( from < size ) && ( to != 0 ) && ( to > -size ) ) {
+			if ( from < -size ) {
+				from = 0;
+			} else if ( from < 0 ) {
+				from += size;
+			}
+			if ( to > size ) {
+				to = size;
+			} else if ( to < 0 ) {
+				to += size;
+			}
+			if ( to > from ) {
+				if ( baseType == TYPE::LIST ) {
+					HList* l( static_cast<HList*>( base_.raw() ) );
+					HList* r( static_cast<HList*>( res.raw() ) );
+					if ( step > 0 ) {
+						for ( int long i( from ); i < to; i += step ) {
+							r->push_back( l->get( i ) );
+						}
+					} else {
+						for ( int long i( to - 1 ); i >= from; i += step ) {
+							r->push_back( l->get( i ) );
+						}
+					}
+				} else {
+					M_ASSERT( baseType == TYPE::STRING );
+					HString* s( static_cast<HString*>( base_.raw() ) );
+					HString* r( static_cast<HString*>( res.raw() ) );
+					if ( step > 0 ) {
+						for ( int long i( from ); i < to; i += step ) {
+							r->value().push_back( s->value()[ i ] );
+						}
+					} else {
+						for ( int long i( to - 1 ); i >= from; i += step ) {
+							r->value().push_back( s->value()[ i ] );
+						}
+					}
+				}
+			}
+		}
+	} else {
+		throw HHuginnRuntimeException( "Range operator is not supported on `"_ys.append( type_name( baseType ) ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -3427,14 +3530,55 @@ void HHuginn::HExpression::power( HFrame* frame_, int ) {
 void HHuginn::HExpression::subscript( SUBSCRIPT subscript_, HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
+	value_t from( _none_ );
+	value_t to( _none_ );
+	value_t step( _none_ );
+	value_t* v( &step );
+	OPERATOR op( frame_->operations().top()._operator );
+	M_ASSERT( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) );
+	int range( 0 );
+	while ( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) ) {
+		if ( op == OPERATOR::FUNCTION_ARGUMENT ) {
+			*v = frame_->values().top();
+			frame_->values().pop();
+		} else {
+			if ( range == 0 ) {
+				v = &to;
+			} else {
+				v = &from;
+			}
+			++ range;
+		}
+		frame_->operations().pop();
+		op = frame_->operations().top()._operator;
+	}
+	M_ASSERT( range <= 2 );
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::SUBSCRIPT );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
-	value_t index( frame_->values().top() );
-	frame_->values().pop();
+	bool select( ( !! from ) || ( !! to ) || ( !! step ) );
 	value_t base( frame_->values().top() );
-	frame_->values().pop();
-	frame_->values().push( HHuginn::HValue::subscript( subscript_, base, index, p ) );
+	if ( ! select && ( range > 0 ) ) {
+		TYPE t( base->type() );
+		if ( ( t != TYPE::LIST ) && ( t != TYPE::STRING ) ) {
+			throw HHuginnRuntimeException( "Range operator not supported on `"_ys.append( HValue::type_name( t ) ).append( "'." ), p );
+		}
+	} else {
+		frame_->values().pop();
+		if ( range > 0 ) {
+			if ( subscript_ == SUBSCRIPT::REFERENCE ) {
+				throw HHuginnRuntimeException( "Cannot assign to a range.", p );
+			}
+			if ( range == 1 ) {
+				from = yaal::move( to );
+				to = yaal::move( step );
+				step = _none_;
+			}
+			frame_->values().push( HHuginn::HValue::range( base, from, to, step, p ) );
+		} else {
+			frame_->values().push( HHuginn::HValue::subscript( subscript_, base, step, p ) );
+		}
+	}
 	return;
 	M_EPILOG
 }

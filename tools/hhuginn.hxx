@@ -103,6 +103,7 @@ public:
 		PARENTHESIS,
 		ASSIGN,
 		SUBSCRIPT,
+		SUBSCRIPT_ARGUMENT,
 		NEGATE,
 		FUNCTION_CALL,
 		FUNCTION_ARGUMENT,
@@ -495,6 +496,7 @@ public:
 	yaal::hcore::HString const& type_name( void ) const;
 	static yaal::hcore::HString const& type_name( TYPE );
 	static value_t subscript( HExpression::SUBSCRIPT, value_t&, value_t const&, int );
+	static value_t range( value_t&, value_t const&, value_t const&, value_t const&, int );
 	static value_t add( value_t const&, value_t const&, int );
 	static value_t sub( value_t const&, value_t const&, int );
 	static value_t mul( value_t const&, value_t const&, int );
