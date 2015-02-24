@@ -2361,57 +2361,80 @@ HHuginn::value_t HHuginn::HValue::range(
 			throw HHuginnRuntimeException( "Range operand `step' is not an integer.", position_ );
 		}
 		int long size( baseType == TYPE::LIST ? static_cast<HList*>( base_.raw() )->size() : static_cast<HString*>( base_.raw() )->value().get_length() );
-		HInteger const* integer( from_->type() == TYPE::INTEGER ? static_cast<HInteger const*>( from_.raw() ) : nullptr );
-		int long from( integer ? static_cast<int long>( integer->value() ) : 0 );
-		integer = to_->type() == TYPE::INTEGER ? static_cast<HInteger const*>( to_.raw() ) : nullptr;
-		int long to( integer ? static_cast<int long>( integer->value() ) : size );
-		integer = step_->type() == TYPE::INTEGER ? static_cast<HInteger const*>( step_.raw() ) : nullptr;
+		HInteger const* integer( step_->type() == TYPE::INTEGER ? static_cast<HInteger const*>( step_.raw() ) : nullptr );
 		int long step( integer ? static_cast<int long>( integer->value() ) : 1 );
 		if ( step == 0 ) {
 			throw HHuginnRuntimeException( "Range step cannot be zero.", position_ );
 		}
+		HInteger const* integerFrom = from_->type() == TYPE::INTEGER ? static_cast<HInteger const*>( from_.raw() ) : nullptr;
+		HInteger const* integerTo = to_->type() == TYPE::INTEGER ? static_cast<HInteger const*>( to_.raw() ) : nullptr;
+		int long from( integerFrom ? static_cast<int long>( integerFrom->value() ) : ( step > 0 ? 0 : size ) );
+		int long to( integerTo ? static_cast<int long>( integerTo->value() ) : ( step > 0 ? size : -1 ) );
 		res = ( baseType == TYPE::LIST ) ? pointer_static_cast<HValue>( make_pointer<HList>() ) : pointer_static_cast<HValue>( make_pointer<HString>( "" ) );
 
-		if ( ( from < size ) && ( to != 0 ) && ( to > -size ) ) {
-			if ( from < -size ) {
-				from = 0;
-			} else if ( from < 0 ) {
-				from += size;
+		do {
+			if ( step > 0 ) {
+				if ( ( from >= size ) || ( to == 0 ) || ( to <= -size ) ) {
+					break;
+				}
+				if ( from < -size ) {
+					from = 0;
+				} else if ( from < 0 ) {
+					from += size;
+				}
+				if ( to > size ) {
+					to = size;
+				} else if ( to < 0 ) {
+					to += size;
+				}
+				if ( to <= from ) {
+					break;
+				}
+			} else {
+				if ( ( to >= ( size - 1 ) ) || ( from < -size ) ) {
+					break;
+				}
+				if ( from >= size ) {
+					from = size - 1;
+				} else if ( from < 0 ) {
+					from += size;
+				}
+				if ( to < - ( size + 1 ) ) {
+					to = -1;
+				} else if ( to < -1 ) {
+					to += size;
+				}
+				if ( from <= to ) {
+					break;
+				}
 			}
-			if ( to > size ) {
-				to = size;
-			} else if ( to < 0 ) {
-				to += size;
-			}
-			if ( to > from ) {
-				if ( baseType == TYPE::LIST ) {
-					HList* l( static_cast<HList*>( base_.raw() ) );
-					HList* r( static_cast<HList*>( res.raw() ) );
-					if ( step > 0 ) {
-						for ( int long i( from ); i < to; i += step ) {
-							r->push_back( l->get( i ) );
-						}
-					} else {
-						for ( int long i( to - 1 ); i >= from; i += step ) {
-							r->push_back( l->get( i ) );
-						}
+			if ( baseType == TYPE::LIST ) {
+				HList* l( static_cast<HList*>( base_.raw() ) );
+				HList* r( static_cast<HList*>( res.raw() ) );
+				if ( step > 0 ) {
+					for ( int long i( from ); i < to; i += step ) {
+						r->push_back( l->get( i ) );
 					}
 				} else {
-					M_ASSERT( baseType == TYPE::STRING );
-					HString* s( static_cast<HString*>( base_.raw() ) );
-					HString* r( static_cast<HString*>( res.raw() ) );
-					if ( step > 0 ) {
-						for ( int long i( from ); i < to; i += step ) {
-							r->value().push_back( s->value()[ i ] );
-						}
-					} else {
-						for ( int long i( to - 1 ); i >= from; i += step ) {
-							r->value().push_back( s->value()[ i ] );
-						}
+					for ( int long i( from ); i > to; i += step ) {
+						r->push_back( l->get( i ) );
+					}
+				}
+			} else {
+				M_ASSERT( baseType == TYPE::STRING );
+				HString* s( static_cast<HString*>( base_.raw() ) );
+				HString* r( static_cast<HString*>( res.raw() ) );
+				if ( step > 0 ) {
+					for ( int long i( from ); i < to; i += step ) {
+						r->value().push_back( s->value()[ i ] );
+					}
+				} else {
+					for ( int long i( from ); i > to; i += step ) {
+						r->value().push_back( s->value()[ i ] );
 					}
 				}
 			}
-		}
+		} while ( false );
 	} else {
 		throw HHuginnRuntimeException( "Range operator is not supported on `"_ys.append( type_name( baseType ) ).append( "'." ), position_ );
 	}
