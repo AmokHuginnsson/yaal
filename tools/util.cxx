@@ -134,6 +134,8 @@ char _koncowka_[][ 3 ][ 6 ] = {
 };
 
 char _integer_[][ 12 ] = {
+	"",
+	"",
 	"thousand",
 	"million",
 	"billion",
@@ -162,6 +164,7 @@ char _numbers_[][ 10 ] = {
 	"fiveteen",
 	"sixteen",
 	"seventeen",
+	"eighteen",
 	"nineteen"
 };
 
@@ -196,56 +199,111 @@ HString money_string( HNumber const& amount_ ) {
 	M_EPILOG
 }
 
+HString in_words_en( HNumber const& kwota_ ) {
+	M_PROLOG
+	int form( 0 );
+	HString inWords;
+	HString string( money_string( kwota_ ) );
+	int long length( string.get_length() );
+	for ( int i( 0 ); i < length; ++ i ) {
+		if ( ( i % 3 ) == 0 ) {
+			int sub( ( length - i ) > 1 ? 2 : 1 );
+			form = lexical_cast<int>( string.mid( ( length - i ) - sub, sub ) );
+			if ( ( i > 5 ) && ( ( length - i ) > 2 ) &&
+					! ::strncmp( string.raw() + ( length - i ) - 3, "000", 3 ) ) {
+				continue;
+			}
+		}
+		if ( i == 2 ) {
+			continue;
+		}
+		char cyfra( static_cast<char>( string[ ( length - i ) - 1 ] - '0' ) );
+		switch ( i % 3 ) {
+			case ( 0 ) : {
+				inWords = _integer_[ i / 3 ] + inWords;
+				if ( ( form < 20 ) &&  ( form > 9 ) ) {
+					inWords = _numbers_[ form ] + inWords;
+				} else if ( cyfra ) {
+					inWords = _numbers_[ static_cast<int>( cyfra ) ] + inWords;
+				} else if ( ! form && ( ( i < 3 ) || ( kwota_ < 1 ) ) ) {
+					inWords = _numbers_[ 0 ] + inWords;
+				}
+			}
+			break;
+			case ( 1 ) : {
+				if ( form > 19 ) {
+					inWords = _tenths_[ static_cast<int>( cyfra ) ] + inWords;
+				}
+			} break;
+			case ( 2 ) : {
+				if ( cyfra ) {
+					inWords = _integer_[ static_cast<int>( cyfra ) ] + inWords;
+				}
+			} break;
+			default:
+			break;
+		}
+	}
+	return ( inWords );
+	M_EPILOG
+}
+
 HString in_words_pl( HNumber const& kwota_ ) {
 	M_PROLOG
-	int forma( 0 );
-	HString slownie;
+	int form( 0 );
+	HString inWords;
 	HString przypadek;
 	HString string( money_string( kwota_ ) );
 	int long length( string.get_length() );
 	for ( int i( 0 ); i < length; i ++ ) {
 		if ( ( i % 3 ) == 0 ) {
 			int sub( ( length - i ) > 1 ? 2 : 1 );
-			forma = lexical_cast<int>( string.mid( ( length - i ) - sub, sub ) );
+			form = lexical_cast<int>( string.mid( ( length - i ) - sub, sub ) );
 			if ( ( i > 5 ) && ( ( length - i ) > 2 ) &&
-					! ::strncmp( string.raw() + ( length - i ) - 3, "000", 3 ) )
+					! ::strncmp( string.raw() + ( length - i ) - 3, "000", 3 ) ) {
 				continue;
+			}
 		}
-		if ( i == 2 )
+		if ( i == 2 ) {
 			continue;
+		}
 		char cyfra( static_cast<char>( string[ ( length - i ) - 1 ] - '0' ) );
 		switch ( i % 3 ) {
 			case ( 0 ) : {
 				przypadek = _temat_[ i / 3 ];
-				if ( forma == 1 )
+				if ( form == 1 ) {
 					przypadek += _koncowka_[ i / 3 ] [ 0 ];
-				else if ( ( ( ( forma % 10 ) > 1 ) && ( ( forma % 10 ) < 5 ) )
-						&& ( ( forma < 10 ) || ( forma > 20 ) ) )
+				} else if ( ( ( ( form % 10 ) > 1 ) && ( ( form % 10 ) < 5 ) )
+						&& ( ( form < 10 ) || ( form > 20 ) ) ) {
 					przypadek += _koncowka_[ i / 3 ] [ 1 ];
-				else
+				} else {
 					przypadek += _koncowka_[ i / 3 ] [ 2 ];
-				slownie = przypadek + slownie;
-				if ( ( forma < 20 ) &&  ( forma > 9 ) )
-					slownie = _jednNastki_[ forma ] + slownie;
-				else if ( cyfra )
-					slownie = _jednNastki_[ static_cast<int>( cyfra ) ] + slownie;
-				else if ( ! forma && ( ( i < 3 ) || ( kwota_ < 1 ) ) )
-					slownie = _jednNastki_[ 0 ] + slownie;
+				}
+				inWords = przypadek + inWords;
+				if ( ( form < 20 ) &&  ( form > 9 ) ) {
+					inWords = _jednNastki_[ form ] + inWords;
+				} else if ( cyfra ) {
+					inWords = _jednNastki_[ static_cast<int>( cyfra ) ] + inWords;
+				} else if ( ! form && ( ( i < 3 ) || ( kwota_ < 1 ) ) ) {
+					inWords = _jednNastki_[ 0 ] + inWords;
+				}
 			}
 			break;
-			case ( 1 ) :
-				if ( forma > 19 )
-					slownie = _dzies_[ static_cast<int>( cyfra ) ] + slownie;
-			break;
-			case ( 2 ) :
-				if ( cyfra )
-					slownie = _setki_[ static_cast<int>( cyfra ) ] + slownie;
-			break;
+			case ( 1 ) : {
+				if ( form > 19 ) {
+					inWords = _dzies_[ static_cast<int>( cyfra ) ] + inWords;
+				}
+			} break;
+			case ( 2 ) : {
+				if ( cyfra ) {
+					inWords = _setki_[ static_cast<int>( cyfra ) ] + inWords;
+				}
+			} break;
 			default:
 			break;
 		}
 	}
-	return ( slownie );
+	return ( inWords );
 	M_EPILOG
 }
 
