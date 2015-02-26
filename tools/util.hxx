@@ -57,7 +57,7 @@ iter_t find_local( iter_t it, iter_t end, pred_t pred ) {
 	return ( pred() );
 }
 yaal::hcore::HString money_string( yaal::hcore::HNumber const& );
-yaal::hcore::HString kwota_slownie( yaal::hcore::HNumber const& );
+yaal::hcore::HString in_words_pl( yaal::hcore::HNumber const& );
 void usun_ogonki( yaal::hcore::HString& );
 double long atof_ex( yaal::hcore::HString const&, bool = false );
 bool verify_IBAN( yaal::hcore::HString const& );

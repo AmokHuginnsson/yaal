@@ -133,6 +133,53 @@ char _koncowka_[][ 3 ][ 6 ] = {
 	{ " ", "y ", "ów " }
 };
 
+char _integer_[][ 12 ] = {
+	"thousand",
+	"million",
+	"billion",
+	"trillion",
+	"quadrillion",
+	"quintillion",
+	"sextillion"
+};
+
+char _numbers_[][ 10 ] = {
+	"zero",
+	"one",
+	"two",
+	"three",
+	"four",
+	"five",
+	"six",
+	"seven",
+	"eight",
+	"nine",
+	"ten",
+	"eleven",
+	"twelve",
+	"thirteen",
+	"fourteen",
+	"fiveteen",
+	"sixteen",
+	"seventeen",
+	"nineteen"
+};
+
+char const _tenths_[][ 10 ] = {
+	"zero-ten",
+	"ten",
+	"twety",
+	"thirty",
+	"fourty",
+	"fivety",
+	"sixty",
+	"seventy",
+	"eighty",
+	"ninety"
+};
+
+char const _houndred_[] = "houndred";
+
 HString _lastErrorMessage_;
 
 HString money_string( HNumber const& amount_ ) {
@@ -149,7 +196,7 @@ HString money_string( HNumber const& amount_ ) {
 	M_EPILOG
 }
 
-HString kwota_slownie( HNumber const& kwota_ ) {
+HString in_words_pl( HNumber const& kwota_ ) {
 	M_PROLOG
 	int forma( 0 );
 	HString slownie;
@@ -218,10 +265,11 @@ double long atof_ex( HString const& string_, bool parse_ ) {
 	if ( parse_ ) {
 		HExpression analyser;
 		try {
-			if ( analyser.compile( str ) )
+			if ( analyser.compile( str ) ) {
 				value = analyser.evaluate();
-			else
+			} else {
 				throw HExpressionException( HString( analyser.get_error() ) + " for: " + string_ + ", at: " + analyser.get_error_token() );
+			}
 		} catch ( HExpressionException const& e ) {
 			throw HExpressionException( HString( e.what() ) + " - " + analyser.get_error() + " for: " + string_ + ", at: " + analyser.get_error_token() );
 		}
