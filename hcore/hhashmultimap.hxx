@@ -144,32 +144,28 @@ public:
 		M_PROLOG
 		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
 		major->second->push_back( storage_t::value( value_ ) );
-		typename value_list_t::iterator minor = major->second->rbegin().base();
-		return ( iterator( this, major, minor ) );
+		return ( iterator( this, major, prev( major->second->end() ) ) );
 		M_EPILOG
 	}
 	iterator push_back( value_type&& value_ ) {
 		M_PROLOG
 		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
 		major->second->push_back( yaal::move( storage_t::value( value_ ) ) );
-		typename value_list_t::iterator minor = major->second->rbegin().base();
-		return ( iterator( this, major, minor ) );
+		return ( iterator( this, major, prev( major->second->end() ) ) );
 		M_EPILOG
 	}
 	iterator insert( value_type const& value_ ) {
 		M_PROLOG
 		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
 		major->second->push_back( storage_t::value( value_ ) );
-		typename value_list_t::iterator minor = major->second->rbegin().base();
-		return ( iterator( this, major, minor ) );
+		return ( iterator( this, major, prev( major->second->end() ) ) );
 		M_EPILOG
 	}
 	iterator insert( value_type&& value_ ) {
 		M_PROLOG
 		typename hashmultimap_engine_t::iterator major = ensure_key( value_.first );
 		major->second->push_back( yaal::move( storage_t::value( value_ ) ) );
-		typename value_list_t::iterator minor = major->second->rbegin().base();
-		return ( iterator( this, major, minor ) );
+		return ( iterator( this, major, prev( major->second->end() ) ) );
 		M_EPILOG
 	}
 	template<typename iterator_t>
@@ -441,8 +437,9 @@ public:
 		++ _minor;
 		if ( _minor == _major->second->end() ) {
 			++ _major;
-			if ( _major != _owner->_engine.end() )
+			if ( _major != _owner->_engine.end() ) {
 				_minor = _major->second->begin();
+			}
 		}
 		return ( *this );
 		M_EPILOG
@@ -454,22 +451,22 @@ public:
 	}
 	HIterator& operator -- ( void ) {
 		M_PROLOG
-		if ( _minor != value_iterator_t() )
+		if ( _minor != value_iterator_t() ) {
 			-- _minor;
-		else {
-			if ( _major != _owner->_engine.rend().base() )
-				_minor = _major->second->rbegin().base();
+		} else if ( _major != prev( _owner->_engine.begin() ) ) {
+			_minor = prev( _major->second->end() );
 		}
 		if ( _major == _owner->_engine.end() ) {
 			-- _major;
-			_minor = _major->second->rbegin().base();
+			_minor = prev( _major->second->end() );
 		}
-		if ( _minor == _major->second->rend().base() ) {
+		if ( _minor == prev( _major->second->begin() ) ) {
 			-- _major;
-			if ( _major != _owner->_engine.rend().base() )
-				_minor = _major->second->rbegin().base();
-			else
+			if ( _major != prev( _owner->_engine.begin() ) ) {
+				_minor = prev( _major->second->end() );
+			} else {
 				_minor = value_iterator_t();
+			}
 		}
 		return ( *this );
 		M_EPILOG

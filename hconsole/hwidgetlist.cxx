@@ -70,7 +70,7 @@ void HWidgetList::add_widget( HWidget::ptr_t widget_ ) {
 	M_PROLOG
 	_list.push_back( widget_ );
 	if ( _focused == _list.end() ) {
-		_focused = cyclic_iterator( &_list, _list.rbegin().base() );
+		_focused = cyclic_iterator( &_list, prev( _list.end() ) );
 	}
 	return;
 	M_EPILOG

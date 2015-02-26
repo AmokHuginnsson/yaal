@@ -166,8 +166,8 @@ public:
 #if defined( __DEBUG__ )
 			disjointed( begin(), node );
 #endif /* defined( __DEBUG__ ) */
-			iterator it = rbegin().base();
-			if ( ( it == rend().base() ) || ( *it._iterator != node ) ) {
+			iterator it = prev( end() );
+			if ( ( it == prev( begin() ) ) || ( *it._iterator != node ) ) {
 				if ( ( _allocator == node->_allocator ) && ( _branch.get_allocator() == node->_branch.get_allocator() ) ) {
 					node->detach();
 					_branch.push_back( node );
@@ -179,7 +179,7 @@ public:
 					M_SAFE( node->~HNode() );
 					allocator.deallocate( node, 1 );
 				}
-				it = iterator( this, _branch.rbegin().base() );
+				it = iterator( this, prev( _branch.end() ) );
 			}
 			return ( it );
 			M_EPILOG
@@ -196,10 +196,10 @@ public:
 		iterator copy_node( typename tree_t::node_t node ) {
 			M_PROLOG
 #if defined( __DEBUG__ )
-			disjointed( rbegin().base(), node );
+			disjointed( prev( end() ), node );
 #endif /* defined( __DEBUG__ ) */
 			_branch.push_back( node->clone_self_to( _allocator, _branch.get_allocator(), this ) );
-			iterator it( this, _branch.rbegin().base() );
+			iterator it( this, prev( _branch.end() ) );
 			return ( it );
 			M_EPILOG
 		}
@@ -219,7 +219,7 @@ public:
 				_allocator.deallocate( node, 1 );
 				throw;
 			}
-			return ( iterator( this, _branch.rbegin().base() ) );
+			return ( iterator( this, prev( _branch.end() ) ) );
 			M_EPILOG
 		}
 		iterator add_node( void ) {
@@ -238,7 +238,7 @@ public:
 				_allocator.deallocate( node, 1 );
 				throw;
 			}
-			return ( iterator( this, _branch.rbegin().base() ) );
+			return ( iterator( this, prev( _branch.end() ) ) );
 			M_EPILOG
 		}
 		iterator insert_node( iterator const& pos, value_t const& value ) {

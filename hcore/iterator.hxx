@@ -119,11 +119,17 @@ inline void advance( iter_t& it_, int long distance_, hcore::iterator_category::
 }
 template<typename type_t>
 inline void advance( type_t& it_, int long distance_, hcore::iterator_category::forward ) {
-	for ( int long i( 0 ); i < distance_; ++ i, ++ it_ )
-		;
+	if ( distance_ >= 0 ) {
+		for ( int long i( 0 ); i < distance_; ++ i, ++ it_ ) {
+		}
+	} else {
+		for ( int long i( 0 ); i < -distance_; ++ i, -- it_ ) {
+		}
+	}
 }
 /*! \endcond */
-/*! \brief Move iterator forward.
+
+/*! \brief Move iterator around.
  *
  * \param it - iterator to be moved.
  * \param dist - how far iterator shall be moved.
@@ -132,6 +138,28 @@ template<typename iter_t>
 void advance( iter_t& it, int long dist ) {
 	advance( it, dist, typename hcore::iterator_traits<iter_t>::category_type() );
 	return;
+}
+
+/*! \brief Move iterator forward.
+ *
+ * \param it - iterator to be moved.
+ * \param dist - how far iterator shall be moved.
+ */
+template<typename iter_t>
+iter_t next( iter_t it, int long dist = 1 ) {
+	advance( it, dist );
+	return ( it );
+}
+
+/*! \brief Move iterator backward.
+ *
+ * \param it - iterator to be moved.
+ * \param dist - how far iterator shall be moved.
+ */
+template<typename iter_t>
+iter_t prev( iter_t it, int long dist = 1 ) {
+	advance( it, -dist );
+	return ( it );
 }
 
 template<typename T>
@@ -238,7 +266,9 @@ public:
 		return ( it );
 	}
 	iterator_t base( void ) const {
-		return ( _iterator );
+		iterator_t it( _iterator );
+		++ it;
+		return ( it );
 	}
 	typename iterator_t::reference operator*( void ) const {
 		return ( *_iterator );

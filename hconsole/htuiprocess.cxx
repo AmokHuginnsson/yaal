@@ -161,7 +161,7 @@ void HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	window_->set_tui( this );
 	window_->init();
 	_windows->push_back( window_ );
-	_foregroundWindow = cyclic_iterator( &*_windows, _windows->rbegin().base() );
+	_foregroundWindow = cyclic_iterator( &*_windows, prev( _windows->end() ) );
 	M_ASSERT( _foregroundWindow != _windows->end() );
 	_mainWindow->update_all();
 	if ( ! (*_foregroundWindow)->is_initialised() )

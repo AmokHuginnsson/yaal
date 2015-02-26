@@ -176,13 +176,15 @@ int HTreeWidget::do_process_input( int code_ ) {
 	switch ( code_ ) {
 		case ( KEY_CODES::HOME ):
 			node = _view.get_root();
-			if ( node->has_childs() )
+			if ( node->has_childs() ) {
 				_selected = &*node->begin();
+			}
 		break;
 		case ( KEY_CODES::END ):
 			node = _view.get_root();
-			if ( node->has_childs() )
-				_selected = &*node->rbegin().base();
+			if ( node->has_childs() ) {
+				_selected = &*prev( node->end() );
+			}
 		break;
 		case ( KEY_CODES::PAGE_UP ):
 			break;
@@ -191,8 +193,9 @@ int HTreeWidget::do_process_input( int code_ ) {
 		case ( KEY_CODES::UP ): {
 			_selected = previous( node );
 			if ( _selected == node ) {
-				if ( node->get_level() > 1 )
+				if ( node->get_level() > 1 ) {
 					_selected = node->get_parent();
+				}
 			} else {
 				node = _selected;
 				while ( (**node)._unfolded ) {
@@ -210,43 +213,49 @@ int HTreeWidget::do_process_input( int code_ ) {
 			wasFolded = ! (**node)._unfolded;
 			if ( node->has_childs() ) {
 				(**node)._unfolded = true;
-				if ( wasFolded )
+				if ( wasFolded ) {
 					break;
+				}
 			}
 		}
 		/* when node is unfolded, right key works as down key */
 		/* no break */
 		case ( KEY_CODES::DOWN ): {
 			if ( (**node)._unfolded ) {
-				if ( node->has_childs() )
+				if ( node->has_childs() ) {
 					_selected = &*node->begin();
+				}
 			} else {
 				node = _selected;
 				node = next( node );
 				while ( ! node ) {
 					node = _selected->get_parent();
-					if ( ! node || ( node->get_level() < 1 ) )
+					if ( ! node || ( node->get_level() < 1 ) ) {
 						break;
+					}
 					_selected = node;
 					node = next( node );
 				}
-				if ( node && ( node->get_level() > 0 ) )
+				if ( node && ( node->get_level() > 0 ) ) {
 					_selected = node;
+				}
 			}
 		}
 		break;
 		case ( KEY_CODES::LEFT ):
-			if ( (**node)._unfolded && node->get_level() )
+			if ( (**node)._unfolded && node->get_level() ) {
 				(**node)._unfolded = false;
-			else if ( node->get_level() > 1 )
+			} else if ( node->get_level() > 1 ) {
 				_selected = node->get_parent();
+			}
 		break;
 		case ( ' ' ):
 		case ( '\r' ):
-			if ( node->has_childs() )
+			if ( node->has_childs() ) {
 				(**node)._unfolded = ! (**node)._unfolded;
-			else
+			} else {
 				errorCode = code_;
+			}
 		break; /* I have to think more about it. */
 		case ( '\t' ):
 			_focused = false;	/* very  */
@@ -306,13 +315,16 @@ HTreeWidget::tree_view_t::node_t HTreeWidget::previous( tree_view_t::node_t node
 			;
 		if ( it != parent->end() ) {
 			if ( it == parent->begin() ) {
-				if ( wrap )
-					it = parent->rbegin().base();
-			} else
+				if ( wrap ) {
+					it = prev( parent->end() );
+				}
+			} else {
 				-- it;
+			}
 		}
-		if ( it != parent->end() )
+		if ( it != parent->end() ) {
 			p = &*it;
+		}
 	}
 	return ( p );
 	M_EPILOG

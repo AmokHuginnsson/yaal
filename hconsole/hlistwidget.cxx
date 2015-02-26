@@ -357,8 +357,9 @@ template<typename tType, typename ttType>
 inline void cyclic_decrement( ttType& model, tType& iterator, int count ) {
 	for ( int i = 0; i < count; ++ i ) {
 		-- iterator;
-		if ( ! iterator.is_valid() )
-			iterator = model->rbegin();
+		if ( ! iterator.is_valid() ) {
+			iterator = model->last();
+		}
 	}
 }
 
@@ -421,7 +422,7 @@ void HListWidget::handle_key_page_down( void ) {
 				increment( _cursor, _heightRaw - 1 );
 				if ( _widgetOffset > ( size - _heightRaw ) ) {
 					_widgetOffset = size - _heightRaw;
-					_cursor = _firstVisibleRow = _model->rbegin();
+					_cursor = _firstVisibleRow = _model->last();
 					decrement( _firstVisibleRow, _heightRaw - 1 );
 				}
 			} else {
@@ -435,7 +436,7 @@ void HListWidget::handle_key_page_down( void ) {
 	} else {
 		if ( _cursorPosition != ( size - 1 ) ) {
 			_cursorPosition = size - 1;
-			_cursor = _model->rbegin();
+			_cursor = _model->last();
 		} else {
 			HConsole::get_instance().bell();
 		}
@@ -482,7 +483,7 @@ void HListWidget::handle_key_home( void ) {
 void HListWidget::handle_key_end( void ) {
 	M_PROLOG
 	int size( static_cast<int>( _model->size() ) );
-	_cursor = _model->rbegin();
+	_cursor = _model->last();
 	if ( size >= _heightRaw ) {
 		_cursorPosition = _heightRaw - 1;
 		_widgetOffset = size - _heightRaw;

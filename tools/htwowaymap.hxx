@@ -355,7 +355,7 @@ HTwoWayMap<left_type_t, right_type_t>::insert( value_type const& value_ ) {
 		typename right_view_type::view_storage_type::const_iterator rvit( _rightView._data.find( &(value_.second) ) );
 		if ( ! ( rvit != _rightView._data.end() ) ) {
 			_data.push_back( value_ );
-			it = _data.rbegin().base();
+			it = prev( _data.end() );
 			_leftView._data.insert( make_pair( &it->first, it ) );
 			_rightView._data.insert( make_pair( &it->second, it ) );
 			inserted = true;

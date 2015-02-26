@@ -194,8 +194,7 @@ public:
 	virtual bool is_empty( void ) const = 0;
 	virtual HModelIteratorWrapper begin() = 0;
 	virtual HModelIteratorWrapper end() = 0;
-	virtual HModelIteratorWrapper rbegin() = 0;
-	virtual HModelIteratorWrapper rend() = 0;
+	virtual HModelIteratorWrapper last() = 0;
 	virtual void erase( HModelIteratorWrapper& ) = 0;
 	void set_widget( HListWidget* );
 private:
@@ -254,11 +253,8 @@ public:
 	virtual HAbstractListModel::HModelIteratorWrapper end( void ) {
 		return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->end() ) ) );
 	}
-	virtual HAbstractListModel::HModelIteratorWrapper rbegin( void ) {
-		return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->rbegin().base() ) ) );
-	}
-	virtual HAbstractListModel::HModelIteratorWrapper rend( void ) {
-		return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->rend().base() ) ) );
+	virtual HAbstractListModel::HModelIteratorWrapper last( void ) {
+		return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, prev( _list->end() ) ) ) );
 	}
 	virtual void erase( HModelIteratorWrapper& );
 	friend class HModelIterator;
