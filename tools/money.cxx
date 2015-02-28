@@ -46,7 +46,12 @@ namespace {
 	static int const STEP_LENGTH = 4;
 }
 
-char _jednNastki_[][ 16 ] = {
+namespace en {
+}
+
+namespace pl {
+
+char const _numbers_[][ 16 ] = {
 	"zero ",
 	"jeden ",
 	"dwa ",
@@ -70,7 +75,7 @@ char _jednNastki_[][ 16 ] = {
 	"dwadzie¶cia "
 };
 
-char _dzies_[][ 24 ] = {
+char const _tenths_[][ 24 ] = {
 	"dziesiêæ-zero ",
 	"dziesiêæ ",
 	"dwadzie¶cia ",
@@ -84,7 +89,7 @@ char _dzies_[][ 24 ] = {
 	"sto "
 };
 
-char _setki_[][ 16 ] = {
+char const _houndreds_[][ 16 ] = {
 	"sto-zero ",
 	"sto ",
 	"dwie¶cie ",
@@ -98,9 +103,67 @@ char _setki_[][ 16 ] = {
 	"tysi±c "
 };
 
-char _temat_[][ 12 ] = {
+namespace currency {
+
+char const _dollar_[][ 12 ] = {
+	"cent",
+	"dollar"
+};
+
+char const _dollarEnd_[][3][6] = {
+	{ "", "y", "ów" },
+	{ " ", "y ", "ów " }
+};
+
+char const _pound_[][ 12 ] = {
+	"pens",
+	"funt"
+};
+
+char const _poundEnd_[][3][6] = {
+	{ "", "y", "ów" },
+	{ " ", "y ", "ów " }
+};
+
+char const _euro_[][ 12 ] = {
+	"eurocent",
+	"euro"
+};
+
+char const _euroEnd_[][3][6] = {
+	{ "", "y", "ów" },
+	{ " ", " ", " " }
+};
+
+char const _pln_[][ 12 ] = {
 	"grosz",
-	"z³ot",
+	"z³ot"
+};
+
+char const _plnEnd_[][3][6] = {
+	{ "", "e", "y" },
+	{ "y ", "e ", "ych " }
+};
+
+}
+
+typedef char const (*currency_t)[12];
+currency_t const _currency_[] = {
+	currency::_dollar_,
+	currency::_pound_,
+	currency::_euro_,
+	currency::_pln_
+};
+
+typedef char const (*currency_end_t)[3][6];
+currency_end_t const _currencyEnd_[] = {
+	currency::_dollarEnd_,
+	currency::_poundEnd_,
+	currency::_euroEnd_,
+	currency::_plnEnd_
+};
+
+char _unit_[][ 12 ] = {
 	"tysi",
 	"milion",
 	"miliard",
@@ -110,9 +173,7 @@ char _temat_[][ 12 ] = {
 	"tryliard"
 };
 
-char _koncowka_[][ 3 ][ 6 ] = {
-	{ "", "e", "y" },
-	{ "y ", "e ", "ych " },
+char _unitEnd_[][ 3 ][ 6 ] = {
 	{ "±c ", "±ce ", "êcy " },
 	{ " ", "y ", "ów " },
 	{ " ", "y ", "ów " },
@@ -121,6 +182,9 @@ char _koncowka_[][ 3 ][ 6 ] = {
 	{ " ", "y ", "ów " },
 	{ " ", "y ", "ów " }
 };
+
+
+}
 
 char _integer_[][ 12 ] = {
 	"",
@@ -186,7 +250,7 @@ HString money_string( HNumber const& amount_ ) {
 	M_EPILOG
 }
 
-HString in_words_en( HNumber const& kwota_ ) {
+HString in_words_en( HNumber const& kwota_, CURRENCY ) {
 	M_PROLOG
 	int form( 0 );
 	HString inWords;
@@ -235,7 +299,7 @@ HString in_words_en( HNumber const& kwota_ ) {
 	M_EPILOG
 }
 
-HString in_words_pl( HNumber const& kwota_ ) {
+HString in_words_pl( HNumber const& kwota_, CURRENCY currency_ ) {
 	M_PROLOG
 	int form( 0 );
 	HString inWords;
@@ -257,33 +321,41 @@ HString in_words_pl( HNumber const& kwota_ ) {
 		char cyfra( static_cast<char>( string[ ( length - i ) - 1 ] - '0' ) );
 		switch ( i % 3 ) {
 			case ( 0 ) : {
-				przypadek = _temat_[ i / 3 ];
+				int unitIdx( i / 3 );
+				typedef char const (*unit_t)[12];
+				unit_t const unit( unitIdx >= 2 ? pl::_unit_ : pl::_currency_[static_cast<int>( currency_ )] );
+				typedef char const (*end_t)[3][6];
+				end_t const end( unitIdx >= 2 ? pl::_unitEnd_ : pl::_currencyEnd_[static_cast<int>( currency_ )] );
+				if ( unitIdx >= 2 ) {
+					unitIdx -= 2;
+				}
+				przypadek = unit[ unitIdx ];
 				if ( form == 1 ) {
-					przypadek += _koncowka_[ i / 3 ] [ 0 ];
+					przypadek += end[ unitIdx ] [ 0 ];
 				} else if ( ( ( ( form % 10 ) > 1 ) && ( ( form % 10 ) < 5 ) )
 						&& ( ( form < 10 ) || ( form > 20 ) ) ) {
-					przypadek += _koncowka_[ i / 3 ] [ 1 ];
+					przypadek += end[ unitIdx ] [ 1 ];
 				} else {
-					przypadek += _koncowka_[ i / 3 ] [ 2 ];
+					przypadek += end[ unitIdx ] [ 2 ];
 				}
 				inWords = przypadek + inWords;
 				if ( ( form < 20 ) &&  ( form > 9 ) ) {
-					inWords = _jednNastki_[ form ] + inWords;
+					inWords = pl::_numbers_[ form ] + inWords;
 				} else if ( cyfra ) {
-					inWords = _jednNastki_[ static_cast<int>( cyfra ) ] + inWords;
+					inWords = pl::_numbers_[ static_cast<int>( cyfra ) ] + inWords;
 				} else if ( ! form && ( ( i < 3 ) || ( kwota_ < 1 ) ) ) {
-					inWords = _jednNastki_[ 0 ] + inWords;
+					inWords = pl::_numbers_[ 0 ] + inWords;
 				}
 			}
 			break;
 			case ( 1 ) : {
 				if ( form > 19 ) {
-					inWords = _dzies_[ static_cast<int>( cyfra ) ] + inWords;
+					inWords = pl::_tenths_[ static_cast<int>( cyfra ) ] + inWords;
 				}
 			} break;
 			case ( 2 ) : {
 				if ( cyfra ) {
-					inWords = _setki_[ static_cast<int>( cyfra ) ] + inWords;
+					inWords = pl::_houndreds_[ static_cast<int>( cyfra ) ] + inWords;
 				}
 			} break;
 			default:

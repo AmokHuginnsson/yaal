@@ -36,9 +36,16 @@ namespace tools {
 
 namespace money {
 
+enum class CURRENCY {
+	DOLLAR,
+	POUND,
+	EURO,
+	PLN
+};
+
 yaal::hcore::HString money_string( yaal::hcore::HNumber const& );
-yaal::hcore::HString in_words_en( yaal::hcore::HNumber const& );
-yaal::hcore::HString in_words_pl( yaal::hcore::HNumber const& );
+yaal::hcore::HString in_words_en( yaal::hcore::HNumber const&, CURRENCY );
+yaal::hcore::HString in_words_pl( yaal::hcore::HNumber const&, CURRENCY );
 bool verify_IBAN( yaal::hcore::HString const& );
 char const* get_last_error( void );
 
