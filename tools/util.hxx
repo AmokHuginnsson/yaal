@@ -33,7 +33,6 @@ Copyright:
 #include "hcore/base.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/hprogramoptionshandler.hxx"
-#include "hcore/hnumber.hxx"
 
 namespace yaal {
 
@@ -56,13 +55,8 @@ iter_t find_local( iter_t it, iter_t end, pred_t pred ) {
 		pred( it );
 	return ( pred() );
 }
-yaal::hcore::HString money_string( yaal::hcore::HNumber const& );
-yaal::hcore::HString in_words_en( yaal::hcore::HNumber const& );
-yaal::hcore::HString in_words_pl( yaal::hcore::HNumber const& );
 void usun_ogonki( yaal::hcore::HString& );
 double long atof_ex( yaal::hcore::HString const&, bool = false );
-bool verify_IBAN( yaal::hcore::HString const& );
-char const* get_last_error( void );
 yaal::hcore::HString get_token( yaal::hcore::HString const&, yaal::hcore::HString const&, int long );
 
 /*! \brief Helper structure for displaing program help and current configuration.
