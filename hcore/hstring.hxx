@@ -294,6 +294,16 @@ public:
 	 * \return pointer to raw character data stored in this string.
 	 */
 	char const* data( void ) const;
+	/*! \brief Get access to first chaacter in the string.
+	 *
+	 * String must be non-empty.
+	 */
+	char front( void ) const;
+	/*! \brief Get access to last chaacter in the string.
+	 *
+	 * String must be non-empty.
+	 */
+	char back( void ) const;
 	/*! \brief Get maximum number of characters that can be stored in any string.
 	 *
 	 * Alias for HString::get_max_size().

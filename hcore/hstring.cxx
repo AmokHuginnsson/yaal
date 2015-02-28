@@ -471,19 +471,22 @@ char HString::operator[] ( int const index_ ) const {
 
 char HString::operator[] ( int long const index_ ) const {
 	M_PROLOG
-	if ( index_ >= GET_ALLOC_BYTES )
+	if ( index_ >= GET_ALLOC_BYTES ) {
 		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], index_ );
+	}
 	return ( MEM[ index_ ] );
 	M_EPILOG
 }
 
 char HString::set_at( int long const index_, char char_ ) {
 	M_PROLOG
-	if ( index_ >= GET_SIZE )
+	if ( index_ >= GET_SIZE ) {
 		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], index_ );
+	}
 	MEM[ index_ ] = char_;
-	if ( ! char_ )
+	if ( ! char_ ) {
 		SET_SIZE( index_ );
+	}
 	return ( char_ );
 	M_EPILOG
 }
@@ -576,6 +579,21 @@ char const* HString::raw( void ) const {
 
 char const* HString::c_str( void ) const {
 	return ( MEM );
+}
+
+char HString::front( void ) const {
+	if ( GET_SIZE == 0 ) {
+		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], 0 );
+	}
+	return ( MEM[0] );
+}
+
+char HString::back( void ) const {
+	int long s( GET_SIZE );
+	if ( s == 0 ) {
+		M_THROW( _errMsgHString_[string_helper::INDEX_OOB], s - 1 );
+	}
+	return ( MEM[s - 1] );
 }
 
 HString::const_iterator HString::begin( void ) const {
