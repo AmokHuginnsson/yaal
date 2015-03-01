@@ -288,7 +288,7 @@ int HEditWidget::delete_char( int length_ ) {
 	int err = ! ( _readOnly || _replace ) ? 0 : 1;
 	if ( ! err ) {
 		if ( ( _widgetOffset + _cursorPosition ) >= length_ ) {
-			_varTmpBuffer.set_at( 0, 0 );
+			_varTmpBuffer.clear();
 			_widgetOffset = 0;
 			_cursorPosition = 0;
 		} else {
