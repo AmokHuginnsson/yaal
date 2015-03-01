@@ -54,7 +54,7 @@ protected:
 public:
 	HDataProcess( void );
 	virtual ~HDataProcess( void );
-	void init_xrc( char const*, char const* );
+	void init_xrc( yaal::hcore::HString const&, yaal::hcore::HString const& );
 /* cppcheck-suppress functionConst */
 	dbwrapper::database_ptr_t data_base( void );
 protected:

@@ -63,8 +63,9 @@ HDataProcess::~HDataProcess( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-void HDataProcess::init_xrc( char const* processName_,
-		char const* resource_ ) {
+void HDataProcess::init_xrc(
+		yaal::hcore::HString const& processName_,
+		yaal::hcore::HString const& resource_ ) {
 	M_PROLOG
 	HTUIProcess::init_xrc( processName_, resource_ );
 	if ( dbwrapper::_dBDrivers_.is_empty() )
