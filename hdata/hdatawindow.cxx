@@ -252,11 +252,13 @@ bool HDataWindow::handler_requery( hconsole::HEvent const& ) {
 
 bool HDataWindow::handler_cancel( hconsole::HEvent const& ) {
 	M_PROLOG
-	if ( _documentMode != DOCUMENT::EDIT )
+	if ( _documentMode != DOCUMENT::EDIT ) {
 		return ( true );
+	}
 	set_mode( DOCUMENT::VIEW );
-	if ( ( _mode == HCRUDDescriptor::MODE::INSERT ) && _mainWidget )
+	if ( ( _mode == HCRUDDescriptor::MODE::INSERT ) && _mainWidget ) {
 		_mainWidget->cancel_new();
+	}
 	_modified = false;
 	_statusBar->paint();
 	_statusBar->message( COLORS::FG_BRIGHTRED, _( "Dropping all changes." ) );
@@ -265,8 +267,9 @@ bool HDataWindow::handler_cancel( hconsole::HEvent const& ) {
 }
 
 bool HDataWindow::on_sel_change( yaal::hconsole::HEvent const& ) {
+	int long currId( _mainWidget->get_current_id() );
 	for ( HDataWidget* dw : _editModeWidgets ) {
-		dw->load( _mainWidget->get_current_id() );
+		dw->load( currId );
 	}
 	return ( true );
 }

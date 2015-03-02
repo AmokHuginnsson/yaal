@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hdatawindow.hxx"
 #include "hdataprocess.hxx"
 #include "hcore/hset.hxx"
+#include "hcore/hlog.hxx"
 #include "tools/stringalgo.hxx"
 
 using namespace yaal::hcore;
@@ -85,6 +86,11 @@ HDataListWidget::~HDataListWidget ( void ) {
 
 void HDataListWidget::make_crud( int long id_ ) {
 	M_PROLOG
+	HDataWindow* parent( dynamic_cast<HDataWindow*>( _window ) );
+	M_ASSERT( parent );
+	if ( _idColumn.is_empty() ) {
+		_idColumn = parent->id_column_name();
+	}
 	if ( ! _crud ) {
 		HDataProcess* proc( dynamic_cast<HDataProcess*>( _window->get_tui() ) );
 		_crud = make_pointer<HCRUDDescriptor>( proc->data_base() );
@@ -106,11 +112,8 @@ void HDataListWidget::make_crud( int long id_ ) {
 void HDataListWidget::do_load( int long id_ ) {
 	M_PROLOG
 	make_crud( id_ );
-	HDataWindow* parent = dynamic_cast<HDataWindow*>( _window );
+	HDataWindow* parent( dynamic_cast<HDataWindow*>( _window ) );
 	M_ASSERT( parent );
-	if ( _idColumn.is_empty() ) {
-		_idColumn = parent->id_column_name();
-	}
 	HRecordSet::ptr_t rs( _viewQuery.is_empty() ? _crud->execute( HCRUDDescriptor::MODE::SELECT ) : _crud->execute( _viewQuery ) );
 	int idColNo( -1 );
 	int const colCount = rs->get_field_count();
@@ -278,9 +281,9 @@ bool HDataListWidgetCreator::do_apply_resources( hconsole::HWidget::ptr_t widget
 		HString table( xml::attr_val( node_, "table" ) );
 		HString columns( xml::attr_val( node_, "column" ) );
 		HString idColumn( xml::attr_val( node_, "id_column" ) );
-		HString filterColumn( xml::attr_val( node_, "filter_column" ) );
+		xml::value_t filterColumn( xml::try_attr_val( node_, "filter_column" ) );
 		xml::value_t sort( xml::try_attr_val( node_, "sort" ) );
-		dl->set_record_descriptor( table, columns, filterColumn, idColumn, sort ? *sort : "" );
+		dl->set_record_descriptor( table, columns, filterColumn ? *filterColumn : "", idColumn, sort ? *sort : "" );
 	}
 	return ( ok );
 	M_EPILOG
