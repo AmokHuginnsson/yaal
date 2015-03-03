@@ -100,6 +100,8 @@ public:
 	HRecordSet::ptr_t execute( MODE::mode_t const& );
 	HRecordSet::ptr_t execute( yaal::hcore::HString const& );
 	HRecordSet::ptr_t execute( void );
+private:
+	void commit_columns( void );
 };
 typedef yaal::hcore::HExceptionT<HCRUDDescriptor> HCRUDDescriptorException;
 

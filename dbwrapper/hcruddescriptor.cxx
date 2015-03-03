@@ -277,11 +277,9 @@ void HCRUDDescriptor::set_columns( yaal::hcore::HString const& columns_ ) {
 
 void HCRUDDescriptor::set_columns( field_names_t&& fields_ ) {
 	M_PROLOG
-	_fields.swap( fields_ );
+	_fields = yaal::move( fields_ );
 	_fieldCount = static_cast<int>( _fields.get_size() );
-	_columns = string::join( _fields, "," );
-	_values.resize( _fieldCount );
-	_mutated.resize( _fieldCount );
+	commit_columns();
 	return;
 	M_EPILOG
 }
@@ -290,7 +288,17 @@ void HCRUDDescriptor::set_columns( field_names_t const& fields_ ) {
 	M_PROLOG
 	_fields = fields_;
 	_fieldCount = static_cast<int>( _fields.get_size() );
+	commit_columns();
+	return;
+	M_EPILOG
+}
+
+void HCRUDDescriptor::commit_columns( void ) {
+	M_PROLOG
 	_columns = string::join( _fields, "," );
+	if ( ! _idColumn.is_empty() ) {
+		_columns.append( "," ).append( _idColumn );
+	}
 	_values.resize( _fieldCount );
 	_mutated.resize( _fieldCount );
 	return;
@@ -300,6 +308,7 @@ void HCRUDDescriptor::set_columns( field_names_t const& fields_ ) {
 void HCRUDDescriptor::set_id_column( yaal::hcore::HString const& idColumn_ ) {
 	M_PROLOG
 	_idColumn = idColumn_;
+	commit_columns();
 	return;
 	M_EPILOG
 }

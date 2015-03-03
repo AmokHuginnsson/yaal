@@ -324,6 +324,7 @@ void HDataWindow::set_record_descriptor( yaal::hcore::HString const& table_,
 	M_ENSURE( _columns.back().trim() == idCol_ );
 	_columns.pop_back();
 	_crud->set_columns( _columns );
+	_crud->set_id_column( idCol_ );
 	_crud->set_filter( filter_ );
 	_crud->set_sort( sort_ );
 	_idColumnName = idCol_;
