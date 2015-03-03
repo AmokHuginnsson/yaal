@@ -63,7 +63,7 @@ HEditWidget::HEditWidget( HWindow* parent_,
 					_password( false ),
 					_maxStringSize( 127 ), _cursorPosition ( 0 ),
 					_widgetOffset( 0 ), _maxHistoryLevel( 8 ),
-					_pattern(), _string(),
+					_mask(), _string(),
 					_infoString( _string ), _history(), _historyIt() {
 	M_PROLOG
 	attr_.apply( *this );
@@ -97,15 +97,13 @@ HEditWidget::~HEditWidget( void ) {
 	M_EPILOG
 }
 
-void HEditWidget::set_pattern( yaal::hcore::HString const& mask_ ) {
+void HEditWidget::set_mask( yaal::hcore::HString const& mask_ ) {
 	M_PROLOG
-	int errorCode( 0 );
-	if ( ( errorCode = _pattern.parse_re( mask_ ) ) ) {
-		M_THROW( _pattern.error(), errorCode );
+	if ( ! _mask.compile( mask_ ) ) {
+		M_THROW( _mask.error(), _mask.error_code() );
 	}
-	( _pattern.find( _string ) == _pattern.end() ) && ( errorCode = _pattern.error_code() );
-	if ( errorCode ) {
-		M_THROW( _pattern.error(), errorCode );
+	if ( ! _mask.matches( _string ) ) {
+		M_THROW( _mask.error(), _mask.error_code() );
 	}
 	return;
 	M_EPILOG
@@ -173,7 +171,7 @@ void HEditWidget::set_bits( int const* maxlen,
 		set_text( *val );
 	}
 	if ( mask ) {
-		set_pattern( *mask );
+		set_mask( *mask );
 	}
 	if ( replace ) {
 		_replace = *replace;
@@ -535,14 +533,12 @@ int HEditWidget::do_process_input( int code_ ) {
 		errorCode = update_from_history();
 	}
 	if ( ! errorCode ) {
-		_pattern.find( _varTmpBuffer.raw() );
-		errorCode = _pattern.error_code();
-		if ( errorCode ) {
+		if ( _mask.is_valid() && ! _mask.matches( _varTmpBuffer ) ) {
 			if ( _window ) {
-				_window->status_bar()->message( COLORS::BG_BROWN, "%s", _pattern.error().raw() );
+				_window->status_bar()->message( COLORS::BG_BROWN, "%s", _mask.error().raw() );
 			}
 		} else {
-			code_ = errorCode;
+			code_ = 0;
 			_string = _varTmpBuffer;
 			if ( _window ) {
 				_window->status_bar()->clear( COLORS::FG_LIGHTGRAY );
@@ -563,10 +559,9 @@ void HEditWidget::set_text( HString const& string_ ) {
 	M_PROLOG
 	int length( 0 );
 	HString errorMessage;
-	_pattern.find( string_.raw() );
-	int errorCode = _pattern.error_code();
-	if ( errorCode )
-		M_THROW( _pattern.error(), errorCode );
+	if ( _mask.is_valid() && ! _mask.matches( string_ ) ) {
+		M_THROW( _mask.error(), _mask.error_code() );
+	}
 	_string = string_;
 	length = static_cast<int>( _string.get_length() );
 	_widgetOffset = 0;
@@ -619,8 +614,8 @@ HEditWidgetAttributes::HEditWidgetAttributes( void )
 	_maxStringSizeSet( false ),
 	_maxHistoryLevel( 8 ),
 	_maxHistoryLevelSet( false ),
-	_pattern( _maskDefault_ ),
-	_patternSet( false ),
+	_mask( _maskDefault_ ),
+	_maskSet( false ),
 	_text( _maskDefault_ ),
 	_textSet( false ) {
 	return;
@@ -633,7 +628,7 @@ void HEditWidgetAttributes::do_apply( HWidget& widget_ ) const {
 		widget->set_bits(
 				_maxStringSizeSet   ? &_maxStringSize   : NULL,
 				_textSet            ? &_text            : NULL,
-				_patternSet         ? &_pattern         : NULL,
+				_maskSet            ? &_mask            : NULL,
 				_replaceSet         ? &_replace         : NULL,
 				_multiLineSet       ? &_multiLine       : NULL,
 				_readOnlySet        ? &_readOnly        : NULL,
@@ -703,10 +698,10 @@ HEditWidgetAttributes& HEditWidgetAttributes::max_history_level( int maxHistoryL
 	M_EPILOG
 }
 
-HEditWidgetAttributes& HEditWidgetAttributes::pattern( yaal::hcore::HString const& pattern_ ) {
+HEditWidgetAttributes& HEditWidgetAttributes::mask( yaal::hcore::HString const& mask_ ) {
 	M_PROLOG
-	_pattern = pattern_;
-	_patternSet = true;
+	_mask = mask_;
+	_maskSet = true;
 	return ( *this );
 	M_EPILOG
 }
@@ -742,7 +737,7 @@ bool HEditWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attr
 		xml::value_t value( xml::try_node_val( node_ ) );
 		attrs.text( value ? *value : "" );
 	} else if ( name == "mask" ) {
-		attrs.pattern( xml::node_val( node_ ) );
+		attrs.mask( xml::node_val( node_ ) );
 	} else if ( name == "replace" ) {
 		attrs.replace( lexical_cast<bool>( xml::node_val( node_ ) ) );
 	} else if ( name == "multi_line" ) {

@@ -28,7 +28,7 @@ Copyright:
 #define YAAL_HCONSOLE_HEDITWIDGET_HXX_INCLUDED 1
 
 #include "hcore/hlist.hxx"
-#include "hconsole/hpattern.hxx"
+#include "hcore/hregex.hxx"
 #include "hconsole/hwidget.hxx"
 #include "hconsole/hwidgetfactory.hxx"
 
@@ -88,8 +88,8 @@ protected:
 	                            this variable keeps offset of first
 	                            character shown */
 	int  _maxHistoryLevel; /*!< how many instertions should history keep */
-	HPattern _pattern;     /*!< regular expression describing what
-	                            characters and in what way can be entered */
+	yaal::hcore::HRegex _mask; /*!< regular expression describing what
+	                                   characters and in what way can be entered */
 	hcore::HString _string; /*!< widget content */
 	HInfoString _infoString;
 	typedef hcore::HList<yaal::hcore::HString> history_t;
@@ -113,7 +113,7 @@ public:
 	void set_flags( bool = false, bool = false );
 	void set_text( yaal::hcore::HString const& );
 	yaal::hcore::HString const& get_text( void ) const;
-	void set_pattern( yaal::hcore::HString const& );
+	void set_mask( yaal::hcore::HString const& );
 	/*! \brief Set varius bits of internal structure.
 	 *
 	 * \param maxlen - maximum string length.
@@ -171,8 +171,8 @@ class HEditWidgetAttributes : virtual public HWidgetAttributes {
 	bool _maxStringSizeSet;
 	int  _maxHistoryLevel;
 	bool _maxHistoryLevelSet;
-	yaal::hcore::HString _pattern;
-	bool _patternSet;
+	yaal::hcore::HString _mask;
+	bool _maskSet;
 	yaal::hcore::HString _text;
 	bool _textSet;
 protected:
@@ -186,7 +186,7 @@ public:
 	HEditWidgetAttributes& password( bool );
 	HEditWidgetAttributes& max_string_size( int );
 	HEditWidgetAttributes& max_history_level( int );
-	HEditWidgetAttributes& pattern( yaal::hcore::HString const& );
+	HEditWidgetAttributes& mask( yaal::hcore::HString const& );
 	HEditWidgetAttributes& text( yaal::hcore::HString const& );
 };
 

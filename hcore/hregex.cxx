@@ -168,11 +168,13 @@ bool HRegex::compile( HString const& pattern_, compile_t flags_ ) {
 bool HRegex::compile( char const* pattern_, compile_t flags_ ) {
 	M_PROLOG
 	M_ASSERT( pattern_ );
-	if ( ! pattern_[0] )
+	if ( ! pattern_[0] ) {
 		throw HRegexException( _errMsgHRegex_[ ERROR::EMPTY_PATTERN ] );
+	}
 	error_clear();
-	if ( _initialized )
+	if ( _initialized ) {
 		::regfree( _compiled.get<regex_t>() );
+	}
 	int cflags( 0 );
 	cflags |= ( ( flags_ & COMPILE::EXTENDED ) ? REG_EXTENDED : 0 );
 	cflags |= ( ( flags_ & COMPILE::IGNORE_CASE ) ? REG_ICASE : 0 );
@@ -213,8 +215,9 @@ HString const& HRegex::error( void ) const {
 				_errorMessage += _errorCause;
 				_errorMessage += "'";
 			}
-		} else
+		} else {
 			_errorMessage = _errMsgHRegex_[ ERROR::OK ];
+		}
 	}
 	return ( _errorMessage );
 }
@@ -226,8 +229,9 @@ int HRegex::error_code( void ) const {
 char const* HRegex::matches( char const* string_, int long* matchLength_ ) const {
 	M_PROLOG
 	M_ASSERT( string_ && matchLength_ );
-	if ( ! _initialized )
+	if ( ! _initialized ) {
 		throw HRegexException( _errMsgHRegex_[ ERROR::UNINITIALIZED ] );
+	}
 	error_clear();
 	char const* ptr = NULL;
 	int long matchLength = 0;
