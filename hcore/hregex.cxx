@@ -234,8 +234,7 @@ char const* HRegex::matches( char const* string_, int long* matchLength_ ) const
 	regmatch_t match;
 	if ( ! ( _lastError = ::regexec( _compiled.get<regex_t>(), string_, 1, &match, 0 ) ) ) {
 		matchLength = match.rm_eo - match.rm_so;
-		if ( matchLength > 0 )
-			ptr = string_ + match.rm_so;
+		ptr = string_ + match.rm_so;
 	}
 	( *matchLength_ ) = matchLength;
 	return ( ptr );
