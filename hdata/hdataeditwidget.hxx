@@ -47,6 +47,7 @@ public:
 	typedef HEditWidget base_type;
 private:
 	hcore::HRegex _valid;
+	OAttribute _attributeCache;
 public:
 	HDataEditWidget( HDataWindow*, /* parent */
 			int, /* top ( parent relative ) */
@@ -55,12 +56,25 @@ public:
 			int, /* width */
 			yaal::hcore::HString const& = "", /* label */
 			hconsole::HWidgetAttributesInterface const& = hconsole::HWidgetAttributesInterface() );
+	void set_validator( yaal::hcore::HString const& );
+	bool is_valid( void ) const;
 	virtual int do_process_input( int );
+};
+
+class HDataEditWidgetAttributes : virtual public hconsole::HEditWidgetAttributes {
+	yaal::hcore::HString _valid;
+	bool _validSet;
+protected:
+	virtual void do_apply( hconsole::HWidget& ) const;
+public:
+	HDataEditWidgetAttributes( void );
+	HDataEditWidgetAttributes& valid( yaal::hcore::HString const& );
 };
 
 class HDataEditWidgetCreator : virtual public yaal::hconsole::HEditWidgetCreator {
 protected:
 	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual bool do_prepare_attributes( hconsole::HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
 };
 
 }

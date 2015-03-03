@@ -401,16 +401,18 @@ int HEditWidget::insert_char( int code_, int length_ ) {
 	if ( ( ! _readOnly && ( code_ > 31 ) && ( code_ < 256 ) )
 			&& ( ( ! _replace && ( length_ < _maxStringSize ) )
 				|| ( _replace && ( ( _widgetOffset + _cursorPosition ) < length_ ) )	) ) {
-		if ( ! _replace )
+		if ( ! _replace ) {
 			_varTmpBuffer.insert( _widgetOffset+ _cursorPosition, 1 );
+		}
 		_varTmpBuffer.set_at( _cursorPosition + _widgetOffset, static_cast<char>( code_ ) );
 		_cursorPosition ++;
 		if ( _cursorPosition >= _widthRaw ) {
 			_cursorPosition = _widthRaw - 1;
 			_widgetOffset ++;
 		}
-	} else
+	} else {
 		err = code_;
+	}
 	return ( err );
 	M_EPILOG
 }
@@ -537,6 +539,7 @@ int HEditWidget::do_process_input( int code_ ) {
 			if ( _window ) {
 				_window->status_bar()->message( COLORS::BG_BROWN, "%s", _mask.error().raw() );
 			}
+			errorCode = 1;
 		} else {
 			code_ = 0;
 			_string = _varTmpBuffer;

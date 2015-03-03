@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hlog.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 using namespace yaal::hconsole;
 using namespace yaal::dbwrapper;
 
@@ -44,13 +45,32 @@ HDataEditWidget::HDataEditWidget( HDataWindow * parent_,
 		yaal::hcore::HString const& label_, HWidgetAttributesInterface const& attr_ )
 	:	HWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
 		HEditWidget( parent_, row_, column_, height_, width_, label_, attr_ ),
-		HDataWidget(), _valid() {
+		HDataWidget(),
+		_valid(),
+		_attributeCache( _attributeFocused ) {
 	M_PROLOG
+	attr_.apply( *this );
 	return;
 	M_EPILOG
 }
 
-int HDataEditWidget::do_process_input ( int code_ ) {
+void HDataEditWidget::set_validator( yaal::hcore::HString const& valid_ ) {
+	M_PROLOG
+	if ( ! _valid.compile( valid_ ) ) {
+		M_THROW( "Bad regex as validator: `"_ys.append( valid_ ).append( "', " ).append( _valid.error() ), _valid.error_code() );
+	}
+	_attributeCache = _attributeFocused;
+	return;
+	M_EPILOG
+}
+
+bool HDataEditWidget::is_valid( void ) const {
+	M_PROLOG
+	return ( ! _valid.is_valid() || _valid.matches( _string ) );
+	M_EPILOG
+}
+
+int HDataEditWidget::do_process_input( int code_ ) {
 	M_PROLOG
 	bool noChange = false;
 	switch ( code_ ) {
@@ -85,19 +105,52 @@ int HDataEditWidget::do_process_input ( int code_ ) {
 		default:
 		break;
 	}
-	code_ = HEditWidget::do_process_input ( code_ );
+	code_ = HEditWidget::do_process_input( code_ );
 	if ( ! ( code_ || noChange ) ) {
 		HDataWindow* win( dynamic_cast<HDataWindow*>( _window ) );
-		M_ASSERT ( win );
+		M_ASSERT( win );
 		win->set_modified();
+		if ( is_valid() ) {
+			_attributeFocused = _attributeCache;
+		} else {
+			_attributeFocused._data = COLORS::FG_BROWN | COLORS::BG_LIGHTGRAY;
+		}
 	}
 	return ( code_ );
 	M_EPILOG
 }
 
+HDataEditWidgetAttributes::HDataEditWidgetAttributes( void )
+	: HEditWidgetAttributes(),
+	_valid( _maskLoose_ ),
+	_validSet( false ) {
+	return;
+}
+
+void HDataEditWidgetAttributes::do_apply( HWidget& widget_ ) const {
+	M_PROLOG
+	HDataEditWidget* widget( dynamic_cast<HDataEditWidget*>( &widget_ ) );
+	if ( widget ) {
+		if ( _validSet ) {
+			widget->set_validator( _valid );
+		}
+	}
+	HEditWidgetAttributes::do_apply( widget_ );
+	return;
+	M_EPILOG
+}
+
+HDataEditWidgetAttributes& HDataEditWidgetAttributes::valid( yaal::hcore::HString const& valid_ ) {
+	M_PROLOG
+	_valid = valid_;
+	_validSet = true;
+	return ( *this );
+	M_EPILOG
+}
+
 HWidget::ptr_t HDataEditWidgetCreator::do_new_instance( HWindow* window_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
 	M_PROLOG
-	HEditWidgetAttributes attrs;
+	HDataEditWidgetAttributes attrs;
 	HDataWindow* window( dynamic_cast<HDataWindow*>( window_ ) );
 	M_ENSURE( window );
 	prepare_attributes( attrs, node_ );
@@ -107,6 +160,20 @@ HWidget::ptr_t HDataEditWidgetCreator::do_new_instance( HWindow* window_, yaal::
 	apply_resources( list->get_pointer(), node_ );
 	apply_role( window, list, node_ );
 	return ( list->get_pointer() );
+	M_EPILOG
+}
+
+bool HDataEditWidgetCreator::do_prepare_attributes( HWidgetAttributesInterface& attributes_, yaal::tools::HXml::HConstNodeProxy const& node_ ) {
+	M_PROLOG
+	HDataEditWidgetAttributes& attrs( dynamic_cast<HDataEditWidgetAttributes&>( attributes_ ) );
+	HString const& name( node_.get_name() );
+	bool ok( HEditWidgetCreator::do_prepare_attributes( attributes_, node_ ) );
+	if ( name == "valid" ) {
+		attrs.valid( xml::node_val( node_ ) );
+	} else {
+		ok = false;
+	}
+	return ( ok );
 	M_EPILOG
 }
 
