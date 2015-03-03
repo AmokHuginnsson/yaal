@@ -3,6 +3,7 @@
 import re
 import datetime
 import time
+import types
 
 def yaal_lookup_function( val_ ):
 	lookup_tag = val_.type.strip_typedefs().tag
@@ -105,14 +106,14 @@ class YaalHCoreHResourcePrinter:
 
 	def __init__( self, val_ ):
 		self._val = val_
-		self._ptr = self._val['_resource']
+		self._ptr = self._val['_holder']['_resource']
 		if self._ptr != 0:
 			self._innerPrinter = yaal_lookup_function( self._ptr.dereference() )
 			if self._innerPrinter != None:
 				if hasattr( self._innerPrinter, 'children' ):
 					def children( self ):
 						return self._innerPrinter.children()
-					setattr( self.__class__, 'children', children )
+					self.children = types.MethodType( children, self )
 
 	def to_string( self ):
 		s = "NULL"
