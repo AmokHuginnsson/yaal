@@ -54,17 +54,18 @@ public:
 			SELECT, /*!< SELECT query. */
 			UPDATE, /*!< Data update query. */
 			INSERT, /*!< INSERT new data query. */
-			DELETE  /*!< DELETER data query. */
+			DELETE  /*!< DELETE data query. */
 		} mode_t;
 	};
 private:
 	MODE::mode_t _mode;
 	yaal::hcore::HString _varTmpBuffer;
 	yaal::hcore::HString _SQL;
-	yaal::hcore::HString _table;			/* table name */
-	yaal::hcore::HString _columns;		/* columns that should be returned by next query */
-	yaal::hcore::HString _filter;		/* additional constant filter (WHERE clause) */
-	yaal::hcore::HString _sort;			/* additional constant sort (ORDER BY clause) */
+	yaal::hcore::HString _table;    /* table name */
+	yaal::hcore::HString _columns;  /* columns that should be returned by next query */
+	yaal::hcore::HString _idColumn; /* column that identifies row for UPDATE and DELETE query */
+	yaal::hcore::HString _filter;   /* additional constant filter (WHERE clause) */
+	yaal::hcore::HString _sort;     /* additional constant sort (ORDER BY clause) */
 	typedef HRecordSet::values_t values_t;
 	typedef yaal::hcore::HArray<bool> mutated_t;
 	field_names_t _fields;
@@ -82,6 +83,7 @@ public:
 	void set_columns( yaal::hcore::HString const& );
 	void set_columns( field_names_t&& );
 	void set_columns( field_names_t const& );
+	void set_id_column( yaal::hcore::HString const& );
 	void set_filter( yaal::hcore::HString const& );
 	void set_sort( yaal::hcore::HString const& );
 	yaal::hcore::HString get_table( void ) const;

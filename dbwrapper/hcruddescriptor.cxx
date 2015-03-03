@@ -44,16 +44,40 @@ char const _eMode_[] = "record set is not in appropriate mode for operation";
 }
 
 HCRUDDescriptor::HCRUDDescriptor( void )
-	: _mode( MODE::SELECT ), _varTmpBuffer(), _SQL(), _table(),
-	_columns( "*" ), _filter(), _sort(), _fields(), _fieldCount( 0 ),
-	_setSize( 0 ), _values(), _dataBase(), _query(), _mutated() {
+	: _mode( MODE::SELECT ),
+	_varTmpBuffer(),
+	_SQL(),
+	_table(),
+	_columns( "*" ),
+	_idColumn(),
+	_filter(),
+	_sort(),
+	_fields(),
+	_fieldCount( 0 ),
+	_setSize( 0 ),
+	_values(),
+	_dataBase(),
+	_query(),
+	_mutated() {
 	return;
 }
 
 HCRUDDescriptor::HCRUDDescriptor( database_ptr_t dataBase_ )
-	: _mode( MODE::SELECT ), _varTmpBuffer(), _SQL(), _table(),
-	_columns( "*" ), _filter(), _sort(), _fields(), _fieldCount( 0 ),
-	_setSize( 0 ), _values(), _dataBase( dataBase_ ), _query(), _mutated() {
+	: _mode( MODE::SELECT ),
+	_varTmpBuffer(),
+	_SQL(),
+	_table(),
+	_columns( "*" ),
+	_idColumn(),
+	_filter(),
+	_sort(),
+	_fields(),
+	_fieldCount( 0 ),
+	_setSize( 0 ),
+	_values(),
+	_dataBase( dataBase_ ),
+	_query(),
+	_mutated() {
 	return;
 }
 
@@ -269,6 +293,13 @@ void HCRUDDescriptor::set_columns( field_names_t const& fields_ ) {
 	_columns = string::join( _fields, "," );
 	_values.resize( _fieldCount );
 	_mutated.resize( _fieldCount );
+	return;
+	M_EPILOG
+}
+
+void HCRUDDescriptor::set_id_column( yaal::hcore::HString const& idColumn_ ) {
+	M_PROLOG
+	_idColumn = idColumn_;
 	return;
 	M_EPILOG
 }
