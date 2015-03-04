@@ -118,7 +118,7 @@ void HEditWidget::do_paint( void ) {
 	} else {
 		_varTmpBuffer.clear();
 	}
-	int long len = _varTmpBuffer.get_length();
+	int long len( _varTmpBuffer.get_length() );
 	if ( len < _widthRaw ) {
 		_varTmpBuffer.reserve( _widthRaw );
 		_varTmpBuffer.fill( ' ', len, _widthRaw - len );
@@ -221,7 +221,7 @@ int HEditWidget::go_to_eow( int length_ ) {
 		int index = find_eow( length_ );
 		err = ( index >= 0 ? 0 : 1 );
 		if ( ! err ) {
-			_cursorPosition =	( index - _widgetOffset );
+			_cursorPosition = ( index - _widgetOffset );
 			if ( _cursorPosition >= _widthRaw ) {
 				_widgetOffset += ( ( _cursorPosition - _widthRaw  ) + 1 );
 				_cursorPosition = _widthRaw - 1;
@@ -245,12 +245,13 @@ int HEditWidget::kill_line( void ) {
 
 int HEditWidget::move_right( int length_ ) {
 	M_PROLOG
-	int err = ( ( _cursorPosition + _widgetOffset ) < length_ ) ? 0 : 1;
+	int err( ( ( _cursorPosition + _widgetOffset ) < length_ ) ? 0 : 1 );
 	if ( ! err ) {
-		_cursorPosition ++;
+		++ _cursorPosition;
 		if ( _cursorPosition >= _widthRaw ) {
+			M_ASSERT( _cursorPosition == _widthRaw );
 			_cursorPosition = _widthRaw - 1;
-			_widgetOffset ++;
+			++ _widgetOffset;
 		}
 	}
 	return ( err );
@@ -259,12 +260,14 @@ int HEditWidget::move_right( int length_ ) {
 
 int HEditWidget::move_left( void ) {
 	M_PROLOG
-	int err = ( ( _widgetOffset + _cursorPosition ) > 0 ) ? 0 : 1;
+	int err( ( ( _widgetOffset + _cursorPosition ) > 0 ) ? 0 : 1 );
 	if ( ! err ) {
-		if ( _cursorPosition > 0 )
-			_cursorPosition --;
-		else if ( _widgetOffset > 0 )
-			_widgetOffset --;
+		if ( _cursorPosition > 0 ) {
+			-- _cursorPosition;
+		} else {
+			M_ASSERT( _widgetOffset > 0 );
+			-- _widgetOffset;
+		}
 	}
 	return ( err );
 	M_EPILOG
@@ -275,8 +278,9 @@ int HEditWidget::go_to_end( int length_ ) {
 	if ( length_ >= _widthRaw ) {
 		_cursorPosition = _widthRaw - 1;
 		_widgetOffset = ( length_ - _widthRaw ) + 1;
-	} else
+	} else {
 		_cursorPosition = length_;
+	}
 	return ( 0 );
 	M_EPILOG
 }
@@ -435,18 +439,15 @@ int HEditWidget::update_from_history( void ) {
 
 int HEditWidget::do_process_input( int code_ ) {
 	M_PROLOG
-	static int const HISTORY_OPERATION = -1;
-	static int const DATA_ENTER = -2;
-	int length = 0;
+	static int const HISTORY_OPERATION( -1 );
+	static int const DATA_ENTER( -2 );
 	int errorCode = 0;
-	int oldWidgetOffset = 0;
-	int oldCursorPosition = 0;
 	HConsole& cons = HConsole::get_instance();
-	code_ = HWidget::do_process_input ( code_ );
+	code_ = HWidget::do_process_input( code_ );
 	_varTmpBuffer = _string;
-	oldWidgetOffset = _widgetOffset;
-	oldCursorPosition = _cursorPosition;
-	length = static_cast<int>( _varTmpBuffer.get_length() );
+	int oldWidgetOffset( _widgetOffset );
+	int oldCursorPosition( _cursorPosition );
+	int length( static_cast<int>( _varTmpBuffer.get_length() ) );
 	switch ( code_ ) {
 		case ( KEY_CODES::PAGE_UP ):
 			_historyIt = hcore::cyclic_iterator( _history );
