@@ -206,6 +206,15 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED, _( "There is nothing to save." ) );
 		return ( true );
 	}
+	if ( ( _mode == HCRUDDescriptor::MODE::INSERT ) || ( _mode == HCRUDDescriptor::MODE::UPDATE ) ) {
+		for ( HDataWidget* dw : _editModeWidgets ) {
+			HDataEditWidget* dew( dynamic_cast<HDataEditWidget*>( dw ) );
+			if ( dew && ! dew->is_valid() ) {
+				_statusBar->message( COLORS::FG_BRIGHTRED, _( "Invalid value in: %s" ), dew->get_label().raw() );
+				return ( true );
+			}
+		}
+	}
 	int long id( _mainWidget->get_current_id() );
 	_crud->set_columns( _columns );
 	if ( _mode == HCRUDDescriptor::MODE::UPDATE ) {
