@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hdatawindow.cxx - this file is integral part of `yaal' project.
+  hdatawindow.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -238,6 +238,7 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 		_crud->set_filter( "" );
 		_mainWidget->load();
 	}
+	reload_record();
 	return ( true );
 	M_EPILOG
 }
@@ -271,16 +272,29 @@ bool HDataWindow::handler_cancel( hconsole::HEvent const& ) {
 	_modified = false;
 	_statusBar->paint();
 	_statusBar->message( COLORS::FG_BRIGHTRED, _( "Dropping all changes." ) );
+	reload_record();
 	return ( true );
 	M_EPILOG
 }
 
+void HDataWindow::reload_record( void ) {
+	M_PROLOG
+	HDataListWidget* l( dynamic_cast<HDataListWidget*>( _mainWidget ) );
+	if ( l ) {
+		l->selection_change();
+	}
+	return;
+	M_EPILOG
+}
+
 bool HDataWindow::on_sel_change( yaal::hconsole::HEvent const& ) {
+	M_PROLOG
 	int long currId( _mainWidget->get_current_id() );
 	for ( HDataWidget* dw : _editModeWidgets ) {
 		dw->load( currId );
 	}
 	return ( true );
+	M_EPILOG
 }
 
 bool HDataWindow::is_modified( void ) const {

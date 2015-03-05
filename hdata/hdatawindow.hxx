@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hdatawindow.hxx - this file is integral part of `yaal' project.
+  hdatawindow.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -100,12 +100,13 @@ protected:
 	bool handler_save( hconsole::HEvent const& );
 	bool handler_requery( hconsole::HEvent const& );
 	bool handler_cancel( hconsole::HEvent const& );
-  bool on_sel_change( yaal::hconsole::HEvent const& );
+	bool on_sel_change( yaal::hconsole::HEvent const& );
 	virtual void do_init( void );
 	virtual hconsole::HStatusBarWidget* do_init_bar( char const* );
 private:
 	HDataWindow( HDataWindow const& );
 	HDataWindow& operator = ( HDataWindow const& );
+	void reload_record( void );
 };
 
 class HDataWindowCreator : public hconsole::HWindowCreator {
