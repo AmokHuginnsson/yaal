@@ -180,21 +180,21 @@ void HCRUDDescriptor::build_query( MODE::mode_t const& mode_ ) {
 HRecordSet::ptr_t HCRUDDescriptor::execute( void ) {
 	M_PROLOG
 	HRecordSet::ptr_t rs = !! _query ? _query->execute() : _dataBase->execute_query( _SQL );
-	_fieldCount = rs->get_field_count();
-	if ( _fields.get_size() != _fieldCount ) {
-		_fields.resize( _fieldCount );
-		_values.resize( _fieldCount );
-		_mutated.resize( _fieldCount );
-	}
-	for ( int ctr = 0; ctr < _fieldCount; ++ ctr ) {
-		_fields[ ctr ] = rs->get_column_name( ctr );
-		_mutated[ ctr ] = false;
-	}
 	if ( _mode == MODE::SELECT ) {
+		_fieldCount = rs->get_field_count();
 		_setSize = rs->get_size();
+		if ( _fields.get_size() != _fieldCount ) {
+			_fields.resize( _fieldCount );
+			_values.resize( _fieldCount );
+			_mutated.resize( _fieldCount );
+		}
+		for ( int ctr = 0; ctr < _fieldCount; ++ ctr ) {
+			_fields[ ctr ] = rs->get_column_name( ctr );
+		}
 	} else {
 		_setSize = rs->get_dml_size();
 	}
+	fill( _mutated.begin(), _mutated.end(), false );
 	return ( rs );
 	M_EPILOG
 }
