@@ -268,9 +268,10 @@ public:
 	int endwin( void );
 	void getyx( int&, int& ) const;
 	void clrtoeol( void ) const;
-	void printf( char const* const, ... ) const;
-	void mvprintf( int, int, char const* const, ... ) const;
-	void cmvprintf( int, int, int, char const* const, ... ) const;
+	void addstr( char const* ) const;
+	void printf( char const*, ... ) const;
+	void mvprintf( int, int, char const*, ... ) const;
+	void cmvprintf( int, int, int, char const*, ... ) const;
 	int ungetch( int );
 	int get_key( void ) const;
 	int kbhit( void ) const;
@@ -289,9 +290,9 @@ public:
 	int on_mouse( int );
 	static void set_escdelay( int );
 protected:
-	void vmvprintf ( int, int, char const* const, void* ) const;
-	void vcmvprintf ( int, int, int, char const* const, void* ) const;
-	void vprintf ( char const* const, void* ) const;
+	void vmvprintf( int, int, char const*, void* ) const;
+	void vcmvprintf( int, int, int, char const*, void* ) const;
+	void vprintf( char const*, void* ) const;
 	void init( void );
 private:
 	HConsole( void );

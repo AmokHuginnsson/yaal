@@ -513,23 +513,27 @@ int HConsole::get_event_fd( void ) const {
 }
 
 void HConsole::vmvprintf( int row_, int column_,
-							 char const* const format_, void* ap_ ) const {
+							 char const* format_, void* ap_ ) const {
 	M_PROLOG
-	int origRow = 0;
-	int origColumn = 0;
-	va_list& ap( *static_cast<va_list*>( ap_ ) );
-	if ( ! _enabled )
+	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
-	if ( column_ >= _width )
+	}
+	if ( column_ >= _width ) {
 		M_THROW( "bad column.", column_ );
-	if ( ( row_ < 0 ) || ( row_ >= _height ) )
+	}
+	if ( ( row_ < 0 ) || ( row_ >= _height ) ) {
 		M_THROW( "bad row.", row_ );
+	}
+	int origRow( 0 );
+	int origColumn( 0 );
 	getyx( origRow, origColumn );
 	if ( column_ < 0 ) {
 		move( row_, 0 );
 		clrtoeol(); /* Always OK */
-	} else
+	} else {
 		move( row_, column_ );
+	}
+	va_list& ap( *static_cast<va_list*>( ap_ ) );
 	M_ENSURE( vw_printw( static_cast<WINDOW*>( _window ), format_, ap ) != ERR );
 	move( origRow, origColumn );
 	return;
@@ -537,7 +541,7 @@ void HConsole::vmvprintf( int row_, int column_,
 }
 
 void HConsole::vcmvprintf( int row_, int column_, int attribute_,
-							 char const* const format_, void* ap_ ) const {
+							 char const* format_, void* ap_ ) const {
 	M_PROLOG
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
@@ -549,7 +553,7 @@ void HConsole::vcmvprintf( int row_, int column_, int attribute_,
 	M_EPILOG
 }
 
-void HConsole::vprintf( char const* const format_, void* ap_ ) const {
+void HConsole::vprintf( char const* format_, void* ap_ ) const {
 	M_PROLOG
 	va_list& ap = *static_cast<va_list*>( ap_ );
 	if ( ! _enabled )
@@ -559,7 +563,7 @@ void HConsole::vprintf( char const* const format_, void* ap_ ) const {
 	M_EPILOG
 }
 
-void HConsole::printf( char const* const format_, ... ) const {
+void HConsole::printf( char const* format_, ... ) const {
 	M_PROLOG
 	va_list ap;
 	va_start( ap, format_ );
@@ -569,7 +573,7 @@ void HConsole::printf( char const* const format_, ... ) const {
 	M_EPILOG
 }
 
-void HConsole::mvprintf( int row_, int column_, char const* const format_,
+void HConsole::mvprintf( int row_, int column_, char const* format_,
 		... ) const {
 	M_PROLOG
 	va_list ap;
@@ -581,12 +585,27 @@ void HConsole::mvprintf( int row_, int column_, char const* const format_,
 }
 
 void HConsole::cmvprintf( int row_, int column_, int attribute_,
-							 char const* const format_, ... ) const {
+							 char const* format_, ... ) const {
 	M_PROLOG
 	va_list ap;
 	va_start( ap, format_ );
 	vcmvprintf( row_, column_, attribute_, format_, &ap );
 	va_end( ap );
+	return;
+	M_EPILOG
+}
+
+inline int waddstr_fwd( WINDOW* win_, char const* str_ ) {
+	return ( ::waddstr( win_, str_ ) );
+}
+
+#undef addstr
+void HConsole::addstr( char const* str_ ) const {
+	M_PROLOG
+	if ( ! _enabled ) {
+		M_THROW( "not in curses mode", errno );
+	}
+	M_ENSURE( waddstr_fwd( static_cast<WINDOW*>( _window ), str_ ) != ERR );
 	return;
 	M_EPILOG
 }

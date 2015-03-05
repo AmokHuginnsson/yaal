@@ -401,13 +401,15 @@ void HTUIProcess::select( HWindow const* const window_ ) {
 
 void HTUIProcess::repaint( bool force_ ) {
 	M_PROLOG
+	HConsole& cons( HConsole::get_instance() );
+	cons.curs_set( CURSOR::INVISIBLE );
 	if ( ( _foregroundWindow != HTUIProcess::cyclic_iterator() ) && ( !! (*_foregroundWindow) ) ) {
 		if ( force_ ) {
 			(*_foregroundWindow)->schedule_repaint( true );
 		}
 		(*_foregroundWindow)->paint();
 	}
-	HConsole::get_instance().refresh();
+	cons.refresh();
 	_needRepaint = false;
 	return;
 	M_EPILOG

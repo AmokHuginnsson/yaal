@@ -442,7 +442,6 @@ int HEditWidget::do_process_input( int code_ ) {
 	static int const HISTORY_OPERATION( -1 );
 	static int const DATA_ENTER( -2 );
 	int errorCode = 0;
-	HConsole& cons = HConsole::get_instance();
 	code_ = HWidget::do_process_input( code_ );
 	_varTmpBuffer = _string;
 	int oldWidgetOffset( _widgetOffset );
@@ -553,7 +552,7 @@ int HEditWidget::do_process_input( int code_ ) {
 	if ( errorCode && ( errorCode != DATA_ENTER ) ) {
 		_widgetOffset = oldWidgetOffset;
 		_cursorPosition = oldCursorPosition;
-		cons.bell();
+		HConsole::get_instance().bell();
 	}
 	return ( code_ );
 	M_EPILOG
