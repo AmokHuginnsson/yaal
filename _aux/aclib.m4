@@ -107,54 +107,60 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_MSG_CHECKING([host operating system])
 	AC_CANONICAL_HOST
 	HOST_OS_TYPE=""
+	UNAME_OS_NAME="`uname -s`"
 	LIB_PREFIX=["lib"]
 	LIB_EXT=['"so"']
 	EXE_SUFFIX=[""]
 	SYMBOL_PREFIX=['""']
-	AC_CHECK_PROG([LINUX_DISTRO],[lsb_release],[yes])
-	if test ["x${LINUX_DISTRO}"] = ["xyes"] ; then
-		HOST_OS_TYPE=`lsb_release -i|awk '/Distributor/{print [$]3}'`
+	if test ["x${UNAME_OS_NAME}"] = ["xLinux"] ; then
 		AC_SUBST([SERIAL_DEVICE],['ttyS0'])
-	fi
-	if test ["x${HOST_OS_TYPE}"] = ["xDebian"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] \) ; then
-		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
-		AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your specific linux version is Debian.])
-		HOST_OS_TYPE=[Debian]
-		YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
-	elif test ["x${HOST_OS_TYPE}"] = ["xUbuntu"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/00-header] \) ; then
-		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
-		AC_DEFINE([__HOST_OS_TYPE_UBUNTU__], [], [Your specific linux version is Ubuntu.])
-		HOST_OS_TYPE=[Ubuntu]
-		YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
-	elif test ["x${HOST_OS_TYPE}"] = ["xCentOS"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
-		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
-		AC_DEFINE([__HOST_OS_TYPE_CENTOS__], [], [Your specific linux version is CentOS.])
-		HOST_OS_TYPE=[CentOS]
-		YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
-	elif test ["x${HOST_OS_TYPE}"] = ["xPLD"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/poldek/poldek.conf] \) ; then
-		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
-		AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your specific linux version is PLD.])
-		HOST_OS_TYPE=[PLD]
-		YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
-	elif test ["x${HOST_OS_TYPE}"] = ["xSlackware"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/random-seed] \) ; then
-		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
-		AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__], [], [Your specific linux version is Slackware.])
-		HOST_OS_TYPE=[Slackware]
-		YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
-	elif test ["x${HOST_OS_TYPE}"] != ["x"] ; then
-		HOST_OS_TYPE=[Linux]
-		AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
-		YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
-	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/rc] ; then
+		AC_CHECK_PROG([LINUX_DISTRO],[lsb_release],[yes])
+		if test ["x${LINUX_DISTRO}"] = ["xyes"] ; then
+			HOST_OS_TYPE=`lsb_release -i|awk '/Distributor/{print [$]3}'`
+		fi
+		if test ["x${HOST_OS_TYPE}"] = ["xDebian"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/debconf.conf] \) ; then
+			AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+			AC_DEFINE([__HOST_OS_TYPE_DEBIAN__], [], [Your specific linux version is Debian.])
+			HOST_OS_TYPE=[Debian]
+			YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
+		elif test ["x${HOST_OS_TYPE}"] = ["xUbuntu"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/00-header] \) ; then
+			AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+			AC_DEFINE([__HOST_OS_TYPE_UBUNTU__], [], [Your specific linux version is Ubuntu.])
+			HOST_OS_TYPE=[Ubuntu]
+			YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
+		elif test ["x${HOST_OS_TYPE}"] = ["xCentOS"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/yum.repos.d/CentOS-Base.repo] \) ; then
+			AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+			AC_DEFINE([__HOST_OS_TYPE_CENTOS__], [], [Your specific linux version is CentOS.])
+			HOST_OS_TYPE=[CentOS]
+			YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
+		elif test ["x${HOST_OS_TYPE}"] = ["xPLD"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/poldek/poldek.conf] \) ; then
+			AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+			AC_DEFINE([__HOST_OS_TYPE_PLD__], [], [Your specific linux version is PLD.])
+			HOST_OS_TYPE=[PLD]
+			YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
+		elif test ["x${HOST_OS_TYPE}"] = ["xSlackware"] -o \( ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/random-seed] \) ; then
+			AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+			AC_DEFINE([__HOST_OS_TYPE_SLACKWARE__], [], [Your specific linux version is Slackware.])
+			HOST_OS_TYPE=[Slackware]
+			YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
+		else
+			HOST_OS_TYPE=[Linux]
+			AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
+			YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
+		fi
+	elif test ["x${UNAME_OS_TYPE}"] = ["xFreeBSD"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
 		HOST_OS_TYPE=[FreeBSD]
-	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/dfs/dfstab] ; then
+	elif test ["x${UNAME_OS_TYPE}"] = ["xSunOS"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_TYPE=[Solaris]
+	elif test ["x${UNAME_OS_NAME}"] = ["xDarwin"] ; then
+		AC_DEFINE([__HOST_OS_TYPE_DARWIN__], [], [Your operating system is Darwin.])
+		HOST_OS_TYPE=[Darwin]
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/tizen-release] ; then
 		AC_DEFINE([__HOST_OS_TYPE_TIZEN__], [], [Your operating system is Tizen.])
 		HOST_OS_TYPE=[Tizen]
-	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -d [c:/windows] ; then
+	elif test ["x${UNAME_OS_NAME}"] = ["xCygwin"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_CYGWIN__], [], [Your operating system is Cygwin.])
 		EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -U__STRICT_ANSI__"]
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(*)\$(LIB_INFIX).\$(LIB_ARCHIVE_SUFFIX)"]

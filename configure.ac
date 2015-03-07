@@ -57,6 +57,7 @@ AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
+YAAL_DETECT_OPERATING_SYSTEM
 AC_DEFINE_UNQUOTED(TARGET_CPU,"${target_cpu}",[Target host system CPU.])
 if test "x${target_cpu}" = "xx86_64" ; then
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
@@ -66,20 +67,21 @@ elif test "${target_os}" != "`echo ${target_os} | sed -e 's/solaris//'`" ; then
 else
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,32,[Target host system CPU bits.])
 fi
+YAAL_DETECT_PHYSICAL_MEMORY
+
+YAAL_DETECT_COMPILER
+
 AC_MSG_CHECKING([host dynamic linker])
-READELF=`whereis -b readelf | awk '{print $2}'`
-DYNAMIC_LINKER=`test "x${READELF}" != "x" && ${READELF} -l /usr/bin/readelf | awk 'BEGIN{FS=":"};/program interp/{gsub("[[]] ]","",$2);print $2}'`
+if test "x${UNAME_OS_NAME}" = "xLinux" ; then
+	READELF=`whereis -b readelf | awk '{print $2}'`
+	DYNAMIC_LINKER=`test "x${READELF}" != "x" && ${READELF} -l /usr/bin/readelf | awk 'BEGIN{FS=":"};/program interp/{gsub("[[]] ]","",$2);print $2}'`
+fi
 if test ["$DYNAMIC_LINKER"] = [""] ; then
 	AC_MSG_WARN([not found])
 else
 	AC_MSG_RESULT([$DYNAMIC_LINKER])
 	AC_DEFINE_UNQUOTED([__DYNAMIC_LINKER__],["$DYNAMIC_LINKER"],[Path to your dynamic linker.])
 fi
-
-YAAL_DETECT_OPERATING_SYSTEM
-YAAL_DETECT_PHYSICAL_MEMORY
-
-YAAL_DETECT_COMPILER
 
 AC_MSG_RESULT([--- Looking standrad development software ... ---       [[33%]]])
 AC_PROG_INSTALL
@@ -130,8 +132,8 @@ dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
 AC_SEARCH_LIBS([pthread_create],[thr pthread],,[AC_MSG_ERROR([Cannot build without threading library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
-AC_SEARCH_LIBS([clock_gettime],[rt],,[AC_MSG_ERROR([Cannot continue without rt library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
-AC_SEARCH_LIBS([timer_create],[rt],,[AC_MSG_ERROR([Cannot continue without rt library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
+AC_SEARCH_LIBS([clock_gettime],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
+AC_SEARCH_LIBS([timer_create],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([gethostbyname_r],[nsl]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([getaddrinfo],[socket getaddrinfo],,[AC_MSG_ERROR([Cannot continue without getaddrinfo feature.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([getnameinfo],[socket getaddrinfo],,[AC_MSG_ERROR([Cannot continue without getnameinfo feature.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
@@ -390,10 +392,10 @@ CFLAGS="-D_GNU_SOURCE=1"
 AC_CHECK_TYPES([sighandler_t],[],[AC_CHECK_TYPES([__sighandler_t],[],[],[#include <signal.h>])],[#include <signal.h>])
 CFLAGS=${CFLAGS_ORIG}
 AC_LANG([C++])
-if test ["${ac_cv_type_sighandler_t}"] = ["no"] -a ["${ac_cv_type___sighandler_t}"] = ["no"] ; then
+if test ["${ac_cv_type_sighandler_t}"] = ["no"] -a ["${ac_cv_type___sighandler_t}"] = ["no"] -a ["x${HOST_OS_TYPE}"] != ["xDarwin"] ; then
 	AC_CHECK_TYPES([SIG_PF],[],[AC_MSG_ERROR([Cannot continue without signal handler type definition.])],[#include <signal.h>])
 fi
-AC_CHECK_FUNCS([getline memrchr strnlen getaddrinfo getnameinfo gethostbyname_r gethostbyaddr_r strcasestr pthread_setname_np pthread_set_name_np prctl])
+AC_CHECK_FUNCS([clock_gettime timer_create getline memrchr strnlen getaddrinfo getnameinfo gethostbyname_r gethostbyaddr_r strcasestr pthread_setname_np pthread_set_name_np prctl])
 AC_CHECK_DECLS([strtold],[],[],[#include <cstdlib>])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])

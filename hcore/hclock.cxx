@@ -29,6 +29,12 @@ Copyright:
 
 #include <ctime>
 
+#include "config.hxx"
+
+#ifndef HAVE_CLOCK_GETTIME
+#include "compat.hxx"
+#endif /* #ifndef HAVE_CLOCK_GETTIME */
+
 #include "base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )

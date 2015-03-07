@@ -68,6 +68,23 @@ int gethostbyname_r( char const*, struct hostent*, char*, long unsigned, struct 
 int gethostbyaddr_r( void const*, int, int, struct hostent*, char*, long unsigned, struct hostent**, int* );
 #endif /* #if ! defined( HAVE_GNU_GETHOSTBYADDR_R ) */
 
+#if ! defined( HAVE_CLOCK_GETTIME )
+enum CLOCK_TYPE {
+	CLOCK_REALTIME = 0,
+	CLOCK_MONOTONIC = 1,
+	CLOCK_THREAD_CPUTIME_ID = 2
+};
+typedef int clockid_t;
+int clock_gettime( clockid_t, struct timespec* );
+#endif /* #if ! defined( HAVE_CLOCK_GETTIME ) */
+
+#if ! defined( HAVE_TIMER_CREATE )
+typedef void* timer_t;
+int timer_create( clockid_t, struct sigevent*, timer_t* );
+int timer_settime( timer_t, int, struct itimerspec const *, struct itimerspec* );
+int timer_delete( timer_t );
+#endif /* #if ! defined( HAVE_TIMER_CREATE ) */
+
 #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 )
 double long powl( double long, double long );
 #endif /* #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 ) */

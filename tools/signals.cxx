@@ -77,9 +77,11 @@ public:
 typedef __sighandler_t* sighandler_t;
 #elif defined ( HAVE_SIG_PF )
 typedef SIG_PF sighandler_t;
-#else /* #elif defined ( HAVE_SIG_PF ) */
+#elif defined ( __HOST_OS_TYPE_DARWIN__ )
+typedef void (*sighandler_t)( int );
+#else /* #elif defined ( __HOST_OS_TYPE_DARWIN__ ) */
 #error No signal handler type definition available.
-#endif /* #else #elif defined ( HAVE_SIG_PF ) */
+#endif /* #else #elif defined ( __HOST_OS_TYPE_DARWIN__ ) */
 #endif /* #ifndef HAVE_SIGHANDLER_T */
 
 namespace {
