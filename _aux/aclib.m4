@@ -148,10 +148,10 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 			AC_DEFINE([__HOST_OS_TYPE_LINUX__], [], [Your operating system is Linux.])
 			YAAL_LXXFLAGS=["-Wl,--entry=\"${PACKAGE_NAME}_\$(*)_main\""]
 		fi
-	elif test ["x${UNAME_OS_TYPE}"] = ["xFreeBSD"] ; then
+	elif test ["x${UNAME_OS_NAME}"] = ["xFreeBSD"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
 		HOST_OS_TYPE=[FreeBSD]
-	elif test ["x${UNAME_OS_TYPE}"] = ["xSunOS"] ; then
+	elif test ["x${UNAME_OS_NAME}"] = ["xSunOS"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_TYPE=[Solaris]
 	elif test ["x${UNAME_OS_NAME}"] = ["xDarwin"] ; then
