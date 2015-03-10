@@ -103,7 +103,7 @@ int wait_for_io( int* input_, int inputCount_, int* output_, int outputCount_, i
 		FWD_FD_SET( output_[ i ], &writers );
 	timeval timeOut, * timeOutP = timeOut_ ? &timeOut : NULL;
 	if ( timeOut_ ) {
-		timeOut.tv_usec = ( *timeOut_ % 1000 ) * 1000;
+		timeOut.tv_usec = static_cast<suseconds_t>( ( *timeOut_ % 1000 ) * 1000 );
 		timeOut.tv_sec = *timeOut_ / 1000;
 	}
 	int ret( 0 );

@@ -32,6 +32,7 @@ Copyright:
 #ifndef YAAL_HCORE_HTHREAD_HXX_INCLUDED
 #define YAAL_HCORE_HTHREAD_HXX_INCLUDED 1
 
+#include "config.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/hresource.hxx"
 #include "hcore/hboundcall.hxx"
@@ -112,7 +113,9 @@ public:
 	typedef HResource<HSemaphoreImplementationInterface> semaphore_implementation_t;
 	struct TYPE {
 		typedef enum {
+#ifdef HAVE_SEM_INIT
 			POSIX,
+#endif /* #ifdef HAVE_SEM_INIT */
 			YAAL
 		} type_t;
 	};

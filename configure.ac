@@ -298,7 +298,16 @@ AC_MSG_RESULT([$RESULT])
 DEFAULT_DRIVER=["null"]
 
 AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[77%]]])
-AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
+if test ["x${HOST_OS_TYPE}"] != ["xDarwin"] ; then
+	AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
+else
+	CXXFLAGS=["$CXXFLAGS -isystem /opt/local/include"]
+	CPPFLAGS=["$CXXFLAGS"]
+	AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
+	CXXFLAGS=$CXXFLAGS_ORIG
+	CPPFLAGS=$CPPFLAGS_ORIG
+	EXTRA_INCLUDE_PATHS="-isystem /opt/local/include ${EXTRA_INCLUDE_PATHS}"
+fi
 _CONSOLE_MOUSE=[""];
 AC_CHECK_HEADERS([sys/consio.h],_CONSOLE_MOUSE=["moused"])
 AC_CHECK_HEADERS([execinfo.h])
@@ -311,7 +320,7 @@ if test ["$_CONSOLE_MOUSE"] = [""] -a ["$CONSOLE_MOUSE"] = ["yes"] ; then
 	AC_MSG_ERROR([Cannot continue without console mouse support.])
 fi
 CXXFLAGS=["$CXXFLAGS -I/usr/include/libxml2"]
-CPPFLAGS=["$CPPFLAGS -I/usr/include/libxml2"]
+CPPFLAGS=["$CXXFLAGS"]
 AC_CHECK_HEADERS([libxml2/libxml/xmlversion.h],
 	EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/usr/include/libxml2"],
 	[
@@ -319,7 +328,7 @@ AC_CHECK_HEADERS([libxml2/libxml/xmlversion.h],
 		CPPFLAGS=$CPPFLAGS_ORIG
 		unset ac_cv_header_libxml2_libxml_xmlversion_h
 		CXXFLAGS=["$CXXFLAGS -I/usr/local/include/libxml2"]
-		CPPFLAGS=["$CPPFLAGS -I/usr/local/include/libxml2"]
+		CPPFLAGS=["$CXXFLAGS"]
 		AC_CHECK_HEADERS([libxml2/libxml/xmlversion.h],
 			EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/usr/local/include/libxml2"],
 			[AC_MSG_ERROR([Cannot continue without XML development files.])])
@@ -421,6 +430,14 @@ AC_MSG_CHECKING([whether powl is available])
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cmath>
 									 int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }]])],
 	[AC_DEFINE([HAVE_POWL],[1],[We have ::powl().]) AC_MSG_RESULT([yes])], AC_MSG_RESULT([no]))
+CXXFLAGS=["$CXXFLAGS -Wall -Werror"]
+CPPFLAGS=["$CXXFLAGS"]
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <semaphore.h>
+									 int main( int, char** ) { ::sem_init( 0, 0, 0 ); return ( 0 ); }]])],
+	[AC_DEFINE([HAVE_SEM_INIT],[1],[We have ::sem_init().]) AC_MSG_RESULT([yes]); SEMAPHORE_TYPE=["POSIX"]], [AC_MSG_RESULT([no]); SEMAPHORE_TYPE=["YAAL"]])
+CXXFLAGS=$CXXFLAGS_ORIG
+CPPFLAGS=$CPPFLAGS_ORIG
+AC_SUBST([SEMAPHORE_TYPE],[${SEMAPHORE_TYPE}])
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 

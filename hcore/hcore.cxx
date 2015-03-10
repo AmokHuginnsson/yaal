@@ -107,7 +107,11 @@ bool set_hcore_variables( HString& option_, HString& value_ ) {
 		}
 	} else if ( ! strcasecmp( option_, "semaphore_type" ) ) {
 		if ( value_ == "POSIX" ) {
+#ifdef HAVE_SEM_INIT
 			HSemaphore::DEFAULT = HSemaphore::TYPE::POSIX;
+#else /* #ifdef HAVE_SEM_INIT */
+			fail = true;
+#endif /* #else #ifdef HAVE_SEM_INIT */
 		} else if ( value_ == "YAAL" ) {
 			HSemaphore::DEFAULT = HSemaphore::TYPE::YAAL;
 		} else {

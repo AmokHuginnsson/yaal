@@ -49,7 +49,12 @@ namespace yaal {
 
 namespace hcore {
 
+#ifdef HAVE_SEM_INIT
 HSemaphore::TYPE::type_t HSemaphore::DEFAULT = HSemaphore::TYPE::POSIX;
+#else /* #ifdef HAVE_SEM_INIT */
+HSemaphore::TYPE::type_t HSemaphore::DEFAULT = HSemaphore::TYPE::YAAL;
+#endif /* #else #ifdef HAVE_SEM_INIT */
+
 int HThread::_threadStackSize = 0;
 
 namespace {
@@ -240,7 +245,11 @@ void HThread::set_name( char const* name_ ) {
 	strncpy( name, name_, 16 );
 	name[15] = 0;
 #if defined( HAVE_PTHREAD_SETNAME_NP )
+#ifdef __HOST_OS_TYPE_DARWIN__
+	::pthread_setname_np( name );
+#else /* #ifdef __HOST_OS_TYPE_DARWIN__ */
 	::pthread_setname_np( ::pthread_self(), name );
+#endif /* #else #ifdef __HOST_OS_TYPE_DARWIN__ */
 #elif defined( HAVE_PTHREAD_SET_NAME_NP ) /* #if defined( HAVE_PTHREAD_SETNAME_NP ) */
 	::pthread_set_name_np( ::pthread_self(), name );
 #elif defined( HAVE_PRCTL ) /* #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
@@ -342,6 +351,8 @@ HLock::~HLock( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
+#ifdef HAVE_SEM_INIT
+
 class HPosixSemaphore : public HSemaphoreImplementationInterface {
 public:
 	typedef HPosixSemaphore this_type;
@@ -386,6 +397,8 @@ void HPosixSemaphore::do_signal( void ) {
 	return;
 	M_EPILOG
 }
+
+#endif /* #ifdef HAVE_SEM_INIT */
 
 void HSemaphoreImplementationInterface::wait( void ) {
 	M_PROLOG
@@ -453,7 +466,13 @@ void HYaalSemaphore::do_signal( void ) {
 }
 
 HSemaphore::HSemaphore( TYPE::type_t type_ )
-	: _impl( type_ == TYPE::POSIX ? semaphore_implementation_t( new ( memory::yaal ) HPosixSemaphore() ) : semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore() ) ) {
+	: _impl() {
+#ifdef HAVE_SEM_INIT
+	_impl = ( type_ == TYPE::POSIX ? semaphore_implementation_t( new ( memory::yaal ) HPosixSemaphore() ) : semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore() ) );
+#else /* #ifdef HAVE_SEM_INIT */
+	_impl = semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore() );
+	static_cast<void>( type_ );
+#endif /* #else #ifdef HAVE_SEM_INIT */
 }
 
 HSemaphore::~HSemaphore( void ) {

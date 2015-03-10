@@ -70,7 +70,7 @@ thread_stack_size 0
 # type: enumerator { POSIX, YAAL }, default: POSIX
 # semaphore_type selects preferred default semaphore implementation to be used by Yaal Threads.
 # valid semaphore types are: POSIX or YAAL.
-semaphore_type POSIX
+semaphore_type @SEMAPHORE_TYPE@
 
 # resolve_hostnames
 # type: bool, default true
