@@ -157,6 +157,8 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${UNAME_OS_NAME}"] = ["xDarwin"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DARWIN__], [], [Your operating system is Darwin.])
 		HOST_OS_TYPE=[Darwin]
+		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,-undefined,dynamic_lookup"]
+		LIB_EXT=['"dylib"']
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/tizen-release] ; then
 		AC_DEFINE([__HOST_OS_TYPE_TIZEN__], [], [Your operating system is Tizen.])
 		HOST_OS_TYPE=[Tizen]

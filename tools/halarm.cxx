@@ -41,6 +41,8 @@ namespace yaal {
 
 namespace tools {
 
+static_assert( sizeof ( timer_t ) <= sizeof ( void* ), "timer handle too big" );
+
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
@@ -50,7 +52,7 @@ static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
 yaal::hcore::HMutex HAlarm::_mutex;
 
 HAlarm::HAlarm( int long miliseconds_ )
-	: _timer(), _lock( _mutex ) {
+	: _timer( -1 ), _lock( _mutex ) {
 	M_PROLOG
 	static int long const MILI_IN_WHOLE = power<10, 3>::value;
 	static int long const NANO_IN_MILI = power<10, 6>::value;
@@ -59,8 +61,9 @@ HAlarm::HAlarm( int long miliseconds_ )
 	::memset( &event, 0, sizeof ( event ) );
 	event.sigev_notify = SIGEV_SIGNAL;
 	event.sigev_signo = SIGALRM;
-	event.sigev_value.sival_ptr = &_timer;
-	M_ENSURE( timer_create( FWD_CLOCK_REALTIME, &event, &_timer ) == 0 );
+	timer_t* t( reinterpret_cast<timer_t*>( &_timer ) );
+	event.sigev_value.sival_ptr = t;
+	M_ENSURE( timer_create( FWD_CLOCK_REALTIME, &event, t ) == 0 );
 
 	int step( 0 );
 	try {
@@ -74,12 +77,12 @@ HAlarm::HAlarm( int long miliseconds_ )
 		::memset( &timeout, 0, sizeof ( timeout ) );
 		timeout.it_value.tv_sec = miliseconds_ / MILI_IN_WHOLE;
 		timeout.it_value.tv_nsec = ( miliseconds_ % MILI_IN_WHOLE ) * NANO_IN_MILI;
-		M_ENSURE( timer_settime( _timer, 0, &timeout, NULL ) == 0 );
+		M_ENSURE( timer_settime( *t, 0, &timeout, NULL ) == 0 );
 		++ step;
 	} catch ( ... ) {
 		if ( step > 0 )
 			cleanup_sigmask();
-		M_ENSURE( timer_delete( _timer ) == 0 );
+		M_ENSURE( timer_delete( *t ) == 0 );
 		throw;
 	}
 	return;
@@ -91,11 +94,12 @@ HAlarm::~HAlarm( void ) {
 
 	itimerspec timeout;
 	::memset( &timeout, 0, sizeof ( timeout ) );
-	M_ENSURE( timer_settime( _timer, 0, &timeout, NULL ) == 0 );
+	timer_t* t( reinterpret_cast<timer_t*>( &_timer ) );
+	M_ENSURE( timer_settime( *t, 0, &timeout, NULL ) == 0 );
 
 	cleanup_sigmask();
 
-	M_ENSURE( timer_delete( _timer ) == 0 );
+	M_ENSURE( timer_delete( *t ) == 0 );
 	return;
 	M_DESTRUCTOR_EPILOG
 }

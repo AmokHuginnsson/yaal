@@ -1,6 +1,6 @@
 #! /bin/sh
 
-HOST_OS_TYPE=`uname`
+HOST_OS_TYPE=`uname -s`
 
 DIR_LIB=""
 
@@ -32,6 +32,9 @@ if [ ! -z "${DIR_LIB}" ] ; then
 			ls -1 cyg*.dll > dlls.txt
 			/bin/rebaseall -v -p -T ./dlls.txt > /dev/null 2>&1
 			/bin/rm ./dlls.txt
+		;;
+		Darwin)
+			echo "Operating system does not support dynamic library indexing."
 		;;
 		*)
 			echo "Unknown host operating system type!"

@@ -32,6 +32,7 @@ Copyright:
 
 #include <ctime>
 
+#include "hcore/compat.hxx"
 #include "hcore/hexception.hxx"
 #include "hcore/hthread.hxx"
 
@@ -43,7 +44,7 @@ namespace tools {
  */
 class HAlarm {
 private:
-	timer_t _timer;
+	i64_t _timer;
 	yaal::hcore::HLock _lock;
 	M_YAAL_TOOLS_PUBLIC_API static yaal::hcore::HMutex _mutex;
 public:

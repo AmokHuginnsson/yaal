@@ -79,7 +79,12 @@ int clock_gettime( clockid_t, struct timespec* );
 #endif /* #if ! defined( HAVE_CLOCK_GETTIME ) */
 
 #if ! defined( HAVE_TIMER_CREATE )
+#include<ctime>
 typedef void* timer_t;
+struct itimerspec {
+	struct timespec it_interval;  /* Timer interval */
+	struct timespec it_value;     /* Initial expiration */
+};
 int timer_create( clockid_t, struct sigevent*, timer_t* );
 int timer_settime( timer_t, int, struct itimerspec const *, struct itimerspec* );
 int timer_delete( timer_t );
