@@ -319,20 +319,31 @@ AC_CHECK_HEADERS([valgrind/memcheck.h])
 if test ["$_CONSOLE_MOUSE"] = [""] -a ["$CONSOLE_MOUSE"] = ["yes"] ; then
 	AC_MSG_ERROR([Cannot continue without console mouse support.])
 fi
-CXXFLAGS=["$CXXFLAGS -I/usr/include/libxml2"]
-CPPFLAGS=["$CXXFLAGS"]
-AC_CHECK_HEADERS([libxml2/libxml/xmlversion.h],
-	EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/usr/include/libxml2"],
-	[
-		CXXFLAGS=$CXXFLAGS_ORIG
-		CPPFLAGS=$CPPFLAGS_ORIG
-		unset ac_cv_header_libxml2_libxml_xmlversion_h
-		CXXFLAGS=["$CXXFLAGS -I/usr/local/include/libxml2"]
-		CPPFLAGS=["$CXXFLAGS"]
-		AC_CHECK_HEADERS([libxml2/libxml/xmlversion.h],
-			EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/usr/local/include/libxml2"],
-			[AC_MSG_ERROR([Cannot continue without XML development files.])])
-	])
+if test ["x${HOST_OS_TYPE}"] != ["xDarwin"] ; then
+	CXXFLAGS=["$CXXFLAGS -I/usr/include/libxml2"]
+	CPPFLAGS=["$CXXFLAGS"]
+	AC_CHECK_HEADERS(
+		[libxml/xmlversion.h],
+		EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/usr/include/libxml2"], [
+			CXXFLAGS=$CXXFLAGS_ORIG
+			CPPFLAGS=$CPPFLAGS_ORIG
+			unset ac_cv_header_libxml_xmlversion_h
+			CXXFLAGS=["$CXXFLAGS -I/usr/local/include/libxml2"]
+			CPPFLAGS=["$CXXFLAGS"]
+			AC_CHECK_HEADERS([libxml/xmlversion.h],
+				EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/usr/local/include/libxml2"],
+				[AC_MSG_ERROR([Cannot continue without XML development files.])])
+		]
+	)
+else
+	CXXFLAGS=["$CXXFLAGS -I/opt/local/include/libxml2"]
+	CPPFLAGS=["$CXXFLAGS"]
+	AC_CHECK_HEADERS(
+		[libxml/xmlversion.h],
+		EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/opt/local/include/libxml2"],
+		[AC_MSG_ERROR([Cannot continue without XML development files.])]
+	)
+fi
 CXXFLAGS=$CXXFLAGS_ORIG
 CPPFLAGS=$CPPFLAGS_ORIG
 AC_CHECK_HEADERS([ncurses/curses.h],_NCURSES_HEADER=['ncurses/curses.h'],
