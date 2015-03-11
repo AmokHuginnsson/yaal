@@ -431,9 +431,8 @@ private:
 	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
 	execution_steps_t _executionSteps;
 	int _position;
-	HHuginn* _huginn;
 public:
-	HExpression( HHuginn*, int = 0 );
+	HExpression( int = 0 );
 	int position( void ) const;
 	void set_position( int );
 	void add_execution_step( execution_step_t const& );

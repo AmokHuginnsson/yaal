@@ -861,7 +861,7 @@ HHuginn::OCompiler::OScopeContext::OScopeContext( HHuginn* huginn_ )
 	: _huginn( huginn_ ),
 	_scope( make_pointer<HScope>() ),
 	_expressionsStack() {
-	_expressionsStack.emplace( 1, make_pointer<HExpression>( huginn_ ) );
+	_expressionsStack.emplace( 1, make_pointer<HExpression>() );
 	return;
 }
 
@@ -877,7 +877,7 @@ void HHuginn::OCompiler::OScopeContext::clear( void ) {
 	M_PROLOG
 	_scope = make_pointer<HScope>();
 	_expressionsStack.clear();
-	_expressionsStack.emplace( 1, make_pointer<HExpression>( _huginn ) );
+	_expressionsStack.emplace( 1, make_pointer<HExpression>() );
 	return;
 	M_EPILOG
 }
@@ -1037,7 +1037,7 @@ void HHuginn::OCompiler::commit_scope( executing_parser::position_t ) {
 
 void HHuginn::OCompiler::reset_expression( void ) {
 	M_PROLOG
-	current_expression() = make_pointer<HExpression>( _huginn );
+	current_expression() = make_pointer<HExpression>();
 	OFunctionContext& fc( f() );
 	M_ASSERT( fc._operations.is_empty() );
 	fc._valueTypes.clear();
@@ -1047,7 +1047,7 @@ void HHuginn::OCompiler::reset_expression( void ) {
 
 void HHuginn::OCompiler::start_subexpression( executing_parser::position_t position_ ) {
 	M_PROLOG
-	f()._compilationStack.top()._context._expressionsStack.emplace( 1, make_pointer<HExpression>( _huginn, position_.get() ) );
+	f()._compilationStack.top()._context._expressionsStack.emplace( 1, make_pointer<HExpression>( position_.get() ) );
 	return;
 	M_EPILOG
 }
@@ -1055,7 +1055,7 @@ void HHuginn::OCompiler::start_subexpression( executing_parser::position_t posit
 void HHuginn::OCompiler::add_subexpression( OPERATOR op_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	fc._compilationStack.top()._context._expressionsStack.top().emplace_back( make_pointer<HExpression>( _huginn, position_.get() ) );
+	fc._compilationStack.top()._context._expressionsStack.top().emplace_back( make_pointer<HExpression>( position_.get() ) );
 	fc._operations.emplace( op_, position_.get() );
 	return;
 	M_EPILOG
@@ -3266,11 +3266,10 @@ void HHuginn::HStatement::execute( HHuginn::HThread* thread_ ) const {
 	M_EPILOG
 }
 
-HHuginn::HExpression::HExpression( HHuginn* huginn_, int position_ )
+HHuginn::HExpression::HExpression( int position_ )
 	: HStatement(),
 	_executionSteps(),
-	_position( position_ ),
-	_huginn( huginn_ ) {
+	_position( position_ ) {
 	return;
 }
 
