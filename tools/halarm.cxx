@@ -41,7 +41,7 @@ namespace yaal {
 
 namespace tools {
 
-static_assert( sizeof ( timer_t ) <= sizeof ( void* ), "timer handle too big" );
+static_assert( sizeof ( timer_t ) <= sizeof ( HAlarm::timer_handle_t ), "timer handle too big" );
 
 namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"

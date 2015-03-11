@@ -43,12 +43,14 @@ namespace tools {
 /*! \brief HAlarm class provides automatic registration and deregistration of system alerts.
  */
 class HAlarm {
+public:
+	typedef HAlarm this_type;
+	typedef i64_t timer_handle_t;
 private:
-	i64_t _timer;
+	timer_handle_t _timer;
 	yaal::hcore::HLock _lock;
 	M_YAAL_TOOLS_PUBLIC_API static yaal::hcore::HMutex _mutex;
 public:
-	typedef HAlarm this_type;
 	/*! \brief Register an alarm.
 	 *
 	 * miliseconds_ - alarm shall come in miliseconds_ miliseconds.
