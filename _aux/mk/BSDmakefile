@@ -1,6 +1,8 @@
-.sinclude ".my_make"
-
-MAKE?=gmake
+.if exists(.my_make)
+.include ".my_make"
+.else
+MAKE=gmake
+.endif
 
 .PHONY: doc tags
 
