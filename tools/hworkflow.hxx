@@ -28,6 +28,7 @@ Copyright:
 #define YAAL_TOOLS_HWORKFLOW_HXX_INCLUDED 1
 
 #include "hcore/hpointer.hxx"
+#include "hcore/hresource.hxx"
 #include "hcore/hboundcall.hxx"
 #include "hcore/hthread.hxx"
 #include "hcore/hlist.hxx"
@@ -41,16 +42,21 @@ namespace tools {
 class HWorkFlowInterface {
 public:
 	typedef HWorkFlowInterface this_type;
-	typedef yaal::hcore::HBoundCall<> task_t;
+	class HTask;
+	typedef yaal::hcore::HBoundCall<> call_t;
+	typedef yaal::hcore::HBoundCall<bool()> want_restart_t;
+	typedef yaal::hcore::HResource<HTask> task_t;
 	virtual ~HWorkFlowInterface( void ){}
 	task_t pop_task( void );
+	void push_task( task_t );
 private:
 	virtual task_t do_pop_task( void ) = 0;
+	virtual void do_push_task( task_t ) = 0;
 };
 
 typedef yaal::hcore::HExceptionT<HWorkFlowInterface> HWorkFlowInterfaceException;
 
-/*! \brief Thread pool idiom implementation.
+/*! \brief Thread Pool idiom implementation.
  */
 class HWorkFlow : public HWorkFlowInterface {
 public:
@@ -58,13 +64,31 @@ public:
 	typedef HWorkFlowInterface base_type;
 	typedef yaal::hcore::HPointer<HWorkFlow> ptr_t;
 	class HWorker;
-	typedef yaal::hcore::HPointer<HWorker> worker_ptr_t;
+	typedef yaal::hcore::HResource<HWorker> worker_t;
+	/*! \brief Current state of HWorkFlow.
+	 */
+	enum class STATE {
+		RUNNING, /*!< This HWorkFlow is working normally. */
+		STOPPING, /*!< This HWorkFlow is currently being stopped but new tasks can be scheduled. */
+		ABORTING, /*!< This HWorkFlow is being aborted right now, new tasks are rejected. */
+		STOPPED, /*!< This HWorkFlow is stopped now, no tasks are running but new tasks can be scheduled. */
+		CLOSED /*!< This HWorkFlow is stopped now, new tasks are rejected. */
+	};
+	/*! \brief Mode for winding up HWorkFlow.
+	 */
+	enum class WINDUP_MODE {
+		ABORT, /*!< Try to interrupt currently running tasks, drop (abort) scheduled tasks, new tasks are rejected. _state -> ABORTING */
+		INTERRUPT, /*!< Interrupt currently running tasks, keep scheduled tasks, new tasks can be scheduled. _state -> STOPPING */
+		SUSPEND, /*!< Finish currently runing tasks normally, new tasks can be scheduled. _state -> STOPPING */
+		CLOSE /*!< Finish currently runing tasks normally, new tasks are rejected. _state -> STOPPING */
+	};
 private:
-	typedef yaal::hcore::HList<worker_ptr_t> pool_t;
+	typedef yaal::hcore::HList<worker_t> pool_t;
 	typedef yaal::hcore::HList<task_t> queue_t;
 	int _workerPoolSize;
 	int _activeWorkers;
 	int _busyWorkers;
+	STATE _state;
 	/*! Tasks executors.
 	 */
 	pool_t _pool;
@@ -88,16 +112,38 @@ public:
 	/*! \brief Schedule execution of task in this worker pool.
 	 *
 	 * \param task - task to execute by this worker pool.
+	 * \param asyncStop - how to notify executing task that it should stop its execution.
+	 * \param wantRestart - test telling if task should be restarted if stopped by asyncStop.
 	 */
-	void push_task( task_t task );
+	void push_task( call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
 	/*! \brief Cancel all scheduled tasks.
 	 *
 	 * Cancel execution of all scheduled tasks that were not started yet.
 	 * Tasks that already started are bound to finish normally.
 	 */
 	void cancel_all( void );
+	/*! \brief Restart execution of tasks scheduled in this HWorkFlow.
+	 *
+	 * \throw HWorkFlowException on parallel start.
+	 */
+	void start( void );
+	/*! \brief Windup all scheduled tasks.
+	 *
+	 * Join all currently running threads and handle
+	 * scheduled tasks.
+	 *
+	 * Winding up can be performed in several modes (see #WINDUP_MODE).
+	 *
+	 * Warning: If you windup with SUSPEND or CLOSE mode and have
+	 * permanently running task then your program will hang indefinitely.
+	 *
+	 * \param windupMode - mode of tasks winding up.
+	 * \throw HWorkFlowException on parallel stop.
+	 */
+	void windup( WINDUP_MODE windupMode );
 private:
 	virtual task_t do_pop_task( void );
+	virtual void do_push_task( task_t );
 };
 
 typedef yaal::hcore::HExceptionT<HWorkFlow, HWorkFlowInterfaceException> HWorkFlowException;
@@ -110,16 +156,20 @@ public:
 private:
 	HWorkFlowInterface* _workFlow;
 	yaal::hcore::HThread _thread;
+	HWorkFlow::STATE _state;
+	HWorkFlowInterface::task_t _task;
+	yaal::hcore::HMutex _mutex;
 private:
 	HWorker( HWorkFlowInterface* );
 	void spawn( void );
 	void finish( void );
+	void async_stop( HWorkFlow::STATE );
 	void run( void );
 	HWorker( HWorker const& );
 	HWorker& operator = ( HWorker const& );
 	friend class HWorkFlow;
 	template<typename tType, typename... arg_t>
-	friend yaal::hcore::HPointer<tType> yaal::hcore::make_pointer( arg_t&&... );
+	friend yaal::hcore::HResource<tType> yaal::hcore::make_resource( arg_t&&... );
 };
 
 typedef yaal::hcore::HExceptionT<HWorkFlow::HWorker> HWorkerException;

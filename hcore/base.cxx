@@ -41,7 +41,7 @@ using namespace yaal::hcore;
 
 namespace yaal {
 
-bool _isKilled_ = false;
+exit_flag_t _isKilled_{ false };
 
 template<>
 bool is_hexadecimal( HString const& str_ ) {

@@ -34,6 +34,8 @@ Copyright:
 #ifndef YAAL_HCORE_BASE_HXX_INCLUDED
 #define YAAL_HCORE_BASE_HXX_INCLUDED 1
 
+#include <atomic>
+
 #include "hcore/compat.hxx"
 #include "hcore/macro.hxx"
 
@@ -55,7 +57,8 @@ Copyright:
  */
 namespace yaal {
 
-extern M_YAAL_HCORE_PUBLIC_API bool _isKilled_;
+typedef std::atomic<bool> exit_flag_t;
+extern M_YAAL_HCORE_PUBLIC_API exit_flag_t _isKilled_;
 
 struct LexicalCast {};
 
