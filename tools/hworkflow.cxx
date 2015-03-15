@@ -129,7 +129,7 @@ void HWorkFlow::do_push_task( task_t task_ ) {
 		++ _busyWorkers;
 	}
 	if ( ( _state == STATE::ABORTING ) || ( _state == STATE::CLOSED ) ) {
-		throw HWorkFlowException( "No accepting new tasks." );
+		throw HWorkFlowException( "Not accepting new tasks." );
 	}
 	_queue.emplace_back( yaal::move( task_ ) );
 	_semaphore.signal();
@@ -200,6 +200,20 @@ HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void ) {
 	_semaphore.wait();
 	HLock l( _mutex );
 	M_ASSERT( ( _state != STATE::CLOSED ) && ( _state != STATE::STOPPED ) );
+	/*
+	 * It is possible for HWorker to get one task of the queue
+	 * and execute it even if windup(WINDUP_MODE::INTERRUPT) was invoked before.
+	 * This is expected and correct behavior.
+	 *
+	 * To prevent this we would have to either check for
+	 * _state in HWorker::run() just after pop_task()
+	 * and possibly re-push task to the queue,
+	 * or add additional STATE == STATE::INTERRUPTING.
+	 *
+	 * We cannot deny HWorker getting vaild task of the queue
+	 * on _state == STATE::STOPPING if we want to support WINDUP_MODE::SUSPEND
+	 * and WINDUP_MODE::CLOSE.
+	 */
 	if ( ! _queue.is_empty() && ( _state != STATE::ABORTING ) ) {
 		t = yaal::move( _queue.front() );
 		_queue.pop_front();
