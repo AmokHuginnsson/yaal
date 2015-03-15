@@ -102,7 +102,13 @@ HWorkFlow::HWorkFlow( int workerPoolSize_ )
 
 HWorkFlow::~HWorkFlow( void ) {
 	M_PROLOG
-	windup( WINDUP_MODE::CLOSE );
+	M_ASSERT( ( _state == STATE::RUNNING ) || ( _state == STATE::STOPPED ) );
+	if ( ( _state == STATE::STOPPED ) && ! _queue.is_empty() ) {
+		start();
+	}
+	if ( _state == STATE::RUNNING ) {
+		windup( WINDUP_MODE::CLOSE );
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }
