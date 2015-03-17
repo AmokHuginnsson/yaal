@@ -125,6 +125,9 @@ void HWorkFlow::do_push_task( task_t task_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	M_ASSERT( _busyWorkers <= _activeWorkers );
+	if ( ( _state == STATE::ABORTING ) || ( _state == STATE::CLOSED ) ) {
+		throw HWorkFlowException( "Not accepting new tasks." );
+	}
 	if ( ( _state == STATE::RUNNING )
 		&& ( _busyWorkers == _activeWorkers )
 		&& ( _activeWorkers < _workerPoolSize ) ) {
@@ -133,9 +136,6 @@ void HWorkFlow::do_push_task( task_t task_ ) {
 		_pool.emplace_back( yaal::move( w ) );
 		++ _activeWorkers;
 		++ _busyWorkers;
-	}
-	if ( ( _state == STATE::ABORTING ) || ( _state == STATE::CLOSED ) ) {
-		throw HWorkFlowException( "Not accepting new tasks." );
 	}
 	_queue.emplace_back( yaal::move( task_ ) );
 	_semaphore.signal();
@@ -171,7 +171,14 @@ void HWorkFlow::windup( WINDUP_MODE windupMode_ ) {
 		if ( _state != STATE::RUNNING ) {
 			throw HWorkFlowException( "Parallel stop." );
 		}
-		_state = ( windupMode_ == WINDUP_MODE::ABORT ) ? STATE::ABORTING : STATE::STOPPING;
+		switch ( windupMode_ ) {
+			case ( WINDUP_MODE::ABORT ): _state = STATE::ABORTING; break;
+			case ( WINDUP_MODE::INTERRUPT ): _state = STATE::INTERRUPTING; break;
+			case ( WINDUP_MODE::SUSPEND ):
+			case ( WINDUP_MODE::CLOSE ): {
+				_state = STATE::STOPPING;
+			} break;
+		}
 	}
 	if ( ( windupMode_ == WINDUP_MODE::ABORT ) || ( windupMode_ == WINDUP_MODE::INTERRUPT ) ) {
 		for ( worker_t& w : _pool ) {
@@ -206,21 +213,7 @@ HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void ) {
 	_semaphore.wait();
 	HLock l( _mutex );
 	M_ASSERT( ( _state != STATE::CLOSED ) && ( _state != STATE::STOPPED ) );
-	/*
-	 * It is possible for HWorker to get one task of the queue
-	 * and execute it even if windup(WINDUP_MODE::INTERRUPT) was invoked before.
-	 * This is expected and correct behavior.
-	 *
-	 * To prevent this we would have to either check for
-	 * _state in HWorker::run() just after pop_task()
-	 * and possibly re-push task to the queue,
-	 * or add additional STATE == STATE::INTERRUPTING.
-	 *
-	 * We cannot deny HWorker getting vaild task of the queue
-	 * on _state == STATE::STOPPING if we want to support WINDUP_MODE::SUSPEND
-	 * and WINDUP_MODE::CLOSE.
-	 */
-	if ( ! _queue.is_empty() && ( _state != STATE::ABORTING ) ) {
+	if ( ! _queue.is_empty() && ( ( _state == STATE::RUNNING ) || ( _state == STATE::STOPPING ) ) ) {
 		t = yaal::move( _queue.front() );
 		_queue.pop_front();
 		++ _busyWorkers;
@@ -240,8 +233,11 @@ HWorkFlow::HWorker::HWorker( HWorkFlowInterface* workFlow_ )
 
 void HWorkFlow::HWorker::spawn( void ) {
 	M_PROLOG
-	_state = HWorkFlow::STATE::RUNNING;
-	_thread.spawn( call( &HWorkFlow::HWorker::run, this ) );
+	HLock l( _mutex );
+	if ( _state == HWorkFlow::STATE::STOPPED ) {
+		_state = HWorkFlow::STATE::RUNNING;
+		_thread.spawn( call( &HWorkFlow::HWorker::run, this ) );
+	}
 	return;
 	M_EPILOG
 }
@@ -273,18 +269,18 @@ void HWorkFlow::HWorker::run( void ) {
 		HTask* t( nullptr );
 		/* Pop task. */ {
 			HLock l( _mutex );
-			_task =_workFlow->pop_task();
 			if ( ! _task ) {
-				break;
+				_task =_workFlow->pop_task();
+				if ( ! _task ) {
+					break;
+				}
 			}
 			t = _task.raw();
 		}
 		t->call();
 		HLock l( _mutex );
 		if ( _state != HWorkFlow::STATE::ABORTING ) {
-			if ( _task->want_restart() ) {
-				_workFlow->push_task( yaal::move( _task ) );
-			} else {
+			if ( ! _task->want_restart() ) {
 				_task.reset();
 			}
 			if ( _state != HWorkFlow::STATE::RUNNING ) {

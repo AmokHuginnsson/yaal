@@ -70,6 +70,7 @@ public:
 	enum class STATE {
 		RUNNING, /*!< This HWorkFlow is working normally. */
 		STOPPING, /*!< This HWorkFlow is currently being stopped but new tasks can be scheduled. */
+		INTERRUPTING, /*!< This HWorkFlow is currently being stopped but new tasks can be scheduled. */
 		ABORTING, /*!< This HWorkFlow is being aborted right now, new tasks are rejected. */
 		STOPPED, /*!< This HWorkFlow is stopped now, no tasks are running but new tasks can be scheduled. */
 		CLOSED /*!< This HWorkFlow is stopped now, new tasks are rejected. */
@@ -78,7 +79,7 @@ public:
 	 */
 	enum class WINDUP_MODE {
 		ABORT, /*!< Try to interrupt currently running tasks, drop (abort) scheduled tasks, new tasks are rejected. _state -> ABORTING */
-		INTERRUPT, /*!< Interrupt currently running tasks, keep scheduled tasks, new tasks can be scheduled. _state -> STOPPING */
+		INTERRUPT, /*!< Interrupt currently running tasks, keep scheduled tasks, new tasks can be scheduled. _state -> INTERRUPTING */
 		SUSPEND, /*!< Finish currently runing tasks normally, new tasks can be scheduled. _state -> STOPPING */
 		CLOSE /*!< Finish currently runing tasks normally, new tasks are rejected. _state -> STOPPING */
 	};
