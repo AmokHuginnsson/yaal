@@ -117,12 +117,6 @@ public:
 	 * \param wantRestart - test telling if task should be restarted if stopped by asyncStop.
 	 */
 	void push_task( call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
-	/*! \brief Cancel all scheduled tasks.
-	 *
-	 * Cancel execution of all scheduled tasks that were not started yet.
-	 * Tasks that already started are bound to finish normally.
-	 */
-	void cancel_all( void );
 	/*! \brief Restart execution of tasks scheduled in this HWorkFlow.
 	 *
 	 * \throw HWorkFlowException on parallel start.

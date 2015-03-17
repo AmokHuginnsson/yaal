@@ -102,7 +102,7 @@ HWorkFlow::HWorkFlow( int workerPoolSize_ )
 
 HWorkFlow::~HWorkFlow( void ) {
 	M_PROLOG
-	M_ASSERT( ( _state == STATE::RUNNING ) || ( _state == STATE::STOPPED ) );
+	M_ASSERT( ( _state == STATE::RUNNING ) || ( _state == STATE::STOPPED ) || ( _state == STATE::CLOSED ) );
 	if ( ( _state == STATE::STOPPED ) && ! _queue.is_empty() ) {
 		start();
 	}
@@ -143,17 +143,10 @@ void HWorkFlow::do_push_task( task_t task_ ) {
 	M_EPILOG
 }
 
-void HWorkFlow::cancel_all( void ) {
-	M_PROLOG
-	HLock l( _mutex );
-	_queue.clear();
-	M_EPILOG
-}
-
 void HWorkFlow::start( void ) {
 	M_PROLOG
 	HLock l( _mutex );
-	if ( _state != STATE::STOPPED ) {
+	if ( ( _state != STATE::STOPPED ) && ( _state != STATE::CLOSED ) ) {
 		throw HWorkFlowException( "Parallel start." );
 	}
 	_state = STATE::RUNNING;
@@ -185,19 +178,18 @@ void HWorkFlow::windup( WINDUP_MODE windupMode_ ) {
 			w->async_stop( _state );
 		}
 	}
-	if ( _state == STATE::ABORTING ) {
-		cancel_all();
-	}
 	for ( int i( 0 ), SIZE( static_cast<int>( _pool.get_size() ) ); i < SIZE; ++ i ) {
 		_semaphore.signal();
 	}
 	for ( worker_t& w : _pool ) {
 		w->finish();
 	}
-	/* Set state. */ {
-		HLock l( _mutex );
-		_state = ( ( windupMode_ == WINDUP_MODE::INTERRUPT ) || ( windupMode_ == WINDUP_MODE::SUSPEND ) ) ? STATE::STOPPED : STATE::CLOSED;
+	HLock l( _mutex );
+	if ( _state == STATE::ABORTING ) {
+		_semaphore.reset();
+		_queue.clear();
 	}
+	_state = ( ( windupMode_ == WINDUP_MODE::INTERRUPT ) || ( windupMode_ == WINDUP_MODE::SUSPEND ) ) ? STATE::STOPPED : STATE::CLOSED;
 	return;
 	M_EPILOG
 }
