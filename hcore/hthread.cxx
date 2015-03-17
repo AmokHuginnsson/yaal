@@ -70,8 +70,14 @@ void do_pthread_attr_destroy( void* attr ) {
 
 
 HThread::HThread( void )
-	: _status( DEAD ), _buf( chunk_size<pthread_t>( 1 ) + chunk_size<pthread_attr_t>( 1 ) ),
-	_mutex( HMutex::TYPE::RECURSIVE ), _semaphore(), _resGuard(), _call(), _id( INVALID ), _exceptionInfo() {
+	: _status( DEAD )
+	, _buf( chunk_size<pthread_t>( 1 ) + chunk_size<pthread_attr_t>( 1 ) )
+	, _mutex( HMutex::TYPE::RECURSIVE )
+	, _semaphore()
+	, _resGuard()
+	, _call()
+	, _id( INVALID )
+	, _exceptionInfo() {
 	M_PROLOG
 	pthread_attr_t* attr( static_cast<pthread_attr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_t ) ) ) );
 	M_ENSURE( ::pthread_attr_init( attr ) == 0 );
@@ -79,8 +85,9 @@ HThread::HThread( void )
 	M_ENSURE( pthread_attr_getstacksize( attr, &stackSize ) == 0 );
 	log( LOG_TYPE::DEBUG ) << "Default thread stack size: " << stackSize
 		<< " and we will use: " << ( _threadStackSize ? _threadStackSize : static_cast<int>( stackSize ) ) << endl;
-	if ( _threadStackSize > 0 )
+	if ( _threadStackSize > 0 ) {
 		M_ENSURE( pthread_attr_setstacksize( attr, static_cast<size_t>( _threadStackSize ) ) == 0 );
+	}
 	HResource<void, void (*)( void* )> res( attr, do_pthread_attr_destroy );
 	_resGuard.swap( res );
 	M_ENSURE( ::pthread_attr_setdetachstate( attr, PTHREAD_CREATE_JOINABLE ) == 0 );
@@ -105,8 +112,9 @@ HThread::~HThread( void ) {
 void HThread::spawn( call_t call_ ) {
 	M_PROLOG
 	HLock lock( _mutex );
-	if ( _status != DEAD )
+	if ( _status != DEAD ) {
 		M_THROW( _( "thread is already running or spawning" ), _status );
+	}
 	_status = SPAWNING;
 	_call = call_;
 	M_ENSURE( ::pthread_create( _buf.get<pthread_t>(),
@@ -129,8 +137,9 @@ void HThread::schedule_finish( void ) {
 void HThread::finish( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
-	if ( ( _status != ALIVE ) && ( _status != ZOMBIE ) && ( _status != SPAWNING ) )
+	if ( ( _status != ALIVE ) && ( _status != ZOMBIE ) && ( _status != SPAWNING ) ) {
 		M_THROW( _( "thread is not running" ), _status );
+	}
 	schedule_finish();
 	_mutex.unlock();
 	_semaphore.wait();
@@ -138,8 +147,9 @@ void HThread::finish( void ) {
 	void* returnValue( NULL );
 	M_ENSURE( ::pthread_join( *_buf.get<pthread_t>(), &returnValue ) == 0 );
 	_status = DEAD;
-	if ( _exceptionInfo._stacked )
+	if ( _exceptionInfo._stacked ) {
 		throw HThreadException( _exceptionInfo._message, _exceptionInfo._code );
+	}
 	return;
 	M_EPILOG
 }
@@ -277,12 +287,15 @@ void do_pthread_mutexattr_destroy( void* attr ) {
 
 }
 
-HMutex::HMutex( TYPE::mutex_type_t const type_ ) : _type( type_ ),
-	_buf( chunk_size<pthread_mutex_t>( 1 ) + chunk_size<pthread_mutexattr_t>( 1 ) ),
-	_resGuard(), _owner( HThread::INVALID ) {
+HMutex::HMutex( TYPE::mutex_type_t const type_ )
+	: _type( type_ )
+	, _buf( chunk_size<pthread_mutex_t>( 1 ) + chunk_size<pthread_mutexattr_t>( 1 ) )
+	, _resGuard()
+	, _owner( HThread::INVALID ) {
 	M_PROLOG
-	if ( _type == TYPE::DEFAULT )
+	if ( _type == TYPE::DEFAULT ) {
 		_type = TYPE::NON_RECURSIVE;
+	}
 	pthread_mutexattr_t* attr( static_cast<pthread_mutexattr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_mutex_t ) ) ) );
 	::pthread_mutexattr_init( attr );
 	HResource<void, void (*)( void* )> res( attr, do_pthread_mutexattr_destroy );
@@ -360,19 +373,20 @@ public:
 private:
 	sem_t _sem;
 public:
-	HPosixSemaphore( void );
+	HPosixSemaphore( int );
 	virtual ~HPosixSemaphore( void );
 private:
 	virtual void do_wait( void );
 	virtual void do_signal( void );
+	virtual void do_reset( int );
 	HPosixSemaphore( HPosixSemaphore const& );
 	HPosixSemaphore& operator = ( HPosixSemaphore const& );
 };
 
-HPosixSemaphore::HPosixSemaphore( void )
+HPosixSemaphore::HPosixSemaphore( int value_ )
 	: _sem() {
 	M_PROLOG
-	M_ENSURE( ::sem_init( &_sem, 0, 0 ) == 0 );
+	M_ENSURE( ::sem_init( &_sem, 0, value_ ) == 0 );
 	return;
 	M_EPILOG
 }
@@ -398,6 +412,14 @@ void HPosixSemaphore::do_signal( void ) {
 	M_EPILOG
 }
 
+void HPosixSemaphore::do_reset( int value_ ) {
+	M_PROLOG
+	M_ENSURE( ::sem_destroy( &_sem ) == 0 );
+	M_ENSURE( ::sem_init( &_sem, 0, value_ ) == 0 );
+	return;
+	M_EPILOG
+}
+
 #endif /* #ifdef HAVE_SEM_INIT */
 
 void HSemaphoreImplementationInterface::wait( void ) {
@@ -414,6 +436,13 @@ void HSemaphoreImplementationInterface::signal( void ) {
 	M_EPILOG
 }
 
+void HSemaphoreImplementationInterface::reset( int value_ ) {
+	M_PROLOG
+	do_reset( value_ );
+	return;
+	M_EPILOG
+}
+
 class HYaalSemaphore : public HSemaphoreImplementationInterface {
 public:
 	typedef HYaalSemaphore this_type;
@@ -423,17 +452,20 @@ private:
 	HCondition _cond;
 	int long _count;
 public:
-	HYaalSemaphore( void );
+	HYaalSemaphore( int );
 	virtual ~HYaalSemaphore( void );
 private:
 	virtual void do_wait( void );
 	virtual void do_signal( void );
+	virtual void do_reset( int );
 	HYaalSemaphore( HYaalSemaphore const& );
 	HYaalSemaphore& operator = ( HYaalSemaphore const& );
 };
 
-HYaalSemaphore::HYaalSemaphore( void )
-	: _mutex(), _cond( _mutex ), _count( 0 ) {
+HYaalSemaphore::HYaalSemaphore( int value_ )
+	: _mutex()
+	, _cond( _mutex )
+	, _count( value_ ) {
 	return;
 }
 
@@ -448,6 +480,7 @@ void HYaalSemaphore::do_wait( void ) {
 		-- _count;
 	else {
 		do {
+			/* Inside cond.wait() mutex is unlocked. */
 			_cond.wait( 0x1fffffff, 0 );
 		} while ( ! _count );
 		-- _count;
@@ -465,14 +498,23 @@ void HYaalSemaphore::do_signal( void ) {
 	M_EPILOG
 }
 
-HSemaphore::HSemaphore( TYPE::type_t type_ )
+void HYaalSemaphore::do_reset( int value_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	_count = value_;
+	return;
+	M_EPILOG
+}
+
+HSemaphore::HSemaphore( int value_, TYPE::type_t type_ )
 	: _impl() {
 #ifdef HAVE_SEM_INIT
-	_impl = ( type_ == TYPE::POSIX ? semaphore_implementation_t( new ( memory::yaal ) HPosixSemaphore() ) : semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore() ) );
+	_impl = ( type_ == TYPE::POSIX ? semaphore_implementation_t( new ( memory::yaal ) HPosixSemaphore( value_ ) ) : semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore( value_ ) ) );
 #else /* #ifdef HAVE_SEM_INIT */
-	_impl = semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore() );
+	_impl = semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore( value_ ) );
 	static_cast<void>( type_ );
 #endif /* #else #ifdef HAVE_SEM_INIT */
+	return;
 }
 
 HSemaphore::~HSemaphore( void ) {
@@ -493,8 +535,16 @@ void HSemaphore::signal( void ) {
 	M_EPILOG
 }
 
+void HSemaphore::reset( int value_ ) {
+	M_PROLOG
+	_impl->reset( value_ );
+	return;
+	M_EPILOG
+}
+
 HCondition::HCondition( HMutex& mutex_ )
-	: _buf( chunk_size<pthread_cond_t>( 1 ) + chunk_size<pthread_condattr_t>( 1 ) ), _mutex( mutex_ ) {
+	: _buf( chunk_size<pthread_cond_t>( 1 ) + chunk_size<pthread_condattr_t>( 1 ) )
+	, _mutex( mutex_ ) {
 	M_PROLOG
 	pthread_condattr_t* attr( static_cast<pthread_condattr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_cond_t ) ) ) );
 	::pthread_condattr_init( attr );
@@ -608,7 +658,9 @@ void HEvent::signal( void ) {
 }
 
 HReadWriteLock::HReadWriteLock( void )
-	: _mutex(), _buf( chunk_size<pthread_rwlock_t>( 1 ) + chunk_size<pthread_rwlockattr_t>( 1 ) ), _lockInfo() {
+	: _mutex()
+	, _buf( chunk_size<pthread_rwlock_t>( 1 ) + chunk_size<pthread_rwlockattr_t>( 1 ) )
+	, _lockInfo() {
 	pthread_rwlockattr_t* attr( static_cast<pthread_rwlockattr_t*>( static_cast<void*>( _buf.get<char>() + sizeof ( pthread_rwlock_t ) ) ) );
 	M_ENSURE( ::pthread_rwlockattr_init( attr ) == 0 );
 	M_ENSURE( ::pthread_rwlock_init( _buf.get<pthread_rwlock_t>(), attr ) == 0 );

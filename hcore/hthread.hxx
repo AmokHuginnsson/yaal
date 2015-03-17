@@ -92,13 +92,15 @@ private:
 class HSemaphoreImplementationInterface {
 	typedef HSemaphoreImplementationInterface this_type;
 public:
-	HSemaphoreImplementationInterface( void ) {}
+	HSemaphoreImplementationInterface() {}
 	virtual ~HSemaphoreImplementationInterface( void ) {}
 	void wait( void );
 	void signal( void );
+	void reset( int );
 private:
 	virtual void do_wait( void ) = 0;
 	virtual void do_signal( void ) = 0;
+	virtual void do_reset( int ) = 0;
 	HSemaphoreImplementationInterface( HSemaphoreImplementationInterface const& );
 	HSemaphoreImplementationInterface& operator = ( HSemaphoreImplementationInterface const& );
 };
@@ -123,10 +125,11 @@ public:
 private:
 	semaphore_implementation_t _impl;
 public:
-	HSemaphore( TYPE::type_t = DEFAULT );
+	HSemaphore( int = 0, TYPE::type_t = DEFAULT );
 	virtual ~HSemaphore( void );
 	void wait( void );
 	void signal( void );
+	void reset( int = 0 );
 private:
 	HSemaphore( HSemaphore const& );
 	HSemaphore& operator = ( HSemaphore const& );
