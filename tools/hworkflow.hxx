@@ -148,18 +148,21 @@ typedef yaal::hcore::HExceptionT<HWorkFlow, HWorkFlowInterfaceException> HWorkFl
 class HWorkFlow::HWorker {
 public:
 	typedef HWorker this_type;
+	typedef std::atomic<bool> task_flag_t;
 private:
 	HWorkFlowInterface* _workFlow;
 	yaal::hcore::HThread _thread;
 	HWorkFlow::STATE _state;
 	HWorkFlowInterface::task_t _task;
-	yaal::hcore::HMutex _mutex;
+	task_flag_t _hasTask;
+	mutable yaal::hcore::HMutex _mutex;
 private:
 	HWorker( HWorkFlowInterface* );
 	void spawn( void );
 	void finish( void );
 	void async_stop( HWorkFlow::STATE );
 	void run( void );
+	bool has_task( void ) const;
 	HWorker( HWorker const& );
 	HWorker& operator = ( HWorker const& );
 	friend class HWorkFlow;

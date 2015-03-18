@@ -320,8 +320,9 @@ HMutex::~HMutex( void ) {
 void HMutex::lock( void ) {
 	M_PROLOG
 	int error = ::pthread_mutex_lock( _buf.get<pthread_mutex_t>() );
-	if ( ! ( _type & TYPE::RECURSIVE ) )
+	if ( ! ( _type & TYPE::RECURSIVE ) ) {
 		M_ENSURE( error != EDEADLK );
+	}
 	_owner = HThread::get_current_thread_id();
 	return;
 	M_EPILOG
