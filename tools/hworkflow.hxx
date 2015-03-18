@@ -71,8 +71,9 @@ public:
 		RUNNING, /*!< This HWorkFlow is working normally. */
 		STOPPING, /*!< This HWorkFlow is currently being stopped but new tasks can be scheduled. */
 		INTERRUPTING, /*!< This HWorkFlow is currently being stopped but new tasks can be scheduled. */
-		ABORTING, /*!< This HWorkFlow is being aborted right now, new tasks are rejected. */
 		STOPPED, /*!< This HWorkFlow is stopped now, no tasks are running but new tasks can be scheduled. */
+		ABORTING, /*!< This HWorkFlow is being aborted right now, new tasks are rejected. */
+		CLOSING, /*!< This HWorkFlow is currently being stopped but new tasks are rejected. */
 		CLOSED /*!< This HWorkFlow is stopped now, new tasks are rejected. */
 	};
 	/*! \brief Mode for winding up HWorkFlow.
@@ -87,7 +88,6 @@ private:
 	typedef yaal::hcore::HList<worker_t> pool_t;
 	typedef yaal::hcore::HList<task_t> queue_t;
 	int _workerPoolSize;
-	int _activeWorkers;
 	int _busyWorkers;
 	STATE _state;
 	/*! Tasks executors.
@@ -132,10 +132,21 @@ public:
 	 * Warning: If you windup with SUSPEND or CLOSE mode and have
 	 * permanently running task then your program will hang indefinitely.
 	 *
+	 * When this method return all threads are joined.
+	 *
 	 * \param windupMode - mode of tasks winding up.
 	 * \throw HWorkFlowException on parallel stop.
 	 */
 	void windup( WINDUP_MODE windupMode );
+	/*! \brief Just like windoup(...) but not wait for threads to join.
+	 */
+	void schedule_windup( WINDUP_MODE windupMode );
+	/*! \brief Join all threads.
+	 */
+	void join( void );
+	/*! \brief Tell if calling join() would be a non-blocking call.
+	 */
+	bool can_join( void );
 private:
 	virtual task_t do_pop_task( void );
 	virtual void do_push_task( task_t );
@@ -148,13 +159,14 @@ typedef yaal::hcore::HExceptionT<HWorkFlow, HWorkFlowInterfaceException> HWorkFl
 class HWorkFlow::HWorker {
 public:
 	typedef HWorker this_type;
-	typedef std::atomic<bool> task_flag_t;
+	typedef std::atomic<bool> async_flag_t;
 private:
 	HWorkFlowInterface* _workFlow;
 	yaal::hcore::HThread _thread;
 	HWorkFlow::STATE _state;
 	HWorkFlowInterface::task_t _task;
-	task_flag_t _hasTask;
+	async_flag_t _hasTask;
+	async_flag_t _canJoin;
 	mutable yaal::hcore::HMutex _mutex;
 private:
 	HWorker( HWorkFlowInterface* );
@@ -163,6 +175,7 @@ private:
 	void async_stop( HWorkFlow::STATE );
 	void run( void );
 	bool has_task( void ) const;
+	bool can_join( void ) const;
 	HWorker( HWorker const& );
 	HWorker& operator = ( HWorker const& );
 	friend class HWorkFlow;

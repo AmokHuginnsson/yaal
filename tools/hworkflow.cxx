@@ -87,7 +87,6 @@ void HWorkFlowInterface::push_task( task_t task_ ) {
 
 HWorkFlow::HWorkFlow( int workerPoolSize_ )
 	: _workerPoolSize( workerPoolSize_ )
-	, _activeWorkers( 0 )
 	, _busyWorkers( 0 )
 	, _state( STATE::RUNNING )
 	, _pool()
@@ -147,17 +146,17 @@ void HWorkFlow::push_task( call_t task_, call_t asyncStop_, want_restart_t wantR
 void HWorkFlow::do_push_task( task_t task_ ) {
 	M_PROLOG
 	HLock l( _mutex );
-	M_ASSERT( _busyWorkers <= _activeWorkers );
-	if ( ( _state == STATE::ABORTING ) || ( _state == STATE::CLOSED ) ) {
+	int activeWorkers( static_cast<int>( _pool.get_size() ) );
+	M_ASSERT( _busyWorkers <= activeWorkers );
+	if ( ( _state == STATE::ABORTING ) || ( _state == STATE::CLOSING ) || ( _state == STATE::CLOSED ) ) {
 		throw HWorkFlowException( "Not accepting new tasks." );
 	}
 	if ( ( _state == STATE::RUNNING )
-		&& ( _busyWorkers == _activeWorkers )
-		&& ( _activeWorkers < _workerPoolSize ) ) {
+		&& ( _busyWorkers == activeWorkers )
+		&& ( activeWorkers < _workerPoolSize ) ) {
 		worker_t w( make_resource<HWorker>( this ) );
 		w->spawn();
 		_pool.emplace_back( yaal::move( w ) );
-		++ _activeWorkers;
 		++ _busyWorkers;
 	}
 	_queue.emplace_back( yaal::move( task_ ) );
@@ -173,6 +172,12 @@ void HWorkFlow::start( void ) {
 		throw HWorkFlowException( "Parallel start." );
 	}
 	_state = STATE::RUNNING;
+	int activeWorkers( static_cast<int>( _pool.get_size() ) );
+	for ( int i( activeWorkers ); i < min( _workerPoolSize, static_cast<int>( _queue.get_size() ) ); ++ i ) {
+		worker_t w( make_resource<HWorker>( this ) );
+		_pool.emplace_back( yaal::move( w ) );
+		++ _busyWorkers;
+	}
 	for ( worker_t& w : _pool ) {
 		w->spawn();
 	}
@@ -180,7 +185,7 @@ void HWorkFlow::start( void ) {
 	M_EPILOG
 }
 
-void HWorkFlow::windup( WINDUP_MODE windupMode_ ) {
+void HWorkFlow::schedule_windup( WINDUP_MODE windupMode_ ) {
 	M_PROLOG
 	/* Set state. */ {
 		HLock l( _mutex );
@@ -190,10 +195,8 @@ void HWorkFlow::windup( WINDUP_MODE windupMode_ ) {
 		switch ( windupMode_ ) {
 			case ( WINDUP_MODE::ABORT ): _state = STATE::ABORTING; break;
 			case ( WINDUP_MODE::INTERRUPT ): _state = STATE::INTERRUPTING; break;
-			case ( WINDUP_MODE::SUSPEND ):
-			case ( WINDUP_MODE::CLOSE ): {
-				_state = STATE::STOPPING;
-			} break;
+			case ( WINDUP_MODE::SUSPEND ): _state = STATE::STOPPING; break;
+			case ( WINDUP_MODE::CLOSE ): _state = STATE::CLOSING; break;
 		}
 	}
 	for ( int i( 0 ), SIZE( static_cast<int>( _pool.get_size() ) ); i < SIZE; ++ i ) {
@@ -204,6 +207,13 @@ void HWorkFlow::windup( WINDUP_MODE windupMode_ ) {
 			w->async_stop( _state );
 		}
 	}
+	return;
+	M_EPILOG
+}
+
+void HWorkFlow::join() {
+	M_PROLOG
+	M_ASSERT( ( _state == STATE::ABORTING ) || ( _state == STATE::INTERRUPTING ) || ( _state == STATE::STOPPING ) || ( _state == STATE::CLOSING ) );
 	for ( worker_t& w : _pool ) {
 		w->finish();
 	}
@@ -212,7 +222,31 @@ void HWorkFlow::windup( WINDUP_MODE windupMode_ ) {
 		_semaphore.reset();
 		_queue.clear();
 	}
-	_state = ( ( windupMode_ == WINDUP_MODE::INTERRUPT ) || ( windupMode_ == WINDUP_MODE::SUSPEND ) ) ? STATE::STOPPED : STATE::CLOSED;
+	_state = ( ( _state == STATE::INTERRUPTING ) || ( _state == STATE::STOPPING ) ) ? STATE::STOPPED : STATE::CLOSED;
+	return;
+	M_EPILOG
+}
+
+bool HWorkFlow::can_join( void ) {
+	M_PROLOG
+	HLock l( _mutex );
+	bool canJoin( ( _state == STATE::ABORTING ) || ( _state == STATE::INTERRUPTING ) || ( _state == STATE::STOPPING ) || ( _state == STATE::CLOSING ) );
+	if ( canJoin ) {
+		for ( worker_t& w : _pool ) {
+			if ( ! w->can_join() ) {
+				canJoin = false;
+				break;
+			}
+		}
+	}
+	return ( canJoin );
+	M_EPILOG
+}
+
+void HWorkFlow::windup( WINDUP_MODE windupMode_ ) {
+	M_PROLOG
+	schedule_windup( windupMode_ );
+	join();
 	return;
 	M_EPILOG
 }
@@ -228,7 +262,7 @@ HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void ) {
 	HLock l( _mutex );
 	M_ASSERT( ( _state != STATE::CLOSED ) && ( _state != STATE::STOPPED ) );
 	HWorkFlow::task_t t;
-	if ( ! _queue.is_empty() && ( ( _state == STATE::RUNNING ) || ( _state == STATE::STOPPING ) ) ) {
+	if ( ! _queue.is_empty() && ( ( _state == STATE::RUNNING ) || ( _state == STATE::STOPPING ) || ( _state == STATE::CLOSING ) ) ) {
 		t = yaal::move( _queue.front() );
 		_queue.pop_front();
 		++ _busyWorkers;
@@ -243,6 +277,7 @@ HWorkFlow::HWorker::HWorker( HWorkFlowInterface* workFlow_ )
 	, _state{ HWorkFlow::STATE::STOPPED }
 	, _task()
 	, _hasTask{ false }
+	, _canJoin{ true }
 	, _mutex() {
 	return;
 }
@@ -283,10 +318,16 @@ bool HWorkFlow::HWorker::has_task( void ) const {
 	M_EPILOG
 }
 
+bool HWorkFlow::HWorker::can_join( void ) const {
+	M_PROLOG
+	return ( _canJoin );
+	M_EPILOG
+}
+
 void HWorkFlow::HWorker::run( void ) {
 	M_PROLOG
 	HThread::set_name( "HWorkFlow" );
-	HWorkFlow::task_t task;
+	_canJoin = false;
 	while ( ! _isKilled_ ) {
 		HTask* t( nullptr );
 		/* Pop task. */ {
@@ -296,7 +337,6 @@ void HWorkFlow::HWorker::run( void ) {
 				if ( ! _task ) {
 					break;
 				}
-				_hasTask = true;
 			}
 			t = _task.raw();
 		}
@@ -306,6 +346,8 @@ void HWorkFlow::HWorker::run( void ) {
 			if ( ! _task->want_restart() ) {
 				_task.reset();
 				_hasTask = false;
+			} else {
+				_hasTask = true;
 			}
 			if ( _state != HWorkFlow::STATE::RUNNING ) {
 				break;
@@ -316,6 +358,7 @@ void HWorkFlow::HWorker::run( void ) {
 			break;
 		}
 	}
+	_canJoin = true;
 	return;
 	M_EPILOG
 }
