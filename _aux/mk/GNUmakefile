@@ -10,5 +10,5 @@ default .DEFAULT doc tags:
 	@$(MAKE) -f _aux/mk/master.mk $(@)
 
 .my_make:
-	@./_aux/guess_make
+	@./_aux/guess-make
 

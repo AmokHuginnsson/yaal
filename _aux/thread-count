@@ -1,0 +1,26 @@
+#! /bin/sh
+
+HOST_OS_TYPE=`uname -s`
+
+THREAD_COUNT=1
+
+case "${HOST_OS_TYPE}" in
+	FreeBSD)
+		THREAD_COUNT=`/sbin/sysctl -n hw.ncpu`
+	;;
+	Linux|CYGWIN*)
+		THREAD_COUNT=`nproc`
+	;;
+	SunOS)
+		THREAD_COUNT=`kstat -m cpu_info|grep -w core_id|uniq|wc -l`
+	;;
+	Darwin)
+		THREAD_COUNT=`/usr/sbin/sysctl -n hw.ncpu`
+	;;
+	*)
+	;;
+esac
+
+echo "${THREAD_COUNT}"
+
+exit 0

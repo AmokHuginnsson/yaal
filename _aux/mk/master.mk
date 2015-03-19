@@ -2,6 +2,8 @@ include _aux/mk/0_sanity.mk
 -include .my_make
 COMMA=,
 include _aux/mk/2_term.mk
+THREAD_COUNT=$(shell ./_aux/thread-count)
+MAKEFLAGS+=$(shell echo '$(THREAD_COUNT)' | awk '/^[0-9]+$$/{if ( $$1 > 1 ) { print "-j"$$1 } }')
 
 define PREPARE_MAIN_TARGET
 $(1): build/$(1)/Makefile.mk build/$(1)/config.hxx $$(if $$(wildcard yaalrc.in),build/$(1)/yaalrc build/$(1)/yaal.pc)
@@ -127,7 +129,7 @@ help:
 # all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov coverage-stats debug dep distclean doc help install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prepare-coverage-baseline prof purge static stats tags uninstall
 
 .my_make:
-	@./_aux/guess_make
+	@./_aux/guess-make
 
 local.mk:
 
