@@ -100,9 +100,9 @@ HThread::~HThread( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
 	if ( _status != DEAD ) {
-		_mutex.unlock();
+		lock.unlock();
 		finish();
-		_mutex.lock();
+		lock.lock();
 	}
 	M_ASSERT( _status == DEAD );
 	return;
@@ -141,9 +141,9 @@ void HThread::finish( void ) {
 		M_THROW( _( "thread is not running" ), _status );
 	}
 	schedule_finish();
-	_mutex.unlock();
+	lock.unlock();
 	_semaphore.wait();
-	_mutex.lock();
+	lock.lock();
 	void* returnValue( NULL );
 	M_ENSURE( ::pthread_join( *_buf.get<pthread_t>(), &returnValue ) == 0 );
 	_status = DEAD;
@@ -177,12 +177,12 @@ void* HThread::SPAWN( void* thread_ ) {
 	 * So again:
 	 *
 	 * In case of `exception in destructor' without library intervention
-	 * thery is a chance to continue normal execution, so we finish gracefuly
+	 * there is a chance to continue normal execution, so we finish gracefully
 	 * via kill_interior().
 	 *
 	 * In case of `exception in thread' there is no chance to continue
 	 * normal execution without library intervention,
-	 * so we die via apropriate fatal signal.
+	 * so we die via appropriate fatal signal.
 	 */
 	try {
 		reinterpret_cast<HThread*>( thread_ )->control();
@@ -351,18 +351,40 @@ void HMutex::reown( void ) {
 	M_EPILOG
 }
 
-HLock::HLock( HMutex& mutex_ ) : _mutex( mutex_ ) {
+HLock::HLock( HMutex& mutex_ )
+	: _mutex( mutex_ )
+	, _locked( false ) {
 	M_PROLOG
 	_mutex.lock();
+	_locked = true;
 	return;
 	M_EPILOG
 }
 
 HLock::~HLock( void ) {
 	M_PROLOG
-	_mutex.unlock();
+	if ( _locked ) {
+		_mutex.unlock();
+		_locked = false;
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
+}
+
+void HLock::lock( void ) {
+	M_PROLOG
+	_mutex.lock();
+	_locked = true;
+	return;
+	M_EPILOG
+}
+
+void HLock::unlock( void ) {
+	M_PROLOG
+	_mutex.unlock();
+	_locked = false;
+	return;
+	M_EPILOG
 }
 
 #ifdef HAVE_SEM_INIT
@@ -572,11 +594,11 @@ static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
  * Read it or die!
  *
  * When ::pthread_cond_wait() is invoked, calling thread releases mutex
- * and goes to sleep, then scheduler (when she sees it as apriopriate)
+ * and goes to sleep, then scheduler (when she sees it as appropriate)
  * switches tasks. In the second task ::pthread_cond_signal() is called ...
- * Here comes important part: scheduler does not neceserily switches task
+ * Here comes important part: scheduler does not necessarily switches task
  * right back, it means that more than one call to ::pthread_cond_signal()
- * may occure in sequence, and all signals, that are send before scheduler
+ * may occur in sequence, and all signals, that are send before scheduler
  * switches back to task one, when ::pthread_cond_wait() may lock again,
  * are lost!
  */
@@ -598,7 +620,7 @@ HCondition::status_t HCondition::wait( int long unsigned timeOutSeconds_,
 	}
 	error = ::pthread_cond_timedwait( _buf.get<pthread_cond_t>(),
 				_mutex._buf.get<pthread_mutex_t>(), &timeOut );
-	/* We need to make sure that mutex owner is reset to proper value, as HCondition::signal() invoker undoubtfuly modified it. */
+	/* We need to make sure that mutex owner is reset to proper value, as HCondition::signal() invoker undoubtedly modified it. */
 	_mutex.reown();
 	/* Error code is not stored in errno but is explicitly returned. */
 	HScopedValueReplacement<int> saveErrno( errno, error );

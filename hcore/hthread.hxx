@@ -233,10 +233,16 @@ typedef HExceptionT<HThread> HThreadException;
  * Scope based automation of locking and unlocking of Mutexes.
  */
 class HLock {
+public:
+	typedef HLock this_type;
+private:
 	HMutex& _mutex;
+	bool _locked;
 public:
 	explicit HLock( HMutex& );
 	virtual ~HLock( void );
+	void lock( void );
+	void unlock( void );
 private:
 	HLock( HLock const& );
 	HLock& operator = ( HLock const& );
