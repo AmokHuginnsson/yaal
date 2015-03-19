@@ -201,11 +201,11 @@ void HWorkFlow::join() {
 	M_PROLOG
 	HLock l( _mutex );
 	M_ASSERT( ( _state == STATE::ABORTING ) || ( _state == STATE::INTERRUPTING ) || ( _state == STATE::STOPPING ) || ( _state == STATE::CLOSING ) );
-	_mutex.unlock();
+	l.unlock();
 	for ( worker_t& w : _pool ) {
 		w->finish();
 	}
-	_mutex.lock();
+	l.lock();
 	if ( _state == STATE::ABORTING ) {
 		_semaphore.reset();
 		_queue.clear();
@@ -244,9 +244,9 @@ HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void ) {
 	HLock l( _mutex );
 	M_ASSERT( ( _state != STATE::CLOSED ) && ( _state != STATE::STOPPED ) );
 	-- _busyWorkers;
-	_mutex.unlock();
+	l.unlock();
 	_semaphore.wait();
-	_mutex.lock();
+	l.lock();
 	M_ASSERT( ( _state != STATE::CLOSED ) && ( _state != STATE::STOPPED ) );
 	HWorkFlow::task_t t;
 	if ( ! _queue.is_empty() && ( ( _state == STATE::RUNNING ) || ( _state == STATE::STOPPING ) || ( _state == STATE::CLOSING ) ) ) {
@@ -318,9 +318,9 @@ void HWorkFlow::HWorker::run( void ) {
 	while ( ! _isKilled_ ) {
 		HLock l( _mutex );
 		if ( ! _task ) {
-			_mutex.unlock();
+			l.unlock();
 			task_t t =_workFlow->pop_task();
-			_mutex.lock();
+			l.lock();
 			if ( !! t ) {
 				_task = yaal::move( t );
 				_hasTask = true;
@@ -329,9 +329,9 @@ void HWorkFlow::HWorker::run( void ) {
 			}
 		}
 		HTask* t( _task.raw() );
-		_mutex.unlock();
+		l.unlock();
 		t->call();
-		_mutex.lock();
+		l.lock();
 		if ( _state != HWorkFlow::STATE::ABORTING ) {
 			if ( ! _task->want_restart() ) {
 				_task.reset();
