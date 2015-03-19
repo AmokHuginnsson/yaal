@@ -48,10 +48,8 @@ public:
 	typedef yaal::hcore::HResource<HTask> task_t;
 	virtual ~HWorkFlowInterface( void ){}
 	task_t pop_task( void );
-	void push_task( task_t );
 private:
 	virtual task_t do_pop_task( void ) = 0;
-	virtual void do_push_task( task_t ) = 0;
 };
 
 typedef yaal::hcore::HExceptionT<HWorkFlowInterface> HWorkFlowInterfaceException;
@@ -149,7 +147,6 @@ public:
 	bool can_join( void );
 private:
 	virtual task_t do_pop_task( void );
-	virtual void do_push_task( task_t );
 };
 
 typedef yaal::hcore::HExceptionT<HWorkFlow, HWorkFlowInterfaceException> HWorkFlowException;

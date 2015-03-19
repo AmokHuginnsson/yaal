@@ -78,13 +78,6 @@ HWorkFlowInterface::task_t HWorkFlowInterface::pop_task( void ) {
 	M_EPILOG
 }
 
-void HWorkFlowInterface::push_task( task_t task_ ) {
-	M_PROLOG
-	do_push_task( yaal::move( task_ ) );
-	return;
-	M_EPILOG
-}
-
 HWorkFlow::HWorkFlow( int workerPoolSize_ )
 	: _workerPoolSize( workerPoolSize_ )
 	, _busyWorkers( 0 )
@@ -137,14 +130,6 @@ HWorkFlow::~HWorkFlow( void ) {
 
 void HWorkFlow::push_task( call_t task_, call_t asyncStop_, want_restart_t wantRestart_ ) {
 	M_PROLOG
-	task_t t( make_resource<HTask>( task_, asyncStop_, wantRestart_ ) );
-	do_push_task( yaal::move( t ) );
-	return;
-	M_EPILOG
-}
-
-void HWorkFlow::do_push_task( task_t task_ ) {
-	M_PROLOG
 	HLock l( _mutex );
 	int activeWorkers( static_cast<int>( _pool.get_size() ) );
 	M_ASSERT( _busyWorkers <= activeWorkers );
@@ -159,7 +144,8 @@ void HWorkFlow::do_push_task( task_t task_ ) {
 		_pool.emplace_back( yaal::move( w ) );
 		++ _busyWorkers;
 	}
-	_queue.emplace_back( yaal::move( task_ ) );
+	task_t t( make_resource<HTask>( task_, asyncStop_, wantRestart_ ) );
+	_queue.emplace_back( yaal::move( t ) );
 	_semaphore.signal();
 	return;
 	M_EPILOG
