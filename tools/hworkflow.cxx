@@ -199,11 +199,13 @@ void HWorkFlow::schedule_windup( WINDUP_MODE windupMode_ ) {
 
 void HWorkFlow::join() {
 	M_PROLOG
+	HLock l( _mutex );
 	M_ASSERT( ( _state == STATE::ABORTING ) || ( _state == STATE::INTERRUPTING ) || ( _state == STATE::STOPPING ) || ( _state == STATE::CLOSING ) );
+	_mutex.unlock();
 	for ( worker_t& w : _pool ) {
 		w->finish();
 	}
-	HLock l( _mutex );
+	_mutex.lock();
 	if ( _state == STATE::ABORTING ) {
 		_semaphore.reset();
 		_queue.clear();
@@ -239,13 +241,12 @@ void HWorkFlow::windup( WINDUP_MODE windupMode_ ) {
 
 HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void ) {
 	M_PROLOG
-	/* make worker as idle (not busy) */ {
-		HLock l( _mutex );
-		M_ASSERT( ( _state != STATE::CLOSED ) && ( _state != STATE::STOPPED ) );
-		-- _busyWorkers;
-	}
-	_semaphore.wait();
 	HLock l( _mutex );
+	M_ASSERT( ( _state != STATE::CLOSED ) && ( _state != STATE::STOPPED ) );
+	-- _busyWorkers;
+	_mutex.unlock();
+	_semaphore.wait();
+	_mutex.lock();
 	M_ASSERT( ( _state != STATE::CLOSED ) && ( _state != STATE::STOPPED ) );
 	HWorkFlow::task_t t;
 	if ( ! _queue.is_empty() && ( ( _state == STATE::RUNNING ) || ( _state == STATE::STOPPING ) || ( _state == STATE::CLOSING ) ) ) {
@@ -315,25 +316,26 @@ void HWorkFlow::HWorker::run( void ) {
 	HThread::set_name( "HWorkFlow" );
 	_canJoin = false;
 	while ( ! _isKilled_ ) {
-		HTask* t( nullptr );
-		/* Pop task. */ {
-			HLock l( _mutex );
-			if ( ! _task ) {
-				_task =_workFlow->pop_task();
-				if ( ! _task ) {
-					break;
-				}
-			}
-			t = _task.raw();
-		}
-		t->call();
 		HLock l( _mutex );
+		if ( ! _task ) {
+			_mutex.unlock();
+			task_t t =_workFlow->pop_task();
+			_mutex.lock();
+			if ( !! t ) {
+				_task = yaal::move( t );
+				_hasTask = true;
+			} else {
+				break;
+			}
+		}
+		HTask* t( _task.raw() );
+		_mutex.unlock();
+		t->call();
+		_mutex.lock();
 		if ( _state != HWorkFlow::STATE::ABORTING ) {
 			if ( ! _task->want_restart() ) {
 				_task.reset();
 				_hasTask = false;
-			} else {
-				_hasTask = true;
 			}
 			if ( _state != HWorkFlow::STATE::RUNNING ) {
 				break;
