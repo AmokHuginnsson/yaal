@@ -1067,6 +1067,8 @@ void HHuginn::OCompiler::commit_boolean( OPERATOR operator_, executing_parser::p
 	if ( fc._compilationStack.top()._context._expressionsStack.top().get_size() > 1 ) {
 		value_t And( make_pointer<HBooleanEvaluator>( fc._compilationStack.top()._context._expressionsStack.top(), operator_ ) );
 		fc._compilationStack.top()._context._expressionsStack.pop();
+		M_ASSERT( ! fc._valueTypes.is_empty() && fc._valueTypes.top() == TYPE::BOOLEAN );
+		fc._valueTypes.pop();
 		defer_store_direct( And, position_ );
 		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), operator_, _1, position_.get() ) );
 		defer_action( operator_ == OPERATOR::BOOLEAN_AND ? &HExpression::boolean_and : &HExpression::boolean_or, position_.get() );
@@ -1086,6 +1088,8 @@ void HHuginn::OCompiler::commit_ternary( executing_parser::position_t position_ 
 		M_ASSERT( exprs.get_size() == 3 );
 		value_t ternary( make_pointer<HTernaryEvaluator>( exprs[0], exprs[1], exprs[2] ) );
 		fc._compilationStack.top()._context._expressionsStack.pop();
+		M_ASSERT( ! fc._valueTypes.is_empty() && fc._valueTypes.top() == TYPE::UNKNOWN );
+		fc._valueTypes.pop();
 		defer_store_direct( ternary, position_ );
 		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), OPERATOR::TERNARY, _1, position_.get() ) );
 		defer_action( &HExpression::ternary, position_.get() );
