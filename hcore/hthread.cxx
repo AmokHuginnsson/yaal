@@ -499,15 +499,11 @@ HYaalSemaphore::~HYaalSemaphore( void ) {
 void HYaalSemaphore::do_wait( void ) {
 	M_PROLOG
 	HLock l( _mutex );
-	if ( _count > 0 )
-		-- _count;
-	else {
-		do {
-			/* Inside cond.wait() mutex is unlocked. */
-			_cond.wait( 0x1fffffff, 0 );
-		} while ( ! _count );
-		-- _count;
+	while ( _count == 0 ) {
+		/* Inside cond.wait() mutex is unlocked. */
+		_cond.wait( 0x1fffffff, 0 );
 	}
+	-- _count;
 	return;
 	M_EPILOG
 }
