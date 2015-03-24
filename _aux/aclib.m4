@@ -109,7 +109,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 	HOST_OS_TYPE=""
 	UNAME_OS_NAME="`uname -s`"
 	LIB_PREFIX=["lib"]
-	LIB_EXT=['"so"']
+	LIB_EXT=["so"]
 	EXE_SUFFIX=[""]
 	SYMBOL_PREFIX=['""']
 	if test ["x${UNAME_OS_NAME}"] = ["xLinux"] ; then
@@ -158,7 +158,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 		AC_DEFINE([__HOST_OS_TYPE_DARWIN__], [], [Your operating system is Darwin.])
 		HOST_OS_TYPE=[Darwin]
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,-undefined,dynamic_lookup"]
-		LIB_EXT=['"dylib"']
+		LIB_EXT=["dylib"]
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/tizen-release] ; then
 		AC_DEFINE([__HOST_OS_TYPE_TIZEN__], [], [Your operating system is Tizen.])
 		HOST_OS_TYPE=[Tizen]
@@ -168,13 +168,13 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(*)\$(LIB_INFIX).\$(LIB_ARCHIVE_SUFFIX)"]
 		HOST_OS_TYPE=[Cygwin]
 		LIB_PREFIX=["cyg"]
-		LIB_EXT=['"dll"']
+		LIB_EXT=["dll"]
 		TOOLS_LIBS=["${TOOLS_LIBS} -liconv"]
 	fi
 	AC_DEFINE_UNQUOTED([SYMBOL_PREFIX],${SYMBOL_PREFIX},[Symbol prefix used on this platform.])
 	AC_DEFINE_UNQUOTED([LIB_PREFIX],"${LIB_PREFIX}",[Dynamic library file name prefix used on this platform.])
 	AC_DEFINE_UNQUOTED([LIB_INFIX],"${LIB_INFIX}",[Target dependent library name infix.])
-	AC_DEFINE_UNQUOTED([LIB_EXT],${LIB_EXT},[Dynamic library file name extension used on this platform.])
+	AC_DEFINE_UNQUOTED([LIB_EXT],"${LIB_EXT}",[Dynamic library file name extension used on this platform.])
 	AC_DEFINE_UNQUOTED([EXE_SUFFIX],${EXE_SUFFIX},[Suffix used for binary program executable on this platform.])
 	AC_SUBST([LIB_EXT],[${LIB_EXT}])
 
@@ -199,10 +199,13 @@ AC_DEFUN([YAAL_DETECT_PHYSICAL_MEMORY], [
 			PHYS_MEM=`free -m | awk '/^Mem:/{print [$]2}'`
 		;;
 		xFreeBSD)
-			PHYS_MEM=`/sbin/sysctl hw.physmem | awk '{print int( [$]2 / 1024 / 1024 )}'`
+			PHYS_MEM=`/sbin/sysctl -n hw.physmem | awk '{print int( [$]1 / 1024 / 1024 )}'`
 		;;
 		xSolaris)
 			PHYS_MEM=`prtconf | awk '/Memory/{print [$]3}'`
+		;;
+		xDarwin)
+			PHYS_MEM=`/usr/sbin/sysctl -n hw.memsize | awk '{print int( [$]1 / 1024 / 1024 )}'`
 		;;
 	esac
 	AC_DEFINE_UNQUOTED([__PHYSICAL_MEMORY__], ${PHYS_MEM}, [Amount of physical memory on this system.])

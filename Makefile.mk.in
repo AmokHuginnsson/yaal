@@ -42,6 +42,7 @@ DIR_LOCALSTATE = $(DESTDIR)@localstatedir@
 DIR_HEADERS    = $(DESTDIR)@includedir@
 DIR_SHARE      = $(DESTDIR)@datarootdir@
 LIB_PREFIX     = @LIB_PREFIX@
+LIB_EXT        = @LIB_EXT@
 CXX            = @CXX@
 MKDIR_P        = @MKDIR_P@
 INSTALL        = @INSTALL@
@@ -84,15 +85,15 @@ DEPS_hdata     = $(TARGET_dbwrapper) $(TARGET_hconsole)
 LIBS_hdata     = $(LIBS_BASE) -l$(LIB_NAME)_hconsole$(LIB_INFIX) -l$(LIB_NAME)_dbwrapper$(LIB_INFIX) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) -lncurses @HCORE_LIBS@
 
 DEPS_sqlite3_driver    = $(TARGET_hcore)
-LIBS_sqlite3_driver    = $(LIBS_BASE) -lsqlite3 $(if $(findstring dll,@LIB_EXT@),-l$(LIB_NAME)_hcore$(LIB_INFIX))
+LIBS_sqlite3_driver    = $(LIBS_BASE) -lsqlite3 $(if $(findstring dll,$(LIB_EXT)),-l$(LIB_NAME)_hcore$(LIB_INFIX))
 DEPS_postgresql_driver = $(TARGET_hcore)
-LIBS_postgresql_driver = $(LIBS_BASE) -lpq $(if $(findstring dll,@LIB_EXT@),-l$(LIB_NAME)_hcore$(LIB_INFIX) -l$(LIB_NAME)_tools$(LIB_INFIX))
+LIBS_postgresql_driver = $(LIBS_BASE) -lpq $(if $(findstring dll,$(LIB_EXT)),-l$(LIB_NAME)_hcore$(LIB_INFIX) -l$(LIB_NAME)_tools$(LIB_INFIX))
 DEPS_mysql_driver      = $(TARGET_hcore)
-LIBS_mysql_driver      = @MYSQLCLIENT_LIBRARY@ $(if $(findstring dll,@LIB_EXT@),-l$(LIB_NAME)_hcore$(LIB_INFIX))
+LIBS_mysql_driver      = @MYSQLCLIENT_LIBRARY@ $(if $(findstring dll,$(LIB_EXT)),-l$(LIB_NAME)_hcore$(LIB_INFIX))
 DEPS_firebird_driver   = $(TARGET_hcore)
-LIBS_firebird_driver   = $(LIBS_BASE) -lfbclient $(if $(findstring dll,@LIB_EXT@),-l$(LIB_NAME)_hcore$(LIB_INFIX))
+LIBS_firebird_driver   = $(LIBS_BASE) -lfbclient $(if $(findstring dll,$(LIB_EXT)),-l$(LIB_NAME)_hcore$(LIB_INFIX))
 DEPS_oracle_driver     = $(TARGET_hcore)
-LIBS_oracle_driver     = $(LIBS_BASE) -lclntsh $(if $(findstring dll,@LIB_EXT@),-l$(LIB_NAME)_hcore$(LIB_INFIX) -l$(LIB_NAME)_tools$(LIB_INFIX))
+LIBS_oracle_driver     = $(LIBS_BASE) -lclntsh $(if $(findstring dll,$(LIB_EXT)),-l$(LIB_NAME)_hcore$(LIB_INFIX) -l$(LIB_NAME)_tools$(LIB_INFIX))
 
 -include $(DIR_ROOT)/local.mk
 
@@ -112,7 +113,7 @@ ifeq ($(LIB_PREFIX),lib)
 	$(call invoke,$(RANLIB) lib$(LIB_NAME)_$(*)$(LIB_INFIX).$(LIB_ARCHIVE_SUFFIX))
 endif # just to allow shared linking during the build
 	@$(call invoke,ln -sf lib$(LIB_NAME)_$(*)$(LIB_INFIX).so.$(RELEASE) lib$(LIB_NAME)_$(*)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION)) && \
-	$(call invoke,ln -sf lib$(LIB_NAME)_$(*)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) lib$(LIB_NAME)_$(*)$(LIB_INFIX).so) \
+	$(call invoke,ln -sf lib$(LIB_NAME)_$(*)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) lib$(LIB_NAME)_$(*)$(LIB_INFIX).$(LIB_EXT)) \
 	$(call msg,&& printf "%b$(NL)" "done.$(CL)")
 
 define INSTALL_TARGET
@@ -122,7 +123,7 @@ define INSTALL_TARGET
 	if [ "x$(LIB_PREFIX)" = "xlib" ] ; then \
 		$(call invoke,ln -sf lib$(LIB_NAME)_$(1)$(LIB_INFIX).so.$(RELEASE) $(DIR_LIB)/lib$(LIB_NAME)_$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) ) && \
 		$(call invoke,ln -sf lib$(LIB_NAME)_$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) $(DIR_LIB)/lib$(LIB_NAME)_$(1)$(LIB_INFIX).so.$(VERSION) ) && \
-		$(call invoke,ln -sf lib$(LIB_NAME)_$(1)$(LIB_INFIX).so.$(VERSION) $(DIR_LIB)/lib$(LIB_NAME)_$(1)$(LIB_INFIX).so ) ; \
+		$(call invoke,ln -sf lib$(LIB_NAME)_$(1)$(LIB_INFIX).so.$(VERSION) $(DIR_LIB)/lib$(LIB_NAME)_$(1)$(LIB_INFIX).$(LIB_EXT) ) ; \
 	fi && \
 	$(call msg,printf "%b$(NL)" "done.$(CL)" && )
 endef
@@ -133,7 +134,7 @@ define UNINSTALL_TARGET
 	$(call msg, printf "%b" "$(RS)" && ) \
 	if [ "x$(LIB_PREFIX)" = "xlib" ] ; then \
 		$(call invoke,/bin/rm -f $(DIR_LIB)/lib$(LIB_NAME)_$(1)$(LIB_INFIX).so.$(VERSION).$(SUBVERSION) \
-			$(DIR_LIB)/lib$(LIB_NAME)_$(1)$(LIB_INFIX).so.$(VERSION) $(DIR_LIB)/lib$(LIB_NAME)_$(1)$(LIB_INFIX).so ) ; \
+			$(DIR_LIB)/lib$(LIB_NAME)_$(1)$(LIB_INFIX).so.$(VERSION) $(DIR_LIB)/lib$(LIB_NAME)_$(1)$(LIB_INFIX).$(LIB_EXT) ) ; \
 	fi && \
 	$(call msg,printf "%b$(NL)" "done.$(CL)" && )
 endef
