@@ -9,7 +9,7 @@ syn keyword yaalKeyword child_kill_grace_period client_character_set collector_c
 syn keyword yaalKeyword command_compose_delay compression_buffer_size compression_level data_base_driver default_encoding
 syn keyword yaalKeyword disable_XON esc_delay exception_logging ignore_signal_SIGINT ignore_signal_SIGQUIT ignore_signal_SIGTSTP
 syn keyword yaalKeyword instance_name kill_grace_period latency log_mask on_alloc_failure resolve_hostnames screen_background
-syn keyword yaalKeyword semaphore_type serial_baudrate serial_device serial_flags ssl_cert ssl_key thread_stack_size
+syn keyword yaalKeyword serial_baudrate serial_device serial_flags ssl_cert ssl_key thread_stack_size
 syn keyword yaalKeyword use_mouse write_timeout
 syn keyword yaalCommand set_env
 syn keyword yaalColorRed RED

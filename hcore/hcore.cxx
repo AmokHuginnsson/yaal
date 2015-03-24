@@ -105,18 +105,6 @@ bool set_hcore_variables( HString& option_, HString& value_ ) {
 				fail = true;
 			}
 		}
-	} else if ( ! strcasecmp( option_, "semaphore_type" ) ) {
-		if ( value_ == "POSIX" ) {
-#ifdef HAVE_SEM_INIT
-			HSemaphore::DEFAULT = HSemaphore::TYPE::POSIX;
-#else /* #ifdef HAVE_SEM_INIT */
-			fail = true;
-#endif /* #else #ifdef HAVE_SEM_INIT */
-		} else if ( value_ == "YAAL" ) {
-			HSemaphore::DEFAULT = HSemaphore::TYPE::YAAL;
-		} else {
-			fail = true;
-		}
 	} else if ( ! strcasecmp( option_, "on_alloc_failure" ) ) {
 		if ( value_ == "ABORT" ) {
 			memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::ABORT;
@@ -285,7 +273,6 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 		( "ssl_cert", program_options_helper::option_value( HOpenSSL::_sSLCert ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Path to the OpenSSL certificate file.", "path" )
 		( "resolve_hostnames", program_options_helper::option_value( HSocket::_resolveHostnames ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Resolve IP address into host names." )
 		( "thread_stack_size", program_options_helper::option_value( HThread::_threadStackSize ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Set size of stack for newly created threads." )
-		( "semaphore_type", program_options_helper::option_value( dummy ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Default semaphore implementation type.", "type" )
 		( "on_alloc_failure", program_options_helper::option_value( dummy ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Memory allocation failure handling policy.", "policy" )
 		( "write_timeout", program_options_helper::option_value( _writeTimeout_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Time-out for low level write operations." )
 		( "exception_logging", program_options_helper::option_value( enableExceptionLogging ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "Enable automatic exception stack frames logging." );

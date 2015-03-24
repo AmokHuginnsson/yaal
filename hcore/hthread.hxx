@@ -48,7 +48,7 @@ typedef i64_t thread_id_t;
 }
 
 class HCondition;
-/*! \brief Implementation of multi-threaded synchronizing prymitive - Mutex.
+/*! \brief Implementation of multi-threaded synchronization primitive - Mutex.
  */
 class HMutex {
 public:
@@ -89,50 +89,64 @@ private:
 	/*}*/
 };
 
-class HSemaphoreImplementationInterface {
-	typedef HSemaphoreImplementationInterface this_type;
-public:
-	HSemaphoreImplementationInterface() {}
-	virtual ~HSemaphoreImplementationInterface( void ) {}
-	void wait( void );
-	void signal( void );
-	void reset( int );
-private:
-	virtual void do_wait( void ) = 0;
-	virtual void do_signal( void ) = 0;
-	virtual void do_reset( int ) = 0;
-	HSemaphoreImplementationInterface( HSemaphoreImplementationInterface const& );
-	HSemaphoreImplementationInterface& operator = ( HSemaphoreImplementationInterface const& );
-};
-
 typedef HExceptionT<HMutex> HMutexException;
 
-/*! \brief Multi-threaded synchronizing prymitive - Semaphore.
+/*! \brief Multi-threaded synchronization primitive - Conditional Variable.
+ */
+class HCondition {
+	typedef HCondition this_type;
+	HChunk _buf;
+	HMutex& _mutex;
+public:
+	typedef enum {
+		OK,
+		TIMEOUT,
+		INTERRUPT
+	} status_t;
+	HCondition( HMutex& );
+	virtual ~HCondition( void );
+	status_t wait( int long unsigned, int long unsigned );
+	void signal( void );
+	void broadcast( void );
+private:
+	HCondition( HCondition const& );
+	HCondition& operator = ( HCondition const& );
+};
+
+typedef HExceptionT<HCondition> HConditionException;
+
+/*! \brief Multi-threaded synchronization primitive - Semaphore.
  */
 class HSemaphore {
 public:
 	typedef HSemaphore this_type;
-	typedef HResource<HSemaphoreImplementationInterface> semaphore_implementation_t;
-	struct TYPE {
-		typedef enum {
-#ifdef HAVE_SEM_INIT
-			POSIX,
-#endif /* #ifdef HAVE_SEM_INIT */
-			YAAL
-		} type_t;
-	};
-	M_YAAL_HCORE_PUBLIC_API static TYPE::type_t DEFAULT;
 private:
-	semaphore_implementation_t _impl;
+	HMutex _mutex;
+	HCondition _cond;
+	int _count;
 public:
-	HSemaphore( int = 0, TYPE::type_t = DEFAULT );
-	virtual ~HSemaphore( void );
+	/*! \brief Create semaphore with specific value.
+	 *
+	 * \param value - initialize new HSemaphore object with this \p value.
+	 */
+	HSemaphore( int value = 0 );
+
+	/*! \brief Wait until semaphore is signaled.
+	 */
 	void wait( void );
+
+	/*! \brief Signal the semaphore.
+	 */
 	void signal( void );
+
+	/*! \brief Set new value for this semaphore to hold.
+	 *
+	 * \param value - set new \p value to be held by this semaphore.
+	 */
 	void reset( int = 0 );
 private:
-	HSemaphore( HSemaphore const& );
-	HSemaphore& operator = ( HSemaphore const& );
+	HSemaphore( HSemaphore const& ) = delete;
+	HSemaphore& operator = ( HSemaphore const& ) = delete;
 };
 
 typedef HExceptionT<HSemaphore> HSemaphoreException;
@@ -228,7 +242,7 @@ private:
 
 typedef HExceptionT<HThread> HThreadException;
 
-/*! \brief HLock Implementats automatic multi-threaded synchronizing prymitive.
+/*! \brief HLock Implementats automatic multi-threaded synchronization primitive.
  *
  * Scope based automation of locking and unlocking of Mutexes.
  */
@@ -248,30 +262,6 @@ private:
 	HLock& operator = ( HLock const& );
 };
 typedef HUniqueMovable<HLock> external_lock_t;
-
-/*! \brief Multi-threaded synchronizing prymitive - Conditional Variable.
- */
-class HCondition {
-	typedef HCondition this_type;
-	HChunk _buf;
-	HMutex& _mutex;
-public:
-	typedef enum {
-		OK,
-		TIMEOUT,
-		INTERRUPT
-	} status_t;
-	HCondition( HMutex& );
-	virtual ~HCondition( void );
-	status_t wait( int long unsigned, int long unsigned );
-	void signal( void );
-	void broadcast( void );
-private:
-	HCondition( HCondition const& );
-	HCondition& operator = ( HCondition const& );
-};
-
-typedef HExceptionT<HCondition> HConditionException;
 
 /*! \brief Asynchronous notification mechanizm.
  */

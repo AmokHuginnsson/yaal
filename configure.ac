@@ -441,14 +441,6 @@ AC_MSG_CHECKING([whether powl is available])
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cmath>
 									 int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }]])],
 	[AC_DEFINE([HAVE_POWL],[1],[We have ::powl().]) AC_MSG_RESULT([yes])], AC_MSG_RESULT([no]))
-CXXFLAGS=["$CXXFLAGS -Wall -Werror"]
-CPPFLAGS=["$CXXFLAGS"]
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <semaphore.h>
-									 int main( int, char** ) { ::sem_init( 0, 0, 0 ); return ( 0 ); }]])],
-	[AC_DEFINE([HAVE_SEM_INIT],[1],[We have ::sem_init().]) AC_MSG_RESULT([yes]); SEMAPHORE_TYPE=["POSIX"]], [AC_MSG_RESULT([no]); SEMAPHORE_TYPE=["YAAL"]])
-CXXFLAGS=$CXXFLAGS_ORIG
-CPPFLAGS=$CPPFLAGS_ORIG
-AC_SUBST([SEMAPHORE_TYPE],[${SEMAPHORE_TYPE}])
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 

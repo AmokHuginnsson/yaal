@@ -66,12 +66,6 @@ write_timeout 4000
 # in another words, 0 means do not alter stack size value
 thread_stack_size 0
 
-# semaphore_type
-# type: enumerator { POSIX, YAAL }, default: POSIX
-# semaphore_type selects preferred default semaphore implementation to be used by Yaal Threads.
-# valid semaphore types are: POSIX or YAAL.
-semaphore_type @SEMAPHORE_TYPE@
-
 # resolve_hostnames
 # type: bool, default true
 # resolve_hostnames switch enables/disables resolving IP address into host names.

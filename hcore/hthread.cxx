@@ -27,7 +27,6 @@ Copyright:
 #include <ctime> /* clock_gettime */
 #include <cstring>
 #include <pthread.h>
-#include <semaphore.h>
 #include <unistd.h>
 #include <libintl.h>
 
@@ -48,12 +47,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 namespace yaal {
 
 namespace hcore {
-
-#ifdef HAVE_SEM_INIT
-HSemaphore::TYPE::type_t HSemaphore::DEFAULT = HSemaphore::TYPE::POSIX;
-#else /* #ifdef HAVE_SEM_INIT */
-HSemaphore::TYPE::type_t HSemaphore::DEFAULT = HSemaphore::TYPE::YAAL;
-#endif /* #else #ifdef HAVE_SEM_INIT */
 
 int HThread::_threadStackSize = 0;
 
@@ -387,116 +380,14 @@ void HLock::unlock( void ) {
 	M_EPILOG
 }
 
-#ifdef HAVE_SEM_INIT
-
-class HPosixSemaphore : public HSemaphoreImplementationInterface {
-public:
-	typedef HPosixSemaphore this_type;
-	typedef HSemaphoreImplementationInterface base_type;
-private:
-	sem_t _sem;
-public:
-	HPosixSemaphore( int );
-	virtual ~HPosixSemaphore( void );
-private:
-	virtual void do_wait( void );
-	virtual void do_signal( void );
-	virtual void do_reset( int );
-	HPosixSemaphore( HPosixSemaphore const& );
-	HPosixSemaphore& operator = ( HPosixSemaphore const& );
-};
-
-HPosixSemaphore::HPosixSemaphore( int value_ )
-	: _sem() {
-	M_PROLOG
-	M_ENSURE( ::sem_init( &_sem, 0, value_ ) == 0 );
-	return;
-	M_EPILOG
-}
-
-HPosixSemaphore::~HPosixSemaphore( void ) {
-	M_PROLOG
-	M_ENSURE( ::sem_destroy( &_sem ) == 0 );
-	return;
-	M_DESTRUCTOR_EPILOG
-}
-
-void HPosixSemaphore::do_wait( void ) {
-	M_PROLOG
-	::sem_wait( &_sem ); /* Always returns 0. */
-	return;
-	M_EPILOG
-}
-
-void HPosixSemaphore::do_signal( void ) {
-	M_PROLOG
-	M_ENSURE( ::sem_post( &_sem ) == 0 );
-	return;
-	M_EPILOG
-}
-
-void HPosixSemaphore::do_reset( int value_ ) {
-	M_PROLOG
-	M_ENSURE( ::sem_destroy( &_sem ) == 0 );
-	M_ENSURE( ::sem_init( &_sem, 0, value_ ) == 0 );
-	return;
-	M_EPILOG
-}
-
-#endif /* #ifdef HAVE_SEM_INIT */
-
-void HSemaphoreImplementationInterface::wait( void ) {
-	M_PROLOG
-	do_wait();
-	return;
-	M_EPILOG
-}
-
-void HSemaphoreImplementationInterface::signal( void ) {
-	M_PROLOG
-	do_signal();
-	return;
-	M_EPILOG
-}
-
-void HSemaphoreImplementationInterface::reset( int value_ ) {
-	M_PROLOG
-	do_reset( value_ );
-	return;
-	M_EPILOG
-}
-
-class HYaalSemaphore : public HSemaphoreImplementationInterface {
-public:
-	typedef HYaalSemaphore this_type;
-	typedef HSemaphoreImplementationInterface base_type;
-private:
-	HMutex _mutex;
-	HCondition _cond;
-	int long _count;
-public:
-	HYaalSemaphore( int );
-	virtual ~HYaalSemaphore( void );
-private:
-	virtual void do_wait( void );
-	virtual void do_signal( void );
-	virtual void do_reset( int );
-	HYaalSemaphore( HYaalSemaphore const& );
-	HYaalSemaphore& operator = ( HYaalSemaphore const& );
-};
-
-HYaalSemaphore::HYaalSemaphore( int value_ )
+HSemaphore::HSemaphore( int value_ )
 	: _mutex()
 	, _cond( _mutex )
 	, _count( value_ ) {
 	return;
 }
 
-HYaalSemaphore::~HYaalSemaphore( void ) {
-	return;
-}
-
-void HYaalSemaphore::do_wait( void ) {
+void HSemaphore::wait( void ) {
 	M_PROLOG
 	HLock l( _mutex );
 	while ( _count == 0 ) {
@@ -508,7 +399,7 @@ void HYaalSemaphore::do_wait( void ) {
 	M_EPILOG
 }
 
-void HYaalSemaphore::do_signal( void ) {
+void HSemaphore::signal( void ) {
 	M_PROLOG
 	HLock l( _mutex );
 	++ _count;
@@ -517,46 +408,13 @@ void HYaalSemaphore::do_signal( void ) {
 	M_EPILOG
 }
 
-void HYaalSemaphore::do_reset( int value_ ) {
+void HSemaphore::reset( int value_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	_count = value_;
-	return;
-	M_EPILOG
-}
-
-HSemaphore::HSemaphore( int value_, TYPE::type_t type_ )
-	: _impl() {
-#ifdef HAVE_SEM_INIT
-	_impl = ( type_ == TYPE::POSIX ? semaphore_implementation_t( new ( memory::yaal ) HPosixSemaphore( value_ ) ) : semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore( value_ ) ) );
-#else /* #ifdef HAVE_SEM_INIT */
-	_impl = semaphore_implementation_t( new ( memory::yaal ) HYaalSemaphore( value_ ) );
-	static_cast<void>( type_ );
-#endif /* #else #ifdef HAVE_SEM_INIT */
-	return;
-}
-
-HSemaphore::~HSemaphore( void ) {
-	return;
-}
-
-void HSemaphore::wait( void ) {
-	M_PROLOG
-	_impl->wait();
-	return;
-	M_EPILOG
-}
-
-void HSemaphore::signal( void ) {
-	M_PROLOG
-	_impl->signal();
-	return;
-	M_EPILOG
-}
-
-void HSemaphore::reset( int value_ ) {
-	M_PROLOG
-	_impl->reset( value_ );
+	if ( _count > 0 ) {
+		_cond.broadcast();
+	}
 	return;
 	M_EPILOG
 }
