@@ -37,6 +37,7 @@ Copyright:
 #include "hcore/hstack.hxx"
 #include "hcore/hstreaminterface.hxx"
 #include "hcore/hthread.hxx"
+#include "hcore/htaggedpod.hxx"
 #include "tools/executingparser.hxx"
 
 namespace yaal {
@@ -48,9 +49,37 @@ namespace tools {
 class HHuginn {
 public:
 	typedef HHuginn this_type;
+	class HType {
+	public:
+		typedef HType this_type;
+		typedef HType const* type_t;
+		typedef yaal::hcore::HResource<HType const> type_holder_t;
+		typedef yaal::hcore::HTaggedPOD<int, HType> id_t;
+		typedef std::atomic<id_t::value_type> id_generator_t;
+		typedef yaal::hcore::HHashMap<yaal::hcore::HString, type_holder_t> type_dict_t;
+	private:
+		yaal::hcore::HString _name;
+		id_t _id;
+		static id_generator_t _idGenerator;
+		static type_dict_t _builtin;
+	public:
+		yaal::hcore::HString const& name( void ) const {
+			return ( _name );
+		}
+		id_t id( void ) const {
+			return ( _id );
+		}
+		static type_t register_type( yaal::hcore::HString const&, HHuginn* );
+		static int builtin_type_count( void );
+	private:
+		HType( yaal::hcore::HString const& );
+		HType( HType const& ) = delete;
+		HType& operator = ( HType const& ) = delete;
+		HType( HType&& ) = delete;
+		HType& operator = ( HType&& ) = delete;
+	};
+	typedef HType::type_t type_t;
 	typedef yaal::hcore::HPointer<HHuginn> ptr_t;
-	class HObject;
-	typedef yaal::hcore::HPointer<HObject> object_t;
 	class HIterable;
 	typedef yaal::hcore::HPointer<HIterable> iterable_t;
 	class HStatement;
@@ -64,6 +93,7 @@ public:
 	class HBreak;
 	class HReturn;
 	class HClass;
+	typedef yaal::hcore::HPointer<HClass> class_t;
 	class HMethod;
 	class HFunction;
 	class HReference;
@@ -121,20 +151,20 @@ public:
 		MAKE_MAP,
 		NONE
 	};
-	enum class TYPE {
-		NONE,
-		BOOLEAN,
-		INTEGER,
-		REAL,
-		STRING,
-		NUMBER,
-		CHARACTER,
-		LIST,
-		MAP,
-		REFERENCE,
-		FUNCTION_REFERENCE,
-		UNKNOWN,
-		NOT_BOOLEAN
+	struct TYPE {
+		static type_t const NONE;
+		static type_t const BOOLEAN;
+		static type_t const INTEGER;
+		static type_t const REAL;
+		static type_t const STRING;
+		static type_t const NUMBER;
+		static type_t const CHARACTER;
+		static type_t const LIST;
+		static type_t const MAP;
+		static type_t const REFERENCE;
+		static type_t const FUNCTION_REFERENCE;
+		static type_t const UNKNOWN;
+		static type_t const NOT_BOOLEAN;
 	};
 	struct OPositionedOperator {
 		OPERATOR _operator;
@@ -197,7 +227,7 @@ private:
 		};
 		struct OFunctionContext {
 			typedef yaal::hcore::HStack<OCompilationFrame> compilation_stack_t;
-			typedef yaal::hcore::HStack<TYPE> type_stack_t;
+			typedef yaal::hcore::HStack<type_t> type_stack_t;
 			yaal::hcore::HString _functionName;
 			parameter_names_t _parameters;
 			expressions_t _defaultValues;
@@ -220,17 +250,17 @@ private:
 		void set_for_identifier( yaal::hcore::HString const&, executing_parser::position_t );
 		void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
 		void verify_default_argument( executing_parser::position_t );
-		static bool is_numeric( TYPE );
-		static bool is_numeric_congruent( TYPE );
-		static bool is_summable( TYPE );
-		static bool is_comparable( TYPE );
-		static bool is_comparable_congruent( TYPE );
-		static bool is_boolean_congruent( TYPE );
-		static bool is_unknown( TYPE );
-		static bool is_reference_congruent( TYPE );
-		static bool is_integer_congruent( TYPE );
-		static bool are_congruous( TYPE, TYPE );
-		static TYPE congruent( TYPE, TYPE );
+		static bool is_numeric( type_t );
+		static bool is_numeric_congruent( type_t );
+		static bool is_summable( type_t );
+		static bool is_comparable( type_t );
+		static bool is_comparable_congruent( type_t );
+		static bool is_boolean_congruent( type_t );
+		static bool is_unknown( type_t );
+		static bool is_reference_congruent( type_t );
+		static bool is_integer_congruent( type_t );
+		static bool are_congruous( type_t, type_t );
+		static type_t congruent( type_t, type_t );
 		scope_t& current_scope( void );
 		expression_t& current_expression( void );
 		void reset_expression( void );
@@ -282,6 +312,7 @@ private:
 		OCompiler( OCompiler const& ) = delete;
 		OCompiler& operator = ( OCompiler const& ) = delete;
 	};
+	typedef yaal::hcore::HMap<yaal::hcore::HString, class_t> classes_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, function_t> functions_t;
 	struct STATE {
 		typedef enum {
@@ -293,6 +324,9 @@ private:
 		} state_t;
 	};
 	STATE::state_t _state;
+	HType::id_generator_t _idGenerator;
+	HType::type_dict_t _userTypeDict;
+	classes_t _classes;
 	functions_t _functions;
 	HExecutingParser _engine;
 	HSource _source;
@@ -362,6 +396,7 @@ public:
 private:
 	void register_builtins( void );
 	char const* error_message( int ) const;
+	friend type_t HType::register_type( yaal::hcore::HString const&, HHuginn* );
 	HHuginn( HHuginn const& ) = delete;
 	HHuginn& operator = ( HHuginn const& ) = delete;
 };
@@ -398,16 +433,9 @@ public:
 	int position( void ) const;
 };
 
-class HHuginn::HObject {
-public:
-	typedef HHuginn::HObject this_type;
-	virtual ~HObject( void ) {}
-};
-
-class HHuginn::HStatement : public HHuginn::HObject {
+class HHuginn::HStatement {
 public:
 	typedef HHuginn::HStatement this_type;
-	typedef HHuginn::HObject base_type;
 public:
 	HStatement( void );
 	virtual ~HStatement( void ) {
@@ -479,21 +507,20 @@ private:
 	HExpression& operator = ( HExpression const& ) = delete;
 };
 
-class HHuginn::HValue : public HHuginn::HObject {
+class HHuginn::HValue {
 public:
 	typedef HHuginn::HValue this_type;
-	typedef HHuginn::HObject base_type;
 	typedef yaal::hcore::HBoundCall<void ( HValue* )> method_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, method_t> methods_t;
 private:
-	TYPE const _type;
+	type_t const _type;
 	methods_t _methods;
 public:
-	HValue( void );
-	HValue( TYPE );
-	TYPE type( void ) const;
-	yaal::hcore::HString const& type_name( void ) const;
-	static yaal::hcore::HString const& type_name( TYPE );
+	HValue( type_t );
+	virtual ~HValue( void ) {
+		return;
+	}
+	type_t type( void ) const;
 	static value_t subscript( HExpression::SUBSCRIPT, value_t&, value_t const&, int );
 	static value_t range( value_t&, value_t const&, value_t const&, value_t const&, int );
 	static value_t add( value_t const&, value_t const&, int );
@@ -518,6 +545,9 @@ public:
 	static value_t boolean( value_t const&, int );
 	static value_t character( value_t const&, int );
 	static value_t number( value_t const&, int );
+private:
+	HValue( HValue const& ) = delete;
+	HValue& operator = ( HValue const& ) = delete;
 };
 
 class HHuginn::HFrame {
@@ -631,7 +661,7 @@ public:
 	typedef HHuginn::HIterable this_type;
 	typedef HHuginn::HValue base_type;
 	class HIterator;
-	HIterable( TYPE );
+	HIterable( type_t );
 	HIterator iterator( void );
 protected:
 	virtual HIterator do_iterator( void ) = 0;
@@ -753,7 +783,7 @@ public:
 	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, cmp_t> values_t;
 private:
 	values_t _data;
-	HHuginn::TYPE _keyType;
+	type_t _keyType;
 public:
 	HMap( void );
 	int long size( void ) const;
@@ -763,7 +793,9 @@ public:
 protected:
 	virtual HIterator do_iterator( void );
 private:
-	void verify_key_type( HHuginn::TYPE, int );
+	void verify_key_type( HHuginn::type_t, int );
+	HMap( HMap const& ) = delete;
+	HMap& operator = ( HMap const& ) = delete;
 };
 
 class HHuginn::HScope : public HHuginn::HStatement {

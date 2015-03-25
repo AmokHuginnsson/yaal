@@ -49,6 +49,7 @@ template<typename pod_t, typename TAG>
 class HTaggedPOD {
 public:
 	typedef HTaggedPOD<pod_t, TAG> this_type;
+	typedef pod_t value_type;
 private:
 	pod_t _value;
 public:

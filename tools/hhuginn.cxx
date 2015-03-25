@@ -63,6 +63,20 @@ main( args ) {
 
 #endif
 
+HHuginn::type_t const HHuginn::TYPE::NONE( HHuginn::HType::register_type( "none", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::INTEGER( HHuginn::HType::register_type( "integer", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::REAL( HHuginn::HType::register_type( "real", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::STRING( HHuginn::HType::register_type( "string", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::NUMBER( HHuginn::HType::register_type( "number", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::BOOLEAN( HHuginn::HType::register_type( "boolean", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::CHARACTER( HHuginn::HType::register_type( "character", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::LIST( HHuginn::HType::register_type( "list", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::MAP( HHuginn::HType::register_type( "map", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::REFERENCE( HHuginn::HType::register_type( "*reference*", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::FUNCTION_REFERENCE( HHuginn::HType::register_type( "*function_reference*", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::UNKNOWN( HHuginn::HType::register_type( "*unknown*", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::NOT_BOOLEAN( HHuginn::HType::register_type( "*not_boolean*", nullptr ) );
+
 namespace {
 
 typedef yaal::hcore::HHashSet<yaal::hcore::HString>  words_t;
@@ -114,7 +128,7 @@ bool is_restricted( yaal::hcore::HString const& name_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t _none_ = make_pointer<HHuginn::HValue>();
+HHuginn::value_t _none_ = make_pointer<HHuginn::HValue>( HHuginn::TYPE::NONE );
 
 namespace ERR_CODE {
 enum {
@@ -144,7 +158,7 @@ char const* _errMsgHHuginn_[ 10 ] = {
 
 }
 
-void operands_type_mismatch( char const*, HHuginn::TYPE, HHuginn::TYPE, int ) __attribute__(( noreturn ));
+void operands_type_mismatch( char const*, HHuginn::type_t, HHuginn::type_t, int ) __attribute__(( noreturn ));
 
 executing_parser::HRule HHuginn::make_engine( void ) {
 	M_PROLOG
@@ -1290,11 +1304,11 @@ void HHuginn::OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser
 	M_EPILOG
 }
 
-bool HHuginn::OCompiler::is_numeric( TYPE type_ ) {
+bool HHuginn::OCompiler::is_numeric( type_t type_ ) {
 	return ( ( type_ == TYPE::INTEGER ) || ( type_ == TYPE::REAL ) || ( type_ == TYPE::NUMBER ) );
 }
 
-bool HHuginn::OCompiler::is_comparable( TYPE type_ ) {
+bool HHuginn::OCompiler::is_comparable( type_t type_ ) {
 	return (
 		is_numeric( type_ )
 		|| ( type_ == TYPE::STRING )
@@ -1302,35 +1316,35 @@ bool HHuginn::OCompiler::is_comparable( TYPE type_ ) {
 	);
 }
 
-bool HHuginn::OCompiler::is_boolean_congruent( TYPE type_ ) {
+bool HHuginn::OCompiler::is_boolean_congruent( type_t type_ ) {
 	return ( ( type_ == TYPE::BOOLEAN ) || ( type_ == TYPE::UNKNOWN ) || ( type_ == TYPE::REFERENCE ) );
 }
 
-bool HHuginn::OCompiler::is_unknown( TYPE type_ ) {
+bool HHuginn::OCompiler::is_unknown( type_t type_ ) {
 	return ( ( type_ == TYPE::NOT_BOOLEAN ) || ( type_ == TYPE::UNKNOWN ) || ( type_ == TYPE::REFERENCE ) );
 }
 
-bool HHuginn::OCompiler::is_numeric_congruent( TYPE type_ ) {
+bool HHuginn::OCompiler::is_numeric_congruent( type_t type_ ) {
 	return ( is_numeric( type_ ) || is_unknown( type_ ) );
 }
 
-bool HHuginn::OCompiler::is_comparable_congruent( TYPE type_ ) {
+bool HHuginn::OCompiler::is_comparable_congruent( type_t type_ ) {
 	return ( is_comparable( type_ ) || is_unknown( type_ ) );
 }
 
-bool HHuginn::OCompiler::is_reference_congruent( TYPE type_ ) {
+bool HHuginn::OCompiler::is_reference_congruent( type_t type_ ) {
 	return ( ( type_ == TYPE::REFERENCE ) || ( type_ == TYPE::UNKNOWN ) );
 }
 
-bool HHuginn::OCompiler::is_integer_congruent( TYPE type_ ) {
+bool HHuginn::OCompiler::is_integer_congruent( type_t type_ ) {
 	return ( ( type_ == TYPE::INTEGER ) || is_unknown( type_ ) );
 }
 
-bool HHuginn::OCompiler::is_summable( TYPE type_ ) {
+bool HHuginn::OCompiler::is_summable( type_t type_ ) {
 	return ( is_numeric_congruent( type_ ) || ( type_ == TYPE::STRING ) );
 }
 
-bool HHuginn::OCompiler::are_congruous( TYPE t1_, TYPE t2_ ) {
+bool HHuginn::OCompiler::are_congruous( type_t t1_, type_t t2_ ) {
 	bool congruous(
 		( t1_ == t2_ )
 		|| ( t1_ == TYPE::UNKNOWN )
@@ -1345,8 +1359,8 @@ bool HHuginn::OCompiler::are_congruous( TYPE t1_, TYPE t2_ ) {
 	return ( congruous );
 }
 
-HHuginn::TYPE HHuginn::OCompiler::congruent( TYPE t1_, TYPE t2_ ) {
-	TYPE t( TYPE::NOT_BOOLEAN );
+HHuginn::type_t HHuginn::OCompiler::congruent( type_t t1_, type_t t2_ ) {
+	type_t t( TYPE::NOT_BOOLEAN );
 	if ( t1_ == t2_ ) {
 		if ( ( t1_ != TYPE::UNKNOWN ) && ( t1_ != TYPE::REFERENCE ) ) {
 			t = t1_;
@@ -1372,9 +1386,9 @@ void HHuginn::OCompiler::dispatch_plus( executing_parser::position_t position_ )
 	M_ASSERT( ( o == OPERATOR::PLUS ) || ( o == OPERATOR::MINUS ) );
 	defer_action( o == OPERATOR::PLUS ? &HExpression::plus : &HExpression::minus, position_ );
 	fc._operations.pop();
-	TYPE t1( fc._valueTypes.top() );
+	type_t t1( fc._valueTypes.top() );
 	fc._valueTypes.pop();
-	TYPE t2( fc._valueTypes.top() );
+	type_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! ( are_congruous( t1, t2 ) && is_summable( t1 ) && is_summable( t2 ) ) ) {
 		throw HHuginnRuntimeException( o == OPERATOR::PLUS ? _errMsgHHuginn_[ERR_CODE::OP_NOT_SUM] : _errMsgHHuginn_[ERR_CODE::OP_NOT_SUB], p );
@@ -1395,9 +1409,9 @@ void HHuginn::OCompiler::dispatch_mul( executing_parser::position_t position_ ) 
 	M_ASSERT( ( o == OPERATOR::MULTIPLY ) || ( o == OPERATOR::DIVIDE ) || ( o == OPERATOR::MODULO ) );
 	defer_action( o == OPERATOR::MULTIPLY ? &HExpression::mul : ( o == OPERATOR::DIVIDE ? &HExpression::div : &HExpression::mod ), position_ );
 	fc._operations.pop();
-	TYPE t1( fc._valueTypes.top() );
+	type_t t1( fc._valueTypes.top() );
 	fc._valueTypes.pop();
-	TYPE t2( fc._valueTypes.top() );
+	type_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! ( are_congruous( t1, t2 ) && is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
 		throw HHuginnRuntimeException( o == OPERATOR::MULTIPLY ? _errMsgHHuginn_[ERR_CODE::OP_NOT_MUL] : _errMsgHHuginn_[ERR_CODE::OP_NOT_DIV], p );
@@ -1415,9 +1429,9 @@ void HHuginn::OCompiler::dispatch_power( executing_parser::position_t position_ 
 		M_ASSERT( fc._valueTypes.get_size() >= 2 );
 		int p( fc._operations.top()._position );
 		fc._operations.pop();
-		TYPE t1( fc._valueTypes.top() );
+		type_t t1( fc._valueTypes.top() );
 		fc._valueTypes.pop();
-		TYPE t2( fc._valueTypes.top() );
+		type_t t2( fc._valueTypes.top() );
 		fc._valueTypes.pop();
 		if ( ! ( are_congruous( t1, t2 ) && is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
 			throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_EXP], p );
@@ -1446,9 +1460,9 @@ void HHuginn::OCompiler::dispatch_compare( executing_parser::position_t position
 	}
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
-	TYPE t1( fc._valueTypes.top() );
+	type_t t1( fc._valueTypes.top() );
 	fc._valueTypes.pop();
-	TYPE t2( fc._valueTypes.top() );
+	type_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! ( are_congruous( t1, t2 ) && is_comparable_congruent( t1 ) && is_comparable_congruent( t2 ) ) ) {
 		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_CMP], p );
@@ -1468,9 +1482,9 @@ void HHuginn::OCompiler::dispatch_boolean( expression_action_t const& action_, e
 	}
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
-	TYPE t1( fc._valueTypes.top() );
+	type_t t1( fc._valueTypes.top() );
 	fc._valueTypes.pop();
-	TYPE t2( fc._valueTypes.top() );
+	type_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! ( is_boolean_congruent( t1 ) && is_boolean_congruent( t2 ) ) ) {
 		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], p );
@@ -1491,7 +1505,7 @@ void HHuginn::OCompiler::dispatch_ternary( void ) {
 	M_ASSERT( fc._valueTypes.get_size() >= 3 );
 	fc._valueTypes.pop();
 	fc._valueTypes.pop();
-	TYPE t0( fc._valueTypes.top() );
+	type_t t0( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! is_boolean_congruent( t0 ) ) {
 		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
@@ -1511,9 +1525,9 @@ void HHuginn::OCompiler::dispatch_equals( executing_parser::position_t position_
 	defer_action( o == OPERATOR::EQUALS ? &HExpression::equals : &HExpression::not_equals, position_ );
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 2 );
-	TYPE t1( fc._valueTypes.top() );
+	type_t t1( fc._valueTypes.top() );
 	fc._valueTypes.pop();
-	TYPE t2( fc._valueTypes.top() );
+	type_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( t1, t2 ) ) {
 		operands_type_mismatch( ( o == OPERATOR::EQUALS ? "==" : "!=" ), t1, t2, p );
@@ -1531,9 +1545,9 @@ void HHuginn::OCompiler::dispatch_assign( executing_parser::position_t position_
 		M_ASSERT( fc._valueTypes.get_size() >= 2 );
 		int p( fc._operations.top()._position );
 		fc._operations.pop();
-		TYPE t1( fc._valueTypes.top() );
+		type_t t1( fc._valueTypes.top() );
 		fc._valueTypes.pop();
-		TYPE t2( fc._valueTypes.top() );
+		type_t t2( fc._valueTypes.top() );
 		fc._valueTypes.pop();
 		if ( ! is_reference_congruent( t2 ) ) {
 			throw HHuginnRuntimeException( "Setting a non reference location.", p );
@@ -1784,25 +1798,52 @@ int HHuginn::HHuginnRuntimeException::position( void ) const {
 	return ( _position );
 }
 
+HHuginn::HType::id_generator_t HHuginn::HType::_idGenerator{ 0 };
+HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
+
+HHuginn::HType::HType( yaal::hcore::HString const& name_ )
+	: _name( name_ )
+	, _id( _idGenerator ++ ) {
+	return;
+}
+
+HHuginn::type_t HHuginn::HType::register_type( yaal::hcore::HString const& name_, HHuginn* huginn_ ) {
+	type_dict_t& typeDict( huginn_ ? huginn_->_userTypeDict : _builtin );
+	if ( ( _builtin.count( name_ ) != 0 )
+		|| ( huginn_ && ( huginn_->_userTypeDict.count( name_ ) != 0 ) ) ) {
+		throw HHuginnException( "Registering existing type: `"_ys.append( name_ ).append( "'." ) );
+	}
+	HType::type_holder_t t( new HType( name_ ) );
+	type_dict_t::iterator it( typeDict.insert( make_pair<yaal::hcore::HString const, HType::type_holder_t>( name_, yaal::move( t ) ) ).first );
+	return ( it->second.get() );
+}
+
+int HHuginn::HType::builtin_type_count( void ) {
+	return ( _idGenerator );
+}
+
 HHuginn::flag_t HHuginn::_grammarVerified{ false };
 
 HHuginn::HHuginn( void )
-	: _state( STATE::EMPTY ),
-	_functions(),
-	_engine( make_engine(), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR ),
-	_source(),
-	_compiler( this ),
-	_threads(),
-	_argv( new ( memory::yaal ) HList() ),
-	_result(),
-	_errorMessage(),
-	_errorPosition( -1 ),
-	_inputStream(),
-	_inputStreamRaw( &cin ),
-	_outputStream(),
-	_outputStreamRaw( &cout ),
-	_errorStream(),
-	_errorStreamRaw( &cerr ) {
+	: _state( STATE::EMPTY )
+	, _idGenerator{ HType::builtin_type_count() }
+	, _userTypeDict()
+	, _classes()
+	, _functions()
+	, _engine( make_engine(), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
+	, _source()
+	, _compiler( this )
+	, _threads()
+	, _argv( new ( memory::yaal ) HList() )
+	, _result()
+	, _errorMessage()
+	, _errorPosition( -1 )
+	, _inputStream()
+	, _inputStreamRaw( &cin )
+	, _outputStream()
+	, _outputStreamRaw( &cout )
+	, _errorStream()
+	, _errorStreamRaw( &cerr ) {
 	M_PROLOG
 	_grammarVerified.store( true );
 	register_builtins();
@@ -2279,41 +2320,17 @@ HHuginn::HFrame::values_t& HHuginn::HFrame::values( void ) {
 	return ( _values );
 }
 
-HHuginn::HValue::HValue( void )
-	: _type( TYPE::NONE ), _methods() {
-	return;
-}
-
-HHuginn::HValue::HValue( TYPE type_ )
+HHuginn::HValue::HValue( type_t type_ )
 	: _type( type_ ), _methods() {
 	return;
 }
 
-HHuginn::TYPE HHuginn::HValue::type( void ) const {
+HHuginn::type_t HHuginn::HValue::type( void ) const {
 	return ( _type );
 }
 
-yaal::hcore::HString const& HHuginn::HValue::type_name( TYPE type_ ) {
-	static yaal::hcore::HString const names[] = {
-		"none",
-		"boolean",
-		"integer",
-		"real",
-		"string",
-		"number",
-		"character",
-		"list",
-		"map",
-		"reference",
-		"function_reference",
-		"unknown",
-		"not-boolean"
-	};
-	return ( names[static_cast<int>( type_ )] );
-}
-
 HHuginn::value_t HHuginn::HValue::subscript( HExpression::SUBSCRIPT subscript_, HHuginn::value_t& base_, HHuginn::value_t const& index_, int position_ ) {
-	TYPE baseType( base_->type() );
+	type_t baseType( base_->type() );
 	value_t res;
 	if ( ( baseType == TYPE::LIST ) || ( baseType == TYPE::STRING ) ) {
 		if ( index_->type() != TYPE::INTEGER ) {
@@ -2340,7 +2357,7 @@ HHuginn::value_t HHuginn::HValue::subscript( HExpression::SUBSCRIPT subscript_, 
 		HMap* m( static_cast<HMap*>( base_.raw() ) );
 		res = ( subscript_ == HExpression::SUBSCRIPT::VALUE ? m->get( index_, position_ ) : m->get_ref( index_, position_ ) );
 	} else {
-		throw HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( type_name( baseType ) ).append( "'." ), position_ );
+		throw HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( baseType->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2352,7 +2369,7 @@ HHuginn::value_t HHuginn::HValue::range(
 	HHuginn::value_t const& step_,
 	int position_
 ) {
-	TYPE baseType( base_->type() );
+	type_t baseType( base_->type() );
 	value_t res;
 	if ( ( baseType == TYPE::LIST ) || ( baseType == TYPE::STRING ) ) {
 		if ( ( from_->type() != TYPE::INTEGER ) && ( from_->type() != TYPE::NONE ) ) {
@@ -2440,7 +2457,7 @@ HHuginn::value_t HHuginn::HValue::range(
 			}
 		} while ( false );
 	} else {
-		throw HHuginnRuntimeException( "Range operator is not supported on `"_ys.append( type_name( baseType ) ).append( "'." ), position_ );
+		throw HHuginnRuntimeException( "Range operator is not supported on `"_ys.append( baseType->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2448,22 +2465,17 @@ HHuginn::value_t HHuginn::HValue::range(
 HHuginn::value_t HHuginn::HValue::add( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	value_t res;
-	switch ( v1_->type() ) {
-		case ( TYPE::INTEGER ): {
-			res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() + static_cast<HInteger const*>( v2_.raw() )->value() );
-		} break;
-		case ( TYPE::REAL ): {
-			res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() + static_cast<HReal const*>( v2_.raw() )->value() );
-		} break;
-		case ( TYPE::STRING ): {
-			res = make_pointer<HString>( static_cast<HString const*>( v1_.raw() )->value() + static_cast<HString const*>( v2_.raw() )->value() );
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() + static_cast<HNumber const*>( v2_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no `+' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
-		}
+	type_t typeId( v1_->type() );
+	if ( typeId == TYPE::INTEGER ) {
+		res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() + static_cast<HInteger const*>( v2_.raw() )->value() );
+	} else if ( typeId == TYPE::REAL ) {
+		res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() + static_cast<HReal const*>( v2_.raw() )->value() );
+	} else if ( typeId == TYPE::STRING ) {
+		res = make_pointer<HString>( static_cast<HString const*>( v1_.raw() )->value() + static_cast<HString const*>( v2_.raw() )->value() );
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() + static_cast<HNumber const*>( v2_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "There is no `+' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2471,19 +2483,15 @@ HHuginn::value_t HHuginn::HValue::add( HHuginn::value_t const& v1_, HHuginn::val
 HHuginn::value_t HHuginn::HValue::sub( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	value_t res;
-	switch ( v1_->type() ) {
-		case ( TYPE::INTEGER ): {
-			res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() - static_cast<HInteger const*>( v2_.raw() )->value() );
-		} break;
-		case ( TYPE::REAL ): {
-			res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() - static_cast<HReal const*>( v2_.raw() )->value() );
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() - static_cast<HNumber const*>( v2_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no `-' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
-		}
+	type_t typeId( v1_->type() );
+	if ( typeId == TYPE::INTEGER ) {
+		res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() - static_cast<HInteger const*>( v2_.raw() )->value() );
+	} else if ( typeId == TYPE::REAL ) {
+		res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() - static_cast<HReal const*>( v2_.raw() )->value() );
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() - static_cast<HNumber const*>( v2_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "There is no `-' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2491,19 +2499,15 @@ HHuginn::value_t HHuginn::HValue::sub( HHuginn::value_t const& v1_, HHuginn::val
 HHuginn::value_t HHuginn::HValue::mul( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	value_t res;
-	switch ( v1_->type() ) {
-		case ( TYPE::INTEGER ): {
-			res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() * static_cast<HInteger const*>( v2_.raw() )->value() );
-		} break;
-		case ( TYPE::REAL ): {
-			res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() * static_cast<HReal const*>( v2_.raw() )->value() );
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() * static_cast<HNumber const*>( v2_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no `*' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
-		}
+	type_t typeId( v1_->type() );
+	if ( typeId == TYPE::INTEGER ) {
+		res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() * static_cast<HInteger const*>( v2_.raw() )->value() );
+	} else if ( typeId == TYPE::REAL ) {
+		res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() * static_cast<HReal const*>( v2_.raw() )->value() );
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() * static_cast<HNumber const*>( v2_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "There is no `*' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2511,19 +2515,15 @@ HHuginn::value_t HHuginn::HValue::mul( HHuginn::value_t const& v1_, HHuginn::val
 HHuginn::value_t HHuginn::HValue::div( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	value_t res;
-	switch ( v1_->type() ) {
-		case ( TYPE::INTEGER ): {
-			res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() / static_cast<HInteger const*>( v2_.raw() )->value() );
-		} break;
-		case ( TYPE::REAL ): {
-			res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() / static_cast<HReal const*>( v2_.raw() )->value() );
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() / static_cast<HNumber const*>( v2_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no `/' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
-		}
+	type_t typeId( v1_->type() );
+	if ( typeId == TYPE::INTEGER ) {
+		res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() / static_cast<HInteger const*>( v2_.raw() )->value() );
+	} else if ( typeId == TYPE::REAL ) {
+		res = make_pointer<HReal>( static_cast<HReal const*>( v1_.raw() )->value() / static_cast<HReal const*>( v2_.raw() )->value() );
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() / static_cast<HNumber const*>( v2_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "There is no `/' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2531,13 +2531,10 @@ HHuginn::value_t HHuginn::HValue::div( HHuginn::value_t const& v1_, HHuginn::val
 HHuginn::value_t HHuginn::HValue::mod( value_t const& v1_, value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	value_t res;
-	switch ( v1_->type() ) {
-		case ( TYPE::INTEGER ): {
-			res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() % static_cast<HInteger const*>( v2_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no `%' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
-		}
+	if ( v1_->type() == TYPE::INTEGER ) {
+		res = make_pointer<HInteger>( static_cast<HInteger const*>( v1_.raw() )->value() % static_cast<HInteger const*>( v2_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "There is no `%' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2545,69 +2542,58 @@ HHuginn::value_t HHuginn::HValue::mod( value_t const& v1_, value_t const& v2_, i
 HHuginn::value_t HHuginn::HValue::pow( value_t const& v1_, value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	value_t res;
-	switch ( v1_->type() ) {
-		case ( TYPE::REAL ): {
-			res = make_pointer<HReal>( ::powl( static_cast<HReal const*>( v1_.raw() )->value(), static_cast<HReal const*>( v2_.raw() )->value() ) );
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() ^ static_cast<HNumber const*>( v2_.raw() )->value().to_integer() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no `^' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
-		}
+	type_t typeId( v1_->type() );
+	if ( typeId == TYPE::REAL ) {
+		res = make_pointer<HReal>( ::powl( static_cast<HReal const*>( v1_.raw() )->value(), static_cast<HReal const*>( v2_.raw() )->value() ) );
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = make_pointer<HNumber>( static_cast<HNumber const*>( v1_.raw() )->value() ^ static_cast<HNumber const*>( v2_.raw() )->value().to_integer() );
+	} else {
+		throw HHuginnRuntimeException( "There is no `^' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t HHuginn::HValue::abs( value_t const& v_, int position_ ) {
 	value_t res;
-	switch ( v_->type() ) {
-		case ( TYPE::INTEGER ): {
-			int long long v( static_cast<HInteger const*>( v_.raw() )->value() );
-			if ( v >= 0 ) {
-				res = v_;
-			} else {
-				res = make_pointer<HInteger>( -v );
-			}
-		} break;
-		case ( TYPE::REAL ): {
-			double long v( static_cast<HReal const*>( v_.raw() )->value() );
-			if ( v >= 0 ) {
-				res = v_;
-			} else {
-				res = make_pointer<HReal>( -v );
-			}
-		} break;
-		case ( TYPE::NUMBER ): {
-			yaal::hcore::HNumber const& v( static_cast<HNumber const*>( v_.raw() )->value() );
-			if ( v >= 0 ) {
-				res = v_;
-			} else {
-				res = make_pointer<HNumber>( -v );
-			}
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no |.| operator for `"_ys.append( type_name( v_->type() ) ).append( "'." ), position_ );
+	type_t typeId( v_->type() );
+	if ( typeId == TYPE::INTEGER ) {
+		int long long v( static_cast<HInteger const*>( v_.raw() )->value() );
+		if ( v >= 0 ) {
+			res = v_;
+		} else {
+			res = make_pointer<HInteger>( -v );
 		}
+	} else if ( typeId == TYPE::REAL ) {
+		double long v( static_cast<HReal const*>( v_.raw() )->value() );
+		if ( v >= 0 ) {
+			res = v_;
+		} else {
+			res = make_pointer<HReal>( -v );
+		}
+	} else if ( typeId == TYPE::NUMBER ) {
+		yaal::hcore::HNumber const& v( static_cast<HNumber const*>( v_.raw() )->value() );
+		if ( v >= 0 ) {
+			res = v_;
+		} else {
+			res = make_pointer<HNumber>( -v );
+		}
+	} else {
+		throw HHuginnRuntimeException( "There is no |.| operator for `"_ys.append( v_->type()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t HHuginn::HValue::neg( value_t const& v_, int position_ ) {
 	value_t res;
-	switch ( v_->type() ) {
-		case ( TYPE::INTEGER ): {
-			res = make_pointer<HInteger>( -static_cast<HInteger const*>( v_.raw() )->value() );
-		} break;
-		case ( TYPE::REAL ): {
-			res = make_pointer<HReal>( -static_cast<HReal const*>( v_.raw() )->value() );
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = make_pointer<HNumber>( -static_cast<HNumber const*>( v_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no `negate` operator for `"_ys.append( type_name( v_->type() ) ).append( "'." ), position_ );
-		}
+	type_t typeId( v_->type() );
+	if ( typeId == TYPE::INTEGER ) {
+		res = make_pointer<HInteger>( -static_cast<HInteger const*>( v_.raw() )->value() );
+	} else if ( typeId == TYPE::REAL ) {
+		res = make_pointer<HReal>( -static_cast<HReal const*>( v_.raw() )->value() );
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = make_pointer<HNumber>( -static_cast<HNumber const*>( v_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "There is no `negate` operator for `"_ys.append( v_->type()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2617,28 +2603,21 @@ bool HHuginn::HValue::equals( value_t const& v1_, value_t const& v2_, int positi
 	M_ASSERT( noneOperand || ( v1_->type() == v2_->type() ) );
 	bool res( false );
 	if ( ! noneOperand ) {
-		switch ( v1_->type() ) {
-			case ( TYPE::INTEGER ): {
-				res = static_cast<HInteger const*>( v1_.raw() )->value() == static_cast<HInteger const*>( v2_.raw() )->value();
-			} break;
-			case ( TYPE::REAL ): {
-				res = static_cast<HReal const*>( v1_.raw() )->value() == static_cast<HReal const*>( v2_.raw() )->value();
-			} break;
-			case ( TYPE::STRING ): {
-				res = static_cast<HString const*>( v1_.raw() )->value() == static_cast<HString const*>( v2_.raw() )->value();
-			} break;
-			case ( TYPE::NUMBER ): {
-				res = static_cast<HNumber const*>( v1_.raw() )->value() == static_cast<HNumber const*>( v2_.raw() )->value();
-			} break;
-			case ( TYPE::CHARACTER ): {
-				res = static_cast<HCharacter const*>( v1_.raw() )->value() == static_cast<HCharacter const*>( v2_.raw() )->value();
-			} break;
-			case ( TYPE::BOOLEAN ): {
-				res = static_cast<HBoolean const*>( v1_.raw() )->value() == static_cast<HBoolean const*>( v2_.raw() )->value();
-			} break;
-			default: {
-				throw HHuginnRuntimeException( "There is no `==' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
-			}
+		type_t typeId( v1_->type() );
+		if ( typeId == TYPE::INTEGER ) {
+			res = static_cast<HInteger const*>( v1_.raw() )->value() == static_cast<HInteger const*>( v2_.raw() )->value();
+		} else if ( typeId == TYPE::REAL ) {
+			res = static_cast<HReal const*>( v1_.raw() )->value() == static_cast<HReal const*>( v2_.raw() )->value();
+		} else if ( typeId == TYPE::STRING ) {
+			res = static_cast<HString const*>( v1_.raw() )->value() == static_cast<HString const*>( v2_.raw() )->value();
+		} else if ( typeId == TYPE::NUMBER ) {
+			res = static_cast<HNumber const*>( v1_.raw() )->value() == static_cast<HNumber const*>( v2_.raw() )->value();
+		} else if ( typeId == TYPE::CHARACTER ) {
+			res = static_cast<HCharacter const*>( v1_.raw() )->value() == static_cast<HCharacter const*>( v2_.raw() )->value();
+		} else if ( typeId == TYPE::BOOLEAN ) {
+			res = static_cast<HBoolean const*>( v1_.raw() )->value() == static_cast<HBoolean const*>( v2_.raw() )->value();
+		} else {
+			throw HHuginnRuntimeException( "There is no `==' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
 		}
 	} else {
 		res = v1_->type() == v2_->type();
@@ -2653,25 +2632,19 @@ bool HHuginn::HValue::less_low( value_t const& v1_, value_t const& v2_ ) {
 bool HHuginn::HValue::less( value_t const& v1_, value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	bool res( false );
-	switch ( v1_->type() ) {
-		case ( TYPE::INTEGER ): {
-			res = static_cast<HInteger const*>( v1_.raw() )->value() < static_cast<HInteger const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::REAL ): {
-			res = static_cast<HReal const*>( v1_.raw() )->value() < static_cast<HReal const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::STRING ): {
-			res = static_cast<HString const*>( v1_.raw() )->value() < static_cast<HString const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = static_cast<HNumber const*>( v1_.raw() )->value() < static_cast<HNumber const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::CHARACTER ): {
-			res = static_cast<int unsigned>( static_cast<HCharacter const*>( v1_.raw() )->value() ) < static_cast<int unsigned>( static_cast<HCharacter const*>( v2_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no `<' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
-		}
+	type_t typeId( v1_->type() );
+	if ( typeId == TYPE::INTEGER ) {
+		res = static_cast<HInteger const*>( v1_.raw() )->value() < static_cast<HInteger const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::REAL ) {
+		res = static_cast<HReal const*>( v1_.raw() )->value() < static_cast<HReal const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::STRING ) {
+		res = static_cast<HString const*>( v1_.raw() )->value() < static_cast<HString const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = static_cast<HNumber const*>( v1_.raw() )->value() < static_cast<HNumber const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::CHARACTER ) {
+		res = static_cast<int unsigned>( static_cast<HCharacter const*>( v1_.raw() )->value() ) < static_cast<int unsigned>( static_cast<HCharacter const*>( v2_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "There is no `<' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2679,25 +2652,19 @@ bool HHuginn::HValue::less( value_t const& v1_, value_t const& v2_, int position
 bool HHuginn::HValue::greater( value_t const& v1_, value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	bool res( false );
-	switch ( v1_->type() ) {
-		case ( TYPE::INTEGER ): {
-			res = static_cast<HInteger const*>( v1_.raw() )->value() > static_cast<HInteger const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::REAL ): {
-			res = static_cast<HReal const*>( v1_.raw() )->value() > static_cast<HReal const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::STRING ): {
-			res = static_cast<HString const*>( v1_.raw() )->value() > static_cast<HString const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = static_cast<HNumber const*>( v1_.raw() )->value() > static_cast<HNumber const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::CHARACTER ): {
-			res = static_cast<int unsigned>( static_cast<HCharacter const*>( v1_.raw() )->value() ) > static_cast<int unsigned>( static_cast<HCharacter const*>( v2_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no `>' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
-		}
+	type_t typeId( v1_->type() );
+	if ( typeId == TYPE::INTEGER ) {
+		res = static_cast<HInteger const*>( v1_.raw() )->value() > static_cast<HInteger const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::REAL ) {
+		res = static_cast<HReal const*>( v1_.raw() )->value() > static_cast<HReal const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::STRING ) {
+		res = static_cast<HString const*>( v1_.raw() )->value() > static_cast<HString const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = static_cast<HNumber const*>( v1_.raw() )->value() > static_cast<HNumber const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::CHARACTER ) {
+		res = static_cast<int unsigned>( static_cast<HCharacter const*>( v1_.raw() )->value() ) > static_cast<int unsigned>( static_cast<HCharacter const*>( v2_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "There is no `>' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2705,25 +2672,19 @@ bool HHuginn::HValue::greater( value_t const& v1_, value_t const& v2_, int posit
 bool HHuginn::HValue::less_or_equal( value_t const& v1_, value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	bool res( false );
-	switch ( v1_->type() ) {
-		case ( TYPE::INTEGER ): {
-			res = static_cast<HInteger const*>( v1_.raw() )->value() <= static_cast<HInteger const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::REAL ): {
-			res = static_cast<HReal const*>( v1_.raw() )->value() <= static_cast<HReal const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::STRING ): {
-			res = static_cast<HString const*>( v1_.raw() )->value() <= static_cast<HString const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = static_cast<HNumber const*>( v1_.raw() )->value() <= static_cast<HNumber const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::CHARACTER ): {
-			res = static_cast<int unsigned>( static_cast<HCharacter const*>( v1_.raw() )->value() ) <= static_cast<int unsigned>( static_cast<HCharacter const*>( v2_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no `<=' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
-		}
+	type_t typeId( v1_->type() );
+	if ( typeId == TYPE::INTEGER ) {
+		res = static_cast<HInteger const*>( v1_.raw() )->value() <= static_cast<HInteger const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::REAL ) {
+		res = static_cast<HReal const*>( v1_.raw() )->value() <= static_cast<HReal const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::STRING ) {
+		res = static_cast<HString const*>( v1_.raw() )->value() <= static_cast<HString const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = static_cast<HNumber const*>( v1_.raw() )->value() <= static_cast<HNumber const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::CHARACTER ) {
+		res = static_cast<int unsigned>( static_cast<HCharacter const*>( v1_.raw() )->value() ) <= static_cast<int unsigned>( static_cast<HCharacter const*>( v2_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "There is no `<=' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2731,25 +2692,19 @@ bool HHuginn::HValue::less_or_equal( value_t const& v1_, value_t const& v2_, int
 bool HHuginn::HValue::greater_or_equal( value_t const& v1_, value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	bool res( false );
-	switch ( v1_->type() ) {
-		case ( TYPE::INTEGER ): {
-			res = static_cast<HInteger const*>( v1_.raw() )->value() >= static_cast<HInteger const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::REAL ): {
-			res = static_cast<HReal const*>( v1_.raw() )->value() >= static_cast<HReal const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::STRING ): {
-			res = static_cast<HString const*>( v1_.raw() )->value() >= static_cast<HString const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = static_cast<HNumber const*>( v1_.raw() )->value() >= static_cast<HNumber const*>( v2_.raw() )->value();
-		} break;
-		case ( TYPE::CHARACTER ): {
-			res = static_cast<int unsigned>( static_cast<HCharacter const*>( v1_.raw() )->value() ) >= static_cast<int unsigned>( static_cast<HCharacter const*>( v2_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "There is no `>=' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
-		}
+	type_t typeId( v1_->type() );
+	if ( typeId == TYPE::INTEGER ) {
+		res = static_cast<HInteger const*>( v1_.raw() )->value() >= static_cast<HInteger const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::REAL ) {
+		res = static_cast<HReal const*>( v1_.raw() )->value() >= static_cast<HReal const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::STRING ) {
+		res = static_cast<HString const*>( v1_.raw() )->value() >= static_cast<HString const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = static_cast<HNumber const*>( v1_.raw() )->value() >= static_cast<HNumber const*>( v2_.raw() )->value();
+	} else if ( typeId == TYPE::CHARACTER ) {
+		res = static_cast<int unsigned>( static_cast<HCharacter const*>( v1_.raw() )->value() ) >= static_cast<int unsigned>( static_cast<HCharacter const*>( v2_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "There is no `>=' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -2768,147 +2723,119 @@ HHuginn::value_t HHuginn::HValue::boolean_not( value_t const& v_, int ) {
 
 HHuginn::value_t HHuginn::HValue::string( value_t const& v_, int position_ ) {
 	value_t res;
-	switch ( v_->type() ) {
-		case ( TYPE::STRING ): {
-			res = v_;
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = make_pointer<HString>( static_cast<HNumber const*>( v_.raw() )->value().to_string() );
-		} break;
-		case ( TYPE::REAL ): {
-			res = make_pointer<HString>( static_cast<HReal const*>( v_.raw() )->value() );
-		} break;
-		case ( TYPE::CHARACTER ): {
-			res = make_pointer<HString>( static_cast<HCharacter const*>( v_.raw() )->value() );
-		} break;
-		case ( TYPE::INTEGER ): {
-			res = make_pointer<HString>( static_cast<HInteger const*>( v_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "Conversion from `"_ys
-				.append( type_name( v_->type() ) )
-				.append( "' to `string' is not supported." ),
-				position_
-			);
-		}
+	type_t typeId( v_->type() );
+	if ( typeId == TYPE::STRING ) {
+		res = v_;
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = make_pointer<HString>( static_cast<HNumber const*>( v_.raw() )->value().to_string() );
+	} else if ( typeId == TYPE::REAL ) {
+		res = make_pointer<HString>( static_cast<HReal const*>( v_.raw() )->value() );
+	} else if ( typeId == TYPE::CHARACTER ) {
+		res = make_pointer<HString>( static_cast<HCharacter const*>( v_.raw() )->value() );
+	} else if ( typeId == TYPE::INTEGER ) {
+		res = make_pointer<HString>( static_cast<HInteger const*>( v_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "Conversion from `"_ys
+			.append( v_->type()->name() )
+			.append( "' to `string' is not supported." ),
+			position_
+		);
 	}
 	return ( res );
 }
 
 HHuginn::value_t HHuginn::HValue::boolean( value_t const& v_, int position_ ) {
 	value_t res;
-	switch ( v_->type() ) {
-		case ( TYPE::BOOLEAN ): {
-			res = v_;
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "Conversion from `"_ys
-				.append( type_name( v_->type() ) )
-				.append( "' to `boolean' is not supported." ),
-				position_
-			);
-		}
+	if ( v_->type() == TYPE::BOOLEAN ) {
+		res = v_;
+	} else {
+		throw HHuginnRuntimeException( "Conversion from `"_ys
+			.append( v_->type()->name() )
+			.append( "' to `boolean' is not supported." ),
+			position_
+		);
 	}
 	return ( res );
 }
 
 HHuginn::value_t HHuginn::HValue::integer( value_t const& v_, int position_ ) {
 	value_t res;
-	switch ( v_->type() ) {
-		case ( TYPE::STRING ): {
-			res = make_pointer<HInteger>( lexical_cast<int long long>( static_cast<HString const*>( v_.raw() )->value() ) );
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = make_pointer<HInteger>( static_cast<HNumber const*>( v_.raw() )->value().to_integer() );
-		} break;
-		case ( TYPE::REAL ): {
-			res = make_pointer<HInteger>( static_cast<int long long>( static_cast<HReal const*>( v_.raw() )->value() ) );
-		} break;
-		case ( TYPE::CHARACTER ): {
-			res = make_pointer<HInteger>( static_cast<int long long>( static_cast<HCharacter const*>( v_.raw() )->value() ) );
-		} break;
-		case ( TYPE::INTEGER ): {
-			res = v_;
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "Conversion from `"_ys
-				.append( type_name( v_->type() ) )
-				.append( "' to `integer' is not supported." ),
-				position_
-			);
-		}
+	type_t typeId( v_->type() );
+	if ( typeId == TYPE::STRING ) {
+		res = make_pointer<HInteger>( lexical_cast<int long long>( static_cast<HString const*>( v_.raw() )->value() ) );
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = make_pointer<HInteger>( static_cast<HNumber const*>( v_.raw() )->value().to_integer() );
+	} else if ( typeId == TYPE::REAL ) {
+		res = make_pointer<HInteger>( static_cast<int long long>( static_cast<HReal const*>( v_.raw() )->value() ) );
+	} else if ( typeId == TYPE::CHARACTER ) {
+		res = make_pointer<HInteger>( static_cast<int long long>( static_cast<HCharacter const*>( v_.raw() )->value() ) );
+	} else if ( typeId == TYPE::INTEGER ) {
+		res = v_;
+	} else {
+		throw HHuginnRuntimeException( "Conversion from `"_ys
+			.append( type_name( v_->type() ) )
+			.append( "' to `integer' is not supported." ),
+			position_
+		);
 	}
 	return ( res );
 }
 
 HHuginn::value_t HHuginn::HValue::real( value_t const& v_, int position_ ) {
 	value_t res;
-	switch ( v_->type() ) {
-		case ( TYPE::STRING ): {
-			res = make_pointer<HReal>( lexical_cast<double long>( static_cast<HString const*>( v_.raw() )->value() ) );
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = make_pointer<HReal>( static_cast<HNumber const*>( v_.raw() )->value().to_floating_point() );
-		} break;
-		case ( TYPE::REAL ): {
-			res = v_;
-		} break;
-		case ( TYPE::INTEGER ): {
-			res = make_pointer<HReal>( static_cast<double long>( static_cast<HInteger const*>( v_.raw() )->value() ) );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "Conversion from `"_ys
-				.append( type_name( v_->type() ) )
-				.append( "' to `real' is not supported." ),
-				position_
-			);
-		}
+	type_t typeId( v_->type() );
+	if ( typeId == TYPE::STRING ) {
+		res = make_pointer<HReal>( lexical_cast<double long>( static_cast<HString const*>( v_.raw() )->value() ) );
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = make_pointer<HReal>( static_cast<HNumber const*>( v_.raw() )->value().to_floating_point() );
+	} else if ( typeId == TYPE::REAL ) {
+		res = v_;
+	} else if ( typeId == TYPE::INTEGER ) {
+		res = make_pointer<HReal>( static_cast<double long>( static_cast<HInteger const*>( v_.raw() )->value() ) );
+	} else {
+		throw HHuginnRuntimeException( "Conversion from `"_ys
+			.append( type_name( v_->type() ) )
+			.append( "' to `real' is not supported." ),
+			position_
+		);
 	}
 	return ( res );
 }
 
 HHuginn::value_t HHuginn::HValue::character( value_t const& v_, int position_ ) {
 	value_t res;
-	switch ( v_->type() ) {
-		case ( TYPE::CHARACTER ): {
-			res = v_;
-		} break;
-		case ( TYPE::INTEGER ): {
-			res = make_pointer<HCharacter>( static_cast<char>( static_cast<HCharacter const*>( v_.raw() )->value() ) );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "Conversion from `"_ys
-				.append( type_name( v_->type() ) )
-				.append( "' to `character' is not supported." ),
-				position_
-			);
-		}
+	type_t typeId( v_->type() );
+	if ( typeId == TYPE::CHARACTER ) {
+		res = v_;
+	} else if ( typeId == TYPE::INTEGER ) {
+		res = make_pointer<HCharacter>( static_cast<char>( static_cast<HCharacter const*>( v_.raw() )->value() ) );
+	} else {
+		throw HHuginnRuntimeException( "Conversion from `"_ys
+			.append( type_name( v_->type() ) )
+			.append( "' to `character' is not supported." ),
+			position_
+		);
 	}
 	return ( res );
 }
 
 HHuginn::value_t HHuginn::HValue::number( value_t const& v_, int position_ ) {
 	value_t res;
-	switch ( v_->type() ) {
-		case ( TYPE::STRING ): {
-			res = make_pointer<HNumber>( static_cast<HString const*>( v_.raw() )->value() );
-		} break;
-		case ( TYPE::NUMBER ): {
-			res = v_;
-		} break;
-		case ( TYPE::REAL ): {
-			res = make_pointer<HNumber>( static_cast<HReal const*>( v_.raw() )->value() );
-		} break;
-		case ( TYPE::INTEGER ): {
-			res = make_pointer<HNumber>( static_cast<HInteger const*>( v_.raw() )->value() );
-		} break;
-		default: {
-			throw HHuginnRuntimeException( "Conversion from `"_ys
-				.append( type_name( v_->type() ) )
-				.append( "' to `number' is not supported." ),
-				position_
-			);
-		}
+	type_t typeId( v_->type() );
+	if ( typeId == TYPE::STRING ) {
+		res = make_pointer<HNumber>( static_cast<HString const*>( v_.raw() )->value() );
+	} else if ( typeId == TYPE::NUMBER ) {
+		res = v_;
+	} else if ( typeId == TYPE::REAL ) {
+		res = make_pointer<HNumber>( static_cast<HReal const*>( v_.raw() )->value() );
+	} else if ( typeId == TYPE::INTEGER ) {
+		res = make_pointer<HNumber>( static_cast<HInteger const*>( v_.raw() )->value() );
+	} else {
+		throw HHuginnRuntimeException( "Conversion from `"_ys
+			.append( type_name( v_->type() ) )
+			.append( "' to `number' is not supported." ),
+			position_
+		);
 	}
 	return ( res );
 }
@@ -3083,7 +3010,7 @@ public:
 	}
 };
 
-HHuginn::HIterable::HIterable( TYPE type_ )
+HHuginn::HIterable::HIterable( type_t type_ )
 	: HValue( type_ ) {
 	return;
 }
@@ -3157,12 +3084,12 @@ int long HHuginn::HMap::size( void ) const {
 	return ( _data.get_size() );
 }
 
-void HHuginn::HMap::verify_key_type( HHuginn::TYPE type_, int position_ ) {
+void HHuginn::HMap::verify_key_type( HHuginn::type_t type_, int position_ ) {
 	if ( ( _keyType != TYPE::NONE ) && ( type_ != _keyType ) ) {
 		throw HHuginnRuntimeException( "Non-uniform key types.", position_ );
 	}
 	if ( ! HHuginn::OCompiler::is_comparable( type_ ) ) {
-		throw HHuginnRuntimeException( "Key type `"_ys.append( HValue::type_name( type_ ) ).append( "' is not a comparable." ), position_ );
+		throw HHuginnRuntimeException( "Key type `"_ys.append( type_->name() ).append( "' is not a comparable." ), position_ );
 	}
 	return;
 }
@@ -3385,7 +3312,7 @@ void HHuginn::HExpression::function_call( HFrame* frame_, int position_ ) {
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_CALL );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
-	TYPE t( frame_->values().top()->type() );
+	type_t t( frame_->values().top()->type() );
 	if ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) {
 		throw HHuginnRuntimeException( "Reference is not a function.", position_ );
 	}
@@ -3585,9 +3512,9 @@ void HHuginn::HExpression::subscript( SUBSCRIPT subscript_, HFrame* frame_, int 
 	bool select( ( !! from ) || ( !! to ) || ( !! step ) );
 	value_t base( frame_->values().top() );
 	if ( ! select && ( range > 0 ) ) {
-		TYPE t( base->type() );
+		type_t t( base->type() );
 		if ( ( t != TYPE::LIST ) && ( t != TYPE::STRING ) ) {
-			throw HHuginnRuntimeException( "Range operator not supported on `"_ys.append( HValue::type_name( t ) ).append( "'." ), p );
+			throw HHuginnRuntimeException( "Range operator not supported on `"_ys.append( t->name() ).append( "'." ), p );
 		}
 	} else {
 		frame_->values().pop();
@@ -4136,31 +4063,35 @@ HHuginn::function_t const& HHuginn::HFunctionReference::function( void ) const {
 
 namespace huginn_builtin {
 
-inline HHuginn::value_t convert( HHuginn::TYPE toType_, HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t convert( HHuginn::type_t toType_, HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException(
 			""_ys
-			.append( HHuginn::HValue::type_name( toType_ ) )
+			.append( toType_->name() )
 			.append( "() expects exactly one parameter, got: " )
 			.append( values_.get_size() ),
 			position_
 		);
 	}
 	HHuginn::value_t res;
-	switch ( toType_ ) {
-		case ( HHuginn::TYPE::INTEGER ): res = HHuginn::HValue::integer( values_.front(), position_ ); break;
-		case ( HHuginn::TYPE::REAL ): res = HHuginn::HValue::real( values_.front(), position_ ); break;
-		case ( HHuginn::TYPE::STRING ): res = HHuginn::HValue::string( values_.front(), position_ ); break;
-		case ( HHuginn::TYPE::NUMBER ): res = HHuginn::HValue::number( values_.front(), position_ ); break;
-		case ( HHuginn::TYPE::BOOLEAN ): res = HHuginn::HValue::boolean( values_.front(), position_ ); break;
-		case ( HHuginn::TYPE::CHARACTER ): res = HHuginn::HValue::character( values_.front(), position_ ); break;
-		default: {
-			throw HHuginn::HHuginnRuntimeException(
-				"Conversion to `"_ys.append( HHuginn::HValue::type_name( toType_ ) ).append( "' is not supported." ),
-				position_
-			);
-		}
+	if ( toType_ == HHuginn::TYPE::INTEGER ) {
+		res = HHuginn::HValue::integer( values_.front(), position_ );
+	} else if ( toType_ == HHuginn::TYPE::REAL ) {
+		res = HHuginn::HValue::real( values_.front(), position_ );
+	} else if ( toType_ == HHuginn::TYPE::STRING ) {
+		res = HHuginn::HValue::string( values_.front(), position_ );
+	} else if ( toType_ == HHuginn::TYPE::NUMBER ) {
+		res = HHuginn::HValue::number( values_.front(), position_ );
+	} else if ( toType_ == HHuginn::TYPE::BOOLEAN ) {
+		res = HHuginn::HValue::boolean( values_.front(), position_ );
+	} else if ( toType_ == HHuginn::TYPE::CHARACTER ) {
+		res = HHuginn::HValue::character( values_.front(), position_ );
+	} else {
+		throw HHuginn::HHuginnRuntimeException(
+			"Conversion to `"_ys.append( toType_->name() ).append( "' is not supported." ),
+			position_
+		);
 	}
 	return ( res );
 	M_EPILOG
@@ -4178,22 +4109,18 @@ inline HHuginn::value_t size( HHuginn::HThread*, HHuginn::values_t const& values
 	}
 	HHuginn::HValue const* v( values_.front().raw() );
 	int long long s( 0 );
-	switch ( v->type() ) {
-		case ( HHuginn::TYPE::STRING ): {
-			s = static_cast<HHuginn::HString const*>( v )->value().get_length();
-		} break;
-		case ( HHuginn::TYPE::LIST ): {
-			s = static_cast<HHuginn::HList const*>( v )->size();
-		} break;
-		case ( HHuginn::TYPE::MAP ): {
-			s = static_cast<HHuginn::HMap const*>( v )->size();
-		} break;
-		default: {
-			throw HHuginn::HHuginnRuntimeException(
-				"Getting size of `"_ys.append( HHuginn::HValue::type_name( v->type() ) ).append( "'s is not supported." ),
-				position_
-			);
-		}
+	HHuginn::type_t typeId( v->type() );
+	if ( typeId == HHuginn::TYPE::STRING ) {
+		s = static_cast<HHuginn::HString const*>( v )->value().get_length();
+	} else if ( typeId == HHuginn::TYPE::LIST ) {
+		s = static_cast<HHuginn::HList const*>( v )->size();
+	} else if ( typeId == HHuginn::TYPE::MAP ) {
+		s = static_cast<HHuginn::HMap const*>( v )->size();
+	} else {
+		throw HHuginn::HHuginnRuntimeException(
+			"Getting size of `"_ys.append( v->type()->name() ).append( "'s is not supported." ),
+			position_
+		);
 	}
 	return ( make_pointer<HHuginn::HInteger>( s ) );
 	M_EPILOG
@@ -4209,7 +4136,7 @@ inline HHuginn::value_t type( HHuginn::HThread*, HHuginn::values_t const& values
 		);
 	}
 	HHuginn::HValue const* v( values_.front().raw() );
-	return ( make_pointer<HHuginn::HString>( HHuginn::HValue::type_name( v->type() ) ) );
+	return ( make_pointer<HHuginn::HString>( v->type()->name() ) );
 	M_EPILOG
 }
 
@@ -4248,31 +4175,24 @@ inline HHuginn::value_t print( HHuginn::HThread* thread_, HHuginn::values_t cons
 	}
 	HHuginn::HValue const* v( values_.front().raw() );
 	yaal::hcore::HStreamInterface& out( thread_->huginn().output_stream() );
-	switch ( v->type() ) {
-		case ( HHuginn::TYPE::INTEGER ): {
-			out << static_cast<HHuginn::HInteger const*>( v )->value();
-		} break;
-		case ( HHuginn::TYPE::REAL ): {
-			out << static_cast<HHuginn::HReal const*>( v )->value();
-		} break;
-		case ( HHuginn::TYPE::STRING ): {
-			out << static_cast<HHuginn::HString const*>( v )->value();
-		} break;
-		case ( HHuginn::TYPE::NUMBER ): {
-			out << static_cast<HHuginn::HNumber const*>( v )->value();
-		} break;
-		case ( HHuginn::TYPE::BOOLEAN ): {
-			out << static_cast<HHuginn::HBoolean const*>( v )->value();
-		} break;
-		case ( HHuginn::TYPE::CHARACTER ): {
-			out << static_cast<HHuginn::HCharacter const*>( v )->value();
-		} break;
-		default: {
-			throw HHuginn::HHuginnRuntimeException(
-				"Printing `"_ys.append( HHuginn::HValue::type_name( v->type() ) ).append( "'s is not supported." ),
-				position_
-			);
-		}
+	HHuginn::type_t typeId( v->type() );
+	if ( typeId == HHuginn::TYPE::INTEGER ) {
+		out << static_cast<HHuginn::HInteger const*>( v )->value();
+	} else if ( typeId == HHuginn::TYPE::REAL ) {
+		out << static_cast<HHuginn::HReal const*>( v )->value();
+	} else if ( typeId == HHuginn::TYPE::STRING ) {
+		out << static_cast<HHuginn::HString const*>( v )->value();
+	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
+		out << static_cast<HHuginn::HNumber const*>( v )->value();
+	} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
+		out << static_cast<HHuginn::HBoolean const*>( v )->value();
+	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
+		out << static_cast<HHuginn::HCharacter const*>( v )->value();
+	} else {
+		throw HHuginn::HHuginnRuntimeException(
+			"Printing `"_ys.append( v->type()->name() ).append( "'s is not supported." ),
+			position_
+		);
 	}
 	out << flush;
 	return ( _none_ );
@@ -4307,13 +4227,13 @@ void HHuginn::register_builtins( void ) {
 	M_EPILOG
 }
 
-void operands_type_mismatch( char const* op_, HHuginn::TYPE t1_, HHuginn::TYPE t2_, int pos_ ) {
+void operands_type_mismatch( char const* op_, HHuginn::type_t t1_, HHuginn::type_t t2_, int pos_ ) {
 	hcore::HString msg( "Operand types for `" );
 	msg.append( op_ )
 		.append( "' do not match: " )
-		.append( HHuginn::HValue::type_name( t1_ ) )
+		.append( t1_->name() )
 		.append( " vs " )
-		.append( HHuginn::HValue::type_name( t2_ ) )
+		.append( t2_->name() )
 		.append( "." ),
 	throw HHuginn::HHuginnRuntimeException( msg, pos_ );
 }
