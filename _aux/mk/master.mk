@@ -2,8 +2,10 @@ include _aux/mk/0_sanity.mk
 -include .my_make
 COMMA=,
 include _aux/mk/2_term.mk
+ifeq ($(NOTPARALLEL),)
 THREAD_COUNT=$(shell ./_aux/thread-count)
 MAKEFLAGS+=$(shell echo '$(THREAD_COUNT)' | awk '/^[0-9]+$$/{if ( $$1 > 1 ) { print "-j"$$1 } }')
+endif
 
 define PREPARE_MAIN_TARGET
 $(1): build/$(1)/Makefile.mk build/$(1)/config.hxx $$(if $$(wildcard yaalrc.in),build/$(1)/yaalrc build/$(1)/yaal.pc)
