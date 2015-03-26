@@ -72,7 +72,7 @@ public:
 		static type_t register_type( yaal::hcore::HString const&, HHuginn* );
 		static int builtin_type_count( void );
 	private:
-		HType( yaal::hcore::HString const& );
+		HType( yaal::hcore::HString const&, int );
 		HType( HType const& ) = delete;
 		HType& operator = ( HType const& ) = delete;
 		HType( HType&& ) = delete;

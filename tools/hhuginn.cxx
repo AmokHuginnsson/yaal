@@ -1801,9 +1801,9 @@ int HHuginn::HHuginnRuntimeException::position( void ) const {
 HHuginn::HType::id_generator_t HHuginn::HType::_idGenerator{ 0 };
 HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
 
-HHuginn::HType::HType( yaal::hcore::HString const& name_ )
+HHuginn::HType::HType( yaal::hcore::HString const& name_, int id_ )
 	: _name( name_ )
-	, _id( _idGenerator ++ ) {
+	, _id( id_ ) {
 	return;
 }
 
@@ -1813,7 +1813,7 @@ HHuginn::type_t HHuginn::HType::register_type( yaal::hcore::HString const& name_
 		|| ( huginn_ && ( huginn_->_userTypeDict.count( name_ ) != 0 ) ) ) {
 		throw HHuginnException( "Registering existing type: `"_ys.append( name_ ).append( "'." ) );
 	}
-	HType::type_holder_t t( new HType( name_ ) );
+	HType::type_holder_t t( new HType( name_, huginn_ ? huginn_->_idGenerator ++ : _idGenerator ++ ) );
 	type_dict_t::iterator it( typeDict.insert( make_pair<yaal::hcore::HString const, HType::type_holder_t>( name_, yaal::move( t ) ) ).first );
 	return ( it->second.get() );
 }
