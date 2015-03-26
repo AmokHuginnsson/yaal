@@ -63,6 +63,12 @@ main( args ) {
 
 #endif
 
+/*
+ * Built-in type dictionary must be declared before first use of register_type().
+ */
+HHuginn::HType::id_generator_t HHuginn::HType::_idGenerator{ 0 };
+HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
+
 HHuginn::type_t const HHuginn::TYPE::NONE( HHuginn::HType::register_type( "none", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::INTEGER( HHuginn::HType::register_type( "integer", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::REAL( HHuginn::HType::register_type( "real", nullptr ) );
@@ -1797,9 +1803,6 @@ yaal::hcore::HString const& HHuginn::HHuginnRuntimeException::message( void ) co
 int HHuginn::HHuginnRuntimeException::position( void ) const {
 	return ( _position );
 }
-
-HHuginn::HType::id_generator_t HHuginn::HType::_idGenerator{ 0 };
-HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
 
 HHuginn::HType::HType( yaal::hcore::HString const& name_, int id_ )
 	: _name( name_ )
