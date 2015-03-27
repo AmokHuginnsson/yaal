@@ -7,3 +7,5 @@ ifneq ($(UMASK),77)
 $(error running with too permissive umask: `$(UMASK)', must be: `0077' - bailing out)
 endif
 
+.DELETE_ON_ERROR:
+

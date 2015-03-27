@@ -1,6 +1,6 @@
 -include .my_make
 
-MAKEFLAGS+=--no-print-directory
+MAKEFLAGS+=--no-print-directory --no-builtin-rules
 
 .NOTPARALLEL:
 

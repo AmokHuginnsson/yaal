@@ -1,7 +1,13 @@
 include _aux/mk/0_sanity.mk
+
+.NOTPARALLEL:
+
 -include .my_make
 COMMA=,
 include _aux/mk/2_term.mk
+
+MAKEFLAGS+=--no-builtin-rules
+
 ifeq ($(NOTPARALLEL),)
 THREAD_COUNT=$(shell ./_aux/thread-count)
 MAKEFLAGS+=$(shell echo '$(THREAD_COUNT)' | awk '/^[0-9]+$$/{if ( $$1 > 1 ) { print "-j"$$1 } }')
@@ -66,7 +72,6 @@ DS=d
 FIND=find
 
 .PHONY: all bin check clean clean-all clean-cov clean-debug clean-prof clean-relassert clean-reldeb clean-release clean-dep cov coverage-stats debug dep distclean doc help install install-all install-cov install-debug install-prof install-relassert install-reldeb install-release mrproper mrproper-all mrproper-cov mrproper-debug mrproper-prof mrproper-relassert mrproper-reldeb mrproper-release relassert reldeb release prepare-coverage-baseline prof purge purge-local static stats tags uninstall
-.NOTPARALLEL: build/%/Makefile.mk build/%/config.hxx build/%/yaalrc build/%/yaal.pc configure config.hxx.in $(MAIN_TARGETS)
 
 default: $(.DEFAULT_GOAL)
 
