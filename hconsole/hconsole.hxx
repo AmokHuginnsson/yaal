@@ -48,12 +48,6 @@ struct USE_MOUSE {
 	} use_mouse_t;
 };
 extern M_YAAL_HCONSOLE_PUBLIC_API USE_MOUSE::use_mouse_t _useMouse_;
-extern M_YAAL_HCONSOLE_PUBLIC_API bool _disableXON_;
-extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlC_;
-extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlZ_;
-extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlS_;
-extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlQ_;
-extern M_YAAL_HCONSOLE_PUBLIC_API bool _leaveCtrlBackSlash_;
 extern M_YAAL_HCONSOLE_PUBLIC_API char _commandComposeCharacter_;
 extern M_YAAL_HCONSOLE_PUBLIC_API int _commandComposeDelay_;
 void banner( void );

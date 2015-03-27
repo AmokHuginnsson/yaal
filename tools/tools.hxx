@@ -48,6 +48,12 @@ extern M_YAAL_TOOLS_PUBLIC_API int long _zBufferSize_;
 extern M_YAAL_TOOLS_PUBLIC_API bool _ignoreSignalSIGINT_;
 extern M_YAAL_TOOLS_PUBLIC_API bool _ignoreSignalSIGTSTP_;
 extern M_YAAL_TOOLS_PUBLIC_API bool _ignoreSignalSIGQUIT_;
+extern M_YAAL_TOOLS_PUBLIC_API bool _disableXON_;
+extern M_YAAL_TOOLS_PUBLIC_API bool _leaveCtrlC_;
+extern M_YAAL_TOOLS_PUBLIC_API bool _leaveCtrlZ_;
+extern M_YAAL_TOOLS_PUBLIC_API bool _leaveCtrlS_;
+extern M_YAAL_TOOLS_PUBLIC_API bool _leaveCtrlQ_;
+extern M_YAAL_TOOLS_PUBLIC_API bool _leaveCtrlBackSlash_;
 void banner( void );
 
 }

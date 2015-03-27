@@ -43,8 +43,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hcore.hxx"
 #include "hcore/system.hxx"
 #include "tools/tools.hxx"
+#include "tools/hterminal.hxx"
 #include "hconsole.hxx"
-#include "hterminal.hxx"
 
 /* curses system header is poluted with huge number of macros
  * though it cannot be included at the top together with rest of sane

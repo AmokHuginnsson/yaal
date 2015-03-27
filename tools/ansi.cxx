@@ -32,7 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "ansi.hxx"
 #include "hterminal.hxx"
 
-using namespace yaal::hconsole;
+using namespace yaal::tools;
 
 namespace yaal {
 

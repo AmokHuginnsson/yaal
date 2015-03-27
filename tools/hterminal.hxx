@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef YAAL_HCONSOLE_HTERMINAL_HXX_INCLUDED
-#define YAAL_HCONSOLE_HTERMINAL_HXX_INCLUDED 1
+#ifndef YAAL_TOOLS_HTERMINAL_HXX_INCLUDED
+#define YAAL_TOOLS_HTERMINAL_HXX_INCLUDED 1
 
 #include "hcore/hchunk.hxx"
 #include "hcore/hpair.hxx"
@@ -33,7 +33,7 @@ Copyright:
 
 namespace yaal {
 
-namespace hconsole {
+namespace tools {
 
 class HTerminal {
 public:
@@ -58,5 +58,5 @@ bool is_a_tty( T const& );
 
 }
 
-#endif /* #ifndef YAAL_HCONSOLE_HTERMINAL_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HTERMINAL_HXX_INCLUDED */
 

@@ -119,6 +119,29 @@ compression_level -1
 # set size (in bytes) for memory buffer used for (de)compression in zlib library
 compression_buffer_size 262144
 
+# terminal configuration
+
+# disable_XON
+# type: bool, default: false
+# disable XON(/XOFF) flow control on output,
+# setting this to `true' disables C-s and C-q special handling
+disable_XON true
+
+# leave_ctrl_(c|z|\|q|s)
+# type: bool, default: false
+# this option decides if terminal should treat
+# some key-press combinations in special way
+# should CTRL-c typed by user be discarded by program?
+# is CTRL-z ignored by process?
+# true - means that terminal should NOT handle given keypress in special way
+# false - means that terminal should install special handler
+# for given keypress combination
+leave_ctrl_c true
+leave_ctrl_z true
+leave_ctrl_\ true
+leave_ctrl_q true
+leave_ctrl_s true
+
 # serial port configuration
 
 # serial_device
@@ -162,24 +185,6 @@ collector_connection_timeout 8
 # after this time elapses next code is treated as separate character
 
 esc_delay 0
-
-# disable_XON
-# type: bool, default: false
-# disable XON(/XOFF) flow control on output,
-# setting this to `true' disables C-s and C-q special handling
-disable_XON true
-
-# leave_ctrl_(c|z|\|q|s)
-# type: bool, default: false
-# this option decides if input routines
-# should treat some key-press combinations special
-# should CTRL-c typed by user be discarded by program ?
-# is CTRL-z ignored by process?
-leave_ctrl_c true
-leave_ctrl_z true
-leave_ctrl_\ true
-leave_ctrl_q true
-leave_ctrl_s true
 
 # use_mouse
 # type: enumerator { yes-flag, no-flag, auto }, default: auto

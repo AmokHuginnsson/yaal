@@ -24,8 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#ifndef YAAL_HCONSOLE_ANSI_HXX_INCLUDED
-#define YAAL_HCONSOLE_ANSI_HXX_INCLUDED 1
+#ifndef YAAL_TOOLS_ANSI_HXX_INCLUDED
+#define YAAL_TOOLS_ANSI_HXX_INCLUDED 1
 
 #include "hcore/hstreaminterface.hxx"
 
@@ -50,37 +50,37 @@ private:
 	HSequence& operator = ( HSequence const& );
 };
 
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const bold;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const reset;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const black;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const red;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const green;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brown;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const blue;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const magenta;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const cyan;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const lightgray;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const gray;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brightred;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brightgreen;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const yellow;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brightblue;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brightmagenta;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const brightcyan;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const white;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const bold;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const reset;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const black;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const red;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const green;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const brown;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const blue;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const magenta;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const cyan;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const lightgray;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const gray;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const brightred;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const brightgreen;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const yellow;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const brightblue;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const brightmagenta;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const brightcyan;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const white;
 
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const up;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const down;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const left;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const right;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const up;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const down;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const left;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const right;
 
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const up_bol;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const up_bol;
 
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const save;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const restore;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const save;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const restore;
 
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const clear;
-extern M_YAAL_HCONSOLE_PUBLIC_API HSequence const clrtoeol;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const clear;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const clrtoeol;
 
 HSequence move( int, int );
 HSequence up_n( int );
@@ -95,5 +95,5 @@ yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface&, HSe
 
 }
 
-#endif /* #ifndef YAAL_HCONSOLE_ANSI_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_ANSI_HXX_INCLUDED */
 

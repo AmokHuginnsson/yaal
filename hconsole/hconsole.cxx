@@ -65,12 +65,6 @@ int _attributeStatusBar_ = ( COLORS::FG_WHITE | COLORS::BG_BLACK ) << 8
 int _attributeSearchHighlight_ = ( COLORS::FG_BLACK | COLORS::BG_BROWN | COLORS::BG_BLINK ) << 8
 																		| ( COLORS::FG_BLACK | COLORS::BG_BROWN );
 USE_MOUSE::use_mouse_t _useMouse_ = USE_MOUSE::AUTO;
-bool _disableXON_ = false;
-bool _leaveCtrlC_ = false;
-bool _leaveCtrlZ_ = false;
-bool _leaveCtrlS_ = false;
-bool _leaveCtrlQ_ = false;
-bool _leaveCtrlBackSlash_ = false;
 char _commandComposeCharacter_ = 'x';
 int  _commandComposeDelay_ = 16;
 
@@ -202,12 +196,6 @@ HConsoleInitDeinit::HConsoleInitDeinit( void ) {
 	errno = 0;
 	int escdelay( 0 );
 	yaal_options()
-		( "disable_XON", program_options_helper::option_value( _disableXON_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable flow control events" )
-		( "leave_ctrl_c", program_options_helper::option_value( _leaveCtrlC_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+C sequence" )
-		( "leave_ctrl_z", program_options_helper::option_value( _leaveCtrlZ_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+Z sequence" )
-		( "leave_ctrl_s", program_options_helper::option_value( _leaveCtrlS_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+S sequence" )
-		( "leave_ctrl_q", program_options_helper::option_value( _leaveCtrlQ_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+Q sequence" )
-		( "leave_ctrl_\\", program_options_helper::option_value( _leaveCtrlBackSlash_ ), HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+\\ sequence" )
 		( "esc_delay", program_options_helper::option_value( escdelay ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "ncurses escape sequence time span", "seconds" ) /* defined inside ncurses lib */
 		( "latency", program_options_helper::option_value( _latency_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "how often invoke idle event", "seconds" )
 		( "command_compose_character", program_options_helper::option_value( _commandComposeCharacter_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED,

@@ -41,23 +41,26 @@ Copyright:
 #include <tty.h>
 #endif /* #ifdef HAVE_TTY_H */
 
+#undef ECHO
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hterminal.hxx"
-#include "hconsole.hxx"
+#include "tools.hxx"
 #include "hcore/hfile.hxx"
 
 using namespace yaal::hcore;
-using namespace yaal::hconsole;
+using namespace yaal::tools;
 
 namespace yaal {
 
-namespace hconsole {
+namespace tools {
 
 HTerminal::HTerminal( void )
-	: _termios( chunk_size<struct termios>( 1 ) )
-	{}
+	: _termios( chunk_size<struct termios>( 1 ) ) {
+	return;
+}
 
 bool HTerminal::exists( void ) const {
 	return ( ::isatty( STDIN_FILENO ) || ::isatty( STDOUT_FILENO ) || ::isatty( STDERR_FILENO ) );
@@ -65,32 +68,37 @@ bool HTerminal::exists( void ) const {
 
 void HTerminal::init( void ) {
 	M_PROLOG
-	termios termios;
+	termios& termios( *_termios.get<struct termios>() );
 	::memset( &termios, 0, sizeof ( termios ) );
+	M_ENSURE( tcgetattr( STDIN_FILENO, &termios ) == 0 );
 	if ( _disableXON_ ) {
-		M_ENSURE( tcgetattr( STDIN_FILENO, _termios.get<struct termios>() ) == 0 );
-		M_ENSURE( tcgetattr( STDIN_FILENO, &termios ) == 0 );
 		termios.c_iflag &= ~static_cast<int unsigned>( IXON );
-		if ( _leaveCtrlC_ )
-			termios.c_cc[ VINTR ] = 0;
-		if ( _leaveCtrlZ_ )
-			termios.c_cc[ VSUSP ] = 0;
-		if ( _leaveCtrlS_ )
-			termios.c_cc[ VSTOP ] = 0;
-		if ( _leaveCtrlQ_ )
-			termios.c_cc[ VSTART ] = 0;
-		if ( _leaveCtrlBackSlash_ )
-			termios.c_cc[ VQUIT ] = 0;
-		M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &termios ) == 0 );
 	}
+	if ( _leaveCtrlC_ ) {
+		termios.c_cc[ VINTR ] = 0;
+	}
+	if ( _leaveCtrlZ_ ) {
+		termios.c_cc[ VSUSP ] = 0;
+	}
+	if ( _leaveCtrlS_ ) {
+		termios.c_cc[ VSTOP ] = 0;
+	}
+	if ( _leaveCtrlQ_ ) {
+		termios.c_cc[ VSTART ] = 0;
+	}
+	if ( _leaveCtrlBackSlash_ ) {
+		termios.c_cc[ VQUIT ] = 0;
+	}
+	M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &termios ) == 0 );
 	return;
 	M_EPILOG
 }
 
 void HTerminal::flush( void ) {
 	M_PROLOG
-	if ( _disableXON_ )
+	if ( _disableXON_ ) {
 		M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, _termios.get<termios>() ) == 0 );
+	}
 	return;
 	M_EPILOG
 }
@@ -101,12 +109,13 @@ static int const BAD_FD( -1 );
 
 int find_term_fd( void ) {
 	int fd( BAD_FD );
-	if ( ::isatty( STDOUT_FILENO ) )
+	if ( ::isatty( STDOUT_FILENO ) ) {
 		fd = STDOUT_FILENO;
-	else if ( ::isatty( STDERR_FILENO ) )
+	} else if ( ::isatty( STDERR_FILENO ) ) {
 		fd = STDERR_FILENO;
-	else if ( ::isatty( STDIN_FILENO ) )
+	} else if ( ::isatty( STDIN_FILENO ) ) {
 		fd = STDIN_FILENO;
+	}
 	return ( fd );
 }
 
@@ -138,24 +147,26 @@ bool is_a_tty( int const& fd_ ) {
 template<>
 bool is_a_tty( FILE* const& file_ ) {
 	bool isTty( false );
-	if ( file_ == stdout )
+	if ( file_ == stdout ) {
 		isTty = ::isatty( STDOUT_FILENO ) ? true : false;
-	else if ( file_ == stderr )
+	} else if ( file_ == stderr ) {
 		isTty = ::isatty( STDERR_FILENO ) ? true : false;
-	else if ( file_ == stdin )
+	} else if ( file_ == stdin ) {
 		isTty = ::isatty( STDIN_FILENO ) ? true : false;
+	}
 	return ( isTty );
 }
 
 template<>
 bool is_a_tty( HStreamInterface const& stream_ ) {
 	bool isTty( false );
-	if ( ( &stream_ == &cout ) || ( &stream_ == &clog ) )
+	if ( ( &stream_ == &cout ) || ( &stream_ == &clog ) ) {
 		isTty = ::isatty( STDOUT_FILENO ) ? true : false;
-	else if ( &stream_ == &cerr )
+	} else if ( &stream_ == &cerr ) {
 		isTty = ::isatty( STDERR_FILENO ) ? true : false;
-	else if ( &stream_ == &cin )
+	} else if ( &stream_ == &cin ) {
 		isTty = ::isatty( STDIN_FILENO ) ? true : false;
+	}
 	return ( isTty );
 }
 
