@@ -39,6 +39,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hlog.hxx"
 #include "xmath.hxx"
 #include "hcore/hrandomizer.hxx"
+#include "hterminal.hxx"
 
 using namespace yaal::hcore;
 
@@ -118,8 +119,18 @@ void show_help( void* arg ) {
 	}
 	HString desc;
 	char const* description( NULL );
-	char const* envColumns( ::getenv( "COLUMNS" ) );
-	int const columns( envColumns ? xmath::clip( 80, lexical_cast<int>( envColumns ), 128 ): 80 );
+	int columns( 0 );
+	if ( _terminal_.exists() ) {
+		HTerminal::coord_t c( _terminal_.size() );
+		columns = c.second;
+	}
+	if ( columns <= 0 ) {
+		char const* envColumns( ::getenv( "COLUMNS" ) );
+		if ( envColumns ) {
+			columns = lexical_cast<int>( envColumns );
+		}
+	}
+	columns = xmath::clip( 80, columns, 128 );
 	int cols( columns - ( longestLongLength + longestShortLength + 2 + 2 + 2 ) );
 	/* display each option description */
 	int const COUNT = static_cast<int>( opts.size() );
@@ -134,8 +145,9 @@ void show_help( void* arg ) {
 			sf += static_cast<char>( o._shortForm );
 		}
 		char const* comma( is_byte( o._shortForm ) && o._name ? "," : " " );
-		if ( ! description )
+		if ( ! description ) {
 			description = o._description;
+		}
 		/* if long form word exist, build full form of long form */
 		HString lf;
 		if ( o._name ) {
