@@ -154,8 +154,7 @@ void HWorkFlow::schedule_task( call_t task_, call_t asyncStop_, want_restart_t w
 void HWorkFlow::start_task( call_t task_, call_t asyncStop_, want_restart_t wantRestart_ ) {
 	M_PROLOG
 	HLock l( _mutex );
-	int activeWorkers( static_cast<int>( _workers.get_size() ) );
-	M_ASSERT( _busyWorkers <= activeWorkers );
+	M_ASSERT( _busyWorkers <= static_cast<int>( _workers.get_size() ) );
 	if ( _state != STATE::RUNNING ) {
 		throw HWorkFlowException( "Cannot start new task now." );
 	}
