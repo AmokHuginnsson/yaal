@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hworkflow.hxx - this file is integral part of `yaal' project.
+  hworkflow.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -83,17 +83,17 @@ public:
 		CLOSE /*!< Finish currently runing tasks normally, new tasks are rejected. _state -> STOPPING */
 	};
 private:
-	typedef yaal::hcore::HList<worker_t> pool_t;
-	typedef yaal::hcore::HList<task_t> queue_t;
+	typedef yaal::hcore::HList<worker_t> worker_pool_t;
+	typedef yaal::hcore::HList<task_t> task_queue_t;
 	int _workerPoolSize;
 	int _busyWorkers;
 	STATE _state;
 	/*! Tasks executors.
 	 */
-	pool_t _pool;
+	worker_pool_t _workers;
 	/*! Task queue.
 	 */
-	queue_t _queue;
+	task_queue_t _tasks;
 	yaal::hcore::HSemaphore _semaphore;
 	yaal::hcore::HMutex _mutex;
 public:
@@ -114,7 +114,14 @@ public:
 	 * \param asyncStop - how to notify executing task that it should stop its execution.
 	 * \param wantRestart - test telling if task should be restarted if stopped by asyncStop.
 	 */
-	void push_task( call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
+	void schedule_task( call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
+	/*! \brief Immediatelly start execution of given task in this worker pool.
+	 *
+	 * \param task - task to execute by this worker pool.
+	 * \param asyncStop - how to notify executing task that it should stop its execution.
+	 * \param wantRestart - test telling if task should be restarted if stopped by asyncStop.
+	 */
+	void start_task( call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
 	/*! \brief Restart execution of tasks scheduled in this HWorkFlow.
 	 *
 	 * \throw HWorkFlowException on parallel start.
@@ -168,6 +175,7 @@ private:
 private:
 	HWorker( HWorkFlowInterface* );
 	void spawn( void );
+	void spawn( HWorkFlowInterface::task_t );
 	void finish( void );
 	void async_stop( HWorkFlow::STATE );
 	void run( void );
