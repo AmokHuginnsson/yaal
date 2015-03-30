@@ -131,20 +131,27 @@ double long strtold( char const* str, char** tail ) {
 #endif /* not HAVE_DECL_STRTOLD */
 
 #if ! defined( HAVE_CLOCK_GETTIME )
-int clock_gettime( clockid_t, struct timespec* ) {
-	return ( 0 );
+#include <sys/time.h>
+int clock_gettime( clockid_t, struct timespec* time_ ) {
+	timeval now;
+	int err( gettimeofday( &now, NULL ) );
+	if ( !err ) {
+		time_->tv_sec  = now.tv_sec;
+		time_->tv_nsec = now.tv_usec * 1000;
+	}
+	return ( err );
 }
 #endif /* #if ! defined( HAVE_CLOCK_GETTIME ) */
 
 #if ! defined( HAVE_TIMER_CREATE )
 int timer_create( clockid_t, struct sigevent*, timer_t* ) {
-	return ( 0 );
+	return ( -1 );
 }
 int timer_settime( timer_t, int, struct itimerspec const *, struct itimerspec* ) {
-	return ( 0 );
+	return ( -1 );
 }
 int timer_delete( timer_t ) {
-	return ( 0 );
+	return ( -1 );
 }
 #endif /* #if ! defined( HAVE_TIMER_CREATE ) */
 
