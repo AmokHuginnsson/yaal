@@ -40,6 +40,12 @@ Copyright:
 #include <sys/vmmeter.h>
 #include <vm/vm_param.h>
 #endif /* #ifdef __HOST_OS_TYPE_FREEBSD__ */
+#ifdef __HOST_OS_TYPE_DARWIN__
+#include <sys/sysctl.h>
+#include <sys/vmmeter.h>
+#include <mach/mach_init.h>
+#include <mach/mach_host.h>
+#endif /* #ifdef __HOST_OS_TYPE_DARWIN__ */
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
@@ -240,6 +246,32 @@ HResourceInfo get_memory_size_info( void ) {
 	usedMemory = ru.ru_maxrss * ::getpagesize();
 	freeMemory = sysconf( _SC_AVPHYS_PAGES ) * sysconf( _SC_PAGESIZE );
 	totalMemory = sysconf( _SC_PHYS_PAGES ) * sysconf( _SC_PAGESIZE );
+#elif defined ( __HOST_OS_TYPE_DARWIN__ ) /* #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
+	usedMemory = ru.ru_maxrss;
+	int mib[] = { CTL_HW, HW_PAGESIZE };
+	int long pagesize( 0 );
+	size_t size( sizeof ( pagesize ) );
+	M_ENSURE( sysctl( mib, 2, &pagesize, &size, NULL, 0 ) == 0 );
+	mib[ 1 ] = HW_MEMSIZE;
+	int long physmem( 0 );
+	size = sizeof ( physmem );
+	M_ENSURE( sysctl( mib, 2, &physmem, &size, NULL, 0 ) == 0 );
+	totalMemory = physmem;
+	mach_msg_type_number_t count = HOST_VM_INFO_COUNT;
+	vm_statistics_data_t vmstat;
+	kern_return_t kr(
+		host_statistics(
+			mach_host_self(),
+			HOST_VM_INFO,
+			reinterpret_cast<host_info_t>( &vmstat ),
+			&count
+		)
+	);
+	if ( kr == KERN_SUCCESS ) {
+		freeMemory = vmstat.free_count * pagesize;
+	} else {
+		freeMemory = totalMemory;
+	}
 #elif defined ( __HOST_OS_TYPE_WINDOWS__ ) /* #elif defined ( __HOST_OS_TYPE_SOLARIS__ ) #elif defined ( __HOST_OS_TYPE_FREEBSD__ ) #if defined ( __HOST_OS_TYPE_LINUX__ ) || defined ( __HOST_OS_TYPE_CYGWIN__ ) */
 	usedMemory = ru.ru_maxrss;
 	ms_get_memory_size_info( freeMemory, totalMemory );
@@ -248,14 +280,16 @@ HResourceInfo get_memory_size_info( void ) {
 #if ( HAVE_DECL_RLIMIT_AS == 1 )
 	rlimit rlVM = { 0, 0 };
 	M_ENSURE( ::getrlimit( RLIMIT_AS, &rlVM ) == 0 );
-	if ( ( rlVM.rlim_cur > 0 ) && ( ( static_cast<i64_t>( rlVM.rlim_cur ) - usedMemory ) < availableMemory ) )
+	if ( ( rlVM.rlim_cur > 0 ) && ( ( static_cast<i64_t>( rlVM.rlim_cur ) - usedMemory ) < availableMemory ) ) {
 		availableMemory = static_cast<i64_t>( rlVM.rlim_cur ) - usedMemory;
+	}
 #endif /* #if ( HAVE_DECL_RLIMIT_AS == 1 ) */
 #ifndef __HOST_OS_TYPE_CYGWIN__
 	rlimit rlData = { 0, 0 };
 	M_ENSURE( ::getrlimit( RLIMIT_DATA, &rlData ) == 0 );
-	if ( ( rlData.rlim_cur > 0 ) && ( ( static_cast<i64_t>( rlData.rlim_cur ) - usedMemory ) < availableMemory ) )
+	if ( ( rlData.rlim_cur > 0 ) && ( ( static_cast<i64_t>( rlData.rlim_cur ) - usedMemory ) < availableMemory ) ) {
 		availableMemory = static_cast<i64_t>( rlData.rlim_cur ) - usedMemory;
+	}
 #endif /* #ifndef __HOST_OS_TYPE_CYGWIN__ */
 	return ( HResourceInfo( availableMemory, freeMemory, totalMemory ) );
 	M_EPILOG
