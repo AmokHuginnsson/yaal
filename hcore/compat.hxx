@@ -80,7 +80,8 @@ int clock_gettime( clockid_t, struct timespec* );
 
 #if ! defined( HAVE_TIMER_CREATE )
 #include<ctime>
-typedef void* timer_t;
+class HDarwinTimer;
+typedef HDarwinTimer* timer_t;
 struct itimerspec {
 	struct timespec it_interval;  /* Timer interval */
 	struct timespec it_value;     /* Initial expiration */

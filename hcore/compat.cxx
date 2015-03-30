@@ -144,14 +144,72 @@ int clock_gettime( clockid_t, struct timespec* time_ ) {
 #endif /* #if ! defined( HAVE_CLOCK_GETTIME ) */
 
 #if ! defined( HAVE_TIMER_CREATE )
-int timer_create( clockid_t, struct sigevent*, timer_t* ) {
-	return ( -1 );
+#include <signal.h>
+#include <unistd.h>
+#include "hcore/hthread.hxx"
+class HDarwinTimer {
+	yaal::hcore::HThread _thread;
+	yaal::hcore::HMutex _mutex;
+	yaal::hcore::HCondition _cond;
+	int _sigNo;
+	itimerspec _timerSpec;
+	bool _reset;
+	bool _loop;
+public:
+	HDarwinTimer( int sigNo_ )
+		: _thread()
+		, _mutex()
+		, _cond( _mutex )
+		, _sigNo( sigNo_ )
+		, _timerSpec()
+		, _reset( false )
+		, _loop( false ) {
+	}
+	virtual ~HDarwinTimer( void ) {
+		yaal::hcore::HLock l( _mutex );
+		_loop = false;
+		_reset = true;
+		_cond.signal();
+		l.unlock();
+		_thread.finish();
+	}
+	void set_time( itimerspec const* timerSpec_ ) {
+		yaal::hcore::HLock l( _mutex );
+		_timerSpec = *timerSpec_;
+		if ( ! _loop ) {
+			_thread.spawn( yaal::hcore::call( &HDarwinTimer::wait, this ) );
+		} else {
+			_reset = true;
+			_cond.signal();
+		}
+	}
+	void wait( void ) {
+		yaal::hcore::HLock l( _mutex );
+		_loop = true;
+		while ( _loop ) {
+			_cond.wait( _timerSpec.it_value.tv_sec, _timerSpec.it_value.tv_nsec );
+			if ( ! _reset ) {
+				::kill( getpid(), _sigNo );
+			}
+			_reset = false;
+		}
+		_loop = false;
+	}
+};
+int timer_create( clockid_t, struct sigevent* event_, timer_t* timer_ ) {
+	int err( event_->sigev_notify == SIGEV_SIGNAL ? 0 : -1 );
+	if ( !err ) {
+		*timer_ = new HDarwinTimer( event_->sigev_signo );
+	}
+	return ( err );
 }
-int timer_settime( timer_t, int, struct itimerspec const *, struct itimerspec* ) {
-	return ( -1 );
+int timer_settime( timer_t timer_, int, itimerspec const* timerSpec_, itimerspec* ) {
+	timer_->set_time( timerSpec_ );
+	return ( 0 );
 }
-int timer_delete( timer_t ) {
-	return ( -1 );
+int timer_delete( timer_t timer_ ) {
+	delete timer_;
+	return ( 0 );
 }
 #endif /* #if ! defined( HAVE_TIMER_CREATE ) */
 
