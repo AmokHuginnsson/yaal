@@ -173,16 +173,6 @@ void HStatusBarWidget::set_prompt( yaal::hcore::HString const& prompt_, PROMPT::
 	M_EPILOG
 }
 
-int HStatusBarWidget::verify( void ) {
-	M_PROLOG
-	int length = 0;
-	bool ok = false;
-	if ( length < _promptLength )
-		ok = true;
-	return ( ok );
-	M_EPILOG
-}
-
 void HStatusBarWidget::init_progress( double max_, char const* title_,
 		bool estimate_ ) {
 	M_PROLOG

@@ -51,8 +51,8 @@ public:
 	HLockedFile( yaal::hcore::HString const& path, open_t const& mode );
 	virtual ~HLockedFile( void );
 protected:
-	virtual int do_open( yaal::hcore::HString const&, open_t const& mode );
-	virtual int do_close( void );
+	virtual int do_open( yaal::hcore::HString const&, open_t const& mode ) override;
+	virtual int do_close( void ) override;
 private:
 	void lock( void );
 	void unlock( void );

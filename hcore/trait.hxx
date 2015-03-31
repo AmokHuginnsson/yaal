@@ -641,8 +641,8 @@ public:
 	HNonCopyable( void ) {}
 	virtual ~HNonCopyable( void ) {}
 private:
-	HNonCopyable( HNonCopyable const& );
-	HNonCopyable& operator = ( HNonCopyable const& );
+	HNonCopyable( HNonCopyable const& ) = delete;
+	HNonCopyable& operator = ( HNonCopyable const& ) = delete;
 };
 
 /*! \brief Check if given type is a field type (actually a pointer to a field).

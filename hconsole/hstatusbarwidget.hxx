@@ -100,11 +100,10 @@ public:
 	virtual int process_input_normal( int );
 	virtual int process_input_menu( int );
 protected:
-	virtual void do_paint( void );
-	virtual void do_draw_label( void );
-	virtual bool do_hit_test( int, int ) const;
-	virtual int verify( void );
-	virtual int do_process_input( int );
+	virtual void do_paint( void ) override;
+	virtual void do_draw_label( void ) override;
+	virtual bool do_hit_test( int, int ) const override;
+	virtual int do_process_input( int ) override;
 };
 
 typedef yaal::hcore::HExceptionT<HStatusBarWidget, HEditWidgetException> HStatusBarWidgetException;

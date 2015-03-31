@@ -87,12 +87,12 @@ public:
 	bool is_running( void ) const;
 	void set_csoi( STREAM::stream_t const& );
 private:
-	virtual int long do_write( void const* const, int long );
-	virtual void do_flush( void );
-	virtual int long do_read( void* const, int long );
-	virtual bool do_is_valid( void ) const;
-	HPipedChild( HPipedChild const& );
-	HPipedChild& operator = ( HPipedChild const& );
+	virtual int long do_write( void const* const, int long ) override;
+	virtual void do_flush( void ) override;
+	virtual int long do_read( void* const, int long ) override;
+	virtual bool do_is_valid( void ) const override;
+	HPipedChild( HPipedChild const& ) = delete;
+	HPipedChild& operator = ( HPipedChild const& ) = delete;
 };
 
 typedef yaal::hcore::HExceptionT<HPipedChild, yaal::hcore::HStreamInterfaceException> HPipedChildException;

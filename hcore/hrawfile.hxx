@@ -95,10 +95,10 @@ protected:
 	int long write_ssl_loader( void const* const, int long );
 	int long read_ssl( void* const, int long );
 	int long write_ssl( void const* const, int long );
-	virtual int long do_write( void const* const, int long );
-	virtual int long do_read( void* const, int long );
-	virtual void do_flush( void );
-	virtual bool do_is_valid( void ) const;
+	virtual int long do_write( void const* const, int long ) override;
+	virtual int long do_read( void* const, int long ) override;
+	virtual void do_flush( void ) override;
+	virtual bool do_is_valid( void ) const override;
 	bool wait_for( ACTION::action_t const&, int long* );
 };
 

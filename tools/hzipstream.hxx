@@ -76,10 +76,10 @@ private:
 	void init( void );
 	void cleanup( void );
 	int long prepare_data( void );
-	virtual int long do_write( void const* const, int long );
-	virtual int long do_read( void* const, int long );
-	virtual void do_flush( void );
-	virtual bool do_is_valid( void ) const;
+	virtual int long do_write( void const* const, int long ) override;
+	virtual int long do_read( void* const, int long ) override;
+	virtual void do_flush( void ) override;
+	virtual bool do_is_valid( void ) const override;
 	HZipStream( HZipStream const& );
 	HZipStream& operator = ( HZipStream const& );
 };

@@ -148,13 +148,13 @@ public:
 		: _stream1( stream1_ ), _stream2( stream2_ ) {}
 	HTee( HTee const& );
 protected:
-	virtual int long do_write( void const* const, int long );
-	virtual int long do_read( void* const, int long ) M_DEBUG_CODE( __attribute__((noreturn)) );
-	virtual void do_flush( void );
-	virtual bool do_is_valid( void ) const;
-	virtual bool do_good( void ) const;
-	virtual bool do_fail( void ) const;
-	virtual bool do_bad( void ) const;
+	virtual int long do_write( void const* const, int long ) override;
+	virtual int long do_read( void* const, int long ) override M_DEBUG_CODE( __attribute__((noreturn)) );
+	virtual void do_flush( void ) override;
+	virtual bool do_is_valid( void ) const override;
+	virtual bool do_good( void ) const override;
+	virtual bool do_fail( void ) const override;
+	virtual bool do_bad( void ) const override;
 };
 
 HTee tee( yaal::hcore::HStreamInterface::ptr_t, yaal::hcore::HStreamInterface::ptr_t  );

@@ -50,9 +50,9 @@ public:
 			HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
 	virtual ~HTimeWidget( void );
 protected:
-	virtual void do_paint( void );
-	virtual int do_process_input( int );
-	virtual bool do_click( mouse::OMouse& );
+	virtual void do_paint( void ) override;
+	virtual int do_process_input( int ) override;
+	virtual bool do_click( mouse::OMouse& ) override;
 };
 
 }

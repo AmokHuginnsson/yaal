@@ -106,7 +106,7 @@ public:
 	int timed_read( void* const, int const, int );
 	static flag_t FLAG_TEXT; /* flags for textmode operation */
 protected:
-	virtual int do_close( void );
+	virtual int do_close( void ) override;
 private:
 	void compile( void );
 	void compile_speed( void );

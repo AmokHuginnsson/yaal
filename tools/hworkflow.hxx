@@ -153,7 +153,7 @@ public:
 	 */
 	bool can_join( void );
 private:
-	virtual task_t do_pop_task( void );
+	virtual task_t do_pop_task( void ) override;
 };
 
 typedef yaal::hcore::HExceptionT<HWorkFlow, HWorkFlowInterfaceException> HWorkFlowException;

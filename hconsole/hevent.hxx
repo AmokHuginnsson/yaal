@@ -77,7 +77,7 @@ public:
 		return ( _keyCode );
 	}
 private:
-	virtual TYPE::type_t do_get_type( void ) const {
+	virtual TYPE::type_t do_get_type( void ) const override {
 		return ( TYPE::KEY_PRESS );
 	}
 };
@@ -96,7 +96,7 @@ public:
 		return ( _mouse );
 	}
 private:
-	virtual TYPE::type_t do_get_type( void ) const {
+	virtual TYPE::type_t do_get_type( void ) const override {
 		return ( TYPE::MOUSE );
 	}
 };
@@ -115,7 +115,7 @@ public:
 		return ( _command );
 	}
 private:
-	virtual TYPE::type_t do_get_type( void ) const {
+	virtual TYPE::type_t do_get_type( void ) const override {
 		return ( TYPE::COMMAND );
 	}
 };

@@ -65,12 +65,12 @@ public:
 			HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
 	virtual ~HDateWidget( void );
 protected:
-	virtual void do_paint( void );
-	virtual int do_process_input( int );
-	virtual bool do_click( mouse::OMouse& );
-	virtual HInfo const& do_get_data( void ) const;
-	virtual void do_set_data( HInfo const& );
-	virtual void do_kill_focus( void );
+	virtual void do_paint( void ) override;
+	virtual int do_process_input( int ) override;
+	virtual bool do_click( mouse::OMouse& ) override;
+	virtual HInfo const& do_get_data( void ) const override;
+	virtual void do_set_data( HInfo const& ) override;
+	virtual void do_kill_focus( void ) override;
 	void on_key_down( void );
 	void on_key_up( void );
 	void on_key_left( void );
@@ -85,9 +85,9 @@ protected:
 
 class HDateWidgetCreator : virtual public HWidgetCreatorInterface {
 protected:
-	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& ) override;
+	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) override;
+	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) override;
 };
 
 }

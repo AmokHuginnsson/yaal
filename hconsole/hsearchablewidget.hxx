@@ -67,7 +67,7 @@ class HSearchableWidgetAttributes : virtual public HWidgetAttributes {
 	bool _searchable;   /*!< can widget content be sorted */
 	bool _searchableSet;
 protected:
-	virtual void do_apply( HWidget& ) const;
+	virtual void do_apply( HWidget& ) const override;
 public:
 	HSearchableWidgetAttributes( void );
 	HSearchableWidgetAttributes& searchable( bool );
@@ -75,7 +75,7 @@ public:
 
 class HSearchableWidgetCreator : virtual public HWidgetCreatorInterface {
 protected:
-	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) override;
 };
 
 }

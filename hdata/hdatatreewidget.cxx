@@ -51,13 +51,13 @@ HDataTreeWidget::HDataTreeWidget(
 	M_EPILOG
 }
 
-HDataTreeWidget::~HDataTreeWidget ( void ) {
+HDataTreeWidget::~HDataTreeWidget( void ) {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
-void HDataTreeWidget::load ( int long /*id_*/ ) {
+void HDataTreeWidget::do_load( int long /*id_*/ ) {
 	M_PROLOG
 	return;
 	M_EPILOG

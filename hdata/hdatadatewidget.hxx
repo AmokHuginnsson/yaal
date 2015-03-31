@@ -58,7 +58,7 @@ public:
 
 class HDataDateWidgetCreator : virtual public yaal::hconsole::HDateWidgetCreator {
 protected:
-	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& ) override;
 };
 
 }

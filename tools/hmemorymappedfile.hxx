@@ -70,8 +70,8 @@ public:
 	 */
 	int long get_size( void ) const;
 private:
-	HMemoryMappedFile( HMemoryMappedFile const& );
-	HMemoryMappedFile& operator = ( HMemoryMappedFile const& );
+	HMemoryMappedFile( HMemoryMappedFile const& ) = delete;
+	HMemoryMappedFile& operator = ( HMemoryMappedFile const& ) = delete;
 };
 
 }

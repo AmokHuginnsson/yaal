@@ -101,18 +101,18 @@ protected:
 	bool handler_requery( hconsole::HEvent const& );
 	bool handler_cancel( hconsole::HEvent const& );
 	bool on_sel_change( yaal::hconsole::HEvent const& );
-	virtual void do_init( void );
-	virtual hconsole::HStatusBarWidget* do_init_bar( char const* );
+	virtual void do_init( void ) override;
+	virtual hconsole::HStatusBarWidget* do_init_bar( char const* ) override;
 private:
-	HDataWindow( HDataWindow const& );
-	HDataWindow& operator = ( HDataWindow const& );
+	HDataWindow( HDataWindow const& ) = delete;
+	HDataWindow& operator = ( HDataWindow const& ) = delete;
 	void reload_record( void );
 };
 
 class HDataWindowCreator : public hconsole::HWindowCreator {
 protected:
-	virtual hconsole::HWindow::ptr_t do_new_instance( hconsole::HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual bool do_apply_resources( hconsole::HTUIProcess*, window_ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual hconsole::HWindow::ptr_t do_new_instance( hconsole::HTUIProcess*, yaal::tools::HXml::HConstNodeProxy const& ) override;
+	virtual bool do_apply_resources( hconsole::HTUIProcess*, window_ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) override;
 };
 
 }

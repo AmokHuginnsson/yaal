@@ -61,8 +61,8 @@ public:
 	void set_data( data_ptr_t );
 protected:
 	OMenuItem const* get_selected( void );
-	virtual int do_process_input( int );
-	virtual bool do_click( mouse::OMouse& );
+	virtual int do_process_input( int ) override;
+	virtual bool do_click( mouse::OMouse& ) override;
 private:
 	HMenuWidget( HMenuWidget const& );
 	HMenuWidget& operator = ( HMenuWidget const& );

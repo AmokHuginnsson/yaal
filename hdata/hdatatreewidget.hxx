@@ -43,12 +43,12 @@ public:
 	HDataTreeWidget( HDataWindow*, int, int, int, int, yaal::hcore::HString const&,
 			hconsole::HWidgetAttributesInterface const& = hconsole::HWidgetAttributesInterface() );
 	virtual ~HDataTreeWidget( void );
-	virtual void load( int long );
+	virtual void do_load( int long ) override;
 };
 
 class HDataTreeWidgetCreator : virtual public yaal::hconsole::HTreeWidgetCreator {
 protected:
-	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& ) override;
 };
 
 }

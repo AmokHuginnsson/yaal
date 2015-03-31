@@ -96,14 +96,14 @@ protected:
 	void save_selection( void );
 	void restore_selection( void );
 	void prepend_none( void );
-	virtual void do_update( void );
-	virtual int do_process_input( int );
-	virtual void do_paint( void );
-	virtual bool do_hit_test( int, int ) const;
-	virtual bool do_click( mouse::OMouse& );
-	virtual void do_kill_focus( void ); /* this one will be used here */
-	virtual HInfo const& do_get_data( void ) const;
-	virtual void do_set_data( HInfo const& );
+	virtual void do_update( void ) override;
+	virtual int do_process_input( int ) override;
+	virtual void do_paint( void ) override;
+	virtual bool do_hit_test( int, int ) const override;
+	virtual bool do_click( mouse::OMouse& ) override;
+	virtual void do_kill_focus( void ) override; /* this one will be used here */
+	virtual HInfo const& do_get_data( void ) const override;
+	virtual void do_set_data( HInfo const& ) override;
 private:
 	void close_combo( ACTION::action_t );
 	HComboboxWidget( HComboboxWidget const& ) = delete;
@@ -118,7 +118,7 @@ class HComboboxWidgetAttributes : public virtual HEditWidgetAttributes, public v
 	yaal::hcore::HString _noneText;
 	bool _noneTextSet;
 protected:
-	virtual void do_apply( HWidget& ) const;
+	virtual void do_apply( HWidget& ) const override;
 public:
 	HComboboxWidgetAttributes( void );
 	HComboboxWidgetAttributes& dropped_width( int );
@@ -127,9 +127,9 @@ public:
 
 class HComboboxWidgetCreator : public virtual HListWidgetCreator, public virtual HEditWidgetCreator {
 protected:
-	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& ) override;
+	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) override;
+	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) override;
 };
 
 }

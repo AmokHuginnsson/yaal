@@ -74,8 +74,8 @@ public:
 	void add( yaal::hcore::HString const& );
 	void add( int );
 protected:
-	virtual int do_process_input( int );
-	virtual void do_paint( void );
+	virtual int do_process_input( int ) override;
+	virtual void do_paint( void ) override;
 };
 
 typedef yaal::hcore::HExceptionT<HLogPad, HWidgetException> HLogPadException;

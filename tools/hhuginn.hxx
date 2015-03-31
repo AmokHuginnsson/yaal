@@ -501,7 +501,7 @@ public:
 	void store_boolean( bool, HFrame*, int );
 	void store_none( HFrame*, int );
 protected:
-	virtual void do_execute( HHuginn::HThread* ) const;
+	virtual void do_execute( HHuginn::HThread* ) const override;
 private:
 	HExpression( HExpression const& ) = delete;
 	HExpression& operator = ( HExpression const& ) = delete;
@@ -726,7 +726,7 @@ public:
 	void to_real( void ) const;
 	void to_string( void ) const;
 protected:
-	virtual HIterator do_iterator( void );
+	virtual HIterator do_iterator( void ) override;
 };
 
 class HHuginn::HCharacter : public HHuginn::HValue {
@@ -772,7 +772,7 @@ public:
 	value_t get( int long long );
 	value_t get_ref( int long long );
 protected:
-	virtual HIterator do_iterator( void );
+	virtual HIterator do_iterator( void ) override;
 };
 
 class HHuginn::HMap : public HHuginn::HIterable {
@@ -791,7 +791,7 @@ public:
 	value_t get_ref( HHuginn::value_t const&, int );
 	void insert( HHuginn::value_t const&, HHuginn::value_t const&, int );
 protected:
-	virtual HIterator do_iterator( void );
+	virtual HIterator do_iterator( void ) override;
 private:
 	void verify_key_type( HHuginn::type_t, int );
 	HMap( HMap const& ) = delete;
@@ -811,7 +811,7 @@ public:
 	}
 	void add_statement( statement_t );
 protected:
-	virtual void do_execute( HHuginn::HThread* ) const;
+	virtual void do_execute( HHuginn::HThread* ) const override;
 private:
 	HScope( HScope const& ) = delete;
 	HScope( HScope&& ) = delete;
@@ -827,7 +827,7 @@ private:
 public:
 	HReturn( expression_t const& );
 protected:
-	virtual void do_execute( HHuginn::HThread* ) const;
+	virtual void do_execute( HHuginn::HThread* ) const override;
 private:
 	HReturn( HReturn const& ) = delete;
 	HReturn& operator = ( HReturn const& ) = delete;
@@ -840,7 +840,7 @@ public:
 public:
 	HBreak( void );
 protected:
-	virtual void do_execute( HHuginn::HThread* ) const;
+	virtual void do_execute( HHuginn::HThread* ) const override;
 private:
 	HBreak( HBreak const& ) = delete;
 	HBreak& operator = ( HBreak const& ) = delete;
@@ -857,7 +857,7 @@ private:
 public:
 	HIf( if_clauses_t const&, scope_t const& );
 protected:
-	virtual void do_execute( HThread* ) const;
+	virtual void do_execute( HThread* ) const override;
 };
 
 class HHuginn::HSwitch : public HHuginn::HStatement {
@@ -872,7 +872,7 @@ private:
 public:
 	HSwitch( expression_t const&, cases_t const&, scope_t const& );
 protected:
-	virtual void do_execute( HThread* ) const;
+	virtual void do_execute( HThread* ) const override;
 };
 
 class HHuginn::HWhile : public HHuginn::HStatement {
@@ -885,7 +885,7 @@ private:
 public:
 	HWhile( expression_t const&, scope_t const& );
 protected:
-	virtual void do_execute( HThread* ) const;
+	virtual void do_execute( HThread* ) const override;
 };
 
 class HHuginn::HFor : public HHuginn::HStatement {
@@ -900,7 +900,7 @@ private:
 public:
 	HFor( yaal::hcore::HString const&, expression_t const&, scope_t const&, int );
 protected:
-	virtual void do_execute( HThread* ) const;
+	virtual void do_execute( HThread* ) const override;
 };
 
 class HHuginn::HFunction {

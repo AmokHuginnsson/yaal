@@ -2929,13 +2929,13 @@ public:
 		return;
 	}
 protected:
-	virtual HHuginn::value_t do_value( void ) {
+	virtual HHuginn::value_t do_value( void ) override {
 		return ( make_pointer<HHuginn::HCharacter>( _string->value()[ _index ] ) );
 	}
-	virtual bool do_is_valid( void ) {
+	virtual bool do_is_valid( void ) override {
 		return ( _index < _string->value().get_size() );
 	}
-	virtual void do_next( void ) {
+	virtual void do_next( void ) override {
 		++ _index;
 	}
 private:
@@ -2953,13 +2953,13 @@ public:
 		return;
 	}
 protected:
-	virtual HHuginn::value_t do_value( void ) {
+	virtual HHuginn::value_t do_value( void ) override {
 		return ( _list->get( _index ) );
 	}
-	virtual bool do_is_valid( void ) {
+	virtual bool do_is_valid( void ) override {
 		return ( _index < _list->size() );
 	}
-	virtual void do_next( void ) {
+	virtual void do_next( void ) override {
 		++ _index;
 	}
 private:
@@ -2976,13 +2976,13 @@ public:
 		return;
 	}
 protected:
-	virtual HHuginn::value_t do_value( void ) {
+	virtual HHuginn::value_t do_value( void ) override {
 		return ( _it->first );
 	}
-	virtual bool do_is_valid( void ) {
+	virtual bool do_is_valid( void ) override {
 		return ( _it != _map->end() );
 	}
-	virtual void do_next( void ) {
+	virtual void do_next( void ) override {
 		++ _it;
 	}
 private:

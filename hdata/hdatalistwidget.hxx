@@ -78,19 +78,19 @@ public:
 			yaal::hcore::HString const&,
 			yaal::hcore::HString const& );
 protected:
-	virtual int long do_get_current_id( void );
-	virtual void do_load( int long );
-	virtual void do_save( int long );
-	virtual void do_add_new( void );
-	virtual void do_cancel_new( void );
+	virtual int long do_get_current_id( void ) override;
+	virtual void do_load( int long ) override;
+	virtual void do_save( int long ) override;
+	virtual void do_add_new( void ) override;
+	virtual void do_cancel_new( void ) override;
 private:
 	void make_crud( int long );
 };
 
 class HDataListWidgetCreator : virtual public yaal::hconsole::HListWidgetCreator {
 protected:
-	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual bool do_apply_resources( hconsole::HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& ) override;
+	virtual bool do_apply_resources( hconsole::HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) override;
 	virtual hconsole::HListWidget::HColumnInfo::ptr_t do_make_column(
 			yaal::tools::HXml::HConstNodeProxy const&,
 			hconsole::HListWidget*,
@@ -99,7 +99,7 @@ protected:
 			hconsole::HListWidget::BITS::ALIGN::align_t const& align,
 			type_id_t type,
 			yaal::hcore::HString const&,
-			hconsole::HWidget* associatedWidget );
+			hconsole::HWidget* associatedWidget ) override;
 };
 
 }

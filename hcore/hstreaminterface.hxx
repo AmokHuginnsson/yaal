@@ -310,16 +310,16 @@ protected:
 	virtual HStreamInterface& do_set_float_format( FLOAT_FORMAT::enum_t );
 	virtual HStreamInterface& do_set_skipws( bool );
 	virtual HStreamInterface& do_set_boolalpha( bool );
-	bool do_get_skipws( void ) const;
-	bool do_get_boolalpha( void ) const;
-	int do_get_fill( void ) const;
-	int do_get_width( void ) const;
-	int do_get_precision( void ) const;
-	BASES::enum_t do_get_base( void ) const;
-	FLOAT_FORMAT::enum_t do_get_float_format( void ) const;
-	bool do_good( void ) const;
-	bool do_fail( void ) const;
-	bool do_bad( void ) const;
+	virtual bool do_get_skipws( void ) const;
+	virtual bool do_get_boolalpha( void ) const;
+	virtual int do_get_fill( void ) const;
+	virtual int do_get_width( void ) const;
+	virtual int do_get_precision( void ) const;
+	virtual BASES::enum_t do_get_base( void ) const;
+	virtual FLOAT_FORMAT::enum_t do_get_float_format( void ) const;
+	virtual bool do_good( void ) const;
+	virtual bool do_fail( void ) const;
+	virtual bool do_bad( void ) const;
 private:
 	int long read_while_retry( yaal::hcore::HString& , char const* const, bool );
 	int long read_until_retry( yaal::hcore::HString& , char const* const, bool );

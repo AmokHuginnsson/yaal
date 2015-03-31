@@ -58,14 +58,14 @@ public:
 			hconsole::HWidgetAttributesInterface const& = hconsole::HWidgetAttributesInterface() );
 	void set_validator( yaal::hcore::HString const& );
 	bool is_valid( void ) const;
-	virtual int do_process_input( int );
+	virtual int do_process_input( int ) override;
 };
 
 class HDataEditWidgetAttributes : virtual public hconsole::HEditWidgetAttributes {
 	yaal::hcore::HString _valid;
 	bool _validSet;
 protected:
-	virtual void do_apply( hconsole::HWidget& ) const;
+	virtual void do_apply( hconsole::HWidget& ) const override;
 public:
 	HDataEditWidgetAttributes( void );
 	HDataEditWidgetAttributes& valid( yaal::hcore::HString const& );
@@ -73,8 +73,8 @@ public:
 
 class HDataEditWidgetCreator : virtual public yaal::hconsole::HEditWidgetCreator {
 protected:
-	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual bool do_prepare_attributes( hconsole::HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual hconsole::HWidget::ptr_t do_new_instance( hconsole::HWindow*, yaal::tools::HXml::HConstNodeProxy const& ) override;
+	virtual bool do_prepare_attributes( hconsole::HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) override;
 };
 
 }

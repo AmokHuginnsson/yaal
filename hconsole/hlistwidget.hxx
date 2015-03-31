@@ -99,11 +99,11 @@ public:
 	virtual ~HCell( void ) {
 		return;
 	}
-	virtual int long long get_integer( void ) const;
-	virtual double long get_real( void ) const;
-	virtual yaal::hcore::HString get_string( void ) const;
-	virtual yaal::hcore::HString get_time( void ) const;
-	virtual void set_child_widget_data( HWidget* );
+	virtual int long long get_integer( void ) const override;
+	virtual double long get_real( void ) const override;
+	virtual yaal::hcore::HString get_string( void ) const override;
+	virtual yaal::hcore::HString get_time( void ) const override;
+	virtual void set_child_widget_data( HWidget* ) override;
 };
 
 /*! \brief Interface for row based access to data (model) in HListWidget.
@@ -129,12 +129,12 @@ class HRow : public HAbstractRow {
 	cells_t _cells;
 public:
 	HRow( tType* );
-	virtual HAbstractCell& operator[]( int column_ ) {
+	virtual HAbstractCell& operator[]( int column_ ) override {
 		return ( *(_cells[ column_ ]) );
 	}
-	virtual void switch_state( void );
-	virtual int long get_id( void );
-	virtual bool get_checked( void );
+	virtual void switch_state( void ) override;
+	virtual int long get_id( void ) override;
+	virtual bool get_checked( void ) override;
 private:
 	HRow( HRow const& ) = delete;
 	HRow& operator = ( HRow const& ) = delete;
@@ -237,26 +237,26 @@ public:
 	void add_tail( tType const& row_ );
 	void add_orderly( tType const& row_, int column_, list_widget_helper::OSortHelper::sort_order_t order_ = OSortHelper::ASCENDING );
 	void remove_tail( void );
-	virtual int long size( void ) const {
+	virtual int long size( void ) const override {
 		return ( _list->size() );
 	}
 	data_ptr_t get_data( void );
-	virtual void sort( list_widget_helper::OSortHelper& );
-	virtual bool is_empty( void ) const {
+	virtual void sort( list_widget_helper::OSortHelper& ) override;
+	virtual bool is_empty( void ) const override {
 		return ( _list->is_empty() );
 	}
-	virtual HAbstractListModel::HModelIteratorWrapper begin( void ) {
+	virtual HAbstractListModel::HModelIteratorWrapper begin( void ) override {
 		return ( HModelIteratorWrapper( _list->begin() != _list->end()
 					? hcore::make_pointer<HModelIterator>( this, _list->begin() )
 					: iterator_ptr_t() ) );
 	}
-	virtual HAbstractListModel::HModelIteratorWrapper end( void ) {
+	virtual HAbstractListModel::HModelIteratorWrapper end( void ) override {
 		return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, _list->end() ) ) );
 	}
-	virtual HAbstractListModel::HModelIteratorWrapper last( void ) {
+	virtual HAbstractListModel::HModelIteratorWrapper last( void ) override {
 		return ( HModelIteratorWrapper( hcore::make_pointer<HModelIterator>( this, prev( _list->end() ) ) ) );
 	}
-	virtual void erase( HModelIteratorWrapper& );
+	virtual void erase( HModelIteratorWrapper& ) override;
 	friend class HModelIterator;
 };
 
@@ -273,31 +273,31 @@ class HAsIsValueListModel<tType>::HModelIterator : public HAbstractModelIterator
 	}
 	HModelIterator( HModelIterator const& );
 	HModelIterator& operator = ( HModelIterator const& );
-	virtual HAbstractRow& dereference( void ) {
+	virtual HAbstractRow& dereference( void ) override {
 		return ( _row );
 	}
-	virtual HAbstractRow* call( void ) {
+	virtual HAbstractRow* call( void ) override {
 		return ( &_row );
 	}
-	virtual void next( void ) {
+	virtual void next( void ) override {
 		++ _iterator;
 		return;
 	}
-	virtual void previous( void ) {
+	virtual void previous( void ) override {
 		-- _iterator;
 		return;
 	}
-	virtual HAbstractListModel::iterator_ptr_t clone( void ) const {
+	virtual HAbstractListModel::iterator_ptr_t clone( void ) const override {
 		return ( iterator_ptr_t( hcore::make_pointer<HModelIterator>( _owner, _iterator ) ) );
 	}
-	virtual bool is_equal( HAbstractModelIterator const& it_ ) const {
+	virtual bool is_equal( HAbstractModelIterator const& it_ ) const override {
 		return ( _iterator == static_cast<typename HAsIsValueListModel<tType>::HModelIterator const&>( it_ )._iterator );
 	}
-	virtual bool is_not_equal( HAbstractModelIterator const& it_ ) const {
+	virtual bool is_not_equal( HAbstractModelIterator const& it_ ) const override {
 		return ( _iterator != static_cast<typename HAsIsValueListModel<tType>::HModelIterator const&>( it_ )._iterator );
 	}
 
-	virtual bool is_valid( void ) const {
+	virtual bool is_valid( void ) const override {
 		HAsIsValueListModel* lc( const_cast<HAsIsValueListModel*>( _owner ) );
 		return ( ( _iterator != iterator_t() ) && ( _iterator != lc->_list->end() ) );
 	}
@@ -439,16 +439,16 @@ public:
 	int get_cursor_position( void ) const;
 	void selection_change( void );
 protected:
-	virtual bool get_text_for_cell( iterator_t&, int, type_id_t, hcore::HFormat* = nullptr );
-	virtual void do_paint( void );
+	virtual void do_paint( void ) override;
+	virtual int do_process_input( int ) override;
+	virtual bool is_searchable( void ) override;
+	virtual void do_update( void ) override;
+	virtual bool do_click( mouse::OMouse& ) override;
+	virtual void go_to_match( void ) override;
+	virtual void go_to_match_previous( void ) override;
+	bool get_text_for_cell( iterator_t&, int, type_id_t, hcore::HFormat* = nullptr );
 	void update_children( void );
 	void draw_cell( iterator_t&, int, int, int, HColumnInfo const* const, bool );
-	virtual int do_process_input( int );
-	virtual bool is_searchable( void );
-	virtual void do_update( void );
-	virtual bool do_click( mouse::OMouse& );
-	virtual void go_to_match( void );
-	virtual void go_to_match_previous( void );
 	void handle_key_page_up( void );
 	void handle_key_page_down( void );
 	void handle_key_up( void );
@@ -477,8 +477,8 @@ private:
 	void draw_header( int );
 	void draw_scroll( int );
 	int column_offset( int ) const;
-	HListWidget( HListWidget const& );
-	HListWidget& operator = ( HListWidget const& );
+	HListWidget( HListWidget const& ) = delete;
+	HListWidget& operator = ( HListWidget const& ) = delete;
 };
 
 /*! \brief HListWidget helper utilities.
@@ -562,7 +562,7 @@ class HListWidgetAttributes : virtual public HSearchableWidgetAttributes {
 	bool _editable;   /*!< is list interactively editable */
 	bool _editableSet;
 protected:
-	virtual void do_apply( HWidget& ) const;
+	virtual void do_apply( HWidget& ) const override;
 public:
 	HListWidgetAttributes( void );
 	HListWidgetAttributes& checkable( bool );
@@ -583,9 +583,9 @@ public:
 			yaal::hcore::HString const& format_,
 			HWidget* associatedWidget );
 protected:
-	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& ) override;
+	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) override;
+	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) override;
 	virtual HListWidget::HColumnInfo::ptr_t do_make_column(
 			yaal::tools::HXml::HConstNodeProxy const&,
 			HListWidget*,

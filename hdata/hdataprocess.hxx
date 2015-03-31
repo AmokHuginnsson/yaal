@@ -58,8 +58,8 @@ public:
 /* cppcheck-suppress functionConst */
 	dbwrapper::database_ptr_t data_base( void );
 protected:
-	virtual void do_quit( void );
-	virtual void do_close_window( void );
+	virtual void do_quit( void ) override;
+	virtual void do_close_window( void ) override;
 	void force_close_window( void );
 	void force_quit( void );
 private:

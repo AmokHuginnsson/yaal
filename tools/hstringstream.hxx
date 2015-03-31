@@ -57,10 +57,10 @@ public:
 	yaal::hcore::HString const& consume( void ) const;
 	bool is_empty( void ) const;
 private:
-	virtual int long do_write( void const* const, int long );
-	virtual void do_flush( void );
-	virtual int long do_read( void* const, int long );
-	virtual bool do_is_valid( void ) const;
+	virtual int long do_write( void const* const, int long ) override;
+	virtual void do_flush( void ) override;
+	virtual int long do_read( void* const, int long ) override;
+	virtual bool do_is_valid( void ) const override;
 	HStringStream( HStringStream const& ) = delete;
 	HStringStream& operator = ( HStringStream const& ) = delete;
 };

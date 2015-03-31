@@ -57,11 +57,11 @@ public:
 	virtual ~HMainWindow( void );
 	void set_menu( HMenuWidget::data_ptr_t );
 protected:
-	virtual void do_init( void );
+	virtual void do_init( void ) override;
 	bool handler_close( HEvent const& ); /* closes window process */
 private:
-	HMainWindow( HMainWindow const& );
-	HMainWindow& operator = ( HMainWindow const& );
+	HMainWindow( HMainWindow const& ) = delete;
+	HMainWindow& operator = ( HMainWindow const& ) = delete;
 };
 
 typedef yaal::hcore::HExceptionT<HMainWindow, HWindowException> HMainWindowException;

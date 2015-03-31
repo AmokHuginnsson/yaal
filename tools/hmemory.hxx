@@ -35,14 +35,19 @@ namespace tools {
 
 class HMemoryHandlingStrategyInterface {
 public:
-	int long get_size( void ) const
-		{ return ( do_get_size() ); }
-	void* get_memory( void ) const
-		{ return ( do_get_memory() ); }
-	void commit( int long size_ )
-		{ do_commit( size_ ); }
-	virtual ~HMemoryHandlingStrategyInterface( void )
-		{}
+	int long get_size( void ) const {
+		return ( do_get_size() );
+	}
+	void* get_memory( void ) const {
+		return ( do_get_memory() );
+	}
+	void commit( int long size_ ) {
+		do_commit( size_ );
+		return;
+	}
+	virtual ~HMemoryHandlingStrategyInterface( void ) {
+		return;
+	}
 protected:
 	virtual int long do_get_size( void ) const = 0;
 	virtual void* do_get_memory( void ) const = 0;
@@ -64,33 +69,39 @@ public:
 		M_ASSERT( ptr );
 	}
 protected:
-	virtual int long do_get_size( void ) const
-		{ return ( _size ); }
-	virtual void* do_get_memory( void ) const
-		{ return ( _block ); }
-	virtual void do_commit( int long )
-		{}
+	virtual int long do_get_size( void ) const override {
+		return ( _size );
+	}
+	virtual void* do_get_memory( void ) const override {
+		return ( _block );
+	}
+	virtual void do_commit( int long ) override {
+		return;
+	}
 private:
-	HMemoryObserver( HMemoryObserver const& );
-	HMemoryObserver& operator = ( HMemoryObserver const& );
+	HMemoryObserver( HMemoryObserver const& ) = delete;
+	HMemoryObserver& operator = ( HMemoryObserver const& ) = delete;
 };
 
 class HMemoryProvider : public HMemoryHandlingStrategyInterface {
 	yaal::hcore::HChunk& _chunk;
 public:
 	HMemoryProvider( yaal::hcore::HChunk& chunk_ )
-		: _chunk( chunk_ )
-		{}
+		: _chunk( chunk_ ) {
+	}
 protected:
-	virtual int long do_get_size( void ) const
-		{ return ( _chunk.get_size() ); }
-	virtual void* do_get_memory( void ) const
-		{ return ( _chunk.raw() ); }
-	virtual void do_commit( int long size_ )
-		{ _chunk.realloc( size_ ); }
+	virtual int long do_get_size( void ) const override {
+		return ( _chunk.get_size() );
+	}
+	virtual void* do_get_memory( void ) const override {
+		return ( _chunk.raw() );
+	}
+	virtual void do_commit( int long size_ ) override {
+		_chunk.realloc( size_ );
+	}
 private:
-	HMemoryProvider( HMemoryProvider const& );
-	HMemoryProvider& operator = ( HMemoryProvider const& );
+	HMemoryProvider( HMemoryProvider const& ) = delete;
+	HMemoryProvider& operator = ( HMemoryProvider const& ) = delete;
 };
 
 /*! \brief Stream based access to raw memory block.
@@ -127,12 +138,12 @@ public:
 	int long valid_octets( void ) const
 		{ return ( _valid ); }
 private:
-	virtual int long do_write( void const* const, int long );
-	virtual void do_flush( void );
-	virtual int long do_read( void* const, int long );
-	virtual bool do_is_valid( void ) const;
-	HMemory( HMemory const& src );
-	HMemory& operator = ( HMemory const& src );
+	virtual int long do_write( void const* const, int long ) override;
+	virtual void do_flush( void ) override;
+	virtual int long do_read( void* const, int long ) override;
+	virtual bool do_is_valid( void ) const override;
+	HMemory( HMemory const& src ) = delete;
+	HMemory& operator = ( HMemory const& src ) = delete;
 };
 
 typedef yaal::hcore::HExceptionT<HMemory, yaal::hcore::HStreamInterfaceException> HMemoryException;

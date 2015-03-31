@@ -53,14 +53,14 @@ public:
 	HInfoString( HInfoString const& );
 	virtual ~HInfoString( void );
 protected:
-	virtual int long long do_get_integer( void ) const;
-	virtual double long do_get_real( void ) const;
-	virtual yaal::hcore::HString const& do_get_string( void ) const;
-	virtual yaal::hcore::HTime const& do_get_time( void ) const M_DEBUG_CODE( __attribute__(( noreturn )) );
-	virtual void do_set_integer( int long long );
-	virtual void do_set_real( double long );
-	virtual void do_set_string( yaal::hcore::HString const& );
-	virtual void do_set_time( yaal::hcore::HTime const& );
+	virtual int long long do_get_integer( void ) const override;
+	virtual double long do_get_real( void ) const override;
+	virtual yaal::hcore::HString const& do_get_string( void ) const override;
+	virtual yaal::hcore::HTime const& do_get_time( void ) const override M_DEBUG_CODE( __attribute__(( noreturn )) );
+	virtual void do_set_integer( int long long ) override;
+	virtual void do_set_real( double long ) override;
+	virtual void do_set_string( yaal::hcore::HString const& ) override;
+	virtual void do_set_time( yaal::hcore::HTime const& ) override;
 private:
 	void purge( void );
 };
@@ -132,11 +132,11 @@ public:
 			bool const* readonly, bool const* rightAlign,
 			bool const* password, int const* maxhist );
 protected:
-	virtual void do_paint( void );
-	virtual int do_process_input( int );
-	virtual bool do_click( mouse::OMouse& );
-	virtual HInfo const& do_get_data( void ) const;
-	virtual void do_set_data( HInfo const& );
+	virtual void do_paint( void ) override;
+	virtual int do_process_input( int ) override;
+	virtual bool do_click( mouse::OMouse& ) override;
+	virtual HInfo const& do_get_data( void ) const override;
+	virtual void do_set_data( HInfo const& ) override;
 private:
 	int find_eow( int );
 	int go_to_eow( int );
@@ -176,7 +176,7 @@ class HEditWidgetAttributes : virtual public HWidgetAttributes {
 	yaal::hcore::HString _text;
 	bool _textSet;
 protected:
-	virtual void do_apply( HWidget& ) const;
+	virtual void do_apply( HWidget& ) const override;
 public:
 	HEditWidgetAttributes( void );
 	HEditWidgetAttributes& replace( bool );
@@ -192,9 +192,9 @@ public:
 
 class HEditWidgetCreator : virtual public HWidgetCreatorInterface {
 protected:
-	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& );
-	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& );
+	virtual HWidget::ptr_t do_new_instance( HWindow*, yaal::tools::HXml::HConstNodeProxy const& ) override;
+	virtual bool do_prepare_attributes( HWidgetAttributesInterface&, yaal::tools::HXml::HConstNodeProxy const& ) override;
+	virtual bool do_apply_resources( HWidget::ptr_t, yaal::tools::HXml::HConstNodeProxy const& ) override;
 };
 
 }

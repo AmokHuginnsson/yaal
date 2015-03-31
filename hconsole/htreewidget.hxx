@@ -146,56 +146,56 @@ public:
 			return ( **_node );
 		}
 	private:
-		virtual id_t do_get_id( void ) const {
+		virtual id_t do_get_id( void ) const override {
 			M_PROLOG
 			return ( reinterpret_cast<id_t>( _node ) );
 			M_EPILOG
 		}
-		virtual bool do_is_valid( void ) const {
+		virtual bool do_is_valid( void ) const override {
 			M_PROLOG
 			return ( _node != NULL );
 			M_EPILOG
 		}
-		virtual int do_get_child_count( void ) const {
+		virtual int do_get_child_count( void ) const override {
 			M_PROLOG
 			return ( static_cast<int>( _node->child_count() ) );
 			M_EPILOG
 		}
-		virtual HAbstractTreeModelNode::ptr_t do_get_child( int childNo_ ) const {
+		virtual HAbstractTreeModelNode::ptr_t do_get_child( int childNo_ ) const override {
 			M_PROLOG
 			typename data_t::HNode::const_iterator it( _node->begin() );
 			advance( it, childNo_ );
 			return ( hcore::make_pointer<HAsIsValueTreeModelNode>( &*it ) );
 			M_EPILOG
 		}
-		virtual HAbstractTreeModelNode::ptr_t do_get_parent( void ) const {
+		virtual HAbstractTreeModelNode::ptr_t do_get_parent( void ) const override {
 			M_PROLOG
 			return ( hcore::make_pointer<HAsIsValueTreeModelNode>( _node->get_parent() ) );
 			M_EPILOG
 		}
-		yaal::hcore::HString do_get_long( void ) const {
+		virtual yaal::hcore::HString do_get_long( void ) const override {
 			M_PROLOG
 			return ( (**_node).get_integer() );
 			M_EPILOG
 		}
-		yaal::hcore::HString do_get_double( void ) const {
+		virtual yaal::hcore::HString do_get_double( void ) const override {
 			M_PROLOG
 			return ( (**_node).get_real() );
 			M_EPILOG
 		}
-		yaal::hcore::HString do_get_string( void ) const {
+		virtual yaal::hcore::HString do_get_string( void ) const override {
 			M_PROLOG
 			return ( (**_node).get_string() );
 			M_EPILOG
 		}
-		yaal::hcore::HString do_get_time( void ) const {
+		virtual yaal::hcore::HString do_get_time( void ) const override {
 			M_PROLOG
 			return ( (**_node).get_time().string() );
 			M_EPILOG
 		}
 	private:
-		HAsIsValueTreeModelNode( HAsIsValueTreeModelNode const& );
-		HAsIsValueTreeModelNode& operator = ( HAsIsValueTreeModelNode const& );
+		HAsIsValueTreeModelNode( HAsIsValueTreeModelNode const& ) = delete;
+		HAsIsValueTreeModelNode& operator = ( HAsIsValueTreeModelNode const& ) = delete;
 	};
 private:
 	data_ptr_t _data;
@@ -218,8 +218,8 @@ protected:
 		return;
 	}
 private:
-	HAsIsValueTreeModel( HAsIsValueTreeModel const& );
-	HAsIsValueTreeModel& operator = ( HAsIsValueTreeModel const& );
+	HAsIsValueTreeModel( HAsIsValueTreeModel const& ) = delete;
+	HAsIsValueTreeModel& operator = ( HAsIsValueTreeModel const& ) = delete;
 };
 
 /*! \brief Implementation of TUI Tree control class.
@@ -278,10 +278,10 @@ public:
 	void set_model( HAbstractTreeModel::ptr_t );
 	HAbstractTreeModel::ptr_t get_model( void ) const;
 protected:
-	virtual int do_process_input( int );
-	virtual bool do_click( mouse::OMouse& );
-	virtual void do_paint( void );
-	virtual void do_on_model_changed( void );
+	virtual int do_process_input( int ) override;
+	virtual bool do_click( mouse::OMouse& ) override;
+	virtual void do_paint( void ) override;
+	virtual void do_on_model_changed( void ) override;
 private:
 	void build_view( tree_view_t::node_t viewNode_, HAbstractTreeModel::HAbstractTreeModelNode::ptr_t modelNode_ );
 	bool do_click( tree_view_t::node_t, mouse::OMouse& );
@@ -289,8 +289,8 @@ private:
 	void collapse( tree_view_t::node_t );
 	tree_view_t::node_t next( tree_view_t::node_t );
 	tree_view_t::node_t previous( tree_view_t::node_t, bool = false );
-	HTreeWidget( HTreeWidget const& );
-	HTreeWidget& operator = ( HTreeWidget const& );
+	HTreeWidget( HTreeWidget const& ) = delete;
+	HTreeWidget& operator = ( HTreeWidget const& ) = delete;
 };
 
 typedef yaal::hcore::HExceptionT<HTreeWidget, HWidgetException> HTreeWidgetException;

@@ -99,10 +99,10 @@ private:
 	void timestamp( void );
 	int vformat( char const* const, va_list ) __attribute__(( format( printf, 2, 0 ) ));
 	void eol_reset( char const* const, int long );
-	virtual int long do_write( void const* const, int long );
-	virtual void do_flush( void );
-	virtual int long do_read( void* const, int long );
-	virtual bool do_is_valid( void ) const;
+	virtual int long do_write( void const* const, int long ) override;
+	virtual void do_flush( void ) override;
+	virtual int long do_read( void* const, int long ) override;
+	virtual bool do_is_valid( void ) const override;
 	HLog( HLog const& );
 	HLog& operator= ( HLog const& );
 	friend class yaal::hcore::HSingleton<HLog>;

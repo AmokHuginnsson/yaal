@@ -96,7 +96,7 @@ public:
 	int get_client_count( void ) const;
 	HString const& get_host_name( void );
 protected:
-	virtual int do_close( void );
+	virtual int do_close( void ) override;
 	void make_address( yaal::hcore::HString const&, int );
 private:
 	HSocket( HSocket const& );
