@@ -147,8 +147,8 @@ void HDataWindow::sync( void ) {
 bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED,
-				_ ( "You cannot add new rocord now." ) );
+		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
+				_( "You cannot add new rocord now." ) );
 		return ( true );
 	}
 	_mode = HCRUDDescriptor::MODE::INSERT;
@@ -162,13 +162,13 @@ bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {
 bool HDataWindow::handler_edit( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED,
-				_ ( "You cannot start editing of this record." ) );
+		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
+				_( "You cannot start editing of this record." ) );
 		return ( true );
 	}
 	if ( ! _crud->get_size() ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED,
-				_ ( "There is nothing to edit." ) );
+		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
+				_( "There is nothing to edit." ) );
 		return ( true );
 	}
 	_mode = HCRUDDescriptor::MODE::UPDATE;
@@ -180,12 +180,12 @@ bool HDataWindow::handler_edit( hconsole::HEvent const& ) {
 bool HDataWindow::handler_delete( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED,
+		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
 				_( "You cannot delete this record." ) );
 		return ( true );
 	}
 	if ( ! _crud->get_size() ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED,
+		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
 				_( "There is nothing to remove." ) );
 		return ( true );
 	}
@@ -203,7 +203,7 @@ bool HDataWindow::handler_delete( hconsole::HEvent const& ) {
 bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::EDIT ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED, _( "There is nothing to save." ) );
+		_statusBar->message( COLORS::FG_BRIGHTRED, "%s", _( "There is nothing to save." ) );
 		return ( true );
 	}
 	if ( ( _mode == HCRUDDescriptor::MODE::INSERT ) || ( _mode == HCRUDDescriptor::MODE::UPDATE ) ) {
@@ -246,7 +246,7 @@ bool HDataWindow::handler_save( hconsole::HEvent const& ) {
 bool HDataWindow::handler_requery( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
-		_statusBar->message( COLORS::FG_BRIGHTRED,
+		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
 				_( "Finish your current operation first." ) );
 		return ( true );
 	}
@@ -271,7 +271,7 @@ bool HDataWindow::handler_cancel( hconsole::HEvent const& ) {
 	}
 	_modified = false;
 	_statusBar->paint();
-	_statusBar->message( COLORS::FG_BRIGHTRED, _( "Dropping all changes." ) );
+	_statusBar->message( COLORS::FG_BRIGHTRED, "%s", _( "Dropping all changes." ) );
 	reload_record();
 	return ( true );
 	M_EPILOG

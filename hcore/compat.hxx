@@ -49,7 +49,7 @@ char* strcasestr( char const*, char const* );
 #endif /* #if ! defined( HAVE_DECL_TEMP_FAILURE_RETRY ) || ( HAVE_DECL_TEMP_FAILURE_RETRY == 0 ) */
 
 #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
-void* memrchr( void const*, int, int long );
+void* memrchr( void const*, int, int long unsigned );
 #endif /* #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 ) */
 
 #if ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 )

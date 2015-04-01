@@ -55,13 +55,16 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 
 #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 )
-void* memrchr( void const* ptr, int what, int long from ) {
-	char const* str = static_cast<char const*>( ptr );
-	while ( -- from >= 0 ) {
-		if ( str[ from ] == what )
+void* memrchr( void const* ptr, int what, int long unsigned from ) {
+	char const* str( static_cast<char const*>( ptr ) );
+	bool found( false );
+	while ( from -- > 0 ) {
+		if ( str[ from ] == what ) {
+			found = true;
 			break;
+		}
 	}
-	return ( from >= 0 ? const_cast<char*>( str + from ) : 0 );
+	return ( found ? const_cast<char*>( str + from ) : nullptr );
 }
 #endif /* not HAVE_MEMRCHR */
 
@@ -75,7 +78,14 @@ int long strnlen( char const* str_, int long maxLen_ ) {
 #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
 #include <cstring>
 char* strcasestr( char const* haystack, char const* needle ) {
-	int long idx = ::yaal::hcore::string_helper::kmpcasesearch( ( haystack ), static_cast<int long>( ::std::strlen( haystack ) ), ( needle ), static_cast<int long>( ::std::strlen( needle ) ) );
+	int long idx(
+		::yaal::hcore::string_helper::kmpcasesearch(
+			haystack,
+			static_cast<int long>( ::std::strlen( haystack ) ),
+			needle,
+			static_cast<int long>( ::std::strlen( needle ) )
+		)
+	);
 	return ( idx >= 0 ? const_cast<char*>( haystack ) + idx : 0 );
 }
 #endif /* not HAVE_STRCASESTR */
@@ -86,8 +96,9 @@ char* strcasestr( char const* haystack, char const* needle ) {
 #include <netdb.h>
 int gethostbyname_r( char const* a0, struct hostent* a1, char* a2, long unsigned a3, struct hostent** a4, int* a5 ) {
 	hostent* h = ::gethostbyname_r( a0, a1, a2, static_cast<int>( a3 ), a5 );
-	if ( a4 )
+	if ( a4 ) {
 		*a4 = h;
+	}
 	return ( h ? 0 : errno );
 }
 #endif /* not HAVE_GNU_GETHOSTBYNAME_R */
@@ -187,7 +198,10 @@ public:
 		yaal::hcore::HLock l( _mutex );
 		_loop = true;
 		while ( _loop ) {
-			_cond.wait( _timerSpec.it_value.tv_sec, _timerSpec.it_value.tv_nsec );
+			_cond.wait(
+				static_cast<int long unsigned>( _timerSpec.it_value.tv_sec ),
+				static_cast<int long unsigned>( _timerSpec.it_value.tv_nsec )
+			);
 			if ( ! _reset ) {
 				::kill( getpid(), _sigNo );
 			}
