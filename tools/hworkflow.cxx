@@ -36,17 +36,14 @@ namespace yaal {
 
 namespace tools {
 
-class HWorkFlowInterface::HTask {
+class HWorkFlow::HTask {
 private:
 	call_t _call;
 	call_t _asyncStop;
 	want_restart_t _wantRestart;
 public:
-	HTask(
-		call_t call_,
-		call_t asyncStop_ = call_t(),
-		want_restart_t wantRestart_ = want_restart_t()
-	) : _call( call_ )
+	HTask( call_t call_, call_t asyncStop_, want_restart_t wantRestart_ )
+		: _call( call_ )
 		, _asyncStop( asyncStop_ )
 		, _wantRestart( wantRestart_ ) {
 		return;
@@ -72,11 +69,39 @@ public:
 	}
 };
 
-HWorkFlowInterface::task_t HWorkFlowInterface::pop_task( void ) {
-	M_PROLOG
-	return ( do_pop_task() );
-	M_EPILOG
-}
+/*! \brief Finest unit of working capacity.
+ */
+class HWorkFlow::HWorker {
+public:
+	typedef HWorker this_type;
+	typedef std::atomic<bool> async_flag_t;
+private:
+	HWorkFlow* _workFlow;
+	yaal::hcore::HThread _thread;
+	HWorkFlow::STATE _state;
+	HWorkFlow::task_t _task;
+	async_flag_t _hasTask;
+	async_flag_t _canJoin;
+	mutable yaal::hcore::HMutex _mutex;
+private:
+	HWorker( HWorkFlow* );
+	void spawn( void );
+	void spawn( HWorkFlow::task_t );
+	void finish( void );
+	void async_stop( HWorkFlow::STATE );
+	void run( void );
+	bool has_task( void ) const {
+		return ( _hasTask );
+	}
+	bool can_join( void ) const {
+		return ( _canJoin );
+	}
+	HWorker( HWorker const& );
+	HWorker& operator = ( HWorker const& );
+	friend class HWorkFlow;
+	template<typename tType, typename... arg_t>
+	friend yaal::hcore::HResource<tType> yaal::hcore::make_resource( arg_t&&... );
+};
 
 HWorkFlow::HWorkFlow( int workerPoolSize_ )
 	: _workerPoolSize( workerPoolSize_ )
@@ -256,7 +281,7 @@ void HWorkFlow::windup( WINDUP_MODE windupMode_ ) {
 	M_EPILOG
 }
 
-HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void ) {
+HWorkFlow::task_t HWorkFlow::pop_task( void ) {
 	M_PROLOG
 	HLock l( _mutex );
 	M_ASSERT( ( _state != STATE::CLOSED ) && ( _state != STATE::STOPPED ) );
@@ -275,7 +300,7 @@ HWorkFlowInterface::task_t HWorkFlow::do_pop_task( void ) {
 	M_EPILOG
 }
 
-HWorkFlow::HWorker::HWorker( HWorkFlowInterface* workFlow_ )
+HWorkFlow::HWorker::HWorker( HWorkFlow* workFlow_ )
 	: _workFlow( workFlow_ )
 	, _thread()
 	, _state{ HWorkFlow::STATE::STOPPED }
@@ -296,7 +321,7 @@ void HWorkFlow::HWorker::spawn( void ) {
 	M_EPILOG
 }
 
-void HWorkFlow::HWorker::spawn( HWorkFlowInterface::task_t task_ ) {
+void HWorkFlow::HWorker::spawn( HWorkFlow::task_t task_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	M_ENSURE( _state == HWorkFlow::STATE::STOPPED );
@@ -323,18 +348,6 @@ void HWorkFlow::HWorker::async_stop( HWorkFlow::STATE state_ ) {
 		_task->async_stop();
 	}
 	return;
-	M_EPILOG
-}
-
-bool HWorkFlow::HWorker::has_task( void ) const {
-	M_PROLOG
-	return ( _hasTask );
-	M_EPILOG
-}
-
-bool HWorkFlow::HWorker::can_join( void ) const {
-	M_PROLOG
-	return ( _canJoin );
 	M_EPILOG
 }
 

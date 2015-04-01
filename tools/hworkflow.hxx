@@ -40,46 +40,18 @@ namespace yaal {
 
 namespace tools {
 
-/*! \brief Interface for HWorkFlow class to be used by HWorker class.
+/*! \brief Thread Pool idiom implementation.
  */
-class HWorkFlowInterface {
+class HWorkFlow {
 public:
-	typedef HWorkFlowInterface this_type;
-	class HTask; /*!< Forward declaration of task definition. */
+	typedef HWorkFlow this_type;
+	typedef yaal::hcore::HPointer<HWorkFlow> ptr_t;
 	/*! \brief Callable type to represent task.
 	 *
 	 * Also type to represent means for asynchronous notification that task should be stopped.
 	 */
 	typedef yaal::hcore::HBoundCall<> call_t;
 	typedef yaal::hcore::HBoundCall<bool()> want_restart_t; /*!< Callable type to represent means for inquiring task if it should be restarted. */
-	typedef yaal::hcore::HResource<HTask> task_t;           /*!< Task holder type. */
-
-	/*! \brief Trivial destructor.
-	 */
-	virtual ~HWorkFlowInterface( void ){}
-
-	/*! \brief Pop task from task queue.
-	 *
-	 * \return Next task to be executer or task_t(nullptr) for no more tasks.
-	 */
-	task_t pop_task( void );
-private:
-	/*! \brief NVI for \see popTask().
-	 */
-	virtual task_t do_pop_task( void ) = 0;
-};
-
-typedef yaal::hcore::HExceptionT<HWorkFlowInterface> HWorkFlowInterfaceException;
-
-/*! \brief Thread Pool idiom implementation.
- */
-class HWorkFlow : public HWorkFlowInterface {
-public:
-	typedef HWorkFlow this_type;
-	typedef HWorkFlowInterface base_type;
-	typedef yaal::hcore::HPointer<HWorkFlow> ptr_t;
-	class HWorker;
-	typedef yaal::hcore::HResource<HWorker> worker_t;
 	/*! \brief Current state of HWorkFlow.
 	 */
 	enum class STATE {
@@ -99,7 +71,12 @@ public:
 		SUSPEND,   /*!< Finish currently runing tasks normally, new tasks can be scheduled. _state -> STOPPING */
 		CLOSE      /*!< Finish currently runing tasks normally, new tasks are rejected. _state -> STOPPING */
 	};
+
 private:
+	class HTask;                                        /*!< Forward declaration of task definition. */
+	typedef yaal::hcore::HResource<HTask> task_t;       /*!< Task holder type. */
+	class HWorker;                                      /*!< Forward definition of worker definition. */
+	typedef yaal::hcore::HResource<HWorker> worker_t;   /*!< Working holder type. */
 	typedef yaal::hcore::HList<worker_t> worker_pool_t; /*!< Type for storing set of workers. */
 	typedef yaal::hcore::HList<task_t> task_queue_t;    /*!< Type for storing set of tasks. */
 	int _workerPoolSize;                /*!< Maximum number of ad-hoc threads. */
@@ -109,6 +86,7 @@ private:
 	task_queue_t _tasks;                /*!< Task queue. */
 	yaal::hcore::HSemaphore _semaphore; /*!< Queue push/pop synchronization method. */
 	yaal::hcore::HMutex _mutex;         /*!< Protect shared state from parallel access. */
+
 public:
 	/*! \brief Construct HWorkFlow object.
 	 *
@@ -173,43 +151,17 @@ public:
 	/*! \brief Tell if calling join() would be a non-blocking call.
 	 */
 	bool can_join( void );
+
 private:
-	virtual task_t do_pop_task( void ) override;
+	/*! \brief Pop task from task queue.
+	 *
+	 * \return Next task to be executer or task_t(nullptr) for no more tasks.
+	 */
+	task_t pop_task( void );
+	friend class HWorker;
 };
 
-typedef yaal::hcore::HExceptionT<HWorkFlow, HWorkFlowInterfaceException> HWorkFlowException;
-
-/*! \brief Finest unit of working capacity.
- */
-class HWorkFlow::HWorker {
-public:
-	typedef HWorker this_type;
-	typedef std::atomic<bool> async_flag_t;
-private:
-	HWorkFlowInterface* _workFlow;
-	yaal::hcore::HThread _thread;
-	HWorkFlow::STATE _state;
-	HWorkFlowInterface::task_t _task;
-	async_flag_t _hasTask;
-	async_flag_t _canJoin;
-	mutable yaal::hcore::HMutex _mutex;
-private:
-	HWorker( HWorkFlowInterface* );
-	void spawn( void );
-	void spawn( HWorkFlowInterface::task_t );
-	void finish( void );
-	void async_stop( HWorkFlow::STATE );
-	void run( void );
-	bool has_task( void ) const;
-	bool can_join( void ) const;
-	HWorker( HWorker const& );
-	HWorker& operator = ( HWorker const& );
-	friend class HWorkFlow;
-	template<typename tType, typename... arg_t>
-	friend yaal::hcore::HResource<tType> yaal::hcore::make_resource( arg_t&&... );
-};
-
-typedef yaal::hcore::HExceptionT<HWorkFlow::HWorker> HWorkerException;
+typedef yaal::hcore::HExceptionT<HWorkFlow> HWorkFlowException;
 
 }
 
