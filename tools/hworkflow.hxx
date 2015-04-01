@@ -23,6 +23,9 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+/*! \file tools/hworkflow.hxx
+ * \brief Declaration of HWorkFlow class.
+ */
 
 #ifndef YAAL_TOOLS_HWORKFLOW_HXX_INCLUDED
 #define YAAL_TOOLS_HWORKFLOW_HXX_INCLUDED 1
@@ -42,13 +45,27 @@ namespace tools {
 class HWorkFlowInterface {
 public:
 	typedef HWorkFlowInterface this_type;
-	class HTask;
+	class HTask; /*!< Forward declaration of task definition. */
+	/*! \brief Callable type to represent task.
+	 *
+	 * Also type to represent means for asynchronous notification that task should be stopped.
+	 */
 	typedef yaal::hcore::HBoundCall<> call_t;
-	typedef yaal::hcore::HBoundCall<bool()> want_restart_t;
-	typedef yaal::hcore::HResource<HTask> task_t;
+	typedef yaal::hcore::HBoundCall<bool()> want_restart_t; /*!< Callable type to represent means for inquiring task if it should be restarted. */
+	typedef yaal::hcore::HResource<HTask> task_t;           /*!< Task holder type. */
+
+	/*! \brief Trivial destructor.
+	 */
 	virtual ~HWorkFlowInterface( void ){}
+
+	/*! \brief Pop task from task queue.
+	 *
+	 * \return Next task to be executer or task_t(nullptr) for no more tasks.
+	 */
 	task_t pop_task( void );
 private:
+	/*! \brief NVI for \see popTask().
+	 */
 	virtual task_t do_pop_task( void ) = 0;
 };
 
@@ -66,48 +83,46 @@ public:
 	/*! \brief Current state of HWorkFlow.
 	 */
 	enum class STATE {
-		RUNNING, /*!< This HWorkFlow is working normally. */
-		STOPPING, /*!< This HWorkFlow is currently being stopped but new tasks can be scheduled. */
+		RUNNING,      /*!< This HWorkFlow is working normally. */
+		STOPPING,     /*!< This HWorkFlow is currently being stopped but new tasks can be scheduled. */
 		INTERRUPTING, /*!< This HWorkFlow is currently being stopped but new tasks can be scheduled. */
-		STOPPED, /*!< This HWorkFlow is stopped now, no tasks are running but new tasks can be scheduled. */
-		ABORTING, /*!< This HWorkFlow is being aborted right now, new tasks are rejected. */
-		CLOSING, /*!< This HWorkFlow is currently being stopped but new tasks are rejected. */
-		CLOSED /*!< This HWorkFlow is stopped now, new tasks are rejected. */
+		STOPPED,      /*!< This HWorkFlow is stopped now, no tasks are running but new tasks can be scheduled. */
+		ABORTING,     /*!< This HWorkFlow is being aborted right now, new tasks are rejected. */
+		CLOSING,      /*!< This HWorkFlow is currently being stopped but new tasks are rejected. */
+		CLOSED        /*!< This HWorkFlow is stopped now, new tasks are rejected. */
 	};
 	/*! \brief Mode for winding up HWorkFlow.
 	 */
 	enum class WINDUP_MODE {
-		ABORT, /*!< Try to interrupt currently running tasks, drop (abort) scheduled tasks, new tasks are rejected. _state -> ABORTING */
+		ABORT,     /*!< Try to interrupt currently running tasks, drop (abort) scheduled tasks, new tasks are rejected. _state -> ABORTING */
 		INTERRUPT, /*!< Interrupt currently running tasks, keep scheduled tasks, new tasks can be scheduled. _state -> INTERRUPTING */
-		SUSPEND, /*!< Finish currently runing tasks normally, new tasks can be scheduled. _state -> STOPPING */
-		CLOSE /*!< Finish currently runing tasks normally, new tasks are rejected. _state -> STOPPING */
+		SUSPEND,   /*!< Finish currently runing tasks normally, new tasks can be scheduled. _state -> STOPPING */
+		CLOSE      /*!< Finish currently runing tasks normally, new tasks are rejected. _state -> STOPPING */
 	};
 private:
-	typedef yaal::hcore::HList<worker_t> worker_pool_t;
-	typedef yaal::hcore::HList<task_t> task_queue_t;
-	int _workerPoolSize;
-	int _busyWorkers;
-	STATE _state;
-	/*! Tasks executors.
-	 */
-	worker_pool_t _workers;
-	/*! Task queue.
-	 */
-	task_queue_t _tasks;
-	yaal::hcore::HSemaphore _semaphore;
-	yaal::hcore::HMutex _mutex;
+	typedef yaal::hcore::HList<worker_t> worker_pool_t; /*!< Type for storing set of workers. */
+	typedef yaal::hcore::HList<task_t> task_queue_t;    /*!< Type for storing set of tasks. */
+	int _workerPoolSize;                /*!< Maximum number of ad-hoc threads. */
+	int _busyWorkers;                   /*!< Number of workers that currently run some tasks. */
+	STATE _state;                       /*!< State of this thread pool, \see STATE. */
+	worker_pool_t _workers;             /*!< Tasks executors. */
+	task_queue_t _tasks;                /*!< Task queue. */
+	yaal::hcore::HSemaphore _semaphore; /*!< Queue push/pop synchronization method. */
+	yaal::hcore::HMutex _mutex;         /*!< Protect shared state from parallel access. */
 public:
 	/*! \brief Construct HWorkFlow object.
 	 *
 	 * \param workerPoolSize - maximum number of workers in this worker pool.
 	 */
 	HWorkFlow( int workerPoolSize = 1 );
+
 	/*! \brief Destroy HWorkFlow object.
 	 *
 	 * All scheduled tasks that are running are bound to finish naturally.
 	 * All scheduled tasks that not yet started are bound to start and then finish naturally.
 	 */
 	virtual ~HWorkFlow( void );
+
 	/*! \brief Schedule execution of task in this worker pool.
 	 *
 	 * \param task - task to execute by this worker pool.
@@ -115,6 +130,7 @@ public:
 	 * \param wantRestart - test telling if task should be restarted if stopped by asyncStop.
 	 */
 	void schedule_task( call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
+
 	/*! \brief Immediatelly start execution of given task in this worker pool.
 	 *
 	 * \param task - task to execute by this worker pool.
@@ -122,11 +138,13 @@ public:
 	 * \param wantRestart - test telling if task should be restarted if stopped by asyncStop.
 	 */
 	void start_task( call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
+
 	/*! \brief Restart execution of tasks scheduled in this HWorkFlow.
 	 *
 	 * \throw HWorkFlowException on parallel start.
 	 */
 	void start( void );
+
 	/*! \brief Windup all scheduled tasks.
 	 *
 	 * Join all currently running threads and handle
@@ -143,12 +161,15 @@ public:
 	 * \throw HWorkFlowException on parallel stop.
 	 */
 	void windup( WINDUP_MODE windupMode );
+
 	/*! \brief Just like windoup(...) but not wait for threads to join.
 	 */
 	void schedule_windup( WINDUP_MODE windupMode );
+
 	/*! \brief Join all threads.
 	 */
 	void join( void );
+
 	/*! \brief Tell if calling join() would be a non-blocking call.
 	 */
 	bool can_join( void );
