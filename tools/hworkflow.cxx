@@ -67,6 +67,9 @@ public:
 		return ( !! _wantRestart && _wantRestart() );
 		M_EPILOG
 	}
+private:
+	HTask( HTask const& ) = delete;
+	HTask& operator = ( HTask const& ) = delete;
 };
 
 /*! \brief Finest unit of working capacity.
@@ -83,7 +86,7 @@ private:
 	async_flag_t _hasTask;
 	async_flag_t _canJoin;
 	mutable yaal::hcore::HMutex _mutex;
-private:
+public:
 	HWorker( HWorkFlow* );
 	void spawn( void );
 	void spawn( HWorkFlow::task_t );
@@ -96,11 +99,9 @@ private:
 	bool can_join( void ) const {
 		return ( _canJoin );
 	}
-	HWorker( HWorker const& );
-	HWorker& operator = ( HWorker const& );
-	friend class HWorkFlow;
-	template<typename tType, typename... arg_t>
-	friend yaal::hcore::HResource<tType> yaal::hcore::make_resource( arg_t&&... );
+private:
+	HWorker( HWorker const& ) = delete;
+	HWorker& operator = ( HWorker const& ) = delete;
 };
 
 HWorkFlow::HWorkFlow( int workerPoolSize_ )

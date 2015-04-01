@@ -158,6 +158,8 @@ private:
 	 * \return Next task to be executer or task_t(nullptr) for no more tasks.
 	 */
 	task_t pop_task( void );
+	HWorkFlow( HWorkFlow const& ) = delete;
+	HWorkFlow& operator = ( HWorkFlow const& ) = delete;
 	friend class HWorker;
 };
 
