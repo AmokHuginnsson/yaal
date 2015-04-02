@@ -61,7 +61,7 @@ include $(DIR_ROOT)/_aux/mk/3_suffix.mk
 include $(DIR_ROOT)/_aux/mk/4_wrapper.mk
 include $(DIR_ROOT)/_aux/mk/5_flags.mk
 EXTRA_COMPILER_OPTIMIZATION_FLAGS=@EXTRA_COMPILER_OPTIMIZATION_FLAGS@
-override CXXFLAGS+= -D__YAAL_BUILD__ @EXTRA_CXXFLAGS@ @DEFS@ @EXTRA_INCLUDE_PATHS@
+override CXXFLAGS+= -D__YAAL_BUILD__ @EXTRA_CXXFLAGS@ @DEFS@ @EXTRA_INCLUDE_PATHS@ @PCRE_CFLAGS@ @XML2_CFLAGS@ @XSLT_CFLAGS@ @EXSLT_CFLAGS@
 override LXXFLAGS+= -L. @EXTRA_LIB_PATHS@ -shared @EXTRA_LXXFLAGS@ @YAAL_LXXFLAGS@
 
 include $(DIR_ROOT)/_aux/mk/7_func.mk
@@ -73,16 +73,18 @@ $(foreach IT,$(DRIVERS),$(eval $(call CONFIGURE_DRIVER,$(IT),$(LIB_NAME)_)))
 
 # Solaris is seriously broken operating system.
 LIBS_BASE      = -lc
+HCORE_LIBS     = @HCORE_LIBS@ @PCRE_LIBS@
+TOOLS_LIBS     = @TOOLS_LIBS@ @XML2_LIBS@ @XSLT_LIBS@ @EXSLT_LIBS@
 
-LIBS_hcore     = $(LIBS_BASE) -lssl -lcrypto @HCORE_LIBS@
+LIBS_hcore     = $(LIBS_BASE) -lssl -lcrypto $(HCORE_LIBS)
 DEPS_tools     = $(TARGET_hcore)
-LIBS_tools     = $(LIBS_BASE) -l$(LIB_NAME)_hcore$(LIB_INFIX) -lpthread -lxml2 -lxslt -lexslt -lz @RDYNAMIC@ @HCORE_LIBS@ @TOOLS_LIBS@ @HCORE_LIBS@
+LIBS_tools     = $(LIBS_BASE) -l$(LIB_NAME)_hcore$(LIB_INFIX) -lpthread -lz @RDYNAMIC@ $(HCORE_LIBS) $(TOOLS_LIBS) $(HCORE_LIBS)
 DEPS_dbwrapper = $(TARGET_hcore) $(TARGET_tools)
-LIBS_dbwrapper = $(LIBS_BASE) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) @HCORE_LIBS@
+LIBS_dbwrapper = $(LIBS_BASE) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) $(HCORE_LIBS)
 DEPS_hconsole  = $(TARGET_hcore) $(TARGET_tools)
-LIBS_hconsole  = $(LIBS_BASE) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) -lncurses @HCONSOLE_LIBS@ @HCORE_LIBS@
+LIBS_hconsole  = $(LIBS_BASE) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) -lncurses @HCONSOLE_LIBS@ $(HCORE_LIBS)
 DEPS_hdata     = $(TARGET_dbwrapper) $(TARGET_hconsole)
-LIBS_hdata     = $(LIBS_BASE) -l$(LIB_NAME)_hconsole$(LIB_INFIX) -l$(LIB_NAME)_dbwrapper$(LIB_INFIX) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) -lncurses @HCORE_LIBS@
+LIBS_hdata     = $(LIBS_BASE) -l$(LIB_NAME)_hconsole$(LIB_INFIX) -l$(LIB_NAME)_dbwrapper$(LIB_INFIX) -l$(LIB_NAME)_tools$(LIB_INFIX) -l$(LIB_NAME)_hcore$(LIB_INFIX) -lncurses $(HCORE_LIBS)
 
 DEPS_sqlite3_driver    = $(TARGET_hcore)
 LIBS_sqlite3_driver    = $(LIBS_BASE) -lsqlite3 $(if $(findstring dll,$(LIB_EXT)),-l$(LIB_NAME)_hcore$(LIB_INFIX))

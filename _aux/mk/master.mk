@@ -88,8 +88,11 @@ $(foreach T, $(MAIN_TARGETS), $(eval $(call PREPARE_MAIN_TARGET,$(T),$(OPT_$(T))
 $(foreach T, $(CONFIG_ITEMS), $(eval $(call PREPARE_CONFIG_ITEM,$(T))))
 
 configure config.hxx.in: configure.ac _aux/aclib.m4
-	@$(call invoke,(libtoolize --force --install > /dev/null 2>&1 || libtoolize --force > /dev/null 2>&1 || glibtoolize --force --install > /dev/null 2>&1) && \
-		automake --add-missing --force-missing > /dev/null 2>&1 ; autoreconf && touch configure config.hxx.in)
+	@$(call invoke,(libtoolize --force --install > /dev/null 2>&1 \
+			|| libtoolize --force > /dev/null 2>&1 \
+			|| glibtoolize --force --install > /dev/null 2>&1) && \
+		automake --add-missing --force-missing > /dev/null 2>&1 ; \
+		autoreconf --install --symlink && touch configure config.hxx.in)
 
 mrproper-all: $(foreach T, $(MAIN_TARGETS), mrproper-$(T))
 

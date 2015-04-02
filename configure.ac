@@ -59,9 +59,9 @@ AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 YAAL_DETECT_OPERATING_SYSTEM
 AC_DEFINE_UNQUOTED(TARGET_CPU,"${target_cpu}",[Target host system CPU.])
-if test "x${target_cpu}" = "xx86_64" ; then
+if test ["x${target_cpu}"] = ["xx86_64"] ; then
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
-elif test "${target_os}" != "`echo ${target_os} | sed -e 's/solaris//'`" ; then
+elif test ["${target_os}"] != ["`echo ${target_os} | sed -e 's/solaris//'`"] ; then
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
 	CXXFLAGS="${CXXFLAGS} -m64"
 else
@@ -72,11 +72,11 @@ YAAL_DETECT_PHYSICAL_MEMORY
 YAAL_DETECT_COMPILER
 
 AC_MSG_CHECKING([host dynamic linker])
-if test "x${UNAME_OS_NAME}" = "xLinux" ; then
+if test ["x${UNAME_OS_NAME}"] = ["xLinux"] ; then
 	READELF=`whereis -b readelf | awk '{print $2}'`
 	DYNAMIC_LINKER=`test "x${READELF}" != "x" && ${READELF} -l /usr/bin/readelf | awk 'BEGIN{FS=":"};/program interp/{gsub("[[]] ]","",$2);print $2}'`
 fi
-if test ["$DYNAMIC_LINKER"] = [""] ; then
+if test ["x${DYNAMIC_LINKER}"] = ["x"] ; then
 	AC_MSG_WARN([not found])
 else
 	AC_MSG_RESULT([$DYNAMIC_LINKER])
@@ -84,6 +84,13 @@ else
 fi
 
 AC_MSG_RESULT([--- Looking standrad development software ... ---       [[33%]]])
+
+m4_ifndef([PKG_PROG_PKG_CONFIG], [m4_fatal([Cannot self-test for pkg-config, macro PKG_PROG_PKG_CONFIG is not available.])])
+PKG_PROG_PKG_CONFIG()
+if test ["x${PKG_CONFIG}"] = ["x"] ; then
+	AC_MSG_ERROR([Cannot continue without pkg-config.])
+fi
+
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_MKDIR_P
@@ -132,7 +139,7 @@ dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
 AC_SEARCH_LIBS([pthread_create],[thr pthread],,[AC_MSG_ERROR([Cannot build without threading library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
-AC_CHECK_LIB([pcreposix],[regcomp]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
+PKG_CHECK_MODULES(PCRE, [libpcre libpcreposix])
 AC_SEARCH_LIBS([clock_gettime],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([timer_create],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([gethostbyname_r],[nsl]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
@@ -142,8 +149,8 @@ AC_SEARCH_LIBS([intl_gettext],[intl],,[AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_
 AC_SEARCH_LIBS([iconv],[iconv]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([xml2],[xmlParseFile],,[AC_MSG_ERROR([Cannot continue without XML library.])]) LIBS=""
 AC_CHECK_LIB([z],[deflateEnd],,[AC_MSG_ERROR([Cannot continue without zlib library.])]) LIBS=""
-AC_CHECK_LIB([xslt],[xsltParseStylesheetFile],,[AC_MSG_ERROR([Cannot continue without XSLT library.])]) LIBS=""
-AC_CHECK_LIB([exslt],[exsltRegisterAll],,[AC_MSG_ERROR([Cannot continue without EXSLT library.])]) LIBS=""
+PKG_CHECK_MODULES(XSLT, [libxslt],,[AC_MSG_ERROR([Cannot continue without XSLT library.])])
+PKG_CHECK_MODULES(EXSLT, [libexslt],,[AC_MSG_ERROR([Cannot continue without EXSLT library.])])
 AC_SEARCH_LIBS([dlopen],[dl],,[AC_MSG_ERROR([Cannot continue without dynamic dynamic linker library.])]) TOOLS_LIBS="${TOOLS_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([ncurses],[initscr],,[AC_MSG_ERROR([Cannot continue without ncurses library.])]) LIBS=""
 AC_CHECK_LIB([tinfo],[curs_set]) HCONSOLE_LIBS="${HCONSOLE_LIBS} ${LIBS}" LIBS=""
@@ -164,9 +171,9 @@ if test ["$POSTGRES"] != ["no"] ; then
 	LIBS=""
 fi
 MYSQL_REENTRANT=[""]
+CXXFLAGS_ORIG="${CXXFLAGS}"
 if test ["$MYSQL"] != ["no"] ; then
 	LIBS=""
-	CXXFLAGS_ORIG="${CXXFLAGS}"
 	AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient])
 	if test ["x$LIBS"] = "x" ; then
 		CXXFLAGS=["$CXXFLAGS_ORIG -L/usr/local/lib/mysql"]
@@ -310,7 +317,9 @@ else
 	EXTRA_INCLUDE_PATHS="-isystem /opt/local/include ${EXTRA_INCLUDE_PATHS}"
 fi
 _CONSOLE_MOUSE=[""];
+CXXFLAGS="${CXXFLAGS_ORIG} ${PCRE_CFLAGS}"
 AC_CHECK_HEADERS([pcreposix.h])
+CXXFLAGS="${CXXFLAGS_ORIG}"
 AC_CHECK_HEADERS([sys/consio.h],_CONSOLE_MOUSE=["moused"])
 AC_CHECK_HEADERS([execinfo.h])
 AC_CHECK_HEADERS([tty.h])
@@ -321,33 +330,7 @@ AC_CHECK_HEADERS([valgrind/memcheck.h])
 if test ["$_CONSOLE_MOUSE"] = [""] -a ["$CONSOLE_MOUSE"] = ["yes"] ; then
 	AC_MSG_ERROR([Cannot continue without console mouse support.])
 fi
-if test ["x${HOST_OS_TYPE}"] != ["xDarwin"] ; then
-	CXXFLAGS=["$CXXFLAGS -I/usr/include/libxml2"]
-	CPPFLAGS=["$CXXFLAGS"]
-	AC_CHECK_HEADERS(
-		[libxml/xmlversion.h],
-		EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/usr/include/libxml2"], [
-			CXXFLAGS=$CXXFLAGS_ORIG
-			CPPFLAGS=$CPPFLAGS_ORIG
-			unset ac_cv_header_libxml_xmlversion_h
-			CXXFLAGS=["$CXXFLAGS -I/usr/local/include/libxml2"]
-			CPPFLAGS=["$CXXFLAGS"]
-			AC_CHECK_HEADERS([libxml/xmlversion.h],
-				EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/usr/local/include/libxml2"],
-				[AC_MSG_ERROR([Cannot continue without XML development files.])])
-		]
-	)
-else
-	CXXFLAGS=["$CXXFLAGS -I/opt/local/include/libxml2"]
-	CPPFLAGS=["$CXXFLAGS"]
-	AC_CHECK_HEADERS(
-		[libxml/xmlversion.h],
-		EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I/opt/local/include/libxml2"],
-		[AC_MSG_ERROR([Cannot continue without XML development files.])]
-	)
-fi
-CXXFLAGS=$CXXFLAGS_ORIG
-CPPFLAGS=$CPPFLAGS_ORIG
+PKG_CHECK_MODULES(XML2,[libxml-2.0],,[AC_MSG_ERROR([Cannot continue without XML development files.])])
 AC_CHECK_HEADERS([ncurses/curses.h],_NCURSES_HEADER=['ncurses/curses.h'],
 	[AC_CHECK_HEADERS([curses.h],_NCURSES_HEADER=['curses.h'],
 			[AC_MSG_ERROR([Cannot continue without ncurses devel!])])])
