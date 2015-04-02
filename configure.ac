@@ -132,7 +132,7 @@ dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
 AC_SEARCH_LIBS([pthread_create],[thr pthread],,[AC_MSG_ERROR([Cannot build without threading library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
-AC_CHECK_LIB([pcreposix],[pcreposix_regcomp]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
+AC_CHECK_LIB([pcreposix],[regcomp]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([clock_gettime],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([timer_create],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([gethostbyname_r],[nsl]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
