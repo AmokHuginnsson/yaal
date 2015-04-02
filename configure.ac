@@ -50,7 +50,6 @@ YAAL_CHECK_GIT
 
 dnl We select default language.
 AC_LANG([C++])
-CXXFLAGS=["-L/usr/local/lib -I/usr/local/include"]
 
 dnl Cheching for machine type.
 AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
@@ -63,7 +62,6 @@ if test ["x${target_cpu}"] = ["xx86_64"] ; then
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
 elif test ["${target_os}"] != ["`echo ${target_os} | sed -e 's/solaris//'`"] ; then
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
-	CXXFLAGS="${CXXFLAGS} -m64"
 else
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,32,[Target host system CPU bits.])
 fi
@@ -111,6 +109,8 @@ YAAL_CXX_STANDARD_CHECK
 YAAL_DETECT_COMMON_FLAGS
 
 YAAL_DETECT_FUNCTION_MACRO
+
+CXXFLAGS=["${EXTRA_CXXFLAGS}"]
 
 dnl Check for POD sizes.
 dnl We shall not pollute namespace with unnecessary macros.
@@ -178,12 +178,12 @@ if test ["$MYSQL"] != ["no"] ; then
 	if test ["x$LIBS"] = "x" ; then
 		CXXFLAGS=["$CXXFLAGS_ORIG -L/usr/local/lib/mysql"]
 		unset ac_cv_search_mysql_init
-		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIB_PATHS="-L/usr/local/lib/mysql"])
+		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIB_PATHS="${EXTRA_LIB_PATHS} -L/usr/local/lib/mysql"])
 	fi
 	if test ["x$LIBS"] = "x" ; then
 		CXXFLAGS=["$CXXFLAGS_ORIG -L/usr/lib64/mysql/"]
 		unset ac_cv_search_mysql_init
-		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIB_PATHS="-L/usr/lib64/mysql/"])
+		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIB_PATHS="${EXTRA_LIB_PATHS} -L/usr/lib64/mysql/"])
 	fi
 	if test ["x$LIBS"] = "x" ; then
 		if test ["$MYSQL"] = ["yes"] ; then
@@ -206,7 +206,7 @@ fi
 if test ["$ORACLE"] != ["no"] ; then
 	CXXFLAGS=["$CXXFLAGS -L$ORACLE_HOME/lib"]
 	AC_CHECK_LIB([clntsh],[OCIEnvCreate],
-								[EXTRA_LIB_PATHS="$EXTRA_LIB_PATHS -L$ORACLE_HOME/lib"],
+								[EXTRA_LIB_PATHS="${EXTRA_LIB_PATHS} -L${ORACLE_HOME}/lib"],
 								[if test ["$ORACLE"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without Oracle.])
 										fi;ORACLE=["no"]])
@@ -343,7 +343,7 @@ if test ["$ORACLE"] != ["no"] ; then
 	AC_CHECK_HEADERS([oci.h],
 		[AC_SUBST([DO_ORACLE_DRIVER],["oracle"])
 		 AC_SUBST([ORACLE_SID],["$ORACLE_SID"])
-			EXTRA_INCLUDE_PATHS=["$EXTRA_INCLUDE_PATHS -I\$(ORACLE_HOME)/rdbms/public"]
+			EXTRA_INCLUDE_PATHS=["${EXTRA_INCLUDE_PATHS} -I\$(ORACLE_HOME)/rdbms/public"]
 			DEFAULT_DRIVER=["Oracle"]],
 				[if test ["$ORACLE"] = ["yes"] ; then
 					AC_MSG_ERROR([[Cannot continue without Oracle devel(client)!]])
@@ -394,7 +394,10 @@ LIBS="${HCORE_LIBS}"
 AC_LANG([C])
 CFLAGS_ORIG=["${CFLAGS}"]
 CFLAGS="-D_GNU_SOURCE=1"
+CPPFLAGS_ORIG="${CPPFLAGS}"
+CPPFLAGS=`echo ${CPPFLAGS} | sed -e 's/-std=c++11//g'`
 AC_CHECK_TYPES([sighandler_t],[],[AC_CHECK_TYPES([__sighandler_t],[],[],[#include <signal.h>])],[#include <signal.h>])
+CPPFLAGS="${CPPFLAGS_ORIG}"
 CFLAGS=${CFLAGS_ORIG}
 AC_LANG([C++])
 if test ["${ac_cv_type_sighandler_t}"] = ["no"] -a ["${ac_cv_type___sighandler_t}"] = ["no"] -a ["x${HOST_OS_TYPE}"] != ["xDarwin"] ; then
@@ -424,7 +427,7 @@ if test ["$MYSQL"] != ["no"] ; then
 fi
 AC_MSG_CHECKING([whether powl is available])
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cmath>
-									 int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }]])],
+									 int main( int, char** ) { static_cast<void>( ::powl( 0., 0. ) ); return ( 0 ); }]])],
 	[AC_DEFINE([HAVE_POWL],[1],[We have ::powl().]) AC_MSG_RESULT([yes])], AC_MSG_RESULT([no]))
 
 AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])

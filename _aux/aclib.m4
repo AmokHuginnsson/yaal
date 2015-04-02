@@ -151,13 +151,16 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${UNAME_OS_NAME}"] = ["xFreeBSD"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
 		HOST_OS_TYPE=[FreeBSD]
+		EXTRA_LIB_PATHS=["${EXTRA_LIB_PATHS} -L/usr/local/lib"]
 	elif test ["x${UNAME_OS_NAME}"] = ["xSunOS"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_TYPE=[Solaris]
+		EXTRA_LIB_PATHS=["${EXTRA_LIB_PATHS} -L/usr/local/lib -L/usr/gnu/lib/amd64 -L/usr/gnu/lib"]
 	elif test ["x${UNAME_OS_NAME}"] = ["xDarwin"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DARWIN__], [], [Your operating system is Darwin.])
 		HOST_OS_TYPE=[Darwin]
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,-undefined,dynamic_lookup"]
+		EXTRA_LIB_PATHS=["${EXTRA_LIB_PATHS} -L/opt/local/lib"]
 		LIB_EXT=["dylib"]
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/tizen-release] ; then
 		AC_DEFINE([__HOST_OS_TYPE_TIZEN__], [], [Your operating system is Tizen.])
@@ -271,6 +274,7 @@ dnl What special compiler flags we can set?
 dnl --------------------------------------------------------------------------
 AC_DEFUN([YAAL_DETECT_COMMON_FLAGS], [
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-pthread], [C++])
+	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-pthread], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-m64], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fPIC], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_COMPILER_OPTIMIZATION_FLAGS, [-fexpensive-optimizations], [C++])
