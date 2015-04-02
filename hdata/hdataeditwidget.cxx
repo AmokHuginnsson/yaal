@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hdataeditwidget.cxx - this file is integral part of `yaal' project.
+  hdataeditwidget.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -56,7 +56,7 @@ HDataEditWidget::HDataEditWidget( HDataWindow * parent_,
 
 void HDataEditWidget::set_validator( yaal::hcore::HString const& valid_ ) {
 	M_PROLOG
-	if ( ! _valid.compile( valid_ ) ) {
+	if ( ! _valid.compile( valid_, HRegex::COMPILE::EXTENDED ) ) {
 		M_THROW( "Bad regex as validator: `"_ys.append( valid_ ).append( "', " ).append( _valid.error() ), _valid.error_code() );
 	}
 	_attributeCache = _attributeFocused;

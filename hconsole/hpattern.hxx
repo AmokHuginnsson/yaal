@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hconsole/hpattern.hxx - this file is integral part of `yaal' project.
+  hconsole/hpattern.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -51,14 +51,14 @@ public:
 	typedef yaal::hcore::HArray<flag_desc_t> pluggable_flags_t;
 	typedef HPattern this_type;
 private:
-	bool		_initialized;          /*!< is pattern initialized */
-	bool		_ignoreCaseDefault;    /*!< default value for ignore case switch */
-	bool		_ignoreCase;           /*!< self explanary */
-	bool		_extended;             /*!< simple strstr or extended RE */
-	int			_simpleMatchLength;    /*!< length of simple strstr pattern */
+	bool _initialized;             /*!< is pattern initialized */
+	bool _ignoreCaseDefault;       /*!< default value for ignore case switch */
+	bool _ignoreCase;              /*!< self explanary */
+	bool _extended;                /*!< simple strstr or extended RE */
+	int  _simpleMatchLength;       /*!< length of simple strstr pattern */
 	yaal::hcore::HRegex  _regex;   /*!< regular expression for search patterns */
-	yaal::hcore::HString _pattern;          /*!< pattern with stripped switches */
-	mutable yaal::hcore::HString _errorCause;   /*!< cause of last error */
+	yaal::hcore::HString _pattern; /*!< pattern with stripped switches */
+	mutable yaal::hcore::HString _errorCause; /*!< cause of last error */
 public:
 	HPattern( void );
 	HPattern( char const* const );

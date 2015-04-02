@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski           ---
 
-	heditwidget.cxx - this file is integral part of `yaal' project.
+  heditwidget.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -99,7 +99,7 @@ HEditWidget::~HEditWidget( void ) {
 
 void HEditWidget::set_mask( yaal::hcore::HString const& mask_ ) {
 	M_PROLOG
-	if ( ! _mask.compile( mask_ ) ) {
+	if ( ! _mask.compile( mask_, HRegex::COMPILE::EXTENDED ) ) {
 		M_THROW( _mask.error(), _mask.error_code() );
 	}
 	if ( ! _mask.matches( _string ) ) {

@@ -25,8 +25,15 @@ Copyright:
 */
 
 #include <cstring>
-#include <sys/types.h>	/* why? - because POSIX says so :/ */
-#include <regex.h>			/* this one is obvious */
+
+#include "config.hxx"
+
+#ifdef HAVE_PCREPOSIX_H
+#	include <pcreposix.h>
+#else /* #ifdef HAVE_PCREPOSIX_H */
+#	include <sys/types.h> /* why? - because POSIX says so :/ */
+#	include <regex.h>     /* this one is obvious */
+#endif /* #else #ifdef HAVE_PCREPOSIX_H */
 #include <libintl.h>
 
 #include "base.hxx"

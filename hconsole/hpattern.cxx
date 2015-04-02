@@ -1,7 +1,7 @@
 /*
 ---           `yaal' (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hpattern.cxx - this file is integral part of `yaal' project.
+  hpattern.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -25,8 +25,6 @@ Copyright:
 */
 
 #include <cstring>
-#include <sys/types.h>	/* why? - because POSIX says so :/ */
-#include <regex.h>			/* this one is obvious */
 #include <libintl.h>
 
 #include "hcore/base.hxx"
