@@ -3060,14 +3060,14 @@ int long HHuginn::HList::size( void ) const {
 HHuginn::value_t HHuginn::HList::get( int long long index_ ) {
 	M_PROLOG
 	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
-	return ( _data[index_] );
+	return ( _data[static_cast<int>( index_ )] );
 	M_EPILOG
 }
 
 HHuginn::value_t HHuginn::HList::get_ref( int long long index_ ) {
 	M_PROLOG
 	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
-	return ( make_pointer<HReference>( _data[index_] ) );
+	return ( make_pointer<HReference>( _data[static_cast<int>( index_ )] ) );
 	M_EPILOG
 }
 

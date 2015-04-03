@@ -294,7 +294,7 @@ private:
 			: _count( 0 ), _firstLockRead( false )
 			{}
 	};
-	typedef yaal::hcore::HMap<int long, OLockInfo> lock_info_t;
+	typedef yaal::hcore::HMap<HThread::id_t, OLockInfo> lock_info_t;
 	HMutex _mutex;
 	HChunk _buf;
 	lock_info_t _lockInfo;

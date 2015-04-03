@@ -558,7 +558,7 @@ void HReadWriteLock::lock_read( void ) {
 	OLockInfo* lockInfo( NULL );
 	/* scope for _lockInfo access */ {
 		HLock l( _mutex );
-		lockInfo = &_lockInfo[ HThread::get_current_thread_id()];
+		lockInfo = &_lockInfo[ HThread::get_current_thread_id() ];
 	}
 	/*
 	 * `lockInfo' is a memory reference that is valid
@@ -578,7 +578,7 @@ void HReadWriteLock::lock_write( void ) {
 	OLockInfo* lockInfo( NULL );
 	/* scope for _lockInfo access */ {
 		HLock l( _mutex );
-		lockInfo = &_lockInfo[ HThread::get_current_thread_id()];
+		lockInfo = &_lockInfo[ HThread::get_current_thread_id() ];
 	}
 	/*
 	 * `lockInfo' is a memory reference that is valid

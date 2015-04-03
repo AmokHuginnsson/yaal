@@ -107,7 +107,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_MSG_CHECKING([host operating system])
 	AC_CANONICAL_HOST
 	HOST_OS_TYPE=""
-	UNAME_OS_NAME="`uname -s`"
+	UNAME_OS_NAME=["`uname -s | sed -e 's/[^a-z].*//gi'`"]
 	LIB_PREFIX=["lib"]
 	LIB_EXT=["so"]
 	EXE_SUFFIX=[""]
@@ -165,7 +165,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/tizen-release] ; then
 		AC_DEFINE([__HOST_OS_TYPE_TIZEN__], [], [Your operating system is Tizen.])
 		HOST_OS_TYPE=[Tizen]
-	elif test ["x${UNAME_OS_NAME}"] = ["xCygwin"] ; then
+	elif test ["x${UNAME_OS_NAME}"] = ["xCYGWIN"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_CYGWIN__], [], [Your operating system is Cygwin.])
 		EXTRA_CXXFLAGS=["${EXTRA_CXXFLAGS} -U__STRICT_ANSI__"]
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,--export-all-symbols -Wl,--enable-auto-import -Wl,--out-implib=lib\$(*)\$(LIB_INFIX).\$(LIB_ARCHIVE_SUFFIX)"]
