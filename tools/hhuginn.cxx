@@ -170,7 +170,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	M_PROLOG
 	using namespace executing_parser;
 	namespace e_p = executing_parser;
-	hcore::HString identifier( "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b" );
+	hcore::HString identifier( YAAL_REGEX_WORD_START "[a-zA-Z_][a-zA-Z0-9_]*" YAAL_REGEX_WORD_END );
 	HRule expression( "expression", e_p::HRuleBase::action_position_t( hcore::call( &HHuginn::OCompiler::mark_expression_position, &_compiler, _1 ) ) );
 	HRule absoluteValue( "absoluteValue",
 		constant( '|', e_p::HCharacter::action_character_position_t( hcore::call( &HHuginn::OCompiler::defer_oper, &_compiler, _1, _2 ) ) )

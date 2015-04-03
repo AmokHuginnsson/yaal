@@ -28,12 +28,12 @@ Copyright:
 
 #include "config.hxx"
 
-#ifdef HAVE_SANE_PCREPOSIX
+#ifdef YAAL_USE_PCRE
 #	include <pcreposix.h>
-#else /* #ifdef HAVE_SANE_PCREPOSIX */
+#else /* #ifdef YAAL_USE_PCRE */
 #	include <sys/types.h> /* why? - because POSIX says so :/ */
 #	include <regex.h>     /* this one is obvious */
-#endif /* #else #ifdef HAVE_SANE_PCREPOSIX */
+#endif /* #else #ifdef YAAL_USE_PCRE */
 #include <libintl.h>
 
 #include "base.hxx"

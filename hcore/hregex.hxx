@@ -32,6 +32,7 @@ Copyright:
 #ifndef YAAL_HCORE_HREGEX_HXX_INCLUDED
 #define YAAL_HCORE_HREGEX_HXX_INCLUDED 1
 
+#include "config.hxx"
 #include "hcore/hchunk.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/hbitflag.hxx"
@@ -189,6 +190,18 @@ inline void swap( HRegex& a, HRegex& b ) {
 }
 
 }
+
+#ifdef YAAL_USE_PCRE
+#	define YAAL_REGEX_WORD_START "\\b"
+#	define YAAL_REGEX_WORD_END   "\\b"
+#elif defined ( __HOST_OS_TYPE_DARWIN__ )
+#	define YAAL_REGEX_WORD_START "[[:<:]]"
+#	define YAAL_REGEX_WORD_END   "[[:>:]]"
+#else /* Not PCRE and not Darwin. */
+#	define YAAL_REGEX_WORD_START "\\<"
+#	define YAAL_REGEX_WORD_END   "\\>"
+#endif
+
 
 #endif /* #ifndef YAAL_HCORE_HREGEX_HXX_INCLUDED */
 

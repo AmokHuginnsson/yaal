@@ -321,7 +321,7 @@ CXXFLAGS="${CXXFLAGS_ORIG} ${PCRE_CFLAGS}"
 AC_CHECK_HEADERS([pcreposix.h], [
 	AC_CHECK_DECLS(
 		[pcreposix_regcomp],
-		[AC_DEFINE([HAVE_SANE_PCREPOSIX], [1], [[PCRE's pcreposix has sane implementation.]])],
+		[AC_DEFINE([YAAL_USE_PCRE], [1], [[Use PCRE engine for regular expression matching.]])],
 		[unset PCRE_LIBS;unset PCRE_CFLAGS],
 		[[#include <pcreposix.h>]]
 	)
