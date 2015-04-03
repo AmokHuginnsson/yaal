@@ -72,11 +72,14 @@ do-fetch:
 		git pull ; \
 	fi
 
-do-configure:
-	@/bin/rm -f $(WRKSRC)/configure
-
 do-extract:
 	@${MKDIR} $(WRKDIR) && ${LN} -nsf ../../../ $(WRKSRC)
+
+run-autotools:
+	@true
+
+do-configure:
+	@/bin/rm -f $(WRKSRC)/configure
 
 do-build:
 	@cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) debug && $(MAKE) $(BUILD_ENV) release && $(MAKE) doc
