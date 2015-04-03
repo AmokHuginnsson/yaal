@@ -28,12 +28,12 @@ Copyright:
 
 #include "config.hxx"
 
-#ifdef HAVE_PCREPOSIX_H
+#ifdef HAVE_SANE_PCREPOSIX
 #	include <pcreposix.h>
-#else /* #ifdef HAVE_PCREPOSIX_H */
+#else /* #ifdef HAVE_SANE_PCREPOSIX */
 #	include <sys/types.h> /* why? - because POSIX says so :/ */
 #	include <regex.h>     /* this one is obvious */
-#endif /* #else #ifdef HAVE_PCREPOSIX_H */
+#endif /* #else #ifdef HAVE_SANE_PCREPOSIX */
 #include <libintl.h>
 
 #include "base.hxx"

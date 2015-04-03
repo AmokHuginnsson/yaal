@@ -318,7 +318,15 @@ else
 fi
 _CONSOLE_MOUSE=[""];
 CXXFLAGS="${CXXFLAGS_ORIG} ${PCRE_CFLAGS}"
-AC_CHECK_HEADERS([pcreposix.h])
+AC_CHECK_HEADERS([pcreposix.h], [
+	AC_CHECK_DECLS(
+		[pcreposix_regcomp],
+		[AC_DEFINE([HAVE_SANE_PCREPOSIX], [1], [[PCRE's pcreposix has sane implementation.]])],
+		[unset PCRE_LIBS;unset PCRE_CFLAGS],
+		[[#include <pcreposix.h>]]
+	)
+])
+dnl '
 CXXFLAGS="${CXXFLAGS_ORIG}"
 AC_CHECK_HEADERS([sys/consio.h],_CONSOLE_MOUSE=["moused"])
 AC_CHECK_HEADERS([execinfo.h])
