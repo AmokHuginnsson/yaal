@@ -139,7 +139,7 @@ dnl Now we can look for all needed libraries.
 AC_MSG_RESULT([--- Looking for needed libraries ... ---                [[67%]]])
 AC_SEARCH_LIBS([pthread_create],[thr pthread],,[AC_MSG_ERROR([Cannot build without threading library.])]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([ssl],[SSL_load_error_strings],,[AC_MSG_ERROR([Cannot continue without OpenSSL library.])]) LIBS=""
-PKG_CHECK_MODULES(PCRE, [libpcre libpcreposix])
+PKG_CHECK_MODULES(PCRE, [libpcre libpcreposix], [true], [true])
 AC_SEARCH_LIBS([clock_gettime],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([timer_create],[rt]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
 AC_SEARCH_LIBS([gethostbyname_r],[nsl]) HCORE_LIBS="${HCORE_LIBS} ${LIBS}" LIBS=""
@@ -321,7 +321,7 @@ CXXFLAGS="${CXXFLAGS_ORIG} ${PCRE_CFLAGS}"
 AC_CHECK_HEADERS([pcreposix.h], [
 	AC_CHECK_DECLS(
 		[pcreposix_regcomp],
-		[AC_DEFINE([YAAL_USE_PCRE], [1], [[Use PCRE engine for regular expression matching.]])],
+		[AC_DEFINE([YAAL_USE_PCRE], [1], [Use PCRE engine for regular expression matching.])],
 		[unset PCRE_LIBS;unset PCRE_CFLAGS],
 		[[#include <pcreposix.h>]]
 	)
