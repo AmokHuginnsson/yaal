@@ -4,6 +4,8 @@ VERIFY_DIR=../../yaalrc.in
 VERSION=$(shell awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in)
 ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 SYSTEM=$(shell lsb_release -si | tr A-Z a-z)
+CODENAME=$(shell lsb_release -sc | tr A-Z a-z)
+COMMIT=$(shell git rev-parse HEAD)
 SYSTEM_RELEASE=$(shell lsb_release -sr)
 ARTIFACTS=yaal_$(VERSION)_$(ARCH).deb \
 					yaal-dev_$(VERSION)_$(ARCH).deb \
@@ -29,8 +31,9 @@ changelog: $(VERIFY_DIR)
 	@/bin/rm -f changelog && \
 	cd ../../ && \
 	ln -nsf ./_aux/debian && \
-	dch --create --newversion $(VERSION) --package yaal "Vendor Release." && \
-	dch --release release
+	dch --distribution "$(CODENAME)" --create --newversion $(VERSION) --package yaal "Vendor Release." && \
+	dch --distribution "$(CODENAME)" --append "commit: $(COMMIT)" && \
+	dch --distribution "$(CODENAME)" --release release
 
 $(ARTIFACTS): $(VERIFY_DIR) changelog
 	@cd ../../ && \
