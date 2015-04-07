@@ -21,6 +21,9 @@ override_dh_auto_build: dropprivs
 override_dh_auto_install: dropprivs
 	./dropprivs dh_auto_install -- install-debug install-release install-doc
 
+override_dh_gencontrol:
+	dh_gencontrol -- -v$(PACKAGE_VERSION)
+
 %: dropprivs
 	./dropprivs dh $(@)
 

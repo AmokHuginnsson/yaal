@@ -2,14 +2,15 @@
 
 VERIFY_DIR=../../yaalrc.in
 VERSION=$(shell awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in)
+PACKAGE_VERSION=$(VERSION)$(BUILD_ID)
 ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 SYSTEM=$(shell lsb_release -si | tr A-Z a-z)
 CODENAME=$(shell lsb_release -sc | tr A-Z a-z)
 COMMIT=$(shell git rev-parse HEAD)
 SYSTEM_RELEASE=$(shell lsb_release -sr)
-ARTIFACTS=yaal_$(VERSION)_$(ARCH).deb \
-					yaal-dev_$(VERSION)_$(ARCH).deb \
-					yaal-doc_$(VERSION)_$(ARCH).deb \
+ARTIFACTS=yaal_$(PACKAGE_VERSION)_$(ARCH).deb \
+					yaal-dev_$(PACKAGE_VERSION)_$(ARCH).deb \
+					yaal-doc_$(PACKAGE_VERSION)_$(ARCH).deb \
 					yaal_$(VERSION).dsc \
 					yaal_$(VERSION).tar.gz \
 					yaal_$(VERSION)_$(ARCH).changes
@@ -17,7 +18,9 @@ BUNDLE_DIR=yaal-bundle/$(SYSTEM)-$(SYSTEM_RELEASE)/$(ARCH)/$(VERSION)
 BUNDLE=yaal-$(VERSION)-$(SYSTEM)-$(SYSTEM_RELEASE)-$(ARCH).tar
 BUNDLE_WRAP=yaal-bundle.tar
 DEBEMAIL=amok@codestation.org
+DCH=dch --force-distribution --distribution "$(CODENAME)"
 export DEBEMAIL
+export PACKAGE_VERSION
 
 .PHONY: all package bundle clean
 
@@ -31,14 +34,14 @@ changelog: $(VERIFY_DIR)
 	@/bin/rm -f changelog && \
 	cd ../../ && \
 	ln -nsf ./_aux/debian && \
-	dch --distribution "$(CODENAME)" --create --newversion $(VERSION) --package yaal "Vendor Release." && \
-	dch --distribution "$(CODENAME)" --append "commit: $(COMMIT)" && \
-	dch --distribution "$(CODENAME)" --release release
+	$(DCH) --create --vendor CodeStation.Org --newversion $(VERSION) --package yaal "Vendor Release." && \
+	$(DCH) --append "commit: $(COMMIT)" && \
+	dch --release release
 
 $(ARTIFACTS): $(VERIFY_DIR) changelog
 	@cd ../../ && \
 	ln -nsf ./_aux/debian && \
-	dpkg-buildpackage -Zgzip -us -uc && \
+	dpkg-buildpackage -Zgzip -us -uc -F --changes-option=-Dversion=$(PACKAGE_VERSION) && \
 	mv $(addprefix ../,$(ARTIFACTS)) _aux/debian
 
 tmp/$(BUNDLE): $(VERIFY_DIR) $(ARTIFACTS)
