@@ -1,5 +1,7 @@
 # NATIVE_MAKE
 
+.NOTPARALLEL:
+
 VERIFY_DIR=../../yaalrc.in
 VERSION=$(shell awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in)
 PACKAGE_VERSION=$(VERSION)$(BUILD_ID)
@@ -62,7 +64,7 @@ clean: $(VERIFY_DIR)
 	/bin/rm -rf changelog yaal-bundle && \
 	cd ../../ && \
 	ln -nsf ./_aux/debian && \
-	dch --create --newversion $(VERSION) --package yaal "Vendor Release." && \
+	$(DCH) --create --vendor CodeStation.Org --newversion $(VERSION) --package yaal "Vendor Release." && \
 	dpkg-buildpackage -Tclean && \
 	/bin/rm debian _aux/debian/changelog
 
