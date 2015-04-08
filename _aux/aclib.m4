@@ -107,7 +107,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_MSG_CHECKING([host operating system])
 	AC_CANONICAL_HOST
 	HOST_OS_TYPE=""
-	UNAME_OS_NAME=["`uname -s | sed -e 's/[^a-z].*//gi'`"]
+	UNAME_OS_NAME=["`uname -s | sed -e 's/[^a-zA-Z].*//g'`"]
 	LIB_PREFIX=["lib"]
 	LIB_EXT=["so"]
 	EXE_SUFFIX=[""]
