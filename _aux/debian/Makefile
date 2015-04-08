@@ -2,9 +2,11 @@
 
 .NOTPARALLEL:
 
+SHELL     = /bin/sh
+UNQUOTE   = $(subst $\",,$(1))
 VERIFY_DIR=../../yaalrc.in
 VERSION=$(shell awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in)
-PACKAGE_VERSION=$(VERSION)$(BUILD_ID)
+PACKAGE_VERSION=$(VERSION)$(call UNQUOTE,$(BUILD_ID))
 ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 SYSTEM=$(shell lsb_release -si | tr A-Z a-z)
 CODENAME=$(shell lsb_release -sc | tr A-Z a-z)
