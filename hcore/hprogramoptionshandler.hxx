@@ -64,13 +64,13 @@ public:
 		typedef HPointer<HOptionValueInterface> ptr_t;
 		virtual ~HOptionValueInterface( void ) {}
 		void set( HString const& );
-		type_id_t get_type( void ) const;
+		TYPE get_type( void ) const;
 		template<typename tType>
 		tType const& get( void ) const;
 		void const* id( void ) const;
 	protected:
 		virtual void do_set( HString const& ) = 0;
-		virtual type_id_t do_get_type( void ) const = 0;
+		virtual TYPE do_get_type( void ) const = 0;
 		virtual void const* do_get( void ) const = 0;
 	};
 	/*! \brief Basic program configuration item.
@@ -239,10 +239,10 @@ protected:
 		return;
 		M_EPILOG
 	}
-	virtual type_id_t do_get_type( void ) const {
-		return ( TYPE::symbolic<tType>::value );
+	virtual TYPE do_get_type( void ) const override {
+		return ( symbolic_type<tType>::value );
 	}
-	virtual void const* do_get( void ) const {
+	virtual void const* do_get( void ) const override {
 		return ( &_instance );
 	}
 };

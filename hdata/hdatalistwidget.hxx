@@ -55,7 +55,7 @@ public:
 				yaal::hcore::HString const& columnName,
 				int width,
 				BITS::ALIGN::align_t const& align = BITS::ALIGN::LEFT,
-				type_id_t type = yaal::TYPE::HSTRING,
+				yaal::TYPE type = yaal::TYPE::HSTRING,
 				yaal::hcore::HString const& format_ = hcore::HString(),
 				HWidget* associatedWidget = NULL,
 				HDictionary::ptr_t const& = HDictionary::ptr_t() );
@@ -97,7 +97,7 @@ protected:
 			yaal::hcore::HString const& columnName,
 			int width,
 			hconsole::HListWidget::BITS::ALIGN::align_t const& align,
-			type_id_t type,
+			yaal::TYPE type,
 			yaal::hcore::HString const&,
 			hconsole::HWidget* associatedWidget ) override;
 };

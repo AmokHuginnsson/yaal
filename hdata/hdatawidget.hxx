@@ -93,7 +93,7 @@ private:
 	HDataWidget & operator = ( HDataWidget const & );
 };
 
-void sync( dbwrapper::HRecordSet::value_t&, hconsole::HInfo const&, TYPE::enum_t );
+void sync( dbwrapper::HRecordSet::value_t&, hconsole::HInfo const&, TYPE );
 void apply_role( HDataWindow*, HDataWidget*, yaal::tools::HXml::HConstNodeProxy );
 
 }

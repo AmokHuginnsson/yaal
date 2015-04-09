@@ -270,7 +270,7 @@ void dump_configuration( void* arg ) {
 		static int const MAXIMUM_LINE_LENGTH = 72;
 		::printf( "# %s, type: ", o._name );
 		if ( !! o._value ) {
-			switch ( o._value->get_type().value() ) {
+			switch ( o._value->get_type() ) {
 				case ( TYPE::BOOL ): ::printf( "boolean\n" ); break;
 				case ( TYPE::INT ): case ( TYPE::INT_SHORT ): case ( TYPE::INT_LONG ): ::printf( "integer\n" ); break;
 				case ( TYPE::FLOAT ): case ( TYPE::DOUBLE ): case ( TYPE::DOUBLE_LONG ): ::printf( "floating point\n" ); break;
@@ -303,7 +303,7 @@ void dump_configuration( void* arg ) {
 			}
 		} while ( loop );
 		if ( !! o._value ) {
-			switch ( o._value->get_type().value() ) {
+			switch ( o._value->get_type() ) {
 				case ( TYPE::BOOL ):
 					::printf( "%s %s\n", o._name, o._value->get<bool>() ? "true" : "false" );
 				break;

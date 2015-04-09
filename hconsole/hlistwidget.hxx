@@ -61,7 +61,7 @@ struct OSortHelper {
 	} sort_order_t;
 	int _sortColumn;
 	sort_order_t _order;
-	type_id_t _type;
+	TYPE _type;
 	int long _comparedItems;
 	int long _size;
 	HWindow* _window;
@@ -352,7 +352,7 @@ public:
 		BITS::ALIGN::align_t _align;
 		int _shortcutIndex;
 		char _shortcut;
-		type_id_t _type;
+		TYPE _type;
 		hcore::HFormat _format;
 		hcore::HString _name;
 		HWidget* _widget;
@@ -361,11 +361,11 @@ public:
 				yaal::hcore::HString const& columnName,
 				int width,
 				BITS::ALIGN::align_t const& align = BITS::ALIGN::LEFT,
-				type_id_t type = TYPE::HSTRING,
+				TYPE type = TYPE::HSTRING,
 				yaal::hcore::HString const& format_ = hcore::HString(),
 				HWidget* associatedWidget = NULL );
 		virtual ~HColumnInfo( void );
-		type_id_t type( void ) const {
+		TYPE type( void ) const {
 			return ( _type );
 		}
 		friend class HListWidget;
@@ -434,7 +434,7 @@ public:
 	list_widget_helper::HAbstractRow& get_current_row( void );
 	void remove_current_row();
 	int long get_row_count( void );
-	type_id_t get_column_type( int );
+	TYPE get_column_type( int );
 	void set_cursor_position( int );
 	int get_cursor_position( void ) const;
 	void selection_change( void );
@@ -446,7 +446,7 @@ protected:
 	virtual bool do_click( mouse::OMouse& ) override;
 	virtual void go_to_match( void ) override;
 	virtual void go_to_match_previous( void ) override;
-	bool get_text_for_cell( iterator_t&, int, type_id_t, hcore::HFormat* = nullptr );
+	bool get_text_for_cell( iterator_t&, int, TYPE, hcore::HFormat* = nullptr );
 	void update_children( void );
 	void draw_cell( iterator_t&, int, int, int, HColumnInfo const* const, bool );
 	void handle_key_page_up( void );
@@ -579,7 +579,7 @@ public:
 			yaal::hcore::HString const& columnName,
 			int width,
 			HListWidget::BITS::ALIGN::align_t const& align,
-			type_id_t type,
+			TYPE type,
 			yaal::hcore::HString const& format_,
 			HWidget* associatedWidget );
 protected:
@@ -592,7 +592,7 @@ protected:
 			yaal::hcore::HString const&,
 			int,
 			HListWidget::BITS::ALIGN::align_t const&,
-			type_id_t,
+			TYPE,
 			yaal::hcore::HString const&,
 			HWidget* );
 };

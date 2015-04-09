@@ -30,7 +30,6 @@ Copyright:
 #include "hcore/hstring.hxx"
 #include "hcore/htime.hxx"
 #include "hcore/hexception.hxx" /* types definitions */
-#include "hcore/hstrongenum.hxx"
 #include "hcore/reflection.hxx"
 #include "hcore/hvariant.hxx"
 
@@ -81,7 +80,8 @@ protected:
 
 class HInfoMultiVal : public HInfo {
 private:
-	u64_t _type;
+	typedef u64_t type_mask_t;
+	type_mask_t _type;
 	int long long _integer;
 	double long _real;
 	mutable yaal::hcore::HString _string;
@@ -113,7 +113,7 @@ private:
 
 class HInfoVariant : public HInfo {
 private:
-	type_id_t _type;
+	TYPE _type;
 	typedef yaal::hcore::HVariant<int long long, double long, yaal::hcore::HString, yaal::hcore::HTime> data_t;
 	data_t _data;
 public:

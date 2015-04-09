@@ -38,7 +38,7 @@ namespace yaal {
 namespace hconsole {
 
 HInfoMultiVal::HInfoMultiVal( void )
-	: _type( TYPE::UNKNOWN ),
+	: _type( static_cast<type_mask_t>( TYPE::UNKNOWN ) ),
 	_integer( 0 ), _real( 0 ),
 	_string(), _time( HTime::TZ::LOCAL ) {
 	M_PROLOG
@@ -47,7 +47,7 @@ HInfoMultiVal::HInfoMultiVal( void )
 }
 
 HInfoMultiVal::HInfoMultiVal( int long long data_ )
-	: _type( TYPE::INT_LONG_LONG ),
+	: _type( static_cast<type_mask_t>( TYPE::INT_LONG_LONG ) ),
 	_integer( data_ ), _real( 0 ),
 	_string(), _time( HTime::TZ::LOCAL ) {
 	M_PROLOG
@@ -56,7 +56,7 @@ HInfoMultiVal::HInfoMultiVal( int long long data_ )
 }
 
 HInfoMultiVal::HInfoMultiVal( double long data_ )
-	: _type( TYPE::DOUBLE_LONG ),
+	: _type( static_cast<type_mask_t>( TYPE::DOUBLE_LONG ) ),
 	_integer( 0 ), _real( data_ ),
 	_string(), _time( HTime::TZ::LOCAL ) {
 	M_PROLOG
@@ -65,7 +65,7 @@ HInfoMultiVal::HInfoMultiVal( double long data_ )
 }
 
 HInfoMultiVal::HInfoMultiVal( HString const& string_ )
-	: _type( TYPE::HSTRING ),
+	: _type( static_cast<type_mask_t>( TYPE::HSTRING ) ),
 	_integer( 0 ), _real( 0 ),
 	_string( string_ ), _time( HTime::TZ::LOCAL ) {
 	M_PROLOG
@@ -74,7 +74,7 @@ HInfoMultiVal::HInfoMultiVal( HString const& string_ )
 }
 
 HInfoMultiVal::HInfoMultiVal( HTime const& time_ )
-	: _type( TYPE::HTIME ),
+	: _type( static_cast<type_mask_t>( TYPE::HTIME ) ),
 	_integer( 0 ), _real( 0 ),
 	_string(), _time( time_ ) {
 	M_PROLOG
@@ -102,7 +102,7 @@ HInfoMultiVal::~HInfoMultiVal( void ) {
 
 void HInfoMultiVal::purge( void ) {
 	M_PROLOG
-	_type = TYPE::UNKNOWN;
+	_type = static_cast<type_mask_t>( TYPE::UNKNOWN );
 	_integer = 0;
 	_real = 0;
 	_string.clear();
@@ -136,15 +136,15 @@ void HInfoMultiVal::swap( HInfoMultiVal& info_ ) {
 int long long HInfoMultiVal::do_get_integer( void ) const {
 	M_PROLOG
 	int long long val( _integer );
-	if ( ! ( _type & TYPE::INT_LONG_LONG ) ) {
-		if ( _type & TYPE::DOUBLE_LONG ) {
+	if ( ! ( _type & static_cast<type_mask_t>( TYPE::INT_LONG_LONG ) ) ) {
+		if ( _type & static_cast<type_mask_t>( TYPE::DOUBLE_LONG ) ) {
 			val = static_cast<int long long>( _real );
-		} else if ( _type & TYPE::HSTRING ) {
+		} else if ( _type & static_cast<type_mask_t>( TYPE::HSTRING ) ) {
 			val = lexical_cast<int long long>( _string );
-		} else if ( _type & TYPE::HTIME ) {
+		} else if ( _type & static_cast<type_mask_t>( TYPE::HTIME ) ) {
 			val = _time.raw();
 		} else {
-			M_ASSERT( ! _integer && ( _type == TYPE::UNKNOWN ) );
+			M_ASSERT( ! _integer && ( _type == static_cast<type_mask_t>( TYPE::UNKNOWN ) ) );
 		}
 	}
 	return ( val );
@@ -154,15 +154,15 @@ int long long HInfoMultiVal::do_get_integer( void ) const {
 double long HInfoMultiVal::do_get_real( void ) const {
 	M_PROLOG
 	double long val( _real );
-	if ( ! ( _type & TYPE::DOUBLE_LONG ) ) {
-		if ( _type & TYPE::INT_LONG_LONG ) {
+	if ( ! ( _type & static_cast<type_mask_t>( TYPE::DOUBLE_LONG ) ) ) {
+		if ( _type & static_cast<type_mask_t>( TYPE::INT_LONG_LONG ) ) {
 			val = _integer;
-		} else if ( _type & TYPE::HSTRING ) {
+		} else if ( _type & static_cast<type_mask_t>( TYPE::HSTRING ) ) {
 			val = lexical_cast<double long>( _string );
-		} else if ( _type & TYPE::HTIME ) {
+		} else if ( _type & static_cast<type_mask_t>( TYPE::HTIME ) ) {
 			val = _time.raw();
 		} else {
-			M_ASSERT( ( _real == 0. ) && ( _type == TYPE::UNKNOWN ) );
+			M_ASSERT( ( _real == 0. ) && ( _type == static_cast<type_mask_t>( TYPE::UNKNOWN ) ) );
 		}
 	}
 	return ( val );
@@ -171,15 +171,15 @@ double long HInfoMultiVal::do_get_real( void ) const {
 
 HString const& HInfoMultiVal::do_get_string( void ) const {
 	M_PROLOG
-	if ( ! ( _type & TYPE::HSTRING ) ) {
-		if ( _type & TYPE::DOUBLE_LONG ) {
+	if ( ! ( _type & static_cast<type_mask_t>( TYPE::HSTRING ) ) ) {
+		if ( _type & static_cast<type_mask_t>( TYPE::DOUBLE_LONG ) ) {
 			_string = _real;
-		} else if ( _type & TYPE::INT_LONG_LONG ) {
+		} else if ( _type & static_cast<type_mask_t>( TYPE::INT_LONG_LONG ) ) {
 			_string = _integer;
-		} else if ( _type & TYPE::HTIME ) {
+		} else if ( _type & static_cast<type_mask_t>( TYPE::HTIME ) ) {
 			_string = _time.string();
 		} else {
-			M_ASSERT( _string.is_empty() && ( _type == TYPE::UNKNOWN ) );
+			M_ASSERT( _string.is_empty() && ( _type == static_cast<type_mask_t>( TYPE::UNKNOWN ) ) );
 		}
 	}
 	return ( _string );
@@ -194,25 +194,25 @@ HTime const& HInfoMultiVal::do_get_time( void ) const {
 
 void HInfoMultiVal::do_set_integer( int long long data_ ) {
 	_integer = data_;
-	_type |= TYPE::INT_LONG_LONG;
+	_type |= static_cast<type_mask_t>( TYPE::INT_LONG_LONG );
 	return;
 }
 
 void HInfoMultiVal::do_set_real( double long data_ ) {
 	_real = data_;
-	_type |= TYPE::DOUBLE_LONG;
+	_type |= static_cast<type_mask_t>( TYPE::DOUBLE_LONG );
 	return;
 }
 
 void HInfoMultiVal::do_set_string( HString const& string_ ) {
 	_string = string_;
-	_type |= TYPE::HSTRING;
+	_type |= static_cast<type_mask_t>( TYPE::HSTRING );
 	return;
 }
 
 void HInfoMultiVal::do_set_time( HTime const& time_ ) {
 	_time = time_;
-	_type |= TYPE::HTIME;
+	_type |= static_cast<type_mask_t>( TYPE::HTIME );
 	return;
 }
 

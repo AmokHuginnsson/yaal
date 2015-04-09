@@ -125,7 +125,7 @@ void HDataWidget::do_cancel_new( void ) {
 	return;
 }
 
-void sync( HRecordSet::value_t& to_, HInfo const& from_, TYPE::enum_t type_ ) {
+void sync( HRecordSet::value_t& to_, HInfo const& from_, TYPE type_ ) {
 	M_PROLOG
 	switch ( type_ ) {
 		case ( TYPE::HSTRING ): {

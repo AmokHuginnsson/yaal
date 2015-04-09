@@ -57,7 +57,7 @@ HListWidget::flag_t const HListWidget::FLAG::DRAW_HEADER = HListWidget::flag_t::
 HListWidget::flag_t const HListWidget::FLAG::ALL = ~HListWidget::FLAG::NONE;
 
 namespace {
-char const* default_format( type_id_t type_ ) {
+char const* default_format( TYPE type_ ) {
 	char const* df = NULL;
 	switch ( type_ ) {
 		case ( TYPE::HSTRING ):       df = "%s"; break;
@@ -73,7 +73,7 @@ char const* default_format( type_id_t type_ ) {
 }
 
 HListWidget::HColumnInfo::HColumnInfo( yaal::hcore::HString const& name_,
-		int width_, BITS::ALIGN::align_t const& align_, type_id_t type_,
+		int width_, BITS::ALIGN::align_t const& align_, TYPE type_,
 		yaal::hcore::HString const& format_, HWidget* widget_ )
 	: _descending( false ), _widthRaw( 0 ), _width( width_ ), _align( align_ ),
 	_shortcutIndex( 0 ), _shortcut( 0 ), _type( type_ ), _format( ! format_.is_empty() ? format_ : default_format( _type ) ),
@@ -1157,11 +1157,11 @@ void HListWidget::set_flags( flag_t flags_, flag_t mask_ ) {
 	M_EPILOG
 }
 
-bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, type_id_t type_, hcore::HFormat* format_ ) {
+bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, TYPE type_, hcore::HFormat* format_ ) {
 	M_PROLOG
 	M_ASSERT( it_.is_valid() );
 	HAbstractRow& item = *it_;
-	switch ( type_.value() ) {
+	switch ( type_ ) {
 		case ( TYPE::INT_LONG_LONG ): {
 			try {
 				int long long v( item[ column_ ].get_integer() );
@@ -1187,7 +1187,7 @@ bool HListWidget::get_text_for_cell( iterator_t& it_, int column_, type_id_t typ
 			_varTmpBuffer.assign( format_ ? ( *format_ % v ).string() : v );
 		} break;
 		default :
-			M_THROW( "unknown type", type_.value() );
+			M_THROW( "unknown type", static_cast<u64_t>( type_ ) );
 		break;
 	}
 	return ( item.get_checked() );
@@ -1274,7 +1274,7 @@ void HListWidget::update_children( void ) {
 	M_EPILOG
 }
 
-type_id_t HListWidget::get_column_type( int column_ ) {
+TYPE HListWidget::get_column_type( int column_ ) {
 	M_PROLOG
 	return ( _header[ column_ ]->_type );
 	M_EPILOG
@@ -1299,7 +1299,7 @@ bool compare_cells( HInfo const& left_, HInfo const& right_, OSortHelper& sortHe
 		sortHelper_.progress();
 	}
 	bool lower = false;
-	switch ( sortHelper_._type.value() ) {
+	switch ( sortHelper_._type ) {
 		case ( TYPE::INT_LONG_LONG ):
 			lower = left_.get_integer() < right_.get_integer();
 		break;
@@ -1629,7 +1629,7 @@ bool HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools
 		} else {
 			M_THROW( _( "unknown align type" ), node_.get_line() );
 		}
-		type_id_t type( TYPE::HSTRING );
+		TYPE type( TYPE::HSTRING );
 		if ( xmlType == "string" ) {
 			type = TYPE::HSTRING;
 		} else if ( xmlType == "integer" ) {
@@ -1662,7 +1662,7 @@ HListWidget::HColumnInfo::ptr_t HListWidgetCreator::make_column(
 		yaal::hcore::HString const& columnName,
 		int width,
 		HListWidget::BITS::ALIGN::align_t const& align,
-		type_id_t type,
+		TYPE type,
 		yaal::hcore::HString const& format_,
 		HWidget* associatedWidget ) {
 	M_PROLOG
@@ -1676,7 +1676,7 @@ HListWidget::HColumnInfo::ptr_t HListWidgetCreator::do_make_column(
 		yaal::hcore::HString const& columnName,
 		int width,
 		HListWidget::BITS::ALIGN::align_t const& align,
-		type_id_t type,
+		TYPE type,
 		yaal::hcore::HString const& format_,
 		HWidget* associatedWidget ) {
 	M_PROLOG
