@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	hpipe.hxx - this file is integral part of `yaal' project.
+  hpipe.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -23,6 +23,10 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+
+/*! \file hcore/hpipe.hxx
+ * \brief Declaration of HPipe class.
+ */
 
 #ifndef YAAL_HCORE_HPIPE_HXX_INCLUDED
 #define YAAL_HCORE_HPIPE_HXX_INCLUDED 1

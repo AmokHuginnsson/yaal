@@ -24,6 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+/*! \file hcore/hhashmultiset.hxx
+ * \brief Declaration and implementation of HHashMultiSet<> class template.
+ */
+
 #ifndef YAAL_HCORE_HHASHMULTISET_HXX_INCLUDED
 #define YAAL_HCORE_HHASHMULTISET_HXX_INCLUDED 1
 
@@ -43,7 +47,7 @@ struct hashmultiset_helper {
 		{	return ( key_.first );	}
 };
 
-/*! \brief Hash set container implementation.
+/*! \brief Hash multi-set container implementation.
  */
 template<typename type_t, typename hasher_t = hash<type_t>, typename allocator_t = allocator::system<HPair<type_t, int long> > >
 class HHashMultiSet {

@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	resolver.hxx - this file is integral part of `yaal' project.
+  resolver.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -24,6 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+/*! \file hcore/resolver.hxx
+ * \brief All name resolution relared classes and free function reside here.
+ *
+ * HIP and resolver belongs here.
+ */
+
 #ifndef YAAL_HCORE_RESOLVER_HXX_INCLUDED
 #define YAAL_HCORE_RESOLVER_HXX_INCLUDED 1
 
@@ -37,6 +43,8 @@ namespace yaal {
 
 namespace hcore {
 
+/*! \brief IP address representation.
+ */
 class HIP {
 private:
 	u32_t _data;

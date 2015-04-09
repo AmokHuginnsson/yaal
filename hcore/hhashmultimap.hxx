@@ -24,6 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+/*! \file hcore/hhashmultimap.hxx
+ * \brief Declaration and implementation of HHashMultiMap<> class template.
+ */
+
 #ifndef YAAL_HCORE_HHASHMULTIMAP_HXX_INCLUDED
 #define YAAL_HCORE_HHASHMULTIMAP_HXX_INCLUDED 1
 

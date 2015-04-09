@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	iterator.hxx - this file is integral part of `yaal' project.
+  iterator.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -23,6 +23,13 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
+
+/*! \file hcore/iterator.hxx
+ * \brief All iterator concept related classes and free functions belong here.
+ *
+ * iterator_category, iterator_interface<>, iterator_traits<>,
+ * HReverseIterator, HCyclicIterator can be found here.
+ */
 
 #ifndef YAAL_HCORE_ITERATOR_HXX_INCLUDED
 #define YAAL_HCORE_ITERATOR_HXX_INCLUDED 1

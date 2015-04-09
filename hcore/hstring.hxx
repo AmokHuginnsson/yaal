@@ -24,6 +24,13 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+/*! \file hcore/hstring.hxx
+ * \brief Declaration of HString class.
+ *
+ * All HString related free functions are included here.
+ * HCharacterClass also resides here.
+ */
+
 #ifndef YAAL_HCORE_HSTRING_HXX_INCLUDED
 #define YAAL_HCORE_HSTRING_HXX_INCLUDED 1
 

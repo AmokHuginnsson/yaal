@@ -24,6 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+/*! \file hcore/hmap.hxx
+ * \brief Declaration and implementation of HMap<> class template.
+ */
+
 #ifndef YAAL_HCORE_HMAP_HXX_INCLUDED
 #define YAAL_HCORE_HMAP_HXX_INCLUDED 1
 

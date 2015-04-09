@@ -24,6 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+/*! \file hcore/allocator.hxx
+ * \brief Declaration and implementation of YAAL allocators.
+ */
+
 #ifndef YAAL_HCORE_ALLOCATOR_HXX_INCLUDED
 #define YAAL_HCORE_ALLOCATOR_HXX_INCLUDED 1
 
@@ -32,8 +36,12 @@ Copyright:
 
 namespace yaal {
 
+/*! \brief YAAL allocators reside here.
+ */
 namespace allocator {
 
+/*! \brief Trivial system allocator.
+ */
 template<typename T>
 struct system {
 	typedef T* pointer;
@@ -92,6 +100,8 @@ private:
 	system& operator = ( system const& );
 };
 
+/*! \brief Pool allocator.
+ */
 template<typename T>
 struct pool {
 	typedef T* pointer;
@@ -161,6 +171,8 @@ private:
 	pool& operator = ( pool const& );
 };
 
+/*! \brief Forwarding allocator.
+ */
 template<typename T, typename allocator_t>
 struct ref {
 	typedef T* pointer;

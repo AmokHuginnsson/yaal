@@ -24,6 +24,10 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+/*! \file hcore/hlist.hxx
+ * \brief Declaration and implementation of HList<> class template.
+ */
+
 #ifndef YAAL_HCORE_HLIST_HXX_INCLUDED
 #define YAAL_HCORE_HLIST_HXX_INCLUDED 1
 
