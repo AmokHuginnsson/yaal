@@ -51,7 +51,6 @@ private:
 	HThreadPool& operator = ( HThreadPool const& ) = delete;
 	friend class yaal::hcore::HSingleton<HThreadPool>;
 	friend class yaal::hcore::HDestructor<HThreadPool>;
-	friend class HWorker;
 };
 
 }
