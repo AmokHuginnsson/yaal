@@ -35,12 +35,13 @@ Copyright:
 #include "hcore/base.hxx" /* M_PROLOG, M_EPILOG */
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
+#include "signals.hxx"
 #include "hcore/hlog.hxx"     /* log object */
 #include "hcore/hset.hxx"
 #include "hcore/hstring.hxx"  /* HString class */
 #include "hcore/system.hxx"   /* get_pid() */
 #include "hcore/iterator.hxx"
-#include "signals.hxx"
+#include "tools/hthreadpool.hxx"
 #include "tools.hxx"          /* tools namespace */
 
 using namespace yaal::hcore;
@@ -127,7 +128,7 @@ int HSignalService::_exitStatus = 0;
 HSignalService::HSignalService( void )
 	: _loop( true ),
 	_catch( chunk_size<sigset_t>( 1 ) ),
-	_thread(), _mutex(), _handlers() {
+	_mutex(), _handlers() {
 	M_PROLOG
 	M_ENSURE( sigemptyset( _catch.get<sigset_t>() ) == 0 );
 	catch_signal( SIGURG );
@@ -152,15 +153,16 @@ HSignalService::HSignalService( void )
 	register_handler( SIGSYS, fatal );
 	catch_signal( SIGPIPE );
 	block_signal( SIGALRM );
-	_thread.spawn( call( &HSignalService::run, this ) );
+	HThreadPool::get_instance().start_task( call( &HSignalService::run, this ) );
 	return;
 	M_EPILOG
 }
 
 HSignalService::~HSignalService( void ) {
 	M_PROLOG
-	if ( _loop )
+	if ( _loop ) {
 		stop();
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -176,7 +178,6 @@ void HSignalService::stop( void ) {
 		 * all hail to IBM Signal Managment documentation.
 		 */
 		M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
-		_thread.finish();
 		reset_signal_low( SIGALRM );
 		HSet<int> signals;
 		transform( _handlers.begin(), _handlers.end(), insert_iterator( signals ), select1st<handlers_t::value_type>() );
@@ -189,7 +190,7 @@ void HSignalService::stop( void ) {
 void HSignalService::run( void ) {
 	M_PROLOG
 	HThread::set_name( "HSignalService" );
-	while ( _loop && _thread.is_alive() ) {
+	while ( _loop ) {
 		int sigNo = 0;
 		M_ENSURE( sigwait( _catch.get<sigset_t>(), &sigNo ) == 0 );
 		HLock lock( _mutex );
@@ -285,7 +286,7 @@ void HSignalService::exit( int ) {
 }
 
 int HSignalService::life_time( int ) {
-	return ( 100 );
+	return ( HThreadPool::life_time( 0 ) - 5 );
 }
 
 void HSignalService::call_handler( int sigNo_ ) {

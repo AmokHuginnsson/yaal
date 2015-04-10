@@ -57,7 +57,6 @@ private:
 	static int _exitStatus;
 	bool _loop;
 	yaal::hcore::HChunk _catch;
-	yaal::hcore::HThread _thread;
 	yaal::hcore::HMutex _mutex;
 	handlers_t _handlers;
 public:
@@ -67,13 +66,13 @@ public:
 	void flush_handlers( void const* );
 	void reset_signal( int );
 	void stop( void	);
+	static int life_time( int );
 private:
 	HSignalService( void );
 	~HSignalService( void );
 	void run( void );
 	void catch_signal( int );
 	void block_signal( int );
-	static int life_time( int );
 	void schedule_exit( int );
 	static void exit( int ) __attribute__(( __noreturn__ ));
 	friend class yaal::hcore::HSingleton<HSignalService>;
