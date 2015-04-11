@@ -1,10 +1,13 @@
 # NATIVE_MAKE
 
+SHELL     = /bin/sh
+UNQUOTE   = $(subst $\",,$(1))
 VERIFY_DIR=../../yaalrc.in
 VERSION=$(shell awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in)
+PACKAGE_VERSION=$(call UNQUOTE,$(BUILD_ID))
 ARCH=$(shell arch)
 SYSTEM=$(shell lsb_release -si | tr A-Z a-z)
-TAG=$(VERSION)-1.el$(SYSTEM_RELEASE).$(SYSTEM).$(ARCH)
+TAG=$(VERSION)-$(PACKAGE_VERSION).el$(SYSTEM_RELEASE).$(SYSTEM).$(ARCH)
 SYSTEM_RELEASE=$(shell lsb_release -sr|awk -F '.' '{print $$1}')
 ARTIFACT_DIR=rpm/RPMS/$(ARCH)
 ARTIFACTS=$(ARTIFACT_DIR)/yaal-$(TAG).rpm \
@@ -25,7 +28,7 @@ $(VERIFY_DIR):
 
 $(ARTIFACTS): $(VERIFY_DIR)
 	@cd ../../ && \
-	rpmbuild -D '_topdir $(CURDIR)/rpm' -bb ./_aux/centos/yaal.spec
+	rpmbuild -D 'BUILD_ID $(PACKAGE_VERSION)' -D '_topdir $(CURDIR)/rpm' -bb ./_aux/centos/yaal.spec
 
 rpm/$(BUNDLE): $(VERIFY_DIR) $(ARTIFACTS)
 	@/bin/rm -rf rpm/yaal-bundle && \

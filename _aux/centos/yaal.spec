@@ -1,6 +1,6 @@
 Name:    yaal
 Version: %(awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $3;DOT="."}END{print VERSION}' ./Makefile.mk.in)
-Release: 1%{?dist}
+Release: %{?BUILD_ID}%{!?BUILD_ID:1}%{?dist}
 Summary: Yet Another Abstraction Layer - general purpose C++ library.
 
 Group:   System Environment/Libraries
