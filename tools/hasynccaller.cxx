@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hthreadpool.hxx"
 #include "hcore/system.hxx"
 
+using namespace yaal;
 using namespace yaal::hcore;
 
 namespace yaal {
@@ -57,7 +58,6 @@ HAsyncCaller::HAsyncCaller( void )
 
 HAsyncCaller::~HAsyncCaller( void ) {
 	M_PROLOG
-	stop();
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -98,6 +98,7 @@ void HAsyncCaller::stop( void ) {
 	M_PROLOG
 	HLock l( _mutex );
 	-- _syncOn;
+	_semaphore.signal();
 	return;
 	M_EPILOG
 }
