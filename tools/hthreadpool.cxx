@@ -42,6 +42,17 @@ HThreadPool::HThreadPool( void )
 	return;
 }
 
+HThreadPool::~HThreadPool( void ) {
+	M_PROLOG
+	_isKilled_ = true;
+	if ( state() == STATE::RUNNING ) {
+		windup( WINDUP_MODE::ABORT );
+	}
+	M_ASSERT( state() == STATE::CLOSED );
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
 }
 
 }

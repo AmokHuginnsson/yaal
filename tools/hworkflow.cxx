@@ -274,6 +274,12 @@ bool HWorkFlow::can_join( void ) {
 	M_EPILOG
 }
 
+HWorkFlow::STATE HWorkFlow::state( void ) const {
+	M_PROLOG
+	return ( _state );
+	M_EPILOG
+}
+
 void HWorkFlow::windup( WINDUP_MODE windupMode_ ) {
 	M_PROLOG
 	schedule_windup( windupMode_ );

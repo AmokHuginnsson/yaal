@@ -47,6 +47,7 @@ public:
 	}
 private:
 	HThreadPool( void );
+	virtual ~HThreadPool( void );
 	HThreadPool( HThreadPool const& ) = delete;
 	HThreadPool& operator = ( HThreadPool const& ) = delete;
 	friend class yaal::hcore::HSingleton<HThreadPool>;

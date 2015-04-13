@@ -152,6 +152,9 @@ public:
 	 */
 	bool can_join( void );
 
+protected:
+	STATE state( void ) const;
+
 private:
 	/*! \brief Pop task from task queue.
 	 *
