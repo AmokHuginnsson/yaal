@@ -30,114 +30,100 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hscheduledasynccaller.hxx"
+#include "hasynccaller.hxx"
+#include "hthreadpool.hxx"
 
+using namespace yaal;
 using namespace yaal::hcore;
 
 namespace yaal {
 
 namespace tools {
 
-HAbstractAsyncCaller::HAbstractAsyncCaller( void )
-	: _queue(), _thread(), _mutex(), _loop( false ) {
+HScheduledAsyncCaller::HScheduledAsyncCaller( void )
+	: _queue()
+	, _mutex()
+	, _condition( _mutex )
+	, _loop( true ) {
 	M_PROLOG
-	return;
-	M_EPILOG
-}
-
-void HAbstractAsyncCaller::stop( void ) {
-	M_PROLOG
-	if ( _loop ) {
-		_loop = false;
-		do_signal();
-		_thread.finish();
-	}
-	return;
-	M_EPILOG
-}
-
-void HAbstractAsyncCaller::start( void ) {
-	M_PROLOG
-	_loop = true;
-	_thread.spawn( call( &HAbstractAsyncCaller::run, this ) );
-	return;
-	M_EPILOG
-}
-
-void HAbstractAsyncCaller::register_call( priority_t prio, call_t call ) {
-	M_PROLOG {
-		HLock l( _mutex );
-		_queue.push_back( make_pair( prio, call ) );
-	}
-	do_signal();
-	return;
-	M_EPILOG
-}
-
-void HAbstractAsyncCaller::flush( void* invoker_ ) {
-	M_PROLOG
-	HLock l( _mutex );
-	for ( queue_t::iterator it = _queue.begin(); it != _queue.end(); ) {
-		if ( (*it).second.id() == invoker_ )
-			it = _queue.erase( it );
-		else
-			++ it;
-	}
-	return;
-	M_EPILOG
-}
-
-void HAbstractAsyncCaller::run( void ) {
-	M_PROLOG
-	return ( do_work() );
-	M_EPILOG
-}
-
-HScheduledAsyncCaller::HScheduledAsyncCaller( void ) : _condition( _mutex ) {
-	M_PROLOG
-	start();
+	HThreadPool::get_instance().start_task(
+		call( &HScheduledAsyncCaller::run, this ),
+		call( &HScheduledAsyncCaller::stop, this ),
+		call( &HScheduledAsyncCaller::want_restart, this )
+	);
 	return;
 	M_EPILOG
 }
 
 HScheduledAsyncCaller::~HScheduledAsyncCaller( void ) {
 	M_PROLOG
-	if ( _loop )
-		stop();
 	return;
 	M_DESTRUCTOR_EPILOG
 }
 
-void HScheduledAsyncCaller::do_signal( void ) {
+void HScheduledAsyncCaller::stop( void ) {
 	M_PROLOG
 	HLock l( _mutex );
+	if ( _loop ) {
+		_loop = false;
+		_condition.signal();
+	}
+	return;
+	M_EPILOG
+}
+
+bool HScheduledAsyncCaller::want_restart( void ) const {
+	return ( true );
+}
+
+void HScheduledAsyncCaller::register_call( priority_t prio, call_t call ) {
+	M_PROLOG
+	HLock l( _mutex );
+	_queue.push_back( make_pair( prio, call ) );
 	_condition.signal();
 	return;
 	M_EPILOG
 }
 
-void HScheduledAsyncCaller::do_work( void ) {
+void HScheduledAsyncCaller::flush( void* invoker_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	for ( queue_t::iterator it = _queue.begin(); it != _queue.end(); ) {
+		if ( (*it).second.id() == invoker_ ) {
+			it = _queue.erase( it );
+		} else {
+			++ it;
+		}
+	}
+	return;
+	M_EPILOG
+}
+
+void HScheduledAsyncCaller::run( void ) {
 	M_PROLOG
 	HLock l( _mutex );
 	HThread::set_name( "HScheduledAsyncCaller" );
-	while ( _loop ) {
+	while ( ! _isKilled_ && _loop ) {
 		queue_t::iterator it = _queue.begin();
 		while ( ( it != _queue.end() ) && ( (*it).first <= time( NULL ) ) ) {
-			(*it).second();
+			HAsyncCaller::get_instance().register_call( 0, (*it).second );
 			it = _queue.erase( it );
 		}
 		if ( it != _queue.end() ) {
 			time_t delay = 0;
-			if ( ( delay = ( (*it).first - time( NULL ) ) ) > 0 )
+			if ( ( delay = ( (*it).first - time( NULL ) ) ) > 0 ) {
 				_condition.wait( static_cast<int long unsigned>( delay ), 0 );
-		} else
+			}
+		} else {
 			_condition.wait( 10000, 0 );
+		}
 	}
 	return;
 	M_EPILOG
 }
 
 int HScheduledAsyncCaller::life_time( int ) {
-	return ( 50 );
+	return ( HAsyncCaller::life_time( 0 ) + 10 );
 }
 
 }

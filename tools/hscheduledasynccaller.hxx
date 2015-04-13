@@ -36,56 +36,37 @@ namespace yaal {
 
 namespace tools {
 
-/*! \brief Interface for asynchronous call providers.
- */
-class HAbstractAsyncCaller {
-public:
-	typedef HAbstractAsyncCaller this_type;
-	typedef int long priority_t;
-	typedef yaal::hcore::HBoundCall<> call_t;
-protected:
-	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
-	queue_t _queue;
-	yaal::hcore::HThread _thread;
-	yaal::hcore::HMutex _mutex;
-	bool _loop;
-public:
-	void register_call( priority_t, call_t );
-	void flush( void* );
-	void stop( void );
-protected:
-	HAbstractAsyncCaller( void );
-	virtual ~HAbstractAsyncCaller( void ) {}
-	void start( void );
-	virtual void do_signal( void ) = 0;
-	virtual void do_work( void ) = 0;
-private:
-	void run( void );
-};
-
-typedef yaal::hcore::HExceptionT<HAbstractAsyncCaller> HAbstractAsyncCallerException;
-
 /*! \brief Task scheduler.
  *
  * HScheduledAsyncCaller is capable of invocation of any method of any class
  * at precisely specified moment in time.
  */
-class M_YAAL_TOOLS_PUBLIC_API HScheduledAsyncCaller : public HAbstractAsyncCaller, public yaal::hcore::HSingleton<HScheduledAsyncCaller> {
+class M_YAAL_TOOLS_PUBLIC_API HScheduledAsyncCaller : public yaal::hcore::HSingleton<HScheduledAsyncCaller> {
 public:
-	typedef HAbstractAsyncCaller base_type;
 	typedef HScheduledAsyncCaller this_type;
+	typedef int long priority_t;
+	typedef yaal::hcore::HBoundCall<> call_t;
 private:
+	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
+	queue_t _queue;
+	yaal::hcore::HMutex _mutex;
 	yaal::hcore::HCondition _condition;
+	bool _loop;
+public:
+	void register_call( priority_t, call_t );
+	void flush( void* );
+	void stop( void );
+private:
+	void run( void );
+	bool want_restart( void ) const;
 	HScheduledAsyncCaller( void );
 	virtual ~HScheduledAsyncCaller( void );
-	virtual void do_work( void );
-	virtual void do_signal( void );
 	static int life_time( int );
 	friend class yaal::hcore::HSingleton<HScheduledAsyncCaller>;
 	friend class yaal::hcore::HDestructor<HScheduledAsyncCaller>;
 };
 
-typedef yaal::hcore::HExceptionT<HScheduledAsyncCaller, HAbstractAsyncCallerException> HScheduledAsyncCallerException;
+typedef yaal::hcore::HExceptionT<HScheduledAsyncCaller> HScheduledAsyncCallerException;
 
 }
 

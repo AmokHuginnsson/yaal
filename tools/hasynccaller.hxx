@@ -45,6 +45,7 @@ public:
 	typedef int long priority_t;
 	typedef yaal::hcore::HBoundCall<> call_t;
 	void register_call( priority_t, call_t );
+	static int life_time( int );
 private:
 	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
 	queue_t _queue;
@@ -53,7 +54,6 @@ private:
 	yaal::hcore::HMutex _mutex;
 	HAsyncCaller( void );
 	virtual ~HAsyncCaller( void );
-	static int life_time( int );
 	void run( void );
 	void stop( void );
 	bool want_restart( void ) const;
