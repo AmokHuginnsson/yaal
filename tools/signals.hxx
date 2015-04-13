@@ -71,6 +71,7 @@ private:
 	HSignalService( void );
 	~HSignalService( void );
 	void run( void );
+	bool want_restart( void ) const;
 	void catch_signal( int );
 	void block_signal( int );
 	void schedule_exit( int );

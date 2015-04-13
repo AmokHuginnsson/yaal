@@ -57,6 +57,7 @@ int HSingletonInterface::life_time( int lifeTime_ ) {
 void HLifeTimeTracker::do_destruct( void ) {
 	M_PROLOG
 	HLock lock( _mutex );
+	_isKilled_ = true;
 	map_stack_t::iterator it = _destructors.begin();
 	M_ASSERT( it != _destructors.end() );
 	destructor_ptr_t destructor = (*it).second;

@@ -37,6 +37,61 @@ namespace yaal {
 
 namespace tools {
 
+HAbstractAsyncCaller::HAbstractAsyncCaller( void )
+	: _queue(), _thread(), _mutex(), _loop( false ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void HAbstractAsyncCaller::stop( void ) {
+	M_PROLOG
+	if ( _loop ) {
+		_loop = false;
+		do_signal();
+		_thread.finish();
+	}
+	return;
+	M_EPILOG
+}
+
+void HAbstractAsyncCaller::start( void ) {
+	M_PROLOG
+	_loop = true;
+	_thread.spawn( call( &HAbstractAsyncCaller::run, this ) );
+	return;
+	M_EPILOG
+}
+
+void HAbstractAsyncCaller::register_call( priority_t prio, call_t call ) {
+	M_PROLOG {
+		HLock l( _mutex );
+		_queue.push_back( make_pair( prio, call ) );
+	}
+	do_signal();
+	return;
+	M_EPILOG
+}
+
+void HAbstractAsyncCaller::flush( void* invoker_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	for ( queue_t::iterator it = _queue.begin(); it != _queue.end(); ) {
+		if ( (*it).second.id() == invoker_ )
+			it = _queue.erase( it );
+		else
+			++ it;
+	}
+	return;
+	M_EPILOG
+}
+
+void HAbstractAsyncCaller::run( void ) {
+	M_PROLOG
+	return ( do_work() );
+	M_EPILOG
+}
+
 HScheduledAsyncCaller::HScheduledAsyncCaller( void ) : _condition( _mutex ) {
 	M_PROLOG
 	start();

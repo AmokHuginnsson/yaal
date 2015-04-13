@@ -36,53 +36,32 @@ namespace yaal {
 
 namespace tools {
 
-/*! \brief Interface for asynchronous call providers.
- */
-class HAbstractAsyncCaller {
-public:
-	typedef HAbstractAsyncCaller this_type;
-	typedef int long priority_t;
-	typedef yaal::hcore::HBoundCall<> call_t;
-protected:
-	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
-	queue_t _queue;
-	yaal::hcore::HThread _thread;
-	yaal::hcore::HMutex _mutex;
-	bool _loop;
-public:
-	void register_call( priority_t, call_t );
-	void flush( void* );
-	void stop( void );
-protected:
-	HAbstractAsyncCaller( void );
-	virtual ~HAbstractAsyncCaller( void ) {}
-	void start( void );
-	virtual void do_signal( void ) = 0;
-	virtual void do_work( void ) = 0;
-private:
-	void run( void );
-};
-
-typedef yaal::hcore::HExceptionT<HAbstractAsyncCaller> HAbstractAsyncCallerException;
 
 /*! \brief Invoke function or method asynchronously.
  */
-class M_YAAL_TOOLS_PUBLIC_API HAsyncCaller : public HAbstractAsyncCaller, public yaal::hcore::HSingleton<HAsyncCaller> {
+class M_YAAL_TOOLS_PUBLIC_API HAsyncCaller : public yaal::hcore::HSingleton<HAsyncCaller> {
 public:
-	typedef HAbstractAsyncCaller base_type;
 	typedef HAsyncCaller this_type;
+	typedef int long priority_t;
+	typedef yaal::hcore::HBoundCall<> call_t;
+	void register_call( priority_t, call_t );
 private:
+	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
+	queue_t _queue;
+	int _syncOn;
 	yaal::hcore::HSemaphore _semaphore;
+	yaal::hcore::HMutex _mutex;
 	HAsyncCaller( void );
 	virtual ~HAsyncCaller( void );
-	virtual void do_work( void );
-	virtual void do_signal( void );
 	static int life_time( int );
+	void run( void );
+	void stop( void );
+	bool want_restart( void ) const;
 	friend class yaal::hcore::HSingleton<HAsyncCaller>;
 	friend class yaal::hcore::HDestructor<HAsyncCaller>;
 };
 
-typedef yaal::hcore::HExceptionT<HAsyncCaller, HAbstractAsyncCallerException> HAsyncCallerException;
+typedef yaal::hcore::HExceptionT<HAsyncCaller> HAsyncCallerException;
 
 }
 

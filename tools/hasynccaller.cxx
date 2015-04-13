@@ -28,6 +28,8 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hasynccaller.hxx"
+#include "hthreadpool.hxx"
+#include "hcore/system.hxx"
 
 using namespace yaal::hcore;
 
@@ -35,64 +37,20 @@ namespace yaal {
 
 namespace tools {
 
-HAbstractAsyncCaller::HAbstractAsyncCaller( void )
-	: _queue(), _thread(), _mutex(), _loop( false ) {
+HAsyncCaller::HAsyncCaller( void )
+	: _queue()
+	, _syncOn( 0 )
+	, _semaphore()
+	, _mutex() {
 	M_PROLOG
-	return;
-	M_EPILOG
-}
-
-void HAbstractAsyncCaller::stop( void ) {
-	M_PROLOG
-	if ( _loop ) {
-		_loop = false;
-		do_signal();
-		_thread.finish();
+	HThreadPool& tp( HThreadPool::get_instance() );
+	for ( int i( 0 ); i < system::get_core_count_info(); ++ i ) {
+		tp.start_task(
+			call( &HAsyncCaller::run, this ),
+			call( &HAsyncCaller::stop, this ),
+			call( &HAsyncCaller::want_restart, this )
+		);
 	}
-	return;
-	M_EPILOG
-}
-
-void HAbstractAsyncCaller::start( void ) {
-	M_PROLOG
-	_loop = true;
-	_thread.spawn( call( &HAbstractAsyncCaller::run, this ) );
-	return;
-	M_EPILOG
-}
-
-void HAbstractAsyncCaller::register_call( priority_t prio, call_t call ) {
-	M_PROLOG {
-		HLock l( _mutex );
-		_queue.push_back( make_pair( prio, call ) );
-	}
-	do_signal();
-	return;
-	M_EPILOG
-}
-
-void HAbstractAsyncCaller::flush( void* invoker_ ) {
-	M_PROLOG
-	HLock l( _mutex );
-	for ( queue_t::iterator it = _queue.begin(); it != _queue.end(); ) {
-		if ( (*it).second.id() == invoker_ )
-			it = _queue.erase( it );
-		else
-			++ it;
-	}
-	return;
-	M_EPILOG
-}
-
-void HAbstractAsyncCaller::run( void ) {
-	M_PROLOG
-	return ( do_work() );
-	M_EPILOG
-}
-
-HAsyncCaller::HAsyncCaller( void ) : _semaphore() {
-	M_PROLOG
-	start();
 	return;
 	M_EPILOG
 }
@@ -104,31 +62,52 @@ HAsyncCaller::~HAsyncCaller( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-void HAsyncCaller::do_signal( void ) {
+void HAsyncCaller::register_call( priority_t prio_, call_t call_ ) {
 	M_PROLOG
+	HLock l( _mutex );
+	_queue.push_back( make_pair( prio_, call_ ) );
 	_semaphore.signal();
 	return;
 	M_EPILOG
 }
 
-void HAsyncCaller::do_work( void ) {
+void HAsyncCaller::run( void ) {
 	M_PROLOG
 	HThread::set_name( "HAsyncCaller" );
-	while ( _loop ) {
+	/* _syncOn lock scope */ {
+		HLock l( _mutex );
+		++ _syncOn;
+	}
+	while ( true ) {
 		_semaphore.wait();
 		HLock l( _mutex );
-		queue_t::iterator it = _queue.begin();
-		if ( it != _queue.end() ) {
-			(*it).second();
-			_queue.erase( it );
+		if ( ( _syncOn <= 0 ) || _queue.is_empty() ) {
+			break;
 		}
+		queue_t::iterator it = _queue.begin();
+		call_t c( (*it).second );
+		_queue.erase( it );
+		l.unlock();
+		c();
 	}
 	return;
 	M_EPILOG
 }
 
+void HAsyncCaller::stop( void ) {
+	M_PROLOG
+	HLock l( _mutex );
+	-- _syncOn;
+	return;
+	M_EPILOG
+}
+
+bool HAsyncCaller::want_restart( void ) const {
+	return ( true );
+}
+
 int HAsyncCaller::life_time( int ) {
-	return ( 50 );
+	return ( HThreadPool::life_time( 0 ) + 10 );
 }
 
 }

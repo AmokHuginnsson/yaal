@@ -27,11 +27,43 @@ Copyright:
 #ifndef YAAL_TOOLS_HSCHEDULEDASYNCCALLER_HXX_INCLUDED
 #define YAAL_TOOLS_HSCHEDULEDASYNCCALLER_HXX_INCLUDED 1
 
-#include "tools/hasynccaller.hxx"
+#include "hcore/hboundcall.hxx"
+#include "hcore/hthread.hxx"
+#include "hcore/hmultimap.hxx"
+#include "hcore/hsingleton.hxx"
 
 namespace yaal {
 
 namespace tools {
+
+/*! \brief Interface for asynchronous call providers.
+ */
+class HAbstractAsyncCaller {
+public:
+	typedef HAbstractAsyncCaller this_type;
+	typedef int long priority_t;
+	typedef yaal::hcore::HBoundCall<> call_t;
+protected:
+	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
+	queue_t _queue;
+	yaal::hcore::HThread _thread;
+	yaal::hcore::HMutex _mutex;
+	bool _loop;
+public:
+	void register_call( priority_t, call_t );
+	void flush( void* );
+	void stop( void );
+protected:
+	HAbstractAsyncCaller( void );
+	virtual ~HAbstractAsyncCaller( void ) {}
+	void start( void );
+	virtual void do_signal( void ) = 0;
+	virtual void do_work( void ) = 0;
+private:
+	void run( void );
+};
+
+typedef yaal::hcore::HExceptionT<HAbstractAsyncCaller> HAbstractAsyncCallerException;
 
 /*! \brief Task scheduler.
  *

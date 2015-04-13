@@ -232,7 +232,7 @@ private:
 	/*! \brief Pass control to user specified call in working thread.
 	 */
 	void control( void );
-	/*! \brief Spawn working thread and execute HThead::control().
+	/*! \brief Spawn working thread and execute HThread::control().
 	 */
 	static void* SPAWN( void* );
 	static void CLEANUP( void* );

@@ -126,14 +126,16 @@ int HSignalService::_killGracePeriod = 1000;
 int HSignalService::_exitStatus = 0;
 
 HSignalService::HSignalService( void )
-	: _loop( true ),
-	_catch( chunk_size<sigset_t>( 1 ) ),
-	_mutex(), _handlers() {
+	: _loop( true )
+	, _catch( chunk_size<sigset_t>( 1 ) )
+	, _mutex()
+	, _handlers() {
 	M_PROLOG
 	M_ENSURE( sigemptyset( _catch.get<sigset_t>() ) == 0 );
 	catch_signal( SIGURG );
-	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
+	if ( _debugLevel_ < DEBUG_LEVEL::GDB ) {
 		register_handler( SIGINT, call( &HBaseSignalHandlers::signal_INT, _1 ) );
+	}
 	register_handler( SIGHUP, call( &HBaseSignalHandlers::signal_HUP, _1 ) );
 	register_handler( SIGTERM, call( &HBaseSignalHandlers::signal_TERM, _1 ) );
 	register_handler( SIGQUIT, call( &HBaseSignalHandlers::signal_QUIT, _1 ) );
@@ -153,16 +155,17 @@ HSignalService::HSignalService( void )
 	register_handler( SIGSYS, fatal );
 	catch_signal( SIGPIPE );
 	block_signal( SIGALRM );
-	HThreadPool::get_instance().start_task( call( &HSignalService::run, this ) );
+	HThreadPool::get_instance().start_task(
+		call( &HSignalService::run, this ),
+		call( &HSignalService::stop, this ),
+		call( &HSignalService::want_restart, this )
+	);
 	return;
 	M_EPILOG
 }
 
 HSignalService::~HSignalService( void ) {
 	M_PROLOG
-	if ( _loop ) {
-		stop();
-	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -200,6 +203,10 @@ void HSignalService::run( void ) {
 	M_EPILOG
 }
 
+bool HSignalService::want_restart( void ) const {
+	return ( true );
+}
+
 void HSignalService::register_handler( int sigNo_, handler_t handler_, void const* owner_ ) {
 	M_PROLOG
 	HLock lock( _mutex );
@@ -229,10 +236,11 @@ void HSignalService::flush_handlers( void const* owner_ ) {
 		++ it;
 		if ( del->second.second == owner_ ) {
 			int sigNo( del->first );
-			if ( _handlers.count( sigNo ) == 1 )
+			if ( _handlers.count( sigNo ) == 1 ) {
 				reset_signal( sigNo );
-			else
+			} else {
 				_handlers.erase( del );
+			}
 		}
 	}
 	return;
@@ -286,7 +294,7 @@ void HSignalService::exit( int ) {
 }
 
 int HSignalService::life_time( int ) {
-	return ( HThreadPool::life_time( 0 ) - 5 );
+	return ( HThreadPool::life_time( 0 ) + 50 );
 }
 
 void HSignalService::call_handler( int sigNo_ ) {
@@ -297,9 +305,10 @@ void HSignalService::call_handler( int sigNo_ ) {
 			handler_t handler( (*it).second.first );
 			M_ASSERT( !! handler );
 			int status = handler( sigNo_ );
-			if ( status > 0 )
-				break; /* signal was entirely consumed */
-			else if ( status < 0 ) {
+			if ( status > 0 ) {
+				/* signal was entirely consumed */
+				break;
+			} else if ( status < 0 ) {
 				_loop = false;
 				schedule_exit( status );
 			}
@@ -316,8 +325,9 @@ namespace {
 
 int HBaseSignalHandlers::signal_INT ( int signum_ ) {
 	M_PROLOG
-	if ( tools::_ignoreSignalSIGINT_ )
+	if ( tools::_ignoreSignalSIGINT_ ) {
 		return ( 0 );
+	}
 	HString message;
 	message = "Interrupt signal caught, process broken: ";
 	message += ::strsignal( signum_ );
