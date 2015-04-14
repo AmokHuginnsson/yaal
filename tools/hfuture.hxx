@@ -30,7 +30,7 @@ Copyright:
 #ifndef YAAL_TOOLS_HFUTURE_HXX_INCLUDED
 #define YAAL_TOOLS_HFUTURE_HXX_INCLUDED 1
 
-#include "hcore/hthread.hxx"
+#include "tools/hasynccaller.hxx"
 
 namespace yaal {
 
@@ -58,22 +58,27 @@ private:
 	typedef yaal::hcore::HBoundCall<return_t ( void )> call_t;
 	typedef typename trait::ternary<trait::is_reference<return_t>::value, ref_fwd<typename trait::strip_reference<return_t>::type>, return_t>::type return_type;
 	call_t _call;
-	yaal::hcore::HThread _thread;
+	yaal::hcore::HMutex _mutex;
+	yaal::hcore::HCondition _condVar;
 	return_type _return;
 	bool _finished;
 public:
 	HFuture( call_t const& call_ )
-		: _call( call_ ), _thread(), _return(), _finished( false ) {
+		: _call( call_ )
+		, _mutex()
+		, _condVar( _mutex )
+		, _return()
+		, _finished( false ) {
 		M_PROLOG
-		_thread.spawn( yaal::hcore::call( &this_type::execute, this ) );
+		HAsyncCaller::get_instance().register_call( 0, yaal::hcore::call( &this_type::execute, this ) );
 		return;
 		M_EPILOG
 	}
 	return_t get( void ) {
 		M_PROLOG
-		if ( ! _finished ) {
-			_thread.join();
-			_finished = true;
+		yaal::hcore::HLock l( _mutex );
+		while ( ! _finished ) {
+			_condVar.wait();
 		}
 		return ( _return );
 		M_EPILOG
@@ -81,7 +86,10 @@ public:
 private:
 	void execute( void ) {
 		M_PROLOG
+		yaal::hcore::HLock l( _mutex );
 		_return = _call();
+		_finished = true;
+		_condVar.broadcast();
 		return;
 		M_EPILOG
 	}
