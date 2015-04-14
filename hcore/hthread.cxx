@@ -392,7 +392,7 @@ void HSemaphore::wait( void ) {
 	HLock l( _mutex );
 	while ( _count == 0 ) {
 		/* Inside cond.wait() mutex is unlocked. */
-		_cond.wait( 0x1fffffff, 0 );
+		_cond.wait();
 	}
 	-- _count;
 	return;
@@ -518,7 +518,7 @@ void HEvent::wait( void ) {
 	M_PROLOG
 	M_ASSERT( _mutex.is_owned() );
 	while ( ! _signaled ) {
-		_condition.wait( 0x1fffffff, 0 ); /* FreeBSD strange limit. */
+		_condition.wait();
 	}
 	_signaled = false;
 	return;

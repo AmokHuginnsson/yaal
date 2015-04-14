@@ -105,7 +105,7 @@ public:
 	} status_t;
 	HCondition( HMutex& );
 	virtual ~HCondition( void );
-	status_t wait( int long unsigned, int long unsigned );
+	status_t wait( int long unsigned = 0x1fffffff /* FreeBSD strange limit. */, int long unsigned = 0 );
 	void signal( void );
 	void broadcast( void );
 private:
