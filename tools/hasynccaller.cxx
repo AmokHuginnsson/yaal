@@ -40,7 +40,7 @@ namespace tools {
 
 HAsyncCaller::HAsyncCaller( void )
 	: _queue()
-	, _syncOn( 0 )
+	, _stopRequests( 0 )
 	, _semaphore()
 	, _mutex() {
 	M_PROLOG
@@ -74,14 +74,11 @@ void HAsyncCaller::register_call( priority_t prio_, call_t call_ ) {
 void HAsyncCaller::run( void ) {
 	M_PROLOG
 	HThread::set_name( "HAsyncCaller" );
-	/* _syncOn lock scope */ {
-		HLock l( _mutex );
-		++ _syncOn;
-	}
 	while ( true ) {
 		_semaphore.wait();
 		HLock l( _mutex );
-		if ( ( _syncOn <= 0 ) || _queue.is_empty() ) {
+		if ( _stopRequests > 0 ) {
+			-- _stopRequests;
 			break;
 		}
 		queue_t::iterator it = _queue.begin();
@@ -97,7 +94,7 @@ void HAsyncCaller::run( void ) {
 void HAsyncCaller::stop( void ) {
 	M_PROLOG
 	HLock l( _mutex );
-	-- _syncOn;
+	++ _stopRequests;
 	_semaphore.signal();
 	return;
 	M_EPILOG

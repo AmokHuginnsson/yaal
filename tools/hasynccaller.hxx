@@ -49,7 +49,7 @@ public:
 private:
 	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
 	queue_t _queue;
-	int _syncOn;
+	int _stopRequests;
 	yaal::hcore::HSemaphore _semaphore;
 	yaal::hcore::HMutex _mutex;
 	HAsyncCaller( void );
