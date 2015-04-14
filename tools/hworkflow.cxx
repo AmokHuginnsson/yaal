@@ -163,8 +163,8 @@ void HWorkFlow::schedule_task( call_t task_, call_t asyncStop_, want_restart_t w
 		throw HWorkFlowException( "Not accepting new tasks." );
 	}
 	if ( ( _state == STATE::RUNNING )
-		&& ( _busyWorkers == activeWorkers )
-		&& ( activeWorkers < _workerPoolSize ) ) {
+		&& ( activeWorkers < _workerPoolSize )
+		&& ( ( _busyWorkers + static_cast<int>( _tasks.size() ) ) >= activeWorkers ) ) {
 		worker_t w( make_resource<HWorker>( this ) );
 		w->spawn();
 		_workers.emplace_back( yaal::move( w ) );
