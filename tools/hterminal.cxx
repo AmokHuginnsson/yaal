@@ -68,37 +68,38 @@ bool HTerminal::exists( void ) const {
 
 void HTerminal::init( void ) {
 	M_PROLOG
-	termios& termios( *_termios.get<struct termios>() );
-	::memset( &termios, 0, sizeof ( termios ) );
-	M_ENSURE( tcgetattr( STDIN_FILENO, &termios ) == 0 );
+	termios& backupTermios( *_termios.get<struct termios>() );
+	::memset( &backupTermios, 0, sizeof ( backupTermios ) );
+	M_ENSURE( tcgetattr( STDIN_FILENO, &backupTermios ) == 0 );
+	termios newTermios;
+	::memset( &newTermios, 0, sizeof ( newTermios ) );
+	M_ENSURE( tcgetattr( STDIN_FILENO, &newTermios ) == 0 );
 	if ( _disableXON_ ) {
-		termios.c_iflag &= ~static_cast<int unsigned>( IXON );
+		newTermios.c_iflag &= ~static_cast<int unsigned>( IXON );
 	}
 	if ( _leaveCtrlC_ ) {
-		termios.c_cc[ VINTR ] = 0;
+		newTermios.c_cc[ VINTR ] = 0;
 	}
 	if ( _leaveCtrlZ_ ) {
-		termios.c_cc[ VSUSP ] = 0;
+		newTermios.c_cc[ VSUSP ] = 0;
 	}
 	if ( _leaveCtrlS_ ) {
-		termios.c_cc[ VSTOP ] = 0;
+		newTermios.c_cc[ VSTOP ] = 0;
 	}
 	if ( _leaveCtrlQ_ ) {
-		termios.c_cc[ VSTART ] = 0;
+		newTermios.c_cc[ VSTART ] = 0;
 	}
 	if ( _leaveCtrlBackSlash_ ) {
-		termios.c_cc[ VQUIT ] = 0;
+		newTermios.c_cc[ VQUIT ] = 0;
 	}
-	M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &termios ) == 0 );
+	M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, &newTermios ) == 0 );
 	return;
 	M_EPILOG
 }
 
 void HTerminal::flush( void ) {
 	M_PROLOG
-	if ( _disableXON_ ) {
-		M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, _termios.get<termios>() ) == 0 );
-	}
+	M_ENSURE( tcsetattr( STDIN_FILENO, TCSAFLUSH, _termios.get<termios>() ) == 0 );
 	return;
 	M_EPILOG
 }
