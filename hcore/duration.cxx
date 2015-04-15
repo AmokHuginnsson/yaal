@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  hclock.hxx - this file is integral part of `yaal' project.
+  duration.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -23,57 +23,51 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/hclock.hxx
- * \brief Declaration of HClock class.
- */
 
-#ifndef YAAL_HCORE_HCLOCK_HXX_INCLUDED
-#define YAAL_HCORE_HCLOCK_HXX_INCLUDED 1
-
-#include "hcore/pod.hxx"
-#include "hcore/duration.hxx"
+#include "hcore/base.hxx"
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
+#include "duration.hxx"
+#include "si.hxx"
+#include "htime.hxx"
 
 namespace yaal {
 
 namespace hcore {
 
-/*! \brief High resolution time mesurement tool.
- */
-class HClock {
-public:
-	typedef HClock this_type;
-	/*! \brief Specify what kind of time to measure.
-	 */
-	struct TYPE {
-		typedef enum {
-			REAL,
-			CPU
-		} type_t;
-	};
-private:
-	i64_t _moment[2];
-	TYPE::type_t _type;
-public:
-	/*! \brief Create clock of given type.
-	 *
-	 * \param type_ - type of clock to create.
-	 */
-	HClock( TYPE::type_t type_ = TYPE::REAL );
-	/*! \brief Get time that elapsed from last reset.
-	 *
-	 * \param unit_ - get time given in specific units.
-	 * \return Amount of time that elapsed in given unit.
-	 */
-	i64_t get_time_elapsed( yaal::hcore::time::UNIT unit_ = yaal::hcore::time::UNIT::SECOND ) const;
+namespace time {
 
-	/*! \brief Reset clock.
-	 */
-	void reset( void );
-};
+duration_t duration( yaal::i64_t duration_, UNIT unit_ ) {
+	duration_t nanoseconds( 0 );
+	switch ( unit_ ) {
+		case ( UNIT::DAY ): {
+			nanoseconds = duration_ * HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE * si::NANO_IN_WHOLE;
+		} break;
+		case ( UNIT::HOUR ): {
+			nanoseconds = duration_ * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE * si::NANO_IN_WHOLE;
+		} break;
+		case ( UNIT::MINUTE ): {
+			nanoseconds = duration_ * HTime::SECONDS_IN_MINUTE * si::NANO_IN_WHOLE;
+		} break;
+		case ( UNIT::SECOND ): {
+			nanoseconds = duration_ * si::NANO_IN_WHOLE;
+		} break;
+		case ( UNIT::MILISECOND ): {
+			nanoseconds = duration_ * si::NANO_IN_MILI;
+		} break;
+		case ( UNIT::MICROSECOND ): {
+			nanoseconds = duration_ * si::NANO_IN_MICRO;
+		} break;
+		case ( UNIT::NANOSECOND ): {
+			nanoseconds = duration_;
+		} break;
+	}
+	return ( nanoseconds );
+}
 
 }
 
 }
 
-#endif /* #ifndef YAAL_HCORE_HCLOCK_HXX_INCLUDED */
+}
 

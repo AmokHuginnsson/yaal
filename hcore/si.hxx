@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  hclock.hxx - this file is integral part of `yaal' project.
+  si.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -23,57 +23,34 @@ Copyright:
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
-/*! \file hcore/hclock.hxx
- * \brief Declaration of HClock class.
+
+/*! \file hcore/si.hxx
+ * \brief Declaration of SI prefix calculation constants.
  */
 
-#ifndef YAAL_HCORE_HCLOCK_HXX_INCLUDED
-#define YAAL_HCORE_HCLOCK_HXX_INCLUDED 1
+#ifndef YAAL_HCORE_SI_HXX_INCLUDED
+#define YAAL_HCORE_SI_HXX_INCLUDED 1
 
 #include "hcore/pod.hxx"
-#include "hcore/duration.hxx"
+#include "hcore/numeric.hxx"
 
 namespace yaal {
 
 namespace hcore {
 
-/*! \brief High resolution time mesurement tool.
- */
-class HClock {
-public:
-	typedef HClock this_type;
-	/*! \brief Specify what kind of time to measure.
-	 */
-	struct TYPE {
-		typedef enum {
-			REAL,
-			CPU
-		} type_t;
-	};
-private:
-	i64_t _moment[2];
-	TYPE::type_t _type;
-public:
-	/*! \brief Create clock of given type.
-	 *
-	 * \param type_ - type of clock to create.
-	 */
-	HClock( TYPE::type_t type_ = TYPE::REAL );
-	/*! \brief Get time that elapsed from last reset.
-	 *
-	 * \param unit_ - get time given in specific units.
-	 * \return Amount of time that elapsed in given unit.
-	 */
-	i64_t get_time_elapsed( yaal::hcore::time::UNIT unit_ = yaal::hcore::time::UNIT::SECOND ) const;
+namespace si {
 
-	/*! \brief Reset clock.
-	 */
-	void reset( void );
-};
+static yaal::i64_t const NANO_IN_WHOLE = yaal::meta::power<10, 9>::value;
+static yaal::i64_t const MICRO_IN_WHOLE = yaal::meta::power<10, 6>::value;
+static yaal::i64_t const MILI_IN_WHOLE = yaal::meta::power<10, 3>::value;
+static yaal::i64_t const NANO_IN_MILI = yaal::meta::power<10, 6>::value;
+static yaal::i64_t const NANO_IN_MICRO = yaal::meta::power<10, 3>::value;
 
 }
 
 }
 
-#endif /* #ifndef YAAL_HCORE_HCLOCK_HXX_INCLUDED */
+}
+
+#endif /* #ifndef YAAL_HCORE_SI_HXX_INCLUDED */
 

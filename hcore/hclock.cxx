@@ -40,7 +40,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hclock.hxx"
 #include "hexception.hxx"
-#include "numeric.hxx"
+#include "si.hxx"
 
 using namespace yaal::meta;
 
@@ -49,6 +49,10 @@ namespace yaal {
 namespace hcore {
 
 namespace {
+
+static int const IDX_SECONDS( 0 );
+static int const IDX_NANOSECONDS( 1 );
+
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
 #if defined( __HOST_OS_TYPE_SOLARIS__ ) || defined( __HOST_OS_TYPE_WINDOWS__ )
@@ -67,29 +71,25 @@ HClock::HClock( TYPE::type_t type_ )
 	M_EPILOG
 }
 
-i64_t HClock::get_time_elapsed( UNIT::unit_t unit_ ) const {
+i64_t HClock::get_time_elapsed( yaal::hcore::time::UNIT unit_ ) const {
 	M_PROLOG
-	static int long const NANO_IN_WHOLE = power<10, 9>::value;
-	static int long const MICRO_IN_WHOLE = power<10, 6>::value;
-	static int long const NANO_IN_MILI = power<10, 6>::value;
-	static int long const MILI_IN_WHOLE = power<10, 3>::value;
-	static int long const NANO_IN_MICRO = power<10, 3>::value;
 	timespec time;
 	timespec now;
 	clockid_t cid( _type == TYPE::REAL ? FWD_CLOCK_REALTIME : FWD_CLOCK_THREAD_CPUTIME_ID );
 	M_ENSURE( clock_gettime( cid, &now ) == 0 );
-	time.tv_sec = static_cast<time_t>( now.tv_sec - _moment[ UNIT::SECOND ] );
-	if ( now.tv_nsec < _moment[ UNIT::NANOSECOND ] ) {
+	time.tv_sec = static_cast<time_t>( now.tv_sec - _moment[ IDX_SECONDS ] );
+	if ( now.tv_nsec < _moment[ IDX_NANOSECONDS ] ) {
 		-- time.tv_sec;
-		time.tv_nsec = NANO_IN_WHOLE - static_cast<int long>( _moment[ UNIT::NANOSECOND ] - now.tv_nsec );
-	} else
-		time.tv_nsec = now.tv_nsec - static_cast<int long>( _moment[ UNIT::NANOSECOND ] );
+		time.tv_nsec = si::NANO_IN_WHOLE - static_cast<int long>( _moment[ IDX_NANOSECONDS ] - now.tv_nsec );
+	} else {
+		time.tv_nsec = now.tv_nsec - static_cast<int long>( _moment[ IDX_NANOSECONDS ] );
+	}
 	i64_t elapsed( 0 );
 	switch ( unit_ ) {
-		case ( UNIT::SECOND ): elapsed = time.tv_sec; break;
-		case ( UNIT::NANOSECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * NANO_IN_WHOLE + time.tv_nsec; break;
-		case ( UNIT::MICROSECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * MICRO_IN_WHOLE + time.tv_nsec / NANO_IN_MICRO; break;
-		case ( UNIT::MILISECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * MILI_IN_WHOLE + time.tv_nsec / NANO_IN_MILI; break;
+		case ( time::UNIT::SECOND ): elapsed = time.tv_sec; break;
+		case ( time::UNIT::NANOSECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * si::NANO_IN_WHOLE + time.tv_nsec; break;
+		case ( time::UNIT::MICROSECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * si::MICRO_IN_WHOLE + time.tv_nsec / si::NANO_IN_MICRO; break;
+		case ( time::UNIT::MILISECOND ): elapsed = static_cast<i64_t>( time.tv_sec ) * si::MILI_IN_WHOLE + time.tv_nsec / si::NANO_IN_MILI; break;
 		default: M_ASSERT( 0 && "bad HClock::UNIT!" ); break;
 	}
 	return ( elapsed );
@@ -101,8 +101,8 @@ void HClock::reset( void ) {
 	timespec time;
 	clockid_t cid( _type == TYPE::REAL ? FWD_CLOCK_REALTIME : FWD_CLOCK_THREAD_CPUTIME_ID );
 	M_ENSURE( clock_gettime( cid, &time ) == 0 );
-	_moment[ UNIT::SECOND ] = time.tv_sec;
-	_moment[ UNIT::NANOSECOND ] = time.tv_nsec;
+	_moment[ IDX_SECONDS ] = time.tv_sec;
+	_moment[ IDX_NANOSECONDS ] = time.tv_nsec;
 	return;
 	M_EPILOG
 }
