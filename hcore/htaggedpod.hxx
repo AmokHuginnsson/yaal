@@ -95,8 +95,8 @@ public:
 		_value OP tp_._value; \
 		return ( *this ); \
 	} \
-	HTaggedPOD& operator OP ( pod_t const& tp_ ) { \
-		_value OP tp_; \
+	HTaggedPOD& operator OP ( pod_t const& value_ ) { \
+		_value OP value_; \
 		return ( *this ); \
 	}
 YAAL_DEFINE_OPER( += )
@@ -125,8 +125,8 @@ YAAL_DEFINE_OPER( -- )
 	HTaggedPOD operator OP ( HTaggedPOD const& tp_ ) const { \
 		return ( HTaggedPOD( _value OP tp_._value ) ); \
 	} \
-	HTaggedPOD operator OP ( pod_t const& tp_ ) const { \
-		return ( HTaggedPOD( _value OP tp_ ) ); \
+	HTaggedPOD operator OP ( pod_t const& value_ ) const { \
+		return ( HTaggedPOD( _value OP value_ ) ); \
 	} \
 	friend HTaggedPOD operator OP ( pod_t const& pod_, HTaggedPOD const& tp_ ) { \
 		return ( HTaggedPOD( pod_ OP tp_._value ) ); \
@@ -144,8 +144,8 @@ YAAL_DEFINE_OPER( | )
 	bool operator OP ( HTaggedPOD const& tp_ ) const { \
 		return ( _value OP tp_._value ); \
 	} \
-	bool operator OP ( pod_t const& tp_ ) const { \
-		return ( _value OP _value ); \
+	bool operator OP ( pod_t const& value_ ) const { \
+		return ( _value OP value_ ); \
 	} \
 	friend bool operator OP ( pod_t const& pod_, HTaggedPOD const& tp_ ) { \
 		return ( pod_ OP tp_._value ); \
