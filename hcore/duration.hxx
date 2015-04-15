@@ -53,7 +53,7 @@ enum class UNIT {
 };
 
 struct Duration{};
-typedef HTaggedPOD<yaal::u64_t, Duration> duration_t;
+typedef HTaggedPOD<yaal::i64_t, Duration> duration_t;
 
 duration_t duration( yaal::i64_t, UNIT );
 
