@@ -44,16 +44,17 @@ namespace tools {
 class M_YAAL_TOOLS_PUBLIC_API HScheduledAsyncCaller : public yaal::hcore::HSingleton<HScheduledAsyncCaller> {
 public:
 	typedef HScheduledAsyncCaller this_type;
-	typedef int long priority_t;
+	typedef yaal::i64_t time_point_t;
 	typedef yaal::hcore::HBoundCall<> call_t;
 private:
-	typedef yaal::hcore::HMultiMap<priority_t, call_t> queue_t;
+	typedef yaal::hcore::HMultiMap<time_point_t, call_t> queue_t;
 	queue_t _queue;
 	yaal::hcore::HMutex _mutex;
 	yaal::hcore::HCondition _condition;
 	bool _loop;
 public:
-	void call_at( priority_t, call_t );
+	void call_at( yaal::hcore::HTime const&, call_t );
+	void call_in( yaal::hcore::time::duration_t, call_t );
 	void flush( void* );
 	void stop( void );
 private:

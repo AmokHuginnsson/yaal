@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hscheduledasynccaller.hxx"
 #include "hasynccaller.hxx"
 #include "hthreadpool.hxx"
+#include "hcore/si.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -76,10 +77,24 @@ bool HScheduledAsyncCaller::want_restart( void ) const {
 	return ( true );
 }
 
-void HScheduledAsyncCaller::call_at( priority_t prio, call_t call ) {
+/*
+ * Let `time_point_t' be a number of nanoseconds from UNIX epoch.
+ */
+
+void HScheduledAsyncCaller::call_at( yaal::hcore::HTime const& time_, call_t call_ ) {
 	M_PROLOG
 	HLock l( _mutex );
-	_queue.push_back( make_pair( prio, call ) );
+	i64_t secondsFromUnixEpoch( time_.raw() - HTime::SECONDS_TO_UNIX_EPOCH );
+	_queue.push_back( make_pair( secondsFromUnixEpoch * si::NANO_IN_WHOLE, call_ ) );
+	_condition.signal();
+	return;
+	M_EPILOG
+}
+
+void HScheduledAsyncCaller::call_in( yaal::hcore::time::duration_t duration_, call_t call_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	_queue.push_back( make_pair( ::time( nullptr ) * si::NANO_IN_WHOLE + duration_.raw(), call_ ) );
 	_condition.signal();
 	return;
 	M_EPILOG
@@ -105,14 +120,14 @@ void HScheduledAsyncCaller::run( void ) {
 	HThread::set_name( "HScheduledAsyncCaller" );
 	while ( ! _isKilled_ && _loop ) {
 		queue_t::iterator it = _queue.begin();
-		while ( ( it != _queue.end() ) && ( (*it).first <= ::time( NULL ) ) ) {
+		i64_t now( ::time( NULL ) * si::NANO_IN_WHOLE );
+		while ( ( it != _queue.end() ) && ( (*it).first <= now ) ) {
 			HAsyncCaller::get_instance().register_call( 0, (*it).second );
 			it = _queue.erase( it );
 		}
 		if ( it != _queue.end() ) {
-			time_t delay( 0 );
-			if ( ( delay = ( (*it).first - ::time( NULL ) ) ) > 0 ) {
-				_condition.wait_for( duration( delay, time::UNIT::SECOND ) );
+			if ( (*it).first > now ) {
+				_condition.wait_for( duration( (*it).first - now, time::UNIT::NANOSECOND ) );
 			}
 		} else {
 			_condition.wait_for( /* ever */ );
