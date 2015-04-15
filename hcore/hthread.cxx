@@ -41,7 +41,8 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hthread.hxx"
-#include "hcore/memory.hxx"
+#include "memory.hxx"
+#include "si.hxx"
 #include "hlog.hxx"
 
 namespace yaal {
@@ -392,7 +393,7 @@ void HSemaphore::wait( void ) {
 	HLock l( _mutex );
 	while ( _count == 0 ) {
 		/* Inside cond.wait() mutex is unlocked. */
-		_cond.wait();
+		_cond.wait_for(/* ever */);
 	}
 	-- _count;
 	return;
@@ -457,29 +458,44 @@ static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
  * are lost!
  */
 
-HCondition::status_t HCondition::wait( int long unsigned timeOutSeconds_,
-		int long unsigned timeOutNanoSeconds_ ) {
+HCondition::status_t HCondition::do_wait( time_t timeOutSeconds_,
+		int long timeOutNanoSeconds_ ) {
 	M_PROLOG
 	M_ASSERT( _mutex.is_owned() );
-	int error = 0;
-	timespec timeOut;
-	::memset( &timeOut, 0, sizeof ( timespec ) );
-	M_ENSURE( clock_gettime( FWD_CLOCK_REALTIME, &timeOut ) == 0 );
-	static int long const NANO_IN_WHOLE = meta::power<10, 9>::value;
-	timeOut.tv_sec += timeOutSeconds_;
-	timeOut.tv_nsec += timeOutNanoSeconds_;
-	if ( timeOut.tv_nsec >= NANO_IN_WHOLE ) {
-		++ timeOut.tv_sec;
-		timeOut.tv_nsec -= NANO_IN_WHOLE;
-	}
+	int error( 0 );
+	timespec timeOut{ timeOutSeconds_, timeOutNanoSeconds_ };
 	error = ::pthread_cond_timedwait( _buf.get<pthread_cond_t>(),
 				_mutex._buf.get<pthread_mutex_t>(), &timeOut );
-	/* We need to make sure that mutex owner is reset to proper value, as HCondition::signal() invoker undoubtedly modified it. */
+	/*
+	 * We need to make sure that mutex owner is reset to proper value,
+	 * as HCondition::signal() invoker undoubtedly modified it.
+	 */
 	_mutex.reown();
 	/* Error code is not stored in errno but is explicitly returned. */
 	HScopedValueReplacement<int> saveErrno( errno, error );
 	M_ENSURE( ( error == 0 ) || ( error == EINTR ) || ( error == ETIMEDOUT ) );
 	return ( ( error == 0 ) ? OK : ( ( error == EINTR ) ? INTERRUPT : TIMEOUT ) );
+	M_EPILOG
+}
+
+HCondition::status_t HCondition::wait_until( HTime const& time_ ) {
+	M_PROLOG
+	return ( do_wait( time_.raw() - HTime::SECONDS_TO_UNIX_EPOCH, 0 ) );
+	M_EPILOG
+}
+
+HCondition::status_t HCondition::wait_for( time::duration_t duration_ ) {
+	M_PROLOG
+	timespec timeOut;
+	::memset( &timeOut, 0, sizeof ( timeOut ) );
+	M_ENSURE( clock_gettime( FWD_CLOCK_REALTIME, &timeOut ) == 0 );
+	timeOut.tv_sec += ( duration_ / si::NANO_IN_WHOLE ).raw();
+	timeOut.tv_nsec += ( duration_ % si::NANO_IN_WHOLE ).raw();
+	if ( timeOut.tv_nsec >= si::NANO_IN_WHOLE ) {
+		++ timeOut.tv_sec;
+		timeOut.tv_nsec -= si::NANO_IN_WHOLE;
+	}
+	return ( do_wait( timeOut.tv_sec, timeOut.tv_nsec ) );
 	M_EPILOG
 }
 
@@ -518,7 +534,7 @@ void HEvent::wait( void ) {
 	M_PROLOG
 	M_ASSERT( _mutex.is_owned() );
 	while ( ! _signaled ) {
-		_condition.wait();
+		_condition.wait_for( /* ever */ );
 	}
 	_signaled = false;
 	return;

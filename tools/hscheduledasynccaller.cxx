@@ -76,7 +76,7 @@ bool HScheduledAsyncCaller::want_restart( void ) const {
 	return ( true );
 }
 
-void HScheduledAsyncCaller::register_call( priority_t prio, call_t call ) {
+void HScheduledAsyncCaller::call_at( priority_t prio, call_t call ) {
 	M_PROLOG
 	HLock l( _mutex );
 	_queue.push_back( make_pair( prio, call ) );
@@ -105,17 +105,17 @@ void HScheduledAsyncCaller::run( void ) {
 	HThread::set_name( "HScheduledAsyncCaller" );
 	while ( ! _isKilled_ && _loop ) {
 		queue_t::iterator it = _queue.begin();
-		while ( ( it != _queue.end() ) && ( (*it).first <= time( NULL ) ) ) {
+		while ( ( it != _queue.end() ) && ( (*it).first <= ::time( NULL ) ) ) {
 			HAsyncCaller::get_instance().register_call( 0, (*it).second );
 			it = _queue.erase( it );
 		}
 		if ( it != _queue.end() ) {
-			time_t delay = 0;
-			if ( ( delay = ( (*it).first - time( NULL ) ) ) > 0 ) {
-				_condition.wait( static_cast<int long unsigned>( delay ), 0 );
+			time_t delay( 0 );
+			if ( ( delay = ( (*it).first - ::time( NULL ) ) ) > 0 ) {
+				_condition.wait_for( duration( delay, time::UNIT::SECOND ) );
 			}
 		} else {
-			_condition.wait( 10000, 0 );
+			_condition.wait_for( /* ever */ );
 		}
 	}
 	return;

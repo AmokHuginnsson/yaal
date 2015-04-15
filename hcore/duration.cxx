@@ -41,25 +41,25 @@ duration_t duration( yaal::i64_t duration_, UNIT unit_ ) {
 	duration_t nanoseconds( 0 );
 	switch ( unit_ ) {
 		case ( UNIT::DAY ): {
-			nanoseconds = duration_ * HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE * si::NANO_IN_WHOLE;
+			nanoseconds = duration_t( duration_ * HTime::HOURS_IN_DAY * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE * si::NANO_IN_WHOLE );
 		} break;
 		case ( UNIT::HOUR ): {
-			nanoseconds = duration_ * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE * si::NANO_IN_WHOLE;
+			nanoseconds = duration_t( duration_ * HTime::MINUTES_IN_HOUR * HTime::SECONDS_IN_MINUTE * si::NANO_IN_WHOLE );
 		} break;
 		case ( UNIT::MINUTE ): {
-			nanoseconds = duration_ * HTime::SECONDS_IN_MINUTE * si::NANO_IN_WHOLE;
+			nanoseconds = duration_t( duration_ * HTime::SECONDS_IN_MINUTE * si::NANO_IN_WHOLE );
 		} break;
 		case ( UNIT::SECOND ): {
-			nanoseconds = duration_ * si::NANO_IN_WHOLE;
+			nanoseconds = duration_t( duration_ * si::NANO_IN_WHOLE );
 		} break;
 		case ( UNIT::MILISECOND ): {
-			nanoseconds = duration_ * si::NANO_IN_MILI;
+			nanoseconds = duration_t( duration_ * si::NANO_IN_MILI );
 		} break;
 		case ( UNIT::MICROSECOND ): {
-			nanoseconds = duration_ * si::NANO_IN_MICRO;
+			nanoseconds = duration_t( duration_ * si::NANO_IN_MICRO );
 		} break;
 		case ( UNIT::NANOSECOND ): {
-			nanoseconds = duration_;
+			nanoseconds = duration_t( duration_ );
 		} break;
 	}
 	return ( nanoseconds );

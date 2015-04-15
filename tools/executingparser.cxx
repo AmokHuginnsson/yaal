@@ -391,9 +391,9 @@ void HRuleBase::report_error( HExecutingParser* executingParser_, yaal::hcore::H
 	M_EPILOG
 }
 
-int HRuleBase::position( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_ ) const {
+executing_parser::position_t HRuleBase::position( HExecutingParser* executingParser_, yaal::hcore::HString::const_iterator position_ ) const {
 	M_PROLOG
-	return ( HExecutingParser::HProxy::position( executingParser_, position_ ) );
+	return ( executing_parser::position_t( HExecutingParser::HProxy::position( executingParser_, position_ ) ) );
 	M_EPILOG
 }
 
@@ -2220,7 +2220,7 @@ yaal::hcore::HString::const_iterator HReal::do_parse( HExecutingParser* executin
 		++ scan;
 	}
 	if ( ( ( _parse == PARSE::GREEDY ) && ( state >= INTEGRAL ) ) || ( ( _parse == PARSE::STRICT ) && ( state >= DOT ) ) ) {
-		int pos( position( executingParser_, start ) );
+		position_t pos( position( executingParser_, start ) );
 		if ( !! _actionDouble ) {
 			double d( lexical_cast<double>( _cache ) );
 			add_execution_step( executingParser_, start, call( _actionDouble, d ) );
@@ -2578,7 +2578,7 @@ yaal::hcore::HString::const_iterator HInteger::do_parse( HExecutingParser* execu
 		++ scan;
 	}
 	if ( state >= DIGIT ) {
-		int pos( position( executingParser_, start ) );
+		position_t pos( position( executingParser_, start ) );
 		if ( !! _actionIntLongLong ) {
 			int long long ill( lexical_cast<int long long>( _cache ) );
 			add_execution_step( executingParser_, start, call( _actionIntLongLong, ill ) );
@@ -2765,7 +2765,7 @@ yaal::hcore::HString::const_iterator HStringLiteral::do_parse( HExecutingParser*
 		_cache.assign( from, scan );
 		++ scan;
 		unescape( _cache, _escapes_ );
-		int pos( position( executingParser_, start ) );
+		position_t pos( position( executingParser_, start ) );
 		if ( !! _actionString ) {
 			add_execution_step( executingParser_, start, call( _actionString, yaal::move( _cache ) ) );
 		} else if ( !! _actionStringPosition ) {
@@ -2920,7 +2920,7 @@ yaal::hcore::HString::const_iterator HCharacterLiteral::do_parse( HExecutingPars
 		_cache.assign( from, scan );
 		++ scan;
 		unescape( _cache, _escapes_ );
-		int pos( position( executingParser_, start ) );
+		position_t pos( position( executingParser_, start ) );
 		if ( !! _actionCharacter ) {
 			add_execution_step( executingParser_, start, call( _actionCharacter, _cache[0] ) );
 		} else if ( !! _actionCharacterPosition ) {
@@ -3058,7 +3058,7 @@ yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* exe
 	if ( first_ != last_ ) {
 		char c( *scan );
 		if ( _characters.is_empty() || ( _characters.find( *scan ) != hcore::HString::npos ) ) {
-			int pos( position( executingParser_, start ) );
+			position_t pos( position( executingParser_, start ) );
 			if ( !! _actionCharacter ) {
 				add_execution_step( executingParser_, start, call( _actionCharacter, c ) );
 			} else if ( !! _actionCharacterPosition ) {
@@ -3298,7 +3298,7 @@ hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingPar
 				}
 			}
 			if ( matched ) {
-				int pos( position( executingParser_, start ) );
+				position_t pos( position( executingParser_, start ) );
 				if ( !! _actionString ) {
 					add_execution_step( executingParser_, start, call( _actionString, s ) );
 				} else if ( !! _actionStringPosition ) {
@@ -3514,7 +3514,7 @@ hcore::HString::const_iterator HRegex::do_parse( HExecutingParser* executingPars
 	if ( first_ != last_ ) {
 		hcore::HRegex::HMatchIterator it( _regex->find( scan ) );
 		if ( ( it != _regex->end() ) && ( it->size() <= ( last_ - scan ) ) ) {
-			int pos( position( executingParser_, start ) );
+			position_t pos( position( executingParser_, start ) );
 			if ( !! _actionString ) {
 				add_execution_step( executingParser_, start, call( _actionString, hcore::HString( it->raw(), it->size() ) ) );
 			} else if ( !! _actionStringPosition ) {

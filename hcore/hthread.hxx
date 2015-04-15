@@ -37,6 +37,8 @@ Copyright:
 #include "hcore/hresource.hxx"
 #include "hcore/hboundcall.hxx"
 #include "hcore/huniquemovable.hxx"
+#include "hcore/duration.hxx"
+#include "hcore/htime.hxx"
 #include "hcore/hmap.hxx"
 
 namespace yaal {
@@ -105,10 +107,12 @@ public:
 	} status_t;
 	HCondition( HMutex& );
 	virtual ~HCondition( void );
-	status_t wait( int long unsigned = 0x1fffffff /* FreeBSD strange limit. */, int long unsigned = 0 );
+	status_t wait_until( HTime const& );
+	status_t wait_for( time::duration_t = time::duration( 0x1fffffff /* FreeBSD strange limit. */, time::UNIT::SECOND ) );
 	void signal( void );
 	void broadcast( void );
 private:
+	status_t do_wait( time_t, int long );
 	HCondition( HCondition const& );
 	HCondition& operator = ( HCondition const& );
 };

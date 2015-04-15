@@ -173,12 +173,12 @@ public:
 	type_t const& back( void ) const;
 	size_type get_size( void ) const {
 		M_PROLOG
-		return ( _size );
+		return ( size_type( _size ) );
 		M_EPILOG
 	}
 	size_type size( void ) const {
 		M_PROLOG
-		return ( _size );
+		return ( size_type( _size ) );
 		M_EPILOG
 	}
 	capacity_type capacity( void ) const {
@@ -188,7 +188,7 @@ public:
 	}
 	capacity_type get_capacity( void ) const {
 		M_PROLOG
-		return ( _buf.count_of<value_type>() );
+		return ( capacity_type( _buf.count_of<value_type>() ) );
 		M_EPILOG
 	}
 	bool is_empty( void ) const {

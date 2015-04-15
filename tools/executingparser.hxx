@@ -170,7 +170,7 @@ protected:
 	void add_execution_step( HExecutingParser*, yaal::hcore::HString::const_iterator, action_t const& ) const;
 	void drop_execution_steps( HExecutingParser*, yaal::hcore::HString::const_iterator ) const;
 	void report_error( HExecutingParser*, yaal::hcore::HString::const_iterator, yaal::hcore::HString const& ) const;
-	int position( HExecutingParser*, yaal::hcore::HString::const_iterator ) const;
+	executing_parser::position_t position( HExecutingParser*, yaal::hcore::HString::const_iterator ) const;
 	friend class yaal::tools::HExecutingParser;
 private:
 	HRuleBase& operator = ( HRuleBase const& );

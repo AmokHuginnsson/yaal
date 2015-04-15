@@ -53,7 +53,7 @@ private:
 	yaal::hcore::HCondition _condition;
 	bool _loop;
 public:
-	void register_call( priority_t, call_t );
+	void call_at( priority_t, call_t );
 	void flush( void* );
 	void stop( void );
 private:

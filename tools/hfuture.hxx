@@ -78,7 +78,7 @@ public:
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		while ( ! _finished ) {
-			_condVar.wait();
+			_condVar.wait_for( /* ever */ );
 		}
 		return ( _return );
 		M_EPILOG

@@ -1091,7 +1091,7 @@ void HHuginn::OCompiler::commit_boolean( OPERATOR operator_, executing_parser::p
 		fc._valueTypes.pop();
 		defer_store_direct( And, position_ );
 		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), operator_, _1, position_.get() ) );
-		defer_action( operator_ == OPERATOR::BOOLEAN_AND ? &HExpression::boolean_and : &HExpression::boolean_or, position_.get() );
+		defer_action( operator_ == OPERATOR::BOOLEAN_AND ? &HExpression::boolean_and : &HExpression::boolean_or, position_ );
 	} else {
 		expression_t e( fc._compilationStack.top()._context.expression() );
 		fc._compilationStack.top()._context._expressionsStack.pop();
@@ -1112,7 +1112,7 @@ void HHuginn::OCompiler::commit_ternary( executing_parser::position_t position_ 
 		fc._valueTypes.pop();
 		defer_store_direct( ternary, position_ );
 		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), OPERATOR::TERNARY, _1, position_.get() ) );
-		defer_action( &HExpression::ternary, position_.get() );
+		defer_action( &HExpression::ternary, position_ );
 	} else {
 		expression_t e( fc._compilationStack.top()._context.expression() );
 		fc._compilationStack.top()._context._expressionsStack.pop();
