@@ -30,9 +30,12 @@ Copyright:
 #ifndef YAAL_HCORE_HBOUNDCALL_HXX_INCLUDED
 #define YAAL_HCORE_HBOUNDCALL_HXX_INCLUDED 1
 
+#include <functional>
+
 #include "hcore/hcall.hxx"
 #include "hcore/hpointer.hxx"
 #include "hcore/memory.hxx"
+#include "hcore/hvariant.hxx"
 
 namespace yaal {
 
@@ -77,7 +80,10 @@ private:
 					eleventh_argument_type
 					> call_t;
 	typedef HPointer<call_t> call_ptr_t;
-	call_ptr_t _call;
+	typedef std::function<signature_t> function_t;
+	typedef HPointer<function_t> function_ptr_t;
+	typedef HVariant<call_ptr_t, function_ptr_t> call_fwd_t;
+	call_fwd_t _call;
 public:
 	HBoundCall( void )
 		: _call() {
@@ -90,31 +96,72 @@ public:
 		typename b6_t, typename b7_t,
 		typename b8_t, typename b9_t,
 		typename b10_t>
-	HBoundCall( HCall<free_args_count, return_t, CALL_type, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& boundCall_ )
-		: _call( make_pointer<HCall<free_args_count, return_t, CALL_type,
-				 b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> >( boundCall_ ) ) {
+	HBoundCall( HCall<free_args_count, return_t, CALL_type, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& rawCall_ )
+		: _call(
+				pointer_static_cast<call_t>(
+					make_pointer<
+						HCall<
+							free_args_count, return_t, CALL_type,
+							b0_t, b1_t, b2_t, b3_t, b4_t, b5_t,
+							b6_t, b7_t, b8_t, b9_t, b10_t
+						>
+					>( rawCall_ )
+				)
+			) {
+		return;
+	}
+	HBoundCall( function_t const& foreignCall_ )
+		: _call( make_pointer<function_t>( foreignCall_ ) ) {
 		return;
 	}
 	template<typename... arg_t>
 	result_type operator()( arg_t&&... arg_ ) const {
-		return ( (*_call)( yaal::forward<arg_t>( arg_ )... ) );
+		int const t( _call.type() );
+		M_ASSERT( ( t != call_fwd_t::INVALID ) && "invoked an unbound call" );
+		if ( t == 0 ) {
+			return ( (*_call.template get<call_ptr_t>())( yaal::forward<arg_t>( arg_ )... ) );
+		}
+		return ( (*_call.template get<function_ptr_t>())( yaal::forward<arg_t>( arg_ )... ) );
 	}
 	template<typename... arg_t>
 	result_type operator()( arg_t&&... arg_ ) {
-		return ( (*_call)( yaal::forward<arg_t>( arg_ )... ) );
+		int const t( _call.type() );
+		M_ASSERT( ( t != call_fwd_t::INVALID ) && "invoked an unbound call" );
+		if ( t == 0 ) {
+			return ( (*_call.template get<call_ptr_t>())( yaal::forward<arg_t>( arg_ )... ) );
+		}
+		return ( (*_call.template get<function_ptr_t>())( yaal::forward<arg_t>( arg_ )... ) );
 	}
-	void const* id( void ) const
-		{ return ( _call->id() ); }
+	void const* id( void ) const {
+		int const t( _call.type() );
+		if ( t == 0 ) {
+			return ( _call.template get<call_ptr_t>()->id() );
+		} else if ( t == 1 ) {
+			return ( _call.template get<function_ptr_t>().raw() );
+		}
+		return ( nullptr );
+	}
 	void reset( void ) {
-		_call.reset();
+		int const t( _call.type() );
+		if ( t == 0 ) {
+			_call.template get<call_ptr_t>().reset();
+		} else if ( t == 1 ) {
+			_call.template get<function_ptr_t>().reset();
+		}
+		return;
 	}
 	bool operator ! ( void ) const {
-		return ( ! _call );
+		int const t( _call.type() );
+		if ( t == 0 ) {
+			return ( ! _call.template get<call_ptr_t>() );
+		} else if ( t == 1 ) {
+			return ( ! _call.template get<function_ptr_t>() );
+		}
+		return ( true );
 	}
 	void swap( HBoundCall& boundCall_ ) {
 		if ( &boundCall_ != this ) {
-			using yaal::swap;
-			swap( boundCall_._call, _call );
+			yaal::swap( boundCall_._call, _call );
 		}
 		return;
 	}

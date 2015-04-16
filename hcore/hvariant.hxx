@@ -59,7 +59,11 @@ template<typename t0_t, typename t1_t = trait::no_type,
 	typename t20_t = trait::no_type>
 class HVariant {
 public:
-	typedef HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t> this_type;
+	typedef HVariant<
+		t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+		t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+		t16_t, t17_t, t18_t, t19_t, t20_t
+	> this_type;
 	static int const SIZE = yaal::meta::max<
 		sizeof ( t0_t ),
 		sizeof ( t1_t ),
@@ -118,7 +122,11 @@ template<typename t0_t, typename t1_t, typename t2_t, typename t3_t,
 	typename t12_t, typename t13_t, typename t14_t, typename t15_t,
 	typename t16_t, typename t17_t, typename t18_t, typename t19_t,
 	typename t20_t>
-int const HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::INVALID = -1;
+int const HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::INVALID = -1;
 
 template<typename t0_t, typename t1_t,
 	typename t2_t, typename t3_t,
@@ -131,8 +139,13 @@ template<typename t0_t, typename t1_t,
 	typename t16_t, typename t17_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
-HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::HVariant( void )
-	: _mem(), _type( INVALID ) {
+HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::HVariant( void )
+	: _mem()
+	, _type( INVALID ) {
 }
 
 template<typename t0_t, typename t1_t,
@@ -146,8 +159,11 @@ template<typename t0_t, typename t1_t,
 	typename t16_t, typename t17_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
-HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
-	t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::HVariant( HVariant const& v_ )
+HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::HVariant( HVariant const& v_ )
 	: _mem(), _type( INVALID ) {
 	switch ( v_._type ) {
 		case ( -1 ): break;
@@ -188,7 +204,11 @@ template<typename t0_t, typename t1_t,
 	typename t16_t, typename t17_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
-HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::~HVariant( void ) {
+HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::~HVariant( void ) {
 	M_PROLOG
 	destroy( _type, _mem );
 	M_DESTRUCTOR_EPILOG
@@ -206,10 +226,20 @@ template<typename t0_t, typename t1_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
 template<typename tType>
-HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::HVariant( tType const& obj )
+HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::HVariant( tType const& obj )
 	: _mem(), _type( INVALID ) {
-	int t( yaal::trait::find_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::value );
-	M_ASSERT( ( t >= 0 ) && ( t <= 20 ) );
+	constexpr int const t(
+		yaal::trait::find_type<
+			tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+			t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+			t16_t, t17_t, t18_t, t19_t, t20_t
+		>::value
+	);
+	static_assert( ( t >= 0 ) && ( t <= 20 ), "type not declared in variant" );
 	new ( _mem ) tType( obj );
 	_type = t;
 }
@@ -225,7 +255,11 @@ template<typename t0_t, typename t1_t,
 	typename t16_t, typename t17_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
-void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::default_construct( int type_, void* mem_ ) {
+void HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::default_construct( int type_, void* mem_ ) {
 	switch ( type_ ) {
 		case ( -1 ): break;
 		case ( 0 ): new ( mem_ ) t0_t(); break;
@@ -264,7 +298,11 @@ template<typename t0_t, typename t1_t,
 	typename t16_t, typename t17_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
-void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::destroy( int type_, void* mem_ ) {
+void HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::destroy( int type_, void* mem_ ) {
 	try {
 		switch ( type_ ) {
 			case ( -1 ): break;
@@ -310,8 +348,15 @@ template<typename t0_t, typename t1_t,
 	typename t16_t, typename t17_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
-HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>&
-HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::operator = ( HVariant const& v ) {
+HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>& HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::operator = ( HVariant const& v ) {
 	if ( &v != this ) {
 		this_type tmp( v );
 		swap( tmp );
@@ -330,7 +375,11 @@ template<typename t0_t, typename t1_t,
 	typename t16_t, typename t17_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
-void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::swap( int type_, void* a_, void* b_ ) {
+void HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::swap( int type_, void* a_, void* b_ ) {
 	using yaal::swap;
 	switch ( type_ ) {
 		case ( -1 ): break;
@@ -357,7 +406,7 @@ void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t,
 		case ( 20 ): swap( *reinterpret_cast<t20_t*>( a_ ), *reinterpret_cast<t20_t*>( b_ ) ); break;
 		default: M_ASSERT( 0 && "Absurd type number." ); break;
 	}
-
+	return;
 }
 
 template<typename t0_t, typename t1_t,
@@ -371,11 +420,15 @@ template<typename t0_t, typename t1_t,
 	typename t16_t, typename t17_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
-void HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::swap( HVariant& v ) {
+void HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::swap( HVariant& v ) {
 	if ( &v != this ) {
-		if ( _type == v._type )
+		if ( _type == v._type ) {
 			swap( _type, _mem, v._mem );
-		else if ( ( _type != INVALID ) && ( v._type != INVALID ) ) {
+		} else if ( ( _type != INVALID ) && ( v._type != INVALID ) ) {
 			aligner_t tmp;
 			default_construct( _type, tmp );
 			swap( _type, _mem, tmp );
@@ -414,7 +467,11 @@ template<typename t0_t, typename t1_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
 template<typename tType>
-tType& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::get( void ) {
+tType& HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::get( void ) {
 	M_ASSERT(( _type == yaal::trait::find_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::value ));
 	tType* v( reinterpret_cast<tType*>( _mem ) );
 	return ( *v );
@@ -432,7 +489,11 @@ template<typename t0_t, typename t1_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
 template<typename tType>
-tType const& HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::get( void ) const {
+tType const& HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::get( void ) const {
 	M_ASSERT(( _type == yaal::trait::find_type<tType, t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::value ));
 	tType const* v( reinterpret_cast<tType const*>( _mem ) );
 	return ( *v );
@@ -449,7 +510,11 @@ template<typename t0_t, typename t1_t,
 	typename t16_t, typename t17_t,
 	typename t18_t, typename t19_t,
 	typename t20_t>
-int HVariant<t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t, t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t, t16_t, t17_t, t18_t, t19_t, t20_t>::type( void ) const {
+int HVariant<
+	t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,
+	t8_t, t9_t, t10_t, t11_t, t12_t, t13_t, t14_t, t15_t,
+	t16_t, t17_t, t18_t, t19_t, t20_t
+>::type( void ) const {
 	return ( _type );
 }
 

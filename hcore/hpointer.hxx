@@ -246,9 +246,9 @@ public:
 	virtual ~HPointer( void ) {
 		/* The make_pointer() helper part.
 		 */
-		if ( _object )
+		if ( _object ) {
 			reset();
-		else if ( _shared ) {
+		} else if ( _shared ) {
 			/* This path is reached only when tType constructor throws
 			 * in make_pointer() helper function.
 			 */
@@ -378,9 +378,13 @@ public:
 	}
 	void swap( HPointer& p ) {
 		if ( &p != this ) {
-			using yaal::swap;
-			swap( _shared, p._shared );
-			swap( _object, p._object );
+			/*
+			 * Both fields are POD types (pointers: tType*, HSharedBase*)
+			 * so they do not have a specialized implementation
+			 * and we can explicitly request yaal generic implementation.
+			 */
+			yaal::swap( _shared, p._shared );
+			yaal::swap( _object, p._object );
 		}
 		return;
 	}
@@ -574,8 +578,9 @@ HPointer<tType> make_pointer( arg_t&&... arg_ ) {
 
 template<typename tType, template<typename>class pointer_type_t,
 	template<typename, typename>class access_type_t>
-inline void swap( yaal::hcore::HPointer<tType, pointer_type_t, access_type_t>& a, yaal::hcore::HPointer<tType, pointer_type_t, access_type_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HPointer<tType, pointer_type_t, access_type_t>& a, yaal::hcore::HPointer<tType, pointer_type_t, access_type_t>& b ) {
+	a.swap( b );
+}
 
 }
 
