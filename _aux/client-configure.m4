@@ -35,7 +35,6 @@ CXXFLAGS=["-L~/lib -L/usr/local/lib -I~/usr/include -I/usr/local/include"]
 dnl Cheching for machine type.
 
 YAAL_DETECT_OPERATING_SYSTEM
-YAAL_DETECT_PHYSICAL_MEMORY
 
 dnl Looking for main libc headers
 AC_HEADER_MAJOR

@@ -189,33 +189,6 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 ])
 
 
-dnl Detect amount of physical memory on this system.
-dnl --------------------------------------------------------------------------
-AC_DEFUN([YAAL_DETECT_PHYSICAL_MEMORY], [
-	AC_MSG_CHECKING([for amount for physical memory])
-	if test ["x${HOST_OS_TYPE}"] = ["x"] ; then
-		AC_MSG_ERROR([[You need to use YAAL_DETECT_OPERATING_SYSTEM first!]])
-	fi
-	PHYS_MEM="0"
-	case "x${HOST_OS_TYPE}" in
-		xDebian|xUbuntu|xCentOS|xPLD|xSlackware|xLinux|xCygwin)
-			PHYS_MEM=`free -m | awk '/^Mem:/{print [$]2}'`
-		;;
-		xFreeBSD)
-			PHYS_MEM=`/sbin/sysctl -n hw.physmem | awk '{print int( [$]1 / 1024 / 1024 )}'`
-		;;
-		xSolaris)
-			PHYS_MEM=`prtconf | awk '/Memory/{print [$]3}'`
-		;;
-		xDarwin)
-			PHYS_MEM=`/usr/sbin/sysctl -n hw.memsize | awk '{print int( [$]1 / 1024 / 1024 )}'`
-		;;
-	esac
-	AC_DEFINE_UNQUOTED([__PHYSICAL_MEMORY__], ${PHYS_MEM}, [Amount of physical memory on this system.])
-	AC_MSG_RESULT([${PHYS_MEM}])
-])
-
-
 dnl Check available git features.
 dnl --------------------------------------------------------------------------
 AC_DEFUN([YAAL_CHECK_GIT], [

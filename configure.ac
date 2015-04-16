@@ -65,7 +65,6 @@ elif test ["${target_os}"] != ["`echo ${target_os} | sed -e 's/solaris//'`"] ; t
 else
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,32,[Target host system CPU bits.])
 fi
-YAAL_DETECT_PHYSICAL_MEMORY
 
 YAAL_DETECT_COMPILER
 
