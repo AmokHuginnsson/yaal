@@ -1,4 +1,5 @@
 cmake_minimum_required( VERSION 2.8.5 )
+
 string( TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC )
 
 # setting CMAKE_CONFIGURATION_TYPES breaks default CMAKE_INSTALL_CONFIG_NAME.
@@ -13,13 +14,14 @@ if ( ( NOT ( "${CMAKE_BUILD_TYPE}" STREQUAL "debug" ) )
 	AND ( NOT ( "${CMAKE_BUILD_TYPE}" STREQUAL "prof" ) ) )
 	message( FATAL_ERROR "Only `debug' and `release' tergets are supported." )
 endif()
+
 if ( ${CMAKE_HOME_DIRECTORY} MATCHES "/_aux" )
 	get_filename_component( CMAKE_HOME_DIRECTORY ${CMAKE_HOME_DIRECTORY}/../ ABSOLUTE )
-else()
-	if ( CMAKE_HOST_WIN32 )
-		add_definitions( -D__MSVCXX__ /FIyaal/fix.hxx -D_USE_32BIT_TIME_T )
-	endif()
+elseif ( ${CMAKE_HOME_DIRECTORY} MATCHES "/_aux/cmake" )
+	get_filename_component( CMAKE_HOME_DIRECTORY ${CMAKE_HOME_DIRECTORY}/../../ ABSOLUTE )
 endif()
+
+set( CMAKE_MODULE_PATH ${CMAKE_HOME_DIRECTORY}/_aux/cmake ${CMAKE_MODULE_PATH} )
 
 if( CMAKE_HOST_WIN32 )
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP" )
@@ -27,6 +29,9 @@ if( CMAKE_HOST_WIN32 )
 	set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO" )
 	set( CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO" )
 	set( CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /SAFESEH:NO" )
+	if ( NOT ( "${PROJECT_NAME}" STREQUAL "yaal" ) ) # For clients only.
+		add_definitions( -D__MSVCXX__ /FIyaal/fix.hxx -D_USE_32BIT_TIME_T )
+	endif()
 endif()
 
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY build/${CMAKE_BUILD_TYPE} )
@@ -48,8 +53,6 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_PROF build/prof )
 if ( NOT ( "$ENV{PREFIX}" STREQUAL "" ) )
 	set( CMAKE_INSTALL_PREFIX $ENV{PREFIX} CACHE PATH "Install prefix." FORCE )
 endif ( NOT ( "$ENV{PREFIX}" STREQUAL "" ) )
-
-set( CMAKE_MODULE_PATH ../yaal/_aux )
 
 include( CheckCXXSourceCompiles )
 include( CheckCXXCompilerFlag )
