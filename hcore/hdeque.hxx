@@ -783,12 +783,14 @@ void HDeque<type_t, allocator_t>::accommodate_chunks( int long size_ ) {
 		} else
 			_start = newFirstChunkIndex * VALUES_PER_CHUNK;
 		if ( size_ > 0 ) {
-			for ( int long i( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ); ( i >= ( newFirstChunkIndex + usedChunksCount ) ) && ! chunks[ i ]; -- i )
+			for ( int long i( ( _start + _size + size_ - 1 ) / VALUES_PER_CHUNK ); ( i >= ( newFirstChunkIndex + usedChunksCount ) ) && ! chunks[ i ]; -- i ) {
 				chunks[ i ] = static_cast<value_type*>( ::operator new ( CHUNK_SIZE, memory::yaal ) );
+			}
 		} else if ( size_ < 0 ) {
 			M_ASSERT( ( _start + size_ ) >= 0 );
-			for ( int long i( ( _start + size_ ) / VALUES_PER_CHUNK ); ( i < newFirstChunkIndex ) && ! chunks[ i ]; ++ i )
+			for ( int long i( ( _start + size_ ) / VALUES_PER_CHUNK ); ( i < newFirstChunkIndex ) && ! chunks[ i ]; ++ i ) {
 				chunks[ i ] = static_cast<value_type*>( ::operator new (  CHUNK_SIZE, memory::yaal ) );
+			}
 		}
 	}
 	return;
@@ -805,12 +807,14 @@ void HDeque<type_t, allocator_t>::resize( int long size_, type_t const& fillWith
 		M_ASSERT( _start + size_ > 0 );
 		accommodate_chunks( size_ - _size );
 		value_type** chunks = _chunks.get<value_type*>();
-		for ( int long i( _start + _size ), last( _start + size_ ); i < last; ++ i )
+		for ( int long i( _start + _size ), last( _start + size_ ); i < last; ++ i ) {
 			new ( chunks[ i / VALUES_PER_CHUNK ] + ( i % VALUES_PER_CHUNK ) ) value_type( fillWith_ );
+		}
 	} else if ( size_ < _size ) {
 		value_type** chunks = _chunks.get<value_type*>();
-		for ( int long i( _start + size_ ), last( _start + _size ); i < last; ++ i )
+		for ( int long i( _start + size_ ), last( _start + _size ); i < last; ++ i ) {
 			M_SAFE( chunks[ i / VALUES_PER_CHUNK ][ i % VALUES_PER_CHUNK ].~value_type() );
+		}
 		for ( int long i( ( ( ( _start + size_ - 1 ) >= _start ? ( _start + size_ - 1 ) : _start + size_ ) / VALUES_PER_CHUNK ) + ( size_ ? 1 : 0 ) ),
 				lastChunkIndex( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ); i < lastChunkIndex; ++ i ) {
 			::operator delete ( static_cast<void*>( chunks[ i ] ), memory::yaal );
@@ -881,31 +885,43 @@ typename HDeque<type_t, allocator_t>::iterator HDeque<type_t, allocator_t>::eras
 	if ( ( last_._index < 0 ) || ( last_._index > _size ) )
 		M_THROW( _errMsgHDeque_[ ERROR::INVALID_ITERATOR ], last_._index );
 	int long toRemove( last_._index - first_._index );
-	if ( last_._index < first_._index )
+	if ( last_._index < first_._index ) {
 		M_THROW( _errMsgHDeque_[ ERROR::INVALID_ITERATOR ], toRemove );
+	}
 	if ( toRemove ) {
 		value_type** chunks = _chunks.get<value_type*>();
 		if ( first_._index < ( _size - last_._index ) ) /* Move front. */ {
-			for ( int long src( _start ), dst( _start + first_._index ); dst < ( _start + last_._index ); ++ src, ++ dst )
-				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ];
-			for ( int long del( _start ); del < ( _start + toRemove ); ++ del )
+			for ( int long src( _start ), dst( _start + first_._index ); dst < ( _start + last_._index ); ++ src, ++ dst ) {
+				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = yaal::move( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
+			}
+			for ( int long del( _start ); del < ( _start + toRemove ); ++ del ) {
 				M_SAFE( chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type() );
-			for ( int long chunkIndex( _start / VALUES_PER_CHUNK ), newFirstChunkIndex( ( _start + toRemove ) / VALUES_PER_CHUNK );
-					chunkIndex < newFirstChunkIndex; ++ chunkIndex ) {
+			}
+			for (
+				int long chunkIndex( _start / VALUES_PER_CHUNK ), newFirstChunkIndex( ( _start + toRemove ) / VALUES_PER_CHUNK );
+				chunkIndex < newFirstChunkIndex;
+				++ chunkIndex
+			) {
 				M_ASSERT( chunks[ chunkIndex ] );
 				::operator delete ( static_cast<void*>( chunks[ chunkIndex ] ), memory::yaal );
 				chunks[ chunkIndex ] = NULL;
 			}
 			_start += toRemove;
 		} else { /* Move back. */
-			for ( int long src( _start + last_._index ), dst( _start + first_._index ); src < ( _start + _size ); ++ src, ++ dst )
-				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ];
-			for ( int long del( _start + _size - toRemove ); del < ( _start + _size ); ++ del )
+			for ( int long src( _start + last_._index ), dst( _start + first_._index ); src < ( _start + _size ); ++ src, ++ dst ) {
+				chunks[ dst / VALUES_PER_CHUNK ][ dst % VALUES_PER_CHUNK ] = yaal::move( chunks[ src / VALUES_PER_CHUNK ][ src % VALUES_PER_CHUNK ] );
+			}
+			for ( int long del( _start + _size - toRemove ); del < ( _start + _size ); ++ del ) {
 				M_SAFE( chunks[ del / VALUES_PER_CHUNK ][ del % VALUES_PER_CHUNK ].~value_type() );
+			}
 			int long chunksCount( _chunks.template count_of<value_type*>() );
-			for ( int long chunkIndex( ( ( ( ( ( _start + _size - toRemove ) - 1 ) >= _start ) ? ( ( _start + _size - toRemove ) - 1 ) : ( _start + _size - toRemove ) ) / VALUES_PER_CHUNK ) + ( ( _size - toRemove ) > 0 ? 1 : 0 ) );
-					( chunkIndex < ( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ) ) && ( chunkIndex < chunksCount );
-					++ chunkIndex ) {
+			int long trimAt( ( _start + _size - toRemove ) - 1 );
+			trimAt = ( ( trimAt >= _start ) ? trimAt : ( _start + _size - toRemove ) );
+			for (
+				int long chunkIndex( ( trimAt / VALUES_PER_CHUNK ) + ( ( _size - toRemove ) > 0 ? 1 : 0 ) );
+				( chunkIndex < ( ( ( _start + _size - 1 ) / VALUES_PER_CHUNK ) + 1 ) ) && ( chunkIndex < chunksCount );
+				++ chunkIndex
+			) {
 				M_ASSERT( chunks[ chunkIndex ] );
 				::operator delete ( static_cast<void*>( chunks[ chunkIndex ] ), memory::yaal );
 				chunks[ chunkIndex ] = NULL;

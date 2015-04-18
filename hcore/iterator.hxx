@@ -28,7 +28,7 @@ Copyright:
  * \brief All iterator concept related classes and free functions belong here.
  *
  * iterator_category, iterator_interface<>, iterator_traits<>,
- * HReverseIterator, HCyclicIterator can be found here.
+ * HReverseIterator, HMoveIterator, HCyclicIterator can be found here.
  */
 
 #ifndef YAAL_HCORE_ITERATOR_HXX_INCLUDED
@@ -240,18 +240,27 @@ public:
 	typedef typename iterator_t::reference reference;
 	typedef typename iterator_t::category_type category_type;
 	HReverseIterator( void )
-		: _iterator() {}
+		: _iterator() {
+		return;
+	}
 	HReverseIterator( HReverseIterator const& iterator_ )
-		: _iterator( iterator_._iterator ) {}
+		: _iterator( iterator_._iterator ) {
+		return;
+	}
 	template<typename other_iterator_t>
 	HReverseIterator( HReverseIterator<other_iterator_t> const& iterator_ )
-		: _iterator( iterator_._iterator ) {}
+		: _iterator( iterator_._iterator ) {
+		return;
+	}
 	HReverseIterator( iterator_t const& iterator_ )
-		: _iterator( iterator_ )
-		{ -- _iterator; }
+		: _iterator( iterator_ ) {
+		-- _iterator;
+		return;
+	}
 	HReverseIterator& operator = ( HReverseIterator const& iterator_ ) {
-		if ( &iterator_ != this )
+		if ( &iterator_ != this ) {
 			_iterator = iterator_._iterator;
+		}
 		return ( *this );
 	}
 	HReverseIterator& operator ++ ( void ) {
@@ -272,15 +281,36 @@ public:
 		++ _iterator;
 		return ( it );
 	}
+	HReverseIterator& operator += ( int long offset_ ) {
+		_iterator -= offset_;
+		return ( *this );
+	}
+	HReverseIterator operator + ( int long offset_ ) const {
+		HReverseIterator it( *this );
+		it += offset_;
+		return ( it );
+	}
+	HReverseIterator& operator -= ( int long offset_ ) {
+		_iterator += offset_;
+		return ( *this );
+	}
+	HReverseIterator operator - ( int long offset_ ) const {
+		HReverseIterator it( *this );
+		it -= offset_;
+		return ( it );
+	}
+	int long operator - ( HReverseIterator const& iterator_ ) const {
+		return ( iterator_._iterator - _iterator ); /* reversed */
+	}
 	iterator_t base( void ) const {
 		iterator_t it( _iterator );
 		++ it;
 		return ( it );
 	}
-	typename iterator_t::reference operator*( void ) const {
+	reference operator*( void ) const {
 		return ( *_iterator );
 	}
-	typename iterator_t::pointer operator->( void ) const {
+	pointer operator->( void ) const {
 		return ( &*_iterator );
 	}
 	bool operator == ( HReverseIterator const& iterator_ ) const {
@@ -289,10 +319,129 @@ public:
 	bool operator != ( HReverseIterator const& iterator_ ) const {
 		return ( _iterator != iterator_._iterator );
 	}
+	bool operator < ( HReverseIterator const& iterator_ ) const {
+		return ( _iterator > iterator_._iterator );
+	}
+	bool operator <= ( HReverseIterator const& iterator_ ) const {
+		return ( _iterator >= iterator_._iterator );
+	}
+	bool operator > ( HReverseIterator const& iterator_ ) const {
+		return ( _iterator < iterator_._iterator );
+	}
+	bool operator >= ( HReverseIterator const& iterator_ ) const {
+		return ( _iterator <= iterator_._iterator );
+	}
 private:
 	template<typename other_iterator_t>
 	friend class HReverseIterator;
 };
+
+template<typename iterator_t>
+class HMoveIterator {
+	iterator_t _iterator;
+public:
+	typedef typename iterator_t::value_type value_type;
+	typedef typename iterator_t::pointer pointer;
+	typedef typename trait::strip_reference<typename iterator_t::reference>::type&& reference;
+	typedef typename iterator_t::category_type category_type;
+	HMoveIterator( void )
+		: _iterator() {
+		return;
+	}
+	HMoveIterator( HMoveIterator const& iterator_ )
+		: _iterator( iterator_._iterator ) {
+		return;
+	}
+	template<typename other_iterator_t>
+	HMoveIterator( HMoveIterator<other_iterator_t> const& iterator_ )
+		: _iterator( iterator_._iterator ) {
+		return;
+	}
+	HMoveIterator( iterator_t const& iterator_ )
+		: _iterator( iterator_ ) {
+		return;
+	}
+	HMoveIterator& operator = ( HMoveIterator const& iterator_ ) {
+		if ( &iterator_ != this ) {
+			_iterator = iterator_._iterator;
+		}
+		return ( *this );
+	}
+	HMoveIterator& operator ++ ( void ) {
+		++ _iterator;
+		return ( *this );
+	}
+	HMoveIterator operator ++ ( int ) {
+		HMoveIterator it( *this );
+		++ _iterator;
+		return ( it );
+	}
+	HMoveIterator& operator -- ( void ) {
+		-- _iterator;
+		return ( *this );
+	}
+	HMoveIterator operator -- ( int ) {
+		HMoveIterator it( *this );
+		-- _iterator;
+		return ( it );
+	}
+	HMoveIterator& operator += ( int long offset_ ) {
+		_iterator += offset_;
+		return ( *this );
+	}
+	HMoveIterator operator + ( int long offset_ ) const {
+		HMoveIterator it( *this );
+		it += offset_;
+		return ( it );
+	}
+	HMoveIterator& operator -= ( int long offset_ ) {
+		_iterator -= offset_;
+		return ( *this );
+	}
+	HMoveIterator operator - ( int long offset_ ) const {
+		HMoveIterator it( *this );
+		it -= offset_;
+		return ( it );
+	}
+	int long operator - ( HMoveIterator const& it_ ) const {
+		return ( _iterator - it_._iterator );
+	}
+	iterator_t base( void ) const {
+		return ( _iterator );
+	}
+	reference operator*( void ) const {
+		return ( yaal::move( *_iterator ) );
+	}
+	pointer operator->( void ) const {
+		return ( &*_iterator );
+	}
+	bool operator == ( HMoveIterator const& iterator_ ) const {
+		return ( _iterator == iterator_._iterator );
+	}
+	bool operator != ( HMoveIterator const& iterator_ ) const {
+		return ( _iterator != iterator_._iterator );
+	}
+	bool operator < ( HMoveIterator const& iterator_ ) const {
+		return ( _iterator < iterator_._iterator );
+	}
+	bool operator <= ( HMoveIterator const& iterator_ ) const {
+		return ( _iterator <= iterator_._iterator );
+	}
+	bool operator > ( HMoveIterator const& iterator_ ) const {
+		return ( _iterator > iterator_._iterator );
+	}
+	bool operator >= ( HMoveIterator const& iterator_ ) const {
+		return ( _iterator >= iterator_._iterator );
+	}
+private:
+	template<typename other_iterator_t>
+	friend class HMoveIterator;
+};
+
+template<typename iterator_t>
+HMoveIterator<iterator_t> make_move_iterator( iterator_t iterator_ ) {
+	return ( HMoveIterator<iterator_t>( iterator_ ) );
+}
 
 template<typename container_t>
 class HCyclicIterator
@@ -372,24 +521,40 @@ public:
 	iterator_type base( void ) const {
 		return ( _it );
 	}
-	bool operator != ( HCyclicIterator const& it_ ) {
+	bool operator != ( HCyclicIterator const& it_ ) const {
 		M_ASSERT( ( _owner == it_._owner ) || ! ( _owner && it_._owner ) );
 		return ( _it != it_._it );
 	}
-	bool operator == ( HCyclicIterator const& it_ ) {
+	bool operator == ( HCyclicIterator const& it_ ) const {
 		M_ASSERT( ( _owner == it_._owner ) || ! ( _owner && it_._owner ) );
 		return ( _it == it_._it );
 	}
-	bool operator != ( typename container_t::const_iterator const& it_ ) {
+	bool operator < ( HCyclicIterator const& it_ ) const {
+		M_ASSERT( ( _owner == it_._owner ) || ! ( _owner && it_._owner ) );
+		return ( _it < it_._it );
+	}
+	bool operator <= ( HCyclicIterator const& it_ ) const {
+		M_ASSERT( ( _owner == it_._owner ) || ! ( _owner && it_._owner ) );
+		return ( _it <= it_._it );
+	}
+	bool operator > ( HCyclicIterator const& it_ ) const {
+		M_ASSERT( ( _owner == it_._owner ) || ! ( _owner && it_._owner ) );
+		return ( _it > it_._it );
+	}
+	bool operator >= ( HCyclicIterator const& it_ ) const {
+		M_ASSERT( ( _owner == it_._owner ) || ! ( _owner && it_._owner ) );
+		return ( _it >= it_._it );
+	}
+	bool operator != ( typename container_t::const_iterator const& it_ ) const {
 		return ( _it != it_ );
 	}
-	bool operator == ( typename container_t::const_iterator const& it_ ) {
+	bool operator == ( typename container_t::const_iterator const& it_ ) const {
 		return ( _it == it_ );
 	}
-	bool operator != ( typename container_t::iterator const& it_ ) {
+	bool operator != ( typename container_t::iterator const& it_ ) const {
 		return ( _it != it_ );
 	}
-	bool operator == ( typename container_t::iterator const& it_ ) {
+	bool operator == ( typename container_t::iterator const& it_ ) const {
 		return ( _it == it_ );
 	}
 };
