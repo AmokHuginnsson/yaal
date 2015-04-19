@@ -158,6 +158,7 @@ int clock_gettime( clockid_t, struct timespec* time_ ) {
 #include <signal.h>
 #include <unistd.h>
 #include "hcore/hthread.hxx"
+#include "hcore/si.hxx"
 class HDarwinTimer {
 	yaal::hcore::HThread _thread;
 	yaal::hcore::HMutex _mutex;
@@ -198,9 +199,11 @@ public:
 		yaal::hcore::HLock l( _mutex );
 		_loop = true;
 		while ( _loop ) {
-			_cond.wait(
-				static_cast<int long unsigned>( _timerSpec.it_value.tv_sec ),
-				static_cast<int long unsigned>( _timerSpec.it_value.tv_nsec )
+			_cond.wait_for(
+				duration(
+					_timerSpec.it_value.tv_sec * yaal::hcore::si::NANO_IN_WHOLE +  _timerSpec.it_value.tv_nsec,
+					yaal::hcore::time::UNIT::NANOSECOND
+				)
 			);
 			if ( ! _reset ) {
 				::kill( getpid(), _sigNo );
