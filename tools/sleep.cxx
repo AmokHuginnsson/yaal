@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	sleep.cxx - this file is integral part of `yaal' project.
+  sleep.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -32,34 +32,31 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "sleep.hxx"
+#include "hcore/hclock.hxx"
+#include "hcore/si.hxx"
+
+using namespace yaal;
+using namespace yaal::hcore;
 
 namespace yaal {
 
 namespace tools {
 
-namespace sleep {
-
-inline bool sleep_real( timeval& time_, bool ignoreInterrrupt_ ) {
+bool sleep_for( yaal::hcore::time::duration_t duration_, bool ignoreInterrupts_ ) {
+	HClock c;
 	int err( 0 );
-	while ( ( ( err = ::select( 0, NULL, NULL, NULL, &time_ ) ) == -1 ) && ( errno == EINTR ) && ignoreInterrrupt_ )
-		;
-	return ( ( err != 0 ) && ! ( ( errno == EINTR ) && ignoreInterrrupt_ ) );
-}
-
-bool milisecond( int quantity_, bool ignoreInterrrupt_ ) {
-	timeval wait;
-	wait.tv_sec = quantity_ / 1000;
-	wait.tv_usec = ( quantity_ %  1000 ) * 1000;
-	return ( sleep_real( wait, ignoreInterrrupt_ ) );
-}
-
-bool second( int quantity_, bool ignoreInterrrupt_ ) {
-	timeval wait;
-	wait.tv_sec = quantity_;
-	wait.tv_usec = 0;
-	return ( sleep_real( wait, ignoreInterrrupt_ ) );
-}
-
+	timeval wait{ 0, 0 };
+	do {
+		i64_t left( duration_.get() - c.get_time_elapsed( time::UNIT::NANOSECOND ) );
+		if ( left <= 0 ) {
+			break;
+		}
+		wait = {
+			left / si::NANO_IN_WHOLE,
+			( left % si::NANO_IN_WHOLE ) / si::NANO_IN_MICRO
+		};
+	} while ( ( ( err = ::select( 0, NULL, NULL, NULL, &wait ) ) == -1 ) && ( errno == EINTR ) && ignoreInterrupts_ );
+	return ( ( c.get_time_elapsed( time::UNIT::NANOSECOND ) >= duration_ ) && ( err == 0 ) );
 }
 
 }

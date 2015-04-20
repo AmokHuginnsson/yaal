@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	tools/sleep.hxx - this file is integral part of `yaal' project.
+  tools/sleep.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -27,6 +27,8 @@ Copyright:
  * \brief Declaration of sleep functions.
  */
 
+#include "hcore/duration.hxx"
+
 #ifndef YAAL_TOOLS_SLEEP_HXX_INCLUDED
 #define YAAL_TOOLS_SLEEP_HXX_INCLUDED 1
 
@@ -34,27 +36,13 @@ namespace yaal {
 
 namespace tools {
 
-/*! \brief Various convinient sleep functions.
- */
-namespace sleep {
-
-/*! \brief Suspend execution of current thread for given number of miliseconds.
+/*! \brief Suspend execution of current thread for given duration.
  *
- * \param miliseconds - sleep that many miliseconds.
+ * \param duration - try sleep for that long period.
  * \param ignoreInterrupts - continue sleeping even if interrupted.
- * \return true iff sleep had been interrupted.
+ * \return True iff sleep_for slept for full duration (was not interrupted).
  */
-bool milisecond( int miliseconds, bool ignoreInterrupts = false );
-
-/*! \brief Suspend execution of current thread for given number of seconds.
- *
- * \param seconds - sleep that many miliseconds.
- * \param ignoreInterrupts - continue sleeping even if interrupted.
- * \return true iff sleep had been interrupted.
- */
-bool second( int seconds, bool ignoreInterrupts = false );
-
-}
+bool sleep_for( yaal::hcore::time::duration_t duration, bool ignoreInterrupts = false );
 
 }
 
