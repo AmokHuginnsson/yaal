@@ -66,6 +66,9 @@
 #cmakedefine01 HAVE_DECL_VSWTC
 #cmakedefine01 HAVE_DECL_SIGIOT
 #cmakedefine01 HAVE_DECL_ERR
+#cmakedefine01 HAVE_CLOCK_GETTIME
+#cmakedefine01 HAVE_TIMER_CREATE
+#cmakedefine01 HAVE_GETLINE
 #cmakedefine01 HAVE_MEMRCHR
 #cmakedefine01 HAVE_GETLINE
 #define LIB_PREFIX "@LIB_PREFIX@"

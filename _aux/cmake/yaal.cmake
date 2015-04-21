@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 2.8.4 )
 
 project( yaal CXX )
-include( lib )
+include( common )
 
 set( PACKAGE_VERSION "\"${PROJECT_VERSION}.${PROJECT_SUBVERSION}.${PROJECT_EXTRAVERSION}\"" )
 
@@ -79,6 +79,8 @@ else()
 	check_function_exists( getaddrinfo HAVE_GETADDRINFO )
 	check_function_exists( getnameinfo HAVE_GETNAMEINFO )
 endif()
+check_function_exists( clock_gettime HAVE_CLOCK_GETTIME )
+check_function_exists( timer_create HAVE_TIMER_CREATE )
 check_function_exists( memrchr HAVE_MEMRCHR )
 check_function_exists( getline HAVE_GETLINE )
 check_symbol_exists( TEMP_FAILURE_RETRY unistd.h HAVE_DECL_TEMP_FAILURE_RETRY )

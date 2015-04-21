@@ -13,8 +13,9 @@ CWARNING_FLAGS = \
 						-Wsign-compare \
 						-Wundef \
 						-Wwrite-strings
-# -Winline makes no sense as inline keyword is only suggestion and actual inlining can change by simply changing compiler version.
-CXXWARNING_FLAGS =	\
+# -Winline makes no sense as inline keyword is only suggestion
+#  and actual inlining can change by simply changing compiler version.
+CXXWARNING_FLAGS = \
 						-Weffc++ \
 						-Wold-style-cast \
 						-Woverloaded-virtual \
