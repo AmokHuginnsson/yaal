@@ -1,7 +1,5 @@
 cmake_minimum_required( VERSION 2.8.5 )
 
-include( lib )
-
 string( TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC )
 
 # setting CMAKE_CONFIGURATION_TYPES breaks default CMAKE_INSTALL_CONFIG_NAME.
@@ -24,6 +22,8 @@ elseif ( ${CMAKE_HOME_DIRECTORY} MATCHES "/_aux/cmake" )
 endif()
 
 set( CMAKE_MODULE_PATH ${CMAKE_HOME_DIRECTORY}/_aux/cmake ${CMAKE_MODULE_PATH} )
+
+include( lib )
 
 if( CMAKE_HOST_WIN32 )
 	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP" )

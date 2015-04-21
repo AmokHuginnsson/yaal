@@ -88,6 +88,7 @@
 #cmakedefine HAVE_POSTGRESQL_LIBPQ_FE_H
 #cmakedefine HAVE_LIBPQ_FE_H
 #cmakedefine HAVE_MYSQL_MYSQL_H
+#cmakedefine HAVE_IBASE_H
 #cmakedefine HAVE_OCI_H
 #cmakedefine HAVE_SYS_IOCTL_H
 #cmakedefine HAVE_SYS_CONSIO_H
