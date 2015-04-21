@@ -57,7 +57,6 @@ if ( NOT ( "$ENV{PREFIX}" STREQUAL "" ) )
 endif ( NOT ( "$ENV{PREFIX}" STREQUAL "" ) )
 
 include( CheckCXXSourceCompiles )
-include( CheckCXXCompilerFlag )
 include( CheckIncludeFileCXX )
 include( CheckFunctionExists )
 include( CheckSymbolExists )

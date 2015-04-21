@@ -40,6 +40,8 @@ set( COMPONENTS hcore tools dbwrapper hconsole hdata )
 
 include( packages )
 
+cxx_search_libraries( HCORE_LIBS timer_create rt )
+
 check_include_file_cxx( pcreposix.h HAVE_PCREPOSIX_H )
 check_include_file_cxx( execinfo.h HAVE_EXECINFO_H )
 check_include_file_cxx( termio.h HAVE_TERMIO_H )
@@ -145,105 +147,20 @@ file( GLOB TTYS0 /dev/ttyS0 )
 if ( "${TTYS0}" STREQUAL "/dev/ttyS0" )
 	set( SERIAL_DEVICE "ttyS0" )
 endif()
-if ( HAVE_NCURSES_CURSES_H )
-	set( CURSES_PATH "ncurses/curses.h" )
-else ( HAVE_NCURSES_CURSES_H )
-	set( CURSES_PATH "curses.h" )
-endif ( HAVE_NCURSES_CURSES_H )
-set( CMAKE_REQUIRED_LIBRARIES ${CURSES_LIBRARIES} )
-check_cxx_source_compiles( "#include <${CURSES_PATH}>
-	int main( int, char** ) { addch(ACS_DARROW); return ( 0 ); }" HAVE_ASCII_GRAPHICS )
-set( CMAKE_REQUIRED_LIBRARIES )
-if ( NOT CMAKE_HOST_WIN32 )
-	set( CMAKE_REQUIRED_FLAGS_ORIG "${CMAKE_REQUIRED_FLAGS}" )
-	set( CMAKE_REQUIRED_FLAGS "-Wall -Werror" )
-endif ( NOT CMAKE_HOST_WIN32 )
-check_cxx_source_compiles( "int main( int, char const* const* const ) { int a( 0 ); typedef __decltype( a ) a_t; a_t b( 0 ); return ( b ); }" HAVE_DECLTYPE )
-if ( NOT CMAKE_HOST_WIN32 )
-	set( CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS_ORIG}" )
-endif ( NOT CMAKE_HOST_WIN32 )
-check_cxx_source_compiles( "int main( int, char** ) { char const* const p( __PRETTY_FUNCTION__ ); return ( 0 ); }" HAVE_PRETTY_FUNCTION )
-if ( NOT HAVE_PRETTY_FUNCTION )
-	check_cxx_source_compiles( "int main( int, char** ) { char const* const p( __FUNCTION__ ); return ( 0 ); }" HAVE_FUNCTION )
-	if ( NOT HAVE_FUNCTION )
-		check_cxx_source_compiles( "int main( int, char** ) { char const* const p( __func__ ); return ( 0 ); }" HAVE_FUNC )
-	endif()
-endif()
 check_cxx_source_compiles("#include <cmath>
 	int main( int, char** ) { ::sqrtl( 0. ); return ( 0 ); }" HAVE_DECL_SQRTL )
 check_cxx_source_compiles( "#include <cmath>
 	int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }" HAVE_POWL )
 check_cxx_source_compiles( "#include <cmath>
 	int main( int, char** ) { ::floorl( 0. ); return ( 0 ); }" HAVE_DECL_FLOORL )
-check_cxx_source_compiles( "#include <netdb.h>
-int main( int, char const* const* const ) {
-	int i( 0 );
-	char* p( 0 );
-	struct hostent h, * ph( 0 );
-	::gethostbyname_r( \"\", &h, p, 0, &ph, &i );
-	return ( 0 );
-}" HAVE_GNU_GETHOSTBYNAME_R )
-check_cxx_source_compiles( "#include <netdb.h>
-int main( int, char const* const* const ) {
-	int i( 0 );
-	char* p( 0 );
-	struct hostent h, * ph( 0 );
-	::gethostbyaddr_r( 0, 0, 0, &h, p, 0, &ph, &i );
-	return ( 0 );
-}" HAVE_GNU_GETHOSTBYADDR_R )
-check_cxx_source_compiles( "#include <cstring>
-int main( int, char** ) {
-	char* p( NULL );
-	basename( p );
-	return ( 0 );
-}" HAVE_BASENAME_IN_CSTRING )
-check_cxx_source_compiles( "#include<cstring>
-int main( int, char const* const* const ) {
-	char const* const p( NULL );
-	basename( p );
-	return ( 0 );
-}" HAVE_BASENAME_ARG_CONST )
-check_cxx_source_compiles( "#include <ctime>
-int main( int, char const* const* const ) {
-	time_t t( time( NULL ) );
-	struct tm broken;
-	localtime_r( &t, &broken );
-	int size( strftime( NULL, 1024, \"%Y-%m-%d %T\", &broken ) );
-	return ( ! size );
-}" HAVE_SMART_STRFTIME )
-check_cxx_source_compiles( "#include <iconv.h>
-int main( int, char const* const* const ) {
-	iconv_t conv( 0 );
-	size_t size( 0 );
-	char const* in( NULL );
-	char* out( NULL );
-	iconv( conv, &in, &size, &out, &size );
-	return ( 0 );
-}" HAVE_ICONV_INPUT_CONST )
-if ( CMAKE_HOST_WIN32 )
-	set( NCURSES_ATTR_GET_SECOND_ARG_TYPE_int_short 1 )
-else ( CMAKE_HOST_WIN32 )
-	set( CMAKE_REQUIRED_LIBRARIES ${CURSES_LIBRARIES} )
-	set( CMAKE_REQUIRED_FLAGS "-Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual" )
-	check_cxx_source_compiles( "#include <${CURSES_PATH}>
-		int main( int, char** ){ attr_t* a( NULL ); int short* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }" NCURSES_ATTR_GET_SECOND_ARG_TYPE_int_short )
-	check_cxx_source_compiles( "#include <${CURSES_PATH}>
-		int main( int, char** ){ attr_t* a( NULL ); int* p( NULL ); attr_get( a, p, NULL ); return( 0 ); }" NCURSES_ATTR_GET_SECOND_ARG_TYPE_int )
-	set( CMAKE_REQUIRED_FLAGS )
-	set( CMAKE_REQUIRED_LIBRARIES )
-endif ( CMAKE_HOST_WIN32 )
-if ( NCURSES_ATTR_GET_SECOND_ARG_TYPE_int_short )
-	set( NCURSES_ATTR_GET_SECOND_ARG_TYPE "int short" )
-elseif ( NCURSES_ATTR_GET_SECOND_ARG_TYPE_int  )
-	set( NCURSES_ATTR_GET_SECOND_ARG_TYPE "int" )
-else ( NCURSES_ATTR_GET_SECOND_ARG_TYPE_int )
-	message( FATAL_ERROR "Unknown type for second argument of attr_get in ncurses library!" )
-endif ( NCURSES_ATTR_GET_SECOND_ARG_TYPE_int_short )
+
 if ( CMAKE_HOST_WIN32 )
 	set( CMAKE_REQUIRED_INCLUDES )
 	set( CMAKE_REQUIRED_LIBRARIES )
 endif ( CMAKE_HOST_WIN32 )
 set( CMAKE_REQUIRED_DEFINITIONS )
+
+include( env )
 
 configure_file( ${CMAKE_HOME_DIRECTORY}/_aux/cmake/config.hxx ${TARGET_PATH}/config.hxx )
 configure_file( ${CMAKE_HOME_DIRECTORY}/yaalrc.in ${TARGET_PATH}/yaalrc @ONLY )
@@ -257,22 +174,44 @@ function( yaal_make_component name )
 	list( REMOVE_ITEM SRCS ${DRIVER} dummy_item )
 	add_library( ${name} SHARED ${SRCS} ${HDRS} )
 	set( HEADERS ${HEADERS} ${HDRS} PARENT_SCOPE )
-	set_target_properties( ${name} PROPERTIES OUTPUT_NAME yaal_${name}${LIB_INFIX} LINKER_LANGUAGE CXX VERSION ${PROJECT_VERSION}.${PROJECT_SUBVERSION} SOVERSION ${PROJECT_VERSION}.${PROJECT_SUBVERSION} )
+	set_target_properties(
+		${name} PROPERTIES
+		OUTPUT_NAME yaal_${name}${LIB_INFIX}
+		LINKER_LANGUAGE CXX VERSION ${PROJECT_VERSION}.${PROJECT_SUBVERSION}
+		SOVERSION ${PROJECT_VERSION}.${PROJECT_SUBVERSION}
+	)
 	if ( CMAKE_HOST_WIN32 )
 		string( TOUPPER ${name} NAME )
 		add_library( ${name}-static STATIC ${SRCS} ${HDRS} )
 		set_target_properties( ${name}-static PROPERTIES OUTPUT_NAME yaal_${name} PREFIX "lib" COMPILE_DEFINITIONS __YAAL_${NAME}_BUILD__ )
 		add_dependencies( ${name} ${name}-static )
-		add_custom_command( TARGET ${name}-static POST_BUILD COMMAND dumpbin /linkermember:1 build/${CMAKE_BUILD_TYPE}/lib${name}.lib /out:build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.sym )
-		add_custom_command( TARGET ${name}-static POST_BUILD COMMAND makedef --source build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.sym --destination build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.def --exclude _aux/msvcxx/exclude.sym )
-		set_target_properties( ${name} PROPERTIES LINK_FLAGS "/DEF:build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.def /IGNORE:4102" COMPILE_DEFINITIONS __YAAL_${NAME}_BUILD__ )
+		add_custom_command(
+			TARGET ${name}-static
+			POST_BUILD COMMAND dumpbin /linkermember:1 build/${CMAKE_BUILD_TYPE}/lib${name}.lib /out:build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.sym
+		)
+		add_custom_command(
+			TARGET ${name}-static
+			POST_BUILD COMMAND makedef --source build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.sym
+				--destination build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.def --exclude _aux/msvcxx/exclude.sym
+		)
+		set_target_properties(
+			${name} PROPERTIES
+			LINK_FLAGS "/DEF:build/${CMAKE_BUILD_TYPE}/${name}${LIB_INFIX}.def /IGNORE:4102"
+			COMPILE_DEFINITIONS __YAAL_${NAME}_BUILD__
+		)
 	endif ( CMAKE_HOST_WIN32 )
 endfunction( yaal_make_component )
 
 function( yaal_make_driver name )
 	msg( "Processing driver: ${name}" )
 	add_library( ${name} MODULE dbwrapper/${name}_driver.cxx )
-	set_target_properties( ${name} PROPERTIES OUTPUT_NAME yaal_${name}_driver${LIB_INFIX} LINKER_LANGUAGE CXX VERSION ${PROJECT_VERSION}.${PROJECT_SUBVERSION} SOVERSION ${PROJECT_VERSION}.${PROJECT_SUBVERSION} )
+	set_target_properties(
+		${name} PROPERTIES
+		OUTPUT_NAME yaal_${name}_driver${LIB_INFIX}
+		LINKER_LANGUAGE CXX
+		VERSION ${PROJECT_VERSION}.${PROJECT_SUBVERSION}
+		SOVERSION ${PROJECT_VERSION}.${PROJECT_SUBVERSION}
+	)
 endfunction( yaal_make_driver )
 
 foreach( COMPONENT ${COMPONENTS} )
@@ -304,8 +243,18 @@ if ( CMAKE_HOST_WIN32 )
 	file( GLOB SRCS ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*.cxx )
 	file( GLOB HDRS ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*.hxx ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*.h ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*/*.h ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/csignal )
 	add_library( msvcxx STATIC ${SRCS} ${HDRS} ${CMAKE_HOME_DIRECTORY}/_aux/cmake-config.hxx )
-	add_custom_command( TARGET hcore-static POST_BUILD COMMAND dumpbin /linkermember:1 build/${CMAKE_BUILD_TYPE}/msvcxx.lib /out:build/${CMAKE_BUILD_TYPE}/msvcxx.sym )
-	add_custom_command( TARGET hcore-static POST_BUILD COMMAND makedef --source build/${CMAKE_BUILD_TYPE}/msvcxx.sym --destination build/${CMAKE_BUILD_TYPE}/hcore${LIB_INFIX}.def --exclude _aux/msvcxx/exclude.sym --append true  )
+	add_custom_command(
+		TARGET hcore-static
+		POST_BUILD COMMAND dumpbin /linkermember:1 build/${CMAKE_BUILD_TYPE}/msvcxx.lib /out:build/${CMAKE_BUILD_TYPE}/msvcxx.sym
+	)
+	add_custom_command(
+		TARGET hcore-static
+		POST_BUILD COMMAND makedef
+			--source build/${CMAKE_BUILD_TYPE}/msvcxx.sym
+			--destination build/${CMAKE_BUILD_TYPE}/hcore${LIB_INFIX}.def
+			--exclude _aux/msvcxx/exclude.sym
+			--append true
+	)
 	set_target_properties( msvcxx PROPERTIES LINKER_LANGUAGE CXX COMPILE_DEFINITIONS __YAAL_HCORE_BUILD__ )
 	add_executable( makedef ${CMAKE_HOME_DIRECTORY}/_aux/makedef.cxx )
 	add_executable( mkheaders ${CMAKE_HOME_DIRECTORY}/_aux/mkheaders.cxx )
@@ -313,14 +262,29 @@ if ( CMAKE_HOST_WIN32 )
 	set_target_properties( hcore PROPERTIES LINK_INTERFACE_LIBRARIES "" )
 	set_target_properties( makedef PROPERTIES COMPILE_DEFINITIONS "YAAL_MSVCXX_FIX_HXX_INCLUDED=1" )
 	set_target_properties( mkheaders PROPERTIES COMPILE_DEFINITIONS "YAAL_MSVCXX_FIX_HXX_INCLUDED=1" )
-	add_custom_command( OUTPUT ${HEADER_TARGET} COMMAND mkheaders ${CMAKE_HOME_DIRECTORY} ${TARGET_PATH} "${HEADERS}" MAIN_DEPENDENCY ${TARGET_PATH}/config.hxx DEPENDS mkheaders ${HEADERS} )
+	add_custom_command(
+		OUTPUT ${HEADER_TARGET}
+		COMMAND mkheaders ${CMAKE_HOME_DIRECTORY} ${TARGET_PATH} "${HEADERS}"
+		MAIN_DEPENDENCY ${TARGET_PATH}/config.hxx
+		DEPENDS mkheaders ${HEADERS}
+	)
 else ( CMAKE_HOST_WIN32 )
-	target_link_libraries( hcore ssl crypto pthread rt nsl )
-	target_link_libraries( tools hcore xml2 xslt exslt dl z )
+	target_link_libraries( hcore ${OPENSSL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${HCORE_LIBS} nsl )
+	target_link_libraries( tools hcore ${LIBXML2_LIBRARIES} ${LIBXSLT_LIBRARIES} exslt dl z )
 	target_link_libraries( dbwrapper tools hcore )
 	target_link_libraries( hconsole tools hcore ncurses gpm )
 	target_link_libraries( hdata hconsole dbwrapper tools hcore )
-	add_custom_command( OUTPUT ${HEADER_TARGET} COMMAND ./_aux/mkheaders --lib-name=${CMAKE_PROJECT_NAME} --lib-version=${PACKAGE_VERSION} --dir-root=${CMAKE_HOME_DIRECTORY} --dir-build=${TARGET_PATH} --headers='${HEADERS}' MAIN_DEPENDENCY ${TARGET_PATH}/config.hxx DEPENDS mkheaders ${HEADERS} )
+	add_custom_command(
+		OUTPUT ${HEADER_TARGET}
+		COMMAND ./_aux/mkheaders
+			--lib-name=${CMAKE_PROJECT_NAME}
+			--lib-version=${PACKAGE_VERSION}
+			--dir-root=${CMAKE_HOME_DIRECTORY}
+			--dir-build=${TARGET_PATH}
+			--headers='${HEADERS}'
+		MAIN_DEPENDENCY ${TARGET_PATH}/config.hxx
+		DEPENDS _aux/mkheaders ${HEADERS}
+	)
 endif ( CMAKE_HOST_WIN32 )
 
 add_custom_target( headers ALL DEPENDS ${HEADER_TARGET} )
