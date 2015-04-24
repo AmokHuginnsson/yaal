@@ -144,7 +144,6 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${UNAME_OS_NAME}"] = ["xSunOS"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_TYPE=[Solaris]
-		YAAL_DETECT_FLAGS(EXTRA_COMPILER_DEBUG_FLAGS, [-gstabs+], [C++])
 		EXTRA_LIB_PATHS=["${EXTRA_LIB_PATHS} -L/usr/local/lib -L/usr/gnu/lib/amd64 -L/usr/gnu/lib"]
 	elif test ["x${UNAME_OS_NAME}"] = ["xDarwin"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DARWIN__], [], [Your operating system is Darwin.])
@@ -255,6 +254,9 @@ AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
 
 	YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])
 	YAAL_DETECT_FLAGS(SONAME_FLAG, [-Wl,-soname,foo], [C++])
+	if test ["x${HOST_OS_TYPE}"] = ["xSolaris"] ; then
+		YAAL_DETECT_FLAGS(EXTRA_COMPILER_DEBUG_FLAGS, [-gstabs+], [C++])
+	fi
 	if test ["x${START_GROUP}"] != ["x"] ; then
 		END_GROUP=["-Wl,--end-group"]
 	fi
