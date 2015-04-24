@@ -168,8 +168,8 @@ configure_file( ${CMAKE_HOME_DIRECTORY}/yaal.pc.in ${TARGET_PATH}/yaal.pc @ONLY 
 
 function( yaal_make_component name )
 	msg( "Processing component: ${name}" )
-	file( GLOB SRCS RELATIVE ${CMAKE_HOME_DIRECTORY} ${CMAKE_HOME_DIRECTORY}/${name}/*.cxx )
-	file( GLOB HDRS RELATIVE ${CMAKE_HOME_DIRECTORY} ${CMAKE_HOME_DIRECTORY}/${name}/*.hxx )
+	file( GLOB_RECURSE SRCS RELATIVE ${CMAKE_HOME_DIRECTORY} ${CMAKE_HOME_DIRECTORY}/${name}/*.cxx )
+	file( GLOB_RECURSE HDRS RELATIVE ${CMAKE_HOME_DIRECTORY} ${CMAKE_HOME_DIRECTORY}/${name}/*.hxx )
 	file( GLOB DRIVER RELATIVE ${CMAKE_HOME_DIRECTORY} ${CMAKE_HOME_DIRECTORY}/${name}/*_driver.cxx )
 	list( REMOVE_ITEM SRCS ${DRIVER} dummy_item )
 	add_library( ${name} SHARED ${SRCS} ${HDRS} )

@@ -40,6 +40,9 @@ cd ${DIR_ROOT}
 DIR_HEADERS="${DIR_BUILD}/include/${LIB_NAME}"
 
 for FILE in ${HDRS}; do
+	if grep -q -w 'YAAL_PRIVATE_IMPLEMENTATION_DETAIL' "${FILE}"; then
+		continue
+	fi
 	mkdir -p ${DIR_HEADERS}/`dirname ${FILE}`
 	awk -f - ${FILE} > ${DIR_HEADERS}/${FILE} << EOF
 /^#\\t*include "/ {
