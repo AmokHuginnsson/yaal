@@ -6,7 +6,7 @@ dnl --------------------------------------------------------------------------
 
 dnl Bail out if running as root.
 dnl --------------------------------------------------------------------------
-AC_DEFUN([PRIVILEGES_SANITY], [
+AC_DEFUN_ONCE([PRIVILEGES_SANITY], [
 	EID=`id -u`
 	if test "x${EID}" = "x0" ; then
 		AC_MSG_ERROR([running with super-user privileges - bailing out])
@@ -55,11 +55,10 @@ AC_DEFUN([YAAL_DETECT_FLAGS], [
 
 dnl Handle user choice regarding C++ standard.
 dnl --------------------------------------------------------------------------
-AC_DEFUN([YAAL_CXX_STANDARD_CHECK], [
+AC_DEFUN_ONCE([YAAL_CXX_STANDARD_CHECK], [
+	AC_REQUIRE([YAAL_CHECK_COMPILER_VERSION])
 	YAAL_DETECT_FLAGS(CXX_STANDARD, [-std=c++11], [C++])
 	if test ["x$CXX_STANDARD"] != ["x"] ; then
-		AC_SUBST( [CXX_STANDARD], ["c++11"] )
-		CXX_STANDARD_NO=2011
 		CXXFLAGS=["$CXXFLAGS -std=c++11"]
 	else
 		AC_MSG_ERROR([Requested C++ Standard version is not available in this environment!])
@@ -68,7 +67,7 @@ AC_DEFUN([YAAL_CXX_STANDARD_CHECK], [
 
 dnl Checks for which function macros exist
 dnl --------------------------------------------------------------------------
-AC_DEFUN([YAAL_DETECT_FUNCTION_MACRO], [
+AC_DEFUN_ONCE([YAAL_DETECT_FUNCTION_MACRO], [
 	AC_MSG_CHECKING(whether $CC implements __PRETTY_FUNCTION__)
 	AC_CACHE_VAL(yaal_cv_have_func,
 							 [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstdio>
@@ -103,7 +102,7 @@ int main( int, char** ){ printf( "%s", __func__ ); return ( 0 );}]])],
 
 dnl We need to know what operating system yaal will be compiled on.
 dnl --------------------------------------------------------------------------
-AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
+AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	AC_MSG_CHECKING([host operating system])
 	AC_CANONICAL_HOST
 	HOST_OS_TYPE=""
@@ -145,6 +144,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${UNAME_OS_NAME}"] = ["xSunOS"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_TYPE=[Solaris]
+		YAAL_DETECT_FLAGS(EXTRA_COMPILER_DEBUG_FLAGS, [-gstabs+], [C++])
 		EXTRA_LIB_PATHS=["${EXTRA_LIB_PATHS} -L/usr/local/lib -L/usr/gnu/lib/amd64 -L/usr/gnu/lib"]
 	elif test ["x${UNAME_OS_NAME}"] = ["xDarwin"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DARWIN__], [], [Your operating system is Darwin.])
@@ -181,7 +181,7 @@ AC_DEFUN([YAAL_DETECT_OPERATING_SYSTEM], [
 
 dnl Check available git features.
 dnl --------------------------------------------------------------------------
-AC_DEFUN([YAAL_CHECK_GIT], [
+AC_DEFUN_ONCE([YAAL_CHECK_GIT], [
 	PACKAGE_VCS=""
 	AC_CHECK_PROG(HAS_GIT,[git],["yes"],["no"])
 	AC_MSG_CHECKING([git id sub-command])
@@ -209,7 +209,7 @@ AC_DEFUN([YAAL_CHECK_GIT], [
 dnl YAAL_DETECT_COMPILER
 dnl Detect installed compiler package.
 dnl --------------------------------------------------------------------------
-AC_DEFUN([YAAL_DETECT_COMPILER], [
+AC_DEFUN_ONCE([YAAL_DETECT_COMPILER], [
 	SAVED_CXX=["${CXX}"]
 	SAVED_CC=["${CC}"]
 	CXX=[""]
@@ -225,7 +225,8 @@ AC_DEFUN([YAAL_DETECT_COMPILER], [
 dnl YAAL_CHECK_COMPILER_VERSION
 dnl Check compiler version.
 dnl --------------------------------------------------------------------------
-AC_DEFUN([YAAL_CHECK_COMPILER_VERSION], [
+AC_DEFUN_ONCE([YAAL_CHECK_COMPILER_VERSION], [
+	AC_REQUIRE([YAAL_DETECT_COMPILER])
 	AC_MSG_CHECKING([compiler version])
 	GCC_MAJOR=`echo | cpp -dM | grep __GNUC__ | awk '{print [$]3}'`
 	GCC_MINOR=`echo | cpp -dM | grep __GNUC_MINOR__ | awk '{print [$]3}'`
@@ -235,7 +236,7 @@ AC_DEFUN([YAAL_CHECK_COMPILER_VERSION], [
 dnl YAAL_DETECT_COMMON_FLAGS
 dnl What special compiler flags we can set?
 dnl --------------------------------------------------------------------------
-AC_DEFUN([YAAL_DETECT_COMMON_FLAGS], [
+AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-pthread], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-pthread], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-m64], [C++])
@@ -255,15 +256,15 @@ AC_DEFUN([YAAL_DETECT_COMMON_FLAGS], [
 	YAAL_DETECT_FLAGS(START_GROUP, [-Wl,--start-group], [C++])
 	YAAL_DETECT_FLAGS(SONAME_FLAG, [-Wl,-soname,foo], [C++])
 	if test ["x${START_GROUP}"] != ["x"] ; then
-		END_GROUP="-Wl,--end-group"
+		END_GROUP=["-Wl,--end-group"]
 	fi
 	if test ["x${SONAME_FLAG}"] != ["x"] ; then
-		SONAME_FLAG="-Wl,-soname,\$(SONAME_\$(*))"
+		SONAME_FLAG=["-Wl,-soname,\$(SONAME_\$(*))"]
 	fi
 
 	_FLAGS=''
-	CXXFLAGS_ORIG=$CXXFLAGS;
-	CPPFLAGS_ORIG=$CPPFLAGS;
+	CXXFLAGS_ORIG=["${CXXFLAGS}"]
+	CPPFLAGS_ORIG=["${CPPFLAGS}"]
 	CXXFLAGS=["-Wextra"]
 	AC_MSG_CHECKING([does gcc support -Wextra])
 	RESULT=["no"]
@@ -285,7 +286,7 @@ AC_DEFUN([YAAL_DETECT_COMMON_FLAGS], [
 								[RESULT=["yes"]],
 								[AC_MSG_WARN([[Cannot use -Wshadow!]])])
 	AC_MSG_RESULT([$RESULT])
-	CXXFLAGS=$CXXFLAGS_ORIG
+	CXXFLAGS=["${CXXFLAGS_ORIG}"]
 	CXXFLAGS=["-pedantic-errors -Wno-long-long -Werror"]
 	AC_MSG_CHECKING([can we use -pedantic-errors in <cstdlib>])
 	RESULT=["no"]
@@ -300,8 +301,8 @@ AC_DEFUN([YAAL_DETECT_COMMON_FLAGS], [
 		_FLAGS='(none)'
 	fi
 	AC_MSG_RESULT([Compiler extra flags are: $_FLAGS])
-	CXXFLAGS=$CXXFLAGS_ORIG;
-	CPPFLAGS=$CXXFLAGS_ORIG;
+	CXXFLAGS=["${CXXFLAGS_ORIG}"]
+	CPPFLAGS=["${CXXFLAGS_ORIG}"]
 	AC_SUBST(LXXFLAGS_NO_UNDEFINED, [${LXXFLAGS_NO_UNDEFINED}])
 ])
 

@@ -57,7 +57,9 @@ ifdef DO_RELASSERT
 endif
 ifdef DO_DEBUG
 	TARGET=debug
-	COMPILER_DEBUG_FLAGS = -O0 -g -ggdb -g3 -ggdb3 -fno-inline -D__DEBUG__ $(DB)
+	COMPILER_DEBUG_FLAGS = -O0 -g -ggdb -g3 -ggdb3 \
+												 -fno-inline -D__DEBUG__ \
+												 $(EXTRA_COMPILER_DEBUG_FLAGS) $(DB)
 	LIB_INFIX = -d
 endif
 ifdef DO_PROFILING

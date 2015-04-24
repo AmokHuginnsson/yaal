@@ -41,7 +41,7 @@ AC_CONFIG_SRCDIR([[yaalrc.in]])
 AC_CONFIG_AUX_DIR([_aux])
 
 dnl yaal is not Free Software.
-AC_COPYRIGHT([[yaal (c) 2014 All rights reserved.]])
+AC_COPYRIGHT([[yaal (c) 2015 All rights reserved.]])
 
 dnl yaal is still in alpha stage.
 AC_REVISION(${THIS_ID})
@@ -56,7 +56,10 @@ AC_MSG_RESULT([--- Checking for machine type ... ---                   [[14%]]])
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
+
+YAAL_DETECT_COMPILER
 YAAL_DETECT_OPERATING_SYSTEM
+
 AC_DEFINE_UNQUOTED(TARGET_CPU,"${target_cpu}",[Target host system CPU.])
 if test ["x${target_cpu}"] = ["xx86_64"] ; then
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
@@ -65,8 +68,6 @@ elif test ["${target_os}"] != ["`echo ${target_os} | sed -e 's/solaris//'`"] ; t
 else
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,32,[Target host system CPU bits.])
 fi
-
-YAAL_DETECT_COMPILER
 
 AC_MSG_CHECKING([host dynamic linker])
 if test ["x${UNAME_OS_NAME}"] = ["xLinux"] ; then
@@ -155,61 +156,61 @@ AC_CHECK_LIB([ncurses],[initscr],,[AC_MSG_ERROR([Cannot continue without ncurses
 AC_CHECK_LIB([tinfo],[curs_set]) HCONSOLE_LIBS="${HCONSOLE_LIBS} ${LIBS}" LIBS=""
 AC_CHECK_LIB([gpm],[Gpm_Open]) HCONSOLE_LIBS="${HCONSOLE_LIBS} ${LIBS}" LIBS=""
 
-if test ["$SQLITE3"] != ["no"] ; then
+if test ["${SQLITE3}"] != ["no"] ; then
 	AC_CHECK_LIB([sqlite3],[sqlite3_open],
-								[],[if test ["$SQLITE3"] = ["yes"] ; then
+								[],[if test ["${SQLITE3}"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without SQLite3.])
 										fi;SQLITE3=["no"]])
 	LIBS=""
 fi
-if test ["$POSTGRES"] != ["no"] ; then
+if test ["${POSTGRES}"] != ["no"] ; then
 	AC_CHECK_LIB([pq],[PQsetdbLogin],
-								[],[if test ["$POSTGRES"] = ["yes"] ; then
+								[],[if test ["${POSTGRES}"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without PostgreSQL.])
 										fi;POSTGRES=["no"]])
 	LIBS=""
 fi
 MYSQL_REENTRANT=[""]
 CXXFLAGS_ORIG="${CXXFLAGS}"
-if test ["$MYSQL"] != ["no"] ; then
+if test ["${MYSQL}"] != ["no"] ; then
 	LIBS=""
 	AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient])
-	if test ["x$LIBS"] = "x" ; then
-		CXXFLAGS=["$CXXFLAGS_ORIG -L/usr/local/lib/mysql"]
+	if test ["x${LIBS}"] = "x" ; then
+		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/local/lib/mysql"]
 		unset ac_cv_search_mysql_init
 		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIB_PATHS="${EXTRA_LIB_PATHS} -L/usr/local/lib/mysql"])
 	fi
-	if test ["x$LIBS"] = "x" ; then
-		CXXFLAGS=["$CXXFLAGS_ORIG -L/usr/lib64/mysql/"]
+	if test ["x${LIBS}"] = "x" ; then
+		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/lib64/mysql/"]
 		unset ac_cv_search_mysql_init
 		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIB_PATHS="${EXTRA_LIB_PATHS} -L/usr/lib64/mysql/"])
 	fi
-	if test ["x$LIBS"] = "x" ; then
-		if test ["$MYSQL"] = ["yes"] ; then
+	if test ["x${LIBS}"] = "x" ; then
+		if test ["${MYSQL}"] = ["yes"] ; then
 			AC_MSG_ERROR([Cannot continue without MySQL.])
 		else
 			MySQL=["no"]
 		fi
 	fi
-	CXXFLAGS=$CXXFLAGS_ORIG
-	MYSQLCLIENT_LIBRARY=["$LIBS"]
+	CXXFLAGS=["${CXXFLAGS_ORIG}"]
+	MYSQLCLIENT_LIBRARY=["${LIBS}"]
 	LIBS=""
 fi
-if test ["$FIREBIRD"] != ["no"] ; then
+if test ["${FIREBIRD}"] != ["no"] ; then
 	AC_CHECK_LIB([fbclient],[isc_attach_database],
-								[],[if test ["$FIREBIRD"] = ["yes"] ; then
+								[],[if test ["${FIREBIRD}"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without Firebird.])
 										fi;FIREBIRD=["no"]])
 	LIBS=""
 fi
-if test ["$ORACLE"] != ["no"] ; then
-	CXXFLAGS=["$CXXFLAGS -L$ORACLE_HOME/lib"]
+if test ["${ORACLE}"] != ["no"] ; then
+	CXXFLAGS=["${CXXFLAGS} -L${ORACLE_HOME}/lib"]
 	AC_CHECK_LIB([clntsh],[OCIEnvCreate],
 								[EXTRA_LIB_PATHS="${EXTRA_LIB_PATHS} -L${ORACLE_HOME}/lib"],
-								[if test ["$ORACLE"] = ["yes"] ; then
+								[if test ["${ORACLE}"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without Oracle.])
 										fi;ORACLE=["no"]])
-	CXXFLAGS=$CXXFLAGS_ORIG
+	CXXFLAGS=["${CXXFLAGS_ORIG}"]
 	LIBS=""
 fi
 
@@ -220,15 +221,15 @@ AC_SUBST([SERIAL_DEVICE],['null'])
 AC_CHECK_FILE([/dev/cuaa0],[AC_SUBST([SERIAL_DEVICE],['cuaa0'])],
 	[AC_CHECK_FILE([/dev/ttyS0],[AC_SUBST([SERIAL_DEVICE],['ttyS0'])])])
 
-CXXFLAGS=$CXXFLAGS_ORIG
+CXXFLAGS=["${CXXFLAGS_ORIG}"]
 
 AC_MSG_CHECKING([whether C++ compiler supports __decltype])
 RESULT=["no"]
-CXXFLAGS_ORIG=$CXXFLAGS
-CXXFLAGS="$CXXFLAGS -Werror -Wall"
+CXXFLAGS_ORIG=["${CXXFLAGS}"]
+CXXFLAGS=["${CXXFLAGS} -Werror -Wall"]
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[int main( int, char const* const* const ) { int a( 0 ); typedef __decltype( a ) a_t; a_t b( 0 ); return ( b ); }]])],
 	[AC_DEFINE([HAVE_DECLTYPE],[],[Is __decltype available?])] RESULT=["yes"])
-CXXFLAGS=$CXXFLAGS_ORIG
+CXXFLAGS=["${CXXFLAGS_ORIG}"]
 AC_MSG_RESULT([$RESULT])
 AC_MSG_CHECKING([whether `.interp' user section is allowed])
 dnl `
@@ -308,15 +309,15 @@ AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[77%]]])
 if test ["x${HOST_OS_TYPE}"] != ["xDarwin"] ; then
 	AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
 else
-	CXXFLAGS=["$CXXFLAGS -isystem /opt/local/include"]
-	CPPFLAGS=["$CXXFLAGS"]
+	CXXFLAGS=["${CXXFLAGS} -isystem /opt/local/include"]
+	CPPFLAGS=["${CXXFLAGS}"]
 	AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
-	CXXFLAGS=$CXXFLAGS_ORIG
-	CPPFLAGS=$CPPFLAGS_ORIG
+	CXXFLAGS=["${CXXFLAGS_ORIG}"]
+	CPPFLAGS=["${CPPFLAGS_ORIG}"]
 	EXTRA_INCLUDE_PATHS="-isystem /opt/local/include ${EXTRA_INCLUDE_PATHS}"
 fi
 _CONSOLE_MOUSE=[""];
-CXXFLAGS="${CXXFLAGS_ORIG} ${PCRE_CFLAGS}"
+CXXFLAGS=["${CXXFLAGS_ORIG} ${PCRE_CFLAGS}"]
 AC_CHECK_HEADERS([pcreposix.h], [
 	AC_CHECK_DECLS(
 		[pcreposix_regcomp],
@@ -326,7 +327,7 @@ AC_CHECK_HEADERS([pcreposix.h], [
 	)
 ])
 dnl '
-CXXFLAGS="${CXXFLAGS_ORIG}"
+CXXFLAGS=["${CXXFLAGS_ORIG}"]
 AC_CHECK_HEADERS([sys/consio.h],_CONSOLE_MOUSE=["moused"])
 AC_CHECK_HEADERS([execinfo.h])
 AC_CHECK_HEADERS([tty.h])
@@ -344,52 +345,52 @@ AC_CHECK_HEADERS([ncurses/curses.h],_NCURSES_HEADER=['ncurses/curses.h'],
 
 dnl Reversed order of database API check is due to setting default db driver properly.
 
-if test ["$ORACLE"] != ["no"] ; then
-	CXXFLAGS=["$CXXFLAGS -I$ORACLE_HOME/rdbms/public"]
-	CPPFLAGS=["$CXXFLAGS"]
+if test ["${ORACLE}"] != ["no"] ; then
+	CXXFLAGS=["${CXXFLAGS} -I${ORACLE_HOME}/rdbms/public"]
+	CPPFLAGS=["${CXXFLAGS}"]
 	AC_CHECK_HEADERS([oci.h],
 		[AC_SUBST([DO_ORACLE_DRIVER],["oracle"])
-		 AC_SUBST([ORACLE_SID],["$ORACLE_SID"])
+		 AC_SUBST([ORACLE_SID],["${ORACLE_SID}"])
 			EXTRA_INCLUDE_PATHS=["${EXTRA_INCLUDE_PATHS} -I\$(ORACLE_HOME)/rdbms/public"]
 			DEFAULT_DRIVER=["Oracle"]],
-				[if test ["$ORACLE"] = ["yes"] ; then
+				[if test ["${ORACLE}"] = ["yes"] ; then
 					AC_MSG_ERROR([[Cannot continue without Oracle devel(client)!]])
 				fi;ORACLE=["no"]])
-	CXXFLAGS=$CXXFLAGS_ORIG
-	CPPFLAGS=$CPPFLAGS_ORIG
+	CXXFLAGS=["${CXXFLAGS_ORIG}"]
+	CPPFLAGS=["${CPPFLAGS_ORIG}"]
 fi
-if test ["$FIREBIRD"] != ["no"] ; then
+if test ["${FIREBIRD}"] != ["no"] ; then
 	AC_CHECK_HEADERS([ibase.h],
 	  [AC_SUBST([DO_FIREBIRD_DRIVER],["firebird"])
 			DEFAULT_DRIVER=["Firebird"]],
-				[if test ["$FIREBIRD"] = ["yes"] ; then
+				[if test ["${FIREBIRD}"] = ["yes"] ; then
 					AC_MSG_ERROR([[Cannot continue without Firebird devel(client)!]])
 				fi;FIREBIRD=["no"]])
 fi
-if test ["$MYSQL"] != ["no"] ; then
+if test ["${MYSQL}"] != ["no"] ; then
 	AC_CHECK_HEADERS([mysql/mysql.h],
 		[AC_SUBST([DO_MYSQL_DRIVER],["mysql"])
 			DEFAULT_DRIVER=["MySQL"]],
-				[if test ["$MYSQL"] = ["yes"] ; then
+				[if test ["${MYSQL}"] = ["yes"] ; then
 					AC_MSG_ERROR([[Cannot continue without MySQL devel(client)!]])
 				fi;MYSQL=["no"]])
 fi
-if test ["$POSTGRES"] != ["no"] ; then
+if test ["${POSTGRES}"] != ["no"] ; then
 	AC_CHECK_HEADERS([postgresql/libpq-fe.h],
 		[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
 			DEFAULT_DRIVER=["PostgreSQL"]],
 		[AC_CHECK_HEADERS([libpq-fe.h],
 			[AC_SUBST([DO_POSTGRESQL_DRIVER],["postgresql"])
 			DEFAULT_DRIVER=["PostgreSQL"]],
-				[if test ["$POSTGRES"] = ["yes"] ; then
+				[if test ["${POSTGRES}"] = ["yes"] ; then
 					AC_MSG_ERROR([[Cannot continue without PostgreSQL devel(client)!]])
 				fi;POSTGRES=["no"]])])
 fi
-if test ["$SQLITE3"] != ["no"] ; then
+if test ["${SQLITE3}"] != ["no"] ; then
 	AC_CHECK_HEADERS([sqlite3.h],
 		[AC_SUBST([DO_SQLITE3_DRIVER],["sqlite3"])
 			DEFAULT_DRIVER=["SQLite3"]],
-				[if test ["$SQLITE3"] = ["yes"] ; then
+				[if test ["${SQLITE3}"] = ["yes"] ; then
 					AC_MSG_ERROR([[Cannot continue without SQLite3 devel(client)!]])
 				fi;SQLITE3=["no"]])
 fi
@@ -400,11 +401,11 @@ AC_MSG_RESULT([--- Looking for functions and data members ... ---      [[83%]]])
 LIBS="${HCORE_LIBS}"
 AC_LANG([C])
 CFLAGS_ORIG=["${CFLAGS}"]
-CFLAGS="-D_GNU_SOURCE=1"
-CPPFLAGS_ORIG="${CPPFLAGS}"
+CFLAGS=["-D_GNU_SOURCE=1"]
+CPPFLAGS_ORIG=["${CPPFLAGS}"]
 CPPFLAGS=`echo ${CPPFLAGS} | sed -e 's/-std=c++11//g'`
 AC_CHECK_TYPES([sighandler_t],[],[AC_CHECK_TYPES([__sighandler_t],[],[],[#include <signal.h>])],[#include <signal.h>])
-CPPFLAGS="${CPPFLAGS_ORIG}"
+CPPFLAGS=["${CPPFLAGS_ORIG}"]
 CFLAGS=${CFLAGS_ORIG}
 AC_LANG([C++])
 if test ["${ac_cv_type_sighandler_t}"] = ["no"] -a ["${ac_cv_type___sighandler_t}"] = ["no"] -a ["x${HOST_OS_TYPE}"] != ["xDarwin"] ; then
@@ -442,7 +443,7 @@ AC_MSG_RESULT([--- Done looking for functions and data members. ---    [[92%]]])
 dnl We need to check if out ncurses devel is not brain-damaged.
 AC_MSG_RESULT([--- Libraries/environment sanity check ... ---          [[93%]]])
 AC_MSG_CHECKING([if your ncurses-devel is seriously brain-damaged])
-CXXFLAGS=$CXXFLAGS_ORIG
+CXXFLAGS=["${CXXFLAGS_ORIG}"]
 CXXFLAGS=["${EXTRA_CXXFLAGS} -Wall -Werror -Wcast-align -Wconversion -Wwrite-strings -pedantic-errors -Wcast-qual"]
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <$_NCURSES_HEADER>
 									 int main( int, char** ) { printw("x"); return ( 0 ); }]])],
@@ -488,6 +489,7 @@ AC_SUBST([DEFAULT_DRIVER], [${DEFAULT_DRIVER}])
 AC_SUBST([MYSQL_SOCKET],[${MYSQL_SOCKET}])
 AC_SUBST([EXTRA_CXXFLAGS],[${EXTRA_CXXFLAGS}])
 AC_SUBST([EXTRA_LXXFLAGS],[${EXTRA_LXXFLAGS}])
+AC_SUBST([EXTRA_COMPILER_DEBUG_FLAGS],[${EXTRA_COMPILER_DEBUG_FLAGS}])
 AC_SUBST([EXTRA_COMPILER_OPTIMIZATION_FLAGS],[${EXTRA_COMPILER_OPTIMIZATION_FLAGS}])
 AC_SUBST([YAAL_LXXFLAGS],[${YAAL_LXXFLAGS}])
 AC_SUBST([START_GROUP],[${START_GROUP}])
