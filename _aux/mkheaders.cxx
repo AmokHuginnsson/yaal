@@ -8,10 +8,11 @@
 #include <iostream>
 #include <fstream>
 #include <cerrno>
-#include <../include/sys/stat.h>
+#include <sys/stat.h>
 
 #ifdef __GNUC__
 #include <dirent.h>
+#include <unistd.h>
 #include <utime.h>
 #else /* __GNUC__ */
 #ifndef __MSVCXX__
@@ -39,6 +40,7 @@ void delete_fucking_old_files_no_matter_fucking_what( string const& );
 void create_fucking_new_directory_no_matter_fucking_what( string const& );
 void remove_all( string const& );
 bool is_directory( string const& );
+bool is_private( string const& );
 string dirname( string const& );
 string basename( string const& );
 string strip_prefix( string, string );
@@ -61,12 +63,13 @@ int main( int argc_, char** argv_ ) {
 		}
 */
 		if ( argc_ != 4 )
-			throw invalid_argument( "mkheaders: exactly 3 arguments required" );
+			throw invalid_argument( string( "mkheaders: exactly 3 arguments required, got: " ) + to_string( argc_ - 1 ) );
 		string dirRoot( argv_[1] );
 		string dirBuild( argv_[2] );
 		typedef set<string> paths_t;
 		vector<string> paths;
-		tokenize( argv_[3], paths, " \t;" );
+		tokenize( argv_[3], paths, " \t\n\r;" );
+		paths.erase( remove_if( paths.begin(), paths.end(), is_private ), paths.end() );
 		set<string> headers;
 		transform( paths.begin(), paths.end(), inserter( headers, headers.begin() ), bind2nd( ptr_fun( strip_prefix ), dirRoot + "/" ) );
 		if ( ! is_directory( dirRoot ) )
@@ -180,6 +183,19 @@ void process_file( string const& from, string const& to ) {
 	copy_modification_time( from, to );
 }
 
+bool is_private( string const& p ) {
+	ifstream i( p.c_str() );
+	string line;
+	bool priv( false );
+	while ( ! getline( i, line ).fail() ) {
+		if ( line.find( "YAAL_PRIVATE_IMPLEMENTATION_DETAIL" ) != std::string::npos ) {
+			priv = true;
+			break;
+		}
+	}
+	return ( priv );
+}
+
 void process_line( string& line ) {
 	if ( line.find( "#include" ) == 0 ) {
 		int posOpen = line.find( "\"" );
@@ -212,7 +228,7 @@ void create_fucking_new_directory_no_matter_fucking_what( string const& p ) {
 			sleep( 1 );
 			cout << "+" << endl;
 		}
-		mkdir( p.c_str(), 0 );
+		mkdir( p.c_str(), 0700 );
 		fail = true;
 	}
 }
