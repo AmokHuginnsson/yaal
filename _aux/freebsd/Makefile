@@ -5,6 +5,7 @@
 
 PORTNAME=      yaal
 PORTVERSION!=  awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in
+PORTREVISION=  $(BUILD_ID)
 CATEGORIES=    devel
 MASTER_SITES=  http://codestation.org/ https://codestation.org/
 
