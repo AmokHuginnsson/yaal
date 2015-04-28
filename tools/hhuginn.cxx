@@ -32,9 +32,9 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hhuginn.hxx"
-#include "streamtools.hxx"
 #include "hcore/hfile.hxx"
-#include "tools/huginn/preprocessor.hxx"
+#include "tools/huginn/source.hxx"
+#include "streamtools.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -501,119 +501,6 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition ) );
 	return ( huginnGrammar );
-	M_EPILOG
-}
-
-HHuginn::HSource::HSource( void )
-	: _name(),
-	_orig(),
-	_origSize( 0 ),
-	_preprocessed(),
-	_preprocessedSize( 0 ),
-	_skips() {
-	return;
-}
-
-void HHuginn::HSource::load( yaal::hcore::HStreamInterface& stream_ ) {
-	M_PROLOG
-	static int const PAGE_SIZE( static_cast<int>( system::get_page_size() ) );
-	int nRead( 0 );
-	int block( 0 );
-	M_ASSERT( _origSize == 0 );
-	do {
-		_orig.realloc( ( block + 1 ) * PAGE_SIZE );
-		nRead = static_cast<int>( stream_.read( _orig.get<char>() + block * PAGE_SIZE, PAGE_SIZE ) );
-		M_ENSURE( nRead >= 0 );
-		_origSize += nRead;
-		++ block;
-	} while ( nRead == PAGE_SIZE );
-	_name = get_stream_id( &stream_ );
-	return;
-	M_EPILOG
-}
-
-yaal::hcore::HString const& HHuginn::HSource::name( void ) const {
-	M_PROLOG
-	return ( _name );
-	M_EPILOG
-}
-
-/*
- * Strip C-style comments, concatenate literal strings.
- */
-void HHuginn::HSource::preprocess( void ) {
-	M_PROLOG
-	_preprocessed.realloc( _origSize );
-	HPrepocessor pp( _orig.get<char>(), _orig.get<char>() + _origSize );
-	char* dst( _preprocessed.get<char>() );
-	_skips[0] = 0;
-	int pos( -1 );
-	int skipsTotal( 0 );
-	for ( HPrepocessor::HIterator it( pp.begin() ), endIt( pp.end() ); it != endIt; ++ it, ++ dst ) {
-		int newPos( static_cast<int>( it.raw() - _orig.get<char>() ) );
-		if ( newPos > ( pos + 1 ) ) {
-			skipsTotal += ( newPos - ( pos + 1 ) );
-			_skips[static_cast<int>( dst - _preprocessed.get<char>() )] = skipsTotal;
-		}
-		pos = newPos;
-		*dst = *it;
-	}
-	_preprocessedSize = static_cast<int>( dst - _preprocessed.get<char>() );
-	return;
-	M_EPILOG
-}
-
-int HHuginn::HSource::error_position( int position_ ) const {
-	M_PROLOG
-	skips_t::const_iterator it( _skips.upper_bound( position_ ) );
-	-- it;
-	M_ENSURE( it != _skips.end() );
-	int errorPosition( it->second + position_ );
-	return ( errorPosition );
-	M_EPILOG
-}
-
-HHuginn::HErrorCoordinate HHuginn::HSource::error_coordinate( int position_ ) const {
-	M_PROLOG
-	char const* src( _orig.get<char>() );
-	/* +1 because we count lines starting from 1 (not starting from 0) */
-	int line( static_cast<int>( count( src, src + position_, NEWLINE ) ) + 1 );
-	int lastNewlinePosition( 0 );
-	if ( line > 1 ) {
-		char const* nl( static_cast<char const*>( ::memrchr( src, NEWLINE, static_cast<size_t>( position_ ) ) ) );
-		M_ASSERT( nl );
-		int nlPos( static_cast<int>( nl - src ) );
-		++ nlPos;
-		lastNewlinePosition = nlPos;
-	}
-	int column( ( position_ - lastNewlinePosition ) + 1 );
-	return ( HErrorCoordinate( line, column ) );
-	M_EPILOG
-}
-
-yaal::hcore::HString::const_iterator HHuginn::HSource::begin( void ) const {
-	M_PROLOG
-	return ( _preprocessed.get<char const>() );
-	M_EPILOG
-}
-
-yaal::hcore::HString::const_iterator HHuginn::HSource::end( void ) const {
-	M_PROLOG
-	return ( _preprocessed.get<char const>() + _preprocessedSize );
-	M_EPILOG
-}
-
-void HHuginn::HSource::dump_preprocessed( yaal::hcore::HStreamInterface& stream_ ) const {
-	M_PROLOG
-	static int const PAGE_SIZE( static_cast<int>( system::get_page_size() ) );
-	int totalWritten( 0 );
-	do {
-		int nWritten( static_cast<int>( stream_.write( _preprocessed.get<char>() + totalWritten,
-						_preprocessedSize - totalWritten >= PAGE_SIZE ? PAGE_SIZE : _preprocessedSize - totalWritten ) ) );
-		M_ENSURE( nWritten >= 0 );
-		totalWritten += nWritten;
-	} while ( totalWritten < _preprocessedSize );
-	return;
 	M_EPILOG
 }
 
@@ -1574,7 +1461,7 @@ HHuginn::HHuginn( void )
 	, _classes()
 	, _functions()
 	, _engine( make_engine(), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
-	, _source()
+	, _source( make_resource<HSource>() )
 	, _compiler( this )
 	, _threads()
 	, _argv( new ( memory::yaal ) HList() )
@@ -1597,7 +1484,7 @@ HHuginn::HHuginn( void )
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::EMPTY );
-	_source.load( stream_ );
+	_source->load( stream_ );
 	_state = STATE::LOADED;
 	return;
 	M_EPILOG
@@ -1606,7 +1493,7 @@ void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
 void HHuginn::preprocess( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::LOADED );
-	_source.preprocess();
+	_source->preprocess();
 	_state = STATE::PREPROCESSED;
 	return;
 	M_EPILOG
@@ -1616,7 +1503,7 @@ bool HHuginn::parse( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PREPROCESSED );
 	_state = STATE::PARSED;
-	bool ok( _engine.parse( _source.begin(), _source.end() ) );
+	bool ok( _engine.parse( _source->begin(), _source->end() ) );
 	if ( ! ok ) {
 		_errorMessage = _engine.error_messages()[0];
 		_errorPosition = _engine.error_position();
@@ -1701,25 +1588,25 @@ HHuginn::function_t HHuginn::get_function( yaal::hcore::HString const& name_ ) {
 
 int HHuginn::error_position( void ) const {
 	M_PROLOG
-	return ( _source.error_position( _errorPosition ) );
+	return ( _source->error_position( _errorPosition ) );
 	M_EPILOG
 }
 
 HHuginn::HErrorCoordinate HHuginn::error_coordinate( void ) const {
 	M_PROLOG
-	return ( _source.error_coordinate( error_position() ) );
+	return ( _source->error_coordinate( error_position() ) );
 	M_EPILOG
 }
 
 HHuginn::HErrorCoordinate HHuginn::get_coordinate( int position_ ) const {
 	M_PROLOG
-	return ( _source.error_coordinate( _source.error_position( position_ ) ) );
+	return ( _source->error_coordinate( _source->error_position( position_ ) ) );
 	M_EPILOG
 }
 
 yaal::hcore::HString HHuginn::error_message( void ) const {
 	M_PROLOG
-	hcore::HString message( _source.name() );
+	hcore::HString message( _source->name() );
 	HErrorCoordinate coord( error_coordinate() );
 	if ( ! _errorMessage.is_empty() ) {
 		message
@@ -1734,10 +1621,6 @@ yaal::hcore::HString HHuginn::error_message( void ) const {
 	}
 	return ( message );
 	M_EPILOG
-}
-
-char const* HHuginn::HSource::error_message( int code_ ) const {
-	return ( ::error_message( code_ ) );
 }
 
 char const* HHuginn::error_message( int code_ ) const {
@@ -1822,14 +1705,14 @@ void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
 
 void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
-	_source.dump_preprocessed( stream_ );
+	_source->dump_preprocessed( stream_ );
 	return;
 	M_EPILOG
 }
 
 void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
-	stream_ << "Huginn VM state for `" << _source.name() << "':\nfunctions:" << endl;
+	stream_ << "Huginn VM state for `" << _source->name() << "':\nfunctions:" << endl;
 	for ( functions_t::value_type const& f : _functions ) {
 		stream_ << f.first << endl;
 	}

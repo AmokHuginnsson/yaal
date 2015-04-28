@@ -44,6 +44,12 @@ namespace yaal {
 
 namespace tools {
 
+namespace huginn {
+
+class HSource;
+
+}
+
 /*! \brief Huginn programming language implementation.
  */
 class HHuginn {
@@ -176,28 +182,8 @@ public:
 	};
 	typedef yaal::hcore::HStack<OPositionedOperator> operations_t;
 	class HHuginnRuntimeException;
+	typedef yaal::hcore::HResource<huginn::HSource> source_t;
 private:
-	class HSource {
-		typedef HSource this_type;
-		typedef yaal::hcore::HMap<int, int> skips_t;
-		yaal::hcore::HString _name;
-		yaal::hcore::HChunk _orig;
-		int _origSize;
-		yaal::hcore::HChunk _preprocessed;
-		int _preprocessedSize;
-		skips_t _skips;
-	public:
-		HSource( void );
-		void load( yaal::hcore::HStreamInterface& );
-		void preprocess( void );
-		char const* error_message( int ) const;
-		int error_position( int ) const;
-		HHuginn::HErrorCoordinate error_coordinate( int ) const;
-		yaal::hcore::HString const& name( void ) const;
-		yaal::hcore::HString::const_iterator begin( void ) const;
-		yaal::hcore::HString::const_iterator end( void ) const;
-		void dump_preprocessed( yaal::hcore::HStreamInterface& ) const;
-	};
 	struct OCompiler {
 		typedef void ( HHuginn::HExpression::* expression_action_t ) ( HFrame*, int );
 		typedef yaal::hcore::HArray<yaal::hcore::HString> parameter_names_t;
@@ -329,7 +315,7 @@ private:
 	classes_t _classes;
 	functions_t _functions;
 	HExecutingParser _engine;
-	HSource _source;
+	source_t _source;
 	OCompiler _compiler;
 	threads_t _threads;
 	list_t _argv;
