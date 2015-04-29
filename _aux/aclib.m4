@@ -58,9 +58,7 @@ dnl --------------------------------------------------------------------------
 AC_DEFUN_ONCE([YAAL_CXX_STANDARD_CHECK], [
 	AC_REQUIRE([YAAL_CHECK_COMPILER_VERSION])
 	YAAL_DETECT_FLAGS(CXX_STANDARD, [-std=c++11], [C++])
-	if test ["x$CXX_STANDARD"] != ["x"] ; then
-		CXXFLAGS=["$CXXFLAGS -std=c++11"]
-	else
+	if test ["x$CXX_STANDARD"] = ["x"] ; then
 		AC_MSG_ERROR([Requested C++ Standard version is not available in this environment!])
 	fi
 ])
@@ -140,16 +138,18 @@ AC_DEFUN_ONCE([YAAL_DETECT_OPERATING_SYSTEM], [
 	elif test ["x${UNAME_OS_NAME}"] = ["xFreeBSD"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_FREEBSD__], [], [Your operating system is FreeBSD.])
 		HOST_OS_TYPE=[FreeBSD]
-		EXTRA_LIB_PATHS=["${EXTRA_LIB_PATHS} -L/usr/local/lib"]
+		EXTRA_INCLUDE_PATHS=["-isystem /usr/include ${EXTRA_INCLUDE_PATHS} -I/usr/local/include"]
+		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/usr/local/lib"]
 	elif test ["x${UNAME_OS_NAME}"] = ["xSunOS"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_SOLARIS__], [], [Your operating system is Solaris.])
 		HOST_OS_TYPE=[Solaris]
-		EXTRA_LIB_PATHS=["${EXTRA_LIB_PATHS} -L/usr/local/lib -L/usr/gnu/lib/amd64 -L/usr/gnu/lib"]
+		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/usr/local/lib -L/usr/gnu/lib/amd64 -L/usr/gnu/lib"]
 	elif test ["x${UNAME_OS_NAME}"] = ["xDarwin"] ; then
 		AC_DEFINE([__HOST_OS_TYPE_DARWIN__], [], [Your operating system is Darwin.])
 		HOST_OS_TYPE=[Darwin]
 		YAAL_LXXFLAGS=["${YAAL_LXXFLAGS} -Wl,-undefined,dynamic_lookup"]
-		EXTRA_LIB_PATHS=["${EXTRA_LIB_PATHS} -L/opt/local/lib"]
+		EXTRA_INCLUDE_PATHS="-isystem /opt/local/include ${EXTRA_INCLUDE_PATHS}"
+		EXTRA_LIBRARY_PATHS=["${EXTRA_LIBRARY_PATHS} -L/opt/local/lib"]
 		LIB_EXT=["dylib"]
 	elif test ["x${HOST_OS_TYPE}"] = ["x"] -a -f [/etc/tizen-release] ; then
 		AC_DEFINE([__HOST_OS_TYPE_TIZEN__], [], [Your operating system is Tizen.])

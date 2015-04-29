@@ -56,7 +56,7 @@ YAAL_DETECT_COMMON_FLAGS
 
 dnl Now we can look for all needed libraries.
 
-CXXFLAGS=["${EXTRA_CXXFLAGS} ${CXXFLAGS} -I~/usr/include -I/usr/local/include"]
+CXXFLAGS=["-std=c++11 ${EXTRA_CXXFLAGS} ${CXXFLAGS} -I~/usr/include -I/usr/local/include"]
 LDFLAGS=["${EXTRA_LXXFLAGS} ${LDFLAGS} -L~/lib -L/usr/local/lib"]
 CPPFLAGS=["$CXXFLAGS"]
 AC_SEARCH_LIBS([libintl_gettext],[intl],,[AC_SEARCH_LIBS([gettext],[intl],,[AC_MSG_ERROR([Cannot continue without localization library.])])])
@@ -100,6 +100,8 @@ fi
 if test ["x${SAVED_CC}"] != ["x"] ; then
 	CC=["${SAVED_CC}"]
 fi
+AC_SUBST([EXTRA_INCLUDE_PATHS], [${EXTRA_INCLUDE_PATHS}])
+AC_SUBST([EXTRA_LIBRARY_PATHS], [${EXTRA_LIBRARY_PATHS}])
 AC_SUBST([EXTRA_CXXFLAGS],[${EXTRA_CXXFLAGS}])
 AC_SUBST([EXTRA_LXXFLAGS],[${EXTRA_LXXFLAGS}])
 AC_SUBST([EXTRA_COMPILER_DEBUG_FLAGS],[${EXTRA_COMPILER_DEBUG_FLAGS}])

@@ -110,7 +110,7 @@ YAAL_DETECT_COMMON_FLAGS
 
 YAAL_DETECT_FUNCTION_MACRO
 
-CXXFLAGS=["${EXTRA_CXXFLAGS}"]
+CXXFLAGS=["-std=c++11 ${EXTRA_CXXFLAGS} ${EXTRA_INCLUDE_PATHS}"]
 
 dnl Check for POD sizes.
 dnl We shall not pollute namespace with unnecessary macros.
@@ -178,12 +178,12 @@ if test ["${MYSQL}"] != ["no"] ; then
 	if test ["x${LIBS}"] = "x" ; then
 		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/local/lib/mysql"]
 		unset ac_cv_search_mysql_init
-		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIB_PATHS="${EXTRA_LIB_PATHS} -L/usr/local/lib/mysql"])
+		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/local/lib/mysql"])
 	fi
 	if test ["x${LIBS}"] = "x" ; then
 		CXXFLAGS=["${CXXFLAGS_ORIG} -L/usr/lib64/mysql/"]
 		unset ac_cv_search_mysql_init
-		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIB_PATHS="${EXTRA_LIB_PATHS} -L/usr/lib64/mysql/"])
+		AC_SEARCH_LIBS([mysql_init],[mysqlclient_r mysqlclient],[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L/usr/lib64/mysql/"])
 	fi
 	if test ["x${LIBS}"] = "x" ; then
 		if test ["${MYSQL}"] = ["yes"] ; then
@@ -206,7 +206,7 @@ fi
 if test ["${ORACLE}"] != ["no"] ; then
 	CXXFLAGS=["${CXXFLAGS} -L${ORACLE_HOME}/lib"]
 	AC_CHECK_LIB([clntsh],[OCIEnvCreate],
-								[EXTRA_LIB_PATHS="${EXTRA_LIB_PATHS} -L${ORACLE_HOME}/lib"],
+								[EXTRA_LIBRARY_PATHS="${EXTRA_LIBRARY_PATHS} -L${ORACLE_HOME}/lib"],
 								[if test ["${ORACLE}"] = ["yes"] ; then
 											AC_MSG_ERROR([Cannot continue without Oracle.])
 										fi;ORACLE=["no"]])
@@ -306,16 +306,8 @@ AC_MSG_RESULT([$RESULT])
 DEFAULT_DRIVER=["null"]
 
 AC_MSG_RESULT([--- Looking for needed headers ... ---                  [[77%]]])
-if test ["x${HOST_OS_TYPE}"] != ["xDarwin"] ; then
-	AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
-else
-	CXXFLAGS=["${CXXFLAGS} -isystem /opt/local/include"]
-	CPPFLAGS=["${CXXFLAGS}"]
-	AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
-	CXXFLAGS=["${CXXFLAGS_ORIG}"]
-	CPPFLAGS=["${CPPFLAGS_ORIG}"]
-	EXTRA_INCLUDE_PATHS="-isystem /opt/local/include ${EXTRA_INCLUDE_PATHS}"
-fi
+
+AC_CHECK_HEADERS([openssl/ssl.h],[],[AC_MSG_ERROR([Cannot continue without SSL development files.])])
 _CONSOLE_MOUSE=[""];
 CXXFLAGS=["${CXXFLAGS_ORIG} ${PCRE_CFLAGS}"]
 AC_CHECK_HEADERS([pcreposix.h], [
@@ -351,7 +343,7 @@ if test ["${ORACLE}"] != ["no"] ; then
 	AC_CHECK_HEADERS([oci.h],
 		[AC_SUBST([DO_ORACLE_DRIVER],["oracle"])
 		 AC_SUBST([ORACLE_SID],["${ORACLE_SID}"])
-			EXTRA_INCLUDE_PATHS=["${EXTRA_INCLUDE_PATHS} -I\$(ORACLE_HOME)/rdbms/public"]
+				EXTRA_INCLUDE_PATHS=["${EXTRA_INCLUDE_PATHS} -I\$(ORACLE_HOME)/rdbms/public"]
 			DEFAULT_DRIVER=["Oracle"]],
 				[if test ["${ORACLE}"] = ["yes"] ; then
 					AC_MSG_ERROR([[Cannot continue without Oracle devel(client)!]])
@@ -483,10 +475,8 @@ fi
 if test ["x${SAVED_CC}"] != ["x"] ; then
 	CC=["${SAVED_CC}"]
 fi
-AC_SUBST([EXTRA_LIB_PATHS], [${EXTRA_LIB_PATHS}])
 AC_SUBST([EXTRA_INCLUDE_PATHS], [${EXTRA_INCLUDE_PATHS}])
-AC_SUBST([DEFAULT_DRIVER], [${DEFAULT_DRIVER}])
-AC_SUBST([MYSQL_SOCKET],[${MYSQL_SOCKET}])
+AC_SUBST([EXTRA_LIBRARY_PATHS], [${EXTRA_LIBRARY_PATHS}])
 AC_SUBST([EXTRA_CXXFLAGS],[${EXTRA_CXXFLAGS}])
 AC_SUBST([EXTRA_LXXFLAGS],[${EXTRA_LXXFLAGS}])
 AC_SUBST([EXTRA_COMPILER_DEBUG_FLAGS],[${EXTRA_COMPILER_DEBUG_FLAGS}])
@@ -502,7 +492,9 @@ AC_SUBST([TOOLS_LIBS],[${TOOLS_LIBS}])
 AC_SUBST([HCONSOLE_LIBS],[${HCONSOLE_LIBS}])
 AC_SUBST([DO_TARGET],[${DO_TARGET}])
 AC_SUBST([VERSION],[YAAL_PACKAGE_VERSION])
+AC_SUBST([DEFAULT_DRIVER], [${DEFAULT_DRIVER}])
 AC_SUBST([MYSQLCLIENT_LIBRARY],[${MYSQLCLIENT_LIBRARY}])
+AC_SUBST([MYSQL_SOCKET],[${MYSQL_SOCKET}])
 AH_TOP([/* $Id$ */
 
 #ifndef YAAL_CONFIG_HXX_INCLUDED
