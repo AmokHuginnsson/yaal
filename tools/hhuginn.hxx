@@ -332,6 +332,7 @@ private:
 	yaal::hcore::HStreamInterface* _errorStreamRaw;
 public:
 	HHuginn( void );
+	virtual ~HHuginn( void );
 	/*! \brief Store source in internal buffer.
 	 *
 	 * \param  stream_ - stream that contains program source.

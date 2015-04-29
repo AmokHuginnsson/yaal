@@ -1481,6 +1481,12 @@ HHuginn::HHuginn( void )
 	M_EPILOG
 }
 
+HHuginn::~HHuginn( void ) {
+	M_PROLOG
+	return;
+	M_DESTRUCTOR_EPILOG
+}
+
 void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::EMPTY );
