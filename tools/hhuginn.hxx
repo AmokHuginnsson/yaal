@@ -508,30 +508,6 @@ public:
 		return;
 	}
 	type_t type( void ) const;
-	static value_t subscript( HExpression::SUBSCRIPT, value_t&, value_t const&, int );
-	static value_t range( value_t&, value_t const&, value_t const&, value_t const&, int );
-	static value_t add( value_t const&, value_t const&, int );
-	static value_t sub( value_t const&, value_t const&, int );
-	static value_t mul( value_t const&, value_t const&, int );
-	static value_t div( value_t const&, value_t const&, int );
-	static value_t mod( value_t const&, value_t const&, int );
-	static value_t pow( value_t const&, value_t const&, int );
-	static value_t abs( value_t const&, int );
-	static value_t neg( value_t const&, int );
-	static bool equals( value_t const&, value_t const&, int );
-	static bool less( value_t const&, value_t const&, int );
-	static bool less_low( value_t const&, value_t const& );
-	static bool greater( value_t const&, value_t const&, int );
-	static bool less_or_equal( value_t const&, value_t const&, int );
-	static bool greater_or_equal( value_t const&, value_t const&, int );
-	static value_t boolean_xor( value_t const&, value_t const&, int );
-	static value_t boolean_not( value_t const&, int );
-	static value_t string( value_t const&, int );
-	static value_t integer( value_t const&, int );
-	static value_t real( value_t const&, int );
-	static value_t boolean( value_t const&, int );
-	static value_t character( value_t const&, int );
-	static value_t number( value_t const&, int );
 private:
 	HValue( HValue const& ) = delete;
 	HValue& operator = ( HValue const& ) = delete;
