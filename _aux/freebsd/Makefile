@@ -90,8 +90,9 @@ pre-install:
 	${RM} $(STAGEDIR)/$(PREFIX)/lib/mkcache && \
 	echo "@name $(PORTNAME)-$(PORTVERSION)" > $(PLIST) && \
 	${CAT} pkg-plist.begin >> $(PLIST) && \
-	${FIND} $(STAGEDIR)/$(PREFIX) -type f -o -type l | ${SED} -e 's;$(STAGEDIR)/$(PREFIX)/;;' >> $(PLIST) && \
-	${FIND} -d $(STAGEDIR)/$(PREFIX)/share/doc/yaal -type d | ${SED} -e 's;$(STAGEDIR)/$(PREFIX)/;@dirrm ;' >> $(PLIST) && \
+	${FIND} $(STAGEDIR)/$(PREFIX) '(' -type f -o -type l ')' -perm -0100 | ${SED} -e 's;$(STAGEDIR)/$(PREFIX)/;@(,,0755) ;' >> $(PLIST) && \
+	${FIND} $(STAGEDIR)/$(PREFIX) '(' -type f -o -type l ')' '!' -perm +0111 | ${SED} -e 's;$(STAGEDIR)/$(PREFIX)/;@(,,0644) ;' >> $(PLIST) && \
+	${FIND} -d $(STAGEDIR)/$(PREFIX)/share/doc/yaal -type d | ${SED} -e 's;$(STAGEDIR)/$(PREFIX)/;@dir ;' >> $(PLIST) && \
 	${CAT} pkg-plist.end >> $(PLIST)
 
 do-install:
