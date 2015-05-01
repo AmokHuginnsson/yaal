@@ -34,6 +34,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hhuginn.hxx"
 #include "hcore/hfile.hxx"
 #include "tools/huginn/source.hxx"
+#include "tools/huginn/thread.hxx"
 #include "streamtools.hxx"
 
 using namespace yaal;
@@ -132,8 +133,6 @@ bool is_restricted( yaal::hcore::HString const& name_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t _none_ = make_pointer<HHuginn::HValue>( HHuginn::TYPE::NONE );
-
 namespace ERR_CODE {
 enum {
 	OP_NOT_SUM = 0,
@@ -161,6 +160,8 @@ char const* _errMsgHHuginn_[ 10 ] = {
 };
 
 }
+
+HHuginn::value_t _none_ = make_pointer<HHuginn::HValue>( HHuginn::TYPE::NONE );
 
 namespace value_builtin {
 HHuginn::value_t subscript( HHuginn::HExpression::SUBSCRIPT, HHuginn::value_t&, HHuginn::value_t const&, int );
@@ -1565,7 +1566,7 @@ bool HHuginn::execute( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::COMPILED );
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
-	threads_t::iterator t( _threads.insert( make_pair( threadId, make_pointer<HThread>( this, threadId ) ) ).first );
+	threads_t::iterator t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first );
 	values_t args;
 	if ( _argv->size() > 0 ) {
 		args.push_back( _argv );
@@ -1599,7 +1600,7 @@ HHuginn::value_t HHuginn::call( yaal::hcore::HString const& name_, values_t cons
 	M_EPILOG
 }
 
-HHuginn::HFrame* HHuginn::current_frame( void ) {
+huginn::HFrame* HHuginn::current_frame( void ) {
 	M_PROLOG
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	threads_t::iterator t( _threads.find( threadId ) );
@@ -1760,223 +1761,6 @@ void HHuginn::create_function( executing_parser::position_t position_ ) {
 	_compiler._functionContexts.pop();
 	return;
 	M_EPILOG
-}
-
-HHuginn::HThread::HThread( HHuginn* huginn_, yaal::hcore::HThread::id_t id_ )
-	: _frames(),
-	_id( id_ ),
-	_huginn( huginn_ ) {
-	return;
-}
-
-yaal::hcore::HThread::id_t HHuginn::HThread::id( void ) const {
-	return ( _id );
-}
-
-HHuginn::HFrame* HHuginn::HThread::current_frame( void ) {
-	M_PROLOG
-	return ( ! _frames.is_empty() ? _frames.top().raw() : nullptr );
-	M_EPILOG
-}
-
-HHuginn::HFrame const* HHuginn::HThread::current_frame( void ) const {
-	M_PROLOG
-	return ( ! _frames.is_empty() ? _frames.top().raw() : nullptr );
-	M_EPILOG
-}
-
-void HHuginn::HThread::create_function_frame( void ) {
-	M_PROLOG
-	HHuginn::HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, true, false ) );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::HThread::create_loop_frame( void ) {
-	M_PROLOG
-	HHuginn::HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, false, true ) );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::HThread::create_scope_frame( void ) {
-	M_PROLOG
-	HHuginn::HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, false, false ) );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::HThread::pop_frame( void ) {
-	M_PROLOG
-	_frames.pop();
-	return;
-	M_EPILOG
-}
-
-bool HHuginn::HThread::can_continue( void ) const {
-	M_PROLOG
-	M_ASSERT( current_frame() );
-	return ( current_frame()->can_continue() );
-	M_EPILOG
-}
-
-void HHuginn::HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& value_, int level_ ) {
-	M_PROLOG
-	M_ASSERT( ( state_ == HHuginn::HFrame::STATE::RETURN ) || ( state_ == HHuginn::HFrame::STATE::BREAK ) );
-	int level( 0 );
-	HFrame* f( current_frame() );
-	HFrame* target( f );
-	int no( f->number() );
-	while ( f ) {
-		f->break_execution( state_ );
-		target = f;
-		if ( f->is_loop() ) {
-			++ level;
-		}
-		f = f->parent();
-		if ( ! f ) {
-			break;
-		} else if ( f->number() != no ) {
-			break;
-		} else if ( ( state_ == HHuginn::HFrame::STATE::BREAK ) && ( level > level_ ) ) {
-			break;
-		}
-	}
-	if ( target ) {
-		target->set_result( value_ );
-	}
-	return;
-	M_EPILOG
-}
-
-HHuginn& HHuginn::HThread::huginn( void ) {
-	return ( *_huginn );
-}
-
-HHuginn::HFrame::HFrame( HThread* thread_, HFrame* parent_, bool bump_, bool loop_ )
-	: _thread( thread_ ),
-	_parent( parent_ ),
-	_variables(),
-	_operations(),
-	_values(),
-	_result( _none_ ),
-	_number( parent_ ? ( parent_->_number + ( bump_ ? 1 : 0 ) ) : 1 ),
-	_loop( loop_ ),
-	_state( STATE::NORMAL ) {
-	return;
-}
-
-HHuginn::HThread* HHuginn::HFrame::thread( void ) const {
-	return ( _thread );
-}
-
-int HHuginn::HFrame::number( void ) const {
-	return ( _number );
-}
-
-HHuginn::HFrame* HHuginn::HFrame::parent( void ) {
-	return ( _parent );
-}
-
-bool HHuginn::HFrame::is_loop( void ) const {
-	return ( _loop );
-}
-
-bool HHuginn::HFrame::can_continue( void ) const {
-	return ( _state == STATE::NORMAL );
-}
-
-void HHuginn::HFrame::break_execution( STATE state_ ) {
-	_state = state_;
-	return;
-}
-
-void HHuginn::HFrame::set_result( HHuginn::value_t const& result_ ) {
-	M_PROLOG
-	_result = result_;
-	return;
-	M_EPILOG
-}
-
-HHuginn::value_t HHuginn::HFrame::result( void ) const {
-	return ( _result );
-}
-
-void HHuginn::HFrame::reset( void ) {
-	M_PROLOG
-	_operations.clear();
-	_values.clear();
-	return;
-	M_EPILOG
-}
-
-HHuginn::value_t HHuginn::HFrame::try_reference( yaal::hcore::HString const& name_, int position_ ) {
-	M_PROLOG
-	variables_t::iterator it( _variables.find( name_ ) );
-	HHuginn::value_t v;
-	if ( it != _variables.end() ) {
-		v = it->second;
-	} else if ( _parent && ( _parent->_number == _number ) ) {
-		v = _parent->try_reference( name_, position_ );
-	} else {
-		HHuginn::function_t f( _thread->huginn().get_function( name_ ) );
-		if ( !! f ) {
-			v = make_pointer<HFunctionReference>( name_, f );
-		}
-	}
-	return ( v );
-	M_EPILOG
-}
-
-HHuginn::value_t HHuginn::HFrame::get_reference( yaal::hcore::HString const& name_, int position_ ) {
-	M_PROLOG
-	HHuginn::value_t v( try_reference( name_, position_ ) );
-	if ( ! v ) {
-		throw HHuginnRuntimeException( "Name `"_ys.append( name_ ).append( "' is not defined." ), position_ );
-	}
-	return ( v );
-	M_EPILOG
-}
-
-void HHuginn::HFrame::set_variable( yaal::hcore::HString const& name_, HHuginn::value_t const& value_, int position_ ) {
-	M_PROLOG
-	value_t ref( make_variable( name_, position_ ) );
-	static_cast<HReference*>( ref.raw() )->value() = value_;
-	return;
-	M_EPILOG
-}
-
-HHuginn::value_t HHuginn::HFrame::make_variable( yaal::hcore::HString const& name_, int ) {
-	M_PROLOG
-	HFrame* f( this );
-	variables_t::iterator it;
-	while ( f ) {
-		it = f->_variables.find( name_ );
-		if ( it != f->_variables.end() ) {
-			break;
-		}
-		if ( f->_parent && ( f->_parent->_number == _number ) ) {
-			f = f->_parent;
-		} else {
-			f = nullptr;
-		}
-	}
-	if ( ! f ) {
-		it = _variables.insert( make_pair( name_, _none_ ) ).first;
-	}
-	return ( make_pointer<HReference>( it->second ) );
-	M_EPILOG
-}
-
-HHuginn::operations_t& HHuginn::HFrame::operations( void ) {
-	return ( _operations );
-}
-
-HHuginn::HFrame::values_t& HHuginn::HFrame::values( void ) {
-	return ( _values );
 }
 
 HHuginn::HValue::HValue( type_t type_ )
@@ -2801,7 +2585,7 @@ HHuginn::HBooleanEvaluator::HBooleanEvaluator( expressions_t const& expressions_
 	return;
 }
 
-bool HHuginn::HBooleanEvaluator::execute( HThread* thread_ ) {
+bool HHuginn::HBooleanEvaluator::execute( huginn::HThread* thread_ ) {
 	M_PROLOG
 	bool all( true );
 	HFrame* f( thread_->current_frame() );
@@ -2836,7 +2620,7 @@ HHuginn::HTernaryEvaluator::HTernaryEvaluator(
 	return;
 }
 
-HHuginn::value_t HHuginn::HTernaryEvaluator::execute( HThread* thread_ ) {
+HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ ) {
 	M_PROLOG
 	_condition->execute( thread_ );
 	HFrame* f( thread_->current_frame() );
@@ -2857,7 +2641,7 @@ HHuginn::HStatement::HStatement( void ) {
 	return;
 }
 
-void HHuginn::HStatement::execute( HHuginn::HThread* thread_ ) const {
+void HHuginn::HStatement::execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	do_execute( thread_ );
 	return;
@@ -3440,7 +3224,7 @@ void HHuginn::HExpression::store_none( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HHuginn::HExpression::do_execute( HHuginn::HThread* thread_ ) const {
+void HHuginn::HExpression::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	HFrame* f( thread_->current_frame() );
 	for ( execution_step_t const& e : _executionSteps ) {
@@ -3467,7 +3251,7 @@ void HHuginn::HScope::add_statement( statement_t statement_ ) {
 	M_EPILOG
 }
 
-void HHuginn::HScope::do_execute( HHuginn::HThread* thread_ ) const {
+void HHuginn::HScope::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_scope_frame();
 	for ( HHuginn::statement_t const& s : _statements ) {
@@ -3488,12 +3272,12 @@ HHuginn::HReturn::HReturn( HHuginn::expression_t const& expression_ )
 	return;
 }
 
-void HHuginn::HReturn::do_execute( HHuginn::HThread* thread_ ) const {
+void HHuginn::HReturn::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	if ( !! _expression ) {
 		_expression->execute( thread_ );
 	}
-	thread_->break_execution( HHuginn::HFrame::STATE::RETURN, thread_->current_frame()->result() );
+	thread_->break_execution( huginn::HFrame::STATE::RETURN, thread_->current_frame()->result() );
 	return;
 	M_EPILOG
 }
@@ -3502,9 +3286,9 @@ HHuginn::HBreak::HBreak( void ) {
 	return;
 }
 
-void HHuginn::HBreak::do_execute( HHuginn::HThread* thread_ ) const {
+void HHuginn::HBreak::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->break_execution( HHuginn::HFrame::STATE::BREAK );
+	thread_->break_execution( huginn::HFrame::STATE::BREAK );
 	return;
 	M_EPILOG
 }
@@ -3518,7 +3302,7 @@ HHuginn::HIf::HIf(
 	return;
 }
 
-void HHuginn::HIf::do_execute( HHuginn::HThread* thread_ ) const {
+void HHuginn::HIf::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_scope_frame();
 	HFrame* f( thread_->current_frame() );
@@ -3556,7 +3340,7 @@ HHuginn::HSwitch::HSwitch(
 	return;
 }
 
-void HHuginn::HSwitch::do_execute( HHuginn::HThread* thread_ ) const {
+void HHuginn::HSwitch::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_loop_frame();
 	HFrame* f( thread_->current_frame() );
@@ -3602,7 +3386,7 @@ HHuginn::HWhile::HWhile( expression_t const& condition_, scope_t const& loop_ )
 	return;
 }
 
-void HHuginn::HWhile::do_execute( HHuginn::HThread* thread_ ) const {
+void HHuginn::HWhile::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_loop_frame();
 	HFrame* f( thread_->current_frame() );
@@ -3635,7 +3419,7 @@ HHuginn::HFor::HFor( yaal::hcore::HString const& variableName_,
 	return;
 }
 
-void HHuginn::HFor::do_execute( HHuginn::HThread* thread_ ) const {
+void HHuginn::HFor::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_loop_frame();
 	HFrame* f( thread_->current_frame() );
@@ -3670,7 +3454,7 @@ HHuginn::HFunction::HFunction( yaal::hcore::HString const& name_,
 	return;
 }
 
-HHuginn::value_t HHuginn::HFunction::execute( HThread* thread_, values_t const& values_, int position_ ) const {
+HHuginn::value_t HHuginn::HFunction::execute( huginn::HThread* thread_, values_t const& values_, int position_ ) const {
 	M_PROLOG
 	if ( values_.get_size() < ( _parameterNames.get_size() - _defaultValues.get_size() ) ) {
 		throw HHuginnRuntimeException(
@@ -3730,7 +3514,7 @@ HHuginn::function_t const& HHuginn::HFunctionReference::function( void ) const {
 
 namespace huginn_builtin {
 
-inline HHuginn::value_t convert( HHuginn::type_t toType_, HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t convert( HHuginn::type_t toType_, huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -3764,7 +3548,7 @@ inline HHuginn::value_t convert( HHuginn::type_t toType_, HHuginn::HThread*, HHu
 	M_EPILOG
 }
 
-inline HHuginn::value_t size( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t size( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -3793,7 +3577,7 @@ inline HHuginn::value_t size( HHuginn::HThread*, HHuginn::values_t const& values
 	M_EPILOG
 }
 
-inline HHuginn::value_t type( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t type( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException( ""_ys
@@ -3807,7 +3591,7 @@ inline HHuginn::value_t type( HHuginn::HThread*, HHuginn::values_t const& values
 	M_EPILOG
 }
 
-inline HHuginn::value_t list( HHuginn::HThread*, HHuginn::values_t const& values_, int ) {
+inline HHuginn::value_t list( huginn::HThread*, HHuginn::values_t const& values_, int ) {
 	M_PROLOG
 	HHuginn::value_t v( make_pointer<HHuginn::HList>() );
 	HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
@@ -3818,7 +3602,7 @@ inline HHuginn::value_t list( HHuginn::HThread*, HHuginn::values_t const& values
 	M_EPILOG
 }
 
-inline HHuginn::value_t map( HHuginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t map( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( ! values_.is_empty() ) {
 		throw HHuginn::HHuginnRuntimeException( ""_ys
@@ -3831,7 +3615,7 @@ inline HHuginn::value_t map( HHuginn::HThread*, HHuginn::values_t const& values_
 	M_EPILOG
 }
 
-inline HHuginn::value_t print( HHuginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t print( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException( ""_ys
@@ -3866,7 +3650,7 @@ inline HHuginn::value_t print( HHuginn::HThread* thread_, HHuginn::values_t cons
 	M_EPILOG
 }
 
-inline HHuginn::value_t input( HHuginn::HThread* thread_, HHuginn::values_t const&, int ) {
+inline HHuginn::value_t input( huginn::HThread* thread_, HHuginn::values_t const&, int ) {
 	M_PROLOG
 	yaal::hcore::HString l;
 	thread_->huginn().input_stream().read_until( l );
