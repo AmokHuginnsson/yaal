@@ -50,6 +50,23 @@ namespace huginn {
 class HSource;
 class HFrame;
 class HThread;
+class HExpression;
+
+namespace ERR_CODE {
+enum {
+	OP_NOT_SUM = 0,
+	OP_NOT_SUB,
+	OP_NOT_MUL,
+	OP_NOT_DIV,
+	OP_NOT_EXP,
+	OP_NOT_CMP,
+	OPS_NOT_BOOL,
+	OP_NOT_BOOL,
+	IDX_NOT_INT
+};
+}
+
+extern M_YAAL_TOOLS_PUBLIC_API char const* _errMsgHHuginn_[];
 
 }
 
@@ -117,10 +134,9 @@ public:
 	class HList;
 	typedef yaal::hcore::HPointer<HList> list_t;
 	class HMap;
-	class HExpression;
 	class HBooleanEvaluator;
 	class HTernaryEvaluator;
-	typedef yaal::hcore::HPointer<HExpression> expression_t;
+	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
 	class HErrorCoordinate;
 	typedef yaal::hcore::HArray<statement_t> statement_list_t;
 	typedef yaal::hcore::HArray<value_t> values_t;
@@ -185,7 +201,7 @@ public:
 	typedef yaal::hcore::HResource<huginn::HSource> source_t;
 private:
 	struct OCompiler {
-		typedef void ( HHuginn::HExpression::* expression_action_t ) ( huginn::HFrame*, int );
+		typedef void ( huginn::HExpression::* expression_action_t ) ( huginn::HFrame*, int );
 		typedef yaal::hcore::HArray<yaal::hcore::HString> parameter_names_t;
 		typedef yaal::hcore::HArray<expression_t> expressions_t;
 		typedef yaal::hcore::HStack<expressions_t> expressions_stack_t;
@@ -418,67 +434,6 @@ public:
 	HHuginnRuntimeException( yaal::hcore::HString const&, int );
 	yaal::hcore::HString const& message( void ) const;
 	int position( void ) const;
-};
-
-class HHuginn::HExpression : public huginn::HStatement {
-public:
-	typedef HHuginn::HExpression this_type;
-	typedef huginn::HStatement base_type;
-	enum class SUBSCRIPT {
-		VALUE,
-		REFERENCE
-	};
-private:
-	typedef yaal::hcore::HBoundCall<void ( huginn::HFrame* )> execution_step_t;
-	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
-	execution_steps_t _executionSteps;
-	int _position;
-public:
-	HExpression( int = 0 );
-	int position( void ) const;
-	void set_position( int );
-	void add_execution_step( execution_step_t const& );
-	void pop_execution_step( void );
-	void merge( HExpression& );
-	void oper( OPERATOR, huginn::HFrame*, int );
-	void close_parenthesis( huginn::HFrame*, int );
-	void plus( huginn::HFrame*, int );
-	void minus( huginn::HFrame*, int );
-	void mul( huginn::HFrame*, int );
-	void div( huginn::HFrame*, int );
-	void mod( huginn::HFrame*, int );
-	void negate( huginn::HFrame*, int );
-	void function_call( huginn::HFrame*, int );
-	void make_map( huginn::HFrame*, int );
-	void get_reference( yaal::hcore::HString const&, huginn::HFrame*, int );
-	void make_variable( yaal::hcore::HString const&, huginn::HFrame*, int );
-	void set_variable( huginn::HFrame*, int );
-	void subscript( SUBSCRIPT, huginn::HFrame*, int );
-	void power( huginn::HFrame*, int );
-	void equals( huginn::HFrame*, int );
-	void not_equals( huginn::HFrame*, int );
-	void less( huginn::HFrame*, int );
-	void greater( huginn::HFrame*, int );
-	void less_or_equal( huginn::HFrame*, int );
-	void greater_or_equal( huginn::HFrame*, int );
-	void boolean_and( huginn::HFrame*, int );
-	void boolean_or( huginn::HFrame*, int );
-	void boolean_xor( huginn::HFrame*, int );
-	void boolean_not( huginn::HFrame*, int );
-	void ternary( huginn::HFrame*, int );
-	void store_direct( value_t const&, huginn::HFrame*, int );
-	void store_real( double long, huginn::HFrame*, int );
-	void store_integer( int long long, huginn::HFrame*, int );
-	void store_string( yaal::hcore::HString const&, huginn::HFrame*, int );
-	void store_number( yaal::hcore::HString const&, huginn::HFrame*, int );
-	void store_character( char, huginn::HFrame*, int );
-	void store_boolean( bool, huginn::HFrame*, int );
-	void store_none( huginn::HFrame*, int );
-protected:
-	virtual void do_execute( huginn::HThread* ) const override;
-private:
-	HExpression( HExpression const& ) = delete;
-	HExpression& operator = ( HExpression const& ) = delete;
 };
 
 class HHuginn::HValue {
