@@ -39,6 +39,7 @@ Copyright:
 #include "hcore/hthread.hxx"
 #include "hcore/htaggedpod.hxx"
 #include "tools/executingparser.hxx"
+#include "tools/huginn/statement.hxx"
 
 namespace yaal {
 
@@ -90,8 +91,7 @@ public:
 	typedef yaal::hcore::HPointer<HHuginn> ptr_t;
 	class HIterable;
 	typedef yaal::hcore::HPointer<HIterable> iterable_t;
-	class HStatement;
-	typedef yaal::hcore::HPointer<HStatement> statement_t;
+	typedef yaal::hcore::HPointer<huginn::HStatement> statement_t;
 	class HScope;
 	typedef yaal::hcore::HPointer<HScope> scope_t;
 	class HIf;
@@ -420,23 +420,10 @@ public:
 	int position( void ) const;
 };
 
-class HHuginn::HStatement {
-public:
-	typedef HHuginn::HStatement this_type;
-public:
-	HStatement( void );
-	virtual ~HStatement( void ) {
-		return;
-	}
-	void execute( huginn::HThread* ) const;
-protected:
-	virtual void do_execute( huginn::HThread* ) const {}
-};
-
-class HHuginn::HExpression : public HHuginn::HStatement {
+class HHuginn::HExpression : public huginn::HStatement {
 public:
 	typedef HHuginn::HExpression this_type;
-	typedef HHuginn::HStatement base_type;
+	typedef huginn::HStatement base_type;
 	enum class SUBSCRIPT {
 		VALUE,
 		REFERENCE
@@ -692,10 +679,10 @@ private:
 	HMap& operator = ( HMap const& ) = delete;
 };
 
-class HHuginn::HScope : public HHuginn::HStatement {
+class HHuginn::HScope : public huginn::HStatement {
 public:
 	typedef HHuginn::HScope this_type;
-	typedef HHuginn::HStatement base_type;
+	typedef huginn::HStatement base_type;
 private:
 	HHuginn::statement_list_t _statements;
 public:
@@ -712,10 +699,10 @@ private:
 	HScope& operator = ( HScope const& ) = delete;
 };
 
-class HHuginn::HReturn : public HHuginn::HStatement {
+class HHuginn::HReturn : public huginn::HStatement {
 public:
 	typedef HHuginn::HReturn this_type;
-	typedef HHuginn::HStatement base_type;
+	typedef huginn::HStatement base_type;
 private:
 	expression_t _expression;
 public:
@@ -727,10 +714,10 @@ private:
 	HReturn& operator = ( HReturn const& ) = delete;
 };
 
-class HHuginn::HBreak : public HHuginn::HStatement {
+class HHuginn::HBreak : public huginn::HStatement {
 public:
 	typedef HHuginn::HBreak this_type;
-	typedef HHuginn::HStatement base_type;
+	typedef huginn::HStatement base_type;
 public:
 	HBreak( void );
 protected:
@@ -740,10 +727,10 @@ private:
 	HBreak& operator = ( HBreak const& ) = delete;
 };
 
-class HHuginn::HIf : public HHuginn::HStatement {
+class HHuginn::HIf : public huginn::HStatement {
 public:
 	typedef HHuginn::HIf this_type;
-	typedef HHuginn::HStatement base_type;
+	typedef huginn::HStatement base_type;
 	typedef HHuginn::OCompiler::OCompilationFrame::contexts_t if_clauses_t;
 private:
 	if_clauses_t _ifClauses;
@@ -754,10 +741,10 @@ protected:
 	virtual void do_execute( huginn::HThread* ) const override;
 };
 
-class HHuginn::HSwitch : public HHuginn::HStatement {
+class HHuginn::HSwitch : public huginn::HStatement {
 public:
 	typedef HHuginn::HSwitch this_type;
-	typedef HHuginn::HStatement base_type;
+	typedef huginn::HStatement base_type;
 	typedef HHuginn::OCompiler::OCompilationFrame::contexts_t cases_t;
 private:
 	expression_t _expression;
@@ -769,10 +756,10 @@ protected:
 	virtual void do_execute( huginn::HThread* ) const override;
 };
 
-class HHuginn::HWhile : public HHuginn::HStatement {
+class HHuginn::HWhile : public huginn::HStatement {
 public:
 	typedef HHuginn::HWhile this_type;
-	typedef HHuginn::HStatement base_type;
+	typedef huginn::HStatement base_type;
 private:
 	expression_t _condition;
 	scope_t _loop;
@@ -782,10 +769,10 @@ protected:
 	virtual void do_execute( huginn::HThread* ) const override;
 };
 
-class HHuginn::HFor : public HHuginn::HStatement {
+class HHuginn::HFor : public huginn::HStatement {
 public:
 	typedef HHuginn::HFor this_type;
-	typedef HHuginn::HStatement base_type;
+	typedef huginn::HStatement base_type;
 private:
 	yaal::hcore::HString _variableName;
 	expression_t _source;

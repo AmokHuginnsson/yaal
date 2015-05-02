@@ -2637,17 +2637,6 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 	M_EPILOG
 }
 
-HHuginn::HStatement::HStatement( void ) {
-	return;
-}
-
-void HHuginn::HStatement::execute( huginn::HThread* thread_ ) const {
-	M_PROLOG
-	do_execute( thread_ );
-	return;
-	M_EPILOG
-}
-
 HHuginn::HExpression::HExpression( int position_ )
 	: HStatement(),
 	_executionSteps(),
