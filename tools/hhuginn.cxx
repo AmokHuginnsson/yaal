@@ -36,6 +36,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/expression.hxx"
 #include "tools/huginn/value_builtin.hxx"
+#include "tools/huginn/scope.hxx"
 #include "streamtools.hxx"
 
 using namespace yaal;
@@ -819,7 +820,7 @@ void HHuginn::OCompiler::add_if_statement( executing_parser::position_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._compilationStack.is_empty() );
-	statement_t ifStatement( make_pointer<HIf>( fc._compilationStack.top()._contextsChain, fc._compilationStack.top()._else ) );
+	HScope::statement_t ifStatement( make_pointer<HIf>( fc._compilationStack.top()._contextsChain, fc._compilationStack.top()._else ) );
 	fc._compilationStack.top()._contextsChain.clear();
 	fc._compilationStack.top()._else.reset();
 	current_scope()->add_statement( ifStatement );
@@ -835,7 +836,7 @@ void HHuginn::OCompiler::add_switch_statement( executing_parser::position_t ) {
 	OCompilationFrame::contexts_t contexts( yaal::move( fc._compilationStack.top()._contextsChain ) );
 	scope_t Default( fc._compilationStack.top()._else );
 	fc._compilationStack.pop();
-	statement_t switchStatement(
+	HScope::statement_t switchStatement(
 		make_pointer<HSwitch>(
 			current_expression(),
 			contexts,
@@ -2079,34 +2080,6 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 		_ifFalse->execute( thread_ );
 	}
 	return ( f->result() );
-	M_EPILOG
-}
-
-HHuginn::HScope::HScope( void )
-	: _statements() {
-	return;
-}
-
-void HHuginn::HScope::add_statement( statement_t statement_ ) {
-	M_PROLOG
-	_statements.emplace_back( statement_ );
-	return;
-	M_EPILOG
-}
-
-void HHuginn::HScope::do_execute( huginn::HThread* thread_ ) const {
-	M_PROLOG
-	thread_->create_scope_frame();
-	for ( HHuginn::statement_t const& s : _statements ) {
-		s->execute( thread_ );
-		M_ASSERT( thread_->current_frame()->values().is_empty() );
-		M_ASSERT( thread_->current_frame()->operations().is_empty() );
-		if ( ! thread_->can_continue() ) {
-			break;
-		}
-	}
-	thread_->pop_frame();
-	return;
 	M_EPILOG
 }
 

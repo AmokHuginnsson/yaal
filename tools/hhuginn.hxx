@@ -51,6 +51,7 @@ class HSource;
 class HFrame;
 class HThread;
 class HExpression;
+class HScope;
 
 namespace ERR_CODE {
 enum {
@@ -108,9 +109,7 @@ public:
 	typedef yaal::hcore::HPointer<HHuginn> ptr_t;
 	class HIterable;
 	typedef yaal::hcore::HPointer<HIterable> iterable_t;
-	typedef yaal::hcore::HPointer<huginn::HStatement> statement_t;
-	class HScope;
-	typedef yaal::hcore::HPointer<HScope> scope_t;
+	typedef yaal::hcore::HPointer<huginn::HScope> scope_t;
 	class HIf;
 	class HWhile;
 	class HFor;
@@ -138,7 +137,6 @@ public:
 	class HTernaryEvaluator;
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
 	class HErrorCoordinate;
-	typedef yaal::hcore::HArray<statement_t> statement_list_t;
 	typedef yaal::hcore::HArray<value_t> values_t;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
 	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, values_t const&, int )> function_t;
@@ -632,26 +630,6 @@ private:
 	void verify_key_type( HHuginn::type_t, int );
 	HMap( HMap const& ) = delete;
 	HMap& operator = ( HMap const& ) = delete;
-};
-
-class HHuginn::HScope : public huginn::HStatement {
-public:
-	typedef HHuginn::HScope this_type;
-	typedef huginn::HStatement base_type;
-private:
-	HHuginn::statement_list_t _statements;
-public:
-	HScope( void );
-	virtual ~HScope( void ) {
-		return;
-	}
-	void add_statement( statement_t );
-protected:
-	virtual void do_execute( huginn::HThread* ) const override;
-private:
-	HScope( HScope const& ) = delete;
-	HScope( HScope&& ) = delete;
-	HScope& operator = ( HScope const& ) = delete;
 };
 
 class HHuginn::HReturn : public huginn::HStatement {
