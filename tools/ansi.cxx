@@ -39,6 +39,7 @@ namespace yaal {
 namespace ansi {
 
 HSequence const bold( "\033[1m" );
+HSequence const underline( "\033[4m" );
 HSequence const reset( "\033[0m" );
 HSequence const black( "\033[0;30m" );
 HSequence const red( "\033[0;31m" );

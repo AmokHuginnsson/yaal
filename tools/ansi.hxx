@@ -51,6 +51,7 @@ private:
 };
 
 extern M_YAAL_TOOLS_PUBLIC_API HSequence const bold;
+extern M_YAAL_TOOLS_PUBLIC_API HSequence const underline;
 extern M_YAAL_TOOLS_PUBLIC_API HSequence const reset;
 extern M_YAAL_TOOLS_PUBLIC_API HSequence const black;
 extern M_YAAL_TOOLS_PUBLIC_API HSequence const red;

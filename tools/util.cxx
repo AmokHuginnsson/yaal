@@ -38,6 +38,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hexpression.hxx"
 #include "hcore/hlog.hxx"
 #include "xmath.hxx"
+#include "ansi.hxx"
 #include "hcore/hrandomizer.hxx"
 #include "hterminal.hxx"
 
@@ -96,12 +97,42 @@ void show_help( void* arg ) {
 	M_PROLOG
 	errno = 0;
 	OOptionInfo& info = *static_cast<OOptionInfo*>( arg );
+	HString name;
+	if ( is_a_tty( stdout ) ) {
+		name.append( *ansi::bold );
+	}
+	name.append( info._name );
+	if ( is_a_tty( stdout ) ) {
+		name.append( *ansi::reset );
+	}
+	HString syntax( info._syntax ? info._syntax : "" );
+	if ( syntax.is_empty() ) {
+		syntax.append( "[" );
+		if ( is_a_tty( stdout ) ) {
+			syntax.append( *ansi::underline );
+		}
+		syntax.append( "OPTION" );
+		if ( is_a_tty( stdout ) ) {
+			syntax.append( *ansi::reset );
+		}
+		syntax.append( "]... [" );
+		if ( is_a_tty( stdout ) ) {
+			syntax.append( *ansi::underline );
+		}
+		syntax.append( "FILE" );
+		if ( is_a_tty( stdout ) ) {
+			syntax.append( *ansi::reset );
+		}
+		syntax.append( "]..." );
+	}
 	::printf(
 "Usage: %s %s\n"
 "%s - %s\n\n"
 "Mandatory arguments to long options are mandatory for short options too.\n"
 "Options:\n",
-			info._name, info._syntax ? info._syntax : "[OPTION]... [FILE]...", info._name, info._intro );
+			name.c_str(), syntax.c_str(),
+			name.c_str(), info._intro
+	);
 	int longestLongLength( 0 );
 	int longestShortLength( 0 );
 	HProgramOptionsHandler::options_t const& opts( info._opt.get_options() );
@@ -133,16 +164,24 @@ void show_help( void* arg ) {
 	columns = xmath::clip( 80, columns, 128 );
 	int cols( columns - ( longestLongLength + longestShortLength + 2 + 2 + 2 ) );
 	/* display each option description */
-	int const COUNT = static_cast<int>( opts.size() );
+	int const COUNT( static_cast<int>( opts.size() ) );
 	for ( int i( 0 ); i < COUNT; ++ i ) {
 		HProgramOptionsHandler::OOption const& o = opts[ i ];
 		if ( ! ( is_byte( o._shortForm ) || o._name ) )
 			continue;
 		HString sf;
+		int extraSFL( 0 );
 		/* if short form char exist, build full form of short form */
 		if ( is_byte( o._shortForm ) ) {
-			sf = "-";
-			sf += static_cast<char>( o._shortForm );
+			if ( is_a_tty( stdout ) ) {
+				sf.append( *ansi::bold );
+			}
+			sf.append( "-" );
+			sf.append( static_cast<char>( o._shortForm ) );
+			if ( is_a_tty( stdout ) ) {
+				sf.append( *ansi::reset );
+				extraSFL = static_cast<int>( strlen( *ansi::bold ) + strlen( *ansi::reset ) );
+			}
 		}
 		char const* comma( is_byte( o._shortForm ) && o._name ? "," : " " );
 		if ( ! description ) {
@@ -150,33 +189,57 @@ void show_help( void* arg ) {
 		}
 		/* if long form word exist, build full form of long form */
 		HString lf;
+		int extraLFL( 0 );
 		if ( o._name ) {
-			lf = "--";
-			lf += o._name;
+			if ( is_a_tty( stdout ) ) {
+				lf.append( *ansi::bold );
+			}
+			lf.append( "--" );
+			lf.append( o._name );
+			if ( is_a_tty( stdout ) ) {
+				lf.append( *ansi::reset );
+				extraLFL = static_cast<int>( strlen( *ansi::bold ) + strlen( *ansi::reset ) );
+			}
 		}
 		if ( o._argument ) {
-			if ( o._switchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL )
-				lf += "[";
-			( lf += "=" ) += o._argument;
-			if ( o._switchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL )
-				lf += "]";
+			if ( o._switchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL ) {
+				lf.append( "[" );
+			}
+			lf.append( "=" );
+			if ( is_a_tty( stdout ) ) {
+				lf.append( *ansi::underline );
+			}
+			lf.append( o._argument );
+			if ( is_a_tty( stdout ) ) {
+				lf.append( *ansi::reset );
+				extraLFL += static_cast<int>( strlen( *ansi::underline ) + strlen( *ansi::reset ) );
+			}
+			if ( o._switchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL ) {
+				lf.append( "]" );
+			}
 		}
 		if ( i > 0 ) /* subsequent options */ {
 			HProgramOptionsHandler::OOption const& p = opts[ i - 1 ];
 			if ( o._name && p._name && ( ! ::strcmp( o._name, p._name ) ) ) {
-				lf = "", comma = " ";
-				if ( description == o._description )
+				lf.clear();
+				extraLFL = 0;
+				comma = " ";
+				if ( description == o._description ) {
 					description = "";
+				}
 			}
 			if ( is_byte( o._shortForm ) && is_byte( p._shortForm ) && (  o._shortForm == p._shortForm ) ) {
-				sf = "", comma = " ";
-				if ( description == o._description )
+				sf.clear();
+				extraSFL = 0;
+				comma = " ";
+				if ( description == o._description ) {
 					description = "";
+				}
 			}
 		}
 		printf( "  %*s%s %-*s  ",
-				static_cast<int>( longestShortLength ), sf.raw() ? sf.raw() : "", comma,
-				static_cast<int>( longestLongLength ), lf.raw() ? lf.raw() : "" );
+				static_cast<int>( longestShortLength + extraSFL ), sf.raw() ? sf.raw() : "", comma,
+				static_cast<int>( longestLongLength + extraLFL ), lf.raw() ? lf.raw() : "" );
 		/* + 2 for two prefixing spaces, + 2 for 2 spaces separating options from descriptions, + 2 for comma and space */
 		desc = description;
 		bool loop( true );
