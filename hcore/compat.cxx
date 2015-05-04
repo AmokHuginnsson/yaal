@@ -165,7 +165,6 @@ class HDarwinTimer {
 	yaal::hcore::HCondition _cond;
 	int _sigNo;
 	itimerspec _timerSpec;
-	bool _reset;
 	bool _loop;
 public:
 	HDarwinTimer( int sigNo_ )
@@ -174,13 +173,11 @@ public:
 		, _cond( _mutex )
 		, _sigNo( sigNo_ )
 		, _timerSpec()
-		, _reset( false )
 		, _loop( false ) {
 	}
 	virtual ~HDarwinTimer( void ) {
 		yaal::hcore::HLock l( _mutex );
 		_loop = false;
-		_reset = true;
 		_cond.signal();
 		l.unlock();
 		_thread.finish();
@@ -189,40 +186,48 @@ public:
 		yaal::hcore::HLock l( _mutex );
 		_timerSpec = *timerSpec_;
 		if ( ! _loop ) {
+			_loop = true;
 			_thread.spawn( yaal::hcore::call( &HDarwinTimer::wait, this ) );
 		} else {
-			_reset = true;
 			_cond.signal();
 		}
 	}
 	void wait( void ) {
 		yaal::hcore::HLock l( _mutex );
-		_loop = true;
 		while ( _loop ) {
-			_cond.wait_for(
-				duration(
-					_timerSpec.it_value.tv_sec * yaal::hcore::si::NANO_IN_WHOLE +  _timerSpec.it_value.tv_nsec,
-					yaal::hcore::time::UNIT::NANOSECOND
+			yaal::hcore::HCondition::status_t status(
+				_cond.wait_for(
+					duration(
+						_timerSpec.it_value.tv_sec * yaal::hcore::si::NANO_IN_WHOLE + _timerSpec.it_value.tv_nsec,
+						yaal::hcore::time::UNIT::NANOSECOND
+					)
 				)
 			);
-			if ( ! _reset ) {
+			if ( status == yaal::hcore::HCondition::TIMEOUT ) {
 				::kill( getpid(), _sigNo );
+				break;
 			}
-			_reset = false;
 		}
-		_loop = false;
 	}
 };
 int timer_create( clockid_t, struct sigevent* event_, timer_t* timer_ ) {
 	int err( event_->sigev_notify == SIGEV_SIGNAL ? 0 : -1 );
 	if ( !err ) {
 		*timer_ = new HDarwinTimer( event_->sigev_signo );
+	} else {
+		errno = EINVAL;
 	}
 	return ( err );
 }
-int timer_settime( timer_t timer_, int, itimerspec const* timerSpec_, itimerspec* ) {
-	timer_->set_time( timerSpec_ );
-	return ( 0 );
+int timer_settime( timer_t timer_, int flags_, itimerspec const* timerSpec_, itimerspec* ) {
+	int err( 0 );
+	if ( ( flags_ == 0 ) && ( timerSpec_->it_interval.tv_sec == 0 ) && ( timerSpec_->it_interval.tv_nsec == 0 ) ) {
+		timer_->set_time( timerSpec_ );
+	} else {
+		err = -1;
+		errno = EINVAL;
+	}
+	return ( err );
 }
 int timer_delete( timer_t timer_ ) {
 	delete timer_;

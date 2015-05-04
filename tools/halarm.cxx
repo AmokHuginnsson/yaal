@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "halarm.hxx"
 #include "hcore/numeric.hxx"
+#include "hcore/si.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::meta;
@@ -54,9 +55,6 @@ yaal::hcore::HMutex HAlarm::_mutex;
 HAlarm::HAlarm( int long miliseconds_ )
 	: _timer( -1 ), _lock( _mutex ) {
 	M_PROLOG
-	static int long const MILI_IN_WHOLE = power<10, 3>::value;
-	static int long const NANO_IN_MILI = power<10, 6>::value;
-
 	sigevent event;
 	::memset( &event, 0, sizeof ( event ) );
 	event.sigev_notify = SIGEV_SIGNAL;
@@ -75,13 +73,14 @@ HAlarm::HAlarm( int long miliseconds_ )
 
 		itimerspec timeout;
 		::memset( &timeout, 0, sizeof ( timeout ) );
-		timeout.it_value.tv_sec = miliseconds_ / MILI_IN_WHOLE;
-		timeout.it_value.tv_nsec = ( miliseconds_ % MILI_IN_WHOLE ) * NANO_IN_MILI;
+		timeout.it_value.tv_sec = miliseconds_ / si::MILI_IN_WHOLE;
+		timeout.it_value.tv_nsec = ( miliseconds_ % si::MILI_IN_WHOLE ) * si::NANO_IN_MILI;
 		M_ENSURE( timer_settime( *t, 0, &timeout, NULL ) == 0 );
 		++ step;
 	} catch ( ... ) {
-		if ( step > 0 )
+		if ( step > 0 ) {
 			cleanup_sigmask();
+		}
 		M_ENSURE( timer_delete( *t ) == 0 );
 		throw;
 	}
