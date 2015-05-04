@@ -32,6 +32,7 @@ Copyright:
 #include "hcore/harray.hxx"
 #include "hcore/hboundcall.hxx"
 #include "tools/huginn/statement.hxx"
+#include "tools/huginn/operator.hxx"
 #include "tools/hhuginn.hxx"
 
 namespace yaal {
@@ -63,7 +64,7 @@ public:
 	void add_execution_step( execution_step_t const& );
 	void pop_execution_step( void );
 	void merge( HExpression& );
-	void oper( HHuginn::OPERATOR, huginn::HFrame*, int );
+	void oper( OPERATOR, huginn::HFrame*, int );
 	void close_parenthesis( huginn::HFrame*, int );
 	void plus( huginn::HFrame*, int );
 	void minus( huginn::HFrame*, int );

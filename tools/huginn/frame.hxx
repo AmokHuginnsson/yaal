@@ -30,6 +30,7 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_FRAME_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
+#include "tools/huginn/operator.hxx"
 
 namespace yaal {
 
@@ -55,7 +56,7 @@ private:
 	HThread* _thread;
 	HFrame* const _parent;
 	variables_t _variables;
-	HHuginn::operations_t _operations;
+	operations_t _operations;
 	values_t _values;
 	HHuginn::value_t _result;
 	int const _number;
@@ -75,7 +76,7 @@ public:
 	bool is_loop( void ) const;
 	HHuginn::value_t result( void ) const;
 	void set_result( HHuginn::value_t const& );
-	HHuginn::operations_t& operations( void );
+	operations_t& operations( void );
 	values_t& values( void );
 	void reset( void );
 private:

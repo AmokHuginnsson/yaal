@@ -52,6 +52,7 @@ class HFrame;
 class HThread;
 class HExpression;
 class HScope;
+struct OCompiler;
 
 namespace ERR_CODE {
 enum {
@@ -142,35 +143,6 @@ public:
 	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, values_t const&, int )> function_t;
 	typedef yaal::hcore::HPointer<huginn::HThread> thread_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
-	enum class OPERATOR {
-		PLUS,
-		MINUS,
-		MULTIPLY,
-		DIVIDE,
-		MODULO,
-		POWER,
-		ABSOLUTE,
-		PARENTHESIS,
-		ASSIGN,
-		SUBSCRIPT,
-		SUBSCRIPT_ARGUMENT,
-		NEGATE,
-		FUNCTION_CALL,
-		FUNCTION_ARGUMENT,
-		EQUALS,
-		NOT_EQUALS,
-		LESS,
-		GREATER,
-		LESS_OR_EQUAL,
-		GREATER_OR_EQUAL,
-		BOOLEAN_AND,
-		BOOLEAN_OR,
-		BOOLEAN_XOR,
-		BOOLEAN_NOT,
-		TERNARY,
-		MAKE_MAP,
-		NONE
-	};
 	struct TYPE {
 		static type_t const NONE;
 		static type_t const BOOLEAN;
@@ -186,132 +158,10 @@ public:
 		static type_t const UNKNOWN;
 		static type_t const NOT_BOOLEAN;
 	};
-	struct OPositionedOperator {
-		OPERATOR _operator;
-		int _position;
-		OPositionedOperator( OPERATOR operator_, int position_ )
-			: _operator( operator_ ), _position( position_ ) {
-			return;
-		}
-	};
-	typedef yaal::hcore::HStack<OPositionedOperator> operations_t;
 	class HHuginnRuntimeException;
 	typedef yaal::hcore::HResource<huginn::HSource> source_t;
+	typedef yaal::hcore::HResource<huginn::OCompiler> compiler_t;
 private:
-	struct OCompiler {
-		typedef void ( huginn::HExpression::* expression_action_t ) ( huginn::HFrame*, int );
-		typedef yaal::hcore::HArray<yaal::hcore::HString> parameter_names_t;
-		typedef yaal::hcore::HArray<expression_t> expressions_t;
-		typedef yaal::hcore::HStack<expressions_t> expressions_stack_t;
-		struct OScopeContext {
-			HHuginn* _huginn;
-			scope_t _scope;
-			expressions_stack_t _expressionsStack;
-			OScopeContext( HHuginn* );
-			OScopeContext( HHuginn*, scope_t const&, expression_t const& );
-			expression_t const& expression( void ) const;
-			expression_t& expression( void );
-			void clear( void );
-			OScopeContext( OScopeContext const& ) = default;
-			OScopeContext& operator = ( OScopeContext const& ) = default;
-		};
-		struct OCompilationFrame {
-			typedef yaal::hcore::HArray<OScopeContext> contexts_t;
-			OScopeContext _context;
-			contexts_t _contextsChain;
-			scope_t _else;
-			yaal::hcore::HString _forIdentifier;
-			int _forPosition;
-			OCompilationFrame( HHuginn* );
-			void clear( void );
-		};
-		struct OFunctionContext {
-			typedef yaal::hcore::HStack<OCompilationFrame> compilation_stack_t;
-			typedef yaal::hcore::HStack<type_t> type_stack_t;
-			yaal::hcore::HString _functionName;
-			parameter_names_t _parameters;
-			expressions_t _defaultValues;
-			int _lastDefaultValuePosition;
-			compilation_stack_t _compilationStack;
-			operations_t _operations;
-			type_stack_t _valueTypes;
-			OPERATOR _lastDereferenceOperator;
-			OFunctionContext( HHuginn* );
-		};
-		typedef yaal::hcore::HStack<OFunctionContext> function_contexts_t;
-		function_contexts_t _functionContexts;
-		HHuginn* _huginn;
-		OCompiler( HHuginn* );
-		OFunctionContext& f( void );
-		void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
-		void set_lambda_name( executing_parser::position_t );
-		function_t create_function( executing_parser::position_t );
-		void create_lambda( executing_parser::position_t );
-		void set_for_identifier( yaal::hcore::HString const&, executing_parser::position_t );
-		void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
-		void verify_default_argument( executing_parser::position_t );
-		static bool is_numeric( type_t );
-		static bool is_numeric_congruent( type_t );
-		static bool is_summable( type_t );
-		static bool is_comparable( type_t );
-		static bool is_comparable_congruent( type_t );
-		static bool is_boolean_congruent( type_t );
-		static bool is_unknown( type_t );
-		static bool is_reference_congruent( type_t );
-		static bool is_integer_congruent( type_t );
-		static bool are_congruous( type_t, type_t );
-		static type_t congruent( type_t, type_t );
-		scope_t& current_scope( void );
-		expression_t& current_expression( void );
-		void reset_expression( void );
-		void start_subexpression( executing_parser::position_t );
-		void add_subexpression( OPERATOR, executing_parser::position_t );
-		void commit_boolean( OPERATOR, executing_parser::position_t );
-		void commit_ternary( executing_parser::position_t );
-		void create_scope( executing_parser::position_t );
-		void commit_scope( executing_parser::position_t );
-		void commit_if_clause( executing_parser::position_t );
-		void commit_else_clause( executing_parser::position_t );
-		void add_return_statement( executing_parser::position_t );
-		void add_break_statement( executing_parser::position_t );
-		void add_while_statement( executing_parser::position_t );
-		void add_for_statement( executing_parser::position_t );
-		void add_if_statement( executing_parser::position_t );
-		void add_switch_statement( executing_parser::position_t );
-		void add_default_value( executing_parser::position_t );
-		void commit_expression( executing_parser::position_t );
-		void mark_expression_position( executing_parser::position_t );
-		void make_reference( executing_parser::position_t );
-		void defer_get_reference( yaal::hcore::HString const&, executing_parser::position_t );
-		void defer_make_variable( yaal::hcore::HString const&, executing_parser::position_t );
-		void defer_oper( char, executing_parser::position_t );
-		void defer_str_oper( yaal::hcore::HString const&, executing_parser::position_t );
-		void defer_oper_direct( OPERATOR, executing_parser::position_t );
-		void dispatch_action( OPERATOR, executing_parser::position_t );
-		void dispatch_plus( executing_parser::position_t );
-		void dispatch_mul( executing_parser::position_t );
-		void dispatch_power( executing_parser::position_t );
-		void dispatch_compare( executing_parser::position_t );
-		void dispatch_equals( executing_parser::position_t );
-		void dispatch_boolean( expression_action_t const&, executing_parser::position_t );
-		void dispatch_ternary( void );
-		void dispatch_assign( executing_parser::position_t );
-		void dispatch_subscript( executing_parser::position_t );
-		void dispatch_function_call( expression_action_t const&, executing_parser::position_t );
-		void defer_action( expression_action_t const&, executing_parser::position_t );
-		void defer_store_direct( value_t const&, executing_parser::position_t );
-		void defer_store_real( double long, executing_parser::position_t );
-		void defer_store_integer( int long long, executing_parser::position_t );
-		void defer_store_string( yaal::hcore::HString const&, executing_parser::position_t );
-		void defer_store_number( yaal::hcore::HString const&, executing_parser::position_t );
-		void defer_store_character( char, executing_parser::position_t );
-		void defer_store_boolean( bool, executing_parser::position_t );
-		void defer_store_none( executing_parser::position_t );
-		void defer_call( yaal::hcore::HString const&, executing_parser::position_t );
-	private:
-		OCompiler( OCompiler const& ) = delete;
-		OCompiler& operator = ( OCompiler const& ) = delete;
-	};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, class_t> classes_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, function_t> functions_t;
 	struct STATE {
@@ -328,9 +178,9 @@ private:
 	HType::type_dict_t _userTypeDict;
 	classes_t _classes;
 	functions_t _functions;
-	HExecutingParser _engine;
 	source_t _source;
-	OCompiler _compiler;
+	compiler_t _compiler;
+	HExecutingParser _engine;
 	threads_t _threads;
 	list_t _argv;
 	value_t _result;
@@ -462,19 +312,6 @@ private:
 public:
 	HReference( HHuginn::value_t& );
 	HHuginn::value_t& value( void ) const;
-};
-
-class HHuginn::HBooleanEvaluator : public HHuginn::HValue {
-public:
-	typedef HHuginn::HBooleanEvaluator this_type;
-	typedef HHuginn::HValue base_type;
-	typedef yaal::hcore::HArray<expression_t> expressions_t;
-private:
-	expressions_t _expressions;
-	OPERATOR _operator;
-public:
-	HBooleanEvaluator( expressions_t const&, OPERATOR );
-	bool execute( huginn::HThread* );
 };
 
 class HHuginn::HTernaryEvaluator : public HHuginn::HValue {
@@ -660,35 +497,6 @@ private:
 	HBreak& operator = ( HBreak const& ) = delete;
 };
 
-class HHuginn::HIf : public huginn::HStatement {
-public:
-	typedef HHuginn::HIf this_type;
-	typedef huginn::HStatement base_type;
-	typedef HHuginn::OCompiler::OCompilationFrame::contexts_t if_clauses_t;
-private:
-	if_clauses_t _ifClauses;
-	scope_t _elseClause;
-public:
-	HIf( if_clauses_t const&, scope_t const& );
-protected:
-	virtual void do_execute( huginn::HThread* ) const override;
-};
-
-class HHuginn::HSwitch : public huginn::HStatement {
-public:
-	typedef HHuginn::HSwitch this_type;
-	typedef huginn::HStatement base_type;
-	typedef HHuginn::OCompiler::OCompilationFrame::contexts_t cases_t;
-private:
-	expression_t _expression;
-	cases_t _cases;
-	scope_t _default;
-public:
-	HSwitch( expression_t const&, cases_t const&, scope_t const& );
-protected:
-	virtual void do_execute( huginn::HThread* ) const override;
-};
-
 class HHuginn::HWhile : public huginn::HStatement {
 public:
 	typedef HHuginn::HWhile this_type;
@@ -715,22 +523,6 @@ public:
 	HFor( yaal::hcore::HString const&, expression_t const&, scope_t const&, int );
 protected:
 	virtual void do_execute( huginn::HThread* ) const override;
-};
-
-class HHuginn::HFunction {
-public:
-	typedef HHuginn::HFunction this_type;
-	typedef HHuginn::OCompiler::parameter_names_t parameter_names_t;
-	typedef HHuginn::OCompiler::expressions_t expressions_t;
-private:
-	yaal::hcore::HString _name;
-	parameter_names_t _parameterNames;
-	expressions_t _defaultValues;
-	HHuginn::scope_t _scope;
-public:
-	HFunction( yaal::hcore::HString const&, parameter_names_t const&, HHuginn::scope_t const&, expressions_t const& );
-	HFunction( HFunction&& ) = default;
-	value_t execute( huginn::HThread*, values_t const&, int ) const;
 };
 
 class HHuginn::HFunctionReference : public HHuginn::HValue {

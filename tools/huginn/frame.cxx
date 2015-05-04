@@ -154,7 +154,7 @@ HHuginn::value_t HFrame::make_variable( yaal::hcore::HString const& name_, int )
 	M_EPILOG
 }
 
-HHuginn::operations_t& HFrame::operations( void ) {
+operations_t& HFrame::operations( void ) {
 	return ( _operations );
 }
 

@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "frame.hxx"
 #include "thread.hxx"
 #include "value_builtin.hxx"
+#include "booleanevaluator.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -39,9 +40,9 @@ namespace yaal {
 
 namespace tools {
 
-void operands_type_mismatch( char const*, HHuginn::type_t, HHuginn::type_t, int ) __attribute__(( noreturn ));
-
 namespace huginn {
+
+void operands_type_mismatch( char const*, HHuginn::type_t, HHuginn::type_t, int ) __attribute__(( noreturn ));
 
 HExpression::HExpression( int position_ )
 	: HStatement(),
@@ -85,7 +86,7 @@ void HExpression::merge( HExpression& expression_ ) {
 	M_EPILOG
 }
 
-void HExpression::oper( HHuginn::OPERATOR operator_, HFrame* frame_, int position_ ) {
+void HExpression::oper( OPERATOR operator_, HFrame* frame_, int position_ ) {
 	M_PROLOG
 	frame_->operations().emplace( operator_, position_ );
 	return;
@@ -96,10 +97,10 @@ void HExpression::close_parenthesis( HFrame* frame_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
 	M_ASSERT( ! frame_->values().is_empty() );
-	HHuginn::OPERATOR o( frame_->operations().top()._operator );
-	M_ASSERT( ( o == HHuginn::OPERATOR::ABSOLUTE ) || ( o == HHuginn::OPERATOR::PARENTHESIS ) );
+	OPERATOR o( frame_->operations().top()._operator );
+	M_ASSERT( ( o == OPERATOR::ABSOLUTE ) || ( o == OPERATOR::PARENTHESIS ) );
 	frame_->operations().pop();
-	if ( o == HHuginn::OPERATOR::ABSOLUTE ) {
+	if ( o == OPERATOR::ABSOLUTE ) {
 		HHuginn::value_t v( frame_->values().top() );
 		frame_->values().pop();
 		frame_->values().push( value_builtin::abs( v, position_ ) );
@@ -125,7 +126,7 @@ void HExpression::make_variable( yaal::hcore::HString const& name_, HFrame* fram
 
 void HExpression::set_variable( HFrame* frame_, int ) {
 	M_PROLOG
-	while ( ! frame_->operations().is_empty() && ( frame_->operations().top()._operator == HHuginn::OPERATOR::ASSIGN ) ) {
+	while ( ! frame_->operations().is_empty() && ( frame_->operations().top()._operator == OPERATOR::ASSIGN ) ) {
 		int p( frame_->operations().top()._position );
 		frame_->operations().pop();
 		HHuginn::value_t value( frame_->values().top() );
@@ -148,14 +149,14 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	M_ASSERT( ! frame_->operations().is_empty() );
 	M_ASSERT( ! frame_->values().is_empty() );
 	HHuginn::values_t values;
-	while ( frame_->operations().top()._operator == HHuginn::OPERATOR::FUNCTION_ARGUMENT ) {
+	while ( frame_->operations().top()._operator == OPERATOR::FUNCTION_ARGUMENT ) {
 		frame_->operations().pop();
 		M_ASSERT( ! frame_->operations().is_empty() );
 		values.push_back( yaal::move( frame_->values().top() ) );
 		frame_->values().pop();
 		M_ASSERT( ! frame_->values().is_empty() );
 	}
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::FUNCTION_CALL );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_CALL );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::type_t t( frame_->values().top()->type() );
@@ -183,7 +184,7 @@ void HExpression::make_map( HFrame* frame_, int ) {
 	};
 	typedef yaal::hcore::HArray<ValuePosition> positioned_values_t;
 	positioned_values_t values;
-	while ( frame_->operations().top()._operator == HHuginn::OPERATOR::FUNCTION_ARGUMENT ) {
+	while ( frame_->operations().top()._operator == OPERATOR::FUNCTION_ARGUMENT ) {
 		M_ASSERT( ! frame_->operations().is_empty() );
 		values.emplace_back( yaal::move( frame_->values().top() ), frame_->operations().top()._position );
 		frame_->operations().pop();
@@ -191,7 +192,7 @@ void HExpression::make_map( HFrame* frame_, int ) {
 		M_ASSERT( ! frame_->operations().is_empty() );
 	}
 	M_ASSERT( ( values.get_size() % 2 ) == 0 );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::FUNCTION_CALL );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_CALL );
 	frame_->operations().pop();
 	reverse( values.begin(), values.end() );
 	HHuginn::value_t map( make_pointer<HHuginn::HMap>() );
@@ -207,7 +208,7 @@ void HExpression::make_map( HFrame* frame_, int ) {
 void HExpression::plus( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::PLUS );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::PLUS );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -225,7 +226,7 @@ void HExpression::plus( HFrame* frame_, int ) {
 void HExpression::minus( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::MINUS );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::MINUS );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -243,7 +244,7 @@ void HExpression::minus( HFrame* frame_, int ) {
 void HExpression::mul( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::MULTIPLY );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::MULTIPLY );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -261,7 +262,7 @@ void HExpression::mul( HFrame* frame_, int ) {
 void HExpression::div( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::DIVIDE );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::DIVIDE );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -279,7 +280,7 @@ void HExpression::div( HFrame* frame_, int ) {
 void HExpression::mod( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::MODULO );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::MODULO );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -297,7 +298,7 @@ void HExpression::mod( HFrame* frame_, int ) {
 void HExpression::negate( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::NEGATE );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::NEGATE );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	M_ASSERT( ! frame_->values().is_empty() );
@@ -310,7 +311,7 @@ void HExpression::negate( HFrame* frame_, int ) {
 
 void HExpression::power( HFrame* frame_, int ) {
 	M_PROLOG
-	while ( ! frame_->operations().is_empty() && ( frame_->operations().top()._operator == HHuginn::OPERATOR::POWER ) ) {
+	while ( ! frame_->operations().is_empty() && ( frame_->operations().top()._operator == OPERATOR::POWER ) ) {
 		int p( frame_->operations().top()._position );
 		frame_->operations().pop();
 		HHuginn::value_t v2( frame_->values().top() );
@@ -333,11 +334,11 @@ void HExpression::subscript( SUBSCRIPT subscript_, HFrame* frame_, int ) {
 	HHuginn::value_t to( _none_ );
 	HHuginn::value_t step( _none_ );
 	HHuginn::value_t* v( &step );
-	HHuginn::OPERATOR op( frame_->operations().top()._operator );
-	M_ASSERT( ( op == HHuginn::OPERATOR::FUNCTION_ARGUMENT ) || ( op == HHuginn::OPERATOR::SUBSCRIPT_ARGUMENT ) );
+	OPERATOR op( frame_->operations().top()._operator );
+	M_ASSERT( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) );
 	int range( 0 );
-	while ( ( op == HHuginn::OPERATOR::FUNCTION_ARGUMENT ) || ( op == HHuginn::OPERATOR::SUBSCRIPT_ARGUMENT ) ) {
-		if ( op == HHuginn::OPERATOR::FUNCTION_ARGUMENT ) {
+	while ( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) ) {
+		if ( op == OPERATOR::FUNCTION_ARGUMENT ) {
 			*v = frame_->values().top();
 			frame_->values().pop();
 		} else {
@@ -352,7 +353,7 @@ void HExpression::subscript( SUBSCRIPT subscript_, HFrame* frame_, int ) {
 		op = frame_->operations().top()._operator;
 	}
 	M_ASSERT( range <= 2 );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::SUBSCRIPT );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::SUBSCRIPT );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	bool select( ( !! from ) || ( !! to ) || ( !! step ) );
@@ -385,7 +386,7 @@ void HExpression::subscript( SUBSCRIPT subscript_, HFrame* frame_, int ) {
 void HExpression::equals( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::EQUALS );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::EQUALS );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -403,7 +404,7 @@ void HExpression::equals( HFrame* frame_, int ) {
 void HExpression::not_equals( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::NOT_EQUALS );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::NOT_EQUALS );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -421,7 +422,7 @@ void HExpression::not_equals( HFrame* frame_, int ) {
 void HExpression::less( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::LESS );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::LESS );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -439,7 +440,7 @@ void HExpression::less( HFrame* frame_, int ) {
 void HExpression::greater( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::GREATER );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::GREATER );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -457,7 +458,7 @@ void HExpression::greater( HFrame* frame_, int ) {
 void HExpression::less_or_equal( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::LESS_OR_EQUAL );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::LESS_OR_EQUAL );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -475,7 +476,7 @@ void HExpression::less_or_equal( HFrame* frame_, int ) {
 void HExpression::greater_or_equal( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::GREATER_OR_EQUAL );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::GREATER_OR_EQUAL );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -493,12 +494,12 @@ void HExpression::greater_or_equal( HFrame* frame_, int ) {
 void HExpression::boolean_and( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::BOOLEAN_AND );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::BOOLEAN_AND );
 	frame_->operations().pop();
 	HHuginn::value_t v( frame_->values().top() );
 	frame_->values().pop();
-	M_ASSERT( dynamic_cast<HHuginn::HBooleanEvaluator*>( v.raw() ) );
-	frame_->values().push( make_pointer<HHuginn::HBoolean>( static_cast<HHuginn::HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
+	M_ASSERT( dynamic_cast<HBooleanEvaluator*>( v.raw() ) );
+	frame_->values().push( make_pointer<HHuginn::HBoolean>( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
 	return;
 	M_EPILOG
 }
@@ -506,12 +507,12 @@ void HExpression::boolean_and( HFrame* frame_, int ) {
 void HExpression::boolean_or( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::BOOLEAN_OR );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::BOOLEAN_OR );
 	frame_->operations().pop();
 	HHuginn::value_t v( frame_->values().top() );
 	frame_->values().pop();
-	M_ASSERT( dynamic_cast<HHuginn::HBooleanEvaluator*>( v.raw() ) );
-	frame_->values().push( make_pointer<HHuginn::HBoolean>( static_cast<HHuginn::HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
+	M_ASSERT( dynamic_cast<HBooleanEvaluator*>( v.raw() ) );
+	frame_->values().push( make_pointer<HHuginn::HBoolean>( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
 	return;
 	M_EPILOG
 }
@@ -519,7 +520,7 @@ void HExpression::boolean_or( HFrame* frame_, int ) {
 void HExpression::boolean_xor( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::BOOLEAN_XOR );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::BOOLEAN_XOR );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v2( frame_->values().top() );
@@ -537,7 +538,7 @@ void HExpression::boolean_xor( HFrame* frame_, int ) {
 void HExpression::boolean_not( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::BOOLEAN_NOT );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::BOOLEAN_NOT );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::value_t v( frame_->values().top() );
@@ -553,7 +554,7 @@ void HExpression::boolean_not( HFrame* frame_, int ) {
 void HExpression::ternary( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( frame_->operations().top()._operator == HHuginn::OPERATOR::TERNARY );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::TERNARY );
 	frame_->operations().pop();
 	HHuginn::value_t v( frame_->values().top() );
 	frame_->values().pop();
