@@ -510,21 +510,6 @@ protected:
 	virtual void do_execute( huginn::HThread* ) const override;
 };
 
-class HHuginn::HFor : public huginn::HStatement {
-public:
-	typedef HHuginn::HFor this_type;
-	typedef huginn::HStatement base_type;
-private:
-	yaal::hcore::HString _variableName;
-	expression_t _source;
-	scope_t _loop;
-	int _position;
-public:
-	HFor( yaal::hcore::HString const&, expression_t const&, scope_t const&, int );
-protected:
-	virtual void do_execute( huginn::HThread* ) const override;
-};
-
 class HHuginn::HFunctionReference : public HHuginn::HValue {
 	typedef HHuginn::HFunctionReference this_type;
 	typedef HHuginn::HValue base_type;

@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "scope.hxx"
 #include "expression.hxx"
 #include "if.hxx"
+#include "for.hxx"
 #include "switch.hxx"
 #include "booleanevaluator.hxx"
 
@@ -335,7 +336,7 @@ void OCompiler::add_for_statement( executing_parser::position_t ) {
 	HHuginn::scope_t scope( current_scope() );
 	fc._compilationStack.pop();
 	OCompilationFrame const& cf( fc._compilationStack.top() );
-	current_scope()->add_statement( make_pointer<HHuginn::HFor>( cf._forIdentifier, current_expression(), scope, cf._forPosition ) );
+	current_scope()->add_statement( make_pointer<HFor>( cf._forIdentifier, current_expression(), scope, cf._forPosition ) );
 	reset_expression();
 	return;
 	M_EPILOG

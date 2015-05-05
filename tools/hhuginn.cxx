@@ -38,6 +38,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/value_builtin.hxx"
 #include "tools/huginn/scope.hxx"
 #include "tools/huginn/compiler.hxx"
+#include "tools/huginn/iterator.hxx"
 #include "streamtools.hxx"
 
 using namespace yaal;
@@ -880,26 +881,6 @@ char HHuginn::HCharacter::value( void ) const {
 
 namespace {
 
-class HIteratorInterface {
-public:
-	virtual ~HIteratorInterface( void ) {
-		return;
-	}
-	HHuginn::value_t value( void ) {
-		return ( do_value() );
-	}
-	bool is_valid( void ) {
-		return ( do_is_valid() );
-	}
-	void next( void ) {
-		do_next();
-	}
-protected:
-	virtual HHuginn::value_t do_value( void ) = 0;
-	virtual bool do_is_valid( void ) = 0;
-	virtual void do_next( void ) = 0;
-};
-
 class HStringIterator : public HIteratorInterface {
 	HHuginn::HString* _string;
 	int _index;
@@ -972,27 +953,6 @@ private:
 };
 
 }
-
-class HHuginn::HIterable::HIterator {
-public:
-	typedef HResource<HIteratorInterface> iterator_implementation_t;
-private:
-	iterator_implementation_t _impl;
-public:
-	HIterator( iterator_implementation_t&& impl_ )
-		: _impl( yaal::move( impl_ ) ) {
-		return;
-	}
-	value_t value( void ) {
-		return ( _impl->value() );
-	}
-	bool is_valid( void ) {
-		return ( _impl->is_valid() );
-	}
-	void next( void ) {
-		_impl->next();
-	}
-};
 
 HHuginn::HIterable::HIterable( type_t type_ )
 	: HValue( type_ ) {
@@ -1186,42 +1146,6 @@ void HHuginn::HWhile::do_execute( huginn::HThread* thread_ ) const {
 			} else {
 				break;
 			}
-		}
-	}
-	thread_->pop_frame();
-	return;
-	M_EPILOG
-}
-
-HHuginn::HFor::HFor( yaal::hcore::HString const& variableName_,
-	expression_t const& source_,
-	scope_t const& loop_,
-	int position_ )
-	: HStatement(),
-	_variableName( variableName_ ),
-	_source( source_ ),
-	_loop( loop_ ),
-	_position( position_ ) {
-	return;
-}
-
-void HHuginn::HFor::do_execute( huginn::HThread* thread_ ) const {
-	M_PROLOG
-	thread_->create_loop_frame();
-	HFrame* f( thread_->current_frame() );
-	_source->execute( thread_ );
-	if ( thread_->can_continue() ) {
-		value_t source( f->result() );
-		HIterable* coll( dynamic_cast<HIterable*>( source.raw() ) );
-		if ( ! coll ) {
-			throw HHuginnRuntimeException( "`For' source is not an iterable.", _source->position() );
-		}
-		HIterable::HIterator it( coll->iterator() );
-		while ( thread_->can_continue() && it.is_valid() ) {
-			value_t v( it.value() );
-			f->set_variable( _variableName, v, _position );
-			_loop->execute( thread_ );
-			it.next();
 		}
 	}
 	thread_->pop_frame();
