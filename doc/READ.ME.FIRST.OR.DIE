@@ -7,12 +7,13 @@
   - amd64 aka x64.
 
 ** Software:
-	- Debian (latest development branch, currently `unstable' aka `Sid') (Debian stable releases are not supported!)
-	- Ubuntu (latest development branch and latest stable release, currently 14.04 and 14.10 respectively)
-	- Centos (latest stable release, currently 7)
-	- FreeBSD (latest stable release, currently 10.0-RELEASE)
-	- Oracle Solaris (latest stable release, currently 11.2)
-	- Windows 7 SP1 with Cygwin (latest available cygwin release, currently 1.7.27)
+  - Debian (latest development branch, currently `unstable' aka `Sid') (Debian stable releases are not supported!)
+  - Ubuntu (latest development branch and latest stable release, currently 14.04 and 14.10 respectively)
+  - Centos (latest stable release, currently 7)
+  - FreeBSD (latest stable release, currently 10.1-RELEASE)
+  - Oracle Solaris (latest stable release, currently 11.2)
+  - Darwin (latest stable release, 14.3.0)
+  - Windows 7 SP1 with Cygwin (latest available cygwin release, currently 1.7.27)
 
 [For more detailed information regarding platform support
 please look into HTML documentation.]

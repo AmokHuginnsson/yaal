@@ -21,10 +21,13 @@
 		<td>Centos 7 (Final)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
-		<td>FreeBSD 10.0 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+		<td>FreeBSD 10.1 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Oracle Solaris 11.2</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
+	</tr>
+	<tr>
+		<td>Darwin 14.3.0 (compiled with clang)</td><td class="good">100%</td><td class="good">100%</td><td class="good">Pass</td>
 	</tr>
 	<tr>
 		<td>Windows 7 SP1 32bit with Cygwin 1.7.27</td><td class="good">100%</td><td class="fine">99%</td><td class="fail">Fail</td>
