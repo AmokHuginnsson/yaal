@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "expression.hxx"
 #include "if.hxx"
 #include "for.hxx"
+#include "while.hxx"
 #include "switch.hxx"
 #include "booleanevaluator.hxx"
 
@@ -314,7 +315,7 @@ void OCompiler::add_while_statement( executing_parser::position_t ) {
 	M_ASSERT( ! fc._compilationStack.is_empty() );
 	HHuginn::scope_t scope( current_scope() );
 	fc._compilationStack.pop();
-	current_scope()->add_statement( make_pointer<HHuginn::HWhile>( current_expression(), scope ) );
+	current_scope()->add_statement( make_pointer<HWhile>( current_expression(), scope ) );
 	reset_expression();
 	return;
 	M_EPILOG

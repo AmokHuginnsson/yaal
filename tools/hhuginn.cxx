@@ -1125,34 +1125,6 @@ void HHuginn::HBreak::do_execute( huginn::HThread* thread_ ) const {
 	M_EPILOG
 }
 
-HHuginn::HWhile::HWhile( expression_t const& condition_, scope_t const& loop_ )
-	: HStatement(),
-	_condition( condition_ ),
-	_loop( loop_ ) {
-	return;
-}
-
-void HHuginn::HWhile::do_execute( huginn::HThread* thread_ ) const {
-	M_PROLOG
-	thread_->create_loop_frame();
-	HFrame* f( thread_->current_frame() );
-	while ( thread_->can_continue() ) {
-		_condition->execute( thread_ );
-		if ( thread_->can_continue() ) {
-			value_t v( f->result() );
-			M_ASSERT( v->type() == TYPE::BOOLEAN );
-			if ( static_cast<HBoolean*>( v.raw() )->value() ) {
-				_loop->execute( thread_ );
-			} else {
-				break;
-			}
-		}
-	}
-	thread_->pop_frame();
-	return;
-	M_EPILOG
-}
-
 HHuginn::HFunctionReference::HFunctionReference(
 	yaal::hcore::HString const& name_,
 	function_t const& function_

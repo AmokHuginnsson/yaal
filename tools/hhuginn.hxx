@@ -497,19 +497,6 @@ private:
 	HBreak& operator = ( HBreak const& ) = delete;
 };
 
-class HHuginn::HWhile : public huginn::HStatement {
-public:
-	typedef HHuginn::HWhile this_type;
-	typedef huginn::HStatement base_type;
-private:
-	expression_t _condition;
-	scope_t _loop;
-public:
-	HWhile( expression_t const&, scope_t const& );
-protected:
-	virtual void do_execute( huginn::HThread* ) const override;
-};
-
 class HHuginn::HFunctionReference : public HHuginn::HValue {
 	typedef HHuginn::HFunctionReference this_type;
 	typedef HHuginn::HValue base_type;
