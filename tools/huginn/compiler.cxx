@@ -35,6 +35,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "for.hxx"
 #include "while.hxx"
 #include "switch.hxx"
+#include "return.hxx"
+#include "break.hxx"
 #include "booleanevaluator.hxx"
 
 using namespace yaal;
@@ -294,7 +296,7 @@ void OCompiler::commit_ternary( executing_parser::position_t position_ ) {
 void OCompiler::add_return_statement( executing_parser::position_t ) {
 	M_PROLOG
 	M_ASSERT( ! f()._compilationStack.is_empty() );
-	current_scope()->add_statement( make_pointer<HHuginn::HReturn>( current_expression() ) );
+	current_scope()->add_statement( make_pointer<HReturn>( current_expression() ) );
 	reset_expression();
 	return;
 	M_EPILOG
@@ -303,7 +305,7 @@ void OCompiler::add_return_statement( executing_parser::position_t ) {
 void OCompiler::add_break_statement( executing_parser::position_t ) {
 	M_PROLOG
 	M_ASSERT( ! f()._compilationStack.is_empty() );
-	current_scope()->add_statement( make_pointer<HHuginn::HBreak>() );
+	current_scope()->add_statement( make_pointer<HBreak>() );
 	reset_expression();
 	return;
 	M_EPILOG

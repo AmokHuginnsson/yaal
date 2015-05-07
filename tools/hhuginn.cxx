@@ -1099,32 +1099,6 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 	M_EPILOG
 }
 
-HHuginn::HReturn::HReturn( HHuginn::expression_t const& expression_ )
-	: _expression( expression_ ) {
-	return;
-}
-
-void HHuginn::HReturn::do_execute( huginn::HThread* thread_ ) const {
-	M_PROLOG
-	if ( !! _expression ) {
-		_expression->execute( thread_ );
-	}
-	thread_->break_execution( huginn::HFrame::STATE::RETURN, thread_->current_frame()->result() );
-	return;
-	M_EPILOG
-}
-
-HHuginn::HBreak::HBreak( void ) {
-	return;
-}
-
-void HHuginn::HBreak::do_execute( huginn::HThread* thread_ ) const {
-	M_PROLOG
-	thread_->break_execution( huginn::HFrame::STATE::BREAK );
-	return;
-	M_EPILOG
-}
-
 HHuginn::HFunctionReference::HFunctionReference(
 	yaal::hcore::HString const& name_,
 	function_t const& function_

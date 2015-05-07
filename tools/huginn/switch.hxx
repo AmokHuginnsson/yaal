@@ -30,6 +30,7 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_SWITCH_HXX_INCLUDED 1
 
 #include "tools/huginn/compiler.hxx"
+#include "tools/huginn/statement.hxx"
 
 namespace yaal {
 

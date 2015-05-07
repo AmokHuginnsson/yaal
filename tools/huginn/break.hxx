@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  statement.hxx - this file is integral part of `yaal' project.
+  break.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -26,8 +26,10 @@ Copyright:
 
 /* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
 
-#ifndef YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED
-#define YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED 1
+#ifndef YAAL_TOOLS_HUGINN_BREAK_HXX_INCLUDED
+#define YAAL_TOOLS_HUGINN_BREAK_HXX_INCLUDED 1
+
+#include "tools/huginn/statement.hxx"
 
 namespace yaal {
 
@@ -37,17 +39,17 @@ namespace huginn {
 
 class HThread;
 
-class HStatement {
+class HBreak : public HStatement {
 public:
-	typedef HStatement this_type;
+	typedef HBreak this_type;
+	typedef HStatement base_type;
 public:
-	HStatement( void );
-	virtual ~HStatement( void ) {
-		return;
-	}
-	void execute( HThread* ) const;
+	HBreak( void );
 protected:
-	virtual void do_execute( HThread* ) const {}
+	virtual void do_execute( HThread* ) const override;
+private:
+	HBreak( HBreak const& ) = delete;
+	HBreak& operator = ( HBreak const& ) = delete;
 };
 
 }
@@ -56,5 +58,5 @@ protected:
 
 }
 
-#endif /* #ifndef YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HUGINN_BREAK_HXX_INCLUDED */
 

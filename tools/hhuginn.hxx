@@ -39,7 +39,6 @@ Copyright:
 #include "hcore/hthread.hxx"
 #include "hcore/htaggedpod.hxx"
 #include "tools/executingparser.hxx"
-#include "tools/huginn/statement.hxx"
 
 namespace yaal {
 
@@ -467,34 +466,6 @@ private:
 	void verify_key_type( HHuginn::type_t, int );
 	HMap( HMap const& ) = delete;
 	HMap& operator = ( HMap const& ) = delete;
-};
-
-class HHuginn::HReturn : public huginn::HStatement {
-public:
-	typedef HHuginn::HReturn this_type;
-	typedef huginn::HStatement base_type;
-private:
-	expression_t _expression;
-public:
-	HReturn( expression_t const& );
-protected:
-	virtual void do_execute( huginn::HThread* ) const override;
-private:
-	HReturn( HReturn const& ) = delete;
-	HReturn& operator = ( HReturn const& ) = delete;
-};
-
-class HHuginn::HBreak : public huginn::HStatement {
-public:
-	typedef HHuginn::HBreak this_type;
-	typedef huginn::HStatement base_type;
-public:
-	HBreak( void );
-protected:
-	virtual void do_execute( huginn::HThread* ) const override;
-private:
-	HBreak( HBreak const& ) = delete;
-	HBreak& operator = ( HBreak const& ) = delete;
 };
 
 class HHuginn::HFunctionReference : public HHuginn::HValue {

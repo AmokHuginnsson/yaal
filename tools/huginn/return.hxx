@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  statement.hxx - this file is integral part of `yaal' project.
+  return.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -26,8 +26,11 @@ Copyright:
 
 /* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
 
-#ifndef YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED
-#define YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED 1
+#ifndef YAAL_TOOLS_HUGINN_RETURN_HXX_INCLUDED
+#define YAAL_TOOLS_HUGINN_RETURN_HXX_INCLUDED 1
+
+#include "tools/hhuginn.hxx"
+#include "tools/huginn/statement.hxx"
 
 namespace yaal {
 
@@ -35,19 +38,19 @@ namespace tools {
 
 namespace huginn {
 
-class HThread;
-
-class HStatement {
+class HReturn : public HStatement {
 public:
-	typedef HStatement this_type;
+	typedef HReturn this_type;
+	typedef HStatement base_type;
+private:
+	HHuginn::expression_t _expression;
 public:
-	HStatement( void );
-	virtual ~HStatement( void ) {
-		return;
-	}
-	void execute( HThread* ) const;
+	HReturn( HHuginn::expression_t const& );
 protected:
-	virtual void do_execute( HThread* ) const {}
+	virtual void do_execute( HThread* ) const override;
+private:
+	HReturn( HReturn const& ) = delete;
+	HReturn& operator = ( HReturn const& ) = delete;
 };
 
 }
@@ -56,5 +59,5 @@ protected:
 
 }
 
-#endif /* #ifndef YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HUGINN_RETURN_HXX_INCLUDED */
 

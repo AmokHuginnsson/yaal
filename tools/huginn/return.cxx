@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  statement.hxx - this file is integral part of `yaal' project.
+  return.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -24,10 +24,12 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-/* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
-
-#ifndef YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED
-#define YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED 1
+#include "hcore/base.hxx"
+M_VCSID( "$Id: " __ID__ " $" )
+M_VCSID( "$Id: " __TID__ " $" )
+#include "return.hxx"
+#include "expression.hxx"
+#include "thread.hxx"
 
 namespace yaal {
 
@@ -35,26 +37,24 @@ namespace tools {
 
 namespace huginn {
 
-class HThread;
+HReturn::HReturn( HHuginn::expression_t const& expression_ )
+	: _expression( expression_ ) {
+	return;
+}
 
-class HStatement {
-public:
-	typedef HStatement this_type;
-public:
-	HStatement( void );
-	virtual ~HStatement( void ) {
-		return;
+void HReturn::do_execute( HThread* thread_ ) const {
+	M_PROLOG
+	if ( !! _expression ) {
+		_expression->execute( thread_ );
 	}
-	void execute( HThread* ) const;
-protected:
-	virtual void do_execute( HThread* ) const {}
-};
-
+	thread_->break_execution( HFrame::STATE::RETURN, thread_->current_frame()->result() );
+	return;
+	M_EPILOG
 }
 
 }
 
 }
 
-#endif /* #ifndef YAAL_TOOLS_HUGINN_STATEMENT_HXX_INCLUDED */
+}
 
