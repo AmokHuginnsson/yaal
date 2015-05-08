@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-	system.cxx - this file is integral part of `yaal' project.
+  system.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -89,6 +89,9 @@ template<typename T1, typename T2>
 inline bool FWD_FD_ISSET( T1 val1_, T2 val2_ ) {
 	return ( FD_ISSET( val1_, val2_ ) );
 }
+#ifdef __HOST_OS_TYPE_DARWIN__
+mach_msg_type_number_t HOST_VM_INFO_COUNT_FWD{ HOST_VM_INFO_COUNT };
+#endif /* #ifdef __HOST_OS_TYPE_DARWIN__ */
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 
@@ -257,7 +260,7 @@ HResourceInfo get_memory_size_info( void ) {
 	size = sizeof ( physmem );
 	M_ENSURE( sysctl( mib, 2, &physmem, &size, NULL, 0 ) == 0 );
 	totalMemory = physmem;
-	mach_msg_type_number_t count = HOST_VM_INFO_COUNT;
+	mach_msg_type_number_t count = HOST_VM_INFO_COUNT_FWD;
 	vm_statistics_data_t vmstat;
 	kern_return_t kr(
 		host_statistics(

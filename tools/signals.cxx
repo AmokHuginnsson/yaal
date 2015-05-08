@@ -90,6 +90,14 @@ namespace {
 static sighandler_t const FWD_SIG_DFL = SIG_DFL;
 static sighandler_t const FWD_SIG_ERR = SIG_ERR;
 #pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+int sigaddset_fwd( sigset_t* set, int signo ) {
+	return ( sigaddset( set, signo ) );
+}
+int sigdelset_fwd( sigset_t* set, int signo ) {
+	return ( sigdelset( set, signo ) );
+}
+#pragma GCC diagnostic error "-Wsign-conversion"
 }
 
 void reset_signal_low( int sigNo_ ) {
@@ -98,7 +106,7 @@ void reset_signal_low( int sigNo_ ) {
 	::memset( &act, 0, sizeof ( act ) );
 	act.sa_handler = FWD_SIG_DFL;
 	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
-	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
+	M_ENSURE( sigaddset_fwd( &act.sa_mask, sigNo_ ) == 0 );
 	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
 	M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &act.sa_mask, NULL ) == 0 );
 	return;
@@ -112,7 +120,7 @@ void catch_signal_low( int sigNo_ ) {
 	act.sa_flags = SA_RESTART;
 	act.sa_handler = dummy_signal_handler;
 	M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
-	M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
+	M_ENSURE( sigaddset_fwd( &act.sa_mask, sigNo_ ) == 0 );
 	M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
 	M_ENSURE( pthread_sigmask( SIG_BLOCK, &act.sa_mask, NULL ) == 0 );
 
@@ -221,7 +229,7 @@ void HSignalService::register_handler( int sigNo_, handler_t handler_, void cons
 		act.sa_flags = SA_RESTART;
 		act.sa_handler = &HBaseSignalHandlers::signal_fatal_sync;
 		M_ENSURE( sigemptyset( &act.sa_mask ) == 0 );
-		M_ENSURE( sigaddset( &act.sa_mask, sigNo_ ) == 0 );
+		M_ENSURE( sigaddset_fwd( &act.sa_mask, sigNo_ ) == 0 );
 		M_ENSURE( sigaction( sigNo_, &act, NULL ) == 0 );
 	}
 	return;
@@ -249,7 +257,7 @@ void HSignalService::flush_handlers( void const* owner_ ) {
 
 void HSignalService::catch_signal( int sigNo_ ) {
 	M_PROLOG
-	M_ENSURE( sigaddset( _catch.get<sigset_t>(), sigNo_ ) == 0 );
+	M_ENSURE( sigaddset_fwd( _catch.get<sigset_t>(), sigNo_ ) == 0 );
 
 	/*
 	 * FreeBSD does not wake sigwait on signal with installed
@@ -274,7 +282,7 @@ void HSignalService::reset_signal( int sigNo_ ) {
 	HLock lock( _mutex );
 	M_ENSURE( _handlers.count( sigNo_ ) );
 	reset_signal_low( sigNo_ );
-	M_ENSURE( sigdelset( _catch.get<sigset_t>(), sigNo_ ) == 0 );
+	M_ENSURE( sigdelset_fwd( _catch.get<sigset_t>(), sigNo_ ) == 0 );
 	_handlers.erase( sigNo_ );
 	return;
 	M_EPILOG

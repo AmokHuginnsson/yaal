@@ -48,6 +48,11 @@ namespace {
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
 #pragma GCC diagnostic error "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+int sigaddset_fwd( sigset_t* set, int signo ) {
+	return ( sigaddset( set, signo ) );
+}
+#pragma GCC diagnostic error "-Wsign-conversion"
 }
 
 yaal::hcore::HMutex HAlarm::_mutex;
@@ -67,7 +72,7 @@ HAlarm::HAlarm( int long miliseconds_ )
 	try {
 		sigset_t mask;
 		M_ENSURE( sigemptyset( &mask ) == 0 );
-		M_ENSURE( sigaddset( &mask, SIGALRM ) == 0 );
+		M_ENSURE( sigaddset_fwd( &mask, SIGALRM ) == 0 );
 		M_ENSURE( pthread_sigmask( SIG_UNBLOCK, &mask, NULL ) == 0 );
 		++ step;
 
@@ -107,7 +112,7 @@ void HAlarm::cleanup_sigmask( void ) {
 	M_PROLOG
 	sigset_t mask;
 	M_ENSURE( sigemptyset( &mask ) == 0 );
-	M_ENSURE( sigaddset( &mask, SIGALRM ) == 0 );
+	M_ENSURE( sigaddset_fwd( &mask, SIGALRM ) == 0 );
 	M_ENSURE( pthread_sigmask( SIG_BLOCK, &mask, NULL ) == 0 );
 	return;
 	M_EPILOG
