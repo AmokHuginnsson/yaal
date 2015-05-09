@@ -1,0 +1,39 @@
+# $Id$
+
+PortSystem          1.0
+name                yaal
+version             @version@
+revision            @revision@
+categories          devel
+platforms           darwin
+supported_archs     x86_64 i386
+maintainers         Marcin Konarski codestation.org:amok
+description         Yet Another Abstraction Layer - a general purpose C++ library
+long_description    Yet Another Abstraction Layer - a general purpose, portable C++ library
+license             codestation
+homepage            http://codestation.org/
+master_sites        http://codestation.org/darwin/
+depends_fetch       port:git
+depends_build       port:autoconf port:libtool port:openssl port:doxygen port:graphviz
+use_automake        no
+use_autoreconf      no
+use_configure       no
+use_parallel_build  no
+
+archivefetch {}
+unarchive {}
+extract {}
+
+fetch.type          git
+git.url             ${portpath}/../../../../
+git.branch          master
+destroot.umask      0022
+
+build.env           CCACHE_DIR=${workpath}/ccache
+build.cmd           umask 0077 && make PREFIX=${prefix} DESTDIR=${destroot} SYSCONFDIR=${prefix}/etc LOCALSTATEDIR=${prefix}/var purge debug release doc
+build.pre_args
+
+destroot.env        CCACHE_DIR=${workpath}/ccache
+destroot.cmd        umask 0077 && make PREFIX=${prefix} DESTDIR=${destroot} SYSCONFDIR=${prefix}/etc LOCALSTATEDIR=${prefix}/var install
+destroot.post_args
+
