@@ -4,9 +4,21 @@
 
 VERSION=$(shell awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in)
 REVISION=$(BUILD_ID)
-PORTFILE=devel/yaal/Portfile
+NAME=yaal
+PORTDIR=devel/$(NAME)
+PORTFILE=$(PORTDIR)/Portfile
+ifeq ($(MAKECMDGOALS),do-bundle)
+ARTIFACT_DIR=$(shell port -d -D devel/yaal info 2>&1 | awk '/workpath/{print $$4;exit}')
+ARTIFACT=$(ARTIFACT_DIR)/$(NAME)-$(VERSION).dmg
+SYSTEM=$(shell uname -s | tr A-Z a-z)
+SYSTEM_RELEASE=$(shell uname -r | tr A-Z a-z)
+ARCH=$(shell uname -m)
+BUNDLE_DIR=yaal-bundle/$(SYSTEM)-$(SYSTEM_RELEASE)/$(ARCH)/$(VERSION)
+BUNDLE=yaal-$(VERSION)-$(SYSTEM)-$(SYSTEM_RELEASE)-$(ARCH).tar
+BUNDLE_WRAP=yaal-bundle.tar
+endif
 
-.PHONY: clean package bundle
+.PHONY: clean package do-package bundle do-bundle
 
 $(PORTFILE): Portfile.in
 	@mkdir -p devel/yaal \
@@ -16,10 +28,27 @@ package:
 	$(MAKE) do-package
 
 do-package: $(PORTFILE)
-	@cd devel/yaal && port lint && port dmg
+	@port -D $(PORTDIR) lint && port -D $(PORTDIR) dmg
+
+bundle: package
+	$(MAKE) do-bundle
+
+ifeq ($(MAKECMDGOALS),do-bundle)
+$(ARTIFACT): do-package
+
+do-bundle: $(PORTDIR)/$(BUNDLE_WRAP)
+
+$(PORTDIR)/$(BUNDLE_WRAP): $(PORTDIR)/$(BUNDLE)
+	@cd $(PORTDIR) && tar cf $(BUNDLE_WRAP) $(BUNDLE)
+
+$(PORTDIR)/$(BUNDLE): $(ARTIFACT)
+	@mkdir -p $(PORTDIR)/$(BUNDLE_DIR) \
+	&& cp -f $(ARTIFACT) $(PORTDIR)/$(BUNDLE_DIR) \
+	&& cd $(PORTDIR) \
+	&& tar cf $(BUNDLE) yaal-bundle
+endif
 
 clean: $(PORTFILE)
-	@cd devel/yaal && port clean --all \
-	&& cd - \
+	@port -D $(PORTDIR) clean --all \
 	&& /bin/rm -rf devel
 
