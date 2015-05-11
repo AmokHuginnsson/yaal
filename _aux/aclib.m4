@@ -236,8 +236,10 @@ dnl YAAL_DETECT_COMMON_FLAGS
 dnl What special compiler flags we can set?
 dnl --------------------------------------------------------------------------
 AC_DEFUN_ONCE([YAAL_DETECT_COMMON_FLAGS], [
-	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-pthread], [C++])
-	YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-pthread], [C++])
+	if test ["x${HOST_OS_TYPE}"] != ["xDarwin"] ; then
+		YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-pthread], [C++])
+		YAAL_DETECT_FLAGS(EXTRA_LXXFLAGS, [-pthread], [C++])
+	fi
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-m64], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_CXXFLAGS, [-fPIC], [C++])
 	YAAL_DETECT_FLAGS(EXTRA_COMPILER_OPTIMIZATION_FLAGS, [-fexpensive-optimizations], [C++])
