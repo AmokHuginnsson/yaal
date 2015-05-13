@@ -2,8 +2,7 @@
 
 PortSystem          1.0
 name                yaal
-version             @version@
-revision            @revision@
+version             @version@-@revision@
 categories          devel
 platforms           darwin
 supported_archs     x86_64 i386

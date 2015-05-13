@@ -4,14 +4,15 @@
 
 VERSION=$(shell awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in)
 ifneq ($(BUILD_ID),)
-REVISION=-$(BUILD_ID)
+REVISION=$(BUILD_ID)
+REVISION_SEPARATOR=-
 endif
 NAME=yaal
 PORTDIR=devel/$(NAME)
 PORTFILE=$(PORTDIR)/Portfile
 ifeq ($(MAKECMDGOALS),do-bundle)
 ARTIFACT_DIR=$(shell port -d -D devel/yaal info 2>&1 | awk '/workpath/{print $$4;exit}')
-ARTIFACT=$(ARTIFACT_DIR)/$(NAME)-$(VERSION)$(REVISION).dmg
+ARTIFACT=$(ARTIFACT_DIR)/$(NAME)-$(VERSION)$(REVISION_SEPARATOR)$(REVISION).dmg
 SYSTEM=$(shell uname -s | tr A-Z a-z)
 SYSTEM_RELEASE=$(shell uname -r | tr A-Z a-z)
 ARCH=$(shell uname -m)
