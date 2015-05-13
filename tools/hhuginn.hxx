@@ -133,6 +133,7 @@ public:
 	class HList;
 	typedef yaal::hcore::HPointer<HList> list_t;
 	class HMap;
+	class HObject;
 	class HBooleanEvaluator;
 	class HTernaryEvaluator;
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
@@ -286,11 +287,8 @@ public:
 class HHuginn::HValue {
 public:
 	typedef HHuginn::HValue this_type;
-	typedef yaal::hcore::HBoundCall<void ( HValue* )> method_t;
-	typedef yaal::hcore::HHashMap<yaal::hcore::HString, method_t> methods_t;
 private:
 	type_t const _type;
-	methods_t _methods;
 public:
 	HValue( type_t );
 	virtual ~HValue( void ) {
@@ -478,6 +476,39 @@ public:
 	HFunctionReference( yaal::hcore::HString const&, HHuginn::function_t const& );
 	yaal::hcore::HString const& name( void ) const;
 	HHuginn::function_t const& function( void ) const;
+};
+
+class HHuginn::HClass {
+public:
+	typedef HHuginn::HClass this_type;
+	typedef yaal::hcore::HHashMap<yaal::hcore::HString, int> name_indexes_t;
+private:
+	HClass const* _base;
+	name_indexes_t _fieldIndexes;
+	name_indexes_t _methodIndexes;
+public:
+	HClass( HClass const* );
+private:
+	HClass( HClass const& ) = delete;
+	HClass& operator = ( HClass const& ) = delete;
+};
+
+class HHuginn::HObject : public HHuginn::HValue {
+public:
+	typedef HHuginn::HObject this_type;
+	typedef HHuginn::HValue base_type;
+	typedef yaal::hcore::HBoundCall<void ( HValue* )> method_t;
+	typedef yaal::hcore::HArray<value_t> fields_t;
+	typedef yaal::hcore::HArray<method_t> methods_t;
+private:
+	HClass const* _class;
+	fields_t _fields;
+	methods_t _methods;
+public:
+	HObject( HClass const*, fields_t const&, methods_t const& );
+private:
+	HObject( HObject const& ) = delete;
+	HObject& operator = ( HObject const& ) = delete;
 };
 
 extern HHuginn::value_t _none_;

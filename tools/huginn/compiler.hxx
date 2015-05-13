@@ -83,11 +83,16 @@ struct OCompiler {
 		OFunctionContext( HHuginn* );
 	};
 	typedef yaal::hcore::HStack<OFunctionContext> function_contexts_t;
+	struct OClassContext {
+		yaal::hcore::HString _className;
+		OClassContext( HHuginn* );
+	};
 	function_contexts_t _functionContexts;
 	HHuginn* _huginn;
 	OCompiler( HHuginn* );
 	OFunctionContext& f( void );
 	void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
+	void set_class_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_lambda_name( executing_parser::position_t );
 	HHuginn::function_t create_function( executing_parser::position_t );
 	void create_lambda( executing_parser::position_t );

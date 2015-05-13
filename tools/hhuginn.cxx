@@ -488,8 +488,11 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule field( "field", regex( "fieldIdentifier", identifier ) >> '=' >> expression >> ';' );
 	HRule classDefinition(
 		"classDefinition",
-		constant( "class" ) >> regex( "classIdentifier", identifier )
-		>> -( ':' >> regex( "baseIdentifier", identifier ) )
+		constant( "class" ) >> regex(
+			"classIdentifier",
+			identifier,
+			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_class_name, _compiler.get(), _1, _2 ) )
+		) >> -( ':' >> regex( "baseIdentifier", identifier ) )
 		>> '{' >> +( field | functionDefinition ) >> '}'
 	);
 	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition ) );
@@ -817,7 +820,7 @@ void HHuginn::create_function( executing_parser::position_t position_ ) {
 }
 
 HHuginn::HValue::HValue( type_t type_ )
-	: _type( type_ ), _methods() {
+	: _type( type_ ) {
 	return;
 }
 

@@ -135,11 +135,20 @@ HHuginn::HHuginn::expression_t& OCompiler::current_expression( void ) {
 
 void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	_functionContexts.emplace( _huginn );
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
+	_functionContexts.emplace( _huginn );
 	f()._functionName = name_;
+	return;
+	M_EPILOG
+}
+
+void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	if ( is_restricted( name_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
+	}
 	return;
 	M_EPILOG
 }
