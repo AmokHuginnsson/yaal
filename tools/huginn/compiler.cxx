@@ -153,11 +153,41 @@ void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_par
 	M_EPILOG
 }
 
+void OCompiler::set_base_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	if ( is_restricted( name_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
+	}
+	return;
+	M_EPILOG
+}
+
+void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	if ( is_restricted( name_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
+	}
+	return;
+	M_EPILOG
+}
+
 void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	M_PROLOG
 	HHuginn::HErrorCoordinate ec( _huginn->get_coordinate( position_.get() ) );
 	_functionContexts.emplace( _huginn );
 	f()._functionName.assign( "@" ).append( ec.line() ).append( ":" ).append( ec.column() );
+	return;
+	M_EPILOG
+}
+
+void OCompiler::add_field( executing_parser::position_t ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
+void OCompiler::add_method( executing_parser::position_t ) {
+	M_PROLOG
 	return;
 	M_EPILOG
 }

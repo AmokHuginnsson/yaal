@@ -475,7 +475,8 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| scope[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_scope, _compiler.get(), _1 ) )]
 	);
 	scope %= ( constant( '{', HRuleBase::action_position_t( hcore::call( &OCompiler::create_scope, _compiler.get(), _1 ) ) ) >> *statement >> '}' );
-	HRule functionDefinition( "functionDefinition",
+	HRule functionDefinition(
+		"functionDefinition",
 		regex(
 			"functionDefinitionIdentifier",
 			identifier,
@@ -485,15 +486,31 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		>> scope,
 		HRuleBase::action_position_t( hcore::call( &HHuginn::create_function, this, _1 ) )
 	);
-	HRule field( "field", regex( "fieldIdentifier", identifier ) >> '=' >> expression >> ';' );
+	HRule field(
+		"field",
+		regex(
+			"fieldIdentifier",
+			identifier,
+			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_field_name, _compiler.get(), _1, _2 ) )
+		) >> '=' >> expression >> ';'
+	);
 	HRule classDefinition(
 		"classDefinition",
 		constant( "class" ) >> regex(
 			"classIdentifier",
 			identifier,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_class_name, _compiler.get(), _1, _2 ) )
-		) >> -( ':' >> regex( "baseIdentifier", identifier ) )
-		>> '{' >> +( field | functionDefinition ) >> '}'
+		) >> -(
+			':' >> regex(
+				"baseIdentifier",
+				identifier,
+				e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_base_name, _compiler.get(), _1, _2 ) )
+			)
+		) >> '{' >> +(
+			field[HRuleBase::action_position_t( hcore::call( &OCompiler::add_field, _compiler.get(), _1 ) )]
+				| functionDefinition[HRuleBase::action_position_t( hcore::call( &OCompiler::add_method, _compiler.get(), _1 ) )]
+		) >> '}',
+		HRuleBase::action_position_t( hcore::call( &HHuginn::create_class, this, _1 ) )
 	);
 	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition ) );
 	return ( huginnGrammar );
@@ -815,6 +832,12 @@ void HHuginn::create_function( executing_parser::position_t position_ ) {
 	OCompiler::OFunctionContext& fc( _compiler->f() );
 	_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( fc._functionName ), _compiler->create_function( position_ ) ) );
 	_compiler->_functionContexts.pop();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::create_class( executing_parser::position_t ) {
+	M_PROLOG
 	return;
 	M_EPILOG
 }

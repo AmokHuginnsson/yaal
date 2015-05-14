@@ -93,6 +93,8 @@ struct OCompiler {
 	OFunctionContext& f( void );
 	void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_class_name( yaal::hcore::HString const&, executing_parser::position_t );
+	void set_base_name( yaal::hcore::HString const&, executing_parser::position_t );
+	void set_field_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_lambda_name( executing_parser::position_t );
 	HHuginn::function_t create_function( executing_parser::position_t );
 	void create_lambda( executing_parser::position_t );
@@ -115,6 +117,8 @@ struct OCompiler {
 	void reset_expression( void );
 	void start_subexpression( executing_parser::position_t );
 	void add_subexpression( OPERATOR, executing_parser::position_t );
+	void add_field( executing_parser::position_t );
+	void add_method( executing_parser::position_t );
 	void commit_boolean( OPERATOR, executing_parser::position_t );
 	void commit_ternary( executing_parser::position_t );
 	void create_scope( executing_parser::position_t );

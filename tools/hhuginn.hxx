@@ -227,6 +227,7 @@ public:
 	void dump_vm_state( yaal::hcore::HStreamInterface& );
 	huginn::HFrame* current_frame( void );
 	void create_function( executing_parser::position_t );
+	void create_class( executing_parser::position_t );
 	void add_argument( yaal::hcore::HString const& );
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& );
 	int error_position( void ) const;
@@ -484,8 +485,7 @@ public:
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, int> name_indexes_t;
 private:
 	HClass const* _base;
-	name_indexes_t _fieldIndexes;
-	name_indexes_t _methodIndexes;
+	name_indexes_t _indexes;
 public:
 	HClass( HClass const* );
 private:
@@ -497,15 +497,12 @@ class HHuginn::HObject : public HHuginn::HValue {
 public:
 	typedef HHuginn::HObject this_type;
 	typedef HHuginn::HValue base_type;
-	typedef yaal::hcore::HBoundCall<void ( HValue* )> method_t;
 	typedef yaal::hcore::HArray<value_t> fields_t;
-	typedef yaal::hcore::HArray<method_t> methods_t;
 private:
 	HClass const* _class;
 	fields_t _fields;
-	methods_t _methods;
 public:
-	HObject( HClass const*, fields_t const&, methods_t const& );
+	HObject( HClass const*, fields_t const& );
 private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;
