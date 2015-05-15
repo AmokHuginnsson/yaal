@@ -103,21 +103,30 @@ void OCompiler::OCompilationFrame::clear( void ) {
 }
 
 OCompiler::OFunctionContext::OFunctionContext( HHuginn* huginn_ )
-	: _functionName(),
-	_parameters(),
-	_defaultValues(),
-	_lastDefaultValuePosition( -1 ),
-	_compilationStack(),
-	_operations(),
-	_valueTypes(),
-	_lastDereferenceOperator( OPERATOR::NONE ) {
+	: _functionName()
+	, _parameters()
+	, _defaultValues()
+	, _lastDefaultValuePosition( -1 )
+	, _compilationStack()
+	, _operations()
+	, _valueTypes()
+	, _lastDereferenceOperator( OPERATOR::NONE ) {
 	_compilationStack.emplace( huginn_ );
 	return;
 }
 
+OCompiler::OClassContext::OClassContext( void )
+	: _className()
+	, _baseName()
+	, _fieldNames() {
+	return;
+}
+
 OCompiler::OCompiler( HHuginn* huginn_ )
-	: _functionContexts(),
-	_huginn( huginn_ ) {
+	: _functionContexts()
+	, _classContext()
+	, _inClassContext( false )
+	, _huginn( huginn_ ) {
 	return;
 }
 
@@ -136,19 +145,27 @@ HHuginn::HHuginn::expression_t& OCompiler::current_expression( void ) {
 void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
+		if ( ! _inClassContext || ( ( name_ != "constructor" ) && ( name_ != "destructor" ) ) ) {
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
+		}
 	}
 	_functionContexts.emplace( _huginn );
 	f()._functionName = name_;
+	if ( _inClassContext ) {
+		add_field_name( name_, position_ );
+	}
 	return;
 	M_EPILOG
 }
 
 void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
+	_inClassContext = true;
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
+	_functionContexts.emplace( _huginn );
+	_classContext._className = name_;
 	return;
 	M_EPILOG
 }
@@ -158,6 +175,19 @@ void OCompiler::set_base_name( yaal::hcore::HString const& name_, executing_pars
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
+	_classContext._baseName = name_;
+	return;
+	M_EPILOG
+}
+
+void OCompiler::add_field_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	if ( find( _classContext._fieldNames.begin(), _classContext._fieldNames.end(), name_ ) != _classContext._fieldNames.end() ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Field `"_ys.append( name_ ).append( "' is already defined in `" ).append(_classContext._className ).append( "'." ), position_.get()
+		);
+	}
+	_classContext._fieldNames.push_back( name_ );
 	return;
 	M_EPILOG
 }
@@ -167,6 +197,7 @@ void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_par
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
+	add_field_name( name_, position_ );
 	return;
 	M_EPILOG
 }

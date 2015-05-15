@@ -95,12 +95,15 @@ words_t _directives_ = {{
 }};
 
 words_t _keywords_ = {{
+	"base",
 	"break",
 	"case",
 	"catch",
 	"class",
+	"constructor",
 	"continue",
 	"default",
+	"destructor",
 	"else",
 	"for",
 	"if",
@@ -507,8 +510,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 				e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_base_name, _compiler.get(), _1, _2 ) )
 			)
 		) >> '{' >> +(
-			field[HRuleBase::action_position_t( hcore::call( &OCompiler::add_field, _compiler.get(), _1 ) )]
-				| functionDefinition[HRuleBase::action_position_t( hcore::call( &OCompiler::add_method, _compiler.get(), _1 ) )]
+			field[HRuleBase::action_position_t( hcore::call( &OCompiler::add_field, _compiler.get(), _1 ) )] | functionDefinition
 		) >> '}',
 		HRuleBase::action_position_t( hcore::call( &HHuginn::create_class, this, _1 ) )
 	);
@@ -516,7 +518,6 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	return ( huginnGrammar );
 	M_EPILOG
 }
-
 
 HHuginn::HHuginnRuntimeException::HHuginnRuntimeException( yaal::hcore::HString const& message_, int position_ )
 	: _message( message_ ),
@@ -838,6 +839,8 @@ void HHuginn::create_function( executing_parser::position_t position_ ) {
 
 void HHuginn::create_class( executing_parser::position_t ) {
 	M_PROLOG
+	_compiler->_functionContexts.pop();
+	_compiler->_inClassContext = false;
 	return;
 	M_EPILOG
 }
