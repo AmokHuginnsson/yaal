@@ -118,14 +118,16 @@ OCompiler::OFunctionContext::OFunctionContext( HHuginn* huginn_ )
 OCompiler::OClassContext::OClassContext( void )
 	: _className()
 	, _baseName()
-	, _fieldNames() {
+	, _fieldNames()
+	, _position( 0 )
+	, _basePosition( 0 ) {
 	return;
 }
 
 OCompiler::OCompiler( HHuginn* huginn_ )
 	: _functionContexts()
 	, _classContext()
-	, _inClassContext( false )
+	, _submittedClasses()
 	, _huginn( huginn_ ) {
 	return;
 }
@@ -145,13 +147,13 @@ HHuginn::HHuginn::expression_t& OCompiler::current_expression( void ) {
 void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	if ( is_restricted( name_ ) ) {
-		if ( ! _inClassContext || ( ( name_ != "constructor" ) && ( name_ != "destructor" ) ) ) {
+		if ( ! _classContext || ( ( name_ != "constructor" ) && ( name_ != "destructor" ) ) ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 		}
 	}
 	_functionContexts.emplace( _huginn );
 	f()._functionName = name_;
-	if ( _inClassContext ) {
+	if ( !! _classContext ) {
 		add_field_name( name_, position_ );
 	}
 	return;
@@ -160,12 +162,16 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 
 void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	_inClassContext = true;
+	_classContext = make_resource<OClassContext>();
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
+	if ( _submittedClasses.count( name_ ) > 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' is already defined." ), position_.get() );
+	}
 	_functionContexts.emplace( _huginn );
-	_classContext._className = name_;
+	_classContext->_className = name_;
+	_classContext->_position = position_;
 	return;
 	M_EPILOG
 }
@@ -175,19 +181,20 @@ void OCompiler::set_base_name( yaal::hcore::HString const& name_, executing_pars
 	if ( is_restricted( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
-	_classContext._baseName = name_;
+	_classContext->_baseName = name_;
+	_classContext->_basePosition = position_;
 	return;
 	M_EPILOG
 }
 
 void OCompiler::add_field_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( find( _classContext._fieldNames.begin(), _classContext._fieldNames.end(), name_ ) != _classContext._fieldNames.end() ) {
+	if ( find( _classContext->_fieldNames.begin(), _classContext->_fieldNames.end(), name_ ) != _classContext->_fieldNames.end() ) {
 		throw HHuginn::HHuginnRuntimeException(
-			"Field `"_ys.append( name_ ).append( "' is already defined in `" ).append(_classContext._className ).append( "'." ), position_.get()
+			"Field `"_ys.append( name_ ).append( "' is already defined in `" ).append(_classContext->_className ).append( "'." ), position_.get()
 		);
 	}
-	_classContext._fieldNames.push_back( name_ );
+	_classContext->_fieldNames.push_back( name_ );
 	return;
 	M_EPILOG
 }
@@ -247,6 +254,44 @@ HHuginn::function_t OCompiler::create_function( executing_parser::position_t ) {
 	fc._defaultValues.clear();
 	fc._lastDefaultValuePosition = -1;
 	return ( fun );
+	M_EPILOG
+}
+
+void OCompiler::submit_class( executing_parser::position_t position_ ) {
+	M_PROLOG
+	_functionContexts.pop();
+	if ( ! _submittedClasses.insert( make_pair<yaal::hcore::HString const, class_context_t>( _classContext->_className, yaal::move( _classContext ) ) ).second ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( _classContext->_className ).append( "' is already defined." ), position_.get() );
+	}
+	return;
+	M_EPILOG
+}
+
+void OCompiler::track_name_cycle( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	typedef yaal::hcore::HHashSet<yaal::hcore::HString> names_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> hierarhy_t;
+	names_t names;
+	hierarhy_t hierarhy;
+	OClassContext const* cc( _submittedClasses.at( name_ ).get() );
+	names.insert( name_ );
+	while ( ! cc->_baseName.is_empty() ) {
+		submitted_classes_t::const_iterator it( _submittedClasses.find( cc->_baseName ) );
+		if ( it == _submittedClasses.end() ) {
+			throw HHuginn::HHuginnRuntimeException( "Base class `"_ys.append( cc->_baseName ).append( "' was not defined." ), cc->_basePosition.get() );
+		}
+		hierarhy.push_back( cc->_baseName );
+		if ( ! names.insert( cc->_baseName ).second ) {
+			hcore::HString hier( name_ );
+			for ( hcore::HString const& n : hierarhy ) {
+				hier.append( "->" );
+				hier.append( n );
+			}
+			throw HHuginn::HHuginnRuntimeException( "Class derivation cycle detected `"_ys.append( hier ).append( "'." ), cc->_basePosition.get() );
+		}
+		cc = it->second.get();
+	}
+	return;
 	M_EPILOG
 }
 

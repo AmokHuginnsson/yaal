@@ -246,6 +246,8 @@ public:
 	yaal::hcore::HStreamInterface& error_stream( void );
 	function_t get_function( yaal::hcore::HString const& );
 private:
+	void commit_classes( void );
+	HClass const* commit_class( yaal::hcore::HString const& );
 	void register_builtins( void );
 	char const* error_message( int ) const;
 	friend type_t HType::register_type( yaal::hcore::HString const&, HHuginn* );
@@ -482,12 +484,15 @@ public:
 class HHuginn::HClass {
 public:
 	typedef HHuginn::HClass this_type;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> names_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, int> name_indexes_t;
+	typedef yaal::hcore::HArray<expression_t> defaults_t;
 private:
 	HClass const* _base;
-	name_indexes_t _indexes;
+	names_t _names;
+	name_indexes_t _nameIndexes;
 public:
-	HClass( HClass const* );
+	HClass( HClass const*, names_t const& );
 private:
 	HClass( HClass const& ) = delete;
 	HClass& operator = ( HClass const& ) = delete;

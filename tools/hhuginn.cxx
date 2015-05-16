@@ -512,7 +512,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		) >> '{' >> +(
 			field[HRuleBase::action_position_t( hcore::call( &OCompiler::add_field, _compiler.get(), _1 ) )] | functionDefinition
 		) >> '}',
-		HRuleBase::action_position_t( hcore::call( &HHuginn::create_class, this, _1 ) )
+		HRuleBase::action_position_t( hcore::call( &OCompiler::submit_class, _compiler.get(), _1 ) )
 	);
 	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition ) );
 	return ( huginnGrammar );
@@ -552,6 +552,20 @@ HHuginn::type_t HHuginn::HType::register_type( yaal::hcore::HString const& name_
 
 int HHuginn::HType::builtin_type_count( void ) {
 	return ( _idGenerator );
+}
+
+HHuginn::HClass::HClass( HClass const* base_, names_t const& names_ )
+	: _base( base_ )
+	, _names( names_ )
+	, _nameIndexes( names_.get_size() ) {
+	M_PROLOG
+	int i( 0 );
+	for ( yaal::hcore::HString const& name : names_ ) {
+		_nameIndexes.insert( make_pair( name, i ) );
+		++ i;
+	}
+	return;
+	M_EPILOG
 }
 
 HHuginn::flag_t HHuginn::_grammarVerified{ false };
@@ -620,6 +634,38 @@ bool HHuginn::parse( void ) {
 	M_EPILOG
 }
 
+HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	HClass const* c( nullptr );
+	classes_t::const_iterator it( _classes.find( name_ ) );
+	if ( it != _classes.end() ) {
+		c = it->second.get();
+	} else {
+		OCompiler::OClassContext* cc( _compiler->_submittedClasses.at( name_ ).get() );
+		_compiler->track_name_cycle( name_ );
+		if ( _functions.count( name_ ) > 0 ) {
+			throw HHuginnRuntimeException( "Function of the same name `"_ys.append( name_ ).append( "' is already defined." ), cc->_position.get() );
+		}
+		HClass const* base( nullptr );
+		if ( ! cc->_baseName.is_empty() ) {
+			base = commit_class( cc->_baseName );
+		}
+		c = _classes.insert( make_pair( name_, make_pointer<HClass>( base, cc->_fieldNames ) ) ).first->second.get();
+		HType::register_type( cc->_className, this );
+	}
+	return ( c );
+	M_EPILOG
+}
+
+void HHuginn::commit_classes( void ) {
+	M_PROLOG
+	for ( OCompiler::submitted_classes_t::value_type const& sc : _compiler->_submittedClasses ) {
+		commit_class( sc.first );
+	}
+	return;
+	M_EPILOG
+}
+
 bool HHuginn::compile( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PARSED );
@@ -627,6 +673,7 @@ bool HHuginn::compile( void ) {
 	bool ok( false );
 	try {
 		_engine.execute();
+		commit_classes();
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
 		_errorMessage = e.message();
@@ -820,7 +867,11 @@ void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ )
 
 void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
-	stream_ << "Huginn VM state for `" << _source->name() << "':\nfunctions:" << endl;
+	stream_ << "Huginn VM state for `" << _source->name() << "'\nclasses:" << endl;
+	for ( classes_t::value_type const& c : _classes ) {
+		stream_ << c.first << endl;
+	}
+	stream_ << "functions:" << endl;
 	for ( functions_t::value_type const& f : _functions ) {
 		stream_ << f.first << endl;
 	}
@@ -833,14 +884,6 @@ void HHuginn::create_function( executing_parser::position_t position_ ) {
 	OCompiler::OFunctionContext& fc( _compiler->f() );
 	_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( fc._functionName ), _compiler->create_function( position_ ) ) );
 	_compiler->_functionContexts.pop();
-	return;
-	M_EPILOG
-}
-
-void HHuginn::create_class( executing_parser::position_t ) {
-	M_PROLOG
-	_compiler->_functionContexts.pop();
-	_compiler->_inClassContext = false;
 	return;
 	M_EPILOG
 }
