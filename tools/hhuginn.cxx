@@ -556,13 +556,16 @@ int HHuginn::HType::builtin_type_count( void ) {
 
 HHuginn::HClass::HClass( HClass const* base_, names_t const& names_ )
 	: _base( base_ )
-	, _names( names_ )
-	, _nameIndexes( names_.get_size() ) {
+	, _names()
+	, _nameIndexes( base_ ? base_->_nameIndexes : name_indexes_t() ) {
 	M_PROLOG
-	int i( 0 );
+	int i( base_ ? static_cast<int>( base_->_nameIndexes.get_size() ) : 0 );
 	for ( yaal::hcore::HString const& name : names_ ) {
-		_nameIndexes.insert( make_pair( name, i ) );
-		++ i;
+		if ( ( base_ == nullptr ) || ( base_->_nameIndexes.count( name ) == 0 ) ) {
+			_nameIndexes.insert( make_pair( name, i ) );
+			_names.push_back( name );
+			++ i;
+		}
 	}
 	return;
 	M_EPILOG
