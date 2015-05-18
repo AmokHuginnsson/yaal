@@ -152,7 +152,7 @@ include $(DIR_ROOT)/_aux/mk/b_implicit-compile.mk
 include $(DIR_ROOT)/_aux/mk/c_target-default.mk
 
 #phony targets
-.PHONY: all bin clean clean-dep cov coverage-stats debug dep distclean doc flint install install-environment mrproper relassert reldeb release prepare-coverage-baseline prof purge purge-local static stats test uninstall
+.PHONY: all bin clean clean-dep cov coverage-stats debug dep distclean doc install install-environment mrproper relassert reldeb release prepare-coverage-baseline prof purge purge-local static stats test uninstall
 
 $(TARGET): $(DIRS) $(TARGETS) $(firstword $(SSL_KEYS)) $(MAIN_LIB_HEADER)
 
@@ -234,13 +234,6 @@ uninstall-doc:
 
 stats:
 	@cd $(DIR_ROOT) && ./_aux/stats $(DIR_ROOT)
-
-flint:
-	@flint -b _aux/flint.lnt hcore/*.$(SS) hconsole/*.$(SS) tools/*.$(SS) \
-						dbwrapper/db_driver_loader.$(SS) dbwrapper/dbwrapper.$(SS) \
-						dbwrapper/hdatabase.$(SS) dbwrapper/hrecordset.$(SS) \
-						hdata/*.$(SS) \
-| awk '{gsub(" \\(compare with line [^)]+\\)","");print}'|head -20
 
 test: all
 	@if [ -d $(DIR_ROOT)/../tress ] ; then \
