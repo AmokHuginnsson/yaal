@@ -484,15 +484,17 @@ public:
 class HHuginn::HClass {
 public:
 	typedef HHuginn::HClass this_type;
-	typedef yaal::hcore::HArray<yaal::hcore::HString> names_t;
-	typedef yaal::hcore::HHashMap<yaal::hcore::HString, int> name_indexes_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
+	typedef yaal::hcore::HHashMap<yaal::hcore::HString, int> field_indexes_t;
 	typedef yaal::hcore::HArray<expression_t> defaults_t;
 private:
 	HClass const* _base;
-	names_t _names;
-	name_indexes_t _nameIndexes;
+	yaal::hcore::HString _name;
+	field_names_t _fieldNames;
+	field_indexes_t _fieldIndexes;
 public:
-	HClass( HClass const*, names_t const& );
+	HClass( HClass const*, yaal::hcore::HString const&, field_names_t const& );
+	HClass const* base( void ) const;
 private:
 	HClass( HClass const& ) = delete;
 	HClass& operator = ( HClass const& ) = delete;

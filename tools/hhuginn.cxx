@@ -554,21 +554,29 @@ int HHuginn::HType::builtin_type_count( void ) {
 	return ( _idGenerator );
 }
 
-HHuginn::HClass::HClass( HClass const* base_, names_t const& names_ )
-	: _base( base_ )
-	, _names()
-	, _nameIndexes( base_ ? base_->_nameIndexes : name_indexes_t() ) {
+HHuginn::HClass::HClass(
+	HClass const* base_,
+	yaal::hcore::HString const& name_,
+	field_names_t const& fieldNames_
+) : _base( base_ )
+	, _name( name_ )
+	, _fieldNames()
+	, _fieldIndexes( base_ ? base_->_fieldIndexes : field_indexes_t() ) {
 	M_PROLOG
-	int i( base_ ? static_cast<int>( base_->_nameIndexes.get_size() ) : 0 );
-	for ( yaal::hcore::HString const& name : names_ ) {
-		if ( ( base_ == nullptr ) || ( base_->_nameIndexes.count( name ) == 0 ) ) {
-			_nameIndexes.insert( make_pair( name, i ) );
-			_names.push_back( name );
+	int i( base_ ? static_cast<int>( base_->_fieldIndexes.get_size() ) : 0 );
+	for ( yaal::hcore::HString const& name : fieldNames_ ) {
+		if ( ( base_ == nullptr ) || ( base_->_fieldIndexes.count( name ) == 0 ) ) {
+			_fieldIndexes.insert( make_pair( name, i ) );
+			_fieldNames.push_back( name );
 			++ i;
 		}
 	}
 	return;
 	M_EPILOG
+}
+
+HHuginn::HClass const* HHuginn::HClass::base( void ) const {
+	return ( _base );
 }
 
 HHuginn::flag_t HHuginn::_grammarVerified{ false };
@@ -653,7 +661,7 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 		if ( ! cc->_baseName.is_empty() ) {
 			base = commit_class( cc->_baseName );
 		}
-		c = _classes.insert( make_pair( name_, make_pointer<HClass>( base, cc->_fieldNames ) ) ).first->second.get();
+		c = _classes.insert( make_pair( name_, make_pointer<HClass>( base, name_, cc->_fieldNames ) ) ).first->second.get();
 		HType::register_type( cc->_className, this );
 	}
 	return ( c );
