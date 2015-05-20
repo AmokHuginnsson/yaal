@@ -119,6 +119,7 @@ OCompiler::OClassContext::OClassContext( void )
 	: _className()
 	, _baseName()
 	, _fieldNames()
+	, _fieldDefinitions()
 	, _position( 0 )
 	, _basePosition( 0 ) {
 	return;
@@ -214,12 +215,6 @@ void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	HHuginn::HErrorCoordinate ec( _huginn->get_coordinate( position_.get() ) );
 	_functionContexts.emplace( _huginn );
 	f()._functionName.assign( "@" ).append( ec.line() ).append( ":" ).append( ec.column() );
-	return;
-	M_EPILOG
-}
-
-void OCompiler::add_field( executing_parser::position_t ) {
-	M_PROLOG
 	return;
 	M_EPILOG
 }
@@ -532,6 +527,15 @@ void OCompiler::add_default_value( executing_parser::position_t ) {
 	M_ASSERT( ! fc._compilationStack.is_empty() );
 	fc._lastDefaultValuePosition = static_cast<int>( fc._parameters.get_size() - 1 );
 	fc._defaultValues.push_back( current_expression() );
+	reset_expression();
+	return;
+	M_EPILOG
+}
+
+void OCompiler::add_field_definition( executing_parser::position_t ) {
+	M_PROLOG
+	M_ASSERT( !! _classContext );
+	_classContext->_fieldDefinitions.push_back( current_expression() );
 	reset_expression();
 	return;
 	M_EPILOG

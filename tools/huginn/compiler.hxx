@@ -88,6 +88,7 @@ struct OCompiler {
 		yaal::hcore::HString _className;
 		yaal::hcore::HString _baseName;
 		filed_names_t _fieldNames;
+		HHuginn::expressions_t _fieldDefinitions;
 		executing_parser::position_t _position;
 		executing_parser::position_t _basePosition;
 		OClassContext( void );
@@ -129,7 +130,7 @@ struct OCompiler {
 	void reset_expression( void );
 	void start_subexpression( executing_parser::position_t );
 	void add_subexpression( OPERATOR, executing_parser::position_t );
-	void add_field( executing_parser::position_t );
+	void add_field_definition( executing_parser::position_t );
 	void add_method( executing_parser::position_t );
 	void commit_boolean( OPERATOR, executing_parser::position_t );
 	void commit_ternary( executing_parser::position_t );

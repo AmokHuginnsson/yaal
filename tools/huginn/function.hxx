@@ -41,7 +41,7 @@ class HFunction {
 public:
 	typedef HFunction this_type;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> parameter_names_t;
-	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
+	typedef HHuginn::expressions_t expressions_t;
 private:
 	yaal::hcore::HString _name;
 	parameter_names_t _parameterNames;

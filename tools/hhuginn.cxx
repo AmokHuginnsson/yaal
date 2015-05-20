@@ -126,12 +126,15 @@ words_t _builtin_ = {{
 	"number",
 	"real",
 	"string",
-	"type"
+	"type",
+	"size",
+	"copy"
 }};
 
 words_t _standardLibrary_ = {{
 	"file",
-	"print"
+	"print",
+	"input"
 }};
 
 }
@@ -495,7 +498,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			"fieldIdentifier",
 			identifier,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_field_name, _compiler.get(), _1, _2 ) )
-		) >> '=' >> expression >> ';'
+		) >> '=' >> HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::add_field_definition, _compiler.get(), _1 ) ) ) >> ';'
 	);
 	HRule classDefinition(
 		"classDefinition",
@@ -509,9 +512,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 				identifier,
 				e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_base_name, _compiler.get(), _1, _2 ) )
 			)
-		) >> '{' >> +(
-			field[HRuleBase::action_position_t( hcore::call( &OCompiler::add_field, _compiler.get(), _1 ) )] | functionDefinition
-		) >> '}',
+		) >> '{' >> +( field | functionDefinition ) >> '}',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::submit_class, _compiler.get(), _1 ) )
 	);
 	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition ) );
@@ -557,11 +558,13 @@ int HHuginn::HType::builtin_type_count( void ) {
 HHuginn::HClass::HClass(
 	HClass const* base_,
 	yaal::hcore::HString const& name_,
-	field_names_t const& fieldNames_
+	field_names_t const& fieldNames_,
+	expressions_t const& fieldDefinitions_
 ) : _base( base_ )
 	, _name( name_ )
 	, _fieldNames()
-	, _fieldIndexes( base_ ? base_->_fieldIndexes : field_indexes_t() ) {
+	, _fieldIndexes( base_ ? base_->_fieldIndexes : field_indexes_t() )
+	, _fieldDefinitions( fieldDefinitions_ ) {
 	M_PROLOG
 	int i( base_ ? static_cast<int>( base_->_fieldIndexes.get_size() ) : 0 );
 	for ( yaal::hcore::HString const& name : fieldNames_ ) {
@@ -661,7 +664,7 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 		if ( ! cc->_baseName.is_empty() ) {
 			base = commit_class( cc->_baseName );
 		}
-		c = _classes.insert( make_pair( name_, make_pointer<HClass>( base, name_, cc->_fieldNames ) ) ).first->second.get();
+		c = _classes.insert( make_pair( name_, make_pointer<HClass>( base, name_, cc->_fieldNames, cc->_fieldDefinitions ) ) ).first->second.get();
 		HType::register_type( cc->_className, this );
 	}
 	return ( c );
@@ -908,6 +911,15 @@ HHuginn::type_t HHuginn::HValue::type( void ) const {
 	return ( _type );
 }
 
+HHuginn::value_t HHuginn::HValue::clone( void ) const {
+	return ( do_clone() );
+}
+
+HHuginn::value_t HHuginn::HValue::do_clone( void ) const {
+	M_ASSERT( _type == TYPE::NONE );
+	return ( _none_ );
+}
+
 HHuginn::HReference::HReference( HHuginn::value_t& value_ )
 	: HValue( TYPE::REFERENCE ), _value( value_ ) {
 	return;
@@ -915,6 +927,10 @@ HHuginn::HReference::HReference( HHuginn::value_t& value_ )
 
 HHuginn::value_t& HHuginn::HReference::value( void ) const {
 	return ( _value );
+}
+
+HHuginn::value_t HHuginn::HReference::do_clone( void ) const {
+	return ( make_pointer<HReference>( _value ) );
 }
 
 HHuginn::HReal::HReal( double long value_ )
@@ -926,6 +942,10 @@ double long HHuginn::HReal::value( void ) const {
 	return ( _value );
 }
 
+HHuginn::value_t HHuginn::HReal::do_clone( void ) const {
+	return ( make_pointer<HReal>( _value ) );
+}
+
 HHuginn::HBoolean::HBoolean( bool value_ )
 	: HValue( TYPE::BOOLEAN ), _value( value_ ) {
 	return;
@@ -933,6 +953,10 @@ HHuginn::HBoolean::HBoolean( bool value_ )
 
 bool HHuginn::HBoolean::value( void ) const {
 	return ( _value );
+}
+
+HHuginn::value_t HHuginn::HBoolean::do_clone( void ) const {
+	return ( make_pointer<HBoolean>( _value ) );
 }
 
 HHuginn::HInteger::HInteger( int long long value_ )
@@ -944,6 +968,10 @@ int long long HHuginn::HInteger::value( void ) const {
 	return ( _value );
 }
 
+HHuginn::value_t HHuginn::HInteger::do_clone( void ) const {
+	return ( make_pointer<HInteger>( _value ) );
+}
+
 HHuginn::HNumber::HNumber( yaal::hcore::HNumber const& value_ )
 	: HValue( TYPE::NUMBER ), _value( value_ ) {
 	return;
@@ -953,6 +981,10 @@ yaal::hcore::HNumber const& HHuginn::HNumber::value( void ) const {
 	return ( _value );
 }
 
+HHuginn::value_t HHuginn::HNumber::do_clone( void ) const {
+	return ( make_pointer<HNumber>( _value ) );
+}
+
 HHuginn::HCharacter::HCharacter( char value_ )
 	: HValue( TYPE::CHARACTER ), _value( value_ ) {
 	return;
@@ -960,6 +992,10 @@ HHuginn::HCharacter::HCharacter( char value_ )
 
 char HHuginn::HCharacter::value( void ) const {
 	return ( _value );
+}
+
+HHuginn::value_t HHuginn::HCharacter::do_clone( void ) const {
+	return ( make_pointer<HCharacter>( _value ) );
 }
 
 namespace {
@@ -1060,13 +1096,24 @@ yaal::hcore::HString& HHuginn::HString::value( void ) {
 	return ( _value );
 }
 
+HHuginn::value_t HHuginn::HString::do_clone( void ) const {
+	return ( make_pointer<HString>( _value ) );
+}
+
 HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( void ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStringIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
 HHuginn::HList::HList( void )
-	: HIterable( TYPE::LIST ), _data() {
+	: HIterable( TYPE::LIST )
+	, _data() {
+	return;
+}
+
+HHuginn::HList::HList( values_t const& data_ )
+	: HIterable( TYPE::LIST )
+	, _data( data_ ) {
 	return;
 }
 
@@ -1100,10 +1147,21 @@ HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
+HHuginn::value_t HHuginn::HList::do_clone( void ) const {
+	return ( make_pointer<HList>( _data ) );
+}
+
 HHuginn::HMap::HMap( void )
 	: HIterable( TYPE::MAP ),
 	_data( &value_builtin::less_low ),
 	_keyType( HHuginn::TYPE::NONE ) {
+	return;
+}
+
+HHuginn::HMap::HMap( values_t const& data_, type_t keyType_ )
+	: HIterable( TYPE::MAP ),
+	_data( data_ ),
+	_keyType( keyType_ ) {
 	return;
 }
 
@@ -1154,6 +1212,10 @@ HHuginn::HIterable::HIterator HHuginn::HMap::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
+HHuginn::value_t HHuginn::HMap::do_clone( void ) const {
+	return ( make_pointer<HMap>( _data, _keyType ) );
+}
+
 HHuginn::HTernaryEvaluator::HTernaryEvaluator(
 	expression_t const& condition_,
 	expression_t const& ifTrue_,
@@ -1182,6 +1244,11 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 	M_EPILOG
 }
 
+HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( void ) const {
+	M_ASSERT( !"cloning ternary evaluator"[0] );
+	return ( _none_ );
+}
+
 HHuginn::HFunctionReference::HFunctionReference(
 	yaal::hcore::HString const& name_,
 	function_t const& function_
@@ -1197,6 +1264,10 @@ yaal::hcore::HString const& HHuginn::HFunctionReference::name( void ) const {
 
 HHuginn::function_t const& HHuginn::HFunctionReference::function( void ) const {
 	return ( _function );
+}
+
+HHuginn::value_t HHuginn::HFunctionReference::do_clone( void ) const {
+	return ( make_pointer<HFunctionReference>( _name, _function ) );
 }
 
 namespace huginn_builtin {
@@ -1275,6 +1346,20 @@ inline HHuginn::value_t type( huginn::HThread*, HHuginn::values_t const& values_
 	}
 	HHuginn::HValue const* v( values_.front().raw() );
 	return ( make_pointer<HHuginn::HString>( v->type()->name() ) );
+	M_EPILOG
+}
+
+inline HHuginn::value_t copy( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	if ( values_.get_size() != 1 ) {
+		throw HHuginn::HHuginnRuntimeException( ""_ys
+			.append( "copy() expects exactly one parameter, got: " )
+			.append( values_.get_size() ),
+			position_
+		);
+	}
+	HHuginn::HValue const* v( values_.front().raw() );
+	return ( v->clone() );
 	M_EPILOG
 }
 
@@ -1357,6 +1442,7 @@ void HHuginn::register_builtins( void ) {
 	_functions.insert( make_pair<yaal::hcore::HString const>( "character", hcore::call( &huginn_builtin::convert, TYPE::CHARACTER, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "size", hcore::call( &huginn_builtin::size, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "type", hcore::call( &huginn_builtin::type, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "copy", hcore::call( &huginn_builtin::copy, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "list", hcore::call( &huginn_builtin::list, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "map", hcore::call( &huginn_builtin::map, _1, _2, _3 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "print", hcore::call( &huginn_builtin::print, _1, _2, _3 ) ) );
