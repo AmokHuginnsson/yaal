@@ -515,14 +515,14 @@ public:
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, int> field_indexes_t;
 	class HMethod;
 private:
-	HClass const* _base;
+	HClass const* _super;
 	yaal::hcore::HString _name;
 	field_names_t _fieldNames;
 	field_indexes_t _fieldIndexes;
 	expressions_t _fieldDefinitions;
 public:
 	HClass( HClass const*, yaal::hcore::HString const&, field_names_t const&, expressions_t const& );
-	HClass const* base( void ) const;
+	HClass const* super( void ) const;
 	yaal::hcore::HString const& name( void ) const;
 	field_names_t const& field_names( void ) const;
 private:

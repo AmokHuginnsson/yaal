@@ -95,7 +95,6 @@ words_t _directives_ = {{
 }};
 
 words_t _keywords_ = {{
-	"base",
 	"break",
 	"case",
 	"catch",
@@ -111,9 +110,11 @@ words_t _keywords_ = {{
 	"none",
 	"null",
 	"return",
+	"super",
 	"switch",
 	"this",
 	"throw",
+	"try",
 	"while"
 }};
 
@@ -560,7 +561,7 @@ HHuginn::HClass::HClass(
 	yaal::hcore::HString const& name_,
 	field_names_t const& fieldNames_,
 	expressions_t const& fieldDefinitions_
-) : _base( base_ )
+) : _super( base_ )
 	, _name( name_ )
 	, _fieldNames( fieldNames_ )
 	, _fieldIndexes( base_ ? base_->_fieldIndexes : field_indexes_t() )
@@ -573,8 +574,8 @@ HHuginn::HClass::HClass(
 	M_EPILOG
 }
 
-HHuginn::HClass const* HHuginn::HClass::base( void ) const {
-	return ( _base );
+HHuginn::HClass const* HHuginn::HClass::super( void ) const {
+	return ( _super );
 }
 
 yaal::hcore::HString const& HHuginn::HClass::name( void ) const {
@@ -663,11 +664,11 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 		if ( _functions.count( name_ ) > 0 ) {
 			throw HHuginnRuntimeException( "Function of the same name `"_ys.append( name_ ).append( "' is already defined." ), cc->_position.get() );
 		}
-		HClass const* base( nullptr );
+		HClass const* super( nullptr );
 		if ( ! cc->_baseName.is_empty() ) {
-			base = commit_class( cc->_baseName );
+			super = commit_class( cc->_baseName );
 		}
-		c = _classes.insert( make_pair( name_, make_pointer<HClass>( base, name_, cc->_fieldNames, cc->_fieldDefinitions ) ) ).first->second.get();
+		c = _classes.insert( make_pair( name_, make_pointer<HClass>( super, name_, cc->_fieldNames, cc->_fieldDefinitions ) ) ).first->second.get();
 		HType::register_type( cc->_className, this );
 	}
 	return ( c );
@@ -885,16 +886,16 @@ void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ )
 inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream_, HHuginn::HClass const& huginnClass_ ) {
 	M_PROLOG
 	stream_ << huginnClass_.name();
-	if ( huginnClass_.base() ) {
-		stream_ << " : " << huginnClass_.base()->name();
+	if ( huginnClass_.super() ) {
+		stream_ << " : " << huginnClass_.super()->name();
 	}
 	HHuginn::HClass::field_names_t newFields( huginnClass_.field_names() );
 	typedef HStack<HHuginn::HClass const*> hierarhy_t;
 	hierarhy_t hierarhy;
-	HHuginn::HClass const* base( huginnClass_.base() );
-	while ( base ) {
-		hierarhy.push( base );
-		base = base->base();
+	HHuginn::HClass const* super( huginnClass_.super() );
+	while ( super ) {
+		hierarhy.push( super );
+		super = super->super();
 	}
 	HHuginn::HClass::field_names_t derivedFields;
 	while ( ! hierarhy.is_empty() ) {
