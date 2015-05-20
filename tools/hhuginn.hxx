@@ -523,6 +523,8 @@ private:
 public:
 	HClass( HClass const*, yaal::hcore::HString const&, field_names_t const&, expressions_t const& );
 	HClass const* base( void ) const;
+	yaal::hcore::HString const& name( void ) const;
+	field_names_t const& field_names( void ) const;
 private:
 	HClass( HClass const& ) = delete;
 	HClass& operator = ( HClass const& ) = delete;

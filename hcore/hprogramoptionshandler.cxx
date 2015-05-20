@@ -667,15 +667,18 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 	hcore::log( LOG_TYPE::INFO ) << "Decoding switches ... ";
 	char const* shortOpts( make_short_opts( _options, shortOptBuffer ) );
 	option* optionArray( make_option_array( _options, longOptBuffer ) );
-	while ( ( val = ::getopt_long( argc_, argv_, shortOpts,
-					optionArray, NULL ) ) != EOF ) {
+	while ( ( val = ::getopt_long( argc_, argv_, shortOpts, optionArray, NULL ) ) != EOF ) {
 		bool validSwitch( false );
 		for ( options_t::iterator it = _options.begin(), end = _options.end(); it != end; ++ it ) {
-			if ( it->_shortForm == val )
-				validSwitch = true, set_option( *it, optarg );
+			if ( it->_shortForm == val ) {
+				validSwitch = true;
+				set_option( *it, optarg );
+				break;
+			}
 		}
-		if ( ! validSwitch && unknown_ )
-			( *unknown_ ) ++;
+		if ( ! validSwitch && unknown_ ) {
+			++ ( *unknown_ );
+		}
 	}
 	hcore::log << "done." << endl;
 	return ( optind );

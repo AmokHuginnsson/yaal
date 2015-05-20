@@ -562,17 +562,12 @@ HHuginn::HClass::HClass(
 	expressions_t const& fieldDefinitions_
 ) : _base( base_ )
 	, _name( name_ )
-	, _fieldNames()
+	, _fieldNames( fieldNames_ )
 	, _fieldIndexes( base_ ? base_->_fieldIndexes : field_indexes_t() )
 	, _fieldDefinitions( fieldDefinitions_ ) {
 	M_PROLOG
-	int i( base_ ? static_cast<int>( base_->_fieldIndexes.get_size() ) : 0 );
-	for ( yaal::hcore::HString const& name : fieldNames_ ) {
-		if ( ( base_ == nullptr ) || ( base_->_fieldIndexes.count( name ) == 0 ) ) {
-			_fieldIndexes.insert( make_pair( name, i ) );
-			_fieldNames.push_back( name );
-			++ i;
-		}
+	for ( yaal::hcore::HString const& n : fieldNames_ ) {
+		_fieldIndexes.insert( make_pair( n, static_cast<int>( _fieldIndexes.get_size() ) ) );
 	}
 	return;
 	M_EPILOG
@@ -580,6 +575,14 @@ HHuginn::HClass::HClass(
 
 HHuginn::HClass const* HHuginn::HClass::base( void ) const {
 	return ( _base );
+}
+
+yaal::hcore::HString const& HHuginn::HClass::name( void ) const {
+	return ( _name );
+}
+
+HHuginn::HClass::field_names_t const& HHuginn::HClass::field_names( void ) const {
+	return ( _fieldNames );
 }
 
 HHuginn::flag_t HHuginn::_grammarVerified{ false };
@@ -879,15 +882,73 @@ void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ )
 	M_EPILOG
 }
 
+inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream_, HHuginn::HClass const& huginnClass_ ) {
+	M_PROLOG
+	stream_ << huginnClass_.name();
+	if ( huginnClass_.base() ) {
+		stream_ << " : " << huginnClass_.base()->name();
+	}
+	HHuginn::HClass::field_names_t newFields( huginnClass_.field_names() );
+	typedef HStack<HHuginn::HClass const*> hierarhy_t;
+	hierarhy_t hierarhy;
+	HHuginn::HClass const* base( huginnClass_.base() );
+	while ( base ) {
+		hierarhy.push( base );
+		base = base->base();
+	}
+	HHuginn::HClass::field_names_t derivedFields;
+	while ( ! hierarhy.is_empty() ) {
+		for ( yaal::hcore::HString const& f : hierarhy.top()->field_names() ) {
+			if ( find( derivedFields.begin(), derivedFields.end(), f ) == derivedFields.end() ) {
+				derivedFields.push_back( f );
+			}
+		}
+		hierarhy.pop();
+	}
+	HHuginn::HClass::field_names_t overridenFields;
+	for ( yaal::hcore::HString const& f : derivedFields ) {
+		if ( find( newFields.begin(), newFields.end(), f ) != newFields.end() ) {
+			overridenFields.push_back( f );
+		}
+	}
+
+	HHuginn::HClass::field_names_t::iterator endDerived( derivedFields.end() );
+	HHuginn::HClass::field_names_t::iterator endNew( newFields.end() );
+	for ( yaal::hcore::HString const& f : overridenFields ) {
+		endDerived = remove( derivedFields.begin(), endDerived, f );
+		endNew = remove( newFields.begin(), endNew, f );
+	}
+	newFields.erase( endNew, newFields.end() );
+	derivedFields.erase( endDerived, derivedFields.end() );
+	for ( yaal::hcore::HString const& f : derivedFields ) {
+		stream_ << "\n" <<  f << " (derived)";
+	}
+	for ( yaal::hcore::HString const& f : overridenFields ) {
+		stream_ << "\n" <<  f << " (overriden)";
+	}
+	for ( yaal::hcore::HString const& f : newFields ) {
+		stream_ << "\n" <<  f << " (new)";
+	}
+	return ( stream_ );
+	M_EPILOG
+}
+
 void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
-	stream_ << "Huginn VM state for `" << _source->name() << "'\nclasses:" << endl;
+	stream_ << "Huginn VM state for `" << _source->name() << "'" << endl << "classes:" << endl;
 	for ( classes_t::value_type const& c : _classes ) {
-		stream_ << c.first << endl;
+		stream_ << *c.second << endl;
 	}
 	stream_ << "functions:" << endl;
 	for ( functions_t::value_type const& f : _functions ) {
-		stream_ << f.first << endl;
+		stream_ << f.first;
+		if ( _builtin_.count( f.first ) > 0 ) {
+			stream_ <<" (builtin)";
+		}
+		if ( _standardLibrary_.count( f.first ) > 0 ) {
+			stream_ <<" (standard library)";
+		}
+		stream_ << endl;
 	}
 	return;
 	M_EPILOG
@@ -895,9 +956,11 @@ void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 
 void HHuginn::create_function( executing_parser::position_t position_ ) {
 	M_PROLOG
-	OCompiler::OFunctionContext& fc( _compiler->f() );
-	_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( fc._functionName ), _compiler->create_function( position_ ) ) );
-	_compiler->_functionContexts.pop();
+	if ( ! _compiler->_classContext ) {
+		OCompiler::OFunctionContext& fc( _compiler->f() );
+		_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( fc._functionName ), _compiler->create_function( position_ ) ) );
+		_compiler->_functionContexts.pop();
+	}
 	return;
 	M_EPILOG
 }
@@ -1310,8 +1373,7 @@ inline HHuginn::value_t size( huginn::HThread*, HHuginn::values_t const& values_
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException(
-			""_ys
-			.append( "size() expects exactly one parameter, got: " )
+			"size() expects exactly one parameter, got: "_ys
 			.append( values_.get_size() ),
 			position_
 		);
@@ -1338,8 +1400,8 @@ inline HHuginn::value_t size( huginn::HThread*, HHuginn::values_t const& values_
 inline HHuginn::value_t type( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
-		throw HHuginn::HHuginnRuntimeException( ""_ys
-			.append( "type() expects exactly one parameter, got: " )
+		throw HHuginn::HHuginnRuntimeException(
+			"type() expects exactly one parameter, got: "_ys
 			.append( values_.get_size() ),
 			position_
 		);
@@ -1352,8 +1414,8 @@ inline HHuginn::value_t type( huginn::HThread*, HHuginn::values_t const& values_
 inline HHuginn::value_t copy( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
-		throw HHuginn::HHuginnRuntimeException( ""_ys
-			.append( "copy() expects exactly one parameter, got: " )
+		throw HHuginn::HHuginnRuntimeException(
+			"copy() expects exactly one parameter, got: "_ys
 			.append( values_.get_size() ),
 			position_
 		);
@@ -1377,8 +1439,8 @@ inline HHuginn::value_t list( huginn::HThread*, HHuginn::values_t const& values_
 inline HHuginn::value_t map( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( ! values_.is_empty() ) {
-		throw HHuginn::HHuginnRuntimeException( ""_ys
-			.append( "map() does not expect any parameters, got: " )
+		throw HHuginn::HHuginnRuntimeException(
+			"map() does not expect any parameters, got: "_ys
 			.append( values_.get_size() ),
 			position_
 		);
@@ -1390,8 +1452,8 @@ inline HHuginn::value_t map( huginn::HThread*, HHuginn::values_t const& values_,
 inline HHuginn::value_t print( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
-		throw HHuginn::HHuginnRuntimeException( ""_ys
-			.append( "print() expects exactly one parameter, got: " )
+		throw HHuginn::HHuginnRuntimeException(
+			"print() expects exactly one parameter, got: "_ys
 			.append( values_.get_size() ),
 			position_
 		);
