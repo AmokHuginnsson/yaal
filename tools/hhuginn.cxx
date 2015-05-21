@@ -558,11 +558,13 @@ int HHuginn::HType::builtin_type_count( void ) {
 }
 
 HHuginn::HClass::HClass(
+	type_t type_,
 	HClass const* super_,
 	yaal::hcore::HString const& name_,
 	field_names_t const& fieldNames_,
 	values_t const& fieldDefinitions_
-) : _super( super_ )
+) : _type( type_ )
+	, _super( super_ )
 	, _name( name_ )
 	, _fieldNames( fieldNames_ )
 	, _fieldIndexes( super_ ? super_->_fieldIndexes : field_indexes_t() )
@@ -583,8 +585,41 @@ yaal::hcore::HString const& HHuginn::HClass::name( void ) const {
 	return ( _name );
 }
 
+HHuginn::type_t HHuginn::HClass::type( void ) const {
+	return ( _type );
+}
+
 HHuginn::HClass::field_names_t const& HHuginn::HClass::field_names( void ) const {
 	return ( _fieldNames );
+}
+
+HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread*, values_t const&, int ) const {
+	M_PROLOG
+	values_t defaults;
+	for ( value_t const& v : _fieldDefinitions ) {
+		defaults.push_back( v->clone() );
+	}
+	value_t v( make_pointer<HObject>( this, defaults ) );
+	return ( v );
+	M_EPILOG
+}
+
+HHuginn::HObject::HObject(
+	HClass const* class_,
+	values_t const& fields_
+) : HValue( class_->type() )
+	, _class( class_ )
+	, _fields( fields_ ) {
+}
+
+HHuginn::value_t HHuginn::HObject::do_clone( void ) const {
+	M_PROLOG
+	values_t fields;
+	for ( value_t const& v : _fields ) {
+		fields.push_back( v->clone() );
+	}
+	return ( make_pointer<HObject>( _class, fields ) );
+	M_EPILOG
 }
 
 HHuginn::flag_t HHuginn::_grammarVerified{ false };
@@ -686,8 +721,8 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 				fieldDefinitions.push_back( make_pointer<HClass::HMethod>( m->second ) );
 			}
 		}
-		c = _classes.insert( make_pair( name_, make_pointer<HClass>( super, name_, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
-		HType::register_type( cc->_className, this );
+		type_t type( HType::register_type( cc->_className, this ) );
+		c = _classes.insert( make_pair( name_, make_pointer<HClass>( type, super, name_, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
 	}
 	return ( c );
 	M_EPILOG
@@ -774,8 +809,17 @@ HHuginn::value_t HHuginn::result( void ) const {
 
 HHuginn::function_t HHuginn::get_function( yaal::hcore::HString const& name_ ) {
 	M_PROLOG
-	functions_t::const_iterator it( _functions.find( name_ ) );
-	return ( it != _functions.end() ? it->second : function_t() );
+	HHuginn::function_t f;
+	functions_t::const_iterator fi( _functions.find( name_ ) );
+	if ( fi != _functions.end() ) {
+		f = fi->second;
+	} else {
+		classes_t::const_iterator ci( _classes.find( name_ ) );
+		if ( ci != _classes.end() ) {
+			f = hcore::call( &HHuginn::HClass::create_instance, ci->second.raw(), _1, _2, _3 );
+		}
+	}
+	return ( f );
 	M_EPILOG
 }
 

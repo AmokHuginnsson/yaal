@@ -516,16 +516,19 @@ public:
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, int> field_indexes_t;
 	class HMethod;
 private:
+	type_t _type;
 	HClass const* _super;
 	yaal::hcore::HString _name;
 	field_names_t _fieldNames;
 	field_indexes_t _fieldIndexes;
 	values_t _fieldDefinitions;
 public:
-	HClass( HClass const*, yaal::hcore::HString const&, field_names_t const&, values_t const& );
+	HClass( type_t, HClass const*, yaal::hcore::HString const&, field_names_t const&, values_t const& );
 	HClass const* super( void ) const;
 	yaal::hcore::HString const& name( void ) const;
+	type_t type( void ) const;
 	field_names_t const& field_names( void ) const;
+	value_t create_instance( huginn::HThread*, values_t const&, int ) const;
 private:
 	HClass( HClass const& ) = delete;
 	HClass& operator = ( HClass const& ) = delete;
