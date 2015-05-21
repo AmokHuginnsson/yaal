@@ -84,11 +84,14 @@ struct OCompiler {
 	};
 	typedef yaal::hcore::HStack<OFunctionContext> function_contexts_t;
 	struct OClassContext {
-		typedef yaal::hcore::HArray<yaal::hcore::HString> filed_names_t;
+		typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
+		typedef yaal::hcore::HHashMap<int, HHuginn::expression_t> expressions_t;
+		typedef yaal::hcore::HHashMap<int, HHuginn::function_t> methods_t;
 		yaal::hcore::HString _className;
 		yaal::hcore::HString _baseName;
-		filed_names_t _fieldNames;
-		HHuginn::expressions_t _fieldDefinitions;
+		field_names_t _fieldNames;
+		expressions_t _fieldDefinitions;
+		methods_t _methods;
 		executing_parser::position_t _position;
 		executing_parser::position_t _basePosition;
 		OClassContext( void );

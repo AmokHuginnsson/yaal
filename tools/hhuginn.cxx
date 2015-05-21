@@ -83,6 +83,7 @@ HHuginn::type_t const HHuginn::TYPE::LIST( HHuginn::HType::register_type( "list"
 HHuginn::type_t const HHuginn::TYPE::MAP( HHuginn::HType::register_type( "map", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::REFERENCE( HHuginn::HType::register_type( "*reference*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::FUNCTION_REFERENCE( HHuginn::HType::register_type( "*function_reference*", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::METHOD( HHuginn::HType::register_type( "*method*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::UNKNOWN( HHuginn::HType::register_type( "*unknown*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::NOT_BOOLEAN( HHuginn::HType::register_type( "*not_boolean*", nullptr ) );
 
@@ -522,8 +523,8 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 }
 
 HHuginn::HHuginnRuntimeException::HHuginnRuntimeException( yaal::hcore::HString const& message_, int position_ )
-	: _message( message_ ),
-	_position( position_ ) {
+	: _message( message_ )
+	, _position( position_ ) {
 	return;
 }
 
@@ -557,14 +558,14 @@ int HHuginn::HType::builtin_type_count( void ) {
 }
 
 HHuginn::HClass::HClass(
-	HClass const* base_,
+	HClass const* super_,
 	yaal::hcore::HString const& name_,
 	field_names_t const& fieldNames_,
-	expressions_t const& fieldDefinitions_
-) : _super( base_ )
+	values_t const& fieldDefinitions_
+) : _super( super_ )
 	, _name( name_ )
 	, _fieldNames( fieldNames_ )
-	, _fieldIndexes( base_ ? base_->_fieldIndexes : field_indexes_t() )
+	, _fieldIndexes( super_ ? super_->_fieldIndexes : field_indexes_t() )
 	, _fieldDefinitions( fieldDefinitions_ ) {
 	M_PROLOG
 	for ( yaal::hcore::HString const& n : fieldNames_ ) {
@@ -668,7 +669,24 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 		if ( ! cc->_baseName.is_empty() ) {
 			super = commit_class( cc->_baseName );
 		}
-		c = _classes.insert( make_pair( name_, make_pointer<HClass>( super, name_, cc->_fieldNames, cc->_fieldDefinitions ) ) ).first->second.get();
+		values_t fieldDefinitions;
+		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
+		threads_t::iterator ti( _threads.find( threadId ) );
+		M_ASSERT( ti != _threads.end() );
+		huginn::HThread* t( ti->second.raw() );
+		HFrame* frame( t->current_frame() );
+		for ( int i( 0 ), size( static_cast<int>( cc->_fieldNames.get_size() ) ); i < size; ++ i ) {
+			OCompiler::OClassContext::expressions_t::const_iterator f( cc->_fieldDefinitions.find( i ) );
+			if ( f != cc->_fieldDefinitions.end() ) {
+				f->second->execute( t );
+				fieldDefinitions.push_back( frame->result() );
+			} else {
+				OCompiler::OClassContext::methods_t::const_iterator m( cc->_methods.find( i ) );
+				M_ASSERT( m != cc->_methods.end() );
+				fieldDefinitions.push_back( make_pointer<HClass::HMethod>( m->second ) );
+			}
+		}
+		c = _classes.insert( make_pair( name_, make_pointer<HClass>( super, name_, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
 		HType::register_type( cc->_className, this );
 	}
 	return ( c );
@@ -677,9 +695,13 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 
 void HHuginn::commit_classes( void ) {
 	M_PROLOG
+	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
+	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
+	t->create_function_frame();
 	for ( OCompiler::submitted_classes_t::value_type const& sc : _compiler->_submittedClasses ) {
 		commit_class( sc.first );
 	}
+	t->pop_frame();
 	return;
 	M_EPILOG
 }
@@ -704,8 +726,6 @@ bool HHuginn::compile( void ) {
 bool HHuginn::execute( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::COMPILED );
-	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
-	threads_t::iterator t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first );
 	values_t args;
 	if ( _argv->size() > 0 ) {
 		args.push_back( _argv );
@@ -961,6 +981,8 @@ void HHuginn::create_function( executing_parser::position_t position_ ) {
 		OCompiler::OFunctionContext& fc( _compiler->f() );
 		_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( fc._functionName ), _compiler->create_function( position_ ) ) );
 		_compiler->_functionContexts.pop();
+	} else {
+		_compiler->add_method( position_ );
 	}
 	return;
 	M_EPILOG
@@ -1332,6 +1354,21 @@ HHuginn::function_t const& HHuginn::HFunctionReference::function( void ) const {
 
 HHuginn::value_t HHuginn::HFunctionReference::do_clone( void ) const {
 	return ( make_pointer<HFunctionReference>( _name, _function ) );
+}
+
+HHuginn::HClass::HMethod::HMethod(
+	function_t const& function_
+) : HValue( TYPE::METHOD )
+	, _function( function_ ) {
+	return;
+}
+
+HHuginn::function_t const& HHuginn::HClass::HMethod::function( void ) const {
+	return ( _function );
+}
+
+HHuginn::value_t HHuginn::HClass::HMethod::do_clone( void ) const {
+	return ( make_pointer<HMethod>( _function ) );
 }
 
 namespace huginn_builtin {

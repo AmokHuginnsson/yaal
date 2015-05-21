@@ -120,6 +120,7 @@ OCompiler::OClassContext::OClassContext( void )
 	, _baseName()
 	, _fieldNames()
 	, _fieldDefinitions()
+	, _methods()
 	, _position( 0 )
 	, _basePosition( 0 ) {
 	return;
@@ -219,8 +220,9 @@ void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::add_method( executing_parser::position_t ) {
+void OCompiler::add_method( executing_parser::position_t position_ ) {
 	M_PROLOG
+	_classContext->_methods.insert( make_pair( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ), create_function( position_ ) ) );
 	return;
 	M_EPILOG
 }
@@ -535,7 +537,7 @@ void OCompiler::add_default_value( executing_parser::position_t ) {
 void OCompiler::add_field_definition( executing_parser::position_t ) {
 	M_PROLOG
 	M_ASSERT( !! _classContext );
-	_classContext->_fieldDefinitions.push_back( current_expression() );
+	_classContext->_fieldDefinitions.insert( make_pair( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ), current_expression() ) );
 	reset_expression();
 	return;
 	M_EPILOG

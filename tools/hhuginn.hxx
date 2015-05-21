@@ -156,6 +156,7 @@ public:
 		static type_t const MAP;
 		static type_t const REFERENCE;
 		static type_t const FUNCTION_REFERENCE;
+		static type_t const METHOD;
 		static type_t const UNKNOWN;
 		static type_t const NOT_BOOLEAN;
 	};
@@ -519,9 +520,9 @@ private:
 	yaal::hcore::HString _name;
 	field_names_t _fieldNames;
 	field_indexes_t _fieldIndexes;
-	expressions_t _fieldDefinitions;
+	values_t _fieldDefinitions;
 public:
-	HClass( HClass const*, yaal::hcore::HString const&, field_names_t const&, expressions_t const& );
+	HClass( HClass const*, yaal::hcore::HString const&, field_names_t const&, values_t const& );
 	HClass const* super( void ) const;
 	yaal::hcore::HString const& name( void ) const;
 	field_names_t const& field_names( void ) const;
