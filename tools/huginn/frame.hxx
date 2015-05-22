@@ -50,7 +50,8 @@ public:
 		RETURN,
 		BREAK,
 		CONTINUE,
-		EXCEPTION
+		EXCEPTION,
+		RUNTIME_EXCEPTION
 	};
 private:
 	HThread* _thread;

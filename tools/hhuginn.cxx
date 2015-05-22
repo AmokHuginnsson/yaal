@@ -660,13 +660,17 @@ HHuginn* HHuginn::HClass::huginn( void ) const {
 	return ( _huginn );
 }
 
-HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread*, values_t const&, int ) const {
+HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, values_t const& values_, int position_ ) const {
 	M_PROLOG
 	values_t defaults;
 	for ( value_t const& v : _fieldDefinitions ) {
 		defaults.push_back( v->clone() );
 	}
 	value_t v( make_pointer<HObject>( this, defaults ) );
+	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR ) );
+	if ( constructorIdx >= 0 ) {
+		function( constructorIdx )( thread_, values_, position_ );
+	}
 	return ( v );
 	M_EPILOG
 }
@@ -681,19 +685,34 @@ HHuginn::HObject::HObject(
 
 HHuginn::HObject::~HObject( void ) {
 	M_PROLOG
-	int destructorIdx( _class->field_index( KEYWORD::DESTRUCTOR ) );
-	if ( destructorIdx >= 0 ) {
-		static_cast<HClass::HMethod const*>(
-			_fields[destructorIdx].raw()
-		)->function()( _class->huginn()->current_thread(), values_t{}, 0 );
-	}
-	HClass const* c( _class->super() );
-	while ( c ) {
-		destructorIdx = c->field_index( KEYWORD::DESTRUCTOR );
+	huginn::HThread* t( _class->huginn()->current_thread() );
+	if ( ! t->has_exception() ) {
+		int destructorIdx( _class->field_index( KEYWORD::DESTRUCTOR ) );
+		HClass const* c( _class->super() );
 		if ( destructorIdx >= 0 ) {
-			c->function( destructorIdx )( c->huginn()->current_thread(), values_t{}, 0 );
+			try {
+				static_cast<HClass::HMethod const*>(
+					_fields[destructorIdx].raw()
+				)->function()( t, values_t{}, 0 );
+			} catch ( HHuginnRuntimeException const& e ) {
+				t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
+				t->set_exception( e.message(), e.position() );
+				c = nullptr;
+			}
 		}
-		c = c->super();
+		while ( c ) {
+			destructorIdx = c->field_index( KEYWORD::DESTRUCTOR );
+			if ( destructorIdx >= 0 ) {
+				try {
+					c->function( destructorIdx )( t, values_t{}, 0 );
+				} catch ( HHuginnRuntimeException const& e ) {
+					t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
+					t->set_exception( e.message(), e.position() );
+					break;
+				}
+			}
+			c = c->super();
+		}
 	}
 	return;
 	M_DESTRUCTOR_EPILOG
@@ -855,6 +874,10 @@ bool HHuginn::execute( void ) {
 	bool ok( false );
 	try {
 		_result = call( "main", args, 0 );
+		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
+		threads_t::iterator t( _threads.find( threadId ) );
+		M_ASSERT( t != _threads.end() );
+		t->second->flush_exception();
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
 		_errorMessage = e.message();

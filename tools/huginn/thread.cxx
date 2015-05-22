@@ -39,9 +39,11 @@ namespace tools {
 namespace huginn {
 
 HThread::HThread( HHuginn* huginn_, yaal::hcore::HThread::id_t id_ )
-	: _frames(),
-	_id( id_ ),
-	_huginn( huginn_ ) {
+	: _frames()
+	, _id( id_ )
+	, _huginn( huginn_ )
+	, _exceptionMessage()
+	, _exceptionPosition( 0 ) {
 	return;
 }
 
@@ -49,13 +51,13 @@ yaal::hcore::HThread::id_t HThread::id( void ) const {
 	return ( _id );
 }
 
-huginn::HFrame* HThread::current_frame( void ) {
+HFrame* HThread::current_frame( void ) {
 	M_PROLOG
 	return ( ! _frames.is_empty() ? _frames.top().raw() : nullptr );
 	M_EPILOG
 }
 
-huginn::HFrame const* HThread::current_frame( void ) const {
+HFrame const* HThread::current_frame( void ) const {
 	M_PROLOG
 	return ( ! _frames.is_empty() ? _frames.top().raw() : nullptr );
 	M_EPILOG
@@ -63,7 +65,7 @@ huginn::HFrame const* HThread::current_frame( void ) const {
 
 void HThread::create_function_frame( void ) {
 	M_PROLOG
-	huginn::HFrame* parent( current_frame() );
+	HFrame* parent( current_frame() );
 	_frames.push( make_pointer<HFrame>( this, parent, true, false ) );
 	return;
 	M_EPILOG
@@ -71,7 +73,7 @@ void HThread::create_function_frame( void ) {
 
 void HThread::create_loop_frame( void ) {
 	M_PROLOG
-	huginn::HFrame* parent( current_frame() );
+	HFrame* parent( current_frame() );
 	_frames.push( make_pointer<HFrame>( this, parent, false, true ) );
 	return;
 	M_EPILOG
@@ -79,7 +81,7 @@ void HThread::create_loop_frame( void ) {
 
 void HThread::create_scope_frame( void ) {
 	M_PROLOG
-	huginn::HFrame* parent( current_frame() );
+	HFrame* parent( current_frame() );
 	_frames.push( make_pointer<HFrame>( this, parent, false, false ) );
 	return;
 	M_EPILOG
@@ -101,7 +103,11 @@ bool HThread::can_continue( void ) const {
 
 void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& value_, int level_ ) {
 	M_PROLOG
-	M_ASSERT( ( state_ == huginn::HFrame::STATE::RETURN ) || ( state_ == huginn::HFrame::STATE::BREAK ) );
+	M_ASSERT(
+		( state_ == HFrame::STATE::RETURN )
+		|| ( state_ == HFrame::STATE::BREAK )
+		|| ( state_ == HFrame::STATE::RUNTIME_EXCEPTION )
+	);
 	int level( 0 );
 	HFrame* f( current_frame() );
 	HFrame* target( f );
@@ -115,9 +121,9 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 		f = f->parent();
 		if ( ! f ) {
 			break;
-		} else if ( f->number() != no ) {
+		} else if ( ( state_ == HFrame::STATE::RETURN ) && ( f->number() != no ) ) {
 			break;
-		} else if ( ( state_ == huginn::HFrame::STATE::BREAK ) && ( level > level_ ) ) {
+		} else if ( ( state_ == HFrame::STATE::BREAK ) && ( level > level_ ) ) {
 			break;
 		}
 	}
@@ -125,6 +131,29 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 		target->set_result( value_ );
 	}
 	return;
+	M_EPILOG
+}
+
+void HThread::set_exception( yaal::hcore::HString const& message_, int position_ ) {
+	M_PROLOG
+	_exceptionMessage = message_;
+	_exceptionPosition = position_;
+	return;
+	M_EPILOG
+}
+
+bool HThread::has_exception( void ) const {
+	return ( ! _exceptionMessage.is_empty() || ( _exceptionPosition != 0 ) );
+}
+
+void HThread::flush_exception( void ) {
+	M_PROLOG
+	if ( has_exception() ) {
+		int position( _exceptionPosition );
+		_exceptionPosition = 0;
+		HString message( yaal::move( _exceptionMessage ) );
+		throw HHuginn::HHuginnRuntimeException( message, position );
+	}
 	M_EPILOG
 }
 

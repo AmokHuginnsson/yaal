@@ -46,6 +46,8 @@ private:
 	frames_t _frames;
 	yaal::hcore::HThread::id_t _id;
 	HHuginn* _huginn;
+	yaal::hcore::HString _exceptionMessage;
+	int _exceptionPosition;
 public:
 	HThread( HHuginn*, yaal::hcore::HThread::id_t );
 	void create_function_frame( void );
@@ -55,8 +57,11 @@ public:
 	HFrame* current_frame( void );
 	HFrame const* current_frame( void ) const;
 	void break_execution( HFrame::STATE, HHuginn::value_t const& = HHuginn::value_t(), int = 0 );
+	void set_exception( yaal::hcore::HString const&, int );
 	bool can_continue( void ) const;
 	yaal::hcore::HThread::id_t id( void ) const;
+	void flush_exception( void );
+	bool has_exception( void ) const;
 	HHuginn& huginn( void );
 private:
 	HThread( HThread const& ) = delete;
