@@ -182,6 +182,8 @@ private:
 	OCompiler& operator = ( OCompiler const& ) = delete;
 };
 
+bool is_keyword( yaal::hcore::HString const& );
+bool is_builtin( yaal::hcore::HString const& );
 bool is_restricted( yaal::hcore::HString const& );
 
 }

@@ -148,7 +148,7 @@ HHuginn::HHuginn::expression_t& OCompiler::current_expression( void ) {
 
 void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( is_restricted( name_ ) ) {
+	if ( is_builtin( name_ ) ) {
 		if ( ! _classContext || ( ( name_ != "constructor" ) && ( name_ != "destructor" ) ) ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 		}
@@ -165,7 +165,7 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	_classContext = make_resource<OClassContext>();
-	if ( is_restricted( name_ ) ) {
+	if ( is_builtin( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
 	if ( _submittedClasses.count( name_ ) > 0 ) {
@@ -180,7 +180,7 @@ void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_par
 
 void OCompiler::set_base_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( is_restricted( name_ ) ) {
+	if ( is_builtin( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
 	_classContext->_baseName = name_;
@@ -203,7 +203,7 @@ void OCompiler::add_field_name( yaal::hcore::HString const& name_, executing_par
 
 void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( is_restricted( name_ ) ) {
+	if ( is_builtin( name_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
 	add_field_name( name_, position_ );
@@ -1006,6 +1006,9 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 
 void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
+	if ( huginn::is_keyword( value_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
+	}
 	current_expression()->add_execution_step( hcore::call( &HExpression::get_reference, current_expression().raw(), value_, _1, position_.get() ) );
 	f()._valueTypes.push( HHuginn::TYPE::UNKNOWN );
 	return;
@@ -1014,6 +1017,9 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 
 void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
+	if ( huginn::is_restricted( value_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted name." ), position_.get() );
+	}
 	current_expression()->add_execution_step( hcore::call( &HExpression::make_variable, current_expression().raw(), value_, _1, position_.get() ) );
 	f()._valueTypes.push( HHuginn::TYPE::UNKNOWN );
 	return;

@@ -95,28 +95,55 @@ words_t _directives_ = {{
 	"import"
 }};
 
+namespace KEYWORD {
+
+char const CONSTRUCTOR[] = "constructor";
+char const DESTRUCTOR[] = "destructor";
+char const BREAK[] = "break";
+char const CASE[] = "case";
+char const CATCH[] = "catch";
+char const CLASS[] = "class";
+char const CONTINUE[] = "continue";
+char const DEFAULT[] = "default";
+char const ELSE[] = "else";
+char const FALSE[] = "false";
+char const FOR[] = "for";
+char const IF[] = "if";
+char const NONE[] = "none";
+char const RETURN[] = "return";
+char const SUPER[] = "super";
+char const SWITCH[] = "switch";
+char const THIS[] = "this";
+char const THROW[] = "throw";
+char const TRUE[] = "true";
+char const TRY[] = "try";
+char const WHILE[] = "while";
+
+}
+
 words_t _keywords_ = {{
-	"break",
-	"case",
-	"catch",
-	"class",
-	"constructor",
-	"continue",
-	"default",
-	"destructor",
-	"else",
-	"for",
-	"if",
-	"nil",
-	"none",
+	KEYWORD::BREAK,
+	KEYWORD::CASE,
+	KEYWORD::CATCH,
+	KEYWORD::CLASS,
+	KEYWORD::CONSTRUCTOR,
+	KEYWORD::CONTINUE,
+	KEYWORD::DEFAULT,
+	KEYWORD::DESTRUCTOR,
+	KEYWORD::ELSE,
+	KEYWORD::FALSE,
+	KEYWORD::FOR,
+	KEYWORD::IF,
+	KEYWORD::NONE,
 	"null",
-	"return",
-	"super",
-	"switch",
-	"this",
-	"throw",
-	"try",
-	"while"
+	KEYWORD::RETURN,
+	KEYWORD::SUPER,
+	KEYWORD::SWITCH,
+	KEYWORD::THIS,
+	KEYWORD::THROW,
+	KEYWORD::TRUE,
+	KEYWORD::TRY,
+	KEYWORD::WHILE
 }};
 
 words_t _builtin_ = {{
@@ -142,6 +169,18 @@ words_t _standardLibrary_ = {{
 }
 
 namespace huginn {
+
+bool is_keyword( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	return ( _keywords_.count( name_ ) > 0 );
+	M_EPILOG
+}
+
+bool is_builtin( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	return ( ( _keywords_.count( name_ ) > 0 ) || ( _builtin_.count( name_ ) > 0 ) );
+	M_EPILOG
+}
 
 bool is_restricted( yaal::hcore::HString const& name_ ) {
 	M_PROLOG
@@ -199,15 +238,15 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule literalNone(
 		"none",
-		constant( "none", e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_none, _compiler.get(), _1 ) ) )
+		constant( KEYWORD::NONE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_none, _compiler.get(), _1 ) ) )
 	);
 	HRule booleanLiteralTrue(
 		"true",
-		constant( "true", e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_boolean, _compiler.get(), true, _1 ) ) )
+		constant( KEYWORD::TRUE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_boolean, _compiler.get(), true, _1 ) ) )
 	);
 	HRule booleanLiteralFalse(
 		"false",
-		constant( "false", e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_boolean, _compiler.get(), false, _1 ) ) )
+		constant( KEYWORD::FALSE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_boolean, _compiler.get(), false, _1 ) ) )
 	);
 	HRule numberLiteral(
 		"numberLiteral",
@@ -431,16 +470,16 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule ifClause(
 		"ifClause",
-		e_p::constant( "if" ) >> '(' >> expression >> ')' >> scope,
+		e_p::constant( KEYWORD::IF ) >> '(' >> expression >> ')' >> scope,
 		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_if_clause, _compiler.get(), _1 ) )
 	);
 	HRule ifStatement(
 		"ifStatement",
 		ifClause >>
-		*( constant( "else" ) >> ifClause ) >>
-		-( ( constant( "else" ) >> scope )[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )] )
+		*( constant( KEYWORD::ELSE ) >> ifClause ) >>
+		-( ( constant( KEYWORD::ELSE ) >> scope )[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )] )
 	);
-	HRule continueStatement( "continueStatement", constant( "continue" ) >> ';' );
+	HRule continueStatement( "continueStatement", constant( KEYWORD::CONTINUE ) >> ';' );
 	/*
 	 * TODO:
 	 * Allow `break' statement to have literal integer argument
@@ -448,8 +487,8 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	 * i.e.:
 	 * break ( 2 ); // <--- break two levels of nested scopes.
 	 */
-	HRule breakStatement( "breakStatement", constant( "break" ) >> ';' );
-	HRule whileStatement( "whileStatement", constant( "while" ) >> '(' >> expression >> ')' >> scope );
+	HRule breakStatement( "breakStatement", constant( KEYWORD::BREAK ) >> ';' );
+	HRule whileStatement( "whileStatement", constant( KEYWORD::WHILE ) >> '(' >> expression >> ')' >> scope );
 	HRule forIdentifier(
 		regex(
 			"forIdentifier",
@@ -457,20 +496,21 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_for_identifier, _compiler.get(), _1, _2 ) )
 		)
 	);
-	HRule forStatement( "forStatement", constant( "for" ) >> '(' >> forIdentifier >> ':' >> expression >> ')' >> scope );
+	HRule forStatement( "forStatement", constant( KEYWORD::FOR ) >> '(' >> forIdentifier >> ':' >> expression >> ')' >> scope );
 	HRule caseStatement(
 		"caseStatement",
-		constant( "case" ) >> '(' >> expression >> ')' >> ':' >> scope >> -( breakStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_break_statement, _compiler.get(), _1 ) )] ),
+		constant( KEYWORD::CASE ) >> '(' >> expression >> ')' >> ':'
+		>> scope >> -( breakStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_break_statement, _compiler.get(), _1 ) )] ),
 		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_if_clause, _compiler.get(), _1 ) )
 	);
-	HRule defaultStatement( "defaultStatement", constant( "default" ) >> ':' >> scope );
+	HRule defaultStatement( "defaultStatement", constant( KEYWORD::DEFAULT ) >> ':' >> scope );
 	HRule switchStatement(
 		"switchStatement",
-		constant( "switch" ) >> '(' >> expression >> ')' >>
+		constant( KEYWORD::SWITCH ) >> '(' >> expression >> ')' >>
 		constant( '{', HRuleBase::action_position_t( hcore::call( &OCompiler::create_scope, _compiler.get(), _1 ) ) ) >> +caseStatement >>
 		-( defaultStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )] ) >> '}'
 	);
-	HRule returnStatement( "returnStatement", constant( "return" ) >> -( '(' >> expression >> ')' ) >> ';' );
+	HRule returnStatement( "returnStatement", constant( KEYWORD::RETURN ) >> -( '(' >> expression >> ')' ) >> ';' );
 	HRule statement( "statement",
 		ifStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_if_statement, _compiler.get(), _1 ) )]
 		| whileStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_while_statement, _compiler.get(), _1 ) )]
@@ -504,7 +544,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule classDefinition(
 		"classDefinition",
-		constant( "class" ) >> regex(
+		constant( KEYWORD::CLASS ) >> regex(
 			"classIdentifier",
 			identifier,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_class_name, _compiler.get(), _1, _2 ) )
@@ -558,6 +598,7 @@ int HHuginn::HType::builtin_type_count( void ) {
 }
 
 HHuginn::HClass::HClass(
+	HHuginn* huginn_,
 	type_t type_,
 	HClass const* super_,
 	yaal::hcore::HString const& name_,
@@ -568,10 +609,18 @@ HHuginn::HClass::HClass(
 	, _name( name_ )
 	, _fieldNames( fieldNames_ )
 	, _fieldIndexes( super_ ? super_->_fieldIndexes : field_indexes_t() )
-	, _fieldDefinitions( fieldDefinitions_ ) {
+	, _fieldDefinitions( super_ ? super_->_fieldDefinitions : values_t() )
+	, _huginn( huginn_ ) {
 	M_PROLOG
+	M_ASSERT( fieldNames_.get_size() == fieldDefinitions_.get_size() );
+	int definitionIdx( 0 );
 	for ( yaal::hcore::HString const& n : fieldNames_ ) {
-		_fieldIndexes.insert( make_pair( n, static_cast<int>( _fieldIndexes.get_size() ) ) );
+		field_indexes_t::const_iterator fi( _fieldIndexes.insert( make_pair( n, static_cast<int>( _fieldIndexes.get_size() ) ) ).first );
+		if ( fi->second >= _fieldDefinitions.get_size() ) {
+			_fieldDefinitions.resize( fi->second + 1 );
+		}
+		_fieldDefinitions[fi->second] = fieldDefinitions_[definitionIdx];
+		++ definitionIdx;
 	}
 	return;
 	M_EPILOG
@@ -593,6 +642,24 @@ HHuginn::HClass::field_names_t const& HHuginn::HClass::field_names( void ) const
 	return ( _fieldNames );
 }
 
+int HHuginn::HClass::field_index( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	field_indexes_t::const_iterator it( _fieldIndexes.find( name_ ) );
+	return ( it != _fieldIndexes.end() ? it->second : -1 );
+	M_EPILOG
+}
+
+HHuginn::function_t const& HHuginn::HClass::function( int index_ ) const {
+	M_PROLOG
+	M_ASSERT( dynamic_cast<HMethod const*>( _fieldDefinitions[index_].raw() ) != nullptr );
+	return ( static_cast<HMethod const*>( _fieldDefinitions[index_].raw() )->function() );
+	M_EPILOG
+}
+
+HHuginn* HHuginn::HClass::huginn( void ) const {
+	return ( _huginn );
+}
+
 HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread*, values_t const&, int ) const {
 	M_PROLOG
 	values_t defaults;
@@ -610,6 +677,26 @@ HHuginn::HObject::HObject(
 ) : HValue( class_->type() )
 	, _class( class_ )
 	, _fields( fields_ ) {
+}
+
+HHuginn::HObject::~HObject( void ) {
+	M_PROLOG
+	int destructorIdx( _class->field_index( KEYWORD::DESTRUCTOR ) );
+	if ( destructorIdx >= 0 ) {
+		static_cast<HClass::HMethod const*>(
+			_fields[destructorIdx].raw()
+		)->function()( _class->huginn()->current_thread(), values_t{}, 0 );
+	}
+	HClass const* c( _class->super() );
+	while ( c ) {
+		destructorIdx = c->field_index( KEYWORD::DESTRUCTOR );
+		if ( destructorIdx >= 0 ) {
+			c->function( destructorIdx )( c->huginn()->current_thread(), values_t{}, 0 );
+		}
+		c = c->super();
+	}
+	return;
+	M_DESTRUCTOR_EPILOG
 }
 
 HHuginn::value_t HHuginn::HObject::do_clone( void ) const {
@@ -722,7 +809,7 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 			}
 		}
 		type_t type( HType::register_type( cc->_className, this ) );
-		c = _classes.insert( make_pair( name_, make_pointer<HClass>( type, super, name_, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
+		c = _classes.insert( make_pair( name_, make_pointer<HClass>( this, type, super, name_, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
 	}
 	return ( c );
 	M_EPILOG
@@ -794,12 +881,18 @@ HHuginn::value_t HHuginn::call( yaal::hcore::HString const& name_, values_t cons
 	M_EPILOG
 }
 
-huginn::HFrame* HHuginn::current_frame( void ) {
+huginn::HThread* HHuginn::current_thread( void ) {
 	M_PROLOG
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	threads_t::iterator t( _threads.find( threadId ) );
 	M_ASSERT( t != _threads.end() );
-	return ( t->second->current_frame() );
+	return ( t->second.raw() );
+	M_EPILOG
+}
+
+huginn::HFrame* HHuginn::current_frame( void ) {
+	M_PROLOG
+	return ( current_thread()->current_frame() );
 	M_EPILOG
 }
 
@@ -1375,8 +1468,10 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 }
 
 HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( void ) const {
-	M_ASSERT( !"cloning ternary evaluator"[0] );
+	M_ASSERT( 0 && "cloning ternary evaluator"[0] );
+#ifdef NDEBUG
 	return ( _none_ );
+#endif /* #ifdef NDEBUG */
 }
 
 HHuginn::HFunctionReference::HFunctionReference(

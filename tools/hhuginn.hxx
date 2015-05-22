@@ -118,7 +118,6 @@ public:
 	class HReturn;
 	class HClass;
 	typedef yaal::hcore::HPointer<HClass> class_t;
-	class HMethod;
 	class HFunction;
 	class HReference;
 	class HFunctionReference;
@@ -227,6 +226,7 @@ public:
 	value_t call( yaal::hcore::HString const&, values_t const&, int );
 	value_t result( void ) const;
 	void dump_vm_state( yaal::hcore::HStreamInterface& );
+	huginn::HThread* current_thread( void );
 	huginn::HFrame* current_frame( void );
 	void create_function( executing_parser::position_t );
 	void create_class( executing_parser::position_t );
@@ -332,7 +332,7 @@ public:
 	HTernaryEvaluator( expression_t const&, expression_t const&, expression_t const& );
 	value_t execute( huginn::HThread* );
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( void ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
 
 class HHuginn::HIterable : public HHuginn::HValue {
@@ -522,12 +522,16 @@ private:
 	field_names_t _fieldNames;
 	field_indexes_t _fieldIndexes;
 	values_t _fieldDefinitions;
+	HHuginn* _huginn;
 public:
-	HClass( type_t, HClass const*, yaal::hcore::HString const&, field_names_t const&, values_t const& );
+	HClass( HHuginn*, type_t, HClass const*, yaal::hcore::HString const&, field_names_t const&, values_t const& );
 	HClass const* super( void ) const;
 	yaal::hcore::HString const& name( void ) const;
 	type_t type( void ) const;
 	field_names_t const& field_names( void ) const;
+	int field_index( yaal::hcore::HString const& ) const;
+	function_t const& function( int ) const;
+	HHuginn* huginn( void ) const;
 	value_t create_instance( huginn::HThread*, values_t const&, int ) const;
 private:
 	HClass( HClass const& ) = delete;
@@ -556,6 +560,7 @@ private:
 	fields_t _fields;
 public:
 	HObject( HClass const*, fields_t const& );
+	virtual ~HObject( void );
 private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;
