@@ -223,6 +223,7 @@ void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 void OCompiler::add_method( executing_parser::position_t position_ ) {
 	M_PROLOG
 	_classContext->_methods.insert( make_pair( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ), create_function( position_ ) ) );
+	_functionContexts.pop();
 	return;
 	M_EPILOG
 }
@@ -241,7 +242,7 @@ HHuginn::function_t OCompiler::create_function( executing_parser::position_t ) {
 				yaal::move( current_scope() ),
 				fc._defaultValues
 			),
-			_1, _2, _3
+			_1, _2, _3, _4
 		)
 	);
 	fc._compilationStack.pop();

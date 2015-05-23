@@ -140,7 +140,7 @@ public:
 	class HErrorCoordinate;
 	typedef yaal::hcore::HArray<value_t> values_t;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
-	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, values_t const&, int )> function_t;
+	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, HObject*, values_t const&, int )> function_t;
 	typedef yaal::hcore::HPointer<huginn::HThread> thread_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
 	struct TYPE {
@@ -532,7 +532,7 @@ public:
 	int field_index( yaal::hcore::HString const& ) const;
 	function_t const& function( int ) const;
 	HHuginn* huginn( void ) const;
-	value_t create_instance( huginn::HThread*, values_t const&, int ) const;
+	value_t create_instance( huginn::HThread*, HObject*, values_t const&, int ) const;
 private:
 	HClass( HClass const& ) = delete;
 	HClass& operator = ( HClass const& ) = delete;
@@ -561,6 +561,8 @@ private:
 public:
 	HObject( HClass const*, fields_t const& );
 	virtual ~HObject( void );
+	int field_index( yaal::hcore::HString const& ) const;
+	value_t& field( int );
 private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;

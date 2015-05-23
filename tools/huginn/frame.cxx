@@ -39,16 +39,17 @@ namespace tools {
 
 namespace huginn {
 
-HFrame::HFrame( HThread* thread_, HFrame* parent_, bool bump_, bool loop_ )
-	: _thread( thread_ ),
-	_parent( parent_ ),
-	_variables(),
-	_operations(),
-	_values(),
-	_result( _none_ ),
-	_number( parent_ ? ( parent_->_number + ( bump_ ? 1 : 0 ) ) : 1 ),
-	_loop( loop_ ),
-	_state( STATE::NORMAL ) {
+HFrame::HFrame( HThread* thread_, HFrame* parent_, HHuginn::HObject* object_, bool bump_, bool loop_ )
+	: _thread( thread_ )
+	, _parent( parent_ )
+	, _object( object_ )
+	, _variables()
+	, _operations()
+	, _values()
+	, _result( _none_ )
+	, _number( parent_ ? ( parent_->_number + ( bump_ ? 1 : 0 ) ) : 1 )
+	, _loop( loop_ )
+	, _state( STATE::NORMAL ) {
 	return;
 }
 
@@ -100,8 +101,11 @@ HHuginn::value_t HFrame::try_reference( yaal::hcore::HString const& name_, int p
 	M_PROLOG
 	variables_t::iterator it( _variables.find( name_ ) );
 	HHuginn::value_t v;
+	int fieldIdx( -1 );
 	if ( it != _variables.end() ) {
 		v = it->second;
+	} else if ( _object && ( ( fieldIdx = _object->field_index( name_ ) ) >= 0 ) ) {
+		v = _object->field( fieldIdx );
 	} else if ( _parent && ( _parent->_number == _number ) ) {
 		v = _parent->try_reference( name_, position_ );
 	} else {
@@ -135,10 +139,16 @@ void HFrame::set_variable( yaal::hcore::HString const& name_, HHuginn::value_t c
 HHuginn::value_t HFrame::make_variable( yaal::hcore::HString const& name_, int ) {
 	M_PROLOG
 	HFrame* f( this );
-	variables_t::iterator it;
+	HHuginn::value_t* v( nullptr );
 	while ( f ) {
-		it = f->_variables.find( name_ );
+		int fieldIdx( -1 );
+		if ( f->_object && ( ( fieldIdx = f->_object->field_index( name_ ) ) >= 0 ) ) {
+			v = &( f->_object->field( fieldIdx ) );
+			break;
+		}
+		variables_t::iterator it( f->_variables.find( name_ ) );
 		if ( it != f->_variables.end() ) {
+			v = &( it->second );
 			break;
 		}
 		if ( f->_parent && ( f->_parent->_number == _number ) ) {
@@ -147,10 +157,10 @@ HHuginn::value_t HFrame::make_variable( yaal::hcore::HString const& name_, int )
 			f = nullptr;
 		}
 	}
-	if ( ! f ) {
-		it = _variables.insert( make_pair( name_, _none_ ) ).first;
+	if ( ! v ) {
+		v = &( _variables.insert( make_pair( name_, _none_ ) ).first->second );
 	}
-	return ( make_pointer<HHuginn::HReference>( it->second ) );
+	return ( make_pointer<HHuginn::HReference>( *v ) );
 	M_EPILOG
 }
 
@@ -160,6 +170,10 @@ operations_t& HFrame::operations( void ) {
 
 HFrame::values_t& HFrame::values( void ) {
 	return ( _values );
+}
+
+HHuginn::HObject* HFrame::object( void ) const {
+	return ( _object ? _object : ( ( _parent && _parent->_number == _number ) ? _parent->object() : nullptr ) );
 }
 
 }

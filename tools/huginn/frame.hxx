@@ -56,6 +56,7 @@ public:
 private:
 	HThread* _thread;
 	HFrame* const _parent;
+	HHuginn::HObject* _object;
 	variables_t _variables;
 	operations_t _operations;
 	values_t _values;
@@ -64,7 +65,7 @@ private:
 	bool _loop;
 	STATE _state;
 public:
-	HFrame( HThread*, HFrame*, bool, bool );
+	HFrame( HThread*, HFrame*, HHuginn::HObject*, bool, bool );
 	HHuginn::value_t make_variable( yaal::hcore::HString const&, int );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( yaal::hcore::HString const&, int );
@@ -80,6 +81,7 @@ public:
 	operations_t& operations( void );
 	values_t& values( void );
 	void reset( void );
+	HHuginn::HObject* object( void ) const;
 private:
 	HFrame( HFrame const& ) = delete;
 	HFrame& operator = ( HFrame const& ) = delete;

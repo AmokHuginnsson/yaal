@@ -160,13 +160,17 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	HHuginn::type_t t( frame_->values().top()->type() );
-	if ( t != HHuginn::HHuginn::TYPE::FUNCTION_REFERENCE ) {
-		throw HHuginn::HHuginnRuntimeException( "Reference is not a function.", position_ );
+	if ( ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) && ( t != HHuginn::TYPE::METHOD ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( t->name() ).append( "' is not a function." ), position_ );
 	}
 	HHuginn::value_t f(  frame_->values().top() );
 	frame_->values().pop();
 	reverse( values.begin(), values.end() );
-	frame_->values().push( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function()( frame_->thread(), values, p ) );
+	if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
+		frame_->values().push( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function()( frame_->thread(), nullptr, values, p ) );
+	} else {
+		frame_->values().push( static_cast<HHuginn::HClass::HMethod*>( f.raw() )->function()( frame_->thread(), frame_->object(), values, p ) );
+	}
 	return;
 	M_EPILOG
 }

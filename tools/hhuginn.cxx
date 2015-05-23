@@ -660,7 +660,7 @@ HHuginn* HHuginn::HClass::huginn( void ) const {
 	return ( _huginn );
 }
 
-HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, values_t const& values_, int position_ ) const {
+HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, HObject*, values_t const& values_, int position_ ) const {
 	M_PROLOG
 	values_t defaults;
 	for ( value_t const& v : _fieldDefinitions ) {
@@ -669,7 +669,7 @@ HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, val
 	value_t v( make_pointer<HObject>( this, defaults ) );
 	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR ) );
 	if ( constructorIdx >= 0 ) {
-		function( constructorIdx )( thread_, values_, position_ );
+		function( constructorIdx )( thread_, static_cast<HObject*>( v.raw() ), values_, position_ );
 	}
 	return ( v );
 	M_EPILOG
@@ -693,7 +693,7 @@ HHuginn::HObject::~HObject( void ) {
 			try {
 				static_cast<HClass::HMethod const*>(
 					_fields[destructorIdx].raw()
-				)->function()( t, values_t{}, 0 );
+				)->function()( t, this, values_t{}, 0 );
 			} catch ( HHuginnRuntimeException const& e ) {
 				t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
 				t->set_exception( e.message(), e.position() );
@@ -704,7 +704,7 @@ HHuginn::HObject::~HObject( void ) {
 			destructorIdx = c->field_index( KEYWORD::DESTRUCTOR );
 			if ( destructorIdx >= 0 ) {
 				try {
-					c->function( destructorIdx )( t, values_t{}, 0 );
+					c->function( destructorIdx )( t, this, values_t{}, 0 );
 				} catch ( HHuginnRuntimeException const& e ) {
 					t->break_execution( HFrame::STATE::RUNTIME_EXCEPTION );
 					t->set_exception( e.message(), e.position() );
@@ -716,6 +716,18 @@ HHuginn::HObject::~HObject( void ) {
 	}
 	return;
 	M_DESTRUCTOR_EPILOG
+}
+
+int HHuginn::HObject::field_index( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	return ( _class->field_index( name_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t& HHuginn::HObject::field( int index_ ) {
+	M_PROLOG
+	return ( _fields[index_] );
+	M_EPILOG
 }
 
 HHuginn::value_t HHuginn::HObject::do_clone( void ) const {
@@ -838,7 +850,7 @@ void HHuginn::commit_classes( void ) {
 	M_PROLOG
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
-	t->create_function_frame();
+	t->create_function_frame( nullptr );
 	for ( OCompiler::submitted_classes_t::value_type const& sc : _compiler->_submittedClasses ) {
 		commit_class( sc.first );
 	}
@@ -896,7 +908,7 @@ HHuginn::value_t HHuginn::call( yaal::hcore::HString const& name_, values_t cons
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 		threads_t::iterator t( _threads.find( threadId ) );
 		M_ASSERT( t != _threads.end() );
-		res = f->second( t->second.raw(), values_, position_ );
+		res = f->second( t->second.raw(), nullptr, values_, position_ );
 	} else {
 		throw HHuginnRuntimeException( "function `"_ys.append( name_ ).append( "' is not defined" ), position_ );
 	}
@@ -932,7 +944,7 @@ HHuginn::function_t HHuginn::get_function( yaal::hcore::HString const& name_ ) {
 	} else {
 		classes_t::const_iterator ci( _classes.find( name_ ) );
 		if ( ci != _classes.end() ) {
-			f = hcore::call( &HHuginn::HClass::create_instance, ci->second.raw(), _1, _2, _3 );
+			f = hcore::call( &HHuginn::HClass::create_instance, ci->second.raw(), _1, _2, _3, _4 );
 		}
 	}
 	return ( f );
@@ -1535,7 +1547,7 @@ HHuginn::value_t HHuginn::HClass::HMethod::do_clone( void ) const {
 
 namespace huginn_builtin {
 
-inline HHuginn::value_t convert( HHuginn::type_t toType_, huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t convert( HHuginn::type_t toType_, huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -1569,7 +1581,7 @@ inline HHuginn::value_t convert( HHuginn::type_t toType_, huginn::HThread*, HHug
 	M_EPILOG
 }
 
-inline HHuginn::value_t size( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t size( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -1597,7 +1609,7 @@ inline HHuginn::value_t size( huginn::HThread*, HHuginn::values_t const& values_
 	M_EPILOG
 }
 
-inline HHuginn::value_t type( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t type( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -1611,7 +1623,7 @@ inline HHuginn::value_t type( huginn::HThread*, HHuginn::values_t const& values_
 	M_EPILOG
 }
 
-inline HHuginn::value_t copy( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t copy( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -1625,7 +1637,7 @@ inline HHuginn::value_t copy( huginn::HThread*, HHuginn::values_t const& values_
 	M_EPILOG
 }
 
-inline HHuginn::value_t list( huginn::HThread*, HHuginn::values_t const& values_, int ) {
+inline HHuginn::value_t list( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int ) {
 	M_PROLOG
 	HHuginn::value_t v( make_pointer<HHuginn::HList>() );
 	HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
@@ -1636,7 +1648,7 @@ inline HHuginn::value_t list( huginn::HThread*, HHuginn::values_t const& values_
 	M_EPILOG
 }
 
-inline HHuginn::value_t map( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t map( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( ! values_.is_empty() ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -1649,7 +1661,7 @@ inline HHuginn::value_t map( huginn::HThread*, HHuginn::values_t const& values_,
 	M_EPILOG
 }
 
-inline HHuginn::value_t print( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t print( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	if ( values_.get_size() != 1 ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -1684,7 +1696,7 @@ inline HHuginn::value_t print( huginn::HThread* thread_, HHuginn::values_t const
 	M_EPILOG
 }
 
-inline HHuginn::value_t input( huginn::HThread* thread_, HHuginn::values_t const&, int ) {
+inline HHuginn::value_t input( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const&, int ) {
 	M_PROLOG
 	yaal::hcore::HString l;
 	thread_->huginn().input_stream().read_until( l );
@@ -1696,19 +1708,19 @@ inline HHuginn::value_t input( huginn::HThread* thread_, HHuginn::values_t const
 
 void HHuginn::register_builtins( void ) {
 	M_PROLOG
-	_functions.insert( make_pair<yaal::hcore::HString const>( "integer", hcore::call( &huginn_builtin::convert, TYPE::INTEGER, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "real", hcore::call( &huginn_builtin::convert, TYPE::REAL, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "string", hcore::call( &huginn_builtin::convert, TYPE::STRING, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "number", hcore::call( &huginn_builtin::convert, TYPE::NUMBER, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "boolean", hcore::call( &huginn_builtin::convert, TYPE::BOOLEAN, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "character", hcore::call( &huginn_builtin::convert, TYPE::CHARACTER, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "size", hcore::call( &huginn_builtin::size, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "type", hcore::call( &huginn_builtin::type, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "copy", hcore::call( &huginn_builtin::copy, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "list", hcore::call( &huginn_builtin::list, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "map", hcore::call( &huginn_builtin::map, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "print", hcore::call( &huginn_builtin::print, _1, _2, _3 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "input", hcore::call( &huginn_builtin::input, _1, _2, _3 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "integer", hcore::call( &huginn_builtin::convert, TYPE::INTEGER, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "real", hcore::call( &huginn_builtin::convert, TYPE::REAL, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "string", hcore::call( &huginn_builtin::convert, TYPE::STRING, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "number", hcore::call( &huginn_builtin::convert, TYPE::NUMBER, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "boolean", hcore::call( &huginn_builtin::convert, TYPE::BOOLEAN, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "character", hcore::call( &huginn_builtin::convert, TYPE::CHARACTER, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "size", hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "type", hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "copy", hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "list", hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "map", hcore::call( &huginn_builtin::map, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) ) );
 	return;
 	M_EPILOG
 }

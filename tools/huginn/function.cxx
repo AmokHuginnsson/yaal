@@ -52,7 +52,7 @@ HFunction::HFunction( yaal::hcore::HString const& name_,
 	return;
 }
 
-HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
+HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) const {
 	M_PROLOG
 	if ( values_.get_size() < ( _parameterNames.get_size() - _defaultValues.get_size() ) ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -63,7 +63,7 @@ HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::values_t
 			position_
 		);
 	}
-	thread_->create_function_frame();
+	thread_->create_function_frame( object_ );
 	HFrame* f( thread_->current_frame() );
 	for (
 		int i( 0 ),
