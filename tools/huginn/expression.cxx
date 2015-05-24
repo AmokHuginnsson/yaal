@@ -117,6 +117,12 @@ void HExpression::get_reference( yaal::hcore::HString const& name_, HFrame* fram
 	M_EPILOG
 }
 
+void HExpression::get_field( yaal::hcore::HString const&, huginn::HFrame*, int ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
 void HExpression::make_variable( yaal::hcore::HString const& name_, HFrame* frame_, int position_ ) {
 	M_PROLOG
 	frame_->values().push( frame_->make_variable( name_, position_ ) );

@@ -78,6 +78,7 @@ public:
 	void make_variable( yaal::hcore::HString const&, huginn::HFrame*, int );
 	void set_variable( huginn::HFrame*, int );
 	void subscript( SUBSCRIPT, huginn::HFrame*, int );
+	void get_field( yaal::hcore::HString const&, huginn::HFrame*, int );
 	void power( huginn::HFrame*, int );
 	void equals( huginn::HFrame*, int );
 	void not_equals( huginn::HFrame*, int );

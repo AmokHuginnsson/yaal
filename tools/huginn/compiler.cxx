@@ -1016,6 +1016,16 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 	M_EPILOG
 }
 
+void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
+	OFunctionContext& fc( f() );
+	if ( huginn::is_keyword( value_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
+	}
+	current_expression()->add_execution_step( hcore::call( &HExpression::get_field, current_expression().raw(), value_, _1, position_.get() ) );
+	fc._valueTypes.pop();
+	fc._valueTypes.push( HHuginn::TYPE::REFERENCE );
+}
+
 void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	if ( huginn::is_restricted( value_ ) ) {

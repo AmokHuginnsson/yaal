@@ -317,7 +317,15 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_get_reference, _compiler.get(), _1, _2 ) )
 		)
 	);
-	HRule dereference( "dereference", ( reference >> *( subscriptOperator | functionCallOperator ) ) );
+	HRule memberAccess(
+		"memberAccess",
+		'.' >> regex(
+			"member",
+			identifier,
+			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_get_field_reference, _compiler.get(), _1, _2 ) )
+		)
+	);
+	HRule dereference( "dereference", *( subscriptOperator | functionCallOperator | memberAccess ) );
 	HRule atom( "atom",
 		absoluteValue
 		| parenthesis
@@ -325,12 +333,12 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| numberLiteral
 		| integer[e_p::HInteger::action_int_long_long_position_t( hcore::call( &OCompiler::defer_store_integer, _compiler.get(), _1, _2 ) )]
 		| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &OCompiler::defer_store_character, _compiler.get(), _1, _2 ) )]
-		| ( listLiteral >> -( subscriptOperator >> *( subscriptOperator | functionCallOperator ) ) )
-		| ( mapLiteral >> -( subscriptOperator >> *( subscriptOperator | functionCallOperator ) ) )
+		| ( listLiteral >> -( subscriptOperator >> dereference ) )
+		| ( mapLiteral >> -( subscriptOperator >> dereference ) )
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
-		| dereference
+		| ( reference >> dereference )
 		| ( stringLiteral >> -subscriptOperator )
-		| ( lambda >> -( functionCallOperator >> *( subscriptOperator | functionCallOperator ) ) )
+		| ( lambda >> -( functionCallOperator >> dereference ) )
 	);
 	HRule negation(
 		"negation",
@@ -444,7 +452,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::commit_ternary, _compiler.get(), _1 ) )
 	);
 	HRule value( "value", ternary );
-	HRule subscript( "subscript", ( reference >> +( subscriptOperator | functionCallOperator ) ) );
+	HRule subscript( "subscript", ( reference >> +( subscriptOperator | functionCallOperator | memberAccess ) ) );
 	/*
 	 * Assignment shall work only as aliasing.
 	 * In other words you cannot modify value of referenced object
