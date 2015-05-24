@@ -543,10 +543,15 @@ class HHuginn::HClass::HMethod : public HHuginn::HValue {
 	typedef HHuginn::HValue base_type;
 private:
 	HHuginn::function_t _function;
+	HObject* _object;
 public:
 	HMethod( HHuginn::function_t const& );
 	HHuginn::function_t const& function( void ) const;
+	HObject* object( void ) const;
+	void set_object( HObject* );
 private:
+	HMethod( HMethod const& ) = delete;
+	HMethod& operator = ( HMethod const& ) = delete;
 	virtual value_t do_clone( void ) const override;
 };
 

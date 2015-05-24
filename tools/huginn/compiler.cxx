@@ -110,7 +110,8 @@ OCompiler::OFunctionContext::OFunctionContext( HHuginn* huginn_ )
 	, _compilationStack()
 	, _operations()
 	, _valueTypes()
-	, _lastDereferenceOperator( OPERATOR::NONE ) {
+	, _lastDereferenceOperator( OPERATOR::NONE )
+	, _lastMemberName() {
 	_compilationStack.emplace( huginn_ );
 	return;
 }
@@ -883,7 +884,7 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 		throw HHuginn::HHuginnRuntimeException( "Range specifier is not an integer.", p );
 	}
 	M_ASSERT( fc._operations.top()._operator == OPERATOR::SUBSCRIPT );
-	current_expression()->add_execution_step( hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::SUBSCRIPT::VALUE, _1, position_.get() ) );
+	current_expression()->add_execution_step( hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::ACCESS::VALUE, _1, position_.get() ) );
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 1 );
 	fc._valueTypes.pop();
@@ -911,6 +912,17 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 	M_EPILOG
 }
 
+void OCompiler::dispatch_member_access( executing_parser::position_t ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	fc._valueTypes.pop();
+	fc._valueTypes.push( HHuginn::TYPE::REFERENCE );
+	fc._operations.pop();
+	fc._lastDereferenceOperator = OPERATOR::MEMBER_ACCESS;
+	return;
+	M_EPILOG
+}
+
 void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
@@ -933,6 +945,7 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 		} break;
 		case ( OPERATOR::SUBSCRIPT ):     { dispatch_subscript( position_ );     } break;
 		case ( OPERATOR::ASSIGN ):        { dispatch_assign( position_ );        } break;
+		case ( OPERATOR::MEMBER_ACCESS ): { dispatch_member_access( position_ ); } break;
 		case ( OPERATOR::FUNCTION_CALL ): { dispatch_function_call( &HExpression::function_call, position_ ); } break;
 		case ( OPERATOR::MAKE_MAP ):      { dispatch_function_call( &HExpression::make_map, position_ ); } break;
 		case ( OPERATOR::PARENTHESIS ):
@@ -996,11 +1009,21 @@ void OCompiler::defer_call( yaal::hcore::HString const& name_, executing_parser:
 
 void OCompiler::make_reference( executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( f()._lastDereferenceOperator != OPERATOR::SUBSCRIPT ) {
+	OFunctionContext& fc( f() );
+	if ( ( fc._lastDereferenceOperator != OPERATOR::SUBSCRIPT ) && ( fc._lastDereferenceOperator != OPERATOR::MEMBER_ACCESS ) ) {
 		throw HHuginn::HHuginnRuntimeException( "Assignment to function result.", position_.get() );
 	}
-	current_expression()->pop_execution_step();
-	current_expression()->add_execution_step( hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::SUBSCRIPT::REFERENCE, _1, position_.get() ) );
+	if ( fc._lastDereferenceOperator == OPERATOR::SUBSCRIPT ) {
+		current_expression()->pop_execution_step();
+		current_expression()->add_execution_step(
+			hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::ACCESS::REFERENCE, _1, position_.get() )
+		);
+	} else {
+		current_expression()->pop_execution_step();
+		current_expression()->add_execution_step(
+			hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::REFERENCE, fc._lastMemberName, _1, position_.get() )
+		);
+	}
 	return;
 	M_EPILOG
 }
@@ -1021,7 +1044,10 @@ void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, e
 	if ( huginn::is_keyword( value_ ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
 	}
-	current_expression()->add_execution_step( hcore::call( &HExpression::get_field, current_expression().raw(), value_, _1, position_.get() ) );
+	current_expression()->add_execution_step(
+		hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::VALUE, value_, _1, position_.get() )
+	);
+	fc._lastMemberName = value_;
 	fc._valueTypes.pop();
 	fc._valueTypes.push( HHuginn::TYPE::REFERENCE );
 }

@@ -117,8 +117,26 @@ void HExpression::get_reference( yaal::hcore::HString const& name_, HFrame* fram
 	M_EPILOG
 }
 
-void HExpression::get_field( yaal::hcore::HString const&, huginn::HFrame*, int ) {
+void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, huginn::HFrame* frame_, int ) {
 	M_PROLOG
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::MEMBER_ACCESS );
+	int p( frame_->operations().top()._position );
+	frame_->operations().pop();
+	HHuginn::value_t v( frame_->values().top() );
+	frame_->values().pop();
+	HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
+	if ( o == nullptr ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->type()->name() ).append( "' is not a compound object." ), p );
+	}
+	int fi( o->field_index( name_ ) );
+	if ( fi < 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->type()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
+	}
+	if ( access_ == ACCESS::VALUE ) {
+		frame_->values().push( o->field( fi ) );
+	} else {
+		frame_->values().push( make_pointer<HHuginn::HReference>( o->field( fi ) ) );
+	}
 	return;
 	M_EPILOG
 }
@@ -175,7 +193,8 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 		frame_->values().push( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function()( frame_->thread(), nullptr, values, p ) );
 	} else {
-		frame_->values().push( static_cast<HHuginn::HClass::HMethod*>( f.raw() )->function()( frame_->thread(), frame_->object(), values, p ) );
+		HHuginn::HClass::HMethod* m( static_cast<HHuginn::HClass::HMethod*>( f.raw() ) );
+		frame_->values().push( m->function()( frame_->thread(), m->object(), values, p ) );
 	}
 	return;
 	M_EPILOG
@@ -337,7 +356,7 @@ void HExpression::power( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
-void HExpression::subscript( SUBSCRIPT subscript_, HFrame* frame_, int ) {
+void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
 	HHuginn::value_t from( _none_ );
@@ -376,7 +395,7 @@ void HExpression::subscript( SUBSCRIPT subscript_, HFrame* frame_, int ) {
 	} else {
 		frame_->values().pop();
 		if ( range > 0 ) {
-			if ( subscript_ == SUBSCRIPT::REFERENCE ) {
+			if ( access_ == ACCESS::REFERENCE ) {
 				throw HHuginn::HHuginnRuntimeException( "Cannot assign to a range.", p );
 			}
 			if ( range == 1 ) {
@@ -386,7 +405,7 @@ void HExpression::subscript( SUBSCRIPT subscript_, HFrame* frame_, int ) {
 			}
 			frame_->values().push( value_builtin::range( base, from, to, step, p ) );
 		} else {
-			frame_->values().push( value_builtin::subscript( subscript_, base, step, p ) );
+			frame_->values().push( value_builtin::subscript( access_, base, step, p ) );
 		}
 	}
 	return;

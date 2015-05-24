@@ -42,7 +42,7 @@ namespace huginn {
 
 namespace value_builtin {
 
-HHuginn::value_t subscript( HExpression::SUBSCRIPT subscript_, HHuginn::value_t& base_, HHuginn::value_t const& index_, int position_ ) {
+HHuginn::value_t subscript( HExpression::ACCESS subscript_, HHuginn::value_t& base_, HHuginn::value_t const& index_, int position_ ) {
 	HHuginn::type_t baseType( base_->type() );
 	HHuginn::value_t res;
 	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::STRING ) ) {
@@ -64,7 +64,7 @@ HHuginn::value_t subscript( HExpression::SUBSCRIPT subscript_, HHuginn::value_t&
 		}
 		if ( baseType == HHuginn::TYPE::LIST ) {
 			HHuginn::HList* l( static_cast<HHuginn::HList*>( base_.raw() ) );
-			res = ( subscript_ == HExpression::SUBSCRIPT::VALUE ? l->get( index ) : l->get_ref( index ) );
+			res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( index ) : l->get_ref( index ) );
 		} else {
 			M_ASSERT( baseType == HHuginn::TYPE::STRING );
 			HHuginn::HString* s( static_cast<HHuginn::HString*>( base_.raw() ) );
@@ -72,7 +72,7 @@ HHuginn::value_t subscript( HExpression::SUBSCRIPT subscript_, HHuginn::value_t&
 		}
 	} else if ( baseType == HHuginn::TYPE::MAP ) {
 		HHuginn::HMap* m( static_cast<HHuginn::HMap*>( base_.raw() ) );
-		res = ( subscript_ == HExpression::SUBSCRIPT::VALUE ? m->get( index_, position_ ) : m->get_ref( index_, position_ ) );
+		res = ( subscript_ == HExpression::ACCESS::VALUE ? m->get( index_, position_ ) : m->get_ref( index_, position_ ) );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( baseType->name() ).append( "'." ), position_ );
 	}

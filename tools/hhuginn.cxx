@@ -319,11 +319,12 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule memberAccess(
 		"memberAccess",
-		'.' >> regex(
+		constant( '.' )[HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) )] >> regex(
 			"member",
 			identifier,
 			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_get_field_reference, _compiler.get(), _1, _2 ) )
-		)
+		),
+		e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) )
 	);
 	HRule dereference( "dereference", *( subscriptOperator | functionCallOperator | memberAccess ) );
 	HRule atom( "atom",
@@ -689,6 +690,11 @@ HHuginn::HObject::HObject(
 ) : HValue( class_->type() )
 	, _class( class_ )
 	, _fields( fields_ ) {
+	for ( value_t& v : _fields ) {
+		if ( v->type() == TYPE::METHOD ) {
+			static_cast<HClass::HMethod*>( v.raw() )->set_object( this );
+		}
+	}
 }
 
 HHuginn::HObject::~HObject( void ) {
@@ -1541,12 +1547,22 @@ HHuginn::value_t HHuginn::HFunctionReference::do_clone( void ) const {
 HHuginn::HClass::HMethod::HMethod(
 	function_t const& function_
 ) : HValue( TYPE::METHOD )
-	, _function( function_ ) {
+	, _function( function_ )
+	, _object( nullptr ) {
 	return;
 }
 
 HHuginn::function_t const& HHuginn::HClass::HMethod::function( void ) const {
 	return ( _function );
+}
+
+HHuginn::HObject* HHuginn::HClass::HMethod::object( void ) const {
+	return ( _object );
+}
+
+void HHuginn::HClass::HMethod::set_object( yaal::tools::HHuginn::HObject* object_ ) {
+	_object = object_;
+	return;
 }
 
 HHuginn::value_t HHuginn::HClass::HMethod::do_clone( void ) const {

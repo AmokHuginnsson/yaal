@@ -48,7 +48,7 @@ class HExpression : public HStatement {
 public:
 	typedef HExpression this_type;
 	typedef HStatement base_type;
-	enum class SUBSCRIPT {
+	enum class ACCESS {
 		VALUE,
 		REFERENCE
 	};
@@ -77,8 +77,8 @@ public:
 	void get_reference( yaal::hcore::HString const&, huginn::HFrame*, int );
 	void make_variable( yaal::hcore::HString const&, huginn::HFrame*, int );
 	void set_variable( huginn::HFrame*, int );
-	void subscript( SUBSCRIPT, huginn::HFrame*, int );
-	void get_field( yaal::hcore::HString const&, huginn::HFrame*, int );
+	void subscript( ACCESS, huginn::HFrame*, int );
+	void get_field( ACCESS, yaal::hcore::HString const&, huginn::HFrame*, int );
 	void power( huginn::HFrame*, int );
 	void equals( huginn::HFrame*, int );
 	void not_equals( huginn::HFrame*, int );

@@ -80,6 +80,7 @@ struct OCompiler {
 		operations_t _operations;
 		type_stack_t _valueTypes;
 		OPERATOR _lastDereferenceOperator;
+		yaal::hcore::HString _lastMemberName;
 		OFunctionContext( HHuginn* );
 	};
 	typedef yaal::hcore::HStack<OFunctionContext> function_contexts_t;
@@ -168,6 +169,7 @@ struct OCompiler {
 	void dispatch_assign( executing_parser::position_t );
 	void dispatch_subscript( executing_parser::position_t );
 	void dispatch_function_call( expression_action_t const&, executing_parser::position_t );
+	void dispatch_member_access( executing_parser::position_t );
 	void defer_action( expression_action_t const&, executing_parser::position_t );
 	void defer_store_direct( HHuginn::value_t const&, executing_parser::position_t );
 	void defer_store_real( double long, executing_parser::position_t );
