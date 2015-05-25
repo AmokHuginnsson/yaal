@@ -194,6 +194,7 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 		frame_->values().push( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function()( frame_->thread(), nullptr, values, p ) );
 	} else {
 		HHuginn::HClass::HMethod* m( static_cast<HHuginn::HClass::HMethod*>( f.raw() ) );
+		M_ASSERT( m->object() );
 		frame_->values().push( m->function()( frame_->thread(), m->object(), values, p ) );
 	}
 	return;

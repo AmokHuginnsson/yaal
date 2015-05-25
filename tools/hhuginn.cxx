@@ -610,12 +610,10 @@ HHuginn::HClass::HClass(
 	HHuginn* huginn_,
 	type_t type_,
 	HClass const* super_,
-	yaal::hcore::HString const& name_,
 	field_names_t const& fieldNames_,
 	values_t const& fieldDefinitions_
 ) : _type( type_ )
 	, _super( super_ )
-	, _name( name_ )
 	, _fieldNames( fieldNames_ )
 	, _fieldIndexes( super_ ? super_->_fieldIndexes : field_indexes_t() )
 	, _fieldDefinitions( super_ ? super_->_fieldDefinitions : values_t() )
@@ -640,7 +638,7 @@ HHuginn::HClass const* HHuginn::HClass::super( void ) const {
 }
 
 yaal::hcore::HString const& HHuginn::HClass::name( void ) const {
-	return ( _name );
+	return ( _type->name() );
 }
 
 HHuginn::type_t HHuginn::HClass::type( void ) const {
@@ -671,11 +669,7 @@ HHuginn* HHuginn::HClass::huginn( void ) const {
 
 HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, HObject*, values_t const& values_, int position_ ) const {
 	M_PROLOG
-	values_t defaults;
-	for ( value_t const& v : _fieldDefinitions ) {
-		defaults.push_back( v->clone() );
-	}
-	value_t v( make_pointer<HObject>( this, defaults ) );
+	value_t v( make_pointer<HObject>( this ) );
 	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR ) );
 	if ( constructorIdx >= 0 ) {
 		function( constructorIdx )( thread_, static_cast<HObject*>( v.raw() ), values_, position_ );
@@ -684,23 +678,34 @@ HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, HOb
 	M_EPILOG
 }
 
-HHuginn::HObject::HObject(
-	HClass const* class_,
-	values_t const& fields_
-) : HValue( class_->type() )
+HHuginn::values_t HHuginn::HClass::get_defaults( void ) const {
+	M_PROLOG
+	values_t defaults;
+	for ( value_t const& v : _fieldDefinitions ) {
+		defaults.push_back( v->clone() );
+	}
+	return ( defaults );
+	M_EPILOG
+}
+
+HHuginn::HObject::HObject( HClass const* class_ )
+	: HValue( class_->type() )
+	, _class( class_ )
+	, _fields( class_->get_defaults() ) {
+	reset_methods();
+}
+
+HHuginn::HObject::HObject( HClass const* class_, fields_t const& fields_ )
+	: HValue( class_->type() )
 	, _class( class_ )
 	, _fields( fields_ ) {
-	for ( value_t& v : _fields ) {
-		if ( v->type() == TYPE::METHOD ) {
-			static_cast<HClass::HMethod*>( v.raw() )->set_object( this );
-		}
-	}
+	reset_methods();
 }
 
 HHuginn::HObject::~HObject( void ) {
 	M_PROLOG
-	huginn::HThread* t( _class->huginn()->current_thread() );
-	if ( ! t->has_exception() ) {
+	huginn::HThread* t( _class->huginn() ? _class->huginn()->current_thread() : nullptr );
+	if ( t && ! t->has_exception() ) {
 		int destructorIdx( _class->field_index( KEYWORD::DESTRUCTOR ) );
 		HClass const* c( _class->super() );
 		if ( destructorIdx >= 0 ) {
@@ -730,6 +735,17 @@ HHuginn::HObject::~HObject( void ) {
 	}
 	return;
 	M_DESTRUCTOR_EPILOG
+}
+
+void HHuginn::HObject::reset_methods( void ) {
+	M_PROLOG
+	for ( value_t& v : _fields ) {
+		if ( v->type() == TYPE::METHOD ) {
+			static_cast<HClass::HMethod*>( v.raw() )->set_object( this );
+		}
+	}
+	return;
+	M_EPILOG
 }
 
 int HHuginn::HObject::field_index( yaal::hcore::HString const& name_ ) const {
@@ -854,7 +870,7 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 			}
 		}
 		type_t type( HType::register_type( cc->_className, this ) );
-		c = _classes.insert( make_pair( name_, make_pointer<HClass>( this, type, super, name_, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
+		c = _classes.insert( make_pair( name_, make_pointer<HClass>( this, type, super, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
 	}
 	return ( c );
 	M_EPILOG
@@ -1296,57 +1312,10 @@ private:
 	HStringIterator& operator = ( HStringIterator const& ) = delete;
 };
 
-class HListIterator : public HIteratorInterface {
-	HHuginn::HList* _list;
-	int _index;
-public:
-	HListIterator( HHuginn::HList* list_ )
-		: _list( list_ ),
-		_index( 0 ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( void ) override {
-		return ( _list->get( _index ) );
-	}
-	virtual bool do_is_valid( void ) override {
-		return ( _index < _list->size() );
-	}
-	virtual void do_next( void ) override {
-		++ _index;
-	}
-private:
-	HListIterator( HListIterator const& ) = delete;
-	HListIterator& operator = ( HListIterator const& ) = delete;
-};
-
-class HMapIterator : public HIteratorInterface {
-	HHuginn::HMap::values_t* _map;
-	HHuginn::HMap::values_t::iterator _it;
-public:
-	HMapIterator( HHuginn::HMap::values_t* map_ )
-		: _map( map_ ), _it( map_->begin() ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( void ) override {
-		return ( _it->first );
-	}
-	virtual bool do_is_valid( void ) override {
-		return ( _it != _map->end() );
-	}
-	virtual void do_next( void ) override {
-		++ _it;
-	}
-private:
-	HMapIterator( HMapIterator const& ) = delete;
-	HMapIterator& operator = ( HMapIterator const& ) = delete;
-};
-
 }
 
-HHuginn::HIterable::HIterable( type_t type_ )
-	: HValue( type_ ) {
+HHuginn::HIterable::HIterable( HClass const* class_ )
+	: HObject( class_ ) {
 	return;
 }
 
@@ -1354,9 +1323,13 @@ HHuginn::HIterable::HIterator HHuginn::HIterable::iterator( void ) {
 	return ( do_iterator() );
 }
 
+namespace {
+HHuginn::HClass huginnString( nullptr, HHuginn::TYPE::STRING, nullptr, HHuginn::HClass::field_names_t(), HHuginn::values_t() );
+}
+
 HHuginn::HString::HString( yaal::hcore::HString const& value_ )
-	: HIterable( TYPE::STRING ),
-	_value( value_ ) {
+	: HIterable( &huginnString )
+	, _value( value_ ) {
 	return;
 }
 
@@ -1375,117 +1348,6 @@ HHuginn::value_t HHuginn::HString::do_clone( void ) const {
 HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( void ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStringIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );
-}
-
-HHuginn::HList::HList( void )
-	: HIterable( TYPE::LIST )
-	, _data() {
-	return;
-}
-
-HHuginn::HList::HList( values_t const& data_ )
-	: HIterable( TYPE::LIST )
-	, _data( data_ ) {
-	return;
-}
-
-void HHuginn::HList::push_back( HHuginn::value_t const& value_ ) {
-	M_PROLOG
-	_data.push_back( value_ );
-	return;
-	M_EPILOG
-}
-
-int long HHuginn::HList::size( void ) const {
-	return ( _data.get_size() );
-}
-
-HHuginn::value_t HHuginn::HList::get( int long long index_ ) {
-	M_PROLOG
-	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
-	return ( _data[static_cast<int>( index_ )] );
-	M_EPILOG
-}
-
-HHuginn::value_t HHuginn::HList::get_ref( int long long index_ ) {
-	M_PROLOG
-	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
-	return ( make_pointer<HReference>( _data[static_cast<int>( index_ )] ) );
-	M_EPILOG
-}
-
-HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HListIterator( this ) );
-	return ( HIterator( yaal::move( impl ) ) );
-}
-
-HHuginn::value_t HHuginn::HList::do_clone( void ) const {
-	return ( make_pointer<HList>( _data ) );
-}
-
-HHuginn::HMap::HMap( void )
-	: HIterable( TYPE::MAP ),
-	_data( &value_builtin::less_low ),
-	_keyType( HHuginn::TYPE::NONE ) {
-	return;
-}
-
-HHuginn::HMap::HMap( values_t const& data_, type_t keyType_ )
-	: HIterable( TYPE::MAP ),
-	_data( data_ ),
-	_keyType( keyType_ ) {
-	return;
-}
-
-int long HHuginn::HMap::size( void ) const {
-	return ( _data.get_size() );
-}
-
-void HHuginn::HMap::verify_key_type( HHuginn::type_t type_, int position_ ) {
-	if ( ( _keyType != TYPE::NONE ) && ( type_ != _keyType ) ) {
-		throw HHuginnRuntimeException( "Non-uniform key types.", position_ );
-	}
-	if ( ! OCompiler::is_comparable( type_ ) ) {
-		throw HHuginnRuntimeException( "Key type `"_ys.append( type_->name() ).append( "' is not a comparable." ), position_ );
-	}
-	return;
-}
-
-HHuginn::value_t HHuginn::HMap::get( HHuginn::value_t const& key_, int position_ ) {
-	M_PROLOG
-	verify_key_type( key_->type(), position_ );
-	values_t::iterator it( _data.find( key_ ) );
-	if ( ! ( it != _data.end() ) ) {
-		throw HHuginnRuntimeException( "Key does not exist in map.", position_ );
-	}
-	return ( it->second );
-	M_EPILOG
-}
-
-HHuginn::value_t HHuginn::HMap::get_ref( HHuginn::value_t const& key_, int position_ ) {
-	M_PROLOG
-	verify_key_type( key_->type(), position_ );
-	_keyType = key_->type();
-	return ( make_pointer<HReference>( _data[key_] ) );
-	M_EPILOG
-}
-
-void HHuginn::HMap::insert( HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
-	M_PROLOG
-	verify_key_type( key_->type(), position_ );
-	_data.insert( make_pair( key_, value_ ) );
-	_keyType = key_->type();
-	return;
-	M_EPILOG
-}
-
-HHuginn::HIterable::HIterator HHuginn::HMap::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HMapIterator( &_data ) );
-	return ( HIterator( yaal::move( impl ) ) );
-}
-
-HHuginn::value_t HHuginn::HMap::do_clone( void ) const {
-	return ( make_pointer<HMap>( _data, _keyType ) );
 }
 
 HHuginn::HTernaryEvaluator::HTernaryEvaluator(

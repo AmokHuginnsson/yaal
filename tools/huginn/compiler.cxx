@@ -1031,7 +1031,11 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	if ( huginn::is_keyword( value_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
+		if ( value_ != "this" ) {
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
+		} else if ( ! _classContext ) {
+			throw HHuginn::HHuginnRuntimeException( "Keyword `this' can be used only in class context.", position_.get() );
+		}
 	}
 	current_expression()->add_execution_step( hcore::call( &HExpression::get_reference, current_expression().raw(), value_, _1, position_.get() ) );
 	f()._valueTypes.push( HHuginn::TYPE::UNKNOWN );

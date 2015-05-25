@@ -106,6 +106,9 @@ HHuginn::value_t HFrame::try_reference( yaal::hcore::HString const& name_, int p
 		v = it->second;
 	} else if ( _object && ( ( fieldIdx = _object->field_index( name_ ) ) >= 0 ) ) {
 		v = _object->field( fieldIdx );
+	} else if ( _object && ( name_ == "this" ) ) {
+		v = _object->get_pointer();
+		M_ASSERT( !! v );
 	} else if ( _parent && ( _parent->_number == _number ) ) {
 		v = _parent->try_reference( name_, position_ );
 	} else {
