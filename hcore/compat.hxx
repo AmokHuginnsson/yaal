@@ -153,10 +153,6 @@ static int const LOGIN_NAME_MAX = 16;
 #endif
 #endif
 
-#if ! defined( HAVE_DECLTYPE )
-#define __decltype typeof
-#endif /* #if ! defined( HAVE_DECLTYPE ) */
-
 #if ( HAVE_DECL_ERR == 1 )
 #include <cstdlib>
 #undef ERR
