@@ -57,6 +57,15 @@ template<typename tType, template<typename>class pointer_type_t,
 				 template<typename, typename>class access_type_t>
 class HPointer;
 
+template<typename T, typename U>
+struct has_initialize_observer {
+private:
+	template<typename X, typename Y> static auto test( int ) -> decltype( static_cast<X*>( nullptr )->initialize_observer( Y() ), static_cast<trait::true_type*>( nullptr ) );
+	template<typename, typename> static trait::false_type* test( ... );
+public:
+	static bool const value = trait::same_type<decltype( test<T, U>( 0 ) ), trait::true_type*>::value;
+};
+
 /*! \brief Pointer life time tracker access policy.
  */
 template<typename tType, typename pointer_type_t>
@@ -82,13 +91,13 @@ struct HPointerStrict {
 	template<typename deleter_t>
 	inline static void delete_pointee( deleter_t const& deleter_ )
 		{ deleter_->do_delete(); }
-	template<typename ptr_t>
-	static void initialize_from_this( HPointerFromThisInterface<tType>* obj, ptr_t const& ptr ) {
+	template<typename ptr_t, typename X = typename trait::enable_if<has_initialize_observer<tType, ptr_t>::value>::type>
+	static void initialize_from_this( tType* obj, ptr_t const& ptr, int ) {
 		obj->initialize_observer( ptr );
 		return;
 	}
 	template<typename ptr_t>
-	static void initialize_from_this( void*, ptr_t const& ) {
+	static void initialize_from_this( tType*, ptr_t const&, long ) {
 		return;
 	}
 	static void inc_reference_counter( int* referenceCounter_ ) {
@@ -231,7 +240,7 @@ public:
 		M_ASSERT( pointer_ );
 		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
 		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
-		access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this );
+		access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this, 0 );
 		return;
 	}
 	template<typename real_t, typename deleter_t>
@@ -240,7 +249,7 @@ public:
 		M_ASSERT( pointer_ );
 		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
 		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
-		access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this );
+		access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this, 0 );
 		return;
 	}
 	virtual ~HPointer( void ) {
@@ -465,7 +474,10 @@ protected:
 		_selfObserver = firstOwner_;
 		return;
 	}
-	friend struct HPointerStrict<tType, HPointerScalar<tType> >;
+	template<typename T, typename U>
+	friend struct HPointerStrict;
+	template<typename T, typename U>
+	friend struct has_initialize_observer;
 };
 
 template<typename alien_t, typename tType, template<typename>class pointer_type_t,
@@ -543,7 +555,7 @@ struct pointer_helper {
 		ptr_._object = static_cast<typename ptr_t::template HShared<HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem();
 		ptr_._shared->_object = ptr_._object;
 		HPointerStrict<tType, HPointerScalar<tType> >::inc_reference_counter( ptr_._shared->_referenceCounter );
-		HPointerStrict<tType, HPointerScalar<tType> >::initialize_from_this( ptr_._object, ptr_ );
+		HPointerStrict<tType, HPointerScalar<tType> >::initialize_from_this( ptr_._object, ptr_, 0 );
 		return;
 	}
 
