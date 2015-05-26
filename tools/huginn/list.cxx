@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "iterator.hxx"
+#include "helper.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -69,13 +70,7 @@ namespace list {
 
 inline HHuginn::value_t add( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	if ( values_.get_size() != 1 ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"list.add() expects exactly one parameter, got: "_ys
-			.append( values_.get_size() ),
-			position_
-		);
-	}
+	verify_arg_count( "list.push", values_, 1, 1, position_ );
 	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_ ) );
 	M_ASSERT( l != nullptr );
 	l->push_back( values_[0] );
@@ -86,13 +81,7 @@ inline HHuginn::value_t add( huginn::HThread*, HHuginn::HObject* object_, HHugin
 
 inline HHuginn::value_t pop( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	if ( values_.get_size() != 0 ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"list.pop() expects no parameter, got: "_ys
-			.append( values_.get_size() ),
-			position_
-		);
-	}
+	verify_arg_count( "list.pop", values_, 0, 0, position_ );
 	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_ ) );
 	M_ASSERT( l != nullptr );
 	l->pop_back();

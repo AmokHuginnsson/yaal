@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "value_builtin.hxx"
 #include "booleanevaluator.hxx"
+#include "helper.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -41,8 +42,6 @@ namespace yaal {
 namespace tools {
 
 namespace huginn {
-
-void operands_type_mismatch( char const*, HHuginn::type_t, HHuginn::type_t, int ) __attribute__(( noreturn ));
 
 HExpression::HExpression( int position_ )
 	: HStatement(),

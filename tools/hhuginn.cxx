@@ -39,6 +39,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/scope.hxx"
 #include "tools/huginn/compiler.hxx"
 #include "tools/huginn/iterator.hxx"
+#include "tools/huginn/helper.hxx"
 #include "streamtools.hxx"
 
 using namespace yaal;
@@ -1377,15 +1378,7 @@ namespace huginn_builtin {
 
 inline HHuginn::value_t convert( HHuginn::type_t toType_, huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	if ( values_.get_size() != 1 ) {
-		throw HHuginn::HHuginnRuntimeException(
-			""_ys
-			.append( toType_->name() )
-			.append( "() expects exactly one parameter, got: " )
-			.append( values_.get_size() ),
-			position_
-		);
-	}
+	verify_arg_count( toType_->name(), values_, 1, 1, position_ );
 	HHuginn::value_t res;
 	if ( toType_ == HHuginn::TYPE::INTEGER ) {
 		res = value_builtin::integer( values_.front(), position_ );
@@ -1411,13 +1404,7 @@ inline HHuginn::value_t convert( HHuginn::type_t toType_, huginn::HThread*, HHug
 
 inline HHuginn::value_t size( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	if ( values_.get_size() != 1 ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"size() expects exactly one parameter, got: "_ys
-			.append( values_.get_size() ),
-			position_
-		);
-	}
+	verify_arg_count( "size", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
 	int long long s( 0 );
 	HHuginn::type_t typeId( v->type() );
@@ -1439,13 +1426,7 @@ inline HHuginn::value_t size( huginn::HThread*, HHuginn::HObject*, HHuginn::valu
 
 inline HHuginn::value_t type( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	if ( values_.get_size() != 1 ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"type() expects exactly one parameter, got: "_ys
-			.append( values_.get_size() ),
-			position_
-		);
-	}
+	verify_arg_count( "type", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
 	return ( make_pointer<HHuginn::HString>( v->type()->name() ) );
 	M_EPILOG
@@ -1453,13 +1434,7 @@ inline HHuginn::value_t type( huginn::HThread*, HHuginn::HObject*, HHuginn::valu
 
 inline HHuginn::value_t copy( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	if ( values_.get_size() != 1 ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"copy() expects exactly one parameter, got: "_ys
-			.append( values_.get_size() ),
-			position_
-		);
-	}
+	verify_arg_count( "copy", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
 	return ( v->clone() );
 	M_EPILOG
@@ -1478,26 +1453,14 @@ inline HHuginn::value_t list( huginn::HThread*, HHuginn::HObject*, HHuginn::valu
 
 inline HHuginn::value_t map( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	if ( ! values_.is_empty() ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"map() does not expect any parameters, got: "_ys
-			.append( values_.get_size() ),
-			position_
-		);
-	}
+	verify_arg_count( "map", values_, 0, 0, position_ );
 	return ( make_pointer<HHuginn::HMap>() );
 	M_EPILOG
 }
 
 inline HHuginn::value_t print( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	if ( values_.get_size() != 1 ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"print() expects exactly one parameter, got: "_ys
-			.append( values_.get_size() ),
-			position_
-		);
-	}
+	verify_arg_count( "print", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
 	yaal::hcore::HStreamInterface& out( thread_->huginn().output_stream() );
 	HHuginn::type_t typeId( v->type() );
@@ -1524,8 +1487,9 @@ inline HHuginn::value_t print( huginn::HThread* thread_, HHuginn::HObject*, HHug
 	M_EPILOG
 }
 
-inline HHuginn::value_t input( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const&, int ) {
+inline HHuginn::value_t input( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
+	verify_arg_count( "input", values_, 0, 0, position_ );
 	yaal::hcore::HString l;
 	thread_->huginn().input_stream().read_until( l );
 	return ( make_pointer<HHuginn::HString>( l ) );

@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "expression.hxx"
 #include "scope.hxx"
+#include "helper.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -54,15 +55,13 @@ HFunction::HFunction( yaal::hcore::HString const& name_,
 
 HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) const {
 	M_PROLOG
-	if ( values_.get_size() < ( _parameterNames.get_size() - _defaultValues.get_size() ) ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"Mismatching number of parameters in call to: `"_ys
-			.append( _name ).append( "', expected at least: " )
-			.append( _parameterNames.get_size() - _defaultValues.get_size() ).append( ", got: " )
-			.append( values_.get_size() ).append( "." ),
-			position_
-		);
-	}
+	verify_arg_count(
+		_name,
+		values_,
+		static_cast<int>( _parameterNames.get_size() - _defaultValues.get_size() ),
+		static_cast<int>( _parameterNames.get_size() ),
+		position_
+	);
 	thread_->create_function_frame( object_ );
 	HFrame* f( thread_->current_frame() );
 	for (

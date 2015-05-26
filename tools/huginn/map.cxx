@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "iterator.hxx"
 #include "compiler.hxx"
 #include "value_builtin.hxx"
+#include "helper.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -71,13 +72,7 @@ namespace map {
 
 inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	if ( values_.get_size() != 1 ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"map.has_key() expects exactly one parameter, got: "_ys
-			.append( values_.get_size() ),
-			position_
-		);
-	}
+	verify_arg_count( "map.has_key", values_, 1, 1, position_ );
 	HHuginn::HMap* m( dynamic_cast<HHuginn::HMap*>( object_ ) );
 	M_ASSERT( m != nullptr );
 	bool hasKey( m->has_key( values_[0], position_ ) );
@@ -87,13 +82,7 @@ inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HH
 
 inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	if ( values_.get_size() != 1 ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"map.has_key() expects exactly one parameter, got: "_ys
-			.append( values_.get_size() ),
-			position_
-		);
-	}
+	verify_arg_count( "map.erase", values_, 1, 1, position_ );
 	HHuginn::HMap* m( dynamic_cast<HHuginn::HMap*>( object_ ) );
 	M_ASSERT( m != nullptr );
 	M_ASSERT( !! m->get_pointer() );

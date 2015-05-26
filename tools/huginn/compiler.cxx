@@ -38,6 +38,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "return.hxx"
 #include "break.hxx"
 #include "booleanevaluator.hxx"
+#include "helper.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -47,8 +48,6 @@ namespace yaal {
 namespace tools {
 
 namespace huginn {
-
-void operands_type_mismatch( char const*, HHuginn::type_t, HHuginn::type_t, int ) __attribute__(( noreturn ));
 
 OCompiler::OScopeContext::OScopeContext( HHuginn* huginn_ )
 	: _huginn( huginn_ ),
@@ -1129,17 +1128,6 @@ void OCompiler::defer_store_none( executing_parser::position_t position_ ) {
 	f()._valueTypes.push( HHuginn::TYPE::NONE );
 	return;
 	M_EPILOG
-}
-
-void operands_type_mismatch( char const* op_, HHuginn::type_t t1_, HHuginn::type_t t2_, int pos_ ) {
-	hcore::HString msg( "Operand types for `" );
-	msg.append( op_ )
-		.append( "' do not match: " )
-		.append( t1_->name() )
-		.append( " vs " )
-		.append( t2_->name() )
-		.append( "." ),
-	throw HHuginn::HHuginnRuntimeException( msg, pos_ );
 }
 
 }
