@@ -79,8 +79,6 @@ HHuginn::type_t const HHuginn::TYPE::STRING( HHuginn::HType::register_type( "str
 HHuginn::type_t const HHuginn::TYPE::NUMBER( HHuginn::HType::register_type( "number", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::BOOLEAN( HHuginn::HType::register_type( "boolean", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::CHARACTER( HHuginn::HType::register_type( "character", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::LIST( HHuginn::HType::register_type( "list", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::MAP( HHuginn::HType::register_type( "map", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::REFERENCE( HHuginn::HType::register_type( "*reference*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::FUNCTION_REFERENCE( HHuginn::HType::register_type( "*function_reference*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::METHOD( HHuginn::HType::register_type( "*method*", nullptr ) );

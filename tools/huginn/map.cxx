@@ -40,6 +40,8 @@ namespace yaal {
 
 namespace tools {
 
+HHuginn::type_t const HHuginn::TYPE::MAP( HHuginn::HType::register_type( "map", nullptr ) );
+
 namespace huginn {
 
 class HMapIterator : public HIteratorInterface {

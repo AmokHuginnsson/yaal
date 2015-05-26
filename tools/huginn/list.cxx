@@ -37,6 +37,8 @@ namespace yaal {
 
 namespace tools {
 
+HHuginn::type_t const HHuginn::TYPE::LIST( HHuginn::HType::register_type( "list", nullptr ) );
+
 namespace huginn {
 
 class HListIterator : public HIteratorInterface {
