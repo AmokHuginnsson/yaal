@@ -75,7 +75,6 @@ HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
 HHuginn::type_t const HHuginn::TYPE::NONE( HHuginn::HType::register_type( "none", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::INTEGER( HHuginn::HType::register_type( "integer", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::REAL( HHuginn::HType::register_type( "real", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::STRING( HHuginn::HType::register_type( "string", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::NUMBER( HHuginn::HType::register_type( "number", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::BOOLEAN( HHuginn::HType::register_type( "boolean", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::CHARACTER( HHuginn::HType::register_type( "character", nullptr ) );
@@ -1284,34 +1283,6 @@ HHuginn::value_t HHuginn::HCharacter::do_clone( void ) const {
 	return ( make_pointer<HCharacter>( _value ) );
 }
 
-namespace {
-
-class HStringIterator : public HIteratorInterface {
-	HHuginn::HString* _string;
-	int _index;
-public:
-	HStringIterator( HHuginn::HString* string_ )
-		: _string( string_ ),
-		_index( 0 ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( void ) override {
-		return ( make_pointer<HHuginn::HCharacter>( _string->value()[ _index ] ) );
-	}
-	virtual bool do_is_valid( void ) override {
-		return ( _index < _string->value().get_size() );
-	}
-	virtual void do_next( void ) override {
-		++ _index;
-	}
-private:
-	HStringIterator( HStringIterator const& ) = delete;
-	HStringIterator& operator = ( HStringIterator const& ) = delete;
-};
-
-}
-
 HHuginn::HIterable::HIterable( HClass const* class_ )
 	: HObject( class_ ) {
 	return;
@@ -1319,33 +1290,6 @@ HHuginn::HIterable::HIterable( HClass const* class_ )
 
 HHuginn::HIterable::HIterator HHuginn::HIterable::iterator( void ) {
 	return ( do_iterator() );
-}
-
-namespace {
-HHuginn::HClass huginnString( nullptr, HHuginn::TYPE::STRING, nullptr, HHuginn::HClass::field_names_t(), HHuginn::values_t() );
-}
-
-HHuginn::HString::HString( yaal::hcore::HString const& value_ )
-	: HIterable( &huginnString )
-	, _value( value_ ) {
-	return;
-}
-
-yaal::hcore::HString const& HHuginn::HString::value( void ) const {
-	return ( _value );
-}
-
-yaal::hcore::HString& HHuginn::HString::value( void ) {
-	return ( _value );
-}
-
-HHuginn::value_t HHuginn::HString::do_clone( void ) const {
-	return ( make_pointer<HString>( _value ) );
-}
-
-HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStringIterator( this ) );
-	return ( HIterator( yaal::move( impl ) ) );
 }
 
 HHuginn::HTernaryEvaluator::HTernaryEvaluator(
