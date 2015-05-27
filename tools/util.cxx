@@ -140,16 +140,15 @@ void show_help( void* arg ) {
 			it != end; ++ it ) {
 		HProgramOptionsHandler::OOption const& o = *it;
 		/* + 2 for --, + 1 for =, 2 for [] */
-		int tmp( static_cast<int>( ( o._name ? ::strlen( o._name ) + 2 : 0 )
-					+ ( o._argument ? ::strlen( o._argument ) + 1 : 0 )
-					+ ( o._switchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL ? 2 : 0 ) ) );
+		int tmp( static_cast<int>( ( ! o.long_form().is_empty() ? o.long_form().get_length() + 2 : 0 )
+					+ ( ! o.argument_name().is_empty() ? o.argument_name().get_length() + 1 : 0 )
+					+ ( o.switch_type() == HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL ? 2 : 0 ) ) );
 		if ( tmp > longestLongLength )
 			longestLongLength = tmp;
-		if ( is_byte( it->_shortForm ) )
+		if ( is_byte( it->short_form() ) )
 			longestShortLength = 2;
 	}
 	HString desc;
-	char const* description( NULL );
 	int columns( 0 );
 	if ( _terminal_.exists() ) {
 		HTerminal::coord_t c( _terminal_.size() );
@@ -165,74 +164,76 @@ void show_help( void* arg ) {
 	int cols( columns - ( longestLongLength + longestShortLength + 2 + 2 + 2 ) );
 	/* display each option description */
 	int const COUNT( static_cast<int>( opts.size() ) );
+	char const* description( NULL );
 	for ( int i( 0 ); i < COUNT; ++ i ) {
 		HProgramOptionsHandler::OOption const& o = opts[ i ];
-		if ( ! ( is_byte( o._shortForm ) || o._name ) )
+		if ( ! ( is_byte( o.short_form() ) || ! o.long_form().is_empty() ) ) {
 			continue;
+		}
 		HString sf;
 		int extraSFL( 0 );
 		/* if short form char exist, build full form of short form */
-		if ( is_byte( o._shortForm ) ) {
+		if ( is_byte( o.short_form() ) ) {
 			if ( is_a_tty( stdout ) ) {
 				sf.append( *ansi::bold );
 			}
 			sf.append( "-" );
-			sf.append( static_cast<char>( o._shortForm ) );
+			sf.append( static_cast<char>( o.short_form() ) );
 			if ( is_a_tty( stdout ) ) {
 				sf.append( *ansi::reset );
 				extraSFL = static_cast<int>( strlen( *ansi::bold ) + strlen( *ansi::reset ) );
 			}
 		}
-		char const* comma( is_byte( o._shortForm ) && o._name ? "," : " " );
+		char const* comma( is_byte( o.short_form() ) && ! o.long_form().is_empty() ? "," : " " );
 		if ( ! description ) {
-			description = o._description;
+			description = o.description().raw();
 		}
 		/* if long form word exist, build full form of long form */
 		HString lf;
 		int extraLFL( 0 );
-		if ( o._name ) {
+		if ( ! o.long_form().is_empty() ) {
 			if ( is_a_tty( stdout ) ) {
 				lf.append( *ansi::bold );
 			}
 			lf.append( "--" );
-			lf.append( o._name );
+			lf.append( o.long_form() );
 			if ( is_a_tty( stdout ) ) {
 				lf.append( *ansi::reset );
 				extraLFL = static_cast<int>( strlen( *ansi::bold ) + strlen( *ansi::reset ) );
 			}
 		}
-		if ( o._argument ) {
-			if ( o._switchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL ) {
+		if ( !o.argument_name().is_empty() ) {
+			if ( o.switch_type() == HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL ) {
 				lf.append( "[" );
 			}
 			lf.append( "=" );
 			if ( is_a_tty( stdout ) ) {
 				lf.append( *ansi::underline );
 			}
-			lf.append( o._argument );
+			lf.append( o.argument_name() );
 			if ( is_a_tty( stdout ) ) {
 				lf.append( *ansi::reset );
 				extraLFL += static_cast<int>( strlen( *ansi::underline ) + strlen( *ansi::reset ) );
 			}
-			if ( o._switchType == HProgramOptionsHandler::OOption::TYPE::OPTIONAL ) {
+			if ( o.switch_type() == HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL ) {
 				lf.append( "]" );
 			}
 		}
 		if ( i > 0 ) /* subsequent options */ {
 			HProgramOptionsHandler::OOption const& p = opts[ i - 1 ];
-			if ( o._name && p._name && ( ! ::strcmp( o._name, p._name ) ) ) {
+			if ( ! o.long_form().is_empty() && ! p.long_form().is_empty() && ( o.long_form() == p.long_form() ) ) {
 				lf.clear();
 				extraLFL = 0;
 				comma = " ";
-				if ( description == o._description ) {
+				if ( description == o.description().raw() ) {
 					description = "";
 				}
 			}
-			if ( is_byte( o._shortForm ) && is_byte( p._shortForm ) && (  o._shortForm == p._shortForm ) ) {
+			if ( is_byte( o.short_form() ) && is_byte( p.short_form() ) && (  o.short_form() == p.short_form() ) ) {
 				sf.clear();
 				extraSFL = 0;
 				comma = " ";
-				if ( description == o._description ) {
+				if ( description == o.description().raw() ) {
 					description = "";
 				}
 			}
@@ -267,8 +268,8 @@ void show_help( void* arg ) {
 				desc.insert( 0, 2, "  " );
 				if ( i < ( COUNT - 1 ) ) {
 					HProgramOptionsHandler::OOption const& n = opts[ i + 1 ];
-					if ( ( o._name && n._name && ( ! ::strcmp( o._name, n._name ) ) )
-							|| ( is_byte( o._shortForm ) && is_byte( n._shortForm ) && ( o._shortForm == n._shortForm ) ) ) {
+					if ( ( ! o.long_form().is_empty() && ! n.long_form().is_empty() && ( o.long_form() == n.long_form() ) )
+							|| ( is_byte( o.short_form() ) && is_byte( n.short_form() ) && ( o.short_form() == n.short_form() ) ) ) {
 						description = desc.raw();
 						break;
 					}
@@ -317,23 +318,24 @@ void dump_configuration( void* arg ) {
 	int const COUNT = static_cast<int>( opts.size() );
 	for ( int i = 0; i < COUNT; ++ i ) {
 		HProgramOptionsHandler::OOption const& o = opts[ i ];
-		if ( ! o._name )
+		if ( o.long_form().is_empty() ) {
 			continue;
+		}
 		if ( i > 0 ) /* subsequent options */ {
 			HProgramOptionsHandler::OOption const& p = opts[ i - 1 ];
-			if ( o._name && p._name
-					&& ( ! ::strcmp( o._name, p._name ) )
-					&& ( o._description == description ) )
+			if ( !o.long_form().is_empty() && !p.long_form().is_empty()
+					&& ( o.long_form() == p.long_form() )
+					&& ( o.description().raw() == description ) )
 				description = "";
-			if ( is_byte( o._shortForm ) && is_byte( p._shortForm )
-					&& ( o._shortForm == p._shortForm )
-					&& ( o._description == description ) )
+			if ( is_byte( o.short_form() ) && is_byte( p.short_form() )
+					&& ( o.short_form() == p.short_form() )
+					&& ( o.description().raw() == description ) )
 				description = "";
 		}
 		static int const MAXIMUM_LINE_LENGTH = 72;
-		::printf( "# %s, type: ", o._name );
-		if ( !! o._value ) {
-			switch ( o._value->get_type() ) {
+		::printf( "# %s, type: ", o.long_form().raw() );
+		if ( !! o.value() ) {
+			switch ( o.value()->get_type() ) {
 				case ( TYPE::BOOL ): ::printf( "boolean\n" ); break;
 				case ( TYPE::INT ): case ( TYPE::INT_SHORT ): case ( TYPE::INT_LONG ): ::printf( "integer\n" ); break;
 				case ( TYPE::FLOAT ): case ( TYPE::DOUBLE ): case ( TYPE::DOUBLE_LONG ): ::printf( "floating point\n" ); break;
@@ -342,8 +344,9 @@ void dump_configuration( void* arg ) {
 			}
 		} else
 			::printf( "boolean\n" );
-		if ( ! description )
-			description = o._description;
+		if ( ! description ) {
+			description = o.description().raw();
+		}
 		desc = description;
 		bool loop = true;
 		do {
@@ -365,30 +368,30 @@ void dump_configuration( void* arg ) {
 				loop = false;
 			}
 		} while ( loop );
-		if ( !! o._value ) {
-			switch ( o._value->get_type() ) {
+		if ( !! o.value() ) {
+			switch ( o.value()->get_type() ) {
 				case ( TYPE::BOOL ):
-					::printf( "%s %s\n", o._name, o._value->get<bool>() ? "true" : "false" );
+					::printf( "%s %s\n", o.long_form().raw(), o.value()->get<bool>() ? "true" : "false" );
 				break;
 				case ( TYPE::HSTRING ): {
-					HString const& s = o._value->get<HString>();
+					HString const& s = o.value()->get<HString>();
 					if ( ! s.is_empty() )
-						::printf( "%s \"%s\"\n", o._name, s.raw() );
+						::printf( "%s \"%s\"\n", o.long_form().raw(), s.raw() );
 					else
-						::printf( "# %s\n", o._name );
+						::printf( "# %s\n", o.long_form().raw() );
 				}
 				break;
 				case ( TYPE::INT ):
-					::printf( "%s %d\n", o._name, o._value->get<int>() );
+					::printf( "%s %d\n", o.long_form().raw(), o.value()->get<int>() );
 				break;
 				case ( TYPE::INT_LONG ):
-					::printf( "%s %ld\n", o._name, o._value->get<int long>() );
+					::printf( "%s %ld\n", o.long_form().raw(), o.value()->get<int long>() );
 				break;
 				case ( TYPE::DOUBLE_LONG ):
-					::printf( "%s %Lf\n", o._name, o._value->get<double long>() );
+					::printf( "%s %Lf\n", o.long_form().raw(), o.value()->get<double long>() );
 				break;
 				case ( TYPE::DOUBLE ):
-					::printf( "%s %f\n", o._name, o._value->get<double>() );
+					::printf( "%s %f\n", o.long_form().raw(), o.value()->get<double>() );
 				break;
 				default:
 					;

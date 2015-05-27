@@ -164,37 +164,37 @@ HToolsInitDeinit::HToolsInitDeinit( void ) {
 	M_PROLOG
 	yaal_options()
 		( "ignore_signal_SIGINT", program_options_helper::option_value( _ignoreSignalSIGINT_ ),
-			HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore INT (interrupt) signal" )
+			HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL, "ignore INT (interrupt) signal" )
 		( "ignore_signal_SIGTSTP", program_options_helper::option_value( _ignoreSignalSIGTSTP_ ),
-			HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore TSTP (terminal stop, suspend) signal" )
+			HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL, "ignore TSTP (terminal stop, suspend) signal" )
 		( "ignore_signal_SIGQUIT", program_options_helper::option_value( _ignoreSignalSIGQUIT_ ),
-			HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "ignore QUIT, core dump signal" )
+			HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL, "ignore QUIT, core dump signal" )
 		( "disable_XON", program_options_helper::option_value( _disableXON_ ),
-			HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable flow control events" )
+			HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL, "disable flow control events" )
 		( "leave_ctrl_c", program_options_helper::option_value( _leaveCtrlC_ ),
-			HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+C sequence" )
+			HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL, "disable special handling of CTRL+C sequence" )
 		( "leave_ctrl_z", program_options_helper::option_value( _leaveCtrlZ_ ),
-			HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+Z sequence" )
+			HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL, "disable special handling of CTRL+Z sequence" )
 		( "leave_ctrl_s", program_options_helper::option_value( _leaveCtrlS_ ),
-			HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+S sequence" )
+			HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL, "disable special handling of CTRL+S sequence" )
 		( "leave_ctrl_q", program_options_helper::option_value( _leaveCtrlQ_ ),
-			HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+Q sequence" )
+			HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL, "disable special handling of CTRL+Q sequence" )
 		( "leave_ctrl_\\", program_options_helper::option_value( _leaveCtrlBackSlash_ ),
-			HProgramOptionsHandler::OOption::TYPE::OPTIONAL, "disable special handling of CTRL+\\ sequence" )
+			HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL, "disable special handling of CTRL+\\ sequence" )
 		( "serial_device", program_options_helper::option_value( _serialDevice_ ),
-			HProgramOptionsHandler::OOption::TYPE::REQUIRED, "path to serial device", "path" )
+			HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "path to serial device", "path" )
 		( "default_encoding", program_options_helper::option_value( _defaultEncoding_ ),
-			HProgramOptionsHandler::OOption::TYPE::REQUIRED, "dafault character encoding used in text documents", "encoding" )
+			HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "dafault character encoding used in text documents", "encoding" )
 		( "kill_grace_period", program_options_helper::option_value( HSignalService::_killGracePeriod ),
-			HProgramOptionsHandler::OOption::TYPE::REQUIRED, "wait for that many miliseconds before killing interior", "miliseconds" )
+			HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "wait for that many miliseconds before killing interior", "miliseconds" )
 		( "child_kill_grace_period", program_options_helper::option_value( HPipedChild::_killGracePeriod ),
-			HProgramOptionsHandler::OOption::TYPE::REQUIRED, "wait for that many miliseconds before killing child process", "miliseconds" )
+			HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "wait for that many miliseconds before killing child process", "miliseconds" )
 		( "compression_level", program_options_helper::option_value( _compressionLevel_ ),
-			HProgramOptionsHandler::OOption::TYPE::REQUIRED, "default compression level for zlib library", "level" )
+			HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "default compression level for zlib library", "level" )
 		( "compression_buffer_size", program_options_helper::option_value( _zBufferSize_ ),
-			HProgramOptionsHandler::OOption::TYPE::REQUIRED, "size for compression buffer used in zlib library", "numBytes" )
+			HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "size for compression buffer used in zlib library", "numBytes" )
 		( "collector_connection_timeout", program_options_helper::option_value( _collectorConnectionTimeOut_ ),
-			HProgramOptionsHandler::OOption::TYPE::REQUIRED, "timeout on collector device read", "seconds" );
+			HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "timeout on collector device read", "seconds" );
 	int ctr = 0;
 	errno = 0;
 	extendable::set_strtold_impl( &yaal_strtold );

@@ -245,29 +245,48 @@ public:
 }
 
 HProgramOptionsHandler::OOption::OOption( void )
-	: _name( NULL ), _value(),
-	_shortForm( 0 ), _switchType( TYPE::NONE ),
-	_description( NULL ), _argument( NULL ),
-	CALLBACK() {}
+	: _shortForm( 0 )
+	, _longForm()
+	, _switchType( ARGUMENT::NONE )
+	, _description()
+	, _argument()
+	, _defaultValue()
+	, _value()
+	, CALLBACK() {
+	return;
+}
 
 HProgramOptionsHandler::OOption::OOption(
-		char const* name_,
-		HOptionValueInterface::ptr_t value_,
 		int shortForm_,
-		TYPE::enum_t switchType_,
-		char const* argument_,
-		char const* description_,
+		yaal::hcore::HString const& longForm_,
+		ARGUMENT switchType_,
+		yaal::hcore::HString const& description_,
+		yaal::hcore::HString const& argument_,
+		yaal::hcore::HString const& defaultValue_,
+		HOptionValueInterface::ptr_t value_,
 		HProgramOptionsHandler::simple_callback_t const& a_CALLBACK )
-	: _name( name_ ), _value( value_ ),
-	_shortForm( shortForm_ ), _switchType( switchType_ ),
-	_description( description_ ), _argument( argument_ ),
-	CALLBACK( a_CALLBACK ) {}
+	: _shortForm( shortForm_ )
+	, _longForm( longForm_ )
+	, _switchType( switchType_ )
+	, _description( description_ )
+	, _argument( argument_ )
+	, _defaultValue( defaultValue_ )
+	, _value( value_ )
+	, CALLBACK( a_CALLBACK ) {
+	return;
+}
 
 HProgramOptionsHandler::OOption::OOption( HProgramOptionsHandler::OOption const& o )
-	: _name( o._name ), _value( o._value ),
-	_shortForm( o._shortForm ), _switchType( o._switchType ),
-	_description( o._description ), _argument( o._argument ),
-	CALLBACK( o.CALLBACK ) {}
+	: _shortForm( o._shortForm )
+	, _longForm( o._longForm )
+	, _switchType( o._switchType )
+	, _description( o._description )
+	, _argument( o._argument )
+	, _defaultValue( o._defaultValue )
+	, _value( o._value )
+	, CALLBACK( o.CALLBACK ) {
+	return;
+}
 
 HProgramOptionsHandler::OOption& HProgramOptionsHandler::OOption::operator = ( HProgramOptionsHandler::OOption const& o ) {
 	M_PROLOG
@@ -283,16 +302,53 @@ void HProgramOptionsHandler::OOption::swap( HProgramOptionsHandler::OOption& o )
 	M_PROLOG
 	if ( &o != this ) {
 		using yaal::swap;
-		swap( _name, o._name );
-		swap( _value, o._value );
 		swap( _shortForm, o._shortForm );
+		swap( _longForm, o._longForm );
 		swap( _switchType, o._switchType );
 		swap( _description, o._description );
 		swap( _argument, o._argument );
+		swap( _defaultValue, o._defaultValue );
+		swap( _value, o._value );
 		swap( CALLBACK, o.CALLBACK );
 	}
 	return;
 	M_EPILOG
+}
+
+yaal::hcore::HString const& HProgramOptionsHandler::OOption::long_form( void ) const {
+	return ( _longForm );
+}
+
+int HProgramOptionsHandler::OOption::short_form( void ) const {
+	return ( _shortForm );
+}
+
+u64_t HProgramOptionsHandler::OOption::value_id( void ) const {
+	M_PROLOG
+	return ( _value->id() );
+	M_EPILOG
+}
+
+HProgramOptionsHandler::OOption::ARGUMENT HProgramOptionsHandler::OOption::switch_type( void ) const {
+	return ( _switchType );
+}
+
+void HProgramOptionsHandler::OOption::set( yaal::hcore::HString const& value_ ) {
+	M_PROLOG
+	_value->set( value_ );
+	M_EPILOG
+}
+
+HProgramOptionsHandler::HOptionValueInterface::ptr_t const& HProgramOptionsHandler::OOption::value( void ) const {
+	return ( _value );
+}
+
+yaal::hcore::HString const& HProgramOptionsHandler::OOption::description( void ) const {
+	return ( _description );
+}
+
+yaal::hcore::HString const& HProgramOptionsHandler::OOption::argument_name( void ) const {
+	return ( _argument );
 }
 
 void HProgramOptionsHandler::HOptionValueInterface::set( HString const& val ) {
@@ -368,8 +424,10 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 							option.raw(), value.raw() );
 				optionOK = false;
 				for ( options_t::iterator it = _options.begin(), end = _options.end(); it != end; ++ it ) {
-					if ( ! strcasecmp( option, it->_name ) )
-						optionOK = true, set_option( *it, value );
+					if ( ! strcasecmp( option, it->long_form() ) ) {
+						optionOK = true;
+						set_option( *it, value );
+					}
 				}
 				if ( rc_callback && !rc_callback( option, value )
 						&& ! optionOK ) {
@@ -391,8 +449,8 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 }
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
-		char const* name, HOptionValueInterface::ptr_t value,
-		int shortForm, OOption::TYPE::enum_t type,
+		yaal::hcore::HString const& longForm_, HOptionValueInterface::ptr_t value,
+		int shortForm, OOption::ARGUMENT type,
 		char const* desc, char const* arg,
 		simple_callback_t const& callback ) {
 	M_PROLOG
@@ -400,17 +458,24 @@ HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 	 * Automatic short form value must be outside of byte range.
 	 */
 	int sf = shortForm ? shortForm : static_cast<int>( _options.size() ) + meta::max_unsigned<char unsigned>::value + 1;
-	OOption o( name, value, sf, type, arg, desc, callback );
-	if ( ! ( name || sf ) )
+	OOption o( sf, longForm_, type, desc, arg, "", value, callback );
+	if ( longForm_.is_empty() && ! sf ) {
 		throw HProgramOptionsHandlerException( "unnamed option encountered" );
-	if ( ( ! value ) && ( ! callback.first ) )
-		throw HProgramOptionsHandlerException( HString( "unused option: " ) + ( name ? HString( name ) : HString( static_cast<char>( sf ) ) ) );
+	}
+	if ( ( ! value ) && ( ! callback.first ) ) {
+		throw HProgramOptionsHandlerException( "unused option: "_ys + ( ! longForm_.is_empty() ? longForm_ : HString( static_cast<char>( sf ) ) ) );
+	}
 	for ( options_t::const_iterator it( _options.begin() ), end( _options.end() ); it != end; ++ it ) {
-		if ( ( !! value && ! it->_value ) || ( ! value && !! it->_value ) || ( !! value && ( value->id() != it->_value->id() ) ) || ( callback != it->CALLBACK ) ) {
-			if ( name && it->_name && ! ::strcasecmp( it->_name, name ) )
-				throw HProgramOptionsHandlerException( HString( "duplicated long option: " ) + name );
-			if ( it->_shortForm == sf )
-				throw HProgramOptionsHandlerException( HString( "duplicated short option: " ) + static_cast<char>( sf ) );
+		if ( ( !! value && ! it->value_id() )
+			|| ( ! value && it->value_id() )
+			|| ( !! value && ( value->id() != it->value_id() ) )
+			|| ( callback != it->CALLBACK ) ) {
+			if ( ! longForm_.is_empty() && ! it->long_form().is_empty() && ! strcasecmp( it->long_form(), longForm_ ) ) {
+				throw HProgramOptionsHandlerException( "duplicated long option: "_ys + longForm_ );
+			}
+			if ( it->short_form() == sf ) {
+				throw HProgramOptionsHandlerException( "duplicated short option: "_ys + static_cast<char>( sf ) );
+			}
 		}
 	}
 	_options.push_back( o );
@@ -419,55 +484,55 @@ HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 }
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
-		char const* name, HOptionValueInterface::ptr_t value,
-		char const* shortForm, OOption::TYPE::enum_t type,
+		yaal::hcore::HString const& longForm_, HOptionValueInterface::ptr_t value,
+		char const* shortForm, OOption::ARGUMENT type,
 		char const* desc, char const* arg,
 		simple_callback_t const& callback ) {
 	M_PROLOG
-	return ( operator()( name, value, shortForm[0], type, desc, arg, callback ) );
+	return ( operator()( longForm_, value, shortForm[0], type, desc, arg, callback ) );
 	M_EPILOG
 }
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
-		char const* name, HOptionValueInterface::ptr_t value,
-		char const* shortForm, OOption::TYPE::enum_t type,
+		yaal::hcore::HString const& longForm_, HOptionValueInterface::ptr_t value,
+		char const* shortForm, OOption::ARGUMENT type,
 		char const* desc, simple_callback_t const& callback ) {
 	M_PROLOG
-	return ( operator()( name, value, shortForm[0], type, desc, NULL, callback ) );
+	return ( operator()( longForm_, value, shortForm[0], type, desc, NULL, callback ) );
 	M_EPILOG
 }
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
-		char const* name, HOptionValueInterface::ptr_t value,
-		int shortForm, OOption::TYPE::enum_t type,
+		yaal::hcore::HString const& longForm_, HOptionValueInterface::ptr_t value,
+		int shortForm, OOption::ARGUMENT type,
 		char const* desc, simple_callback_t const& callback ) {
 	M_PROLOG
-	return ( operator()( name, value, shortForm, type, desc, NULL, callback ) );
+	return ( operator()( longForm_, value, shortForm, type, desc, NULL, callback ) );
 	M_EPILOG
 }
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
-		char const* name, HOptionValueInterface::ptr_t value,
-		OOption::TYPE::enum_t type,
+		yaal::hcore::HString const& longForm_, HOptionValueInterface::ptr_t value,
+		OOption::ARGUMENT type,
 		char const* desc, simple_callback_t const& callback ) {
 	M_PROLOG
-	return ( operator()( name, value, 0, type, desc, NULL, callback ) );
+	return ( operator()( longForm_, value, 0, type, desc, NULL, callback ) );
 	M_EPILOG
 }
 
 HProgramOptionsHandler& HProgramOptionsHandler::operator()(
-		char const* name, HOptionValueInterface::ptr_t value,
-		OOption::TYPE::enum_t type,
+		yaal::hcore::HString const& longForm_, HOptionValueInterface::ptr_t value,
+		OOption::ARGUMENT type,
 		char const* desc, char const* arg,
 		simple_callback_t const& callback ) {
 	M_PROLOG
-	return ( operator()( name, value, 0, type, desc, arg, callback ) );
+	return ( operator()( longForm_, value, 0, type, desc, arg, callback ) );
 	M_EPILOG
 }
 
-void const* HProgramOptionsHandler::HOptionValueInterface::id( void ) const {
+u64_t HProgramOptionsHandler::HOptionValueInterface::id( void ) const {
 	M_PROLOG
-	return ( do_get() );
+	return ( reinterpret_cast<u64_t>( do_get() ) );
 	M_EPILOG
 }
 
@@ -586,12 +651,12 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 
 void HProgramOptionsHandler::set_option( OOption& option_, HString const& value_ ) {
 	M_PROLOG
-	if ( !! option_._value ) {
-		if ( option_._switchType == OOption::TYPE::NONE ) {
-			M_ENSURE( option_._value->get_type() == TYPE::BOOL );
-			option_._value->set( "true" );
+	if ( option_.value_id() ) {
+		if ( option_.switch_type() == OOption::ARGUMENT::NONE ) {
+			M_ENSURE( option_.value()->get_type() == TYPE::BOOL );
+			option_.set( "true" );
 		} else
-			option_._value->set( value_ );
+			option_.set( value_ );
 	}
 	if ( option_.CALLBACK.first )
 		option_.CALLBACK.first( option_.CALLBACK.second );
@@ -606,17 +671,17 @@ char const* make_short_opts( HProgramOptionsHandler::options_t const& options_, 
 	buffer_ = "";
 	for ( HProgramOptionsHandler::options_t::const_iterator it = options_.begin(),
 			end = options_.end(); it != end; ++ it ) {
-		if ( it->_shortForm > static_cast<int>( meta::max_unsigned<char unsigned>::value ) )
+		if ( it->short_form() > static_cast<int>( meta::max_unsigned<char unsigned>::value ) )
 			continue;
-		buffer_ += static_cast<char>( it->_shortForm );
-		switch ( it->_switchType ) {
-			case ( HProgramOptionsHandler::OOption::TYPE::REQUIRED ):
+		buffer_ += static_cast<char>( it->short_form() );
+		switch ( it->switch_type() ) {
+			case ( HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED ):
 				buffer_ += ':';
 			break;
-			case ( HProgramOptionsHandler::OOption::TYPE::OPTIONAL ):
+			case ( HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL ):
 				buffer_ += "::";
 			break;
-			case ( HProgramOptionsHandler::OOption::TYPE::NONE ):
+			case ( HProgramOptionsHandler::OOption::ARGUMENT::NONE ):
 			default :
 				break;
 		}
@@ -636,20 +701,20 @@ option* make_option_array( HProgramOptionsHandler::options_t const& options_, HC
 		/* Solaris version of `struct option' is braindead broken.
 		 * Another proof that Solaris sucks big time.
 		 */
-		options[ ctr ].name = const_cast<char*>( it->_name );
-		switch ( it->_switchType ) {
-			case ( HProgramOptionsHandler::OOption::TYPE::REQUIRED ):
+		options[ ctr ].name = const_cast<char*>( it->long_form().raw() );
+		switch ( it->switch_type() ) {
+			case ( HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED ):
 				options[ ctr ].has_arg = required_argument;
 			break;
-			case ( HProgramOptionsHandler::OOption::TYPE::OPTIONAL ):
+			case ( HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL ):
 				options[ ctr ].has_arg = optional_argument;
 			break;
-			case ( HProgramOptionsHandler::OOption::TYPE::NONE ):
+			case ( HProgramOptionsHandler::OOption::ARGUMENT::NONE ):
 			default :
 				options[ ctr ].has_arg = no_argument;
 			break;
 		}
-		options[ ctr ].val = it->_shortForm;
+		options[ ctr ].val = it->short_form();
 	}
 	return ( options );
 	M_EPILOG
@@ -670,7 +735,7 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 	while ( ( val = ::getopt_long( argc_, argv_, shortOpts, optionArray, NULL ) ) != EOF ) {
 		bool validSwitch( false );
 		for ( options_t::iterator it = _options.begin(), end = _options.end(); it != end; ++ it ) {
-			if ( it->_shortForm == val ) {
+			if ( it->short_form() == val ) {
 				validSwitch = true;
 				set_option( *it, optarg );
 				break;

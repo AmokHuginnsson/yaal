@@ -196,11 +196,11 @@ HConsoleInitDeinit::HConsoleInitDeinit( void ) {
 	errno = 0;
 	int escdelay( 0 );
 	yaal_options()
-		( "esc_delay", program_options_helper::option_value( escdelay ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "ncurses escape sequence time span", "seconds" ) /* defined inside ncurses lib */
-		( "latency", program_options_helper::option_value( _latency_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "how often invoke idle event", "seconds" )
-		( "command_compose_character", program_options_helper::option_value( _commandComposeCharacter_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED,
+		( "esc_delay", program_options_helper::option_value( escdelay ), HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "ncurses escape sequence time span", "seconds" ) /* defined inside ncurses lib */
+		( "latency", program_options_helper::option_value( _latency_ ), HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "how often invoke idle event", "seconds" )
+		( "command_compose_character", program_options_helper::option_value( _commandComposeCharacter_ ), HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED,
 			"character that shall be uses as command composition base", "character" )
-		( "command_compose_delay", program_options_helper::option_value( _commandComposeDelay_ ), HProgramOptionsHandler::OOption::TYPE::REQUIRED, "command composition time span", "seconds" );
+		( "command_compose_delay", program_options_helper::option_value( _commandComposeDelay_ ), HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "command composition time span", "seconds" );
 	yaal_options().process_rc_file( "yaal", "console", set_hconsole_variables );
 	HConsole::set_escdelay( escdelay );
 	return;

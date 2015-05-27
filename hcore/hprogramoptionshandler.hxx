@@ -67,7 +67,7 @@ public:
 		TYPE get_type( void ) const;
 		template<typename tType>
 		tType const& get( void ) const;
-		void const* id( void ) const;
+		u64_t id( void ) const;
 	protected:
 		virtual void do_set( HString const& ) = 0;
 		virtual TYPE do_get_type( void ) const = 0;
@@ -75,27 +75,42 @@ public:
 	};
 	/*! \brief Basic program configuration item.
 	 */
-	struct OOption {
-		struct TYPE {
-			typedef enum {
-				NONE,
-				OPTIONAL,
-				REQUIRED
-			} enum_t;
+	class OOption {
+	public:
+		enum class ARGUMENT {
+			NONE,
+			OPTIONAL,
+			REQUIRED
 		};
-		char const* _name;
-		HOptionValueInterface::ptr_t _value;
+	private:
 		int _shortForm;
-		TYPE::enum_t _switchType;
-		char const* _description;
-		char const* _argument;
+		yaal::hcore::HString _longForm;
+		ARGUMENT _switchType;
+		yaal::hcore::HString _description;
+		yaal::hcore::HString _argument;
+		yaal::hcore::HString _defaultValue;
+		HOptionValueInterface::ptr_t _value;
+	public:
 		simple_callback_t CALLBACK;
 		OOption( void );
 		OOption(
-				char const*, HOptionValueInterface::ptr_t,
-				int, TYPE::enum_t,
-				char const*, char const*,
-				HProgramOptionsHandler::simple_callback_t const& );
+			int,
+			yaal::hcore::HString const&,
+			ARGUMENT,
+			yaal::hcore::HString const&,
+			yaal::hcore::HString const&,
+			yaal::hcore::HString const&,
+			HOptionValueInterface::ptr_t,
+			HProgramOptionsHandler::simple_callback_t const&
+		);
+		yaal::hcore::HString const& long_form( void ) const;
+		int short_form( void ) const;
+		u64_t value_id( void ) const;
+		void set( yaal::hcore::HString const& );
+		HOptionValueInterface::ptr_t const& value( void ) const;
+		ARGUMENT switch_type( void ) const;
+		yaal::hcore::HString const& description( void ) const;
+		yaal::hcore::HString const& argument_name( void ) const;
 		OOption( OOption const& );
 		OOption& operator = ( OOption const& );
 		void swap( OOption& );
@@ -119,26 +134,26 @@ public:
 	 * \param argName - name of addtional option argument for generated help message.
 	 * \param callback - a function invoked when option is encountered.
 	 */
-	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			int shortForm, OOption::TYPE::enum_t argType,
+	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
+			int shortForm, OOption::ARGUMENT argType,
 			char const* desc = NULL, char const* argName = NULL,
 			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
-	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			int shortForm, OOption::TYPE::enum_t argType,
+	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
+			int shortForm, OOption::ARGUMENT argType,
 			char const* desc,
 			simple_callback_t const& callback );
-	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			OOption::TYPE::enum_t argType, char const* desc,
+	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
+			OOption::ARGUMENT argType, char const* desc,
 			simple_callback_t const& callback );
-	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			char const* shortForm, OOption::TYPE::enum_t argType,
+	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
+			char const* shortForm, OOption::ARGUMENT argType,
 			char const* desc = NULL, char const* argName = NULL,
 			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
-	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			char const* shortForm, OOption::TYPE::enum_t argType,
+	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
+			char const* shortForm, OOption::ARGUMENT argType,
 			char const* desc, simple_callback_t const& callback );
-	HProgramOptionsHandler& operator()( char const* name, HOptionValueInterface::ptr_t value,
-			OOption::TYPE::enum_t argType,
+	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
+			OOption::ARGUMENT argType,
 			char const* desc = NULL, char const* argName = NULL,
 			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
 	/*! \brief Parse command line options and set program setup variables.
