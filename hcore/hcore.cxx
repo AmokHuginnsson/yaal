@@ -269,13 +269,45 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 		_debugLevel_ = lexical_cast<int>( env );
 	HString dummy;
 	bool enableExceptionLogging( true );
-	yaal_options()( "ssl_key", program_options_helper::option_value( HOpenSSL::_sSLKey ), HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "Path to the OpenSSL private key file.", "path" )
-		( "ssl_cert", program_options_helper::option_value( HOpenSSL::_sSLCert ), HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "Path to the OpenSSL certificate file.", "path" )
-		( "resolve_hostnames", program_options_helper::option_value( HSocket::_resolveHostnames ), HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "Resolve IP address into host names." )
-		( "thread_stack_size", program_options_helper::option_value( HThread::_threadStackSize ), HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "Set size of stack for newly created threads." )
-		( "on_alloc_failure", program_options_helper::option_value( dummy ), HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "Memory allocation failure handling policy.", "policy" )
-		( "write_timeout", program_options_helper::option_value( _writeTimeout_ ), HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "Time-out for low level write operations." )
-		( "exception_logging", program_options_helper::option_value( enableExceptionLogging ), HProgramOptionsHandler::OOption::ARGUMENT::REQUIRED, "Enable automatic exception stack frames logging." );
+	yaal_options()(
+		"ssl_key",
+		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
+		"Path to the OpenSSL private key file.",
+		program_options_helper::option_value( HOpenSSL::_sSLKey ),
+		"path"
+	)(
+		"ssl_cert",
+		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
+		"Path to the OpenSSL certificate file.",
+		program_options_helper::option_value( HOpenSSL::_sSLCert ),
+		"path"
+	)(
+		"resolve_hostnames",
+		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
+		"Resolve IP address into host names.",
+		program_options_helper::option_value( HSocket::_resolveHostnames )
+	)(
+		"thread_stack_size",
+		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
+		"Set size of stack for newly created threads.",
+		program_options_helper::option_value( HThread::_threadStackSize )
+	)(
+		"on_alloc_failure",
+		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
+		"Memory allocation failure handling policy.",
+		program_options_helper::option_value( dummy ),
+		"policy"
+	)(
+		"write_timeout",
+		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
+		"Time-out for low level write operations.",
+		program_options_helper::option_value( _writeTimeout_ )
+	)(
+		"exception_logging",
+		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
+		"Enable automatic exception stack frames logging.",
+		program_options_helper::option_value( enableExceptionLogging )
+	);
 	if ( enableExceptionLogging )
 		HException::enable_logging();
 	else

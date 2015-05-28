@@ -138,11 +138,11 @@ void show_help( void* arg ) {
 	HProgramOptionsHandler::options_t const& opts( info._opt.get_options() );
 	for ( HProgramOptionsHandler::options_t::const_iterator it( opts.begin() ), end( opts.end() );
 			it != end; ++ it ) {
-		HProgramOptionsHandler::OOption const& o = *it;
+		HProgramOptionsHandler::HOption const& o = *it;
 		/* + 2 for --, + 1 for =, 2 for [] */
 		int tmp( static_cast<int>( ( ! o.long_form().is_empty() ? o.long_form().get_length() + 2 : 0 )
 					+ ( ! o.argument_name().is_empty() ? o.argument_name().get_length() + 1 : 0 )
-					+ ( o.switch_type() == HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL ? 2 : 0 ) ) );
+					+ ( o.switch_type() == HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL ? 2 : 0 ) ) );
 		if ( tmp > longestLongLength )
 			longestLongLength = tmp;
 		if ( is_byte( it->short_form() ) )
@@ -166,7 +166,7 @@ void show_help( void* arg ) {
 	int const COUNT( static_cast<int>( opts.size() ) );
 	char const* description( NULL );
 	for ( int i( 0 ); i < COUNT; ++ i ) {
-		HProgramOptionsHandler::OOption const& o = opts[ i ];
+		HProgramOptionsHandler::HOption const& o = opts[ i ];
 		if ( ! ( is_byte( o.short_form() ) || ! o.long_form().is_empty() ) ) {
 			continue;
 		}
@@ -203,7 +203,7 @@ void show_help( void* arg ) {
 			}
 		}
 		if ( !o.argument_name().is_empty() ) {
-			if ( o.switch_type() == HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL ) {
+			if ( o.switch_type() == HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL ) {
 				lf.append( "[" );
 			}
 			lf.append( "=" );
@@ -215,12 +215,12 @@ void show_help( void* arg ) {
 				lf.append( *ansi::reset );
 				extraLFL += static_cast<int>( strlen( *ansi::underline ) + strlen( *ansi::reset ) );
 			}
-			if ( o.switch_type() == HProgramOptionsHandler::OOption::ARGUMENT::OPTIONAL ) {
+			if ( o.switch_type() == HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL ) {
 				lf.append( "]" );
 			}
 		}
 		if ( i > 0 ) /* subsequent options */ {
-			HProgramOptionsHandler::OOption const& p = opts[ i - 1 ];
+			HProgramOptionsHandler::HOption const& p = opts[ i - 1 ];
 			if ( ! o.long_form().is_empty() && ! p.long_form().is_empty() && ( o.long_form() == p.long_form() ) ) {
 				lf.clear();
 				extraLFL = 0;
@@ -267,7 +267,7 @@ void show_help( void* arg ) {
 				desc.trim_left();
 				desc.insert( 0, 2, "  " );
 				if ( i < ( COUNT - 1 ) ) {
-					HProgramOptionsHandler::OOption const& n = opts[ i + 1 ];
+					HProgramOptionsHandler::HOption const& n = opts[ i + 1 ];
 					if ( ( ! o.long_form().is_empty() && ! n.long_form().is_empty() && ( o.long_form() == n.long_form() ) )
 							|| ( is_byte( o.short_form() ) && is_byte( n.short_form() ) && ( o.short_form() == n.short_form() ) ) ) {
 						description = desc.raw();
@@ -317,12 +317,12 @@ void dump_configuration( void* arg ) {
 	HProgramOptionsHandler::options_t const& opts = info._opt.get_options();
 	int const COUNT = static_cast<int>( opts.size() );
 	for ( int i = 0; i < COUNT; ++ i ) {
-		HProgramOptionsHandler::OOption const& o = opts[ i ];
+		HProgramOptionsHandler::HOption const& o = opts[ i ];
 		if ( o.long_form().is_empty() ) {
 			continue;
 		}
 		if ( i > 0 ) /* subsequent options */ {
-			HProgramOptionsHandler::OOption const& p = opts[ i - 1 ];
+			HProgramOptionsHandler::HOption const& p = opts[ i - 1 ];
 			if ( !o.long_form().is_empty() && !p.long_form().is_empty()
 					&& ( o.long_form() == p.long_form() )
 					&& ( o.description().raw() == description ) )

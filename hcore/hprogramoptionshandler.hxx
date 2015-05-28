@@ -1,7 +1,7 @@
 /*
 ---         `yaal' (c) 1978 by Marcin 'Amok' Konarski           ---
 
-	hprogramoptionshandler.hxx - this file is integral part of `yaal' project.
+  hprogramoptionshandler.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -27,7 +27,7 @@ Copyright:
  *
  * \brief Infrastructure for handling program options.
  * This file contains HProgramOptionsHandler class.
- * Declaration of OOption structure.
+ * Declaration of HOption structure.
  * Declaration of command line hadling routines.
  */
 
@@ -44,6 +44,7 @@ Copyright:
 #include "hcore/hpair.hxx"
 #include "hcore/reflection.hxx"
 #include "hcore/memory.hxx"
+#include "hcore/hboundcall.hxx"
 
 namespace yaal {
 
@@ -56,8 +57,8 @@ class HProgramOptionsHandler {
 	typedef HProgramOptionsHandler this_type;
 public:
 	typedef bool ( *RC_CALLBACK_t )( HString&, HString& );
-	typedef void ( *param_callback_t )( void* );
-	typedef yaal::hcore::HPair<param_callback_t, void*> simple_callback_t;
+	typedef yaal::hcore::HBoundCall<> simple_callback_t;
+	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> setter_t;
 	class HOptionValueInterface {
 		typedef HOptionValueInterface this_type;
 	public:
@@ -75,7 +76,7 @@ public:
 	};
 	/*! \brief Basic program configuration item.
 	 */
-	class OOption {
+	class HOption {
 	public:
 		enum class ARGUMENT {
 			NONE,
@@ -90,72 +91,90 @@ public:
 		yaal::hcore::HString _argument;
 		yaal::hcore::HString _defaultValue;
 		HOptionValueInterface::ptr_t _value;
+		setter_t _setter;
+		simple_callback_t _callback;
 	public:
-		simple_callback_t CALLBACK;
-		OOption( void );
-		OOption(
-			int,
-			yaal::hcore::HString const&,
-			ARGUMENT,
-			yaal::hcore::HString const&,
-			yaal::hcore::HString const&,
-			yaal::hcore::HString const&,
-			HOptionValueInterface::ptr_t,
-			HProgramOptionsHandler::simple_callback_t const&
+		HOption( void );
+		HOption(
+			int = 0,
+			yaal::hcore::HString const& = yaal::hcore::HString(),
+			ARGUMENT = ARGUMENT::NONE,
+			yaal::hcore::HString const& = yaal::hcore::HString(),
+			yaal::hcore::HString const& = yaal::hcore::HString(),
+			yaal::hcore::HString const& = yaal::hcore::HString(),
+			HOptionValueInterface::ptr_t = HOptionValueInterface::ptr_t(),
+			HProgramOptionsHandler::simple_callback_t const& = HProgramOptionsHandler::simple_callback_t()
 		);
 		yaal::hcore::HString const& long_form( void ) const;
+		HOption& long_form( yaal::hcore::HString const& );
 		int short_form( void ) const;
+		HOption& short_form( int );
 		u64_t value_id( void ) const;
 		void set( yaal::hcore::HString const& );
 		HOptionValueInterface::ptr_t const& value( void ) const;
 		ARGUMENT switch_type( void ) const;
+		HOption& switch_type( ARGUMENT );
 		yaal::hcore::HString const& description( void ) const;
+		HOption& description( yaal::hcore::HString const& );
 		yaal::hcore::HString const& argument_name( void ) const;
-		OOption( OOption const& );
-		OOption& operator = ( OOption const& );
-		void swap( OOption& );
+		HOption& argument_name( yaal::hcore::HString const& );
+		yaal::hcore::HString const& default_value( void ) const;
+		HOption& default_value( yaal::hcore::HString const& );
+		HOption& setter( setter_t const& );
+		simple_callback_t const& callback( void ) const;
+		HOption( HOption const& );
+		HOption& operator = ( HOption const& );
+		void swap( HOption& );
 	};
 	template<typename tType>
 	class HOptionValue;
-	typedef HArray<OOption> options_t;
+	typedef HArray<HOption> options_t;
 private:
 	options_t _options;
 public:
 	/*! \brief Trivial default constructor.
 	 */
 	HProgramOptionsHandler( void ) : _options() {}
+	HProgramOptionsHandler& operator()( HOption const& );
 	/*! \brief Add new option descriptor to option handler.
 	 *
 	 * \param name - option name.
-	 * \param value - value storage helper.
 	 * \param shortForm - a short form of option name.
 	 * \param argType - type of option with respect to requirements of addtional arguments.
 	 * \param desc - option descrition for help generation.
 	 * \param argName - name of addtional option argument for generated help message.
+	 * \param defaultValue - default value to set for this option.
+	 * \param value - value storage helper.
 	 * \param callback - a function invoked when option is encountered.
 	 */
-	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
-			int shortForm, OOption::ARGUMENT argType,
-			char const* desc = NULL, char const* argName = NULL,
-			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
-	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
-			int shortForm, OOption::ARGUMENT argType,
-			char const* desc,
-			simple_callback_t const& callback );
-	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
-			OOption::ARGUMENT argType, char const* desc,
-			simple_callback_t const& callback );
-	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
-			char const* shortForm, OOption::ARGUMENT argType,
-			char const* desc = NULL, char const* argName = NULL,
-			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
-	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
-			char const* shortForm, OOption::ARGUMENT argType,
-			char const* desc, simple_callback_t const& callback );
-	HProgramOptionsHandler& operator()( yaal::hcore::HString const& name, HOptionValueInterface::ptr_t value,
-			OOption::ARGUMENT argType,
-			char const* desc = NULL, char const* argName = NULL,
-			simple_callback_t const& callback = simple_callback_t( NULL, NULL ) );
+	HProgramOptionsHandler& operator()(
+		int shortForm,
+		yaal::hcore::HString const& name,
+		HOption::ARGUMENT argType,
+		yaal::hcore::HString const& desc,
+		HOptionValueInterface::ptr_t value = HOptionValueInterface::ptr_t(),
+		yaal::hcore::HString const& argName = yaal::hcore::HString(),
+		yaal::hcore::HString const& defaultValue = yaal::hcore::HString(),
+		simple_callback_t const& callback = simple_callback_t()
+	);
+	HProgramOptionsHandler& operator()(
+		yaal::hcore::HString const& name,
+		HOption::ARGUMENT argType,
+		yaal::hcore::HString const& desc,
+		HOptionValueInterface::ptr_t value = HOptionValueInterface::ptr_t(),
+		yaal::hcore::HString const& argName = yaal::hcore::HString(),
+		yaal::hcore::HString const& defaultValue = yaal::hcore::HString(),
+		simple_callback_t const& callback = simple_callback_t()
+	);
+	HProgramOptionsHandler& operator()(
+		int shortForm,
+		HOption::ARGUMENT argType,
+		yaal::hcore::HString const& desc,
+		HOptionValueInterface::ptr_t value = HOptionValueInterface::ptr_t(),
+		yaal::hcore::HString const& argName = yaal::hcore::HString(),
+		yaal::hcore::HString const& defaultValue = yaal::hcore::HString(),
+		simple_callback_t const& callback = simple_callback_t()
+	);
 	/*! \brief Parse command line options and set program setup variables.
 	 *
 	 * process_command_line gives easy to use API for interpreting and handling
@@ -177,7 +196,8 @@ public:
 	options_t const& get_options( void ) const
 		{ return ( _options ); }
 private:
-	void set_option( OOption&, HString const& );
+	void verify_new_option( HOption const& );
+	void set_option( HOption&, HString const& );
 };
 
 typedef HExceptionT<HProgramOptionsHandler> HProgramOptionsHandlerException;
@@ -281,15 +301,11 @@ HProgramOptionsHandler::HOptionValueInterface::ptr_t option_value( tType& instan
 
 static HProgramOptionsHandler::HOptionValueInterface::ptr_t no_value;
 
-inline yaal::hcore::HProgramOptionsHandler::simple_callback_t callback( yaal::hcore::HProgramOptionsHandler::param_callback_t func, void* param ) {
-	return ( HProgramOptionsHandler::simple_callback_t( func, param ) );
-}
-
 int reload_configuration( void );
 
 }
 
-inline void swap( yaal::hcore::HProgramOptionsHandler::OOption& a, yaal::hcore::HProgramOptionsHandler::OOption& b )
+inline void swap( yaal::hcore::HProgramOptionsHandler::HOption& a, yaal::hcore::HProgramOptionsHandler::HOption& b )
 	{ a.swap( b ); }
 
 }
