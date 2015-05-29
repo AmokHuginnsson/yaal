@@ -92,7 +92,6 @@ public:
 		HOptionValueInterface::ptr_t _value;
 		simple_callback_t _callback;
 	public:
-		HOption( void );
 		HOption(
 			int = 0,
 			yaal::hcore::HString const& = yaal::hcore::HString(),
@@ -126,6 +125,7 @@ public:
 			M_EPILOG
 		}
 		simple_callback_t const& callback( void ) const;
+		HOption& callback( simple_callback_t const& );
 		HOption( HOption const& );
 		HOption& operator = ( HOption const& );
 		void swap( HOption& );
@@ -139,7 +139,7 @@ public:
 	/*! \brief Trivial default constructor.
 	 */
 	HProgramOptionsHandler( void ) : _options() {}
-	HProgramOptionsHandler& operator()( HOption const& );
+	HProgramOptionsHandler& operator()( HOption );
 	/*! \brief Add new option descriptor to option handler.
 	 *
 	 * \param name - option name.
@@ -200,7 +200,7 @@ public:
 	options_t const& get_options( void ) const
 		{ return ( _options ); }
 private:
-	void verify_new_option( HOption const& );
+	void verify_new_option( HOption& );
 	void set_option( HOption&, HString const& );
 };
 

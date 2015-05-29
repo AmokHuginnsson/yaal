@@ -244,18 +244,6 @@ public:
 
 }
 
-HProgramOptionsHandler::HOption::HOption( void )
-	: _shortForm( 0 )
-	, _longForm()
-	, _switchType( ARGUMENT::NONE )
-	, _description()
-	, _argument()
-	, _defaultValue()
-	, _value()
-	, _callback() {
-	return;
-}
-
 HProgramOptionsHandler::HOption::HOption(
 		int shortForm_,
 		yaal::hcore::HString const& longForm_,
@@ -352,6 +340,13 @@ HProgramOptionsHandler::HOption& HProgramOptionsHandler::HOption::switch_type( A
 
 HProgramOptionsHandler::simple_callback_t const& HProgramOptionsHandler::HOption::callback( void ) const {
 	return ( _callback );
+}
+
+HProgramOptionsHandler::HOption& HProgramOptionsHandler::HOption::callback( simple_callback_t const& callback_ ) {
+	M_PROLOG
+	_callback = callback_;
+	return ( *this );
+	M_EPILOG
 }
 
 void HProgramOptionsHandler::HOption::set( yaal::hcore::HString const& value_ ) {
@@ -494,22 +489,26 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 	M_EPILOG
 }
 
-HProgramOptionsHandler& HProgramOptionsHandler::operator()( HOption const& option_ ) {
+HProgramOptionsHandler& HProgramOptionsHandler::operator()( HOption option_ ) {
 	M_PROLOG
 	verify_new_option( option_ );
-	_options.push_back( option_ );
+	_options.emplace_back( option_ );
 	return ( *this );
 	M_EPILOG
 }
 
-void HProgramOptionsHandler::verify_new_option( HOption const& option_ ) {
+void HProgramOptionsHandler::verify_new_option( HOption& option_ ) {
 	M_PROLOG
-	if ( option_.long_form().is_empty() && ! option_.short_form() ) {
+	int sf( option_.short_form() );
+	if ( ! sf ) {
+		sf = static_cast<int>( _options.size() ) + meta::max_unsigned<char unsigned>::value + 1;
+	}
+	if ( option_.long_form().is_empty() && ! sf ) {
 		throw HProgramOptionsHandlerException( "unnamed option encountered" );
 	}
 	if ( ( ! option_.value() ) && ( ! option_.callback() ) ) {
 		throw HProgramOptionsHandlerException(
-			"unused option: "_ys + ( ! option_.long_form().is_empty() ? option_.long_form() : HString( static_cast<char>( option_.short_form() ) ) )
+			"unused option: "_ys + ( ! option_.long_form().is_empty() ? option_.long_form() : HString( static_cast<char>( sf ) ) )
 		);
 	}
 	for ( options_t::const_iterator it( _options.begin() ), end( _options.end() ); it != end; ++ it ) {
@@ -520,10 +519,13 @@ void HProgramOptionsHandler::verify_new_option( HOption const& option_ ) {
 			if ( ! option_.long_form().is_empty() && ! it->long_form().is_empty() && ! strcasecmp( it->long_form(), option_.long_form() ) ) {
 				throw HProgramOptionsHandlerException( "duplicated long option: "_ys + option_.long_form() );
 			}
-			if ( it->short_form() == option_.short_form() ) {
-				throw HProgramOptionsHandlerException( "duplicated short option: "_ys + static_cast<char>( option_.short_form() ) );
+			if ( it->short_form() == sf ) {
+				throw HProgramOptionsHandlerException( "duplicated short option: "_ys + static_cast<char>( sf ) );
 			}
 		}
+	}
+	if ( ! option_.short_form() ) {
+		option_.short_form( sf );
 	}
 	return;
 	M_EPILOG
@@ -542,8 +544,7 @@ HProgramOptionsHandler& HProgramOptionsHandler::operator()(
 	/* If user does not specify short form by hand an automatic short form value will by assigned.
 	 * Automatic short form value must be outside of byte range.
 	 */
-	int sf = shortForm ? shortForm : static_cast<int>( _options.size() ) + meta::max_unsigned<char unsigned>::value + 1;
-	HOption o( sf, longForm_, type, desc, arg, defVal, value, callback );
+	HOption o( shortForm, longForm_, type, desc, arg, defVal, value, callback );
 	verify_new_option( o );
 	_options.push_back( o );
 	return ( *this );
