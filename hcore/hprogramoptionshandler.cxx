@@ -252,7 +252,6 @@ HProgramOptionsHandler::HOption::HOption( void )
 	, _argument()
 	, _defaultValue()
 	, _value()
-	, _setter()
 	, _callback() {
 	return;
 }
@@ -273,7 +272,6 @@ HProgramOptionsHandler::HOption::HOption(
 	, _argument( argument_ )
 	, _defaultValue( defaultValue_ )
 	, _value( value_ )
-	, _setter()
 	, _callback( a_CALLBACK ) {
 	return;
 }
@@ -286,7 +284,6 @@ HProgramOptionsHandler::HOption::HOption( HProgramOptionsHandler::HOption const&
 	, _argument( o._argument )
 	, _defaultValue( o._defaultValue )
 	, _value( o._value )
-	, _setter( o._setter )
 	, _callback( o._callback ) {
 	return;
 }
@@ -312,7 +309,6 @@ void HProgramOptionsHandler::HOption::swap( HProgramOptionsHandler::HOption& o )
 		swap( _argument, o._argument );
 		swap( _defaultValue, o._defaultValue );
 		swap( _value, o._value );
-		swap( _setter, o._setter );
 		swap( _callback, o._callback );
 	}
 	return;
@@ -397,13 +393,6 @@ yaal::hcore::HString const& HProgramOptionsHandler::HOption::default_value( void
 HProgramOptionsHandler::HOption& HProgramOptionsHandler::HOption::default_value( yaal::hcore::HString const& defaultValue_ ) {
 	M_PROLOG
 	_defaultValue = defaultValue_;
-	return ( *this );
-	M_EPILOG
-}
-
-HProgramOptionsHandler::HOption& HProgramOptionsHandler::HOption::setter( setter_t const& setter_ ) {
-	M_PROLOG
-	_setter = setter_;
 	return ( *this );
 	M_EPILOG
 }

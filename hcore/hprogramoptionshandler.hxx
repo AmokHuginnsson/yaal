@@ -58,7 +58,6 @@ class HProgramOptionsHandler {
 public:
 	typedef bool ( *RC_CALLBACK_t )( HString&, HString& );
 	typedef yaal::hcore::HBoundCall<> simple_callback_t;
-	typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> setter_t;
 	class HOptionValueInterface {
 		typedef HOptionValueInterface this_type;
 	public:
@@ -91,7 +90,6 @@ public:
 		yaal::hcore::HString _argument;
 		yaal::hcore::HString _defaultValue;
 		HOptionValueInterface::ptr_t _value;
-		setter_t _setter;
 		simple_callback_t _callback;
 	public:
 		HOption( void );
@@ -120,7 +118,13 @@ public:
 		HOption& argument_name( yaal::hcore::HString const& );
 		yaal::hcore::HString const& default_value( void ) const;
 		HOption& default_value( yaal::hcore::HString const& );
-		HOption& setter( setter_t const& );
+		template<typename T>
+		HOption& recipient( T& recipient_ ) {
+			M_PROLOG
+			_value = make_pointer<HProgramOptionsHandler::HOptionValue<T>>( yaal::ref( recipient_ ) );
+			return ( *this );
+			M_EPILOG
+		}
 		simple_callback_t const& callback( void ) const;
 		HOption( HOption const& );
 		HOption& operator = ( HOption const& );
