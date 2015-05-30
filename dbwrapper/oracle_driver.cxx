@@ -534,11 +534,12 @@ M_EXPORT_SYMBOL char const* rs_column_name( void* dataR_, int field_ ) {
 void oracle_init( void ) __attribute__((__constructor__));
 void oracle_init( void ) {
 	yaal_options()(
-		"instance_name",
-		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
-		"name of the Oracle database instance",
-		program_options_helper::option_value( _instanceName_ ),
-		"name"
+		HProgramOptionsHandler::HOption()
+		.long_form( "instance_name" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+		.description( "name of the Oracle database instance" )
+		.recipient( _instanceName_ )
+		.argument_name( "name" )
 	);
 	yaal_options().process_rc_file( "yaal", "oracle", NULL );
 	return;

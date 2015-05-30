@@ -270,43 +270,50 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 	HString dummy;
 	bool enableExceptionLogging( true );
 	yaal_options()(
-		"ssl_key",
-		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
-		"Path to the OpenSSL private key file.",
-		program_options_helper::option_value( HOpenSSL::_sSLKey ),
-		"path"
+		HProgramOptionsHandler::HOption()
+		.long_form( "ssl_key" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+		.description( "Path to the OpenSSL private key file." )
+		.recipient( HOpenSSL::_sSLKey )
+		.argument_name( "path" )
 	)(
-		"ssl_cert",
-		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
-		"Path to the OpenSSL certificate file.",
-		program_options_helper::option_value( HOpenSSL::_sSLCert ),
-		"path"
+		HProgramOptionsHandler::HOption()
+		.long_form( "ssl_cert" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+		.description( "Path to the OpenSSL certificate file." )
+		.recipient( HOpenSSL::_sSLCert )
+		.argument_name( "path" )
 	)(
-		"resolve_hostnames",
-		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
-		"Resolve IP address into host names.",
-		program_options_helper::option_value( HSocket::_resolveHostnames )
+		HProgramOptionsHandler::HOption()
+		.long_form( "resolve_hostnames" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+		.description( "Resolve IP address into host names." )
+		.recipient( HSocket::_resolveHostnames )
 	)(
-		"thread_stack_size",
-		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
-		"Set size of stack for newly created threads.",
-		program_options_helper::option_value( HThread::_threadStackSize )
+		HProgramOptionsHandler::HOption()
+		.long_form( "thread_stack_size" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+		.description( "Set size of stack for newly created threads." )
+		.recipient( HThread::_threadStackSize )
 	)(
-		"on_alloc_failure",
-		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
-		"Memory allocation failure handling policy.",
-		program_options_helper::option_value( dummy ),
-		"policy"
+		HProgramOptionsHandler::HOption()
+		.long_form( "on_alloc_failure" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+		.description( "Memory allocation failure handling policy." )
+		.recipient( dummy )
+		.argument_name( "policy" )
 	)(
-		"write_timeout",
-		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
-		"Time-out for low level write operations.",
-		program_options_helper::option_value( _writeTimeout_ )
+		HProgramOptionsHandler::HOption()
+		.long_form( "write_timeout" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+		.description( "Time-out for low level write operations." )
+		.recipient( _writeTimeout_ )
 	)(
-		"exception_logging",
-		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
-		"Enable automatic exception stack frames logging.",
-		program_options_helper::option_value( enableExceptionLogging )
+		HProgramOptionsHandler::HOption()
+		.long_form( "exception_logging" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+		.description( "Enable automatic exception stack frames logging." )
+		.recipient( enableExceptionLogging )
 	);
 	if ( enableExceptionLogging )
 		HException::enable_logging();

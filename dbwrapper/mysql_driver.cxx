@@ -342,11 +342,12 @@ public:
 HMySQLInitDeinit::HMySQLInitDeinit( void ) {
 	M_PROLOG
 	yaal_options()(
-		"client_character_set",
-		HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED,
-		"character set used by mysql client",
-		program_options_helper::option_value( _clientCharacterSet_ ),
-		"name"
+		HProgramOptionsHandler::HOption()
+		.long_form( "client_character_set" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+		.description( "character set used by mysql client" )
+		.recipient( _clientCharacterSet_ )
+		.argument_name( "name" )
 	);
 	yaal_options().process_rc_file( "yaal", "mysql", NULL );
 #if defined( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME ) && ( HAVE_DECL_MYSQL_AUTODETECT_CHARSET_NAME == 1 )
