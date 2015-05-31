@@ -41,10 +41,19 @@ static int const INVALID_CHARACTER = -256;
 char const* const HStreamInterface::eols = "\r\n"; /* order matters */
 
 HStreamInterface::HStreamInterface( void )
-	: _cache( 1, HChunk::STRATEGY::GEOMETRIC ), _offset( 0 ),
-	_wordCache(), _fill( ' ' ), _width( 0 ), _precision( 6 ),
-	_base( BASES::DEC ), _floatFormat( FLOAT_FORMAT::NATURAL ),
-	_skipWS( true ), _boolAlpha( false ), _valid( true ), _fail( false ) {
+	: _cache( 1, HChunk::STRATEGY::GEOMETRIC )
+	, _offset( 0 )
+	, _wordCache()
+	, _fill( ' ' )
+	, _width( 0 )
+	, _precision( 6 )
+	, _base( BASES::DEC )
+	, _floatFormat( FLOAT_FORMAT::NATURAL )
+	, _adjust( ADJUST::LEFT )
+	, _skipWS( true )
+	, _boolAlpha( false )
+	, _valid( true )
+	, _fail( false ) {
 	return;
 }
 
@@ -147,10 +156,24 @@ HStreamInterface& HStreamInterface::do_output( int long long longLongInteger_ ) 
 
 int long HStreamInterface::reformat( void ) {
 	M_PROLOG
-	int long len( _wordCache.get_length() );
+	int len( static_cast<int>( _wordCache.get_length() ) );
 	if ( _width ) {
 		if ( _width > len ) {
-			_wordCache.insert( 0, _width - len, static_cast<char>( _fill ) );
+			switch ( _adjust ) {
+				case ( ADJUST::LEFT ): {
+					_wordCache.insert( len, _width - len, static_cast<char>( _fill ) );
+				} break;
+				case ( ADJUST::RIGHT ): {
+					_wordCache.insert( 0, _width - len, static_cast<char>( _fill ) );
+				} break;
+				case ( ADJUST::CENTER ): {
+					int pre( ( _width - len ) / 2 );
+					_wordCache.insert( 0, pre, static_cast<char>( _fill ) );
+					int post( ( _width - len ) - pre );
+					_wordCache.insert( pre + len, post, static_cast<char>( _fill ) );
+					break;
+				}
+			}
 			len = _width;
 		}
 		_width = 0;
@@ -317,6 +340,24 @@ HStreamInterface& fixed( HStreamInterface& iface_ ) {
 HStreamInterface& scientific( HStreamInterface& iface_ ) {
 	M_PROLOG
 	return ( iface_.set_float_format( HStreamInterface::FLOAT_FORMAT::SCIENTIFIC ) );
+	M_EPILOG
+}
+
+HStreamInterface& left( HStreamInterface& iface_ ) {
+	M_PROLOG
+	return ( iface_.set_adjust( HStreamInterface::ADJUST::LEFT ) );
+	M_EPILOG
+}
+
+HStreamInterface& right( HStreamInterface& iface_ ) {
+	M_PROLOG
+	return ( iface_.set_adjust( HStreamInterface::ADJUST::RIGHT ) );
+	M_EPILOG
+}
+
+HStreamInterface& center( HStreamInterface& iface_ ) {
+	M_PROLOG
+	return ( iface_.set_adjust( HStreamInterface::ADJUST::CENTER ) );
 	M_EPILOG
 }
 
@@ -776,16 +817,23 @@ HStreamInterface& HStreamInterface::do_set_precision( int precision_ ) {
 	M_EPILOG
 }
 
-HStreamInterface& HStreamInterface::do_set_base( BASES::enum_t base_ ) {
+HStreamInterface& HStreamInterface::do_set_base( BASES base_ ) {
 	M_PROLOG
 	_base = base_;
 	return ( *this );
 	M_EPILOG
 }
 
-HStreamInterface& HStreamInterface::do_set_float_format( FLOAT_FORMAT::enum_t floatFormat_ ) {
+HStreamInterface& HStreamInterface::do_set_float_format( FLOAT_FORMAT floatFormat_ ) {
 	M_PROLOG
 	_floatFormat = floatFormat_;
+	return ( *this );
+	M_EPILOG
+}
+
+HStreamInterface& HStreamInterface::do_set_adjust( ADJUST adjust_ ) {
+	M_PROLOG
+	_adjust = adjust_;
 	return ( *this );
 	M_EPILOG
 }
@@ -824,12 +872,16 @@ int HStreamInterface::do_get_precision( void ) const {
 	return ( _precision );
 }
 
-HStreamInterface::BASES::enum_t HStreamInterface::do_get_base( void ) const {
+HStreamInterface::BASES HStreamInterface::do_get_base( void ) const {
 	return ( _base );
 }
 
-HStreamInterface::FLOAT_FORMAT::enum_t HStreamInterface::do_get_float_format( void ) const {
+HStreamInterface::FLOAT_FORMAT HStreamInterface::do_get_float_format( void ) const {
 	return ( _floatFormat );
+}
+
+HStreamInterface::ADJUST HStreamInterface::do_get_adjust( void ) const {
+	return ( _adjust );
 }
 
 HStreamInterface::HManipulator::HManipulator( int value_, ACTION_t action_ )

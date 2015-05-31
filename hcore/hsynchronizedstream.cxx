@@ -382,17 +382,24 @@ HStreamInterface& HSynchronizedStream::do_set_precision( int val_ ) {
 	M_EPILOG
 }
 
-HStreamInterface& HSynchronizedStream::do_set_base( BASES::enum_t val_ ) {
+HStreamInterface& HSynchronizedStream::do_set_base( BASES val_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_set_base( val_ ) );
 	M_EPILOG
 }
 
-HStreamInterface& HSynchronizedStream::do_set_float_format( FLOAT_FORMAT::enum_t val_ ) {
+HStreamInterface& HSynchronizedStream::do_set_float_format( FLOAT_FORMAT val_ ) {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_set_float_format( val_ ) );
+	M_EPILOG
+}
+
+HStreamInterface& HSynchronizedStream::do_set_adjust( ADJUST val_ ) {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_set_adjust( val_ ) );
 	M_EPILOG
 }
 
@@ -445,17 +452,24 @@ int HSynchronizedStream::do_get_precision( void ) const {
 	M_EPILOG
 }
 
-HStreamInterface::BASES::enum_t HSynchronizedStream::do_get_base( void ) const {
+HStreamInterface::BASES HSynchronizedStream::do_get_base( void ) const {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_get_base() );
 	M_EPILOG
 }
 
-HStreamInterface::FLOAT_FORMAT::enum_t HSynchronizedStream::do_get_float_format( void ) const {
+HStreamInterface::FLOAT_FORMAT HSynchronizedStream::do_get_float_format( void ) const {
 	M_PROLOG
 	HLock l( _mutex );
 	return ( HStreamInterface::do_get_float_format() );
+	M_EPILOG
+}
+
+HStreamInterface::ADJUST HSynchronizedStream::do_get_adjust( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( HStreamInterface::do_get_adjust() );
 	M_EPILOG
 }
 
