@@ -125,14 +125,10 @@ void show_help( void* arg ) {
 		}
 		syntax.append( "]..." );
 	}
-	::printf(
-"Usage: %s %s\n"
-"%s - %s\n\n"
-"Mandatory arguments to long options are mandatory for short options too.\n"
-"Options:\n",
-			name.c_str(), syntax.c_str(),
-			name.c_str(), info._intro
-	);
+	cout << "Usage: " << name << " " << syntax << "\n"
+		<< name << " - " << info._intro << "\n\n"
+		"Mandatory arguments to long options are mandatory for short options too.\n"
+		"Options:\n";
 	int longestLongLength( 0 );
 	int longestShortLength( 0 );
 	HProgramOptionsHandler::options_t const& opts( info._opt.get_options() );
@@ -238,11 +234,13 @@ void show_help( void* arg ) {
 				}
 			}
 		}
-		printf( "  %*s%s %-*s  ",
-				static_cast<int>( longestShortLength + extraSFL ), sf.raw() ? sf.raw() : "", comma,
-				static_cast<int>( longestLongLength + extraLFL ), lf.raw() ? lf.raw() : "" );
+		cout << "  " << setw( static_cast<int>( longestShortLength + extraSFL ) ) << sf << comma << " "
+			<< setw( static_cast<int>( longestLongLength + extraLFL ) ) << left << lf << right << "  ";
 		/* + 2 for two prefixing spaces, + 2 for 2 spaces separating options from descriptions, + 2 for comma and space */
 		desc = description;
+		if ( ! o.default_value().is_empty() ) {
+			desc.append( " (default: " ).append( o.default_value() ).append( ")" );
+		}
 		bool loop( true );
 		do {
 			int eol( 0 );
@@ -262,7 +260,7 @@ void show_help( void* arg ) {
 					++ words;
 			}
 			if ( ( ws >= cols ) || ( desc.get_length() > cols ) ) {
-				printf( "%.*s\n", eol, desc.raw() );
+				cout << desc.left( eol ) << "\n";
 				desc.shift_left( eol );
 				desc.trim_left();
 				desc.insert( 0, 2, "  " );
@@ -274,16 +272,17 @@ void show_help( void* arg ) {
 						break;
 					}
 				}
-				printf( "%*s", static_cast<int>( longestLongLength + longestShortLength + 2 + 2 + 2 ), "" );
+				cout << setw( static_cast<int>( longestLongLength + longestShortLength + 2 + 2 + 2 ) ) << "";
 			} else {
-				printf( "%s\n", desc.raw() );
+				cout << desc << "\n";
 				description = NULL;
 				loop = false;
 			}
 		} while ( loop );
 	}
-	if ( info._note )
-		::printf( "\n%s\n", info._note );
+	if ( info._note ) {
+		cout << "\n" << info._note << endl;
+	}
 	return;
 	M_EPILOG
 }
@@ -291,11 +290,16 @@ void show_help( void* arg ) {
 void dump_configuration( void* arg ) {
 	M_PROLOG
 	OOptionInfo& info = *static_cast<OOptionInfo*>( arg );
-	info._name && ::printf( "# this is configuration file for: `%s' program\n", info._name );
-	info._intro && ::printf( "# %s\n", info._intro );
-	if ( info._name || info._intro )
-		::printf( "\n" );
-	::printf(
+	if ( info._name ) {
+		cout << "# this is configuration file for: `" << info._name << "' program\n";
+	}
+	if ( info._intro ) {
+		cout << "# " << info._intro << "\n";
+	}
+	if ( info._name || info._intro ) {
+		cout << "\n";
+	}
+	cout <<
 "# comments begin with `#' char and continues until end of line\n"
 "# option names are case insensitive\n"
 "# in most cases option values are case insensitive also\n"
@@ -310,8 +314,7 @@ void dump_configuration( void* arg ) {
 "# string - [^ ].*\n"
 "#\n"
 "# example:\n"
-"# log_path ${HOME}/var/log/program.log\n\n"
-	);
+"# log_path ${HOME}/var/log/program.log\n\n";
 	HString desc;
 	char const* description = NULL;
 	HProgramOptionsHandler::options_t const& opts = info._opt.get_options();
@@ -333,17 +336,36 @@ void dump_configuration( void* arg ) {
 				description = "";
 		}
 		static int const MAXIMUM_LINE_LENGTH = 72;
-		::printf( "# %s, type: ", o.long_form().raw() );
+		cout << "### " << o.long_form() << " ###\n# type: ";
 		if ( !! o.value() ) {
 			switch ( o.value()->get_type() ) {
-				case ( TYPE::BOOL ): ::printf( "boolean\n" ); break;
-				case ( TYPE::INT ): case ( TYPE::INT_SHORT ): case ( TYPE::INT_LONG ): ::printf( "integer\n" ); break;
-				case ( TYPE::FLOAT ): case ( TYPE::DOUBLE ): case ( TYPE::DOUBLE_LONG ): ::printf( "floating point\n" ); break;
-				case ( TYPE::HSTRING ): ::printf( "character string\n" ); break;
-				default: ::printf( "special\n" ); break;
+				case ( TYPE::BOOL ): {
+					cout << "boolean";
+				} break;
+				case ( TYPE::INT ):
+				case ( TYPE::INT_SHORT ):
+				case ( TYPE::INT_LONG ): {
+					cout << "integer";
+				} break;
+				case ( TYPE::FLOAT ):
+				case ( TYPE::DOUBLE ):
+				case ( TYPE::DOUBLE_LONG ): {
+					cout << "floating point";
+				} break;
+				case ( TYPE::HSTRING ): {
+					cout << "character string";
+				} break;
+				default: {
+					cout << "special";
+				} break;
 			}
-		} else
-			::printf( "boolean\n" );
+		} else {
+			cout << "boolean";
+		}
+		if ( ! o.default_value().is_empty() ) {
+			cout << ", default: " << o.default_value();
+		}
+		cout << "\n";
 		if ( ! description ) {
 			description = o.description().raw();
 		}
@@ -358,12 +380,12 @@ void dump_configuration( void* arg ) {
 				eol = static_cast<int>( desc.find_other_than( _whiteSpace_.data(), eol ) );
 			}
 			if ( eol >= MAXIMUM_LINE_LENGTH ) {
-				printf( "# %.*s\n", eol, desc.raw() );
+				cout << "# " << desc.left( eol ) << "\n";
 				desc.shift_left( eol );
 				desc.trim_left();
 				description = desc.raw();
 			} else {
-				printf( "# %s\n", desc.raw() );
+				cout << "# " << desc << "\n";
 				description = NULL;
 				loop = false;
 			}
@@ -371,37 +393,40 @@ void dump_configuration( void* arg ) {
 		if ( !! o.value() ) {
 			switch ( o.value()->get_type() ) {
 				case ( TYPE::BOOL ):
-					::printf( "%s %s\n", o.long_form().raw(), o.value()->get<bool>() ? "true" : "false" );
+					cout << o.long_form() << " " << ( o.value()->get<bool>() ? "true" : "false" ) << "\n";
 				break;
 				case ( TYPE::HSTRING ): {
 					HString const& s = o.value()->get<HString>();
-					if ( ! s.is_empty() )
-						::printf( "%s \"%s\"\n", o.long_form().raw(), s.raw() );
-					else
-						::printf( "# %s\n", o.long_form().raw() );
+					if ( ! s.is_empty() ) {
+						cout << o.long_form() << " \"" << s << "\"\n";
+					} else {
+						cout << "# " << o.long_form() << "\n";
+					}
 				}
 				break;
 				case ( TYPE::INT ):
-					::printf( "%s %d\n", o.long_form().raw(), o.value()->get<int>() );
+					cout << o.long_form() << " " << o.value()->get<int>() << "\n";
 				break;
 				case ( TYPE::INT_LONG ):
-					::printf( "%s %ld\n", o.long_form().raw(), o.value()->get<int long>() );
+					cout << o.long_form() << " " << o.value()->get<int long>() << "\n";
 				break;
 				case ( TYPE::DOUBLE_LONG ):
-					::printf( "%s %Lf\n", o.long_form().raw(), o.value()->get<double long>() );
+					cout << o.long_form() << " " << o.value()->get<double long>() << "\n";
 				break;
 				case ( TYPE::DOUBLE ):
-					::printf( "%s %f\n", o.long_form().raw(), o.value()->get<double>() );
+					cout << o.long_form() << " " << o.value()->get<double>() << "\n";
 				break;
 				default:
 					;
 				break;
 			}
 		}
-		::printf( "\n" );
+		cout << "\n";
 	}
-	info._note && ::printf( "# %s\n\n", info._note );
-	::printf( "# vim: ft=conf\n" );
+	if ( info._note ) {
+		cout << "# " << info._note << "\n\n";
+	}
+	cout << "# vim: ft=conf" << endl;
 	return;
 	M_EPILOG
 }
