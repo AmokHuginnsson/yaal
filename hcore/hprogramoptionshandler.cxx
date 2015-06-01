@@ -325,7 +325,7 @@ HProgramOptionsHandler::HOption& HProgramOptionsHandler::HOption::short_form( in
 
 u64_t HProgramOptionsHandler::HOption::value_id( void ) const {
 	M_PROLOG
-	return ( _value->id() );
+	return ( !! _value ? _value->id() : reinterpret_cast<u64_t>( this ) );
 	M_EPILOG
 }
 
@@ -526,6 +526,9 @@ void HProgramOptionsHandler::verify_new_option( HOption& option_ ) {
 	}
 	if ( ! option_.short_form() ) {
 		option_.short_form( sf );
+	}
+	if ( ! option_.default_value().is_empty() ) {
+		option_.set( option_.default_value() );
 	}
 	return;
 	M_EPILOG

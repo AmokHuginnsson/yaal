@@ -160,8 +160,9 @@ void HLog::rehash( HString const& logFileName_,
 		char const* const processName_ ) {
 	M_PROLOG
 	HLock l( _mutex );
-	if ( logFileName_.is_empty() )
-		M_THROW( "new file name argument is", logFileName_.get_length() );
+	if ( logFileName_.is_empty() ) {
+		M_THROW( "new file name argument is empty", logFileName_.get_length() );
+	}
 	void* src( _file::ref().release() );
 	_file::ref().open( logFileName_, HFile::open_t( HFile::OPEN::WRITING ) | HFile::OPEN::APPEND );
 	if ( ! _file::ref() ) {
