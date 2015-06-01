@@ -495,7 +495,13 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	 * break ( 2 ); // <--- break two levels of nested scopes.
 	 */
 	HRule breakStatement( "breakStatement", constant( KEYWORD::BREAK ) >> ';' );
-	HRule whileStatement( "whileStatement", constant( KEYWORD::WHILE ) >> '(' >> expression >> ')' >> scope );
+	HRule whileStatement(
+		"whileStatement",
+		constant(
+			KEYWORD::WHILE,
+			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::inc_loop_count, _compiler.get(), _1 )
+		) >> '(' >> expression >> ')' >> scope
+	);
 	HRule forIdentifier(
 		regex(
 			"forIdentifier",
@@ -503,7 +509,13 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_for_identifier, _compiler.get(), _1, _2 ) )
 		)
 	);
-	HRule forStatement( "forStatement", constant( KEYWORD::FOR ) >> '(' >> forIdentifier >> ':' >> expression >> ')' >> scope );
+	HRule forStatement(
+		"forStatement",
+		constant(
+			KEYWORD::FOR,
+			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::inc_loop_count, _compiler.get(), _1 )
+		) >> '(' >> forIdentifier >> ':' >> expression >> ')' >> scope
+	);
 	HRule caseStatement(
 		"caseStatement",
 		constant( KEYWORD::CASE ) >> '(' >> expression >> ')' >> ':'
@@ -513,7 +525,10 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule defaultStatement( "defaultStatement", constant( KEYWORD::DEFAULT ) >> ':' >> scope );
 	HRule switchStatement(
 		"switchStatement",
-		constant( KEYWORD::SWITCH ) >> '(' >> expression >> ')' >>
+		constant(
+			KEYWORD::SWITCH,
+			bound_call<e_p::HRuleBase::action_position_t>( &OCompiler::inc_loop_switch_count, _compiler.get(), _1 )
+		) >> '(' >> expression >> ')' >>
 		constant( '{', HRuleBase::action_position_t( hcore::call( &OCompiler::create_scope, _compiler.get(), _1 ) ) ) >> +caseStatement >>
 		-( defaultStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )] ) >> '}'
 	);

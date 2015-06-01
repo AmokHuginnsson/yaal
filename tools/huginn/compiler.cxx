@@ -50,19 +50,23 @@ namespace tools {
 namespace huginn {
 
 OCompiler::OScopeContext::OScopeContext( HHuginn* huginn_ )
-	: _huginn( huginn_ ),
-	_scope( make_pointer<HScope>() ),
-	_expressionsStack() {
+	: _huginn( huginn_ )
+	, _scope( make_pointer<HScope>() )
+	, _expressionsStack() {
+	M_PROLOG
 	_expressionsStack.emplace( 1, make_pointer<HExpression>() );
 	return;
+	M_EPILOG
 }
 
 OCompiler::OScopeContext::OScopeContext( HHuginn* huginn_, HHuginn::scope_t const& scope_, HHuginn::expression_t const& expression_ )
-	: _huginn( huginn_ ),
-	_scope( scope_ ),
-	_expressionsStack() {
+	: _huginn( huginn_ )
+	, _scope( scope_ )
+	, _expressionsStack() {
+	M_PROLOG
 	_expressionsStack.emplace( 1, expression_ );
 	return;
+	M_EPILOG
 }
 
 void OCompiler::OScopeContext::clear( void ) {
@@ -83,11 +87,11 @@ HHuginn::HHuginn::expression_t& OCompiler::OScopeContext::expression( void ) {
 }
 
 OCompiler::OCompilationFrame::OCompilationFrame( HHuginn* huginn_ )
-	: _context( huginn_ ),
-	_contextsChain(),
-	_else(),
-	_forIdentifier(),
-	_forPosition( 0 ) {
+	: _context( huginn_ )
+	, _contextsChain()
+	, _else()
+	, _forIdentifier()
+	, _forPosition( 0 ) {
 	return;
 }
 
@@ -109,10 +113,20 @@ OCompiler::OFunctionContext::OFunctionContext( HHuginn* huginn_ )
 	, _compilationStack()
 	, _operations()
 	, _valueTypes()
+	, _loopCount( 0 )
+	, _loopSwitchCount( 0 )
 	, _lastDereferenceOperator( OPERATOR::NONE )
 	, _lastMemberName() {
 	_compilationStack.emplace( huginn_ );
 	return;
+}
+
+OCompiler::OFunctionContext::~OFunctionContext( void ) {
+	M_PROLOG
+	M_ASSERT( _loopCount == 0 );
+	M_ASSERT( _loopSwitchCount == 0 );
+	return;
+	M_DESTRUCTOR_EPILOG
 }
 
 OCompiler::OClassContext::OClassContext( void )
@@ -351,6 +365,23 @@ void OCompiler::reset_expression( void ) {
 	M_EPILOG
 }
 
+void OCompiler::inc_loop_count( executing_parser::position_t ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	++ fc._loopCount;
+	++ fc._loopSwitchCount;
+	return;
+	M_EPILOG
+}
+
+void OCompiler::inc_loop_switch_count( executing_parser::position_t ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	++ fc._loopSwitchCount;
+	return;
+	M_EPILOG
+}
+
 void OCompiler::start_subexpression( executing_parser::position_t position_ ) {
 	M_PROLOG
 	f()._compilationStack.top()._context._expressionsStack.emplace( 1, make_pointer<HExpression>( position_.get() ) );
@@ -415,9 +446,13 @@ void OCompiler::add_return_statement( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::add_break_statement( executing_parser::position_t ) {
+void OCompiler::add_break_statement( executing_parser::position_t position_ ) {
 	M_PROLOG
-	M_ASSERT( ! f()._compilationStack.is_empty() );
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
+	if ( fc._loopSwitchCount == 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "Invalid context for `break' statement.", position_.get() );
+	}
 	current_scope()->add_statement( make_pointer<HBreak>() );
 	reset_expression();
 	return;
@@ -431,6 +466,8 @@ void OCompiler::add_while_statement( executing_parser::position_t ) {
 	HHuginn::scope_t scope( current_scope() );
 	fc._compilationStack.pop();
 	current_scope()->add_statement( make_pointer<HWhile>( current_expression(), scope ) );
+	-- fc._loopCount;
+	-- fc._loopSwitchCount;
 	reset_expression();
 	return;
 	M_EPILOG
@@ -453,6 +490,8 @@ void OCompiler::add_for_statement( executing_parser::position_t ) {
 	fc._compilationStack.pop();
 	OCompilationFrame const& cf( fc._compilationStack.top() );
 	current_scope()->add_statement( make_pointer<HFor>( cf._forIdentifier, current_expression(), scope, cf._forPosition ) );
+	-- fc._loopCount;
+	-- fc._loopSwitchCount;
 	reset_expression();
 	return;
 	M_EPILOG
@@ -509,6 +548,7 @@ void OCompiler::add_switch_statement( executing_parser::position_t ) {
 			Default
 		)
 	);
+	-- fc._loopSwitchCount;
 	current_scope()->add_statement( switchStatement );
 	reset_expression();
 	return;

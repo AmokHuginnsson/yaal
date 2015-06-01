@@ -79,9 +79,12 @@ struct OCompiler {
 		compilation_stack_t _compilationStack;
 		operations_t _operations;
 		type_stack_t _valueTypes;
+		int _loopCount;
+		int _loopSwitchCount;
 		OPERATOR _lastDereferenceOperator;
 		yaal::hcore::HString _lastMemberName;
 		OFunctionContext( HHuginn* );
+		virtual ~OFunctionContext( void );
 	};
 	typedef yaal::hcore::HStack<OFunctionContext> function_contexts_t;
 	struct OClassContext {
@@ -132,6 +135,8 @@ struct OCompiler {
 	HHuginn::scope_t& current_scope( void );
 	HHuginn::expression_t& current_expression( void );
 	void reset_expression( void );
+	void inc_loop_count( executing_parser::position_t );
+	void inc_loop_switch_count( executing_parser::position_t );
 	void start_subexpression( executing_parser::position_t );
 	void add_subexpression( OPERATOR, executing_parser::position_t );
 	void add_field_definition( executing_parser::position_t );

@@ -167,6 +167,12 @@ public:
 	}
 };
 
+template<typename bound_call_t, typename... T>
+bound_call_t bound_call( T&&... arg_ ) {
+	return ( yaal::hcore::call( yaal::forward<T>( arg_ )... ) );
+}
+
+
 template<typename signature_t>
 inline void swap( HBoundCall<signature_t>& a, HBoundCall<signature_t>& b ) {
 	a.swap( b );
