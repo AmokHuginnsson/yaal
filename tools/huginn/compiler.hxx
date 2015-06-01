@@ -84,7 +84,6 @@ struct OCompiler {
 		OPERATOR _lastDereferenceOperator;
 		yaal::hcore::HString _lastMemberName;
 		OFunctionContext( HHuginn* );
-		virtual ~OFunctionContext( void );
 	};
 	typedef yaal::hcore::HStack<OFunctionContext> function_contexts_t;
 	struct OClassContext {
@@ -135,6 +134,7 @@ struct OCompiler {
 	HHuginn::scope_t& current_scope( void );
 	HHuginn::expression_t& current_expression( void );
 	void reset_expression( void );
+	void pop_function_context( void );
 	void inc_loop_count( executing_parser::position_t );
 	void inc_loop_switch_count( executing_parser::position_t );
 	void start_subexpression( executing_parser::position_t );
@@ -149,6 +149,7 @@ struct OCompiler {
 	void commit_else_clause( executing_parser::position_t );
 	void add_return_statement( executing_parser::position_t );
 	void add_break_statement( executing_parser::position_t );
+	void add_continue_statement( executing_parser::position_t );
 	void add_while_statement( executing_parser::position_t );
 	void add_for_statement( executing_parser::position_t );
 	void add_if_statement( executing_parser::position_t );

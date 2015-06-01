@@ -539,7 +539,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| forStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_for_statement, _compiler.get(), _1 ) )]
 		| switchStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_switch_statement, _compiler.get(), _1 ) )]
 		| breakStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_break_statement, _compiler.get(), _1 ) )]
-		| continueStatement
+		| continueStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_continue_statement, _compiler.get(), _1 ) )]
 		| returnStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_return_statement, _compiler.get(), _1 ) )]
 		| expressionStatement
 		| scope[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_scope, _compiler.get(), _1 ) )]
@@ -1195,7 +1195,7 @@ void HHuginn::create_function( executing_parser::position_t position_ ) {
 	if ( ! _compiler->_classContext ) {
 		OCompiler::OFunctionContext& fc( _compiler->f() );
 		_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( fc._functionName ), _compiler->create_function( position_ ) ) );
-		_compiler->_functionContexts.pop();
+		_compiler->pop_function_context();
 	} else {
 		_compiler->add_method( position_ );
 	}

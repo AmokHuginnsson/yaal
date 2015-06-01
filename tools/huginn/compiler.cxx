@@ -121,14 +121,6 @@ OCompiler::OFunctionContext::OFunctionContext( HHuginn* huginn_ )
 	return;
 }
 
-OCompiler::OFunctionContext::~OFunctionContext( void ) {
-	M_PROLOG
-	M_ASSERT( _loopCount == 0 );
-	M_ASSERT( _loopSwitchCount == 0 );
-	return;
-	M_DESTRUCTOR_EPILOG
-}
-
 OCompiler::OClassContext::OClassContext( void )
 	: _className()
 	, _baseName()
@@ -237,7 +229,7 @@ void OCompiler::set_lambda_name( executing_parser::position_t position_ ) {
 void OCompiler::add_method( executing_parser::position_t position_ ) {
 	M_PROLOG
 	_classContext->_methods.insert( make_pair( static_cast<int>( _classContext->_fieldNames.get_size() - 1 ), create_function( position_ ) ) );
-	_functionContexts.pop();
+	pop_function_context();
 	return;
 	M_EPILOG
 }
@@ -271,7 +263,7 @@ HHuginn::function_t OCompiler::create_function( executing_parser::position_t ) {
 
 void OCompiler::submit_class( executing_parser::position_t position_ ) {
 	M_PROLOG
-	_functionContexts.pop();
+	pop_function_context();
 	if ( ! _submittedClasses.insert( make_pair<yaal::hcore::HString const, class_context_t>( _classContext->_className, yaal::move( _classContext ) ) ).second ) {
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( _classContext->_className ).append( "' is already defined." ), position_.get() );
 	}
@@ -311,7 +303,7 @@ void OCompiler::create_lambda( executing_parser::position_t position_ ) {
 	M_PROLOG
 	HHuginn::function_t fun( create_function( position_ ) );
 	HHuginn::value_t fRef( make_pointer<HHuginn::HFunctionReference>( f()._functionName, fun ) );
-	_functionContexts.pop();
+	pop_function_context();
 	defer_store_direct( fRef, position_ );
 	return;
 	M_EPILOG
@@ -361,6 +353,16 @@ void OCompiler::reset_expression( void ) {
 	OFunctionContext& fc( f() );
 	M_ASSERT( fc._operations.is_empty() );
 	fc._valueTypes.clear();
+	return;
+	M_EPILOG
+}
+
+void OCompiler::pop_function_context( void ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	M_ASSERT( fc._loopCount == 0 );
+	M_ASSERT( fc._loopSwitchCount == 0 );
+	_functionContexts.pop();
 	return;
 	M_EPILOG
 }
@@ -453,7 +455,20 @@ void OCompiler::add_break_statement( executing_parser::position_t position_ ) {
 	if ( fc._loopSwitchCount == 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Invalid context for `break' statement.", position_.get() );
 	}
-	current_scope()->add_statement( make_pointer<HBreak>() );
+	current_scope()->add_statement( make_pointer<HBreak>( HFrame::STATE::BREAK ) );
+	reset_expression();
+	return;
+	M_EPILOG
+}
+
+void OCompiler::add_continue_statement( executing_parser::position_t position_ ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
+	if ( fc._loopCount == 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "Invalid context for `continue' statement.", position_.get() );
+	}
+	current_scope()->add_statement( make_pointer<HBreak>( HFrame::STATE::CONTINUE ) );
 	reset_expression();
 	return;
 	M_EPILOG

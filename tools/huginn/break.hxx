@@ -30,6 +30,7 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_BREAK_HXX_INCLUDED 1
 
 #include "tools/huginn/statement.hxx"
+#include "tools/huginn/frame.hxx"
 
 namespace yaal {
 
@@ -43,8 +44,10 @@ class HBreak : public HStatement {
 public:
 	typedef HBreak this_type;
 	typedef HStatement base_type;
+private:
+	HFrame::STATE _state;
 public:
-	HBreak( void );
+	HBreak( HFrame::STATE );
 protected:
 	virtual void do_execute( HThread* ) const override;
 private:

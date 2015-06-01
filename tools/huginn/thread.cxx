@@ -106,6 +106,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 	M_ASSERT(
 		( state_ == HFrame::STATE::RETURN )
 		|| ( state_ == HFrame::STATE::BREAK )
+		|| ( state_ == HFrame::STATE::CONTINUE )
 		|| ( state_ == HFrame::STATE::RUNTIME_EXCEPTION )
 	);
 	int level( 0 );
@@ -113,11 +114,14 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 	HFrame* target( f );
 	int no( f->number() );
 	while ( f ) {
-		f->break_execution( state_ );
 		target = f;
 		if ( f->is_loop() ) {
 			++ level;
 		}
+		if ( ( state_ == HFrame::STATE::CONTINUE ) && ( level > 0 ) ) {
+			break;
+		}
+		f->break_execution( state_ );
 		f = f->parent();
 		if ( ! f ) {
 			break;
