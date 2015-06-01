@@ -31,7 +31,7 @@ package:
 	$(MAKE) do-package
 
 do-package: $(PORTFILE)
-	@port -D $(PORTDIR) lint && port -D $(PORTDIR) dmg
+	@port -D $(PORTDIR) lint && port -v -D $(PORTDIR) dmg
 
 bundle: package
 	$(MAKE) do-bundle
