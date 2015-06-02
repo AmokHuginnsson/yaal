@@ -109,6 +109,10 @@ HHuginn::value_t HFrame::try_reference( yaal::hcore::HString const& name_, int p
 	} else if ( _object && ( name_ == "this" ) ) {
 		v = _object->get_pointer();
 		M_ASSERT( !! v );
+	} else if ( _object && ( name_ == "super" ) ) {
+		HHuginn::value_t p = _object->get_pointer();
+		M_ASSERT( !! p );
+		v = make_pointer<HHuginn::HObjectReference>( p );
 	} else if ( _parent && ( _parent->_number == _number ) ) {
 		v = _parent->try_reference( name_, position_ );
 	} else {

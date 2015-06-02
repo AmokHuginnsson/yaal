@@ -81,6 +81,7 @@ HHuginn::type_t const HHuginn::TYPE::BOOLEAN( HHuginn::HType::register_type( "bo
 HHuginn::type_t const HHuginn::TYPE::CHARACTER( HHuginn::HType::register_type( "character", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::REFERENCE( HHuginn::HType::register_type( "*reference*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::FUNCTION_REFERENCE( HHuginn::HType::register_type( "*function_reference*", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::OBJECT_REFERENCE( HHuginn::HType::register_type( "*object_reference*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::METHOD( HHuginn::HType::register_type( "*method*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::UNKNOWN( HHuginn::HType::register_type( "*unknown*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::NOT_BOOLEAN( HHuginn::HType::register_type( "*not_boolean*", nullptr ) );
@@ -773,6 +774,12 @@ HHuginn::value_t& HHuginn::HObject::field( int index_ ) {
 	M_EPILOG
 }
 
+HHuginn::HClass const* HHuginn::HObject::get_class( void ) const {
+	M_PROLOG
+	return ( _class );
+	M_EPILOG
+}
+
 HHuginn::value_t HHuginn::HObject::do_clone( void ) const {
 	M_PROLOG
 	values_t fields;
@@ -780,6 +787,49 @@ HHuginn::value_t HHuginn::HObject::do_clone( void ) const {
 		fields.push_back( v->clone() );
 	}
 	return ( make_pointer<HObject>( _class, fields ) );
+	M_EPILOG
+}
+
+HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCast_ )
+	: HValue( TYPE::OBJECT_REFERENCE )
+	, _object( value_ )
+	, _upCast( upCast_ ) {
+	M_PROLOG
+	M_ASSERT( dynamic_cast<HObject*>( _object.raw() ) );
+	return;
+	M_EPILOG
+}
+
+int HHuginn::HObjectReference::field_index( yaal::hcore::HString const& name_, int position_ ) const {
+	M_PROLOG
+	HObject const* o( dynamic_cast<HObject const*>( _object.raw() ) );
+	HClass const* c( o->get_class() );
+	HClass const* s( c->super() );
+	if ( !s ) {
+		throw HHuginnRuntimeException( "`"_ys.append( o->type()->name() ).append( "' does not have superclass." ), position_ );
+	}
+	return ( s->field_index( name_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HObjectReference::field( int index_ ) {
+	M_PROLOG
+	HObject* o( dynamic_cast<HObject*>( _object.raw() ) );
+	HClass const* c( o->get_class() );
+	HClass const* s( c->super() );
+	values_t v( s->get_defaults() );
+	value_t& f( v[index_] );
+	HClass::HMethod* m( dynamic_cast<HClass::HMethod*>( f.raw() ) );
+	if ( m ) {
+		m->set_object( o );
+	}
+	return ( f );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HObjectReference::do_clone( void ) const {
+	M_PROLOG
+	return ( make_pointer<HObjectReference>( _object->clone(), _upCast ) );
 	M_EPILOG
 }
 

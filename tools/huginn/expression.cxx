@@ -124,17 +124,29 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 	HHuginn::value_t v( frame_->values().top() );
 	frame_->values().pop();
 	HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
-	if ( o == nullptr ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->type()->name() ).append( "' is not a compound object." ), p );
-	}
-	int fi( o->field_index( name_ ) );
-	if ( fi < 0 ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->type()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
-	}
-	if ( access_ == ACCESS::VALUE ) {
-		frame_->values().push( o->field( fi ) );
+	HHuginn::HObjectReference* oref( dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) );
+	if ( o != nullptr ) {
+		int fi( o->field_index( name_ ) );
+		if ( fi < 0 ) {
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->type()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
+		}
+		if ( access_ == ACCESS::VALUE ) {
+			frame_->values().push( o->field( fi ) );
+		} else {
+			frame_->values().push( make_pointer<HHuginn::HReference>( o->field( fi ) ) );
+		}
+	} else if ( oref != nullptr ) {
+		int fi( oref->field_index( name_, p ) );
+		if ( fi < 0 ) {
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( oref->type()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
+		}
+		if ( access_ == ACCESS::VALUE ) {
+			frame_->values().push( oref->field( fi ) );
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", p );
+		}
 	} else {
-		frame_->values().push( make_pointer<HHuginn::HReference>( o->field( fi ) ) );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->type()->name() ).append( "' is not a compound object." ), p );
 	}
 	return;
 	M_EPILOG

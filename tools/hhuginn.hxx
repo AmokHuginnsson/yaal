@@ -133,6 +133,7 @@ public:
 	typedef yaal::hcore::HPointer<HList> list_t;
 	class HMap;
 	class HObject;
+	class HObjectReference;
 	class HBooleanEvaluator;
 	class HTernaryEvaluator;
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
@@ -155,6 +156,7 @@ public:
 		static type_t const MAP;
 		static type_t const REFERENCE;
 		static type_t const FUNCTION_REFERENCE;
+		static type_t const OBJECT_REFERENCE;
 		static type_t const METHOD;
 		static type_t const UNKNOWN;
 		static type_t const NOT_BOOLEAN;
@@ -367,11 +369,28 @@ public:
 	virtual ~HObject( void );
 	int field_index( yaal::hcore::HString const& ) const;
 	value_t& field( int );
+	HClass const* get_class( void ) const;
 private:
 	void reset_methods( void );
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;
 private:
+	virtual value_t do_clone( void ) const override;
+};
+
+class HHuginn::HObjectReference : public HHuginn::HValue {
+public:
+	typedef HHuginn::HObjectReference this_type;
+	typedef HHuginn::HValue base_type;
+private:
+	value_t _object;
+	int _upCast;
+public:
+	HObjectReference( value_t const&, int = 0 );
+	int field_index( yaal::hcore::HString const&, int ) const;
+	value_t field( int );
+private:
+	HObjectReference( HObjectReference const& ) = delete;
 	virtual value_t do_clone( void ) const override;
 };
 

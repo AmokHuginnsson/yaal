@@ -1085,10 +1085,10 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	if ( huginn::is_keyword( value_ ) ) {
-		if ( value_ != "this" ) {
+		if ( ( value_ != "this" ) && ( value_ != "super" ) ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
 		} else if ( ! _classContext ) {
-			throw HHuginn::HHuginnRuntimeException( "Keyword `this' can be used only in class context.", position_.get() );
+			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), position_.get() );
 		}
 	}
 	current_expression()->add_execution_step( hcore::call( &HExpression::get_reference, current_expression().raw(), value_, _1, position_.get() ) );
@@ -1100,7 +1100,11 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	OFunctionContext& fc( f() );
 	if ( huginn::is_keyword( value_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
+		if ( value_ != "constructor" ) {
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
+		} else if ( ! _classContext ) {
+			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), position_.get() );
+		}
 	}
 	current_expression()->add_execution_step(
 		hcore::call( &HExpression::get_field, current_expression().raw(), HExpression::ACCESS::VALUE, value_, _1, position_.get() )
