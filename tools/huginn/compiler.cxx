@@ -359,7 +359,7 @@ void OCompiler::reset_expression( void ) {
 
 void OCompiler::pop_function_context( void ) {
 	M_PROLOG
-	OFunctionContext& fc( f() );
+	M_DEBUG_CODE( OFunctionContext& fc( f() ); );
 	M_ASSERT( fc._loopCount == 0 );
 	M_ASSERT( fc._loopSwitchCount == 0 );
 	_functionContexts.pop();
