@@ -62,7 +62,22 @@ HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::HObject*
 		static_cast<int>( _parameterNames.get_size() ),
 		position_
 	);
-	thread_->create_function_frame( object_ );
+	int upCast( 0 );
+	if ( object_ && ( object_->field_index( _name ) >= 0 ) ) {
+		HHuginn::HClass const* c( object_->get_class() );
+		while ( c ) {
+			int idx( c->field_index( _name ) );
+			if ( ( idx >= 0 ) && ( c->function( idx ).id() == this ) ) {
+				break;
+			}
+			c = c->super();
+			++ upCast;
+		}
+		if ( ! c ) {
+			upCast = 0;
+		}
+	}
+	thread_->create_function_frame( object_, upCast );
 	HFrame* f( thread_->current_frame() );
 	for (
 		int i( 0 ),

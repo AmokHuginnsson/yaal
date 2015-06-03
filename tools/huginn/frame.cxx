@@ -39,10 +39,17 @@ namespace tools {
 
 namespace huginn {
 
-HFrame::HFrame( HThread* thread_, HFrame* parent_, HHuginn::HObject* object_, bool bump_, bool loop_ )
-	: _thread( thread_ )
+HFrame::HFrame(
+	HThread* thread_,
+	HFrame* parent_,
+	HHuginn::HObject* object_,
+	int upCast_,
+	bool bump_,
+	bool loop_
+) : _thread( thread_ )
 	, _parent( parent_ )
 	, _object( object_ )
+	, _upCast( upCast_ )
 	, _variables()
 	, _operations()
 	, _values()
@@ -112,7 +119,7 @@ HHuginn::value_t HFrame::try_reference( yaal::hcore::HString const& name_, int p
 	} else if ( _object && ( name_ == "super" ) ) {
 		HHuginn::value_t p = _object->get_pointer();
 		M_ASSERT( !! p );
-		v = make_pointer<HHuginn::HObjectReference>( p );
+		v = make_pointer<HHuginn::HObjectReference>( p, _upCast, true, position_ );
 	} else if ( _parent && ( _parent->_number == _number ) ) {
 		v = _parent->try_reference( name_, position_ );
 	} else {

@@ -63,10 +63,10 @@ HFrame const* HThread::current_frame( void ) const {
 	M_EPILOG
 }
 
-void HThread::create_function_frame( HHuginn::HObject* object_ ) {
+void HThread::create_function_frame( HHuginn::HObject* object_, int upCast_ ) {
 	M_PROLOG
 	HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, object_, true, false ) );
+	_frames.push( make_pointer<HFrame>( this, parent, object_, upCast_, true, false ) );
 	return;
 	M_EPILOG
 }
@@ -74,7 +74,7 @@ void HThread::create_function_frame( HHuginn::HObject* object_ ) {
 void HThread::create_loop_frame( void ) {
 	M_PROLOG
 	HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, nullptr, false, true ) );
+	_frames.push( make_pointer<HFrame>( this, parent, nullptr, 0, false, true ) );
 	return;
 	M_EPILOG
 }
@@ -82,7 +82,7 @@ void HThread::create_loop_frame( void ) {
 void HThread::create_scope_frame( void ) {
 	M_PROLOG
 	HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, nullptr, false, false ) );
+	_frames.push( make_pointer<HFrame>( this, parent, nullptr, 0, false, false ) );
 	return;
 	M_EPILOG
 }

@@ -136,7 +136,7 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 			frame_->values().push( make_pointer<HHuginn::HReference>( o->field( fi ) ) );
 		}
 	} else if ( oref != nullptr ) {
-		int fi( oref->field_index( name_, p ) );
+		int fi( oref->field_index( name_) );
 		if ( fi < 0 ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( oref->type()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
 		}

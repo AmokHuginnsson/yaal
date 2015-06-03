@@ -39,6 +39,7 @@ namespace tools {
 namespace huginn {
 
 class HThread;
+class HFunction;
 
 class HFrame {
 public:
@@ -57,6 +58,7 @@ private:
 	HThread* _thread;
 	HFrame* const _parent;
 	HHuginn::HObject* _object;
+	int _upCast;
 	variables_t _variables;
 	operations_t _operations;
 	values_t _values;
@@ -65,7 +67,7 @@ private:
 	bool _loop;
 	STATE _state;
 public:
-	HFrame( HThread*, HFrame*, HHuginn::HObject*, bool, bool );
+	HFrame( HThread*, HFrame*, HHuginn::HObject*, int, bool, bool );
 	HHuginn::value_t make_variable( yaal::hcore::HString const&, int );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( yaal::hcore::HString const&, int );

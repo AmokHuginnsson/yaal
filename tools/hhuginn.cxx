@@ -790,46 +790,64 @@ HHuginn::value_t HHuginn::HObject::do_clone( void ) const {
 	M_EPILOG
 }
 
-HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCast_ )
+HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLevel_, bool upCast_, int position_ )
 	: HValue( TYPE::OBJECT_REFERENCE )
 	, _object( value_ )
-	, _upCast( upCast_ ) {
+	, _class( nullptr ) {
 	M_PROLOG
-	M_ASSERT( dynamic_cast<HObject*>( _object.raw() ) );
+	HObject const* o( dynamic_cast<HObject const*>( _object.raw() ) );
+	M_ASSERT( o );
+	HClass const* c( o->get_class() );
+	for ( int i( 0 ); i < ( upCastLevel_ + ( upCast_ ? 1 : 0 ) ); ++ i ) {
+		HClass const* s( c->super() );
+		if ( ! s ) {
+			throw HHuginnRuntimeException( "`"_ys.append( s->type()->name() ).append( "' does not have superclass." ), position_ );
+		}
+		c = s;
+	}
+	_class = c;
 	return;
 	M_EPILOG
 }
 
-int HHuginn::HObjectReference::field_index( yaal::hcore::HString const& name_, int position_ ) const {
+HHuginn::HObjectReference::HObjectReference( value_t const& value_, HClass const* class_ )
+	: HValue( TYPE::OBJECT_REFERENCE )
+	, _object( value_ )
+	, _class( class_ ) {
 	M_PROLOG
-	HObject const* o( dynamic_cast<HObject const*>( _object.raw() ) );
-	HClass const* c( o->get_class() );
-	HClass const* s( c->super() );
-	if ( !s ) {
-		throw HHuginnRuntimeException( "`"_ys.append( o->type()->name() ).append( "' does not have superclass." ), position_ );
-	}
-	return ( s->field_index( name_ ) );
+	return;
+	M_EPILOG
+}
+
+int HHuginn::HObjectReference::field_index( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	HObject const* o( static_cast<HObject const*>( _object.raw() ) );
+	return ( _class != o->get_class() ? o->field_index( name_ ) : o->field_index( name_ ) );
 	M_EPILOG
 }
 
 HHuginn::value_t HHuginn::HObjectReference::field( int index_ ) {
 	M_PROLOG
-	HObject* o( dynamic_cast<HObject*>( _object.raw() ) );
-	HClass const* c( o->get_class() );
-	HClass const* s( c->super() );
-	values_t v( s->get_defaults() );
-	value_t& f( v[index_] );
-	HClass::HMethod* m( dynamic_cast<HClass::HMethod*>( f.raw() ) );
+	HObject* o( static_cast<HObject*>( _object.raw() ) );
+	value_t* f( nullptr );
+	values_t v;
+	if ( _class != o->get_class() ) {
+		v = _class->get_defaults();
+		f = &v[index_];
+	} else {
+		f = &o->field( index_ );
+	}
+	HClass::HMethod* m( dynamic_cast<HClass::HMethod*>( f->raw() ) );
 	if ( m ) {
 		m->set_object( o );
 	}
-	return ( f );
+	return ( *f );
 	M_EPILOG
 }
 
 HHuginn::value_t HHuginn::HObjectReference::do_clone( void ) const {
 	M_PROLOG
-	return ( make_pointer<HObjectReference>( _object->clone(), _upCast ) );
+	return ( make_pointer<HObjectReference>( _object->clone(), _class ) );
 	M_EPILOG
 }
 
@@ -943,7 +961,7 @@ void HHuginn::commit_classes( void ) {
 	M_PROLOG
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
-	t->create_function_frame( nullptr );
+	t->create_function_frame( nullptr, 0 );
 	for ( OCompiler::submitted_classes_t::value_type const& sc : _compiler->_submittedClasses ) {
 		commit_class( sc.first );
 	}

@@ -51,6 +51,7 @@ class HFrame;
 class HThread;
 class HExpression;
 class HScope;
+class HFunction;
 struct OCompiler;
 
 namespace ERR_CODE {
@@ -118,7 +119,6 @@ public:
 	class HReturn;
 	class HClass;
 	typedef yaal::hcore::HPointer<HClass> class_t;
-	class HFunction;
 	class HReference;
 	class HFunctionReference;
 	class HValue;
@@ -384,13 +384,15 @@ public:
 	typedef HHuginn::HValue base_type;
 private:
 	value_t _object;
-	int _upCast;
+	HClass const* _class;
 public:
-	HObjectReference( value_t const&, int = 0 );
-	int field_index( yaal::hcore::HString const&, int ) const;
+	HObjectReference( value_t const&, int, bool, int );
+	HObjectReference( value_t const&, HClass const* );
+	int field_index( yaal::hcore::HString const& ) const;
 	value_t field( int );
 private:
 	HObjectReference( HObjectReference const& ) = delete;
+	HObjectReference& operator = ( HObjectReference const& ) = delete;
 	virtual value_t do_clone( void ) const override;
 };
 
