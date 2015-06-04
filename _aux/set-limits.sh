@@ -14,7 +14,7 @@ case "x${OSTYPE}" in
 		PHYS_MEM=`prtconf | awk '/Memory/{print $3}'`
 	;;
 	xDarwin)
-		PHYS_MEM=`/sbin/sysctl -n hw.memsize | awk '{print int( $1 / 1024 / 1024 )}'`
+		PHYS_MEM=`/usr/sbin/sysctl -n hw.memsize | awk '{print int( $1 / 1024 / 1024 )}'`
 	;;
 esac
 
