@@ -1,17 +1,20 @@
 ### ! /bin/sh
 
 PHYS_MEM=0
-OSTYPE=`uname`
+OSTYPE=`uname -s`
 
-case "${OSTYPE}" in
-	*Linux)
+case "x${OSTYPE}" in
+	x*Linux)
 		PHYS_MEM=`free -m | awk '/^Mem:/{print $2}'`
 	;;
-	FreeBSD)
-		PHYS_MEM=`/sbin/sysctl hw.physmem | awk '{print int( $2 / 1024 / 1024 )}'`
+	xFreeBSD)
+		PHYS_MEM=`/sbin/sysctl -n hw.physmem | awk '{print int( $1 / 1024 / 1024 )}'`
 	;;
-	Solaris|SunOS)
+	xSolaris|xSunOS)
 		PHYS_MEM=`prtconf | awk '/Memory/{print $3}'`
+	;;
+	xDarwin)
+		PHYS_MEM=`/sbin/sysctl -n hw.memsize | awk '{print int( $1 / 1024 / 1024 )}'`
 	;;
 esac
 
@@ -30,6 +33,11 @@ ulimit -s 8192
 if [ ${PHYS_MEM} -ne 0 ] ; then
 	ulimit -v ${PHYS_MEM}
 	ulimit -d ${PHYS_MEM}
+	LIMITED=`ulimit -v`
+	if [ \( ${PHYS_MEM} -gt 4095 \) -a \( "x${LIMITED}" = "xunlimited" \) ] ; then
+		ulimit -v 4095
+		ulimit -d 4095
+	fi
 fi
 
 # vim: ft=sh
