@@ -101,7 +101,7 @@ class HCondition {
 	HMutex& _mutex;
 public:
 	typedef enum {
-		OK,
+		SIGNALED,
 		TIMEOUT,
 		INTERRUPT
 	} status_t;

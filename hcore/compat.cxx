@@ -203,7 +203,7 @@ public:
 					)
 				)
 			);
-			if ( status == yaal::hcore::HCondition::TIMEOUT ) {
+			if ( status != yaal::hcore::HCondition::SIGNALED ) {
 				::kill( getpid(), _sigNo );
 				break;
 			}

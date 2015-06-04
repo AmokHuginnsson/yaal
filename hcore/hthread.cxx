@@ -474,7 +474,7 @@ HCondition::status_t HCondition::do_wait( time_t timeOutSeconds_,
 	/* Error code is not stored in errno but is explicitly returned. */
 	HScopedValueReplacement<int> saveErrno( errno, error );
 	M_ENSURE( ( error == 0 ) || ( error == EINTR ) || ( error == ETIMEDOUT ) );
-	return ( ( error == 0 ) ? OK : ( ( error == EINTR ) ? INTERRUPT : TIMEOUT ) );
+	return ( ( error == 0 ) ? SIGNALED : ( ( error == EINTR ) ? INTERRUPT : TIMEOUT ) );
 	M_EPILOG
 }
 
