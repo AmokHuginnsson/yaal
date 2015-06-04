@@ -476,6 +476,12 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"expressionStatement",
 		HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::commit_expression, _compiler.get(), _1 ) ) ) >> ';'
 	);
+	HRule tryCatchStatement(
+		"tryCatchStatement",
+		constant( KEYWORD::TRY ) >> scope >>
+		constant( KEYWORD::CATCH ) >> '(' >> regex( "exceptionType", identifier ) >> regex( "exceptionVariable", identifier ) >> ')'
+		>> scope
+	);
 	HRule ifClause(
 		"ifClause",
 		e_p::constant( KEYWORD::IF ) >> '(' >> expression >> ')' >> scope,
@@ -488,6 +494,10 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		-( ( constant( KEYWORD::ELSE ) >> scope )[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_else_clause, _compiler.get(), _1 ) )] )
 	);
 	HRule continueStatement( "continueStatement", constant( KEYWORD::CONTINUE ) >> ';' );
+	HRule throwStatement(
+		"throwStatement",
+		constant( KEYWORD::THROW ) >> expression >> ';'
+	);
 	/*
 	 * TODO:
 	 * Allow `break' statement to have literal integer argument
@@ -539,6 +549,8 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| whileStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_while_statement, _compiler.get(), _1 ) )]
 		| forStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_for_statement, _compiler.get(), _1 ) )]
 		| switchStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_switch_statement, _compiler.get(), _1 ) )]
+		| tryCatchStatement
+		| throwStatement
 		| breakStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_break_statement, _compiler.get(), _1 ) )]
 		| continueStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_continue_statement, _compiler.get(), _1 ) )]
 		| returnStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_return_statement, _compiler.get(), _1 ) )]
@@ -580,7 +592,11 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		) >> '{' >> +( field | functionDefinition ) >> '}',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::submit_class, _compiler.get(), _1 ) )
 	);
-	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition ) );
+	HRule importStatement(
+		"importStatement",
+		constant( "import" ) >> regex( "packageName", identifier ) >> "as" >> regex( "importName", identifier ) >> ';'
+	);
+	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition | importStatement ) );
 	return ( huginnGrammar );
 	M_EPILOG
 }
