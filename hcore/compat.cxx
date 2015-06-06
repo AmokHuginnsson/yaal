@@ -194,6 +194,7 @@ public:
 	}
 	void wait( void ) {
 		yaal::hcore::HLock l( _mutex );
+		yaal::hcore::HThread::set_name( "HDarwinTimer" );
 		while ( _loop ) {
 			yaal::hcore::HCondition::status_t status(
 				_cond.wait_for(
