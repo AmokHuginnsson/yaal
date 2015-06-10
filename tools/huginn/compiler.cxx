@@ -746,7 +746,10 @@ void OCompiler::dispatch_plus( executing_parser::position_t position_ ) {
 	fc._valueTypes.pop();
 	HHuginn::type_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
-	if ( ! ( are_congruous( t1, t2 ) && is_summable( t1 ) && is_summable( t2 ) ) ) {
+	if ( ! are_congruous( t1, t2 ) ) {
+		operands_type_mismatch( o == OPERATOR::PLUS ? "+" : "-", t1, t2, position_.get() );
+	}
+	if ( ! ( is_summable( t1 ) && is_summable( t2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException( o == OPERATOR::PLUS ? _errMsgHHuginn_[ERR_CODE::OP_NOT_SUM] : _errMsgHHuginn_[ERR_CODE::OP_NOT_SUB], p );
 	}
 	fc._valueTypes.push( congruent( t1, t2 ) );
@@ -769,7 +772,10 @@ void OCompiler::dispatch_mul( executing_parser::position_t position_ ) {
 	fc._valueTypes.pop();
 	HHuginn::type_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
-	if ( ! ( are_congruous( t1, t2 ) && is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
+	if ( ! are_congruous( t1, t2 ) ) {
+		operands_type_mismatch( o == OPERATOR::MULTIPLY ? "*" : ( o == OPERATOR::DIVIDE ? "/"  : "%" ), t1, t2, position_.get() );
+	}
+	if ( ! ( is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException( o == OPERATOR::MULTIPLY ? _errMsgHHuginn_[ERR_CODE::OP_NOT_MUL] : _errMsgHHuginn_[ERR_CODE::OP_NOT_DIV], p );
 	}
 	fc._valueTypes.push( congruent( t1, t2 ) );
@@ -789,7 +795,10 @@ void OCompiler::dispatch_power( executing_parser::position_t position_ ) {
 		fc._valueTypes.pop();
 		HHuginn::type_t t2( fc._valueTypes.top() );
 		fc._valueTypes.pop();
-		if ( ! ( are_congruous( t1, t2 ) && is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
+		if ( ! are_congruous( t1, t2 ) ) {
+			operands_type_mismatch( "^", t1, t2, p );
+		}
+		if ( ! ( is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
 			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_EXP], p );
 		}
 		fc._valueTypes.push( congruent( t1, t2 ) );
@@ -805,11 +814,12 @@ void OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
 	OPERATOR o( po._operator );
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::LESS ) || ( o == OPERATOR::GREATER ) || ( o == OPERATOR::LESS_OR_EQUAL ) || ( o == OPERATOR::GREATER_OR_EQUAL ) );
+	char const* os( nullptr );
 	switch ( o ) {
-		case ( OPERATOR::LESS ):             { defer_action( &HExpression::less, position_ );             } break;
-		case ( OPERATOR::GREATER ):          { defer_action( &HExpression::greater, position_ );          } break;
-		case ( OPERATOR::LESS_OR_EQUAL ):    { defer_action( &HExpression::less_or_equal, position_ );    } break;
-		case ( OPERATOR::GREATER_OR_EQUAL ): { defer_action( &HExpression::greater_or_equal, position_ ); } break;
+		case ( OPERATOR::LESS ):             { os = "<";  defer_action( &HExpression::less, position_ );             } break;
+		case ( OPERATOR::GREATER ):          { os = ">";  defer_action( &HExpression::greater, position_ );          } break;
+		case ( OPERATOR::LESS_OR_EQUAL ):    { os = "<="; defer_action( &HExpression::less_or_equal, position_ );    } break;
+		case ( OPERATOR::GREATER_OR_EQUAL ): { os = ">="; defer_action( &HExpression::greater_or_equal, position_ ); } break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
 		}
@@ -820,7 +830,10 @@ void OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
 	fc._valueTypes.pop();
 	HHuginn::type_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
-	if ( ! ( are_congruous( t1, t2 ) && is_comparable_congruent( t1 ) && is_comparable_congruent( t2 ) ) ) {
+	if ( ! are_congruous( t1, t2 ) ) {
+		operands_type_mismatch( os, t1, t2, p );
+	}
+	if ( ! ( is_comparable_congruent( t1 ) && is_comparable_congruent( t2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_CMP], p );
 	}
 	fc._valueTypes.push( HHuginn::TYPE::BOOLEAN );
