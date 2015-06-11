@@ -392,6 +392,12 @@ HProgramOptionsHandler::HOption& HProgramOptionsHandler::HOption::default_value(
 	M_EPILOG
 }
 
+HProgramOptionsHandler::HProgramOptionsHandler( yaal::hcore::HString const& package_ )
+	: _options()
+	, _package( package_ ) {
+	return;
+}
+
 void HProgramOptionsHandler::HOptionValueInterface::set( HString const& val ) {
 	M_PROLOG
 	do_set( val );
@@ -482,8 +488,10 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 			}
 		}
 	}
-	if ( !! rc )
+	if ( !! rc ) {
 		rc.close();
+	}
+	set_from_env();
 	log << "done." << endl;
 	return ( 0 );
 	M_EPILOG
@@ -796,8 +804,23 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 			++ ( *unknown_ );
 		}
 	}
+	set_from_env();
 	hcore::log << "done." << endl;
 	return ( optind );
+	M_EPILOG
+}
+
+void HProgramOptionsHandler::set_from_env( void ) {
+	M_PROLOG
+	for ( options_t::iterator it = _options.begin(), end = _options.end(); it != end; ++ it ) {
+		HString lo( _package );
+		lo.append( "_" ).append( it->long_form() ).upper().replace( "-", "_" );
+		char const* fromEnv( ::getenv( lo.raw() ) );
+		if ( fromEnv ) {
+			set_option( *it, fromEnv );
+		}
+	}
+	return;
 	M_EPILOG
 }
 

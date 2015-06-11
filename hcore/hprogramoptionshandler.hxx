@@ -135,10 +135,11 @@ public:
 	typedef HArray<HOption> options_t;
 private:
 	options_t _options;
+	yaal::hcore::HString _package;
 public:
 	/*! \brief Trivial default constructor.
 	 */
-	HProgramOptionsHandler( void ) : _options() {}
+	HProgramOptionsHandler( yaal::hcore::HString const& = PACKAGE_NAME );
 	HProgramOptionsHandler& operator()( HOption );
 	/*! \brief Add new option descriptor to option handler.
 	 *
@@ -202,6 +203,7 @@ public:
 private:
 	void verify_new_option( HOption& );
 	void set_option( HOption&, HString const& );
+	void set_from_env( void );
 };
 
 typedef HExceptionT<HProgramOptionsHandler> HProgramOptionsHandlerException;
