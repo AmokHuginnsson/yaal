@@ -32,9 +32,15 @@ Copyright:
 
 #include "hcore/base.hxx"
 #include "hcore/hstring.hxx"
-#include "hcore/hprogramoptionshandler.hxx"
+#include "hcore/algorithm.hxx"
 
 namespace yaal {
+
+namespace hcore {
+
+class HProgramOptionsHandler;
+
+}
 
 namespace tools {
 
