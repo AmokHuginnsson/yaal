@@ -45,26 +45,18 @@ public:
 	typedef HSerial base_type;
 	/*! \brief Protocol description for Collector device.
 	 */
-	struct PROTOCOL {
-		static char const* const SYN;
-		static char const* const ACK;
-		static char const* const DTA; /* warrning! no endline */
-		static char const* const FIN; /* warrning! no endline, but \0 at end,
-																							 so sizeof() retruns 4 */
-		static char const* const ERR;
-		static int const RECV_BUF_SIZE = 8; /* 5 should be enought but you never know */
-	};
+	static int const RECV_BUF_SIZE = 8; /* 5 should be enought but you never know */
 private:
-	int			_lines;
-	char		_readBuf [ PROTOCOL::RECV_BUF_SIZE + 1 /* for \0 - the terminator */ ];
-	hcore::HString	_line;
+	int  _lines;
+	char _readBuf[ RECV_BUF_SIZE + 1 /* for \0 - the terminator */ ];
+	hcore::HString _line;
 public:
 	HCollector( char const* = NULL ); /* device path */
 	int send_line( char const* );
 	int receive_line( hcore::HString& );
-	int establish_connection ( int = 9999 );
-	int wait_for_connection ( int = 9999 );
-	int read_collector( void ( * )( char const* const, int ) );
+	int establish_connection( int = 9999 );
+	int wait_for_connection( int = 9999 );
+	int read_collector( void (*)( char const*, int ) );
 private:
 	bool test_char( char const*, int ) const;
 };

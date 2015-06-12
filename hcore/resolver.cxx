@@ -112,8 +112,9 @@ HString resolver::get_name( ip_t ip_ ) {
 	int size( NI_MAXHOST );
 	_cache->realloc( size );
 	error = getnameinfo(
-					reinterpret_cast<sockaddr*>( &addr ), static_cast<int>( sizeof ( addr ) ),
-					_cache->get<char>(), static_cast<socklen_t>( size ), NULL, 0, NI_NOFQDN );
+		reinterpret_cast<sockaddr*>( &addr ), static_cast<socklen_t>( sizeof ( addr ) ),
+		_cache->get<char>(), static_cast<socklen_t>( size ), NULL, 0, NI_NOFQDN
+	);
 	HScopedValueReplacement<int> saveErrno( errno, error );
 	M_ENSURE( error == 0 );
 	name = _cache->get<char>();
@@ -126,17 +127,21 @@ HString resolver::get_name( ip_t ip_ ) {
 	while ( ( error = ::gethostbyaddr_r( &addr.sin_addr, sizeof ( addr.sin_addr ),
 				AF_INET, &hostName,
 				_cache->raw(),
-				size, &hostNameStatus, &code ) ) == ERANGE )
+				size, &hostNameStatus, &code ) ) == ERANGE ) {
 		_cache->realloc( size <<= 1 );
-	if ( code )
+	}
+	if ( code ) {
 		log_trace << error_message( code ) << endl;
+	}
 	HScopedValueReplacement<int> saveErrno( errno, error );
 	M_ENSURE( error == 0 );
-	if ( hostNameStatus )
+	if ( hostNameStatus ) {
 		name = hostName.h_name;
+	}
 #endif /* #else #if defined ( HAVE_GETNAMEINFO ) && ( HAVE_GETNAMEINFO != 0 ) */
-	if ( ! name )
+	if ( ! name ) {
 		name = ip_to_string( ip_ );
+	}
 	return ( name );
 	M_EPILOG
 }

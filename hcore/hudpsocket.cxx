@@ -122,7 +122,10 @@ void HUDPSocket::bind( int port_, ip_t ip_ ) {
 	address.sin_family = AF_INET;
 	address.sin_port = fwd_htons( static_cast<int short unsigned>( port_ ) );
 	address.sin_addr.s_addr = ip_.raw();
-	M_ENSURE_EX( ( ::bind( _fileDescriptor, reinterpret_cast<sockaddr*>( &address ), static_cast<int>( sizeof ( address ) ) ) == 0 ), resolver::ip_to_string( ip_ ) + ":" + port_ );
+	M_ENSURE_EX(
+		( ::bind( _fileDescriptor, reinterpret_cast<sockaddr*>( &address ), static_cast<socklen_t>( sizeof ( address ) ) ) == 0 ),
+		resolver::ip_to_string( ip_ ) + ":" + port_
+	);
 	return;
 	M_EPILOG
 }
@@ -133,7 +136,10 @@ void HUDPSocket::connect( ip_t ip_, int port_ ) {
 	address.sin_family = AF_INET;
 	address.sin_port = fwd_htons( static_cast<int short unsigned>( port_ ) );
 	address.sin_addr.s_addr = ip_.raw();
-	M_ENSURE_EX( ( ::connect( _fileDescriptor, reinterpret_cast<sockaddr*>( &address ), static_cast<int>( sizeof ( address ) ) ) == 0 ), resolver::ip_to_string( ip_ ) + ":" + port_ );
+	M_ENSURE_EX(
+		( ::connect( _fileDescriptor, reinterpret_cast<sockaddr*>( &address ), static_cast<socklen_t>( sizeof ( address ) ) ) == 0 ),
+		resolver::ip_to_string( ip_ ) + ":" + port_
+	);
 	return;
 	M_EPILOG
 }
@@ -144,9 +150,12 @@ void HUDPSocket::send_to( ip_t dest_, int port_, void const* data_, int long siz
 	address.sin_family = AF_INET;
 	address.sin_port = fwd_htons( static_cast<int short unsigned>( port_ ) );
 	address.sin_addr.s_addr = dest_.raw();
-	M_ENSURE( ::sendto( _fileDescriptor, data_, static_cast<size_t>( size_ ),
+	M_ENSURE(
+		::sendto( _fileDescriptor, data_, static_cast<size_t>( size_ ),
 				0, reinterpret_cast<sockaddr*>( &address ),
-				static_cast<int>( sizeof ( address ) ) ) == size_ );
+				static_cast<socklen_t>( sizeof ( address ) )
+		) == size_
+	);
 	return;
 	M_EPILOG
 }
@@ -161,7 +170,7 @@ void HUDPSocket::send( void const* data_, int long size_ ) {
 int long HUDPSocket::receive( ODatagram& datagram_ ) {
 	M_PROLOG
 	sockaddr_in address;
-	socklen_t len( static_cast<int>( sizeof ( address ) ) );
+	socklen_t len( static_cast<socklen_t>( sizeof ( address ) ) );
 	int long nRead( ::recvfrom( _fileDescriptor, datagram_._data.raw(),
 				static_cast<size_t>( datagram_._size ), 0, reinterpret_cast<sockaddr*>( &address ), &len ) );
 	datagram_._ip = ip_t( address.sin_addr.s_addr );

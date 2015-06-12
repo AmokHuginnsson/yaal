@@ -52,9 +52,10 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHDeque_[];
 template<typename type_t, typename allocator_t = allocator::system<type_t> >
 class HDeque {
 private:
-	static int long const DEFAULT_CHUNK_SIZE = ( 512 / sizeof ( type_t ) ) * sizeof ( type_t ) + ( ( 512 - ( ( 512 / sizeof ( type_t ) ) * sizeof ( type_t ) ) ) > ( sizeof ( type_t ) / 2 ) ? sizeof ( type_t ) : 0 );
-	static int long const CHUNK_SIZE = meta::max<sizeof ( type_t ), DEFAULT_CHUNK_SIZE>::value;
-	static int long const VALUES_PER_CHUNK = CHUNK_SIZE / sizeof ( type_t );
+	static int const VALUE_SIZE = static_cast<int>( sizeof ( type_t ) );
+	static int long const DEFAULT_CHUNK_SIZE = ( 512 / VALUE_SIZE ) * VALUE_SIZE + ( ( 512 - ( ( 512 / VALUE_SIZE ) * VALUE_SIZE ) ) > ( VALUE_SIZE / 2 ) ? VALUE_SIZE : 0 );
+	static int long const CHUNK_SIZE = meta::max<VALUE_SIZE, DEFAULT_CHUNK_SIZE>::value;
+	static int long const VALUES_PER_CHUNK = CHUNK_SIZE / VALUE_SIZE;
 	static int long const MIN_CHUNKS_COUNT = 8;
 protected:
 	typedef HDeque<type_t> this_type;

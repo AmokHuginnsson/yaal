@@ -216,27 +216,40 @@ void HSerial::set_flags( flag_t flags_ ) {
 
 void HSerial::compile_flags( void ) {
 	M_PROLOG
-	if ( _fileDescriptor >= 0 )
+	if ( _fileDescriptor >= 0 ) {
 		M_THROW( _eAlreadyOpened_, errno );
+	}
 	termios& tIO = *_tIO.get<termios>();
 	int ctr = 0;
-	if ( !!( _flags & FLAG::DEFAULT ) )
+	if ( !!( _flags & FLAG::DEFAULT ) ) {
 		_flags |= tools::_serialFlags_;
+	}
 	/* consistency tests */
-	if ( ( !!( _flags & FLAG::STOP_BITS_1 ) ) && ( !!( _flags & FLAG::STOP_BITS_2 ) ) )
+	if ( ( !!( _flags & FLAG::STOP_BITS_1 ) ) && ( !!( _flags & FLAG::STOP_BITS_2 ) ) ) {
 		M_THROW( _( "stop bits setup inconsistent" ), _flags.value() );
-	if ( ( !!( _flags & FLAG::FLOW_CONTROL_HARDWARE ) ) && ( !!( _flags & FLAG::FLOW_CONTROL_SOFTWARE ) ) )
+	}
+	if ( ( !!( _flags & FLAG::FLOW_CONTROL_HARDWARE ) ) && ( !!( _flags & FLAG::FLOW_CONTROL_SOFTWARE ) ) ) {
 		M_THROW( _( "flow control inconsistent" ), _flags.value() );
-	if ( !!( _flags & FLAG::BITS_PER_BYTE_8 ) )
-		ctr ++, tIO.c_cflag = CS8;
-	if ( !!( _flags & FLAG::BITS_PER_BYTE_7 ) )
-		ctr ++, tIO.c_cflag = CS7;
-	if ( !!( _flags & FLAG::BITS_PER_BYTE_6 ) )
-		ctr ++, tIO.c_cflag = CS6;
-	if ( !!( _flags & FLAG::BITS_PER_BYTE_5 ) )
-		ctr ++, tIO.c_cflag = CS5;
-	if ( ctr != 1 )
+	}
+	if ( !!( _flags & FLAG::BITS_PER_BYTE_8 ) ) {
+		ctr ++;
+		tIO.c_cflag = CS8;
+	}
+	if ( !!( _flags & FLAG::BITS_PER_BYTE_7 ) ) {
+		ctr ++;
+		tIO.c_cflag = CS7;
+	}
+	if ( !!( _flags & FLAG::BITS_PER_BYTE_6 ) ) {
+		ctr ++;
+		tIO.c_cflag = CS6;
+	}
+	if ( !!( _flags & FLAG::BITS_PER_BYTE_5 ) ) {
+		ctr ++;
+		tIO.c_cflag = CS5;
+	}
+	if ( ctr != 1 ) {
 		M_THROW( _( "bits per byte inconsistent" ), _flags.value() );
+	}
 
 	/* compiling settings */
 	/* setting c_cflag */
@@ -254,8 +267,9 @@ void HSerial::compile_flags( void ) {
  *   Newwer interface for setting speed (baudrate)
  */
 	tIO.c_cflag |= CSIZE | CREAD /* | CLOCAL */;
-	if ( !!( _flags & FLAG::FLOW_CONTROL_HARDWARE ) )
+	if ( !!( _flags & FLAG::FLOW_CONTROL_HARDWARE ) ) {
 		tIO.c_cflag |= CRTSCTS;
+	}
 
 	/* setting c_iflag */
 /*
@@ -268,12 +282,15 @@ void HSerial::compile_flags( void ) {
  *   INPCK   : Enable input parity checking.
  */
 	tIO.c_iflag = IGNPAR | IGNBRK | IXANY;
-	if ( !!( _flags & FLAG::CR2NL ) )
+	if ( !!( _flags & FLAG::CR2NL ) ) {
 		tIO.c_iflag |= ICRNL;
-	if ( !!( _flags & FLAG::FLOW_CONTROL_SOFTWARE ) )
+	}
+	if ( !!( _flags & FLAG::FLOW_CONTROL_SOFTWARE ) ) {
 		tIO.c_iflag |= IXON | IXOFF;
-	if ( !!( _flags & FLAG::PARITY_CHECK ) )
+	}
+	if ( !!( _flags & FLAG::PARITY_CHECK ) ) {
 		tIO.c_iflag |= INPCK;
+	}
 
 	/* setting c_oflag */
 /*
@@ -283,12 +300,15 @@ void HSerial::compile_flags( void ) {
  *  PARODD  : Parity for input and output is odd.
  */
 	tIO.c_oflag = 0;
-	if ( !!( _flags & FLAG::STOP_BITS_2 ) )
+	if ( !!( _flags & FLAG::STOP_BITS_2 ) ) {
 		tIO.c_oflag |= CSTOPB;
-	if ( !!( _flags & FLAG::PARITY_CHECK ) )
+	}
+	if ( !!( _flags & FLAG::PARITY_CHECK ) ) {
 		tIO.c_oflag |= PARENB;
-	if ( !!( _flags & FLAG::PARITY_ODD ) )
+	}
+	if ( !!( _flags & FLAG::PARITY_ODD ) ) {
 		tIO.c_oflag |= PARODD;
+	}
 
 /*
  *   ICANON  : enable canonical input disable all echo functionality,
@@ -301,10 +321,12 @@ void HSerial::compile_flags( void ) {
  *   ECHO    : Echo input characters.
  */
 	tIO.c_lflag = IEXTEN;
-	if ( !!( _flags & FLAG::CANONICAL ) )
+	if ( !!( _flags & FLAG::CANONICAL ) ) {
 		tIO.c_lflag |= ICANON;
-	if ( !!( _flags & FLAG::ECHO ) )
-		tIO.c_lflag |= ECHO_VAL;
+	}
+	if ( !!( _flags & FLAG::ECHO ) ) {
+		tIO.c_lflag = tIO.c_iflag | ECHO_VAL;
+	}
 	return;
 	M_EPILOG
 }

@@ -145,8 +145,8 @@ void HDes::_des( u32_t* block_, int action_, int part_ ) {
 	HBitmap rowBmp;
 	HBitmap colBmp;
 	src.use( bufT, DES::BLOCK_SIZE * DES::BITS_IN_BYTE );
-	rowBmp.use( &row, sizeof ( row ) * DES::BITS_IN_BYTE );
-	colBmp.use( &col, sizeof ( col ) * DES::BITS_IN_BYTE );
+	rowBmp.use( &row, static_cast<int long>( sizeof ( row ) * DES::BITS_IN_BYTE ) );
+	colBmp.use( &col, static_cast<int long>( sizeof ( col ) * DES::BITS_IN_BYTE ) );
 	for ( int cycle( 0 ); cycle < DES::IKEYS_COUNT; ++ cycle ) {
 		buf[ 0 ] = 0;
 		u32_t* endKey( NULL );

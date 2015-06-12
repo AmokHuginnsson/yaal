@@ -466,7 +466,7 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 				iPoolSize = _cache.size();
 			}
 			/* We read only one byte at a time. */
-			nRead = do_read( buffer + _offset, sizeof ( char ) * 1 );
+			nRead = do_read( buffer + _offset, static_cast<int>( sizeof ( char ) ) * 1 );
 			/* nRead can be one of the following:
 			 * nRead > 0 - a successful read, we shall check for stop char and possibly continue reading.
 			 * nRead == 0 - stream is blocking and has just been closed or has no data to read and is internally non-blocking.

@@ -45,14 +45,19 @@ namespace yaal {
 
 namespace tools {
 
-char const* const HCollector::PROTOCOL::SYN = "SYN\n";
-char const* const HCollector::PROTOCOL::ACK = "ACK\n";
-char const* const HCollector::PROTOCOL::DTA = "DTA"; /* warrning! no endline */
-char const* const HCollector::PROTOCOL::FIN = "FIN"; /* warrning! no endline, but \0 at end,
-																																	so sizeof() retruns 4 */
-char const* const HCollector::PROTOCOL::ERR = "ERR\n";
+namespace {
 
-int const HCollector::PROTOCOL::RECV_BUF_SIZE; /* 5 should be enought but you never know */
+namespace PROTOCOL {
+
+char const SYN[] = "SYN\n";
+char const ACK[] = "ACK\n";
+char const DTA[] = "DTA"; /* warrning! no endline */
+char const FIN[] = "FIN"; /* warrning! no endline, but \0 at end, so sizeof() retruns 4 */
+char const ERR[] = "ERR\n";
+
+}
+
+}
 
 char const* const _error_ = _( "collector device not opened" );
 
@@ -60,12 +65,12 @@ HCollector::HCollector( char const* devicePath_ )
 					: HSerial( devicePath_ ), _lines( 0 ),
 						_line() {
 	M_PROLOG
-	memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+	memset( _readBuf, 0, RECV_BUF_SIZE );
 	/*
-	 * Actual _readBuf buffer size is equal to PROTOCOL::RECV_BUF_SIZE + 1.
+	 * Actual _readBuf buffer size is equal to RECV_BUF_SIZE + 1.
 	 * So we have additional one byte for string terminator (0).
 	 */
-	_readBuf[ PROTOCOL::RECV_BUF_SIZE ] = 0;
+	_readBuf[ RECV_BUF_SIZE ] = 0;
 	set_flags( HSerial::FLAG_TEXT );
 	return;
 	M_EPILOG
@@ -103,15 +108,15 @@ int HCollector::send_line( char const* line_ ) {
 		cRC += localCopy[ ctr ];
 	line.format ( "%s%02x%02x%s\n", PROTOCOL::DTA,
 			length & 0x0ff, cRC & 0x0ff, localCopy.raw() );
-	::memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+	::memset( _readBuf, 0, RECV_BUF_SIZE );
 	length += static_cast<int>( ::strlen( PROTOCOL::DTA ) );
 	length += ( 2 /* for lenght */ + 2 /* for crc */ + 1 /* for newline */ );
 	while ( ::strncmp( _readBuf, PROTOCOL::ACK, ::strlen( PROTOCOL::ACK ) ) ) {
 		flush( TCOFLUSH );
 		ctr = HRawFile::write( line.raw(), length );
 		wait_for_eot();
-		::memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
-		HRawFile::read( _readBuf, PROTOCOL::RECV_BUF_SIZE );
+		::memset( _readBuf, 0, RECV_BUF_SIZE );
+		HRawFile::read( _readBuf, RECV_BUF_SIZE );
 		flush( TCIFLUSH );
 		error ++;
 	}
@@ -131,9 +136,9 @@ int HCollector::receive_line( HString& line_ ) {
 	while ( ( pCRC != cRC ) || ( pLength != length ) ) {
 		_line = "";
 		_readBuf[ 0 ] = 0;
-		while ( strlen( _readBuf ) < static_cast<size_t>( PROTOCOL::RECV_BUF_SIZE ) ) {
-			::memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
-			HRawFile::read( _readBuf, PROTOCOL::RECV_BUF_SIZE );
+		while ( strlen( _readBuf ) < static_cast<size_t>( RECV_BUF_SIZE ) ) {
+			::memset( _readBuf, 0, RECV_BUF_SIZE );
+			HRawFile::read( _readBuf, RECV_BUF_SIZE );
 			_line += _readBuf;
 		}
 		flush( TCIFLUSH );
@@ -144,10 +149,10 @@ int HCollector::receive_line( HString& line_ ) {
 			cRC += line_[ ctr ];
 		length &= 0x0ff;
 		cRC &= 0x0ff;
-		::memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+		::memset( _readBuf, 0, RECV_BUF_SIZE );
 		::strncpy( _readBuf, _line.raw() + ::strlen( PROTOCOL::DTA ), 2 );
 		pLength = strtol ( _readBuf, NULL, 0x10 );
-		::memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+		::memset( _readBuf, 0, RECV_BUF_SIZE );
 		::strncpy( _readBuf, _line.raw()
 				+ ::strlen( PROTOCOL::DTA ) + 2 /* for Plength */, 2 );
 		pCRC = lexical_cast<int, char const*>( _readBuf );
@@ -174,7 +179,7 @@ int HCollector::establish_connection ( int timeOut_ ) {
 	int lenght = static_cast<int>( ::strlen( PROTOCOL::SYN ) ), error = -1;
 	if ( _fileDescriptor < 0 )
 		M_THROW( _error_, _fileDescriptor );
-	::memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+	::memset( _readBuf, 0, RECV_BUF_SIZE );
 	while ( ::strncmp( _readBuf, PROTOCOL::ACK, ::strlen( PROTOCOL::ACK ) ) ) {
 		flush( TCOFLUSH );
 		if ( HRawFile::write( PROTOCOL::SYN, lenght ) != lenght )
@@ -182,8 +187,8 @@ int HCollector::establish_connection ( int timeOut_ ) {
 		wait_for_eot();
 		if ( tcsendbreak( _fileDescriptor, 0 ) )
 			M_THROW( "tcsendbreak", errno );
-		memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
-		timed_read( _readBuf, PROTOCOL::RECV_BUF_SIZE, 1 );
+		memset( _readBuf, 0, RECV_BUF_SIZE );
+		timed_read( _readBuf, RECV_BUF_SIZE, 1 );
 		flush( TCIFLUSH );
 		error ++;
 		if ( error > timeOut_ )
@@ -200,9 +205,9 @@ int HCollector::wait_for_connection ( int timeOut_ ) {
 	int lenght = static_cast<int>( ::strlen( PROTOCOL::ACK ) );
 	if ( _fileDescriptor < 0 )
 		M_THROW ( _error_, _fileDescriptor );
-	::memset( _readBuf, 0, PROTOCOL::RECV_BUF_SIZE );
+	::memset( _readBuf, 0, RECV_BUF_SIZE );
 	while ( ::strncmp( _readBuf, PROTOCOL::SYN, strlen ( PROTOCOL::SYN ) ) ) {
-		if ( timed_read( _readBuf, PROTOCOL::RECV_BUF_SIZE, timeOut_ ) >= 0 )
+		if ( timed_read( _readBuf, RECV_BUF_SIZE, timeOut_ ) >= 0 )
 			error ++;
 		else
 			return ( -1 );
@@ -222,8 +227,9 @@ int HCollector::read_collector ( void ( *process_line )( char const* const, int 
 	while ( error >= 0 ) {
 		error += receive_line( line );
 		/* '\n' is stripped from each line so we need to FIN treat special */
-		if ( ! ::strncmp( line.raw(), PROTOCOL::FIN, static_cast<int>( sizeof ( PROTOCOL::FIN ) ) ) )
+		if ( ! ::strncmp( line.raw(), PROTOCOL::FIN, sizeof ( PROTOCOL::FIN ) ) ) {
 			break;
+		}
 		process_line( line.raw(), _lines );
 	}
 	return ( error );
