@@ -476,11 +476,14 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"expressionStatement",
 		HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::commit_expression, _compiler.get(), _1 ) ) ) >> ';'
 	);
-	HRule tryCatchStatement(
-		"tryCatchStatement",
-		constant( KEYWORD::TRY ) >> scope >>
+	HRule catchStatement(
+		"catchStatement",
 		constant( KEYWORD::CATCH ) >> '(' >> regex( "exceptionType", identifier ) >> regex( "exceptionVariable", identifier ) >> ')'
 		>> scope
+	);
+	HRule tryCatchStatement(
+		"tryCatchStatement",
+		constant( KEYWORD::TRY ) >> scope >> +catchStatement
 	);
 	HRule ifClause(
 		"ifClause",
