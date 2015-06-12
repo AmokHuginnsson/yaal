@@ -39,9 +39,9 @@ namespace hcore {
 
 namespace {
 	static int const MM = HRandomizer::STATE_SIZE / 2;
-	static u64_t const MATRIX_A = 0xB5026F5AA96619E9ull;
-	static u64_t const UM = 0xFFFFFFFF80000000ull; /* Most significant 33 bits */
-	static u64_t const LM = 0x7FFFFFFFull; /* Least significant 31 bits */
+	static u64_t const MATRIX_A = 0xB5026F5AA96619E9ULL;
+	static u64_t const UM = 0xFFFFFFFF80000000ULL; /* Most significant 33 bits */
+	static u64_t const LM = 0x7FFFFFFFULL; /* Least significant 31 bits */
 }
 
 class HSimpleRandom {
@@ -120,20 +120,23 @@ void HRandomizer::swap( HRandomizer& randomizer_ ) {
 void HRandomizer::init( u64_t seed_ ) {
 	M_PROLOG
 	_state[0] = seed_;
-	for ( _index = 1; _index < STATE_SIZE; ++ _index )
-		_state[_index] = ( 6364136223846793005ull * ( _state[_index-1] ^ ( _state[_index - 1] >> 62 ) ) + static_cast<u64_t>( _index ) );
+	for ( _index = 1; _index < STATE_SIZE; ++ _index ) {
+		_state[_index] = 6364136223846793005ULL * ( _state[_index - 1] ^ ( _state[_index - 1] >> 62 ) );
+		_state[_index] += static_cast<u64_t>( _index );
+	}
 	return;
 	M_EPILOG
 }
 
 void HRandomizer::init( u64_t const* state_, int stateSize_ ) {
 	M_PROLOG
-	init( 19650218ull );
+	init( 19650218ULL );
 	int i( 1 );
 	int j( 0 );
 	int k( ( STATE_SIZE > stateSize_ ? STATE_SIZE : stateSize_ ) );
 	for ( ; k; -- k ) {
-		_state[i] = ( _state[i] ^ ( ( _state[i - 1] ^ ( _state[i - 1] >> 62 ) ) * 3935559000370003845ull ) ) + state_[j] + static_cast<u64_t>( j ); /* non linear */
+		_state[i] = ( _state[i] ^ ( ( _state[i - 1] ^ ( _state[i - 1] >> 62 ) ) * 3935559000370003845ULL ) ) + state_[j];
+		_state[i] += static_cast<u64_t>( j ); /* non linear */
 		++ i;
 		++ j;
 		if ( i >= STATE_SIZE ) {
@@ -144,14 +147,15 @@ void HRandomizer::init( u64_t const* state_, int stateSize_ ) {
 			j = 0;
 	}
 	for ( k = STATE_SIZE - 1; k; -- k ) {
-		_state[i] = ( _state[i] ^ ( (_state[i - 1] ^ ( _state[i - 1] >> 62 ) ) * 2862933555777941757ull ) ) - static_cast<u64_t>( i ); /* non linear */
+		_state[i] = ( _state[i] ^ ( (_state[i - 1] ^ ( _state[i - 1] >> 62 ) ) * 2862933555777941757ULL ) );
+		_state[i] -= static_cast<u64_t>( i ); /* non linear */
 		++ i;
 		if ( i >= STATE_SIZE ) {
 			_state[0] = _state[STATE_SIZE - 1];
 			i = 1;
 		}
 	}
-	_state[0] = 1ull << 63; /* MSB is 1; assuring non-zero initial array */
+	_state[0] = 1ULL << 63; /* MSB is 1; assuring non-zero initial array */
 	return;
 	M_EPILOG
 }
@@ -165,26 +169,26 @@ u64_t HRandomizer::operator()( u64_t range_ ) {
 u64_t HRandomizer::operator()( void ) {
 	M_PROLOG
 	u64_t x( 0 );
-	u64_t const mag01[ 2 ] = { 0ull, MATRIX_A };
+	u64_t const mag01[ 2 ] = { 0ULL, MATRIX_A };
 	if ( _index >= STATE_SIZE ) { /* generate STATE_SIZE words at one time */
 		int i( 0 );
 		for ( ; i < STATE_SIZE - MM; ++ i ) {
 			x = ( _state[i] & UM ) | ( _state[ i + 1 ] & LM );
-			_state[i] = _state[i + MM] ^ ( x >> 1 ) ^ mag01[static_cast<int>( x & 1ull )];
+			_state[i] = _state[i + MM] ^ ( x >> 1 ) ^ mag01[static_cast<int>( x & 1ULL )];
 		}
 		for ( ; i < STATE_SIZE - 1; ++ i ) {
 			x = ( _state[i] & UM ) | ( _state[ i + 1 ] & LM );
-			_state[i] = _state[i + ( MM - STATE_SIZE )] ^ ( x >> 1 ) ^ mag01[static_cast<int>( x & 1ull )];
+			_state[i] = _state[i + ( MM - STATE_SIZE )] ^ ( x >> 1 ) ^ mag01[static_cast<int>( x & 1ULL )];
 		}
 		x = ( _state[ STATE_SIZE - 1 ] & UM ) | ( _state[0] & LM );
-		_state[ STATE_SIZE - 1 ] = _state[ MM - 1 ] ^ ( x >> 1 ) ^ mag01[static_cast<int>( x & 1ull )];
+		_state[ STATE_SIZE - 1 ] = _state[ MM - 1 ] ^ ( x >> 1 ) ^ mag01[static_cast<int>( x & 1ULL )];
 		_index = 0;
 	}
 
 	x = _state[ _index ++ ];
-	x ^= ( x >> 29 ) & 0x5555555555555555ull;
-	x ^= ( x << 17 ) & 0x71D67FFFEDA60000ull;
-	x ^= ( x << 37 ) & 0xFFF7EEE000000000ull;
+	x ^= ( x >> 29 ) & 0x5555555555555555ULL;
+	x ^= ( x << 17 ) & 0x71D67FFFEDA60000ULL;
+	x ^= ( x << 37 ) & 0xFFF7EEE000000000ULL;
 	x ^= ( x >> 43 );
 	return ( x % _range );
 	M_EPILOG

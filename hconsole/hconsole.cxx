@@ -75,7 +75,7 @@ inline void set_color_bits( int& word_, int bits_, int what_ ) {
 		bits_ <<= what_;
 		mask <<= what_;
 	}
-	word_ &= ~ mask;
+	word_ = static_cast<int>( static_cast<int unsigned>( word_ ) & ~ mask );
 	word_ |= bits_;
 	return;
 }

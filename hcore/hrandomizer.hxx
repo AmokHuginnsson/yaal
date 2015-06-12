@@ -56,7 +56,7 @@ public:
  * \param seed - initialize pseudo-random number generator with seed.
  * \param range - upper limit for generated number.
  */
-	HRandomizer( u64_t seed = 5489ull, u64_t range = meta::max_unsigned<u64_t>::value );
+	HRandomizer( u64_t seed = 5489ULL, u64_t range = meta::max_unsigned<u64_t>::value );
 
 /*! \brief Construct new randomizer.
  *

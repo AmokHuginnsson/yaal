@@ -53,10 +53,10 @@ void find_primes( primes_t& primes_, int long unsigned lowerLimit_, int long uns
 	M_PROLOG
 	M_ENSURE( upperLimit_ > lowerLimit_ );
 	primes_.clear();
-	int long memSize( ( upperLimit_ >> 3 ) + 1 );
-	HChunk mem( memSize );
+	int long unsigned memSize( ( upperLimit_ >> 3 ) + 1u );
+	HChunk mem( static_cast<int long>( memSize ) );
 	u8_t* sieve( mem.get<u8_t>() );
-	::memset( sieve, 0xff, static_cast<size_t>( memSize ) );
+	::memset( sieve, 0xff, memSize );
 	int long unsigned limit( static_cast<int long unsigned>( square_root( static_cast<double long>( upperLimit_ ) ) ) + 1 );
 	int long unsigned step( 0 );
 	for ( int long unsigned i( 2 ); i <= limit; ++ i ) {
