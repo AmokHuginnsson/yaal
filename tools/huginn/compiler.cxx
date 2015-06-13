@@ -36,6 +36,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "while.hxx"
 #include "switch.hxx"
 #include "return.hxx"
+#include "throw.hxx"
 #include "break.hxx"
 #include "booleanevaluator.hxx"
 #include "helper.hxx"
@@ -443,6 +444,15 @@ void OCompiler::add_return_statement( executing_parser::position_t ) {
 	M_PROLOG
 	M_ASSERT( ! f()._compilationStack.is_empty() );
 	current_scope()->add_statement( make_pointer<HReturn>( current_expression() ) );
+	reset_expression();
+	return;
+	M_EPILOG
+}
+
+void OCompiler::add_throw_statement( executing_parser::position_t ) {
+	M_PROLOG
+	M_ASSERT( ! f()._compilationStack.is_empty() );
+	current_scope()->add_statement( make_pointer<HThrow>( current_expression() ) );
 	reset_expression();
 	return;
 	M_EPILOG

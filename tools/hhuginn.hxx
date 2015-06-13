@@ -331,6 +331,7 @@ public:
 	int field_index( yaal::hcore::HString const& ) const;
 	values_t get_defaults( void ) const;
 	function_t const& function( int ) const;
+	bool is_kind_of( yaal::hcore::HString const& ) const;
 	HHuginn* huginn( void ) const;
 	value_t create_instance( huginn::HThread*, HObject*, values_t const&, int ) const;
 private:
@@ -370,6 +371,7 @@ public:
 	int field_index( yaal::hcore::HString const& ) const;
 	value_t& field( int );
 	HClass const* get_class( void ) const;
+	bool is_kind_of( yaal::hcore::HString const& ) const;
 private:
 	void reset_methods( void );
 	HObject( HObject const& ) = delete;

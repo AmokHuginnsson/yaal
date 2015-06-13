@@ -148,6 +148,7 @@ struct OCompiler {
 	void commit_if_clause( executing_parser::position_t );
 	void commit_else_clause( executing_parser::position_t );
 	void add_return_statement( executing_parser::position_t );
+	void add_throw_statement( executing_parser::position_t );
 	void add_break_statement( executing_parser::position_t );
 	void add_continue_statement( executing_parser::position_t );
 	void add_while_statement( executing_parser::position_t );
