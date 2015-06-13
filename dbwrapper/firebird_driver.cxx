@@ -208,7 +208,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 			break;
 		}
 		if ( descIn.sqld > 0 ) {
-			res->_descIn.realloc( XSQLDA_LENGTH( descIn.sqld ), HChunk::STRATEGY::EXACT );
+			res->_descIn.realloc( static_cast<int>( XSQLDA_LENGTH( static_cast<int unsigned>( descIn.sqld ) ) ), HChunk::STRATEGY::EXACT );
 			XSQLDA* in( res->_descIn.get<XSQLDA>() );
 			in->version = SQLDA_VERSION1;
 			in->sqln = in->sqld = descIn.sqld;
@@ -227,7 +227,7 @@ void* firebird_db_prepare_query( ODBLink& dbLink_, char const* query_ ) {
 			break;
 		}
 		if ( descOut.sqld > 0 ) {
-			res->_descOut.realloc( XSQLDA_LENGTH( descOut.sqld ), HChunk::STRATEGY::EXACT );
+			res->_descOut.realloc( static_cast<int>( XSQLDA_LENGTH( static_cast<int unsigned>( descOut.sqld ) ) ), HChunk::STRATEGY::EXACT );
 			XSQLDA* out( res->_descOut.get<XSQLDA>() );
 			out->version = SQLDA_VERSION1;
 			out->sqld = out->sqln = descOut.sqld;
