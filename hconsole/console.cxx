@@ -178,14 +178,14 @@ void init_glyphs( void ) {
  * 128 (0x80) - 10000000
  */
 struct ATTR {
-	inline static int value( int const attr_ ) {
+	inline static int value( int attr_ ) {
 		return ( static_cast<int>( COLOR_PAIR( static_cast<int unsigned>(
 							( ( attr_ & COLORS::BG_MASK ) >> 1 )              /* background */
 							| ( attr_ & COLORS::FG_MASK ) ) )                 /* foreground */
 					| ( ( attr_ & COLORS::FG_BOLD ) ? A_BOLD : 0 )        /* brighter foreground */
 					| ( ( attr_ & COLORS::BG_BLINK ) ? A_BLINK : 0 ) ) ); /* brighter background */
 	}
-	inline static int value_fix( int const attr_ ) {
+	inline static int value_fix( int attr_ ) {
 		/*
 		 * On broken terminals we use trick to get bright background,
 		 * first we swap foreground and background colord and then
@@ -418,10 +418,11 @@ void HConsole::set_attr( int attr_ ) const {
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
 	char unsigned byte( static_cast<char unsigned>( attr_ ) );
-	if ( _brokenBrightBackground )
-		static_cast<void>( wattrset( static_cast<WINDOW*>( _window ), ATTR::value_fix( byte ) ) );
-	else
-		static_cast<void>( wattrset( static_cast<WINDOW*>( _window ), ATTR::value( byte ) ) );
+	if ( _brokenBrightBackground ) {
+		static_cast<void>( wattrset( static_cast<WINDOW*>( _window ), static_cast<attr_t>( ATTR::value_fix( byte ) ) ) );
+	} else {
+		static_cast<void>( wattrset( static_cast<WINDOW*>( _window ), static_cast<attr_t>( ATTR::value( byte ) ) ) );
+	}
 	return;
 	M_EPILOG
 }
