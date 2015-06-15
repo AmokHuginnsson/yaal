@@ -589,10 +589,8 @@ void OCompiler::add_try_catch_statement( executing_parser::position_t ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	M_ASSERT( ! fc._compilationStack.is_empty() );
-	HScope::statement_t trCatchStatement( make_pointer<HTryCatch>( fc._compilationStack.top()._context._scope, fc._compilationStack.top()._catches ) );
-	fc._compilationStack.top()._contextsChain.clear();
-	fc._compilationStack.top()._catches.clear();
-	fc._compilationStack.top()._else.reset();
+	HScope::statement_t trCatchStatement( make_pointer<HTryCatch>( current_scope(), fc._compilationStack.top()._catches ) );
+	fc._compilationStack.pop();
 	current_scope()->add_statement( trCatchStatement );
 	reset_expression();
 	return;
