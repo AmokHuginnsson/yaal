@@ -47,12 +47,14 @@ public:
 	typedef yaal::hcore::HArray<statement_t> statement_list_t;
 private:
 	statement_list_t _statements;
+	bool _inline;
 public:
 	HScope( void );
 	virtual ~HScope( void ) {
 		return;
 	}
 	void add_statement( statement_t );
+	void make_inline( void );
 protected:
 	virtual void do_execute( HThread* ) const override;
 private:

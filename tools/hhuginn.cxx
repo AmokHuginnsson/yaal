@@ -478,8 +478,17 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule catchStatement(
 		"catchStatement",
-		constant( KEYWORD::CATCH ) >> '(' >> regex( "exceptionType", identifier ) >> regex( "exceptionVariable", identifier ) >> ')'
-		>> scope
+		constant( KEYWORD::CATCH ) >> '(' >>
+		regex(
+			"exceptionType",
+			identifier,
+			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_type_name, _compiler.get(), _1, _2 ) )
+		) >>
+		regex(
+			"exceptionVariable",
+			identifier,
+			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_identifier, _compiler.get(), _1, _2 ) )
+		) >> ')' >> scope[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_catch, _compiler.get(), _1 ) )]
 	);
 	HRule tryCatchStatement(
 		"tryCatchStatement",
@@ -520,7 +529,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		regex(
 			"forIdentifier",
 			identifier,
-			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_for_identifier, _compiler.get(), _1, _2 ) )
+			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_identifier, _compiler.get(), _1, _2 ) )
 		)
 	);
 	HRule forStatement(
@@ -552,7 +561,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| whileStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_while_statement, _compiler.get(), _1 ) )]
 		| forStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_for_statement, _compiler.get(), _1 ) )]
 		| switchStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_switch_statement, _compiler.get(), _1 ) )]
-		| tryCatchStatement
+		| tryCatchStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_try_catch_statement, _compiler.get(), _1 ) )]
 		| throwStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_throw_statement, _compiler.get(), _1 ) )]
 		| breakStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_break_statement, _compiler.get(), _1 ) )]
 		| continueStatement[HRuleBase::action_position_t( hcore::call( &OCompiler::add_continue_statement, _compiler.get(), _1 ) )]
@@ -723,7 +732,7 @@ HHuginn::values_t HHuginn::HClass::get_defaults( void ) const {
 
 bool HHuginn::HClass::is_kind_of( yaal::hcore::HString const& typeName_ ) const {
 	M_PROLOG
-	return ( typeName_ == _type->name() || ( _super ? _super->is_kind_of( typeName_ ) : false ) );
+	return ( ( typeName_ == _type->name() ) || ( _super ? _super->is_kind_of( typeName_ ) : false ) );
 	M_EPILOG
 }
 

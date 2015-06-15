@@ -37,7 +37,8 @@ namespace tools {
 namespace huginn {
 
 HScope::HScope( void )
-	: _statements() {
+	: _statements()
+	, _inline( false ) {
 	return;
 }
 
@@ -50,7 +51,9 @@ void HScope::add_statement( statement_t statement_ ) {
 
 void HScope::do_execute( HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_scope_frame();
+	if ( ! _inline ) {
+		thread_->create_scope_frame();
+	}
 	for ( statement_t const& s : _statements ) {
 		s->execute( thread_ );
 		M_ASSERT( thread_->current_frame()->values().is_empty() );
@@ -59,9 +62,15 @@ void HScope::do_execute( HThread* thread_ ) const {
 			break;
 		}
 	}
-	thread_->pop_frame();
+	if ( ! _inline ) {
+		thread_->pop_frame();
+	}
 	return;
 	M_EPILOG
+}
+
+void HScope::make_inline( void ) {
+	_inline = true;
 }
 
 }

@@ -91,8 +91,10 @@ OCompiler::OCompilationFrame::OCompilationFrame( HHuginn* huginn_ )
 	: _context( huginn_ )
 	, _contextsChain()
 	, _else()
-	, _forIdentifier()
-	, _forPosition( 0 ) {
+	, _type()
+	, _identifier()
+	, _position( 0 )
+	, _catches() {
 	return;
 }
 
@@ -100,8 +102,10 @@ void OCompiler::OCompilationFrame::clear( void ) {
 	M_PROLOG
 	_contextsChain.clear();
 	_else.reset();
-	_forIdentifier.clear();
-	_forPosition = 0;
+	_type.clear();
+	_identifier.clear();
+	_position = 0;
+	_catches.clear();
 	return;
 	M_EPILOG
 }
@@ -348,6 +352,19 @@ void OCompiler::commit_scope( executing_parser::position_t ) {
 	M_EPILOG
 }
 
+void OCompiler::commit_catch( executing_parser::position_t ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
+	HHuginn::scope_t scope( current_scope() );
+	fc._compilationStack.pop();
+	OCompilationFrame& cf( fc._compilationStack.top() );
+	cf._catches.emplace_back( HTryCatch::OCatch{ cf._type, cf._identifier, scope } );
+	reset_expression();
+	return;
+	M_EPILOG
+}
+
 void OCompiler::reset_expression( void ) {
 	M_PROLOG
 	current_expression() = make_pointer<HExpression>();
@@ -498,11 +515,20 @@ void OCompiler::add_while_statement( executing_parser::position_t ) {
 	M_EPILOG
 }
 
-void OCompiler::set_for_identifier( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+void OCompiler::set_identifier( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OCompilationFrame& cf( f()._compilationStack.top() );
-	cf._forIdentifier = name_;
-	cf._forPosition = position_.get();
+	cf._identifier = name_;
+	cf._position = position_.get();
+	return;
+	M_EPILOG
+}
+
+void OCompiler::set_type_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	OCompilationFrame& cf( f()._compilationStack.top() );
+	cf._type = name_;
+	cf._position = position_.get();
 	return;
 	M_EPILOG
 }
@@ -514,7 +540,7 @@ void OCompiler::add_for_statement( executing_parser::position_t ) {
 	HHuginn::scope_t scope( current_scope() );
 	fc._compilationStack.pop();
 	OCompilationFrame const& cf( fc._compilationStack.top() );
-	current_scope()->add_statement( make_pointer<HFor>( cf._forIdentifier, current_expression(), scope, cf._forPosition ) );
+	current_scope()->add_statement( make_pointer<HFor>( cf._identifier, current_expression(), scope, cf._position ) );
 	-- fc._loopCount;
 	-- fc._loopSwitchCount;
 	reset_expression();
@@ -554,6 +580,20 @@ void OCompiler::add_if_statement( executing_parser::position_t ) {
 	fc._compilationStack.top()._contextsChain.clear();
 	fc._compilationStack.top()._else.reset();
 	current_scope()->add_statement( ifStatement );
+	reset_expression();
+	return;
+	M_EPILOG
+}
+
+void OCompiler::add_try_catch_statement( executing_parser::position_t ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._compilationStack.is_empty() );
+	HScope::statement_t trCatchStatement( make_pointer<HTryCatch>( fc._compilationStack.top()._context._scope, fc._compilationStack.top()._catches ) );
+	fc._compilationStack.top()._contextsChain.clear();
+	fc._compilationStack.top()._catches.clear();
+	fc._compilationStack.top()._else.reset();
+	current_scope()->add_statement( trCatchStatement );
 	reset_expression();
 	return;
 	M_EPILOG

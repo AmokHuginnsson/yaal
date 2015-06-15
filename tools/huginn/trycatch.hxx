@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  while.cxx - this file is integral part of `yaal' project.
+  trycatch.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -24,13 +24,13 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
-#include "hcore/base.hxx"
-M_VCSID( "$Id: " __ID__ " $" )
-M_VCSID( "$Id: " __TID__ " $" )
-#include "while.hxx"
-#include "thread.hxx"
-#include "expression.hxx"
-#include "scope.hxx"
+/* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
+
+#ifndef YAAL_TOOLS_HUGINN_TRYCATCH_HXX_INCLUDED
+#define YAAL_TOOLS_HUGINN_TRYCATCH_HXX_INCLUDED 1
+
+#include "tools/hhuginn.hxx"
+#include "tools/huginn/statement.hxx"
 
 namespace yaal {
 
@@ -38,38 +38,30 @@ namespace tools {
 
 namespace huginn {
 
-HWhile::HWhile( HHuginn::expression_t const& condition_, HHuginn::scope_t const& loop_ )
-	: HStatement()
-	, _condition( condition_ )
-	, _loop( loop_ ) {
-	_loop->make_inline();
-	return;
-}
-
-void HWhile::do_execute( huginn::HThread* thread_ ) const {
-	M_PROLOG
-	thread_->create_loop_frame();
-	HFrame* f( thread_->current_frame() );
-	while ( thread_->can_continue() ) {
-		_condition->execute( thread_ );
-		if ( thread_->can_continue() ) {
-			HHuginn::value_t v( f->result() );
-			M_ASSERT( v->type() == HHuginn::TYPE::BOOLEAN );
-			if ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() ) {
-				_loop->execute( thread_ );
-			} else {
-				break;
-			}
-		}
-	}
-	thread_->pop_frame();
-	return;
-	M_EPILOG
-}
+class HTryCatch : public HStatement {
+public:
+	typedef HTryCatch this_type;
+	typedef HStatement base_type;
+	struct OCatch {
+		yaal::hcore::HString _type;
+		yaal::hcore::HString _identifier;
+		HHuginn::scope_t _scope;
+	};
+	typedef yaal::hcore::HArray<OCatch> catches_t;
+private:
+	HHuginn::scope_t _try;
+	catches_t _catches;
+public:
+	HTryCatch( HHuginn::scope_t const&, catches_t const& );
+protected:
+	virtual void do_execute( HThread* ) const override;
+};
 
 }
 
 }
 
 }
+
+#endif /* #ifndef YAAL_TOOLS_HUGINN_TRYCATCH_HXX_INCLUDED */
 

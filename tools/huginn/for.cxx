@@ -46,11 +46,12 @@ HFor::HFor( yaal::hcore::HString const& variableName_,
 	HHuginn::expression_t const& source_,
 	HHuginn::scope_t const& loop_,
 	int position_ )
-	: HStatement(),
-	_variableName( variableName_ ),
-	_source( source_ ),
-	_loop( loop_ ),
-	_position( position_ ) {
+	: HStatement()
+	, _variableName( variableName_ )
+	, _source( source_ )
+	, _loop( loop_ )
+	, _position( position_ ) {
+	_loop->make_inline();
 	return;
 }
 

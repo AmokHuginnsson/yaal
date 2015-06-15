@@ -33,6 +33,7 @@ Copyright:
 #include "hcore/hstack.hxx"
 #include "tools/huginn/operator.hxx"
 #include "tools/huginn/function.hxx"
+#include "tools/huginn/trycatch.hxx"
 #include "tools/hhuginn.hxx"
 
 namespace yaal {
@@ -64,8 +65,10 @@ struct OCompiler {
 		OScopeContext _context;
 		contexts_t _contextsChain;
 		HHuginn::scope_t _else;
-		yaal::hcore::HString _forIdentifier;
-		int _forPosition;
+		yaal::hcore::HString _type;
+		yaal::hcore::HString _identifier;
+		int _position;
+		HTryCatch::catches_t _catches;
 		OCompilationFrame( HHuginn* );
 		void clear( void );
 	};
@@ -116,7 +119,8 @@ struct OCompiler {
 	HHuginn::function_t create_function( executing_parser::position_t );
 	void submit_class( executing_parser::position_t );
 	void create_lambda( executing_parser::position_t );
-	void set_for_identifier( yaal::hcore::HString const&, executing_parser::position_t );
+	void set_identifier( yaal::hcore::HString const&, executing_parser::position_t );
+	void set_type_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
 	void verify_default_argument( executing_parser::position_t );
 	void track_name_cycle( yaal::hcore::HString const& );
@@ -145,6 +149,7 @@ struct OCompiler {
 	void commit_ternary( executing_parser::position_t );
 	void create_scope( executing_parser::position_t );
 	void commit_scope( executing_parser::position_t );
+	void commit_catch( executing_parser::position_t );
 	void commit_if_clause( executing_parser::position_t );
 	void commit_else_clause( executing_parser::position_t );
 	void add_return_statement( executing_parser::position_t );
@@ -152,6 +157,7 @@ struct OCompiler {
 	void add_break_statement( executing_parser::position_t );
 	void add_continue_statement( executing_parser::position_t );
 	void add_while_statement( executing_parser::position_t );
+	void add_try_catch_statement( executing_parser::position_t );
 	void add_for_statement( executing_parser::position_t );
 	void add_if_statement( executing_parser::position_t );
 	void add_switch_statement( executing_parser::position_t );

@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  if.cxx - this file is integral part of `yaal' project.
+  trycatch.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -27,10 +27,13 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "if.hxx"
+#include "trycatch.hxx"
 #include "thread.hxx"
-#include "expression.hxx"
 #include "scope.hxx"
+
+using namespace yaal;
+using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal {
 
@@ -38,43 +41,18 @@ namespace tools {
 
 namespace huginn {
 
-HIf::HIf(
-	OCompiler::OCompilationFrame::contexts_t const& ifClause_,
-	HHuginn::scope_t const& elseClause_
-) : HStatement(),
-	_ifClauses( ifClause_ ),
-	_elseClause( elseClause_ ) {
-	for ( OCompiler::OScopeContext& sc : _ifClauses ) {
-		sc._scope->make_inline();
-	}
-	if ( !! _elseClause ) {
-		_elseClause->make_inline();
-	}
+HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_ )
+	: HStatement()
+	, _try( try_ )
+	, _catches( catches_ ) {
+	_try->make_inline();
 	return;
 }
 
-void HIf::do_execute( huginn::HThread* thread_ ) const {
+void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_scope_frame();
-	HFrame* f( thread_->current_frame() );
-	bool done( false );
-	for ( if_clauses_t::const_iterator it( _ifClauses.begin() ), end( _ifClauses.end() );
-		( it != end ) && ! done && thread_->can_continue(); ++ it ) {
-		it->expression()->execute( thread_ );
-		if ( thread_->can_continue() ) {
-			HHuginn::value_t v( f->result() );
-			M_ASSERT( v->type() == HHuginn::TYPE::BOOLEAN );
-			if ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() ) {
-				done = true;
-				it->_scope->execute( thread_ );
-			}
-		} else {
-			break;
-		}
-	}
-	if ( ! done && thread_->can_continue() && !! _elseClause ) {
-		_elseClause->execute( thread_ );
-	}
+	thread_->create_loop_frame();
+//	HFrame* f( thread_->current_frame() );
 	thread_->pop_frame();
 	return;
 	M_EPILOG
