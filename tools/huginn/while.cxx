@@ -57,6 +57,7 @@ void HWhile::do_execute( huginn::HThread* thread_ ) const {
 			M_ASSERT( v->type() == HHuginn::TYPE::BOOLEAN );
 			if ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() ) {
 				_loop->execute( thread_ );
+				f->continue_execution();
 			} else {
 				break;
 			}

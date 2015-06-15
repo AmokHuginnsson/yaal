@@ -118,9 +118,6 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 		if ( f->is_loop() ) {
 			++ level;
 		}
-		if ( ( state_ == HFrame::STATE::CONTINUE ) && ( level > 0 ) ) {
-			break;
-		}
 		f->break_execution( state_ );
 		f = f->parent();
 		if ( ! f ) {
@@ -128,6 +125,8 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 		} else if ( ( state_ == HFrame::STATE::RETURN ) && ( f->number() != no ) ) {
 			break;
 		} else if ( ( state_ == HFrame::STATE::BREAK ) && ( level > level_ ) ) {
+			break;
+		} else if ( ( state_ == HFrame::STATE::CONTINUE ) && ( level > 0 ) ) {
 			break;
 		}
 	}

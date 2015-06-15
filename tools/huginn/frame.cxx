@@ -85,6 +85,13 @@ void HFrame::break_execution( STATE state_ ) {
 	return;
 }
 
+void HFrame::continue_execution( void ) {
+	if ( _state == STATE::CONTINUE ) {
+		_state = STATE::NORMAL;
+	}
+	return;
+}
+
 void HFrame::set_result( HHuginn::value_t const& result_ ) {
 	M_PROLOG
 	_result = result_;

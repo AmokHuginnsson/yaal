@@ -71,6 +71,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 			HHuginn::value_t v( it.value() );
 			f->set_variable( _variableName, v, _position );
 			_loop->execute( thread_ );
+			f->continue_execution();
 			it.next();
 		}
 	}

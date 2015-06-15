@@ -74,6 +74,7 @@ public:
 	HHuginn::value_t try_reference( yaal::hcore::HString const&, int );
 	bool can_continue( void ) const;
 	void break_execution( STATE );
+	void continue_execution( void );
 	int number( void ) const;
 	HFrame* parent( void );
 	HThread* thread( void ) const;
