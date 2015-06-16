@@ -122,18 +122,19 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 			++ level;
 		}
 		f->break_execution( state_ );
-		f = f->parent();
-		if ( ! f ) {
+		HFrame* parent( f->parent() );
+		if ( ! parent ) {
 			break;
-		} else if ( ( state_ == HFrame::STATE::RETURN ) && ( f->number() != no ) ) {
+		} else if ( ( state_ == HFrame::STATE::RETURN ) && ( parent->number() != no ) ) {
 			break;
 		} else if ( ( state_ == HFrame::STATE::BREAK ) && ( level > level_ ) ) {
 			break;
 		} else if ( ( state_ == HFrame::STATE::CONTINUE ) && ( level > 0 ) ) {
 			break;
-		} else if ( ( state_ == HFrame::STATE::EXCEPTION ) && f->has_catch() ) {
+		} else if ( ( state_ == HFrame::STATE::EXCEPTION ) && target->has_catch() ) {
 			break;
 		}
+		f = parent;
 	}
 	if ( target ) {
 		target->set_result( value_ );

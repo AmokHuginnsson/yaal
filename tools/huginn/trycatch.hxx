@@ -46,6 +46,7 @@ public:
 		yaal::hcore::HString _type;
 		yaal::hcore::HString _identifier;
 		HHuginn::scope_t _scope;
+		int _position;
 	};
 	typedef yaal::hcore::HArray<OCatch> catches_t;
 private:

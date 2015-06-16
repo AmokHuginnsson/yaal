@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "trycatch.hxx"
 #include "thread.hxx"
 #include "scope.hxx"
+#include "hcore/hfile.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -57,11 +58,10 @@ void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
 		HFrame* f( thread_->current_frame() );
 		HHuginn::value_t v( f->result() );
 		HHuginn::HObject* e( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
-		M_ASSERT( e );
 		bool handled( false );
 		for ( OCatch const& c : _catches ) {
-			if ( e->is_kind_of( c._type ) ) {
-				f->set_variable( c._identifier, v, 0 );
+			if ( ( e && e->is_kind_of( c._type ) ) || ( ! e && ( v->type()->name() == c._type ) ) ) {
+				f->set_variable( c._identifier, v, c._position );
 				c._scope->execute( thread_ );
 				handled = true;
 				break;

@@ -1071,8 +1071,7 @@ huginn::HThread* HHuginn::current_thread( void ) {
 	M_PROLOG
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	threads_t::iterator t( _threads.find( threadId ) );
-	M_ASSERT( t != _threads.end() );
-	return ( t->second.raw() );
+	return ( t != _threads.end() ? t->second.raw() : nullptr );
 	M_EPILOG
 }
 

@@ -359,7 +359,7 @@ void OCompiler::commit_catch( executing_parser::position_t ) {
 	HHuginn::scope_t scope( current_scope() );
 	fc._compilationStack.pop();
 	OCompilationFrame& cf( fc._compilationStack.top() );
-	cf._catches.emplace_back( HTryCatch::OCatch{ cf._type, cf._identifier, scope } );
+	cf._catches.emplace_back( HTryCatch::OCatch{ cf._type, cf._identifier, scope, cf._position } );
 	reset_expression();
 	return;
 	M_EPILOG
