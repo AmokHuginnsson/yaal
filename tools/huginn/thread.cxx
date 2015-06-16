@@ -66,7 +66,7 @@ HFrame const* HThread::current_frame( void ) const {
 void HThread::create_function_frame( HHuginn::HObject* object_, int upCast_ ) {
 	M_PROLOG
 	HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, object_, upCast_, true, false ) );
+	_frames.push( make_pointer<HFrame>( this, parent, object_, upCast_, HFrame::TYPE::FUNCTION ) );
 	return;
 	M_EPILOG
 }
@@ -74,7 +74,7 @@ void HThread::create_function_frame( HHuginn::HObject* object_, int upCast_ ) {
 void HThread::create_loop_frame( void ) {
 	M_PROLOG
 	HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, nullptr, 0, false, true ) );
+	_frames.push( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::LOOP ) );
 	return;
 	M_EPILOG
 }
@@ -82,7 +82,15 @@ void HThread::create_loop_frame( void ) {
 void HThread::create_scope_frame( void ) {
 	M_PROLOG
 	HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, nullptr, 0, false, false ) );
+	_frames.push( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::SCOPE ) );
+	return;
+	M_EPILOG
+}
+
+void HThread::create_try_catch_frame( void ) {
+	M_PROLOG
+	HFrame* parent( current_frame() );
+	_frames.push( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::TRY_CATCH ) );
 	return;
 	M_EPILOG
 }
@@ -103,12 +111,7 @@ bool HThread::can_continue( void ) const {
 
 void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& value_, int level_ ) {
 	M_PROLOG
-	M_ASSERT(
-		( state_ == HFrame::STATE::RETURN )
-		|| ( state_ == HFrame::STATE::BREAK )
-		|| ( state_ == HFrame::STATE::CONTINUE )
-		|| ( state_ == HFrame::STATE::RUNTIME_EXCEPTION )
-	);
+	M_ASSERT( state_ != HFrame::STATE::NORMAL );
 	int level( 0 );
 	HFrame* f( current_frame() );
 	HFrame* target( f );
@@ -127,6 +130,8 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 		} else if ( ( state_ == HFrame::STATE::BREAK ) && ( level > level_ ) ) {
 			break;
 		} else if ( ( state_ == HFrame::STATE::CONTINUE ) && ( level > 0 ) ) {
+			break;
+		} else if ( ( state_ == HFrame::STATE::EXCEPTION ) && f->has_catch() ) {
 			break;
 		}
 	}

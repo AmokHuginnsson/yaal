@@ -44,8 +44,7 @@ HFrame::HFrame(
 	HFrame* parent_,
 	HHuginn::HObject* object_,
 	int upCast_,
-	bool bump_,
-	bool loop_
+	TYPE type_
 ) : _thread( thread_ )
 	, _parent( parent_ )
 	, _object( object_ )
@@ -54,8 +53,8 @@ HFrame::HFrame(
 	, _operations()
 	, _values()
 	, _result( _none_ )
-	, _number( parent_ ? ( parent_->_number + ( bump_ ? 1 : 0 ) ) : 1 )
-	, _loop( loop_ )
+	, _number( parent_ ? ( parent_->_number + ( ( type_ == TYPE::FUNCTION ) ? 1 : 0 ) ) : 1 )
+	, _type( type_ )
 	, _state( STATE::NORMAL ) {
 	return;
 }
@@ -73,7 +72,11 @@ HFrame* HFrame::parent( void ) {
 }
 
 bool HFrame::is_loop( void ) const {
-	return ( _loop );
+	return ( _type == TYPE::LOOP );
+}
+
+bool HFrame::has_catch( void ) const {
+	return ( _type == TYPE::TRY_CATCH );
 }
 
 bool HFrame::can_continue( void ) const {

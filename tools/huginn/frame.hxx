@@ -46,6 +46,12 @@ public:
 	typedef HFrame this_type;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::value_t> variables_t;
 	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
+	enum class TYPE {
+		SCOPE,
+		LOOP,
+		TRY_CATCH,
+		FUNCTION
+	};
 	enum class STATE {
 		NORMAL,
 		RETURN,
@@ -64,10 +70,10 @@ private:
 	values_t _values;
 	HHuginn::value_t _result;
 	int const _number;
-	bool _loop;
+	TYPE _type;
 	STATE _state;
 public:
-	HFrame( HThread*, HFrame*, HHuginn::HObject*, int, bool, bool );
+	HFrame( HThread*, HFrame*, HHuginn::HObject*, int, TYPE );
 	HHuginn::value_t make_variable( yaal::hcore::HString const&, int );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( yaal::hcore::HString const&, int );
@@ -79,6 +85,7 @@ public:
 	HFrame* parent( void );
 	HThread* thread( void ) const;
 	bool is_loop( void ) const;
+	bool has_catch( void ) const;
 	HHuginn::value_t result( void ) const;
 	void set_result( HHuginn::value_t const& );
 	operations_t& operations( void );

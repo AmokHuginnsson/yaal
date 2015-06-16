@@ -51,7 +51,7 @@ HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_ )
 
 void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
-	thread_->create_loop_frame();
+	thread_->create_try_catch_frame();
 //	HFrame* f( thread_->current_frame() );
 	thread_->pop_frame();
 	return;

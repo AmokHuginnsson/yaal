@@ -53,6 +53,7 @@ public:
 	void create_function_frame( HHuginn::HObject*, int );
 	void create_loop_frame( void );
 	void create_scope_frame( void );
+	void create_try_catch_frame( void );
 	void pop_frame( void );
 	HFrame* current_frame( void );
 	HFrame const* current_frame( void ) const;
