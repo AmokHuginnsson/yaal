@@ -151,12 +151,17 @@ void HThread::set_exception( yaal::hcore::HString const& message_, int position_
 }
 
 bool HThread::has_exception( void ) const {
+	M_ASSERT( current_frame() );
+	return ( current_frame()->state() == HFrame::STATE::EXCEPTION );
+}
+
+bool HThread::has_runtime_exception( void ) const {
 	return ( ! _exceptionMessage.is_empty() || ( _exceptionPosition != 0 ) );
 }
 
-void HThread::flush_exception( void ) {
+void HThread::flush_runtime_exception( void ) {
 	M_PROLOG
-	if ( has_exception() ) {
+	if ( has_runtime_exception() ) {
 		int position( _exceptionPosition );
 		_exceptionPosition = 0;
 		HString message( yaal::move( _exceptionMessage ) );

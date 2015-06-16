@@ -83,6 +83,10 @@ bool HFrame::can_continue( void ) const {
 	return ( _state == STATE::NORMAL );
 }
 
+HFrame::STATE HFrame::state( void ) const {
+	return ( _state );
+}
+
 void HFrame::break_execution( STATE state_ ) {
 	_state = state_;
 	return;

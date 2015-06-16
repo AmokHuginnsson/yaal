@@ -86,6 +86,7 @@ public:
 	HThread* thread( void ) const;
 	bool is_loop( void ) const;
 	bool has_catch( void ) const;
+	STATE state( void ) const;
 	HHuginn::value_t result( void ) const;
 	void set_result( HHuginn::value_t const& );
 	operations_t& operations( void );

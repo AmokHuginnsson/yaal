@@ -52,8 +52,28 @@ HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_ )
 void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_try_catch_frame();
-//	HFrame* f( thread_->current_frame() );
-	thread_->pop_frame();
+	_try->execute( thread_ );
+	if ( thread_->has_exception() ) {
+		HFrame* f( thread_->current_frame() );
+		HHuginn::value_t v( f->result() );
+		HHuginn::HObject* e( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
+		M_ASSERT( e );
+		bool handled( false );
+		for ( OCatch const& c : _catches ) {
+			if ( e->is_kind_of( c._type ) ) {
+				f->set_variable( c._identifier, v, 0 );
+				c._scope->execute( thread_ );
+				handled = true;
+				break;
+			}
+		}
+		thread_->pop_frame();
+		if ( ! handled ) {
+			thread_->break_execution( HFrame::STATE::EXCEPTION, v );
+		}
+	} else {
+		thread_->pop_frame();
+	}
 	return;
 	M_EPILOG
 }

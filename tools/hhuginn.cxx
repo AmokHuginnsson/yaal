@@ -753,7 +753,7 @@ HHuginn::HObject::HObject( HClass const* class_, fields_t const& fields_ )
 HHuginn::HObject::~HObject( void ) {
 	M_PROLOG
 	huginn::HThread* t( _class->huginn() ? _class->huginn()->current_thread() : nullptr );
-	if ( t && ! t->has_exception() ) {
+	if ( t && ! t->has_runtime_exception() ) {
 		int destructorIdx( _class->field_index( KEYWORD::DESTRUCTOR ) );
 		HClass const* c( _class->super() );
 		if ( destructorIdx >= 0 ) {
@@ -1040,7 +1040,7 @@ bool HHuginn::execute( void ) {
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 		threads_t::iterator t( _threads.find( threadId ) );
 		M_ASSERT( t != _threads.end() );
-		t->second->flush_exception();
+		t->second->flush_runtime_exception();
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
 		_errorMessage = e.message();

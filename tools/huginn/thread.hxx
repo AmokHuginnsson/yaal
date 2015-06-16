@@ -61,7 +61,8 @@ public:
 	void set_exception( yaal::hcore::HString const&, int );
 	bool can_continue( void ) const;
 	yaal::hcore::HThread::id_t id( void ) const;
-	void flush_exception( void );
+	void flush_runtime_exception( void );
+	bool has_runtime_exception( void ) const;
 	bool has_exception( void ) const;
 	HHuginn& huginn( void );
 private:
