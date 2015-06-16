@@ -111,12 +111,6 @@ public:
 	class HIterable;
 	typedef yaal::hcore::HPointer<HIterable> iterable_t;
 	typedef yaal::hcore::HPointer<huginn::HScope> scope_t;
-	class HIf;
-	class HWhile;
-	class HFor;
-	class HSwitch;
-	class HBreak;
-	class HReturn;
 	class HClass;
 	typedef yaal::hcore::HPointer<HClass> class_t;
 	class HReference;
@@ -134,7 +128,6 @@ public:
 	class HMap;
 	class HObject;
 	class HObjectReference;
-	class HBooleanEvaluator;
 	class HTernaryEvaluator;
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
 	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
