@@ -64,6 +64,8 @@ iter_t find_local( iter_t it, iter_t end, pred_t pred ) {
 void usun_ogonki( yaal::hcore::HString& );
 double long atof_ex( yaal::hcore::HString const&, bool = false );
 yaal::hcore::HString get_token( yaal::hcore::HString const&, yaal::hcore::HString const&, int long );
+yaal::hcore::HString cardinal( int );
+yaal::hcore::HString ordinal( int );
 
 /*! \brief Helper structure for displaing program help and current configuration.
  */

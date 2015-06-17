@@ -90,6 +90,86 @@ HString get_token( yaal::hcore::HString const& s, yaal::hcore::HString const& d,
 	M_EPILOG
 }
 
+yaal::hcore::HString cardinal( int no_ ) {
+	M_PROLOG
+	static char const CARDINALS[][10] = {
+		"zero"
+		"one",
+		"two",
+		"three",
+		"four",
+		"five",
+		"six",
+		"seven",
+		"eight",
+		"nine",
+		"ten",
+		"eleven",
+		"twelve",
+		"thirteen",
+		"fourteen",
+		"fifteen",
+		"sixteen",
+		"seventeen",
+		"eighteen",
+		"nineteen"
+	};
+	HString c;
+	if ( no_ < 0 ) {
+		c.append( "minus " );
+		no_ = -no_;
+	}
+	if ( no_ < 20 ) {
+		c.append( CARDINALS[no_] );
+	} else {
+		c.append( no_ );
+	}
+	return ( c );
+	M_EPILOG
+}
+
+yaal::hcore::HString ordinal( int no_ ) {
+	M_PROLOG
+	static char const ORDINALS[][10] = {
+		"first",
+		"second",
+		"third",
+		"fourth",
+		"fifth",
+		"sixth",
+		"seventh",
+		"eighth",
+		"ninth",
+		"tenth",
+		"eleventh",
+		"twelfth"
+	};
+	HString o;
+	if ( no_ < 1 ) {
+		throw HRuntimeException( "No ordinal for non-positive number: "_ys.append( no_ ).append( "." ) );
+	} else if ( no_ < 13 ) {
+		o = ORDINALS[no_ - 1];
+	} else {
+		static char const SUFFIX[][4] = {
+			"th" /* 0 */,
+			"st" /* 1 */,
+			"nd" /* 2 */,
+			"rd" /* 3 */,
+			"th" /* 4 */,
+			"th" /* 5 */,
+			"th" /* 6 */,
+			"th" /* 7 */,
+			"th" /* 8 */,
+			"th" /* 9 */
+		};
+		int digit( no_ % 10 );
+		o = cardinal( no_ );
+		o.append( SUFFIX[digit] );
+	}
+	return ( o );
+	M_EPILOG
+}
+
 inline bool is_byte( int value ) {
 	return ( value <= static_cast<int>( meta::max_unsigned<char unsigned>::value ) );
 }
