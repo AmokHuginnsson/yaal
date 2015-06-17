@@ -82,7 +82,7 @@ inline HHuginn::value_t find( huginn::HThread*, HHuginn::HObject* object_, HHugi
 	if ( values_.get_size() > 1 ) {
 		if ( values_[1]->type() != HHuginn::TYPE::INTEGER ) {
 			throw HHuginn::HHuginnRuntimeException(
-				"string.find() second argument must be an integer, not a `"_ys.append( values_[0]->type()->name() ).append( "'." ),
+				"string.find() second argument must be an integer, not a `"_ys.append( values_[1]->type()->name() ).append( "'." ),
 				position_
 			);
 		}
