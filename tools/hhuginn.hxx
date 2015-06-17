@@ -571,6 +571,7 @@ public:
 	value_t get_ref( HHuginn::value_t const&, int );
 	void insert( HHuginn::value_t const&, HHuginn::value_t const&, int );
 	bool has_key( HHuginn::value_t const&, int ) const;
+	bool try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ );
 	void erase( HHuginn::value_t const&, int );
 protected:
 	virtual HIterator do_iterator( void ) override;

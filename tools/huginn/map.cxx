@@ -80,6 +80,24 @@ inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HH
 	M_EPILOG
 }
 
+inline HHuginn::value_t get( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "map.get", values_, 1, 2, position_ );
+	HHuginn::HMap* m( dynamic_cast<HHuginn::HMap*>( object_ ) );
+	M_ASSERT( m != nullptr );
+	HHuginn::value_t v;
+	if ( values_.get_size() > 1 ) {
+		bool hasKey( m->try_get( values_[0], v, position_ ) );
+		if ( ! hasKey ) {
+			v = values_[1];
+		}
+	} else {
+		v = m->get( values_[0], position_ );
+	}
+	return ( v );
+	M_EPILOG
+}
+
 inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "map.erase", values_, 1, 1, position_ );
@@ -99,9 +117,11 @@ HHuginn::HClass _mapClass_(
 	nullptr,
 	/* methods */ {
 		"has_key",
+		"get",
 		"erase"
 	}, {
 		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &map::has_key, _1, _2, _3, _4 ) ),
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &map::get, _1, _2, _3, _4 ) ),
 		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &map::erase, _1, _2, _3, _4 ) )
 	}
 );
@@ -144,6 +164,19 @@ HHuginn::value_t HHuginn::HMap::get( HHuginn::value_t const& key_, int position_
 		throw HHuginnRuntimeException( "Key does not exist in map.", position_ );
 	}
 	return ( it->second );
+	M_EPILOG
+}
+
+bool HHuginn::HMap::try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ ) {
+	M_PROLOG
+	verify_key_type( key_->type(), position_ );
+	values_t::iterator it( _data.find( key_ ) );
+	bool found( false );
+	if ( it != _data.end() ) {
+		result_ = it->second;
+		found = true;
+	}
+	return ( found );
 	M_EPILOG
 }
 

@@ -215,7 +215,6 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 void HExpression::make_map( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	M_ASSERT( ! frame_->values().is_empty() );
 	struct ValuePosition {
 		HHuginn::value_t _value;
 		int _position;

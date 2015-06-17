@@ -40,9 +40,24 @@ namespace huginn {
 bool is_keyword( yaal::hcore::HString const& );
 bool is_builtin( yaal::hcore::HString const& );
 bool is_restricted( yaal::hcore::HString const& );
+
 void operands_type_mismatch( char const*, HHuginn::type_t, HHuginn::type_t, int ) __attribute__(( noreturn ));
 void verify_arg_count( yaal::hcore::HString const&, HHuginn::values_t const&, int, int, int );
 void verify_arg_type( yaal::hcore::HString const&, HHuginn::values_t const&, int, HHuginn::type_t, bool, int );
+
+yaal::hcore::HString const& get_string( HHuginn::value_t const& );
+int long get_integer( HHuginn::value_t const& );
+double long get_real( HHuginn::value_t const& );
+yaal::hcore::HNumber const& get_number( HHuginn::value_t const& );
+bool get_boolean( HHuginn::value_t const& );
+char get_character( HHuginn::value_t const& );
+
+yaal::hcore::HString const& get_string( HHuginn::HObject const* );
+int long get_integer( HHuginn::HObject const* );
+double long get_real( HHuginn::HObject const* );
+yaal::hcore::HNumber const& get_number( HHuginn::HObject const* );
+bool get_boolean( HHuginn::HObject const* );
+char get_character( HHuginn::HObject const* );
 
 }
 

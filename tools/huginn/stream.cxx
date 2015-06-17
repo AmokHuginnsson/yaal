@@ -27,8 +27,8 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "tools/hhuginn.hxx"
-#include "hcore/hstreaminterface.hxx"
+#include "stream.hxx"
+#include "iterator.hxx"
 #include "helper.hxx"
 
 using namespace yaal;
@@ -41,61 +41,113 @@ namespace tools {
 
 namespace huginn {
 
-class HStream : public HHuginn::HObject {
-	HStreamInterface::ptr_t _stream;
-	HChunk _buffer;
-	static HHuginn::HClass _streamClass_;
+class HStreamIterator : public HIteratorInterface {
+	HStream* _stream;
+	HString _lineCache;
 public:
-	HStream( HStreamInterface::ptr_t stream_ )
-		: HObject( &_streamClass_ )
-		, _stream( stream_ )
-		, _buffer() {
+	HStreamIterator( HStream* stream_ )
+		: _stream( stream_ )
+		, _lineCache( _stream->read_line_impl() ) {
 		return;
 	}
-	static HHuginn::value_t read( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
-		M_PROLOG
-		verify_arg_count( "Stream.read", values_, 1, 1, position_ );
-		verify_arg_type( "Stream.read", values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
-		int long size( static_cast<int long>( static_cast<HHuginn::HInteger const*>( values_[0].raw() )->value() ) );
-		HStream* s( static_cast<HStream*>( object_ ) );
-		return ( make_pointer<HHuginn::HString>( s->read_impl( size ) ) );
-		M_EPILOG
+protected:
+	virtual HHuginn::value_t do_value( void ) override {
+		return ( make_pointer<HHuginn::HString>( _lineCache ) );
 	}
-	static HHuginn::value_t write( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
-		M_PROLOG
-		verify_arg_count( "Stream.write", values_, 1, 1, position_ );
-		verify_arg_type( "Stream.write", values_, 0, HHuginn::TYPE::STRING, true, position_ );
-		HString const& val( static_cast<HHuginn::HString const*>( values_[0].raw() )->value() );
-		HStream* s( static_cast<HStream*>( object_ ) );
-		s->write_impl( val );
-		return ( _none_ );
-		M_EPILOG
+	virtual bool do_is_valid( void ) override {
+		return ( _stream->is_valid() );
+	}
+	virtual void do_next( void ) override {
+		_lineCache = _stream->read_line_impl();
 	}
 private:
-	HString read_impl( int long size_ ) {
-		M_PROLOG
-		_buffer.realloc( size_ );
-		int long nRead( _stream->read( _buffer.raw(), size_ ) );
-		HString s( _buffer.get<char>(), nRead );
-		return ( s );
-		M_EPILOG
-	}
-	void write_impl( HString const& val_ ) {
-		M_PROLOG
-		_stream->write( val_.raw(), val_.get_length() );
-		M_EPILOG
-	}
+	HStreamIterator( HStreamIterator const& ) = delete;
+	HStreamIterator& operator = ( HStreamIterator const& ) = delete;
 };
 
-HHuginn::HClass HStream::_streamClass_(
+HStream::HStream( HStreamInterface::ptr_t stream_ )
+	: HIterable( &_stream_ )
+	, _stream( stream_ )
+	, _buffer()
+	, _lineBuffer() {
+	return;
+}
+
+HHuginn::value_t HStream::read( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Stream.read";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+	int long size( get_integer( values_[0] ) );
+	HStream* s( static_cast<HStream*>( object_ ) );
+	return ( make_pointer<HHuginn::HString>( s->read_impl( size ) ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::read_line( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "Stream.read_line", values_, 0, 0, position_ );
+	HStream* s( static_cast<HStream*>( object_ ) );
+	return ( make_pointer<HHuginn::HString>( s->read_line_impl() ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HStream::write( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Stream.write";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+	HString const& val( get_string( values_[0] ) );
+	HStream* s( static_cast<HStream*>( object_ ) );
+	s->write_impl( val );
+	return ( _none_ );
+	M_EPILOG
+}
+
+HString HStream::read_impl( int long size_ ) {
+	M_PROLOG
+	_buffer.realloc( size_ );
+	int long nRead( _stream->read( _buffer.raw(), size_ ) );
+	HString s( _buffer.get<char>(), nRead );
+	return ( s );
+	M_EPILOG
+}
+
+void HStream::write_impl( HString const& val_ ) {
+	M_PROLOG
+	_stream->write( val_.raw(), val_.get_length() );
+	M_EPILOG
+}
+
+yaal::hcore::HString const& HStream::read_line_impl( void ) {
+	M_PROLOG
+	_stream->read_until( _lineBuffer );
+	return ( _lineBuffer );
+	M_EPILOG
+}
+
+bool HStream::is_valid( void ) const {
+	M_PROLOG
+	return ( _stream->is_valid() );
+	M_EPILOG
+}
+
+HHuginn::HIterable::HIterator HStream::do_iterator( void ) {
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HStreamIterator( this ) );
+	return ( HIterator( yaal::move( impl ) ) );
+}
+
+HHuginn::HClass HStream::_stream_(
 	nullptr,
 	HHuginn::HType::register_type( "Stream", nullptr ),
 	nullptr,
 	/* methods */ {
 		"read",
-		"read"
+		"read_line",
+		"write"
 	}, {
 		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read, _1, _2, _3, _4 ) ),
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read_line, _1, _2, _3, _4 ) ),
 		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::write, _1, _2, _3, _4 ) )
 	}
 );

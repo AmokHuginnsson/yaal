@@ -77,11 +77,10 @@ inline HHuginn::value_t find( huginn::HThread*, HHuginn::HObject* object_, HHugi
 	int long startAt( 0 );
 	if ( values_.get_size() > 1 ) {
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
-		startAt = static_cast<int long>( static_cast<HHuginn::HInteger const*>( values_[1].raw() )->value() );
+		startAt = get_integer( values_[1] );
 	}
 
-	HHuginn::HString* s( static_cast<HHuginn::HString*>( object_ ) );
-	int long pos( s->value().find( static_cast<HHuginn::HString const*>( values_[0].raw() )->value(), startAt ) );
+	int long pos( get_string( object_ ).find( get_string( values_[0] ), startAt ) );
 	return ( make_pointer<HHuginn::HInteger>( pos != hcore::HString::npos ? pos : -1 ) );
 	M_EPILOG
 }
