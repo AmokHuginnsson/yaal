@@ -71,21 +71,12 @@ namespace string {
 
 inline HHuginn::value_t find( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "string.find", values_, 1, 2, position_ );
-	if ( values_[0]->type() != HHuginn::TYPE::STRING ) {
-		throw HHuginn::HHuginnRuntimeException(
-			"string.find() first argument must be a string, not a `"_ys.append( values_[0]->type()->name() ).append( "'." ),
-			position_
-		);
-	}
+	char const name[] = "string.find";
+	verify_arg_count( name, values_, 1, 2, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
 	int long startAt( 0 );
 	if ( values_.get_size() > 1 ) {
-		if ( values_[1]->type() != HHuginn::TYPE::INTEGER ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"string.find() second argument must be an integer, not a `"_ys.append( values_[1]->type()->name() ).append( "'." ),
-				position_
-			);
-		}
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
 		startAt = static_cast<int long>( static_cast<HHuginn::HInteger const*>( values_[1].raw() )->value() );
 	}
 

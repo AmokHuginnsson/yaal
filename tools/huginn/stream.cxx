@@ -54,13 +54,8 @@ public:
 	}
 	static HHuginn::value_t read( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_arg_count( "stream.read", values_, 1, 1, position_ );
-		if ( values_[0]->type() != HHuginn::TYPE::INTEGER ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"stream.read() argument must be an integer, not a `"_ys.append( values_[0]->type()->name() ).append( "'." ),
-				position_
-			);
-		}
+		verify_arg_count( "Stream.read", values_, 1, 1, position_ );
+		verify_arg_type( "Stream.read", values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
 		int long size( static_cast<int long>( static_cast<HHuginn::HInteger const*>( values_[0].raw() )->value() ) );
 		HStream* s( static_cast<HStream*>( object_ ) );
 		return ( make_pointer<HHuginn::HString>( s->read_impl( size ) ) );
@@ -68,13 +63,8 @@ public:
 	}
 	static HHuginn::value_t write( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		verify_arg_count( "stream.write", values_, 1, 1, position_ );
-		if ( values_[0]->type() != HHuginn::TYPE::INTEGER ) {
-			throw HHuginn::HHuginnRuntimeException(
-				"stream.write() argument must be a string, not a `"_ys.append( values_[0]->type()->name() ).append( "'." ),
-				position_
-			);
-		}
+		verify_arg_count( "Stream.write", values_, 1, 1, position_ );
+		verify_arg_type( "Stream.write", values_, 0, HHuginn::TYPE::STRING, true, position_ );
 		HString const& val( static_cast<HHuginn::HString const*>( values_[0].raw() )->value() );
 		HStream* s( static_cast<HStream*>( object_ ) );
 		s->write_impl( val );

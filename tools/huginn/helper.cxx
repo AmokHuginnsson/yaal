@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
+#include "tools/util.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -81,6 +82,32 @@ void verify_arg_count( yaal::hcore::HString const& name_, HHuginn::values_t cons
 				position_
 			);
 		}
+	}
+	return;
+	M_EPILOG
+}
+
+void verify_arg_type(
+	yaal::hcore::HString const& name_,
+	HHuginn::values_t const& values_,
+	int no_, HHuginn::type_t type_, bool oneArg_, int position_ ) {
+	M_PROLOG
+	if ( values_[no_]->type() != type_ ) {
+		HString no;
+		if ( ! oneArg_ ) {
+			no = util::ordinal( no_ + 1 ).append( " " );
+		}
+		throw HHuginn::HHuginnRuntimeException(
+			""_ys.append( name_ )
+			.append( "() " )
+			.append( no )
+			.append( "argument must be a `" )
+			.append( type_->name() )
+			.append( "', not a `" )
+			.append( values_[no_]->type()->name() )
+			.append( "'." ),
+			position_
+		);
 	}
 	return;
 	M_EPILOG

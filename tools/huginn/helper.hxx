@@ -42,6 +42,7 @@ bool is_builtin( yaal::hcore::HString const& );
 bool is_restricted( yaal::hcore::HString const& );
 void operands_type_mismatch( char const*, HHuginn::type_t, HHuginn::type_t, int ) __attribute__(( noreturn ));
 void verify_arg_count( yaal::hcore::HString const&, HHuginn::values_t const&, int, int, int );
+void verify_arg_type( yaal::hcore::HString const&, HHuginn::values_t const&, int, HHuginn::type_t, bool, int );
 
 }
 
