@@ -87,8 +87,10 @@ public:
 	 */
 	void checkpoints_push( void ) {
 		M_PROLOG
-		_visited.emplace( _visited.top() );
-		_checkpoints.emplace( _checkpoints.top() );
+		visited_t visited( _visited.top() );
+		_visited.emplace( yaal::move( visited ) );
+		visited_t checkpoints( _checkpoints.top() );
+		_checkpoints.emplace( yaal::move( checkpoints ) );
 		return;
 		M_EPILOG
 	}

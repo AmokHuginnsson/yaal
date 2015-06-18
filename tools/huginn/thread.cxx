@@ -66,7 +66,7 @@ HFrame const* HThread::current_frame( void ) const {
 void HThread::create_function_frame( HHuginn::HObject* object_, int upCast_ ) {
 	M_PROLOG
 	HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, object_, upCast_, HFrame::TYPE::FUNCTION ) );
+	_frames.emplace( make_pointer<HFrame>( this, parent, object_, upCast_, HFrame::TYPE::FUNCTION ) );
 	return;
 	M_EPILOG
 }
@@ -74,7 +74,7 @@ void HThread::create_function_frame( HHuginn::HObject* object_, int upCast_ ) {
 void HThread::create_loop_frame( void ) {
 	M_PROLOG
 	HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::LOOP ) );
+	_frames.emplace( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::LOOP ) );
 	return;
 	M_EPILOG
 }
@@ -82,7 +82,7 @@ void HThread::create_loop_frame( void ) {
 void HThread::create_scope_frame( void ) {
 	M_PROLOG
 	HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::SCOPE ) );
+	_frames.emplace( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::SCOPE ) );
 	return;
 	M_EPILOG
 }
@@ -90,13 +90,14 @@ void HThread::create_scope_frame( void ) {
 void HThread::create_try_catch_frame( void ) {
 	M_PROLOG
 	HFrame* parent( current_frame() );
-	_frames.push( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::TRY_CATCH ) );
+	_frames.emplace( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::TRY_CATCH ) );
 	return;
 	M_EPILOG
 }
 
 void HThread::pop_frame( void ) {
 	M_PROLOG
+	frame_t f( _frames.top() );
 	_frames.pop();
 	return;
 	M_EPILOG

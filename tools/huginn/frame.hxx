@@ -77,7 +77,6 @@ public:
 	HHuginn::value_t make_variable( yaal::hcore::HString const&, int );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( yaal::hcore::HString const&, int );
-	HHuginn::value_t try_reference( yaal::hcore::HString const&, int );
 	bool can_continue( void ) const;
 	void break_execution( STATE );
 	void continue_execution( void );

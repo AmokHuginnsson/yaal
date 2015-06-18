@@ -160,15 +160,19 @@ HHuginn::value_t range(
 				}
 			} else {
 				M_ASSERT( baseType == HHuginn::TYPE::STRING );
-				HHuginn::HString* s( static_cast<HHuginn::HString*>( base_.raw() ) );
-				HHuginn::HString* r( static_cast<HHuginn::HString*>( res.raw() ) );
-				if ( step > 0 ) {
-					for ( int long i( from ); i < to; i += step ) {
-						r->value().push_back( s->value()[ i ] );
-					}
+				hcore::HString const& s( static_cast<HHuginn::HString*>( base_.raw() )->value() );
+				hcore::HString& r( static_cast<HHuginn::HString*>( res.raw() )->value() );
+				if ( step == 1 ) {
+					r.assign( s.raw() + from, to - from );
 				} else {
-					for ( int long i( from ); i > to; i += step ) {
-						r->value().push_back( s->value()[ i ] );
+					if ( step > 0 ) {
+						for ( int long i( from ); i < to; i += step ) {
+							r.push_back( s[ i ] );
+						}
+					} else {
+						for ( int long i( from ); i > to; i += step ) {
+							r.push_back( s[ i ] );
+						}
 					}
 				}
 			}

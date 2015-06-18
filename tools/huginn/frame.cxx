@@ -119,39 +119,41 @@ void HFrame::reset( void ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HFrame::try_reference( yaal::hcore::HString const& name_, int position_ ) {
-	M_PROLOG
-	variables_t::iterator it( _variables.find( name_ ) );
-	HHuginn::value_t v;
-	int fieldIdx( -1 );
-	if ( it != _variables.end() ) {
-		v = it->second;
-	} else if ( _object && ( ( fieldIdx = _object->field_index( name_ ) ) >= 0 ) ) {
-		v = _object->field( fieldIdx );
-	} else if ( _object && ( name_ == KEYWORD::THIS ) ) {
-		v = _object->get_pointer();
-		M_ASSERT( !! v );
-	} else if ( _object && ( name_ == KEYWORD::SUPER ) ) {
-		HHuginn::value_t p = _object->get_pointer();
-		M_ASSERT( !! p );
-		v = make_pointer<HHuginn::HObjectReference>( p, _upCast, true, position_ );
-	} else if ( _parent && ( _parent->_number == _number ) ) {
-		v = _parent->try_reference( name_, position_ );
-	} else {
-		HHuginn::function_t f( _thread->huginn().get_function( name_ ) );
-		if ( !! f ) {
-			v = make_pointer<HHuginn::HFunctionReference>( name_, f );
-		}
-	}
-	return ( v );
-	M_EPILOG
-}
-
 HHuginn::value_t HFrame::get_reference( yaal::hcore::HString const& name_, int position_ ) {
 	M_PROLOG
-	HHuginn::value_t v( try_reference( name_, position_ ) );
+	HHuginn::value_t v;
+	int fieldIdx( -1 );
+	HFrame* f( this );
+	while ( f ) {
+		variables_t::iterator it( f->_variables.find( name_ ) );
+		if ( it != f->_variables.end() ) {
+			v = it->second;
+			break;
+		} else if ( f->_object && ( ( fieldIdx = f->_object->field_index( name_ ) ) >= 0 ) ) {
+			v = f->_object->field( fieldIdx );
+			break;
+		} else if ( f->_object && ( name_ == KEYWORD::THIS ) ) {
+			v = f->_object->get_pointer();
+			M_ASSERT( !! v );
+			break;
+		} else if ( f->_object && ( name_ == KEYWORD::SUPER ) ) {
+			HHuginn::value_t p = f->_object->get_pointer();
+			M_ASSERT( !! p );
+			v = make_pointer<HHuginn::HObjectReference>( p, _upCast, true, position_ );
+			break;
+		} else if ( f->_parent && ( f->_parent->_number == _number ) ) {
+			f = f->_parent;
+		} else {
+			break;
+		}
+	}
 	if ( ! v ) {
-		throw HHuginn::HHuginnRuntimeException( "Name `"_ys.append( name_ ).append( "' is not defined." ), position_ );
+		HHuginn::function_t fun( _thread->huginn().get_function( name_ ) );
+		if ( !! fun ) {
+			v = make_pointer<HHuginn::HFunctionReference>( name_, fun );
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "Name `"_ys.append( name_ ).append( "' is not defined." ), position_ );
+		}
 	}
 	return ( v );
 	M_EPILOG

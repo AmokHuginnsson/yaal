@@ -50,6 +50,7 @@ HFunction::HFunction( yaal::hcore::HString const& name_,
 	_parameterNames( parameterNames_ ),
 	_defaultValues( defaultValues_ ),
 	_scope( scope_ ) {
+	_scope->make_inline();
 	return;
 }
 
