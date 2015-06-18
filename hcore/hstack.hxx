@@ -30,7 +30,7 @@ Copyright:
 #ifndef YAAL_HCORE_HSTACK_HXX_INCLUDED
 #define YAAL_HCORE_HSTACK_HXX_INCLUDED 1
 
-#include "hcore/hdeque.hxx"
+#include "hcore/harray.hxx"
 
 namespace yaal {
 
@@ -38,7 +38,7 @@ namespace hcore {
 
 /*! \brief HStack<> - a stack container adaptor.
  */
-template<typename type_t, typename sequence_t = HDeque<type_t> >
+template<typename type_t, typename sequence_t = HArray<type_t> >
 class HStack {
 public:
 	typedef HStack<type_t, sequence_t> this_type;
