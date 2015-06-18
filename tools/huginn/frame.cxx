@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "frame.hxx"
 #include "thread.hxx"
+#include "keyword.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -127,10 +128,10 @@ HHuginn::value_t HFrame::try_reference( yaal::hcore::HString const& name_, int p
 		v = it->second;
 	} else if ( _object && ( ( fieldIdx = _object->field_index( name_ ) ) >= 0 ) ) {
 		v = _object->field( fieldIdx );
-	} else if ( _object && ( name_ == "this" ) ) {
+	} else if ( _object && ( name_ == KEYWORD::THIS ) ) {
 		v = _object->get_pointer();
 		M_ASSERT( !! v );
-	} else if ( _object && ( name_ == "super" ) ) {
+	} else if ( _object && ( name_ == KEYWORD::SUPER ) ) {
 		HHuginn::value_t p = _object->get_pointer();
 		M_ASSERT( !! p );
 		v = make_pointer<HHuginn::HObjectReference>( p, _upCast, true, position_ );

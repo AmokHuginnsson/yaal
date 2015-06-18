@@ -40,6 +40,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "break.hxx"
 #include "booleanevaluator.hxx"
 #include "helper.hxx"
+#include "keyword.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -1146,7 +1147,7 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	if ( huginn::is_keyword( value_ ) ) {
-		if ( ( value_ != "this" ) && ( value_ != "super" ) ) {
+		if ( ( value_ != KEYWORD::THIS ) && ( value_ != KEYWORD::SUPER ) ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
 		} else if ( ! _classContext ) {
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), position_.get() );
@@ -1161,7 +1162,7 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 void OCompiler::defer_get_field_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	OFunctionContext& fc( f() );
 	if ( huginn::is_keyword( value_ ) ) {
-		if ( value_ != "constructor" ) {
+		if ( value_ != KEYWORD::CONSTRUCTOR ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
 		} else if ( ! _classContext ) {
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), position_.get() );

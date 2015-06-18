@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
+#include "keyword.hxx"
 #include "tools/util.hxx"
 
 using namespace yaal;
@@ -39,6 +40,24 @@ namespace yaal {
 namespace tools {
 
 namespace huginn {
+
+bool is_keyword( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	return ( _keywords_.count( name_ ) > 0 );
+	M_EPILOG
+}
+
+bool is_builtin( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	return ( ( _keywords_.count( name_ ) > 0 ) || ( _builtin_.count( name_ ) > 0 ) );
+	M_EPILOG
+}
+
+bool is_restricted( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	return ( ( _keywords_.count( name_ ) > 0 ) || ( _builtin_.count( name_ ) > 0 ) || ( _standardLibrary_.count( name_ ) > 0 ) );
+	M_EPILOG
+}
 
 void operands_type_mismatch( char const* op_, HHuginn::type_t t1_, HHuginn::type_t t2_, int pos_ ) {
 	hcore::HString msg( "Operand types for `" );

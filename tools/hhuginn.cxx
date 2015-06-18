@@ -40,6 +40,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/compiler.hxx"
 #include "tools/huginn/iterator.hxx"
 #include "tools/huginn/helper.hxx"
+#include "tools/huginn/keyword.hxx"
 #include "streamtools.hxx"
 
 using namespace yaal;
@@ -87,105 +88,9 @@ HHuginn::type_t const HHuginn::TYPE::UNKNOWN( HHuginn::HType::register_type( "*u
 HHuginn::type_t const HHuginn::TYPE::NOT_BOOLEAN( HHuginn::HType::register_type( "*not_boolean*", nullptr ) );
 
 namespace {
-
-typedef yaal::hcore::HHashSet<yaal::hcore::HString>  words_t;
-
-words_t _directives_ = {{
-	"import"
-}};
-
-namespace KEYWORD {
-
-char const CONSTRUCTOR[] = "constructor";
-char const DESTRUCTOR[] = "destructor";
-char const BREAK[] = "break";
-char const CASE[] = "case";
-char const CATCH[] = "catch";
-char const CLASS[] = "class";
-char const CONTINUE[] = "continue";
-char const DEFAULT[] = "default";
-char const ELSE[] = "else";
-char const FALSE[] = "false";
-char const FOR[] = "for";
-char const IF[] = "if";
-char const NONE[] = "none";
-char const RETURN[] = "return";
-char const SUPER[] = "super";
-char const SWITCH[] = "switch";
-char const THIS[] = "this";
-char const THROW[] = "throw";
-char const TRUE[] = "true";
-char const TRY[] = "try";
-char const WHILE[] = "while";
-
-}
-
-words_t _keywords_ = {{
-	KEYWORD::BREAK,
-	KEYWORD::CASE,
-	KEYWORD::CATCH,
-	KEYWORD::CLASS,
-	KEYWORD::CONSTRUCTOR,
-	KEYWORD::CONTINUE,
-	KEYWORD::DEFAULT,
-	KEYWORD::DESTRUCTOR,
-	KEYWORD::ELSE,
-	KEYWORD::FALSE,
-	KEYWORD::FOR,
-	KEYWORD::IF,
-	KEYWORD::NONE,
-	"null",
-	KEYWORD::RETURN,
-	KEYWORD::SUPER,
-	KEYWORD::SWITCH,
-	KEYWORD::THIS,
-	KEYWORD::THROW,
-	KEYWORD::TRUE,
-	KEYWORD::TRY,
-	KEYWORD::WHILE
-}};
-
-words_t _builtin_ = {{
-	"boolean",
-	"character",
-	"integer",
-	"list",
-	"map",
-	"number",
-	"real",
-	"string",
-	"type",
-	"size",
-	"copy"
-}};
-
-words_t _standardLibrary_ = {{
-	"file",
-	"print",
-	"input"
-}};
-
 }
 
 namespace huginn {
-
-bool is_keyword( yaal::hcore::HString const& name_ ) {
-	M_PROLOG
-	return ( _keywords_.count( name_ ) > 0 );
-	M_EPILOG
-}
-
-bool is_builtin( yaal::hcore::HString const& name_ ) {
-	M_PROLOG
-	return ( ( _keywords_.count( name_ ) > 0 ) || ( _builtin_.count( name_ ) > 0 ) );
-	M_EPILOG
-}
-
-bool is_restricted( yaal::hcore::HString const& name_ ) {
-	M_PROLOG
-	return ( ( _keywords_.count( name_ ) > 0 ) || ( _builtin_.count( name_ ) > 0 ) || ( _standardLibrary_.count( name_ ) > 0 ) );
-	M_EPILOG
-}
 
 char const* _errMsgHHuginn_[ 10 ] = {
 	_( "Operands are not summable." ),
