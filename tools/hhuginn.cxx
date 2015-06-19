@@ -104,9 +104,11 @@ char const* _errMsgHHuginn_[ 10 ] = {
 	_( "Subscript is not an integer." )
 };
 
-}
-
 HHuginn::value_t _none_ = make_pointer<HHuginn::HValue>( HHuginn::TYPE::NONE );
+HHuginn::value_t _true_ = make_pointer<HHuginn::HBoolean>( true );
+HHuginn::value_t _false_ = make_pointer<HHuginn::HBoolean>( false );
+
+}
 
 executing_parser::HRule HHuginn::make_engine( void ) {
 	M_PROLOG
@@ -133,7 +135,8 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		constant(
 			'(',
 			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
-		) >> -argList >> ')',
+		) >> -argList >>
+		constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::set_position, _compiler.get(), _1 ) ) ),
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
 	HRule stringLiteral(
@@ -142,15 +145,15 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule literalNone(
 		"none",
-		constant( KEYWORD::NONE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_none, _compiler.get(), _1 ) ) )
+		constant( KEYWORD::NONE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _none_, _1 ) ) )
 	);
 	HRule booleanLiteralTrue(
 		"true",
-		constant( KEYWORD::TRUE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_boolean, _compiler.get(), true, _1 ) ) )
+		constant( KEYWORD::TRUE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _true_, _1 ) ) )
 	);
 	HRule booleanLiteralFalse(
 		"false",
-		constant( KEYWORD::FALSE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_boolean, _compiler.get(), false, _1 ) ) )
+		constant( KEYWORD::FALSE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _false_, _1 ) ) )
 	);
 	HRule numberLiteral(
 		"numberLiteral",
@@ -1047,6 +1050,12 @@ char const* HHuginn::error_message( int code_ ) const {
 	return ( ::error_message( code_ ) );
 }
 
+yaal::hcore::HString HHuginn::get_snippet( int from_, int len_ ) const {
+	M_PROLOG
+	return ( _source->get_snippet( from_, len_ ) );
+	M_EPILOG
+}
+
 void HHuginn::set_input_stream( yaal::hcore::HStreamInterface::ptr_t stream_ ) {
 	M_PROLOG
 	_inputStream = stream_;
@@ -1523,6 +1532,19 @@ inline HHuginn::value_t input( huginn::HThread* thread_, HHuginn::HObject*, HHug
 	M_EPILOG
 }
 
+inline HHuginn::value_t assert( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "assert";
+	verify_arg_count( name, values_, 2, 3, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::BOOLEAN, false, position_ );
+	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+	if ( ! get_boolean( values_[0] ) ) {
+		throw HHuginn::HHuginnRuntimeException( get_string( values_[values_.get_size() - 1] ), position_ );
+	}
+	return ( _none_ );
+	M_EPILOG
+}
+
 }
 
 void HHuginn::register_builtins( void ) {
@@ -1540,6 +1562,7 @@ void HHuginn::register_builtins( void ) {
 	_functions.insert( make_pair<yaal::hcore::HString const>( "map", hcore::call( &huginn_builtin::map, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "assert", hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ) ) );
 	return;
 	M_EPILOG
 }

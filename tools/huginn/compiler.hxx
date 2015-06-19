@@ -85,6 +85,7 @@ struct OCompiler {
 		int _loopCount;
 		int _loopSwitchCount;
 		OPERATOR _lastDereferenceOperator;
+		bool _isAssert;
 		yaal::hcore::HString _lastMemberName;
 		OFunctionContext( HHuginn* );
 	};
@@ -120,6 +121,7 @@ struct OCompiler {
 	void submit_class( executing_parser::position_t );
 	void create_lambda( executing_parser::position_t );
 	void set_identifier( yaal::hcore::HString const&, executing_parser::position_t );
+	void set_position( executing_parser::position_t );
 	void set_type_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
 	void verify_default_argument( executing_parser::position_t );
@@ -190,8 +192,6 @@ struct OCompiler {
 	void defer_store_string( yaal::hcore::HString const&, executing_parser::position_t );
 	void defer_store_number( yaal::hcore::HString const&, executing_parser::position_t );
 	void defer_store_character( char, executing_parser::position_t );
-	void defer_store_boolean( bool, executing_parser::position_t );
-	void defer_store_none( executing_parser::position_t );
 	void defer_call( yaal::hcore::HString const&, executing_parser::position_t );
 private:
 	OCompiler( OCompiler const& ) = delete;

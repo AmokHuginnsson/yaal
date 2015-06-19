@@ -37,6 +37,7 @@ namespace huginn {
 
 namespace KEYWORD {
 
+char const* ASSERT = "assert";
 char const* CONSTRUCTOR = "constructor";
 char const* DESTRUCTOR = "destructor";
 char const* BREAK = "break";
@@ -66,6 +67,7 @@ words_t _directives_ = {{
 }};
 
 words_t _keywords_ = {{
+	KEYWORD::ASSERT,
 	KEYWORD::BREAK,
 	KEYWORD::CASE,
 	KEYWORD::CATCH,
@@ -90,7 +92,6 @@ words_t _keywords_ = {{
 }};
 
 words_t _builtin_ = {{
-	"assert", /* is actually a keyword but its simpler if it is handled as builtin */
 	"boolean",
 	"character",
 	"integer",

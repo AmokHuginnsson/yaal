@@ -97,8 +97,7 @@ public:
 	void store_string( yaal::hcore::HString const&, huginn::HFrame*, int );
 	void store_number( yaal::hcore::HString const&, huginn::HFrame*, int );
 	void store_character( char, huginn::HFrame*, int );
-	void store_boolean( bool, huginn::HFrame*, int );
-	void store_none( huginn::HFrame*, int );
+	bool is_empty( void ) const;
 protected:
 	virtual void do_execute( huginn::HThread* ) const override;
 private:

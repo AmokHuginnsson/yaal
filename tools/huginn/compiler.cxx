@@ -41,6 +41,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "booleanevaluator.hxx"
 #include "helper.hxx"
 #include "keyword.hxx"
+#include "hcore/hfile.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -122,6 +123,7 @@ OCompiler::OFunctionContext::OFunctionContext( HHuginn* huginn_ )
 	, _loopCount( 0 )
 	, _loopSwitchCount( 0 )
 	, _lastDereferenceOperator( OPERATOR::NONE )
+	, _isAssert( false )
 	, _lastMemberName() {
 	_compilationStack.emplace( huginn_ );
 	return;
@@ -520,6 +522,14 @@ void OCompiler::set_identifier( yaal::hcore::HString const& name_, executing_par
 	M_PROLOG
 	OCompilationFrame& cf( f()._compilationStack.top() );
 	cf._identifier = name_;
+	cf._position = position_.get();
+	return;
+	M_EPILOG
+}
+
+void OCompiler::set_position( executing_parser::position_t position_ ) {
+	M_PROLOG
+	OCompilationFrame& cf( f()._compilationStack.top() );
 	cf._position = position_.get();
 	return;
 	M_EPILOG
@@ -979,10 +989,13 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	int p( position_.get() );
+	if ( fc._isAssert ) {
+		throw HHuginn::HHuginnRuntimeException( "`assert' is a restricted keyword.", p );
+	}
 	OPERATOR op( fc._operations.top()._operator );
 	int range( 0 );
 	bool nonInteger( false );
-	int p( position_.get() );
 	while ( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) ) {
 		if ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) {
 			++ range;
@@ -1013,6 +1026,20 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 void OCompiler::dispatch_function_call( expression_action_t const& action_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	if ( fc._isAssert ) {
+		int from( position_.get() + 1 );
+		int len( fc._compilationStack.top()._position - from );
+		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), OPERATOR::FUNCTION_ARGUMENT, _1, position_.get() ) );
+		current_expression()->add_execution_step(
+			hcore::call(
+				&HExpression::store_direct, current_expression().raw(),
+				make_pointer<HHuginn::HString>( _huginn->get_snippet( from, len ).trim() ),
+				_1,
+				position_.get()
+			)
+		);
+		fc._isAssert = false;
+	}
 	while ( ! fc._operations.is_empty() && ( fc._operations.top()._operator == OPERATOR::FUNCTION_ARGUMENT ) ) {
 		fc._operations.pop();
 		fc._valueTypes.pop();
@@ -1028,9 +1055,12 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 	M_EPILOG
 }
 
-void OCompiler::dispatch_member_access( executing_parser::position_t ) {
+void OCompiler::dispatch_member_access( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	if ( fc._isAssert ) {
+		throw HHuginn::HHuginnRuntimeException( "`assert' is a restricted keyword.", position_.get() );
+	}
 	fc._valueTypes.pop();
 	fc._valueTypes.push( HHuginn::TYPE::REFERENCE );
 	fc._operations.pop();
@@ -1146,15 +1176,17 @@ void OCompiler::make_reference( executing_parser::position_t position_ ) {
 
 void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executing_parser::position_t position_ ) {
 	M_PROLOG
+	OFunctionContext& fc( f() );
 	if ( huginn::is_keyword( value_ ) ) {
-		if ( ( value_ != KEYWORD::THIS ) && ( value_ != KEYWORD::SUPER ) ) {
+		fc._isAssert = value_ == KEYWORD::ASSERT;
+		if ( ( ( value_ != KEYWORD::THIS ) && ( value_ != KEYWORD::SUPER ) && ! fc._isAssert ) || ( fc._isAssert && ! current_expression()->is_empty() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
-		} else if ( ! _classContext ) {
+		} else if ( ! fc._isAssert && ! _classContext ) {
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), position_.get() );
 		}
 	}
 	current_expression()->add_execution_step( hcore::call( &HExpression::get_reference, current_expression().raw(), value_, _1, position_.get() ) );
-	f()._valueTypes.push( HHuginn::TYPE::UNKNOWN );
+	fc._valueTypes.push( HHuginn::TYPE::UNKNOWN );
 	return;
 	M_EPILOG
 }
@@ -1231,22 +1263,6 @@ void OCompiler::defer_store_character( char value_, executing_parser::position_t
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::store_character, current_expression().raw(), value_, _1, position_.get() ) );
 	f()._valueTypes.push( HHuginn::TYPE::CHARACTER );
-	return;
-	M_EPILOG
-}
-
-void OCompiler::defer_store_boolean( bool value_, executing_parser::position_t position_ ) {
-	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( &HExpression::store_boolean, current_expression().raw(), value_, _1, position_.get() ) );
-	f()._valueTypes.push( HHuginn::TYPE::BOOLEAN );
-	return;
-	M_EPILOG
-}
-
-void OCompiler::defer_store_none( executing_parser::position_t position_ ) {
-	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( &HExpression::store_none, current_expression().raw(), _1, position_.get() ) );
-	f()._valueTypes.push( HHuginn::TYPE::NONE );
 	return;
 	M_EPILOG
 }

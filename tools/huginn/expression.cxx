@@ -85,6 +85,12 @@ void HExpression::merge( HExpression& expression_ ) {
 	M_EPILOG
 }
 
+bool HExpression::is_empty( void ) const {
+	M_PROLOG
+	return ( _executionSteps.is_empty() );
+	M_EPILOG
+}
+
 void HExpression::oper( OPERATOR operator_, HFrame* frame_, int position_ ) {
 	M_PROLOG
 	frame_->operations().emplace( operator_, position_ );
@@ -642,20 +648,6 @@ void HExpression::store_number( yaal::hcore::HString const& value_, HFrame* fram
 void HExpression::store_character( char value_, HFrame* frame_, int ) {
 	M_PROLOG
 	frame_->values().push( make_pointer<HHuginn::HCharacter>( value_ ) );
-	return;
-	M_EPILOG
-}
-
-void HExpression::store_boolean( bool value_, HFrame* frame_, int ) {
-	M_PROLOG
-	frame_->values().push( make_pointer<HHuginn::HBoolean>( value_ ) );
-	return;
-	M_EPILOG
-}
-
-void HExpression::store_none( HFrame* frame_, int ) {
-	M_PROLOG
-	frame_->values().push( _none_ );
 	return;
 	M_EPILOG
 }

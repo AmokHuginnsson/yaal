@@ -39,6 +39,7 @@ namespace huginn {
 
 namespace KEYWORD {
 
+extern char const* ASSERT;
 extern char const* CONSTRUCTOR;
 extern char const* DESTRUCTOR;
 extern char const* BREAK;

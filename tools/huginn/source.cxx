@@ -131,6 +131,12 @@ char const* HSource::error_message( int code_ ) const {
 	return ( ::error_message( code_ ) );
 }
 
+yaal::hcore::HString HSource::get_snippet( int from_, int len_ ) const {
+	M_PROLOG
+	return ( HString( _preprocessed.get<char>() + from_, len_ ) );
+	M_EPILOG
+}
+
 yaal::hcore::HString::const_iterator HSource::begin( void ) const {
 	M_PROLOG
 	return ( _preprocessed.get<char const>() );

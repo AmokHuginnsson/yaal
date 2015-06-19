@@ -242,6 +242,7 @@ public:
 	yaal::hcore::HStreamInterface& output_stream( void );
 	yaal::hcore::HStreamInterface& error_stream( void );
 	function_t get_function( yaal::hcore::HString const& );
+	yaal::hcore::HString get_snippet( int, int ) const;
 private:
 	void commit_classes( void );
 	HClass const* commit_class( yaal::hcore::HString const& );
@@ -597,7 +598,13 @@ private:
 	virtual value_t do_clone( void ) const override;
 };
 
+namespace huginn {
+
 extern HHuginn::value_t _none_;
+extern HHuginn::value_t _true_;
+extern HHuginn::value_t _false_;
+
+}
 
 }
 
