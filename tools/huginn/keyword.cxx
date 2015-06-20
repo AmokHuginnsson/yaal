@@ -107,7 +107,7 @@ words_t _builtin_ = {{
 }};
 
 words_t _standardLibrary_ = {{
-	"file",
+	"Exception",
 	"print",
 	"input"
 }};

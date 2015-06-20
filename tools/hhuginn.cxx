@@ -108,6 +108,12 @@ HHuginn::value_t _none_ = make_pointer<HHuginn::HValue>( HHuginn::TYPE::NONE );
 HHuginn::value_t _true_ = make_pointer<HHuginn::HBoolean>( true );
 HHuginn::value_t _false_ = make_pointer<HHuginn::HBoolean>( false );
 
+namespace exception {
+
+extern HHuginn::class_t _class_;
+
+}
+
 }
 
 executing_parser::HRule HHuginn::make_engine( void ) {
@@ -617,6 +623,12 @@ HHuginn* HHuginn::HClass::huginn( void ) const {
 
 HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, HObject*, values_t const& values_, int position_ ) const {
 	M_PROLOG
+	return ( do_create_instance( thread_, values_, position_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, values_t const& values_, int position_ ) const {
+	M_PROLOG
 	value_t v( make_pointer<HObject>( this ) );
 	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR ) );
 	if ( constructorIdx >= 0 ) {
@@ -905,6 +917,7 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 
 void HHuginn::commit_classes( void ) {
 	M_PROLOG
+	_classes.insert( make_pair<hcore::HString>( "Exception", exception::_class_ ) );
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
 	t->create_function_frame( nullptr, 0 );

@@ -127,6 +127,7 @@ public:
 	typedef yaal::hcore::HPointer<HList> list_t;
 	class HMap;
 	class HObject;
+	class HException;
 	class HObjectReference;
 	class HTernaryEvaluator;
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
@@ -319,6 +320,8 @@ private:
 public:
 	HClass( HHuginn*, type_t, HClass const*, field_names_t const&, values_t const& );
 	HClass const* super( void ) const;
+	virtual ~HClass( void ) {
+	}
 	yaal::hcore::HString const& name( void ) const;
 	type_t type( void ) const;
 	field_names_t const& field_names( void ) const;
@@ -329,6 +332,7 @@ public:
 	HHuginn* huginn( void ) const;
 	value_t create_instance( huginn::HThread*, HObject*, values_t const&, int ) const;
 private:
+	virtual value_t do_create_instance( huginn::HThread*, values_t const&, int ) const;
 	HClass( HClass const& ) = delete;
 	HClass& operator = ( HClass const& ) = delete;
 };
@@ -594,6 +598,19 @@ public:
 	HFunctionReference( yaal::hcore::HString const&, HHuginn::function_t const& );
 	yaal::hcore::HString const& name( void ) const;
 	HHuginn::function_t const& function( void ) const;
+private:
+	virtual value_t do_clone( void ) const override;
+};
+
+class HHuginn::HException : public HHuginn::HObject {
+public:
+	typedef HHuginn::HException this_type;
+	typedef HHuginn::HObject base_type;
+private:
+	yaal::hcore::HString _message;
+public:
+	HException( yaal::hcore::HString const& );
+	yaal::hcore::HString const& what( void ) const;
 private:
 	virtual value_t do_clone( void ) const override;
 };
