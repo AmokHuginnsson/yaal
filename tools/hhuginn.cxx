@@ -132,11 +132,9 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule argList( "argList", arg >> ( * ( ',' >> arg ) ) );
 	HRule functionCallOperator(
 		"functionCallOperator",
-		constant(
-			'(',
-			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
-		) >> -argList >>
-		constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::set_position, _compiler.get(), _1 ) ) ),
+		constant( '(', HRuleBase::action_position_t( hcore::call( &OCompiler::start_function_call, _compiler.get(), _1 ) ) )
+		>> -argList >>
+		constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::close_function_call, _compiler.get(), _1 ) ) ),
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
 	HRule stringLiteral(

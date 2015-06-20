@@ -122,6 +122,7 @@ OCompiler::OFunctionContext::OFunctionContext( HHuginn* huginn_ )
 	, _valueTypes()
 	, _loopCount( 0 )
 	, _loopSwitchCount( 0 )
+	, _nestedCalls( 0 )
 	, _lastDereferenceOperator( OPERATOR::NONE )
 	, _isAssert( false )
 	, _lastMemberName() {
@@ -527,10 +528,27 @@ void OCompiler::set_identifier( yaal::hcore::HString const& name_, executing_par
 	M_EPILOG
 }
 
-void OCompiler::set_position( executing_parser::position_t position_ ) {
+void OCompiler::start_function_call( executing_parser::position_t position_ ) {
 	M_PROLOG
-	OCompilationFrame& cf( f()._compilationStack.top() );
-	cf._position = position_.get();
+	defer_oper_direct( OPERATOR::FUNCTION_CALL, position_ );
+	OFunctionContext& fc( f() );
+	if ( fc._isAssert ) {
+		++ fc._nestedCalls;
+	}
+	return;
+	M_EPILOG
+}
+
+void OCompiler::close_function_call( executing_parser::position_t position_ ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	OCompilationFrame& cf( fc._compilationStack.top() );
+	if ( fc._isAssert ) {
+		-- fc._nestedCalls;
+		if ( fc._nestedCalls == 0 ) {
+			cf._position = position_.get();
+		}
+	}
 	return;
 	M_EPILOG
 }
@@ -1026,7 +1044,7 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 void OCompiler::dispatch_function_call( expression_action_t const& action_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	if ( fc._isAssert ) {
+	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
 		int from( position_.get() + 1 );
 		int len( fc._compilationStack.top()._position - from );
 		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), OPERATOR::FUNCTION_ARGUMENT, _1, position_.get() ) );
