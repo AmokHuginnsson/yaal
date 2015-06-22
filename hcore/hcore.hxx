@@ -34,11 +34,12 @@ Copyright:
 #define YAAL_HCORE_HCORE_HXX_INCLUDED 1
 
 #include "hcore/hstring.hxx"
-#include "hcore/hprogramoptionshandler.hxx"
 
 namespace yaal {
 
 namespace hcore {
+
+class HProgramOptionsHandler;
 
 HProgramOptionsHandler& yaal_options( void );
 bool eq( double long, double long );

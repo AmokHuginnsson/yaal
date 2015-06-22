@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcomplex.hxx"
 #include "hcore.hxx"
 #include "math.hxx"
+#include "algorithm.hxx"
 
 using namespace yaal::math;
 
