@@ -51,10 +51,16 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.square_root";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		verify_arg_type( name, values_, 0, HHuginn::TYPE::REAL, false, position_ );
-		double long val( get_real( values_[0] ) );
-//		HNumber val( get_number( values_[0] ) );
-		return ( make_pointer<HHuginn::HReal>( yaal::square_root( val ) ) );
+		HHuginn::type_t t( verify_arg_numeric( name, values_, 0, false, position_ ) );
+		HHuginn::value_t v;
+		if ( t == HHuginn::TYPE::NUMBER ) {
+			HNumber val( get_number( values_[0] ) );
+			v = make_pointer<HHuginn::HNumber>( hcore::square_root( val ) );
+		} else {
+			double long val( get_real( values_[0] ) );
+			v = make_pointer<HHuginn::HReal>( yaal::square_root( val ) );
+		}
+		return ( v );
 		M_EPILOG
 	}
 };
