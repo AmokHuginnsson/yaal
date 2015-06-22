@@ -51,7 +51,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.square_root";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_t t( verify_arg_numeric( name, values_, 0, false, position_ ) );
+		HHuginn::type_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
