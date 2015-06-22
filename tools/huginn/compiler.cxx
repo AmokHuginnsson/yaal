@@ -145,6 +145,9 @@ OCompiler::OCompiler( HHuginn* huginn_ )
 	: _functionContexts()
 	, _classContext()
 	, _submittedClasses()
+	, _submittedImports()
+	, _importName()
+	, _importAlias()
 	, _huginn( huginn_ ) {
 	return;
 }
@@ -163,9 +166,9 @@ HHuginn::HHuginn::expression_t& OCompiler::current_expression( void ) {
 
 void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( is_builtin( name_ ) ) {
+	if ( is_restricted( name_ ) ) {
 		if ( ! _classContext || ( ( name_ != "constructor" ) && ( name_ != "destructor" ) ) ) {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
 		}
 	}
 	_functionContexts.emplace( _huginn );
@@ -177,11 +180,51 @@ void OCompiler::set_function_name( yaal::hcore::HString const& name_, executing_
 	M_EPILOG
 }
 
+void OCompiler::set_import_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	if ( is_restricted( name_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
+	}
+	if ( _submittedClasses.count( name_ ) > 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), position_.get() );
+	}
+	_importName = name_;
+	return;
+	M_EPILOG
+}
+
+void OCompiler::set_import_alias( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
+	M_PROLOG
+	if ( is_restricted( name_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
+	}
+	if ( _submittedClasses.count( name_ ) > 0 ) {
+		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), position_.get() );
+	}
+	_importAlias = name_;
+	return;
+	M_EPILOG
+}
+
+void OCompiler::commit_import( executing_parser::position_t position_ ) {
+	M_PROLOG
+	for ( submitted_imports_t::value_type const& i : _submittedImports ) {
+		if ( i.second == _importAlias ) {
+			throw HHuginn::HHuginnRuntimeException( "Import alias `"_ys.append( _importAlias ).append( "' is already defined." ), position_.get() );
+		}
+	}
+	if ( ! _submittedImports.insert( make_pair( _importName, _importAlias ) ).second ) {
+		throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( _importName ).append( "' was already imported." ), position_.get() );
+	}
+	return;
+	M_EPILOG
+}
+
 void OCompiler::set_class_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	_classContext = make_resource<OClassContext>();
-	if ( is_builtin( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
+	if ( is_restricted( name_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
 	}
 	if ( _submittedClasses.count( name_ ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' is already defined." ), position_.get() );
@@ -218,8 +261,8 @@ void OCompiler::add_field_name( yaal::hcore::HString const& name_, executing_par
 
 void OCompiler::set_field_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	if ( is_builtin( name_ ) ) {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted keyword." ), position_.get() );
+	if ( is_restricted( name_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( name_ ).append( "' is a restricted name." ), position_.get() );
 	}
 	add_field_name( name_, position_ );
 	return;

@@ -152,7 +152,10 @@ HHuginn::value_t HFrame::get_reference( yaal::hcore::HString const& name_, int p
 		if ( !! fun ) {
 			v = make_pointer<HHuginn::HFunctionReference>( name_, fun );
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "Name `"_ys.append( name_ ).append( "' is not defined." ), position_ );
+			v = _thread->huginn().get_package( name_ );
+			if ( ! v ) {
+				throw HHuginn::HHuginnRuntimeException( "Name `"_ys.append( name_ ).append( "' is not defined." ), position_ );
+			}
 		}
 	}
 	return ( v );

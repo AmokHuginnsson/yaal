@@ -130,6 +130,7 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HHuginn* huginn_ ) {
 			}
 		)
 	);
+	huginn_->register_class( c );
 	return ( make_pointer<HFileSystem>( c.raw() ) );
 	M_EPILOG
 }

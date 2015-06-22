@@ -41,6 +41,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/iterator.hxx"
 #include "tools/huginn/helper.hxx"
 #include "tools/huginn/keyword.hxx"
+#include "tools/huginn/packagefactory.hxx"
 #include "streamtools.hxx"
 
 using namespace yaal;
@@ -518,7 +519,16 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule importStatement(
 		"importStatement",
-		constant( "import" ) >> regex( "packageName", identifier ) >> "as" >> regex( "importName", identifier ) >> ';'
+		constant( "import" ) >> regex(
+			"packageName",
+			identifier,
+			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_import_name, _compiler.get(), _1, _2 ) )
+		) >> "as" >> regex(
+			"importName",
+			identifier,
+			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_import_alias, _compiler.get(), _1, _2 ) )
+		) >> ';',
+		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_import, _compiler.get(), _1 ) )
 	);
 	HRule huginnGrammar( "huginnGrammar", + ( classDefinition | functionDefinition | importStatement ) );
 	return ( huginnGrammar );
@@ -821,6 +831,7 @@ HHuginn::HHuginn( void )
 	, _compiler( make_resource<OCompiler>( this ) )
 	, _engine( make_engine(), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
 	, _threads()
+	, _packages()
 	, _argv( new ( memory::yaal ) HList() )
 	, _result()
 	, _errorMessage()
@@ -922,9 +933,12 @@ void HHuginn::register_class( class_t class_ ) {
 	M_EPILOG
 }
 
-void HHuginn::commit_classes( void ) {
+void HHuginn::finalize_compilation( void ) {
 	M_PROLOG
 	register_class( exception::_class_ );
+	for ( OCompiler::submitted_imports_t::value_type i : _compiler->_submittedImports ) {
+		_packages.insert( make_pair( i.second, HPackageFactoryInstance::get_instance().create_package( this, i.first ) ) );
+	}
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
 	t->create_function_frame( nullptr, 0 );
@@ -943,7 +957,7 @@ bool HHuginn::compile( void ) {
 	bool ok( false );
 	try {
 		_engine.execute();
-		commit_classes();
+		finalize_compilation();
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
 		_errorMessage = e.message();
@@ -1024,6 +1038,17 @@ HHuginn::function_t HHuginn::get_function( yaal::hcore::HString const& name_ ) {
 		}
 	}
 	return ( f );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::get_package( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	HHuginn::value_t v;
+	packages_t::iterator it( _packages.find( name_ ) );
+	if ( it != _packages.end() ) {
+		v = it->second;
+	}
+	return ( v );
 	M_EPILOG
 }
 

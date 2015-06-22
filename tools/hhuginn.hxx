@@ -160,6 +160,7 @@ public:
 	typedef yaal::hcore::HResource<huginn::OCompiler> compiler_t;
 private:
 	typedef yaal::hcore::HMap<yaal::hcore::HString, class_t> classes_t;
+	typedef yaal::hcore::HMap<yaal::hcore::HString, value_t> packages_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, function_t> functions_t;
 	struct STATE {
 		typedef enum {
@@ -179,6 +180,7 @@ private:
 	compiler_t _compiler;
 	HExecutingParser _engine;
 	threads_t _threads;
+	packages_t _packages;
 	list_t _argv;
 	value_t _result;
 	yaal::hcore::HString _errorMessage;
@@ -243,10 +245,11 @@ public:
 	yaal::hcore::HStreamInterface& output_stream( void );
 	yaal::hcore::HStreamInterface& error_stream( void );
 	function_t get_function( yaal::hcore::HString const& );
+	value_t get_package( yaal::hcore::HString const& );
 	yaal::hcore::HString get_snippet( int, int ) const;
 	void register_class( class_t );
 private:
-	void commit_classes( void );
+	void finalize_compilation( void );
 	HClass const* commit_class( yaal::hcore::HString const& );
 	void register_builtins( void );
 	char const* error_message( int ) const;
