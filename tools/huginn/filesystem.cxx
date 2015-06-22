@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/stream.hxx"
 #include "helper.hxx"
 #include "hcore/hfile.hxx"
+#include "packagefactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -44,17 +45,37 @@ namespace tools {
 namespace huginn {
 
 class HFileSystem : public HHuginn::HObject {
-	static HHuginn::HClass _class_;
 	struct OPERATIONS {
 		static int const READING = 1;
 		static int const WRITTING = 2;
 	};
+	HHuginn::class_t _streamClass;
 public:
-	HFileSystem( void )
-		: HObject( &_class_ ) {
+	HFileSystem( HHuginn::HClass* class_ )
+		: HObject( class_ )
+		, _streamClass( HStream::get_class( class_->huginn() ) ) {
+		class_->huginn()->register_class( _streamClass );
 		return;
 	}
-	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		return ( static_cast<HFileSystem*>( object_ )->do_open( thread_, values_, position_ ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t reading( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "FileSystem.reading", values_, 0, 0, position_ );
+		return ( make_pointer<HHuginn::HInteger>( OPERATIONS::READING + 0 ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t writting( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "FileSystem.writting", values_, 0, 0, position_ );
+		return ( make_pointer<HHuginn::HInteger>( OPERATIONS::WRITTING + 0 ) );
+		M_EPILOG
+	}
+private:
+	HHuginn::value_t do_open( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "FileSystem.open";
 		verify_arg_count( name, values_, 2, 2, position_ );
@@ -77,37 +98,58 @@ public:
 		if ( ! f->is_opened() ) {
 			thread_->break_execution( HFrame::STATE::EXCEPTION );
 		}
-		return ( make_pointer<HStream>( stream ) );
-		M_EPILOG
-	}
-	static HHuginn::value_t reading( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
-		M_PROLOG
-		verify_arg_count( "FileSystem.reading", values_, 0, 0, position_ );
-		return ( make_pointer<HHuginn::HInteger>( OPERATIONS::READING + 0 ) );
-		M_EPILOG
-	}
-	static HHuginn::value_t writting( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
-		M_PROLOG
-		verify_arg_count( "FileSystem.writting", values_, 0, 0, position_ );
-		return ( make_pointer<HHuginn::HInteger>( OPERATIONS::WRITTING + 0 ) );
+		return ( make_pointer<HStream>( _streamClass.raw(), stream ) );
 		M_EPILOG
 	}
 };
 
-HHuginn::HClass HFileSystem::_class_(
-	nullptr,
-	HHuginn::HType::register_type( "FileSystem", nullptr ),
-	nullptr,
-	/* methods */ {
-		"open",
-		"reading",
-		"writting"
-	}, {
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::open, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::reading, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::writting, _1, _2, _3, _4 ) )
-	}
-);
+namespace package_factory {
+
+class HFileSystemCreator : public HPackageCreatorInterface {
+protected:
+	virtual HHuginn::value_t do_new_instance( HHuginn* );
+} filesystemCreator;
+
+HHuginn::value_t HFileSystemCreator::do_new_instance( HHuginn* huginn_ ) {
+	M_PROLOG
+	HHuginn::type_t t( HHuginn::HType::register_type( "FileSystem", huginn_ ) );
+	HHuginn::class_t c(
+		make_pointer<HHuginn::HClass>(
+			huginn_,
+			t,
+			nullptr,
+			HHuginn::HClass::field_names_t{
+				"open",
+				"reading",
+				"writting"
+			},
+			HHuginn::values_t{
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::open, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::reading, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::writting, _1, _2, _3, _4 ) )
+			}
+		)
+	);
+	return ( make_pointer<HFileSystem>( c.raw() ) );
+	M_EPILOG
+}
+
+namespace {
+
+bool registrar( void ) {
+	M_PROLOG
+	bool volatile failed = false;
+	HPackageFactory& factory = HPackageFactoryInstance::get_instance();
+	factory.register_package_creator( "FileSystem", &filesystemCreator );
+	return ( failed );
+	M_EPILOG
+}
+
+bool volatile registered = registrar();
+
+}
+
+}
 
 }
 

@@ -915,9 +915,16 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 	M_EPILOG
 }
 
+void HHuginn::register_class( class_t class_ ) {
+	M_PROLOG
+	_classes.insert( make_pair( class_->type()->name(), class_ ) );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::commit_classes( void ) {
 	M_PROLOG
-	_classes.insert( make_pair<hcore::HString>( "Exception", exception::_class_ ) );
+	register_class( exception::_class_ );
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
 	t->create_function_frame( nullptr, 0 );

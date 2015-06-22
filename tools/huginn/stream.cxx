@@ -65,8 +65,8 @@ private:
 	HStreamIterator& operator = ( HStreamIterator const& ) = delete;
 };
 
-HStream::HStream( HStreamInterface::ptr_t stream_ )
-	: HIterable( &_stream_ )
+HStream::HStream( HHuginn::HClass* class_, HStreamInterface::ptr_t stream_ )
+	: HIterable( class_ )
 	, _stream( stream_ )
 	, _buffer()
 	, _lineBuffer() {
@@ -137,20 +137,28 @@ HHuginn::HIterable::HIterator HStream::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::HClass HStream::_stream_(
-	nullptr,
-	HHuginn::HType::register_type( "Stream", nullptr ),
-	nullptr,
-	/* methods */ {
-		"read",
-		"read_line",
-		"write"
-	}, {
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read_line, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::write, _1, _2, _3, _4 ) )
-	}
-);
+HHuginn::class_t HStream::get_class( HHuginn* huginn_ ) {
+	M_PROLOG
+	HHuginn::class_t c(
+		make_pointer<HHuginn::HClass>(
+			huginn_,
+			HHuginn::HType::register_type( "Stream", huginn_ ),
+			nullptr,
+			HHuginn::HClass::field_names_t{
+				"read",
+				"read_line",
+				"write"
+			},
+			HHuginn::values_t{
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read_line, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::write, _1, _2, _3, _4 ) )
+			}
+		)
+	);
+	return ( c );
+	M_EPILOG
+}
 
 }
 

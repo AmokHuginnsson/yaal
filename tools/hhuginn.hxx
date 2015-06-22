@@ -244,6 +244,7 @@ public:
 	yaal::hcore::HStreamInterface& error_stream( void );
 	function_t get_function( yaal::hcore::HString const& );
 	yaal::hcore::HString get_snippet( int, int ) const;
+	void register_class( class_t );
 private:
 	void commit_classes( void );
 	HClass const* commit_class( yaal::hcore::HString const& );
