@@ -1221,13 +1221,13 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 	newFields.erase( endNew, newFields.end() );
 	derivedFields.erase( endDerived, derivedFields.end() );
 	for ( yaal::hcore::HString const& f : derivedFields ) {
-		stream_ << "\n" <<  f << " (derived)";
+		stream_ << "\n" << "  " << f << " (derived)";
 	}
 	for ( yaal::hcore::HString const& f : overridenFields ) {
-		stream_ << "\n" <<  f << " (overriden)";
+		stream_ << "\n" << "  " << f << " (overriden)";
 	}
 	for ( yaal::hcore::HString const& f : newFields ) {
-		stream_ << "\n" <<  f << " (new)";
+		stream_ << "\n" << "  " << f << " (new)";
 	}
 	return ( stream_ );
 	M_EPILOG

@@ -92,6 +92,7 @@ words_t _keywords_ = {{
 }};
 
 words_t _builtin_ = {{
+	"assert", /* for VM dump */
 	"boolean",
 	"character",
 	"integer",

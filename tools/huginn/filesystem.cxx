@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/stream.hxx"
 #include "helper.hxx"
+#include "exception.hxx"
 #include "hcore/hfile.hxx"
 #include "packagefactory.hxx"
 
@@ -50,11 +51,14 @@ class HFileSystem : public HHuginn::HObject {
 		static int const WRITTING = 2;
 	};
 	HHuginn::class_t _streamClass;
+	HHuginn::class_t _exceptionClass;
 public:
 	HFileSystem( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _streamClass( HStream::get_class( class_->huginn() ) ) {
+		, _streamClass( HStream::get_class( class_->huginn() ) )
+		, _exceptionClass( exception::create_class( class_->huginn(), "FileSystemException" ) ) {
 		class_->huginn()->register_class( _streamClass );
+		class_->huginn()->register_class( _exceptionClass );
 		return;
 	}
 	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
@@ -95,10 +99,13 @@ private:
 			)
 		);
 		HFile* f( static_cast<HFile*>( stream.raw() ) );
-		if ( ! f->is_opened() ) {
-			thread_->break_execution( HFrame::STATE::EXCEPTION );
+		HHuginn::value_t v( _none_ );
+		if ( f->is_opened() ) {
+			v = make_pointer<HStream>( _streamClass.raw(), stream );
+		} else {
+			thread_->raise( _exceptionClass.raw(), f->get_error() );
 		}
-		return ( make_pointer<HStream>( _streamClass.raw(), stream ) );
+		return ( v );
 		M_EPILOG
 	}
 };

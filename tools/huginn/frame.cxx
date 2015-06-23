@@ -90,6 +90,10 @@ HFrame::STATE HFrame::state( void ) const {
 
 void HFrame::break_execution( STATE state_ ) {
 	_state = state_;
+	if ( _state == STATE::EXCEPTION ) {
+		_values.clear();
+		_operations.clear();
+	}
 	return;
 }
 

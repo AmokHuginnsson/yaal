@@ -30,7 +30,6 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "trycatch.hxx"
 #include "thread.hxx"
 #include "scope.hxx"
-#include "hcore/hfile.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;

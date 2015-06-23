@@ -613,7 +613,7 @@ public:
 private:
 	yaal::hcore::HString _message;
 public:
-	HException( yaal::hcore::HString const& );
+	HException( HHuginn::HClass const*, yaal::hcore::HString const& );
 	yaal::hcore::HString const& what( void ) const;
 private:
 	virtual value_t do_clone( void ) const override;

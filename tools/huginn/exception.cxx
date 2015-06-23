@@ -27,6 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
+#include "exception.hxx"
 #include "tools/hhuginn.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
@@ -63,7 +64,7 @@ private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread*, HHuginn::values_t const& values_, int position_ ) const {
 		M_PROLOG
 		verify_arg_count( "Exception.contructor", values_, 1, 1, position_ );
-		return ( make_pointer<HHuginn::HException>( get_string( values_[0] ) ) );
+		return ( make_pointer<HHuginn::HException>( this, get_string( values_[0] ) ) );
 		M_EPILOG
 	}
 };
@@ -82,12 +83,27 @@ HHuginn::class_t _class_(
 	)
 );
 
+HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	HHuginn::class_t c(
+		make_pointer<HHuginn::HClass>(
+			huginn_,
+			HHuginn::HType::register_type( name_, huginn_ ),
+			_class_.raw(),
+			HHuginn::HClass::field_names_t{},
+			HHuginn::values_t{}
+		)
+	);
+	return ( c );
+	M_EPILOG
 }
 
 }
 
-HHuginn::HException::HException( yaal::hcore::HString const& message_ )
-	: HObject( exception::_class_.raw() )
+}
+
+HHuginn::HException::HException( HHuginn::HClass const* class_, yaal::hcore::HString const& message_ )
+	: HObject( class_ )
 	, _message( message_ ) {
 	return;
 }

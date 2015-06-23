@@ -28,7 +28,9 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
+#include "tools/huginn/thread.hxx"
 #include "helper.hxx"
+#include "exception.hxx"
 #include "packagefactory.hxx"
 
 using namespace yaal;
@@ -42,23 +44,33 @@ namespace tools {
 namespace huginn {
 
 class HMathematics : public HHuginn::HObject {
+	HHuginn::class_t _exceptionClass;
 public:
 	HMathematics( HHuginn::HClass* class_ )
-		: HObject( class_ ) {
+		: HObject( class_ )
+		, _exceptionClass( exception::create_class( class_->huginn(), "MathematicsException" ) ) {
+		class_->huginn()->register_class( _exceptionClass );
 		return;
 	}
-	static HHuginn::value_t square_root( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t square_root( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.square_root";
 		verify_arg_count( name, values_, 1, 1, position_ );
 		HHuginn::type_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
-		HHuginn::value_t v;
+		HHuginn::value_t v( _none_ );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
-			v = make_pointer<HHuginn::HNumber>( hcore::square_root( val ) );
+			if ( val >= 0 ) {
+				v = make_pointer<HHuginn::HNumber>( hcore::square_root( val ) );
+			}
 		} else {
 			double long val( get_real( values_[0] ) );
-			v = make_pointer<HHuginn::HReal>( yaal::square_root( val ) );
+			if ( val >= 0 ) {
+				v = make_pointer<HHuginn::HReal>( yaal::square_root( val ) );
+			}
+		}
+		if ( v == _none_ ) {
+			thread_->raise( static_cast<HMathematics*>( object_ )->_exceptionClass.raw(), "bad domain" );
 		}
 		return ( v );
 		M_EPILOG

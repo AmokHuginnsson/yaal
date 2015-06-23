@@ -661,7 +661,9 @@ void HExpression::do_execute( huginn::HThread* thread_ ) const {
 			break;
 		}
 	}
-	f->set_result( f->values().top() );
+	if ( f->state() != HFrame::STATE::EXCEPTION ) {
+		f->set_result( f->values().top() );
+	}
 	f->values().pop();
 	return;
 	M_EPILOG
