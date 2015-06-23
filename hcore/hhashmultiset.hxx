@@ -49,17 +49,23 @@ struct hashmultiset_helper {
 
 /*! \brief Hash multi-set container implementation.
  */
-template<typename type_t, typename hasher_t = hash<type_t>, typename allocator_t = allocator::system<HPair<type_t, int long> > >
+template<
+	typename type_t,
+	typename hasher_t = hash<type_t>,
+	typename equal_key_t = yaal::equal_to<type_t>,
+	typename allocator_t = allocator::system<HPair<type_t, int long>>
+>
 class HHashMultiSet {
 public:
 	typedef type_t key_type;
 /* cppcheck-suppress variableHidingTypedef */
 	typedef type_t value_type;
 	typedef hasher_t hasher_type;
+	typedef equal_key_t equal_key_type;
 	typedef HPair<type_t, int long> elem_t;
-	typedef HHashContainer<elem_t, hasher_type, hashmultiset_helper<elem_t>, allocator_t> engine_t;
+	typedef HHashContainer<elem_t, hasher_type, equal_key_type, hashmultiset_helper<elem_t>, allocator_t> engine_t;
 	typedef typename engine_t::allocator_type allocator_type;
-	typedef HHashMultiSet<value_type, hasher_type, allocator_t> this_type;
+	typedef HHashMultiSet<value_type, hasher_type, equal_key_type, allocator_t> this_type;
 	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
 		int long _index;
 		engine_t const* _owner;
@@ -124,7 +130,7 @@ public:
 			return ( ( _engine != it._engine ) || ( _index != it._index ) );
 		}
 	private:
-		friend class HHashMultiSet<key_type, hasher_type, allocator_t>;
+		friend class HHashMultiSet<key_type, hasher_type, equal_key_type, allocator_t>;
 		explicit HIterator( engine_t const* owner_, typename engine_t::HIterator const& it, int long index_ )
 			: base_type(), _index( index_ ), _owner( owner_ ), _engine( it ) {
 			return;
@@ -138,53 +144,70 @@ private:
 	engine_t _engine;
 public:
 	HHashMultiSet( void )
-		: _engine( hasher_type(), allocator_type() ) {
+		: _engine( hasher_type(), equal_key_type(), allocator_type() ) {
 		return;
 	}
-	explicit HHashMultiSet( hasher_type const& hasher_ )
-		: _engine( hasher_, allocator_type() ) {
+	explicit HHashMultiSet( hasher_type const& hasher_, equal_key_type const& equals_ = equal_key_type() )
+		: _engine( hasher_, equals_, allocator_type() ) {
 		return;
 	}
 	explicit HHashMultiSet( allocator_type const& allocator_ )
-		: _engine( hasher_type(), allocator_ ) {
+		: _engine( hasher_type(), equal_key_type(), allocator_ ) {
 		return;
 	}
 	/*! \brief Lower bound of size of map's table */
 	explicit HHashMultiSet( int long size_ )
-		: _engine( hasher_type(), allocator_type() ) {
+		: _engine( hasher_type(), equal_key_type(), allocator_type() ) {
 		M_PROLOG
 		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
-	HHashMultiSet( int long size_, hasher_type const& hasher_, allocator_type const& allocator_ = allocator_type() )
-		: _engine( hasher_, allocator_ ) {
+	HHashMultiSet(
+		int long size_,
+		hasher_type const& hasher_,
+		equal_key_type const& equals_ = equal_key_type(),
+		allocator_type const& allocator_ = allocator_type()
+	) : _engine( hasher_, equals_, allocator_ ) {
 		M_PROLOG
 		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HHashMultiSet( iterator_t first, iterator_t last, hasher_type const& hasher_ = hasher_type(), allocator_type const& allocator_ = allocator_type() )
-		: _engine( hasher_, allocator_ ) {
+	HHashMultiSet(
+		iterator_t first,
+		iterator_t last,
+		hasher_type const& hasher_ = hasher_type(),
+		equal_key_type const& equals_ = equal_key_type(),
+		allocator_type const& allocator_ = allocator_type()
+	) : _engine( hasher_, equals_, allocator_ ) {
 		M_PROLOG
-		for ( ; first != last; ++ first )
+		for ( ; first != last; ++ first ) {
 			insert( *first );
+		}
 		return;
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HHashMultiSet( iterator_t first, iterator_t last, int long size_, hasher_type const& hasher_ = hasher_type(), allocator_type const& allocator_ = allocator_type() )
-		: _engine( hasher_, allocator_ ) {
+	HHashMultiSet(
+		iterator_t first,
+		iterator_t last,
+		int long size_,
+		hasher_type const& hasher_ = hasher_type(),
+		equal_key_type const& equals_ = equal_key_type(),
+		allocator_type const& allocator_ = allocator_type()
+	) : _engine( hasher_, equals_, allocator_ ) {
 		M_PROLOG
 		resize( size_ );
-		for ( ; first != last; ++ first )
+		for ( ; first != last; ++ first ) {
 			insert( *first );
+		}
 		return;
 		M_EPILOG
 	}
 	HHashMultiSet( HHashMultiSet const& set_ )
-		: _engine( set_._engine.hasher(), set_._engine.get_allocator() ) {
+		: _engine( set_._engine.hasher(), set_._engine.equal_key(), set_._engine.get_allocator() ) {
 		M_PROLOG
 		_engine.copy_from( set_._engine );
 		return;
@@ -348,9 +371,10 @@ public:
 private:
 };
 
-template<typename key_type, typename hasher_t, typename allocator_t>
-inline void swap( yaal::hcore::HHashMultiSet<key_type, hasher_t, allocator_t>& a,
-		yaal::hcore::HHashMultiSet<key_type, hasher_t, allocator_t>& b ) {
+template<typename key_type, typename hasher_t, typename equal_key_t, typename allocator_t>
+inline void swap(
+	yaal::hcore::HHashMultiSet<key_type, hasher_t, equal_key_t, allocator_t>& a,
+	yaal::hcore::HHashMultiSet<key_type, hasher_t, equal_key_t, allocator_t>& b ) {
 	a.swap( b );
 }
 

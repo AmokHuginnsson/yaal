@@ -54,7 +54,13 @@ struct hashmap_helper {
 
 /*! \brief Hash map container implementation.
  */
-template<typename key_t, typename data_t, typename hasher_t = hash<key_t>, typename allocator_t = allocator::system<HPair<key_t, data_t> > >
+template<
+	typename key_t,
+	typename data_t,
+	typename hasher_t = hash<key_t>,
+	typename equal_key_t = yaal::equal_to<key_t>,
+	typename allocator_t = allocator::system<HPair<key_t, data_t>>
+>
 class HHashMap {
 public:
 	typedef key_t key_type;
@@ -62,6 +68,7 @@ public:
 /* cppcheck-suppress variableHidingTypedef */
 	typedef HPair<key_t const, data_t> value_type;
 	typedef hasher_t hasher_type;
+	typedef equal_key_t equal_key_type;
 	template<typename const_qual_t>
 	class HIterator;
 	typedef HIterator<value_type> iterator;
@@ -80,41 +87,50 @@ public:
 		} error_t;
 	};
 private:
-	typedef HHashContainer<value_type, hasher_type, hashmap_helper<key_type, data_type>, allocator_t> engine_t;
+	typedef HHashContainer<value_type, hasher_type, equal_key_type, hashmap_helper<key_type, data_type>, allocator_t> engine_t;
 	engine_t _engine;
 public:
 	typedef typename engine_t::allocator_type allocator_type;
-	typedef HHashMap<key_type, data_type, hasher_type, allocator_t> this_type;
+	typedef HHashMap<key_type, data_type, hasher_type, equal_key_type, allocator_t> this_type;
 	HHashMap( void )
-		: _engine( hasher_type(), allocator_type() ) {
+		: _engine( hasher_type(), equal_key_type(), allocator_type() ) {
 		return;
 	}
-	explicit HHashMap( hasher_type const& hasher_ )
-		: _engine( hasher_, allocator_type() ) {
+	explicit HHashMap( hasher_type const& hasher_, equal_key_type const& equals_ = equal_key_type() )
+		: _engine( hasher_, equals_, allocator_type() ) {
 		return;
 	}
 	explicit HHashMap( allocator_type const& allocator_ )
-		: _engine( hasher_type(), allocator_ ) {
+		: _engine( hasher_type(), equal_key_type(), allocator_ ) {
 		return;
 	}
 	/*! \brief Lower bound of size of map's table */
 	explicit HHashMap( int long size_ )
-		: _engine( hasher_type(), allocator_type() ) {
+		: _engine( hasher_type(), equal_key_type(), allocator_type() ) {
 		M_PROLOG
 		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
-	HHashMap( int long size_, hasher_type const& hasher_, allocator_type const& allocator_ = allocator_type() )
-		: _engine( hasher_, allocator_ ) {
+	HHashMap(
+		int long size_,
+		hasher_type const& hasher_,
+		equal_key_type const& equals_ = equal_key_type(),
+		allocator_type const& allocator_ = allocator_type()
+	) : _engine( hasher_, equals_, allocator_ ) {
 		M_PROLOG
 		_engine.resize( size_ );
 		return;
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HHashMap( iterator_t first, iterator_t last, hasher_type const& hasher_ = hasher_type(), allocator_type const& allocator_ = allocator_type() )
-		: _engine( hasher_, allocator_ ) {
+	HHashMap(
+		iterator_t first,
+		iterator_t last,
+		hasher_type const& hasher_ = hasher_type(),
+		equal_key_type const& equals_ = equal_key_type(),
+		allocator_type const& allocator_ = allocator_type()
+	) : _engine( hasher_, equals_, allocator_ ) {
 		M_PROLOG
 		for ( ; first != last; ++ first )
 			insert( *first );
@@ -122,8 +138,14 @@ public:
 		M_EPILOG
 	}
 	template<typename iterator_t>
-	HHashMap( iterator_t first, iterator_t last, int long size_, hasher_type const& hasher_ = hasher_type(), allocator_type const& allocator_ = allocator_type() )
-		: _engine( hasher_, allocator_ ) {
+	HHashMap(
+		iterator_t first,
+		iterator_t last,
+		int long size_,
+		hasher_type const& hasher_ = hasher_type(),
+		equal_key_type const& equals_ = equal_key_type(),
+		allocator_type const& allocator_ = allocator_type()
+	) : _engine( hasher_, equals_, allocator_ ) {
 		M_PROLOG
 		resize( size_ );
 		for ( ; first != last; ++ first )
@@ -132,7 +154,7 @@ public:
 		M_EPILOG
 	}
 	HHashMap( std::initializer_list<value_type> constants_ )
-		: _engine( hasher_type(), allocator_type() ) {
+		: _engine( hasher_type(), equal_key_type(), allocator_type() ) {
 		M_PROLOG
 		_engine.resize( static_cast<int>( constants_.size() ) );
 		for ( value_type const& v : constants_ ) {
@@ -142,7 +164,7 @@ public:
 		M_EPILOG
 	}
 	HHashMap( HHashMap const& map_ )
-		: _engine( map_._engine.hasher(), map_._engine.get_allocator() ) {
+		: _engine( map_._engine.hasher(), map_._engine.equal_key(), map_._engine.get_allocator() ) {
 		M_PROLOG
 		_engine.copy_from( map_._engine );
 		return;
@@ -370,12 +392,13 @@ private:
 };
 
 
-template<typename key_type_t, typename data_type_t, typename hasher_t, typename allocator_t>
+template<typename key_type_t, typename data_type_t, typename hasher_t, typename equal_key_t, typename allocator_t>
 template<typename const_qual_t>
-class HHashMap<key_type_t, data_type_t, hasher_t, allocator_t>::HIterator : public iterator_interface<const_qual_t, iterator_category::forward> {
+class HHashMap<key_type_t, data_type_t, hasher_t, equal_key_t, allocator_t>::HIterator
+	: public iterator_interface<const_qual_t, iterator_category::forward> {
 	typedef key_type_t key_type;
 	typedef data_type_t data_type;
-	typedef HHashMap<key_type, data_type, hasher_t, allocator_t> hashmap_t;
+	typedef HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t> hashmap_t;
 	typename hashmap_t::engine_t::HIterator _engine;
 public:
 	typedef iterator_interface<const_qual_t, iterator_category::forward> base_type;
@@ -426,7 +449,7 @@ public:
 		return ( _engine != it._engine );
 	}
 private:
-	friend class HHashMap<key_type, data_type, hasher_t, allocator_t>;
+	friend class HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t>;
 	template<typename other_const_qual_t>
 	friend class HIterator;
 	explicit HIterator( typename hashmap_t::engine_t::HIterator const& it )
@@ -435,8 +458,10 @@ private:
 	}
 };
 
-template<typename key_type, typename data_type, typename hasher_t, typename allocator_t>
-inline void swap( yaal::hcore::HHashMap<key_type, data_type, hasher_t, allocator_t>& a, yaal::hcore::HHashMap<key_type, data_type, hasher_t, allocator_t>& b ) {
+template<typename key_type, typename data_type, typename hasher_t, typename equal_key_t, typename allocator_t>
+inline void swap(
+	yaal::hcore::HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t>& a,
+	yaal::hcore::HHashMap<key_type, data_type, hasher_t, equal_key_t, allocator_t>& b ) {
 	a.swap( b );
 }
 
