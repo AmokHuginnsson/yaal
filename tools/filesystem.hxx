@@ -45,6 +45,7 @@ typedef yaal::hcore::HString path_t;
 
 path_t normalize_path( path_t const& );
 
+path_t current_working_directory( void );
 bool exists( path_t const& );
 bool is_directory( path_t const& );
 bool is_symbolic_link( path_t const& );

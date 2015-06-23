@@ -34,6 +34,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "exception.hxx"
 #include "hcore/hfile.hxx"
 #include "packagefactory.hxx"
+#include "tools/filesystem.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -76,6 +77,12 @@ public:
 		M_PROLOG
 		verify_arg_count( "FileSystem.writting", values_, 0, 0, position_ );
 		return ( make_pointer<HHuginn::HInteger>( OPERATIONS::WRITTING + 0 ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t current_working_directory( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		verify_arg_count( "FileSystem.current_working_directory", values_, 0, 0, position_ );
+		return ( make_pointer<HHuginn::HString>( filesystem::current_working_directory() ) );
 		M_EPILOG
 	}
 private:
@@ -128,12 +135,14 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HHuginn* huginn_ ) {
 			HHuginn::HClass::field_names_t{
 				"open",
 				"reading",
-				"writting"
+				"writting",
+				"current_working_directory"
 			},
 			HHuginn::values_t{
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::open, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::reading, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::writting, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::writting, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::current_working_directory, _1, _2, _3, _4 ) )
 			}
 		)
 	);

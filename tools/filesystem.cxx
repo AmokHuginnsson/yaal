@@ -26,6 +26,7 @@ Copyright:
 
 #include <cstring>
 #include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
 #include <sys/stat.h>
 
@@ -66,6 +67,13 @@ bool do_stat( struct stat* s, path_t const& path_ ) {
 	M_EPILOG
 }
 
+}
+
+path_t current_working_directory( void ) {
+	char* cwd( ::getcwd( nullptr, 0 ) );
+	path_t p( cwd );
+	::free( cwd );
+	return ( p );
 }
 
 path_t normalize_path( path_t const& path_ ) {
