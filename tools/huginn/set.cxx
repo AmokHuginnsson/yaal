@@ -95,7 +95,7 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHug
 
 HHuginn::HClass _setClass_(
 	nullptr,
-	HHuginn::TYPE::DICT,
+	HHuginn::TYPE::SET,
 	nullptr,
 	/* methods */ {
 		"has_key",
