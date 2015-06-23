@@ -218,7 +218,7 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	M_EPILOG
 }
 
-void HExpression::make_map( HFrame* frame_, int ) {
+void HExpression::make_dict( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
 	struct ValuePosition {
@@ -241,12 +241,12 @@ void HExpression::make_map( HFrame* frame_, int ) {
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_CALL );
 	frame_->operations().pop();
 	reverse( values.begin(), values.end() );
-	HHuginn::value_t map( make_pointer<HHuginn::HMap>() );
-	HHuginn::HMap* m( static_cast<HHuginn::HMap*>( map.raw() ) );
+	HHuginn::value_t dict( make_pointer<HHuginn::HDict>() );
+	HHuginn::HDict* m( static_cast<HHuginn::HDict*>( dict.raw() ) );
 	for ( int i( 0 ), S( static_cast<int>( values.get_size() ) ); i < S; i += 2 ) {
 		m->insert( values[i]._value, values[i + 1]._value, values[i]._position );
 	}
-	frame_->values().push( map );
+	frame_->values().push( dict );
 	return;
 	M_EPILOG
 }

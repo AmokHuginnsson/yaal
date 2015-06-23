@@ -55,11 +55,17 @@ int long hash<HString>::operator () ( HString const& string_ ) const {
 	return ( h );
 }
 
+template<>
+int long hash<double long>::operator () ( double long const& val_ ) const {
+	return ( reinterpret_cast<int long long const&>( static_cast<double const&>( val_ ) ) );
+}
+
 template<typename T>
 int long hash<T>::operator () ( T const& key_ ) const {
 	return ( static_cast<int long>( key_ ) );
 }
 
+template struct hash<bool>;
 template struct hash<char>;
 template struct hash<char signed>;
 template struct hash<char unsigned>;

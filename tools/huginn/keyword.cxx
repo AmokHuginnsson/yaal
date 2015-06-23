@@ -95,9 +95,11 @@ words_t _builtin_ = {{
 	"assert", /* for VM dump */
 	"boolean",
 	"character",
+	"dict",
 	"integer",
 	"list",
-	"map",
+	"lookup",
+	"order",
 	"number",
 	"real",
 	"set",

@@ -172,17 +172,17 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		) >> -argList >> ']',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
 	);
-	HRule mapLiteralElement(
-		"mapLiteralElement",
+	HRule dictLiteralElement(
+		"dictLiteralElement",
 		arg >> ':' >>	arg
 	);
-	HRule mapLiteral(
-		"mapLiteral",
+	HRule dictLiteral(
+		"dictLiteral",
 		constant(
 			'{',
 			HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::FUNCTION_CALL, _1 ) )
-		) >> -( mapLiteralElement >> *( ',' >> mapLiteralElement ) ) >> '}',
-		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_MAP, _1 ) )
+		) >> -( dictLiteralElement >> *( ',' >> dictLiteralElement ) ) >> '}',
+		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MAKE_DICT, _1 ) )
 	);
 	HRule parameter(
 		"parameter",
@@ -247,7 +247,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| integer[e_p::HInteger::action_int_long_long_position_t( hcore::call( &OCompiler::defer_store_integer, _compiler.get(), _1, _2 ) )]
 		| character_literal[e_p::HCharacterLiteral::action_character_position_t( hcore::call( &OCompiler::defer_store_character, _compiler.get(), _1, _2 ) )]
 		| ( listLiteral >> -( subscriptOperator >> dereference ) )
-		| ( mapLiteral >> -( subscriptOperator >> dereference ) )
+		| ( dictLiteral >> -( subscriptOperator >> dereference ) )
 		| literalNone | booleanLiteralTrue | booleanLiteralFalse
 		| ( reference >> dereference )
 		| ( stringLiteral >> -subscriptOperator )
@@ -1491,8 +1491,8 @@ inline HHuginn::value_t size( huginn::HThread*, HHuginn::HObject*, HHuginn::valu
 		s = static_cast<HHuginn::HString const*>( v )->value().get_length();
 	} else if ( typeId == HHuginn::TYPE::LIST ) {
 		s = static_cast<HHuginn::HList const*>( v )->size();
-	} else if ( typeId == HHuginn::TYPE::MAP ) {
-		s = static_cast<HHuginn::HMap const*>( v )->size();
+	} else if ( typeId == HHuginn::TYPE::DICT ) {
+		s = static_cast<HHuginn::HDict const*>( v )->size();
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Getting size of `"_ys.append( v->type()->name() ).append( "'s is not supported." ),
@@ -1530,10 +1530,21 @@ inline HHuginn::value_t list( huginn::HThread*, HHuginn::HObject*, HHuginn::valu
 	M_EPILOG
 }
 
-inline HHuginn::value_t map( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t dict( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "map", values_, 0, 0, position_ );
-	return ( make_pointer<HHuginn::HMap>() );
+	verify_arg_count( "dict", values_, 0, 0, position_ );
+	return ( make_pointer<HHuginn::HDict>() );
+	M_EPILOG
+}
+
+inline HHuginn::value_t set( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int ) {
+	M_PROLOG
+	HHuginn::value_t v( make_pointer<HHuginn::HSet>() );
+	HHuginn::HSet* l( static_cast<HHuginn::HSet*>( v.raw() ) );
+	for ( HHuginn::value_t const& e : values_ ) {
+		l->insert( e );
+	}
+	return ( v );
 	M_EPILOG
 }
 
@@ -1602,7 +1613,8 @@ void HHuginn::register_builtins( void ) {
 	_functions.insert( make_pair<yaal::hcore::HString const>( "type", hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "copy", hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "list", hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "map", hcore::call( &huginn_builtin::map, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "dict", hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "set", hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "assert", hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ) ) );

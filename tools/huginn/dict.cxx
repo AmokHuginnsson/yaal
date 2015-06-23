@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  map.cxx - this file is integral part of `yaal' project.
+  dict.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -41,16 +41,16 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::MAP( HHuginn::HType::register_type( "map", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::DICT( HHuginn::HType::register_type( "dict", nullptr ) );
 
 namespace huginn {
 
-class HMapIterator : public HIteratorInterface {
-	HHuginn::HMap::values_t* _map;
-	HHuginn::HMap::values_t::iterator _it;
+class HDictIterator : public HIteratorInterface {
+	HHuginn::HDict::values_t* _dict;
+	HHuginn::HDict::values_t::iterator _it;
 public:
-	HMapIterator( HHuginn::HMap::values_t* map_ )
-		: _map( map_ ), _it( map_->begin() ) {
+	HDictIterator( HHuginn::HDict::values_t* dict_ )
+		: _dict( dict_ ), _it( dict_->begin() ) {
 		return;
 	}
 protected:
@@ -58,22 +58,22 @@ protected:
 		return ( _it->first );
 	}
 	virtual bool do_is_valid( void ) override {
-		return ( _it != _map->end() );
+		return ( _it != _dict->end() );
 	}
 	virtual void do_next( void ) override {
 		++ _it;
 	}
 private:
-	HMapIterator( HMapIterator const& ) = delete;
-	HMapIterator& operator = ( HMapIterator const& ) = delete;
+	HDictIterator( HDictIterator const& ) = delete;
+	HDictIterator& operator = ( HDictIterator const& ) = delete;
 };
 
-namespace map {
+namespace dict {
 
 inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "map.has_key", values_, 1, 1, position_ );
-	HHuginn::HMap* m( dynamic_cast<HHuginn::HMap*>( object_ ) );
+	verify_arg_count( "dict.has_key", values_, 1, 1, position_ );
+	HHuginn::HDict* m( dynamic_cast<HHuginn::HDict*>( object_ ) );
 	M_ASSERT( m != nullptr );
 	bool hasKey( m->has_key( values_[0], position_ ) );
 	return ( make_pointer<HHuginn::HBoolean>( hasKey ) );
@@ -82,8 +82,8 @@ inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HH
 
 inline HHuginn::value_t get( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "map.get", values_, 1, 2, position_ );
-	HHuginn::HMap* m( dynamic_cast<HHuginn::HMap*>( object_ ) );
+	verify_arg_count( "dict.get", values_, 1, 2, position_ );
+	HHuginn::HDict* m( dynamic_cast<HHuginn::HDict*>( object_ ) );
 	M_ASSERT( m != nullptr );
 	HHuginn::value_t v;
 	if ( values_.get_size() > 1 ) {
@@ -100,8 +100,8 @@ inline HHuginn::value_t get( huginn::HThread*, HHuginn::HObject* object_, HHugin
 
 inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "map.erase", values_, 1, 1, position_ );
-	HHuginn::HMap* m( dynamic_cast<HHuginn::HMap*>( object_ ) );
+	verify_arg_count( "dict.erase", values_, 1, 1, position_ );
+	HHuginn::HDict* m( dynamic_cast<HHuginn::HDict*>( object_ ) );
 	M_ASSERT( m != nullptr );
 	M_ASSERT( !! m->get_pointer() );
 	m->erase( values_[0], position_ );
@@ -111,42 +111,42 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHug
 
 }
 
-HHuginn::HClass _mapClass_(
+HHuginn::HClass _dictClass_(
 	nullptr,
-	HHuginn::TYPE::MAP,
+	HHuginn::TYPE::DICT,
 	nullptr,
 	/* methods */ {
 		"has_key",
 		"get",
 		"erase"
 	}, {
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &map::has_key, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &map::get, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &map::erase, _1, _2, _3, _4 ) )
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ),
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::get, _1, _2, _3, _4 ) ),
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::erase, _1, _2, _3, _4 ) )
 	}
 );
 
 }
 
-HHuginn::HMap::HMap( void )
-	: HIterable( &huginn::_mapClass_ )
+HHuginn::HDict::HDict( void )
+	: HIterable( &huginn::_dictClass_ )
 	, _data( &value_builtin::less_low )
 	, _keyType( HHuginn::TYPE::NONE ) {
 	return;
 }
 
-HHuginn::HMap::HMap( values_t const& data_, type_t keyType_ )
-	: HIterable( &huginn::_mapClass_ ),
+HHuginn::HDict::HDict( values_t const& data_, type_t keyType_ )
+	: HIterable( &huginn::_dictClass_ ),
 	_data( data_ ),
 	_keyType( keyType_ ) {
 	return;
 }
 
-int long HHuginn::HMap::size( void ) const {
+int long HHuginn::HDict::size( void ) const {
 	return ( _data.get_size() );
 }
 
-void HHuginn::HMap::verify_key_type( HHuginn::type_t type_, int position_ ) const {
+void HHuginn::HDict::verify_key_type( HHuginn::type_t type_, int position_ ) const {
 	if ( ( _keyType != TYPE::NONE ) && ( type_ != _keyType ) ) {
 		throw HHuginnRuntimeException( "Non-uniform key types.", position_ );
 	}
@@ -156,18 +156,18 @@ void HHuginn::HMap::verify_key_type( HHuginn::type_t type_, int position_ ) cons
 	return;
 }
 
-HHuginn::value_t HHuginn::HMap::get( HHuginn::value_t const& key_, int position_ ) {
+HHuginn::value_t HHuginn::HDict::get( HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
 	verify_key_type( key_->type(), position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( ! ( it != _data.end() ) ) {
-		throw HHuginnRuntimeException( "Key does not exist in map.", position_ );
+		throw HHuginnRuntimeException( "Key does not exist in `dict'.", position_ );
 	}
 	return ( it->second );
 	M_EPILOG
 }
 
-bool HHuginn::HMap::try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ ) {
+bool HHuginn::HDict::try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ ) {
 	M_PROLOG
 	verify_key_type( key_->type(), position_ );
 	values_t::iterator it( _data.find( key_ ) );
@@ -180,14 +180,14 @@ bool HHuginn::HMap::try_get( HHuginn::value_t const& key_, HHuginn::value_t& res
 	M_EPILOG
 }
 
-bool HHuginn::HMap::has_key( HHuginn::value_t const& key_, int position_ ) const {
+bool HHuginn::HDict::has_key( HHuginn::value_t const& key_, int position_ ) const {
 	M_PROLOG
 	verify_key_type( key_->type(), position_ );
 	return ( _data.find( key_ ) != _data.end() );
 	M_EPILOG
 }
 
-void HHuginn::HMap::erase( HHuginn::value_t const& key_, int position_ ) {
+void HHuginn::HDict::erase( HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
 	verify_key_type( key_->type(), position_ );
 	_data.erase( key_ );
@@ -195,7 +195,7 @@ void HHuginn::HMap::erase( HHuginn::value_t const& key_, int position_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HMap::get_ref( HHuginn::value_t const& key_, int position_ ) {
+HHuginn::value_t HHuginn::HDict::get_ref( HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
 	verify_key_type( key_->type(), position_ );
 	_keyType = key_->type();
@@ -203,7 +203,7 @@ HHuginn::value_t HHuginn::HMap::get_ref( HHuginn::value_t const& key_, int posit
 	M_EPILOG
 }
 
-void HHuginn::HMap::insert( HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
+void HHuginn::HDict::insert( HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	verify_key_type( key_->type(), position_ );
 	_data.insert( make_pair( key_, value_ ) );
@@ -212,13 +212,13 @@ void HHuginn::HMap::insert( HHuginn::value_t const& key_, HHuginn::value_t const
 	M_EPILOG
 }
 
-HHuginn::HIterable::HIterator HHuginn::HMap::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HMapIterator( &_data ) );
+HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( void ) {
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HDictIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HMap::do_clone( void ) const {
-	return ( make_pointer<HMap>( _data, _keyType ) );
+HHuginn::value_t HHuginn::HDict::do_clone( void ) const {
+	return ( make_pointer<HDict>( _data, _keyType ) );
 }
 
 }

@@ -125,7 +125,10 @@ public:
 	class HNumber;
 	class HList;
 	typedef yaal::hcore::HPointer<HList> list_t;
-	class HMap;
+	class HDict;
+	class HOrder;
+	class HLookup;
+	class HSet;
 	class HObject;
 	class HException;
 	class HObjectReference;
@@ -147,7 +150,10 @@ public:
 		static type_t const NUMBER;
 		static type_t const CHARACTER;
 		static type_t const LIST;
-		static type_t const MAP;
+		static type_t const DICT;
+		static type_t const ORDER;
+		static type_t const LOOKUP;
+		static type_t const SET;
 		static type_t const REFERENCE;
 		static type_t const FUNCTION_REFERENCE;
 		static type_t const OBJECT_REFERENCE;
@@ -563,9 +569,9 @@ private:
 	virtual value_t do_clone( void ) const override;
 };
 
-class HHuginn::HMap : public HHuginn::HIterable {
+class HHuginn::HDict : public HHuginn::HIterable {
 public:
-	typedef HHuginn::HMap this_type;
+	typedef HHuginn::HDict this_type;
 	typedef HHuginn::HIterable base_type;
 	typedef bool (*cmp_t)( HHuginn::value_t const&, HHuginn::value_t const& );
 	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, cmp_t> values_t;
@@ -573,8 +579,8 @@ private:
 	values_t _data;
 	type_t _keyType;
 public:
-	HMap( void );
-	HMap( values_t const&, type_t );
+	HDict( void );
+	HDict( values_t const&, type_t );
 	int long size( void ) const;
 	value_t get( HHuginn::value_t const&, int );
 	value_t get_ref( HHuginn::value_t const&, int );
@@ -586,8 +592,33 @@ protected:
 	virtual HIterator do_iterator( void ) override;
 private:
 	void verify_key_type( HHuginn::type_t, int ) const;
-	HMap( HMap const& ) = delete;
-	HMap& operator = ( HMap const& ) = delete;
+	HDict( HDict const& ) = delete;
+	HDict& operator = ( HDict const& ) = delete;
+private:
+	virtual value_t do_clone( void ) const override;
+};
+
+class HHuginn::HSet : public HHuginn::HIterable {
+public:
+	typedef HHuginn::HSet this_type;
+	typedef HHuginn::HIterable base_type;
+	typedef int long (*hash_t)( HHuginn::value_t const& );
+	typedef bool (*equals_t)( HHuginn::value_t const&, HHuginn::value_t const& );
+	typedef yaal::hcore::HHashSet<HHuginn::value_t, hash_t, equals_t> values_t;
+private:
+	values_t _data;
+public:
+	HSet( void );
+	HSet( values_t const& );
+	int long size( void ) const;
+	void insert( HHuginn::value_t const& );
+	bool has_key( HHuginn::value_t const& ) const;
+	void erase( HHuginn::value_t const& );
+protected:
+	virtual HIterator do_iterator( void ) override;
+private:
+	HSet( HSet const& ) = delete;
+	HSet& operator = ( HSet const& ) = delete;
 private:
 	virtual value_t do_clone( void ) const override;
 };

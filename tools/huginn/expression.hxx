@@ -73,7 +73,7 @@ public:
 	void mod( huginn::HFrame*, int );
 	void negate( huginn::HFrame*, int );
 	void function_call( huginn::HFrame*, int );
-	void make_map( huginn::HFrame*, int );
+	void make_dict( huginn::HFrame*, int );
 	void get_reference( yaal::hcore::HString const&, huginn::HFrame*, int );
 	void make_variable( yaal::hcore::HString const&, huginn::HFrame*, int );
 	void set_variable( huginn::HFrame*, int );

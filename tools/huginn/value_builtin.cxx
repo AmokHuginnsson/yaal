@@ -70,8 +70,8 @@ HHuginn::value_t subscript( HExpression::ACCESS subscript_, HHuginn::value_t& ba
 			HHuginn::HString* s( static_cast<HHuginn::HString*>( base_.raw() ) );
 			res = make_pointer<HHuginn::HHuginn::HCharacter>( s->value()[static_cast<int>( index )] );
 		}
-	} else if ( baseType == HHuginn::TYPE::MAP ) {
-		HHuginn::HMap* m( static_cast<HHuginn::HMap*>( base_.raw() ) );
+	} else if ( baseType == HHuginn::TYPE::DICT ) {
+		HHuginn::HDict* m( static_cast<HHuginn::HDict*>( base_.raw() ) );
 		res = ( subscript_ == HExpression::ACCESS::VALUE ? m->get( index_, position_ ) : m->get_ref( index_, position_ ) );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( baseType->name() ).append( "'." ), position_ );
@@ -319,6 +319,28 @@ HHuginn::value_t neg( HHuginn::value_t const& v_, int position_ ) {
 	return ( res );
 }
 
+int long hash( HHuginn::value_t const& v_ ) {
+	int long h( 0 );
+	HHuginn::type_t typeId( v_->type() );
+	if ( typeId == HHuginn::TYPE::INTEGER ) {
+		h = hcore::hash<int long>()( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
+	} else if ( typeId == HHuginn::TYPE::REAL ) {
+		h = hcore::hash<double long>()( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
+	} else if ( typeId == HHuginn::TYPE::STRING ) {
+		h = hcore::hash<hcore::HString>()( static_cast<HHuginn::HString const*>( v_.raw() )->value() );
+	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
+		h = hcore::hash<double long>()( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_floating_point() );
+	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
+		h = hcore::hash<char>()( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
+	} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
+		h = hcore::hash<bool>()( static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() );
+	} else if ( typeId != HHuginn::TYPE::NONE ) {
+		throw HHuginn::HHuginnRuntimeException( "There is no `hash' operator for `"_ys.append( typeId->name() ).append( "'." ), 0 );
+	}
+	return ( h );
+}
+
+
 bool equals( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	bool noneOperand( ( v1_->type() == HHuginn::TYPE::NONE ) || ( v2_->type() == HHuginn::TYPE::NONE ) );
 	M_ASSERT( noneOperand || ( v1_->type() == v2_->type() ) );
@@ -344,6 +366,10 @@ bool equals( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int posit
 		res = v1_->type() == v2_->type();
 	}
 	return ( res );
+}
+
+bool key_equals( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
+	return ( ( v1_->type() == v2_->type() ) && equals( v1_, v2_, 0 ) );
 }
 
 bool less_low( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {

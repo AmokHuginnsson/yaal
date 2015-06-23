@@ -56,6 +56,8 @@ bool less_low( HHuginn::value_t const&, HHuginn::value_t const& );
 bool greater( HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool less_or_equal( HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool greater_or_equal( HHuginn::value_t const&, HHuginn::value_t const&, int );
+int long hash( HHuginn::value_t const& );
+bool key_equals( HHuginn::value_t const&, HHuginn::value_t const& );
 HHuginn::value_t boolean_xor( HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_not( HHuginn::value_t const&, int );
 HHuginn::value_t string( HHuginn::value_t const&, int );
