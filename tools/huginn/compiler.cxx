@@ -41,7 +41,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "booleanevaluator.hxx"
 #include "helper.hxx"
 #include "keyword.hxx"
-#include "hcore/hfile.hxx"
+#include "packagefactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -187,6 +187,9 @@ void OCompiler::set_import_name( yaal::hcore::HString const& name_, executing_pa
 	}
 	if ( _submittedClasses.count( name_ ) > 0 ) {
 		throw HHuginn::HHuginnRuntimeException( "Class `"_ys.append( name_ ).append( "' named is already defined." ), position_.get() );
+	}
+	if ( ! HPackageFactoryInstance::get_instance().is_type_valid( name_ ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Package `"_ys.append( name_ ).append( "' does not exist." ), position_.get() );
 	}
 	_importName = name_;
 	return;
