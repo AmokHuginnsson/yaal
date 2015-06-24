@@ -553,8 +553,8 @@ class HHuginn::HList : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HList this_type;
 	typedef HHuginn::HIterable base_type;
-private:
 	typedef yaal::hcore::HDeque<HHuginn::value_t> values_t;
+private:
 	values_t _data;
 public:
 	HList( void );
@@ -564,6 +564,8 @@ public:
 	int long size( void ) const;
 	value_t get( int long long );
 	value_t get_ref( int long long );
+	values_t const& value( void ) const;
+	values_t& value( void );
 protected:
 	virtual HIterator do_iterator( void ) override;
 private:
@@ -589,6 +591,8 @@ public:
 	bool has_key( HHuginn::value_t const&, int ) const;
 	bool try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ );
 	void erase( HHuginn::value_t const&, int );
+	values_t const& value( void ) const;
+	values_t& value( void );
 protected:
 	virtual HIterator do_iterator( void ) override;
 private:
@@ -615,6 +619,8 @@ public:
 	void insert( HHuginn::value_t const&, int );
 	bool has_key( HHuginn::value_t const&, int ) const;
 	void erase( HHuginn::value_t const&, int );
+	values_t const& value( void ) const;
+	values_t& value( void );
 protected:
 	virtual HIterator do_iterator( void ) override;
 private:
@@ -644,6 +650,8 @@ public:
 	value_t get( HHuginn::value_t const&, int );
 	value_t get_ref( HHuginn::value_t const& );
 	bool try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_ );
+	values_t const& value( void ) const;
+	values_t& value( void );
 protected:
 	virtual HIterator do_iterator( void ) override;
 private:
@@ -669,6 +677,8 @@ public:
 	void insert( HHuginn::value_t const& );
 	bool has_key( HHuginn::value_t const& ) const;
 	void erase( HHuginn::value_t const& );
+	values_t const& value( void ) const;
+	values_t& value( void );
 protected:
 	virtual HIterator do_iterator( void ) override;
 private:

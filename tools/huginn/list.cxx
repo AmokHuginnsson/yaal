@@ -151,6 +151,14 @@ HHuginn::value_t HHuginn::HList::get_ref( int long long index_ ) {
 	M_EPILOG
 }
 
+HHuginn::HList::values_t const& HHuginn::HList::value( void ) const {
+	return ( _data );
+}
+
+HHuginn::HList::values_t& HHuginn::HList::value( void ) {
+	return ( _data );
+}
+
 HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( void ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HListIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );

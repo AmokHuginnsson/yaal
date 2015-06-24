@@ -157,6 +157,38 @@ HHuginn::type_t verify_arg_numeric(
 	M_EPILOG
 }
 
+HHuginn::type_t verify_arg_collection(
+	yaal::hcore::HString const& name_,
+	HHuginn::values_t const& values_,
+	int no_, bool oneArg_, int position_ ) {
+	M_PROLOG
+	HHuginn::type_t t( values_[no_]->type() );
+	if (
+			( t != HHuginn::TYPE::LIST )
+			&& ( t != HHuginn::TYPE::ORDER )
+			&& ( t != HHuginn::TYPE::SET )
+			&& ( t != HHuginn::TYPE::DICT )
+			&& ( t != HHuginn::TYPE::LOOKUP )
+			&& ( t != HHuginn::TYPE::STRING )
+	) {
+		HString no;
+		if ( ! oneArg_ ) {
+			no = util::ordinal( no_ + 1 ).append( " " );
+		}
+		throw HHuginn::HHuginnRuntimeException(
+			""_ys.append( name_ )
+			.append( "() " )
+			.append( no )
+			.append( "argument must be a collection type, not a " )
+			.append( values_[no_]->type()->name() )
+			.append( "'." ),
+			position_
+		);
+	}
+	return ( t );
+	M_EPILOG
+}
+
 yaal::hcore::HString const& get_string( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HString const*>( value_.raw() ) );

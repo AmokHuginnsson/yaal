@@ -156,6 +156,14 @@ void HHuginn::HSet::insert( HHuginn::value_t const& value_ ) {
 	M_EPILOG
 }
 
+HHuginn::HSet::values_t const& HHuginn::HSet::value( void ) const {
+	return ( _data );
+}
+
+HHuginn::HSet::values_t& HHuginn::HSet::value( void ) {
+	return ( _data );
+}
+
 HHuginn::HIterable::HIterator HHuginn::HSet::do_iterator( void ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HSetIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );

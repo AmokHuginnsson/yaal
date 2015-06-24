@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
+#include "value_builtin.hxx"
 #include "packagefactory.hxx"
 
 using namespace yaal;
@@ -112,6 +113,67 @@ public:
 	static HHuginn::value_t range( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 		return ( static_cast<HAlgorithms*>( object_ )->do_range( values_, position_ ) );
 	}
+	static HHuginn::value_t sorted( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+		char const name[] = "Algorithms.sorted";
+		verify_arg_count( name, values_, 1, 2, position_ );
+		HHuginn::type_t t( verify_arg_collection( name, values_, 0, false, position_ ) );
+		HHuginn::value_t key;
+		if ( values_.get_size() > 1 ) {
+			verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
+			key = values_[1];
+		}
+		HHuginn::value_t v( make_pointer<HHuginn::HList>() );
+		HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
+		if ( t == HHuginn::TYPE::LIST ) {
+			HHuginn::HList::values_t const& s( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
+			dest = s;
+		} else if ( t == HHuginn::TYPE::ORDER ) {
+			HHuginn::HOrder::values_t const& s( static_cast<HHuginn::HOrder const*>( values_[0].raw() )->value() );
+			dest.assign( s.begin(), s.end() );
+		} else if ( t == HHuginn::TYPE::SET ) {
+			HHuginn::HSet::values_t const& s( static_cast<HHuginn::HSet const*>( values_[0].raw() )->value() );
+			dest.assign( s.begin(), s.end() );
+		} else if ( t == HHuginn::TYPE::DICT ) {
+			HHuginn::HDict::values_t const& s( static_cast<HHuginn::HDict const*>( values_[0].raw() )->value() );
+			for ( HHuginn::HDict::values_t::value_type const& e : s ) {
+				dest.push_back( e.first );
+			}
+		} else if ( t == HHuginn::TYPE::LOOKUP ) {
+			HHuginn::HLookup::values_t const& s( static_cast<HHuginn::HLookup const*>( values_[0].raw() )->value() );
+			for ( HHuginn::HLookup::values_t::value_type const& e : s ) {
+				dest.push_back( e.first );
+			}
+		} else if ( t == HHuginn::TYPE::STRING ) {
+			HString const& s( get_string( values_[0] ) );
+			for ( char c : s ) {
+				dest.push_back( make_pointer<HHuginn::HCharacter>( c ) );
+			}
+		} else {
+			M_ASSERT( ! "bad code path"[0] );
+		}
+		if ( ! key ) {
+			sort( dest.begin(), dest.end(), &value_builtin::less_low );
+		} else {
+			HHuginn::values_t l( 1 );
+			HHuginn::values_t r( 1 );
+			HHuginn::function_t k( static_cast<HHuginn::HFunctionReference*>( key.raw() )->function() );
+			sort(
+				dest.begin(), dest.end(),
+				[&l, &r, &k, &thread_, &position_]( HHuginn::value_t const& l_, HHuginn::value_t const& r_ ) {
+					l[0] = l_;
+					r[0] = r_;
+					return (
+						value_builtin::less(
+							k( thread_, nullptr, l, position_ ),
+							k( thread_, nullptr, r, position_ ),
+							position_
+						)
+					);
+				}
+			);
+		}
+		return ( v );
+	}
 private:
 	HHuginn::value_t do_range( HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
@@ -127,9 +189,11 @@ private:
 				stop = static_cast<int>( get_integer( values_[0] ) );
 			} break;
 			case ( 3 ): {
+				verify_arg_type( name, values_, 2, HHuginn::TYPE::INTEGER, false, position_ );
 				step = static_cast<int>( get_integer( values_[2] ) );
 			} /* fall-through */
 			case ( 2 ): {
+				verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
 				from = static_cast<int>( get_integer( values_[0] ) );
 				stop = static_cast<int>( get_integer( values_[1] ) );
 			} break;
@@ -155,10 +219,12 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HHuginn* huginn_ ) {
 			t,
 			nullptr,
 			HHuginn::HClass::field_names_t{
-				"range"
+				"range",
+				"sorted"
 			},
 			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) )
 			}
 		)
 	);
