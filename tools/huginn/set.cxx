@@ -73,9 +73,9 @@ namespace set {
 inline HHuginn::value_t add( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "set.add", values_, 1, 1, position_ );
-	HHuginn::HOrder* s( dynamic_cast<HHuginn::HOrder*>( object_ ) );
+	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_ ) );
 	M_ASSERT( s != nullptr );
-	s->insert( values_[0], position_ );
+	s->insert( values_[0] );
 	return ( object_->get_pointer() );
 	M_EPILOG
 }

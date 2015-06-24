@@ -507,10 +507,14 @@ void OCompiler::commit_ternary( executing_parser::position_t position_ ) {
 	}
 }
 
-void OCompiler::add_return_statement( executing_parser::position_t ) {
+void OCompiler::add_return_statement( executing_parser::position_t position_ ) {
 	M_PROLOG
 	M_ASSERT( ! f()._compilationStack.is_empty() );
-	current_scope()->add_statement( make_pointer<HReturn>( current_expression() ) );
+	HHuginn::expression_t& e( current_expression() );
+	if ( e->is_empty() ) {
+		e->add_execution_step( hcore::call( &HExpression::store_direct, e.raw(), _none_, _1, position_.get() ) );
+	}
+	current_scope()->add_statement( make_pointer<HReturn>( e ) );
 	reset_expression();
 	return;
 	M_EPILOG

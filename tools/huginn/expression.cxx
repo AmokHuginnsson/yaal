@@ -439,8 +439,10 @@ void HExpression::equals( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( v1->type() != v2->type() ) {
-		operands_type_mismatch( "==", v1->type(), v2->type(), p );
+	HHuginn::type_t t1( v1->type() );
+	HHuginn::type_t t2( v2->type() );
+	if ( ( t1 != t2 ) && ( t1 != HHuginn::TYPE::NONE ) && ( t2 != HHuginn::TYPE::NONE ) ) {
+		operands_type_mismatch( "==", t1, t2, p );
 	}
 	frame_->values().push( make_pointer<HHuginn::HBoolean>( value_builtin::equals( v1, v2, p ) ) );
 	return;
@@ -457,8 +459,10 @@ void HExpression::not_equals( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( v1->type() != v2->type() ) {
-		operands_type_mismatch( "!=", v1->type(), v2->type(), p );
+	HHuginn::type_t t1( v1->type() );
+	HHuginn::type_t t2( v2->type() );
+	if ( ( t1 != t2 ) && ( t1 != HHuginn::TYPE::NONE ) && ( t2 != HHuginn::TYPE::NONE ) ) {
+		operands_type_mismatch( "!=", t1, t2, p );
 	}
 	frame_->values().push( make_pointer<HHuginn::HBoolean>( ! value_builtin::equals( v1, v2, p ) ) );
 	return;
