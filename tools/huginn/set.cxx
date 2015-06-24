@@ -70,12 +70,22 @@ private:
 
 namespace set {
 
+inline HHuginn::value_t add( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "set.add", values_, 1, 1, position_ );
+	HHuginn::HOrder* s( dynamic_cast<HHuginn::HOrder*>( object_ ) );
+	M_ASSERT( s != nullptr );
+	s->insert( values_[0], position_ );
+	return ( object_->get_pointer() );
+	M_EPILOG
+}
+
 inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "set.has_key", values_, 1, 1, position_ );
-	HHuginn::HSet* m( dynamic_cast<HHuginn::HSet*>( object_ ) );
-	M_ASSERT( m != nullptr );
-	bool hasKey( m->has_key( values_[0] ) );
+	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_ ) );
+	M_ASSERT( s != nullptr );
+	bool hasKey( s->has_key( values_[0] ) );
 	return ( make_pointer<HHuginn::HBoolean>( hasKey ) );
 	M_EPILOG
 }
@@ -83,11 +93,11 @@ inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HH
 inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "set.erase", values_, 1, 1, position_ );
-	HHuginn::HSet* m( dynamic_cast<HHuginn::HSet*>( object_ ) );
-	M_ASSERT( m != nullptr );
-	M_ASSERT( !! m->get_pointer() );
-	m->erase( values_[0] );
-	return ( m->get_pointer() );
+	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_ ) );
+	M_ASSERT( s != nullptr );
+	M_ASSERT( !! s->get_pointer() );
+	s->erase( values_[0] );
+	return ( s->get_pointer() );
 	M_EPILOG
 }
 
@@ -98,9 +108,11 @@ HHuginn::HClass _setClass_(
 	HHuginn::TYPE::SET,
 	nullptr,
 	/* methods */ {
+		"add",
 		"has_key",
 		"erase"
 	}, {
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::add, _1, _2, _3, _4 ) ),
 		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::has_key, _1, _2, _3, _4 ) ),
 		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::erase, _1, _2, _3, _4 ) )
 	}

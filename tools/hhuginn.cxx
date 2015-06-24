@@ -1537,12 +1537,23 @@ inline HHuginn::value_t dict( huginn::HThread*, HHuginn::HObject*, HHuginn::valu
 	M_EPILOG
 }
 
+inline HHuginn::value_t order( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	HHuginn::value_t v( make_pointer<HHuginn::HOrder>() );
+	HHuginn::HOrder* o( static_cast<HHuginn::HOrder*>( v.raw() ) );
+	for ( HHuginn::value_t const& e : values_ ) {
+		o->insert( e, position_ );
+	}
+	return ( v );
+	M_EPILOG
+}
+
 inline HHuginn::value_t set( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int ) {
 	M_PROLOG
 	HHuginn::value_t v( make_pointer<HHuginn::HSet>() );
-	HHuginn::HSet* l( static_cast<HHuginn::HSet*>( v.raw() ) );
+	HHuginn::HSet* s( static_cast<HHuginn::HSet*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
-		l->insert( e );
+		s->insert( e );
 	}
 	return ( v );
 	M_EPILOG
@@ -1614,6 +1625,7 @@ void HHuginn::register_builtins( void ) {
 	_functions.insert( make_pair<yaal::hcore::HString const>( "copy", hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "list", hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "dict", hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "order", hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "set", hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) ) );

@@ -33,6 +33,7 @@ Copyright:
 #include <atomic>
 
 #include "hcore/hmap.hxx"
+#include "hcore/hset.hxx"
 #include "hcore/hhashmap.hxx"
 #include "hcore/hstack.hxx"
 #include "hcore/hstreaminterface.hxx"
@@ -594,6 +595,32 @@ private:
 	void verify_key_type( HHuginn::type_t, int ) const;
 	HDict( HDict const& ) = delete;
 	HDict& operator = ( HDict const& ) = delete;
+private:
+	virtual value_t do_clone( void ) const override;
+};
+
+class HHuginn::HOrder : public HHuginn::HIterable {
+public:
+	typedef HHuginn::HOrder this_type;
+	typedef HHuginn::HIterable base_type;
+	typedef bool (*cmp_t)( HHuginn::value_t const&, HHuginn::value_t const& );
+	typedef yaal::hcore::HSet<HHuginn::value_t, cmp_t> values_t;
+private:
+	values_t _data;
+	type_t _keyType;
+public:
+	HOrder( void );
+	HOrder( values_t const&, type_t );
+	int long size( void ) const;
+	void insert( HHuginn::value_t const&, int );
+	bool has_key( HHuginn::value_t const&, int ) const;
+	void erase( HHuginn::value_t const&, int );
+protected:
+	virtual HIterator do_iterator( void ) override;
+private:
+	void verify_key_type( HHuginn::type_t, int ) const;
+	HOrder( HOrder const& ) = delete;
+	HOrder& operator = ( HOrder const& ) = delete;
 private:
 	virtual value_t do_clone( void ) const override;
 };

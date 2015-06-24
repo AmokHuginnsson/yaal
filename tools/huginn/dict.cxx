@@ -73,9 +73,9 @@ namespace dict {
 inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict.has_key", values_, 1, 1, position_ );
-	HHuginn::HDict* m( dynamic_cast<HHuginn::HDict*>( object_ ) );
-	M_ASSERT( m != nullptr );
-	bool hasKey( m->has_key( values_[0], position_ ) );
+	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_ ) );
+	M_ASSERT( d != nullptr );
+	bool hasKey( d->has_key( values_[0], position_ ) );
 	return ( make_pointer<HHuginn::HBoolean>( hasKey ) );
 	M_EPILOG
 }
@@ -83,16 +83,16 @@ inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HH
 inline HHuginn::value_t get( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict.get", values_, 1, 2, position_ );
-	HHuginn::HDict* m( dynamic_cast<HHuginn::HDict*>( object_ ) );
-	M_ASSERT( m != nullptr );
+	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_ ) );
+	M_ASSERT( d != nullptr );
 	HHuginn::value_t v;
 	if ( values_.get_size() > 1 ) {
-		bool hasKey( m->try_get( values_[0], v, position_ ) );
+		bool hasKey( d->try_get( values_[0], v, position_ ) );
 		if ( ! hasKey ) {
 			v = values_[1];
 		}
 	} else {
-		v = m->get( values_[0], position_ );
+		v = d->get( values_[0], position_ );
 	}
 	return ( v );
 	M_EPILOG
@@ -101,11 +101,11 @@ inline HHuginn::value_t get( huginn::HThread*, HHuginn::HObject* object_, HHugin
 inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict.erase", values_, 1, 1, position_ );
-	HHuginn::HDict* m( dynamic_cast<HHuginn::HDict*>( object_ ) );
-	M_ASSERT( m != nullptr );
-	M_ASSERT( !! m->get_pointer() );
-	m->erase( values_[0], position_ );
-	return ( m->get_pointer() );
+	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_ ) );
+	M_ASSERT( d != nullptr );
+	M_ASSERT( !! d->get_pointer() );
+	d->erase( values_[0], position_ );
+	return ( d->get_pointer() );
 	M_EPILOG
 }
 
