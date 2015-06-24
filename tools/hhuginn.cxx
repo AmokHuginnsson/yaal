@@ -1548,6 +1548,13 @@ inline HHuginn::value_t order( huginn::HThread*, HHuginn::HObject*, HHuginn::val
 	M_EPILOG
 }
 
+inline HHuginn::value_t lookup( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "lookup", values_, 0, 0, position_ );
+	return ( make_pointer<HHuginn::HLookup>() );
+	M_EPILOG
+}
+
 inline HHuginn::value_t set( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int ) {
 	M_PROLOG
 	HHuginn::value_t v( make_pointer<HHuginn::HSet>() );
@@ -1626,6 +1633,7 @@ void HHuginn::register_builtins( void ) {
 	_functions.insert( make_pair<yaal::hcore::HString const>( "list", hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "dict", hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "order", hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "lookup", hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "set", hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) ) );

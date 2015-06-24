@@ -71,8 +71,11 @@ HHuginn::value_t subscript( HExpression::ACCESS subscript_, HHuginn::value_t& ba
 			res = make_pointer<HHuginn::HHuginn::HCharacter>( s->value()[static_cast<int>( index )] );
 		}
 	} else if ( baseType == HHuginn::TYPE::DICT ) {
-		HHuginn::HDict* m( static_cast<HHuginn::HDict*>( base_.raw() ) );
-		res = ( subscript_ == HExpression::ACCESS::VALUE ? m->get( index_, position_ ) : m->get_ref( index_, position_ ) );
+		HHuginn::HDict* d( static_cast<HHuginn::HDict*>( base_.raw() ) );
+		res = ( subscript_ == HExpression::ACCESS::VALUE ? d->get( index_, position_ ) : d->get_ref( index_, position_ ) );
+	} else if ( baseType == HHuginn::TYPE::LOOKUP ) {
+		HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( base_.raw() ) );
+		res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( index_, position_ ) : l->get_ref( index_ ) );
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( baseType->name() ).append( "'." ), position_ );
 	}

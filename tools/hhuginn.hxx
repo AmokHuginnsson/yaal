@@ -625,6 +625,34 @@ private:
 	virtual value_t do_clone( void ) const override;
 };
 
+class HHuginn::HLookup : public HHuginn::HIterable {
+public:
+	typedef HHuginn::HLookup this_type;
+	typedef HHuginn::HIterable base_type;
+	typedef int long (*hash_t)( HHuginn::value_t const& );
+	typedef bool (*equals_t)( HHuginn::value_t const&, HHuginn::value_t const& );
+	typedef yaal::hcore::HHashMap<HHuginn::value_t, HHuginn::value_t, hash_t, equals_t> values_t;
+private:
+	values_t _data;
+public:
+	HLookup( void );
+	HLookup( values_t const& );
+	int long size( void ) const;
+	void insert( HHuginn::value_t const&, HHuginn::value_t const& );
+	bool has_key( HHuginn::value_t const& ) const;
+	void erase( HHuginn::value_t const& );
+	value_t get( HHuginn::value_t const&, int );
+	value_t get_ref( HHuginn::value_t const& );
+	bool try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_ );
+protected:
+	virtual HIterator do_iterator( void ) override;
+private:
+	HLookup( HLookup const& ) = delete;
+	HLookup& operator = ( HLookup const& ) = delete;
+private:
+	virtual value_t do_clone( void ) const override;
+};
+
 class HHuginn::HSet : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HSet this_type;
