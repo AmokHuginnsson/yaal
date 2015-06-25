@@ -85,14 +85,42 @@ inline HHuginn::value_t find( huginn::HThread*, HHuginn::HObject* object_, HHugi
 	M_EPILOG
 }
 
+inline HHuginn::value_t strip( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "string.find";
+	verify_arg_count( name, values_, 0, 1, position_ );
+	char const* trimChars( nullptr );
+	if ( values_.get_size() > 0 ) {
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		trimChars = get_string( values_[0] ).raw();
+	}
+	HString dest( get_string( object_ ) );
+	int long len( dest.get_length() );
+	if ( trimChars ) {
+		dest.trim( trimChars );
+	} else {
+		dest.trim();
+	}
+	HHuginn::value_t v;
+	if ( dest.get_length() != len ) {
+		v =  make_pointer<HHuginn::HString>( dest );
+	} else {
+		v = object_->get_pointer();
+	}
+	return ( v );
+	M_EPILOG
+}
+
 HHuginn::HClass _stringClass_(
 	nullptr,
 	HHuginn::TYPE::STRING,
 	nullptr,
 	/* methods */ {
-		"find"
+		"find",
+		"strip"
 	}, {
 		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find, _1, _2, _3, _4 ) ),
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) )
 	}
 );
 

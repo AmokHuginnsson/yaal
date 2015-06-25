@@ -1599,7 +1599,7 @@ inline HHuginn::value_t input( huginn::HThread* thread_, HHuginn::HObject*, HHug
 	M_PROLOG
 	verify_arg_count( "input", values_, 0, 0, position_ );
 	yaal::hcore::HString l;
-	thread_->huginn().input_stream().read_until( l );
+	thread_->huginn().input_stream().read_until( l, HStreamInterface::eols, false );
 	return ( make_pointer<HHuginn::HString>( l ) );
 	M_EPILOG
 }

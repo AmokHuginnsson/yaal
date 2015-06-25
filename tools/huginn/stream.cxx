@@ -121,7 +121,7 @@ void HStream::write_impl( HString const& val_ ) {
 
 yaal::hcore::HString const& HStream::read_line_impl( void ) {
 	M_PROLOG
-	_stream->read_until( _lineBuffer );
+	_stream->read_until( _lineBuffer, HStreamInterface::eols, false );
 	return ( _lineBuffer );
 	M_EPILOG
 }
