@@ -340,17 +340,17 @@ int long HSynchronizedStream::do_read_until_n( yaal::hcore::HString& store, int 
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_read_while( yaal::hcore::HString& store, char const* const acquire_, bool strip ) {
+int long HSynchronizedStream::do_read_while( yaal::hcore::HString& store, char const* const acquire_ ) {
 	M_PROLOG
 	HLock l( _mutex );
-	return ( HStreamInterface::do_read_while( store, acquire_, strip ) );
+	return ( HStreamInterface::do_read_while( store, acquire_ ) );
 	M_EPILOG
 }
 
-int long HSynchronizedStream::do_read_while_n( yaal::hcore::HString& store, int long maxcount, char const* const acquire_, bool strip ) {
+int long HSynchronizedStream::do_read_while_n( yaal::hcore::HString& store, int long maxcount, char const* const acquire_ ) {
 	M_PROLOG
 	HLock l( _mutex );
-	return ( HStreamInterface::do_read_while_n( store, maxcount, acquire_, strip ) );
+	return ( HStreamInterface::do_read_while_n( store, maxcount, acquire_ ) );
 	M_EPILOG
 }
 

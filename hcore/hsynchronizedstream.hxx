@@ -103,8 +103,8 @@ protected:
 	virtual HStreamInterface& do_input( manipulator_t const& ) override;
 	virtual int long do_read_until( yaal::hcore::HString&, char const* const, bool ) override;
 	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const* const, bool ) override;
-	virtual int long do_read_while( yaal::hcore::HString&, char const* const, bool ) override;
-	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* const, bool ) override;
+	virtual int long do_read_while( yaal::hcore::HString&, char const* const ) override;
+	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* const ) override;
 	virtual int do_peek( void ) override;
 	virtual HStreamInterface& do_set_fill( int ) override;
 	virtual HStreamInterface& do_set_width( int ) override;

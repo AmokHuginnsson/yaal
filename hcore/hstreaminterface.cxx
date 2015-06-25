@@ -394,25 +394,25 @@ int long HStreamInterface::do_read_until_n( HString& message_, int long maxCount
 }
 
 int long HStreamInterface::do_read_while( HString& message_,
-		char const* const acquire_, bool stripDelim_ ) {
+		char const* const acquire_ ) {
 	M_PROLOG
-	return ( HStreamInterface::do_read_while_n( message_, meta::max_signed<int long>::value, acquire_, stripDelim_ ) );
+	return ( HStreamInterface::do_read_while_n( message_, meta::max_signed<int long>::value, acquire_ ) );
 	M_EPILOG
 }
 
 int long HStreamInterface::do_read_while_n( HString& message_, int long maxCount_,
-		char const* const acquire_, bool stripDelim_ ) {
+		char const* const acquire_ ) {
 	M_PROLOG
-	return ( semantic_read( message_, maxCount_, acquire_, stripDelim_, false ) );
+	return ( semantic_read( message_, maxCount_, acquire_, false, false ) );
 	M_EPILOG
 }
 
 int long HStreamInterface::read_while_retry( yaal::hcore::HString& message_,
-		char const* acquire_, bool stripDelim_ ) {
+		char const* acquire_ ) {
 	M_PROLOG
 	int long nRead( 0 );
 	do {
-		nRead = HStreamInterface::do_read_while( message_, acquire_, stripDelim_ );
+		nRead = HStreamInterface::do_read_while( message_, acquire_ );
 	} while ( good() && nRead < 0 );
 	return ( nRead );
 	M_EPILOG
@@ -429,8 +429,15 @@ int long HStreamInterface::read_until_retry( yaal::hcore::HString& message_,
 	M_EPILOG
 }
 
-int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int long maxCount_, char const* const set_, bool stripDelim_, bool isStopSet_ ) {
+int long HStreamInterface::semantic_read(
+	yaal::hcore::HString& message_,
+	int long maxCount_,
+	char const* set_,
+	bool stripDelim_,
+	bool isStopSet_
+) {
 	M_PROLOG
+	M_ASSERT( isStopSet_ || ! stripDelim_ );
 	M_ASSERT( _offset >= 0 );
 	int long nRead( 0 ); /* how many bytes were read in this single invocation */
 	int long iPoolSize( _cache.size() );
@@ -439,19 +446,20 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 	int setLen( static_cast<int>( ::strlen( set_ ) + 1 ) ); /* + 1 for terminating \0 byte that also could be searched for */
 	if ( _offset ) {
 		int cached( 0 );
-		for ( ; ( cached < _offset ) && ( cached < maxCount_ ); ++ cached ) {
-			if ( ( byDelim = ( ::memchr( set_, buffer[ cached ], static_cast<size_t>( setLen ) ) ? isStopSet_ : ! isStopSet_ ) ) )
+		int long toReadFromCache( min( _offset, static_cast<int>( maxCount_ ) ) );
+		for ( ; cached < toReadFromCache; ++ cached ) {
+			if ( ( byDelim = ( ::memchr( set_, buffer[ cached ], static_cast<size_t>( setLen ) ) ? isStopSet_ : ! isStopSet_ ) ) ) {
+				if ( isStopSet_ ) {
+					++ cached;
+				}
 				break;
+			}
 		}
 		if ( ( cached == maxCount_ ) || byDelim ) {
-			nRead = cached - ( ( ( cached > 0 ) && ! stripDelim_ ) ? 1 : 0 );
-			message_.assign( buffer, nRead );
-			if ( nRead ) {
-				_offset -= static_cast<int>( nRead );
-				::memmove( buffer, buffer + nRead, static_cast<size_t>( _offset ) );
-			}
-			if ( byDelim )
-				++ nRead;
+			nRead = cached;
+			message_.assign( buffer, nRead - ( ( ( nRead > 0 ) && byDelim && stripDelim_ ) ? 1 : 0 ) );
+			_offset -= static_cast<int>( nRead );
+			::memmove( buffer, buffer + nRead, static_cast<size_t>( _offset ) );
 		}
 	}
 	if ( ! ( nRead || byDelim ) ) {
@@ -480,18 +488,19 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 				_valid = false;
 			}
 			nRead = _offset;
-			message_.assign( buffer, _offset - ( ( ( _offset > 0 ) && byDelim ) ? 1 : 0 ) );
-			if ( byDelim && ! stripDelim_ ) {
-				M_ASSERT( _offset > 0 );
-				/*
-				 * WTF???
-				 */
-				buffer[ 0 ] = buffer[ _offset - 1 ];
+			if ( byDelim && ! isStopSet_ ) {
+				-- nRead;
+			}
+			message_.assign( buffer, nRead - ( ( ( nRead > 0 ) && byDelim && stripDelim_ ) ? 1 : 0 ) );
+			if ( byDelim && ! isStopSet_ ) {
+				buffer[0] = buffer[_offset - 1];
 				_offset = 1;
-			} else
+			} else {
 				_offset = 0;
-		} else
+			}
+		} else {
 			message_.clear();
+		}
 	}
 	return ( nRead );
 	M_EPILOG
@@ -500,8 +509,9 @@ int long HStreamInterface::semantic_read( yaal::hcore::HString& message_, int lo
 int HStreamInterface::do_peek( void ) {
 	if ( ! _offset ) {
 		int long iPoolSize( _cache.size() );
-		if ( iPoolSize < 1 )
+		if ( iPoolSize < 1 ) {
 			_cache.realloc( 1 );
+		}
 		int long nRead( 0 );
 		do {
 			nRead = do_read( _cache.raw(), 1 );
@@ -532,7 +542,7 @@ bool HStreamInterface::read_word( void ) {
 		}
 	}
 	if ( good() ) {
-		read_while_retry( _wordCache, _whiteSpace_.data(), false );
+		read_while_retry( _wordCache, _whiteSpace_.data() );
 		if ( _skipWS ) {
 			_wordCache.clear();
 		}
@@ -546,7 +556,7 @@ bool HStreamInterface::read_word( void ) {
 
 bool HStreamInterface::read_integer( void ) {
 	M_PROLOG
-	read_while_retry( _wordCache, _whiteSpace_.data(), false );
+	read_while_retry( _wordCache, _whiteSpace_.data() );
 	_wordCache.clear();
 	if ( good() ) {
 		bool neg( HStreamInterface::do_peek() == '-' );
@@ -555,7 +565,7 @@ bool HStreamInterface::read_integer( void ) {
 			HStreamInterface::read( &sink, 1 );
 		}
 		if ( good() ) {
-			read_while_retry( _wordCache, _digit_.data(), false );
+			read_while_retry( _wordCache, _digit_.data() );
 			if ( neg ) {
 				_wordCache.insert( 0, "-" );
 			}
@@ -568,7 +578,7 @@ bool HStreamInterface::read_integer( void ) {
 bool HStreamInterface::read_floatint_point( void ) {
 	M_PROLOG
 	do {
-		read_while_retry( _wordCache, _whiteSpace_.data(), false );
+		read_while_retry( _wordCache, _whiteSpace_.data() );
 		_wordCache.clear();
 		if ( ! good() ) {
 			break;
@@ -581,7 +591,7 @@ bool HStreamInterface::read_floatint_point( void ) {
 		if ( neg ) {
 			read( &sink, 1 );
 		}
-		read_while_retry( _wordCache, _digit_.data(), false );
+		read_while_retry( _wordCache, _digit_.data() );
 		if ( ! good() ) {
 			break;
 		}
@@ -594,7 +604,7 @@ bool HStreamInterface::read_floatint_point( void ) {
 		}
 		if ( dot ) {
 			HString decimal;
-			read_while_retry( decimal, _digit_.data(), false );
+			read_while_retry( decimal, _digit_.data() );
 			if ( ! decimal.is_empty() ) {
 				_wordCache += sink;
 				_wordCache += decimal;
