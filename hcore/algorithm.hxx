@@ -1618,8 +1618,11 @@ inline bool is_heap( iterator_t first_, iterator_t last_ ) {
  */
 template<typename iterator_t, typename compare_t>
 inline void sort_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
-	for ( iterator_t first( first_ + 1 ); last_ != first; -- last_ )
-		pop_heap( first_, last_, comp_ );
+	if ( first_ != last_ ) {
+		for ( iterator_t first( first_ + 1 ); last_ != first; -- last_ ) {
+			pop_heap( first_, last_, comp_ );
+		}
+	}
 	return;
 }
 
@@ -1642,8 +1645,10 @@ inline void sort_heap( iterator_t first_, iterator_t last_ ) {
  */
 template<typename iterator_t, typename compare_t>
 inline void heap_sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
-	make_heap( first_, last_, comp_ );
-	sort_heap( first_, last_, comp_ );
+	if ( first_ != last_ ) {
+		make_heap( first_, last_, comp_ );
+		sort_heap( first_, last_, comp_ );
+	}
 	return;
 }
 
@@ -1668,8 +1673,9 @@ inline void insert_sort( iterator_t first_, iterator_t last_, compare_t comp_, h
 		iterator_t next( it );
 		++ next;
 		iterator_t sorted( first_ );
-		while ( ( sorted != it ) && ! comp_( *it, *sorted ) )
+		while ( ( sorted != it ) && ! comp_( *it, *sorted ) ) {
 			++ sorted;
+		}
 		if ( sorted != it ) {
 			value_t tmp( *it );
 			copy_backward( sorted, it, next );
@@ -1689,15 +1695,18 @@ inline void insert_sort( iterator_t first_, iterator_t last_, compare_t comp_, h
 		iterator_t sorted( first_ + dist );
 		while ( dist > 1 ) {
 			dist >>= 1;
-			if ( comp_( *it, *sorted ) )
+			if ( comp_( *it, *sorted ) ) {
 				sorted -= ( dist & 1 ? dist + 1 : dist );
-			else
+			} else {
 				sorted += dist;
+			}
 		}
-		if ( ( sorted != first_ ) && comp_( *it, *sorted ) )
+		if ( ( sorted != first_ ) && comp_( *it, *sorted ) ) {
 			-- sorted;
-		while ( ( sorted != it ) && ! comp_( *it, *sorted ) )
+		}
+		while ( ( sorted != it ) && ! comp_( *it, *sorted ) ) {
 			++ sorted;
+		}
 		if ( sorted != it ) {
 			value_t tmp( *it );
 			copy_backward( sorted, it, it + 1 );
@@ -1731,9 +1740,9 @@ inline void stable_sort_impl( iterator_t first_, iterator_t last_, compare_t com
 		hcore::HAuxiliaryBuffer<typename hcore::iterator_traits<iterator_t>::value_type>& aux_ ) {
 	using yaal::distance;
 	int long size( distance( first_, last_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
-	if ( size < YAAL_MERGE_SORT_ALGO_THRESHOLD )
+	if ( size < YAAL_MERGE_SORT_ALGO_THRESHOLD ) {
 		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() );
-	else {
+	} else {
 		iterator_t mid( first_ );
 		using yaal::advance;
 		advance( mid, size / 2, typename hcore::iterator_traits<iterator_t>::category_type() );
@@ -1755,20 +1764,22 @@ inline void stable_sort_impl( iterator_t first_, iterator_t last_, compare_t com
 template<typename iterator_t, typename compare_t>
 inline void stable_sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	using yaal::distance;
-	int long size( distance( first_, last_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
-	if ( size < YAAL_MERGE_SORT_ALGO_THRESHOLD )
-		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() );
-	else {
-		iterator_t mid( first_ );
-		using yaal::advance;
-		advance( mid, size / 2, typename hcore::iterator_traits<iterator_t>::category_type() );
-		typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
-		typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
-		aux_t aux( first_, mid );
-		stable_sort_impl( first_, mid, comp_, aux );
-		stable_sort_impl( mid, last_, comp_, aux );
-		aux.init( first_, mid );
-		inplace_merge_impl( first_, mid, last_, comp_, aux );
+	if ( first_ != last_ ) {
+		int long size( distance( first_, last_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
+		if ( size < YAAL_MERGE_SORT_ALGO_THRESHOLD ) {
+			insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() );
+		} else {
+			iterator_t mid( first_ );
+			using yaal::advance;
+			advance( mid, size / 2, typename hcore::iterator_traits<iterator_t>::category_type() );
+			typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
+			typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
+			aux_t aux( first_, mid );
+			stable_sort_impl( first_, mid, comp_, aux );
+			stable_sort_impl( mid, last_, comp_, aux );
+			aux.init( first_, mid );
+			inplace_merge_impl( first_, mid, last_, comp_, aux );
+		}
 	}
 	return;
 }
@@ -1912,12 +1923,15 @@ template<typename iterator_t, typename predicate_t>
 inline iterator_t stable_partition( iterator_t first_, iterator_t last_, predicate_t predicate_ ) {
 	typedef typename hcore::iterator_traits<iterator_t>::value_type value_t;
 	typedef hcore::HAuxiliaryBuffer<value_t> aux_t;
-	aux_t aux( first_, last_ );
-	iterator_t it;
-	if ( aux.get_size() > 0 )
-		it = stable_partition_impl( first_, last_, predicate_, aux );
-	else
-		it = stable_partition_impl( first_, last_, predicate_ );
+	iterator_t it( first_ );
+	if ( first_ != last_ ) {
+		aux_t aux( first_, last_ );
+		if ( aux.get_size() > 0 ) {
+			it = stable_partition_impl( first_, last_, predicate_, aux );
+		} else {
+			it = stable_partition_impl( first_, last_, predicate_ );
+		}
+	}
 	return ( it );
 }
 
@@ -1930,47 +1944,49 @@ inline iterator_t stable_partition( iterator_t first_, iterator_t last_, predica
 template<typename iterator_t, typename compare_t>
 inline void sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 	using yaal::distance;
-	int long size( distance( first_, last_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
-	if ( size < YAAL_QUICK_SORT_ALGO_THRESHOLD )
-		insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() );
-	else {
-		iterator_t l( first_ );
-		iterator_t r( last_ - 1 );
-		typename hcore::iterator_traits<iterator_t>::value_type pivot( choose_pivot( l, r, comp_ ) );
-		using yaal::swap;
-		while ( l != r ) {
-			for ( ; ( l != r ) && comp_( *l, pivot ); ++ l )
-				;
-			for ( ; ( r != l ) && ! comp_( *r, pivot ); -- r )
-				;
-			if ( l != r ) {
-				swap( *l, *r );
-				++ l;
-				if ( l != r )
-					-- r;
-				else
-					break;
-			} else
-				break;
-		}
-		for ( ; ( l != last_ ) && comp_( *l, pivot ); ++ l )
-			;
-		bool leftConstant( false );
-		if ( ! ( l != first_ ) ) {
-			/* if l == first_ it means that pivot is minimum of a set
-			 */
-			leftConstant = true;
-			for ( r = l; r != last_; ++ r ) {
-				if ( ( ! comp_( pivot, *r ) ) && ( r != l ) ) {
-					swap( *r, *l );
+	if ( first_ != last_ ) {
+		int long size( distance( first_, last_, typename hcore::iterator_traits<iterator_t>::category_type() ) );
+		if ( size < YAAL_QUICK_SORT_ALGO_THRESHOLD ) {
+			insert_sort( first_, last_, comp_, typename hcore::iterator_traits<iterator_t>::category_type() );
+		} else {
+			iterator_t l( first_ );
+			iterator_t r( last_ - 1 );
+			typename hcore::iterator_traits<iterator_t>::value_type pivot( choose_pivot( l, r, comp_ ) );
+			using yaal::swap;
+			while ( l != r ) {
+				for ( ; ( l != r ) && comp_( *l, pivot ); ++ l )
+					;
+				for ( ; ( r != l ) && ! comp_( *r, pivot ); -- r )
+					;
+				if ( l != r ) {
+					swap( *l, *r );
 					++ l;
+					if ( l != r )
+						-- r;
+					else
+						break;
+				} else
+					break;
+			}
+			for ( ; ( l != last_ ) && comp_( *l, pivot ); ++ l )
+				;
+			bool leftConstant( false );
+			if ( ! ( l != first_ ) ) {
+				/* if l == first_ it means that pivot is minimum of a set
+				 */
+				leftConstant = true;
+				for ( r = l; r != last_; ++ r ) {
+					if ( ( ! comp_( pivot, *r ) ) && ( r != l ) ) {
+						swap( *r, *l );
+						++ l;
+					}
 				}
 			}
-		}
-		if ( l != last_ ) {
-			if ( ! leftConstant )
-				sort( first_, l, comp_ );
-			sort( l, last_, comp_ );
+			if ( l != last_ ) {
+				if ( ! leftConstant )
+					sort( first_, l, comp_ );
+				sort( l, last_, comp_ );
+			}
 		}
 	}
 	return;
