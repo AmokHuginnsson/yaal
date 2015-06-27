@@ -55,11 +55,12 @@ SSL_KEYS_DIR   = db/$(LIB_NAME)/keys/
 SSL_KEYS       = $(SSL_KEYS_DIR)/key $(SSL_KEYS_DIR)/pem
 DIRS           = $(DIR_BUILD) $(SSL_KEYS_DIR)
 DO_@DO_TARGET@=1
-include $(DIR_ROOT)/_aux/mk/1_basic.mk
-include $(DIR_ROOT)/_aux/mk/2_term.mk
-include $(DIR_ROOT)/_aux/mk/3_suffix.mk
-include $(DIR_ROOT)/_aux/mk/4_wrapper.mk
-include $(DIR_ROOT)/_aux/mk/5_flags.mk
+include $(DIR_ROOT)/_aux/mk/00_sanity.mk
+include $(DIR_ROOT)/_aux/mk/10_basic.mk
+include $(DIR_ROOT)/_aux/mk/20_term.mk
+include $(DIR_ROOT)/_aux/mk/30_suffix.mk
+include $(DIR_ROOT)/_aux/mk/50_wrapper.mk
+include $(DIR_ROOT)/_aux/mk/60_flags.mk
 EXTRA_COMPILER_DEBUG_FLAGS=@EXTRA_COMPILER_DEBUG_FLAGS@
 EXTRA_COMPILER_OPTIMIZATION_FLAGS=@EXTRA_COMPILER_OPTIMIZATION_FLAGS@
 EXTRA_INCLUDE_PATHS=@EXTRA_INCLUDE_PATHS@
@@ -69,7 +70,7 @@ override EXTRA_LXXFLAGS+=@EXTRA_LXXFLAGS@
 override CXXFLAGS+= -D__YAAL_BUILD__ @DEFS@ @PCRE_CFLAGS@ @XML2_CFLAGS@ @XSLT_CFLAGS@ @EXSLT_CFLAGS@
 override LXXFLAGS+= -L. -shared @YAAL_LXXFLAGS@
 
-include $(DIR_ROOT)/_aux/mk/7_func.mk
+include $(DIR_ROOT)/_aux/mk/80_func.mk
 
 $(foreach IT,$(COMPONENTS),$(eval $(call PREPARE_VARIABLES,$(IT),$(IT),$(LIB_NAME)_)))
 SRCS := $(filter-out %_driver.$(SS),$(SRCS))
@@ -146,10 +147,10 @@ define UNINSTALL_TARGET
 	$(call msg,printf "%b$(NL)" "done.$(CL)" && )
 endef
 
-include $(DIR_ROOT)/_aux/mk/b_implicit-compile.mk
+include $(DIR_ROOT)/_aux/mk/c0_implicit-compile.mk
 #------------------------------------------------------------------------
 
-include $(DIR_ROOT)/_aux/mk/c_target-default.mk
+include $(DIR_ROOT)/_aux/mk/d0_target-default.mk
 
 #phony targets
 .PHONY: all bin clean clean-dep cov coverage-stats debug dep distclean doc install install-environment mrproper relassert reldeb release prepare-coverage-baseline prof purge purge-local static stats test uninstall
@@ -218,7 +219,7 @@ mrproper: clean
 purge-local:
 	@/bin/rm -f $(DIR_ROOT)/dropprivs $(DIR_ROOT)/debian
 
-include $(DIR_ROOT)/_aux/mk/d_target-tools.mk
+include $(DIR_ROOT)/_aux/mk/e0_target-tools.mk
 
 doc: $(DIR_ROOT)/build/doc/html/doxygen.css
 
@@ -251,6 +252,6 @@ test: all
 			$(MAKE) purge debug test ; \
 	fi
 
-include $(DIR_ROOT)/_aux/mk/e_deps.mk
+include $(DIR_ROOT)/_aux/mk/f0_deps.mk
 
 # vim:ts=2

@@ -1,5 +1,5 @@
-include $(DIR_ROOT)/_aux/mk/2_term.mk
-include $(DIR_ROOT)/_aux/mk/3_suffix.mk
-include $(DIR_ROOT)/_aux/mk/4_wrapper.mk
-include $(DIR_ROOT)/_aux/mk/5_flags.mk
+include $(DIR_ROOT)/_aux/mk/20_term.mk
+include $(DIR_ROOT)/_aux/mk/30_suffix.mk
+include $(DIR_ROOT)/_aux/mk/50_wrapper.mk
+include $(DIR_ROOT)/_aux/mk/60_flags.mk
 
