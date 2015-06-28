@@ -23,12 +23,15 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
     - gpm
 
   required tools:
+    - g++ or clang++
+  and:
     - autoreconf
     - autoheader
     - autoconf
     - libtool
     - GNU make
-    - g++
+  or:
+    - cmake
 
   other:
     - lots of grace and patience
@@ -36,9 +39,10 @@ First of all, if you did not read READ.ME.FIRST.OR.DIE go there now.
 * Installation process.
 
   1. Create new (possibly persistent) environment variables (see your shell documentation)
-     one named PREFIX and set its value to desired installation destination directory,
+     three named: PREFIX, SYSCONFDIR and LOCALSTATEDIR
+     and set its values to desired installation destination directories,
      another named DEFAULT_TARGET and set to desired build mode, a `debug' value is advised.
-  2. Go to sources directory and type `make', i.e:.
+  2. Go to sources directory and type `make'.
   3. (Required only once.) Still in yaal sources directory type `make install-environment'.
   4. Still in yaal sources directory type `make install'.
   5. Spawn new shell instance to get yaal installed headers and libraries visible.
@@ -112,10 +116,10 @@ All installed files can be stored in your home directory.
 Because you will install yaal headers outside of default header directory location
 (like /usr/include or /usr/local/include), and you will install binary libraries
 outside of default directory location (like /usr/lib or /usr/local/lib) you will
-need to tell your compiler (GCC) and operating system dynamic linker (ld-so)
+need to tell your compiler (GCC or clang) and operating system dynamic linker (ld-so)
 where to find these files. To do that you will need to persistently add four
 special variables (C_INCLUDE_PATH, CPLUS_INCLUDE_PATH, LIBRARY_PATH, LD_LIBRARY_PATH)
-to your environment. In this step you shall do precisely that.
+to your's shell environment. In this step you shall do precisely that.
 
 !! This step is required only once !!
 
@@ -147,9 +151,9 @@ accordingly.
 * System configuration.
 
 This part if totally optional.
-Can be used as handbook by developers who want to try and play with
+It can be used as handbook by developers who want to try and play with
 yaal but do not want to spend time learning how to setup some
-obscure system facility.
+obscure system facilities.
 
 ** Configuration of databases.
 

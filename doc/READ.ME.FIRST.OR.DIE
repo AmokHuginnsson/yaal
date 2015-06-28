@@ -36,9 +36,9 @@ implementation have been created with sole educational purposes in mind.
 If you need any of those, do NOT use yaal implementation,
 use STL instead.
 
-Yaal smart pointers, yaal::hcore::call() (as in boost::bind()),
+Yaal smart pointers, yaal::hcore::call() (as in std::bind()),
 program options handling and variant implementation have been created
 with sole educational purposes in mind.
 If you need any of those, do NOT use yaal implementation,
-use Boost instead.
+use stl or Boost instead.
 
