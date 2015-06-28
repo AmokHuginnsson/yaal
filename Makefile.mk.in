@@ -59,6 +59,7 @@ include $(DIR_ROOT)/_aux/mk/00_sanity.mk
 include $(DIR_ROOT)/_aux/mk/10_basic.mk
 include $(DIR_ROOT)/_aux/mk/20_term.mk
 include $(DIR_ROOT)/_aux/mk/30_suffix.mk
+include $(DIR_ROOT)/_aux/mk/40_commit-id.mk
 include $(DIR_ROOT)/_aux/mk/50_wrapper.mk
 include $(DIR_ROOT)/_aux/mk/60_flags.mk
 EXTRA_COMPILER_DEBUG_FLAGS=@EXTRA_COMPILER_DEBUG_FLAGS@

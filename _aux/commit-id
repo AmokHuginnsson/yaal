@@ -1,0 +1,13 @@
+#! /bin/sh
+
+ID="`git rev-parse HEAD`"
+git update-index -q --refresh
+
+STATUS=""
+
+if ! git diff-index --quiet HEAD -- ; then
+	STATUS="*"
+fi
+
+echo "${ID}${STATUS}"
+

@@ -47,6 +47,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hopenssl.hxx"
 #include "hsocket.hxx"
 #include "pod.hxx"
+#include "commit_id.hxx"
 
 namespace yaal {
 
@@ -328,7 +329,7 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 void banner( char const* packageName_, char const* packageVersion_ ) {
 	HLog::disable_auto_rehash();
 	::printf( COPYRIGHT, packageName_ ? packageName_ : PACKAGE_NAME, packageVersion_ ? packageVersion_ : PACKAGE_VERSION );
-	::printf( "\nVCS id: %s\n\n", PACKAGE_VCS );
+	::printf( "\nVCS id: %s\n\n", COMMIT_ID );
 	::printf(
 		"Available libraries:\n"
 		"\thcore\n" );
