@@ -29,7 +29,7 @@ if [ "x${GITID}" = "xtrue" ] ; then
 	exit 0
 fi
 
-NEW_COMMIT_ID=`mktemp`
+NEW_COMMIT_ID=`mktemp "${COMMIT_ID}.XXXXXXXXXX"`
 
 echo "#define COMMIT_ID \"`${DIR_ROOT}/_aux/commit-id`\"" > "${NEW_COMMIT_ID}"
 
