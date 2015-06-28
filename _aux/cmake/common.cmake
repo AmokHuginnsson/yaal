@@ -175,6 +175,7 @@ use_cxx_compiler_flag( -Wmissing-noreturn )
 use_cxx_compiler_flag( -Wpointer-arith )
 use_cxx_compiler_flag( -Wredundant-decls )
 use_cxx_compiler_flag( -Wsign-compare )
+use_cxx_compiler_flag( -Wsign-conversion )
 use_cxx_compiler_flag( -Wundef )
 use_cxx_compiler_flag( -Wwrite-strings )
 use_cxx_compiler_flag( -Weffc++ )
@@ -241,8 +242,10 @@ endif ( NOT CMAKE_HOST_WIN32 )
 find_package(Git)
 if ( GIT_FOUND )
 	execute_process( COMMAND git rev-parse HEAD OUTPUT_VARIABLE PACKAGE_VCS OUTPUT_STRIP_TRAILING_WHITESPACE )
+	set( GITID "git log --no-color -n 1 --pretty=format:\"%H %ad %an\"" )
 else()
 	set( PACKAGE_VCS "" )
+	set( GITID "true" )
 endif()
 
 add_definitions( -D__ID__="" -D__TID__="" )
@@ -262,4 +265,10 @@ today( TODAY )
 set( VERSION "${PROJECT_VERSION}.${PROJECT_SUBVERSION}.${PROJECT_EXTRAVERSION}-${TODAY}" )
 
 link_directories( ${CMAKE_LIBRARY_PATH} )
+
+add_custom_target(
+	commit_id ALL
+	COMMAND "${CMAKE_HOME_DIRECTORY}/_aux/update-commit-id" "${CMAKE_HOME_DIRECTORY}" "${TARGET_PATH}/commit_id.hxx" "${GITID}"
+	COMMENT "Regenerating commit_id.hxx."
+)
 
