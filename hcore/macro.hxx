@@ -157,6 +157,12 @@ Copyright:
  * \return Automatic C++ identifier name.
  */
 #define M_YAAL_AUTO_ID( name ) M_CONCAT( name, __LINE__ )
+#ifndef __ID__
+#define __ID__ __FILE__ " " __DATE__ " " __TIME__
+#endif /* #ifndef __ID__ */
+#ifndef __TID__
+#define __TID__ ""
+#endif /* #ifndef __TID__ */
 /*! \brief Create object file identifier for ident(1) program.
  */
 #define M_VCSID( id ) namespace { static char const M_CONCAT( wrapper_VCSID, __LINE__ )[] __attribute__((unused)) = id; }

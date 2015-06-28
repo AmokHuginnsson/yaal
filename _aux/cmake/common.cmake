@@ -248,8 +248,6 @@ else()
 	set( GITID "true" )
 endif()
 
-add_definitions( -D__ID__="" -D__TID__="" )
-
 set( TARGET_PATH "${CMAKE_HOME_DIRECTORY}/build/${CMAKE_BUILD_TYPE}" )
 include_directories( ${TARGET_PATH} ${CMAKE_HOME_DIRECTORY} ${CMAKE_INCLUDE_PATH} )
 #set( CMAKE_VERBOSE_MAKEFILE true )
