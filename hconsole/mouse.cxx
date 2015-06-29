@@ -129,7 +129,7 @@ int console_mouse_open( void ) {
 		throw HMouseException( error, errno );
 	}
 
-	log( LOG_TYPE::INFO ) << "i have opened device: `" << tty << '\'' << endl;
+	log( LOG_LEVEL::INFO ) << "i have opened device: `" << tty << '\'' << endl;
 
 	return ( 0 );
 	M_EPILOG
@@ -178,7 +178,7 @@ int console_mouse_open( void ) {
 		error.format( "Can't open mouse connection: %s", error_message( errno ) );
 		throw HMouseException( error, vC );
 	}
-	log( LOG_TYPE::INFO ) << "i have opened device: `" << vC << '\'' << endl;
+	log( LOG_LEVEL::INFO ) << "i have opened device: `" << vC << '\'' << endl;
 	return ( gpm_fd );
 	M_EPILOG
 }

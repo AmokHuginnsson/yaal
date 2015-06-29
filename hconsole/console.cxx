@@ -355,7 +355,7 @@ void HConsole::enter_curses( void ) {
 		}
 		try {
 			if ( ( _mouseDes = mouse::mouse_open() ) >= 0 ) {
-				log( LOG_TYPE::INFO )
+				log( LOG_LEVEL::INFO )
 					<< ( ( mouse::mouse_open == mouse::x_mouse_open ) ? _( "using ncurses mouse support, at fd(" ) : _( "using console mouse support, at fd(" ) )
 					<< _mouseDes << ')' << endl;
 			} else if ( _useMouse_ == USE_MOUSE::YES ) {

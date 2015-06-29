@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hquery.hxx"
 #include "hdatabase.hxx"
 #include "hrecordset.hxx"
+#include "dbwrapper.hxx"
 #include "hcore/hlog.hxx"
 
 using namespace yaal;
@@ -44,8 +45,7 @@ HQuery::HQuery(
 		ODBConnector const* connector_,
 		yaal::hcore::HString const& sql_,
 		void* query_
-	)
-	: _dataBase( database_ ), _connector( connector_ ),
+) : _dataBase( database_ ), _connector( connector_ ),
 	_query( query_ ), _sql( sql_ ),
 	_bindBuffer() {
 	return;
@@ -71,7 +71,7 @@ HRecordSet::ptr_t HQuery::execute( void ) {
 	if ( ! _dataBase->_dbLink._valid ) {
 		M_THROW( "not connected to database", errno );
 	}
-	if ( HLog::_logMask & LOG_TYPE::SQL ) {
+	if ( _logSQL_ ) {
 		log << "SQL: " << _sql << endl;
 	}
 	void* result( (_connector->query_execute)( _dataBase->_dbLink, _query ) );

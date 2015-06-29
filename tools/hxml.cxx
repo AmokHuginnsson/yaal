@@ -152,11 +152,11 @@ struct HXml::OConvert {
 		if ( !! encoding_ ) {
 			encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
 		} else {
-			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: no encoding declared in `" )
+			log( LOG_LEVEL::WARNING ) << _( "HXml::WARNING: no encoding declared in `" )
 				<< fileName_ << ":" << root_->line <<"'." << endl;
 		}
 		if ( ! encoder ) {
-			log( LOG_TYPE::WARNING ) << _( "HXml::WARNING: char encoding handler not found in `" )
+			log( LOG_LEVEL::WARNING ) << _( "HXml::WARNING: char encoding handler not found in `" )
 				<< fileName_ << ":" << root_->line << "'." << endl;
 			xmlCharEncoding encoding = ::xmlDetectCharEncoding( root_->name,
 					xmlStrlen( root_->name ) );
@@ -398,7 +398,7 @@ void HXml::init( yaal::hcore::HStreamInterface& stream, parser_t parser_ ) {
 	doc_resource_t doc( ::xmlReadIO( reader_callback, NULL, &stream, _streamId.raw(), NULL, LOW_LEVEL_PARSING_OPTIONS ),
 			xmlFreeDoc );
 	if ( errno ) {
-		log( LOG_TYPE::WARNING ) << "XML: " << error_message( errno ) << ": " << _streamId;
+		log( LOG_LEVEL::WARNING ) << "XML: " << error_message( errno ) << ": " << _streamId;
 		log << ", code: " << errno << '.' << endl;
 	}
 	errno = savedErrno;
@@ -436,7 +436,7 @@ void HXml::parse_dtd( void* dtd_ ) {
 			if ( ( node->type == XML_ENTITY_DECL ) && ( node->name && node->content ) ) {
 				_entities[ reinterpret_cast<char const*>( node->name ) ] = reinterpret_cast<char const*>( node->content );
 			} else {
-				log( LOG_TYPE::ERROR ) << "XML: `" << _streamId << ":" << node->line
+				log( LOG_LEVEL::ERROR ) << "XML: `" << _streamId << ":" << node->line
 					<< "' failed to handle DTD child: " << static_cast<int>( node->type )
 					<< " " << ( node->name ? reinterpret_cast<char const*>( node->name ) : "(nil)" )
 					<< " " << ( node->content ? reinterpret_cast<char const*>( node->content ) : "(nil)" )<< endl;
@@ -542,7 +542,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 				 */
 			break;
 			default:
-				log( LOG_TYPE::WARNING ) << "XML: `" << _streamId << "' unsupported type: " << static_cast<int>( node->type )
+				log( LOG_LEVEL::WARNING ) << "XML: `" << _streamId << "' unsupported type: " << static_cast<int>( node->type )
 					<< ", at: " << node->line << endl;
 			break;
 		}

@@ -164,9 +164,9 @@ HToolsInitDeinit::HToolsInitDeinit( void ) {
 	M_PROLOG
 	yaal_options()(
 		HProgramOptionsHandler::HOption()
-		.long_form( 	"ignore_signal_SIGINT" )
-		.switch_type( 	HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
-		.description( 	"ignore INT (interrupt) signal" )
+		.long_form( "ignore_signal_SIGINT" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+		.description( "ignore INT (interrupt) signal" )
 		.recipient( _ignoreSignalSIGINT_ )
 	)(
 		HProgramOptionsHandler::HOption()

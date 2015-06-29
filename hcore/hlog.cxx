@@ -55,32 +55,63 @@ static int const TIMESTAMP_SIZE	= 16;
 
 }
 
+char const* LOG_LEVEL::name( priority_t level_ ) {
+	char const* n( "?????" );
+	switch ( level_ ) {
+		case ( LOG_LEVEL::DEBUG ):     n = "DEBUG";     break;
+		case ( LOG_LEVEL::INFO ):      n = "INFO";      break;
+		case ( LOG_LEVEL::NOTICE ):    n = "NOTICE";    break;
+		case ( LOG_LEVEL::WARNING ):   n = "WARNING";   break;
+		case ( LOG_LEVEL::ERROR ):     n = "ERROR";     break;
+		case ( LOG_LEVEL::CRITICAL ):  n = "CRITICAL";  break;
+		case ( LOG_LEVEL::ALERT ):     n = "ALERT";     break;
+		case ( LOG_LEVEL::EMERGENCY ): n = "EMERGENCY"; break;
+	}
+	return ( n );
+}
+
 bool HLog::_autoRehash = true;
-int long HLog::_logMask = 0;
+LOG_LEVEL::priority_t HLog::_logLevel = LOG_LEVEL::EMERGENCY;
 
 void* DEFAULT_LOG_STREAM( stderr );
 
-HLog::HLog( void ) : HField<HFile>( tmpfile(), HFile::OWNERSHIP::ACQUIRED ), HSynchronizedStream( _file::ref() ), _realMode( false ), _newLine( true ),
-	_type( 0 ), _bufferSize( BUFFER_SIZE ),
-	_processName( NULL ),
-	_loginName(), _hostName( system::get_host_name() ),
-	_buffer( static_cast<int>( _bufferSize ) ) {
+HLog::HLog( void )
+	: HField<HFile>( tmpfile(), HFile::OWNERSHIP::ACQUIRED )
+	, HSynchronizedStream( _file::ref() )
+	, _realMode( false )
+	, _newLine( true )
+	, _type( LOG_LEVEL::DEBUG )
+	, _bufferSize( BUFFER_SIZE )
+	, _processName( NULL )
+	, _loginName()
+	, _hostName( system::get_host_name() )
+	, _buffer( static_cast<int>( _bufferSize )
+) {
 	M_PROLOG
-	if ( ! _file::ref() )
+	if ( ! _file::ref() ) {
 		M_THROW( "tmpfile() failed", errno );
-	HString intro;
-	intro.format( "%-10xProcess started (%ld).\n",
-			LOG_TYPE::NOTICE, static_cast<int long>( system::getpid() ) );
-	_file::ref() << intro;
+	}
+	HString msg;
+	msg.format( "%-10xProcess started (%ld).\n",
+		LOG_LEVEL::NOTICE, static_cast<int long>( system::getpid() )
+	);
+	_file::ref() << msg;
+	if ( _logLevel >= LOG_LEVEL::INFO ) {
+		msg.format( "%-10xyaal version = %s.\n",
+			LOG_LEVEL::DEBUG, yaal_version( _logLevel >= LOG_LEVEL::DEBUG )
+		);
+		_file::ref() << msg;
+	}
 	return;
 	M_EPILOG
 }
 
 HLog::~HLog( void ) {
 	M_PROLOG
-	if ( _logMask & LOG_TYPE::NOTICE ) {
-		if ( _newLine )
+	if ( _logLevel >= LOG_LEVEL::NOTICE ) {
+		if ( _newLine ) {
 			timestamp();
+		}
 		_file::ref() << "Process exited normally.\n";
 	}
 	if ( ! _realMode ) {
@@ -105,8 +136,9 @@ void HLog::do_rehash( void* src_, char const* const processName_ ) {
 	int len = 0;
 #endif /* not HAVE_GETLINE */
 	_realMode = true;
-	if ( processName_ )
+	if ( processName_ ) {
 		_processName = ::basename( processName_ );
+	}
 	FILE* src( static_cast<FILE*>( src_ ) );
 	if ( src ) {
 		_loginName = system::get_user_name( static_cast<int>( getuid() ) );
@@ -127,15 +159,16 @@ void HLog::do_rehash( void* src_, char const* const processName_ ) {
 			* ++ ptr = 0;
 			::fseek( src, static_cast<int long>( ptr - buf ) - len, SEEK_CUR );
 #endif /* not HAVE_GETLINE */
-			_type = ::strtol( buf, NULL, 0x10 );
-			if ( ! _type || ( _type & _logMask ) ) {
+			_type = static_cast<LOG_LEVEL::priority_t>( ::strtol( buf, NULL, 0x10 ) );
+			if ( _type <= _logLevel ) {
 				timestamp();
 				static int const TIMESTAMP_LENGTH( 10 );
 				_file::ref() << buf + TIMESTAMP_LENGTH;
 			}
 		}
-		if ( buf[ ::strlen( buf ) - 1 ] == '\n' )
-			_type = 0;
+		if ( buf[ ::strlen( buf ) - 1 ] == '\n' ) {
+			_type = LOG_LEVEL::MAX;
+		}
 		::fclose( src );
 	}
 	do_flush();
@@ -147,8 +180,9 @@ void HLog::rehash_stream( void* stream_,
 		char const* const processName_ ) {
 	M_PROLOG
 	HLock l( _mutex );
-	if ( ! stream_ )
+	if ( ! stream_ ) {
 		M_THROW( "file parameter is", reinterpret_cast<int long>( stream_ ) );
+	}
 	void* src( _file::ref().release() );
 	_file::ref().open( stream_, HFile::OWNERSHIP::ACQUIRED );
 	do_rehash( src, processName_ );
@@ -164,7 +198,7 @@ void HLog::rehash( HString const& logFileName_,
 		M_THROW( "new file name argument is empty", logFileName_.get_length() );
 	}
 	void* src( _file::ref().release() );
-	_file::ref().open( logFileName_, HFile::open_t( HFile::OPEN::WRITING ) | HFile::OPEN::APPEND );
+	_file::ref().open( logFileName_, HFile::OPEN::WRITING | HFile::OPEN::APPEND );
 	if ( ! _file::ref() ) {
 		_file::ref().open( src, HFile::OWNERSHIP::ACQUIRED );
 		HException::disable_logging();
@@ -180,7 +214,7 @@ void HLog::timestamp( void ) {
 	char buffer[ TIMESTAMP_SIZE ];
 	if ( ! _realMode ) {
 		if ( !! _file::ref() ) {
-			::snprintf( buffer, TIMESTAMP_SIZE - 1, "%-10lx", _type );
+			::snprintf( buffer, TIMESTAMP_SIZE - 1, "%-10x", _type );
 			_file::ref() << buffer;
 		}
 		return;
@@ -193,28 +227,30 @@ void HLog::timestamp( void ) {
 	/* (range ` 1' through `31'). */
 	/* This format was first standardized by POSIX.2-1992 and by ISO C99.*/
 	/* I will have to wait with using `%e'. */
-	int long size = static_cast<int long>( ::strftime( buffer, TIMESTAMP_SIZE, "%b %d %H:%M:%S",
-			brokenTime ) );
-	if ( size > TIMESTAMP_SIZE )
+	int long size = static_cast<int long>(
+		::strftime( buffer, TIMESTAMP_SIZE, "%b %d %H:%M:%S", brokenTime )
+	);
+	if ( size > TIMESTAMP_SIZE ) {
 		M_THROW( _( "strftime returned more than TIMESTAMP_SIZE" ), size );
-	if ( _processName )
+	}
+	if ( _processName ) {
 		_file::ref() << buffer << " " << _loginName << "@" << _hostName << "->" << _processName << ": ";
-	else
+	} else {
 		_file::ref() << buffer << " " << _loginName << "@" << _hostName << ": ";
-	if ( _type & LOG_TYPE::WARNING )
-		_file::ref() << "(WARNING) ";
-	else if ( _type & LOG_TYPE::ERROR )
-		_file::ref() << "(ERROR) ";
+	}
+	if ( _type <= LOG_LEVEL::WARNING ) {
+		_file::ref() << "(" << LOG_LEVEL::name( _type ) << ") ";
+	}
 	return;
 	M_EPILOG
 }
 
 void HLog::eol_reset( char const* const buf_, int long len_ ) {
 	M_PROLOG
-	if ( ( len_ < 1 ) || ( buf_[ len_ - 1 ] != '\n' ) )
+	if ( ( len_ < 1 ) || ( buf_[ len_ - 1 ] != '\n' ) ) {
 		_newLine = false;
-	else {
-		_type = 0;
+	} else {
+		_type = LOG_LEVEL::DEBUG;
 		_newLine = true;
 		_file::ref().flush();
 	}
@@ -230,8 +266,9 @@ int HLog::vformat( char const* const format_, va_list ap_ ) {
 	char* buf = _buffer.get<char>();
 	::memset( buf, 0, _bufferSize );
 	err = ::vsnprintf( buf, _bufferSize, format_, ap_ );
-	if ( ! ( _type && _realMode ) || ( _type & _logMask ) )
+	if ( ! _realMode || ( _type <= _logLevel ) ) {
 		_file::ref() << buf;
+	}
 	eol_reset( buf, static_cast<int>( ::strlen( buf ) ) );
 	return ( err );
 	M_EPILOG
@@ -248,8 +285,7 @@ int HLog::operator() ( char const * const format_, ... ) {
 	M_EPILOG
 }
 
-int HLog::operator() ( int long const type_,
-		char const* const format_, ... ) {
+int HLog::operator() ( LOG_LEVEL::priority_t type_, char const* const format_, ... ) {
 	M_PROLOG
 	int err = 0;
 	va_list ap;
@@ -261,14 +297,14 @@ int HLog::operator() ( int long const type_,
 	M_EPILOG
 }
 
-HLog& HLog::operator() ( int long type_ ) {
+HLog& HLog::operator() ( LOG_LEVEL::priority_t type_ ) {
 	M_PROLOG
 	_type = type_;
 	return ( *this );
 	M_EPILOG
 }
 
-HLog& HLog::filter( int long type_ ) {
+HLog& HLog::filter( LOG_LEVEL::priority_t type_ ) {
 	M_PROLOG
 	_type = type_;
 	return ( *this );
@@ -281,9 +317,10 @@ int long HLog::do_write( void const* const string_, int long size_ ) {
 		return ( 0 );
 	int len = 0;
 	char const* const str = static_cast<char const* const>( string_ );
-	if ( ! ( _type && _realMode ) || ( _type & _logMask ) ) {
-		if ( _newLine )
+	if ( ! _realMode || ( _type <= _logLevel ) ) {
+		if ( _newLine ) {
 			timestamp();
+		}
 		len = static_cast<int>( _file::ref().write( str, size_ ) );
 	}
 	eol_reset( str, size_ );

@@ -77,7 +77,7 @@ HThread::HThread( void )
 	M_ENSURE( ::pthread_attr_init( attr ) == 0 );
 	size_t stackSize( 0 );
 	M_ENSURE( pthread_attr_getstacksize( attr, &stackSize ) == 0 );
-	log( LOG_TYPE::DEBUG ) << "Default thread stack size: " << stackSize
+	log( LOG_LEVEL::DEBUG ) << "Default thread stack size: " << stackSize
 		<< " and we will use: " << ( _threadStackSize ? _threadStackSize : static_cast<int>( stackSize ) ) << endl;
 	if ( _threadStackSize > 0 ) {
 		M_ENSURE( pthread_attr_setstacksize( attr, static_cast<size_t>( _threadStackSize ) ) == 0 );
@@ -181,10 +181,10 @@ void* HThread::SPAWN( void* thread_ ) {
 	try {
 		reinterpret_cast<HThread*>( thread_ )->control();
 	} catch ( HException const& e ) {
-		log( LOG_TYPE::ERROR ) << "Uncaught exception: `" << e.what() << "' in thread!" << endl;
+		log( LOG_LEVEL::ERROR ) << "Uncaught exception: `" << e.what() << "' in thread!" << endl;
 		throw;
 	} catch ( ... ) {
-		log( LOG_TYPE::ERROR ) << "Unknown uncaught exception in thread!" << endl;
+		log( LOG_LEVEL::ERROR ) << "Unknown uncaught exception in thread!" << endl;
 		throw;
 	}
 	return ( NULL );
@@ -259,7 +259,7 @@ void HThread::set_name( char const* name_ ) {
 #elif defined( HAVE_PRCTL ) /* #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
 	::prctl( PR_SET_NAME, name, 0, 0, 0 );
 #else /* #elif defined( HAVE_PRCTL ) #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
-	log( LOG_TYPE::WARNING ) << "Setting thread name (`" << name_ << "') not supported on your platform." << endl;
+	log( LOG_LEVEL::WARNING ) << "Setting thread name (`" << name_ << "') not supported on your platform." << endl;
 #endif /* #else #elif defined( HAVE_PRCTL ) #elif defined( HAVE_PTHREAD_SET_NAME_NP ) #if defined( HAVE_PTHREAD_SETNAME_NP ) */
 	return;
 }

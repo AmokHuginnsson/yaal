@@ -75,133 +75,133 @@ namespace {
 
 bool null_db_connect( ODBLink&, yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const&, yaal::hcore::HString const& ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "db_connect" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "db_connect" << eend << endl;
 	return ( true );
 	M_EPILOG
 }
 
 void null_db_disconnect( ODBLink& ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "(db_disconnect)" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "(db_disconnect)" << eend << endl;
 	return;
 	M_EPILOG
 }
 
 int null_dbrs_errno( ODBLink const&, void* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "db_errno" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "db_errno" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 }
 
 char const* null_dbrs_error( ODBLink const&, void* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "db_error" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "db_error" << eend << endl;
 	return ( _( "null database driver loaded" ) );
 	M_EPILOG
 }
 
 void* null_db_fetch_query_result( ODBLink&, char const* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "db_fetch_query_result" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "db_fetch_query_result" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 }
 
 void null_rs_free_query_result( void* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "rs_free_query_result" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "rs_free_query_result" << eend << endl;
 	return;
 	M_EPILOG
 }
 
 void* null_db_query( ODBLink&, char const* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "db_query" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "db_query" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 }
 
 void* null_db_prepare_query( ODBLink&, char const* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "db_prepare_query" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "db_prepare_query" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 }
 
 void null_query_bind( ODBLink&, void*, int, yaal::hcore::HString const& ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "query_bind" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "query_bind" << eend << endl;
 	return;
 	M_EPILOG
 }
 
 void* null_query_execute( ODBLink&, void* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "query_execute" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "query_execute" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 }
 
 void null_query_free( ODBLink&, void* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "query_free" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "query_free" << eend << endl;
 	return;
 	M_EPILOG
 }
 
 void null_rs_free_cursor( void* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "rs_free_cursor" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "rs_free_cursor" << eend << endl;
 	return;
 	M_EPILOG
 }
 
 char const* null_rs_get( void*, int long, int ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "rs_get" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "rs_get" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 }
 
 bool null_rs_next( void* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "rs_next" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "rs_next" << eend << endl;
 	return ( true );
 	M_EPILOG
 }
 
 char const* null_rs_get_field( void*, int ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "rs_get_field" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "rs_get_field" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 }
 
 int null_rs_fields_count( void* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "rs_fields_count" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "rs_fields_count" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 }
 
 int long null_dbrs_records_count( ODBLink&, void* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "dbrs_records_count" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "dbrs_records_count" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 }
 
 int long null_dbrs_id( ODBLink&, void* ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "dbrs_id" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "dbrs_id" << eend << endl;
 	return ( 0 );
 	M_EPILOG
 }
 
 char const* null_rs_column_name( void*, int ) {
 	M_PROLOG
-	log( LOG_TYPE::ERROR ) << etag << "rs_column_name" << eend << endl;
+	log( LOG_LEVEL::ERROR ) << etag << "rs_column_name" << eend << endl;
 	return ( NULL );
 	M_EPILOG
 }
@@ -212,7 +212,7 @@ void dbwrapper_error( void ) {
 	M_PROLOG
 	HString message;
 	message = HPlugin().error_message( 0 );
-	log( LOG_TYPE::ERROR ) << message << endl;
+	log( LOG_LEVEL::ERROR ) << message << endl;
 	::fprintf( stderr, "(%s), ", message.raw() );
 	return;
 	M_EPILOG
@@ -232,7 +232,7 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 	if ( it == _dBDrivers_.end() ) /* given driver has not been loaded yet */ {
 		try {
 			driver = make_pair( make_pointer<HPlugin>(), make_pointer<ODBConnector>() );
-			log( LOG_TYPE::NOTICE ) << "Loading [" << _driver_[ driverId_ + 1 ] << "] driver ... ";
+			log( LOG_LEVEL::NOTICE ) << "Loading [" << _driver_[ driverId_ + 1 ] << "] driver ... ";
 			driver.first->load( _driver_[ driverId_ + 1 ] );
 			cout << "(linking symbols ...) " << flush;
 			driver.first->try_resolve( SYMBOL_PREFIX"driver_init", driver.second->driver_init );
@@ -268,13 +268,13 @@ ODBConnector const* try_load_driver( ODBConnector::DRIVER::enum_t driverId_ ) {
 			it = _dBDrivers_.insert( make_pair( driverId_, driver ) ).first;
 			driver.second->init();
 		} catch ( HPluginException& e ) {
-			log( LOG_TYPE::NOTICE ) << "fail." << endl;
+			log( LOG_LEVEL::NOTICE ) << "fail." << endl;
 			HStringStream reason;
 			reason << _( "cannot load database driver: " ) << e.what();
 			M_THROW( reason.string(), _dataBaseDriver_ );
 		}
 		if ( driver.first->is_loaded() )
-			log( LOG_TYPE::NOTICE ) << "success." << endl;
+			log( LOG_LEVEL::NOTICE ) << "success." << endl;
 		else {
 			dbwrapper_error();
 			dbwrapper_exit();

@@ -72,6 +72,10 @@ HProgramOptionsHandler& yaal_options( void ) {
 	M_EPILOG
 }
 
+char const* yaal_version( bool commitId_ ) {
+	return ( commitId_ ? PACKAGE_VERSION " " COMMIT_ID : PACKAGE_VERSION );
+}
+
 /* mathematical macros */
 static double long const EPSILON = 0.000001;
 bool eq( double long left_, double long right_ ) {
@@ -87,23 +91,13 @@ bool set_hcore_variables( HString& option_, HString& value_ ) {
 	bool fail( false );
 	if ( ! strcasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
-	} else if ( ! strcasecmp( option_, "log_mask" ) ) {
-		HTokenizer t( value_, " \t", HTokenizer::DELIMITED_BY_ANY_OF );
-		for ( HTokenizer::HIterator it = t.begin(), end = t.end(); it != end; ++ it ) {
-			if ( ! strcasecmp( *it, "LOG_DEBUG" ) ) {
-				HLog::_logMask |= LOG_TYPE::DEBUG;
-			} else if ( ! strcasecmp( *it, "LOG_INFO" ) ) {
-				HLog::_logMask |= LOG_TYPE::INFO;
-			} else if ( ! strcasecmp( *it, "LOG_NOTICE" ) ) {
-				HLog::_logMask |= LOG_TYPE::NOTICE;
-			} else if ( ! strcasecmp( *it, "LOG_WARNING" ) ) {
-				HLog::_logMask |= LOG_TYPE::WARNING;
-			} else if ( ! strcasecmp( *it, "LOG_ERROR" ) ) {
-				HLog::_logMask |= LOG_TYPE::ERROR;
-			} else if ( ! strcasecmp( *it, "LOG_VCSHEADER" ) ) {
-				HLog::_logMask |= LOG_TYPE::VCSHEADER;
-			} else {
-				fail = true;
+	} else if ( ! strcasecmp( option_, "log_level" ) ) {
+		fail = true;
+		for ( int l( LOG_LEVEL::MIN ); l <= LOG_LEVEL::MAX; ++ l ) {
+			if ( ! strcasecmp( value_, LOG_LEVEL::name( static_cast<LOG_LEVEL::priority_t>( l ) ) ) ) {
+				HLog::_logLevel = static_cast<LOG_LEVEL::priority_t>( l );
+				fail = false;
+				break;
 			}
 		}
 	} else if ( ! strcasecmp( option_, "on_alloc_failure" ) ) {
@@ -144,13 +138,13 @@ void decode_set_env( HString line ) {
 	int long eon = 0;
 	if ( ( line.length() < 3 )
 			|| ( ( eon = line.find_one_of( " \t" ) ) == -1 ) ) {
-		log( LOG_TYPE::ERROR ) << "bad set_env argument: `";
+		log( LOG_LEVEL::ERROR ) << "bad set_env argument: `";
 		log << line << '\'' << endl;
 		return;
 	}
 	int long valPos = line.find_other_than( " \t", eon );
 	if ( valPos < 0 ) {
-		log( LOG_TYPE::ERROR ) << "no value for environment variable in set_env: `";
+		log( LOG_LEVEL::ERROR ) << "no value for environment variable in set_env: `";
 		log << line << '\'' << endl;
 		return;
 	}
@@ -322,7 +316,7 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 		HException::disable_logging();
 	yaal_options().process_rc_file( "yaal", "core", set_hcore_variables );
 	if ( _writeTimeout_ < LOW_TIMEOUT_WARNING )
-		log( LOG_TYPE::WARNING ) << "Low default timout for write operations!" << endl;
+		log( LOG_LEVEL::WARNING ) << "Low default timout for write operations!" << endl;
 	return;
 }
 

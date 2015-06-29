@@ -130,16 +130,6 @@ yaal::hcore::HString transform_sql( yaal::hcore::HString, place_holder_generator
 
 }
 
-namespace hcore {
-
-namespace LOG_TYPE {
-
-static int const SQL = 1073741824;
-
-}
-
-}
-
 }
 
 #endif /* #ifndef YAAL_DBWRAPPER_DB_DRIVER_HXX_INCLUDED */

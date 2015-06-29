@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/memory.hxx"
 #include "hcore/hlog.hxx"
 #include "db_driver_loader.hxx"
+#include "dbwrapper.hxx"
 
 using namespace yaal::hcore;
 
@@ -74,7 +75,7 @@ HRecordSet::ptr_t HDataBase::execute_query( HString const& query_, HRecordSet::C
 	if ( ! _dbLink._valid ) {
 		M_THROW( "not connected to database", errno );
 	}
-	if ( HLog::_logMask & LOG_TYPE::SQL ) {
+	if ( _logSQL_ ) {
 		log << "SQL: " << query_ << endl;
 	}
 	void* result( cursor_ == HRecordSet::CURSOR::RANDOM_ACCESS ? (_connector->db_fetch_query_result)( _dbLink, query_.raw() ) : (_connector->db_query)( _dbLink, query_.raw() ) );
@@ -92,7 +93,7 @@ HQuery::ptr_t HDataBase::prepare_query( HString const& query_ ) {
 	}
 	void* result( (_connector->db_prepare_query)( _dbLink, query_.raw() ) );
 	if ( (_connector->dbrs_errno)( _dbLink, result ) ) {
-		log( LOG_TYPE::ERROR ) << "SQL prepare error: " << query_ << endl;
+		log( LOG_LEVEL::ERROR ) << "SQL prepare error: " << query_ << endl;
 		throw HSQLException( HString( "SQL error: " ) + (_connector->dbrs_error)( _dbLink, result ) );
 	}
 	return ( make_pointer<HQuery>( get_pointer(), _connector, query_, result ) );

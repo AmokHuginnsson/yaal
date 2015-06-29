@@ -194,7 +194,7 @@ int HCollector::establish_connection ( int timeOut_ ) {
 		if ( error > timeOut_ )
 			return ( -1 );
 	}
-	log( LOG_TYPE::DEBUG ) << "Collector: Connected ! (estab)" << endl;
+	log( LOG_LEVEL::DEBUG ) << "Collector: Connected ! (estab)" << endl;
 	return ( error );
 	M_EPILOG
 }
@@ -213,7 +213,7 @@ int HCollector::wait_for_connection ( int timeOut_ ) {
 			return ( -1 );
 	}
 	error += static_cast<int>( lenght - HRawFile::write( PROTOCOL::ACK, lenght ) );
-	log( LOG_TYPE::DEBUG ) << "Collector: Connected ! (wait)" << endl;
+	log( LOG_LEVEL::DEBUG ) << "Collector: Connected ! (wait)" << endl;
 	return ( error );
 	M_EPILOG
 }

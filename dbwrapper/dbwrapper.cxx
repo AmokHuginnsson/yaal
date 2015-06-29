@@ -118,6 +118,7 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ ) {
 
 }
 
+bool _logSQL_ = false;
 ODBConnector::DRIVER::enum_t _dataBaseDriver_ = ODBConnector::DRIVER::NONE;
 
 namespace {
@@ -127,17 +128,11 @@ bool set_dbwrapper_variables( HString& option_, HString& value_ ) {
 	bool fail( false );
 	if ( ! strcasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
-	} else if ( ! strcasecmp( option_, "log_mask" ) ) {
-		if ( ! strcasecmp( value_, "LOG_SQL" ) ) {
-			HLog::_logMask |= LOG_TYPE::SQL;
-		} else {
-			fail = true;
-		}
 	} else if ( ! strcasecmp( option_, "data_base_driver" ) ) {
 		try {
 			dbwrapper::_dataBaseDriver_ = db_driver_from_string( value_ );
 		} catch ( HDataBaseException const& ) {
-			log( LOG_TYPE::ERROR ) << "Error: `" << value_;
+			log( LOG_LEVEL::ERROR ) << "Error: `" << value_;
 			log << "' is unknown driver." << endl;
 			exit( 1 );
 		}
@@ -157,6 +152,13 @@ public:
 
 HDBWrapperInitDeinit::HDBWrapperInitDeinit( void ) {
 	M_PROLOG
+	yaal_options()(
+		HProgramOptionsHandler::HOption()
+		.long_form( "log_sql" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::OPTIONAL )
+		.description( "log content of SQL queries" )
+		.recipient( _logSQL_ )
+	);
 	yaal_options().process_rc_file( "yaal", "dbwrapper", set_dbwrapper_variables );
 	return;
 	M_EPILOG

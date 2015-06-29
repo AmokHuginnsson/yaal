@@ -52,14 +52,21 @@ extern void* DEFAULT_LOG_STREAM;
 
 /*! \brief Enumeration of available log levels.
  */
-namespace LOG_TYPE {
-	static int const DEBUG     = 1;
-	static int const INFO      = 2;
-	static int const NOTICE    = 4;
-	static int const WARNING   = 8;
-	static int const ERROR     = 16;
-	static int const VCSHEADER = 32;
-}
+struct LOG_LEVEL {
+	enum priority_t {
+		EMERGENCY = 0,
+		ALERT     = 1,
+		CRITICAL  = 2,
+		ERROR     = 3,
+		WARNING   = 4,
+		NOTICE    = 5,
+		INFO      = 6,
+		DEBUG     = 7,
+		MIN       = EMERGENCY,
+		MAX       = DEBUG
+	};
+	static char const* name( priority_t );
+};
 
 /*! \brief Logging utility.
  */
@@ -71,7 +78,7 @@ private:
 	typedef HField<HFile> _file;
 	bool     _realMode;
 	bool     _newLine;
-	int long _type;
+	LOG_LEVEL::priority_t _type;
 	size_t   _bufferSize;
 	char const* _processName;
 	HString  _loginName;
@@ -79,7 +86,7 @@ private:
 	HChunk   _buffer;
 	static bool _autoRehash;
 public:
-	static int long _logMask;
+	static LOG_LEVEL::priority_t _logLevel;
 public:
 	/* already opened file */
 	void rehash_stream( void* = DEFAULT_LOG_STREAM, char const* const = NULL );
@@ -90,11 +97,11 @@ public:
 	int operator()( char const* const, ... ) __attribute__(( format( printf, 2, 3 ) ));
 	/*! \brief log ( "data %d", x ); will look nice
 	 */
-	int operator()( int long const, char const*, ... ) __attribute__(( format( printf, 3, 4 ) ));
+	int operator()( LOG_LEVEL::priority_t, char const*, ... ) __attribute__(( format( printf, 3, 4 ) ));
 	/*! \brief sets log type
 	 */
-	HLog& operator()( int long );
-	HLog& filter( int long );
+	HLog& operator()( LOG_LEVEL::priority_t );
+	HLog& filter( LOG_LEVEL::priority_t );
 	static void disable_auto_rehash( void );
 private:
 	HLog( void );

@@ -47,6 +47,7 @@ HDataBase::ptr_t connect( yaal::hcore::HString const& dsn_ );
 
 }
 
+extern M_YAAL_DBWRAPPER_PUBLIC_API bool _logSQL_;
 extern M_YAAL_DBWRAPPER_PUBLIC_API ODBConnector::DRIVER::enum_t _dataBaseDriver_;
 void banner( void );
 

@@ -42,6 +42,7 @@ namespace hcore {
 class HProgramOptionsHandler;
 
 HProgramOptionsHandler& yaal_options( void );
+char const* yaal_version( bool );
 bool eq( double long, double long );
 void set_env( HString const&, HString const&, bool = true );
 void unset_env( HString const& );

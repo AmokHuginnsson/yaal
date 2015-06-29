@@ -243,11 +243,11 @@ void* oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mode_ )
 	queryObj->_error = oracle->_error;
 	if ( ( oracle->_status != OCI_SUCCESS )
 			&& ( oracle->_status != OCI_SUCCESS_WITH_INFO ) ) {
-		log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to prepare statement." << endl;
+		log( LOG_LEVEL::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to prepare statement." << endl;
 		oracle_free_query( queryObj );
 		queryObj = NULL;
 	} else if ( oracle->_status == OCI_SUCCESS_WITH_INFO ) {
-		log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, NULL ) << endl;
+		log( LOG_LEVEL::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, NULL ) << endl;
 	}
 	return ( queryObj );
 }
@@ -286,7 +286,7 @@ void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
 				iters = 0;
 			} break;
 			default: {
-				log( LOG_TYPE::ERROR ) << _logTag_ <<  __FUNCTION__ << ": " << "unknown statement type: " << stmtType << endl;
+				log( LOG_LEVEL::ERROR ) << _logTag_ <<  __FUNCTION__ << ": " << "unknown statement type: " << stmtType << endl;
 				fail = true;
 				break;
 			}
@@ -303,7 +303,7 @@ void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
 			fail = true;
 			break;
 		} else if ( oracle->_status == OCI_SUCCESS_WITH_INFO ) {
-			log( LOG_TYPE::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, NULL ) << endl;
+			log( LOG_LEVEL::INFO ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, NULL ) << endl;
 		}
 		int fc( -1 );
 		if ( ( ( *query->_status ) = OCIAttrGet( query->_statement,
@@ -380,7 +380,7 @@ void* oracle_query_execute( ODBLink& dbLink_, void* data_ ) {
 			OCIDescriptorFree( *it, OCI_DTYPE_PARAM );
 	}
 	if ( fail ) {
-		log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to execute statement." << endl;
+		log( LOG_LEVEL::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to execute statement." << endl;
 	}
 	return ( query );
 }
@@ -430,7 +430,7 @@ M_EXPORT_SYMBOL void query_bind( ODBLink& dbLink_, void* data_, int attrNo_, yaa
 	if ( ( ( *query->_status ) = OCIBindByPos( query->_statement, &dummy, query->_error,
 			static_cast<ub4>( attrNo_ ), const_cast<char*>( value_.c_str() ), static_cast<sb4>( value_.get_size() ) + 1,
 			SQLT_STR, &query->_inNullInd.back(), NULL, NULL, 0, NULL, OCI_DEFAULT ) ) != OCI_SUCCESS ) {
-		log( LOG_TYPE::ERROR ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, query ) << endl;
+		log( LOG_LEVEL::ERROR ) << _logTag_ <<  __FUNCTION__ << ": " << dbrs_error( dbLink_, query ) << endl;
 	}
 	return;
 }
@@ -503,7 +503,7 @@ M_EXPORT_SYMBOL int long dbrs_records_count( ODBLink&, void* dataR_ ) {
 		if ( ( *query->_status ) != OCI_NO_DATA ) {
 			if ( ( ( *query->_status ) != OCI_SUCCESS )
 					&& ( ( *query->_status ) != OCI_SUCCESS_WITH_INFO ) ) {
-				log( LOG_TYPE::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to fetch last row." << endl;
+				log( LOG_LEVEL::ERROR ) << _logTag_ << __FUNCTION__ << ": failed to fetch last row." << endl;
 				rows = -1;
 			}
 		}

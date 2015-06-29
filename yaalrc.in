@@ -44,14 +44,10 @@ on_alloc_failure THROW
 # exception_logging if set to true enables automatic logging information about exceptions.
 exception_logging true
 
-# log_mask
-# type: special(multi-flag), default: (empty)
-# log_mask decides what types of information will be logged
-# log_mask can occur in all yaalrc's sections and flag are
-# additive across all sections
-# argument to log_mask can be any combination of flags:
-# LOG_DEBUG, LOG_INFO, LOG_NOTICE, LOG_WARNING, LOG_ERROR, LOG_VCSHEADER
-log_mask LOG_INFO LOG_NOTICE LOG_WARNING LOG_ERROR LOG_VCSHEADER
+# log_level
+# type: enumerator { DEBUG, INFO, NOTICE, WARNING, ERROR, CRITICAL, ALERT, EMERGENCY }, default: (NOTICE)
+# log_level decides what types of information will be logged
+log_level NOTICE
 
 # write_timeout
 # type: integer, default 4000
@@ -258,7 +254,7 @@ attribute_search_highlight BLACK YELLOW BLACK BROWN
 [dbwrapper]
 
 # log SQL queries
-log_mask LOG_SQL
+log_sql true
 
 # select data base driver
 # accepted drivers are:

@@ -340,7 +340,7 @@ int HBaseSignalHandlers::signal_INT ( int signum_ ) {
 	message = "Interrupt signal caught, process broken: ";
 	message += ::strsignal( signum_ );
 	message += '.';
-	log( LOG_TYPE::INFO ) << message << endl;
+	log( LOG_LEVEL::INFO ) << message << endl;
 	cerr << "\n" << message << endl;
 	return ( -1 );
 	M_EPILOG
@@ -352,7 +352,7 @@ int HBaseSignalHandlers::signal_HUP( int signum_ ) {
 	message = "Unhandled HUP received: ";
 	message += ::strsignal( signum_ );
 	message += '.';
-	log( LOG_TYPE::INFO ) << message << endl;
+	log( LOG_LEVEL::INFO ) << message << endl;
 	cerr << "\n" << message << endl;
 	return ( -1 );
 	M_EPILOG
@@ -364,7 +364,7 @@ int HBaseSignalHandlers::signal_TERM( int signum_ ) {
 	message = "Process was explictly killed: ";
 	message += strsignal( signum_ );
 	message += '.';
-	log( LOG_TYPE::INFO ) << message << endl;
+	log( LOG_LEVEL::INFO ) << message << endl;
 	cerr << "\n" << message << endl;
 	return ( -2 );
 	M_EPILOG
@@ -378,7 +378,7 @@ int HBaseSignalHandlers::signal_QUIT ( int signum_ ) {
 	message = "Abnormal program quit forced: ";
 	message += ::strsignal( signum_ );
 	message += '.';
-	log( LOG_TYPE::INFO ) << message << endl;
+	log( LOG_LEVEL::INFO ) << message << endl;
 	cerr << "\n" << message << endl;
 	abort();
 	return ( 0 );
@@ -393,7 +393,7 @@ int HBaseSignalHandlers::signal_TSTP( int signum_ ) {
 	message = "Stop signal caught, process suspended: ";
 	message += ::strsignal( signum_ );
 	message += '.';
-	log( LOG_TYPE::INFO ) << message << endl;
+	log( LOG_LEVEL::INFO ) << message << endl;
 	cerr << "\n" << message << endl;
 	reset_signal_low( SIGTSTP );
 	raise( SIGTSTP );
@@ -408,7 +408,7 @@ int HBaseSignalHandlers::signal_CONT( int signum_ ) {
 	message = "Process was resurected: ";
 	message += ::strsignal( signum_ );
 	message += '.';
-	log( LOG_TYPE::INFO ) << message << endl;
+	log( LOG_LEVEL::INFO ) << message << endl;
 	cerr << "\n" << message << endl;
 	return ( 0 );
 	M_EPILOG
@@ -420,7 +420,7 @@ int HBaseSignalHandlers::signal_fatal( int signum_ ) {
 	message = "Process caused FATAL ERROR: ";
 	message += ::strsignal( signum_ );
 	message += '.';
-	log( LOG_TYPE::INFO ) << message << endl;
+	log( LOG_LEVEL::INFO ) << message << endl;
 	cerr << "\n" << message << endl;
 	abort();
 #ifdef __MSVCXX__
@@ -441,7 +441,7 @@ int HBaseSignalHandlers::signal_USR1( int signum_ ) {
 	message = "\nDo you play with the mouse under FreeBSD ? ";
 	message += ::strsignal( signum_ );
 	message += '.';
-	log( LOG_TYPE::INFO ) << message << endl;
+	log( LOG_LEVEL::INFO ) << message << endl;
 	cerr << "\n" << message << endl;
 	return ( -3 );
 	M_EPILOG

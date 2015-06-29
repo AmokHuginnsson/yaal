@@ -431,7 +431,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 	RC_PATHER::placement_state_t successStory( RC_PATHER::NONE );
 	HFile rc;
 	HString option, value, message;
-	log( LOG_TYPE::INFO ) << __FUNCTION__ << ": ";
+	log( LOG_LEVEL::INFO ) << __FUNCTION__ << ": ";
 	if ( _options.is_empty() )
 		M_THROW( _( "bad variable count" ), _options.size() );
 	typedef HSet<HString> paths_t;
@@ -482,7 +482,7 @@ int HProgramOptionsHandler::process_rc_file( HString const& rcName_,
 					message.format( "Error: unknown option found: `%s', "
 								"with value: `%s', on line %d.\n",
 								option.raw(), value.raw(), line );
-					log( LOG_TYPE::ERROR ) << message;
+					log( LOG_LEVEL::ERROR ) << message;
 					::fputs( message.raw(), stderr );
 				}
 			}
@@ -788,7 +788,7 @@ int HProgramOptionsHandler::process_command_line( int argc_,
 	int val( 0 );
 	HString shortOptBuffer;
 	HChunk longOptBuffer( chunk_size<option>( _options.size() + 1 ) ); /* + 1 for array terminator */
-	hcore::log( LOG_TYPE::INFO ) << "Decoding switches ... ";
+	hcore::log( LOG_LEVEL::INFO ) << "Decoding switches ... ";
 	char const* shortOpts( make_short_opts( _options, shortOptBuffer ) );
 	option* optionArray( make_option_array( _options, longOptBuffer ) );
 	while ( ( val = ::getopt_long( argc_, argv_, shortOpts, optionArray, NULL ) ) != EOF ) {
