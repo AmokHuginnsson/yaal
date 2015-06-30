@@ -174,10 +174,9 @@ inline bool is_byte( int value ) {
 	return ( value <= static_cast<int>( meta::max_unsigned<char unsigned>::value ) );
 }
 
-void show_help( void* arg ) {
+void show_help( OOptionInfo const& info ) {
 	M_PROLOG
 	errno = 0;
-	OOptionInfo& info = *static_cast<OOptionInfo*>( arg );
 	HString name;
 	if ( is_a_tty( stdout ) ) {
 		name.append( *ansi::bold );
@@ -368,9 +367,8 @@ void show_help( void* arg ) {
 	M_EPILOG
 }
 
-void dump_configuration( void* arg ) {
+void dump_configuration( OOptionInfo const& info ) {
 	M_PROLOG
-	OOptionInfo& info = *static_cast<OOptionInfo*>( arg );
 	if ( info._name ) {
 		cout << "# this is configuration file for: `" << info._name << "' program\n";
 	}
@@ -418,30 +416,26 @@ void dump_configuration( void* arg ) {
 		}
 		static int const MAXIMUM_LINE_LENGTH = 72;
 		cout << "### " << o.long_form() << " ###\n# type: ";
-		if ( !! o.value() ) {
-			switch ( o.value()->get_type() ) {
-				case ( TYPE::BOOL ): {
-					cout << "boolean";
-				} break;
-				case ( TYPE::INT ):
-				case ( TYPE::INT_SHORT ):
-				case ( TYPE::INT_LONG ): {
-					cout << "integer";
-				} break;
-				case ( TYPE::FLOAT ):
-				case ( TYPE::DOUBLE ):
-				case ( TYPE::DOUBLE_LONG ): {
-					cout << "floating point";
-				} break;
-				case ( TYPE::HSTRING ): {
-					cout << "character string";
-				} break;
-				default: {
-					cout << "special";
-				} break;
-			}
-		} else {
-			cout << "boolean";
+		switch ( o.recipient_type() ) {
+			case ( TYPE::BOOL ): {
+				cout << "boolean";
+			} break;
+			case ( TYPE::INT ):
+			case ( TYPE::INT_SHORT ):
+			case ( TYPE::INT_LONG ): {
+				cout << "integer";
+			} break;
+			case ( TYPE::FLOAT ):
+			case ( TYPE::DOUBLE ):
+			case ( TYPE::DOUBLE_LONG ): {
+				cout << "floating point";
+			} break;
+			case ( TYPE::HSTRING ): {
+				cout << "character string";
+			} break;
+			default: {
+				cout << "special";
+			} break;
 		}
 		if ( ! o.default_value().is_empty() ) {
 			cout << ", default: " << o.default_value();
@@ -471,36 +465,26 @@ void dump_configuration( void* arg ) {
 				loop = false;
 			}
 		} while ( loop );
-		if ( !! o.value() ) {
-			switch ( o.value()->get_type() ) {
-				case ( TYPE::BOOL ):
-					cout << o.long_form() << " " << ( o.value()->get<bool>() ? "true" : "false" ) << "\n";
-				break;
-				case ( TYPE::HSTRING ): {
-					HString const& s = o.value()->get<HString>();
-					if ( ! s.is_empty() ) {
-						cout << o.long_form() << " \"" << s << "\"\n";
-					} else {
-						cout << "# " << o.long_form() << "\n";
-					}
+		switch ( o.recipient_type() ) {
+			case ( TYPE::BOOL ):
+			case ( TYPE::INT ):
+			case ( TYPE::INT_LONG ):
+			case ( TYPE::DOUBLE_LONG ):
+			case ( TYPE::DOUBLE ):
+				cout << o.long_form() << " " << o.get() << "\n";
+			break;
+			case ( TYPE::HSTRING ): {
+				HString s = o.get();
+				if ( ! s.is_empty() ) {
+					cout << o.long_form() << " \"" << s << "\"\n";
+				} else {
+					cout << "# " << o.long_form() << "\n";
 				}
-				break;
-				case ( TYPE::INT ):
-					cout << o.long_form() << " " << o.value()->get<int>() << "\n";
-				break;
-				case ( TYPE::INT_LONG ):
-					cout << o.long_form() << " " << o.value()->get<int long>() << "\n";
-				break;
-				case ( TYPE::DOUBLE_LONG ):
-					cout << o.long_form() << " " << o.value()->get<double long>() << "\n";
-				break;
-				case ( TYPE::DOUBLE ):
-					cout << o.long_form() << " " << o.value()->get<double>() << "\n";
-				break;
-				default:
-					;
-				break;
 			}
+			break;
+			default:
+				;
+			break;
 		}
 		cout << "\n";
 	}

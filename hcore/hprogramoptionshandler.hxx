@@ -50,6 +50,28 @@ namespace yaal {
 
 namespace hcore {
 
+namespace program_options_helper {
+
+template<typename tType>
+void set_option_value_from_string( tType& object, yaal::hcore::HString const& value );
+
+template<typename tType>
+void set_option_value_from_string( yaal::hcore::HArray<tType>& object, yaal::hcore::HString const& value );
+
+template<typename tType>
+void set_option_value_from_string( yaal::hcore::HDeque<tType>& object, yaal::hcore::HString const& value );
+
+template<typename tType>
+void set_option_value_from_string( yaal::hcore::HList<tType>& object, yaal::hcore::HString const& value );
+
+template<typename tType>
+void set_option_value_from_string( yaal::hcore::HSet<tType>& object, yaal::hcore::HString const& value );
+
+template<typename tType>
+void set_option_value_from_string( yaal::hcore::HHashSet<tType>& object, yaal::hcore::HString const& value );
+
+}
+
 /*! \brief Handle program options from command-line and configuration (resource) file.
  */
 class HProgramOptionsHandler {
@@ -57,22 +79,6 @@ class HProgramOptionsHandler {
 	typedef HProgramOptionsHandler this_type;
 public:
 	typedef bool ( *RC_CALLBACK_t )( HString&, HString& );
-	typedef yaal::hcore::HBoundCall<> simple_callback_t;
-	class HOptionValueInterface {
-		typedef HOptionValueInterface this_type;
-	public:
-		typedef HPointer<HOptionValueInterface> ptr_t;
-		virtual ~HOptionValueInterface( void ) {}
-		void set( HString const& );
-		TYPE get_type( void ) const;
-		template<typename tType>
-		tType const& get( void ) const;
-		u64_t id( void ) const;
-	protected:
-		virtual void do_set( HString const& ) = 0;
-		virtual TYPE do_get_type( void ) const = 0;
-		virtual void const* do_get( void ) const = 0;
-	};
 	/*! \brief Basic program configuration item.
 	 */
 	class HOption {
@@ -82,6 +88,8 @@ public:
 			OPTIONAL,
 			REQUIRED
 		};
+		typedef yaal::hcore::HBoundCall<void ( yaal::hcore::HString const& )> setter_t;
+		typedef yaal::hcore::HBoundCall<yaal::hcore::HString ( void )> getter_t;
 	private:
 		int _shortForm;
 		yaal::hcore::HString _longForm;
@@ -89,26 +97,17 @@ public:
 		yaal::hcore::HString _description;
 		yaal::hcore::HString _argument;
 		yaal::hcore::HString _defaultValue;
-		HOptionValueInterface::ptr_t _value;
-		simple_callback_t _callback;
+		setter_t _setter;
+		getter_t _getter;
+		TYPE _recipientType;
+		u64_t _valueId;
 	public:
-		HOption(
-			int = 0,
-			yaal::hcore::HString const& = yaal::hcore::HString(),
-			ARGUMENT = ARGUMENT::NONE,
-			yaal::hcore::HString const& = yaal::hcore::HString(),
-			yaal::hcore::HString const& = yaal::hcore::HString(),
-			yaal::hcore::HString const& = yaal::hcore::HString(),
-			HOptionValueInterface::ptr_t = HOptionValueInterface::ptr_t(),
-			HProgramOptionsHandler::simple_callback_t const& = HProgramOptionsHandler::simple_callback_t()
-		);
+		HOption( void );
 		yaal::hcore::HString const& long_form( void ) const;
 		HOption& long_form( yaal::hcore::HString const& );
 		int short_form( void ) const;
 		HOption& short_form( int );
 		u64_t value_id( void ) const;
-		void set( yaal::hcore::HString const& );
-		HOptionValueInterface::ptr_t const& value( void ) const;
 		ARGUMENT switch_type( void ) const;
 		HOption& switch_type( ARGUMENT );
 		yaal::hcore::HString const& description( void ) const;
@@ -117,18 +116,43 @@ public:
 		HOption& argument_name( yaal::hcore::HString const& );
 		yaal::hcore::HString const& default_value( void ) const;
 		HOption& default_value( yaal::hcore::HString const& );
+		HOption& setter( setter_t const& );
+		HOption& setter( setter_t::function_t const& setter_ ) {
+			return ( setter( setter_t( setter_ ) ) );
+		}
+		HOption& getter( getter_t const& );
+		HOption& getter( getter_t::function_t const& getter_ ) {
+			return ( getter( getter_t( getter_ ) ) );
+		}
 		template<typename T>
 		HOption& recipient( T& recipient_ ) {
 			M_PROLOG
-			_value = make_pointer<HProgramOptionsHandler::HOptionValue<T>>( yaal::ref( recipient_ ) );
+			_setter = yaal::hcore::call( static_cast<void (*)( T&, yaal::hcore::HString const& )>( &HOption::set ), yaal::ref( recipient_ ), _1 );
+			_getter = yaal::hcore::call( static_cast<yaal::hcore::HString (*)( T const& )>( &HOption::get ), yaal::cref( recipient_ ) );
+			_recipientType = yaal::symbolic_type<T>::value;
+			_valueId = reinterpret_cast<u64_t>( &recipient_ );
 			return ( *this );
 			M_EPILOG
 		}
-		simple_callback_t const& callback( void ) const;
-		HOption& callback( simple_callback_t const& );
+		TYPE recipient_type( void ) const;
+		bool used( void ) const;
+		void set( yaal::hcore::HString const& );
+		yaal::hcore::HString get( void ) const;
 		HOption( HOption const& );
 		HOption& operator = ( HOption const& );
 		void swap( HOption& );
+	private:
+		template<typename T>
+		static void set( T& recipient_, yaal::hcore::HString const& value_ ) {
+			M_PROLOG
+			program_options_helper::set_option_value_from_string( recipient_, value_ );
+			return;
+			M_EPILOG
+		}
+		template<typename T>
+		static yaal::hcore::HString get( T const& value_ ) {
+			return ( lexical_cast<yaal::hcore::HString>( value_ ) );
+		}
 	};
 	template<typename tType>
 	class HOptionValue;
@@ -141,45 +165,6 @@ public:
 	 */
 	HProgramOptionsHandler( yaal::hcore::HString const& = PACKAGE_NAME );
 	HProgramOptionsHandler& operator()( HOption );
-	/*! \brief Add new option descriptor to option handler.
-	 *
-	 * \param name - option name.
-	 * \param shortForm - a short form of option name.
-	 * \param argType - type of option with respect to requirements of addtional arguments.
-	 * \param desc - option descrition for help generation.
-	 * \param argName - name of addtional option argument for generated help message.
-	 * \param defaultValue - default value to set for this option.
-	 * \param value - value storage helper.
-	 * \param callback - a function invoked when option is encountered.
-	 */
-	HProgramOptionsHandler& operator()(
-		int shortForm,
-		yaal::hcore::HString const& name,
-		HOption::ARGUMENT argType,
-		yaal::hcore::HString const& desc,
-		HOptionValueInterface::ptr_t value = HOptionValueInterface::ptr_t(),
-		yaal::hcore::HString const& argName = yaal::hcore::HString(),
-		yaal::hcore::HString const& defaultValue = yaal::hcore::HString(),
-		simple_callback_t const& callback = simple_callback_t()
-	);
-	HProgramOptionsHandler& operator()(
-		yaal::hcore::HString const& name,
-		HOption::ARGUMENT argType,
-		yaal::hcore::HString const& desc,
-		HOptionValueInterface::ptr_t value = HOptionValueInterface::ptr_t(),
-		yaal::hcore::HString const& argName = yaal::hcore::HString(),
-		yaal::hcore::HString const& defaultValue = yaal::hcore::HString(),
-		simple_callback_t const& callback = simple_callback_t()
-	);
-	HProgramOptionsHandler& operator()(
-		int shortForm,
-		HOption::ARGUMENT argType,
-		yaal::hcore::HString const& desc,
-		HOptionValueInterface::ptr_t value = HOptionValueInterface::ptr_t(),
-		yaal::hcore::HString const& argName = yaal::hcore::HString(),
-		yaal::hcore::HString const& defaultValue = yaal::hcore::HString(),
-		simple_callback_t const& callback = simple_callback_t()
-	);
 	/*! \brief Parse command line options and set program setup variables.
 	 *
 	 * process_command_line gives easy to use API for interpreting and handling
@@ -264,48 +249,7 @@ void set_option_value_from_string( tType& object, HString const& value ) {
 
 }
 
-template<typename tType>
-class HProgramOptionsHandler::HOptionValue : public HProgramOptionsHandler::HOptionValueInterface, private trait::HNonCopyable {
-	tType& _instance;
-	typedef HProgramOptionsHandler::HOptionValue<tType> this_type;
-protected:
-	typedef HProgramOptionsHandler::HOptionValueInterface base_type;
-public:
-	HOptionValue( tType& instance ) : _instance( instance ) {}
-protected:
-	virtual void do_set( HString const& value ) {
-		M_PROLOG
-		using yaal::hcore::program_options_helper::set_option_value_from_string;
-		set_option_value_from_string( _instance, value );
-		return;
-		M_EPILOG
-	}
-	virtual TYPE do_get_type( void ) const override {
-		return ( symbolic_type<tType>::value );
-	}
-	virtual void const* do_get( void ) const override {
-		return ( &_instance );
-	}
-};
-
-template<typename tType>
-tType const& HProgramOptionsHandler::HOptionValueInterface::get( void ) const {
-	M_PROLOG
-	return ( *static_cast<tType const*>( do_get() ) );
-	M_EPILOG
-}
-
 namespace program_options_helper {
-
-/*! \brief Type safe option container.
- */
-template<typename tType>
-HProgramOptionsHandler::HOptionValueInterface::ptr_t option_value( tType& instance ) {
-	HProgramOptionsHandler::HOptionValueInterface::ptr_t value( make_pointer<HProgramOptionsHandler::HOptionValue<tType> >( yaal::ref( instance ) ) );
-	return ( value );
-}
-
-static HProgramOptionsHandler::HOptionValueInterface::ptr_t no_value;
 
 int reload_configuration( void );
 

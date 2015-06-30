@@ -91,23 +91,6 @@ bool set_hcore_variables( HString& option_, HString& value_ ) {
 	bool fail( false );
 	if ( ! strcasecmp( option_, "set_env" ) ) {
 		decode_set_env( value_ );
-	} else if ( ! strcasecmp( option_, "log_level" ) ) {
-		fail = true;
-		for ( int l( LOG_LEVEL::MIN ); l <= LOG_LEVEL::MAX; ++ l ) {
-			if ( ! strcasecmp( value_, LOG_LEVEL::name( static_cast<LOG_LEVEL::priority_t>( l ) ) ) ) {
-				HLog::_logLevel = static_cast<LOG_LEVEL::priority_t>( l );
-				fail = false;
-				break;
-			}
-		}
-	} else if ( ! strcasecmp( option_, "on_alloc_failure" ) ) {
-		if ( value_ == "ABORT" ) {
-			memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::ABORT;
-		} else if ( value_ == "THROW" ) {
-			memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::THROW;
-		} else {
-			fail = true;
-		}
 	} else {
 		fail = true;
 	}
@@ -260,11 +243,56 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 #endif /* #if ( HAVE_DECL_RLIMIT_NPROC == 1 ) */
 	init_locale();
 	char* env( ::getenv( "YAAL_DEBUG" ) );
-	if ( env )
+	if ( env ) {
 		_debugLevel_ = lexical_cast<int>( env );
+	}
 	HString dummy;
 	bool enableExceptionLogging( true );
 	yaal_options()(
+		HProgramOptionsHandler::HOption()
+		.long_form( "log_level" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+		.description( "Log severity level above which messages are actually processed." )
+		.argument_name( "level" )
+		.setter(
+			[]( yaal::hcore::HString const& value_ ) {
+				for ( int l( LOG_LEVEL::MIN ); l <= LOG_LEVEL::MAX; ++ l ) {
+					if ( ! strcasecmp( value_, LOG_LEVEL::name( static_cast<LOG_LEVEL::priority_t>( l ) ) ) ) {
+						HLog::_logLevel = static_cast<LOG_LEVEL::priority_t>( l );
+						return;
+					}
+				}
+				throw HProgramOptionsHandlerException( "Bad severity level: "_ys.append( value_ ) );
+			}
+		)
+		.getter(
+			[]( void ) {
+				return ( LOG_LEVEL::name( HLog::_logLevel ) );
+			}
+		)
+	)(
+		HProgramOptionsHandler::HOption()
+		.long_form( "on_alloc_failure" )
+		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
+		.description( "Specify how to handle memory allocation failures." )
+		.argument_name( "strategy" )
+		.setter(
+			[]( yaal::hcore::HString const& value_ ) {
+				if ( value_ == "ABORT" ) {
+					memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::ABORT;
+				} else if ( value_ == "THROW" ) {
+					memory::_onAllocFailure_ = memory::ON_ALLOC_FAILURE::THROW;
+				} else {
+					throw HProgramOptionsHandlerException( "Bad allocation failure strategy: "_ys.append( value_ ) );
+				}
+			}
+		)
+		.getter(
+			[]( void ) {
+				return ( memory::_onAllocFailure_ == memory::ON_ALLOC_FAILURE::THROW ? "THROW" : "ABORT" );
+			}
+		)
+	)(
 		HProgramOptionsHandler::HOption()
 		.long_form( "ssl_key" )
 		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
@@ -310,10 +338,11 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 		.description( "Enable automatic exception stack frames logging." )
 		.recipient( enableExceptionLogging )
 	);
-	if ( enableExceptionLogging )
+	if ( enableExceptionLogging ) {
 		HException::enable_logging();
-	else
+	} else {
 		HException::disable_logging();
+	}
 	yaal_options().process_rc_file( "yaal", "core", set_hcore_variables );
 	if ( _writeTimeout_ < LOW_TIMEOUT_WARNING )
 		log( LOG_LEVEL::WARNING ) << "Low default timout for write operations!" << endl;

@@ -64,7 +64,6 @@ public:
 	typedef typename trait::argument_type<signature_t, 8>::type ninth_argument_type;
 	typedef typename trait::argument_type<signature_t, 9>::type tenth_argument_type;
 	typedef typename trait::argument_type<signature_t, 10>::type eleventh_argument_type;
-private:
 	typedef HCallInterface<trait::argument_count<signature_t>::value,
 					result_type,
 					first_argument_type,
@@ -83,6 +82,7 @@ private:
 	typedef std::function<signature_t> function_t;
 	typedef HPointer<function_t> function_ptr_t;
 	typedef HVariant<call_ptr_t, function_ptr_t> call_fwd_t;
+private:
 	call_fwd_t _call;
 public:
 	HBoundCall( void )

@@ -91,17 +91,8 @@ HLog::HLog( void )
 	if ( ! _file::ref() ) {
 		M_THROW( "tmpfile() failed", errno );
 	}
-	HString msg;
-	msg.format( "%-10xProcess started (%ld).\n",
-		LOG_LEVEL::NOTICE, static_cast<int long>( system::getpid() )
-	);
-	_file::ref() << msg;
-	if ( _logLevel >= LOG_LEVEL::INFO ) {
-		msg.format( "%-10xyaal version = %s.\n",
-			LOG_LEVEL::DEBUG, yaal_version( _logLevel >= LOG_LEVEL::DEBUG )
-		);
-		_file::ref() << msg;
-	}
+	operator()( LOG_LEVEL::NOTICE ) << "Process started (" << system::getpid() << ")." << endl;
+	operator()( LOG_LEVEL::NOTICE ) << "yaal version = " << yaal_version( true ) << endl;
 	return;
 	M_EPILOG
 }

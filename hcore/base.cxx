@@ -359,9 +359,51 @@ HString lexical_cast( HString const& val ) {
 }
 
 template<>
+HString lexical_cast( char const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
+HString lexical_cast( int short const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
 HString lexical_cast( int const& val_ ) {
 	M_PROLOG
 	return ( val_ );
+	M_EPILOG
+}
+
+template<>
+HString lexical_cast( int long const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
+HString lexical_cast( double const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
+HString lexical_cast( double long const& val_ ) {
+	M_PROLOG
+	return ( val_ );
+	M_EPILOG
+}
+
+template<>
+HString lexical_cast( bool const& val_ ) {
+	M_PROLOG
+	return ( val_ ? "true" : "false" );
 	M_EPILOG
 }
 

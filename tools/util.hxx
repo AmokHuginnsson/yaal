@@ -82,8 +82,8 @@ private:
 	OOptionInfo& operator = ( OOptionInfo const& );
 };
 
-void show_help( void* );
-void dump_configuration( void* );
+void show_help( OOptionInfo const& );
+void dump_configuration( OOptionInfo const& );
 
 void failure( int, char const* const, ... ) __attribute__(( __noreturn__, format( printf, 2, 3 ) ));
 
