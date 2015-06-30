@@ -246,7 +246,6 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 	if ( env ) {
 		_debugLevel_ = lexical_cast<int>( env );
 	}
-	HString dummy;
 	bool enableExceptionLogging( true );
 	yaal_options()(
 		HProgramOptionsHandler::HOption()
@@ -318,13 +317,6 @@ HCoreInitDeinit::HCoreInitDeinit( void ) {
 		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
 		.description( "Set size of stack for newly created threads." )
 		.recipient( HThread::_threadStackSize )
-	)(
-		HProgramOptionsHandler::HOption()
-		.long_form( "on_alloc_failure" )
-		.switch_type( HProgramOptionsHandler::HOption::ARGUMENT::REQUIRED )
-		.description( "Memory allocation failure handling policy." )
-		.recipient( dummy )
-		.argument_name( "policy" )
 	)(
 		HProgramOptionsHandler::HOption()
 		.long_form( "write_timeout" )
