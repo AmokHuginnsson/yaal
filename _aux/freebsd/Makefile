@@ -96,7 +96,7 @@ pre-install:
 	${CAT} pkg-plist.end >> $(PLIST)
 
 do-install:
-	@true
+	@cd $(WRKSRC) && $(MAKE) $(BUILD_ENV) LC_CTYPE=pl_PL.ISO8859-2 test
 
 .include <bsd.port.mk>
 
