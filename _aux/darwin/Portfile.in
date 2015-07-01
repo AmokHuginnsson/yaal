@@ -18,6 +18,7 @@ use_automake        no
 use_autoreconf      no
 use_configure       no
 use_parallel_build  no
+test.run            yes
 
 archivefetch {}
 unarchive {}
@@ -36,3 +37,11 @@ destroot.env        CCACHE_DIR=${workpath}/ccache
 destroot.cmd        umask 0077 && make PREFIX=${prefix} DESTDIR=${destroot} SYSCONFDIR=${prefix}/etc LOCALSTATEDIR=${prefix}/var install
 destroot.post_args
 
+pre-test {
+	exec ln -nsf ${worksrcpath} ${workpath}/yaal
+	exec /bin/rm -rf ${workpath}/tress
+	exec tar cf - -C ${portpath}/../../../../../ --exclude build tress | tar xpf - -C ${workpath}/
+}
+
+test.env            CCACHE_DIR=${workpath}/ccache
+test.cmd            umask 0077 && make PREFIX=${prefix} DESTDIR=${destroot} SYSCONFDIR=${prefix}/etc LOCALSTATEDIR=${prefix}/var
