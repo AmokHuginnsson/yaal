@@ -50,6 +50,11 @@ umask 0077
 make install-debug install-release install-doc DESTDIR=${RPM_BUILD_ROOT}
 rm -f ${RPM_BUILD_ROOT}/%{_libdir}/ld.so.conf ${RPM_BUILD_ROOT}/%{_libdir}/ld.so.cache ${RPM_BUILD_ROOT}/%{_libdir}/mkcache
 
+%check
+umask 0077
+ln -nsf ../../../../../tress ../
+make test
+
 %clean
 rm -rf ${RPM_BUILD_ROOT}
 umask 0077

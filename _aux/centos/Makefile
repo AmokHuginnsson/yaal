@@ -4,7 +4,7 @@ SHELL     = /bin/sh
 UNQUOTE   = $(subst $\",,$(1))
 VERIFY_DIR=../../yaalrc.in
 VERSION=$(shell awk '/^VERSION *=|SUBVERSION *=|EXTRAVERSION *=/{VERSION=VERSION DOT $$3;DOT="."}END{print VERSION}' ../../Makefile.mk.in)
-PACKAGE_VERSION=$(call UNQUOTE,$(BUILD_ID))
+PACKAGE_VERSION=$(or $(call UNQUOTE,$(BUILD_ID)),1)
 ARCH=$(shell arch)
 SYSTEM=$(shell lsb_release -si | tr A-Z a-z)
 TAG=$(VERSION)-$(PACKAGE_VERSION).el$(SYSTEM_RELEASE).$(SYSTEM).$(ARCH)
