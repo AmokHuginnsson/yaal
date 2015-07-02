@@ -9,9 +9,10 @@ ARTIFACT=$(DESTDIR)/$(PREFIX)/lib/libhdata.so
 BUNDLE_DIR=yaal-bundle/solaris-$(OS)/$(ARCH)/$(PORTVERSION)
 BUNDLE=yaal-$(VERSION)-solaris-$(OS)-$(ARCH).tar
 BUNDLE_WRAP=yaal-bundle.tar
+TEST_ARTIFACT=$(DESTDIR)/test-ok
 
 all: $(VERIFY_DIR)
-	@echo "Explicit target required!" && echo && echo "supported targets: clean build package"
+	@echo "Explicit target required!" && echo && echo "supported targets: clean package bundle"
 
 $(VERIFY_DIR):
 	@echo "You must run this Makefile from yaal/_aux/solaris directory." && false
@@ -21,9 +22,10 @@ $(ARTIFACT): $(VERIFY_DIR)
 	cd ../../ && $(MAKE) $(MAKE_ENV) debug release && \
 	$(MAKE) $(MAKE_ENV) install-debug install-release
 
-build: $(ARTIFACT)
+$(TEST_ARTIFACT): $(ARTIFACT)
+	cd ../../ && $(MAKE) $(MAKE_ENV) test && touch $(@)
 
-$(PKGFILENAME): $(ARTIFACT) pkginfo.in solaris.mk GNUmakefile makefile
+$(PKGFILENAME): $(TEST_ARTIFACT) pkginfo.in solaris.mk GNUmakefile makefile
 	@echo "i pkginfo" > Prototype && \
 	pkgproto pkg= | awk '{print $$1" "$$2" "$$3" "$$4" root root"}' | sed -e 's/ 0700 / 0755 /' >> Prototype && \
 	sed -e 's/@VERSION@/$(VERSION)/' -e 's/@ARCH@/$(ARCH)/' pkginfo.in > pkginfo && \

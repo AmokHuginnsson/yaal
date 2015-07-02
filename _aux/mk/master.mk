@@ -3,7 +3,7 @@ include _aux/mk/00_sanity.mk
 .NOTPARALLEL:
 
 -include .my_make
-COMMA=,
+,:=,
 include _aux/mk/20_term.mk
 
 MAKEFLAGS+=--no-builtin-rules
