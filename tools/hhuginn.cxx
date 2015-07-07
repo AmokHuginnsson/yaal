@@ -730,9 +730,21 @@ int HHuginn::HObject::field_index( yaal::hcore::HString const& name_ ) const {
 	M_EPILOG
 }
 
-HHuginn::value_t& HHuginn::HObject::field( int index_ ) {
+HHuginn::value_t& HHuginn::HObject::field_ref( int index_ ) {
 	M_PROLOG
 	return ( _fields[index_] );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HObject::field( int index_, bool copy_ ) {
+	M_PROLOG
+	value_t& f( _fields[index_] );
+	bool isMethod( f->type() == TYPE::METHOD );
+	return (
+		! ( copy_ && isMethod )
+			? f
+			: pointer_static_cast<HHuginn::HValue>( make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod*>( f.raw() ) ) )
+	);
 	M_EPILOG
 }
 
@@ -794,22 +806,23 @@ int HHuginn::HObjectReference::field_index( yaal::hcore::HString const& name_ ) 
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObjectReference::field( int index_ ) {
+HHuginn::value_t HHuginn::HObjectReference::field( int index_, bool copy_ ) {
 	M_PROLOG
 	HObject* o( static_cast<HObject*>( _object.raw() ) );
-	value_t* f( nullptr );
-	values_t v;
+	value_t v;
 	if ( _class != o->get_class() ) {
-		v = _class->get_defaults();
-		f = &v[index_];
+		v = _class->get_defaults()[index_];
 	} else {
-		f = &o->field( index_ );
+		v = o->field_ref( index_ );
 	}
-	HClass::HMethod* m( dynamic_cast<HClass::HMethod*>( f->raw() ) );
+	HClass::HMethod* m( dynamic_cast<HClass::HMethod*>( v.raw() ) );
 	if ( m ) {
 		m->set_object( o );
+		if ( copy_ ) {
+			v = make_pointer<HClass::HBoundMethod>( *m );
+		}
 	}
-	return ( *f );
+	return ( v );
 	M_EPILOG
 }
 
@@ -1451,6 +1464,18 @@ void HHuginn::HClass::HMethod::set_object( yaal::tools::HHuginn::HObject* object
 
 HHuginn::value_t HHuginn::HClass::HMethod::do_clone( void ) const {
 	return ( make_pointer<HMethod>( _function ) );
+}
+
+HHuginn::HClass::HBoundMethod::HBoundMethod( HMethod const& method_ )
+	: HMethod( method_.function() )
+	, _objectHolder( method_.object()->get_pointer() ) {
+	HMethod::set_object( static_cast<HHuginn::HObject*>( _objectHolder.raw() ) );
+	M_ASSERT( object() );
+	return;
+}
+
+HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( void ) const {
+	return ( make_pointer<HBoundMethod>( *static_cast<HMethod const*>( this ) ) );
 }
 
 namespace huginn_builtin {

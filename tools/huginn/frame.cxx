@@ -134,7 +134,7 @@ HHuginn::value_t HFrame::get_reference( yaal::hcore::HString const& name_, int p
 			v = it->second;
 			break;
 		} else if ( f->_object && ( ( fieldIdx = f->_object->field_index( name_ ) ) >= 0 ) ) {
-			v = f->_object->field( fieldIdx );
+			v = f->_object->field( fieldIdx, false );
 			break;
 		} else if ( f->_object && ( name_ == KEYWORD::THIS ) ) {
 			v = f->_object->get_pointer();
@@ -181,7 +181,7 @@ HHuginn::value_t HFrame::make_variable( yaal::hcore::HString const& name_, int )
 	while ( f ) {
 		int fieldIdx( -1 );
 		if ( f->_object && ( ( fieldIdx = f->_object->field_index( name_ ) ) >= 0 ) ) {
-			v = &( f->_object->field( fieldIdx ) );
+			v = &( f->_object->field_ref( fieldIdx ) );
 			break;
 		}
 		variables_t::iterator it( f->_variables.find( name_ ) );

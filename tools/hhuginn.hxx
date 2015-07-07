@@ -321,6 +321,7 @@ public:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, int> field_indexes_t;
 	class HMethod;
+	class HBoundMethod;
 private:
 	type_t _type;
 	HClass const* _super;
@@ -365,6 +366,20 @@ private:
 	virtual value_t do_clone( void ) const override;
 };
 
+class HHuginn::HClass::HBoundMethod : public HHuginn::HClass::HMethod {
+	typedef HHuginn::HClass::HBoundMethod this_type;
+	typedef HHuginn::HClass::HMethod base_type;
+private:
+	HHuginn::value_t _objectHolder;
+public:
+	HBoundMethod( HMethod const& );
+	void set_object( HObject* ) = delete;
+private:
+	HBoundMethod( HBoundMethod const& ) = delete;
+	HBoundMethod& operator = ( HBoundMethod const& ) = delete;
+	virtual value_t do_clone( void ) const override;
+};
+
 class HHuginn::HObject : public HHuginn::HValue, public yaal::hcore::HPointerFromThisInterface<HHuginn::HObject> {
 public:
 	typedef HHuginn::HObject this_type;
@@ -378,7 +393,8 @@ public:
 	HObject( HClass const*, fields_t const& );
 	virtual ~HObject( void );
 	int field_index( yaal::hcore::HString const& ) const;
-	value_t& field( int );
+	value_t& field_ref( int );
+	value_t field( int, bool );
 	HClass const* get_class( void ) const;
 	bool is_kind_of( yaal::hcore::HString const& ) const;
 private:
@@ -400,7 +416,7 @@ public:
 	HObjectReference( value_t const&, int, bool, int );
 	HObjectReference( value_t const&, HClass const* );
 	int field_index( yaal::hcore::HString const& ) const;
-	value_t field( int );
+	value_t field( int, bool );
 private:
 	HObjectReference( HObjectReference const& ) = delete;
 	HObjectReference& operator = ( HObjectReference const& ) = delete;
