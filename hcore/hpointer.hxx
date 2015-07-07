@@ -277,14 +277,32 @@ public:
 		acquire( pointer_ );
 		return;
 	}
+	HPointer( HPointer&& other_ ) noexcept
+		: _shared( NULL ), _object( NULL ) {
+		swap( other_ );
+		return;
+	}
 	HPointer& operator = ( HPointer const& pointer_ ) {
 		acquire( pointer_ );
+		return ( *this );
+	}
+	HPointer& operator = ( HPointer&& other_ ) noexcept {
+		if ( & other_ != this ) {
+			swap( other_ );
+			other_.reset();
+		}
 		return ( *this );
 	}
 	template<typename alien_t, template<typename, typename>class alien_access_t>
 	HPointer& operator = ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) {
 		acquire( pointer_ );
 		return ( *this );
+	}
+	bool unique( void ) const {
+		return ( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] == 1 ) );
+	}
+	int use_count( void ) const {
+		return ( _shared ? _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] : 0 );
 	}
 	const_reference operator* ( void ) const {
 		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
