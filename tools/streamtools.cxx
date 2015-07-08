@@ -35,6 +35,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "streamtools.hxx"
 #include "hcore/hfile.hxx"
+#include "hcore/hlog.hxx"
 #include "hcore/hsocket.hxx"
 #include "hcore/hnumber.hxx"
 #include "hcore/hcomplex.hxx"
@@ -174,9 +175,25 @@ HBinaryFormatter operator << ( HStreamInterface& stream_, HBinaryFormatterSeed c
 HBinaryFormatterSeed bin;
 
 HString get_stream_id( HStreamInterface* stream ) {
-	HFile* f = dynamic_cast<HFile*>( stream );
-	HSocket* s = dynamic_cast<HSocket*>( stream );
-	return ( f ? f->get_path() : ( s ? s->get_host_name() : "anonymous stream" ) );
+	HString name;
+	if ( HFile* f = dynamic_cast<HFile*>( stream ) ) {
+		name = f->get_path();
+	} else if ( HSocket* s = dynamic_cast<HSocket*>( stream ) ) {
+		name = s->get_host_name();
+	} else if ( stream == &cin ) {
+		name = "*standard input*";
+	} else if ( stream == &cout ) {
+		name = "*standard output*";
+	} else if ( stream == &cerr ) {
+		name = "*standard error*";
+	} else if ( stream == &clog ) {
+		name = "*standard log*";
+	} else if ( stream == &hcore::log ) {
+		name = "*log*";
+	} else {
+		name = "*anonymous stream*";
+	}
+	return ( name );
 }
 
 HStreamInterface& ensure( HStreamInterface& stream_ ) {
