@@ -48,9 +48,10 @@ class HSource {
 	yaal::hcore::HChunk _preprocessed;
 	int _preprocessedSize;
 	skips_t _skips;
+	int _skippedLines;
 public:
 	HSource( void );
-	void load( yaal::hcore::HStreamInterface& );
+	void load( yaal::hcore::HStreamInterface&, yaal::hcore::HString const&, int );
 	void preprocess( void );
 	char const* error_message( int ) const;
 	int error_position( int ) const;

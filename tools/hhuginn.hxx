@@ -203,33 +203,54 @@ private:
 public:
 	HHuginn( void );
 	virtual ~HHuginn( void );
+
 	/*! \brief Store source in internal buffer.
 	 *
-	 * \param  stream_ - stream that contains program source.
+	 * \param stream_ - stream that contains program source.
+	 * \param skippedLines_ - number of lines skipped from real input.
 	 */
-	void load( yaal::hcore::HStreamInterface& stream_ );
+	void load( yaal::hcore::HStreamInterface& stream_, int skippedLines_ = 0 );
+
+	/*! \brief Store source in internal buffer.
+	 *
+	 * \param stream_ - stream that contains program source.
+	 * \param name_ - symbolic name of program source.
+	 * \param skippedLines_ - number of lines skipped from real input.
+	 */
+	void load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString const& name_, int skippedLines_ = 0 );
+
 	/*! \brief Preprocess loaded program source.
 	 */
 	void preprocess( void );
+
 	/*! \brief Parse preprocessed program source.
 	 *
 	 * \return True iff whole input source was parsed successfully.
 	 */
 	bool parse( void );
+
 	/*! \brief Compile parsed program.
 	 *
 	 * \return True iff compilation finished with no errors.
 	 */
 	bool compile( void );
+
 	/*! \brief Execute compiled program.
 	 *
 	 * \return True iff execution finished with no errors.
 	 */
 	bool execute( void );
+
 	/*! \brief Dump Huginn Virtual Machine state.
 	 */
 	value_t call( yaal::hcore::HString const&, values_t const&, int );
+
+	/*! \brief Get value returned by program's main().
+	 *
+	 * \return Value returned by program's main() function.
+	 */
 	value_t result( void ) const;
+
 	void dump_vm_state( yaal::hcore::HStreamInterface& );
 	huginn::HThread* current_thread( void );
 	huginn::HFrame* current_frame( void );

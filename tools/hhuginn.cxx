@@ -868,10 +868,19 @@ HHuginn::~HHuginn( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-void HHuginn::load( yaal::hcore::HStreamInterface& stream_ ) {
+void HHuginn::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString const& name_, int skippedLines_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::EMPTY );
-	_source->load( stream_ );
+	_source->load( stream_, name_, skippedLines_ );
+	_state = STATE::LOADED;
+	return;
+	M_EPILOG
+}
+
+void HHuginn::load( yaal::hcore::HStreamInterface& stream_, int skippedLines_ ) {
+	M_PROLOG
+	M_ENSURE( _state == STATE::EMPTY );
+	_source->load( stream_, hcore::HString(), skippedLines_ );
 	_state = STATE::LOADED;
 	return;
 	M_EPILOG
@@ -1014,7 +1023,7 @@ HHuginn::value_t HHuginn::call( yaal::hcore::HString const& name_, values_t cons
 		M_ASSERT( t != _threads.end() );
 		res = f->second( t->second.raw(), nullptr, values_, position_ );
 	} else {
-		throw HHuginnRuntimeException( "function `"_ys.append( name_ ).append( "' is not defined" ), position_ );
+		throw HHuginnRuntimeException( "Function `"_ys.append( name_ ).append( "(...)' is not defined." ), position_ );
 	}
 	return ( res );
 	M_EPILOG

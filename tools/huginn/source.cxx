@@ -41,16 +41,17 @@ namespace tools {
 namespace huginn {
 
 HSource::HSource( void )
-	: _name(),
-	_orig(),
-	_origSize( 0 ),
-	_preprocessed(),
-	_preprocessedSize( 0 ),
-	_skips() {
+	: _name()
+	, _orig()
+	, _origSize( 0 )
+	, _preprocessed()
+	, _preprocessedSize( 0 )
+	, _skips()
+	, _skippedLines( 0 ) {
 	return;
 }
 
-void HSource::load( yaal::hcore::HStreamInterface& stream_ ) {
+void HSource::load( yaal::hcore::HStreamInterface& stream_, yaal::hcore::HString const& name_, int skippedLines_ ) {
 	M_PROLOG
 	static int const PAGE_SIZE( static_cast<int>( system::get_page_size() ) );
 	int nRead( 0 );
@@ -63,7 +64,8 @@ void HSource::load( yaal::hcore::HStreamInterface& stream_ ) {
 		_origSize += nRead;
 		++ block;
 	} while ( nRead == PAGE_SIZE );
-	_name = get_stream_id( &stream_ );
+	_name = name_.is_empty() ? get_stream_id( &stream_ ) : name_;
+	_skippedLines = skippedLines_;
 	return;
 	M_EPILOG
 }
@@ -79,32 +81,37 @@ yaal::hcore::HString const& HSource::name( void ) const {
  */
 void HSource::preprocess( void ) {
 	M_PROLOG
-	_preprocessed.realloc( _origSize );
-	HPrepocessor pp( _orig.get<char>(), _orig.get<char>() + _origSize );
-	char* dst( _preprocessed.get<char>() );
-	_skips[0] = 0;
-	int pos( -1 );
-	int skipsTotal( 0 );
-	for ( HPrepocessor::HIterator it( pp.begin() ), endIt( pp.end() ); it != endIt; ++ it, ++ dst ) {
-		int newPos( static_cast<int>( it.raw() - _orig.get<char>() ) );
-		if ( newPos > ( pos + 1 ) ) {
-			skipsTotal += ( newPos - ( pos + 1 ) );
-			_skips[static_cast<int>( dst - _preprocessed.get<char>() )] = skipsTotal;
+	if ( _origSize > 0 ) {
+		_preprocessed.realloc( _origSize );
+		HPrepocessor pp( _orig.get<char>(), _orig.get<char>() + _origSize );
+		char* dst( _preprocessed.get<char>() );
+		_skips[0] = 0;
+		int pos( -1 );
+		int skipsTotal( 0 );
+		for ( HPrepocessor::HIterator it( pp.begin() ), endIt( pp.end() ); it != endIt; ++ it, ++ dst ) {
+			int newPos( static_cast<int>( it.raw() - _orig.get<char>() ) );
+			if ( newPos > ( pos + 1 ) ) {
+				skipsTotal += ( newPos - ( pos + 1 ) );
+				_skips[static_cast<int>( dst - _preprocessed.get<char>() )] = skipsTotal;
+			}
+			pos = newPos;
+			*dst = *it;
 		}
-		pos = newPos;
-		*dst = *it;
+		_preprocessedSize = static_cast<int>( dst - _preprocessed.get<char>() );
 	}
-	_preprocessedSize = static_cast<int>( dst - _preprocessed.get<char>() );
 	return;
 	M_EPILOG
 }
 
 int HSource::error_position( int position_ ) const {
 	M_PROLOG
-	skips_t::const_iterator it( _skips.upper_bound( position_ ) );
-	-- it;
-	M_ENSURE( it != _skips.end() );
-	int errorPosition( it->second + position_ );
+	int errorPosition( 0 );
+	if ( _origSize > 0 ) {
+		skips_t::const_iterator it( _skips.upper_bound( position_ ) );
+		-- it;
+		M_ENSURE( it != _skips.end() );
+		errorPosition = it->second + position_;
+	}
 	return ( errorPosition );
 	M_EPILOG
 }
@@ -123,7 +130,7 @@ HHuginn::HErrorCoordinate HSource::error_coordinate( int position_ ) const {
 		lastNewlinePosition = nlPos;
 	}
 	int column( ( position_ - lastNewlinePosition ) + 1 );
-	return ( HHuginn::HErrorCoordinate( line, column ) );
+	return ( HHuginn::HErrorCoordinate( line + _skippedLines, column ) );
 	M_EPILOG
 }
 
@@ -139,13 +146,13 @@ yaal::hcore::HString HSource::get_snippet( int from_, int len_ ) const {
 
 yaal::hcore::HString::const_iterator HSource::begin( void ) const {
 	M_PROLOG
-	return ( _preprocessed.get<char const>() );
+	return ( _origSize > 0 ? _preprocessed.get<char const>() : _orig.get<char const>() );
 	M_EPILOG
 }
 
 yaal::hcore::HString::const_iterator HSource::end( void ) const {
 	M_PROLOG
-	return ( _preprocessed.get<char const>() + _preprocessedSize );
+	return ( _origSize > 0 ? _preprocessed.get<char const>() + _preprocessedSize : _orig.get<char const>() );
 	M_EPILOG
 }
 
