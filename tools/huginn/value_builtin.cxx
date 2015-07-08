@@ -471,7 +471,55 @@ HHuginn::value_t boolean_not( HHuginn::value_t const& v_, int ) {
 	return ( make_pointer<HHuginn::HBoolean>( ! static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() ) );
 }
 
-HHuginn::value_t string( HHuginn::value_t const& v_, int position_ ) {
+namespace {
+
+HHuginn::value_t fallback_conversion( HHuginn::type_t type_, HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
+	HHuginn::value_t res;
+	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
+		HString methodName( "to_"_ys.append( type_->name() ) );
+		int idx( o->field_index( methodName ) );
+		if ( idx >= 0 ) {
+			HHuginn::value_t const& f( o->field( idx, false ) );
+			if ( f->type() == HHuginn::TYPE::METHOD ) {
+				HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( f.raw() ) );
+				HHuginn::values_t args;
+				res = m->function()( thread_, const_cast<HHuginn::HObject*>( o ), args, position_ );
+			} else {
+				throw HHuginn::HHuginnRuntimeException(
+					"`"_ys
+					.append( methodName )
+					.append( "' in class `" )
+					.append( o->type()->name() )
+					.append( "' is not a method." ),
+					position_
+				);
+			}
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"Class `"_ys
+				.append( o->type()->name() )
+				.append( "' does not have `" )
+				.append( methodName )
+				.append( "' method." ),
+				position_
+			);
+		}
+	} else {
+		throw HHuginn::HHuginnRuntimeException(
+			"Conversion from `"_ys
+			.append( v_->type()->name() )
+			.append( "' to `" )
+			.append( type_->name() )
+			.append( "' is not supported." ),
+			position_
+		);
+	}
+	return ( res );
+}
+
+}
+
+HHuginn::value_t string( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	HHuginn::type_t typeId( v_->type() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
@@ -485,30 +533,22 @@ HHuginn::value_t string( HHuginn::value_t const& v_, int position_ ) {
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = make_pointer<HHuginn::HString>( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Conversion from `"_ys
-			.append( v_->type()->name() )
-			.append( "' to `string' is not supported." ),
-			position_
-		);
+		res = fallback_conversion( HHuginn::TYPE::STRING, thread_, v_, position_ );
 	}
 	return ( res );
 }
 
-HHuginn::value_t boolean( HHuginn::value_t const& v_, int position_ ) {
+HHuginn::value_t boolean( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	if ( v_->type() == HHuginn::TYPE::BOOLEAN ) {
 		res = v_;
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Conversion from `"_ys
-			.append( v_->type()->name() )
-			.append( "' to `boolean' is not supported." ),
-			position_
-		);
+		res = fallback_conversion( HHuginn::TYPE::BOOLEAN, thread_, v_, position_ );
 	}
 	return ( res );
 }
 
-HHuginn::value_t integer( HHuginn::value_t const& v_, int position_ ) {
+HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	HHuginn::type_t typeId( v_->type() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
@@ -522,16 +562,12 @@ HHuginn::value_t integer( HHuginn::value_t const& v_, int position_ ) {
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = v_;
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Conversion from `"_ys
-			.append( type_name( v_->type() ) )
-			.append( "' to `integer' is not supported." ),
-			position_
-		);
+		res = fallback_conversion( HHuginn::TYPE::INTEGER, thread_, v_, position_ );
 	}
 	return ( res );
 }
 
-HHuginn::value_t real( HHuginn::value_t const& v_, int position_ ) {
+HHuginn::value_t real( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	HHuginn::type_t typeId( v_->type() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
@@ -543,16 +579,12 @@ HHuginn::value_t real( HHuginn::value_t const& v_, int position_ ) {
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = make_pointer<HHuginn::HReal>( static_cast<double long>( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() ) );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Conversion from `"_ys
-			.append( type_name( v_->type() ) )
-			.append( "' to `real' is not supported." ),
-			position_
-		);
+		res = fallback_conversion( HHuginn::TYPE::REAL, thread_, v_, position_ );
 	}
 	return ( res );
 }
 
-HHuginn::value_t character( HHuginn::value_t const& v_, int position_ ) {
+HHuginn::value_t character( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	HHuginn::type_t typeId( v_->type() );
 	if ( typeId == HHuginn::TYPE::CHARACTER ) {
@@ -560,16 +592,12 @@ HHuginn::value_t character( HHuginn::value_t const& v_, int position_ ) {
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = make_pointer<HHuginn::HCharacter>( static_cast<char>( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() ) );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Conversion from `"_ys
-			.append( type_name( v_->type() ) )
-			.append( "' to `character' is not supported." ),
-			position_
-		);
+		res = fallback_conversion( HHuginn::TYPE::CHARACTER, thread_, v_, position_ );
 	}
 	return ( res );
 }
 
-HHuginn::value_t number( HHuginn::value_t const& v_, int position_ ) {
+HHuginn::value_t number( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	HHuginn::type_t typeId( v_->type() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
@@ -581,11 +609,7 @@ HHuginn::value_t number( HHuginn::value_t const& v_, int position_ ) {
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = make_pointer<HHuginn::HNumber>( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Conversion from `"_ys
-			.append( type_name( v_->type() ) )
-			.append( "' to `number' is not supported." ),
-			position_
-		);
+		res = fallback_conversion( HHuginn::TYPE::NUMBER, thread_, v_, position_ );
 	}
 	return ( res );
 }

@@ -736,14 +736,14 @@ HHuginn::value_t& HHuginn::HObject::field_ref( int index_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObject::field( int index_, bool copy_ ) {
+HHuginn::value_t HHuginn::HObject::field( int index_, bool copy_ ) const {
 	M_PROLOG
-	value_t& f( _fields[index_] );
+	value_t const& f( _fields[index_] );
 	bool isMethod( f->type() == TYPE::METHOD );
 	return (
 		! ( copy_ && isMethod )
 			? f
-			: pointer_static_cast<HHuginn::HValue>( make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod*>( f.raw() ) ) )
+			: pointer_static_cast<HHuginn::HValue>( make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod const*>( f.raw() ) ) )
 	);
 	M_EPILOG
 }
@@ -1480,22 +1480,22 @@ HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( void ) const {
 
 namespace huginn_builtin {
 
-inline HHuginn::value_t convert( HHuginn::type_t toType_, huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t convert( HHuginn::type_t toType_, huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( toType_->name(), values_, 1, 1, position_ );
 	HHuginn::value_t res;
 	if ( toType_ == HHuginn::TYPE::INTEGER ) {
-		res = value_builtin::integer( values_.front(), position_ );
+		res = value_builtin::integer( thread_, values_.front(), position_ );
 	} else if ( toType_ == HHuginn::TYPE::REAL ) {
-		res = value_builtin::real( values_.front(), position_ );
+		res = value_builtin::real( thread_, values_.front(), position_ );
 	} else if ( toType_ == HHuginn::TYPE::STRING ) {
-		res = value_builtin::string( values_.front(), position_ );
+		res = value_builtin::string( thread_, values_.front(), position_ );
 	} else if ( toType_ == HHuginn::TYPE::NUMBER ) {
-		res = value_builtin::number( values_.front(), position_ );
+		res = value_builtin::number( thread_, values_.front(), position_ );
 	} else if ( toType_ == HHuginn::TYPE::BOOLEAN ) {
-		res = value_builtin::boolean( values_.front(), position_ );
+		res = value_builtin::boolean( thread_, values_.front(), position_ );
 	} else if ( toType_ == HHuginn::TYPE::CHARACTER ) {
-		res = value_builtin::character( values_.front(), position_ );
+		res = value_builtin::character( thread_, values_.front(), position_ );
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Conversion to `"_ys.append( toType_->name() ).append( "' is not supported." ),

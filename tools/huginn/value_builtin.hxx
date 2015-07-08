@@ -60,12 +60,12 @@ int long hash( HHuginn::value_t const& );
 bool key_equals( HHuginn::value_t const&, HHuginn::value_t const& );
 HHuginn::value_t boolean_xor( HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t boolean_not( HHuginn::value_t const&, int );
-HHuginn::value_t string( HHuginn::value_t const&, int );
-HHuginn::value_t integer( HHuginn::value_t const&, int );
-HHuginn::value_t real( HHuginn::value_t const&, int );
-HHuginn::value_t boolean( HHuginn::value_t const&, int );
-HHuginn::value_t character( HHuginn::value_t const&, int );
-HHuginn::value_t number( HHuginn::value_t const&, int );
+HHuginn::value_t string( HThread*, HHuginn::value_t const&, int );
+HHuginn::value_t integer( HThread*, HHuginn::value_t const&, int );
+HHuginn::value_t real( HThread*, HHuginn::value_t const&, int );
+HHuginn::value_t boolean( HThread*, HHuginn::value_t const&, int );
+HHuginn::value_t character( HThread*, HHuginn::value_t const&, int );
+HHuginn::value_t number( HThread*, HHuginn::value_t const&, int );
 
 }
 

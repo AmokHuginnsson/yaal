@@ -394,7 +394,7 @@ public:
 	virtual ~HObject( void );
 	int field_index( yaal::hcore::HString const& ) const;
 	value_t& field_ref( int );
-	value_t field( int, bool );
+	value_t field( int, bool ) const;
 	HClass const* get_class( void ) const;
 	bool is_kind_of( yaal::hcore::HString const& ) const;
 private:
