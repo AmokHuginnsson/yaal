@@ -31,6 +31,8 @@ Copyright:
 #ifndef YAAL_HCORE_ALGORITHM_HXX_INCLUDED
 #define YAAL_HCORE_ALGORITHM_HXX_INCLUDED 1
 
+#include <initializer_list>
+
 #include "hcore/algorithm_low.hxx"
 #include "hcore/trait.hxx"
 #include "hcore/hpair.hxx"
@@ -1416,6 +1418,11 @@ inline iterator_t min_element( iterator_t it, iterator_t end, predicate_t predic
 	return ( min );
 }
 
+template<typename tType>
+tType min( std::initializer_list<tType> constants_ ) {
+	return ( *min_element( constants_.begin(), constants_.end() ) );
+}
+
 /*! \brief Find maximum element in a range.
  *
  * \param it - begining of the range to search thru.
@@ -1443,6 +1450,11 @@ inline iterator_t max_element( iterator_t it, iterator_t end ) {
 template<typename iterator_t, typename predicate_t>
 inline iterator_t max_element( iterator_t it, iterator_t end, predicate_t predicate_ ) {
 	return ( min_element( it, end, predicate_ ) );
+}
+
+template<typename tType>
+tType max( std::initializer_list<tType> constants_ ) {
+	return ( *max_element( constants_.begin(), constants_.end() ) );
 }
 
 /*! \brief Calculate absolute value of a number.

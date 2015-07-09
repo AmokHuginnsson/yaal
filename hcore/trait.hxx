@@ -72,6 +72,17 @@ struct enable_if<false, T> {
 };
 /* \endcond */
 
+/*! \brief Unpack first type from parameter pack.
+ *
+ * \tparam head_t - first type in parameter pack.
+ * \tparam tail_t - parameter pack types excluding first type.
+ * \retval type - first type in parameter pack.
+ */
+template<typename head_t, typename... tail_t>
+struct variadic_head {
+	typedef head_t type;
+};
+
 /*! \brief Meta function, tells if two types are the same.
  *
  * \tparam T1 - first of two types to compare.
