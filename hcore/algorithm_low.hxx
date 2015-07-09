@@ -87,6 +87,12 @@ inline void swap( tType (&left)[SIZE], tType (&right)[SIZE] ) {
 	return;
 }
 
+template<typename head_type_t, typename... tail_type_t>
+inline head_type_t min( head_type_t const& head_, tail_type_t const&... tail_ ) {
+	head_type_t tail( min( yaal::forward<tail_type_t>( tail_ )... ) );
+	return ( head_ < tail ? head_ : tail );
+}
+
 /*! \brief Get smaller of two values.
  *
  * \param left - first value to be considered as smaller.
@@ -96,6 +102,12 @@ inline void swap( tType (&left)[SIZE], tType (&right)[SIZE] ) {
 template<typename tType>
 inline tType min( tType const& left, tType const& right ) {
 	return ( left < right ? left : right );
+}
+
+template<typename head_type_t, typename... tail_type_t>
+inline head_type_t max( head_type_t const& head_, tail_type_t const&... tail_ ) {
+	head_type_t tail( max( yaal::forward<tail_type_t>( tail_ )... ) );
+	return ( head_ < tail ? head_ : tail );
 }
 
 /*! \brief Get bigger of two values.
