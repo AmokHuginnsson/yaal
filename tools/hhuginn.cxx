@@ -1645,7 +1645,12 @@ inline HHuginn::value_t assert( huginn::HThread*, HHuginn::HObject*, HHuginn::va
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::BOOLEAN, false, position_ );
 	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
 	if ( ! get_boolean( values_[0] ) ) {
-		throw HHuginn::HHuginnRuntimeException( get_string( values_[values_.get_size() - 1] ), position_ );
+		int argc( static_cast<int>( values_.get_size() ) );
+		HString message( get_string( values_[argc - 1] ) );
+		if ( argc > 2 ) {
+			message.append( " " ).append( get_string( values_[1] ) );
+		}
+		throw HHuginn::HHuginnRuntimeException( message, position_ );
 	}
 	return ( _none_ );
 	M_EPILOG

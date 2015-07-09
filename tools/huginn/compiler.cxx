@@ -410,6 +410,7 @@ void OCompiler::commit_catch( executing_parser::position_t ) {
 	fc._compilationStack.pop();
 	OCompilationFrame& cf( fc._compilationStack.top() );
 	cf._catches.emplace_back( HTryCatch::OCatch{ cf._type, cf._identifier, scope, cf._position } );
+	cf._position = 0;
 	reset_expression();
 	return;
 	M_EPILOG
@@ -592,10 +593,10 @@ void OCompiler::start_function_call( executing_parser::position_t position_ ) {
 void OCompiler::close_function_call( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	OCompilationFrame& cf( fc._compilationStack.top() );
 	if ( fc._isAssert ) {
 		-- fc._nestedCalls;
-		if ( fc._nestedCalls == 0 ) {
+		OCompilationFrame& cf( fc._compilationStack.top() );
+		if ( ( fc._nestedCalls == 0 ) && ( cf._position == 0 ) ) {
 			cf._position = position_.get();
 		}
 	}
@@ -618,8 +619,9 @@ void OCompiler::add_for_statement( executing_parser::position_t ) {
 	M_ASSERT( ! fc._compilationStack.is_empty() );
 	HHuginn::scope_t scope( current_scope() );
 	fc._compilationStack.pop();
-	OCompilationFrame const& cf( fc._compilationStack.top() );
+	OCompilationFrame& cf( fc._compilationStack.top() );
 	current_scope()->add_statement( make_pointer<HFor>( cf._identifier, current_expression(), scope, cf._position ) );
+	cf._position = 0;
 	-- fc._loopCount;
 	-- fc._loopSwitchCount;
 	reset_expression();
@@ -782,7 +784,28 @@ void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing
 void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), operator_, _1, position_.get() ) );
-	f()._operations.emplace( operator_, position_.get() );
+	OFunctionContext& fc( f() );
+	fc._operations.emplace( operator_, position_.get() );
+	/*
+	 * We want to support assert() statement.
+	 * We need to know where assert's condition expression ends.
+	 * It can end at the close of assert statement if user did not add any description message,
+	 * this case is handled in ::close_function_call().
+	 * It can end at first comma separating assert's arguments.
+	 * To find this place we wait for `defer` of function argument operation
+	 * but for SECOND argument of this call.
+	 * Total number of operations on the stack (including call itself) is 3.
+	 */
+	static int const ASSERT_SECOND_ARGUMENT_OPERATION_COUNT( 1 /*function call*/ + 1 /*assert's condition*/ + 1 /*assert's user message*/ );
+	if (
+		( operator_ == OPERATOR::FUNCTION_ARGUMENT )
+		&& fc._isAssert
+		&& ( fc._nestedCalls == 1 )
+		&& ( fc._operations.size() == ASSERT_SECOND_ARGUMENT_OPERATION_COUNT )
+	) {
+		OCompilationFrame& cf( fc._compilationStack.top() );
+		cf._position = position_.get();
+	}
 	return;
 	M_EPILOG
 }
@@ -1058,7 +1081,7 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	int p( position_.get() );
-	if ( fc._isAssert ) {
+	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`assert' is a restricted keyword.", p );
 	}
 	OPERATOR op( fc._operations.top()._operator );
@@ -1096,7 +1119,9 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 	OFunctionContext& fc( f() );
 	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
 		int from( position_.get() + 1 );
-		int len( fc._compilationStack.top()._position - from );
+		OCompilationFrame& cf( fc._compilationStack.top() );
+		int len( cf._position - from );
+		cf._position = 0;
 		current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), OPERATOR::FUNCTION_ARGUMENT, _1, position_.get() ) );
 		current_expression()->add_execution_step(
 			hcore::call(
@@ -1126,7 +1151,7 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 void OCompiler::dispatch_member_access( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	if ( fc._isAssert ) {
+	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`assert' is a restricted keyword.", position_.get() );
 	}
 	fc._valueTypes.pop();
