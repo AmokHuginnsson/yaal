@@ -41,9 +41,15 @@ int _compressionLevel_ = Z_DEFAULT_COMPRESSION; /* Library dafault, it is the sa
 int long _zBufferSize_ = 256 * 1024; /* As advised in the documentation. */
 
 HZipStream::HZipStream( MODE::mode_t mode_ )
-	: _mode( mode_ ), _error( Z_OK ), _streamOwned(), _streamRef( NULL ),
-	_zStream( sizeof ( z_stream ) ), _zBufferIn( _zBufferSize_ ), _zBufferOut( _zBufferSize_ ),
-	_offset( 0 ), _flushed( false ) {
+	: _mode( mode_ )
+	, _error( Z_OK )
+	, _streamOwned()
+	, _streamRef( NULL )
+	, _zStream( sizeof ( z_stream ) )
+	, _zBufferIn( _zBufferSize_ )
+	, _zBufferOut( _zBufferSize_ )
+	, _offset( 0 )
+	, _flushed( false ) {
 	M_PROLOG
 	init();
 	return;
@@ -51,9 +57,15 @@ HZipStream::HZipStream( MODE::mode_t mode_ )
 }
 
 HZipStream::HZipStream( owned_stream_t stream_, MODE::mode_t mode_ )
-	: _mode( mode_ ), _error( Z_OK ), _streamOwned( stream_ ), _streamRef( _streamOwned.raw() ),
-	_zStream( sizeof ( z_stream ) ), _zBufferIn( _zBufferSize_ ), _zBufferOut( _zBufferSize_ ),
-	_offset( 0 ), _flushed( false ) {
+	: _mode( mode_ )
+	, _error( Z_OK )
+	, _streamOwned( stream_ )
+	, _streamRef( _streamOwned.raw() )
+	, _zStream( sizeof ( z_stream ) )
+	, _zBufferIn( _zBufferSize_ )
+	, _zBufferOut( _zBufferSize_ )
+	, _offset( 0 )
+	, _flushed( false ) {
 	M_PROLOG
 	init();
 	return;
@@ -61,9 +73,15 @@ HZipStream::HZipStream( owned_stream_t stream_, MODE::mode_t mode_ )
 }
 
 HZipStream::HZipStream( ref_stream_t stream_, MODE::mode_t mode_ )
-	: _mode( mode_ ), _error( Z_OK ), _streamOwned(), _streamRef( &stream_ ),
-	_zStream( sizeof ( z_stream ) ), _zBufferIn( _zBufferSize_ ), _zBufferOut( _zBufferSize_ ),
-	_offset( 0 ), _flushed( false ) {
+	: _mode( mode_ )
+	, _error( Z_OK )
+	, _streamOwned()
+	, _streamRef( &stream_ )
+	, _zStream( sizeof ( z_stream ) )
+	, _zBufferIn( _zBufferSize_ )
+	, _zBufferOut( _zBufferSize_ )
+	, _offset( 0 )
+	, _flushed( false ) {
 	M_PROLOG
 	init();
 	return;
@@ -156,7 +174,7 @@ int long HZipStream::do_write( void const* const buf_, int long size_ ) {
 		int err( deflate( zstream, size_ > 0 ? Z_NO_FLUSH : Z_FINISH ) );
 		M_ASSERT( err != Z_STREAM_ERROR ); /* lets debug zlib library, why the f*ck not */
 		static_cast<void>( err ); /* in release, unused variable warning */
-		nWritten += _streamRef->write( buf, CHUNK - zstream->avail_out );
+		nWritten += _streamRef->write( buf, CHUNK - static_cast<int long>( zstream->avail_out ) );
 		size_ -= CHUNK;
 	} while ( zstream->avail_out == 0 );
 	M_ASSERT( zstream->avail_in == 0 ); /* yeah, why the f*ck not */
@@ -175,15 +193,16 @@ int long HZipStream::prepare_data( void ) {
 		nRead = _streamRef->read( in, CHUNK );
 		zstream->next_in = static_cast<Bytef*>( in );
 		zstream->avail_in = static_cast<uInt>( nRead );
-	} else
-		nRead = zstream->avail_in;
+	} else {
+		nRead = static_cast<int long>( zstream->avail_in );
+	}
 	if ( nRead > 0 ) {
 		zstream->next_out = reinterpret_cast<Bytef*>( _zBufferOut.raw() );
 		zstream->avail_out = static_cast<uInt>( CHUNK );
 		_error = inflate( zstream, Z_NO_FLUSH );
 		M_ENSURE( ( _error == Z_OK ) || ( _error == Z_STREAM_END ) );
 	}
-	return ( nRead > 0 ? CHUNK - zstream->avail_out : 0 );
+	return ( nRead > 0 ? CHUNK - static_cast<int long>( zstream->avail_out ) : 0 );
 	M_EPILOG
 }
 
@@ -196,10 +215,11 @@ int long HZipStream::do_read( void* const buf_, int long size_ ) {
 	char* buf( _zBufferOut.get<char>() );
 	int long copied( 0 );
 	while ( copied < size_ ) {
-		int long have( min<int long>( ( CHUNK - zstream->avail_out ) - _offset, size_ - copied ) );
+		int long have( min<int long>( ( CHUNK - static_cast<int long>( zstream->avail_out ) ) - _offset, size_ - copied ) );
 		if ( have < 1 ) {
-			if ( ( _error == Z_STREAM_END ) || ! prepare_data() )
+			if ( ( _error == Z_STREAM_END ) || ! prepare_data() ) {
 				break;
+			}
 			continue;
 		}
 		::memcpy( static_cast<char*>( buf_ ) + copied, buf + _offset, static_cast<size_t>( have ) );

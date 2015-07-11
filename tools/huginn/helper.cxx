@@ -195,7 +195,7 @@ yaal::hcore::HString const& get_string( HHuginn::value_t const& value_ ) {
 	return ( static_cast<HHuginn::HString const*>( value_.raw() )->value() );
 }
 
-int long get_integer( HHuginn::value_t const& value_ ) {
+int long long get_integer( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HInteger const*>( value_.raw() ) );
 	return ( static_cast<HHuginn::HInteger const*>( value_.raw() )->value() );

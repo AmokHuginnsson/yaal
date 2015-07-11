@@ -64,25 +64,32 @@ public:
 	HChunk& operator = ( HChunk&& );
 	~HChunk( void );
 	template<typename tType>
-	tType const* get() const
-		{ return ( static_cast<tType const*>( _data ) ); }
+	tType const* get() const {
+		return ( static_cast<tType const*>( _data ) );
+	}
 	template<typename tType>
-	tType* get()
-		{ return ( static_cast<tType*>( _data ) ); }
-	void const* raw( void ) const
-		{ return ( static_cast<char const*>( _data ) ); }
-	void* raw( void )
-		{ return ( static_cast<char*>( _data ) ); }
+	tType* get() {
+		return ( static_cast<tType*>( _data ) );
+	}
+	void const* raw( void ) const {
+		return ( static_cast<char const*>( _data ) );
+	}
+	void* raw( void ) {
+		return ( static_cast<char*>( _data ) );
+	}
 	void free( void );
 	void* realloc( int long, STRATEGY::enum_t = STRATEGY::GEOMETRIC );
 	void swap( HChunk& );
-	int long get_size( void ) const
-		{ return ( _size ); }
-	int long size( void ) const
-		{ return ( _size ); }
+	int long get_size( void ) const {
+		return ( _size );
+	}
+	int long size( void ) const {
+		return ( _size );
+	}
 	template<typename T>
-	int long count_of( void ) const
-		{ return ( _size / static_cast<int>( sizeof ( T ) ) ); }
+	int long count_of( void ) const {
+		return ( _size / static_cast<int>( sizeof ( T ) ) );
+	}
 private:
 	HChunk( HChunk const& ) = delete;
 	HChunk& operator = ( HChunk const& ) = delete;
@@ -93,8 +100,9 @@ int long chunk_size( int long count_ ) {
 	return ( static_cast<int>( sizeof ( T ) ) * count_ );
 }
 
-inline void swap( yaal::hcore::HChunk& a, yaal::hcore::HChunk& b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HChunk& a, yaal::hcore::HChunk& b ) {
+	a.swap( b );
+}
 
 }
 

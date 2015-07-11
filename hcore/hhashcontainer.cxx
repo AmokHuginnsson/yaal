@@ -57,7 +57,7 @@ int long hash<HString>::operator () ( HString const& string_ ) const {
 
 template<>
 int long hash<double long>::operator () ( double long const& val_ ) const {
-	return ( reinterpret_cast<int long long const&>( static_cast<double const&>( val_ ) ) );
+	return ( static_cast<int long>( reinterpret_cast<int long long const&>( static_cast<double const&>( val_ ) ) ) );
 }
 
 template<typename T>

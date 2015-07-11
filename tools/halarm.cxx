@@ -79,7 +79,7 @@ HAlarm::HAlarm( int long miliseconds_ )
 		itimerspec timeout;
 		::memset( &timeout, 0, sizeof ( timeout ) );
 		timeout.it_value.tv_sec = miliseconds_ / si::MILI_IN_WHOLE;
-		timeout.it_value.tv_nsec = ( miliseconds_ % si::MILI_IN_WHOLE ) * si::NANO_IN_MILI;
+		timeout.it_value.tv_nsec = static_cast<int long>( ( miliseconds_ % si::MILI_IN_WHOLE ) * si::NANO_IN_MILI );
 		M_ENSURE( timer_settime( *t, 0, &timeout, NULL ) == 0 );
 		++ step;
 	} catch ( ... ) {

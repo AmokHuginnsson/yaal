@@ -160,11 +160,10 @@ void HDes::_des( u32_t* block_, int action_, int part_ ) {
 				^ reinterpret_cast<u16_t*>( endKey )[ 2 ] );
 		for ( int ctr( 0 ); ctr < DES::BLOCK_SIZE; ctr ++ ) {
 			col = row = 0;
-			rowBmp.set( 6, src.get( static_cast<u32_t>( ctr ) * 6 ) );
-			rowBmp.set( 7, src.get( static_cast<u32_t>( ctr ) * 6 + 5 ) );
+			rowBmp.set( 6, src.get( ctr * 6 ) );
+			rowBmp.set( 7, src.get( ctr * 6 + 5 ) );
 			for ( int i( 0 ); i < 4; ++ i )
-				colBmp.set( static_cast<u32_t>( i ) + 4,
-						src.get( static_cast<u32_t>( ctr * 6 + i + 1 ) ) );
+				colBmp.set( i + 4, src.get( ctr * 6 + i + 1 ) );
 			u8_t mask( _sBlock_[ ctr ][ row ][ col ] );
 			if ( ! ( ctr & 1 ) )
 				mask = static_cast<u8_t>( mask << 4 );
@@ -191,8 +190,7 @@ void HDes::permutate( u8_t* buffer_, const u8_t* tab_, int len_ ) const {
 	src.use( buffer_, DES::BLOCK_SIZE * DES::BITS_IN_BYTE );
 	dst.use( bufTmp, DES::BLOCK_SIZE * DES::BITS_IN_BYTE );
 	for ( ctr = 0; ctr < len_; ctr ++ )
-		dst.set( static_cast<u32_t>( ctr ),
-				src.get( static_cast<u32_t>( tab_[ ctr ] ) ) );
+		dst.set( ctr, src.get( tab_[ ctr ] ) );
 	::memcpy( buffer_, bufTmp, DES::BLOCK_SIZE );
 	return;
 }

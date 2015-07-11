@@ -80,7 +80,7 @@ i64_t HClock::get_time_elapsed( yaal::hcore::time::UNIT unit_ ) const {
 	time.tv_sec = static_cast<time_t>( now.tv_sec - _moment[ IDX_SECONDS ] );
 	if ( now.tv_nsec < _moment[ IDX_NANOSECONDS ] ) {
 		-- time.tv_sec;
-		time.tv_nsec = si::NANO_IN_WHOLE - static_cast<int long>( _moment[ IDX_NANOSECONDS ] - now.tv_nsec );
+		time.tv_nsec = static_cast<int long>( ( si::NANO_IN_WHOLE - _moment[ IDX_NANOSECONDS ] ) - now.tv_nsec );
 	} else {
 		time.tv_nsec = now.tv_nsec - static_cast<int long>( _moment[ IDX_NANOSECONDS ] );
 	}

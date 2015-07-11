@@ -480,7 +480,7 @@ HCondition::status_t HCondition::do_wait( time_t timeOutSeconds_,
 
 HCondition::status_t HCondition::wait_until( HTime const& time_ ) {
 	M_PROLOG
-	return ( do_wait( time_.raw() - HTime::SECONDS_TO_UNIX_EPOCH, 0 ) );
+	return ( do_wait( static_cast<time_t>( time_.raw() - HTime::SECONDS_TO_UNIX_EPOCH ), 0 ) );
 	M_EPILOG
 }
 
@@ -489,11 +489,11 @@ HCondition::status_t HCondition::wait_for( time::duration_t duration_ ) {
 	timespec timeOut;
 	::memset( &timeOut, 0, sizeof ( timeOut ) );
 	M_ENSURE( clock_gettime( FWD_CLOCK_REALTIME, &timeOut ) == 0 );
-	timeOut.tv_sec += ( duration_ / si::NANO_IN_WHOLE ).raw();
-	timeOut.tv_nsec += ( duration_ % si::NANO_IN_WHOLE ).raw();
+	timeOut.tv_sec += static_cast<time_t>( ( duration_ / si::NANO_IN_WHOLE ).raw() );
+	timeOut.tv_nsec += static_cast<int long>( ( duration_ % si::NANO_IN_WHOLE ).raw() );
 	if ( timeOut.tv_nsec >= si::NANO_IN_WHOLE ) {
 		++ timeOut.tv_sec;
-		timeOut.tv_nsec -= si::NANO_IN_WHOLE;
+		timeOut.tv_nsec -= static_cast<int long>( si::NANO_IN_WHOLE );
 	}
 	return ( do_wait( timeOut.tv_sec, timeOut.tv_nsec ) );
 	M_EPILOG

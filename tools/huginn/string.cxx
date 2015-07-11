@@ -77,7 +77,7 @@ inline HHuginn::value_t find( huginn::HThread*, HHuginn::HObject* object_, HHugi
 	int long startAt( 0 );
 	if ( values_.get_size() > 1 ) {
 		verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
-		startAt = get_integer( values_[1] );
+		startAt = static_cast<int long>( get_integer( values_[1] ) );
 	}
 
 	int long pos( get_string( object_ ).find( get_string( values_[0] ), startAt ) );

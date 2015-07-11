@@ -326,7 +326,7 @@ int long hash( HHuginn::value_t const& v_ ) {
 	int long h( 0 );
 	HHuginn::type_t typeId( v_->type() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		h = hcore::hash<int long>()( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
+		h = hcore::hash<int long long>()( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		h = hcore::hash<double long>()( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::STRING ) {

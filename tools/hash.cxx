@@ -74,8 +74,8 @@ yaal::hcore::HString md5( HStreamInterface& stream ) {
 			u32_t* x = static_cast<u32_t*>( block.data() );
 			HBitmap bmp;
 			bmp.use( block.data(), BLOCK_SIZE );
-			bmp.fill( last, BLOCK_SIZE - last, false );
-			bmp.set( last, true );
+			bmp.fill( static_cast<int long>( last ), static_cast<int long>( BLOCK_SIZE - last ), false );
+			bmp.set( static_cast<int long>( last ), true );
 			if ( last >= ( ( BLOCK_SIZE - MESSAGE_LENGTH_SIZE ) - SUPPLEMENT_SIZE ) ) {
 				update_md5_state( state, block );
 				yaal::fill( x, x + ( BLOCK_SIZE >> 5 ), 0u );
@@ -135,8 +135,8 @@ yaal::hcore::HString sha1( HStreamInterface& stream ) {
 			u32_t* x = static_cast<u32_t*>( block.data() );
 			HBitmap bmp;
 			bmp.use( block.data(),BLOCK_SIZE );
-			bmp.fill( last, BLOCK_SIZE - last, false );
-			bmp.set( last, true );
+			bmp.fill( static_cast<int long>( last ), static_cast<int long>( BLOCK_SIZE - last ), false );
+			bmp.set( static_cast<int long>( last ), true );
 			if ( last >= ( ( BLOCK_SIZE - MESSAGE_LENGTH_SIZE ) - SUPPLEMENT_SIZE ) ) {
 				update_sha1_state( state, block );
 				yaal::fill( x, x + ( BLOCK_SIZE >> 5 ), 0u );

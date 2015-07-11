@@ -78,7 +78,7 @@ HHuginn::value_t HStream::read( huginn::HThread*, HHuginn::HObject* object_, HHu
 	char const name[] = "Stream.read";
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
-	int long size( get_integer( values_[0] ) );
+	int size( static_cast<int>( get_integer( values_[0] ) ) );
 	HStream* s( static_cast<HStream*>( object_ ) );
 	return ( make_pointer<HHuginn::HString>( s->read_impl( size ) ) );
 	M_EPILOG
