@@ -86,11 +86,11 @@ template<typename T1, typename T2>
 inline void FWD_FD_SET( T1 val1_, T2 val2_ ) {
 	FD_SET( val1_, val2_ );
 }
-#pragma GCC diagnostic error "-Wsign-conversion"
 template<typename T1, typename T2>
 inline bool FWD_FD_ISSET( T1 val1_, T2 val2_ ) {
 	return ( FD_ISSET( val1_, val2_ ) );
 }
+#pragma GCC diagnostic error "-Wsign-conversion"
 #ifdef __HOST_OS_TYPE_DARWIN__
 mach_msg_type_number_t HOST_VM_INFO_COUNT_FWD{ HOST_VM_INFO_COUNT };
 #endif /* #ifdef __HOST_OS_TYPE_DARWIN__ */

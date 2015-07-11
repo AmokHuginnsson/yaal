@@ -37,6 +37,7 @@ Copyright:
 
 /*! \cond */
 #if ! defined( HAVE_BASENAME_ARG_CONST )
+#undef basename
 #define basename( x ) basename( const_cast<char*>( x ) )
 #endif /* #if ! defined( HAVE_BASENAME_ARG_CONST ) */
 

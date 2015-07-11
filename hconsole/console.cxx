@@ -413,16 +413,26 @@ void HConsole::leave_curses( void ) {
 	M_EPILOG
 }
 
+namespace {
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+template <typename T>
+inline void fwd_wattrset( WINDOW* win_, T val_ ) {
+	static_cast<void>( wattrset( win_, val_ ) );
+}
+#pragma GCC diagnostic error "-Wsign-conversion"
+}
+
 void HConsole::set_attr( int attr_ ) const {
 	M_PROLOG
 	if ( ! _enabled )
 		M_THROW( "not in curses mode", errno );
 	char unsigned byte( static_cast<char unsigned>( attr_ ) );
-	if ( _brokenBrightBackground ) {
-		static_cast<void>( wattrset( static_cast<WINDOW*>( _window ), static_cast<attr_t>( ATTR::value_fix( byte ) ) ) );
-	} else {
-		static_cast<void>( wattrset( static_cast<WINDOW*>( _window ), static_cast<attr_t>( ATTR::value( byte ) ) ) );
-	}
+	fwd_wattrset(
+		static_cast<WINDOW*>( _window ),
+		_brokenBrightBackground
+			? static_cast<attr_t>( ATTR::value_fix( byte ) )
+			: static_cast<attr_t>( ATTR::value( byte ) )
+	);
 	return;
 	M_EPILOG
 }

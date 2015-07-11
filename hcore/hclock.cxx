@@ -54,12 +54,12 @@ static int const IDX_SECONDS( 0 );
 static int const IDX_NANOSECONDS( 1 );
 
 #pragma GCC diagnostic ignored "-Wold-style-cast"
-static int const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
+static clockid_t const FWD_CLOCK_REALTIME = CLOCK_REALTIME;
 #if defined( __HOST_OS_TYPE_SOLARIS__ ) || defined( __HOST_OS_TYPE_WINDOWS__ )
 #undef CLOCK_THREAD_CPUTIME_ID
 #define CLOCK_THREAD_CPUTIME_ID CLOCK_REALTIME
 #endif /* #if defined( __HOST_OS_TYPE_SOLARIS__ ) || defined( __HOST_OS_TYPE_WINDOWS__ ) */
-static int const FWD_CLOCK_THREAD_CPUTIME_ID = CLOCK_THREAD_CPUTIME_ID;
+static clockid_t const FWD_CLOCK_THREAD_CPUTIME_ID = CLOCK_THREAD_CPUTIME_ID;
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 
