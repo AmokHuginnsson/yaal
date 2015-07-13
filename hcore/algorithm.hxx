@@ -1418,6 +1418,11 @@ inline iterator_t min_element( iterator_t it, iterator_t end, predicate_t predic
 	return ( min );
 }
 
+template<typename tType, typename predicate_t>
+tType min( std::initializer_list<tType> constants_, predicate_t predicate_ ) {
+	return ( *min_element( constants_.begin(), constants_.end(), predicate_ ) );
+}
+
 template<typename tType>
 tType min( std::initializer_list<tType> constants_ ) {
 	return ( *min_element( constants_.begin(), constants_.end() ) );
@@ -1450,6 +1455,11 @@ inline iterator_t max_element( iterator_t it, iterator_t end ) {
 template<typename iterator_t, typename predicate_t>
 inline iterator_t max_element( iterator_t it, iterator_t end, predicate_t predicate_ ) {
 	return ( min_element( it, end, predicate_ ) );
+}
+
+template<typename tType, typename predicate_t>
+tType max( std::initializer_list<tType> constants_, predicate_t predicate_ ) {
+	return ( *max_element( constants_.begin(), constants_.end(), predicate_ ) );
 }
 
 template<typename tType>
