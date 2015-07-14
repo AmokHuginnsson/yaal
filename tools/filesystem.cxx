@@ -90,7 +90,7 @@ path_t normalize_path( path_t const& path_ ) {
 	int back( 0 );
 	while ( ( back = static_cast<int>( path.find( "/../", pos ) ) ) != HString::npos ) {
 		pos = back + 1;
-		int prev( static_cast<int>( path.find_last( '/', back - 1 ) ) );
+		int prev( static_cast<int>( path.find_last( '/', back > 0 ? back - 1 : 0 ) ) );
 		if ( prev != HString::npos ) {
 			if ( ! ( ( ( back - prev ) == 3 ) && ( path[prev + 1] == '.' ) && ( path[prev + 2] == '.' ) ) ) {
 				path.erase( prev + 1, back - prev + 3 );

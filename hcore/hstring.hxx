@@ -417,7 +417,7 @@ public:
 	 * \param length - a length of substring to get.
 	 * \return Self.
 	 */
-	HString& assign( HString const& str, int long offset = 0, int long length = MAX_STRING_LENGTH );
+	HString& assign( HString const& str, int long offset = 0, int long length = npos );
 	/*! \brief Erase old content and assign a range of characters to this string.
 	 *
 	 * first_ - begining of the character range to copy.
@@ -472,13 +472,13 @@ public:
 	 * \param before - assume that this string is only that long.
 	 * \return index of last occurence of given character if given character can be found or HString::npos otherwise.
 	 */
-	int long find_last( char character, int long before = MAX_STRING_LENGTH ) const;
-	int long find_one_of( char const* const, int long = 0 ) const;
-	int long reverse_find_one_of( char const* const, int long = 0 ) const;
-	int long find_last_one_of( char const* const, int long = MAX_STRING_LENGTH ) const;
-	int long find_other_than( char const* const, int long = 0 ) const;
-	int long reverse_find_other_than( char const* const, int long = 0 ) const;
-	int long find_last_other_than( char const* const, int long = MAX_STRING_LENGTH ) const;
+	int long find_last( char character, int long before = npos ) const;
+	int long find_one_of( char const*, int long = 0 ) const;
+	int long reverse_find_one_of( char const*, int long = 0 ) const;
+	int long find_last_one_of( char const*, int long = npos ) const;
+	int long find_other_than( char const*, int long = 0 ) const;
+	int long reverse_find_other_than( char const*, int long = 0 ) const;
+	int long find_last_other_than( char const*, int long = npos ) const;
 	/*! \brief Replace each occurence of given pattern with replacement.
 	 *
 	 * \param pattern - search and replace all occurences of this pattern.
@@ -542,7 +542,7 @@ public:
 	 * \param length - length of a substring.
 	 * \return Substring.
 	 */
-	HString substr( int long start, int long length = MAX_STRING_LENGTH ) const;
+	HString substr( int long start, int long length = npos ) const;
 	/*! \brief Get left part of this string of given length.
 	 *
 	 * \param len - length of left part of this string to get.
@@ -557,7 +557,7 @@ public:
 	 * \param length - length of a substring.
 	 * \return Substring.
 	 */
-	HString mid( int long start, int long length = MAX_STRING_LENGTH ) const;
+	HString mid( int long start, int long length = npos ) const;
 	/*! \brief Get right part of this string of given length.
 	 *
 	 * \param len - length of right part of this string to get.
@@ -595,7 +595,7 @@ public:
 	 * \param count - fill that many bytes.
 	 * \return Self.
 	 */
-	HString& fill( char value = '\0', int long position = 0, int long lenght = MAX_STRING_LENGTH );
+	HString& fill( char value = '\0', int long position = 0, int long lenght = npos );
 	/*! \brief Fill portion of string with constatnt value and finish with \0 (zero) byte.
 	 *
 	 * \param value - use this value as a filler.
@@ -603,14 +603,14 @@ public:
 	 * \param count - fill that many bytes.
 	 * \return Self.
 	 */
-	HString& fillz( char value = '\0', int long position = 0, int long count = MAX_STRING_LENGTH );
+	HString& fillz( char value = '\0', int long position = 0, int long count = npos );
 	/*! \brief Erase part of the string.
 	 *
 	 * \param position_ - start position for part to be erased.
 	 * \param length_ - length of part to be erased.
 	 * \return Self.
 	 */
-	HString& erase( int long position_ = 0, int long length_ = MAX_STRING_LENGTH );
+	HString& erase( int long position_ = 0, int long length_ = npos );
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos - position where given string has to be inserted.
@@ -660,7 +660,7 @@ public:
 	 * \param length - a length of substring to get.
 	 * \return Self.
 	 */
-	HString& append( HString const&, int long idx_, int long len_ = MAX_STRING_LENGTH );
+	HString& append( HString const&, int long idx_, int long len_ = npos );
 	HString& append( int long count_, char val_ );
 	/*! \brief Append new data from buffer to already existing data in this string.
 	 *

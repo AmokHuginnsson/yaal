@@ -685,10 +685,15 @@ void HString::swap( HString& other ) {
 
 HString& HString::assign( HString const& str_, int long offset_, int long length_ ) {
 	M_PROLOG
-	if ( length_ < 0 )
+	if ( length_ == npos ) {
+		length_ = MAX_STRING_LENGTH;
+	}
+	if ( length_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], length_ );
-	if ( offset_ < 0 )
+	}
+	if ( offset_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
+	}
 	int long s( str_.get_length() );
 	int long newSize( 0 );
 	if ( offset_ < s ) {
@@ -811,8 +816,7 @@ int long HString::nfind( HString const& pattern_, int long patternLength_, int l
 	M_EPILOG
 }
 
-int long HString::find_one_of( char const* const set_,
-		int long after_ ) const {
+int long HString::find_one_of( char const* set_, int long after_ ) const {
 	M_PROLOG
 	if ( ! set_ )
 		return ( npos );
@@ -828,8 +832,7 @@ int long HString::find_one_of( char const* const set_,
 	M_EPILOG
 }
 
-int long HString::reverse_find_one_of( char const* const set_,
-		int long before_ ) const {
+int long HString::reverse_find_one_of( char const* set_, int long before_ ) const {
 	M_PROLOG
 	if ( ! set_ )
 		return ( npos );
@@ -844,24 +847,24 @@ int long HString::reverse_find_one_of( char const* const set_,
 	M_EPILOG
 }
 
-int long HString::find_last_one_of( char const* const set_,
-		int long before_ ) const {
+int long HString::find_last_one_of( char const* set_, int long before_ ) const {
 	M_PROLOG
-	if ( ! set_ )
-		return ( npos );
-	if ( before_ >= GET_SIZE )
+	M_ASSERT( set_ != nullptr );
+	if ( ( before_ == npos ) || ( before_ >= GET_SIZE ) ) {
 		before_ = GET_SIZE - 1;
-	if ( ( before_ < 0 ) || ( ! set_[0] ) )
+	}
+	if ( ( before_ < 0 ) || ( ! set_[0] ) ) {
 		return ( npos );
+	}
 	char* str( string_helper::strrnpbrk( MEM, set_, before_ + 1 ) );
-	if ( ! str )
+	if ( ! str ) {
 		return ( npos );
+	}
 	return ( static_cast<int long>( str - MEM ) );
 	M_EPILOG
 }
 
-int long HString::find_other_than( char const* const set_,
-		int long after_ ) const {
+int long HString::find_other_than( char const* set_, int long after_ ) const {
 	M_PROLOG
 	if ( ! set_ )
 		return ( 0 );
@@ -878,8 +881,7 @@ int long HString::find_other_than( char const* const set_,
 	M_EPILOG
 }
 
-int long HString::reverse_find_other_than( char const* const set_,
-		int long before_ ) const {
+int long HString::reverse_find_other_than( char const* set_, int long before_ ) const {
 	M_PROLOG
 	if ( ! set_ )
 		return ( 0 );
@@ -896,20 +898,22 @@ int long HString::reverse_find_other_than( char const* const set_,
 	M_EPILOG
 }
 
-int long HString::find_last_other_than( char const* const set_,
-		int long before_ ) const {
+int long HString::find_last_other_than( char const* set_, int long before_ ) const {
 	M_PROLOG
-	if ( ! set_ )
-		return ( GET_SIZE - 1 );
-	if ( before_ >= GET_SIZE )
+	M_ASSERT( set_ != nullptr );
+	if ( ( before_ == npos ) || ( before_ >= GET_SIZE ) ) {
 		before_ = GET_SIZE - 1;
-	if ( before_ < 0 )
+	}
+	if ( before_ < 0 ) {
 		return ( npos );
-	if ( ! set_[0] )
+	}
+	if ( ! set_[0] ) {
 		return ( before_ );
+	}
 	int long index( string_helper::strrnspn( MEM, set_, before_ + 1 ) );
-	if ( index > before_ )
+	if ( index > before_ ) {
 		return ( npos );
+	}
 	return ( index );
 	M_EPILOG
 }
@@ -929,10 +933,12 @@ int long HString::reverse_find( char char_, int long before_ ) const {
 
 int long HString::find_last( char char_, int long before_ ) const {
 	M_PROLOG
-	if ( before_ < 0 )
-		return ( npos );
-	if ( before_ >= GET_SIZE )
+	if ( ( before_ == npos ) || ( before_ >= GET_SIZE ) ) {
 		before_ = GET_SIZE - 1;
+	}
+	if ( before_ < 0 ) {
+		return ( npos );
+	}
 	char const* str( static_cast<char const*>( ::memrchr( MEM, char_, static_cast<size_t>( before_ + 1 ) ) ) );
 	if ( ! str )
 		return ( npos );
@@ -1071,12 +1077,18 @@ HString& HString::reverse( void ) {
 
 void HString::substr( HString& dest_, int long from_, int long length_ ) const {
 	M_PROLOG
-	if ( from_ < 0 )
-		length_ += from_, from_ = 0;
+	if ( length_ == npos ) {
+		length_ = MAX_STRING_LENGTH;
+	}
+	if ( from_ < 0 ) {
+		length_ += from_;
+		from_ = 0;
+	}
 	if ( ( length_ > 0 ) && ( from_ < GET_SIZE ) ) {
 		int long newSize( min( length_, GET_SIZE ) );
-		if ( ( newSize + from_ ) > GET_SIZE )
+		if ( ( newSize + from_ ) > GET_SIZE ) {
 			newSize = GET_SIZE - from_;
+		}
 		dest_.reserve( newSize );
 		::std::strncpy( EXT_MEM( dest_ ), MEM + from_, static_cast<size_t>( newSize ) );
 		EXT_MEM( dest_ )[ newSize ] = 0;
@@ -1203,23 +1215,28 @@ HString& HString::shift_right( int long shift_, char const filler_ ) {
 
 HString& HString::fill( char filler_, int long offset_, int long count_ ) {
 	M_PROLOG
-	if ( count_ == MAX_STRING_LENGTH ) {
+	if ( count_ == npos ) {
 		/* we maintain zero terminator (even though it is not fillz()) hence - 1 */
 		count_ = ( GET_ALLOC_BYTES - offset_ ) - 1;
 	}
-	if ( count_ < 0 )
+	if ( count_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], count_ );
-	if ( offset_ < 0 )
+	}
+	if ( offset_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], offset_ );
-	if ( ( offset_ + count_ ) >= GET_ALLOC_BYTES )
+	}
+	if ( ( offset_ + count_ ) >= GET_ALLOC_BYTES ) {
 		M_THROW( _errMsgHString_[string_helper::OVERFLOW], offset_ + count_ );
+	}
 	if ( filler_ ) {
-		if ( ( count_ + offset_ ) > GET_SIZE )
+		if ( ( count_ + offset_ ) > GET_SIZE ) {
 			SET_SIZE( count_ + offset_ );
+		}
 		::std::memset( MEM + offset_, filler_, static_cast<size_t>( count_ ) );
 		MEM[ GET_SIZE ] = 0;
-	} else
+	} else {
 		clear();
+	}
 	return ( *this );
 	M_EPILOG
 }
@@ -1227,6 +1244,9 @@ HString& HString::fill( char filler_, int long offset_, int long count_ ) {
 HString& HString::fillz( char filler_, int long offset_, int long count_ ) {
 	M_PROLOG
 	fill( filler_, offset_, count_ );
+	if ( count_ == npos ) {
+		count_ = ( GET_ALLOC_BYTES - offset_ ) - 1;
+	}
 	MEM[ count_ + offset_ ] = 0;
 	SET_SIZE( count_ + offset_ );
 	return ( *this );
@@ -1235,6 +1255,9 @@ HString& HString::fillz( char filler_, int long offset_, int long count_ ) {
 
 HString& HString::erase( int long from_, int long length_ ) {
 	M_PROLOG
+	if ( length_ == npos ) {
+		length_ = GET_SIZE;
+	}
 	if ( from_ < 0 ) {
 		length_ += from_;
 		from_ = 0;
@@ -1313,13 +1336,21 @@ HString& HString::append( HString const& str_ ) {
 
 HString& HString::append( HString const& str_, int long idx_, int long len_ ) {
 	M_PROLOG
-	if ( len_ < 0 )
+	if ( len_ == npos ) {
+		len_ = MAX_STRING_LENGTH;
+	}
+	if ( len_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_LENGTH], len_ );
-	if ( idx_ < 0 )
+	}
+	if ( idx_ < 0 ) {
 		M_THROW( _errMsgHString_[string_helper::BAD_OFFSET], idx_ );
-	if ( ( len_ > 0 ) && ( idx_ < str_.get_length() ) )
-		append( str_.raw() + ( idx_ >= 0 ? idx_ : 0 ),
-				( ( idx_ + len_ ) < str_.get_length() ) ? len_ : str_.get_length() - idx_ );
+	}
+	if ( ( len_ > 0 ) && ( idx_ < str_.get_length() ) ) {
+		append(
+			str_.raw() + ( idx_ >= 0 ? idx_ : 0 ),
+			( ( idx_ + len_ ) < str_.get_length() ) ? len_ : str_.get_length() - idx_
+		);
+	}
 	return ( *this );
 	M_EPILOG
 }
