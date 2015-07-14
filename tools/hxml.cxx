@@ -979,10 +979,36 @@ HXml::HNode::properties_t& HXml::HNodeProxy::properties( void ) {
 	M_EPILOG
 }
 
+HXml::HConstNodeProxy HXml::HConstNodeProxy::get_parent( void ) const {
+	M_PROLOG
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( (*_node).get_parent() );
+	M_EPILOG
+}
+
+bool HXml::HConstNodeProxy::operator == ( HConstNodeProxy const& other_ ) const {
+	M_PROLOG
+	return ( _node == other_._node );
+	M_EPILOG
+}
+
+bool HXml::HConstNodeProxy::operator != ( HConstNodeProxy const& other_ ) const {
+	M_PROLOG
+	return ( _node != other_._node );
+	M_EPILOG
+}
+
 HXml::HNode::properties_t const& HXml::HConstNodeProxy::properties( void ) const {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
 	return ( (**_node)._properties );
+	M_EPILOG
+}
+
+HXml::HNodeProxy HXml::HNodeProxy::get_parent( void ) {
+	M_PROLOG
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	return ( (*_node).get_parent() );
 	M_EPILOG
 }
 

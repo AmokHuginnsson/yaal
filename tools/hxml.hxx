@@ -247,11 +247,14 @@ public:
 	yaal::hcore::HString const& get_name( void ) const;
 	yaal::hcore::HString const& get_value( void ) const;
 	HXml::HNode::properties_t const& properties( void ) const;
+	HConstNodeProxy get_parent( void ) const;
 	HConstNodeProxy( void );
 	virtual ~HConstNodeProxy( void ) {}
 	HConstNodeProxy( HConstNodeProxy const& );
 	HConstNodeProxy( HNodeProxy const& );
 	HConstNodeProxy& operator = ( HConstNodeProxy const& );
+	bool operator == ( HConstNodeProxy const& ) const;
+	bool operator != ( HConstNodeProxy const& ) const;
 	bool operator ! ( void ) const;
 private:
 	friend class HXml;
@@ -281,7 +284,9 @@ public:
 	void set_name( yaal::hcore::HString const& );
 	void set_value( yaal::hcore::HString const& );
 	HXml::HNode::properties_t& properties( void );
+	HNodeProxy get_parent( void );
 	using HConstNodeProxy::properties;
+	using HConstNodeProxy::get_parent;
 	HXml::HIterator remove_node( HXml::HIterator );
 	HXml::HIterator replace_node( HXml::HIterator, HXml::HNodeProxy );
 	HXml::HIterator add_node( HXml::HNode::TYPE::type_t const&, yaal::hcore::HString const& );
