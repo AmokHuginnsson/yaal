@@ -42,7 +42,7 @@ namespace tools {
  * Provide interface for values that can be unitialized.
  */
 template<typename type_t>
-class HOptional {
+class HOptional final {
 public:
 	typedef HOptional<type_t> this_type;
 	struct SemanticContext { SemanticContext const& member( SemanticContext& ) const { return ( *this ); } };

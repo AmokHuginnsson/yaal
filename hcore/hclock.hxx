@@ -39,7 +39,7 @@ namespace hcore {
 
 /*! \brief High resolution time mesurement tool.
  */
-class HClock {
+class HClock final {
 public:
 	typedef HClock this_type;
 	/*! \brief Specify what kind of time to measure.

@@ -92,7 +92,7 @@ extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const* _characterClass_[];
 
 /*! \brief Implementation of high level string operations.
  */
-class HString {
+class HString final {
 public:
 	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 2 ) - 1;
 	typedef HString this_type;

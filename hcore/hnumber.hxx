@@ -93,7 +93,7 @@ namespace hcore {
  * n1 /= 3;
  * assert( n1 == ".3333333333333333" );
  */
-class HNumber {
+class HNumber final {
 public:
 	typedef HNumber this_type;
 	typedef int integer_t;

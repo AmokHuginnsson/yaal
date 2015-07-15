@@ -43,7 +43,7 @@ namespace hcore {
 
 /*! \brief Regular expression string searcher.
  */
-class HRegex {
+class HRegex final {
 public:
 	struct COMPILE;
 	typedef HBitFlag<COMPILE> compile_t;
@@ -96,7 +96,7 @@ public:
 	HRegex( HString const& regex, compile_t flags = COMPILE::DEFAULT );
 	/*! \brief Destroy regex object and free all resources.
 	 */
-	virtual ~HRegex( void );
+	~HRegex( void );
 	/*! \brief Parse regular expression pattern with configuration and prepare for matches retrieval.
 	 *
 	 * \param regex - regular expression pattern to match against.

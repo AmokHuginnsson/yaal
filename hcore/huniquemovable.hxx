@@ -42,7 +42,7 @@ namespace hcore {
 /*! \brief Keep memory movable object on stack and ensure its uniqeness.
  */
 template<typename tType>
-class HUniqueMovable {
+class HUniqueMovable final {
 public:
 	typedef tType value_type;
 private:

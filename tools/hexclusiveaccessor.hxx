@@ -37,7 +37,7 @@ namespace yaal {
 namespace tools {
 
 template<typename T>
-class HExclusiveAccessor {
+class HExclusiveAccessor final {
 	T _object;
 	yaal::hcore::external_lock_t _lock;
 public:

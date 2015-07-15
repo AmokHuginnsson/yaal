@@ -55,7 +55,7 @@ inline bool operator()( key_type const& left, key_type const& right ) const
  * \tparam right_type_t - type of elements in "right" set in map.
  */
 template<typename left_type_t, typename right_type_t>
-class HTwoWayMap {
+class HTwoWayMap final {
 public:
 	typedef HTwoWayMap<left_type_t, right_type_t> this_type;
 	typedef left_type_t left_type;

@@ -42,7 +42,7 @@ namespace tools {
 
 /*! \brief HAlarm class provides automatic registration and deregistration of system alerts.
  */
-class HAlarm {
+class HAlarm final {
 public:
 	typedef HAlarm this_type;
 	typedef i64_t timer_handle_t;

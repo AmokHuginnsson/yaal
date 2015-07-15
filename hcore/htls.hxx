@@ -58,10 +58,10 @@ void free( key_t );
 /*! \brief HTLS<> adds automation around handling Thread Local Storage objects.
  */
 template<typename tType>
-class HTLS : private trait::HNonCopyable {
+class HTLS final {
 public:
 	typedef HTLS<tType> this_type;
-	class HTLSHolder : private trait::HNonCopyable {
+	class HTLSHolder final {
 	public:
 		typedef HTLSHolder this_type;
 	protected:
@@ -72,7 +72,7 @@ public:
 		template<typename... arg_t>
 		explicit HTLSHolder( owner_t* owner_, arg_t&&... arg_ )
 			: _object( yaal::forward<arg_t>( arg_ )... ), _owner( owner_ ) {}
-		virtual ~HTLSHolder( void ) {}
+		~HTLSHolder( void ) {}
 		operator tType const& ( void ) const
 			{ return ( _object ); }
 		operator tType& ( void )
@@ -90,8 +90,8 @@ public:
 			return ( _owner );
 		}
 	private:
-		HTLSHolder( HTLSHolder const& );
-		HTLSHolder& operator = ( HTLSHolder const& );
+		HTLSHolder( HTLSHolder const& ) = delete;
+		HTLSHolder& operator = ( HTLSHolder const& ) = delete;
 	};
 	typedef yaal::hcore::HResource<HTLSHolder> tls_holder_res_t;
 	typedef yaal::hcore::HSet<HTLSHolder*> instances_t;
@@ -132,7 +132,7 @@ public:
 		M_SAFE( delete th );
 		M_EPILOG
 	}
-	virtual ~HTLS( void ) {
+	~HTLS( void ) {
 		M_PROLOG
 		yaal::hcore::HLock l( _mutex );
 		for ( typename instances_t::iterator it( _instances.begin() ), endIt( _instances.end() ); it != endIt; ++ it ) {
@@ -178,6 +178,9 @@ public:
 	int long get_instance_count( void ) const {
 		return ( _instances.get_size() );
 	}
+private:
+	HTLS( HTLS const& ) = delete;
+	HTLS& operator = ( HTLS const& ) = delete;
 };
 
 }

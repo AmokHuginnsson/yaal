@@ -50,7 +50,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHArray_[];
  * \tparam allocator_t - type of internal allocator used for all array's allocations.
  */
 template<typename type_t, typename allocator_t = allocator::system<type_t> >
-class HArray {
+class HArray final {
 public:
 	typedef HArray<type_t, allocator_t> this_type;
 	typedef type_t value_type;
@@ -207,7 +207,7 @@ public:
 		return;
 		M_EPILOG
 	}
-	virtual ~HArray( void ) {
+	~HArray( void ) {
 		M_PROLOG
 		clear();
 		::operator delete ( _buf, memory::yaal );

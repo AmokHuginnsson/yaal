@@ -39,7 +39,7 @@ namespace hcore {
 /*! \brief HStack<> - a stack container adaptor.
  */
 template<typename type_t, typename sequence_t = HArray<type_t> >
-class HStack {
+class HStack final {
 public:
 	typedef HStack<type_t, sequence_t> this_type;
 private:

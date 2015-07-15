@@ -45,7 +45,7 @@ namespace hcore {
  * \tparam second_t - type of second pair element.
  */
 template<typename first_t, typename second_t>
-class HPair {
+class HPair final {
 public:
 	typedef first_t first_type;
 	typedef second_t second_type;

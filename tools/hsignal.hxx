@@ -85,7 +85,7 @@ enum class POSITION {
 template<typename signature_t,
 	typename result_agregator_t = signal::result_agregator::HLast<typename trait::return_type<signature_t>::type>,
 	typename group_by = int>
-class HSignal {
+class HSignal final {
 public:
 	typedef HSignal<signature_t> this_type;
 	typedef result_agregator_t result_agregator;
@@ -109,7 +109,7 @@ public:
 		: _slotsPre(), _slotsPrio(), _slotsPost() {
 		return;
 	}
-	virtual ~HSignal( void ) {
+	~HSignal( void ) {
 		for ( slot_t& slot : _slotsPre ) {
 			slot->disown();
 		}

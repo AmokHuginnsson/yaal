@@ -37,7 +37,7 @@ namespace tools {
 
 /*! \brief Mathematical expression analyser and evaluator.
  */
-class HExpression {
+class HExpression final {
 public:
 	static int const MAX_VARIABLE_COUNT = 26;
 	typedef HExpression this_type;
@@ -79,7 +79,7 @@ public:
 	HExpression( yaal::hcore::HString const& );
 	HExpression( HExpression const& );
 	HExpression& operator = ( HExpression const& );
-	virtual ~HExpression( void );
+	~HExpression( void );
 	void swap( HExpression& );
 	double long* compile( yaal::hcore::HString const& );
 	double long* variables( void );

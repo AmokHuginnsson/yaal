@@ -42,7 +42,7 @@ namespace hcore {
  *
  * Congurent pseudo random number generator class.
  */
-class HRandomizer {
+class HRandomizer final {
 public:
 	typedef HRandomizer this_type;
 	static int const STATE_SIZE = 312;

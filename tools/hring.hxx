@@ -56,7 +56,7 @@ typedef yaal::hcore::HTaggedPOD<int long, size_tag> size_type;
 /*! \brief HRing<> - a cyclic (aka circular) container.
  */
 template<typename type_t>
-class HRing {
+class HRing final {
 public:
 	typedef HRing<type_t> this_type;
 	typedef type_t value_type;
@@ -113,7 +113,7 @@ public:
 		return;
 		M_EPILOG
 	}
-	virtual ~HRing( void ) {
+	~HRing( void ) {
 		M_PROLOG
 		clear();
 		return;

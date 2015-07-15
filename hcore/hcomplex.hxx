@@ -38,7 +38,7 @@ namespace hcore {
 
 /*! \brief Complex number representation.
  */
-class HComplex {
+class HComplex final {
 public:
 	typedef HComplex this_type;
 private:
@@ -48,7 +48,7 @@ public:
 	HComplex( void );
 	HComplex( double long, double long = 0 );
 	HComplex( HComplex const& );
-	virtual ~HComplex( void );
+	~HComplex( void );
 	double long re( void ) const;
 	double long im( void ) const;
 	HComplex& set_real( double long );

@@ -52,7 +52,7 @@ typedef i64_t thread_id_t;
 class HCondition;
 /*! \brief Implementation of multi-threaded synchronization primitive - Mutex.
  */
-class HMutex {
+class HMutex final {
 public:
 	typedef HMutex this_type;
 	/*! \brief Mutex types.
@@ -76,7 +76,7 @@ private:
 public:
 	/*{*/
 	HMutex( TYPE::mutex_type_t const /* recursive | fair */ = TYPE::DEFAULT );
-	virtual ~HMutex( void );
+	~HMutex( void );
 	void lock( void );
 	bool try_lock( void );
 	void unlock( void );
@@ -95,7 +95,7 @@ typedef HExceptionT<HMutex> HMutexException;
 
 /*! \brief Multi-threaded synchronization primitive - Conditional Variable.
  */
-class HCondition {
+class HCondition final {
 	typedef HCondition this_type;
 	HChunk _buf;
 	HMutex& _mutex;
@@ -106,7 +106,7 @@ public:
 		INTERRUPT
 	} status_t;
 	HCondition( HMutex& );
-	virtual ~HCondition( void );
+	~HCondition( void );
 	status_t wait_until( HTime const& );
 	status_t wait_for( time::duration_t = time::duration( 0x1fffffff /* FreeBSD strange limit. */, time::UNIT::SECOND ) );
 	void signal( void );
@@ -121,7 +121,7 @@ typedef HExceptionT<HCondition> HConditionException;
 
 /*! \brief Multi-threaded synchronization primitive - Semaphore.
  */
-class HSemaphore {
+class HSemaphore final {
 public:
 	typedef HSemaphore this_type;
 private:
@@ -157,7 +157,7 @@ typedef HExceptionT<HSemaphore> HSemaphoreException;
 
 /*! \brief Core multi-threading primitive - Thread.
  */
-class HThread {
+class HThread final {
 public:
 	typedef HThread this_type;
 	typedef HBoundCall<> call_t;
@@ -187,7 +187,7 @@ private:
 	OExceptionInfo _exceptionInfo;
 public:
 	HThread( void );
-	virtual ~HThread( void );
+	~HThread( void );
 	/*! \brief Spawn new working thread.
 	 *
 	 * \param call_ - a call that shall be invoked in newly spawned thread.
@@ -250,7 +250,7 @@ typedef HExceptionT<HThread> HThreadException;
  *
  * Scope based automation of locking and unlocking of Mutexes.
  */
-class HLock {
+class HLock final {
 public:
 	typedef HLock this_type;
 private:
@@ -258,7 +258,7 @@ private:
 	bool _locked;
 public:
 	explicit HLock( HMutex& );
-	virtual ~HLock( void );
+	~HLock( void );
 	void lock( void );
 	void unlock( void );
 private:
@@ -287,7 +287,7 @@ typedef HExceptionT<HEvent> HEventException;
 
 /*! \brief Read-Write Lock functionality implementation.
  */
-class HReadWriteLock {
+class HReadWriteLock final {
 public:
 	typedef HReadWriteLock this_type;
 private:
@@ -304,7 +304,7 @@ private:
 	lock_info_t _lockInfo;
 public:
 	HReadWriteLock( void );
-	virtual ~HReadWriteLock( void );
+	~HReadWriteLock( void );
 	void lock_read( void );
 	void lock_write( void );
 	void unlock( void );
@@ -312,14 +312,14 @@ public:
 
 /*! \brief Read-Write Lock reader-guard functionality implementation.
  */
-class HReadWriteLockReadLock {
+class HReadWriteLockReadLock final {
 public:
 	typedef HReadWriteLockReadLock this_type;
 private:
 	HReadWriteLock& _rwLock;
 public:
 	explicit HReadWriteLockReadLock( HReadWriteLock& );
-	virtual ~HReadWriteLockReadLock( void );
+	~HReadWriteLockReadLock( void );
 private:
 	HReadWriteLockReadLock( HReadWriteLockReadLock const& );
 	HReadWriteLockReadLock& operator = ( HReadWriteLockReadLock const& );
@@ -328,14 +328,14 @@ typedef HUniqueMovable<HReadWriteLockReadLock> external_read_write_lock_read_loc
 
 /*! \brief Read-Write Lock writer-guard functionality implementation.
  */
-class HReadWriteLockWriteLock {
+class HReadWriteLockWriteLock final {
 public:
 	typedef HReadWriteLockWriteLock this_type;
 private:
 	HReadWriteLock& _rwLock;
 public:
 	explicit HReadWriteLockWriteLock( HReadWriteLock& );
-	virtual ~HReadWriteLockWriteLock( void );
+	~HReadWriteLockWriteLock( void );
 private:
 	HReadWriteLockWriteLock( HReadWriteLockWriteLock const& );
 	HReadWriteLockWriteLock& operator = ( HReadWriteLockWriteLock const& );

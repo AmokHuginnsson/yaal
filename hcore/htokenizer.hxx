@@ -42,7 +42,7 @@ namespace hcore {
 
 /*! \brief Convenient interface for splitting strings into tokens.
  */
-class HTokenizer {
+class HTokenizer final {
 	typedef HTokenizer this_type;
 public:
 	typedef HBitFlag<HTokenizer> behavior_t;

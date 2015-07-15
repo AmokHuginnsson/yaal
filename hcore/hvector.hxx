@@ -46,7 +46,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* _errMsgHVector_[];
 /*! \brief Vector class for linear algebra calculus.
  */
 template<typename value_t>
-class HVector {
+class HVector final {
 public:
 	typedef value_t value_type;
 	typedef HArray<value_type> data_t;

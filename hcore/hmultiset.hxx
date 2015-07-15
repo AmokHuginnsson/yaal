@@ -57,7 +57,7 @@ struct multiset_helper {
  * \tparam helper_t - HSBBSTree plugable code.
  */
 template<typename type_t, typename compare_t = less<type_t>, typename allocator_t = allocator::system<type_t> >
-class HMultiSet {
+class HMultiSet final {
 public:
 	typedef type_t value_type;
 	typedef type_t key_type;

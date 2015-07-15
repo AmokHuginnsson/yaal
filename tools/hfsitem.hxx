@@ -38,7 +38,7 @@ namespace tools {
 
 /*! \brief File system object representation.
  */
-class HFSItem {
+class HFSItem final {
 	typedef HFSItem this_type;
 	int _nameLen;
 	yaal::hcore::HString _path;

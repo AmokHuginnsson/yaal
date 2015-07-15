@@ -43,7 +43,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHMatrix_[];
 /*! \brief Abstraction of Matrix, and all relevant algebraic operations.
  */
 template<typename value_type>
-class HMatrix {
+class HMatrix final {
 	typedef HMatrix<value_type> this_type;
 public:
 	typedef value_type value_t;
@@ -86,7 +86,7 @@ private:
 public:
 	HMatrix( int const, int const );
 	HMatrix( HMatrix const& );
-	virtual ~HMatrix( void );
+	~HMatrix( void );
 	void swap( HMatrix& );
 	int set( value_type const** );
 	int row( void ) const;

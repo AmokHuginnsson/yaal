@@ -36,7 +36,7 @@ namespace tools {
 
 /*! \brief Dynamically load and use shared libraries.
  */
-class HPlugin {
+class HPlugin final {
 	typedef HPlugin this_type;
 	void* _handle;
 public:

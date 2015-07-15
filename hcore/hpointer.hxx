@@ -169,7 +169,7 @@ struct pointer_helper;
  */
 template<typename tType, template<typename>class pointer_type_t = HPointerScalar,
 				 template<typename, typename>class access_type_t = HPointerStrict>
-class HPointer {
+class HPointer final {
 	class HSharedBase {
 	protected:
 		int _referenceCounter[ 2 ];
@@ -252,7 +252,7 @@ public:
 		access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this, 0 );
 		return;
 	}
-	virtual ~HPointer( void ) {
+	~HPointer( void ) {
 		/* The make_pointer() helper part.
 		 */
 		if ( _object ) {

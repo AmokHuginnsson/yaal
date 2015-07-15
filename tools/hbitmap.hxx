@@ -41,7 +41,7 @@ namespace tools {
 
 /*! \brief Abstract for bit pool bit operations.
  */
-class HBitmap {
+class HBitmap final {
 	typedef HBitmap this_type;
 public:
 	class HBit;

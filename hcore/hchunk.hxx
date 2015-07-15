@@ -38,7 +38,7 @@ namespace hcore {
 
 /*! \brief Simplest raw memory provisioner.
  */
-class HChunk {
+class HChunk final {
 public:
 	typedef HChunk this_type;
 private:

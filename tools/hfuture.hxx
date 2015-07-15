@@ -39,7 +39,7 @@ namespace tools {
 /*! \brief Request asynchronous execution of single operation.
  */
 template<typename return_t>
-class HFuture {
+class HFuture final {
 public:
 	typedef HFuture<return_t> this_type;
 private:

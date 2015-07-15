@@ -42,7 +42,7 @@ namespace hcore {
 /*! \brief HPool<> - object memory pool.
  */
 template<typename T>
-class HPool {
+class HPool final {
 public:
 	typedef int long long aligner_t;
 	static int const OBJECTS_PER_BLOCK = 256;

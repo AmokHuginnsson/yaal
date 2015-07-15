@@ -124,7 +124,7 @@ struct OResourceHolder<T, deleter, false> {
 /*! \brief Raw resource life time tracker.
  */
 template<typename type_t, typename free_t = resource_helper::HResourceDeleter<type_t>>
-class HResource {
+class HResource final {
 public:
 	typedef typename resource_helper::trait<type_t>::type value_type;
 	typedef typename trait::make_reference<typename trait::strip_const<value_type>::type>::type reference;

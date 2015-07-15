@@ -43,7 +43,7 @@ namespace hcore {
 /*! \brief Provision operations for set of bits.
  */
 template<int const SIZE>
-class HBitset {
+class HBitset final {
 	typedef u64_t word_t;
 	static int const BITS_IN_WORD = static_cast<int>( sizeof ( word_t ) ) * 8;
 	static word_t const BIT = 0x1LL << ( BITS_IN_WORD - 1 );

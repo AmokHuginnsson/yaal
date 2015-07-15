@@ -55,7 +55,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const _iso8601DateTimeFormat_[];
  * In short time-diff makes no sense for dates in broken-down time form
  * on 32 bit time_t systems.
  */
-class HTime {
+class HTime final {
 public:
 	typedef HTime this_type;
 	enum class TZ {
@@ -118,7 +118,7 @@ public:
 	HTime( TZ, i64_t, char const* = _iso8601DateTimeFormat_ );
 	HTime( int, int, int, int = 0, int = 0, int = 0, char const* = _iso8601DateTimeFormat_ );
 	HTime( TZ, int, int, int, int = 0, int = 0, int = 0, char const* = _iso8601DateTimeFormat_ );
-	virtual ~HTime( void );
+	~HTime( void );
 	void swap( HTime& );
 	HTime& set_tz( TZ );
 	HTime& set_now( void );

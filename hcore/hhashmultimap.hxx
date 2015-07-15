@@ -65,7 +65,7 @@ template<typename key_type_t, typename value_type_t,
 	typename allocator_t = allocator::system<HPair<key_type_t, value_type_t>>,
 	template<typename, typename>class storage_policy_t = HMultiContainerStorage::HTransparent
 >
-class HHashMultiMap {
+class HHashMultiMap final {
 public:
 	typedef HHashMultiMap<key_type_t, value_type_t, hasher_t, equal_key_t, allocator_t, storage_policy_t> this_type;
 	typedef key_type_t key_type;

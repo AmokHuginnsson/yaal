@@ -57,7 +57,7 @@ template<
 	typename equal_key_t = yaal::equal_to<type_t>,
 	typename allocator_t = allocator::system<type_t>
 >
-class HHashSet {
+class HHashSet final {
 public:
 	typedef type_t key_type;
 /* cppcheck-suppress variableHidingTypedef */
@@ -203,7 +203,7 @@ public:
 		return;
 		M_EPILOG
 	}
-	virtual ~HHashSet( void ) {
+	~HHashSet( void ) {
 		M_PROLOG
 		clear();
 		return;

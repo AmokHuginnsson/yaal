@@ -50,7 +50,7 @@ struct DES {
  *
  * Small class incorporates simple cryptography functionality.
  */
-class HDes {
+class HDes final {
 public:
 	typedef HDes this_type;
 	typedef enum {
@@ -61,7 +61,7 @@ private:
 	u32_t _IKeys[ DES::SIDES_COUNT ][ DES::IKEYS_COUNT ][ ( DES::IKEY_SIZE + static_cast<int>( sizeof ( u32_t ) ) - 1 ) / static_cast<int>( sizeof ( u32_t ) ) ];
 public:
 	HDes( yaal::hcore::HString const& );
-	virtual ~HDes( void );
+	~HDes( void );
 	void crypt( u8_t*, int long, action_t const& );
 	void flush_keys( void );
 private:

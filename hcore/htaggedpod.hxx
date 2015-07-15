@@ -46,7 +46,7 @@ namespace hcore {
  * pod look-alikes.
  */
 template<typename pod_t, typename TAG>
-class HTaggedPOD {
+class HTaggedPOD final {
 public:
 	typedef HTaggedPOD<pod_t, TAG> this_type;
 	typedef pod_t value_type;
@@ -65,7 +65,7 @@ public:
 		: _value( tp_._value ) {
 		return;
 	}
-	virtual ~HTaggedPOD( void ) {
+	~HTaggedPOD( void ) {
 		return;
 	}
 	HTaggedPOD& operator = ( HTaggedPOD const& tp_ ) {

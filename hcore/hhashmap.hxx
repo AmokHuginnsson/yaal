@@ -61,7 +61,7 @@ template<
 	typename equal_key_t = yaal::equal_to<key_t>,
 	typename allocator_t = allocator::system<HPair<key_t, data_t>>
 >
-class HHashMap {
+class HHashMap final {
 public:
 	typedef key_t key_type;
 	typedef data_t data_type;
@@ -170,7 +170,7 @@ public:
 		return;
 		M_EPILOG
 	}
-	virtual ~HHashMap( void ) {
+	~HHashMap( void ) {
 		M_PROLOG
 		clear();
 		return;

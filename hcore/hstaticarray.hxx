@@ -44,7 +44,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHStaticArray_[];
  * Arrays provisioned with boundary checking and copy constructible.
  */
 template<typename type_t, int const N>
-class HStaticArray {
+class HStaticArray final {
 public:
 	typedef HStaticArray<type_t, N> this_type;
 	typedef type_t value_type;

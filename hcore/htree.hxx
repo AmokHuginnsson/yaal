@@ -47,7 +47,7 @@ class HTree;
 /*! \brief Tree based data structure and operations.
  */
 template<typename value_t, typename allocator_t = allocator::system<value_t>, template <typename, typename> class sequence_t = HList>
-class HTree {
+class HTree final {
 public:
 	typedef HTree<value_t, allocator_t, sequence_t> this_type;
 	typedef value_t value_type;
@@ -57,7 +57,7 @@ public:
 	typedef HNode const* const_node_t;
 	/*! \brief Basic building block of HTree<>.
 	 */
-	class HNode {
+	class HNode final {
 	public:
 		template<typename const_qual_t>
 		class HIterator;
@@ -371,7 +371,7 @@ public:
 			return;
 			M_EPILOG
 		}
-		virtual ~HNode( void ) {
+		~HNode( void ) {
 			M_PROLOG
 			for ( typename branch_t::iterator it( _branch.begin() ), endIt( _branch.end() ); it != endIt; ++ it ) {
 				HNode* node( *it );
@@ -468,7 +468,7 @@ public:
 		return;
 		M_EPILOG
 	}
-	virtual ~HTree( void ) {
+	~HTree( void ) {
 		M_PROLOG
 		clear();
 		return;

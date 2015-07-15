@@ -50,7 +50,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHDeque_[];
  * Implemented as array of arrays.
  */
 template<typename type_t, typename allocator_t = allocator::system<type_t> >
-class HDeque {
+class HDeque final {
 private:
 	static int const VALUE_SIZE = static_cast<int>( sizeof ( type_t ) );
 	static int long const DEFAULT_CHUNK_SIZE = ( 512 / VALUE_SIZE ) * VALUE_SIZE + ( ( 512 - ( ( 512 / VALUE_SIZE ) * VALUE_SIZE ) ) > ( VALUE_SIZE / 2 ) ? VALUE_SIZE : 0 );
@@ -177,7 +177,7 @@ public:
 		M_EPILOG
 	}
 
-	virtual ~HDeque( void ) {
+	~HDeque( void ) {
 		M_PROLOG
 		clear();
 		return;

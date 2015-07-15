@@ -55,7 +55,7 @@ template<
 	typename equal_key_t = yaal::equal_to<type_t>,
 	typename allocator_t = allocator::system<HPair<type_t, int long>>
 >
-class HHashMultiSet {
+class HHashMultiSet final {
 public:
 	typedef type_t key_type;
 /* cppcheck-suppress variableHidingTypedef */
@@ -213,7 +213,7 @@ public:
 		return;
 		M_EPILOG
 	}
-	virtual ~HHashMultiSet( void ) {
+	~HHashMultiSet( void ) {
 		M_PROLOG
 		clear();
 		return;

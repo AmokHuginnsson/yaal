@@ -48,7 +48,7 @@ extern M_YAAL_HCORE_PUBLIC_API char const* const _errMsgHList_[];
 /*! \brief Doubly-linked list data structure and its operations.
  */
 template<typename type_t, typename allocator_t = allocator::system<type_t> >
-class HList {
+class HList final {
 public:
 	typedef HList<type_t, allocator_t> this_type;
 	typedef type_t value_type;
@@ -251,7 +251,7 @@ public:
 	 *
 	 * Destroy list and all its contents.
 	 */
-	virtual ~HList( void ) {
+	~HList( void ) {
 		M_PROLOG
 		clear();
 		return;

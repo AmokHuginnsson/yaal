@@ -57,7 +57,7 @@ template<typename t0_t, typename t1_t = trait::no_type,
 	typename t16_t = trait::no_type, typename t17_t = trait::no_type,
 	typename t18_t = trait::no_type, typename t19_t = trait::no_type,
 	typename t20_t = trait::no_type>
-class HVariant {
+class HVariant final {
 public:
 	typedef HVariant<
 		t0_t, t1_t, t2_t, t3_t, t4_t, t5_t, t6_t, t7_t,

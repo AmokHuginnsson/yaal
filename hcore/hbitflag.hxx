@@ -39,7 +39,7 @@ namespace yaal {
 namespace hcore {
 
 template<typename TAG>
-class HBitFlag {
+class HBitFlag final {
 	class Unspecified {
 		Unspecified& unspecified( Unspecified& ) { return ( *this ); }
 		friend class HBitFlag;

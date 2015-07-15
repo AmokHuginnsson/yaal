@@ -56,7 +56,7 @@ struct hash<key_t*> {
 extern M_YAAL_HCORE_PUBLIC_API int long const* const _primes_;
 
 template<typename value_t, typename hasher_t, typename equal_key_t, typename get_key_t, typename allocator_t>
-class HHashContainer : private trait::HNonCopyable {
+class HHashContainer final {
 public:
 	typedef HHashContainer this_type;
 	typedef value_t value_type;
@@ -213,7 +213,7 @@ public:
 		, _equals( equals_ )
 		, _allocator( allocator_ ) {
 	}
-	virtual ~HHashContainer( void ) {
+	~HHashContainer( void ) {
 		M_PROLOG
 		clear();
 		return;
@@ -335,6 +335,8 @@ public:
 		return;
 	}
 private:
+	HHashContainer( HHashContainer const& ) = delete;
+	HHashContainer& operator = ( HHashContainer const& ) = delete;
 	template<typename constructor_t>
 	HPair<HIterator, bool> insert_impl( constructor_t&& );
 };
