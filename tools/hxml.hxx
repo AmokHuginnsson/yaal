@@ -68,6 +68,8 @@ public:
 	typedef HConstIterator const_iterator;
 	typedef yaal::hcore::HTree<HNode> tree_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, yaal::hcore::HString> entities_t;
+	typedef yaal::hcore::HPair<yaal::hcore::HString, yaal::hcore::HString> parameter_t;
+	typedef yaal::hcore::HArray<parameter_t> parameters_t;
 	typedef yaal::hcore::HHashSet<HNameSpace> namespaces_t;
 	typedef entities_t::const_iterator const_entity_iterator;
 	typedef entities_t::iterator entity_iterator;
@@ -104,7 +106,7 @@ public:
 	HXml& operator = ( HXml const& );
 	void init( yaal::hcore::HStreamInterface&, parser_t = PARSER::DEFAULT );
 	void init( yaal::hcore::HStreamInterface::ptr_t, parser_t = PARSER::DEFAULT );
-	void apply_style( yaal::hcore::HString const& );
+	void apply_style( yaal::hcore::HString const&, parameters_t const& = parameters_t() );
 	void parse( void );
 	void parse( yaal::hcore::HString const& );
 	void parse( parser_t );

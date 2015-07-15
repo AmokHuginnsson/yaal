@@ -552,7 +552,7 @@ void HXml::parse( xml_node_ptr_t data_, tree_t::node_t node_, parser_t parser_ )
 	M_EPILOG
 }
 
-void HXml::apply_style( yaal::hcore::HString const& path_ ) {
+void HXml::apply_style( yaal::hcore::HString const& path_, parameters_t const& parameters_ ) {
 	M_PROLOG
 	if ( !! get_root() ) {
 		generate_intermediate_form( false );
@@ -562,7 +562,24 @@ void HXml::apply_style( yaal::hcore::HString const& path_ ) {
 	xsltStylesheet* pstyle( xsltParseStylesheetFile( reinterpret_cast<xmlChar const* const>( path_.raw() ) ) );
 	M_ENSURE_EX( pstyle, HString( "failure parsing XSLT file: " ) + path_ );
 	style_resource_t style( pstyle, xsltFreeStylesheet );
-	doc_resource_t doc( xsltApplyStylesheet( style.get(), _xml->_doc.get(), NULL ), xmlFreeDoc );
+	HResource<char const*[]> parametersHolder( !parameters_.is_empty() ? new char const*[parameters_.get_size() + 1] : nullptr );
+	char const** parameters( parametersHolder.get() );
+	int parIdx( 0 );
+	for ( parameter_t const& p : parameters_ ) {
+		parameters[parIdx ++] = p.first.raw();
+		parameters[parIdx ++] = p.second.raw();
+	}
+	if ( parIdx > 0 ) {
+		parameters[parIdx] = nullptr;
+	}
+	doc_resource_t doc(
+		xsltApplyStylesheet(
+			style.get(),
+			_xml->_doc.get(),
+			parameters
+		),
+		xmlFreeDoc
+	);
 	if ( ! doc.get() ) {
 		throw HXmlException( HString( "cannot apply stylesheet: " ) + path_ );
 	}
