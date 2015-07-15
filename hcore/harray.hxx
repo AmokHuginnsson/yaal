@@ -152,11 +152,9 @@ public:
 	}
 	/*! \brief Construct array based on compile time constant data set.
 	 *
-	 * \tparam T - type of compile time constants to insert into this array.
 	 * \param constants_ - set of compile time constants to into into this array.
 	 */
-	template<typename T>
-	HArray( std::initializer_list<T> constants_ )
+	HArray( std::initializer_list<value_type> constants_ )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
 		M_PROLOG
 		initialize( constants_.begin(), constants_.end(), static_cast<trait::false_type*>( nullptr ) );

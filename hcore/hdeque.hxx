@@ -165,11 +165,9 @@ public:
 
 	/*! \brief Construct deque based on compile time constant data set.
 	 *
-	 * \tparam T - type of compile time constants to insert into this deque.
 	 * \param constants_ - set of compile time constants to into into this deque.
 	 */
-	template<typename T>
-	HDeque( std::initializer_list<T> constants_ )
+	HDeque( std::initializer_list<value_type> constants_ )
 		: _chunks(), _start( 0 ), _size( 0 ) {
 		M_PROLOG
 		initialize( constants_.begin(), constants_.end(), static_cast<trait::false_type*>( nullptr ) );

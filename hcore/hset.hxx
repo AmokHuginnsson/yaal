@@ -141,11 +141,9 @@ public:
 
 	/*! \brief Construct set based on compile time constant data set.
 	 *
-	 * \tparam T - type of compile time constants to insert into this set.
 	 * \param constants_ - set of compile time constants to into into this set.
 	 */
-	template<typename T>
-	HSet( std::initializer_list<T> constants_ )
+	HSet( std::initializer_list<value_type> constants_ )
 		: _engine( compare_type(), allocator_type() ) {
 		M_PROLOG
 		insert( constants_.begin(), constants_.end() );

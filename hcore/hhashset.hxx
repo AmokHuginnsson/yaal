@@ -185,12 +185,11 @@ public:
 		return;
 		M_EPILOG
 	}
-	template<typename T>
-	HHashSet( std::initializer_list<T> constants_ )
+	HHashSet( std::initializer_list<value_type> constants_ )
 		: _engine( hasher_type(), equal_key_type(), allocator_type() ) {
 		M_PROLOG
 		_engine.resize( static_cast<int>( constants_.size() ) );
-		for ( T const& v : constants_ ) {
+		for ( value_type const& v : constants_ ) {
 			insert( v );
 		}
 		return;

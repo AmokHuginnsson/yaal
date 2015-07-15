@@ -31,6 +31,8 @@ Copyright:
 #ifndef YAAL_HCORE_HMAP_HXX_INCLUDED
 #define YAAL_HCORE_HMAP_HXX_INCLUDED 1
 
+#include <initializer_list>
+
 #include "hcore/hsbbstree.hxx"
 #include "hcore/hpair.hxx"
 #include "hcore/iterator.hxx"
@@ -113,6 +115,15 @@ public:
 		: _engine( source._engine.compare(), source._engine.get_allocator() ) {
 		M_PROLOG
 		_engine.copy_from( source._engine );
+		return;
+		M_EPILOG
+	}
+	HMap( std::initializer_list<value_type> constants_ )
+		: _engine( compare_type(), allocator_type() ) {
+		M_PROLOG
+		for ( value_type const& v : constants_ ) {
+			insert( v );
+		}
 		return;
 		M_EPILOG
 	}
