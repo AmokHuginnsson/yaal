@@ -75,18 +75,26 @@ HRegex::match_t const HRegex::MATCH::NOT_END_OF_LINE = HRegex::match_t::new_flag
 HRegex::match_t const HRegex::MATCH::DEFAULT = HRegex::MATCH::NONE;
 
 HRegex::HRegex( void )
-	: _initialized( false ), _pattern(), _compiled( sizeof ( regex_t ) ),
-	_lastError( 0 ), _errorBuffer(), _errorCause(), _errorMessage() {
+	: _initialized( false )
+	, _pattern()
+	, _compiled( sizeof ( regex_t ) )
+	, _lastError( 0 )
+	, _errorBuffer()
+	, _errorCause()
+	, _errorMessage() {
 	M_PROLOG
 	return;
 	M_EPILOG
 }
 
 HRegex::HRegex( HRegex&& reg_ )
-	: _initialized( reg_._initialized ), _pattern( yaal::move( reg_._pattern ) ),
-	_compiled( yaal::move( reg_._compiled ) ), _lastError( reg_._lastError ),
-	_errorBuffer( yaal::move( reg_._errorBuffer ) ), _errorCause( yaal::move( reg_._errorCause ) ),
-	_errorMessage( yaal::move( reg_._errorMessage ) ) {
+	: _initialized( reg_._initialized )
+	, _pattern( yaal::move( reg_._pattern ) )
+	, _compiled( yaal::move( reg_._compiled ) )
+	, _lastError( reg_._lastError )
+	, _errorBuffer( yaal::move( reg_._errorBuffer ) )
+	, _errorCause( yaal::move( reg_._errorCause ) )
+	, _errorMessage( yaal::move( reg_._errorMessage ) ) {
 	M_PROLOG
 	reg_._initialized = false;
 	reg_._lastError = 0;
@@ -95,8 +103,13 @@ HRegex::HRegex( HRegex&& reg_ )
 }
 
 HRegex::HRegex( char const* const pattern_, compile_t flags_ )
-	: _initialized( false ), _pattern(), _compiled( sizeof ( regex_t ) ),
-	_lastError( 0 ), _errorBuffer(), _errorCause(), _errorMessage() {
+	: _initialized( false )
+	, _pattern()
+	, _compiled( sizeof ( regex_t ) )
+	, _lastError( 0 )
+	, _errorBuffer()
+	, _errorCause()
+	, _errorMessage() {
 	M_PROLOG
 	compile( pattern_, flags_ );
 	return;
@@ -104,8 +117,13 @@ HRegex::HRegex( char const* const pattern_, compile_t flags_ )
 }
 
 HRegex::HRegex( HString const& pattern_, compile_t flags_ )
-	: _initialized( false ), _pattern(), _compiled( sizeof ( regex_t ) ),
-	_lastError( 0 ), _errorBuffer(), _errorCause(), _errorMessage() {
+	: _initialized( false )
+	, _pattern()
+	, _compiled( sizeof ( regex_t ) )
+	, _lastError( 0 )
+	, _errorBuffer()
+	, _errorCause()
+	, _errorMessage() {
 	M_PROLOG
 	compile( pattern_, flags_ );
 	return;
