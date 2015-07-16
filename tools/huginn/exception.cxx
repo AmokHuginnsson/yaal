@@ -83,13 +83,13 @@ HHuginn::class_t _class_(
 	)
 );
 
-HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& name_ ) {
+HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& name_, HHuginn::HClass const* base_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			huginn_,
 			HHuginn::HType::register_type( name_, huginn_ ),
-			_class_.raw(),
+			base_ ? base_ : _class_.raw(),
 			HHuginn::HClass::field_names_t{},
 			HHuginn::values_t{}
 		)
