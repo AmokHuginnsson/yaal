@@ -71,7 +71,7 @@ char const* LOG_LEVEL::name( priority_t level_ ) {
 }
 
 bool HLog::_autoRehash = true;
-LOG_LEVEL::priority_t HLog::_logLevel = LOG_LEVEL::EMERGENCY;
+LOG_LEVEL::priority_t HLog::_logLevel = LOG_LEVEL::NOTICE;
 
 void* DEFAULT_LOG_STREAM( stderr );
 
@@ -241,7 +241,7 @@ void HLog::eol_reset( char const* const buf_, int long len_ ) {
 	if ( ( len_ < 1 ) || ( buf_[ len_ - 1 ] != '\n' ) ) {
 		_newLine = false;
 	} else {
-		_type = LOG_LEVEL::DEBUG;
+		_type = _logLevel;
 		_newLine = true;
 		_file::ref().flush();
 	}
