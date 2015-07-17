@@ -40,9 +40,13 @@ namespace huginn {
 
 class HRegularExpressionMatch : public HHuginn::HIterable {
 	HCompiledRegularExpression::regex_t _regex;
+	HHuginn::value_t _string;
+	yaal::hcore::HString const& _fast;
 public:
-	HRegularExpressionMatch( HHuginn::HClass*, HCompiledRegularExpression::regex_t );
-	static HHuginn::value_t matches( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const&, int );
+	HRegularExpressionMatch( HHuginn::HClass const*, HCompiledRegularExpression::regex_t, HHuginn::value_t const& );
+	yaal::hcore::HString const& get_string( void ) const;
+	yaal::hcore::HRegex::HMatchIterator end( void ) const;
+	static HHuginn::value_t matched( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HHuginn* );
 private:
 	virtual HIterator do_iterator( void ) override;

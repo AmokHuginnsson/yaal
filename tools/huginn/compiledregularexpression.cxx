@@ -48,16 +48,23 @@ HCompiledRegularExpression::HCompiledRegularExpression( HHuginn::HClass const* c
 	return;
 }
 
-HHuginn::value_t HCompiledRegularExpression::match( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const&, int ) {
-	return ( _none_ );
-}
-
 HHuginn::value_t HCompiledRegularExpression::groups( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const&, int ) {
 	return ( _none_ );
 }
 
+HHuginn::value_t HCompiledRegularExpression::match(
+	huginn::HThread* thread_,
+	HHuginn::HObject* object_,
+	HHuginn::values_t const& values_,
+	int position_
+) {
+	HCompiledRegularExpression* cre( static_cast<HCompiledRegularExpression*>( object_ ) );
+	return ( cre->do_match( thread_, values_, position_ ) );
+}
+
 class HCompiledRegularExpressionClass : public HHuginn::HClass {
 	HHuginn::class_t const& _exceptionClass;
+	HHuginn::class_t _regularExpressionMatchClass;
 public:
 	typedef HCompiledRegularExpressionClass this_type;
 	typedef HHuginn::HClass base_type;
@@ -77,8 +84,12 @@ public:
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::groups, _1, _2, _3, _4 ) )
 			}
 		)
-		, _exceptionClass( exceptionClass_ ) {
+		, _exceptionClass( exceptionClass_ )
+		, _regularExpressionMatchClass( HRegularExpressionMatch::get_class( huginn_ ) ) {
 		return;
+	}
+	HHuginn::HClass const* remc( void ) const {
+		return ( _regularExpressionMatchClass.raw() );
 	}
 private:
 	virtual HHuginn::value_t do_create_instance( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
@@ -95,6 +106,18 @@ private:
 		M_EPILOG
 	}
 };
+
+HHuginn::value_t HCompiledRegularExpression::do_match(
+	huginn::HThread*,
+	HHuginn::values_t const& values_,
+	int position_
+) {
+	char const name[] = "CompiledRegularExpression.match";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+	HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HObject::get_class() ) );
+	return ( make_pointer<HRegularExpressionMatch>( creClass->remc(), make_resource<HRegex>( _regex->copy() ), values_[0] ) );
+}
 
 HHuginn::class_t HCompiledRegularExpression::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG

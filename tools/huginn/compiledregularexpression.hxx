@@ -49,6 +49,8 @@ public:
 	static HHuginn::value_t match( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const&, int );
 	static HHuginn::value_t groups( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HHuginn*, HHuginn::class_t const& );
+private:
+	HHuginn::value_t do_match( huginn::HThread*, HHuginn::values_t const&, int );
 };
 
 }
