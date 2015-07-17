@@ -36,6 +36,7 @@ Copyright:
 #include "hcore/hchunk.hxx"
 #include "hcore/hstring.hxx"
 #include "hcore/hbitflag.hxx"
+#include "hcore/harray.hxx"
 
 namespace yaal {
 
@@ -67,6 +68,7 @@ public:
 	class HMatchIterator;
 	typedef HMatchIterator iterator;
 	typedef HRegex this_type;
+	typedef yaal::hcore::HArray<HMatch> groups_t;
 private:
 	bool    _initialized;          /*!< is regex initialized */
 	HString _pattern;              /*!< original regex pattern */
@@ -133,6 +135,7 @@ public:
 	 * \return True iff given string matches this regex.
 	 */
 	bool matches( HString const& string_ ) const;
+	groups_t groups( HString const& string_ ) const;
 	void swap( HRegex& );
 	void clear( void );
 	HRegex copy( void ) const;
@@ -140,7 +143,8 @@ private:
 	HRegex( HRegex const& ) = delete;
 	HRegex& operator = ( HRegex const& ) = delete;
 	void error_clear( void ) const;
-	char const* matches( char const*, int* ) const;
+	char const* matches_impl( char const*, int* ) const;
+	groups_t groups_impl( char const*, int ) const;
 };
 
 /*! \brief Instance of single match for given regex.
@@ -149,10 +153,10 @@ class HRegex::HMatch {
 	int _start;
 	int _size;
 public:
+	HMatch( int, int );
 	int start() const;
 	int size() const;
 private:
-	HMatch( int, int );
 	friend class HRegex::HMatchIterator;
 };
 

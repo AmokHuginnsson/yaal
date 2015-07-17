@@ -243,7 +243,7 @@ int HRegex::error_code( void ) const {
 	return ( _lastError );
 }
 
-char const* HRegex::matches( char const* string_, int* matchLength_ ) const {
+char const* HRegex::matches_impl( char const* string_, int* matchLength_ ) const {
 	M_PROLOG
 	M_ASSERT( string_ && matchLength_ );
 	if ( ! _initialized ) {
@@ -258,14 +258,37 @@ char const* HRegex::matches( char const* string_, int* matchLength_ ) const {
 		ptr = string_ + match.rm_so;
 	}
 	( *matchLength_ ) = matchLength;
+	error_clear();
 	return ( ptr );
+	M_EPILOG
+}
+
+HRegex::groups_t HRegex::groups_impl( char const* string_, int len_ ) const {
+	M_PROLOG
+	groups_t g;
+	typedef yaal::hcore::HArray<regmatch_t> matches_t;
+	int expectedGroupCount( static_cast<int>( count( string_, string_ + len_, '(' ) + 1 ) );
+	matches_t matchesBuffer( expectedGroupCount );
+	if ( ! ( _lastError = ::regexec( _compiled.get<regex_t>(), string_, static_cast<size_t>( expectedGroupCount ), matchesBuffer.data(), 0 ) ) ) {
+		int groupCount( 0 );
+		for ( regmatch_t const& m : matchesBuffer ) {
+			if ( m.rm_so >= 0 ) {
+				++ groupCount;
+			}
+		}
+		g.reserve( groupCount );
+		for ( regmatch_t const& m : matchesBuffer ) {
+			g.emplace_back( m.rm_so, m.rm_eo - m.rm_so );
+		}
+	}
+	return ( g );
 	M_EPILOG
 }
 
 HRegex::HMatchIterator HRegex::find( char const* str_ ) const {
 	M_ASSERT( str_ );
 	int len( 0 );
-	char const* start( matches( str_, &len ) );
+	char const* start( matches_impl( str_, &len ) );
 	HMatchIterator it( this, str_, start ? static_cast<int>( start - str_ ) : -1, len );
 	return ( it );
 }
@@ -280,6 +303,12 @@ HRegex::HMatchIterator HRegex::end( void ) const {
 
 bool HRegex::matches( HString const& str_ ) const {
 	return ( find( str_ ) != end() );
+}
+
+HRegex::groups_t HRegex::groups( yaal::hcore::HString const& string_ ) const {
+	M_PROLOG
+	return ( groups_impl( string_.raw(), static_cast<int>( string_.get_size() ) ) );
+	M_EPILOG
 }
 
 HRegex::HMatch::HMatch( int start_, int size_ )
@@ -343,7 +372,7 @@ bool HRegex::HMatchIterator::operator == ( HMatchIterator const& mi_ ) const {
 HRegex::HMatchIterator& HRegex::HMatchIterator::operator ++ ( void ) {
 	M_PROLOG
 	M_ASSERT( _string && ( _match._start >= 0 ) );
-	char const* match( _owner->matches( _string + _match._start + 1, &_match._size ) );
+	char const* match( _owner->matches_impl( _string + _match._start + 1, &_match._size ) );
 	_match._start = match ? static_cast<int>( match - _string ) : -1;
 	return ( *this );
 	M_EPILOG
