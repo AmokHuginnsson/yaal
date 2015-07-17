@@ -253,7 +253,8 @@ char const* HRegex::matches_impl( char const* string_, int* matchLength_ ) const
 	char const* ptr = NULL;
 	int matchLength = 0;
 	regmatch_t match;
-	if ( ! ( _lastError = ::regexec( _compiled.get<regex_t>(), string_, 1, &match, 0 ) ) ) {
+	_lastError = ::regexec( _compiled.get<regex_t>(), string_, 1, &match, 0 );
+	if ( ! _lastError ) {
 		matchLength = static_cast<int>( match.rm_eo - match.rm_so );
 		ptr = string_ + match.rm_so;
 	}
@@ -263,13 +264,20 @@ char const* HRegex::matches_impl( char const* string_, int* matchLength_ ) const
 	M_EPILOG
 }
 
-HRegex::groups_t HRegex::groups_impl( char const* string_, int len_ ) const {
+HRegex::groups_t HRegex::groups_impl( char const* string_ ) const {
 	M_PROLOG
 	groups_t g;
 	typedef yaal::hcore::HArray<regmatch_t> matches_t;
-	int expectedGroupCount( static_cast<int>( count( string_, string_ + len_, '(' ) + 1 ) );
+	int expectedGroupCount( static_cast<int>( count( _pattern.begin(), _pattern.end(), '(' ) + 1 ) );
 	matches_t matchesBuffer( expectedGroupCount );
-	if ( ! ( _lastError = ::regexec( _compiled.get<regex_t>(), string_, static_cast<size_t>( expectedGroupCount ), matchesBuffer.data(), 0 ) ) ) {
+	_lastError = ::regexec(
+		_compiled.get<regex_t>(),
+		string_,
+		static_cast<size_t>( expectedGroupCount ),
+		matchesBuffer.data(),
+		0
+	);
+	if ( ! _lastError ) {
 		int groupCount( 0 );
 		for ( regmatch_t const& m : matchesBuffer ) {
 			if ( m.rm_so >= 0 ) {
@@ -307,7 +315,7 @@ bool HRegex::matches( HString const& str_ ) const {
 
 HRegex::groups_t HRegex::groups( yaal::hcore::HString const& string_ ) const {
 	M_PROLOG
-	return ( groups_impl( string_.raw(), static_cast<int>( string_.get_size() ) ) );
+	return ( groups_impl( string_.raw() ) );
 	M_EPILOG
 }
 

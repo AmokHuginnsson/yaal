@@ -144,7 +144,7 @@ private:
 	HRegex& operator = ( HRegex const& ) = delete;
 	void error_clear( void ) const;
 	char const* matches_impl( char const*, int* ) const;
-	groups_t groups_impl( char const*, int ) const;
+	groups_t groups_impl( char const* ) const;
 };
 
 /*! \brief Instance of single match for given regex.
