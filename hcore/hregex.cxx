@@ -254,7 +254,7 @@ char const* HRegex::matches_impl( char const* string_, int* matchLength_ ) const
 	int matchLength = 0;
 	regmatch_t match;
 	if ( ! ( _lastError = ::regexec( _compiled.get<regex_t>(), string_, 1, &match, 0 ) ) ) {
-		matchLength = match.rm_eo - match.rm_so;
+		matchLength = static_cast<int>( match.rm_eo - match.rm_so );
 		ptr = string_ + match.rm_so;
 	}
 	( *matchLength_ ) = matchLength;
@@ -278,7 +278,7 @@ HRegex::groups_t HRegex::groups_impl( char const* string_, int len_ ) const {
 		}
 		g.reserve( groupCount );
 		for ( regmatch_t const& m : matchesBuffer ) {
-			g.emplace_back( m.rm_so, m.rm_eo - m.rm_so );
+			g.emplace_back( static_cast<int>( m.rm_so ), static_cast<int>( m.rm_eo - m.rm_so ) );
 		}
 	}
 	return ( g );
