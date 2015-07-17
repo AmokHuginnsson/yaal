@@ -48,8 +48,14 @@ HCompiledRegularExpression::HCompiledRegularExpression( HHuginn::HClass const* c
 	return;
 }
 
-HHuginn::value_t HCompiledRegularExpression::groups( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const&, int ) {
-	return ( _none_ );
+HHuginn::value_t HCompiledRegularExpression::groups(
+	huginn::HThread* thread_,
+	HHuginn::HObject* object_,
+	HHuginn::values_t const& values_,
+	int position_
+) {
+	HCompiledRegularExpression* cre( static_cast<HCompiledRegularExpression*>( object_ ) );
+	return ( cre->do_groups( thread_, values_, position_ ) );
 }
 
 HHuginn::value_t HCompiledRegularExpression::match(
@@ -117,6 +123,27 @@ HHuginn::value_t HCompiledRegularExpression::do_match(
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 	HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HObject::get_class() ) );
 	return ( make_pointer<HRegularExpressionMatch>( creClass->remc(), make_resource<HRegex>( _regex->copy() ), values_[0] ) );
+}
+
+HHuginn::value_t HCompiledRegularExpression::do_groups(
+	huginn::HThread*,
+	HHuginn::values_t const& values_,
+	int position_
+) {
+	char const name[] = "CompiledRegularExpression.groups";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+	yaal::hcore::HString const& string( get_string( values_[0] ) );
+	HRegex::groups_t g( _regex->groups( string ) );
+	HHuginn::value_t v( _none_ );
+	if ( ! g.empty() ) {
+		v = make_pointer<HHuginn::HList>();
+		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
+		for ( HRegex::HMatch const& m : g ) {
+			l->push_back( make_pointer<HHuginn::HString>( string.substr( m.start(), m.size() ) ) );
+		}
+	}
+	return ( v );
 }
 
 HHuginn::class_t HCompiledRegularExpression::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
