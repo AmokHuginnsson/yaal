@@ -70,6 +70,7 @@ public:
 private:
 	bool    _initialized;          /*!< is regex initialized */
 	HString _pattern;              /*!< original regex pattern */
+	compile_t _flags;              /*!< flags used to compile this regex */
 	HChunk  _compiled;             /*!< compiled regular expression for search patterns */
 	mutable int _lastError;
 	/* All fields below are conceptually a memory cache. */
@@ -82,33 +83,25 @@ public:
 	HRegex( void );
 	HRegex( HRegex&& );
 	HRegex& operator = ( HRegex&& );
-	/*! \brief Construct regex with regex rule.
-	 *
-	 * \param regex - regex pattern to construct regex object.
-	 * \param flags - configure various aspects of regex behavior.
-	 */
-	HRegex( char const* regex, compile_t flags = COMPILE::DEFAULT );
+
 	/*! \brief Construct regex with regex rule.
 	 *
 	 * \param regex - regex pattern to construct regex object.
 	 * \param flags - configure various aspects of regex behavior.
 	 */
 	HRegex( HString const& regex, compile_t flags = COMPILE::DEFAULT );
+
 	/*! \brief Destroy regex object and free all resources.
 	 */
 	~HRegex( void );
-	/*! \brief Parse regular expression pattern with configuration and prepare for matches retrieval.
-	 *
-	 * \param regex - regular expression pattern to match against.
-	 * \param flags - configure various aspects of regex behavior.
-	 */
-	bool compile( char const* regex, compile_t flags = COMPILE::DEFAULT );
+
 	/*! \brief Parse regular expression pattern with configuration and prepare for matches retrieval.
 	 *
 	 * \param regex - regular expression pattern to match against.
 	 * \param flags - configure various aspects of regex behavior.
 	 */
 	bool compile( HString const& regex, compile_t flags = COMPILE::DEFAULT );
+
 	/*! \brief Test if this regex object is a valid regex object.
 	 *
 	 * \return True iff this regex object is valid.
@@ -119,8 +112,10 @@ public:
 	 * \return Original regex pattern.
 	 */
 	HString const& pattern( void ) const;
+
 	HString const& error( void ) const;
 	int error_code( void ) const;
+
 	/*! \brief Find substring matching this patter in given string.
 	 *
 	 * \param string_ - string to search through.
@@ -129,7 +124,7 @@ public:
 	 * Parameter must be raw memory pointer for HMatchIterator returns
 	 * raw memory pointers to input string while dereferenced.
 	 */
-	HMatchIterator find( char const* const string_ ) const;
+	HMatchIterator find( char const* string_ ) const;
 	HMatchIterator find( HString const& string_ ) const;
 	HMatchIterator end( void ) const;
 	/*! \brief Tell if given string matches regex.
@@ -140,23 +135,24 @@ public:
 	bool matches( HString const& string_ ) const;
 	void swap( HRegex& );
 	void clear( void );
+	HRegex copy( void ) const;
 private:
 	HRegex( HRegex const& ) = delete;
 	HRegex& operator = ( HRegex const& ) = delete;
 	void error_clear( void ) const;
-	char const* matches( char const*, int long* ) const;
+	char const* matches( char const*, int* ) const;
 };
 
 /*! \brief Instance of single match for given regex.
  */
 class HRegex::HMatch {
-	int long _size;
-	char const* _start;
+	int _start;
+	int _size;
 public:
-	int long size() const;
-	char const* raw() const;
+	int start() const;
+	int size() const;
 private:
-	HMatch( char const*, int long );
+	HMatch( int, int );
 	friend class HRegex::HMatchIterator;
 };
 
@@ -164,6 +160,7 @@ private:
  */
 class HRegex::HMatchIterator : public iterator_interface<HMatch, iterator_category::forward> {
 	HRegex const* _owner;
+	char const* _string;
 	HRegex::HMatch _match;
 public:
 	typedef iterator_interface<HMatch, iterator_category::forward> base_type;
@@ -175,7 +172,7 @@ public:
 	HMatchIterator( HMatchIterator const& );
 	HMatchIterator& operator = ( HMatchIterator const& );
 private:
-	HMatchIterator( HRegex const*, char const*, int long );
+	HMatchIterator( HRegex const*, char const*, int, int );
 	friend class HRegex;
 };
 

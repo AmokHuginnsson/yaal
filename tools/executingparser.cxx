@@ -3518,15 +3518,15 @@ hcore::HString::const_iterator HRegex::do_parse( HExecutingParser* executingPars
 		if ( ( it != _regex->end() ) && ( it->size() <= ( last_ - scan ) ) ) {
 			position_t pos( position( executingParser_, start ) );
 			if ( !! _actionString ) {
-				add_execution_step( executingParser_, start, call( _actionString, hcore::HString( it->raw(), it->size() ) ) );
+				add_execution_step( executingParser_, start, call( _actionString, hcore::HString( scan + it->start(), it->size() ) ) );
 			} else if ( !! _actionStringPosition ) {
-				add_execution_step( executingParser_, start, call( _actionStringPosition, hcore::HString( it->raw(), it->size() ), pos ) );
+				add_execution_step( executingParser_, start, call( _actionStringPosition, hcore::HString( scan + it->start(), it->size() ), pos ) );
 			} else if ( !! _action ) {
 				add_execution_step( executingParser_, start, call( _action ) );
 			} else if ( !! _actionPosition ) {
 				add_execution_step( executingParser_, start, call( _actionPosition, pos ) );
 			}
-			scan = it->raw() + it->size();
+			scan += ( it->start() + it->size() );
 			matched = true;
 		}
 	}

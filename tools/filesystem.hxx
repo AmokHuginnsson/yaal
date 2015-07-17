@@ -73,6 +73,8 @@ struct FILE_TYPE {
 
 typedef yaal::hcore::HArray<path_t> find_result;
 
+find_result find( yaal::hcore::HString const&, yaal::hcore::HString const&,
+		int = 0, int = meta::max_signed<int>::value, FILE_TYPE::enum_t = FILE_TYPE::ALL );
 find_result find( yaal::hcore::HString const&, yaal::hcore::HRegex const&,
 		int = 0, int = meta::max_signed<int>::value, FILE_TYPE::enum_t = FILE_TYPE::ALL );
 

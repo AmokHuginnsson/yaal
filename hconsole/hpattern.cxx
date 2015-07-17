@@ -244,21 +244,26 @@ char const* HPattern::matches( char const* const string_,
 			HRegex::HMatchIterator it( _regex.find( string_ ) );
 			if ( it != _regex.end() ) {
 				matchLength = it->size();
-				if ( matchLength > 0 )
-					ptr = it->raw();
-			} else
+				if ( matchLength > 0 ) {
+					ptr = string_ + it->start();
+				}
+			} else {
 				_errorCause = _pattern;
+			}
 		} else {
-			if ( _ignoreCase )
+			if ( _ignoreCase ) {
 				ptr = ::strcasestr( string_, _pattern.raw() );
-			else
+			} else {
 				ptr = ::strstr( string_, _pattern.raw() );
-			if ( ptr )
+			}
+			if ( ptr ) {
 				matchLength = _simpleMatchLength;
+			}
 		}
 	}
-	if ( matchLength_ )
+	if ( matchLength_ ) {
 		( *matchLength_ ) = matchLength;
+	}
 	return ( ptr );
 	M_EPILOG
 }

@@ -77,6 +77,7 @@ HRegex::match_t const HRegex::MATCH::DEFAULT = HRegex::MATCH::NONE;
 HRegex::HRegex( void )
 	: _initialized( false )
 	, _pattern()
+	, _flags( COMPILE::DEFAULT )
 	, _compiled( sizeof ( regex_t ) )
 	, _lastError( 0 )
 	, _errorBuffer()
@@ -90,6 +91,7 @@ HRegex::HRegex( void )
 HRegex::HRegex( HRegex&& reg_ )
 	: _initialized( reg_._initialized )
 	, _pattern( yaal::move( reg_._pattern ) )
+	, _flags( yaal::move( reg_._flags ) )
 	, _compiled( yaal::move( reg_._compiled ) )
 	, _lastError( reg_._lastError )
 	, _errorBuffer( yaal::move( reg_._errorBuffer ) )
@@ -97,21 +99,8 @@ HRegex::HRegex( HRegex&& reg_ )
 	, _errorMessage( yaal::move( reg_._errorMessage ) ) {
 	M_PROLOG
 	reg_._initialized = false;
+	reg_._flags = COMPILE::DEFAULT;
 	reg_._lastError = 0;
-	return;
-	M_EPILOG
-}
-
-HRegex::HRegex( char const* const pattern_, compile_t flags_ )
-	: _initialized( false )
-	, _pattern()
-	, _compiled( sizeof ( regex_t ) )
-	, _lastError( 0 )
-	, _errorBuffer()
-	, _errorCause()
-	, _errorMessage() {
-	M_PROLOG
-	compile( pattern_, flags_ );
 	return;
 	M_EPILOG
 }
@@ -119,6 +108,7 @@ HRegex::HRegex( char const* const pattern_, compile_t flags_ )
 HRegex::HRegex( HString const& pattern_, compile_t flags_ )
 	: _initialized( false )
 	, _pattern()
+	, _flags( flags_ )
 	, _compiled( sizeof ( regex_t ) )
 	, _lastError( 0 )
 	, _errorBuffer()
@@ -152,6 +142,7 @@ void HRegex::swap( HRegex& reg_ ) {
 		using yaal::swap;
 		swap( _initialized, reg_._initialized );
 		swap( _pattern, reg_._pattern );
+		swap( _flags, reg_._flags );
 		swap( _compiled, reg_._compiled );
 		swap( _lastError, reg_._lastError );
 		swap( _errorBuffer, reg_._errorBuffer );
@@ -169,9 +160,17 @@ void HRegex::clear( void ) {
 	_initialized = false;
 	_lastError = 0;
 	_pattern.clear();
+	_flags = COMPILE::DEFAULT;
 	_errorCause.clear();
 	_errorMessage.clear();
 	return;
+	M_EPILOG
+}
+
+HRegex HRegex::copy( void ) const {
+	M_PROLOG
+	HRegex regex( _pattern, _flags );
+	return ( regex );
 	M_EPILOG
 }
 
@@ -186,14 +185,7 @@ void HRegex::error_clear( void ) const {
 
 bool HRegex::compile( HString const& pattern_, compile_t flags_ ) {
 	M_PROLOG
-	return ( compile( pattern_.raw(), flags_ ) );
-	M_EPILOG
-}
-
-bool HRegex::compile( char const* pattern_, compile_t flags_ ) {
-	M_PROLOG
-	M_ASSERT( pattern_ );
-	if ( ! pattern_[0] ) {
+	if ( pattern_.is_empty() ) {
 		throw HRegexException( _errMsgHRegex_[ ERROR::EMPTY_PATTERN ] );
 	}
 	error_clear();
@@ -204,7 +196,7 @@ bool HRegex::compile( char const* pattern_, compile_t flags_ ) {
 	cflags |= ( ( flags_ & COMPILE::EXTENDED ) ? REG_EXTENDED : 0 );
 	cflags |= ( ( flags_ & COMPILE::IGNORE_CASE ) ? REG_ICASE : 0 );
 	cflags |= ( ( flags_ & COMPILE::NEWLINE ) ? REG_NEWLINE : 0 );
-	_lastError = ::regcomp( _compiled.get<regex_t>(), pattern_, cflags );
+	_lastError = ::regcomp( _compiled.get<regex_t>(), pattern_.raw(), cflags );
 	if ( ! _lastError ) {
 		_initialized = true;
 		_pattern = pattern_;
@@ -251,7 +243,7 @@ int HRegex::error_code( void ) const {
 	return ( _lastError );
 }
 
-char const* HRegex::matches( char const* string_, int long* matchLength_ ) const {
+char const* HRegex::matches( char const* string_, int* matchLength_ ) const {
 	M_PROLOG
 	M_ASSERT( string_ && matchLength_ );
 	if ( ! _initialized ) {
@@ -259,7 +251,7 @@ char const* HRegex::matches( char const* string_, int long* matchLength_ ) const
 	}
 	error_clear();
 	char const* ptr = NULL;
-	int long matchLength = 0;
+	int matchLength = 0;
 	regmatch_t match;
 	if ( ! ( _lastError = ::regexec( _compiled.get<regex_t>(), string_, 1, &match, 0 ) ) ) {
 		matchLength = match.rm_eo - match.rm_so;
@@ -270,11 +262,11 @@ char const* HRegex::matches( char const* string_, int long* matchLength_ ) const
 	M_EPILOG
 }
 
-HRegex::HMatchIterator HRegex::find( char const* const str_ ) const {
+HRegex::HMatchIterator HRegex::find( char const* str_ ) const {
 	M_ASSERT( str_ );
-	int long len( 0 );
-	char const* start = matches( str_, &len );
-	HMatchIterator it( this, start, len );
+	int len( 0 );
+	char const* start( matches( str_, &len ) );
+	HMatchIterator it( this, str_, start ? static_cast<int>( start - str_ ) : -1, len );
 	return ( it );
 }
 
@@ -283,37 +275,49 @@ HRegex::HMatchIterator HRegex::find( HString const& str_ ) const {
 }
 
 HRegex::HMatchIterator HRegex::end( void ) const {
-	return ( HMatchIterator( this, NULL, 0 ) );
+	return ( HMatchIterator( this, nullptr, -1, 0 ) );
 }
 
 bool HRegex::matches( HString const& str_ ) const {
 	return ( find( str_ ) != end() );
 }
 
-HRegex::HMatch::HMatch( char const* start_, int long size_ )
-	: _size( size_ ), _start( start_ ) {
+HRegex::HMatch::HMatch( int start_, int size_ )
+	: _start( start_ )
+	, _size( size_ ) {
 }
 
-int long HRegex::HMatch::size( void ) const {
-	return ( _size );
-}
-
-char const* HRegex::HMatch::raw( void ) const {
+int HRegex::HMatch::start( void ) const {
 	return ( _start );
 }
 
-HRegex::HMatchIterator::HMatchIterator( HRegex const* owner_, char const* const start_, int long len_ )
-	: base_type(), _owner( owner_ ), _match( start_, len_ ) {
+int HRegex::HMatch::size( void ) const {
+	return ( _size );
+}
+
+HRegex::HMatchIterator::HMatchIterator(
+	HRegex const* owner_,
+	char const* string_,
+	int start_,
+	int len_
+) : base_type()
+	, _owner( owner_ )
+	, _string( string_ )
+	, _match( start_, len_ ) {
 }
 
 HRegex::HMatchIterator::HMatchIterator( HMatchIterator const& it_ )
-	: base_type(), _owner( it_._owner ), _match( it_._match ) {
+	: base_type()
+	, _owner( it_._owner )
+	, _string( it_._string )
+	, _match( it_._match ) {
 }
 
 HRegex::HMatchIterator& HRegex::HMatchIterator::operator = ( HRegex::HMatchIterator const& it_ ) {
 	if ( &it_ != this ) {
 		_owner = it_._owner;
 		_match = it_._match;
+		_string = it_._string;
 	}
 	return ( *this );
 }
@@ -338,8 +342,9 @@ bool HRegex::HMatchIterator::operator == ( HMatchIterator const& mi_ ) const {
 
 HRegex::HMatchIterator& HRegex::HMatchIterator::operator ++ ( void ) {
 	M_PROLOG
-	M_ASSERT( _match._start );
-	_match._start = _owner->matches( _match._start + 1, &_match._size );
+	M_ASSERT( _string && ( _match._start >= 0 ) );
+	char const* match( _owner->matches( _string + _match._start + 1, &_match._size ) );
+	_match._start = match ? static_cast<int>( match - _string ) : -1;
 	return ( *this );
 	M_EPILOG
 }

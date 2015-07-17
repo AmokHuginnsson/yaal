@@ -244,6 +244,12 @@ void remove_directory( path_t const& path_, DIRECTORY_MODIFICATION directoryModi
 	}
 }
 
+find_result find( yaal::hcore::HString const& in, yaal::hcore::HString const& pattern_,
+		int minDepth_, int maxDepth_, FILE_TYPE::enum_t fileType_ ) {
+	HRegex regex( pattern_ );
+	return ( find( in, regex, minDepth_, maxDepth_, fileType_ ) );
+}
+
 find_result find( yaal::hcore::HString const& in, yaal::hcore::HRegex const& pattern_,
 		int minDepth_, int maxDepth_, FILE_TYPE::enum_t fileType_ ) {
 	find_result result;

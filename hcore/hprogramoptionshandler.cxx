@@ -142,7 +142,7 @@ bool substitute_environment( HString& string_ ) {
 		HRegex pattern( "[$][{][^{}]+[}]", HRegex::COMPILE::EXTENDED );
 		HRegex::HMatchIterator it = pattern.find( string_.raw() );
 		if ( it != pattern.end() ) {
-			HString var = string_.mid( static_cast<int long>( it->raw() - string_.raw() ), it->size() );
+			HString var = string_.mid( it->start(), it->size() );
 			HString name = var.mid( 2, it->size() - 3 );
 			char const* start = ::getenv( name.raw() );
 			string_.replace( var, start ? start : "" );
