@@ -110,7 +110,7 @@ private:
 		if ( f->is_opened() ) {
 			v = make_pointer<HStream>( _streamClass.raw(), stream );
 		} else {
-			thread_->raise( _exceptionClass.raw(), f->get_error() );
+			thread_->raise( _exceptionClass.raw(), f->get_error(), position_ );
 		}
 		return ( v );
 		M_EPILOG

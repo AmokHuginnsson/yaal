@@ -521,10 +521,10 @@ void OCompiler::add_return_statement( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-void OCompiler::add_throw_statement( executing_parser::position_t ) {
+void OCompiler::add_throw_statement( executing_parser::position_t position_ ) {
 	M_PROLOG
 	M_ASSERT( ! f()._compilationStack.is_empty() );
-	current_scope()->add_statement( make_pointer<HThrow>( current_expression() ) );
+	current_scope()->add_statement( make_pointer<HThrow>( _huginn, current_expression(), position_.get() ) );
 	reset_expression();
 	return;
 	M_EPILOG

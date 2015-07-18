@@ -70,7 +70,7 @@ public:
 			}
 		}
 		if ( v == _none_ ) {
-			thread_->raise( static_cast<HMathematics*>( object_ )->_exceptionClass.raw(), "bad domain" );
+			thread_->raise( static_cast<HMathematics*>( object_ )->_exceptionClass.raw(), "bad domain", position_ );
 		}
 		return ( v );
 		M_EPILOG

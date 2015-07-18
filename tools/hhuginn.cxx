@@ -1074,6 +1074,21 @@ HHuginn::value_t HHuginn::get_package( yaal::hcore::HString const& name_ ) {
 	M_EPILOG
 }
 
+yaal::hcore::HString HHuginn::source_name( void ) const {
+	M_PROLOG
+	return ( _source->name() );
+	M_EPILOG
+}
+
+yaal::hcore::HString HHuginn::where( int position_ ) const {
+	M_PROLOG
+	hcore::HString w( source_name() );
+	HHuginn::HErrorCoordinate ec( get_coordinate( position_ ) );
+	w.append( ":" ).append( ec.line() ).append( ":" ).append( ec.column() );
+	return ( w );
+	M_EPILOG
+}
+
 int HHuginn::error_position( void ) const {
 	M_PROLOG
 	return ( _source->error_position( _errorPosition ) );

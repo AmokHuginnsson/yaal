@@ -261,6 +261,8 @@ public:
 	int error_position( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;
 	HErrorCoordinate get_coordinate( int ) const;
+	yaal::hcore::HString source_name( void ) const;
+	yaal::hcore::HString where( int ) const;
 	yaal::hcore::HString error_message( void ) const;
 	void set_input_stream( yaal::hcore::HStreamInterface& );
 	void set_input_stream( yaal::hcore::HStreamInterface::ptr_t );
@@ -745,9 +747,12 @@ public:
 	typedef HHuginn::HObject base_type;
 private:
 	yaal::hcore::HString _message;
+	yaal::hcore::HString _where;
 public:
 	HException( HHuginn::HClass const*, yaal::hcore::HString const& );
 	yaal::hcore::HString const& what( void ) const;
+	yaal::hcore::HString const& where( void ) const;
+	void set_where( yaal::hcore::HString const& );
 private:
 	virtual value_t do_clone( void ) const override;
 };

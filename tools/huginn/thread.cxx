@@ -144,9 +144,11 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 	M_EPILOG
 }
 
-void HThread::raise( HHuginn::HClass const* class_, yaal::hcore::HString const& message_ ) {
+void HThread::raise( HHuginn::HClass const* class_, yaal::hcore::HString const& message_, int position_ ) {
 	M_PROLOG
-	break_execution( HFrame::STATE::EXCEPTION, make_pointer<HHuginn::HException>( class_, message_ ) );
+	HHuginn::value_t e( make_pointer<HHuginn::HException>( class_, message_ ) );
+	static_cast<HHuginn::HException*>( e.raw() )->set_where( _huginn->where( position_ ) );
+	break_execution( HFrame::STATE::EXCEPTION, e );
 	return;
 	M_EPILOG
 }

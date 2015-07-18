@@ -64,7 +64,7 @@ public:
 	void flush_runtime_exception( void );
 	bool has_runtime_exception( void ) const;
 	bool has_exception( void ) const;
-	void raise( HHuginn::HClass const*, yaal::hcore::HString const& );
+	void raise( HHuginn::HClass const*, yaal::hcore::HString const&, int );
 	HHuginn& huginn( void );
 private:
 	HThread( HThread const& ) = delete;

@@ -60,13 +60,15 @@ public:
 				? HHuginn::HClass::field_names_t{}
 				: HHuginn::HClass::field_names_t{
 					"what",
+					"where",
 					"message"
 				},
 			base_
 				? HHuginn::values_t{}
 				: HHuginn::values_t{
 					make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::what, _1, _2, _3, _4 ) ),
-					make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::what, _1, _2, _3, _4 ) )
+					make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::where, _1, _2, _3, _4 ) ),
+					make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::message, _1, _2, _3, _4 ) )
 				}
 		) {
 		return;
@@ -88,6 +90,28 @@ private:
 			values_, 0, 0, position_
 		);
 		return ( make_pointer<HHuginn::HString>( e->what() ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t where( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_ ) );
+		verify_arg_count(
+			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".where",
+			values_, 0, 0, position_
+		);
+		return ( make_pointer<HHuginn::HString>( e->where() ) );
+		M_EPILOG
+	}
+	static HHuginn::value_t message( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_ ) );
+		verify_arg_count(
+			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".message",
+			values_, 0, 0, position_
+		);
+		HString message( e->where() );
+		message.append( ": " ).append( e->what() );
+		return ( make_pointer<HHuginn::HString>( message ) );
 		M_EPILOG
 	}
 };
@@ -113,12 +137,21 @@ HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& nam
 
 HHuginn::HException::HException( HHuginn::HClass const* class_, yaal::hcore::HString const& message_ )
 	: HObject( class_ )
-	, _message( message_ ) {
+	, _message( message_ )
+	, _where() {
 	return;
 }
 
 yaal::hcore::HString const& HHuginn::HException::what( void ) const {
 	return ( _message );
+}
+
+yaal::hcore::HString const& HHuginn::HException::where( void ) const {
+	return ( _where );
+}
+
+void HHuginn::HException::set_where( yaal::hcore::HString const& where_ ) {
+	_where = where_;
 }
 
 HHuginn::value_t HHuginn::HException::do_clone( void ) const {

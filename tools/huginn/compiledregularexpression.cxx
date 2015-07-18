@@ -106,7 +106,7 @@ private:
 		if ( regex->is_valid() ) {
 			v = make_pointer<HCompiledRegularExpression>( this, yaal::move( regex ) );
 		} else {
-			thread_->raise( _exceptionClass.raw(), regex->error() );
+			thread_->raise( _exceptionClass.raw(), regex->error(), position_ );
 		}
 		return ( v );
 		M_EPILOG

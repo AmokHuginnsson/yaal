@@ -31,14 +31,18 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "expression.hxx"
 #include "thread.hxx"
 
+using namespace yaal::hcore;
+
 namespace yaal {
 
 namespace tools {
 
 namespace huginn {
 
-HThrow::HThrow( HHuginn::expression_t const& expression_ )
-	: _expression( expression_ ) {
+HThrow::HThrow( HHuginn* huginn_, HHuginn::expression_t const& expression_, int position_ )
+	: _huginn( huginn_ )
+	, _expression( expression_ )
+	, _position( position_ ) {
 	return;
 }
 
@@ -47,7 +51,12 @@ void HThrow::do_execute( HThread* thread_ ) const {
 	if ( !! _expression ) {
 		_expression->execute( thread_ );
 	}
-	thread_->break_execution( HFrame::STATE::EXCEPTION, thread_->current_frame()->result() );
+	HHuginn::value_t v( thread_->current_frame()->result() );
+	HHuginn::HException* e( dynamic_cast<HHuginn::HException*>( v.raw() ) );
+	if ( e != nullptr ) {
+		e->set_where( _huginn->where( _position ) );
+	}
+	thread_->break_execution( HFrame::STATE::EXCEPTION, v );
 	return;
 	M_EPILOG
 }
