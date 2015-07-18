@@ -325,9 +325,7 @@ void HMutex::lock( void ) {
 void HMutex::unlock( void ) {
 	M_PROLOG
 	_owner = HThread::INVALID;
-	int error = ::pthread_mutex_unlock( _buf.get<pthread_mutex_t>() );
-	if ( ! ( _type & TYPE::RECURSIVE ) )
-		M_ENSURE( error != EPERM );
+	M_ENSURE( ::pthread_mutex_unlock( _buf.get<pthread_mutex_t>() ) == 0 );
 	return;
 	M_EPILOG
 }
