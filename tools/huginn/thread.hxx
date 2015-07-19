@@ -57,7 +57,7 @@ public:
 	void pop_frame( void );
 	HFrame* current_frame( void );
 	HFrame const* current_frame( void ) const;
-	void break_execution( HFrame::STATE, HHuginn::value_t const& = HHuginn::value_t(), int = 0 );
+	void break_execution( HFrame::STATE, HHuginn::value_t const& = HHuginn::value_t(), int = 0, int = 0 );
 	void set_exception( yaal::hcore::HString const&, int );
 	bool can_continue( void ) const;
 	yaal::hcore::HThread::id_t id( void ) const;

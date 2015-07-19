@@ -56,7 +56,7 @@ void HThrow::do_execute( HThread* thread_ ) const {
 	if ( e != nullptr ) {
 		e->set_where( _huginn->where( _position ) );
 	}
-	thread_->break_execution( HFrame::STATE::EXCEPTION, v );
+	thread_->break_execution( HFrame::STATE::EXCEPTION, v, 0, _position );
 	return;
 	M_EPILOG
 }

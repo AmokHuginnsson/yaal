@@ -110,21 +110,24 @@ bool HThread::can_continue( void ) const {
 	M_EPILOG
 }
 
-void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& value_, int level_ ) {
+void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& value_, int level_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( state_ != HFrame::STATE::NORMAL );
 	int level( 0 );
-	HFrame* f( current_frame() );
-	HFrame* target( f );
-	int no( f->number() );
-	while ( f ) {
-		target = f;
-		if ( f->is_loop() ) {
+	HFrame* target( current_frame() );
+	int no( target->number() );
+	while ( target ) {
+		if ( target->is_loop() ) {
 			++ level;
 		}
-		f->break_execution( state_ );
-		HFrame* parent( f->parent() );
+		target->break_execution( state_ );
+		HFrame* parent( target->parent() );
 		if ( ! parent ) {
+			if ( ( state_ == HFrame::STATE::EXCEPTION ) || ( state_ == HFrame::STATE::RUNTIME_EXCEPTION ) ) {
+				target = nullptr;
+			} else {
+				M_ASSERT( state_ == HFrame::STATE::RETURN );
+			}
 			break;
 		} else if ( ( state_ == HFrame::STATE::RETURN ) && ( parent->number() != no ) ) {
 			break;
@@ -135,10 +138,22 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 		} else if ( ( state_ == HFrame::STATE::EXCEPTION ) && target->has_catch() ) {
 			break;
 		}
-		f = parent;
+		target = parent;
 	}
 	if ( target ) {
 		target->set_result( value_ );
+	} else if ( state_ == HFrame::STATE::EXCEPTION ) {
+		/*
+		 * Uncaught STATE::EXCEPTION becomes STATE::RUNTIME_EXCEPTION!
+		 */
+		HHuginn::HException const* e( dynamic_cast<HHuginn::HException const*>( value_.raw() ) );
+		_exceptionMessage = "Uncaught exception ";
+		_exceptionPosition = position_;
+		if ( e ) {
+			_exceptionMessage.append( e->what() );
+		} else {
+			_exceptionMessage.append( "of type " ).append( value_->type()->name() );
+		}
 	}
 	return;
 	M_EPILOG
@@ -148,7 +163,7 @@ void HThread::raise( HHuginn::HClass const* class_, yaal::hcore::HString const& 
 	M_PROLOG
 	HHuginn::value_t e( make_pointer<HHuginn::HException>( class_, message_ ) );
 	static_cast<HHuginn::HException*>( e.raw() )->set_where( _huginn->where( position_ ) );
-	break_execution( HFrame::STATE::EXCEPTION, e );
+	break_execution( HFrame::STATE::EXCEPTION, e, 0, position_ );
 	return;
 	M_EPILOG
 }
