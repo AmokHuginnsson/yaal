@@ -1216,6 +1216,13 @@ void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_EPILOG
 }
 
+void HHuginn::clear_arguments( void ) {
+	M_PROLOG
+	_argv->clear();
+	return;
+	M_EPILOG
+}
+
 void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ ) {
 	M_PROLOG
 	_source->dump_preprocessed( stream_ );

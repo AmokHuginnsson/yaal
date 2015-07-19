@@ -90,6 +90,17 @@ inline HHuginn::value_t pop( huginn::HThread*, HHuginn::HObject* object_, HHugin
 	M_EPILOG
 }
 
+inline HHuginn::value_t clear( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "list.clear", values_, 0, 0, position_ );
+	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_ ) );
+	M_ASSERT( l != nullptr );
+	l->clear();
+	M_ASSERT( !! l->get_pointer() );
+	return ( object_->get_pointer() );
+	M_EPILOG
+}
+
 }
 
 HHuginn::HClass _listClass_(
@@ -98,10 +109,12 @@ HHuginn::HClass _listClass_(
 	nullptr,
 	/* methods */ {
 		"add",
-		"pop"
+		"pop",
+		"clear"
 	}, {
 		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::add, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::pop, _1, _2, _3, _4 ) )
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::pop, _1, _2, _3, _4 ) ),
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::clear, _1, _2, _3, _4 ) )
 	}
 );
 
@@ -135,6 +148,10 @@ void HHuginn::HList::pop_back( void ) {
 
 int long HHuginn::HList::size( void ) const {
 	return ( _data.get_size() );
+}
+
+void HHuginn::HList::clear( void ) {
+	_data.clear();
 }
 
 HHuginn::value_t HHuginn::HList::get( int long long index_ ) {

@@ -241,9 +241,14 @@ public:
 	 */
 	bool execute( void );
 
-	/*! \brief Dump Huginn Virtual Machine state.
+	/*! \brief Call (execute) Huginn function.
+	 *
+	 * \param name_ - name of the function to call.
+	 * \param argv_ - array of arguments that shall be passed to function call.
+	 * \param position_ - call context information for error reporting.
+	 * \return Result returned by called Huginn function.
 	 */
-	value_t call( yaal::hcore::HString const&, values_t const&, int );
+	value_t call( yaal::hcore::HString const& name_, values_t const& argv_, int posiiton_ );
 
 	/*! \brief Get value returned by program's main().
 	 *
@@ -251,12 +256,25 @@ public:
 	 */
 	value_t result( void ) const;
 
+	/*! \brief Dump Huginn Virtual Machine state onto given stream.
+	 *
+	 * \param stream_ - stream where VM state shall be dumped.
+	 */
 	void dump_vm_state( yaal::hcore::HStreamInterface& );
 	huginn::HThread* current_thread( void );
 	huginn::HFrame* current_frame( void );
 	void create_function( executing_parser::position_t );
 	void create_class( executing_parser::position_t );
-	void add_argument( yaal::hcore::HString const& );
+
+	/*! \brief Add argument for main() function.
+	 *
+	 * \param value_ - value of argument being added.
+	 */
+	void add_argument( yaal::hcore::HString const& value_ );
+
+	/*! \brief Remove all argument currently held for main() function.
+	 */
+	void clear_arguments( void );
 	void dump_preprocessed_source( yaal::hcore::HStreamInterface& );
 	int error_position( void ) const;
 	HErrorCoordinate error_coordinate( void ) const;
@@ -602,6 +620,7 @@ public:
 	void push_back( value_t const& );
 	void pop_back( void );
 	int long size( void ) const;
+	void clear( void );
 	value_t get( int long long );
 	value_t get_ref( int long long );
 	values_t const& value( void ) const;
