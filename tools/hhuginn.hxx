@@ -278,6 +278,7 @@ public:
 	value_t get_package( yaal::hcore::HString const& );
 	yaal::hcore::HString get_snippet( int, int ) const;
 	void register_class( class_t );
+	static void disable_grammar_verification( void );
 private:
 	void finalize_compilation( void );
 	HClass const* commit_class( yaal::hcore::HString const& );

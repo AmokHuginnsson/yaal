@@ -834,6 +834,10 @@ HHuginn::value_t HHuginn::HObjectReference::do_clone( void ) const {
 
 HHuginn::flag_t HHuginn::_grammarVerified{ false };
 
+void HHuginn::disable_grammar_verification( void ) {
+	_grammarVerified.store( true );
+}
+
 HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY )
 	, _idGenerator{ HType::builtin_type_count() }
