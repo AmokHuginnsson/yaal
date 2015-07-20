@@ -81,10 +81,10 @@ public:
 			}
 		)
 		, _exceptionClass( exceptionClass_ )
-		, _queryClass( huginn::HQuery::get_class( huginn_ ) ) {
+		, _queryClass( huginn::HQuery::get_class( huginn_, exceptionClass_ ) ) {
 		return;
 	}
-	HHuginn::HClass const* remc( void ) const {
+	HHuginn::HClass const* query_class( void ) const {
 		return ( _queryClass.raw() );
 	}
 private:
@@ -108,7 +108,7 @@ HHuginn::value_t HDatabaseConnection::do_query(
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HObject::get_class() ) );
-	return ( make_pointer<huginn::HQuery>( dbcClass->remc(), _database->prepare_query( get_string( values_[0] ) ) ) );
+	return ( make_pointer<huginn::HQuery>( dbcClass->query_class(), _database->prepare_query( get_string( values_[0] ) ) ) );
 }
 
 HHuginn::class_t HDatabaseConnection::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {

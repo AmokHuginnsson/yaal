@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "query.hxx"
+#include "queryresult.hxx"
 #include "tools/huginn/helper.hxx"
 
 using namespace yaal;
@@ -72,10 +73,16 @@ HHuginn::value_t HQuery::execute( tools::huginn::HThread*, HHuginn::HObject* obj
 	M_EPILOG
 }
 
-HHuginn::class_t HQuery::get_class( HHuginn* huginn_ ) {
-	M_PROLOG
-	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+class HQueryClass : public HHuginn::HClass {
+	HHuginn::class_t const& _exceptionClass;
+	HHuginn::class_t _queryResultClass;
+public:
+	typedef HQueryClass this_type;
+	typedef HHuginn::HClass base_type;
+	HQueryClass(
+		HHuginn* huginn_,
+		HHuginn::class_t const& exceptionClass_
+	) : HHuginn::HClass(
 			huginn_,
 			HHuginn::HType::register_type( "Query", huginn_ ),
 			nullptr,
@@ -87,6 +94,22 @@ HHuginn::class_t HQuery::get_class( HHuginn* huginn_ ) {
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQuery::bind, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQuery::execute, _1, _2, _3, _4 ) )
 			}
+		)
+		, _exceptionClass( exceptionClass_ )
+		, _queryResultClass( huginn::HQueryResult::get_class( huginn_, exceptionClass_ ) ) {
+		return;
+	}
+	HHuginn::HClass const* query_result_classc( void ) const {
+		return ( _queryResultClass.raw() );
+	}
+};
+
+HHuginn::class_t HQuery::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
+	M_PROLOG
+	HHuginn::class_t c(
+		make_pointer<HQueryClass>(
+			huginn_,
+			exceptionClass_
 		)
 	);
 	return ( c );

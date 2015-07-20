@@ -94,7 +94,7 @@ public:
 		, _regularExpressionMatchClass( HRegularExpressionMatch::get_class( huginn_ ) ) {
 		return;
 	}
-	HHuginn::HClass const* remc( void ) const {
+	HHuginn::HClass const* regular_expression_match_class( void ) const {
 		return ( _regularExpressionMatchClass.raw() );
 	}
 private:
@@ -124,7 +124,7 @@ HHuginn::value_t HCompiledRegularExpression::do_match(
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 	HCompiledRegularExpressionClass const* creClass( static_cast<HCompiledRegularExpressionClass const*>( HObject::get_class() ) );
-	return ( make_pointer<HRegularExpressionMatch>( creClass->remc(), make_resource<HRegex>( _regex->copy() ), values_[0] ) );
+	return ( make_pointer<HRegularExpressionMatch>( creClass->regular_expression_match_class(), make_resource<HRegex>( _regex->copy() ), values_[0] ) );
 }
 
 HHuginn::value_t HCompiledRegularExpression::do_groups(

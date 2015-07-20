@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  query.hxx - this file is integral part of `yaal' project.
+  queryresult.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -26,11 +26,11 @@ Copyright:
 
 /* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
 
-#ifndef YAAL_DBWRAPPER_HUGINN_QUERY_HXX_INCLUDED
-#define YAAL_DBWRAPPER_HUGINN_QUERY_HXX_INCLUDED 1
+#ifndef YAAL_DBWRAPPER_HUGINN_QUERYRESULT_HXX_INCLUDED
+#define YAAL_DBWRAPPER_HUGINN_QUERYRESULT_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "dbwrapper/hquery.hxx"
+#include "dbwrapper/hrecordset.hxx"
 
 namespace yaal {
 
@@ -38,13 +38,16 @@ namespace dbwrapper {
 
 namespace huginn {
 
-class HQuery : public tools::HHuginn::HObject {
-	dbwrapper::HQuery::ptr_t _query;
+class HQueryResult : public tools::HHuginn::HIterable {
+	dbwrapper::HRecordSet::ptr_t _recordSet;
 public:
-	HQuery( tools::HHuginn::HClass const*, dbwrapper::HQuery::ptr_t const& );
-	static tools::HHuginn::value_t bind( tools::huginn::HThread*, tools::HHuginn::HObject* object_, tools::HHuginn::values_t const&, int );
-	static tools::HHuginn::value_t execute( tools::huginn::HThread*, tools::HHuginn::HObject* object_, tools::HHuginn::values_t const&, int );
+	HQueryResult( tools::HHuginn::HClass const*, dbwrapper::HRecordSet::ptr_t const& );
+	static tools::HHuginn::value_t column_name( tools::huginn::HThread*, tools::HHuginn::HObject*, tools::HHuginn::values_t const&, int );
+	static tools::HHuginn::value_t field_count( tools::huginn::HThread*, tools::HHuginn::HObject*, tools::HHuginn::values_t const&, int );
+	static tools::HHuginn::value_t insert_id( tools::huginn::HThread*, tools::HHuginn::HObject*, tools::HHuginn::values_t const&, int );
 	static tools::HHuginn::class_t get_class( tools::HHuginn*, tools::HHuginn::class_t const& );
+private:
+	virtual HIterator do_iterator( void ) override;
 };
 
 }
@@ -53,5 +56,5 @@ public:
 
 }
 
-#endif /* #ifndef YAAL_DBWRAPPER_HUGINN_QUERY_HXX_INCLUDED */
+#endif /* #ifndef YAAL_DBWRAPPER_HUGINN_QUERYRESULT_HXX_INCLUDED */
 
