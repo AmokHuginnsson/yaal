@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "query.hxx"
 #include "queryresult.hxx"
+#include "tools/huginn/thread.hxx"
 #include "tools/huginn/helper.hxx"
 
 using namespace yaal;
@@ -49,28 +50,6 @@ HQuery::HQuery(
 ) : HObject( class_ )
 	, _query( query_ ) {
 	return;
-}
-
-HHuginn::value_t HQuery::bind( tools::huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
-	M_PROLOG
-	char const name[] = "Query.bind";
-	verify_arg_count( name, values_, 2, 2, position_ );
-	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, false, position_ );
-	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
-	HQuery* q( static_cast<HQuery*>( object_ ) );
-	q = q ? nullptr : nullptr;
-	return ( _none_ );
-	M_EPILOG
-}
-
-HHuginn::value_t HQuery::execute( tools::huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
-	M_PROLOG
-	char const name[] = "Query.execute";
-	verify_arg_count( name, values_, 0, 0, position_ );
-	HQuery* q( static_cast<HQuery*>( object_ ) );
-	q = q ? nullptr : nullptr;
-	return ( _none_ );
-	M_EPILOG
 }
 
 class HQueryClass : public HHuginn::HClass {
@@ -99,10 +78,49 @@ public:
 		, _queryResultClass( huginn::HQueryResult::get_class( huginn_, exceptionClass_ ) ) {
 		return;
 	}
-	HHuginn::HClass const* query_result_classc( void ) const {
+	HHuginn::HClass const* query_result_class( void ) const {
 		return ( _queryResultClass.raw() );
 	}
+	HHuginn::HClass const* exception_class( void ) const {
+		return ( _exceptionClass.raw() );
+	}
 };
+
+HHuginn::value_t HQuery::bind( tools::huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Query.bind";
+	verify_arg_count( name, values_, 2, 2, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, false, position_ );
+	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+	HQuery* q( static_cast<HQuery*>( object_ ) );
+	HQueryClass const* qc( static_cast<HQueryClass const*>( q->HObject::get_class() ) );
+	HHuginn::value_t v( _none_ );
+	try {
+		q->_query->bind( static_cast<int>( get_integer( values_[0] ) ), get_string( values_[1] ) );
+		v = object_->get_pointer();
+	} catch ( HException const& e ) {
+		thread_->raise( qc->exception_class(), e.what(), position_ );
+	}
+	return ( v );
+	M_EPILOG
+}
+
+HHuginn::value_t HQuery::execute( tools::huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "Query.execute";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HQuery* q( static_cast<HQuery*>( object_ ) );
+	HQueryClass const* qc( static_cast<HQueryClass const*>( q->HObject::get_class() ) );
+	HHuginn::value_t v( _none_ );
+	try {
+		HRecordSet::ptr_t rs( q->_query->execute() );
+		v = make_pointer<HQueryResult>( qc->query_result_class(), rs );
+	} catch ( HException const& e ) {
+		thread_->raise( qc->exception_class(), e.what(), position_ );
+	}
+	return ( v );
+	M_EPILOG
+}
 
 HHuginn::class_t HQuery::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG

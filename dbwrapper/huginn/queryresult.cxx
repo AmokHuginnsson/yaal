@@ -46,9 +46,9 @@ class HQueryResultIterator : public HIteratorInterface {
 	HRecordSet::ptr_t _recordSet;
 	HRecordSet::HIterator _it;
 public:
-	HQueryResultIterator( HRecordSet::ptr_t const& recordSet_, HRecordSet::HIterator const& it_ )
+	HQueryResultIterator( HRecordSet::ptr_t const& recordSet_, HRecordSet::HIterator&& it_ )
 		: _recordSet( recordSet_ )
-		, _it( it_ ) {
+		, _it( yaal::move( it_ ) ) {
 		return;
 	}
 protected:
@@ -94,6 +94,24 @@ HHuginn::value_t HQueryResult::column_name( tools::huginn::HThread*, HHuginn::HO
 	M_EPILOG
 }
 
+HHuginn::value_t HQueryResult::field_count( tools::huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "QueryResult.field_count";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HQueryResult* qr( static_cast<HQueryResult*>( object_ ) );
+	return ( make_pointer<HHuginn::HInteger>( qr->_recordSet->get_field_count() ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HQueryResult::insert_id( tools::huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "QueryResult.insert_id";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HQueryResult* qr( static_cast<HQueryResult*>( object_ ) );
+	return ( make_pointer<HHuginn::HInteger>( qr->_recordSet->get_insert_id() ) );
+	M_EPILOG
+}
+
 HHuginn::HIterable::HIterator HQueryResult::do_iterator( void ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HQueryResultIterator( _recordSet, _recordSet->begin() ) );
 	return ( HIterator( yaal::move( impl ) ) );
@@ -112,14 +130,21 @@ public:
 			HHuginn::HType::register_type( "QueryResult", huginn_ ),
 			nullptr,
 			HHuginn::HClass::field_names_t{
-				"column_name"
+				"column_name",
+				"field_count",
+				"insert_id"
 			},
 			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::column_name, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::column_name, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::field_count, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::insert_id, _1, _2, _3, _4 ) )
 			}
 		)
 		, _exceptionClass( exceptionClass_ ) {
 		return;
+	}
+	HHuginn::HClass const* exception_class( void ) const {
+		return ( _exceptionClass.raw() );
 	}
 };
 

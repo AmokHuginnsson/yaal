@@ -60,6 +60,26 @@ HHuginn::value_t HDatabaseConnection::query(
 	return ( dbc->do_query( thread_, values_, position_ ) );
 }
 
+HHuginn::value_t HDatabaseConnection::table_names(
+	tools::huginn::HThread* thread_,
+	HHuginn::HObject* object_,
+	HHuginn::values_t const& values_,
+	int position_
+) {
+	HDatabaseConnection* dbc( static_cast<HDatabaseConnection*>( object_ ) );
+	return ( dbc->do_table_names( thread_, values_, position_ ) );
+}
+
+HHuginn::value_t HDatabaseConnection::column_names(
+	tools::huginn::HThread* thread_,
+	HHuginn::HObject* object_,
+	HHuginn::values_t const& values_,
+	int position_
+) {
+	HDatabaseConnection* dbc( static_cast<HDatabaseConnection*>( object_ ) );
+	return ( dbc->do_column_names( thread_, values_, position_ ) );
+}
+
 class HDatabaseConnectionClass : public HHuginn::HClass {
 	HHuginn::class_t const& _exceptionClass;
 	HHuginn::class_t _queryClass;
@@ -74,10 +94,14 @@ public:
 			HHuginn::HType::register_type( "DatabaseConnection", huginn_ ),
 			nullptr,
 			HHuginn::HClass::field_names_t{
-				"query"
+				"query",
+				"table_names",
+				"column_names"
 			},
 			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::query, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::query, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::table_names, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::column_names, _1, _2, _3, _4 ) )
 			}
 		)
 		, _exceptionClass( exceptionClass_ )
@@ -87,20 +111,29 @@ public:
 	HHuginn::HClass const* query_class( void ) const {
 		return ( _queryClass.raw() );
 	}
+	HHuginn::HClass const* exception_class( void ) const {
+		return ( _exceptionClass.raw() );
+	}
 private:
-	virtual HHuginn::value_t do_create_instance( tools::huginn::HThread*, HHuginn::values_t const& values_, int position_ ) const {
+	virtual HHuginn::value_t do_create_instance( tools::huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) const {
 		M_PROLOG
 		char const n[] = "DatabaseConnection.contructor";
 		verify_arg_count( n, values_, 1, 1, position_ );
 		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, true, position_ );
-		HHuginn::value_t v( make_pointer<HDatabaseConnection>( this, dbwrapper::util::connect( get_string( values_[0] ) ) ) );
+		HHuginn::value_t v( _none_ );
+		try {
+			dbwrapper::database_ptr_t db( dbwrapper::util::connect( get_string( values_[0] ) ) );
+			v = make_pointer<HDatabaseConnection>( this, db );
+		} catch ( HException const& e ) {
+			thread_->raise( exception_class(), e.what(), position_ );
+		}
 		return ( v );
 		M_EPILOG
 	}
 };
 
 HHuginn::value_t HDatabaseConnection::do_query(
-	tools::huginn::HThread*,
+	tools::huginn::HThread* thread_,
 	HHuginn::values_t const& values_,
 	int position_
 ) {
@@ -108,7 +141,59 @@ HHuginn::value_t HDatabaseConnection::do_query(
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HObject::get_class() ) );
-	return ( make_pointer<huginn::HQuery>( dbcClass->query_class(), _database->prepare_query( get_string( values_[0] ) ) ) );
+	HHuginn::value_t v( _none_ );
+	try {
+		dbwrapper::HQuery::ptr_t q( _database->prepare_query( get_string( values_[0] ) ) );
+		v = make_pointer<huginn::HQuery>( dbcClass->query_class(), q );
+	} catch ( HException const& e ) {
+		thread_->raise( dbcClass->exception_class(), e.what(), position_ );
+	}
+	return ( v );
+}
+
+HHuginn::value_t HDatabaseConnection::do_table_names(
+	tools::huginn::HThread* thread_,
+	HHuginn::values_t const& values_,
+	int position_
+) {
+	char const name[] = "DatabaseConnection.table_names";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HObject::get_class() ) );
+	HHuginn::value_t v( _none_ );
+	try {
+		HDataBase::table_list_t tl( _database->get_tables() );
+		v = make_pointer<HHuginn::HList>();
+		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
+		for ( yaal::hcore::HString const& tn : tl ) {
+			l->push_back( make_pointer<HHuginn::HString>( tn ) );
+		}
+	} catch ( HException const& e ) {
+		thread_->raise( dbcClass->exception_class(), e.what(), position_ );
+	}
+	return ( v );
+}
+
+HHuginn::value_t HDatabaseConnection::do_column_names(
+	tools::huginn::HThread* thread_,
+	HHuginn::values_t const& values_,
+	int position_
+) {
+	char const name[] = "DatabaseConnection.table_names";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HObject::get_class() ) );
+	HHuginn::value_t v( _none_ );
+	try {
+		HDataBase::column_list_t cl( _database->get_columns( get_string( values_[0] ) ) );
+		v = make_pointer<HHuginn::HList>();
+		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
+		for ( yaal::hcore::HString const& cn : cl ) {
+			l->push_back( make_pointer<HHuginn::HString>( cn ) );
+		}
+	} catch ( HException const& e ) {
+		thread_->raise( dbcClass->exception_class(), e.what(), position_ );
+	}
+	return ( v );
 }
 
 HHuginn::class_t HDatabaseConnection::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
