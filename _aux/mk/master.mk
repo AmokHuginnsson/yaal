@@ -60,7 +60,7 @@ endef
 
 MAIN_TARGETS=debug release reldeb relassert prof cov
 .DEFAULT_GOAL:=$(firstword $(notdir $(foreach T,$(MAIN_TARGETS),$(if $(wildcard ./build/$(T)/Makefile.mk),$(T))) $(DEFAULT_TARGET) release))
-CONFIG_ITEMS=Makefile.mk config.hxx yaalrc yaal.pc
+CONFIG_ITEMS=Makefile.mk configure.mk config.hxx yaalrc yaal.pc
 CONF_release=
 CONF_reldeb=--enable-reldeb
 CONF_relassert=--enable-relassert
