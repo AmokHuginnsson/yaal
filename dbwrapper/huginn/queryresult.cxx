@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "queryresult.hxx"
+#include "tools/huginn/thread.hxx"
 #include "tools/huginn/iterator.hxx"
 #include "tools/huginn/helper.hxx"
 
@@ -42,6 +43,22 @@ namespace dbwrapper {
 
 namespace huginn {
 
+namespace {
+HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator& it_ ) {
+	HHuginn::value_t v( make_pointer<HHuginn::HList>() );
+	HHuginn::HList* row( static_cast<HHuginn::HList*>( v.raw() ) );
+	for ( int i( 0 ), fieldCount( rs_->get_field_count() ); i < fieldCount; ++ i ) {
+		HRecordSet::value_t f( it_[i] );
+		if ( !! f ) {
+			row->push_back( make_pointer<HHuginn::HString>( yaal::move( *f ) ) );
+		} else {
+			row->push_back( _none_ );
+		}
+	}
+	return ( v );
+}
+}
+
 class HQueryResultIterator : public HIteratorInterface {
 	HRecordSet::ptr_t _recordSet;
 	HRecordSet::HIterator _it;
@@ -53,17 +70,7 @@ public:
 	}
 protected:
 	virtual HHuginn::value_t do_value( void ) override {
-		HHuginn::value_t v( make_pointer<HHuginn::HList>() );
-		HHuginn::HList* row( static_cast<HHuginn::HList*>( v.raw() ) );
-		for ( int i( 0 ); i < _recordSet->get_field_count(); ++ i ) {
-			HRecordSet::value_t f( _it[i] );
-			if ( !! f ) {
-				row->push_back( make_pointer<HHuginn::HString>( yaal::move( *f ) ) );
-			} else {
-				row->push_back( _none_ );
-			}
-		}
-		return ( v );
+		return ( fetch_row( _recordSet, _it ) );
 	}
 	virtual bool do_is_valid( void ) override {
 		return ( _it != _recordSet->end() );
@@ -80,7 +87,8 @@ HQueryResult::HQueryResult(
 	HHuginn::HClass const* class_,
 	HRecordSet::ptr_t const& recordSet_
 ) : HIterable( class_ )
-	, _recordSet( recordSet_ ) {
+	, _recordSet( recordSet_ )
+	, _it( _recordSet->begin() ) {
 	return;
 }
 
@@ -112,8 +120,17 @@ HHuginn::value_t HQueryResult::insert_id( tools::huginn::HThread*, HHuginn::HObj
 	M_EPILOG
 }
 
+HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "QueryResult.has_next";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HQueryResult* qr( static_cast<HQueryResult*>( object_ ) );
+	return ( make_pointer<HHuginn::HBoolean>( qr->_it != qr->_recordSet->end() ) );
+	M_EPILOG
+}
+
 HHuginn::HIterable::HIterator HQueryResult::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HQueryResultIterator( _recordSet, _recordSet->begin() ) );
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HQueryResultIterator( _recordSet, yaal::move( _it ) ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
@@ -132,12 +149,16 @@ public:
 			HHuginn::HClass::field_names_t{
 				"column_name",
 				"field_count",
-				"insert_id"
+				"insert_id",
+				"has_next",
+				"fetch_row"
 			},
 			HHuginn::values_t{
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::column_name, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::field_count, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::insert_id, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::insert_id, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::has_next, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::fetch_row, _1, _2, _3, _4 ) )
 			}
 		)
 		, _exceptionClass( exceptionClass_ ) {
@@ -147,6 +168,23 @@ public:
 		return ( _exceptionClass.raw() );
 	}
 };
+
+HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "QueryResult.fetch_row";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HQueryResult* qr( static_cast<HQueryResult*>( object_ ) );
+	HQueryResultClass const* qrc( static_cast<HQueryResultClass const*>( qr->HObject::get_class() ) );
+	HHuginn::value_t v( _none_ );
+	try {
+		v = huginn::fetch_row( qr->_recordSet, qr->_it );
+		++ qr->_it;
+	} catch ( HException const& e ) {
+		thread_->raise( qrc->exception_class(), e.what(), position_ );
+	}
+	return ( v );
+	M_EPILOG
+}
 
 HHuginn::class_t HQueryResult::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG

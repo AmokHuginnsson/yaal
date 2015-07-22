@@ -40,11 +40,14 @@ namespace huginn {
 
 class HQueryResult : public tools::HHuginn::HIterable {
 	dbwrapper::HRecordSet::ptr_t _recordSet;
+	dbwrapper::HRecordSet::HIterator _it;
 public:
 	HQueryResult( tools::HHuginn::HClass const*, dbwrapper::HRecordSet::ptr_t const& );
 	static tools::HHuginn::value_t column_name( tools::huginn::HThread*, tools::HHuginn::HObject*, tools::HHuginn::values_t const&, int );
 	static tools::HHuginn::value_t field_count( tools::huginn::HThread*, tools::HHuginn::HObject*, tools::HHuginn::values_t const&, int );
 	static tools::HHuginn::value_t insert_id( tools::huginn::HThread*, tools::HHuginn::HObject*, tools::HHuginn::values_t const&, int );
+	static tools::HHuginn::value_t has_next( tools::huginn::HThread*, tools::HHuginn::HObject*, tools::HHuginn::values_t const&, int );
+	static tools::HHuginn::value_t fetch_row( tools::huginn::HThread*, tools::HHuginn::HObject*, tools::HHuginn::values_t const&, int );
 	static tools::HHuginn::class_t get_class( tools::HHuginn*, tools::HHuginn::class_t const& );
 private:
 	virtual HIterator do_iterator( void ) override;
