@@ -166,6 +166,52 @@ struct boolean_value<false_type> {
 };
 /* \endcond */
 
+/*! \brief Perform compile time boolean AND on types.
+ *
+ * \tparam T1,...Tn - boolean value type.
+ * \retval value - true iff all types T1,...Tn are true types.
+ * \retval type - true_type iff all types T1,...Tn are true types.
+ */
+template<typename...>
+struct and_op;
+
+/* \cond */
+template<typename head_t>
+struct and_op<head_t> {
+	static bool const value = same_type<head_t, true_type>::value;
+	typedef typename boolean_type<value>::type type;
+};
+
+template<typename head_t, typename... tail_t>
+struct and_op<head_t, tail_t...> {
+	static bool const value = and_op<tail_t...>::value && same_type<head_t, true_type>::value;
+	typedef typename boolean_type<value>::type type;
+};
+/* \endcond */
+
+/*! \brief Perform compile time boolean OR on types.
+ *
+ * \tparam T1,...Tn - boolean value type.
+ * \retval value - true iff at least one of types T1,...Tn is true type.
+ * \retval type - true_type iff at least one of types T1,...Tn is true type.
+ */
+template<typename...>
+struct or_op;
+
+/* \cond */
+template<typename head_t>
+struct or_op<head_t> {
+	static bool const value = same_type<head_t, true_type>::value;
+	typedef typename boolean_type<value>::type type;
+};
+
+template<typename head_t, typename... tail_t>
+struct or_op<head_t, tail_t...> {
+	static bool const value = or_op<tail_t...>::value || same_type<head_t, true_type>::value;
+	typedef typename boolean_type<value>::type type;
+};
+/* \endcond */
+
 /*! \brief Search for given type in a type list.
  *
  * \tparam tType - look for this type in given type set.
@@ -419,6 +465,36 @@ struct make_reference {
 };
 /* \endcond */
 
+/*! \brief Meta function used to append rvalue reference to given type.
+ *
+ * \tparam tType - type to add rvalue reference trait to.
+ * \retval type - a type with rvalue reference trait added.
+ */
+template<typename tType>
+struct add_rvalue_reference;
+
+/*! cond */
+template<>
+struct add_rvalue_reference<void> {
+	typedef void type;
+};
+
+template<>
+struct add_rvalue_reference<void const> {
+	typedef void type;
+};
+
+template<typename tType>
+struct add_rvalue_reference {
+	typedef tType&& type;
+};
+/* \endcond */
+
+/*! \brief Define compile-time value for types with inaccessible constructors.
+ */
+template<typename tType>
+typename add_rvalue_reference<tType>::type declval();
+
 /*! \brief Meta function used to strip reference from type.
  *
  * \tparam T - type to strip reference from.
@@ -576,6 +652,25 @@ template<typename T>
 struct is_pointer {
 	typedef typename is_pointer_helper<typename strip_cv<T>::type>::type type;
 	static bool const value = boolean_value<type>::value;
+};
+
+/*! \brief Check if one type is convertible to another type.
+ *
+ * \tparam from_t - source type.
+ * \tparam to_t - destination type.
+ * \retval value - true iff from_t is convertible to to_t, else false.
+ * \retval type - true_type iff from_t is convertible to to_t, else false_type.
+ */
+template<typename from_t, typename to_t>
+struct is_convertible {
+	template <typename to_x_t>
+	static void test_try( to_x_t );
+	template<typename from_x_t, typename to_x_t, typename = decltype( test_try<to_x_t>( declval<from_x_t>() ) )>
+	static trait::true_type test( int );
+	template<typename, typename>
+	static trait::false_type test( ... );
+	static bool const value = sizeof ( test<from_t, to_t>( 0 ) ) == sizeof ( trait::true_type );
+	typedef typename boolean_type<value>::type type;
 };
 
 /*! \brief Copy constness (or lack of it) from on type to another.
