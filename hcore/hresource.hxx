@@ -223,10 +223,11 @@ public:
 	pointer get( void ) {
 		return ( _holder._resource );
 	}
-	void reset( void ) {
-		if ( _holder._resource != nullptr ) {
-			_holder.do_delete();
-			_holder._resource = nullptr;
+	void reset( pointer ptr_ = pointer() ) {
+		holder old( _holder );
+		_holder._resource = ptr_;
+		if ( old._resource != nullptr ) {
+			old.do_delete();
 		}
 		return;
 	}
