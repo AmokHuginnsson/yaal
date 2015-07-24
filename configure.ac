@@ -260,6 +260,12 @@ int main( int, char const** )
 	}]])], [AC_DEFINE([HAVE_ICONV_INPUT_CONST],[],[Is your iconv() input args const?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
+AC_MSG_CHECKING([whether basename is declared in cstring])
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstring>
+	int main( int, char** ){ char* p( NULL ); basename( p ); return ( 0 ); }]])],
+	[AC_DEFINE([HAVE_BASENAME_IN_CSTRING],[1],[Does your basename() is included in cstring header?]) AC_MSG_RESULT([yes])],
+	[AC_MSG_RESULT([no])])
+
 AC_MSG_CHECKING([whether arg for basename is const])
 RESULT=["no"]
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstring>
@@ -401,11 +407,6 @@ AC_CHECK_FUNCS([clock_gettime timer_create getline memrchr strnlen getaddrinfo g
 AC_CHECK_DECLS([strtold],[],[],[#include <cstdlib>])
 AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])
-AC_MSG_CHECKING([whether basename is declared in cstring])
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstring>
-	int main( int, char** ){ char* p( NULL ); basename( p ); return ( 0 ); }]])],
-	[AC_DEFINE([HAVE_BASENAME_IN_CSTRING],[1],[Does your basename() is included in cstring header?]) AC_MSG_RESULT([yes])],
-	[AC_MSG_RESULT([no])])
 AC_CHECK_DECLS([RLIMIT_AS, RLIMIT_NPROC],[],[],[#include <sys/resource.h>])
 AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
