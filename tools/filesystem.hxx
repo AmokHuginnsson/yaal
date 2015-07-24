@@ -54,6 +54,17 @@ bool is_other( path_t const& );
 i64_t file_size( path_t const& );
 void remove( path_t const& );
 void rename( path_t const&, path_t const& );
+path_t dirname( path_t const& );
+path_t basename( path_t const& );
+
+namespace path {
+
+extern path_t const ROOT;
+extern path_t const CURRENT;
+extern path_t const PARENT;
+static char const SEPARATOR = '/';
+
+}
 
 enum class DIRECTORY_MODIFICATION {
 	EXACT,

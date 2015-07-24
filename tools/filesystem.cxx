@@ -47,6 +47,15 @@ namespace tools {
 
 namespace filesystem {
 
+namespace path {
+
+path_t const ROOT = "/";
+path_t const CURRENT = ".";
+path_t const PARENT = "..";
+path_t const SEPARATOR_STR = "/";
+
+}
+
 typedef FileSystem this_type;
 
 namespace {
@@ -83,14 +92,14 @@ path_t normalize_path( path_t const& path_ ) {
 	int origLen( -1 );
 	while ( origLen != static_cast<int>( path.get_length() ) ) {
 		origLen = static_cast<int>( path.get_length() );
-		path.replace( "/./", "/" );
-		path.replace( "//", "/" );
+		path.replace( "/./", path::SEPARATOR_STR );
+		path.replace( "//", path::SEPARATOR_STR );
 	}
 	int pos( 0 );
 	int back( 0 );
 	while ( ( back = static_cast<int>( path.find( "/../", pos ) ) ) != HString::npos ) {
 		pos = back + 1;
-		int prev( static_cast<int>( path.find_last( '/', back > 0 ? back - 1 : 0 ) ) );
+		int prev( static_cast<int>( path.find_last( path::SEPARATOR, back > 0 ? back - 1 : 0 ) ) );
 		if ( prev != HString::npos ) {
 			if ( ! ( ( ( back - prev ) == 3 ) && ( path[prev + 1] == '.' ) && ( path[prev + 2] == '.' ) ) ) {
 				path.erase( prev + 1, back - prev + 3 );
@@ -101,7 +110,7 @@ path_t normalize_path( path_t const& path_ ) {
 		}
 	}
 	if ( path.find( "/..", path.get_length() - 3 ) != HString::npos ) {
-		int prev( static_cast<int>( path.find_last( '/', path.get_length() - 4 ) ) );
+		int prev( static_cast<int>( path.find_last( path::SEPARATOR, path.get_length() - 4 ) ) );
 		if ( prev != HString::npos ) {
 			if ( ! ( ( ( back - prev ) == 3 ) && ( path[prev + 1] == '.' ) && ( path[prev + 2] == '.' ) ) ) {
 				path.erase( prev ? prev : 1 );
@@ -113,7 +122,7 @@ path_t normalize_path( path_t const& path_ ) {
 	if ( path.find( "./" ) == 0 ) {
 		path.erase( 0, 2 );
 	}
-	if ( ( ( path.get_length() > 1 ) || ! ( absolute || path.is_empty() ) ) && ( path[path.get_length() - 1] == '/' ) ) {
+	if ( ( ( path.get_length() > 1 ) || ! ( absolute || path.is_empty() ) ) && ( path[path.get_length() - 1] == path::SEPARATOR ) ) {
 		path.erase( path.get_length() - 1 );
 	}
 	if ( path.find( "/.", path.get_length() - 2 ) != HString::npos ) {
@@ -124,7 +133,7 @@ path_t normalize_path( path_t const& path_ ) {
 		}
 	} else if ( path == "/.." ) {
 		path.erase( absolute ? 1 : 0 );
-	} else if ( path == "." ) {
+	} else if ( path == path::CURRENT ) {
 		path.clear();
 	}
 	return ( path );
@@ -171,6 +180,48 @@ i64_t file_size( path_t const& path_ ) {
 	M_PROLOG
 	struct stat s;
 	return ( do_stat( &s, path_ ) ? static_cast<i64_t>( s.st_size ) : -1 );
+	M_EPILOG
+}
+
+path_t dirname( path_t const& path_ ) {
+	M_PROLOG
+	path_t dname( path_ );
+	bool degenerated( false );
+	if ( dname.is_empty() ) {
+		degenerated = true;
+	}	else if ( dname != path::ROOT ) {
+		dname.trim_right( path::SEPARATOR_STR.raw() );
+		if ( ! dname.is_empty() ) {
+			int long delimPos( dname.find_last( path::SEPARATOR ) );
+			if ( delimPos != HString::npos ) {
+				dname.erase( delimPos > 0 ? delimPos : 1 );
+			} else {
+				degenerated = true;
+			}
+		} else {
+			M_ASSERT( !"bad code path"[0] );
+		}
+	}
+	if ( degenerated ) {
+		dname.assign( "." );
+	}
+	return ( dname );
+	M_EPILOG
+}
+
+path_t basename( path_t const& path_ ) {
+	M_PROLOG
+	path_t bname( path_ );
+	if ( ( bname != path::ROOT )
+		&& ( bname != path::CURRENT )
+		&& ( bname != path::PARENT ) ) {
+		bname.trim_right( path::SEPARATOR_STR.raw() );
+		int long delimPos( bname.find_last( path::SEPARATOR ) );
+		if ( delimPos != HString::npos ) {
+			bname.shift_left( delimPos + 1 );
+		}
+	}
+	return ( bname );
 	M_EPILOG
 }
 
