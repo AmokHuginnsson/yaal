@@ -236,7 +236,7 @@ AC_MSG_RESULT([$RESULT])
 AC_MSG_CHECKING([whether strftime() returns required buffer size])
 RESULT=["no"]
 AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <ctime>
-int main( int, char const* const* const )
+int main( int, char const** )
 	{
 	time_t t( time( NULL ) );
 	struct tm broken;
@@ -249,7 +249,7 @@ AC_MSG_RESULT([$RESULT])
 AC_MSG_CHECKING([whether contents of input buffer for iconv() is const])
 RESULT=["no"]
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <iconv.h>
-int main( int, char const* const* const )
+int main( int, char const** )
 	{
 	iconv_t conv( 0 );
 	size_t size( 0 );
@@ -263,38 +263,38 @@ AC_MSG_RESULT([$RESULT])
 AC_MSG_CHECKING([whether arg for basename is const])
 RESULT=["no"]
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <cstring>
-int main( int, char const* const* const )
-	{
+#ifndef HAVE_BASENAME_IN_CSTRING
+# include <libgen.h>
+#endif /* not HAVE_BASENAME_IN_CSTRING */
+int main( int, char const** ) {
 	char const* const p( NULL );
 	basename( p );
 	return ( 0 );
-	}]])], [AC_DEFINE([HAVE_BASENAME_ARG_CONST],[],[Is your argument to basename a pointer to const?])] RESULT=["yes"])
+}]])], [AC_DEFINE([HAVE_BASENAME_ARG_CONST],[],[Is your argument to basename a pointer to const?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether gethostbyname_r is GNU variant])
 RESULT=["no"]
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <netdb.h>
-int main( int, char const* const* const )
-	{
+int main( int, char const** ) {
 	int i( 0 );
 	char* p( 0 );
 	struct hostent h, * ph( 0 );
 	::gethostbyname_r( "", &h, p, 0, &ph, &i );
 	return ( 0 );
-	}]])], [AC_DEFINE([HAVE_GNU_GETHOSTBYNAME_R],[],[Is gethostbyname_r a GNU flavour?])] RESULT=["yes"])
+}]])], [AC_DEFINE([HAVE_GNU_GETHOSTBYNAME_R],[],[Is gethostbyname_r a GNU flavour?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 AC_MSG_CHECKING([whether gethostbyaddr_r is GNU variant])
 RESULT=["no"]
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include<netdb.h>
-int main( int, char const* const* const )
-	{
+int main( int, char const** ) {
 	int i( 0 );
 	char* p( 0 );
 	struct hostent h, * ph( 0 );
 	::gethostbyaddr_r( 0, 0, 0, &h, p, 0, &ph, &i );
 	return ( 0 );
-	}]])], [AC_DEFINE([HAVE_GNU_GETHOSTBYADDR_R],[],[Is gethostbyaddr_r a GNU flavour?])] RESULT=["yes"])
+}]])], [AC_DEFINE([HAVE_GNU_GETHOSTBYADDR_R],[],[Is gethostbyaddr_r a GNU flavour?])] RESULT=["yes"])
 AC_MSG_RESULT([$RESULT])
 
 DEFAULT_DRIVER=["null"]
