@@ -38,7 +38,9 @@ Copyright:
 /*! \cond */
 #if ! defined( HAVE_BASENAME_ARG_CONST )
 #undef basename
-#define basename( x ) basename( const_cast<char*>( x ) )
+inline char const* basename( char const* x ) {
+	return ( basename( const_cast<char*>( x ) ) );
+}
 #endif /* #if ! defined( HAVE_BASENAME_ARG_CONST ) */
 
 #if ! defined( HAVE_STRCASESTR ) || ( HAVE_STRCASESTR == 0 )
