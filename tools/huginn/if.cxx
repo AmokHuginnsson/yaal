@@ -39,13 +39,13 @@ namespace tools {
 namespace huginn {
 
 HIf::HIf(
-	OCompiler::OStatementContext::scope_contexts_t const& ifClause_,
+	OCompiler::OScopeContext::active_scopes_t const& ifClause_,
 	HHuginn::scope_t const& elseClause_
 ) : HStatement(),
 	_ifClauses( ifClause_ ),
 	_elseClause( elseClause_ ) {
-	for ( OCompiler::OScopeContext& sc : _ifClauses ) {
-		sc._scope->make_inline();
+	for ( OCompiler::OActiveScope& as : _ifClauses ) {
+		as._scope->make_inline();
 	}
 	if ( !! _elseClause ) {
 		_elseClause->make_inline();
@@ -60,7 +60,7 @@ void HIf::do_execute( huginn::HThread* thread_ ) const {
 	bool done( false );
 	for ( if_clauses_t::const_iterator it( _ifClauses.begin() ), end( _ifClauses.end() );
 		( it != end ) && ! done && thread_->can_continue(); ++ it ) {
-		it->expression()->execute( thread_ );
+		it->_expression->execute( thread_ );
 		if ( thread_->can_continue() ) {
 			HHuginn::value_t v( f->result() );
 			M_ASSERT( v->type() == HHuginn::TYPE::BOOLEAN );

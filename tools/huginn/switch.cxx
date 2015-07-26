@@ -64,15 +64,15 @@ void HSwitch::do_execute( HThread* thread_ ) const {
 		for ( cases_t::const_iterator it( _cases.begin() ), end( _cases.end() );
 			( it != end ) && thread_->can_continue(); ++ it ) {
 			if ( ! matched ) {
-				it->expression()->execute( thread_ );
+				it->_expression->execute( thread_ );
 			}
 			if ( thread_->can_continue() ) {
 				if ( ! matched ) {
 					if ( v->type() != f->result()->type() ) {
-						throw HHuginn::HHuginnRuntimeException( "Case type does not match switch type.", it->expression()->position() );
+						throw HHuginn::HHuginnRuntimeException( "Case type does not match switch type.", it->_expression->position() );
 					}
 				}
-				if ( matched || value_builtin::equals( v, f->result(), it->expression()->position() ) ) {
+				if ( matched || value_builtin::equals( v, f->result(), it->_expression->position() ) ) {
 					matched = true;
 					it->_scope->execute( thread_ );
 				}

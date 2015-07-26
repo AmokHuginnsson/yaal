@@ -48,38 +48,34 @@ class HFrame;
 struct OCompiler {
 	typedef void ( HExpression::* expression_action_t ) ( HFrame*, int );
 	typedef yaal::hcore::HStack<HFunction::expressions_t> expressions_stack_t;
+	struct OActiveScope {
+		HHuginn::scope_t _scope;
+		HHuginn::expression_t _expression;
+		OActiveScope( HHuginn::scope_t&, HHuginn::expression_t& );
+	};
 	struct OScopeContext {
-		HHuginn* _huginn;
+		typedef yaal::hcore::HArray<OActiveScope> active_scopes_t;
 		HHuginn::scope_t _scope;
 		expressions_stack_t _expressionsStack;
-		OScopeContext( HHuginn* );
-		OScopeContext( HHuginn*, HHuginn::scope_t const&, HHuginn::expression_t const& );
-		HHuginn::expression_t const& expression( void ) const;
-		HHuginn::expression_t& expression( void );
-		void clear( void );
-		OScopeContext( OScopeContext const& ) = default;
-		OScopeContext& operator = ( OScopeContext const& ) = default;
-	};
-	struct OStatementContext {
-		typedef yaal::hcore::HArray<OScopeContext> scope_contexts_t;
-		OScopeContext _scopeContext;
-		scope_contexts_t _scopeContextsChain;
-		HHuginn::scope_t _else;
 		yaal::hcore::HString _type;
 		yaal::hcore::HString _identifier;
 		int _position;
+		active_scopes_t _scopeChain;
+		HHuginn::scope_t _else;
 		HTryCatch::catches_t _catches;
-		OStatementContext( HHuginn* );
+		OScopeContext( void );
+		HHuginn::expression_t const& expression( void ) const;
+		HHuginn::expression_t& expression( void );
 		void clear( void );
 	};
 	struct OFunctionContext {
-		typedef yaal::hcore::HStack<OStatementContext> statement_stack_t;
+		typedef yaal::hcore::HStack<OScopeContext> scope_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::type_t> type_stack_t;
 		yaal::hcore::HString _functionName;
 		HFunction::parameter_names_t _parameters;
 		HFunction::expressions_t _defaultValues;
 		int _lastDefaultValuePosition;
-		statement_stack_t _statementStack;
+		scope_stack_t _scopeStack;
 		operations_t _operations;
 		type_stack_t _valueTypes;
 		int _loopCount;
@@ -88,7 +84,7 @@ struct OCompiler {
 		OPERATOR _lastDereferenceOperator;
 		bool _isAssert;
 		yaal::hcore::HString _lastMemberName;
-		OFunctionContext( HHuginn* );
+		OFunctionContext( void );
 	};
 	typedef yaal::hcore::HStack<OFunctionContext> function_contexts_t;
 	struct OClassContext {

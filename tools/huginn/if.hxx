@@ -42,7 +42,7 @@ class HIf : public HStatement {
 public:
 	typedef HIf this_type;
 	typedef HStatement base_type;
-	typedef OCompiler::OStatementContext::scope_contexts_t if_clauses_t;
+	typedef OCompiler::OScopeContext::active_scopes_t if_clauses_t;
 private:
 	if_clauses_t _ifClauses;
 	HHuginn::scope_t _elseClause;
