@@ -39,7 +39,7 @@ namespace tools {
 namespace huginn {
 
 HIf::HIf(
-	OCompiler::OCompilationFrame::contexts_t const& ifClause_,
+	OCompiler::OStatementContext::scope_contexts_t const& ifClause_,
 	HHuginn::scope_t const& elseClause_
 ) : HStatement(),
 	_ifClauses( ifClause_ ),

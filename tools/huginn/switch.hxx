@@ -42,7 +42,7 @@ class HSwitch : public HStatement {
 public:
 	typedef HSwitch this_type;
 	typedef HStatement base_type;
-	typedef OCompiler::OCompilationFrame::contexts_t cases_t;
+	typedef OCompiler::OStatementContext::scope_contexts_t cases_t;
 private:
 	HHuginn::expression_t _expression;
 	cases_t _cases;

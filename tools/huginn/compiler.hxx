@@ -60,26 +60,26 @@ struct OCompiler {
 		OScopeContext( OScopeContext const& ) = default;
 		OScopeContext& operator = ( OScopeContext const& ) = default;
 	};
-	struct OCompilationFrame {
-		typedef yaal::hcore::HArray<OScopeContext> contexts_t;
-		OScopeContext _context;
-		contexts_t _contextsChain;
+	struct OStatementContext {
+		typedef yaal::hcore::HArray<OScopeContext> scope_contexts_t;
+		OScopeContext _scopeContext;
+		scope_contexts_t _scopeContextsChain;
 		HHuginn::scope_t _else;
 		yaal::hcore::HString _type;
 		yaal::hcore::HString _identifier;
 		int _position;
 		HTryCatch::catches_t _catches;
-		OCompilationFrame( HHuginn* );
+		OStatementContext( HHuginn* );
 		void clear( void );
 	};
 	struct OFunctionContext {
-		typedef yaal::hcore::HStack<OCompilationFrame> compilation_stack_t;
+		typedef yaal::hcore::HStack<OStatementContext> statement_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::type_t> type_stack_t;
 		yaal::hcore::HString _functionName;
 		HFunction::parameter_names_t _parameters;
 		HFunction::expressions_t _defaultValues;
 		int _lastDefaultValuePosition;
-		compilation_stack_t _compilationStack;
+		statement_stack_t _statementStack;
 		operations_t _operations;
 		type_stack_t _valueTypes;
 		int _loopCount;
