@@ -94,10 +94,10 @@ namespace {
 namespace huginn {
 
 char const* _errMsgHHuginn_[ 10 ] = {
-	_( "Operands are not summable." ),
-	_( "Operands are not substractable." ),
-	_( "Operands are not multipliable." ),
-	_( "Operands are not divisible." ),
+	_( "Operands are not summable: " ),
+	_( "Operands are not substractable: " ),
+	_( "Operands are not multipliable: " ),
+	_( "Operands are not divisible: " ),
 	_( "Operands are not exponentionable." ),
 	_( "Operands are not comparable." ),
 	_( "Operands are not boolean values." ),

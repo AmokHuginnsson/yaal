@@ -48,6 +48,7 @@ class HFrame;
 struct OCompiler {
 	typedef void ( HExpression::* expression_action_t ) ( HFrame*, int );
 	typedef yaal::hcore::HStack<HFunction::expressions_t> expressions_stack_t;
+	typedef yaal::hcore::HHashMap<yaal::hcore::HString, HHuginn::type_t> variable_types_t;
 	struct OActiveScope {
 		HHuginn::scope_t _scope;
 		HHuginn::expression_t _expression;
@@ -55,22 +56,31 @@ struct OCompiler {
 	};
 	struct OScopeContext {
 		typedef yaal::hcore::HArray<OActiveScope> active_scopes_t;
+		OScopeContext* _parent;
 		HHuginn::scope_t _scope;
 		expressions_stack_t _expressionsStack;
+		variable_types_t _variableTypes;
 		yaal::hcore::HString _type;
 		yaal::hcore::HString _identifier;
 		int _position;
 		active_scopes_t _scopeChain;
 		HHuginn::scope_t _else;
 		HTryCatch::catches_t _catches;
-		OScopeContext( void );
+		OScopeContext( OScopeContext* );
 		HHuginn::expression_t const& expression( void ) const;
 		HHuginn::expression_t& expression( void );
+		HHuginn::type_t guess_type( yaal::hcore::HString const& ) const;
+		void note_type( yaal::hcore::HString const&, HHuginn::type_t );
 		void clear( void );
+	private:
+		OScopeContext( OScopeContext const& ) = delete;
+		OScopeContext& operator = ( OScopeContext const& ) = delete;
 	};
 	struct OFunctionContext {
-		typedef yaal::hcore::HStack<OScopeContext> scope_stack_t;
+		typedef yaal::hcore::HResource<OScopeContext> scope_context_t;
+		typedef yaal::hcore::HStack<scope_context_t> scope_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::type_t> type_stack_t;
+		typedef yaal::hcore::HStack<yaal::hcore::HString> variable_stack_t;
 		yaal::hcore::HString _functionName;
 		HFunction::parameter_names_t _parameters;
 		HFunction::expressions_t _defaultValues;
@@ -78,6 +88,7 @@ struct OCompiler {
 		scope_stack_t _scopeStack;
 		operations_t _operations;
 		type_stack_t _valueTypes;
+		variable_stack_t _variables;
 		int _loopCount;
 		int _loopSwitchCount;
 		int _nestedCalls;
@@ -85,8 +96,10 @@ struct OCompiler {
 		bool _isAssert;
 		yaal::hcore::HString _lastMemberName;
 		OFunctionContext( void );
+		expressions_stack_t& expressions_stack( void );
 	};
-	typedef yaal::hcore::HStack<OFunctionContext> function_contexts_t;
+	typedef yaal::hcore::HResource<OFunctionContext> function_context_t;
+	typedef yaal::hcore::HStack<function_context_t> function_contexts_t;
 	struct OClassContext {
 		typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
 		typedef yaal::hcore::HHashMap<int, HHuginn::expression_t> expressions_t;
@@ -144,6 +157,9 @@ struct OCompiler {
 	static HHuginn::type_t congruent( HHuginn::type_t, HHuginn::type_t );
 	HHuginn::scope_t& current_scope( void );
 	HHuginn::expression_t& current_expression( void );
+	OScopeContext& current_scope_context( void );
+	HHuginn::type_t guess_type( yaal::hcore::HString const& );
+	void note_type( yaal::hcore::HString const&, HHuginn::type_t );
 	void reset_expression( void );
 	void pop_function_context( void );
 	void inc_loop_count( executing_parser::position_t );
