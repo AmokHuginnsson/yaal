@@ -286,7 +286,7 @@ public:
 	typedef HRuleRef this_type;
 	typedef HRuleBase base_type;
 private:
-	typedef yaal::hcore::HPointer<HRuleBase, yaal::hcore::HPointerScalar, yaal::hcore::HPointerWeak> rule_ref_t;
+	typedef yaal::hcore::HPointerObserver<HRuleBase> rule_ref_t;
 	rule_ref_t _rule;
 public:
 	HRuleRef( HRuleBase::ptr_t );

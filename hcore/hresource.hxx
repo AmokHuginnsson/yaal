@@ -56,18 +56,6 @@ struct HResourceDeleter<T[]> {
 	}
 };
 
-template<typename T>
-struct trait {
-	typedef T type;
-	static bool const is_array = false;
-};
-
-template<typename T>
-struct trait<T[]> {
-	typedef T type;
-	static bool const is_array = true;
-};
-
 template<typename T, typename deleter, bool const default_deleter>
 struct OResourceHolder;
 
@@ -126,7 +114,8 @@ struct OResourceHolder<T, deleter, false> {
 template<typename type_t, typename free_t = resource_helper::HResourceDeleter<type_t>>
 class HResource final {
 public:
-	typedef typename resource_helper::trait<type_t>::type value_type;
+	typedef typename trait::decay<type_t>::type decayed_type;
+	typedef typename trait::ternary<trait::is_array<type_t>::value, typename trait::strip_pointer<decayed_type>::type, decayed_type>::type value_type;
 	typedef typename trait::make_reference<typename trait::strip_const<value_type>::type>::type reference;
 	typedef typename trait::make_reference<value_type const>::type reference_const;
 	typedef value_type* pointer;
@@ -182,32 +171,32 @@ public:
 		return ( *this );
 	}
 	reference_const operator*( void ) const {
-		static_assert( !resource_helper::trait<type_t>::is_array, "indirection operator is called for an array" );
+		static_assert( !trait::is_array<type_t>::value, "indirection operator is called for an array" );
 		M_ASSERT( _holder._resource );
 		return ( *_holder._resource );
 	}
 	reference operator*( void ) {
-		static_assert( !resource_helper::trait<type_t>::is_array, "indirection operator is called for an array" );
+		static_assert( !trait::is_array<type_t>::value, "indirection operator is called for an array" );
 		M_ASSERT( _holder._resource );
 		return ( *_holder._resource );
 	}
 	pointer_const operator->( void ) const {
-		static_assert( !resource_helper::trait<type_t>::is_array, "structure dereference operator is called for an array" );
+		static_assert( !trait::is_array<type_t>::value, "structure dereference operator is called for an array" );
 		M_ASSERT( _holder._resource );
 		return ( _holder._resource );
 	}
 	pointer operator->( void ) {
-		static_assert( !resource_helper::trait<type_t>::is_array, "structure dereference operator is called for an array" );
+		static_assert( !trait::is_array<type_t>::value, "structure dereference operator is called for an array" );
 		M_ASSERT( _holder._resource );
 		return ( _holder._resource );
 	}
 	reference_const operator[] ( int index_ ) const {
-		static_assert( resource_helper::trait<type_t>::is_array, "array subscript operator is called for a scalar" );
+		static_assert( trait::is_array<type_t>::value, "array subscript operator is called for a scalar" );
 		M_ASSERT( _holder._resource );
 		return ( _holder._resource[index_] );
 	}
 	reference operator[] ( int index_ ) {
-		static_assert( resource_helper::trait<type_t>::is_array, "array subscript operator is called for a scalar" );
+		static_assert( trait::is_array<type_t>::value, "array subscript operator is called for a scalar" );
 		M_ASSERT( _holder._resource );
 		return ( _holder._resource[index_] );
 	}

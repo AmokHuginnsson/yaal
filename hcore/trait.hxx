@@ -433,6 +433,34 @@ struct is_array<T[SIZE]> {
 	static bool const value = true;
 	typedef trait::true_type type;
 };
+
+template<typename T>
+struct is_array<T[]> {
+	static bool const value = true;
+	typedef trait::true_type type;
+};
+/*! \endcond */
+
+/*! \brief Transform C-array type to pointer type.
+ *
+ * \tparam T - type to decay from array to pointer.
+ * \return type - pointer type decayed from array type.
+ */
+template<typename T>
+struct decay {
+	typedef T type;
+};
+
+/*! \cond */
+template<typename T, int const SIZE>
+struct decay<T[SIZE]> {
+	typedef T* type;
+};
+
+template<typename T>
+struct decay<T[]> {
+	typedef T* type;
+};
 /*! \endcond */
 
 /*! \brief Meta function used to make reference from type.

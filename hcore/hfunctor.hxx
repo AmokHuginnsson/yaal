@@ -361,8 +361,8 @@ struct getter<N, -1, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7
 struct object_resolver {
 	template<typename tType>
 	struct is_smart_pointer {
-		template<typename T, template<typename>class K, template<typename, typename>class A>
-		static constexpr bool sfinae( typename yaal::hcore::HPointer<T, K, A> const* ) {
+		template<typename T>
+		static constexpr bool sfinae( typename yaal::hcore::HPointer<T> const* ) {
 			return ( true );
 		}
 		template<typename T, typename D>

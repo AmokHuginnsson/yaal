@@ -46,15 +46,14 @@ namespace hcore {
 /*! \brief Types of reference counters.
  */
 struct REFERENCE_COUNTER_TYPE {
-	static int const STRICT = 0;
-	static int const WEAK = 1;
+	static int const HOLDER = 0;
+	static int const OBSERVER = 1;
 };
 
 template<typename tType>
 class HPointerFromThisInterface;
 
-template<typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
+template<typename tType>
 class HPointer;
 
 template<typename T, typename U>
@@ -66,144 +65,70 @@ public:
 	static bool const value = trait::same_type<decltype( test<T, U>( 0 ) ), trait::true_type*>::value;
 };
 
-/*! \brief Pointer life time tracker access policy.
- */
-template<typename tType, typename pointer_type_t>
-struct HPointerStrict {
-	static tType const* raw( tType const* pointer_ ) {
-		return ( pointer_type_t::raw( pointer_ ) );
-	}
-	static tType* raw( tType* pointer_ ) {
-		return ( pointer_type_t::raw( pointer_ ) );
-	}
-	static typename trait::make_reference<tType>::type object_at( tType const* pointer_, int index_ ) {
-		return ( pointer_type_t::object_at( pointer_, index_ ) );
-	}
-	static typename trait::make_reference<tType>::type object_at( tType* pointer_, int index_ ) {
-		return ( pointer_type_t::object_at( pointer_, index_ ) );
-	}
-	static tType const* pointer( tType const* pointer_ ) {
-		return ( pointer_ );
-	}
-	static tType* pointer( tType* pointer_ ) {
-		return ( pointer_ );
-	}
-	template<typename deleter_t>
-	inline static void delete_pointee( deleter_t const& deleter_ )
-		{ deleter_->do_delete(); }
-	template<typename ptr_t, typename X = typename trait::enable_if<has_initialize_observer<tType, ptr_t>::value>::type>
-	static void initialize_from_this( tType* obj, ptr_t const& ptr, int ) {
-		obj->initialize_observer( ptr );
-		return;
-	}
-	template<typename ptr_t>
-	static void initialize_from_this( tType*, ptr_t const&, long ) {
-		return;
-	}
-	static void inc_reference_counter( int* referenceCounter_ ) {
-		++ referenceCounter_[ REFERENCE_COUNTER_TYPE::STRICT ];
-		++ referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
-	}
-	static void dec_reference_counter( int* referenceCounter_ ) {
-		M_ASSERT( referenceCounter_[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 );
-		M_ASSERT( referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ] > 0 );
-		-- referenceCounter_[ REFERENCE_COUNTER_TYPE::STRICT ];
-		-- referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
-	}
-};
-
-/*! \brief Pointer's observer access policy.
- */
-template<typename tType, typename pointer_type_t>
-struct HPointerWeak {
-	template<typename deleter_t>
-	inline static void delete_pointee( deleter_t const& ) {}
-	static void inc_reference_counter( int* referenceCounter_ ) {
-		++ referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
-	}
-	static void dec_reference_counter( int* referenceCounter_ ) {
-		M_ASSERT( referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ] > 0 );
-		-- referenceCounter_[ REFERENCE_COUNTER_TYPE::WEAK ];
-	}
-};
-
-/*! \brief Pointer to scalar deletion policy.
- */
 template<typename tType>
-struct HPointerScalar {
-	template<typename real_t>
-	static void delete_pointee( tType* pointer_ ) {
-		M_SAFE( delete static_cast<real_t*>( pointer_ ) );
+class HSharedBase {
+public:
+	typedef typename trait::decay<typename trait::strip_const<tType>::type>::type decayed_type;
+	typedef typename trait::ternary<trait::is_array<tType>::value, typename trait::strip_pointer<decayed_type>::type, decayed_type>::type value_type;
+	typedef typename trait::make_reference<value_type>::type reference;
+	typedef typename trait::make_reference<value_type const>::type const_reference;
+protected:
+	int _referenceCounter[ 2 ];
+	value_type* _object;
+	HSharedBase( value_type* object_ )
+		: _referenceCounter()
+		, _object( object_ ) {
+		_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] = 0;
+		_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] = 0;
 	}
-	static tType const* raw( tType const* pointer_ ) {
-		return ( pointer_ );
+	void inc_reference_counter( trait::true_type* ) {
+		++ _referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ];
+		++ _referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ];
 	}
-	static tType* raw( tType* pointer_ ) {
-		return ( pointer_ );
+	void inc_reference_counter( trait::false_type* ) {
+		++ _referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ];
 	}
+	void dec_reference_counter( trait::true_type* ) {
+		M_ASSERT( _referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 );
+		M_ASSERT( _referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] > 0 );
+		-- _referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ];
+		-- _referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ];
+	}
+	void dec_reference_counter( trait::false_type* ) {
+		M_ASSERT( _referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] > 0 );
+		-- _referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ];
+	}
+	virtual ~HSharedBase( void ) {}
+	void do_delete( trait::true_type* ) {
+		do_delete();
+	}
+	void do_delete( trait::false_type* ) {}
+	virtual void do_delete( void ) = 0;
+	friend struct pointer_helper;
+	template<typename>
+	friend class HPointerBase;
+	template<typename>
+	friend class HPointer;
+private:
+	HSharedBase( HSharedBase const& );
+	HSharedBase& operator = ( HSharedBase const& );
 };
 
-/*! \brief Pointer to array deletion policy.
- */
-template<typename tType>
-struct HPointerArray {
-	template<typename real_t>
-	static void delete_pointee( tType* pointer_ ) {
-		M_SAFE( delete [] static_cast<real_t*>( pointer_ ) );
-	}
-	static tType const& object_at( tType const* pointer_, int index_ ) {
-		return ( pointer_[ index_ ] );
-	}
-	static tType& object_at( tType* pointer_, int index_ ) {
-		return ( pointer_[ index_ ] );
-	}
-};
+template<typename tType, typename real_t>
+class HShared;
+
+template<typename tType, typename deleter_t>
+class HSharedDeleter;
 
 struct pointer_helper;
 
-/*! \brief Smart pointer, reference counting implementation.
- *
- * \tparam tType - object type which life time will be guarded.
- * \tparam pointer_type_t - select pointer type, one of HPointerScalar or HPointerArray.
- * \tparam access_type_t - defines pointer kind, one of HPointerStrict or HPointerWeak.
- */
-template<typename tType, template<typename>class pointer_type_t = HPointerScalar,
-				 template<typename, typename>class access_type_t = HPointerStrict>
-class HPointer final {
-	class HSharedBase {
-	protected:
-		int _referenceCounter[ 2 ];
-		tType* _object;
-		HSharedBase( tType* object_ ) : _referenceCounter(), _object( object_ ) {
-			_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 0;
-			_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 0;
-		}
-		virtual ~HSharedBase( void ) {}
-		virtual void do_delete( void ) = 0;
-		friend struct pointer_helper;
-		friend class HPointer;
-		template<typename T1, typename T2>
-		friend struct HPointerStrict;
-	private:
-		HSharedBase( HSharedBase const& );
-		HSharedBase& operator = ( HSharedBase const& );
-	};
-	template<typename deleter_t>
-	class HShared : protected HSharedBase {
-		deleter_t DELETER;
-		HShared( deleter_t const& deleter_, tType* object_ )
-			: HSharedBase( object_ ), DELETER( deleter_ )
-			{ }
-		virtual ~HShared( void ) {}
-		virtual void do_delete( void ) {
-			DELETER( HSharedBase::_object );
-			HSharedBase::_object = NULL;
-		}
-		friend struct pointer_helper;
-		friend class HPointer;
-		template<typename T1, typename T2>
-		friend struct HPointerStrict;
-	};
+template<typename tType>
+class HPointerBase {
+public:
+	typedef HSharedBase<tType> shared_t;
+	typedef typename shared_t::value_type value_type;
+	typedef typename shared_t::reference reference;
+	typedef typename shared_t::const_reference const_reference;
 	/*
 	 * WARNING!
 	 *
@@ -221,240 +146,79 @@ class HPointer final {
 	 *
 	 * Shared struct (a reference counters) must be initialized
 	 * first in HPointer constructor. In case of memory allocation
-	 * failure an object pointee must still be NULL.
+	 * failure an object pointee must still be nullptr.
 	 */
-	HSharedBase* _shared;
-	tType* _object;
+protected:
+	shared_t* _shared;
+	value_type* _object;
 public:
-	typedef typename trait::strip_const<tType>::type value_type;
-	typedef typename trait::make_reference<tType>::type reference;
-	typedef typename trait::make_reference<tType const>::type const_reference;
-	typedef pointer_type_t<tType> pointer_type;
-	HPointer( void )
-		: _shared( NULL ), _object( NULL ) {
+	HPointerBase( void )
+		: _shared( nullptr )
+		, _object( nullptr ) {
 		return;
 	}
-	template<typename real_t>
-	explicit HPointer( real_t* const pointer_ )
-		: _shared( pointer_ ? new ( memory::yaal ) HShared<void (*)( tType* )>( &pointer_type::template delete_pointee<real_t>, pointer_ ) : NULL ), _object( pointer_ ) {
-		M_ASSERT( pointer_ );
-		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
-		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
-		access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this, 0 );
+	HPointerBase( shared_t* shared_, value_type* object_ )
+		: _shared( shared_ )
+		, _object( object_ ) {
+		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] = 1;
+		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] = 1;
 		return;
 	}
-	template<typename real_t, typename deleter_t>
-	explicit HPointer( real_t* const pointer_,  deleter_t deleter_ )
-		: _shared( pointer_ ? new ( memory::yaal ) HShared<deleter_t>( deleter_, pointer_ ) : NULL ), _object( pointer_ ) {
-		M_ASSERT( pointer_ );
-		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] = 1;
-		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] = 1;
-		access_type_t<tType, pointer_type_t<tType> >::initialize_from_this( pointer_, *this, 0 );
-		return;
-	}
-	~HPointer( void ) {
-		/* The make_pointer() helper part.
-		 */
-		if ( _object ) {
-			reset();
-		} else if ( _shared ) {
+	HPointerBase( HPointerBase const& ) = delete;
+	HPointerBase& operator = ( HPointerBase const& ) = delete;
+protected:
+	~HPointerBase( void ) {
+		if ( ! _object && _shared ) {
 			/* This path is reached only when tType constructor throws
 			 * in make_pointer() helper function.
 			 */
 			delete _shared;
-			_shared = NULL;
+			_shared = nullptr;
 		}
 		return;
 	}
-	HPointer( HPointer const& pointer_ )
-		: _shared( NULL ), _object( NULL ) {
-		acquire( pointer_ );
+	template<typename type>
+	void do_reset( void ) {
+		_shared && release<type>();
+		_shared = nullptr;
+		_object = nullptr;
 		return;
 	}
-	template<typename alien_t, template<typename, typename>class alien_access_t>
-	HPointer( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ )
-		: _shared( NULL ), _object( NULL ) {
-		acquire( pointer_ );
-		return;
-	}
-	HPointer( HPointer&& other_ ) noexcept
-		: _shared( NULL ), _object( NULL ) {
-		swap( other_ );
-		return;
-	}
-	HPointer& operator = ( HPointer const& pointer_ ) {
-		acquire( pointer_ );
-		return ( *this );
-	}
-	HPointer& operator = ( HPointer&& other_ ) noexcept {
-		if ( & other_ != this ) {
-			swap( other_ );
-			other_.reset();
-		}
-		return ( *this );
-	}
-	template<typename alien_t, template<typename, typename>class alien_access_t>
-	HPointer& operator = ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) {
-		acquire( pointer_ );
-		return ( *this );
-	}
-	bool unique( void ) const {
-		return ( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] == 1 ) );
-	}
-	int use_count( void ) const {
-		return ( _shared ? _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] : 0 );
-	}
-	const_reference operator* ( void ) const {
-		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-		return ( *access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) );
-	}
-	reference operator* ( void ) {
-		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-		return ( *access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) );
-	}
-	const_reference operator[] ( int index_ ) const {
-		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-		M_ASSERT( index_ >= 0 );
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::object_at( _object, index_ ) );
-	}
-	reference operator[] ( int index_ ) {
-		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-		M_ASSERT( index_ >= 0 );
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::object_at( _object, index_ ) );
-	}
-
-	template<typename alien_t, template<typename, typename>class alien_access_t>
-	bool operator == ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) == alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
-	}
-	template<typename alien_t>
-	bool operator == ( alien_t const* const pointer_ ) const {
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer(_object ) == pointer_ );
-	}
-	template<typename alien_t, template<typename, typename>class alien_access_t>
-	bool operator != ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) != alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
-	}
-	template<typename alien_t>
-	bool operator != ( alien_t const* const pointer_ ) const {
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) != pointer_ );
-	}
-
-	template<typename alien_t, template<typename, typename>class alien_access_t>
-	bool operator < ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) < alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
-	}
-	template<typename alien_t>
-	bool operator < ( alien_t const* const pointer_ ) const {
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer(_object ) < pointer_ );
-	}
-	template<typename alien_t, template<typename, typename>class alien_access_t>
-	bool operator > ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) > alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
-	}
-	template<typename alien_t>
-	bool operator > ( alien_t const* const pointer_ ) const {
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer(_object ) > pointer_ );
-	}
-
-	template<typename alien_t, template<typename, typename>class alien_access_t>
-	bool operator <= ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) <= alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
-	}
-	template<typename alien_t>
-	bool operator <= ( alien_t const* const pointer_ ) const {
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer(_object ) <= pointer_ );
-	}
-	template<typename alien_t, template<typename, typename>class alien_access_t>
-	bool operator >= ( HPointer<alien_t, pointer_type_t, alien_access_t> const& pointer_ ) const {
-		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) >= alien_access_t<alien_t, pointer_type_t<alien_t> >::pointer( static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) ) );
-	}
-	template<typename alien_t>
-	bool operator >= ( alien_t const* const pointer_ ) const {
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer(_object ) >= pointer_ );
-	}
-
-	tType const* operator->( void ) const {
-		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::raw( _object ) );
-	}
-	tType* operator->( void ) {
-		M_ASSERT( _shared && ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) );
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::raw( _object ) );
-	}
-	tType const* raw( void ) const {
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) );
-	}
-	value_type* raw( void ) {
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) );
-	}
-	value_type const* get( void ) const {
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) );
-	}
-	value_type* get( void ) {
-		return ( access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) );
-	}
-	bool operator! ( void ) const {
-		return ( ! access_type_t<value_type, pointer_type_t<value_type> >::pointer( _object ) );
-	}
-	void swap( HPointer& p ) {
-		if ( &p != this ) {
-			/*
-			 * Both fields are POD types (pointers: tType*, HSharedBase*)
-			 * so they do not have a specialized implementation
-			 * and we can explicitly request yaal generic implementation.
-			 */
-			yaal::swap( _shared, p._shared );
-			yaal::swap( _object, p._object );
-		}
-		return;
-	}
-	void reset( void ) {
-		_shared && release();
-		_shared = NULL;
-		_object = NULL;
-		return;
-	}
-private:
-	bool release( void ) throw() {
-		M_ASSERT( _shared && _object );
-		if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] == 1 ) {
-			access_type_t<value_type, pointer_type_t<value_type> >::delete_pointee( _shared );
-		}
-		access_type_t<value_type, pointer_type_t<value_type> >::dec_reference_counter( _shared->_referenceCounter );
-		if ( ! _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::WEAK ] ) {
-			delete _shared;
-			_shared = NULL;
-		}
-		return ( ! ( _shared && _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] ) );
-	}
-	template<typename alien_t, template<typename, typename> class alien_access_t>
-	void acquire( HPointer<alien_t, pointer_type_t, alien_access_t> const& from ) {
-		HPointer const& alien = reinterpret_cast<HPointer const&>( from );
+	template<typename type, typename alien_t>
+	void acquire( HPointerBase<alien_t> const& from ) {
+		HPointerBase const& alien = reinterpret_cast<HPointerBase const&>( from );
 		if ( ( &alien != this ) && ( _shared != alien._shared ) ) {
 			M_ASSERT( ( ! ( _shared && alien._shared ) )
 					|| ( ( _shared && alien._shared )
 						&& ( _object != static_cast<alien_t*>( static_cast<void*>( alien._object ) ) ) ) );
 			if ( _shared ) {
-				release();
+				release<type>();
 			}
-			if ( alien._shared && ( alien._shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::STRICT ] > 0 ) ) {
-				access_type_t<value_type, pointer_type_t<value_type> >::inc_reference_counter( alien._shared->_referenceCounter );
+			if ( alien._shared && ( alien._shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) ) {
+				alien._shared->inc_reference_counter( static_cast<type*>( nullptr ) );
 				_shared = alien._shared;
 				assign( _object, static_cast<alien_t*>( static_cast<void*>( alien._object ) ) );
 			} else {
-				_shared = NULL;
-				_object = NULL;
+				_shared = nullptr;
+				_object = nullptr;
 			}
 		}
 		return;
 	}
+	template<typename type>
+	bool release( void ) throw() {
+		M_ASSERT( _shared && _object );
+		if ( _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 ) {
+			_shared->do_delete( static_cast<type*>( nullptr ) );
+		}
+		_shared->dec_reference_counter( static_cast<type*>( nullptr ) );
+		if ( ! _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] ) {
+			delete _shared;
+			_shared = nullptr;
+		}
+		return ( ! ( _shared && _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] ) );
+	}
+private:
 	void assign( tType*& to, tType* from ) {
 		to = from;
 		return;
@@ -467,14 +231,355 @@ private:
 	friend struct pointer_helper;
 };
 
+/*
+ * Work-around for bug in GCC 4.8.4,
+ * Superfluous warning about non-virtual destructor in base class.
+ * In our case base class has `protected' destructor so this warning
+ * makes no sense.
+ */
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008004
+# pragma GCC diagnostic ignored "-Weffc++"
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
+template<typename tType>
+class HPointerObserver final : public HPointerBase<tType> {
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008004
+# pragma GCC diagnostic error "-Weffc++"
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
+public:
+	typedef HSharedBase<tType> shared_t;
+	HPointerObserver( void )
+		: HPointerBase<tType>() {
+		return;
+	}
+	HPointerObserver( HPointerObserver const& pointer_ )
+		: HPointerBase<tType>() {
+		this->template acquire<trait::false_type>( pointer_ );
+		return;
+	}
+	template<typename alien_t>
+	HPointerObserver( HPointerObserver<alien_t> const& pointer_ )
+		: HPointerBase<tType>() {
+		this->template acquire<trait::false_type>( pointer_ );
+		return;
+	}
+	HPointerObserver( HPointerObserver&& other_ ) noexcept
+		: HPointerBase<tType>() {
+		swap( other_ );
+		return;
+	}
+	HPointerObserver( HPointer<tType> const& pointer_ )
+		: HPointerBase<tType>() {
+		this->template acquire<trait::false_type>( pointer_ );
+		return;
+	}
+	~HPointerObserver( void ) {
+		/* The make_pointer() helper part.
+		 */
+		if ( this->_object ) {
+			reset();
+		}
+	}
+	HPointerObserver& operator = ( HPointerObserver const& pointer_ ) {
+		this->template acquire<trait::false_type>( pointer_ );
+		return ( *this );
+	}
+	HPointerObserver& operator = ( HPointerObserver&& other_ ) noexcept {
+		if ( & other_ != this ) {
+			swap( other_ );
+			other_.reset();
+		}
+		return ( *this );
+	}
+	template<typename alien_t>
+	HPointerObserver& operator = ( HPointerObserver<alien_t> const& pointer_ ) {
+		this->template acquire<trait::false_type>( pointer_ );
+		return ( *this );
+	}
+	void reset( void ) {
+		this->template do_reset<trait::false_type>();
+	}
+	void swap( HPointerObserver& p ) {
+		if ( &p != this ) {
+			/*
+			 * Both fields are POD types (pointers: tType*, HSharedBase*)
+			 * so they do not have a specialized implementation
+			 * and we can explicitly request yaal generic implementation.
+			 */
+			yaal::swap( this->_shared, p._shared );
+			yaal::swap( this->_object, p._object );
+		}
+		return;
+	}
+};
+
+/*! \brief Smart pointer, reference counting implementation.
+ *
+ * \tparam tType - object type which life time will be guarded.
+ * \tparam pointer_type_t - select pointer type, one of HPointerScalar or HPointerArray.
+ * \tparam access_type_t - defines pointer kind, one of HPointerStrict or HPointerWeak.
+ */
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008004
+# pragma GCC diagnostic ignored "-Weffc++"
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
+template<typename tType>
+class HPointer final : public HPointerBase<tType> {
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008004
+# pragma GCC diagnostic error "-Weffc++"
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
+public:
+	typedef typename HPointerBase<tType>::value_type value_type;
+	typedef typename HPointerBase<tType>::reference reference;
+	typedef typename HPointerBase<tType const>::const_reference const_reference;
+	HPointer( void )
+		: HPointerBase<tType>() {
+		return;
+	}
+	template<typename real_t>
+	explicit HPointer( real_t* pointer_ )
+		: HPointerBase<tType>(
+			pointer_ ? new ( memory::yaal ) HShared<tType, real_t>( pointer_ ) : nullptr,
+			pointer_
+		) {
+		M_ASSERT( pointer_ );
+		initialize_from_this( pointer_, *this, 0 );
+		return;
+	}
+	template<typename real_t, typename deleter_t>
+	explicit HPointer( real_t* pointer_,  deleter_t deleter_ )
+		: HPointerBase<tType>( pointer_ ? new ( memory::yaal ) HSharedDeleter<tType, deleter_t>( deleter_, pointer_ ) : nullptr, pointer_ ) {
+		M_ASSERT( pointer_ );
+		initialize_from_this( pointer_, *this, 0 );
+		return;
+	}
+	HPointer( HPointer const& pointer_ )
+		: HPointerBase<tType>() {
+		this->template acquire<trait::true_type>( pointer_ );
+		return;
+	}
+	HPointer( HPointerObserver<tType> const& pointer_ )
+		: HPointerBase<tType>() {
+		this->template acquire<trait::true_type>( pointer_ );
+		return;
+	}
+	template<typename alien_t>
+	HPointer( HPointer<alien_t> const& pointer_ )
+		: HPointerBase<tType>() {
+		this->template acquire<trait::true_type>( pointer_ );
+		return;
+	}
+	HPointer( HPointer&& other_ ) noexcept
+		: HPointerBase<tType>() {
+		swap( other_ );
+		return;
+	}
+	~HPointer( void ) {
+		/* The make_pointer() helper part.
+		 */
+		if ( this->_object ) {
+			reset();
+		}
+	}
+	HPointer& operator = ( HPointer const& pointer_ ) {
+		this->template acquire<trait::true_type>( pointer_ );
+		return ( *this );
+	}
+	HPointer& operator = ( HPointer&& other_ ) noexcept {
+		if ( & other_ != this ) {
+			swap( other_ );
+			other_.reset();
+		}
+		return ( *this );
+	}
+	template<typename alien_t>
+	HPointer& operator = ( HPointer<alien_t> const& pointer_ ) {
+		this->template acquire<trait::true_type>( pointer_ );
+		return ( *this );
+	}
+	void swap( HPointer& p ) {
+		if ( &p != this ) {
+			/*
+			 * Both fields are POD types (pointers: tType*, HSharedBase*)
+			 * so they do not have a specialized implementation
+			 * and we can explicitly request yaal generic implementation.
+			 */
+			yaal::swap( this->_shared, p._shared );
+			yaal::swap( this->_object, p._object );
+		}
+		return;
+	}
+	bool unique( void ) const {
+		return ( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] == 1 ) );
+	}
+	int use_count( void ) const {
+		return ( this->_shared ? this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] : 0 );
+	}
+	void reset( void ) {
+		this->template do_reset<trait::true_type>();
+	}
+	const_reference operator* ( void ) const {
+		static_assert( !trait::is_array<tType>::value, "indirection operator is called for an array" );
+		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
+		return ( *(this->_object) );
+	}
+	reference operator* ( void ) {
+		static_assert( !trait::is_array<tType>::value, "indirection operator is called for an array" );
+		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
+		return ( *(this->_object) );
+	}
+	const_reference operator[] ( int index_ ) const {
+		static_assert( trait::is_array<tType>::value, "array subscript operator is called for a scalar" );
+		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
+		M_ASSERT( index_ >= 0 );
+		return ( this->_object[ index_ ] );
+	}
+	reference operator[] ( int index_ ) {
+		static_assert( trait::is_array<tType>::value, "array subscript operator is called for a scalar" );
+		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
+		M_ASSERT( index_ >= 0 );
+		return ( this->_object[ index_ ] );
+	}
+
+	template<typename alien_t>
+	bool operator == ( HPointer<alien_t> const& pointer_ ) const {
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( this->_object == static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
+	}
+	template<typename alien_t>
+	bool operator == ( alien_t const* const pointer_ ) const {
+		return ( this->_object == pointer_ );
+	}
+	template<typename alien_t>
+	bool operator != ( HPointer<alien_t> const& pointer_ ) const {
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( this->_object != static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
+	}
+	template<typename alien_t>
+	bool operator != ( alien_t const* const pointer_ ) const {
+		return ( this->_object != pointer_ );
+	}
+
+	template<typename alien_t>
+	bool operator < ( HPointer<alien_t> const& pointer_ ) const {
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( this->_object < static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
+	}
+	template<typename alien_t>
+	bool operator < ( alien_t const* const pointer_ ) const {
+		return ( this->_object < pointer_ );
+	}
+	template<typename alien_t>
+	bool operator > ( HPointer<alien_t> const& pointer_ ) const {
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( this->_object > static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
+	}
+	template<typename alien_t>
+	bool operator > ( alien_t const* const pointer_ ) const {
+		return ( this->_object > pointer_ );
+	}
+
+	template<typename alien_t>
+	bool operator <= ( HPointer<alien_t> const& pointer_ ) const {
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( this->_object <= static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
+	}
+	template<typename alien_t>
+	bool operator <= ( alien_t const* const pointer_ ) const {
+		return ( this->_object <= pointer_ );
+	}
+	template<typename alien_t>
+	bool operator >= ( HPointer<alien_t> const& pointer_ ) const {
+		HPointer const* alien = reinterpret_cast<HPointer const *>( &pointer_ );
+		return ( this->_object >= static_cast<alien_t const*>( static_cast<void const*>( alien->_object ) ) );
+	}
+	template<typename alien_t>
+	bool operator >= ( alien_t const* const pointer_ ) const {
+		return ( this->_object >= pointer_ );
+	}
+
+	tType const* operator->( void ) const {
+    static_assert( !trait::is_array<tType>::value, "structure dereference operator is called for an array" );
+		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
+		return ( this->_object );
+	}
+	value_type* operator->( void ) {
+    static_assert( !trait::is_array<tType>::value, "structure dereference operator is called for an array" );
+		M_ASSERT( this->_shared && ( this->_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] > 0 ) );
+		return ( this->_object );
+	}
+	tType const* raw( void ) const {
+		return ( this->_object );
+	}
+	value_type* raw( void ) {
+		return ( this->_object );
+	}
+	value_type const* get( void ) const {
+		return ( this->_object );
+	}
+	value_type* get( void ) {
+		return ( this->_object );
+	}
+	bool operator! ( void ) const {
+		return ( ! this->_object );
+	}
+private:
+	friend struct pointer_helper;
+	template<typename ptr_t, typename X = typename trait::enable_if<has_initialize_observer<tType, ptr_t>::value>::type>
+	static void initialize_from_this( value_type* obj, ptr_t const& ptr, int ) {
+		obj->initialize_observer( ptr );
+		return;
+	}
+	template<typename ptr_t>
+	static void initialize_from_this( value_type*, ptr_t const&, long ) {
+		return;
+	}
+};
+
+template<typename tType, typename real_t>
+class HShared : protected HSharedBase<tType> {
+	HShared( real_t* object_ )
+		: HSharedBase<tType>( object_ ) {
+	}
+	virtual ~HShared( void ) {}
+	virtual void do_delete( void ) override {
+		delete_pointee( static_cast<typename trait::ternary<trait::is_array<tType>::value, trait::true_type, trait::false_type>::type*>( nullptr ) );
+		this->_object = nullptr;
+	}
+	void delete_pointee( trait::false_type* ) {
+		M_SAFE( delete static_cast<real_t*>( this->_object ) );
+	}
+	void delete_pointee( trait::true_type* ) {
+		M_SAFE( delete [] static_cast<real_t*>( this->_object ) );
+	}
+	friend struct pointer_helper;
+	template<typename>
+	friend class HPointer;
+};
+
+template<typename tType, typename deleter_t>
+class HSharedDeleter : protected HSharedBase<tType> {
+	deleter_t DELETER;
+	HSharedDeleter( deleter_t const& deleter_, tType* object_ )
+		: HSharedBase<tType>( object_ )
+		, DELETER( deleter_ ) {
+	}
+	virtual ~HSharedDeleter( void ) {}
+	virtual void do_delete( void ) override {
+		DELETER( HSharedBase<tType>::_object );
+		HSharedBase<tType>::_object = nullptr;
+	}
+	friend struct pointer_helper;
+	template<typename>
+	friend class HPointer;
+};
+
 /*! \brief Interface for concept of getting smart pointer from `this'.
  */
 template<typename tType>
 class HPointerFromThisInterface {
 protected:
-	typedef HPointer<tType, HPointerScalar, HPointerStrict> ptr_t;
-	typedef HPointer<tType, HPointerScalar, HPointerWeak> weak_t;
-	weak_t _selfObserver;
+	typedef HPointer<tType> ptr_t;
+	typedef HPointerObserver<tType> observer_t;
+	observer_t _selfObserver;
 public:
 	HPointerFromThisInterface( void )
 		: _selfObserver() {
@@ -492,57 +597,52 @@ protected:
 		_selfObserver = firstOwner_;
 		return;
 	}
-	template<typename T, typename U>
-	friend struct HPointerStrict;
+	template<typename T>
+	friend class HPointer;
 	template<typename T, typename U>
 	friend struct has_initialize_observer;
 };
 
-template<typename alien_t, typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-bool operator == ( alien_t const* const pointer_, HPointer<tType, pointer_type_t, access_type_t> const& smartPointer_ ) {
+template<typename alien_t, typename tType>
+bool operator == ( alien_t const* const pointer_, HPointer<tType> const& smartPointer_ ) {
 	return ( smartPointer_ == pointer_ );
 }
 
-template<typename alien_t, typename tType, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-bool operator != ( alien_t const* const pointer_, HPointer<tType, pointer_type_t, access_type_t> const& smartPointer_ ) {
+template<typename alien_t, typename tType>
+bool operator != ( alien_t const* const pointer_, HPointer<tType> const& smartPointer_ ) {
 	return ( smartPointer_ != pointer_ );
 }
 
 struct pointer_helper {
-	template<typename to_t, typename from_t, template<typename>class pointer_type_t,
-					 template<typename, typename>class access_type_t>
-	static typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> do_static_cast( HPointer<from_t, pointer_type_t, access_type_t> from_ ) {
-		HPointer<to_t, pointer_type_t, access_type_t> to;
+	template<typename to_t, typename from_t>
+	static typename yaal::hcore::HPointer<to_t> do_static_cast( HPointer<from_t> const& from_ ) {
+		HPointer<to_t> to;
 		if ( from_._object ) {
-			to._shared = reinterpret_cast<typename HPointer<to_t, pointer_type_t, access_type_t>::HSharedBase*>( from_._shared );
+			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
 			to._object = static_cast<to_t*>( from_._object );
-			access_type_t<to_t, pointer_type_t<to_t> >::inc_reference_counter( to._shared->_referenceCounter );
+			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
 		}
 		return ( to );
 	}
 
-	template<typename to_t, typename from_t, template<typename>class pointer_type_t,
-					 template<typename, typename>class access_type_t>
-	static typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> do_dynamic_cast( HPointer<from_t, pointer_type_t, access_type_t> from_ ) {
-		HPointer<to_t, pointer_type_t, access_type_t> to;
+	template<typename to_t, typename from_t>
+	static typename yaal::hcore::HPointer<to_t> do_dynamic_cast( HPointer<from_t> const& from_ ) {
+		HPointer<to_t> to;
 		if ( dynamic_cast<to_t*>( from_._object ) ) {
-			to._shared = reinterpret_cast<typename HPointer<to_t, pointer_type_t, access_type_t>::HSharedBase*>( from_._shared );
+			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
 			to._object = static_cast<to_t*>( from_._object );
-			access_type_t<to_t, pointer_type_t<to_t> >::inc_reference_counter( to._shared->_referenceCounter );
+			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
 		}
 		return ( to );
 	}
 
-	template<typename to_t, typename from_t, template<typename>class pointer_type_t,
-					 template<typename, typename>class access_type_t>
-	static typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> do_const_cast( HPointer<from_t, pointer_type_t, access_type_t> from_ ) {
-		HPointer<to_t, pointer_type_t, access_type_t> to;
+	template<typename to_t, typename from_t>
+	static typename yaal::hcore::HPointer<to_t> do_const_cast( HPointer<from_t> const& from_ ) {
+		HPointer<to_t> to;
 		if ( dynamic_cast<to_t*>( from_._object ) ) {
-			to._shared = reinterpret_cast<typename HPointer<to_t, pointer_type_t, access_type_t>::HSharedBase*>( from_._shared );
+			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
 			to._object = const_cast<to_t*>( from_._object );
-			access_type_t<to_t, pointer_type_t<to_t> >::inc_reference_counter( to._shared->_referenceCounter );
+			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
 		}
 		return ( to );
 	}
@@ -562,38 +662,33 @@ struct pointer_helper {
 
 	template<typename tType>
 	static tType* do_make_pointer_pre( HPointer<tType>& ptr_ ) {
-		typedef HPointer<tType> ptr_t;
-		ptr_._shared = new ( memory::yaal ) typename ptr_t::template HShared<HSpaceHolderDeleter<tType> >( HSpaceHolderDeleter<tType>(), static_cast<tType*>( NULL ) );
-		return ( static_cast<typename ptr_t::template HShared<HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem() );
+		ptr_._shared = new ( memory::yaal ) HSharedDeleter<tType, HSpaceHolderDeleter<tType> >( HSpaceHolderDeleter<tType>(), static_cast<tType*>( nullptr ) );
+		return ( static_cast<HSharedDeleter<tType, HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem() );
 	}
 
 	template<typename tType>
 	static void do_make_pointer_post( HPointer<tType>& ptr_ ) {
-		typedef HPointer<tType> ptr_t;
-		ptr_._object = static_cast<typename ptr_t::template HShared<HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem();
+		ptr_._object = static_cast<HSharedDeleter<tType, HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem();
 		ptr_._shared->_object = ptr_._object;
-		HPointerStrict<tType, HPointerScalar<tType> >::inc_reference_counter( ptr_._shared->_referenceCounter );
-		HPointerStrict<tType, HPointerScalar<tType> >::initialize_from_this( ptr_._object, ptr_, 0 );
+		ptr_._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
+		HPointer<tType>::initialize_from_this( ptr_._object, ptr_, 0 );
 		return;
 	}
 
 };
 
-template<typename to_t, typename from_t, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> pointer_static_cast( HPointer<from_t, pointer_type_t, access_type_t> from_ ) {
+template<typename to_t, typename from_t>
+typename yaal::hcore::HPointer<to_t> pointer_static_cast( HPointer<from_t> const& from_ ) {
 	return ( pointer_helper::do_static_cast<to_t>( from_ ) );
 }
 
-template<typename to_t, typename from_t, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> pointer_dynamic_cast( HPointer<from_t, pointer_type_t, access_type_t> from_ ) {
+template<typename to_t, typename from_t>
+typename yaal::hcore::HPointer<to_t> pointer_dynamic_cast( HPointer<from_t> const& from_ ) {
 	return ( pointer_helper::do_dynamic_cast<to_t>( from_ ) );
 }
 
-template<typename to_t, typename from_t, template<typename>class pointer_type_t,
-				 template<typename, typename>class access_type_t>
-typename yaal::hcore::HPointer<to_t, pointer_type_t, access_type_t> pointer_const_cast( HPointer<from_t, pointer_type_t, access_type_t> from_ ) {
+template<typename to_t, typename from_t>
+typename yaal::hcore::HPointer<to_t> pointer_const_cast( HPointer<from_t> const& from_ ) {
 	return ( pointer_helper::do_const_cast<to_t>( from_ ) );
 }
 
@@ -606,9 +701,8 @@ HPointer<tType> make_pointer( arg_t&&... arg_ ) {
 	return ( ptr );
 }
 
-template<typename tType, template<typename>class pointer_type_t,
-	template<typename, typename>class access_type_t>
-inline void swap( yaal::hcore::HPointer<tType, pointer_type_t, access_type_t>& a, yaal::hcore::HPointer<tType, pointer_type_t, access_type_t>& b ) {
+template<typename tType>
+inline void swap( yaal::hcore::HPointer<tType>& a, yaal::hcore::HPointer<tType>& b ) {
 	a.swap( b );
 }
 
