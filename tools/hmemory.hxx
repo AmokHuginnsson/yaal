@@ -75,7 +75,8 @@ protected:
 	virtual void* do_get_memory( void ) const override {
 		return ( _block );
 	}
-	virtual void do_commit( int long ) override {
+	virtual void do_commit( int long size_ ) override {
+		M_ENSURE( size_ <= _size );
 		return;
 	}
 private:
@@ -85,19 +86,21 @@ private:
 
 class HMemoryProvider : public HMemoryHandlingStrategyInterface {
 	yaal::hcore::HChunk& _chunk;
+	int long _size;
 public:
-	HMemoryProvider( yaal::hcore::HChunk& chunk_ )
-		: _chunk( chunk_ ) {
+	HMemoryProvider( yaal::hcore::HChunk& chunk_, int long size_ )
+		: _chunk( chunk_ )
+		, _size( size_ ) {
 	}
 protected:
 	virtual int long do_get_size( void ) const override {
-		return ( _chunk.get_size() );
+		return ( _size );
 	}
 	virtual void* do_get_memory( void ) const override {
 		return ( _chunk.raw() );
 	}
 	virtual void do_commit( int long size_ ) override {
-		_chunk.realloc( size_ );
+		_chunk.realloc( _size = size_ );
 	}
 private:
 	HMemoryProvider( HMemoryProvider const& ) = delete;
