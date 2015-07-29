@@ -1029,6 +1029,22 @@ HXml::HNodeProxy HXml::HNodeProxy::get_parent( void ) {
 	M_EPILOG
 }
 
+void HXml::HNodeProxy::set_name( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	(**_node)._text = name_;
+	return;
+	M_EPILOG
+}
+
+void HXml::HNodeProxy::set_value( yaal::hcore::HString const& value_ ) {
+	M_PROLOG
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::COMMENT ) );
+	(**_node)._text = value_;
+	return;
+	M_EPILOG
+}
+
 HXml::HIterator HXml::HNodeProxy::add_node( HXml::HNode::TYPE::type_t const& type_, yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
