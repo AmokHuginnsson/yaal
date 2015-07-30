@@ -104,6 +104,9 @@ protected:
 	}
 	void do_delete( trait::false_type* ) {}
 	virtual void do_delete( void ) = 0;
+	virtual void destroy( void ) {
+		delete this;
+	}
 	friend struct pointer_helper;
 	template<typename>
 	friend class HPointerBase;
@@ -119,6 +122,9 @@ class HShared;
 
 template<typename tType, typename deleter_t>
 class HSharedDeleter;
+
+template<typename tType, typename deleter_t, typename allocator_t>
+class HSharedDeleterAllocator;
 
 struct pointer_helper;
 
@@ -172,7 +178,7 @@ protected:
 			/* This path is reached only when tType constructor throws
 			 * in make_pointer() helper function.
 			 */
-			delete _shared;
+			_shared->destroy();
 			_shared = nullptr;
 		}
 		return;
@@ -213,7 +219,7 @@ protected:
 		}
 		_shared->dec_reference_counter( static_cast<type*>( nullptr ) );
 		if ( ! _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] ) {
-			delete _shared;
+			_shared->destroy();
 			_shared = nullptr;
 		}
 		return ( ! ( _shared && _shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] ) );
@@ -348,6 +354,16 @@ public:
 	explicit HPointer( real_t* pointer_,  deleter_t deleter_ )
 		: HPointerBase<tType>( pointer_ ? new ( memory::yaal ) HSharedDeleter<tType, deleter_t>( deleter_, pointer_ ) : nullptr, pointer_ ) {
 		M_ASSERT( pointer_ );
+		initialize_from_this( pointer_, *this, 0 );
+		return;
+	}
+	template<typename real_t, typename deleter_t, typename allocator_t>
+	explicit HPointer( real_t* pointer_,  deleter_t deleter_, allocator_t allocator_ )
+		: HPointerBase<tType>() {
+		M_ASSERT( pointer_ );
+		this->_shared = allocator_.allocate( 1 );
+		new ( this->_shared ) HSharedDeleterAllocator<tType, deleter_t, allocator_t>( deleter_, allocator_, pointer_ );
+		this->_object = pointer_;
 		initialize_from_this( pointer_, *this, 0 );
 		return;
 	}
@@ -562,10 +578,30 @@ class HSharedDeleter : protected HSharedBase<tType> {
 		: HSharedBase<tType>( object_ )
 		, DELETER( deleter_ ) {
 	}
-	virtual ~HSharedDeleter( void ) {}
 	virtual void do_delete( void ) override {
 		DELETER( HSharedBase<tType>::_object );
 		HSharedBase<tType>::_object = nullptr;
+	}
+	friend struct pointer_helper;
+	template<typename>
+	friend class HPointer;
+};
+
+template<typename tType, typename deleter_t, typename allocator_t>
+class HSharedDeleterAllocator : protected HSharedBase<tType> {
+	deleter_t DELETER;
+	allocator_t _allocator;
+	HSharedDeleterAllocator( deleter_t const& deleter_, allocator_t const& allocator_, tType* object_ )
+		: HSharedBase<tType>( object_ )
+		, DELETER( deleter_ )
+		, _allocator( allocator_ ) {
+	}
+	virtual void do_delete( void ) override {
+		DELETER( HSharedBase<tType>::_object );
+		HSharedBase<tType>::_object = nullptr;
+	}
+	virtual void destroy( void ) override {
+		_allocator.deallocate( this, 1 );
 	}
 	friend struct pointer_helper;
 	template<typename>
@@ -675,6 +711,21 @@ struct pointer_helper {
 		return;
 	}
 
+	template<typename allocator_t, typename tType>
+	static tType* do_allocate_pointer_pre( allocator_t const& allocator_, HPointer<tType>& ptr_ ) {
+		ptr_._shared = new ( memory::yaal ) HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>( HSpaceHolderDeleter<tType>(), allocator_, static_cast<tType*>( nullptr ) );
+		return ( static_cast<HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>*>( ptr_._shared )->DELETER.mem() );
+	}
+
+	template<typename allocator_t, typename tType>
+	static void do_allocate_pointer_post( HPointer<tType>& ptr_ ) {
+		ptr_._object = static_cast<HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>*>( ptr_._shared )->DELETER.mem();
+		ptr_._shared->_object = ptr_._object;
+		ptr_._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
+		HPointer<tType>::initialize_from_this( ptr_._object, ptr_, 0 );
+		return;
+	}
+
 };
 
 template<typename to_t, typename from_t>
@@ -698,6 +749,15 @@ HPointer<tType> make_pointer( arg_t&&... arg_ ) {
 	tType* p( pointer_helper::do_make_pointer_pre( ptr ) );
 	new ( p ) tType( yaal::forward<arg_t>( arg_ )... );
 	pointer_helper::do_make_pointer_post( ptr );
+	return ( ptr );
+}
+
+template<typename allocator_t, typename tType, typename... arg_t>
+HPointer<tType> allocate_pointer( allocator_t const& allocator_, arg_t&&... arg_ ) {
+	HPointer<tType> ptr;
+	tType* p( pointer_helper::do_allocate_pointer_pre( allocator_, ptr ) );
+	new ( p ) tType( yaal::forward<arg_t>( arg_ )... );
+	pointer_helper::do_allocate_pointer_post<allocator_t>( ptr );
 	return ( ptr );
 }
 
