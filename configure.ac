@@ -61,7 +61,7 @@ YAAL_DETECT_COMPILER
 YAAL_DETECT_OPERATING_SYSTEM
 
 AC_DEFINE_UNQUOTED(TARGET_CPU,"${target_cpu}",[Target host system CPU.])
-if test ["x${target_cpu}"] = ["xx86_64"] ; then
+if test ["x${target_cpu}"] = ["xx86_64"] -o ["x${target_cpu}"] = ["xamd64"] ; then
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
 elif test ["${target_os}"] != ["`echo ${target_os} | sed -e 's/solaris//'`"] ; then
 	AC_DEFINE_UNQUOTED(TARGET_CPU_BITS,64,[Target host system CPU bits.])
