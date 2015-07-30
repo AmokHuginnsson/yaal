@@ -43,7 +43,7 @@ namespace allocator {
 /*! \brief Trivial system allocator.
  */
 template<typename T>
-struct system {
+struct system final {
 	typedef T* pointer;
 	typedef T const* const_pointer;
 	typedef T& reference;
@@ -59,6 +59,7 @@ struct system {
 	}
 	template<typename U>
 	system( system<U> const& ) {
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
 	}
 	void swap( system& ) {
 	}
@@ -84,10 +85,12 @@ struct system {
  */
 	template<typename U>
 	bool operator == ( system<U> const& ) const {
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
 		return ( true );
 	}
 	template<typename U>
 	bool operator != ( system<U> const& ) const {
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
 		return ( false );
 	}
 	void construct( pointer p, const_reference t ) {
@@ -103,7 +106,7 @@ private:
 /*! \brief Pool allocator.
  */
 template<typename T>
-struct pool {
+struct pool final {
 	typedef T* pointer;
 	typedef T const* const_pointer;
 	typedef T& reference;
@@ -125,8 +128,9 @@ struct pool {
 		{}
 	template<typename U>
 	pool( pool<U> const& )
-		: _pool()
-		{}
+		: _pool() {
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+	}
 	void swap( pool& pool_ ) {
 		if ( &pool_ != this ) {
 			using yaal::swap;
@@ -155,10 +159,12 @@ struct pool {
  */
 	template<typename U>
 	bool operator == ( pool<U> const& pool_ ) const {
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
 		return ( this == &pool_ );
 	}
 	template<typename U>
 	bool operator != ( pool<U> const& pool_ ) const {
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
 		return ( this != &pool_ );
 	}
 	void construct( pointer p, const_reference t ) {
@@ -174,7 +180,7 @@ private:
 /*! \brief Forwarding allocator.
  */
 template<typename T, typename allocator_t>
-struct ref {
+struct ref final {
 	typedef T* pointer;
 	typedef T const* const_pointer;
 	typedef T& reference;
@@ -189,15 +195,19 @@ struct ref {
 		typedef ref<U, typename allocator_type::template rebind<U>::other> other;
 	};
 	explicit ref( allocator_type* allocator_ )
-		: _allocator( allocator_ )
-		{}
+		: _allocator( allocator_ ) {
+		static_assert( sizeof ( T ) == sizeof ( typename allocator_type::value_type ), "incompatibile allocator types" );
+	}
 	ref( ref const& ref_ )
-		: _allocator( ref_._allocator )
-		{}
+		: _allocator( ref_._allocator ) {
+		static_assert( sizeof ( T ) == sizeof ( typename allocator_type::value_type ), "incompatibile allocator types" );
+	}
 	template<typename U>
 	ref( ref<U, allocator_type> const& ref_ )
-		: _allocator( ref_._allocator )
-		{}
+		: _allocator( ref_._allocator ) {
+		static_assert( sizeof ( T ) == sizeof ( typename allocator_type::value_type ), "incompatibile allocator types" );
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+	}
 	void swap( ref& ref_ ) {
 		if ( &ref_ != this ) {
 			using yaal::swap;
@@ -205,14 +215,12 @@ struct ref {
 		}
 	}
 	pointer allocate( size_type n ) {
-		STATIC_ASSERT( sizeof ( value_type ) == sizeof ( typename allocator_type::value_type ) );
 		return ( reinterpret_cast<pointer>( _allocator->allocate( n ) ) );
 	}
 	pointer allocate( size_type n, const_pointer p ) {
 		return ( _allocator->allocate( n, p ) );
 	}
 	void deallocate( pointer p, size_type n ) {
-		STATIC_ASSERT( sizeof ( value_type ) == sizeof ( typename allocator_type::value_type ) );
 		_allocator->deallocate( reinterpret_cast<typename allocator_type::pointer>( p ), n );
 	}
 	pointer address( reference r ) const {
@@ -228,10 +236,12 @@ struct ref {
  */
 	template<typename U>
 	bool operator == ( ref<U, allocator_type> const& ref_ ) const {
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
 		return ( *_allocator == *ref_._allocator );
 	}
 	template<typename U>
 	bool operator != ( ref<U, allocator_type> const& ref_ ) const {
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
 		return ( *_allocator != *ref_._allocator );
 	}
 	void construct( pointer p, const_reference t ) {
