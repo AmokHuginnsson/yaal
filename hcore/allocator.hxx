@@ -177,6 +177,80 @@ private:
 	pool& operator = ( pool const& );
 };
 
+/*! \brief Allocator with external (possibly shared) pool.
+ */
+template<typename T>
+struct shared_pool final {
+	typedef T* pointer;
+	typedef T const* const_pointer;
+	typedef T& reference;
+	typedef T const& const_reference;
+	typedef T value_type;
+	typedef size_t size_type;
+	typedef ptrdiff_t difference_type;
+	typedef yaal::hcore::HPool<sizeof ( T )> pool_t;
+	pool_t* _pool;
+	template<typename U>
+	struct rebind {
+		typedef shared_pool<U> other;
+	};
+	shared_pool( pool_t& pool_ )
+		: _pool( &pool_ )
+		{}
+	shared_pool( shared_pool const& other_ )
+		: _pool( other_._pool )
+		{}
+	template<typename U>
+	shared_pool( shared_pool<U> const& other_ )
+		: _pool( other_._pool ) {
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+	}
+	void swap( shared_pool& pool_ ) {
+		if ( &pool_ != this ) {
+			using yaal::swap;
+			swap( _pool, pool_._pool );
+		}
+	}
+	pointer allocate( size_type ) {
+		return ( static_cast<pointer>( _pool->alloc() ) );
+	}
+	pointer allocate( size_type, const_pointer ) {
+		return ( static_cast<pointer>( _pool->alloc() ) );
+	}
+	void deallocate( pointer p, size_type ) {
+		_pool->free( p );
+	}
+	pointer address( reference r ) const {
+		return ( &r );
+	}
+	const_pointer address( const_reference s ) const {
+		return ( &s );
+	}
+	size_type max_size( void ) const {
+		return ( 0x1fffffff );
+	}
+/*! \brief true iff you can deallocate with shared_pool<Y> something allocated with shared_pool<X>.
+ */
+	template<typename U>
+	bool operator == ( shared_pool<U> const& pool_ ) const {
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		return ( _pool == pool_->_pool );
+	}
+	template<typename U>
+	bool operator != ( shared_pool<U> const& pool_ ) const {
+		static_assert( sizeof ( T ) == sizeof ( U ), "incompatibile allocator types" );
+		return ( _pool != pool_->_pool );
+	}
+	void construct( pointer p, const_reference t ) {
+		new ( p ) T( t );
+	}
+	void destroy( pointer p ) {
+		p->~T();
+	}
+private:
+	shared_pool& operator = ( shared_pool const& );
+};
+
 /*! \brief Forwarding allocator.
  */
 template<typename T, typename allocator_t>
