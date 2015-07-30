@@ -114,7 +114,7 @@ struct pool final {
 	typedef T value_type;
 	typedef size_t size_type;
 	typedef ptrdiff_t difference_type;
-	typedef yaal::hcore::HPool<T> pool_t;
+	typedef yaal::hcore::HPool<sizeof ( T )> pool_t;
 	pool_t _pool;
 	template<typename U>
 	struct rebind {
@@ -138,10 +138,10 @@ struct pool final {
 		}
 	}
 	pointer allocate( size_type ) {
-		return ( _pool.alloc() );
+		return ( static_cast<pointer>( _pool.alloc() ) );
 	}
 	pointer allocate( size_type, const_pointer ) {
-		return ( _pool.alloc() );
+		return ( static_cast<pointer>( _pool.alloc() ) );
 	}
 	void deallocate( pointer p, size_type ) {
 		_pool.free( p );

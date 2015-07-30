@@ -41,12 +41,12 @@ namespace hcore {
 
 /*! \brief HPool<> - object memory pool.
  */
-template<typename T>
+template<int const size>
 class HPool final {
 public:
 	typedef int long long aligner_t;
 	static int const OBJECTS_PER_BLOCK = 256;
-	static int const OBJECT_SIZE = sizeof ( T );
+	static int const OBJECT_SIZE = size;
 #if TARGET_CPU_BITS == 64
 	static int const OBJECT_SPACE = meta::ternary<(OBJECT_SIZE < 2), 2,
 	                                meta::ternary<(OBJECT_SIZE < 4), 4,
@@ -61,9 +61,9 @@ public:
 #endif /* #else #elif TARGET_CPU_BITS == 32 #if TARGET_CPU_BITS == 64 */
 	static int const ALIGNER_ELEMENTS_PER_BLOCK = OBJECT_SPACE * ( OBJECTS_PER_BLOCK / sizeof ( aligner_t ) );
 private:
-	class HPoolBlock {
+	class HPoolBlock final {
 	private:
-		aligner_t _mem[ HPool<T>::ALIGNER_ELEMENTS_PER_BLOCK ];
+		aligner_t _mem[ HPool<size>::ALIGNER_ELEMENTS_PER_BLOCK ];
 		int _free; /*!< index of first free object */
 		int _used; /*!< number of allocated object in this block pool*/
 		int _index; /*!< This block index in HPool<>. */
@@ -77,15 +77,15 @@ private:
 				*( p + OBJECT_SPACE - 1 ) = i;
 			}
 		}
-		T* alloc( void ) {
-			T* p( reinterpret_cast<T*>( reinterpret_cast<char*>( _mem ) + OBJECT_SPACE * _free ) );
-			_free = *reinterpret_cast<char unsigned*>( p );
+		void* alloc( void ) {
+			void* p( reinterpret_cast<char*>( _mem ) + OBJECT_SPACE * _free );
+			_free = *static_cast<char unsigned*>( p );
 			++ _used;
 			return ( p );
 		}
-		bool free( T* ptr_ ) {
-			int freed( *( reinterpret_cast<char unsigned*>( ptr_ ) + OBJECT_SPACE - 1 ) );
-			*reinterpret_cast<char unsigned*>( ptr_ ) = _free;
+		bool free( void* ptr_ ) {
+			int freed( *( static_cast<char unsigned*>( ptr_ ) + OBJECT_SPACE - 1 ) );
+			*static_cast<char unsigned*>( ptr_ ) = _free;
 			_free = freed;
 			-- _used;
 			return ( _used == 0 );
@@ -94,9 +94,9 @@ private:
 			return ( _used == OBJECTS_PER_BLOCK );
 		}
 	private:
-		friend class HPool<T>;
-		HPoolBlock( HPoolBlock const& );
-		HPoolBlock& operator = ( HPoolBlock const& );
+		friend class HPool<size>;
+		HPoolBlock( HPoolBlock const& ) = delete;
+		HPoolBlock& operator = ( HPoolBlock const& ) = delete;
 	};
 	HPoolBlock** _poolBlocks;
 	int _poolBlockCount;
@@ -104,30 +104,38 @@ private:
 	int _free; /*!< index of first HPoolBlock with free space. */
 public:
 	HPool( void )
-		: _poolBlocks( NULL ), _poolBlockCount( 0 ),
-		_poolBlockCapacity( 0 ), _free( -1 )
-		{}
+		: _poolBlocks( NULL )
+		, _poolBlockCount( 0 )
+		, _poolBlockCapacity( 0 )
+		, _free( -1 ) {
+		return;
+	}
+	HPool( HPool&& ) = default;
+	HPool& operator = ( HPool&& ) = default;
 	~HPool( void ) {
-		for ( int i( 0 ); i < _poolBlockCount; ++ i )
+		for ( int i( 0 ); i < _poolBlockCount; ++ i ) {
 			delete _poolBlocks[i];
+		}
 		delete [] _poolBlocks;
 	}
-	T* alloc( void ) {
-		if ( _free == -1 )
+	void* alloc( void ) {
+		if ( _free == -1 ) {
 			get_free_block();
-		T* p( _poolBlocks[_free]->alloc() );
+		}
+		void* p( _poolBlocks[_free]->alloc() );
 		if ( _poolBlocks[_free]->is_full() ) {
-			if ( _free < ( _poolBlockCount - 1 ) )
+			if ( _free < ( _poolBlockCount - 1 ) ) {
 				++ _free;
-			else
+			} else {
 				_free = -1;
+			}
 		}
 		return ( p );
 	}
-	void free( T* p ) {
+	void free( void* p ) {
 		/* Find HPoolBlock that holds this object memory. */
-		int offset( *( reinterpret_cast<char unsigned*>( p ) + OBJECT_SPACE - 1 ) );
-		HPoolBlock* pb( reinterpret_cast<HPoolBlock*>( reinterpret_cast<char unsigned*>( p ) - offset * OBJECT_SPACE ) );
+		int offset( *( static_cast<char unsigned*>( p ) + OBJECT_SPACE - 1 ) );
+		HPoolBlock* pb( reinterpret_cast<HPoolBlock*>( static_cast<char unsigned*>( p ) - offset * OBJECT_SPACE ) );
 		bool wasFull( pb->is_full() );
 		if ( pb->free( p ) ) {
 			/* HPoolBlock is no longer used so we can possibly remove it. */
@@ -187,13 +195,8 @@ private:
 	HPool& operator = ( HPool const& );
 };
 
-template<typename T>
-int const HPool<T>::OBJECTS_PER_BLOCK;
-template<typename T>
-int const HPool<T>::OBJECT_SPACE;
-
-template<typename T>
-inline void swap( yaal::hcore::HPool<T>& a, yaal::hcore::HPool<T>& b ) {
+template<int const size>
+inline void swap( yaal::hcore::HPool<size>& a, yaal::hcore::HPool<size>& b ) {
 	a.swap( b );
 }
 
