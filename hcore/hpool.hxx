@@ -113,8 +113,12 @@ public:
 	HPool( HPool&& ) = default;
 	HPool& operator = ( HPool&& ) = default;
 	~HPool( void ) {
-		for ( int i( 0 ); i < _poolBlockCount; ++ i ) {
-			delete _poolBlocks[i];
+		M_ASSERT( ( _poolBlockCount == 0 ) || ( _poolBlockCount == 1 ) );
+		if ( _poolBlockCount == 1 ) {
+			M_ASSERT( _free == 0 );
+			M_ASSERT( _poolBlocks[_free]->_used == 0 );
+			delete _poolBlocks[_free];
+
 		}
 		delete [] _poolBlocks;
 	}

@@ -78,8 +78,8 @@ protected:
 	HSharedBase( value_type* object_ )
 		: _referenceCounter()
 		, _object( object_ ) {
-		_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] = 0;
-		_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] = 0;
+		_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] = 1;
+		_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] = 1;
 	}
 	void inc_reference_counter( trait::true_type* ) {
 		++ _referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ];
@@ -166,8 +166,6 @@ public:
 	HPointerBase( shared_t* shared_, value_type* object_ )
 		: _shared( shared_ )
 		, _object( object_ ) {
-		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::HOLDER ] = 1;
-		_shared->_referenceCounter[ REFERENCE_COUNTER_TYPE::OBSERVER ] = 1;
 		return;
 	}
 	HPointerBase( HPointerBase const& ) = delete;
@@ -361,8 +359,10 @@ public:
 	explicit HPointer( real_t* pointer_,  deleter_t deleter_, allocator_t allocator_ )
 		: HPointerBase<tType>() {
 		M_ASSERT( pointer_ );
-		this->_shared = allocator_.allocate( 1 );
-		new ( this->_shared ) HSharedDeleterAllocator<tType, deleter_t, allocator_t>( deleter_, allocator_, pointer_ );
+		typedef typename allocator_t::template rebind<HSharedDeleterAllocator<tType, deleter_t, allocator_t>>::other allocator_type;
+		allocator_type allocator( allocator_ );
+		this->_shared = allocator.allocate( 1 );
+		new ( this->_shared ) HSharedDeleterAllocator<tType, deleter_t, allocator_type>( deleter_, allocator, pointer_ );
 		this->_object = pointer_;
 		initialize_from_this( pointer_, *this, 0 );
 		return;
@@ -591,7 +591,8 @@ template<typename tType, typename deleter_t, typename allocator_t>
 class HSharedDeleterAllocator : protected HSharedBase<tType> {
 	deleter_t DELETER;
 	allocator_t _allocator;
-	HSharedDeleterAllocator( deleter_t const& deleter_, allocator_t const& allocator_, tType* object_ )
+	template<typename input_allocator>
+	HSharedDeleterAllocator( deleter_t const& deleter_, input_allocator const& allocator_, tType* object_ )
 		: HSharedBase<tType>( object_ )
 		, DELETER( deleter_ )
 		, _allocator( allocator_ ) {
@@ -601,7 +602,8 @@ class HSharedDeleterAllocator : protected HSharedBase<tType> {
 		HSharedBase<tType>::_object = nullptr;
 	}
 	virtual void destroy( void ) override {
-		_allocator.deallocate( this, 1 );
+		typedef typename allocator_t:: template rebind<HSharedDeleterAllocator>::other allocator_type;
+		allocator_type( _allocator ).deallocate( this, 1 );
 	}
 	friend struct pointer_helper;
 	template<typename>
@@ -706,7 +708,6 @@ struct pointer_helper {
 	static void do_make_pointer_post( HPointer<tType>& ptr_ ) {
 		ptr_._object = static_cast<HSharedDeleter<tType, HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem();
 		ptr_._shared->_object = ptr_._object;
-		ptr_._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
 		HPointer<tType>::initialize_from_this( ptr_._object, ptr_, 0 );
 		return;
 	}
@@ -721,7 +722,6 @@ struct pointer_helper {
 	static void do_allocate_pointer_post( HPointer<tType>& ptr_ ) {
 		ptr_._object = static_cast<HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>*>( ptr_._shared )->DELETER.mem();
 		ptr_._shared->_object = ptr_._object;
-		ptr_._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
 		HPointer<tType>::initialize_from_this( ptr_._object, ptr_, 0 );
 		return;
 	}
