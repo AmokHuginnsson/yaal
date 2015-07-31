@@ -126,7 +126,82 @@ class HSharedDeleter;
 template<typename tType, typename deleter_t, typename allocator_t>
 class HSharedDeleterAllocator;
 
-struct pointer_helper;
+struct pointer_helper {
+	template<typename to_t, typename from_t>
+	static typename yaal::hcore::HPointer<to_t> do_static_cast( HPointer<from_t> const& from_ ) {
+		HPointer<to_t> to;
+		if ( from_._object ) {
+			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
+			to._object = static_cast<to_t*>( from_._object );
+			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
+		}
+		return ( to );
+	}
+
+	template<typename to_t, typename from_t>
+	static typename yaal::hcore::HPointer<to_t> do_dynamic_cast( HPointer<from_t> const& from_ ) {
+		HPointer<to_t> to;
+		if ( dynamic_cast<to_t*>( from_._object ) ) {
+			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
+			to._object = static_cast<to_t*>( from_._object );
+			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
+		}
+		return ( to );
+	}
+
+	template<typename to_t, typename from_t>
+	static typename yaal::hcore::HPointer<to_t> do_const_cast( HPointer<from_t> const& from_ ) {
+		HPointer<to_t> to;
+		if ( dynamic_cast<to_t*>( from_._object ) ) {
+			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
+			to._object = const_cast<to_t*>( from_._object );
+			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
+		}
+		return ( to );
+	}
+
+	template<typename tType>
+	class HSpaceHolderDeleter {
+		char _mem[sizeof ( tType )];
+	public:
+		HSpaceHolderDeleter( void ) : _mem() {}
+		void operator()( tType* ) {
+			mem()->~tType();
+		}
+		tType* mem( void ) {
+			return ( static_cast<tType*>( static_cast<void*>( _mem ) ) );
+		}
+	};
+
+	template<typename tType>
+	static tType* do_make_pointer_pre( HPointer<tType>& ptr_ ) {
+		ptr_._shared = new ( memory::yaal ) HSharedDeleter<tType, HSpaceHolderDeleter<tType> >( HSpaceHolderDeleter<tType>(), static_cast<tType*>( nullptr ) );
+		return ( static_cast<HSharedDeleter<tType, HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem() );
+	}
+
+	template<typename tType>
+	static void do_make_pointer_post( HPointer<tType>& ptr_ ) {
+		ptr_._object = static_cast<HSharedDeleter<tType, HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem();
+		ptr_._shared->_object = ptr_._object;
+		HPointer<tType>::initialize_from_this( ptr_._object, ptr_, 0 );
+		return;
+	}
+
+	template<typename allocator_t, typename tType>
+	static tType* do_allocate_pointer_pre( allocator_t const& allocator_, HPointer<tType>& ptr_ ) {
+		ptr_._shared = new ( memory::yaal ) HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>( HSpaceHolderDeleter<tType>(), allocator_, static_cast<tType*>( nullptr ) );
+		return ( static_cast<HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>*>( ptr_._shared )->DELETER.mem() );
+	}
+
+	template<typename allocator_t, typename tType>
+	static void do_allocate_pointer_post( HPointer<tType>& ptr_ ) {
+		ptr_._object = static_cast<HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>*>( ptr_._shared )->DELETER.mem();
+		ptr_._shared->_object = ptr_._object;
+		HPointer<tType>::initialize_from_this( ptr_._object, ptr_, 0 );
+		return;
+	}
+
+};
 
 template<typename tType>
 class HPointerBase {
@@ -334,6 +409,12 @@ public:
 	typedef typename HPointerBase<tType>::value_type value_type;
 	typedef typename HPointerBase<tType>::reference reference;
 	typedef typename HPointerBase<tType const>::const_reference const_reference;
+	typedef pointer_helper::HSpaceHolderDeleter<tType> space_holder_deleter_t;
+	template<typename allocator_t>
+	struct allocated_shared {
+		typedef HSharedDeleterAllocator<tType, space_holder_deleter_t, allocator_t> type;
+		static int const size = static_cast<int>( sizeof ( type ) );
+	};
 	HPointer( void )
 		: HPointerBase<tType>() {
 		return;
@@ -650,83 +731,6 @@ template<typename alien_t, typename tType>
 bool operator != ( alien_t const* const pointer_, HPointer<tType> const& smartPointer_ ) {
 	return ( smartPointer_ != pointer_ );
 }
-
-struct pointer_helper {
-	template<typename to_t, typename from_t>
-	static typename yaal::hcore::HPointer<to_t> do_static_cast( HPointer<from_t> const& from_ ) {
-		HPointer<to_t> to;
-		if ( from_._object ) {
-			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
-			to._object = static_cast<to_t*>( from_._object );
-			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
-		}
-		return ( to );
-	}
-
-	template<typename to_t, typename from_t>
-	static typename yaal::hcore::HPointer<to_t> do_dynamic_cast( HPointer<from_t> const& from_ ) {
-		HPointer<to_t> to;
-		if ( dynamic_cast<to_t*>( from_._object ) ) {
-			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
-			to._object = static_cast<to_t*>( from_._object );
-			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
-		}
-		return ( to );
-	}
-
-	template<typename to_t, typename from_t>
-	static typename yaal::hcore::HPointer<to_t> do_const_cast( HPointer<from_t> const& from_ ) {
-		HPointer<to_t> to;
-		if ( dynamic_cast<to_t*>( from_._object ) ) {
-			to._shared = reinterpret_cast<HSharedBase<to_t>*>( from_._shared );
-			to._object = const_cast<to_t*>( from_._object );
-			to._shared->inc_reference_counter( static_cast<trait::true_type*>( nullptr ) );
-		}
-		return ( to );
-	}
-
-	template<typename tType>
-	class HSpaceHolderDeleter {
-		char _mem[sizeof ( tType )];
-	public:
-		HSpaceHolderDeleter( void ) : _mem() {}
-		void operator()( tType* ) {
-			mem()->~tType();
-		}
-		tType* mem( void ) {
-			return ( static_cast<tType*>( static_cast<void*>( _mem ) ) );
-		}
-	};
-
-	template<typename tType>
-	static tType* do_make_pointer_pre( HPointer<tType>& ptr_ ) {
-		ptr_._shared = new ( memory::yaal ) HSharedDeleter<tType, HSpaceHolderDeleter<tType> >( HSpaceHolderDeleter<tType>(), static_cast<tType*>( nullptr ) );
-		return ( static_cast<HSharedDeleter<tType, HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem() );
-	}
-
-	template<typename tType>
-	static void do_make_pointer_post( HPointer<tType>& ptr_ ) {
-		ptr_._object = static_cast<HSharedDeleter<tType, HSpaceHolderDeleter<tType> >*>( ptr_._shared )->DELETER.mem();
-		ptr_._shared->_object = ptr_._object;
-		HPointer<tType>::initialize_from_this( ptr_._object, ptr_, 0 );
-		return;
-	}
-
-	template<typename allocator_t, typename tType>
-	static tType* do_allocate_pointer_pre( allocator_t const& allocator_, HPointer<tType>& ptr_ ) {
-		ptr_._shared = new ( memory::yaal ) HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>( HSpaceHolderDeleter<tType>(), allocator_, static_cast<tType*>( nullptr ) );
-		return ( static_cast<HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>*>( ptr_._shared )->DELETER.mem() );
-	}
-
-	template<typename allocator_t, typename tType>
-	static void do_allocate_pointer_post( HPointer<tType>& ptr_ ) {
-		ptr_._object = static_cast<HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>*>( ptr_._shared )->DELETER.mem();
-		ptr_._shared->_object = ptr_._object;
-		HPointer<tType>::initialize_from_this( ptr_._object, ptr_, 0 );
-		return;
-	}
-
-};
 
 template<typename to_t, typename from_t>
 typename yaal::hcore::HPointer<to_t> pointer_static_cast( HPointer<from_t> const& from_ ) {
