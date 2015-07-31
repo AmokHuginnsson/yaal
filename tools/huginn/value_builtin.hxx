@@ -45,8 +45,8 @@ HHuginn::value_t range( HHuginn::value_t&, HHuginn::value_t const&, HHuginn::val
 HHuginn::value_t add( HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t sub( HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t mul( HHuginn::value_t const&, HHuginn::value_t const&, int );
-HHuginn::value_t div( HHuginn::value_t const&, HHuginn::value_t const&, int );
-HHuginn::value_t mod( HHuginn::value_t const&, HHuginn::value_t const&, int );
+HHuginn::value_t div( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
+HHuginn::value_t mod( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t pow( HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t abs( HHuginn::value_t const&, int );
 HHuginn::value_t neg( HHuginn::value_t const&, int );

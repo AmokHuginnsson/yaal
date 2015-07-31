@@ -111,7 +111,7 @@ HHuginn::value_t _false_ = make_pointer<HHuginn::HBoolean>( false );
 
 namespace exception {
 
-extern HHuginn::class_t _class_;
+extern HHuginn::class_t _exceptionClass_;
 
 }
 
@@ -961,7 +961,7 @@ void HHuginn::register_class( class_t class_ ) {
 
 void HHuginn::finalize_compilation( void ) {
 	M_PROLOG
-	register_class( exception::_class_ );
+	register_class( exception::_exceptionClass_ );
 	for ( OCompiler::submitted_imports_t::value_type i : _compiler->_submittedImports ) {
 		_packages.insert( make_pair( i.second, HPackageFactoryInstance::get_instance().create_package( this, i.first ) ) );
 	}

@@ -95,6 +95,10 @@ inline i32_t leafcmp( i32_t const* left_, i32_t const* right_, HNumber::integer_
 	return ( cmp );
 }
 
+}
+
+namespace number {
+
 HNumber const _zero_( 0 );
 HNumber const _one_( 1 );
 HNumber const _two_( 2 );
@@ -1281,7 +1285,7 @@ HNumber& HNumber::operator ^= ( int long long exp_ ) {
 
 HNumber& HNumber::operator ++ ( void ) {
 	M_PROLOG
-	operator += ( _one_ );
+	operator += ( number::_one_ );
 	return ( *this );
 	M_EPILOG
 }
@@ -1296,7 +1300,7 @@ HNumber HNumber::operator ++ ( int ) {
 
 HNumber& HNumber::operator -- ( void ) {
 	M_PROLOG
-	operator -= ( _one_ );
+	operator -= ( number::_one_ );
 	return ( *this );
 	M_EPILOG
 }
@@ -1621,7 +1625,7 @@ struct HNumber::ElementaryFunctions {
 			}
 			HString s( value_.to_string() );
 			integer_t digits( 0 );
-			bool aboveOne( value_ >= _one_ );
+			bool aboveOne( value_ >= number::_one_ );
 			if ( aboveOne ) {
 				digits = static_cast<integer_t>( s.find( VALID_CHARACTERS[A_DOT] ) );
 				if ( digits == HString::npos ) {
@@ -1631,7 +1635,7 @@ struct HNumber::ElementaryFunctions {
 				static int const SKIP_ZERO_DOT( 2 );
 				digits = static_cast<integer_t>( s.find_other_than( "0", SKIP_ZERO_DOT ) ); /* SKIP_ZERO_DOT - skip "0." at the beginning */
 				if ( digits == HString::npos ) {
-					n = _zero_;
+					n = number::_zero_;
 					break;
 				}
 				digits -= SKIP_ZERO_DOT;
@@ -1667,7 +1671,7 @@ struct HNumber::ElementaryFunctions {
 				}
 				tmp /= n;
 				n += tmp;
-				n *= _half_;
+				n *= number::_half_;
 				if ( n.is_exact() && ( ( n * n ) == value_ ) ) {
 					break;
 				}

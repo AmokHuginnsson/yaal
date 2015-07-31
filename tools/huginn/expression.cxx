@@ -321,7 +321,7 @@ void HExpression::div( HFrame* frame_, int ) {
 	if ( v1->type() != v2->type() ) {
 		operands_type_mismatch( "/", v1->type(), v2->type(), p );
 	}
-	frame_->values().push( value_builtin::div( v1, v2, p ) );
+	frame_->values().push( value_builtin::div( frame_->thread(), v1, v2, p ) );
 	return;
 	M_EPILOG
 }
@@ -339,7 +339,7 @@ void HExpression::mod( HFrame* frame_, int ) {
 	if ( v1->type() != v2->type() ) {
 		operands_type_mismatch( "%", v1->type(), v2->type(), p );
 	}
-	frame_->values().push( value_builtin::mod( v1, v2, p ) );
+	frame_->values().push( value_builtin::mod( frame_->thread(), v1, v2, p ) );
 	return;
 	M_EPILOG
 }

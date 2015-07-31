@@ -266,6 +266,13 @@ inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b ) {
 
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& );
 
+namespace number {
+	extern HNumber const _zero_;
+	extern HNumber const _one_;
+	extern HNumber const _two_;
+	extern HNumber const _half_;
+}
+
 }
 
 }

@@ -116,7 +116,7 @@ private:
 	}
 };
 
-HHuginn::class_t _class_( make_pointer<HExceptionClass>( nullptr, "Exception", nullptr ) );
+HHuginn::class_t _exceptionClass_( make_pointer<HExceptionClass>( nullptr, "Exception", nullptr ) );
 
 HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& name_, HHuginn::HClass const* base_ ) {
 	M_PROLOG
@@ -124,14 +124,21 @@ HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& nam
 		make_pointer<HExceptionClass>(
 			huginn_,
 			name_,
-			base_ ? base_ : _class_.raw()
+			base_ ? base_ : _exceptionClass_.raw()
 		)
 	);
 	return ( c );
 	M_EPILOG
 }
 
+HHuginn::class_t _conversionExceptionClass_ = exception::create_class( nullptr, "ConversionException" );
+HHuginn::class_t _arithmeticExceptionClass_ = exception::create_class( nullptr, "ArithmeticException" );
+
 }
+
+HHuginn::HClass const* _exception_( exception::_exceptionClass_.raw() );
+HHuginn::HClass const* _conversionException_( exception::_conversionExceptionClass_.raw() );
+HHuginn::HClass const* _arithmeticException_( exception::_arithmeticExceptionClass_.raw() );
 
 }
 
