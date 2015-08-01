@@ -189,7 +189,10 @@ struct pointer_helper {
 
 	template<typename allocator_t, typename tType>
 	static tType* do_allocate_pointer_pre( allocator_t const& allocator_, HPointer<tType>& ptr_ ) {
-		ptr_._shared = new ( memory::yaal ) HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>( HSpaceHolderDeleter<tType>(), allocator_, static_cast<tType*>( nullptr ) );
+		typedef typename allocator_t::template rebind<HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>>::other allocator_type;
+		allocator_type allocator( allocator_ );
+		ptr_._shared = allocator.allocate( 1 );
+		new ( ptr_._shared ) HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>( HSpaceHolderDeleter<tType>(), allocator, static_cast<tType*>( nullptr ) );
 		return ( static_cast<HSharedDeleterAllocator<tType, HSpaceHolderDeleter<tType>, allocator_t>*>( ptr_._shared )->DELETER.mem() );
 	}
 
