@@ -33,7 +33,7 @@ Copyright:
 
 #include "config.hxx"
 #include "hcore/memory.hxx"
-#include "hcore/algorithm_low.hxx"
+#include "hcore/algorithm.hxx"
 
 namespace yaal {
 
@@ -71,21 +71,21 @@ private:
 		HPoolBlock( int index_ )
 			: _mem(), _free( 0 ), _used( 0 ), _index( index_ ) {
 			/* Create linked list of free object memory places. */
-			char unsigned* p( reinterpret_cast<char unsigned*>( _mem ) );
+			u8_t* p( reinterpret_cast<u8_t*>( _mem ) );
 			for ( int i( 0 ); i < OBJECTS_PER_BLOCK; ++ i, p += OBJECT_SPACE ) {
-				*p = static_cast<char unsigned>( i + 1 );
-				*( p + OBJECT_SPACE - 1 ) = i;
+				*p = static_cast<u8_t>( i + 1 );
+				*( p + OBJECT_SPACE - 1 ) = static_cast<u8_t>( i );
 			}
 		}
 		void* alloc( void ) {
 			void* p( reinterpret_cast<char*>( _mem ) + OBJECT_SPACE * _free );
-			_free = *static_cast<char unsigned*>( p );
+			_free = *static_cast<u8_t*>( p );
 			++ _used;
 			return ( p );
 		}
 		bool free( void* ptr_ ) {
-			int freed( *( static_cast<char unsigned*>( ptr_ ) + OBJECT_SPACE - 1 ) );
-			*static_cast<char unsigned*>( ptr_ ) = _free;
+			int freed( *( static_cast<u8_t*>( ptr_ ) + OBJECT_SPACE - 1 ) );
+			*static_cast<u8_t*>( ptr_ ) = static_cast<u8_t>( _free );
 			_free = freed;
 			-- _used;
 			return ( _used == 0 );
@@ -138,8 +138,8 @@ public:
 	}
 	void free( void* p ) {
 		/* Find HPoolBlock that holds this object memory. */
-		int offset( *( static_cast<char unsigned*>( p ) + OBJECT_SPACE - 1 ) );
-		HPoolBlock* pb( reinterpret_cast<HPoolBlock*>( static_cast<char unsigned*>( p ) - offset * OBJECT_SPACE ) );
+		int offset( *( static_cast<u8_t*>( p ) + OBJECT_SPACE - 1 ) );
+		HPoolBlock* pb( reinterpret_cast<HPoolBlock*>( static_cast<u8_t*>( p ) - offset * OBJECT_SPACE ) );
 		bool wasFull( pb->is_full() );
 		if ( pb->free( p ) ) {
 			/* HPoolBlock is no longer used so we can possibly remove it. */
@@ -150,15 +150,17 @@ public:
 					_poolBlocks[pb->_index] = _poolBlocks[_poolBlockCount];
 					_poolBlocks[pb->_index]->_index = pb->_index;
 				}
-				if ( _free == _poolBlockCount )
+				if ( _free == _poolBlockCount ) {
 					-- _free;
+				}
 				delete pb;
 			} /* else, this is the only block with free space so we keep it. */
 		} else if ( wasFull ) {
-			if ( _free > 0 )
+			if ( _free > 0 ) {
 				-- _free;
-			else
+			} else {
 				_free = _poolBlockCount - 1;
+			}
 			if ( pb != _poolBlocks[_free] ) {
 				using yaal::swap;
 				/* Oreder of swaps matters. */
@@ -182,8 +184,9 @@ private:
 			int newCapacity( ( _poolBlockCapacity > 0 ? _poolBlockCapacity * 2 : 8 ) );
 			/* msvcxx does not allow `T v( i );', it must be `T v = i;'. */
 			HPoolBlock** poolBlocks = new ( memory::yaal ) HPoolBlock*[ newCapacity ];
-			if ( _poolBlockCapacity )
-				copy( _poolBlocks, _poolBlocks + _poolBlockCount, poolBlocks );
+			if ( _poolBlockCapacity ) {
+				yaal::copy( _poolBlocks, _poolBlocks + _poolBlockCount, poolBlocks );
+			}
 			using yaal::swap;
 			swap( _poolBlocks, poolBlocks );
 			delete [] poolBlocks;
