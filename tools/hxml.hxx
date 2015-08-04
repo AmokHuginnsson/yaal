@@ -152,21 +152,17 @@ class HXml::HNode {
 public:
 	/*! \brief XML node types.
 	 */
-	struct TYPE {
-		/*! \brief XML node types.
-		 */
-		typedef enum {
-			NODE,    /*!< XML node. */
-			CONTENT, /*!< XML node content. */
-			ENTITY,  /*!< XML entity. */
-			COMMENT  /*!< XML comment. */
-		} type_t;
+	enum class TYPE {
+		NODE,    /*!< XML node. */
+		CONTENT, /*!< XML node content. */
+		ENTITY,  /*!< XML entity. */
+		COMMENT  /*!< XML comment. */
 	};
 	typedef yaal::hcore::HMap<yaal::hcore::HString, yaal::hcore::HString> properties_t;
 	typedef yaal::hcore::HArray<HXml::HNameSpace const*> namespace_definitions_t;
 private:
 	HXml const* _owner;
-	TYPE::type_t _type;
+	TYPE _type;
 	yaal::hcore::HString _text;
 	properties_t _properties;
 	namespace_definitions_t _namespaceDefinitions;
@@ -178,7 +174,7 @@ public:
 		_namespaceDefinitions(), _line( line_ ) {
 		return;
 	}
-	HNode( HXml const* owner_, TYPE::type_t const& type,
+	HNode( HXml const* owner_, TYPE type,
 			yaal::hcore::HString const& value, int line_ = 0 )
 		: _owner( owner_ ), _type( type ),
 		_text( value ), _properties(),
@@ -241,7 +237,7 @@ public:
 	const_reverse_iterator rbegin() const;
 	const_reverse_iterator rend() const;
 	HXml const* xml( void ) const;
-	HXml::HNode::TYPE::type_t get_type() const;
+	HXml::HNode::TYPE get_type() const;
 	bool has_childs( void ) const;
 	int long child_count( void ) const;
 	int get_level( void ) const;
@@ -291,9 +287,9 @@ public:
 	using HConstNodeProxy::get_parent;
 	HXml::HIterator remove_node( HXml::HIterator );
 	HXml::HIterator replace_node( HXml::HIterator, HXml::HNodeProxy );
-	HXml::HIterator add_node( HXml::HNode::TYPE::type_t const&, yaal::hcore::HString const& );
+	HXml::HIterator add_node( HXml::HNode::TYPE, yaal::hcore::HString const& = yaal::hcore::HString() );
 	HXml::HIterator add_node( yaal::hcore::HString const&, yaal::hcore::HString const& = yaal::hcore::HString() );
-	HXml::HIterator insert_node( HXml::HIterator, HXml::HNode::TYPE::type_t const&, yaal::hcore::HString const& );
+	HXml::HIterator insert_node( HXml::HIterator, HXml::HNode::TYPE, yaal::hcore::HString const& );
 	HXml::HIterator insert_node( HXml::HIterator, yaal::hcore::HString const&, yaal::hcore::HString const& = yaal::hcore::HString() );
 	HXml::HIterator move_node( HXml::HIterator, HXml::HNodeProxy );
 	HXml::HIterator move_node( HXml::HNodeProxy );
