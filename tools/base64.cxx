@@ -145,8 +145,9 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 		}
 	}
 	if ( i % 4 ) {
+		M_ENSURE( i > 1 );
 		do_buf_4_to_3( output + size, coder, static_cast<int>( ( bufSize - size - 1 ) ) );
-		size += ( length - i );
+		size += ( ( i * 3 ) / 4 );
 	}
 	return ( size );
 	M_EPILOG
