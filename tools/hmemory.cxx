@@ -95,7 +95,7 @@ int long HMemory::do_read( void* const dest_, int long size_ ) {
 		int long part2( size - part1 );
 		::memcpy( dest_, static_cast<char*>( _memory.get_memory() ) + _cursorRead, static_cast<size_t>( part1 ) );
 		::memcpy( static_cast<char*>( dest_ ) + part1, static_cast<char*>( _memory.get_memory() ), static_cast<size_t>( part2 ) );
-		_cursorWrite = part2;
+		_cursorRead = part2;
 	} else {
 		::memcpy( dest_, static_cast<char const* const>( _memory.get_memory() ) + _cursorRead, static_cast<size_t>( size ) );
 		_cursorRead += size;
