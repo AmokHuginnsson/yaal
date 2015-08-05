@@ -228,6 +228,10 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 			}
 		}
 	}
+	if ( decodebuf.get_length() > 0 ) {
+		size = base64_raw_decode( decodebuf, buf, sizeof ( buf ), standardCompliantMode );
+		out.write( buf, size );
+	}
 	return;
 	M_EPILOG
 }
