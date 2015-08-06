@@ -55,6 +55,7 @@ public:
 	typedef typename sequence_t<HNode*, allocator::ref<HNode*, allocator_t> >::allocator_type ref_branch_allocator_type;
 	typedef HNode* node_t;
 	typedef HNode const* const_node_t;
+	typedef yaal::hcore::HExceptionT<this_type> exception_type;
 	/*! \brief Basic building block of HTree<>.
 	 */
 	class HNode final {
@@ -113,9 +114,7 @@ public:
 		}
 		iterator replace_node( iterator pos, typename tree_t::node_t node ) {
 			M_PROLOG
-#if defined( __DEBUG__ )
-			disjointed( pos, node );
-#endif /* defined( __DEBUG__ ) */
+			M_ASSERT( disjointed( pos, node ) );
 			HNode* wasted( *pos._iterator );
 			if ( wasted != node ) {
 				node->detach();
@@ -145,9 +144,7 @@ public:
 		}
 		iterator move_node( iterator const& pos, typename tree_t::node_t node ) {
 			M_PROLOG
-#if defined( __DEBUG__ )
-			disjointed( pos, node );
-#endif /* defined( __DEBUG__ ) */
+			M_ASSERT( disjointed( pos, node ) );
 			iterator it = pos;
 			if ( *pos._iterator != node ) {
 				if ( ( _allocator == node->_allocator ) && ( _branch.get_allocator() == node->_branch.get_allocator() ) ) {
@@ -167,9 +164,7 @@ public:
 		}
 		iterator move_node( typename tree_t::node_t node ) {
 			M_PROLOG
-#if defined( __DEBUG__ )
-			disjointed( begin(), node );
-#endif /* defined( __DEBUG__ ) */
+			M_ASSERT( disjointed( begin(), node ) );
 			iterator it = prev( end() );
 			if ( ( it == prev( begin() ) ) || ( *it._iterator != node ) ) {
 				if ( ( _allocator == node->_allocator ) && ( _branch.get_allocator() == node->_branch.get_allocator() ) ) {
@@ -190,18 +185,14 @@ public:
 		}
 		iterator copy_node( iterator const& pos, typename tree_t::node_t node ) {
 			M_PROLOG
-#if defined( __DEBUG__ )
-			disjointed( pos, node );
-#endif /* defined( __DEBUG__ ) */
+			M_ASSERT( disjointed( pos, node ) );
 			iterator it( this, _branch.insert( pos._iterator, node->clone_self_to( _allocator, _branch.get_allocator(), this ) ) );
 			return ( it );
 			M_EPILOG
 		}
 		iterator copy_node( typename tree_t::node_t node ) {
 			M_PROLOG
-#if defined( __DEBUG__ )
-			disjointed( prev( end() ), node );
-#endif /* defined( __DEBUG__ ) */
+			M_ASSERT( disjointed( prev( end() ), node ) );
 			_branch.push_back( node->clone_self_to( _allocator, _branch.get_allocator(), this ) );
 			iterator it( this, prev( _branch.end() ) );
 			return ( it );
@@ -322,6 +313,19 @@ public:
 		value_t const* operator->( void ) const {
 			return ( &_data );
 		}
+		bool disjointed( iterator const& pos, typename tree_t::node_t node ) const {
+			M_PROLOG
+			M_ENSURE( pos._owner == this );
+			HNode* p( _trunk );
+			while ( p ) {
+				if ( p == node ) {
+					break;
+				}
+				p = p->_trunk;
+			}
+			return ( p == nullptr );
+			M_EPILOG
+		}
 	private:
 		/*! \brief Create a root node.
 		 */
@@ -381,8 +385,8 @@ public:
 			return;
 			M_DESTRUCTOR_EPILOG
 		}
-		HNode( HNode const& );
-		HNode& operator = ( HNode const& );
+		HNode( HNode const& ) = delete;
+		HNode& operator = ( HNode const& ) = delete;
 		void detach( void ) {
 			M_PROLOG
 			if ( _tree ) {
@@ -414,22 +418,10 @@ public:
 			node->_trunk = parent;
 			typename branch_t::const_iterator endIt = _branch.end();
 			for ( typename branch_t::const_iterator it = _branch.begin();
-					it != endIt; ++ it )
+					it != endIt; ++ it ) {
 				node->_branch.push_back( (*it)->clone_self_to( allocator_, branchAllocator_, node ) );
-			return ( node );
-			M_EPILOG
-		}
-		void disjointed( iterator const& pos, typename tree_t::node_t node ) const {
-			M_PROLOG
-			HNode* p = _trunk;
-			while ( p ) {
-				M_ASSERT( p != node );
-				p = p->_trunk;
 			}
-			M_ASSERT( pos._owner == this );
-			static_cast<void>( pos );
-			static_cast<void>( node );
-			return;
+			return ( node );
 			M_EPILOG
 		}
 		friend class HTree<value_t, allocator_t, sequence_t>;
