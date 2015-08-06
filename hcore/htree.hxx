@@ -114,7 +114,8 @@ public:
 		}
 		iterator replace_node( iterator pos, typename tree_t::node_t node ) {
 			M_PROLOG
-			M_ASSERT( disjointed( pos, node ) );
+			M_ASSERT( disjointed( node ) );
+			M_ENSURE( pos._owner == this );
 			HNode* wasted( *pos._iterator );
 			if ( wasted != node ) {
 				node->detach();
@@ -144,7 +145,8 @@ public:
 		}
 		iterator move_node( iterator const& pos, typename tree_t::node_t node ) {
 			M_PROLOG
-			M_ASSERT( disjointed( pos, node ) );
+			M_ASSERT( disjointed( node ) );
+			M_ENSURE( pos._owner == this );
 			iterator it = pos;
 			if ( *pos._iterator != node ) {
 				if ( ( _allocator == node->_allocator ) && ( _branch.get_allocator() == node->_branch.get_allocator() ) ) {
@@ -164,7 +166,7 @@ public:
 		}
 		iterator move_node( typename tree_t::node_t node ) {
 			M_PROLOG
-			M_ASSERT( disjointed( begin(), node ) );
+			M_ASSERT( disjointed( node ) );
 			iterator it = prev( end() );
 			if ( ( it == prev( begin() ) ) || ( *it._iterator != node ) ) {
 				if ( ( _allocator == node->_allocator ) && ( _branch.get_allocator() == node->_branch.get_allocator() ) ) {
@@ -185,14 +187,15 @@ public:
 		}
 		iterator copy_node( iterator const& pos, typename tree_t::node_t node ) {
 			M_PROLOG
-			M_ASSERT( disjointed( pos, node ) );
+			M_ASSERT( disjointed( node ) );
+			M_ENSURE( pos._owner == this );
 			iterator it( this, _branch.insert( pos._iterator, node->clone_self_to( _allocator, _branch.get_allocator(), this ) ) );
 			return ( it );
 			M_EPILOG
 		}
 		iterator copy_node( typename tree_t::node_t node ) {
 			M_PROLOG
-			M_ASSERT( disjointed( prev( end() ), node ) );
+			M_ASSERT( disjointed( node ) );
 			_branch.push_back( node->clone_self_to( _allocator, _branch.get_allocator(), this ) );
 			iterator it( this, prev( _branch.end() ) );
 			return ( it );
@@ -313,9 +316,8 @@ public:
 		value_t const* operator->( void ) const {
 			return ( &_data );
 		}
-		bool disjointed( const_iterator const& pos, typename tree_t::const_node_t node ) const {
+		bool disjointed( typename tree_t::const_node_t node ) const {
 			M_PROLOG
-			M_ENSURE( pos._owner == this );
 			HNode* p( _trunk );
 			while ( p ) {
 				if ( p == node ) {

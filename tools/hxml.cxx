@@ -938,9 +938,9 @@ HXml::HConstNodeProxy& HXml::HConstNodeProxy::operator = ( HConstNodeProxy const
 	return ( *this );
 }
 
-bool HXml::HConstNodeProxy::disjointed( HXml::HConstIterator const& pos_, HXml::HConstNodeProxy const& node_ ) const {
+bool HXml::HConstNodeProxy::disjointed( HXml::HConstNodeProxy const& node_ ) const {
 	M_PROLOG
-	return ( _node->disjointed( pos_._iterator, node_._node ) );
+	return ( _node->disjointed( node_._node ) );
 	M_EPILOG
 }
 
