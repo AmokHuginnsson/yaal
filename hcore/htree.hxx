@@ -313,7 +313,7 @@ public:
 		value_t const* operator->( void ) const {
 			return ( &_data );
 		}
-		bool disjointed( iterator const& pos, typename tree_t::node_t node ) const {
+		bool disjointed( const_iterator const& pos, typename tree_t::const_node_t node ) const {
 			M_PROLOG
 			M_ENSURE( pos._owner == this );
 			HNode* p( _trunk );
