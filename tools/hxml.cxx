@@ -1132,6 +1132,15 @@ HXml::HIterator HXml::HNodeProxy::move_node( HXml::HNodeProxy node ) {
 	M_EPILOG
 }
 
+HXml::HIterator HXml::HNodeProxy::replace_node( HXml::HIterator it, HXml::HNodeProxy node ) {
+	M_PROLOG
+	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
+	tree_t::HNode::iterator newIt = _node->replace_node( it._iterator, node._node );
+	reset_owner( (**_node)._owner );
+	return ( HXml::HIterator( _node, newIt ) );
+	M_EPILOG
+}
+
 HXml::HIterator HXml::HNodeProxy::copy_node( HXml::HIterator it, HXml::HNodeProxy node ) {
 	M_PROLOG
 	M_ASSERT( _node && ( (**_node)._type == HXml::HNode::TYPE::NODE ) );
