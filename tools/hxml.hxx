@@ -342,6 +342,7 @@ public:
 	HXml::HConstNodeProxy operator* ( void ) const;
 private:
 	friend class HXml::HNodeProxy;
+	friend class HXml::HConstIterator;
 	HIterator( HXml::tree_t::node_t, HXml::tree_t::HNode::iterator const& );
 };
 
@@ -354,6 +355,7 @@ public:
 	typedef yaal::hcore::iterator_interface<HXml::HConstNodeProxy, yaal::hcore::iterator_category::forward> base_type;
 	HConstIterator( void );
 	HConstIterator( HConstIterator const& );
+	HConstIterator( HIterator const& );
 	HConstIterator& operator ++ ( void ) {
 		++ _iterator;
 		return ( *this );

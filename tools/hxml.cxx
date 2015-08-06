@@ -1252,6 +1252,10 @@ HXml::HConstIterator::HConstIterator( HXml::HConstIterator const& other )
 	: base_type(), _owner( other._owner ), _iterator( other._iterator ) {
 }
 
+HXml::HConstIterator::HConstIterator( HXml::HIterator const& other )
+	: base_type(), _owner( other._owner ), _iterator( other._iterator ) {
+}
+
 HXml::HIterator& HXml::HIterator::operator = ( HXml::HIterator const& other ) {
 	if ( &other != this ) {
 		_owner = other._owner;
