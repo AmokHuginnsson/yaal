@@ -76,12 +76,11 @@ int long HMemory::do_write( void const* const src_, int long size_ ) {
 	M_EPILOG
 }
 
+/*
+ * Do not change this!
+ * Flush on HMemory should be a no-op.
+ */
 void HMemory::do_flush( void ) {
-	if ( _valid > 0 ) {
-		_valid = -1;
-		_cursorRead = 0;
-		_cursorWrite = 0;
-	}
 	return;
 }
 
