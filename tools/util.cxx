@@ -26,6 +26,7 @@ Copyright:
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <cstdarg>
 
 #include "hcore/base.hxx"

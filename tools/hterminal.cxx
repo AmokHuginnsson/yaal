@@ -26,6 +26,7 @@ Copyright:
 
 #include <cstdlib> /* getenv */
 #include <cstdio>
+#include <cstring>
 #include <unistd.h>
 #include <termios.h>
 

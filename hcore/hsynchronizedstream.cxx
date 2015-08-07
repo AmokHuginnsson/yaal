@@ -68,9 +68,9 @@ void HSynchronizedStream::reset( ref_stream_t stream_ ) {
 	M_EPILOG
 }
 
-external_lock_t HSynchronizedStream::acquire( void ) {
+HLock HSynchronizedStream::acquire( void ) {
 	M_PROLOG
-	return ( external_lock_t( ref( _mutex ) ) );
+	return ( HLock( _mutex ) );
 	M_EPILOG
 }
 

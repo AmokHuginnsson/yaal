@@ -39,9 +39,9 @@ namespace tools {
 template<typename T>
 class HExclusiveAccessor final {
 	T _object;
-	yaal::hcore::external_lock_t _lock;
+	yaal::hcore::HLock _lock;
 public:
-	HExclusiveAccessor( yaal::hcore::external_lock_t lock_, T object_ )
+	HExclusiveAccessor( yaal::hcore::HLock lock_, T object_ )
 		: _object( yaal::move( object_ ) ), _lock( yaal::move( lock_ ) ) {
 		return;
 	}
@@ -62,19 +62,19 @@ public:
 		return ( *this );
 	}
 	T& operator->( void ) {
-		M_ASSERT( _lock.has_ownership() );
+		M_ASSERT( _lock.owns_lock() );
 		return ( _object );
 	}
 	T const& operator->( void ) const {
-		M_ASSERT( _lock.has_ownership() );
+		M_ASSERT( _lock.owns_lock() );
 		return ( _object );
 	}
 	T& operator*( void ) {
-		M_ASSERT( _lock.has_ownership() );
+		M_ASSERT( _lock.owns_lock() );
 		return ( *_object );
 	}
 	T const& operator*( void ) const {
-		M_ASSERT( _lock.has_ownership() );
+		M_ASSERT( _lock.owns_lock() );
 		return ( *_object );
 	}
 	template<typename real_t>

@@ -44,7 +44,7 @@ HMonitor::HMonitor( void )
 HMonitor::~HMonitor( void ) {
 }
 
-external_lock_t HMonitor::acquire( HString const& name_ ) {
+HLock HMonitor::acquire( HString const& name_ ) {
 	M_PROLOG
 	HMutex* m( NULL );
 	/* scope for mutexes' containter mutex */ {
@@ -55,7 +55,7 @@ external_lock_t HMonitor::acquire( HString const& name_ ) {
 		}
 		m = it->second.raw();
 	}
-	return ( external_lock_t( ref( *m ) ) );
+	return ( HLock( ref( *m ) ) );
 	M_EPILOG
 }
 

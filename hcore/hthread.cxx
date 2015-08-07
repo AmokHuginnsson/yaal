@@ -344,28 +344,51 @@ void HMutex::reown( void ) {
 }
 
 HLock::HLock( HMutex& mutex_ )
-	: _mutex( mutex_ )
+	: _mutex( &mutex_ )
 	, _locked( false ) {
 	M_PROLOG
-	_mutex.lock();
+	_mutex->lock();
 	_locked = true;
 	return;
 	M_EPILOG
 }
 
+HLock::HLock( HLock&& other_ ) noexcept
+	: _mutex( other_._mutex )
+	, _locked( other_._locked ) {
+	other_._mutex = nullptr;
+	other_._locked = false;
+	return;
+}
+
 HLock::~HLock( void ) {
 	M_PROLOG
 	if ( _locked ) {
-		_mutex.unlock();
+		_mutex->unlock();
 		_locked = false;
 	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }
 
+HLock& HLock::operator = ( HLock&& other_ ) noexcept {
+	if ( &other_ != this ) {
+		_mutex = other_._mutex;
+		_locked = other_._locked;
+		other_._mutex = nullptr;
+		other_._locked = false;
+	}
+	return ( *this );
+}
+
+bool HLock::owns_lock( void ) const noexcept {
+	return ( _locked );
+}
+
 void HLock::lock( void ) {
 	M_PROLOG
-	_mutex.lock();
+	M_ASSERT( _mutex && ! _locked );
+	_mutex->lock();
 	_locked = true;
 	return;
 	M_EPILOG
@@ -373,7 +396,8 @@ void HLock::lock( void ) {
 
 void HLock::unlock( void ) {
 	M_PROLOG
-	_mutex.unlock();
+	M_ASSERT( _locked );
+	_mutex->unlock();
 	_locked = false;
 	return;
 	M_EPILOG
@@ -628,31 +652,61 @@ void HReadWriteLock::unlock( void ) {
 }
 
 HReadWriteLockReadLock::HReadWriteLockReadLock( HReadWriteLock& rwLock_ )
-	: _rwLock( rwLock_ ) {
+	: _rwLock( &rwLock_ ) {
 	M_PROLOG
-	_rwLock.lock_read();
+	_rwLock->lock_read();
 	return;
 	M_EPILOG
 }
 
+HReadWriteLockReadLock::HReadWriteLockReadLock( HReadWriteLockReadLock&& other_ ) noexcept
+	: _rwLock( other_._rwLock ) {
+	other_._rwLock = nullptr;
+}
+
+HReadWriteLockReadLock& HReadWriteLockReadLock::operator = ( yaal::hcore::HReadWriteLockReadLock&& other_ ) noexcept {
+	if ( &other_ != this ) {
+		_rwLock = other_._rwLock;
+		other_._rwLock = nullptr;
+	}
+	return ( *this );
+}
+
 HReadWriteLockReadLock::~HReadWriteLockReadLock( void ) {
 	M_PROLOG
-	_rwLock.unlock();
+	if ( _rwLock ) {
+		_rwLock->unlock();
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }
 
 HReadWriteLockWriteLock::HReadWriteLockWriteLock( HReadWriteLock& rwLock_ )
-	: _rwLock( rwLock_ ) {
+	: _rwLock( &rwLock_ ) {
 	M_PROLOG
-	_rwLock.lock_write();
+	_rwLock->lock_write();
 	return;
 	M_EPILOG
 }
 
+HReadWriteLockWriteLock::HReadWriteLockWriteLock( HReadWriteLockWriteLock&& other_ ) noexcept
+	: _rwLock( other_._rwLock ) {
+	other_._rwLock = nullptr;
+}
+
+HReadWriteLockWriteLock& HReadWriteLockWriteLock::operator = ( yaal::hcore::HReadWriteLockWriteLock&& other_ ) noexcept {
+	if ( &other_ != this ) {
+		_rwLock = other_._rwLock;
+		other_._rwLock = nullptr;
+	}
+	return ( *this );
+}
+
 HReadWriteLockWriteLock::~HReadWriteLockWriteLock( void ) {
 	M_PROLOG
-	_rwLock.unlock();
+	if ( _rwLock ) {
+		_rwLock->unlock();
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }

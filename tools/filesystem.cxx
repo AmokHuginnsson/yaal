@@ -59,7 +59,7 @@ path_t const SEPARATOR_STR = "/";
 typedef FileSystem this_type;
 
 namespace {
-bool const initHFileSystemException = HFileSystemException::decode_errno();
+bool const initHFileSystemException __attribute__((used)) = HFileSystemException::decode_errno();
 }
 
 namespace {

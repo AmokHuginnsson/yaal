@@ -86,7 +86,9 @@ i32_t const DECIMAL_SHIFT[] = {
 i32_t const LEAF = meta::power<10, DECIMAL_DIGITS_IN_LEAF_CONST>::value;
 char ZFORMAT[] = "%00u";
 
-char unused = ZFORMAT[2] = static_cast<char>( '0' + DECIMAL_DIGITS_IN_LEAF_CONST );
+namespace {
+char unused __attribute__((used)) = ZFORMAT[2] = static_cast<char>( '0' + DECIMAL_DIGITS_IN_LEAF_CONST );
+}
 
 inline i32_t leafcmp( i32_t const* left_, i32_t const* right_, HNumber::integer_t len_ ) {
 	i32_t cmp( 0 );

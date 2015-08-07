@@ -36,7 +36,6 @@ Copyright:
 #include "hcore/hchunk.hxx"
 #include "hcore/hresource.hxx"
 #include "hcore/hboundcall.hxx"
-#include "hcore/huniquemovable.hxx"
 #include "hcore/duration.hxx"
 #include "hcore/htime.hxx"
 #include "hcore/hmap.hxx"
@@ -254,18 +253,20 @@ class HLock final {
 public:
 	typedef HLock this_type;
 private:
-	HMutex& _mutex;
+	HMutex* _mutex;
 	bool _locked;
 public:
 	explicit HLock( HMutex& );
+	HLock( HLock&& ) noexcept;
+	HLock& operator = ( HLock&& ) noexcept;
 	~HLock( void );
 	void lock( void );
 	void unlock( void );
+	bool owns_lock( void ) const noexcept;
 private:
-	HLock( HLock const& );
-	HLock& operator = ( HLock const& );
+	HLock( HLock const& ) = delete;
+	HLock& operator = ( HLock const& ) = delete;
 };
-typedef HUniqueMovable<HLock> external_lock_t;
 
 /*! \brief Asynchronous notification mechanizm.
  */
@@ -316,15 +317,16 @@ class HReadWriteLockReadLock final {
 public:
 	typedef HReadWriteLockReadLock this_type;
 private:
-	HReadWriteLock& _rwLock;
+	HReadWriteLock* _rwLock;
 public:
 	explicit HReadWriteLockReadLock( HReadWriteLock& );
+	HReadWriteLockReadLock( HReadWriteLockReadLock&& ) noexcept;
+	HReadWriteLockReadLock& operator = ( HReadWriteLockReadLock&& ) noexcept;
 	~HReadWriteLockReadLock( void );
 private:
-	HReadWriteLockReadLock( HReadWriteLockReadLock const& );
-	HReadWriteLockReadLock& operator = ( HReadWriteLockReadLock const& );
+	HReadWriteLockReadLock( HReadWriteLockReadLock const& ) = delete;
+	HReadWriteLockReadLock& operator = ( HReadWriteLockReadLock const& ) = delete;
 };
-typedef HUniqueMovable<HReadWriteLockReadLock> external_read_write_lock_read_lock_t;
 
 /*! \brief Read-Write Lock writer-guard functionality implementation.
  */
@@ -332,15 +334,16 @@ class HReadWriteLockWriteLock final {
 public:
 	typedef HReadWriteLockWriteLock this_type;
 private:
-	HReadWriteLock& _rwLock;
+	HReadWriteLock* _rwLock;
 public:
 	explicit HReadWriteLockWriteLock( HReadWriteLock& );
+	HReadWriteLockWriteLock( HReadWriteLockWriteLock&& ) noexcept;
+	HReadWriteLockWriteLock& operator = ( HReadWriteLockWriteLock&& ) noexcept;
 	~HReadWriteLockWriteLock( void );
 private:
-	HReadWriteLockWriteLock( HReadWriteLockWriteLock const& );
-	HReadWriteLockWriteLock& operator = ( HReadWriteLockWriteLock const& );
+	HReadWriteLockWriteLock( HReadWriteLockWriteLock const& ) = delete;
+	HReadWriteLockWriteLock& operator = ( HReadWriteLockWriteLock const& ) = delete;
 };
-typedef HUniqueMovable<HReadWriteLockWriteLock> external_read_write_lock_write_lock_t;
 
 }
 

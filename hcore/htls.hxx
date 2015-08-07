@@ -142,9 +142,9 @@ public:
 		tls::free( _key );
 		M_DESTRUCTOR_EPILOG
 	}
-	external_lock_t acquire( void ) {
+	HLock acquire( void ) {
 		M_PROLOG
-		return ( external_lock_t( ref( _mutex ) ) );
+		return ( HLock( ref( _mutex ) ) );
 		M_EPILOG
 	}
 	tType* operator->( void ) {

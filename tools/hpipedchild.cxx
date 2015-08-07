@@ -151,9 +151,9 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 	M_ENSURE_EX( !! image && image.is_executable(), image_ );
 	M_ENSURE( ( ! ::pipe( fileDesIn ) ) && ( ! ::pipe( fileDesOut ) ) && ( ! ::pipe( fileDesErr ) ) );
 	HChunk argv( chunk_size<char const*>( argv_.size() + 2 ) );
-	external_lock_t stdinLock( cin.acquire() );
-	external_lock_t sdtoutLock( cout.acquire() );
-	external_lock_t stderrLock( cerr.acquire() );
+	HLock stdinLock( cin.acquire() );
+	HLock sdtoutLock( cout.acquire() );
+	HLock stderrLock( cerr.acquire() );
 	int const stdinFd( fileno( stdin ) );
 	int const stdoutFd( fileno( stdout ) );
 	int const stderrFd( fileno( stderr ) );
