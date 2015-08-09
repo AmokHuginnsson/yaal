@@ -52,8 +52,9 @@ public:
 		::memset( _base64DecodeTable_[0], 0, sizeof ( _base64DecodeTable_[0] ) );
 		::memset( _base64DecodeTable_[1], 0, sizeof ( _base64DecodeTable_[1] ) );
 		for ( size_t m = 0; m < 2; ++ m ) {
-			for ( size_t i = 0; i < sizeof ( _base64EncodeTable_[m] ); ++ i )
+			for ( size_t i = 0; i < sizeof ( _base64EncodeTable_[m] ); ++ i ) {
 				_base64DecodeTable_[m][ static_cast<int>( _base64EncodeTable_[m][ i ] ) ] = static_cast<u8_t>( i );
+			}
 		}
 	}
 } base64DecodeTableInit;
@@ -66,18 +67,21 @@ void do_buf_3_to_4( HString& out, u32_t const& in, int mode, int long pad = 0 ) 
 	buf[ 1 ] = _base64EncodeTable_[mode][ ( in >> 12 ) & 63 ];
 	buf[ 2 ] = _base64EncodeTable_[mode][ ( in >> 6 ) & 63 ];
 	buf[ 3 ] = _base64EncodeTable_[mode][ in & 63 ];
-	if ( pad )
+	if ( pad ) {
 		::memset( ( ( buf + sizeof ( buf ) ) - pad ) - 1, '=', static_cast<size_t>( pad ) );
+	}
 	out += buf;
 	return;
 }
 
 void do_buf_4_to_3( char* out, u32_t const& in, int size = 3 ) {
 	out[ 0 ] = static_cast<char>( ( in >> 16 ) & 255 );
-	if ( size > 1 )
+	if ( size > 1 ) {
 		out[ 1 ] = static_cast<char>( ( in >> 8 ) & 255 );
-	if ( size > 2 )
+	}
+	if ( size > 2 ) {
 		out[ 2 ] = static_cast<char>( in & 255 );
+	}
 	return;
 }
 
@@ -95,8 +99,9 @@ yaal::hcore::HString base64_raw_encode( char const* ptr, int long length, bool s
 			coder = 0;
 		}
 	}
-	if ( length % 3 )
+	if ( length % 3 ) {
 		do_buf_3_to_4( output, coder, standardCompliantMode ? 1 : 0, 3 - ( length % 3 ) );
+	}
 	return ( output );
 	M_EPILOG
 }
@@ -144,7 +149,7 @@ int long base64_raw_decode( yaal::hcore::HString const& message, char* output, i
 			coder = 0;
 		}
 	}
-	if ( i % 4 ) {
+	if ( ( i %= 4 ) ) {
 		M_ENSURE( i > 1 );
 		do_buf_4_to_3( output + size, coder, static_cast<int>( ( bufSize - size - 1 ) ) );
 		size += ( ( i * 3 ) / 4 );
@@ -195,11 +200,13 @@ void base64::encode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 				offset = nRead;
 				needEndl = true;
 			}
-		} else
+		} else {
 			out << line << flush;
+		}
 	}
-	if ( wrap_ && needEndl )
+	if ( wrap_ && needEndl ) {
 		out << endl;
+	}
 	return;
 	M_EPILOG
 }
@@ -219,8 +226,9 @@ void base64::decode( yaal::hcore::HStreamInterface& in, yaal::hcore::HStreamInte
 		for ( int i = 0; i < SIZE; ++ i, ++ pos ) {
 			char ch = ptr[ i ];
 			M_ENSURE_EX( is_base64_character( ch, standardCompliantMode ) || isalpha( ch ), ( HFormat( "char: %c, at position: %ld" ) % ch % pos ).string() );
-			if ( is_base64_character( ch, standardCompliantMode	) )
+			if ( is_base64_character( ch, standardCompliantMode	) ) {
 				decodebuf += ch;
+			}
 			if ( decodebuf.get_length() >= BASE64LINELEN ) {
 				M_ASSERT( decodebuf.get_length() == BASE64LINELEN );
 				size = base64_raw_decode( decodebuf, buf, sizeof ( buf ), standardCompliantMode );
