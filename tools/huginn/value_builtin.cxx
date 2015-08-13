@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "value_builtin.hxx"
 #include "thread.hxx"
+#include "helper.hxx"
 #include "exception.hxx"
 
 using namespace yaal;
@@ -495,34 +496,7 @@ namespace {
 HHuginn::value_t fallback_conversion( HHuginn::type_t type_, HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
-		HString methodName( "to_"_ys.append( type_->name() ) );
-		int idx( o->field_index( methodName ) );
-		if ( idx >= 0 ) {
-			HHuginn::value_t const& f( o->field( idx, false ) );
-			if ( f->type() == HHuginn::TYPE::METHOD ) {
-				HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( f.raw() ) );
-				HHuginn::values_t args;
-				res = m->function()( thread_, const_cast<HHuginn::HObject*>( o ), args, position_ );
-			} else {
-				throw HHuginn::HHuginnRuntimeException(
-					"`"_ys
-					.append( methodName )
-					.append( "' in class `" )
-					.append( o->type()->name() )
-					.append( "' is not a method." ),
-					position_
-				);
-			}
-		} else {
-			throw HHuginn::HHuginnRuntimeException(
-				"Class `"_ys
-				.append( o->type()->name() )
-				.append( "' does not have `" )
-				.append( methodName )
-				.append( "' method." ),
-				position_
-			);
-		}
+		res = call_method( thread_, o, "to_"_ys.append( type_->name() ), HHuginn::values_t(), position_ );
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Conversion from `"_ys

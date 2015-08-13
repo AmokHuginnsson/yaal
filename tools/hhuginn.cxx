@@ -1541,23 +1541,32 @@ inline HHuginn::value_t convert( HHuginn::type_t toType_, huginn::HThread* threa
 	M_EPILOG
 }
 
-inline HHuginn::value_t size( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t size( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "size", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
 	int long long s( 0 );
 	HHuginn::type_t typeId( v->type() );
+	HHuginn::value_t res;
 	if ( typeId == HHuginn::TYPE::STRING ) {
 		s = static_cast<HHuginn::HString const*>( v )->value().get_length();
 	} else if ( typeId == HHuginn::TYPE::LIST ) {
 		s = static_cast<HHuginn::HList const*>( v )->size();
 	} else if ( typeId == HHuginn::TYPE::DICT ) {
 		s = static_cast<HHuginn::HDict const*>( v )->size();
+	} else if ( typeId == HHuginn::TYPE::ORDER ) {
+		s = static_cast<HHuginn::HOrder const*>( v )->size();
+	} else if ( typeId == HHuginn::TYPE::SET ) {
+		s = static_cast<HHuginn::HSet const*>( v )->size();
 	} else {
-		throw HHuginn::HHuginnRuntimeException(
-			"Getting size of `"_ys.append( v->type()->name() ).append( "'s is not supported." ),
-			position_
-		);
+		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v ) ) {
+			s = get_integer( value_builtin::integer( thread_, call_method( thread_, o, "get_size", HHuginn::values_t(), position_ ), position_ ) );
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"Getting size of `"_ys.append( v->type()->name() ).append( "'s is not supported." ),
+				position_
+			);
+		}
 	}
 	return ( make_pointer<HHuginn::HInteger>( s ) );
 	M_EPILOG

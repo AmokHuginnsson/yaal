@@ -37,6 +37,8 @@ namespace tools {
 
 namespace huginn {
 
+class HThread;
+
 bool is_keyword( yaal::hcore::HString const& );
 bool is_builtin( yaal::hcore::HString const& );
 bool is_restricted( yaal::hcore::HString const& );
@@ -46,6 +48,8 @@ void verify_arg_count( yaal::hcore::HString const&, HHuginn::values_t const&, in
 void verify_arg_type( yaal::hcore::HString const&, HHuginn::values_t const&, int, HHuginn::type_t, bool, int );
 HHuginn::type_t verify_arg_numeric( yaal::hcore::HString const&, HHuginn::values_t const&, int, bool, int );
 HHuginn::type_t verify_arg_collection( yaal::hcore::HString const&, HHuginn::values_t const&, int, bool, int );
+
+HHuginn::value_t call_method( HThread*, HHuginn::HObject const*, yaal::hcore::HString const&, HHuginn::values_t const&, int );
 
 yaal::hcore::HString const& get_string( HHuginn::value_t const& );
 int long long get_integer( HHuginn::value_t const& );
