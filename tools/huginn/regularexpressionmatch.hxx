@@ -48,8 +48,9 @@ public:
 	yaal::hcore::HRegex::HMatchIterator end( void ) const;
 	static HHuginn::value_t matched( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HHuginn* );
-private:
+protected:
 	virtual HIterator do_iterator( void ) override;
+	virtual int long do_size( void ) const override;
 };
 
 }

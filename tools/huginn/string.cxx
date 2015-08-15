@@ -151,6 +151,10 @@ HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
+int long HHuginn::HString::do_size( void ) const {
+	return ( _value.get_length() );
+}
+
 }
 
 }

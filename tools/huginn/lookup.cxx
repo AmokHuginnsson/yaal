@@ -140,7 +140,7 @@ HHuginn::HLookup::HLookup( values_t const& data_ )
 	return;
 }
 
-int long HHuginn::HLookup::size( void ) const {
+int long HHuginn::HLookup::do_size( void ) const {
 	return ( _data.get_size() );
 }
 

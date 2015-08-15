@@ -98,6 +98,10 @@ HHuginn::HIterable::HIterator HRegularExpressionMatch::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
+int long HRegularExpressionMatch::do_size( void ) const {
+	return ( distance( _regex->find( _fast ), _regex->end() ) );
+}
+
 HHuginn::class_t HRegularExpressionMatch::get_class( HHuginn* huginn_ ) {
 	M_PROLOG
 	HHuginn::class_t c(

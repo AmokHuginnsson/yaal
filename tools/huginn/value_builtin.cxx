@@ -48,17 +48,13 @@ namespace value_builtin {
 HHuginn::value_t subscript( HExpression::ACCESS subscript_, HHuginn::value_t& base_, HHuginn::value_t const& index_, int position_ ) {
 	HHuginn::type_t baseType( base_->type() );
 	HHuginn::value_t res;
-	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::STRING ) ) {
+	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
 		if ( index_->type() != HHuginn::TYPE::INTEGER ) {
 			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT], position_ );
 		}
 		HHuginn::HInteger const* i( static_cast<HHuginn::HInteger const*>( index_.raw() ) );
 		int long long index( i->value() );
-		int long size(
-			baseType == HHuginn::TYPE::LIST
-				? static_cast<HHuginn::HList*>( base_.raw() )->size()
-				: static_cast<HHuginn::HString*>( base_.raw() )->value().get_length()
-		);
+		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size() );
 		if ( ( index < -size ) || ( index >= size ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Bad index.", position_ );
 		}
@@ -68,6 +64,9 @@ HHuginn::value_t subscript( HExpression::ACCESS subscript_, HHuginn::value_t& ba
 		if ( baseType == HHuginn::TYPE::LIST ) {
 			HHuginn::HList* l( static_cast<HHuginn::HList*>( base_.raw() ) );
 			res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( index ) : l->get_ref( index ) );
+		} else if ( baseType == HHuginn::TYPE::DEQUE ) {
+			HHuginn::HDeque* d( static_cast<HHuginn::HDeque*>( base_.raw() ) );
+			res = ( subscript_ == HExpression::ACCESS::VALUE ? d->get( index ) : d->get_ref( index ) );
 		} else {
 			M_ASSERT( baseType == HHuginn::TYPE::STRING );
 			HHuginn::HString* s( static_cast<HHuginn::HString*>( base_.raw() ) );

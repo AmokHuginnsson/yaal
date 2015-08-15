@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  list.cxx - this file is integral part of `yaal' project.
+  deque.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -38,40 +38,40 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::LIST( HHuginn::HType::register_type( "list", nullptr ) );
+HHuginn::type_t const HHuginn::TYPE::DEQUE( HHuginn::HType::register_type( "deque", nullptr ) );
 
 namespace huginn {
 
-class HListIterator : public HIteratorInterface {
-	HHuginn::HList* _list;
+class HDequeIterator : public HIteratorInterface {
+	HHuginn::HDeque* _deque;
 	int _index;
 public:
-	HListIterator( HHuginn::HList* list_ )
-		: _list( list_ ),
+	HDequeIterator( HHuginn::HDeque* deque_ )
+		: _deque( deque_ ),
 		_index( 0 ) {
 		return;
 	}
 protected:
 	virtual HHuginn::value_t do_value( void ) override {
-		return ( _list->get( _index ) );
+		return ( _deque->get( _index ) );
 	}
 	virtual bool do_is_valid( void ) override {
-		return ( _index < _list->size() );
+		return ( _index < _deque->size() );
 	}
 	virtual void do_next( void ) override {
 		++ _index;
 	}
 private:
-	HListIterator( HListIterator const& ) = delete;
-	HListIterator& operator = ( HListIterator const& ) = delete;
+	HDequeIterator( HDequeIterator const& ) = delete;
+	HDequeIterator& operator = ( HDequeIterator const& ) = delete;
 };
 
-namespace list {
+namespace deque {
 
 inline HHuginn::value_t add( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "list.push", values_, 1, 1, position_ );
-	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_ ) );
+	verify_arg_count( "deque.push", values_, 1, 1, position_ );
+	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
 	M_ASSERT( l != nullptr );
 	l->push_back( values_[0] );
 	M_ASSERT( !! l->get_pointer() );
@@ -81,8 +81,8 @@ inline HHuginn::value_t add( huginn::HThread*, HHuginn::HObject* object_, HHugin
 
 inline HHuginn::value_t pop( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "list.pop", values_, 0, 0, position_ );
-	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_ ) );
+	verify_arg_count( "deque.pop", values_, 0, 0, position_ );
+	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
 	M_ASSERT( l != nullptr );
 	l->pop_back();
 	M_ASSERT( !! l->get_pointer() );
@@ -92,8 +92,8 @@ inline HHuginn::value_t pop( huginn::HThread*, HHuginn::HObject* object_, HHugin
 
 inline HHuginn::value_t clear( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "list.clear", values_, 0, 0, position_ );
-	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_ ) );
+	verify_arg_count( "deque.clear", values_, 0, 0, position_ );
+	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
 	M_ASSERT( l != nullptr );
 	l->clear();
 	M_ASSERT( !! l->get_pointer() );
@@ -103,86 +103,86 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::HObject* object_, HHug
 
 }
 
-HHuginn::HClass _listClass_(
+HHuginn::HClass _dequeClass_(
 	nullptr,
-	HHuginn::TYPE::LIST,
+	HHuginn::TYPE::DEQUE,
 	nullptr,
 	/* methods */ {
 		"add",
 		"pop",
 		"clear"
 	}, {
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::add, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::pop, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::clear, _1, _2, _3, _4 ) )
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add, _1, _2, _3, _4 ) ),
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop, _1, _2, _3, _4 ) ),
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::clear, _1, _2, _3, _4 ) )
 	}
 );
 
 }
 
-HHuginn::HList::HList( void )
-	: HIterable( &huginn::_listClass_ )
+HHuginn::HDeque::HDeque( void )
+	: HIterable( &huginn::_dequeClass_ )
 	, _data() {
 	return;
 }
 
-HHuginn::HList::HList( values_t const& data_ )
-	: HIterable( &huginn::_listClass_ )
+HHuginn::HDeque::HDeque( values_t const& data_ )
+	: HIterable( &huginn::_dequeClass_ )
 	, _data( data_ ) {
 	return;
 }
 
-void HHuginn::HList::push_back( HHuginn::value_t const& value_ ) {
+void HHuginn::HDeque::push_back( HHuginn::value_t const& value_ ) {
 	M_PROLOG
 	_data.push_back( value_ );
 	return;
 	M_EPILOG
 }
 
-void HHuginn::HList::pop_back( void ) {
+void HHuginn::HDeque::pop_back( void ) {
 	M_PROLOG
 	_data.pop_back();
 	return;
 	M_EPILOG
 }
 
-int long HHuginn::HList::do_size( void ) const {
+int long HHuginn::HDeque::do_size( void ) const {
 	return ( _data.get_size() );
 }
 
-void HHuginn::HList::clear( void ) {
+void HHuginn::HDeque::clear( void ) {
 	_data.clear();
 }
 
-HHuginn::value_t HHuginn::HList::get( int long long index_ ) {
+HHuginn::value_t HHuginn::HDeque::get( int long long index_ ) {
 	M_PROLOG
 	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
 	return ( _data[static_cast<int>( index_ )] );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HList::get_ref( int long long index_ ) {
+HHuginn::value_t HHuginn::HDeque::get_ref( int long long index_ ) {
 	M_PROLOG
 	M_ASSERT( ( index_ >= 0 ) && ( index_ < _data.get_size() ) );
 	return ( make_pointer<HReference>( _data[static_cast<int>( index_ )] ) );
 	M_EPILOG
 }
 
-HHuginn::HList::values_t const& HHuginn::HList::value( void ) const {
+HHuginn::HDeque::values_t const& HHuginn::HDeque::value( void ) const {
 	return ( _data );
 }
 
-HHuginn::HList::values_t& HHuginn::HList::value( void ) {
+HHuginn::HDeque::values_t& HHuginn::HDeque::value( void ) {
 	return ( _data );
 }
 
-HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HListIterator( this ) );
+HHuginn::HIterable::HIterator HHuginn::HDeque::do_iterator( void ) {
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HDequeIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HList::do_clone( void ) const {
-	return ( make_pointer<HList>( _data ) );
+HHuginn::value_t HHuginn::HDeque::do_clone( void ) const {
+	return ( make_pointer<HDeque>( _data ) );
 }
 
 }

@@ -125,6 +125,7 @@ public:
 	class HCharacter;
 	class HNumber;
 	class HList;
+	class HDeque;
 	typedef yaal::hcore::HPointer<HList> list_t;
 	class HDict;
 	class HOrder;
@@ -151,6 +152,7 @@ public:
 		static type_t const NUMBER;
 		static type_t const CHARACTER;
 		static type_t const LIST;
+		static type_t const DEQUE;
 		static type_t const DICT;
 		static type_t const ORDER;
 		static type_t const LOOKUP;
@@ -500,8 +502,10 @@ public:
 	class HIterator;
 	HIterable( HClass const* );
 	HIterator iterator( void );
+	int long size( void ) const;
 protected:
 	virtual HIterator do_iterator( void ) = 0;
+	virtual int long do_size( void ) const = 0;
 };
 
 class HHuginn::HBoolean : public HHuginn::HValue {
@@ -570,6 +574,7 @@ public:
 	void to_string( void ) const;
 protected:
 	virtual HIterator do_iterator( void ) override;
+	virtual int long do_size( void ) const override;
 private:
 	virtual value_t do_clone( void ) const override;
 };
@@ -611,7 +616,7 @@ class HHuginn::HList : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HList this_type;
 	typedef HHuginn::HIterable base_type;
-	typedef yaal::hcore::HDeque<HHuginn::value_t> values_t;
+	typedef yaal::hcore::HArray<HHuginn::value_t> values_t;
 private:
 	values_t _data;
 public:
@@ -619,7 +624,6 @@ public:
 	HList( values_t const& );
 	void push_back( value_t const& );
 	void pop_back( void );
-	int long size( void ) const;
 	void clear( void );
 	value_t get( int long long );
 	value_t get_ref( int long long );
@@ -627,6 +631,31 @@ public:
 	values_t& value( void );
 protected:
 	virtual HIterator do_iterator( void ) override;
+	virtual int long do_size( void ) const override;
+private:
+	virtual value_t do_clone( void ) const override;
+};
+
+class HHuginn::HDeque : public HHuginn::HIterable {
+public:
+	typedef HHuginn::HDeque this_type;
+	typedef HHuginn::HIterable base_type;
+	typedef yaal::hcore::HDeque<HHuginn::value_t> values_t;
+private:
+	values_t _data;
+public:
+	HDeque( void );
+	HDeque( values_t const& );
+	void push_back( value_t const& );
+	void pop_back( void );
+	void clear( void );
+	value_t get( int long long );
+	value_t get_ref( int long long );
+	values_t const& value( void ) const;
+	values_t& value( void );
+protected:
+	virtual HIterator do_iterator( void ) override;
+	virtual int long do_size( void ) const override;
 private:
 	virtual value_t do_clone( void ) const override;
 };
@@ -643,7 +672,6 @@ private:
 public:
 	HDict( void );
 	HDict( values_t const&, type_t );
-	int long size( void ) const;
 	value_t get( HHuginn::value_t const&, int );
 	value_t get_ref( HHuginn::value_t const&, int );
 	void insert( HHuginn::value_t const&, HHuginn::value_t const&, int );
@@ -654,6 +682,7 @@ public:
 	values_t& value( void );
 protected:
 	virtual HIterator do_iterator( void ) override;
+	virtual int long do_size( void ) const override;
 private:
 	void verify_key_type( HHuginn::type_t, int ) const;
 	HDict( HDict const& ) = delete;
@@ -674,7 +703,6 @@ private:
 public:
 	HOrder( void );
 	HOrder( values_t const&, type_t );
-	int long size( void ) const;
 	void insert( HHuginn::value_t const&, int );
 	bool has_key( HHuginn::value_t const&, int ) const;
 	void erase( HHuginn::value_t const&, int );
@@ -682,6 +710,7 @@ public:
 	values_t& value( void );
 protected:
 	virtual HIterator do_iterator( void ) override;
+	virtual int long do_size( void ) const override;
 private:
 	void verify_key_type( HHuginn::type_t, int ) const;
 	HOrder( HOrder const& ) = delete;
@@ -702,7 +731,6 @@ private:
 public:
 	HLookup( void );
 	HLookup( values_t const& );
-	int long size( void ) const;
 	void insert( HHuginn::value_t const&, HHuginn::value_t const& );
 	bool has_key( HHuginn::value_t const& ) const;
 	void erase( HHuginn::value_t const& );
@@ -713,6 +741,7 @@ public:
 	values_t& value( void );
 protected:
 	virtual HIterator do_iterator( void ) override;
+	virtual int long do_size( void ) const override;
 private:
 	HLookup( HLookup const& ) = delete;
 	HLookup& operator = ( HLookup const& ) = delete;
@@ -732,7 +761,6 @@ private:
 public:
 	HSet( void );
 	HSet( values_t const& );
-	int long size( void ) const;
 	void insert( HHuginn::value_t const& );
 	bool has_key( HHuginn::value_t const& ) const;
 	void erase( HHuginn::value_t const& );
@@ -740,6 +768,7 @@ public:
 	values_t& value( void );
 protected:
 	virtual HIterator do_iterator( void ) override;
+	virtual int long do_size( void ) const override;
 private:
 	HSet( HSet const& ) = delete;
 	HSet& operator = ( HSet const& ) = delete;

@@ -94,6 +94,10 @@ public:
 		return ( c );
 		M_EPILOG
 	}
+protected:
+	virtual int long do_size( void ) const override {
+		return ( ( _stop - _from ) / _step );
+	}
 private:
 	virtual HIterator do_iterator( void ) override {
 		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HRangeIterator( _from, _stop, _step ) );

@@ -132,7 +132,7 @@ HHuginn::HSet::HSet( values_t const& data_ )
 	return;
 }
 
-int long HHuginn::HSet::size( void ) const {
+int long HHuginn::HSet::do_size( void ) const {
 	return ( _data.get_size() );
 }
 

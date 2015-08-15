@@ -134,6 +134,10 @@ HHuginn::HIterable::HIterator HQueryResult::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
+int long HQueryResult::do_size( void ) const {
+	return ( _recordSet->get_dml_size() );
+}
+
 class HQueryResultClass : public HHuginn::HClass {
 	HHuginn::class_t const& _exceptionClass;
 public:

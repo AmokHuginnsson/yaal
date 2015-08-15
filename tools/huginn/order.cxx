@@ -134,7 +134,7 @@ HHuginn::HOrder::HOrder( values_t const& data_, type_t keyType_ )
 	return;
 }
 
-int long HHuginn::HOrder::size( void ) const {
+int long HHuginn::HOrder::do_size( void ) const {
 	return ( _data.get_size() );
 }
 

@@ -137,6 +137,10 @@ HHuginn::HIterable::HIterator HStream::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
+int long HStream::do_size( void ) const {
+	return ( 0 );
+}
+
 HHuginn::class_t HStream::get_class( HHuginn* huginn_ ) {
 	M_PROLOG
 	HHuginn::class_t c(

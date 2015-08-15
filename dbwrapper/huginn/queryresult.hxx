@@ -51,6 +51,7 @@ public:
 	static tools::HHuginn::class_t get_class( tools::HHuginn*, tools::HHuginn::class_t const& );
 private:
 	virtual HIterator do_iterator( void ) override;
+	virtual int long do_size( void ) const override;
 };
 
 }

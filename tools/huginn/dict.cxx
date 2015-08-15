@@ -142,7 +142,7 @@ HHuginn::HDict::HDict( values_t const& data_, type_t keyType_ )
 	return;
 }
 
-int long HHuginn::HDict::size( void ) const {
+int long HHuginn::HDict::do_size( void ) const {
 	return ( _data.get_size() );
 }
 

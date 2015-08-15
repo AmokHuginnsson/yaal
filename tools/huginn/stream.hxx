@@ -54,6 +54,7 @@ private:
 	yaal::hcore::HString read_impl( int long );
 	void write_impl( yaal::hcore::HString const& );
 	virtual HIterator do_iterator( void ) override;
+	virtual int long do_size( void ) const override;
 };
 
 }

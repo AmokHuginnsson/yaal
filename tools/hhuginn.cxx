@@ -1420,6 +1420,10 @@ HHuginn::HIterable::HIterator HHuginn::HIterable::iterator( void ) {
 	return ( do_iterator() );
 }
 
+int long HHuginn::HIterable::size( void ) const {
+	return ( do_size() );
+}
+
 HHuginn::HTernaryEvaluator::HTernaryEvaluator(
 	expression_t const& condition_,
 	expression_t const& ifTrue_,
@@ -1552,6 +1556,8 @@ inline HHuginn::value_t size( huginn::HThread* thread_, HHuginn::HObject*, HHugi
 		s = static_cast<HHuginn::HString const*>( v )->value().get_length();
 	} else if ( typeId == HHuginn::TYPE::LIST ) {
 		s = static_cast<HHuginn::HList const*>( v )->size();
+	} else if ( typeId == HHuginn::TYPE::DEQUE ) {
+		s = static_cast<HHuginn::HDeque const*>( v )->size();
 	} else if ( typeId == HHuginn::TYPE::DICT ) {
 		s = static_cast<HHuginn::HDict const*>( v )->size();
 	} else if ( typeId == HHuginn::TYPE::ORDER ) {
@@ -1594,6 +1600,17 @@ inline HHuginn::value_t list( huginn::HThread*, HHuginn::HObject*, HHuginn::valu
 	HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
 		l->push_back( e );
+	}
+	return ( v );
+	M_EPILOG
+}
+
+inline HHuginn::value_t deque( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int ) {
+	M_PROLOG
+	HHuginn::value_t v( make_pointer<HHuginn::HDeque>() );
+	HHuginn::HDeque* d( static_cast<HHuginn::HDeque*>( v.raw() ) );
+	for ( HHuginn::value_t const& e : values_ ) {
+		d->push_back( e );
 	}
 	return ( v );
 	M_EPILOG
@@ -1705,6 +1722,7 @@ void HHuginn::register_builtins( void ) {
 	_functions.insert( make_pair<yaal::hcore::HString const>( "type", hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "copy", hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "list", hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair<yaal::hcore::HString const>( "deque", hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "dict", hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "order", hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ) ) );
 	_functions.insert( make_pair<yaal::hcore::HString const>( "lookup", hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ) ) );
