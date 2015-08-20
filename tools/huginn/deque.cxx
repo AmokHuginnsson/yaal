@@ -70,7 +70,7 @@ namespace deque {
 
 inline HHuginn::value_t add( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "deque.push", values_, 1, 1, position_ );
+	verify_arg_count( "deque.add", values_, 1, 1, position_ );
 	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
 	M_ASSERT( l != nullptr );
 	l->push_back( values_[0] );
@@ -85,6 +85,28 @@ inline HHuginn::value_t pop( huginn::HThread*, HHuginn::HObject* object_, HHugin
 	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
 	M_ASSERT( l != nullptr );
 	l->pop_back();
+	M_ASSERT( !! l->get_pointer() );
+	return ( object_->get_pointer() );
+	M_EPILOG
+}
+
+inline HHuginn::value_t add_front( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "deque.add_front", values_, 1, 1, position_ );
+	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
+	M_ASSERT( l != nullptr );
+	l->push_front( values_[0] );
+	M_ASSERT( !! l->get_pointer() );
+	return ( object_->get_pointer() );
+	M_EPILOG
+}
+
+inline HHuginn::value_t pop_front( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "deque.pop_front", values_, 0, 0, position_ );
+	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
+	M_ASSERT( l != nullptr );
+	l->pop_front();
 	M_ASSERT( !! l->get_pointer() );
 	return ( object_->get_pointer() );
 	M_EPILOG
@@ -110,10 +132,14 @@ HHuginn::HClass _dequeClass_(
 	/* methods */ {
 		"add",
 		"pop",
+		"add_front",
+		"pop_front",
 		"clear"
 	}, {
 		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add, _1, _2, _3, _4 ) ),
 		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop, _1, _2, _3, _4 ) ),
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add_front, _1, _2, _3, _4 ) ),
+		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop_front, _1, _2, _3, _4 ) ),
 		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::clear, _1, _2, _3, _4 ) )
 	}
 );
@@ -142,6 +168,20 @@ void HHuginn::HDeque::push_back( HHuginn::value_t const& value_ ) {
 void HHuginn::HDeque::pop_back( void ) {
 	M_PROLOG
 	_data.pop_back();
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HDeque::push_front( HHuginn::value_t const& value_ ) {
+	M_PROLOG
+	_data.push_front( value_ );
+	return;
+	M_EPILOG
+}
+
+void HHuginn::HDeque::pop_front( void ) {
+	M_PROLOG
+	_data.pop_front();
 	return;
 	M_EPILOG
 }

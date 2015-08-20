@@ -70,7 +70,7 @@ namespace list {
 
 inline HHuginn::value_t add( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( "list.push", values_, 1, 1, position_ );
+	verify_arg_count( "list.add", values_, 1, 1, position_ );
 	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_ ) );
 	M_ASSERT( l != nullptr );
 	l->push_back( values_[0] );

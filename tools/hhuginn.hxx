@@ -648,6 +648,8 @@ public:
 	HDeque( values_t const& );
 	void push_back( value_t const& );
 	void pop_back( void );
+	void push_front( value_t const& );
+	void pop_front( void );
 	void clear( void );
 	value_t get( int long long );
 	value_t get_ref( int long long );
