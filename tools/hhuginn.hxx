@@ -441,6 +441,7 @@ public:
 	value_t field( int, bool ) const;
 	HClass const* get_class( void ) const;
 	bool is_kind_of( yaal::hcore::HString const& ) const;
+	HHuginn::value_t call_method( huginn::HThread*, yaal::hcore::HString const&, HHuginn::values_t const&, int ) const;
 private:
 	void reset_methods( void );
 	HObject( HObject const& ) = delete;

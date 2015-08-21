@@ -189,45 +189,6 @@ HHuginn::type_t verify_arg_collection(
 	M_EPILOG
 }
 
-HHuginn::value_t call_method(
-	HThread* thread_,
-	HHuginn::HObject const* object_,
-	yaal::hcore::HString const& methodName_,
-	HHuginn::values_t const& arguments_,
-	int position_
-) {
-	M_PROLOG
-	HHuginn::value_t res;
-	int idx( object_->field_index( methodName_ ) );
-	if ( idx >= 0 ) {
-		HHuginn::value_t const& f( object_->field( idx, false ) );
-		if ( f->type() == HHuginn::TYPE::METHOD ) {
-			HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( f.raw() ) );
-			res = m->function()( thread_, const_cast<HHuginn::HObject*>( object_ ), arguments_, position_ );
-		} else {
-			throw HHuginn::HHuginnRuntimeException(
-				"`"_ys
-				.append( methodName_ )
-				.append( "' in class `" )
-				.append( object_->type()->name() )
-				.append( "' is not a method." ),
-				position_
-			);
-		}
-	} else {
-		throw HHuginn::HHuginnRuntimeException(
-			"Class `"_ys
-			.append( object_->type()->name() )
-			.append( "' does not have `" )
-			.append( methodName_ )
-			.append( "' method." ),
-			position_
-		);
-	}
-	return ( res );
-	M_EPILOG
-}
-
 yaal::hcore::HString const& get_string( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HString const*>( value_.raw() ) );

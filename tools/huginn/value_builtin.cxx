@@ -495,7 +495,7 @@ namespace {
 HHuginn::value_t fallback_conversion( HHuginn::type_t type_, HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
-		res = call_method( thread_, o, "to_"_ys.append( type_->name() ), HHuginn::values_t(), position_ );
+		res = o->call_method( thread_, "to_"_ys.append( type_->name() ), HHuginn::values_t(), position_ );
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Conversion from `"_ys

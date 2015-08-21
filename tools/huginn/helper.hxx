@@ -49,8 +49,6 @@ void verify_arg_type( yaal::hcore::HString const&, HHuginn::values_t const&, int
 HHuginn::type_t verify_arg_numeric( yaal::hcore::HString const&, HHuginn::values_t const&, int, bool, int );
 HHuginn::type_t verify_arg_collection( yaal::hcore::HString const&, HHuginn::values_t const&, int, bool, int );
 
-HHuginn::value_t call_method( HThread*, HHuginn::HObject const*, yaal::hcore::HString const&, HHuginn::values_t const&, int );
-
 yaal::hcore::HString const& get_string( HHuginn::value_t const& );
 int long long get_integer( HHuginn::value_t const& );
 double long get_real( HHuginn::value_t const& );

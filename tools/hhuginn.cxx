@@ -760,6 +760,44 @@ bool HHuginn::HObject::is_kind_of( yaal::hcore::HString const& typeName_ ) const
 	M_EPILOG
 }
 
+HHuginn::value_t HHuginn::HObject::call_method(
+	huginn::HThread* thread_,
+	yaal::hcore::HString const& methodName_,
+	HHuginn::values_t const& arguments_,
+	int position_
+) const {
+	M_PROLOG
+	HHuginn::value_t res;
+	int idx( field_index( methodName_ ) );
+	if ( idx >= 0 ) {
+		HHuginn::value_t const& f( field( idx, false ) );
+		if ( f->type() == HHuginn::TYPE::METHOD ) {
+			HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( f.raw() ) );
+			res = m->function()( thread_, const_cast<HHuginn::HObject*>( this ), arguments_, position_ );
+		} else {
+			throw HHuginn::HHuginnRuntimeException(
+				"`"_ys
+				.append( methodName_ )
+				.append( "' in class `" )
+				.append( type()->name() )
+				.append( "' is not a method." ),
+				position_
+			);
+		}
+	} else {
+		throw HHuginn::HHuginnRuntimeException(
+			"Class `"_ys
+			.append( type()->name() )
+			.append( "' does not have `" )
+			.append( methodName_ )
+			.append( "' method." ),
+			position_
+		);
+	}
+	return ( res );
+	M_EPILOG
+}
+
 HHuginn::value_t HHuginn::HObject::do_clone( void ) const {
 	M_PROLOG
 	values_t fields;
@@ -1566,7 +1604,7 @@ inline HHuginn::value_t size( huginn::HThread* thread_, HHuginn::HObject*, HHugi
 		s = static_cast<HHuginn::HSet const*>( v )->size();
 	} else {
 		if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v ) ) {
-			s = get_integer( value_builtin::integer( thread_, call_method( thread_, o, "get_size", HHuginn::values_t(), position_ ), position_ ) );
+			s = get_integer( value_builtin::integer( thread_, o->call_method( thread_, "get_size", HHuginn::values_t(), position_ ), position_ ) );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
 				"Getting size of `"_ys.append( v->type()->name() ).append( "'s is not supported." ),
