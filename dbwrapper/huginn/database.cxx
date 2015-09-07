@@ -54,7 +54,6 @@ public:
 		, _exceptionClass( exception::create_class( class_->huginn(), "DatabaseException" ) )
 		, _databaseConnectionClass( HDatabaseConnection::get_class( class_->huginn(), _exceptionClass ) ) {
 		class_->huginn()->register_class( _databaseConnectionClass );
-		class_->huginn()->register_class( _exceptionClass );
 		return;
 	}
 	static HHuginn::value_t connect( tools::huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {

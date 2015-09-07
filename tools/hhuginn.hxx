@@ -295,6 +295,7 @@ public:
 	yaal::hcore::HStreamInterface& output_stream( void );
 	yaal::hcore::HStreamInterface& error_stream( void );
 	function_t get_function( yaal::hcore::HString const& );
+	class_t get_class( yaal::hcore::HString const& );
 	value_t get_package( yaal::hcore::HString const& );
 	yaal::hcore::HString get_snippet( int, int ) const;
 	void register_class( class_t );

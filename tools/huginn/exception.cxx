@@ -120,13 +120,17 @@ HHuginn::class_t _exceptionClass_( make_pointer<HExceptionClass>( nullptr, "Exce
 
 HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& name_, HHuginn::HClass const* base_ ) {
 	M_PROLOG
-	HHuginn::class_t c(
-		make_pointer<HExceptionClass>(
+	HHuginn::class_t c( huginn_ ? huginn_->get_class( name_ ) : nullptr );
+	if ( ! c ) {
+		c = make_pointer<HExceptionClass>(
 			huginn_,
 			name_,
 			base_ ? base_ : _exceptionClass_.raw()
-		)
-	);
+		);
+	}
+	if ( huginn_ ) {
+		huginn_->register_class( c );
+	}
 	return ( c );
 	M_EPILOG
 }

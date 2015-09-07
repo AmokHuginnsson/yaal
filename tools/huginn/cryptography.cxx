@@ -50,7 +50,6 @@ public:
 	HCryptography( HHuginn::HClass* class_ )
 		: HObject( class_ )
 		, _exceptionClass( exception::create_class( class_->huginn(), "CryptographyException" ) ) {
-		class_->huginn()->register_class( _exceptionClass );
 		return;
 	}
 	static HHuginn::value_t md5( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {

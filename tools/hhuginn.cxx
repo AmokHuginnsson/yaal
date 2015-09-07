@@ -1105,6 +1105,13 @@ HHuginn::function_t HHuginn::get_function( yaal::hcore::HString const& name_ ) {
 	M_EPILOG
 }
 
+HHuginn::class_t HHuginn::get_class( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	classes_t::const_iterator ci( _classes.find( name_ ) );
+	return ( ci != _classes.end() ? ci->second : class_t() );
+	M_EPILOG
+}
+
 HHuginn::value_t HHuginn::get_package( yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	HHuginn::value_t v;

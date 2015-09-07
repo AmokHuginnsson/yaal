@@ -51,7 +51,6 @@ public:
 	HOperatingSystem( HHuginn::HClass* class_ )
 		: HObject( class_ )
 		, _exceptionClass( exception::create_class( class_->huginn(), "OperatingSystemException" ) ) {
-		class_->huginn()->register_class( _exceptionClass );
 		return;
 	}
 	static HHuginn::value_t env( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {

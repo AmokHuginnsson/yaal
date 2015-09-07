@@ -58,8 +58,6 @@ public:
 		: HObject( class_ )
 		, _streamClass( HStream::get_class( class_->huginn() ) )
 		, _exceptionClass( exception::create_class( class_->huginn(), "FileSystemException" ) ) {
-		class_->huginn()->register_class( _streamClass );
-		class_->huginn()->register_class( _exceptionClass );
 		return;
 	}
 	static HHuginn::value_t open( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {

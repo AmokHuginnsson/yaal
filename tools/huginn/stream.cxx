@@ -143,10 +143,12 @@ int long HStream::do_size( void ) const {
 
 HHuginn::class_t HStream::get_class( HHuginn* huginn_ ) {
 	M_PROLOG
-	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
+	char const name[] = "Stream";
+	HHuginn::class_t c( huginn_->get_class( name ) );
+	if ( ! c ) {
+		c =	make_pointer<HHuginn::HClass>(
 			huginn_,
-			HHuginn::HType::register_type( "Stream", huginn_ ),
+			HHuginn::HType::register_type( name, huginn_ ),
 			nullptr,
 			HHuginn::HClass::field_names_t{
 				"read",
@@ -158,8 +160,9 @@ HHuginn::class_t HStream::get_class( HHuginn* huginn_ ) {
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read_line, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::write, _1, _2, _3, _4 ) )
 			}
-		)
-	);
+		);
+		huginn_->register_class( c );
+	}
 	return ( c );
 	M_EPILOG
 }

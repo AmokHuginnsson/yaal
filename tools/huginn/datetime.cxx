@@ -57,7 +57,6 @@ public:
 		, _exceptionClass( exception::create_class( class_->huginn(), "DateTimeException" ) ) {
 		class_->huginn()->register_class( _timeClass );
 		class_->huginn()->register_class( _clockClass );
-		class_->huginn()->register_class( _exceptionClass );
 		return;
 	}
 	static HHuginn::value_t now( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {

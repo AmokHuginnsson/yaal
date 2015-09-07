@@ -49,7 +49,6 @@ public:
 	HMathematics( HHuginn::HClass* class_ )
 		: HObject( class_ )
 		, _exceptionClass( exception::create_class( class_->huginn(), "MathematicsException" ) ) {
-		class_->huginn()->register_class( _exceptionClass );
 		return;
 	}
 	static HHuginn::value_t square_root( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
