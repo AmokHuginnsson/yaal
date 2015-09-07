@@ -205,9 +205,9 @@ Copyright:
  * \param condition - condition to be tested.
  */
 #define M_ENSURE( ... ) M_MACRO_ARGC( M_ENSURE_, __VA_ARGS__ )
-#define M_ENSURE_1( condition ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition, errno, error_message( errno ) ); } } while ( 0 )
-#define M_ENSURE_2( condition, type ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition, errno, error_message( errno ) ); } } while ( 0 )
-#define M_ENSURE_EX( condition, comment ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition, errno, error_message( errno ), comment ); } } while ( 0 )
+#define M_ENSURE_1( condition ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno ); } } while ( 0 )
+#define M_ENSURE_2( condition, type ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno ); } } while ( 0 )
+#define M_ENSURE_EX( condition, comment ) do { if ( ! ( condition ) ) { yaal::hcore::throw_exception<this_type>( __FILE__, __LINE__, __PRETTY_FUNCTION__, error_message( errno ), errno, comment ); } } while ( 0 )
 #ifndef NDEBUG
 /*! \brief Run-time assertion tester.
  *

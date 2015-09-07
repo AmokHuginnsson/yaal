@@ -60,11 +60,11 @@ resolver::cache_on_tls_t resolver::_cache( RESOLVER_INITIAL_CACHE_SIZE );
 ip_t resolver::get_ip( HString const& hostName_ ) {
 	M_PROLOG
 	ip_t ip;
-	int error( 0 );
+	HScopedValueReplacement<int> saveErrno( errno, 0 );
 #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 )
 	addrinfo* addrInfo( NULL );
-	error = ::getaddrinfo( hostName_.raw(), NULL, NULL, &addrInfo );
-	M_ENSURE_EX( ! error && addrInfo, hostName_ );
+	errno = ::getaddrinfo( hostName_.raw(), NULL, NULL, &addrInfo );
+	M_ENSURE_EX( ! errno && addrInfo, hostName_ );
 	ip = ip_t( static_cast<sockaddr_in*>( static_cast<void*>( addrInfo->ai_addr ) )->sin_addr.s_addr );
 	::freeaddrinfo( addrInfo );
 #else /* #if defined( HAVE_GETADDRINFO ) && ( HAVE_GETADDRINFO != 0 ) */
@@ -72,6 +72,7 @@ ip_t resolver::get_ip( HString const& hostName_ ) {
 	hostent* hostNameStatus( NULL );
 	int size( static_cast<int>( _cache->get_size() ) );
 	_cache->realloc( size );
+	int error( 0 );
 	while ( ::gethostbyname_r( hostName_.raw(), &hostName,
 				_cache->raw(), size,
 				&hostNameStatus, &error ) == ERANGE )

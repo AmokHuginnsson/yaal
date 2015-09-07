@@ -282,21 +282,21 @@ struct parent_exception<void> {
 }
 
 template<typename tType, typename code_t>
-void throw_exception( char const*, int, char const*, HString const&, code_t const&, HString const& = HString() ) __attribute__(( __noreturn__ ));
+void throw_exception( char const*, int, char const*, HString const&, code_t const& ) __attribute__(( __noreturn__ ));
 template<typename tType, typename code_t>
-void throw_exception( char const* file, int line, char const* function, HString const& message, code_t const& code, HString const& reason ) {
+void throw_exception( char const* file, int line, char const* function, HString const& message, code_t const& code ) {
 	typedef typename exception_auto_hierarchy::parent_exception<tType>::parent_exception_t parent_exception_t;
 	typedef typename yaal::hcore::HExceptionT<tType, parent_exception_t> exception_t;
-	throw exception_t( file, line, function, ! reason.is_empty() ? message + ": " + reason : message, static_cast<int>( code ) );
+	throw exception_t( file, line, function, message, static_cast<int>( code ) );
 }
 
 template<typename tType, typename code_t>
-void throw_exception( char const*, int, char const*, HString const&, code_t const&, HString const&, HString const& ) __attribute__(( __noreturn__ ));
+void throw_exception( char const*, int, char const*, HString const&, code_t const&, HString const& ) __attribute__(( __noreturn__ ));
 template<typename tType, typename code_t>
-void throw_exception( char const* file, int line, char const* function, HString const& message, code_t const& code, HString const& reason, HString const& comment ) {
+void throw_exception( char const* file, int line, char const* function, HString const& message, code_t const& code, HString const& comment ) {
 	typedef typename exception_auto_hierarchy::parent_exception<tType>::parent_exception_t parent_exception_t;
 	typedef typename yaal::hcore::HExceptionT<tType, parent_exception_t> exception_t;
-	throw exception_t( file, line, function, message + ": " + reason + ": " + comment, static_cast<int>( code ) );
+	throw exception_t( file, line, function, message + ": " + comment, static_cast<int>( code ) );
 }
 
 }
