@@ -422,6 +422,9 @@ public:
 		: HPointerBase<tType>() {
 		return;
 	}
+	HPointer( std::nullptr_t )
+		: HPointerBase<tType>() {
+	}
 	template<typename real_t>
 	explicit HPointer( real_t* pointer_ )
 		: HPointerBase<tType>(
