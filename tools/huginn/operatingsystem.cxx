@@ -25,6 +25,8 @@ Copyright:
 */
 
 #include <cstdlib>
+#include <cstring>
+#include <unistd.h>
 
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
@@ -62,6 +64,24 @@ public:
 		return ( val ? pointer_static_cast<HHuginn::HValue>( make_pointer<HHuginn::HString>( val ) ) : _none_ );
 		M_EPILOG
 	}
+	static HHuginn::value_t exec( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		static int const MAX_ARG_COUNT( 65535 );
+		char const name[] = "OperatingSystem.exec";
+		verify_arg_count( name, values_, 1, MAX_ARG_COUNT, position_ );
+		int argc( static_cast<int>( values_.get_size() ) );
+		HResource<char*[]> argvHolder( new char*[argc + 1] );
+		char** argv( argvHolder.get() );
+		argv[argc] = nullptr;
+		for ( int i( 0 ); i < argc; ++ i ) {
+			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, false, position_ );
+			argv[i] = const_cast<char*>( get_string( values_[i] ).raw() );
+		}
+		::execvp( argv[0], argv );
+		thread_->raise( static_cast<HOperatingSystem*>( object_ )->_exceptionClass.raw(), strerror( errno ), position_ );
+		return ( _none_ );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -80,10 +100,12 @@ HHuginn::value_t HOperatingSystemCreator::do_new_instance( HHuginn* huginn_ ) {
 			t,
 			nullptr,
 			HHuginn::HClass::field_names_t{
-				"env"
+				"env",
+				"exec"
 			},
 			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::env, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::env, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exec, _1, _2, _3, _4 ) )
 			}
 		)
 	);
