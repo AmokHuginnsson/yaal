@@ -74,7 +74,6 @@ main( args ) {
  */
 HHuginn::HType::id_generator_t HHuginn::HType::_idGenerator{ 0 };
 HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
-yaal::hcore::HMutex HHuginn::HType::_mutex{};
 
 HHuginn::type_t const HHuginn::TYPE::NONE( HHuginn::HType::register_type( "none", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::INTEGER( HHuginn::HType::register_type( "integer", nullptr ) );
@@ -553,7 +552,8 @@ HHuginn::HType::HType( yaal::hcore::HString const& name_, int id_ )
 }
 
 HHuginn::type_t HHuginn::HType::register_type( yaal::hcore::HString const& name_, HHuginn* huginn_ ) {
-	HLock l( _mutex );
+	static yaal::hcore::HMutex mutex;
+	HLock l( mutex );
 	type_dict_t& typeDict( huginn_ ? huginn_->_userTypeDict : _builtin );
 	if ( ( _builtin.count( name_ ) != 0 )
 		|| ( huginn_ && ( huginn_->_userTypeDict.count( name_ ) != 0 ) ) ) {
@@ -565,7 +565,6 @@ HHuginn::type_t HHuginn::HType::register_type( yaal::hcore::HString const& name_
 }
 
 int HHuginn::HType::builtin_type_count( void ) {
-	HLock l( _mutex );
 	return ( _idGenerator );
 }
 

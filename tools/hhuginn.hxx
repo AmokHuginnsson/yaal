@@ -91,7 +91,6 @@ public:
 		id_t _id;
 		static id_generator_t _idGenerator;
 		static type_dict_t _builtin;
-		static yaal::hcore::HMutex _mutex;
 	public:
 		yaal::hcore::HString const& name( void ) const {
 			return ( _name );
