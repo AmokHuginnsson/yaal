@@ -41,6 +41,7 @@ namespace huginn {
 class HQueryResult : public tools::HHuginn::HIterable {
 	dbwrapper::HRecordSet::ptr_t _recordSet;
 	dbwrapper::HRecordSet::HIterator _it;
+	tools::HHuginn* _huginn;
 public:
 	HQueryResult( tools::HHuginn::HClass const*, dbwrapper::HRecordSet::ptr_t const& );
 	static tools::HHuginn::value_t column_name( tools::huginn::HThread*, tools::HHuginn::HObject*, tools::HHuginn::values_t const&, int );
@@ -52,6 +53,8 @@ public:
 private:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
+	HQueryResult( HQueryResult const& ) = delete;
+	HQueryResult& operator = ( HQueryResult const& ) = delete;
 };
 
 }

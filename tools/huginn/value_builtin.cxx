@@ -240,7 +240,7 @@ HHuginn::value_t mul( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, 
 
 HHuginn::value_t div( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
-	HHuginn::value_t res( _none_ );
+	HHuginn::value_t res( thread_->huginn().none_value() );
 	HHuginn::type_t typeId( v1_->type() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		int long long denominator( static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
@@ -260,7 +260,7 @@ HHuginn::value_t div( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "There is no `/' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
 	}
-	if ( res == _none_ ) {
+	if ( res == thread_->huginn().none_value() ) {
 		thread_->raise( _arithmeticException_, "Division by zero.", position_ );
 	}
 	return ( res );
@@ -268,7 +268,7 @@ HHuginn::value_t div( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 
 HHuginn::value_t mod( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
-	HHuginn::value_t res( _none_ );
+	HHuginn::value_t res( thread_->huginn().none_value() );
 	if ( v1_->type() == HHuginn::TYPE::INTEGER ) {
 		int long long denominator( static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 		if ( denominator != 0 ) {
@@ -541,7 +541,7 @@ HHuginn::value_t boolean( HThread* thread_, HHuginn::value_t const& v_, int posi
 }
 
 HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	HHuginn::value_t res( _none_ );
+	HHuginn::value_t res( thread_->huginn().none_value() );
 	HHuginn::type_t typeId( v_->type() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
 		int long long v( 0 );
@@ -602,7 +602,7 @@ HHuginn::value_t character( HThread* thread_, HHuginn::value_t const& v_, int po
 }
 
 HHuginn::value_t number( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
-	HHuginn::value_t res( _none_ );
+	HHuginn::value_t res( thread_->huginn().none_value() );
 	HHuginn::type_t typeId( v_->type() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
 		try {

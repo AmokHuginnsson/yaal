@@ -142,7 +142,7 @@ yaal::hcore::HString& HHuginn::HString::value( void ) {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HString::do_clone( void ) const {
+HHuginn::value_t HHuginn::HString::do_clone( HHuginn* ) const {
 	return ( make_pointer<HString>( _value ) );
 }
 

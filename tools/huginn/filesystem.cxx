@@ -104,7 +104,7 @@ private:
 			)
 		);
 		HFile* f( static_cast<HFile*>( stream.raw() ) );
-		HHuginn::value_t v( _none_ );
+		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( f->is_opened() ) {
 			v = make_pointer<HStream>( _streamClass.raw(), stream );
 		} else {

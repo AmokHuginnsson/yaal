@@ -56,7 +56,7 @@ public:
 		char const name[] = "Mathematics.square_root";
 		verify_arg_count( name, values_, 1, 1, position_ );
 		HHuginn::type_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
-		HHuginn::value_t v( _none_ );
+		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
 			if ( val >= 0 ) {
@@ -68,7 +68,7 @@ public:
 				v = make_pointer<HHuginn::HReal>( yaal::square_root( val ) );
 			}
 		}
-		if ( v == _none_ ) {
+		if ( v == thread_->huginn().none_value() ) {
 			thread_->raise( static_cast<HMathematics*>( object_ )->_exceptionClass.raw(), "bad domain", position_ );
 		}
 		return ( v );

@@ -379,9 +379,10 @@ void HExpression::power( HFrame* frame_, int ) {
 void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	HHuginn::value_t from( _none_ );
-	HHuginn::value_t to( _none_ );
-	HHuginn::value_t step( _none_ );
+	HHuginn& h( frame_->thread()->huginn() );
+	HHuginn::value_t from( h.none_value() );
+	HHuginn::value_t to( h.none_value() );
+	HHuginn::value_t step( h.none_value() );
 	HHuginn::value_t* v( &step );
 	OPERATOR op( frame_->operations().top()._operator );
 	M_ASSERT( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) );
@@ -421,7 +422,7 @@ void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
 			if ( range == 1 ) {
 				from = yaal::move( to );
 				to = yaal::move( step );
-				step = _none_;
+				step = h.none_value();
 			}
 			frame_->values().push( value_builtin::range( base, from, to, step, p ) );
 		} else {

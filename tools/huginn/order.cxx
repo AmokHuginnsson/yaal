@@ -185,7 +185,7 @@ HHuginn::HIterable::HIterator HHuginn::HOrder::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HOrder::do_clone( void ) const {
+HHuginn::value_t HHuginn::HOrder::do_clone( HHuginn* ) const {
 	return ( make_pointer<HOrder>( _data, _keyType ) );
 }
 

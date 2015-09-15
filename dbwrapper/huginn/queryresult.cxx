@@ -44,7 +44,7 @@ namespace dbwrapper {
 namespace huginn {
 
 namespace {
-HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator& it_ ) {
+HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator& it_, HHuginn::value_t& none_ ) {
 	HHuginn::value_t v( make_pointer<HHuginn::HList>() );
 	HHuginn::HList* row( static_cast<HHuginn::HList*>( v.raw() ) );
 	for ( int i( 0 ), fieldCount( rs_->get_field_count() ); i < fieldCount; ++ i ) {
@@ -52,7 +52,7 @@ HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator&
 		if ( !! f ) {
 			row->push_back( make_pointer<HHuginn::HString>( yaal::move( *f ) ) );
 		} else {
-			row->push_back( _none_ );
+			row->push_back( none_ );
 		}
 	}
 	return ( v );
@@ -62,15 +62,17 @@ HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator&
 class HQueryResultIterator : public HIteratorInterface {
 	HRecordSet::ptr_t _recordSet;
 	HRecordSet::HIterator _it;
+	HHuginn* _huginn;
 public:
-	HQueryResultIterator( HRecordSet::ptr_t const& recordSet_, HRecordSet::HIterator&& it_ )
+	HQueryResultIterator( HRecordSet::ptr_t const& recordSet_, HRecordSet::HIterator&& it_, HHuginn* huginn_ )
 		: _recordSet( recordSet_ )
-		, _it( yaal::move( it_ ) ) {
+		, _it( yaal::move( it_ ) )
+		, _huginn( huginn_ ) {
 		return;
 	}
 protected:
 	virtual HHuginn::value_t do_value( void ) override {
-		return ( fetch_row( _recordSet, _it ) );
+		return ( fetch_row( _recordSet, _it, _huginn->none_value() ) );
 	}
 	virtual bool do_is_valid( void ) override {
 		return ( _it != _recordSet->end() );
@@ -88,7 +90,8 @@ HQueryResult::HQueryResult(
 	HRecordSet::ptr_t const& recordSet_
 ) : HIterable( class_ )
 	, _recordSet( recordSet_ )
-	, _it( _recordSet->begin() ) {
+	, _it( _recordSet->begin() )
+	, _huginn( class_->huginn() ) {
 	return;
 }
 
@@ -130,7 +133,7 @@ HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread*, HHuginn::HObje
 }
 
 HHuginn::HIterable::HIterator HQueryResult::do_iterator( void ) {
-	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HQueryResultIterator( _recordSet, yaal::move( _it ) ) );
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HQueryResultIterator( _recordSet, yaal::move( _it ), _huginn ) );
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
@@ -179,9 +182,9 @@ HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHugi
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_ ) );
 	HQueryResultClass const* qrc( static_cast<HQueryResultClass const*>( qr->HObject::get_class() ) );
-	HHuginn::value_t v( _none_ );
+	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {
-		v = huginn::fetch_row( qr->_recordSet, qr->_it );
+		v = huginn::fetch_row( qr->_recordSet, qr->_it, thread_->huginn().none_value() );
 		++ qr->_it;
 	} catch ( HException const& e ) {
 		thread_->raise( qrc->exception_class(), e.what(), position_ );

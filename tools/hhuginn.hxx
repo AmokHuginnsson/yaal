@@ -91,6 +91,7 @@ public:
 		id_t _id;
 		static id_generator_t _idGenerator;
 		static type_dict_t _builtin;
+		static yaal::hcore::HMutex _mutex;
 	public:
 		yaal::hcore::HString const& name( void ) const {
 			return ( _name );
@@ -183,6 +184,9 @@ private:
 	STATE::state_t _state;
 	HType::id_generator_t _idGenerator;
 	HType::type_dict_t _userTypeDict;
+	value_t _none;
+	value_t _true;
+	value_t _false;
 	classes_t _classes;
 	functions_t _functions;
 	source_t _source;
@@ -300,6 +304,15 @@ public:
 	yaal::hcore::HString get_snippet( int, int ) const;
 	void register_class( class_t );
 	static void disable_grammar_verification( void );
+	value_t& none_value( void ) {
+		return ( _none );
+	}
+	value_t& true_value( void ) {
+		return ( _true );
+	}
+	value_t& false_value( void ) {
+		return ( _false );
+	}
 private:
 	void finalize_compilation( void );
 	HClass const* commit_class( yaal::hcore::HString const& );
@@ -353,9 +366,9 @@ public:
 		return;
 	}
 	type_t type( void ) const;
-	value_t clone( void ) const;
+	value_t clone( HHuginn* ) const;
 private:
-	virtual value_t do_clone( void ) const;
+	virtual value_t do_clone( HHuginn* ) const;
 	HValue( HValue const& ) = delete;
 	HValue& operator = ( HValue const& ) = delete;
 };
@@ -408,7 +421,7 @@ public:
 private:
 	HMethod( HMethod const& ) = delete;
 	HMethod& operator = ( HMethod const& ) = delete;
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HClass::HBoundMethod : public HHuginn::HClass::HMethod {
@@ -422,7 +435,7 @@ public:
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
 	HBoundMethod& operator = ( HBoundMethod const& ) = delete;
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HObject : public HHuginn::HValue, public yaal::hcore::HPointerFromThisInterface<HHuginn::HObject> {
@@ -448,7 +461,7 @@ private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HObjectReference : public HHuginn::HValue {
@@ -466,7 +479,7 @@ public:
 private:
 	HObjectReference( HObjectReference const& ) = delete;
 	HObjectReference& operator = ( HObjectReference const& ) = delete;
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HReference : public HHuginn::HValue {
@@ -479,7 +492,7 @@ public:
 	HReference( HHuginn::value_t& );
 	HHuginn::value_t& value( void ) const;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HTernaryEvaluator : public HHuginn::HValue {
@@ -494,7 +507,7 @@ public:
 	HTernaryEvaluator( expression_t const&, expression_t const&, expression_t const& );
 	value_t execute( huginn::HThread* );
 private:
-	virtual value_t do_clone( void ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
+	virtual value_t do_clone( HHuginn* ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
 
 class HHuginn::HIterable : public HHuginn::HObject {
@@ -521,7 +534,7 @@ public:
 	bool value( void ) const;
 	void to_string( void ) const;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HInteger : public HHuginn::HValue {
@@ -539,7 +552,7 @@ public:
 	void to_real( void ) const;
 	void to_string( void ) const;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HReal : public HHuginn::HValue {
@@ -557,7 +570,7 @@ public:
 	void to_string( void ) const;
 	/* There is no direct convertion to character. */
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HString : public HHuginn::HIterable {
@@ -578,7 +591,7 @@ protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HCharacter : public HHuginn::HValue {
@@ -594,7 +607,7 @@ public:
 	void to_integer( void ) const;
 	void to_string( void ) const;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HNumber : public HHuginn::HValue {
@@ -611,7 +624,7 @@ public:
 	void to_real( void ) const;
 	void to_string( void ) const;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HList : public HHuginn::HIterable {
@@ -635,7 +648,7 @@ protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HDeque : public HHuginn::HIterable {
@@ -661,7 +674,7 @@ protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HDict : public HHuginn::HIterable {
@@ -692,7 +705,7 @@ private:
 	HDict( HDict const& ) = delete;
 	HDict& operator = ( HDict const& ) = delete;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HOrder : public HHuginn::HIterable {
@@ -720,7 +733,7 @@ private:
 	HOrder( HOrder const& ) = delete;
 	HOrder& operator = ( HOrder const& ) = delete;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HLookup : public HHuginn::HIterable {
@@ -750,7 +763,7 @@ private:
 	HLookup( HLookup const& ) = delete;
 	HLookup& operator = ( HLookup const& ) = delete;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HSet : public HHuginn::HIterable {
@@ -777,7 +790,7 @@ private:
 	HSet( HSet const& ) = delete;
 	HSet& operator = ( HSet const& ) = delete;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HFunctionReference : public HHuginn::HValue {
@@ -791,7 +804,7 @@ public:
 	yaal::hcore::HString const& name( void ) const;
 	HHuginn::function_t const& function( void ) const;
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
 
 class HHuginn::HException : public HHuginn::HObject {
@@ -807,16 +820,8 @@ public:
 	yaal::hcore::HString const& where( void ) const;
 	void set_where( yaal::hcore::HString const& );
 private:
-	virtual value_t do_clone( void ) const override;
+	virtual value_t do_clone( HHuginn* ) const override;
 };
-
-namespace huginn {
-
-extern HHuginn::value_t _none_;
-extern HHuginn::value_t _true_;
-extern HHuginn::value_t _false_;
-
-}
 
 }
 

@@ -181,7 +181,7 @@ HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HList::do_clone( void ) const {
+HHuginn::value_t HHuginn::HList::do_clone( HHuginn* ) const {
 	return ( make_pointer<HList>( _data ) );
 }
 

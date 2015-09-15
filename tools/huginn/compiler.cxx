@@ -555,7 +555,7 @@ void OCompiler::add_return_statement( executing_parser::position_t position_ ) {
 	M_ASSERT( ! f()._scopeStack.is_empty() );
 	HHuginn::expression_t& e( current_expression() );
 	if ( e->is_empty() ) {
-		e->add_execution_step( hcore::call( &HExpression::store_direct, e.raw(), _none_, _1, position_.get() ) );
+		e->add_execution_step( hcore::call( &HExpression::store_direct, e.raw(), _huginn->none_value(), _1, position_.get() ) );
 	}
 	current_scope()->add_statement( make_pointer<HReturn>( e ) );
 	reset_expression();

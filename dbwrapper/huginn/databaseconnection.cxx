@@ -120,7 +120,7 @@ private:
 		char const n[] = "DatabaseConnection.contructor";
 		verify_arg_count( n, values_, 1, 1, position_ );
 		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, true, position_ );
-		HHuginn::value_t v( _none_ );
+		HHuginn::value_t v( thread_->huginn().none_value() );
 		try {
 			dbwrapper::database_ptr_t db( dbwrapper::util::connect( get_string( values_[0] ) ) );
 			v = make_pointer<HDatabaseConnection>( this, db );
@@ -141,7 +141,7 @@ HHuginn::value_t HDatabaseConnection::do_query(
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HObject::get_class() ) );
-	HHuginn::value_t v( _none_ );
+	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {
 		dbwrapper::HQuery::ptr_t q( _database->prepare_query( get_string( values_[0] ) ) );
 		v = make_pointer<huginn::HQuery>( dbcClass->query_class(), q );
@@ -159,7 +159,7 @@ HHuginn::value_t HDatabaseConnection::do_table_names(
 	char const name[] = "DatabaseConnection.table_names";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HObject::get_class() ) );
-	HHuginn::value_t v( _none_ );
+	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {
 		HDataBase::table_list_t tl( _database->get_tables() );
 		v = make_pointer<HHuginn::HList>();
@@ -182,7 +182,7 @@ HHuginn::value_t HDatabaseConnection::do_column_names(
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 	HDatabaseConnectionClass const* dbcClass( static_cast<HDatabaseConnectionClass const*>( HObject::get_class() ) );
-	HHuginn::value_t v( _none_ );
+	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {
 		HDataBase::column_list_t cl( _database->get_columns( get_string( values_[0] ) ) );
 		v = make_pointer<HHuginn::HList>();

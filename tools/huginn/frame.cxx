@@ -53,7 +53,7 @@ HFrame::HFrame(
 	, _variables()
 	, _operations()
 	, _values()
-	, _result( _none_ )
+	, _result( thread_->huginn().none_value() )
 	, _number( parent_ ? ( parent_->_number + ( ( type_ == TYPE::FUNCTION ) ? 1 : 0 ) ) : 1 )
 	, _type( type_ )
 	, _state( STATE::NORMAL ) {
@@ -196,7 +196,7 @@ HHuginn::value_t HFrame::make_variable( yaal::hcore::HString const& name_, int )
 		}
 	}
 	if ( ! v ) {
-		v = &( _variables.insert( make_pair( name_, _none_ ) ).first->second );
+		v = &( _variables.insert( make_pair( name_, _thread->huginn().none_value() ) ).first->second );
 	}
 	return ( make_pointer<HHuginn::HReference>( *v ) );
 	M_EPILOG

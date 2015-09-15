@@ -74,6 +74,7 @@ main( args ) {
  */
 HHuginn::HType::id_generator_t HHuginn::HType::_idGenerator{ 0 };
 HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
+yaal::hcore::HMutex HHuginn::HType::_mutex{};
 
 HHuginn::type_t const HHuginn::TYPE::NONE( HHuginn::HType::register_type( "none", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::INTEGER( HHuginn::HType::register_type( "integer", nullptr ) );
@@ -104,10 +105,6 @@ char const* _errMsgHHuginn_[ 10 ] = {
 	_( "Operand is not a boolean value." ),
 	_( "Subscript is not an integer." )
 };
-
-HHuginn::value_t _none_ = make_pointer<HHuginn::HValue>( HHuginn::TYPE::NONE );
-HHuginn::value_t _true_ = make_pointer<HHuginn::HBoolean>( true );
-HHuginn::value_t _false_ = make_pointer<HHuginn::HBoolean>( false );
 
 namespace exception {
 
@@ -150,15 +147,15 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	);
 	HRule literalNone(
 		"none",
-		constant( KEYWORD::NONE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _none_, _1 ) ) )
+		constant( KEYWORD::NONE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _none, _1 ) ) )
 	);
 	HRule booleanLiteralTrue(
 		"true",
-		constant( KEYWORD::TRUE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _true_, _1 ) ) )
+		constant( KEYWORD::TRUE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _true, _1 ) ) )
 	);
 	HRule booleanLiteralFalse(
 		"false",
-		constant( KEYWORD::FALSE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _false_, _1 ) ) )
+		constant( KEYWORD::FALSE, e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::defer_store_direct, _compiler.get(), _false, _1 ) ) )
 	);
 	HRule numberLiteral(
 		"numberLiteral",
@@ -556,6 +553,7 @@ HHuginn::HType::HType( yaal::hcore::HString const& name_, int id_ )
 }
 
 HHuginn::type_t HHuginn::HType::register_type( yaal::hcore::HString const& name_, HHuginn* huginn_ ) {
+	HLock l( _mutex );
 	type_dict_t& typeDict( huginn_ ? huginn_->_userTypeDict : _builtin );
 	if ( ( _builtin.count( name_ ) != 0 )
 		|| ( huginn_ && ( huginn_->_userTypeDict.count( name_ ) != 0 ) ) ) {
@@ -567,6 +565,7 @@ HHuginn::type_t HHuginn::HType::register_type( yaal::hcore::HString const& name_
 }
 
 int HHuginn::HType::builtin_type_count( void ) {
+	HLock l( _mutex );
 	return ( _idGenerator );
 }
 
@@ -652,7 +651,7 @@ HHuginn::values_t HHuginn::HClass::get_defaults( void ) const {
 	M_PROLOG
 	values_t defaults;
 	for ( value_t const& v : _fieldDefinitions ) {
-		defaults.push_back( v->clone() );
+		defaults.push_back( v->clone( _huginn ) );
 	}
 	return ( defaults );
 	M_EPILOG
@@ -798,11 +797,11 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObject::do_clone( void ) const {
+HHuginn::value_t HHuginn::HObject::do_clone( HHuginn* huginn_ ) const {
 	M_PROLOG
 	values_t fields;
 	for ( value_t const& v : _fields ) {
-		fields.push_back( v->clone() );
+		fields.push_back( v->clone( huginn_ ) );
 	}
 	return ( make_pointer<HObject>( _class, fields ) );
 	M_EPILOG
@@ -864,9 +863,9 @@ HHuginn::value_t HHuginn::HObjectReference::field( int index_, bool copy_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObjectReference::do_clone( void ) const {
+HHuginn::value_t HHuginn::HObjectReference::do_clone( HHuginn* huginn_ ) const {
 	M_PROLOG
-	return ( make_pointer<HObjectReference>( _object->clone(), _class ) );
+	return ( make_pointer<HObjectReference>( _object->clone( huginn_ ), _class ) );
 	M_EPILOG
 }
 
@@ -880,6 +879,9 @@ HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY )
 	, _idGenerator{ HType::builtin_type_count() }
 	, _userTypeDict()
+	, _none( make_pointer<HHuginn::HValue>( HHuginn::TYPE::NONE ) )
+	, _true( make_pointer<HHuginn::HBoolean>( true ) )
+	, _false( make_pointer<HHuginn::HBoolean>( false ) )
 	, _classes()
 	, _functions()
 	, _source( make_resource<HSource>() )
@@ -1369,13 +1371,13 @@ HHuginn::type_t HHuginn::HValue::type( void ) const {
 	return ( _type );
 }
 
-HHuginn::value_t HHuginn::HValue::clone( void ) const {
-	return ( do_clone() );
+HHuginn::value_t HHuginn::HValue::clone( HHuginn* huginn_ ) const {
+	return ( do_clone( huginn_ ) );
 }
 
-HHuginn::value_t HHuginn::HValue::do_clone( void ) const {
+HHuginn::value_t HHuginn::HValue::do_clone( HHuginn* huginn_ ) const {
 	M_ASSERT( _type == TYPE::NONE );
-	return ( _none_ );
+	return ( huginn_->none_value() );
 }
 
 HHuginn::HReference::HReference( HHuginn::value_t& value_ )
@@ -1387,7 +1389,7 @@ HHuginn::value_t& HHuginn::HReference::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HReference::do_clone( void ) const {
+HHuginn::value_t HHuginn::HReference::do_clone( HHuginn* ) const {
 	return ( make_pointer<HReference>( _value ) );
 }
 
@@ -1400,7 +1402,7 @@ double long HHuginn::HReal::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HReal::do_clone( void ) const {
+HHuginn::value_t HHuginn::HReal::do_clone( HHuginn* ) const {
 	return ( make_pointer<HReal>( _value ) );
 }
 
@@ -1413,7 +1415,7 @@ bool HHuginn::HBoolean::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HBoolean::do_clone( void ) const {
+HHuginn::value_t HHuginn::HBoolean::do_clone( HHuginn* ) const {
 	return ( make_pointer<HBoolean>( _value ) );
 }
 
@@ -1426,7 +1428,7 @@ int long long HHuginn::HInteger::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HInteger::do_clone( void ) const {
+HHuginn::value_t HHuginn::HInteger::do_clone( HHuginn* ) const {
 	return ( make_pointer<HInteger>( _value ) );
 }
 
@@ -1439,7 +1441,7 @@ yaal::hcore::HNumber const& HHuginn::HNumber::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HNumber::do_clone( void ) const {
+HHuginn::value_t HHuginn::HNumber::do_clone( HHuginn* ) const {
 	return ( make_pointer<HNumber>( _value ) );
 }
 
@@ -1452,7 +1454,7 @@ char HHuginn::HCharacter::value( void ) const {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HCharacter::do_clone( void ) const {
+HHuginn::value_t HHuginn::HCharacter::do_clone( HHuginn* ) const {
 	return ( make_pointer<HCharacter>( _value ) );
 }
 
@@ -1497,10 +1499,10 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( void ) const {
+HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( HHuginn* M_NDEBUG_CODE( huginn_ ) ) const {
 	M_ASSERT( 0 && "cloning ternary evaluator"[0] );
 #ifdef NDEBUG
-	return ( _none_ );
+	return ( huginn_->none_value() );
 #endif /* #ifdef NDEBUG */
 }
 
@@ -1521,7 +1523,7 @@ HHuginn::function_t const& HHuginn::HFunctionReference::function( void ) const {
 	return ( _function );
 }
 
-HHuginn::value_t HHuginn::HFunctionReference::do_clone( void ) const {
+HHuginn::value_t HHuginn::HFunctionReference::do_clone( HHuginn* ) const {
 	return ( make_pointer<HFunctionReference>( _name, _function ) );
 }
 
@@ -1546,7 +1548,7 @@ void HHuginn::HClass::HMethod::set_object( yaal::tools::HHuginn::HObject* object
 	return;
 }
 
-HHuginn::value_t HHuginn::HClass::HMethod::do_clone( void ) const {
+HHuginn::value_t HHuginn::HClass::HMethod::do_clone( HHuginn* ) const {
 	return ( make_pointer<HMethod>( _function ) );
 }
 
@@ -1558,7 +1560,7 @@ HHuginn::HClass::HBoundMethod::HBoundMethod( HMethod const& method_ )
 	return;
 }
 
-HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( void ) const {
+HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( HHuginn* ) const {
 	return ( make_pointer<HBoundMethod>( *static_cast<HMethod const*>( this ) ) );
 }
 
@@ -1631,11 +1633,11 @@ inline HHuginn::value_t type( huginn::HThread*, HHuginn::HObject*, HHuginn::valu
 	M_EPILOG
 }
 
-inline HHuginn::value_t copy( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t copy( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "copy", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
-	return ( v->clone() );
+	return ( v->clone( &(thread_->huginn()) ) );
 	M_EPILOG
 }
 
@@ -1722,7 +1724,7 @@ inline HHuginn::value_t print( huginn::HThread* thread_, HHuginn::HObject*, HHug
 		);
 	}
 	out << flush;
-	return ( _none_ );
+	return ( thread_->huginn().none_value() );
 	M_EPILOG
 }
 
@@ -1735,7 +1737,7 @@ inline HHuginn::value_t input( huginn::HThread* thread_, HHuginn::HObject*, HHug
 	M_EPILOG
 }
 
-inline HHuginn::value_t assert( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "assert";
 	verify_arg_count( name, values_, 2, 3, position_ );
@@ -1749,7 +1751,7 @@ inline HHuginn::value_t assert( huginn::HThread*, HHuginn::HObject*, HHuginn::va
 		}
 		throw HHuginn::HHuginnRuntimeException( message, position_ );
 	}
-	return ( _none_ );
+	return ( thread_->huginn().none_value() );
 	M_EPILOG
 }
 

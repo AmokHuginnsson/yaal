@@ -225,7 +225,7 @@ HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HDict::do_clone( void ) const {
+HHuginn::value_t HHuginn::HDict::do_clone( HHuginn* ) const {
 	return ( make_pointer<HDict>( _data, _keyType ) );
 }
 

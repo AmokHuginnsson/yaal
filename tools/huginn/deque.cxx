@@ -221,7 +221,7 @@ HHuginn::HIterable::HIterator HHuginn::HDeque::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HDeque::do_clone( void ) const {
+HHuginn::value_t HHuginn::HDeque::do_clone( HHuginn* ) const {
 	return ( make_pointer<HDeque>( _data ) );
 }
 

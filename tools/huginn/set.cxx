@@ -169,7 +169,7 @@ HHuginn::HIterable::HIterator HHuginn::HSet::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HSet::do_clone( void ) const {
+HHuginn::value_t HHuginn::HSet::do_clone( HHuginn* ) const {
 	return ( make_pointer<HSet>( _data ) );
 }
 

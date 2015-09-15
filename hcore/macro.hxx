@@ -97,6 +97,12 @@ Copyright:
 #ifdef M_ASSERT
 #	error Yaal redefines M_ASSERT macro.
 #endif /* #ifdef M_ASSERT */
+#ifdef M_DEBUG_CODE
+#	error Yaal redefines M_DEBUG_CODE macro.
+#endif /* #ifdef M_DEBUG_CODE */
+#ifdef M_NDEBUG_CODE
+#	error Yaal redefines M_NDEBUG_CODE macro.
+#endif /* #ifdef M_NDEBUG_CODE */
 #ifdef M_AT_END_OF_SCOPE
 #	error Yaal redefines M_AT_END_OF_SCOPE macro.
 #endif /* #ifdef M_AT_END_OF_SCOPE */
@@ -218,9 +224,11 @@ Copyright:
  */
 #	define M_ASSERT( condition ) do { if ( ! ( condition ) ) yaal::hcore::failed_assert( __FILE__, __LINE__, __PRETTY_FUNCTION__, #condition ); } while ( 0 )
 # define M_DEBUG_CODE( code ) code
+# define M_NDEBUG_CODE( code ) /**/
 #else /* #ifndef NDEBUG */
 #	define M_ASSERT( c ) /**/
 # define M_DEBUG_CODE( code ) /**/
+# define M_NDEBUG_CODE( code ) code
 #endif /* #else #ifndef NDEBUG */
 /*! \brief Run given code exactly once at the end of currnt scope.
  *

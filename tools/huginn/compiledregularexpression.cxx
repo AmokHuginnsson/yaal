@@ -104,7 +104,7 @@ private:
 		verify_arg_count( n, values_, 1, 1, position_ );
 		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 		HCompiledRegularExpression::regex_t regex( make_resource<HRegex>( get_string( values_[0] ), HRegex::COMPILE::NO_EXCEPTION ) );
-		HHuginn::value_t v( _none_ );
+		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( regex->is_valid() ) {
 			v = make_pointer<HCompiledRegularExpression>( this, yaal::move( regex ) );
 		} else {
@@ -128,7 +128,7 @@ HHuginn::value_t HCompiledRegularExpression::do_match(
 }
 
 HHuginn::value_t HCompiledRegularExpression::do_groups(
-	huginn::HThread*,
+	huginn::HThread* thread_,
 	HHuginn::values_t const& values_,
 	int position_
 ) {
@@ -137,7 +137,7 @@ HHuginn::value_t HCompiledRegularExpression::do_groups(
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 	yaal::hcore::HString const& string( get_string( values_[0] ) );
 	HRegex::groups_t g( _regex->groups( string ) );
-	HHuginn::value_t v( _none_ );
+	HHuginn::value_t v( thread_->huginn().none_value() );
 	if ( ! g.empty() ) {
 		v = make_pointer<HHuginn::HList>();
 		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );

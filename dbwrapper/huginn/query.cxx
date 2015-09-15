@@ -94,7 +94,7 @@ HHuginn::value_t HQuery::bind( tools::huginn::HThread* thread_, HHuginn::HObject
 	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
 	HQuery* q( static_cast<HQuery*>( object_ ) );
 	HQueryClass const* qc( static_cast<HQueryClass const*>( q->HObject::get_class() ) );
-	HHuginn::value_t v( _none_ );
+	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {
 		q->_query->bind( static_cast<int>( get_integer( values_[0] ) ), get_string( values_[1] ) );
 		v = object_->get_pointer();
@@ -111,7 +111,7 @@ HHuginn::value_t HQuery::execute( tools::huginn::HThread* thread_, HHuginn::HObj
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HQuery* q( static_cast<HQuery*>( object_ ) );
 	HQueryClass const* qc( static_cast<HQueryClass const*>( q->HObject::get_class() ) );
-	HHuginn::value_t v( _none_ );
+	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {
 		HRecordSet::ptr_t rs( q->_query->execute() );
 		v = make_pointer<HQueryResult>( qc->query_result_class(), rs );

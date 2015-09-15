@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "stream.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
+#include "thread.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -92,7 +93,7 @@ HHuginn::value_t HStream::read_line( huginn::HThread*, HHuginn::HObject* object_
 	M_EPILOG
 }
 
-HHuginn::value_t HStream::write( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HStream::write( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Stream.write";
 	verify_arg_count( name, values_, 1, 1, position_ );
@@ -100,7 +101,7 @@ HHuginn::value_t HStream::write( huginn::HThread*, HHuginn::HObject* object_, HH
 	HString const& val( get_string( values_[0] ) );
 	HStream* s( static_cast<HStream*>( object_ ) );
 	s->write_impl( val );
-	return ( _none_ );
+	return ( thread_->huginn().none_value() );
 	M_EPILOG
 }
 

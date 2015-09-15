@@ -91,7 +91,7 @@ private:
 				port = -1;
 			}
 		}
-		HHuginn::value_t v( _none_ );
+		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( port >= 0 ) {
 			HStreamInterface::ptr_t stream( make_pointer<HSocket>( port > 0 ? HSocket::TYPE::NETWORK : HSocket::TYPE::FILE ) );
 			HSocket* s( static_cast<HSocket*>( stream.raw() ) );
