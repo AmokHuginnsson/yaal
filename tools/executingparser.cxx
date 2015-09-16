@@ -3057,7 +3057,7 @@ yaal::hcore::HString::const_iterator HCharacter::do_parse( HExecutingParser* exe
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
 	bool matched( false );
-	if ( first_ != last_ ) {
+	if ( scan != last_ ) {
 		char c( *scan );
 		if ( _characters.is_empty() || ( _characters.find( *scan ) != hcore::HString::npos ) ) {
 			position_t pos( position( executingParser_, start ) );
@@ -3289,7 +3289,7 @@ hcore::HString::const_iterator HString::do_parse( HExecutingParser* executingPar
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
 	bool matched( false );
-	if ( first_ != last_ ) {
+	if ( scan != last_ ) {
 		for ( yaal::hcore::HString const& s : _dictionary ) {
 			matched = true;
 			scan = start;
@@ -3513,7 +3513,7 @@ hcore::HString::const_iterator HRegex::do_parse( HExecutingParser* executingPars
 	yaal::hcore::HString::const_iterator start( skip_space( first_, last_ ) );
 	yaal::hcore::HString::const_iterator scan( start );
 	bool matched( false );
-	if ( first_ != last_ ) {
+	if ( scan != last_ ) {
 		hcore::HRegex::HMatchIterator it( _regex->find( scan ) );
 		if ( ( it != _regex->end() ) && ( it->size() <= ( last_ - scan ) ) ) {
 			position_t pos( position( executingParser_, start ) );
