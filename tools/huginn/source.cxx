@@ -84,9 +84,10 @@ yaal::hcore::HString const& HSource::name( void ) const {
 void HSource::preprocess( void ) {
 	M_PROLOG
 	if ( _origSize > 0 ) {
-		_preprocessed.realloc( _origSize );
+		_preprocessed.realloc( _origSize + 1 ); /* + 1 for terminating \0 */
 		HPrepocessor pp( _orig.get<char>(), _orig.get<char>() + _origSize );
 		char* dst( _preprocessed.get<char>() );
+		dst[_origSize] = 0;
 		_skips[0] = 0;
 		int pos( -1 );
 		int skipsTotal( 0 );
