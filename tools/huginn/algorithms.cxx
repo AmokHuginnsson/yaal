@@ -30,8 +30,10 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
+#include "thread.hxx"
 #include "value_builtin.hxx"
 #include "packagefactory.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -126,7 +128,7 @@ public:
 			verify_arg_type( name, values_, 1, HHuginn::TYPE::FUNCTION_REFERENCE, false, position_ );
 			key = values_[1];
 		}
-		HHuginn::value_t v( make_pointer<HHuginn::HList>() );
+		HHuginn::value_t v( thread_->object_factory().create_list() );
 		HHuginn::HList::values_t& dest( static_cast<HHuginn::HList*>( v.raw() )->value() );
 		if ( t == HHuginn::TYPE::LIST ) {
 			HHuginn::HList::values_t const& s( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );

@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -101,33 +102,42 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::HObject* object_, HHug
 	M_EPILOG
 }
 
+HHuginn::class_t get_class( void );
+HHuginn::class_t get_class( void ) {
+	M_PROLOG
+	HHuginn::class_t c(
+		make_pointer<HHuginn::HClass>(
+			nullptr,
+			HHuginn::TYPE::LIST,
+			nullptr,
+			HHuginn::HClass::field_names_t{
+				"add",
+				"pop",
+				"clear"
+			},
+			HHuginn::values_t{
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::add, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::pop, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::clear, _1, _2, _3, _4 ) )
+			}
+		)
+	);
+	return ( c );
+	M_EPILOG
 }
 
-HHuginn::HClass _listClass_(
-	nullptr,
-	HHuginn::TYPE::LIST,
-	nullptr,
-	/* methods */ {
-		"add",
-		"pop",
-		"clear"
-	}, {
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::add, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::pop, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &list::clear, _1, _2, _3, _4 ) )
-	}
-);
+}
 
 }
 
-HHuginn::HList::HList( void )
-	: HIterable( &huginn::_listClass_ )
+HHuginn::HList::HList( HHuginn::HClass const* class_ )
+	: HIterable( class_ )
 	, _data() {
 	return;
 }
 
-HHuginn::HList::HList( values_t const& data_ )
-	: HIterable( &huginn::_listClass_ )
+HHuginn::HList::HList( HHuginn::HClass const* class_, values_t const& data_ )
+	: HIterable( class_ )
 	, _data( data_ ) {
 	return;
 }
@@ -181,8 +191,8 @@ HHuginn::HIterable::HIterator HHuginn::HList::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HList::do_clone( HHuginn* ) const {
-	return ( make_pointer<HList>( _data ) );
+HHuginn::value_t HHuginn::HList::do_clone( HHuginn* huginn_ ) const {
+	return ( huginn_->object_factory()->create_list( _data ) );
 }
 
 }

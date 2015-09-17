@@ -46,10 +46,10 @@ namespace huginn {
 
 namespace {
 HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator& it_, HHuginn& huginn_ ) {
-	HHuginn::value_t v( make_pointer<HHuginn::HList>() );
+	HObjectFactory& objectFactory( *huginn_.object_factory() );
+	HHuginn::value_t v( objectFactory.create_list() );
 	HHuginn::HList* row( static_cast<HHuginn::HList*>( v.raw() ) );
 	HHuginn::value_t& none( huginn_.none_value() );
-	HObjectFactory& objectFactory( *huginn_.object_factory() );
 	for ( int i( 0 ), fieldCount( rs_->get_field_count() ); i < fieldCount; ++ i ) {
 		HRecordSet::value_t f( it_[i] );
 		if ( !! f ) {

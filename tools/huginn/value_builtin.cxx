@@ -115,7 +115,7 @@ HHuginn::value_t range(
 		HHuginn::HInteger const* integerTo = to_->type() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( to_.raw() ) : nullptr;
 		int long from( integerFrom ? static_cast<int long>( integerFrom->value() ) : ( step > 0 ? 0 : size ) );
 		int long to( integerTo ? static_cast<int long>( integerTo->value() ) : ( step > 0 ? size : -1 ) );
-		res = ( baseType == HHuginn::TYPE::LIST ) ? pointer_static_cast<HHuginn::HValue>( make_pointer<HHuginn::HList>() ) : pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_string( "" ) );
+		res = ( baseType == HHuginn::TYPE::LIST ) ? pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_list() ) : pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_string( "" ) );
 
 		do {
 			if ( step > 0 ) {

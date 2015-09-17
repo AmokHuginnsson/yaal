@@ -49,6 +49,7 @@ public:
 	HObjectFactory( void );
 	HHuginn::value_t create_string( yaal::hcore::HString const& );
 	HHuginn::value_t create_list( void );
+	HHuginn::value_t create_list( HHuginn::values_t const& );
 	HHuginn::value_t create_deque( void );
 	HHuginn::value_t create_dict( void );
 	HHuginn::value_t create_order( void );

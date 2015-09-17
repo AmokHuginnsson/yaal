@@ -42,9 +42,13 @@ namespace string {
 HHuginn::class_t get_class( void );
 }
 
+namespace list {
+HHuginn::class_t get_class( void );
+}
+
 HObjectFactory::HObjectFactory( void )
 	: _string( string::get_class() )
-	, _list()
+	, _list( list::get_class() )
 	, _deque()
 	, _dict()
 	, _order()
@@ -55,6 +59,14 @@ HObjectFactory::HObjectFactory( void )
 
 HHuginn::value_t HObjectFactory::create_string( yaal::hcore::HString const& value_ ) {
 	return ( make_pointer<HHuginn::HString>( _string.raw(), value_ ) );
+}
+
+HHuginn::value_t HObjectFactory::create_list( void ) {
+	return ( make_pointer<HHuginn::HList>( _list.raw() ) );
+}
+
+HHuginn::value_t HObjectFactory::create_list( HHuginn::values_t const& values_ ) {
+	return ( make_pointer<HHuginn::HList>( _list.raw(), values_ ) );
 }
 
 }

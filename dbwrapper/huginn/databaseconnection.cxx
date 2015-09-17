@@ -163,7 +163,7 @@ HHuginn::value_t HDatabaseConnection::do_table_names(
 	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {
 		HDataBase::table_list_t tl( _database->get_tables() );
-		v = make_pointer<HHuginn::HList>();
+		v = thread_->object_factory().create_list();
 		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
 		for ( yaal::hcore::HString const& tn : tl ) {
 			l->push_back( thread_->object_factory().create_string( tn ) );
@@ -186,7 +186,7 @@ HHuginn::value_t HDatabaseConnection::do_column_names(
 	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {
 		HDataBase::column_list_t cl( _database->get_columns( get_string( values_[0] ) ) );
-		v = make_pointer<HHuginn::HList>();
+		v = thread_->object_factory().create_list();
 		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
 		for ( yaal::hcore::HString const& cn : cl ) {
 			l->push_back( thread_->object_factory().create_string( cn ) );

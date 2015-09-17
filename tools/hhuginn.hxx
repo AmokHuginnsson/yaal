@@ -640,8 +640,8 @@ public:
 private:
 	values_t _data;
 public:
-	HList( void );
-	HList( values_t const& );
+	HList( HHuginn::HClass const* );
+	HList( HHuginn::HClass const*, values_t const& );
 	void push_back( value_t const& );
 	void pop_back( void );
 	void clear( void );

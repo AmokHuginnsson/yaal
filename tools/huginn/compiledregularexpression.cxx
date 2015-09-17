@@ -141,7 +141,7 @@ HHuginn::value_t HCompiledRegularExpression::do_groups(
 	HHuginn& h( thread_->huginn() );
 	HHuginn::value_t v( h.none_value() );
 	if ( ! g.empty() ) {
-		v = make_pointer<HHuginn::HList>();
+		v = thread_->object_factory().create_list();
 		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
 		for ( HRegex::HMatch const& m : g ) {
 			l->push_back( h.object_factory()->create_string( string.substr( m.start(), m.size() ) ) );

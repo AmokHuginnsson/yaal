@@ -890,7 +890,7 @@ HHuginn::HHuginn( void )
 	, _engine( make_engine(), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
 	, _threads()
 	, _packages()
-	, _argv( new ( memory::yaal ) HList() )
+	, _argv( _objectFactory->create_list() )
 	, _result()
 	, _errorMessage()
 	, _errorPosition( -1 )
@@ -1642,9 +1642,9 @@ inline HHuginn::value_t copy( huginn::HThread* thread_, HHuginn::HObject*, HHugi
 	M_EPILOG
 }
 
-inline HHuginn::value_t list( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int ) {
+inline HHuginn::value_t list( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int ) {
 	M_PROLOG
-	HHuginn::value_t v( make_pointer<HHuginn::HList>() );
+	HHuginn::value_t v( thread_->object_factory().create_list() );
 	HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
 		l->push_back( e );
