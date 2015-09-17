@@ -31,6 +31,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
+#include "thread.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -82,27 +84,27 @@ private:
 		return ( make_pointer<HHuginn::HException>( this, get_string( values_[0] ) ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t what( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t what( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_ ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".what",
 			values_, 0, 0, position_
 		);
-		return ( make_pointer<HHuginn::HString>( e->what() ) );
+		return ( thread_->object_factory().create_string( e->what() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t where( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t where( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_ ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".where",
 			values_, 0, 0, position_
 		);
-		return ( make_pointer<HHuginn::HString>( e->where() ) );
+		return ( thread_->object_factory().create_string( e->where() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t message( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t message( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_ ) );
 		verify_arg_count(
@@ -111,7 +113,7 @@ private:
 		);
 		HString message( e->where() );
 		message.append( ": " ).append( e->what() );
-		return ( make_pointer<HHuginn::HString>( message ) );
+		return ( thread_->object_factory().create_string( message ) );
 		M_EPILOG
 	}
 };

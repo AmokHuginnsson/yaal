@@ -60,10 +60,6 @@ HFrame::HFrame(
 	return;
 }
 
-HThread* HFrame::thread( void ) const {
-	return ( _thread );
-}
-
 int HFrame::number( void ) const {
 	return ( _number );
 }

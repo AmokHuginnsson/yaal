@@ -30,6 +30,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
+#include "thread.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -85,7 +87,7 @@ inline HHuginn::value_t find( huginn::HThread*, HHuginn::HObject* object_, HHugi
 	M_EPILOG
 }
 
-inline HHuginn::value_t strip( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "string.find";
 	verify_arg_count( name, values_, 0, 1, position_ );
@@ -103,7 +105,7 @@ inline HHuginn::value_t strip( huginn::HThread*, HHuginn::HObject* object_, HHug
 	}
 	HHuginn::value_t v;
 	if ( dest.get_length() != len ) {
-		v =  make_pointer<HHuginn::HString>( dest );
+		v =  thread_->object_factory().create_string( dest );
 	} else {
 		v = object_->get_pointer();
 	}
@@ -111,25 +113,34 @@ inline HHuginn::value_t strip( huginn::HThread*, HHuginn::HObject* object_, HHug
 	M_EPILOG
 }
 
-HHuginn::HClass _stringClass_(
-	nullptr,
-	HHuginn::TYPE::STRING,
-	nullptr,
-	/* methods */ {
-		"find",
-		"strip"
-	}, {
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) )
-	}
-);
-
+HHuginn::class_t get_class( void );
+HHuginn::class_t get_class( void ) {
+	M_PROLOG
+	HHuginn::class_t c(
+		make_pointer<HHuginn::HClass>(
+			nullptr,
+			HHuginn::TYPE::STRING,
+			nullptr,
+			HHuginn::HClass::field_names_t{
+				"find",
+				"strip"
+			},
+			HHuginn::values_t{
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) )
+			}
+		)
+	);
+	return ( c );
+	M_EPILOG
 }
 
 }
 
-HHuginn::HString::HString( yaal::hcore::HString const& value_ )
-	: HIterable( &string::_stringClass_ )
+}
+
+HHuginn::HString::HString( HHuginn::HClass const* class_, yaal::hcore::HString const& value_ )
+	: HIterable( class_ )
 	, _value( value_ ) {
 	return;
 }
@@ -142,8 +153,8 @@ yaal::hcore::HString& HHuginn::HString::value( void ) {
 	return ( _value );
 }
 
-HHuginn::value_t HHuginn::HString::do_clone( HHuginn* ) const {
-	return ( make_pointer<HString>( _value ) );
+HHuginn::value_t HHuginn::HString::do_clone( HHuginn* huginn_ ) const {
+	return ( huginn_->object_factory()->create_string( _value ) );
 }
 
 HHuginn::HIterable::HIterator HHuginn::HString::do_iterator( void ) {

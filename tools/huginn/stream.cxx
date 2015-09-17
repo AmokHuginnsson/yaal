@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "iterator.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -45,15 +46,17 @@ namespace huginn {
 class HStreamIterator : public HIteratorInterface {
 	HStream* _stream;
 	HString _lineCache;
+	HObjectFactory* _objectFactory;
 public:
 	HStreamIterator( HStream* stream_ )
 		: _stream( stream_ )
-		, _lineCache( _stream->read_line_impl() ) {
+		, _lineCache( _stream->read_line_impl() )
+		, _objectFactory( _stream->HObject::get_class()->huginn()->object_factory() ) {
 		return;
 	}
 protected:
 	virtual HHuginn::value_t do_value( void ) override {
-		return ( make_pointer<HHuginn::HString>( _lineCache ) );
+		return ( _objectFactory->create_string( _lineCache ) );
 	}
 	virtual bool do_is_valid( void ) override {
 		return ( _stream->is_valid() );
@@ -74,22 +77,22 @@ HStream::HStream( HHuginn::HClass* class_, HStreamInterface::ptr_t stream_ )
 	return;
 }
 
-HHuginn::value_t HStream::read( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HStream::read( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Stream.read";
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
 	int size( static_cast<int>( get_integer( values_[0] ) ) );
 	HStream* s( static_cast<HStream*>( object_ ) );
-	return ( make_pointer<HHuginn::HString>( s->read_impl( size ) ) );
+	return ( thread_->object_factory().create_string( s->read_impl( size ) ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HStream::read_line( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HStream::read_line( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "Stream.read_line", values_, 0, 0, position_ );
 	HStream* s( static_cast<HStream*>( object_ ) );
-	return ( make_pointer<HHuginn::HString>( s->read_line_impl() ) );
+	return ( thread_->object_factory().create_string( s->read_line_impl() ) );
 	M_EPILOG
 }
 

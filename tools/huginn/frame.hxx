@@ -82,7 +82,9 @@ public:
 	void continue_execution( void );
 	int number( void ) const;
 	HFrame* parent( void );
-	HThread* thread( void ) const;
+	HThread* thread( void ) const {
+		return ( _thread );
+	}
 	bool is_loop( void ) const;
 	bool has_catch( void ) const;
 	STATE state( void ) const;

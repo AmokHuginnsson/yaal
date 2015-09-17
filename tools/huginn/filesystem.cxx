@@ -35,6 +35,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hfile.hxx"
 #include "packagefactory.hxx"
 #include "tools/filesystem.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -77,10 +78,10 @@ public:
 		return ( make_pointer<HHuginn::HInteger>( OPERATIONS::WRITTING + 0 ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t current_working_directory( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t current_working_directory( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "FileSystem.current_working_directory", values_, 0, 0, position_ );
-		return ( make_pointer<HHuginn::HString>( filesystem::current_working_directory() ) );
+		return ( thread_->object_factory().create_string( filesystem::current_working_directory() ) );
 		M_EPILOG
 	}
 private:

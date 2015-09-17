@@ -53,6 +53,7 @@ class HThread;
 class HExpression;
 class HScope;
 class HFunction;
+class HObjectFactory;
 struct OCompiler;
 
 namespace ERR_CODE {
@@ -168,6 +169,7 @@ public:
 	typedef yaal::hcore::HResource<huginn::HSource> source_t;
 	typedef yaal::hcore::HResource<huginn::OCompiler> compiler_t;
 private:
+	typedef yaal::hcore::HResource<huginn::HObjectFactory> object_factory_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, class_t> classes_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, value_t> packages_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, function_t> functions_t;
@@ -188,6 +190,7 @@ private:
 	value_t _false;
 	classes_t _classes;
 	functions_t _functions;
+	object_factory_t _objectFactory;
 	source_t _source;
 	compiler_t _compiler;
 	HExecutingParser _engine;
@@ -311,6 +314,9 @@ public:
 	}
 	value_t& false_value( void ) {
 		return ( _false );
+	}
+	huginn::HObjectFactory* object_factory( void ) {
+		return ( _objectFactory.raw() );
 	}
 private:
 	void finalize_compilation( void );
@@ -579,7 +585,7 @@ public:
 private:
 	yaal::hcore::HString _value;
 public:
-	HString( yaal::hcore::HString const& );
+	HString( HHuginn::HClass const*, yaal::hcore::HString const& );
 	yaal::hcore::HString const& value( void ) const;
 	yaal::hcore::HString& value( void );
 	void to_integer( void ) const;

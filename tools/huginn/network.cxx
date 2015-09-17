@@ -35,6 +35,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/hsocket.hxx"
 #include "hcore/resolver.hxx"
 #include "packagefactory.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -62,12 +63,12 @@ public:
 		class_->huginn()->register_class( _exceptionClass );
 		return;
 	}
-	static HHuginn::value_t resolve( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t resolve( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Network.resolve";
 		verify_arg_count( name, values_, 1, 1, position_ );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
-		return ( make_pointer<HHuginn::HString>( resolver::ip_to_string( resolver::get_ip( get_string( values_[0] ) ) ) ) );
+		return ( thread_->object_factory().create_string( resolver::ip_to_string( resolver::get_ip( get_string( values_[0] ) ) ) ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t connect( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {

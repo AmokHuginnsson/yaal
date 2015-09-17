@@ -66,6 +66,9 @@ public:
 	bool has_exception( void ) const;
 	void raise( HHuginn::HClass const*, yaal::hcore::HString const&, int );
 	HHuginn& huginn( void );
+	HObjectFactory& object_factory( void ) const {
+		return ( *_huginn->object_factory() );
+	}
 private:
 	HThread( HThread const& ) = delete;
 	HThread& operator = ( HThread const& ) = delete;

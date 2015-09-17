@@ -36,6 +36,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "exception.hxx"
 #include "packagefactory.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -61,7 +62,8 @@ public:
 		verify_arg_count( name, values_, 1, 1, position_ );
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 		char const* val( ::getenv( get_string( values_[0] ).raw() ) );
-		return ( val ? pointer_static_cast<HHuginn::HValue>( make_pointer<HHuginn::HString>( val ) ) : thread_->huginn().none_value() );
+		HHuginn& h( thread_->huginn() );
+		return ( val ? pointer_static_cast<HHuginn::HValue>( h.object_factory()->create_string( val ) ) : h.none_value() );
 		M_EPILOG
 	}
 	static HHuginn::value_t exec( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {

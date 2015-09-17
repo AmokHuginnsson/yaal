@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hhuginn.hxx"
 #include "hcore/hfile.hxx"
 #include "tools/huginn/source.hxx"
+#include "tools/huginn/objectfactory.hxx"
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/expression.hxx"
 #include "tools/huginn/value_builtin.hxx"
@@ -883,6 +884,7 @@ HHuginn::HHuginn( void )
 	, _false( make_pointer<HHuginn::HBoolean>( false ) )
 	, _classes()
 	, _functions()
+	, _objectFactory( new HObjectFactory() )
 	, _source( make_resource<HSource>() )
 	, _compiler( make_resource<OCompiler>( this ) )
 	, _engine( make_engine(), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
@@ -1257,7 +1259,7 @@ yaal::hcore::HStreamInterface& HHuginn::error_stream( void ) {
 
 void HHuginn::add_argument( yaal::hcore::HString const& arg_ ) {
 	M_PROLOG
-	_argv->push_back( make_pointer<HString>( arg_ ) );
+	_argv->push_back( _objectFactory->create_string( arg_ ) );
 	return;
 	M_EPILOG
 }
@@ -1624,11 +1626,11 @@ inline HHuginn::value_t size( huginn::HThread* thread_, HHuginn::HObject*, HHugi
 	M_EPILOG
 }
 
-inline HHuginn::value_t type( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t type( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "type", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
-	return ( make_pointer<HHuginn::HString>( v->type()->name() ) );
+	return ( thread_->object_factory().create_string( v->type()->name() ) );
 	M_EPILOG
 }
 
@@ -1732,7 +1734,7 @@ inline HHuginn::value_t input( huginn::HThread* thread_, HHuginn::HObject*, HHug
 	verify_arg_count( "input", values_, 0, 0, position_ );
 	yaal::hcore::HString l;
 	thread_->huginn().input_stream().read_until( l, HStreamInterface::eols, false );
-	return ( make_pointer<HHuginn::HString>( l ) );
+	return ( thread_->object_factory().create_string( l ) );
 	M_EPILOG
 }
 

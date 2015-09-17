@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "regularexpressionmatch.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -44,15 +45,19 @@ namespace huginn {
 class HRegularExpressionMatchIterator : public HIteratorInterface {
 	HRegularExpressionMatch* _regularExpressionMatch;
 	HRegex::HMatchIterator _it;
+	HObjectFactory* _objectFactory;
 public:
-	HRegularExpressionMatchIterator( HRegularExpressionMatch* regularExpressionMatch_, HRegex::HMatchIterator const& it_ )
-		: _regularExpressionMatch( regularExpressionMatch_ )
-		, _it( it_ ) {
+	HRegularExpressionMatchIterator(
+		HRegularExpressionMatch* regularExpressionMatch_,
+		HRegex::HMatchIterator const& it_
+	) : _regularExpressionMatch( regularExpressionMatch_ )
+		, _it( it_ )
+		, _objectFactory( _regularExpressionMatch->HObject::get_class()->huginn()->object_factory() ) {
 		return;
 	}
 protected:
 	virtual HHuginn::value_t do_value( void ) override {
-		return ( make_pointer<HHuginn::HString>( _regularExpressionMatch->get_string().substr( _it->start(), _it->size() ) ) );
+		return ( _objectFactory->create_string( _regularExpressionMatch->get_string().substr( _it->start(), _it->size() ) ) );
 	}
 	virtual bool do_is_valid( void ) override {
 		return ( _it != _regularExpressionMatch->end() );

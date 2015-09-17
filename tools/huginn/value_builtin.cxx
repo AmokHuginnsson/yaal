@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "thread.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -85,6 +86,7 @@ HHuginn::value_t subscript( HExpression::ACCESS subscript_, HHuginn::value_t& ba
 }
 
 HHuginn::value_t range(
+	HThread* thread_,
 	HHuginn::value_t& base_,
 	HHuginn::value_t const& from_,
 	HHuginn::value_t const& to_,
@@ -113,7 +115,7 @@ HHuginn::value_t range(
 		HHuginn::HInteger const* integerTo = to_->type() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( to_.raw() ) : nullptr;
 		int long from( integerFrom ? static_cast<int long>( integerFrom->value() ) : ( step > 0 ? 0 : size ) );
 		int long to( integerTo ? static_cast<int long>( integerTo->value() ) : ( step > 0 ? size : -1 ) );
-		res = ( baseType == HHuginn::TYPE::LIST ) ? pointer_static_cast<HHuginn::HValue>( make_pointer<HHuginn::HList>() ) : pointer_static_cast<HHuginn::HValue>( make_pointer<HHuginn::HString>( "" ) );
+		res = ( baseType == HHuginn::TYPE::LIST ) ? pointer_static_cast<HHuginn::HValue>( make_pointer<HHuginn::HList>() ) : pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_string( "" ) );
 
 		do {
 			if ( step > 0 ) {
@@ -188,7 +190,7 @@ HHuginn::value_t range(
 	return ( res );
 }
 
-HHuginn::value_t add( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+HHuginn::value_t add( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	HHuginn::value_t res;
 	HHuginn::type_t typeId( v1_->type() );
@@ -197,7 +199,7 @@ HHuginn::value_t add( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, 
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		res = make_pointer<HHuginn::HReal>( static_cast<HHuginn::HReal const*>( v1_.raw() )->value() + static_cast<HHuginn::HReal const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::STRING ) {
-		res = make_pointer<HHuginn::HString>( static_cast<HHuginn::HString const*>( v1_.raw() )->value() + static_cast<HHuginn::HString const*>( v2_.raw() )->value() );
+		res = thread_->object_factory().create_string( static_cast<HHuginn::HString const*>( v1_.raw() )->value() + static_cast<HHuginn::HString const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = make_pointer<HHuginn::HNumber>( static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() + static_cast<HHuginn::HNumber const*>( v2_.raw() )->value() );
 	} else {
@@ -517,13 +519,13 @@ HHuginn::value_t string( HThread* thread_, HHuginn::value_t const& v_, int posit
 	if ( typeId == HHuginn::TYPE::STRING ) {
 		res = v_;
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		res = make_pointer<HHuginn::HString>( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_string() );
+		res = thread_->object_factory().create_string( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_string() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
-		res = make_pointer<HHuginn::HString>( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
+		res = thread_->object_factory().create_string( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		res = make_pointer<HHuginn::HString>( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
+		res = thread_->object_factory().create_string( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
-		res = make_pointer<HHuginn::HString>( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
+		res = thread_->object_factory().create_string( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else {
 		res = fallback_conversion( HHuginn::TYPE::STRING, thread_, v_, position_ );
 	}

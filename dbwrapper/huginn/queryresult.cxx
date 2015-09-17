@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/thread.hxx"
 #include "tools/huginn/iterator.hxx"
 #include "tools/huginn/helper.hxx"
+#include "tools/huginn/objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -44,15 +45,17 @@ namespace dbwrapper {
 namespace huginn {
 
 namespace {
-HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator& it_, HHuginn::value_t& none_ ) {
+HHuginn::value_t fetch_row( HRecordSet::ptr_t const& rs_, HRecordSet::HIterator& it_, HHuginn& huginn_ ) {
 	HHuginn::value_t v( make_pointer<HHuginn::HList>() );
 	HHuginn::HList* row( static_cast<HHuginn::HList*>( v.raw() ) );
+	HHuginn::value_t& none( huginn_.none_value() );
+	HObjectFactory& objectFactory( *huginn_.object_factory() );
 	for ( int i( 0 ), fieldCount( rs_->get_field_count() ); i < fieldCount; ++ i ) {
 		HRecordSet::value_t f( it_[i] );
 		if ( !! f ) {
-			row->push_back( make_pointer<HHuginn::HString>( yaal::move( *f ) ) );
+			row->push_back( objectFactory.create_string( yaal::move( *f ) ) );
 		} else {
-			row->push_back( none_ );
+			row->push_back( none );
 		}
 	}
 	return ( v );
@@ -72,7 +75,7 @@ public:
 	}
 protected:
 	virtual HHuginn::value_t do_value( void ) override {
-		return ( fetch_row( _recordSet, _it, _huginn->none_value() ) );
+		return ( fetch_row( _recordSet, _it, *_huginn ) );
 	}
 	virtual bool do_is_valid( void ) override {
 		return ( _it != _recordSet->end() );
@@ -95,13 +98,18 @@ HQueryResult::HQueryResult(
 	return;
 }
 
-HHuginn::value_t HQueryResult::column_name( tools::huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQueryResult::column_name(
+	tools::huginn::HThread* thread_,
+	HHuginn::HObject* object_,
+	HHuginn::values_t const& values_,
+	int position_
+) {
 	M_PROLOG
 	char const name[] = "QueryResult.column_name";
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_ ) );
-	return ( make_pointer<HHuginn::HString>( qr->_recordSet->get_column_name( static_cast<int>( get_integer( values_[0] ) ) ) ) );
+	return ( thread_->object_factory().create_string( qr->_recordSet->get_column_name( static_cast<int>( get_integer( values_[0] ) ) ) ) );
 	M_EPILOG
 }
 
@@ -184,7 +192,7 @@ HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHugi
 	HQueryResultClass const* qrc( static_cast<HQueryResultClass const*>( qr->HObject::get_class() ) );
 	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {
-		v = huginn::fetch_row( qr->_recordSet, qr->_it, thread_->huginn().none_value() );
+		v = huginn::fetch_row( qr->_recordSet, qr->_it, thread_->huginn() );
 		++ qr->_it;
 	} catch ( HException const& e ) {
 		thread_->raise( qrc->exception_class(), e.what(), position_ );

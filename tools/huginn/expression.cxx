@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "value_builtin.hxx"
 #include "booleanevaluator.hxx"
 #include "helper.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -267,7 +268,7 @@ void HExpression::plus( HFrame* frame_, int ) {
 	if ( v1->type() != v2->type() ) {
 		operands_type_mismatch( "+", v1->type(), v2->type(), p );
 	}
-	frame_->values().push( value_builtin::add( v1, v2, p ) );
+	frame_->values().push( value_builtin::add( frame_->thread(), v1, v2, p ) );
 	return;
 	M_EPILOG
 }
@@ -424,7 +425,7 @@ void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
 				to = yaal::move( step );
 				step = h.none_value();
 			}
-			frame_->values().push( value_builtin::range( base, from, to, step, p ) );
+			frame_->values().push( value_builtin::range( frame_->thread(), base, from, to, step, p ) );
 		} else {
 			frame_->values().push( value_builtin::subscript( access_, base, step, p ) );
 		}
@@ -641,7 +642,7 @@ void HExpression::store_integer( int long long value_, HFrame* frame_, int ) {
 
 void HExpression::store_string( yaal::hcore::HString const& value_, HFrame* frame_, int ) {
 	M_PROLOG
-	frame_->values().push( make_pointer<HHuginn::HString>( value_ ) );
+	frame_->values().push( frame_->thread()->huginn().object_factory()->create_string( value_ ) );
 	return;
 	M_EPILOG
 }

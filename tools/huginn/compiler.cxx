@@ -42,6 +42,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "keyword.hxx"
 #include "packagefactory.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -1187,7 +1188,7 @@ void OCompiler::dispatch_function_call( expression_action_t const& action_, exec
 		current_expression()->add_execution_step(
 			hcore::call(
 				&HExpression::store_direct, current_expression().raw(),
-				make_pointer<HHuginn::HString>( _huginn->get_snippet( from, len ).trim() ),
+				_huginn->object_factory()->create_string( _huginn->get_snippet( from, len ).trim() ),
 				_1,
 				position_.get()
 			)

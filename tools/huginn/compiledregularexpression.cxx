@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "regularexpressionmatch.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -137,12 +138,13 @@ HHuginn::value_t HCompiledRegularExpression::do_groups(
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 	yaal::hcore::HString const& string( get_string( values_[0] ) );
 	HRegex::groups_t g( _regex->groups( string ) );
-	HHuginn::value_t v( thread_->huginn().none_value() );
+	HHuginn& h( thread_->huginn() );
+	HHuginn::value_t v( h.none_value() );
 	if ( ! g.empty() ) {
 		v = make_pointer<HHuginn::HList>();
 		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
 		for ( HRegex::HMatch const& m : g ) {
-			l->push_back( make_pointer<HHuginn::HString>( string.substr( m.start(), m.size() ) ) );
+			l->push_back( h.object_factory()->create_string( string.substr( m.start(), m.size() ) ) );
 		}
 	}
 	return ( v );

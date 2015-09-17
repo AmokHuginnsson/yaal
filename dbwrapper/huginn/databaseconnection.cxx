@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "dbwrapper/dbwrapper.hxx"
 #include "tools/huginn/helper.hxx"
 #include "tools/huginn/thread.hxx"
+#include "tools/huginn/objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -165,7 +166,7 @@ HHuginn::value_t HDatabaseConnection::do_table_names(
 		v = make_pointer<HHuginn::HList>();
 		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
 		for ( yaal::hcore::HString const& tn : tl ) {
-			l->push_back( make_pointer<HHuginn::HString>( tn ) );
+			l->push_back( thread_->object_factory().create_string( tn ) );
 		}
 	} catch ( HException const& e ) {
 		thread_->raise( dbcClass->exception_class(), e.what(), position_ );
@@ -188,7 +189,7 @@ HHuginn::value_t HDatabaseConnection::do_column_names(
 		v = make_pointer<HHuginn::HList>();
 		HHuginn::HList* l( static_cast<HHuginn::HList*>( v.raw() ) );
 		for ( yaal::hcore::HString const& cn : cl ) {
-			l->push_back( make_pointer<HHuginn::HString>( cn ) );
+			l->push_back( thread_->object_factory().create_string( cn ) );
 		}
 	} catch ( HException const& e ) {
 		thread_->raise( dbcClass->exception_class(), e.what(), position_ );
