@@ -758,8 +758,8 @@ public:
 private:
 	values_t _data;
 public:
-	HLookup( void );
-	HLookup( values_t const& );
+	HLookup( HHuginn::HClass const* );
+	HLookup( HHuginn::HClass const*, values_t const& );
 	void insert( HHuginn::value_t const&, HHuginn::value_t const& );
 	bool has_key( HHuginn::value_t const& ) const;
 	void erase( HHuginn::value_t const& );

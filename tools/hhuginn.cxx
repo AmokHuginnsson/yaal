@@ -1682,10 +1682,10 @@ inline HHuginn::value_t order( huginn::HThread*, HHuginn::HObject*, HHuginn::val
 	M_EPILOG
 }
 
-inline HHuginn::value_t lookup( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t lookup( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "lookup", values_, 0, 0, position_ );
-	return ( make_pointer<HHuginn::HLookup>() );
+	return ( thread_->object_factory().create_lookup() );
 	M_EPILOG
 }
 

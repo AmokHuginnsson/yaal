@@ -54,13 +54,17 @@ namespace dict {
 HHuginn::class_t get_class( void );
 }
 
+namespace lookup {
+HHuginn::class_t get_class( void );
+}
+
 HObjectFactory::HObjectFactory( void )
 	: _string( string::get_class() )
 	, _list( list::get_class() )
 	, _deque( deque::get_class() )
 	, _dict( dict::get_class() )
 	, _order()
-	, _lookup()
+	, _lookup( lookup::get_class() )
 	, _set() {
 	return;
 }
@@ -91,6 +95,14 @@ HHuginn::value_t HObjectFactory::create_dict( void ) {
 
 HHuginn::value_t HObjectFactory::create_dict( HHuginn::HDict::values_t const& data_, HHuginn::type_t keyType_ ) {
 	return ( make_pointer<HHuginn::HDict>( _dict.raw(), data_, keyType_ ) );
+}
+
+HHuginn::value_t HObjectFactory::create_lookup( void ) {
+	return ( make_pointer<HHuginn::HLookup>( _lookup.raw() ) );
+}
+
+HHuginn::value_t HObjectFactory::create_lookup( HHuginn::HLookup::values_t const& data_ ) {
+	return ( make_pointer<HHuginn::HLookup>( _lookup.raw(), data_ ) );
 }
 
 }
