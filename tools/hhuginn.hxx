@@ -188,9 +188,16 @@ private:
 	value_t _none;
 	value_t _true;
 	value_t _false;
+	/*
+	 * ObjectFactory holds built-in type definitions local to HHuginn instance.
+	 * Built-in types can by use as field definitions in user classes.
+	 * User class needs to be able to use built-in types in its destructor.
+	 * Hence order of two following fields:
+	 * _objectFactory and _class
+	 */
+	object_factory_t _objectFactory;
 	classes_t _classes;
 	functions_t _functions;
-	object_factory_t _objectFactory;
 	source_t _source;
 	compiler_t _compiler;
 	HExecutingParser _engine;
