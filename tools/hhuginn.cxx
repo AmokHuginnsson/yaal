@@ -1653,9 +1653,9 @@ inline HHuginn::value_t list( huginn::HThread* thread_, HHuginn::HObject*, HHugi
 	M_EPILOG
 }
 
-inline HHuginn::value_t deque( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int ) {
+inline HHuginn::value_t deque( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int ) {
 	M_PROLOG
-	HHuginn::value_t v( make_pointer<HHuginn::HDeque>() );
+	HHuginn::value_t v( thread_->object_factory().create_deque() );
 	HHuginn::HDeque* d( static_cast<HHuginn::HDeque*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
 		d->push_back( e );

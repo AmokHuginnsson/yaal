@@ -664,8 +664,8 @@ public:
 private:
 	values_t _data;
 public:
-	HDeque( void );
-	HDeque( values_t const& );
+	HDeque( HHuginn::HClass const* );
+	HDeque( HHuginn::HClass const*, values_t const& );
 	void push_back( value_t const& );
 	void pop_back( void );
 	void push_front( value_t const& );

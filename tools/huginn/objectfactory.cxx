@@ -46,10 +46,14 @@ namespace list {
 HHuginn::class_t get_class( void );
 }
 
+namespace deque {
+HHuginn::class_t get_class( void );
+}
+
 HObjectFactory::HObjectFactory( void )
 	: _string( string::get_class() )
 	, _list( list::get_class() )
-	, _deque()
+	, _deque( deque::get_class() )
 	, _dict()
 	, _order()
 	, _lookup()
@@ -67,6 +71,14 @@ HHuginn::value_t HObjectFactory::create_list( void ) {
 
 HHuginn::value_t HObjectFactory::create_list( HHuginn::values_t const& values_ ) {
 	return ( make_pointer<HHuginn::HList>( _list.raw(), values_ ) );
+}
+
+HHuginn::value_t HObjectFactory::create_deque( void ) {
+	return ( make_pointer<HHuginn::HDeque>( _deque.raw() ) );
+}
+
+HHuginn::value_t HObjectFactory::create_deque( HHuginn::HDeque::values_t const& values_ ) {
+	return ( make_pointer<HHuginn::HDeque>( _deque.raw(), values_ ) );
 }
 
 }

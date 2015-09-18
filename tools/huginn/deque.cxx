@@ -30,6 +30,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "iterator.hxx"
 #include "helper.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -123,37 +124,46 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::HObject* object_, HHug
 	M_EPILOG
 }
 
+HHuginn::class_t get_class( void );
+HHuginn::class_t get_class( void ) {
+	M_PROLOG
+	HHuginn::class_t c(
+		make_pointer<HHuginn::HClass>(
+			nullptr,
+			HHuginn::TYPE::DEQUE,
+			nullptr,
+			HHuginn::HClass::field_names_t{
+				"add",
+				"pop",
+				"add_front",
+				"pop_front",
+				"clear"
+			},
+			HHuginn::values_t{
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add_front, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop_front, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::clear, _1, _2, _3, _4 ) )
+			}
+		)
+	);
+	return ( c );
+	M_EPILOG
 }
 
-HHuginn::HClass _dequeClass_(
-	nullptr,
-	HHuginn::TYPE::DEQUE,
-	nullptr,
-	/* methods */ {
-		"add",
-		"pop",
-		"add_front",
-		"pop_front",
-		"clear"
-	}, {
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::add_front, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::pop_front, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &deque::clear, _1, _2, _3, _4 ) )
-	}
-);
+}
 
 }
 
-HHuginn::HDeque::HDeque( void )
-	: HIterable( &huginn::_dequeClass_ )
+HHuginn::HDeque::HDeque( HHuginn::HClass const* class_ )
+	: HIterable( class_ )
 	, _data() {
 	return;
 }
 
-HHuginn::HDeque::HDeque( values_t const& data_ )
-	: HIterable( &huginn::_dequeClass_ )
+HHuginn::HDeque::HDeque( HHuginn::HClass const* class_, values_t const& data_ )
+	: HIterable( class_ )
 	, _data( data_ ) {
 	return;
 }
@@ -221,8 +231,8 @@ HHuginn::HIterable::HIterator HHuginn::HDeque::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HDeque::do_clone( HHuginn* ) const {
-	return ( make_pointer<HDeque>( _data ) );
+HHuginn::value_t HHuginn::HDeque::do_clone( HHuginn* huginn_ ) const {
+	return ( huginn_->object_factory()->create_deque( _data ) );
 }
 
 }
