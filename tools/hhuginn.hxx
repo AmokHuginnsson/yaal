@@ -789,8 +789,8 @@ public:
 private:
 	values_t _data;
 public:
-	HSet( void );
-	HSet( values_t const& );
+	HSet( HHuginn::HClass const* );
+	HSet( HHuginn::HClass const*, values_t const& );
 	void insert( HHuginn::value_t const& );
 	bool has_key( HHuginn::value_t const& ) const;
 	void erase( HHuginn::value_t const& );

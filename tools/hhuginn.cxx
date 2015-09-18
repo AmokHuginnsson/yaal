@@ -1689,9 +1689,9 @@ inline HHuginn::value_t lookup( huginn::HThread* thread_, HHuginn::HObject*, HHu
 	M_EPILOG
 }
 
-inline HHuginn::value_t set( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int ) {
+inline HHuginn::value_t set( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int ) {
 	M_PROLOG
-	HHuginn::value_t v( make_pointer<HHuginn::HSet>() );
+	HHuginn::value_t v( thread_->object_factory().create_set() );
 	HHuginn::HSet* s( static_cast<HHuginn::HSet*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
 		s->insert( e );

@@ -62,6 +62,10 @@ namespace lookup {
 HHuginn::class_t get_class( void );
 }
 
+namespace set {
+HHuginn::class_t get_class( void );
+}
+
 HObjectFactory::HObjectFactory( void )
 	: _string( string::get_class() )
 	, _list( list::get_class() )
@@ -69,7 +73,7 @@ HObjectFactory::HObjectFactory( void )
 	, _dict( dict::get_class() )
 	, _order( order::get_class() )
 	, _lookup( lookup::get_class() )
-	, _set() {
+	, _set( set::get_class() ) {
 	return;
 }
 
@@ -101,8 +105,20 @@ HHuginn::value_t HObjectFactory::create_order( HHuginn::HOrder::values_t const& 
 	return ( make_pointer<HHuginn::HOrder>( _order.raw(), data_, keyType_ ) );
 }
 
+HHuginn::value_t HObjectFactory::create_lookup( void ) {
+	return ( make_pointer<HHuginn::HLookup>( _lookup.raw() ) );
+}
+
 HHuginn::value_t HObjectFactory::create_lookup( HHuginn::HLookup::values_t const& data_ ) {
 	return ( make_pointer<HHuginn::HLookup>( _lookup.raw(), data_ ) );
+}
+
+HHuginn::value_t HObjectFactory::create_set( void ) {
+	return ( make_pointer<HHuginn::HSet>( _set.raw() ) );
+}
+
+HHuginn::value_t HObjectFactory::create_set( HHuginn::HSet::values_t const& data_ ) {
+	return ( make_pointer<HHuginn::HSet>( _set.raw(), data_ ) );
 }
 
 }

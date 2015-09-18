@@ -54,8 +54,10 @@ public:
 	HHuginn::value_t create_dict( HHuginn::HDict::values_t const&, HHuginn::type_t );
 	HHuginn::value_t create_order( void );
 	HHuginn::value_t create_order( HHuginn::HOrder::values_t const&, HHuginn::type_t );
-	HHuginn::value_t create_lookup( HHuginn::HLookup::values_t const& = HHuginn::HLookup::values_t() );
-	HHuginn::value_t create_set( HHuginn::HSet::values_t const& = HHuginn::HSet::values_t() );
+	HHuginn::value_t create_lookup( void );
+	HHuginn::value_t create_lookup( HHuginn::HLookup::values_t const& );
+	HHuginn::value_t create_set( void );
+	HHuginn::value_t create_set( HHuginn::HSet::values_t const& );
 };
 
 }
