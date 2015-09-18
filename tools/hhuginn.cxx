@@ -1671,9 +1671,9 @@ inline HHuginn::value_t dict( huginn::HThread* thread_, HHuginn::HObject*, HHugi
 	M_EPILOG
 }
 
-inline HHuginn::value_t order( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t order( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	HHuginn::value_t v( make_pointer<HHuginn::HOrder>() );
+	HHuginn::value_t v( thread_->object_factory().create_order() );
 	HHuginn::HOrder* o( static_cast<HHuginn::HOrder*>( v.raw() ) );
 	for ( HHuginn::value_t const& e : values_ ) {
 		o->insert( e, position_ );

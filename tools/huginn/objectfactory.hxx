@@ -47,17 +47,15 @@ class HObjectFactory final {
 	HHuginn::class_t _set;
 public:
 	HObjectFactory( void );
-	HHuginn::value_t create_string( yaal::hcore::HString const& );
-	HHuginn::value_t create_list( void );
-	HHuginn::value_t create_list( HHuginn::values_t const& );
-	HHuginn::value_t create_deque( void );
-	HHuginn::value_t create_deque( HHuginn::HDeque::values_t const& );
+	HHuginn::value_t create_string( yaal::hcore::HString const& = yaal::hcore::HString() );
+	HHuginn::value_t create_list( HHuginn::values_t const& = HHuginn::values_t() );
+	HHuginn::value_t create_deque( HHuginn::HDeque::values_t const& = HHuginn::HDeque::values_t() );
 	HHuginn::value_t create_dict( void );
 	HHuginn::value_t create_dict( HHuginn::HDict::values_t const&, HHuginn::type_t );
 	HHuginn::value_t create_order( void );
-	HHuginn::value_t create_lookup( void );
-	HHuginn::value_t create_lookup(HHuginn::HLookup::values_t const& );
-	HHuginn::value_t create_set( void );
+	HHuginn::value_t create_order( HHuginn::HOrder::values_t const&, HHuginn::type_t );
+	HHuginn::value_t create_lookup( HHuginn::HLookup::values_t const& = HHuginn::HLookup::values_t() );
+	HHuginn::value_t create_set( HHuginn::HSet::values_t const& = HHuginn::HSet::values_t() );
 };
 
 }

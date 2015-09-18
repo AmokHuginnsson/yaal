@@ -54,6 +54,10 @@ namespace dict {
 HHuginn::class_t get_class( void );
 }
 
+namespace order {
+HHuginn::class_t get_class( void );
+}
+
 namespace lookup {
 HHuginn::class_t get_class( void );
 }
@@ -63,7 +67,7 @@ HObjectFactory::HObjectFactory( void )
 	, _list( list::get_class() )
 	, _deque( deque::get_class() )
 	, _dict( dict::get_class() )
-	, _order()
+	, _order( order::get_class() )
 	, _lookup( lookup::get_class() )
 	, _set() {
 	return;
@@ -73,16 +77,8 @@ HHuginn::value_t HObjectFactory::create_string( yaal::hcore::HString const& valu
 	return ( make_pointer<HHuginn::HString>( _string.raw(), value_ ) );
 }
 
-HHuginn::value_t HObjectFactory::create_list( void ) {
-	return ( make_pointer<HHuginn::HList>( _list.raw() ) );
-}
-
 HHuginn::value_t HObjectFactory::create_list( HHuginn::values_t const& values_ ) {
 	return ( make_pointer<HHuginn::HList>( _list.raw(), values_ ) );
-}
-
-HHuginn::value_t HObjectFactory::create_deque( void ) {
-	return ( make_pointer<HHuginn::HDeque>( _deque.raw() ) );
 }
 
 HHuginn::value_t HObjectFactory::create_deque( HHuginn::HDeque::values_t const& values_ ) {
@@ -97,8 +93,12 @@ HHuginn::value_t HObjectFactory::create_dict( HHuginn::HDict::values_t const& da
 	return ( make_pointer<HHuginn::HDict>( _dict.raw(), data_, keyType_ ) );
 }
 
-HHuginn::value_t HObjectFactory::create_lookup( void ) {
-	return ( make_pointer<HHuginn::HLookup>( _lookup.raw() ) );
+HHuginn::value_t HObjectFactory::create_order( void ) {
+	return ( make_pointer<HHuginn::HOrder>( _order.raw() ) );
+}
+
+HHuginn::value_t HObjectFactory::create_order( HHuginn::HOrder::values_t const& data_, HHuginn::type_t keyType_ ) {
+	return ( make_pointer<HHuginn::HOrder>( _order.raw(), data_, keyType_ ) );
 }
 
 HHuginn::value_t HObjectFactory::create_lookup( HHuginn::HLookup::values_t const& data_ ) {
