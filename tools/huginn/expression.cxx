@@ -245,7 +245,7 @@ void HExpression::make_dict( HFrame* frame_, int ) {
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_CALL );
 	frame_->operations().pop();
 	reverse( values.begin(), values.end() );
-	HHuginn::value_t dict( make_pointer<HHuginn::HDict>() );
+	HHuginn::value_t dict( frame_->thread()->object_factory().create_dict() );
 	HHuginn::HDict* m( static_cast<HHuginn::HDict*>( dict.raw() ) );
 	for ( int i( 0 ), S( static_cast<int>( values.get_size() ) ); i < S; i += 2 ) {
 		m->insert( values[i]._value, values[i + 1]._value, values[i]._position );

@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "compiler.hxx"
 #include "value_builtin.hxx"
 #include "helper.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -109,34 +110,43 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHug
 	M_EPILOG
 }
 
+HHuginn::class_t get_class( void );
+HHuginn::class_t get_class( void ) {
+	M_PROLOG
+	HHuginn::class_t c(
+		make_pointer<HHuginn::HClass>(
+			nullptr,
+			HHuginn::TYPE::DICT,
+			nullptr,
+			HHuginn::HClass::field_names_t{
+				"has_key",
+				"get",
+				"erase"
+			},
+			HHuginn::values_t{
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::get, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::erase, _1, _2, _3, _4 ) )
+			}
+		)
+	);
+	return ( c );
+	M_EPILOG
 }
 
-HHuginn::HClass _dictClass_(
-	nullptr,
-	HHuginn::TYPE::DICT,
-	nullptr,
-	/* methods */ {
-		"has_key",
-		"get",
-		"erase"
-	}, {
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::get, _1, _2, _3, _4 ) ),
-		make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::erase, _1, _2, _3, _4 ) )
-	}
-);
+}
 
 }
 
-HHuginn::HDict::HDict( void )
-	: HIterable( &huginn::_dictClass_ )
+HHuginn::HDict::HDict( HHuginn::HClass const* class_ )
+	: HIterable( class_ )
 	, _data( &value_builtin::less_low )
 	, _keyType( HHuginn::TYPE::NONE ) {
 	return;
 }
 
-HHuginn::HDict::HDict( values_t const& data_, type_t keyType_ )
-	: HIterable( &huginn::_dictClass_ ),
+HHuginn::HDict::HDict( HHuginn::HClass const* class_, values_t const& data_, type_t keyType_ )
+	: HIterable( class_ ),
 	_data( data_ ),
 	_keyType( keyType_ ) {
 	return;
@@ -225,8 +235,8 @@ HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( void ) {
 	return ( HIterator( yaal::move( impl ) ) );
 }
 
-HHuginn::value_t HHuginn::HDict::do_clone( HHuginn* ) const {
-	return ( make_pointer<HDict>( _data, _keyType ) );
+HHuginn::value_t HHuginn::HDict::do_clone( HHuginn* huginn_ ) const {
+	return ( huginn_->object_factory()->create_dict( _data, _keyType ) );
 }
 
 }

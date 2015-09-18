@@ -1664,10 +1664,10 @@ inline HHuginn::value_t deque( huginn::HThread* thread_, HHuginn::HObject*, HHug
 	M_EPILOG
 }
 
-inline HHuginn::value_t dict( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t dict( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict", values_, 0, 0, position_ );
-	return ( make_pointer<HHuginn::HDict>() );
+	return ( thread_->object_factory().create_dict() );
 	M_EPILOG
 }
 

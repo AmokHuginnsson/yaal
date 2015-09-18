@@ -53,6 +53,7 @@ public:
 	HHuginn::value_t create_deque( void );
 	HHuginn::value_t create_deque( HHuginn::HDeque::values_t const& );
 	HHuginn::value_t create_dict( void );
+	HHuginn::value_t create_dict( HHuginn::HDict::values_t const& data_, HHuginn::type_t keyType_ );
 	HHuginn::value_t create_order( void );
 	HHuginn::value_t create_lookup( void );
 	HHuginn::value_t create_set( void );

@@ -50,11 +50,15 @@ namespace deque {
 HHuginn::class_t get_class( void );
 }
 
+namespace dict {
+HHuginn::class_t get_class( void );
+}
+
 HObjectFactory::HObjectFactory( void )
 	: _string( string::get_class() )
 	, _list( list::get_class() )
 	, _deque( deque::get_class() )
-	, _dict()
+	, _dict( dict::get_class() )
 	, _order()
 	, _lookup()
 	, _set() {
@@ -79,6 +83,14 @@ HHuginn::value_t HObjectFactory::create_deque( void ) {
 
 HHuginn::value_t HObjectFactory::create_deque( HHuginn::HDeque::values_t const& values_ ) {
 	return ( make_pointer<HHuginn::HDeque>( _deque.raw(), values_ ) );
+}
+
+HHuginn::value_t HObjectFactory::create_dict( void ) {
+	return ( make_pointer<HHuginn::HDict>( _dict.raw() ) );
+}
+
+HHuginn::value_t HObjectFactory::create_dict( HHuginn::HDict::values_t const& data_, HHuginn::type_t keyType_ ) {
+	return ( make_pointer<HHuginn::HDict>( _dict.raw(), data_, keyType_ ) );
 }
 
 }

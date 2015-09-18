@@ -692,8 +692,8 @@ private:
 	values_t _data;
 	type_t _keyType;
 public:
-	HDict( void );
-	HDict( values_t const&, type_t );
+	HDict( HHuginn::HClass const* );
+	HDict( HHuginn::HClass const*, values_t const&, type_t );
 	value_t get( HHuginn::value_t const&, int );
 	value_t get_ref( HHuginn::value_t const&, int );
 	void insert( HHuginn::value_t const&, HHuginn::value_t const&, int );
