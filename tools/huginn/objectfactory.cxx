@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "objectfactory.hxx"
+#include "exception.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -73,52 +74,79 @@ HObjectFactory::HObjectFactory( void )
 	, _dict( dict::get_class() )
 	, _order( order::get_class() )
 	, _lookup( lookup::get_class() )
-	, _set( set::get_class() ) {
+	, _set( set::get_class() )
+	, _exception()
+	, _conversionException()
+	, _arithmeticException() {
 	return;
 }
 
-HHuginn::value_t HObjectFactory::create_string( yaal::hcore::HString const& value_ ) {
+void HObjectFactory::register_exception_classes( HHuginn* huginn_ ) {
+	M_PROLOG
+	_exception = exception::get_class( huginn_ );
+	_conversionException = exception::create_class( huginn_, "ConversionException", _exception.raw() );
+	_arithmeticException = exception::create_class( huginn_, "ArithmeticException", _exception.raw() );
+	huginn_->register_class( _exception );
+	huginn_->register_class( _conversionException );
+	huginn_->register_class( _arithmeticException );
+	return;
+	M_EPILOG
+}
+
+HHuginn::value_t HObjectFactory::create_string( yaal::hcore::HString const& value_ ) const {
 	return ( make_pointer<HHuginn::HString>( _string.raw(), value_ ) );
 }
 
-HHuginn::value_t HObjectFactory::create_list( HHuginn::values_t const& values_ ) {
+HHuginn::value_t HObjectFactory::create_list( HHuginn::values_t const& values_ ) const {
 	return ( make_pointer<HHuginn::HList>( _list.raw(), values_ ) );
 }
 
-HHuginn::value_t HObjectFactory::create_deque( HHuginn::HDeque::values_t const& values_ ) {
+HHuginn::value_t HObjectFactory::create_deque( HHuginn::HDeque::values_t const& values_ ) const {
 	return ( make_pointer<HHuginn::HDeque>( _deque.raw(), values_ ) );
 }
 
-HHuginn::value_t HObjectFactory::create_dict( void ) {
+HHuginn::value_t HObjectFactory::create_dict( void ) const {
 	return ( make_pointer<HHuginn::HDict>( _dict.raw() ) );
 }
 
-HHuginn::value_t HObjectFactory::create_dict( HHuginn::HDict::values_t const& data_, HHuginn::type_t keyType_ ) {
+HHuginn::value_t HObjectFactory::create_dict( HHuginn::HDict::values_t const& data_, HHuginn::type_t keyType_ ) const {
 	return ( make_pointer<HHuginn::HDict>( _dict.raw(), data_, keyType_ ) );
 }
 
-HHuginn::value_t HObjectFactory::create_order( void ) {
+HHuginn::value_t HObjectFactory::create_order( void ) const {
 	return ( make_pointer<HHuginn::HOrder>( _order.raw() ) );
 }
 
-HHuginn::value_t HObjectFactory::create_order( HHuginn::HOrder::values_t const& data_, HHuginn::type_t keyType_ ) {
+HHuginn::value_t HObjectFactory::create_order( HHuginn::HOrder::values_t const& data_, HHuginn::type_t keyType_ ) const {
 	return ( make_pointer<HHuginn::HOrder>( _order.raw(), data_, keyType_ ) );
 }
 
-HHuginn::value_t HObjectFactory::create_lookup( void ) {
+HHuginn::value_t HObjectFactory::create_lookup( void ) const {
 	return ( make_pointer<HHuginn::HLookup>( _lookup.raw() ) );
 }
 
-HHuginn::value_t HObjectFactory::create_lookup( HHuginn::HLookup::values_t const& data_ ) {
+HHuginn::value_t HObjectFactory::create_lookup( HHuginn::HLookup::values_t const& data_ ) const {
 	return ( make_pointer<HHuginn::HLookup>( _lookup.raw(), data_ ) );
 }
 
-HHuginn::value_t HObjectFactory::create_set( void ) {
+HHuginn::value_t HObjectFactory::create_set( void ) const {
 	return ( make_pointer<HHuginn::HSet>( _set.raw() ) );
 }
 
-HHuginn::value_t HObjectFactory::create_set( HHuginn::HSet::values_t const& data_ ) {
+HHuginn::value_t HObjectFactory::create_set( HHuginn::HSet::values_t const& data_ ) const {
 	return ( make_pointer<HHuginn::HSet>( _set.raw(), data_ ) );
+}
+
+HHuginn::HClass const* HObjectFactory::exception_class( void ) const {
+	return ( _exception.raw() );
+}
+
+HHuginn::HClass const* HObjectFactory::conversion_exception_class( void ) const {
+	return ( _conversionException.raw() );
+}
+
+HHuginn::HClass const* HObjectFactory::arithmetic_exception_class( void ) const {
+	return ( _arithmeticException.raw() );
 }
 
 }

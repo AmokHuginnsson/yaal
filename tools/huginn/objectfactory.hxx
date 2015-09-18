@@ -45,19 +45,26 @@ class HObjectFactory final {
 	HHuginn::class_t _order;
 	HHuginn::class_t _lookup;
 	HHuginn::class_t _set;
+	HHuginn::class_t _exception;
+	HHuginn::class_t _conversionException;
+	HHuginn::class_t _arithmeticException;
 public:
 	HObjectFactory( void );
-	HHuginn::value_t create_string( yaal::hcore::HString const& = yaal::hcore::HString() );
-	HHuginn::value_t create_list( HHuginn::values_t const& = HHuginn::values_t() );
-	HHuginn::value_t create_deque( HHuginn::HDeque::values_t const& = HHuginn::HDeque::values_t() );
-	HHuginn::value_t create_dict( void );
-	HHuginn::value_t create_dict( HHuginn::HDict::values_t const&, HHuginn::type_t );
-	HHuginn::value_t create_order( void );
-	HHuginn::value_t create_order( HHuginn::HOrder::values_t const&, HHuginn::type_t );
-	HHuginn::value_t create_lookup( void );
-	HHuginn::value_t create_lookup( HHuginn::HLookup::values_t const& );
-	HHuginn::value_t create_set( void );
-	HHuginn::value_t create_set( HHuginn::HSet::values_t const& );
+	void register_exception_classes( HHuginn* );
+	HHuginn::value_t create_string( yaal::hcore::HString const& = yaal::hcore::HString() ) const;
+	HHuginn::value_t create_list( HHuginn::values_t const& = HHuginn::values_t() ) const;
+	HHuginn::value_t create_deque( HHuginn::HDeque::values_t const& = HHuginn::HDeque::values_t() ) const;
+	HHuginn::value_t create_dict( void ) const;
+	HHuginn::value_t create_dict( HHuginn::HDict::values_t const&, HHuginn::type_t ) const;
+	HHuginn::value_t create_order( void ) const;
+	HHuginn::value_t create_order( HHuginn::HOrder::values_t const&, HHuginn::type_t ) const;
+	HHuginn::value_t create_lookup( void ) const;
+	HHuginn::value_t create_lookup( HHuginn::HLookup::values_t const& ) const;
+	HHuginn::value_t create_set( void ) const;
+	HHuginn::value_t create_set( HHuginn::HSet::values_t const& ) const;
+	HHuginn::HClass const* exception_class( void ) const;
+	HHuginn::HClass const* conversion_exception_class( void ) const;
+	HHuginn::HClass const* arithmetic_exception_class( void ) const;
 };
 
 }

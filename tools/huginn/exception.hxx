@@ -39,6 +39,8 @@ namespace huginn {
 
 namespace exception {
 
+HHuginn::class_t get_class( HHuginn* );
+
 HHuginn::class_t create_class(
 	HHuginn*,
 	yaal::hcore::HString const&,
@@ -46,10 +48,6 @@ HHuginn::class_t create_class(
 );
 
 }
-
-extern HHuginn::HClass const* _exception_;
-extern HHuginn::HClass const* _conversionException_;
-extern HHuginn::HClass const* _arithmeticException_;
 
 }
 

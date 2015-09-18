@@ -33,6 +33,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
+#include "objectfactory.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -118,7 +119,12 @@ private:
 	}
 };
 
-HHuginn::class_t _exceptionClass_( make_pointer<HExceptionClass>( nullptr, "Exception", nullptr ) );
+HHuginn::class_t get_class( HHuginn* huginn_ ) {
+	M_PROLOG
+	HHuginn::class_t c( make_pointer<HExceptionClass>( huginn_, "Exception", nullptr ) );
+	return ( c );
+	M_EPILOG
+}
 
 HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& name_, HHuginn::HClass const* base_ ) {
 	M_PROLOG
@@ -127,7 +133,7 @@ HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& nam
 		c = make_pointer<HExceptionClass>(
 			huginn_,
 			name_,
-			base_ ? base_ : _exceptionClass_.raw()
+			base_ ? base_ : huginn_->object_factory()->exception_class()
 		);
 	}
 	if ( huginn_ ) {
@@ -137,14 +143,7 @@ HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& nam
 	M_EPILOG
 }
 
-HHuginn::class_t _conversionExceptionClass_ = exception::create_class( nullptr, "ConversionException" );
-HHuginn::class_t _arithmeticExceptionClass_ = exception::create_class( nullptr, "ArithmeticException" );
-
 }
-
-HHuginn::HClass const* _exception_( exception::_exceptionClass_.raw() );
-HHuginn::HClass const* _conversionException_( exception::_conversionExceptionClass_.raw() );
-HHuginn::HClass const* _arithmeticException_( exception::_arithmeticExceptionClass_.raw() );
 
 }
 

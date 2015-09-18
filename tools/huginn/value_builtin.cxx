@@ -262,8 +262,9 @@ HHuginn::value_t div( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "There is no `/' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
 	}
-	if ( res == thread_->huginn().none_value() ) {
-		thread_->raise( _arithmeticException_, "Division by zero.", position_ );
+	HHuginn& h( thread_->huginn() );
+	if ( res == h.none_value() ) {
+		thread_->raise( h.object_factory()->arithmetic_exception_class(), "Division by zero.", position_ );
 	}
 	return ( res );
 }
@@ -276,7 +277,7 @@ HHuginn::value_t mod( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 		if ( denominator != 0 ) {
 			res = make_pointer<HHuginn::HInteger>( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() / denominator );
 		} else {
-			thread_->raise( _arithmeticException_, "Division by zero.", position_ );
+			thread_->raise( thread_->object_factory().arithmetic_exception_class(), "Division by zero.", position_ );
 		}
 	} else {
 		throw HHuginn::HHuginnRuntimeException( "There is no `%' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
@@ -550,7 +551,7 @@ HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int posi
 		try {
 			v = lexical_cast<int long long>( static_cast<HHuginn::HString const*>( v_.raw() )->value() );
 		} catch ( HLexicalCastException const& e ) {
-			thread_->raise( _conversionException_, e.what(), position_ );
+			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
 		}
 		res = make_pointer<HHuginn::HInteger>( v );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
@@ -575,7 +576,7 @@ HHuginn::value_t real( HThread* thread_, HHuginn::value_t const& v_, int positio
 		try {
 			v = lexical_cast<double long>( static_cast<HHuginn::HString const*>( v_.raw() )->value() );
 		} catch ( HLexicalCastException const& e ) {
-			thread_->raise( _conversionException_, e.what(), position_ );
+			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
 		}
 		res = make_pointer<HHuginn::HReal>( v );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
@@ -610,7 +611,7 @@ HHuginn::value_t number( HThread* thread_, HHuginn::value_t const& v_, int posit
 		try {
 			res = make_pointer<HHuginn::HNumber>( static_cast<HHuginn::HString const*>( v_.raw() )->value() );
 		} catch ( HNumberException const& ) {
-			thread_->raise( _conversionException_, "Not a number.", position_ );
+			thread_->raise( thread_->object_factory().conversion_exception_class(), "Not a number.", position_ );
 		}
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = v_;

@@ -903,6 +903,7 @@ HHuginn::HHuginn( void )
 	M_PROLOG
 	_grammarVerified.store( true );
 	register_builtins();
+	_objectFactory->register_exception_classes( this );
 	return;
 	M_EPILOG
 }
@@ -1002,7 +1003,6 @@ void HHuginn::register_class( class_t class_ ) {
 
 void HHuginn::finalize_compilation( void ) {
 	M_PROLOG
-	register_class( exception::_exceptionClass_ );
 	for ( OCompiler::submitted_imports_t::value_type i : _compiler->_submittedImports ) {
 		_packages.insert( make_pair( i.second, HPackageFactoryInstance::get_instance().create_package( this, i.first ) ) );
 	}
