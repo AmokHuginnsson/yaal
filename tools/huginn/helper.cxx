@@ -165,6 +165,7 @@ HHuginn::type_t verify_arg_collection(
 	HHuginn::type_t t( values_[no_]->type() );
 	if (
 			( t != HHuginn::TYPE::LIST )
+			&& ( t != HHuginn::TYPE::DEQUE )
 			&& ( t != HHuginn::TYPE::ORDER )
 			&& ( t != HHuginn::TYPE::SET )
 			&& ( t != HHuginn::TYPE::DICT )

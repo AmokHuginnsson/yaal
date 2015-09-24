@@ -133,6 +133,9 @@ public:
 		if ( t == HHuginn::TYPE::LIST ) {
 			HHuginn::HList::values_t const& s( static_cast<HHuginn::HList const*>( values_[0].raw() )->value() );
 			dest = s;
+		} else if ( t == HHuginn::TYPE::DEQUE ) {
+			HHuginn::HDeque::values_t const& d( static_cast<HHuginn::HDeque const*>( values_[0].raw() )->value() );
+			dest.assign( d.begin(), d.end() );
 		} else if ( t == HHuginn::TYPE::ORDER ) {
 			HHuginn::HOrder::values_t const& s( static_cast<HHuginn::HOrder const*>( values_[0].raw() )->value() );
 			dest.assign( s.begin(), s.end() );
