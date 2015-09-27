@@ -958,10 +958,18 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 	M_PROLOG
 	HClass const* c( nullptr );
 	classes_t::const_iterator it( _classes.find( name_ ) );
+	OCompiler::OClassContext* cc( _compiler->_submittedClasses.at( name_ ).get() );
+	for ( packages_t::value_type const& p : _packages ) {
+		if ( name_ == p.second->type()->name() ) {
+			throw HHuginnRuntimeException( "Package of the same name `"_ys.append( name_ ).append( "' is already imported." ), cc->_position.get() );
+		}
+	}
+	if ( _packages.count( name_ ) > 0 ) {
+		throw HHuginnRuntimeException( "Package alias of the same name `"_ys.append( name_ ).append( "' is already defined." ), cc->_position.get() );
+	}
 	if ( it != _classes.end() ) {
 		c = it->second.get();
 	} else {
-		OCompiler::OClassContext* cc( _compiler->_submittedClasses.at( name_ ).get() );
 		_compiler->track_name_cycle( name_ );
 		if ( _functions.count( name_ ) > 0 ) {
 			throw HHuginnRuntimeException( "Function of the same name `"_ys.append( name_ ).append( "' is already defined." ), cc->_position.get() );
