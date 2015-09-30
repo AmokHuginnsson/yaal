@@ -67,7 +67,6 @@ struct OCompiler {
 		HHuginn::scope_t _else;
 		HTryCatch::catches_t _catches;
 		OScopeContext( OScopeContext* );
-		HHuginn::expression_t const& expression( void ) const;
 		HHuginn::expression_t& expression( void );
 		HHuginn::type_t guess_type( yaal::hcore::HString const& ) const;
 		void note_type( yaal::hcore::HString const&, HHuginn::type_t );

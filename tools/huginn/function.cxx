@@ -89,20 +89,20 @@ HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::HObject*
 		++ i
 	) {
 		if ( i < VALUE_COUNT ) {
-			thread_->current_frame()->set_variable( _parameterNames[i], values_[i], position_ );
+			f->set_variable( _parameterNames[i], values_[i], position_ );
 		} else {
 			int defaultValueIndex( i - ( NAME_COUNT - DEFAULT_VALUE_COUNT ) );
 			_defaultValues[defaultValueIndex]->execute( thread_ );
-			if ( ! thread_->can_continue() ) {
+			if ( ! f->can_continue() ) {
 				break;
 			}
-			thread_->current_frame()->set_variable( _parameterNames[i], f->result(), position_ );
+			f->set_variable( _parameterNames[i], f->result(), position_ );
 		}
 	}
-	if ( thread_->can_continue() ) {
+	if ( f->can_continue() ) {
 		_scope->execute( thread_ );
 	}
-	HHuginn::value_t res( thread_->current_frame()->result() );
+	HHuginn::value_t res( f->result() );
 	thread_->pop_frame();
 	return ( res );
 	M_EPILOG

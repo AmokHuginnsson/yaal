@@ -77,7 +77,9 @@ public:
 	HHuginn::value_t make_variable( yaal::hcore::HString const&, int );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( yaal::hcore::HString const&, int );
-	bool can_continue( void ) const;
+	bool can_continue( void ) const {
+		return ( _state == STATE::NORMAL );
+	}
 	void break_execution( STATE );
 	void continue_execution( void );
 	int number( void ) const;
@@ -88,7 +90,9 @@ public:
 	bool is_loop( void ) const;
 	bool has_catch( void ) const;
 	STATE state( void ) const;
-	HHuginn::value_t result( void ) const;
+	HHuginn::value_t result( void ) const {
+		return ( _result );
+	}
 	void set_result( HHuginn::value_t const& );
 	operations_t& operations( void );
 	values_t& values( void );

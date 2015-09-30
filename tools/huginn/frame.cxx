@@ -76,10 +76,6 @@ bool HFrame::has_catch( void ) const {
 	return ( _type == TYPE::TRY_CATCH );
 }
 
-bool HFrame::can_continue( void ) const {
-	return ( _state == STATE::NORMAL );
-}
-
 HFrame::STATE HFrame::state( void ) const {
 	return ( _state );
 }
@@ -105,10 +101,6 @@ void HFrame::set_result( HHuginn::value_t const& result_ ) {
 	_result = result_;
 	return;
 	M_EPILOG
-}
-
-HHuginn::value_t HFrame::result( void ) const {
-	return ( _result );
 }
 
 void HFrame::reset( void ) {

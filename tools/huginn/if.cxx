@@ -59,9 +59,9 @@ void HIf::do_execute( huginn::HThread* thread_ ) const {
 	HFrame* f( thread_->current_frame() );
 	bool done( false );
 	for ( if_clauses_t::const_iterator it( _ifClauses.begin() ), end( _ifClauses.end() );
-		( it != end ) && ! done && thread_->can_continue(); ++ it ) {
+		( it != end ) && ! done && f->can_continue(); ++ it ) {
 		it->_expression->execute( thread_ );
-		if ( thread_->can_continue() ) {
+		if ( f->can_continue() ) {
 			HHuginn::value_t v( f->result() );
 			M_ASSERT( v->type() == HHuginn::TYPE::BOOLEAN );
 			if ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() ) {
@@ -72,7 +72,7 @@ void HIf::do_execute( huginn::HThread* thread_ ) const {
 			break;
 		}
 	}
-	if ( ! done && thread_->can_continue() && !! _elseClause ) {
+	if ( ! done && f->can_continue() && !! _elseClause ) {
 		_elseClause->execute( thread_ );
 	}
 	thread_->pop_frame();

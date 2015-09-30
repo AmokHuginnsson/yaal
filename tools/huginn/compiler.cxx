@@ -90,10 +90,6 @@ void OCompiler::OScopeContext::clear( void ) {
 	M_EPILOG
 }
 
-HHuginn::HHuginn::expression_t const& OCompiler::OScopeContext::expression( void ) const {
-	return ( _expressionsStack.top().back() );
-}
-
 HHuginn::HHuginn::expression_t& OCompiler::OScopeContext::expression( void ) {
 	return ( _expressionsStack.top().back() );
 }

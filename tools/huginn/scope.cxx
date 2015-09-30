@@ -54,11 +54,12 @@ void HScope::do_execute( HThread* thread_ ) const {
 	if ( ! _inline ) {
 		thread_->create_scope_frame();
 	}
+	HFrame* f( thread_->current_frame() );
 	for ( statement_t const& s : _statements ) {
 		s->execute( thread_ );
-		M_ASSERT( thread_->current_frame()->values().is_empty() );
-		M_ASSERT( thread_->current_frame()->operations().is_empty() );
-		if ( ! thread_->can_continue() ) {
+		M_ASSERT( f->values().is_empty() );
+		M_ASSERT( f->operations().is_empty() );
+		if ( ! f->can_continue() ) {
 			break;
 		}
 	}

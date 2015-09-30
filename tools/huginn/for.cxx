@@ -60,14 +60,14 @@ void HFor::do_execute( HThread* thread_ ) const {
 	thread_->create_loop_frame();
 	HFrame* f( thread_->current_frame() );
 	_source->execute( thread_ );
-	if ( thread_->can_continue() ) {
+	if ( f->can_continue() ) {
 		HHuginn::value_t source( f->result() );
 		HHuginn::HIterable* coll( dynamic_cast<HHuginn::HIterable*>( source.raw() ) );
 		if ( ! coll ) {
 			throw HHuginn::HHuginnRuntimeException( "`For' source is not an iterable.", _source->position() );
 		}
 		HHuginn::HIterable::HIterator it( coll->iterator() );
-		while ( thread_->can_continue() && it.is_valid() ) {
+		while ( f->can_continue() && it.is_valid() ) {
 			HHuginn::value_t v( it.value() );
 			f->set_variable( _variableName, v, _position );
 			_loop->execute( thread_ );

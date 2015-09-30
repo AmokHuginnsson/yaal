@@ -50,9 +50,9 @@ void HWhile::do_execute( huginn::HThread* thread_ ) const {
 	M_PROLOG
 	thread_->create_loop_frame();
 	HFrame* f( thread_->current_frame() );
-	while ( thread_->can_continue() ) {
+	while ( f->can_continue() ) {
 		_condition->execute( thread_ );
-		if ( thread_->can_continue() ) {
+		if ( f->can_continue() ) {
 			HHuginn::value_t v( f->result() );
 			M_ASSERT( v->type() == HHuginn::TYPE::BOOLEAN );
 			if ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() ) {
