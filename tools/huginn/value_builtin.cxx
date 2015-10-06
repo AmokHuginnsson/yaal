@@ -95,7 +95,7 @@ HHuginn::value_t range(
 ) {
 	HHuginn::type_t baseType( base_->type() );
 	HHuginn::value_t res;
-	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::STRING ) ) {
+	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
 		if ( ( from_->type() != HHuginn::TYPE::INTEGER ) && ( from_->type() != HHuginn::TYPE::NONE ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operand `from' is not an integer.", position_ );
 		}
@@ -105,7 +105,14 @@ HHuginn::value_t range(
 		if ( ( step_->type() != HHuginn::TYPE::INTEGER ) && ( step_->type() != HHuginn::TYPE::NONE ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operand `step' is not an integer.", position_ );
 		}
-		int long size( baseType == HHuginn::TYPE::LIST ? static_cast<HHuginn::HList*>( base_.raw() )->size() : static_cast<HHuginn::HString*>( base_.raw() )->value().get_length() );
+		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size() );
+		if ( baseType == HHuginn::TYPE::LIST ) {
+			res = pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_list() );
+		} else if ( baseType == HHuginn::TYPE::DEQUE ) {
+			res = pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_deque() );
+		} else {
+			res = pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_string() );
+		}
 		HHuginn::HInteger const* integer( step_->type() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( step_.raw() ) : nullptr );
 		int long step( integer ? static_cast<int long>( integer->value() ) : 1 );
 		if ( step == 0 ) {
@@ -115,7 +122,6 @@ HHuginn::value_t range(
 		HHuginn::HInteger const* integerTo = to_->type() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( to_.raw() ) : nullptr;
 		int long from( integerFrom ? static_cast<int long>( integerFrom->value() ) : ( step > 0 ? 0 : size ) );
 		int long to( integerTo ? static_cast<int long>( integerTo->value() ) : ( step > 0 ? size : -1 ) );
-		res = ( baseType == HHuginn::TYPE::LIST ) ? pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_list() ) : pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_string() );
 
 		do {
 			if ( step > 0 ) {
@@ -156,6 +162,18 @@ HHuginn::value_t range(
 			if ( baseType == HHuginn::TYPE::LIST ) {
 				HHuginn::HList* l( static_cast<HHuginn::HList*>( base_.raw() ) );
 				HHuginn::HList* r( static_cast<HHuginn::HList*>( res.raw() ) );
+				if ( step > 0 ) {
+					for ( int long i( from ); i < to; i += step ) {
+						r->push_back( l->get( i ) );
+					}
+				} else {
+					for ( int long i( from ); i > to; i += step ) {
+						r->push_back( l->get( i ) );
+					}
+				}
+			} else if ( baseType == HHuginn::TYPE::DEQUE ) {
+				HHuginn::HDeque* l( static_cast<HHuginn::HDeque*>( base_.raw() ) );
+				HHuginn::HDeque* r( static_cast<HHuginn::HDeque*>( res.raw() ) );
 				if ( step > 0 ) {
 					for ( int long i( from ); i < to; i += step ) {
 						r->push_back( l->get( i ) );
