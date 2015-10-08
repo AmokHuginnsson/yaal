@@ -80,9 +80,7 @@ private:
 	bool     _newLine;
 	LOG_LEVEL::priority_t _type;
 	size_t   _bufferSize;
-	char const* _processName;
-	HString  _loginName;
-	HString  _hostName;
+	HString  _tag;
 	HChunk   _buffer;
 	static bool _autoRehash;
 public:

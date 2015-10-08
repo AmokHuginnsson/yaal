@@ -82,16 +82,14 @@ HLog::HLog( void )
 	, _newLine( true )
 	, _type( LOG_LEVEL::DEBUG )
 	, _bufferSize( BUFFER_SIZE )
-	, _processName( NULL )
-	, _loginName()
-	, _hostName( system::get_host_name() )
+	, _tag()
 	, _buffer( static_cast<int>( _bufferSize )
 ) {
 	M_PROLOG
 	if ( ! _file::ref() ) {
 		M_THROW( "tmpfile() failed", errno );
 	}
-	operator()( LOG_LEVEL::NOTICE ) << "Process started (" << system::getpid() << ")." << endl;
+	operator()( LOG_LEVEL::NOTICE ) << "Process started." << endl;
 	operator()( LOG_LEVEL::NOTICE ) << "yaal version = " << yaal_version( true ) << endl;
 	return;
 	M_EPILOG
@@ -122,17 +120,23 @@ void HLog::disable_auto_rehash( void ) {
 void HLog::do_rehash( void* src_, char const* const processName_ ) {
 	M_PROLOG
 	M_ASSERT( ! _realMode );
+	M_ASSERT( processName_ );
 #ifndef HAVE_GETLINE
 	char* ptr = NULL;
 	int len = 0;
 #endif /* not HAVE_GETLINE */
 	_realMode = true;
-	if ( processName_ ) {
-		_processName = ::basename( processName_ );
-	}
 	FILE* src( static_cast<FILE*>( src_ ) );
 	if ( src ) {
-		_loginName = system::get_user_name( static_cast<int>( getuid() ) );
+		_tag.assign( " " )
+			.append( system::get_user_name( static_cast<int>( getuid() ) ) )
+			.append( "@" )
+			.append( system::get_host_name() )
+			.append( "->" )
+			.append( ::basename( processName_ ) )
+			.append( "[" )
+			.append( system::getpid() )
+			.append( "]: " );
 		::fseek( src, 0, SEEK_SET );
 		char* buf = _buffer.get<char>();
 #ifdef HAVE_GETLINE
@@ -224,11 +228,7 @@ void HLog::timestamp( void ) {
 	if ( size > TIMESTAMP_SIZE ) {
 		M_THROW( _( "strftime returned more than TIMESTAMP_SIZE" ), size );
 	}
-	if ( _processName ) {
-		_file::ref() << buffer << " " << _loginName << "@" << _hostName << "->" << _processName << ": ";
-	} else {
-		_file::ref() << buffer << " " << _loginName << "@" << _hostName << ": ";
-	}
+	_file::ref() << buffer << _tag;
 	if ( _type <= LOG_LEVEL::WARNING ) {
 		_file::ref() << "(" << LOG_LEVEL::name( _type ) << ") ";
 	}
