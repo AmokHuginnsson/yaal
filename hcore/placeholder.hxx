@@ -82,17 +82,17 @@ struct placeholder<3> : public placeholder_base {
 
 namespace {
 
-static const higher_order::placeholder<1> _1; /*!< Place holder for first anonymous argument. */
-static const higher_order::placeholder<2> _2; /*!< Place holder for second anonymous argument. */
-static const higher_order::placeholder<3> _3; /*!< Place holder for third anonymous argument. */
-static const higher_order::placeholder<4> _4; /*!< Place holder for fourth anonymous argument. */
-static const higher_order::placeholder<5> _5; /*!< Place holder for fifth anonymous argument. */
-static const higher_order::placeholder<6> _6; /*!< Place holder for sixth anonymous argument. */
-static const higher_order::placeholder<7> _7; /*!< Place holder for seventh anonymous argument. */
-static const higher_order::placeholder<8> _8; /*!< Place holder for eighth anonymous argument. */
-static const higher_order::placeholder<9> _9; /*!< Place holder for ninth anonymous argument. */
-static const higher_order::placeholder<10> _10; /*!< Place holder for tenth anonymous argument. */
-static const higher_order::placeholder<11> _11; /*!< Place holder for eleventh anonymous argument. */
+static higher_order::placeholder<1> const _1; /*!< Place holder for first anonymous argument. */
+static higher_order::placeholder<2> const _2; /*!< Place holder for second anonymous argument. */
+static higher_order::placeholder<3> const _3; /*!< Place holder for third anonymous argument. */
+static higher_order::placeholder<4> const _4; /*!< Place holder for fourth anonymous argument. */
+static higher_order::placeholder<5> const _5; /*!< Place holder for fifth anonymous argument. */
+static higher_order::placeholder<6> const _6; /*!< Place holder for sixth anonymous argument. */
+static higher_order::placeholder<7> const _7; /*!< Place holder for seventh anonymous argument. */
+static higher_order::placeholder<8> const _8; /*!< Place holder for eighth anonymous argument. */
+static higher_order::placeholder<9> const _9; /*!< Place holder for ninth anonymous argument. */
+static higher_order::placeholder<10> const _10; /*!< Place holder for tenth anonymous argument. */
+static higher_order::placeholder<11> const _11; /*!< Place holder for eleventh anonymous argument. */
 
 }
 
