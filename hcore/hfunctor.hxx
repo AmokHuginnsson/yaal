@@ -372,7 +372,7 @@ struct object_resolver {
 		static constexpr bool sfinae( ... ) {
 			return ( false );
 		}
-		static bool const value = sfinae( static_cast<tType const*>( nullptr ) );
+		static bool const value = sfinae( static_cast<typename trait::strip_reference<tType>::type const*>( nullptr ) );
 	};
 	typedef enum { REF, PTR, SMART, FREE_REF, FREE_PTR } object_type_t;
 	template<typename CLASS_t, typename arg_t = int>
@@ -475,7 +475,7 @@ class HFunctor {
 	typedef typename trait::return_type<METHOD_t>::type return_t;
 public:
 	HFunctor( CLASS_t object_, METHOD_t method_ )
-		: _object( object_ ), _method( method_ ) {
+		: _object( yaal::forward<CLASS_t>( object_ ) ), _method( yaal::forward<METHOD_t>( method_ ) ) {
 		return;
 	}
 
