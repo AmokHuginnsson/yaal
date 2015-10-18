@@ -86,34 +86,42 @@ HCRUDDescriptor::~HCRUDDescriptor( void ) {
 
 void HCRUDDescriptor::build_query( MODE::mode_t const& mode_ ) {
 	M_PROLOG
+	if ( _table.is_empty() ) {
+		throw HCRUDDescriptorException( "table is not set" );
+	}
 	_varTmpBuffer.clear();
 	_query.reset();
 	switch ( mode_ ) {
 		case ( MODE::SELECT ): {
 			_SQL.format( "SELECT %s FROM %s", _columns.raw(),
 					_table.raw() );
-			if ( ! _filter.is_empty() )
+			if ( ! _filter.is_empty() ) {
 				_SQL += ( " WHERE " + _filter );
-			if ( ! _sort.is_empty() )
+			}
+			if ( ! _sort.is_empty() ) {
 				_SQL += ( " ORDER BY " + _sort );
+			}
 			_SQL += ';';
 		}
 		break;
 		case ( MODE::UPDATE ): {
+			verify_dml();
 			_SQL = "UPDATE " + _table + " SET ";
 			M_ENSURE( _fields.get_size() == _values.get_size() );
 			int long const size = _values.get_size();
 			bool hasField = false;
 			for ( int i = 0; i < size; ++ i ) {
 				if ( _mutated[ i ] ) {
-					if ( hasField )
+					if ( hasField ) {
 						_SQL += ", ";
+					}
 					hasField = true;
 					_SQL += _fields[ i ];
 					if ( !! _values[ i ] ) {
 						_SQL += " = ?";
-					} else
+					} else {
 						_SQL += " = NULL";
+					}
 				}
 			}
 			if ( ! _filter.is_empty() ) {
@@ -122,29 +130,36 @@ void HCRUDDescriptor::build_query( MODE::mode_t const& mode_ ) {
 			}
 			_SQL += ';';
 			_query = _dataBase->prepare_query( _SQL );
-			for ( int i = 0; i < size; ++ i ) {
-				if ( !! _values[i] ) {
-					_query->bind( i + 1, *_values[ i ] );
+			for ( int i( 0 ), pos( 1 ); i < size; ++ i ) {
+				if ( _mutated[i] && !! _values[i] ) {
+					_query->bind( pos ++, *_values[ i ] );
 				}
 			}
 		}
 		break;
 		case ( MODE::INSERT ): {
+			verify_dml();
 			_SQL = "INSERT INTO " + _table + " ( ";
 			M_ENSURE( _fields.get_size() == _values.get_size() );
 			int long const size( _fields.get_size() );
+			bool hasField( false );
 			for ( int i( 0 ); i < size; ++ i ) {
 				if ( !! _values[i] ) {
-					if ( i > 0 )
+					if ( hasField ) {
 						_SQL += ", ";
+					}
+					hasField = true;
 					_SQL += _fields[ i ];
 				}
 			}
 			_SQL += " ) VALUES ( ";
+			hasField = false;
 			for ( int i = 0; i < size; ++ i ) {
 				if ( !! _values[i] ) {
-					if ( i > 0 )
+					if ( hasField ) {
 						_SQL += ", ";
+					}
+					hasField = true;
 					_SQL += "?";
 				}
 			}
@@ -173,6 +188,21 @@ void HCRUDDescriptor::build_query( MODE::mode_t const& mode_ ) {
 		break;
 	}
 	_mode = mode_;
+	return;
+	M_EPILOG
+}
+
+void HCRUDDescriptor::verify_dml( void ) {
+	M_PROLOG
+	if ( _fields.is_empty() ) {
+		throw HCRUDDescriptorException( "there are no fields" );
+	}
+	if ( _values.is_empty() ) {
+		throw HCRUDDescriptorException( "there are no values" );
+	}
+	if ( _fields.get_size() != _values.get_size() ) {
+		throw HCRUDDescriptorException( "fields size does not equal values size" );
+	}
 	return;
 	M_EPILOG
 }

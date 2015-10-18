@@ -102,6 +102,7 @@ public:
 	HRecordSet::ptr_t execute( void );
 private:
 	void commit_columns( void );
+	void verify_dml( void );
 };
 typedef yaal::hcore::HExceptionT<HCRUDDescriptor> HCRUDDescriptorException;
 
