@@ -41,6 +41,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hcore/memory.hxx"
 #include "hcore/hlog.hxx"
 #include "hcore/hcore.hxx"
+#include "hcore/numeric.hxx"
 #include "hcore/system.hxx"
 #include "tools/tools.hxx"
 #include "tools/hterminal.hxx"
@@ -61,6 +62,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #undef COLORS
 
 using namespace yaal::hcore;
+using namespace yaal::meta;
 using namespace yaal::tools;
 
 namespace yaal {
@@ -178,27 +180,66 @@ void init_glyphs( void ) {
  * 128 (0x80) - 10000000
  */
 struct ATTR {
-	inline static int value( int attr_ ) {
-		return ( static_cast<int>( COLOR_PAIR( static_cast<int unsigned>(
-							( ( attr_ & COLORS::BG_MASK ) >> 1 )              /* background */
-							| ( attr_ & COLORS::FG_MASK ) ) )                 /* foreground */
-					| ( ( attr_ & COLORS::FG_BOLD ) ? A_BOLD : 0 )        /* brighter foreground */
-					| ( ( attr_ & COLORS::BG_BLINK ) ? A_BLINK : 0 ) ) ); /* brighter background */
+	inline static int encode( int attr_ ) {
+		return (
+			static_cast<int>(
+				COLOR_PAIR(
+					static_cast<int unsigned>(
+						( ( attr_ & COLORS::BG_MASK ) >> 1 )            /* background */
+						| ( attr_ & COLORS::FG_MASK )                   /* foreground */
+					)
+				) | ( ( attr_ & COLORS::FG_BOLD ) ? A_BOLD : 0 )    /* brighter foreground */
+					| ( ( attr_ & COLORS::BG_BLINK ) ? A_BLINK : 0 )  /* brighter background */
+			)
+		);
 	}
-	inline static int value_fix( int attr_ ) {
+	inline static int decode( int color_, int attr_ ) {
+		return (
+			static_cast<int>(
+				( color_ & obinary<0111>::value )
+				| ( ( color_ & obinary<0111000>::value ) << 1 )
+				| ( ( attr_ & A_BOLD ) ? COLORS::FG_BOLD : 0 )
+				| ( attr_ & A_BLINK ? COLORS::BG_BLINK : 0 )
+			)
+		);
+	}
+	inline static int encode_fix( int attr_ ) {
+		int attr( 0 );
 		/*
 		 * On broken terminals we use trick to get bright background,
-		 * first we swap foreground and background colord and then
+		 * first we swap foreground and background colors and then
 		 * we add REVERSE attribure.
 		 */
 		if ( attr_ & COLORS::BG_BLINK ) {
-			return ( static_cast<int>( COLOR_PAIR( static_cast<int unsigned>(
+			attr = (
+				static_cast<int>(
+					COLOR_PAIR(
+						static_cast<int unsigned>(
 								( ( attr_ & COLORS::FG_MASK ) << 3 )
-								| ( ( attr_ & COLORS::BG_MASK ) >> 4 ) ) )
-						| ( ( attr_ & COLORS::FG_BOLD ) ? A_BLINK : 0 )
-						| A_BOLD | A_REVERSE ) );
+							| ( ( attr_ & COLORS::BG_MASK ) >> 4 )
+						)
+					) | ( ( attr_ & COLORS::FG_BOLD ) ? A_BLINK : 0 )
+						| A_BOLD | A_REVERSE
+				)
+			);
+		} else {
+			attr = encode( attr_ );
 		}
-		return ( value( attr_ ) );
+		return ( attr );
+	}
+	inline static int decode_fix( int color_, int attr_ ) {
+		int attr( 0 );
+		if ( attr_ & A_REVERSE ) {
+			attr = static_cast<int>(
+				( ( color_ & obinary<0111>::value ) << 4 )
+				| ( ( color_ & obinary<0111000>::value ) >> 3 )
+				| ( attr_ & A_BLINK ? COLORS::FG_BOLD : 0 )
+				| COLORS::BG_BLINK
+			);
+		} else {
+			attr = decode( color_, attr_ );
+		}
+		return ( attr );
 	}
 };
 
@@ -234,9 +275,10 @@ namespace {
 
 bool has_broken_bright_background( void ) {
 	bool hasBrokenBrightBackground(
-			( ::getenv( "MRXVT_TABTITLE" ) != NULL )
-			|| ( ::getenv( "TERMINATOR_UUID" ) != NULL )
-		);
+		( ::getenv( "YAAL_HAS_BROKEN_BRIGHT_BACKGROUND" ) != nullptr )
+		|| ( ::getenv( "MRXVT_TABTITLE" ) != nullptr )
+		|| ( ::getenv( "TERMINATOR_UUID" ) != nullptr )
+	);
 	return ( hasBrokenBrightBackground );
 }
 
@@ -301,14 +343,16 @@ void HConsole::init( void ) {
 
 void HConsole::enter_curses( void ) {
 	M_PROLOG
-	if ( ! _terminal_.exists() )
+	if ( ! _terminal_.exists() ) {
 		throw HConsoleException( "Not connected to a terminal." );
+	}
 	static short const colors[] = { COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
 		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
 /*	def_shell_mode(); */
 /* this is done automaticly by initscr(), read man next time */
-	if ( ! _initialized )
+	if ( ! _initialized ) {
 		init();
+	}
 	_terminal_.init();
 	use_env( true );
 	if ( ! _window ) {
@@ -379,8 +423,9 @@ void HConsole::enter_curses( void ) {
 
 void HConsole::leave_curses( void ) {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
+	}
 	if ( _mouseDes >= 0 ) {
 		static_cast<void>( mouse::mouse_close() );
 		_mouseDes = -1;
@@ -424,14 +469,15 @@ inline void fwd_wattrset( WINDOW* win_, T val_ ) {
 
 void HConsole::set_attr( int attr_ ) const {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
+	}
 	char unsigned byte( static_cast<char unsigned>( attr_ ) );
 	fwd_wattrset(
 		static_cast<WINDOW*>( _window ),
 		_brokenBrightBackground
-			? static_cast<attr_t>( ATTR::value_fix( byte ) )
-			: static_cast<attr_t>( ATTR::value( byte ) )
+			? static_cast<attr_t>( ATTR::encode_fix( byte ) )
+			: static_cast<attr_t>( ATTR::encode( byte ) )
 	);
 	return;
 	M_EPILOG
@@ -439,11 +485,12 @@ void HConsole::set_attr( int attr_ ) const {
 
 void HConsole::set_background( int color_ ) const {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
+	}
 	wbkgd( static_cast<WINDOW*>( _window ), ' '
-			| static_cast<chtype>( _brokenBrightBackground ? ATTR::value_fix( COLORS::FG_BLACK | color_ )
-				: ATTR::value( COLORS::FG_BLACK | color_ ) ) ); /* meaningless value from macro */
+			| static_cast<chtype>( _brokenBrightBackground ? ATTR::encode_fix( COLORS::FG_BLACK | color_ )
+				: ATTR::encode( COLORS::FG_BLACK | color_ ) ) ); /* meaningless value from macro */
 	return;
 	M_EPILOG
 }
@@ -469,8 +516,9 @@ inline int waddch_fwd( WINDOW* win_, int char_ ) {
 #undef addch
 void HConsole::addch( int char_ ) {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
+	}
 	M_ENSURE( waddch_fwd( static_cast<WINDOW*>( _window ), char_ ) != ERR );
 	return;
 	M_EPILOG
@@ -668,8 +716,9 @@ int HConsole::ungetch( int code_ ) {
 int HConsole::get_key( void ) const {
 	M_PROLOG
 	CURSOR::cursor_t origCursState = CURSOR::INVISIBLE;
-	if ( ! _enabled )
+	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
+	}
 	M_ENSURE( noecho() != ERR );
 	M_ENSURE( ::fflush( NULL ) == 0 );
 	int key( getch() );
@@ -678,10 +727,11 @@ int HConsole::get_key( void ) const {
 		M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 		key = getch();
 		M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
-		if ( key == ERR )
+		if ( key == ERR ) {
 			key = KEY_CODES::ESCAPE;
-		else
+		} else {
 			key = KEY<>::meta_r( key );
+		}
 	}
 	if ( key == KEY<>::ctrl_r( _commandComposeCharacter_ ) ) {
 		origCursState = curs_set( CURSOR::INVISIBLE );
@@ -695,18 +745,20 @@ int HConsole::get_key( void ) const {
 			cmvprintf( _height - 1, 0, COLORS::FG_LIGHTGRAY, "      " );
 		} else {
 			int character = 0;
-			if ( key < KEY_CODES::ESCAPE )
+			if ( key < KEY_CODES::ESCAPE ) {
 				key = KEY<>::command_r( character = key + 96 );
-			else if ( key == KEY_CODES::ESCAPE ) {
+			} else if ( key == KEY_CODES::ESCAPE ) {
 				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 				key = getch();
 				M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
-				if ( key == ERR )
+				if ( key == ERR ) {
 					key = KEY<>::command_r( character = KEY_CODES::ESCAPE );
-				else
+				} else {
 					key = KEY<>::command_r( KEY<>::meta_r( character = key ) );
-			} else
+				}
+			} else {
 				key = KEY<>::command_r( character = key );
+			}
 			cmvprintf( _height - 1, 6, COLORS::FG_WHITE, " %c", character );
 		}
 		curs_set( origCursState );
@@ -762,14 +814,13 @@ int HConsole::get_key( void ) const {
 
 int HConsole::kbhit( void ) const {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
+	}
 	M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), true ) != ERR );
 	int key( get_key() );
 	M_ENSURE( nodelay( static_cast<WINDOW*>( _window ), false ) != ERR );
-	if ( key == ERR )
-		return ( 0 );
-	return ( key );
+	return ( key != ERR ? key : 0 );
 	M_EPILOG
 }
 
@@ -784,29 +835,30 @@ inline void fwd_attr_get( WINDOW* win_, T1& val1_, T2& val2_, void* ) {
 
 char unsigned HConsole::get_attr( void ) const {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
-	attr_t attr;
+	}
+	attr_t attr = 0;
 	NCURSES_ATTR_GET_SECOND_ARG_TYPE color = 0;
 	/* A workaround for compiler warning regarding
 	 * &attr and &color never being NULL. */
 	attr_t* pa( &attr );
 	NCURSES_ATTR_GET_SECOND_ARG_TYPE* pc( &color );
 	fwd_attr_get( static_cast<WINDOW*>( _window ), pa, pc, NULL );
-	int unsigned attribute = ( color << 1 ) & 56;
-	attribute |= ( color & 7 );
-	if ( attr & A_BOLD )
-		attribute |= 8;
-	if ( attr & A_BLINK )
-		attribute |= 128;
+	int attribute(
+		_brokenBrightBackground
+			? ATTR::decode_fix( static_cast<int>( color ), static_cast<int>( attr ) )
+			: ATTR::decode( static_cast<int>( color ), static_cast<int>( attr ) )
+	);
 	return ( static_cast<char unsigned>( attribute ) );
 	M_EPILOG
 }
 
 void HConsole::clrscr( void ) {
 	M_PROLOG
-	if ( ! _enabled )
+	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
+	}
 	wclear( static_cast<WINDOW*>( _window ) ); /* Always returns OK */
 	return;
 	M_EPILOG
