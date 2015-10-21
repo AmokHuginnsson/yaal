@@ -196,10 +196,10 @@ struct ATTR {
 	inline static int decode( int color_, int attr_ ) {
 		return (
 			static_cast<int>(
-				( color_ & obinary<0111>::value )
-				| ( ( color_ & obinary<0111000>::value ) << 1 )
-				| ( ( attr_ & A_BOLD ) ? COLORS::FG_BOLD : 0 )
-				| ( attr_ & A_BLINK ? COLORS::BG_BLINK : 0 )
+				( color_ & static_cast<int>( obinary<0111>::value ) )
+				| ( ( color_ & static_cast<int>( obinary<0111000>::value ) ) << 1 )
+				| ( ( attr_ & static_cast<int>( A_BOLD ) ) ? COLORS::FG_BOLD : 0 )
+				| ( attr_ & static_cast<int>( A_BLINK ) ? COLORS::BG_BLINK : 0 )
 			)
 		);
 	}
@@ -229,11 +229,11 @@ struct ATTR {
 	}
 	inline static int decode_fix( int color_, int attr_ ) {
 		int attr( 0 );
-		if ( attr_ & A_REVERSE ) {
+		if ( attr_ & static_cast<int>( A_REVERSE ) ) {
 			attr = static_cast<int>(
-				( ( color_ & obinary<0111>::value ) << 4 )
-				| ( ( color_ & obinary<0111000>::value ) >> 3 )
-				| ( attr_ & A_BLINK ? COLORS::FG_BOLD : 0 )
+				( ( color_ & static_cast<int>( obinary<0111>::value ) ) << 4 )
+				| ( ( color_ & static_cast<int>( obinary<0111000>::value ) ) >> 3 )
+				| ( attr_ & static_cast<int>( A_BLINK ) ? COLORS::FG_BOLD : 0 )
 				| COLORS::BG_BLINK
 			);
 		} else {
