@@ -110,8 +110,33 @@ public:
 			) {
 		return;
 	}
+	template<int free_args_count, typename return_t, typename CALL_type,
+		typename b0_t, typename b1_t,
+		typename b2_t, typename b3_t,
+		typename b4_t, typename b5_t,
+		typename b6_t, typename b7_t,
+		typename b8_t, typename b9_t,
+		typename b10_t>
+	HBoundCall( HCall<free_args_count, return_t, CALL_type, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>&& rawCall_ )
+		: _call(
+				pointer_static_cast<call_t>(
+					make_pointer<
+						HCall<
+							free_args_count, return_t, CALL_type,
+							b0_t, b1_t, b2_t, b3_t, b4_t, b5_t,
+							b6_t, b7_t, b8_t, b9_t, b10_t
+						>
+					>( yaal::move( rawCall_ ) )
+				)
+			) {
+		return;
+	}
 	HBoundCall( function_t const& foreignCall_ )
 		: _call( make_pointer<function_t>( foreignCall_ ) ) {
+		return;
+	}
+	HBoundCall( function_t&& foreignCall_ )
+		: _call( make_pointer<function_t>( yaal::move( foreignCall_ ) ) ) {
 		return;
 	}
 	template<typename... arg_t>
