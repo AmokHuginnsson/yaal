@@ -137,31 +137,31 @@ public:
 		, _type( INVALID ) {
 		switch ( v_._type ) {
 			case ( -1 ): break;
-			case ( 0 ): { t0_t const* v( reinterpret_cast<t0_t const*>( v_._mem ) ); new ( _mem ) t0_t( yaal::move( *v ) ); } break;
-			case ( 1 ): { t1_t const* v( reinterpret_cast<t1_t const*>( v_._mem ) ); new ( _mem ) t1_t( yaal::move( *v ) ); } break;
-			case ( 2 ): { t2_t const* v( reinterpret_cast<t2_t const*>( v_._mem ) ); new ( _mem ) t2_t( yaal::move( *v ) ); } break;
-			case ( 3 ): { t3_t const* v( reinterpret_cast<t3_t const*>( v_._mem ) ); new ( _mem ) t3_t( yaal::move( *v ) ); } break;
-			case ( 4 ): { t4_t const* v( reinterpret_cast<t4_t const*>( v_._mem ) ); new ( _mem ) t4_t( yaal::move( *v ) ); } break;
-			case ( 5 ): { t5_t const* v( reinterpret_cast<t5_t const*>( v_._mem ) ); new ( _mem ) t5_t( yaal::move( *v ) ); } break;
-			case ( 6 ): { t6_t const* v( reinterpret_cast<t6_t const*>( v_._mem ) ); new ( _mem ) t6_t( yaal::move( *v ) ); } break;
-			case ( 7 ): { t7_t const* v( reinterpret_cast<t7_t const*>( v_._mem ) ); new ( _mem ) t7_t( yaal::move( *v ) ); } break;
-			case ( 8 ): { t8_t const* v( reinterpret_cast<t8_t const*>( v_._mem ) ); new ( _mem ) t8_t( yaal::move( *v ) ); } break;
-			case ( 9 ): { t9_t const* v( reinterpret_cast<t9_t const*>( v_._mem ) ); new ( _mem ) t9_t( yaal::move( *v ) ); } break;
-			case ( 10 ): { t10_t const* v( reinterpret_cast<t10_t const*>( v_._mem ) ); new ( _mem ) t10_t( yaal::move( *v ) ); } break;
-			case ( 11 ): { t11_t const* v( reinterpret_cast<t11_t const*>( v_._mem ) ); new ( _mem ) t11_t( yaal::move( *v ) ); } break;
-			case ( 12 ): { t12_t const* v( reinterpret_cast<t12_t const*>( v_._mem ) ); new ( _mem ) t12_t( yaal::move( *v ) ); } break;
-			case ( 13 ): { t13_t const* v( reinterpret_cast<t13_t const*>( v_._mem ) ); new ( _mem ) t13_t( yaal::move( *v ) ); } break;
-			case ( 14 ): { t14_t const* v( reinterpret_cast<t14_t const*>( v_._mem ) ); new ( _mem ) t14_t( yaal::move( *v ) ); } break;
-			case ( 15 ): { t15_t const* v( reinterpret_cast<t15_t const*>( v_._mem ) ); new ( _mem ) t15_t( yaal::move( *v ) ); } break;
-			case ( 16 ): { t16_t const* v( reinterpret_cast<t16_t const*>( v_._mem ) ); new ( _mem ) t16_t( yaal::move( *v ) ); } break;
-			case ( 17 ): { t17_t const* v( reinterpret_cast<t17_t const*>( v_._mem ) ); new ( _mem ) t17_t( yaal::move( *v ) ); } break;
-			case ( 18 ): { t18_t const* v( reinterpret_cast<t18_t const*>( v_._mem ) ); new ( _mem ) t18_t( yaal::move( *v ) ); } break;
-			case ( 19 ): { t19_t const* v( reinterpret_cast<t19_t const*>( v_._mem ) ); new ( _mem ) t19_t( yaal::move( *v ) ); } break;
-			case ( 20 ): { t20_t const* v( reinterpret_cast<t20_t const*>( v_._mem ) ); new ( _mem ) t20_t( yaal::move( *v ) ); } break;
+			case ( 0 ): { t0_t* v( reinterpret_cast<t0_t*>( v_._mem ) ); new ( _mem ) t0_t( yaal::move( *v ) ); } break;
+			case ( 1 ): { t1_t* v( reinterpret_cast<t1_t*>( v_._mem ) ); new ( _mem ) t1_t( yaal::move( *v ) ); } break;
+			case ( 2 ): { t2_t* v( reinterpret_cast<t2_t*>( v_._mem ) ); new ( _mem ) t2_t( yaal::move( *v ) ); } break;
+			case ( 3 ): { t3_t* v( reinterpret_cast<t3_t*>( v_._mem ) ); new ( _mem ) t3_t( yaal::move( *v ) ); } break;
+			case ( 4 ): { t4_t* v( reinterpret_cast<t4_t*>( v_._mem ) ); new ( _mem ) t4_t( yaal::move( *v ) ); } break;
+			case ( 5 ): { t5_t* v( reinterpret_cast<t5_t*>( v_._mem ) ); new ( _mem ) t5_t( yaal::move( *v ) ); } break;
+			case ( 6 ): { t6_t* v( reinterpret_cast<t6_t*>( v_._mem ) ); new ( _mem ) t6_t( yaal::move( *v ) ); } break;
+			case ( 7 ): { t7_t* v( reinterpret_cast<t7_t*>( v_._mem ) ); new ( _mem ) t7_t( yaal::move( *v ) ); } break;
+			case ( 8 ): { t8_t* v( reinterpret_cast<t8_t*>( v_._mem ) ); new ( _mem ) t8_t( yaal::move( *v ) ); } break;
+			case ( 9 ): { t9_t* v( reinterpret_cast<t9_t*>( v_._mem ) ); new ( _mem ) t9_t( yaal::move( *v ) ); } break;
+			case ( 10 ): { t10_t* v( reinterpret_cast<t10_t*>( v_._mem ) ); new ( _mem ) t10_t( yaal::move( *v ) ); } break;
+			case ( 11 ): { t11_t* v( reinterpret_cast<t11_t*>( v_._mem ) ); new ( _mem ) t11_t( yaal::move( *v ) ); } break;
+			case ( 12 ): { t12_t* v( reinterpret_cast<t12_t*>( v_._mem ) ); new ( _mem ) t12_t( yaal::move( *v ) ); } break;
+			case ( 13 ): { t13_t* v( reinterpret_cast<t13_t*>( v_._mem ) ); new ( _mem ) t13_t( yaal::move( *v ) ); } break;
+			case ( 14 ): { t14_t* v( reinterpret_cast<t14_t*>( v_._mem ) ); new ( _mem ) t14_t( yaal::move( *v ) ); } break;
+			case ( 15 ): { t15_t* v( reinterpret_cast<t15_t*>( v_._mem ) ); new ( _mem ) t15_t( yaal::move( *v ) ); } break;
+			case ( 16 ): { t16_t* v( reinterpret_cast<t16_t*>( v_._mem ) ); new ( _mem ) t16_t( yaal::move( *v ) ); } break;
+			case ( 17 ): { t17_t* v( reinterpret_cast<t17_t*>( v_._mem ) ); new ( _mem ) t17_t( yaal::move( *v ) ); } break;
+			case ( 18 ): { t18_t* v( reinterpret_cast<t18_t*>( v_._mem ) ); new ( _mem ) t18_t( yaal::move( *v ) ); } break;
+			case ( 19 ): { t19_t* v( reinterpret_cast<t19_t*>( v_._mem ) ); new ( _mem ) t19_t( yaal::move( *v ) ); } break;
+			case ( 20 ): { t20_t* v( reinterpret_cast<t20_t*>( v_._mem ) ); new ( _mem ) t20_t( yaal::move( *v ) ); } break;
 			default: M_ASSERT( 0 && "Absurd type number." ); break;
 		}
 		_type = v_._type;
-		v_._type = INVALID;
+		destroy( v_._type, v_._mem );
 	}
 	~HVariant( void ) {
 		M_PROLOG
@@ -207,6 +207,13 @@ public:
 		}
 		return ( *this );
 	}
+	HVariant& operator = ( HVariant&& v_ ) {
+		if ( &v_ != this ) {
+			swap( v_ );
+			destroy( v_._type, v_._mem );
+		}
+		return ( *this );
+	}
 	void swap( HVariant& v_ ) {
 		if ( &v_ != this ) {
 			if ( _type == v_._type ) {
@@ -239,6 +246,7 @@ public:
 	}
 	template<typename tType>
 	tType& get( void ) {
+		M_ASSERT( _type != INVALID );
 		M_ASSERT((
 			_type == yaal::trait::find_type<
 				tType,
@@ -251,6 +259,7 @@ public:
 	}
 	template<typename tType>
 	tType const& get( void ) const {
+		M_ASSERT( _type != INVALID );
 		M_ASSERT((
 			_type == yaal::trait::find_type<
 				tType,
