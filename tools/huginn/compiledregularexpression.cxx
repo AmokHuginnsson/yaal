@@ -104,7 +104,12 @@ private:
 		char const n[] = "CompiledRegularExpression.contructor";
 		verify_arg_count( n, values_, 1, 1, position_ );
 		verify_arg_type( n, values_, 0, HHuginn::TYPE::STRING, true, position_ );
-		HCompiledRegularExpression::regex_t regex( make_resource<HRegex>( get_string( values_[0] ), HRegex::COMPILE::NO_EXCEPTION ) );
+		HCompiledRegularExpression::regex_t regex(
+			make_resource<HRegex>(
+				get_string( values_[0] ),
+				HRegex::COMPILE::EXTENDED | HRegex::COMPILE::NO_EXCEPTION
+			)
+		);
 		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( regex->is_valid() ) {
 			v = make_pointer<HCompiledRegularExpression>( this, yaal::move( regex ) );
