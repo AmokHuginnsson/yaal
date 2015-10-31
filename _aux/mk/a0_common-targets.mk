@@ -1,5 +1,5 @@
 #phony targets
-.PHONY: all bin check clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge static stats uninstall
+.PHONY: all bin check clean clean-dep cov debug dep distclean doc install install-environment mrproper relassert reldeb release prof purge spell static stats uninstall
 
 all: $(TARGET)
 

@@ -85,3 +85,6 @@ check: $(SRCS) $(HDRS)
 		$(call invoke, $(CPPCHECK_CMD)) ; \
 	fi
 
+spell: $(SRCS) $(HDRS)
+	@cd $(DIR_ROOT) && codespell -e iso8859-2 -q 7 $(SRCS) $(HDRS)
+
