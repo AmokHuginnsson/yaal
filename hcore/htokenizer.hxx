@@ -75,7 +75,7 @@ private:
 	friend class HIterator;
 };
 
-/*! \brief Interface for itertion thru tokens from given string.
+/*! \brief Interface for itertion through tokens from given string.
  */
 class HTokenizer::HIterator {
 	typedef HTokenizer::HIterator this_type;

@@ -83,7 +83,7 @@ protected:
 	                            only in single line mode */
 	bool _password;        /*!< should be entered text visible */
 	int  _maxStringSize;   /*!< maximum length of text in widget */
-	int  _cursorPosition;  /*!< cursor position relative to widget begining */
+	int  _cursorPosition;  /*!< cursor position relative to widget beginning */
 	int  _widgetOffset;   /*!< when content is bigger than widget size
 	                            this variable keeps offset of first
 	                            character shown */

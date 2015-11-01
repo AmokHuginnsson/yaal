@@ -91,12 +91,13 @@ public:
 	}
 	bool normalize( void ) {
 		M_PROLOG
-		value_type lenght = norm();
+		value_type length = norm();
 		bool normalized( false );
-		if ( lenght != 0 ) {
+		if ( length != 0 ) {
 			int long size = _data.size();
-			for ( int long i = 0; i < size; ++ i )
-				_data[ i ] /= lenght;
+			for ( int long i = 0; i < size; ++ i ) {
+				_data[ i ] /= length;
+			}
 			normalized = true;
 		}
 		return ( normalized );
@@ -117,8 +118,9 @@ public:
 		M_PROLOG
 		if ( &vector_ != this ) {
 			int long size( vector_._data.size() );
-			if ( _data.size() && size )
+			if ( _data.size() && size ) {
 				check_dimensions( size );
+			}
 			HVector tmp( vector_ );
 			swap( tmp );
 		}

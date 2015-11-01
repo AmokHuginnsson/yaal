@@ -464,7 +464,7 @@ int long HStreamInterface::semantic_read(
 	}
 	if ( ! ( nRead || byDelim ) ) {
 		do {
-			/* Let's check if next read wont exceed size of our read buffer.
+			/* Let's check if next read won't exceed size of our read buffer.
 			 * 1 byte or terminating zero and one byte for at least one new character,
 			 * hence + 2 in condition.
 			 */
@@ -478,7 +478,7 @@ int long HStreamInterface::semantic_read(
 			/* nRead can be one of the following:
 			 * nRead > 0 - a successful read, we shall check for stop char and possibly continue reading.
 			 * nRead == 0 - stream is blocking and has just been closed or has no data to read and is internally non-blocking.
-			 * nRead < 0 - an error occured, read opration could be externally interrupted.
+			 * nRead < 0 - an error occurred, read opration could be externally interrupted.
 			 */
 		} while ( ( nRead > 0 ) /* We increment _offset only if read succeeded. */
 				&& ( ! ( byDelim = ( ::memchr( set_, buffer[ _offset ++ ], static_cast<size_t>( setLen ) ) ? isStopSet_ : ! isStopSet_ ) ) )

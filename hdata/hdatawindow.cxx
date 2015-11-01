@@ -148,7 +148,7 @@ bool HDataWindow::handler_add_new( hconsole::HEvent const& ) {
 	M_PROLOG
 	if ( _documentMode != DOCUMENT::VIEW ) {
 		_statusBar->message( COLORS::FG_BRIGHTRED, "%s",
-				_( "You cannot add new rocord now." ) );
+				_( "You cannot add new record now." ) );
 		return ( true );
 	}
 	_mode = HCRUDDescriptor::MODE::INSERT;

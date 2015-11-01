@@ -43,7 +43,7 @@ namespace hcore {
 /*! \brief Network socket primitive.
  *
  * HSocket implements both server (listening) and client (connecting)
- * network connectivity and data tranfer operations.
+ * network connectivity and data transfer operations.
  */
 class HSocket : public HRawFile {
 public:

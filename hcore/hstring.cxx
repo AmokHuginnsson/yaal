@@ -186,7 +186,7 @@ void HString::reserve( int long preallocate_ ) {
 	if ( ( preallocate_ < 0 ) || ( preallocate_ > MAX_STRING_LENGTH ) ) {
 		M_THROW( _( "bad new buffer size requested" ), preallocate_ );
 	}
-	/* Increase requested buffer size to accomodate space terminating NIL. */
+	/* Increase requested buffer size to accommodate space terminating NIL. */
 	++ preallocate_;
 	int long oldAllocBytes( GET_ALLOC_BYTES );
 	if ( preallocate_ > oldAllocBytes ) {
@@ -940,22 +940,21 @@ int long HString::find_last( char char_, int long before_ ) const {
 		return ( npos );
 	}
 	char const* str( static_cast<char const*>( ::memrchr( MEM, char_, static_cast<size_t>( before_ + 1 ) ) ) );
-	if ( ! str )
-		return ( npos );
-	return ( static_cast<int long>( str - MEM ) );
+	return ( str ? static_cast<int long>( str - MEM ) : npos );
 	M_EPILOG
 }
 
 HString& HString::replace( HString const& pattern_,
 		HString const& with_ ) {
 	M_PROLOG
-	if ( pattern_.is_empty() )
+	if ( pattern_.is_empty() ) {
 		return ( *this );
+	}
 	int long lenPattern( pattern_.get_length() );
 	int long lenWith( with_.get_length() );
 	int long subWP( lenWith - lenPattern );
 	int long index( 0 );
-	if ( subWP == 0 ) { /* replacement is equal lenght to pattern */
+	if ( subWP == 0 ) { /* replacement is equal length to pattern */
 		while ( ( index = find( pattern_, index ) ) != npos ) {
 			::std::strncpy( MEM + index, with_.raw(), static_cast<size_t>( lenWith ) );
 			index += lenPattern;
@@ -1178,8 +1177,9 @@ HString& HString::trim( char const* const set_ ) {
 
 HString& HString::shift_left( int long shift_ ) {
 	M_PROLOG
-	if ( shift_ < 0 )
-		M_THROW( "bad left shift lenght", shift_ );
+	if ( shift_ < 0 ) {
+		M_THROW( "bad left shift length", shift_ );
+	}
 	if ( shift_ ) {
 		if ( shift_ < GET_SIZE ) {
 			SET_SIZE( GET_SIZE - shift_ );
@@ -1193,8 +1193,9 @@ HString& HString::shift_left( int long shift_ ) {
 
 HString& HString::shift_right( int long shift_, char const filler_ ) {
 	M_PROLOG
-	if ( shift_ < 0 )
-		M_THROW( "bad right shift lenght", shift_ );
+	if ( shift_ < 0 ) {
+		M_THROW( "bad right shift length", shift_ );
+	}
 	if ( shift_ ) {
 		int long oldSize( GET_SIZE );
 		int long newSize( oldSize + shift_ );

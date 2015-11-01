@@ -74,7 +74,7 @@ namespace {
 
 int hunt_tty( int offset_ ) {
 	M_PROLOG
-	/* this hack allows to guess current controling virtual terminal screen */
+	/* this hack allows to guess current controlling virtual terminal screen */
 	int vC( 0 );
 	char const* ttyName( ttyname( STDIN_FILENO ) );
 	if ( ttyName && ! ::strncmp( ttyName, "/dev/ttyv", static_cast<size_t>( 8 + offset_ ) ) )
@@ -87,8 +87,9 @@ int hunt_tty( int offset_ ) {
 				vC = lexical_cast<int>( ptr + 4 + offset_ );
 			else if ( ( ptr = ::strstr( ttyName, ".pts" ) ) )
 				vC = lexical_cast<int>( ptr + 4 + offset_ );
-		} else
-			throw HConsoleException( "cannot find controling virtual console", errno );
+		} else {
+			throw HConsoleException( "cannot find controlling virtual console", errno );
+		}
 	}
 	return ( vC );
 	M_EPILOG
@@ -248,11 +249,12 @@ int x_mouse_open( void ) {
 
 	set_env( "NCURSES_GPM_TERMS", "" );
 	mmask_t mouseMask( mousemask( desiredMouseMask, NULL ) );
-	if ( ! mouseMask )
+	if ( ! mouseMask ) {
 		throw HMouseException( "mousemask() returned 0", errno );
+	}
 	else if ( ( mouseMask & strictlyRequiredMask ) < strictlyRequiredMask ) {
 		HString error;
-		error.format( "could not set up apropriate mask: B1C = %lu, B2C = %lu, B3C = %lu, B1DC = %lu",
+		error.format( "could not set up appropriate mask: B1C = %lu, B2C = %lu, B3C = %lu, B1DC = %lu",
 				mouseMask & BUTTON1_CLICKED, mouseMask & BUTTON2_CLICKED,
 				mouseMask & BUTTON3_CLICKED, mouseMask & BUTTON1_DOUBLE_CLICKED );
 		throw ( HMouseException( error ) );

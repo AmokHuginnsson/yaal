@@ -242,8 +242,9 @@ HSocket::ptr_t HSocket::accept( void ) {
 	socket->_needShutdown = true;
 	socket->set_timeout( _timeout );
 	::memcpy( socket->_address, address, static_cast<size_t>( addressSize ) );
-	if ( _clients->find( fileDescriptor ) != _clients->end() )
-		M_THROW( _( "inconsitent client list state" ), fileDescriptor );
+	if ( _clients->find( fileDescriptor ) != _clients->end() ) {
+		M_THROW( _( "inconsistent client list state" ), fileDescriptor );
+	}
 	_clients->insert( make_pair( fileDescriptor, socket ) );
 	return ( socket );
 	M_EPILOG

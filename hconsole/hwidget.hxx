@@ -113,9 +113,9 @@ protected:
 	 * three cases keeps label (widget title)
 	 * color, low byte keeps work place color */
 	//@{
-	OAttribute _attributeDisabled; /*!< The attribute of disabled cotrol. */
-	OAttribute _attributeEnabled;  /*!< The attribute of enabled cotrol. */
-	OAttribute _attributeFocused;  /*!< The attribute of focused cotrol. */
+	OAttribute _attributeDisabled; /*!< The attribute of disabled control. */
+	OAttribute _attributeEnabled;  /*!< The attribute of enabled control. */
+	OAttribute _attributeFocused;  /*!< The attribute of focused control. */
 	//@}
 	int _row;       /*!< Widget top coordinate relative
 	                     to parent window (top or bottom border). */
@@ -183,7 +183,7 @@ public:
  * Set focus if widget is enabled or if shortcut char is specified.
  *
  * \param shortcut - Alphanumeric portion of keypress event that possibly holds shortcut to this widget.
- * \return True iff focus was successfuly switched to this widget.
+ * \return True iff focus was successfully switched to this widget.
  */
 	virtual bool set_focus( char shortcut = 0 ); /* focused and shortcut char match */
 
@@ -236,7 +236,7 @@ public:
  *
  * All mouse input for this widget shall be handled inside this method call.
  *
- * \param eventdesc - Full description of mouse event that occured in this widget.
+ * \param eventdesc - Full description of mouse event that occurred in this widget.
  * \return Return true iff click action was handled in whole by this widget.
  */
 	bool click( mouse::OMouse& eventdesc );

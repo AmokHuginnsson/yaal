@@ -390,7 +390,7 @@ int HOpenSSL::check_err( int code ) const {
 			else if ( code == -1 )
 				buffer = strerror( errno );
 			else
-				buffer = "unknown problem occured!";
+				buffer = "unknown problem occurred!";
 		} else
 			openssl_helper::format_error_message( buffer, errTop );
 		throw HOpenSSLException( buffer );

@@ -47,7 +47,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hterminal.hxx"
 #include "hconsole.hxx"
 
-/* curses system header is poluted with huge number of macros
+/* curses system header is polluted with huge number of macros
  * though it cannot be included at the top together with rest of sane
  * system headers. */
 
@@ -349,7 +349,7 @@ void HConsole::enter_curses( void ) {
 	static short const colors[] = { COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
 		COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
 /*	def_shell_mode(); */
-/* this is done automaticly by initscr(), read man next time */
+/* this is done automatically by initscr(), read man next time */
 	if ( ! _initialized ) {
 		init();
 	}
@@ -403,8 +403,10 @@ void HConsole::enter_curses( void ) {
 					<< ( ( mouse::mouse_open == mouse::x_mouse_open ) ? _( "using ncurses mouse support, at fd(" ) : _( "using console mouse support, at fd(" ) )
 					<< _mouseDes << ')' << endl;
 			} else if ( _useMouse_ == USE_MOUSE::YES ) {
-				M_THROW( _( "mouse is console type"
-							" and we did not recived file descriptor" ), errno );
+				M_THROW(
+					_( "mouse is console type and we did not received file descriptor" ),
+					errno
+				);
 			}
 		} catch ( HConsoleException const& ) {
 			if ( _useMouse_ == USE_MOUSE::YES ) {

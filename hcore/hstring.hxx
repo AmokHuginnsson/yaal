@@ -159,13 +159,13 @@ public:
 	HString( char const* const str );
 	/*! \brief Construct string based on const iterator pair.
 	 *
-	 * first_ - begining of the character range to copy.
+	 * first_ - beginning of the character range to copy.
 	 * last_ - one past the end of character range to copy.
 	 */
 	HString( const_iterator first_, const_iterator last_ );
 	/*! \brief Construct string based on iterator pair.
 	 *
-	 * first_ - begining of the character range to copy.
+	 * first_ - beginning of the character range to copy.
 	 * last_ - one past the end of character range to copy.
 	 */
 	HString( iterator first_, iterator last_ );
@@ -323,9 +323,9 @@ public:
 	 * \return Maximum number of characters that can be stored in any string.
 	 */
 	int long get_max_size( void ) const;
-	/*! \brief Get iterator pointing to begining (a first character) of this string.
+	/*! \brief Get iterator pointing to beginning (a first character) of this string.
 	 *
-	 * \return Iterator pointing to begining of this string.
+	 * \return Iterator pointing to beginning of this string.
 	 */
 	iterator begin( void );
 	/*! \brief Get iterator pointing to end (one past last character) of this string.
@@ -333,9 +333,9 @@ public:
 	 * \return Iterator pointing to end (terminating \0) of this string.
 	 */
 	iterator end( void );
-	/*! \brief Get iterator pointing to begining (a first character) of this string.
+	/*! \brief Get iterator pointing to beginning (a first character) of this string.
 	 *
-	 * \return Iterator pointing to begining of this string.
+	 * \return Iterator pointing to beginning of this string.
 	 */
 	const_iterator begin( void ) const;
 	/*! \brief Get iterator pointing to end (one past last character) of this string.
@@ -420,7 +420,7 @@ public:
 	HString& assign( HString const& str, int long offset = 0, int long length = npos );
 	/*! \brief Erase old content and assign a range of characters to this string.
 	 *
-	 * first_ - begining of the character range to copy.
+	 * first_ - beginning of the character range to copy.
 	 * last_ - one past the end of character range to copy.
 	 */
 	HString& assign( const_iterator first_, const_iterator last_ );
@@ -451,7 +451,7 @@ public:
 	 */
 	int long find( HString const& str, int long offset = 0 ) const;
 	int long nfind( HString const&, int long, int long = 0 ) const;
-	/*! \brief Find distance from the end of last occurance of given character.
+	/*! \brief Find distance from the end of last occurrence of given character.
 	 *
 	 * HString::reverse_find() is really 100% equivalent of HString::find() on reversed string,
 	 * which means that given character is search from the end and returned index is counted
@@ -464,13 +464,13 @@ public:
 	 * \param distance from the end to given character if given character can be found or HString::npos otherwise.
 	 */
 	int long reverse_find( char character, int long before = 0 ) const;
-	/*! \brief Find index of last occurence of given character.
+	/*! \brief Find index of last occurrence of given character.
 	 *
 	 * This method is totally different than HString::reverse_find().
 	 *
 	 * \param character - look for position of this character in this string.
 	 * \param before - assume that this string is only that long.
-	 * \return index of last occurence of given character if given character can be found or HString::npos otherwise.
+	 * \return index of last occurrence of given character if given character can be found or HString::npos otherwise.
 	 */
 	int long find_last( char character, int long before = npos ) const;
 	int long find_one_of( char const*, int long = 0 ) const;
@@ -479,9 +479,9 @@ public:
 	int long find_other_than( char const*, int long = 0 ) const;
 	int long reverse_find_other_than( char const*, int long = 0 ) const;
 	int long find_last_other_than( char const*, int long = npos ) const;
-	/*! \brief Replace each occurence of given pattern with replacement.
+	/*! \brief Replace each occurrence of given pattern with replacement.
 	 *
-	 * \param pattern - search and replace all occurences of this pattern.
+	 * \param pattern - search and replace all occurrences of this pattern.
 	 * \param replacement - use this string as a replacement for given pattern.
 	 * \return Self.
 	 */
@@ -538,7 +538,7 @@ public:
 	HString& reverse( void );
 	/*! \brief Get substring of this string by start position and length.
 	 *
-	 * \param start - position for begining of a substring.
+	 * \param start - position for beginning of a substring.
 	 * \param length - length of a substring.
 	 * \return Substring.
 	 */
@@ -553,7 +553,7 @@ public:
 	 *
 	 * mid() is really an alias for substr().
 	 *
-	 * \param start - position for begining of a substring.
+	 * \param start - position for beginning of a substring.
 	 * \param length - length of a substring.
 	 * \return Substring.
 	 */
@@ -595,7 +595,7 @@ public:
 	 * \param count - fill that many bytes.
 	 * \return Self.
 	 */
-	HString& fill( char value = '\0', int long position = 0, int long lenght = npos );
+	HString& fill( char value = '\0', int long position = 0, int long length = npos );
 	/*! \brief Fill portion of string with constatnt value and finish with \0 (zero) byte.
 	 *
 	 * \param value - use this value as a filler.
@@ -621,7 +621,7 @@ public:
 	/*! \brief Insert given string at given position.
 	 *
 	 * \param pos - position where given string has to be inserted.
-	 * \param len - lenght of string to be inserted.
+	 * \param len - length of string to be inserted.
 	 * \param str - string to be inserted.
 	 * \return Self.
 	 *
@@ -639,7 +639,7 @@ public:
 	 *
 	 * \param pos - position where given string has to be inserted.
 	 * \param str - string to be inserted.
-	 * \param len - lenght of string to be inserted.
+	 * \param len - length of string to be inserted.
 	 * \return Self.
 	 *
 	 * \pre \e str real length must not be smaller than \e len.
@@ -671,7 +671,7 @@ public:
 	HString& append( char const* const, int long len_ );
 	/*! \brief Append new data from a range of characters to already existing data in this string.
 	 *
-	 * first_ - begining of the character range to copy.
+	 * first_ - beginning of the character range to copy.
 	 * last_ - one past the end of character range to copy.
 	 */
 	HString& append( const_iterator first_, const_iterator last_ );

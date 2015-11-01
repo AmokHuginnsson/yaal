@@ -186,7 +186,7 @@ void HSignalService::stop( void ) {
 		 * man for raise() is full of shit
 		 * raise( SIG_NO ) is NOT equivalent for kill( getpid(), SIG_NO )
 		 * with respect to multi-thread environment at least
-		 * all hail to IBM Signal Managment documentation.
+		 * all hail to IBM Signal Management documentation.
 		 */
 		M_ENSURE( hcore::system::kill( hcore::system::getpid(), SIGURG ) == 0 );
 		reset_signal_low( SIGALRM );
@@ -361,7 +361,7 @@ int HBaseSignalHandlers::signal_HUP( int signum_ ) {
 int HBaseSignalHandlers::signal_TERM( int signum_ ) {
 	M_PROLOG
 	HString message;
-	message = "Process was explictly killed: ";
+	message = "Process was explicitly killed: ";
 	message += strsignal( signum_ );
 	message += '.';
 	log( LOG_LEVEL::INFO ) << message << endl;

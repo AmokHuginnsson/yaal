@@ -60,7 +60,7 @@ public:
 
 /*! \brief Construct new randomizer.
  *
- * \param stateFirst_ - begining of pseudo-random number generator initial state range.
+ * \param stateFirst_ - beginning of pseudo-random number generator initial state range.
  * \param stateLast_ - one past the end of pseudo-random number generator initial state range.
  * \param range - upper limit for generated number.
  */

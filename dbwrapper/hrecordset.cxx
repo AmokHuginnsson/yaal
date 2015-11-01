@@ -52,7 +52,7 @@ HRecordSet::HRecordSet( database_ptr_t dataBase_,
 	if ( ( _cursor == CURSOR::RANDOM_ACCESS ) && ( get_size() < 0 ) )
 		log( LOG_LEVEL::ERROR ) << "SQL error (query): " << (_connector->dbrs_error)( _dataBase->_dbLink, _result ) << endl;
 	if ( get_field_count() < 0 )
-		log( LOG_LEVEL::ERROR ) << "SQL error (fiels count): " << (_connector->dbrs_error)( _dataBase->_dbLink, _result ) << endl;
+		log( LOG_LEVEL::ERROR ) << "SQL error (fields count): " << (_connector->dbrs_error)( _dataBase->_dbLink, _result ) << endl;
 	return;
 	M_EPILOG
 }

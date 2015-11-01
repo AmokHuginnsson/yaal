@@ -45,11 +45,11 @@ public:
 	typedef HSearchableWidget this_type;
 	typedef HWidget base_type;
 protected:
-	bool _searchable;		/*!< are items searchable */
-	bool _searchActived;	/*!< should we highlight last search */
-	bool _filtered;			/*!< is content of list filtered thru pattern */
-	bool _backwards;			/*!< last search direction */
-	HPattern	_pattern;	/*!< used for searching */
+	bool _searchable;    /*!< are items searchable */
+	bool _searchActived; /*!< should we highlight last search */
+	bool _filtered;      /*!< is content of list filtered through pattern */
+	bool _backwards;     /*!< last search direction */
+	HPattern _pattern;   /*!< used for searching */
 public:
 	HSearchableWidget( HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
 	virtual ~HSearchableWidget( void );

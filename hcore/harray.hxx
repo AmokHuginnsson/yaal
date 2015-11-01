@@ -179,7 +179,7 @@ public:
 	}
 	/*! \brief Moving constructor.
 	 *
-	 * \param arr_ - array whose whole data should be transfered to this newly created array.
+	 * \param arr_ - array whose whole data should be transferred to this newly created array.
 	 */
 	HArray( HArray&& arr_ )
 		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
@@ -495,7 +495,7 @@ public:
 	 *
 	 * \tparam iterator_t - Type of iterator pair defining an input range.
 	 *
-	 * \param first - begining of the range of values to copy into this array.
+	 * \param first - beginning of the range of values to copy into this array.
 	 * \param last - one past the end of the range of values to copy into this array.
 	 */
 	template<typename iterator_t>
@@ -525,7 +525,7 @@ public:
 	 * \tparam iterator_t - Type of iterator pair defining an input range.
 	 *
 	 * \param pos_ - insert values from given range at this position in array.
-	 * \param first_ - begining of the range of values to insert into this array.
+	 * \param first_ - beginning of the range of values to insert into this array.
 	 * \param last_ - one past the end of the range of values to insert into this array.
 	 */
 	template<typename iterator_t>
@@ -606,7 +606,7 @@ public:
 	 * Part of array to be removed is defined by pair of valid iterators
 	 * forming a range in this array.
 	 *
-	 * \param first_ - begining of range of elements to be removed from array.
+	 * \param first_ - beginning of range of elements to be removed from array.
 	 * \param last_ - one past the end of range of elements to be removed from array.
 	 * \return Iterator pointing to first element after removed range.
 	 */
@@ -632,7 +632,7 @@ public:
 	}
 	/*! \brief Remove element at given position.
 	 *
-	 * \param it - postion of the element to be removed from array.
+	 * \param it - position of the element to be removed from array.
 	 * \return Iterator pointing to element directly after the removed one.
 	 */
 	iterator erase( iterator it ) {

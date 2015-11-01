@@ -96,7 +96,7 @@ public:
 	 * \param ownership - shall this file object take ownership of this low level stream.
 	 */
 	HFile( void* raw, OWNERSHIP::ownership_t ownership );
-	/*! \brief Create new file stream and open file item immediatelly.
+	/*! \brief Create new file stream and open file item immediately.
 	 *
 	 * \param path - path to file item to be opened.
 	 * \param mode - open mode.

@@ -37,7 +37,7 @@ namespace hconsole {
 
 /*! \brief Implementation of TUI Menu control class.
  *
- * Menu control displays menu and automatically spawns apropriate actions.
+ * Menu control displays menu and automatically spawns appropriate actions.
  */
 class HMenuWidget : public HTreeWidget {
 public:

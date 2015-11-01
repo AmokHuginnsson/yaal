@@ -143,7 +143,7 @@ int HPattern::parse( HString const& pattern_, pluggable_flags_t* externalFlags )
 	}
 /* FIXME g++ 4.3 bug *///		flags_[ i ] &= FLAG_MASK;
 /* end of clearing */
-/* look for switches at the beginnig of pattern */
+/* look for switches at the beginning of pattern */
 	int long ctr( 0 );
 	int err( 0 );
 	while ( pattern[ ctr ] == '\\' ) {

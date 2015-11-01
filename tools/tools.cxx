@@ -82,7 +82,7 @@ extern char _transTableStripPL_ [ 256 ];
 
 namespace {
 
-/* return true means error occured, false - every thing ok */
+/* return true means error occurred, false - everything ok */
 bool set_tools_variables( HString& option_, HString& value_ ) {
 	M_PROLOG
 	bool fail( false );

@@ -43,7 +43,7 @@ public:
 	/*! \brief Create closed file stream object.
 	 */
 	HLockedFile( void );
-	/*! \brief Create new file stream and open file item immediatelly.
+	/*! \brief Create new file stream and open file item immediately.
 	 *
 	 * \param path - path to file item to be opened.
 	 * \param mode - open mode.

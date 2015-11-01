@@ -232,7 +232,7 @@ void HWidget::do_draw_label( void ) {
 	M_PROLOG
 	HConsole& cons = HConsole::get_instance();
 	schedule_repaint();
-/* reposition widget acordingly to current parent window size */
+/* reposition widget accordingly to current parent window size */
 	_rowRaw = ( _row >= 0 ) ? _row : cons.get_height() + _row;
 	_columnRaw = ( _column >= 0 ) ? _column
 		: cons.get_width() + _column;

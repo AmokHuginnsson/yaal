@@ -110,7 +110,7 @@ int HCollector::send_line( char const* line_ ) {
 			length & 0x0ff, cRC & 0x0ff, localCopy.raw() );
 	::memset( _readBuf, 0, RECV_BUF_SIZE );
 	length += static_cast<int>( ::strlen( PROTOCOL::DTA ) );
-	length += ( 2 /* for lenght */ + 2 /* for crc */ + 1 /* for newline */ );
+	length += ( 2 /* for length */ + 2 /* for crc */ + 1 /* for newline */ );
 	while ( ::strncmp( _readBuf, PROTOCOL::ACK, ::strlen( PROTOCOL::ACK ) ) ) {
 		flush( TCOFLUSH );
 		ctr = HRawFile::write( line.raw(), length );
@@ -143,7 +143,7 @@ int HCollector::receive_line( HString& line_ ) {
 		}
 		flush( TCIFLUSH );
 		line_ = _line;
-		line_.shift_left(	static_cast<int long>( ::strlen( PROTOCOL::DTA ) ) + 2 /* for lenght */ + 2 /* for crc */ );
+		line_.shift_left(	static_cast<int long>( ::strlen( PROTOCOL::DTA ) ) + 2 /* for length */ + 2 /* for crc */ );
 		length = line_.get_length() - 1;
 		for ( ctr = 0; ctr < length; ctr ++ )
 			cRC += line_[ ctr ];
@@ -176,14 +176,14 @@ int HCollector::establish_connection ( int timeOut_ ) {
 	 Either waiting part runs before initializing part (the easy case),
 	 or initializing part runs before waiting part (here comes the trouble).
 */
-	int lenght = static_cast<int>( ::strlen( PROTOCOL::SYN ) ), error = -1;
+	int length = static_cast<int>( ::strlen( PROTOCOL::SYN ) ), error = -1;
 	if ( _fileDescriptor < 0 )
 		M_THROW( _error_, _fileDescriptor );
 	::memset( _readBuf, 0, RECV_BUF_SIZE );
 	while ( ::strncmp( _readBuf, PROTOCOL::ACK, ::strlen( PROTOCOL::ACK ) ) ) {
 		flush( TCOFLUSH );
-		if ( HRawFile::write( PROTOCOL::SYN, lenght ) != lenght )
-			M_THROW( "write", lenght );
+		if ( HRawFile::write( PROTOCOL::SYN, length ) != length )
+			M_THROW( "write", length );
 		wait_for_eot();
 		if ( tcsendbreak( _fileDescriptor, 0 ) )
 			M_THROW( "tcsendbreak", errno );
@@ -202,7 +202,7 @@ int HCollector::establish_connection ( int timeOut_ ) {
 int HCollector::wait_for_connection ( int timeOut_ ) {
 	M_PROLOG
 	int error = - 1;
-	int lenght = static_cast<int>( ::strlen( PROTOCOL::ACK ) );
+	int length = static_cast<int>( ::strlen( PROTOCOL::ACK ) );
 	if ( _fileDescriptor < 0 )
 		M_THROW ( _error_, _fileDescriptor );
 	::memset( _readBuf, 0, RECV_BUF_SIZE );
@@ -212,7 +212,7 @@ int HCollector::wait_for_connection ( int timeOut_ ) {
 		else
 			return ( -1 );
 	}
-	error += static_cast<int>( lenght - HRawFile::write( PROTOCOL::ACK, lenght ) );
+	error += static_cast<int>( length - HRawFile::write( PROTOCOL::ACK, length ) );
 	log( LOG_LEVEL::DEBUG ) << "Collector: Connected ! (wait)" << endl;
 	return ( error );
 	M_EPILOG

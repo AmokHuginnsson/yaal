@@ -170,7 +170,7 @@ struct plus : public binary_function<tType, tType, tType> {
 
 /*! \brief Meta function function minus operator.
  *
- * \tparam tType - type of substracted objects.
+ * \tparam tType - type of subtracted objects.
  */
 template<typename tType>
 struct minus : public binary_function<tType, tType, tType> {
@@ -241,7 +241,7 @@ struct negate : public unary_function<tType, tType> {
 		{ return ( - val_ ); }
 };
 
-/*! \brief Generic equality comparision operator.
+/*! \brief Generic equality comparison operator.
  *
  * \tparam tType - type of compared objects.
  */
@@ -258,7 +258,7 @@ struct equal_to : public binary_function<bool, tType, tType> {
 	}
 };
 
-/*! \brief Generic non equality comparision operator.
+/*! \brief Generic non equality comparison operator.
  *
  * \tparam tType - type of compared objects.
  */

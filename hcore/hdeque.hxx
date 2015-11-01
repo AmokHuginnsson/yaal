@@ -280,9 +280,9 @@ public:
 		return ( _chunks.get<value_type*>()[ itemIndex / VALUES_PER_CHUNK][ itemIndex % VALUES_PER_CHUNK ] );
 	}
 
-	/*! \brief Add element at in the begining of this deque.
+	/*! \brief Add element at in the beginning of this deque.
 	 *
-	 * \param value_ - element to be added in the begining of this deque.
+	 * \param value_ - element to be added in the beginning of this deque.
 	 */
 	void push_front( type_t const& value_ ) {
 		M_PROLOG
@@ -421,7 +421,7 @@ public:
 	 *
 	 * \tparam iterator_t - Type of iterator pair defining an input range.
 	 *
-	 * \param first - begining of the range of values to copy into this deque.
+	 * \param first - beginning of the range of values to copy into this deque.
 	 * \param last - one past the end of the range of values to copy into this deque.
 	 */
 	template<typename iterator_t>
@@ -432,7 +432,7 @@ public:
 	void insert( iterator, int long, type_t const& );
 	/*! \brief Remove element at given position.
 	 *
-	 * \param it - postion of the element to be removed from deque.
+	 * \param it - position of the element to be removed from deque.
 	 * \return Iterator pointing to element directly after the removed one.
 	 */
 	iterator erase( iterator it ) {
@@ -447,7 +447,7 @@ public:
 	 * Part of deque to be removed is defined by pair of valid iterators
 	 * forming a range in this deque.
 	 *
-	 * \param first_ - begining of range of elements to be removed from deque.
+	 * \param first_ - beginning of range of elements to be removed from deque.
 	 * \param last_ - one past the end of range of elements to be removed from deque.
 	 * \return Iterator pointing to first element after removed range.
 	 */

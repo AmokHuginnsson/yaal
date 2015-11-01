@@ -249,7 +249,7 @@ class M_CONCAT( AtEndOfScope, __LINE__ ) { public: M_CONCAT( AtEndOfScope, __LIN
 #else /* #if defined( HAVE_DECL_TEMP_FAILURE_RETRY ) && ( HAVE_DECL_TEMP_FAILURE_RETRY == 1 ) */
 #	define M_TEMP_FAILURE_RETRY( expr ) ( expr )
 #endif /* #else #if defined( HAVE_DECL_TEMP_FAILURE_RETRY ) && ( HAVE_DECL_TEMP_FAILURE_RETRY == 1 ) */
-/*! \brief Convinience macro to obtain number of elements of declared array.
+/*! \brief Convenience macro to obtain number of elements of declared array.
  */
 #define countof( array ) ( yaal::meta::integer_cast<int, sizeof ( yaal::YaalArrayElementCountHelper( ( array ) ) )>::value )
 

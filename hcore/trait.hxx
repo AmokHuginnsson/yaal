@@ -295,11 +295,11 @@ struct select_index {
 					typename ternary<index == 20, t20_t, no_type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type type;
 };
 
-/*! \brief Count occurences of a type.
+/*! \brief Count occurrences of a type.
  *
  * \tparam t0_t, t1_t, ..., t9_t - list of types to search.
- * \tparam tType - look for number of occurences of this type in given type set.
- * \retval value - number of occurences of given type in given list of types.
+ * \tparam tType - look for number of occurrences of this type in given type set.
+ * \retval value - number of occurrences of given type in given list of types.
  */
 template<typename tType, typename t0_t, typename t1_t = no_type,
 	typename t2_t = no_type, typename t3_t = no_type,

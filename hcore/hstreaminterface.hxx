@@ -96,7 +96,7 @@ protected:
 	HString _wordCache; /*!< Cache for operator >> () and operator << (). */
 	int _fill; /*!< Fill character for output operations. */
 	int _width; /*!< Next output operation width. */
-	int _precision; /*!< Set number of siginificant digits to display for all subsequent outputs of floating point type values. */
+	int _precision; /*!< Set number of significant digits to display for all subsequent outputs of floating point type values. */
 	BASES _base;
 	FLOAT_FORMAT _floatFormat;
 	ADJUST _adjust;

@@ -43,10 +43,10 @@ Copyright:
 
 namespace yaal {
 
-/*! \brief Find first occurence of given value in given range of elements.
+/*! \brief Find first occurrence of given value in given range of elements.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \param v - look for this value in given range.
  * \return iterator pointing to found value or end of range.
  */
@@ -59,8 +59,8 @@ inline iterator_t find( iterator_t it, iterator_t end, value_t const& v ) {
 
 /*! \brief Find first element in range that meets a given condition.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \param cond - condition which must be satified.
  * \return iterator pointing to found element or end of range.
  */
@@ -71,10 +71,10 @@ inline iterator_t find_if( iterator_t it, iterator_t end, condition_t cond ) {
 	return ( it );
 }
 
-/*! \brief Find first occurence of value from given set in given range of elements.
+/*! \brief Find first occurrence of value from given set in given range of elements.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \param first2_ - beginning of range of elements to look in.
  * \param last2_ - one past the end of range of elements to look in.
  * \return iterator pointing to found value or end of range.
@@ -88,10 +88,10 @@ inline iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_,
 	return ( it );
 }
 
-/*! \brief Find first occurence of value from given set in given range of elements, using condition to match elements.
+/*! \brief Find first occurrence of value from given set in given range of elements, using condition to match elements.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \param first2_ - beginning of range of elements to look in.
  * \param last2_ - one past the end of range of elements to look in.
  * \param cond_ - use condition for matching elements.
@@ -109,10 +109,10 @@ inline iterator_t find_first_of( iterator_t it, iterator_t end, iter2_t first2_,
 	return ( it );
 }
 
-/*! \brief Find first occurence of value that is not in given set of values in given range of elements.
+/*! \brief Find first occurrence of value that is not in given set of values in given range of elements.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \param first2_ - beginning of range of elements to look in.
  * \param last2_ - one past the end of range of elements to look in.
  * \return iterator pointing to found value or end of range.
@@ -126,10 +126,10 @@ inline iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t firs
 	return ( it );
 }
 
-/*! \brief Find first occurence of value that is not in given set of values in given range of elements, using condition to match elements.
+/*! \brief Find first occurrence of value that is not in given set of values in given range of elements, using condition to match elements.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \param first2_ - beginning of range of elements to look in.
  * \param last2_ - one past the end of range of elements to look in.
  * \param cond_ - use condition for matching elements.
@@ -147,12 +147,12 @@ inline iterator_t find_first_not_of( iterator_t it, iterator_t end, iter2_t firs
 	return ( it );
 }
 
-/*! \brief Count number of occurences of element in range.
+/*! \brief Count number of occurrences of element in range.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \param v - look for this value in given range.
- * \return Number of occurences of v in range.
+ * \return Number of occurrences of v in range.
  */
 template<typename iterator_t, typename value_t>
 inline int long count( iterator_t it, iterator_t end, value_t const& v ) {
@@ -166,8 +166,8 @@ inline int long count( iterator_t it, iterator_t end, value_t const& v ) {
 
 /*! \brief Count number of element meeting a predicate in range.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \param cond - condition which must be satified.
  * \return Number of elements in range that satify a given condition.
  */
@@ -183,7 +183,7 @@ inline int long count_if( iterator_t it, iterator_t end, condition_t cond ) {
 
 /*! \brief For each element in range pass its value into function.
  *
- * \param it - begining of the range.
+ * \param it - beginning of the range.
  * \param end - one past the end of range.
  * \param CALL - invoke this function and pass values from range to it.
  */
@@ -195,9 +195,9 @@ inline void for_each( iterator_t it, iterator_t const& end, call_t CALL ) {
 
 /*! \brief Replace elements in destination container by transformed elements from source range.
  *
- * \param it - begining of source range.
+ * \param it - beginning of source range.
  * \param end - one past the end of source range.
- * \param dst - begining of destination container.
+ * \param dst - beginning of destination container.
  * \param op - transforming operation, an unary function.
  * \return one past end of output range.
  */
@@ -210,9 +210,9 @@ inline dst_iter_t transform( src_iter_t it, src_iter_t end, dst_iter_t dst, oper
 
 /*! \brief Replace elements in destination container by transformed elements, from source range, that are not equal to some value.
  *
- * \param it - begining of source range.
+ * \param it - beginning of source range.
  * \param end - one past the end of source range.
- * \param dst - begining of destination container.
+ * \param dst - beginning of destination container.
  * \param skip_ - value that should be skipped while performing range transformation.
  * \param op - transforming operation, an unary function.
  * \return one past end of output range.
@@ -230,9 +230,9 @@ inline dst_iter_t remove_transform( src_iter_t it, src_iter_t end, dst_iter_t ds
 
 /*! \brief Replace elements in destination container by transformed elements, from source range, that do not satisfy some predicate.
  *
- * \param it - begining of source range.
+ * \param it - beginning of source range.
  * \param end - one past the end of source range.
- * \param dst - begining of destination container.
+ * \param dst - beginning of destination container.
  * \param predicate_ - predicate used to filter out unwantted elements.
  * \param op - transforming operation, an unary function.
  * \return one past end of output range.
@@ -250,9 +250,9 @@ inline dst_iter_t remove_transform_if( src_iter_t it, src_iter_t end, dst_iter_t
 
 /*! \brief Replace elements in destination container by elements from source range conditionaly transformed.
  *
- * \param it - begining of source range.
+ * \param it - beginning of source range.
  * \param end - one past the end of source range.
- * \param dst - begining of destination container.
+ * \param dst - beginning of destination container.
  * \param op - transforming operation, an unary function.
  * \param cond - condition that has to be met to perform a transformation.
  * \return one past end of output range.
@@ -270,10 +270,10 @@ inline dst_iter_t transform_if( src_iter_t it, src_iter_t end, dst_iter_t dst, o
 
 /*! \brief Replace elements in destination container by elements resulting from transformation of elements from source range and another container.
  *
- * \param it - begining of source range.
+ * \param it - beginning of source range.
  * \param end - one past the end of source range.
- * \param arg - begining of second source container.
- * \param dst - begining of destination container.
+ * \param arg - beginning of second source container.
+ * \param dst - beginning of destination container.
  * \param op - transforming operation, a binary function.
  * \return end of output range.
  */
@@ -284,8 +284,8 @@ inline dst_iter_t transform( src_iter_t it, src_iter_t end, arg_iter_t arg, dst_
 	return ( dst );
 }
 
-/*! \brief Replace all occurences of given value in range with new value.
- * \param it - begining of range to modify.
+/*! \brief Replace all occurrences of given value in range with new value.
+ * \param it - beginning of range to modify.
  * \param end - one past the end of range to modify.
  * \param oldVal_ - old value that shall to be replaced.
  * \param newVal_ - a value that shall replace old values.
@@ -299,8 +299,8 @@ inline void replace( iterator_t it, iterator_t end, value_t const& oldVal_, valu
 	return;
 }
 
-/*! \brief Replace all occurences of values in range fulfilling given predicate with new value.
- * \param it - begining of range to modify.
+/*! \brief Replace all occurrences of values in range fulfilling given predicate with new value.
+ * \param it - beginning of range to modify.
  * \param end - one past the end of range to modify.
  * \param predicate_ - a predicate to fulfill so a value could be replaced.
  * \param newVal_ - a value that shall replace old values.
@@ -314,10 +314,10 @@ inline void replace_if( iterator_t it, iterator_t end, predicate_t predicate_, v
 	return;
 }
 
-/*! \brief Copies one range onto the another but with replacing all occurences of given value with new value.
- * \param it - begining of range to copy.
+/*! \brief Copies one range onto the another but with replacing all occurrences of given value with new value.
+ * \param it - beginning of range to copy.
  * \param end - one past the end of range to copy.
- * \param out_ - begining of output range.
+ * \param out_ - beginning of output range.
  * \param oldVal_ - old value that shall to be replaced.
  * \param newVal_ - a value that shall replace old values.
  */
@@ -332,10 +332,10 @@ inline void replace_copy( iterator_t it, iterator_t end, output_iterator_t out, 
 	return;
 }
 
-/*! \brief Copies one range onto the another but with replacing all occurences of value satifying a given predicate with new value.
- * \param it - begining of range to copy.
+/*! \brief Copies one range onto the another but with replacing all occurrences of value satifying a given predicate with new value.
+ * \param it - beginning of range to copy.
  * \param end - one past the end of range to copy.
- * \param out_ - begining of output range.
+ * \param out_ - beginning of output range.
  * \param predicate_ - replace all elements that satify this predicate.
  * \param newVal_ - a value that shall replace old values.
  */
@@ -352,9 +352,9 @@ inline void replace_copy_if( iterator_t it, iterator_t end, output_iterator_t ou
 
 /*! \brief Copy range of values onto another range.
  *
- * \param src - begining of source range of elements.
+ * \param src - beginning of source range of elements.
  * \param end - one past the end of source range of elements.
- * \param dst - begining of destination range.
+ * \param dst - beginning of destination range.
  * \return one past end of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
@@ -366,10 +366,10 @@ inline dst_it_t copy( src_it_t src, src_it_t const& end, dst_it_t dst ) {
 
 /*! \brief Copy range of values onto another range.
  *
- * \param first - begining of source range of elements.
+ * \param first - beginning of source range of elements.
  * \param last - one past the end of source range of elements.
  * \param dst - one past end of destination range.
- * \return begining of destination range.
+ * \return beginning of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
 inline dst_it_t copy_backward( src_it_t const& first, src_it_t last, dst_it_t dst ) {
@@ -385,9 +385,9 @@ inline dst_it_t copy_backward( src_it_t const& first, src_it_t last, dst_it_t ds
 
 /*! \brief Copy given number of elements from range of values onto another range.
  *
- * \param src - begining of source range of elements.
+ * \param src - beginning of source range of elements.
  * \param count - number of elements to copy.
- * \param dst - begining of destination range.
+ * \param dst - beginning of destination range.
  * \return one past end of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
@@ -399,9 +399,9 @@ inline dst_it_t copy_n( src_it_t src, int long count, dst_it_t dst ) {
 
 /*! \brief Move range of values onto another range.
  *
- * \param src - begining of source range of elements.
+ * \param src - beginning of source range of elements.
  * \param end - one past the end of source range of elements.
- * \param dst - begining of destination range.
+ * \param dst - beginning of destination range.
  * \return one past end of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
@@ -414,10 +414,10 @@ inline dst_it_t move( src_it_t src, src_it_t const& end, dst_it_t dst ) {
 
 /*! \brief Move range of values onto another range.
  *
- * \param first - begining of source range of elements.
+ * \param first - beginning of source range of elements.
  * \param last - one past the end of source range of elements.
  * \param dst - one past end of destination range.
- * \return begining of destination range.
+ * \return beginning of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
 inline dst_it_t move_backward( src_it_t const& first, src_it_t last, dst_it_t dst ) {
@@ -434,9 +434,9 @@ inline dst_it_t move_backward( src_it_t const& first, src_it_t last, dst_it_t ds
 
 /*! \brief Move given number of elements from range of values onto another range.
  *
- * \param src - begining of source range of elements.
+ * \param src - beginning of source range of elements.
  * \param count - number of elements to move.
- * \param dst - begining of destination range.
+ * \param dst - beginning of destination range.
  * \return one past end of destination range.
  */
 template<typename src_it_t, typename dst_it_t>
@@ -447,9 +447,9 @@ inline dst_it_t move_n( src_it_t src, int long count, dst_it_t dst ) {
 	return ( dst );
 }
 
-/*! \brief Remove all occurences of given value from range.
+/*! \brief Remove all occurrences of given value from range.
  *
- * \param first_ - begining of range of elements to filter.
+ * \param first_ - beginning of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
  * \param value_ - a value to be removed.
  * \return new end of range - none of elements in resulting range meet a condition.
@@ -471,7 +471,7 @@ inline iterator_t remove( iterator_t first_, iterator_t const& last_, value_t va
 
 /*! \brief Remove elements meeting a predicate from range.
  *
- * \param first_ - begining of range of elements to filter.
+ * \param first_ - beginning of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
  * \param condition_ - a predicate that element must fulfill to be removed.
  * \return new end of range - none of elements in resulting range meet a condition.
@@ -493,9 +493,9 @@ inline iterator_t remove_if( iterator_t first_, iterator_t const& last_, conditi
 
 /*! \brief Copy elements all elements not equal to given value from one range to another.
  *
- * \param first_ - begining of range of elements to filter.
+ * \param first_ - beginning of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
- * \param res_ - begining of output range.
+ * \param res_ - beginning of output range.
  * \param value_ - elements not equal to this value will be copied..
  * \return end of output range - none of elements in resulting range are equal to given value.
  */
@@ -512,9 +512,9 @@ inline iter2_t remove_copy( iter1_t first_, iter1_t const& last_, iter2_t res_, 
 
 /*! \brief Copy elements that do not meet given predicate from first one to another.
  *
- * \param first_ - begining of range of elements to filter.
+ * \param first_ - beginning of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
- * \param res_ - begining of output range.
+ * \param res_ - beginning of output range.
  * \param condition_ - a predicate that element must fulfill to be removed.
  * \return end of output range - none of elements in resulting range meet a condition.
  */
@@ -531,9 +531,9 @@ inline iter2_t remove_copy_if( iter1_t first_, iter1_t const& last_, iter2_t res
 
 /*! \brief Checks if two ranges are of same size and have same set of values.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \param end2 - one past last element of second range.
  * \param equity - an element equity predicate that has to be met for all compared elements.
  * \return true if and only if ranges have same size and same contents.
@@ -547,9 +547,9 @@ inline bool safe_equal( iter1_t it1, iter1_t end1, iter2_t it2, iter2_t end2, eq
 
 /*! \brief Checks if two ranges are of same size and have same set of values.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \param end2 - one past last element of second range.
  * \return true if and only if ranges have same size and same contents.
  */
@@ -570,12 +570,12 @@ inline bool search_try_subsequence( iter1_t it1, iter1_t end1, iter2_t it2, iter
 /*! \condend */
 
 /*! \brief Search for sequence of elements in another sequence.
- * \param first1 - begining of sequence that we search thru.
- * \param last1 - one past the end of sequence that we search thru.
- * \param first2 - begining of sequence that we are looking for.
+ * \param first1 - beginning of sequence that we search through.
+ * \param last1 - one past the end of sequence that we search through.
+ * \param first2 - beginning of sequence that we are looking for.
  * \param last2 - one past the end of the sequence that we are looking for.
  * \param equity - a predicate that shall be met for elements in respective ranges.
- * \return Begining of found sequence or one past the end of sequence that we searched thru.
+ * \return Beginning of found sequence or one past the end of sequence that we searched through.
  */
 template<typename iter1_t, typename iter2_t, typename equity_t>
 inline iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t last2, equity_t equity ) {
@@ -586,11 +586,11 @@ inline iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t la
 }
 
 /*! \brief Search for sequence of elements in another sequence.
- * \param first1 - begining of sequence that we search thru.
- * \param last1 - one past the end of sequence that we search thru.
- * \param first2 - begining of sequence that we are looking for.
+ * \param first1 - beginning of sequence that we search through.
+ * \param last1 - one past the end of sequence that we search through.
+ * \param first2 - beginning of sequence that we are looking for.
  * \param last2 - one past the end of the sequence that we are looking for.
- * \return Begining of found sequence or one past the end of sequence that we searched thru.
+ * \return Beginning of found sequence or one past the end of sequence that we searched through.
  */
 template<typename iter1_t, typename iter2_t>
 inline iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t last2 ) {
@@ -599,9 +599,9 @@ inline iter1_t search( iter1_t first1, iter1_t last1, iter2_t first2, iter2_t la
 
 /*! \brief Checks if two ranges have same set of values.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \return true if and only if ranges have same size and same contents.
  */
 template<typename iter1_t, typename iter2_t>
@@ -613,9 +613,9 @@ inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2 ) {
 
 /*! \brief Checks if two ranges are equivalent according to some predicate.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \param predicate_ - a predicate to test, an equity equivalence.
  * \return true if and only if ranges have same size and same contents.
  */
@@ -628,11 +628,11 @@ inline bool equal( iter1_t it1, iter1_t end1, iter2_t it2, predicate_t predicate
 
 /*! \brief Checks if one range is lexicographicaly before another range.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \param end2 - one past last element of second range.
- * \param compare - comparision function.
+ * \param compare - comparison function.
  * \return true if and only if first range is lexicographicaly before second range.
  */
 template<typename iter1_t, typename iter2_t, typename compare_t>
@@ -645,9 +645,9 @@ inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, ite
 
 /*! \brief Checks if one range is lexicographicaly before another range.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \param end2 - one past last element of second range.
  * \return true if and only if first range is lexicographicaly before second range.
  */
@@ -661,9 +661,9 @@ inline bool lexicographical_compare( iter1_t it1, iter1_t end1, iter2_t it2, ite
 
 /*! \brief Find first difference in ranges values or difference in range sizes.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \param end2 - one past last element of second range.
  * \return A pair of iteators which point to first differentiating element.
  */
@@ -676,9 +676,9 @@ inline yaal::hcore::HPair<iter1_t, iter2_t> safe_mismatch( iter1_t it1, iter1_t 
 
 /*! \brief Find first difference in ranges of values.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \return A pair of iteators which point to first differentiating element.
  */
 template<typename iter1_t, typename iter2_t>
@@ -690,9 +690,9 @@ inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1,
 
 /*! \brief Find first difference in ranges of values.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past last element of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \param predicate_ - a predicate to test a differences with.
  * \return A pair of iteators which point to first differentiating element.
  */
@@ -704,10 +704,10 @@ inline yaal::hcore::HPair<iter1_t, iter2_t> mismatch( iter1_t it1, iter1_t end1,
 }
 
 /*! \brief Rotate range of elements, or "swap" two consecutive ranges of elements.
- * \param first_ - begining of range to rotate, or begining of first range to "swap".
- * \param mid_ - the rotation point, or one past end of first range to "swap" and begining of the second range.
+ * \param first_ - beginning of range to rotate, or beginning of first range to "swap".
+ * \param mid_ - the rotation point, or one past end of first range to "swap" and beginning of the second range.
  * \param last_ - one past end of range to rotate, or one past end of the second range to "swap".
- * \return A rotation point that could be used to revert the operation, or new begining of new second range.
+ * \return A rotation point that could be used to revert the operation, or new beginning of new second range.
  */
 template<typename iterator_t>
 inline iterator_t rotate( iterator_t first_, iterator_t mid_, iterator_t last_ ) {
@@ -730,11 +730,11 @@ inline iterator_t rotate( iterator_t first_, iterator_t mid_, iterator_t last_ )
 }
 
 /*! \brief Rotate range of elements, or "swap" two consecutive ranges of elements storing result in another range.
- * \param first_ - begining of range to rotate, or begining of first range to "swap".
- * \param mid_ - the rotation point, or one past end of first range to "swap" and begining of the second range.
+ * \param first_ - beginning of range to rotate, or beginning of first range to "swap".
+ * \param mid_ - the rotation point, or one past end of first range to "swap" and beginning of the second range.
  * \param last_ - one past end of range to rotate, or one past end of the second range to "swap".
- * \param out_ - begining of detination range.
- * \return A rotation point that could be used to revert the operation, or new begining of new second range.
+ * \param out_ - beginning of detination range.
+ * \return A rotation point that could be used to revert the operation, or new beginning of new second range.
  */
 template<typename iterator_t, typename out_it_t>
 inline out_it_t rotate_copy( iterator_t first_, iterator_t mid_, iterator_t last_, out_it_t out_ ) {
@@ -786,10 +786,10 @@ inline iterator_t lower_bound( iterator_t first_, iterator_t last_, value_t cons
  *
  * \pre Range first_ - last_ must be ordered in given order.
  *
- * \param first_ - begining of ordered range to search through.
+ * \param first_ - beginning of ordered range to search through.
  * \param last_ - one past the end of ordered range to search through.
  * \param value_ - lower bound value.
- * \param comp_ - comparision operator that defines order.
+ * \param comp_ - comparison operator that defines order.
  * \return First position in range where value could be inserted without violating ordering.
  */
 template<typename iterator_t, typename value_t, typename compare_t>
@@ -801,7 +801,7 @@ inline iterator_t lower_bound( iterator_t first_, iterator_t last_, value_t cons
  *
  * \pre Range first_ - last_ must be ordered.
  *
- * \param first_ - begining of ordered range to search through.
+ * \param first_ - beginning of ordered range to search through.
  * \param last_ - one past the end of ordered range to search through.
  * \param value_ - lower bound value.
  * \return First position in range where value could be inserted without violating ordering.
@@ -854,10 +854,10 @@ inline iterator_t upper_bound( iterator_t first_, iterator_t last_, value_t cons
  *
  * \pre Range first_ - last_ must be ordered in given order.
  *
- * \param first_ - begining of ordered range to search through.
+ * \param first_ - beginning of ordered range to search through.
  * \param last_ - one past the end of ordered range to search through.
  * \param value_ - upper bound value.
- * \param comp_ - comparision operator that defines order.
+ * \param comp_ - comparison operator that defines order.
  * \return Last position in range where value could be inserted without violating ordering.
  */
 template<typename iterator_t, typename value_t, typename compare_t>
@@ -869,7 +869,7 @@ inline iterator_t upper_bound( iterator_t first_, iterator_t last_, value_t cons
  *
  * \pre Range first_ - last_ must be ordered.
  *
- * \param first_ - begining of ordered range to search through.
+ * \param first_ - beginning of ordered range to search through.
  * \param last_ - one past the end of ordered range to search through.
  * \param value_ - upper bound value.
  * \return Last position in range where value could be inserted without violating ordering.
@@ -928,7 +928,7 @@ inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& v
 
 /*! \brief Verify if Given value exists in ordered (where order is given) range.
  *
- * \param first_ - begining of ordered range to search through.
+ * \param first_ - beginning of ordered range to search through.
  * \param last_ - one past the end of ordered range to search through.
  * \param value_ - value to look for in ordered range.
  * \param comp_ - comparator operator that defines order.
@@ -941,7 +941,7 @@ inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& v
 
 /*! \brief Verify if Given value exists in ordered range.
  *
- * \param first_ - begining of ordered range to search through.
+ * \param first_ - beginning of ordered range to search through.
  * \param last_ - one past the end of ordered range to search through.
  * \param value_ - value to look for in ordered range.
  * \return True iff given value is present in given ordered range.
@@ -953,9 +953,9 @@ inline bool binary_search( iterator_t first_, iterator_t last_, value_t const& v
 
 /*! \brief Swap contents (values) of two ranges of elements.
  *
- * \param first - begining of first range.
+ * \param first - beginning of first range.
  * \param end - one past the end of first range.
- * \param second - begining of second range.
+ * \param second - beginning of second range.
  */
 template<typename iterator_t>
 inline void swap_ranges( iterator_t first, iterator_t const& end, iterator_t second ) {
@@ -976,12 +976,12 @@ inline void swap_ranges( first_it_t first, first_it_t const& end, second_it_t se
 
 /*! \brief Joins two sorted ranges of elements into one sorted range of elements.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past the end of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \param end2 - one past the end of second range.
  * \param out - destination container extender functor.
- * \param comp_ - comparision operator.
+ * \param comp_ - comparison operator.
  */
 template<typename iter_in1_t, typename iter_in2_t, typename iter_out_t, typename compare_t>
 inline iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_in2_t end2, iter_out_t out, compare_t comp_ ) {
@@ -995,9 +995,9 @@ inline iter_out_t merge( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, iter_i
 
 /*! \brief Joins two sorted ranges of elements into one sorted range of elements.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past the end of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \param end2 - one past the end of second range.
  * \param out - destination container extender functor.
  */
@@ -1066,10 +1066,10 @@ inline void inplace_merge_impl( iterator_t first_, iterator_t mid_, iterator_t l
 
 /*! \brief Merges in place two consecutive sorted ranges of elements into one sorted range of elements.
  *
- * \param first_ - begining of first range.
+ * \param first_ - beginning of first range.
  * \param mid_ - one past the end of first range and beginning of second range.
  * \param last_ - end of second range.
- * \param comp_ - comparision operator.
+ * \param comp_ - comparison operator.
  */
 template<typename iterator_t, typename compare_t>
 inline void inplace_merge( iterator_t first_, iterator_t mid_, iterator_t last_, compare_t comp_ ) {
@@ -1085,7 +1085,7 @@ inline void inplace_merge( iterator_t first_, iterator_t mid_, iterator_t last_,
 
 /*! \brief Merges in place two consecutive sorted ranges of elements into one sorted range of elements.
  *
- * \param first_ - begining of first range.
+ * \param first_ - beginning of first range.
  * \param mid_ - one past the end of first range and beginning of second range.
  * \param last_ - end of second range.
  */
@@ -1097,9 +1097,9 @@ inline void inplace_merge( iterator_t first_, iterator_t mid_, iterator_t last_ 
 
 /*! \brief Create union of two sorted ranges of elements.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past the end of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \param end2 - one past the end of second range.
  * \param out - destination container extender functor.
  */
@@ -1134,9 +1134,9 @@ inline iter_out_t set_union( iter_in1_t it1, iter_in1_t end1, iter_in2_t it2, it
 
 /*! \brief Create intersection of two sorted ranges of elements.
  *
- * \param it1 - begining of first range.
+ * \param it1 - beginning of first range.
  * \param end1 - one past the end of first range.
- * \param it2 - begining of second range.
+ * \param it2 - beginning of second range.
  * \param end2 - one past the end of second range.
  * \param out - destination container extender functor.
  */
@@ -1156,7 +1156,7 @@ inline iter_out_t set_intersection( iter_in1_t it1, iter_in1_t end1, iter_in2_t 
 
 /*! \brief Fill range of elements with given value.
  *
- * \param it - begining of range to fill.
+ * \param it - beginning of range to fill.
  * \param end - one past the end of range.
  * \param filler - value to be set for all elements in range.
  */
@@ -1169,7 +1169,7 @@ inline void fill( dst_it_t it, dst_it_t end, filler_t const& filler ) {
 
 /*! \brief Fill specified amount of elements with given value.
  *
- * \param it - begining of range to fill.
+ * \param it - beginning of range to fill.
  * \param count - amount of elements to set.
  * \param filler - value to be set for all elements in range.
  */
@@ -1182,7 +1182,7 @@ inline void fill_n( dst_it_t it, int long count, filler_t const& filler ) {
 
 /*! \brief Fill specified range with run-time generated values.
  *
- * \param it - begining of the range.
+ * \param it - beginning of the range.
  * \param end - one past last element in range.
  * \param generator - function object that creates new values for range.
  */
@@ -1195,7 +1195,7 @@ inline void generate( iterator_t it, iterator_t const& end, generator_t generato
 
 /*! \brief Fill specified range with n run-time generated values.
  *
- * \param it - begining of the container.
+ * \param it - beginning of the container.
  * \param count - numer of the elements to be generated.
  * \param generator - function object that creates new values for range.
  */
@@ -1208,7 +1208,7 @@ inline void generate_n( iterator_t it, int long count, generator_t generator ) {
 
 /*! \brief Reverses order of elements in range.
  *
- * \param it - begining of range of elemnts to be reverted.
+ * \param it - beginning of range of elemnts to be reverted.
  * \param end - one past last element of range to be reverted.
  */
 template<typename iterator_t>
@@ -1229,7 +1229,7 @@ inline void reverse( iterator_t it, iterator_t end ) {
 
 /*! \brief Generate next, in lexographical order, permutation of the range of elements.
  *
- * \param it - begining of range of elemnts for permutation.
+ * \param it - beginning of range of elemnts for permutation.
  * \param end - one past last element of range for permutation.
  * \return true iff last, in lexographical order, permutation has been generated.
  */
@@ -1270,7 +1270,7 @@ inline bool next_permutation( iterator_t it, iterator_t end ) {
 
 /*! \brief Generate previous, in lexographical order, permutation of the range of elements.
  *
- * \param it - begining of range of elemnts for permutation.
+ * \param it - beginning of range of elemnts for permutation.
  * \param end - one past last element of range for permutation.
  * \return true iff first, in lexographical order, permutation has been generated.
  */
@@ -1311,7 +1311,7 @@ inline bool prev_permutation( iterator_t it, iterator_t end ) {
 
 /*! \brief Calculate sum of elements in range.
  *
- * \param it - begining of range of elemnts to summed up.
+ * \param it - beginning of range of elemnts to summed up.
  * \param end - one past last element of range to be summed up.
  * \param ret - starting value for sum operation.
  * \return Sum of all elements in [it, end) + ret.
@@ -1325,7 +1325,7 @@ inline return_t accumulate( iterator_t it, iterator_t end, return_t ret ) {
 
 /*! \brief Calculate generalized sum of elements in range.
  *
- * \param it - begining of range of elemnts to summed up.
+ * \param it - beginning of range of elemnts to summed up.
  * \param end - one past last element of range to be summed up.
  * \param ret - starting value for sum operation.
  * \param oper - operator used to calculate generalized sum.
@@ -1343,9 +1343,9 @@ inline return_t accumulate( iterator_t it, iterator_t end, return_t ret, operato
  * Calculate inner product of two ranges as sum of products of respective pairs
  * of elements from both ranges.
  *
- * \param itLeft - begining of first range of elemnts to calculate inner product.
+ * \param itLeft - beginning of first range of elemnts to calculate inner product.
  * \param endLeft - one past last element of first range to calculate inner product.
- * \param itRight - begining of second range of elemnts to calculate inner product.
+ * \param itRight - beginning of second range of elemnts to calculate inner product.
  * \param endRight - one past last element of second range to calculate inner product.
  * \param ret - starting value for sum operation.
  * \return Inner product of all elements in ranges [itLeft, endLeft) and [itRight, endRight) + ret.
@@ -1364,9 +1364,9 @@ inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
  * as generalized sum of generalized products of respective pairs
  * of elements from both ranges.
  *
- * \param itLeft - begining of first range of elemnts to calculate inner product.
+ * \param itLeft - beginning of first range of elemnts to calculate inner product.
  * \param endLeft - one past last element of first range to calculate inner product.
- * \param itRight - begining of second range of elemnts to calculate inner product.
+ * \param itRight - beginning of second range of elemnts to calculate inner product.
  * \param endRight - one past last element of second range to calculate inner product.
  * \param ret - starting value for sum operation.
  * \param sumator - generalized sum operator.
@@ -1385,8 +1385,8 @@ inline return_t inner_product( iter_left_t itLeft, iter_left_t endLeft,
 
 /*! \brief Find minimum element in a range.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \return iterator pointing to found position or end of range.
  */
 template<typename iterator_t>
@@ -1402,8 +1402,8 @@ inline iterator_t min_element( iterator_t it, iterator_t end ) {
 
 /*! \brief Find element in a range that is best with respect to some predicate.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \param pred - predicate to test.
  * \return iterator pointing to found position or end of range.
  */
@@ -1430,8 +1430,8 @@ tType min( std::initializer_list<tType> constants_ ) {
 
 /*! \brief Find maximum element in a range.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \return iterator pointing to found position or end of range.
  */
 template<typename iterator_t>
@@ -1447,8 +1447,8 @@ inline iterator_t max_element( iterator_t it, iterator_t end ) {
 
 /*! \brief Find element in a range that is best with respect to some predicate.
  *
- * \param it - begining of the range to search thru.
- * \param end - one past the end of the range to search thru.
+ * \param it - beginning of the range to search through.
+ * \param end - one past the end of the range to search through.
  * \param pred - predicate to test.
  * \return iterator pointing to found position or end of range.
  */
@@ -1479,9 +1479,9 @@ inline tType abs( tType const& val ) {
 
 /*! \brief Make heap from range of elements.
  *
- * \param first_ - begining of the heap.
+ * \param first_ - beginning of the heap.
  * \param last_ - one past the end of the heap.
- * \param comp_ - comparision operator.
+ * \param comp_ - comparison operator.
  */
 template<typename iterator_t, typename compare_t>
 inline void make_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
@@ -1511,7 +1511,7 @@ inline void make_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 
 /*! \brief Make heap from range of elements.
  *
- * \param first_ - begining of the heap.
+ * \param first_ - beginning of the heap.
  * \param last_ - one past the end of the heap.
  */
 template<typename iterator_t>
@@ -1522,9 +1522,9 @@ inline void make_heap( iterator_t first_, iterator_t last_ ) {
 
 /*! \brief Add element to the heap.
  *
- * \param first_ - begining of the heap.
+ * \param first_ - beginning of the heap.
  * \param last_ - one past the end of the heap and new element at the same time.
- * \param comp_ - comparision operator.
+ * \param comp_ - comparison operator.
  */
 template<typename iterator_t, typename compare_t>
 inline void push_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
@@ -1538,7 +1538,7 @@ inline void push_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 
 /*! \brief Add element to the heap.
  *
- * \param first_ - begining of the heap.
+ * \param first_ - beginning of the heap.
  * \param last_ - one past the end of the heap and new element at the same time.
  */
 template<typename iterator_t>
@@ -1549,9 +1549,9 @@ inline void push_heap( iterator_t first_, iterator_t last_ ) {
 
 /*! \brief Retrieve top element from the heap.
  *
- * \param first_ - begining of the heap.
+ * \param first_ - beginning of the heap.
  * \param last_ - one past the end of the heap.
- * \param comp_ - comparision operator.
+ * \param comp_ - comparison operator.
  */
 template<typename iterator_t, typename compare_t>
 inline void pop_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
@@ -1582,7 +1582,7 @@ inline void pop_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 
 /*! \brief Retrieve top element from the heap.
  *
- * \param first_ - begining of the heap.
+ * \param first_ - beginning of the heap.
  * \param last_ - one past the end of the heap.
  */
 template<typename iterator_t>
@@ -1593,9 +1593,9 @@ inline void pop_heap( iterator_t first_, iterator_t last_ ) {
 
 /*! \brief Test if given range of elements forms a heap.
  *
- * \param first_ - begining of the heap.
+ * \param first_ - beginning of the heap.
  * \param last_ - one past the end of the heap.
- * \param comp_ - comparision operator.
+ * \param comp_ - comparison operator.
  */
 template<typename iterator_t, typename compare_t>
 inline bool is_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
@@ -1624,7 +1624,7 @@ inline bool is_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 
 /*! \brief Test if given range of elements forms a heap.
  *
- * \param first_ - begining of the heap.
+ * \param first_ - beginning of the heap.
  * \param last_ - one past the end of the heap.
  */
 template<typename iterator_t>
@@ -1634,9 +1634,9 @@ inline bool is_heap( iterator_t first_, iterator_t last_ ) {
 
 /*! \brief Turn range of elements that is a heap into a sorted range.
  *
- * \param first_ - begining of the heap.
+ * \param first_ - beginning of the heap.
  * \param last_ - one past the end of the heap.
- * \param comp_ - comparision operator.
+ * \param comp_ - comparison operator.
  */
 template<typename iterator_t, typename compare_t>
 inline void sort_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
@@ -1650,7 +1650,7 @@ inline void sort_heap( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 
 /*! \brief Turn range of elements that is a heap into a sorted range.
  *
- * \param first_ - begining of the heap.
+ * \param first_ - beginning of the heap.
  * \param last_ - one past the end of the heap.
  */
 template<typename iterator_t>
@@ -1661,9 +1661,9 @@ inline void sort_heap( iterator_t first_, iterator_t last_ ) {
 
 /*! \brief Sort range of elements (sorting algorithm is unstable with worst case complexity guarantee O(n*ln(n)) ).
  *
- * \param first_ - begining of the range to be sorted.
+ * \param first_ - beginning of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
- * \param comp_ - comparision operator used for sorting.
+ * \param comp_ - comparison operator used for sorting.
  */
 template<typename iterator_t, typename compare_t>
 inline void heap_sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
@@ -1676,7 +1676,7 @@ inline void heap_sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 
 /*! \brief Sort range of elements (sorting algorithm is unstable with worst case complexity guarantee O(n*ln(n)) ).
  *
- * \param first_ - begining of the range to be sorted.
+ * \param first_ - beginning of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
  */
 template<typename iterator_t>
@@ -1779,9 +1779,9 @@ inline void stable_sort_impl( iterator_t first_, iterator_t last_, compare_t com
 
 /*! \brief Perform stable sort of range of elements (sorting algorithm is unstable).
  *
- * \param first_ - begining of the range to be sorted.
+ * \param first_ - beginning of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
- * \param comp_ - comparision operator used for sorting.
+ * \param comp_ - comparison operator used for sorting.
  */
 template<typename iterator_t, typename compare_t>
 inline void stable_sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
@@ -1808,7 +1808,7 @@ inline void stable_sort( iterator_t first_, iterator_t last_, compare_t comp_ ) 
 
 /*! \brief Perform stable sort of range of elements (sorting algorithm is unstable).
  *
- * \param first_ - begining of the range to be sorted.
+ * \param first_ - beginning of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
  */
 template<typename iterator_t>
@@ -1841,7 +1841,7 @@ inline typename hcore::iterator_traits<iterator_t>::value_type choose_pivot( ite
 
 /*! \brief Partition range of elements according to specified predicate.
  *
- * \param first_ - begining of the range to partition.
+ * \param first_ - beginning of the range to partition.
  * \param last_ - one past the end of the range to partition.
  * \param predicate_ - a predicate according to which partitioning shall be performed.
  * \return Iterator m for which all i in [first_, m) predicate_( *i ) is true and for all i in [m, last_) predicate_( *i ) is false.
@@ -1936,7 +1936,7 @@ inline iterator_t stable_partition_impl( iterator_t first_, iterator_t last_, pr
 
 /*! \brief Partition range of elements according to specified predicate preserving relative order of elements.
  *
- * \param first_ - begining of the range to partition.
+ * \param first_ - beginning of the range to partition.
  * \param last_ - one past the end of the range to partition.
  * \param predicate_ - a predicate according to which partitioning shall be performed.
  * \return Iterator m for which all i in [first_, m) predicate_( *i ) is true and for all i in [m, last_) predicate_( *i ) is false.
@@ -1959,9 +1959,9 @@ inline iterator_t stable_partition( iterator_t first_, iterator_t last_, predica
 
 /*! \brief Sort range of elements (sorting algorithm is unstable with worst case complexity O(n^2) ).
  *
- * \param first_ - begining of the range to be sorted.
+ * \param first_ - beginning of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
- * \param comp_ - comparision operator used for sorting.
+ * \param comp_ - comparison operator used for sorting.
  */
 template<typename iterator_t, typename compare_t>
 inline void sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
@@ -2016,7 +2016,7 @@ inline void sort( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 
 /*! \brief Sort range of elements (sorting algorithm is unstable with worst case complexity O(n^2) ).
  *
- * \param first_ - begining of the range to be sorted.
+ * \param first_ - beginning of the range to be sorted.
  * \param last_ - one past the end of the range to be sorted.
  */
 template<typename iterator_t>
@@ -2027,7 +2027,7 @@ inline void sort( iterator_t first_, iterator_t last_ ) {
 
 /*! \brief Check is given range is sorted according to given ordering.
  *
- * \param first_ - begining of the range to test.
+ * \param first_ - beginning of the range to test.
  * \param last_ - one past the end of the range to test.
  * \param comp_ - definition of the ordering.
  * \return True iff given range is sorted according to given ordering.
@@ -2050,7 +2050,7 @@ inline bool is_sorted( iterator_t first_, iterator_t last_, compare_t comp_ ) {
 
 /*! \brief Check is given range is sorted according to given ordering.
  *
- * \param first_ - begining of the range to test.
+ * \param first_ - beginning of the range to test.
  * \param last_ - one past the end of the range to test.
  * \return True iff given range is sorted according to "<" ordering.
  */
@@ -2061,9 +2061,9 @@ inline bool is_sorted( iterator_t first_, iterator_t last_ ) {
 
 /*! \brief Remove consecutive duplicates from range.
  *
- * \param first_ - begining of range of elements to filter.
+ * \param first_ - beginning of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
- * \param dest_ - begining of destination range.
+ * \param dest_ - beginning of destination range.
  * \param comp_ - uniqeness test predicate.
  */
 template<typename iterator_t, typename iter_out_t, typename compare_t>
@@ -2087,9 +2087,9 @@ inline iterator_t unique_copy( iterator_t first_, iterator_t last_, iter_out_t d
 
 /*! \brief Remove consecutive duplicates from range.
  *
- * \param first_ - begining of range of elements to filter.
+ * \param first_ - beginning of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
- * \param dest_ - begining of destination range.
+ * \param dest_ - beginning of destination range.
  * \param comp_ - uniqeness test predicate.
  */
 template<typename iterator_t, typename iter_out_t>
@@ -2099,7 +2099,7 @@ inline iterator_t unique_copy( iterator_t first_, iterator_t last_, iter_out_t d
 
 /*! \brief Remove consecutive duplicates from range.
  *
- * \param first_ - begining of range of elements to filter.
+ * \param first_ - beginning of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
  * \param comp_ - uniqeness test predicate.
  */
@@ -2110,7 +2110,7 @@ inline iterator_t unique( iterator_t first_, iterator_t last_, compare_t comp_ )
 
 /*! \brief Remove consecutive duplicates from range.
  *
- * \param first_ - begining of range of elements to filter.
+ * \param first_ - beginning of range of elements to filter.
  * \param last_ - one past the end of range of elements to filter.
  */
 template<typename iterator_t>
@@ -2120,7 +2120,7 @@ inline iterator_t unique( iterator_t first_, iterator_t last_ ) {
 
 /*! \brief Randomly shuffle elements in range using given funcion as source of randomness.
  *
- * \param first_ - begining of range of elements to shuffle.
+ * \param first_ - beginning of range of elements to shuffle.
  * \param last_ - one past the end of range of elements to shuffle.
  * \param randomGenerator_ - random number generator used as source of randomness.
  */
@@ -2140,7 +2140,7 @@ inline void random_shuffle( iterator_t first_, iterator_t last_, generator_t ran
 
 /*! \brief Randomly shuffle elements in range.
  *
- * \param first_ - begining of range of elements to shuffle.
+ * \param first_ - beginning of range of elements to shuffle.
  * \param last_ - one past the end of range of elements to shuffle.
  */
 template<typename iterator_t>
@@ -2151,9 +2151,9 @@ inline void random_shuffle( iterator_t first_, iterator_t last_ ) {
 
 /*! \brief Randomly copy subset of elements from one range onto another range using given funcion as source of randomness.
  *
- * \param srcFirst_ - begining of range of elements to copy from.
+ * \param srcFirst_ - beginning of range of elements to copy from.
  * \param srcLast_ - one past the end of range of elements to copy from.
- * \param dstFirst_ - begining of range of elements to copy to.
+ * \param dstFirst_ - beginning of range of elements to copy to.
  * \param dstLast_ - one past the end of range of elements to copy to.
  * \param randomGenerator_ - random number generator used as source of randomness.
  */
@@ -2176,9 +2176,9 @@ inline void random_sample( source_iterator_t srcFirst_, source_iterator_t srcLas
 
 /*! \brief Randomly copy subset of elements from one range onto another range.
  *
- * \param srcFirst_ - begining of range of elements to copy from.
+ * \param srcFirst_ - beginning of range of elements to copy from.
  * \param srcLast_ - one past the end of range of elements to copy from.
- * \param dstFirst_ - begining of range of elements to copy to.
+ * \param dstFirst_ - beginning of range of elements to copy to.
  * \param dstLast_ - one past the end of range of elements to copy to.
  * \param randomGenerator_ - random number generator used as source of randomness.
  */

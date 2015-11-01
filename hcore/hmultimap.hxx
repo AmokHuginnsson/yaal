@@ -202,7 +202,7 @@ public:
 	/*! \brief Erase all elements of given \e key.
 	 *
 	 * \param key_ - erase elements with this key.
-	 * \return number of elements actualy erased.
+	 * \return number of elements actually erased.
 	 */
 	int long erase( key_type const& key_ ) {
 		M_PROLOG

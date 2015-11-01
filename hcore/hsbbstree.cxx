@@ -157,13 +157,13 @@ void HSBBSTreeBase::insert_rebalance( HAbstractNode* node_ ) {
 
 void HSBBSTreeBase::rotate_left( HAbstractNode* node_ ) {
 	/*
-	 * At the beggining of left rotation:
+	 * At the beginning of left rotation:
 	 * node_ is parent node (center of the rotation)
-	 * node_->_right is child node (lets call it satelite)
+	 * node_->_right is child node (lets call it satellite)
 	 *
 	 * At the end of left rotation:
 	 * center of the rotation is left child
-	 * of its satelite
+	 * of its satellite
 	 */
 	HAbstractNode* parent = node_->_parent;
 	HAbstractNode* node = node_->_right;

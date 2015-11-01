@@ -581,7 +581,7 @@ public:
 	void to_number( void ) const;
 	void to_real( void ) const;
 	void to_string( void ) const;
-	/* There is no direct convertion to character. */
+	/* There is no direct conversion to character. */
 private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };

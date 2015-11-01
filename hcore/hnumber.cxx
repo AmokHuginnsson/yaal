@@ -1048,7 +1048,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 				 * We need memory buffer for dividend sample,
 				 * and another one for multiplier sample.
 				 * Assuming divisor has n leafs, a multiplier sample's buffer must
-				 * be able to accomodate n + 1 leafs ( + 1 for possible carrier),
+				 * be able to accommodate n + 1 leafs ( + 1 for possible carrier),
 				 * dividendSample also must provide space for n + 1 leafs.
 				 */
 				HChunk buffer( chunk_size<i32_t>( ( divisorLeafCount + 1 ) * 2 ) );
@@ -1203,7 +1203,7 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 					}
 					/*
 					 * A helper for mutate_addition.
-					 * The substraction is done `in place'.
+					 * The subtraction is done `in place'.
 					 */
 					::memcpy( multiplierSample + 1, divisor, static_cast<size_t>( chunk_size<i32_t>( divisorLeafCount ) ) );
 					multiplierSample[0] = multiply_by_leaf_low( multiplierSample + 1, divisorLeafCount, static_cast<i32_t>( leaf ) );

@@ -139,7 +139,7 @@ struct HXml::OConvert {
 		M_PROLOG
 		xmlCharEncodingHandlerPtr encoder = ::xmlFindCharEncodingHandler( encoding_.raw() );
 		if ( ! encoder ) {
-			M_THROW( _( "cannot enable internal convertion" ), errno );
+			M_THROW( _( "cannot enable internal conversion" ), errno );
 		}
 		_encoder = encoder_resource_t( encoder, xmlCharEncCloseFunc );
 		_iconvToExternal = _encoder->iconv_in;
@@ -166,7 +166,7 @@ struct HXml::OConvert {
 			encoder = xmlGetCharEncodingHandler( encoding );
 		}
 		if ( ! encoder ) {
-			M_THROW( _( "cannot enable internal convertion" ), errno );
+			M_THROW( _( "cannot enable internal conversion" ), errno );
 		}
 		_encoder = encoder_resource_t( encoder, xmlCharEncCloseFunc );
 		_iconvToExternal = _encoder->iconv_in;

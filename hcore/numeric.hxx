@@ -313,8 +313,8 @@ struct ternary<false, value_for_true, value_for_false> {
 
 /*! \brief Check if one value is greater than another.
  *
- * \tparam val1 - first value for comparision.
- * \tparam val2 - second value for comparision.
+ * \tparam val1 - first value for comparison.
+ * \tparam val2 - second value for comparison.
  * \retval value - true iff val1 > val2.
  */
 template<int long long const val1, int long long const val2>
@@ -324,8 +324,8 @@ struct greater {
 
 /*! \brief Check if one value is less than another.
  *
- * \tparam val1 - first value for comparision.
- * \tparam val2 - second value for comparision.
+ * \tparam val1 - first value for comparison.
+ * \tparam val2 - second value for comparison.
  * \retval value - true iff val1 < val2.
  */
 template<int long long const val1, int long long const val2>

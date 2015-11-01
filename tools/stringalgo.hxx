@@ -73,14 +73,14 @@ namespace distance {
  *
  * \param first - first string of a pair of strings to calculate distance.
  * \param second - second string of given pair.
- * \param damerau - use Levenshtein-Damerau definition of string distance if set to true, use Levenshtein definiton otherwise.
+ * \param damerau - use Levenshtein-Damerau definition of string distance if set to true, use Levenshtein definition otherwise.
  * \return calculated Levenshtein(-Damerau) distance between strings.
  */
 int levenshtein_damerau( yaal::hcore::HString const& first, yaal::hcore::HString const& second, bool damerau = true );
 
 /*! \brief Predicate for find_local algorithm.
  *
- * HAlike looks for string most similiar to a given string.
+ * HAlike looks for string most similar to a given string.
  *
  * \tparam iter_t - type of an iterator that will be used to traverse collection.
  * \tparam item_t - type of item to look for.

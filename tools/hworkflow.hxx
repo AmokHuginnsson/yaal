@@ -68,8 +68,8 @@ public:
 	enum class WINDUP_MODE {
 		ABORT,     /*!< Try to interrupt currently running tasks, drop (abort) scheduled tasks, new tasks are rejected. _state -> ABORTING */
 		INTERRUPT, /*!< Interrupt currently running tasks, keep scheduled tasks, new tasks can be scheduled. _state -> INTERRUPTING */
-		SUSPEND,   /*!< Finish currently runing tasks normally, new tasks can be scheduled. _state -> STOPPING */
-		CLOSE      /*!< Finish currently runing tasks normally, new tasks are rejected. _state -> STOPPING */
+		SUSPEND,   /*!< Finish currently running tasks normally, new tasks can be scheduled. _state -> STOPPING */
+		CLOSE      /*!< Finish currently running tasks normally, new tasks are rejected. _state -> STOPPING */
 	};
 
 private:
@@ -109,7 +109,7 @@ public:
 	 */
 	void schedule_task( call_t task, call_t asyncStop = call_t(), want_restart_t wantRestart = want_restart_t() );
 
-	/*! \brief Immediatelly start execution of given task in this worker pool.
+	/*! \brief Immediately start execution of given task in this worker pool.
 	 *
 	 * \param task - task to execute by this worker pool.
 	 * \param asyncStop - how to notify executing task that it should stop its execution.

@@ -580,8 +580,8 @@ namespace {
 void strip_comment( HString& line_ ) {
 	M_PROLOG
 	bool apostrophe = false, quotation = false;
-	int long ctr = 0, lenght = line_.get_length();
-	for ( ctr = 0; ctr < lenght; ctr ++ ) {
+	int long ctr = 0, length = line_.get_length();
+	for ( ctr = 0; ctr < length; ctr ++ ) {
 		switch ( line_[ ctr ] ) {
 			case ( '\'' ):
 				apostrophe = ! apostrophe;
@@ -611,7 +611,7 @@ char const _keyValueSep_[] = " \t=";
 int read_rc_line( HString& option_, HString& value_, HFile& file_,
 		int& line_ ) {
 	M_PROLOG
-	int long index = 0, lenght = 0, end = 0;
+	int long index = 0, length = 0, end = 0;
 	option_ = value_ = "";
 	while ( file_.read_line( option_ ) >= 0 ) {
 		line_ ++;
@@ -625,10 +625,10 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 		/* at this point we know we have _some_ option */
 		strip_comment( option_ );
 		/* strip comment from end of line */
-		lenght = option_.get_length();
+		length = option_.get_length();
 		if ( index ) {
 			option_.shift_left( index );
-			lenght -= index;
+			length -= index;
 		}
 		/* now we look for first key-value separator after option */
 		if ( ( index = option_.find_one_of( _keyValueSep_ ) ) > 0 ) {
@@ -640,13 +640,13 @@ int read_rc_line( HString& option_, HString& value_, HFile& file_,
 				if ( count( option_.raw() + endOfOption, option_.raw() + index, '=' ) > 1 )
 					throw HProgramOptionsHandlerException( "Syntax error: redundant `=' sign.", line_ );
 				/* we have found a non-whitespace, so there certainly is a value */
-				end = ( lenght - 1 ) - option_.reverse_find_other_than( _whiteSpace_.data() );
+				end = ( length - 1 ) - option_.reverse_find_other_than( _whiteSpace_.data() );
 				/* now we strip apostrophe or quotation marks */
 				if ( ( ( option_[ end ] == '\'' )
 							|| ( option_[ end ] == '"' ) )
 						&& ( option_[ end ] == option_[ index ] ) )
 					index ++, end --;
-				if ( ( end + 1 ) < lenght )
+				if ( ( end + 1 ) < length )
 					option_.set_at( end + 1, 0 );
 				value_ = option_.mid( index );
 			}

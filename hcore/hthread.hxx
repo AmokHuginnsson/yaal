@@ -208,7 +208,7 @@ public:
 	 * \return True if working thread is currently running.
 	 */
  	bool is_alive( void ) const;
-	/*! \brief Store information about exception that occured.
+	/*! \brief Store information about exception that occurred.
 	 *
 	 * Using this method cause HThread::finish() to throw a HThreadException.
 	 *

@@ -81,7 +81,7 @@ private:
 	/*! \brief Construct exception object.
 	 *
 	 * \param fileName_ - source code file name where exception has been generated.
-	 * \param line_ - line of code where throw occured.
+	 * \param line_ - line of code where throw occurred.
 	 * \param functionName_ - name of the function that throws this exception.
 	 * \param message_ - an exception description.
 	 * \param code_ - error code.
@@ -233,7 +233,7 @@ struct existing_hier;
 /*! \brief Get superclass in hierarchy if one exists, predefined value otherwise.
  *
  * Access checking is part of substitution process,
- * hence one cannot detect existance of private or protected members types
+ * hence one cannot detect existence of private or protected members types
  * using SFINAE based method.
  */
 template<typename tType>

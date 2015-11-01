@@ -128,7 +128,7 @@ public:
 private:
 	allocator_type _allocator;
 	int long _size;  /*!< how many elements this list contains */
-	HElement* _hook; /*!< "begining" of the list ( "first" element ) */
+	HElement* _hook; /*!< "beginning" of the list ( "first" element ) */
 
 public:
 	typedef class HIterator<type_t> iterator;
@@ -221,7 +221,7 @@ public:
 
 	/*! \brief Creates list, from range of elements.
 	 *
-	 * \param first_ - begining of range to copy into newly created list.
+	 * \param first_ - beginning of range to copy into newly created list.
 	 * \param last_ - one past the end of range to copy into newly created list.
 	 */
 	template<typename iter_t>
@@ -464,7 +464,7 @@ public:
 		M_EPILOG
 	}
 
-	/*! \brief Adds new element at beggining of the list
+	/*! \brief Adds new element at beginning of the list
 	 *
 	 * Newly created element will have default value.
 	 */

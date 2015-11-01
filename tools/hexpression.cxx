@@ -49,7 +49,7 @@ namespace tools {
 
 struct OPERATOR {
 	static int const ADD;
-	static int const SUBSTRACT;
+	static int const SUBTRACT;
 	static int const MULTIPLY;
 	static int const DIVIDE;
 	static int const MODULO;
@@ -57,7 +57,7 @@ struct OPERATOR {
 };
 
 int const OPERATOR::ADD = '+';
-int const OPERATOR::SUBSTRACT = '-';
+int const OPERATOR::SUBTRACT = '-';
 int const OPERATOR::MULTIPLY = '*';
 int const OPERATOR::DIVIDE = '/';
 int const OPERATOR::MODULO = '%';
@@ -317,7 +317,7 @@ double long HExpression::addition( tree_t::const_node_t node_ ) {
 			case ( OPERATOR::ADD ) :
 				leftValue += rightValue;
 			break;
-			case ( OPERATOR::SUBSTRACT ) :
+			case ( OPERATOR::SUBTRACT ) :
 				leftValue -= rightValue;
 			break;
 			default:
@@ -448,11 +448,11 @@ bool HExpression::addition_production( tree_t::node_t node_ ) {
 	}
 	(**node_).METHOD = &HExpression::addition;
 	if ( ( _formula[ _index ] != OPERATOR::ADD )
-			&& ( _formula[ _index ] != OPERATOR::SUBSTRACT ) ) {
+			&& ( _formula[ _index ] != OPERATOR::SUBTRACT ) ) {
 		shorten_the_branch( node_ );
 		return ( false );
 	} while ( ( _formula [ _index ] == OPERATOR::ADD )
-			|| ( _formula [ _index ] == OPERATOR::SUBSTRACT ) ) {
+			|| ( _formula [ _index ] == OPERATOR::SUBTRACT ) ) {
 		(**node_)._variables.push_back( _formula[ _index ++ ] );
 		if ( multiplication_production( &*node_->add_node() ) )
 			return ( true );
@@ -715,7 +715,7 @@ char const* HExpression::get_error( void ) const {
 	M_PROLOG
 	switch ( _error ) {
 		case ( OK ):
-			return ( _( "succesful" ) );
+			return ( _( "successful" ) );
 		case ( UNKNOWN_MNEMONIC ):
 			return ( _( "unknown mnemonic" ) );
 		case ( UNEXPECTED_TERMINATION ):
