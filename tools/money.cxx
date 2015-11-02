@@ -274,7 +274,7 @@ currency_end_t const _currencyEnd_[] = {
 
 char _unit_[][ 12 ] = {
 	"tysi",
-	"milion",
+	"m" "i" "l" "i" "o" "n", /* codespell */
 	"miliard",
 	"bilion",
 	"biliard",
