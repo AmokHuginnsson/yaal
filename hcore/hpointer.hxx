@@ -319,14 +319,14 @@ private:
  * In our case base class has `protected' destructor so this warning
  * makes no sense.
  */
-#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008004
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005
 # pragma GCC diagnostic ignored "-Weffc++"
-#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005 */
 template<typename tType>
 class HPointerObserver final : public HPointerBase<tType> {
-#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008004
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005
 # pragma GCC diagnostic error "-Weffc++"
-#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005 */
 public:
 	typedef HSharedBase<tType> shared_t;
 	HPointerObserver( void )
@@ -400,14 +400,14 @@ public:
  * \tparam pointer_type_t - select pointer type, one of HPointerScalar or HPointerArray.
  * \tparam access_type_t - defines pointer kind, one of HPointerStrict or HPointerWeak.
  */
-#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008004
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005
 # pragma GCC diagnostic ignored "-Weffc++"
-#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005 */
 template<typename tType>
 class HPointer final : public HPointerBase<tType> {
-#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008004
+#if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005
 # pragma GCC diagnostic error "-Weffc++"
-#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4005002 */
+#endif /* #if __GCC_VERSION_LOWER_OR_EQUAL__ <= 4008005 */
 public:
 	typedef typename HPointerBase<tType>::value_type value_type;
 	typedef typename HPointerBase<tType>::reference reference;
