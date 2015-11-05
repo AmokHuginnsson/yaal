@@ -739,51 +739,52 @@ struct call_calculator {
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ),
-						yaal::move( fa9 ), yaal::move( fa10 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ), yaal::forward<fa7_t>( fa7 ), yaal::forward<fa8_t>( fa8 ),
+						yaal::forward<fa9_t>( fa9 ), yaal::forward<fa10_t>( fa10 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ),
-						yaal::move( fa9 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ), yaal::forward<fa7_t>( fa7 ), yaal::forward<fa8_t>( fa8 ),
+						yaal::forward<fa9_t>( fa9 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ), yaal::forward<fa7_t>( fa7 ), yaal::forward<fa8_t>( fa8 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ), yaal::forward<fa7_t>( fa7 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ), yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa1 ), yaal::move( fa2 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ), yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa1 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ), yaal::forward<fa1_t>( fa1 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ) ) );
 		}
 	};
 	struct functor_this {
@@ -811,53 +812,53 @@ struct call_calculator {
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ), yaal::move( fa9 ),
-						yaal::move( fa10 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa0_t>( fa0 ), yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ), yaal::forward<fa7_t>( fa7 ), yaal::forward<fa8_t>( fa8 ), yaal::forward<fa9_t>( fa9 ),
+						yaal::forward<fa10_t>( fa10 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ), yaal::move( fa9 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa0_t>( fa0 ), yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ), yaal::forward<fa7_t>( fa7 ), yaal::forward<fa8_t>( fa8 ), yaal::forward<fa9_t>( fa9 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa0_t>( fa0 ), yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ), yaal::forward<fa7_t>( fa7 ), yaal::forward<fa8_t>( fa8 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa0_t>( fa0 ), yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ), yaal::forward<fa7_t>( fa7 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa0_t>( fa0 ), yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa0_t>( fa0 ), yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa0_t>( fa0 ), yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa0_t>( fa0 ), yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ),
-						yaal::move( fa0 ), yaal::move( fa1 ), yaal::move( fa2 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ),
+						yaal::forward<fa0_t>( fa0 ), yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa0 ), yaal::move( fa1 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ), yaal::forward<fa0_t>( fa0 ), yaal::forward<fa1_t>( fa1 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0 ) {
-			return ( type( functor_t( yaal::move( fa0 ), yaal::move( m ) ), yaal::move( fa0 ) ) );
+			return ( type( functor_t( yaal::forward<fa0_t>( fa0 ), m ), yaal::forward<fa0_t>( fa0 ) ) );
 		}
 	};
 	struct function {
@@ -882,48 +883,48 @@ struct call_calculator {
 						typename sorted_real_args::a4_t, typename sorted_real_args::a5_t, typename sorted_real_args::a6_t, typename sorted_real_args::a7_t,
 						typename sorted_real_args::a8_t, typename sorted_real_args::a9_t, typename sorted_real_args::a10_t> interface_type;
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 ) {
-			return ( type( m, yaal::move( fa0 ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ),
-						yaal::move( fa9 ) ) );
+			return ( type( m, yaal::forward<fa0_t>( fa0 ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ), yaal::forward<fa7_t>( fa7 ), yaal::forward<fa8_t>( fa8 ),
+						yaal::forward<fa9_t>( fa9 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 ) {
-			return ( type( m, yaal::move( fa0 ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ), yaal::move( fa8 ) ) );
+			return ( type( m, yaal::forward<fa0_t>( fa0 ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ), yaal::forward<fa7_t>( fa7 ), yaal::forward<fa8_t>( fa8 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 ) {
-			return ( type( m, yaal::move( fa0 ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ), yaal::move( fa7 ) ) );
+			return ( type( m, yaal::forward<fa0_t>( fa0 ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ), yaal::forward<fa7_t>( fa7 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 ) {
-			return ( type( m, yaal::move( fa0 ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ), yaal::move( fa6 ) ) );
+			return ( type( m, yaal::forward<fa0_t>( fa0 ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ), yaal::forward<fa6_t>( fa6 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 ) {
-			return ( type( m, yaal::move( fa0 ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ),
-						yaal::move( fa5 ) ) );
+			return ( type( m, yaal::forward<fa0_t>( fa0 ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ),
+						yaal::forward<fa5_t>( fa5 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 ) {
-			return ( type( m, yaal::move( fa0 ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ), yaal::move( fa4 ) ) );
+			return ( type( m, yaal::forward<fa0_t>( fa0 ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ), yaal::forward<fa4_t>( fa4 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 ) {
-			return ( type( m, yaal::move( fa0 ),
-						yaal::move( fa1 ), yaal::move( fa2 ), yaal::move( fa3 ) ) );
+			return ( type( m, yaal::forward<fa0_t>( fa0 ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ), yaal::forward<fa3_t>( fa3 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1, fa2_t fa2 ) {
-			return ( type( m, yaal::move( fa0 ),
-						yaal::move( fa1 ), yaal::move( fa2 ) ) );
+			return ( type( m, yaal::forward<fa0_t>( fa0 ),
+						yaal::forward<fa1_t>( fa1 ), yaal::forward<fa2_t>( fa2 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0, fa1_t fa1 ) {
-			return ( type( m, yaal::move( fa0 ), yaal::move( fa1 ) ) );
+			return ( type( m, yaal::forward<fa0_t>( fa0 ), yaal::forward<fa1_t>( fa1 ) ) );
 		}
 		inline static type make( METHOD_t m, fa0_t fa0 ) {
-			return ( type( m, yaal::move( fa0 ) ) );
+			return ( type( m, yaal::forward<fa0_t>( fa0 ) ) );
 		}
 		inline static type make( METHOD_t m ) {
 			return ( type( m ) );
@@ -932,15 +933,15 @@ struct call_calculator {
 	struct field {
 		typedef HCall<-2, descriptor, typename trait::field_type<METHOD_t>::type,
 						fa0_t, METHOD_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
-		inline static type make( METHOD_t m, fa0_t a0 ) {
-			return ( type( yaal::move( m ), yaal::move( a0 ) ) );
+		inline static type make( METHOD_t m, fa0_t&& a0 ) {
+			return ( type( m, yaal::forward<fa0_t>( a0 ) ) );
 		}
 	};
 	struct field_this {
 		typedef HCall<-1, descriptor, typename trait::field_type<METHOD_t>::type,
 						fa0_t, METHOD_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t> type;
-		inline static type make( METHOD_t m, fa0_t ) {
-			return ( type( yaal::move( m ) ) );
+		inline static type make( METHOD_t m, fa0_t&& ) {
+			return ( type( m ) );
 		}
 	};
 	typedef typename trait::ternary<
@@ -988,7 +989,7 @@ protected:
 	CALL_t _call;
 public:
 	HCallBase( CALL_t call_ )
-		: _call( yaal::move( call_ ) ) {}
+		: _call( yaal::forward<CALL_t>( call_ ) ) {}
 protected:
 	virtual void const* do_id( void ) const {
 		return ( caller_id( _call ) );
@@ -1063,7 +1064,7 @@ public:
 	trait::no_type, trait::no_type, trait::no_type> base_type;
 public:
 	HCall( CALL_t call_ )
-		: base_type( yaal::move( call_ ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1095,7 +1096,7 @@ private:
 	a0_t _a0;
 public:
 	HCall( CALL_t call_, a0_t a0 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1125,7 +1126,7 @@ private:
 	a1_t _a1;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ), _a1( yaal::forward<a1_t>( a1 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1157,8 +1158,8 @@ private:
 	a2_t _a2;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1191,8 +1192,8 @@ private:
 	a3_t _a3;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ), _a3( yaal::forward<a3_t>( a3 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1227,9 +1228,9 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1262,9 +1263,9 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ), _a5( yaal::forward<a5_t>( a5 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1303,10 +1304,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1346,10 +1347,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ), _a7( yaal::forward<a7_t>( a7 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1390,11 +1391,11 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1435,11 +1436,11 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ), _a9( yaal::forward<a9_t>( a9 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1472,7 +1473,7 @@ private:
 	a0_t _a0;
 public:
 	HCall( CALL_t call_, a0_t a0 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1505,7 +1506,7 @@ private:
 	a1_t _a1;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ), _a1( yaal::forward<a1_t>( a1 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1541,8 +1542,8 @@ private:
 	a2_t _a2;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1581,8 +1582,8 @@ private:
 	a3_t _a3;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ), _a3( yaal::forward<a3_t>( a3 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1625,9 +1626,9 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1672,9 +1673,9 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ), _a5( yaal::forward<a5_t>( a5 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1723,10 +1724,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1778,10 +1779,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ), _a7( yaal::forward<a7_t>( a7 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1836,11 +1837,11 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1897,11 +1898,11 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ), _a9( yaal::forward<a9_t>( a9 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -1961,12 +1962,12 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10)
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
-		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ),
+		_a9( yaal::forward<a9_t>( a9 ) ), _a10( yaal::forward<a10_t>( a10 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2019,7 +2020,7 @@ private:
 	a1_t _a1;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ), _a1( yaal::move( a1 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ), _a1( yaal::forward<a1_t>( a1 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2056,8 +2057,8 @@ private:
 	a2_t _a2;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2097,8 +2098,8 @@ private:
 	a3_t _a3;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ), _a3( yaal::forward<a3_t>( a3 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2142,9 +2143,9 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2190,9 +2191,9 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ), _a5( yaal::forward<a5_t>( a5 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2242,10 +2243,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2298,10 +2299,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ), _a7( yaal::forward<a7_t>( a7 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2357,11 +2358,11 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2419,11 +2420,11 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ), _a9( yaal::forward<a9_t>( a9 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2484,12 +2485,12 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
-		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ),
+		_a9( yaal::forward<a9_t>( a9 ) ), _a10( yaal::forward<a10_t>( a10 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2545,8 +2546,8 @@ private:
 	a2_t _a2;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2587,8 +2588,8 @@ private:
 	a3_t _a3;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ), _a3( yaal::forward<a3_t>( a3 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2633,9 +2634,9 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2682,9 +2683,9 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ), _a5( yaal::forward<a5_t>( a5 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2735,10 +2736,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2792,10 +2793,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ), _a7( yaal::forward<a7_t>( a7 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2852,11 +2853,11 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2915,11 +2916,11 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ), _a9( yaal::forward<a9_t>( a9 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -2981,12 +2982,12 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
-		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ),
+		_a9( yaal::forward<a9_t>( a9 ) ), _a10( yaal::forward<a10_t>( a10 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3044,8 +3045,8 @@ private:
 	a3_t _a3;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ), _a3( yaal::move( a3 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ), _a3( yaal::forward<a3_t>( a3 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3091,9 +3092,9 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3141,9 +3142,9 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ), _a5( yaal::forward<a5_t>( a5 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3195,10 +3196,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3253,10 +3254,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ), _a7( yaal::forward<a7_t>( a7 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3314,11 +3315,11 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3378,11 +3379,11 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ), _a9( yaal::forward<a9_t>( a9 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3445,12 +3446,12 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
-		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ),
+		_a9( yaal::forward<a9_t>( a9 ) ), _a10( yaal::forward<a10_t>( a10 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3511,9 +3512,9 @@ private:
 	a4_t _a4;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3562,9 +3563,9 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ), _a5( yaal::forward<a5_t>( a5 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3617,10 +3618,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3676,10 +3677,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ), _a7( yaal::forward<a7_t>( a7 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3738,11 +3739,11 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3803,11 +3804,11 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ), _a9( yaal::forward<a9_t>( a9 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3871,12 +3872,12 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
-		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ),
+		_a9( yaal::forward<a9_t>( a9 ) ), _a10( yaal::forward<a10_t>( a10 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3938,9 +3939,9 @@ private:
 	a5_t _a5;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ), _a5( yaal::move( a5 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ), _a5( yaal::forward<a5_t>( a5 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -3994,10 +3995,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4054,10 +4055,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ), _a7( yaal::forward<a7_t>( a7 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4117,11 +4118,11 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4183,11 +4184,11 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ), _a9( yaal::forward<a9_t>( a9 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4252,12 +4253,12 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
-		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ),
+		_a9( yaal::forward<a9_t>( a9 ) ), _a10( yaal::forward<a10_t>( a10 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4322,10 +4323,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4383,10 +4384,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ), _a7( yaal::forward<a7_t>( a7 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4447,11 +4448,11 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4514,11 +4515,11 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ), _a9( yaal::forward<a9_t>( a9 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4584,12 +4585,12 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
-		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ),
+		_a9( yaal::forward<a9_t>( a9 ) ), _a10( yaal::forward<a10_t>( a10 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4656,10 +4657,10 @@ private:
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1,
 			a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ), _a7( yaal::move( a7 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ), _a7( yaal::forward<a7_t>( a7 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4721,11 +4722,11 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4789,11 +4790,11 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ), _a9( yaal::forward<a9_t>( a9 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4860,12 +4861,12 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
-		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ),
+		_a9( yaal::forward<a9_t>( a9 ) ), _a10( yaal::forward<a10_t>( a10 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -4934,11 +4935,11 @@ private:
 	a8_t _a8;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -5003,11 +5004,11 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ), _a9( yaal::forward<a9_t>( a9 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -5075,12 +5076,12 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
-		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ),
+		_a9( yaal::forward<a9_t>( a9 ) ), _a10( yaal::forward<a10_t>( a10 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -5150,11 +5151,11 @@ private:
 	a9_t _a9;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ), _a9( yaal::move( a9 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ), _a9( yaal::forward<a9_t>( a9 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -5223,12 +5224,12 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
-		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ),
+		_a9( yaal::forward<a9_t>( a9 ) ), _a10( yaal::forward<a10_t>( a10 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
@@ -5300,12 +5301,12 @@ private:
 	a10_t _a10;
 public:
 	HCall( CALL_t call_, a0_t a0, a1_t a1, a2_t a2, a3_t a3, a4_t a4, a5_t a5, a6_t a6, a7_t a7, a8_t a8, a9_t a9, a10_t a10 )
-		: base_type( yaal::move( call_ ) ), _a0( yaal::move( a0 ) ),
-		_a1( yaal::move( a1 ) ), _a2( yaal::move( a2 ) ),
-		_a3( yaal::move( a3 ) ), _a4( yaal::move( a4 ) ),
-		_a5( yaal::move( a5 ) ), _a6( yaal::move( a6 ) ),
-		_a7( yaal::move( a7 ) ), _a8( yaal::move( a8 ) ),
-		_a9( yaal::move( a9 ) ), _a10( yaal::move( a10 ) ) {
+		: base_type( yaal::forward<CALL_t>( call_ ) ), _a0( yaal::forward<a0_t>( a0 ) ),
+		_a1( yaal::forward<a1_t>( a1 ) ), _a2( yaal::forward<a2_t>( a2 ) ),
+		_a3( yaal::forward<a3_t>( a3 ) ), _a4( yaal::forward<a4_t>( a4 ) ),
+		_a5( yaal::forward<a5_t>( a5 ) ), _a6( yaal::forward<a6_t>( a6 ) ),
+		_a7( yaal::forward<a7_t>( a7 ) ), _a8( yaal::forward<a8_t>( a8 ) ),
+		_a9( yaal::forward<a9_t>( a9 ) ), _a10( yaal::forward<a10_t>( a10 ) ) {
 		return;
 	}
 	HCall( HCall const& ) = default;
