@@ -1112,7 +1112,7 @@ struct return_type {
 		typedef typename generic_helper::return_type<T>::type type;
 	};
 
-	typedef typename functional_return_type<T>::type functional_return_type_t;
+	typedef typename functional_return_type<typename strip_reference<T>::type>::type functional_return_type_t;
 
 	typedef typename resolve<same_type<functional_return_type_t, no_type>::value, functional_return_type_t>::type type;
 };
@@ -1138,7 +1138,7 @@ struct argument_type {
 		typedef typename generic_helper::argument_type<T>::template index<no>::type type;
 	};
 
-	typedef typename functional_argument_type<T>::template index<no>::type functional_argument_type_t;
+	typedef typename functional_argument_type<typename strip_reference<T>::type>::template index<no>::type functional_argument_type_t;
 
 	typedef typename resolve<same_type<functional_argument_type_t, no_type>::value, functional_argument_type_t>::type type;
 };
