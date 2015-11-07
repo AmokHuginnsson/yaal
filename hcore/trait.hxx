@@ -441,28 +441,6 @@ struct is_array<T[]> {
 };
 /*! \endcond */
 
-/*! \brief Transform C-array type to pointer type.
- *
- * \tparam T - type to decay from array to pointer.
- * \return type - pointer type decayed from array type.
- */
-template<typename T>
-struct decay {
-	typedef T type;
-};
-
-/*! \cond */
-template<typename T, int const SIZE>
-struct decay<T[SIZE]> {
-	typedef T* type;
-};
-
-template<typename T>
-struct decay<T[]> {
-	typedef T* type;
-};
-/*! \endcond */
-
 /*! \brief Meta function used to make reference from type.
  *
  * \tparam T - type to make reference of.
@@ -656,6 +634,33 @@ template<typename T>
 struct strip {
 	typedef typename strip_cv<typename strip_reference<T>::type>::type type;
 };
+
+/*! \brief Remove references and cv-qualifiers and potentially transform C-array type to pointer type.
+ *
+ * \tparam T - type to decay.
+ * \return type - decayed type.
+ */
+template<typename T>
+struct decay {
+	typedef typename strip<T>::type type;
+};
+
+/*! \cond */
+template<typename T, int const SIZE>
+struct decay<T[SIZE]> {
+	typedef T* type;
+};
+
+template<typename T>
+struct decay<T[]> {
+	typedef T* type;
+};
+
+template<typename R, typename... ARG>
+struct decay<R (ARG...)> {
+	typedef R (*type)( ARG... );
+};
+/*! \endcond */
 
 /*! \cond */
 template<typename T>
