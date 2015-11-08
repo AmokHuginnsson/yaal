@@ -635,29 +635,37 @@ struct strip {
 	typedef typename strip_cv<typename strip_reference<T>::type>::type type;
 };
 
-/*! \brief Remove references and cv-qualifiers and potentially transform C-array type to pointer type.
+/*! \brief Remove first dimmension from array type.
  *
- * \tparam T - type to decay.
- * \return type - decayed type.
+ * \tparam T - type to remove first array dimmension from.
  */
 template<typename T>
-struct decay {
-	typedef typename strip<T>::type type;
+struct remove_extent {
+	typedef T type;
 };
 
 /*! \cond */
 template<typename T, int const SIZE>
-struct decay<T[SIZE]> {
-	typedef T* type;
+struct remove_extent<T[SIZE]> {
+	typedef T type;
 };
 
 template<typename T>
-struct decay<T[]> {
-	typedef T* type;
+struct remove_extent<T[]> {
+	typedef T type;
+};
+/*! \endcond */
+
+/*! \brief Turn function type into pointer type.
+ */
+template<typename T>
+struct pointerize_function {
+	typedef T type;
 };
 
+/*! \cond */
 template<typename R, typename... ARG>
-struct decay<R (ARG...)> {
+struct pointerize_function<R (ARG...)> {
 	typedef R (*type)( ARG... );
 };
 /*! \endcond */
@@ -813,6 +821,25 @@ struct is_function<return_t (&)( arg_t... )> {
 	static bool const value = true;
 };
 /*! \endcond */
+
+/*! \brief Remove references and cv-qualifiers and potentially transform C-array type to pointer type.
+ *
+ * \tparam T - type to decay.
+ * \return type - decayed type.
+ */
+template<typename T>
+struct decay {
+	typedef typename strip_reference<T>::type U;
+	typedef typename ternary<
+		is_array<U>::value,
+		typename remove_extent<U>::type*,
+		typename ternary<
+			is_function<U>::value,
+			typename pointerize_function<U>::type,
+			typename strip_cv<U>::type
+		>::type
+	>::type type;
+};
 
 /*! \brief Check if given type is a function pointer type.
  *
