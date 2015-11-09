@@ -792,18 +792,41 @@ private:
 	HNonCopyable& operator = ( HNonCopyable const& ) = delete;
 };
 
+/*! \cond */
+template<typename T>
+struct is_field_impl {
+	static bool const value = false;
+};
+template<typename class_t, typename T>
+struct is_field_impl<T class_t::*> {
+	static bool const value = true;
+};
+/*! \cond */
+
 /*! \brief Check if given type is a field type (actually a pointer to a field).
  *
  * \tparam T - type to check for being a field.
  * \retval value - true iff given type is a field type.
  */
 template<typename T>
-struct is_field
-	{ static bool const value = false; };
+struct is_field {
+	static bool const value = is_field_impl<typename strip<T>::type>::value;
+};
 
-template<typename class_t, typename T>
-struct is_field<T class_t::*>
-	{ static bool const value = true; };
+/*! \cond */
+template<typename T>
+struct is_function_impl {
+	static bool const value = false;
+};
+template<typename return_t, typename... arg_t>
+struct is_function_impl<return_t ( arg_t... )> {
+	static bool const value = true;
+};
+template<typename return_t, typename... arg_t>
+struct is_function_impl<return_t (&)( arg_t... )> {
+	static bool const value = true;
+};
+/*! \endcond */
 
 /*! \brief Check if given type is a function type.
  *
@@ -812,15 +835,8 @@ struct is_field<T class_t::*>
  */
 template<typename T>
 struct is_function {
-	static bool const value = false;
+	static bool const value = is_function_impl<typename strip<T>::type>::value;
 };
-
-/*! \cond */
-template<typename return_t, typename... arg_t>
-struct is_function<return_t (&)( arg_t... )> {
-	static bool const value = true;
-};
-/*! \endcond */
 
 /*! \brief Remove references and cv-qualifiers and potentially transform C-array type to pointer type.
  *
@@ -858,6 +874,29 @@ struct is_function_pointer<return_t (*)( arg_t... )> {
 };
 /*! \endcond */
 
+/*! \cond */
+template<typename T>
+struct is_member_impl {
+	static bool const value = false;
+};
+template<typename return_t, typename class_t, typename... A>
+struct is_member_impl<return_t ( class_t::* )( A... )> {
+	static bool const value = true;
+};
+template<typename return_t, typename class_t, typename... A>
+struct is_member_impl<return_t ( class_t::* )( A... ) const> {
+	static bool const value = true;
+};
+template<typename return_t, typename class_t, typename... A>
+struct is_member_impl<return_t ( class_t::* )( A... ) volatile> {
+	static bool const value = true;
+};
+template<typename return_t, typename class_t, typename... A>
+struct is_member_impl<return_t ( class_t::* )( A... ) const volatile> {
+	static bool const value = true;
+};
+/*! \endcond */
+
 /*! \brief Check if given type is a member type.
  *
  * \tparam T - type to check for being a member.
@@ -865,21 +904,18 @@ struct is_function_pointer<return_t (*)( arg_t... )> {
  */
 template<typename T>
 struct is_member {
-	static bool const value = false;
+	static bool const value = is_member_impl<typename strip<T>::type>::value;
 };
 
 /*! \cond */
+template<typename T>
+struct is_member_const_impl
+	{ static bool const value = false; };
 template<typename return_t, typename class_t, typename... A>
-struct is_member<return_t ( class_t::* )( A... )>
+struct is_member_const_impl<return_t ( class_t::* )( A... ) const>
 	{ static bool const value = true; };
 template<typename return_t, typename class_t, typename... A>
-struct is_member<return_t ( class_t::* )( A... ) const>
-	{ static bool const value = true; };
-template<typename return_t, typename class_t, typename... A>
-struct is_member<return_t ( class_t::* )( A... ) volatile>
-	{ static bool const value = true; };
-template<typename return_t, typename class_t, typename... A>
-struct is_member<return_t ( class_t::* )( A... ) const volatile>
+struct is_member_const_impl<return_t ( class_t::* )( A... ) const volatile>
 	{ static bool const value = true; };
 /*! \endcond */
 
@@ -889,17 +925,9 @@ struct is_member<return_t ( class_t::* )( A... ) const volatile>
  * \retval value - true iff given type is a const member type.
  */
 template<typename T>
-struct is_member_const
-	{ static bool const value = false; };
-
-/*! \cond */
-template<typename return_t, typename class_t, typename... A>
-struct is_member_const<return_t ( class_t::* )( A... ) const>
-	{ static bool const value = true; };
-template<typename return_t, typename class_t, typename... A>
-struct is_member_const<return_t ( class_t::* )( A... ) const volatile>
-	{ static bool const value = true; };
-/*! \endcond */
+struct is_member_const {
+	static bool const value = is_member_const_impl<typename strip<T>::type>::value;
+};
 
 namespace generic_helper {
 
@@ -921,6 +949,9 @@ struct return_type<return_t ( class_t::* )( A... ) const volatile>
 	{ typedef return_t type; };
 template<typename return_t, typename... A>
 struct return_type<return_t ( * )( A... )>
+	{ typedef return_t type; };
+template<typename return_t, typename... A>
+struct return_type<return_t ( & )( A... )>
 	{ typedef return_t type; };
 template<typename return_t, typename... A>
 struct return_type<return_t ( A... )>
@@ -1141,7 +1172,7 @@ struct return_type {
 
 	template<typename U>
 	struct resolve<true, U> {
-		typedef typename generic_helper::return_type<T>::type type;
+		typedef typename generic_helper::return_type<typename strip<T>::type>::type type;
 	};
 
 	typedef typename functional_return_type<typename strip_reference<T>::type>::type functional_return_type_t;
@@ -1167,10 +1198,10 @@ struct argument_type {
 
 	template<typename U>
 	struct resolve<true, U> {
-		typedef typename generic_helper::argument_type<T>::template index<no>::type type;
+		typedef typename generic_helper::argument_type<typename strip<T>::type>::template index<no>::type type;
 	};
 
-	typedef typename functional_argument_type<typename strip_reference<T>::type>::template index<no>::type functional_argument_type_t;
+	typedef typename functional_argument_type<typename strip<T>::type>::template index<no>::type functional_argument_type_t;
 
 	typedef typename resolve<same_type<functional_argument_type_t, no_type>::value, functional_argument_type_t>::type type;
 };
@@ -1206,8 +1237,9 @@ template<typename class_t, typename field_t>
 struct class_type_from_field<field_t class_t::*>
 	{ typedef class_t type; };
 
-template<typename class_t>
+template<typename T>
 struct class_type {
+	typedef typename strip<T>::type class_t;
 	template<typename real_class>
 	static true_type has_this_type( typename strip_reference<typename real_class::this_type>::type* );
 	template<typename real_class>
@@ -1414,10 +1446,10 @@ struct argument_count {
 
 	template<int const count>
 	struct resolve<true, count> {
-		static int const value = generic_helper::argument_count<T>::value;
+		static int const value = generic_helper::argument_count<typename strip<T>::type>::value;
 	};
 
-	static int const functionalArgumentCount = functional_argument_count<T>::value;
+	static int const functionalArgumentCount = functional_argument_count<typename strip<T>::type>::value;
 
 	static int const value = resolve<functionalArgumentCount == -1, functionalArgumentCount>::value;
 };
