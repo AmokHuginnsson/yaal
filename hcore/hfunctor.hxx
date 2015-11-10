@@ -67,64 +67,66 @@ template<typename arg_t, typename fa0_t, typename fa1_t = trait::no_type,
 	typename fa8_t = trait::no_type, typename fa9_t = trait::no_type,
 	typename fa10_t = trait::no_type>
 struct select {
-	typedef typename trait::ternary<trait::same_type<higher_order::placeholder<1>, arg_t>::value, fa0_t,
-					typename trait::ternary<trait::same_type<higher_order::placeholder<2>, arg_t>::value, fa1_t,
-					typename trait::ternary<trait::same_type<higher_order::placeholder<3>, arg_t>::value, fa2_t,
-					typename trait::ternary<trait::same_type<higher_order::placeholder<4>, arg_t>::value, fa3_t,
-					typename trait::ternary<trait::same_type<higher_order::placeholder<5>, arg_t>::value, fa4_t,
-					typename trait::ternary<trait::same_type<higher_order::placeholder<6>, arg_t>::value, fa5_t,
-					typename trait::ternary<trait::same_type<higher_order::placeholder<7>, arg_t>::value, fa6_t,
-					typename trait::ternary<trait::same_type<higher_order::placeholder<8>, arg_t>::value, fa7_t,
-					typename trait::ternary<trait::same_type<higher_order::placeholder<9>, arg_t>::value, fa8_t,
-					typename trait::ternary<trait::same_type<higher_order::placeholder<10>, arg_t>::value, fa9_t,
-					typename trait::ternary<trait::same_type<higher_order::placeholder<11>, arg_t>::value, fa10_t,
+	typedef typename trait::strip<arg_t>::type stripped_arg_t;
+	typedef typename trait::ternary<trait::same_type<higher_order::placeholder<1>, stripped_arg_t>::value, fa0_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<2>, stripped_arg_t>::value, fa1_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<3>, stripped_arg_t>::value, fa2_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<4>, stripped_arg_t>::value, fa3_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<5>, stripped_arg_t>::value, fa4_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<6>, stripped_arg_t>::value, fa5_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<7>, stripped_arg_t>::value, fa6_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<8>, stripped_arg_t>::value, fa7_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<9>, stripped_arg_t>::value, fa8_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<10>, stripped_arg_t>::value, fa9_t,
+					typename trait::ternary<trait::same_type<higher_order::placeholder<11>, stripped_arg_t>::value, fa10_t,
 					arg_t>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type>::type type;
 
 };
 
 template<typename arg_t, typename fa0_t>
-struct resolve_arg<1, arg_t, fa0_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
+struct resolve_arg<1, arg_t, fa0_t> {
 	typedef typename select<arg_t, fa0_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0 ) {
 		return (
 				getter<1, trait::find_type<
-						arg_t,
-						higher_order::placeholder<1> >::value,
-				arg_t, fa0_t>::get( a, fa0 ) );
+						typename trait::strip<arg_t>::type,
+						higher_order::placeholder<1>
+					>::value,
+					arg_t, fa0_t>::get( a, fa0 ) );
 	}
 };
 
 template<typename arg_t, typename fa0_t, typename fa1_t>
-struct resolve_arg<2, arg_t, fa0_t, fa1_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
+struct resolve_arg<2, arg_t, fa0_t, fa1_t> {
 	typedef typename select<arg_t, fa0_t, fa1_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1 ) {
 		return (
 				getter<2, trait::find_type<
-						arg_t,
+						typename trait::strip<arg_t>::type,
 						higher_order::placeholder<1>, higher_order::placeholder<2> >::value,
 				arg_t, fa0_t, fa1_t>::get( a, fa0, fa1 ) );
 	}
 };
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t>
-struct resolve_arg<3, arg_t, fa0_t, fa1_t, fa2_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
+struct resolve_arg<3, arg_t, fa0_t, fa1_t, fa2_t> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2 ) {
 		return (
 				getter<3, trait::find_type<
-						arg_t,
+						typename trait::strip<arg_t>::type,
 						higher_order::placeholder<1>, higher_order::placeholder<2>, higher_order::placeholder<3> >::value,
 				arg_t, fa0_t, fa1_t, fa2_t>::get( a, fa0, fa1, fa2 ) );
 	}
 };
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t>
-struct resolve_arg<4, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
+struct resolve_arg<4, arg_t, fa0_t, fa1_t, fa2_t, fa3_t> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3 ) {
 		return (
 				getter<4, trait::find_type<
-						arg_t,
+						typename trait::strip<arg_t>::type,
 						higher_order::placeholder<1>,
 						higher_order::placeholder<2>,
 						higher_order::placeholder<3>,
@@ -134,12 +136,12 @@ struct resolve_arg<4, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, trait::no_type, trait::
 };
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t, typename fa4_t>
-struct resolve_arg<5, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
+struct resolve_arg<5, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4 ) {
 		return (
 				getter<5, trait::find_type<
-						arg_t,
+						typename trait::strip<arg_t>::type,
 						higher_order::placeholder<1>,
 						higher_order::placeholder<2>,
 						higher_order::placeholder<3>,
@@ -151,12 +153,12 @@ struct resolve_arg<5, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, trait::no_type, 
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
 	typename fa4_t, typename fa5_t>
-struct resolve_arg<6, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, trait::no_type, trait::no_type, trait::no_type, trait::no_type> {
+struct resolve_arg<6, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5 ) {
 		return (
 				getter<6, trait::find_type<
-						arg_t,
+						typename trait::strip<arg_t>::type,
 						higher_order::placeholder<1>,
 						higher_order::placeholder<2>,
 						higher_order::placeholder<3>,
@@ -169,12 +171,12 @@ struct resolve_arg<6, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, trait::no
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
 	typename fa4_t, typename fa5_t, typename fa6_t>
-struct resolve_arg<7, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, trait::no_type, trait::no_type, trait::no_type> {
+struct resolve_arg<7, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6 ) {
 		return (
 				getter<7, trait::find_type<
-						arg_t,
+						typename trait::strip<arg_t>::type,
 						higher_order::placeholder<1>,
 						higher_order::placeholder<2>,
 						higher_order::placeholder<3>,
@@ -188,12 +190,12 @@ struct resolve_arg<7, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, tr
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
 	typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t>
-struct resolve_arg<8, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, trait::no_type, trait::no_type> {
+struct resolve_arg<8, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7 ) {
 		return (
 				getter<8, trait::find_type<
-						arg_t,
+						typename trait::strip<arg_t>::type,
 						higher_order::placeholder<1>,
 						higher_order::placeholder<2>,
 						higher_order::placeholder<3>,
@@ -208,12 +210,12 @@ struct resolve_arg<8, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa
 
 template<typename arg_t, typename fa0_t, typename fa1_t, typename fa2_t, typename fa3_t,
 	typename fa4_t, typename fa5_t, typename fa6_t, typename fa7_t, typename fa8_t>
-struct resolve_arg<9, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, trait::no_type> {
+struct resolve_arg<9, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t> {
 	typedef typename select<arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::type return_t;
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa2_t fa2, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8 ) {
 		return (
 				getter<9, trait::find_type<
-						arg_t,
+						typename trait::strip<arg_t>::type,
 						higher_order::placeholder<1>,
 						higher_order::placeholder<2>,
 						higher_order::placeholder<3>,
@@ -234,7 +236,7 @@ struct resolve_arg<10, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, f
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9 ) {
 		return (
 				getter<10, trait::find_type<
-						arg_t,
+						typename trait::strip<arg_t>::type,
 						higher_order::placeholder<1>,
 						higher_order::placeholder<2>,
 						higher_order::placeholder<3>,
@@ -256,7 +258,7 @@ struct resolve_arg<11, arg_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, f
 	inline static return_t get( arg_t a, fa0_t fa0, fa1_t fa1, fa3_t fa3, fa4_t fa4, fa5_t fa5, fa6_t fa6, fa7_t fa7, fa8_t fa8, fa9_t fa9, fa10_t fa10 ) {
 		return (
 				getter<11, trait::find_type<
-						arg_t,
+						typename trait::strip<arg_t>::type,
 						higher_order::placeholder<1>,
 						higher_order::placeholder<2>,
 						higher_order::placeholder<3>,
@@ -381,7 +383,7 @@ struct object_resolver {
 				meta::ternary<
 						meta::greater<
 								trait::find_type<
-										CLASS_t,
+										typename trait::strip<CLASS_t>::type,
 										higher_order::placeholder<1>,
 										higher_order::placeholder<2>,
 										higher_order::placeholder<3>,
@@ -395,11 +397,11 @@ struct object_resolver {
 								>::value,
 								-1
 						>::value,
-						meta::ternary<trait::is_pointer<typename trait::strip_reference<arg_t>::type>::value, FREE_PTR, FREE_REF>::value,
+						meta::ternary<trait::is_pointer<typename trait::strip<arg_t>::type>::value, FREE_PTR, FREE_REF>::value,
 						meta::ternary<
-							trait::is_pointer<typename trait::strip_reference<CLASS_t>::type>::value,
+							trait::is_pointer<typename trait::strip<CLASS_t>::type>::value,
 							PTR,
-							meta::ternary<is_smart_pointer<CLASS_t>::value, SMART, REF>::value
+							meta::ternary<is_smart_pointer<typename trait::strip<CLASS_t>::type>::value, SMART, REF>::value
 						>::value
 				>::value
 		);
@@ -470,11 +472,11 @@ struct object_resolver {
  */
 template<typename CLASS_t, typename METHOD_t>
 class HFunctor {
-	CLASS_t _object;
-	METHOD_t _method;
+	typename trait::decay<CLASS_t>::type _object;
+	typename trait::decay<METHOD_t>::type _method;
 	typedef typename trait::return_type<METHOD_t>::type return_t;
 public:
-	HFunctor( CLASS_t object_, METHOD_t method_ )
+	HFunctor( CLASS_t&& object_, METHOD_t&& method_ )
 		: _object( yaal::forward<CLASS_t>( object_ ) ), _method( yaal::forward<METHOD_t>( method_ ) ) {
 		return;
 	}

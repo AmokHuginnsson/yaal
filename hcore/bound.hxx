@@ -49,8 +49,8 @@ typename call_calculator<
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
 		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>
 	>,
-	higher_order::placeholder<1>,
-	higher_order::placeholder<2>
+	higher_order::placeholder<1> const&,
+	higher_order::placeholder<2> const&
 >::type::type
 	operator == ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
 			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ ) {
@@ -69,8 +69,8 @@ typename call_calculator<
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
 		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>
 	>,
-	higher_order::placeholder<1>,
-	higher_order::placeholder<2>
+	higher_order::placeholder<1> const&,
+	higher_order::placeholder<2> const&
 >::type::type
 	operator != ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
 			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ ) {
@@ -89,8 +89,8 @@ typename call_calculator<
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
 		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>
 	>,
-	higher_order::placeholder<1>,
-	higher_order::placeholder<2>
+	higher_order::placeholder<1> const&,
+	higher_order::placeholder<2> const&
 >::type::type
 	operator < ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
 			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ ) {
@@ -109,8 +109,8 @@ typename call_calculator<
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
 		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>
 	>,
-	higher_order::placeholder<1>,
-	higher_order::placeholder<2>
+	higher_order::placeholder<1> const&,
+	higher_order::placeholder<2> const&
 >::type::type
 	operator > ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
 			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ ) {
@@ -129,8 +129,8 @@ typename call_calculator<
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
 		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>
 	>,
-	higher_order::placeholder<1>,
-	higher_order::placeholder<2>
+	higher_order::placeholder<1> const&,
+	higher_order::placeholder<2> const&
 >::type::type
 	operator <= ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
 			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ ) {
@@ -149,8 +149,8 @@ typename call_calculator<
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>,
 		HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t>
 	>,
-	higher_order::placeholder<1>,
-	higher_order::placeholder<2>
+	higher_order::placeholder<1> const&,
+	higher_order::placeholder<2> const&
 >::type::type
 	operator >= ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& left_,
 			HCall<free_args2, descriptor2_t, return2_t, CALL2_t, b0_t, b1_t, b2_t, b3_t, b4_t, b5_t, b6_t, b7_t, b8_t, b9_t, b10_t> const& right_ ) {
@@ -166,7 +166,7 @@ typename call_calculator<
 		HBinder<equal_to<return_t>, constant_t, 1>,
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	>,
-	higher_order::placeholder<1>
+	higher_order::placeholder<1> const&
 >::type::type
 	operator == ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& var_, constant_t const& constant_ ) {
 	return ( call( compose1( bind2nd( equal_to<return_t>(), constant_ ), var_ ), _1 ) );
@@ -181,7 +181,7 @@ typename call_calculator<
 		HBinder<not_equal_to<return_t>, constant_t, 1>,
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	>,
-	higher_order::placeholder<1>
+	higher_order::placeholder<1> const&
 >::type::type
 	operator != ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& var_, constant_t const& constant_ ) {
 	return ( call( compose1( bind2nd( not_equal_to<return_t>(), constant_ ), var_ ), _1 ) );
@@ -196,7 +196,7 @@ typename call_calculator<
 		HBinder<less<return_t>, constant_t, 1>,
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	>,
-	higher_order::placeholder<1>
+	higher_order::placeholder<1> const&
 >::type::type
 	operator < ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& var_, constant_t const& constant_ ) {
 	return ( call( compose1( bind2nd( less<return_t>(), constant_ ), var_ ), _1 ) );
@@ -211,7 +211,7 @@ typename call_calculator<
 		HBinder<greater<return_t>, constant_t, 1>,
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	>,
-	higher_order::placeholder<1>
+	higher_order::placeholder<1> const&
 >::type::type
 	operator > ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& var_, constant_t const& constant_ ) {
 	return ( call( compose1( bind2nd( greater<return_t>(), constant_ ), var_ ), _1 ) );
@@ -226,7 +226,7 @@ typename call_calculator<
 		HBinder<less_equal<return_t>, constant_t, 1>,
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	>,
-	higher_order::placeholder<1>
+	higher_order::placeholder<1> const&
 >::type::type
 	operator <= ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& var_, constant_t const& constant_ ) {
 	return ( call( compose1( bind2nd( less_equal<return_t>(), constant_ ), var_ ), _1 ) );
@@ -241,7 +241,7 @@ typename call_calculator<
 		HBinder<greater_equal<return_t>, constant_t, 1>,
 		HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t>
 	>,
-	higher_order::placeholder<1>
+	higher_order::placeholder<1> const&
 >::type::type
 	operator >= ( HCall<free_args, descriptor_t, return_t, CALL_t, a0_t, a1_t, a2_t, a3_t, a4_t, a5_t, a6_t, a7_t, a8_t, a9_t, a10_t> const& var_, constant_t const& constant_ ) {
 	return ( call( compose1( bind2nd( greater_equal<return_t>(), constant_ ), var_ ), _1 ) );
