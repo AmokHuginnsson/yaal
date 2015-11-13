@@ -145,7 +145,7 @@ public:
 	template<typename... arg_t>
 	result_type operator()( arg_t&&... arg_ ) {
 		M_PROLOG
-		callback_t c( call( static_cast<result_type ( call_t::* )( arg_t&&... )>( &HSlot::call_t::operator() ), hcore::_1, arg_... ) );
+		callback_t c( call( static_cast<result_type ( call_t::* )( arg_t&&... )>( &HSlot::call_t::operator() ), hcore::_1, yaal::forward<arg_t>( arg_ )... ) );
 		return ( result_agregator()(
 					HIterator<callback_t>( _slotsPre.begin(), c, this, HIterator<callback_t>::STATE::PRE ),
 					HIterator<callback_t>( _slotsPost.end(), c, this, HIterator<callback_t>::STATE::POST ) ) );
