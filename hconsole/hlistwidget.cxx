@@ -670,7 +670,7 @@ bool HListWidget::commit_edit( void ) {
 void HListWidget::selection_change( void ) {
 	M_PROLOG
 	update_children();
-	_eventDispatcher( HWidgetEvent( this ) );
+	_eventDispatcher( static_cast<HWidgetEvent const&>( HWidgetEvent( this ) ) );
 	return;
 	M_EPILOG
 }
