@@ -1411,10 +1411,10 @@ public:
 	HCall( HCall const& ) = default;
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
-		return ( (base_type::_call)( free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ) ) );
+		return ( (base_type::_call)( free_standing_call_args::resolve_arg_get( _a0, a0 ) ) );
 	}
 	virtual return_t do_invoke( fa0_t a0 ) const {
-		return ( (base_type::_call)( free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ) ) );
+		return ( (base_type::_call)( free_standing_call_args::resolve_arg_get( _a0, a0 ) ) );
 	}
 };
 
@@ -1437,11 +1437,11 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1466,13 +1466,13 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1498,15 +1498,15 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1535,17 +1535,17 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1575,19 +1575,19 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1620,21 +1620,21 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v6_t, fa0_t>::get( _a6, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v6_t, fa0_t>::get( _a6, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1668,23 +1668,23 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v6_t, fa0_t>::get( _a6, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v7_t, fa0_t>::get( _a7, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v6_t, fa0_t>::get( _a6, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v7_t, fa0_t>::get( _a7, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1720,25 +1720,25 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v6_t, fa0_t>::get( _a6, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v7_t, fa0_t>::get( _a7, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v8_t, fa0_t>::get( _a8, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v6_t, fa0_t>::get( _a6, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v7_t, fa0_t>::get( _a7, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v8_t, fa0_t>::get( _a8, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1775,27 +1775,27 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v6_t, fa0_t>::get( _a6, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v7_t, fa0_t>::get( _a7, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v8_t, fa0_t>::get( _a8, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v9_t, fa0_t>::get( _a9, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v6_t, fa0_t>::get( _a6, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v7_t, fa0_t>::get( _a7, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v8_t, fa0_t>::get( _a8, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v9_t, fa0_t>::get( _a9, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1834,29 +1834,29 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v6_t, fa0_t>::get( _a6, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v7_t, fa0_t>::get( _a7, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v8_t, fa0_t>::get( _a8, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v9_t, fa0_t>::get( _a9, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v10_t, fa0_t>::get( _a10, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<1, typename descriptor::v0_t, fa0_t>::get( _a0, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v1_t, fa0_t>::get( _a1, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v2_t, fa0_t>::get( _a2, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v3_t, fa0_t>::get( _a3, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v4_t, fa0_t>::get( _a4, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v5_t, fa0_t>::get( _a5, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v6_t, fa0_t>::get( _a6, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v7_t, fa0_t>::get( _a7, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v8_t, fa0_t>::get( _a8, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v9_t, fa0_t>::get( _a9, a0 ),
-				free_standing_call_args::resolve_arg<1, typename descriptor::v10_t, fa0_t>::get( _a10, a0 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t, typename a0_t, typename a1_t>
@@ -1879,11 +1879,11 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1909,13 +1909,13 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1942,15 +1942,15 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -1980,17 +1980,17 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2021,19 +2021,19 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2067,21 +2067,21 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2116,23 +2116,23 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2169,25 +2169,25 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2225,27 +2225,27 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v9_t, fa0_t, fa1_t>::get( _a9, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v9_t, fa0_t, fa1_t>::get( _a9, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2285,29 +2285,29 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v9_t, fa0_t, fa1_t>::get( _a9, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v10_t, fa0_t, fa1_t>::get( _a10, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<2, typename descriptor::v0_t, fa0_t, fa1_t>::get( _a0, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v1_t, fa0_t, fa1_t>::get( _a1, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v2_t, fa0_t, fa1_t>::get( _a2, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v3_t, fa0_t, fa1_t>::get( _a3, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v4_t, fa0_t, fa1_t>::get( _a4, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v5_t, fa0_t, fa1_t>::get( _a5, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v6_t, fa0_t, fa1_t>::get( _a6, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v7_t, fa0_t, fa1_t>::get( _a7, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v8_t, fa0_t, fa1_t>::get( _a8, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v9_t, fa0_t, fa1_t>::get( _a9, a0, a1 ),
-				free_standing_call_args::resolve_arg<2, typename descriptor::v10_t, fa0_t, fa1_t>::get( _a10, a0, a1 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2334,13 +2334,13 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2368,15 +2368,15 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2407,17 +2407,17 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2449,19 +2449,19 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2496,21 +2496,21 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2546,23 +2546,23 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2600,25 +2600,25 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2657,27 +2657,27 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t>::get( _a9, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t>::get( _a9, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2718,29 +2718,29 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t>::get( _a9, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t>::get( _a10, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<3, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t>::get( _a0, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t>::get( _a1, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t>::get( _a2, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t>::get( _a3, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t>::get( _a4, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t>::get( _a5, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t>::get( _a6, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t>::get( _a7, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t>::get( _a8, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t>::get( _a9, a0, a1, a2 ),
-				free_standing_call_args::resolve_arg<3, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t>::get( _a10, a0, a1, a2 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2769,15 +2769,15 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2809,17 +2809,17 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2852,19 +2852,19 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2900,21 +2900,21 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -2951,23 +2951,23 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3006,25 +3006,25 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3064,27 +3064,27 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a9, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a9, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3126,29 +3126,29 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a9, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a10, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<4, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a0, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a1, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a2, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a3, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a4, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a5, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a6, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a7, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a8, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a9, a0, a1, a2, a3 ),
-				free_standing_call_args::resolve_arg<4, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t>::get( _a10, a0, a1, a2, a3 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3181,17 +3181,17 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3225,19 +3225,19 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3274,21 +3274,21 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3326,23 +3326,23 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3382,25 +3382,25 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3441,27 +3441,27 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a9, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a9, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3504,29 +3504,29 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a9, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a10, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<5, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a0, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a1, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a2, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a3, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a4, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a5, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a6, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a7, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a8, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a9, a0, a1, a2, a3, a4 ),
-				free_standing_call_args::resolve_arg<5, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t>::get( _a10, a0, a1, a2, a3, a4 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3561,19 +3561,19 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3611,21 +3611,21 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3664,23 +3664,23 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3721,25 +3721,25 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3781,27 +3781,27 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a9, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a9, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3845,29 +3845,29 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a9, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a10, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<6, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a0, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a1, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a2, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a3, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a4, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a5, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a6, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a7, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a8, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a9, a0, a1, a2, a3, a4, a5 ),
-				free_standing_call_args::resolve_arg<6, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t>::get( _a10, a0, a1, a2, a3, a4, a5 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3906,21 +3906,21 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<7, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<7, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -3960,23 +3960,23 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<7, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<7, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4018,25 +4018,25 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<7, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<7, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4079,27 +4079,27 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<7, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<7, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4144,29 +4144,29 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<7, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<7, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6 ),
-				free_standing_call_args::resolve_arg<7, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5, a6 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4207,23 +4207,23 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<8, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<8, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4266,25 +4266,25 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<8, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<8, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4328,27 +4328,27 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<8, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<8, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4394,29 +4394,29 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<8, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<8, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ),
-				free_standing_call_args::resolve_arg<8, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5, a6, a7 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4460,25 +4460,25 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<9, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<9, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4523,27 +4523,27 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<9, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<9, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4590,29 +4590,29 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<9, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<9, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
-				free_standing_call_args::resolve_arg<9, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4658,27 +4658,27 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<10, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<10, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4726,29 +4726,29 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<10, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<10, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
-				free_standing_call_args::resolve_arg<10, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9 ) ) ); }
 };
 
 template<typename descriptor, typename return_t, typename CALL_t,
@@ -4797,29 +4797,29 @@ public:
 	HCall& operator = ( HCall const& ) = default;
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9, fa10_t a10 ) {
 		return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<11, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ) ); }
 	virtual return_t do_invoke( fa0_t a0, fa1_t a1, fa2_t a2, fa3_t a3, fa4_t a4, fa5_t a5, fa6_t a6, fa7_t a7, fa8_t a8, fa9_t a9, fa10_t a10 ) const { return ( (base_type::_call)(
-				free_standing_call_args::resolve_arg<11, typename descriptor::v0_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v1_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v2_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v3_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v4_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v5_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v6_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v7_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v8_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v9_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
-				free_standing_call_args::resolve_arg<11, typename descriptor::v10_t, fa0_t, fa1_t, fa2_t, fa3_t, fa4_t, fa5_t, fa6_t, fa7_t, fa8_t, fa9_t, fa10_t>::get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ) ); }
+				free_standing_call_args::resolve_arg_get( _a0, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a1, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a2, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a3, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a4, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a5, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a6, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a7, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a8, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a9, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ),
+				free_standing_call_args::resolve_arg_get( _a10, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 ) ) ); }
 };
 
 /*! \endcond */
