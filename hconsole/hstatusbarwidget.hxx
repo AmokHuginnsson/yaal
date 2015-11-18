@@ -50,23 +50,19 @@ public:
 	typedef yaal::hcore::HPointer<HStatusBarWidget> ptr_t;
 	typedef yaal::hcore::HPair<yaal::hcore::HString, HTUIProcess::call_t> choice_t;
 	typedef yaal::hcore::HArray<choice_t> choices_t;
-	/*! \brief HStatusBarWidget prompt configuration.
+	/*! \brief HStatusBarWidget prompt mode configuration.
 	 */
-	struct PROMPT {
-		/*! \brief HStatusBarWidget prompt mode.
-		 */
-		typedef enum {
-			NORMAL,
-			COMMAND,
-			SEARCH,
-			DIALOG,
-			MENU
-		} mode_t;
+	enum class PROMPT {
+		NORMAL,
+		COMMAND,
+		SEARCH,
+		DIALOG,
+		MENU
 	};
 protected:
 	int    _statusBarAttribute;
 	int    _promptLength;
-	PROMPT::mode_t _mode;         /* prompt mode */
+	PROMPT _mode;         /* prompt mode */
 	hcore::HString _prompt;
 	/* progress bar data */
 	bool   _done;
@@ -86,7 +82,7 @@ public:
 	HStatusBarWidget( HWindow*, yaal::hcore::HString const&, int = -1 );
 	virtual ~HStatusBarWidget ( void );
 	void setup( char const*, char const*, int );
-	void set_prompt( yaal::hcore::HString const&, PROMPT::mode_t = PROMPT::NORMAL );
+	void set_prompt( yaal::hcore::HString const&, PROMPT = PROMPT::NORMAL );
 	void end_prompt( void );
 	void init_progress( double, char const*, bool = true );
 	void update_progress( double = -1, char const * = NULL );

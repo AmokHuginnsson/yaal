@@ -502,7 +502,7 @@ void HConsole::move( int row_, int column_ ) const {
 	return;
 }
 
-CURSOR::cursor_t HConsole::curs_set( CURSOR::cursor_t const &cursor_ ) const {
+CURSOR HConsole::curs_set( CURSOR cursor_ ) const {
 	int cursor = ::curs_set( cursor_ == CURSOR::VISIBLE ? 1 : ( cursor_ == CURSOR::INVISIBLE ? 0 : 2 ) );
 	if ( cursor == 1 )
 		return ( CURSOR::VISIBLE );
@@ -717,7 +717,7 @@ int HConsole::ungetch( int code_ ) {
 
 int HConsole::get_key( void ) const {
 	M_PROLOG
-	CURSOR::cursor_t origCursState = CURSOR::INVISIBLE;
+	CURSOR origCursState = CURSOR::INVISIBLE;
 	if ( ! _enabled ) {
 		M_THROW( "not in curses mode", errno );
 	}

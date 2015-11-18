@@ -95,7 +95,7 @@ HStatusBarWidget* HDataWindow::do_init_bar( char const* label_ ) {
 	M_EPILOG
 }
 
-void HDataWindow::set_mode( DOCUMENT::mode_t mode_ ) {
+void HDataWindow::set_mode( DOCUMENT mode_ ) {
 	M_PROLOG
 	switch ( mode_ ) {
 		case ( DOCUMENT::VIEW ):
@@ -311,7 +311,7 @@ void HDataWindow::set_modified( bool modified_ ) {
 	M_EPILOG
 }
 
-void HDataWindow::set_widget_role( yaal::hdata::HDataWidget* widget_, HDataWidget::ROLE::role_t role_ ) {
+void HDataWindow::set_widget_role( yaal::hdata::HDataWidget* widget_, HDataWidget::ROLE role_ ) {
 	M_PROLOG
 	switch ( role_ ) {
 		case ( HDataWidget::ROLE::MAIN ): {

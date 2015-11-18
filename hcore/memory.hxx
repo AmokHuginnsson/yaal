@@ -48,11 +48,9 @@ static YaalNew yaal __attribute__((used));
 struct MemoryAllocation {};
 typedef yaal::hcore::HExceptionT<MemoryAllocation> HMemoryAllocationException;
 
-struct ON_ALLOC_FAILURE {
-	typedef enum {
-		ABORT,
-		THROW
-	} on_alloc_failure_t;
+enum class ON_ALLOC_FAILURE {
+	ABORT,
+	THROW
 };
 
 void* alloc( int long );

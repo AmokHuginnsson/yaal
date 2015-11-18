@@ -134,7 +134,7 @@ void HDateWidget::do_kill_focus( void ) {
 	M_EPILOG
 }
 
-void HDateWidget::close_calendar( ACTION::action_t action_ ) {
+void HDateWidget::close_calendar( ACTION action_ ) {
 	M_PROLOG
 	_mode = MODE::VIEW;
 	if ( action_ == ACTION::APPLY ) {

@@ -54,13 +54,9 @@ public:
 	static yaal::hcore::HString _sSLCert;
 	/*! \brief SSL object types.
 	 */
-	struct TYPE {
-		/*! \brief Types.
-		 */
-		typedef enum {
-			SERVER, /*!< Server side of SSL connection. */
-			CLIENT  /*!< Client side of SSL connection. */
-		} ssl_context_type_t;
+	enum class TYPE {
+		SERVER, /*!< Server side of SSL connection. */
+		CLIENT  /*!< Client side of SSL connection. */
 	};
 private:
 	class OSSLContext {
@@ -103,7 +99,7 @@ private:
 	OSSLContext* _ctx;
 public:
 	typedef yaal::hcore::HPointer<HOpenSSL> ptr_t;
-	HOpenSSL( int, TYPE::ssl_context_type_t );
+	HOpenSSL( int, TYPE );
 	~HOpenSSL( void );
 	int long read( void* const, int long );
 	int long write( void const* const, int long );

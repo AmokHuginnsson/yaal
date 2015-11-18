@@ -104,7 +104,7 @@ protected:
 private:
 	friend bool HWidget::set_focus( char );
 	friend void HStatusBarWidget::set_prompt(  yaal::hcore::HString const&,
-			HStatusBarWidget::PROMPT::mode_t );
+			HStatusBarWidget::PROMPT );
 	friend void HStatusBarWidget::end_prompt( void );
 	friend int HStatusBarWidget::process_input_normal( int );
 	void acquire_focus( HWidget const* );
@@ -137,7 +137,7 @@ public:
 		return ( _window );
 	}
 private:
-	virtual TYPE::type_t do_get_type( void ) const {
+	virtual TYPE do_get_type( void ) const {
 		return ( TYPE::WINDOW );
 	}
 };

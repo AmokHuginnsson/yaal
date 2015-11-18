@@ -71,17 +71,15 @@ private:
 	static char const ESCAPE = '\\';
 	static char const DOUBLE_QUOTE = '"';
 	static char const SINGLE_QUOTE = '\'';
-	struct STATE {
-		typedef enum {
-			NORMAL,
-			IN_COMMENT,
-			IN_SINGLE_QUOTE,
-			IN_DOUBLE_QUOTE
-		} state_t;
+	enum class STATE {
+		NORMAL,
+		IN_COMMENT,
+		IN_SINGLE_QUOTE,
+		IN_DOUBLE_QUOTE
 	};
 	HPrepocessor const* _owner;
 	yaal::hcore::HString::const_iterator _cur;
-	STATE::state_t _state;
+	STATE _state;
 	bool _escape; /*!< Is a QUOTE substate. */
 public:
 	HIterator( void )

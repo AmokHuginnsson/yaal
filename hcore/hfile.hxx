@@ -56,36 +56,30 @@ public:
 	};
 	/*! \brief Ownership.
 	 */
-	struct OWNERSHIP {
-		typedef enum {
-			NONE,
-			ACQUIRED,
-			EXTERNAL
-		} ownership_t;
+	enum class OWNERSHIP {
+		NONE,
+		ACQUIRED,
+		EXTERNAL
 	};
 	/*! \brief Read operation modifiers.
 	 */
-	struct READ {
-		typedef enum {
-			DEFAULTS, /* BUFFERED_READS */
-			BUFFERED_READS,
-			UNBUFFERED_READS
-		} read_t;
+	enum class READ {
+		DEFAULTS, /* BUFFERED_READS */
+		BUFFERED_READS,
+		UNBUFFERED_READS
 	};
 	/*! \brief Kinds of seek operation.
 	 */
-	struct SEEK {
-		typedef enum {
-			SET,
-			CUR,
-			END
-		} seek_t;
+	enum class SEEK {
+		SET,
+		CUR,
+		END
 	};
 private:
 	void* _handle;
 	HString _path;
 	HString _error;
-	OWNERSHIP::ownership_t _ownership;
+	OWNERSHIP _ownership;
 public:
 	/*! \brief Create closed file stream object.
 	 */
@@ -95,7 +89,7 @@ public:
 	 * \param raw - low level interface stream handler.
 	 * \param ownership - shall this file object take ownership of this low level stream.
 	 */
-	HFile( void* raw, OWNERSHIP::ownership_t ownership );
+	HFile( void* raw, OWNERSHIP ownership );
 	/*! \brief Create new file stream and open file item immediately.
 	 *
 	 * \param path - path to file item to be opened.
@@ -109,12 +103,12 @@ public:
 	 * \param raw - low level interface stream handler.
 	 * \param ownership - shall this file object take ownership of this low level stream.
 	 */
-	int open( void* raw, OWNERSHIP::ownership_t ownership );
+	int open( void* raw, OWNERSHIP ownership );
 	int close( void );
 	void* release( void );
-	int long read_line( HString&, READ::read_t = READ::DEFAULTS, int const = 0 );
+	int long read_line( HString&, READ = READ::DEFAULTS, int const = 0 );
 	int long tell( void ) const;
-	void seek( int long, SEEK::seek_t const& = SEEK::SET );
+	void seek( int long, SEEK const& = SEEK::SET );
 	HString const& get_path( void ) const;
 	HString const& get_error( void ) const;
 	bool is_opened( void ) const;

@@ -42,7 +42,7 @@ HChunk::HChunk( void )
 	return;
 }
 
-HChunk::HChunk( int long size_, STRATEGY::enum_t strategy_ )
+HChunk::HChunk( int long size_, STRATEGY strategy_ )
 	: _size( 0 ), _data( NULL ) {
 	M_PROLOG
 	realloc( size_, strategy_ );
@@ -82,7 +82,7 @@ void HChunk::free( void ) {
 	return;
 }
 
-void* HChunk::realloc( int long size_, STRATEGY::enum_t strategy_ ) {
+void* HChunk::realloc( int long size_, STRATEGY strategy_ ) {
 	if ( size_ < 1 )
 		M_THROW( "bad size", size_ );
 	if ( size_ > _size ) {

@@ -150,12 +150,10 @@ struct GLYPHS {
 
 /*! \brief Cursor visibility types.
  */
-struct CURSOR {
-	typedef enum {
-		INVISIBLE,
-		VISIBLE,
-		VERY_VISIBLE
-	} cursor_t;
+enum class CURSOR {
+	INVISIBLE,
+	VISIBLE,
+	VERY_VISIBLE
 };
 
 /*! \brief TUI colors definitions.
@@ -262,7 +260,7 @@ public:
 	void set_attr( int ) const;
 	void set_background( int ) const;
 	void move( int, int ) const;
-	CURSOR::cursor_t curs_set( CURSOR::cursor_t const& ) const;
+	CURSOR curs_set( CURSOR ) const;
 	void addch( int );
 	void refresh( void );
 	int endwin( void );

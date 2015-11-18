@@ -79,7 +79,7 @@ HIODispatcher::~HIODispatcher( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-void HIODispatcher::register_file_descriptor_handler( int fileDescriptor_, call_fd_t HANDLER, FD_TYPE::fd_type_t const& fdType_ ) {
+void HIODispatcher::register_file_descriptor_handler( int fileDescriptor_, call_fd_t HANDLER, FD_TYPE fdType_ ) {
 	M_PROLOG
 	if ( _callbackContext )
 		_newIOHandlers.push_back( new_io_handler_t( fdType_, fileDescriptor_, HANDLER ) );

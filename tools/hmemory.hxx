@@ -115,12 +115,10 @@ class HMemory : public yaal::hcore::HStreamInterface {
 public:
 	typedef HMemory this_type;
 	typedef yaal::hcore::HStreamInterface base_type;
-	struct INITIAL_STATE {
-		typedef enum {
-			AUTO,
-			VALID,
-			INVALID
-		} enum_t;
+	enum class INITIAL_STATE {
+		AUTO,
+		VALID,
+		INVALID
 	};
 private:
 	HMemoryHandlingStrategyInterface& _memory;
@@ -128,7 +126,7 @@ private:
 	int long _cursorRead;
 	int long _cursorWrite;
 public:
-	HMemory( HMemoryHandlingStrategyInterface& memory_, INITIAL_STATE::enum_t = INITIAL_STATE::AUTO );
+	HMemory( HMemoryHandlingStrategyInterface& memory_, INITIAL_STATE = INITIAL_STATE::AUTO );
 	/*! \brief Destructor.
 	 */
 	virtual ~HMemory( void );

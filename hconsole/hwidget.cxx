@@ -447,7 +447,7 @@ void HWidget::set_draw_label( bool drawLabel_ ) {
 	M_EPILOG
 }
 
-void HWidget::set_label_position( LABEL::POSITION::label_position_t labelPosition_ ) {
+void HWidget::set_label_position( LABEL::POSITION labelPosition_ ) {
 	M_PROLOG
 	_labelPosition = labelPosition_;
 	schedule_repaint();
@@ -455,7 +455,7 @@ void HWidget::set_label_position( LABEL::POSITION::label_position_t labelPositio
 	M_EPILOG
 }
 
-void HWidget::set_label_decoration( LABEL::DECORATION::decoration_t decoration_ ) {
+void HWidget::set_label_decoration( LABEL::DECORATION decoration_ ) {
 	M_PROLOG
 	_labelDecoration = decoration_;
 	_labelLength = static_cast<int>( _label.get_size() );
@@ -534,13 +534,13 @@ HWidgetAttributes& HWidgetAttributes::draw_label( bool drawLabel_ ) {
 	return ( *this );
 }
 
-HWidgetAttributes& HWidgetAttributes::label_position( HWidget::LABEL::POSITION::label_position_t labelPosition_ ) {
+HWidgetAttributes& HWidgetAttributes::label_position( HWidget::LABEL::POSITION labelPosition_ ) {
 	_labelPosition = labelPosition_;
 	_labelPositionSet = true;
 	return ( *this );
 }
 
-HWidgetAttributes& HWidgetAttributes::label_decoration( HWidget::LABEL::DECORATION::decoration_t decoration_ ) {
+HWidgetAttributes& HWidgetAttributes::label_decoration( HWidget::LABEL::DECORATION decoration_ ) {
 	_labelDecoration = decoration_;
 	_labelDecorationSet = true;
 	return ( *this );

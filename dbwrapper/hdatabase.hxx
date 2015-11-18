@@ -71,7 +71,7 @@ public:
 	 * \param cursor_ - query result cursor type.
 	 * \return Result set for given query.
 	 */
-	HRecordSet::ptr_t execute_query( yaal::hcore::HString const& query_, HRecordSet::CURSOR::cursor_t cursor_ = HRecordSet::CURSOR::RANDOM_ACCESS );
+	HRecordSet::ptr_t execute_query( yaal::hcore::HString const& query_, HRecordSet::CURSOR cursor_ = HRecordSet::CURSOR::RANDOM_ACCESS );
 
 	/*! \brief Prepare query object for argument binding.
 	 *

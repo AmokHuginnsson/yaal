@@ -215,7 +215,7 @@ bool HComboboxWidget::do_click( mouse::OMouse& mouse_ ) {
 	M_EPILOG
 }
 
-void HComboboxWidget::close_combo( ACTION::action_t action_ ) {
+void HComboboxWidget::close_combo( ACTION action_ ) {
 	M_PROLOG
 	_mode = MODE::EDITCONTROL;
 	if ( action_ == ACTION::APPLY ) {

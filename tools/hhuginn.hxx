@@ -175,16 +175,14 @@ private:
 	typedef yaal::hcore::HMap<yaal::hcore::HString, class_t> classes_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, value_t> packages_t;
 	typedef yaal::hcore::HMap<yaal::hcore::HString, function_t> functions_t;
-	struct STATE {
-		typedef enum {
-			EMPTY,
-			LOADED,
-			PREPROCESSED,
-			PARSED,
-			COMPILED
-		} state_t;
+	enum class STATE {
+		EMPTY,
+		LOADED,
+		PREPROCESSED,
+		PARSED,
+		COMPILED
 	};
-	STATE::state_t _state;
+	STATE _state;
 	HType::id_generator_t _idGenerator;
 	HType::type_dict_t _userTypeDict;
 	value_t _none;

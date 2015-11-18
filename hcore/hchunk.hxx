@@ -45,11 +45,9 @@ private:
 	int long _size;
 	void* _data;
 public:
-	struct STRATEGY {
-		typedef enum {
-			GEOMETRIC,
-			EXACT
-		} enum_t;
+	enum class STRATEGY {
+		GEOMETRIC,
+		EXACT
 	};
 	typedef yaal::hcore::HPointer<HChunk> ptr_t;
 	/*! \brief Create empty memory holder.
@@ -59,7 +57,7 @@ public:
 	 *
 	 * \param size - requested memory chunk size.
 	 */
-	explicit HChunk( int long size, STRATEGY::enum_t = STRATEGY::EXACT );
+	explicit HChunk( int long size, STRATEGY = STRATEGY::EXACT );
 	HChunk( HChunk&& );
 	HChunk& operator = ( HChunk&& );
 	~HChunk( void );
@@ -78,7 +76,7 @@ public:
 		return ( static_cast<char*>( _data ) );
 	}
 	void free( void );
-	void* realloc( int long, STRATEGY::enum_t = STRATEGY::GEOMETRIC );
+	void* realloc( int long, STRATEGY = STRATEGY::GEOMETRIC );
 	void swap( HChunk& );
 	int long get_size( void ) const {
 		return ( _size );

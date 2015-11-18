@@ -281,7 +281,7 @@ void do_pthread_mutexattr_destroy( void* attr ) {
 
 }
 
-HMutex::HMutex( TYPE::mutex_type_t const type_ )
+HMutex::HMutex( TYPE type_ )
 	: _type( type_ )
 	, _buf( chunk_size<pthread_mutex_t>( 1 ) + chunk_size<pthread_mutexattr_t>( 1 ) )
 	, _resGuard()
@@ -295,7 +295,7 @@ HMutex::HMutex( TYPE::mutex_type_t const type_ )
 	HResource<void, void (*)( void* )> res( attr, do_pthread_mutexattr_destroy );
 	_resGuard.swap( res );
 	M_ENSURE( ::pthread_mutexattr_settype( attr,
-				_type & TYPE::RECURSIVE ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
+				_type == TYPE::RECURSIVE ? PTHREAD_MUTEX_RECURSIVE : PTHREAD_MUTEX_ERRORCHECK ) != EINVAL );
 	::pthread_mutex_init( _buf.get<pthread_mutex_t>(), attr );
 	return;
 	M_EPILOG
@@ -314,7 +314,7 @@ HMutex::~HMutex( void ) {
 void HMutex::lock( void ) {
 	M_PROLOG
 	int error = ::pthread_mutex_lock( _buf.get<pthread_mutex_t>() );
-	if ( ! ( _type & TYPE::RECURSIVE ) ) {
+	if ( _type != TYPE::RECURSIVE ) {
 		M_ENSURE( error != EDEADLK );
 	}
 	_owner = HThread::get_current_thread_id();

@@ -57,7 +57,7 @@ HFile::HFile( void )
 	M_EPILOG
 }
 
-HFile::HFile( void* const handle_, OWNERSHIP::ownership_t ownership_ )
+HFile::HFile( void* const handle_, OWNERSHIP ownership_ )
 	: HStreamInterface(),
 	_handle( handle_ ), _path(), _error(),
 	_ownership( handle_ ? ownership_ : OWNERSHIP::NONE ) {
@@ -138,7 +138,7 @@ int HFile::do_open( HString const& path_, open_t const& open_ ) {
 	M_EPILOG
 }
 
-int HFile::open( void* const handle_, OWNERSHIP::ownership_t ownership_ ) {
+int HFile::open( void* const handle_, OWNERSHIP ownership_ ) {
 	M_PROLOG
 	M_ENSURE_EX( ! _handle, "stream already opened" );
 	M_ENSURE( handle_ || ( ownership_ == OWNERSHIP::NONE ) );
@@ -189,7 +189,7 @@ int long HFile::tell( void ) const {
 	M_EPILOG
 }
 
-void HFile::seek( int long pos, SEEK::seek_t const& seek_ ) {
+void HFile::seek( int long pos, SEEK const& seek_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
 	int s( 0 );
@@ -212,11 +212,11 @@ void HFile::seek( int long pos, SEEK::seek_t const& seek_ ) {
 	M_EPILOG
 }
 
-int long HFile::read_line( HString& line_, READ::read_t read_,
+int long HFile::read_line( HString& line_, READ read_,
 		int const maximumLength_ ) {
 	M_PROLOG
 	M_ASSERT( _handle );
-	READ::read_t readMode( read_ );
+	READ readMode( read_ );
 	if ( readMode == READ::DEFAULTS ) {
 		readMode = READ::BUFFERED_READS;
 	}

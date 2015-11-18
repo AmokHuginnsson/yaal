@@ -46,8 +46,8 @@ public:
 		int _height;        /*!< height of control */
 		int _width;         /*!< width of control */
 		yaal::hcore::HString _label; /*!< control label */
-		HWidget::LABEL::POSITION::label_position_t _labelPosition;
-		HWidget::LABEL::DECORATION::decoration_t _labelDecoration;
+		HWidget::LABEL::POSITION _labelPosition;
+		HWidget::LABEL::DECORATION _labelDecoration;
 		OResource( void );
 	};
 protected:

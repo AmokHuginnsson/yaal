@@ -46,8 +46,11 @@ struct ODatagram {
 	HChunk _data;
 	int long _size;
 	ODatagram( int size_ )
-		: _ip(), _port( 0 ), _data( size_ ), _size( size_ )
-		{}
+		: _ip()
+		, _port( 0 )
+		, _data( size_ )
+		, _size( size_ ) {
+	}
 };
 
 class HUDPSocket : public trait::HNonCopyable {
@@ -56,20 +59,16 @@ public:
 	typedef HPointer<HUDPSocket> ptr_t;
 	/*! \brief Socket types.
 	 */
-	struct MODE {
-		/*! \brief Socket types.
-		 */
-		typedef enum {
-			DEFAULT,
-			BLOCKING,
-			NONBLOCKING
-		} socket_mode_t;
+	enum class MODE {
+		DEFAULT,
+		BLOCKING,
+		NONBLOCKING
 	};
 private:
 	int _fileDescriptor;
 public:
-	HUDPSocket( MODE::socket_mode_t = MODE::DEFAULT );
-	HUDPSocket( int, ip_t = ip_t(), MODE::socket_mode_t = MODE::DEFAULT );
+	HUDPSocket( MODE = MODE::DEFAULT );
+	HUDPSocket( int, ip_t = ip_t(), MODE = MODE::DEFAULT );
 	virtual ~HUDPSocket( void );
 	int get_file_descriptor( void ) const;
 	void bind( int, ip_t = ip_t() );
@@ -78,7 +77,7 @@ public:
 	void send( void const*, int long );
 	int long receive( ODatagram& );
 private:
-	void init( MODE::socket_mode_t );
+	void init( MODE );
 	void do_bind( int, ip_t );
 };
 

@@ -54,7 +54,7 @@ public:
 		HDataColumnInfo(
 				yaal::hcore::HString const& columnName,
 				int width,
-				BITS::ALIGN::align_t const& align = BITS::ALIGN::LEFT,
+				BITS::ALIGN align = BITS::ALIGN::LEFT,
 				yaal::TYPE type = yaal::TYPE::HSTRING,
 				yaal::hcore::HString const& format_ = hcore::HString(),
 				HWidget* associatedWidget = NULL,
@@ -96,7 +96,7 @@ protected:
 			hconsole::HListWidget*,
 			yaal::hcore::HString const& columnName,
 			int width,
-			hconsole::HListWidget::BITS::ALIGN::align_t const& align,
+			hconsole::HListWidget::BITS::ALIGN align,
 			yaal::TYPE type,
 			yaal::hcore::HString const&,
 			hconsole::HWidget* associatedWidget ) override;

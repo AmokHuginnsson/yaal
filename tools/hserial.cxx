@@ -159,7 +159,7 @@ void HSerial::compile( void ) {
 	M_EPILOG
 }
 
-void HSerial::set_speed( SPEED::speed_t speed_ ) {
+void HSerial::set_speed( SPEED speed_ ) {
 	M_PROLOG
 	_speed = speed_;
 	return;

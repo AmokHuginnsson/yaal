@@ -46,14 +46,12 @@ public:
 	typedef yaal::hcore::HStreamInterface base_type;
 	typedef yaal::hcore::HStreamInterface::ptr_t owned_stream_t;
 	typedef yaal::hcore::HStreamInterface& ref_stream_t;
-	struct MODE {
-		typedef enum {
-			DEFLATE,
-			INFLATE
-		} mode_t;
+	enum class MODE {
+		DEFLATE,
+		INFLATE
 	};
 private:
-	MODE::mode_t _mode;
+	MODE _mode;
 	int _error;
 	owned_stream_t _streamOwned;
 	yaal::hcore::HStreamInterface* _streamRef;
@@ -63,10 +61,10 @@ private:
 	int long _offset;
 	bool _flushed;
 public:
-	HZipStream( MODE::mode_t );
+	HZipStream( MODE );
 	virtual ~HZipStream( void );
-	explicit HZipStream( owned_stream_t, MODE::mode_t );
-	explicit HZipStream( ref_stream_t, MODE::mode_t );
+	explicit HZipStream( owned_stream_t, MODE );
+	explicit HZipStream( ref_stream_t, MODE );
 	template<typename call_t>
 	HZipStream& operator()( call_t );
 	void reset( owned_stream_t = owned_stream_t() );

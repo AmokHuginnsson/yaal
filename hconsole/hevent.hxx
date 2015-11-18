@@ -41,23 +41,21 @@ namespace hconsole {
 class HEvent {
 public:
 	typedef HEvent this_type;
-	struct TYPE {
-		typedef enum {
-			KEY_PRESS,
-			MOUSE,
-			COMMAND,
-			WINDOW,
-			WIDGET
-		} type_t;
+	enum class TYPE {
+		KEY_PRESS,
+		MOUSE,
+		COMMAND,
+		WINDOW,
+		WIDGET
 	};
 public:
 	virtual ~HEvent( void ) {
 	}
-	TYPE::type_t get_type( void ) const {
+	TYPE get_type( void ) const {
 		return ( do_get_type() );
 	}
 private:
-	virtual TYPE::type_t do_get_type( void ) const = 0;
+	virtual TYPE do_get_type( void ) const = 0;
 };
 
 typedef hcore::HBoundCall<bool ( HEvent const& )> event_listener_t;
@@ -77,7 +75,7 @@ public:
 		return ( _keyCode );
 	}
 private:
-	virtual TYPE::type_t do_get_type( void ) const override {
+	virtual TYPE do_get_type( void ) const override {
 		return ( TYPE::KEY_PRESS );
 	}
 };
@@ -96,7 +94,7 @@ public:
 		return ( _mouse );
 	}
 private:
-	virtual TYPE::type_t do_get_type( void ) const override {
+	virtual TYPE do_get_type( void ) const override {
 		return ( TYPE::MOUSE );
 	}
 };
@@ -115,7 +113,7 @@ public:
 		return ( _command );
 	}
 private:
-	virtual TYPE::type_t do_get_type( void ) const override {
+	virtual TYPE do_get_type( void ) const override {
 		return ( TYPE::COMMAND );
 	}
 };

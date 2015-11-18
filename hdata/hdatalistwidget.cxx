@@ -49,7 +49,7 @@ namespace hdata {
 HDataListWidget::HDataColumnInfo::HDataColumnInfo(
 		yaal::hcore::HString const& columnName_,
 		int width_,
-		BITS::ALIGN::align_t const& align_,
+		BITS::ALIGN align_,
 		yaal::TYPE type_,
 		hcore::HString const& format_,
 		HWidget* associatedWidget_,
@@ -294,7 +294,7 @@ HListWidget::HColumnInfo::ptr_t HDataListWidgetCreator::do_make_column(
 		HListWidget* widget_,
 		yaal::hcore::HString const& columnName,
 		int width,
-		HListWidget::BITS::ALIGN::align_t const& align,
+		HListWidget::BITS::ALIGN align,
 		yaal::TYPE type,
 		yaal::hcore::HString const& format_,
 		HWidget* associatedWidget ) {

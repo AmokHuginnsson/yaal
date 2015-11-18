@@ -70,14 +70,10 @@ public:
 	struct BITS {
 		/*! \brief Possible alignment types of text in HWidget.
 		 */
-		struct ALIGN {
-			/*! \brief Align type.
-			 */
-			typedef enum {
-				LEFT,   /*!< text ought to be left aligned */
-				CENTER, /*!< text ought to be centered */
-				RIGHT   /*!< text ought to be right aligned */
-			} align_t;
+		enum class ALIGN {
+			LEFT,   /*!< text ought to be left aligned */
+			CENTER, /*!< text ought to be centered */
+			RIGHT   /*!< text ought to be right aligned */
 		};
 	};
 	/*! \brief How widget label should be painted.
@@ -85,19 +81,13 @@ public:
 	struct LABEL {
 		/*! \brief Where should label be painted relative to widget contents.
 		 */
-		struct POSITION {
-			/*! \brief Possible label positions relative to widget contents.
-			 */
-			typedef enum {
-				SIDE_BY_SIDE, /*!< Label is on the left of widget contents. */
-				STACKED       /*!< Label is drawn above of the widget contents (TY aerofoam). */
-			} label_position_t;
+		enum class POSITION {
+			SIDE_BY_SIDE, /*!< Label is on the left of widget contents. */
+			STACKED       /*!< Label is drawn above of the widget contents (TY aerofoam). */
 		};
-		struct DECORATION {
-			typedef enum {
-				AUTO,
-				EXPLICIT
-			} decoration_t;
+		enum class DECORATION {
+			AUTO,
+			EXPLICIT
 		};
 	};
 	static OAttribute const DEFAULT_ATTRS; /*!< Default HWidget attribites (colors of label and data fore/back-ground) */
@@ -106,8 +96,8 @@ protected:
 	bool _enabled;    /*!< Tells if widget is enabled, focus can go only to enabled widget. */
 	bool _focused;    /*!< Tells if widget has focus. */
 	bool _drawLabel;  /*!< Will be label driven? */
-	LABEL::POSITION::label_position_t _labelPosition; /*!< Is label in the same line as top of widget? */
-	LABEL::DECORATION::decoration_t _labelDecoration; /*!< Should this label be auto-decorated? */
+	LABEL::POSITION _labelPosition; /*!< Is label in the same line as top of widget? */
+	LABEL::DECORATION _labelDecoration; /*!< Should this label be auto-decorated? */
 	/** \name Widget attributes.
 	 * High byte of attribute, in all
 	 * three cases keeps label (widget title)
@@ -321,13 +311,13 @@ public:
  *
  * \param labelPosition - New position for label in this widget.
  */
-	void set_label_position( LABEL::POSITION::label_position_t labelPosition );
+	void set_label_position( LABEL::POSITION labelPosition );
 
 /*! \brief Set label decoraton mode.
  *
  * \param decoration - New decoration mode for label in this widget.
  */
-	void set_label_decoration( LABEL::DECORATION::decoration_t decoration );
+	void set_label_decoration( LABEL::DECORATION decoration );
 
 /*! \brief Set new coordinates and size for a widget.
  *
@@ -418,9 +408,9 @@ typedef yaal::hcore::HExceptionT<HWidget> HWidgetException;
 class HWidgetAttributes : public HWidgetAttributesInterface {
 	bool _drawLabel;
 	bool _drawLabelSet;
-	HWidget::LABEL::POSITION::label_position_t _labelPosition;
+	HWidget::LABEL::POSITION _labelPosition;
 	bool _labelPositionSet;
-	HWidget::LABEL::DECORATION::decoration_t _labelDecoration;
+	HWidget::LABEL::DECORATION _labelDecoration;
 	bool _labelDecorationSet;
 	HWidget::OAttribute _attributeDisabled;
 	bool _attributeDisabledSet;
@@ -433,8 +423,8 @@ protected:
 public:
 	HWidgetAttributes( void );
 	HWidgetAttributes& draw_label( bool );
-	HWidgetAttributes& label_position( HWidget::LABEL::POSITION::label_position_t );
-	HWidgetAttributes& label_decoration( HWidget::LABEL::DECORATION::decoration_t );
+	HWidgetAttributes& label_position( HWidget::LABEL::POSITION );
+	HWidgetAttributes& label_decoration( HWidget::LABEL::DECORATION );
 	HWidgetAttributes& attribure_enabled( HWidget::OAttribute const& );
 	HWidgetAttributes& attribure_disabled( HWidget::OAttribute const& );
 	HWidgetAttributes& attribure_focused( HWidget::OAttribute const& );
@@ -456,7 +446,7 @@ public:
 		return ( _widget );
 	}
 private:
-	virtual TYPE::type_t do_get_type( void ) const {
+	virtual TYPE do_get_type( void ) const {
 		return ( TYPE::WINDOW );
 	}
 };

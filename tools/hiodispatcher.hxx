@@ -42,11 +42,9 @@ namespace tools {
  */
 class HIODispatcher {
 public:
-	struct FD_TYPE {
-		typedef enum {
-			READER,
-			WRITER
-		} fd_type_t;
+	enum class FD_TYPE {
+		READER,
+		WRITER
 	};
 protected:
 	typedef HIODispatcher this_type;
@@ -54,7 +52,7 @@ private:
 	typedef yaal::hcore::HBoundCall<> delayed_call_t;
 	typedef yaal::hcore::HBoundCall<void ( int )> call_fd_t;
 	typedef yaal::hcore::HPair<int, call_fd_t> io_handler_t;
-	typedef yaal::hcore::HTuple<FD_TYPE::fd_type_t, int, call_fd_t> new_io_handler_t;
+	typedef yaal::hcore::HTuple<FD_TYPE, int, call_fd_t> new_io_handler_t;
 	typedef yaal::hcore::HArray<int> dropped_fd_t;
 	typedef yaal::hcore::HArray<io_handler_t> io_handlers_t;
 	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
@@ -84,7 +82,7 @@ public:
 	void run( void );
 	void stop( void );
 	int idle_cycles( void ) const;
-	void register_file_descriptor_handler( int, call_fd_t, FD_TYPE::fd_type_t const& = FD_TYPE::READER );
+	void register_file_descriptor_handler( int, call_fd_t, FD_TYPE = FD_TYPE::READER );
 	void unregister_file_descriptor_handler( int );
 	void add_alert_handle( delayed_call_t );
 	void add_idle_handle( delayed_call_t );

@@ -40,7 +40,7 @@ namespace tools {
 int _compressionLevel_ = Z_DEFAULT_COMPRESSION; /* Library dafault, it is the same as 6. */
 int long _zBufferSize_ = 256 * 1024; /* As advised in the documentation. */
 
-HZipStream::HZipStream( MODE::mode_t mode_ )
+HZipStream::HZipStream( MODE mode_ )
 	: _mode( mode_ )
 	, _error( Z_OK )
 	, _streamOwned()
@@ -56,7 +56,7 @@ HZipStream::HZipStream( MODE::mode_t mode_ )
 	M_EPILOG
 }
 
-HZipStream::HZipStream( owned_stream_t stream_, MODE::mode_t mode_ )
+HZipStream::HZipStream( owned_stream_t stream_, MODE mode_ )
 	: _mode( mode_ )
 	, _error( Z_OK )
 	, _streamOwned( stream_ )
@@ -72,7 +72,7 @@ HZipStream::HZipStream( owned_stream_t stream_, MODE::mode_t mode_ )
 	M_EPILOG
 }
 
-HZipStream::HZipStream( ref_stream_t stream_, MODE::mode_t mode_ )
+HZipStream::HZipStream( ref_stream_t stream_, MODE mode_ )
 	: _mode( mode_ )
 	, _error( Z_OK )
 	, _streamOwned()

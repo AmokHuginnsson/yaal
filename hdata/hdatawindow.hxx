@@ -50,24 +50,20 @@ public:
 	typedef HWindow base_type;
 	/*! \brief Data window operation mode.
 	 */
-	struct DOCUMENT {
-		/*! \brief Data window operation mode.
-		 */
-		typedef enum {
-			VIEW, /*!< Browse data. */
-			EDIT  /*!< Edit current record. */
-		} mode_t;
+	enum DOCUMENT {
+		VIEW, /*!< Browse data. */
+		EDIT  /*!< Edit current record. */
 	};
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, HDictionary::ptr_t> dictionaries_t;
 protected:
 	bool _modified;
-	DOCUMENT::mode_t _documentMode;
+	DOCUMENT _documentMode;
 	HDataWidget* _mainWidget;
 	typedef yaal::hcore::HList<HDataWidget*> controls_t;
 	controls_t _viewModeWidgets;
 	controls_t _editModeWidgets;
 	yaal::dbwrapper::HCRUDDescriptor::ptr_t _crud;
-	yaal::dbwrapper::HCRUDDescriptor::MODE::mode_t _mode;
+	yaal::dbwrapper::HCRUDDescriptor::MODE _mode;
 	yaal::dbwrapper::HCRUDDescriptor::field_names_t _columns;
 	yaal::hcore::HString _idColumnName;
 	dictionaries_t _dictionaries;
@@ -77,7 +73,7 @@ public:
 	bool is_modified( void ) const;
 	void set_modified( bool = true );
 	void sync( yaal::dbwrapper::HRecordSet::iterator );
-	void set_widget_role( HDataWidget*, HDataWidget::ROLE::role_t );
+	void set_widget_role( HDataWidget*, HDataWidget::ROLE );
 	void set_record_descriptor(
 			yaal::hcore::HString const&,
 			yaal::hcore::HString const&,
@@ -90,7 +86,7 @@ public:
 	void add_dictionary( yaal::hcore::HString const&, HDictionary::ptr_t const& );
 	HDictionary::ptr_t get_dictionary( yaal::hcore::HString const& );
 protected:
-	void set_mode( DOCUMENT::mode_t );
+	void set_mode( DOCUMENT );
 	void sync( void );
 	void sync( int, hconsole::HEditWidget& );
 	void sync( int, HDataListWidget& );

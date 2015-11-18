@@ -64,33 +64,31 @@ public:
 	};
 	/*! \brief Serial port data trnsmission speeds.
 	 */
-	struct SPEED {
-		typedef enum {
-			DEFAULT,
-			B_230400,
-			B_115200,
+	enum class SPEED {
+		DEFAULT,
+		B_230400,
+		B_115200,
 #if defined( HAVE_DECL_B76800 ) && ( HAVE_DECL_B76800 == 1 )
-			B_76800,
+		B_76800,
 #endif /* HAVE_DECL_B76800 */
-			B_57600,
-			B_38400,
+		B_57600,
+		B_38400,
 #if defined( HAVE_DECL_B28800 ) && ( HAVE_DECL_B28800 == 1 )
-			B_28800,
+		B_28800,
 #endif /* HAVE_DECL_B28800 */
-			B_19200,
+		B_19200,
 #if defined( HAVE_DECL_B14400 ) && ( HAVE_DECL_B14400 == 1 )
-			B_14400,
+		B_14400,
 #endif /* HAVE_DECL_B14400 */
-			B_9600,
+		B_9600,
 #if defined( HAVE_DECL_B7200 ) && ( HAVE_DECL_B7200 == 1 )
-			B_7200,
+		B_7200,
 #endif /* HAVE_DECL_B7200 */
-			B_4800,
-			B_2400
-		} speed_t;
+		B_4800,
+		B_2400
 	};
 protected:
-	SPEED::speed_t _speed;
+	SPEED _speed;
 	flag_t _flags;
 	hcore::HString _devicePath;
 	hcore::HChunk _tIO;
@@ -99,7 +97,7 @@ public:
 	HSerial( yaal::hcore::HString const& = yaal::hcore::HString() ); /* device path */
 	virtual ~HSerial( void );
 	void open( void );
-	void set_speed( SPEED::speed_t );
+	void set_speed( SPEED );
 	void set_flags( flag_t );
 	void flush( int );
 	void wait_for_eot( void );

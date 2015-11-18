@@ -45,7 +45,7 @@ static int const INVALID_CURSOR( -1 );
 }
 
 HRecordSet::HRecordSet( database_ptr_t dataBase_,
-		ODBConnector const* connector_, void* reuslt_, CURSOR::cursor_t cursor_ )
+		ODBConnector const* connector_, void* reuslt_, CURSOR cursor_ )
 	: _dataBase( dataBase_ ), _connector( connector_ ),
 	_result( reuslt_ ), _cursor( cursor_ ), _iterating( false ) {
 	M_PROLOG

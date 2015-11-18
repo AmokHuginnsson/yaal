@@ -84,7 +84,7 @@ HCRUDDescriptor::HCRUDDescriptor( database_ptr_t dataBase_ )
 HCRUDDescriptor::~HCRUDDescriptor( void ) {
 }
 
-void HCRUDDescriptor::build_query( MODE::mode_t const& mode_ ) {
+void HCRUDDescriptor::build_query( MODE mode_ ) {
 	M_PROLOG
 	if ( _table.is_empty() ) {
 		throw HCRUDDescriptorException( "table is not set" );
@@ -229,7 +229,7 @@ HRecordSet::ptr_t HCRUDDescriptor::execute( void ) {
 	M_EPILOG
 }
 
-HRecordSet::ptr_t HCRUDDescriptor::execute( MODE::mode_t const& mode_ ) {
+HRecordSet::ptr_t HCRUDDescriptor::execute( MODE mode_ ) {
 	M_PROLOG
 	build_query( mode_ );
 	return ( execute() );
@@ -373,7 +373,7 @@ HString HCRUDDescriptor::get_sort( void ) const {
 	return ( _sort );
 }
 
-HCRUDDescriptor::MODE::mode_t HCRUDDescriptor::get_mode( void ) const {
+HCRUDDescriptor::MODE HCRUDDescriptor::get_mode( void ) const {
 	return ( _mode );
 }
 

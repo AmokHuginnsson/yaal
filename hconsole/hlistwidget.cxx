@@ -73,7 +73,7 @@ char const* default_format( TYPE type_ ) {
 }
 
 HListWidget::HColumnInfo::HColumnInfo( yaal::hcore::HString const& name_,
-		int width_, BITS::ALIGN::align_t const& align_, TYPE type_,
+		int width_, BITS::ALIGN align_, TYPE type_,
 		yaal::hcore::HString const& format_, HWidget* widget_ )
 	: _descending( false ), _widthRaw( 0 ), _width( width_ ), _align( align_ ),
 	_shortcutIndex( 0 ), _shortcut( 0 ), _type( type_ ), _format( ! format_.is_empty() ? format_ : default_format( _type ) ),
@@ -1621,7 +1621,7 @@ bool HListWidgetCreator::do_apply_resources( HWidget::ptr_t widget_, yaal::tools
 		HString xmlAlign( xml::attr_val( node_, "align" ) );
 		HString xmlType( xml::attr_val( node_, "type" ) );
 		xml::value_t format( xml::try_attr_val( node_, "format" ) );
-		HWidget::BITS::ALIGN::align_t align( HWidget::BITS::ALIGN::LEFT );
+		HWidget::BITS::ALIGN align( HWidget::BITS::ALIGN::LEFT );
 		if ( xmlAlign == "left" ) {
 			align = HWidget::BITS::ALIGN::LEFT;
 		} else if ( xmlAlign == "center" ) {
@@ -1663,7 +1663,7 @@ HListWidget::HColumnInfo::ptr_t HListWidgetCreator::make_column(
 		HListWidget* widget_,
 		yaal::hcore::HString const& columnName,
 		int width,
-		HListWidget::BITS::ALIGN::align_t const& align,
+		HListWidget::BITS::ALIGN align,
 		TYPE type,
 		yaal::hcore::HString const& format_,
 		HWidget* associatedWidget ) {
@@ -1677,7 +1677,7 @@ HListWidget::HColumnInfo::ptr_t HListWidgetCreator::do_make_column(
 		HListWidget*,
 		yaal::hcore::HString const& columnName,
 		int width,
-		HListWidget::BITS::ALIGN::align_t const& align,
+		HListWidget::BITS::ALIGN align,
 		TYPE type,
 		yaal::hcore::HString const& format_,
 		HWidget* associatedWidget ) {

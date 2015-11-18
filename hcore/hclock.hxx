@@ -44,21 +44,19 @@ public:
 	typedef HClock this_type;
 	/*! \brief Specify what kind of time to measure.
 	 */
-	struct TYPE {
-		typedef enum {
-			REAL,
-			CPU
-		} type_t;
+	enum class TYPE {
+		REAL,
+		CPU
 	};
 private:
 	i64_t _moment[2];
-	TYPE::type_t _type;
+	TYPE _type;
 public:
 	/*! \brief Create clock of given type.
 	 *
 	 * \param type_ - type of clock to create.
 	 */
-	HClock( TYPE::type_t type_ = TYPE::REAL );
+	HClock( TYPE type_ = TYPE::REAL );
 	/*! \brief Get time that elapsed from last reset.
 	 *
 	 * \param unit_ - get time given in specific units.

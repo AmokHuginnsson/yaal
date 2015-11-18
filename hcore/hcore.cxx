@@ -53,7 +53,7 @@ namespace yaal {
 
 namespace memory {
 
-extern ON_ALLOC_FAILURE::on_alloc_failure_t _onAllocFailure_;
+extern ON_ALLOC_FAILURE _onAllocFailure_;
 
 }
 

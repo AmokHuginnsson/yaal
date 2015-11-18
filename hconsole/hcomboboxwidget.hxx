@@ -51,22 +51,16 @@ public:
 	typedef HListWidget base_type;
 	/*! \brief Current combobox state.
 	 */
-	struct MODE {
-		/*! \brief Current combobox state.
-		 */
-		typedef enum {
-			EDITCONTROL, /*!< Combobox retracted. */
-			LISTCONTROL  /*!< Combobox expanded. */
-		} mode_t;
+	enum class MODE {
+		EDITCONTROL, /*!< Combobox retracted. */
+		LISTCONTROL  /*!< Combobox expanded. */
 	};
-	struct ACTION {
-		typedef enum {
-			APPLY,
-			CANCEL
-		} action_t;
+	enum class ACTION {
+		APPLY,
+		CANCEL
 	};
 protected:
-	MODE::mode_t _mode; /*!< operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
+	MODE _mode; /*!< operating mode (MODE_EDITCONTROL|MODE_LISTCONTROL) */
 	int _droppedWidth;  /*!< width of dropped list */
 	struct OSelection {
 		iterator_t _cursor;
@@ -105,7 +99,7 @@ protected:
 	virtual HInfo const& do_get_data( void ) const override;
 	virtual void do_set_data( HInfo const& ) override;
 private:
-	void close_combo( ACTION::action_t );
+	void close_combo( ACTION );
 	HComboboxWidget( HComboboxWidget const& ) = delete;
 	HComboboxWidget& operator = ( HComboboxWidget const& ) = delete;
 };

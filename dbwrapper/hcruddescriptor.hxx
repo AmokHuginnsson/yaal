@@ -47,18 +47,14 @@ public:
 	typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
 	/*! \brief Query types.
 	 */
-	struct MODE {
-		/*! \brief Query types.
-		 */
-		typedef enum {
-			SELECT, /*!< SELECT query. */
-			UPDATE, /*!< Data update query. */
-			INSERT, /*!< INSERT new data query. */
-			DELETE  /*!< DELETE data query. */
-		} mode_t;
+	enum class MODE {
+		SELECT, /*!< SELECT query. */
+		UPDATE, /*!< Data update query. */
+		INSERT, /*!< INSERT new data query. */
+		DELETE  /*!< DELETE data query. */
 	};
 private:
-	MODE::mode_t _mode;
+	MODE _mode;
 	yaal::hcore::HString _varTmpBuffer;
 	yaal::hcore::HString _SQL;
 	yaal::hcore::HString _table;    /* table name */
@@ -93,11 +89,11 @@ public:
 	void sync( int, int long& );
 	void sync( int, yaal::hcore::HString& );
 	void sync( int, yaal::hcore::HTime& );
-	MODE::mode_t get_mode( void ) const;
+	MODE get_mode( void ) const;
 	int long get_size( void ) const;
 	HRecordSet::value_t& operator[]( int );
-	void build_query( MODE::mode_t const& );
-	HRecordSet::ptr_t execute( MODE::mode_t const& );
+	void build_query( MODE );
+	HRecordSet::ptr_t execute( MODE );
 	HRecordSet::ptr_t execute( yaal::hcore::HString const& );
 	HRecordSet::ptr_t execute( void );
 private:

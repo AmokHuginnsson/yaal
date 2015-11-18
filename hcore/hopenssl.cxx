@@ -320,7 +320,7 @@ void const* HOpenSSL::OSSLContextClient::do_method( void ) const {
 	M_EPILOG
 }
 
-HOpenSSL::HOpenSSL( int fileDescriptor_, TYPE::ssl_context_type_t type_ )
+HOpenSSL::HOpenSSL( int fileDescriptor_, TYPE type_ )
 	: _pendingOperation( false ), _ssl( NULL ),
 	_ctx( ( type_ == TYPE::SERVER )
 			? static_cast<OSSLContext*>( &OSSLContextServer::get_instance() )

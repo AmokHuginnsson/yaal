@@ -63,7 +63,7 @@ static clockid_t const FWD_CLOCK_THREAD_CPUTIME_ID = CLOCK_THREAD_CPUTIME_ID;
 #pragma GCC diagnostic error "-Wold-style-cast"
 }
 
-HClock::HClock( TYPE::type_t type_ )
+HClock::HClock( TYPE type_ )
 	: _moment(), _type( type_ ) {
 	M_PROLOG
 	reset();

@@ -151,7 +151,7 @@ void sync( HRecordSet::value_t& to_, HInfo const& from_, TYPE type_ ) {
 void apply_role( HDataWindow* window_, HDataWidget* widget_, yaal::tools::HXml::HConstNodeProxy node_ ) {
 	M_PROLOG
 	HString xmlRole( xml::attr_val( node_, "role" ) );
-	HDataWidget::ROLE::role_t role( HDataWidget::ROLE::INVALID );
+	HDataWidget::ROLE role( HDataWidget::ROLE::INVALID );
 	if ( xmlRole == "main" )
 		role = HDataWidget::ROLE::MAIN;
 	else if ( xmlRole == "data" )

@@ -157,7 +157,7 @@ int HStatusBarWidget::do_process_input( int code_ ) {
 	M_EPILOG
 }
 
-void HStatusBarWidget::set_prompt( yaal::hcore::HString const& prompt_, PROMPT::mode_t mode_ ) {
+void HStatusBarWidget::set_prompt( yaal::hcore::HString const& prompt_, PROMPT mode_ ) {
 	M_PROLOG
 	_mode = mode_;
 	_window->_previousFocusedChild = _window->_focusedChild;
@@ -323,7 +323,7 @@ void HStatusBarWidget::ask( char const* question_,
 	_choices = choices_;
 	_currentChoice = default_;
 	M_ENSURE( default_ < _choices.get_size() );
-	PROMPT::mode_t mode( PROMPT::NORMAL );
+	PROMPT mode( PROMPT::NORMAL );
 	if ( _currentChoice >= 0 ) {
 		mode = PROMPT::MENU;
 	} else {

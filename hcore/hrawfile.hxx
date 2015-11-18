@@ -56,10 +56,10 @@ protected:
 		/*! \brief Fd type flags.
 		 */
 		typedef enum {
-			DEFAULT			= 0, /*!< means plain */
-			PLAIN				= 1, /*!< fd represents plain raw IO */
-			SSL_SERVER	= 2, /*!< fd represents SSL server part of IO */
-			SSL_CLIENT	= 4  /*!< fd represents SSL client part of IO */
+			DEFAULT     = 0, /*!< means plain */
+			PLAIN       = 1, /*!< fd represents plain raw IO */
+			SSL_SERVER  = 2, /*!< fd represents SSL server part of IO */
+			SSL_CLIENT  = 4  /*!< fd represents SSL client part of IO */
 		} raw_file_type_t;
 	};
 	/*! \brief HRawFile event type that HRawFile user can wait for.

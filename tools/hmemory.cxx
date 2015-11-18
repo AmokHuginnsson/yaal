@@ -36,7 +36,7 @@ namespace yaal {
 
 namespace tools {
 
-HMemory::HMemory( HMemoryHandlingStrategyInterface& memory_, INITIAL_STATE::enum_t initialState_ )
+HMemory::HMemory( HMemoryHandlingStrategyInterface& memory_, INITIAL_STATE initialState_ )
 	: _memory( memory_ ),
 	_valid( initialState_ == INITIAL_STATE::AUTO ? -1 : ( initialState_ == INITIAL_STATE::VALID ? memory_.get_size() : 0 ) ),
 	_cursorRead( 0 ), _cursorWrite( 0 ) {

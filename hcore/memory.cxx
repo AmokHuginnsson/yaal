@@ -37,7 +37,7 @@ namespace yaal {
 
 namespace memory {
 
-ON_ALLOC_FAILURE::on_alloc_failure_t _onAllocFailure_ = ON_ALLOC_FAILURE::ABORT;
+ON_ALLOC_FAILURE _onAllocFailure_ = ON_ALLOC_FAILURE::ABORT;
 
 void* alloc( int long size_ ) {
 	M_ASSERT( ( size_ > 0 ) && "memory::malloc: requested size lower than 0" );

@@ -42,29 +42,21 @@ public:
 	typedef HStreamInterface base_type;
 	/*! \brief Child process output stream types.
 	 */
-	struct STREAM {
-		/*! \brief Output type flags.
-		 */
-		typedef enum {
-			OUT, /*!< Output stream is of interest. */
-			ERR /*!< Error stream is of interest. */
-		} stream_t;
+	enum class STREAM {
+		OUT, /*!< Output stream is of interest. */
+		ERR /*!< Error stream is of interest. */
 	};
 	/*! \brief Status of this child process.
 	 */
 	struct STATUS {
 		/*! \brief Status flags.
 		 */
-		struct TYPE {
-			/*! \brief Status flags.
-			 */
-			typedef enum {
-				NORMAL, /*!< process is running. */
-				ABORT, /*!< process has been stopped. */
-				NOT_SPAWNED /*!< process has not been spawned yet. */
-			} type_t;
+		enum class TYPE {
+			NORMAL, /*!< process is running. */
+			ABORT, /*!< process has been stopped. */
+			NOT_SPAWNED /*!< process has not been spawned yet. */
 		};
-		TYPE::type_t type; /*!< child process current status. */
+		TYPE type; /*!< child process current status. */
 		int value; /*!< exit value of finished child process. */
 		STATUS( void ) : type( TYPE::NOT_SPAWNED ), value( 0 ) {}
 	};
@@ -74,7 +66,7 @@ private:
 	int _pipeIn;
 	int _pipeOut;
 	int _pipeErr;
-	STREAM::stream_t _cSOI; /* Current Stream Of Interest */
+	STREAM _cSOI; /* Current Stream Of Interest */
 	yaal::hcore::HChunk _secondLineCache;
 	int _secondLineOffset;
 public:
@@ -85,7 +77,7 @@ public:
 	bool read_poll( int long* );
 	STATUS finish( void );
 	bool is_running( void ) const;
-	void set_csoi( STREAM::stream_t const& );
+	void set_csoi( STREAM );
 private:
 	virtual int long do_write( void const* const, int long ) override;
 	virtual void do_flush( void ) override;

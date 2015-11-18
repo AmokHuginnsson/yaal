@@ -44,22 +44,18 @@ public:
 	typedef HDateWidget this_type;
 	typedef HWidget base_type;
 private:
-	struct MODE {
-		typedef enum {
-			VIEW,
-			EDIT
-		} mode_t;
+	enum class MODE {
+		VIEW,
+		EDIT
 	};
-	struct ACTION {
-		typedef enum {
-			APPLY,
-			CANCEL
-		} action_t;
+	enum class ACTION {
+		APPLY,
+		CANCEL
 	};
 	yaal::hcore::HTime _time;
 	yaal::hcore::HTime _selectedTime;
 	HInfoTime _infoTime;
-	MODE::mode_t _mode;
+	MODE _mode;
 public:
 	HDateWidget( HWindow*, int, int, yaal::hcore::HString const&,
 			HWidgetAttributesInterface const& = HWidgetAttributesInterface() );
@@ -78,7 +74,7 @@ protected:
 	void on_key_page_down( void );
 	void on_key_page_up( void );
 	void on_key_enter( void );
-	void close_calendar( ACTION::action_t );
+	void close_calendar( ACTION );
 	char const* week_day_name( int );
 	int get_first_day_of_month_in_week_index( void ) const;
 };

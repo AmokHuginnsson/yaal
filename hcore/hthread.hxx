@@ -56,25 +56,21 @@ public:
 	typedef HMutex this_type;
 	/*! \brief Mutex types.
 	 */
-	struct TYPE {
-		/*! \brief Mutex types.
-		 */
-		typedef enum {
-			DEFAULT = 0,      /*!< Default mutex type (non-recursive). */
-			RECURSIVE = 1,    /*!< Recursive mutex type. */
-			NON_RECURSIVE = 2 /*!< Implicit non-recursive mutex type. */
-		} mutex_type_t;
+	enum class TYPE {
+		DEFAULT,      /*!< Default mutex type (non-recursive). */
+		RECURSIVE,    /*!< Recursive mutex type. */
+		NON_RECURSIVE /*!< Implicit non-recursive mutex type. */
 	};
 private:
 	/*{*/
-	TYPE::mutex_type_t _type;
+	TYPE _type;
 	HChunk _buf;
 	HResource<void, void (*)( void* )> _resGuard;
 	thread_helper::thread_id_t _owner;
 	/*}*/
 public:
 	/*{*/
-	HMutex( TYPE::mutex_type_t const /* recursive | fair */ = TYPE::DEFAULT );
+	HMutex( TYPE /* recursive | fair */ = TYPE::DEFAULT );
 	~HMutex( void );
 	void lock( void );
 	bool try_lock( void );

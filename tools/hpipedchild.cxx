@@ -230,15 +230,15 @@ bool HPipedChild::is_running( void ) const {
 	return ( ( _pid > 0 ) && ! err );
 }
 
-void HPipedChild::set_csoi( STREAM::stream_t const& cSOI_ ) {
+void HPipedChild::set_csoi( STREAM childStreamOfInterest_ ) {
 	M_PROLOG
-	M_ASSERT( ( cSOI_ == STREAM::OUT ) || ( cSOI_ == STREAM::ERR ) );
-	if ( cSOI_ != _cSOI ) {
+	M_ASSERT( ( childStreamOfInterest_ == STREAM::OUT ) || ( childStreamOfInterest_ == STREAM::ERR ) );
+	if ( childStreamOfInterest_ != _cSOI ) {
 		using yaal::swap;
 		swap( _offset, _secondLineOffset );
 		swap( _cache, _secondLineCache );
 	}
-	_cSOI = cSOI_;
+	_cSOI = childStreamOfInterest_;
 	return;
 	M_EPILOG
 }

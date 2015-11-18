@@ -64,7 +64,7 @@ int _attributeStatusBar_ = ( COLORS::FG_WHITE | COLORS::BG_BLACK ) << 8
 															| ( COLORS::FG_LIGHTGRAY | COLORS::BG_BLACK );
 int _attributeSearchHighlight_ = ( COLORS::FG_BLACK | COLORS::BG_BROWN | COLORS::BG_BLINK ) << 8
 																		| ( COLORS::FG_BLACK | COLORS::BG_BROWN );
-USE_MOUSE::use_mouse_t _useMouse_ = USE_MOUSE::AUTO;
+USE_MOUSE _useMouse_ = USE_MOUSE::AUTO;
 char _commandComposeCharacter_ = 'x';
 int  _commandComposeDelay_ = 16;
 

@@ -39,7 +39,7 @@ namespace yaal {
 
 namespace hcore {
 
-HUDPSocket::HUDPSocket( MODE::socket_mode_t type_ )
+HUDPSocket::HUDPSocket( MODE type_ )
 	: _fileDescriptor( -1 ) {
 	M_PROLOG
 	try {
@@ -55,7 +55,7 @@ HUDPSocket::HUDPSocket( MODE::socket_mode_t type_ )
 	M_EPILOG
 }
 
-HUDPSocket::HUDPSocket( int port_, ip_t ip_, MODE::socket_mode_t type_ )
+HUDPSocket::HUDPSocket( int port_, ip_t ip_, MODE type_ )
 	: _fileDescriptor( -1 ) {
 	M_PROLOG
 	try {
@@ -81,7 +81,7 @@ HUDPSocket::~HUDPSocket( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-void HUDPSocket::init( MODE::socket_mode_t type_ ) {
+void HUDPSocket::init( MODE type_ ) {
 	M_PROLOG
 	if ( type_ == MODE::DEFAULT ) {
 		type_ = MODE::BLOCKING;
@@ -91,7 +91,7 @@ void HUDPSocket::init( MODE::socket_mode_t type_ ) {
 					static_cast<int>( SOCK_DGRAM ),
 					0 /* info libc "Creating a Socket"
 							 says that "zero is usually right for PROTOCOL" */ ) ) >= 0 );
-		if ( !!( type_ & MODE::NONBLOCKING ) ) {
+		if ( type_ == MODE::NONBLOCKING ) {
 			int statusFlags( ::fcntl( _fileDescriptor, F_GETFL, 0 ) );
 			M_ENSURE( statusFlags >= 0 );
 			M_ENSURE( ::fcntl( _fileDescriptor, F_SETFL, statusFlags | O_NONBLOCK ) == 0 );

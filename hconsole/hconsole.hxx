@@ -40,14 +40,12 @@ extern M_YAAL_HCONSOLE_PUBLIC_API HWidget::OAttribute _attributeEnabled_;
 extern M_YAAL_HCONSOLE_PUBLIC_API HWidget::OAttribute _attributeFocused_;
 extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeStatusBar_;
 extern M_YAAL_HCONSOLE_PUBLIC_API int _attributeSearchHighlight_;
-struct USE_MOUSE {
-	typedef enum {
-		YES,
-		NO,
-		AUTO
-	} use_mouse_t;
+enum class USE_MOUSE {
+	YES,
+	NO,
+	AUTO
 };
-extern M_YAAL_HCONSOLE_PUBLIC_API USE_MOUSE::use_mouse_t _useMouse_;
+extern M_YAAL_HCONSOLE_PUBLIC_API USE_MOUSE _useMouse_;
 extern M_YAAL_HCONSOLE_PUBLIC_API char _commandComposeCharacter_;
 extern M_YAAL_HCONSOLE_PUBLIC_API int _commandComposeDelay_;
 void banner( void );

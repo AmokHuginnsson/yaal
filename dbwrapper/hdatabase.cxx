@@ -70,7 +70,7 @@ void HDataBase::connect( yaal::hcore::HString const& dataBase_, yaal::hcore::HSt
 	M_EPILOG
 }
 
-HRecordSet::ptr_t HDataBase::execute_query( HString const& query_, HRecordSet::CURSOR::cursor_t cursor_ ) {
+HRecordSet::ptr_t HDataBase::execute_query( HString const& query_, HRecordSet::CURSOR cursor_ ) {
 	M_PROLOG
 	if ( ! _dbLink._valid ) {
 		M_THROW( "not connected to database", errno );

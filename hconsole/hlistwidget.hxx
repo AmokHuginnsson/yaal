@@ -349,7 +349,7 @@ public:
 		bool _descending;
 		int _widthRaw;
 		int _width;
-		BITS::ALIGN::align_t _align;
+		BITS::ALIGN _align;
 		int _shortcutIndex;
 		char _shortcut;
 		TYPE _type;
@@ -360,7 +360,7 @@ public:
 		HColumnInfo(
 				yaal::hcore::HString const& columnName,
 				int width,
-				BITS::ALIGN::align_t const& align = BITS::ALIGN::LEFT,
+				BITS::ALIGN align = BITS::ALIGN::LEFT,
 				TYPE type = TYPE::HSTRING,
 				yaal::hcore::HString const& format_ = hcore::HString(),
 				HWidget* associatedWidget = NULL );
@@ -578,7 +578,7 @@ public:
 			HListWidget*,
 			yaal::hcore::HString const& columnName,
 			int width,
-			HListWidget::BITS::ALIGN::align_t const& align,
+			HListWidget::BITS::ALIGN align,
 			TYPE type,
 			yaal::hcore::HString const& format_,
 			HWidget* associatedWidget );
@@ -591,7 +591,7 @@ protected:
 			HListWidget*,
 			yaal::hcore::HString const&,
 			int,
-			HListWidget::BITS::ALIGN::align_t const&,
+			HListWidget::BITS::ALIGN,
 			TYPE,
 			yaal::hcore::HString const&,
 			HWidget* );
