@@ -122,7 +122,7 @@ HHuginn::value_t HFrame::get_reference( yaal::hcore::HString const& name_, int p
 			v = it->second;
 			break;
 		} else if ( f->_object && ( ( fieldIdx = f->_object->field_index( name_ ) ) >= 0 ) ) {
-			v = f->_object->field( fieldIdx, false );
+			v = f->_object->field( fieldIdx );
 			break;
 		} else if ( f->_object && ( name_ == KEYWORD::THIS ) ) {
 			v = f->_object->get_pointer();

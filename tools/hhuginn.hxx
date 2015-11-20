@@ -423,12 +423,9 @@ class HHuginn::HClass::HMethod : public HHuginn::HValue {
 	typedef HHuginn::HValue base_type;
 private:
 	HHuginn::function_t _function;
-	HObject* _object;
 public:
 	HMethod( HHuginn::function_t const& );
 	HHuginn::function_t const& function( void ) const;
-	HObject* object( void ) const;
-	void set_object( HObject* );
 private:
 	HMethod( HMethod const& ) = delete;
 	HMethod& operator = ( HMethod const& ) = delete;
@@ -441,8 +438,8 @@ class HHuginn::HClass::HBoundMethod : public HHuginn::HClass::HMethod {
 private:
 	HHuginn::value_t _objectHolder;
 public:
-	HBoundMethod( HMethod const& );
-	void set_object( HObject* ) = delete;
+	HBoundMethod( HMethod const&, HHuginn::value_t const& );
+	HHuginn::HObject* object( void );
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
 	HBoundMethod& operator = ( HBoundMethod const& ) = delete;
@@ -463,18 +460,21 @@ public:
 	virtual ~HObject( void );
 	int field_index( yaal::hcore::HString const& ) const;
 	value_t& field_ref( int );
-	value_t field( int, bool ) const;
+	value_t field( int ) const;
 	HClass const* get_class( void ) const;
 	bool is_kind_of( yaal::hcore::HString const& ) const;
 	HHuginn::value_t call_method( huginn::HThread*, yaal::hcore::HString const&, HHuginn::values_t const&, int ) const;
 private:
-	void reset_methods( void );
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;
 private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
 
+/*! \brief Type hierarchy aware object reference.
+ *
+ * Sole purpose of this class is to handle `super' Huginn keyword.
+ */
 class HHuginn::HObjectReference : public HHuginn::HValue {
 public:
 	typedef HHuginn::HObjectReference this_type;
@@ -486,7 +486,7 @@ public:
 	HObjectReference( value_t const&, int, bool, int );
 	HObjectReference( value_t const&, HClass const* );
 	int field_index( yaal::hcore::HString const& ) const;
-	value_t field( int, bool );
+	value_t field( int );
 private:
 	HObjectReference( HObjectReference const& ) = delete;
 	HObjectReference& operator = ( HObjectReference const& ) = delete;

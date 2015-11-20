@@ -130,7 +130,6 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 	frame_->operations().pop();
 	HHuginn::value_t v( frame_->values().top() );
 	frame_->values().pop();
-	bool temporary( v.unique() );
 	HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
 	HHuginn::HObjectReference* oref( dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) );
 	if ( o != nullptr ) {
@@ -139,8 +138,8 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->type()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
 		}
 		if ( access_ == ACCESS::VALUE ) {
-			frame_->values().push( o->field( fi, temporary ) );
-		} else if ( ! temporary ) {
+			frame_->values().push( o->field( fi ) );
+		} else if ( ! v.unique() ) {
 			frame_->values().push( make_pointer<HHuginn::HReference>( o->field_ref( fi ) ) );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", position_ );
@@ -151,7 +150,7 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( oref->type()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
 		}
 		if ( access_ == ACCESS::VALUE ) {
-			frame_->values().push( oref->field( fi, temporary ) );
+			frame_->values().push( oref->field( fi ) );
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", p );
 		}
@@ -214,8 +213,8 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	if ( t == HHuginn::TYPE::FUNCTION_REFERENCE ) {
 		frame_->values().push( static_cast<HHuginn::HFunctionReference*>( f.raw() )->function()( frame_->thread(), nullptr, values, p ) );
 	} else {
-		HHuginn::HClass::HMethod* m( static_cast<HHuginn::HClass::HMethod*>( f.raw() ) );
-		M_ASSERT( m->object() );
+		HHuginn::HClass::HBoundMethod* m( dynamic_cast<HHuginn::HClass::HBoundMethod*>( f.raw() ) );
+		M_ASSERT( m );
 		frame_->values().push( m->function()( frame_->thread(), m->object(), values, p ) );
 	}
 	return;
