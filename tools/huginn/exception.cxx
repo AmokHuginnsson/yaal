@@ -85,9 +85,9 @@ private:
 		return ( make_pointer<HHuginn::HException>( this, get_string( values_[0] ) ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t what( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t what( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_ ) );
+		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".what",
 			values_, 0, 0, position_
@@ -95,9 +95,9 @@ private:
 		return ( thread_->object_factory().create_string( e->what() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t where( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t where( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_ ) );
+		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".where",
 			values_, 0, 0, position_
@@ -105,9 +105,9 @@ private:
 		return ( thread_->object_factory().create_string( e->where() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t message( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t message( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_ ) );
+		HHuginn::HException* e( static_cast<HHuginn::HException*>( object_->raw() ) );
 		verify_arg_count(
 			static_cast<HExceptionClass const*>( e->get_class() )->name() + ".message",
 			values_, 0, 0, position_

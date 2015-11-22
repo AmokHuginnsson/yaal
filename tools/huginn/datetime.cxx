@@ -59,18 +59,18 @@ public:
 		class_->huginn()->register_class( _clockClass );
 		return;
 	}
-	static HHuginn::value_t now( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t now( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "DateTime.now", values_, 0, 0, position_ );
-		HDateTime* dt( dynamic_cast<HDateTime*>( object_ ) );
+		HDateTime* dt( dynamic_cast<HDateTime*>( object_->raw() ) );
 		M_ASSERT( dt );
 		return ( make_pointer<huginn::HTime>( dt->_timeClass.raw() ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t clock( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t clock( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "DateTime.clock", values_, 0, 0, position_ );
-		HDateTime* dt( dynamic_cast<HDateTime*>( object_ ) );
+		HDateTime* dt( dynamic_cast<HDateTime*>( object_->raw() ) );
 		M_ASSERT( dt );
 		return ( make_pointer<HClock>( dt->_clockClass.raw() ) );
 		M_EPILOG

@@ -53,31 +53,31 @@ HDatabaseConnection::HDatabaseConnection( HHuginn::HClass const* class_, dbwrapp
 
 HHuginn::value_t HDatabaseConnection::query(
 	tools::huginn::HThread* thread_,
-	HHuginn::HObject* object_,
+	HHuginn::value_t* object_,
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	HDatabaseConnection* dbc( static_cast<HDatabaseConnection*>( object_ ) );
+	HDatabaseConnection* dbc( static_cast<HDatabaseConnection*>( object_->raw() ) );
 	return ( dbc->do_query( thread_, values_, position_ ) );
 }
 
 HHuginn::value_t HDatabaseConnection::table_names(
 	tools::huginn::HThread* thread_,
-	HHuginn::HObject* object_,
+	HHuginn::value_t* object_,
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	HDatabaseConnection* dbc( static_cast<HDatabaseConnection*>( object_ ) );
+	HDatabaseConnection* dbc( static_cast<HDatabaseConnection*>( object_->raw() ) );
 	return ( dbc->do_table_names( thread_, values_, position_ ) );
 }
 
 HHuginn::value_t HDatabaseConnection::column_names(
 	tools::huginn::HThread* thread_,
-	HHuginn::HObject* object_,
+	HHuginn::value_t* object_,
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	HDatabaseConnection* dbc( static_cast<HDatabaseConnection*>( object_ ) );
+	HDatabaseConnection* dbc( static_cast<HDatabaseConnection*>( object_->raw() ) );
 	return ( dbc->do_column_names( thread_, values_, position_ ) );
 }
 

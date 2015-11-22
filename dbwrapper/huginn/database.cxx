@@ -56,9 +56,9 @@ public:
 		class_->huginn()->register_class( _databaseConnectionClass );
 		return;
 	}
-	static HHuginn::value_t connect( tools::huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t connect( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		return ( static_cast<HDatabase*>( object_ )->do_connect( thread_, values_, position_ ) );
+		return ( static_cast<HDatabase*>( object_->raw() )->do_connect( thread_, values_, position_ ) );
 		M_EPILOG
 	}
 private:

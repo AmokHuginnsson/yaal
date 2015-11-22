@@ -100,7 +100,7 @@ HQueryResult::HQueryResult(
 
 HHuginn::value_t HQueryResult::column_name(
 	tools::huginn::HThread* thread_,
-	HHuginn::HObject* object_,
+	HHuginn::value_t* object_,
 	HHuginn::values_t const& values_,
 	int position_
 ) {
@@ -108,34 +108,34 @@ HHuginn::value_t HQueryResult::column_name(
 	char const name[] = "QueryResult.column_name";
 	verify_arg_count( name, values_, 1, 1, position_ );
 	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
-	HQueryResult* qr( static_cast<HQueryResult*>( object_ ) );
+	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	return ( thread_->object_factory().create_string( qr->_recordSet->get_column_name( static_cast<int>( get_integer( values_[0] ) ) ) ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HQueryResult::field_count( tools::huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQueryResult::field_count( tools::huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.field_count";
 	verify_arg_count( name, values_, 0, 0, position_ );
-	HQueryResult* qr( static_cast<HQueryResult*>( object_ ) );
+	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	return ( make_pointer<HHuginn::HInteger>( qr->_recordSet->get_field_count() ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HQueryResult::insert_id( tools::huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQueryResult::insert_id( tools::huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.insert_id";
 	verify_arg_count( name, values_, 0, 0, position_ );
-	HQueryResult* qr( static_cast<HQueryResult*>( object_ ) );
+	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	return ( make_pointer<HHuginn::HInteger>( qr->_recordSet->get_insert_id() ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.has_next";
 	verify_arg_count( name, values_, 0, 0, position_ );
-	HQueryResult* qr( static_cast<HQueryResult*>( object_ ) );
+	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	return ( make_pointer<HHuginn::HBoolean>( qr->_it != qr->_recordSet->end() ) );
 	M_EPILOG
 }
@@ -184,11 +184,11 @@ public:
 	}
 };
 
-HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.fetch_row";
 	verify_arg_count( name, values_, 0, 0, position_ );
-	HQueryResult* qr( static_cast<HQueryResult*>( object_ ) );
+	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
 	HQueryResultClass const* qrc( static_cast<HQueryResultClass const*>( qr->HObject::get_class() ) );
 	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {

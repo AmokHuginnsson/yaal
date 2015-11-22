@@ -71,34 +71,34 @@ private:
 
 namespace set {
 
-inline HHuginn::value_t add( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "set.add", values_, 1, 1, position_ );
-	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_ ) );
+	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_->raw() ) );
 	M_ASSERT( s != nullptr );
 	s->insert( values_[0] );
-	return ( object_->get_pointer() );
+	return ( *object_ );
 	M_EPILOG
 }
 
-inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "set.has_key", values_, 1, 1, position_ );
-	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_ ) );
+	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_->raw() ) );
 	M_ASSERT( s != nullptr );
 	bool hasKey( s->has_key( values_[0] ) );
 	return ( make_pointer<HHuginn::HBoolean>( hasKey ) );
 	M_EPILOG
 }
 
-inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "set.erase", values_, 1, 1, position_ );
-	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_ ) );
+	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_->raw() ) );
 	M_ASSERT( s != nullptr );
 	M_ASSERT( !! s->get_pointer() );
 	s->erase( values_[0] );
-	return ( s->get_pointer() );
+	return ( *object_ );
 	M_EPILOG
 }
 

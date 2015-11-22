@@ -89,11 +89,11 @@ yaal::hcore::HRegex::HMatchIterator HRegularExpressionMatch::end( void ) const {
 	return ( _regex->end() );
 }
 
-HHuginn::value_t HRegularExpressionMatch::matched( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HRegularExpressionMatch::matched( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "RegularExpressionMatch.matched";
 	verify_arg_count( name, values_, 0, 0, position_ );
-	HRegularExpressionMatch* rem( static_cast<HRegularExpressionMatch*>( object_ ) );
+	HRegularExpressionMatch* rem( static_cast<HRegularExpressionMatch*>( object_->raw() ) );
 	return ( make_pointer<HHuginn::HBoolean>( rem->_regex->matches( rem->_fast ) ) );
 	M_EPILOG
 }

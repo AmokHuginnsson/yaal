@@ -55,9 +55,9 @@ public:
 		class_->huginn()->register_class( _compiledRegularExpressionClass );
 		return;
 	}
-	static HHuginn::value_t compile( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t compile( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
-		return ( static_cast<HRegularExpressions*>( object_ )->do_compile( thread_, values_, position_ ) );
+		return ( static_cast<HRegularExpressions*>( object_->raw() )->do_compile( thread_, values_, position_ ) );
 		M_EPILOG
 	}
 private:

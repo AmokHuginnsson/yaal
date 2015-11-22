@@ -50,7 +50,7 @@ private:
 public:
 	HFunction( yaal::hcore::HString const&, parameter_names_t const&, HHuginn::scope_t const&, expressions_t const& );
 	HFunction( HFunction&& ) = default;
-	HHuginn::value_t execute( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const&, int ) const;
+	HHuginn::value_t execute( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 };
 
 }

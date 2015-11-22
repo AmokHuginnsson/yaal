@@ -42,7 +42,7 @@ class HTime : public HHuginn::HObject {
 	yaal::hcore::HTime _time;
 public:
 	HTime( HHuginn::HClass* );
-	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::HObject*, HHuginn::values_t const&, int );
+	static HHuginn::value_t to_string( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
 	static HHuginn::class_t get_class( HHuginn* );
 };
 

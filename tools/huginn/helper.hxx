@@ -56,12 +56,12 @@ yaal::hcore::HNumber const& get_number( HHuginn::value_t const& );
 bool get_boolean( HHuginn::value_t const& );
 char get_character( HHuginn::value_t const& );
 
-yaal::hcore::HString const& get_string( HHuginn::HObject const* );
-int long get_integer( HHuginn::HObject const* );
-double long get_real( HHuginn::HObject const* );
-yaal::hcore::HNumber const& get_number( HHuginn::HObject const* );
-bool get_boolean( HHuginn::HObject const* );
-char get_character( HHuginn::HObject const* );
+yaal::hcore::HString const& get_string( HHuginn::HValue const* );
+int long get_integer( HHuginn::HValue const* );
+double long get_real( HHuginn::HValue const* );
+yaal::hcore::HNumber const& get_number( HHuginn::HValue const* );
+bool get_boolean( HHuginn::HValue const* );
+char get_character( HHuginn::HValue const* );
 
 }
 

@@ -46,22 +46,22 @@ HClock::HClock( HHuginn::HClass* class_ )
 	return;
 }
 
-HHuginn::value_t HClock::miliseconds( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HClock::miliseconds( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Clock.miliseconds";
 	verify_arg_count( name, values_, 0, 0, position_ );
-	huginn::HClock* c( static_cast<huginn::HClock*>( object_ ) );
+	huginn::HClock* c( static_cast<huginn::HClock*>( object_->raw() ) );
 	return ( make_pointer<HHuginn::HInteger>( c->_clock.get_time_elapsed( time::UNIT::MILISECOND ) ) );
 	M_EPILOG
 }
 
-HHuginn::value_t HClock::reset( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HClock::reset( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Clock.reset";
 	verify_arg_count( name, values_, 0, 0, position_ );
-	huginn::HClock* c( static_cast<huginn::HClock*>( object_ ) );
+	huginn::HClock* c( static_cast<huginn::HClock*>( object_->raw() ) );
 	c->_clock.reset();
-	return ( object_->get_pointer() );
+	return ( c->get_pointer() );
 	M_EPILOG
 }
 

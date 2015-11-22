@@ -56,7 +56,7 @@ public:
 		, _exceptionClass( exception::create_class( class_->huginn(), "OperatingSystemException" ) ) {
 		return;
 	}
-	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "OperatingSystem.env";
 		verify_arg_count( name, values_, 1, 1, position_ );
@@ -66,7 +66,7 @@ public:
 		return ( val ? pointer_static_cast<HHuginn::HValue>( h.object_factory()->create_string( val ) ) : h.none_value() );
 		M_EPILOG
 	}
-	static HHuginn::value_t exec( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t exec( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		static int const MAX_ARG_COUNT( 65535 );
 		char const name[] = "OperatingSystem.exec";
@@ -80,7 +80,7 @@ public:
 			argv[i] = const_cast<char*>( get_string( values_[i] ).raw() );
 		}
 		::execvp( argv[0], argv );
-		thread_->raise( static_cast<HOperatingSystem*>( object_ )->_exceptionClass.raw(), strerror( errno ), position_ );
+		thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->_exceptionClass.raw(), strerror( errno ), position_ );
 		return ( thread_->huginn().none_value() );
 		M_EPILOG
 	}

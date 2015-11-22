@@ -143,7 +143,7 @@ public:
 	class HErrorCoordinate;
 	typedef yaal::hcore::HArray<value_t> values_t;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
-	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, HObject*, values_t const&, int )> function_t;
+	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, value_t*, values_t const&, int )> function_t;
 	typedef yaal::hcore::HPointer<huginn::HThread> thread_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
 	struct TYPE {
@@ -411,7 +411,7 @@ public:
 	function_t const& function( int ) const;
 	bool is_kind_of( yaal::hcore::HString const& ) const;
 	HHuginn* huginn( void ) const;
-	value_t create_instance( huginn::HThread*, HObject*, values_t const&, int ) const;
+	value_t create_instance( huginn::HThread*, value_t*, values_t const&, int ) const;
 private:
 	virtual value_t do_create_instance( huginn::HThread*, values_t const&, int ) const;
 	HClass( HClass const& ) = delete;
@@ -439,7 +439,7 @@ private:
 	HHuginn::value_t _objectHolder;
 public:
 	HBoundMethod( HMethod const&, HHuginn::value_t const& );
-	HHuginn::HObject* object( void );
+	HHuginn::value_t* object( void );
 private:
 	HBoundMethod( HBoundMethod const& ) = delete;
 	HBoundMethod& operator = ( HBoundMethod const& ) = delete;
@@ -463,7 +463,7 @@ public:
 	value_t field( int ) const;
 	HClass const* get_class( void ) const;
 	bool is_kind_of( yaal::hcore::HString const& ) const;
-	HHuginn::value_t call_method( huginn::HThread*, yaal::hcore::HString const&, HHuginn::values_t const&, int ) const;
+	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, HHuginn::values_t const&, int ) const;
 private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;

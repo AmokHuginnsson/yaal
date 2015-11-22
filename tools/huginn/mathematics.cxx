@@ -51,7 +51,7 @@ public:
 		, _exceptionClass( exception::create_class( class_->huginn(), "MathematicsException" ) ) {
 		return;
 	}
-	static HHuginn::value_t square_root( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t square_root( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.square_root";
 		verify_arg_count( name, values_, 1, 1, position_ );
@@ -69,7 +69,7 @@ public:
 			}
 		}
 		if ( v == thread_->huginn().none_value() ) {
-			thread_->raise( static_cast<HMathematics*>( object_ )->_exceptionClass.raw(), "bad domain", position_ );
+			thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "bad domain", position_ );
 		}
 		return ( v );
 		M_EPILOG

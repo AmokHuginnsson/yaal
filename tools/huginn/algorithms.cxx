@@ -116,10 +116,10 @@ public:
 		class_->huginn()->register_class( _rangeClass );
 		return;
 	}
-	static HHuginn::value_t range( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
-		return ( static_cast<HAlgorithms*>( object_ )->do_range( values_, position_ ) );
+	static HHuginn::value_t range( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		return ( static_cast<HAlgorithms*>( object_->raw() )->do_range( values_, position_ ) );
 	}
-	static HHuginn::value_t sorted( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t sorted( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		char const name[] = "Algorithms.sorted";
 		verify_arg_count( name, values_, 1, 2, position_ );
 		HHuginn::type_t t( verify_arg_collection( name, values_, 0, false, position_ ) );

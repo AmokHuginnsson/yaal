@@ -71,30 +71,30 @@ private:
 
 namespace order {
 
-inline HHuginn::value_t add( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "order.add", values_, 1, 1, position_ );
-	HHuginn::HOrder* o( dynamic_cast<HHuginn::HOrder*>( object_ ) );
+	HHuginn::HOrder* o( dynamic_cast<HHuginn::HOrder*>( object_->raw() ) );
 	M_ASSERT( o != nullptr );
 	o->insert( values_[0], position_ );
-	return ( object_->get_pointer() );
+	return ( o->get_pointer() );
 	M_EPILOG
 }
 
-inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "order.has_key", values_, 1, 1, position_ );
-	HHuginn::HOrder* o( dynamic_cast<HHuginn::HOrder*>( object_ ) );
+	HHuginn::HOrder* o( dynamic_cast<HHuginn::HOrder*>( object_->raw() ) );
 	M_ASSERT( o != nullptr );
 	bool hasKey( o->has_key( values_[0], position_ ) );
 	return ( make_pointer<HHuginn::HBoolean>( hasKey ) );
 	M_EPILOG
 }
 
-inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "order.erase", values_, 1, 1, position_ );
-	HHuginn::HOrder* o( dynamic_cast<HHuginn::HOrder*>( object_ ) );
+	HHuginn::HOrder* o( dynamic_cast<HHuginn::HOrder*>( object_->raw() ) );
 	M_ASSERT( o != nullptr );
 	M_ASSERT( !! o->get_pointer() );
 	o->erase( values_[0], position_ );

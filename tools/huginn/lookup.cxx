@@ -71,20 +71,20 @@ private:
 
 namespace lookup {
 
-inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "lookup.has_key", values_, 1, 1, position_ );
-	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_ ) );
+	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_->raw() ) );
 	M_ASSERT( l != nullptr );
 	bool hasKey( l->has_key( values_[0] ) );
 	return ( make_pointer<HHuginn::HBoolean>( hasKey ) );
 	M_EPILOG
 }
 
-inline HHuginn::value_t get( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t get( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "lookup.get", values_, 1, 2, position_ );
-	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_ ) );
+	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_->raw() ) );
 	M_ASSERT( l != nullptr );
 	HHuginn::value_t v;
 	if ( values_.get_size() > 1 ) {
@@ -99,10 +99,10 @@ inline HHuginn::value_t get( huginn::HThread*, HHuginn::HObject* object_, HHugin
 	M_EPILOG
 }
 
-inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "lookup.erase", values_, 1, 1, position_ );
-	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_ ) );
+	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_->raw() ) );
 	M_ASSERT( l != nullptr );
 	M_ASSERT( !! l->get_pointer() );
 	l->erase( values_[0] );

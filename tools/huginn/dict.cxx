@@ -71,20 +71,20 @@ private:
 
 namespace dict {
 
-inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict.has_key", values_, 1, 1, position_ );
-	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_ ) );
+	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_->raw() ) );
 	M_ASSERT( d != nullptr );
 	bool hasKey( d->has_key( values_[0], position_ ) );
 	return ( make_pointer<HHuginn::HBoolean>( hasKey ) );
 	M_EPILOG
 }
 
-inline HHuginn::value_t get( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t get( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict.get", values_, 1, 2, position_ );
-	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_ ) );
+	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_->raw() ) );
 	M_ASSERT( d != nullptr );
 	HHuginn::value_t v;
 	if ( values_.get_size() > 1 ) {
@@ -99,10 +99,10 @@ inline HHuginn::value_t get( huginn::HThread*, HHuginn::HObject* object_, HHugin
 	M_EPILOG
 }
 
-inline HHuginn::value_t erase( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "dict.erase", values_, 1, 1, position_ );
-	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_ ) );
+	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_->raw() ) );
 	M_ASSERT( d != nullptr );
 	M_ASSERT( !! d->get_pointer() );
 	d->erase( values_[0], position_ );

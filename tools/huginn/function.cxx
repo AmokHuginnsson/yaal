@@ -54,7 +54,7 @@ HFunction::HFunction( yaal::hcore::HString const& name_,
 	return;
 }
 
-HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) const {
+HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) const {
 	M_PROLOG
 	verify_arg_count(
 		_name,
@@ -64,8 +64,9 @@ HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::HObject*
 		position_
 	);
 	int upCast( 0 );
-	if ( object_ && ( object_->field_index( _name ) >= 0 ) ) {
-		HHuginn::HClass const* c( object_->get_class() );
+	HHuginn::HObject* object( object_ ? static_cast<HHuginn::HObject*>( object_->raw() ) : nullptr );
+	if ( object_ && ( object->field_index( _name ) >= 0 ) ) {
+		HHuginn::HClass const* c( object->get_class() );
 		while ( c ) {
 			int idx( c->field_index( _name ) );
 			if ( ( idx >= 0 ) && ( c->function( idx ).id() == this ) ) {
@@ -78,7 +79,7 @@ HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::HObject*
 			upCast = 0;
 		}
 	}
-	thread_->create_function_frame( object_, upCast );
+	thread_->create_function_frame( object, upCast );
 	HFrame* f( thread_->current_frame() );
 	for (
 		int i( 0 ),

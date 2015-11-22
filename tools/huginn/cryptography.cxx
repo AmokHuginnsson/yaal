@@ -53,7 +53,7 @@ public:
 		, _exceptionClass( exception::create_class( class_->huginn(), "CryptographyException" ) ) {
 		return;
 	}
-	static HHuginn::value_t md5( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t md5( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Cryptography.md5";
 		verify_arg_count( name, values_, 1, 1, position_ );
@@ -61,7 +61,7 @@ public:
 		return ( thread_->object_factory().create_string( hash::md5( get_string( values_[0] ) ) ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t sha1( huginn::HThread* thread_, HHuginn::HObject*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t sha1( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Cryptography.sha1";
 		verify_arg_count( name, values_, 1, 1, position_ );

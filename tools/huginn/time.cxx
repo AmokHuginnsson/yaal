@@ -48,11 +48,11 @@ HTime::HTime( HHuginn::HClass* class_ )
 	return;
 }
 
-HHuginn::value_t HTime::to_string( huginn::HThread* thread_, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HTime::to_string( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "Time.to_string";
 	verify_arg_count( name, values_, 0, 0, position_ );
-	huginn::HTime* t( static_cast<huginn::HTime*>( object_ ) );
+	huginn::HTime* t( static_cast<huginn::HTime*>( object_->raw() ) );
 	return ( thread_->object_factory().create_string( t->_time.to_string() ) );
 	M_EPILOG
 }

@@ -69,58 +69,58 @@ private:
 
 namespace deque {
 
-inline HHuginn::value_t add( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "deque.add", values_, 1, 1, position_ );
-	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
-	M_ASSERT( l != nullptr );
-	l->push_back( values_[0] );
-	M_ASSERT( !! l->get_pointer() );
-	return ( object_->get_pointer() );
+	HHuginn::HDeque* d( dynamic_cast<HHuginn::HDeque*>( object_->raw() ) );
+	M_ASSERT( d != nullptr );
+	d->push_back( values_[0] );
+	M_ASSERT( !! d->get_pointer() );
+	return ( d->get_pointer() );
 	M_EPILOG
 }
 
-inline HHuginn::value_t pop( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t pop( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "deque.pop", values_, 0, 0, position_ );
-	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
-	M_ASSERT( l != nullptr );
-	l->pop_back();
-	M_ASSERT( !! l->get_pointer() );
-	return ( object_->get_pointer() );
+	HHuginn::HDeque* d( dynamic_cast<HHuginn::HDeque*>( object_->raw() ) );
+	M_ASSERT( d != nullptr );
+	d->pop_back();
+	M_ASSERT( !! d->get_pointer() );
+	return ( d->get_pointer() );
 	M_EPILOG
 }
 
-inline HHuginn::value_t add_front( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t add_front( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "deque.add_front", values_, 1, 1, position_ );
-	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
-	M_ASSERT( l != nullptr );
-	l->push_front( values_[0] );
-	M_ASSERT( !! l->get_pointer() );
-	return ( object_->get_pointer() );
+	HHuginn::HDeque* d( dynamic_cast<HHuginn::HDeque*>( object_->raw() ) );
+	M_ASSERT( d != nullptr );
+	d->push_front( values_[0] );
+	M_ASSERT( !! d->get_pointer() );
+	return ( d->get_pointer() );
 	M_EPILOG
 }
 
-inline HHuginn::value_t pop_front( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t pop_front( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "deque.pop_front", values_, 0, 0, position_ );
-	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
-	M_ASSERT( l != nullptr );
-	l->pop_front();
-	M_ASSERT( !! l->get_pointer() );
-	return ( object_->get_pointer() );
+	HHuginn::HDeque* d( dynamic_cast<HHuginn::HDeque*>( object_->raw() ) );
+	M_ASSERT( d != nullptr );
+	d->pop_front();
+	M_ASSERT( !! d->get_pointer() );
+	return ( d->get_pointer() );
 	M_EPILOG
 }
 
-inline HHuginn::value_t clear( huginn::HThread*, HHuginn::HObject* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "deque.clear", values_, 0, 0, position_ );
-	HHuginn::HDeque* l( dynamic_cast<HHuginn::HDeque*>( object_ ) );
-	M_ASSERT( l != nullptr );
-	l->clear();
-	M_ASSERT( !! l->get_pointer() );
-	return ( object_->get_pointer() );
+	HHuginn::HDeque* d( dynamic_cast<HHuginn::HDeque*>( object_->raw() ) );
+	M_ASSERT( d != nullptr );
+	d->clear();
+	M_ASSERT( !! d->get_pointer() );
+	return ( d->get_pointer() );
 	M_EPILOG
 }
 

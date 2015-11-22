@@ -51,21 +51,21 @@ HCompiledRegularExpression::HCompiledRegularExpression( HHuginn::HClass const* c
 
 HHuginn::value_t HCompiledRegularExpression::groups(
 	huginn::HThread* thread_,
-	HHuginn::HObject* object_,
+	HHuginn::value_t* object_,
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	HCompiledRegularExpression* cre( static_cast<HCompiledRegularExpression*>( object_ ) );
+	HCompiledRegularExpression* cre( static_cast<HCompiledRegularExpression*>( object_->raw() ) );
 	return ( cre->do_groups( thread_, values_, position_ ) );
 }
 
 HHuginn::value_t HCompiledRegularExpression::match(
 	huginn::HThread* thread_,
-	HHuginn::HObject* object_,
+	HHuginn::value_t* object_,
 	HHuginn::values_t const& values_,
 	int position_
 ) {
-	HCompiledRegularExpression* cre( static_cast<HCompiledRegularExpression*>( object_ ) );
+	HCompiledRegularExpression* cre( static_cast<HCompiledRegularExpression*>( object_->raw() ) );
 	return ( cre->do_match( thread_, values_, position_ ) );
 }
 
