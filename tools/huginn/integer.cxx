@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  clock.cxx - this file is integral part of `yaal' project.
+  integer.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -27,7 +27,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
-#include "clock.hxx"
+#include "tools/hhuginn.hxx"
 #include "helper.hxx"
 #include "thread.hxx"
 #include "objectfactory.hxx"
@@ -40,47 +40,23 @@ namespace yaal {
 
 namespace tools {
 
+HHuginn::type_t const HHuginn::TYPE::INTEGER( HHuginn::HType::register_type( "integer", nullptr ) );
+
 namespace huginn {
 
-HClock::HClock( HHuginn::HClass* class_ )
-	: HObject( class_ )
-	, _clock() {
-	return;
-}
+namespace integer {
 
-HHuginn::value_t HClock::miliseconds( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
-	M_PROLOG
-	char const name[] = "Clock.miliseconds";
-	verify_arg_count( name, values_, 0, 0, position_ );
-	huginn::HClock* c( static_cast<huginn::HClock*>( object_->raw() ) );
-	return ( thread_->object_factory().create_integer( c->_clock.get_time_elapsed( time::UNIT::MILISECOND ) ) );
-	M_EPILOG
-}
-
-HHuginn::value_t HClock::reset( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
-	M_PROLOG
-	char const name[] = "Clock.reset";
-	verify_arg_count( name, values_, 0, 0, position_ );
-	huginn::HClock* c( static_cast<huginn::HClock*>( object_->raw() ) );
-	c->_clock.reset();
-	return ( c->get_pointer() );
-	M_EPILOG
-}
-
-HHuginn::class_t HClock::get_class( HHuginn* huginn_ ) {
+HHuginn::class_t get_class( void );
+HHuginn::class_t get_class( void ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
-			huginn_,
-			HHuginn::HType::register_type( "Clock", huginn_ ),
+			nullptr,
+			HHuginn::TYPE::INTEGER,
 			nullptr,
 			HHuginn::HClass::field_names_t{
-				"miliseconds",
-				"reset"
 			},
 			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::miliseconds, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::reset, _1, _2, _3, _4 ) )
 			}
 		)
 	);
@@ -88,6 +64,22 @@ HHuginn::class_t HClock::get_class( HHuginn* huginn_ ) {
 	M_EPILOG
 }
 
+}
+
+}
+
+HHuginn::HInteger::HInteger( HHuginn::HClass const* class_, HHuginn::HInteger::value_type value_ )
+	: HObject( class_ )
+	, _value( value_ ) {
+	return;
+}
+
+HHuginn::HInteger::value_type HHuginn::HInteger::value( void ) const {
+	return ( _value );
+}
+
+HHuginn::value_t HHuginn::HInteger::do_clone( HHuginn* huginn_ ) const {
+	return ( huginn_->object_factory()->create_integer( _value ) );
 }
 
 }

@@ -43,6 +43,10 @@ namespace string {
 HHuginn::class_t get_class( void );
 }
 
+namespace integer {
+HHuginn::class_t get_class( void );
+}
+
 namespace list {
 HHuginn::class_t get_class( void );
 }
@@ -69,6 +73,7 @@ HHuginn::class_t get_class( void );
 
 HObjectFactory::HObjectFactory( void )
 	: _string( string::get_class() )
+	, _integer( integer::get_class() )
 	, _list( list::get_class() )
 	, _deque( deque::get_class() )
 	, _dict( dict::get_class() )
@@ -95,6 +100,10 @@ void HObjectFactory::register_exception_classes( HHuginn* huginn_ ) {
 
 HHuginn::value_t HObjectFactory::create_string( yaal::hcore::HString const& value_ ) const {
 	return ( make_pointer<HHuginn::HString>( _string.raw(), value_ ) );
+}
+
+HHuginn::value_t HObjectFactory::create_integer( HHuginn::HInteger::value_type value_ ) const {
+	return ( make_pointer<HHuginn::HInteger>( _integer.raw(), value_ ) );
 }
 
 HHuginn::value_t HObjectFactory::create_list( HHuginn::values_t const& values_ ) const {

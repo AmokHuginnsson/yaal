@@ -213,7 +213,7 @@ HHuginn::value_t add( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 	HHuginn::value_t res;
 	HHuginn::type_t typeId( v1_->type() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		res = make_pointer<HHuginn::HInteger>( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() + static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
+		res = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() + static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		res = make_pointer<HHuginn::HReal>( static_cast<HHuginn::HReal const*>( v1_.raw() )->value() + static_cast<HHuginn::HReal const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::STRING ) {
@@ -226,12 +226,12 @@ HHuginn::value_t add( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 	return ( res );
 }
 
-HHuginn::value_t sub( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+HHuginn::value_t sub( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	HHuginn::value_t res;
 	HHuginn::type_t typeId( v1_->type() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		res = make_pointer<HHuginn::HInteger>( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() - static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
+		res = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() - static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		res = make_pointer<HHuginn::HReal>( static_cast<HHuginn::HReal const*>( v1_.raw() )->value() - static_cast<HHuginn::HReal const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
@@ -242,12 +242,12 @@ HHuginn::value_t sub( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, 
 	return ( res );
 }
 
-HHuginn::value_t mul( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
+HHuginn::value_t mul( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type() == v2_->type() );
 	HHuginn::value_t res;
 	HHuginn::type_t typeId( v1_->type() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		res = make_pointer<HHuginn::HInteger>( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() * static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
+		res = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() * static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		res = make_pointer<HHuginn::HReal>( static_cast<HHuginn::HReal const*>( v1_.raw() )->value() * static_cast<HHuginn::HReal const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
@@ -265,7 +265,7 @@ HHuginn::value_t div( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		int long long denominator( static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 		if ( denominator != 0 ) {
-			res = make_pointer<HHuginn::HInteger>( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() / denominator );
+			res = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() / denominator );
 		}
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		double long denominator( static_cast<HHuginn::HReal const*>( v2_.raw() )->value() );
@@ -293,7 +293,7 @@ HHuginn::value_t mod( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 	if ( v1_->type() == HHuginn::TYPE::INTEGER ) {
 		int long long denominator( static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 		if ( denominator != 0 ) {
-			res = make_pointer<HHuginn::HInteger>( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() / denominator );
+			res = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() / denominator );
 		} else {
 			thread_->raise( thread_->object_factory().arithmetic_exception_class(), "Division by zero.", position_ );
 		}
@@ -317,7 +317,7 @@ HHuginn::value_t pow( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, 
 	return ( res );
 }
 
-HHuginn::value_t abs( HHuginn::value_t const& v_, int position_ ) {
+HHuginn::value_t abs( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	HHuginn::type_t typeId( v_->type() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
@@ -325,7 +325,7 @@ HHuginn::value_t abs( HHuginn::value_t const& v_, int position_ ) {
 		if ( v >= 0 ) {
 			res = v_;
 		} else {
-			res = make_pointer<HHuginn::HInteger>( -v );
+			res = thread_->object_factory().create_integer( -v );
 		}
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		double long v( static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
@@ -347,11 +347,11 @@ HHuginn::value_t abs( HHuginn::value_t const& v_, int position_ ) {
 	return ( res );
 }
 
-HHuginn::value_t neg( HHuginn::value_t const& v_, int position_ ) {
+HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	HHuginn::type_t typeId( v_->type() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
-		res = make_pointer<HHuginn::HInteger>( -static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
+		res = thread_->object_factory().create_integer( -static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
 		res = make_pointer<HHuginn::HReal>( -static_cast<HHuginn::HReal const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
@@ -571,13 +571,13 @@ HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int posi
 		} catch ( HLexicalCastException const& e ) {
 			thread_->raise( thread_->object_factory().conversion_exception_class(), e.what(), position_ );
 		}
-		res = make_pointer<HHuginn::HInteger>( v );
+		res = thread_->object_factory().create_integer( v );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
-		res = make_pointer<HHuginn::HInteger>( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_integer() );
+		res = thread_->object_factory().create_integer( static_cast<HHuginn::HNumber const*>( v_.raw() )->value().to_integer() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
-		res = make_pointer<HHuginn::HInteger>( static_cast<int long long>( static_cast<HHuginn::HReal const*>( v_.raw() )->value() ) );
+		res = thread_->object_factory().create_integer( static_cast<int long long>( static_cast<HHuginn::HReal const*>( v_.raw() )->value() ) );
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
-		res = make_pointer<HHuginn::HInteger>( static_cast<int long long>( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() ) );
+		res = thread_->object_factory().create_integer( static_cast<int long long>( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() ) );
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = v_;
 	} else {

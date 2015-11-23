@@ -45,32 +45,6 @@ namespace tools {
 
 namespace huginn {
 
-class HRangeIterator : public HIteratorInterface {
-	int _i;
-	int _stop;
-	int _step;
-public:
-	HRangeIterator( int from_, int stop_, int step_ )
-		: _i( from_ )
-		, _stop( stop_ )
-		, _step( step_ ) {
-		return;
-	}
-protected:
-	virtual HHuginn::value_t do_value( void ) override {
-		return ( make_pointer<HHuginn::HInteger>( _i ) );
-	}
-	virtual bool do_is_valid( void ) override {
-		return ( _i < _stop );
-	}
-	virtual void do_next( void ) override {
-		_i += _step;
-	}
-private:
-	HRangeIterator( HRangeIterator const& ) = delete;
-	HRangeIterator& operator = ( HRangeIterator const& ) = delete;
-};
-
 class HRange : public HHuginn::HIterable {
 	int _from;
 	int _stop;
@@ -81,6 +55,12 @@ public:
 		, _from( from_ )
 		, _stop( stop_ )
 		, _step( step_ ) {
+	}
+	int step( void ) const {
+		return ( _step );
+	}
+	int stop( void ) const {
+		return ( _stop );
 	}
 	static HHuginn::class_t get_class( HHuginn*  huginn_ ) {
 		M_PROLOG
@@ -101,11 +81,39 @@ protected:
 		return ( ( _stop - _from ) / _step );
 	}
 private:
-	virtual HIterator do_iterator( void ) override {
-		HIterator::iterator_implementation_t impl( new ( memory::yaal ) HRangeIterator( _from, _stop, _step ) );
-		return ( HIterator( yaal::move( impl ) ) );
-	}
+	virtual HIterator do_iterator( void ) override;
 };
+
+class HRangeIterator : public HIteratorInterface {
+	int _i;
+	HRange const* _range;
+	HObjectFactory* _objectFactory;
+public:
+	HRangeIterator( int from_, HRange const* range_ )
+		: _i( from_ )
+		, _range( range_ )
+		, _objectFactory( range_->HIterable::get_class()->huginn()->object_factory() ) {
+		return;
+	}
+protected:
+	virtual HHuginn::value_t do_value( void ) override {
+		return ( _objectFactory->create_integer( _i ) );
+	}
+	virtual bool do_is_valid( void ) override {
+		return ( _i < _range->stop() );
+	}
+	virtual void do_next( void ) override {
+		_i += _range->step();
+	}
+private:
+	HRangeIterator( HRangeIterator const& ) = delete;
+	HRangeIterator& operator = ( HRangeIterator const& ) = delete;
+};
+
+HRange::HIterator HRange::do_iterator( void ) {
+	HIterator::iterator_implementation_t impl( new ( memory::yaal ) HRangeIterator( _from, this ) );
+	return ( HIterator( yaal::move( impl ) ) );
+}
 
 class HAlgorithms : public HHuginn::HObject {
 	HHuginn::class_t _rangeClass;

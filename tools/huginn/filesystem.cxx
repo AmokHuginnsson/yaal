@@ -66,16 +66,16 @@ public:
 		return ( static_cast<HFileSystem*>( object_->raw() )->do_open( thread_, values_, position_ ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t reading( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t reading( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "FileSystem.reading", values_, 0, 0, position_ );
-		return ( make_pointer<HHuginn::HInteger>( OPERATIONS::READING + 0 ) );
+		return ( thread_->object_factory().create_integer( OPERATIONS::READING + 0 ) );
 		M_EPILOG
 	}
-	static HHuginn::value_t writting( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	static HHuginn::value_t writting( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		verify_arg_count( "FileSystem.writting", values_, 0, 0, position_ );
-		return ( make_pointer<HHuginn::HInteger>( OPERATIONS::WRITTING + 0 ) );
+		return ( thread_->object_factory().create_integer( OPERATIONS::WRITTING + 0 ) );
 		M_EPILOG
 	}
 	static HHuginn::value_t current_working_directory( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {

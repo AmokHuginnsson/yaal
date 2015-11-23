@@ -109,7 +109,7 @@ void HExpression::close_parenthesis( HFrame* frame_, int position_ ) {
 	if ( o == OPERATOR::ABSOLUTE ) {
 		HHuginn::value_t v( frame_->values().top() );
 		frame_->values().pop();
-		frame_->values().push( value_builtin::abs( v, position_ ) );
+		frame_->values().push( value_builtin::abs( frame_->thread(), v, position_ ) );
 	}
 	return;
 	M_EPILOG
@@ -285,7 +285,7 @@ void HExpression::minus( HFrame* frame_, int ) {
 	if ( v1->type() != v2->type() ) {
 		operands_type_mismatch( "-", v1->type(), v2->type(), p );
 	}
-	frame_->values().push( value_builtin::sub( v1, v2, p ) );
+	frame_->values().push( value_builtin::sub( frame_->thread(), v1, v2, p ) );
 	return;
 	M_EPILOG
 }
@@ -303,7 +303,7 @@ void HExpression::mul( HFrame* frame_, int ) {
 	if ( v1->type() != v2->type() ) {
 		operands_type_mismatch( "*", v1->type(), v2->type(), p );
 	}
-	frame_->values().push( value_builtin::mul( v1, v2, p ) );
+	frame_->values().push( value_builtin::mul( frame_->thread(), v1, v2, p ) );
 	return;
 	M_EPILOG
 }
@@ -353,7 +353,7 @@ void HExpression::negate( HFrame* frame_, int ) {
 	M_ASSERT( ! frame_->values().is_empty() );
 	HHuginn::value_t v( frame_->values().top() );
 	frame_->values().pop();
-	frame_->values().push( value_builtin::neg( v, p ) );
+	frame_->values().push( value_builtin::neg( frame_->thread(), v, p ) );
 	return;
 	M_EPILOG
 }
@@ -634,7 +634,7 @@ void HExpression::store_real( double long value_, HFrame* frame_, int ) {
 
 void HExpression::store_integer( int long long value_, HFrame* frame_, int ) {
 	M_PROLOG
-	frame_->values().push( make_pointer<HHuginn::HInteger>( value_ ) );
+	frame_->values().push( frame_->thread()->object_factory().create_integer( value_ ) );
 	return;
 	M_EPILOG
 }

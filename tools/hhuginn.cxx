@@ -77,7 +77,6 @@ HHuginn::HType::id_generator_t HHuginn::HType::_idGenerator{ 0 };
 HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
 
 HHuginn::type_t const HHuginn::TYPE::NONE( HHuginn::HType::register_type( "none", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::INTEGER( HHuginn::HType::register_type( "integer", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::REAL( HHuginn::HType::register_type( "real", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::NUMBER( HHuginn::HType::register_type( "number", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::BOOLEAN( HHuginn::HType::register_type( "boolean", nullptr ) );
@@ -1452,19 +1451,6 @@ HHuginn::value_t HHuginn::HBoolean::do_clone( HHuginn* ) const {
 	return ( make_pointer<HBoolean>( _value ) );
 }
 
-HHuginn::HInteger::HInteger( int long long value_ )
-	: HValue( TYPE::INTEGER ), _value( value_ ) {
-	return;
-}
-
-int long long HHuginn::HInteger::value( void ) const {
-	return ( _value );
-}
-
-HHuginn::value_t HHuginn::HInteger::do_clone( HHuginn* ) const {
-	return ( make_pointer<HInteger>( _value ) );
-}
-
 HHuginn::HNumber::HNumber( yaal::hcore::HNumber const& value_ )
 	: HValue( TYPE::NUMBER ), _value( value_ ) {
 	return;
@@ -1647,7 +1633,7 @@ inline HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHugi
 			);
 		}
 	}
-	return ( make_pointer<HHuginn::HInteger>( s ) );
+	return ( thread_->object_factory().create_integer( s ) );
 	M_EPILOG
 }
 

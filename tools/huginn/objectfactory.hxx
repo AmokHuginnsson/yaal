@@ -39,6 +39,7 @@ namespace huginn {
 
 class HObjectFactory final {
 	HHuginn::class_t _string;
+	HHuginn::class_t _integer;
 	HHuginn::class_t _list;
 	HHuginn::class_t _deque;
 	HHuginn::class_t _dict;
@@ -52,6 +53,7 @@ public:
 	HObjectFactory( void );
 	void register_exception_classes( HHuginn* );
 	HHuginn::value_t create_string( yaal::hcore::HString const& = yaal::hcore::HString() ) const;
+	HHuginn::value_t create_integer( HHuginn::HInteger::value_type ) const;
 	HHuginn::value_t create_list( HHuginn::values_t const& = HHuginn::values_t() ) const;
 	HHuginn::value_t create_deque( HHuginn::HDeque::values_t const& = HHuginn::HDeque::values_t() ) const;
 	HHuginn::value_t create_dict( void ) const;

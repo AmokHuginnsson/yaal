@@ -71,7 +71,7 @@ private:
 
 namespace string {
 
-inline HHuginn::value_t find( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "string.find";
 	verify_arg_count( name, values_, 1, 2, position_ );
@@ -83,7 +83,7 @@ inline HHuginn::value_t find( huginn::HThread*, HHuginn::value_t* object_, HHugi
 	}
 
 	int long pos( get_string( object_->raw() ).find( get_string( values_[0] ), startAt ) );
-	return ( make_pointer<HHuginn::HInteger>( pos != hcore::HString::npos ? pos : -1 ) );
+	return ( thread_->object_factory().create_integer( pos != hcore::HString::npos ? pos : -1 ) );
 	M_EPILOG
 }
 
