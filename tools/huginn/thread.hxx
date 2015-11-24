@@ -46,6 +46,7 @@ private:
 	frames_t _frames;
 	yaal::hcore::HThread::id_t _id;
 	HHuginn* _huginn;
+	HObjectFactory& _objectFactory;
 	yaal::hcore::HString _exceptionMessage;
 	int _exceptionPosition;
 public:
@@ -67,7 +68,7 @@ public:
 	void raise( HHuginn::HClass const*, yaal::hcore::HString const&, int );
 	HHuginn& huginn( void );
 	HObjectFactory& object_factory( void ) const {
-		return ( *_huginn->object_factory() );
+		return ( _objectFactory );
 	}
 private:
 	HThread( HThread const& ) = delete;

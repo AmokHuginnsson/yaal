@@ -42,6 +42,7 @@ HThread::HThread( HHuginn* huginn_, yaal::hcore::HThread::id_t id_ )
 	: _frames()
 	, _id( id_ )
 	, _huginn( huginn_ )
+	, _objectFactory( *_huginn->object_factory() )
 	, _exceptionMessage()
 	, _exceptionPosition( 0 ) {
 	return;

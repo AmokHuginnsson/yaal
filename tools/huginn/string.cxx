@@ -113,7 +113,6 @@ inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( void );
 HHuginn::class_t get_class( void ) {
 	M_PROLOG
 	HHuginn::class_t c(

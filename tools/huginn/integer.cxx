@@ -46,7 +46,6 @@ namespace huginn {
 
 namespace integer {
 
-HHuginn::class_t get_class( void );
 HHuginn::class_t get_class( void ) {
 	M_PROLOG
 	HHuginn::class_t c(

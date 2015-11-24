@@ -124,7 +124,6 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( void );
 HHuginn::class_t get_class( void ) {
 	M_PROLOG
 	HHuginn::class_t c(

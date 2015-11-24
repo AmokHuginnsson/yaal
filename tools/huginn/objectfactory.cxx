@@ -39,38 +39,6 @@ namespace tools {
 
 namespace huginn {
 
-namespace string {
-HHuginn::class_t get_class( void );
-}
-
-namespace integer {
-HHuginn::class_t get_class( void );
-}
-
-namespace list {
-HHuginn::class_t get_class( void );
-}
-
-namespace deque {
-HHuginn::class_t get_class( void );
-}
-
-namespace dict {
-HHuginn::class_t get_class( void );
-}
-
-namespace order {
-HHuginn::class_t get_class( void );
-}
-
-namespace lookup {
-HHuginn::class_t get_class( void );
-}
-
-namespace set {
-HHuginn::class_t get_class( void );
-}
-
 HObjectFactory::HObjectFactory( void )
 	: _string( string::get_class() )
 	, _integer( integer::get_class() )
@@ -96,66 +64,6 @@ void HObjectFactory::register_exception_classes( HHuginn* huginn_ ) {
 	huginn_->register_class( _arithmeticException );
 	return;
 	M_EPILOG
-}
-
-HHuginn::value_t HObjectFactory::create_string( yaal::hcore::HString const& value_ ) const {
-	return ( make_pointer<HHuginn::HString>( _string.raw(), value_ ) );
-}
-
-HHuginn::value_t HObjectFactory::create_integer( HHuginn::HInteger::value_type value_ ) const {
-	return ( make_pointer<HHuginn::HInteger>( _integer.raw(), value_ ) );
-}
-
-HHuginn::value_t HObjectFactory::create_list( HHuginn::values_t const& values_ ) const {
-	return ( make_pointer<HHuginn::HList>( _list.raw(), values_ ) );
-}
-
-HHuginn::value_t HObjectFactory::create_deque( HHuginn::HDeque::values_t const& values_ ) const {
-	return ( make_pointer<HHuginn::HDeque>( _deque.raw(), values_ ) );
-}
-
-HHuginn::value_t HObjectFactory::create_dict( void ) const {
-	return ( make_pointer<HHuginn::HDict>( _dict.raw() ) );
-}
-
-HHuginn::value_t HObjectFactory::create_dict( HHuginn::HDict::values_t const& data_, HHuginn::type_t keyType_ ) const {
-	return ( make_pointer<HHuginn::HDict>( _dict.raw(), data_, keyType_ ) );
-}
-
-HHuginn::value_t HObjectFactory::create_order( void ) const {
-	return ( make_pointer<HHuginn::HOrder>( _order.raw() ) );
-}
-
-HHuginn::value_t HObjectFactory::create_order( HHuginn::HOrder::values_t const& data_, HHuginn::type_t keyType_ ) const {
-	return ( make_pointer<HHuginn::HOrder>( _order.raw(), data_, keyType_ ) );
-}
-
-HHuginn::value_t HObjectFactory::create_lookup( void ) const {
-	return ( make_pointer<HHuginn::HLookup>( _lookup.raw() ) );
-}
-
-HHuginn::value_t HObjectFactory::create_lookup( HHuginn::HLookup::values_t const& data_ ) const {
-	return ( make_pointer<HHuginn::HLookup>( _lookup.raw(), data_ ) );
-}
-
-HHuginn::value_t HObjectFactory::create_set( void ) const {
-	return ( make_pointer<HHuginn::HSet>( _set.raw() ) );
-}
-
-HHuginn::value_t HObjectFactory::create_set( HHuginn::HSet::values_t const& data_ ) const {
-	return ( make_pointer<HHuginn::HSet>( _set.raw(), data_ ) );
-}
-
-HHuginn::HClass const* HObjectFactory::exception_class( void ) const {
-	return ( _exception.raw() );
-}
-
-HHuginn::HClass const* HObjectFactory::conversion_exception_class( void ) const {
-	return ( _conversionException.raw() );
-}
-
-HHuginn::HClass const* HObjectFactory::arithmetic_exception_class( void ) const {
-	return ( _arithmeticException.raw() );
 }
 
 }
