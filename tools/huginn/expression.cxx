@@ -370,7 +370,7 @@ void HExpression::power( HFrame* frame_, int ) {
 		if ( v1->type() != v2->type() ) {
 			operands_type_mismatch( "^", v1->type(), v2->type(), p );
 		}
-		frame_->values().push( value_builtin::pow( v1, v2, p ) );
+		frame_->values().push( value_builtin::pow( frame_->thread(), v1, v2, p ) );
 	}
 	return;
 	M_EPILOG
@@ -627,7 +627,7 @@ void HExpression::store_direct( HHuginn::value_t const& value_, HFrame* frame_, 
 
 void HExpression::store_real( double long value_, HFrame* frame_, int ) {
 	M_PROLOG
-	frame_->values().push( make_pointer<HHuginn::HReal>( value_ ) );
+	frame_->values().push( frame_->thread()->object_factory().create_real( value_ ) );
 	return;
 	M_EPILOG
 }

@@ -567,15 +567,16 @@ private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
 
-class HHuginn::HReal : public HHuginn::HValue {
+class HHuginn::HReal : public HHuginn::HObject {
 public:
 	typedef HHuginn::HReal this_type;
 	typedef HHuginn::HValue base_type;
+	typedef double long value_type;
 private:
-	double long _value;
+	value_type _value;
 public:
-	HReal( double long );
-	double long value( void ) const;
+	HReal( HHuginn::HClass const*, value_type );
+	value_type value( void ) const;
 	void to_integer( void ) const;
 	void to_number( void ) const;
 	void to_real( void ) const;

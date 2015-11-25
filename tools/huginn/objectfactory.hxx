@@ -45,6 +45,10 @@ namespace integer {
 HHuginn::class_t get_class( void );
 }
 
+namespace real {
+HHuginn::class_t get_class( void );
+}
+
 namespace list {
 HHuginn::class_t get_class( void );
 }
@@ -72,6 +76,7 @@ HHuginn::class_t get_class( void );
 class HObjectFactory final {
 	HHuginn::class_t _string;
 	HHuginn::class_t _integer;
+	HHuginn::class_t _real;
 	HHuginn::class_t _list;
 	HHuginn::class_t _deque;
 	HHuginn::class_t _dict;
@@ -89,6 +94,9 @@ public:
 	}
 	HHuginn::value_t create_integer( HHuginn::HInteger::value_type value_ ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HInteger>( _integer.raw(), value_ ) );
+	}
+	HHuginn::value_t create_real( HHuginn::HReal::value_type value_ ) const {
+		return ( yaal::hcore::make_pointer<HHuginn::HReal>( _real.raw(), value_ ) );
 	}
 	HHuginn::value_t create_list( HHuginn::values_t const& values_ = HHuginn::values_t() ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HList>( _list.raw(), values_ ) );

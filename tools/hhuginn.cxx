@@ -77,7 +77,6 @@ HHuginn::HType::id_generator_t HHuginn::HType::_idGenerator{ 0 };
 HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
 
 HHuginn::type_t const HHuginn::TYPE::NONE( HHuginn::HType::register_type( "none", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::REAL( HHuginn::HType::register_type( "real", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::NUMBER( HHuginn::HType::register_type( "number", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::BOOLEAN( HHuginn::HType::register_type( "boolean", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::CHARACTER( HHuginn::HType::register_type( "character", nullptr ) );
@@ -1423,19 +1422,6 @@ HHuginn::value_t& HHuginn::HReference::value( void ) const {
 
 HHuginn::value_t HHuginn::HReference::do_clone( HHuginn* ) const {
 	return ( make_pointer<HReference>( _value ) );
-}
-
-HHuginn::HReal::HReal( double long value_ )
-	: HValue( TYPE::REAL ), _value( value_ ) {
-	return;
-}
-
-double long HHuginn::HReal::value( void ) const {
-	return ( _value );
-}
-
-HHuginn::value_t HHuginn::HReal::do_clone( HHuginn* ) const {
-	return ( make_pointer<HReal>( _value ) );
 }
 
 HHuginn::HBoolean::HBoolean( bool value_ )

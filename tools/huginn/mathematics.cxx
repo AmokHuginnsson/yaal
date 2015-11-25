@@ -31,6 +31,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/huginn/thread.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
+#include "objectfactory.hxx"
 #include "packagefactory.hxx"
 
 using namespace yaal;
@@ -65,7 +66,7 @@ public:
 		} else {
 			double long val( get_real( values_[0] ) );
 			if ( val >= 0 ) {
-				v = make_pointer<HHuginn::HReal>( yaal::square_root( val ) );
+				v = thread_->object_factory().create_real( yaal::square_root( val ) );
 			}
 		}
 		if ( v == thread_->huginn().none_value() ) {
