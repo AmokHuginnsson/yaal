@@ -61,7 +61,7 @@ public:
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
 			if ( val >= 0 ) {
-				v = make_pointer<HHuginn::HNumber>( hcore::square_root( val ) );
+				v = thread_->object_factory().create_number( hcore::square_root( val ) );
 			}
 		} else {
 			double long val( get_real( values_[0] ) );

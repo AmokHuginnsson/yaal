@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  objectfactory.cxx - this file is integral part of `yaal' project.
+  number.cxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -27,47 +27,59 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
+#include "tools/hhuginn.hxx"
+#include "helper.hxx"
+#include "thread.hxx"
 #include "objectfactory.hxx"
-#include "exception.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
+using namespace yaal::tools::huginn;
 
 namespace yaal {
 
 namespace tools {
 
+HHuginn::type_t const HHuginn::TYPE::NUMBER( HHuginn::HType::register_type( "number", nullptr ) );
+
 namespace huginn {
 
-HObjectFactory::HObjectFactory( void )
-	: _string( string::get_class() )
-	, _integer( integer::get_class() )
-	, _real( real::get_class() )
-	, _number( number::get_class() )
-	, _list( list::get_class() )
-	, _deque( deque::get_class() )
-	, _dict( dict::get_class() )
-	, _order( order::get_class() )
-	, _lookup( lookup::get_class() )
-	, _set( set::get_class() )
-	, _exception()
-	, _conversionException()
-	, _arithmeticException() {
-	return;
-}
+namespace number {
 
-void HObjectFactory::register_exception_classes( HHuginn* huginn_ ) {
+HHuginn::class_t get_class( void ) {
 	M_PROLOG
-	_exception = exception::get_class( huginn_ );
-	_conversionException = exception::create_class( huginn_, "ConversionException", _exception.raw() );
-	_arithmeticException = exception::create_class( huginn_, "ArithmeticException", _exception.raw() );
-	huginn_->register_class( _exception );
-	huginn_->register_class( _conversionException );
-	huginn_->register_class( _arithmeticException );
-	return;
+	HHuginn::class_t c(
+		make_pointer<HHuginn::HClass>(
+			nullptr,
+			HHuginn::TYPE::NUMBER,
+			nullptr,
+			HHuginn::HClass::field_names_t{
+			},
+			HHuginn::values_t{
+			}
+		)
+	);
+	return ( c );
 	M_EPILOG
 }
 
+}
+
+}
+
+
+HHuginn::HNumber::HNumber( HHuginn::HClass const* class_, HHuginn::HNumber::value_type const& value_ )
+	: HObject( class_ )
+	, _value( value_ ) {
+	return;
+}
+
+HHuginn::HNumber::value_type const& HHuginn::HNumber::value( void ) const {
+	return ( _value );
+}
+
+HHuginn::value_t HHuginn::HNumber::do_clone( HHuginn* huginn_ ) const {
+	return ( huginn_->object_factory()->create_number( _value ) );
 }
 
 }

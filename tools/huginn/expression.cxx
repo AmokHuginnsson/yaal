@@ -648,7 +648,7 @@ void HExpression::store_string( yaal::hcore::HString const& value_, HFrame* fram
 
 void HExpression::store_number( yaal::hcore::HString const& value_, HFrame* frame_, int ) {
 	M_PROLOG
-	frame_->values().push( make_pointer<HHuginn::HNumber>( value_ ) );
+	frame_->values().push( frame_->thread()->object_factory().create_number( value_ ) );
 	return;
 	M_EPILOG
 }

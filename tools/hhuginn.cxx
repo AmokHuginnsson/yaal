@@ -77,7 +77,6 @@ HHuginn::HType::id_generator_t HHuginn::HType::_idGenerator{ 0 };
 HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
 
 HHuginn::type_t const HHuginn::TYPE::NONE( HHuginn::HType::register_type( "none", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::NUMBER( HHuginn::HType::register_type( "number", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::BOOLEAN( HHuginn::HType::register_type( "boolean", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::CHARACTER( HHuginn::HType::register_type( "character", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::REFERENCE( HHuginn::HType::register_type( "*reference*", nullptr ) );
@@ -1435,19 +1434,6 @@ bool HHuginn::HBoolean::value( void ) const {
 
 HHuginn::value_t HHuginn::HBoolean::do_clone( HHuginn* ) const {
 	return ( make_pointer<HBoolean>( _value ) );
-}
-
-HHuginn::HNumber::HNumber( yaal::hcore::HNumber const& value_ )
-	: HValue( TYPE::NUMBER ), _value( value_ ) {
-	return;
-}
-
-yaal::hcore::HNumber const& HHuginn::HNumber::value( void ) const {
-	return ( _value );
-}
-
-HHuginn::value_t HHuginn::HNumber::do_clone( HHuginn* ) const {
-	return ( make_pointer<HNumber>( _value ) );
 }
 
 HHuginn::HCharacter::HCharacter( char value_ )

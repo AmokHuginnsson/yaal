@@ -590,12 +590,13 @@ class HHuginn::HString : public HHuginn::HIterable {
 public:
 	typedef HHuginn::HString this_type;
 	typedef HHuginn::HValue base_type;
+	typedef yaal::hcore::HString value_type;
 private:
-	yaal::hcore::HString _value;
+	value_type _value;
 public:
-	HString( HHuginn::HClass const*, yaal::hcore::HString const& );
-	yaal::hcore::HString const& value( void ) const;
-	yaal::hcore::HString& value( void );
+	HString( HHuginn::HClass const*, value_type const& );
+	value_type const& value( void ) const;
+	value_type& value( void );
 	void to_integer( void ) const;
 	void to_number( void ) const;
 	void to_real( void ) const;
@@ -623,15 +624,16 @@ private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
 
-class HHuginn::HNumber : public HHuginn::HValue {
+class HHuginn::HNumber : public HHuginn::HObject {
 public:
 	typedef HHuginn::HNumber this_type;
 	typedef HHuginn::HValue base_type;
+	typedef yaal::hcore::HNumber value_type;
 private:
-	yaal::hcore::HNumber _value;
+	value_type _value;
 public:
-	HNumber( yaal::hcore::HNumber const& );
-	yaal::hcore::HNumber const& value( void ) const;
+	HNumber( HHuginn::HClass const*, value_type const& );
+	value_type const& value( void ) const;
 	void to_integer( void ) const;
 	void to_number( void ) const;
 	void to_real( void ) const;
