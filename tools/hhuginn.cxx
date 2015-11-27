@@ -78,7 +78,6 @@ HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
 
 HHuginn::type_t const HHuginn::TYPE::NONE( HHuginn::HType::register_type( "none", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::BOOLEAN( HHuginn::HType::register_type( "boolean", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::CHARACTER( HHuginn::HType::register_type( "character", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::REFERENCE( HHuginn::HType::register_type( "*reference*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::FUNCTION_REFERENCE( HHuginn::HType::register_type( "*function_reference*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::OBJECT_REFERENCE( HHuginn::HType::register_type( "*object_reference*", nullptr ) );
@@ -1434,19 +1433,6 @@ bool HHuginn::HBoolean::value( void ) const {
 
 HHuginn::value_t HHuginn::HBoolean::do_clone( HHuginn* ) const {
 	return ( make_pointer<HBoolean>( _value ) );
-}
-
-HHuginn::HCharacter::HCharacter( char value_ )
-	: HValue( TYPE::CHARACTER ), _value( value_ ) {
-	return;
-}
-
-char HHuginn::HCharacter::value( void ) const {
-	return ( _value );
-}
-
-HHuginn::value_t HHuginn::HCharacter::do_clone( HHuginn* ) const {
-	return ( make_pointer<HCharacter>( _value ) );
 }
 
 HHuginn::HIterable::HIterable( HClass const* class_ )

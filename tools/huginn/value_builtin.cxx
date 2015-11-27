@@ -46,7 +46,13 @@ namespace huginn {
 
 namespace value_builtin {
 
-HHuginn::value_t subscript( HExpression::ACCESS subscript_, HHuginn::value_t& base_, HHuginn::value_t const& index_, int position_ ) {
+HHuginn::value_t subscript(
+	HThread* thread_,
+	HExpression::ACCESS subscript_,
+	HHuginn::value_t& base_,
+	HHuginn::value_t const& index_,
+	int position_
+) {
 	HHuginn::type_t baseType( base_->type() );
 	HHuginn::value_t res;
 	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
@@ -71,7 +77,7 @@ HHuginn::value_t subscript( HExpression::ACCESS subscript_, HHuginn::value_t& ba
 		} else {
 			M_ASSERT( baseType == HHuginn::TYPE::STRING );
 			HHuginn::HString* s( static_cast<HHuginn::HString*>( base_.raw() ) );
-			res = make_pointer<HHuginn::HHuginn::HCharacter>( s->value()[static_cast<int>( index )] );
+			res = thread_->object_factory().create_character( s->value()[static_cast<int>( index )] );
 		}
 	} else if ( baseType == HHuginn::TYPE::DICT ) {
 		HHuginn::HDict* d( static_cast<HHuginn::HDict*>( base_.raw() ) );
@@ -615,7 +621,7 @@ HHuginn::value_t character( HThread* thread_, HHuginn::value_t const& v_, int po
 	if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = v_;
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
-		res = make_pointer<HHuginn::HCharacter>( static_cast<char>( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() ) );
+		res = thread_->object_factory().create_character( static_cast<char>( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() ) );
 	} else {
 		res = fallback_conversion( HHuginn::TYPE::CHARACTER, thread_, v_, position_ );
 	}

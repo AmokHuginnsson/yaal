@@ -426,7 +426,7 @@ void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
 			}
 			frame_->values().push( value_builtin::range( frame_->thread(), base, from, to, step, p ) );
 		} else {
-			frame_->values().push( value_builtin::subscript( access_, base, step, p ) );
+			frame_->values().push( value_builtin::subscript( frame_->thread(), access_, base, step, p ) );
 		}
 	}
 	return;
@@ -655,7 +655,7 @@ void HExpression::store_number( yaal::hcore::HString const& value_, HFrame* fram
 
 void HExpression::store_character( char value_, HFrame* frame_, int ) {
 	M_PROLOG
-	frame_->values().push( make_pointer<HHuginn::HCharacter>( value_ ) );
+	frame_->values().push( frame_->thread()->object_factory().create_character( value_ ) );
 	return;
 	M_EPILOG
 }

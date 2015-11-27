@@ -53,6 +53,10 @@ namespace number {
 HHuginn::class_t get_class( void );
 }
 
+namespace character {
+HHuginn::class_t get_class( void );
+}
+
 namespace list {
 HHuginn::class_t get_class( void );
 }
@@ -82,6 +86,7 @@ class HObjectFactory final {
 	HHuginn::class_t _integer;
 	HHuginn::class_t _real;
 	HHuginn::class_t _number;
+	HHuginn::class_t _character;
 	HHuginn::class_t _list;
 	HHuginn::class_t _deque;
 	HHuginn::class_t _dict;
@@ -105,6 +110,9 @@ public:
 	}
 	HHuginn::value_t create_number( HHuginn::HNumber::value_type const& value_ ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HNumber>( _number.raw(), value_ ) );
+	}
+	HHuginn::value_t create_character( HHuginn::HCharacter::value_type value_ ) const {
+		return ( yaal::hcore::make_pointer<HHuginn::HCharacter>( _character.raw(), value_ ) );
 	}
 	HHuginn::value_t create_list( HHuginn::values_t const& values_ = HHuginn::values_t() ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HList>( _list.raw(), values_ ) );

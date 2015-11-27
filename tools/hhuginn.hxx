@@ -608,15 +608,16 @@ private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
 
-class HHuginn::HCharacter : public HHuginn::HValue {
+class HHuginn::HCharacter : public HHuginn::HObject {
 public:
 	typedef HHuginn::HCharacter this_type;
 	typedef HHuginn::HValue base_type;
+	typedef char value_type;
 private:
-	char _value;
+	value_type _value;
 public:
-	HCharacter( char );
-	char value( void ) const;
+	HCharacter( HHuginn::HClass const*, value_type );
+	value_type value( void ) const;
 	void to_character( void ) const;
 	void to_integer( void ) const;
 	void to_string( void ) const;

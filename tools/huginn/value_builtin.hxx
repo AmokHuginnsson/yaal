@@ -40,7 +40,7 @@ namespace huginn {
 
 namespace value_builtin {
 
-HHuginn::value_t subscript( HExpression::ACCESS, HHuginn::value_t&, HHuginn::value_t const&, int );
+HHuginn::value_t subscript( HThread*, HExpression::ACCESS, HHuginn::value_t&, HHuginn::value_t const&, int );
 HHuginn::value_t range( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t add( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
 HHuginn::value_t sub( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );

@@ -163,7 +163,7 @@ public:
 		} else if ( t == HHuginn::TYPE::STRING ) {
 			HString const& s( get_string( values_[0] ) );
 			for ( char c : s ) {
-				dest.push_back( make_pointer<HHuginn::HCharacter>( c ) );
+				dest.push_back( thread_->object_factory().create_character( c ) );
 			}
 		} else {
 			M_ASSERT( ! "bad code path"[0] );

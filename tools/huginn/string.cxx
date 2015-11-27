@@ -47,16 +47,18 @@ namespace huginn {
 
 class HStringIterator : public HIteratorInterface {
 	HHuginn::HString* _string;
+	HObjectFactory* _objectFactory;
 	int _index;
 public:
 	HStringIterator( HHuginn::HString* string_ )
-		: _string( string_ ),
-		_index( 0 ) {
+		: _string( string_ )
+		, _objectFactory( string_->get_class()->huginn()->object_factory() )
+		, _index( 0 ) {
 		return;
 	}
 protected:
 	virtual HHuginn::value_t do_value( void ) override {
-		return ( make_pointer<HHuginn::HCharacter>( _string->value()[ _index ] ) );
+		return ( _objectFactory->create_character( _string->value()[ _index ] ) );
 	}
 	virtual bool do_is_valid( void ) override {
 		return ( _index < _string->value().get_size() );
