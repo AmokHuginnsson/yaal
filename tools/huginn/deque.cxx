@@ -124,11 +124,12 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
-HHuginn::class_t get_class( void ) {
+HHuginn::class_t get_class( HHuginn* );
+HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
-			nullptr,
+			huginn_,
 			HHuginn::TYPE::DEQUE,
 			nullptr,
 			HHuginn::HClass::field_names_t{

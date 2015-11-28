@@ -46,11 +46,12 @@ namespace huginn {
 
 namespace integer {
 
-HHuginn::class_t get_class( void ) {
+HHuginn::class_t get_class( HHuginn* );
+HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
-			nullptr,
+			huginn_,
 			HHuginn::TYPE::INTEGER,
 			nullptr,
 			HHuginn::HClass::field_names_t{

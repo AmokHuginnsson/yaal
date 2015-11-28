@@ -37,50 +37,6 @@ namespace tools {
 
 namespace huginn {
 
-namespace string {
-HHuginn::class_t get_class( void );
-}
-
-namespace integer {
-HHuginn::class_t get_class( void );
-}
-
-namespace real {
-HHuginn::class_t get_class( void );
-}
-
-namespace number {
-HHuginn::class_t get_class( void );
-}
-
-namespace character {
-HHuginn::class_t get_class( void );
-}
-
-namespace list {
-HHuginn::class_t get_class( void );
-}
-
-namespace deque {
-HHuginn::class_t get_class( void );
-}
-
-namespace dict {
-HHuginn::class_t get_class( void );
-}
-
-namespace order {
-HHuginn::class_t get_class( void );
-}
-
-namespace lookup {
-HHuginn::class_t get_class( void );
-}
-
-namespace set {
-HHuginn::class_t get_class( void );
-}
-
 class HObjectFactory final {
 	HHuginn::class_t _string;
 	HHuginn::class_t _integer;
@@ -97,7 +53,7 @@ class HObjectFactory final {
 	HHuginn::class_t _conversionException;
 	HHuginn::class_t _arithmeticException;
 public:
-	HObjectFactory( void );
+	HObjectFactory( HHuginn* );
 	void register_exception_classes( HHuginn* );
 	HHuginn::value_t create_string( yaal::hcore::HString const& value_ = yaal::hcore::HString() ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HString>( _string.raw(), value_ ) );

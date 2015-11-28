@@ -709,7 +709,8 @@ typedef typename memory::aligned<BUFFER_SIZE, holder_t>::type buffer_t;
 
 HHuginn::HObject::~HObject( void ) {
 	M_PROLOG
-	huginn::HThread* t( _class->huginn() ? _class->huginn()->current_thread() : nullptr );
+	/* *FIXME* *TODO* Remove !is_builtin() test after HObject, HValue hierarchy fix. */
+	huginn::HThread* t( _class->huginn() && ! is_builtin( type()->name() ) ? _class->huginn()->current_thread() : nullptr );
 	if ( t && ! t->has_runtime_exception() ) {
 		hobject_destructor_helper::buffer_t buffer;
 		hobject_destructor_helper::allocator<hobject_destructor_helper::holder_t> allocator( buffer.mem() );
@@ -902,7 +903,7 @@ HHuginn::HHuginn( void )
 	, _none( make_pointer<HHuginn::HValue>( HHuginn::TYPE::NONE ) )
 	, _true( make_pointer<HHuginn::HBoolean>( true ) )
 	, _false( make_pointer<HHuginn::HBoolean>( false ) )
-	, _objectFactory( new HObjectFactory() )
+	, _objectFactory( new HObjectFactory( this ) )
 	, _classes()
 	, _functions()
 	, _source( make_resource<HSource>() )

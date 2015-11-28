@@ -39,18 +39,62 @@ namespace tools {
 
 namespace huginn {
 
-HObjectFactory::HObjectFactory( void )
-	: _string( string::get_class() )
-	, _integer( integer::get_class() )
-	, _real( real::get_class() )
-	, _number( number::get_class() )
-	, _character( character::get_class() )
-	, _list( list::get_class() )
-	, _deque( deque::get_class() )
-	, _dict( dict::get_class() )
-	, _order( order::get_class() )
-	, _lookup( lookup::get_class() )
-	, _set( set::get_class() )
+namespace string {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+namespace integer {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+namespace real {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+namespace number {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+namespace character {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+namespace list {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+namespace deque {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+namespace dict {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+namespace order {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+namespace lookup {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+namespace set {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+HObjectFactory::HObjectFactory( HHuginn* huginn_ )
+	: _string( string::get_class( huginn_ ) )
+	, _integer( integer::get_class( huginn_ ) )
+	, _real( real::get_class( huginn_ ) )
+	, _number( number::get_class( huginn_ ) )
+	, _character( character::get_class( huginn_ ) )
+	, _list( list::get_class( huginn_ ) )
+	, _deque( deque::get_class( huginn_ ) )
+	, _dict( dict::get_class( huginn_ ) )
+	, _order( order::get_class( huginn_ ) )
+	, _lookup( lookup::get_class( huginn_ ) )
+	, _set( set::get_class( huginn_ ) )
 	, _exception()
 	, _conversionException()
 	, _arithmeticException() {
