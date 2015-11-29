@@ -185,9 +185,6 @@ private:
 	STATE _state;
 	HType::id_generator_t _idGenerator;
 	HType::type_dict_t _userTypeDict;
-	value_t _none;
-	value_t _true;
-	value_t _false;
 	/*
 	 * Built-in types can by used as field definitions in user classes.
 	 * User class needs to be able to use built-in types in its destructor.
@@ -195,6 +192,9 @@ private:
 	 * _objectFactory and _classes
 	 */
 	object_factory_t _objectFactory;
+	value_t _none;
+	value_t _true;
+	value_t _false;
 	classes_t _classes;
 	functions_t _functions;
 	source_t _source;
@@ -534,15 +534,16 @@ protected:
 	virtual int long do_size( void ) const = 0;
 };
 
-class HHuginn::HBoolean : public HHuginn::HValue {
+class HHuginn::HBoolean : public HHuginn::HObject {
 public:
 	typedef HHuginn::HBoolean this_type;
 	typedef HHuginn::HValue base_type;
+	typedef bool value_type;
 private:
-	bool _value;
+	value_type _value;
 public:
-	HBoolean( bool );
-	bool value( void ) const;
+	HBoolean( HHuginn::HClass const*, value_type );
+	value_type value( void ) const;
 	void to_string( void ) const;
 private:
 	virtual value_t do_clone( HHuginn* ) const override;

@@ -131,12 +131,12 @@ HHuginn::value_t HQueryResult::insert_id( tools::huginn::HThread* thread_, HHugi
 	M_EPILOG
 }
 
-HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+HHuginn::value_t HQueryResult::has_next( tools::huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "QueryResult.has_next";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
-	return ( make_pointer<HHuginn::HBoolean>( qr->_it != qr->_recordSet->end() ) );
+	return ( thread_->object_factory().create_boolean( qr->_it != qr->_recordSet->end() ) );
 	M_EPILOG
 }
 

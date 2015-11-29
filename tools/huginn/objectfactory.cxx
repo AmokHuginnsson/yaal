@@ -39,11 +39,15 @@ namespace tools {
 
 namespace huginn {
 
-namespace string {
+namespace boolean {
 HHuginn::class_t get_class( HHuginn* );
 }
 
 namespace integer {
+HHuginn::class_t get_class( HHuginn* );
+}
+
+namespace string {
 HHuginn::class_t get_class( HHuginn* );
 }
 
@@ -84,8 +88,9 @@ HHuginn::class_t get_class( HHuginn* );
 }
 
 HObjectFactory::HObjectFactory( HHuginn* huginn_ )
-	: _string( string::get_class( huginn_ ) )
+	: _boolean( boolean::get_class( huginn_ ) )
 	, _integer( integer::get_class( huginn_ ) )
+	, _string( string::get_class( huginn_ ) )
 	, _real( real::get_class( huginn_ ) )
 	, _number( number::get_class( huginn_ ) )
 	, _character( character::get_class( huginn_ ) )

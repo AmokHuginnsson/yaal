@@ -448,7 +448,7 @@ void HExpression::equals( HFrame* frame_, int ) {
 	if ( ( t1 != t2 ) && ( t1 != HHuginn::TYPE::NONE ) && ( t2 != HHuginn::TYPE::NONE ) ) {
 		operands_type_mismatch( "==", t1, t2, p );
 	}
-	frame_->values().push( make_pointer<HHuginn::HBoolean>( value_builtin::equals( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::equals( v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -468,7 +468,7 @@ void HExpression::not_equals( HFrame* frame_, int ) {
 	if ( ( t1 != t2 ) && ( t1 != HHuginn::TYPE::NONE ) && ( t2 != HHuginn::TYPE::NONE ) ) {
 		operands_type_mismatch( "!=", t1, t2, p );
 	}
-	frame_->values().push( make_pointer<HHuginn::HBoolean>( ! value_builtin::equals( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( ! value_builtin::equals( v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -486,7 +486,7 @@ void HExpression::less( HFrame* frame_, int ) {
 	if ( v1->type() != v2->type() ) {
 		operands_type_mismatch( "<", v1->type(), v2->type(), p );
 	}
-	frame_->values().push( make_pointer<HHuginn::HBoolean>( value_builtin::less( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::less( v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -504,7 +504,7 @@ void HExpression::greater( HFrame* frame_, int ) {
 	if ( v1->type() != v2->type() ) {
 		operands_type_mismatch( ">", v1->type(), v2->type(), p );
 	}
-	frame_->values().push( make_pointer<HHuginn::HBoolean>( value_builtin::greater( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::greater( v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -522,7 +522,7 @@ void HExpression::less_or_equal( HFrame* frame_, int ) {
 	if ( v1->type() != v2->type() ) {
 		operands_type_mismatch( "<=", v1->type(), v2->type(), p );
 	}
-	frame_->values().push( make_pointer<HHuginn::HBoolean>( value_builtin::less_or_equal( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::less_or_equal( v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -540,7 +540,7 @@ void HExpression::greater_or_equal( HFrame* frame_, int ) {
 	if ( v1->type() != v2->type() ) {
 		operands_type_mismatch( ">=", v1->type(), v2->type(), p );
 	}
-	frame_->values().push( make_pointer<HHuginn::HBoolean>( value_builtin::greater_or_equal( v1, v2, p ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::greater_or_equal( v1, v2, p ) ) );
 	return;
 	M_EPILOG
 }
@@ -553,7 +553,7 @@ void HExpression::boolean_and( HFrame* frame_, int ) {
 	HHuginn::value_t v( frame_->values().top() );
 	frame_->values().pop();
 	M_ASSERT( dynamic_cast<HBooleanEvaluator*>( v.raw() ) );
-	frame_->values().push( make_pointer<HHuginn::HBoolean>( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
 	return;
 	M_EPILOG
 }
@@ -566,7 +566,7 @@ void HExpression::boolean_or( HFrame* frame_, int ) {
 	HHuginn::value_t v( frame_->values().top() );
 	frame_->values().pop();
 	M_ASSERT( dynamic_cast<HBooleanEvaluator*>( v.raw() ) );
-	frame_->values().push( make_pointer<HHuginn::HBoolean>( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
+	frame_->values().push( frame_->thread()->object_factory().create_boolean( static_cast<HBooleanEvaluator*>( v.raw() )->execute( frame_->thread() ) ) );
 	return;
 	M_EPILOG
 }
@@ -584,7 +584,7 @@ void HExpression::boolean_xor( HFrame* frame_, int ) {
 	if ( ( v1->type() != HHuginn::TYPE::BOOLEAN ) || ( v2->type() != HHuginn::TYPE::BOOLEAN ) ) {
 		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], p );
 	}
-	frame_->values().push( value_builtin::boolean_xor( v1, v2, p ) );
+	frame_->values().push( value_builtin::boolean_xor( frame_->thread(), v1, v2, p ) );
 	return;
 	M_EPILOG
 }
@@ -600,7 +600,7 @@ void HExpression::boolean_not( HFrame* frame_, int ) {
 	if ( v->type() != HHuginn::TYPE::BOOLEAN ) {
 		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
 	}
-	frame_->values().push( value_builtin::boolean_not( v, p ) );
+	frame_->values().push( value_builtin::boolean_not( frame_->thread(), v, p ) );
 	return;
 	M_EPILOG
 }

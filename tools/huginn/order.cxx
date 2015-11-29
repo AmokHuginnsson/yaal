@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "compiler.hxx"
 #include "value_builtin.hxx"
 #include "helper.hxx"
+#include "thread.hxx"
 #include "objectfactory.hxx"
 
 using namespace yaal;
@@ -81,13 +82,13 @@ inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHugin
 	M_EPILOG
 }
 
-inline HHuginn::value_t has_key( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t has_key( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	verify_arg_count( "order.has_key", values_, 1, 1, position_ );
 	HHuginn::HOrder* o( dynamic_cast<HHuginn::HOrder*>( object_->raw() ) );
 	M_ASSERT( o != nullptr );
 	bool hasKey( o->has_key( values_[0], position_ ) );
-	return ( make_pointer<HHuginn::HBoolean>( hasKey ) );
+	return ( thread_->object_factory().create_boolean( hasKey ) );
 	M_EPILOG
 }
 

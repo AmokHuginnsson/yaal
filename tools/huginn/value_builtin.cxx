@@ -505,16 +505,16 @@ bool greater_or_equal( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_,
 	return ( res );
 }
 
-HHuginn::value_t boolean_xor( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int ) {
+HHuginn::value_t boolean_xor( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int ) {
 	M_ASSERT( ( v1_->type() == HHuginn::TYPE::BOOLEAN ) && ( v2_->type() == HHuginn::TYPE::BOOLEAN ) );
 	bool v1( static_cast<HHuginn::HBoolean const*>( v1_.raw() )->value() );
 	bool v2( static_cast<HHuginn::HBoolean const*>( v2_.raw() )->value() );
-	return ( make_pointer<HHuginn::HBoolean>( ( v1 && ! v2 ) || ( ! v1 && v2 ) ) );
+	return ( thread_->object_factory().create_boolean( ( v1 && ! v2 ) || ( ! v1 && v2 ) ) );
 }
 
-HHuginn::value_t boolean_not( HHuginn::value_t const& v_, int ) {
+HHuginn::value_t boolean_not( HThread* thread_, HHuginn::value_t const& v_, int ) {
 	M_ASSERT( v_->type() == HHuginn::TYPE::BOOLEAN );
-	return ( make_pointer<HHuginn::HBoolean>( ! static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() ) );
+	return ( thread_->object_factory().create_boolean( ! static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() ) );
 }
 
 namespace {

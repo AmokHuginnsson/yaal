@@ -77,7 +77,6 @@ HHuginn::HType::id_generator_t HHuginn::HType::_idGenerator{ 0 };
 HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
 
 HHuginn::type_t const HHuginn::TYPE::NONE( HHuginn::HType::register_type( "none", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::BOOLEAN( HHuginn::HType::register_type( "boolean", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::REFERENCE( HHuginn::HType::register_type( "*reference*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::FUNCTION_REFERENCE( HHuginn::HType::register_type( "*function_reference*", nullptr ) );
 HHuginn::type_t const HHuginn::TYPE::OBJECT_REFERENCE( HHuginn::HType::register_type( "*object_reference*", nullptr ) );
@@ -900,10 +899,10 @@ HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY )
 	, _idGenerator{ HType::builtin_type_count() }
 	, _userTypeDict()
-	, _none( make_pointer<HHuginn::HValue>( HHuginn::TYPE::NONE ) )
-	, _true( make_pointer<HHuginn::HBoolean>( true ) )
-	, _false( make_pointer<HHuginn::HBoolean>( false ) )
 	, _objectFactory( new HObjectFactory( this ) )
+	, _none( make_pointer<HHuginn::HValue>( HHuginn::TYPE::NONE ) )
+	, _true( _objectFactory->create_boolean( true ) )
+	, _false( _objectFactory->create_boolean( false ) )
 	, _classes()
 	, _functions()
 	, _source( make_resource<HSource>() )
@@ -1421,19 +1420,6 @@ HHuginn::value_t& HHuginn::HReference::value( void ) const {
 
 HHuginn::value_t HHuginn::HReference::do_clone( HHuginn* ) const {
 	return ( make_pointer<HReference>( _value ) );
-}
-
-HHuginn::HBoolean::HBoolean( bool value_ )
-	: HValue( TYPE::BOOLEAN ), _value( value_ ) {
-	return;
-}
-
-bool HHuginn::HBoolean::value( void ) const {
-	return ( _value );
-}
-
-HHuginn::value_t HHuginn::HBoolean::do_clone( HHuginn* ) const {
-	return ( make_pointer<HBoolean>( _value ) );
 }
 
 HHuginn::HIterable::HIterable( HClass const* class_ )

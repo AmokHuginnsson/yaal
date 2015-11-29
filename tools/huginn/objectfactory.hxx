@@ -38,8 +38,9 @@ namespace tools {
 namespace huginn {
 
 class HObjectFactory final {
-	HHuginn::class_t _string;
+	HHuginn::class_t _boolean;
 	HHuginn::class_t _integer;
+	HHuginn::class_t _string;
 	HHuginn::class_t _real;
 	HHuginn::class_t _number;
 	HHuginn::class_t _character;
@@ -55,11 +56,14 @@ class HObjectFactory final {
 public:
 	HObjectFactory( HHuginn* );
 	void register_exception_classes( HHuginn* );
-	HHuginn::value_t create_string( yaal::hcore::HString const& value_ = yaal::hcore::HString() ) const {
-		return ( yaal::hcore::make_pointer<HHuginn::HString>( _string.raw(), value_ ) );
+	HHuginn::value_t create_boolean( HHuginn::HBoolean::value_type value_ ) const {
+		return ( yaal::hcore::make_pointer<HHuginn::HBoolean>( _boolean.raw(), value_ ) );
 	}
 	HHuginn::value_t create_integer( HHuginn::HInteger::value_type value_ ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HInteger>( _integer.raw(), value_ ) );
+	}
+	HHuginn::value_t create_string( yaal::hcore::HString const& value_ = yaal::hcore::HString() ) const {
+		return ( yaal::hcore::make_pointer<HHuginn::HString>( _string.raw(), value_ ) );
 	}
 	HHuginn::value_t create_real( HHuginn::HReal::value_type value_ ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HReal>( _real.raw(), value_ ) );
