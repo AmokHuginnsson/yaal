@@ -446,7 +446,7 @@ private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
 
-class HHuginn::HObject : public HHuginn::HValue, public yaal::hcore::HPointerFromThisInterface<HHuginn::HObject> {
+class HHuginn::HObject : public HHuginn::HValue {
 public:
 	typedef HHuginn::HObject this_type;
 	typedef HHuginn::HValue base_type;
@@ -460,7 +460,7 @@ public:
 	virtual ~HObject( void );
 	int field_index( yaal::hcore::HString const& ) const;
 	value_t& field_ref( int );
-	value_t field( int ) const;
+	value_t field( HHuginn::value_t const&, int ) const;
 	HClass const* get_class( void ) const;
 	bool is_kind_of( yaal::hcore::HString const& ) const;
 	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, HHuginn::values_t const&, int ) const;

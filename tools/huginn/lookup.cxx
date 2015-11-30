@@ -105,9 +105,8 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHug
 	verify_arg_count( "lookup.erase", values_, 1, 1, position_ );
 	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_->raw() ) );
 	M_ASSERT( l != nullptr );
-	M_ASSERT( !! l->get_pointer() );
 	l->erase( values_[0] );
-	return ( l->get_pointer() );
+	return ( *object_ );
 	M_EPILOG
 }
 

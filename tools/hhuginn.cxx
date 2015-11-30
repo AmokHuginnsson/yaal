@@ -757,13 +757,13 @@ HHuginn::value_t& HHuginn::HObject::field_ref( int index_ ) {
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObject::field( int index_ ) const {
+HHuginn::value_t HHuginn::HObject::field( HHuginn::value_t const& object_, int index_ ) const {
 	M_PROLOG
 	value_t const& f( _fields[index_] );
 	bool isMethod( f->type() == TYPE::METHOD );
 	return (
 		isMethod
-			? pointer_static_cast<HHuginn::HValue>( make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod const*>( f.raw() ), get_pointer() ) )
+			? pointer_static_cast<HHuginn::HValue>( make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod const*>( f.raw() ), object_ ) )
 			: f
 	);
 	M_EPILOG
@@ -793,7 +793,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	HHuginn::value_t res;
 	int idx( field_index( methodName_ ) );
 	if ( idx >= 0 ) {
-		HHuginn::value_t const& f( field( idx ) );
+		HHuginn::value_t const& f( field( object_, idx ) );
 		if ( f->type() == HHuginn::TYPE::METHOD ) {
 			HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( f.raw() ) );
 			res = m->function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), arguments_, position_ );
@@ -877,7 +877,7 @@ HHuginn::value_t HHuginn::HObjectReference::field( int index_ ) {
 		v = o->field_ref( index_ );
 	}
 	if ( v->type() == TYPE::METHOD ) {
-		v = make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod*>( v.raw() ), o->get_pointer() );
+		v = make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod*>( v.raw() ), _object );
 	}
 	return ( v );
 	M_EPILOG

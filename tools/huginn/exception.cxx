@@ -167,7 +167,9 @@ void HHuginn::HException::set_where( yaal::hcore::HString const& where_ ) {
 }
 
 HHuginn::value_t HHuginn::HException::do_clone( HHuginn* ) const {
-	return ( get_pointer() );
+	HHuginn::value_t e( make_pointer<HException>( get_class(), _message ) );
+	static_cast<HException*>( e.raw() )->set_where( _where );
+	return ( e );
 }
 
 }

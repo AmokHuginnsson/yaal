@@ -64,7 +64,7 @@ HFrame const* HThread::current_frame( void ) const {
 	M_EPILOG
 }
 
-void HThread::create_function_frame( HHuginn::HObject* object_, int upCast_ ) {
+void HThread::create_function_frame( HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
 	HFrame* parent( current_frame() );
 	_frames.emplace( make_pointer<HFrame>( this, parent, object_, upCast_, HFrame::TYPE::FUNCTION ) );

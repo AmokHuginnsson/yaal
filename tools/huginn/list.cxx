@@ -75,8 +75,7 @@ inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHugin
 	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_->raw() ) );
 	M_ASSERT( l != nullptr );
 	l->push_back( values_[0] );
-	M_ASSERT( !! l->get_pointer() );
-	return ( l->get_pointer() );
+	return ( *object_ );
 	M_EPILOG
 }
 
@@ -86,8 +85,7 @@ inline HHuginn::value_t pop( huginn::HThread*, HHuginn::value_t* object_, HHugin
 	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_->raw() ) );
 	M_ASSERT( l != nullptr );
 	l->pop_back();
-	M_ASSERT( !! l->get_pointer() );
-	return ( l->get_pointer() );
+	return ( *object_ );
 	M_EPILOG
 }
 
@@ -97,8 +95,7 @@ inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHug
 	HHuginn::HList* l( dynamic_cast<HHuginn::HList*>( object_->raw() ) );
 	M_ASSERT( l != nullptr );
 	l->clear();
-	M_ASSERT( !! l->get_pointer() );
-	return ( l->get_pointer() );
+	return ( *object_ );
 	M_EPILOG
 }
 

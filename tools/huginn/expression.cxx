@@ -138,7 +138,7 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->type()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
 		}
 		if ( access_ == ACCESS::VALUE ) {
-			frame_->values().push( o->field( fi ) );
+			frame_->values().push( o->field( v, fi ) );
 		} else if ( ! v.unique() ) {
 			frame_->values().push( make_pointer<HHuginn::HReference>( o->field_ref( fi ) ) );
 		} else {

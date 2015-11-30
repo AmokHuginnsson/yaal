@@ -43,7 +43,7 @@ namespace huginn {
 HFrame::HFrame(
 	HThread* thread_,
 	HFrame* parent_,
-	HHuginn::HObject* object_,
+	HHuginn::value_t* object_,
 	int upCast_,
 	TYPE type_
 ) : _thread( thread_ )
@@ -118,18 +118,19 @@ HHuginn::value_t HFrame::get_reference( yaal::hcore::HString const& name_, int p
 	HFrame* f( this );
 	while ( f ) {
 		variables_t::iterator it( f->_variables.find( name_ ) );
+		HHuginn::HObject* object( f->_object ? static_cast<HHuginn::HObject*>( f->_object->raw() ) : nullptr );
 		if ( it != f->_variables.end() ) {
 			v = it->second;
 			break;
-		} else if ( f->_object && ( ( fieldIdx = f->_object->field_index( name_ ) ) >= 0 ) ) {
-			v = f->_object->field( fieldIdx );
+		} else if ( object && ( ( fieldIdx = object->field_index( name_ ) ) >= 0 ) ) {
+			v = object->field( *_object, fieldIdx );
 			break;
-		} else if ( f->_object && ( name_ == KEYWORD::THIS ) ) {
-			v = f->_object->get_pointer();
+		} else if ( object && ( name_ == KEYWORD::THIS ) ) {
+			v = *_object;
 			M_ASSERT( !! v );
 			break;
-		} else if ( f->_object && ( name_ == KEYWORD::SUPER ) ) {
-			HHuginn::value_t p = f->_object->get_pointer();
+		} else if ( object && ( name_ == KEYWORD::SUPER ) ) {
+			HHuginn::value_t p = *_object;
 			M_ASSERT( !! p );
 			v = make_pointer<HHuginn::HObjectReference>( p, _upCast, true, position_ );
 			break;
@@ -168,8 +169,9 @@ HHuginn::value_t HFrame::make_variable( yaal::hcore::HString const& name_, int )
 	HHuginn::value_t* v( nullptr );
 	while ( f ) {
 		int fieldIdx( -1 );
-		if ( f->_object && ( ( fieldIdx = f->_object->field_index( name_ ) ) >= 0 ) ) {
-			v = &( f->_object->field_ref( fieldIdx ) );
+		HHuginn::HObject* object( f->_object ? static_cast<HHuginn::HObject*>( f->_object->raw() ) : nullptr );
+		if ( object && ( ( fieldIdx = object->field_index( name_ ) ) >= 0 ) ) {
+			v = &( object->field_ref( fieldIdx ) );
 			break;
 		}
 		variables_t::iterator it( f->_variables.find( name_ ) );
@@ -199,7 +201,7 @@ HFrame::values_t& HFrame::values( void ) {
 }
 
 HHuginn::HObject* HFrame::object( void ) const {
-	return ( _object ? _object : ( ( _parent && _parent->_number == _number ) ? _parent->object() : nullptr ) );
+	return ( _object ? static_cast<HHuginn::HObject*>( _object->raw() ) : ( ( _parent && _parent->_number == _number ) ? _parent->object() : nullptr ) );
 }
 
 }

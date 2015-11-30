@@ -97,7 +97,6 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHug
 	verify_arg_count( "set.erase", values_, 1, 1, position_ );
 	HHuginn::HSet* s( dynamic_cast<HHuginn::HSet*>( object_->raw() ) );
 	M_ASSERT( s != nullptr );
-	M_ASSERT( !! s->get_pointer() );
 	s->erase( values_[0] );
 	return ( *object_ );
 	M_EPILOG

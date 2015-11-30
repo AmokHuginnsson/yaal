@@ -63,7 +63,7 @@ HHuginn::value_t HClock::reset( huginn::HThread*, HHuginn::value_t* object_, HHu
 	verify_arg_count( name, values_, 0, 0, position_ );
 	huginn::HClock* c( static_cast<huginn::HClock*>( object_->raw() ) );
 	c->_clock.reset();
-	return ( c->get_pointer() );
+	return ( *object_ );
 	M_EPILOG
 }
 

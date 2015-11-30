@@ -105,9 +105,8 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHug
 	verify_arg_count( "dict.erase", values_, 1, 1, position_ );
 	HHuginn::HDict* d( dynamic_cast<HHuginn::HDict*>( object_->raw() ) );
 	M_ASSERT( d != nullptr );
-	M_ASSERT( !! d->get_pointer() );
 	d->erase( values_[0], position_ );
-	return ( d->get_pointer() );
+	return ( *object_ );
 	M_EPILOG
 }
 

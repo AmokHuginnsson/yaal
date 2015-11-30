@@ -97,7 +97,7 @@ HHuginn::value_t HQuery::bind( tools::huginn::HThread* thread_, HHuginn::value_t
 	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {
 		q->_query->bind( static_cast<int>( get_integer( values_[0] ) ), get_string( values_[1] ) );
-		v = q->get_pointer();
+		v = *object_;
 	} catch ( HException const& e ) {
 		thread_->raise( qc->exception_class(), e.what(), position_ );
 	}

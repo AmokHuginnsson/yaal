@@ -63,7 +63,7 @@ public:
 private:
 	HThread* _thread;
 	HFrame* const _parent;
-	HHuginn::HObject* _object;
+	HHuginn::value_t* _object;
 	int _upCast;
 	variables_t _variables;
 	operations_t _operations;
@@ -73,7 +73,7 @@ private:
 	TYPE _type;
 	STATE _state;
 public:
-	HFrame( HThread*, HFrame*, HHuginn::HObject*, int, TYPE );
+	HFrame( HThread*, HFrame*, HHuginn::value_t*, int, TYPE );
 	HHuginn::value_t make_variable( yaal::hcore::HString const&, int );
 	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( yaal::hcore::HString const&, int );

@@ -78,7 +78,7 @@ inline HHuginn::value_t add( huginn::HThread*, HHuginn::value_t* object_, HHugin
 	HHuginn::HOrder* o( dynamic_cast<HHuginn::HOrder*>( object_->raw() ) );
 	M_ASSERT( o != nullptr );
 	o->insert( values_[0], position_ );
-	return ( o->get_pointer() );
+	return ( *object_ );
 	M_EPILOG
 }
 
@@ -97,9 +97,8 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHug
 	verify_arg_count( "order.erase", values_, 1, 1, position_ );
 	HHuginn::HOrder* o( dynamic_cast<HHuginn::HOrder*>( object_->raw() ) );
 	M_ASSERT( o != nullptr );
-	M_ASSERT( !! o->get_pointer() );
 	o->erase( values_[0], position_ );
-	return ( o->get_pointer() );
+	return ( *object_ );
 	M_EPILOG
 }
 
