@@ -118,18 +118,18 @@ HHuginn::value_t HFrame::get_reference( yaal::hcore::HString const& name_, int p
 	HFrame* f( this );
 	while ( f ) {
 		variables_t::iterator it( f->_variables.find( name_ ) );
-		HHuginn::HObject* object( f->_object ? static_cast<HHuginn::HObject*>( f->_object->raw() ) : nullptr );
+		HHuginn::HObject* obj( f->_object ? static_cast<HHuginn::HObject*>( f->_object->raw() ) : nullptr );
 		if ( it != f->_variables.end() ) {
 			v = it->second;
 			break;
-		} else if ( object && ( ( fieldIdx = object->field_index( name_ ) ) >= 0 ) ) {
-			v = object->field( *_object, fieldIdx );
+		} else if ( obj && ( ( fieldIdx = obj->field_index( name_ ) ) >= 0 ) ) {
+			v = obj->field( *_object, fieldIdx );
 			break;
-		} else if ( object && ( name_ == KEYWORD::THIS ) ) {
+		} else if ( obj && ( name_ == KEYWORD::THIS ) ) {
 			v = *_object;
 			M_ASSERT( !! v );
 			break;
-		} else if ( object && ( name_ == KEYWORD::SUPER ) ) {
+		} else if ( obj && ( name_ == KEYWORD::SUPER ) ) {
 			HHuginn::value_t p = *_object;
 			M_ASSERT( !! p );
 			v = make_pointer<HHuginn::HObjectReference>( p, _upCast, true, position_ );
@@ -169,9 +169,9 @@ HHuginn::value_t HFrame::make_variable( yaal::hcore::HString const& name_, int )
 	HHuginn::value_t* v( nullptr );
 	while ( f ) {
 		int fieldIdx( -1 );
-		HHuginn::HObject* object( f->_object ? static_cast<HHuginn::HObject*>( f->_object->raw() ) : nullptr );
-		if ( object && ( ( fieldIdx = object->field_index( name_ ) ) >= 0 ) ) {
-			v = &( object->field_ref( fieldIdx ) );
+		HHuginn::HObject* obj( f->_object ? static_cast<HHuginn::HObject*>( f->_object->raw() ) : nullptr );
+		if ( obj && ( ( fieldIdx = obj->field_index( name_ ) ) >= 0 ) ) {
+			v = &( obj->field_ref( fieldIdx ) );
 			break;
 		}
 		variables_t::iterator it( f->_variables.find( name_ ) );
