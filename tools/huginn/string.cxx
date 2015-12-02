@@ -91,7 +91,7 @@ inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object
 
 inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	char const name[] = "string.find";
+	char const name[] = "string.strip";
 	verify_arg_count( name, values_, 0, 1, position_ );
 	char const* trimChars( nullptr );
 	if ( values_.get_size() > 0 ) {
@@ -115,6 +115,24 @@ inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::value_t* objec
 	M_EPILOG
 }
 
+inline HHuginn::value_t to_lower( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "string.to_lower";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	static_cast<HHuginn::HString*>( object_->raw() )->value().lower();
+	return ( *object_ );
+	M_EPILOG
+}
+
+inline HHuginn::value_t to_upper( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "string.to_upper";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	static_cast<HHuginn::HString*>( object_->raw() )->value().upper();
+	return ( *object_ );
+	M_EPILOG
+}
+
 HHuginn::class_t get_class( HHuginn* );
 HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	M_PROLOG
@@ -125,11 +143,15 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			nullptr,
 			HHuginn::HClass::field_names_t{
 				"find",
-				"strip"
+				"strip",
+				"to_lower",
+				"to_upper"
 			},
 			HHuginn::values_t{
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_lower, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_upper, _1, _2, _3, _4 ) )
 			}
 		)
 	);
