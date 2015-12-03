@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cctype>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -46,6 +48,26 @@ namespace huginn {
 
 namespace character {
 
+inline HHuginn::value_t to_lower( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "character.to_lower";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
+	c->set( static_cast<HHuginn::HCharacter::value_type>( std::tolower( c->value() ) ) );
+	return ( *object_ );
+	M_EPILOG
+}
+
+inline HHuginn::value_t to_upper( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "character.to_upper";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	HHuginn::HCharacter* c( static_cast<HHuginn::HCharacter*>( object_->raw() ) );
+	c->set( static_cast<HHuginn::HCharacter::value_type>( std::toupper( c->value() ) ) );
+	return ( *object_ );
+	M_EPILOG
+}
+
 HHuginn::class_t get_class( HHuginn* );
 HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	M_PROLOG
@@ -55,8 +77,12 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			HHuginn::TYPE::CHARACTER,
 			nullptr,
 			HHuginn::HClass::field_names_t{
+				"to_lower",
+				"to_upper"
 			},
 			HHuginn::values_t{
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::to_lower, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &character::to_upper, _1, _2, _3, _4 ) )
 			}
 		)
 	);
@@ -76,6 +102,11 @@ HHuginn::HCharacter::HCharacter( HHuginn::HClass const* class_, HHuginn::HCharac
 
 HHuginn::HCharacter::value_type HHuginn::HCharacter::value( void ) const {
 	return ( _value );
+}
+
+void HHuginn::HCharacter::set( value_type value_ ) {
+	_value = value_;
+	return;
 }
 
 HHuginn::value_t HHuginn::HCharacter::do_clone( HHuginn* huginn_ ) const {

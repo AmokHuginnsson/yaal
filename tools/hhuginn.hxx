@@ -619,6 +619,7 @@ private:
 public:
 	HCharacter( HHuginn::HClass const*, value_type );
 	value_type value( void ) const;
+	void set( value_type );
 	void to_character( void ) const;
 	void to_integer( void ) const;
 	void to_string( void ) const;
