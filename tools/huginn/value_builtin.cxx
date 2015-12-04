@@ -299,7 +299,7 @@ HHuginn::value_t mod( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 	if ( v1_->type() == HHuginn::TYPE::INTEGER ) {
 		int long long denominator( static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 		if ( denominator != 0 ) {
-			res = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() / denominator );
+			res = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() % denominator );
 		} else {
 			thread_->raise( thread_->object_factory().arithmetic_exception_class(), "Division by zero.", position_ );
 		}
