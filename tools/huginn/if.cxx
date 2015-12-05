@@ -58,12 +58,17 @@ void HIf::do_execute( huginn::HThread* thread_ ) const {
 	thread_->create_scope_frame();
 	HFrame* f( thread_->current_frame() );
 	bool done( false );
-	for ( if_clauses_t::const_iterator it( _ifClauses.begin() ), end( _ifClauses.end() );
-		( it != end ) && ! done && f->can_continue(); ++ it ) {
+	for (
+		if_clauses_t::const_iterator it( _ifClauses.begin() ), end( _ifClauses.end() );
+		( it != end ) && ! done && f->can_continue();
+		++ it
+	) {
 		it->_expression->execute( thread_ );
 		if ( f->can_continue() ) {
 			HHuginn::value_t v( f->result() );
-			M_ASSERT( v->type() == HHuginn::TYPE::BOOLEAN );
+			if ( v->type() != HHuginn::TYPE::BOOLEAN ) {
+				throw HHuginn::HHuginnRuntimeException( "`If' argument is not a boolean.", it->_expression->position() );
+			}
 			if ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() ) {
 				done = true;
 				it->_scope->execute( thread_ );
