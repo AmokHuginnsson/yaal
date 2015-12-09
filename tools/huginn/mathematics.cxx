@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cmath>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -75,6 +77,35 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	static HHuginn::value_t round( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Mathematics.round";
+		verify_arg_count( name, values_, 1, 2, position_ );
+		HHuginn::type_t t( verify_arg_numeric( name, values_, 0, false, position_ ) );
+		int to( 0 );
+		if ( values_.get_size() > 1 ) {
+			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
+			to = static_cast<int>( get_integer( values_[1] ) );
+		}
+		HHuginn::value_t v( thread_->huginn().none_value() );
+		if ( t == HHuginn::TYPE::NUMBER ) {
+			HNumber val( get_number( values_[0] ) );
+			try {
+				v = thread_->object_factory().create_number( val.round( to ) );
+			} catch ( HNumberException const& e ) {
+				thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
+			}
+		} else {
+			if ( to == 0 ) {
+				double long val( get_real( values_[0] ) );
+				v = thread_->object_factory().create_real( std::roundl( val ) );
+			} else {
+				thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "rounding to nth place on real not supported", position_ );
+			}
+		}
+		return ( v );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -93,10 +124,12 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HHuginn* huginn_ ) {
 			t,
 			nullptr,
 			HHuginn::HClass::field_names_t{
-				"square_root"
+				"square_root",
+				"round"
 			},
 			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::square_root, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::square_root, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::round, _1, _2, _3, _4 ) )
 			}
 		)
 	);
