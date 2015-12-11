@@ -122,6 +122,22 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	static HHuginn::value_t ceil( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Mathematics.ceil";
+		verify_arg_count( name, values_, 1, 1, position_ );
+		HHuginn::type_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::value_t v( thread_->huginn().none_value() );
+		if ( t == HHuginn::TYPE::NUMBER ) {
+			HNumber val( get_number( values_[0] ) );
+			v = thread_->object_factory().create_number( val.ceil() );
+		} else {
+			double long val( get_real( values_[0] ) );
+			v = thread_->object_factory().create_real( ceill( val ) );
+		}
+		return ( v );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -142,12 +158,14 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HHuginn* huginn_ ) {
 			HHuginn::HClass::field_names_t{
 				"square_root",
 				"round",
-				"floor"
+				"floor",
+				"ceil"
 			},
 			HHuginn::values_t{
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::square_root, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::round, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) )
 			}
 		)
 	);
