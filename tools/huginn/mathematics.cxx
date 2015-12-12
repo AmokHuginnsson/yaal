@@ -98,7 +98,7 @@ public:
 		} else {
 			if ( to == 0 ) {
 				double long val( get_real( values_[0] ) );
-				v = thread_->object_factory().create_real( std::roundl( val ) );
+				v = thread_->object_factory().create_real( roundl( val ) );
 			} else {
 				thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "rounding to nth place on real not supported", position_ );
 			}
