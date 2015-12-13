@@ -52,7 +52,7 @@ enum class UNIT {
 	DAY
 };
 
-struct Duration{};
+struct Duration;
 typedef HTaggedPOD<yaal::i64_t, Duration> duration_t;
 
 duration_t duration( yaal::i64_t, UNIT );

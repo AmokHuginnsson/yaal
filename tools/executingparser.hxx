@@ -67,7 +67,7 @@ class HRuleAggregator;
 typedef yaal::hcore::HExceptionT<HRecursionDetector> HRecursionDetectorException;
 typedef yaal::hcore::HHashSet<HRuleBase const*> visited_t;
 typedef yaal::hcore::HHashMap<HRuleBase const*, int> rule_use_t;
-struct Position {};
+struct Position;
 typedef yaal::hcore::HTaggedPOD<int, Position> position_t;
 
 class HRuleDescription {
