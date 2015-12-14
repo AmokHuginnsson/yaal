@@ -60,8 +60,8 @@ public:
 			HHuginn::HType::register_type( name_, huginn_ ),
 			base_,
 			base_
-				? HHuginn::HClass::field_names_t{}
-				: HHuginn::HClass::field_names_t{
+				? HHuginn::field_names_t{}
+				: HHuginn::field_names_t{
 					"what",
 					"where",
 					"message"
@@ -130,10 +130,18 @@ HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& nam
 	M_PROLOG
 	HHuginn::class_t c( huginn_ ? huginn_->get_class( name_ ) : nullptr );
 	if ( ! c ) {
-		c = make_pointer<HExceptionClass>(
-			huginn_,
-			name_,
-			base_ ? base_ : huginn_->object_factory()->exception_class()
+		c =	huginn_->create_class(
+			HHuginn::class_constructor_t(
+				[&name_, &base_] ( HHuginn* huginn ) -> HHuginn::class_t {
+					return (
+						make_pointer<HExceptionClass>(
+							huginn,
+							name_,
+							base_ ? base_ : huginn->object_factory()->exception_class()
+						)
+					);
+				}
+			)
 		);
 	}
 	if ( huginn_ ) {

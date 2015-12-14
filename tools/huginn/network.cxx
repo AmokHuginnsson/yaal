@@ -125,7 +125,7 @@ HHuginn::value_t HNetworkCreator::do_new_instance( HHuginn* huginn_ ) {
 			huginn_,
 			t,
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"connect",
 				"resolve"
 			},

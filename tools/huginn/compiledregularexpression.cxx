@@ -82,7 +82,7 @@ public:
 			huginn_,
 			HHuginn::HType::register_type( "CompiledRegularExpression", huginn_ ),
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"match",
 				"groups"
 			},
@@ -158,9 +158,17 @@ HHuginn::value_t HCompiledRegularExpression::do_groups(
 HHuginn::class_t HCompiledRegularExpression::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		make_pointer<HCompiledRegularExpressionClass>(
-			huginn_,
-			exceptionClass_
+		huginn_->create_class(
+			HHuginn::class_constructor_t(
+				[&exceptionClass_] ( HHuginn* huginn ) -> HHuginn::class_t {
+					return (
+						make_pointer<HCompiledRegularExpressionClass>(
+							huginn,
+							exceptionClass_
+						)
+					);
+				}
+			)
 		)
 	);
 	return ( c );

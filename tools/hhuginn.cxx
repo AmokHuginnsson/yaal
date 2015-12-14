@@ -789,7 +789,7 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 	if ( huginnClass_.super() ) {
 		stream_ << " : " << huginnClass_.super()->name();
 	}
-	HHuginn::HClass::field_names_t newFields( huginnClass_.field_names() );
+	HHuginn::field_names_t newFields( huginnClass_.field_names() );
 	typedef HStack<HHuginn::HClass const*> hierarhy_t;
 	hierarhy_t hierarhy;
 	HHuginn::HClass const* super( huginnClass_.super() );
@@ -797,7 +797,7 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 		hierarhy.push( super );
 		super = super->super();
 	}
-	HHuginn::HClass::field_names_t derivedFields;
+	HHuginn::field_names_t derivedFields;
 	while ( ! hierarhy.is_empty() ) {
 		for ( yaal::hcore::HString const& f : hierarhy.top()->field_names() ) {
 			if ( find( derivedFields.begin(), derivedFields.end(), f ) == derivedFields.end() ) {
@@ -806,15 +806,15 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 		}
 		hierarhy.pop();
 	}
-	HHuginn::HClass::field_names_t overridenFields;
+	HHuginn::field_names_t overridenFields;
 	for ( yaal::hcore::HString const& f : derivedFields ) {
 		if ( find( newFields.begin(), newFields.end(), f ) != newFields.end() ) {
 			overridenFields.push_back( f );
 		}
 	}
 
-	HHuginn::HClass::field_names_t::iterator endDerived( derivedFields.end() );
-	HHuginn::HClass::field_names_t::iterator endNew( newFields.end() );
+	HHuginn::field_names_t::iterator endDerived( derivedFields.end() );
+	HHuginn::field_names_t::iterator endNew( newFields.end() );
 	for ( yaal::hcore::HString const& f : overridenFields ) {
 		endDerived = remove( derivedFields.begin(), endDerived, f );
 		endNew = remove( newFields.begin(), endNew, f );
@@ -866,6 +866,23 @@ void HHuginn::create_function( executing_parser::position_t position_ ) {
 	}
 	return;
 	M_EPILOG
+}
+
+HHuginn::class_t HHuginn::create_class( HHuginn::type_t type_, HClass const* base_, field_names_t const& fieldNames_, values_t const& values_ ) {
+	HHuginn::class_t c(
+		make_pointer<HHuginn::HClass>(
+			this,
+			type_,
+			base_,
+			fieldNames_,
+			values_
+		)
+	);
+	return ( c );
+}
+
+HHuginn::class_t HHuginn::create_class( class_constructor_t const& classConstructor_ ) {
+	return ( classConstructor_( this ) );
 }
 
 HHuginn::HValue::HValue( type_t type_ )

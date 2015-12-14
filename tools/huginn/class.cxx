@@ -77,7 +77,7 @@ HHuginn::type_t HHuginn::HClass::type( void ) const {
 	return ( _type );
 }
 
-HHuginn::HClass::field_names_t const& HHuginn::HClass::field_names( void ) const {
+HHuginn::field_names_t const& HHuginn::HClass::field_names( void ) const {
 	return ( _fieldNames );
 }
 

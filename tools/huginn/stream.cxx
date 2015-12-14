@@ -150,11 +150,10 @@ HHuginn::class_t HStream::get_class( HHuginn* huginn_ ) {
 	char const name[] = "Stream";
 	HHuginn::class_t c( huginn_->get_class( name ) );
 	if ( ! c ) {
-		c =	make_pointer<HHuginn::HClass>(
-			huginn_,
+		c = huginn_->create_class(
 			HHuginn::HType::register_type( name, huginn_ ),
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"read",
 				"read_line",
 				"write"

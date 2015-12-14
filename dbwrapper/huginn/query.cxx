@@ -65,7 +65,7 @@ public:
 			huginn_,
 			HHuginn::HType::register_type( "Query", huginn_ ),
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"bind",
 				"execute"
 			},
@@ -125,9 +125,17 @@ HHuginn::value_t HQuery::execute( tools::huginn::HThread* thread_, HHuginn::valu
 HHuginn::class_t HQuery::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		make_pointer<HQueryClass>(
-			huginn_,
-			exceptionClass_
+		huginn_->create_class(
+			HHuginn::class_constructor_t(
+				[&exceptionClass_] ( HHuginn* huginn ) -> HHuginn::class_t {
+					return (
+						make_pointer<HQueryClass>(
+							huginn,
+							exceptionClass_
+						)
+					);
+				}
+			)
 		)
 	);
 	return ( c );

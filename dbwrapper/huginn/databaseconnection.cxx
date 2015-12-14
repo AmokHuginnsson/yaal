@@ -94,7 +94,7 @@ public:
 			huginn_,
 			HHuginn::HType::register_type( "DatabaseConnection", huginn_ ),
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"query",
 				"table_names",
 				"column_names"
@@ -200,9 +200,17 @@ HHuginn::value_t HDatabaseConnection::do_column_names(
 HHuginn::class_t HDatabaseConnection::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		make_pointer<HDatabaseConnectionClass>(
-			huginn_,
-			exceptionClass_
+		huginn_->create_class(
+			HHuginn::class_constructor_t(
+				[&exceptionClass_] ( HHuginn* huginn ) -> HHuginn::class_t {
+					return (
+						make_pointer<HDatabaseConnectionClass>(
+							huginn,
+							exceptionClass_
+						)
+					);
+				}
+			)
 		)
 	);
 	return ( c );

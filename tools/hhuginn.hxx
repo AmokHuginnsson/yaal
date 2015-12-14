@@ -141,9 +141,11 @@ public:
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
 	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
 	class HErrorCoordinate;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
 	typedef yaal::hcore::HArray<value_t> values_t;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
 	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, value_t*, values_t const&, int )> function_t;
+	typedef yaal::hcore::HBoundCall<HHuginn::class_t ( HHuginn* )> class_constructor_t;
 	typedef yaal::hcore::HPointer<huginn::HThread> thread_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
 	struct TYPE {
@@ -278,7 +280,8 @@ public:
 	huginn::HThread* current_thread( void );
 	huginn::HFrame* current_frame( void );
 	void create_function( executing_parser::position_t );
-	void create_class( executing_parser::position_t );
+	class_t create_class( type_t, HClass const*, field_names_t const&, values_t const& );
+	class_t create_class( class_constructor_t const& );
 
 	/*! \brief Add argument for main() function.
 	 *
@@ -387,7 +390,6 @@ private:
 class HHuginn::HClass {
 public:
 	typedef HHuginn::HClass this_type;
-	typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, int> field_indexes_t;
 	class HMethod;
 	class HBoundMethod;

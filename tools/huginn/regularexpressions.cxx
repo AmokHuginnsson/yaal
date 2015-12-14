@@ -82,11 +82,10 @@ HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HHuginn* huginn_ )
 	M_PROLOG
 	HHuginn::type_t t( HHuginn::HType::register_type( "RegularExpressions", huginn_ ) );
 	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
-			huginn_,
+		huginn_->create_class(
 			t,
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"compile"
 			},
 			HHuginn::values_t{

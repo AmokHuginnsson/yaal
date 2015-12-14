@@ -86,7 +86,7 @@ HHuginn::value_t HCryptographyCreator::do_new_instance( HHuginn* huginn_ ) {
 			huginn_,
 			t,
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"md5",
 				"sha1"
 			},

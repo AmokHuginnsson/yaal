@@ -118,7 +118,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			huginn_,
 			HHuginn::TYPE::DICT,
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"has_key",
 				"get",
 				"erase"

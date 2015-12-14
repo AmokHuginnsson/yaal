@@ -64,7 +64,7 @@ HHuginn::class_t HTime::get_class( HHuginn* huginn_ ) {
 			huginn_,
 			HHuginn::HType::register_type( "Time", huginn_ ),
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"to_string"
 			},
 			HHuginn::values_t{

@@ -141,7 +141,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			huginn_,
 			HHuginn::TYPE::STRING,
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"find",
 				"strip",
 				"to_lower",

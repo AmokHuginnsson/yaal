@@ -161,7 +161,7 @@ public:
 			huginn_,
 			HHuginn::HType::register_type( "QueryResult", huginn_ ),
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"column_name",
 				"field_count",
 				"insert_id",
@@ -204,9 +204,17 @@ HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHugi
 HHuginn::class_t HQueryResult::get_class( HHuginn* huginn_, HHuginn::class_t const& exceptionClass_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		make_pointer<HQueryResultClass>(
-			huginn_,
-			exceptionClass_
+		huginn_->create_class(
+			HHuginn::class_constructor_t(
+				[&exceptionClass_] ( HHuginn* huginn ) -> HHuginn::class_t {
+					return (
+						make_pointer<HQueryResultClass>(
+							huginn,
+							exceptionClass_
+						)
+					);
+				}
+			)
 		)
 	);
 	return ( c );

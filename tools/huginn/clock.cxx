@@ -69,12 +69,11 @@ HHuginn::value_t HClock::reset( huginn::HThread*, HHuginn::value_t* object_, HHu
 
 HHuginn::class_t HClock::get_class( HHuginn* huginn_ ) {
 	M_PROLOG
-	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
-			huginn_,
+	return (
+		huginn_->create_class(
 			HHuginn::HType::register_type( "Clock", huginn_ ),
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"miliseconds",
 				"reset"
 			},
@@ -84,7 +83,6 @@ HHuginn::class_t HClock::get_class( HHuginn* huginn_ ) {
 			}
 		)
 	);
-	return ( c );
 	M_EPILOG
 }
 

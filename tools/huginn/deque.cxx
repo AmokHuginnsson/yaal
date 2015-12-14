@@ -127,7 +127,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			huginn_,
 			HHuginn::TYPE::DEQUE,
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"add",
 				"pop",
 				"add_front",

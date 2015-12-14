@@ -64,16 +64,14 @@ public:
 	}
 	static HHuginn::class_t get_class( HHuginn*  huginn_ ) {
 		M_PROLOG
-		HHuginn::class_t c(
-			make_pointer<HHuginn::HClass>(
-				huginn_,
+		return (
+			huginn_->create_class(
 				HHuginn::HType::register_type( "Range", huginn_ ),
 				nullptr,
-				HHuginn::HClass::field_names_t{},
+				HHuginn::field_names_t{},
 				HHuginn::values_t{}
 			)
 		);
-		return ( c );
 		M_EPILOG
 	}
 protected:
@@ -231,11 +229,10 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HHuginn* huginn_ ) {
 	M_PROLOG
 	HHuginn::type_t t( HHuginn::HType::register_type( "Algorithms", huginn_ ) );
 	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
-			huginn_,
+		huginn_->create_class(
 			t,
 			nullptr,
-			HHuginn::HClass::field_names_t{
+			HHuginn::field_names_t{
 				"range",
 				"sorted"
 			},
