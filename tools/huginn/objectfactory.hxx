@@ -83,13 +83,13 @@ public:
 	HHuginn::value_t create_dict( void ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HDict>( _dict.raw() ) );
 	}
-	HHuginn::value_t create_dict( HHuginn::HDict::values_t const& data_, HHuginn::type_t keyType_ ) const {
+	HHuginn::value_t create_dict( HHuginn::HDict::values_t const& data_, HHuginn::HClass const* keyType_ ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HDict>( _dict.raw(), data_, keyType_ ) );
 	}
 	HHuginn::value_t create_order( void ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HOrder>( _order.raw() ) );
 	}
-	HHuginn::value_t create_order( HHuginn::HOrder::values_t const& data_, HHuginn::type_t keyType_ ) const {
+	HHuginn::value_t create_order( HHuginn::HOrder::values_t const& data_, HHuginn::HClass const* keyType_ ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HOrder>( _order.raw(), data_, keyType_ ) );
 	}
 	HHuginn::value_t create_lookup( void ) const {
@@ -103,6 +103,9 @@ public:
 	}
 	HHuginn::value_t create_set( HHuginn::HSet::values_t const& data_ ) const {
 		return ( yaal::hcore::make_pointer<HHuginn::HSet>( _set.raw(), data_ ) );
+	}
+	HHuginn::HClass const* boolean_class( void ) const {
+		return ( _boolean.raw() );
 	}
 	HHuginn::HClass const* exception_class( void ) const {
 		return ( _exception.raw() );

@@ -80,11 +80,9 @@ protected:
 
 HHuginn::value_t HCryptographyCreator::do_new_instance( HHuginn* huginn_ ) {
 	M_PROLOG
-	HHuginn::type_t t( HHuginn::HType::register_type( "Cryptography", huginn_ ) );
 	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
-			huginn_,
-			t,
+		huginn_->create_class(
+			"Cryptography",
 			nullptr,
 			HHuginn::field_names_t{
 				"md5",

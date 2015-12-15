@@ -40,8 +40,6 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::NUMBER( HHuginn::HType::register_type( "number", nullptr ) );
-
 namespace huginn {
 
 namespace number {
@@ -52,12 +50,11 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			huginn_,
-			HHuginn::TYPE::NUMBER,
+			type_id( HHuginn::TYPE::NUMBER ),
+			type_name( HHuginn::TYPE::NUMBER ),
 			nullptr,
-			HHuginn::field_names_t{
-			},
-			HHuginn::values_t{
-			}
+			HHuginn::field_names_t{},
+			HHuginn::values_t{}
 		)
 	);
 	return ( c );

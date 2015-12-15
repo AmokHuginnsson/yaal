@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "keyword.hxx"
+#include "helper.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -40,11 +41,13 @@ namespace tools {
 
 HHuginn::HClass::HClass(
 	HHuginn* huginn_,
-	type_t type_,
+	type_id_t typeId_,
+	yaal::hcore::HString const& name_,
 	HClass const* super_,
 	field_names_t const& fieldNames_,
 	values_t const& fieldDefinitions_
-) : _type( type_ )
+) : _typeId( typeId_ )
+	, _name( name_ )
 	, _super( super_ )
 	, _fieldNames( fieldNames_ )
 	, _fieldIndexes( super_ ? super_->_fieldIndexes : field_indexes_t() )
@@ -65,16 +68,30 @@ HHuginn::HClass::HClass(
 	M_EPILOG
 }
 
+HHuginn::HClass::HClass(
+	HHuginn::TYPE typeTag_
+) : _typeId( huginn::type_id( typeTag_ ) )
+	, _name( type_name( typeTag_ ) )
+	, _super( nullptr )
+	, _fieldNames()
+	, _fieldIndexes()
+	, _fieldDefinitions()
+	, _huginn( nullptr ) {
+	M_PROLOG
+	return;
+	M_EPILOG
+}
+
 HHuginn::HClass const* HHuginn::HClass::super( void ) const {
 	return ( _super );
 }
 
 yaal::hcore::HString const& HHuginn::HClass::name( void ) const {
-	return ( _type->name() );
+	return ( _name );
 }
 
-HHuginn::type_t HHuginn::HClass::type( void ) const {
-	return ( _type );
+HHuginn::type_id_t HHuginn::HClass::type_id( void ) const {
+	return ( _typeId );
 }
 
 HHuginn::field_names_t const& HHuginn::HClass::field_names( void ) const {
@@ -128,20 +145,8 @@ HHuginn::values_t HHuginn::HClass::get_defaults( void ) const {
 
 bool HHuginn::HClass::is_kind_of( yaal::hcore::HString const& typeName_ ) const {
 	M_PROLOG
-	return ( ( typeName_ == _type->name() ) || ( _super ? _super->is_kind_of( typeName_ ) : false ) );
+	return ( ( typeName_ == _name ) || ( _super ? _super->is_kind_of( typeName_ ) : false ) );
 	M_EPILOG
-}
-
-HHuginn::HObject::HObject( HClass const* class_ )
-	: HValue( class_->type() )
-	, _class( class_ )
-	, _fields( class_->get_defaults() ) {
-}
-
-HHuginn::HObject::HObject( HClass const* class_, fields_t const& fields_ )
-	: HValue( class_->type() )
-	, _class( class_ )
-	, _fields( fields_ ) {
 }
 
 }

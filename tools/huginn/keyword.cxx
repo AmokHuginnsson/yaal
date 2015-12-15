@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "keyword.hxx"
+#include "helper.hxx"
 
 namespace yaal {
 
@@ -93,17 +94,18 @@ words_t _keywords_ = {{
 
 words_t _builtin_ = {{
 	"assert", /* for VM dump */
-	"boolean",
-	"character",
-	"dict",
-	"integer",
-	"list",
-	"lookup",
-	"order",
-	"number",
-	"real",
-	"set",
-	"string",
+	type_name( HHuginn::TYPE::BOOLEAN ),
+	type_name( HHuginn::TYPE::CHARACTER ),
+	type_name( HHuginn::TYPE::DEQUE ),
+	type_name( HHuginn::TYPE::DICT ),
+	type_name( HHuginn::TYPE::INTEGER ),
+	type_name( HHuginn::TYPE::LIST ),
+	type_name( HHuginn::TYPE::LOOKUP ),
+	type_name( HHuginn::TYPE::ORDER ),
+	type_name( HHuginn::TYPE::NUMBER ),
+	type_name( HHuginn::TYPE::REAL ),
+	type_name( HHuginn::TYPE::SET ),
+	type_name( HHuginn::TYPE::STRING ),
 	"type",
 	"size",
 	"copy"

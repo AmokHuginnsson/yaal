@@ -89,10 +89,12 @@ public:
 	typedef HHuginn::HClass base_type;
 	HDatabaseConnectionClass(
 		HHuginn* huginn_,
+		HHuginn::type_id_t typeId_,
 		HHuginn::class_t const& exceptionClass_
 	) : HHuginn::HClass(
 			huginn_,
-			HHuginn::HType::register_type( "DatabaseConnection", huginn_ ),
+			typeId_,
+			"DatabaseConnection",
 			nullptr,
 			HHuginn::field_names_t{
 				"query",
@@ -202,10 +204,11 @@ HHuginn::class_t HDatabaseConnection::get_class( HHuginn* huginn_, HHuginn::clas
 	HHuginn::class_t c(
 		huginn_->create_class(
 			HHuginn::class_constructor_t(
-				[&exceptionClass_] ( HHuginn* huginn ) -> HHuginn::class_t {
+				[&huginn_, &exceptionClass_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HDatabaseConnectionClass>(
-							huginn,
+							huginn_,
+							typeId_,
 							exceptionClass_
 						)
 					);

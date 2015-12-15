@@ -112,7 +112,7 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HHuginn* huginn_ ) {
 	M_PROLOG
 	return (
 		huginn_->create_class(
-			HHuginn::HType::register_type( "RegularExpressionMatch", huginn_ ),
+			"RegularExpressionMatch",
 			nullptr,
 			HHuginn::field_names_t{
 				"matched"

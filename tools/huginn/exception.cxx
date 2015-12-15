@@ -53,11 +53,13 @@ public:
 	typedef HHuginn::HClass base_type;
 	HExceptionClass(
 		HHuginn* huginn_,
+		HHuginn::type_id_t typeId_,
 		yaal::hcore::HString const& name_,
 		HHuginn::HClass const* base_
 	) : HHuginn::HClass(
 			huginn_,
-			HHuginn::HType::register_type( name_, huginn_ ),
+			typeId_,
+			name_,
 			base_,
 			base_
 				? HHuginn::field_names_t{}
@@ -121,7 +123,17 @@ private:
 
 HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	M_PROLOG
-	HHuginn::class_t c( make_pointer<HExceptionClass>( huginn_, "Exception", nullptr ) );
+	HHuginn::class_t c(
+		huginn_->create_class(
+			HHuginn::class_constructor_t(
+				[&huginn_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
+					return (
+						make_pointer<HExceptionClass>( huginn_, typeId_, "Exception", nullptr )
+					);
+				}
+			)
+		)
+	);
 	return ( c );
 	M_EPILOG
 }
@@ -132,12 +144,13 @@ HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& nam
 	if ( ! c ) {
 		c =	huginn_->create_class(
 			HHuginn::class_constructor_t(
-				[&name_, &base_] ( HHuginn* huginn ) -> HHuginn::class_t {
+				[&huginn_, &name_, &base_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HExceptionClass>(
-							huginn,
+							huginn_,
+							typeId_,
 							name_,
-							base_ ? base_ : huginn->object_factory()->exception_class()
+							base_ ? base_ : huginn_->object_factory()->exception_class()
 						)
 					);
 				}

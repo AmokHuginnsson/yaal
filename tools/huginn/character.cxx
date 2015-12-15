@@ -42,8 +42,6 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::CHARACTER( HHuginn::HType::register_type( "character", nullptr ) );
-
 namespace huginn {
 
 namespace character {
@@ -79,10 +77,12 @@ inline HHuginn::value_t is_of_a_kind( char const* name, int (*isofakind)(int), h
 HHuginn::class_t get_class( HHuginn* );
 HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	M_PROLOG
+
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			huginn_,
-			HHuginn::TYPE::CHARACTER,
+			type_id( HHuginn::TYPE::CHARACTER ),
+			type_name( HHuginn::TYPE::CHARACTER ),
 			nullptr,
 			HHuginn::field_names_t{
 				"to_lower",

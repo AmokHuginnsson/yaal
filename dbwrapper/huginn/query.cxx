@@ -60,10 +60,12 @@ public:
 	typedef HHuginn::HClass base_type;
 	HQueryClass(
 		HHuginn* huginn_,
+		HHuginn::type_id_t typeId_,
 		HHuginn::class_t const& exceptionClass_
 	) : HHuginn::HClass(
 			huginn_,
-			HHuginn::HType::register_type( "Query", huginn_ ),
+			typeId_,
+			"Query",
 			nullptr,
 			HHuginn::field_names_t{
 				"bind",
@@ -127,10 +129,11 @@ HHuginn::class_t HQuery::get_class( HHuginn* huginn_, HHuginn::class_t const& ex
 	HHuginn::class_t c(
 		huginn_->create_class(
 			HHuginn::class_constructor_t(
-				[&exceptionClass_] ( HHuginn* huginn ) -> HHuginn::class_t {
+				[&huginn_, &exceptionClass_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HQueryClass>(
-							huginn,
+							huginn_,
+							typeId_,
 							exceptionClass_
 						)
 					);

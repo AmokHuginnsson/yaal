@@ -81,10 +81,9 @@ protected:
 
 HHuginn::value_t HDatabaseCreator::do_new_instance( HHuginn* huginn_ ) {
 	M_PROLOG
-	HHuginn::type_t t( HHuginn::HType::register_type( "Database", huginn_ ) );
 	HHuginn::class_t c(
 		huginn_->create_class(
-			t,
+			"Database",
 			nullptr,
 			HHuginn::field_names_t{
 				"connect"

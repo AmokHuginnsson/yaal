@@ -39,8 +39,6 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::DEQUE( HHuginn::HType::register_type( "deque", nullptr ) );
-
 namespace huginn {
 
 class HDequeIterator : public HIteratorInterface {
@@ -125,7 +123,8 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			huginn_,
-			HHuginn::TYPE::DEQUE,
+			type_id( HHuginn::TYPE::DEQUE ),
+			type_name( HHuginn::TYPE::DEQUE ),
 			nullptr,
 			HHuginn::field_names_t{
 				"add",

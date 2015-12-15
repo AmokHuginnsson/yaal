@@ -41,8 +41,6 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::STRING( HHuginn::HType::register_type( "string", nullptr ) );
-
 namespace huginn {
 
 class HStringIterator : public HIteratorInterface {
@@ -139,7 +137,8 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			huginn_,
-			HHuginn::TYPE::STRING,
+			type_id( HHuginn::TYPE::STRING ),
+			type_name( HHuginn::TYPE::STRING ),
 			nullptr,
 			HHuginn::field_names_t{
 				"find",

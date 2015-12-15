@@ -43,8 +43,6 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::SET( HHuginn::HType::register_type( "set", nullptr ) );
-
 namespace huginn {
 
 class HSetIterator : public HIteratorInterface {
@@ -108,7 +106,8 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			huginn_,
-			HHuginn::TYPE::SET,
+			type_id( HHuginn::TYPE::SET ),
+			type_name( HHuginn::TYPE::SET ),
 			nullptr,
 			HHuginn::field_names_t{
 				"add",

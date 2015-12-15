@@ -151,7 +151,7 @@ HHuginn::class_t HStream::get_class( HHuginn* huginn_ ) {
 	HHuginn::class_t c( huginn_->get_class( name ) );
 	if ( ! c ) {
 		c = huginn_->create_class(
-			HHuginn::HType::register_type( name, huginn_ ),
+			name,
 			nullptr,
 			HHuginn::field_names_t{
 				"read",

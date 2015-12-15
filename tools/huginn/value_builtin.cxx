@@ -53,10 +53,10 @@ HHuginn::value_t subscript(
 	HHuginn::value_t const& index_,
 	int position_
 ) {
-	HHuginn::type_t baseType( base_->type() );
+	HHuginn::type_id_t baseType( base_->type_id() );
 	HHuginn::value_t res;
 	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
-		if ( index_->type() != HHuginn::TYPE::INTEGER ) {
+		if ( index_->type_id() != HHuginn::TYPE::INTEGER ) {
 			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::IDX_NOT_INT], position_ );
 		}
 		HHuginn::HInteger const* i( static_cast<HHuginn::HInteger const*>( index_.raw() ) );
@@ -86,7 +86,7 @@ HHuginn::value_t subscript(
 		HHuginn::HLookup* l( static_cast<HHuginn::HLookup*>( base_.raw() ) );
 		res = ( subscript_ == HExpression::ACCESS::VALUE ? l->get( index_, position_ ) : l->get_ref( index_ ) );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( baseType->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Subscript is not supported on `"_ys.append( base_->get_class()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
@@ -99,16 +99,16 @@ HHuginn::value_t range(
 	HHuginn::value_t const& step_,
 	int position_
 ) {
-	HHuginn::type_t baseType( base_->type() );
+	HHuginn::type_id_t baseType( base_->type_id() );
 	HHuginn::value_t res;
 	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
-		if ( ( from_->type() != HHuginn::TYPE::INTEGER ) && ( from_->type() != HHuginn::TYPE::NONE ) ) {
+		if ( ( from_->type_id() != HHuginn::TYPE::INTEGER ) && ( from_->type_id() != HHuginn::TYPE::NONE ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operand `from' is not an integer.", position_ );
 		}
-		if ( ( to_->type() != HHuginn::TYPE::INTEGER ) && ( to_->type() != HHuginn::TYPE::NONE ) ) {
+		if ( ( to_->type_id() != HHuginn::TYPE::INTEGER ) && ( to_->type_id() != HHuginn::TYPE::NONE ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operand `to' is not an integer.", position_ );
 		}
-		if ( ( step_->type() != HHuginn::TYPE::INTEGER ) && ( step_->type() != HHuginn::TYPE::NONE ) ) {
+		if ( ( step_->type_id() != HHuginn::TYPE::INTEGER ) && ( step_->type_id() != HHuginn::TYPE::NONE ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operand `step' is not an integer.", position_ );
 		}
 		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size() );
@@ -119,13 +119,13 @@ HHuginn::value_t range(
 		} else {
 			res = pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_string() );
 		}
-		HHuginn::HInteger const* integer( step_->type() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( step_.raw() ) : nullptr );
+		HHuginn::HInteger const* integer( step_->type_id() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( step_.raw() ) : nullptr );
 		int long step( integer ? static_cast<int long>( integer->value() ) : 1 );
 		if ( step == 0 ) {
 			throw HHuginn::HHuginnRuntimeException( "Range step cannot be zero.", position_ );
 		}
-		HHuginn::HInteger const* integerFrom = from_->type() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( from_.raw() ) : nullptr;
-		HHuginn::HInteger const* integerTo = to_->type() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( to_.raw() ) : nullptr;
+		HHuginn::HInteger const* integerFrom = from_->type_id() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( from_.raw() ) : nullptr;
+		HHuginn::HInteger const* integerTo = to_->type_id() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( to_.raw() ) : nullptr;
 		int long from( integerFrom ? static_cast<int long>( integerFrom->value() ) : ( step > 0 ? 0 : size ) );
 		int long to( integerTo ? static_cast<int long>( integerTo->value() ) : ( step > 0 ? size : -1 ) );
 
@@ -209,15 +209,15 @@ HHuginn::value_t range(
 			}
 		} while ( false );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "Range operator is not supported on `"_ys.append( baseType->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Range operator is not supported on `"_ys.append( base_->get_class()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t add( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type() == v2_->type() );
+	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	HHuginn::value_t res;
-	HHuginn::type_t typeId( v1_->type() );
+	HHuginn::type_id_t typeId( v1_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() + static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -227,15 +227,15 @@ HHuginn::value_t add( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = thread_->object_factory().create_number( static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() + static_cast<HHuginn::HNumber const*>( v2_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `+' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `+' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t sub( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type() == v2_->type() );
+	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	HHuginn::value_t res;
-	HHuginn::type_t typeId( v1_->type() );
+	HHuginn::type_id_t typeId( v1_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() - static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -243,15 +243,15 @@ HHuginn::value_t sub( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = thread_->object_factory().create_number( static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() - static_cast<HHuginn::HNumber const*>( v2_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `-' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `-' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t mul( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type() == v2_->type() );
+	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	HHuginn::value_t res;
-	HHuginn::type_t typeId( v1_->type() );
+	HHuginn::type_id_t typeId( v1_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() * static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -259,15 +259,15 @@ HHuginn::value_t mul( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = thread_->object_factory().create_number( static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() * static_cast<HHuginn::HNumber const*>( v2_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `*' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `*' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t div( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type() == v2_->type() );
+	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	HHuginn::value_t res( thread_->huginn().none_value() );
-	HHuginn::type_t typeId( v1_->type() );
+	HHuginn::type_id_t typeId( v1_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		int long long denominator( static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 		if ( denominator != 0 ) {
@@ -284,7 +284,7 @@ HHuginn::value_t div( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 			res = thread_->object_factory().create_number( static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() / denominator );
 		}
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `/' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `/' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
 	}
 	HHuginn& h( thread_->huginn() );
 	if ( res == h.none_value() ) {
@@ -294,9 +294,9 @@ HHuginn::value_t div( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 }
 
 HHuginn::value_t mod( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type() == v2_->type() );
+	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	HHuginn::value_t res( thread_->huginn().none_value() );
-	if ( v1_->type() == HHuginn::TYPE::INTEGER ) {
+	if ( v1_->type_id() == HHuginn::TYPE::INTEGER ) {
 		int long long denominator( static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 		if ( denominator != 0 ) {
 			res = thread_->object_factory().create_integer( static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() % denominator );
@@ -304,28 +304,28 @@ HHuginn::value_t mod( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::va
 			thread_->raise( thread_->object_factory().arithmetic_exception_class(), "Division by zero.", position_ );
 		}
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `%' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `%' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t pow( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type() == v2_->type() );
+	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	HHuginn::value_t res;
-	HHuginn::type_t typeId( v1_->type() );
+	HHuginn::type_id_t typeId( v1_->type_id() );
 	if ( typeId == HHuginn::TYPE::REAL ) {
 		res = thread_->object_factory().create_real( ::powl( static_cast<HHuginn::HReal const*>( v1_.raw() )->value(), static_cast<HHuginn::HReal const*>( v2_.raw() )->value() ) );
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = thread_->object_factory().create_number( static_cast<HHuginn::HNumber const*>( v1_.raw() )->value() ^ static_cast<HHuginn::HNumber const*>( v2_.raw() )->value().to_integer() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `^' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `^' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t abs( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
-	HHuginn::type_t typeId( v_->type() );
+	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		int long long v( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 		if ( v >= 0 ) {
@@ -348,14 +348,14 @@ HHuginn::value_t abs( HThread* thread_, HHuginn::value_t const& v_, int position
 			res = thread_->object_factory().create_number( -v );
 		}
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no |.| operator for `"_ys.append( v_->type()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no |.| operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
-	HHuginn::type_t typeId( v_->type() );
+	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_integer( -static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -363,14 +363,14 @@ HHuginn::value_t neg( HThread* thread_, HHuginn::value_t const& v_, int position
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		res = thread_->object_factory().create_number( -static_cast<HHuginn::HNumber const*>( v_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `negate` operator for `"_ys.append( v_->type()->name() ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `negate` operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 int long hash( HHuginn::value_t const& v_ ) {
 	int long h( 0 );
-	HHuginn::type_t typeId( v_->type() );
+	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		h = hcore::hash<int long long>()( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -384,18 +384,18 @@ int long hash( HHuginn::value_t const& v_ ) {
 	} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
 		h = hcore::hash<bool>()( static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() );
 	} else if ( typeId != HHuginn::TYPE::NONE ) {
-		throw HHuginn::HHuginnRuntimeException( "There is no `hash' operator for `"_ys.append( typeId->name() ).append( "'." ), 0 );
+		throw HHuginn::HHuginnRuntimeException( "There is no `hash' operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), 0 );
 	}
 	return ( h );
 }
 
 
 bool equals( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	bool noneOperand( ( v1_->type() == HHuginn::TYPE::NONE ) || ( v2_->type() == HHuginn::TYPE::NONE ) );
-	M_ASSERT( noneOperand || ( v1_->type() == v2_->type() ) );
+	bool noneOperand( ( v1_->type_id() == HHuginn::TYPE::NONE ) || ( v2_->type_id() == HHuginn::TYPE::NONE ) );
+	M_ASSERT( noneOperand || ( v1_->type_id() == v2_->type_id() ) );
 	bool res( false );
 	if ( ! noneOperand ) {
-		HHuginn::type_t typeId( v1_->type() );
+		HHuginn::type_id_t typeId( v1_->type_id() );
 		if ( typeId == HHuginn::TYPE::INTEGER ) {
 			res = static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() == static_cast<HHuginn::HInteger const*>( v2_.raw() )->value();
 		} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -409,16 +409,16 @@ bool equals( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int posit
 		} else if ( typeId == HHuginn::TYPE::BOOLEAN ) {
 			res = static_cast<HHuginn::HBoolean const*>( v1_.raw() )->value() == static_cast<HHuginn::HBoolean const*>( v2_.raw() )->value();
 		} else {
-			throw HHuginn::HHuginnRuntimeException( "There is no `==' operator for `"_ys.append( v1_->type()->name() ).append( "'." ), position_ );
+			throw HHuginn::HHuginnRuntimeException( "There is no `==' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
 		}
 	} else {
-		res = v1_->type() == v2_->type();
+		res = v1_->type_id() == v2_->type_id();
 	}
 	return ( res );
 }
 
 bool key_equals( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
-	return ( ( v1_->type() == v2_->type() ) && equals( v1_, v2_, 0 ) );
+	return ( ( v1_->type_id() == v2_->type_id() ) && equals( v1_, v2_, 0 ) );
 }
 
 bool less_low( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
@@ -426,9 +426,9 @@ bool less_low( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_ ) {
 }
 
 bool less( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type() == v2_->type() );
+	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	bool res( false );
-	HHuginn::type_t typeId( v1_->type() );
+	HHuginn::type_id_t typeId( v1_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() < static_cast<HHuginn::HInteger const*>( v2_.raw() )->value();
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -440,15 +440,15 @@ bool less( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int positio
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) < static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `<' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `<' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 bool greater( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type() == v2_->type() );
+	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	bool res( false );
-	HHuginn::type_t typeId( v1_->type() );
+	HHuginn::type_id_t typeId( v1_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() > static_cast<HHuginn::HInteger const*>( v2_.raw() )->value();
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -460,15 +460,15 @@ bool greater( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int posi
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) > static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `>' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `>' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 bool less_or_equal( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type() == v2_->type() );
+	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	bool res( false );
-	HHuginn::type_t typeId( v1_->type() );
+	HHuginn::type_id_t typeId( v1_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() <= static_cast<HHuginn::HInteger const*>( v2_.raw() )->value();
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -480,15 +480,15 @@ bool less_or_equal( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, in
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) <= static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `<=' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `<=' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 bool greater_or_equal( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int position_ ) {
-	M_ASSERT( v1_->type() == v2_->type() );
+	M_ASSERT( v1_->type_id() == v2_->type_id() );
 	bool res( false );
-	HHuginn::type_t typeId( v1_->type() );
+	HHuginn::type_id_t typeId( v1_->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = static_cast<HHuginn::HInteger const*>( v1_.raw() )->value() >= static_cast<HHuginn::HInteger const*>( v2_.raw() )->value();
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -500,35 +500,35 @@ bool greater_or_equal( HHuginn::value_t const& v1_, HHuginn::value_t const& v2_,
 	} else if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v1_.raw() )->value() ) >= static_cast<int unsigned>( static_cast<HHuginn::HCharacter const*>( v2_.raw() )->value() );
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "There is no `>=' operator for `"_ys.append( type_name( v1_->type() ) ).append( "'." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "There is no `>=' operator for `"_ys.append( type_name( v1_->type_id() ) ).append( "'." ), position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t boolean_xor( HThread* thread_, HHuginn::value_t const& v1_, HHuginn::value_t const& v2_, int ) {
-	M_ASSERT( ( v1_->type() == HHuginn::TYPE::BOOLEAN ) && ( v2_->type() == HHuginn::TYPE::BOOLEAN ) );
+	M_ASSERT( ( v1_->type_id() == HHuginn::TYPE::BOOLEAN ) && ( v2_->type_id() == HHuginn::TYPE::BOOLEAN ) );
 	bool v1( static_cast<HHuginn::HBoolean const*>( v1_.raw() )->value() );
 	bool v2( static_cast<HHuginn::HBoolean const*>( v2_.raw() )->value() );
 	return ( thread_->object_factory().create_boolean( ( v1 && ! v2 ) || ( ! v1 && v2 ) ) );
 }
 
 HHuginn::value_t boolean_not( HThread* thread_, HHuginn::value_t const& v_, int ) {
-	M_ASSERT( v_->type() == HHuginn::TYPE::BOOLEAN );
+	M_ASSERT( v_->type_id() == HHuginn::TYPE::BOOLEAN );
 	return ( thread_->object_factory().create_boolean( ! static_cast<HHuginn::HBoolean const*>( v_.raw() )->value() ) );
 }
 
 namespace {
 
-HHuginn::value_t fallback_conversion( HHuginn::type_t type_, HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
+HHuginn::value_t fallback_conversion( HHuginn::type_id_t type_, HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	if ( HHuginn::HObject const* o = dynamic_cast<HHuginn::HObject const*>( v_.raw() ) ) {
-		res = o->call_method( thread_, v_, "to_"_ys.append( type_->name() ), HHuginn::values_t(), position_ );
+		res = o->call_method( thread_, v_, "to_"_ys.append( type_name( type_ ) ), HHuginn::values_t(), position_ );
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Conversion from `"_ys
-			.append( v_->type()->name() )
+			.append( v_->get_class()->name() )
 			.append( "' to `" )
-			.append( type_->name() )
+			.append( type_name( type_ ) )
 			.append( "' is not supported." ),
 			position_
 		);
@@ -540,7 +540,7 @@ HHuginn::value_t fallback_conversion( HHuginn::type_t type_, HThread* thread_, H
 
 HHuginn::value_t string( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
-	HHuginn::type_t typeId( v_->type() );
+	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
 		res = v_;
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
@@ -552,24 +552,24 @@ HHuginn::value_t string( HThread* thread_, HHuginn::value_t const& v_, int posit
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_string( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else {
-		res = fallback_conversion( HHuginn::TYPE::STRING, thread_, v_, position_ );
+		res = fallback_conversion( type_id( HHuginn::TYPE::STRING ), thread_, v_, position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t boolean( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
-	if ( v_->type() == HHuginn::TYPE::BOOLEAN ) {
+	if ( v_->type_id() == HHuginn::TYPE::BOOLEAN ) {
 		res = v_;
 	} else {
-		res = fallback_conversion( HHuginn::TYPE::BOOLEAN, thread_, v_, position_ );
+		res = fallback_conversion( type_id( HHuginn::TYPE::BOOLEAN ), thread_, v_, position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res( thread_->huginn().none_value() );
-	HHuginn::type_t typeId( v_->type() );
+	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
 		int long long v( 0 );
 		try {
@@ -587,14 +587,14 @@ HHuginn::value_t integer( HThread* thread_, HHuginn::value_t const& v_, int posi
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = v_;
 	} else {
-		res = fallback_conversion( HHuginn::TYPE::INTEGER, thread_, v_, position_ );
+		res = fallback_conversion( type_id( HHuginn::TYPE::INTEGER ), thread_, v_, position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t real( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
-	HHuginn::type_t typeId( v_->type() );
+	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
 		double long v( 0 );
 		try {
@@ -610,27 +610,27 @@ HHuginn::value_t real( HThread* thread_, HHuginn::value_t const& v_, int positio
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_real( static_cast<double long>( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() ) );
 	} else {
-		res = fallback_conversion( HHuginn::TYPE::REAL, thread_, v_, position_ );
+		res = fallback_conversion( type_id( HHuginn::TYPE::REAL ), thread_, v_, position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t character( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
-	HHuginn::type_t typeId( v_->type() );
+	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::CHARACTER ) {
 		res = v_;
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_character( static_cast<char>( static_cast<HHuginn::HCharacter const*>( v_.raw() )->value() ) );
 	} else {
-		res = fallback_conversion( HHuginn::TYPE::CHARACTER, thread_, v_, position_ );
+		res = fallback_conversion( type_id( HHuginn::TYPE::CHARACTER ), thread_, v_, position_ );
 	}
 	return ( res );
 }
 
 HHuginn::value_t number( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res( thread_->huginn().none_value() );
-	HHuginn::type_t typeId( v_->type() );
+	HHuginn::type_id_t typeId( v_->type_id() );
 	if ( typeId == HHuginn::TYPE::STRING ) {
 		try {
 			res = thread_->object_factory().create_number( static_cast<HHuginn::HString const*>( v_.raw() )->value() );
@@ -644,7 +644,7 @@ HHuginn::value_t number( HThread* thread_, HHuginn::value_t const& v_, int posit
 	} else if ( typeId == HHuginn::TYPE::INTEGER ) {
 		res = thread_->object_factory().create_number( static_cast<HHuginn::HInteger const*>( v_.raw() )->value() );
 	} else {
-		res = fallback_conversion( HHuginn::TYPE::NUMBER, thread_, v_, position_ );
+		res = fallback_conversion( type_id( HHuginn::TYPE::NUMBER ), thread_, v_, position_ );
 	}
 	return ( res );
 }

@@ -71,7 +71,7 @@ HHuginn::class_t HClock::get_class( HHuginn* huginn_ ) {
 	M_PROLOG
 	return (
 		huginn_->create_class(
-			HHuginn::HType::register_type( "Clock", huginn_ ),
+			"Clock",
 			nullptr,
 			HHuginn::field_names_t{
 				"miliseconds",

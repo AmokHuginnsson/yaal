@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "while.hxx"
+#include "helper.hxx"
 #include "thread.hxx"
 #include "expression.hxx"
 #include "scope.hxx"
@@ -54,7 +55,7 @@ void HWhile::do_execute( huginn::HThread* thread_ ) const {
 		_condition->execute( thread_ );
 		if ( f->can_continue() ) {
 			HHuginn::value_t v( f->result() );
-			M_ASSERT( v->type() == HHuginn::TYPE::BOOLEAN );
+			M_ASSERT( v->type_id() == HHuginn::TYPE::BOOLEAN ); /* *FIXME* *TODO* */
 			if ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() ) {
 				_loop->execute( thread_ );
 				f->continue_execution();

@@ -30,6 +30,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "booleanevaluator.hxx"
 #include "thread.hxx"
 #include "expression.hxx"
+#include "helper.hxx"
+#include "objectfactory.hxx"
 #include "tools/hhuginn.hxx"
 
 namespace yaal {
@@ -38,8 +40,8 @@ namespace tools {
 
 namespace huginn {
 
-HBooleanEvaluator::HBooleanEvaluator( expressions_t const& expressions_, OPERATOR operator_ )
-	: HValue( HHuginn::TYPE::BOOLEAN ),
+HBooleanEvaluator::HBooleanEvaluator( HHuginn* huginn_, expressions_t const& expressions_, OPERATOR operator_ )
+	: HValue( huginn_->object_factory()->boolean_class() ),
 	_expressions( expressions_ ),
 	_operator( operator_ ) {
 	return;
@@ -55,7 +57,7 @@ bool HBooleanEvaluator::execute( huginn::HThread* thread_ ) {
 			break;
 		}
 		HHuginn::value_t result( f->result() );
-		if ( result->type() != HHuginn::TYPE::BOOLEAN ) {
+		if ( result->type_id() != HHuginn::TYPE::BOOLEAN ) {
 			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], e->position() );
 		}
 		bool v( static_cast<HHuginn::HBoolean*>( result.raw() )->value() );

@@ -119,11 +119,9 @@ protected:
 
 HHuginn::value_t HNetworkCreator::do_new_instance( HHuginn* huginn_ ) {
 	M_PROLOG
-	HHuginn::type_t t( HHuginn::HType::register_type( "Network", huginn_ ) );
 	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
-			huginn_,
-			t,
+		huginn_->create_class(
+			"Network",
 			nullptr,
 			HHuginn::field_names_t{
 				"connect",

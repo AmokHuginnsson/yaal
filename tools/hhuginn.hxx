@@ -81,36 +81,8 @@ extern M_YAAL_TOOLS_PUBLIC_API char const* _errMsgHHuginn_[];
 class HHuginn {
 public:
 	typedef HHuginn this_type;
-	class HType {
-	public:
-		typedef HType this_type;
-		typedef HType const* type_t;
-		typedef yaal::hcore::HResource<HType const> type_holder_t;
-		typedef yaal::hcore::HTaggedPOD<int, HType> id_t;
-		typedef std::atomic<id_t::value_type> id_generator_t;
-		typedef yaal::hcore::HHashMap<yaal::hcore::HString, type_holder_t> type_dict_t;
-	private:
-		yaal::hcore::HString _name;
-		id_t _id;
-		static id_generator_t _idGenerator;
-		static type_dict_t _builtin;
-	public:
-		yaal::hcore::HString const& name( void ) const {
-			return ( _name );
-		}
-		id_t id( void ) const {
-			return ( _id );
-		}
-		static type_t register_type( yaal::hcore::HString const&, HHuginn* );
-		static int builtin_type_count( void );
-	private:
-		HType( yaal::hcore::HString const&, int );
-		HType( HType const& ) = delete;
-		HType& operator = ( HType const& ) = delete;
-		HType( HType&& ) = delete;
-		HType& operator = ( HType&& ) = delete;
-	};
-	typedef HType::type_t type_t;
+	struct type_tag;
+	typedef yaal::hcore::HTaggedPOD<int, type_tag> type_id_t;
 	typedef yaal::hcore::HPointer<HHuginn> ptr_t;
 	class HIterable;
 	typedef yaal::hcore::HPointer<HIterable> iterable_t;
@@ -145,29 +117,29 @@ public:
 	typedef yaal::hcore::HArray<value_t> values_t;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
 	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, value_t*, values_t const&, int )> function_t;
-	typedef yaal::hcore::HBoundCall<HHuginn::class_t ( HHuginn* )> class_constructor_t;
+	typedef yaal::hcore::HBoundCall<HHuginn::class_t ( type_id_t )> class_constructor_t;
 	typedef yaal::hcore::HPointer<huginn::HThread> thread_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
-	struct TYPE {
-		static type_t const NONE;
-		static type_t const BOOLEAN;
-		static type_t const INTEGER;
-		static type_t const REAL;
-		static type_t const STRING;
-		static type_t const NUMBER;
-		static type_t const CHARACTER;
-		static type_t const LIST;
-		static type_t const DEQUE;
-		static type_t const DICT;
-		static type_t const ORDER;
-		static type_t const LOOKUP;
-		static type_t const SET;
-		static type_t const REFERENCE;
-		static type_t const FUNCTION_REFERENCE;
-		static type_t const OBJECT_REFERENCE;
-		static type_t const METHOD;
-		static type_t const UNKNOWN;
-		static type_t const NOT_BOOLEAN;
+	enum class TYPE {
+		NONE,
+		BOOLEAN,
+		INTEGER,
+		REAL,
+		STRING,
+		NUMBER,
+		CHARACTER,
+		LIST,
+		DEQUE,
+		DICT,
+		ORDER,
+		LOOKUP,
+		SET,
+		REFERENCE,
+		FUNCTION_REFERENCE,
+		OBJECT_REFERENCE,
+		METHOD,
+		UNKNOWN,
+		NOT_BOOLEAN
 	};
 	class HHuginnRuntimeException;
 	typedef yaal::hcore::HResource<huginn::HSource> source_t;
@@ -185,8 +157,7 @@ private:
 		COMPILED
 	};
 	STATE _state;
-	HType::id_generator_t _idGenerator;
-	HType::type_dict_t _userTypeDict;
+	type_id_t::value_type _idGenerator;
 	/*
 	 * Built-in types can by used as field definitions in user classes.
 	 * User class needs to be able to use built-in types in its destructor.
@@ -280,7 +251,7 @@ public:
 	huginn::HThread* current_thread( void );
 	huginn::HFrame* current_frame( void );
 	void create_function( executing_parser::position_t );
-	class_t create_class( type_t, HClass const*, field_names_t const&, values_t const& );
+	class_t create_class( yaal::hcore::HString const&, HClass const*, field_names_t const&, values_t const& );
 	class_t create_class( class_constructor_t const& );
 
 	/*! \brief Add argument for main() function.
@@ -332,7 +303,6 @@ private:
 	HClass const* commit_class( yaal::hcore::HString const& );
 	void register_builtins( void );
 	char const* error_message( int ) const;
-	friend type_t HType::register_type( yaal::hcore::HString const&, HHuginn* );
 	HHuginn( HHuginn const& ) = delete;
 	HHuginn& operator = ( HHuginn const& ) = delete;
 };
@@ -373,13 +343,16 @@ class HHuginn::HValue {
 public:
 	typedef HHuginn::HValue this_type;
 private:
-	type_t const _type;
+	HClass const* _class;
 public:
-	HValue( type_t );
+	HValue( HClass const* );
 	virtual ~HValue( void ) {
 		return;
 	}
-	type_t type( void ) const;
+	type_id_t type_id( void ) const;
+	HClass const* get_class( void ) const {
+		return ( _class );
+	}
 	value_t clone( HHuginn* ) const;
 private:
 	virtual value_t do_clone( HHuginn* ) const;
@@ -394,19 +367,21 @@ public:
 	class HMethod;
 	class HBoundMethod;
 private:
-	type_t _type;
+	type_id_t _typeId;
+	yaal::hcore::HString _name;
 	HClass const* _super;
 	field_names_t _fieldNames;
 	field_indexes_t _fieldIndexes;
 	values_t _fieldDefinitions;
 	HHuginn* _huginn;
 public:
-	HClass( HHuginn*, type_t, HClass const*, field_names_t const&, values_t const& );
+	HClass( HHuginn*, type_id_t, yaal::hcore::HString const&, HClass const*, field_names_t const&, values_t const& );
+	HClass( HHuginn::TYPE );
 	HClass const* super( void ) const;
 	virtual ~HClass( void ) {
 	}
 	yaal::hcore::HString const& name( void ) const;
-	type_t type( void ) const;
+	type_id_t type_id( void ) const;
 	field_names_t const& field_names( void ) const;
 	int field_index( yaal::hcore::HString const& ) const;
 	values_t get_defaults( void ) const;
@@ -454,7 +429,6 @@ public:
 	typedef HHuginn::HValue base_type;
 	typedef yaal::hcore::HArray<value_t> fields_t;
 private:
-	HClass const* _class;
 	fields_t _fields;
 public:
 	HObject( HClass const* );
@@ -463,7 +437,6 @@ public:
 	int field_index( yaal::hcore::HString const& ) const;
 	value_t& field_ref( int );
 	value_t field( HHuginn::value_t const&, int ) const;
-	HClass const* get_class( void ) const;
 	bool is_kind_of( yaal::hcore::HString const& ) const;
 	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, HHuginn::values_t const&, int ) const;
 private:
@@ -705,10 +678,10 @@ public:
 	typedef yaal::hcore::HMap<HHuginn::value_t, HHuginn::value_t, cmp_t> values_t;
 private:
 	values_t _data;
-	type_t _keyType;
+	HHuginn::HClass const* _keyType;
 public:
 	HDict( HHuginn::HClass const* );
-	HDict( HHuginn::HClass const*, values_t const&, type_t );
+	HDict( HHuginn::HClass const*, values_t const&, HHuginn::HClass const* );
 	value_t get( HHuginn::value_t const&, int );
 	value_t get_ref( HHuginn::value_t const&, int );
 	void insert( HHuginn::value_t const&, HHuginn::value_t const&, int );
@@ -721,7 +694,7 @@ protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
 private:
-	void verify_key_type( HHuginn::type_t, int ) const;
+	void verify_key_type( HHuginn::HClass const*, int ) const;
 	HDict( HDict const& ) = delete;
 	HDict& operator = ( HDict const& ) = delete;
 private:
@@ -736,10 +709,10 @@ public:
 	typedef yaal::hcore::HSet<HHuginn::value_t, cmp_t> values_t;
 private:
 	values_t _data;
-	type_t _keyType;
+	HHuginn::HClass const* _keyType;
 public:
 	HOrder( HHuginn::HClass const* );
-	HOrder( HHuginn::HClass const*, values_t const&, type_t );
+	HOrder( HHuginn::HClass const*, values_t const&, HHuginn::HClass const* );
 	void insert( HHuginn::value_t const&, int );
 	bool has_key( HHuginn::value_t const&, int ) const;
 	void erase( HHuginn::value_t const&, int );
@@ -749,7 +722,7 @@ protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
 private:
-	void verify_key_type( HHuginn::type_t, int ) const;
+	void verify_key_type( HHuginn::HClass const*, int ) const;
 	HOrder( HOrder const& ) = delete;
 	HOrder& operator = ( HOrder const& ) = delete;
 private:
@@ -842,6 +815,33 @@ public:
 private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
+
+namespace huginn {
+
+extern HHuginn::HClass const _noneClass_;
+
+inline bool operator == ( HHuginn::TYPE t1_, HHuginn::type_id_t t2_ ) {
+	return ( static_cast<HHuginn::type_id_t::value_type>( t1_ ) == t2_.get() );
+}
+inline bool operator == ( HHuginn::type_id_t t1_, HHuginn::TYPE t2_ ) {
+	return ( static_cast<HHuginn::type_id_t::value_type>( t2_ ) == t1_.get() );
+}
+inline bool operator != ( HHuginn::TYPE t1_, HHuginn::type_id_t t2_ ) {
+	return ( static_cast<HHuginn::type_id_t::value_type>( t1_ ) != t2_.get() );
+}
+inline bool operator != ( HHuginn::type_id_t t1_, HHuginn::TYPE t2_ ) {
+	return ( static_cast<HHuginn::type_id_t::value_type>( t2_ ) != t1_.get() );
+}
+
+inline HHuginn::type_id_t type_id( HHuginn::TYPE type_ ) {
+	return ( HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ) );
+}
+yaal::hcore::HString const& type_name( HHuginn::TYPE );
+inline yaal::hcore::HString const& type_name( HHuginn::type_id_t type_ ) {
+	return ( type_name( static_cast<HHuginn::TYPE>( type_.get() ) ) );
+}
+
+}
 
 }
 

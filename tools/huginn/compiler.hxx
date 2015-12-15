@@ -48,7 +48,7 @@ class HFrame;
 struct OCompiler {
 	typedef void ( HExpression::* expression_action_t ) ( HFrame*, int );
 	typedef yaal::hcore::HStack<HFunction::expressions_t> expressions_stack_t;
-	typedef yaal::hcore::HHashMap<yaal::hcore::HString, HHuginn::type_t> variable_types_t;
+	typedef yaal::hcore::HHashMap<yaal::hcore::HString, HHuginn::type_id_t> variable_types_t;
 	struct OActiveScope {
 		HHuginn::scope_t _scope;
 		HHuginn::expression_t _expression;
@@ -68,8 +68,8 @@ struct OCompiler {
 		HTryCatch::catches_t _catches;
 		OScopeContext( OScopeContext* );
 		HHuginn::expression_t& expression( void );
-		HHuginn::type_t guess_type( yaal::hcore::HString const& ) const;
-		void note_type( yaal::hcore::HString const&, HHuginn::type_t );
+		HHuginn::type_id_t guess_type( yaal::hcore::HString const& ) const;
+		void note_type( yaal::hcore::HString const&, HHuginn::type_id_t );
 		void clear( void );
 	private:
 		OScopeContext( OScopeContext const& ) = delete;
@@ -78,7 +78,7 @@ struct OCompiler {
 	struct OFunctionContext {
 		typedef yaal::hcore::HResource<OScopeContext> scope_context_t;
 		typedef yaal::hcore::HStack<scope_context_t> scope_stack_t;
-		typedef yaal::hcore::HStack<HHuginn::type_t> type_stack_t;
+		typedef yaal::hcore::HStack<HHuginn::type_id_t> type_stack_t;
 		typedef yaal::hcore::HStack<yaal::hcore::HString> variable_stack_t;
 		yaal::hcore::HString _functionName;
 		HFunction::parameter_names_t _parameters;
@@ -143,22 +143,22 @@ struct OCompiler {
 	void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
 	void verify_default_argument( executing_parser::position_t );
 	void track_name_cycle( yaal::hcore::HString const& );
-	static bool is_numeric( HHuginn::type_t );
-	static bool is_numeric_congruent( HHuginn::type_t );
-	static bool is_summable( HHuginn::type_t );
-	static bool is_comparable( HHuginn::type_t );
-	static bool is_comparable_congruent( HHuginn::type_t );
-	static bool is_boolean_congruent( HHuginn::type_t );
-	static bool is_unknown( HHuginn::type_t );
-	static bool is_reference_congruent( HHuginn::type_t );
-	static bool is_integer_congruent( HHuginn::type_t );
-	static bool are_congruous( HHuginn::type_t, HHuginn::type_t );
-	static HHuginn::type_t congruent( HHuginn::type_t, HHuginn::type_t );
+	static bool is_numeric( HHuginn::type_id_t );
+	static bool is_numeric_congruent( HHuginn::type_id_t );
+	static bool is_summable( HHuginn::type_id_t );
+	static bool is_comparable( HHuginn::type_id_t );
+	static bool is_comparable_congruent( HHuginn::type_id_t );
+	static bool is_boolean_congruent( HHuginn::type_id_t );
+	static bool is_unknown( HHuginn::type_id_t );
+	static bool is_reference_congruent( HHuginn::type_id_t );
+	static bool is_integer_congruent( HHuginn::type_id_t );
+	static bool are_congruous( HHuginn::type_id_t, HHuginn::type_id_t );
+	static HHuginn::type_id_t congruent( HHuginn::type_id_t, HHuginn::type_id_t );
 	HHuginn::scope_t& current_scope( void );
 	HHuginn::expression_t& current_expression( void );
 	OScopeContext& current_scope_context( void );
-	HHuginn::type_t guess_type( yaal::hcore::HString const& );
-	void note_type( yaal::hcore::HString const&, HHuginn::type_t );
+	HHuginn::type_id_t guess_type( yaal::hcore::HString const& );
+	void note_type( yaal::hcore::HString const&, HHuginn::type_id_t );
 	void reset_expression( void );
 	void pop_function_context( void );
 	void inc_loop_count( executing_parser::position_t );

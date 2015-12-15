@@ -43,8 +43,6 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::LOOKUP( HHuginn::HType::register_type( "lookup", nullptr ) );
-
 namespace huginn {
 
 class HLookupIterator : public HIteratorInterface {
@@ -116,7 +114,8 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			huginn_,
-			HHuginn::TYPE::LOOKUP,
+			type_id( HHuginn::TYPE::LOOKUP ),
+			type_name( HHuginn::TYPE::LOOKUP ),
 			nullptr,
 			HHuginn::field_names_t{
 				"has_key",

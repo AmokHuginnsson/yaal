@@ -70,24 +70,14 @@ main( args ) {
 
 #endif
 
-/*
- * Built-in type dictionary must be declared before first use of register_type().
- */
-HHuginn::HType::id_generator_t HHuginn::HType::_idGenerator{ 0 };
-HHuginn::HType::type_dict_t HHuginn::HType::_builtin{};
-
-HHuginn::type_t const HHuginn::TYPE::NONE( HHuginn::HType::register_type( "none", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::REFERENCE( HHuginn::HType::register_type( "*reference*", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::FUNCTION_REFERENCE( HHuginn::HType::register_type( "*function_reference*", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::OBJECT_REFERENCE( HHuginn::HType::register_type( "*object_reference*", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::METHOD( HHuginn::HType::register_type( "*method*", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::UNKNOWN( HHuginn::HType::register_type( "*unknown*", nullptr ) );
-HHuginn::type_t const HHuginn::TYPE::NOT_BOOLEAN( HHuginn::HType::register_type( "*not_boolean*", nullptr ) );
-
-namespace {
-}
-
 namespace huginn {
+
+HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE );
+HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE );
+HHuginn::HClass const _functionReferenceClass_( HHuginn::TYPE::FUNCTION_REFERENCE );
+HHuginn::HClass const _objectReferenceClass_( HHuginn::TYPE::OBJECT_REFERENCE );
+HHuginn::HClass const _methodClass_( HHuginn::TYPE::METHOD );
+HHuginn::HClass const _unknownClass_( HHuginn::TYPE::UNKNOWN );
 
 char const* _errMsgHHuginn_[ 10 ] = {
 	_( "Operands are not summable: " ),
@@ -122,30 +112,6 @@ yaal::hcore::HString const& HHuginn::HHuginnRuntimeException::message( void ) co
 int HHuginn::HHuginnRuntimeException::position( void ) const {
 	return ( _position );
 }
-
-HHuginn::HType::HType( yaal::hcore::HString const& name_, int id_ )
-	: _name( name_ )
-	, _id( id_ ) {
-	return;
-}
-
-HHuginn::type_t HHuginn::HType::register_type( yaal::hcore::HString const& name_, HHuginn* huginn_ ) {
-	static yaal::hcore::HMutex mutex;
-	HLock l( mutex );
-	type_dict_t& typeDict( huginn_ ? huginn_->_userTypeDict : _builtin );
-	if ( ( _builtin.count( name_ ) != 0 )
-		|| ( huginn_ && ( huginn_->_userTypeDict.count( name_ ) != 0 ) ) ) {
-		throw HHuginnException( "Registering existing type: `"_ys.append( name_ ).append( "'." ) );
-	}
-	HType::type_holder_t t( new HType( name_, huginn_ ? huginn_->_idGenerator ++ : _idGenerator ++ ) );
-	type_dict_t::iterator it( typeDict.insert( make_pair<yaal::hcore::HString const, HType::type_holder_t>( name_, yaal::move( t ) ) ).first );
-	return ( it->second.get() );
-}
-
-int HHuginn::HType::builtin_type_count( void ) {
-	return ( _idGenerator );
-}
-
 
 namespace hobject_destructor_helper {
 
@@ -183,16 +149,28 @@ typedef typename memory::aligned<BUFFER_SIZE, holder_t>::type buffer_t;
 
 }
 
+HHuginn::HObject::HObject( HClass const* class_ )
+	: HValue( class_ )
+	, _fields( class_->get_defaults() ) {
+}
+
+HHuginn::HObject::HObject( HClass const* class_, fields_t const& fields_ )
+	: HValue( class_ )
+	, _fields( fields_ ) {
+}
+
 HHuginn::HObject::~HObject( void ) {
 	M_PROLOG
 	/* *FIXME* *TODO* Remove !is_builtin() test after HObject, HValue hierarchy fix. */
-	huginn::HThread* t( _class->huginn() && ! is_builtin( type()->name() ) ? _class->huginn()->current_thread() : nullptr );
+	HHuginn::HClass const* clss( get_class() );
+	HHuginn* huginn( clss->huginn() );
+	huginn::HThread* t( huginn && ! is_builtin( clss->name() ) ? huginn->current_thread() : nullptr );
 	if ( t && ! t->has_runtime_exception() ) {
 		hobject_destructor_helper::buffer_t buffer;
 		hobject_destructor_helper::allocator<hobject_destructor_helper::holder_t> allocator( buffer.mem() );
 		HHuginn::value_t nonOwning( this, &hobject_destructor_helper::deleter, allocator );
-		int destructorIdx( _class->field_index( KEYWORD::DESTRUCTOR ) );
-		HClass const* c( _class->super() );
+		int destructorIdx( clss->field_index( KEYWORD::DESTRUCTOR ) );
+		HClass const* c( clss->super() );
 		if ( destructorIdx >= 0 ) {
 			try {
 				static_cast<HClass::HMethod const*>(
@@ -224,7 +202,7 @@ HHuginn::HObject::~HObject( void ) {
 
 int HHuginn::HObject::field_index( yaal::hcore::HString const& name_ ) const {
 	M_PROLOG
-	return ( _class->field_index( name_ ) );
+	return ( get_class()->field_index( name_ ) );
 	M_EPILOG
 }
 
@@ -237,7 +215,7 @@ HHuginn::value_t& HHuginn::HObject::field_ref( int index_ ) {
 HHuginn::value_t HHuginn::HObject::field( HHuginn::value_t const& object_, int index_ ) const {
 	M_PROLOG
 	value_t const& f( _fields[index_] );
-	bool isMethod( f->type() == TYPE::METHOD );
+	bool isMethod( f->type_id() == TYPE::METHOD );
 	return (
 		isMethod
 			? pointer_static_cast<HHuginn::HValue>( make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod const*>( f.raw() ), object_ ) )
@@ -246,15 +224,9 @@ HHuginn::value_t HHuginn::HObject::field( HHuginn::value_t const& object_, int i
 	M_EPILOG
 }
 
-HHuginn::HClass const* HHuginn::HObject::get_class( void ) const {
-	M_PROLOG
-	return ( _class );
-	M_EPILOG
-}
-
 bool HHuginn::HObject::is_kind_of( yaal::hcore::HString const& typeName_ ) const {
 	M_PROLOG
-	return ( _class->is_kind_of( typeName_ ) );
+	return ( get_class()->is_kind_of( typeName_ ) );
 	M_EPILOG
 }
 
@@ -271,7 +243,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	int idx( field_index( methodName_ ) );
 	if ( idx >= 0 ) {
 		HHuginn::value_t const& f( field( object_, idx ) );
-		if ( f->type() == HHuginn::TYPE::METHOD ) {
+		if ( f->type_id() == HHuginn::TYPE::METHOD ) {
 			HHuginn::HClass::HMethod const* m( static_cast<HHuginn::HClass::HMethod const*>( f.raw() ) );
 			res = m->function()( thread_, const_cast<HHuginn::value_t*>( &object_ ), arguments_, position_ );
 		} else {
@@ -279,7 +251,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 				"`"_ys
 				.append( methodName_ )
 				.append( "' in class `" )
-				.append( type()->name() )
+				.append( get_class()->name() )
 				.append( "' is not a method." ),
 				position_
 			);
@@ -287,7 +259,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
 			"Class `"_ys
-			.append( type()->name() )
+			.append( get_class()->name() )
 			.append( "' does not have `" )
 			.append( methodName_ )
 			.append( "' method." ),
@@ -304,12 +276,12 @@ HHuginn::value_t HHuginn::HObject::do_clone( HHuginn* huginn_ ) const {
 	for ( value_t const& v : _fields ) {
 		fields.push_back( v->clone( huginn_ ) );
 	}
-	return ( make_pointer<HObject>( _class, fields ) );
+	return ( make_pointer<HObject>( get_class(), fields ) );
 	M_EPILOG
 }
 
 HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLevel_, bool upCast_, int position_ )
-	: HValue( TYPE::OBJECT_REFERENCE )
+	: HValue( &_objectReferenceClass_ )
 	, _object( value_ )
 	, _class( nullptr ) {
 	M_PROLOG
@@ -319,7 +291,7 @@ HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLe
 	for ( int i( 0 ); i < ( upCastLevel_ + ( upCast_ ? 1 : 0 ) ); ++ i ) {
 		HClass const* s( c->super() );
 		if ( ! s ) {
-			throw HHuginnRuntimeException( "`"_ys.append( s->type()->name() ).append( "' does not have superclass." ), position_ );
+			throw HHuginnRuntimeException( "`"_ys.append( s->name() ).append( "' does not have superclass." ), position_ );
 		}
 		c = s;
 	}
@@ -329,7 +301,7 @@ HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLe
 }
 
 HHuginn::HObjectReference::HObjectReference( value_t const& value_, HClass const* class_ )
-	: HValue( TYPE::OBJECT_REFERENCE )
+	: HValue( &_objectReferenceClass_ )
 	, _object( value_ )
 	, _class( class_ ) {
 	M_PROLOG
@@ -353,7 +325,7 @@ HHuginn::value_t HHuginn::HObjectReference::field( int index_ ) {
 	} else {
 		v = o->field_ref( index_ );
 	}
-	if ( v->type() == TYPE::METHOD ) {
+	if ( v->type_id() == TYPE::METHOD ) {
 		v = make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod*>( v.raw() ), _object );
 	}
 	return ( v );
@@ -374,10 +346,9 @@ void HHuginn::disable_grammar_verification( void ) {
 
 HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY )
-	, _idGenerator{ HType::builtin_type_count() }
-	, _userTypeDict()
+	, _idGenerator( static_cast<type_id_t::value_type>( TYPE::NOT_BOOLEAN ) )
 	, _objectFactory( new HObjectFactory( this ) )
-	, _none( make_pointer<HHuginn::HValue>( HHuginn::TYPE::NONE ) )
+	, _none( make_pointer<HHuginn::HValue>( &_noneClass_ ) )
 	, _true( _objectFactory->create_boolean( true ) )
 	, _false( _objectFactory->create_boolean( false ) )
 	, _classes()
@@ -457,7 +428,7 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 	classes_t::const_iterator it( _classes.find( name_ ) );
 	OCompiler::OClassContext* cc( _compiler->_submittedClasses.at( name_ ).get() );
 	for ( packages_t::value_type const& p : _packages ) {
-		if ( name_ == p.second->type()->name() ) {
+		if ( name_ == p.second->get_class()->name() ) {
 			throw HHuginnRuntimeException( "Package of the same name `"_ys.append( name_ ).append( "' is already imported." ), cc->_position.get() );
 		}
 	}
@@ -492,8 +463,8 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 				fieldDefinitions.push_back( make_pointer<HClass::HMethod>( m->second ) );
 			}
 		}
-		type_t type( HType::register_type( cc->_className, this ) );
-		c = _classes.insert( make_pair( name_, make_pointer<HClass>( this, type, super, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
+		c = _classes.insert( make_pair( name_, make_pointer<HClass>( this, type_id_t( _idGenerator ), cc->_className, super, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
+		++ _idGenerator;
 	}
 	return ( c );
 	M_EPILOG
@@ -501,7 +472,7 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 
 void HHuginn::register_class( class_t class_ ) {
 	M_PROLOG
-	_classes.insert( make_pair( class_->type()->name(), class_ ) );
+	_classes.insert( make_pair( class_->name(), class_ ) );
 	return;
 	M_EPILOG
 }
@@ -868,30 +839,34 @@ void HHuginn::create_function( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-HHuginn::class_t HHuginn::create_class( HHuginn::type_t type_, HClass const* base_, field_names_t const& fieldNames_, values_t const& values_ ) {
+HHuginn::class_t HHuginn::create_class( yaal::hcore::HString const& name_, HClass const* base_, field_names_t const& fieldNames_, values_t const& values_ ) {
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			this,
-			type_,
+			type_id_t( _idGenerator ),
+			name_,
 			base_,
 			fieldNames_,
 			values_
 		)
 	);
+	++ _idGenerator;
 	return ( c );
 }
 
 HHuginn::class_t HHuginn::create_class( class_constructor_t const& classConstructor_ ) {
-	return ( classConstructor_( this ) );
+	class_t c( classConstructor_( type_id_t( _idGenerator ) ) );
+	++ _idGenerator;
+	return ( c );
 }
 
-HHuginn::HValue::HValue( type_t type_ )
-	: _type( type_ ) {
+HHuginn::HValue::HValue( HClass const* class_ )
+	: _class( class_ ) {
 	return;
 }
 
-HHuginn::type_t HHuginn::HValue::type( void ) const {
-	return ( _type );
+HHuginn::type_id_t HHuginn::HValue::type_id( void ) const {
+	return ( _class->type_id() );
 }
 
 HHuginn::value_t HHuginn::HValue::clone( HHuginn* huginn_ ) const {
@@ -899,12 +874,12 @@ HHuginn::value_t HHuginn::HValue::clone( HHuginn* huginn_ ) const {
 }
 
 HHuginn::value_t HHuginn::HValue::do_clone( HHuginn* huginn_ ) const {
-	M_ASSERT( _type == TYPE::NONE );
+	M_ASSERT( _class->type_id() == TYPE::NONE );
 	return ( huginn_->none_value() );
 }
 
 HHuginn::HReference::HReference( HHuginn::value_t& value_ )
-	: HValue( TYPE::REFERENCE ), _value( value_ ) {
+	: HValue( &_referenceClass_ ), _value( value_ ) {
 	return;
 }
 
@@ -933,7 +908,7 @@ HHuginn::HTernaryEvaluator::HTernaryEvaluator(
 	expression_t const& condition_,
 	expression_t const& ifTrue_,
 	expression_t const& ifFalse_
-) : HValue( TYPE::UNKNOWN ),
+) : HValue( &_unknownClass_ ),
 	_condition( condition_ ),
 	_ifTrue( ifTrue_ ),
 	_ifFalse( ifFalse_ ) {
@@ -945,7 +920,7 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::execute( huginn::HThread* thread_ )
 	_condition->execute( thread_ );
 	HFrame* f( thread_->current_frame() );
 	value_t v( f->result() );
-	if ( v->type() != TYPE::BOOLEAN ) {
+	if ( v->type_id() != TYPE::BOOLEAN ) {
 		throw HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], _condition->position() );
 	}
 	if ( static_cast<HBoolean*>( v.raw() )->value() ) {
@@ -967,7 +942,7 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( HHuginn* M_NDEBUG_CODE( h
 HHuginn::HFunctionReference::HFunctionReference(
 	yaal::hcore::HString const& name_,
 	function_t const& function_
-) : HValue( TYPE::FUNCTION_REFERENCE ),
+) : HValue( &_functionReferenceClass_ ),
 	_name( name_ ),
 	_function( function_ ) {
 	return;
@@ -987,7 +962,7 @@ HHuginn::value_t HHuginn::HFunctionReference::do_clone( HHuginn* ) const {
 
 HHuginn::HClass::HMethod::HMethod(
 	function_t const& function_
-) : HValue( TYPE::METHOD )
+) : HValue( &_methodClass_ )
 	, _function( function_ ) {
 	return;
 }
@@ -1016,9 +991,9 @@ HHuginn::value_t HHuginn::HClass::HBoundMethod::do_clone( HHuginn* ) const {
 
 namespace huginn_builtin {
 
-inline HHuginn::value_t convert( HHuginn::type_t toType_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+inline HHuginn::value_t convert( HHuginn::TYPE toType_, huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
-	verify_arg_count( toType_->name(), values_, 1, 1, position_ );
+	verify_arg_count( type_name( toType_ ), values_, 1, 1, position_ );
 	HHuginn::value_t res;
 	if ( toType_ == HHuginn::TYPE::INTEGER ) {
 		res = value_builtin::integer( thread_, values_.front(), position_ );
@@ -1034,7 +1009,7 @@ inline HHuginn::value_t convert( HHuginn::type_t toType_, huginn::HThread* threa
 		res = value_builtin::character( thread_, values_.front(), position_ );
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
-			"Conversion to `"_ys.append( toType_->name() ).append( "' is not supported." ),
+			"Conversion to `"_ys.append( type_name( toType_ ) ).append( "' is not supported." ),
 			position_
 		);
 	}
@@ -1048,7 +1023,7 @@ inline HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHugi
 	HHuginn::value_t const& val( values_.front() );
 	HHuginn::HValue const* v( val.raw() );
 	int long long s( 0 );
-	HHuginn::type_t typeId( v->type() );
+	HHuginn::type_id_t typeId( v->type_id() );
 	HHuginn::value_t res;
 	if ( typeId == HHuginn::TYPE::STRING ) {
 		s = static_cast<HHuginn::HString const*>( v )->value().get_length();
@@ -1067,7 +1042,7 @@ inline HHuginn::value_t size( huginn::HThread* thread_, HHuginn::value_t*, HHugi
 			s = get_integer( value_builtin::integer( thread_, o->call_method( thread_, val, "get_size", HHuginn::values_t(), position_ ), position_ ) );
 		} else {
 			throw HHuginn::HHuginnRuntimeException(
-				"Getting size of `"_ys.append( v->type()->name() ).append( "'s is not supported." ),
+				"Getting size of `"_ys.append( v->get_class()->name() ).append( "'s is not supported." ),
 				position_
 			);
 		}
@@ -1080,7 +1055,7 @@ inline HHuginn::value_t type( huginn::HThread* thread_, HHuginn::value_t*, HHugi
 	M_PROLOG
 	verify_arg_count( "type", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
-	return ( thread_->object_factory().create_string( v->type()->name() ) );
+	return ( thread_->object_factory().create_string( v->get_class()->name() ) );
 	M_EPILOG
 }
 
@@ -1155,7 +1130,7 @@ inline HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHug
 	verify_arg_count( "print", values_, 1, 1, position_ );
 	HHuginn::HValue const* v( values_.front().raw() );
 	yaal::hcore::HStreamInterface& out( thread_->huginn().output_stream() );
-	HHuginn::type_t typeId( v->type() );
+	HHuginn::type_id_t typeId( v->type_id() );
 	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		out << static_cast<HHuginn::HInteger const*>( v )->value();
 	} else if ( typeId == HHuginn::TYPE::REAL ) {
@@ -1170,7 +1145,7 @@ inline HHuginn::value_t print( huginn::HThread* thread_, HHuginn::value_t*, HHug
 		out << static_cast<HHuginn::HCharacter const*>( v )->value();
 	} else {
 		throw HHuginn::HHuginnRuntimeException(
-			"Printing `"_ys.append( v->type()->name() ).append( "'s is not supported." ),
+			"Printing `"_ys.append( v->get_class()->name() ).append( "'s is not supported." ),
 			position_
 		);
 	}

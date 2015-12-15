@@ -57,7 +57,7 @@ void HSwitch::do_execute( HThread* thread_ ) const {
 	_expression->execute( thread_ );
 	if ( f->can_continue() ) {
 		HHuginn::value_t v( f->result() );
-		if ( ! OCompiler::is_comparable( v->type() ) ) {
+		if ( ! OCompiler::is_comparable( v->type_id() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Expression does not evaluate to comparable type.", _expression->position() );
 		}
 		bool matched( false );
@@ -68,7 +68,7 @@ void HSwitch::do_execute( HThread* thread_ ) const {
 			}
 			if ( f->can_continue() ) {
 				if ( ! matched ) {
-					if ( v->type() != f->result()->type() ) {
+					if ( v->type_id() != f->result()->type_id() ) {
 						throw HHuginn::HHuginnRuntimeException( "Case type does not match switch type.", it->_expression->position() );
 					}
 				}

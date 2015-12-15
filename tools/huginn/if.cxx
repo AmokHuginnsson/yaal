@@ -28,6 +28,7 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "if.hxx"
+#include "helper.hxx"
 #include "thread.hxx"
 #include "expression.hxx"
 #include "scope.hxx"
@@ -66,7 +67,7 @@ void HIf::do_execute( huginn::HThread* thread_ ) const {
 		it->_expression->execute( thread_ );
 		if ( f->can_continue() ) {
 			HHuginn::value_t v( f->result() );
-			if ( v->type() != HHuginn::TYPE::BOOLEAN ) {
+			if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 				throw HHuginn::HHuginnRuntimeException( "`If' argument is not a boolean.", it->_expression->position() );
 			}
 			if ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() ) {

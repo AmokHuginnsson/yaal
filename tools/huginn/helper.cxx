@@ -59,13 +59,13 @@ bool is_restricted( yaal::hcore::HString const& name_ ) {
 	M_EPILOG
 }
 
-void operands_type_mismatch( char const* op_, HHuginn::type_t t1_, HHuginn::type_t t2_, int pos_ ) {
+void operands_type_mismatch( char const* op_, HHuginn::type_id_t t1_, HHuginn::type_id_t t2_, int pos_ ) {
 	hcore::HString msg( "Operand types for `" );
 	msg.append( op_ )
 		.append( "' do not match: " )
-		.append( t1_->name() )
+		.append( type_name( t1_ ) )
 		.append( " vs " )
-		.append( t2_->name() )
+		.append( type_name( t2_ ) )
 		.append( "." ),
 	throw HHuginn::HHuginnRuntimeException( msg, pos_ );
 }
@@ -109,9 +109,9 @@ void verify_arg_count( yaal::hcore::HString const& name_, HHuginn::values_t cons
 void verify_arg_type(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
-	int no_, HHuginn::type_t type_, bool oneArg_, int position_ ) {
+	int no_, HHuginn::TYPE type_, bool oneArg_, int position_ ) {
 	M_PROLOG
-	if ( values_[no_]->type() != type_ ) {
+	if ( values_[no_]->type_id() != type_ ) {
 		HString no;
 		if ( ! oneArg_ ) {
 			no = util::ordinal( no_ + 1 ).append( " " );
@@ -121,9 +121,9 @@ void verify_arg_type(
 			.append( "() " )
 			.append( no )
 			.append( "argument must be a `" )
-			.append( type_->name() )
+			.append( type_name( type_ ) )
 			.append( "', not a `" )
-			.append( values_[no_]->type()->name() )
+			.append( values_[no_]->get_class()->name() )
 			.append( "'." ),
 			position_
 		);
@@ -132,12 +132,12 @@ void verify_arg_type(
 	M_EPILOG
 }
 
-HHuginn::type_t verify_arg_numeric(
+HHuginn::type_id_t verify_arg_numeric(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
 	int no_, bool oneArg_, int position_ ) {
 	M_PROLOG
-	HHuginn::type_t t( values_[no_]->type() );
+	HHuginn::type_id_t t( values_[no_]->type_id() );
 	if ( ( t != HHuginn::TYPE::NUMBER ) && ( t != HHuginn::TYPE::REAL ) ) {
 		HString no;
 		if ( ! oneArg_ ) {
@@ -148,7 +148,7 @@ HHuginn::type_t verify_arg_numeric(
 			.append( "() " )
 			.append( no )
 			.append( "argument must be a numeric type, either `number' or `real', not a " )
-			.append( values_[no_]->type()->name() )
+			.append( values_[no_]->get_class()->name() )
 			.append( "'." ),
 			position_
 		);
@@ -157,12 +157,12 @@ HHuginn::type_t verify_arg_numeric(
 	M_EPILOG
 }
 
-HHuginn::type_t verify_arg_collection(
+HHuginn::type_id_t verify_arg_collection(
 	yaal::hcore::HString const& name_,
 	HHuginn::values_t const& values_,
 	int no_, bool oneArg_, int position_ ) {
 	M_PROLOG
-	HHuginn::type_t t( values_[no_]->type() );
+	HHuginn::type_id_t t( values_[no_]->type_id() );
 	if (
 			( t != HHuginn::TYPE::LIST )
 			&& ( t != HHuginn::TYPE::DEQUE )
@@ -181,7 +181,7 @@ HHuginn::type_t verify_arg_collection(
 			.append( "() " )
 			.append( no )
 			.append( "argument must be a collection type, not a " )
-			.append( values_[no_]->type()->name() )
+			.append( values_[no_]->get_class()->name() )
 			.append( "'." ),
 			position_
 		);
@@ -260,6 +260,50 @@ char get_character( HHuginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HCharacter const*>( value_ ) );
 	return ( static_cast<HHuginn::HCharacter const*>( value_ )->value() );
+}
+
+yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
+	static HString const NAME_NONE = "none";
+	static HString const NAME_BOOLEAN = "boolean";
+	static HString const NAME_INTEGER = "integer";
+	static HString const NAME_REAL = "real";
+	static HString const NAME_STRING = "string";
+	static HString const NAME_NUMBER = "number";
+	static HString const NAME_CHARACTER = "character";
+	static HString const NAME_LIST = "list";
+	static HString const NAME_DICT = "dict";
+	static HString const NAME_DEQUE = "deque";
+	static HString const NAME_ORDER = "order";
+	static HString const NAME_LOOKUP = "lookup";
+	static HString const NAME_SET = "set";
+	static HString const NAME_REFERENCE = "*reference*";
+	static HString const NAME_FUNCTION_REFERENCE = "*function_reference*";
+	static HString const NAME_OBJECT_REFERENCE = "*object_reference*";
+	static HString const NAME_METHOD = "*method*";
+	static HString const NAME_UNKNOWN = "*unknown*";
+	HString const* s( &NAME_UNKNOWN );
+	switch ( type_ ) {
+		case ( HHuginn::TYPE::NONE ):               s = &NAME_NONE;               break;
+		case ( HHuginn::TYPE::BOOLEAN ):            s = &NAME_BOOLEAN;            break;
+		case ( HHuginn::TYPE::INTEGER ):            s = &NAME_INTEGER;            break;
+		case ( HHuginn::TYPE::REAL ):               s = &NAME_REAL;               break;
+		case ( HHuginn::TYPE::STRING ):             s = &NAME_STRING;             break;
+		case ( HHuginn::TYPE::NUMBER ):             s = &NAME_NUMBER;             break;
+		case ( HHuginn::TYPE::CHARACTER ):          s = &NAME_CHARACTER;          break;
+		case ( HHuginn::TYPE::LIST ):               s = &NAME_LIST;               break;
+		case ( HHuginn::TYPE::DICT ):               s = &NAME_DICT;               break;
+		case ( HHuginn::TYPE::DEQUE ):              s = &NAME_DEQUE;              break;
+		case ( HHuginn::TYPE::ORDER ):              s = &NAME_ORDER;              break;
+		case ( HHuginn::TYPE::LOOKUP ):             s = &NAME_LOOKUP;             break;
+		case ( HHuginn::TYPE::SET ):                s = &NAME_SET;                break;
+		case ( HHuginn::TYPE::REFERENCE ):          s = &NAME_REFERENCE;          break;
+		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): s = &NAME_FUNCTION_REFERENCE; break;
+		case ( HHuginn::TYPE::OBJECT_REFERENCE ):   s = &NAME_OBJECT_REFERENCE;   break;
+		case ( HHuginn::TYPE::METHOD ):             s = &NAME_METHOD;             break;
+		case ( HHuginn::TYPE::UNKNOWN ):            s = &NAME_UNKNOWN;            break;
+		case ( HHuginn::TYPE::NOT_BOOLEAN ):        s = &NAME_UNKNOWN;            break;
+	}
+	return ( *s );
 }
 
 }

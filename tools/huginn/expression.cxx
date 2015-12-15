@@ -135,7 +135,7 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 	if ( o != nullptr ) {
 		int fi( o->field_index( name_ ) );
 		if ( fi < 0 ) {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->type()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->get_class()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
 		}
 		if ( access_ == ACCESS::VALUE ) {
 			frame_->values().push( o->field( v, fi ) );
@@ -147,7 +147,7 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 	} else if ( oref != nullptr ) {
 		int fi( oref->field_index( name_) );
 		if ( fi < 0 ) {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( oref->type()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( oref->get_class()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
 		}
 		if ( access_ == ACCESS::VALUE ) {
 			frame_->values().push( oref->field( fi ) );
@@ -155,7 +155,7 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", p );
 		}
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->type()->name() ).append( "' is not a compound object." ), p );
+		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->get_class()->name() ).append( "' is not a compound object." ), p );
 	}
 	return;
 	M_EPILOG
@@ -177,8 +177,8 @@ void HExpression::set_variable( HFrame* frame_, int ) {
 		frame_->values().pop();
 		HHuginn::value_t ref( frame_->values().top() );
 		frame_->values().pop();
-		if ( ref->type() != HHuginn::TYPE::REFERENCE ) {
-			M_ASSERT( ref->type() == HHuginn::TYPE::CHARACTER );
+		if ( ref->type_id() != HHuginn::TYPE::REFERENCE ) {
+			M_ASSERT( ref->type_id() == HHuginn::TYPE::CHARACTER );
 			throw HHuginn::HHuginnRuntimeException( "String does not support item assignment.", p );
 		}
 		static_cast<HHuginn::HReference*>( ref.raw() )->value() = value;
@@ -203,9 +203,10 @@ void HExpression::function_call( HFrame* frame_, int position_ ) {
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_CALL );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
-	HHuginn::type_t t( frame_->values().top()->type() );
+	HHuginn::HClass const* c( frame_->values().top()->get_class() );
+	HHuginn::type_id_t t( c->type_id() );
 	if ( ( t != HHuginn::TYPE::FUNCTION_REFERENCE ) && ( t != HHuginn::TYPE::METHOD ) ) {
-		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( t->name() ).append( "' is not a function." ), position_ );
+		throw HHuginn::HHuginnRuntimeException( "Reference `"_ys.append( c->name() ).append( "' is not a function." ), position_ );
 	}
 	HHuginn::value_t f(  frame_->values().top() );
 	frame_->values().pop();
@@ -264,8 +265,8 @@ void HExpression::plus( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( v1->type() != v2->type() ) {
-		operands_type_mismatch( "+", v1->type(), v2->type(), p );
+	if ( v1->type_id() != v2->type_id() ) {
+		operands_type_mismatch( "+", v1->type_id(), v2->type_id(), p );
 	}
 	frame_->values().push( value_builtin::add( frame_->thread(), v1, v2, p ) );
 	return;
@@ -282,8 +283,8 @@ void HExpression::minus( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( v1->type() != v2->type() ) {
-		operands_type_mismatch( "-", v1->type(), v2->type(), p );
+	if ( v1->type_id() != v2->type_id() ) {
+		operands_type_mismatch( "-", v1->type_id(), v2->type_id(), p );
 	}
 	frame_->values().push( value_builtin::sub( frame_->thread(), v1, v2, p ) );
 	return;
@@ -300,8 +301,8 @@ void HExpression::mul( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( v1->type() != v2->type() ) {
-		operands_type_mismatch( "*", v1->type(), v2->type(), p );
+	if ( v1->type_id() != v2->type_id() ) {
+		operands_type_mismatch( "*", v1->type_id(), v2->type_id(), p );
 	}
 	frame_->values().push( value_builtin::mul( frame_->thread(), v1, v2, p ) );
 	return;
@@ -318,8 +319,8 @@ void HExpression::div( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( v1->type() != v2->type() ) {
-		operands_type_mismatch( "/", v1->type(), v2->type(), p );
+	if ( v1->type_id() != v2->type_id() ) {
+		operands_type_mismatch( "/", v1->type_id(), v2->type_id(), p );
 	}
 	frame_->values().push( value_builtin::div( frame_->thread(), v1, v2, p ) );
 	return;
@@ -336,8 +337,8 @@ void HExpression::mod( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( v1->type() != v2->type() ) {
-		operands_type_mismatch( "%", v1->type(), v2->type(), p );
+	if ( v1->type_id() != v2->type_id() ) {
+		operands_type_mismatch( "%", v1->type_id(), v2->type_id(), p );
 	}
 	frame_->values().push( value_builtin::mod( frame_->thread(), v1, v2, p ) );
 	return;
@@ -367,8 +368,8 @@ void HExpression::power( HFrame* frame_, int ) {
 		frame_->values().pop();
 		HHuginn::value_t v1( frame_->values().top() );
 		frame_->values().pop();
-		if ( v1->type() != v2->type() ) {
-			operands_type_mismatch( "^", v1->type(), v2->type(), p );
+		if ( v1->type_id() != v2->type_id() ) {
+			operands_type_mismatch( "^", v1->type_id(), v2->type_id(), p );
 		}
 		frame_->values().push( value_builtin::pow( frame_->thread(), v1, v2, p ) );
 	}
@@ -409,9 +410,9 @@ void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
 	bool select( ( !! from ) || ( !! to ) || ( !! step ) );
 	HHuginn::value_t base( frame_->values().top() );
 	if ( ! select && ( range > 0 ) ) {
-		HHuginn::type_t t( base->type() );
+		HHuginn::type_id_t t( base->type_id() );
 		if ( ( t != HHuginn::TYPE::LIST ) && ( t != HHuginn::TYPE::STRING ) ) {
-			throw HHuginn::HHuginnRuntimeException( "Range operator not supported on `"_ys.append( t->name() ).append( "'." ), p );
+			throw HHuginn::HHuginnRuntimeException( "Range operator not supported on `"_ys.append( base->get_class()->name() ).append( "'." ), p );
 		}
 	} else {
 		frame_->values().pop();
@@ -443,8 +444,8 @@ void HExpression::equals( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	HHuginn::type_t t1( v1->type() );
-	HHuginn::type_t t2( v2->type() );
+	HHuginn::type_id_t t1( v1->type_id() );
+	HHuginn::type_id_t t2( v2->type_id() );
 	if ( ( t1 != t2 ) && ( t1 != HHuginn::TYPE::NONE ) && ( t2 != HHuginn::TYPE::NONE ) ) {
 		operands_type_mismatch( "==", t1, t2, p );
 	}
@@ -463,8 +464,8 @@ void HExpression::not_equals( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	HHuginn::type_t t1( v1->type() );
-	HHuginn::type_t t2( v2->type() );
+	HHuginn::type_id_t t1( v1->type_id() );
+	HHuginn::type_id_t t2( v2->type_id() );
 	if ( ( t1 != t2 ) && ( t1 != HHuginn::TYPE::NONE ) && ( t2 != HHuginn::TYPE::NONE ) ) {
 		operands_type_mismatch( "!=", t1, t2, p );
 	}
@@ -483,8 +484,8 @@ void HExpression::less( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( v1->type() != v2->type() ) {
-		operands_type_mismatch( "<", v1->type(), v2->type(), p );
+	if ( v1->type_id() != v2->type_id() ) {
+		operands_type_mismatch( "<", v1->type_id(), v2->type_id(), p );
 	}
 	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::less( v1, v2, p ) ) );
 	return;
@@ -501,8 +502,8 @@ void HExpression::greater( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( v1->type() != v2->type() ) {
-		operands_type_mismatch( ">", v1->type(), v2->type(), p );
+	if ( v1->type_id() != v2->type_id() ) {
+		operands_type_mismatch( ">", v1->type_id(), v2->type_id(), p );
 	}
 	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::greater( v1, v2, p ) ) );
 	return;
@@ -519,8 +520,8 @@ void HExpression::less_or_equal( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( v1->type() != v2->type() ) {
-		operands_type_mismatch( "<=", v1->type(), v2->type(), p );
+	if ( v1->type_id() != v2->type_id() ) {
+		operands_type_mismatch( "<=", v1->type_id(), v2->type_id(), p );
 	}
 	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::less_or_equal( v1, v2, p ) ) );
 	return;
@@ -537,8 +538,8 @@ void HExpression::greater_or_equal( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( v1->type() != v2->type() ) {
-		operands_type_mismatch( ">=", v1->type(), v2->type(), p );
+	if ( v1->type_id() != v2->type_id() ) {
+		operands_type_mismatch( ">=", v1->type_id(), v2->type_id(), p );
 	}
 	frame_->values().push( frame_->thread()->object_factory().create_boolean( value_builtin::greater_or_equal( v1, v2, p ) ) );
 	return;
@@ -581,7 +582,7 @@ void HExpression::boolean_xor( HFrame* frame_, int ) {
 	frame_->values().pop();
 	HHuginn::value_t v1( frame_->values().top() );
 	frame_->values().pop();
-	if ( ( v1->type() != HHuginn::TYPE::BOOLEAN ) || ( v2->type() != HHuginn::TYPE::BOOLEAN ) ) {
+	if ( ( v1->type_id() != HHuginn::TYPE::BOOLEAN ) || ( v2->type_id() != HHuginn::TYPE::BOOLEAN ) ) {
 		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OPS_NOT_BOOL], p );
 	}
 	frame_->values().push( value_builtin::boolean_xor( frame_->thread(), v1, v2, p ) );
@@ -597,7 +598,7 @@ void HExpression::boolean_not( HFrame* frame_, int ) {
 	frame_->operations().pop();
 	HHuginn::value_t v( frame_->values().top() );
 	frame_->values().pop();
-	if ( v->type() != HHuginn::TYPE::BOOLEAN ) {
+	if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
 		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_BOOL], p );
 	}
 	frame_->values().push( value_builtin::boolean_not( frame_->thread(), v, p ) );

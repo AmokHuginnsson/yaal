@@ -43,8 +43,6 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::ORDER( HHuginn::HType::register_type( "order", nullptr ) );
-
 namespace huginn {
 
 class HOrderIterator : public HIteratorInterface {
@@ -108,7 +106,8 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			huginn_,
-			HHuginn::TYPE::ORDER,
+			type_id( HHuginn::TYPE::ORDER ),
+			type_name( HHuginn::TYPE::ORDER ),
 			nullptr,
 			HHuginn::field_names_t{
 				"add",
@@ -133,11 +132,11 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 HHuginn::HOrder::HOrder( HHuginn::HClass const* class_ )
 	: HIterable( class_ )
 	, _data( &value_builtin::less_low )
-	, _keyType( HHuginn::TYPE::NONE ) {
+	, _keyType( &huginn::_noneClass_ ) {
 	return;
 }
 
-HHuginn::HOrder::HOrder( HHuginn::HClass const* class_, values_t const& data_, type_t keyType_ )
+HHuginn::HOrder::HOrder( HHuginn::HClass const* class_, values_t const& data_, HHuginn::HClass const* keyType_ )
 	: HIterable( class_ ),
 	_data( data_ ),
 	_keyType( keyType_ ) {
@@ -148,26 +147,26 @@ int long HHuginn::HOrder::do_size( void ) const {
 	return ( _data.get_size() );
 }
 
-void HHuginn::HOrder::verify_key_type( HHuginn::type_t type_, int position_ ) const {
-	if ( ( _keyType != TYPE::NONE ) && ( type_ != _keyType ) ) {
+void HHuginn::HOrder::verify_key_type( HHuginn::HHuginn::HClass const* typeId_, int position_ ) const {
+	if ( ( _keyType->type_id() != TYPE::NONE ) && ( typeId_ != _keyType ) ) {
 		throw HHuginnRuntimeException( "Non-uniform key types.", position_ );
 	}
-	if ( ! OCompiler::is_comparable( type_ ) ) {
-		throw HHuginnRuntimeException( "Key type `"_ys.append( type_->name() ).append( "' is not a comparable." ), position_ );
+	if ( ! OCompiler::is_comparable( typeId_->type_id() ) ) {
+		throw HHuginnRuntimeException( "Key type `"_ys.append( typeId_->name() ).append( "' is not a comparable." ), position_ );
 	}
 	return;
 }
 
 bool HHuginn::HOrder::has_key( HHuginn::value_t const& value_, int position_ ) const {
 	M_PROLOG
-	verify_key_type( value_->type(), position_ );
+	verify_key_type( value_->get_class(), position_ );
 	return ( _data.find( value_ ) != _data.end() );
 	M_EPILOG
 }
 
 void HHuginn::HOrder::erase( HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	verify_key_type( value_->type(), position_ );
+	verify_key_type( value_->get_class(), position_ );
 	_data.erase( value_ );
 	return;
 	M_EPILOG
@@ -175,9 +174,9 @@ void HHuginn::HOrder::erase( HHuginn::value_t const& value_, int position_ ) {
 
 void HHuginn::HOrder::insert( HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	verify_key_type( value_->type(), position_ );
+	verify_key_type( value_->get_class(), position_ );
 	_data.insert( value_ );
-	_keyType = value_->type();
+	_keyType = value_->get_class();
 	return;
 	M_EPILOG
 }

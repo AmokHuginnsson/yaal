@@ -58,7 +58,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.square_root";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
 		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -81,7 +81,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.round";
 		verify_arg_count( name, values_, 1, 2, position_ );
-		HHuginn::type_t t( verify_arg_numeric( name, values_, 0, false, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, false, position_ ) );
 		int to( 0 );
 		if ( values_.get_size() > 1 ) {
 			verify_arg_type( name, values_, 1, HHuginn::TYPE::INTEGER, false, position_ );
@@ -110,7 +110,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.floor";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
 		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -126,7 +126,7 @@ public:
 		M_PROLOG
 		char const name[] = "Mathematics.ceil";
 		verify_arg_count( name, values_, 1, 1, position_ );
-		HHuginn::type_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
 		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
@@ -149,10 +149,9 @@ protected:
 
 HHuginn::value_t HMathematicsCreator::do_new_instance( HHuginn* huginn_ ) {
 	M_PROLOG
-	HHuginn::type_t t( HHuginn::HType::register_type( "Mathematics", huginn_ ) );
 	HHuginn::class_t c(
 		huginn_->create_class(
-			t,
+			"Mathematics",
 			nullptr,
 			HHuginn::field_names_t{
 				"square_root",

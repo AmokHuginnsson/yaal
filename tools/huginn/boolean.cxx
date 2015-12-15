@@ -40,8 +40,6 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::BOOLEAN( HHuginn::HType::register_type( "boolean", nullptr ) );
-
 namespace huginn {
 
 namespace boolean {
@@ -52,7 +50,8 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			huginn_,
-			HHuginn::TYPE::BOOLEAN,
+			type_id( HHuginn::TYPE::BOOLEAN ),
+			type_name( HHuginn::TYPE::BOOLEAN ),
 			nullptr,
 			HHuginn::field_names_t{
 			},

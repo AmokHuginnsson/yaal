@@ -86,10 +86,9 @@ protected:
 
 HHuginn::value_t HDateTimeCreator::do_new_instance( HHuginn* huginn_ ) {
 	M_PROLOG
-	HHuginn::type_t t( HHuginn::HType::register_type( "DateTime", huginn_ ) );
 	HHuginn::class_t c(
 		huginn_->create_class(
-			t,
+			"DateTime",
 			nullptr,
 			HHuginn::field_names_t{
 				"now",

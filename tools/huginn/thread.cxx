@@ -153,7 +153,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 		if ( e ) {
 			_exceptionMessage.append( e->what() );
 		} else {
-			_exceptionMessage.append( "of type " ).append( value_->type()->name() );
+			_exceptionMessage.append( "of type " ).append( value_->get_class()->name() );
 		}
 	}
 	return;

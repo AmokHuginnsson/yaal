@@ -40,8 +40,6 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::REAL( HHuginn::HType::register_type( "real", nullptr ) );
-
 namespace huginn {
 
 namespace real {
@@ -52,12 +50,11 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			huginn_,
-			HHuginn::TYPE::REAL,
+			type_id( HHuginn::TYPE::REAL ),
+			type_name( HHuginn::TYPE::REAL ),
 			nullptr,
-			HHuginn::field_names_t{
-			},
-			HHuginn::values_t{
-			}
+			HHuginn::field_names_t{},
+			HHuginn::values_t{}
 		)
 	);
 	return ( c );

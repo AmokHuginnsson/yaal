@@ -77,10 +77,12 @@ public:
 	typedef HHuginn::HClass base_type;
 	HCompiledRegularExpressionClass(
 		HHuginn* huginn_,
+		HHuginn::type_id_t typeId_,
 		HHuginn::class_t const& exceptionClass_
 	) : HHuginn::HClass(
 			huginn_,
-			HHuginn::HType::register_type( "CompiledRegularExpression", huginn_ ),
+			typeId_,
+			"CompiledRegularExpression",
 			nullptr,
 			HHuginn::field_names_t{
 				"match",
@@ -160,10 +162,11 @@ HHuginn::class_t HCompiledRegularExpression::get_class( HHuginn* huginn_, HHugin
 	HHuginn::class_t c(
 		huginn_->create_class(
 			HHuginn::class_constructor_t(
-				[&exceptionClass_] ( HHuginn* huginn ) -> HHuginn::class_t {
+				[&huginn_, &exceptionClass_] ( HHuginn::type_id_t typeId_ ) -> HHuginn::class_t {
 					return (
 						make_pointer<HCompiledRegularExpressionClass>(
-							huginn,
+							huginn_,
+							typeId_,
 							exceptionClass_
 						)
 					);

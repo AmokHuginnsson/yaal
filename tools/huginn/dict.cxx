@@ -43,8 +43,6 @@ namespace yaal {
 
 namespace tools {
 
-HHuginn::type_t const HHuginn::TYPE::DICT( HHuginn::HType::register_type( "dict", nullptr ) );
-
 namespace huginn {
 
 class HDictIterator : public HIteratorInterface {
@@ -116,7 +114,8 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			huginn_,
-			HHuginn::TYPE::DICT,
+			type_id( HHuginn::TYPE::DICT ),
+			type_name( HHuginn::TYPE::DICT ),
 			nullptr,
 			HHuginn::field_names_t{
 				"has_key",
@@ -141,11 +140,11 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 HHuginn::HDict::HDict( HHuginn::HClass const* class_ )
 	: HIterable( class_ )
 	, _data( &value_builtin::less_low )
-	, _keyType( HHuginn::TYPE::NONE ) {
+	, _keyType( &huginn::_noneClass_ ) {
 	return;
 }
 
-HHuginn::HDict::HDict( HHuginn::HClass const* class_, values_t const& data_, type_t keyType_ )
+HHuginn::HDict::HDict( HHuginn::HClass const* class_, values_t const& data_, HHuginn::HClass const* keyType_ )
 	: HIterable( class_ ),
 	_data( data_ ),
 	_keyType( keyType_ ) {
@@ -156,19 +155,19 @@ int long HHuginn::HDict::do_size( void ) const {
 	return ( _data.get_size() );
 }
 
-void HHuginn::HDict::verify_key_type( HHuginn::type_t type_, int position_ ) const {
-	if ( ( _keyType != TYPE::NONE ) && ( type_ != _keyType ) ) {
+void HHuginn::HDict::verify_key_type( HHuginn::HClass const* keyType_, int position_ ) const {
+	if ( ( _keyType->type_id() != TYPE::NONE ) && ( keyType_ != _keyType ) ) {
 		throw HHuginnRuntimeException( "Non-uniform key types.", position_ );
 	}
-	if ( ! OCompiler::is_comparable( type_ ) ) {
-		throw HHuginnRuntimeException( "Key type `"_ys.append( type_->name() ).append( "' is not a comparable." ), position_ );
+	if ( ! OCompiler::is_comparable( keyType_->type_id() ) ) {
+		throw HHuginnRuntimeException( "Key type `"_ys.append( keyType_->name() ).append( "' is not a comparable." ), position_ );
 	}
 	return;
 }
 
 HHuginn::value_t HHuginn::HDict::get( HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	verify_key_type( key_->type(), position_ );
+	verify_key_type( key_->get_class(), position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	if ( ! ( it != _data.end() ) ) {
 		throw HHuginnRuntimeException( "Key does not exist in `dict'.", position_ );
@@ -179,7 +178,7 @@ HHuginn::value_t HHuginn::HDict::get( HHuginn::value_t const& key_, int position
 
 bool HHuginn::HDict::try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ ) {
 	M_PROLOG
-	verify_key_type( key_->type(), position_ );
+	verify_key_type( key_->get_class(), position_ );
 	values_t::iterator it( _data.find( key_ ) );
 	bool found( false );
 	if ( it != _data.end() ) {
@@ -192,14 +191,14 @@ bool HHuginn::HDict::try_get( HHuginn::value_t const& key_, HHuginn::value_t& re
 
 bool HHuginn::HDict::has_key( HHuginn::value_t const& key_, int position_ ) const {
 	M_PROLOG
-	verify_key_type( key_->type(), position_ );
+	verify_key_type( key_->get_class(), position_ );
 	return ( _data.find( key_ ) != _data.end() );
 	M_EPILOG
 }
 
 void HHuginn::HDict::erase( HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	verify_key_type( key_->type(), position_ );
+	verify_key_type( key_->get_class(), position_ );
 	_data.erase( key_ );
 	return;
 	M_EPILOG
@@ -207,17 +206,17 @@ void HHuginn::HDict::erase( HHuginn::value_t const& key_, int position_ ) {
 
 HHuginn::value_t HHuginn::HDict::get_ref( HHuginn::value_t const& key_, int position_ ) {
 	M_PROLOG
-	verify_key_type( key_->type(), position_ );
-	_keyType = key_->type();
+	verify_key_type( key_->get_class(), position_ );
+	_keyType = key_->get_class();
 	return ( make_pointer<HReference>( _data[key_] ) );
 	M_EPILOG
 }
 
 void HHuginn::HDict::insert( HHuginn::value_t const& key_, HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
-	verify_key_type( key_->type(), position_ );
+	verify_key_type( key_->get_class(), position_ );
 	_data.insert( make_pair( key_, value_ ) );
-	_keyType = key_->type();
+	_keyType = key_->get_class();
 	return;
 	M_EPILOG
 }

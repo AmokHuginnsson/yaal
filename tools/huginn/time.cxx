@@ -60,9 +60,8 @@ HHuginn::value_t HTime::to_string( huginn::HThread* thread_, HHuginn::value_t* o
 HHuginn::class_t HTime::get_class( HHuginn* huginn_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
-		make_pointer<HHuginn::HClass>(
-			huginn_,
-			HHuginn::HType::register_type( "Time", huginn_ ),
+		huginn_->create_class(
+			"Time",
 			nullptr,
 			HHuginn::field_names_t{
 				"to_string"

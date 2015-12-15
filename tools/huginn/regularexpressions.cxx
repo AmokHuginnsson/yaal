@@ -80,10 +80,9 @@ protected:
 
 HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HHuginn* huginn_ ) {
 	M_PROLOG
-	HHuginn::type_t t( HHuginn::HType::register_type( "RegularExpressions", huginn_ ) );
 	HHuginn::class_t c(
 		huginn_->create_class(
-			t,
+			"RegularExpressions",
 			nullptr,
 			HHuginn::field_names_t{
 				"compile"
