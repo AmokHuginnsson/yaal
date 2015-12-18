@@ -55,7 +55,9 @@ void HWhile::do_execute( huginn::HThread* thread_ ) const {
 		_condition->execute( thread_ );
 		if ( f->can_continue() ) {
 			HHuginn::value_t v( f->result() );
-			M_ASSERT( v->type_id() == HHuginn::TYPE::BOOLEAN ); /* *FIXME* *TODO* */
+			if ( v->type_id() != HHuginn::TYPE::BOOLEAN ) {
+				throw HHuginn::HHuginnRuntimeException( "`While' argument is not a boolean.", _condition->position() );
+			}
 			if ( static_cast<HHuginn::HBoolean*>( v.raw() )->value() ) {
 				_loop->execute( thread_ );
 				f->continue_execution();
