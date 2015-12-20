@@ -820,6 +820,16 @@ namespace huginn {
 
 extern HHuginn::HClass const _noneClass_;
 
+inline HHuginn::type_id_t type_id( HHuginn::TYPE type_ ) {
+	return ( HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ) );
+}
+yaal::hcore::HString const& type_name( HHuginn::TYPE );
+inline yaal::hcore::HString const& type_name( HHuginn::type_id_t type_ ) {
+	return ( type_name( static_cast<HHuginn::TYPE>( type_.get() ) ) );
+}
+
+}
+
 inline bool operator == ( HHuginn::TYPE t1_, HHuginn::type_id_t t2_ ) {
 	return ( static_cast<HHuginn::type_id_t::value_type>( t1_ ) == t2_.get() );
 }
@@ -831,16 +841,6 @@ inline bool operator != ( HHuginn::TYPE t1_, HHuginn::type_id_t t2_ ) {
 }
 inline bool operator != ( HHuginn::type_id_t t1_, HHuginn::TYPE t2_ ) {
 	return ( static_cast<HHuginn::type_id_t::value_type>( t2_ ) != t1_.get() );
-}
-
-inline HHuginn::type_id_t type_id( HHuginn::TYPE type_ ) {
-	return ( HHuginn::type_id_t( static_cast<HHuginn::type_id_t::value_type>( type_ ) ) );
-}
-yaal::hcore::HString const& type_name( HHuginn::TYPE );
-inline yaal::hcore::HString const& type_name( HHuginn::type_id_t type_ ) {
-	return ( type_name( static_cast<HHuginn::TYPE>( type_.get() ) ) );
-}
-
 }
 
 }
