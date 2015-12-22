@@ -191,7 +191,7 @@ HHuginn::value_t HQueryResult::fetch_row( tools::huginn::HThread* thread_, HHugi
 	char const name[] = "QueryResult.fetch_row";
 	verify_arg_count( name, values_, 0, 0, position_ );
 	HQueryResult* qr( static_cast<HQueryResult*>( object_->raw() ) );
-	HQueryResultClass const* qrc( static_cast<HQueryResultClass const*>( qr->HObject::get_class() ) );
+	HQueryResultClass const* qrc( static_cast<HQueryResultClass const*>( qr->HValue::get_class() ) );
 	HHuginn::value_t v( thread_->huginn().none_value() );
 	try {
 		v = huginn::fetch_row( qr->_recordSet, qr->_it, thread_->huginn() );

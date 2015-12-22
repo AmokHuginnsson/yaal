@@ -82,22 +82,6 @@ HHuginn::HClass::HClass(
 	M_EPILOG
 }
 
-HHuginn::HClass const* HHuginn::HClass::super( void ) const {
-	return ( _super );
-}
-
-yaal::hcore::HString const& HHuginn::HClass::name( void ) const {
-	return ( _name );
-}
-
-HHuginn::type_id_t HHuginn::HClass::type_id( void ) const {
-	return ( _typeId );
-}
-
-HHuginn::field_names_t const& HHuginn::HClass::field_names( void ) const {
-	return ( _fieldNames );
-}
-
 int HHuginn::HClass::field_index( yaal::hcore::HString const& name_ ) const {
 	M_PROLOG
 	field_indexes_t::const_iterator it( _fieldIndexes.find( name_ ) );
@@ -110,10 +94,6 @@ HHuginn::function_t const& HHuginn::HClass::function( int index_ ) const {
 	M_ASSERT( dynamic_cast<HMethod const*>( _fieldDefinitions[index_].raw() ) != nullptr );
 	return ( static_cast<HMethod const*>( _fieldDefinitions[index_].raw() )->function() );
 	M_EPILOG
-}
-
-HHuginn* HHuginn::HClass::huginn( void ) const {
-	return ( _huginn );
 }
 
 HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, value_t*, values_t const& values_, int position_ ) const {

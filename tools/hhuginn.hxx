@@ -354,7 +354,12 @@ public:
 		return ( _class );
 	}
 	value_t clone( HHuginn* ) const;
+	int field_index( yaal::hcore::HString const& ) const;
+	value_t field( HHuginn::value_t const& subject_, int index_ ) const {
+		return ( do_field( subject_, index_ ) );
+	}
 private:
+	virtual value_t do_field( HHuginn::value_t const&, int ) const;
 	virtual value_t do_clone( HHuginn* ) const;
 	HValue( HValue const& ) = delete;
 	HValue& operator = ( HValue const& ) = delete;
@@ -377,17 +382,33 @@ private:
 public:
 	HClass( HHuginn*, type_id_t, yaal::hcore::HString const&, HClass const*, field_names_t const&, values_t const& );
 	HClass( HHuginn::TYPE );
-	HClass const* super( void ) const;
 	virtual ~HClass( void ) {
 	}
-	yaal::hcore::HString const& name( void ) const;
-	type_id_t type_id( void ) const;
-	field_names_t const& field_names( void ) const;
+	HClass const* super( void ) const {
+		return ( _super );
+	}
+	yaal::hcore::HString const& name( void ) const {
+		return ( _name );
+	}
+	type_id_t type_id( void ) const {
+		return ( _typeId );
+	}
+	field_names_t const& field_names( void ) const {
+		return ( _fieldNames );
+	}
 	int field_index( yaal::hcore::HString const& ) const;
+	value_t const& field( int index_ ) const {
+		return ( _fieldDefinitions[index_] );
+	}
 	values_t get_defaults( void ) const;
 	function_t const& function( int ) const;
 	bool is_kind_of( yaal::hcore::HString const& ) const;
-	HHuginn* huginn( void ) const;
+	bool is_complex( void ) const {
+		return ( ! _fieldDefinitions.is_empty() );
+	}
+	HHuginn* huginn( void ) const {
+		return ( _huginn );
+	}
 	value_t create_instance( huginn::HThread*, value_t*, values_t const&, int ) const;
 private:
 	virtual value_t do_create_instance( huginn::HThread*, values_t const&, int ) const;
@@ -434,16 +455,15 @@ public:
 	HObject( HClass const* );
 	HObject( HClass const*, fields_t const& );
 	virtual ~HObject( void );
-	int field_index( yaal::hcore::HString const& ) const;
-	value_t& field_ref( int );
-	value_t field( HHuginn::value_t const&, int ) const;
 	bool is_kind_of( yaal::hcore::HString const& ) const;
+	value_t& field_ref( int );
 	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, HHuginn::values_t const&, int ) const;
 private:
 	HObject( HObject const& ) = delete;
 	HObject& operator = ( HObject const& ) = delete;
 private:
 	virtual value_t do_clone( HHuginn* ) const override;
+	virtual value_t do_field( HHuginn::value_t const&, int ) const override;
 };
 
 /*! \brief Type hierarchy aware object reference.
@@ -496,7 +516,7 @@ private:
 	virtual value_t do_clone( HHuginn* ) const override M_DEBUG_CODE( __attribute__((__noreturn__)) );
 };
 
-class HHuginn::HIterable : public HHuginn::HObject {
+class HHuginn::HIterable : public HHuginn::HValue {
 public:
 	typedef HHuginn::HIterable this_type;
 	typedef HHuginn::HValue base_type;
@@ -509,7 +529,7 @@ protected:
 	virtual int long do_size( void ) const = 0;
 };
 
-class HHuginn::HBoolean : public HHuginn::HObject {
+class HHuginn::HBoolean : public HHuginn::HValue {
 public:
 	typedef HHuginn::HBoolean this_type;
 	typedef HHuginn::HValue base_type;
@@ -524,7 +544,7 @@ private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
 
-class HHuginn::HInteger : public HHuginn::HObject {
+class HHuginn::HInteger : public HHuginn::HValue {
 public:
 	typedef HHuginn::HInteger this_type;
 	typedef HHuginn::HValue base_type;
@@ -543,7 +563,7 @@ private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
 
-class HHuginn::HReal : public HHuginn::HObject {
+class HHuginn::HReal : public HHuginn::HValue {
 public:
 	typedef HHuginn::HReal this_type;
 	typedef HHuginn::HValue base_type;
@@ -584,7 +604,7 @@ private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
 
-class HHuginn::HCharacter : public HHuginn::HObject {
+class HHuginn::HCharacter : public HHuginn::HValue {
 public:
 	typedef HHuginn::HCharacter this_type;
 	typedef HHuginn::HValue base_type;
@@ -602,7 +622,7 @@ private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
 
-class HHuginn::HNumber : public HHuginn::HObject {
+class HHuginn::HNumber : public HHuginn::HValue {
 public:
 	typedef HHuginn::HNumber this_type;
 	typedef HHuginn::HValue base_type;
@@ -800,10 +820,10 @@ private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
 
-class HHuginn::HException : public HHuginn::HObject {
+class HHuginn::HException : public HHuginn::HValue {
 public:
 	typedef HHuginn::HException this_type;
-	typedef HHuginn::HObject base_type;
+	typedef HHuginn::HValue base_type;
 private:
 	yaal::hcore::HString _message;
 	yaal::hcore::HString _where;

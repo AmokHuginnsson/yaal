@@ -66,7 +66,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 }
 
 HHuginn::HInteger::HInteger( HHuginn::HClass const* class_, HHuginn::HInteger::value_type value_ )
-	: HObject( class_ )
+	: HValue( class_ )
 	, _value( value_ ) {
 	return;
 }

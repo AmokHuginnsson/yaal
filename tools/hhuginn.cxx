@@ -702,6 +702,24 @@ HHuginn::type_id_t HHuginn::HValue::type_id( void ) const {
 	return ( _class->type_id() );
 }
 
+int HHuginn::HValue::field_index( yaal::hcore::HString const& name_ ) const {
+	M_PROLOG
+	return ( _class->field_index( name_ ) );
+	M_EPILOG
+}
+
+HHuginn::value_t HHuginn::HValue::do_field( HHuginn::value_t const& object_, int index_ ) const {
+	M_PROLOG
+	value_t const& f( _class->field( index_ ) );
+	M_ASSERT( f->type_id() == TYPE::METHOD );
+	return (
+		pointer_static_cast<HHuginn::HValue>(
+			make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod const*>( f.raw() ), object_ )
+		)
+	);
+	M_EPILOG
+}
+
 HHuginn::value_t HHuginn::HValue::clone( HHuginn* huginn_ ) const {
 	return ( do_clone( huginn_ ) );
 }
@@ -725,7 +743,7 @@ HHuginn::value_t HHuginn::HReference::do_clone( HHuginn* ) const {
 }
 
 HHuginn::HIterable::HIterable( HClass const* class_ )
-	: HObject( class_ ) {
+	: HValue( class_ ) {
 	return;
 }
 

@@ -66,7 +66,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 }
 
 HHuginn::HReal::HReal( HHuginn::HClass const* class_, HHuginn::HReal::value_type value_ )
-	: HObject( class_ )
+	: HValue( class_ )
 	, _value( value_ ) {
 	return;
 }

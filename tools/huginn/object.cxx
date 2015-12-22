@@ -127,19 +127,13 @@ HHuginn::HObject::~HObject( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-int HHuginn::HObject::field_index( yaal::hcore::HString const& name_ ) const {
-	M_PROLOG
-	return ( get_class()->field_index( name_ ) );
-	M_EPILOG
-}
-
 HHuginn::value_t& HHuginn::HObject::field_ref( int index_ ) {
 	M_PROLOG
 	return ( _fields[index_] );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::HObject::field( HHuginn::value_t const& object_, int index_ ) const {
+HHuginn::value_t HHuginn::HObject::do_field( HHuginn::value_t const& object_, int index_ ) const {
 	M_PROLOG
 	value_t const& f( _fields[index_] );
 	bool isMethod( f->type_id() == TYPE::METHOD );

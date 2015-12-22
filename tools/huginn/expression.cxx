@@ -128,34 +128,40 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::MEMBER_ACCESS );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
-	HHuginn::value_t v( frame_->values().top() );
+	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
-	HHuginn::HObjectReference* oref( dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) );
-	if ( o != nullptr ) {
-		int fi( o->field_index( name_ ) );
+	if ( v->get_class()->is_complex() ) {
+		int fi( v->field_index( name_ ) );
 		if ( fi < 0 ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->get_class()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
 		}
 		if ( access_ == ACCESS::VALUE ) {
-			frame_->values().push( o->field( v, fi ) );
+			frame_->values().push( v->field( v, fi ) );
 		} else if ( ! v.unique() ) {
-			frame_->values().push( make_pointer<HHuginn::HReference>( o->field_ref( fi ) ) );
+			HHuginn::HObject* o( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
+			if ( o != nullptr ) {
+				frame_->values().push( make_pointer<HHuginn::HReference>( o->field_ref( fi ) ) );
+			} else {
+				throw HHuginn::HHuginnRuntimeException( "Assignment to read-only location.", position_ );
+			}
 		} else {
 			throw HHuginn::HHuginnRuntimeException( "Assignment to temporary.", position_ );
 		}
-	} else if ( oref != nullptr ) {
-		int fi( oref->field_index( name_) );
-		if ( fi < 0 ) {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( oref->get_class()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
-		}
-		if ( access_ == ACCESS::VALUE ) {
-			frame_->values().push( oref->field( fi ) );
-		} else {
-			throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", p );
-		}
 	} else {
-		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->get_class()->name() ).append( "' is not a compound object." ), p );
+		HHuginn::HObjectReference* oref( dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) );
+		if ( oref != nullptr ) { /* Handle `super' keyword. */
+			int fi( oref->field_index( name_) );
+			if ( fi < 0 ) {
+				throw HHuginn::HHuginnRuntimeException( "`"_ys.append( oref->get_class()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
+			}
+			if ( access_ == ACCESS::VALUE ) {
+				frame_->values().push( oref->field( fi ) );
+			} else {
+				throw HHuginn::HHuginnRuntimeException( "Changing upcasted reference.", p );
+			}
+		} else {
+			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->get_class()->name() ).append( "' is not a compound object." ), p );
+		}
 	}
 	return;
 	M_EPILOG

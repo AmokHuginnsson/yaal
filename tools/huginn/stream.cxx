@@ -51,7 +51,7 @@ public:
 	HStreamIterator( HStream* stream_ )
 		: _stream( stream_ )
 		, _lineCache( _stream->read_line_impl() )
-		, _objectFactory( _stream->HObject::get_class()->huginn()->object_factory() ) {
+		, _objectFactory( _stream->HValue::get_class()->huginn()->object_factory() ) {
 		return;
 	}
 protected:

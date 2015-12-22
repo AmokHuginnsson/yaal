@@ -169,7 +169,7 @@ HHuginn::class_t create_class( HHuginn* huginn_, yaal::hcore::HString const& nam
 }
 
 HHuginn::HException::HException( HHuginn::HClass const* class_, yaal::hcore::HString const& message_ )
-	: HObject( class_ )
+	: HValue( class_ )
 	, _message( message_ )
 	, _where() {
 	return;

@@ -53,7 +53,7 @@ public:
 		HRegex::HMatchIterator const& it_
 	) : _regularExpressionMatch( regularExpressionMatch_ )
 		, _it( it_ )
-		, _objectFactory( _regularExpressionMatch->HObject::get_class()->huginn()->object_factory() ) {
+		, _objectFactory( _regularExpressionMatch->HValue::get_class()->huginn()->object_factory() ) {
 		return;
 	}
 protected:

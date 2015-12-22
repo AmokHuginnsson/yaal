@@ -67,7 +67,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 
 
 HHuginn::HNumber::HNumber( HHuginn::HClass const* class_, HHuginn::HNumber::value_type const& value_ )
-	: HObject( class_ )
+	: HValue( class_ )
 	, _value( value_ ) {
 	return;
 }
