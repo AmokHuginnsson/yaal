@@ -189,6 +189,8 @@ HHuginn::HHuginn( void )
 	, _source( make_resource<HSource>() )
 	, _compiler( make_resource<OCompiler>( this ) )
 	, _engine( make_engine(), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
+	, _identifierIds()
+	, _identifierNames()
 	, _threads()
 	, _packages()
 	, _argv( _objectFactory->create_list() )
@@ -307,6 +309,29 @@ void HHuginn::register_class( class_t class_ ) {
 	M_PROLOG
 	_classes.insert( make_pair( class_->name(), class_ ) );
 	return;
+	M_EPILOG
+}
+
+HHuginn::identifier_id_t HHuginn::register_identifier( yaal::hcore::HString const& name_ ) {
+	M_PROLOG
+	M_ASSERT( _identifierIds.get_size() == _identifierNames.get_size() );
+	identifier_id_t id;
+	identifier_ids_t::const_iterator it( _identifierIds.find( name_ ) );
+	if ( it != _identifierIds.end() ) {
+		id = it->second;
+	} else {
+		id = identifier_id_t( static_cast<identifier_id_t::value_type>( _identifierIds.get_size() ) );
+		_identifierIds.insert( make_pair( name_, id ) );
+		_identifierNames.emplace_back( name_ );
+	}
+	M_ASSERT( _identifierIds.get_size() == _identifierNames.get_size() );
+	return ( id );
+	M_EPILOG
+}
+
+yaal::hcore::HString const& HHuginn::identifier( identifier_id_t id_ ) const {
+	M_PROLOG
+	return ( _identifierNames[id_.get()] );
 	M_EPILOG
 }
 

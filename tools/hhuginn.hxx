@@ -82,7 +82,9 @@ class HHuginn {
 public:
 	typedef HHuginn this_type;
 	struct type_tag;
+	struct identifier_tag;
 	typedef yaal::hcore::HTaggedPOD<int, type_tag> type_id_t;
+	typedef yaal::hcore::HTaggedPOD<int, identifier_tag> identifier_id_t;
 	typedef yaal::hcore::HPointer<HHuginn> ptr_t;
 	class HIterable;
 	typedef yaal::hcore::HPointer<HIterable> iterable_t;
@@ -120,6 +122,8 @@ public:
 	typedef yaal::hcore::HBoundCall<HHuginn::class_t ( type_id_t )> class_constructor_t;
 	typedef yaal::hcore::HPointer<huginn::HThread> thread_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
+	typedef yaal::hcore::HHashMap<yaal::hcore::HString, identifier_id_t> identifier_ids_t;
+	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
 	enum class TYPE {
 		NONE,
 		BOOLEAN,
@@ -173,6 +177,8 @@ private:
 	source_t _source;
 	compiler_t _compiler;
 	HExecutingParser _engine;
+	identifier_ids_t _identifierIds;
+	identifier_names_t _identifierNames;
 	threads_t _threads;
 	packages_t _packages;
 	list_t _argv;
@@ -285,6 +291,8 @@ public:
 	value_t get_package( yaal::hcore::HString const& );
 	yaal::hcore::HString get_snippet( int, int ) const;
 	void register_class( class_t );
+	identifier_id_t register_identifier( yaal::hcore::HString const& );
+	yaal::hcore::HString const& identifier( identifier_id_t ) const;
 	static void disable_grammar_verification( void );
 	value_t& none_value( void ) {
 		return ( _none );
