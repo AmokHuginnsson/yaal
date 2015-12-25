@@ -43,7 +43,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	M_PROLOG
 	using namespace executing_parser;
 	namespace e_p = executing_parser;
-	hcore::HString identifier( YAAL_REGEX_WORD_START "[a-zA-Z_][a-zA-Z0-9_]*" YAAL_REGEX_WORD_END );
+	hcore::HString identifierPattern( YAAL_REGEX_WORD_START "[a-zA-Z_][a-zA-Z0-9_]*" YAAL_REGEX_WORD_END );
 	HRule expression( "expression", e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::mark_expression_position, _compiler.get(), _1 ) ) );
 	HRule absoluteValue( "absoluteValue",
 		constant( '|', e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) ) )
@@ -110,7 +110,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"parameter",
 		regex(
 			"parameterIdentifier",
-			identifier,
+			identifierPattern,
 			HRegex::action_string_position_t( hcore::call( &OCompiler::add_paramater, _compiler.get(), _1, _2 ) )
 		) >> -( constant( '=' ) >> HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::add_default_value, _compiler.get(), _1 ) ) ) )
 	);
@@ -147,7 +147,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule reference(
 		regex(
 			"reference",
-			identifier,
+			identifierPattern,
 			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_get_reference, _compiler.get(), _1, _2 ) )
 		)
 	);
@@ -155,7 +155,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"memberAccess",
 		constant( '.' )[HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) )] >> regex(
 			"member",
-			identifier,
+			identifierPattern,
 			e_p::HStringLiteral::action_string_position_t( hcore::call( &OCompiler::defer_get_field_reference, _compiler.get(), _1, _2 ) )
 		),
 		e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::MEMBER_ACCESS, _1 ) )
@@ -299,7 +299,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 				subscript[e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::make_reference, _compiler.get(), _1 ) )]
 				| regex(
 					"variableSetter",
-					identifier,
+					identifierPattern,
 					e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_make_variable, _compiler.get(), _1, _2 ) )
 				)
 			) >>
@@ -316,12 +316,12 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		constant( KEYWORD::CATCH ) >> '(' >>
 		regex(
 			"exceptionType",
-			identifier,
+			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_type_name, _compiler.get(), _1, _2 ) )
 		) >>
 		regex(
 			"exceptionVariable",
-			identifier,
+			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_identifier, _compiler.get(), _1, _2 ) )
 		) >> ')' >> scope[HRuleBase::action_position_t( hcore::call( &OCompiler::commit_catch, _compiler.get(), _1 ) )]
 	);
@@ -363,7 +363,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 	HRule forIdentifier(
 		regex(
 			"forIdentifier",
-			identifier,
+			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_identifier, _compiler.get(), _1, _2 ) )
 		)
 	);
@@ -409,7 +409,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"functionDefinition",
 		regex(
 			"functionDefinitionIdentifier",
-			identifier,
+			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_function_name, _compiler.get(), _1, _2 ) )
 		) >> '(' >> -nameList >>
 		constant( ')', HRuleBase::action_position_t( hcore::call( &OCompiler::verify_default_argument, _compiler.get(), _1 ) ) )
@@ -420,7 +420,7 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"field",
 		regex(
 			"fieldIdentifier",
-			identifier,
+			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_field_name, _compiler.get(), _1, _2 ) )
 		) >> '=' >> HRule( expression, HRuleBase::action_position_t( hcore::call( &OCompiler::add_field_definition, _compiler.get(), _1 ) ) ) >> ';'
 	);
@@ -428,12 +428,12 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"classDefinition",
 		constant( KEYWORD::CLASS ) >> regex(
 			"classIdentifier",
-			identifier,
+			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_class_name, _compiler.get(), _1, _2 ) )
 		) >> -(
 			':' >> regex(
 				"baseIdentifier",
-				identifier,
+				identifierPattern,
 				e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_base_name, _compiler.get(), _1, _2 ) )
 			)
 		) >> '{' >> +( field | functionDefinition ) >> '}',
@@ -443,11 +443,11 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		"importStatement",
 		constant( "import" ) >> regex(
 			"packageName",
-			identifier,
+			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_import_name, _compiler.get(), _1, _2 ) )
 		) >> "as" >> regex(
 			"importName",
-			identifier,
+			identifierPattern,
 			e_p::HRegex::action_string_position_t( hcore::call( &OCompiler::set_import_alias, _compiler.get(), _1, _2 ) )
 		) >> ';',
 		HRuleBase::action_position_t( hcore::call( &OCompiler::commit_import, _compiler.get(), _1 ) )

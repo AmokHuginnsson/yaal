@@ -292,7 +292,7 @@ public:
 	yaal::hcore::HString get_snippet( int, int ) const;
 	void register_class( class_t );
 	identifier_id_t register_identifier( yaal::hcore::HString const& );
-	yaal::hcore::HString const& identifier( identifier_id_t ) const;
+	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
 	static void disable_grammar_verification( void );
 	value_t& none_value( void ) {
 		return ( _none );

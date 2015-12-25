@@ -329,7 +329,7 @@ HHuginn::identifier_id_t HHuginn::register_identifier( yaal::hcore::HString cons
 	M_EPILOG
 }
 
-yaal::hcore::HString const& HHuginn::identifier( identifier_id_t id_ ) const {
+yaal::hcore::HString const& HHuginn::identifier_name( identifier_id_t id_ ) const {
 	M_PROLOG
 	return ( _identifierNames[id_.get()] );
 	M_EPILOG
