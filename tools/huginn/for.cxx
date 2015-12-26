@@ -42,11 +42,12 @@ namespace tools {
 
 namespace huginn {
 
-HFor::HFor( yaal::hcore::HString const& variableName_,
+HFor::HFor(
+	HHuginn::identifier_id_t variableName_,
 	HHuginn::expression_t const& source_,
 	HHuginn::scope_t const& loop_,
-	int position_ )
-	: HStatement()
+	int position_
+) : HStatement()
 	, _variableName( variableName_ )
 	, _source( source_ )
 	, _loop( loop_ )

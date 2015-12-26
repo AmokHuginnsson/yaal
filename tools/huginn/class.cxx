@@ -29,6 +29,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
 #include "keyword.hxx"
+#include "compiler.hxx"
 #include "helper.hxx"
 
 using namespace yaal;
@@ -42,22 +43,26 @@ namespace tools {
 HHuginn::HClass::HClass(
 	HHuginn* huginn_,
 	type_id_t typeId_,
-	yaal::hcore::HString const& name_,
+	identifier_id_t identifierId_,
 	HClass const* super_,
 	field_names_t const& fieldNames_,
 	values_t const& fieldDefinitions_
 ) : _typeId( typeId_ )
-	, _name( name_ )
+	, _identifierId( identifierId_ )
 	, _super( super_ )
-	, _fieldNames( fieldNames_ )
+	, _fieldIdentifiers()
 	, _fieldIndexes( super_ ? super_->_fieldIndexes : field_indexes_t() )
 	, _fieldDefinitions( super_ ? super_->_fieldDefinitions : values_t() )
 	, _huginn( huginn_ ) {
 	M_PROLOG
 	M_ASSERT( fieldNames_.get_size() == fieldDefinitions_.get_size() );
 	int definitionIdx( 0 );
-	for ( yaal::hcore::HString const& n : fieldNames_ ) {
-		field_indexes_t::const_iterator fi( _fieldIndexes.insert( make_pair( n, static_cast<int>( _fieldIndexes.get_size() ) ) ).first );
+	for ( field_names_t::value_type const& n : fieldNames_ ) {
+		identifier_id_t identifierId( huginn_->identifier_id( n ) );
+		_fieldIdentifiers.emplace_back( identifierId );
+		field_indexes_t::const_iterator fi(
+			_fieldIndexes.insert( make_pair( identifierId, static_cast<int>( _fieldIndexes.get_size() ) ) ).first
+		);
 		if ( fi->second >= _fieldDefinitions.get_size() ) {
 			_fieldDefinitions.resize( fi->second + 1 );
 		}
@@ -71,9 +76,9 @@ HHuginn::HClass::HClass(
 HHuginn::HClass::HClass(
 	HHuginn::TYPE typeTag_
 ) : _typeId( huginn::type_id( typeTag_ ) )
-	, _name( type_name( typeTag_ ) )
+	, _identifierId( INVALID_IDENTIFIER )
 	, _super( nullptr )
-	, _fieldNames()
+	, _fieldIdentifiers()
 	, _fieldIndexes()
 	, _fieldDefinitions()
 	, _huginn( nullptr ) {
@@ -82,10 +87,16 @@ HHuginn::HClass::HClass(
 	M_EPILOG
 }
 
-int HHuginn::HClass::field_index( yaal::hcore::HString const& name_ ) const {
+int HHuginn::HClass::field_index( identifier_id_t identifierId_ ) const {
 	M_PROLOG
-	field_indexes_t::const_iterator it( _fieldIndexes.find( name_ ) );
+	field_indexes_t::const_iterator it( _fieldIndexes.find( identifierId_ ) );
 	return ( it != _fieldIndexes.end() ? it->second : -1 );
+	M_EPILOG
+}
+
+yaal::hcore::HString const& HHuginn::HClass::name( void ) const {
+	M_PROLOG
+	return ( _huginn ? _huginn->identifier_name( _identifierId ) : type_name( _typeId ) );
 	M_EPILOG
 }
 
@@ -105,7 +116,7 @@ HHuginn::value_t HHuginn::HClass::create_instance( huginn::HThread* thread_, val
 HHuginn::value_t HHuginn::HClass::do_create_instance( huginn::HThread* thread_, values_t const& values_, int position_ ) const {
 	M_PROLOG
 	value_t v( make_pointer<HObject>( this ) );
-	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR ) );
+	int constructorIdx( field_index( KEYWORD::CONSTRUCTOR_IDENTIFIER ) );
 	if ( constructorIdx >= 0 ) {
 		function( constructorIdx )( thread_, &v, values_, position_ );
 	}
@@ -123,9 +134,9 @@ HHuginn::values_t HHuginn::HClass::get_defaults( void ) const {
 	M_EPILOG
 }
 
-bool HHuginn::HClass::is_kind_of( yaal::hcore::HString const& typeName_ ) const {
+bool HHuginn::HClass::is_kind_of( identifier_id_t identifierId_ ) const {
 	M_PROLOG
-	return ( ( typeName_ == _name ) || ( _super ? _super->is_kind_of( typeName_ ) : false ) );
+	return ( ( identifierId_ == _identifierId ) || ( _super ? _super->is_kind_of( identifierId_ ) : false ) );
 	M_EPILOG
 }
 

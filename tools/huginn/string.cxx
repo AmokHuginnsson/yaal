@@ -138,7 +138,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 		make_pointer<HHuginn::HClass>(
 			huginn_,
 			type_id( HHuginn::TYPE::STRING ),
-			type_name( HHuginn::TYPE::STRING ),
+			huginn_->identifier_id( type_name( HHuginn::TYPE::STRING ) ),
 			nullptr,
 			HHuginn::field_names_t{
 				"find",

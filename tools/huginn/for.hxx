@@ -43,12 +43,12 @@ public:
 	typedef HFor this_type;
 	typedef HStatement base_type;
 private:
-	yaal::hcore::HString _variableName;
+	HHuginn::identifier_id_t _variableName;
 	HHuginn::expression_t _source;
 	HHuginn::scope_t _loop;
 	int _position;
 public:
-	HFor( yaal::hcore::HString const&, HHuginn::expression_t const&, HHuginn::scope_t const&, int );
+	HFor( HHuginn::identifier_id_t, HHuginn::expression_t const&, HHuginn::scope_t const&, int );
 protected:
 	virtual void do_execute( HThread* ) const override;
 };

@@ -148,7 +148,7 @@ int long HStream::do_size( void ) const {
 HHuginn::class_t HStream::get_class( HHuginn* huginn_ ) {
 	M_PROLOG
 	char const name[] = "Stream";
-	HHuginn::class_t c( huginn_->get_class( name ) );
+	HHuginn::class_t c( huginn_->get_class( huginn_->identifier_id( name ) ) );
 	if ( ! c ) {
 		c = huginn_->create_class(
 			name,

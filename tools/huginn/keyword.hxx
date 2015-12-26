@@ -30,6 +30,7 @@ Copyright:
 #define YAAL_TOOLS_HUGINN_KEYWORD_HXX_INCLUDED 1
 
 #include "hcore/hhashset.hxx"
+#include "tools/hhuginn.hxx"
 
 namespace yaal {
 
@@ -61,6 +62,11 @@ extern char const* THROW;
 extern char const* TRUE;
 extern char const* TRY;
 extern char const* WHILE;
+extern HHuginn::identifier_id_t const CONSTRUCTOR_IDENTIFIER;
+extern HHuginn::identifier_id_t const DESTRUCTOR_IDENTIFIER;
+extern HHuginn::identifier_id_t const THIS_IDENTIFIER;
+extern HHuginn::identifier_id_t const SUPER_IDENTIFIER;
+extern HHuginn::identifier_id_t const ASSERT_IDENTIFIER;
 
 }
 

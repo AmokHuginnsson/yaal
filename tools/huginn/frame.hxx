@@ -44,7 +44,7 @@ class HFunction;
 class HFrame {
 public:
 	typedef HFrame this_type;
-	typedef yaal::hcore::HMap<yaal::hcore::HString, HHuginn::value_t> variables_t;
+	typedef yaal::hcore::HMap<HHuginn::identifier_id_t, HHuginn::value_t> variables_t;
 	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
 	enum class TYPE {
 		SCOPE,
@@ -74,9 +74,9 @@ private:
 	STATE _state;
 public:
 	HFrame( HThread*, HFrame*, HHuginn::value_t*, int, TYPE );
-	HHuginn::value_t make_variable( yaal::hcore::HString const&, int );
-	void set_variable( yaal::hcore::HString const&, HHuginn::value_t const&, int );
-	HHuginn::value_t get_reference( yaal::hcore::HString const&, int );
+	HHuginn::value_t make_variable( HHuginn::identifier_id_t, int );
+	void set_variable( HHuginn::identifier_id_t, HHuginn::value_t const&, int );
+	HHuginn::value_t get_reference( HHuginn::identifier_id_t, int );
 	bool can_continue( void ) const {
 		return ( _state == STATE::NORMAL );
 	}

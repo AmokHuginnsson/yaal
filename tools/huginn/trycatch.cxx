@@ -59,7 +59,7 @@ void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
 		HHuginn::HObject* e( dynamic_cast<HHuginn::HObject*>( v.raw() ) );
 		bool handled( false );
 		for ( OCatch const& c : _catches ) {
-			if ( ( e && e->is_kind_of( c._type ) ) || ( ! e && ( v->get_class()->name() == c._type ) ) ) {
+			if ( ( e && e->is_kind_of( c._type ) ) || ( ! e && ( v->get_class()->identifier_id() == c._type ) ) ) {
 				f->set_variable( c._identifier, v, c._position );
 				c._scope->execute( thread_ );
 				handled = true;

@@ -43,8 +43,8 @@ public:
 	typedef HTryCatch this_type;
 	typedef HStatement base_type;
 	struct OCatch {
-		yaal::hcore::HString _type;
-		yaal::hcore::HString _identifier;
+		HHuginn::identifier_id_t _type;
+		HHuginn::identifier_id_t _identifier;
 		HHuginn::scope_t _scope;
 		int _position;
 	};

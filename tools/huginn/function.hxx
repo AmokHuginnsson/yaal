@@ -40,15 +40,15 @@ namespace huginn {
 class HFunction {
 public:
 	typedef HFunction this_type;
-	typedef yaal::hcore::HArray<yaal::hcore::HString> parameter_names_t;
+	typedef yaal::hcore::HArray<HHuginn::identifier_id_t> parameter_names_t;
 	typedef HHuginn::expressions_t expressions_t;
 private:
-	yaal::hcore::HString _name;
+	HHuginn::identifier_id_t _name;
 	parameter_names_t _parameterNames;
 	expressions_t _defaultValues;
 	HHuginn::scope_t _scope;
 public:
-	HFunction( yaal::hcore::HString const&, parameter_names_t const&, HHuginn::scope_t const&, expressions_t const& );
+	HFunction( HHuginn::identifier_id_t, parameter_names_t const&, HHuginn::scope_t const&, expressions_t const& );
 	HFunction( HFunction&& ) = default;
 	HHuginn::value_t execute( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int ) const;
 };

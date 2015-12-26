@@ -65,7 +65,7 @@ public:
 	) : HHuginn::HClass(
 			huginn_,
 			typeId_,
-			"Query",
+			huginn_->identifier_id( "Query" ),
 			nullptr,
 			HHuginn::field_names_t{
 				"bind",

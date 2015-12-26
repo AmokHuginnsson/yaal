@@ -48,7 +48,7 @@ class HFrame;
 struct OCompiler {
 	typedef void ( HExpression::* expression_action_t ) ( HFrame*, int );
 	typedef yaal::hcore::HStack<HFunction::expressions_t> expressions_stack_t;
-	typedef yaal::hcore::HHashMap<yaal::hcore::HString, HHuginn::type_id_t> variable_types_t;
+	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, HHuginn::type_id_t> variable_types_t;
 	struct OActiveScope {
 		HHuginn::scope_t _scope;
 		HHuginn::expression_t _expression;
@@ -60,16 +60,16 @@ struct OCompiler {
 		HHuginn::scope_t _scope;
 		expressions_stack_t _expressionsStack;
 		variable_types_t _variableTypes;
-		yaal::hcore::HString _type;
-		yaal::hcore::HString _identifier;
+		HHuginn::identifier_id_t _type;
+		HHuginn::identifier_id_t _identifier;
 		int _position;
 		active_scopes_t _scopeChain;
 		HHuginn::scope_t _else;
 		HTryCatch::catches_t _catches;
 		OScopeContext( OScopeContext* );
 		HHuginn::expression_t& expression( void );
-		HHuginn::type_id_t guess_type( yaal::hcore::HString const& ) const;
-		void note_type( yaal::hcore::HString const&, HHuginn::type_id_t );
+		HHuginn::type_id_t guess_type( HHuginn::identifier_id_t ) const;
+		void note_type( HHuginn::identifier_id_t, HHuginn::type_id_t );
 		void clear( void );
 	private:
 		OScopeContext( OScopeContext const& ) = delete;
@@ -79,8 +79,8 @@ struct OCompiler {
 		typedef yaal::hcore::HResource<OScopeContext> scope_context_t;
 		typedef yaal::hcore::HStack<scope_context_t> scope_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::type_id_t> type_stack_t;
-		typedef yaal::hcore::HStack<yaal::hcore::HString> variable_stack_t;
-		yaal::hcore::HString _functionName;
+		typedef yaal::hcore::HStack<HHuginn::identifier_id_t> variable_stack_t;
+		HHuginn::identifier_id_t _functionIdentifier;
 		HFunction::parameter_names_t _parameters;
 		HFunction::expressions_t _defaultValues;
 		int _lastDefaultValuePosition;
@@ -93,18 +93,18 @@ struct OCompiler {
 		int _nestedCalls;
 		OPERATOR _lastDereferenceOperator;
 		bool _isAssert;
-		yaal::hcore::HString _lastMemberName;
+		HHuginn::identifier_id_t _lastMemberName;
 		OFunctionContext( void );
 		expressions_stack_t& expressions_stack( void );
 	};
 	typedef yaal::hcore::HResource<OFunctionContext> function_context_t;
 	typedef yaal::hcore::HStack<function_context_t> function_contexts_t;
 	struct OClassContext {
-		typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
+		typedef HHuginn::field_names_t field_names_t;
 		typedef yaal::hcore::HHashMap<int, HHuginn::expression_t> expressions_t;
 		typedef yaal::hcore::HHashMap<int, HHuginn::function_t> methods_t;
-		yaal::hcore::HString _className;
-		yaal::hcore::HString _baseName;
+		HHuginn::identifier_id_t _classIdentifier;
+		HHuginn::identifier_id_t _baseName;
 		field_names_t _fieldNames;
 		expressions_t _fieldDefinitions;
 		methods_t _methods;
@@ -113,14 +113,14 @@ struct OCompiler {
 		OClassContext( void );
 	};
 	typedef yaal::hcore::HResource<OClassContext> class_context_t;
-	typedef yaal::hcore::HHashMap<yaal::hcore::HString, class_context_t> submitted_classes_t;
-	typedef yaal::hcore::HHashMap<yaal::hcore::HString, yaal::hcore::HString> submitted_imports_t;
+	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, class_context_t> submitted_classes_t;
+	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, HHuginn::identifier_id_t> submitted_imports_t;
 	function_contexts_t _functionContexts;
 	class_context_t _classContext;
 	submitted_classes_t _submittedClasses;
 	submitted_imports_t _submittedImports;
-	yaal::hcore::HString _importName;
-	yaal::hcore::HString _importAlias;
+	HHuginn::identifier_id_t _importIdentifier;
+	HHuginn::identifier_id_t _importAlias;
 	HHuginn* _huginn;
 	OCompiler( HHuginn* );
 	OFunctionContext& f( void );
@@ -142,7 +142,7 @@ struct OCompiler {
 	void set_type_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
 	void verify_default_argument( executing_parser::position_t );
-	void track_name_cycle( yaal::hcore::HString const& );
+	void track_name_cycle( HHuginn::identifier_id_t );
 	static bool is_numeric( HHuginn::type_id_t );
 	static bool is_numeric_congruent( HHuginn::type_id_t );
 	static bool is_summable( HHuginn::type_id_t );
@@ -157,8 +157,8 @@ struct OCompiler {
 	HHuginn::scope_t& current_scope( void );
 	HHuginn::expression_t& current_expression( void );
 	OScopeContext& current_scope_context( void );
-	HHuginn::type_id_t guess_type( yaal::hcore::HString const& );
-	void note_type( yaal::hcore::HString const&, HHuginn::type_id_t );
+	HHuginn::type_id_t guess_type( HHuginn::identifier_id_t );
+	void note_type( HHuginn::identifier_id_t, HHuginn::type_id_t );
 	void reset_expression( void );
 	void pop_function_context( void );
 	void inc_loop_count( executing_parser::position_t );
@@ -217,6 +217,8 @@ private:
 	OCompiler( OCompiler const& ) = delete;
 	OCompiler& operator = ( OCompiler const& ) = delete;
 };
+
+extern HHuginn::identifier_id_t const INVALID_IDENTIFIER;
 
 }
 

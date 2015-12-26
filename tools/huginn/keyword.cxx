@@ -60,6 +60,11 @@ char const* THROW = "throw";
 char const* TRUE = "true";
 char const* TRY = "try";
 char const* WHILE = "while";
+HHuginn::identifier_id_t const CONSTRUCTOR_IDENTIFIER( 0 );
+HHuginn::identifier_id_t const DESTRUCTOR_IDENTIFIER( 1 );
+HHuginn::identifier_id_t const THIS_IDENTIFIER( 2 );
+HHuginn::identifier_id_t const SUPER_IDENTIFIER( 3 );
+HHuginn::identifier_id_t const ASSERT_IDENTIFIER( 4 );
 
 }
 

@@ -124,7 +124,10 @@ HHuginn::HObjectReference::HObjectReference( value_t const& value_, int upCastLe
 	for ( int i( 0 ); i < ( upCastLevel_ + ( upCast_ ? 1 : 0 ) ); ++ i ) {
 		HClass const* s( c->super() );
 		if ( ! s ) {
-			throw HHuginnRuntimeException( "`"_ys.append( s->name() ).append( "' does not have superclass." ), position_ );
+			throw HHuginnRuntimeException(
+				"`"_ys.append( s->name() ).append( "' does not have superclass." ),
+				position_
+			);
 		}
 		c = s;
 	}
@@ -142,10 +145,10 @@ HHuginn::HObjectReference::HObjectReference( value_t const& value_, HClass const
 	M_EPILOG
 }
 
-int HHuginn::HObjectReference::field_index( yaal::hcore::HString const& name_ ) const {
+int HHuginn::HObjectReference::field_index( identifier_id_t identifierId_ ) const {
 	M_PROLOG
 	HObject const* o( static_cast<HObject const*>( _object.raw() ) );
-	return ( _class != o->get_class() ? _class->field_index( name_ ) : o->field_index( name_ ) );
+	return ( _class != o->get_class() ? _class->field_index( identifierId_ ) : o->field_index( identifierId_ ) );
 	M_EPILOG
 }
 
@@ -180,6 +183,20 @@ void HHuginn::disable_grammar_verification( void ) {
 HHuginn::HHuginn( void )
 	: _state( STATE::EMPTY )
 	, _idGenerator( static_cast<type_id_t::value_type>( TYPE::NOT_BOOLEAN ) )
+	, _identifierIds( {
+			{ KEYWORD::CONSTRUCTOR, KEYWORD::CONSTRUCTOR_IDENTIFIER },
+			{ KEYWORD::DESTRUCTOR, KEYWORD::DESTRUCTOR_IDENTIFIER },
+			{ KEYWORD::THIS, KEYWORD::THIS_IDENTIFIER },
+			{ KEYWORD::SUPER, KEYWORD::SUPER_IDENTIFIER },
+			{ KEYWORD::ASSERT, KEYWORD::ASSERT_IDENTIFIER }
+		} )
+	, _identifierNames( {
+			KEYWORD::CONSTRUCTOR,
+			KEYWORD::DESTRUCTOR,
+			KEYWORD::THIS,
+			KEYWORD::SUPER,
+			KEYWORD::ASSERT
+		} )
 	, _objectFactory( new HObjectFactory( this ) )
 	, _none( make_pointer<HHuginn::HValue>( &_noneClass_ ) )
 	, _true( _objectFactory->create_boolean( true ) )
@@ -189,8 +206,6 @@ HHuginn::HHuginn( void )
 	, _source( make_resource<HSource>() )
 	, _compiler( make_resource<OCompiler>( this ) )
 	, _engine( make_engine(), _grammarVerified.load() ? HExecutingParser::INIT_MODE::TRUST_GRAMMAR : HExecutingParser::INIT_MODE::VERIFY_GRAMMAR )
-	, _identifierIds()
-	, _identifierNames()
 	, _threads()
 	, _packages()
 	, _argv( _objectFactory->create_list() )
@@ -247,38 +262,40 @@ void HHuginn::preprocess( void ) {
 bool HHuginn::parse( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PREPROCESSED );
-	_state = STATE::PARSED;
 	bool ok( _engine.parse( _source->begin(), _source->end() ) );
 	if ( ! ok ) {
 		_errorMessage = _engine.error_messages()[0];
 		_errorPosition = _engine.error_position();
+	} else {
+		_state = STATE::PARSED;
 	}
 	return ( ok );
 	M_EPILOG
 }
 
-HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ ) {
+HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 	M_PROLOG
+	yaal::hcore::HString const& name( identifier_name( identifierId_ ) );
 	HClass const* c( nullptr );
-	classes_t::const_iterator it( _classes.find( name_ ) );
-	OCompiler::OClassContext* cc( _compiler->_submittedClasses.at( name_ ).get() );
+	classes_t::const_iterator it( _classes.find( identifierId_ ) );
+	OCompiler::OClassContext* cc( _compiler->_submittedClasses.at( identifierId_ ).get() );
 	for ( packages_t::value_type const& p : _packages ) {
-		if ( name_ == p.second->get_class()->name() ) {
-			throw HHuginnRuntimeException( "Package of the same name `"_ys.append( name_ ).append( "' is already imported." ), cc->_position.get() );
+		if ( identifierId_ == p.second->get_class()->identifier_id() ) {
+			throw HHuginnRuntimeException( "Package of the same name `"_ys.append( name ).append( "' is already imported." ), cc->_position.get() );
 		}
 	}
-	if ( _packages.count( name_ ) > 0 ) {
-		throw HHuginnRuntimeException( "Package alias of the same name `"_ys.append( name_ ).append( "' is already defined." ), cc->_position.get() );
+	if ( _packages.count( identifierId_ ) > 0 ) {
+		throw HHuginnRuntimeException( "Package alias of the same name `"_ys.append( name ).append( "' is already defined." ), cc->_position.get() );
 	}
 	if ( it != _classes.end() ) {
 		c = it->second.get();
 	} else {
-		_compiler->track_name_cycle( name_ );
-		if ( _functions.count( name_ ) > 0 ) {
-			throw HHuginnRuntimeException( "Function of the same name `"_ys.append( name_ ).append( "' is already defined." ), cc->_position.get() );
+		_compiler->track_name_cycle( identifierId_ );
+		if ( _functions.count( identifierId_ ) > 0 ) {
+			throw HHuginnRuntimeException( "Function of the same name `"_ys.append( name ).append( "' is already defined." ), cc->_position.get() );
 		}
 		HClass const* super( nullptr );
-		if ( ! cc->_baseName.is_empty() ) {
+		if ( cc->_baseName != INVALID_IDENTIFIER ) {
 			super = commit_class( cc->_baseName );
 		}
 		values_t fieldDefinitions;
@@ -298,7 +315,7 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 				fieldDefinitions.push_back( make_pointer<HClass::HMethod>( m->second ) );
 			}
 		}
-		c = _classes.insert( make_pair( name_, make_pointer<HClass>( this, type_id_t( _idGenerator ), cc->_className, super, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
+		c = _classes.insert( make_pair( identifierId_, make_pointer<HClass>( this, type_id_t( _idGenerator ), cc->_classIdentifier, super, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
 		++ _idGenerator;
 	}
 	return ( c );
@@ -307,12 +324,13 @@ HHuginn::HClass const* HHuginn::commit_class( yaal::hcore::HString const& name_ 
 
 void HHuginn::register_class( class_t class_ ) {
 	M_PROLOG
-	_classes.insert( make_pair( class_->name(), class_ ) );
+	M_ENSURE( _state != STATE::COMPILED );
+	_classes.insert( make_pair( class_->identifier_id(), class_ ) );
 	return;
 	M_EPILOG
 }
 
-HHuginn::identifier_id_t HHuginn::register_identifier( yaal::hcore::HString const& name_ ) {
+HHuginn::identifier_id_t HHuginn::identifier_id( yaal::hcore::HString const& name_ ) {
 	M_PROLOG
 	M_ASSERT( _identifierIds.get_size() == _identifierNames.get_size() );
 	identifier_id_t id;
@@ -331,14 +349,15 @@ HHuginn::identifier_id_t HHuginn::register_identifier( yaal::hcore::HString cons
 
 yaal::hcore::HString const& HHuginn::identifier_name( identifier_id_t id_ ) const {
 	M_PROLOG
-	return ( _identifierNames[id_.get()] );
+	static yaal::hcore::HString const INVALID_IDENTIFIER_NAME = "*invalid_identifier*";
+	return ( id_ != INVALID_IDENTIFIER ? _identifierNames[id_.get()] : INVALID_IDENTIFIER_NAME );
 	M_EPILOG
 }
 
 void HHuginn::finalize_compilation( void ) {
 	M_PROLOG
 	for ( OCompiler::submitted_imports_t::value_type i : _compiler->_submittedImports ) {
-		_packages.insert( make_pair( i.second, HPackageFactoryInstance::get_instance().create_package( this, i.first ) ) );
+		_packages.insert( make_pair( i.second, HPackageFactoryInstance::get_instance().create_package( this, identifier_name( i.first ) ) ) );
 	}
 	yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 	huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
@@ -354,11 +373,11 @@ void HHuginn::finalize_compilation( void ) {
 bool HHuginn::compile( void ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PARSED );
-	_state = STATE::COMPILED;
 	bool ok( false );
 	try {
 		_engine.execute();
 		finalize_compilation();
+		_state = STATE::COMPILED;
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
 		_errorMessage = e.message();
@@ -394,7 +413,7 @@ bool HHuginn::execute( void ) {
 
 HHuginn::value_t HHuginn::call( yaal::hcore::HString const& name_, values_t const& values_, int position_ ) {
 	M_PROLOG
-	functions_t::const_iterator f( _functions.find( name_ ) );
+	functions_t::const_iterator f( _functions.find( identifier_id( name_ ) ) );
 	value_t res;
 	if ( f != _functions.end() ) {
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
@@ -426,14 +445,14 @@ HHuginn::value_t HHuginn::result( void ) const {
 	return ( _result );
 }
 
-HHuginn::function_t HHuginn::get_function( yaal::hcore::HString const& name_ ) {
+HHuginn::function_t HHuginn::get_function( identifier_id_t identifierId_ ) {
 	M_PROLOG
 	HHuginn::function_t f;
-	functions_t::const_iterator fi( _functions.find( name_ ) );
+	functions_t::const_iterator fi( _functions.find( identifierId_ ) );
 	if ( fi != _functions.end() ) {
 		f = fi->second;
 	} else {
-		classes_t::const_iterator ci( _classes.find( name_ ) );
+		classes_t::const_iterator ci( _classes.find( identifierId_ ) );
 		if ( ci != _classes.end() ) {
 			f = hcore::call( &HHuginn::HClass::create_instance, ci->second.raw(), _1, _2, _3, _4 );
 		}
@@ -442,17 +461,17 @@ HHuginn::function_t HHuginn::get_function( yaal::hcore::HString const& name_ ) {
 	M_EPILOG
 }
 
-HHuginn::class_t HHuginn::get_class( yaal::hcore::HString const& name_ ) {
+HHuginn::class_t HHuginn::get_class( identifier_id_t identifierId_ ) {
 	M_PROLOG
-	classes_t::const_iterator ci( _classes.find( name_ ) );
+	classes_t::const_iterator ci( _classes.find( identifierId_ ) );
 	return ( ci != _classes.end() ? ci->second : class_t() );
 	M_EPILOG
 }
 
-HHuginn::value_t HHuginn::get_package( yaal::hcore::HString const& name_ ) {
+HHuginn::value_t HHuginn::get_package( identifier_id_t identifierId_ ) {
 	M_PROLOG
 	HHuginn::value_t v;
-	packages_t::iterator it( _packages.find( name_ ) );
+	packages_t::iterator it( _packages.find( identifierId_ ) );
 	if ( it != _packages.end() ) {
 		v = it->second;
 	}
@@ -614,11 +633,12 @@ void HHuginn::dump_preprocessed_source( yaal::hcore::HStreamInterface& stream_ )
 
 inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterface& stream_, HHuginn::HClass const& huginnClass_ ) {
 	M_PROLOG
+	HHuginn const* huginn( huginnClass_.huginn() );
 	stream_ << huginnClass_.name();
 	if ( huginnClass_.super() ) {
 		stream_ << " : " << huginnClass_.super()->name();
 	}
-	HHuginn::field_names_t newFields( huginnClass_.field_names() );
+	HHuginn::field_identifiers_t newFields( huginnClass_.field_identifiers() );
 	typedef HStack<HHuginn::HClass const*> hierarhy_t;
 	hierarhy_t hierarhy;
 	HHuginn::HClass const* super( huginnClass_.super() );
@@ -626,38 +646,38 @@ inline yaal::hcore::HStreamInterface& operator << ( yaal::hcore::HStreamInterfac
 		hierarhy.push( super );
 		super = super->super();
 	}
-	HHuginn::field_names_t derivedFields;
+	HHuginn::field_identifiers_t derivedFields;
 	while ( ! hierarhy.is_empty() ) {
-		for ( yaal::hcore::HString const& f : hierarhy.top()->field_names() ) {
+		for ( HHuginn::identifier_id_t f : hierarhy.top()->field_identifiers() ) {
 			if ( find( derivedFields.begin(), derivedFields.end(), f ) == derivedFields.end() ) {
 				derivedFields.push_back( f );
 			}
 		}
 		hierarhy.pop();
 	}
-	HHuginn::field_names_t overridenFields;
-	for ( yaal::hcore::HString const& f : derivedFields ) {
+	HHuginn::field_identifiers_t overridenFields;
+	for ( HHuginn::identifier_id_t f : derivedFields ) {
 		if ( find( newFields.begin(), newFields.end(), f ) != newFields.end() ) {
 			overridenFields.push_back( f );
 		}
 	}
 
-	HHuginn::field_names_t::iterator endDerived( derivedFields.end() );
-	HHuginn::field_names_t::iterator endNew( newFields.end() );
-	for ( yaal::hcore::HString const& f : overridenFields ) {
+	HHuginn::field_identifiers_t::iterator endDerived( derivedFields.end() );
+	HHuginn::field_identifiers_t::iterator endNew( newFields.end() );
+	for ( HHuginn::identifier_id_t f : overridenFields ) {
 		endDerived = remove( derivedFields.begin(), endDerived, f );
 		endNew = remove( newFields.begin(), endNew, f );
 	}
 	newFields.erase( endNew, newFields.end() );
 	derivedFields.erase( endDerived, derivedFields.end() );
-	for ( yaal::hcore::HString const& f : derivedFields ) {
-		stream_ << "\n" << "  " << f << " (derived)";
+	for ( HHuginn::identifier_id_t f : derivedFields ) {
+		stream_ << "\n" << "  " << huginn->identifier_name( f ) << " (derived)";
 	}
-	for ( yaal::hcore::HString const& f : overridenFields ) {
-		stream_ << "\n" << "  " << f << " (overriden)";
+	for ( HHuginn::identifier_id_t f : overridenFields ) {
+		stream_ << "\n" << "  " << huginn->identifier_name( f ) << " (overriden)";
 	}
-	for ( yaal::hcore::HString const& f : newFields ) {
-		stream_ << "\n" << "  " << f << " (new)";
+	for ( HHuginn::identifier_id_t f : newFields ) {
+		stream_ << "\n" << "  " << huginn->identifier_name( f ) << " (new)";
 	}
 	return ( stream_ );
 	M_EPILOG
@@ -671,11 +691,12 @@ void HHuginn::dump_vm_state( yaal::hcore::HStreamInterface& stream_ ) {
 	}
 	stream_ << "functions:" << endl;
 	for ( functions_t::value_type const& f : _functions ) {
-		stream_ << f.first;
-		if ( _builtin_.count( f.first ) > 0 ) {
+		yaal::hcore::HString const& name( identifier_name( f.first ) );
+		stream_ << name;
+		if ( _builtin_.count( name ) > 0 ) {
 			stream_ <<" (builtin)";
 		}
-		if ( _standardLibrary_.count( f.first ) > 0 ) {
+		if ( _standardLibrary_.count( name ) > 0 ) {
 			stream_ <<" (standard library)";
 		}
 		stream_ << endl;
@@ -688,7 +709,7 @@ void HHuginn::create_function( executing_parser::position_t position_ ) {
 	M_PROLOG
 	if ( ! _compiler->_classContext ) {
 		OCompiler::OFunctionContext& fc( _compiler->f() );
-		_functions.insert( make_pair<hcore::HString const, function_t>( yaal::move( fc._functionName ), _compiler->create_function( position_ ) ) );
+		_functions.insert( make_pair( fc._functionIdentifier, _compiler->create_function( position_ ) ) );
 		_compiler->pop_function_context();
 	} else {
 		_compiler->add_method( position_ );
@@ -702,7 +723,7 @@ HHuginn::class_t HHuginn::create_class( yaal::hcore::HString const& name_, HClas
 		make_pointer<HHuginn::HClass>(
 			this,
 			type_id_t( _idGenerator ),
-			name_,
+			identifier_id( name_ ),
 			base_,
 			fieldNames_,
 			values_
@@ -727,9 +748,9 @@ HHuginn::type_id_t HHuginn::HValue::type_id( void ) const {
 	return ( _class->type_id() );
 }
 
-int HHuginn::HValue::field_index( yaal::hcore::HString const& name_ ) const {
+int HHuginn::HValue::field_index( identifier_id_t identifierId_ ) const {
 	M_PROLOG
-	return ( _class->field_index( name_ ) );
+	return ( _class->field_index( identifierId_ ) );
 	M_EPILOG
 }
 
@@ -816,16 +837,16 @@ HHuginn::value_t HHuginn::HTernaryEvaluator::do_clone( HHuginn* M_NDEBUG_CODE( h
 }
 
 HHuginn::HFunctionReference::HFunctionReference(
-	yaal::hcore::HString const& name_,
+	identifier_id_t identifierId_,
 	function_t const& function_
 ) : HValue( &_functionReferenceClass_ ),
-	_name( name_ ),
+	_identifierId( identifierId_ ),
 	_function( function_ ) {
 	return;
 }
 
-yaal::hcore::HString const& HHuginn::HFunctionReference::name( void ) const {
-	return ( _name );
+HHuginn::identifier_id_t HHuginn::HFunctionReference::identifier_id( void ) const {
+	return ( _identifierId );
 }
 
 HHuginn::function_t const& HHuginn::HFunctionReference::function( void ) const {
@@ -833,7 +854,7 @@ HHuginn::function_t const& HHuginn::HFunctionReference::function( void ) const {
 }
 
 HHuginn::value_t HHuginn::HFunctionReference::do_clone( HHuginn* ) const {
-	return ( make_pointer<HFunctionReference>( _name, _function ) );
+	return ( make_pointer<HFunctionReference>( _identifierId, _function ) );
 }
 
 HHuginn::HClass::HMethod::HMethod(
@@ -1061,24 +1082,30 @@ inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHu
 
 void HHuginn::register_builtins( void ) {
 	M_PROLOG
-	_functions.insert( make_pair<yaal::hcore::HString const>( "integer", hcore::call( &huginn_builtin::convert, TYPE::INTEGER, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "real", hcore::call( &huginn_builtin::convert, TYPE::REAL, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "string", hcore::call( &huginn_builtin::convert, TYPE::STRING, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "number", hcore::call( &huginn_builtin::convert, TYPE::NUMBER, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "boolean", hcore::call( &huginn_builtin::convert, TYPE::BOOLEAN, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "character", hcore::call( &huginn_builtin::convert, TYPE::CHARACTER, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "size", hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "type", hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "copy", hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "list", hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "deque", hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "dict", hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "order", hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "lookup", hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "set", hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair<yaal::hcore::HString const>( "assert", hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ) ) );
+	M_ENSURE( _state != STATE::COMPILED );
+	M_ENSURE( identifier_id( KEYWORD::CONSTRUCTOR ) == KEYWORD::CONSTRUCTOR_IDENTIFIER );
+	M_ENSURE( identifier_id( KEYWORD::DESTRUCTOR ) == KEYWORD::DESTRUCTOR_IDENTIFIER );
+	M_ENSURE( identifier_id( KEYWORD::THIS ) == KEYWORD::THIS_IDENTIFIER );
+	M_ENSURE( identifier_id( KEYWORD::SUPER ) == KEYWORD::SUPER_IDENTIFIER );
+	M_ENSURE( identifier_id( KEYWORD::ASSERT ) == KEYWORD::ASSERT_IDENTIFIER );
+	_functions.insert( make_pair( identifier_id( "integer" ), hcore::call( &huginn_builtin::convert, TYPE::INTEGER, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "real" ), hcore::call( &huginn_builtin::convert, TYPE::REAL, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "string" ), hcore::call( &huginn_builtin::convert, TYPE::STRING, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "number" ), hcore::call( &huginn_builtin::convert, TYPE::NUMBER, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "boolean" ), hcore::call( &huginn_builtin::convert, TYPE::BOOLEAN, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "character" ), hcore::call( &huginn_builtin::convert, TYPE::CHARACTER, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "size" ), hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "type" ), hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "copy" ), hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "list" ), hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "deque" ), hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "dict" ), hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "order" ), hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "lookup" ), hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "set" ), hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "print" ), hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "input" ), hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) ) );
+	_functions.insert( make_pair( identifier_id( "assert" ), hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ) ) );
 	return;
 	M_EPILOG
 }

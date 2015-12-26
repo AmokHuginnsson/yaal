@@ -127,7 +127,7 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HHuginn* huginn_ ) {
 	M_PROLOG
 	HHuginn::class_t c(
 		huginn_->create_class(
-			 "FileSystem",
+			"FileSystem",
 			nullptr,
 			HHuginn::field_names_t{
 				"open",

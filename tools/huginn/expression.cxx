@@ -115,15 +115,15 @@ void HExpression::close_parenthesis( HFrame* frame_, int position_ ) {
 	M_EPILOG
 }
 
-void HExpression::get_reference( yaal::hcore::HString const& name_, HFrame* frame_, int position_ ) {
+void HExpression::get_reference( HHuginn::identifier_id_t identifierId_, HFrame* frame_, int position_ ) {
 	M_PROLOG
-	HHuginn::value_t v( frame_->get_reference( name_, position_ ) );
+	HHuginn::value_t v( frame_->get_reference( identifierId_, position_ ) );
 	frame_->values().push( v );
 	return;
 	M_EPILOG
 }
 
-void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, huginn::HFrame* frame_, int position_ ) {
+void HExpression::get_field( ACCESS access_, HHuginn::identifier_id_t identifierId_, huginn::HFrame* frame_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::MEMBER_ACCESS );
 	int p( frame_->operations().top()._position );
@@ -131,9 +131,12 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
 	if ( v->get_class()->is_complex() ) {
-		int fi( v->field_index( name_ ) );
+		int fi( v->field_index( identifierId_ ) );
 		if ( fi < 0 ) {
-			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( v->get_class()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
+			throw HHuginn::HHuginnRuntimeException(
+				"`"_ys.append( v->get_class()->name() ).append( "' does not have `" ).append( frame_->thread()->huginn().identifier_name( identifierId_ ) ).append( "' member." ),
+				p
+			);
 		}
 		if ( access_ == ACCESS::VALUE ) {
 			frame_->values().push( v->field( v, fi ) );
@@ -150,9 +153,12 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 	} else {
 		HHuginn::HObjectReference* oref( dynamic_cast<HHuginn::HObjectReference*>( v.raw() ) );
 		if ( oref != nullptr ) { /* Handle `super' keyword. */
-			int fi( oref->field_index( name_) );
+			int fi( oref->field_index( identifierId_ ) );
 			if ( fi < 0 ) {
-				throw HHuginn::HHuginnRuntimeException( "`"_ys.append( oref->get_class()->name() ).append( "' does not have `" ).append( name_ ).append( "' member." ), p );
+				throw HHuginn::HHuginnRuntimeException(
+					"`"_ys.append( oref->get_class()->name() ).append( "' does not have `" ).append( frame_->thread()->huginn().identifier_name( identifierId_ ) ).append( "' member." ),
+					p
+				);
 			}
 			if ( access_ == ACCESS::VALUE ) {
 				frame_->values().push( oref->field( fi ) );
@@ -167,9 +173,9 @@ void HExpression::get_field( ACCESS access_, yaal::hcore::HString const& name_, 
 	M_EPILOG
 }
 
-void HExpression::make_variable( yaal::hcore::HString const& name_, HFrame* frame_, int position_ ) {
+void HExpression::make_variable( HHuginn::identifier_id_t identifierId_, HFrame* frame_, int position_ ) {
 	M_PROLOG
-	frame_->values().push( frame_->make_variable( name_, position_ ) );
+	frame_->values().push( frame_->make_variable( identifierId_, position_ ) );
 	return;
 	M_EPILOG
 }

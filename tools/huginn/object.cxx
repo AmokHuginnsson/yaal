@@ -96,7 +96,7 @@ HHuginn::HObject::~HObject( void ) {
 		hobject_destructor_helper::buffer_t buffer;
 		hobject_destructor_helper::allocator<hobject_destructor_helper::holder_t> allocator( buffer.mem() );
 		HHuginn::value_t nonOwning( this, &hobject_destructor_helper::deleter, allocator );
-		int destructorIdx( clss->field_index( KEYWORD::DESTRUCTOR ) );
+		int destructorIdx( clss->field_index( KEYWORD::DESTRUCTOR_IDENTIFIER ) );
 		HClass const* c( clss->super() );
 		if ( destructorIdx >= 0 ) {
 			try {
@@ -110,7 +110,7 @@ HHuginn::HObject::~HObject( void ) {
 			}
 		}
 		while ( c ) {
-			destructorIdx = c->field_index( KEYWORD::DESTRUCTOR );
+			destructorIdx = c->field_index( KEYWORD::DESTRUCTOR_IDENTIFIER );
 			if ( destructorIdx >= 0 ) {
 				try {
 					c->function( destructorIdx )( t, &nonOwning, values_t{}, 0 );
@@ -145,7 +145,7 @@ HHuginn::value_t HHuginn::HObject::do_field( HHuginn::value_t const& object_, in
 	M_EPILOG
 }
 
-bool HHuginn::HObject::is_kind_of( yaal::hcore::HString const& typeName_ ) const {
+bool HHuginn::HObject::is_kind_of( HHuginn::identifier_id_t typeName_ ) const {
 	M_PROLOG
 	return ( get_class()->is_kind_of( typeName_ ) );
 	M_EPILOG
@@ -161,7 +161,7 @@ HHuginn::value_t HHuginn::HObject::call_method(
 	M_PROLOG
 	M_ASSERT( object_.raw() == this );
 	HHuginn::value_t res;
-	int idx( field_index( methodName_ ) );
+	int idx( field_index( thread_->huginn().identifier_id( methodName_ ) ) );
 	if ( idx >= 0 ) {
 		HHuginn::value_t const& f( field( object_, idx ) );
 		if ( f->type_id() == HHuginn::TYPE::METHOD ) {

@@ -82,7 +82,7 @@ public:
 	) : HHuginn::HClass(
 			huginn_,
 			typeId_,
-			"CompiledRegularExpression",
+			huginn_->identifier_id( "CompiledRegularExpression" ),
 			nullptr,
 			HHuginn::field_names_t{
 				"match",

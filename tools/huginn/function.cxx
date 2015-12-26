@@ -42,11 +42,12 @@ namespace tools {
 
 namespace huginn {
 
-HFunction::HFunction( yaal::hcore::HString const& name_,
+HFunction::HFunction(
+	HHuginn::identifier_id_t name_,
 	parameter_names_t const& parameterNames_,
 	HHuginn::scope_t const& scope_,
-	expressions_t const& defaultValues_ )
-	: _name( name_ ),
+	expressions_t const& defaultValues_
+) : _name( name_ ),
 	_parameterNames( parameterNames_ ),
 	_defaultValues( defaultValues_ ),
 	_scope( scope_ ) {
@@ -57,7 +58,7 @@ HFunction::HFunction( yaal::hcore::HString const& name_,
 HHuginn::value_t HFunction::execute( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) const {
 	M_PROLOG
 	verify_arg_count(
-		_name,
+		thread_->huginn().identifier_name( _name ),
 		values_,
 		static_cast<int>( _parameterNames.get_size() - _defaultValues.get_size() ),
 		static_cast<int>( _parameterNames.get_size() ),

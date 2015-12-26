@@ -115,7 +115,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 		make_pointer<HHuginn::HClass>(
 			huginn_,
 			type_id( HHuginn::TYPE::DICT ),
-			type_name( HHuginn::TYPE::DICT ),
+			huginn_->identifier_id( type_name( HHuginn::TYPE::DICT ) ),
 			nullptr,
 			HHuginn::field_names_t{
 				"has_key",

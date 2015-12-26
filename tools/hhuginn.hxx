@@ -43,6 +43,17 @@ Copyright:
 
 namespace yaal {
 
+namespace hcore {
+
+template<typename key_t, typename TAG>
+struct hash<hcore::HTaggedPOD<key_t, TAG>> {
+	int long operator () ( HTaggedPOD<key_t, TAG> const& key_ ) const {
+		return ( hash<key_t>()( key_.get() ) );
+	}
+};
+
+}
+
 namespace tools {
 
 namespace huginn {
@@ -116,6 +127,7 @@ public:
 	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
 	class HErrorCoordinate;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
+	typedef yaal::hcore::HArray<identifier_id_t> field_identifiers_t;
 	typedef yaal::hcore::HArray<value_t> values_t;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
 	typedef yaal::hcore::HBoundCall<value_t ( huginn::HThread*, value_t*, values_t const&, int )> function_t;
@@ -150,9 +162,9 @@ public:
 	typedef yaal::hcore::HResource<huginn::OCompiler> compiler_t;
 private:
 	typedef yaal::hcore::HResource<huginn::HObjectFactory> object_factory_t;
-	typedef yaal::hcore::HMap<yaal::hcore::HString, class_t> classes_t;
-	typedef yaal::hcore::HMap<yaal::hcore::HString, value_t> packages_t;
-	typedef yaal::hcore::HMap<yaal::hcore::HString, function_t> functions_t;
+	typedef yaal::hcore::HMap<identifier_id_t, class_t> classes_t;
+	typedef yaal::hcore::HMap<identifier_id_t, value_t> packages_t;
+	typedef yaal::hcore::HMap<identifier_id_t, function_t> functions_t;
 	enum class STATE {
 		EMPTY,
 		LOADED,
@@ -162,6 +174,8 @@ private:
 	};
 	STATE _state;
 	type_id_t::value_type _idGenerator;
+	identifier_ids_t _identifierIds;
+	identifier_names_t _identifierNames;
 	/*
 	 * Built-in types can by used as field definitions in user classes.
 	 * User class needs to be able to use built-in types in its destructor.
@@ -177,8 +191,6 @@ private:
 	source_t _source;
 	compiler_t _compiler;
 	HExecutingParser _engine;
-	identifier_ids_t _identifierIds;
-	identifier_names_t _identifierNames;
 	threads_t _threads;
 	packages_t _packages;
 	list_t _argv;
@@ -286,12 +298,12 @@ public:
 	yaal::hcore::HStreamInterface& input_stream( void );
 	yaal::hcore::HStreamInterface& output_stream( void );
 	yaal::hcore::HStreamInterface& error_stream( void );
-	function_t get_function( yaal::hcore::HString const& );
-	class_t get_class( yaal::hcore::HString const& );
-	value_t get_package( yaal::hcore::HString const& );
+	function_t get_function( identifier_id_t );
+	class_t get_class( identifier_id_t );
+	value_t get_package( identifier_id_t );
 	yaal::hcore::HString get_snippet( int, int ) const;
 	void register_class( class_t );
-	identifier_id_t register_identifier( yaal::hcore::HString const& );
+	identifier_id_t identifier_id( yaal::hcore::HString const& );
 	yaal::hcore::HString const& identifier_name( identifier_id_t ) const;
 	static void disable_grammar_verification( void );
 	value_t& none_value( void ) {
@@ -308,7 +320,7 @@ public:
 	}
 private:
 	void finalize_compilation( void );
-	HClass const* commit_class( yaal::hcore::HString const& );
+	HClass const* commit_class( identifier_id_t );
 	void register_builtins( void );
 	char const* error_message( int ) const;
 	HHuginn( HHuginn const& ) = delete;
@@ -362,7 +374,7 @@ public:
 		return ( _class );
 	}
 	value_t clone( HHuginn* ) const;
-	int field_index( yaal::hcore::HString const& ) const;
+	int field_index( identifier_id_t ) const;
 	value_t field( HHuginn::value_t const& subject_, int index_ ) const {
 		return ( do_field( subject_, index_ ) );
 	}
@@ -376,41 +388,42 @@ private:
 class HHuginn::HClass {
 public:
 	typedef HHuginn::HClass this_type;
-	typedef yaal::hcore::HHashMap<yaal::hcore::HString, int> field_indexes_t;
+	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, int> field_indexes_t;
 	class HMethod;
 	class HBoundMethod;
 private:
 	type_id_t _typeId;
-	yaal::hcore::HString _name;
+	identifier_id_t _identifierId;
 	HClass const* _super;
-	field_names_t _fieldNames;
+	field_identifiers_t _fieldIdentifiers;
 	field_indexes_t _fieldIndexes;
 	values_t _fieldDefinitions;
 	HHuginn* _huginn;
 public:
-	HClass( HHuginn*, type_id_t, yaal::hcore::HString const&, HClass const*, field_names_t const&, values_t const& );
+	HClass( HHuginn*, type_id_t, identifier_id_t, HClass const*, field_names_t const&, values_t const& );
 	HClass( HHuginn::TYPE );
 	virtual ~HClass( void ) {
 	}
 	HClass const* super( void ) const {
 		return ( _super );
 	}
-	yaal::hcore::HString const& name( void ) const {
-		return ( _name );
+	identifier_id_t identifier_id( void ) const {
+		return ( _identifierId );
 	}
+	yaal::hcore::HString const& name( void ) const;
 	type_id_t type_id( void ) const {
 		return ( _typeId );
 	}
-	field_names_t const& field_names( void ) const {
-		return ( _fieldNames );
+	field_identifiers_t const& field_identifiers( void ) const {
+		return ( _fieldIdentifiers );
 	}
-	int field_index( yaal::hcore::HString const& ) const;
+	int field_index( identifier_id_t ) const;
 	value_t const& field( int index_ ) const {
 		return ( _fieldDefinitions[index_] );
 	}
 	values_t get_defaults( void ) const;
 	function_t const& function( int ) const;
-	bool is_kind_of( yaal::hcore::HString const& ) const;
+	bool is_kind_of( identifier_id_t ) const;
 	bool is_complex( void ) const {
 		return ( ! _fieldDefinitions.is_empty() );
 	}
@@ -463,7 +476,7 @@ public:
 	HObject( HClass const* );
 	HObject( HClass const*, fields_t const& );
 	virtual ~HObject( void );
-	bool is_kind_of( yaal::hcore::HString const& ) const;
+	bool is_kind_of( HHuginn::identifier_id_t ) const;
 	value_t& field_ref( int );
 	HHuginn::value_t call_method( huginn::HThread*, HHuginn::value_t const&, yaal::hcore::HString const&, HHuginn::values_t const&, int ) const;
 private:
@@ -488,7 +501,7 @@ private:
 public:
 	HObjectReference( value_t const&, int, bool, int );
 	HObjectReference( value_t const&, HClass const* );
-	int field_index( yaal::hcore::HString const& ) const;
+	int field_index( identifier_id_t ) const;
 	value_t field( int );
 private:
 	HObjectReference( HObjectReference const& ) = delete;
@@ -818,11 +831,11 @@ class HHuginn::HFunctionReference : public HHuginn::HValue {
 	typedef HHuginn::HFunctionReference this_type;
 	typedef HHuginn::HValue base_type;
 private:
-	yaal::hcore::HString _name;
+	HHuginn::identifier_id_t _identifierId;
 	HHuginn::function_t _function;
 public:
-	HFunctionReference( yaal::hcore::HString const&, HHuginn::function_t const& );
-	yaal::hcore::HString const& name( void ) const;
+	HFunctionReference( identifier_id_t, HHuginn::function_t const& );
+	identifier_id_t identifier_id( void ) const;
 	HHuginn::function_t const& function( void ) const;
 private:
 	virtual value_t do_clone( HHuginn* ) const override;

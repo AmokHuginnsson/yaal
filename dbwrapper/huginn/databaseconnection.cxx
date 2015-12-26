@@ -94,7 +94,7 @@ public:
 	) : HHuginn::HClass(
 			huginn_,
 			typeId_,
-			"DatabaseConnection",
+			huginn_->identifier_id( "DatabaseConnection" ),
 			nullptr,
 			HHuginn::field_names_t{
 				"query",

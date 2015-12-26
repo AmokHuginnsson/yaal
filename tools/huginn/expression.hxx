@@ -74,11 +74,11 @@ public:
 	void negate( huginn::HFrame*, int );
 	void function_call( huginn::HFrame*, int );
 	void make_dict( huginn::HFrame*, int );
-	void get_reference( yaal::hcore::HString const&, huginn::HFrame*, int );
-	void make_variable( yaal::hcore::HString const&, huginn::HFrame*, int );
+	void get_reference( HHuginn::identifier_id_t, huginn::HFrame*, int );
+	void make_variable( HHuginn::identifier_id_t, huginn::HFrame*, int );
 	void set_variable( huginn::HFrame*, int );
 	void subscript( ACCESS, huginn::HFrame*, int );
-	void get_field( ACCESS, yaal::hcore::HString const&, huginn::HFrame*, int );
+	void get_field( ACCESS, HHuginn::identifier_id_t, huginn::HFrame*, int );
 	void power( huginn::HFrame*, int );
 	void equals( huginn::HFrame*, int );
 	void not_equals( huginn::HFrame*, int );

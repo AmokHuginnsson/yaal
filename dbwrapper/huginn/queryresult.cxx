@@ -161,7 +161,7 @@ public:
 	) : HHuginn::HClass(
 			huginn_,
 			typeId_,
-			"QueryResult",
+			huginn_->identifier_id( "QueryResult" ),
 			nullptr,
 			HHuginn::field_names_t{
 				"column_name",

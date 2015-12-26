@@ -124,7 +124,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 		make_pointer<HHuginn::HClass>(
 			huginn_,
 			type_id( HHuginn::TYPE::DEQUE ),
-			type_name( HHuginn::TYPE::DEQUE ),
+			huginn_->identifier_id( type_name( HHuginn::TYPE::DEQUE ) ),
 			nullptr,
 			HHuginn::field_names_t{
 				"add",
