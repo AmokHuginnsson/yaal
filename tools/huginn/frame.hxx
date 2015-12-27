@@ -66,6 +66,11 @@ private:
 	HHuginn::value_t* _object;
 	int _upCast;
 	variables_t _variables;
+	/*
+	 * Operations must be kept per frame (and not in HThread)
+	 * because new frame (new scope) can be created from within an expression
+	 * by means of function call.
+	 */
 	operations_t _operations;
 	values_t _values;
 	HHuginn::value_t _result;
