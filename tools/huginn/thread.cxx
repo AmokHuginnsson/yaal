@@ -40,6 +40,8 @@ namespace huginn {
 
 HThread::HThread( HHuginn* huginn_, yaal::hcore::HThread::id_t id_ )
 	: _frames()
+	, _currentFrame( nullptr )
+	, _frameCount( 0 )
 	, _id( id_ )
 	, _huginn( huginn_ )
 	, _objectFactory( *_huginn->object_factory() )
@@ -52,62 +54,63 @@ yaal::hcore::HThread::id_t HThread::id( void ) const {
 	return ( _id );
 }
 
-HFrame* HThread::current_frame( void ) {
-	M_PROLOG
-	return ( ! _frames.is_empty() ? _frames.top().raw() : nullptr );
-	M_EPILOG
-}
-
-HFrame const* HThread::current_frame( void ) const {
-	M_PROLOG
-	return ( ! _frames.is_empty() ? _frames.top().raw() : nullptr );
-	M_EPILOG
+void HThread::add_frame( void ) {
+	if ( _frameCount == static_cast<int>( _frames.get_size() ) ) {
+		_frames.emplace_back( make_pointer<HFrame>( this, _currentFrame ) );
+	}
+	_currentFrame = _frames[_frameCount].raw();
+	++ _frameCount;
 }
 
 void HThread::create_function_frame( HHuginn::value_t* object_, int upCast_ ) {
 	M_PROLOG
-	HFrame* parent( current_frame() );
-	_frames.emplace( make_pointer<HFrame>( this, parent, object_, upCast_, HFrame::TYPE::FUNCTION ) );
+	add_frame();
+	_currentFrame->init( HFrame::TYPE::FUNCTION, object_, upCast_ );
 	return;
 	M_EPILOG
 }
 
 void HThread::create_loop_frame( void ) {
 	M_PROLOG
-	HFrame* parent( current_frame() );
-	_frames.emplace( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::LOOP ) );
+	add_frame();
+	_currentFrame->init( HFrame::TYPE::LOOP );
 	return;
 	M_EPILOG
 }
 
 void HThread::create_scope_frame( void ) {
 	M_PROLOG
-	HFrame* parent( current_frame() );
-	_frames.emplace( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::SCOPE ) );
+	add_frame();
+	_currentFrame->init( HFrame::TYPE::SCOPE );
 	return;
 	M_EPILOG
 }
 
 void HThread::create_try_catch_frame( void ) {
 	M_PROLOG
-	HFrame* parent( current_frame() );
-	_frames.emplace( make_pointer<HFrame>( this, parent, nullptr, 0, HFrame::TYPE::TRY_CATCH ) );
+	add_frame();
+	_currentFrame->init( HFrame::TYPE::TRY_CATCH );
 	return;
 	M_EPILOG
 }
 
 void HThread::pop_frame( void ) {
 	M_PROLOG
-	frame_t f( _frames.top() );
-	_frames.pop();
+	/*
+	 * Order of those lines matter and is extreamely non-trivial!
+	 *
+	 * Whan removing a frame it is possible that
+	 * non-trivial destructor of user class is invoked.
+	 * This destructor body will create another frame on top of currently
+	 * removed frame.
+	 * So we need first to reset currently removed frame (invoking non-trivial
+	 * destructors in the process) and only then we update _currentFrame marker.
+	 */
+	M_ASSERT( _currentFrame );
+	_currentFrame->reset();
+	_currentFrame = _currentFrame->parent();
+	-- _frameCount;
 	return;
-	M_EPILOG
-}
-
-bool HThread::can_continue( void ) const {
-	M_PROLOG
-	M_ASSERT( current_frame() );
-	return ( current_frame()->can_continue() );
 	M_EPILOG
 }
 

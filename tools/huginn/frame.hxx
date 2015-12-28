@@ -74,11 +74,12 @@ private:
 	operations_t _operations;
 	values_t _values;
 	HHuginn::value_t _result;
-	int const _number;
+	int _number;
 	TYPE _type;
 	STATE _state;
 public:
-	HFrame( HThread*, HFrame*, HHuginn::value_t*, int, TYPE );
+	HFrame( HThread*, HFrame* );
+	void init( TYPE, HHuginn::value_t* = nullptr, int = 0 );
 	HHuginn::value_t make_variable( HHuginn::identifier_id_t, int );
 	void set_variable( HHuginn::identifier_id_t, HHuginn::value_t const&, int );
 	HHuginn::value_t get_reference( HHuginn::identifier_id_t, int );

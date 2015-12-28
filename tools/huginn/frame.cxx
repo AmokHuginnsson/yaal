@@ -42,22 +42,34 @@ namespace huginn {
 
 HFrame::HFrame(
 	HThread* thread_,
-	HFrame* parent_,
-	HHuginn::value_t* object_,
-	int upCast_,
-	TYPE type_
+	HFrame* parent_
 ) : _thread( thread_ )
 	, _parent( parent_ )
-	, _object( object_ )
-	, _upCast( upCast_ )
+	, _object( nullptr )
+	, _upCast( 0 )
 	, _variables()
 	, _operations()
 	, _values()
-	, _result( thread_->huginn().none_value() )
-	, _number( parent_ ? ( parent_->_number + ( ( type_ == TYPE::FUNCTION ) ? 1 : 0 ) ) : 1 )
-	, _type( type_ )
+	, _result()
+	, _number( 0 )
+	, _type( TYPE::SCOPE )
 	, _state( STATE::NORMAL ) {
 	return;
+}
+
+void HFrame::init(
+	TYPE type_,
+	HHuginn::value_t* object_,
+	int upCast_
+) {
+	M_PROLOG
+	_type = type_;
+	_object = object_;
+	_upCast = upCast_;
+	_result = _thread->huginn().none_value();
+	_number = _parent ? ( _parent->_number + ( ( type_ == TYPE::FUNCTION ) ? 1 : 0 ) ) : 1;
+	return;
+	M_EPILOG
 }
 
 int HFrame::number( void ) const {
@@ -82,10 +94,8 @@ HFrame::STATE HFrame::state( void ) const {
 
 void HFrame::break_execution( STATE state_ ) {
 	_state = state_;
-	if ( _state == STATE::EXCEPTION ) {
-		_values.clear();
-		_operations.clear();
-	}
+	_values.clear();
+	_operations.clear();
 	return;
 }
 
@@ -105,8 +115,11 @@ void HFrame::set_result( HHuginn::value_t const& result_ ) {
 
 void HFrame::reset( void ) {
 	M_PROLOG
-	_operations.clear();
-	_values.clear();
+	M_ASSERT( _values.is_empty() );
+	M_ASSERT( _operations.is_empty() );
+	_result.reset();
+	_variables.clear();
+	_state = STATE::NORMAL;
 	return;
 	M_EPILOG
 }

@@ -41,9 +41,11 @@ class HThread {
 public:
 	typedef HThread this_type;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
-	typedef yaal::hcore::HStack<frame_t> frames_t;
+	typedef yaal::hcore::HArray<frame_t> frames_t;
 private:
 	frames_t _frames;
+	HFrame* _currentFrame;
+	int _frameCount;
 	yaal::hcore::HThread::id_t _id;
 	HHuginn* _huginn;
 	HObjectFactory& _objectFactory;
@@ -56,11 +58,20 @@ public:
 	void create_scope_frame( void );
 	void create_try_catch_frame( void );
 	void pop_frame( void );
-	HFrame* current_frame( void );
-	HFrame const* current_frame( void ) const;
+	HFrame* current_frame( void ) {
+		return ( _currentFrame );
+	}
+	HFrame const* current_frame( void ) const {
+		return ( _currentFrame );
+	}
 	void break_execution( HFrame::STATE, HHuginn::value_t const& = HHuginn::value_t(), int = 0, int = 0 );
 	void set_exception( yaal::hcore::HString const&, int );
-	bool can_continue( void ) const;
+	bool can_continue( void ) const {
+		M_PROLOG
+		M_ASSERT( _currentFrame );
+		return ( _currentFrame->can_continue() );
+		M_EPILOG
+	}
 	yaal::hcore::HThread::id_t id( void ) const;
 	void flush_runtime_exception( void );
 	bool has_runtime_exception( void ) const;
@@ -71,6 +82,7 @@ public:
 		return ( _objectFactory );
 	}
 private:
+	void add_frame( void );
 	HThread( HThread const& ) = delete;
 	HThread& operator = ( HThread const& ) = delete;
 };
