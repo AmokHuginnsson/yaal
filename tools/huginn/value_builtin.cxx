@@ -113,11 +113,11 @@ HHuginn::value_t range(
 		}
 		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size() );
 		if ( baseType == HHuginn::TYPE::LIST ) {
-			res = pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_list() );
+			res = thread_->object_factory().create_list();
 		} else if ( baseType == HHuginn::TYPE::DEQUE ) {
-			res = pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_deque() );
+			res = thread_->object_factory().create_deque();
 		} else {
-			res = pointer_static_cast<HHuginn::HValue>( thread_->object_factory().create_string() );
+			res = thread_->object_factory().create_string();
 		}
 		HHuginn::HInteger const* integer( step_->type_id() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( step_.raw() ) : nullptr );
 		int long step( integer ? static_cast<int long>( integer->value() ) : 1 );

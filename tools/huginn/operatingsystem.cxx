@@ -63,7 +63,7 @@ public:
 		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
 		char const* val( ::getenv( get_string( values_[0] ).raw() ) );
 		HHuginn& h( thread_->huginn() );
-		return ( val ? pointer_static_cast<HHuginn::HValue>( h.object_factory()->create_string( val ) ) : h.none_value() );
+		return ( val ? h.object_factory()->create_string( val ) : h.none_value() );
 		M_EPILOG
 	}
 	static HHuginn::value_t exec( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {

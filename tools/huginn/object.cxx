@@ -137,11 +137,10 @@ HHuginn::value_t HHuginn::HObject::do_field( HHuginn::value_t const& object_, in
 	M_PROLOG
 	value_t const& f( _fields[index_] );
 	bool isMethod( f->type_id() == TYPE::METHOD );
-	return (
-		isMethod
-			? pointer_static_cast<HHuginn::HValue>( make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod const*>( f.raw() ), object_ ) )
-			: f
-	);
+	if ( isMethod ) {
+		return ( make_pointer<HClass::HBoundMethod>( *static_cast<HClass::HMethod const*>( f.raw() ), object_ ) );
+	}
+	return ( f );
 	M_EPILOG
 }
 
