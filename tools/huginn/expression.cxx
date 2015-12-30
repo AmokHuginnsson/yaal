@@ -182,9 +182,14 @@ void HExpression::make_variable( HHuginn::identifier_id_t identifierId_, HFrame*
 
 void HExpression::set_variable( HFrame* frame_, int ) {
 	M_PROLOG
-	while ( ! frame_->operations().is_empty() && ( frame_->operations().top()._operator == OPERATOR::ASSIGN ) ) {
-		int p( frame_->operations().top()._position );
-		frame_->operations().pop();
+	operations_t& operations( frame_->operations() );
+	while ( ! operations.is_empty() ) {
+		operations_t::value_type& operation( operations.top() );
+		if ( operation._operator != OPERATOR::ASSIGN ) {
+			break;
+		}
+		int p( operation._position );
+		operations.pop();
 		HHuginn::value_t value( frame_->values().top() );
 		frame_->values().pop();
 		HHuginn::value_t ref( frame_->values().top() );
