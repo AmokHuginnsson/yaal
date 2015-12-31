@@ -85,6 +85,11 @@ protected:
 public:
 	HSBBSTreeBase( void );
 	virtual ~HSBBSTreeBase( void ) {}
+	void swap( HSBBSTreeBase& other_ ) {
+		using yaal::swap;
+		swap( _size, other_._size );
+		swap( _root, other_._root );
+	}
 	int long get_size( void ) const;
 	bool is_empty( void ) const;
 	HAbstractNode* leftmost( void ) const;
@@ -112,6 +117,7 @@ public:
 	typedef key_get_t key_get_type;
 	typedef typename key_get_type::key_type key_type;
 	class HIterator;
+	typedef HIterator iterator_type;
 private:
 #ifndef __sun__
 #pragma pack( push, 1 )
@@ -125,10 +131,12 @@ private:
 #pragma GCC diagnostic error "-Weffc++"
 		key_value_type _key;
 		HNode( key_value_type const& key_ )
-			: HAbstractNode(), _key( key_ ) {
+			: HAbstractNode()
+			, _key( key_ ) {
 		}
 		HNode( key_value_type&& key_ )
-			: HAbstractNode(), _key( yaal::move( key_ ) ) {
+			: HAbstractNode()
+			, _key( yaal::move( key_ ) ) {
 		}
 		HNode( HNode const& );
 		HNode& operator = ( HNode const& );
@@ -166,8 +174,10 @@ private:
 	allocator_type _allocator;
 public:
 	HSBBSTree( compare_type const& compare_, allocator_type const& allocator_ )
-		: HSBBSTreeBase(), _compare( compare_ ), _allocator( allocator_ )
-		{}
+		: HSBBSTreeBase()
+		, _compare( compare_ )
+		, _allocator( allocator_ ) {
+	}
 	~HSBBSTree( void ) {
 		M_PROLOG
 		clear();
@@ -182,9 +192,10 @@ public:
 	}
 	void remove( HIterator const& it_ ) {
 		M_PROLOG
-		if ( ! it_._current )
+		if ( ! it_._current ) {
 			M_THROW( _errMsgHSBBSTree_[ ERROR::NIL_ITERATOR ],
 					static_cast<int>( ERROR::NIL_ITERATOR ) );
+		}
 		remove_node( it_._current );
 		HNode* node( static_cast<HNode*>( it_._current ) );
 		M_SAFE( node->~HNode() );
@@ -207,17 +218,19 @@ public:
 	}
 	void clear( void ) {
 		M_PROLOG
-		if ( _root )
+		if ( _root ) {
 			delete_node( static_cast<HNode*>( _root ) );
+		}
 		_root = NULL;
 		_size = 0;
 		M_EPILOG
 	}
-	void swap( HSBBSTree& other ) {
-		if ( &other != this ) {
+	void swap( HSBBSTree& other_ ) {
+		if ( &other_ != this ) {
 			using yaal::swap;
-			swap( _size, other._size );
-			swap( _root, other._root );
+			HSBBSTreeBase::swap( other_ );
+			swap( _compare, other_._compare );
+			swap( _allocator, other_._allocator );
 		}
 		return;
 	}
@@ -226,8 +239,9 @@ public:
 		if ( &source != this ) {
 			clear();
 			_compare = source._compare;
-			if ( source._root )
+			if ( source._root ) {
 				_root = copy_node( static_cast<HNode*>( source._root ) );
+			}
 			_size = source._size;
 		}
 		return;
@@ -261,11 +275,13 @@ private:
 	}
 	void delete_node( HNode* node_ ) {
 		M_PROLOG
-		if ( node_->_left )
+		if ( node_->_left ) {
 			delete_node( static_cast<HNode*>( node_->_left ) );
+		}
 		node_->_left = NULL;
-		if ( node_->_right )
+		if ( node_->_right ) {
 			delete_node( static_cast<HNode*>( node_->_right ) );
+		}
 		node_->_right = NULL;
 		M_SAFE( node_->~HNode() );
 		_allocator.deallocate( node_, 1 );
@@ -314,10 +330,16 @@ public:
 		M_ASSERT( _owner == iterator_._owner );
 		return ( _current != iterator_._current );
 	}
-	key_value_t& get( void ) const {
+	key_value_t& operator*( void ) const {
 		M_PROLOG
 		M_ASSERT( _current );
 		return ( static_cast<typename owner_t::HNode*>( _current )->_key );
+		M_EPILOG
+	}
+	key_value_t* operator->( void ) const {
+		M_PROLOG
+		M_ASSERT( _current );
+		return ( &static_cast<typename owner_t::HNode*>( _current )->_key );
 		M_EPILOG
 	}
 private:

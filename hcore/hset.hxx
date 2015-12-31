@@ -45,8 +45,9 @@ namespace hcore {
 template<typename type_t>
 struct set_helper {
 	typedef type_t key_type;
-	inline static key_type const& key( type_t const& key_ )
-		{	return ( key_ );	}
+	inline static key_type const& key( type_t const& key_ ) {
+		return ( key_ );
+	}
 };
 
 /*! \brief Binary tree based set.
@@ -63,17 +64,21 @@ public:
 	typedef type_t value_type;
 	typedef type_t key_type;
 	typedef compare_t compare_type;
-	typedef HSBBSTree<value_type, compare_type, set_helper<value_type>, allocator_t> engine_t;
-	typedef typename engine_t::allocator_type allocator_type;
+	typedef HSBBSTree<value_type, compare_type, set_helper<value_type>, allocator_t> engine_type;
+	typedef typename engine_type::allocator_type allocator_type;
 	typedef HSet<type_t, compare_t, allocator_t> this_type;
 	/*! \brief Iterator for HSet<> data structure.
 	 */
 	class HIterator : public iterator_interface<value_type const, iterator_category::forward> {
-		typename engine_t::HIterator _engine;
+		typename engine_type::iterator_type _engine;
 	public:
 		typedef iterator_interface<value_type const, iterator_category::forward> base_type;
 		HIterator( void ) : base_type(), _engine() {}
-		HIterator( HIterator const& it_ ) : base_type(), _engine( it_._engine ) {}
+		HIterator( HIterator const& it_ )
+			: base_type()
+			, _engine( it_._engine ) {
+			return;
+		}
 		HIterator& operator = ( HIterator const& it_ ) {
 			if ( &it_ != this )
 				_engine = it_._engine;
@@ -97,17 +102,21 @@ public:
 			-- _engine;
 			return ( it );
 		}
-		value_type const& operator * ( void ) const
-			{	return ( _engine.get() );	}
-		value_type const* operator -> ( void ) const
-			{ return ( &_engine.get() );	}
-		bool operator == ( HIterator const& it ) const
-			{ return ( _engine == it._engine ); }
-		bool operator != ( HIterator const& it ) const
-			{ return ( _engine != it._engine ); }
+		value_type const& operator * ( void ) const {
+			return ( *_engine );
+		}
+		value_type const* operator -> ( void ) const {
+			return ( &*_engine );
+		}
+		bool operator == ( HIterator const& it ) const {
+			return ( _engine == it._engine );
+		}
+		bool operator != ( HIterator const& it ) const {
+			return ( _engine != it._engine );
+		}
 	private:
 		friend class HSet<type_t, compare_type, allocator_t>;
-		explicit HIterator( typename engine_t::HIterator const& it )
+		explicit HIterator( typename engine_type::iterator_type const& it )
 			: base_type(), _engine( it ) {}
 	};
 	typedef HIterator iterator;
@@ -116,7 +125,7 @@ public:
 	typedef HReverseIterator<const_iterator> const_reverse_iterator;
 	typedef HPair<iterator, bool> insert_result;
 private:
-	engine_t _engine;
+	engine_type _engine;
 public:
 	HSet( void )
 		: _engine( compare_type(), allocator_type() ) {
@@ -179,13 +188,13 @@ public:
 		{ return ( _engine.is_empty() );	}
 	insert_result insert( value_type const& elem ) {
 		M_PROLOG
-		HPair<typename engine_t::HIterator, bool> p = _engine.insert( elem );
+		HPair<typename engine_type::iterator_type, bool> p = _engine.insert( elem );
 		return ( make_pair( HIterator( p.first ), p.second ) );
 		M_EPILOG
 	}
 	insert_result insert( value_type&& elem ) {
 		M_PROLOG
-		HPair<typename engine_t::HIterator, bool> p = _engine.insert( yaal::move( elem ) );
+		HPair<typename engine_type::iterator_type, bool> p = _engine.insert( yaal::move( elem ) );
 		return ( make_pair( HIterator( p.first ), p.second ) );
 		M_EPILOG
 	}
@@ -244,23 +253,31 @@ public:
 		{ return ( end() ); }
 	reverse_iterator rend( void ) const
 		{ return ( begin() ); }
-	void clear( void )
-		{ _engine.clear(); }
+	void clear( void ) {
+		_engine.clear();
+	}
 	void swap( HSet& other ) {
 		if ( &other != this ) {
 			using yaal::swap;
 			_engine.swap( other._engine );
 		}
 	}
-	bool operator == ( HSet const& set_ ) const
-		{ M_PROLOG return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
-	bool operator < ( HSet const& set_ ) const
-		{ M_PROLOG return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) ); M_EPILOG }
+	bool operator == ( HSet const& set_ ) const {
+		M_PROLOG
+		return ( ( &set_ == this ) || safe_equal( begin(), end(), set_.begin(), set_.end() ) );
+		M_EPILOG
+	}
+	bool operator < ( HSet const& set_ ) const {
+		M_PROLOG
+		return ( ( &set_ != this ) && lexicographical_compare( begin(), end(), set_.begin(), set_.end() ) );
+		M_EPILOG
+	}
 };
 
 template<typename value_type, typename compare_t, typename allocator_t>
-inline void swap( yaal::hcore::HSet<value_type, compare_t, allocator_t>& a, yaal::hcore::HSet<value_type, compare_t, allocator_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::hcore::HSet<value_type, compare_t, allocator_t>& a, yaal::hcore::HSet<value_type, compare_t, allocator_t>& b ) {
+	a.swap( b );
+}
 
 }
 

@@ -76,8 +76,20 @@ public:
 		typename engine_t::HIterator _engine;
 	public:
 		typedef iterator_interface<value_type const, iterator_category::forward> base_type;
-		HIterator( void ) : base_type(), _index( 0 ), _owner( NULL ), _engine() {}
-		HIterator( HIterator const& it_ ) : base_type(), _index( it_._index ), _owner( it_._owner ), _engine( it_._engine ) {}
+		HIterator( void )
+			: base_type()
+			, _index( 0 )
+			, _owner( NULL )
+			, _engine() {
+			return;
+		}
+		HIterator( HIterator const& it_ )
+			: base_type()
+			, _index( it_._index )
+			, _owner( it_._owner )
+			, _engine( it_._engine ) {
+			return;
+		}
 		HIterator& operator = ( HIterator const& it_ ) {
 			if ( &it_ != this ) {
 				_index = it_._index;
@@ -87,9 +99,9 @@ public:
 			return ( *this );
 		}
 		HIterator& operator ++ ( void ) {
-			if ( _index < ( _engine.get().second - 1 ) )
+			if ( _index < ( _engine->second - 1 ) ) {
 				++ _index;
-			else {
+			} else {
 				_index = 0;
 				++ _engine;
 			}
@@ -105,8 +117,9 @@ public:
 				-- _index;
 			} else {
 				-- _engine;
-				if ( _engine != _owner->end() )
-					_index = _engine.get().second - 1;
+				if ( _engine != _owner->end() ) {
+					_index = _engine->second - 1;
+				}
 			}
 			return ( *this );
 		}
@@ -117,11 +130,11 @@ public:
 		}
 		value_type const& operator * ( void ) const {
 			M_ASSERT( _owner );
-			return ( _engine.get().first );
+			return ( _engine->first );
 		}
 		value_type const* operator -> ( void ) const {
 			M_ASSERT( _owner );
-			return ( &_engine.get().first );
+			return ( &_engine->first );
 		}
 		bool operator == ( HIterator const& it ) const {
 			M_ASSERT( it._owner == _owner );
@@ -189,7 +202,7 @@ public:
 		M_PROLOG
 		int long sizeAcc( 0 );
 		for ( typename engine_t::HIterator it( _engine.begin() ), endIt( _engine.end() ); it != endIt; ++ it )
-			sizeAcc += it.get().second;
+			sizeAcc += it->second;
 		return ( sizeAcc );
 		M_EPILOG
 	}
@@ -202,31 +215,34 @@ public:
 	HIterator insert( value_type const& elem ) {
 		M_PROLOG
 		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair( elem, 1L ) ) );
-		if ( ! p.second )
-			++ p.first.get().second;
-		return ( HIterator( &_engine, p.first, p.first.get().second - 1 ) );
+		if ( ! p.second ) {
+			++ p.first->second;
+		}
+		return ( HIterator( &_engine, p.first, p.first->second - 1 ) );
 		M_EPILOG
 	}
 	HIterator insert( value_type&& elem ) {
 		M_PROLOG
 		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair<value_type, int long>( yaal::move( elem ), yaal::move( 1L ) ) ) );
-		if ( ! p.second )
-			++ p.first.get().second;
-		return ( HIterator( &_engine, p.first, p.first.get().second - 1 ) );
+		if ( ! p.second ) {
+			++ p.first->second;
+		}
+		return ( HIterator( &_engine, p.first, p.first->second - 1 ) );
 		M_EPILOG
 	}
 	template<typename iter_t>
 	void insert( iter_t i, iter_t endIt ) {
 		M_PROLOG
-		for ( ; i != endIt; ++ i )
+		for ( ; i != endIt; ++ i ) {
 			insert( *i );
+		}
 		return;
 		M_EPILOG
 	}
 	int long count( value_type const& elem ) const {
 		M_PROLOG
 		HIterator it( find( elem ) );
-		return ( it != end() ? it._engine.get().second : 0 );
+		return ( it != end() ? it._engine->second : 0 );
 		M_EPILOG
 	}
 	int long erase( value_type const& elem ) {
@@ -234,7 +250,7 @@ public:
 		HIterator it( find( elem ) );
 		int long erased( 0 );
 		if ( it != end() ) {
-			erased = it._engine.get().second;
+			erased = it._engine->second;
 			_engine.remove( it._engine );
 		}
 		return ( erased );

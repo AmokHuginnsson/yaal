@@ -82,7 +82,9 @@ public:
 	/*! \brief Construct empty array object.
 	 */
 	HArray( void )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		: _buf( NULL )
+		, _size( 0 )
+		, _capacity( 0 ) {
 		return;
 	}
 	/*! \brief Construct empty array object using external allocator.
@@ -90,7 +92,9 @@ public:
 	 * \param allocator_ - external allocator that should be used for all array's allocations.
 	 */
 	explicit HArray( allocator_t const& )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		: _buf( NULL )
+		, _size( 0 )
+		, _capacity( 0 ) {
 		return;
 	}
 	/*! \brief Construct array of given size.
@@ -100,7 +104,9 @@ public:
 	 * \param size_ - size for newly created array.
 	 */
 	explicit HArray( int long size_ )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		: _buf( NULL )
+		, _size( 0 )
+		, _capacity( 0 ) {
 		M_PROLOG
 		resize( size_ );
 		return;
@@ -114,7 +120,9 @@ public:
 	 * \param allocator_ - external allocator that should be used for all array's allocations.
 	 */
 	HArray( int long size_, allocator_t const& )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		: _buf( NULL )
+		, _size( 0 )
+		, _capacity( 0 ) {
 		M_PROLOG
 		resize( size_ );
 		return;
@@ -129,7 +137,9 @@ public:
 	 * \param allocator_ - external allocator that should be used for all array's allocations.
 	 */
 	HArray( int long size_, type_t const& fillWith_, allocator_t const& = allocator_t() )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		: _buf( NULL )
+		, _size( 0 )
+		, _capacity( 0 ) {
 		M_PROLOG
 		resize( size_, fillWith_ );
 		return;
@@ -144,7 +154,9 @@ public:
 	 */
 	template<typename iterator_t>
 	HArray( iterator_t first, iterator_t last, allocator_t const& = allocator_t() )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		: _buf( NULL )
+		, _size( 0 )
+		, _capacity( 0 ) {
 		M_PROLOG
 		initialize( first, last, typename trait::add_pointer<typename is_integral<iterator_t>::type>::type() );
 		return;
@@ -155,7 +167,9 @@ public:
 	 * \param constants_ - set of compile time constants to into into this array.
 	 */
 	HArray( std::initializer_list<value_type> constants_ )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		: _buf( NULL )
+		, _size( 0 )
+		, _capacity( 0 ) {
 		M_PROLOG
 		initialize( constants_.begin(), constants_.end(), static_cast<trait::false_type*>( nullptr ) );
 		return;
@@ -166,7 +180,9 @@ public:
 	 * \param arr_ - array object that this new array should be a copy of.
 	 */
 	HArray( HArray const& arr_ )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		: _buf( NULL )
+		, _size( 0 )
+		, _capacity( 0 ) {
 		M_PROLOG
 		if ( arr_._size > 0 ) {
 			reserve( arr_._size );
@@ -182,7 +198,9 @@ public:
 	 * \param arr_ - array whose whole data should be transferred to this newly created array.
 	 */
 	HArray( HArray&& arr_ )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		: _buf( NULL )
+		, _size( 0 )
+		, _capacity( 0 ) {
 		M_PROLOG
 		swap( arr_ );
 		return;
@@ -194,7 +212,9 @@ public:
 	 * \param allocator_ - external allocator that should be used for all array's allocations.
 	 */
 	HArray( HArray const& arr_, allocator_t const& )
-		: _buf( NULL ), _size( 0 ), _capacity( 0 ) {
+		: _buf( NULL )
+		, _size( 0 )
+		, _capacity( 0 ) {
 		M_PROLOG
 		if ( arr_._size > 0 ) {
 			reserve( arr_._size );
@@ -623,7 +643,11 @@ public:
 		if ( last_._index < first_._index ) {
 			M_THROW( _errMsgHArray_[ ERROR::INVALID_ITERATOR ], last_._index - first_._index );
 		}
-		for ( iterator it( move( last_, end(), first_ ) ), endIt( end() ); ( it != endIt ); ++ it ) {
+		for ( iterator it( first_ ); it != last_; ++ it ) {
+			M_SAFE( (*it).~value_type() );
+		}
+		for ( iterator it( last_ ), to( first_ ), endIt( end() ); it != endIt; ++ it, ++ to ) {
+			new ( _buf + to._index ) value_type( yaal::move( *it ) );
 			M_SAFE( (*it).~value_type() );
 		}
 		_size -= ( last_._index - first_._index );
@@ -762,11 +786,28 @@ class HArray<type_t, allocator_t>::HIterator : public iterator_interface<const_q
 public:
 	typedef type_t value_type;
 	typedef iterator_interface<const_qual_t, iterator_category::random_access> base_type;
-	HIterator( void ) : base_type(), _owner( NULL ), _index( 0 ) {}
-	HIterator( HIterator const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index ) {}
+	HIterator( void )
+		: base_type()
+		, _owner( NULL )
+		, _index( 0 ) {
+		return;
+	}
+	HIterator( HIterator const& it_ )
+		: base_type()
+		, _owner( it_._owner )
+		, _index( it_._index ) {
+		return;
+	}
 	template<typename other_const_qual_t>
-	HIterator( HIterator<other_const_qual_t> const& it_ ) : base_type(), _owner( it_._owner ), _index( it_._index ) {
-		STATIC_ASSERT(( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ));
+	HIterator( HIterator<other_const_qual_t> const& it_ )
+		: base_type()
+		, _owner( it_._owner )
+		, _index( it_._index ) {
+		static_assert(
+			( trait::same_type<const_qual_t, other_const_qual_t>::value || trait::same_type<const_qual_t, other_const_qual_t const>::value ),
+			"creating non-const instance discards qualifiers"
+		);
+		return;
 	}
 	HIterator& operator = ( HIterator const& it_ ) {
 		if ( &it_ != this ) {
