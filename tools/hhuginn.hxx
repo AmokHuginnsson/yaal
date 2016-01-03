@@ -134,7 +134,7 @@ public:
 	typedef yaal::hcore::HBoundCall<HHuginn::class_t ( type_id_t )> class_constructor_t;
 	typedef yaal::hcore::HPointer<huginn::HThread> thread_t;
 	typedef yaal::hcore::HHashMap<yaal::hcore::HThread::id_t, thread_t> threads_t;
-	typedef yaal::hcore::HHashMap<yaal::hcore::HString, identifier_id_t> identifier_ids_t;
+	typedef yaal::hcore::HLookupMap<yaal::hcore::HString, identifier_id_t> identifier_ids_t;
 	typedef yaal::hcore::HArray<yaal::hcore::HString> identifier_names_t;
 	enum class TYPE {
 		NONE,
@@ -162,9 +162,9 @@ public:
 	typedef yaal::hcore::HResource<huginn::OCompiler> compiler_t;
 private:
 	typedef yaal::hcore::HResource<huginn::HObjectFactory> object_factory_t;
-	typedef yaal::hcore::HMap<identifier_id_t, class_t> classes_t;
-	typedef yaal::hcore::HMap<identifier_id_t, value_t> packages_t;
-	typedef yaal::hcore::HMap<identifier_id_t, function_t> functions_t;
+	typedef yaal::hcore::HLookupMap<identifier_id_t, class_t> classes_t;
+	typedef yaal::hcore::HLookupMap<identifier_id_t, value_t> packages_t;
+	typedef yaal::hcore::HLookupMap<identifier_id_t, function_t> functions_t;
 	enum class STATE {
 		EMPTY,
 		LOADED,
@@ -388,7 +388,7 @@ private:
 class HHuginn::HClass {
 public:
 	typedef HHuginn::HClass this_type;
-	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, int> field_indexes_t;
+	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, int> field_indexes_t;
 	class HMethod;
 	class HBoundMethod;
 private:
