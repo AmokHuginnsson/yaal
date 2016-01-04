@@ -44,7 +44,7 @@ class HFunction;
 class HFrame {
 public:
 	typedef HFrame this_type;
-	typedef yaal::hcore::HMap<HHuginn::identifier_id_t, HHuginn::value_t> variables_t;
+	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, HHuginn::value_t> variables_t;
 	typedef yaal::hcore::HStack<HHuginn::value_t> values_t;
 	enum class TYPE {
 		SCOPE,
