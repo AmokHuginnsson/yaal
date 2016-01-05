@@ -303,7 +303,9 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 					e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_make_variable, _compiler.get(), _1, _2 ) )
 				)
 			) >>
-			constant( '=' )[e_p::HCharacter::action_character_position_t( hcore::call( &OCompiler::defer_oper, _compiler.get(), _1, _2 ) )] ^ '='
+			( constant( "=" ) | "+=" | "-=" | "*=" | "/=" | "%=" | "^=" )[
+				e_p::HString::action_string_position_t( hcore::call( &OCompiler::defer_str_oper, _compiler.get(), _1, _2 ) )
+			] ^ '='
 		) >> value,
 		HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::ASSIGN, _1 ) )
 	);

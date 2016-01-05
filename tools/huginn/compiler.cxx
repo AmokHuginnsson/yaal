@@ -808,7 +808,6 @@ void OCompiler::defer_oper( char operator_, executing_parser::position_t positio
 		case ( '^' ): o = OPERATOR::POWER;       break;
 		case ( '(' ): o = OPERATOR::PARENTHESIS; break;
 		case ( '|' ): o = OPERATOR::ABSOLUTE;    break;
-		case ( '=' ): o = OPERATOR::ASSIGN;      break;
 		case ( '!' ): o = OPERATOR::BOOLEAN_NOT; break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
@@ -824,6 +823,7 @@ void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing
 	M_PROLOG
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, OPERATOR> operator_lookup_t;
 	static operator_lookup_t const operatorLookup( {
+		{ "=",  OPERATOR::ASSIGN },
 		{ "==", OPERATOR::EQUALS },
 		{ "!=", OPERATOR::NOT_EQUALS },
 		{ "<=", OPERATOR::LESS_OR_EQUAL },
