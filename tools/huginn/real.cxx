@@ -71,10 +71,6 @@ HHuginn::HReal::HReal( HHuginn::HClass const* class_, HHuginn::HReal::value_type
 	return;
 }
 
-HHuginn::HReal::value_type HHuginn::HReal::value( void ) const {
-	return ( _value );
-}
-
 HHuginn::value_t HHuginn::HReal::do_clone( HHuginn* huginn_ ) const {
 	return ( huginn_->object_factory()->create_real( _value ) );
 }

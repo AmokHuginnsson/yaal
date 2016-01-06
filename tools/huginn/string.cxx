@@ -168,14 +168,6 @@ HHuginn::HString::HString( HHuginn::HClass const* class_, yaal::hcore::HString c
 	return;
 }
 
-yaal::hcore::HString const& HHuginn::HString::value( void ) const {
-	return ( _value );
-}
-
-yaal::hcore::HString& HHuginn::HString::value( void ) {
-	return ( _value );
-}
-
 HHuginn::value_t HHuginn::HString::do_clone( HHuginn* huginn_ ) const {
 	return ( huginn_->object_factory()->create_string( _value ) );
 }

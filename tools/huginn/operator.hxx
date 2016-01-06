@@ -47,6 +47,12 @@ enum class OPERATOR {
 	ABSOLUTE,
 	PARENTHESIS,
 	ASSIGN,
+	PLUS_ASSIGN,
+	MINUS_ASSIGN,
+	MULTIPLY_ASSIGN,
+	DIVIDE_ASSIGN,
+	MODULO_ASSIGN,
+	POWER_ASSIGN,
 	SUBSCRIPT,
 	SUBSCRIPT_ARGUMENT,
 	NEGATE,
@@ -78,6 +84,8 @@ struct OPositionedOperator {
 };
 
 typedef yaal::hcore::HStack<OPositionedOperator> operations_t;
+
+char const* op_to_str( OPERATOR );
 
 }
 

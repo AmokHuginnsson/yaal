@@ -574,7 +574,12 @@ private:
 	value_type _value;
 public:
 	HInteger( HHuginn::HClass const*, value_type );
-	value_type value( void ) const;
+	value_type value( void ) const {
+		return ( _value );
+	}
+	value_type& value( void ) {
+		return ( _value );
+	}
 	void to_character( void ) const;
 	void to_integer( void ) const;
 	void to_number( void ) const;
@@ -593,7 +598,12 @@ private:
 	value_type _value;
 public:
 	HReal( HHuginn::HClass const*, value_type );
-	value_type value( void ) const;
+	value_type value( void ) const {
+		return ( _value );
+	}
+	value_type& value( void ) {
+		return ( _value );
+	}
 	void to_integer( void ) const;
 	void to_number( void ) const;
 	void to_real( void ) const;
@@ -612,8 +622,12 @@ private:
 	value_type _value;
 public:
 	HString( HHuginn::HClass const*, value_type const& );
-	value_type const& value( void ) const;
-	value_type& value( void );
+	value_type const& value( void ) const {
+		return ( _value );
+	}
+	value_type& value( void ) {
+		return ( _value );
+	}
 	void to_integer( void ) const;
 	void to_number( void ) const;
 	void to_real( void ) const;
@@ -652,7 +666,12 @@ private:
 	value_type _value;
 public:
 	HNumber( HHuginn::HClass const*, value_type const& );
-	value_type const& value( void ) const;
+	value_type const& value( void ) const {
+		return ( _value );
+	}
+	value_type& value( void ) {
+		return ( _value );
+	}
 	void to_integer( void ) const;
 	void to_number( void ) const;
 	void to_real( void ) const;

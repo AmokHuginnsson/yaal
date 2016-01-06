@@ -306,6 +306,47 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 	return ( *s );
 }
 
+char const* op_to_str( OPERATOR o_ ) {
+	char const* str( "" );
+	switch ( o_ ) {
+		case ( OPERATOR::PLUS ):               str = "+";      break;
+		case ( OPERATOR::MINUS ):              str = "-";      break;
+		case ( OPERATOR::MULTIPLY ):           str = "*";      break;
+		case ( OPERATOR::DIVIDE ):             str = "/";      break;
+		case ( OPERATOR::MODULO ):             str = "%";      break;
+		case ( OPERATOR::POWER ):              str = "^";      break;
+		case ( OPERATOR::ABSOLUTE ):           str = "|...|";  break;
+		case ( OPERATOR::PARENTHESIS ):        str = "(...)";  break;
+		case ( OPERATOR::ASSIGN ):             str = "=";      break;
+		case ( OPERATOR::PLUS_ASSIGN ):        str = "+=";     break;
+		case ( OPERATOR::MINUS_ASSIGN ):       str = "-=";     break;
+		case ( OPERATOR::MULTIPLY_ASSIGN ):    str = "*=";     break;
+		case ( OPERATOR::DIVIDE_ASSIGN ):      str = "/=";     break;
+		case ( OPERATOR::MODULO_ASSIGN ):      str = "%=";     break;
+		case ( OPERATOR::POWER_ASSIGN ):       str = "^=";     break;
+		case ( OPERATOR::SUBSCRIPT ):          str = "[...]";  break;
+		case ( OPERATOR::SUBSCRIPT_ARGUMENT ): str = "[xxx]";  break;
+		case ( OPERATOR::NEGATE ):             str = "-x";     break;
+		case ( OPERATOR::FUNCTION_CALL ):      str = "f(,,,)"; break;
+		case ( OPERATOR::FUNCTION_ARGUMENT ):  str = "f(arg)"; break;
+		case ( OPERATOR::MEMBER_ACCESS ):      str = "o.memb"; break;
+		case ( OPERATOR::EQUALS ):             str = "==";     break;
+		case ( OPERATOR::NOT_EQUALS ):         str = "!=";     break;
+		case ( OPERATOR::LESS ):               str = "<";      break;
+		case ( OPERATOR::GREATER ):            str = ">";      break;
+		case ( OPERATOR::LESS_OR_EQUAL ):      str = "<=";     break;
+		case ( OPERATOR::GREATER_OR_EQUAL ):   str = ">=";     break;
+		case ( OPERATOR::BOOLEAN_AND ):        str = "&&";     break;
+		case ( OPERATOR::BOOLEAN_OR ):         str = "||";     break;
+		case ( OPERATOR::BOOLEAN_XOR ):        str = "^^";     break;
+		case ( OPERATOR::BOOLEAN_NOT ):        str = "!";      break;
+		case ( OPERATOR::TERNARY ):            str = "?:";     break;
+		case ( OPERATOR::MAKE_DICT ):          str = "{k:v}";  break;
+		case ( OPERATOR::NONE ): break;
+	}
+	return ( str );
+}
+
 }
 
 }

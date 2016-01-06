@@ -71,10 +71,6 @@ HHuginn::HInteger::HInteger( HHuginn::HClass const* class_, HHuginn::HInteger::v
 	return;
 }
 
-HHuginn::HInteger::value_type HHuginn::HInteger::value( void ) const {
-	return ( _value );
-}
-
 HHuginn::value_t HHuginn::HInteger::do_clone( HHuginn* huginn_ ) const {
 	return ( huginn_->object_factory()->create_integer( _value ) );
 }

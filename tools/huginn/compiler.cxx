@@ -823,16 +823,22 @@ void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing
 	M_PROLOG
 	typedef yaal::hcore::HHashMap<yaal::hcore::HString, OPERATOR> operator_lookup_t;
 	static operator_lookup_t const operatorLookup( {
-		{ "=",  OPERATOR::ASSIGN },
-		{ "==", OPERATOR::EQUALS },
-		{ "!=", OPERATOR::NOT_EQUALS },
-		{ "<=", OPERATOR::LESS_OR_EQUAL },
-		{ ">=", OPERATOR::GREATER_OR_EQUAL },
-		{ "&&", OPERATOR::BOOLEAN_AND },
-		{ "||", OPERATOR::BOOLEAN_OR },
-		{ "^^", OPERATOR::BOOLEAN_XOR },
-		{ "<",  OPERATOR::LESS },
-		{ ">",  OPERATOR::GREATER }
+		{ op_to_str( OPERATOR::ASSIGN ),           OPERATOR::ASSIGN },
+		{ op_to_str( OPERATOR::PLUS_ASSIGN ),      OPERATOR::PLUS_ASSIGN },
+		{ op_to_str( OPERATOR::MINUS_ASSIGN ),     OPERATOR::MINUS_ASSIGN },
+		{ op_to_str( OPERATOR::MULTIPLY_ASSIGN ),  OPERATOR::MULTIPLY_ASSIGN },
+		{ op_to_str( OPERATOR::DIVIDE_ASSIGN ),    OPERATOR::DIVIDE_ASSIGN },
+		{ op_to_str( OPERATOR::MODULO_ASSIGN ),    OPERATOR::MODULO_ASSIGN },
+		{ op_to_str( OPERATOR::POWER_ASSIGN ),     OPERATOR::POWER_ASSIGN },
+		{ op_to_str( OPERATOR::EQUALS ),           OPERATOR::EQUALS },
+		{ op_to_str( OPERATOR::NOT_EQUALS ),       OPERATOR::NOT_EQUALS },
+		{ op_to_str( OPERATOR::LESS_OR_EQUAL ),    OPERATOR::LESS_OR_EQUAL },
+		{ op_to_str( OPERATOR::GREATER_OR_EQUAL ), OPERATOR::GREATER_OR_EQUAL },
+		{ op_to_str( OPERATOR::BOOLEAN_AND ),      OPERATOR::BOOLEAN_AND },
+		{ op_to_str( OPERATOR::BOOLEAN_OR ),       OPERATOR::BOOLEAN_OR },
+		{ op_to_str( OPERATOR::BOOLEAN_XOR ),      OPERATOR::BOOLEAN_XOR },
+		{ op_to_str( OPERATOR::LESS ),             OPERATOR::LESS },
+		{ op_to_str( OPERATOR::GREATER ),          OPERATOR::GREATER }
 	} );
 	OPERATOR o( operatorLookup.at( operator_ ) );
 	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), o, _1, position_.get() ) );
@@ -957,7 +963,7 @@ void OCompiler::dispatch_plus( executing_parser::position_t position_ ) {
 	HHuginn::type_id_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( t1, t2 ) ) {
-		operands_type_mismatch( o == OPERATOR::PLUS ? "+" : "-", t1, t2, position_.get() );
+		operands_type_mismatch( op_to_str( o ), t1, t2, position_.get() );
 	}
 	if ( ! ( is_summable( t1 ) && is_summable( t2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -989,7 +995,7 @@ void OCompiler::dispatch_mul( executing_parser::position_t position_ ) {
 	HHuginn::type_id_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( t1, t2 ) ) {
-		operands_type_mismatch( o == OPERATOR::MULTIPLY ? "*" : ( o == OPERATOR::DIVIDE ? "/"  : "%" ), t1, t2, position_.get() );
+		operands_type_mismatch( op_to_str( o ), t1, t2, position_.get() );
 	}
 	if ( ! ( is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -1018,7 +1024,7 @@ void OCompiler::dispatch_power( executing_parser::position_t position_ ) {
 		HHuginn::type_id_t t2( fc._valueTypes.top() );
 		fc._valueTypes.pop();
 		if ( ! are_congruous( t1, t2 ) ) {
-			operands_type_mismatch( "^", t1, t2, p );
+			operands_type_mismatch( op_to_str( OPERATOR::POWER ), t1, t2, p );
 		}
 		if ( ! ( is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
 			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_EXP], p );
@@ -1036,12 +1042,12 @@ void OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
 	OPERATOR o( po._operator );
 	int p( po._position );
 	M_ASSERT( ( o == OPERATOR::LESS ) || ( o == OPERATOR::GREATER ) || ( o == OPERATOR::LESS_OR_EQUAL ) || ( o == OPERATOR::GREATER_OR_EQUAL ) );
-	char const* os( nullptr );
+	char const* os( op_to_str( o ) );
 	switch ( o ) {
-		case ( OPERATOR::LESS ):             { os = "<";  defer_action( &HExpression::less, position_ );             } break;
-		case ( OPERATOR::GREATER ):          { os = ">";  defer_action( &HExpression::greater, position_ );          } break;
-		case ( OPERATOR::LESS_OR_EQUAL ):    { os = "<="; defer_action( &HExpression::less_or_equal, position_ );    } break;
-		case ( OPERATOR::GREATER_OR_EQUAL ): { os = ">="; defer_action( &HExpression::greater_or_equal, position_ ); } break;
+		case ( OPERATOR::LESS ):             { defer_action( &HExpression::less, position_ );             } break;
+		case ( OPERATOR::GREATER ):          { defer_action( &HExpression::greater, position_ );          } break;
+		case ( OPERATOR::LESS_OR_EQUAL ):    { defer_action( &HExpression::less_or_equal, position_ );    } break;
+		case ( OPERATOR::GREATER_OR_EQUAL ): { defer_action( &HExpression::greater_or_equal, position_ ); } break;
 		default: {
 			M_ASSERT( ! "bad code path"[0] );
 		}
@@ -1121,7 +1127,7 @@ void OCompiler::dispatch_equals( executing_parser::position_t position_ ) {
 	HHuginn::type_id_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( t1, t2 ) ) {
-		operands_type_mismatch( ( o == OPERATOR::EQUALS ? "==" : "!=" ), t1, t2, p );
+		operands_type_mismatch( op_to_str( o ), t1, t2, p );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::BOOLEAN ) );
 	return;
@@ -1132,7 +1138,11 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	defer_action( &HExpression::set_variable, position_ );
-	while ( ! fc._operations.is_empty() && ( fc._operations.top()._operator == OPERATOR::ASSIGN ) ) {
+	while ( ! fc._operations.is_empty() ) {
+		OPERATOR o( fc._operations.top()._operator );
+		if ( ( o < OPERATOR::ASSIGN ) || ( o > OPERATOR::POWER_ASSIGN ) ) {
+			break;
+		}
 		M_ASSERT( fc._valueTypes.get_size() >= 2 );
 		M_ASSERT( ! fc._variables.is_empty() );
 		int p( fc._operations.top()._position );
@@ -1142,14 +1152,59 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 		HHuginn::type_id_t t2( fc._valueTypes.top() );
 		fc._valueTypes.pop();
 		HHuginn::identifier_id_t name( fc._variables.top() );
+		HHuginn::type_id_t realDestType( t2 );
+		if ( realDestType == HHuginn::TYPE::UNKNOWN ) {
+			realDestType = guess_type( name );
+		}
 		if ( name != INVALID_IDENTIFIER ) {
 			note_type( name, t1 );
+		}
+		if ( ! are_congruous( t1, realDestType ) ) {
+			operands_type_mismatch( op_to_str( o ), t1, realDestType, position_.get() );
+		}
+		switch ( o ) {
+			case ( OPERATOR::PLUS_ASSIGN ):
+			case ( OPERATOR::MINUS_ASSIGN ): {
+				if ( ! ( is_summable( t1 ) && is_summable( realDestType ) ) ) {
+					throw HHuginn::HHuginnRuntimeException(
+						HString( o == OPERATOR::PLUS_ASSIGN ? _errMsgHHuginn_[ERR_CODE::OP_NOT_SUM] : _errMsgHHuginn_[ERR_CODE::OP_NOT_SUB] )
+						.append( type_name( realDestType ) )
+						.append( ", " )
+						.append( type_name( t1 ) ),
+						p
+					);
+				}
+			} break;
+			case ( OPERATOR::MULTIPLY_ASSIGN ):
+			case ( OPERATOR::DIVIDE_ASSIGN ):
+			case ( OPERATOR::MODULO_ASSIGN ):
+			case ( OPERATOR::POWER_ASSIGN ): {
+				if ( ! ( is_numeric_congruent( t1 ) && is_numeric_congruent( realDestType ) ) ) {
+					throw HHuginn::HHuginnRuntimeException(
+						HString(
+							o == OPERATOR::MULTIPLY_ASSIGN
+								? _errMsgHHuginn_[ERR_CODE::OP_NOT_MUL]
+								: (
+									o == OPERATOR::POWER_ASSIGN ? _errMsgHHuginn_[ERR_CODE::OP_NOT_EXP] : _errMsgHHuginn_[ERR_CODE::OP_NOT_DIV]
+								)
+						)
+						.append( type_name( realDestType ) )
+						.append( ", " )
+						.append( type_name( t1 ) ),
+						p
+					);
+				}
+			} break;
+			case ( OPERATOR::ASSIGN ): break;
+			default: {
+				M_ASSERT( ! "bad code path"[0] );
+			} break;
 		}
 		fc._variables.pop();
 		if ( ! is_reference_congruent( t2 ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Setting a non reference location.", p );
 		}
-		fc._valueTypes.push( t1 );
+		fc._valueTypes.push( congruent( t1, t2 ) );
 	}
 	return;
 	M_EPILOG

@@ -42,12 +42,12 @@ namespace value_builtin {
 
 HHuginn::value_t subscript( HThread*, HExpression::ACCESS, HHuginn::value_t&, HHuginn::value_t const&, int );
 HHuginn::value_t range( HThread*, HHuginn::value_t&, HHuginn::value_t const&, HHuginn::value_t const&, HHuginn::value_t const&, int );
-HHuginn::value_t add( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-HHuginn::value_t sub( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-HHuginn::value_t mul( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-HHuginn::value_t div( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-HHuginn::value_t mod( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
-HHuginn::value_t pow( HThread*, HHuginn::value_t const&, HHuginn::value_t const&, int );
+void add( HHuginn::value_t&, HHuginn::value_t const&, int );
+void sub( HHuginn::value_t&, HHuginn::value_t const&, int );
+void mul( HHuginn::value_t&, HHuginn::value_t const&, int );
+void div( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
+void mod( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
+void pow( HHuginn::value_t&, HHuginn::value_t const&, int );
 HHuginn::value_t abs( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t neg( HThread*, HHuginn::value_t const&, int );
 bool equals( HHuginn::value_t const&, HHuginn::value_t const&, int );

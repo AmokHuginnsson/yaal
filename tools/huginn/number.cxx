@@ -72,10 +72,6 @@ HHuginn::HNumber::HNumber( HHuginn::HClass const* class_, HHuginn::HNumber::valu
 	return;
 }
 
-HHuginn::HNumber::value_type const& HHuginn::HNumber::value( void ) const {
-	return ( _value );
-}
-
 HHuginn::value_t HHuginn::HNumber::do_clone( HHuginn* huginn_ ) const {
 	return ( huginn_->object_factory()->create_number( _value ) );
 }
