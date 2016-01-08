@@ -68,11 +68,9 @@ constexpr tType&& forward( typename trait::strip_reference<tType>::type& val_ ) 
  */
 template<typename tType>
 inline void swap( tType& left, tType& right ) {
-	if ( &left != &right ) {
-		tType tmp( yaal::move( left ) );
-		left = yaal::move( right );
-		right = yaal::move( tmp );
-	}
+	tType tmp( yaal::move( left ) );
+	left = yaal::move( right );
+	right = yaal::move( tmp );
 	return;
 }
 
