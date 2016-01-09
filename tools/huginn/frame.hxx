@@ -88,20 +88,35 @@ public:
 	}
 	void break_execution( STATE );
 	void continue_execution( void );
-	int number( void ) const;
-	HFrame* parent( void );
+	int number( void ) const {
+		return ( _number );
+	}
+	HFrame* parent( void ) {
+		return ( _parent );
+	}
 	HThread* thread( void ) const {
 		return ( _thread );
 	}
-	bool is_loop( void ) const;
-	bool has_catch( void ) const;
-	STATE state( void ) const;
+	bool is_loop( void ) const {
+		return ( _type == TYPE::LOOP );
+	}
+	bool has_catch( void ) const {
+		return ( _type == TYPE::TRY_CATCH );
+	}
+	STATE state( void ) const {
+		return ( _state );
+	}
 	HHuginn::value_t result( void ) const {
 		return ( _result );
 	}
 	void set_result( HHuginn::value_t const& );
-	operations_t& operations( void );
-	values_t& values( void );
+	operations_t& operations( void ) {
+		return ( _operations );
+	}
+
+	values_t& values( void ) {
+		return ( _values );
+	}
 	void reset( void );
 	HHuginn::HObject* object( void ) const;
 private:

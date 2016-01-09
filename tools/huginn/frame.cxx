@@ -72,26 +72,6 @@ void HFrame::init(
 	M_EPILOG
 }
 
-int HFrame::number( void ) const {
-	return ( _number );
-}
-
-HFrame* HFrame::parent( void ) {
-	return ( _parent );
-}
-
-bool HFrame::is_loop( void ) const {
-	return ( _type == TYPE::LOOP );
-}
-
-bool HFrame::has_catch( void ) const {
-	return ( _type == TYPE::TRY_CATCH );
-}
-
-HFrame::STATE HFrame::state( void ) const {
-	return ( _state );
-}
-
 void HFrame::break_execution( STATE state_ ) {
 	_state = state_;
 	_values.clear();
@@ -206,14 +186,6 @@ HHuginn::value_t HFrame::make_variable( HHuginn::identifier_id_t identifierId_, 
 	}
 	return ( make_pointer<HHuginn::HReference>( *v ) );
 	M_EPILOG
-}
-
-operations_t& HFrame::operations( void ) {
-	return ( _operations );
-}
-
-HFrame::values_t& HFrame::values( void ) {
-	return ( _values );
 }
 
 HHuginn::HObject* HFrame::object( void ) const {
