@@ -460,7 +460,7 @@ void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
 	HHuginn::value_t base( yaal::move( frame_->values().top() ) );
 	if ( ! select && ( range > 0 ) ) {
 		HHuginn::type_id_t t( base->type_id() );
-		if ( ( t != HHuginn::TYPE::LIST ) && ( t != HHuginn::TYPE::STRING ) ) {
+		if ( ( t != HHuginn::TYPE::LIST ) && ( t != HHuginn::TYPE::DEQUE ) && ( t != HHuginn::TYPE::STRING ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operator not supported on `"_ys.append( base->get_class()->name() ).append( "'." ), p );
 		}
 	} else {
