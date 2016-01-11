@@ -1405,7 +1405,8 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 	M_PROLOG
 	OFunctionContext& fc( f() );
 	HHuginn::identifier_id_t refIdentifier( _huginn->identifier_id( value_ ) );
-	if ( huginn::is_keyword( value_ ) ) {
+	bool keyword( false );
+	if ( ( keyword = huginn::is_keyword( value_ ) ) ) {
 		fc._isAssert = refIdentifier == KEYWORD::ASSERT_IDENTIFIER;
 		if ( ( ( value_ != KEYWORD::THIS ) && ( value_ != KEYWORD::SUPER ) && ! fc._isAssert ) || ( fc._isAssert && ! current_expression()->is_empty() ) ) {
 			throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted keyword." ), position_.get() );
@@ -1413,7 +1414,19 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			throw HHuginn::HHuginnRuntimeException( "Keyword `"_ys.append( value_ ).append( "' can be used only in class context." ), position_.get() );
 		}
 	}
-	current_expression()->add_execution_step( hcore::call( &HExpression::get_reference, current_expression().raw(), refIdentifier, _1, position_.get() ) );
+	if ( ! keyword && huginn::is_builtin( value_ ) ) {
+		current_expression()->add_execution_step(
+			hcore::call(
+				&HExpression::store_direct,
+				current_expression().raw(),
+				make_pointer<HHuginn::HFunctionReference>( refIdentifier, _huginn->get_function( refIdentifier ) ),
+				_1,
+				position_.get()
+			)
+		);
+	} else {
+		current_expression()->add_execution_step( hcore::call( &HExpression::get_reference, current_expression().raw(), refIdentifier, _1, position_.get() ) );
+	}
 	fc._valueTypes.push( guess_type( refIdentifier ) );
 	return;
 	M_EPILOG
