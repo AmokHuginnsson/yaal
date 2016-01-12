@@ -137,7 +137,11 @@ HHuginn::HSet::HSet( HHuginn::HClass const* class_ )
 
 HHuginn::HSet::HSet( HHuginn::HClass const* class_, values_t const& data_ )
 	: HIterable( class_ )
-	, _data( data_ ) {
+	, _data() {
+	HHuginn* huginn( class_->huginn() );
+	for ( values_t::value_type const& v : data_ ) {
+		_data.insert( v->clone( huginn ) );
+	}
 	return;
 }
 
@@ -160,7 +164,7 @@ void HHuginn::HSet::erase( HHuginn::value_t const& key_ ) {
 
 void HHuginn::HSet::insert( HHuginn::value_t const& value_ ) {
 	M_PROLOG
-	_data.insert( value_ );
+	_data.insert( value_->clone( get_class()->huginn() ) );
 	return;
 	M_EPILOG
 }

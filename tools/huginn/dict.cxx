@@ -145,9 +145,13 @@ HHuginn::HDict::HDict( HHuginn::HClass const* class_ )
 }
 
 HHuginn::HDict::HDict( HHuginn::HClass const* class_, values_t const& data_, HHuginn::HClass const* keyType_ )
-	: HIterable( class_ ),
-	_data( data_ ),
-	_keyType( keyType_ ) {
+	: HIterable( class_ )
+	, _data( &value_builtin::less_low )
+	, _keyType( keyType_ ) {
+	HHuginn* huginn( class_->huginn() );
+	for ( values_t::value_type const& v : data_ ) {
+		_data.insert( make_pair( v.first->clone( huginn ), v.second->clone( huginn ) ) );
+	}
 	return;
 }
 

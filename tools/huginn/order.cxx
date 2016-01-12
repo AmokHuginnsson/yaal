@@ -138,8 +138,12 @@ HHuginn::HOrder::HOrder( HHuginn::HClass const* class_ )
 
 HHuginn::HOrder::HOrder( HHuginn::HClass const* class_, values_t const& data_, HHuginn::HClass const* keyType_ )
 	: HIterable( class_ ),
-	_data( data_ ),
+	_data(),
 	_keyType( keyType_ ) {
+	HHuginn* huginn( class_->huginn() );
+	for ( values_t::value_type const& v : data_ ) {
+		_data.insert( v->clone( huginn ) );
+	}
 	return;
 }
 
@@ -175,7 +179,7 @@ void HHuginn::HOrder::erase( HHuginn::value_t const& value_, int position_ ) {
 void HHuginn::HOrder::insert( HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	verify_key_type( value_->get_class(), position_ );
-	_data.insert( value_ );
+	_data.insert( value_->clone( get_class()->huginn() ) );
 	_keyType = value_->get_class();
 	return;
 	M_EPILOG

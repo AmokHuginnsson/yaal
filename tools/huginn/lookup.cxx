@@ -144,8 +144,12 @@ HHuginn::HLookup::HLookup( HHuginn::HClass const* class_ )
 }
 
 HHuginn::HLookup::HLookup( HHuginn::HClass const* class_, values_t const& data_ )
-	: HIterable( class_ ),
-	_data( data_ ) {
+	: HIterable( class_ )
+	, _data( &value_builtin::hash, &value_builtin::key_equals ) {
+	HHuginn* huginn( class_->huginn() );
+	for ( values_t::value_type const& v : data_ ) {
+		_data.insert( make_pair( v.first->clone( huginn ), v.second->clone( huginn ) ) );
+	}
 	return;
 }
 

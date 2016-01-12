@@ -134,7 +134,12 @@ HHuginn::HList::HList( HHuginn::HClass const* class_ )
 
 HHuginn::HList::HList( HHuginn::HClass const* class_, values_t const& data_ )
 	: HIterable( class_ )
-	, _data( data_ ) {
+	, _data() {
+	_data.reserve( data_.get_size() );
+	HHuginn* huginn( class_->huginn() );
+	for ( values_t::value_type const& v : data_ ) {
+		_data.push_back( v->clone( huginn ) );
+	}
 	return;
 }
 
