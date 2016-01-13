@@ -164,7 +164,7 @@ void HHuginn::HSet::erase( HHuginn::value_t const& key_ ) {
 
 void HHuginn::HSet::insert( HHuginn::value_t const& value_ ) {
 	M_PROLOG
-	_data.insert( value_->clone( get_class()->huginn() ) );
+	_data.insert( value_ );
 	return;
 	M_EPILOG
 }

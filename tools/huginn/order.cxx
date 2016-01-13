@@ -179,7 +179,7 @@ void HHuginn::HOrder::erase( HHuginn::value_t const& value_, int position_ ) {
 void HHuginn::HOrder::insert( HHuginn::value_t const& value_, int position_ ) {
 	M_PROLOG
 	verify_key_type( value_->get_class(), position_ );
-	_data.insert( value_->clone( get_class()->huginn() ) );
+	_data.insert( value_ );
 	_keyType = value_->get_class();
 	return;
 	M_EPILOG
