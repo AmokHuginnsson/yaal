@@ -38,8 +38,9 @@ namespace hcore {
 
 char const* const _errMsgHSBBSTree_[ 4 ] = {
 	_( "ok" ),
-/* HSBBSTreeBase::NON_EXISTING_KEY */			_( "key does not exists" ),
-/* HSBBSTreeBase::NIL_ITERATOR */					_( "dereferencing nil iterator" )
+/* HSBBSTreeBase::NON_EXISTING_KEY */ _( "key does not exists" ),
+/* HSBBSTreeBase::NIL_ITERATOR */     _( "dereferencing nil iterator" ),
+/* HSBBSTreeBase::BAD_HINT */         _( "bad hint" )
 };
 
 HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::next( HAbstractNode* node_ ) const {
@@ -49,20 +50,23 @@ HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::next( HAbstractNode* node_ ) const 
 		while ( node_ ) {
 			if ( node_->_right && ( node_->_right != lastNode ) ) {
 				node_ = node_->_right;
-				while ( node_->_left )
+				while ( node_->_left ) {
 					node_ = node_->_left;
+				}
 				break;
 			} else {
 				lastNode = node_;
 				node_ = node_->_parent;
-				if ( node_ && ( lastNode == node_->_left ) )
+				if ( node_ && ( lastNode == node_->_left ) ) {
 					break;
+				}
 			}
 		}
 	} else {
 		node_ = _root;
-		while ( node_ && node_->_left )
+		while ( node_ && node_->_left ) {
 			node_ = node_->_left;
+		}
 	}
 	return ( node_ );
 	M_EPILOG
@@ -75,42 +79,49 @@ HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::previous( HAbstractNode* node_ ) co
 		while ( node_ ) {
 			if ( node_->_left && ( node_->_left != lastNode ) ) {
 				node_ = node_->_left;
-				while ( node_->_right )
+				while ( node_->_right ) {
 					node_ = node_->_right;
+				}
 				break;
 			} else {
 				lastNode = node_;
 				node_ = node_->_parent;
-				if ( node_ && ( lastNode == node_->_right ) )
+				if ( node_ && ( lastNode == node_->_right ) ) {
 					break;
+				}
 			}
 		}
 	} else {
 		node_ = _root;
-		while ( node_ && node_->_right )
+		while ( node_ && node_->_right ) {
 			node_ = node_->_right;
+		}
 	}
 	return ( node_ );
 	M_EPILOG
 }
 
 HSBBSTreeBase::HAbstractNode::HAbstractNode( void )
-	: _color( RED ), _parent( NULL ),
-	_left( NULL ), _right( NULL ) {
+	: _color( RED )
+	, _parent( NULL )
+	, _left( NULL )
+	, _right( NULL ) {
 	return;
 }
 
 void HSBBSTreeBase::HAbstractNode::set_child( HAbstractNode* which_, HAbstractNode* new_ ) {
 	M_ASSERT( ( which_ == _left ) || ( which_ == _right ) );
-	if ( which_ == _left )
+	if ( which_ == _left ) {
 		_left = new_;
-	else
+	} else {
 		_right = new_;
+	}
 	return;
 }
 
 HSBBSTreeBase::HSBBSTreeBase( void )
-	: _root( NULL ), _size( 0 ) {
+	: _root( NULL )
+	, _size( 0 ) {
 	return;
 }
 
@@ -118,8 +129,9 @@ void HSBBSTreeBase::insert_rebalance( HAbstractNode* node_ ) {
 	M_PROLOG
 	for ( ; ; ) {
 		if ( node_->_parent ) {
-			if ( node_->_parent->_color == HAbstractNode::BLACK )
+			if ( node_->_parent->_color == HAbstractNode::BLACK ) {
 				break;
+			}
 			HAbstractNode* grandpa = node_->_parent->_parent;
 			if ( grandpa ) {
 				if ( grandpa->_left && grandpa->_right
@@ -131,24 +143,26 @@ void HSBBSTreeBase::insert_rebalance( HAbstractNode* node_ ) {
 					node_ = grandpa;
 					continue;
 				} else {
-					if ( ( node_ == node_->_parent->_right ) && ( grandpa->_left == node_->_parent ) )
+					if ( ( node_ == node_->_parent->_right ) && ( grandpa->_left == node_->_parent ) ) {
 						rotate_left( node_ = node_->_parent );
-					else if ( ( node_ == node_->_parent->_left ) && ( grandpa->_right == node_->_parent ) )
+					} else if ( ( node_ == node_->_parent->_left ) && ( grandpa->_right == node_->_parent ) ) {
 						rotate_right( node_ = node_->_parent );
+					}
 					node_->_parent->_color = HAbstractNode::BLACK;
 					node_->_parent->_parent->_color = HAbstractNode::RED;
 					if ( ( node_ == node_->_parent->_left )
-							&& ( node_->_parent == node_->_parent->_parent->_left ) )
+							&& ( node_->_parent == node_->_parent->_parent->_left ) ) {
 						rotate_right( node_->_parent->_parent );
-					else {
+					} else {
 						M_ASSERT( ( node_ == node_->_parent->_right )
 								&& ( node_->_parent == node_->_parent->_parent->_right ) );
 						rotate_left( node_->_parent->_parent );
 					}
 				}
 			}
-		} else
+		} else {
 			node_->_color = HAbstractNode::BLACK;
+		}
 		break;
 	}
 	return;
@@ -168,18 +182,20 @@ void HSBBSTreeBase::rotate_left( HAbstractNode* node_ ) {
 	HAbstractNode* parent = node_->_parent;
 	HAbstractNode* node = node_->_right;
 	if ( parent ) {
-		if ( parent->_left == node_ )
+		if ( parent->_left == node_ ) {
 			parent->_left = node;
-		else {
+		} else {
 			M_ASSERT( parent->_right == node_ );
 			parent->_right = node;
 		}
-	} else
+	} else {
 		_root = node;
+	}
 	node_->_parent = node;
 	node_->_right = node->_left;
-	if ( node_->_right )
+	if ( node_->_right ) {
 		node_->_right->_parent = node_;
+	}
 	node->_left = node_;
 	node->_parent = parent;
 	return;
@@ -189,57 +205,63 @@ void HSBBSTreeBase::rotate_right( HAbstractNode* node_ ) {
 	HAbstractNode* parent = node_->_parent;
 	HAbstractNode* node = node_->_left;
 	if ( parent ) {
-		if ( parent->_right == node_ )
+		if ( parent->_right == node_ ) {
 			parent->_right = node;
-		else {
+		} else {
 			M_ASSERT( parent->_left == node_ );
 			parent->_left = node;
 		}
-	} else
+	} else {
 		_root = node;
+	}
 	node_->_parent = node;
 	node_->_left = node->_right;
-	if ( node_->_left )
+	if ( node_->_left ) {
 		node_->_left->_parent = node_;
+	}
 	node->_right = node_;
 	node->_parent = parent;
 	return;
 }
 
 void HSBBSTreeBase::remove_node( HAbstractNode* node_ ) {
-	if ( node_->_left && node_->_right ) /* both children exists */ {
+	if ( node_->_left && node_->_right ) { /* both children exists */
 		HAbstractNode* node = node_->_left;
-		while ( node->_right )
+		while ( node->_right ) {
 			node = node->_right;
+		}
 		swap( node_, node );
 	}
 	if ( node_->_left ) {
 		M_ASSERT( ! node_->_right );
 		node_->_left->_parent = node_->_parent;
-		if ( node_->_parent )
+		if ( node_->_parent ) {
 			node_->_parent->set_child( node_, node_->_left );
-		else {
+		} else {
 			M_ASSERT( _root == node_ );
 			_root = node_->_left;
 		}
 	} else if ( node_->_right ) {
 		node_->_right->_parent = node_->_parent;
-		if ( node_->_parent )
+		if ( node_->_parent ) {
 			node_->_parent->set_child( node_, node_->_right );
-		else {
+		} else {
 			M_ASSERT( _root == node_ );
 			_root = node_->_right;
 		}
 	}
 	remove_rebalance( node_ );
 	if ( ( node_->_parent )
-			&& ! ( node_->_left || node_->_right ) )
+			&& ! ( node_->_left || node_->_right ) ) {
 		node_->_parent->set_child( node_, NULL );
+	}
 	node_->_left = node_->_right = NULL;
 	_size --;
-	if ( ! _size )
+	if ( ! _size ) {
 		_root = NULL;
+	}
 	M_ASSERT( ! ( _root && _root->_parent ) ); /* very tricky :^) */
+	return;
 }
 
 void HSBBSTreeBase::remove_rebalance( HAbstractNode* node_ ) {
@@ -247,17 +269,18 @@ void HSBBSTreeBase::remove_rebalance( HAbstractNode* node_ ) {
 	HAbstractNode* child = node_->_left ? node_->_left : node_->_right;
 	M_ASSERT( ! child || ( node_->_parent == child->_parent ) );
 	if ( node_->_color == HAbstractNode::BLACK ) {
-		if ( child && child->_color == HAbstractNode::RED )
+		if ( child && child->_color == HAbstractNode::RED ) {
 			child->_color = HAbstractNode::BLACK;
-		else {
-			if ( child )
+		} else {
+			if ( child ) {
 				node_ = child;
+			}
 			/* after this line node_ is a pivot of rebalancing
 			 * no matter if it's child of removed node, or the node it self */
-			for ( int i = 0; ; ++i ) /* tail recursion may be easily changed to iteration */ {
-				if ( node_->_parent == NULL )
+			for ( int i = 0; ; ++i ) { /* tail recursion may be easily changed to iteration */
+				if ( node_->_parent == NULL ) {
 					_root->_color = HAbstractNode::BLACK;
-				else /* hard part starts here */ {
+				} else { /* hard part starts here */
 					HAbstractNode* sibling = get_sibling( node_ );
 					if ( sibling->_color == HAbstractNode::RED ) {
 						/* sibling must exists because all black nodes have siblings,
@@ -265,10 +288,11 @@ void HSBBSTreeBase::remove_rebalance( HAbstractNode* node_ ) {
 						 * is black, due to rule that prevents two subsequent red nodes */
 						sibling->_color = HAbstractNode::BLACK;
 						node_->_parent->_color = HAbstractNode::RED;
-						if ( node_ == node_->_parent->_left )
+						if ( node_ == node_->_parent->_left ) {
 							rotate_left( node_->_parent );
-						else
+						} else {
 							rotate_right( node_->_parent );
+						}
 						sibling = get_sibling( node_ );
 					}
 					if ( ( node_->_parent->_color == HAbstractNode::BLACK )
@@ -329,26 +353,36 @@ bool HSBBSTreeBase::is_empty( void ) const {
 }
 
 HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::leftmost( void ) const {
-	HAbstractNode* node = _root;
-	while ( node && node->_left )
+	HAbstractNode* node( _root );
+	while ( node && node->_left ) {
 		node = node->_left;
+	}
+	return ( node );
+}
+
+HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::rightmost( void ) const {
+	HAbstractNode* node( _root );
+	while ( node && node->_right ) {
+		node = node->_right;
+	}
 	return ( node );
 }
 
 void HSBBSTreeBase::swap( HAbstractNode* first_, HAbstractNode* second_ ) {
 	M_ASSERT( first_ && second_ );
 	M_ASSERT( first_ != second_ );
-	if ( first_ == _root )
+	if ( first_ == _root ) {
 		_root = second_;
-	else if ( second_ == _root )
+	} else if ( second_ == _root ) {
 		_root = first_;
+	}
 	HAbstractNode* firstParent = first_->_parent;
 	HAbstractNode* firstLeft = first_->_left;
 	HAbstractNode* firstRight = first_->_right;
 	HAbstractNode* secondParent = second_->_parent;
 	HAbstractNode* secondLeft = second_->_left;
 	HAbstractNode* secondRight = second_->_right;
-	if ( firstParent == secondParent ) /* siblings */ {
+	if ( firstParent == secondParent ) { /* siblings */
 		M_ASSERT( firstParent );
 		if ( first_ == firstParent->_left ) {
 			firstParent->_left = second_;
@@ -358,56 +392,66 @@ void HSBBSTreeBase::swap( HAbstractNode* first_, HAbstractNode* second_ ) {
 			firstParent->_left = first_;
 			firstParent->_right = second_;
 		}
-	} else /* not siblings */ {
+	} else { /* not siblings */
 		if ( firstParent ) {
-			if ( first_ == firstParent->_left )
+			if ( first_ == firstParent->_left ) {
 				firstParent->_left = second_;
-			else {
+			} else {
 				M_ASSERT( first_ == firstParent->_right );
 				firstParent->_right = second_;
 			}
 		}
 		if ( secondParent ) {
-			if ( second_ == secondParent->_left )
+			if ( second_ == secondParent->_left ) {
 				secondParent->_left = first_;
-			else {
+			} else {
 				M_ASSERT( second_ == secondParent->_right );
 				secondParent->_right = first_;
 			}
 		}
 	}
-	if ( firstLeft )
+	if ( firstLeft ) {
 		firstLeft->_parent = second_;
-	if ( firstRight )
+	}
+	if ( firstRight ) {
 		firstRight->_parent = second_;
-	if ( secondLeft )
+	}
+	if ( secondLeft ) {
 		secondLeft->_parent = first_;
-	if ( secondRight )
+	}
+	if ( secondRight ) {
 		secondRight->_parent = first_;
-	if ( secondParent != first_ )
+	}
+	if ( secondParent != first_ ) {
 		first_->_parent = secondParent;
-	else
+	} else {
 		first_->_parent = second_;
-	if ( secondLeft != first_ )
+	}
+	if ( secondLeft != first_ ) {
 		first_->_left = secondLeft;
-	else
+	} else {
 		first_->_left = second_;
-	if ( secondRight != first_ )
+	}
+	if ( secondRight != first_ ) {
 		first_->_right = secondRight;
-	else
+	} else {
 		first_->_right = second_;
-	if ( firstParent != second_ )
+	}
+	if ( firstParent != second_ ) {
 		second_->_parent = firstParent;
-	else
+	} else {
 		second_->_parent = first_;
-	if ( firstLeft != second_ )
+	}
+	if ( firstLeft != second_ ) {
 		second_->_left = firstLeft;
-	else
+	} else {
 		second_->_left = first_;
-	if ( firstRight != second_ )
+	}
+	if ( firstRight != second_ ) {
 		second_->_right = firstRight;
-	else
+	} else {
 		second_->_right = first_;
+	}
 	HAbstractNode::color_t color = first_->_color;
 	first_->_color = second_->_color;
 	second_->_color = color;
@@ -415,8 +459,9 @@ void HSBBSTreeBase::swap( HAbstractNode* first_, HAbstractNode* second_ ) {
 }
 
 HSBBSTreeBase::HAbstractNode* HSBBSTreeBase::get_sibling( HAbstractNode* node_ ) const {
-	if ( node_->_parent->_left == node_ )
+	if ( node_->_parent->_left == node_ ) {
 		return ( node_->_parent->_right );
+	}
 	M_ASSERT( node_->_parent->_right == node_ );
 	return ( node_->_parent->_left );
 }

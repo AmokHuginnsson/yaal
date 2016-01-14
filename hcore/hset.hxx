@@ -198,6 +198,18 @@ public:
 		return ( make_pair( HIterator( p.first ), p.second ) );
 		M_EPILOG
 	}
+	void insert( HIterator it, value_type const& elem, bool forceHint = false ) {
+		M_PROLOG
+		_engine.insert( it._engine, elem, forceHint );
+		return;
+		M_EPILOG
+	}
+	void insert( HIterator it, value_type&& elem, bool forceHint = false ) {
+		M_PROLOG
+		_engine.insert( it._engine, yaal::move( elem ), forceHint );
+		return;
+		M_EPILOG
+	}
 	template<typename iter_t>
 	void insert( iter_t i, iter_t endIt ) {
 		M_PROLOG
