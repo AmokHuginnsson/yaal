@@ -150,7 +150,7 @@ HHuginn::HDict::HDict( HHuginn::HClass const* class_, values_t const& data_, HHu
 	, _keyType( keyType_ ) {
 	HHuginn* huginn( class_->huginn() );
 	for ( values_t::value_type const& v : data_ ) {
-		_data.insert( make_pair( v.first->clone( huginn ), v.second->clone( huginn ) ) );
+		_data.insert( _data.end(), make_pair( v.first->clone( huginn ), v.second->clone( huginn ) ) );
 	}
 	return;
 }

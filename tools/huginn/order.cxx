@@ -142,7 +142,7 @@ HHuginn::HOrder::HOrder( HHuginn::HClass const* class_, values_t const& data_, H
 	_keyType( keyType_ ) {
 	HHuginn* huginn( class_->huginn() );
 	for ( values_t::value_type const& v : data_ ) {
-		_data.insert( v->clone( huginn ) );
+		_data.insert( _data.end(), v->clone( huginn ) );
 	}
 	return;
 }
