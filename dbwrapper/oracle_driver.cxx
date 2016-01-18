@@ -54,6 +54,12 @@ static char const* const _logTag_ = "Oracle: ";
 
 HString _instanceName_;
 
+HString placeholder_generator( int no_ ) {
+	HString placeholder;
+	placeholder.format( ":%d", no_ );
+	return ( placeholder );
+}
+
 }
 
 extern "C" {
@@ -221,12 +227,6 @@ M_EXPORT_SYMBOL char const* dbrs_error( ODBLink const& dbLink_, void* ) {
 }
 
 namespace {
-
-HString placeholder_generator( int no_ ) {
-	HString placeholder;
-	placeholder.format( ":%d", no_ );
-	return ( placeholder );
-}
 
 void* oracle_db_prepare_query( ODBLink& dbLink_, char const* query_, ub4 mode_ ) {
 	M_ASSERT( dbLink_._conn && dbLink_._valid );
