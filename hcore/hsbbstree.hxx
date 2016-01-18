@@ -187,10 +187,10 @@ public:
 		M_DESTRUCTOR_EPILOG
 	}
 	HPair<HIterator, bool> insert( key_value_type const& key_ ) {
-		return ( insert_impl( constructor_copy( key_ ), find_node( key_get_type::key( key_ ) ) ) );
+		return ( insert_impl( constructor_copy( key_ ), find_node( key_get_type::key( key_ ), &_root ) ) );
 	}
 	HPair<HIterator, bool> insert( key_value_type&& key_ ) {
-		return ( insert_impl( constructor_move( key_ ), find_node( key_get_type::key( key_ ) ) ) );
+		return ( insert_impl( constructor_move( key_ ), find_node( key_get_type::key( key_ ), &_root ) ) );
 	}
 	void insert( HIterator const& pos_, key_value_type const& key_, bool forceHint_ ) {
 		insert_impl( constructor_copy( key_ ), verify_hint( key_get_type::key( key_ ), pos_, forceHint_ ) );
@@ -213,7 +213,7 @@ public:
 	}
 	HIterator find( key_type const& key_ ) const {
 		M_PROLOG
-		return ( HIterator( this, *(find_node( key_ ).first) ) );
+		return ( HIterator( this, *(find_node( key_, &_root ).first) ) );
 		M_EPILOG
 	}
 	HIterator lower_bound( key_type const& ) const;
@@ -279,9 +279,6 @@ private:
 		}
 		return ( make_pair( node, parent ) );
 		M_EPILOG
-	}
-	hint_t find_node( key_type const& key_ ) const {
-		return ( find_node( key_, &_root ) );
 	}
 	template<typename constructor_t>
 	HPair<HIterator, bool> insert_impl( constructor_t&&, hint_t );
@@ -351,7 +348,7 @@ private:
 			if ( forceHint_ ) {
 				M_THROW( _errMsgHSBBSTree_[ ERROR::BAD_HINT ], static_cast<int>( ERROR::BAD_HINT ) );
 			} else {
-				hint = find_node( key_ );
+				hint = find_node( key_, &_root );
 			}
 		}
 		return ( hint );
@@ -488,7 +485,7 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::lower_bound( key_type
 	M_PROLOG
 	HIterator it( this, NULL );
 	if ( _root ) {
-		hint_t hint( find_node( key_ ) );
+		hint_t hint( find_node( key_, &_root ) );
 		if ( *(hint.first) ) {
 			it._current = *(hint.first);
 		} else {
@@ -508,7 +505,7 @@ HSBBSTree<key_value_t, compare_t, key_get_t, allocator_t>::upper_bound( key_type
 	M_PROLOG
 	HIterator it( this, NULL );
 	if ( _root ) {
-		hint_t hint( find_node( key_ ) );
+		hint_t hint( find_node( key_, &_root ) );
 		if ( *(hint.first) ) {
 			it._current = *(hint.first);
 			++ it;
