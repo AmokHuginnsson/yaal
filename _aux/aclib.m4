@@ -206,16 +206,12 @@ dnl YAAL_DETECT_COMPILER
 dnl Detect installed compiler package.
 dnl --------------------------------------------------------------------------
 AC_DEFUN_ONCE([YAAL_DETECT_COMPILER], [
-	SAVED_CXX=["${CXX}"]
-	SAVED_CC=["${CC}"]
-	CXX=[""]
-	CC=[""]
 	AC_MSG_RESULT([--- Testing presence of C and C++ compiler ... ---      [[19%]]])
-	AC_PROG_CC([gcc clang ${SAVED_CC}])
-	AC_PROG_CXX([g++ clang++ clang ${SAVED_CXX}])
+	AC_PROG_CC([${CC} gcc clang])
+	AC_PROG_CXX([${CXX} g++ clang++ clang])
 	AC_MSG_RESULT([--- Testing presence of C and C++ preprocesor ... ---   [[28%]]])
-	AC_PROG_CPP([gcc clang ${SAVED_CC}])
-	AC_PROG_CXXCPP([g++ clang++ clang ${SAVED_CXX}])
+	AC_PROG_CPP([${CC} gcc clang])
+	AC_PROG_CXXCPP([${CXX} g++ clang++ clang])
 ])
 
 dnl YAAL_CHECK_COMPILER_VERSION

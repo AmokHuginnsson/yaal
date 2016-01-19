@@ -464,12 +464,6 @@ if test ["$ORACLE"] = ["no"] -a ["$POSTGRES"] = ["no"] -a ["$MYSQL"] = ["no"] -a
 	AC_MSG_WARN([yaal without any data base driver will be unusable for most professional purpouses.])
 fi
 
-if test ["x${SAVED_CXX}"] != ["x"] ; then
-	CXX=["${SAVED_CXX}"]
-fi
-if test ["x${SAVED_CC}"] != ["x"] ; then
-	CC=["${SAVED_CC}"]
-fi
 AC_SUBST([EXTRA_INCLUDE_PATHS], [${EXTRA_INCLUDE_PATHS}])
 AC_SUBST([EXTRA_LIBRARY_PATHS], [${EXTRA_LIBRARY_PATHS}])
 AC_SUBST([EXTRA_CXXFLAGS],[${EXTRA_CXXFLAGS}])

@@ -86,8 +86,7 @@ AC_CHECK_HEADERS([yaal/yaal.hxx],,
 dnl We need to check if out ncurses devel is not brain-damaged.
 ])
 
-AC_DEFUN_ONCE([GEN_CONFIG_HXX_IN],
-[
+AC_DEFUN_ONCE([GEN_CONFIG_HXX_IN], [
 AH_TOP([/* $Id$ */
 
 #ifndef $1_CONFIG_HXX_INCLUDED
@@ -99,14 +98,7 @@ AH_BOTTOM(
 )
 ])
 
-AC_DEFUN_ONCE([YAAL_CONFIGURE_CLIENT_FINALIZE],
-[
-if test ["x${SAVED_CXX}"] != ["x"] ; then
-	CXX=["${SAVED_CXX}"]
-fi
-if test ["x${SAVED_CC}"] != ["x"] ; then
-	CC=["${SAVED_CC}"]
-fi
+AC_DEFUN_ONCE([YAAL_CONFIGURE_CLIENT_FINALIZE], [
 AC_SUBST([EXTRA_INCLUDE_PATHS], [${EXTRA_INCLUDE_PATHS}])
 AC_SUBST([EXTRA_LIBRARY_PATHS], [${EXTRA_LIBRARY_PATHS}])
 AC_SUBST([EXTRA_CXXFLAGS],[${EXTRA_CXXFLAGS}])
