@@ -112,6 +112,14 @@ struct OCompiler {
 		executing_parser::position_t _basePosition;
 		OClassContext( void );
 	};
+	struct OExecutionStep {
+		HHuginn::expression_t _expression;
+		int _index;
+		HHuginn::identifier_id_t _identifier;
+		int _position;
+		OExecutionStep( HHuginn::expression_t&, int, HHuginn::identifier_id_t, int );
+	};
+	typedef yaal::hcore::HArray<OExecutionStep> execution_steps_backlog_t;
 	typedef yaal::hcore::HResource<OClassContext> class_context_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, class_context_t> submitted_classes_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, HHuginn::identifier_id_t> submitted_imports_t;
@@ -121,9 +129,11 @@ struct OCompiler {
 	submitted_imports_t _submittedImports;
 	HHuginn::identifier_id_t _importIdentifier;
 	HHuginn::identifier_id_t _importAlias;
+	execution_steps_backlog_t _executionStepsBacklog;
 	HHuginn* _huginn;
 	OCompiler( HHuginn* );
 	OFunctionContext& f( void );
+	void optimize( void );
 	void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_import_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_import_alias( yaal::hcore::HString const&, executing_parser::position_t );

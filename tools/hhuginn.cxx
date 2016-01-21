@@ -366,6 +366,8 @@ void HHuginn::finalize_compilation( void ) {
 		commit_class( sc.first );
 	}
 	t->pop_frame();
+	_compiler->_submittedClasses.clear();
+	_compiler->optimize();
 	return;
 	M_EPILOG
 }

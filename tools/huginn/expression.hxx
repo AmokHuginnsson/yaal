@@ -61,7 +61,8 @@ public:
 	HExpression( int = 0 );
 	int position( void ) const;
 	void set_position( int );
-	void add_execution_step( execution_step_t const& );
+	int add_execution_step( execution_step_t const& );
+	void replace_execution_step( int, execution_step_t const& );
 	void pop_execution_step( void );
 	void merge( HExpression& );
 	void oper( OPERATOR, huginn::HFrame*, int );

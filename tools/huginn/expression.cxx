@@ -64,9 +64,16 @@ void HExpression::set_position( int position_ ) {
 	M_EPILOG
 }
 
-void HExpression::add_execution_step( execution_step_t const& executionStep_ ) {
+int HExpression::add_execution_step( execution_step_t const& executionStep_ ) {
 	M_PROLOG
 	_executionSteps.push_back( executionStep_ );
+	return ( static_cast<int>( _executionSteps.get_size() - 1 ) );
+	M_EPILOG
+}
+
+void HExpression::replace_execution_step( int index_, execution_step_t const& executionStep_ ) {
+	M_PROLOG
+	_executionSteps[index_] = executionStep_;
 	return;
 	M_EPILOG
 }

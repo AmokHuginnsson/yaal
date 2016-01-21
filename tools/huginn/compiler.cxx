@@ -168,6 +168,14 @@ OCompiler::OClassContext::OClassContext( void )
 	return;
 }
 
+OCompiler::OExecutionStep::OExecutionStep( HHuginn::expression_t& expression_, int index_, HHuginn::identifier_id_t identifier_, int position_ )
+	: _expression( expression_ )
+	, _index( index_ )
+	, _identifier( identifier_ )
+	, _position( position_ ) {
+	return;
+}
+
 OCompiler::OCompiler( HHuginn* huginn_ )
 	: _functionContexts()
 	, _classContext()
@@ -175,8 +183,36 @@ OCompiler::OCompiler( HHuginn* huginn_ )
 	, _submittedImports()
 	, _importIdentifier( INVALID_IDENTIFIER )
 	, _importAlias( INVALID_IDENTIFIER )
+	, _executionStepsBacklog()
 	, _huginn( huginn_ ) {
 	return;
+}
+
+void OCompiler::optimize( void ) {
+	M_PROLOG
+	M_ASSERT( _submittedClasses.is_empty() );
+	for ( OExecutionStep& es : _executionStepsBacklog ) {
+		if ( ! is_keyword( _huginn->identifier_name( es._identifier ) ) ) {
+			HHuginn::class_t c( _huginn->get_class( es._identifier ) );
+			if ( !! c ) {
+				es._expression->replace_execution_step(
+					es._index,
+					hcore::call(
+						&HExpression::store_direct,
+						es._expression.raw(),
+						make_pointer<HHuginn::HFunctionReference>(
+							es._identifier,
+							hcore::call( &HHuginn::HClass::create_instance, c.raw(), _1, _2, _3, _4 )
+						),
+						_1,
+						es._position
+					)
+				);
+			}
+		}
+	}
+	return;
+	M_EPILOG
 }
 
 OCompiler::OFunctionContext& OCompiler::f( void ) {
@@ -1425,7 +1461,13 @@ void OCompiler::defer_get_reference( yaal::hcore::HString const& value_, executi
 			)
 		);
 	} else {
-		current_expression()->add_execution_step( hcore::call( &HExpression::get_reference, current_expression().raw(), refIdentifier, _1, position_.get() ) );
+		HHuginn::expression_t& expression( current_expression() );
+		int index(
+			expression->add_execution_step(
+				hcore::call( &HExpression::get_reference, expression.raw(), refIdentifier, _1, position_.get() )
+			)
+		);
+		_executionStepsBacklog.emplace_back( expression, index, refIdentifier, position_.get() );
 	}
 	fc._valueTypes.push( guess_type( refIdentifier ) );
 	return;
