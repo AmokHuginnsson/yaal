@@ -746,10 +746,6 @@ HHuginn::HValue::HValue( HClass const* class_ )
 	return;
 }
 
-HHuginn::type_id_t HHuginn::HValue::type_id( void ) const {
-	return ( _class->type_id() );
-}
-
 int HHuginn::HValue::field_index( identifier_id_t identifierId_ ) const {
 	M_PROLOG
 	return ( _class->field_index( identifierId_ ) );

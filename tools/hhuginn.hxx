@@ -359,32 +359,6 @@ public:
 	int position( void ) const;
 };
 
-class HHuginn::HValue {
-public:
-	typedef HHuginn::HValue this_type;
-private:
-	HClass const* _class;
-public:
-	HValue( HClass const* );
-	virtual ~HValue( void ) {
-		return;
-	}
-	type_id_t type_id( void ) const;
-	HClass const* get_class( void ) const {
-		return ( _class );
-	}
-	value_t clone( HHuginn* ) const;
-	int field_index( identifier_id_t ) const;
-	value_t field( HHuginn::value_t const& subject_, int index_ ) const {
-		return ( do_field( subject_, index_ ) );
-	}
-private:
-	virtual value_t do_field( HHuginn::value_t const&, int ) const;
-	virtual value_t do_clone( HHuginn* ) const;
-	HValue( HValue const& ) = delete;
-	HValue& operator = ( HValue const& ) = delete;
-};
-
 class HHuginn::HClass {
 public:
 	typedef HHuginn::HClass this_type;
@@ -435,6 +409,34 @@ private:
 	virtual value_t do_create_instance( huginn::HThread*, values_t const&, int ) const;
 	HClass( HClass const& ) = delete;
 	HClass& operator = ( HClass const& ) = delete;
+};
+
+class HHuginn::HValue {
+public:
+	typedef HHuginn::HValue this_type;
+private:
+	HClass const* _class;
+public:
+	HValue( HClass const* );
+	virtual ~HValue( void ) {
+		return;
+	}
+	type_id_t type_id( void ) const {
+		return ( _class->type_id() );
+	}
+	HClass const* get_class( void ) const {
+		return ( _class );
+	}
+	value_t clone( HHuginn* ) const;
+	int field_index( identifier_id_t ) const;
+	value_t field( HHuginn::value_t const& subject_, int index_ ) const {
+		return ( do_field( subject_, index_ ) );
+	}
+private:
+	virtual value_t do_field( HHuginn::value_t const&, int ) const;
+	virtual value_t do_clone( HHuginn* ) const;
+	HValue( HValue const& ) = delete;
+	HValue& operator = ( HValue const& ) = delete;
 };
 
 class HHuginn::HClass::HMethod : public HHuginn::HValue {
