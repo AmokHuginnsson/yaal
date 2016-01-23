@@ -53,7 +53,7 @@ void failed_assert( char const* const fileName_,
 		char const* const message_ ) {
 	M_PROLOG
 	hcore::log << "Failed assertion: " << message_ << " -> " << fileName_ << "(" << line_ << "): " << functionName_ << endl;
-	fprintf( ERROR_STREAM, "Failed assertion: `%s' at: %s: %4d : %s\n",
+	fprintf( ERROR_STREAM, "Failed assertion: `%s' at: %s:%d: %s\n",
 			message_, fileName_, line_, functionName_ );
 	if ( ! errno )
 		++ errno;
