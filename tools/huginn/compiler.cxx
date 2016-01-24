@@ -885,9 +885,7 @@ void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing
 
 void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::position_t position_ ) {
 	M_PROLOG
-	current_expression()->add_execution_step( hcore::call( &HExpression::oper, current_expression().raw(), operator_, _1, position_.get() ) );
 	OFunctionContext& fc( f() );
-	fc._operations.emplace( operator_, position_.get() );
 	/*
 	 * We want to support assert() statement.
 	 * We need to know where assert's condition expression ends.
@@ -899,6 +897,7 @@ void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::positio
 	 * Total number of operations on the stack (including call itself) is 3.
 	 */
 	static int const ASSERT_SECOND_ARGUMENT_OPERATION_COUNT( 1 /*function call*/ + 1 /*assert's condition*/ + 1 /*assert's user message*/ );
+	HHuginn::expression_t& expression( current_expression() );
 	if (
 		( operator_ == OPERATOR::FUNCTION_ARGUMENT )
 		&& fc._isAssert
@@ -908,6 +907,8 @@ void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::positio
 		OScopeContext& sc( *fc._scopeStack.top() );
 		sc._position = position_.get();
 	}
+	expression->add_execution_step( hcore::call( &HExpression::oper, expression.raw(), operator_, _1, position_.get() ) );
+	fc._operations.emplace( operator_, position_.get() );
 	return;
 	M_EPILOG
 }
@@ -1253,6 +1254,8 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 	if ( fc._isAssert && ( fc._nestedCalls == 0 ) ) {
 		throw HHuginn::HHuginnRuntimeException( "`assert' is a restricted keyword.", p );
 	}
+	M_ASSERT( ! fc._operations.is_empty() );
+	HHuginn::expression_t& expression( current_expression() );
 	OPERATOR op( fc._operations.top()._operator );
 	int range( 0 );
 	bool nonInteger( false );
@@ -1269,11 +1272,15 @@ void OCompiler::dispatch_subscript( executing_parser::position_t position_ ) {
 		fc._operations.pop();
 		op = fc._operations.top()._operator;
 	}
-	if ( ( range > 0 ) && nonInteger ) {
-		throw HHuginn::HHuginnRuntimeException( "Range specifier is not an integer.", p );
-	}
 	M_ASSERT( fc._operations.top()._operator == OPERATOR::SUBSCRIPT );
-	current_expression()->add_execution_step( hcore::call( &HExpression::subscript, current_expression().raw(), HExpression::ACCESS::VALUE, _1, position_.get() ) );
+	if ( range > 0 ) {
+		if ( nonInteger ) {
+			throw HHuginn::HHuginnRuntimeException( "Range specifier is not an integer.", p );
+		}
+		expression->add_execution_step( hcore::call( &HExpression::range, expression.raw(), _1, position_.get() ) );
+	} else {
+		expression->add_execution_step( hcore::call( &HExpression::subscript, expression.raw(), HExpression::ACCESS::VALUE, _1, position_.get() ) );
+	}
 	fc._operations.pop();
 	M_ASSERT( fc._valueTypes.get_size() >= 1 );
 	fc._valueTypes.pop();

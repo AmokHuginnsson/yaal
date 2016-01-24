@@ -99,16 +99,19 @@ HHuginn::value_t range(
 	HHuginn::value_t const& step_,
 	int position_
 ) {
+	/*
+	 * from_, to_ and step_ can be passed as nullptrs and not as none_value.
+	 */
 	HHuginn::type_id_t baseType( base_->type_id() );
 	HHuginn::value_t res;
 	if ( ( baseType == HHuginn::TYPE::LIST ) || ( baseType == HHuginn::TYPE::DEQUE ) || ( baseType == HHuginn::TYPE::STRING ) ) {
-		if ( ( from_->type_id() != HHuginn::TYPE::INTEGER ) && ( from_->type_id() != HHuginn::TYPE::NONE ) ) {
+		if ( !! from_ && ( from_->type_id() != HHuginn::TYPE::INTEGER ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operand `from' is not an integer.", position_ );
 		}
-		if ( ( to_->type_id() != HHuginn::TYPE::INTEGER ) && ( to_->type_id() != HHuginn::TYPE::NONE ) ) {
+		if ( !! to_ && ( to_->type_id() != HHuginn::TYPE::INTEGER ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operand `to' is not an integer.", position_ );
 		}
-		if ( ( step_->type_id() != HHuginn::TYPE::INTEGER ) && ( step_->type_id() != HHuginn::TYPE::NONE ) ) {
+		if ( !! step_ && ( step_->type_id() != HHuginn::TYPE::INTEGER ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operand `step' is not an integer.", position_ );
 		}
 		int long size( static_cast<HHuginn::HIterable*>( base_.raw() )->size() );
@@ -119,13 +122,13 @@ HHuginn::value_t range(
 		} else {
 			res = thread_->object_factory().create_string();
 		}
-		HHuginn::HInteger const* integer( step_->type_id() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( step_.raw() ) : nullptr );
+		HHuginn::HInteger const* integer( static_cast<HHuginn::HInteger const*>( step_.raw() ) );
 		int long step( integer ? static_cast<int long>( integer->value() ) : 1 );
 		if ( step == 0 ) {
 			throw HHuginn::HHuginnRuntimeException( "Range step cannot be zero.", position_ );
 		}
-		HHuginn::HInteger const* integerFrom = from_->type_id() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( from_.raw() ) : nullptr;
-		HHuginn::HInteger const* integerTo = to_->type_id() == HHuginn::TYPE::INTEGER ? static_cast<HHuginn::HInteger const*>( to_.raw() ) : nullptr;
+		HHuginn::HInteger const* integerFrom = static_cast<HHuginn::HInteger const*>( from_.raw() );
+		HHuginn::HInteger const* integerTo = static_cast<HHuginn::HInteger const*>( to_.raw() );
 		int long from( integerFrom ? static_cast<int long>( integerFrom->value() ) : ( step > 0 ? 0 : size ) );
 		int long to( integerTo ? static_cast<int long>( integerTo->value() ) : ( step > 0 ? size : -1 ) );
 

@@ -436,10 +436,26 @@ void HExpression::power( HFrame* frame_, int ) {
 void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );
-	HHuginn& h( frame_->thread()->huginn() );
-	HHuginn::value_t from( h.none_value() );
-	HHuginn::value_t to( h.none_value() );
-	HHuginn::value_t step( h.none_value() );
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::FUNCTION_ARGUMENT );
+	frame_->operations().pop();
+	HHuginn::value_t index( yaal::move( frame_->values().top() ) );
+	frame_->values().pop();
+	M_ASSERT( frame_->operations().top()._operator == OPERATOR::SUBSCRIPT );
+	int p( frame_->operations().top()._position );
+	frame_->operations().pop();
+	HHuginn::value_t base( yaal::move( frame_->values().top() ) );
+	frame_->values().pop();
+	frame_->values().push( value_builtin::subscript( frame_->thread(), access_, base, index, p ) );
+	return;
+	M_EPILOG
+}
+
+void HExpression::range( HFrame* frame_, int ) {
+	M_PROLOG
+	M_ASSERT( ! frame_->operations().is_empty() );
+	HHuginn::value_t from;
+	HHuginn::value_t to;
+	HHuginn::value_t step;
 	HHuginn::value_t* v( &step );
 	OPERATOR op( frame_->operations().top()._operator );
 	M_ASSERT( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) );
@@ -465,26 +481,19 @@ void HExpression::subscript( ACCESS access_, HFrame* frame_, int ) {
 	frame_->operations().pop();
 	bool select( ( !! from ) || ( !! to ) || ( !! step ) );
 	HHuginn::value_t base( yaal::move( frame_->values().top() ) );
+	frame_->values().pop();
 	if ( ! select && ( range > 0 ) ) {
 		HHuginn::type_id_t t( base->type_id() );
 		if ( ( t != HHuginn::TYPE::LIST ) && ( t != HHuginn::TYPE::DEQUE ) && ( t != HHuginn::TYPE::STRING ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operator not supported on `"_ys.append( base->get_class()->name() ).append( "'." ), p );
 		}
+		frame_->values().push( yaal::move( base ) );
 	} else {
-		frame_->values().pop();
-		if ( range > 0 ) {
-			if ( access_ == ACCESS::REFERENCE ) {
-				throw HHuginn::HHuginnRuntimeException( "Cannot assign to a range.", p );
-			}
-			if ( range == 1 ) {
-				from = yaal::move( to );
-				to = yaal::move( step );
-				step = h.none_value();
-			}
-			frame_->values().push( value_builtin::range( frame_->thread(), base, from, to, step, p ) );
-		} else {
-			frame_->values().push( value_builtin::subscript( frame_->thread(), access_, base, step, p ) );
+		if ( range == 1 ) {
+			from = yaal::move( to );
+			to = yaal::move( step );
 		}
+		frame_->values().push( value_builtin::range( frame_->thread(), base, from, to, step, p ) );
 	}
 	return;
 	M_EPILOG
