@@ -459,37 +459,37 @@ void HExpression::range( HFrame* frame_, int ) {
 	HHuginn::value_t* v( &step );
 	OPERATOR op( frame_->operations().top()._operator );
 	M_ASSERT( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) );
-	int range( 0 );
+	int rangeOpCount( 0 );
 	while ( ( op == OPERATOR::FUNCTION_ARGUMENT ) || ( op == OPERATOR::SUBSCRIPT_ARGUMENT ) ) {
 		if ( op == OPERATOR::FUNCTION_ARGUMENT ) {
 			*v = yaal::move( frame_->values().top() );
 			frame_->values().pop();
 		} else {
-			if ( range == 0 ) {
+			if ( rangeOpCount == 0 ) {
 				v = &to;
 			} else {
 				v = &from;
 			}
-			++ range;
+			++ rangeOpCount;
 		}
 		frame_->operations().pop();
 		op = frame_->operations().top()._operator;
 	}
-	M_ASSERT( range <= 2 );
+	M_ASSERT( rangeOpCount <= 2 );
 	M_ASSERT( frame_->operations().top()._operator == OPERATOR::SUBSCRIPT );
 	int p( frame_->operations().top()._position );
 	frame_->operations().pop();
 	bool select( ( !! from ) || ( !! to ) || ( !! step ) );
 	HHuginn::value_t base( yaal::move( frame_->values().top() ) );
 	frame_->values().pop();
-	if ( ! select && ( range > 0 ) ) {
+	if ( ! select && ( rangeOpCount > 0 ) ) {
 		HHuginn::type_id_t t( base->type_id() );
 		if ( ( t != HHuginn::TYPE::LIST ) && ( t != HHuginn::TYPE::DEQUE ) && ( t != HHuginn::TYPE::STRING ) ) {
 			throw HHuginn::HHuginnRuntimeException( "Range operator not supported on `"_ys.append( base->get_class()->name() ).append( "'." ), p );
 		}
 		frame_->values().push( yaal::move( base ) );
 	} else {
-		if ( range == 1 ) {
+		if ( rangeOpCount == 1 ) {
 			from = yaal::move( to );
 			to = yaal::move( step );
 		}
