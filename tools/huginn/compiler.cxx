@@ -886,6 +886,9 @@ void OCompiler::defer_str_oper( yaal::hcore::HString const& operator_, executing
 void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
+	HHuginn::expression_t& expression( current_expression() );
+	expression->add_execution_step( hcore::call( &HExpression::oper, expression.raw(), operator_, _1, position_.get() ) );
+	fc._operations.emplace( operator_, position_.get() );
 	/*
 	 * We want to support assert() statement.
 	 * We need to know where assert's condition expression ends.
@@ -897,7 +900,6 @@ void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::positio
 	 * Total number of operations on the stack (including call itself) is 3.
 	 */
 	static int const ASSERT_SECOND_ARGUMENT_OPERATION_COUNT( 1 /*function call*/ + 1 /*assert's condition*/ + 1 /*assert's user message*/ );
-	HHuginn::expression_t& expression( current_expression() );
 	if (
 		( operator_ == OPERATOR::FUNCTION_ARGUMENT )
 		&& fc._isAssert
@@ -907,8 +909,6 @@ void OCompiler::defer_oper_direct( OPERATOR operator_, executing_parser::positio
 		OScopeContext& sc( *fc._scopeStack.top() );
 		sc._position = position_.get();
 	}
-	expression->add_execution_step( hcore::call( &HExpression::oper, expression.raw(), operator_, _1, position_.get() ) );
-	fc._operations.emplace( operator_, position_.get() );
 	return;
 	M_EPILOG
 }
