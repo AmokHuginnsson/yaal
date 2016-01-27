@@ -102,7 +102,19 @@ HObjectFactory::HObjectFactory( HHuginn* huginn_ )
 	, _set( set::get_class( huginn_ ) )
 	, _exception()
 	, _conversionException()
-	, _arithmeticException() {
+	, _arithmeticException()
+	, _stringPool()
+	, _stringAllocator( _stringPool )
+	, _integerPool()
+	, _integerAllocator( _integerPool )
+	, _booleanPool()
+	, _booleanAllocator( _booleanPool )
+	, _realPool()
+	, _realAllocator( _realPool )
+	, _numberPool()
+	, _numberAllocator( _numberPool )
+	, _characterPool()
+	, _characterAllocator( _characterPool ) {
 	return;
 }
 
