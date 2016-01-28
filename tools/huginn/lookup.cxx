@@ -108,6 +108,16 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
+inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "lookup.clear", values_, 0, 0, position_ );
+	HHuginn::HLookup* l( dynamic_cast<HHuginn::HLookup*>( object_->raw() ) );
+	M_ASSERT( l != nullptr );
+	l->value().clear();
+	return ( *object_ );
+	M_EPILOG
+}
+
 HHuginn::class_t get_class( HHuginn* );
 HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	M_PROLOG
@@ -120,12 +130,14 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			HHuginn::field_names_t{
 				"has_key",
 				"get",
-				"erase"
+				"erase",
+				"clear"
 			},
 			HHuginn::values_t{
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::has_key, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::get, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::erase, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::erase, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &lookup::clear, _1, _2, _3, _4 ) )
 			}
 		)
 	);

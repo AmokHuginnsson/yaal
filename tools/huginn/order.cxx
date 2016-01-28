@@ -100,6 +100,16 @@ inline HHuginn::value_t erase( huginn::HThread*, HHuginn::value_t* object_, HHug
 	M_EPILOG
 }
 
+inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "order.clear", values_, 0, 0, position_ );
+	HHuginn::HOrder* o( dynamic_cast<HHuginn::HOrder*>( object_->raw() ) );
+	M_ASSERT( o != nullptr );
+	o->value().clear();
+	return ( *object_ );
+	M_EPILOG
+}
+
 HHuginn::class_t get_class( HHuginn* );
 HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	M_PROLOG
@@ -112,12 +122,14 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			HHuginn::field_names_t{
 				"add",
 				"has_key",
-				"erase"
+				"erase",
+				"clear"
 			},
 			HHuginn::values_t{
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::add, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::has_key, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::erase, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::erase, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &order::clear, _1, _2, _3, _4 ) )
 			}
 		)
 	);

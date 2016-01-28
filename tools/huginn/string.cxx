@@ -131,6 +131,15 @@ inline HHuginn::value_t to_upper( huginn::HThread*, HHuginn::value_t* object_, H
 	M_EPILOG
 }
 
+inline HHuginn::value_t clear( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "string.clear";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	static_cast<HHuginn::HString*>( object_->raw() )->value().clear();
+	return ( *object_ );
+	M_EPILOG
+}
+
 HHuginn::class_t get_class( HHuginn* );
 HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	M_PROLOG
@@ -144,13 +153,15 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 				"find",
 				"strip",
 				"to_lower",
-				"to_upper"
+				"to_upper",
+				"clear"
 			},
 			HHuginn::values_t{
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_lower, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_upper, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_upper, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::clear, _1, _2, _3, _4 ) )
 			}
 		)
 	);
