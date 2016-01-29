@@ -193,7 +193,7 @@ public:
 /*! \endcond */
 
 template<typename type_t>
-inline type_t get_optional_value_or( HOptional<type_t> const& value_, type_t default_ ) {
+inline type_t get_optional_value_or( HOptional<type_t> const& value_, type_t const& default_ ) {
 	return ( value_ ? *value_ : default_ );
 }
 
@@ -203,8 +203,9 @@ inline type_t const& get_optional_value_or( HOptional<type_t const&> const& valu
 }
 
 template<typename type_t>
-inline void swap( yaal::tools::HOptional<type_t>& a, yaal::tools::HOptional<type_t>& b )
-	{ a.swap( b ); }
+inline void swap( yaal::tools::HOptional<type_t>& a, yaal::tools::HOptional<type_t>& b ) {
+	a.swap( b );
+}
 
 }
 
