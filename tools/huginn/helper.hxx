@@ -49,19 +49,19 @@ void verify_arg_type( yaal::hcore::HString const&, HHuginn::values_t const&, int
 HHuginn::type_id_t verify_arg_numeric( yaal::hcore::HString const&, HHuginn::values_t const&, int, bool, int );
 HHuginn::type_id_t verify_arg_collection( yaal::hcore::HString const&, HHuginn::values_t const&, int, bool, int );
 
-yaal::hcore::HString const& get_string( HHuginn::value_t const& );
-int long long get_integer( HHuginn::value_t const& );
-double long get_real( HHuginn::value_t const& );
-yaal::hcore::HNumber const& get_number( HHuginn::value_t const& );
-bool get_boolean( HHuginn::value_t const& );
-char get_character( HHuginn::value_t const& );
+HHuginn::HString::value_type const& get_string( HHuginn::value_t const& );
+HHuginn::HInteger::value_type get_integer( HHuginn::value_t const& );
+HHuginn::HReal::value_type get_real( HHuginn::value_t const& );
+HHuginn::HNumber::value_type const& get_number( HHuginn::value_t const& );
+HHuginn::HBoolean::value_type get_boolean( HHuginn::value_t const& );
+HHuginn::HCharacter::value_type  get_character( HHuginn::value_t const& );
 
-yaal::hcore::HString const& get_string( HHuginn::HValue const* );
-int long get_integer( HHuginn::HValue const* );
-double long get_real( HHuginn::HValue const* );
-yaal::hcore::HNumber const& get_number( HHuginn::HValue const* );
-bool get_boolean( HHuginn::HValue const* );
-char get_character( HHuginn::HValue const* );
+HHuginn::HString::value_type const& get_string( HHuginn::HValue const* );
+HHuginn::HInteger::value_type get_integer( HHuginn::HValue const* );
+HHuginn::HReal::value_type get_real( HHuginn::HValue const* );
+HHuginn::HNumber::value_type const& get_number( HHuginn::HValue const* );
+HHuginn::HBoolean::value_type get_boolean( HHuginn::HValue const* );
+HHuginn::HCharacter::value_type get_character( HHuginn::HValue const* );
 
 }
 

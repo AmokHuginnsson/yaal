@@ -190,73 +190,73 @@ HHuginn::type_id_t verify_arg_collection(
 	M_EPILOG
 }
 
-yaal::hcore::HString const& get_string( HHuginn::value_t const& value_ ) {
+HHuginn::HString::value_type const& get_string( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HString const*>( value_.raw() ) );
 	return ( static_cast<HHuginn::HString const*>( value_.raw() )->value() );
 }
 
-int long long get_integer( HHuginn::value_t const& value_ ) {
+HHuginn::HInteger::value_type get_integer( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HInteger const*>( value_.raw() ) );
 	return ( static_cast<HHuginn::HInteger const*>( value_.raw() )->value() );
 }
 
-double long get_real( HHuginn::value_t const& value_ ) {
+HHuginn::HReal::value_type get_real( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HReal const*>( value_.raw() ) );
 	return ( static_cast<HHuginn::HReal const*>( value_.raw() )->value() );
 }
 
-yaal::hcore::HNumber const& get_number( HHuginn::value_t const& value_ ) {
+HHuginn::HNumber::value_type const& get_number( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HNumber const*>( value_.raw() ) );
 	return ( static_cast<HHuginn::HNumber const*>( value_.raw() )->value() );
 }
 
-bool get_boolean( HHuginn::value_t const& value_ ) {
+HHuginn::HBoolean::value_type get_boolean( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HBoolean const*>( value_.raw() ) );
 	return ( static_cast<HHuginn::HBoolean const*>( value_.raw() )->value() );
 }
 
-char get_character( HHuginn::value_t const& value_ ) {
+HHuginn::HCharacter::value_type get_character( HHuginn::value_t const& value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HCharacter const*>( value_.raw() ) );
 	return ( static_cast<HHuginn::HCharacter const*>( value_.raw() )->value() );
 }
 
-yaal::hcore::HString const& get_string( HHuginn::HValue const* value_ ) {
+HHuginn::HString::value_type const& get_string( HHuginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HString const*>( value_ ) );
 	return ( static_cast<HHuginn::HString const*>( value_ )->value() );
 }
 
-int long get_integer( HHuginn::HValue const* value_ ) {
+HHuginn::HInteger::value_type get_integer( HHuginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HInteger const*>( value_ ) );
 	return ( static_cast<HHuginn::HInteger const*>( value_ )->value() );
 }
 
-double long get_real( HHuginn::HValue const* value_ ) {
+HHuginn::HReal::value_type get_real( HHuginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HReal const*>( value_ ) );
 	return ( static_cast<HHuginn::HReal const*>( value_ )->value() );
 }
 
-yaal::hcore::HNumber const& get_number( HHuginn::HValue const* value_ ) {
+HHuginn::HNumber::value_type const& get_number( HHuginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HNumber const*>( value_ ) );
 	return ( static_cast<HHuginn::HNumber const*>( value_ )->value() );
 }
 
-bool get_boolean( HHuginn::HValue const* value_ ) {
+HHuginn::HBoolean::value_type get_boolean( HHuginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HBoolean const*>( value_ ) );
 	return ( static_cast<HHuginn::HBoolean const*>( value_ )->value() );
 }
 
-char get_character( HHuginn::HValue const* value_ ) {
+HHuginn::HCharacter::value_type get_character( HHuginn::HValue const* value_ ) {
 	M_ASSERT( !! value_ );
 	M_ASSERT( dynamic_cast<HHuginn::HCharacter const*>( value_ ) );
 	return ( static_cast<HHuginn::HCharacter const*>( value_ )->value() );
