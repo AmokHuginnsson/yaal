@@ -28,9 +28,12 @@ Copyright:
 
 #include "compat.hxx"
 
-#if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 ) || ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 )
+#if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 ) \
+	|| ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 ) \
+	|| ! defined( HAVE_DECL_CEILL ) || ( HAVE_DECL_CEILL == 0 ) \
+	|| ! defined( HAVE_DECL_ROUNDL ) || ( HAVE_DECL_ROUNDL == 0 )
 #include <cmath>
-#endif /* not HAVE_POWL *//* not HAVE_DECL_FLOORL */
+#endif /* not HAVE_POWL *//* not HAVE_DECL_FLOORL *//* not HAVE_DECL_CEILL *//* not HAVE_DECL_ROUNDL */
 
 #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 ) || ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 )
 #include <cstring>
@@ -128,6 +131,18 @@ double long floorl( double long x ) {
 	return ( ::std::floor( x ) );
 }
 #endif /* not HAVE_DECL_FLOORL */
+
+#if ! defined( HAVE_DECL_CEILL ) || ( HAVE_DECL_CEILL == 0 )
+double long ceill( double long x ) {
+	return ( ::std::ceil( x ) );
+}
+#endif /* not HAVE_DECL_CEILL */
+
+#if ! defined( HAVE_DECL_ROUNDL ) || ( HAVE_DECL_ROUNDL == 0 )
+double long roundl( double long x ) {
+	return ( ::round( static_cast<double>( x ) ) );
+}
+#endif /* not HAVE_DECL_ROUNDL */
 
 #if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 )
 double long sqrtl( double long x ) {

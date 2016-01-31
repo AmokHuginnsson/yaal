@@ -102,6 +102,14 @@ double long powl( double long, double long );
 double long floorl( double long );
 #endif /* #if ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 ) */
 
+#if ! defined( HAVE_DECL_CEILL ) || ( HAVE_DECL_CEILL == 0 )
+double long ceill( double long );
+#endif /* #if ! defined( HAVE_DECL_CEILL ) || ( HAVE_DECL_CEILL == 0 ) */
+
+#if ! defined( HAVE_DECL_ROUNDL ) || ( HAVE_DECL_ROUNDL == 0 )
+double long roundl( double long );
+#endif /* #if ! defined( HAVE_DECL_ROUNDL ) || ( HAVE_DECL_ROUNDL == 0 ) */
+
 #if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 )
 double long sqrtl( double long );
 #endif /* #if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 ) */
