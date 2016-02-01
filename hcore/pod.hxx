@@ -179,26 +179,31 @@ struct is_floating_point<hcore::HNumber> {
 
 /*! \endcond */
 
-typedef char unsigned u8_t; /*!< 8 bit unsigned integer. */
-typedef int short unsigned u16_t; /*!< 16 bit unsigned integer. */
-typedef int unsigned u32_t; /*!< 32 bit unsigned integer. */
+typedef char unsigned          u8_t;  /*!< 8 bit unsigned integer. */
+typedef char signed            i8_t;  /*!< 8 bit signed integer. */
+typedef int short unsigned     u16_t; /*!< 16 bit unsigned integer. */
+typedef int short signed       i16_t; /*!< 16 bit signed integer. */
+typedef int unsigned           u32_t; /*!< 32 bit unsigned integer. */
+typedef int signed             i32_t; /*!< 32 bit signed integer. */
 #if ( SIZEOF_INT_LONG == 8 )
-typedef int long unsigned u64_t; /*!< 64 bit unsigned integer. */
+typedef int long unsigned      u64_t; /*!< 64 bit unsigned integer. */
+typedef int long signed        i64_t; /*!< 64 bit signed integer. */
 #elif ( SIZEOF_INT_LONG_LONG == 8 ) /* #if ( SIZEOF_INT_LONG == 8 ) */
 typedef int long long unsigned u64_t; /*!< 64 bit unsigned integer. */
+typedef int long long signed   i64_t; /*!< 64 bit signed integer. */
 #else /* #elif ( SIZEOF_INT_LONG_LONG == 8 ) #if ( SIZEOF_INT_LONG == 8 ) */
 #error Required type: a 64bit integer, is not available.
 #endif /* #else #elif ( SIZEOF_INT_LONG_LONG == 8 ) #if ( SIZEOF_INT_LONG == 8 ) */
-typedef char signed i8_t; /*!< 8 bit signed integer. */
-typedef int short signed i16_t; /*!< 16 bit signed integer. */
-typedef int signed i32_t; /*!< 32 bit signed integer. */
-#if ( SIZEOF_INT_LONG == 8 )
-typedef int long signed i64_t; /*!< 64 bit signed integer. */
-#elif ( SIZEOF_INT_LONG_LONG == 8 ) /* #if ( SIZEOF_INT_LONG == 8 ) */
-typedef int long long signed i64_t; /*!< 64 bit signed integer. */
-#else /* #elif ( SIZEOF_INT_LONG_LONG == 8 ) #if ( SIZEOF_INT_LONG == 8 ) */
-#error Required type: a 64bit integer, is not available.
-#endif /* #else #elif ( SIZEOF_INT_LONG_LONG == 8 ) #if ( SIZEOF_INT_LONG == 8 ) */
+
+#if ( SIZEOF_INT == SIZEOF_VOIDP )
+typedef int                    int_native_t;
+#elif ( SIZEOF_INT_LONG == SIZEOF_VOIDP )
+typedef int long               int_native_t;
+#elif ( SIZEOF_INT_LONG_LONG == SIZEOF_VOIDP )
+typedef int long long          int_native_t;
+#else /* Native integer type is either `int', or `int long', or `int long long'. */
+#error Cannot establish native integer type.
+#endif /* Native integer type detection */
 
 }
 
