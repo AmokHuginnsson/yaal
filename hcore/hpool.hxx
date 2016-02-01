@@ -59,7 +59,7 @@ public:
 #else /* #elif TARGET_CPU_BITS == 32 #if TARGET_CPU_BITS == 64 */
 #error Unsupported CPU bitness.
 #endif /* #else #elif TARGET_CPU_BITS == 32 #if TARGET_CPU_BITS == 64 */
-	static int const ALIGNER_ELEMENTS_PER_BLOCK = OBJECT_SPACE * ( OBJECTS_PER_BLOCK / sizeof ( aligner_t ) );
+	static int const ALIGNER_ELEMENTS_PER_BLOCK = OBJECT_SPACE * ( OBJECTS_PER_BLOCK / static_cast<int>( sizeof ( aligner_t ) ) );
 private:
 	class HPoolBlock final {
 	private:
