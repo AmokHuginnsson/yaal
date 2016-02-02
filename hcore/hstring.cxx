@@ -104,7 +104,7 @@ static int const ALLOC_BIT_MASK = 128;
 #undef EXT_MEM
 #define EXT_MEM( base ) ( EXT_IS_INPLACE( base ) ? base._mem : base._ptr )
 #undef GET_SIZE
-#define GET_SIZE ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] : _len[ 1 ] )
+#define GET_SIZE ( IS_INPLACE ? _mem[ ALLOC_FLAG_INDEX ] : static_cast<int long>( _len[ 1 ] ) )
 #undef SET_SIZE
 #define SET_SIZE( size ) \
 	do { \
