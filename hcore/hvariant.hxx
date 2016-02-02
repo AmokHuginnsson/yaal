@@ -156,6 +156,7 @@ public:
 		}
 		_type = v_._type;
 		destroy( v_._type, v_._mem.mem() );
+		v_._type = INVALID;
 	}
 	~HVariant( void ) {
 		M_PROLOG
@@ -205,6 +206,7 @@ public:
 		if ( &v_ != this ) {
 			swap( v_ );
 			destroy( v_._type, v_._mem.mem() );
+			v_._type = INVALID;
 		}
 		return ( *this );
 	}
@@ -214,15 +216,15 @@ public:
 				swap( _type, _mem.mem(), v_._mem.mem() );
 			} else if ( ( _type != INVALID ) && ( v_._type != INVALID ) ) {
 				aligner_t tmp{};
-				default_construct( _type, &tmp );
-				swap( _type, _mem.mem(), &tmp );
+				default_construct( _type, tmp.mem() );
+				swap( _type, _mem.mem(), tmp.mem() );
 				destroy( _type, _mem.mem() );
 				default_construct( v_._type, _mem.mem() );
 				swap( v_._type, _mem.mem(), v_._mem.mem() );
 				destroy( v_._type, v_._mem.mem() );
 				default_construct( _type, v_._mem.mem() );
-				swap( _type, &tmp, v_._mem.mem() );
-				destroy( _type, &tmp );
+				swap( _type, tmp.mem(), v_._mem.mem() );
+				destroy( _type, tmp.mem() );
 				yaal::swap( _type, v_._type );
 			} else if ( _type != INVALID ) {
 				default_construct( _type, v_._mem.mem() );
