@@ -146,8 +146,9 @@ HString::HString( void )
 
 HString::~HString( void ) {
 	M_PROLOG
-	if ( ! IS_INPLACE )
+	if ( ! IS_INPLACE ) {
 		memory::free( _ptr );
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -195,9 +196,9 @@ void HString::reserve( int long preallocate_ ) {
 			newAllocBytes <<= 1;
 		}
 		if ( ! IS_INPLACE ) {
-			_ptr = memory::realloc<char>( MEM, newAllocBytes );
+			_ptr = memory::realloc<char>( _ptr, newAllocBytes );
 			SET_ALLOC_BYTES( newAllocBytes );
-			::std::memset( MEM + oldAllocBytes, 0, static_cast<size_t>( newAllocBytes - oldAllocBytes ) );
+			::std::memset( _ptr + oldAllocBytes, 0, static_cast<size_t>( newAllocBytes - oldAllocBytes ) );
 		} else {
 			char* newMem( memory::calloc<char>( newAllocBytes ) );
 			int long origSize( GET_SIZE );
@@ -421,10 +422,12 @@ HString& HString::operator = ( HString const& string_ ) {
 	M_PROLOG
 	if ( this != &string_ ) {
 		int long newSize( string_.get_length() );
-		if ( newSize >= GET_ALLOC_BYTES )
+		if ( newSize >= GET_ALLOC_BYTES ) {
 			reserve( newSize );
-		if ( newSize )
+		}
+		if ( newSize ) {
 			::std::strncpy( MEM, string_.raw(), static_cast<size_t>( newSize ) );
+		}
 		MEM[ newSize ] = 0;
 		SET_SIZE( newSize );
 	}
@@ -435,8 +438,9 @@ HString& HString::operator = ( HString const& string_ ) {
 HString& HString::operator = ( HString&& string_ ) {
 	M_PROLOG
 	if ( &string_ != this ) {
-		if ( ! IS_INPLACE )
+		if ( ! IS_INPLACE ) {
 			memory::free( _ptr );
+		}
 		::memcpy( _mem, string_._mem, INPLACE_BUFFER_SIZE );
 		::memset( string_._mem, 0, INPLACE_BUFFER_SIZE );
 	}
@@ -676,10 +680,8 @@ int long HString::max_size( void ) const {
 }
 
 void HString::swap( HString& other ) {
-	if ( &other != this ) {
-		using yaal::swap_ranges;
-		swap_ranges( yaal::begin( _mem ), yaal::end( _mem ), other._mem );
-	}
+	using yaal::swap;
+	swap( _len, other._len );
 	return;
 }
 

@@ -39,6 +39,7 @@ Copyright:
 #include "config.hxx"
 #include "hcore/macro.hxx"
 #include "hcore/base.hxx"
+#include "hcore/pod.hxx"
 #include "hcore/numeric.hxx"
 #include "hcore/assert.hxx"
 
@@ -94,20 +95,22 @@ extern M_YAAL_HCORE_PUBLIC_API HCharacterClass const* _characterClass_[];
  */
 class HString final {
 public:
+	static_assert( sizeof ( int long ) <= sizeof ( int_native_t ), "length type overflows native integer type" );
 	static int long const MAX_STRING_LENGTH = ( meta::max_signed<int long>::value / 2 ) - 1;
 	typedef HString this_type;
 	class HIterator;
 	class HCharRef;
 private:
-	static int const INPLACE_BUFFER_SIZE = sizeof ( char* ) + sizeof ( int long ) + sizeof ( int long );
+	static int const INPLACE_BUFFER_SIZE = sizeof ( char* ) + sizeof ( int_native_t ) + sizeof ( int_native_t );
 	static int const ALLOC_FLAG_INDEX = INPLACE_BUFFER_SIZE - 1;
 	static int const MAX_INPLACE_CAPACITY = INPLACE_BUFFER_SIZE - 2; /* -1 for terminating NIL, -1 for ALLOC_FLAG byte. */
 	STATIC_ASSERT( sizeof ( int long ) == sizeof ( char* ) );
 	union {
-		int long _len[ 3 ];
-		char _mem[ 3 * sizeof ( char* ) ];
+		int_native_t _len[ 3 ];
+		char _mem[ INPLACE_BUFFER_SIZE ];
 		char* _ptr;
 	};
+	static_assert( sizeof ( _mem ) == sizeof ( _len ), "buffer views are missaligned" );
 public:
 	static int long const npos = -1;
 	typedef HIterator iterator; /*!< mutable iterator for string characters */
