@@ -488,10 +488,8 @@ public:
 		return ( *this );
 	}
 	HPointer& operator = ( HPointer&& other_ ) noexcept {
-		if ( & other_ != this ) {
-			swap( other_ );
-			other_.reset();
-		}
+		swap( other_ );
+		other_.reset();
 		return ( *this );
 	}
 	template<typename alien_t>
@@ -500,15 +498,13 @@ public:
 		return ( *this );
 	}
 	void swap( HPointer& p ) {
-		if ( &p != this ) {
-			/*
-			 * Both fields are POD types (pointers: tType*, HSharedBase*)
-			 * so they do not have a specialized implementation
-			 * and we can explicitly request yaal generic implementation.
-			 */
-			yaal::swap( this->_shared, p._shared );
-			yaal::swap( this->_object, p._object );
-		}
+		/*
+		 * Both fields are POD types (pointers: tType*, HSharedBase*)
+		 * so they do not have a specialized implementation
+		 * and we can explicitly request yaal generic implementation.
+		 */
+		yaal::swap( this->_shared, p._shared );
+		yaal::swap( this->_object, p._object );
 		return;
 	}
 	bool unique( void ) const {
