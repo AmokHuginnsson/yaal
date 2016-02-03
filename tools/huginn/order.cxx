@@ -197,14 +197,6 @@ void HHuginn::HOrder::insert( HHuginn::value_t const& value_, int position_ ) {
 	M_EPILOG
 }
 
-HHuginn::HOrder::values_t const& HHuginn::HOrder::value( void ) const {
-	return ( _data );
-}
-
-HHuginn::HOrder::values_t& HHuginn::HOrder::value( void ) {
-	return ( _data );
-}
-
 HHuginn::HIterable::HIterator HHuginn::HOrder::do_iterator( void ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HOrderIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );

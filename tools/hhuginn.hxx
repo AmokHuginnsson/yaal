@@ -561,7 +561,9 @@ private:
 	value_type _value;
 public:
 	HBoolean( HHuginn::HClass const*, value_type );
-	value_type value( void ) const;
+	value_type value( void ) const {
+		return ( _value );
+	}
 	void to_string( void ) const;
 private:
 	virtual value_t do_clone( HHuginn* ) const override;
@@ -650,7 +652,9 @@ private:
 	value_type _value;
 public:
 	HCharacter( HHuginn::HClass const*, value_type );
-	value_type value( void ) const;
+	value_type value( void ) const {
+		return ( _value );
+	}
 	void set( value_type );
 	void to_character( void ) const;
 	void to_integer( void ) const;
@@ -697,8 +701,12 @@ public:
 	void clear( void );
 	value_t get( int long long );
 	value_t get_ref( int long long );
-	values_t const& value( void ) const;
-	values_t& value( void );
+	values_t const& value( void ) const {
+		return ( _data );
+	}
+	values_t& value( void ) {
+		return ( _data );
+	}
 protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
@@ -723,8 +731,12 @@ public:
 	void clear( void );
 	value_t get( int long long );
 	value_t get_ref( int long long );
-	values_t const& value( void ) const;
-	values_t& value( void );
+	values_t const& value( void ) const {
+		return ( _data );
+	}
+	values_t& value( void ) {
+		return ( _data );
+	}
 protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
@@ -750,8 +762,12 @@ public:
 	bool has_key( HHuginn::value_t const&, int ) const;
 	bool try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_, int position_ );
 	void erase( HHuginn::value_t const&, int );
-	values_t const& value( void ) const;
-	values_t& value( void );
+	values_t const& value( void ) const {
+		return ( _data );
+	}
+	values_t& value( void ) {
+		return ( _data );
+	}
 protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
@@ -778,8 +794,12 @@ public:
 	void insert( HHuginn::value_t const&, int );
 	bool has_key( HHuginn::value_t const&, int ) const;
 	void erase( HHuginn::value_t const&, int );
-	values_t const& value( void ) const;
-	values_t& value( void );
+	values_t const& value( void ) const {
+		return ( _data );
+	}
+	values_t& value( void ) {
+		return ( _data );
+	}
 protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
@@ -809,8 +829,12 @@ public:
 	value_t get( HHuginn::value_t const&, int );
 	value_t get_ref( HHuginn::value_t const& );
 	bool try_get( HHuginn::value_t const& key_, HHuginn::value_t& result_ );
-	values_t const& value( void ) const;
-	values_t& value( void );
+	values_t const& value( void ) const {
+		return ( _data );
+	}
+	values_t& value( void ) {
+		return ( _data );
+	}
 protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
@@ -836,8 +860,12 @@ public:
 	void insert( HHuginn::value_t const& );
 	bool has_key( HHuginn::value_t const& ) const;
 	void erase( HHuginn::value_t const& );
-	values_t const& value( void ) const;
-	values_t& value( void );
+	values_t const& value( void ) const {
+		return ( _data );
+	}
+	values_t& value( void ) {
+		return ( _data );
+	}
 protected:
 	virtual HIterator do_iterator( void ) override;
 	virtual int long do_size( void ) const override;
@@ -856,8 +884,12 @@ private:
 	HHuginn::function_t _function;
 public:
 	HFunctionReference( identifier_id_t, HHuginn::function_t const& );
-	identifier_id_t identifier_id( void ) const;
-	HHuginn::function_t const& function( void ) const;
+	identifier_id_t identifier_id( void ) const {
+		return ( _identifierId );
+	}
+	HHuginn::function_t const& function( void ) const {
+		return ( _function );
+	}
 private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };

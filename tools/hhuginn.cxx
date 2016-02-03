@@ -843,14 +843,6 @@ HHuginn::HFunctionReference::HFunctionReference(
 	return;
 }
 
-HHuginn::identifier_id_t HHuginn::HFunctionReference::identifier_id( void ) const {
-	return ( _identifierId );
-}
-
-HHuginn::function_t const& HHuginn::HFunctionReference::function( void ) const {
-	return ( _function );
-}
-
 HHuginn::value_t HHuginn::HFunctionReference::do_clone( HHuginn* ) const {
 	return ( make_pointer<HFunctionReference>( _identifierId, _function ) );
 }

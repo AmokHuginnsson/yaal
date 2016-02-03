@@ -217,14 +217,6 @@ void HHuginn::HLookup::insert( HHuginn::value_t const& key_, HHuginn::value_t co
 	M_EPILOG
 }
 
-HHuginn::HLookup::values_t const& HHuginn::HLookup::value( void ) const {
-	return ( _data );
-}
-
-HHuginn::HLookup::values_t& HHuginn::HLookup::value( void ) {
-	return ( _data );
-}
-
 HHuginn::HIterable::HIterator HHuginn::HLookup::do_iterator( void ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HLookupIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );

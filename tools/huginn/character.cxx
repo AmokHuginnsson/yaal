@@ -122,10 +122,6 @@ HHuginn::HCharacter::HCharacter( HHuginn::HClass const* class_, HHuginn::HCharac
 	return;
 }
 
-HHuginn::HCharacter::value_type HHuginn::HCharacter::value( void ) const {
-	return ( _value );
-}
-
 void HHuginn::HCharacter::set( value_type value_ ) {
 	_value = value_;
 	return;

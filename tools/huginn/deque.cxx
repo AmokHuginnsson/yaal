@@ -216,14 +216,6 @@ HHuginn::value_t HHuginn::HDeque::get_ref( int long long index_ ) {
 	M_EPILOG
 }
 
-HHuginn::HDeque::values_t const& HHuginn::HDeque::value( void ) const {
-	return ( _data );
-}
-
-HHuginn::HDeque::values_t& HHuginn::HDeque::value( void ) {
-	return ( _data );
-}
-
 HHuginn::HIterable::HIterator HHuginn::HDeque::do_iterator( void ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HDequeIterator( this ) );
 	return ( HIterator( yaal::move( impl ) ) );

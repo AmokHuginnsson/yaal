@@ -237,14 +237,6 @@ void HHuginn::HDict::insert( HHuginn::value_t const& key_, HHuginn::value_t cons
 	M_EPILOG
 }
 
-HHuginn::HDict::values_t const& HHuginn::HDict::value( void ) const {
-	return ( _data );
-}
-
-HHuginn::HDict::values_t& HHuginn::HDict::value( void ) {
-	return ( _data );
-}
-
 HHuginn::HIterable::HIterator HHuginn::HDict::do_iterator( void ) {
 	HIterator::iterator_implementation_t impl( new ( memory::yaal ) huginn::HDictIterator( &_data ) );
 	return ( HIterator( yaal::move( impl ) ) );
