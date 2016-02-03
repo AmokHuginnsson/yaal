@@ -109,7 +109,7 @@ public:
 	HHuginn::value_t result( void ) const {
 		return ( _result );
 	}
-	void set_result( HHuginn::value_t const& );
+	void set_result( HHuginn::value_t&& );
 	operations_t& operations( void ) {
 		return ( _operations );
 	}

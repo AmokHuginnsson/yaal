@@ -110,7 +110,7 @@ void HThread::pop_frame( void ) {
 	M_EPILOG
 }
 
-void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& value_, int level_, int position_ ) {
+void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t&& value_, int level_, int position_ ) {
 	M_PROLOG
 	M_ASSERT( state_ != HFrame::STATE::NORMAL );
 	int level( 0 );
@@ -141,7 +141,7 @@ void HThread::break_execution( HFrame::STATE state_, HHuginn::value_t const& val
 		target = parent;
 	}
 	if ( target ) {
-		target->set_result( value_ );
+		target->set_result( yaal::move( value_ ) );
 	} else if ( state_ == HFrame::STATE::EXCEPTION ) {
 		/*
 		 * Uncaught STATE::EXCEPTION becomes STATE::RUNTIME_EXCEPTION!
@@ -163,7 +163,7 @@ void HThread::raise( HHuginn::HClass const* class_, yaal::hcore::HString const& 
 	M_PROLOG
 	HHuginn::value_t e( make_pointer<HHuginn::HException>( class_, message_ ) );
 	static_cast<HHuginn::HException*>( e.raw() )->set_where( _huginn->where( position_ ) );
-	break_execution( HFrame::STATE::EXCEPTION, e, 0, position_ );
+	break_execution( HFrame::STATE::EXCEPTION, yaal::move( e ), 0, position_ );
 	return;
 	M_EPILOG
 }

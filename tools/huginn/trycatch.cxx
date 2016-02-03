@@ -68,7 +68,7 @@ void HTryCatch::do_execute( huginn::HThread* thread_ ) const {
 		}
 		thread_->pop_frame();
 		if ( ! handled ) {
-			thread_->break_execution( HFrame::STATE::EXCEPTION, v );
+			thread_->break_execution( HFrame::STATE::EXCEPTION, yaal::move( v ) );
 		}
 	} else {
 		thread_->pop_frame();

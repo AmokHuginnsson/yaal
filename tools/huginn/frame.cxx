@@ -86,9 +86,9 @@ void HFrame::continue_execution( void ) {
 	return;
 }
 
-void HFrame::set_result( HHuginn::value_t const& result_ ) {
+void HFrame::set_result( HHuginn::value_t&& result_ ) {
 	M_PROLOG
-	_result = result_;
+	_result = yaal::move( result_ );
 	return;
 	M_EPILOG
 }

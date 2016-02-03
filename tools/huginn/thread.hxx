@@ -64,7 +64,7 @@ public:
 	HFrame const* current_frame( void ) const {
 		return ( _currentFrame );
 	}
-	void break_execution( HFrame::STATE, HHuginn::value_t const& = HHuginn::value_t(), int = 0, int = 0 );
+	void break_execution( HFrame::STATE, HHuginn::value_t&& = HHuginn::value_t(), int = 0, int = 0 );
 	void set_exception( yaal::hcore::HString const&, int );
 	bool can_continue( void ) const {
 		M_PROLOG
