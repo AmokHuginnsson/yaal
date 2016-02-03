@@ -285,7 +285,6 @@ void yaal_rs_free_cursor( void* data_ ) {
 	-- result->_useCount;
 	if ( result->_useCount > 0 ) {
 		sqlite3_reset( static_cast<sqlite3_stmt*>( result->_data ) );
-		sqlite3_clear_bindings( static_cast<sqlite3_stmt*>( result->_data ) );
 	} else {
 		sqlite3_finalize( static_cast<sqlite3_stmt*>( result->_data ) );
 		M_SAFE( delete result );
