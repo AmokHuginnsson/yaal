@@ -50,10 +50,6 @@ HThread::HThread( HHuginn* huginn_, yaal::hcore::HThread::id_t id_ )
 	return;
 }
 
-yaal::hcore::HThread::id_t HThread::id( void ) const {
-	return ( _id );
-}
-
 void HThread::add_frame( void ) {
 	if ( _frameCount == static_cast<int>( _frames.get_size() ) ) {
 		_frames.emplace_back( make_pointer<HFrame>( this, _currentFrame ) );
@@ -199,11 +195,6 @@ void HThread::flush_runtime_exception( void ) {
 	}
 	M_EPILOG
 }
-
-HHuginn& HThread::huginn( void ) {
-	return ( *_huginn );
-}
-
 
 }
 

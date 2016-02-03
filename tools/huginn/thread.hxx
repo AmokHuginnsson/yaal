@@ -72,12 +72,16 @@ public:
 		return ( _currentFrame->can_continue() );
 		M_EPILOG
 	}
-	yaal::hcore::HThread::id_t id( void ) const;
+	yaal::hcore::HThread::id_t id( void ) const {
+		return ( _id );
+	}
 	void flush_runtime_exception( void );
 	bool has_runtime_exception( void ) const;
 	bool has_exception( void ) const;
 	void raise( HHuginn::HClass const*, yaal::hcore::HString const&, int );
-	HHuginn& huginn( void );
+	HHuginn& huginn( void ) {
+		return ( *_huginn );
+	}
 	HObjectFactory& object_factory( void ) const {
 		return ( _objectFactory );
 	}
