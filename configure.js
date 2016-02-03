@@ -108,8 +108,8 @@ function boostInfo( install_path ) {
 
 function vcVersion() {
 	var versions = [
-		[ "Wow6432Node\\", "12.0", "Visual Studio 12" ],
-		[ "", "12.0", "Visual Studio 12" ]
+		[ "Wow6432Node\\", "14.0", "Visual Studio 14" ],
+		[ "", "14.0", "Visual Studio 14" ]
 	];
 	var version = "";
 	var keyPrefix = "HKEY_LOCAL_MACHINE\\SOFTWARE\\";

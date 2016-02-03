@@ -49,7 +49,7 @@ endfunction( msg )
 
 macro ( today RESULT )
 	if (WIN32)
-		try_run( RUN_RESULT COMPILE_RESULT ${CMAKE_HOME_DIRECTORY}/build ${CMAKE_HOME_DIRECTORY}/../yaal/_aux/cmake-getdate.cxx RUN_OUTPUT_VARIABLE ${RESULT} )
+		try_run( RUN_RESULT COMPILE_RESULT ${CMAKE_HOME_DIRECTORY}/build ${CMAKE_HOME_DIRECTORY}/../yaal/_aux/cmake/getdate.cxx RUN_OUTPUT_VARIABLE ${RESULT} )
 	elseif(UNIX)
 		execute_process( COMMAND "date" "+%Y%m%d" OUTPUT_VARIABLE ${RESULT} OUTPUT_STRIP_TRAILING_WHITESPACE )
 	else (WIN32)

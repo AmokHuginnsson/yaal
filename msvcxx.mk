@@ -18,7 +18,7 @@ debug: $(BUILD_ARTIFACT)
 
 $(BUILD_ARTIFACT): $(wildcard */*.cxx) $(wildcard */*.hxx)  $(wildcard */*/*.cxx) $(wildcard */*/*.hxx) $(PROJECT_NAME).sln
 	@export VS_VER="x`awk '/# Visual Studio /{print $$4}' $(PROJECT_NAME).sln`" ; \
-	if [ "$${VS_VER}" = "x2013" ] ; then \
+	if [ "$${VS_VER}" = "x14" ] ; then \
 		"$(CMAKE)" --build . ; \
 	else \
 		echo "Unsupported Visual Studio C++ version ($${VS_VER})!" && false ; \
@@ -32,7 +32,7 @@ $(PROJECT_NAME).sln: ./configure.js ./local.js
 
 install: all
 	@export VS_VER="x`awk '/# Visual Studio /{print $$4}' $(PROJECT_NAME).sln`" ; \
-	if [ "$${VS_VER}" = "x2013" ] ; then \
+	if [ "$${VS_VER}" = "x14" ] ; then \
 		"$(CMAKE)" --build . --target install ; \
 	else \
 		echo "Unsupported Visual Studio C++ version ($${VS_VER})!" && false ; \
@@ -40,7 +40,7 @@ install: all
 
 clean: $(PROJECT_NAME).sln
 	@export VS_VER="x`awk '/# Visual Studio /{print $$4}' $(PROJECT_NAME).sln`" ; \
-	if [ "$${VS_VER}" = "x2013" ] ; then \
+	if [ "$${VS_VER}" = "x14" ] ; then \
 		"$(CMAKE)" --build . --target clean ; \
 	else \
 		echo "Unsupported Visual Studio C++ version ($${VS_VER})!" && false ; \

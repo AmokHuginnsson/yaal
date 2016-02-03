@@ -242,7 +242,7 @@ if ( CMAKE_HOST_WIN32 )
 	msg( "Processing component: msvcxx" )
 	file( GLOB SRCS ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*.cxx )
 	file( GLOB HDRS ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*.hxx ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*.h ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/*/*.h ${CMAKE_HOME_DIRECTORY}/_aux/msvcxx/csignal )
-	add_library( msvcxx STATIC ${SRCS} ${HDRS} ${CMAKE_HOME_DIRECTORY}/_aux/cmake-config.hxx )
+	add_library( msvcxx STATIC ${SRCS} ${HDRS} ${CMAKE_HOME_DIRECTORY}/_aux/cmake/config.hxx )
 	add_custom_command(
 		TARGET hcore-static
 		POST_BUILD COMMAND dumpbin /linkermember:1 build/${CMAKE_BUILD_TYPE}/msvcxx.lib /out:build/${CMAKE_BUILD_TYPE}/msvcxx.sym
