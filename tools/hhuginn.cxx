@@ -368,6 +368,7 @@ void HHuginn::finalize_compilation( void ) {
 	t->pop_frame();
 	_compiler->_submittedClasses.clear();
 	_compiler->optimize();
+	_threads.clear();
 	return;
 	M_EPILOG
 }
@@ -398,11 +399,10 @@ bool HHuginn::execute( void ) {
 	}
 	bool ok( false );
 	try {
-		_result = call( "main", args, 0 );
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
-		threads_t::iterator t( _threads.find( threadId ) );
-		M_ASSERT( t != _threads.end() );
-		t->second->flush_runtime_exception();
+		huginn::HThread* t( _threads.insert( make_pair( threadId, make_pointer<huginn::HThread>( this, threadId ) ) ).first->second.get() );
+		_result = call( "main", args, 0 );
+		t->flush_runtime_exception();
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {
 		_errorMessage = e.message();
