@@ -1051,7 +1051,7 @@ void OCompiler::dispatch_mul( executing_parser::position_t position_ ) {
 void OCompiler::dispatch_power( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	defer_action( &HExpression::power, position_ );
+	bool hasPower( false );
 	while ( ! fc._operations.is_empty() && ( fc._operations.top()._operator == OPERATOR::POWER ) ) {
 		M_ASSERT( fc._valueTypes.get_size() >= 2 );
 		int p( fc._operations.top()._position );
@@ -1067,6 +1067,10 @@ void OCompiler::dispatch_power( executing_parser::position_t position_ ) {
 			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_EXP], p );
 		}
 		fc._valueTypes.push( congruent( t1, t2 ) );
+		hasPower = true;
+	}
+	if ( hasPower ) {
+		defer_action( &HExpression::power, position_ );
 	}
 	return;
 	M_EPILOG
@@ -1174,7 +1178,7 @@ void OCompiler::dispatch_equals( executing_parser::position_t position_ ) {
 void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
-	defer_action( &HExpression::set_variable, position_ );
+	bool hasAssign( false );
 	while ( ! fc._operations.is_empty() ) {
 		OPERATOR o( fc._operations.top()._operator );
 		if ( ( o < OPERATOR::ASSIGN ) || ( o > OPERATOR::POWER_ASSIGN ) ) {
@@ -1242,6 +1246,10 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 			throw HHuginn::HHuginnRuntimeException( "Setting a non reference location.", p );
 		}
 		fc._valueTypes.push( congruent( t1, t2 ) );
+		hasAssign = true;
+	}
+	if ( hasAssign ) {
+		defer_action( &HExpression::set_variable, position_ );
 	}
 	return;
 	M_EPILOG
