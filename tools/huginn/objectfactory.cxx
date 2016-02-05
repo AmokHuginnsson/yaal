@@ -118,11 +118,24 @@ HObjectFactory::HObjectFactory( HHuginn* huginn_ )
 	return;
 }
 
-void HObjectFactory::register_exception_classes( HHuginn* huginn_ ) {
+void HObjectFactory::register_builtin_classes( HHuginn* huginn_ ) {
 	M_PROLOG
 	_exception = exception::get_class( huginn_ );
 	_conversionException = exception::create_class( huginn_, "ConversionException", _exception.raw() );
 	_arithmeticException = exception::create_class( huginn_, "ArithmeticException", _exception.raw() );
+
+	huginn_->register_class( _boolean );
+	huginn_->register_class( _integer );
+	huginn_->register_class( _string );
+	huginn_->register_class( _real );
+	huginn_->register_class( _number );
+	huginn_->register_class( _character );
+	huginn_->register_class( _list );
+	huginn_->register_class( _deque );
+	huginn_->register_class( _dict );
+	huginn_->register_class( _order );
+	huginn_->register_class( _lookup );
+	huginn_->register_class( _set );
 	huginn_->register_class( _exception );
 	huginn_->register_class( _conversionException );
 	huginn_->register_class( _arithmeticException );

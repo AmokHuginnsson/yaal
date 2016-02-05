@@ -216,6 +216,7 @@ HHuginn::class_t HDatabaseConnection::get_class( HHuginn* huginn_, HHuginn::clas
 			)
 		)
 	);
+	huginn_->register_class( c );
 	return ( c );
 	M_EPILOG
 }

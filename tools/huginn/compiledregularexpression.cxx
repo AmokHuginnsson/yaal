@@ -174,6 +174,7 @@ HHuginn::class_t HCompiledRegularExpression::get_class( HHuginn* huginn_, HHugin
 			)
 		)
 	);
+	huginn_->register_class( c );
 	return ( c );
 	M_EPILOG
 }

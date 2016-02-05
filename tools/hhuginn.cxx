@@ -221,7 +221,7 @@ HHuginn::HHuginn( void )
 	M_PROLOG
 	_grammarVerified.store( true );
 	register_builtins();
-	_objectFactory->register_exception_classes( this );
+	_objectFactory->register_builtin_classes( this );
 	return;
 	M_EPILOG
 }
@@ -326,6 +326,14 @@ void HHuginn::register_class( class_t class_ ) {
 	M_PROLOG
 	M_ENSURE( _state != STATE::COMPILED );
 	_classes.insert( make_pair( class_->identifier_id(), class_ ) );
+	OCompiler::OIdentifierUse& ciu( _compiler->_usedIdentifiers[class_->identifier_id()] );
+	ciu.write( 0, OCompiler::OIdentifierUse::TYPE::CLASS );
+	ciu.read( 0 );
+	for ( identifier_id_t id : class_->field_identifiers() ) {
+		OCompiler::OIdentifierUse& iu( _compiler->_usedIdentifiers[id] );
+		iu.write( 0, OCompiler::OIdentifierUse::TYPE::FIELD );
+		iu.read( 0 );
+	}
 	return;
 	M_EPILOG
 }
@@ -367,6 +375,7 @@ void HHuginn::finalize_compilation( void ) {
 	}
 	t->pop_frame();
 	_compiler->_submittedClasses.clear();
+	_compiler->detect_misuse();
 	_compiler->optimize();
 	_threads.clear();
 	return;
@@ -1070,6 +1079,17 @@ inline HHuginn::value_t assert( huginn::HThread* thread_, HHuginn::value_t*, HHu
 
 }
 
+void HHuginn::register_builtin_function( char const* name_, function_t&& function_ ) {
+	M_PROLOG
+	identifier_id_t id( identifier_id( name_ ) );
+	OCompiler::OIdentifierUse& iu( _compiler->_usedIdentifiers[id] );
+	iu.write( 0, OCompiler::OIdentifierUse::TYPE::FUNCTION );
+	iu.read( 0 );
+	_functions.insert( make_pair( id, yaal::move( function_ ) ) );
+	return;
+	M_EPILOG
+}
+
 void HHuginn::register_builtins( void ) {
 	M_PROLOG
 	M_ENSURE( _state != STATE::COMPILED );
@@ -1078,24 +1098,24 @@ void HHuginn::register_builtins( void ) {
 	M_ENSURE( identifier_id( KEYWORD::THIS ) == KEYWORD::THIS_IDENTIFIER );
 	M_ENSURE( identifier_id( KEYWORD::SUPER ) == KEYWORD::SUPER_IDENTIFIER );
 	M_ENSURE( identifier_id( KEYWORD::ASSERT ) == KEYWORD::ASSERT_IDENTIFIER );
-	_functions.insert( make_pair( identifier_id( "integer" ), hcore::call( &huginn_builtin::convert, TYPE::INTEGER, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "real" ), hcore::call( &huginn_builtin::convert, TYPE::REAL, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "string" ), hcore::call( &huginn_builtin::convert, TYPE::STRING, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "number" ), hcore::call( &huginn_builtin::convert, TYPE::NUMBER, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "boolean" ), hcore::call( &huginn_builtin::convert, TYPE::BOOLEAN, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "character" ), hcore::call( &huginn_builtin::convert, TYPE::CHARACTER, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "size" ), hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "type" ), hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "copy" ), hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "list" ), hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "deque" ), hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "dict" ), hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "order" ), hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "lookup" ), hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "set" ), hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "print" ), hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "input" ), hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) ) );
-	_functions.insert( make_pair( identifier_id( "assert" ), hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ) ) );
+	register_builtin_function( "integer", hcore::call( &huginn_builtin::convert, TYPE::INTEGER, _1, _2, _3, _4 ) );
+	register_builtin_function( "real", hcore::call( &huginn_builtin::convert, TYPE::REAL, _1, _2, _3, _4 ) );
+	register_builtin_function( "string", hcore::call( &huginn_builtin::convert, TYPE::STRING, _1, _2, _3, _4 ) );
+	register_builtin_function( "number", hcore::call( &huginn_builtin::convert, TYPE::NUMBER, _1, _2, _3, _4 ) );
+	register_builtin_function( "boolean", hcore::call( &huginn_builtin::convert, TYPE::BOOLEAN, _1, _2, _3, _4 ) );
+	register_builtin_function( "character", hcore::call( &huginn_builtin::convert, TYPE::CHARACTER, _1, _2, _3, _4 ) );
+	register_builtin_function( "size", hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ) );
+	register_builtin_function( "type", hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) );
+	register_builtin_function( "copy", hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) );
+	register_builtin_function( "list", hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) );
+	register_builtin_function( "deque", hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ) );
+	register_builtin_function( "dict", hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) );
+	register_builtin_function( "order", hcore::call( &huginn_builtin::order, _1, _2, _3, _4 ) );
+	register_builtin_function( "lookup", hcore::call( &huginn_builtin::lookup, _1, _2, _3, _4 ) );
+	register_builtin_function( "set", hcore::call( &huginn_builtin::set, _1, _2, _3, _4 ) );
+	register_builtin_function( "print", hcore::call( &huginn_builtin::print, _1, _2, _3, _4 ) );
+	register_builtin_function( "input", hcore::call( &huginn_builtin::input, _1, _2, _3, _4 ) );
+	register_builtin_function( "assert", hcore::call( &huginn_builtin::assert, _1, _2, _3, _4 ) );
 	return;
 	M_EPILOG
 }

@@ -322,6 +322,7 @@ private:
 	void finalize_compilation( void );
 	HClass const* commit_class( identifier_id_t );
 	void register_builtins( void );
+	void register_builtin_function( char const*, function_t&& );
 	char const* error_message( int ) const;
 	HHuginn( HHuginn const& ) = delete;
 	HHuginn& operator = ( HHuginn const& ) = delete;

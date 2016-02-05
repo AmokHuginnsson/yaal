@@ -119,6 +119,26 @@ struct OCompiler {
 		int _position;
 		OExecutionStep( HHuginn::expression_t&, int, HHuginn::identifier_id_t, int );
 	};
+	struct OIdentifierUse {
+		enum class TYPE {
+			UNKNOWN,
+			CLASS,
+			FIELD,
+			METHOD,
+			VARIABLE,
+			FUNCTION,
+			PACKAGE
+		};
+		TYPE _type;
+		int _readCount;
+		int _readPosition;
+		int _writeCount;
+		int _writePosition;
+		OIdentifierUse( void );
+		void read( int, TYPE = TYPE::UNKNOWN );
+		void write( int, TYPE );
+	};
+	typedef yaal::hcore::HLookupMap<HHuginn::identifier_id_t, OIdentifierUse> used_identifiers_t;
 	typedef yaal::hcore::HArray<OExecutionStep> execution_steps_backlog_t;
 	typedef yaal::hcore::HResource<OClassContext> class_context_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, class_context_t> submitted_classes_t;
@@ -130,9 +150,11 @@ struct OCompiler {
 	HHuginn::identifier_id_t _importIdentifier;
 	HHuginn::identifier_id_t _importAlias;
 	execution_steps_backlog_t _executionStepsBacklog;
+	used_identifiers_t _usedIdentifiers;
 	HHuginn* _huginn;
 	OCompiler( HHuginn* );
 	OFunctionContext& f( void );
+	void detect_misuse( void ) const;
 	void optimize( void );
 	void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void set_import_name( yaal::hcore::HString const&, executing_parser::position_t );

@@ -98,7 +98,7 @@ class HObjectFactory final {
 	character_allocator_t _characterAllocator;
 public:
 	HObjectFactory( HHuginn* );
-	void register_exception_classes( HHuginn* );
+	void register_builtin_classes( HHuginn* );
 	HHuginn::value_t create_boolean( HHuginn::HBoolean::value_type value_ ) const {
 		return ( yaal::hcore::allocate_pointer<boolean_allocator_t, HHuginn::HBoolean>( _booleanAllocator, _boolean.raw(), value_ ) );
 	}

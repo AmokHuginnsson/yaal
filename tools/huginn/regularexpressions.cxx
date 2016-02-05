@@ -52,7 +52,6 @@ public:
 		: HObject( class_ )
 		, _exceptionClass( exception::create_class( class_->huginn(), "RegularExpressionException" ) )
 		, _compiledRegularExpressionClass( HCompiledRegularExpression::get_class( class_->huginn(), _exceptionClass ) ) {
-		class_->huginn()->register_class( _compiledRegularExpressionClass );
 		return;
 	}
 	static HHuginn::value_t compile( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {

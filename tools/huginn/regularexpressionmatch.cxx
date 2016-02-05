@@ -110,7 +110,7 @@ int long HRegularExpressionMatch::do_size( void ) const {
 
 HHuginn::class_t HRegularExpressionMatch::get_class( HHuginn* huginn_ ) {
 	M_PROLOG
-	return (
+	HHuginn::class_t c(
 		huginn_->create_class(
 			"RegularExpressionMatch",
 			nullptr,
@@ -122,6 +122,8 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HHuginn* huginn_ ) {
 			}
 		)
 	);
+	huginn_->register_class( c );
+	return ( c );
 	M_EPILOG
 }
 

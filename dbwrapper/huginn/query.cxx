@@ -141,6 +141,7 @@ HHuginn::class_t HQuery::get_class( HHuginn* huginn_, HHuginn::class_t const& ex
 			)
 		)
 	);
+	huginn_->register_class( c );
 	return ( c );
 	M_EPILOG
 }
