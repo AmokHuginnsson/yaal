@@ -40,6 +40,9 @@ endif
 ifdef DO_RELASSERT
 	DO_RELEASE = 1
 endif
+ifdef DO_PROFILING
+	DO_RELEASE = 1
+endif
 ifdef DO_RELEASE
 	TARGET=release
 	COMPILER_OPTIMIZATION_FLAGS = -O3 $(EXTRA_COMPILER_OPTIMIZATION_FLAGS)
@@ -50,6 +53,7 @@ ifdef DO_RELDEB
 	TARGET=reldeb
 	COMPILER_DEBUG_FLAGS = -g -DNDEBUG
 	LIB_INFIX = -rd
+	undefine DO_RELEASE # We want to keep program symbols.
 endif
 ifdef DO_RELASSERT
 	TARGET=relassert
@@ -65,10 +69,11 @@ ifdef DO_DEBUG
 endif
 ifdef DO_PROFILING
 	TARGET=prof
+	COMPILER_DEBUG_FLAGS = -g -DNDEBUG
 	COMPILER_PROFILING_FLAGS = -pg
-	COMPILER_DEBUG_FLAGS = -D__DEBUG__
 	LINKER_PROFILING_FLAGS   = -pg
 	LIB_INFIX = -p
+	undefine DO_RELEASE # We want to keep program symbols.
 endif
 ifdef DO_COVERAGE
 	TARGET=cov

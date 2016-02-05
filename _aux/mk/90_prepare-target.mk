@@ -40,7 +40,7 @@ $$(REAL_TARGET): $$(OBJS_$(1)) $$(EXTRA_DEPS_$(1))
 	/bin/rm -f "$$(@)"; \
 	$$(call invoke,$$(LXX) $$(LXXFLAGS) $$(LXXFLAGS_$(1)) -o $$(@) $$(START_GROUP) $$(OBJS_$(1)) $$(END_GROUP) $$(EXTRA_LIBS) $$(LIBS) $$(LIBS_$(1)) 2>&1 | tee -a make.log )
 ifdef DO_RELEASE
-	@strip $$(REAL_TARGET)
+	$$(call invoke,strip $$(REAL_TARGET))
 endif
 	@test -f $$(@) \
 	$$(call msg,&& printf "%b$$(NL)" "done.$$(CL)")
