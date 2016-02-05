@@ -116,14 +116,14 @@ HHuginn::value_t HFrame::get_reference( HHuginn::identifier_id_t identifierId_, 
 			v = it->second;
 			break;
 		} else if ( obj && ( ( fieldIdx = obj->field_index( identifierId_ ) ) >= 0 ) ) {
-			v = obj->field( *_object, fieldIdx );
+			v = obj->field( *f->_object, fieldIdx );
 			break;
 		} else if ( obj && ( identifierId_ == KEYWORD::THIS_IDENTIFIER ) ) {
-			v = *_object;
+			v = *f->_object;
 			M_ASSERT( !! v );
 			break;
 		} else if ( obj && ( identifierId_ == KEYWORD::SUPER_IDENTIFIER ) ) {
-			HHuginn::value_t p = *_object;
+			HHuginn::value_t p = *f->_object;
 			M_ASSERT( !! p );
 			v = make_pointer<HHuginn::HObjectReference>( p, _upCast, true, position_ );
 			break;
