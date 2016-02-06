@@ -1292,7 +1292,13 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 		if ( name != INVALID_IDENTIFIER ) {
 			note_type( name, t1 );
 		}
-		if ( ! are_congruous( t1, realDestType ) ) {
+		if ( o == OPERATOR::ASSIGN ) {
+			if ( name != INVALID_IDENTIFIER ) {
+				_usedIdentifiers[name].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+			}
+		} else if ( are_congruous( t1, realDestType ) ) {
+			_usedIdentifiers[name].read( position_.get(), OIdentifierUse::TYPE::VARIABLE );
+		} else {
 			operands_type_mismatch( op_to_str( o ), t1, realDestType, position_.get() );
 		}
 		switch ( o ) {
@@ -1608,7 +1614,6 @@ void OCompiler::defer_make_variable( yaal::hcore::HString const& value_, executi
 		throw HHuginn::HHuginnRuntimeException( "`"_ys.append( value_ ).append( "' is a restricted name." ), position_.get() );
 	}
 	HHuginn::identifier_id_t varIdentifier( _huginn->identifier_id( value_ ) );
-	_usedIdentifiers[varIdentifier].write( position_.get(), OIdentifierUse::TYPE::VARIABLE );
 	current_expression()->add_execution_step( hcore::call( &HExpression::make_variable, current_expression().raw(), varIdentifier, _1, position_.get() ) );
 	fc._valueTypes.push( type_id( HHuginn::TYPE::UNKNOWN ) );
 	fc._variables.push( varIdentifier );
