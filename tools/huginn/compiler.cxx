@@ -263,7 +263,13 @@ void OCompiler::detect_misuse( void ) const {
 	M_PROLOG
 	HHuginn::identifier_id_t implicitUse[] = {
 		_huginn->identifier_id( "main" ),
-		_huginn->identifier_id( "get_size" )
+		_huginn->identifier_id( "get_size" ),
+		_huginn->identifier_id( "to_string" ),
+		_huginn->identifier_id( "to_integer" ),
+		_huginn->identifier_id( "to_real" ),
+		_huginn->identifier_id( "to_number" ),
+		_huginn->identifier_id( "to_character" ),
+		_huginn->identifier_id( "to_boolean" )
 	};
 	HHuginn::identifier_id_t implicitDefinition[] = {
 		KEYWORD::CONSTRUCTOR_IDENTIFIER,
