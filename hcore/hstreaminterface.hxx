@@ -74,6 +74,11 @@ public:
 		void set_precision( HStreamInterface& ) const;
 	};
 	typedef HPointer<HStreamInterface> ptr_t;
+	enum class POLL_TYPE {
+		NATIVE,
+		EMULATED,
+		INVALID
+	};
 	enum class BASES {
 		DEC,
 		HEX,
@@ -258,7 +263,17 @@ public:
 	int long read( void* const, int long );
 	int long write( void const* const, int long );
 	M_YAAL_HCORE_PUBLIC_API static char const* const eols;
+	/*! \brief Tell if given stream instance if a valid stream object.
+	 *
+	 * Note: Implementation is not a trivial forward.
+	 */
 	bool is_valid( void ) const;
+	POLL_TYPE poll_type( void ) const {
+		return ( do_poll_type() );
+	}
+	void const* data( void ) const {
+		return ( do_data() );
+	}
 	/*! \brief Tell if all operations until now succeeded.
 	 *
 	 * \return True iff all operations until now succeeded.
@@ -406,6 +421,8 @@ private:
 	virtual int long do_read( void* const, int long ) = 0;
 	virtual void do_flush( void ) = 0;
 	virtual bool do_is_valid( void ) const = 0;
+	virtual POLL_TYPE do_poll_type( void ) const = 0;
+	virtual void const* do_data( void ) const = 0;
 	friend HStreamInterface& endl( HStreamInterface& );
 	friend HStreamInterface& flush( HStreamInterface& );
 };

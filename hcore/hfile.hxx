@@ -122,6 +122,8 @@ private:
 	virtual void do_flush( void ) override;
 	virtual int long do_read( void* const, int long ) override;
 	virtual bool do_is_valid( void ) const override;
+	virtual POLL_TYPE do_poll_type( void ) const override;
+	virtual void const* do_data( void ) const override;
 	int long get_line_length( void );
 	HFile( HFile const& ) = delete;
 	HFile& operator = ( HFile const& ) = delete;

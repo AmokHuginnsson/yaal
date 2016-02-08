@@ -32,6 +32,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hmemory.hxx"
 #include "hcore/algorithm.hxx"
 
+using namespace yaal::hcore;
+
 namespace yaal {
 
 namespace tools {
@@ -107,6 +109,18 @@ int long HMemory::do_read( void* const dest_, int long size_ ) {
 bool HMemory::do_is_valid( void ) const {
 	M_PROLOG
 	return ( ( _cursorRead < _memory.get_size() ) && ( _cursorWrite < _memory.get_size() ) );
+	M_EPILOG
+}
+
+HStreamInterface::POLL_TYPE HMemory::do_poll_type( void ) const {
+	M_PROLOG
+	return ( is_valid() ? POLL_TYPE::EMULATED : POLL_TYPE::INVALID );
+	M_EPILOG
+}
+
+void const* HMemory::do_data( void ) const {
+	M_PROLOG
+	return ( is_valid() ? this : nullptr );
 	M_EPILOG
 }
 

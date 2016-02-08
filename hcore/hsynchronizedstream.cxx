@@ -503,6 +503,20 @@ bool HSynchronizedStream::do_is_valid( void ) const {
 	M_EPILOG
 }
 
+HStreamInterface::POLL_TYPE HSynchronizedStream::do_poll_type( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( _streamRef ? _streamRef->poll_type() : POLL_TYPE::INVALID );
+	M_EPILOG
+}
+
+void const* HSynchronizedStream::do_data( void ) const {
+	M_PROLOG
+	HLock l( _mutex );
+	return ( _streamRef ? _streamRef->data() : nullptr );
+	M_EPILOG
+}
+
 bool HSynchronizedStream::do_good( void ) const {
 	M_PROLOG
 	HLock l( _mutex );

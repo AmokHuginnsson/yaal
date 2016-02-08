@@ -143,6 +143,8 @@ private:
 	virtual void do_flush( void ) override;
 	virtual int long do_read( void* const, int long ) override;
 	virtual bool do_is_valid( void ) const override;
+	virtual POLL_TYPE do_poll_type( void ) const override;
+	virtual void const* do_data( void ) const override;
 	HMemory( HMemory const& src ) = delete;
 	HMemory& operator = ( HMemory const& src ) = delete;
 };

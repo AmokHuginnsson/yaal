@@ -211,8 +211,10 @@ HStreamInterface::ptr_t ensure( HStreamInterface::ptr_t stream_ ) {
 }
 
 HTee::HTee( HTee const& tee_ )
-	: HStreamInterface(), _stream1( tee_._stream1 ), _stream2( tee_._stream2 )
-	{}
+	: HStreamInterface()
+	, _stream1( tee_._stream1 )
+	, _stream2( tee_._stream2 ) {
+}
 
 int long HTee::do_write( void const* const data_, int long size_ ) {
 	M_PROLOG
@@ -242,6 +244,18 @@ void HTee::do_flush( void ) {
 bool HTee::do_is_valid( void ) const {
 	M_PROLOG
 	return ( _stream1.is_valid() && _stream2.is_valid() );
+	M_EPILOG
+}
+
+HStreamInterface::POLL_TYPE HTee::do_poll_type( void ) const {
+	M_PROLOG
+	return ( is_valid() ? POLL_TYPE::EMULATED : POLL_TYPE::INVALID );
+	M_EPILOG
+}
+
+void const* HTee::do_data( void ) const {
+	M_PROLOG
+	return ( is_valid() ? this : nullptr );
 	M_EPILOG
 }
 

@@ -33,6 +33,8 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hzipstream.hxx"
 #include "tools.hxx"
 
+using namespace yaal::hcore;
+
 namespace yaal {
 
 namespace tools {
@@ -244,6 +246,18 @@ void HZipStream::do_flush( void ) {
 bool HZipStream::do_is_valid( void ) const {
 	M_PROLOG
 	return ( _streamRef ? _streamRef->is_valid() : false );
+	M_EPILOG
+}
+
+HStreamInterface::POLL_TYPE HZipStream::do_poll_type( void ) const {
+	M_PROLOG
+	return ( _streamRef ? _streamRef->poll_type() : POLL_TYPE::INVALID );
+	M_EPILOG
+}
+
+void const* HZipStream::do_data( void ) const {
+	M_PROLOG
+	return ( _streamRef ? _streamRef->data() : nullptr );
 	M_EPILOG
 }
 

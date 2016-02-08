@@ -231,6 +231,18 @@ bool HRawFile::do_is_valid( void ) const {
 	M_EPILOG
 }
 
+HStreamInterface::POLL_TYPE HRawFile::do_poll_type( void ) const {
+	M_PROLOG
+	return ( is_valid() ? POLL_TYPE::NATIVE : POLL_TYPE::INVALID );
+	M_EPILOG
+}
+
+void const* HRawFile::do_data( void ) const {
+	M_PROLOG
+	return ( is_valid() ? reinterpret_cast<void const*>( _fileDescriptor ) : nullptr );
+	M_EPILOG
+}
+
 }
 
 }

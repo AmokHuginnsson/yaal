@@ -145,6 +145,18 @@ bool HStringStream::do_is_valid( void ) const {
 	M_EPILOG
 }
 
+HStreamInterface::POLL_TYPE HStringStream::do_poll_type( void ) const {
+	M_PROLOG
+	return ( is_valid() ? POLL_TYPE::EMULATED : POLL_TYPE::INVALID );
+	M_EPILOG
+}
+
+void const* HStringStream::do_data( void ) const {
+	M_PROLOG
+	return ( is_valid() ? this : nullptr );
+	M_EPILOG
+}
+
 }
 
 }
