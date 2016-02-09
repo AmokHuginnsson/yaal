@@ -87,6 +87,17 @@ inline HHuginn::value_t find( huginn::HThread* thread_, HHuginn::value_t* object
 	M_EPILOG
 }
 
+inline HHuginn::value_t replace( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "string.replace";
+	verify_arg_count( name, values_, 2, 2, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
+	verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+	static_cast<HHuginn::HString*>( object_->raw() )->value().replace( get_string( values_[0] ), get_string( values_[1] ) );
+	return ( *object_ );
+	M_EPILOG
+}
+
 inline HHuginn::value_t strip( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "string.strip";
@@ -151,6 +162,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			nullptr,
 			HHuginn::field_names_t{
 				"find",
+				"replace",
 				"strip",
 				"to_lower",
 				"to_upper",
@@ -158,6 +170,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			},
 			HHuginn::values_t{
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::replace, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_lower, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_upper, _1, _2, _3, _4 ) ),
