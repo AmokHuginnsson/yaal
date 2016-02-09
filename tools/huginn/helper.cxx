@@ -276,6 +276,7 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 	static HString const NAME_ORDER = "order";
 	static HString const NAME_LOOKUP = "lookup";
 	static HString const NAME_SET = "set";
+	static HString const NAME_OBSERVER = "*observer*";
 	static HString const NAME_REFERENCE = "*reference*";
 	static HString const NAME_FUNCTION_REFERENCE = "*function_reference*";
 	static HString const NAME_OBJECT_REFERENCE = "*object_reference*";
@@ -296,6 +297,7 @@ yaal::hcore::HString const& type_name( HHuginn::TYPE type_ ) {
 		case ( HHuginn::TYPE::ORDER ):              s = &NAME_ORDER;              break;
 		case ( HHuginn::TYPE::LOOKUP ):             s = &NAME_LOOKUP;             break;
 		case ( HHuginn::TYPE::SET ):                s = &NAME_SET;                break;
+		case ( HHuginn::TYPE::OBSERVER ):           s = &NAME_OBSERVER;           break;
 		case ( HHuginn::TYPE::REFERENCE ):          s = &NAME_REFERENCE;          break;
 		case ( HHuginn::TYPE::FUNCTION_REFERENCE ): s = &NAME_FUNCTION_REFERENCE; break;
 		case ( HHuginn::TYPE::OBJECT_REFERENCE ):   s = &NAME_OBJECT_REFERENCE;   break;

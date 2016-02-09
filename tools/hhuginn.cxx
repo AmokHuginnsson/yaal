@@ -73,6 +73,7 @@ main( args ) {
 namespace huginn {
 
 HHuginn::HClass const _noneClass_( HHuginn::TYPE::NONE );
+HHuginn::HClass const _observerClass_( HHuginn::TYPE::OBSERVER );
 HHuginn::HClass const _referenceClass_( HHuginn::TYPE::REFERENCE );
 HHuginn::HClass const _functionReferenceClass_( HHuginn::TYPE::FUNCTION_REFERENCE );
 HHuginn::HClass const _objectReferenceClass_( HHuginn::TYPE::OBJECT_REFERENCE );
@@ -782,6 +783,20 @@ HHuginn::value_t HHuginn::HValue::do_clone( HHuginn* huginn_ ) const {
 	return ( huginn_->none_value() );
 }
 
+HHuginn::HObserver::HObserver( HHuginn::value_t const& value_ )
+	: HValue( &_observerClass_ )
+	, _value( value_ ) {
+	return;
+}
+
+HHuginn::value_t HHuginn::HObserver::value( void ) const {
+	return ( _value );
+}
+
+HHuginn::value_t HHuginn::HObserver::do_clone( HHuginn* ) const {
+	return ( make_pointer<HObserver>( _value ) );
+}
+
 HHuginn::HReference::HReference( HHuginn::value_t& value_ )
 	: HValue( &_referenceClass_ ), _value( value_ ) {
 	return;
@@ -963,6 +978,34 @@ inline HHuginn::value_t copy( huginn::HThread* thread_, HHuginn::value_t*, HHugi
 	M_EPILOG
 }
 
+inline HHuginn::value_t observe( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	verify_arg_count( "observe", values_, 1, 1, position_ );
+	HHuginn::value_t const& v( values_.front() );
+	if ( v->type_id() == HHuginn::TYPE::OBSERVER ) {
+		throw HHuginn::HHuginnRuntimeException(
+			"Making observer out of observer.",
+			position_
+		);
+	}
+	return ( make_pointer<HHuginn::HObserver>( v ) );
+	M_EPILOG
+}
+
+inline HHuginn::value_t use( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	static char const name[] = "use";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::OBSERVER, true, position_ );
+	HHuginn::HObserver const* o( static_cast<HHuginn::HObserver const*>( values_.front().raw() ) );
+	HHuginn::value_t v( o->value() );
+	if ( !v ) {
+		v = thread_->huginn().none_value();
+	}
+	return ( v );
+	M_EPILOG
+}
+
 inline HHuginn::value_t list( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int ) {
 	M_PROLOG
 	HHuginn::value_t v( thread_->object_factory().create_list() );
@@ -1107,6 +1150,8 @@ void HHuginn::register_builtins( void ) {
 	register_builtin_function( "size", hcore::call( &huginn_builtin::size, _1, _2, _3, _4 ) );
 	register_builtin_function( "type", hcore::call( &huginn_builtin::type, _1, _2, _3, _4 ) );
 	register_builtin_function( "copy", hcore::call( &huginn_builtin::copy, _1, _2, _3, _4 ) );
+	register_builtin_function( "observe", hcore::call( &huginn_builtin::observe, _1, _2, _3, _4 ) );
+	register_builtin_function( "use", hcore::call( &huginn_builtin::use, _1, _2, _3, _4 ) );
 	register_builtin_function( "list", hcore::call( &huginn_builtin::list, _1, _2, _3, _4 ) );
 	register_builtin_function( "deque", hcore::call( &huginn_builtin::deque, _1, _2, _3, _4 ) );
 	register_builtin_function( "dict", hcore::call( &huginn_builtin::dict, _1, _2, _3, _4 ) );

@@ -113,7 +113,9 @@ words_t _builtin_ = {{
 	type_name( HHuginn::TYPE::STRING ),
 	"type",
 	"size",
-	"copy"
+	"copy",
+	"observe",
+	"use"
 }};
 
 words_t _standardLibrary_ = {{

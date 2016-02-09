@@ -102,6 +102,7 @@ public:
 	typedef yaal::hcore::HPointer<huginn::HScope> scope_t;
 	class HClass;
 	typedef yaal::hcore::HPointer<HClass> class_t;
+	class HObserver;
 	class HReference;
 	class HFunctionReference;
 	class HValue;
@@ -150,6 +151,7 @@ public:
 		ORDER,
 		LOOKUP,
 		SET,
+		OBSERVER,
 		REFERENCE,
 		FUNCTION_REFERENCE,
 		OBJECT_REFERENCE,
@@ -509,6 +511,20 @@ public:
 private:
 	HObjectReference( HObjectReference const& ) = delete;
 	HObjectReference& operator = ( HObjectReference const& ) = delete;
+	virtual value_t do_clone( HHuginn* ) const override;
+};
+
+class HHuginn::HObserver : public HHuginn::HValue {
+public:
+	typedef HHuginn::HObserver this_type;
+	typedef HHuginn::HValue base_type;
+	typedef yaal::hcore::HPointerObserver<HHuginn::HValue> value_type;
+private:
+	value_type _value;
+public:
+	HObserver( HHuginn::value_t const& );
+	HHuginn::value_t value( void ) const;
+private:
 	virtual value_t do_clone( HHuginn* ) const override;
 };
 
