@@ -66,7 +66,7 @@ OCompiler::OScopeContext::OScopeContext( OScopeContext* parent_ )
 	, _scope( make_pointer<HScope>() )
 	, _expressionsStack()
 	, _variableTypes()
-	, _type( INVALID_IDENTIFIER )
+	, _exceptionType( INVALID_IDENTIFIER )
 	, _identifier( INVALID_IDENTIFIER )
 	, _position( 0 )
 	, _scopeChain()
@@ -82,7 +82,7 @@ void OCompiler::OScopeContext::clear( void ) {
 	_expressionsStack.clear();
 	_expressionsStack.emplace( 1, make_pointer<HExpression>() );
 	_variableTypes.clear();
-	_type = INVALID_IDENTIFIER;
+	_exceptionType = INVALID_IDENTIFIER;
 	_identifier = INVALID_IDENTIFIER;
 	_position = 0;
 	_scopeChain.clear();
@@ -599,7 +599,7 @@ void OCompiler::commit_catch( executing_parser::position_t ) {
 	HHuginn::scope_t scope( current_scope() );
 	fc._scopeStack.pop();
 	OScopeContext& sc( *fc._scopeStack.top() );
-	sc._catches.emplace_back( HTryCatch::OCatch{ sc._type, sc._identifier, scope, sc._position } );
+	sc._catches.emplace_back( HTryCatch::OCatch{ sc._exceptionType, sc._identifier, scope, sc._position } );
 	sc._position = 0;
 	reset_expression();
 	return;
@@ -800,7 +800,7 @@ void OCompiler::close_function_call( executing_parser::position_t position_ ) {
 void OCompiler::set_type_name( yaal::hcore::HString const& name_, executing_parser::position_t position_ ) {
 	M_PROLOG
 	OScopeContext& sc( current_scope_context() );
-	sc._type = _huginn->identifier_id( name_ );
+	sc._exceptionType = _huginn->identifier_id( name_ );
 	sc._position = position_.get();
 	return;
 	M_EPILOG

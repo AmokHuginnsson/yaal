@@ -45,26 +45,68 @@ namespace huginn {
 class HExpression;
 class HFrame;
 
+/*! \brief Huginn language compiler.
+ */
 struct OCompiler {
 	typedef void ( HExpression::* expression_action_t ) ( HFrame*, int );
 	typedef yaal::hcore::HStack<HFunction::expressions_t> expressions_stack_t;
 	typedef yaal::hcore::HHashMap<HHuginn::identifier_id_t, HHuginn::type_id_t> variable_types_t;
+	/*! \brief Saves _compiled_ `if'/`case' expression-scope pairs.
+	 *
+	 * Once created by compiler OActiveScope instance is never modified
+	 * and only passed around.
+	 *
+	 * Term "active" comes from a main (entry) expression that is intrinsic for this kind of scope.
+	 */
 	struct OActiveScope {
 		HHuginn::scope_t _scope;
 		HHuginn::expression_t _expression;
 		OActiveScope( HHuginn::scope_t&, HHuginn::expression_t& );
 	};
+	/*! \brief Huginn program scope as seen by the compiler.
+	 */
 	struct OScopeContext {
 		typedef yaal::hcore::HArray<OActiveScope> active_scopes_t;
-		OScopeContext* _parent;
-		HHuginn::scope_t _scope;
+		OScopeContext* _parent;  /*!< parent scope */
+		HHuginn::scope_t _scope; /*!< currently compiled Huginn run-time scope */
+
+		/*! \brief Currently constructed expression.
+		 *
+		 * Expressions need to have form of a stack to support ternary operator
+		 * and short-circuiting boolean operators.
+		 *
+		 * Expressions need to be held per scope to support `while' and `for'
+		 * which commit their main (entry) expressions after their scope
+		 * has been closed.
+		 */
 		expressions_stack_t _expressionsStack;
+
+		/*! \brief Local symbol type book-keeper.
+		 *
+		 * Used for compile-time detection of type mismatches.
+		 */
 		variable_types_t _variableTypes;
-		HHuginn::identifier_id_t _type;
+
+		/*! \brief type of currently compiled exception catch clause
+		 */
+		HHuginn::identifier_id_t _exceptionType;
+
+		/*! \brief identifier used either as `for' variable or caught exception variable
+		 */
 		HHuginn::identifier_id_t _identifier;
 		int _position;
+
+		/*! \brief Set of already fully compiled scopes of either if/else-if of switch->case..case chain.
+		 */
 		active_scopes_t _scopeChain;
+
+		/*! \brief Already fully compiled scope for `else' in if/else-if/else chain.
+		 * Also used as fully compiled `default' clause in `switch' statement.
+		 */
 		HHuginn::scope_t _else;
+
+		/*! \brief Fully compiled chain of catch statements.
+		 */
 		HTryCatch::catches_t _catches;
 		OScopeContext( OScopeContext* );
 		HHuginn::expression_t& expression( void );
