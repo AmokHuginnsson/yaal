@@ -1098,7 +1098,7 @@ void OCompiler::dispatch_plus( executing_parser::position_t position_ ) {
 	HHuginn::type_id_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( t1, t2 ) ) {
-		operands_type_mismatch( op_to_str( o ), t1, t2, position_.get() );
+		operands_type_mismatch( op_to_str( o ), t2, t1, position_.get() );
 	}
 	if ( ! ( is_summable( t1 ) && is_summable( t2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -1130,7 +1130,7 @@ void OCompiler::dispatch_mul( executing_parser::position_t position_ ) {
 	HHuginn::type_id_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( t1, t2 ) ) {
-		operands_type_mismatch( op_to_str( o ), t1, t2, position_.get() );
+		operands_type_mismatch( op_to_str( o ), t2, t1, position_.get() );
 	}
 	if ( ! ( is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException(
@@ -1159,7 +1159,7 @@ void OCompiler::dispatch_power( executing_parser::position_t position_ ) {
 		HHuginn::type_id_t t2( fc._valueTypes.top() );
 		fc._valueTypes.pop();
 		if ( ! are_congruous( t1, t2 ) ) {
-			operands_type_mismatch( op_to_str( OPERATOR::POWER ), t1, t2, p );
+			operands_type_mismatch( op_to_str( OPERATOR::POWER ), t2, t1, p );
 		}
 		if ( ! ( is_numeric_congruent( t1 ) && is_numeric_congruent( t2 ) ) ) {
 			throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_EXP], p );
@@ -1198,7 +1198,7 @@ void OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
 	HHuginn::type_id_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( t1, t2 ) ) {
-		operands_type_mismatch( os, t1, t2, p );
+		operands_type_mismatch( os, t2, t1, p );
 	}
 	if ( ! ( is_comparable_congruent( t1 ) && is_comparable_congruent( t2 ) ) ) {
 		throw HHuginn::HHuginnRuntimeException( _errMsgHHuginn_[ERR_CODE::OP_NOT_CMP], p );
@@ -1266,7 +1266,7 @@ void OCompiler::dispatch_equals( executing_parser::position_t position_ ) {
 	HHuginn::type_id_t t2( fc._valueTypes.top() );
 	fc._valueTypes.pop();
 	if ( ! are_congruous( t1, t2 ) ) {
-		operands_type_mismatch( op_to_str( o ), t1, t2, p );
+		operands_type_mismatch( op_to_str( o ), t2, t1, p );
 	}
 	fc._valueTypes.push( type_id( HHuginn::TYPE::BOOLEAN ) );
 	return;
@@ -1305,7 +1305,7 @@ void OCompiler::dispatch_assign( executing_parser::position_t position_ ) {
 		} else if ( are_congruous( t1, realDestType ) ) {
 			_usedIdentifiers[name].read( position_.get(), OIdentifierUse::TYPE::VARIABLE );
 		} else {
-			operands_type_mismatch( op_to_str( o ), t1, realDestType, position_.get() );
+			operands_type_mismatch( op_to_str( o ), realDestType, t1, p );
 		}
 		switch ( o ) {
 			case ( OPERATOR::PLUS_ASSIGN ):
