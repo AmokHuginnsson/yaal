@@ -45,7 +45,7 @@ public:
 	typedef HFile this_type;
 	typedef HStreamInterface base_type;
 	struct OPEN;
-	/*! \brief Bits user for specyfying the way files are opened.
+	/*! \brief Bits used for specyfying the way files are opened.
 	 */
 	typedef HBitFlag<OPEN> open_t;
 	struct OPEN {

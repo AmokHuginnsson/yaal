@@ -100,6 +100,12 @@ extern HHuginn::class_t _exceptionClass_;
 
 }
 
+HHuginn::compiler_setup_t const HHuginn::COMPILER::DEFAULT = HHuginn::compiler_setup_t::new_flag();
+HHuginn::compiler_setup_t const HHuginn::COMPILER::BE_STRICT = HHuginn::compiler_setup_t::new_flag();
+HHuginn::compiler_setup_t const HHuginn::COMPILER::BE_SLOPPY = HHuginn::compiler_setup_t::new_flag();
+HHuginn::compiler_setup_t const HHuginn::COMPILER::OPTIMIZE = HHuginn::compiler_setup_t::new_flag();
+HHuginn::compiler_setup_t const HHuginn::COMPILER::DONT_OPTIMIZE = HHuginn::compiler_setup_t::new_flag();
+
 HHuginn::HHuginnRuntimeException::HHuginnRuntimeException( yaal::hcore::HString const& message_, int position_ )
 	: _message( message_ )
 	, _position( position_ ) {
@@ -363,7 +369,7 @@ yaal::hcore::HString const& HHuginn::identifier_name( identifier_id_t id_ ) cons
 	M_EPILOG
 }
 
-void HHuginn::finalize_compilation( void ) {
+void HHuginn::finalize_compilation( compiler_setup_t compilerSetup_ ) {
 	M_PROLOG
 	for ( OCompiler::submitted_imports_t::value_type i : _compiler->_submittedImports ) {
 		_packages.insert( make_pair( i.second, HPackageFactoryInstance::get_instance().create_package( this, identifier_name( i.first ) ) ) );
@@ -376,20 +382,36 @@ void HHuginn::finalize_compilation( void ) {
 	}
 	t->pop_frame();
 	_compiler->_submittedClasses.clear();
-	_compiler->detect_misuse();
-	_compiler->optimize();
+	if ( compilerSetup_ & COMPILER::BE_STRICT ) {
+		_compiler->detect_misuse();
+	}
+	if ( compilerSetup_ & COMPILER::OPTIMIZE ) {
+		_compiler->optimize();
+	}
 	_threads.clear();
 	return;
 	M_EPILOG
 }
 
-bool HHuginn::compile( void ) {
+bool HHuginn::compile( compiler_setup_t compilerSetup_ ) {
 	M_PROLOG
 	M_ENSURE( _state == STATE::PARSED );
+	if ( ( compilerSetup_ & COMPILER::BE_STRICT ) && ( compilerSetup_ & COMPILER::BE_SLOPPY ) ) {
+		throw HHuginnException( "BE_STRICT and BE_SLOPPY flags are mutually exclusive." );
+	}
+	if ( ! ( ( compilerSetup_ & COMPILER::BE_STRICT ) || ( compilerSetup_ & COMPILER::BE_SLOPPY ) ) ) {
+		compilerSetup_ |= COMPILER::BE_STRICT;
+	}
+	if ( ( compilerSetup_ & COMPILER::OPTIMIZE ) && ( compilerSetup_ & COMPILER::DONT_OPTIMIZE ) ) {
+		throw HHuginnException( "OPTIMIZE and DONT_OPTIMIZE flags are mutually exclusive." );
+	}
+	if ( ! ( ( compilerSetup_ & COMPILER::OPTIMIZE ) || ( compilerSetup_ & COMPILER::DONT_OPTIMIZE ) ) ) {
+		compilerSetup_ |= COMPILER::OPTIMIZE;
+	}
 	bool ok( false );
 	try {
 		_engine.execute();
-		finalize_compilation();
+		finalize_compilation( compilerSetup_ );
 		_state = STATE::COMPILED;
 		ok = true;
 	} catch ( HHuginnRuntimeException const& e ) {

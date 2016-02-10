@@ -159,6 +159,17 @@ public:
 		UNKNOWN,
 		NOT_BOOLEAN
 	};
+	struct COMPILER;
+	/*! \brief Bits used for specyfying how compiler should work.
+	 */
+	typedef yaal::hcore::HBitFlag<COMPILER> compiler_setup_t;
+	struct COMPILER {
+		static M_YAAL_HCORE_PUBLIC_API compiler_setup_t const DEFAULT;
+		static M_YAAL_HCORE_PUBLIC_API compiler_setup_t const BE_STRICT;
+		static M_YAAL_HCORE_PUBLIC_API compiler_setup_t const BE_SLOPPY;
+		static M_YAAL_HCORE_PUBLIC_API compiler_setup_t const OPTIMIZE;
+		static M_YAAL_HCORE_PUBLIC_API compiler_setup_t const DONT_OPTIMIZE;
+	};
 	class HHuginnRuntimeException;
 	typedef yaal::hcore::HResource<huginn::HSource> source_t;
 	typedef yaal::hcore::HResource<huginn::OCompiler> compiler_t;
@@ -238,9 +249,10 @@ public:
 
 	/*! \brief Compile parsed program.
 	 *
+	 * \param compilerSetup_ - decide how compiler should work.
 	 * \return True iff compilation finished with no errors.
 	 */
-	bool compile( void );
+	bool compile( compiler_setup_t compilerSetup_ = COMPILER::DEFAULT );
 
 	/*! \brief Execute compiled program.
 	 *
@@ -321,7 +333,7 @@ public:
 		return ( _objectFactory.raw() );
 	}
 private:
-	void finalize_compilation( void );
+	void finalize_compilation( compiler_setup_t );
 	HClass const* commit_class( identifier_id_t );
 	void register_builtins( void );
 	void register_builtin_function( char const*, function_t&& );
