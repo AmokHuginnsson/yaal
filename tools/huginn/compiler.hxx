@@ -117,24 +117,103 @@ struct OCompiler {
 		OScopeContext( OScopeContext const& ) = delete;
 		OScopeContext& operator = ( OScopeContext const& ) = delete;
 	};
+	/* \brief Compilation context for currently compiled function/method/lambda.
+	 */
 	struct OFunctionContext {
 		typedef yaal::hcore::HResource<OScopeContext> scope_context_t;
 		typedef yaal::hcore::HStack<scope_context_t> scope_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::type_id_t> type_stack_t;
 		typedef yaal::hcore::HStack<HHuginn::identifier_id_t> variable_stack_t;
+
+		/*! \brief Identifier of currently compiled function.
+		 */
 		HHuginn::identifier_id_t _functionIdentifier;
+
+		/*! \param Names of parameters for currently compiled function.
+		 */
 		HFunction::parameter_names_t _parameters;
+
+		/*! \brief Default values for parameters of currently compiled function.
+		 */
 		HFunction::expressions_t _defaultValues;
+
+		/*! \brief Index of default value for function argument that was defined last.
+		 */
 		int _lastDefaultValuePosition;
+
+		/*! \brief Currently compiled scope stack.
+		 */
 		scope_stack_t _scopeStack;
+
+		/*! \brief Expression execution emulator helper (operators).
+		 *
+		 * Keeps track of operators to be executed in currently compiled expression.
+		 * This must be kept in \e OFunctionContext (as opposite to \e OScopeContext) to support
+		 * expressions with directly called lambdas, e.g:
+		 * \code
+		 * x = 1 + @(){return ( 2 );}();
+		 * \endcode
+		 */
 		operations_t _operations;
+
+		/*! \brief Expression execution emulator helper (value types).
+		 *
+		 * Complementary of \e _operations.
+		 * Helps with detection of mismatched types in expressions using built-in operators.
+		 * Must be held in \e OFunctionContext for the same reason as \e _operations.
+		 */
 		type_stack_t _valueTypes;
+
+		/*! \brief Remember what variables are used in (re)assignment sub-expression.
+		 *
+		 * Those remembered variable identifiers are used in dispatch_assign()
+		 * to link types to variables in current compilation context.
+		 */
 		variable_stack_t _variables;
+
+		/*! \brief Keep track how deep we are in nested for/while statements.
+		 *
+		 * Helps in detection on invalid use of `break' and `continue' statement.
+		 */
 		int _loopCount;
+
+		/*! \brief Keep track how deep we are in nested for/while/switch statements.
+		 *
+		 * Helps in detection on invalid use of `break' statement.
+		 */
 		int _loopSwitchCount;
+
+		/*! \brief Count how many nested calls we have at current stage of compilation of an expression.
+		 *
+		 * This count is used to support `assert' statement.
+		 *
+		 * By nested calls we mean:
+		 * \code
+		 * foo( foo( foo( foo( 0 ) ) ) )
+		 * \codeend
+		 */
 		int _nestedCalls;
+
+		/*! \brief Keeps information about type of last dereference operators used in currently compiled expression.
+		 *
+		 * Used to prevent assignment to function call result.
+		 */
 		OPERATOR _lastDereferenceOperator;
+
+		/*! \brief Tell if currently compiled expression is in fact in assert statement.
+		 *
+		 * Used to support `assert' statement, also
+		 * helps with detection of invalid uses of `assert' statement.
+		 */
 		bool _isAssert;
+
+		/*! \brief Keeps information of last used member access name in currently compiled expression.
+		 *
+		 * Allows support for assignment to referenced object members:
+		 * \code
+		 * x._field = 0;
+		 * \endcode
+		 */
 		HHuginn::identifier_id_t _lastMemberName;
 		OFunctionContext( void );
 		expressions_stack_t& expressions_stack( void );
@@ -215,6 +294,12 @@ struct OCompiler {
 	void close_function_call( executing_parser::position_t );
 	void set_type_name( yaal::hcore::HString const&, executing_parser::position_t );
 	void add_paramater( yaal::hcore::HString const&, executing_parser::position_t );
+
+	/*! \brief Verify that there are no holes in default argument definitions in function parameters.
+	 *
+	 * This function is called both explicitly by OCompiler
+	 * and implicitly by executing_parser (from grammar).
+	 */
 	void verify_default_argument( executing_parser::position_t );
 	void track_name_cycle( HHuginn::identifier_id_t );
 	static bool is_numeric( HHuginn::type_id_t );
