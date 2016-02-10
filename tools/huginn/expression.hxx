@@ -56,11 +56,8 @@ private:
 	typedef yaal::hcore::HBoundCall<void ( huginn::HFrame* )> execution_step_t;
 	typedef yaal::hcore::HArray<execution_step_t> execution_steps_t;
 	execution_steps_t _executionSteps;
-	int _position;
 public:
 	HExpression( int = 0 );
-	int position( void ) const;
-	void set_position( int );
 	int add_execution_step( execution_step_t const& );
 	void replace_execution_step( int, execution_step_t const& );
 	void pop_execution_step( void );

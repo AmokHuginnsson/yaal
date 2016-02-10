@@ -40,9 +40,9 @@ namespace tools {
 namespace huginn {
 
 HThrow::HThrow( HHuginn* huginn_, HHuginn::expression_t const& expression_, int position_ )
-	: _huginn( huginn_ )
-	, _expression( expression_ )
-	, _position( position_ ) {
+	: HStatement( position_ )
+	, _huginn( huginn_ )
+	, _expression( expression_ ) {
 	return;
 }
 
@@ -54,9 +54,9 @@ void HThrow::do_execute( HThread* thread_ ) const {
 	HHuginn::value_t v( thread_->current_frame()->result() );
 	HHuginn::HException* e( dynamic_cast<HHuginn::HException*>( v.raw() ) );
 	if ( e != nullptr ) {
-		e->set_where( _huginn->where( _position ) );
+		e->set_where( _huginn->where( position() ) );
 	}
-	thread_->break_execution( HFrame::STATE::EXCEPTION, yaal::move( v ), 0, _position );
+	thread_->break_execution( HFrame::STATE::EXCEPTION, yaal::move( v ), 0, position() );
 	return;
 	M_EPILOG
 }

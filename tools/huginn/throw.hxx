@@ -45,7 +45,6 @@ public:
 private:
 	HHuginn* _huginn;
 	HHuginn::expression_t _expression;
-	int _position;
 public:
 	HThrow( HHuginn*, HHuginn::expression_t const&, int );
 protected:

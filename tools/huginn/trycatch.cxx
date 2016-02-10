@@ -41,8 +41,8 @@ namespace tools {
 
 namespace huginn {
 
-HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_ )
-	: HStatement()
+HTryCatch::HTryCatch( HHuginn::scope_t const& try_, catches_t const& catches_, int position_ )
+	: HStatement( position_ )
 	, _try( try_ )
 	, _catches( catches_ ) {
 	_try->make_inline();

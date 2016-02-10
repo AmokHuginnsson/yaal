@@ -40,12 +40,27 @@ class HThread;
 class HStatement {
 public:
 	typedef HStatement this_type;
+private:
+	int _position;
 public:
-	HStatement( void );
+	HStatement( int position_ )
+		: _position( position_ ) {
+		return;
+	}
 	virtual ~HStatement( void ) {
 		return;
 	}
-	void execute( HThread* ) const;
+	void execute( HThread* thread_ ) const {
+		do_execute( thread_ );
+		return;
+	}
+	int position( void ) const {
+		return ( _position );
+	}
+	void set_position( int position_ ) {
+		_position = position_;
+		return;
+	}
 protected:
 	virtual void do_execute( HThread* ) const {}
 };

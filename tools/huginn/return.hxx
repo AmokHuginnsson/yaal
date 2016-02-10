@@ -45,7 +45,7 @@ public:
 private:
 	HHuginn::expression_t _expression;
 public:
-	HReturn( HHuginn::expression_t const& );
+	HReturn( HHuginn::expression_t const&, int );
 protected:
 	virtual void do_execute( HThread* ) const override;
 private:

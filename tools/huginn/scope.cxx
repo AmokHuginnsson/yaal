@@ -36,17 +36,22 @@ namespace tools {
 
 namespace huginn {
 
-HScope::HScope( void )
-	: _statements()
+HScope::HScope( int position_ )
+	: HStatement( position_ )
+	, _statements()
 	, _inline( false ) {
 	return;
 }
 
-void HScope::add_statement( statement_t statement_ ) {
+int HScope::add_statement( statement_t statement_ ) {
 	M_PROLOG
 	_statements.emplace_back( statement_ );
-	return;
+	return ( static_cast<int>( _statements.get_size() - 1 ) );
 	M_EPILOG
+}
+
+int HScope::statement_position_at( int index_ ) const {
+	return ( _statements[index_]->position() );
 }
 
 void HScope::do_execute( HThread* thread_ ) const {

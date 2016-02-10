@@ -34,6 +34,7 @@ Copyright:
 #include "tools/huginn/operator.hxx"
 #include "tools/huginn/function.hxx"
 #include "tools/huginn/trycatch.hxx"
+#include "tools/huginn/scope.hxx"
 #include "tools/hhuginn.hxx"
 
 namespace yaal {
@@ -108,7 +109,11 @@ struct OCompiler {
 		/*! \brief Fully compiled chain of catch statements.
 		 */
 		HTryCatch::catches_t _catches;
-		OScopeContext( OScopeContext* );
+
+		/*! \brief Tells what was statement count when `return/break/continue/throw' statement occurred.
+		 */
+		int _terminatedAt;
+		OScopeContext( OScopeContext*, int );
 		HHuginn::expression_t& expression( void );
 		HHuginn::type_id_t guess_type( HHuginn::identifier_id_t ) const;
 		void note_type( HHuginn::identifier_id_t, HHuginn::type_id_t );
@@ -320,6 +325,8 @@ struct OCompiler {
 	void note_type( HHuginn::identifier_id_t, HHuginn::type_id_t );
 	void reset_expression( void );
 	void pop_function_context( void );
+	HHuginn::scope_t pop_scope_context( void );
+	void terminate_scope( HScope::statement_t&& );
 	void inc_loop_count( executing_parser::position_t );
 	void inc_loop_switch_count( executing_parser::position_t );
 	void start_subexpression( executing_parser::position_t );

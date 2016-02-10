@@ -39,8 +39,11 @@ namespace tools {
 
 namespace huginn {
 
-HWhile::HWhile( HHuginn::expression_t const& condition_, HHuginn::scope_t const& loop_ )
-	: HStatement()
+HWhile::HWhile(
+	HHuginn::expression_t const& condition_,
+	HHuginn::scope_t const& loop_,
+	int position_
+) : HStatement( position_ )
 	, _condition( condition_ )
 	, _loop( loop_ ) {
 	_loop->make_inline();

@@ -46,12 +46,13 @@ HFor::HFor(
 	HHuginn::identifier_id_t variableName_,
 	HHuginn::expression_t const& source_,
 	HHuginn::scope_t const& loop_,
-	int position_
-) : HStatement()
+	int statementPosition_,
+	int identifierPosition_
+) : HStatement( statementPosition_ )
 	, _variableName( variableName_ )
 	, _source( source_ )
 	, _loop( loop_ )
-	, _position( position_ ) {
+	, _identifierPosition( identifierPosition_ ) {
 	_loop->make_inline();
 	return;
 }
@@ -70,7 +71,7 @@ void HFor::do_execute( HThread* thread_ ) const {
 		HHuginn::HIterable::HIterator it( coll->iterator() );
 		while ( f->can_continue() && it.is_valid() ) {
 			HHuginn::value_t v( it.value() );
-			f->set_variable( _variableName, v, _position );
+			f->set_variable( _variableName, v, _identifierPosition );
 			_loop->execute( thread_ );
 			f->continue_execution();
 			it.next();

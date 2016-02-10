@@ -46,7 +46,7 @@ private:
 	HHuginn::expression_t _condition;
 	HHuginn::scope_t _loop;
 public:
-	HWhile( HHuginn::expression_t const&, HHuginn::scope_t const& );
+	HWhile( HHuginn::expression_t const&, HHuginn::scope_t const&, int );
 protected:
 	virtual void do_execute( HThread* ) const override;
 };

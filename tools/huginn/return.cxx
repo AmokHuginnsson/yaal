@@ -37,8 +37,9 @@ namespace tools {
 
 namespace huginn {
 
-HReturn::HReturn( HHuginn::expression_t const& expression_ )
-	: _expression( expression_ ) {
+HReturn::HReturn( HHuginn::expression_t const& expression_, int position_ )
+	: HStatement( position_ )
+	, _expression( expression_ ) {
 	return;
 }
 

@@ -41,8 +41,9 @@ namespace huginn {
 
 HIf::HIf(
 	OCompiler::OScopeContext::active_scopes_t const& ifClause_,
-	HHuginn::scope_t const& elseClause_
-) : HStatement(),
+	HHuginn::scope_t const& elseClause_,
+	int position_
+) : HStatement( position_ ),
 	_ifClauses( ifClause_ ),
 	_elseClause( elseClause_ ) {
 	for ( OCompiler::OActiveScope& as : _ifClauses ) {

@@ -49,12 +49,16 @@ private:
 	statement_list_t _statements;
 	bool _inline;
 public:
-	HScope( void );
+	HScope( int );
 	virtual ~HScope( void ) {
 		return;
 	}
-	void add_statement( statement_t );
+	int add_statement( statement_t );
 	void make_inline( void );
+	int statement_position_at( int ) const;
+	int statement_count( void ) const {
+		return ( static_cast<int>( _statements.get_size() ) );
+	}
 protected:
 	virtual void do_execute( HThread* ) const override;
 private:

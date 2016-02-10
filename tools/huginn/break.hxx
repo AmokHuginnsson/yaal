@@ -47,7 +47,7 @@ public:
 private:
 	HFrame::STATE _state;
 public:
-	HBreak( HFrame::STATE );
+	HBreak( HFrame::STATE, int );
 protected:
 	virtual void do_execute( HThread* ) const override;
 private:

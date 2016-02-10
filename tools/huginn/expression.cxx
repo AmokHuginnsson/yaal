@@ -45,23 +45,9 @@ namespace tools {
 namespace huginn {
 
 HExpression::HExpression( int position_ )
-	: HStatement(),
-	_executionSteps(),
-	_position( position_ ) {
+	: HStatement( position_ ),
+	_executionSteps() {
 	return;
-}
-
-int HExpression::position( void ) const {
-	M_PROLOG
-	return ( _position );
-	M_EPILOG
-}
-
-void HExpression::set_position( int position_ ) {
-	M_PROLOG
-	_position = position_;
-	return;
-	M_EPILOG
 }
 
 int HExpression::add_execution_step( execution_step_t const& executionStep_ ) {

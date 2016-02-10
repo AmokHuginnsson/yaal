@@ -42,8 +42,9 @@ namespace huginn {
 HSwitch::HSwitch(
 	HHuginn::expression_t const& expression_,
 	cases_t const& cases_,
-	HHuginn::scope_t const& default_
-) : HStatement(),
+	HHuginn::scope_t const& default_,
+	int position_
+) : HStatement( position_ ),
 	_expression( expression_ ),
 	_cases( cases_ ),
 	_default( default_ ) {
