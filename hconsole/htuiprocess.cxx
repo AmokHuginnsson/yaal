@@ -81,7 +81,10 @@ void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::p
 	int mouseDes( cons.get_mouse_fd() );
 	if ( ( _useMouse_ != USE_MOUSE::NO ) && ( mouseDes > 0 ) )
 		_dispatcher.register_file_descriptor_handler( mouseDes, call( &HTUIProcess::process_mouse, this, _1 ) );
-	_dispatcher.register_file_descriptor_handler( cons.get_event_fd(), call( &HTUIProcess::process_terminal_event, this, _1 ) );
+	_dispatcher.register_file_descriptor_handler(
+		static_cast<int>( reinterpret_cast<int_native_t>( cons.get_event_source()->data() ) ),
+		call( &HTUIProcess::process_terminal_event, this, _1 )
+	);
 	_dispatcher.add_alert_handle( call( &HTUIProcess::handler_alert, this ) );
 	_dispatcher.add_idle_handle( call( &HTUIProcess::handler_idle, this ) );
 	register_postprocess_handler( CTRLS_COUNT, ctrls, call( &HTUIProcess::handler_refresh, this, _1 ) );

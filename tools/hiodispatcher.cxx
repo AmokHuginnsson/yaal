@@ -64,7 +64,10 @@ HIODispatcher::HIODispatcher( int noFileHandlers_, int long latency_ )
 	if ( _debugLevel_ < DEBUG_LEVEL::GDB )
 		ss.register_handler( SIGINT, handler, this );
 	ss.register_handler( SIGHUP, handler, this );
-	register_file_descriptor_handler( _event.get_reader_fd(), call( &HIODispatcher::process_interrupt, this, _1 ) );
+	register_file_descriptor_handler(
+		static_cast<int>( reinterpret_cast<int_native_t>( _event.out()->data() ) ),
+		call( &HIODispatcher::process_interrupt, this, _1 )
+	);
 	if ( _latency < LOW_LATENCY_WARNING )
 		log( LOG_LEVEL::WARNING ) << "Low latency on IO Dispatcher!" << endl;
 	return;

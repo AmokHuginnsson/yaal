@@ -38,65 +38,43 @@ namespace yaal {
 namespace hcore {
 
 HPipe::HPipe( void )
-	: _pipe() {
+	: _in()
+	, _out() {
 	M_PROLOG
-	M_ENSURE( ::pipe( _pipe ) == 0 );
+	int fds[2] = { -1, -1 };
+	M_ENSURE( ::pipe( fds ) == 0 );
+	_in = make_pointer<HRawFile>( fds[1] );
+	_out = make_pointer<HRawFile>( fds[0] );
 	return;
 	M_EPILOG
 }
 
 HPipe::~HPipe( void ) {
 	M_PROLOG
-	M_ENSURE( M_TEMP_FAILURE_RETRY( system::close( _pipe[ 1 ] ) == 0 ) );
-	M_ENSURE( M_TEMP_FAILURE_RETRY( system::close( _pipe[ 0 ] ) == 0 ) );
+	M_ENSURE( static_cast<HRawFile*>( _in.raw() )->close() == 0 );
+	M_ENSURE( static_cast<HRawFile*>( _out.raw() )->close() == 0 );
 	return;
 	M_DESTRUCTOR_EPILOG
 }
 
-int HPipe::get_reader_fd( void ) const {
-	return ( _pipe[ 0 ] );
-}
-
-int long HPipe::do_read( void* const buffer_, int long size_ ) {
+int long HPipe::read( void* buffer_, int long size_ ) {
 	M_PROLOG
-	return ( ::read( _pipe[ 0 ], buffer_, static_cast<size_t>( size_ ) ) );
+	return ( _out->read( buffer_, size_ ) );
 	M_EPILOG
 }
 
-int long HPipe::do_write( void const* const buffer_, int long size_ ) {
+int long HPipe::write( void const* buffer_, int long size_ ) {
 	M_PROLOG
-	M_ASSERT( _pipe[1] >= 0 );
-	int long nWritten( 0 );
-	int long nWriteChunk( 0 );
-	do {
-		nWriteChunk = M_TEMP_FAILURE_RETRY( ::write( _pipe[ 1 ],
-					static_cast<char const* const>( buffer_ ) + nWritten,
-					static_cast<size_t>( size_ - nWritten ) ) );
-		nWritten += nWriteChunk;
-	} while ( ( nWriteChunk > 0 ) && ( nWritten < size_ ) );
-	return ( nWritten );
+	return ( _in->write( buffer_, size_ ) );
 	M_EPILOG
 }
 
-void HPipe::do_flush( void ) {
+yaal::hcore::HStreamInterface::ptr_t const& HPipe::in( void ) const {
+	return ( _in );
 }
 
-bool HPipe::do_is_valid( void ) const {
-	M_PROLOG
-	return ( ( _pipe[ 0 ] >= 0 ) && ( _pipe[ 1 ] >= 0 ) );
-	M_EPILOG
-}
-
-HStreamInterface::POLL_TYPE HPipe::do_poll_type( void ) const {
-	M_PROLOG
-	return ( is_valid() ? POLL_TYPE::NATIVE : POLL_TYPE::INVALID );
-	M_EPILOG
-}
-
-void const* HPipe::do_data( void ) const {
-	M_PROLOG
-	return ( is_valid() ? reinterpret_cast<void const*>( get_reader_fd() ) : nullptr );
-	M_EPILOG
+yaal::hcore::HStreamInterface::ptr_t const& HPipe::out( void ) const {
+	return ( _out );
 }
 
 }

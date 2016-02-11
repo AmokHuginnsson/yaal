@@ -279,7 +279,7 @@ public:
 	int wait_for_user_input( int&, mouse::OMouse&, int = 0 ) const;
 	void bell( void ) const;
 	int get_mouse_fd( void ) const;
-	int get_event_fd( void ) const;
+	yaal::hcore::HStreamInterface::ptr_t const& get_event_source( void ) const;
 	int on_terminal_resize( int );
 	int console_cleanup( int );
 	int on_quit( int );

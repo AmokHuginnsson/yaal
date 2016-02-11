@@ -40,24 +40,20 @@ namespace hcore {
 
 /*! \brief Unnamed pipe C++ wrapper.
  */
-class HPipe : public yaal::hcore::HStreamInterface {
+class HPipe {
 public:
 	typedef HPipe this_type;
-	typedef HStreamInterface base_type;
-private:
-	int _pipe[ 2 ];
-public:
 	typedef yaal::hcore::HPointer<HPipe> ptr_t;
+private:
+	yaal::hcore::HStreamInterface::ptr_t _in;
+	yaal::hcore::HStreamInterface::ptr_t _out;
+public:
 	HPipe( void );
 	~HPipe( void );
-	int get_reader_fd( void ) const;
-protected:
-	virtual int long do_write( void const* const, int long ) override;
-	virtual int long do_read( void* const, int long ) override;
-	virtual void do_flush( void ) override;
-	virtual bool do_is_valid( void ) const override;
-	virtual POLL_TYPE do_poll_type( void ) const override;
-	virtual void const* do_data( void ) const override;
+	int long read( void* const, int long );
+	int long write( void const* const, int long );
+	yaal::hcore::HStreamInterface::ptr_t const& in( void ) const;
+	yaal::hcore::HStreamInterface::ptr_t const& out( void ) const;
 };
 
 typedef HExceptionT<HPipe, HStreamInterfaceException> HPipeException;

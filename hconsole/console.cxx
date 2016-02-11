@@ -569,8 +569,8 @@ int HConsole::get_mouse_fd( void ) const {
 	return ( _mouseDes );
 }
 
-int HConsole::get_event_fd( void ) const {
-	return ( _event->get_reader_fd() );
+yaal::hcore::HStreamInterface::ptr_t const& HConsole::get_event_source( void ) const {
+	return ( _event->out() );
 }
 
 void HConsole::vmvprintf( int row_, int column_,
@@ -906,10 +906,11 @@ int HConsole::on_terminal_resize( int signum_ ) {
 	message += strsignal( signum_ );
 	message += '.';
 	log << message << endl;
-	if ( is_enabled() )
-		*_event << 'r';
-	else
+	if ( is_enabled() ) {
+		_event->write( "r", 1 );
+	} else {
 		::fprintf( stderr, "\n%s", message.raw() );
+	}
 	return ( 0 );
 	M_EPILOG
 }
@@ -958,23 +959,25 @@ int HConsole::on_cont( int ) {
 	M_PROLOG
 	if ( ! is_enabled() )
 		enter_curses();
-	if ( is_enabled() )
-		*_event << 'r';
+	if ( is_enabled() ) {
+		_event->write( "r", 1 );
+	}
 	return ( 0 );
 	M_EPILOG
 }
 
 int HConsole::on_mouse( int ) {
 	M_PROLOG
+	int res( 0 );
 	if ( _mouseDes >= 0 ) {
 		if ( is_enabled() ) {
-			*_event << 'm';
-			return ( 1 );
+			res = static_cast<int>( _event->write( "m", 1 ) );
 		}
 	}
-	if ( is_enabled() )
+	if ( is_enabled() ) {
 		leave_curses();
-	return ( 0 );
+	}
+	return ( res );
 	M_EPILOG
 }
 
