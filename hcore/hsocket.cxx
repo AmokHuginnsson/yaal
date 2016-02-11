@@ -124,11 +124,16 @@ HSocket::HSocket( socket_type_t const& socketType_,
 
 HSocket::~HSocket( void ) {
 	M_PROLOG
-	shutdown();
-	/* There will be no memory leakage if shutdown() throws,
-	 * because application has to terminate. */
-	if ( _address )
+	if ( _needShutdown ) {
+		shutdown();
+	}
+	/*
+	 * There will be no memory leakage if shutdown() throws,
+	 * because application has to terminate.
+	 */
+	if ( _address ) {
 		memory::free( _address );
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -136,6 +141,19 @@ HSocket::~HSocket( void ) {
 void HSocket::shutdown( void ) {
 	M_PROLOG
 	close();
+	return;
+	M_EPILOG
+}
+
+void HSocket::cleanup( void ) {
+	M_PROLOG
+	if ( ( !!( _type & TYPE::FILE ) ) && ( _address ) ) {
+		sockaddr_un* addressFile( static_cast<sockaddr_un*>( _address ) );
+		if ( addressFile->sun_path[ 0 ] ) {
+			M_ENSURE_EX( ( ::unlink( addressFile->sun_path ) == 0 ), addressFile->sun_path );
+		}
+	}
+	return;
 	M_EPILOG
 }
 
@@ -143,12 +161,8 @@ int HSocket::do_close( void ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
 	if ( !!_clients ) {
+		cleanup();
 		_clients.reset();
-		if ( ( !!( _type & TYPE::FILE ) ) && ( _address ) ) {
-			sockaddr_un* addressFile( static_cast<sockaddr_un*>( _address ) );
-			if ( addressFile->sun_path [ 0 ] )
-				M_ENSURE_EX( ( ::unlink( addressFile->sun_path ) == 0 ), addressFile->sun_path );
-		}
 	}
 	if ( _needShutdown && ( _fileDescriptor >= 0 ) ) {
 		M_ENSURE( ( ::shutdown( _fileDescriptor, SHUT_RDWR ) == 0 ) || ( errno == ENOTCONN ) || ( errno == ECONNRESET ) );
@@ -178,16 +192,20 @@ void HSocket::shutdown_client( int fileDescriptor_ ) {
 void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	if ( _fileDescriptor < 0 )
+	if ( _fileDescriptor < 0 ) {
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
-	if ( !!_clients )
+	}
+	if ( !!_clients ) {
 		M_THROW( _errMsgHSocket_[ ALREADY_LISTENING ], _fileDescriptor );
-	if ( _maximumNumberOfClients < 1 )
+	}
+	if ( _maximumNumberOfClients < 1 ) {
 		M_THROW( _( "bad maximum number of clients" ), _maximumNumberOfClients );
+	}
 	make_address( address_, port_ );
 	int reuseAddr( 1 );
 	M_ENSURE(
-		::setsockopt( _fileDescriptor, SOL_SOCKET, SO_REUSEADDR,
+		::setsockopt(
+			_fileDescriptor, SOL_SOCKET, SO_REUSEADDR,
 			reinterpret_cast<char*>( &reuseAddr ), static_cast<socklen_t>( sizeof ( reuseAddr ) )
 		) == 0
 	);
@@ -195,7 +213,10 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 		( ::bind( _fileDescriptor, static_cast<sockaddr*>( _address ), static_cast<socklen_t>( _addressSize ) ) == 0 ),
 		!!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_
 	);
-	M_ENSURE_EX( ( ::listen( _fileDescriptor, _maximumNumberOfClients ) == 0 ), !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
+	if ( ::listen( _fileDescriptor, _maximumNumberOfClients ) != 0 ) {
+		cleanup();
+		throw HSocketException( !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
+	}
 	_clients = make_resource<clients_t>( _maximumNumberOfClients );
 	_needShutdown = true;
 	return;

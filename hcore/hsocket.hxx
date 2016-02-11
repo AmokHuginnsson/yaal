@@ -98,6 +98,7 @@ public:
 protected:
 	virtual int do_close( void ) override;
 	void make_address( yaal::hcore::HString const&, int );
+	void cleanup( void );
 private:
 	HSocket( HSocket const& );
 	HSocket& operator = ( HSocket const& );
