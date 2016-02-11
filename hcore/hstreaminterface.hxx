@@ -227,7 +227,7 @@ public:
 	 * \param strip - Remove delimiting stop char from output buffer.
 	 * \return number of bytes read.
 	 */
-	int long read_until( yaal::hcore::HString& store, char const* const delim = eols, bool strip = true ) {
+	int long read_until( yaal::hcore::HString& store, char const* delim = eols, bool strip = true ) {
 		return ( do_read_until( store, delim, strip ) );
 	}
 	/*! \brief Read data from stream until end of it or until delimiter is encountered or enough data has been acquired.
@@ -238,7 +238,7 @@ public:
 	 * \param strip - Remove delimiting stop char from output buffer.
 	 * \return number of bytes read.
 	 */
-	int long read_until_n( yaal::hcore::HString& store, int long maxcount, char const* const delim = eols, bool strip = true ) {
+	int long read_until_n( yaal::hcore::HString& store, int long maxcount, char const* delim = eols, bool strip = true ) {
 		return ( do_read_until_n( store, maxcount, delim, strip ) );
 	}
 	/*! \brief Read data from stream as long as read characters are in set and end of stream has not been reached.
@@ -257,11 +257,11 @@ public:
 	 * \param acquire - Read only those characters.
 	 * \return number of bytes read.
 	 */
-	int long read_while_n( yaal::hcore::HString& store, int long maxcount, char const* const acquire ) {
+	int long read_while_n( yaal::hcore::HString& store, int long maxcount, char const* acquire ) {
 		return ( do_read_while_n( store, maxcount, acquire ) );
 	}
-	int long read( void* const, int long );
-	int long write( void const* const, int long );
+	int long read( void*, int long );
+	int long write( void const*, int long );
 	M_YAAL_HCORE_PUBLIC_API static char const* const eols;
 	/*! \brief Tell if given stream instance if a valid stream object.
 	 *
@@ -384,10 +384,10 @@ protected:
 	virtual HStreamInterface& do_input( float& );
 	virtual HStreamInterface& do_input( void const*& );
 	virtual HStreamInterface& do_input( manipulator_t const& );
-	virtual int long do_read_until( yaal::hcore::HString&, char const* const, bool );
-	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const* const, bool );
-	virtual int long do_read_while( yaal::hcore::HString&, char const* const );
-	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* const );
+	virtual int long do_read_until( yaal::hcore::HString&, char const*, bool );
+	virtual int long do_read_until_n( yaal::hcore::HString&, int long, char const*, bool );
+	virtual int long do_read_while( yaal::hcore::HString&, char const* );
+	virtual int long do_read_while_n( yaal::hcore::HString&, int long, char const* );
 	virtual int do_peek( void );
 	virtual HStreamInterface& do_set_fill( int );
 	virtual HStreamInterface& do_set_width( int );
@@ -409,16 +409,16 @@ protected:
 	virtual bool do_fail( void ) const;
 	virtual bool do_bad( void ) const;
 private:
-	int long read_while_retry( yaal::hcore::HString&, char const* const );
-	int long read_until_retry( yaal::hcore::HString&, char const* const, bool );
+	int long read_while_retry( yaal::hcore::HString&, char const* );
+	int long read_until_retry( yaal::hcore::HString&, char const*, bool );
 	bool read_word( void );
 	bool read_integer( void );
 	bool read_floatint_point( void );
-	int long semantic_read( yaal::hcore::HString&, int long, char const* const, bool, bool );
+	int long semantic_read( yaal::hcore::HString&, int long, char const*, bool, bool );
 	int long reformat( void );
 	void apply_precision( void );
-	virtual int long do_write( void const* const, int long ) = 0;
-	virtual int long do_read( void* const, int long ) = 0;
+	virtual int long do_write( void const*, int long ) = 0;
+	virtual int long do_read( void*, int long ) = 0;
 	virtual void do_flush( void ) = 0;
 	virtual bool do_is_valid( void ) const = 0;
 	virtual POLL_TYPE do_poll_type( void ) const = 0;

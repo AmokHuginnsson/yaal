@@ -380,28 +380,28 @@ HStreamInterface::HManipulator setfill( int fill_ ) {
 }
 
 int long HStreamInterface::do_read_until( HString& message_,
-		char const* const stopSet_, bool stripDelim_ ) {
+		char const* stopSet_, bool stripDelim_ ) {
 	M_PROLOG
 	return ( HStreamInterface::read_until_n( message_, meta::max_signed<int long>::value, stopSet_, stripDelim_ ) );
 	M_EPILOG
 }
 
 int long HStreamInterface::do_read_until_n( HString& message_, int long maxCount_,
-		char const* const stopSet_, bool stripDelim_ ) {
+		char const* stopSet_, bool stripDelim_ ) {
 	M_PROLOG
 	return ( semantic_read( message_, maxCount_, stopSet_, stripDelim_, true ) );
 	M_EPILOG
 }
 
 int long HStreamInterface::do_read_while( HString& message_,
-		char const* const acquire_ ) {
+		char const* acquire_ ) {
 	M_PROLOG
 	return ( HStreamInterface::do_read_while_n( message_, meta::max_signed<int long>::value, acquire_ ) );
 	M_EPILOG
 }
 
 int long HStreamInterface::do_read_while_n( HString& message_, int long maxCount_,
-		char const* const acquire_ ) {
+		char const* acquire_ ) {
 	M_PROLOG
 	return ( semantic_read( message_, maxCount_, acquire_, false, false ) );
 	M_EPILOG
@@ -747,7 +747,7 @@ HStreamInterface& HStreamInterface::do_input( manipulator_t const& HFILE_INTERFA
 	M_EPILOG
 }
 
-int long HStreamInterface::read( void* const buffer_, int long size_ ) {
+int long HStreamInterface::read( void* buffer_, int long size_ ) {
 	M_PROLOG
 	int long nRead( 0 );
 	if ( _offset ) {
@@ -775,7 +775,7 @@ int long HStreamInterface::read( void* const buffer_, int long size_ ) {
 	M_EPILOG
 }
 
-int long HStreamInterface::write( void const* const buffer_, int long size_ ) {
+int long HStreamInterface::write( void const* buffer_, int long size_ ) {
 	M_PROLOG
 	return ( do_write( buffer_, size_ ) );
 	M_EPILOG
