@@ -410,6 +410,7 @@ bool HHuginn::compile( compiler_setup_t compilerSetup_ ) {
 	}
 	bool ok( false );
 	try {
+		_compiler->set_setup( compilerSetup_ );
 		_engine.execute();
 		finalize_compilation( compilerSetup_ );
 		_state = STATE::COMPILED;

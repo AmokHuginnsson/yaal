@@ -277,9 +277,11 @@ struct OCompiler {
 	HHuginn::identifier_id_t _importAlias;
 	execution_steps_backlog_t _executionStepsBacklog;
 	used_identifiers_t _usedIdentifiers;
+	HHuginn::compiler_setup_t _setup;
 	HHuginn* _huginn;
 	OCompiler( HHuginn* );
 	OFunctionContext& f( void );
+	void set_setup( HHuginn::compiler_setup_t );
 	void detect_misuse( void ) const;
 	void optimize( void );
 	void set_function_name( yaal::hcore::HString const&, executing_parser::position_t );

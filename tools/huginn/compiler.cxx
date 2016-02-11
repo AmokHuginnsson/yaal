@@ -215,7 +215,13 @@ OCompiler::OCompiler( HHuginn* huginn_ )
 	, _importAlias( INVALID_IDENTIFIER )
 	, _executionStepsBacklog()
 	, _usedIdentifiers()
+	, _setup( HHuginn::COMPILER::BE_STRICT | HHuginn::COMPILER::OPTIMIZE )
 	, _huginn( huginn_ ) {
+	return;
+}
+
+void OCompiler::set_setup( HHuginn::compiler_setup_t setup_ ) {
+	_setup = setup_;
 	return;
 }
 
@@ -632,7 +638,11 @@ HHuginn::scope_t OCompiler::pop_scope_context( void ) {
 	OFunctionContext& fc( f() );
 	OScopeContext& sc( *fc._scopeStack.top() );
 	HHuginn::scope_t scope( yaal::move( sc._scope ) );
-	if ( ( sc._terminatedAt != NOT_TERMINATED ) && ( scope->statement_count() > ( sc._terminatedAt + 1 ) ) ) {
+	if (
+		( _setup & HHuginn::COMPILER::BE_STRICT )
+		&& ( sc._terminatedAt != NOT_TERMINATED )
+		&& ( scope->statement_count() > ( sc._terminatedAt + 1 ) )
+	) {
 		throw HHuginn::HHuginnRuntimeException(
 			"Statement is unreachable.",
 			scope->statement_position_at( sc._terminatedAt + 1 )
