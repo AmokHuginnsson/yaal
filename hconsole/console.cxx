@@ -287,10 +287,14 @@ bool has_broken_bright_background( void ) {
 /* public: */
 
 HConsole::HConsole( void )
-	: _initialized( false ), _enabled( false ),
-	_brokenBrightBackground( has_broken_bright_background() ),
-	_width( 0 ), _height( 0 ), _mouseDes( -1 ), _window( NULL ),
-	_event() {
+	: _initialized( false )
+	, _enabled( false )
+	, _brokenBrightBackground( has_broken_bright_background() )
+	, _width( 0 )
+	, _height( 0 )
+	, _mouseDes( -1 )
+	, _window( NULL )
+	, _event() {
 	return;
 }
 

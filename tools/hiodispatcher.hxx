@@ -31,6 +31,7 @@ Copyright:
 #include "hcore/hhashmap.hxx"
 #include "hcore/hboundcall.hxx"
 #include "hcore/htuple.hxx"
+#include "hcore/hstreaminterface.hxx"
 #include "hcore/hpipe.hxx"
 #include "tools/signals.hxx"
 
@@ -42,31 +43,31 @@ namespace tools {
  */
 class HIODispatcher {
 public:
+	typedef HIODispatcher this_type;
 	enum class FD_TYPE {
 		READER,
 		WRITER
 	};
-protected:
-	typedef HIODispatcher this_type;
+	typedef yaal::hcore::HStreamInterface::ptr_t stream_t;
+	typedef yaal::hcore::HBoundCall<void ( stream_t& )> callback_t;
+	typedef yaal::hcore::HPair<stream_t, callback_t> io_handler_t;
+	typedef yaal::hcore::HArray<io_handler_t> io_handlers_t;
 private:
 	typedef yaal::hcore::HBoundCall<> delayed_call_t;
-	typedef yaal::hcore::HBoundCall<void ( int )> call_fd_t;
-	typedef yaal::hcore::HPair<int, call_fd_t> io_handler_t;
-	typedef yaal::hcore::HTuple<FD_TYPE, int, call_fd_t> new_io_handler_t;
-	typedef yaal::hcore::HArray<int> dropped_fd_t;
-	typedef yaal::hcore::HArray<io_handler_t> io_handlers_t;
+	typedef yaal::hcore::HTuple<FD_TYPE, stream_t, callback_t> new_io_handler_t;
+	typedef yaal::hcore::HArray<stream_t> dropped_io_handlers_t;
 	typedef yaal::hcore::HArray<delayed_call_t> delayed_calls_t;
 	typedef yaal::hcore::HArray<new_io_handler_t> new_io_handlers_t;
-	bool _initialised;					/*!< did process has necessery initialisation */
-	bool _loop; 								/*!< indicates if main loop continues */
-	int _idleCycles;					/*!< full select()'s without io activity */
-	int long _latency;			/*!< timeout between recall (miliseconds) */
+	bool _initialised; /*!< did process has necessery initialisation */
+	bool _loop;        /*!< indicates if main loop continues */
+	int _idleCycles;   /*!< full select()'s without io activity */
+	int long _latency; /*!< timeout between recall (miliseconds) */
 	yaal::hcore::HChunk _select;
 	io_handlers_t _readers;
 	io_handlers_t _writers;
 	delayed_calls_t _alert;
 	delayed_calls_t _idle;
-	dropped_fd_t _droppedFd;
+	dropped_io_handlers_t _droppedIOHandlers;
 	new_io_handlers_t _newIOHandlers;
 	bool _callbackContext;
 	yaal::hcore::HPipe _event;
@@ -82,15 +83,15 @@ public:
 	void run( void );
 	void stop( void );
 	int idle_cycles( void ) const;
-	void register_file_descriptor_handler( int, call_fd_t, FD_TYPE = FD_TYPE::READER );
-	void unregister_file_descriptor_handler( int );
+	void register_file_descriptor_handler( stream_t, callback_t, FD_TYPE = FD_TYPE::READER );
+	void unregister_file_descriptor_handler( stream_t const& );
 	void add_alert_handle( delayed_call_t );
 	void add_idle_handle( delayed_call_t );
 private:
-	int reconstruct_fdset( void );
+	void reconstruct_fdset( void );
 	/*! \brief Process incoming events from interrupt socket.
 	 */
-	void process_interrupt( int );
+	void process_interrupt( stream_t& );
 	/*! \brief Callback for SignalService.
 	 */
 	int handler_interrupt( int );

@@ -52,12 +52,12 @@ HIODispatcher::HIODispatcher( int noFileHandlers_, int long latency_ )
 	_latency( latency_ ),
 	_select( chunk_size<int>( noFileHandlers_ ) * 2 ), /* * 2 because 1 for readers and 1 for writters */
 	_readers(), _writers(),
-	_alert(), _idle(), _droppedFd( noFileHandlers_ ), _newIOHandlers( noFileHandlers_ ),
+	_alert(), _idle(), _droppedIOHandlers( noFileHandlers_ ), _newIOHandlers( noFileHandlers_ ),
 	_callbackContext( false ), _event(), _mutex() {
 	M_PROLOG
-	_droppedFd.clear();
+	_droppedIOHandlers.clear();
 	_newIOHandlers.clear();
-	M_ASSERT( _droppedFd.is_empty() );
+	M_ASSERT( _droppedIOHandlers.is_empty() );
 	M_ASSERT( _newIOHandlers.is_empty() );
 	HSignalService& ss = HSignalService::get_instance();
 	HSignalService::handler_t handler( call( &HIODispatcher::handler_interrupt, this, _1 ) );
@@ -65,7 +65,7 @@ HIODispatcher::HIODispatcher( int noFileHandlers_, int long latency_ )
 		ss.register_handler( SIGINT, handler, this );
 	ss.register_handler( SIGHUP, handler, this );
 	register_file_descriptor_handler(
-		static_cast<int>( reinterpret_cast<int_native_t>( _event.out()->data() ) ),
+		_event.out(),
 		call( &HIODispatcher::process_interrupt, this, _1 )
 	);
 	if ( _latency < LOW_LATENCY_WARNING )
@@ -82,34 +82,59 @@ HIODispatcher::~HIODispatcher( void ) {
 	M_DESTRUCTOR_EPILOG
 }
 
-void HIODispatcher::register_file_descriptor_handler( int fileDescriptor_, call_fd_t HANDLER, FD_TYPE fdType_ ) {
+void HIODispatcher::register_file_descriptor_handler(
+	stream_t stream_,
+	callback_t callback_, FD_TYPE fdType_
+) {
 	M_PROLOG
-	if ( _callbackContext )
-		_newIOHandlers.push_back( new_io_handler_t( fdType_, fileDescriptor_, HANDLER ) );
-	else {
+	if ( _callbackContext ) {
+		_newIOHandlers.push_back( new_io_handler_t( fdType_, stream_, callback_ ) );
+	} else {
 		io_handlers_t& fds( fdType_ == FD_TYPE::READER ? _readers : _writers );
-		io_handlers_t::iterator it( find_if( fds.begin(), fds.end(),
-					compose1( bind1st( equal_to<int>(), fileDescriptor_ ), select1st<io_handlers_t::value_type>() ) ) );
+		io_handlers_t::iterator it(
+			find_if(
+				fds.begin(),
+				fds.end(),
+				compose1(
+					bind1st( equal_to<stream_t>(), stream_ ),
+					select1st<io_handlers_t::value_type>()
+				)
+			)
+		);
 		M_ENSURE( it == fds.end() );
-		fds.push_back( make_pair( fileDescriptor_, HANDLER ) );
+		fds.push_back( make_pair( stream_, callback_ ) );
 		_select.realloc( chunk_size<int>( _readers.get_size() + _writers.get_size() ) );
 	}
 	return;
 	M_EPILOG
 }
 
-void HIODispatcher::unregister_file_descriptor_handler( int fileDescriptor_ ) {
+void HIODispatcher::unregister_file_descriptor_handler( yaal::hcore::HStreamInterface::ptr_t const& stream_ ) {
 	M_PROLOG
 	if ( _callbackContext ) {
-		_droppedFd.push_back( fileDescriptor_ );
+		_droppedIOHandlers.push_back( stream_ );
 	} else {
-		io_handlers_t::iterator it( find_if( _readers.begin(), _readers.end(),
-					compose1( bind1st( equal_to<int>(), fileDescriptor_ ), select1st<io_handlers_t::value_type>() ) ) );
+		io_handlers_t::iterator it(
+			find_if(
+				_readers.begin(),
+				_readers.end(),
+				compose1(
+					bind1st( equal_to<stream_t>(), stream_ ),
+					select1st<io_handlers_t::value_type>()
+				)
+			)
+		);
 		if ( it != _readers.end() ) {
 			_readers.erase( it );
 		} else {
-			it = find_if( _writers.begin(), _writers.end(),
-					compose1( bind1st( equal_to<int>(), fileDescriptor_ ), select1st<io_handlers_t::value_type>() ) );
+			it = find_if(
+				_writers.begin(),
+				_writers.end(),
+				compose1(
+					bind1st( equal_to<stream_t>(), stream_ ),
+					select1st<io_handlers_t::value_type>()
+				)
+			);
 			if ( it != _writers.end() ) {
 				_writers.erase( it );
 			} else {
@@ -121,14 +146,22 @@ void HIODispatcher::unregister_file_descriptor_handler( int fileDescriptor_ ) {
 	M_EPILOG
 }
 
-int HIODispatcher::reconstruct_fdset( void ) {
+namespace {
+int stream_to_fd( HIODispatcher::io_handlers_t::value_type& ioHandler_ ) {
+	return ( static_cast<int>( reinterpret_cast<int_native_t>( ioHandler_.first->data() ) ) );
+}
+}
+
+void HIODispatcher::reconstruct_fdset( void ) {
 	M_PROLOG
-	if ( _readers.is_empty() && _writers.is_empty() )
-		return ( -1 );
-	transform( _readers.begin(), _readers.end(), _select.get<int>(), select1st<io_handlers_t::value_type>() );
-	transform( _writers.begin(), _writers.end(), _select.get<int>() + _readers.get_size(), select1st<io_handlers_t::value_type>() );
+	if ( ! _readers.is_empty() ) {
+		transform( _readers.begin(), _readers.end(), _select.get<int>(), stream_to_fd );
+	}
+	if ( ! _writers.is_empty() ) {
+		transform( _writers.begin(), _writers.end(), _select.get<int>() + _readers.get_size(), stream_to_fd );
+	}
 /* FD_SET is a macro and first argument is evaluated twice ! */
-	return ( 0 );
+	return;
 	M_EPILOG
 }
 
@@ -151,28 +184,33 @@ void HIODispatcher::run( void ) {
 			for ( int i( 0 ); i < nReaders; ++ i ) {
 				if ( readers[ i ] != -1 ) {
 					io_handler_t& h( _readers[ i ] );
-					static_cast<void>( h.second( h.first ) );
+					h.second( h.first );
 					_idleCycles = 0;
 				}
 			}
 			for ( int i( 0 ); i < nWriters; ++ i ) {
 				if ( writers[ i ] != -1 ) {
 					io_handler_t& h( _writers[ i ] );
-					static_cast<void>( h.second( h.first ) );
+					h.second( h.first );
 					_idleCycles = 0;
 				}
 			}
-		} else
+		} else {
 			handle_idle();
+		}
 		_callbackContext = false;
-		if ( ! _droppedFd.is_empty() ) {
-			for_each( _droppedFd.begin(), _droppedFd.end(), call( &HIODispatcher::unregister_file_descriptor_handler, this, _1 ) );
-			_droppedFd.clear();
+		if ( ! _droppedIOHandlers.is_empty() ) {
+			for_each( _droppedIOHandlers.begin(), _droppedIOHandlers.end(), call( &HIODispatcher::unregister_file_descriptor_handler, this, _1 ) );
+			_droppedIOHandlers.clear();
 		}
 		if ( ! _newIOHandlers.is_empty() ) {
-			for ( new_io_handlers_t::const_iterator it( _newIOHandlers.begin() ),
-					end( _newIOHandlers.end() ); it != end; ++ it )
+			for (
+				new_io_handlers_t::const_iterator it( _newIOHandlers.begin() ), end( _newIOHandlers.end() );
+				it != end;
+				++ it
+			) {
 				register_file_descriptor_handler( it->get<1>(), it->get<2>(), it->get<0>() );
+			}
 			_newIOHandlers.clear();
 		}
 	}
@@ -201,15 +239,17 @@ int HIODispatcher::handler_interrupt( int sigNo_ ) {
 	M_EPILOG
 }
 
-void HIODispatcher::process_interrupt( int ) {
+void HIODispatcher::process_interrupt( stream_t& M_DEBUG_CODE( stream_ ) ) {
 	M_PROLOG
 	HLock l( _mutex );
+	M_ASSERT( stream_ == _event.out() );
 	int sigNo = 0;
 	M_ENSURE( _event.read( &sigNo, sizeof ( sigNo ) ) == sizeof ( sigNo ) );
-	if ( sigNo == SIGINT )
+	if ( sigNo == SIGINT ) {
 		_loop = false;
-	else if ( sigNo == SIGHUP )
+	} else if ( sigNo == SIGHUP ) {
 		program_options_helper::reload_configuration();
+	}
 	return;
 	M_EPILOG
 }

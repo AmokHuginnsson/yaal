@@ -33,6 +33,8 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "htuiprocess.hxx"
 #include "hcore/memory.hxx"
+#include "hcore/hfile.hxx"
+#include "hcore/hrawfile.hxx"
 #include "hconsole.hxx"
 #include "hmainwindow.hxx"
 #include "mouse.hxx"
@@ -42,6 +44,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #endif /* __DEBUGGER_BABUNI__ */
 
 using namespace yaal::hcore;
+using namespace yaal::tools;
 
 namespace yaal {
 
@@ -49,10 +52,14 @@ namespace hconsole {
 
 HTUIProcess::HTUIProcess( int noFileHandlers_, int keyHandlers_,
 		int commandHandlers_ )
-	: HHandler( keyHandlers_, commandHandlers_ ),
-	_dispatcher( noFileHandlers_, _latency_ * 1000 ), _mainWindow(), _foregroundWindow(),
-	_windows( new ( memory::yaal ) model_t() ), _needRepaint( false ), _callQueue(),
-	_resource() {
+	: HHandler( keyHandlers_, commandHandlers_ )
+	, _dispatcher( noFileHandlers_, _latency_ * 1000 )
+	, _mainWindow()
+	, _foregroundWindow()
+	, _windows( new ( memory::yaal ) model_t() )
+	, _needRepaint( false )
+	, _callQueue()
+	, _resource() {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -60,8 +67,9 @@ HTUIProcess::HTUIProcess( int noFileHandlers_, int keyHandlers_,
 
 HTUIProcess::~HTUIProcess( void ) {
 	M_PROLOG
-	if ( _windows->size() > 0 )
+	if ( _windows->size() > 0 ) {
 		_windows->pop_front();
+	}
 #ifdef __DEBUGGER_BABUNI__
 	log_trace << "destruction success" << endl;
 #endif /* __DEBUGGER_BABUNI__ */
@@ -76,13 +84,16 @@ void HTUIProcess::init_tui( yaal::hcore::HString const& processName_, HWindow::p
 	int alts[ ALTS_COUNT ];
 	int ctrls[] = { KEY<'l'>::ctrl, KEY<'x'>::ctrl };
 	HWindow::ptr_t mainWindow;
-	_dispatcher.register_file_descriptor_handler( STDIN_FILENO, call( &HTUIProcess::process_stdin, this, _1 ) );
+	HIODispatcher::stream_t consIn( make_pointer<HRawFile>( STDIN_FILENO, HRawFile::OWNERSHIP::EXTERNAL ) );
+	_dispatcher.register_file_descriptor_handler( consIn, call( &HTUIProcess::process_stdin, this, _1 ) );
 	HConsole& cons = HConsole::get_instance();
 	int mouseDes( cons.get_mouse_fd() );
-	if ( ( _useMouse_ != USE_MOUSE::NO ) && ( mouseDes > 0 ) )
-		_dispatcher.register_file_descriptor_handler( mouseDes, call( &HTUIProcess::process_mouse, this, _1 ) );
+	if ( ( _useMouse_ != USE_MOUSE::NO ) && ( mouseDes > 0 ) ) {
+		HIODispatcher::stream_t mouseStream( make_pointer<HRawFile>( mouseDes, HRawFile::OWNERSHIP::EXTERNAL ) );
+		_dispatcher.register_file_descriptor_handler( mouseStream, call( &HTUIProcess::process_mouse, this, _1 ) );
+	}
 	_dispatcher.register_file_descriptor_handler(
-		static_cast<int>( reinterpret_cast<int_native_t>( cons.get_event_source()->data() ) ),
+		cons.get_event_source(),
 		call( &HTUIProcess::process_terminal_event, this, _1 )
 	);
 	_dispatcher.add_alert_handle( call( &HTUIProcess::handler_alert, this ) );
@@ -174,7 +185,7 @@ void HTUIProcess::add_window( HWindow::ptr_t window_ ) {
 	M_EPILOG
 }
 
-void HTUIProcess::process_stdin( int ) {
+void HTUIProcess::process_stdin( HIODispatcher::stream_t& ) {
 	M_PROLOG
 	HString command;
 	HConsole& cons = HConsole::get_instance();
@@ -263,7 +274,7 @@ void HTUIProcess::handler_idle( void ) {
 	M_EPILOG
 }
 
-void HTUIProcess::process_mouse( int ) {
+void HTUIProcess::process_mouse( HIODispatcher::stream_t& ) {
 	M_PROLOG
 	handler_mouse( HMouseEvent( mouse::OMouse() ) );
 	return;
@@ -287,17 +298,18 @@ bool HTUIProcess::handler_mouse( HEvent const& ) {
 	M_EPILOG
 }
 
-void HTUIProcess::process_terminal_event( int event_ ) {
+void HTUIProcess::process_terminal_event( HIODispatcher::stream_t& event_ ) {
 	M_PROLOG
 	char type;
-	M_ENSURE( ::read( event_, &type, 1 ) == 1 );
+	M_ENSURE( event_->read( &type, 1 ) == 1 );
 	switch( type ) {
 		case 'r':
 			handler_refresh( HKeyPressEvent( 'r' ) );
 		break;
-		case 'm':
-			process_mouse( 0 );
-		break;
+		case 'm': {
+			static HIODispatcher::stream_t dummy;
+			process_mouse( dummy );
+		} break;
 	}
 	return;
 	M_EPILOG

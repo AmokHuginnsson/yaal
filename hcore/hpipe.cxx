@@ -43,8 +43,8 @@ HPipe::HPipe( void )
 	M_PROLOG
 	int fds[2] = { -1, -1 };
 	M_ENSURE( ::pipe( fds ) == 0 );
-	_in = make_pointer<HRawFile>( fds[1] );
-	_out = make_pointer<HRawFile>( fds[0] );
+	_in = make_pointer<HRawFile>( fds[1], HRawFile::OWNERSHIP::ACQUIRED );
+	_out = make_pointer<HRawFile>( fds[0], HRawFile::OWNERSHIP::ACQUIRED );
 	return;
 	M_EPILOG
 }

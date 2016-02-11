@@ -46,12 +46,22 @@ char const* const _error_ = _( "file is not opened" );
 int long _writeTimeout_ = 4 * 1000; /* 4 seconds */
 
 HRawFile::HRawFile( TYPE::raw_file_type_t type_ )
-	: _type( type_ ), _fileDescriptor( -1 ), _timeout( _writeTimeout_ ), _ssl(),
-	reader( ( ( type_ & TYPE::SSL_SERVER )
-				|| ( type_ & TYPE::SSL_CLIENT ) ) ? &HRawFile::read_ssl_loader : &HRawFile::read_plain ),
-	writer( ( ( type_ & TYPE::SSL_SERVER )
-				|| ( type_ & TYPE::SSL_CLIENT ) ) ? &HRawFile::write_ssl_loader : &HRawFile::write_plain ),
-	closer( &HRawFile::close_plain ) {
+	: _type( type_ )
+	, _fileDescriptor( -1 )
+	, _timeout( _writeTimeout_ )
+	, _ssl()
+	, reader(
+		( ( type_ & TYPE::SSL_SERVER ) || ( type_ & TYPE::SSL_CLIENT ) )
+			? &HRawFile::read_ssl_loader
+			: &HRawFile::read_plain
+		)
+	, writer(
+		( ( type_ & TYPE::SSL_SERVER ) || ( type_ & TYPE::SSL_CLIENT ) )
+			? &HRawFile::write_ssl_loader
+			: &HRawFile::write_plain
+		)
+	, closer( &HRawFile::close_plain )
+	, _ownership( OWNERSHIP::ACQUIRED ) {
 	M_PROLOG
 	M_ASSERT( ! ( ( type_ == TYPE::DEFAULT ) && ( type_ & TYPE::SSL_SERVER ) ) );
 	M_ASSERT( ! ( ( type_ == TYPE::DEFAULT ) && ( type_ & TYPE::SSL_CLIENT ) ) );
@@ -62,9 +72,15 @@ HRawFile::HRawFile( TYPE::raw_file_type_t type_ )
 	M_EPILOG
 }
 
-HRawFile::HRawFile( file_descriptor_t fd_ )
-	: _type( TYPE::DEFAULT ), _fileDescriptor( fd_ ), _timeout( _writeTimeout_ ), _ssl(),
-	reader( &HRawFile::read_plain ), writer( &HRawFile::write_plain ), closer( &HRawFile::close_plain ) {
+HRawFile::HRawFile( file_descriptor_t fd_, OWNERSHIP ownership_ )
+	: _type( TYPE::DEFAULT )
+	, _fileDescriptor( fd_ )
+	, _timeout( _writeTimeout_ )
+	, _ssl()
+	, reader( &HRawFile::read_plain )
+	, writer( &HRawFile::write_plain )
+	, closer( &HRawFile::close_plain )
+	, _ownership( fd_ >= 0 ? ownership_ : OWNERSHIP::NONE ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -72,13 +88,15 @@ HRawFile::HRawFile( file_descriptor_t fd_ )
 
 HRawFile::~HRawFile( void ) {
 	M_PROLOG
-	if ( _fileDescriptor >= 0 )
+	if ( ( _ownership == OWNERSHIP::ACQUIRED ) && ( _fileDescriptor >= 0 ) ) {
 		HRawFile::close();
+	}
 	M_DESTRUCTOR_EPILOG
 }
 
 int HRawFile::close( void ) {
 	M_PROLOG
+	M_ENSURE( ( _fileDescriptor >= 0 ) && ( _ownership == OWNERSHIP::ACQUIRED ) );
 	return ( (this->*closer)() );
 	M_EPILOG
 }
@@ -239,7 +257,7 @@ HStreamInterface::POLL_TYPE HRawFile::do_poll_type( void ) const {
 
 void const* HRawFile::do_data( void ) const {
 	M_PROLOG
-	return ( is_valid() ? reinterpret_cast<void const*>( _fileDescriptor ) : nullptr );
+	return ( is_valid() ? reinterpret_cast<void const*>( static_cast<int_native_t>( _fileDescriptor ) ) : nullptr );
 	M_EPILOG
 }
 

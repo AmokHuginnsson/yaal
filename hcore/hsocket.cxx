@@ -74,11 +74,14 @@ HSocket::HSocket( socket_type_t const& socketType_,
 	: HRawFile( !!( socketType_ & TYPE::SSL_SERVER )
 			? HRawFile::TYPE::SSL_SERVER
 			: ( ( ( socketType_ == TYPE::DEFAULT ) || ( !!( socketType_ & TYPE::SSL_CLIENT ) ) )
-				? HRawFile::TYPE::SSL_CLIENT : HRawFile::TYPE::DEFAULT ) ),
-	_needShutdown( false ), _type( socketType_ ),
-	_maximumNumberOfClients( maximumNumberOfClients_ ),
-	_addressSize( 0 ), _address( NULL ), _clients(),
-	_hostName() {
+				? HRawFile::TYPE::SSL_CLIENT : HRawFile::TYPE::DEFAULT ) )
+	, _needShutdown( false )
+	, _type( socketType_ )
+	, _maximumNumberOfClients( maximumNumberOfClients_ )
+	, _addressSize( 0 )
+	, _address( NULL )
+	, _clients()
+	, _hostName() {
 	M_PROLOG
 	if ( _type == TYPE::DEFAULT )
 		_type |= TYPE::SSL_CLIENT;

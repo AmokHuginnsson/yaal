@@ -46,10 +46,6 @@ class HRawFile : public HStreamInterface {
 public:
 	typedef HRawFile this_type;
 	typedef HStreamInterface base_type;
-protected:
-	typedef int long ( HRawFile::* READER_t )( void* const, int long );
-	typedef int long ( HRawFile::* WRITER_t )( void const* const, int long );
-	typedef int ( HRawFile::* CLOSER_t )( void );
 	/*! \brief Type of underneath file descriptor.
 	 */
 	struct TYPE {
@@ -71,6 +67,17 @@ protected:
 			BOTH = READ | WRITE
 		} action_t;
 	};
+	/*! \brief Ownership.
+	 */
+	enum class OWNERSHIP {
+		NONE,
+		ACQUIRED,
+		EXTERNAL
+	};
+protected:
+	typedef int long ( HRawFile::* READER_t )( void* const, int long );
+	typedef int long ( HRawFile::* WRITER_t )( void const* const, int long );
+	typedef int ( HRawFile::* CLOSER_t )( void );
 	TYPE::raw_file_type_t _type;
 	file_descriptor_t _fileDescriptor; /* raw file descriptor of the file */
 	int long _timeout;
@@ -78,8 +85,9 @@ protected:
 	READER_t reader;
 	WRITER_t writer;
 	CLOSER_t closer;
+	OWNERSHIP _ownership;
 public:
-	explicit HRawFile( file_descriptor_t );
+	HRawFile( file_descriptor_t, OWNERSHIP ownership );
 	HRawFile( TYPE::raw_file_type_t = TYPE::DEFAULT );
 	virtual ~HRawFile( void );
 	int close( void );
