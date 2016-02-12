@@ -94,6 +94,8 @@ struct aligned {
 	typedef aligned_storage<T, aligner_type, SIZE, static_cast<int>( SIZE - sizeof ( aligner_type ) )> type;
 };
 
+static void const* const INVALID_HANDLE __attribute__((used)) = reinterpret_cast<void const*>( static_cast<int_native_t>( -1 ) );
+
 struct YaalNew {};
 
 static YaalNew yaal __attribute__((used));

@@ -68,8 +68,9 @@ HIODispatcher::HIODispatcher( int noFileHandlers_, int long latency_ )
 		_event.out(),
 		call( &HIODispatcher::process_interrupt, this, _1 )
 	);
-	if ( _latency < LOW_LATENCY_WARNING )
+	if ( _latency < LOW_LATENCY_WARNING ) {
 		log( LOG_LEVEL::WARNING ) << "Low latency on IO Dispatcher!" << endl;
+	}
 	return;
 	M_EPILOG
 }
@@ -87,6 +88,9 @@ void HIODispatcher::register_file_descriptor_handler(
 	callback_t callback_, FD_TYPE fdType_
 ) {
 	M_PROLOG
+	if ( stream_->data() == memory::INVALID_HANDLE ) {
+		throw HIODispatcherException( "The stream is invalid." );
+	}
 	if ( _callbackContext ) {
 		_newIOHandlers.push_back( new_io_handler_t( fdType_, stream_, callback_ ) );
 	} else {

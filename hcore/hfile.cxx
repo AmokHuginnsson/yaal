@@ -348,7 +348,7 @@ HStreamInterface::POLL_TYPE HFile::do_poll_type( void ) const {
 void const* HFile::do_data( void ) const {
 	M_PROLOG
 	int_native_t fd( get_file_descriptor() );
-	return ( is_valid() ? reinterpret_cast<void const*>( fd ) : nullptr );
+	return ( is_valid() ? reinterpret_cast<void const*>( fd ) : memory::INVALID_HANDLE );
 	M_EPILOG
 }
 

@@ -258,7 +258,7 @@ HStreamInterface::POLL_TYPE HPipedChild::do_poll_type( void ) const {
 void const* HPipedChild::do_data( void ) const {
 	M_PROLOG
 	int fd( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
-	return ( is_valid() ? reinterpret_cast<void const*>( fd ) : nullptr );
+	return ( is_valid() ? reinterpret_cast<void const*>( fd ) : memory::INVALID_HANDLE );
 	M_EPILOG
 }
 

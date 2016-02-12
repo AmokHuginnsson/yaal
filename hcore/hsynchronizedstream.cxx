@@ -513,7 +513,7 @@ HStreamInterface::POLL_TYPE HSynchronizedStream::do_poll_type( void ) const {
 void const* HSynchronizedStream::do_data( void ) const {
 	M_PROLOG
 	HLock l( _mutex );
-	return ( _streamRef ? _streamRef->data() : nullptr );
+	return ( _streamRef ? _streamRef->data() : memory::INVALID_HANDLE );
 	M_EPILOG
 }
 

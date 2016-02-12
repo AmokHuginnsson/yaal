@@ -257,7 +257,7 @@ HStreamInterface::POLL_TYPE HZipStream::do_poll_type( void ) const {
 
 void const* HZipStream::do_data( void ) const {
 	M_PROLOG
-	return ( _streamRef ? _streamRef->data() : nullptr );
+	return ( _streamRef ? _streamRef->data() : memory::INVALID_HANDLE );
 	M_EPILOG
 }
 

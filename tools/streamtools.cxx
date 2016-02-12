@@ -255,7 +255,7 @@ HStreamInterface::POLL_TYPE HTee::do_poll_type( void ) const {
 
 void const* HTee::do_data( void ) const {
 	M_PROLOG
-	return ( is_valid() ? this : nullptr );
+	return ( is_valid() ? this : memory::INVALID_HANDLE );
 	M_EPILOG
 }
 

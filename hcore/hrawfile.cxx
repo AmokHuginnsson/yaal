@@ -257,7 +257,7 @@ HStreamInterface::POLL_TYPE HRawFile::do_poll_type( void ) const {
 
 void const* HRawFile::do_data( void ) const {
 	M_PROLOG
-	return ( is_valid() ? reinterpret_cast<void const*>( static_cast<int_native_t>( _fileDescriptor ) ) : nullptr );
+	return ( is_valid() ? reinterpret_cast<void const*>( static_cast<int_native_t>( _fileDescriptor ) ) : memory::INVALID_HANDLE );
 	M_EPILOG
 }
 
