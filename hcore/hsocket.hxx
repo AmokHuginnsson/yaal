@@ -63,8 +63,9 @@ public:
 		static M_YAAL_HCORE_PUBLIC_API socket_type_t const NETWORK;
 		static M_YAAL_HCORE_PUBLIC_API socket_type_t const BLOCKING;
 		static M_YAAL_HCORE_PUBLIC_API socket_type_t const NONBLOCKING;
-		static M_YAAL_HCORE_PUBLIC_API socket_type_t const SSL_SERVER;
-		static M_YAAL_HCORE_PUBLIC_API socket_type_t const SSL_CLIENT;
+		static M_YAAL_HCORE_PUBLIC_API socket_type_t const SSL;
+		static M_YAAL_HCORE_PUBLIC_API socket_type_t const SERVER;
+		static M_YAAL_HCORE_PUBLIC_API socket_type_t const CLIENT;
 	};
 protected:
 	typedef HHashMap<int, ptr_t> clients_t;
@@ -77,7 +78,6 @@ protected:
 	int _maximumNumberOfClients;
 	int _addressSize;
 	void* _address;
-	clients_res_t _clients;
 	HString _hostName;
 public:
 	HSocket( socket_type_t const& = TYPE::DEFAULT, int = 0 );
@@ -87,12 +87,6 @@ public:
 	void connect( yaal::hcore::HString const&, int = 0 );
 	int get_port( void ) const;
 	void shutdown( void );
-	void shutdown_client( int );
-	ptr_t get_client( int ) const;
-	iterator begin( void ) const;
-	iterator end( void ) const;
-	iterator find( int ) const;
-	int get_client_count( void ) const;
 	HString const& get_host_name( void );
 protected:
 	virtual int do_close( void ) override;

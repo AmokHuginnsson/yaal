@@ -49,14 +49,16 @@ enum {
 	OK = 0,
 	NOT_INITIALIZED,
 	NOT_A_SERVER,
-	ALREADY_LISTENING
+	ALREADY_LISTENING,
+	ALREADY_CONNECTED
 };
 
-char const* const _errMsgHSocket_[ 4 ] = {
+char const* const _errMsgHSocket_[ 5 ] = {
 	_( "ok" ),
 	_( "socket not initialized" ),
 	_( "socket is not a server" ),
-	_( "already listening" )
+	_( "already listening" ),
+	_( "already connected" )
 };
 
 HSocket::socket_type_t const HSocket::TYPE::DEFAULT = HSocket::socket_type_t::new_flag();
@@ -64,35 +66,49 @@ HSocket::socket_type_t const HSocket::TYPE::FILE = HSocket::socket_type_t::new_f
 HSocket::socket_type_t const HSocket::TYPE::NETWORK = HSocket::socket_type_t::new_flag();
 HSocket::socket_type_t const HSocket::TYPE::BLOCKING = HSocket::socket_type_t::new_flag();
 HSocket::socket_type_t const HSocket::TYPE::NONBLOCKING = HSocket::socket_type_t::new_flag();
-HSocket::socket_type_t const HSocket::TYPE::SSL_SERVER = HSocket::socket_type_t::new_flag();
-HSocket::socket_type_t const HSocket::TYPE::SSL_CLIENT = HSocket::socket_type_t::new_flag();
+HSocket::socket_type_t const HSocket::TYPE::SSL = HSocket::socket_type_t::new_flag();
+HSocket::socket_type_t const HSocket::TYPE::SERVER = HSocket::socket_type_t::new_flag();
+HSocket::socket_type_t const HSocket::TYPE::CLIENT = HSocket::socket_type_t::new_flag();
 
 bool HSocket::_resolveHostnames = true;
 
 HSocket::HSocket( socket_type_t const& socketType_,
 		int maximumNumberOfClients_ )
-	: HRawFile( !!( socketType_ & TYPE::SSL_SERVER )
-			? HRawFile::TYPE::SSL_SERVER
-			: ( ( ( socketType_ == TYPE::DEFAULT ) || ( !!( socketType_ & TYPE::SSL_CLIENT ) ) )
-				? HRawFile::TYPE::SSL_CLIENT : HRawFile::TYPE::DEFAULT ) )
+	: HRawFile(
+			( ( socketType_ & TYPE::SSL ) || ( socketType_ == TYPE::DEFAULT ) )
+				? (
+					( socketType_ & TYPE::SERVER )
+						? HRawFile::TYPE::SSL_SERVER
+						: HRawFile::TYPE::SSL_CLIENT
+				) : HRawFile::TYPE::PLAIN
+		)
 	, _needShutdown( false )
 	, _type( socketType_ )
 	, _maximumNumberOfClients( maximumNumberOfClients_ )
 	, _addressSize( 0 )
 	, _address( NULL )
-	, _clients()
 	, _hostName() {
 	M_PROLOG
-	if ( _type == TYPE::DEFAULT )
-		_type |= TYPE::SSL_CLIENT;
-	if ( ( !!( socketType_ & TYPE::FILE ) ) && ( !!( socketType_ & TYPE::NETWORK ) ) )
+	if ( _type == TYPE::DEFAULT ) {
+		_type |= TYPE::SSL;
+	}
+	if ( ( _type & TYPE::SERVER ) && ( _type & TYPE::CLIENT ) ) {
+		M_THROW( _( "bad socket mode setting" ), socketType_.value() );
+	}
+	_type &= ~TYPE::SERVER;
+	_type &= ~TYPE::CLIENT;
+	if ( ( !!( socketType_ & TYPE::FILE ) ) && ( !!( socketType_ & TYPE::NETWORK ) ) ) {
 		M_THROW( _( "bad socket namespace setting" ), socketType_.value() );
-	if ( ! ( socketType_ & ( TYPE::FILE | TYPE::NETWORK ) ) )
+	}
+	if ( ! ( socketType_ & ( TYPE::FILE | TYPE::NETWORK ) ) ) {
 		_type |= TYPE::NETWORK;
-	if ( ( !!( socketType_ & TYPE::BLOCKING ) ) && ( !!( socketType_ & TYPE::NONBLOCKING ) ) )
+	}
+	if ( ( !!( socketType_ & TYPE::BLOCKING ) ) && ( !!( socketType_ & TYPE::NONBLOCKING ) ) ) {
 		M_THROW( _( "bad socket option" ), socketType_.value() );
-	if ( ! ( socketType_ & ( TYPE::BLOCKING | TYPE::NONBLOCKING ) ) )
+	}
+	if ( ! ( socketType_ & ( TYPE::BLOCKING | TYPE::NONBLOCKING ) ) ) {
 		_type |= TYPE::BLOCKING;
+	}
 	if ( _maximumNumberOfClients >= 0 ) {
 		M_ENSURE( ( _fileDescriptor = ::socket(
 						!!( _type & TYPE::NETWORK ) ? PF_INET : PF_UNIX,
@@ -114,10 +130,11 @@ HSocket::HSocket( socket_type_t const& socketType_,
 			throw;
 		}
 	}
-	if ( !!( _type & TYPE::NETWORK ) )
+	if ( !!( _type & TYPE::NETWORK ) ) {
 		_address = memory::calloc<sockaddr_in>( 1 );
-	else
+	} else {
 		_address = memory::calloc<sockaddr_un>( 1 );
+	}
 	return;
 	M_EPILOG
 }
@@ -160,32 +177,18 @@ void HSocket::cleanup( void ) {
 int HSocket::do_close( void ) {
 	M_PROLOG
 	HScopedValueReplacement<int> saveErrno( errno, 0 );
-	if ( !!_clients ) {
+	if ( _type & TYPE::SERVER ) {
 		cleanup();
-		_clients.reset();
 	}
+	int res( 0 );
+	_type &= ~TYPE::SERVER;
+	_type &= ~TYPE::CLIENT;
 	if ( _needShutdown && ( _fileDescriptor >= 0 ) ) {
 		M_ENSURE( ( ::shutdown( _fileDescriptor, SHUT_RDWR ) == 0 ) || ( errno == ENOTCONN ) || ( errno == ECONNRESET ) );
-		HRawFile::do_close();
+		res = HRawFile::do_close();
 		_needShutdown = false;
 	}
-	return( 0 );
-	M_EPILOG
-}
-
-void HSocket::shutdown_client( int fileDescriptor_ ) {
-	M_PROLOG
-	ptr_t client;
-	if ( ! _clients ) {
-		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
-	}
-	clients_t::iterator it( _clients->find( fileDescriptor_ ) );
-	if ( it == _clients->end() ) {
-		M_THROW( _( "no such client" ), fileDescriptor_ );
-	}
-	M_ASSERT( !! it->second );
-	_clients->erase( fileDescriptor_ );
-	return;
+	return( res );
 	M_EPILOG
 }
 
@@ -195,7 +198,10 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 	if ( _fileDescriptor < 0 ) {
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
 	}
-	if ( !!_clients ) {
+	if ( _type & TYPE::CLIENT ) {
+		M_THROW( _errMsgHSocket_[ ALREADY_CONNECTED ], _fileDescriptor );
+	}
+	if ( _type & TYPE::SERVER ) {
 		M_THROW( _errMsgHSocket_[ ALREADY_LISTENING ], _fileDescriptor );
 	}
 	if ( _maximumNumberOfClients < 1 ) {
@@ -217,7 +223,7 @@ void HSocket::listen( yaal::hcore::HString const& address_, int port_ ) {
 		cleanup();
 		throw HSocketException( !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	}
-	_clients = make_resource<clients_t>( _maximumNumberOfClients );
+	_type |= TYPE::SERVER;
 	_needShutdown = true;
 	return;
 	M_EPILOG
@@ -230,10 +236,12 @@ HSocket::ptr_t HSocket::accept( void ) {
 	sockaddr_in addressNetwork;
 	sockaddr_un addressFile;
 	sockaddr* address;
-	if ( _fileDescriptor < 0 )
+	if ( _fileDescriptor < 0 ) {
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
-	if ( ! _clients )
+	}
+	if ( ! ( _type & TYPE::SERVER ) ) {
 		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
+	}
 	if ( !!( _type & TYPE::NETWORK ) ) {
 		address = static_cast<sockaddr*>(
 				static_cast<void*>( &addressNetwork ) );
@@ -246,12 +254,7 @@ HSocket::ptr_t HSocket::accept( void ) {
 	M_ENSURE( ( fileDescriptor = ::accept( _fileDescriptor,
 					address, &addressSize ) ) >= 0 );
 	/* - 1 means that constructor shall not create socket */
-	socket_type_t type = _type;
-	if ( !!( _type & ( TYPE::SSL_SERVER | TYPE::SSL_CLIENT ) ) ) {
-		type &= ~TYPE::SSL_CLIENT;
-		type |= TYPE::SSL_SERVER;
-	}
-	ptr_t socket( make_pointer<HSocket>( type, -1 ) );
+	ptr_t socket( make_pointer<HSocket>( _type, -1 ) );
 	M_ASSERT( ! socket->_ssl );
 	socket->_fileDescriptor = fileDescriptor;
 	if ( !!( _type & TYPE::NONBLOCKING ) ) {
@@ -266,18 +269,21 @@ HSocket::ptr_t HSocket::accept( void ) {
 	socket->_needShutdown = true;
 	socket->set_timeout( _timeout );
 	::memcpy( socket->_address, address, static_cast<size_t>( addressSize ) );
-	if ( _clients->find( fileDescriptor ) != _clients->end() ) {
-		M_THROW( _( "inconsistent client list state" ), fileDescriptor );
-	}
-	_clients->insert( make_pair( fileDescriptor, socket ) );
 	return ( socket );
 	M_EPILOG
 }
 
 void HSocket::connect( yaal::hcore::HString const& address_, int port_ ) {
 	M_PROLOG
-	if ( _fileDescriptor < 0 )
+	if ( _fileDescriptor < 0 ) {
 		M_THROW( _errMsgHSocket_[ NOT_INITIALIZED ], _fileDescriptor );
+	}
+	if ( _type & TYPE::CLIENT ) {
+		M_THROW( _errMsgHSocket_[ ALREADY_CONNECTED ], _fileDescriptor );
+	}
+	if ( _type & TYPE::SERVER ) {
+		M_THROW( _errMsgHSocket_[ ALREADY_LISTENING ], _fileDescriptor );
+	}
 	int saveErrno( errno );
 	make_address( address_, port_ );
 	int error( ::connect( _fileDescriptor, static_cast<sockaddr*>( _address ), static_cast<socklen_t>( _addressSize ) ) );
@@ -295,6 +301,7 @@ void HSocket::connect( yaal::hcore::HString const& address_, int port_ ) {
 	}
 	M_ENSURE_EX( error == 0, !!( _type & TYPE::NETWORK ) ? address_ + ":" + port_ : address_ );
 	errno = saveErrno;
+	_type |= TYPE::CLIENT;
 	_needShutdown = true;
 	return;
 	M_EPILOG
@@ -350,55 +357,6 @@ int HSocket::get_port( void ) const {
 	}
 	addressNetwork = static_cast<sockaddr_in*>( _address );
 	return ( fwd_ntohs( addressNetwork->sin_port ) );
-	M_EPILOG
-}
-
-HSocket::ptr_t HSocket::get_client( int fileDescriptor_ ) const {
-	M_PROLOG
-	if ( ! _clients ) {
-		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
-	}
-	clients_t::const_iterator it( _clients->find( fileDescriptor_ ) );
-	if ( it == _clients->end() ) {
-		M_THROW( _( "no such client" ), fileDescriptor_ );
-	}
-	return ( it->second );
-	M_EPILOG
-}
-
-HSocket::iterator HSocket::begin( void ) const {
-	M_PROLOG
-	if ( ! _clients ) {
-		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
-	}
-	return ( _clients->begin() );
-	M_EPILOG
-}
-
-HSocket::iterator HSocket::end( void ) const {
-	M_PROLOG
-	if ( ! _clients ) {
-		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
-	}
-	return ( _clients->end() );
-	M_EPILOG
-}
-
-HSocket::iterator HSocket::find( int socket_ ) const {
-	M_PROLOG
-	if ( ! _clients ) {
-		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
-	}
-	return ( _clients->find( socket_ ) );
-	M_EPILOG
-}
-
-int HSocket::get_client_count( void ) const {
-	M_PROLOG
-	if ( ! _clients ) {
-		M_THROW( _errMsgHSocket_[ NOT_A_SERVER ], _fileDescriptor );
-	}
-	return ( static_cast<int>( _clients->size() ) );
 	M_EPILOG
 }
 
