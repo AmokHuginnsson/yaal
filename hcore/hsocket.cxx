@@ -393,17 +393,6 @@ HSocket::iterator HSocket::find( int socket_ ) const {
 	M_EPILOG
 }
 
-int long HSocket::write_until_eos( HString const& message_ ) {
-	M_PROLOG
-	int long nSize = 0;
-	nSize = message_.get_length();
-	if ( nSize > 0 ) {
-		nSize = write( message_.raw(), nSize );
-	}
-	return ( nSize );
-	M_EPILOG
-}
-
 int HSocket::get_client_count( void ) const {
 	M_PROLOG
 	if ( ! _clients ) {

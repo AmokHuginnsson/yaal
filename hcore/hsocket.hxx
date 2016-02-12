@@ -92,7 +92,6 @@ public:
 	iterator begin( void ) const;
 	iterator end( void ) const;
 	iterator find( int ) const;
-	int long write_until_eos( HString const& );
 	int get_client_count( void ) const;
 	HString const& get_host_name( void );
 protected:
