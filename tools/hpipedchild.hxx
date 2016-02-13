@@ -36,16 +36,9 @@ namespace tools {
 
 /*! \brief Run process and access its std(in/out/err).
  */
-class HPipedChild : public yaal::hcore::HStreamInterface {
+class HPipedChild {
 public:
 	typedef HPipedChild this_type;
-	typedef HStreamInterface base_type;
-	/*! \brief Child process output stream types.
-	 */
-	enum class STREAM {
-		OUT, /*!< Output stream is of interest. */
-		ERR /*!< Error stream is of interest. */
-	};
 	/*! \brief Status of this child process.
 	 */
 	struct STATUS {
@@ -58,38 +51,36 @@ public:
 		};
 		TYPE type; /*!< child process current status. */
 		int value; /*!< exit value of finished child process. */
-		STATUS( void ) : type( TYPE::NOT_SPAWNED ), value( 0 ) {}
+		STATUS( void )
+			: type( TYPE::NOT_SPAWNED )
+			, value( 0 ) {
+		}
 	};
 	typedef yaal::hcore::HArray<yaal::hcore::HString> argv_t;
 private:
 	int _pid;
-	int _pipeIn;
-	int _pipeOut;
-	int _pipeErr;
-	STREAM _cSOI; /* Current Stream Of Interest */
-	yaal::hcore::HChunk _secondLineCache;
-	int _secondLineOffset;
+	yaal::hcore::HStreamInterface::ptr_t _in;
+	yaal::hcore::HStreamInterface::ptr_t _out;
+	yaal::hcore::HStreamInterface::ptr_t _err;
 public:
 	M_YAAL_TOOLS_PUBLIC_API static int _killGracePeriod;
 	HPipedChild( void );
 	~HPipedChild( void );
 	void spawn( yaal::hcore::HString const&, argv_t const& = argv_t() );
-	bool read_poll( int long* );
 	STATUS finish( void );
 	bool is_running( void ) const;
-	void set_csoi( STREAM );
+	yaal::hcore::HStreamInterface& in( void );
+	yaal::hcore::HStreamInterface& out( void );
+	yaal::hcore::HStreamInterface& err( void );
+	yaal::hcore::HStreamInterface::ptr_t stream_in( void );
+	yaal::hcore::HStreamInterface::ptr_t stream_out( void );
+	yaal::hcore::HStreamInterface::ptr_t stream_err( void );
 private:
-	virtual int long do_write( void const* const, int long ) override;
-	virtual void do_flush( void ) override;
-	virtual int long do_read( void* const, int long ) override;
-	virtual bool do_is_valid( void ) const override;
-	virtual POLL_TYPE do_poll_type( void ) const override;
-	virtual void const* do_data( void ) const override;
 	HPipedChild( HPipedChild const& ) = delete;
 	HPipedChild& operator = ( HPipedChild const& ) = delete;
 };
 
-typedef yaal::hcore::HExceptionT<HPipedChild, yaal::hcore::HStreamInterfaceException> HPipedChildException;
+typedef yaal::hcore::HExceptionT<HPipedChild> HPipedChildException;
 
 }
 

@@ -36,7 +36,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "hpipedchild.hxx"
 #include "hfsitem.hxx"
-#include "hcore/system.hxx"
+#include "hcore/hrawfile.hxx"
 #include "hcore/hfile.hxx"
 #include "util.hxx"
 #include "halarm.hxx"
@@ -47,10 +47,21 @@ namespace yaal {
 
 namespace tools {
 
+static void close_and_invalidate( HStreamInterface::ptr_t& stream_ ) {
+	M_PROLOG
+	if ( !! stream_ ) {
+		static_cast<HRawFile*>( stream_.raw() )->close();
+	}
+	stream_.reset();
+	return;
+	M_EPILOG
+}
+
 static void close_and_invalidate( int& fd_ ) {
 	M_PROLOG
-	if ( fd_ >= 0 )
+	if ( fd_ >= 0 ) {
 		M_ENSURE( M_TEMP_FAILURE_RETRY( hcore::system::close( fd_ ) ) == 0 );
+	}
 	fd_ = -1;
 	return;
 	M_EPILOG
@@ -59,16 +70,18 @@ static void close_and_invalidate( int& fd_ ) {
 int HPipedChild::_killGracePeriod = 1000;
 
 HPipedChild::HPipedChild( void )
-	: HStreamInterface(), _pid( 0 ),
-	_pipeIn( -1 ), _pipeOut( -1 ), _pipeErr( -1 ),
-	_cSOI( STREAM::OUT ), _secondLineCache( _cache.size() ), _secondLineOffset( _offset ) {
+	: _pid( -1 )
+	, _in()
+	, _out()
+	, _err() {
 	return;
 }
 
 HPipedChild::~HPipedChild( void ) {
 	M_PROLOG
-	if ( _pid > 0 )
+	if ( _pid > 0 ) {
 		finish();
+	}
 	return;
 	M_DESTRUCTOR_EPILOG
 }
@@ -96,9 +109,9 @@ inline int FWD_WTERMSIG( T val_ ) {
 
 HPipedChild::STATUS HPipedChild::finish( void ) {
 	M_PROLOG
-	close_and_invalidate( _pipeErr );
-	close_and_invalidate( _pipeOut );
-	close_and_invalidate( _pipeIn );
+	close_and_invalidate( _err );
+	close_and_invalidate( _out );
+	close_and_invalidate( _in );
 	STATUS s;
 	if ( _pid > 0 ) {
 		int status( 0 );
@@ -129,14 +142,17 @@ HPipedChild::STATUS HPipedChild::finish( void ) {
 
 struct OPipeResGuard {
 	int _res[2];
-	OPipeResGuard( void ) : _res() {
-		_res[ 0 ] = _res[ 1 ] = -1;
+	OPipeResGuard( void )
+		: _res() {
+		_res[0] = _res[1] = -1;
 	}
 	~OPipeResGuard( void ) {
-		if ( _res[ 0 ] >= 0 )
+		if ( _res[ 0 ] >= 0 ) {
 			M_ENSURE( M_TEMP_FAILURE_RETRY( hcore::system::close( _res[ 0 ] ) ) == 0 );
-		if ( _res[ 1 ] >= 0 )
+		}
+		if ( _res[ 1 ] >= 0 ) {
 			M_ENSURE( M_TEMP_FAILURE_RETRY( hcore::system::close( _res[ 1 ] ) ) == 0 );
+		}
 	}
 };
 
@@ -182,83 +198,58 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 		close_and_invalidate( fileDesOut[ 1 ] );
 		close_and_invalidate( fileDesErr[ 1 ] );
 		using yaal::swap;
-		swap( _pipeIn, fileDesIn[ 1 ] );
-		swap( _pipeOut, fileDesOut[ 0 ] );
-		swap( _pipeErr, fileDesErr[ 0 ] );
+		_in = make_pointer<HRawFile>( fileDesIn[ 1 ], HRawFile::OWNERSHIP::ACQUIRED );
+		fileDesIn[1] = -1;
+		_out = make_pointer<HRawFile>( fileDesOut[ 0 ], HRawFile::OWNERSHIP::ACQUIRED );
+		fileDesOut[0] = -1;
+		_err = make_pointer<HRawFile>( fileDesErr[ 0 ], HRawFile::OWNERSHIP::ACQUIRED );
+		fileDesErr[0] = -1;
 	}
 	return;
-	M_EPILOG
-}
-
-int long HPipedChild::do_read( void* const buffer_, int long size_ ) {
-	M_PROLOG
-	M_ASSERT( ( _pipeOut >= 0 ) && ( _pipeErr >= 0 ) );
-	int fd = ( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
-	return ( ::read( fd, buffer_, static_cast<size_t>( size_ ) ) );
-	M_EPILOG
-}
-
-int long HPipedChild::do_write( void const* const string_, int long size_ ) {
-	M_PROLOG
-	M_ASSERT( _pipeIn >= 0 );
-	int long nWritten( 0 );
-	int long nWriteChunk( 0 );
-	do {
-		nWriteChunk = M_TEMP_FAILURE_RETRY( ::write( _pipeIn,
-					static_cast<char const* const>( string_ ) + nWritten,
-					static_cast<size_t>( size_ - nWritten ) ) );
-		nWritten += nWriteChunk;
-	} while ( ( nWriteChunk > 0 ) && ( nWritten < size_ ) );
-	return ( nWritten );
-	M_EPILOG
-}
-
-void HPipedChild::do_flush( void ) {
-}
-
-bool HPipedChild::read_poll( int long* time_ ) {
-	M_PROLOG
-	int fd( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
-	return ( hcore::system::wait_for_io( &fd, 1, NULL, 0, time_ ) <= 0 );
 	M_EPILOG
 }
 
 bool HPipedChild::is_running( void ) const {
 	int err( 0 );
-	if ( _pid > 0 )
+	if ( _pid > 0 ) {
 		err = hcore::system::kill( _pid, 0 );
+	}
 	return ( ( _pid > 0 ) && ! err );
 }
 
-void HPipedChild::set_csoi( STREAM childStreamOfInterest_ ) {
+yaal::hcore::HStreamInterface& HPipedChild::in( void ) {
 	M_PROLOG
-	M_ASSERT( ( childStreamOfInterest_ == STREAM::OUT ) || ( childStreamOfInterest_ == STREAM::ERR ) );
-	if ( childStreamOfInterest_ != _cSOI ) {
-		using yaal::swap;
-		swap( _offset, _secondLineOffset );
-		swap( _cache, _secondLineCache );
-	}
-	_cSOI = childStreamOfInterest_;
-	return;
+	return ( *_in );
 	M_EPILOG
 }
 
-bool HPipedChild::do_is_valid( void ) const {
+yaal::hcore::HStreamInterface& HPipedChild::out( void ) {
 	M_PROLOG
-	return ( is_running() && ( _pipeIn >= 0 ) && ( _pipeOut >= 0 ) && ( _pipeErr >= 0 ) );
+	return ( *_out );
 	M_EPILOG
 }
 
-HStreamInterface::POLL_TYPE HPipedChild::do_poll_type( void ) const {
+yaal::hcore::HStreamInterface& HPipedChild::err( void ) {
 	M_PROLOG
-	return ( is_valid() ? POLL_TYPE::NATIVE : POLL_TYPE::INVALID );
+	return ( *_err );
 	M_EPILOG
 }
 
-void const* HPipedChild::do_data( void ) const {
+yaal::hcore::HStreamInterface::ptr_t HPipedChild::stream_in( void ) {
 	M_PROLOG
-	int fd( ( _cSOI == STREAM::OUT ) ? _pipeOut : _pipeErr );
-	return ( is_valid() ? reinterpret_cast<void const*>( fd ) : memory::INVALID_HANDLE );
+	return ( _in );
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface::ptr_t HPipedChild::stream_out( void ) {
+	M_PROLOG
+	return ( _out );
+	M_EPILOG
+}
+
+yaal::hcore::HStreamInterface::ptr_t HPipedChild::stream_err( void ) {
+	M_PROLOG
+	return ( _err );
 	M_EPILOG
 }
 
