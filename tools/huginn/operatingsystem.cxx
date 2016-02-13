@@ -84,6 +84,16 @@ public:
 		return ( thread_->huginn().none_value() );
 		M_EPILOG
 	}
+	static HHuginn::value_t exit( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "OperatingSystem.exit";
+		verify_arg_count( name, values_, 1, 1, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+		HHuginn::HInteger::value_type val( get_integer( values_[0] ) );
+		::exit( static_cast<int>( val ) );
+		return ( thread_->huginn().none_value() );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -101,11 +111,13 @@ HHuginn::value_t HOperatingSystemCreator::do_new_instance( HHuginn* huginn_ ) {
 			nullptr,
 			HHuginn::field_names_t{
 				"env",
-				"exec"
+				"exec",
+				"exit"
 			},
 			HHuginn::values_t{
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::env, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exec, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exec, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exit, _1, _2, _3, _4 ) )
 			}
 		)
 	);
