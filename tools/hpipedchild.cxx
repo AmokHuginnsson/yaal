@@ -210,11 +210,11 @@ void HPipedChild::spawn( HString const& image_, argv_t const& argv_ ) {
 }
 
 bool HPipedChild::is_running( void ) const {
-	int err( 0 );
+	int res( 0 );
 	if ( _pid > 0 ) {
-		err = hcore::system::kill( _pid, 0 );
+		res = hcore::system::kill( _pid, 0 );
 	}
-	return ( ( _pid > 0 ) && ! err );
+	return ( ( _pid > 0 ) && !res  );
 }
 
 yaal::hcore::HStreamInterface& HPipedChild::in( void ) {
