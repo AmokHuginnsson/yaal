@@ -69,7 +69,7 @@ private:
 	HStreamIterator& operator = ( HStreamIterator const& ) = delete;
 };
 
-HStream::HStream( HHuginn::HClass* class_, HStreamInterface::ptr_t stream_ )
+HStream::HStream( HHuginn::HClass const* class_, HStreamInterface::ptr_t stream_ )
 	: HIterable( class_ )
 	, _stream( stream_ )
 	, _buffer()

@@ -28,8 +28,8 @@ Copyright:
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "tools/hhuginn.hxx"
-#include "tools/huginn/thread.hxx"
-#include "tools/huginn/stream.hxx"
+#include "thread.hxx"
+#include "stream.hxx"
 #include "helper.hxx"
 #include "exception.hxx"
 #include "hcore/hfile.hxx"

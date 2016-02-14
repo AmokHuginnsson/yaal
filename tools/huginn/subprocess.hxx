@@ -1,7 +1,7 @@
 /*
 ---           `yaal' 0.0.0 (c) 1978 by Marcin 'Amok' Konarski            ---
 
-  stream.hxx - this file is integral part of `yaal' project.
+  subprocess.hxx - this file is integral part of `yaal' project.
 
   i.  You may not make any changes in Copyright information.
   ii. You must attach Copyright information to any part of every copy
@@ -26,11 +26,11 @@ Copyright:
 
 /* YAAL_PRIVATE_IMPLEMENTATION_DETAIL */
 
-#ifndef YAAL_TOOLS_HUGINN_STREAM_HXX_INCLUDED
-#define YAAL_TOOLS_HUGINN_STREAM_HXX_INCLUDED 1
+#ifndef YAAL_TOOLS_HUGINN_SUBPROCESS_HXX_INCLUDED
+#define YAAL_TOOLS_HUGINN_SUBPROCESS_HXX_INCLUDED 1
 
 #include "tools/hhuginn.hxx"
-#include "hcore/hstreaminterface.hxx"
+#include "tools/hpipedchild.hxx"
 
 namespace yaal {
 
@@ -38,23 +38,17 @@ namespace tools {
 
 namespace huginn {
 
-class HStream : public HHuginn::HIterable {
-	yaal::hcore::HStreamInterface::ptr_t _stream;
-	yaal::hcore::HChunk _buffer;
-	yaal::hcore::HString _lineBuffer;
-public:
-	HStream( HHuginn::HClass const*, yaal::hcore::HStreamInterface::ptr_t );
-	static HHuginn::value_t read( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t read_line( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	static HHuginn::value_t write( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
-	yaal::hcore::HString const& read_line_impl( void );
-	bool is_valid( void ) const;
-	static HHuginn::class_t get_class( HHuginn* );
+class HSubprocess : public HHuginn::HObject {
 private:
-	yaal::hcore::HString read_impl( int long );
-	void write_impl( yaal::hcore::HString const& );
-	virtual HIterator do_iterator( void ) override;
-	virtual int long do_size( void ) const override;
+	HPipedChild _pipedChild;
+public:
+	typedef yaal::hcore::HStreamInterface::ptr_t ( HPipedChild::* stream_getter_t )( void );
+	HSubprocess( HHuginn::HClass const*, HHuginn::values_t const& );
+	static HHuginn::value_t is_alive( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t get_pid( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t kill( huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::value_t stream( char const*, stream_getter_t, huginn::HThread*, HHuginn::value_t*, HHuginn::values_t const&, int );
+	static HHuginn::class_t get_class( HHuginn* );
 };
 
 }
@@ -63,5 +57,5 @@ private:
 
 }
 
-#endif /* #ifndef YAAL_TOOLS_HUGINN_STREAM_HXX_INCLUDED */
+#endif /* #ifndef YAAL_TOOLS_HUGINN_SUBPROCESS_HXX_INCLUDED */
 

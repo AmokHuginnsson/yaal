@@ -69,6 +69,7 @@ public:
 	void spawn( yaal::hcore::HString const&, argv_t const& = argv_t() );
 	STATUS finish( void );
 	bool is_running( void ) const;
+	int get_pid( void ) const;
 	yaal::hcore::HStreamInterface& in( void );
 	yaal::hcore::HStreamInterface& out( void );
 	yaal::hcore::HStreamInterface& err( void );

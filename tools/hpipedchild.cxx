@@ -217,6 +217,12 @@ bool HPipedChild::is_running( void ) const {
 	return ( ( _pid > 0 ) && !res  );
 }
 
+int HPipedChild::get_pid( void ) const {
+	M_PROLOG
+	return ( _pid );
+	M_EPILOG
+}
+
 yaal::hcore::HStreamInterface& HPipedChild::in( void ) {
 	M_PROLOG
 	return ( *_in );

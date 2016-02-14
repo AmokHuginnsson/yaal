@@ -37,6 +37,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "exception.hxx"
 #include "packagefactory.hxx"
 #include "objectfactory.hxx"
+#include "subprocess.hxx"
 
 using namespace yaal;
 using namespace yaal::hcore;
@@ -50,10 +51,12 @@ namespace huginn {
 
 class HOperatingSystem : public HHuginn::HObject {
 	HHuginn::class_t _exceptionClass;
+	HHuginn::class_t _subprocessClass;
 public:
 	HOperatingSystem( HHuginn::HClass* class_ )
 		: HObject( class_ )
-		, _exceptionClass( exception::create_class( class_->huginn(), "OperatingSystemException" ) ) {
+		, _exceptionClass( exception::create_class( class_->huginn(), "OperatingSystemException" ) )
+		, _subprocessClass( HSubprocess::get_class( class_->huginn() ) ) {
 		return;
 	}
 	static HHuginn::value_t env( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
@@ -94,6 +97,24 @@ public:
 		return ( thread_->huginn().none_value() );
 		M_EPILOG
 	}
+	static HHuginn::value_t spawn( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "OperatingSystem.spawn";
+		verify_arg_count( name, values_, 1, meta::max_signed<int short>::value, position_ );
+ 		int argc( static_cast<int>( values_.get_size() ) );
+		for ( int i( 0 ); i < argc; ++ i ) {
+			verify_arg_type( name, values_, i, HHuginn::TYPE::STRING, argc == 1, position_ );
+		}
+		HHuginn::value_t v( thread_->huginn().none_value() );
+		try {
+			HOperatingSystem* o( static_cast<HOperatingSystem*>( object_->raw() ) );
+			v = make_pointer<HSubprocess>( o->_subprocessClass.raw(), values_ );
+		} catch ( HException const& e ) {
+			thread_->raise( static_cast<HOperatingSystem*>( object_->raw() )->_exceptionClass.raw(), e.what(), position_ );
+		}
+		return ( v );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
@@ -112,12 +133,14 @@ HHuginn::value_t HOperatingSystemCreator::do_new_instance( HHuginn* huginn_ ) {
 			HHuginn::field_names_t{
 				"env",
 				"exec",
-				"exit"
+				"exit",
+				"spawn"
 			},
 			HHuginn::values_t{
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::env, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exec, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exit, _1, _2, _3, _4 ) )
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exit, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::spawn, _1, _2, _3, _4 ) )
 			}
 		)
 	);
