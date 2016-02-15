@@ -116,9 +116,12 @@ int HNumber::DEFAULT_PRECISION = 100;
 
 HNumber::HNumber( void )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
-			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	return;
 	M_EPILOG
@@ -132,9 +135,12 @@ HNumber::~HNumber( void ) {
 
 HNumber::HNumber( double long number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
-			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_floating_point( number_ );
 	return;
@@ -143,9 +149,12 @@ HNumber::HNumber( double long number_ )
 
 HNumber::HNumber( double number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
-			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_floating_point( number_ );
 	return;
@@ -154,9 +163,12 @@ HNumber::HNumber( double number_ )
 
 HNumber::HNumber( int long long number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
-			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_integer( number_ );
 	return;
@@ -165,9 +177,12 @@ HNumber::HNumber( int long long number_ )
 
 HNumber::HNumber( int long long unsigned number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
-			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_unsigned_integer( number_ );
 	return;
@@ -176,9 +191,12 @@ HNumber::HNumber( int long long unsigned number_ )
 
 HNumber::HNumber( int long number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
-			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_integer( number_ );
 	return;
@@ -187,9 +205,12 @@ HNumber::HNumber( int long number_ )
 
 HNumber::HNumber( int number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
-			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_integer( number_ );
 	return;
@@ -198,9 +219,12 @@ HNumber::HNumber( int number_ )
 
 HNumber::HNumber( int long long number_, integer_t precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
-			? precision_ : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? precision_ : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_integer( number_ );
 	return;
@@ -209,9 +233,12 @@ HNumber::HNumber( int long long number_, integer_t precision_ )
 
 HNumber::HNumber( int long number_, integer_t precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
-			? precision_ : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? precision_ : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_integer( number_ );
 	return;
@@ -220,9 +247,12 @@ HNumber::HNumber( int long number_, integer_t precision_ )
 
 HNumber::HNumber( int number_, integer_t precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
-			? precision_ : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? precision_ : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_integer( number_ );
 	return;
@@ -231,9 +261,12 @@ HNumber::HNumber( int number_, integer_t precision_ )
 
 HNumber::HNumber( double long number_, integer_t precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
-			? precision_ : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? precision_ : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_floating_point( number_ );
 	return;
@@ -242,9 +275,12 @@ HNumber::HNumber( double long number_, integer_t precision_ )
 
 HNumber::HNumber( double number_, integer_t precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
-			? precision_ : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? precision_ : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_floating_point( number_ );
 	return;
@@ -253,9 +289,12 @@ HNumber::HNumber( double number_, integer_t precision_ )
 
 HNumber::HNumber( char const* const number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
-			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -264,9 +303,12 @@ HNumber::HNumber( char const* const number_ )
 
 HNumber::HNumber( char const* const number_, integer_t precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
-			? precision_ : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? precision_ : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -275,9 +317,12 @@ HNumber::HNumber( char const* const number_, integer_t precision_ )
 
 HNumber::HNumber( HString const& number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
-			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -286,9 +331,12 @@ HNumber::HNumber( HString const& number_ )
 
 HNumber::HNumber( HString const& number_, integer_t precision_ )
 	: _precision( precision_ > HARDCODED_MINIMUM_PRECISION
-			? precision_ : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? precision_ : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	from_string( number_ );
 	return;
@@ -296,11 +344,12 @@ HNumber::HNumber( HString const& number_, integer_t precision_ )
 }
 
 HNumber::HNumber( HNumber const& source )
-	: _precision( source._precision ),
-	_leafCount( source._leafCount ),
-	_integralPartSize( source._integralPartSize ),
-	_canonical(), _cache(),
-	_negative( source._negative ) {
+	: _precision( source._precision )
+	, _leafCount( source._leafCount )
+	, _integralPartSize( source._integralPartSize )
+	, _canonical()
+	, _cache()
+	, _negative( source._negative ) {
 	M_PROLOG
 	if ( source._leafCount ) {
 		_canonical.realloc( chunk_size<i32_t>( source._leafCount ), HChunk::STRATEGY::EXACT );
@@ -314,11 +363,35 @@ HNumber::HNumber( HNumber const& source )
 	M_EPILOG
 }
 
+HNumber::HNumber( HNumber const& source, integer_t precision_ )
+	: _precision( source._precision )
+	, _leafCount( source._leafCount )
+	, _integralPartSize( source._integralPartSize )
+	, _canonical()
+	, _cache()
+	, _negative( source._negative ) {
+	M_PROLOG
+	if ( source._leafCount ) {
+		_canonical.realloc( chunk_size<i32_t>( source._leafCount ), HChunk::STRATEGY::EXACT );
+		::memcpy( _canonical.raw(), source._canonical.raw(), static_cast<size_t>( chunk_size<i32_t>( source._leafCount ) ) );
+		if ( source._cache.get_size() > 0 ) {
+			_cache.realloc( source._cache.get_size(), HChunk::STRATEGY::EXACT );
+			::memcpy( _cache.raw(), source._cache.raw(), static_cast<size_t>( source._cache.get_size() ) );
+		}
+	}
+	set_precision( precision_ );
+	return;
+	M_EPILOG
+}
+
 HNumber::HNumber( HNumber&& number_ )
 	: _precision( DEFAULT_PRECISION > HARDCODED_MINIMUM_PRECISION
-			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION ),
-	_leafCount( 0 ), _integralPartSize( 0 ),
-	_canonical(), _cache(), _negative( false ) {
+			? DEFAULT_PRECISION : HARDCODED_MINIMUM_PRECISION )
+	, _leafCount( 0 )
+	, _integralPartSize( 0 )
+	, _canonical()
+	, _cache()
+	, _negative( false ) {
 	M_PROLOG
 	swap( number_ );
 	return;
@@ -1718,6 +1791,47 @@ struct HNumber::ElementaryFunctions {
 		return ( n );
 		M_EPILOG
 	}
+	static yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		HNumber input( value_ );
+		bool minus( false );
+		/* Check the sign of input. */
+		if ( input < number::_zero_ ) {
+			minus = true;
+			input = -input;
+		}
+
+		/* Precondition x. */
+		int long log2( 0 );
+		while ( input > number::_one_ ) {
+			++ log2;
+			input * number::_half_;
+		}
+
+		/* Initialize the variables. */
+		HNumber v( input );
+		++ v;
+		HNumber a( input );
+		HNumber d( number::_one_ );
+
+		HNumber e;
+		for ( HNumber i( number::_two_ ); true; ++ i ) {
+			e = ( a *= input ) / ( d *= i );
+			if ( e == number::_zero_ ) {
+				while ( log2 > 0 ) {
+					v = v * v;
+					-- log2;
+				}
+				break;
+			}
+			v += e;
+		}
+		if ( minus ) {
+			v = number::_one_ / v;
+		}
+		return ( v );
+		M_EPILOG
+	}
 };
 
 HNumber operator "" _yn ( char const* str_, size_t len_ ) {
@@ -1735,6 +1849,12 @@ HNumber operator "" _yn ( int long long unsigned val_ ) {
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::square_root( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::natural_expotential( value_ ) );
 	M_EPILOG
 }
 

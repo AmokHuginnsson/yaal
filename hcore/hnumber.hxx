@@ -180,6 +180,7 @@ public:
 	HNumber( HString const& );
 	HNumber( HString const&, integer_t );
 	HNumber( HNumber const& );
+	HNumber( HNumber const&, integer_t );
 	HNumber( HNumber&& );
 	~HNumber( void );
 	HNumber& operator = ( HNumber const& );
@@ -265,12 +266,16 @@ inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b ) {
 }
 
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& );
 
 namespace number {
 	extern HNumber const _zero_;
 	extern HNumber const _one_;
 	extern HNumber const _two_;
 	extern HNumber const _half_;
+	extern HNumber const PI;
+	extern HNumber const E;
+	extern HNumber const LN2;
 }
 
 }
