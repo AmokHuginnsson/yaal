@@ -1793,7 +1793,8 @@ struct HNumber::ElementaryFunctions {
 	}
 	static yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
-		HNumber input( value_ );
+		integer_t precision( value_.get_precision() * 2 );
+		HNumber input( value_, precision );
 		bool minus( false );
 		/* Check the sign of input. */
 		if ( input < number::_zero_ ) {
@@ -1801,22 +1802,24 @@ struct HNumber::ElementaryFunctions {
 			input = -input;
 		}
 
-		/* Precondition x. */
+		/* Precondition input. */
 		int long log2( 0 );
 		while ( input > number::_one_ ) {
 			++ log2;
-			input * number::_half_;
+			input *= number::_half_;
 		}
 
 		/* Initialize the variables. */
-		HNumber v( input );
+		HNumber v( input, precision );
 		++ v;
-		HNumber a( input );
-		HNumber d( number::_one_ );
+		HNumber a( input, precision );
+		HNumber d( number::_one_, precision );
 
 		HNumber e;
 		for ( HNumber i( number::_two_ ); true; ++ i ) {
 			e = ( a *= input ) / ( d *= i );
+			a.set_precision( precision );
+			d.set_precision( precision );
 			if ( e == number::_zero_ ) {
 				while ( log2 > 0 ) {
 					v = v * v;
@@ -1829,6 +1832,8 @@ struct HNumber::ElementaryFunctions {
 		if ( minus ) {
 			v = number::_one_ / v;
 		}
+		v.round( value_.get_precision() );
+		v.set_precision( value_.get_precision() );
 		return ( v );
 		M_EPILOG
 	}
