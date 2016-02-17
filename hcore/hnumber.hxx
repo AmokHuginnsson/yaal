@@ -267,6 +267,7 @@ inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b ) {
 
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& );
 
 namespace number {
 	extern HNumber const _zero_;

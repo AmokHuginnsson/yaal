@@ -137,6 +137,7 @@ bool is_octal( type_t const& );
 
 double long square_root_impl( double long );
 double long natural_expotential_impl( double long );
+double long natural_logarithm_impl( double long );
 
 template<typename T>
 T square_root( T val_ ) {
@@ -146,6 +147,11 @@ T square_root( T val_ ) {
 template<typename T>
 T natural_expotential( T val_ ) {
 	return ( static_cast<T>( natural_expotential_impl( val_ ) ) );
+}
+
+template<typename T>
+T natural_logarithm( T val_ ) {
+	return ( static_cast<T>( natural_logarithm_impl( val_ ) ) );
 }
 
 }

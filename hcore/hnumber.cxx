@@ -1837,6 +1837,45 @@ struct HNumber::ElementaryFunctions {
 		return ( v );
 		M_EPILOG
 	}
+	static yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		if ( value_ <= number::_zero_ ) {
+			throw HNumberException( "natural logarithm from non-positive" );
+		}
+		integer_t precision( value_.get_precision() * 2 );
+
+		HNumber f( number::_two_ );
+		HNumber input( value_, precision );
+		while ( input >= number::_two_ ) {  /* for large numbers */
+			f *= number::_two_;
+			input = square_root( input );
+		}
+		while ( input <= number::_half_ ) {  /* for small numbers */
+			f *= number::_two_;
+			input = square_root( input );
+		}
+
+		/* Set up the loop. */
+		HNumber n( ( input - number::_one_ ) / ( input + number::_one_ ), precision );
+		HNumber v( n );
+		HNumber m( n * n, precision );
+
+		/* Sum the series. */
+		HNumber e;
+		for ( HNumber i( 3 ); true; i += number::_two_ ) {
+			e = ( n *= m ) / i;
+			n.set_precision( precision );
+			if ( e == number::_zero_ ) {
+				v *= f;
+				break;
+			}
+			v += e;
+		}
+		v.round( value_.get_precision() );
+		v.set_precision( value_.get_precision() );
+		return ( v );
+		M_EPILOG
+	}
 };
 
 HNumber operator "" _yn ( char const* str_, size_t len_ ) {
@@ -1860,6 +1899,12 @@ yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::natural_expotential( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::natural_logarithm( value_ ) );
 	M_EPILOG
 }
 

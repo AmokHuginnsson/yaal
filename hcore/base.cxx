@@ -441,5 +441,9 @@ double long natural_expotential_impl( double long val_ ) {
 	return ( expl( val_ ) );
 }
 
+double long natural_logarithm_impl( double long val_ ) {
+	return ( logl( val_ ) );
+}
+
 }
 
