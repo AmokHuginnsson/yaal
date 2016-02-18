@@ -62,7 +62,7 @@ public:
 		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
-			if ( val >= 0 ) {
+			if ( val >= number::_zero_ ) {
 				v = thread_->object_factory().create_number( hcore::square_root( val ) );
 			}
 		} else {
@@ -93,6 +93,29 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	static HHuginn::value_t natural_logarithm( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Mathematics.natural_logarithm";
+		verify_arg_count( name, values_, 1, 1, position_ );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::value_t v( thread_->huginn().none_value() );
+		if ( t == HHuginn::TYPE::NUMBER ) {
+			HNumber val( get_number( values_[0] ) );
+			if ( val > number::_zero_ ) {
+				v = thread_->object_factory().create_number( hcore::natural_logarithm( val ) );
+			}
+		} else {
+			double long val( get_real( values_[0] ) );
+			if ( val > 0 ) {
+				v = thread_->object_factory().create_real( yaal::natural_logarithm( val ) );
+			}
+		}
+		if ( v == thread_->huginn().none_value() ) {
+			thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "bad domain", position_ );
+		}
+		return ( v );
+		M_EPILOG
+	}
 	static HHuginn::value_t round( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.round";
@@ -116,7 +139,7 @@ public:
 				double long val( get_real( values_[0] ) );
 				v = thread_->object_factory().create_real( roundl( val ) );
 			} else {
-				thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "rounding to nth place on real not supported", position_ );
+				thread_->raise( static_cast<HMathematics*>( object_->raw() )->_exceptionClass.raw(), "rounding to nth place on real is not supported", position_ );
 			}
 		}
 		return ( v );
@@ -172,6 +195,7 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HHuginn* huginn_ ) {
 			HHuginn::field_names_t{
 				"square_root",
 				"natural_expotential",
+				"natural_logarithm",
 				"round",
 				"floor",
 				"ceil"
@@ -179,6 +203,7 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HHuginn* huginn_ ) {
 			HHuginn::values_t{
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::square_root, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_expotential, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_logarithm, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::round, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) )
