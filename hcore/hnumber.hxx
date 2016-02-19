@@ -275,10 +275,12 @@ yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& );
 
 namespace number {
 
-extern yaal::hcore::HNumber const _zero_;
-extern yaal::hcore::HNumber const _one_;
-extern yaal::hcore::HNumber const _two_;
-extern yaal::hcore::HNumber const _half_;
+extern yaal::hcore::HNumber const N0;
+extern yaal::hcore::HNumber const N1;
+extern yaal::hcore::HNumber const N2;
+extern yaal::hcore::HNumber const N3;
+extern yaal::hcore::HNumber const N4;
+extern yaal::hcore::HNumber const N0_5;
 extern yaal::hcore::HNumber const PI;
 extern yaal::hcore::HNumber const E;
 extern yaal::hcore::HNumber const LN2;
