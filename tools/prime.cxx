@@ -32,6 +32,7 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "prime.hxx"
 #include "hcore/hchunk.hxx"
+#include "hcore/math.hxx"
 
 using namespace yaal::hcore;
 
@@ -57,7 +58,7 @@ void find_primes( primes_t& primes_, int long unsigned lowerLimit_, int long uns
 	HChunk mem( static_cast<int long>( memSize ) );
 	u8_t* sieve( mem.get<u8_t>() );
 	::memset( sieve, 0xff, memSize );
-	int long unsigned limit( static_cast<int long unsigned>( square_root( static_cast<double long>( upperLimit_ ) ) ) + 1 );
+	int long unsigned limit( static_cast<int long unsigned>( math::square_root( static_cast<double long>( upperLimit_ ) ) ) + 1 );
 	int long unsigned step( 0 );
 	for ( int long unsigned i( 2 ); i <= limit; ++ i ) {
 		if ( sieve[ i >> 3 ] & _mask_[ i & 0x07 ] ) {

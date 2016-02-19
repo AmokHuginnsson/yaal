@@ -27,7 +27,6 @@ Copyright:
 #include <cstdlib>
 #include <cstring>
 #include <climits>
-#include <cmath>
 
 #include "base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
@@ -431,18 +430,6 @@ bool is_binary( char const* const& str_ ) {
 template<>
 bool is_octal( char const* const& str_ ) {
 	return ( is_octal<HString>( str_ ) );
-}
-
-double long square_root_impl( double long val_ ) {
-	return ( sqrtl( val_ ) );
-}
-
-double long natural_expotential_impl( double long val_ ) {
-	return ( expl( val_ ) );
-}
-
-double long natural_logarithm_impl( double long val_ ) {
-	return ( logl( val_ ) );
 }
 
 }

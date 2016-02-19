@@ -35,6 +35,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "hnumber.hxx"
 
 using namespace yaal::hcore;
+using namespace yaal::math;
 
 /*
  * Naming conventions:
@@ -96,18 +97,6 @@ inline i32_t leafcmp( i32_t const* left_, i32_t const* right_, HNumber::integer_
 		cmp = left_[ i ] - right_[ i ];
 	return ( cmp );
 }
-
-}
-
-namespace number {
-
-HNumber const _zero_( 0 );
-HNumber const _one_( 1 );
-HNumber const _two_( 2 );
-HNumber const _half_( "0.5" );
-HNumber const PI(  "3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384" );
-HNumber const E(   "2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741" );
-HNumber const LN2( "0.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863326996418687" );
 
 }
 
@@ -1890,6 +1879,10 @@ HNumber operator "" _yn ( int long long unsigned val_ ) {
 	return ( val_ );
 }
 
+}
+
+namespace math {
+
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::square_root( value_ ) );
@@ -1906,6 +1899,18 @@ yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::natural_logarithm( value_ ) );
 	M_EPILOG
+}
+
+namespace number {
+
+yaal::hcore::HNumber const _zero_( 0 );
+yaal::hcore::HNumber const _one_( 1 );
+yaal::hcore::HNumber const _two_( 2 );
+yaal::hcore::HNumber const _half_( "0.5" );
+yaal::hcore::HNumber const PI(  "3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384" );
+yaal::hcore::HNumber const E(   "2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741" );
+yaal::hcore::HNumber const LN2( "0.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863326996418687" );
+
 }
 
 }

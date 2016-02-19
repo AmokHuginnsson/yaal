@@ -265,18 +265,24 @@ inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b ) {
 	a.swap( b );
 }
 
+}
+
+namespace math {
+
 yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& );
 
 namespace number {
-	extern HNumber const _zero_;
-	extern HNumber const _one_;
-	extern HNumber const _two_;
-	extern HNumber const _half_;
-	extern HNumber const PI;
-	extern HNumber const E;
-	extern HNumber const LN2;
+
+extern yaal::hcore::HNumber const _zero_;
+extern yaal::hcore::HNumber const _one_;
+extern yaal::hcore::HNumber const _two_;
+extern yaal::hcore::HNumber const _half_;
+extern yaal::hcore::HNumber const PI;
+extern yaal::hcore::HNumber const E;
+extern yaal::hcore::HNumber const LN2;
+
 }
 
 }

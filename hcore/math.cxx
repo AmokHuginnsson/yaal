@@ -24,6 +24,8 @@ Copyright:
  FITNESS FOR A PARTICULAR PURPOSE. Use it at your own risk.
 */
 
+#include <cmath>
+
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
@@ -36,6 +38,22 @@ namespace math {
 /* Number of digits here is limited by Visual Studio C++ compiler internal identifier buffer size. */
 double long PI( 3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384L );
 double long E( 2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741L );
+
+double long square_root_impl( double long val_ ) {
+	return ( sqrtl( val_ ) );
+}
+
+double long natural_expotential_impl( double long val_ ) {
+	return ( expl( val_ ) );
+}
+
+double long natural_logarithm_impl( double long val_ ) {
+	return ( logl( val_ ) );
+}
+
+double long sinus_impl( double long val_ ) {
+	return ( sinl( val_ ) );
+}
 
 }
 

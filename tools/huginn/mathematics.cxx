@@ -29,6 +29,7 @@ Copyright:
 #include "hcore/base.hxx"
 M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
+#include "hcore/math.hxx"
 #include "tools/hhuginn.hxx"
 #include "tools/huginn/thread.hxx"
 #include "helper.hxx"
@@ -62,13 +63,13 @@ public:
 		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
-			if ( val >= number::_zero_ ) {
-				v = thread_->object_factory().create_number( hcore::square_root( val ) );
+			if ( val >= math::number::_zero_ ) {
+				v = thread_->object_factory().create_number( math::square_root( val ) );
 			}
 		} else {
 			double long val( get_real( values_[0] ) );
 			if ( val >= 0 ) {
-				v = thread_->object_factory().create_real( yaal::square_root( val ) );
+				v = thread_->object_factory().create_real( math::square_root( val ) );
 			}
 		}
 		if ( v == thread_->huginn().none_value() ) {
@@ -85,10 +86,10 @@ public:
 		HHuginn::value_t v;
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
-			v = thread_->object_factory().create_number( hcore::natural_expotential( val ) );
+			v = thread_->object_factory().create_number( math::natural_expotential( val ) );
 		} else {
 			double long val( get_real( values_[0] ) );
-			v = thread_->object_factory().create_real( yaal::natural_expotential( val ) );
+			v = thread_->object_factory().create_real( math::natural_expotential( val ) );
 		}
 		return ( v );
 		M_EPILOG
@@ -101,13 +102,13 @@ public:
 		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
-			if ( val > number::_zero_ ) {
-				v = thread_->object_factory().create_number( hcore::natural_logarithm( val ) );
+			if ( val > math::number::_zero_ ) {
+				v = thread_->object_factory().create_number( math::natural_logarithm( val ) );
 			}
 		} else {
 			double long val( get_real( values_[0] ) );
 			if ( val > 0 ) {
-				v = thread_->object_factory().create_real( yaal::natural_logarithm( val ) );
+				v = thread_->object_factory().create_real( math::natural_logarithm( val ) );
 			}
 		}
 		if ( v == thread_->huginn().none_value() ) {

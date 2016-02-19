@@ -34,6 +34,7 @@ Copyright:
 #include <cmath>
 
 #include "hcore/harray.hxx"
+#include "hcore/math.hxx"
 #include "hcore/hexception.hxx"
 #include "hcore/functional.hxx"
 
@@ -111,7 +112,7 @@ public:
 	value_type norm( void ) const {
 		M_PROLOG
 		value_type scalar( inner_product( _data.begin(), _data.end(), _data.begin(), 0.0 ) );
-		return ( square_root( scalar ) );
+		return ( math::square_root( scalar ) );
 		M_EPILOG
 	}
 	HVector& operator = ( HVector const& vector_ ) {

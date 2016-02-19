@@ -28,9 +28,10 @@ Copyright:
 #define YAAL_TOOLS_XMATH_HXX_INCLUDED 1
 
 #include "hcore/hexception.hxx"
-#include "hcore/iterator.hxx"
+#include "hcore/math.hxx"
 #include "hcore/pod.hxx"
 #include "hcore/algorithm.hxx"
+#include "hcore/iterator.hxx"
 
 namespace yaal {
 
@@ -139,13 +140,13 @@ public:
 	numeric_t standard_deviation( void ) const {
 		M_PROLOG
 		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::STANDARD_DEVIATION ) && ( _count > 1 ) );
-		return ( square_root( _variance ) );
+		return ( math::square_root( _variance ) );
 		M_EPILOG
 	}
 	numeric_t population_standard_deviation( void ) const {
 		M_PROLOG
 		M_ENSURE( ( _aggregateType & AGGREGATE_TYPE::POPULATION_STANDARD_DEVIATION ) && ( _count > 0 ) );
-		return ( square_root( _populationVariance ) );
+		return ( math::square_root( _populationVariance ) );
 		M_EPILOG
 	}
 };
