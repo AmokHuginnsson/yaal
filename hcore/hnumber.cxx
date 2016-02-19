@@ -1865,6 +1865,51 @@ struct HNumber::ElementaryFunctions {
 		return ( v );
 		M_EPILOG
 	}
+	static yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		integer_t precision( value_.get_precision() * 2 );
+		HNumber input( value_, precision );
+
+		bool minus( false );
+		/* Check the sign of input. */
+		if ( input < number::N0 ) {
+			minus = true;
+			input = -input;
+		}
+
+//		scale = 0
+		HNumber n( ( input / number::PI ) + number::N0_5 );
+		n.floor();
+		input -= ( n * number::PI );
+		if ( n.to_integer() % 2 ) {
+			input = -input;
+		}
+
+		/* Do the loop. */
+		HNumber e( input, precision );
+		HNumber v( input );
+		HNumber s( -input * input, precision );
+		HNumber tmp;
+		for ( HNumber i( number::N2 ); true; ++ i ) {
+			tmp = i;
+			++ i;
+			e *= s;
+			e.set_precision( precision );
+			e /= ( tmp * i );
+			e.set_precision( precision );
+			if ( e == number::N0 ) {
+				break;
+			}
+			v += e;
+		}
+		if ( minus ) {
+			v = -v;
+		}
+		v.round( value_.get_precision() );
+		v.set_precision( value_.get_precision() );
+		return ( v );
+		M_EPILOG
+	}
 };
 
 HNumber operator "" _yn ( char const* str_, size_t len_ ) {
@@ -1898,6 +1943,12 @@ yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::natural_logarithm( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::sinus( value_ ) );
 	M_EPILOG
 }
 
