@@ -283,7 +283,7 @@ extern yaal::hcore::HNumber const N3;
 extern yaal::hcore::HNumber const N4;
 extern yaal::hcore::HNumber const N0_5;
 extern yaal::hcore::HNumber const PI;
-extern yaal::hcore::HNumber const E;
+yaal::hcore::HNumber const& E( yaal::hcore::HNumber::integer_t = 0 );
 extern yaal::hcore::HNumber const LN2;
 
 }

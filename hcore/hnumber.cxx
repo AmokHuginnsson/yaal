@@ -33,6 +33,8 @@ M_VCSID( "$Id: " __ID__ " $" )
 M_VCSID( "$Id: " __TID__ " $" )
 #include "algorithm.hxx"
 #include "hnumber.hxx"
+#include "hlist.hxx"
+#include "hthread.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::math;
@@ -1954,6 +1956,42 @@ yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& value_ ) {
 
 namespace number {
 
+class HNumericConstantCache {
+public:
+	typedef HNumericConstantCache this_type;
+	typedef yaal::hcore::HList<HNumber> approximation_log_t;
+	typedef std::atomic<HNumber*> best_approximation_t;
+	typedef yaal::hcore::HBoundCall<yaal::hcore::HNumber ( yaal::hcore::HNumber::integer_t )> approximator_t;
+private:
+	approximation_log_t _approximationLog;
+	best_approximation_t _bestApproximation;
+	approximator_t _approximator;
+	yaal::hcore::HMutex _mutex;
+public:
+	HNumericConstantCache( approximator_t const& approximator_, HNumber&& init_ )
+		: _approximationLog()
+		, _bestApproximation( nullptr )
+		, _approximator( approximator_ )
+		, _mutex() {
+		_approximationLog.push_back( yaal::move( init_ ) );
+		_bestApproximation = &_approximationLog.back();
+	}
+	HNumber const& approximation( yaal::hcore::HNumber::integer_t precision_ ) {
+		HNumber* bestApproximation( _bestApproximation.load() );
+		if ( bestApproximation->get_precision() < precision_ ) {
+			HLock l( _mutex );
+			bestApproximation = _bestApproximation.load();
+			if ( bestApproximation->get_precision() < precision_ ) {
+				_approximationLog.push_back( _approximator( precision_ ) );
+				_bestApproximation.store( &_approximationLog.back() );
+				bestApproximation = _bestApproximation.load();
+				M_ASSERT( bestApproximation->get_precision() >= precision_ );
+			}
+		}
+		return ( *bestApproximation );
+	}
+};
+
 yaal::hcore::HNumber const N0( 0 );
 yaal::hcore::HNumber const N1( 1 );
 yaal::hcore::HNumber const N2( 2 );
@@ -1961,7 +1999,17 @@ yaal::hcore::HNumber const N3( 3 );
 yaal::hcore::HNumber const N4( 4 );
 yaal::hcore::HNumber const N0_5( "0.5" );
 yaal::hcore::HNumber const PI(  "3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384" );
-yaal::hcore::HNumber const E(   "2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741" );
+HNumericConstantCache ECache(
+	HNumericConstantCache::approximator_t(
+		[]( yaal::hcore::HNumber::integer_t precision_ ) -> yaal::hcore::HNumber {
+			return ( natural_expotential( yaal::hcore::HNumber( 1, precision_ ) ) );
+		}
+	),
+	HNumber( "2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741" )
+);
+yaal::hcore::HNumber const& E( yaal::hcore::HNumber::integer_t precision_ ) {
+	return ( ECache.approximation( precision_ ) );
+}
 yaal::hcore::HNumber const LN2( "0.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863326996418687" );
 
 }
