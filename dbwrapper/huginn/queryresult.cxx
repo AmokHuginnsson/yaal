@@ -220,6 +220,7 @@ HHuginn::class_t HQueryResult::get_class( HHuginn* huginn_, HHuginn::class_t con
 			)
 		)
 	);
+	huginn_->register_class( c );
 	return ( c );
 	M_EPILOG
 }
