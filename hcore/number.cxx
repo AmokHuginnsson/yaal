@@ -36,6 +36,7 @@ M_VCSID( "$Id: " __TID__ " $" )
 #include "math.hxx"
 #include "hlist.hxx"
 #include "hthread.hxx"
+#include "hsingleton.hxx"
 
 using namespace yaal::hcore;
 using namespace yaal::math;
@@ -300,6 +301,44 @@ struct HNumber::ElementaryFunctions {
 
 namespace number {
 
+class HFactorialCache : public yaal::hcore::HSingleton<HFactorialCache> {
+public:
+	typedef HFactorialCache this_type;
+	typedef HResource<HNumber> number_t;
+	typedef HArray<number_t> cache_t;
+private:
+	cache_t _cache;
+	HMutex _mutex;
+public:
+	yaal::hcore::HNumber const& factorial( int long long value_ ) {
+		M_ENSURE( value_ >= 0 );
+		HLock l( _mutex );
+		if ( value_ >= _cache.get_size() ) {
+			for ( int long long i( _cache.get_size() ); i <= value_; ++ i ) {
+				number_t n( make_resource<HNumber>( *_cache.back() ) );
+				*n *=i;
+				_cache.push_back( yaal::move( n ) );
+			}
+		}
+		return ( *_cache[value_] );
+	}
+private:
+	HFactorialCache( void )
+		: _cache()
+		, _mutex() {
+		_cache.push_back( make_resource<HNumber>( N1 ) );
+		_cache.push_back( make_resource<HNumber>( N1 ) );
+		return;
+	}
+	virtual ~HFactorialCache( void ) {
+		return;
+	}
+	HFactorialCache( HFactorialCache const& ) = delete;
+	HFactorialCache& operator = ( HFactorialCache const& ) = delete;
+	friend class yaal::hcore::HSingleton<HFactorialCache>;
+	friend class yaal::hcore::HDestructor<HFactorialCache>;
+};
+
 class HNumericConstantCache {
 public:
 	typedef HNumericConstantCache this_type;
@@ -383,6 +422,12 @@ yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::sinus( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber const& factorial( int long long value_ ) {
+	M_PROLOG
+	return ( HFactorialCache::get_instance().factorial( value_ ) );
 	M_EPILOG
 }
 
