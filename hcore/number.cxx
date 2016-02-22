@@ -265,9 +265,10 @@ struct HNumber::ElementaryFunctions {
 		}
 
 //		scale = 0
-		HNumber n( ( input / number::PI ) + number::N0_5 );
+		HNumber const& pi( number::PI( precision ) );
+		HNumber n( ( input / pi ) + number::N0_5 );
 		n.floor();
-		input -= ( n * number::PI );
+		input -= ( n * pi );
 		if ( n.to_integer() % 2 ) {
 			input = -input;
 		}
@@ -380,8 +381,53 @@ yaal::hcore::HNumber const N1( 1 );
 yaal::hcore::HNumber const N2( 2 );
 yaal::hcore::HNumber const N3( 3 );
 yaal::hcore::HNumber const N4( 4 );
+yaal::hcore::HNumber const N5( 5 );
+yaal::hcore::HNumber const N6( 6 );
 yaal::hcore::HNumber const N0_5( "0.5" );
-yaal::hcore::HNumber const PI(  "3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384" );
+namespace {
+yaal::hcore::HNumber find_pi( yaal::hcore::HNumber::integer_t precision_ ) {
+	static HNumber a( 545140134_yn );
+	static HNumber b( 13591409_yn );
+	static HNumber c( 640320_yn ^ 3 );
+
+	bool plus( true );
+
+	HNumber v;
+	HNumber e;
+	HNumber denominator;
+
+	for ( int long long i( 0 ); true; ++ i ) {
+		e = factorial( 6LL * i ) * ( a * i + b );
+		e.set_precision( precision_ + 6 );
+		denominator = factorial( 3LL * i ) * ( factorial( i ) ^ 3 ) * ( c ^ i );
+		e /= denominator;
+		if ( e == number::N0 ) {
+			break;
+		}
+		if ( plus ) {
+			v += e;
+		} else {
+			v -= e;
+		}
+		plus = !plus;
+	}
+	e = v;
+	e *= square_root( HNumber( 10005_yn, precision_ + 6 ) );
+	v = 4270934400_yn;
+	v.set_precision( precision_ );
+	v /= e;
+	v.round( precision_ );
+	v.set_precision( precision_ );
+	return ( v );
+}
+}
+HNumericConstantCache PiCache(
+	call( &find_pi, _1 ),
+	HNumber( "3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384" )
+);
+yaal::hcore::HNumber const& PI( yaal::hcore::HNumber::integer_t precision_ ) {
+	return ( PiCache.approximation( precision_ ) );
+}
 HNumericConstantCache ECache(
 	HNumericConstantCache::approximator_t(
 		[]( yaal::hcore::HNumber::integer_t precision_ ) -> yaal::hcore::HNumber {
