@@ -63,7 +63,7 @@ public:
 		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
-			if ( val >= math::number::N0 ) {
+			if ( val >= number::N0 ) {
 				v = thread_->object_factory().create_number( math::square_root( val ) );
 			}
 		} else {
@@ -102,7 +102,7 @@ public:
 		HHuginn::value_t v( thread_->huginn().none_value() );
 		if ( t == HHuginn::TYPE::NUMBER ) {
 			HNumber val( get_number( values_[0] ) );
-			if ( val > math::number::N0 ) {
+			if ( val > number::N0 ) {
 				v = thread_->object_factory().create_number( math::natural_logarithm( val ) );
 			}
 		} else {

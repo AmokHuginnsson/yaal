@@ -283,7 +283,7 @@ void div( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 		}
 	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
 		HHuginn::HNumber::value_type const& denominator( static_cast<HHuginn::HNumber const*>( v2_.raw() )->value() );
-		if ( denominator != math::number::N0 ) {
+		if ( denominator != number::N0 ) {
 			static_cast<HHuginn::HNumber*>( v1_.raw() )->value() /= denominator;
 		} else {
 			v1_ = thread_->huginn().none_value();

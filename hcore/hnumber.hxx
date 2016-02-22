@@ -265,15 +265,6 @@ inline void swap( yaal::hcore::HNumber& a, yaal::hcore::HNumber& b ) {
 	a.swap( b );
 }
 
-}
-
-namespace math {
-
-yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& );
-yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& );
-yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& );
-yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& );
-
 namespace number {
 
 extern yaal::hcore::HNumber const N0;
@@ -287,6 +278,15 @@ yaal::hcore::HNumber const& E( yaal::hcore::HNumber::integer_t = 0 );
 extern yaal::hcore::HNumber const LN2;
 
 }
+
+}
+
+namespace math {
+
+yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber natural_expotential( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& );
 
 }
 
