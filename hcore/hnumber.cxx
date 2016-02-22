@@ -913,6 +913,11 @@ HNumber& HNumber::operator *= ( HNumber const& factor_ ) {
 	if ( n._leafCount && factor._leafCount ) {
 		bool multiplierExact( n.is_exact() );
 		bool factorExact( factor.is_exact() );
+		if ( n.fractional_length() < factor.fractional_length() ) {
+			_precision = multiplierExact ? factor._precision : n._precision;
+		} else {
+			_precision = factorExact ? n._precision : factor._precision;
+		}
 		::memset( _cache.raw(), 0, static_cast<size_t>( _cache.get_size() ) );
 		karatsuba( _cache,
 				n._canonical.get<i32_t>(), n._leafCount,
