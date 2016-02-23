@@ -117,6 +117,22 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	static HHuginn::value_t sinus( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Mathematics.sinus";
+		verify_arg_count( name, values_, 1, 1, position_ );
+		HHuginn::type_id_t t( verify_arg_numeric( name, values_, 0, true, position_ ) );
+		HHuginn::value_t v;
+		if ( t == HHuginn::TYPE::NUMBER ) {
+			HNumber val( get_number( values_[0] ) );
+			v = thread_->object_factory().create_number( math::sinus( val ) );
+		} else {
+			double long val( get_real( values_[0] ) );
+			v = thread_->object_factory().create_real( math::sinus( val ) );
+		}
+		return ( v );
+		M_EPILOG
+	}
 	static HHuginn::value_t round( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
 		char const name[] = "Mathematics.round";
@@ -197,6 +213,7 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HHuginn* huginn_ ) {
 				"square_root",
 				"natural_expotential",
 				"natural_logarithm",
+				"sinus",
 				"round",
 				"floor",
 				"ceil"
@@ -205,6 +222,7 @@ HHuginn::value_t HMathematicsCreator::do_new_instance( HHuginn* huginn_ ) {
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::square_root, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_expotential, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::natural_logarithm, _1, _2, _3, _4 ) ),
+				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::sinus, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::round, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::floor, _1, _2, _3, _4 ) ),
 				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HMathematics::ceil, _1, _2, _3, _4 ) )
