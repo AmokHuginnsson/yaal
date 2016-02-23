@@ -57,8 +57,8 @@ coverage-stats:
 	     --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-baseline.info \
 	     --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-client-baseline.info \
 			 --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-test.info \
-			 --add-tracefile $(DIR_COVERAGE)/$(LIB_NAME)-client-test.info \
-			 --output-file $(DIR_COVERAGE)/$(LIB_NAME)-total.info && \
+			 --add-tracefile $(DIR_ROOT)/$(DIR_COVERAGE)/$(LIB_NAME)-client-test.info \
+			 --output-file $(DIR_ROOT)/$(DIR_COVERAGE)/$(LIB_NAME)-total.info && \
 	lcov $(LCOV_PARAMS) \
 	     --extract $(DIR_COVERAGE)/$(LIB_NAME)-total.info '*/$(LIB_NAME)/*' \
 			 --output-file $(DIR_COVERAGE)/$(LIB_NAME)-coverage.info && \
