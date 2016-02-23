@@ -264,7 +264,6 @@ struct HNumber::ElementaryFunctions {
 			input = -input;
 		}
 
-//		scale = 0
 		HNumber const& pi( number::PI( precision ) );
 		HNumber n( ( input / pi ) + number::N0_5 );
 		n.floor();
@@ -295,6 +294,11 @@ struct HNumber::ElementaryFunctions {
 		}
 		v.round( value_.get_precision() );
 		v.set_precision( value_.get_precision() );
+		if ( v > number::N1 ) {
+			v = number::N1;
+		} else if ( v < -number::N1 ) {
+			v = -number::N1;
+		}
 		return ( v );
 		M_EPILOG
 	}
@@ -423,7 +427,7 @@ yaal::hcore::HNumber find_pi( yaal::hcore::HNumber::integer_t precision_ ) {
 }
 HNumericConstantCache PiCache(
 	call( &find_pi, _1 ),
-	HNumber( "3.14159265358979323846264338327950288419706939937510582097494459230781640628620899862803482534211706798214808651328230664709384" )
+	HNumber( "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384461" )
 );
 yaal::hcore::HNumber const& PI( yaal::hcore::HNumber::integer_t precision_ ) {
 	return ( PiCache.approximation( precision_ ) );
