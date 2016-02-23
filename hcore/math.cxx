@@ -55,6 +55,10 @@ double long sinus_impl( double long val_ ) {
 	return ( sinl( val_ ) );
 }
 
+double long cosinus_impl( double long val_ ) {
+	return ( cosl( val_ ) );
+}
+
 }
 
 }

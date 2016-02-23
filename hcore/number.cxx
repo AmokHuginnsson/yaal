@@ -302,6 +302,12 @@ struct HNumber::ElementaryFunctions {
 		return ( v );
 		M_EPILOG
 	}
+	static yaal::hcore::HNumber cosinus( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		HNumber value( value_ + number::PI( value_.get_precision() * 2 ) * number::N0_5, value_.get_precision() );
+		return ( sinus( value ) );
+		M_EPILOG
+	}
 };
 
 namespace number {
@@ -472,6 +478,12 @@ yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::sinus( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber cosinus( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::cosinus( value_ ) );
 	M_EPILOG
 }
 
