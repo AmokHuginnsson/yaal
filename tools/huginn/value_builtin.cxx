@@ -300,17 +300,36 @@ void div( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, 
 
 void mod( HThread* thread_, HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	M_ASSERT( v1_->type_id() == v2_->type_id() );
-	if ( v1_->type_id() == HHuginn::TYPE::INTEGER ) {
+	HHuginn::type_id_t typeId( v1_->type_id() );
+	if ( typeId == HHuginn::TYPE::INTEGER ) {
 		HHuginn::HInteger::value_type denominator( static_cast<HHuginn::HInteger const*>( v2_.raw() )->value() );
 		if ( denominator != 0 ) {
 			static_cast<HHuginn::HInteger*>( v1_.raw() )->value() %= denominator;
 		} else {
 			v1_ = thread_->huginn().none_value();
-			thread_->raise( thread_->object_factory().arithmetic_exception_class(), "Division by zero.", position_ );
+		}
+	} else if ( typeId == HHuginn::TYPE::REAL ) {
+		HHuginn::HReal::value_type denominator( static_cast<HHuginn::HReal const*>( v2_.raw() )->value() );
+		if ( denominator != 0.0l ) {
+			double long& v( static_cast<HHuginn::HReal*>( v1_.raw() )->value() );
+			v = fmodl( v, denominator );
+		} else {
+			v1_ = thread_->huginn().none_value();
+		}
+	} else if ( typeId == HHuginn::TYPE::NUMBER ) {
+		HHuginn::HNumber::value_type const& denominator( static_cast<HHuginn::HNumber const*>( v2_.raw() )->value() );
+		if ( denominator != number::N0 ) {
+			static_cast<HHuginn::HNumber*>( v1_.raw() )->value() %= denominator;
+		} else {
+			v1_ = thread_->huginn().none_value();
 		}
 	} else {
 		v1_ = thread_->huginn().none_value();
 		throw HHuginn::HHuginnRuntimeException( "There is no `%' operator for `"_ys.append( v1_->get_class()->name() ).append( "'." ), position_ );
+	}
+	HHuginn& h( thread_->huginn() );
+	if ( v1_ == h.none_value() ) {
+		thread_->raise( h.object_factory()->arithmetic_exception_class(), "Division by zero.", position_ );
 	}
 	return;
 }
