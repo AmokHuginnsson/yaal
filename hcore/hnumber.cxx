@@ -943,6 +943,14 @@ HNumber HNumber::operator / ( HNumber const& divisor_ ) const {
 	M_EPILOG
 }
 
+HNumber HNumber::operator % ( HNumber const& divisor_ ) const {
+	M_PROLOG
+	HNumber n( *this );
+	n %= divisor_;
+	return ( n );
+	M_EPILOG
+}
+
 i32_t HNumber::multiply_by_leaf_low( i32_t* data_, integer_t leafCount_, i32_t leaf_ ) {
 	M_ASSERT( ( leaf_ >= 0 ) && ( leaf_ < LEAF ) );
 	i32_t carrier( 0 );
@@ -1282,6 +1290,24 @@ HNumber& HNumber::operator /= ( HNumber const& divisor_ ) {
 			}
 		}
 	}
+	return ( *this );
+	M_EPILOG
+}
+
+HNumber& HNumber::operator %= ( HNumber const& divisor_ ) {
+	M_PROLOG
+	HNumber n( *this );
+	n /= divisor_;
+	n._negative = false;
+	if ( exor( _negative, divisor_._negative ) ) {
+		n.ceil();
+	} else {
+		n.floor();
+	}
+	n *= divisor_;
+	n._negative = _negative = false;
+	operator -= ( n );
+	_negative = divisor_._negative;
 	return ( *this );
 	M_EPILOG
 }
