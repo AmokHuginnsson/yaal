@@ -308,6 +308,15 @@ struct HNumber::ElementaryFunctions {
 		return ( sinus( value ) );
 		M_EPILOG
 	}
+	static yaal::hcore::HNumber tangens( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		HNumber denominator( cosinus( value_ ) );
+		if ( denominator == number::N0 ) {
+			throw HNumberException( "argument not in tangens domain" );
+		}
+		return ( sinus( value_ ) / denominator );
+		M_EPILOG
+	}
 };
 
 namespace number {
@@ -484,6 +493,12 @@ yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber cosinus( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::cosinus( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber tangens( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::tangens( value_ ) );
 	M_EPILOG
 }
 

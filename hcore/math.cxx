@@ -59,6 +59,10 @@ double long cosinus_impl( double long val_ ) {
 	return ( cosl( val_ ) );
 }
 
+double long tangens_impl( double long val_ ) {
+	return ( tanl( val_ ) );
+}
+
 }
 
 }

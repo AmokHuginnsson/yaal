@@ -44,6 +44,7 @@ double long natural_expotential_impl( double long );
 double long natural_logarithm_impl( double long );
 double long sinus_impl( double long );
 double long cosinus_impl( double long );
+double long tangens_impl( double long );
 
 template<typename T>
 T square_root( T val_ ) {
@@ -68,6 +69,11 @@ T sinus( T val_ ) {
 template<typename T>
 T cosinus( T val_ ) {
 	return ( static_cast<T>( cosinus_impl( val_ ) ) );
+}
+
+template<typename T>
+T tangens( T val_ ) {
+	return ( static_cast<T>( tangens_impl( val_ ) ) );
 }
 
 }
