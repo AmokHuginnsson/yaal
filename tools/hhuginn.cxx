@@ -305,7 +305,7 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 		if ( cc->_baseName != INVALID_IDENTIFIER ) {
 			super = commit_class( cc->_baseName );
 		}
-		values_t fieldDefinitions;
+		field_definitions_t fieldDefinitions;
 		yaal::hcore::HThread::id_t threadId( hcore::HThread::get_current_thread_id() );
 		threads_t::iterator ti( _threads.find( threadId ) );
 		M_ASSERT( ti != _threads.end() );
@@ -315,14 +315,14 @@ HHuginn::HClass const* HHuginn::commit_class( identifier_id_t identifierId_ ) {
 			OCompiler::OClassContext::expressions_t::const_iterator f( cc->_fieldDefinitions.find( i ) );
 			if ( f != cc->_fieldDefinitions.end() ) {
 				f->second->execute( t );
-				fieldDefinitions.push_back( frame->result() );
+				fieldDefinitions.emplace_back( cc->_fieldNames[i], frame->result() );
 			} else {
 				OCompiler::OClassContext::methods_t::const_iterator m( cc->_methods.find( i ) );
 				M_ASSERT( m != cc->_methods.end() );
-				fieldDefinitions.push_back( make_pointer<HClass::HMethod>( m->second ) );
+				fieldDefinitions.emplace_back( cc->_fieldNames[i], make_pointer<HClass::HMethod>( m->second ) );
 			}
 		}
-		c = _classes.insert( make_pair( identifierId_, make_pointer<HClass>( this, type_id_t( _idGenerator ), cc->_classIdentifier, super, cc->_fieldNames, fieldDefinitions ) ) ).first->second.get();
+		c = _classes.insert( make_pair( identifierId_, make_pointer<HClass>( this, type_id_t( _idGenerator ), cc->_classIdentifier, super, fieldDefinitions ) ) ).first->second.get();
 		++ _idGenerator;
 	}
 	return ( c );
@@ -753,15 +753,14 @@ void HHuginn::create_function( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
-HHuginn::class_t HHuginn::create_class( yaal::hcore::HString const& name_, HClass const* base_, field_names_t const& fieldNames_, values_t const& values_ ) {
+HHuginn::class_t HHuginn::create_class( yaal::hcore::HString const& name_, HClass const* base_, field_definitions_t const& fieldDefinitions_ ) {
 	HHuginn::class_t c(
 		make_pointer<HHuginn::HClass>(
 			this,
 			type_id_t( _idGenerator ),
 			identifier_id( name_ ),
 			base_,
-			fieldNames_,
-			values_
+			fieldDefinitions_
 		)
 	);
 	++ _idGenerator;

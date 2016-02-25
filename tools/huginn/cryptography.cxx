@@ -84,13 +84,9 @@ HHuginn::value_t HCryptographyCreator::do_new_instance( HHuginn* huginn_ ) {
 		huginn_->create_class(
 			"Cryptography",
 			nullptr,
-			HHuginn::field_names_t{
-				"md5",
-				"sha1"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::md5, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::sha1, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "md5", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::md5, _1, _2, _3, _4 ) ) },
+				{ "sha1", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCryptography::sha1, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

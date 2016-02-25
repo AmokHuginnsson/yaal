@@ -127,17 +127,11 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			type_id( HHuginn::TYPE::DICT ),
 			huginn_->identifier_id( type_name( HHuginn::TYPE::DICT ) ),
 			nullptr,
-			HHuginn::field_names_t{
-				"has_key",
-				"get",
-				"erase",
-				"clear"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::get, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::erase, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::clear, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::has_key, _1, _2, _3, _4 ) ) },
+				{ "get", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::get, _1, _2, _3, _4 ) ) },
+				{ "erase", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::erase, _1, _2, _3, _4 ) ) },
+				{ "clear", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &dict::clear, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

@@ -63,11 +63,8 @@ HHuginn::class_t HTime::get_class( HHuginn* huginn_ ) {
 		huginn_->create_class(
 			"Time",
 			nullptr,
-			HHuginn::field_names_t{
-				"to_string"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::to_string, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "to_string", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HTime::to_string, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

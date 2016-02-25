@@ -130,17 +130,11 @@ HHuginn::value_t HOperatingSystemCreator::do_new_instance( HHuginn* huginn_ ) {
 		huginn_->create_class(
 			"OperatingSystem",
 			nullptr,
-			HHuginn::field_names_t{
-				"env",
-				"exec",
-				"exit",
-				"spawn"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::env, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exec, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exit, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::spawn, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "env",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::env, _1, _2, _3, _4 ) ) },
+				{ "exec",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exec, _1, _2, _3, _4 ) ) },
+				{ "exit",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::exit, _1, _2, _3, _4 ) ) },
+				{ "spawn", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HOperatingSystem::spawn, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

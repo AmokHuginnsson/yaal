@@ -114,11 +114,8 @@ HHuginn::class_t HRegularExpressionMatch::get_class( HHuginn* huginn_ ) {
 		huginn_->create_class(
 			"RegularExpressionMatch",
 			nullptr,
-			HHuginn::field_names_t{
-				"matched"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRegularExpressionMatch::matched, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "matched", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRegularExpressionMatch::matched, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

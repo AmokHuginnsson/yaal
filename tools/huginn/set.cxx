@@ -119,17 +119,11 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			type_id( HHuginn::TYPE::SET ),
 			huginn_->identifier_id( type_name( HHuginn::TYPE::SET ) ),
 			nullptr,
-			HHuginn::field_names_t{
-				"add",
-				"has_key",
-				"erase",
-				"clear"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::add, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::has_key, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::erase, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::clear, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "add",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::add, _1, _2, _3, _4 ) ) },
+				{ "has_key", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::has_key, _1, _2, _3, _4 ) ) },
+				{ "erase",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::erase, _1, _2, _3, _4 ) ) },
+				{ "clear",   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &set::clear, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

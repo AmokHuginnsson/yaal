@@ -84,13 +84,9 @@ public:
 			typeId_,
 			huginn_->identifier_id( "CompiledRegularExpression" ),
 			nullptr,
-			HHuginn::field_names_t{
-				"match",
-				"groups"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::match, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::groups, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "match", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::match, _1, _2, _3, _4 ) ) },
+				{ "groups", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HCompiledRegularExpression::groups, _1, _2, _3, _4 ) ) }
 			}
 		)
 		, _exceptionClass( exceptionClass_ )

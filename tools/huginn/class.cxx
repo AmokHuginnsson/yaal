@@ -45,8 +45,7 @@ HHuginn::HClass::HClass(
 	type_id_t typeId_,
 	identifier_id_t identifierId_,
 	HClass const* super_,
-	field_names_t const& fieldNames_,
-	values_t const& fieldDefinitions_
+	field_definitions_t const& fieldDefinitions_
 ) : _typeId( typeId_ )
 	, _identifierId( identifierId_ )
 	, _super( super_ )
@@ -55,10 +54,8 @@ HHuginn::HClass::HClass(
 	, _fieldDefinitions( super_ ? super_->_fieldDefinitions : values_t() )
 	, _huginn( huginn_ ) {
 	M_PROLOG
-	M_ASSERT( fieldNames_.get_size() == fieldDefinitions_.get_size() );
-	int definitionIdx( 0 );
-	for ( field_names_t::value_type const& n : fieldNames_ ) {
-		identifier_id_t identifierId( huginn_->identifier_id( n ) );
+	for ( field_definitions_t::value_type const& fd : fieldDefinitions_ ) {
+		identifier_id_t identifierId( huginn_->identifier_id( fd.name() ) );
 		_fieldIdentifiers.emplace_back( identifierId );
 		field_indexes_t::const_iterator fi(
 			_fieldIndexes.insert( make_pair( identifierId, static_cast<int>( _fieldIndexes.get_size() ) ) ).first
@@ -66,8 +63,7 @@ HHuginn::HClass::HClass(
 		if ( fi->second >= _fieldDefinitions.get_size() ) {
 			_fieldDefinitions.resize( fi->second + 1 );
 		}
-		_fieldDefinitions[fi->second] = fieldDefinitions_[definitionIdx];
-		++ definitionIdx;
+		_fieldDefinitions[fi->second] = fd.value();
 	}
 	return;
 	M_EPILOG

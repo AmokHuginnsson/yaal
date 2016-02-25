@@ -53,10 +53,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			type_id( HHuginn::TYPE::BOOLEAN ),
 			huginn_->identifier_id( type_name( HHuginn::TYPE::BOOLEAN ) ),
 			nullptr,
-			HHuginn::field_names_t{
-			},
-			HHuginn::values_t{
-			}
+			HHuginn::field_definitions_t{}
 		)
 	);
 	return ( c );

@@ -96,15 +96,10 @@ public:
 			typeId_,
 			huginn_->identifier_id( "DatabaseConnection" ),
 			nullptr,
-			HHuginn::field_names_t{
-				"query",
-				"table_names",
-				"column_names"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::query, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::table_names, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::column_names, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "query", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::query, _1, _2, _3, _4 ) ) },
+				{ "table_names", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::table_names, _1, _2, _3, _4 ) ) },
+				{ "column_names", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabaseConnection::column_names, _1, _2, _3, _4 ) ) }
 			}
 		)
 		, _exceptionClass( exceptionClass_ )

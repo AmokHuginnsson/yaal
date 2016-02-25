@@ -163,19 +163,12 @@ public:
 			typeId_,
 			huginn_->identifier_id( "QueryResult" ),
 			nullptr,
-			HHuginn::field_names_t{
-				"column_name",
-				"field_count",
-				"insert_id",
-				"has_next",
-				"fetch_row"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::column_name, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::field_count, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::insert_id, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::has_next, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::fetch_row, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "column_name", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::column_name, _1, _2, _3, _4 ) ) },
+				{ "field_count", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::field_count, _1, _2, _3, _4 ) ) },
+				{ "insert_id", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::insert_id, _1, _2, _3, _4 ) ) },
+				{ "has_next", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::has_next, _1, _2, _3, _4 ) ) },
+				{ "fetch_row", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQueryResult::fetch_row, _1, _2, _3, _4 ) ) }
 			}
 		)
 		, _exceptionClass( exceptionClass_ ) {

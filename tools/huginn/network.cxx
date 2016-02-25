@@ -123,13 +123,9 @@ HHuginn::value_t HNetworkCreator::do_new_instance( HHuginn* huginn_ ) {
 		huginn_->create_class(
 			"Network",
 			nullptr,
-			HHuginn::field_names_t{
-				"connect",
-				"resolve"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNetwork::connect, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNetwork::resolve, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "connect", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNetwork::connect, _1, _2, _3, _4 ) ) },
+				{ "resolve", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HNetwork::resolve, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

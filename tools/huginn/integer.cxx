@@ -53,8 +53,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			type_id( HHuginn::TYPE::INTEGER ),
 			huginn_->identifier_id( type_name( HHuginn::TYPE::INTEGER ) ),
 			nullptr,
-			HHuginn::field_names_t{},
-			HHuginn::values_t{}
+			HHuginn::field_definitions_t{}
 		)
 	);
 	return ( c );

@@ -67,13 +67,9 @@ public:
 			typeId_,
 			huginn_->identifier_id( "Query" ),
 			nullptr,
-			HHuginn::field_names_t{
-				"bind",
-				"execute"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQuery::bind, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQuery::execute, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "bind", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQuery::bind, _1, _2, _3, _4 ) ) },
+				{ "execute", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HQuery::execute, _1, _2, _3, _4 ) ) }
 			}
 		)
 		, _exceptionClass( exceptionClass_ )

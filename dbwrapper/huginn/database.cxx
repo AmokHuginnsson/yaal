@@ -84,11 +84,8 @@ HHuginn::value_t HDatabaseCreator::do_new_instance( HHuginn* huginn_ ) {
 		huginn_->create_class(
 			"Database",
 			nullptr,
-			HHuginn::field_names_t{
-				"connect"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabase::connect, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "connect", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDatabase::connect, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

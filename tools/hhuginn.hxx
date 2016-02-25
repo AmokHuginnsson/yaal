@@ -127,7 +127,8 @@ public:
 	typedef yaal::hcore::HPointer<huginn::HExpression> expression_t;
 	typedef yaal::hcore::HArray<HHuginn::expression_t> expressions_t;
 	class HErrorCoordinate;
-	typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
+	class HFieldDefinition;
+	typedef yaal::hcore::HArray<HFieldDefinition> field_definitions_t;
 	typedef yaal::hcore::HArray<identifier_id_t> field_identifiers_t;
 	typedef yaal::hcore::HArray<value_t> values_t;
 	typedef yaal::hcore::HPointer<huginn::HFrame> frame_t;
@@ -283,7 +284,7 @@ public:
 	huginn::HThread* current_thread( void );
 	huginn::HFrame* current_frame( void );
 	void create_function( executing_parser::position_t );
-	class_t create_class( yaal::hcore::HString const&, HClass const*, field_names_t const&, values_t const& );
+	class_t create_class( yaal::hcore::HString const&, HClass const*, field_definitions_t const& );
 	class_t create_class( class_constructor_t const& );
 
 	/*! \brief Add argument for main() function.
@@ -374,6 +375,23 @@ public:
 	int position( void ) const;
 };
 
+class HHuginn::HFieldDefinition {
+	yaal::hcore::HString _name;
+	value_t _value;
+public:
+	HFieldDefinition( yaal::hcore::HString const& name_, value_t const& value_ )
+		: _name( name_ )
+		, _value( value_ ) {
+		return;
+	}
+	yaal::hcore::HString const& name( void ) const {
+		return ( _name );
+	}
+	value_t const& value( void ) const {
+		return ( _value );
+	}
+};
+
 class HHuginn::HClass {
 public:
 	typedef HHuginn::HClass this_type;
@@ -389,7 +407,7 @@ private:
 	values_t _fieldDefinitions;
 	HHuginn* _huginn;
 public:
-	HClass( HHuginn*, type_id_t, identifier_id_t, HClass const*, field_names_t const&, values_t const& );
+	HClass( HHuginn*, type_id_t, identifier_id_t, HClass const*, field_definitions_t const& );
 	HClass( HHuginn::TYPE );
 	virtual ~HClass( void ) {
 	}

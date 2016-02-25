@@ -83,11 +83,8 @@ HHuginn::value_t HRegularExpressionsCreator::do_new_instance( HHuginn* huginn_ )
 		huginn_->create_class(
 			"RegularExpressions",
 			nullptr,
-			HHuginn::field_names_t{
-				"compile"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRegularExpressions::compile, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "compile", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HRegularExpressions::compile, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

@@ -73,13 +73,9 @@ HHuginn::class_t HClock::get_class( HHuginn* huginn_ ) {
 		huginn_->create_class(
 			"Clock",
 			nullptr,
-			HHuginn::field_names_t{
-				"miliseconds",
-				"reset"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::miliseconds, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::reset, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "miliseconds", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::miliseconds, _1, _2, _3, _4 ) ) },
+				{ "reset", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HClock::reset, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

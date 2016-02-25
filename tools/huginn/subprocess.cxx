@@ -55,21 +55,13 @@ public:
 			typeId_,
 			huginn_->identifier_id( "Subprocess" ),
 			nullptr,
-			HHuginn::field_names_t{
-				"is_alive",
-				"kill",
-				"get_pid",
-				"in",
-				"out",
-				"err"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::is_alive, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::kill, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::get_pid, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.in", &HPipedChild::stream_in, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.out", &HPipedChild::stream_out, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.err", &HPipedChild::stream_err, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "is_alive", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::is_alive, _1, _2, _3, _4 ) ) },
+				{ "kill",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::kill, _1, _2, _3, _4 ) ) },
+				{ "get_pid",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::get_pid, _1, _2, _3, _4 ) ) },
+				{ "in",       make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.in", &HPipedChild::stream_in, _1, _2, _3, _4 ) ) },
+				{ "out",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.out", &HPipedChild::stream_out, _1, _2, _3, _4 ) ) },
+				{ "err",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HSubprocess::stream, "Subprocess.err", &HPipedChild::stream_err, _1, _2, _3, _4 ) ) }
 			}
 		)
 		, _streamClass( HStream::get_class( huginn_ ) ) {

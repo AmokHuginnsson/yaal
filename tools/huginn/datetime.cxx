@@ -90,13 +90,9 @@ HHuginn::value_t HDateTimeCreator::do_new_instance( HHuginn* huginn_ ) {
 		huginn_->create_class(
 			"DateTime",
 			nullptr,
-			HHuginn::field_names_t{
-				"now",
-				"clock"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::now, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::clock, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "now", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::now, _1, _2, _3, _4 ) ) },
+				{ "clock", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HDateTime::clock, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

@@ -160,21 +160,13 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			type_id( HHuginn::TYPE::STRING ),
 			huginn_->identifier_id( type_name( HHuginn::TYPE::STRING ) ),
 			nullptr,
-			HHuginn::field_names_t{
-				"find",
-				"replace",
-				"strip",
-				"to_lower",
-				"to_upper",
-				"clear"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::replace, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_lower, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_upper, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::clear, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "find",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::find, _1, _2, _3, _4 ) ) },
+				{ "replace",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::replace, _1, _2, _3, _4 ) ) },
+				{ "strip",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::strip, _1, _2, _3, _4 ) ) },
+				{ "to_lower", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_lower, _1, _2, _3, _4 ) ) },
+				{ "to_upper", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::to_upper, _1, _2, _3, _4 ) ) },
+				{ "clear",    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &string::clear, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);

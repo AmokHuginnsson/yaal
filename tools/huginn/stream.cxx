@@ -153,15 +153,10 @@ HHuginn::class_t HStream::get_class( HHuginn* huginn_ ) {
 		c = huginn_->create_class(
 			name,
 			nullptr,
-			HHuginn::field_names_t{
-				"read",
-				"read_line",
-				"write"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read_line, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::write, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "read", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read, _1, _2, _3, _4 ) ) },
+				{ "read_line", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::read_line, _1, _2, _3, _4 ) ) },
+				{ "write", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HStream::write, _1, _2, _3, _4 ) ) }
 			}
 		);
 		huginn_->register_class( c );

@@ -226,7 +226,7 @@ struct OCompiler {
 	typedef yaal::hcore::HResource<OFunctionContext> function_context_t;
 	typedef yaal::hcore::HStack<function_context_t> function_contexts_t;
 	struct OClassContext {
-		typedef HHuginn::field_names_t field_names_t;
+		typedef yaal::hcore::HArray<yaal::hcore::HString> field_names_t;
 		typedef yaal::hcore::HHashMap<int, HHuginn::expression_t> expressions_t;
 		typedef yaal::hcore::HHashMap<int, HHuginn::function_t> methods_t;
 		HHuginn::identifier_id_t _classIdentifier;

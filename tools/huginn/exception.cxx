@@ -62,18 +62,11 @@ public:
 			identifierId_,
 			base_,
 			base_
-				? HHuginn::field_names_t{}
-				: HHuginn::field_names_t{
-					"what",
-					"where",
-					"message"
-				},
-			base_
-				? HHuginn::values_t{}
-				: HHuginn::values_t{
-					make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::what, _1, _2, _3, _4 ) ),
-					make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::where, _1, _2, _3, _4 ) ),
-					make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::message, _1, _2, _3, _4 ) )
+				? HHuginn::field_definitions_t{}
+				: HHuginn::field_definitions_t{
+						{ "what", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::what, _1, _2, _3, _4 ) ) },
+						{ "where", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::where, _1, _2, _3, _4 ) ) },
+						{ "message", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HExceptionClass::message, _1, _2, _3, _4 ) ) }
 				}
 		) {
 		return;

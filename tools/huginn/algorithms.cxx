@@ -68,8 +68,7 @@ public:
 			huginn_->create_class(
 				"Range",
 				nullptr,
-				HHuginn::field_names_t{},
-				HHuginn::values_t{}
+				HHuginn::field_definitions_t{}
 			)
 		);
 		M_EPILOG
@@ -231,13 +230,9 @@ HHuginn::value_t HAlgorithmsCreator::do_new_instance( HHuginn* huginn_ ) {
 		huginn_->create_class(
 			"Algorithms",
 			nullptr,
-			HHuginn::field_names_t{
-				"range",
-				"sorted"
-			},
-			HHuginn::values_t{
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ),
-				make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) )
+			HHuginn::field_definitions_t{
+				{ "range",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::range, _1, _2, _3, _4 ) ) },
+				{ "sorted", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HAlgorithms::sorted, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);
