@@ -29,11 +29,12 @@ Copyright:
 #include "compat.hxx"
 
 #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 ) \
+	|| ! defined( HAVE_DECL_SINCOSL ) || ( HAVE_DECL_SINCOSL == 0 ) \
 	|| ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 ) \
 	|| ! defined( HAVE_DECL_CEILL ) || ( HAVE_DECL_CEILL == 0 ) \
 	|| ! defined( HAVE_DECL_ROUNDL ) || ( HAVE_DECL_ROUNDL == 0 )
 #include <cmath>
-#endif /* not HAVE_POWL *//* not HAVE_DECL_FLOORL *//* not HAVE_DECL_CEILL *//* not HAVE_DECL_ROUNDL */
+#endif /* not HAVE_POWL *//* not HAVE_DECL_SINCOSL *//* not HAVE_DECL_FLOORL *//* not HAVE_DECL_CEILL *//* not HAVE_DECL_ROUNDL */
 
 #if ! defined( HAVE_MEMRCHR ) || ( HAVE_MEMRCHR == 0 ) || ! defined( HAVE_STRNLEN ) || ( HAVE_STRNLEN == 0 )
 #include <cstring>
@@ -149,6 +150,14 @@ double long sqrtl( double long x ) {
 	return ( ::std::sqrt( x ) );
 }
 #endif /* not HAVE_DECL_SQRTL */
+
+#if ! defined( HAVE_DECL_SINCOSL ) || ( HAVE_DECL_SINCOSL == 0 )
+void sincosl( double long arg_, double long* sinVal_, double long* cosVal_ ) {
+	*sinVal_ = sinl( arg_ );
+	*cosVal_ = cosl( arg_ );
+	return;
+}
+#endif /* #if ! defined( HAVE_DECL_SINCOSL ) || ( HAVE_DECL_SINCOSL == 0 ) */
 
 #if ! defined( HAVE_DECL_STRTOLD ) || ( HAVE_DECL_STRTOLD == 0 )
 double long strtold( char const* str, char** tail ) {

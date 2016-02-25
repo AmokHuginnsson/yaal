@@ -47,8 +47,11 @@
 #cmakedefine HAVE_PRCTL
 #cmakedefine01 HAVE_POWL
 #cmakedefine01 HAVE_DECL_SQRTL
+#cmakedefine01 HAVE_DECL_SINCOSL
 #cmakedefine01 HAVE_DECL_TEMP_FAILURE_RETRY
 #cmakedefine01 HAVE_DECL_FLOORL
+#cmakedefine01 HAVE_DECL_CEILL
+#cmakedefine01 HAVE_DECL_ROUNDL
 #cmakedefine01 HAVE_GETHOSTBYNAME_R
 #cmakedefine01 HAVE_GETADDRINFO
 #cmakedefine01 HAVE_GETNAMEINFO

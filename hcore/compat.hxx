@@ -114,6 +114,10 @@ double long roundl( double long );
 double long sqrtl( double long );
 #endif /* #if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 ) */
 
+#if ! defined( HAVE_DECL_SINCOSL ) || ( HAVE_DECL_SINCOSL == 0 )
+void sincosl( double long, double long*, double long* );
+#endif /* #if ! defined( HAVE_DECL_SINCOSL ) || ( HAVE_DECL_SINCOSL == 0 ) */
+
 #if ! defined( HAVE_DECL_STRTOLD ) || ( HAVE_DECL_STRTOLD == 0 )
 double long strtold( char const*, char** );
 #endif /* #if ! defined( HAVE_DECL_STRTOLD ) || ( HAVE_DECL_STRTOLD == 0 ) */
