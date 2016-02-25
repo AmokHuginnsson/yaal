@@ -310,11 +310,28 @@ struct HNumber::ElementaryFunctions {
 	}
 	static yaal::hcore::HNumber tangens( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
-		HNumber denominator( cosinus( value_ ) );
+		HNumber value( value_, value_.get_precision() + 6 );
+		HNumber denominator( cosinus( value ) );
 		if ( denominator == number::N0 ) {
 			throw HNumberException( "argument not in tangens domain" );
 		}
-		return ( sinus( value_ ) / denominator );
+		value = sinus( value );
+		value /= denominator;
+		value.round( value_.get_precision() );
+		return ( value );
+		M_EPILOG
+	}
+	static yaal::hcore::HNumber cotangens( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		HNumber value( value_, value_.get_precision() + 6 );
+		HNumber denominator( sinus( value ) );
+		if ( denominator == number::N0 ) {
+			throw HNumberException( "argument not in cotangens domain" );
+		}
+		value = cosinus( value );
+		value /= denominator;
+		value.round( value_.get_precision() );
+		return ( value );
 		M_EPILOG
 	}
 };
@@ -499,6 +516,12 @@ yaal::hcore::HNumber cosinus( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber tangens( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::tangens( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber cotangens( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::cotangens( value_ ) );
 	M_EPILOG
 }
 

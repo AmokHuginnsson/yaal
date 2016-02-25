@@ -293,6 +293,7 @@ yaal::hcore::HNumber natural_logarithm( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber cosinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber tangens( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber cotangens( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber const& factorial( int long long );
 
 }

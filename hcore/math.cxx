@@ -63,6 +63,13 @@ double long tangens_impl( double long val_ ) {
 	return ( tanl( val_ ) );
 }
 
+double long cotangens_impl( double long val_ ) {
+	double long sinusVal( 0 );
+	double long cosinusVal( 0 );
+	sincosl( val_, &sinusVal, &cosinusVal );
+	return ( cosinusVal / sinusVal );
+}
+
 }
 
 }
