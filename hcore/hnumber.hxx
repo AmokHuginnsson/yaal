@@ -279,7 +279,6 @@ extern yaal::hcore::HNumber const N6;
 extern yaal::hcore::HNumber const N0_5;
 yaal::hcore::HNumber const& PI( yaal::hcore::HNumber::integer_t = 0 );
 yaal::hcore::HNumber const& E( yaal::hcore::HNumber::integer_t = 0 );
-extern yaal::hcore::HNumber const LN2;
 
 yaal::hcore::HNumber const& factorial( int long long );
 yaal::hcore::HNumber binomial_coefficient( int long long, int long long );
@@ -297,6 +296,7 @@ yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber cosinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber tangens( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber cotangens( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber arcus_tangens( yaal::hcore::HNumber const& );
 
 }
 

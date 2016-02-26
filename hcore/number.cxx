@@ -47,6 +47,7 @@ namespace yaal {
 namespace hcore {
 
 namespace number {
+
 char const VALID_CHARACTERS[] = "-.0123456789";
 i32_t const DECIMAL_SHIFT[] = {
 	/* 0 */ 1l,
@@ -60,6 +61,8 @@ i32_t const DECIMAL_SHIFT[] = {
 	/* 8 */ 100000000l,
 	/* 9 */ 1000000000l
 };
+
+yaal::hcore::HNumber const& ArcTan0_2( yaal::hcore::HNumber::integer_t = 0 );
 
 }
 
@@ -318,6 +321,7 @@ struct HNumber::ElementaryFunctions {
 		value = sinus( value );
 		value /= denominator;
 		value.round( value_.get_precision() );
+		value.set_precision( value_.get_precision() );
 		return ( value );
 		M_EPILOG
 	}
@@ -331,7 +335,53 @@ struct HNumber::ElementaryFunctions {
 		value = cosinus( value );
 		value /= denominator;
 		value.round( value_.get_precision() );
+		value.set_precision( value_.get_precision() );
 		return ( value );
+		M_EPILOG
+	}
+	static yaal::hcore::HNumber arcus_tangens( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		integer_t precision( value_.get_precision() * 2 );
+		HNumber input( value_, precision );
+
+		bool minus( false );
+		/* Check the sign of input. */
+		if ( input < number::N0 ) {
+			minus = true;
+			input = -input;
+		}
+
+		static HNumber const c( "0.2", precision );
+		HNumber a;
+		HNumber f;
+		if ( input > c ) {
+			a = ArcTan0_2( precision );
+			while ( input > c ) {
+				++ f;
+				input = ( input - c ) / ( number::N1 + input * c );
+			}
+		}
+
+		HNumber v( input );
+		HNumber s( -input * input );
+		s.set_precision( precision );
+		HNumber e;
+		for ( HNumber i( number::N3, precision ); true; i += 2 ) {
+			e = ( input *= s ) / i;
+			input.set_precision( precision );
+			if ( e == number::N0 ) {
+				v += ( f * a );
+				break;
+			}
+			v += e;
+		}
+
+		if ( minus ) {
+			v = -v;
+		}
+		v.round( value_.get_precision() );
+		v.set_precision( value_.get_precision() );
+		return ( v );
 		M_EPILOG
 	}
 };
@@ -470,12 +520,22 @@ HNumericConstantCache ECache(
 			return ( natural_expotential( yaal::hcore::HNumber( 1, precision_ ) ) );
 		}
 	),
-	HNumber( "2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741" )
+	HNumber( "2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274274663919320030599218174136" )
 );
 yaal::hcore::HNumber const& E( yaal::hcore::HNumber::integer_t precision_ ) {
 	return ( ECache.approximation( precision_ ) );
 }
-yaal::hcore::HNumber const LN2( "0.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863326996418687" );
+HNumericConstantCache ArcTan0_2Cache(
+	HNumericConstantCache::approximator_t(
+		[]( yaal::hcore::HNumber::integer_t precision_ ) -> yaal::hcore::HNumber {
+			return ( arcus_tangens( yaal::hcore::HNumber( "0.2", precision_ ) ) );
+		}
+	),
+	HNumber( "0.19739555984988075837004976519479029344758510378785210151768894024103396997824378573269782803728804411262811807369136010445647989" )
+);
+yaal::hcore::HNumber const& ArcTan0_2( yaal::hcore::HNumber::integer_t precision_ ) {
+	return ( ArcTan0_2Cache.approximation( precision_ ) );
+}
 
 yaal::hcore::HNumber const& factorial( int long long value_ ) {
 	M_PROLOG
@@ -535,6 +595,12 @@ yaal::hcore::HNumber tangens( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber cotangens( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::cotangens( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber arcus_tangens( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::arcus_tangens( value_ ) );
 	M_EPILOG
 }
 

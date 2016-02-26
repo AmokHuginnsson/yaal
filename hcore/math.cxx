@@ -70,6 +70,10 @@ double long cotangens_impl( double long val_ ) {
 	return ( cosinusVal / sinusVal );
 }
 
+double long arcus_tangens_impl( double long val_ ) {
+	return ( atanl( val_ ) );
+}
+
 }
 
 }
