@@ -44,6 +44,33 @@ namespace huginn {
 
 namespace number {
 
+inline HHuginn::value_t is_exact( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "number.is_exact";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	return ( thread_->object_factory().create_boolean( static_cast<HHuginn::HNumber*>( object_->raw() )->value().is_exact() ) );
+	M_EPILOG
+}
+
+inline HHuginn::value_t get_precision( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "number.get_precision";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	return ( thread_->object_factory().create_integer( static_cast<HHuginn::HNumber*>( object_->raw() )->value().get_precision() ) );
+	M_EPILOG
+}
+
+inline HHuginn::value_t set_precision( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "number.set_precision";
+	verify_arg_count( name, values_, 1, 1, position_ );
+	verify_arg_type( name, values_, 0, HHuginn::TYPE::INTEGER, true, position_ );
+	int precision = static_cast<int>( get_integer( values_[0] ) );
+	static_cast<HHuginn::HNumber*>( object_->raw() )->value().set_precision( precision );
+	return ( *object_ );
+	M_EPILOG
+}
+
 HHuginn::class_t get_class( HHuginn* );
 HHuginn::class_t get_class( HHuginn* huginn_ ) {
 	M_PROLOG
@@ -53,7 +80,11 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			type_id( HHuginn::TYPE::NUMBER ),
 			huginn_->identifier_id( type_name( HHuginn::TYPE::NUMBER ) ),
 			nullptr,
-			HHuginn::field_definitions_t{}
+			HHuginn::field_definitions_t{
+				{ "is_exact", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::is_exact, _1, _2, _3, _4 ) ) },
+				{ "get_precision", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::get_precision, _1, _2, _3, _4 ) ) },
+				{ "set_precision", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::set_precision, _1, _2, _3, _4 ) ) }
+			}
 		)
 	);
 	return ( c );
