@@ -84,6 +84,25 @@ public:
 		return ( thread_->object_factory().create_string( filesystem::current_working_directory() ) );
 		M_EPILOG
 	}
+	static HHuginn::value_t rename( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "FileSystem.rename";
+		verify_arg_count( name, values_, 2, 2, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+		filesystem::rename( get_string( values_[0] ), get_string( values_[1] ) );
+		return ( *object_ );
+		M_EPILOG
+	}
+	static HHuginn::value_t remove( huginn::HThread*, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "FileSystem.remove";
+		verify_arg_count( name, values_, 1, 1, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, true, position_ );
+		filesystem::remove( get_string( values_[0] ) );
+		return ( *object_ );
+		M_EPILOG
+	}
 private:
 	HHuginn::value_t do_open( huginn::HThread* thread_, HHuginn::values_t const& values_, int position_ ) {
 		M_PROLOG
@@ -133,6 +152,8 @@ HHuginn::value_t HFileSystemCreator::do_new_instance( HHuginn* huginn_ ) {
 				{ "open",                      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::open, _1, _2, _3, _4 ) ) },
 				{ "reading",                   make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::reading, _1, _2, _3, _4 ) ) },
 				{ "writting",                  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::writting, _1, _2, _3, _4 ) ) },
+				{ "rename",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::rename, _1, _2, _3, _4 ) ) },
+				{ "remove",                    make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::remove, _1, _2, _3, _4 ) ) },
 				{ "current_working_directory", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HFileSystem::current_working_directory, _1, _2, _3, _4 ) ) }
 			}
 		)
