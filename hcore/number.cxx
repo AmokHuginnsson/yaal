@@ -477,6 +477,19 @@ yaal::hcore::HNumber const& E( yaal::hcore::HNumber::integer_t precision_ ) {
 }
 yaal::hcore::HNumber const LN2( "0.693147180559945309417232121458176568075500134360255254120680009493393621969694715605863326996418687" );
 
+yaal::hcore::HNumber const& factorial( int long long value_ ) {
+	M_PROLOG
+	return ( HFactorialCache::get_instance().factorial( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber binomial_coefficient( int long long cardinal_, int long long subCardinal_ ) {
+	if ( subCardinal_ > ( cardinal_ / 2 ) ) {
+		subCardinal_ = cardinal_ - subCardinal_;
+	}
+	return ( factorial( cardinal_ ) / ( factorial( subCardinal_ ) * factorial( cardinal_ - subCardinal_ ) ) );
+}
+
 }
 
 }
@@ -522,12 +535,6 @@ yaal::hcore::HNumber tangens( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber cotangens( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::cotangens( value_ ) );
-	M_EPILOG
-}
-
-yaal::hcore::HNumber const& factorial( int long long value_ ) {
-	M_PROLOG
-	return ( HFactorialCache::get_instance().factorial( value_ ) );
 	M_EPILOG
 }
 
