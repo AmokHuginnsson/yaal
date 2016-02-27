@@ -298,6 +298,7 @@ yaal::hcore::HNumber sinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber cosinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber tangens( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber cotangens( yaal::hcore::HNumber const& );
+yaal::hcore::HNumber arcus_sinus( yaal::hcore::HNumber const& );
 yaal::hcore::HNumber arcus_tangens( yaal::hcore::HNumber const& );
 
 }

@@ -309,6 +309,33 @@ struct HNumber::ElementaryFunctions {
 		return ( value );
 		M_EPILOG
 	}
+	/*
+	 * arcsin(x) power series converges extreamly slowly near 1.
+	 * we will use arctan(x) to get result faster.
+	 * arcsin(x) = arctan(x/sqrt(1-x^2));
+	 * for 1 and -1 we return values from definition
+	 */
+	static yaal::hcore::HNumber arcus_sinus( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		if ( ( value_ > number::N1 ) || ( value_ < -number::N1 ) ) {
+			throw HNumberException( "argument not in arcus sinus domain" );
+		}
+		HNumber v;
+		if ( ( value_ < number::N1 ) && ( value_ > -number::N1 ) ) {
+			HNumber input( value_, value_.get_precision() + 9 );
+			HNumber d( square_root( number::N1 - ( input ^ 2 ) ) );
+			v = arcus_tangens( input / d );
+		} else {
+			v = number::PI( value_.get_precision() );
+			v *= number::N0_5;
+			v._negative = value_._negative;
+		}
+
+		v.round( value_.get_precision() );
+		v.set_precision( value_.get_precision() );
+		return ( v );
+		M_EPILOG
+	}
 	static yaal::hcore::HNumber arcus_tangens( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
 		integer_t precision( value_.get_precision() * 2 );
@@ -565,6 +592,12 @@ yaal::hcore::HNumber tangens( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber cotangens( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::cotangens( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber arcus_sinus( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::arcus_sinus( value_ ) );
 	M_EPILOG
 }
 
