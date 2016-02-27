@@ -70,13 +70,17 @@ struct HNumber::ElementaryFunctions {
 	static yaal::hcore::HNumber square_root( yaal::hcore::HNumber const& value_ ) {
 		M_PROLOG
 		HNumber n;
-		HNumber tmp;
-		HNumber oldN;
-		HNumber::integer_t requiredPrecision( value_.get_precision() );
 		do {
 			if ( value_._negative ) {
 				throw HNumberException( "square root from negative" );
 			}
+			/*
+			 * Prepare first guess.
+			 * 1. For argument greater than 1 count number of decimal digits.
+			 *    For argument lower then 1 count number of leading zeros in fractional decimal digits part.
+			 * 2. Take this number and divide it by 2 to get starting guess digit count.
+			 * 3. Significant digit (leading or trailing) is decided by oddness of number found in step 1.
+			 */
 			HString s( value_.to_string() );
 			integer_t digits( 0 );
 			bool aboveOne( value_ >= number::N1 );
@@ -110,63 +114,29 @@ struct HNumber::ElementaryFunctions {
 				s.set_at( 0, '.' );
 				s.set_at( digits, odd ? '2' : '6' );
 			}
+			/* Newton's method of finding square root. */
 			n = s;
-			HNumber::integer_t precision( n.fractional_decimal_digits() + 1 );
+			HNumber::integer_t precision( max( n.fractional_decimal_digits() + 1, value_.fractional_decimal_digits() ) );
+			HNumber tmp;
 			while ( true ) {
 				tmp = value_;
 				n.set_precision( precision );
 				tmp.set_precision( precision );
-				if ( precision >= HARDCODED_MINIMUM_PRECISION ) {
-					n._precision = precision + 1;
-					tmp._precision = precision + 1;
-				} else {
-					n._precision = HARDCODED_MINIMUM_PRECISION + 1;
-					tmp._precision = HARDCODED_MINIMUM_PRECISION + 1;
-				}
+				n._precision = tmp._precision = ( precision > HARDCODED_MINIMUM_PRECISION ? precision : HARDCODED_MINIMUM_PRECISION ) + 1;
 				tmp /= n;
 				n += tmp;
 				n *= number::N0_5;
-				if ( n.is_exact() && ( ( n * n ) == value_ ) ) {
+				HNumber::integer_t converged( differs_at( n, tmp ) );
+				if ( converged >= value_.get_precision() ) {
+					n.round( converged );
 					break;
 				}
-				if ( n._integralPartSize == oldN._integralPartSize ) {
-					i32_t const* a( n._canonical.get<i32_t const>() );
-					i32_t const* b( oldN._canonical.get<i32_t const>() );
-					HNumber::integer_t d( 0 );
-					HNumber::integer_t SIZE( min( n._leafCount, oldN._leafCount ) );
-					for ( ; d < SIZE; ++ d ) {
-						if ( a[d] != b[d] ) {
-							break;
-						}
-					}
-					HNumber::integer_t sameFractionalLeafs( d - n._integralPartSize );
-					if ( sameFractionalLeafs > 0 ) {
-						HNumber::integer_t newPrecision( sameFractionalLeafs * DECIMAL_DIGITS_IN_LEAF_CONST );
-						if ( d < SIZE ) {
-							i32_t diff( yaal::abs( a[d] - b[d] ) );
-							for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
-								if ( ( diff % DECIMAL_SHIFT[DECIMAL_DIGITS_IN_LEAF_CONST - i] ) != diff ) {
-									break;
-								}
-								++ newPrecision;
-							}
-						}
-						if ( newPrecision >= requiredPrecision ) {
-							break;
-						}
-						newPrecision = ( newPrecision << 2 ) + ( DECIMAL_DIGITS_IN_LEAF_CONST << 1 ) - 1;
-						if ( newPrecision < HARDCODED_MINIMUM_PRECISION ) {
-							newPrecision = HARDCODED_MINIMUM_PRECISION;
-						}
-						if ( newPrecision > precision ) {
-							precision = newPrecision;
-						}
-					}
+				if ( converged >= ( n.get_precision() - 1 ) ) {
+					precision = min( precision * 3, value_.get_precision() + 4 );
 				}
-				oldN = n;
 			}
 		} while ( false );
-		n.set_precision( requiredPrecision );
+		n.set_precision( value_.get_precision() );
 		return ( n );
 		M_EPILOG
 	}
