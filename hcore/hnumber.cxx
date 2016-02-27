@@ -72,15 +72,35 @@ int const KARATSUBA_THRESHOLD = 20; /* FIXME: 20 is fine */
 i32_t const LEAF = meta::power<10, DECIMAL_DIGITS_IN_LEAF_CONST>::value;
 char ZFORMAT[] = "%00u";
 
-namespace {
 char unused __attribute__((used)) = ZFORMAT[2] = static_cast<char>( '0' + DECIMAL_DIGITS_IN_LEAF_CONST );
-}
 
 inline i32_t leafcmp( i32_t const* left_, i32_t const* right_, HNumber::integer_t len_ ) {
 	i32_t cmp( 0 );
 	for ( HNumber::integer_t i( 0 ); ! cmp && ( i < len_ ); ++ i )
 		cmp = left_[ i ] - right_[ i ];
 	return ( cmp );
+}
+
+inline int leading_zeros( i32_t leaf_ ) {
+	int zeros( 0 );
+	for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
+		if ( ( leaf_ % DECIMAL_SHIFT[DECIMAL_DIGITS_IN_LEAF_CONST - i] ) != leaf_ ) {
+			break;
+		}
+		++ zeros;
+	}
+	return ( zeros );
+}
+
+inline int trailing_zeros( i32_t leaf_ ) {
+	int zeros( 0 );
+	for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
+		if ( leaf_ % DECIMAL_SHIFT[i] ) {
+			break;
+		}
+		++ zeros;
+	}
+	return ( zeros );
 }
 
 }
@@ -633,13 +653,7 @@ HNumber::integer_t HNumber::fractional_length( void ) const {
 HNumber::integer_t HNumber::fractional_decimal_digits( void ) const {
 	integer_t fractionalDecimalDigits( fractional_length() * DECIMAL_DIGITS_IN_LEAF_CONST );
 	if ( fractionalDecimalDigits > 0 ) {
-		i32_t lastLeaf( _canonical.get<i32_t>()[ _leafCount - 1 ] );
-		for ( int i( 1 ); i < DECIMAL_DIGITS_IN_LEAF_CONST; ++ i ) {
-			if ( lastLeaf % DECIMAL_SHIFT[i] ) {
-				break;
-			}
-			-- fractionalDecimalDigits;
-		}
+		fractionalDecimalDigits -= trailing_zeros( _canonical.get<i32_t>()[ _leafCount - 1 ] );
 	}
 	return ( fractionalDecimalDigits );
 }
@@ -654,6 +668,10 @@ bool HNumber::is_exact( void ) const {
 	}
 	return ( exact );
 	M_EPILOG
+}
+
+bool HNumber::is_integral( void ) const {
+	return ( _leafCount == _integralPartSize );
 }
 
 HNumber::integer_t HNumber::absolute_lower( HNumber const& other ) const {
@@ -1689,6 +1707,32 @@ void HNumber::add_leaf_low( integer_t from_, i32_t leaf_ ) {
 		data[0] = carrier;
 	}
 	return;
+	M_EPILOG
+}
+
+HNumber::integer_t differs_at( HNumber n1_, HNumber const& n2_ ) {
+	M_PROLOG
+	HNumber::integer_t pos( 0 );
+	bool n1Exact( n1_.is_exact() );
+	n1_ -= n2_;
+	i32_t const* n( n1_._canonical.get<i32_t const>() );
+	if ( n1_._integralPartSize == 0 ) {
+		HNumber::integer_t same( 0 );
+		for ( same = n1_._integralPartSize ; same < n1_._leafCount; ++ same ) {
+			if ( n[same] != 0 ) {
+				break;
+			}
+		}
+		int rest( ( same < n1_._leafCount ) ? leading_zeros( n[same] ) : 0 );
+		if ( n1_._leafCount > 0 ) {
+			pos = same * DECIMAL_DIGITS_IN_LEAF_CONST + rest;
+		} else {
+			pos = n1Exact && n2_.is_exact() ? meta::max_signed<HNumber::integer_t>::value : n2_.fractional_decimal_digits();
+		}
+	} else {
+		pos = leading_zeros( n[0] ) - n1_._integralPartSize * DECIMAL_DIGITS_IN_LEAF_CONST;
+	}
+	return ( pos );
 	M_EPILOG
 }
 

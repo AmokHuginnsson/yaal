@@ -237,6 +237,7 @@ public:
 	int long long to_integer( void ) const;
 	HString to_string( void ) const;
 	bool is_exact( void ) const;
+	bool is_integral( void ) const;
 private:
 	bool mutate_addition( i32_t*, integer_t, i32_t const* const[], integer_t*, integer_t*, bool ) const;
 	integer_t absolute_lower( HNumber const& ) const;
@@ -255,6 +256,7 @@ private:
 	void normalize( bool );
 public:
 	struct ElementaryFunctions;
+	friend integer_t differs_at( HNumber, HNumber const& );
 };
 
 typedef HExceptionT<HNumber> HNumberException;
