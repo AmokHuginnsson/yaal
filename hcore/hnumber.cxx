@@ -1414,6 +1414,10 @@ HNumber HNumber::operator -- ( int ) {
 void HNumber::normalize( bool updatePrecision_ ) {
 	M_PROLOG
 	i32_t* res( _canonical.get<i32_t>() );
+	/*
+	 * Remove leading zero-leafs.
+	 * 000345.678 -> 345.678
+	 */
 	integer_t shift( 0 );
 	while ( ( shift < _integralPartSize ) && ( res[ shift ] == 0 ) ) {
 		++ shift;
@@ -1423,22 +1427,42 @@ void HNumber::normalize( bool updatePrecision_ ) {
 		_leafCount -= shift;
 		::memmove( res, res + shift, static_cast<size_t>( chunk_size<i32_t>( _leafCount ) ) );
 	}
+
+	/*
+	 * Remove trailing zero-leafs.
+	 * 345.678000 -> 345.678
+	 */
 	while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) ) {
 		-- _leafCount;
 	}
+
+	/*
+	 * Increase precision if necessary.
+	 */
 	integer_t fractionalDecimalDigits( fractional_decimal_digits() );
 	if ( updatePrecision_ && ( fractionalDecimalDigits >= _precision ) ) {
 		_precision = fractionalDecimalDigits + 1;
 	}
+
+	/*
+	 * Crop rounded (not-exact) number to proper number of digits.
+	 */
 	integer_t leafPrecision( ( _precision + DECIMAL_DIGITS_IN_LEAF_CONST - 1 ) / DECIMAL_DIGITS_IN_LEAF_CONST );
 	if ( ( _leafCount > 0 ) && ( fractionalDecimalDigits > _precision ) && ( leafPrecision <= fractional_length() ) ) {
 		_leafCount -= ( fractional_length() - leafPrecision );
-		i32_t& lastLeaf( res[ _leafCount - 1 ] );
-		lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( _precision % DECIMAL_DIGITS_IN_LEAF_CONST ) ] );
+		if ( _precision % DECIMAL_DIGITS_IN_LEAF_CONST ) {
+			i32_t& lastLeaf( res[ _leafCount - 1 ] );
+			lastLeaf -= ( lastLeaf % DECIMAL_SHIFT[ DECIMAL_DIGITS_IN_LEAF_CONST - ( _precision % DECIMAL_DIGITS_IN_LEAF_CONST ) ] );
+		}
+		while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) ) {
+			-- _leafCount;
+		}
+		_precision = fractional_decimal_digits();
 	}
-	while ( ( _leafCount > _integralPartSize ) && ( res[ _leafCount - 1 ] == 0 ) ) {
-		-- _leafCount;
-	}
+
+	/*
+	 * 0 cannot be negative.
+	 */
 	if ( ! _leafCount ) {
 		_negative = false;
 	}
