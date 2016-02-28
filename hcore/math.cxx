@@ -74,6 +74,10 @@ double long arcus_sinus_impl( double long val_ ) {
 	return ( asinl( val_ ) );
 }
 
+double long arcus_cosinus_impl( double long val_ ) {
+	return ( acosl( val_ ) );
+}
+
 double long arcus_tangens_impl( double long val_ ) {
 	return ( atanl( val_ ) );
 }
