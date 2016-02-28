@@ -132,7 +132,7 @@ struct HNumber::ElementaryFunctions {
 					break;
 				}
 				if ( converged >= ( n.get_precision() - 1 ) ) {
-					precision = min( precision * 3, value_.get_precision() + 4 );
+					precision = min( precision * 3, value_.get_precision() + 6 );
 				}
 			}
 		} while ( false );
