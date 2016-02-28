@@ -320,10 +320,10 @@ public:
 		return ( _iterator != iterator_._iterator );
 	}
 	bool operator < ( HReverseIterator const& iterator_ ) const {
-		return ( _iterator > iterator_._iterator );
+		return ( ! ( _iterator <= iterator_._iterator ) );
 	}
 	bool operator <= ( HReverseIterator const& iterator_ ) const {
-		return ( _iterator >= iterator_._iterator );
+		return ( ! ( _iterator < iterator_._iterator ) );
 	}
 	bool operator > ( HReverseIterator const& iterator_ ) const {
 		return ( _iterator < iterator_._iterator );

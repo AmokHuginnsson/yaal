@@ -885,6 +885,11 @@ public:
 		M_ASSERT( _owner == it._owner );
 		return ( _index < it._index );
 	}
+	template<typename other_const_qual_t>
+	bool operator <= ( HIterator<other_const_qual_t> const& it ) const {
+		M_ASSERT( _owner == it._owner );
+		return ( _index <= it._index );
+	}
 private:
 	friend class HArray<type_t, allocator_t>;
 	explicit HIterator( array_t const* owner_, int long idx )
