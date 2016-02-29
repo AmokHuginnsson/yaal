@@ -634,11 +634,12 @@ HNumber::integer_t HNumber::get_precision( void ) const {
 
 void HNumber::set_precision( integer_t precision_ ) {
 	M_PROLOG
-	if ( precision_ < HARDCODED_MINIMUM_PRECISION )
+	if ( precision_ < HARDCODED_MINIMUM_PRECISION ) {
 		precision_ = HARDCODED_MINIMUM_PRECISION;
+	}
 	if ( ( precision_ < _precision ) || ( ( precision_ > _precision ) && is_exact() ) ) {
 		if ( precision_ < _precision ) {
-			static_cast<void>( round( precision_ ) );
+			round( precision_ );
 		}
 		_precision = precision_;
 	}

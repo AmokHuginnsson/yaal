@@ -116,23 +116,26 @@ struct HNumber::ElementaryFunctions {
 			}
 			/* Newton's method of finding square root. */
 			n = s;
-			HNumber::integer_t precision( max( n.fractional_decimal_digits() + 1, value_.fractional_decimal_digits() ) );
+			HNumber::integer_t precision( max( n.fractional_decimal_digits() + 1, value_.fractional_decimal_digits(), HARDCODED_MINIMUM_PRECISION ) );
 			HNumber tmp;
 			while ( true ) {
 				tmp = value_;
 				n.set_precision( precision );
 				tmp.set_precision( precision );
-				n._precision = tmp._precision = ( precision > HARDCODED_MINIMUM_PRECISION ? precision : HARDCODED_MINIMUM_PRECISION ) + 1;
+				n._precision = tmp._precision = precision + 1;
 				tmp /= n;
 				n += tmp;
+				n.set_precision( precision + 1 );
+				n._precision = precision + 1;
 				n *= number::N0_5;
 				HNumber::integer_t converged( differs_at( n, tmp ) );
-				if ( converged >= value_.get_precision() ) {
-					n.round( converged );
-					break;
-				}
-				if ( converged >= ( n.get_precision() - 1 ) ) {
-					precision = min( precision * 3, value_.get_precision() + 6 );
+				HNumber::integer_t fdd( max( n.fractional_decimal_digits(), tmp.fractional_decimal_digits() ) - 1 );
+				if ( converged >= fdd ) {
+					if ( precision >= value_.get_precision() ) {
+						n.round( converged );
+						break;
+					}
+					precision = min( precision * 3, value_.get_precision() + 1 );
 				}
 			}
 		} while ( false );
