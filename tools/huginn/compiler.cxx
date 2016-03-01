@@ -508,7 +508,7 @@ HHuginn::function_t OCompiler::create_function( executing_parser::position_t ) {
 void OCompiler::submit_class( executing_parser::position_t position_ ) {
 	M_PROLOG
 	pop_function_context();
-	if ( ! _submittedClasses.insert( make_pair<HHuginn::identifier_id_t const, class_context_t>( _classContext->_classIdentifier, yaal::move( _classContext ) ) ).second ) {
+	if ( ! _submittedClasses.insert( make_pair( _classContext->_classIdentifier, yaal::move( _classContext ) ) ).second ) {
 		throw HHuginn::HHuginnRuntimeException(
 			"`"_ys.append( _huginn->identifier_name( _classContext->_classIdentifier ) ).append( "' is already defined." ),
 			position_.get()

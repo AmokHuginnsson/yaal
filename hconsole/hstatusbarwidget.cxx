@@ -365,8 +365,8 @@ void HStatusBarWidget::confirm( char const* question_,
 		HTUIProcess::call_t yes_, HTUIProcess::call_t no_ ) {
 	M_PROLOG
 	choices_t choices;
-	choices.push_back( make_pair<HString>( "yes", yes_ ) );
-	choices.push_back( make_pair<HString>( "no", no_ ) );
+	choices.push_back( make_pair( "yes", yes_ ) );
+	choices.push_back( make_pair( "no", no_ ) );
 	ask( question_, choices, 1 );
 	return;
 	M_EPILOG

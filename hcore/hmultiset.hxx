@@ -223,7 +223,7 @@ public:
 	}
 	HIterator insert( value_type&& elem ) {
 		M_PROLOG
-		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair<value_type, int long>( yaal::move( elem ), yaal::move( 1L ) ) ) );
+		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair( yaal::move( elem ), yaal::move( 1L ) ) ) );
 		if ( ! p.second ) {
 			++ p.first->second;
 		}

@@ -266,7 +266,7 @@ public:
 	}
 	iterator insert( value_type&& val_ ) {
 		M_PROLOG
-		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair<value_type, int long>( yaal::move( val_ ), 1L ) ) );
+		HPair<typename engine_t::HIterator, bool> p( _engine.insert( make_pair( yaal::move( val_ ), 1L ) ) );
 		if ( ! p.second ) {
 			++ p.first.get().second;
 		}

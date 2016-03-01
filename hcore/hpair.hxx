@@ -59,31 +59,65 @@ public:
 		: first( key_ ), second( value_ ) {
 		return;
 	}
-	HPair( first_type const& key_, typename trait::strip_reference<second_type>::type&& value_ )
-		: first( key_ ), second( yaal::move( value_ ) ) {
-		return;
-	}
-	HPair( typename trait::strip_reference<first_type>::type&& key_, second_type const& value_ )
-		: first( yaal::move( key_ ) ), second( value_ ) {
-		return;
-	}
-	HPair( typename trait::strip_reference<first_type>::type&& key_, typename trait::strip_reference<second_type>::type&& value_ )
-		: first( yaal::move( key_ ) ), second( yaal::move( value_ ) ) {
-		return;
-	}
-	HPair( HPair const& pair_ )
-		: first( pair_.first ), second( pair_.second ) {
-		return;
-	}
-	HPair( HPair&& pair_ )
-		: first( yaal::move( pair_.first ) ), second( yaal::move( pair_.second ) ) {
-		return;
-	}
-	template<typename alt_first_t, typename alt_second_t>
+	template<
+		typename alt_first_t,
+		typename alt_second_t,
+		typename = typename trait::enable_if<
+			trait::and_op<
+				typename trait::is_convertible<alt_first_t const&, first_type>,
+				typename trait::is_convertible<alt_second_t const&, second_type>
+			>::value
+		>
+	>
 	HPair( HPair<alt_first_t, alt_second_t> const& altPair_ )
 		: first( altPair_.first ), second( altPair_.second ) {
 		return;
 	}
+
+	constexpr HPair( HPair const& ) = default;
+	constexpr HPair( HPair&& ) = default;
+
+	template<typename alt_first_t, typename = typename trait::enable_if<trait::is_convertible<alt_first_t, first_type>::value>::type>
+	HPair( alt_first_t&& key_, second_type const& value_ )
+		: first( yaal::forward<alt_first_t>( key_ ) ), second( value_ ) {
+		return;
+	}
+	template<typename alt_second_t, typename = typename trait::enable_if<trait::is_convertible<alt_second_t, second_type>::value>::type>
+	HPair( HPair<first_type, alt_second_t>&& altPair_ )
+		: first( altPair_.first ), second( yaal::forward<alt_second_t>( altPair_.second ) ) {
+		return;
+	}
+
+	template<
+		typename alt_first_t,
+		typename alt_second_t,
+		typename = typename trait::enable_if<
+			trait::and_op<
+				typename trait::is_convertible<alt_first_t, first_type>,
+				typename trait::is_convertible<alt_second_t, second_type>
+			>::value
+		>
+	>
+	HPair( alt_first_t&& key_, alt_second_t&& value_ )
+		: first( yaal::forward<alt_first_t>( key_ ) ), second( yaal::forward<alt_second_t>( value_ ) ) {
+		return;
+	}
+
+	template<
+		typename alt_first_t,
+		typename alt_second_t,
+		typename = typename trait::enable_if<
+			trait::and_op<
+				typename trait::is_convertible<alt_first_t, first_type>,
+				typename trait::is_convertible<alt_second_t, second_type>
+			>::value
+		>
+	>
+	HPair( HPair<alt_first_t, alt_second_t>&& altPair_ )
+		: first( yaal::forward<alt_first_t>( altPair_.first ) ), second( yaal::forward<alt_second_t>( altPair_.second ) ) {
+		return;
+	}
+
 	HPair& operator = ( HPair const& pair_ ) {
 		M_PROLOG
 		if ( &pair_ != this ) {
@@ -127,23 +161,9 @@ public:
 };
 
 template<typename first_type, typename second_type>
-inline HPair<first_type, second_type> make_pair( first_type const& first_, second_type const& second_ ) {
-	return ( HPair<first_type, second_type>( first_, second_ ) );
-}
-
-template<typename first_type, typename second_type>
-inline HPair<first_type, second_type> make_pair( first_type const& first_, typename trait::strip_reference<second_type>::type&& second_ ) {
-	return ( HPair<first_type, second_type>( first_, yaal::move( second_ ) ) );
-}
-
-template<typename first_type, typename second_type>
-inline HPair<first_type, second_type> make_pair( typename trait::strip_reference<first_type>::type&& first_, second_type const& second_ ) {
-	return ( HPair<first_type, second_type>( yaal::move( first_ ), second_ ) );
-}
-
-template<typename first_type, typename second_type>
-inline HPair<first_type, second_type> make_pair( typename trait::strip_reference<first_type>::type&& first_, typename trait::strip_reference<second_type>::type&& second_ ) {
-	return ( HPair<first_type, second_type>( yaal::move( first_ ), yaal::move( second_ ) ) );
+inline HPair<typename trait::decay<first_type>::type, typename trait::decay<second_type>::type> make_pair( first_type&& first_, second_type&& second_ ) {
+	typedef HPair<typename trait::decay<first_type>::type, typename trait::decay<second_type>::type> pair_t;
+	return ( pair_t( yaal::forward<first_type>( first_ ), yaal::forward<second_type>( second_ ) ) );
 }
 
 template<typename first_type, typename second_type>
