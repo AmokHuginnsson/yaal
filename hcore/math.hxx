@@ -49,6 +49,7 @@ double long cotangens_impl( double long );
 double long arcus_sinus_impl( double long );
 double long arcus_cosinus_impl( double long );
 double long arcus_tangens_impl( double long );
+double long arcus_cotangens_impl( double long );
 
 template<typename T>
 T square_root( T val_ ) {
@@ -98,6 +99,11 @@ T arcus_cosinus( T val_ ) {
 template<typename T>
 T arcus_tangens( T val_ ) {
 	return ( static_cast<T>( arcus_tangens_impl( val_ ) ) );
+}
+
+template<typename T>
+T arcus_cotangens( T val_ ) {
+	return ( static_cast<T>( arcus_cotangens_impl( val_ ) ) );
 }
 
 }

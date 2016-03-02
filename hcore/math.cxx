@@ -82,6 +82,10 @@ double long arcus_tangens_impl( double long val_ ) {
 	return ( atanl( val_ ) );
 }
 
+double long arcus_cotangens_impl( double long val_ ) {
+	return ( math::PI / 2.0L - atanl( val_ ) );
+}
+
 }
 
 }

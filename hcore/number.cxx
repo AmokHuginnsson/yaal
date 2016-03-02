@@ -407,6 +407,17 @@ struct HNumber::ElementaryFunctions {
 		return ( v );
 		M_EPILOG
 	}
+	static yaal::hcore::HNumber arcus_cotangens( yaal::hcore::HNumber const& value_ ) {
+		M_PROLOG
+		HNumber v( number::PI( value_.get_precision() ) );
+		v *= number::N0_5;
+		HNumber input( value_, value_.get_precision() + 1 );
+		v -= arcus_tangens( input );
+		v.round( value_.get_precision() );
+		v.set_precision( value_.get_precision() );
+		return ( v );
+		M_EPILOG
+	}
 };
 
 namespace number {
@@ -636,6 +647,12 @@ yaal::hcore::HNumber arcus_cosinus( yaal::hcore::HNumber const& value_ ) {
 yaal::hcore::HNumber arcus_tangens( yaal::hcore::HNumber const& value_ ) {
 	M_PROLOG
 	return ( yaal::hcore::HNumber::ElementaryFunctions::arcus_tangens( value_ ) );
+	M_EPILOG
+}
+
+yaal::hcore::HNumber arcus_cotangens( yaal::hcore::HNumber const& value_ ) {
+	M_PROLOG
+	return ( yaal::hcore::HNumber::ElementaryFunctions::arcus_cotangens( value_ ) );
 	M_EPILOG
 }
 
