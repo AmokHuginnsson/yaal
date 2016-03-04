@@ -52,6 +52,14 @@ inline HHuginn::value_t is_exact( huginn::HThread* thread_, HHuginn::value_t* ob
 	M_EPILOG
 }
 
+inline HHuginn::value_t is_integral( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
+	M_PROLOG
+	char const name[] = "number.is_integral";
+	verify_arg_count( name, values_, 0, 0, position_ );
+	return ( thread_->object_factory().create_boolean( static_cast<HHuginn::HNumber*>( object_->raw() )->value().is_integral() ) );
+	M_EPILOG
+}
+
 inline HHuginn::value_t get_precision( huginn::HThread* thread_, HHuginn::value_t* object_, HHuginn::values_t const& values_, int position_ ) {
 	M_PROLOG
 	char const name[] = "number.get_precision";
@@ -82,6 +90,7 @@ HHuginn::class_t get_class( HHuginn* huginn_ ) {
 			nullptr,
 			HHuginn::field_definitions_t{
 				{ "is_exact", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::is_exact, _1, _2, _3, _4 ) ) },
+				{ "is_integral", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::is_integral, _1, _2, _3, _4 ) ) },
 				{ "get_precision", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::get_precision, _1, _2, _3, _4 ) ) },
 				{ "set_precision", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &number::set_precision, _1, _2, _3, _4 ) ) }
 			}
