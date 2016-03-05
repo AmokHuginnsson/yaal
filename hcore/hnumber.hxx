@@ -38,6 +38,15 @@ namespace yaal {
 
 namespace hcore {
 
+class HNumber;
+
+namespace number {
+
+typedef int integer_t;
+integer_t differs_at( HNumber, HNumber const& );
+
+}
+
 /*! \brief Finite precision calculation units (numbers).
  *
  * HNumber is a representation for finite precision numbers.
@@ -96,7 +105,7 @@ namespace hcore {
 class HNumber final {
 public:
 	typedef HNumber this_type;
-	typedef int integer_t;
+	typedef number::integer_t integer_t;
 private:
 	integer_t _precision;
 	integer_t _leafCount;
@@ -256,7 +265,7 @@ private:
 	void normalize( bool );
 public:
 	struct ElementaryFunctions;
-	friend integer_t differs_at( HNumber, HNumber const& );
+	friend integer_t number::differs_at( HNumber, HNumber const& );
 };
 
 typedef HExceptionT<HNumber> HNumberException;

@@ -1735,6 +1735,8 @@ void HNumber::add_leaf_low( integer_t from_, i32_t leaf_ ) {
 	M_EPILOG
 }
 
+namespace number {
+
 HNumber::integer_t differs_at( HNumber n1_, HNumber const& n2_ ) {
 	M_PROLOG
 	HNumber::integer_t pos( 0 );
@@ -1759,6 +1761,8 @@ HNumber::integer_t differs_at( HNumber n1_, HNumber const& n2_ ) {
 	}
 	return ( pos );
 	M_EPILOG
+}
+
 }
 
 HNumber operator "" _yn ( char const* str_, size_t len_ ) {
