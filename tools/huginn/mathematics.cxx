@@ -306,6 +306,16 @@ public:
 		return ( v );
 		M_EPILOG
 	}
+	static HHuginn::value_t differs_at( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		M_PROLOG
+		char const name[] = "Mathematics.differs_at";
+		verify_arg_count( name, values_, 2, 2, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::NUMBER, false, position_ );
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::NUMBER, false, position_ );
+		HHuginn::value_t v( thread_->huginn().none_value() );
+		return ( thread_->object_factory().create_integer( number::differs_at( get_number( values_[0] ), get_number( values_[1] ) ) ) );
+		M_EPILOG
+	}
 };
 
 namespace package_factory {
