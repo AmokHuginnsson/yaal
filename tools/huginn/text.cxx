@@ -110,6 +110,13 @@ public:
 		HHuginn::value_t v( thread_->huginn().object_factory()->create_string( s ) );
 		return ( v );
 	}
+	static HHuginn::value_t distance( huginn::HThread* thread_, HHuginn::value_t*, HHuginn::values_t const& values_, int position_ ) {
+		char const name[] = "Text.distance";
+		verify_arg_count( name, values_, 2, 2, position_ );
+		verify_arg_type( name, values_, 0, HHuginn::TYPE::STRING, false, position_ );
+		verify_arg_type( name, values_, 1, HHuginn::TYPE::STRING, false, position_ );
+		return ( thread_->huginn().object_factory()->create_integer( string::distance::levenshtein_damerau( get_string( values_[0] ), get_string( values_[1] ) ) ) );
+	}
 };
 
 namespace package_factory {
@@ -126,8 +133,9 @@ HHuginn::value_t HTextCreator::do_new_instance( HHuginn* huginn_ ) {
 			"Text",
 			nullptr,
 			HHuginn::field_definitions_t{
-				{ "split", make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::split, _1, _2, _3, _4 ) ) },
-				{ "join",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::join, _1, _2, _3, _4 ) ) }
+				{ "split",     make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::split, _1, _2, _3, _4 ) ) },
+				{ "join",      make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::join, _1, _2, _3, _4 ) ) },
+				{ "distance",  make_pointer<HHuginn::HClass::HMethod>( hcore::call( &HText::distance, _1, _2, _3, _4 ) ) }
 			}
 		)
 	);
