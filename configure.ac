@@ -404,19 +404,16 @@ if test ["${ac_cv_type_sighandler_t}"] = ["no"] -a ["${ac_cv_type___sighandler_t
 	AC_CHECK_TYPES([SIG_PF],[],[AC_MSG_ERROR([Cannot continue without signal handler type definition.])],[#include <signal.h>])
 fi
 AC_CHECK_FUNCS([clock_gettime timer_create getline memrchr strnlen getaddrinfo getnameinfo gethostbyname_r gethostbyaddr_r strcasestr pthread_setname_np pthread_set_name_np prctl])
-AC_CHECK_DECLS([strtold],[],[],[#include <cstdlib>])
-AC_CHECK_DECLS([VSWTC],[],[],[#include <termios.h>])
+AC_CHECK_DECLS([strtold, ERR],[],[],[#include <cstdlib>])
 AC_CHECK_DECLS([deflateInit],[],[],[#include <zlib.h>])
 AC_CHECK_DECLS([RLIMIT_AS, RLIMIT_NPROC],[],[],[#include <sys/resource.h>])
-AC_CHECK_DECLS([B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
+AC_CHECK_DECLS([VSWTC, B76800, B28800, B14400, B7200],[],[],[#include <termios.h>])
 AC_CHECK_DECLS([TEMP_FAILURE_RETRY],[],[],[#include <unistd.h>])
-AC_CHECK_DECLS([floorl, ceill, roundl],[],[],[#include <cmath>])
-AC_CHECK_DECLS([sqrtl, sincosl],[],[],[#include <cmath>])
+AC_CHECK_DECLS([expl, logl, sqrtl, sinl, cosl, tanl, asinl, acosl, atanl, sincosl, fmodl, floorl, ceill, roundl],[],[],[#include <cmath>])
 AC_CHECK_DECLS([has_mouse],[],[],[#include <${_NCURSES_HEADER}>])
 AC_CHECK_DECLS([SIGIOT],[],[],[#include <csignal>])
 AC_CHECK_DECLS([SUN_LEN],[],[],[#include <cstdlib>
 								#include <sys/un.h>])
-AC_CHECK_DECLS([ERR],[],[],[#include <cstdlib>])
 if test ["$MYSQL"] != ["no"] ; then
 	AC_CHECK_DECLS([MYSQL_AUTODETECT_CHARSET_NAME],[],[],[#include <mysql/mysql.h>])
 fi

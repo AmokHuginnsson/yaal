@@ -46,8 +46,17 @@
 #cmakedefine HAVE_PTHREAD_SET_NAME_NP
 #cmakedefine HAVE_PRCTL
 #cmakedefine01 HAVE_POWL
+#cmakedefine01 HAVE_DECL_EXPL
+#cmakedefine01 HAVE_DECL_LOGL
 #cmakedefine01 HAVE_DECL_SQRTL
+#cmakedefine01 HAVE_DECL_SINL
+#cmakedefine01 HAVE_DECL_COSL
+#cmakedefine01 HAVE_DECL_TANL
+#cmakedefine01 HAVE_DECL_ASINL
+#cmakedefine01 HAVE_DECL_ACOSL
+#cmakedefine01 HAVE_DECL_ATANL
 #cmakedefine01 HAVE_DECL_SINCOSL
+#cmakedefine01 HAVE_DECL_FMODL
 #cmakedefine01 HAVE_DECL_TEMP_FAILURE_RETRY
 #cmakedefine01 HAVE_DECL_FLOORL
 #cmakedefine01 HAVE_DECL_CEILL

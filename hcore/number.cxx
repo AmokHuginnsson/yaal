@@ -441,7 +441,7 @@ public:
 				_cache.push_back( yaal::move( n ) );
 			}
 		}
-		return ( *_cache[value_] );
+		return ( *_cache[static_cast<int long>( value_ )] );
 	}
 private:
 	HFactorialCache( void )

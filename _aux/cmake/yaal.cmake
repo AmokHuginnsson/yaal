@@ -151,16 +151,33 @@ endif()
 check_cxx_source_compiles("#include <cmath>
 	int main( int, char** ) { ::sqrtl( 0. ); return ( 0 ); }" HAVE_DECL_SQRTL )
 check_cxx_source_compiles("#include <cmath>
+	int main( int, char** ) { ::expl( 0. ); return ( 0 ); }" HAVE_DECL_EXPL )
+check_cxx_source_compiles("#include <cmath>
+	int main( int, char** ) { ::logl( 0. ); return ( 0 ); }" HAVE_DECL_LOGL )
+check_cxx_source_compiles("#include <cmath>
+	int main( int, char** ) { ::sinl( 0. ); return ( 0 ); }" HAVE_DECL_SINL )
+check_cxx_source_compiles("#include <cmath>
+	int main( int, char** ) { ::cosl( 0. ); return ( 0 ); }" HAVE_DECL_COSL )
+check_cxx_source_compiles("#include <cmath>
+	int main( int, char** ) { ::tanl( 0. ); return ( 0 ); }" HAVE_DECL_TANL )
+check_cxx_source_compiles("#include <cmath>
+	int main( int, char** ) { ::asinl( 0. ); return ( 0 ); }" HAVE_DECL_ASINL )
+check_cxx_source_compiles("#include <cmath>
+	int main( int, char** ) { ::acosl( 0. ); return ( 0 ); }" HAVE_DECL_ACOSL )
+check_cxx_source_compiles("#include <cmath>
+	int main( int, char** ) { ::atanl( 0. ); return ( 0 ); }" HAVE_DECL_ATANL )
+check_cxx_source_compiles("#include <cmath>
 	int main( int, char** ) { ::sincosl( 0., static_cast<double long*>( 0 ), static_cast<double long*>( 0 ) ); return ( 0 ); }" HAVE_DECL_SINCOSL )
 check_cxx_source_compiles( "#include <cmath>
 	int main( int, char** ) { ::powl( 0., 0. ); return ( 0 ); }" HAVE_POWL )
+check_cxx_source_compiles( "#include <cmath>
+	int main( int, char** ) { ::fmodl( 0., 0. ); return ( 0 ); }" HAVE_DECL_FMODL )
 check_cxx_source_compiles( "#include <cmath>
 	int main( int, char** ) { ::floorl( 0. ); return ( 0 ); }" HAVE_DECL_FLOORL )
 check_cxx_source_compiles( "#include <cmath>
 	int main( int, char** ) { ::ceill( 0. ); return ( 0 ); }" HAVE_DECL_CEILL )
 check_cxx_source_compiles( "#include <cmath>
 	int main( int, char** ) { ::roundl( 0. ); return ( 0 ); }" HAVE_DECL_ROUNDL )
-
 
 include( env )
 

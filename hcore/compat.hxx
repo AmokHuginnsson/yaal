@@ -98,6 +98,50 @@ int timer_delete( timer_t );
 double long powl( double long, double long );
 #endif /* #if ! defined( HAVE_POWL ) || ( HAVE_POWL == 0 ) */
 
+#if ! defined( HAVE_DECL_EXPL ) || ( HAVE_DECL_EXPL == 0 )
+double long expl( double long );
+#endif /* #if ! defined( HAVE_DECL_EXPL ) || ( HAVE_DECL_EXPL == 0 ) */
+
+#if ! defined( HAVE_DECL_LOGL ) || ( HAVE_DECL_LOGL == 0 )
+double long logl( double long );
+#endif /* #if ! defined( HAVE_DECL_LOGL ) || ( HAVE_DECL_LOGL == 0 ) */
+
+#if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 )
+double long sqrtl( double long );
+#endif /* #if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 ) */
+
+#if ! defined( HAVE_DECL_SINL ) || ( HAVE_DECL_SINL == 0 )
+double long sinl( double long );
+#endif /* #if ! defined( HAVE_DECL_SINL ) || ( HAVE_DECL_SINL == 0 ) */
+
+#if ! defined( HAVE_DECL_COSL ) || ( HAVE_DECL_COSL == 0 )
+double long cosl( double long );
+#endif /* #if ! defined( HAVE_DECL_COSL ) || ( HAVE_DECL_COSL == 0 ) */
+
+#if ! defined( HAVE_DECL_TANL ) || ( HAVE_DECL_TANL == 0 )
+double long tanl( double long );
+#endif /* #if ! defined( HAVE_DECL_TANL ) || ( HAVE_DECL_TANL == 0 ) */
+
+#if ! defined( HAVE_DECL_ASINL ) || ( HAVE_DECL_ASINL == 0 )
+double long asinl( double long );
+#endif /* #if ! defined( HAVE_DECL_ASINL ) || ( HAVE_DECL_ASINL == 0 ) */
+
+#if ! defined( HAVE_DECL_ACOSL ) || ( HAVE_DECL_ACOSL == 0 )
+double long acosl( double long );
+#endif /* #if ! defined( HAVE_DECL_ACOSL ) || ( HAVE_DECL_ACOSL == 0 ) */
+
+#if ! defined( HAVE_DECL_ATANL ) || ( HAVE_DECL_ATANL == 0 )
+double long atanl( double long );
+#endif /* #if ! defined( HAVE_DECL_ATANL ) || ( HAVE_DECL_ATANL == 0 ) */
+
+#if ! defined( HAVE_DECL_SINCOSL ) || ( HAVE_DECL_SINCOSL == 0 )
+void sincosl( double long, double long*, double long* );
+#endif /* #if ! defined( HAVE_DECL_SINCOSL ) || ( HAVE_DECL_SINCOSL == 0 ) */
+
+#if ! defined( HAVE_DECL_FMODL ) || ( HAVE_DECL_FMODL == 0 )
+double long fmodl( double long, double long );
+#endif /* #if ! defined( HAVE_DECL_FMODL ) || ( HAVE_DECL_FMODL == 0 ) */
+
 #if ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 )
 double long floorl( double long );
 #endif /* #if ! defined( HAVE_DECL_FLOORL ) || ( HAVE_DECL_FLOORL == 0 ) */
@@ -109,14 +153,6 @@ double long ceill( double long );
 #if ! defined( HAVE_DECL_ROUNDL ) || ( HAVE_DECL_ROUNDL == 0 )
 double long roundl( double long );
 #endif /* #if ! defined( HAVE_DECL_ROUNDL ) || ( HAVE_DECL_ROUNDL == 0 ) */
-
-#if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 )
-double long sqrtl( double long );
-#endif /* #if ! defined( HAVE_DECL_SQRTL ) || ( HAVE_DECL_SQRTL == 0 ) */
-
-#if ! defined( HAVE_DECL_SINCOSL ) || ( HAVE_DECL_SINCOSL == 0 )
-void sincosl( double long, double long*, double long* );
-#endif /* #if ! defined( HAVE_DECL_SINCOSL ) || ( HAVE_DECL_SINCOSL == 0 ) */
 
 #if ! defined( HAVE_DECL_STRTOLD ) || ( HAVE_DECL_STRTOLD == 0 )
 double long strtold( char const*, char** );
