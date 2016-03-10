@@ -620,8 +620,12 @@ int long long HNumber::to_integer( void ) const {
 			value += data[ 1 ];
 		}
 		if ( _integralPartSize > 2 ) {
+			int long long old( value );
 			value *= LEAF;
 			value += data[ 2 ];
+			if ( value < old ) {
+				throw HNumberException( "integer overflow" );
+			}
 		}
 	}
 	return ( ! _negative ? value : -value );
