@@ -1214,6 +1214,35 @@ void OCompiler::dispatch_power( executing_parser::position_t position_ ) {
 	M_EPILOG
 }
 
+void OCompiler::dispatch_factorial( executing_parser::position_t position_ ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._valueTypes.is_empty() );
+	defer_action( &HExpression::factorial, position_ );
+	if ( ! is_numeric_congruent( fc._valueTypes.top() ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Operand is not a numeric value.", position_.get() );
+	}
+	return;
+	M_EPILOG
+}
+
+void OCompiler::dispatch_negate( executing_parser::position_t position_ ) {
+	M_PROLOG
+	OFunctionContext& fc( f() );
+	M_ASSERT( ! fc._operations.is_empty() );
+	OPositionedOperator const& po(  fc._operations.top() );
+	int p( po._position  );
+	M_ASSERT( po._operator == OPERATOR::NEGATE );
+	M_ASSERT( ! fc._valueTypes.is_empty() );
+	defer_action( &HExpression::negate, position_ );
+	fc._operations.pop();
+	if ( ! is_numeric_congruent( fc._valueTypes.top() ) ) {
+		throw HHuginn::HHuginnRuntimeException( "Operand is not a numeric value.", p );
+	}
+	return;
+	M_EPILOG
+}
+
 void OCompiler::dispatch_compare( executing_parser::position_t position_ ) {
 	M_PROLOG
 	OFunctionContext& fc( f() );
@@ -1498,18 +1527,11 @@ void OCompiler::dispatch_action( OPERATOR oper_, executing_parser::position_t po
 	OPERATOR o( po._operator );
 	int p( po._position );
 	switch ( oper_ ) {
-		case ( OPERATOR::PLUS ):     { dispatch_plus( position_ );  } break;
-		case ( OPERATOR::MULTIPLY ): { dispatch_mul( position_ );   } break;
-		case ( OPERATOR::POWER ):    { dispatch_power( position_ ); } break;
-		case ( OPERATOR::NEGATE ): {
-			M_ASSERT( o == OPERATOR::NEGATE );
-			M_ASSERT( ! fc._valueTypes.is_empty() );
-			defer_action( &HExpression::negate, position_ );
-			fc._operations.pop();
-			if ( ! is_numeric_congruent( fc._valueTypes.top() ) ) {
-				throw HHuginn::HHuginnRuntimeException( "Operand is not a numeric value.", p );
-			}
-		} break;
+		case ( OPERATOR::PLUS ):          { dispatch_plus( position_ );          } break;
+		case ( OPERATOR::MULTIPLY ):      { dispatch_mul( position_ );           } break;
+		case ( OPERATOR::POWER ):         { dispatch_power( position_ );         } break;
+		case ( OPERATOR::FACTORIAL ):     { dispatch_factorial( position_ );     } break;
+		case ( OPERATOR::NEGATE ):        { dispatch_negate( position_ );        } break;
 		case ( OPERATOR::SUBSCRIPT ):     { dispatch_subscript( position_ );     } break;
 		case ( OPERATOR::ASSIGN ):        { dispatch_assign( position_ );        } break;
 		case ( OPERATOR::MEMBER_ACCESS ): { dispatch_member_access( position_ ); } break;

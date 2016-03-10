@@ -386,6 +386,16 @@ void HExpression::mod( HFrame* frame_, int ) {
 	M_EPILOG
 }
 
+void HExpression::factorial( huginn::HFrame* frame_, int position_ ) {
+	M_PROLOG
+	M_ASSERT( ! frame_->values().is_empty() );
+	HHuginn::value_t v( yaal::move( frame_->values().top() ) );
+	frame_->values().pop();
+	frame_->values().push( value_builtin::factorial( frame_->thread(), v, position_ ) );
+	return;
+	M_EPILOG
+}
+
 void HExpression::negate( HFrame* frame_, int ) {
 	M_PROLOG
 	M_ASSERT( ! frame_->operations().is_empty() );

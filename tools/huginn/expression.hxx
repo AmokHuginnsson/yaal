@@ -69,6 +69,7 @@ public:
 	void mul( huginn::HFrame*, int );
 	void div( huginn::HFrame*, int );
 	void mod( huginn::HFrame*, int );
+	void factorial( huginn::HFrame*, int );
 	void negate( huginn::HFrame*, int );
 	void function_call( huginn::HFrame*, int );
 	void make_dict( huginn::HFrame*, int );

@@ -175,11 +175,15 @@ executing_parser::HRule HHuginn::make_engine( void ) {
 		| ( stringLiteral >> -subscriptOperator )
 		| ( lambda >> -( functionCallOperator >> dereference ) )
 	);
+	HRule factorial(
+		"factorial",
+		atom >> -( constant( '!' )[HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::FACTORIAL, _1 ) )] ^ '=' )
+	);
 	HRule negation(
 		"negation",
-		( constant( '-' )[HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::NEGATE, _1 ) )] >> atom )[
+		( constant( '-' )[HRuleBase::action_position_t( hcore::call( &OCompiler::defer_oper_direct, _compiler.get(), OPERATOR::NEGATE, _1 ) )] >> factorial )[
 			e_p::HRuleBase::action_position_t( hcore::call( &OCompiler::dispatch_action, _compiler.get(), OPERATOR::NEGATE, _1 ) )
-		] | atom
+		] | factorial
 	);
 	HRule booleanNot(
 		"booleanNot", (

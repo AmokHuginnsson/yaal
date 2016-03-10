@@ -50,6 +50,7 @@ void mod( HThread*, HHuginn::value_t&, HHuginn::value_t const&, int );
 void pow( HHuginn::value_t&, HHuginn::value_t const&, int );
 HHuginn::value_t abs( HThread*, HHuginn::value_t const&, int );
 HHuginn::value_t neg( HThread*, HHuginn::value_t const&, int );
+HHuginn::value_t factorial( HThread*, HHuginn::value_t const&, int );
 bool equals( HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool less( HHuginn::value_t const&, HHuginn::value_t const&, int );
 bool less_low( HHuginn::value_t const&, HHuginn::value_t const& );

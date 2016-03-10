@@ -317,6 +317,7 @@ char const* op_to_str( OPERATOR o_ ) {
 		case ( OPERATOR::DIVIDE ):             str = "/";      break;
 		case ( OPERATOR::MODULO ):             str = "%";      break;
 		case ( OPERATOR::POWER ):              str = "^";      break;
+		case ( OPERATOR::FACTORIAL ):          str = "x!";     break;
 		case ( OPERATOR::ABSOLUTE ):           str = "|...|";  break;
 		case ( OPERATOR::PARENTHESIS ):        str = "(...)";  break;
 		case ( OPERATOR::ASSIGN ):             str = "=";      break;
@@ -341,7 +342,7 @@ char const* op_to_str( OPERATOR o_ ) {
 		case ( OPERATOR::BOOLEAN_AND ):        str = "&&";     break;
 		case ( OPERATOR::BOOLEAN_OR ):         str = "||";     break;
 		case ( OPERATOR::BOOLEAN_XOR ):        str = "^^";     break;
-		case ( OPERATOR::BOOLEAN_NOT ):        str = "!";      break;
+		case ( OPERATOR::BOOLEAN_NOT ):        str = "!x";     break;
 		case ( OPERATOR::TERNARY ):            str = "?:";     break;
 		case ( OPERATOR::MAKE_DICT ):          str = "{k:v}";  break;
 		case ( OPERATOR::NONE ): break;

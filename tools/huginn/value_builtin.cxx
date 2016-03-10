@@ -349,6 +349,25 @@ void pow( HHuginn::value_t& v1_, HHuginn::value_t const& v2_, int position_ ) {
 	return;
 }
 
+HHuginn::value_t factorial( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
+	HHuginn::value_t res;
+	HHuginn::type_id_t typeId( v_->type_id() );
+	if ( typeId == HHuginn::TYPE::NUMBER ) {
+		HNumber const& n( static_cast<HHuginn::HNumber const*>( v_.raw() )->value() );
+		HHuginn& h( thread_->huginn() );
+		if ( n < number::N0 ) {
+			thread_->raise( h.object_factory()->arithmetic_exception_class(), "Factorial from negative.", position_ );
+		}
+		if ( ! n.is_integral() ) {
+			thread_->raise( h.object_factory()->arithmetic_exception_class(), "Factorial from fraction.", position_ );
+		}
+		res = thread_->object_factory().create_number( number::factorial( n.to_integer() ) );
+	} else {
+		throw HHuginn::HHuginnRuntimeException( "There is no `!` operator for `"_ys.append( v_->get_class()->name() ).append( "'." ), position_ );
+	}
+	return ( res );
+}
+
 HHuginn::value_t abs( HThread* thread_, HHuginn::value_t const& v_, int position_ ) {
 	HHuginn::value_t res;
 	HHuginn::type_id_t typeId( v_->type_id() );

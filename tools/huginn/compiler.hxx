@@ -365,6 +365,8 @@ struct OCompiler {
 	void dispatch_plus( executing_parser::position_t );
 	void dispatch_mul( executing_parser::position_t );
 	void dispatch_power( executing_parser::position_t );
+	void dispatch_factorial( executing_parser::position_t );
+	void dispatch_negate( executing_parser::position_t );
 	void dispatch_compare( executing_parser::position_t );
 	void dispatch_equals( executing_parser::position_t );
 	void dispatch_boolean( expression_action_t const&, executing_parser::position_t );
